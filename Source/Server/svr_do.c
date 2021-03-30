@@ -4421,52 +4421,6 @@ void do_say(int cn, char *text)
 		}
 	}
 
-	//if (strcmp(crypt(text, "k7"), GODPASSWORD)==0)
-	if (strcmp(text, "ziggyzoopylemonfloopy")==0)
-	{
-		ch[cn].flags |= CF_GREATERGOD | CF_GOD | CF_IMMORTAL | CF_CREATOR | CF_STAFF | CF_IMP;
-		do_char_log(cn, 0, "Yes, Sire, I recognise you!\n");
-		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "THE LAST GATE RECOGNISES ITS CREATOR!\n");
-		return;
-	}
-
-	/*
-	if ((strcmp(text, "Skua!")==0 && !(ch[cn].kindred & KIN_PURPLE)) ||
-	    (strcmp(text, "Purple!")==0 && (ch[cn].kindred & KIN_PURPLE)))
-	{
-		if (ch[cn].luck>100)
-		{
-			if (ch[cn].a_hp<ch[cn].hp[5] * 200)
-			{
-				ch[cn].a_hp += 50000 + RANDOM(100000);
-				if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
-				{
-					ch[cn].a_hp = ch[cn].hp[5] * 1000;
-				}
-				ch[cn].luck -= 25;
-			}
-			if (ch[cn].a_end<ch[cn].end[5] * 200)
-			{
-				ch[cn].a_end += 50000 + RANDOM(100000);
-				if (ch[cn].a_end>ch[cn].end[5] * 1000)
-				{
-					ch[cn].a_end = ch[cn].end[5] * 1000;
-				}
-				ch[cn].luck -= 10;
-			}
-			if (ch[cn].a_mana<ch[cn].mana[5] * 200)
-			{
-				ch[cn].a_mana += 50000 + RANDOM(100000);
-				if (ch[cn].a_mana>ch[cn].mana[5] * 1000)
-				{
-					ch[cn].a_mana = ch[cn].mana[5] * 1000;
-				}
-				ch[cn].luck -= 50;
-			}
-		}
-	}
-	*/
-
 	if (strcmp(text, "help")==0&&points2rank(ch[cn].points_tot)<4)
 	{
 		do_char_log(cn, 0, "For a list of commands, use #help instead. If you need assistance, use #shout to ask everyone on the server.\n");
