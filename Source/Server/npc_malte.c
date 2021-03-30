@@ -118,7 +118,7 @@ void npc_malte_low(int cn)
 		do_sayx(cn, "I found this part of the coin, and I heard that Damor in Aston has another one. Ask him for the 'Black Stronghold Coin'.");
 		ch[cn].data[2] = globs->ticker + TICKS * 5;
 		ch[cn].data[1]++;
-		in = ch[cn].citem = god_create_item(763);
+		in = ch[cn].citem = god_create_item(763, 0);
 		it[in].carried = cn;
 		ch[cn].misc_action  = DR_GIVE;
 		ch[cn].misc_target1 = co;
@@ -140,6 +140,55 @@ void npc_malte_low(int cn)
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 		break;
 	case    6:
+		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");
+		plr_map_remove(cn);
+		god_destroy_items(cn);
+		ch[cn].used = USE_EMPTY;
+		break;
+	}
+}
+
+void npc_archeologist_low(int cn)
+{
+	int co, in;
+
+	if (globs->ticker<ch[cn].data[2])
+	{
+		return;
+	}
+
+	co = ch[cn].data[0];
+
+	switch(ch[cn].data[1])
+	{
+	case    0:
+		do_sayx(cn, "Thank you so much for saving me, %s!", ch[co].name);
+		ch[cn].data[2] = globs->ticker + TICKS * 6;
+		ch[cn].data[1]++;
+		ch[cn].misc_action  = DR_TURN;
+		ch[cn].misc_target1 = DX_DOWN;
+		break;
+	case    1:
+		do_sayx(cn, "Before the monsters caught me, I found this golden skull. Please take it, if you would.");
+		ch[cn].data[2] = globs->ticker + TICKS * 4;
+		ch[cn].data[1]++;
+		in = ch[cn].citem = god_create_item(1617, 0);
+		it[in].carried = cn;
+		ch[cn].misc_action  = DR_GIVE;
+		ch[cn].misc_target1 = co;
+		break;
+	case    2:
+		do_sayx(cn, "I'm sure my collegue is worried for me. Give them that skull and let them know I'm safe.");
+		ch[cn].data[2] = globs->ticker + TICKS * 6;
+		ch[cn].data[1]++;
+		break;
+	case    3:
+		do_sayx(cn, "I will recall now. I've had enough of this place!");
+		ch[cn].data[2] = globs->ticker + TICKS * 4;
+		ch[cn].data[1]++;
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		break;
+	case    4:
 		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");
 		plr_map_remove(cn);
 		god_destroy_items(cn);

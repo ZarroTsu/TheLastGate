@@ -102,7 +102,9 @@ int char_wears_item(int cn, int tmp);
 
 // --- god ---
 void god_init_freelist(void);
-int god_create_item(int temp);
+
+int god_create_buff(void);
+int god_create_item(int temp, int godwep);
 int god_create_char(int temp, int withitems);
 int god_drop_item(int nr, int x, int y);
 int god_drop_item_fuzzy(int nr, int x, int y);
@@ -170,9 +172,13 @@ void god_init_badnames(void);
 int god_is_badname(char *name);
 int god_read_banlist(void);
 void god_shutup(int cn, int co);
+void god_cleanslots(int cn);
+void god_reset_greeters(int cn);
+void god_reset_ticker(int cn);
 
 // ---- do ----
 void do_log(int cn, int font, char *text);
+int do_surround_check(int cn, int co, int gethit);
 void do_attack(int cn, int co, int surround);
 int do_char_can_see(int cn, int co);
 int do_char_can_see_item(int cn, int in);
@@ -186,19 +192,29 @@ void do_announce(int source, int author, char *format, ...);
 int do_raise_attrib(int cn, int nr);
 int do_raise_skill(int cn, int nr);
 int do_raise_hp(int cn);
-int do_raise_end(int cn);
+//int do_raise_end(int cn);
 int do_raise_mana(int cn);
 int do_lower_hp(int cn);
 int do_lower_mana(int cn);
 
 int attrib_needed(int v, int diff);
 int hp_needed(int v, int diff);
-int end_needed(int v, int diff);
+//int end_needed(int v, int diff);
 int mana_needed(int v, int diff);
 int skill_needed(int v, int diff);
-
+//
+int get_attrib_base(int cn, int n);
+int get_skill_base(int cn, int n);
+int get_attrib_score(int cn, int n);
+int get_skill_score(int cn, int n);
+int get_fight_skill(int cn);
+int get_combat_skill(int cn, int flag);
+int get_offhand_skill(int cn, int flag);
+int get_tarot(int cn, int in);
+//
 void do_add_light(int x, int y, int stren);
 int do_store_item(int cn);
+int do_check_fool(int cn, int in);
 int do_swap_item(int cn, int n);
 void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag);
 void do_look_item(int cn, int in);
@@ -209,7 +225,7 @@ int do_char_score(int cn);
 void do_area_log(int cn, int co, int x, int y, int font, char *format, ...) __attribute__ ((format(printf, 6, 7)));
 int do_char_can_flee(int cn);
 void remove_enemy(int cn);
-void do_char_killed(int cn, int co);
+void do_char_killed(int cn, int co, int pentsolve);
 void do_give(int cn, int co);
 void do_area_sound(int cn, int co, int x, int y, int nr);
 void do_notify_char(int cn, int type, int dat1, int dat2, int dat3, int dat4);
@@ -217,7 +233,6 @@ void do_area_notify(int cn, int co, int xs, int ys, int type, int dat1, int dat2
 void do_npc_shout(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_shop_char(int cn, int co, int nr);
 void do_give_exp(int cn, int p, int gflag, int rank);
-int get_fight_skill(int cn);
 int do_hurt(int cn, int co, int dam, int type);
 void do_staff_log(int font, char *format, ...) __attribute__ ((format(printf, 2, 3)));
 int do_remove_unique(int cn);
@@ -237,10 +252,12 @@ int dbatoi_self(int cn, char *text);
 void do_seen(int cn, char *cco);
 void do_spellignore(int cn);
 int isgroup(int cn, int co);
+int isnearby(int cn, int co);
 void do_afk(int cn, char *msg);
 void do_ransack_corpse(int cn, int co, char *msg);
 void remember_pvp(int cn, int co);
 void really_update_char(int cn);
+void do_appraisal(int cn, int in);
 
 //-- use --
 void use_driver(int cn, int in, int worn);
@@ -254,6 +271,7 @@ int item_age(int in);
 void step_driver_remove(int cn, int in);
 int sub_door_driver(int cn, int in);
 void finish_laby_teleport(int cn, int nr, int exp_pts);
+void show_pent_count(int cn);
 
 //-- effect --
 void effect_tick(void);
@@ -261,6 +279,7 @@ int fx_add_effect(int type, int duration, int d1, int d2, int d3);
 
 // -- look --
 void look_driver(int cn, int in);
+void look_door(int cn, int in);
 
 //-- build --
 void build_drop(int x, int y, int in);
@@ -284,6 +303,7 @@ int absrankdiff(int cn, int co);
 int in_attackrange(int cn, int co);
 int in_grouprange(int cn, int co);
 int points2rank(int v);
+int rank2points(int v);
 int points_tolevel(int curr_exp);
 int scale_exps(int cn, int co, int exps);
 int scale_exps2(int cn, int co_rank, int exps);
@@ -307,11 +327,13 @@ void set_cap(int cn, int nr);
 
 //-- skill_driver --
 int spell_immunity(int power, int immun);
+int spell_race_mod(int power, int cn);
 int friend_is_enemy(int cn, int cc);
 void skill_driver(int cn, int nr);
 void char_info(int cn, int co);
 void item_info(int cn, int in, int look);
 void spell_from_item(int cn, int in2);
+int has_spell_from_item(int cn, int temp);
 int add_spell(int cn, int in);
 void remove_spells(int cn);
 int is_facing(int cn, int co);
@@ -321,14 +343,21 @@ int spell_protect(int cn, int co, int power);
 int spell_enhance(int cn, int co, int power);
 int spell_bless(int cn, int co, int power);
 int spell_mshield(int cn, int co, int power);
+int spell_haste(int cn, int co, int power);
 int spell_heal(int cn, int co, int power);
-int spell_curse(int cn, int co, int power);
-int spell_stun(int cn, int co, int power);
+int get_target_resistance(int co);
+int get_target_immunity(int co);
+int spell_curse(int cn, int co, int power, int flag);
+int spell_slow(int cn, int co, int power, int flag);
+int spell_poison(int cn, int co, int power, int flag);
+int spell_scorch(int cn, int co, int power, int flag);
+int spell_weaken(int cn, int co, int power, int flag);
 int skill_lookup(char *skill);
 int chance_base(int cn, int skill, int d20, int power);
 int player_or_ghost(int cn, int co);
 
 // -- driver --
+int is_inline(int cn, int linenum);
 int npc_driver_high(int cn);
 void npc_driver_low(int cn);
 int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4);
@@ -342,11 +371,14 @@ int npc_remove_enemy(int npc, int enemy);
 void die_companion(int cn);
 int is_potion(int in);
 int is_scroll(int in);
+int is_soulstone(int in);
+int is_unique_able(int in);
 int is_unique(int in);
 
 // --- talk ---
 void npc_hear(int cn, int co, char *text);
 void strlower(char *str);
+int stronghold_points(int cn);
 
 // --- area ---
 char *get_area(int cn, int verbose);

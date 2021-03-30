@@ -12,7 +12,8 @@ OBJS=.obj/server.o .obj/svr_disk.o .obj/svr_tick.o .obj/svr_act.o \
 .obj/driver_etc.o .obj/driver_generic.o .obj/populate.o \
 .obj/helper.o .obj/skill.o .obj/skill_driver.o .obj/talk.o \
 .obj/area.o .obj/path.o .obj/stunrun.o .obj/cityattack.o \
-.obj/npc_malte.o .obj/lab9.o .obj/rdtsc.o .obj/ccp_driver.o
+.obj/npc_malte.o .obj/lab9.o .obj/rdtsc.o .obj/ccp_driver.o \
+.obj/npc_shiva.o
 
 SHEADER=client.h data.h funcs.h gendefs.h globals.h server.h driver.h \
 lab9.h
@@ -25,14 +26,14 @@ USERNAME := $(shell logname)
 structure:
 	sudo mkdir -p $(SERVERDIR)
 	sudo mkdir -p $(SERVERDIR)/.obj
-	sudo mkdir -p $(SERVERDIR)/.dat
+	#sudo mkdir -p $(SERVERDIR)/.dat
 	sudo mkdir -p $(SERVERDIR)/.save
 	sudo mkdir -p $(SERVERDIR)/.tmp
 	sudo cp start.sh $(SERVERDIR)/start.sh
 	sudo cp shutdown.sh $(SERVERDIR)/shutdown.sh
 	sudo chmod a+x $(SERVERDIR)/start.sh
 	sudo chmod a+x $(SERVERDIR)/shutdown.sh
-	sudo cp .dat/*.* $(SERVERDIR)/.dat/
+	#sudo cp .dat/*.* $(SERVERDIR)/.dat/
 	sudo chmod -R a+rwx $(SERVERDIR)/.dat/
 	sudo chmod a+rwx $(SERVERDIR)/.save
 	sudo chmod a+rwx $(SERVERDIR)/.tmp
@@ -84,6 +85,9 @@ password: password.c $(SHEADER)
 
 .obj/npc_malte.o:	npc_malte.c $(SHEADER) npc.h
 	$(CC) $(CFLAGS) -o .obj/npc_malte.o -c npc_malte.c
+	
+.obj/npc_shiva.o:	npc_shiva.c $(SHEADER) npc.h
+	$(CC) $(CFLAGS) -o .obj/npc_shiva.o -c npc_shiva.c
 
 .obj/cityattack.o:	cityattack.c $(SHEADER) npc.h
 	$(CC) $(CFLAGS) -o .obj/cityattack.o -c cityattack.c

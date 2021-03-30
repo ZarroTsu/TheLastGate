@@ -36,7 +36,20 @@
 // data[50] to data[70] are safe to use:
 // data[50] to data[69]: timer for seen array
 
+#define GROLMY_X_1	308 // Top left corner of outer door area
+#define GROLMY_X_2	326 // Bottom right corner of outer door area
+#define GROLMY_X_3	325 // Far wander point A
+#define GROLMY_X_4	326 // Far wander point B
+#define GROLMY_X_5	313 // Home on rug
 
+#define GROLMY_Y_1	488 // Top left corner of outer door area
+#define GROLMY_Y_2	496 // Bottom right corner of outer door area
+#define GROLMY_Y_3	454 // Far wander point A
+#define GROLMY_Y_4	455 // Far wander point B
+#define GROLMY_Y_5	511 // Home on rug
+
+
+//{
 int npc_stunrun_add_seen(int cn, int co)
 {
 	int n;
@@ -65,7 +78,6 @@ int npc_stunrun_add_seen(int cn, int co)
 
 	return(1);
 }
-
 
 int npc_stunrun_gotattack(int cn, int co)
 {
@@ -187,7 +199,7 @@ int npc_check_target(int x, int y)
 	m = x + y * MAPX;
 
 	if (((unsigned long)map[m].flags & (MF_MOVEBLOCK | MF_NOMONST)) || map[m].ch || map[m].to_ch ||
-	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2))
+	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78))
 	{
 		return( 0);
 	}
@@ -199,15 +211,15 @@ int npc_is_stunned(int cn)
 {
 	int n, in;
 
-	for (n = 0; n<20; n++)
+	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && it[in].temp==SK_STUN)
+		if ((in = ch[cn].spell[n]) && bu[in].temp==SK_SLOW && bu[in].active > bu[in].duration/4*3) // it[in].temp < 500)
 		{
 			break;
 		}
 	}
 
-	if (n<20)
+	if (n<MAXBUFFS)
 	{
 		return( 1);
 	}
@@ -219,15 +231,15 @@ int npc_is_blessed(int cn)
 {
 	int n, in;
 
-	for (n = 0; n<20; n++)
+	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && it[in].temp==SK_BLESS)
+		if ((in = ch[cn].spell[n]) && bu[in].temp==SK_BLESS)
 		{
 			break;
 		}
 	}
 
-	if (n<20)
+	if (n<MAXBUFFS)
 	{
 		return( 1);
 	}
@@ -244,6 +256,7 @@ struct seen
 	int help;
 };
 
+//}
 int npc_stunrun_high(int cn)
 {
 	int n, co, maxseen = 0, m, tmp, done = 0, in;
@@ -254,6 +267,8 @@ int npc_stunrun_high(int cn)
 	int up = 0, down = 0, left = 0, right = 0;         // directions to move in
 
 	ch[cn].data[92] = TICKS * 60;
+
+	//{
 
 	for (n = 0; n<20; n++)
 	{
@@ -276,7 +291,7 @@ int npc_stunrun_high(int cn)
 				seen[maxseen].friend = 0;
 				if (!npc_is_stunned(co))
 				{
-					seen[maxseen].stun = (ch[cn].skill[SK_STUN][5] * 12>ch[co].skill[SK_RESIST][5] * 10);
+					seen[maxseen].stun = (get_skill_score(cn, SK_SLOW) * 12>get_target_resistance(co) * 10);
 				}
 				else
 				{
@@ -357,7 +372,7 @@ int npc_stunrun_high(int cn)
 			seen[maxseen].co = co;
 			seen[maxseen].dist = npc_dist(cn, co);
 			seen[maxseen].friend = 0;
-			seen[maxseen].stun = (ch[cn].skill[SK_STUN][5] * 12>ch[co].skill[SK_RESIST][5] * 10);
+			seen[maxseen].stun = (get_skill_score(cn, SK_SLOW) * 12>get_target_resistance(co) * 10);
 			if (seen[maxseen].stun)
 			{
 				seen[maxseen].stun += 5;
@@ -654,7 +669,7 @@ int npc_stunrun_high(int cn)
 			if ((co = ch[cn].data[20]))
 			{
 				ch[cn].attack_cn = co;
-				npc_try_spell(cn, co, SK_STUN);
+				npc_try_spell(cn, co, SK_SLOW);
 				done = 1;
 			}
 		}
@@ -690,7 +705,7 @@ int npc_stunrun_high(int cn)
 		}
 		if (tmp>0)
 		{
-			done = npc_try_spell(cn, seen[m].co, SK_STUN);
+			done = npc_try_spell(cn, seen[m].co, SK_SLOW);
 			if (!done)
 			{
 				done = npc_try_spell(cn, seen[m].co, SK_CURSE);
@@ -734,12 +749,10 @@ int npc_stunrun_high(int cn)
 		}
 	}
 
-
+//}
 
 	if (!done)
 	{
-
-
 		if (ch[cn].data[22]==0)         // staying at home
 		{
 			if ((in = ch[cn].citem))
@@ -755,9 +768,9 @@ int npc_stunrun_high(int cn)
 			{
 				int x, y;
 
-				for (y = 322, tmp = 0; y<=332 && !tmp; y++)
+				for (y = GROLMY_Y_1, tmp = 0; y<=GROLMY_Y_2 && !tmp; y++)
 				{
-					for (x = 212; x<=232 && !tmp; x++)
+					for (x = GROLMY_X_1; x<=GROLMY_X_2 && !tmp; x++)
 					{
 						if ((co = map[x + y * MAPX].ch) && ch[co].data[42]!=ch[cn].data[42])
 						{
@@ -776,28 +789,28 @@ int npc_stunrun_high(int cn)
 		{
 			if (!ch[cn].citem)
 			{
-				in = god_create_item(718);
+				in = god_create_item(718, 0);
 				ch[cn].citem = in;
 				it[in].carried = cn;
 			}
-			if (abs(ch[cn].x - 264) + abs(ch[cn].y - 317)<20)
+			if (abs(ch[cn].x - GROLMY_X_3) + abs(ch[cn].y - GROLMY_Y_3)<20)
 			{
 				ch[cn].data[22] = 2;
 				ch[cn].data[23] = globs->ticker;
 			}
 			else
 			{
-				if (npc_check_target(264, 317))
+				if (npc_check_target(GROLMY_X_3, GROLMY_Y_3))
 				{
-					ch[cn].goto_x = 264;
-					ch[cn].goto_y = 317;
+					ch[cn].goto_x = GROLMY_X_3; // Lower pents a
+					ch[cn].goto_y = GROLMY_Y_3;
 				}
-				else if (npc_check_target(265, 318))
+				else if (npc_check_target(GROLMY_X_4, GROLMY_Y_4))
 				{
-					ch[cn].goto_x = 265;
-					ch[cn].goto_y = 318;
+					ch[cn].goto_x = GROLMY_X_4; // Lower pents b
+					ch[cn].goto_y = GROLMY_Y_4;
 				}
-				if (ch[cn].x>232)
+				if (ch[cn].x>GROLMY_X_2)
 				{
 					ch[cn].data[24] = globs->ticker;
 				}
@@ -809,7 +822,7 @@ int npc_stunrun_high(int cn)
 		}
 		if (ch[cn].data[22]==2)         // moving towards home
 		{
-			if (abs(ch[cn].x - 217) + abs(ch[cn].y - 349)<3)
+			if (abs(ch[cn].x - GROLMY_X_5) + abs(ch[cn].y - GROLMY_Y_5)<3)
 			{
 				ch[cn].data[22] = 0;
 				ch[cn].data[23] = globs->ticker;
@@ -817,8 +830,8 @@ int npc_stunrun_high(int cn)
 			}
 			else
 			{
-				ch[cn].goto_x = 217;
-				ch[cn].goto_y = 349;
+				ch[cn].goto_x = GROLMY_X_5; // Middle of rug
+				ch[cn].goto_y = GROLMY_Y_5;
 			}
 		}
 	}

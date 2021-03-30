@@ -67,226 +67,85 @@ void init_lights(void)
 int pop_create_item(int temp, int cn)
 {
 	int in = 0;
-
-	if (!in && ch[cn].alignment<0 && !RANDOM(150))
+	int enbl = 0;
+	
+	int godroll = 0;
+	char *gend, *godn, name[60], refer[60], descr[220];
+	
+	if (is_unique_able(temp))
 	{
-		switch(temp)                                            // gorn uniques
+		if (!in && ch[cn].alignment<0 && !RANDOM(150))			// Reward a unique weapon
 		{
-		case    27:
-			in = god_create_item(542);
-			break;                                          // bronze dagger
-		case    28:
-			in = god_create_item(543);
-			break;                                          // steel dagger
-		case    29:
-			in = god_create_item(544);
-			break;                                          // gold dagger
-		case    30:
-			in = god_create_item(545);
-			break;                                          // crystal dagger
-		case    523:
-			in = god_create_item(546);
-			break;                                          // titan dagger
-		case    31:
-			in = god_create_item(547);
-			break;                                          // bronze sword
-		case    32:
-			in = god_create_item(548);
-			break;                                          // steel sword
-		case    33:
-			in = god_create_item(549);
-			break;                                          // gold sword
-		case    34:
-			in = god_create_item(550);
-			break;                                          // crystal sword
-		case    524:
-			in = god_create_item(551);
-			break;                                          // titan sword
-		case    35:
-			in = god_create_item(552);
-			break;                                          // bronze two
-		case    36:
-			in = god_create_item(553);
-			break;                                          // steel two
-		case    37:
-			in = god_create_item(554);
-			break;                                          // gold two
-		case    38:
-			in = god_create_item(555);
-			break;                                          // crystal two
-		case    125:
-			in = god_create_item(556);
-			break;                                          // titan two
-		default:
-			break;
-		}
-	}
-
-	if (!in && ch[cn].alignment<0 && !RANDOM(150))
-	{
-		switch(temp)                                            // kwai uniques
-		{
-		case    27:
-			in = god_create_item(527);
-			break;                                          // bronze dagger
-		case    28:
-			in = god_create_item(528);
-			break;                                          // steel dagger
-		case    29:
-			in = god_create_item(529);
-			break;                                          // gold dagger
-		case    30:
-			in = god_create_item(530);
-			break;                                          // crystal dagger
-		case    523:
-			in = god_create_item(531);
-			break;                                          // titan dagger
-		case    31:
-			in = god_create_item(532);
-			break;                                          // bronze sword
-		case    32:
-			in = god_create_item(533);
-			break;                                          // steel sword
-		case    33:
-			in = god_create_item(534);
-			break;                                          // gold sword
-		case    34:
-			in = god_create_item(535);
-			break;                                          // crystal sword
-		case    524:
-			in = god_create_item(536);
-			break;                                          // titan sword
-		case    35:
-			in = god_create_item(537);
-			break;                                          // bronze two
-		case    36:
-			in = god_create_item(538);
-			break;                                          // steel two
-		case    37:
-			in = god_create_item(539);
-			break;                                          // gold two
-		case    38:
-			in = god_create_item(540);
-			break;                                          // crystal two
-		case    125:
-			in = god_create_item(541);
-			break;                                          // titan two
-		default:
-			break;
-		}
-	}
-
-	if (!in && ch[cn].alignment<0 && !RANDOM(150))
-	{
-		switch(temp)                                            // purple one uniques
-		{
-		case    27:
-			in = god_create_item(572);
-			break;                                          // bronze dagger
-		case    28:
-			in = god_create_item(573);
-			break;                                          // steel dagger
-		case    29:
-			in = god_create_item(574);
-			break;                                          // gold dagger
-		case    30:
-			in = god_create_item(575);
-			break;                                          // crystal dagger
-		case    523:
-			in = god_create_item(576);
-			break;                                          // titan dagger
-		case    31:
-			in = god_create_item(577);
-			break;                                          // bronze sword
-		case    32:
-			in = god_create_item(578);
-			break;                                          // steel sword
-		case    33:
-			in = god_create_item(579);
-			break;                                          // gold sword
-		case    34:
-			in = god_create_item(580);
-			break;                                          // crystal sword
-		case    524:
-			in = god_create_item(581);
-			break;                                          // titan sword
-		case    35:
-			in = god_create_item(582);
-			break;                                          // bronze two
-		case    36:
-			in = god_create_item(583);
-			break;                                          // steel two
-		case    37:
-			in = god_create_item(584);
-			break;                                          // gold two
-		case    38:
-			in = god_create_item(585);
-			break;                                          // crystal two
-		case    125:
-			in = god_create_item(586);
-			break;                                          // titan two
-		default:
-			break;
-		}
-	}
-
-
-	if (!in && ch[cn].alignment<0 && !RANDOM(150))
-	{
-		switch(temp)                                            // skua uniques
-		{
-		case    27:
-			in = god_create_item(280);
-			break;                                          // bronze dagger
-		case    28:
-			in = god_create_item(281);
-			break;                                          // steel dagger
-		case    29:
-			in = god_create_item(282);
-			break;                                          // gold dagger
-		case    30:
-			in = god_create_item(283);
-			break;                                          // crystal dagger
-		case    523:
-			in = god_create_item(525);
-			break;                                          // titan dagger
-		case    31:
-			in = god_create_item(284);
-			break;                                          // bronze sword
-		case    32:
-			in = god_create_item(285);
-			break;                                          // steel sword
-		case    33:
-			in = god_create_item(286);
-			break;                                          // gold sword
-		case    34:
-			in = god_create_item(287);
-			break;                                          // crystal sword
-		case    524:
-			in = god_create_item(526);
-			break;                                          // titan sword
-		case    35:
-			in = god_create_item(288);
-			break;                                          // bronze two
-		case    36:
-			in = god_create_item(289);
-			break;                                          // steel two
-		case    37:
-			in = god_create_item(290);
-			break;                                          // gold two
-		case    38:
-			in = god_create_item(291);
-			break;                                          // crystal two
-		case    125:
-			in = god_create_item(292);
-			break;                                          // titan two
-		default:
-			break;
+			godroll = RANDOM(3)+1; // Decide which god blessed the weapon. No purple for now.
+			
+			in = god_create_item(temp, godroll); // create the item
+			
+			if (in)	// assure the item is created and passed the unique check
+			{
+				switch (godroll)
+				{
+					case 1:
+						gend = "god";
+						godn = "Skua";
+						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI | IF_GORN_UNI;
+						it[in].attrib[AT_BRV][0] += 4;
+						break;
+					case 2:
+						gend = "goddess";
+						godn = "Kwai";
+						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI;
+						it[in].attrib[AT_STR][0] += 4;
+						break;
+					default:
+						gend = "god";
+						godn = "Gorn";
+						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_GORN_UNI;
+						it[in].attrib[AT_WIL][0] += 4;
+						break;
+				}
+				
+				if (it[in].flags & IF_OF_SHIELD)
+					it[in].armor[0] += 4;
+				else
+					it[in].weapon[0] += 4;
+				
+				it[in].max_damage = 0;
+				it[in].flags |= IF_SINGLEAGE;
+				strcpy(name, it[in].name);
+				strcpy(refer, it[in].reference);
+				strcpy(descr, it[in].description);
+				sprintf(it[in].name, "%s's %s", godn, name);
+				sprintf(it[in].reference, "%s's %s", godn, refer);
+				sprintf(it[in].description, "%s It has been blessed by the %s %s.", descr, gend, godn);
+				
+				if (is_unique_able(temp) > 45)
+				{
+					if (godroll==1)
+						it[in].sprite[0] = 2602 + is_unique_able(temp)-46;
+					else if (godroll==2)
+						it[in].sprite[0] = 2611 + is_unique_able(temp)-46;
+					else
+						it[in].sprite[0] = 2620 + is_unique_able(temp)-46;
+				}
+				else
+				{
+					if (godroll==1)
+						it[in].sprite[0] =  730 + is_unique_able(temp)-1;
+					else if (godroll==2)
+						it[in].sprite[0] = 2512 + is_unique_able(temp)-1;
+					else
+						it[in].sprite[0] = 2557 + is_unique_able(temp)-1;
+				}
+			}
+			else
+			{
+				in = 0;
+			}
 		}
 	}
 	if (!in)
 	{
-		in = god_create_item(temp);
+		in = god_create_item(temp, 0);
 		if (in && it[in].max_damage>0)
 		{
 			if (RANDOM(2))
@@ -313,90 +172,181 @@ int pop_create_bonus(int cn, int chance)
 	// they are the same as in pop_create_bonus_belt()
 	// if (RANDOM(chance)) return 0;
 
-	if (ch[cn].points_tot>20000000)
+	if (ch[cn].points_tot>20000000) // 20,000,000
 	{
-		static int gitem[] = {273, 274, 693, 273, 274, 694, 273, 274, 695, 273, 274, 696, 273, 274, 697, 273, 274, 698, 361, 360, 487, 361, 360, 488, 361, 360, 489, 337, 361, 292, 525, 526};
-		static int item[]  = {273, 274};
+		static int gitem[] = {
+			IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, 	// 6 / 40 = 15.0%
+			IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, 	// 6 / 40 = 15.0%
+			IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, 	// 6 / 40 = 15.0%
+			IT_POP_GRING, IT_POP_GRING, IT_POP_GRING, IT_POP_GRING, 								// 4 / 40 = 10.0%
+			IT_POP_PRING, 																			// 1 / 40 =  2.5%
+			IT_POP_VITPT, 																			// 1 / 40 =  2.5%
+			IT_POP_CLAPT,  																			// 1 / 40 =  2.5%
+			IT_POP_SAGPT, 																			// 1 / 40 =  2.5%
+			IT_POP_LIFEP, 																			// 1 / 40 =  2.5%
+			IT_POP_SSPEL, 																			// 1 / 40 =  2.5%
+			IT_POP_SSPEL+1, 																		// 1 / 40 =  2.5%
+			IT_POP_SSPEL+2, 																		// 1 / 40 =  2.5%
+			IT_POP_SSPEL+3, 																		// 1 / 40 =  2.5%
+			IT_POP_SSPEL+4, 																		// 1 / 40 =  2.5%
+			IT_POP_SSPEL+5, 																		// 1 / 40 =  2.5%
+			IT_POP_SSPEL+6, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMFL, 																			// 1 / 40 =  2.5%
+			IT_POP_GEMFL+1, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMFL+2, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMFL+3, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMFL+4, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMFL+5 																			// 1 / 40 =  2.5%
+		};
+		static int item[]  = {
+			IT_POP_GHEAL, 	// 1 / 4 = 25%
+			IT_POP_GENDU, 	// 1 / 4 = 25%
+			IT_POP_GMANA, 	// 1 / 4 = 25%
+			IT_POP_LIFEP	// 1 / 4 = 25%
+		};
 
-		if (RANDOM(5))
-		{
-			n = RANDOM(sizeof(item) / sizeof(int));
-			n = item[n];
-		}
-		else
-		{
-			n = RANDOM(sizeof(gitem) / sizeof(int));
-			n = gitem[n];
-		}
+		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
+		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-	else if (ch[cn].points_tot>1500000)
+	else if (ch[cn].points_tot>2000000) // 2,000,000
 	{
-		static int gitem[] = {273, 274, 699, 273, 274, 700, 273, 274, 701, 273, 274, 702, 273, 274, 703, 273, 274, 704, 361, 360, 347, 361, 360, 344, 361, 360, 341, 337, 283, 287, 291};
-		static int item[]  = {273, 274};
+		static int gitem[] = {
+			IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, 	// 6 / 40 = 15.0%
+			IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, 	// 6 / 40 = 15.0%
+			IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, 	// 6 / 40 = 15.0%
+			IT_POP_GRING, IT_POP_GRING, IT_POP_GRING, 												// 3 / 40 =  7.5%
+			IT_POP_VITPT, IT_POP_VITPT, 															// 2 / 40 =  5.0%
+			IT_POP_CLAPT, IT_POP_CLAPT, 															// 2 / 40 =  5.0%
+			IT_POP_SAGPT, IT_POP_SAGPT, 															// 2 / 40 =  5.0%
+			IT_POP_ISPEL, 																			// 1 / 40 =  2.5%
+			IT_POP_ISPEL+1, 																		// 1 / 40 =  2.5%
+			IT_POP_ISPEL+2, 																		// 1 / 40 =  2.5%
+			IT_POP_ISPEL+3, 																		// 1 / 40 =  2.5%
+			IT_POP_ISPEL+4, 																		// 1 / 40 =  2.5%
+			IT_POP_ISPEL+5, 																		// 1 / 40 =  2.5%
+			IT_POP_ISPEL+6, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMHU, 																			// 1 / 40 =  2.5%
+			IT_POP_GEMHU+1, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMHU+2, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMHU+3, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMHU+4, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMHU+5 																			// 1 / 40 =  2.5%
+		};
+		static int item[]  = {
+			IT_POP_GHEAL, IT_POP_GHEAL, 	// 2 / 10 = 20%
+			IT_POP_GENDU, IT_POP_GENDU, 	// 2 / 10 = 20%
+			IT_POP_GMANA, IT_POP_GMANA, 	// 2 / 10 = 20%
+			IT_POP_VITPT, 					// 1 / 10 = 10%
+			IT_POP_CLAPT, 					// 1 / 10 = 10%
+			IT_POP_SAGPT, 					// 1 / 10 = 10%
+			IT_POP_RAINP 					// 1 / 10 = 10%
+		};
 
-		if (RANDOM(5))
-		{
-			n = RANDOM(sizeof(item) / sizeof(int));
-			n = item[n];
-		}
-		else
-		{
-			n = RANDOM(sizeof(gitem) / sizeof(int));
-			n = gitem[n];
-		}
+		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
+		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-	else if (ch[cn].points_tot>125000)
+	else if (ch[cn].points_tot>200000) // 200,000
 	{
-		static int gitem[] = {101, 102, 705, 101, 102, 706, 101, 102, 707, 101, 102, 708, 101, 102, 709, 101, 102, 710, 360, 338, 361, 340, 361, 343, 361, 346, 282, 286, 290};
-		static int item[]  = {101, 102};
+		static int gitem[] = {
+			IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, 	// 6 / 40 = 15.0%
+			IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, 	// 6 / 40 = 15.0%
+			IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, 	// 6 / 40 = 15.0%
+			IT_POP_SRING, IT_POP_SRING, 			 												// 2 / 40 =  5.0%
+			IT_POP_GRING, IT_POP_GRING, 															// 2 / 40 =  5.0%
+			IT_POP_RAINP, IT_POP_RAINP,																// 2 / 40 =  5.0%
+			IT_POP_VITPT, 																			// 1 / 40 =  2.5%
+			IT_POP_CLAPT, 																			// 1 / 40 =  2.5%
+			IT_POP_SAGPT, 																			// 1 / 40 =  2.5%
+			IT_POP_ASPEL, 																			// 1 / 40 =  2.5%
+			IT_POP_ASPEL+1, 																		// 1 / 40 =  2.5%
+			IT_POP_ASPEL+2, 																		// 1 / 40 =  2.5%
+			IT_POP_ASPEL+3, 																		// 1 / 40 =  2.5%
+			IT_POP_ASPEL+4, 																		// 1 / 40 =  2.5%
+			IT_POP_ASPEL+5, 																		// 1 / 40 =  2.5%
+			IT_POP_ASPEL+6, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMBG, 																			// 1 / 40 =  2.5%
+			IT_POP_GEMBG+1, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMBG+2, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMBG+3, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMBG+4, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMBG+5 																			// 1 / 40 =  2.5%
+		};
+		static int item[]  = {
+			IT_POP_HEALP, 	// 1 / 4 = 25%
+			IT_POP_ENDUP, 	// 1 / 4 = 25%
+			IT_POP_MANAP, 	// 1 / 4 = 25%
+			IT_POP_RAINP	// 1 / 4 = 25%
+		};
 
-		if (RANDOM(5))
-		{
-			n = RANDOM(sizeof(item) / sizeof(int));
-			n = item[n];
-		}
-		else
-		{
-			n = RANDOM(sizeof(gitem) / sizeof(int));
-			n = gitem[n];
-		}
+		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
+		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-	else if (ch[cn].points_tot>11250)
+	else if (ch[cn].points_tot>20000) // 20,000
 	{
-		static int gitem[] = {18, 46, 711, 18, 46, 712, 18, 46, 713, 18, 46, 714, 18, 46, 715, 18, 46, 716, 360, 338, 361, 339, 361, 342, 361, 345, 281, 285, 289};
-		static int item[]  = {18, 46, 100};
+		static int gitem[] = {
+			IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, 	// 6 / 40 = 15.0%
+			IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, 	// 6 / 40 = 15.0%
+			IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, 	// 6 / 40 = 15.0%
+			IT_POP_SRING, IT_POP_SRING, IT_POP_SRING, 												// 3 / 40 =  7.5%
+			IT_POP_YELFL, IT_POP_YELFL, 															// 2 / 40 =  5.0%
+			IT_POP_BLUFL, IT_POP_BLUFL, 															// 2 / 40 =  5.0%
+			IT_POP_GRING, 																			// 1 / 40 =  2.5%
+			IT_POP_FLASK, 																			// 1 / 40 =  2.5%
+			IT_POP_SPELL, 																			// 1 / 40 =  2.5%
+			IT_POP_SPELL+1, 																		// 1 / 40 =  2.5%
+			IT_POP_SPELL+2, 																		// 1 / 40 =  2.5%
+			IT_POP_SPELL+3, 																		// 1 / 40 =  2.5%
+			IT_POP_SPELL+4, 																		// 1 / 40 =  2.5%
+			IT_POP_SPELL+5, 																		// 1 / 40 =  2.5%
+			IT_POP_SPELL+6, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMMD, 																			// 1 / 40 =  2.5%
+			IT_POP_GEMMD+1, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMMD+2, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMMD+3, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMMD+4, 																		// 1 / 40 =  2.5%
+			IT_POP_GEMMD+5 																			// 1 / 40 =  2.5%
+		};
+		static int item[]  = {
+			IT_POP_REDFL, IT_POP_REDFL, 	// 2 / 10 = 20%
+			IT_POP_GREFL, IT_POP_GREFL, 	// 2 / 10 = 20%
+			IT_POP_PURFL, IT_POP_PURFL, 	// 2 / 10 = 20%
+			IT_POP_YELFL, 					// 1 / 10 = 10%
+			IT_POP_BLUFL, 					// 1 / 10 = 10%
+			IT_POP_FLASK, IT_POP_FLASK 		// 2 / 10 = 20%
+		};
 
-		if (RANDOM(5))
-		{
-			n = RANDOM(sizeof(item) / sizeof(int));
-			n = item[n];
-		}
-		else
-		{
-			n = RANDOM(sizeof(gitem) / sizeof(int));
-			n = gitem[n];
-		}
+		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
+		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
 	else
 	{
-		static int gitem[] = {18, 46, 361, 348, 18, 46, 351, 18, 46, 354, 361, 338, 280, 284, 288};
-		static int item[]  = {18, 46, 100};
+		static int gitem[] = {
+			IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, 	// 4 / 20 = 20%
+			IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, 	// 4 / 20 = 20%
+			IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, 	// 4 / 20 = 20%
+			IT_POP_FLASK, 												// 1 / 20 =  5%
+			IT_POP_SRING, 												// 1 / 20 =  5%
+			IT_POP_GEMSM, 												// 1 / 20 =  5%
+			IT_POP_GEMSM+1, 											// 1 / 20 =  5%
+			IT_POP_GEMSM+2, 											// 1 / 20 =  5%
+			IT_POP_GEMSM+3, 											// 1 / 20 =  5%
+			IT_POP_GEMSM+4, 											// 1 / 20 =  5%
+			IT_POP_GEMSM+5 												// 1 / 20 =  5%
+		};
+		static int item[]  = {
+			IT_POP_REDFL, 	// 1 / 4 = 25%
+			IT_POP_GREFL, 	// 1 / 4 = 25%
+			IT_POP_PURFL, 	// 1 / 4 = 25%
+			IT_POP_FLASK 	// 1 / 4 = 25%
+		};
 
-		if (RANDOM(5))
-		{
-			n = RANDOM(sizeof(item) / sizeof(int));
-			n = item[n];
-		}
-		else
-		{
-			n = RANDOM(sizeof(gitem) / sizeof(int));
-			n = gitem[n];
-		}
+		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
+		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
 
 	if (n)
 	{
-		n = god_create_item(n);
+		n = god_create_item(n, 0);
 
 		chlog(cn, "got %s (t=%d)", it[n].name, it[n].temp);
 	}
@@ -411,7 +361,7 @@ int pop_create_bonus_belt(int cn)
 	int n = 1106;   // value to store id-number of created belt
 	                // at start it contains template of 'rainbow_belt'
 	int i, j;
-	int rank, skill_value, skill_number;
+	int rank, skill_value, skill_number, skm;
 
 
 //	item will be created with chance 1 from 10000
@@ -426,12 +376,11 @@ int pop_create_bonus_belt(int cn)
 	rank = points2rank(ch[cn].points_tot);  // private wont get this belt
 	if(!rank)
 	{
-		return( 0);                     //
-
+		return( 0);
 	}
 	if (n)
 	{
-		n = god_create_item(n);   // creating belt from template
+		n = god_create_item(n, 0);   // creating belt from template
 		if(!n)
 		{
 			return( 0);     // return if failed
@@ -444,28 +393,24 @@ int pop_create_bonus_belt(int cn)
 		it[n].temp = 0; // clearing template
 		it[n].sprite[0] = 16964;
 		strcpy(it[n].name, "Rainbow Belt");
-		strcpy(it[n].description, "An ancient belt. It seems to be highly magical");
 		strcpy(it[n].reference, "rainbow belt");
+		strcpy(it[n].description, "An ancient belt. It seems to be highly magical, and highly volatile.");
 		// putting message about created belt into log-file
 		chlog(cn, ", with rank %d, got %s (t=%d)", rank, it[n].name, it[n].temp);
 	}
 
-	j = RANDOM(rank); // how many skills will be in belt?
-	if(j==0)
-	{
-		j = 1;          //
-	}
+	j = RANDOM(rank+1)+1; // how many skills will be in belt?
 	it[n].power += 5 * j;     // counting power of item, *remind* power = 10 in template
 	it[n].value += 10000 * j; // counting price value, value = 100 in template
 	// here we decide which skills will be in belt, not more than rank
 	for(i = 0; i < j; i++)
 	{
-		skill_number = RANDOM(39); // which skill it will be
-		skill_value  = RANDOM(rank);    // with that value of skill
-		skill_value  = skill_value >> 1; // divide it by 2, cause it cant be more than 12 (max_rank/2)
+		skill_number = RANDOM(60);			// which skill it will be
+		skill_value  = RANDOM(rank+2);		// with that value of skill
+		skill_value  = skill_value >> 1;	// divide it by 2, cause it cant be more than 12 (max_rank/2)
 		if(skill_value == 0)
 		{
-			skill_value = 1;              // and cant be zero
+			skill_value = 1;              	// and cant be zero
 		}
 		// the following code put all these skills in belt
 		// sometimes requirements are zeroed, cause if we have, in example,
@@ -473,346 +418,66 @@ int pop_create_bonus_belt(int cn)
 		// templar/seyan, but i dont want this
 		switch(skill_number)
 		{
-		case 0:
-			// this line is how much it will raise attribute
-			it[n].attrib[AT_BRAVE][0] += skill_value;
-			// this will check for max level = 12
-			// and if it is reached, will down it back to 12
-			if(it[n].attrib[AT_BRAVE][0] > 12)
-			{
-				it[n].attrib[AT_BRAVE][0] = 12;
-			}
-			// this line will set requirements
-			it[n].attrib[AT_BRAVE][2] = 10 +
-			                            (it[n].attrib[AT_BRAVE][0] * RANDOM(7));
-			break;
-		case 1:
-			it[n].attrib[AT_WILL][0] += skill_value;
-			if(it[n].attrib[AT_WILL][0] > 12)
-			{
-				it[n].attrib[AT_WILL][0] = 12;
-			}
-			it[n].attrib[AT_WILL][2] = 10 +
-			                           (it[n].attrib[AT_WILL][0] * RANDOM(7));
-			break;
-		case 2:
-			it[n].attrib[AT_INT][0] += skill_value;
-			if(it[n].attrib[AT_INT][0] > 12)
-			{
-				it[n].attrib[AT_INT][0] = 12;
-			}
-			it[n].attrib[AT_INT][2] = 10 +
-			                          (it[n].attrib[AT_INT][0] * RANDOM(7));
-			break;
-		case 3:
-			it[n].attrib[AT_AGIL][0] += skill_value;
-			if(it[n].attrib[AT_AGIL][0] > 12)
-			{
-				it[n].attrib[AT_AGIL][0] = 12;
-			}
-			it[n].attrib[AT_AGIL][2] = 10 +
-			                           (it[n].attrib[AT_AGIL][0] * RANDOM(7));
-			break;
-		case 4:
-			it[n].attrib[AT_STREN][0] += skill_value;
-			if(it[n].attrib[AT_STREN][0] > 12)
-			{
-				it[n].attrib[AT_STREN][0] = 12;
-			}
-			it[n].attrib[AT_STREN][2] = 10 +
-			                            (it[n].attrib[AT_STREN][0] * RANDOM(7));
-			break;
-		case 5:
-			it[n].hp[0] += (skill_value * 5);
-			if(it[n].hp[0] > 60)
-			{
-				it[n].hp[0] = 60;
-			}
-			it[n].hp[2] = 50 +
-			              (it[n].hp[0] * RANDOM(7));
-			break;
-		case 6:
-			it[n].end[0] += (skill_value * 5);
-			if(it[n].end[0] > 60)
-			{
-				it[n].end[0] = 60;
-			}
-			it[n].end[2] = 50 +
-			               (it[n].end[0] * RANDOM(7));
-			break;
-		case 7:
-			it[n].mana[0] += (skill_value * 5);
-			if(it[n].mana[0] > 60)
-			{
-				it[n].mana[0] = 60;
-			}
-			it[n].mana[2] = 50 +
-			                (it[n].mana[0] * RANDOM(7));
-			break;
-		case 8:
-			it[n].armor[0] += skill_value;
-			if(it[n].armor[0] > 12)
-			{
-				it[n].armor[0] = 12;
-			}
-			break;
-		case 9:
-			it[n].skill[SK_WARCRY][0] += skill_value;
-			if(it[n].skill[SK_WARCRY][0] > 12)
-			{
-				it[n].skill[SK_WARCRY][0] = 12;
-			}
-			break;
-		case 10:
-			it[n].skill[SK_HAND][0] += skill_value;
-			if(it[n].skill[SK_HAND][0] > 12)
-			{
-				it[n].skill[SK_HAND][0] = 12;
-			}
-			it[n].skill[SK_HAND][2] =
-				(it[n].skill[SK_HAND][0] * RANDOM(7));
-			break;
-		case 11:
-			it[n].skill[SK_SWORD][0] += skill_value;
-			if(it[n].skill[SK_SWORD][0] > 12)
-			{
-				it[n].skill[SK_SWORD][0] = 12;
-			}
-			break;
-		case 12:
-			it[n].skill[SK_DAGGER][0] += skill_value;
-			if(it[n].skill[SK_DAGGER][0] > 12)
-			{
-				it[n].skill[SK_DAGGER][0] = 12;
-			}
-			break;
-		case 13:
-			it[n].skill[SK_TWOHAND][0] += skill_value;
-			if(it[n].skill[SK_TWOHAND][0] > 12)
-			{
-				it[n].skill[SK_TWOHAND][0] = 12;
-			}
-			break;
-		case 14:
-			it[n].skill[SK_LOCK][0] += skill_value;
-			if(it[n].skill[SK_LOCK][0] > 12)
-			{
-				it[n].skill[SK_LOCK][0] = 12;
-			}
-			it[n].skill[SK_LOCK][2] =
-				(it[n].skill[SK_LOCK][0] * RANDOM(7));
-			break;
-		case 15:
-			it[n].skill[SK_STEALTH][0] += skill_value;
-			if(it[n].skill[SK_STEALTH][0] > 12)
-			{
-				it[n].skill[SK_STEALTH][0] = 12;
-			}
-			break;
-		case 16:
-			it[n].skill[SK_PERCEPT][0] += skill_value;
-			if(it[n].skill[SK_PERCEPT][0] > 12)
-			{
-				it[n].skill[SK_PERCEPT][0] = 12;
-			}
-			it[n].skill[SK_PERCEPT][2] =
-				(it[n].skill[SK_PERCEPT][0] * RANDOM(7));
-			break;
-		case 17:
-			it[n].skill[SK_MSHIELD][0] += skill_value;
-			if(it[n].skill[SK_MSHIELD][0] > 12)
-			{
-				it[n].skill[SK_MSHIELD][0] = 12;
-			}
-			break;
-		case 18:
-			it[n].skill[SK_BARTER][0] += skill_value;
-			if(it[n].skill[SK_BARTER][0] > 12)
-			{
-				it[n].skill[SK_BARTER][0] = 12;
-			}
-			it[n].skill[SK_BARTER][2] =
-				(it[n].skill[SK_BARTER][0] * RANDOM(7));
-			break;
-		case 19:
-			it[n].skill[SK_REPAIR][0] += skill_value;
-			if(it[n].skill[SK_REPAIR][0] > 12)
-			{
-				it[n].skill[SK_REPAIR][0] = 12;
-			}
-			it[n].skill[SK_REPAIR][2] =
-				(it[n].skill[SK_REPAIR][0] * RANDOM(7));
-			break;
-		case 20:
-			it[n].skill[SK_LIGHT][0] += skill_value;
-			if(it[n].skill[SK_LIGHT][0] > 12)
-			{
-				it[n].skill[SK_LIGHT][0] = 12;
-			}
-			it[n].skill[SK_LIGHT][2] =
-				(it[n].skill[SK_LIGHT][0] * RANDOM(7));
-			break;
-		case 21:
-			it[n].skill[SK_RECALL][0] += skill_value;
-			if(it[n].skill[SK_RECALL][0] > 12)
-			{
-				it[n].skill[SK_RECALL][0] = 12;
-			}
-			it[n].skill[SK_RECALL][2] =
-				(it[n].skill[SK_RECALL][0] * RANDOM(7));
-			break;
-		case 22:
-			it[n].skill[SK_PROTECT][0] += skill_value;
-			if(it[n].skill[SK_PROTECT][0] > 12)
-			{
-				it[n].skill[SK_PROTECT][0] = 12;
-			}
-			it[n].skill[SK_PROTECT][2] =
-				(it[n].skill[SK_PROTECT][0] * RANDOM(7));
-			break;
-		case 23:
-			it[n].skill[SK_ENHANCE][0] += skill_value;
-			if(it[n].skill[SK_ENHANCE][0] > 12)
-			{
-				it[n].skill[SK_ENHANCE][0] = 12;
-			}
-			it[n].skill[SK_ENHANCE][2] =
-				(it[n].skill[SK_ENHANCE][0] * RANDOM(7));
-			break;
-		case 24:
-			it[n].skill[SK_STUN][0] += skill_value;
-			if(it[n].skill[SK_STUN][0] > 12)
-			{
-				it[n].skill[SK_STUN][0] = 12;
-			}
-			break;
-		case 25:
-			it[n].skill[SK_CURSE][0] += skill_value;
-			if(it[n].skill[SK_CURSE][0] > 12)
-			{
-				it[n].skill[SK_CURSE][0] = 12;
-			}
-			break;
-		case 26:
-			it[n].skill[SK_BLESS][0] += skill_value;
-			if(it[n].skill[SK_BLESS][0] > 12)
-			{
-				it[n].skill[SK_BLESS][0] = 12;
-			}
-			it[n].skill[SK_BLESS][2] =
-				(it[n].skill[SK_BLESS][0] * RANDOM(7));
-			break;
-		case 27:
-			it[n].skill[SK_IDENT][0] += skill_value;
-			if(it[n].skill[SK_IDENT][0] > 12)
-			{
-				it[n].skill[SK_IDENT][0] = 12;
-			}
-			it[n].skill[SK_IDENT][2] =
-				(it[n].skill[SK_IDENT][0] * RANDOM(7));
-			break;
-		case 28:
-			it[n].skill[SK_RESIST][0] += skill_value;
-			if(it[n].skill[SK_RESIST][0] > 12)
-			{
-				it[n].skill[SK_RESIST][0] = 12;
-			}
-			it[n].skill[SK_RESIST][2] =
-				(it[n].skill[SK_RESIST][0] * RANDOM(7));
-			break;
-		case 29:
-			it[n].skill[SK_BLAST][0] += skill_value;
-			if(it[n].skill[SK_BLAST][0] > 12)
-			{
-				it[n].skill[SK_BLAST][0] = 12;
-			}
-			break;
-		case 30:
-			it[n].skill[SK_DISPEL][0] += skill_value;
-			if(it[n].skill[SK_DISPEL][0] > 12)
-			{
-				it[n].skill[SK_DISPEL][0] = 12;
-			}
-			break;
-		case 31:
-			it[n].skill[SK_HEAL][0] += skill_value;
-			if(it[n].skill[SK_HEAL][0] > 12)
-			{
-				it[n].skill[SK_HEAL][0] = 12;
-			}
-			it[n].skill[SK_HEAL][2] =
-				(it[n].skill[SK_HEAL][0] * RANDOM(7));
-			break;
-		case 32:
-			it[n].skill[SK_GHOST][0] += skill_value;
-			if(it[n].skill[SK_GHOST][0] > 12)
-			{
-				it[n].skill[SK_GHOST][0] = 12;
-			}
-			break;
-		case 33:
-			it[n].skill[SK_REGEN][0] += skill_value;
-			if(it[n].skill[SK_REGEN][0] > 12)
-			{
-				it[n].skill[SK_REGEN][0] = 12;
-			}
-			break;
-		case 34:
-			it[n].skill[SK_REST][0] += skill_value;
-			if(it[n].skill[SK_REST][0] > 12)
-			{
-				it[n].skill[SK_REST][0] = 12;
-			}
-			it[n].skill[SK_REST][2] =
-				(it[n].skill[SK_REST][0] * RANDOM(7));
-			break;
-		case 35:
-			it[n].skill[SK_MEDIT][0] += skill_value;
-			if(it[n].skill[SK_MEDIT][0] > 12)
-			{
-				it[n].skill[SK_MEDIT][0] = 12;
-			}
-			break;
-		case 36:
-			it[n].skill[SK_SENSE][0] += skill_value;
-			if(it[n].skill[SK_SENSE][0] > 12)
-			{
-				it[n].skill[SK_SENSE][0] = 12;
-			}
-			it[n].skill[SK_SENSE][2] =
-				(it[n].skill[SK_SENSE][0] * RANDOM(7));
-			break;
-		case 37:
-			it[n].skill[SK_IMMUN][0] += skill_value;
-			if(it[n].skill[SK_IMMUN][0] > 12)
-			{
-				it[n].skill[SK_IMMUN][0] = 12;
-			}
-			break;
-		case 38:
-			it[n].skill[SK_SURROUND][0] += skill_value;
-			if(it[n].skill[SK_SURROUND][0] > 12)
-			{
-				it[n].skill[SK_SURROUND][0] = 12;
-			}
-			break;
-		case 39:
-			it[n].skill[SK_CONCEN][0] += skill_value;
-			if(it[n].skill[SK_CONCEN][0] > 12)
-			{
-				it[n].skill[SK_CONCEN][0] = 12;
-			}
-			break;
-// this will be created in future, right now it is not needed
-/*		case 40:
-                        it[n].weapon[0] += skill_value;
-                        if(it[n].weapon[0] > 12)
-                        {
-                                it[n].weapon[0] = 12;
-                        }
-                        break; */
-		default:
-			break;
+			case 0:
+				it[n].attrib[AT_BRV][0] += skill_value; 								// this line is how much it will raise attribute
+				if(it[n].attrib[AT_BRV][0] > 12) it[n].attrib[AT_BRV][0] = 12; 			// this will check for max level = 12 and will down it back to 12
+				it[n].attrib[AT_BRV][2] = 10 + (it[n].attrib[AT_BRV][0] * RANDOM(7)); 	// this line will set requirements
+				break;
+			case 1:
+				it[n].attrib[AT_WIL][0] += skill_value;
+				if(it[n].attrib[AT_WIL][0] > 12) it[n].attrib[AT_WIL][0] = 12;
+				it[n].attrib[AT_WIL][2] = 10 + (it[n].attrib[AT_WIL][0] * RANDOM(7));
+				break;
+			case 2:
+				it[n].attrib[AT_INT][0] += skill_value;
+				if(it[n].attrib[AT_INT][0] > 12) it[n].attrib[AT_INT][0] = 12;
+				it[n].attrib[AT_INT][2] = 10 + (it[n].attrib[AT_INT][0] * RANDOM(7));
+				break;
+			case 3:
+				it[n].attrib[AT_AGL][0] += skill_value;
+				if(it[n].attrib[AT_AGL][0] > 12) it[n].attrib[AT_AGL][0] = 12;
+				it[n].attrib[AT_AGL][2] = 10 + (it[n].attrib[AT_AGL][0] * RANDOM(7));
+				break;
+			case 4:
+				it[n].attrib[AT_STR][0] += skill_value;
+				if(it[n].attrib[AT_STR][0] > 12) it[n].attrib[AT_STR][0] = 12;
+				it[n].attrib[AT_STR][2] = 10 + (it[n].attrib[AT_STR][0] * RANDOM(7));
+				break;
+			case 5:
+				it[n].hp[0] += (skill_value * 5);
+				if(it[n].hp[0] > 60) it[n].hp[0] = 60;
+				it[n].hp[2] = 50 + (it[n].hp[0] * RANDOM(7));
+				break;
+			case 6:
+				it[n].end[0] += (skill_value * 5)/2;
+				if(it[n].end[0] > 30) it[n].end[0] = 30;
+				break;
+			case 7:
+				it[n].mana[0] += (skill_value * 5);
+				if(it[n].mana[0] > 60) it[n].mana[0] = 60;
+				it[n].mana[2] = 50 + (it[n].mana[0] * RANDOM(7));
+				break;
+			case 8:
+				it[n].armor[0] += (skill_value+1)/2;
+				if(it[n].armor[0] > 6) it[n].armor[0] = 6;
+				break;
+			case 9:
+				it[n].weapon[0] += (skill_value+1)/2;
+				if(it[n].weapon[0] > 6) it[n].armor[0] = 6;
+				break;
+			default:
+				skm = skill_number-10;
+				it[n].skill[skm][0] += skill_value;
+				if(it[n].skill[skm][0] > 12) it[n].skill[skm][0] = 12;
+				// Check for skills that *all* classes would know, to apply an equip requirement.
+				if (skm == SK_HAND    || skm == SK_REST   || skm == SK_MEDIT 
+				 || skm == SK_HEAL    || skm == SK_LIGHT  || skm == SK_RECALL  
+				 || skm == SK_IDENT   || skm == SK_REPAIR || skm == SK_RESIST 
+				 || skm == SK_PERCEPT || skm == SK_BARTER || skm == SK_SENSE)
+				{
+					it[n].skill[skm][2] = (it[n].skill[skm][0] * RANDOM(7));
+				}
+				break;
 		}
 	}
 
@@ -847,7 +512,7 @@ int pop_create_char(int n, int drop)
 	{
 		if ((tmp = ch[cn].item[m])!=0)
 		{
-			tmp = god_create_item(tmp);
+			tmp = god_create_item(tmp, 0);
 			if (!tmp)
 			{
 				flag = 1;
@@ -881,7 +546,7 @@ int pop_create_char(int n, int drop)
 		}
 	}
 
-	for (m = 0; m<20; m++)
+	for (m = 0; m<MAXBUFFS; m++)
 	{
 		if (ch[cn].spell[m]!=0)
 		{
@@ -891,7 +556,7 @@ int pop_create_char(int n, int drop)
 
 	if ((tmp = ch[cn].citem)!=0)
 	{
-		tmp = god_create_item(tmp);
+		tmp = god_create_item(tmp, 0);
 		if (!tmp)
 		{
 			flag = 1;
@@ -1022,34 +687,30 @@ void reset_char(int n)
 	{
 		for (m = 10; m<ch_temp[n].attrib[z][0]; m++)
 		{
-			pts += attrib_needed(m, 3);
+			pts += attrib_needed(m, 4);
 		}
 	}
 
 	for (m = 50; m<ch_temp[n].hp[0]; m++)
 	{
-		pts += hp_needed(m, 3);
+		pts += hp_needed(m, 4);
 	}
 
-	for (m = 50; m<ch_temp[n].end[0]; m++)
-	{
-		pts += end_needed(m, 2);
-	}
+	//for (m = 50; m<ch_temp[n].end[0]; m++)
+	//{
+	//	pts += end_needed(m, 2);
+	//}
 
 	for (m = 50; m<ch_temp[n].mana[0]; m++)
 	{
-		pts += mana_needed(m, 3);
+		pts += mana_needed(m, 4);
 	}
 
-	for (z = 0; z<50; z++)
+	for (z = 0; z<MAXSKILL; z++)
 	{
-		if (z==SK_PERCEPT || z==SK_STEALTH || z==SK_LOCK)
-		{
-			continue;
-		}
 		for (m = 1; m<ch_temp[n].skill[z][0]; m++)
 		{
-			pts += skill_needed(m, 2);
+			pts += skill_needed(m, 3);
 		}
 	}
 
@@ -1111,7 +772,7 @@ void reset_char(int n)
 
 	if (ch_temp[n].used==USE_ACTIVE)   // schedule respawn
 	{
-		fx_add_effect(2, TICKS * 10, ch_temp[n].x, ch_temp[n].y, n);
+		fx_add_effect(2, TICKS * 10, ch_temp[n].x, ch_temp[n].y, n); // 10 seconds
 	}
 
 }
@@ -1140,7 +801,7 @@ void pop_skill(void)
 		}
 		t = ch[cn].temp;
 
-		for (n = 0; n<50; n++)
+		for (n = 0; n<MAXSKILL; n++)
 		{
 			if (ch[cn].skill[n][0]==0 && ch_temp[t].skill[n][0])
 			{
@@ -1397,11 +1058,11 @@ void pop_remove(void)
 			}
 		}
 
-		for (m = 0; m<20; m++)
+		for (m = 0; m<MAXBUFFS; m++)
 		{
 			if ((in = ch[n].spell[m])!=0)
 			{
-				write(h2, &it[in], sizeof(struct item));
+				write(h2, &bu[in], sizeof(struct item));
 				itc++;
 			}
 		}
@@ -1475,11 +1136,11 @@ void pop_load(void)
 					it[in].used = USE_EMPTY;
 				}
 			}
-			for (m = 0; m<20; m++)
+			for (m = 0; m<MAXBUFFS; m++)
 			{
 				if ((in = ch[n].spell[m])!=0)
 				{
-					it[in].used = USE_EMPTY;
+					bu[in].used = USE_EMPTY;
 				}
 			}
 			for (m = 0; m<20; m++)
@@ -1545,24 +1206,24 @@ void pop_load(void)
 			}
 		}
 
-		for (m = 0; m<20; m++)
+		for (m = 0; m<MAXBUFFS; m++)
 		{
 			if (ch[n].spell[m])
 			{
-				for (in = 1; in<MAXITEM; in++)
+				for (in = 1; in<MAXBUFF; in++)
 				{
-					if (it[in].used==USE_EMPTY)
+					if (bu[in].used==USE_EMPTY)
 					{
 						break;
 					}
 				}
-				if (in==MAXITEM)
+				if (in==MAXBUFF)
 				{
-					xlog("MAXITEM reached.");
+					xlog("MAXBUFF reached.");
 					break;
 				}
 
-				read(h2, &it[in], sizeof(struct item));
+				read(h2, &bu[in], sizeof(struct item));
 				itc++;
 
 				ch[n].spell[m] = in;
@@ -1784,11 +1445,11 @@ void pop_load_char(int nr)
 				it[in].used = USE_EMPTY;
 			}
 		}
-		for (m = 0; m<20; m++)
+		for (m = 0; m<MAXBUFFS; m++)
 		{
 			if ((in = ch[nr].spell[m])!=0)
 			{
-				it[in].used = USE_EMPTY;
+				bu[in].used = USE_EMPTY;
 			}
 		}
 		for (m = 0; m<20; m++)
@@ -1837,7 +1498,7 @@ void pop_load_char(int nr)
 		}
 	}
 
-	for (m = 0; m<20; m++)
+	for (m = 0; m<MAXBUFFS; m++)
 	{
 		ch[nr].spell[m] = 0;
 	}

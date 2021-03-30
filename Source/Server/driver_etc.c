@@ -92,7 +92,7 @@ int char_moveto(int cn, int x, int y, int flag, int x2, int y2)
 			act_turn_right(cn);
 			return( 0);
 		}
-		if ((in = map[(ch[cn].x + 1) + (ch[cn].y) * MAPX].it)!=0 && !it[in].active && it[in].driver==2)
+		if ((in = map[(ch[cn].x + 1) + (ch[cn].y) * MAPX].it)!=0 && !it[in].active && ( it[in].driver==2 || it[in].driver==77 || it[in].driver==78 ))
 		{
 			act_use(cn);
 			return( 0);
@@ -105,7 +105,7 @@ int char_moveto(int cn, int x, int y, int flag, int x2, int y2)
 			act_turn_left(cn);
 			return( 0);
 		}
-		if ((in = map[(ch[cn].x - 1) + (ch[cn].y) * MAPX].it)!=0 && !it[in].active && it[in].driver==2)
+		if ((in = map[(ch[cn].x - 1) + (ch[cn].y) * MAPX].it)!=0 && !it[in].active && ( it[in].driver==2 || it[in].driver==77 || it[in].driver==78 ))
 		{
 			act_use(cn);
 			return( 0);
@@ -118,7 +118,7 @@ int char_moveto(int cn, int x, int y, int flag, int x2, int y2)
 			act_turn_down(cn);
 			return( 0);
 		}
-		if ((in = map[(ch[cn].x) + (ch[cn].y + 1) * MAPX].it)!=0 && !it[in].active && it[in].driver==2)
+		if ((in = map[(ch[cn].x) + (ch[cn].y + 1) * MAPX].it)!=0 && !it[in].active && ( it[in].driver==2 || it[in].driver==77 || it[in].driver==78 ))
 		{
 			act_use(cn);
 			return( 0);
@@ -131,7 +131,7 @@ int char_moveto(int cn, int x, int y, int flag, int x2, int y2)
 			act_turn_up(cn);
 			return( 0);
 		}
-		if ((in = map[(ch[cn].x) + (ch[cn].y - 1) * MAPX].it)!=0 && !it[in].active && it[in].driver==2)
+		if ((in = map[(ch[cn].x) + (ch[cn].y - 1) * MAPX].it)!=0 && !it[in].active && ( it[in].driver==2 || it[in].driver==77 || it[in].driver==78 ))
 		{
 			act_use(cn);
 			return( 0);

@@ -23,8 +23,8 @@ extern int riddletimeout[RIDDLEGIVERS];
 // extern int riddleattempts[RIDDLEGIVERS];
 
 // Areas of knowledge define a riddlegiver
-#define RIDDLE_MIN_AREA 21
-#define RIDDLE_MAX_AREA 25
+#define RIDDLE_MIN_AREA 1091
+#define RIDDLE_MAX_AREA 1095
 
 // how many attempts a player has to solve.
 #define RIDDLE_ATTEMPTS 3
@@ -32,9 +32,9 @@ extern int riddletimeout[RIDDLEGIVERS];
 // Number of true-false switch banks
 #define BANKS 5
 // Number of switches per bank
-#define SWITCHES 6
+#define SWITCHES 7
 // Number of questions available (PER_BLOCK chosen at random)
-#define BANK_QUESTIONS 8
+#define BANK_QUESTIONS 10
 
 /* Prototypes */
 int lab9_guesser_says(int cn, char *text);

@@ -1,0 +1,72 @@
+27.02.20 00:38:05: Mercenaries of Astonia Server v2.14.07
+27.02.20 00:38:05: Copyright (C) 1997-2001 Daniel Brockhaus
+27.02.20 00:38:06: Speed test: 3300 Mhz
+27.02.20 00:38:06: Loading MAP: Item size=28, file size=28672K
+27.02.20 00:38:06: Loading CHAR: Item size=3605, file size=28840K
+27.02.20 00:38:06: Loading TCHAR: Item size=3605, file size=16011K
+27.02.20 00:38:06: Loading ITEM: Item size=634, file size=60864K
+27.02.20 00:38:06: Loading TITEM: Item size=634, file size=2815K
+27.02.20 00:38:06: Loading EFFECT: Item size=47, file size=188K
+27.02.20 00:38:06: Loading GLOBS: Item size=644, file size=644b
+27.02.20 00:38:06: lab9: reset bank #1
+27.02.20 00:38:06: lab9: reset bank #1
+27.02.20 00:38:06: lab9: reset bank #2
+27.02.20 00:38:06: lab9: reset bank #2
+27.02.20 00:38:06: lab9: reset bank #3
+27.02.20 00:38:06: lab9: reset bank #3
+27.02.20 00:38:06: lab9: reset bank #4
+27.02.20 00:38:06: lab9: reset bank #4
+27.02.20 00:38:06: lab9: reset bank #5
+27.02.20 00:38:06: lab9: reset bank #5
+27.02.20 00:38:07: Entering game loop...
+27.02.20 00:38:08: Ghost (233 at 836,346 from 0.0.0.0, ID=0): Cast Warcry on Ghost
+27.02.20 00:38:08: Ghost (233 at 836,346 from 0.0.0.0, ID=0): Cast Warcry on Ghost
+27.02.20 00:38:08: Ghost (233 at 836,346 from 0.0.0.0, ID=0): Cast Warcry on Ghost
+27.02.20 00:38:08: Ghost (233 at 836,346 from 0.0.0.0, ID=0): Cast Warcry on Ghost
+27.02.20 00:38:10: Should have erased player Hoture, 0 exp; however disabled during development
+27.02.20 00:38:17: lab9: reset bank #1
+27.02.20 00:38:18: lab9: reset bank #2
+27.02.20 00:38:18: lab9: reset bank #3
+27.02.20 00:38:18: lab9: reset bank #4
+27.02.20 00:38:19: lab9: reset bank #5
+27.02.20 00:38:23: *unknown* (0 at 0,0 from 10.0.2.2, ID=0): New connection
+27.02.20 00:38:23: *unknown* (0 at 0,0 from 10.0.2.2, ID=0): challenge_login
+27.02.20 00:38:23: *unknown* (0 at 0,0 from 10.0.2.2, ID=0): Challenge ok
+27.02.20 00:38:23: *unknown* (0 at 0,0 from 10.0.2.2, ID=58645): received unique E515
+27.02.20 00:38:23: *unknown* (0 at 0,0 from 10.0.2.2, ID=58645): Login as Librarian denied (pass1/pass2)
+27.02.20 00:38:29: Should have erased player Lolzyep, 0 exp; however disabled during development
+27.02.20 00:38:32: Should have erased player Darklord, 239633 exp; however disabled during development
+27.02.20 00:38:38: *unknown* (0 at 0,0 from 10.0.2.2, ID=58645): Connection closed (ST_EXIT)
+27.02.20 00:38:49: Should have erased player Ishtar, 86946714 exp; however disabled during development
+27.02.20 00:39:07: Should have erased player Hoture, 0 exp; however disabled during development
+27.02.20 00:39:12: Got signal to terminate. Shutdown initiated...
+27.02.20 00:39:12: Sending shutdown message
+27.02.20 00:39:13: Leaving main loop
+27.02.20 00:39:13: Unloading data files
+27.02.20 00:39:13: Server down (18419,79)
+01.03.20 21:06:12: Mercenaries of Astonia Server v2.14.07
+01.03.20 21:06:12: Copyright (C) 1997-2001 Daniel Brockhaus
+01.03.20 21:06:13: Speed test: 3300 Mhz
+01.03.20 21:06:13: Loading MAP: Item size=28, file size=28672K
+01.03.20 21:06:13: Loading CHAR: Item size=3605, file size=28840K
+01.03.20 21:06:13: Loading TCHAR: Item size=3605, file size=16011K
+01.03.20 21:06:13: Loading ITEM: Item size=634, file size=60864K
+01.03.20 21:06:13: Loading TITEM: Item size=634, file size=2815K
+01.03.20 21:06:13: Loading EFFECT: Item size=47, file size=188K
+01.03.20 21:06:13: Loading GLOBS: Item size=644, file size=644b
+01.03.20 21:06:14: lab9: reset bank #1
+01.03.20 21:06:14: lab9: reset bank #1
+01.03.20 21:06:14: lab9: reset bank #2
+01.03.20 21:06:15: lab9: reset bank #2
+01.03.20 21:06:15: lab9: reset bank #3
+01.03.20 21:06:15: lab9: reset bank #3
+01.03.20 21:06:15: lab9: reset bank #4
+01.03.20 21:06:15: lab9: reset bank #4
+01.03.20 21:06:15: lab9: reset bank #5
+01.03.20 21:06:15: lab9: reset bank #5
+01.03.20 21:06:16: Entering game loop...
+01.03.20 21:06:17: Got signal to terminate. Shutdown initiated...
+01.03.20 21:06:17: Sending shutdown message
+01.03.20 21:06:18: Leaving main loop
+01.03.20 21:06:18: Unloading data files
+01.03.20 21:06:18: Server down (471,37)

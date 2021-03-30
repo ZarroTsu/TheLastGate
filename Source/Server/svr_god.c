@@ -49,11 +49,11 @@ static char *mkp(void)
 
 	buf[0] = 0;
 
-	n = random() % (sizeof(syl1) / sizeof(char *));
+	n = random() % max(1,(sizeof(syl1) / sizeof(char *)));
 	strcat(buf, syl1[n]);
 	buf[0] = toupper(buf[0]);
 
-	n = random() % (sizeof(syl2) / sizeof(char *));
+	n = random() % max(1,(sizeof(syl2) / sizeof(char *)));
 	strcat(buf, syl2[n]);
 
 	if (random() % 2)
@@ -61,19 +61,35 @@ static char *mkp(void)
 		return( buf);
 	}
 
-	n = random() % (sizeof(syl3) / sizeof(char *));
+	n = random() % max(1,(sizeof(syl3) / sizeof(char *)));
 	strcat(buf, syl3[n]);
 
 	return(buf);
 }
 
+#define MAXFREEBUFF 32
 #define MAXFREEITEM 32
+static int free_buff_list[MAXFREEBUFF];
 static int free_item_list[MAXFREEITEM];
 
 void god_init_freelist(void)
 {
 	int n, m;
 
+	bzero(free_buff_list, sizeof(free_buff_list));
+
+	for (m = 0, n = 1; n<MAXBUFF; n++)
+	{
+		if (it[n].used==USE_EMPTY)
+		{
+			free_buff_list[m++] = n;
+			if (m>=MAXFREEBUFF)
+			{
+				break;
+			}
+		}
+	}
+	
 	bzero(free_item_list, sizeof(free_item_list));
 
 	for (m = 0, n = 1; n<MAXITEM; n++)
@@ -87,6 +103,62 @@ void god_init_freelist(void)
 			}
 		}
 	}
+}
+
+
+int get_free_buff(void)
+{
+	int n, in, m;
+
+	for (n = 0; n<MAXFREEBUFF; n++)
+	{
+		if ((in = free_buff_list[n]) && bu[in].used==USE_EMPTY)
+		{
+			break;
+		}
+	}
+	if (n<MAXFREEBUFF)
+	{
+		free_buff_list[n] = 0;
+		return(in);
+	}
+
+	for (m = in = 0, n = 1; n<MAXBUFF; n++)
+	{
+		if (bu[n].used==USE_EMPTY)
+		{
+			in = free_buff_list[m++] = n;
+			if (m>=MAXFREEBUFF)
+			{
+				break;
+			}
+		}
+	}
+
+	return(in);
+}
+
+int god_create_buff(void)
+{
+	int n, m;
+	unsigned long long prof;
+
+	prof = prof_start();
+
+	n = get_free_buff();
+	if (!n)
+	{
+		xlog("god_create_buff (svr_god.c): MAXBUFF reached");
+		prof_stop(46, prof);
+		return(0);
+	}
+
+	bu[n] = it_temp[1];
+	bu[n].temp = 1;
+
+	prof_stop(46, prof);
+
+	return(n);
 }
 
 int get_free_item(void)
@@ -121,7 +193,7 @@ int get_free_item(void)
 	return(in);
 }
 
-int god_create_item(int temp)
+int god_create_item(int temp, int godwep)
 {
 	int n, m;
 	unsigned long long prof;
@@ -148,16 +220,24 @@ int god_create_item(int temp)
 		return(0);
 	}
 
-	if (it_temp[temp].flags & IF_UNIQUE)
+	if ((it_temp[temp].flags & IF_UNIQUE) || godwep)
 	{
 		for (m = 1; m<MAXITEM; m++)
 		{
-			if (it[m].used!=USE_EMPTY && it[m].temp==temp)
+			if (it[m].used!=USE_EMPTY && it[m].temp==temp && (
+				godwep == 0
+				||
+				(godwep == 1 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_KWAI_UNI) && (it[m].flags & IF_GORN_UNI))
+				||
+				(godwep == 2 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_KWAI_UNI))
+				||
+				(godwep == 3 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_GORN_UNI))
+				))
 			{
 				break;
 			}
 		}
-
+		
 		if (m<MAXITEM)
 		{
 			prof_stop(23, prof);
@@ -247,7 +327,7 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp);
+				tmp = god_create_item(tmp, 0);
 				if (!tmp)
 				{
 					flag = 1;
@@ -268,7 +348,7 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp);
+				tmp = god_create_item(tmp, 0);
 				if (!tmp)
 				{
 					flag = 1;
@@ -283,7 +363,7 @@ int god_create_char(int temp, int withitems)
 		}
 	}
 
-	for (m = 0; m<20; m++)
+	for (m = 0; m<MAXBUFFS; m++)
 	{
 		if (ch[n].spell[m]!=0)
 		{
@@ -295,7 +375,7 @@ int god_create_char(int temp, int withitems)
 	{
 		if (withitems)
 		{
-			tmp = god_create_item(tmp);
+			tmp = god_create_item(tmp, 0);
 			if (!tmp)
 			{
 				flag = 1;
@@ -865,41 +945,41 @@ int god_take_from_char(int in, int cn)
 
 int god_transfer_char(int cn, int x, int y)
 {
+	int ret = 0, gc, sc;
+	
 	if (!IS_SANECHAR(cn) || !SANEXY(x, y))
 	{
 		return( 0);
 	}
-
+	
+	gc = ch[cn].data[CHD_COMPANION];
+	sc = ch[cn].data[CHD_SHADOWCOPY];
+	
 	ch[cn].status = 0;
 	ch[cn].attack_cn = 0;
 	ch[cn].skill_nr  = 0;
 	ch[cn].goto_x = 0;
 
 	plr_map_remove(cn);
-
-	if (god_drop_char_fuzzy_large(cn, x, y, x, y))
+	
+	if (god_drop_char_fuzzy_large(cn, x, y, x, y)) 		ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x + 3, y, x, y))	ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x - 3, y, x, y))	ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x, y + 3, x, y))	ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x, y - 3, x, y))	ret = 1;
+	
+	if (ret)
 	{
-		return( 1);
+		if (ch[cn].flags & CF_GCTOME)
+		{
+			if (IS_SANECHAR(gc) && ch[gc].data[63]==cn) god_transfer_char(gc, x, y);
+			if (IS_SANECHAR(sc) && ch[sc].data[63]==cn) god_transfer_char(sc, x, y);
+		}
+		return 1;
 	}
-	if (god_drop_char_fuzzy_large(cn, x + 3, y, x, y))
-	{
-		return( 1);
-	}
-	if (god_drop_char_fuzzy_large(cn, x - 3, y, x, y))
-	{
-		return( 1);
-	}
-	if (god_drop_char_fuzzy_large(cn, x, y + 3, x, y))
-	{
-		return( 1);
-	}
-	if (god_drop_char_fuzzy_large(cn, x, y - 3, x, y))
-	{
-		return( 1);
-	}
-
+	
 	plr_map_set(cn);
-
+	
 	return(0);
 }
 
@@ -1083,9 +1163,15 @@ void god_info(int cn, int co)
 			            ch[co].data[23], ch[co].data[24], ch[co].data[25]);
 			do_char_log(cn, 3, "Killed %d players outside arena, killed %d shopkeepers.\n",
 			            ch[co].data[29], ch[co].data[40]);
-			do_char_log(cn, 3, "BS: Killed %d NPCs below rank, %d NPCs at rank, %d NPCs above rank, %d candles returned.\n",
-			            ch[co].data[26], ch[co].data[27], ch[co].data[28], ch[co].data[43]);
+			do_char_log(cn, 3, "BS: %d (%d) t1 points, %d t2 points, %d (%d) t3 points, %d total used.\n",
+			            ch[co].data[26]/5, ch[co].data[26], 
+						ch[co].data[27], 
+						ch[co].data[28]*5, ch[co].data[28],
+						ch[co].data[41]);
 		}
+		do_char_log(cn, 1, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
+			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
+			            ch[co].data[5], ch[co].data[6], ch[co].data[7], ch[co].data[8], ch[co].data[9]);
 		do_char_log(cn, 3, "Armor=%d, Weapon=%d. Alignment=%d.\n", ch[co].armor, ch[co].weapon, ch[co].alignment);
 		do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[42], group_active(co), ch[co].data[92], ch[co].data[96]);
 		do_char_log(cn, 3, "Luck=%d, Gethit_Dam=%d.\n", ch[co].luck, ch[co].gethit_dam);
@@ -1164,10 +1250,10 @@ void god_tinfo(int cn, int temp)
 void god_unique(int cn)
 {
 	static int unique[60] = {
-		280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 525, 526,
-		527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541,
-		542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556,
-		572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586
+	//	280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 525, 526,
+	//	527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541,
+	//	542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556,
+	//	572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586
 	};
 	int owner[60];
 	int n, in;
@@ -1458,7 +1544,7 @@ void god_create(int cn, int x)
 		do_char_log(cn, 0, "item is not take-able.\n");
 		return;
 	}
-	in = god_create_item(x);
+	in = god_create_item(x, 0);
 	if (in==0)
 	{
 		do_char_log(cn, 0, "god_create_item() failed.\n");
@@ -1471,6 +1557,77 @@ void god_create(int cn, int x)
 	}
 	do_char_log(cn, 1, "created one %s.\n", it[in].name);
 	chlog(cn, "IMP: created one %s.", it[in].name);
+	return;
+}
+
+void god_cleanslots(int cn)
+{
+	int n, m;
+	
+	do_char_log(cn, 1, "Now cleaning all character dummy slots...\n");
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (!(ch[n].flags & (CF_PLAYER)))
+		{
+			continue;
+		}
+		if (ch[n].used==USE_EMPTY)
+		{
+			continue;
+		}
+		for (m=12;m<20;m++)
+		{
+			ch[n].worn[m] = 0;
+		}
+	}
+	do_char_log(cn, 0, "Done.\n");
+	return;
+}
+
+void god_reset_npcs(int cn)
+{
+	int n;
+	
+	do_char_log(cn, 1, "Now wiping all npcs...\n");
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used==USE_EMPTY)
+		{
+			continue;
+		}
+		if (IS_SANEPLAYER(n))
+		{
+			continue;
+		}
+		god_destroy_items(n);
+		if (ch[n].used==USE_ACTIVE)
+		{
+			plr_map_remove(n);
+		}
+		ch[n].flags = 0;
+		ch[n].used = USE_EMPTY;
+	}
+	do_char_log(cn, 1, "Now resetting npcs...\n");
+	for (n = 1; n<MAXTCHARS; n++)
+	{
+		if (ch_temp[n].flags & CF_RESPAWN)
+		{
+			reset_char(n);
+		}
+	}
+	globs->reset_char = 0;
+	do_char_log(cn, 0, "Done.\n");
+	return;
+}
+
+void god_reset_ticker(int cn)
+{
+	do_char_log(cn, 1, "The ticker was %d\n", globs->ticker);
+	globs->ticker 	= 0;
+	globs->mdtime 	= 0;
+	globs->mdday 	= 0;
+	globs->mdyear 	= 0;
+	do_char_log(cn, 0, "The ticker is now %d\nCheck #time for further details.\n", globs->ticker);
 	return;
 }
 
@@ -1731,7 +1888,7 @@ void god_mirror(int cn, char *spec1, char *spec2)
 	;                                                       // 2 arguments
 
 //	cc=pop_create_char(968,0);
-	if (!(cc = god_create_char(968, 0)))
+	if (!(cc = god_create_char(CT_UNDEAD, 0)))
 	{
 		do_char_log(cn, 0, "god_create_char() failed.\n");
 		return;
@@ -2099,7 +2256,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x40000000 | MF_NOFIGHT;
 		ch[cn].item[m++] = 0x40000000 | MF_NOEXPIRE;
 
-		ch[cn].item[m++] = 0x20000000 | SPR_TUNDRA_GROUND;
+		//ch[cn].item[m++] = 0x20000000 | SPR_TUNDRA_GROUND;
 		ch[cn].item[m++] = 0x20000000 | SPR_DESERT_GROUND;
 		ch[cn].item[m++] = 0x20000000 | SPR_GROUND1;
 		ch[cn].item[m++] = 0x20000000 | SPR_WOOD_GROUND;
@@ -2108,6 +2265,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND2;
 		ch[cn].item[m++] = 0x20000000 | 1100;
 		ch[cn].item[m++] = 0x20000000 | 1099;
+		ch[cn].item[m++] = 0x20000000 | 1012;
 		ch[cn].item[m++] = 0x20000000 | 1109;
 		ch[cn].item[m++] = 0x20000000 | 1118;
 		ch[cn].item[m++] = 0x20000000 | 1141;
@@ -2188,37 +2346,286 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 174;
 		ch[cn].item[m++] = 0x20000000 | 175;
 		break;
-	case 331:
+	case 11:	// Grass to Dark Grass
+		ch[cn].item[m++] = 0x20000000 | 551;
+		ch[cn].item[m++] = 0x20000000 | 1118;
+		ch[cn].item[m++] = 0x20000000 | 2721;
+		ch[cn].item[m++] = 0x20000000 | 2722;
+		ch[cn].item[m++] = 0x20000000 | 2723;
+		ch[cn].item[m++] = 0x20000000 | 2724;
+		ch[cn].item[m++] = 0x20000000 | 2725;
+		ch[cn].item[m++] = 0x20000000 | 2726;
+		ch[cn].item[m++] = 0x20000000 | 2727;
+		ch[cn].item[m++] = 0x20000000 | 2728;
+		ch[cn].item[m++] = 0x20000000 | 2729;
+		ch[cn].item[m++] = 0x20000000 | 2730;
+		ch[cn].item[m++] = 0x20000000 | 2731;
+		ch[cn].item[m++] = 0x20000000 | 2732;
+		break;
+	case 12:	// Grass to Sand
+		ch[cn].item[m++] = 0x20000000 | 551;	// Grass
+		ch[cn].item[m++] = 0x20000000 | 130;	// Sand
+		ch[cn].item[m++] = 0x20000000 | 2741;	// Grass N, Sand S
+		ch[cn].item[m++] = 0x20000000 | 2742;	// Grass NE (U)
+		ch[cn].item[m++] = 0x20000000 | 2743;	// Grass E, Sand W
+		ch[cn].item[m++] = 0x20000000 | 2744;	// Grass SE (U)
+		ch[cn].item[m++] = 0x20000000 | 2745;	// Grass S, Sand N
+		ch[cn].item[m++] = 0x20000000 | 2746;	// Grass SW (U)
+		ch[cn].item[m++] = 0x20000000 | 2747;	// Grass W, Sand E
+		ch[cn].item[m++] = 0x20000000 | 2748;	// Grass NW (U)
+		ch[cn].item[m++] = 0x20000000 | 2749;	// Sand NE (U)
+		ch[cn].item[m++] = 0x20000000 | 2750;	// Sand SE (U)
+		ch[cn].item[m++] = 0x20000000 | 2751;	// Sand SW (U)
+		ch[cn].item[m++] = 0x20000000 | 2752;	// Sand NW (U)
+		break;
+	case 13:	// Black Marble Stuff
+		ch[cn].item[m++] = 0x20000000 | 2717;
+		ch[cn].item[m++] = 122;
+		ch[cn].item[m++] = 123;
+		ch[cn].item[m++] = 0x20000000 | 531;
+		ch[cn].item[m++] = 0x20000000 | 532;
+		ch[cn].item[m++] = 0x20000000 | 533;
+		ch[cn].item[m++] = 0x20000000 | 534;
+		ch[cn].item[m++] = 0x20000000 | 535;
+		ch[cn].item[m++] = 0x20000000 | 536;
+		ch[cn].item[m++] = 0x20000000 | 537;
+		ch[cn].item[m++] = 0x20000000 | 538;
+		ch[cn].item[m++] = 0x20000000 | 539;
+		ch[cn].item[m++] = 0x20000000 | 540;
+		ch[cn].item[m++] = 0x20000000 | 541;
+		break;
+	case 14:	// Grass to Dirt
+		ch[cn].item[m++] = 0x20000000 | 551;	// Grass
+		ch[cn].item[m++] = 0x20000000 | 131;	// Dirt
+		ch[cn].item[m++] = 0x20000000 | 3570;	// Grass N, Dirt S
+		ch[cn].item[m++] = 0x20000000 | 3571;	// Grass NE (U)
+		ch[cn].item[m++] = 0x20000000 | 3572;	// Grass E, Dirt W
+		ch[cn].item[m++] = 0x20000000 | 3573;	// Grass SE (U)
+		ch[cn].item[m++] = 0x20000000 | 3574;	// Grass S, Dirt N
+		ch[cn].item[m++] = 0x20000000 | 3575;	// Grass SW (U)
+		ch[cn].item[m++] = 0x20000000 | 3576;	// Grass W, Dirt E
+		ch[cn].item[m++] = 0x20000000 | 3577;	// Grass NW (U)
+		ch[cn].item[m++] = 0x20000000 | 3578;	// Dirt NE (U)
+		ch[cn].item[m++] = 0x20000000 | 3579;	// Dirt SE (U)
+		ch[cn].item[m++] = 0x20000000 | 3580;	// Dirt SW (U)
+		ch[cn].item[m++] = 0x20000000 | 3581;	// Dirt NW (U)
+		break;
+	case 15:	// Yellow Grass to Dark Yellow Grass
+		ch[cn].item[m++] = 0x20000000 | 2828;	// Grass
+		ch[cn].item[m++] = 0x20000000 | 2832;	// DarkG
+		ch[cn].item[m++] = 0x20000000 | 2833;	// Grass N, DarkG S
+		ch[cn].item[m++] = 0x20000000 | 2834;	// Grass NE (U)
+		ch[cn].item[m++] = 0x20000000 | 2835;	// Grass E, DarkG W
+		ch[cn].item[m++] = 0x20000000 | 2836;	// Grass SE (U)
+		ch[cn].item[m++] = 0x20000000 | 2837;	// Grass S, DarkG N
+		ch[cn].item[m++] = 0x20000000 | 2838;	// Grass SW (U)
+		ch[cn].item[m++] = 0x20000000 | 2839;	// Grass W, DarkG E
+		ch[cn].item[m++] = 0x20000000 | 2840;	// Grass NW (U)
+		//
+		ch[cn].item[m++] = 0x20000000 | 2841;	// DarkG NE (U)
+		ch[cn].item[m++] = 0x20000000 | 2842;	// DarkG SE (U)
+		ch[cn].item[m++] = 0x20000000 | 2843;	// DarkG SW (U)
+		ch[cn].item[m++] = 0x20000000 | 2844;	// DarkG NW (U)
+		ch[cn].item[m++] = 1689;				// ** Deco
+		ch[cn].item[m++] = 1690;				// ** Deco
+		ch[cn].item[m++] = 1691;				// ** Deco
+		break;	
+	case 16:	// Snowy
+		ch[cn].item[m++] = 0x20000000 | 2822;	// Dark Sand
+		ch[cn].item[m++] = 0x20000000 | 2823;	// Snow 1
+		ch[cn].item[m++] = 0x20000000 | 2827;	// Snow 2
+		ch[cn].item[m++] = 0x20000000 | 3021;	// Snow 3
+		ch[cn].item[m++] = 1675;				// ** Wall
+		ch[cn].item[m++] = 1692;				// ** Deco
+		ch[cn].item[m++] = 1693;				// ** Deco
+		ch[cn].item[m++] = 1694;				// ** Deco
+		ch[cn].item[m++] = 1688;				// ** Tree
+		break;	
+	case 17:	// Canyon
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 1674;				// ** Wall
+		ch[cn].item[m++] = 1710;				// ** Rope
+		ch[cn].item[m++] = 0x20000000 | 3614;
+		ch[cn].item[m++] = 0x20000000 | 3615;
+		ch[cn].item[m++] = 0x20000000 | 3538;
+		ch[cn].item[m++] = 0x20000000 | 3539;
+		ch[cn].item[m++] = 0x20000000 | 3540;
+		ch[cn].item[m++] = 0x20000000 | 3541;
+		ch[cn].item[m++] = 0x20000000 | 3542;
+		ch[cn].item[m++] = 0x20000000 | 3543;
+		ch[cn].item[m++] = 0x20000000 | 3544;
+		ch[cn].item[m++] = 0x20000000 | 3545;
+		ch[cn].item[m++] = 0x20000000 | 3546;
+		ch[cn].item[m++] = 0x20000000 | 3547;
+		ch[cn].item[m++] = 0x20000000 | 3548;
+		ch[cn].item[m++] = 0x20000000 | 3549;
+		ch[cn].item[m++] = 0x20000000 | 3550;
+		ch[cn].item[m++] = 0x20000000 | 3551;
+		ch[cn].item[m++] = 0x20000000 | 3552;
+		ch[cn].item[m++] = 0x20000000 | 3553;
+		ch[cn].item[m++] = 0x20000000 | 3554;
+		ch[cn].item[m++] = 0x20000000 | 3555;
+		ch[cn].item[m++] = 0x20000000 | 3556;
+		ch[cn].item[m++] = 0x20000000 | 3557;
+		ch[cn].item[m++] = 0x20000000 | 3558;
+		ch[cn].item[m++] = 0x20000000 | 3559;
+		ch[cn].item[m++] = 0x20000000 | 3560;
+		ch[cn].item[m++] = 0x20000000 | 3561;
+		ch[cn].item[m++] = 0x20000000 | 3562;
+		ch[cn].item[m++] = 0x20000000 | 3563;
+		ch[cn].item[m++] = 0x20000000 | 3564;
+		ch[cn].item[m++] = 0x20000000 | 3565;
+		ch[cn].item[m++] = 0x20000000 | 3566;
+		ch[cn].item[m++] = 0x20000000 | 3567;
+		ch[cn].item[m++] = 0x20000000 | 3568;
+		ch[cn].item[m++] = 0x20000000 | 3569;
+		break;	
+	case 18:	// Water border tiles etc
+		ch[cn].item[m++] = 0x20000000 | 16933;
+		ch[cn].item[m++] = 0x20000000 | 3582;
+		ch[cn].item[m++] = 0x20000000 | 3583;
+		ch[cn].item[m++] = 0x20000000 | 3584;
+		ch[cn].item[m++] = 0x20000000 | 3585;
+		ch[cn].item[m++] = 0x20000000 | 3586;
+		ch[cn].item[m++] = 0x20000000 | 3587;
+		ch[cn].item[m++] = 0x20000000 | 3588;
+		ch[cn].item[m++] = 0x20000000 | 3589;
+		ch[cn].item[m++] = 0x20000000 | 3590;
+		ch[cn].item[m++] = 0x20000000 | 3591;
+		ch[cn].item[m++] = 0x20000000 | 3592;
+		ch[cn].item[m++] = 0x20000000 | 3600;
+		ch[cn].item[m++] = 0x20000000 | 3601;
+		ch[cn].item[m++] = 0x20000000 | 3610;
+		ch[cn].item[m++] = 1806;				// ** Edge piece
+		ch[cn].item[m++] = 1807;				// ** Edge piece
+		ch[cn].item[m++] = 1808;				// ** Edge piece
+		ch[cn].item[m++] = 1809;				// ** Edge piece
+		ch[cn].item[m++] = 1810;				// ** Edge piece
+		ch[cn].item[m++] = 1811;				// ** Edge piece
+		ch[cn].item[m++] = 1812;				// ** Edge piece
+		break;
+	case 20:	// New Brick Walls
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 0x20000000 | 3021;
+		ch[cn].item[m++] = 1662;				// ** Grey
+		ch[cn].item[m++] = 1663;				// ** Grey window
+		ch[cn].item[m++] = 1664;				// ** M.Grey
+		ch[cn].item[m++] = 1665;				// ** M.Grey window
+		ch[cn].item[m++] = 1666;				// ** Tan
+		ch[cn].item[m++] = 1667;				// ** Tan window
+		ch[cn].item[m++] = 1668;				// ** M.Tan
+		ch[cn].item[m++] = 1669;				// ** M.Tan window
+		ch[cn].item[m++] = 1670;				// ** Red
+		ch[cn].item[m++] = 1671;				// ** Red window
+		ch[cn].item[m++] = 1672;				// ** M.Red
+		ch[cn].item[m++] = 1673;				// ** M.Red window
+		break;	
+	
+	case 25:	// Tables and table-candles
+		ch[cn].item[m++] = 82; 	// Rough Table  w/ leg
+		ch[cn].item[m++] = 83; 	// Rough Table  no leg
+		ch[cn].item[m++] = 81; 	// Rough G.Candle  w/ leg
+		ch[cn].item[m++] = 85; 	// Rough G.Candle  no leg
+		ch[cn].item[m++] = 175; // Rough B.Candle  w/ leg
+		ch[cn].item[m++] = 176; // Rough B.Candle  no leg
+		ch[cn].item[m++] = 298; // Smooth Table  w/ leg
+		ch[cn].item[m++] = 299; // Smooth Table  no leg
+		ch[cn].item[m++] = 26; 	// Smooth G.Candle  w/ leg
+		ch[cn].item[m++] = 88; 	// Smooth G.Candle  no leg
+		ch[cn].item[m++] = 177; // Smooth B.Candle  w/ leg
+		ch[cn].item[m++] = 178; // Smooth B.Candle  no leg
+		break;
+		
+	case 300:
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
 		ch[cn].item[m++] = 0x20000000 | 116;
 		ch[cn].item[m++] = 0x20000000 | 117;
 		ch[cn].item[m++] = 0x20000000 | 118;
-
 		ch[cn].item[m++] = 0x20000000 | 704;
-		/*ch[cn].item[m++]=0x20000000|705;
-		   ch[cn].item[m++]=0x20000000|706;
-		   ch[cn].item[m++]=0x20000000|707;
-		   ch[cn].item[m++]=0x20000000|708;
-		   ch[cn].item[m++]=0x20000000|709;
-		   ch[cn].item[m++]=0x20000000|710;
-		   ch[cn].item[m++]=0x20000000|711;
-		   ch[cn].item[m++]=0x20000000|712;
-		   ch[cn].item[m++]=0x20000000|713;
-		   ch[cn].item[m++]=0x20000000|714;
-		   ch[cn].item[m++]=0x20000000|715;
-		   ch[cn].item[m++]=0x20000000|716;
-		   ch[cn].item[m++]=0x20000000|717;
-		   ch[cn].item[m++]=0x20000000|718;
-		   ch[cn].item[m++]=0x20000000|719;
-		   ch[cn].item[m++]=0x20000000|720;
-		   ch[cn].item[m++]=0x20000000|721;
-		   ch[cn].item[m++]=0x20000000|722;
-		   ch[cn].item[m++]=0x20000000|723;
-		   ch[cn].item[m++]=0x20000000|724;
-		   ch[cn].item[m++]=0x20000000|725;
-		   ch[cn].item[m++]=0x20000000|726;
-		   ch[cn].item[m++]=0x20000000|727;
-		   ch[cn].item[m++]=0x20000000|728;*/
+		//
+		ch[cn].item[m++] = 1465;
+		ch[cn].item[m++] = 1441;
+		ch[cn].item[m++] = 1449;
+		ch[cn].item[m++] = 1457;
+		ch[cn].item[m++] = 437;
+		//
+		ch[cn].item[m++] = 359;
+		ch[cn].item[m++] = 332;
+		ch[cn].item[m++] = 373;
+		ch[cn].item[m++] = 381;
+		ch[cn].item[m++] = 443;
+		//
+		ch[cn].item[m++] = 371;
+		ch[cn].item[m++] = 389;
+		ch[cn].item[m++] = 397;
+		ch[cn].item[m++] = 405;
+		ch[cn].item[m++] = 438;
+		//
+		ch[cn].item[m++] = 372;
+		ch[cn].item[m++] = 413;
+		ch[cn].item[m++] = 421;
+		ch[cn].item[m++] = 429;
+		ch[cn].item[m++] = 439;
+		//
+		ch[cn].item[m++] = 443;
+		ch[cn].item[m++] = 444;
+		ch[cn].item[m++] = 445;
+		ch[cn].item[m++] = 446;
+		ch[cn].item[m++] = 447;
+		//
+		ch[cn].item[m++] = 448;
+		ch[cn].item[m++] = 450;
+		ch[cn].item[m++] = 451;
+		break;
+	case 301:
+		ch[cn].item[m++] = 0x20000000 | 704;
+		ch[cn].item[m++] = 0x20000000 | 705;
+		ch[cn].item[m++] = 0x20000000 | 706;
+		ch[cn].item[m++] = 0x20000000 | 707;
+		ch[cn].item[m++] = 0x20000000 | 708;
+		ch[cn].item[m++] = 0x20000000 | 709;
+		ch[cn].item[m++] = 0x20000000 | 710;
+		ch[cn].item[m++] = 0x20000000 | 711;
+		ch[cn].item[m++] = 0x20000000 | 712;
+		ch[cn].item[m++] = 0x20000000 | 713;
+		//
+		ch[cn].item[m++] = 0x20000000 | 714;
+		ch[cn].item[m++] = 0x20000000 | 715;
+		ch[cn].item[m++] = 0x20000000 | 716;
+		ch[cn].item[m++] = 0x20000000 | 717;
+		ch[cn].item[m++] = 0x20000000 | 718;
+		ch[cn].item[m++] = 0x20000000 | 719;
+		ch[cn].item[m++] = 0x20000000 | 720;
+		ch[cn].item[m++] = 0x20000000 | 721;
+		ch[cn].item[m++] = 0x20000000 | 722;
+		ch[cn].item[m++] = 0x20000000 | 723;
+		//
+		ch[cn].item[m++] = 0x20000000 | 724;
+		ch[cn].item[m++] = 0x20000000 | 725;
+		ch[cn].item[m++] = 0x20000000 | 726;
+		ch[cn].item[m++] = 0x20000000 | 727;
+		ch[cn].item[m++] = 0x20000000 | 728;
+		break;
+	case 302:		// Jungle-fied lava
+		ch[cn].item[m++] = 0x20000000 | 2845;
+		ch[cn].item[m++] = 0x20000000 | 2846;
+		ch[cn].item[m++] = 0x20000000 | 2847;
+		ch[cn].item[m++] = 0x20000000 | 2848;
+		ch[cn].item[m++] = 0x20000000 | 2849;
+		ch[cn].item[m++] = 0x20000000 | 2850;
+		ch[cn].item[m++] = 0x20000000 | 2851;
+		ch[cn].item[m++] = 0x20000000 | 2852;
+		ch[cn].item[m++] = 0x20000000 | 2853;
+		ch[cn].item[m++] = 0x20000000 | 2854;
+		ch[cn].item[m++] = 0x20000000 | 2855;
+		ch[cn].item[m++] = 0x20000000 | 2856;
+		ch[cn].item[m++] = 0x20000000 | 2857;
+		ch[cn].item[m++] = 0x20000000 | 2858;
+		ch[cn].item[m++] = 0x20000000 | 2859;
+		ch[cn].item[m++] = 0x20000000 | 2860;
+		ch[cn].item[m++] = 0x20000000 | 2861;
+		ch[cn].item[m++] = 0x20000000 | 2862;
+		ch[cn].item[m++] = 0x20000000 | 2863;
 		break;
 	case 700:       // black stronghold
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
@@ -2274,6 +2681,8 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
 		ch[cn].item[m++] = 0x20000000 | 1014;
 		ch[cn].item[m++] = 0x20000000 | 704;
+		ch[cn].item[m++] = 0x20000000 | 662;
+		ch[cn].item[m++] = 0x20000000 | 16689;
 		//ch[cn].item[m++]=150;
 		//ch[cn].item[m++]=171;
 		//ch[cn].item[m++]=152;
@@ -2303,21 +2712,33 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 522;
 		break;
 	case 1001:
-		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
-		ch[cn].item[m++] = 0x20000000 | 1118;
-		ch[cn].item[m++] = 16;
-		ch[cn].item[m++] = 17;
-		ch[cn].item[m++] = 45;
-		ch[cn].item[m++] = 47;
-		ch[cn].item[m++] = 19;
-		ch[cn].item[m++] = 20;
-		ch[cn].item[m++] = 48;
-		ch[cn].item[m++] = 49;
-		ch[cn].item[m++] = 606;
-		ch[cn].item[m++] = 607;
-		ch[cn].item[m++] = 608;
-		ch[cn].item[m++] = 609;
-		ch[cn].item[m++] = 611;
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS; // Indoor flag
+		ch[cn].item[m++] = 0x20000000 | 551;		// Light Grass
+		ch[cn].item[m++] = 0x20000000 | 1118;		// Dark Grass
+		ch[cn].item[m++] = 1467;	// Random Town Tree
+		ch[cn].item[m++] = 1468;	// Random Forest Tree
+		ch[cn].item[m++] = 16;		// Red Flower
+		ch[cn].item[m++] = 45;		// Purple Flower
+		ch[cn].item[m++] = 139;		// Green Flower
+		ch[cn].item[m++] = 17;		// Light moss
+		ch[cn].item[m++] = 47;		// Dark moss
+		//
+		ch[cn].item[m++] = 137;		// Yellow Flower
+		ch[cn].item[m++] = 138;		// Blue Flower
+		ch[cn].item[m++] = 19;		// Tree I
+		ch[cn].item[m++] = 20;		// Tree II
+		ch[cn].item[m++] = 48;		// Tree III
+		ch[cn].item[m++] = 49;		// Tree IV
+		ch[cn].item[m++] = 606;		// Tree V
+		ch[cn].item[m++] = 607;		// Tree VI
+		ch[cn].item[m++] = 608;		// Tree VII
+		ch[cn].item[m++] = 609;		// Tree VIII
+		//
+		ch[cn].item[m++] = 1434;	// Apple Tree
+		ch[cn].item[m++] = 1436;	// Pear Tree
+		ch[cn].item[m++] = 1438;	// Berry Bush
+		ch[cn].item[m++] = 1440;	// Bush
+		ch[cn].item[m++] = 611;		// Spider Web
 		break;
 	case 1002:   // ice penta
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
@@ -2338,6 +2759,25 @@ void god_build_equip(int cn, int x)
 		break;
 	case    1003:
 		ch[cn].item[m++] = 0x20000000 | 16980;
+		break;
+	case    1004:
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS; // Indoor flag
+		ch[cn].item[m++] = 0x20000000 | 2828;		// Light Grass
+		ch[cn].item[m++] = 0x20000000 | 2832;		// Dark Grass
+		ch[cn].item[m++] = 1695;	// Random Town Tree
+		ch[cn].item[m++] = 1696;	// Random Forest Tree
+		ch[cn].item[m++] = 1689;
+		ch[cn].item[m++] = 1690;
+		ch[cn].item[m++] = 1691;
+		ch[cn].item[m++] = 1680;
+		ch[cn].item[m++] = 1681;
+		//
+		ch[cn].item[m++] = 1682;
+		ch[cn].item[m++] = 1683;
+		ch[cn].item[m++] = 1684;
+		ch[cn].item[m++] = 1685;
+		ch[cn].item[m++] = 1686;
+		ch[cn].item[m++] = 1687;
 		break;
 	case    1140:
 		ch[cn].item[m++] = 0x20000000 | 17064;
@@ -2384,6 +2824,12 @@ void god_build(int cn, int x)
 
 	if (!IS_BUILDING(cn))
 	{
+		// Remove GC-to-me to prevent weird holder teleport behavior
+		if (ch[cn].flags & CF_GCTOME)
+		{
+			ch[cn].flags ^= CF_GCTOME;
+		}
+		
 		// build from non-build mode: start
 		if (god_build_start(cn))
 		{
@@ -2529,7 +2975,7 @@ void god_erase(int cn, int co, int erase_player)
 	}
 	else
 	{
-		do_char_killed(0, co);
+		do_char_killed(0, co, 0);
 		chlog(cn, "IMP: Erased NPC %d (%-.20s).", co, ch[co].name);
 		do_char_log(cn, 1, "NPC %d (%-.20s) is no more.\n", co, ch[co].name);
 	}
@@ -2598,8 +3044,8 @@ void god_skill(int cn, int co, int n, int val)
 
 void god_donate_item(int in, int place)
 {
-	static int don_x[] = {497, 560}; // Temple of Skua
-	static int don_y[] = {512, 542}; // Temple of the Purple One
+	static int don_x[] = {760, 505, 579}; // Tavern X, Skua X, Purple X
+	static int don_y[] = {261, 512, 455}; // Tavern Y, Skua Y, Purple Y
 	int x, y;
 
 	if (!IS_SANEUSEDITEM(in))
@@ -2607,13 +3053,13 @@ void god_donate_item(int in, int place)
 		xlog("Attempt to god_donate_item %d", in);
 		return;
 	}
-	if (place<1 || place>2)
+	if (place<1 || place>3)
 	{
-		place = RANDOM(2) + 1;
+		place = RANDOM(2)+1;
 	}
 
-	x = don_x[place - 1];
-	y = don_y[place - 1];
+	x = don_x[place];
+	y = don_y[place];
 
 	if (!god_drop_item_fuzzy(in, x, y))
 	{
@@ -2652,6 +3098,9 @@ void god_set_flag(int cn, int co, unsigned long long flag)
 		break;
 	case    CF_PLAYER:
 		ptr = "player";
+		break;
+	case    CF_LOCKPICK:
+		ptr = "lockpick";
 		break;
 	case    CF_CCP:
 		ptr = "ccp";
@@ -2755,22 +3204,22 @@ void god_set_flag(int cn, int co, unsigned long long flag)
 	chlog(cn, "IMP: set %s (%llX) on %s (%d) to %s", ptr, flag, ch[co].name, co, (ch[co].flags & flag) ? "on" : "off");
 	do_char_log(cn, 3, "Set %s on %s to %s.\n", ptr, ch[co].name, (ch[co].flags & flag) ? "on" : "off");
 
-	if (flag==CF_STAFF)
+	if (flag==CF_STAFF && ch[co].temple_x!=HOME_START_X)
 	{
 		if (ch[co].kindred & KIN_PURPLE)
 		{
-			ch[co].temple_x = ch[co].tavern_x = 558;
-			ch[co].temple_y = ch[co].tavern_y = 542;
+			ch[co].temple_x = ch[co].tavern_x = HOME_PURPLE_X;
+			ch[co].temple_y = ch[co].tavern_y = HOME_PURPLE_Y;
 		}
 		else if (ch[co].flags & CF_STAFF)
 		{
-			ch[co].temple_x = ch[co].tavern_x = 813;
-			ch[co].temple_y = ch[co].tavern_y = 165;
+			ch[co].temple_x = ch[co].tavern_x = HOME_STAFF_X;
+			ch[co].temple_y = ch[co].tavern_y = HOME_STAFF_Y;
 		}
 		else
 		{
-			ch[co].temple_x = ch[co].tavern_x = 512;
-			ch[co].temple_y = ch[co].tavern_y = 512;
+			ch[co].temple_x = ch[co].tavern_x = HOME_START_X;
+			ch[co].temple_y = ch[co].tavern_y = HOME_START_Y;
 		}
 	}
 }
@@ -2826,13 +3275,13 @@ void god_set_purple(int cn, int co)
 	{
 		ch[co].data[CHD_ATTACKTIME] = 0;
 		ch[co].data[CHD_ATTACKVICT] = 0;
-		ch[co].temple_x = 512;
-		ch[co].temple_y = 512;
+		ch[co].temple_x = HOME_TEMPLE_X;
+		ch[co].temple_y = HOME_TEMPLE_Y;
 	}
 	else
 	{
-		ch[co].temple_x = 558;
-		ch[co].temple_y = 542;
+		ch[co].temple_x = HOME_PURPLE_X;
+		ch[co].temple_y = HOME_PURPLE_Y;
 	}
 }
 
@@ -2861,12 +3310,15 @@ void god_destroy_items(int cn)
 				it[in].used = USE_EMPTY;
 			}
 		}
+	}
+	for (n = 0; n<MAXBUFFS; n++)
+	{
 		if ((in = ch[cn].spell[n])!=0)
 		{
 			ch[cn].spell[n] = 0;
 			if (in>0 && in<MAXITEM)
 			{
-				it[in].used = USE_EMPTY;
+				bu[in].used = USE_EMPTY;
 			}
 		}
 	}
@@ -2904,9 +3356,9 @@ void god_racechange(int co, int temp)
 	{
 		return;
 	}
-
+	
 	god_destroy_items(co);
-
+	
 	old = ch[co];
 
 	ch[co] = ch_temp[temp];
@@ -2922,8 +3374,8 @@ void god_racechange(int co, int temp)
 
 	ch[co].dir = old.dir;
 
-	ch[co].temple_x = ch[co].tavern_x = HOME_MERCENARY_X;
-	ch[co].temple_y = ch[co].tavern_y = HOME_MERCENARY_Y;
+	ch[co].temple_x = ch[co].tavern_x = HOME_TEMPLE_X;
+	ch[co].temple_y = ch[co].tavern_y = HOME_TEMPLE_Y;
 
 	ch[co].creation_date = old.creation_date;
 	ch[co].login_date = old.login_date;
@@ -2931,8 +3383,8 @@ void god_racechange(int co, int temp)
 	if (old.kindred & KIN_PURPLE)
 	{
 		ch[co].kindred |= KIN_PURPLE;
-		ch[co].temple_x = 558;
-		ch[co].temple_y = 542;
+		ch[co].temple_x = HOME_PURPLE_X;
+		ch[co].temple_y = HOME_PURPLE_Y;
 	}
 	ch[co].total_online_time = old.total_online_time;
 	ch[co].current_online_time = old.current_online_time;
@@ -2969,8 +3421,13 @@ void god_racechange(int co, int temp)
 	{
 		ch[co].worn[n] = 0;
 	}
+	
+	for (n = 0; n<62; n++)
+	{
+		ch[co].depot[n] = 0;
+	}
 
-	for (n = 0; n<20; n++)
+	for (n = 0; n<MAXBUFFS; n++)
 	{
 		ch[co].spell[n] = 0;
 	}
@@ -2985,11 +3442,6 @@ void god_racechange(int co, int temp)
 	ch[co].data[21] = 0;      // seyan'du sword bits
 	ch[co].data[22] = 0;      // arena monster reset
 	ch[co].data[45] = 0;      // current rank
-
-	for (n = 0; n<62; n++)
-	{
-		ch[co].depot[n] = old.depot[n];
-	}
 
 	do_update_char(co);
 }
@@ -3426,7 +3878,7 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 		ch[cn].attrib[n][3] = ch_temp[t].attrib[n][3];
 	}
 
-	for (n = 0; n<50; n++)
+	for (n = 0; n<MAXSKILL; n++)
 	{
 		if (ch[cn].skill[n][0]==0 && ch_temp[t].skill[n][0])
 		{

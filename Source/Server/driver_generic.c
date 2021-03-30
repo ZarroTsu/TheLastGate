@@ -576,7 +576,7 @@ void driver_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 	// if it handles the case, we should return.
 	// otherwise we use the following defaults:
 
-	if (ch[cn].stunned)
+	if (ch[cn].stunned==1)
 	{
 		return;                 // stunned players don't get messages...
 

@@ -534,7 +534,7 @@ void game_loop(int sock)
 		tdiff = 1;
 	}
 
-	if (globs->ticker % 8==0)
+	if (globs->ticker%1==0)
 	{
 		while (panic<500)
 		{
@@ -1051,7 +1051,9 @@ int main(int argc, char *args[])
 		}
 		if ((it[n].flags & IF_SOULSTONE) && it[n].max_damage==0)
 		{
-			it[n].max_damage = 60000;
+			if 		(it[n].power == 60) it[n].max_damage = 65000;
+			else if	(it[n].power == 75)	it[n].max_damage = 85000;
+			else 						it[n].max_damage = 60000;
 			xlog("Set %s (%d) max_damage to %d", it[n].name, n, it[n].max_damage);
 		}
 	}

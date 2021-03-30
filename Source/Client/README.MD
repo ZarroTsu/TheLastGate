@@ -1,13 +1,4 @@
-# openMerc Client
+# Mercenaries of Astonia v2 client - modified
+Original code found at https://brockhaus.org/merc2.html. You will need to download the packaged graphic files from this site for the client to work properly.
 
-## Setting IP
-The IP address for the server must be changed in two places:
-* `main.c` in  the function: `WinMain` - `strcmp(host_addr,"127.0.0.1")`
-* `common.h` - `#define MHOST  "127.0.0.1"`
-
-
-# Enable Sprite Packer
-* `common.h` - uncomment `//#define DOCONVERT  // enable sprite packer`
-
-This will take graphics from the `gfx` folder and make the packed `.dat` and `.idx` files
-`TODO:` Check to see if it needs ALL graphics, or can append/replace.
+You also need to move the images from gfx/overlays/ back into the gfx folder.

@@ -38,7 +38,7 @@ int build_item(int nr, int x, int y)
 
 	if (it_temp[nr].flags & (IF_TAKE | IF_LOOK | IF_LOOKSPECIAL | IF_USE | IF_USESPECIAL))
 	{
-		in = god_create_item(nr);
+		in = god_create_item(nr, 0);
 
 		if (it[in].driver==33)
 		{
@@ -87,6 +87,17 @@ int build_item(int nr, int x, int y)
 void build_drop(int x, int y, int in)
 {
 	int nr;
+	static int trees1[15] = {19, 19, 19, 20, 20, 20, 48, 48, 48, 49, 49, 49, 606, 607, 607};
+	static int trees2[15] = {19, 19, 20, 20, 48, 48, 49, 49, 606, 607, 607, 608, 608, 609, 609};
+	
+	static int trees3[15] = {1680, 1680, 1680, 1681, 1681, 
+							 1681, 1682, 1682, 1682, 1683, 
+							 1683, 1683, 1684, 1685, 1685};
+	static int trees4[15] = {1680, 1680, 1681, 1681, 1682, 
+							 1682, 1683, 1683, 1684, 1685, 
+							 1685, 1686, 1686, 1687, 1687};
+							 
+	static int trees5[5] = {200, 236, 237, 238, 239};
 
 	if (x<0 || x>=MAPX || y<0 || y>=MAPY)
 	{
@@ -101,6 +112,14 @@ void build_drop(int x, int y, int in)
 	if (in & 0x20000000)
 	{
 		nr = in & 0xfffffff;
+		if (nr==520 && !RANDOM(4))	// hack for red carpet
+		{
+			nr += RANDOM(3);
+		}
+		if (nr==531 && !RANDOM(4))	// hack for purple carpet
+		{
+			nr += RANDOM(3);
+		}
 		if (nr==1003)   // hack for jungle ground
 		{
 			nr += RANDOM(4);
@@ -113,7 +132,7 @@ void build_drop(int x, int y, int in)
 		{
 			nr += RANDOM(9);
 		}
-		if (nr==551)   // hack for grass ground
+		if (nr==551 || nr==2823 || nr==2828)   // hack for grass grounds
 		{
 			nr += RANDOM(4);
 		}
@@ -151,9 +170,47 @@ void build_drop(int x, int y, int in)
 			static int tab[4] = {16933, 16957, 16958, 16959};
 			nr = tab[RANDOM(4)];
 		}
+		if (nr==662)	// hack for garg nest floor
+		{
+			// Death Red, light red, dark red, brick
+			static int tab[4] = {1099, 1109, 1014, 558};
+			nr = abs((x-y)%4);
+			nr = tab[nr];
+		}
+		if (nr==16689)	// hack for icey nest floor
+		{
+			// Marble, Plain Grey, Blind Grey, Purple-grey
+			static int tab[4] = {1158, 1100, 1010, 1141};
+			nr = abs((x-y)%4);
+			nr = tab[nr];
+		}
 
 		map[x + y * MAPX].sprite = nr;
 		return;
+	}
+	
+	switch (in)
+	{
+		case 1:		// special cleaning material
+			map[x + y * MAPX].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK); 
+			break;
+		case 1467:	// hack for random trees - town
+			in = trees1[RANDOM(15)];
+			break;
+		case 1468:	// hack for random trees - any
+			in = trees2[RANDOM(15)];
+			break;
+		case 1695:	// hack for random autumn trees - small
+			in = trees3[RANDOM(15)];
+			break;
+		case 1696:	// hack for random autumn trees - large
+			in = trees4[RANDOM(15)];
+			break;
+		case 1902:	// hack for random jungle trees
+			in = trees5[RANDOM(5)];
+			break;
+		default: 
+			break;
 	}
 
 	nr = build_item(in, x, y);
@@ -187,8 +244,6 @@ void build_remove(int x, int y)
 	{
 		return;
 	}
-
-
 
 	map[x + y * MAPX].fsprite = 0;
 	map[x + y * MAPX].flags &= ~(MF_MOVEBLOCK | MF_SIGHTBLOCK);

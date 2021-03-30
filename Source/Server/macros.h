@@ -64,7 +64,8 @@
 #define IS_BUILDING(cn)        ((ch[(cn)].flags & CF_BUILDMODE) != 0)
 
 // special character group checks
-#define IS_COMPANION(cn) (IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION))
+#define IS_COMPANION(cn) (IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
+#define IS_COMP_TEMP(cn) (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER)
 
 // Visibility, etc.
 #define IS_INVISIBLE(cn)   ((ch[(cn)].flags & CF_INVISIBLE) != 0)
@@ -89,3 +90,10 @@
 
 // Sanity check on skill number
 #define SANESKILL(s) ((s)>=0 && (s)<MAXSKILL)
+
+// Slow's formula (used to degrade)
+#define SLOWFORM(n) (n*3)
+// Slow2's formula (used to degrade) 
+#define SLOW2FORM(n) (n*6)
+// Curse2's formula (used to degrade)
+#define CURSE2FORM(p, n) (((p*3/2)-n)/5)

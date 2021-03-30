@@ -81,7 +81,7 @@ void global_tick(void)
 		globs->mdday++;
 		globs->mdtime = 0;
 		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear);
-		pay_rent();
+		//pay_rent();
 		do_misc();
 	}
 

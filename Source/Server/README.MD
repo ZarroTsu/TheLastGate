@@ -45,9 +45,9 @@ usage of data for players:
 * `23:`     overall kill counter - below own rank
 * `24:`     overall kill counter - at own rank
 * `25:`     overall kill counter - above own rank
-* `26:`     black stronghold kill counter - below own rank
-* `27:`     black stronghold kill counter - at own rank
-* `28:`     black stronghold kill counter - above own rank
+* `26:`     black stronghold kill counter - line 1 (low)
+* `27:`     black stronghold kill counter - line 2 (mid)
+* `28:`     black stronghold kill counter - line 3 (high)
 * `29:`     other players killed outside of arena
 * `30-39:`  soft ignore list
 * `40:`     shopkeepers etc. killed
@@ -65,9 +65,11 @@ usage of data for players:
 * `67:`     Riddle giver (lab 9)
 * `68:`     Date of last player attack (CHD_ATTACKTIME)
 * `69:`     Last player attacked       (CHD_ATTACKVICT)
-* `70:`	number of fire points
+* `70:`		Flags of killed NPC of certain class (Extended)
 * `71:`     number of says/tells/looks/lights
 * `72:`     bad word score
+* '73:'		--Zarro-- for "Way of the Sword" book
+* '75:'		--Zarro-- for spell delays when hit by blast, cleave, or warcry
 * `80-89:`	seen logging in from these class C nets
 * `90:`     number in database
 * `92:`     reserved

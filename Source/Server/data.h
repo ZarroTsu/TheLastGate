@@ -15,6 +15,9 @@
 /* Globs */
 /*********/
 
+// 02162020 - Added for larger client render
+#define VISI_SIZE 60
+
 /* CS, 991113: SIZEs in one header */
 #define GLOBSIZE (sizeof(struct global))
 
@@ -185,6 +188,8 @@ extern unsigned int mapmarker;
 #define KIN_ARCHHARAKIM (1u<<9)
 #define KIN_WARRIOR     (1u<<10)        // arch-merc, warrior
 #define KIN_SORCERER    (1u<<11)        // arch-merc, sorcerer
+#define KIN_PUGILIST    (1u<<12)
+#define KIN_SUMMONER    (1u<<13)
 
 #define CF_IMMORTAL    (1ull<<0)        // will not suffer any damage
 #define CF_GOD         (1ull<<1)        // may issue #god commands
@@ -219,7 +224,7 @@ extern unsigned int mapmarker;
 #define CF_SPELLIGNORE (1ull<<31)       // ignore spells cast on me
 #define CF_CCP         (1ull<<32)       // Computer Controlled Player, does NOT log out and may have some extra logic
 #define CF_SAFE        (1ull<<33)       // safety measures for gods
-#define CF_NOSTAFF     (1ull<<34)        // #stell will only work if flag off
+#define CF_NOSTAFF     (1ull<<34)       // #stell will only work if flag off
 #define CF_POH         (1ull<<35)       // clan purples of honor
 #define CF_POH_LEADER  (1ull<<36)       // clan purples of honor
 #define CF_THRALL      (1ull<<37)       // is enthralled NPC
@@ -232,50 +237,95 @@ extern unsigned int mapmarker;
 #define CF_SAVEME      (1ull<<44)       // save this player to disk
 #define CF_GREATERGOD  (1ull<<45)       // greater god
 #define CF_GREATERINV  (1ull<<46)       // no one sees me, ever
+#define CF_LOCKPICK    (1ull<<47)       // Ability to use lockpicks and evaluate doors
+#define CF_SHADOWCOPY  (1ull<<48)       // Special flag for shadow copies so you cannot spell them.
+#define CF_SILENCE     (1ull<<49)       // Shuts up NPC greetings so pents isn't as spammy
+#define CF_GCTOME      (1ull<<50)       // Ghost Companion (and Shadow Copy) will automatically teleport with the player
+#define CF_EXTRAEXP    (1ull<<51)		// NPC gives extra exp! Used for STRONG mobs and grind spots
+#define CF_CANCRIT     (1ull<<52)       // Flag to determine if non-players can crit
+#define CF_APPRAISE    (1ull<<53)       // Can see item value
+#define CF_APPR_OFF    (1ull<<54)       // Toggle Appraisal
+#define CF_AREA_OFF    (1ull<<55)       // Toggle AoE Skills
+#define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
 
-#define AT_BRAVE 0
-#define AT_WILL  1
-#define AT_INT   2
-#define AT_AGIL  3
-#define AT_STREN 4
+#define AT_CAP		255
 
-#define SK_HAND     0
-#define SK_KARATE   1
-#define SK_SWORD    3
-#define SK_AXE      4
-#define SK_DAGGER   2
-#define SK_STAFF    5
-#define SK_TWOHAND  6           // two handed weapon
-#define SK_LOCK     7
-#define SK_STEALTH  8
-#define SK_PERCEPT  9
-#define SK_SWIM     10
-#define SK_MSHIELD  11
-#define SK_BARTER   12
-#define SK_REPAIR   13
-#define SK_LIGHT    14
-#define SK_RECALL   15
-#define SK_WIMPY    16
-#define SK_PROTECT  17
-#define SK_ENHANCE  18
-#define SK_STUN     19
-#define SK_CURSE    20
-#define SK_BLESS    21
-#define SK_IDENT    22
-#define SK_RESIST   23
-#define SK_BLAST    24
-#define SK_DISPEL   25
-#define SK_HEAL     26
-#define SK_GHOST    27
-#define SK_REGEN    28
-#define SK_REST     29
-#define SK_MEDIT    30
-#define SK_SENSE    31
-#define SK_IMMUN    32
-#define SK_SURROUND 33
-#define SK_CONCEN   34
-#define SK_WARCRY   35
-#define SK_WARCRY2  (SK_WARCRY+100)
+#define PROXIMITY_MULTI		(AT_CAP/(3/2))
+#define PROXIMITY_CAP		(AT_CAP/9)
+#define PRECISION_CAP		(AT_CAP/4)
+
+// Attribute Definitions
+#define AT_BRV 		0
+#define AT_WIL 		1
+#define AT_INT 		2
+#define AT_AGL 		3
+#define AT_STR 		4
+
+// Skill Definitions    //
+#define SK_HAND			 0
+#define SK_PRECISION	 1
+#define SK_DAGGER		 2
+#define SK_STAFF		 5
+#define SK_SWORD		 3
+#define SK_SHIELD		16
+#define SK_DUAL			36
+#define SK_AXE			 4
+#define SK_TWOHAND		 6
+#define SK_COMBATM		37
+//////////////////////////
+#define SK_WEAPONM		38
+#define SK_ARMORM		39
+#define SK_REGEN		28
+#define SK_REST			29
+#define SK_MEDIT		30
+#define SK_CONCEN		34
+#define SK_CLEAVE		40
+#define SK_WEAKEN		41
+#define SK_WARCRY		35
+#define SK_BLAST		24
+//////////////////////////
+#define SK_POISON		42
+#define SK_DAMAREA		43
+#define SK_CURSE		20
+#define SK_SLOW			19
+#define SK_HEXAREA		44
+#define SK_GHOST		27
+#define SK_GCMASTERY	45
+#define SK_SHADOW		46
+#define SK_BLESS		21
+#define SK_PROTECT		17
+//////////////////////////
+#define SK_ENHANCE		18
+#define SK_MSHIELD		11
+#define SK_HASTE		47
+#define SK_HEAL			26
+#define SK_DISPEL		25
+#define SK_LIGHT		14
+#define SK_RECALL		15
+#define SK_IDENT		22
+#define SK_REPAIR		13
+#define SK_RESIST		23
+//////////////////////////
+#define SK_IMMUN		32
+#define SK_PERCEPT		 9
+#define SK_STEALTH		 8
+#define SK_SURROUND		33
+#define SK_SURRAREA		48
+#define SK_SURRSPEED	49
+#define SK_BARTER		12
+#define SK_SENSE		31
+#define SK_SWIM			10
+#define SK_FOCUS		 7
+//////////////////////////
+#define SK_WARCRY2  	50
+#define SK_BLEED		51
+#define SK_WEAKEN2		52
+#define SK_SCORCH		53
+#define SK_CURSE2		54
+#define SK_SLOW2		55
+#define SK_MSHELL		56
+//#define SK_REGEN		57
+//////////////////////////
 
 /* ch.data[] definitions */
 /* (this list is growing very slowly;
@@ -294,6 +344,7 @@ extern unsigned int mapmarker;
 #define CHD_ATTACKTIME  68
 #define CHD_ATTACKVICT  69
 #define CHD_TALKATIVE   71
+#define CHD_SHADOWCOPY  74
 #define CHD_ENEMY1ST    80
 #define CHD_ENEMYZZZ    91
 
@@ -319,7 +370,7 @@ struct character
 	int kindred;                    // 285
 
 	int player;                     // 289
-	unsigned int pass1, pass2;       // 297
+	unsigned int pass1, pass2;      // 297
 
 	unsigned short sprite;          // 299, sprite base value, 1024 dist
 	unsigned short sound;           // 301, sound base value, 64 dist
@@ -389,7 +440,7 @@ struct character
 	unsigned int worn[20];
 
 	// spells active on character
-	unsigned int spell[20];
+	unsigned int spell[MAXBUFFS];
 
 	// item currently in hand (mouse cursor)
 	unsigned int citem;
@@ -430,7 +481,7 @@ struct character
 	unsigned short stunned;         // is stunned for X ticks
 
 	// misc stuff added later:
-	char speed_mod;                 // race dependand speed modification
+	char speed_mod;                 // race dependent speed modification
 	char last_action;               // last action was success/failure (driver_generic level)
 	char unused;
 	char depot_sold;                // items from depot where sold to pay for the rent
@@ -443,11 +494,11 @@ struct character
 	char passwd[16];
 
 	char lastattack;                // neater display: remembers the last attack animation
-	char future1[25];               // space for future expansion
+	char future1[25];               // space for future expansion							~ possible [4][6] to store meta stats?
 
 	short int sprite_override;
 
-	short future2[49];
+	short future2[49];				// 49*2 = 98 bytes of free space - can store int (4)[11] slots for swapping gear sets
 
 	unsigned int depot[62];
 
@@ -514,12 +565,20 @@ __attribute__ ((packed));
 #define IF_IDENTIFIED    (1ull<<37)     // item has been identified
 #define IF_NOEXPIRE      (1ull<<38)     // dont expire item
 #define IF_SOULSTONE     (1ull<<39)     // item was enhanced by a soulstone
+#define IF_OF_DUALSW     (1ull<<40)     // off-handed item is a dual sword
+#define IF_OF_SHIELD     (1ull<<41)     // off-handed item is a shield
+#define IF_KWAI_UNI      (1ull<<42)     // unique check for Kwai 
+#define IF_GORN_UNI      (1ull<<43)     // unique check for Gorn 
+#define IF_WP_CLAW       (1ull<<44)     // is a weapon - claw/unarmed
+#define IF_BOOK          (1ull<<45)     // is a book
 
-#define IF_WEAPON   (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND)
-#define IF_SELLABLE (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMOR)
+#define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
+#define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
+#define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK)
 
-#define ITEMSIZE  (sizeof(struct item)*MAXITEM)
-#define TITEMSIZE (sizeof(struct item)*MAXTITEM)
+#define BUFFSIZE         (sizeof(struct item)*MAXBUFF)
+#define ITEMSIZE         (sizeof(struct item)*MAXITEM)
+#define TITEMSIZE        (sizeof(struct item)*MAXTITEM)
 
 struct item
 {
@@ -583,8 +642,8 @@ struct item
 	char gethit_dam[2];             // 547, damage for hitting this item
 
 	char min_rank;                  // minimum rank to wear the item
-	char future[3];
-	int future3[9];                 // 587
+	char future[3];					//		~  3 bytes free space
+	int future3[9];                 // 587	~ 36 bytes free space
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
@@ -633,13 +692,14 @@ struct s_skilltab
 struct see_map
 {
 	int x, y;
-	char vis[40 * 40];
+	char vis[VISI_SIZE * VISI_SIZE]; // 02162020 - updated from 40x40 to 60x60 for larger client render
 };
 
 extern struct s_skilltab skilltab[MAXSKILL];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
+extern struct item *bu;
 extern struct item *it;
 extern struct character *ch_temp;
 extern struct item *it_temp;

@@ -27,6 +27,7 @@
 
 struct map *map;
 struct character *ch;
+struct item *bu;
 struct item *it;
 struct effect *fx;
 struct global *globs;
@@ -64,6 +65,23 @@ static int load(void)
 		return(-1);
 	}
 	close(handle);
+
+	//
+	handle = open(DATDIR "/buff.dat", O_RDONLY);
+	if (handle==-1)
+	{
+		fprintf(stderr, "buff.dat does not exist.\n");
+		return(-1);
+	}
+
+	bu = mmap(NULL, BUFFSIZE, PROT_READ, MAP_SHARED, handle, 0);
+	if (bu==(void*)-1)
+	{
+		fprintf(stderr, "cannot mmap buff.dat.\n");
+		return(-1);
+	}
+	close(handle);
+	//
 
 	handle = open(DATDIR "/item.dat", O_RDONLY);
 	if (handle==-1)
@@ -158,109 +176,38 @@ static char *_rank[24] = {
 	"Lieutenant General",
 	"General",
 	"Field Marshal",
-	"Knight of openMerc",
-	"Baron of openMerc",
-	"Earl of openMerc",
-	"Warlord of openMerc"
+	"Knight of Astonia",
+	"Baron of Astonia",
+	"Earl of Astonia",
+	"Warlord of Astonia"
 };
 
 static int points2rank(int v)
 {
-	if (v<      50)
-	{
-		return( 0);
-	}
-	if (v<     850)
-	{
-		return( 1);
-	}
-	if (v<    4900)
-	{
-		return( 2);
-	}
-	if (v<   17700)
-	{
-		return( 3);
-	}
-	if (v<   48950)
-	{
-		return( 4);
-	}
-	if (v<  113750)
-	{
-		return( 5);
-	}
-	if (v<  233800)
-	{
-		return( 6);
-	}
-	if (v<  438600)
-	{
-		return( 7);
-	}
-	if (v<  766650)
-	{
-		return( 8);
-	}
-	if (v< 1266650)
-	{
-		return( 9);
-	}
-	if (v< 1998700)
-	{
-		return( 10);
-	}
-	if (v< 3035500)
-	{
-		return( 11);
-	}
-	if (v< 4463550)
-	{
-		return( 12);
-	}
-	if (v< 6384350)
-	{
-		return( 13);
-	}
-	if (v< 8915600)
-	{
-		return( 14);
-	}
-	if (v<12192400)
-	{
-		return( 15);
-	}
-	if (v<16368450)
-	{
-		return( 16);
-	}
-	if (v<21617250)
-	{
-		return( 17);
-	}
-	if (v<28133300)
-	{
-		return( 18);
-	}
-	if (v<36133300)
-	{
-		return( 19);
-	}
-
-	if (v<49014500)
-	{
-		return( 20);
-	}
-	if (v<63000600)
-	{
-		return( 21);
-	}
-	if (v<80977100)
-	{
-		return( 22);
-	}
-
-	return(23);
+	if (v<     250)	return( 0); // Private
+	if (v<    1750)	return( 1); // Private FIrst Class
+	if (v<    7000)	return( 2); // Lance Corporal
+	if (v<   21000)	return( 3); // Corporal
+	if (v<   52500)	return( 4); // Sergeant
+	if (v<  115500)	return( 5); // Staff Sergeant
+	if (v<  231000)	return( 6); // Master Sergeant
+	if (v<  429000)	return( 7); // First Sergeant
+	if (v<  750750)	return( 8); // Sergeant Major
+	if (v< 1251250)	return( 9); // Second Leiutenant
+	if (v< 2002000)	return(10); // First Leiutenant
+	if (v< 3094000)	return(11); // Captain
+	if (v< 4641000)	return(12); // Major
+	if (v< 6783000)	return(13); // Lieutenant Colonel
+	if (v< 9690000)	return(14); // Colonel
+	if (v<13566000)	return(15); // Brigadier General
+	if (v<18653250)	return(16); // Major General
+	if (v<25236750)	return(17); // Lieutenant General
+	if (v<33649000)	return(18); // General
+	if (v<44275000)	return(19); // Field Marshal
+	if (v<57557500)	return(20); // Knight
+	if (v<74002500)	return(21); // Baron
+	if (v<94185000)	return(22); // Earl
+					return(23); // Warlord
 }
 
 static char *rank(int pts)
@@ -270,38 +217,16 @@ static char *rank(int pts)
 
 static char *racename(int kin)
 {
-	if (kin & KIN_MERCENARY)
-	{
-		return( "Mercenary");
-	}
-	if (kin & KIN_TEMPLAR)
-	{
-		return( "Templar");
-	}
-	if (kin & KIN_HARAKIM)
-	{
-		return( "Harakim");
-	}
-	if (kin & KIN_SEYAN_DU)
-	{
-		return( "Seyan'Du");
-	}
-	if (kin & KIN_ARCHTEMPLAR)
-	{
-		return( "Archtemplar");
-	}
-	if (kin & KIN_ARCHHARAKIM)
-	{
-		return( "Archharakim");
-	}
-	if (kin & KIN_SORCERER)
-	{
-		return( "Sorcerer");
-	}
-	if (kin & KIN_WARRIOR)
-	{
-		return( "Warrior");
-	}
+	if (kin & KIN_MERCENARY)	return("Mercenary");
+	if (kin & KIN_TEMPLAR)		return("Templar");
+	if (kin & KIN_HARAKIM)		return("Harakim");
+	if (kin & KIN_SEYAN_DU)		return("Seyan'Du");
+	if (kin & KIN_ARCHTEMPLAR)	return("Archtemplar");
+	if (kin & KIN_ARCHHARAKIM)	return("Archharakim");
+	if (kin & KIN_SORCERER)		return("Sorcerer");
+	if (kin & KIN_WARRIOR)		return("Warrior");
+	if (kin & KIN_PUGILIST)		return("Brawler");
+	if (kin & KIN_SUMMONER)		return("Summoner");
 
 	return("Monster");
 }

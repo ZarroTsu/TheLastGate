@@ -220,7 +220,7 @@ int ccp_raise(int cn)
 {
 	struct ccp_mem *mem = get_ccp_mem(cn);
 	int n;
-	static int skill[] = {SK_DAGGER, SK_MEDIT, SK_BLAST, SK_CURSE, SK_STUN, SK_ENHANCE, SK_PROTECT, SK_BLESS, SK_MSHIELD};
+	static int skill[] = {SK_DAGGER, SK_MEDIT, SK_BLAST, SK_CURSE, SK_SLOW, SK_ENHANCE, SK_PROTECT, SK_BLESS, SK_MSHIELD};
 
 	for (n = 0; n<5; n++)
 	{
@@ -392,7 +392,7 @@ void ccp_driver(int cn)
 				{
 					return;                                 // keep him cursed
 				}
-				if (npc_try_spell(cn, co, SK_STUN))
+				if (npc_try_spell(cn, co, SK_SLOW))
 				{
 					return;                                 // and stunned all the time
 				}

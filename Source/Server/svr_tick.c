@@ -24,9 +24,8 @@
 
 int ctick = 0;
 
-static char intro_msg1[] = {"Welcome to openMerc, based on the Mercenaries of Astonia engine by Daniel Brockhaus, my friend!\n"};
+static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
-
 static char intro_msg3[] = {"\n"};
 static char intro_msg4[] = {"Use #help (or /help) to get a listing of the text commands.\n"};
 //static char intro_msg4[]={"WARNING: Lag scrolls will only work if used not later than four minutes after lagging out!\n"};
@@ -440,7 +439,7 @@ void plr_cmd_inv(int nr)
 		{
 			return;                 // sanity check
 		}
-		if (ch[cn].stunned)
+		if (ch[cn].stunned==1)
 		{
 			return;
 		}
@@ -480,7 +479,7 @@ void plr_cmd_inv(int nr)
 	}
 	if (what==1)   // big inventory
 	{
-		if (ch[cn].stunned)
+		if (ch[cn].stunned==1)
 		{
 			return;
 		}
@@ -490,7 +489,7 @@ void plr_cmd_inv(int nr)
 	}
 	if (what==2)
 	{
-		if (ch[cn].stunned)
+		if (ch[cn].stunned==1)
 		{
 			return;
 		}
@@ -556,6 +555,19 @@ void plr_cmd_inv(int nr)
 			do_look_item(cn, in);
 		}
 		return;
+	}
+	if (what==9)
+	{
+		if (n<0 || n>39 || IS_BUILDING(cn))
+		{
+			return;                             // sanity check
+		}
+		if (ch[cn].stunned==1)
+		{
+			return;
+		}
+		do_trash(cn);
+		do_update_char(cn);
 	}
 	plog(nr, "Unknown CMD-INV-what %d", what);
 }
@@ -853,7 +865,7 @@ void plr_cmd_stat(int nr)
 	{
 		while (v--)
 		{
-			do_raise_end(cn);
+			//do_raise_end(cn);
 		}
 	}
 	else if (n==7)
@@ -1149,6 +1161,14 @@ void plr_cmd_setuser(int nr)
 			{
 				race_name = "a Sorcerer";
 			}
+			else if (ch[cn].kindred & KIN_PUGILIST)
+			{
+				race_name = "a Brawler";
+			}
+			else if (ch[cn].kindred & KIN_SUMMONER)
+			{
+				race_name = "a Summoner";
+			}
 			else
 			{
 				race_name = "a strange figure";
@@ -1306,7 +1326,7 @@ void plr_cmd(int nr)
 	}
 
 	cn = player[nr].usnr;
-	if (ch[cn].stunned)
+	if (ch[cn].stunned==1)
 	{
 		do_char_log(cn, 2, "You have been stunned. You cannot move.\n");
 	}
@@ -1357,7 +1377,7 @@ void plr_cmd(int nr)
 		return;
 	}
 
-	if (ch[cn].stunned)
+	if (ch[cn].stunned==1)
 	{
 		return;
 	}
@@ -1426,16 +1446,20 @@ void plr_newlogin(int nr)
 		return;
 	}
 	temp = player[nr].race;
-	if (temp!=2 && temp!=3 && temp!=4 && temp!=76 && temp!=77 && temp!=78)
+	
+	if (temp!=CT_TEMP_M && temp!=CT_TEMP_F 
+	 && temp!=CT_MERC_M && temp!=CT_MERC_F 
+	 && temp!=CT_HARA_M && temp!=CT_HARA_F
+	 && temp!=CT_GOD_M && temp!=CT_GOD_F)
 	{
-		temp = 2;
+		temp = CT_MERC_M;
 	}
 
 	cn = god_create_char(temp, 1);
 	ch[cn].player = nr;
 
-	ch[cn].temple_x = ch[cn].tavern_x = HOME_MERCENARY_X;
-	ch[cn].temple_y = ch[cn].tavern_y = HOME_MERCENARY_Y;
+	ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
+	ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 
 	ch[cn].points = 0;
 	ch[cn].points_tot = 0;
@@ -1628,13 +1652,13 @@ void plr_login(int nr)
 		}
 	}
 
-	for (n = 0; n<20; n++)
+	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n]))
 		{
-			if (it[in].temp==SK_RECALL)
+			if (bu[in].temp==SK_RECALL)
 			{
-				it[in].used = 0;
+				bu[in].used = 0;
 				ch[cn].spell[n] = 0;
 				chlog(cn, "CHEATER: removed active teleport");
 			}
@@ -1691,19 +1715,22 @@ void plr_logout(int cn, int nr, int reason)
 
 		if (reason==LO_EXIT)
 		{
-			chlog(cn, "Punished for leaving the game by means of F12");
+			chlog(cn, "Punished for leaving the game with F12");
 
 			do_char_log(cn, 0, " \n");
-			do_char_log(cn, 0, "You are being punished for leaving the game without entering a tavern:\n");
+			do_char_log(cn, 0, "You are being punished for leaving the game without entering a tavern.\n");
+			do_char_log(cn, 0, "If you are out of combat, this punishment will be minimal. Otherwise...\n");
 			do_char_log(cn, 0, " \n");
-			do_char_log(cn, 0, "You have been hit by a demon. You lost %d HP.\n", ch[cn].hp[5] * 8 / 10);
-			ch[cn].a_hp -= ch[cn].hp[5] * 800;
+			do_char_log(cn, 0, "You have been hit by a demon. You lost %d HP.\n", ch[cn].hp[5] * 5 / 10);
+			ch[cn].a_hp -= ch[cn].hp[5] * 500;
 			if (ch[cn].a_hp<500)
 			{
-				do_char_log(cn, 0, "The demon killed you.\n");
 				do_char_log(cn, 0, " \n");
-				do_char_killed(0, cn);
+				do_char_log(cn, 0, "Oh dear, the demon killed you.\n");
+				do_char_log(cn, 0, "Your belongings dropped to the ground where you stood.\n");
+				do_char_killed(0, cn, 0);
 			}
+			/*
 			else
 			{
 				do_char_log(cn, 0, " \n");
@@ -1718,7 +1745,8 @@ void plr_logout(int cn, int nr, int reason)
 					ch[cn].citem = 0;
 				}
 			}
-			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 2, "%s left the game without saying goodbye and was punished by the gods.\n", ch[cn].name);
+			*/
+			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 2, "%s left the game without saying goodbye.\n", ch[cn].name);
 		}
 
 		if (map[ch[cn].x + ch[cn].y * MAPX].ch==cn)
@@ -1739,7 +1767,7 @@ void plr_logout(int cn, int nr, int reason)
 		{
 			if (abs(ch[cn].x - ch[cn].temple_x) + abs(ch[cn].y - ch[cn].temple_y)>10 && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_NOLAG))
 			{
-				in = god_create_item(IT_LAGSCROLL);
+				in = god_create_item(IT_LAGSCROLL, 0);
 				it[in].data[0] = ch[cn].x;
 				it[in].data[1] = ch[cn].y;
 				it[in].data[2] = globs->ticker;
@@ -2100,16 +2128,18 @@ int cl_light_26(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 				l++;
 			}
 		}
-		return(50 * l / 16);
+		return(VISI_SIZE * l / 16);
 	}
 	else
 	{
 
 		buf[0] = SV_SETMAP3;
-		*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
+		*(unsigned int*)(buf+1)=n;
+		*(unsigned char*)(buf+5)=smap[n].light;
+		//*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
 		cmap[n].light = smap[n].light;
 
-		for (m = n + 2, p = 3; m<min(n + 26 + 2, TILEX * TILEY); m += 2, p++)
+		for (m = n + 2, p = 6; m<min(n + 20 + 2, TILEX * TILEY); m += 2, p++) // 02162020 - changed 26 to 20
 		{
 			*(unsigned char*)(buf + p) = smap[m].light | (smap[m - 1].light << 4);
 			cmap[m].light = smap[m].light;
@@ -2125,15 +2155,17 @@ int cl_light_one(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 
 	if (!dosend)
 	{
-		return(50 * 1 / 3);
+		return(VISI_SIZE * 1 / 3);
 	}
 	else
 	{
 
 		buf[0] = SV_SETMAP4;
-		*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
+		*(unsigned int*)(buf+1)=n;
+		*(unsigned char*)(buf+5)=smap[n].light;
+		//*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
 		cmap[n].light = smap[n].light;
-		xsend(dosend, buf, 3);
+		xsend(dosend, buf, 6); // 02162020 - changed 3 to 6
 		return(1);
 	}
 }
@@ -2151,22 +2183,24 @@ int cl_light_three(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 				l++;
 			}
 		}
-		return(50 * l / 4);
+		return(VISI_SIZE * l / 4);
 	}
 	else
 	{
 
 		buf[0] = SV_SETMAP5;
-		*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
+		*(unsigned int*)(buf+1)=n;
+		*(unsigned char*)(buf+5)=smap[n].light;
+		//*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
 		cmap[n].light = smap[n].light;
 
-		for (m = n + 2, p = 3; m<min(n + 2 + 2, TILEX * TILEY); m += 2, p++)
+		for (m = n + 2, p = 6; m<min(n + 2 + 2, TILEX * TILEY); m += 2, p++)
 		{
 			*(unsigned char*)(buf + p) = smap[m].light | (smap[m - 1].light << 4);
 			cmap[m].light = smap[m].light;
 			cmap[m - 1].light = smap[m - 1].light;
 		}
-		xsend(dosend, buf, 4);
+		xsend(dosend, buf, 7); // 02162020 - changed 4 to 7
 		return(1);
 	}
 	return(0);
@@ -2185,22 +2219,24 @@ int cl_light_seven(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 				l++;
 			}
 		}
-		return(50 * l / 6);
+		return(VISI_SIZE * l / 6);
 	}
 	else
 	{
 
 		buf[0] = SV_SETMAP6;
-		*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
+		*(unsigned int*)(buf+1)=n;
+		*(unsigned char*)(buf+5)=smap[n].light;
+		//*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
 		cmap[n].light = smap[n].light;
 
-		for (m = n + 2, p = 3; m<min(n + 6 + 2, TILEX * TILEY); m += 2, p++)
+		for (m = n + 2, p = 6; m<min(n + 6 + 2, TILEX * TILEY); m += 2, p++)
 		{
 			*(unsigned char*)(buf + p) = smap[m].light | (smap[m - 1].light << 4);
 			cmap[m].light = smap[m].light;
 			cmap[m - 1].light = smap[m - 1].light;
 		}
-		xsend(dosend, buf, 6);
+		xsend(dosend, buf, 9); // 02162020 - changed 6 to 9
 		return(1);
 	}
 }
@@ -2253,7 +2289,7 @@ void plr_change(int nr)
 		plr_change_power(nr, cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
 		plr_change_power(nr, cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
 
-		for (n = 0; n<50; n++)
+		for (n = 0; n<MAXSKILL; n++)
 		{
 			plr_change_stat(nr, cpl->skill[n], ch[cn].skill[n], SV_SETCHAR_SKILL, n);
 		}
@@ -2283,6 +2319,9 @@ void plr_change(int nr)
 								break;
 							case    MF_UWATER:
 								*(short int*)(buf + 5) = 50;
+								break;
+							case    MF_NOFIGHT:
+								*(short int*)(buf + 5) = 36;
 								break;
 							case    MF_NOMONST:
 								*(short int*)(buf + 5) = 51;
@@ -2354,7 +2393,35 @@ void plr_change(int nr)
 
 		for (n = 0; n<20; n++)
 		{
-			if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
+			if (n >= 13)	// Sneaky hack to pass bonus player variables
+			{
+				buf[0] = SV_SETCHAR_WORN;
+				*(unsigned long*)(buf + 1) = n;
+				if (n == WN_SPEED)	*(short int*)(buf + 5) = ch[cn].speed;
+				if (n == WN_SPMOD)	*(short int*)(buf + 5) = spell_race_mod(100, cn);
+				if (n == WN_CRIT)
+				{
+					int crit =  100; // 1% chance...
+					int in2 = it[ch[cn].worn[WN_ARMS]].temp;
+					if (it[ch[cn].worn[WN_RHAND]].flags & (IF_WP_CLAW))	
+						crit *= 5;
+					else if (it[ch[cn].worn[WN_RHAND]].flags & (IF_WP_DAGGER | IF_WP_TWOHAND))	
+						crit *= 2;
+					if (in2==IT_GL_SERPENT || in2==IT_GL_SPIDER || in2==IT_GL_CURSED || in2==IT_GL_TITANS)	
+						crit /= 2;
+					if (ch[cn].skill[SK_PRECISION][0])
+						crit = (crit * get_skill_score(cn, SK_PRECISION))/50;
+					if (ch[cn].data[73]) 
+						crit += ch[cn].data[73]/2;
+					crit *= 3;	// ...of 3x damage
+					if (crit>20000)
+						crit = 20000;
+					*(short int*)(buf + 5) = crit + 10000;
+				}
+				*(short int*)(buf + 7) = 0;
+				xsend(nr, buf, 9);
+			}
+			else if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
 			{
 				buf[0] = SV_SETCHAR_WORN;
 				*(unsigned long*)(buf + 1) = n;
@@ -2382,20 +2449,20 @@ void plr_change(int nr)
 			}
 		}
 
-		for (n = 0; n<20; n++)
+		for (n = 0; n<MAXBUFFS; n++)
 		{
 			if (cpl->spell[n]!=(in = ch[cn].spell[n]) ||
-			    (cpl->active[n]!=it[in].active * 16 / max(1, it[in].duration)) || (it[in].flags & IF_UPDATE))
+			    (cpl->active[n]!=bu[in].active * 16 / max(1, bu[in].duration)) || (bu[in].flags & IF_UPDATE))
 			{
 				buf[0] = SV_SETCHAR_SPELL;
 				*(unsigned long*)(buf + 1) = n;
 				if (in)
 				{
-					*(short int*)(buf + 5) = it[in].sprite[1];
-					*(short int*)(buf + 7) = it[in].active * 16 / max(1, it[in].duration);
+					*(short int*)(buf + 5) = bu[in].sprite[1];
+					*(short int*)(buf + 7) = bu[in].active * 16 / max(1, bu[in].duration);
 					cpl->spell[n]  = in;
-					cpl->active[n] = (it[in].active * 16 / max(1, it[in].duration));
-					it[in].flags &= ~IF_UPDATE;
+					cpl->active[n] = (bu[in].active * 16 / max(1, bu[in].duration));
+					bu[in].flags &= ~IF_UPDATE;
 				}
 				else
 				{
@@ -2734,6 +2801,11 @@ void plr_change(int nr)
 			buf[1] |= 128;
 			*(unsigned char*)(buf + p) = smap[n].ch_proz;
 			p += 1;
+			// Feb 2020 - Hope this works...
+			*(unsigned char*)(buf + p) = smap[n].ch_brv;
+			p += 1;
+			*(unsigned char*)(buf + p) = smap[n].ch_agl;
+			p += 1;
 		}
 
 		if (buf[1])   // we found a change (no change found can happen since it_status & ch_status are not transmitted all the time)
@@ -2791,13 +2863,18 @@ void char_play_sound(int cn, int sound, int vol, int pan)
 inline int do_char_calc_light(int cn, int light)
 {
 	int val;
-
-	if (light==0 && ch[cn].skill[SK_PERCEPT][5]>150)
+	
+	if (IS_BUILDING(cn))
+	{
+		light = 64;
+	}
+	
+	if (light==0 && get_skill_score(cn, SK_PERCEPT)>150)
 	{
 		light = 1;
 	}
 
-	val = light * min(ch[cn].skill[SK_PERCEPT][5], 10) / 10;
+	val = light * min(get_skill_score(cn, SK_PERCEPT), 10) / 10;
 
 	if (val>255)
 	{
@@ -2977,12 +3054,12 @@ void plr_getmap_complete(int nr)
 	xe = ch[cn].x + (TILEX / 2) - XECUT;
 
 	// trigger recomputation of visibility map
-	can_see(cn, ch[cn].x, ch[cn].y, ch[cn].x + 1, ch[cn].y + 1, 16);
+	can_see(cn, ch[cn].x, ch[cn].y, ch[cn].x + 1, ch[cn].y + 1, TILEX/2);
 
 	// check if visibility changed
-	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || mcmp(player[nr].visi, see[cn].vis, 40 * 40))
+	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || mcmp(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE))
 	{
-		mcpy(player[nr].visi, see[cn].vis, 40 * 40);
+		mcpy(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE);
 		player[nr].vx = see[cn].x;
 		player[nr].vy = see[cn].y;
 		do_all = 1;
@@ -3110,17 +3187,17 @@ void plr_getmap_complete(int nr)
 				smap[n].flags2 = 0;
 			}
 
-			tmp = (x - ch[cn].x + 20) + (y - ch[cn].y + 20) * 40;
+			tmp = (x - ch[cn].x + VISI_SIZE/2) + (y - ch[cn].y + VISI_SIZE/2) * VISI_SIZE;
 
 			if (see[cn].vis[tmp + 0 + 0] ||
-			    see[cn].vis[tmp + 0 + 40] ||
-			    see[cn].vis[tmp + 0 - 40] ||
+			    see[cn].vis[tmp + 0 + VISI_SIZE] ||
+			    see[cn].vis[tmp + 0 - VISI_SIZE] ||
 			    see[cn].vis[tmp + 1 + 0] ||
-			    see[cn].vis[tmp + 1 + 40] ||
-			    see[cn].vis[tmp + 1 - 40] ||
+			    see[cn].vis[tmp + 1 + VISI_SIZE] ||
+			    see[cn].vis[tmp + 1 - VISI_SIZE] ||
 			    see[cn].vis[tmp - 1 + 0] ||
-			    see[cn].vis[tmp - 1 + 40] ||
-			    see[cn].vis[tmp - 1 - 40])
+			    see[cn].vis[tmp - 1 + VISI_SIZE] ||
+			    see[cn].vis[tmp - 1 - VISI_SIZE])
 			{
 				visible = 1;
 			}
@@ -3231,8 +3308,25 @@ void plr_getmap_complete(int nr)
 				{
 					smap[n].ch_proz = 0;
 				}
+				// Feb 2020 - Hope this works...
+				if (it[ch[co].worn[WN_LHAND]].temp==IT_BOOK_TRAV) // Book: Traveller's Guide
+				{
+					smap[n].ch_brv = get_attrib_score(co, AT_AGL)/28; // Agl - for cast speed
+					smap[n].ch_agl = get_attrib_score(co, AT_BRV)/28; // Brv - for attack speed
+				}
+				else if ((ch[co].flags & CF_SHADOWCOPY) && IS_PLAYER(ch[co].data[63]))
+				{
+					smap[n].ch_brv = get_attrib_score(ch[co].data[63], AT_BRV)/28; // Brv - for cast speed
+					smap[n].ch_agl = get_attrib_score(ch[co].data[63], AT_AGL)/28; // Agl - for attack speed
+				}
+				else
+				{
+					smap[n].ch_brv = get_attrib_score(co, AT_BRV)/28; // Brv - for cast speed
+					smap[n].ch_agl = get_attrib_score(co, AT_AGL)/28; // Agl - for attack speed
+				}
+				//
 				smap[n].flags |= ISCHAR;
-				if (ch[co].stunned)
+				if (ch[co].stunned==1)
 				{
 					smap[n].flags |= STUNNED;
 				}
@@ -3319,9 +3413,9 @@ void plr_getmap_fast(int nr)
 	can_see(cn, ch[cn].x, ch[cn].y, ch[cn].x + 1, ch[cn].y + 1, 16);
 
 	// check if visibility changed
-	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || mcmp(player[nr].visi, see[cn].vis, 40 * 40))
+	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || mcmp(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE))
 	{
-		mcpy(player[nr].visi, see[cn].vis, 40 * 40);
+		mcpy(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE);
 		player[nr].vx = see[cn].x;
 		player[nr].vy = see[cn].y;
 		do_all = 1;
@@ -3443,17 +3537,17 @@ void plr_getmap_fast(int nr)
 				smap[n].flags2 = (unsigned int)map[m].flags;
 			}
 
-			tmp = (x - ch[cn].x + 20) + (y - ch[cn].y + 20) * 40;
+			tmp = (x - ch[cn].x + VISI_SIZE/2) + (y - ch[cn].y + VISI_SIZE/2) * VISI_SIZE;
 
 			if (see[cn].vis[tmp + 0 + 0] ||
-			    see[cn].vis[tmp + 0 + 40] ||
-			    see[cn].vis[tmp + 0 - 40] ||
+			    see[cn].vis[tmp + 0 + VISI_SIZE] ||
+			    see[cn].vis[tmp + 0 - VISI_SIZE] ||
 			    see[cn].vis[tmp + 1 + 0] ||
-			    see[cn].vis[tmp + 1 + 40] ||
-			    see[cn].vis[tmp + 1 - 40] ||
+			    see[cn].vis[tmp + 1 + VISI_SIZE] ||
+			    see[cn].vis[tmp + 1 - VISI_SIZE] ||
 			    see[cn].vis[tmp - 1 + 0] ||
-			    see[cn].vis[tmp - 1 + 40] ||
-			    see[cn].vis[tmp - 1 - 40])
+			    see[cn].vis[tmp - 1 + VISI_SIZE] ||
+			    see[cn].vis[tmp - 1 - VISI_SIZE])
 			{
 				visible = 1;
 			}
@@ -3560,7 +3654,7 @@ void plr_getmap_fast(int nr)
 					smap[n].ch_proz = 0;
 				}
 				smap[n].flags |= ISCHAR;
-				if (ch[co].stunned)
+				if (ch[co].stunned==1)
 				{
 					smap[n].flags |= STUNNED;
 				}
@@ -3721,7 +3815,7 @@ int check_valid(int cn)
 	if (ch[cn].x<1 || ch[cn].y<1 || ch[cn].x>MAPX - 2 || ch[cn].y>MAPY - 2)
 	{
 		chlog(cn, "Killed character %s (%d) for invalid data", ch[cn].name, cn);
-		do_char_killed(0, cn);
+		do_char_killed(0, cn, 0);
 		return(0);
 	}
 
@@ -3781,14 +3875,28 @@ int check_valid(int cn)
 				ch[cn].worn[n] = 0;
 			}
 		}
+	}
+	for (n = 0; n<MAXBUFFS; n++)
+	{
 		if ((in = ch[cn].spell[n])!=0)
 		{
-			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
+			if (bu[in].carried!=cn || bu[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset spell item %d (%s,%d,%d) from char %d (%s)",
-				     in, it[in].name, it[in].carried, it[in].used, cn, ch[cn].name);
+				xlog("Reset spell buff %d (%s,%d,%d) from char %d (%s)",
+				     in, bu[in].name, bu[in].carried, bu[in].used, cn, ch[cn].name);
 				ch[cn].spell[n] = 0;
 			}
+		}
+	}
+	
+	for (n = 0; n<MAXBUFFS; n++)	// Remove old item buffs
+	{
+		if ((in = ch[cn].spell[n])!=0 && it[in].flags & IF_SPELL && it[in].carried==cn)
+		{
+			xlog("Removed (old) spell item %d (%s,%d,%d) from char %d (%s)",
+				 in, it[in].name, it[in].carried, it[in].used, cn, ch[cn].name);
+			ch[cn].spell[n] = 0;
+			it[in].used = USE_EMPTY;
 		}
 	}
 
@@ -3808,50 +3916,57 @@ int check_valid(int cn)
 
 void check_expire(int cn)
 {
-	int erase = 0, t, week = 60 * 60 * 24 * 7, day = 60 * 60 * 24;
+	int erase = 0, t, month = 60*60*24*30, week = 60*60*24*7, day = 60*60*24;
 
 	t = time(NULL);
 
-	if (ch[cn].points_tot==0)
+	if (ch[cn].kindred & KIN_SEYAN_DU)
 	{
-		if (ch[cn].login_date + 3 * day<t)
+		if (ch[cn].points_tot<10000000) 	//  10 million
 		{
-			erase = 1;
+			if (ch[cn].login_date + 6 * month<t)	erase = 1;
+		}
+		else
+		{
+			if (ch[cn].login_date + 12 * month<t)	erase = 1;
 		}
 	}
-	else if (ch[cn].points_tot<10000)
+	else if (ch[cn].points_tot==0)
 	{
-		if (ch[cn].login_date + 1 * week<t)
-		{
-			erase = 1;
-		}
+		if (ch[cn].login_date + 3 * day<t)		erase = 1;
 	}
-	else if (ch[cn].points_tot<100000)
+	else if (ch[cn].points_tot<10000)		//  10 thousand
 	{
-		if (ch[cn].login_date + 2 * week<t)
-		{
-			erase = 1;
-		}
+		if (ch[cn].login_date + 2 * week<t)		erase = 1;
 	}
-	else if (ch[cn].points_tot<1000000)
+	else if (ch[cn].points_tot<100000)		// 100 thousand
 	{
-		if (ch[cn].login_date + 4 * week<t)
-		{
-			erase = 1;
-		}
+		if (ch[cn].login_date + 1 * month<t)	erase = 1;
+	}
+	else if (ch[cn].points_tot<1000000) 	//   1 million
+	{
+		if (ch[cn].login_date + 3 * month<t)	erase = 1;
+	}
+	else if (ch[cn].points_tot<10000000) 	//  10 million
+	{
+		if (ch[cn].login_date + 6 * month<t)	erase = 1;
 	}
 	else
 	{
-		if (ch[cn].login_date + 6 * week<t)
-		{
-			erase = 1;
-		}
+		if (ch[cn].login_date + 12 * month<t)	erase = 1;
 	}
 	if (erase)
 	{
-		xlog("Should have erased player %s, %d exp; however disabled during development", ch[cn].name, ch[cn].points_tot);
-		//god_destroy_items(cn);
-		//ch[cn].used=USE_EMPTY;
+		if (ch[cn].flags & (CF_IMP | CF_GOD))
+		{
+			xlog("Player %s, %d exp has expired, but will not be deleted (Imp/God).", ch[cn].name, ch[cn].points_tot);
+		}
+		else
+		{
+			xlog("Player %s, %d exp has expired, and has been deleted.", ch[cn].name, ch[cn].points_tot);
+			god_destroy_items(cn);
+			ch[cn].used=USE_EMPTY;
+		}
 	}
 }
 
@@ -4033,6 +4148,7 @@ void tick(void)
 
 		if (ch[n].used==USE_NONACTIVE && (n & 1023)==(globs->ticker & 1023))
 		{
+			// Check if we delete the character
 			check_expire(n);
 		}
 		if (ch[n].flags & CF_BODY)
@@ -4054,6 +4170,7 @@ void tick(void)
 		}
 		if (ch[n].status<8 && !group_active(n))
 		{
+			// Character is idle/standing still and not a player/usurp/nosleep
 			continue;
 		}
 
@@ -4075,10 +4192,13 @@ void tick(void)
 				{
 					ch[n].data[71]--;
 				}
-				if ((ch[n].flags & CF_PLAYER) && ch[n].data[72]>0)
+				// Old badword timer - was [72]
+				/*
+				if ((ch[n].flags & CF_PLAYER) && ch[n].data[x]>0)
 				{
-					ch[n].data[72]--;
+					ch[n].data[x]--;
 				}
+				*/
 				if ((ch[n].flags & CF_PLAYER) && !(ch[n].flags & CF_INVISIBLE))
 				{
 					plon++;
@@ -4111,7 +4231,7 @@ void tick(void)
 	prof_stop(26, prof);
 
 	ctick++;
-	if (ctick>19)
+	if (ctick>23)	// Feb 2020 - extended from 20 to 24
 	{
 		ctick = 0;
 	}

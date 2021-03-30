@@ -8,8 +8,9 @@
 
 #include <zlib.h>
 
-#define TILEX 34
-#define TILEY 34
+// 02162020 - Updated for larger client render
+#define TILEX 		54
+#define TILEY 		54
 
 #define INJURED  (1u<<0)
 #define INJURED1 (1u<<1)
@@ -50,6 +51,8 @@ struct cmap
 	unsigned short ch_nr;
 	unsigned short ch_id;
 	unsigned char ch_proz;          // health in percent
+	unsigned char ch_brv;			// Feb 2020 - dumb hack for bonus animation speed
+	unsigned char ch_agl;			//          - dumb hack
 
 	// for item
 	short int it_sprite;            // basic sprite of item
@@ -378,7 +381,7 @@ struct player
 
 	// copy of visibility map for comparision
 	int vx, vy;
-	char visi[40 * 40];
+	char visi[VISI_SIZE * VISI_SIZE]; // 02162020 - updated from 40x40 to 60x60 for larger client render
 
 	char input[128];
 

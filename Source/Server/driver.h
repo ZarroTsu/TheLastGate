@@ -28,6 +28,9 @@ int drv_is_friend(int cn, int co);
 int drv_dcoor2dir(int dx, int dy);
 int drv_attack(int cn, int co);
 
+int get_frust_x_off(int f);
+int get_frust_y_off(int f);
+
 int follow_driver(int cn, int co);
 
 int spell_value(int in);
@@ -36,4 +39,4 @@ void do_sayx(int cn, char *format, ...) __attribute__ ((format(printf, 2, 3)));
 
 #define ERR_NONE    0
 #define ERR_SUCCESS 1           // operation finished, successfully
-#define ERR_FAILED  2           // failed and will never succedd
+#define ERR_FAILED  2           // failed and will never succeed

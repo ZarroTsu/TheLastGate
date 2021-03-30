@@ -25,15 +25,17 @@
 //static char visi[40*40];
 
 static char *visi;
-static char  _visi[40 * 40];
+static char  _visi[VISI_SIZE * VISI_SIZE]; // 02162020 - updated from 40x40 to 60x60 for larger client render
 static int   ox = 0, oy = 0;
 static char  ismonster = 0;
+static char  isbuilding = 0;
 
 static inline void add_vis(int x, int y, int v)
 {
-	if (!visi[(x - ox + 20) + (y - oy + 20) * 40])
+	// 02162020 - updated for larger client render
+	if (!visi[(x - ox + VISI_SIZE/2) + (y - oy + VISI_SIZE/2) * VISI_SIZE])
 	{
-		visi[(x - ox + 20) + (y - oy + 20) * 40] = v;
+		visi[(x - ox + VISI_SIZE/2) + (y - oy + VISI_SIZE/2) * VISI_SIZE] = v;
 	}
 }
 
@@ -47,7 +49,12 @@ static inline int check_map_see(int x, int y)
 	}
 
 	m = x + y * MAPX;
-
+	
+	if (isbuilding)
+	{
+		return(1);
+	}
+	
 	if (ismonster)
 	{
 		if (map[m].flags & (MF_SIGHTBLOCK | MF_NOMONST))
@@ -96,43 +103,44 @@ static inline int check_map_go(int x, int y)
 
 static inline int close_vis_see(int x, int y, int v)
 {
+	// 02162020 - updated 20's and 40's for larger client render
 	if (!check_map_see(x, y))
 	{
 		return( 0);
 	}
 
-	x = x - ox + 20;
-	y = y - oy + 20;
+	x = x - ox + VISI_SIZE/2;
+	y = y - oy + VISI_SIZE/2;
 
-	if (visi[(x + 1) + (y) * 40]==v)
+	if (visi[(x + 1) + (y) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x - 1) + (y) * 40]==v)
+	if (visi[(x - 1) + (y) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x) + (y + 1) * 40]==v)
+	if (visi[(x) + (y + 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x) + (y - 1) * 40]==v)
+	if (visi[(x) + (y - 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x + 1) + (y + 1) * 40]==v)
+	if (visi[(x + 1) + (y + 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x + 1) + (y - 1) * 40]==v)
+	if (visi[(x + 1) + (y - 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x - 1) + (y + 1) * 40]==v)
+	if (visi[(x - 1) + (y + 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x - 1) + (y - 1) * 40]==v)
+	if (visi[(x - 1) + (y - 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
@@ -142,43 +150,44 @@ static inline int close_vis_see(int x, int y, int v)
 
 static inline int close_vis_go(int x, int y, int v)
 {
+	// 02162020 - updated 20's and 40's for larger client render
 	if (!check_map_go(x, y))
 	{
 		return( 0);
 	}
 
-	x = x - ox + 20;
-	y = y - oy + 20;
+	x = x - ox + VISI_SIZE/2;
+	y = y - oy + VISI_SIZE/2;
 
-	if (visi[(x + 1) + (y) * 40]==v)
+	if (visi[(x + 1) + (y) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x - 1) + (y) * 40]==v)
+	if (visi[(x - 1) + (y) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x) + (y + 1) * 40]==v)
+	if (visi[(x) + (y + 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x) + (y - 1) * 40]==v)
+	if (visi[(x) + (y - 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x + 1) + (y + 1) * 40]==v)
+	if (visi[(x + 1) + (y + 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x + 1) + (y - 1) * 40]==v)
+	if (visi[(x + 1) + (y - 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x - 1) + (y + 1) * 40]==v)
+	if (visi[(x - 1) + (y + 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
-	if (visi[(x - 1) + (y - 1) * 40]==v)
+	if (visi[(x - 1) + (y - 1) * VISI_SIZE]==v)
 	{
 		return( 1);
 	}
@@ -188,42 +197,43 @@ static inline int close_vis_go(int x, int y, int v)
 
 static inline int check_vis(int x, int y)
 {
+	// 02162020 - updated 20's and 40's for larger client render
 	int best = 99;
 
-	x = x - ox + 20;
-	y = y - oy + 20;
+	x = x - ox + VISI_SIZE/2;
+	y = y - oy + VISI_SIZE/2;
 
-	if (visi[(x + 1) + (y + 0) * 40] && visi[(x + 1) + (y + 0) * 40]<best)
+	if (visi[(x + 1) + (y + 0) * VISI_SIZE] && visi[(x + 1) + (y + 0) * VISI_SIZE]<best)
 	{
-		best = visi[(x + 1) + (y + 0) * 40];
+		best = visi[(x + 1) + (y + 0) * VISI_SIZE];
 	}
-	if (visi[(x - 1) + (y + 0) * 40] && visi[(x - 1) + (y + 0) * 40]<best)
+	if (visi[(x - 1) + (y + 0) * VISI_SIZE] && visi[(x - 1) + (y + 0) * VISI_SIZE]<best)
 	{
-		best = visi[(x - 1) + (y + 0) * 40];
+		best = visi[(x - 1) + (y + 0) * VISI_SIZE];
 	}
-	if (visi[(x + 0) + (y + 1) * 40] && visi[(x + 0) + (y + 1) * 40]<best)
+	if (visi[(x + 0) + (y + 1) * VISI_SIZE] && visi[(x + 0) + (y + 1) * VISI_SIZE]<best)
 	{
-		best = visi[(x + 0) + (y + 1) * 40];
+		best = visi[(x + 0) + (y + 1) * VISI_SIZE];
 	}
-	if (visi[(x + 0) + (y - 1) * 40] && visi[(x + 0) + (y - 1) * 40]<best)
+	if (visi[(x + 0) + (y - 1) * VISI_SIZE] && visi[(x + 0) + (y - 1) * VISI_SIZE]<best)
 	{
-		best = visi[(x + 0) + (y - 1) * 40];
+		best = visi[(x + 0) + (y - 1) * VISI_SIZE];
 	}
-	if (visi[(x + 1) + (y + 1) * 40] && visi[(x + 1) + (y + 1) * 40]<best)
+	if (visi[(x + 1) + (y + 1) * VISI_SIZE] && visi[(x + 1) + (y + 1) * VISI_SIZE]<best)
 	{
-		best = visi[(x + 1) + (y + 1) * 40];
+		best = visi[(x + 1) + (y + 1) * VISI_SIZE];
 	}
-	if (visi[(x + 1) + (y - 1) * 40] && visi[(x + 1) + (y - 1) * 40]<best)
+	if (visi[(x + 1) + (y - 1) * VISI_SIZE] && visi[(x + 1) + (y - 1) * VISI_SIZE]<best)
 	{
-		best = visi[(x + 1) + (y - 1) * 40];
+		best = visi[(x + 1) + (y - 1) * VISI_SIZE];
 	}
-	if (visi[(x - 1) + (y + 1) * 40] && visi[(x - 1) + (y + 1) * 40]<best)
+	if (visi[(x - 1) + (y + 1) * VISI_SIZE] && visi[(x - 1) + (y + 1) * VISI_SIZE]<best)
 	{
-		best = visi[(x - 1) + (y + 1) * 40];
+		best = visi[(x - 1) + (y + 1) * VISI_SIZE];
 	}
-	if (visi[(x - 1) + (y - 1) * 40] && visi[(x - 1) + (y - 1) * 40]<best)
+	if (visi[(x - 1) + (y - 1) * VISI_SIZE] && visi[(x - 1) + (y - 1) * VISI_SIZE]<best)
 	{
-		best = visi[(x - 1) + (y - 1) * 40];
+		best = visi[(x - 1) + (y - 1) * VISI_SIZE];
 	}
 
 	if (best==99)
@@ -238,9 +248,10 @@ static inline int check_vis(int x, int y)
 
 static void can_map_see(int _fx, int _fy, int maxdist)
 {
+	// 02162020 - updated 20's and 40's for larger client render
 	int xc, yc, x, y, dist;
 
-	bzero(visi, sizeof(char) * 40 * 40);
+	bzero(visi, sizeof(char) * VISI_SIZE * VISI_SIZE);
 
 	ox = _fx;
 	oy = _fy;
@@ -278,9 +289,10 @@ static void can_map_see(int _fx, int _fy, int maxdist)
 
 static void can_map_go(int _fx, int _fy, int maxdist)
 {
+	// 02162020 - updated 20's and 40's for larger client render
 	int xc, yc, x, y, dist;
 
-	bzero(visi, sizeof(char) * 40 * 40);
+	bzero(visi, sizeof(char) * VISI_SIZE * VISI_SIZE);
 
 	ox = _fx;
 	oy = _fy;
@@ -354,6 +366,14 @@ int can_see(int cn, int _fx, int _fy, int tx, int ty, int maxdist)
 			else
 			{
 				ismonster = 0;
+			}
+			if (IS_BUILDING(cn))
+			{
+				isbuilding = 1;
+			}
+			else
+			{
+				isbuilding = 0;
 			}
 			can_map_see(_fx, _fy, maxdist);
 			see[cn].x = _fx;
@@ -584,101 +604,62 @@ int char_id(int cn)
 
 int points2rank(int v)
 {
-	if (v<      50)
-	{
-		return( 0);
-	}
-	if (v<     850)
-	{
-		return( 1);
-	}
-	if (v<    4900)
-	{
-		return( 2);
-	}
-	if (v<   17700)
-	{
-		return( 3);
-	}
-	if (v<   48950)
-	{
-		return( 4);
-	}
-	if (v<  113750)
-	{
-		return( 5);
-	}
-	if (v<  233800)
-	{
-		return( 6);
-	}
-	if (v<  438600)
-	{
-		return( 7);
-	}
-	if (v<  766650)
-	{
-		return( 8);
-	}
-	if (v< 1266650)
-	{
-		return( 9);
-	}
-	if (v< 1998700)
-	{
-		return( 10);
-	}
-	if (v< 3035500)
-	{
-		return( 11);
-	}
-	if (v< 4463550)
-	{
-		return( 12);
-	}
-	if (v< 6384350)
-	{
-		return( 13);
-	}
-	if (v< 8915600)
-	{
-		return( 14);
-	}
-	if (v<12192400)
-	{
-		return( 15);
-	}
-	if (v<16368450)
-	{
-		return( 16);
-	}
-	if (v<21617250)
-	{
-		return( 17);
-	}
-	if (v<28133300)
-	{
-		return( 18);
-	}
-	if (v<36133300)
-	{
-		return( 19);
-	}
+	if (v<      250)	return( 0); // Private
+	if (v<     1750)	return( 1); // Private FIrst Class
+	if (v<     7000)	return( 2); // Lance Corporal
+	if (v<    21000)	return( 3); // Corporal
+	if (v<    52500)	return( 4); // Sergeant
+	if (v<   115500)	return( 5); // Staff Sergeant
+	if (v<   231000)	return( 6); // Master Sergeant
+	if (v<   429000)	return( 7); // First Sergeant
+	if (v<   750750)	return( 8); // Sergeant Major
+	if (v<  1251250)	return( 9); // Second Lieutenant
+	if (v<  2002000)	return(10); // First Lieutenant
+	if (v<  3094000)	return(11); // Captain
+	if (v<  4641000)	return(12); // Major
+	if (v<  6783000)	return(13); // Lieutenant Colonel
+	if (v<  9690000)	return(14); // Colonel
+	if (v< 13566000)	return(15); // Brigadier General
+	if (v< 18653250)	return(16); // Major General
+	if (v< 25236750)	return(17); // Lieutenant General
+	if (v< 33649000)	return(18); // General
+	if (v< 44275000)	return(19); // Field Marshal
+	if (v< 57557500)	return(20); // Knight
+	if (v< 74002500)	return(21); // Baron
+	if (v< 94185000)	return(22); // Earl
+	if (v<118755000)	return(23); // Marquess
+						return(23); // Warlord
+}
 
-	if (v<49014500)
+int rank2points(int v)
+{
+	switch(v)
 	{
-		return( 20);
+		case  0:	return       250;
+		case  1:	return      1750;
+		case  2:	return      7000;
+		case  3:	return     21000;
+		case  4:	return     52500;
+		case  5:	return    115500;
+		case  6:	return    231000;
+		case  7:	return    429000;
+		case  8:	return    750750;
+		case  9:	return   1251250;
+		case 10:	return   2002000;
+		case 11:	return   3094000;
+		case 12:	return   4641000;
+		case 13:	return   6783000;
+		case 14:	return   9690000;
+		case 15:	return  13566000;
+		case 16:	return  18653250;
+		case 17:	return  25236750;
+		case 18:	return  33649000;
+		case 19:	return  44275000;
+		case 20:	return  57557500;
+		case 21:	return  74002500;
+		case 22:	return  94185000;
+		default:	return 118755000;
 	}
-	if (v<63000600)
-	{
-		return( 21);
-	}
-	if (v<80977100)
-	{
-		return( 22);
-	}
-
-	return(23);
 }
 
 /* Calculates experience to next level from current experience and the
@@ -691,7 +672,7 @@ int points_tolevel(int curr_exp)
 	int curr_level, next_level, p0, p5, p9, r, j;
 
 	curr_level = points2rank(curr_exp);
-	if (curr_level == 23)
+	if (curr_level >= RANKS-1)
 	{
 		return( 0);
 	}
@@ -744,25 +725,35 @@ int in_grouprange(int cn, int co)
 
 int scale_exps2(int cn, int co_rank, int exp)
 {
-	static float scale_tab[49] = {
-		//       -24, -23, -22, -21, -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10,  -9,  -8,  -7,  -6,  -5,  -4,  -3,  -2,  -1,   0,
-		0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.10, 0.15, 0.20, 0.25, 0.33, 0.50, 0.70, 0.80, 0.90, 1.00,
-
-		//         1,   2,   3,   4,   5,   6,   7,   8,   9 , 10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24
-		1.02, 1.04, 1.08, 1.16, 1.32, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 3.75, 4.00, 4.00, 4.00, 4.00, 4.00, 4.00, 4.00, 4.00, 4.00
+	static float scale_tab[RANKS*2+1] = {
+		0.04, 0.04, 0.04, 0.04, // -24, -23, -22, -21
+		0.04, 0.04, 0.04, 0.04, // -20, -19, -18, -17
+		0.12, 0.19, 0.26, 0.33, // -16, -15, -14, -13
+		0.40, 0.46, 0.52, 0.58, // -12, -11, -10, - 9
+		0.64, 0.69, 0.74, 0.79, // - 8, - 7, - 6, - 5
+		0.84, 0.88, 0.92, 0.96, // - 4, - 3, - 2, - 1
+		
+		1.00,					// +- 0
+		
+		1.02, 1.06, 1.12, 1.20, // + 1, + 2, + 3, + 4
+		1.30, 1.42, 1.56, 1.72, // + 5, + 6, + 7, + 8
+		1.90, 2.10, 2.32, 2.56, // + 9, +10, +11, +12
+		2.82, 3.10, 3.40, 3.72, // +13, +14, +15, +16
+		4.00, 4.00, 4.00, 4.00, // +17, +18, +19, +20
+		4.00, 4.00, 4.00, 4.00  // +21, +22, +23, +24
 	};
 	int diff;
 
 	diff = co_rank - points2rank(ch[cn].points_tot);
 
-	diff += 24;
+	diff += RANKS;
 	if (diff<0)
 	{
 		diff = 0;
 	}
-	if (diff>48)
+	if (diff>RANKS*2)
 	{
-		diff = 48;
+		diff = RANKS*2;
 	}
 
 //      xlog("scale %d to %d: diff=%d, scale=%f",points2rank(ch[cn].points_tot),co_rank,diff,scale_tab[diff]);
@@ -778,15 +769,14 @@ int scale_exps(int cn, int co, int exp)
 
 /* CS, 991128: Ranks rearranged for clarity */
 char *rank_name[RANKS] = {
-	"Private",           "Private First Class", "Lance Corporal",   // 0 1 2
-	"Corporal",          "Sergeant", "Staff Sergeant",              // 3 4 5
-	"Master Sergeant",   "First Sergeant", "Sergeant Major",        // 6 7 8
-	"Second Lieutenant", "First Lieutenant", "Captain",             // 9 10 11
-
-	"Major",             "Lieutenant Colonel", "Colonel",           // 12 13 14
-	"Brigadier General", "Major General", "Lieutenant General",     // 15 16 17
-	"General",           "Field Marshal", "Knight of openMerc",     // 18 19 20
-	"Baron of openMerc", "Earl of openMerc", "Warlord of openMerc"  // 21 22 23
+	"Private",           	"Private First Class", "Lance Corporal",		//  0  1  2
+	"Corporal",          	"Sergeant", 			"Staff Sergeant",		//  3  4  5
+	"Master Sergeant",   	"First Sergeant", 		"Sergeant Major",		//  6  7  8
+	"Second Lieutenant", 	"First Lieutenant", 	"Captain",				//  9 10 11
+	"Major",             	"Lieutenant Colonel", 	"Colonel",				// 12 13 14
+	"Brigadier General", 	"Major General", 		"Lieutenant General",	// 15 16 17
+	"General",           	"Field Marshal", 		"Knight of Astonia",	// 18 19 20
+	"Baron of Astonia", 	"Earl of Astonia", 		"Warlord of Astonia"  	// 21 22 23
 };
 
 char *who_rank_name[RANKS] = {
@@ -794,132 +784,360 @@ char *who_rank_name[RANKS] = {
 	" Cpl ", " Sgt ", " SSg ",
 	" MSg ", " 1Sg ", " SgM ",
 	"2Lieu", "1Lieu", "Captn",
-
 	"Major", "LtCol", "Colnl",
 	"BrGen", "MaGen", "LtGen",
 	"Genrl", "FDMAR", "KNIGT",
-//"BARON",                "EARLA",                "WARLD",	// SH 04.04.2000
-	"BARON", " EARL", "WARLD",                              // SH 04.04.2000
+	"BARON", " EARL", "WARLD"
 };
 
 int create_special_item(int temp)
 {
-	int in, mul = 1, spr;
-	char *pref, *suffix, name[60];
+	int in, mul = 1, spr, roll=21, legendary = 0, n, prev=-1;
+	char *pref, *suffix, name[40], newname[60];
 
-	in = god_create_item(temp);
+	in = god_create_item(temp, 0);
 	if (!in)
 	{
 		return( 0);
 	}
-
+	
 	it[in].temp = 0;
-
-	switch(RANDOM(8))
+	
+	// Special 'Legendary' affixes
+	if (!RANDOM(15))
 	{
-	case    0:
-		pref = "Shining ";
-		it[in].light[0] += 10;
-		break;
-	case    1:
-		pref = "Godly ";
-		mul  = 2;
-		break;
-	default:
-		pref = "";
-		break;
+		legendary = 1;
+		roll = 14;
 	}
-	switch(RANDOM(8))       // SH 04.04.2000
-	{//        switch(RANDOM(7)) {
-	case    0:
-		suffix = " of the Lion";
-		it[in].attrib[AT_BRAVE][0] += 4 * mul;
-		break;
-	case    1:
-		suffix = " of the Snake";
-		it[in].attrib[AT_WILL][0] += 4 * mul;
-		break;
-	case    2:
-		suffix = " of the Owl";
-		it[in].attrib[AT_INT][0] += 4 * mul;
-		break;
-	case    3:
-		suffix = " of the Weasel";
-		it[in].attrib[AT_AGIL][0] += 4 * mul;
-		break;
-	case    4:
-		suffix = " of the Bear";
-		it[in].attrib[AT_STREN][0] += 4 * mul;
-		break;
-	case    5:
-		suffix = " of Magic";
-		it[in].mana[0] += 10 * mul;
-		break;
-	case    6:
-		suffix = " of Life";
-		it[in].hp[0] += 10 * mul;
-		break;
-/* Added by SoulHunter 04.04.2000 */
-	case    7:
-		suffix = " of Defence";
-		it[in].armor[0] += 2 * mul;
-		break;
-/* --end */
-	default:
-		suffix = "";
-		break;                            // not reached!
+	
+	// Pick a prefix
+	switch(RANDOM(roll))
+	{
+		case  0: 
+		case  1: 
+			if (legendary) pref = "Leo "; else pref = "Lion's ";
+			it[in].attrib[AT_BRV][0] += 3; 
+			break;
+		case  2: 
+		case  3: 
+			if (legendary) pref = "Anguis "; else pref = "Snake's "; 
+			it[in].attrib[AT_WIL][0] += 3; 
+			break;
+		case  4: 
+		case  5: 
+			if (legendary) pref = "Ibis "; else pref = "Owl's "; 
+			it[in].attrib[AT_INT][0] += 3; 
+			break;
+		case  6: 
+		case  7: 
+			if (legendary) pref = "Mus "; else pref = "Weasel's "; 
+			it[in].attrib[AT_AGL][0] += 3; 
+			break;
+		case  8: 
+		case  9: 
+			if (legendary) pref = "Ursa "; else pref = "Bear's "; 
+			it[in].attrib[AT_STR][0] += 3; 
+			break;
+		case 10: 
+		case 11: 
+			if (legendary) pref = "Angelus "; else pref = "Angelic "; 
+			it[in].attrib[AT_BRV][0] += 1; 
+			it[in].attrib[AT_WIL][0] += 1; 
+			it[in].attrib[AT_INT][0] += 1; 
+			it[in].attrib[AT_AGL][0] += 1; 
+			it[in].attrib[AT_STR][0] += 1; 
+			break;
+		case 12: 
+			if (legendary) pref = "Lux "; else pref = "Glowing "; 
+			it[in].light[0] += 20; 
+			break;
+		case 13: 
+			if (legendary) pref = "Deus "; else pref = "Godly "; 
+			mul = 2; 
+			break;
+		default: 
+			pref = ""; 
+			break;
+	}
+	
+	roll=RANDOM(39);
+
+	// Pick a suffix, or two if legendary
+	for (n=0;n<=legendary;n++)
+	{
+		while (roll==prev) // avoid picking the same thing twice if legendary
+		{
+			roll=RANDOM(39);
+		}
+		prev = roll;
+		
+		switch(roll)
+		{
+			case  0:
+			case  1:
+				if (legendary) suffix = "Fortem"; else suffix = " of Braveness";
+				it[in].attrib[AT_BRV][0] += 4 * mul;
+				break;
+			case  2:
+			case  3:
+				if (legendary) suffix = "Autem"; else suffix = " of Willpower";
+				it[in].attrib[AT_WIL][0] += 4 * mul;
+				break;
+			case  4:
+			case  5:
+				if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
+				it[in].attrib[AT_INT][0] += 4 * mul;
+				break;
+			case  6:
+			case  7:
+				if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
+				it[in].attrib[AT_AGL][0] += 4 * mul;
+				break;
+			case  8:
+			case  9:
+				if (legendary) suffix = "Viribus"; else suffix = " of Strength";
+				it[in].attrib[AT_STR][0] += 4 * mul;
+				break;
+			case 10:
+				if (legendary) suffix = "Callidus"; else suffix = " of the Adept";
+				it[in].attrib[AT_BRV][0] += 2 * mul; 
+				it[in].attrib[AT_WIL][0] += 2 * mul; 
+				it[in].attrib[AT_INT][0] += 2 * mul; 
+				it[in].attrib[AT_AGL][0] += 2 * mul; 
+				it[in].attrib[AT_STR][0] += 2 * mul; 
+				break;
+			case 11:
+			case 12:
+				if (legendary) suffix = "Salutem"; else suffix = " of Hitpoints";
+				it[in].hp[0] += 40 * mul;
+				break;
+			case 13:
+			case 14:
+				if (legendary) suffix = "Pati"; else suffix = " of Endurance";
+				it[in].end[0] += 20 * mul;
+				break;
+			case 15:
+			case 16:
+				if (legendary) suffix = "Magus"; else suffix = " of Mana";
+				it[in].mana[0] += 40 * mul;
+				break;
+			case 17:
+				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
+				it[in].weapon[0] += 3 * mul;
+				break;
+			case 18:
+				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
+				it[in].armor[0] += 3 * mul;
+				break;
+			case 19:
+				if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
+				it[in].skill[SK_IMMUN][0] += 3 * mul;
+				break;
+			case 20:
+				if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
+				it[in].skill[SK_RESIST][0] += 3 * mul;
+				break;
+			case 21:
+			case 22:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Pugione"; else suffix = " of the Dagger";
+					it[in].skill[SK_DAGGER][0] += 3 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Manibus"; else suffix = " of the Unarmed";
+					it[in].skill[SK_HAND][0] += 3 * mul;
+				}
+				break;
+			case 23:
+			case 24:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Virgam"; else suffix = " of the Staff";
+					it[in].skill[SK_STAFF][0] += 3 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Gladio"; else suffix = " of the Sword";
+					it[in].skill[SK_SWORD][0] += 3 * mul;
+				}
+				break;
+			case 25:
+			case 26:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Benedicite"; else suffix = " of Blessing";
+					it[in].skill[SK_BLESS][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Securis"; else suffix = " of the Axe";
+					it[in].skill[SK_AXE][0] += 3 * mul;
+				}
+				break;
+			case 27:
+			case 28:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Maledictum"; else suffix = " of Cursing";
+					it[in].skill[SK_CURSE][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Magna"; else suffix = " of the Twohander";
+					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+				}
+				break;
+			case 29:
+			case 30:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Tarda"; else suffix = " of Slowing";
+					it[in].skill[SK_SLOW][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Adductius"; else suffix = " of Cleaving";
+					it[in].skill[SK_CLEAVE][0] += 4 * mul;
+				}
+				break;
+			case 31:
+			case 32:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Ignis"; else suffix = " of Blasting";
+					it[in].skill[SK_BLAST][0] += 3 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Infirmi"; else suffix = " of Weakening";
+					it[in].skill[SK_WEAKEN][0] += 4 * mul;
+				}
+				break;
+			case 33:
+			case 34:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+				)
+				{
+					if (legendary) suffix = "Familia"; else suffix = " of Company";
+					it[in].skill[SK_GHOST][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Regio"; else suffix = " of Surrounding";
+					it[in].skill[SK_SURROUND][0] += 5 * mul;
+				}
+				break;
+			//
+			case 35:
+				if (legendary) suffix = "Sana"; else suffix = " of Healing";
+				it[in].skill[SK_HEAL][0] += 5 * mul;
+				break;
+			case 36:
+				if (legendary) suffix = "Renati"; else suffix = " of Regeneration";
+				it[in].skill[SK_REGEN][0] += 5 * mul;
+				break;
+			case 37:
+				if (legendary) suffix = "Requiem"; else suffix = " of Resting";
+				it[in].skill[SK_REST][0] += 5 * mul;
+				break;
+			case 38:
+				if (legendary) suffix = "Meditor"; else suffix = " of Meditation";
+				it[in].skill[SK_MEDIT][0] += 5 * mul;
+				break;
+			/*
+			case 39:
+				suffix = " of Perception";
+				it[in].skill[SK_PERCEPT][0] += 6 * mul;
+				break;
+			case 40:
+				suffix = " of Stealth";
+				it[in].skill[SK_STEALTH][0] += 6 * mul;
+				break;
+			case 41:
+				suffix = " of Swimming";
+				it[in].skill[SK_SWIM][0] += 6 * mul;
+				break;
+			*/
+		}
 	}
 
 	switch(temp)
 	{
-	case    57:
-		spr = 840;
-		break;
-	case    59:
-		spr = 845;
-		break;
-	case    63:
-		spr = 830;
-		break;
-	case    65:
-		spr = 835;
-		break;
-	case    69:
-		spr = 870;
-		break;
-	case    71:
-		spr = 875;
-		break;
-	case    75:
-		spr = 850;
-		break;
-	case    76:
-		spr = 855;
-		break;
-	case    94:
-		spr = 860;
-		break;
-	case    95:
-		spr = 865;
-		break;
-	case    981:
-		spr = 16860;
-		break;                            // DY - Fix Special Emerald Helm
-	case    982:
-		spr = 16865;
-		break;                            // DY - Special Emerald Armor
-	default:
-		spr = it[in].sprite[0];
-		break;
+		case IT_HELM_BRNZ: spr = 180; 	break;
+		case IT_BODY_BRNZ: spr = 181; 	break;
+		case IT_HELM_STEL: spr = 182; 	break;
+		case IT_BODY_STEL: spr = 183; 	break;
+		case IT_HELM_GOLD: spr = 184; 	break;
+		case IT_BODY_GOLD: spr = 185; 	break;
+		case IT_HELM_EMER: spr = 186; 	break;
+		case IT_BODY_EMER: spr = 187; 	break;
+		case IT_HELM_CRYS: spr = 188; 	break;
+		case IT_BODY_CRYS: spr = 189; 	break;
+		case IT_HELM_TITN: spr = 190;	break;
+		case IT_BODY_TITN: spr = 191;	break;
+		case IT_HELM_ADAM: spr = 192; 	break;
+		case IT_BODY_ADAM: spr = 193; 	break;
+		case IT_HELM_CAST: spr = 194; 	break;
+		case IT_BODY_CAST: spr = 195; 	break;
+		case IT_HELM_ADEP: spr = 196; 	break;
+		case IT_BODY_ADEP: spr = 197; 	break;
+		case IT_HELM_WIZR: spr = 198; 	break;
+		case IT_BODY_WIZR: spr = 199; 	break;
+		//
+		default: spr = it[in].sprite[0]; break;
 	}
 
 	it[in].sprite[0]  = spr;
 	it[in].max_damage = 0;
-
+	it[in].flags |= IF_SINGLEAGE;
+	
 	strcpy(name, it[in].name);
-	sprintf(it[in].name, "%s%s%s", pref, name, suffix);
-	sprintf(it[in].reference, "%s%s%s", pref, name, suffix);
-	sprintf(it[in].description, "A %s%s%s.", pref, name, suffix);
+	
+	xlog("create_special_item: %s%s%s (%d)", pref, name, suffix, strlen(pref)+strlen(name)+strlen(suffix));
+	
+	if (legendary)
+	{
+		sprintf(newname, "%s%s, %s", pref, suffix, name);
+	}
+	else
+	{
+		sprintf(newname, "%s%s%s", pref, name, suffix);
+	}
+	
+	for (n=39;n<60;n++)	newname[n]='\0'; // cull excess characters from string
+	
+	sprintf(it[in].name, "%s", newname);
+	sprintf(it[in].reference, "%s", newname);
+	sprintf(it[in].description, "A %s.", newname);
 	it[in].name[0] = toupper(it[in].name[0]);
 
 	return(in);
@@ -932,84 +1150,182 @@ struct npc_class
 };
 
 struct npc_class npc_class[] = {
-	{""                        },   // 0
-	{"Weak Thief"              },   // 1
-	{"Thief"                   },   // 2
-	{"Ghost"                   },   // 3
-	{"Weak Skeleton"           },   // 4
-	{"Strong Skeleton"         },   // 5
-	{"Skeleton"                },   // 6
-	{"Outlaw"                  },   // 7
-	{"Grolm Fighter"           },   // 8
-	{"Grolm Warrior"           },   // 9
-	{"Grolm Knight"            },   // 10
-	{"Lizard Youngster"        },   // 11
-	{"Lizard Youth"            },   // 12
-	{"Lizard Worker"           },   // 13
-	{"Lizard Fighter"          },   // 14
-	{"Lizard Warrior"          },   // 15
-	{"Lizard Mage"             },   // 16
-	{"Ratling"                 },   // 17
-	{"Ratling Fighter"         },   // 18
-	{"Ratling Warrior"         },   // 19
-	{"Ratling Knight"          },   // 20
-	{"Ratling Baron"           },   // 21
-	{"Ratling Count"           },   // 22
-	{"Ratling Duke"            },   // 23
-	{"Ratling Prince"          },   // 24
-	{"Ratling King"            },   // 25
-	{"Spellcaster"             },   // 26
-	{"Knight"                  },   // 27
-	{"Weak Golem"              },   // 28
-	{"Captain Gargoyle"        },   // 29
-	{"Undead"                  },   // 30
-	{"Very Strong Ice Gargoyle"},   // 31
-	{"Strong Outlaw"           },   // 32
-	{"Private Grolm"           },   // 33
-	{"PFC Grolm"               },   // 34
-	{"Lance Corp Grolm"        },   // 35
-	{"Corporal Grolm"          },   // 36
-	{"Sergeant Grolm"          },   // 37
-	{"Staff Sergeant Grolm"    },   // 38
-	{"Master Sergeant Grolm"   },   // 39
-	{"First Sergeant Grolm"    },   // 40
-	{"Sergeant Major Grolm"    },   // 41
-	{"2nd Lieutenant Grolm"    },   // 42
-	{"1st Lieutenant Grolm"    },   // 43
-	{"Major Gargoyle"          },   // 44
-	{"Lt. Colonel Gargoyle"    },   // 45
-	{"Colonel Gargoyle"        },   // 46
-	{"Brig. General Gargoyle"  },   // 47
-	{"Major General Gargoyle"  },   // 48
-	{"Lieutenant Gargoyle"     },   // 49
-	{"Weak Spider"             },   // 50
-	{"Spider"                  },   // 51
-	{"Strong Spider"           },   // 52
-	{"Very Strong Outlaw"      },   // 53
-	{"Lizard Knight"           },   // 54
-	{"Lizard Archmage"         },   // 55
-	{"Undead Lord"             },   // 56
-	{"Undead King"             },   // 57
-	{"Very Weak Ice Gargoyle"  },   // 58
-	{"Strong Golem"            },   // 59
-	{"Strong Ghost"            },   // 60
-	{"Shiva"                   },   // 61
-	{"Flame"                   },   // 62
-	{"Weak Ice Gargoyle"       },   // 63
-	{"Ice Gargoyle"            },   // 64
-	{"Strong Ice Gargoyle"     },   // 65
-	{"Greenling"               },   // 66
-	{"Greenling Fighter"       },   // 67
-	{"Greenling Warrior"       },   // 68
-	{"Greenling Knight"        },   // 69
-	{"Greenling Baron"         },   // 70
-	{"Greenling Count"         },   // 71
-	{"Greenling Duke"          },   // 72
-	{"Greenling Prince"        },   // 73
-	{"Greenling King"          },   // 74
-	{"Strong Thief"            },   // 75
-	{"Major Grolm"             }
-};                                      // 76
+	{""							},	// 0  --  Stays blank (null)
+	//
+	{"Weak Thief"				},	// 1
+	{"Crawler"					},	// 2
+	{"Weak Skeleton"			},	// 3
+	{"Weak Harakim"				},	// 4
+	{"Weak Outlaw"				},	// 5
+	{"Skeleton"					},	// 6
+	{"Weak Ghost"				},	// 7
+	{"Outlaw"					},	// 8
+	{"Thief"					},	// 9
+	{"Creeper"					},	// 10
+	//
+	{"Weak Spider"				},	// 11
+	{"Spider"					},	// 12
+	{"Strong Spider"			},	// 13
+	{"Ghost"					},	// 14
+	{"Bandit"					},	// 15
+	//
+	{"Arachnid"					},	// 16
+	{"Templar"					},	// 17
+	{"Strong Skeleton"          },	// 18
+	{"Tarantula"                },	// 19
+	{"Strong Templar"           },	// 20
+	{"Strong Harakim"           },	// 21
+	{"First Lieu. Grolm"		},	// 22
+	{"First Lieu. Seagrel"      },	// 23
+	{"Robber"					},	// 24
+	{"Very Strong Skeleton"		},	// 25
+	//
+	{"Strong Bandit"			},	// 26
+	{"Mud Golem"				},	// 27
+	{"Specter"					},	// 28
+	{"Grudge"					},	// 29
+	{"Swamp Lizard"				},	// 30
+	{"Viking"					},	// 31
+	{"Wraith"					},	// 32
+	{"Wight"					},	// 33
+	{"Demilich"					},	// 34
+	//
+	{"Strong Undead"			},	// 35
+	{"Living Flame"				},	// 36
+	{"Colonel Ice Gargoyle"		},	// 37
+	//
+	{"Gargoyle Knight"			},	// 38
+	{"Gargoyle Mage"			},	// 39
+	//
+	{""},	// 40
+	{""},	// 41
+	{""},	// 42
+	{""},	// 43
+	{""},	// 44
+	{""},	// 45
+	{""},	// 46
+	{""},	// 47
+	{""},	// 48
+	{""},	// 49
+	{""},	// 50
+	{""},	// 51
+	{""},	// 52
+	{""},	// 53
+	//
+	{"Gargoyle Queen"			},	// 54
+	{"Brig. Gen Ice Gargoyle"	},	// 55
+	{"Major Gen Ice Gargoyle"	},	// 56
+	{"Lieu. Gen Ice Gargoyle"	},	// 57
+	{"General Ice Gargoyle"		},	// 58
+	{"Ice Gargoyle Queen"		},	// 59
+	//
+	{"Second Lieu. Thrall"		},	// 60
+	{"First Lieu. Thrall"		},	// 61
+	{"Captain Thrall"			},	// 62
+	{"Major Thrall"				},	// 63
+	{"Lt.Colonel Thrall"		},	// 64
+	{"Colonel Vampire"			},	// 65
+	{"Brig. General Vampire"	},	// 66
+	{"Major General Vampire"	},	// 67
+	{"Lieu. General Vampire"	},	// 68
+	{"General Vampire"			},	// 69
+	{"F.Marshal Vampire"		},	// 70
+	//
+	{"Weak Skeleton Miner"		},	// 71
+	{"Skeleton Miner"			},	// 72
+	{"Silver Golem"				},	// 73
+	{"Magma Gargoyle"			},	// 74
+	{"Marble Golem"				},	// 75
+	//
+	{"Grolm Soldier"			},	// 76
+	{"Grolm Mage"				},	// 77
+	{"Grolm King"				},	// 78
+	{"Lizard Youth"				},	// 79
+	{"Lizard Worker"			},	// 80
+	{"Lizard Seer"				},	// 81
+	{"Undead"					},	// 82
+	{"Reptite"					},	// 83 *
+	{"Spellcaster"				},	// 84
+	{"Puppeteer"				},	// 85
+	{"Mad Knight"				},	// 86
+	{"Old Bones"				},	// 87
+	{"Sand Golem"				},	// 88
+	{"Pharoh"					},	// 89
+	{"Undead King"				},	// 90
+	{"Stone Golem"				},	// 91
+	{"Librarian"				},	// 92
+	{"Golemancer"				},	// 93
+	{"Grolm Trapper"			},	// 94
+	{"Weaver"					},	// 95
+	{"Iguana"					},	// 96
+	{"Wood Golem"				},	// 97
+	{"Sculpture"				},	// 98
+	{"Barbarian"				},	// 99
+	{"Magmaling"				},	// 100
+	//
+	{"Ratling"					},	// 101
+	{"Ratling Fighter"			},	// 102
+	{"Ratling Warrior"			},	// 103
+	{"Ratling Knight"			},	// 104
+	{"Ratling Baron"			},	// 105
+	{"Ratling Count"			},	// 106
+	{"Ratling Duke"				},	// 107
+	{"Ratling Prince"			},	// 108
+	{"Ratling King"				},	// 109
+	{"Ratling Guard"			},	// 110
+	//
+	{"Greenling"				},	// 111
+	{"Greenling Fighter"		},	// 112
+	{"Greenling Warrior"		},	// 113
+	{"Greenling Knight"			},	// 114
+	{"Greenling Baron"			},	// 115
+	{"Greenling Count"			},	// 116
+	{"Greenling Duke"			},	// 117
+	{"Greenling Prince"			},	// 118
+	{"Greenling King"			},	// 119
+	{"Greenling Veteran"		},	// 120
+	//
+	{"Sogling"					},	// 121
+	{"Sogling Fighter"			},	// 122
+	{"Sogling Warrior"			},	// 123
+	{"Sogling Knight"			},	// 124
+	{"Sogling Baron"			},	// 125
+	{"Sogling Count"			},	// 126
+	{"Sogling Duke"				},	// 127
+	{"Sogling Prince"			},	// 128
+	{"Sogling King"				},	// 129
+	{"Sogling Archmage"			},	// 130
+	//
+	{"Private Grolm"			},	// 131
+	{"PFC Grolm"				},	// 132
+	{"Lance Corporal Grolm"		},	// 133
+	{"Corporal Grolm"			},	// 134
+	{"Sergeant Grolm"			},	// 135
+	{"Staff Sergeant Grolm"		},	// 136
+	{"Master Sergeant Grolm"	},	// 137
+	{"First Sergeant Grolm"		},	// 138
+	{"Sergeant Major Grolm"		},	// 139
+	{"Second Lieu. Grolm"		},	// 140
+	{"Second Lieu. Gargoyle"	},	// 141
+	{"First Lieu. Gargoyle"		},	// 142
+	{"Captain Gargoyle"			},	// 143
+	{"Major Gargoyle"			},	// 144
+	{"Lt.Colonel Gargoyle"		},	// 145
+	{"Colonel Gargoyle"			},	// 146
+	{"Brig. General Gargoyle"	},	// 147
+	{"Brig. General Grulge"		},	// 148
+	{"Major General Grulge"		},	// 149
+	{"Lieu. General Grulge"		},	// 150
+	{"General Grulge"			},	// 151
+	{"F.Marshal Grulge"			},	// 152
+	{"F.Marshal Ice Gargoyle"	},	// 153
+	{"Knight Ice Gargoyle"		},	// 154
+	{"Baron Ice Gargoyle"		},	// 155
+	{"Baron Seagrel"			},	// 156
+	{"Earl Seagrel"				},	// 157
+	{"Earl Onyx Gargoyle"		},	// 158
+	{"Warlord Onyx Gargoyle"	}	// 159
+};
 
 int killed_class(int cn, int val)
 {
@@ -1036,11 +1352,18 @@ int killed_class(int cn, int val)
 		ch[cn].data[62] |= bit;
 		return(tmp);
 	}
-	else
+	else if (val<128)
 	{
 		bit = 1 << (val - 96);
 		tmp = ch[cn].data[63] & bit;
 		ch[cn].data[63] |= bit;
+		return(tmp);
+	}
+	else
+	{
+		bit = 1 << (val - 128);
+		tmp = ch[cn].data[70] & bit;
+		ch[cn].data[70] |= bit;
 		return(tmp);
 	}
 }
@@ -1139,9 +1462,9 @@ int use_labtransfer(int cn, int nr, int exp)
 {
 	int x, y, co;
 
-	for (y = 159; y<179; y++)
+	for (y = LAB_ARENA_TOP_Y; y<=LAB_ARENA_BOTTOM_Y; y++)
 	{
-		for (x = 164; x<=184; x++)
+		for (x = LAB_ARENA_TOP_X; x<=LAB_ARENA_BOTTOM_X; x++)
 		{
 			if ((co = map[x + y * MAPX].ch) && (ch[co].flags & (CF_PLAYER | CF_LABKEEPER)))
 			{
@@ -1154,40 +1477,46 @@ int use_labtransfer(int cn, int nr, int exp)
 
 	switch(nr)
 	{
-	case 1:
-		co = pop_create_char(137, 0);
-		break;                                          // grolms
-	case 2:
-		co = pop_create_char(156, 0);
-		break;                                          // lizard
-	case 3:
-		co = pop_create_char(278, 0);
-		break;                                          // spellcaster
-	case 4:
-		co = pop_create_char(315, 0);
-		break;                                          // knight
-	case 5:
-		co = pop_create_char(328, 0);
-		break;                                          // undead
-	case 6:
-		co = pop_create_char(458, 0);
-		break;                                          // light&dark
-	case 7:
-		co = pop_create_char(462, 0);
-		break;                                          // underwater
-	case 8:
-		co = pop_create_char(845, 0);
-		break;                                          // forest / golem
-	case 9:
-		co = pop_create_char(919, 0);
-		break;                                          // riddle
-	case 10:
-		co = pop_create_char(1164, 0);
-		break;                                          // seasons
-	default:
-		do_char_log(cn, 0, "Sorry, could not determine which enemy to send you.\n");
-		chlog(cn, "Sorry, could not determine which enemy to send you");
-		return( 0);
+		case 1:
+			co = pop_create_char(CT_LAB_1_BOSS, 0);
+			break;                                          // grolms
+		case 2:
+			co = pop_create_char(CT_LAB_2_BOSS, 0);
+			break;                                          // lizard
+		case 3:
+			co = pop_create_char(CT_LAB_3_BOSS, 0);
+			break;                                          // spellcaster
+		case 4:
+			co = pop_create_char(CT_LAB_4_BOSS, 0);
+			break;                                          // knight
+		case 5:
+			co = pop_create_char(CT_LAB_5_BOSS, 0);
+			break;                                          // undead
+		case 6:
+			co = pop_create_char(CT_LAB_6_BOSS, 0);
+			break;                                          // light&dark
+		case 7:
+			co = pop_create_char(CT_LAB_7_BOSS, 0);
+			break;                                          // underwater
+		case 8:
+			co = pop_create_char(CT_LAB_8_BOSS, 0);
+			break;                                          // forest / golem
+		case 9:
+			co = pop_create_char(CT_LAB_9_BOSS, 0);
+			break;                                          // riddle
+		case 10:
+			co = pop_create_char(CT_LAB10_BOSS, 0);
+			break;                                          // seasons
+		case 11:
+			co = pop_create_char(CT_LAB11_BOSS, 0);
+			break;                                          // seasons
+		case 12:
+			co = pop_create_char(CT_LAB12_BOSS, 0);
+			break;                                          // seasons
+		default:
+			do_char_log(cn, 0, "Sorry, could not determine which enemy to send you.\n");
+			chlog(cn, "Sorry, could not determine which enemy to send you");
+			return( 0);
 	}
 
 
@@ -1198,7 +1527,7 @@ int use_labtransfer(int cn, int nr, int exp)
 		return(0);
 	}
 
-	if (!god_drop_char(co, 174, 172))
+	if (!god_drop_char(co, LAB_ARENA_BOSS_X, LAB_ARENA_BOSS_Y))
 	{
 		do_char_log(cn, 0, "Sorry, could not place your enemy.\n");
 		chlog(cn, "Sorry, could not place your enemy");
@@ -1221,7 +1550,7 @@ int use_labtransfer(int cn, int nr, int exp)
 
 	npc_add_enemy(co, cn, 1); // make him attack the solver
 
-	if (!god_transfer_char(cn, 174, 166))
+	if (!god_transfer_char(cn, LAB_ARENA_SPAWN_X, LAB_ARENA_SPAWN_Y))
 	{
 		do_char_log(cn, 0, "Sorry, could not transfer you to your enemy.\n");
 		chlog(cn, "Sorry, could not transfer you to your enemy");
@@ -1242,7 +1571,7 @@ void use_labtransfer2(int cn, int co)
 	{
 		do_char_log(cc, 0, "Your Companion killed your enemy.\n");
 		finish_laby_teleport(cc, ch[co].data[1], ch[co].data[2]);
-		god_transfer_char(cn, 512, 512);
+		god_transfer_char(cn, HOME_TEMPLE_X, HOME_TEMPLE_Y);
 		chlog(cc, "Labkeeper room solved by GC");
 		return;
 	}
@@ -1257,7 +1586,7 @@ void use_labtransfer2(int cn, int co)
 
 	if ((cc = ch[cn].data[64]) && IS_SANENPC(cc) && IS_COMPANION(cc))         // transfer GC as well
 	{
-		god_transfer_char(cc, 512, 512);
+		god_transfer_char(cc, HOME_TEMPLE_X, HOME_TEMPLE_Y);
 	}
 }
 
@@ -1351,21 +1680,25 @@ void player_analyser(int cn, char *text)
 		return;
 	}
 
+	/* 
+	// Old badword checker. This is kind of... moot after all these years, and we're all adults here. For now.
+	// Going to retool this particular data slot ( 72 ) for internal quest flags. So avoid uncommetning this.
 	if (is_badword(text))
 	{
-		ch[cn].data[72] += TICKS * 50;
-		if (ch[cn].data[72]>TICKS * 120)
+		ch[cn].data[x] += TICKS * 50;
+		if (ch[cn].data[x]>TICKS * 120)
 		{
 			do_char_log(cn, 0, "Don't say I didn't warn you. Now I'll shut your mouth for you!\n");
 			ch[cn].flags |= CF_SHUTUP;
-			chlog(cn, "Auto-Shutup for \"%s\" (%d)", text, ch[cn].data[72] / TICKS);
+			chlog(cn, "Auto-Shutup for \"%s\" (%d)", text, ch[cn].data[x] / TICKS);
 		}
-		else if (ch[cn].data[72]>TICKS * 80)
+		else if (ch[cn].data[x]>TICKS * 80)
 		{
 			do_char_log(cn, 0, "My, what a filthy mouth you have. You'd better keep it closed for a while!\n");
-			chlog(cn, "Bad-Mouth warning for \"%s\" (%d)", text, ch[cn].data[72] / TICKS);
+			chlog(cn, "Bad-Mouth warning for \"%s\" (%d)", text, ch[cn].data[x] / TICKS);
 		}
 	}
+	*/
 }
 
 void show_time(int cn)
@@ -1585,7 +1918,7 @@ int soultransform(int cn, int in, int in2, int temp)
 	it[in].used  = USE_EMPTY;
 	it[in2].used = USE_EMPTY;
 
-	in = god_create_item(temp);
+	in = god_create_item(temp, 0);
 	god_give_char(in, cn);
 
 	return(in);
@@ -1612,143 +1945,203 @@ void souldestroy(int cn, int in)
 
 #define over_add(a, b) a=(((int)(a)+(int)(b)>120) ? (120) : ((a)+(b)))
 
+static int soul_pen[9+MAXSKILL] = { // Penalties and requirements for each outcome for SS Gear
+	1, //  0 Hitpoints
+	2, //  1 Endurance
+	1, //  2 Mana
+	3, //  3 WV or AV
+	
+	2, //  4 Braveness
+	2, //  5 Willpower
+	2, //  6 Intuition
+	2, //  7 Agility
+	2, //  8 Strength
+	
+	4, //  9 Hand to Hand
+	2, // 10 Precision
+	4, // 11 Dagger
+	4, // 12 Sword
+	4, // 13 Axe
+	4, // 14 Staff
+	4, // 15 Two-Handed
+	
+	3, // 16 Focus
+	1, // 17 Stealth
+	1, // 18 Perception
+	1, // 19 Swimming
+	1, // 20 Magic Shield
+	1, // 21 Bartering
+	1, // 22 Repair
+	1, // 23 Light
+	1, // 24 Recall
+	2, // 25 Shield
+	1, // 26 Protect
+	1, // 27 Enhance
+	2, // 28 Slow
+	2, // 29 Curse
+	2, // 30 Bless
+	1, // 31 Identify
+	3, // 32 Resistance
+	2, // 33 Blast
+	2, // 34 Dispel
+	1, // 35 Heal
+	2, // 36 Ghost Companion
+	1, // 37 Regenerate
+	1, // 38 Rest
+	1, // 39 Meditate
+	1, // 40 Sense Magic
+	3, // 41 Immunity
+	1, // 42 Surround Hit
+	4, // 43 Concentrate
+	2, // 44 Warcry
+	2, // 45 Dual Wield
+	2, // 46 Combat Mastery
+	1, // 47 Weapon Mastery
+	1, // 48 Armor Mastery
+	2, // 49 Cleave
+	2, // 50 Weaken
+	2, // 51 Poison
+	1, // 52 Damage Proximity
+	1, // 53 Hex Proximity
+	2, // 54 Companion Mastery
+	2, // 55 Shadow Copy
+	2, // 56 Haste
+	1, // 57 Surround Area
+	1  // 58 Surround Rate
+};
+
 void soultrans_equipment(int cn, int in, int in2)
 {
-	int stren, rank, ran;
-
+	int stren, rank, ran, i;
+	int known[MAXSKILL] = {0};		// count of total skills in the game
+	int cnt = 0, spen = 1;
+	
+	// Loop through skills the player knows and add them to a secondary list.
+	for (i=0;i<MAXSKILL;i++)			// count of total skills in the game
+	{
+		if (ch[cn].skill[i][0])
+		{
+			known[cnt]=i;
+			cnt++;
+		}
+	}
+	
+	// Set 'rank' to the power of the soul stone
 	rank = it[in].data[0];
 
 	while (rank)
 	{
-		stren = RANDOM(rank + 1);
-		rank -= stren;
-
-		if (it[in].flags & IF_WEAPON)
+		ran = -1;
+		stren = RANDOM(rank)+1;
+		
+		while (ran < 0)
 		{
-			ran = RANDOM(27);
+			ran = RANDOM(9+cnt); 		// Pick from known skills and attributes
+			
+			if (ran<=8)
+				spen = soul_pen[ran];
+			else
+				spen = soul_pen[9+known[ran-8]];
+			
+			if (spen > stren) 			// If the stat has too high a penalty, try again
+				ran = -1;
 		}
-		else
-		{
-			ran = RANDOM(26);
-		}
+		
+		stren = max(1, min(9, stren/max(1, spen) ) );	// Reduce the strength that will be applied by its penalty cost
+		rank -= (stren * spen);							// Reduce remaining rank by the now rounded strength value
 
-		switch(ran)
+		chlog(cn, "SOULSTONE: Rolled %d with stren of %d",ran,stren);
+
+		if (ran==0) // For every 5 points of HP, END, MANA, it requires 20 base points to use.
 		{
-		case 0:
-			it[in2].hp[2] += stren * 25;
+			it[in2].hp[2] += stren * 20;
 			it[in2].hp[0] += stren * 5;
-			break;
-		case 1:
-			it[in2].mana[2] += stren * 25;
+		}
+		else if (ran==1)
+		{
+			//it[in2].end[2] += stren * 20;
+			it[in2].end[0] += stren * 5;
+		}
+		else if (ran==2)
+		{
+			it[in2].mana[2] += stren * 20;
 			it[in2].mana[0] += stren * 5;
-			break;
-
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-			over_add(it[in2].attrib[ran - 2][2], stren * 3);
-			it[in2].attrib[ran - 2][0] += stren / 2;
-			break;
-
-		case 7:
-			over_add(it[in2].skill[SK_DAGGER][2], stren * 5);
-			it[in2].skill[SK_DAGGER][0] += stren;
-			break;
-		case 8:
-			over_add(it[in2].skill[SK_SWORD][2], stren * 5);
-			it[in2].skill[SK_SWORD][0] += stren;
-			break;
-		case 9:
-			over_add(it[in2].skill[SK_TWOHAND][2], stren * 5);
-			it[in2].skill[SK_TWOHAND][0] += stren;
-			break;
-		case 10:
-			over_add(it[in2].skill[SK_STEALTH][2], stren * 5);
-			it[in2].skill[SK_STEALTH][0] += stren;
-			break;
-		case 11:
-			over_add(it[in2].skill[SK_MSHIELD][2], stren * 5);
-			it[in2].skill[SK_MSHIELD][0] += stren;
-			break;
-		case 12:
-			over_add(it[in2].skill[SK_PROTECT][2], stren * 5);
-			it[in2].skill[SK_PROTECT][0] += stren;
-			break;
-		case 13:
-			over_add(it[in2].skill[SK_ENHANCE][2], stren * 5);
-			it[in2].skill[SK_ENHANCE][0] += stren;
-			break;
-		case 14:
-			over_add(it[in2].skill[SK_STUN][2], stren * 5);
-			it[in2].skill[SK_STUN][0] += stren;
-			break;
-		case 15:
-			over_add(it[in2].skill[SK_CURSE][2], stren * 5);
-			it[in2].skill[SK_CURSE][0] += stren;
-			break;
-		case 16:
-			over_add(it[in2].skill[SK_BLESS][2], stren * 5);
-			it[in2].skill[SK_BLESS][0] += stren;
-			break;
-		case 17:
-			over_add(it[in2].skill[SK_RESIST][2], stren * 5);
-			it[in2].skill[SK_RESIST][0] += stren;
-			break;
-		case 18:
-			over_add(it[in2].skill[SK_BLAST][2], stren * 5);
-			it[in2].skill[SK_BLAST][0] += stren;
-			break;
-		case 19:
-			over_add(it[in2].skill[SK_HEAL][2], stren * 5);
-			it[in2].skill[SK_HEAL][0] += stren;
-			break;
-		case 20:
-			over_add(it[in2].skill[SK_GHOST][2], stren * 5);
-			it[in2].skill[SK_GHOST][0] += stren;
-			break;
-		case 21:
-			over_add(it[in2].skill[SK_IMMUN][2], stren * 5);
-			it[in2].skill[SK_IMMUN][0] += stren;
-			break;
-		case 22:
-			over_add(it[in2].skill[SK_SURROUND][2], stren * 5);
-			it[in2].skill[SK_SURROUND][0] += stren;
-			break;
-		case 23:
-			over_add(it[in2].skill[SK_CONCEN][2], stren * 5);
-			it[in2].skill[SK_CONCEN][0] += stren;
-			break;
-		case 24:
-			over_add(it[in2].skill[SK_WARCRY][2], stren * 5);
-			it[in2].skill[SK_WARCRY][0] += stren;
-			break;
-		case 25:
-			it[in2].armor[0] += stren / 2;
-			break;
-		case 26:
-			it[in2].weapon[0] += stren / 2;
-			break;
-		default:
-			xlog("should never happen in soultrans_equipment()");
-			break;
+		}
+		else if (ran==3)
+		{
+			if (it[in2].weapon[0]>0)
+				it[in2].weapon[0] += stren;
+			else
+				it[in2].armor[0] += stren;
+		}
+		else if (ran>=4 && ran<=8) // For every 1 attribute point, it requires 3 base points to use.
+		{
+			i = ran-4;
+			over_add(it[in2].attrib[i][2], stren * 3);
+			it[in2].attrib[i][0] += stren;
+		}
+		else if (ran > 8) // For every 1 skill point, it requires 5 base points to use.
+		{
+			i = known[ran-8];
+			over_add(it[in2].skill[i][2], stren * 5);
+			it[in2].skill[i][0] += stren;
 		}
 	}
 
-	it[in2].temp   = 0;
+	if (it[in2].temp!=IT_CH_FOOL) it[in2].temp   = 0;
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_NOREPAIR | IF_SOULSTONE;
-
 	it[in2].min_rank = max(it[in].data[0], it[in2].min_rank);
-
+	it[in2].value -= 1;
+	
 	if (!it[in2].max_damage)
 	{
-		it[in2].max_damage = 60000;
+		if 		(it[in2].weapon[0]>0) 	it[in2].max_damage = 3500*it[in2].weapon[0];
+		else if	(it[in2].power == 60) 	it[in2].max_damage = 65000;
+		else if	(it[in2].power == 75)	it[in2].max_damage = 85000;
+		else 							it[in2].max_damage = 60000;
 	}
 
 	souldestroy(cn, in);
 
 	sprintf(it[in2].description, "A %s enhanced by a rank %d soulstone.", it[in2].name, it[in].data[0]);
+}
+
+int can_be_soulstoned(int in)
+{
+	static int valid_ss[] = {
+		// valid weapons
+		32, 33, 34, 35, 36, 37, 38,						// Bronze
+		284, 285, 286, 287, 288, 289, 290, 291, 292,	// Steel
+		523, 524, 525, 526, 527, 528, 529, 530, 531,	// Gold
+		532, 533, 534, 535, 536, 537, 538, 539, 540,	// Emerald
+		541, 542, 543, 544, 545, 546, 547, 548, 549,	// Crystal
+		572, 573, 574, 575, 576, 577, 578, 579, 580,	// Titanium
+		693, 694, 695, 696, 697, 698, 699, 700, 701,	// Adamantine
+		// valid armors
+		27, 28, 29, 30, 31, 39, 40, 41, 42, 43, 51, 52, 53, 54, 55, 	// Cloth, Leather, Bronze
+		56, 57, 58, 59, 60,	61, 62, 63, 64, 65, 66, 67, 68, 69, 70,		// Steel, Gold, Emerald
+		71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 94, 95, 96, 97, 98, 	// Crystal, Titanium, Adamantine
+		337, 338, 339, 340, 341, 342, 343, 344, 345, 346,				// Simple, Caster
+		347, 348, 349, 350, 351, 352, 353, 354, 355, 356,				// Adept, Wizard
+		// other
+		IT_CH_FOOL
+		};
+	int n, temp;
+	
+	temp = it[in].temp;
+
+	for (n = 0; n<ARRAYSIZE(valid_ss); n++)
+	{
+		if (temp == valid_ss[n])
+		{
+			if (temp==IT_CH_FOOL&& (it[in].flags & IF_SOULSTONE))
+			{
+				return 0;
+			}
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int use_soulstone(int cn, int in)
@@ -1777,12 +2170,16 @@ int use_soulstone(int cn, int in)
 
 	if (it[in2].driver==68)
 	{
-		it[in].data[1] += RANDOM(it[in2].data[1] + 1);
+		it[in].data[1] += it[in2].data[1] - RANDOM(it[in2].data[1]/4 + 1);
 		rank = points2rank(it[in].data[1]);
+		
+		if (rank > 18) 
+			rank = 18;
+		
 		it[in].data[0] = rank;
 		sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, it[in].data[1]);
 
-		if (rank>20)
+		if (rank==18)
 		{
 			do_char_log(cn, 1, "That's as high as they go.\n");
 		}
@@ -1794,105 +2191,40 @@ int use_soulstone(int cn, int in)
 
 	switch(it[in2].temp)
 	{
-	case 18:
-		in = soultransform(cn, in, in2, 101);
-		it[in].hp[0] += 10;
-		return( 1);                                                                     // red flower
-	case 46:
-		in = soultransform(cn, in, in2, 102);
-		it[in].mana[0] += 10;
-		return( 1);                                                                     // purple flower
-	case 91:
-		in = soulrepair(cn, in, in2);
-		it[in].max_age[1] *= 4;
-		return( 1);                                                                     // torch
-	case 100:
-		in = soultransform(cn, in, in2, 102);
-		return( 1);                                                                     // flask
-
-	case 101:
-		souldestroy(cn, in);
-		it[in].hp[0] += 10;
-		return( 1);                                                                     // healing potion
-	case 102:
-		souldestroy(cn, in);
-		it[in].mana[0] += 10;
-		return( 1);                                                                     // mana potion
-
-	case 27:
-	case 28:
-	case 29:
-	case 30:
-	case 31:
-	case 32:
-	case 33:
-	case 34:
-	case 35:
-	case 36:
-	case 37:
-	case 38:
-	case 39:
-	case 40:
-	case 41:
-	case 42:
-	case 43:
-	case 44:
-	case 51:
-	case 52:
-	case 53:
-	case 54:
-	case 55:
-	case 56:
-	case 57:
-	case 58:
-	case 59:
-	case 60:
-	case 61:
-	case 62:
-	case 63:
-	case 64:
-	case 65:
-	case 66:
-	case 67:
-	case 68:
-	case 69:
-	case 70:
-	case 71:
-	case 72:
-	case 73:
-	case 74:
-	case 75:
-	case 76:
-	case 77:
-	case 78:
-	case 79:
-	case 80:
-	case 94:
-	case 95:
-	case 96:
-	case 97:
-	case 98:
-	case 99:
-	case 116:
-	case 125:
-	case 158:
-	case 501:
-	case 502:
-	case 503:
-	case 523:
-	case 524:
-	case 813:
-	case 981:
-	case 982:
-	case 983:
-	case 984:
-	case 985:
-	case 986:
-		soultrans_equipment(cn, in, in2);
-		return( 1);
-	default:
-		do_char_log(cn, 1, "Nothing happened.\n");
-		return( 0);
+		case 18: // red flower
+			in = soultransform(cn, in, in2, 101);
+			it[in].hp[0] += 10;
+			return( 1);
+		case 46: // purple flower
+			in = soultransform(cn, in, in2, 102);
+			it[in].mana[0] += 10;
+			return( 1);
+		case 91: // torch
+			in = soulrepair(cn, in, in2);
+			it[in].max_age[1] *= 4;
+			return( 1);
+		case 100: // flask
+			in = soultransform(cn, in, in2, 102);
+			return( 1);
+		case 101: // healing potion
+			souldestroy(cn, in);
+			it[in].hp[0] += 10;
+			return( 1);
+		case 102: // mana potion
+			souldestroy(cn, in);
+			it[in].mana[0] += 10;
+			return( 1);
+		default:
+			if (can_be_soulstoned(in2))
+			{
+				soultrans_equipment(cn, in, in2);
+				return( 1);
+			}
+			else
+			{
+				do_char_log(cn, 1, "Nothing happened.\n");
+				return( 0);
+			}
 	}
 }
 

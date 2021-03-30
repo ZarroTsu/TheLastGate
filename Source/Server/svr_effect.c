@@ -213,7 +213,7 @@ void effect_tick(void)
 
 						if (ch[co].flags & CF_RESPAWN)
 						{
-							fx_add_effect(2, TICKS * 60 * 5 + RANDOM(TICKS * 60 * 10), ch_temp[temp].x, ch_temp[temp].y, temp);
+							fx_add_effect(2, TICKS * 60 * 5 + RANDOM(TICKS * 60 * 10), ch_temp[temp].x, ch_temp[temp].y, temp); // 5 - 10 minutes
 						}
 						m = 0;
 					}
@@ -227,12 +227,24 @@ void effect_tick(void)
 						{
 							if (ch[co].item[z])
 							{
+								// skip if held item template matches current weapon
+								if (it[ch[co].item[z]].temp == it[ch[co].worn[WN_RHAND]].temp) 
+								{
+									continue;
+								}
+								
 								flag = 1;
 								break;
 							}
 						}
 						for (z = 0; z<20 && !flag; z++)
 						{
+							// skip weapon slot
+							if (z == WN_RHAND && !(ch[co].worn[z] && is_unique(ch[co].worn[z])))
+							{
+								continue;
+							}
+							
 							if (ch[co].worn[z])
 							{
 								flag = 1;
@@ -265,13 +277,14 @@ void effect_tick(void)
 
 							if (temp && (ch[co].flags & CF_RESPAWN))
 							{
-								if (temp==189 || temp==561)
+								// Eyeball kings take extra time to respawn
+								if (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING )
 								{
-									fx_add_effect(2, TICKS * 60 * 20 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp);
+									fx_add_effect(2, TICKS * 60 * 15 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp); // 15 - 20 minutes
 								}
 								else
 								{
-									fx_add_effect(2, TICKS * 60 * 4 + RANDOM(TICKS * 60 * 1), ch_temp[temp].x, ch_temp[temp].y, temp);
+									fx_add_effect(2, TICKS * 60 * 4 + RANDOM(TICKS * 60 * 1), ch_temp[temp].x, ch_temp[temp].y, temp); // 4 - 5 minutes
 								}
 								xlog("respawn %d (%s): YES", co, ch[co].name);
 							}
@@ -299,8 +312,9 @@ void effect_tick(void)
 				map[m].flags &= ~MF_GFX_TOMB;
 				map[m].flags &= ~MF_MOVEBLOCK;
 
-				in = god_create_item(170);
+				in = god_create_item(IT_TOMBSTONE, 0);
 				it[in].data[0] = co;
+				
 				if (ch[co].data[99])
 				{
 					it[in].max_age[0] *= 4;
@@ -335,7 +349,6 @@ void effect_tick(void)
 			m = fx[n].data[0] + fx[n].data[1] * MAPX;
 			if (fx[n].duration==8)
 			{
-
 				fx[n].used = USE_EMPTY;
 				map[m].flags &= ~MF_GFX_EMAGIC;
 			}
@@ -352,7 +365,6 @@ void effect_tick(void)
 			m = fx[n].data[0] + fx[n].data[1] * MAPX;
 			if (fx[n].duration==8)
 			{
-
 				fx[n].used = USE_EMPTY;
 				map[m].flags &= ~MF_GFX_GMAGIC;
 			}
@@ -465,7 +477,7 @@ void effect_tick(void)
 				in2 = map[m].it;
 				map[m].it = 0;
 
-				in = god_create_item(fx[n].data[2]);
+				in = god_create_item(fx[n].data[2], 0);
 
 				if (!god_drop_item(in, fx[n].data[0], fx[n].data[1]))
 				{

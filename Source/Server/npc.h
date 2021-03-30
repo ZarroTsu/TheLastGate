@@ -24,3 +24,8 @@ void npc_cityattack_low(int cn);
 int npc_malte_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 int npc_malte_high(int cn);
 void npc_malte_low(int cn);
+
+// -- npc_shiva.c
+int npc_shiva_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4);
+int npc_shiva_high(int cn);
+void npc_shiva_low(int cn);

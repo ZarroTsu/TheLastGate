@@ -21,6 +21,7 @@
 
 struct map *map;
 struct character *ch;
+struct item *bu;
 struct item *it;
 struct character *ch_temp;
 struct item *it_temp;
@@ -134,6 +135,29 @@ int load(void)
 	}
 	close(handle);
 
+	/** BUFF - 3/11/2021 **/
+	xlog("Loading BUFF: Item size=%d, file size=%dK",
+	     sizeof(struct item), BUFFSIZE >> 10);
+
+	handle = open(DATDIR "/buff.dat", O_RDWR);
+	if (handle==-1)
+	{
+		xlog("Building buffs");
+		handle = open(DATDIR "/buff.dat", O_RDWR | O_CREAT, 0600);
+	}
+	if (!extend(handle, BUFFSIZE, sizeof(struct item), NULL))
+	{
+		return( -1);
+	}
+
+
+	bu = mmap(NULL, BUFFSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (bu==(void*)-1)
+	{
+		return( -1);
+	}
+	close(handle);
+
 	/** ITEM **/
 	xlog("Loading ITEM: Item size=%d, file size=%dK",
 	     sizeof(struct item), ITEMSIZE >> 10);
@@ -237,6 +261,10 @@ void update(void)
 	{
 		xlog("ERROR msync(ch) %s", strerror(errno));
 	}
+	if (msync(bu, BUFFSIZE, MS_ASYNC))
+	{
+		xlog("ERROR: msync(bu) %s", strerror(errno));
+	}
 	if (msync(it, ITEMSIZE, MS_ASYNC))
 	{
 		xlog("ERROR: msync(it) %s", strerror(errno));
@@ -281,11 +309,11 @@ void flush_char(int cn)
 		}
 	}
 
-	for (n = 0; n<20; n++)
+	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if (IS_SANEITEM(in = ch[cn].spell[n]))
 		{
-			msync(&it[in], sizeof(struct item), MS_ASYNC);
+			msync(&bu[in], sizeof(struct item), MS_ASYNC);
 		}
 	}
 
@@ -308,6 +336,10 @@ void flush(void)
 	if (msync(ch, CHARSIZE, MS_SYNC))
 	{
 		xlog("ERROR msync(ch) %s", strerror(errno));
+	}
+	if (msync(bu, BUFFSIZE, MS_SYNC))
+	{
+		xlog("ERROR: msync(bu) %s", strerror(errno));
 	}
 	if (msync(it, ITEMSIZE, MS_SYNC))
 	{
@@ -341,6 +373,10 @@ void unload(void)
 	if (munmap(ch, CHARSIZE))
 	{
 		xlog("ERROR: munmap(ch) %s", strerror(errno));
+	}
+	if (munmap(bu, BUFFSIZE))
+	{
+		xlog("ERROR: munmap(bu) %s", strerror(errno));
 	}
 	if (munmap(it, ITEMSIZE))
 	{

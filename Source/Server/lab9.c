@@ -27,7 +27,7 @@ struct destination
 	int y;
 }
 destinations[RIDDLEGIVERS] = {
-	{ 39, 729}, {40, 749}, {40, 769}, {40, 789}, {34, 806}
+	{88, 689}, {53, 689}, {53, 660}, {88, 660}, {106, 660} // These are up to date with new TLG values
 };
 
 // riddle questions and answers for 5 riddlers, 11 to choose from.
@@ -386,55 +386,65 @@ switch_questions[BANKS][BANK_QUESTIONS] = {
 	{ //bank 1
 		{ TRUE,  "Jefferson gives the quest for repair."                                           },
 		{ FALSE, "Steven asks you to bring him a greater healing potion."                          },
-		{ FALSE, "Gunthar lives in Rose Street."                                                   },
-		{ FALSE, "The golems in the Pentagram Quest say \"Dusdra gur, Hu-Har!\" when attacking."   },
-		{ TRUE,  "Argha is a Master Sergeant."                                                     },
-		{ FALSE, "There are exactly 17 rooms in the Dungeon of Doors."                             },
+		{ FALSE, "Gunther lives on Rose Street."                                                   },
+		{ FALSE, "The grolms in the Pentagram Quest say \"Dusdra gur, Hu-Har!\" when attacking."   },
+		{ FALSE, "Argha is a Master Sergeant."                                                     },
+		{ TRUE,  "There are exactly 19 rooms in the Dungeon of Doors."                             },
 		{ TRUE,  "Serena is a templar."                                                            },
-		{ TRUE,  "There is a purple flower growing under the tree beside the Magic Shop."          }
+		{ FALSE, "There are exactly 7 purple flowers growing around the Temple of the Purple One"  },
+		{ TRUE,  "The library in Lynbore sells a copy of Alchemy 101."                             },
+		{ TRUE,  "There is an apple tree growing outside of Damor's Magic Shop."                   }
 	}, //end bank 1
 
 	{ // bank 2
 		{ FALSE, "Ingrid gives the quest for recall."                                              },
 		{ FALSE, "Nasir asks you to bring him a potion of life."                                   },
-		{ TRUE,  "Serena lives in Temple Street."                                                  },
-		{ TRUE,  "If asked, Robin tells you about Lord Azrael of Aston."                           },
-		{ TRUE,  "The barkeeper in the Tavern of the Blue is a First Lieutenant."                  },
-		{ TRUE,  "In Stevens house is a hole, that leads into the Underground."                    },
+		{ TRUE,  "Serena lives on Second Street."                                                  },
+		{ FALSE, "If asked, Robin tells you about Lord Azrael."                                    },
+		{ TRUE,  "The barkeeper in the Tavern of the Blue Ogre is a First Lieutenant."             },
+		{ TRUE,  "In Oscar's house is a hole, that leads into the Underground."                    },
+		{ TRUE,  "There are four guards in the Guard House in Lynbore."                            },
+		{ TRUE,  "The Ghost Lord in the Abandoned Manor was once named Edric."                     },
 		{ FALSE, "Kira is a Staff Sergeant."                                                       },
 		{ FALSE, "Leopold is an old man of about 70 years."                                        }
 	}, // end bank 2
 
 	{ // bank 3
 		{ TRUE,  "Manfred gives the quest for sense magic."                                        },
-		{ TRUE,  "Leopold wants you to bring him a Ratling Fighters Eye."                          },
-		{ FALSE, "The priest in the Temple of the Purple One is a Master Sergeant."                },
-		{ TRUE,  "21 ghosts roam the Haunted Castle."                                              },
+		{ FALSE, "Leopold wants you to bring him a Ratling Fighters Eye."                          },
+		{ TRUE,  "The priest in the Temple of the Purple One is a Master Sergeant."                },
+		{ TRUE,  "23 ghosts roam the Haunted Castle in Lynbore."                                   },
 		{ FALSE, "Garna runs her shop right at the entrance to the mines."                         },
-		{ FALSE, "A golden ring adorned with a huge ruby raises you Intuition by 24 if activated." },
+		{ FALSE, "A gold ring adorned with a huge ruby raises your Intuition by 24 if activated."  },
 		{ TRUE,  "Jefferson is a Second Lieutenant."                                               },
-		{ FALSE, "There is a green flower growing behind the Leather Armor Shop."                  }
+		{ FALSE, "Sarah wields a golden dagger."                                                   },
+		{ FALSE, "Gerald collects spider heads near the south entrance to Aston."                  },
+		{ TRUE,  "There is a yellow flower growing behind the House of Cards in Aston."            }
 	}, // end bank 3
 
 	{ // bank 4
-		{ FALSE, "Sirjan gives the quest for identify."                                            },
+		{ FALSE, "April teaches you how to appraise items."                                        },
 		{ FALSE, "Cirrus wants you to bring him the Amulet of Resistance."                         },
-		{ TRUE,  "There are three Ratling Counts to be found in the Underground."                  },
+		{ TRUE,  "There are four Ratling Count spawners in the Underground."                       },
 		{ FALSE, "The ghosts in the Haunted Castle praise Damor when they die."                    },
 		{ TRUE,  "Malte is a Corporal."                                                            },
 		{ FALSE, "Clara is wielding a golden dagger."                                              },
-		{ TRUE,  "Hagen is running the Golden Armor Shop."                                         },
+		{ FALSE, "Hagen is running the Golden Armor Shop in Aston."                                },
+		{ TRUE,  "The prisoners in Astonia Penitentiary are completely unarmed."                   },
+		{ TRUE,  "The Mad Hermit uses an emerald staff."                                           },
 		{ TRUE,  "Nasir's left eye looks as if it was made of glass."                              }
 	}, // end bank 4
 
 	{ // bank 5
-		{ FALSE, "Shiva is a Baron of Astonia."                                                    },
-		{ TRUE,  "Ursel is wearing bronze armor."                                                  },
-		{ TRUE,  "The Lizard Archmages carry 93 silver pieces."                                    },
+		{ TRUE,  "Shiva is a Brigadier General."                                                   },
+		{ FALSE, "Ursel is wearing bronze armor."                                                  },
+		{ TRUE,  "The Swamp Lizards carry 93 silver pieces."                                       },
 		{ TRUE,  "The pentagram 134 is worth 2566 points."                                         },
-		{ TRUE,  "The Greenling Prince is a Captain."                                              },
-		{ FALSE, "Antonia runs the leather armor shop."                                            },
+		{ FALSE, "The Greenling Prince is a Captain."                                              },
+		{ TRUE,  "Eva runs the emerald armor shop in Aston."                                       },
 		{ FALSE, "The pentagram 139 is worth 2766 points."                                         },
+		{ FALSE, "There are 20 Seagrels in the Violet Lakebed"                                     },
+		{ TRUE,  "The robbers in the Strange Forest are lead by a woman named Shion."              },
 		{ FALSE, "Cirrus is a fat old man."                                                        }
 	} // end bank 5
 };
@@ -448,11 +458,11 @@ struct bank
 	int doory;
 }
 banks[BANKS] = {
-	{ 23, 707, 1047, 23, 720 },
-	{ 23, 727, 1069, 23, 741 },
-	{ 23, 747, 1076, 23, 761 },
-	{ 23, 767, 1084, 31, 781 },
-	{ 23, 787, 1088, 19, 803 }
+	{ 100, 690, 1047, 100, 703 }, // These are up to date with new TLG values
+	{  65, 690, 1069,  65, 703 },
+	{  30, 690, 1076,  30, 703 },
+	{  30, 661, 1084,  38, 674 },
+	{  65, 661, 1088,  60, 676 }
 };
 
 /* The 6 question selected from the 11 available questions per bank. */
@@ -648,7 +658,7 @@ int lab9_check_door(int bankno)
 			it[in].flags &= ~(IF_MOVEBLOCK | IF_SIGHTBLOCK);
 			do_area_sound(0, 0, it[in].x, it[in].y, 10);
 			reset_go(it[in].x, it[in].y);
-			add_lights(it[in].x, it[in].y);
+			//add_lights(it[in].x, it[in].y);
 		}
 		return(1);
 	}
@@ -663,7 +673,7 @@ int lab9_check_door(int bankno)
 			it[in].flags |= IF_MOVEBLOCK | flags;
 			do_area_sound(0, 0, it[in].x, it[in].y, 10);
 			reset_go(it[in].x, it[in].y);
-			add_lights(it[in].x, it[in].y);
+			//add_lights(it[in].x, it[in].y);
 		}
 		return(0);
 	}
