@@ -166,7 +166,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	return co;
 }
 
-int make_new_buff(int intemp, int sptemp, int power, int dur, int ext)
+int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
 {
 	int in;
 	
@@ -953,7 +953,7 @@ int spell_light(int cn, int co, int power)
 	
 	power = spell_race_mod(power, cn);
 	
-	if (!(in = make_new_buff(SK_LIGHT, BUF_SPR_LIGHT, power, SP_DUR_LIGHT, 0))) return 0;
+	if (!(in = make_new_buff(cn, SK_LIGHT, BUF_SPR_LIGHT, power, SP_DUR_LIGHT, 0))) return 0;
 	
 	bu[in].light[1]  = min(250, power * 4);
 	
@@ -976,7 +976,7 @@ int spell_protect(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
 
-	if (!(in = make_new_buff(SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) return 0;
 
 	if (ch[co].kindred & KIN_SEYAN_DU)	bu[in].armor[1]  = power / 6 + 3;
 	else								bu[in].armor[1]  = power / 4 + 4;
@@ -1000,7 +1000,7 @@ int spell_enhance(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
 	
-	if (!(in = make_new_buff(SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) return 0;
 	
 	if (ch[co].kindred & KIN_SEYAN_DU) 	bu[in].weapon[1] = power / 6 + 3;
 	else								bu[in].weapon[1] = power / 4 + 4;
@@ -1024,7 +1024,7 @@ int spell_bless(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 1);
 	
-	if (!(in = make_new_buff(SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) return 0;
 	
 	for (n = 0; n<5; n++) bu[in].attrib[n][1] = ((power*2/3)-n) / 5 + 3;
 	
@@ -1049,11 +1049,11 @@ int spell_mshield(int cn, int co, int power)
 	
 	if (ta_cn_cha)
 	{
-		in = make_new_buff(SK_MSHELL, BUF_SPR_MSHELL, power, SP_DUR_MSHELL(power), 1);
+		in = make_new_buff(cn, SK_MSHELL, BUF_SPR_MSHELL, power, SP_DUR_MSHELL(power), 1);
 	}
 	else
 	{
-		in = make_new_buff(SK_MSHIELD, BUF_SPR_MSHIELD, power, SP_DUR_MSHIELD(power), 1);
+		in = make_new_buff(cn, SK_MSHIELD, BUF_SPR_MSHIELD, power, SP_DUR_MSHIELD(power), 1);
 	}
 	
 	if (!in) return 0;
@@ -1156,7 +1156,7 @@ int spell_haste(int cn, int co, int power)
 	
 	power = spellpower_check(cn,co,spell_race_mod(power, cn),0);
 	
-	if (!(in = make_new_buff(SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) return 0;
 	
 	return add_friendly_spell(cn, co, power, in);
 }
