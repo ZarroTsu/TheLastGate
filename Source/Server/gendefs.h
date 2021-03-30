@@ -213,7 +213,7 @@
 #define SP_DUR_ENHANCE		( TICKS * 60 * 10                 )
 #define SP_DUR_BLESS		( TICKS * 60 * 10                 )
 #define SP_DUR_MSHELL(a)	( a * 128                         )
-#define SP_DUR_MSHIELD(a)	( a * 256;                        )
+#define SP_DUR_MSHIELD(a)	( a * 256                         )
 #define SP_DUR_HASTE(a)		( TICKS * 60 * 2 + TICKS * a * 3  )
 #define SP_DUR_REGEN		( TICKS * 15                      )
 #define SP_DUR_HEAL			( TICKS * 60                      )
