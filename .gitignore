@@ -1,14 +1,8 @@
-
+Source/Client/TheLastGate/*
 Source/Server/.vscode/*
 *.moa
-
-
 *.cgi
-
 Source/Server/\.obj/
-
 Source/Server/password
-
 Source/Server/respawn
-
 Source/Server/server
