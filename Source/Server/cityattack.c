@@ -287,7 +287,7 @@ int npc_cityattack_high(int cn)
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_WARCRY))
 		{
-			ch[co].data[75] = globs->ticker + (TICKS*2 + TICKS * GET_SKL_TOTAL(cn, SK_WARCRY)/80)*3/2;
+			ch[co].data[75] = globs->ticker + (TICKS*2 + TICKS * get_skill_score(cn, SK_WARCRY)/80)*3/2;
 			return( 1);
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))

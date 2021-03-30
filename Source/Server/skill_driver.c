@@ -103,6 +103,22 @@ int player_or_ghost(int cn, int co)
 	return(0);
 }
 
+int is_exhausted(int cn)
+{
+	int n, in;
+
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_BLAST) { break; }
+	}
+	if (n<MAXBUFFS)
+	{
+		do_char_log(cn, 0, "You are still exhausted from your last skill!\n");
+		return(1);
+	}
+	return(0);
+}
+
 int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana)
 {
 	int m, co;
@@ -646,22 +662,6 @@ int add_spell(int cn, int in)
 	do_update_char(cn);
 
 	return 1;
-}
-
-int is_exhausted(int cn)
-{
-	int n, in;
-
-	for (n = 0; n<MAXBUFFS; n++)
-	{
-		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_BLAST) { break; }
-	}
-	if (n<MAXBUFFS)
-	{
-		do_char_log(cn, 0, "You are still exhausted from your last skill!\n");
-		return(1);
-	}
-	return(0);
 }
 
 void add_exhaust(int cn, int len)
