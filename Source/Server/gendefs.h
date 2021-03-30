@@ -194,8 +194,8 @@
 #define SP_COST_DISPEL		45
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		50
-#defule SP_COST_PULSE		30
-#defule SP_COST_RAZOR		40
+#define SP_COST_PULSE		30
+#define SP_COST_RAZOR		40
 
 #define SP_COST_WEAKEN		10
 #define SP_COST_BLIND		10
@@ -232,8 +232,8 @@
 
 #define SP_DUR_BLIND		( TICKS * 60 * 10                 )
 #define SP_DUR_TAUNT		( TICKS * 60 * 10                 )
-#defule SP_DUR_PULSE		( TICKS * 60 * 10                 )
-#defule SP_DUR_RAZOR		( TICKS * 60 * 10                 )
+#define SP_DUR_PULSE		( TICKS * 60 * 10                 )
+#define SP_DUR_RAZOR		( TICKS * 60 * 10                 )
 
 // -------- Skill Exhaustion values -------- //
 #define SK_EXH_MAXIMUM	 	(TICKS * 10)
@@ -257,8 +257,8 @@
 #define SK_EXH_CLEAVE		(TICKS *  5)
 #define SK_EXH_WEAKEN		(TICKS *  3)
 
-#defule SK_EXH_PULSE		(TICKS * 10)
-#defule SK_EXH_RAZOR		(TICKS * 10)
+#define SK_EXH_PULSE		(TICKS * 10)
+#define SK_EXH_RAZOR		(TICKS * 10)
 #define SK_EXH_BLIND		(TICKS * 10)
 #define SK_EXH_TAUNT		(TICKS * 10)
 #define SK_EXH_BLINK		(TICKS * 10)
