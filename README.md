@@ -1,11 +1,11 @@
-openMerc
+The Last Gate
 ==================================================================================
-![openMerc Screenshot](openMerc.png?raw=true "openMerc Screenshot")
+![TheLastGate Screenshot](TheLastGate.png?raw=true "TheLastGate Screenshot")
 
 Description
 ==================================================================================
-The source code of Mercenaries of Astonia v2.
-Additional Instructions, guidance and fixes.
+Modified source code of Mercenaries of Astonia v2.
+Branch pulled from openMerc by dylanyaga: https://github.com/dylanyaga/openMerc
 
 
 Original Work
