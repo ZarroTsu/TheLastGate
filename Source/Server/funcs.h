@@ -326,6 +326,7 @@ int load_mod(void);
 void set_cap(int cn, int nr);
 
 //-- skill_driver --
+int has_buff(int cn, int bu_temp);
 int spell_immunity(int power, int immun);
 int spell_race_mod(int power, int cn);
 int friend_is_enemy(int cn, int cc);

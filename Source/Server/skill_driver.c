@@ -48,7 +48,7 @@ char *sp_name[60] = {
 	"23",					// SK_RESIST
 	"Exhaust",				// SK_BLAST
 	"Dispel",				// SK_DISPEL
-	"Heal",					// SK_HEAL
+	"Healing Sickness",		// SK_HEAL
 	"27",					// SK_GHOST
 	"Regen", 				// SK_REGEN
 	"29",					// SK_REST
@@ -209,6 +209,24 @@ int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
 	}
 	
 	return in;
+}
+
+int has_buff(int cn, int bu_temp)
+{
+	int in, n;
+	
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in = ch[cn].spell[n])!=0)
+		{
+			if (bu[in].temp==bu_temp)
+			{
+				return in;
+			}
+		}
+	}
+	
+	return 0;
 }
 
 int is_facing(int cn, int co)
@@ -555,16 +573,19 @@ int spell_race_mod(int power, int cn)
 	if (globs->newmoon)		{ mod += 0.10; }
 	if (globs->fullmoon)	{ mod += 0.15; }
 	
-	if (it[ch[cn].worn[WN_NECK]].temp==IT_RD_AMMYTHR) // Amulet of Adepts
+	// Amulet of Adepts
+	if (it[ch[cn].worn[WN_NECK]].temp==IT_RD_AMMYTHR)
 	{
 		mod += 0.05;
 	}
-	if (it[ch[cn].worn[WN_LRING]].temp==IT_TW_PROPHET) // Ring of Prophets
+	// Ring of Prophets
+	if (it[ch[cn].worn[WN_LRING]].temp==IT_TW_PROPHET)
 	{
 		if (it[ch[cn].worn[WN_LRING]].active) 	mod += 0.10;
 		else 									mod += 0.05;
 	}
-	if (it[ch[cn].worn[WN_RRING]].temp==IT_TW_PROPHET) // Ring of Prophets
+	// Ring of Prophets
+	if (it[ch[cn].worn[WN_RRING]].temp==IT_TW_PROPHET)
 	{
 		if (it[ch[cn].worn[WN_RRING]].active) 	mod += 0.10;
 		else 									mod += 0.05;
@@ -668,16 +689,21 @@ void add_exhaust(int cn, int len)
 {
 	int in=0, baselen=100;
 	
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO) // Book: Damor's Grudge
+	// Book: Damor's Grudge
+	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO)
 	{
 		baselen=90;
 	}
 	
 	// Tarot - Magician - Effects of Strength and Intuition are swapped
 	if (get_tarot(cn, IT_CH_MAGI))
+	{
 		len = len*(baselen-max(0,get_attrib_score(cn, AT_STR)-10)/4)/100;
+	}
 	else
+	{
 		len = len*(baselen-max(0,get_attrib_score(cn, AT_INT)-10)/4)/100;
+	}
 	
 	in = god_create_buff();
 	if (!in)
@@ -685,6 +711,9 @@ void add_exhaust(int cn, int len)
 		xlog("god_create_buff failed in add_exhaust");
 		return;
 	}
+	
+	// Trying to assure Exhaustion isn't 'permanent'
+	if (len > SK_EXH_MAXIMUM) len = SK_EXH_MAXIMUM;
 	
 	strcpy(bu[in].name, "Skill Exhaustion");
 	bu[in].flags 	|= IF_SPELL;
@@ -953,7 +982,8 @@ int spell_light(int cn, int co, int power)
 	
 	power = spell_race_mod(power, cn);
 	
-	if (!(in = make_new_buff(cn, SK_LIGHT, BUF_SPR_LIGHT, power, SP_DUR_LIGHT, 0))) return 0;
+	if (!(in = make_new_buff(cn, SK_LIGHT, BUF_SPR_LIGHT, power, SP_DUR_LIGHT, 0))) 
+		return 0;
 	
 	bu[in].light[1]  = min(250, power * 4);
 	
@@ -963,7 +993,8 @@ void skill_light(int cn)
 {
 	int co;
 	
-	if (!(co = get_target(cn, 1, 1, 0, SP_COST_LIGHT, SK_LIGHT, 1))) return;
+	if (!(co = get_target(cn, 1, 1, 0, SP_COST_LIGHT, SK_LIGHT, 1))) 
+		return;
 	
 	spell_light(cn, co, get_skill_score(cn, SK_LIGHT));
 
@@ -976,10 +1007,17 @@ int spell_protect(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
 
-	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) 
+		return 0;
 
-	if (ch[co].kindred & KIN_SEYAN_DU)	bu[in].armor[1]  = power / 6 + 3;
-	else								bu[in].armor[1]  = power / 4 + 4;
+	if (ch[co].kindred & KIN_SEYAN_DU)
+	{
+		bu[in].armor[1]  = power / 6 + 3;
+	}
+	else
+	{
+		bu[in].armor[1]  = power / 4 + 4;
+	}
 
 	return add_friendly_spell(cn, co, power, in);
 }
@@ -987,7 +1025,8 @@ void skill_protect(int cn)
 {
 	int co;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_PROTECT, SK_PROTECT, 1))) return;
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_PROTECT, SK_PROTECT, 1))) 
+		return;
 
 	spell_protect(cn, co, get_skill_score(cn, SK_PROTECT));
 
@@ -1000,10 +1039,17 @@ int spell_enhance(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
 	
-	if (!(in = make_new_buff(cn, SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) 
+		return 0;
 	
-	if (ch[co].kindred & KIN_SEYAN_DU) 	bu[in].weapon[1] = power / 6 + 3;
-	else								bu[in].weapon[1] = power / 4 + 4;
+	if (ch[co].kindred & KIN_SEYAN_DU)
+	{
+		bu[in].weapon[1] = power / 6 + 3;
+	}
+	else
+	{
+		bu[in].weapon[1] = power / 4 + 4;
+	}
 	
 	return add_friendly_spell(cn, co, power, in);
 }
@@ -1011,7 +1057,8 @@ void skill_enhance(int cn)
 {
 	int co;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_ENHANCE, SK_ENHANCE, 1))) return;
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_ENHANCE, SK_ENHANCE, 1))) 
+		return;
 	
 	spell_enhance(cn, co, get_skill_score(cn, SK_ENHANCE));
 
@@ -1024,9 +1071,13 @@ int spell_bless(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 1);
 	
-	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) 
+		return 0;
 	
-	for (n = 0; n<5; n++) bu[in].attrib[n][1] = ((power*2/3)-n) / 5 + 3;
+	for (n = 0; n<5; n++) 
+	{
+		bu[in].attrib[n][1] = ((power*2/3)-n) / 5 + 3;
+	}
 	
 	return add_friendly_spell(cn, co, power, in);
 }
@@ -1034,7 +1085,8 @@ void skill_bless(int cn)
 {
 	int co;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_BLESS, SK_BLESS, 1))) return;
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_BLESS, SK_BLESS, 1))) 
+		return;
 	
 	spell_bless(cn, co, get_skill_score(cn, SK_BLESS));
 
@@ -1047,6 +1099,9 @@ int spell_mshield(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
 	
+	ta_cn_cha = get_tarot(cn, IT_CH_CHARIOT);
+	ta_co_emp = get_tarot(co, IT_CH_EMPRESS);
+	
 	if (ta_cn_cha)
 	{
 		in = make_new_buff(cn, SK_MSHELL, BUF_SPR_MSHELL, power, SP_DUR_MSHELL(power), 1);
@@ -1056,10 +1111,8 @@ int spell_mshield(int cn, int co, int power)
 		in = make_new_buff(cn, SK_MSHIELD, BUF_SPR_MSHIELD, power, SP_DUR_MSHIELD(power), 1);
 	}
 	
-	if (!in) return 0;
-	
-	ta_cn_cha = get_tarot(cn, IT_CH_CHARIOT);
-	ta_co_emp = get_tarot(co, IT_CH_EMPRESS);
+	if (!in) 
+		return 0;
 	
 	// Tarot Card - Empress :: Change MS target to the target's Ghost Companion instead
 	if (ta_co_emp)
@@ -1156,7 +1209,8 @@ int spell_haste(int cn, int co, int power)
 	
 	power = spellpower_check(cn,co,spell_race_mod(power, cn),0);
 	
-	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) return 0;
+	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) 
+		return 0;
 	
 	return add_friendly_spell(cn, co, power, in);
 }
@@ -1176,23 +1230,12 @@ int spell_regen(int cn, int co, int power)
 {
 	int in;
 	
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_regen");
-		return 0;
-	}
-	
-	//power = spellpower_check(cn,co,spell_race_mod(power, cn),0);
 	power = spell_race_mod(power, cn);
 	
-	strcpy(bu[in].name, "Regen");
-	bu[in].flags 	|= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_REGEN;
-	bu[in].hp[0]     = (power * 1875) / SP_DUR_REGEN;
-	bu[in].duration  = bu[in].active = SP_DUR_REGEN;
-	bu[in].temp  	 = SK_REGEN;
-	bu[in].power 	 = power;
+	if (!(in = make_new_buff(cn, SK_REGEN, BUF_SPR_REGEN, power, SP_DUR_REGEN, 0))) 
+		return 0;
+	
+	bu[in].hp[0] = (power * 1875) / SP_DUR_REGEN;
 	
 	return add_friendly_spell(cn, co, power, in);
 }
@@ -1200,58 +1243,37 @@ int spell_heal(int cn, int co, int power)
 {
 	int in, in2, n, tmp;
 	
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_heal");
+	if (!(in = make_new_buff(cn, SK_HEAL, BUF_SPR_HEALSICK, power, SP_DUR_HEAL, 0))) 
 		return 0;
-	}
 	
-	strcpy(bu[in].name, "Healing Sickness");
-	bu[in].flags 	|= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_HEALSICK;
-	bu[in].duration  = bu[in].active = SP_DUR_HEAL;
-	bu[in].temp  	 = SK_HEAL;
-	bu[in].power 	 = power;
-	bu[in].cost		 = 0;
+	bu[in].cost = 0;
 	
 	// Every time heal is cast it updates itself and adds 1 to 'cost'
 	if (add_friendly_spell(cn, co, power, in))
 	{
-		for (n = 0; n<MAXBUFFS; n++)
+		if ((in2=has_buff(cn, SK_HEAL))!=0)
 		{
-			if ((in2 = ch[co].spell[n])!=0)
-			{
-				if (bu[in2].temp==SK_HEAL)
-				{
-					// Each stack of heal sickness reduces the spell power by 1/4th
-					tmp = 4 - bu[in2].cost; // (it[in2].temp - SK_HEAL)/100);
-					power = power * tmp / 4;
-					if (4-tmp) 
-						do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", 100-tmp*25);
-					break;
-				}
-			}
+			// Each stack of heal sickness reduces the spell power by 1/4th
+			tmp = 4 - bu[in2].cost;
+			power = power * tmp / 4;
+			if (4-tmp) 
+				do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", 100-tmp*25);
+			break;
 		}
 	}
-	
-	//do_char_log(cn, 1, "Heal restored %d hitpoints.\n", power * 2500 / 1000);
 	
 	if (cn!=co)
 	{
 		ch[co].a_hp += spell_race_mod(power * 2500, cn);
-		if (ch[co].a_hp>ch[co].hp[5] * 1000)
-		{
-			ch[co].a_hp = ch[co].hp[5] * 1000;
-		}
 	}
 	else
 	{
-		ch[cn].a_hp += power * 2500;
-		if (ch[co].a_hp>ch[co].hp[5] * 1000)
-		{
-			ch[co].a_hp = ch[co].hp[5] * 1000;
-		}
+		ch[co].a_hp += power * 2500;
+	}
+	
+	if (ch[co].a_hp > ch[co].hp[5] * 1000)
+	{
+		ch[co].a_hp = ch[co].hp[5] * 1000;
 	}
 	
 	return 1;
@@ -1259,46 +1281,17 @@ int spell_heal(int cn, int co, int power)
 void skill_heal(int cn)
 {
 	int co;
-
-	if ((co = ch[cn].skill_target1)) { ; }
-	else { co = cn; }
-
-	if (!do_char_can_see(cn, co))
-	{
-		do_char_log(cn, 0, "You cannot see your target.\n");
+	
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_HEAL, SK_HEAL, 1))) 
 		return;
-	}
-
-	if (is_exhausted(cn)) 							{ return; }
-	if (spellcost(cn, SP_COST_HEAL, SK_HEAL, 1))	{ return; }
-
-	if (!player_or_ghost(cn, co))
-	{
-		do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", ch[co].name, ch[cn].name);
-		co = cn;
-	}
 	
 	// Tarot Card - Star :: Change Heal into Regen
 	if (get_tarot(cn, IT_CH_STAR))
 	{
-		if (chance(cn, FIVE_PERC_FAIL))
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>get_skill_score(cn, SK_HEAL) + 5)
-				if (!(ch[co].flags & CF_SENSE))
-					do_char_log(co, 1, "%s tried to cast regen on you but failed.\n", ch[cn].reference);
-			return;
-		}
 		spell_regen(cn, co, get_skill_score(cn, SK_HEAL));
 	}
 	else
 	{
-		if (chance(cn, FIVE_PERC_FAIL))
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>get_skill_score(cn, SK_HEAL) + 5)
-				if (!(ch[co].flags & CF_SENSE))
-					do_char_log(co, 1, "%s tried to cast heal on you but failed.\n", ch[cn].reference);
-			return;
-		}
 		spell_heal(cn, co, get_skill_score(cn, SK_HEAL));
 	}
 
