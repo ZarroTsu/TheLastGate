@@ -359,6 +359,39 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	return 1;
 }
 
+void surround_cast(int cn, int co_orig, int intemp, int power)
+{
+	int m, n, mc, co;
+	
+	m = ch[cn].x + ch[cn].y * MAPX;
+	
+	for (n=0; n<4; n++)
+	{
+		switch (n)
+		{
+			case 0: mc = m + 1; break;
+			case 1: mc = m - 1; break;
+			case 2: mc = m + MAPX; break;
+			case 3: mc = m - MAPX; break;
+		}
+		if ((co = map[mc].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
+		{
+			damage_mshell(co);
+			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) 
+			{
+				switch (intemp)
+				{
+					case SK_CURSE: 
+						spell_curse(cn, co, power, 0);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	}
+}
+
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
 {
 	int in;
@@ -1552,10 +1585,9 @@ int spell_curse(int cn, int co, int power, int flag)
 void skill_curse(int cn)
 {
 	int d20 = 10;
-	int n, cost, power, aoe_power;
-	int spellaoe, xf, yf, xt, yt, x, y;
-	int count = 0, hit = 0, aoefocus = 0;
-	int co, co_orig = -1, m;
+	int power, aoe_power, cost;
+	int count = 0, hit = 0;
+	int co, co_orig = -1;
 	
 	power = get_skill_score(cn, SK_CURSE);
 	aoe_power = get_skill_score(cn, SK_HEXAREA);
@@ -1593,27 +1625,7 @@ void skill_curse(int cn)
 	}
 	else
 	{
-		m = ch[cn].x + ch[cn].y * MAPX;
-		if ((co = map[m + 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_curse(cn, co, power, 0);
-		}
-		if ((co = map[m - 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_curse(cn, co, power, 0);
-		}
-		if ((co = map[m + MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_curse(cn, co, power, 0);
-		}
-		if ((co = map[m - MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_curse(cn, co, power, 0);
-		}
+		surround_cast(cn, co_orig, SK_CURSE, power);
 	}
 
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
