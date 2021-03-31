@@ -119,9 +119,9 @@ int is_exhausted(int cn)
 	return(0);
 }
 
-int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana)
+int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana, int power, int d20)
 {
-	int m, co;
+	int m, co, aoe_spell = 0;
 	
 	if (cnts && (ch[cn].flags & CF_PLAYER))
 	{
@@ -143,10 +143,36 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	else if (!buff && (co = ch[cn].attack_cn)!=0) ;
 	else co = cn;
 	
+	if (in==SK_CURSE)
+	{
+		// AoE Spells immediately stop processing - everything else is handled by aoe cast
+		if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+		{
+			return co;
+		}
+		else if (cn==co)
+		{
+			do_char_log(cn, 0, 
+			"You cannot curse yourself!\n");
+			return 0;
+		}
+		else if (co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION])
+		{ 
+			do_char_log(cn, 0, 
+			"You stop yourself from cursing your companion. That would be silly.\n");
+			return 0;
+		}
+	}
+	
 	if (!do_char_can_see(cn, co))
 	{
 		do_char_log(cn, 0, "You cannot see your target.\n");
 		return 0;
+	}
+	
+	if (!buff)
+	{
+		remember_pvp(cn, co);
 	}
 	
 	if (is_exhausted(cn))
@@ -159,6 +185,16 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0; 
 	}
 	
+	if (!buff)
+	{
+		if (!may_attack_msg(cn, co, 1))
+		{
+			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
+			return 0;
+		}
+		damage_mshell(co);
+	}
+	
 	if (redir && !player_or_ghost(cn, co))
 	{
 		do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", 
@@ -167,19 +203,160 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		co = cn;
 	}
 	
-	if (chance(cn, FIVE_PERC_FAIL))
+	if ((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
+		(d20 && chance_base(cn, power, d20, get_target_resistance(co))))
 	{
-		if (cn!=co && 
-			(get_skill_score(co, SK_SENSE) > get_skill_score(cn, in) + 5) && 
-			!(ch[co].flags & CF_SENSE))
+		if (cn!=co && (get_skill_score(co, SK_SENSE) > power + 5))
 		{
-			do_char_log(co, 1, "%s tried to cast %s on you but failed.\n", 
-				ch[cn].reference, sp_name[in]);
+			if (!(ch[co].flags & CF_SENSE))
+			{
+				do_char_log(co, 1, 
+				"%s tried to cast %s on you but failed.\n", 
+					ch[cn].reference, sp_name[in]);
+			}
+			if (!buff && !IS_IGNORING_SPELLS(co))
+			{
+				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
+			}
+		}
+		if (!buff && (ch[cn].kindred & KIN_MONSTER))
+		{
+			add_exhaust(cn, TICKS * 2);
+		}
+		// Book: Shiva's Malice :: Curse tries Slow afterward
+		if (in==SK_CURSE && it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+		{
+			skill_slow(cn, 0);
 		}
 		return 0;
 	}
 	
+	if (!buff && (ch[co].flags & CF_IMMORTAL))
+	{
+		do_char_log(cn, 0, "You lost your focus.\n");
+		return 0;
+	}
+	
 	return co;
+}
+
+int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit)
+{
+	int co_orig, spellaoe, xf, yf, xt, yt, x, y;
+	char *log_act, *log_name, *log_sense, *log_other, *log_self;
+	
+	switch (intemp)
+	{
+		case SK_CURSE:
+			log_act 	= "cursing";
+			log_name 	= "curse";
+			log_sense 	= " tried to include you in a mass-curse but failed.";
+			log_other 	= "You feel a wiked power emanate from somewhere.";
+			log_self	= "You unleash a powerful mass-curse.";
+			break;
+		
+		default:
+			log_act 	= "something-ing";
+			log_name 	= "something";
+			log_sense 	= " tried to include you in something but failed.";
+			log_other 	= "You something emanate from somewhere.";
+			log_self	= "You unleash a powerful something.";
+			break;
+	}
+	
+	if (co)
+	{
+		co_orig = co;
+	}
+	
+	spellaoe = aoe_power/PROXIMITY_CAP;
+	
+	xf = max(1, ch[cn].x - spellaoe);
+	yf = max(1, ch[cn].y - spellaoe);
+	xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
+	yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
+	
+	// Loop through and count the number of targets first
+	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
+		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
+	{ 
+		if (!do_surround_check(cn, co, 0)) 
+		{
+			continue;
+		}
+		count++; 
+	}
+	if (!count)
+	{ 
+		if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
+		{ 
+			do_char_log(cn, 0, 
+			"You stop yourself from %s your companion. That would be silly.\n", log_act);
+			return 0;
+		}
+		else
+		{ 
+			do_char_log(cn, 0, 
+			"You cannot %s yourself!\n", log_name); 
+			return 0;
+		}
+	}
+	if (!hit)
+	{
+		if (is_exhausted(cn)) return 0;
+		if (spellcost(cn, cost, intemp, 1)) return 0;
+		if (chance(cn, FIVE_PERC_FAIL)) return 0;
+	}
+	
+	// Then loop through and apply the effect based off the number of targets
+	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	
+		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
+	{
+		remember_pvp(cn, co);
+		if (!do_surround_check(cn, co, 1)) 
+		{
+			continue;
+		}
+		damage_mshell(co);
+		if (power + RANDOM(max(1, 24 - max(4, count / 2))) > 
+			get_target_resistance(co) + RANDOM(max(1, 12 + max(4, count / 2))))
+		{
+			switch (intemp)
+			{
+				case SK_CURSE:
+					spell_curse(cn, co, power, 1);
+					break;
+				default:
+					break;
+			}
+			
+			hit++;
+		}
+		else
+		{
+			if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
+			{
+				if (!(ch[co].flags & CF_SENSE))
+				{
+					do_char_log(co, 0, 
+					"%s%s\n", ch[cn].reference, log_sense);
+				}
+				if (!IS_IGNORING_SPELLS(co))
+				{
+					do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
+				}
+			}
+			else
+			{
+				do_char_log(co, 0, 
+				"%s\n", log_other);
+			}
+		}
+	}
+	do_char_log(cn, 1, "%s\n", log_self);
+	do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+	
+	return 1;
 }
 
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
@@ -1020,12 +1197,14 @@ int spell_light(int cn, int co, int power)
 }
 void skill_light(int cn)
 {
-	int co;
+	int co, power;
 	
-	if (!(co = get_target(cn, 1, 1, 0, SP_COST_LIGHT, SK_LIGHT, 1))) 
+	power = get_skill_score(cn, SK_LIGHT);
+	
+	if (!(co = get_target(cn, 1, 1, 0, SP_COST_LIGHT, SK_LIGHT, 1, power, 0))) 
 		return;
 	
-	spell_light(cn, co, get_skill_score(cn, SK_LIGHT));
+	spell_light(cn, co, power);
 
 	add_exhaust(cn, SK_EXH_LIGHT);
 }
@@ -1052,12 +1231,14 @@ int spell_protect(int cn, int co, int power)
 }
 void skill_protect(int cn)
 {
-	int co;
+	int co, power;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_PROTECT, SK_PROTECT, 1))) 
+	power = get_skill_score(cn, SK_PROTECT);
+	
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_PROTECT, SK_PROTECT, 1, power, 0))) 
 		return;
 
-	spell_protect(cn, co, get_skill_score(cn, SK_PROTECT));
+	spell_protect(cn, co, power);
 
 	add_exhaust(cn, SK_EXH_PROTECT);
 }
@@ -1084,12 +1265,14 @@ int spell_enhance(int cn, int co, int power)
 }
 void skill_enhance(int cn)
 {
-	int co;
+	int co, power;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_ENHANCE, SK_ENHANCE, 1))) 
+	power = get_skill_score(cn, SK_ENHANCE);
+	
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_ENHANCE, SK_ENHANCE, 1, power, 0))) 
 		return;
 	
-	spell_enhance(cn, co, get_skill_score(cn, SK_ENHANCE));
+	spell_enhance(cn, co, power);
 
 	add_exhaust(cn, SK_EXH_ENHANCE); // Half-second
 }
@@ -1112,12 +1295,14 @@ int spell_bless(int cn, int co, int power)
 }
 void skill_bless(int cn)
 {
-	int co;
+	int co, power;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_BLESS, SK_BLESS, 1))) 
+	power = get_skill_score(cn, SK_BLESS);
+	
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_BLESS, SK_BLESS, 1, power, 0))) 
 		return;
 	
-	spell_bless(cn, co, get_skill_score(cn, SK_BLESS));
+	spell_bless(cn, co, power);
 
 	add_exhaust(cn, SK_EXH_BLESS);
 }
@@ -1309,19 +1494,21 @@ int spell_heal(int cn, int co, int power)
 }
 void skill_heal(int cn)
 {
-	int co;
+	int co, power;
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_HEAL, SK_HEAL, 1))) 
+	power = get_skill_score(cn, SK_HEAL);
+	
+	if (!(co = get_target(cn, 0, 1, 1, SP_COST_HEAL, SK_HEAL, 1, power, 0))) 
 		return;
 	
 	// Tarot Card - Star :: Change Heal into Regen
 	if (get_tarot(cn, IT_CH_STAR))
 	{
-		spell_regen(cn, co, get_skill_score(cn, SK_HEAL));
+		spell_regen(cn, co, power);
 	}
 	else
 	{
-		spell_heal(cn, co, get_skill_score(cn, SK_HEAL));
+		spell_heal(cn, co, power);
 	}
 
 	add_exhaust(cn, SK_EXH_HEAL);
@@ -1347,7 +1534,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		{
 			bu[in].attrib[n][1] = -(2 + CURSE2FORM(power, (4 - n)));
 		}
-		bu[in].cost  = power*100;
+		bu[in].cost = power * 100;
 	}
 	else
 	{
@@ -1356,7 +1543,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		
 		for (n = 0; n<5; n++)
 		{
-			bu[in].attrib[n][1] = -(2+(power-(4-n)) / 5);
+			bu[in].attrib[n][1] = -(2 + (power - (4 - n)) / 5);
 		}
 	}
 
@@ -1365,140 +1552,44 @@ int spell_curse(int cn, int co, int power, int flag)
 void skill_curse(int cn)
 {
 	int d20 = 10;
-	int n, cost, power, spellaoe, xf, yf, xt, yt, x, y, count = 0, hit = 0, aoefocus = 0; // Added for AoE Stuff
+	int n, cost, power, aoe_power;
+	int spellaoe, xf, yf, xt, yt, x, y;
+	int count = 0, hit = 0, aoefocus = 0;
 	int co, co_orig = -1, m;
-
-	if ((co = ch[cn].skill_target1)) { ; }
-	else if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	else { co = cn; }
 	
-	cost = SP_COST_CURSE;
-	if (get_tarot(cn, IT_CH_TOWER)) { cost *= (4/3); d20-=1; }
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_HEXAREA)) / PROXIMITY_MULTI;
 	power = get_skill_score(cn, SK_CURSE);
+	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	cost = SP_COST_CURSE;
 	
-	if (cn==co && (!ch[cn].skill[SK_HEXAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
-	{
-		do_char_log(cn, 0, "You cannot curse yourself!\n");
-		return;
-	}
-	else if ((co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION]) && (!ch[cn].skill[SK_HEXAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
+	// Tarot Card - Tower :: Change Curse into Curse II
+	if (get_tarot(cn, IT_CH_TOWER)) 
 	{ 
-		do_char_log(cn, 0, "You stop yourself from cursing your companion. That would be silly.\n");
-		return;
+		cost *= (4 / 3);
+		d20 -= 1;
 	}
-	else if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	
+	// Hex Area increases spell cost
+	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return;
-		}
-		
-		/* CS, 000209: Remember PvP attacks */
-		remember_pvp(cn, co);
-		
-		if (is_exhausted(cn)) 					{ return; }
-		if (spellcost(cn, cost, SK_CURSE, 1)) 	{ return; }
-		
-		if (!may_attack_msg(cn, co, 1))
-		{
-			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
-			return;
-		}
-		
-		damage_mshell(co);
-		
-		if (chance_base(cn, power, d20, get_target_resistance(co)))
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-			{
-				if (!(ch[co].flags & CF_SENSE))
-					do_char_log(co, 0, "%s tried to cast curse on you but failed.\n", ch[cn].reference);
-				if (!IS_IGNORING_SPELLS(co))
-				{
-					do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-			}
-			if (ch[cn].kindred&KIN_MONSTER) add_exhaust(cn,TICKS*2);
-			if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV) // Book: Shiva's Malice
-			{
-				skill_slow(cn, 0);
-			}
-			return;
-		}
-		
+		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+	}
+	
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20)))
+		return;
+	
+	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	{
 		spell_curse(cn, co, power, 0);
 		
 		co_orig = co;
 		count++;
 		hit++;
-		
-		if (ch[co].flags & CF_IMMORTAL)
-		{
-			do_char_log(cn, 0, "You lost your focus.\n");
-			return;
-		}
 	}
 	// Feb 2020 - AoE Curses
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (co) co_orig = co;
-		
-		spellaoe = get_skill_score(cn, SK_HEXAREA)/PROXIMITY_CAP; //get_spell_aoe(get_skill_score(cn, SK_HEXAREA));
-		
-		xf = max(1, ch[cn].x - spellaoe);
-		yf = max(1, ch[cn].y - spellaoe);
-		xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
-		yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
-		
-		// Loop through and count the number of targets first
-		for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co && co_orig!=co) 
-		{ 
-			if (!do_surround_check(cn, co, 0)) continue;
-			count++; 
-		}
-		if (!count)
-		{ 
-			if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
-			{ do_char_log(cn, 0, "You stop yourself from cursing your companion. That would be silly.\n"); return; }
-			else
-			{ do_char_log(cn, 0, "You cannot curse yourself!\n"); return; }
-		}
-		if (!hit)
-		{
-			if (is_exhausted(cn)) 					return;
-			if (spellcost(cn, cost, SK_CURSE, 1)) 	return;
-			if (chance(cn, FIVE_PERC_FAIL))			return;
-		}
-		
-		// Then loop through and apply the effect based off the number of targets
-		for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	if ((co = map[x + y * MAPX].ch))
-		if (cn!=co && co_orig!=co)
-		{
-			remember_pvp(cn, co);
-			if (!do_surround_check(cn, co, 1)) continue;
-			damage_mshell(co);
-			if (power+RANDOM(max(1,24-max(4,count/2))) > get_target_resistance(co)+RANDOM(max(1,12+max(4,count/2))))
-			{
-				spell_curse(cn, co, power, 1);
-				hit++;
-			}
-			else
-			{
-				if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-				{
-					if (!(ch[co].flags & CF_SENSE))
-						do_char_log(co, 0, "%s tried to include you in a mass-curse but failed.\n", ch[cn].reference);
-					if (!IS_IGNORING_SPELLS(co))
-						do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-				else
-					do_char_log(co, 0, "You feel a wiked power emanate from somewhere.\n");
-			}
-		}
-		do_char_log(cn, 1, "You unleash a powerful mass-curse.\n");
-		do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+		if (!cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit))
+			return;
 	}
 	else
 	{
