@@ -800,7 +800,8 @@ int has_spell_from_item(int cn, int temp)
 	return 0;
 }
 
-int add_friendly_spell(int cn, int co, int power, int in)
+// debuff: 1 for normal debuff, 2 for AoE debuff (to remove interference spam)
+int cast_a_spell(int cn, int co, int in, int debuff)
 {
 	char *log_name;
 	char *log_sense, *log_self, *log_other;
@@ -820,51 +821,54 @@ int add_friendly_spell(int cn, int co, int power, int in)
 			log_sense 	= " cast protect on you.";
 			log_self 	= "You feel protected.";
 			log_other 	= " is now protected.";
-			arealog = 0;
 			break;
 		case SK_ENHANCE:
 			log_sense 	= " cast enhance weapon on you.";
 			log_self 	= "Your weapon feels stronger.";
 			log_other 	= "'s weapon is now stronger.";
-			arealog = 0;
 			break;
 		case SK_BLESS:
 			log_sense 	= " cast bless on you.";
 			log_self 	= "You have been blessed.";
 			log_other 	= " was blessed.";
-			arealog = 0;
 			break;
 		case SK_MSHIELD:
 			log_sense 	= " cast magic shield on you.";
 			log_self 	= "Magic Shield active!";
 			log_other 	= "'s Magic Shield activated.";
-			arealog = 0;
 			break;
 		case SK_MSHELL:
 			log_sense 	= " cast magic shell on you.";
 			log_self 	= "Magic Shell active!";
 			log_other 	= "'s Magic Shell activated.";
-			arealog = 0;
 			break;
 		case SK_HASTE:
 			log_sense 	= " cast haste on you.";
 			log_self 	= "You suddenly feel faster!";
 			log_other 	= " has been hasted.";
-			arealog = 0;
 			break;
 		case SK_HEAL:
 			log_name	= "Heal";
 			log_sense 	= " cast heal on you.";
 			log_self 	= "You have been healed.";
 			log_other 	= " was healed.";
-			arealog = 0;
 			break;
 		case SK_REGEN:
 			log_name	= "Regen";
 			log_sense 	= " cast regen on you.";
 			log_self 	= "You begin regenerating hitpoints!";
 			log_other 	= " starts regenerating.";
-			arealog = 0;
+			break;
+			
+		case SK_CURSE2:
+			log_sense 	= " cast greater curse on you.";
+			log_self 	= "You have been badly cursed.";
+			log_other 	= " was badly cursed.";
+			break;
+		case SK_CURSE:
+			log_sense 	= " cast curse on you.";
+			log_self 	= "You have been cursed.";
+			log_other 	= " was cursed.";
 			break;
 		
 		default:
@@ -879,31 +883,56 @@ int add_friendly_spell(int cn, int co, int power, int in)
 	{
 		if (!add_spell(co, in))
 		{
-			do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", log_name);
+			if (debuff<2)
+			{
+				do_char_log(cn, 1, 
+				"Magical interference neutralized the %s's effect.\n", log_name);
+			}
 			return 0;
 		}
-		if (get_skill_score(co, SK_SENSE) + 10 > power) 
+		if (get_skill_score(co, SK_SENSE) + 10 > bu[in].power)
 		{
 			do_char_log(co, 1, "%s%s\n", ch[cn].reference, log_sense);
 		}
 		else
 		{
-			do_char_log(co, 1, "%s\n", log_self);
+			do_char_log(co, debuff>0?0:1, "%s\n", log_self);
 		}
 		if (arealog) 
+		{
 			do_area_log(co, 0, ch[co].x, ch[co].y, 2, "%s%s\n", ch[co].name, log_other);
-		else
+		}
+		else if (debuff<2)
+		{
 			do_char_log(cn, 1, "%s%s\n", ch[co].name, log_other);
+		}
+		if (debuff)
+		{
+			if (!IS_IGNORING_SPELLS(co))
+			{
+				do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
+			}
+			do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
+		}
 		chlog(cn, "Cast %s on %s", log_name, ch[co].name);
-		char_play_sound(co, ch[cn].sound + 1, -150, 0);
 		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+		if (debuff)
+		{
+			char_play_sound(co, ch[cn].sound + 7, -150, 0);
+			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		}
+		else
+		{
+			char_play_sound(co, ch[cn].sound + 1, -150, 0);
+			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+		}
 	}
 	else
 	{
 		if (!add_spell(cn, in))
 		{
-			do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+			do_char_log(cn, 1, 
+			"Magical interference neutralized the %s's effect.\n", bu[in].name);
 			return 0;
 		}
 		do_char_log(cn, 1, "%s\n", log_self);
@@ -987,7 +1016,7 @@ int spell_light(int cn, int co, int power)
 	
 	bu[in].light[1]  = min(250, power * 4);
 	
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 void skill_light(int cn)
 {
@@ -1019,7 +1048,7 @@ int spell_protect(int cn, int co, int power)
 		bu[in].armor[1]  = power / 4 + 4;
 	}
 
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 void skill_protect(int cn)
 {
@@ -1051,7 +1080,7 @@ int spell_enhance(int cn, int co, int power)
 		bu[in].weapon[1] = power / 4 + 4;
 	}
 	
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 void skill_enhance(int cn)
 {
@@ -1079,7 +1108,7 @@ int spell_bless(int cn, int co, int power)
 		bu[in].attrib[n][1] = ((power*2/3)-n) / 5 + 3;
 	}
 	
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 void skill_bless(int cn)
 {
@@ -1189,7 +1218,7 @@ int spell_mshield(int cn, int co, int power)
 		}
 	}
 	
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 void skill_mshield(int cn)
 {
@@ -1212,7 +1241,7 @@ int spell_haste(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) 
 		return 0;
 	
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 void skill_haste(int cn)
 {
@@ -1237,7 +1266,7 @@ int spell_regen(int cn, int co, int power)
 	
 	bu[in].hp[0] = (power * 1875) / SP_DUR_REGEN;
 	
-	return add_friendly_spell(cn, co, power, in);
+	return cast_a_spell(cn, co, in, 0);
 }
 int spell_heal(int cn, int co, int power)
 {
@@ -1249,7 +1278,7 @@ int spell_heal(int cn, int co, int power)
 	bu[in].cost = 0;
 	
 	// Every time heal is cast it updates itself and adds 1 to 'cost'
-	if (add_friendly_spell(cn, co, power, in))
+	if (cast_a_spell(cn, co, in, 0))
 	{
 		if ((in2=has_buff(cn, SK_HEAL))!=0)
 		{
@@ -1305,80 +1334,33 @@ int spell_curse(int cn, int co, int power, int flag)
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_curse");
-		return( 0);
-	}
-
 	power = spell_immunity(power, get_target_immunity(co));
 	power = spell_race_mod(power, cn);
 	
 	// Tarot Card - Tower :: Change Curse into Curse II
 	if (get_tarot(cn, IT_CH_TOWER))
 	{
-		strcpy(bu[in].name, "Greater Curse");
-		bu[in].flags |= IF_SPELL;
-		for (n = 0; n<5; n++) bu[in].attrib[n][1] = -(2+CURSE2FORM(power, (4-n))); // (((power*3/2)-n) / 5);
-		bu[in].sprite[1] = BUF_SPR_CURSE2;
-		bu[in].duration  = bu[in].active = SP_DUR_CURSE2;
-		bu[in].temp  = SK_CURSE2;
-		bu[in].power = power;
-		bu[in].cost  = power*100;
-
-		if (!add_spell(co, in))
-		{
-			if (!flag) 
-				do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+		if (!(in = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_CURSE2, 0)))
 			return 0;
+		
+		for (n = 0; n<5; n++) 
+		{
+			bu[in].attrib[n][1] = -(2 + CURSE2FORM(power, (4 - n)));
 		}
-		if (get_skill_score(co, SK_SENSE) + 10>power)
-			do_char_log(co, 1, "%s cast greater curse on you.\n", ch[cn].reference);
-		else
-			do_char_log(co, 0, "You have been badly cursed.\n");
-		if (!flag) 
-			do_char_log(cn, 1, "%s was badly cursed.\n", ch[co].name);
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -150, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		chlog(cn, "Cast Greater Curse on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		bu[in].cost  = power*100;
 	}
 	else
 	{
-		strcpy(bu[in].name, "Curse");
-		bu[in].flags |= IF_SPELL;
-		for (n = 0; n<5; n++) bu[in].attrib[n][1] = -(2+(power-(4-n)) / 5);
-		bu[in].sprite[1] = BUF_SPR_CURSE;
-		bu[in].duration  = bu[in].active = SP_DUR_CURSE;
-		bu[in].temp  = SK_CURSE;
-		bu[in].power = power;
-
-		if (!add_spell(co, in))
-		{
-			if (!flag) 
-				do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+		if (!(in = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_CURSE, 0)))
 			return 0;
+		
+		for (n = 0; n<5; n++)
+		{
+			bu[in].attrib[n][1] = -(2+(power-(4-n)) / 5);
 		}
-		if (get_skill_score(co, SK_SENSE) + 10>power)
-			do_char_log(co, 1, "%s cast curse on you.\n", ch[cn].reference);
-		else
-			do_char_log(co, 0, "You have been cursed.\n");
-		if (!flag) 
-			do_char_log(cn, 1, "%s was cursed.\n", ch[co].name);
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -150, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		chlog(cn, "Cast Curse on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	}
 
-	return 1;
+	return cast_a_spell(cn, co, in, 1+flag);
 }
 void skill_curse(int cn)
 {
