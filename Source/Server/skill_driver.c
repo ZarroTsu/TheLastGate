@@ -22,66 +22,66 @@ char *at_name[5] = {
 };
 
 char *sp_name[60] = {
-	"00", 			// SK_HAND
-	"01", 			// SK_PRECISION
-	"02", 			// SK_DAGGER
-	"03", 			// SK_SWORD
-	"04", 			// SK_AXE
-	"05", 			// SK_STAFF
-	"06", 			// SK_TWOHAND
-	"07", 			// SK_FOCUS
-	"08", 			// SK_STEALTH
-	"09", 			// SK_PERCEPT
-	"10",			// SK_SWIM
-	"Magic Shield",	// SK_MSHIELD
-	"12",			// SK_BARTER
-	"Repair",		// SK_REPAIR
-	"Light",		// SK_LIGHT
-	"15",			// SK_RECALL
-	"16", 			// SK_SHIELD
-	"Protect",		// SK_PROTECT
-	"Enhance",		// SK_ENHANCE
-	"Slow",			// SK_SLOW
-	"Curse",		// SK_CURSE
-	"Bless",		// SK_BLESS
-	"Identify",		// SK_IDENT
-	"23",			// SK_RESIST
-	"Exhaust",		// SK_BLAST
-	"Dispel",		// SK_DISPEL
-	"Heal",			// SK_HEAL
-	"27",			// SK_GHOST
-	"Regen", 		// SK_REGEN
-	"29",			// SK_REST
-	"30",			// SK_MEDIT
-	"31",			// SK_SENSE
-	"32",			// SK_IMMUN
-	"33",			// SK_SURROUND
-	"34",			// SK_CONCEN
-	"35",			// SK_WARCRY
-	"36", 			// SK_DUAL
-	"37", 			// SK_COMBATM
-	"38", 			// SK_WEAPONM
-	"39", 			// SK_ARMORM
-	"40",			// SK_CLEAVE
-	"41",			// SK_WEAKEN
-	"42",			// SK_POISON
-	"43",			// SK_DAMAREA
-	"44",			// SK_HEXAREA
-	"45",			// SK_GCMASTERY
-	"Shadow Copy",	// SK_SHADOW
-	"Haste",		// SK_HASTE
-	"48",			// SK_SURRAREA
-	"49",			// SK_SURRSPEED
-	"50",			// SK_WARCRY2
-	"51",			// SK_BLEED
-	"52",			// SK_WEAKEN2
-	"53",			// SK_SCORCH
-	"54",			// SK_CURSE2
-	"55",			// SK_SLOW2
-	"56",			// SK_MSHELL
-	"57",
-	"58",
-	"59"
+	"00", 					// SK_HAND
+	"01", 					// SK_PRECISION
+	"02", 					// SK_DAGGER
+	"03", 					// SK_SWORD
+	"04", 					// SK_AXE
+	"05", 					// SK_STAFF
+	"06", 					// SK_TWOHAND
+	"07", 					// SK_FOCUS
+	"08", 					// SK_STEALTH
+	"09", 					// SK_PERCEPT
+	"10",					// SK_SWIM
+	"Magic Shield",			// SK_MSHIELD
+	"12",					// SK_BARTER
+	"Repair",				// SK_REPAIR
+	"Light",				// SK_LIGHT
+	"Recall",				// SK_RECALL
+	"16", 					// SK_SHIELD
+	"Protect",				// SK_PROTECT
+	"Enhance",				// SK_ENHANCE
+	"Slow",					// SK_SLOW
+	"Curse",				// SK_CURSE
+	"Bless",				// SK_BLESS
+	"Identify",				// SK_IDENT
+	"23",					// SK_RESIST
+	"Exhaust",				// SK_BLAST
+	"Dispel",				// SK_DISPEL
+	"Heal",					// SK_HEAL
+	"27",					// SK_GHOST
+	"Regen", 				// SK_REGEN
+	"29",					// SK_REST
+	"30",					// SK_MEDIT
+	"31",					// SK_SENSE
+	"32",					// SK_IMMUN
+	"33",					// SK_SURROUND
+	"34",					// SK_CONCEN
+	"Fear",					// SK_WARCRY
+	"36", 					// SK_DUAL
+	"37", 					// SK_COMBATM
+	"38", 					// SK_WEAPONM
+	"39", 					// SK_ARMORM
+	"40",					// SK_CLEAVE
+	"Weakness",				// SK_WEAKEN
+	"Poison",				// SK_POISON
+	"43",					// SK_DAMAREA
+	"44",					// SK_HEXAREA
+	"45",					// SK_GCMASTERY
+	"Shadow Copy",			// SK_SHADOW
+	"Haste",				// SK_HASTE
+	"48",					// SK_SURRAREA
+	"49",					// SK_SURRSPEED
+	"Stun",					// SK_WARCRY2
+	"Bleed",				// SK_BLEED
+	"Greater Weakness",		// SK_WEAKEN2
+	"Scorch",				// SK_SCORCH
+	"Greater Curse",		// SK_CURSE2
+	"Greater Slow",			// SK_SLOW2
+	"Magic Shell",			// SK_MSHELL
+	"57",					// 
+	"58",					// 
+	"59"					// 
 };
 
 int friend_is_enemy(int cn, int cc)
