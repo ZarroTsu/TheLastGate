@@ -102,7 +102,7 @@ struct s_splog splog[60] = {
 		SK_WARCRY, 		"Fear",			"fear",			"scaring",
 		"",
 		"",
-		"",
+		"You cry out loud and clear.",
 		"",
 		""
 	},{ 
@@ -333,14 +333,22 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit)
 {
 	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower;
+	int no_target = 0;
 	
 	if (co)
 	{
 		co_orig = co;
 	}
 	
-	spellaoe = aoe_power/PROXIMITY_CAP;
 	hitpower = power/2 + power/4;
+	spellaoe = aoe_power/PROXIMITY_CAP;
+	
+	if (intemp==SK_WARCRY)
+	{
+		hitpower = power;
+		spellaoe = aoe_power;
+		no_target = 1;
+	}
 	
 	xf = max(1, ch[cn].x - spellaoe);
 	yf = max(1, ch[cn].y - spellaoe);
@@ -357,7 +365,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		}
 		count++; 
 	}
-	if (!count)
+	if (!count && !no_target)
 	{ 
 		if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
 		{ 
@@ -372,7 +380,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			return 0;
 		}
 	}
-	if (!hit)
+	if (!hit && !no_target)
 	{
 		if (is_exhausted(cn)) return 0;
 		if (spellcost(cn, cost, intemp, 1)) return 0;
@@ -383,13 +391,33 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	
 		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 	{
-		remember_pvp(cn, co);
-		if (!do_surround_check(cn, co, 1)) 
+		if (no_target)
+		{
+			switch (intemp)
+			{
+				case SK_WARCRY:
+					if (warcry(cn, co, power))
+					{
+						do_char_log(co, 0, 
+						"You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
+						hit++;
+					}
+					else
+					{
+						do_char_log(co, 0, 
+						"You hear %s's warcry.\n", ch[cn].reference);
+						continue;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		else if (!do_surround_check(cn, co, 1)) 
 		{
 			continue;
 		}
-		damage_mshell(co);
-		if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20))
+		else if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20))
 		{
 			switch (intemp)
 			{
@@ -428,6 +456,8 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				"%s\n", splog[intemp].otheraoe);
 			}
 		}
+		remember_pvp(cn, co);
+		damage_mshell(co);
 	}
 	do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
 	do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
@@ -1823,99 +1853,53 @@ void skill_poison(int cn)
 int warcry(int cn, int co, int power)
 {
 	int n, in;
-
-	// dont affect good NPCs unless they're a direct target
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) return 0;
-	// dont attack those we may not attack anyway
-	if (!may_attack_msg(cn, co, 0)) return 0;
-	// ignore those whose resistance is greater than our skill
-	damage_mshell(co);
-	if (power<get_target_resistance(co)) return 0;
-	// ignore those we grouped with
-	for (n = 1; n<10; n++) if (ch[cn].data[n]==co) return 0;
-	// ignore the immortals
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
-
-	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
-
+	
+	if (!do_surround_check(cn, co, 1) || get_target_resistance(co)>power)
+	{
+		return 0;
+	}
+	if (!IS_IGNORING_SPELLS(co)) 
+	{ 
+		do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); 
+	}
+	
 	power = spell_immunity(power, get_target_immunity(co));
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in skill_warcry (1)");
-		return( 0);
-	}
-
-	strcpy(bu[in].name, "Stun");
-	bu[in].flags |= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_WARCRY2;
-	bu[in].duration  = bu[in].active = SP_DUR_WARCRY2(power);
-	bu[in].temp  = SK_WARCRY2;
-	bu[in].power = power;
-
+	
+	// Add War-Stun
+	if (!(in = make_new_buff(cn, SK_WARCRY2, BUF_SPR_WARCRY2, power, SP_DUR_WARCRY2(power), 0)))
+		return 0;
+	
 	add_spell(co, in);
-
-	in = god_create_buff();
-	if (!in)
+	
+	// Add War-Fear
+	if (!(in = make_new_buff(cn, SK_WARCRY, BUF_SPR_WARCRY, power/2, SP_DUR_WARCRY, 0)))
+		return 0;
+	
+	for (n = 0; n<5; n++) 
 	{
-		xlog("god_create_buff failed in skill_warcry (2)");
-		return( 0);
+		bu[in].attrib[n][1] = -(2+(power/(10/3)-n) / 5);
 	}
-
-	strcpy(bu[in].name, "Fear");
-	bu[in].flags |= IF_SPELL;
-	for (n = 0; n<5; n++) bu[in].attrib[n][1] = -(2+(power/(10/3)-n) / 5);
-	bu[in].sprite[1] = BUF_SPR_WARCRY;
-	bu[in].duration  = bu[in].active = SP_DUR_WARCRY;
-	bu[in].temp  = SK_WARCRY;
-	bu[in].power = power / 2;
-
+	
 	add_spell(co, in);
-
+	
 	chlog(cn, "Used Warcry on %s", ch[co].name);
-
+	
 	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-
-	return(1);
+	
+	return 1;
 }
 void skill_warcry(cn)
 {
-	int power, n, xf, yf, xt, yt, x, y, co, hit = 0, count = 0, sk_aoe;
+	int power, aoe_power;
+	
+	power = get_skill_score(cn, SK_WARCRY);
+	aoe_power = 6 + get_skill_score(cn, SK_WARCRY)/40;
 	
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, SP_COST_WARCRY, SK_WARCRY, 0)) { return; }
 	
-	power = get_skill_score(cn, SK_WARCRY);
-	sk_aoe = 6 + get_skill_score(cn, SK_WARCRY)/40;
-
-	xf = max(1, ch[cn].x - sk_aoe);
-	yf = max(1, ch[cn].y - sk_aoe);
-	xt = min(MAPX - 1, ch[cn].x + sk_aoe+1);
-	yt = min(MAPY - 1, ch[cn].y + sk_aoe+1);
-
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co) 
-	{ 
-		if (!do_surround_check(cn, co, 0)) continue;
-		count++; 
-	}
-
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co) 
-	{
-		if (!do_surround_check(cn, co, 1)) continue;
-		if (warcry(cn, co, power))
-		{
-			/* CS, 000209: Remember PvP attacks */
-			remember_pvp(cn, co);
-			do_char_log(co, 0, "You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
-			hit++;
-		}
-		else
-		{
-			do_char_log(co, 0, "You hear %s's warcry.\n", ch[cn].reference);
-		}
-	}
-	do_char_log(cn, 1, "You cry out loud and clear. You affected %d of %d creatures in range.\n", hit, count);
+	if (!cast_aoe_spell(cn, 0, SK_WARCRY, power, aoe_power, 0, 0, 0))
+		return;
 	
 	add_exhaust(cn, SK_EXH_WARCRY + TICKS * power/80);
 }
