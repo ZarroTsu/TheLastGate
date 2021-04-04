@@ -112,11 +112,12 @@ struct s_splog splog[60] = {
 		""
 	},{ 
 		SK_POISON, 		"Poison",		"poison",		"poisoning",
-		"",
-		"",
-		"",
-		"",
-		""
+		"You have been poisoned!",
+		" was poisoned.",
+		" cast poison on you.",
+		"You unleash a powerful mass-poison.",
+		"You feel a toxic aura emanate from somewhere.",
+		" tried to include you in a mass-poison but failed."
 	},{ 
 		SK_SHADOW, 		"Shadow Copy",	"shadow copy",	"shadow copying",
 		"",
@@ -331,7 +332,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit)
 {
-	int co_orig, spellaoe, xf, yf, xt, yt, x, y;
+	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower;
 	
 	if (co)
 	{
@@ -339,6 +340,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	}
 	
 	spellaoe = aoe_power/PROXIMITY_CAP;
+	hitpower = power/2 + power/4;
 	
 	xf = max(1, ch[cn].x - spellaoe);
 	yf = max(1, ch[cn].y - spellaoe);
@@ -387,16 +389,18 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			continue;
 		}
 		damage_mshell(co);
-		if (power + RANDOM(max(1, 24 - max(4, count / 2))) > 
-			get_target_resistance(co) + RANDOM(max(1, 12 + max(4, count / 2))))
+		if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20))
 		{
 			switch (intemp)
 			{
 				case SK_CURSE:
-					spell_curse(cn, co, power, 1);
+					spell_curse(cn, co, hitpower, 1);
 					break;
 				case SK_SLOW:
-					spell_slow(cn, co, power, 1);
+					spell_slow(cn, co, hitpower, 1);
+					break;
+				case SK_POISON:
+					spell_poison(cn, co, hitpower, 1);
 					break;
 				default:
 					break;
@@ -433,9 +437,11 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 
 void surround_cast(int cn, int co_orig, int intemp, int power)
 {
-	int m, n, mc, co;
+	int m, n, mc, co, hitpower;
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
+	
+	hitpower = power/2 + power/4;
 	
 	for (n=0; n<4; n++)
 	{
@@ -449,15 +455,18 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 		if ((co = map[mc].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
 		{
 			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) 
+			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20)) 
 			{
 				switch (intemp)
 				{
 					case SK_CURSE: 
-						spell_curse(cn, co, power, 0);
+						spell_curse(cn, co, hitpower, 0);
 						break;
 					case SK_SLOW: 
-						spell_slow(cn, co, power, 0);
+						spell_slow(cn, co, hitpower, 0);
+						break;
+					case SK_POISON:
+						spell_poison(cn, co, hitpower, 0);
 						break;
 					default:
 						break;
@@ -1716,7 +1725,7 @@ void skill_slow(int cn, int flag)
 		surround_cast(cn, co_orig, SK_SLOW, power);
 	}
 	
-	// Book - Shiva's Malice :: Cast Slow after casting Curse
+	// Book - Shiva's Malice :: Extend exhaust after casting both Curse and Slow
 	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
 	{
 		add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
@@ -1730,232 +1739,84 @@ void skill_slow(int cn, int flag)
 // Feb 2020 - Poison
 int spell_poison(int cn, int co, int power, int flag)
 {
-	int in, n, dur;
-
+	int in, dur;
+	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_poison");
-		return( 0);
-	}
-
+	
 	power = spell_immunity(power, get_target_immunity(co));
 	power = spell_race_mod(power, cn);
 	
 	dur = SP_DUR_POISON(power);
 	
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_VENO) // Book: Venom Compendium
+	// Book - Venom Compendium
+	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_VENO) 
 	{
 		dur = dur*70/100; // 70% duration = between 14 and 42 seconds
 	}
 	
-	strcpy(bu[in].name, "Poison");
-	bu[in].flags |= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_POISON;
-	bu[in].duration  = bu[in].active = dur; 
-	bu[in].temp  = SK_POISON;
-	bu[in].power = power;
-	bu[in].cost = cn; // Special case -- the user of the poison should earn the kill for the poison.
-
-	if (!add_spell(co, in))
-	{
-		if (!flag) 
-			do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+	if (!(in = make_new_buff(cn, SK_POISON, BUF_SPR_POISON, power, dur, 0)))
 		return 0;
-	}
-	if (get_skill_score(co, SK_SENSE) + 10>power)
-		do_char_log(co, 1, "%s cast poison on you.\n", ch[cn].reference);
-	else
-		do_char_log(co, 0, "You have been poisoned!\n");
-	if (!flag) 
-		do_char_log(cn, 1, "%s was poisoned.\n", ch[co].name);
-	if (!IS_IGNORING_SPELLS(co))
-		do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-	do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-	char_play_sound(co, ch[cn].sound + 7, -150, 0);
-	char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-	chlog(cn, "Cast Poison on %s", ch[co].name);
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-
-	return 1;
+	
+	// Special case -- the user of the poison should earn the kill for the poison.
+	bu[in].cost = cn; 
+	
+	return cast_a_spell(cn, co, in, 1+flag);
 }
 void skill_poison(int cn)
 {
 	int d20 = 13;
-	int n, cost, power, dampower, spellaoe, xf, yf, xt, yt, x, y, count = 0, hit = 0, aoefocus = 0; // Added for AoE Stuff
-	int co, co_orig = -1, m;
-
-	if ((co = ch[cn].skill_target1)) { ; }
-	else if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	else { co = cn; }
+	int power, aoe_power, cost;
+	int count = 0, hit = 0;
+	int co, co_orig = -1;
 	
+	power = get_skill_score(cn, SK_POISON);
+	aoe_power = get_skill_score(cn, SK_HEXAREA);
 	cost = SP_COST_POISON;
-	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_SORCERER)) cost /= 2;
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_HEXAREA)) / PROXIMITY_MULTI;
-	else if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_DAMAREA)) / PROXIMITY_MULTI;
-	dampower = power = get_skill_score(cn, SK_POISON);
 	
-	if (cn==co && (!(ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) || (ch[cn].flags & CF_AREA_OFF)))
+	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_SORCERER)) 
 	{
-		do_char_log(cn, 0, "You cannot poison yourself!\n");
-		return;
+		cost /= 2;
 	}
-	else if ((co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION]) 
-		&& (!(ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) || (ch[cn].flags & CF_AREA_OFF)))
-	{ 
-		do_char_log(cn, 0, "You stop yourself from poisoning your companion. That would be silly.\n");
-		return;
-	}
-	else if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	
+	if (get_skill_score(cn, SK_DAMAREA) > aoe_power)
 	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return;
-		}
-		
-		/* CS, 000209: Remember PvP attacks */
-		remember_pvp(cn, co);
-		
-		if (is_exhausted(cn)) 					{ return; }
-		if (spellcost(cn, cost, SK_POISON, 1)) 	{ return; }
-		
-		if (!may_attack_msg(cn, co, 1))
-		{
-			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
-			return;
-		}
-		
-		damage_mshell(co);
-		if (chance_base(cn, power, d20, get_target_resistance(co)))
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-			{
-				if (!(ch[co].flags & CF_SENSE))
-					do_char_log(co, 0, "%s tried to cast poison on you but failed.\n", ch[cn].reference);
-				if (!IS_IGNORING_SPELLS(co))
-				{
-					do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-			}
-			if (ch[cn].kindred&KIN_MONSTER) add_exhaust(cn,TICKS*2);
-			return;
-		}
-		
+		aoe_power = get_skill_score(cn, SK_DAMAREA);
+	}
+	
+	// Hex Area and Dam Area increases spell cost
+	if ((ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) && !(ch[cn].flags & CF_AREA_OFF))
+	{
+		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+	}
+	
+	// Get spell target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_POISON, 1, power, d20)))
+		return;
+	
+	// If we have a valid target, cast Poison on them
+	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	{
 		spell_poison(cn, co, power, 0);
 		
 		co_orig = co;
 		count++;
 		hit++;
-		
-		if (ch[co].flags & CF_IMMORTAL)
-		{
-			do_char_log(cn, 0, "You lost your focus.\n");
-			return;
-		}
 	}
-
-	// Feb 2020 - AoE Poisons
+	
+	// Cast AoE or general surround-hit
 	if ((ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (co) co_orig = co;
+		if (!cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit))
+			return;
 		
-		spellaoe = 1;
-		
-		
-		if (ch[cn].skill[SK_HEXAREA][0]) 
-		{
-			spellaoe = get_skill_score(cn, SK_HEXAREA)/PROXIMITY_CAP; //get_spell_aoe(get_skill_score(cn, SK_HEXAREA));
-			dampower = power/2 + power/max(4, count/2-(get_skill_score(cn, SK_HEXAREA)/40));
-		}
-		else 
-		{
-			spellaoe = get_skill_score(cn, SK_DAMAREA)/PROXIMITY_CAP; //get_spell_aoe(get_skill_score(cn, SK_DAMAREA));
-			dampower = power/2 + power/max(4, count/2-(get_skill_score(cn, SK_DAMAREA)/40));
-		}
-		
-		xf = max(1, ch[cn].x - spellaoe);
-		yf = max(1, ch[cn].y - spellaoe);
-		xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
-		yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
-		
-		// Loop through and count the number of targets first
-		for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co && co_orig!=co) 
-		{ 
-			if (!do_surround_check(cn, co, 0)) continue;
-			count++; 
-		}
-		if (!count)
-		{ 
-			if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
-			{ do_char_log(cn, 0, "You stop yourself from poisoning your companion. That would be silly.\n"); return; }
-			else
-			{ do_char_log(cn, 0, "You cannot poison yourself!\n"); return; }
-		}
-		if (!hit)
-		{
-			if (is_exhausted(cn)) 					return;
-			if (spellcost(cn, cost, SK_POISON, 1)) 	return;
-			if (chance(cn, FIVE_PERC_FAIL))			return;
-		}
-		// Then loop through and apply the effect based off the number of targets
-		for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	if ((co = map[x + y * MAPX].ch)) if (cn!=co && co_orig!=co)
-		{
-			remember_pvp(cn, co);
-			if (!do_surround_check(cn, co, 1)) continue;
-			damage_mshell(co);
-			if (power+1+RANDOM(max(1,24-max(4,count/2))) > get_target_resistance(co)+RANDOM(max(1,12+max(4,count/2))))
-			{
-				spell_poison(cn, co, dampower, 1);
-				hit++;
-			}
-			else
-			{
-				if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-				{
-					if (!(ch[co].flags & CF_SENSE))
-						do_char_log(co, 0, "%s tried to include you in a mass-poison but failed.\n", ch[cn].reference);
-					if (!IS_IGNORING_SPELLS(co))
-						do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-				else
-					do_char_log(co, 0, "You feel a toxic aura emanate from somewhere.\n");
-			}
-		}
-		do_char_log(cn, 1, "You unleash a powerful mass-poison.\n");
-		do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
-		dampower = power/2 + power/4;
-		m = ch[cn].x + ch[cn].y * MAPX;
-		if ((co = map[m + 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_poison(cn, co, dampower, 0);
-		}
-		if ((co = map[m - 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_poison(cn, co, dampower, 0);
-		}
-		if ((co = map[m + MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_poison(cn, co, dampower, 0);
-		}
-		if ((co = map[m - MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_poison(cn, co, dampower, 0);
-		}
+		surround_cast(cn, co_orig, SK_POISON, power);
 	}
-
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-
+	
 	add_exhaust(cn, SK_EXH_POISON);
 }
 
