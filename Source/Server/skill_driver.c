@@ -21,68 +21,151 @@ char *at_name[5] = {
 	"Strength"
 };
 
-char *sp_name[60] = {
-	"00", 					// SK_HAND
-	"01", 					// SK_PRECISION
-	"02", 					// SK_DAGGER
-	"03", 					// SK_SWORD
-	"04", 					// SK_AXE
-	"05", 					// SK_STAFF
-	"06", 					// SK_TWOHAND
-	"07", 					// SK_FOCUS
-	"08", 					// SK_STEALTH
-	"09", 					// SK_PERCEPT
-	"10",					// SK_SWIM
-	"Magic Shield",			// SK_MSHIELD
-	"12",					// SK_BARTER
-	"Repair",				// SK_REPAIR
-	"Light",				// SK_LIGHT
-	"Recall",				// SK_RECALL
-	"16", 					// SK_SHIELD
-	"Protect",				// SK_PROTECT
-	"Enhance",				// SK_ENHANCE
-	"Slow",					// SK_SLOW
-	"Curse",				// SK_CURSE
-	"Bless",				// SK_BLESS
-	"Identify",				// SK_IDENT
-	"23",					// SK_RESIST
-	"Exhaust",				// SK_BLAST
-	"Dispel",				// SK_DISPEL
-	"Healing Sickness",		// SK_HEAL
-	"27",					// SK_GHOST
-	"Regen", 				// SK_REGEN
-	"29",					// SK_REST
-	"30",					// SK_MEDIT
-	"31",					// SK_SENSE
-	"32",					// SK_IMMUN
-	"33",					// SK_SURROUND
-	"34",					// SK_CONCEN
-	"Fear",					// SK_WARCRY
-	"36", 					// SK_DUAL
-	"37", 					// SK_COMBATM
-	"38", 					// SK_WEAPONM
-	"39", 					// SK_ARMORM
-	"40",					// SK_CLEAVE
-	"Weakness",				// SK_WEAKEN
-	"Poison",				// SK_POISON
-	"43",					// SK_DAMAREA
-	"44",					// SK_HEXAREA
-	"45",					// SK_GCMASTERY
-	"Shadow Copy",			// SK_SHADOW
-	"Haste",				// SK_HASTE
-	"48",					// SK_SURRAREA
-	"49",					// SK_SURRSPEED
-	"Stun",					// SK_WARCRY2
-	"Bleed",				// SK_BLEED
-	"Greater Weakness",		// SK_WEAKEN2
-	"Scorch",				// SK_SCORCH
-	"Greater Curse",		// SK_CURSE2
-	"Greater Slow",			// SK_SLOW2
-	"Magic Shell",			// SK_MSHELL
-	"57",					// 
-	"58",					// 
-	"59"					// 
-};
+struct s_splog splog[60] = {
+	{ 
+		SK_MSHIELD,		"Magic Shield",	"magic shield",	"magic shielding",
+		"Magic Shield active!",
+		"'s Magic Shield activated.",
+		" cast magic shield on you."
+	},{ 
+		SK_REPAIR, 		"Repair",		"repair",		"repairing",
+		"",
+		"",
+		""
+	},{ 
+		SK_LIGHT, 		"Light",		"light",		"lighting",
+		"You start to emit light.",
+		" starts to emit light.",
+		" cast light on you."
+	},{ 
+		SK_RECALL, 		"Recall",		"recall",		"recalling",
+		"",
+		"",
+		""
+	},{ 
+		SK_PROTECT,		"Protect",		"protect",		"protecting",
+		"You feel protected.",
+		" is now protected.",
+		" cast protect on you."
+	},{ 
+		SK_ENHANCE,		"Enhance",		"enhance",		"enhancing",
+		"Your weapon feels stronger.",
+		"'s weapon is now stronger.",
+		" cast enhance weapon on you."
+	},{ 
+		SK_SLOW, 		"Slow",			"slow",			"slowing",
+		"You have been slowed.",
+		" was slowed.",
+		" cast slow on you.",
+		"",
+		"",
+		""
+	},{ 
+		SK_CURSE,		"Curse",		"curse",		"cursing",
+		"You have been cursed.",
+		" was cursed.",
+		" cast curse on you.",
+		"You unleash a powerful mass-curse.",
+		"You feel a wiked power emanate from somewhere.",
+		" tried to include you in a mass-curse but failed."
+	},{ 
+		SK_BLESS, 		"Bless",		"bless",		"blessing",
+		"You have been blessed.",
+		" was blessed.",
+		" cast bless on you."
+	},{ 
+		SK_IDENT, 		"Identify",		"identify",		"identifying",
+		"",
+		"",
+		""
+	},{ 
+		SK_BLAST, 		"Exhaust",		"exhaust",		"exhausting",
+		"",
+		"",
+		""
+	},{ 
+		SK_DISPEL, 		"Dispel",		"dispel",		"dispelling",
+		"",
+		"",
+		""
+	},{ 
+		SK_HEAL, 		"Healing Sickness",	"heal",		"healing",
+		"You have been healed.",
+		" was healed.",
+		" cast heal on you."
+	},{ 
+		SK_REGEN, 		"Regen",		"regen",		"regenerating",
+		"You begin regenerating hitpoints!",
+		" starts regenerating.",
+		" cast regen on you."
+	},{ 
+		SK_WARCRY, 		"Fear",			"fear",			"scaring",
+		"",
+		"",
+		"",
+		"",
+		""
+	},{ 
+		SK_WEAKEN, 		"Weakness",		"weakness",		"weakening",
+		"",
+		"",
+		""
+	},{ 
+		SK_POISON, 		"Poison",		"poison",		"poisoning",
+		"",
+		"",
+		"",
+		"",
+		""
+	},{ 
+		SK_SHADOW, 		"Shadow Copy",	"shadow copy",	"shadow copying",
+		"",
+		"",
+		""
+	},{ 
+		SK_HASTE, 		"Haste",		"haste",		"hasting",
+		"You suddenly feel faster!",
+		" has been hasted.",
+		" cast haste on you."
+	},{ 
+		SK_WARCRY2, 	"Stun",			"stun",			"stunning",
+		"",
+		"",
+		"",
+		"",
+		""
+	},{ 
+		SK_BLEED, 		"Bleed",		"bleed",		"bleeding",
+		"",
+		"",
+		""
+	},{ 
+		SK_WEAKEN2, 	"Greater Weakness",	"greater weakness",	"weakening",
+		"",
+		"",
+		""
+	},{ 
+		SK_SCORCH, 		"Scorch",		"scorch",		"scorching",
+		"",
+		"",
+		""
+	},{ 
+		SK_CURSE2, 		"Greater Curse",	"greater curse",	"cursing",
+		"You have been badly cursed.",
+		" was badly cursed.",
+		" cast greater curse on you."
+	},{ 
+		SK_SLOW2, 		"Greater Slow",		"greater slow",		"slowing",
+		"You have been badly slowed.",
+		" was badly slowed.",
+		" cast greater slow on you."
+	},{ 
+		SK_MSHELL, 		"Magic Shell",	"magic shell",	"magic shelling",
+		"Magic Shell active!",
+		"'s Magic Shell activated.",
+		" cast magic shell on you."
+	}
+}
 
 int friend_is_enemy(int cn, int cc)
 {
@@ -212,7 +295,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			{
 				do_char_log(co, 1, 
 				"%s tried to cast %s on you but failed.\n", 
-					ch[cn].reference, sp_name[in]);
+					ch[cn].reference, splog[in].ref);
 			}
 			if (!buff && !IS_IGNORING_SPELLS(co))
 			{
@@ -243,26 +326,6 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit)
 {
 	int co_orig, spellaoe, xf, yf, xt, yt, x, y;
-	char *log_act, *log_name, *log_sense, *log_other, *log_self;
-	
-	switch (intemp)
-	{
-		case SK_CURSE:
-			log_act 	= "cursing";
-			log_name 	= "curse";
-			log_sense 	= " tried to include you in a mass-curse but failed.";
-			log_other 	= "You feel a wiked power emanate from somewhere.";
-			log_self	= "You unleash a powerful mass-curse.";
-			break;
-		
-		default:
-			log_act 	= "something-ing";
-			log_name 	= "something";
-			log_sense 	= " tried to include you in something but failed.";
-			log_other 	= "You something emanate from somewhere.";
-			log_self	= "You unleash a powerful something.";
-			break;
-	}
 	
 	if (co)
 	{
@@ -291,13 +354,13 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
 		{ 
 			do_char_log(cn, 0, 
-			"You stop yourself from %s your companion. That would be silly.\n", log_act);
+			"You stop yourself from %s your companion. That would be silly.\n", splog[intemp].act);
 			return 0;
 		}
 		else
 		{ 
 			do_char_log(cn, 0, 
-			"You cannot %s yourself!\n", log_name); 
+			"You cannot %s yourself!\n", splog[intemp].ref); 
 			return 0;
 		}
 	}
@@ -339,7 +402,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				if (!(ch[co].flags & CF_SENSE))
 				{
 					do_char_log(co, 0, 
-					"%s%s\n", ch[cn].reference, log_sense);
+					"%s%s\n", ch[cn].reference, splog[intemp].senseaoe);
 				}
 				if (!IS_IGNORING_SPELLS(co))
 				{
@@ -349,11 +412,11 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			else
 			{
 				do_char_log(co, 0, 
-				"%s\n", log_other);
+				"%s\n", splog[intemp].otheraoe);
 			}
 		}
 	}
-	do_char_log(cn, 1, "%s\n", log_self);
+	do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
 	do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
 	
 	return 1;
@@ -399,11 +462,11 @@ int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
 	in = god_create_buff();
 	if (!in)
 	{
-		xlog("god_create_buff failed for spell_%s", sp_name[intemp]);
+		xlog("god_create_buff failed for spell_%s", splog[intemp].ref);
 		return 0;
 	}
 	
-	strcpy(bu[in].name, sp_name[intemp]);
+	strcpy(bu[in].name, splog[intemp].name);
 	bu[in].flags 	|= IF_SPELL;
 	bu[in].temp  	 = intemp;
 	bu[in].sprite[1] = sptemp;
@@ -1013,80 +1076,13 @@ int has_spell_from_item(int cn, int temp)
 // debuff: 1 for normal debuff, 2 for AoE debuff (to remove interference spam)
 int cast_a_spell(int cn, int co, int in, int debuff)
 {
-	char *log_name;
-	char *log_sense, *log_self, *log_other;
-	int arealog = 0;
+	int temp, arealog = 0;
 	
-	log_name = bu[in].name;
+	temp = bu[in].temp;
 	
-	switch (bu[in].temp)
+	if (temp==SK_LIGHT)
 	{
-		case SK_LIGHT:
-			log_sense 	= " cast light on you.";
-			log_self 	= "You start to emit light.";
-			log_other 	= " starts to emit light.";
-			arealog = 1;
-			break;
-		case SK_PROTECT:
-			log_sense 	= " cast protect on you.";
-			log_self 	= "You feel protected.";
-			log_other 	= " is now protected.";
-			break;
-		case SK_ENHANCE:
-			log_sense 	= " cast enhance weapon on you.";
-			log_self 	= "Your weapon feels stronger.";
-			log_other 	= "'s weapon is now stronger.";
-			break;
-		case SK_BLESS:
-			log_sense 	= " cast bless on you.";
-			log_self 	= "You have been blessed.";
-			log_other 	= " was blessed.";
-			break;
-		case SK_MSHIELD:
-			log_sense 	= " cast magic shield on you.";
-			log_self 	= "Magic Shield active!";
-			log_other 	= "'s Magic Shield activated.";
-			break;
-		case SK_MSHELL:
-			log_sense 	= " cast magic shell on you.";
-			log_self 	= "Magic Shell active!";
-			log_other 	= "'s Magic Shell activated.";
-			break;
-		case SK_HASTE:
-			log_sense 	= " cast haste on you.";
-			log_self 	= "You suddenly feel faster!";
-			log_other 	= " has been hasted.";
-			break;
-		case SK_HEAL:
-			log_name	= "Heal";
-			log_sense 	= " cast heal on you.";
-			log_self 	= "You have been healed.";
-			log_other 	= " was healed.";
-			break;
-		case SK_REGEN:
-			log_name	= "Regen";
-			log_sense 	= " cast regen on you.";
-			log_self 	= "You begin regenerating hitpoints!";
-			log_other 	= " starts regenerating.";
-			break;
-			
-		case SK_CURSE2:
-			log_sense 	= " cast greater curse on you.";
-			log_self 	= "You have been badly cursed.";
-			log_other 	= " was badly cursed.";
-			break;
-		case SK_CURSE:
-			log_sense 	= " cast curse on you.";
-			log_self 	= "You have been cursed.";
-			log_other 	= " was cursed.";
-			break;
-		
-		default:
-			log_sense 	= " cast something... strange on you.";
-			log_self 	= "You feel... strange.";
-			log_other 	= " has been spelled by... whatever that was.";
-			arealog = 1;
-			break;
+		arealog = 1;
 	}
 	
 	if (cn!=co)
@@ -1096,25 +1092,25 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 			if (debuff<2)
 			{
 				do_char_log(cn, 1, 
-				"Magical interference neutralized the %s's effect.\n", log_name);
+				"Magical interference neutralized the %s's effect.\n", splog[temp].ref);
 			}
 			return 0;
 		}
 		if (get_skill_score(co, SK_SENSE) + 10 > bu[in].power)
 		{
-			do_char_log(co, 1, "%s%s\n", ch[cn].reference, log_sense);
+			do_char_log(co, 1, "%s%s\n", ch[cn].reference, splog[temp].sense);
 		}
 		else
 		{
-			do_char_log(co, debuff>0?0:1, "%s\n", log_self);
+			do_char_log(co, debuff>0?0:1, "%s\n", splog[temp].self);
 		}
 		if (arealog) 
 		{
-			do_area_log(co, 0, ch[co].x, ch[co].y, 2, "%s%s\n", ch[co].name, log_other);
+			do_area_log(co, 0, ch[co].x, ch[co].y, 2, "%s%s\n", ch[co].name, splog[temp].other);
 		}
 		else if (debuff<2)
 		{
-			do_char_log(cn, 1, "%s%s\n", ch[co].name, log_other);
+			do_char_log(cn, 1, "%s%s\n", ch[co].name, splog[temp].other);
 		}
 		if (debuff)
 		{
@@ -1124,7 +1120,7 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 			}
 			do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
 		}
-		chlog(cn, "Cast %s on %s", log_name, ch[co].name);
+		chlog(cn, "Cast %s on %s", splog[temp].ref, ch[co].name);
 		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
 		if (debuff)
 		{
@@ -1145,7 +1141,7 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 			"Magical interference neutralized the %s's effect.\n", bu[in].name);
 			return 0;
 		}
-		do_char_log(cn, 1, "%s\n", log_self);
+		do_char_log(cn, 1, "%s\n", splog[temp].self);
 		if (ch[cn].flags & (CF_PLAYER))
 		{
 			chlog(cn, "Cast %s", bu[in].name);
@@ -1153,7 +1149,10 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	}
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (debuff<2)
+	{
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	}
 	
 	return 1;
 }
@@ -1557,7 +1556,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(co));
 	power = spell_race_mod(power, cn);
 	
-	// Tarot Card - Tower :: Change Curse into Curse II
+	// Tarot Card - Tower :: Change Curse into Greater Curse
 	if (get_tarot(cn, IT_CH_TOWER))
 	{
 		if (!(in = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_CURSE2, 0)))
@@ -1593,7 +1592,7 @@ void skill_curse(int cn)
 	aoe_power = get_skill_score(cn, SK_HEXAREA);
 	cost = SP_COST_CURSE;
 	
-	// Tarot Card - Tower :: Change Curse into Curse II
+	// Tarot Card - Tower :: Change Curse into Greater Curse
 	if (get_tarot(cn, IT_CH_TOWER)) 
 	{ 
 		cost *= (4 / 3);
@@ -1606,9 +1605,11 @@ void skill_curse(int cn)
 		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
 	}
 	
+	// Get spell target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20)))
 		return;
 	
+	// If we have a valid target, cast Curse on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
 		spell_curse(cn, co, power, 0);
@@ -1617,120 +1618,97 @@ void skill_curse(int cn)
 		count++;
 		hit++;
 	}
-	// Feb 2020 - AoE Curses
+	
+	// Cast AoE or general surround-hit
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
 		if (!cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit))
 			return;
+		
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
 		surround_cast(cn, co_orig, SK_CURSE, power);
 	}
-
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV) // Book: Shiva's Malice
+	
+	// Book - Shiva's Malice :: Cast Slow after casting Curse
+	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+	{
 		skill_slow(cn, 1);
+	}
 	else
+	{
 		add_exhaust(cn, SK_EXH_CURSE);
+	}
 }
 // Feb 2020 - Slow
 int spell_slow(int cn, int co, int power, int flag)
 {
-	int in, n;
-
+	int in;
+	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_slow");
-		return( 0);
-	}
-
+	
 	power = spell_immunity(power, get_target_immunity(co));
 	power = spell_race_mod(power, cn);
 	
-	// Tarot Card - Emperor :: Change Slow into Slow II
+	// Tarot Card - Emperor :: Change Slow into Greater Slow
 	if (get_tarot(cn, IT_CH_EMPEROR))
 	{
-		strcpy(bu[in].name, "Greater Slow");
-		bu[in].flags |= IF_SPELL;
-		bu[in].sprite[1] = BUF_SPR_SLOW2;
-		bu[in].duration  = bu[in].active = SP_DUR_SLOW2(power);
-		bu[in].temp  = SK_SLOW2;
-		bu[in].power = bu[in].cost = power;
-		//bu[in].cost  = SLOW2FORM(power); // power of the slowness, gradually reduced over time
-
-		if (!add_spell(co, in))
-		{
-			if (!flag) 
-				do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+		if (!(in = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0)))
 			return 0;
-		}
-		if (get_skill_score(co, SK_SENSE) + 10>power)
-			do_char_log(co, 1, "%s cast greater slow on you.\n", ch[cn].reference);
-		else
-			do_char_log(co, 0, "You have been badly slowed.\n");
-		if (!flag) 
-			do_char_log(cn, 1, "%s was badly slowed.\n", ch[co].name);
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -150, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		chlog(cn, "Cast Greater Slow on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	}
 	else
 	{
-		strcpy(bu[in].name, "Slow");
-		bu[in].flags |= IF_SPELL;
-		bu[in].sprite[1] = BUF_SPR_SLOW;
-		bu[in].duration  = bu[in].active = SP_DUR_SLOW(power);
-		bu[in].temp  = SK_SLOW;
-		bu[in].power = bu[in].cost = power;
-		//bu[in].cost = SLOWFORM(power); // power of the slowness, gradually reduced over time
-
-		if (!add_spell(co, in))
-		{
-			if (!flag) 
-				do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+		if (!(in = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_SLOW(power), 0)))
 			return 0;
-		}
-		if (get_skill_score(co, SK_SENSE) + 10>power)
-			do_char_log(co, 1, "%s cast slow on you.\n", ch[cn].reference);
-		else
-			do_char_log(co, 0, "You have been slowed.\n");
-		if (!flag) 
-			do_char_log(cn, 1, "%s was slowed.\n", ch[co].name);
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -150, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		chlog(cn, "Cast Slow on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	}
-
-	return 1;
+	
+	return cast_a_spell(cn, co, in, 1+flag);
 }
 void skill_slow(int cn, int flag)
 {
 	int d20 = 12;
-	int n, cost, power, spellaoe, xf, yf, xt, yt, x, y, count = 0, hit = 0, aoefocus = 0; // Added for AoE Stuff
-	int co, co_orig = -1, m;
-
-	if ((co = ch[cn].skill_target1)) { ; }
-	else if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	else { co = cn; }
-
-	cost = SP_COST_SLOW;
-	if (get_tarot(cn, IT_CH_EMPEROR)) { cost *= (4/3); d20 -=1; }
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_HEXAREA)) / PROXIMITY_MULTI;
+	int power, aoe_power, cost;
+	int count = 0, hit = 0;
+	int co, co_orig = -1;
+	
 	power = get_skill_score(cn, SK_SLOW);
+	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	cost = SP_COST_SLOW;
+	
+	// Tarot Card - Emperor :: Change Slow into Greater Slow
+	if (get_tarot(cn, IT_CH_EMPEROR)) 
+	{ 
+		cost *= (4 / 3);
+		d20 -= 1;
+	}
+	
+	// Hex Area increases spell cost
+	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	{
+		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+	}
+	
+	// Get spell target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SLOW, 1, power, d20)))
+		return;
+	
+	
+	
+	
+	//int n, cost, power, spellaoe, xf, yf, xt, yt, x, y, count = 0, hit = 0, aoefocus = 0; // Added for AoE Stuff
+	//int co, co_orig = -1, m;
+
+	//if ((co = ch[cn].skill_target1)) { ; }
+	//else if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
+	//else { co = cn; }
+
+	//cost = SP_COST_SLOW;
+	//if (get_tarot(cn, IT_CH_EMPEROR)) { cost *= (4/3); d20 -=1; }
+	//if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_HEXAREA)) / PROXIMITY_MULTI;
+	//power = get_skill_score(cn, SK_SLOW);
 	
 	if (cn==co && (!ch[cn].skill[SK_HEXAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
 	{

@@ -695,6 +695,23 @@ struct see_map
 	char vis[VISI_SIZE * VISI_SIZE]; // 02162020 - updated from 40x40 to 60x60 for larger client render
 };
 
+struct s_splog
+{
+	int nr;
+	
+	char name[40];		// log name, 		ie. "Curse"
+	char ref[40];		// log reference, 	ie. "curse"
+	char act[40];		// log action, 		ie. "cursing"
+	
+	char self[100];		// log self,		ie. "You have been cursed."
+	char other[100];	// log other,		ie. " was cursed."
+	char sense[100];	// log sense,		ie. " cast curse on you."
+	
+	char selfaoe[100];	// log self aoe,	ie. "You unleash a powerful mass-curse."
+	char otheraoe[100]; // log other aoe,   ie. "You feel a wiked power emanate from somewhere."
+	char senseaoe[100];	// log sense aoe,	ie. " tried to include you in a mass-curse but failed."
+};
+
 extern struct s_skilltab skilltab[MAXSKILL];
 extern struct global *globs;
 extern struct map *map;
