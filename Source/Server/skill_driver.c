@@ -57,9 +57,9 @@ struct s_splog splog[60] = {
 		"You have been slowed.",
 		" was slowed.",
 		" cast slow on you.",
-		"",
-		"",
-		""
+		"You unleash a powerful mass-slow.",
+		"You feel a chilling power emanate from somewhere.",
+		" tried to include you in a mass-slow but failed."
 	},{ 
 		SK_CURSE,		"Curse",		"curse",		"cursing",
 		"You have been cursed.",
@@ -226,23 +226,29 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	else if (!buff && (co = ch[cn].attack_cn)!=0) ;
 	else co = cn;
 	
-	if (in==SK_CURSE)
+	if (!buff)
 	{
 		// AoE Spells immediately stop processing - everything else is handled by aoe cast
-		if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+		if (( in==SK_CURSE || in==SK_SLOW || in==SK_POISON ) &&
+			ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+		{
+			return co;
+		}
+		else if (( in==SK_POISON || in==SK_BLAST ) &&
+			ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 		{
 			return co;
 		}
 		else if (cn==co)
 		{
 			do_char_log(cn, 0, 
-			"You cannot curse yourself!\n");
+			"You cannot %s yourself!\n", splog[in].ref);
 			return 0;
 		}
 		else if (co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION])
 		{ 
 			do_char_log(cn, 0, 
-			"You stop yourself from cursing your companion. That would be silly.\n");
+			"You stop yourself from %s your companion. That would be silly.\n", splog[in].act);
 			return 0;
 		}
 	}
@@ -389,6 +395,9 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				case SK_CURSE:
 					spell_curse(cn, co, power, 1);
 					break;
+				case SK_SLOW:
+					spell_slow(cn, co, power, 1);
+					break;
 				default:
 					break;
 			}
@@ -446,6 +455,9 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 				{
 					case SK_CURSE: 
 						spell_curse(cn, co, power, 0);
+						break;
+					case SK_SLOW: 
+						spell_slow(cn, co, power, 0);
 						break;
 					default:
 						break;
@@ -1341,7 +1353,7 @@ void skill_bless(int cn)
 
 int spell_mshield(int cn, int co, int power)
 {
-	int in, ta_cn_cha, ta_co_emp, cc;
+	int in, ta_cn_cha, ta_co_emp, n, cc;
 	
 	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
 	
@@ -1351,10 +1363,12 @@ int spell_mshield(int cn, int co, int power)
 	if (ta_cn_cha)
 	{
 		in = make_new_buff(cn, SK_MSHELL, BUF_SPR_MSHELL, power, SP_DUR_MSHELL(power), 1);
+		n = SK_MSHELL;
 	}
 	else
 	{
 		in = make_new_buff(cn, SK_MSHIELD, BUF_SPR_MSHIELD, power, SP_DUR_MSHIELD(power), 1);
+		n = SK_MSHIELD;
 	}
 	
 	if (!in) 
@@ -1376,32 +1390,16 @@ int spell_mshield(int cn, int co, int power)
 			}
 			else
 			{
-				if (ta_cn_cha)
-				{
-					do_char_log(co, 0, 
-					"Since you lack a Ghost Companion, the Magic Shell's power was halved.\n");
-				}
-				else
-				{
-					do_char_log(co, 0, 
-					"Since you lack a Ghost Companion, the Magic Shield's power was halved.\n");
-				}
+				do_char_log(co, 0, 
+				"Since you lack a Ghost Companion, the %s's power was halved.\n", splog[n].name);
 				bu[in].duration /= 2;
 				bu[in].active   /= 2;
 			}
 		}
 		else
 		{
-			if (ta_cn_cha)
-			{
-				do_char_log(co, 0, 
-				"Since you lack a Ghost Companion, the Magic Shell's power was halved.\n");
-			}
-			else
-			{
-				do_char_log(co, 0, 
-				"Since you lack a Ghost Companion, the Magic Shield's power was halved.\n");
-			}
+			do_char_log(co, 0, 
+			"Since you lack a Ghost Companion, the %s's power was halved.\n", splog[n].name);
 			bu[in].duration /= 2;
 			bu[in].active   /= 2;
 		}
@@ -1695,171 +1693,38 @@ void skill_slow(int cn, int flag)
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SLOW, 1, power, d20)))
 		return;
 	
-	
-	
-	
-	//int n, cost, power, spellaoe, xf, yf, xt, yt, x, y, count = 0, hit = 0, aoefocus = 0; // Added for AoE Stuff
-	//int co, co_orig = -1, m;
-
-	//if ((co = ch[cn].skill_target1)) { ; }
-	//else if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	//else { co = cn; }
-
-	//cost = SP_COST_SLOW;
-	//if (get_tarot(cn, IT_CH_EMPEROR)) { cost *= (4/3); d20 -=1; }
-	//if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_HEXAREA)) / PROXIMITY_MULTI;
-	//power = get_skill_score(cn, SK_SLOW);
-	
-	if (cn==co && (!ch[cn].skill[SK_HEXAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
+	// If we have a valid target, cast Slow on them
+	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
-		do_char_log(cn, 0, "You cannot slow yourself!\n");
-		return;
-	}
-	else if ((co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION]) && (!ch[cn].skill[SK_HEXAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
-	{ 
-		do_char_log(cn, 0, "You stop yourself from slowing your companion. That would be silly.\n");
-		return;
-	}
-	else if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
-	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return;
-		}
-		
-		/* CS, 000209: Remember PvP attacks */
-		remember_pvp(cn, co);
-		
-		if (is_exhausted(cn)) 					{ return; }
-		if (spellcost(cn, cost, SK_SLOW, 1)) 	{ if (flag) add_exhaust(cn,TICKS*4); return; }
-		
-		if (!may_attack_msg(cn, co, 1))
-		{
-			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
-			return;
-		}
-		
-		damage_mshell(co);
-		if (chance_base(cn, power, d20, get_target_resistance(co)))
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-			{
-				if (!(ch[co].flags & CF_SENSE))
-					do_char_log(co, 0, "%s tried to cast slow on you but failed.\n", ch[cn].reference);
-				if (!IS_IGNORING_SPELLS(co))
-				{
-					do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-			}
-			if (ch[cn].kindred&KIN_MONSTER) add_exhaust(cn,TICKS*2);
-			if (flag) add_exhaust(cn,TICKS*4);
-			return;
-		}
-		
 		spell_slow(cn, co, power, 0);
 		
 		co_orig = co;
 		count++;
 		hit++;
-		
-		if (ch[co].flags & CF_IMMORTAL)
-		{
-			do_char_log(cn, 0, "You lost your focus.\n");
-			if (flag) add_exhaust(cn,TICKS*4);
-			return;
-		}
 	}
-
-	// Feb 2020 - AoE Slows
+	
+	// Cast AoE or general surround-hit
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (co) co_orig = co;
+		if (!cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit))
+			return;
 		
-		spellaoe = get_skill_score(cn, SK_HEXAREA)/PROXIMITY_CAP; //get_spell_aoe(get_skill_score(cn, SK_HEXAREA));
-		
-		xf = max(1, ch[cn].x - spellaoe);
-		yf = max(1, ch[cn].y - spellaoe);
-		xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
-		yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
-		
-		// Loop through and count the number of targets first
-		for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co && co_orig!=co) 
-		{ 
-			if (!do_surround_check(cn, co, 0)) continue;
-			count++; 
-		}
-		if (!count)
-		{ 
-			if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
-			{ do_char_log(cn, 0, "You stop yourself from slowing your companion. That would be silly.\n"); return; }
-			else
-			{ do_char_log(cn, 0, "You cannot slow yourself!\n"); return; }
-		}
-		if (!hit)
-		{
-			if (is_exhausted(cn)) 					return;
-			if (spellcost(cn, cost, SK_SLOW, 1))	{ if (flag) add_exhaust(cn,TICKS*4); return; }
-			if (chance(cn, FIVE_PERC_FAIL))			{ if (flag) add_exhaust(cn,TICKS*4); return; }
-		}
-		// Then loop through and apply the effect based off the number of targets
-		for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	if ((co = map[x + y * MAPX].ch))
-		if (cn!=co && co_orig!=co)
-		{
-			remember_pvp(cn, co);
-			if (!do_surround_check(cn, co, 1)) continue;
-			damage_mshell(co);
-			if (power+2+RANDOM(max(1,24-max(4,count/2))) > get_target_resistance(co)+RANDOM(max(1,12+max(4,count/2))))
-			{
-				spell_slow(cn, co, power, 1);
-				hit++;
-			}
-			else
-			{
-				if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-				{
-					if (!(ch[co].flags & CF_SENSE))
-						do_char_log(co, 0, "%s tried to include you in a mass-slow but failed.\n", ch[cn].reference);
-					if (!IS_IGNORING_SPELLS(co))
-						do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-				else
-					do_char_log(co, 0, "You feel a chilling power emanate from somewhere.\n");
-			}
-		}
-		do_char_log(cn, 1, "You unleash a powerful mass-slow.\n");
-		do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
-		m = ch[cn].x + ch[cn].y * MAPX;
-		if ((co = map[m + 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_slow(cn, co, power, 0);
-		}
-		if ((co = map[m - 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_slow(cn, co, power, 0);
-		}
-		if ((co = map[m + MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_slow(cn, co, power, 0);
-		}
-		if ((co = map[m - MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(16)) spell_slow(cn, co, power, 0);
-		}
+		surround_cast(cn, co_orig, SK_SLOW, power);
 	}
-
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	if (flag)
+	
+	// Book - Shiva's Malice :: Cast Slow after casting Curse
+	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+	{
 		add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
+	}
 	else
+	{
 		add_exhaust(cn, SK_EXH_SLOW);
+	}
 }
 
 // Feb 2020 - Poison
