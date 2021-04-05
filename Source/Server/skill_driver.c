@@ -22,7 +22,9 @@ char *at_name[5] = {
 };
 
 struct s_splog splog[60] = {
-	{ 
+	{
+		0, 				"Exhaust", 		"exhaust", 		"exhausting"
+	},{ 
 		SK_MSHIELD,		"Magic Shield",	"magic shield",	"magic shielding",
 		"Magic Shield active!",
 		"'s Magic Shield activated.",
@@ -79,10 +81,13 @@ struct s_splog splog[60] = {
 		"",
 		""
 	},{ 
-		SK_BLAST, 		"Exhaust",		"exhaust",		"exhausting",
+		SK_BLAST, 		"Blast",		"blast",		"blasting",
 		"",
 		"",
-		""
+		"",
+		"You unleash a destructive shockwave.",
+		"You feel a tingling shockwave from somewhere.",
+		" tried to include you in a mass-blast but failed."
 	},{ 
 		SK_DISPEL, 		"Dispel",		"dispel",		"dispelling",
 		"",
@@ -147,9 +152,9 @@ struct s_splog splog[60] = {
 		""
 	},{ 
 		SK_SCORCH, 		"Scorch",		"scorch",		"scorching",
-		"",
-		"",
-		""
+		"You have been scorched.",
+		" was scorched.",
+		" scorched you."
 	},{ 
 		SK_CURSE2, 		"Greater Curse",	"greater curse",	"cursing",
 		"You have been badly cursed.",
@@ -260,6 +265,12 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
+	if (ch[co].flags & CF_STONED)
+	{
+		do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+		return 0;
+	}
+	
 	if (!buff)
 	{
 		remember_pvp(cn, co);
@@ -270,7 +281,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0; 
 	}
 	
-	if (spellcost(cn, cost, in, 1))
+	if (spellcost(cn, cost, in, usemana))
 	{
 		return 0; 
 	}
@@ -311,7 +322,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 		if (!buff && (ch[cn].kindred & KIN_MONSTER))
 		{
-			add_exhaust(cn, TICKS * 2);
+			add_exhaust(cn, TICKS * 4);
 		}
 		// Book: Shiva's Malice :: Curse tries Slow afterward
 		if (in==SK_CURSE && it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
@@ -330,10 +341,10 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	return co;
 }
 
-int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit)
+int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg)
 {
-	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower;
-	int no_target = 0;
+	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm;
+	int no_target = 0, scorch = 0;
 	
 	if (co)
 	{
@@ -363,7 +374,9 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		{
 			continue;
 		}
-		count++; 
+		damage_mshell(co);
+		aoeimm += get_target_immunity(co);
+		count++;
 	}
 	if (!count && !no_target)
 	{ 
@@ -380,6 +393,33 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			return 0;
 		}
 	}
+	
+	aoeimm /= max(1,count);
+	
+	if (intemp==SK_BLAST)
+	{
+		hitpower = spell_immunity(power, aoeimm) * 2;
+		hitpower = hitpower/2 + hitpower/4;
+		cost = ((power * 2) / 8 + 5) * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+		
+		// Harakim costs less, monster cost more mana
+		if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)))
+		{
+			cost = cost/3;
+		}
+		else if (!(ch[cn].flags & CF_PLAYER)) 
+		{
+			cost = cost*2;
+		}
+		
+		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
+		if (get_tarot(cn, IT_CH_JUDGE))
+		{
+			hitpower = hitpower * 85/100;
+			scorch = 1;
+		}
+	}
+	
 	if (!hit && !no_target)
 	{
 		if (is_exhausted(cn)) return 0;
@@ -416,6 +456,30 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		else if (!do_surround_check(cn, co, 1)) 
 		{
 			continue;
+		}
+		else if (intemp==SK_BLAST)
+		{
+			chlog(cn, "Cast Blast on %s", ch[co].name);
+			
+			tmp = do_hurt(cn, co, hitpower, 1);
+			
+			if (tmp>0)
+			{
+				do_char_log(co, 1, 
+				"%s blasted you for %d HP.\n", ch[cn].name, tmp);
+			}
+			
+			char_play_sound(co, ch[cn].sound + 6, -150, 0);
+			do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
+			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+
+			if (scorch)
+			{
+				spell_scorch(cn, co, (power/2 + power/4), 0);
+			}
+			
+			avgdmg += tmp;
+			hit++;
 		}
 		else if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20))
 		{
@@ -457,10 +521,20 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			}
 		}
 		remember_pvp(cn, co);
-		damage_mshell(co);
 	}
 	do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
-	do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+	if (intemp==SK_BLAST)
+	{
+		do_char_log(cn, 1, 
+		"You hit %d of %d creatures in range.\n", hit, count);
+		do_char_log(cn, 1, 
+		"You delt an average of %d damage.\n", avgdmg/max(1,hit));
+	}
+	else
+	{
+		do_char_log(cn, 1, 
+		"You affected %d of %d creatures in range.\n", hit, count);
+	}
 	
 	return 1;
 }
@@ -497,6 +571,40 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 						break;
 					case SK_POISON:
 						spell_poison(cn, co, hitpower, 0);
+						break;
+					case SK_BLAST:
+						int scorch = 0;
+						
+						hitpower = spell_immunity(power, get_target_immunity(co)) * 2;
+						hitpower = hitpower/2 + hitpower/4;
+						
+						// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
+						if (get_tarot(cn, IT_CH_JUDGE))
+						{
+							dam = dam * 85/100;
+							scorch = 1;
+						}
+						
+						chlog(cn, "Cast Blast on %s", ch[co].name);
+						tmp = do_hurt(cn, co, dam, 1);
+						if (tmp<1)	
+						{
+							do_char_log(cn, 0, 
+							"You cannot penetrate %s's armor.\n", ch[co].reference);
+						}
+						else
+						{
+							do_char_log(cn, 1, 
+							"You blast %s for %d HP.\n", ch[co].reference, tmp);
+							do_char_log(co, 1, 
+							"%s blasted you for %d HP.\n", ch[cn].name, tmp);
+						}
+						fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+						
+						if (scorch)
+						{
+							spell_scorch(cn, co, power, 0);
+						}
 						break;
 					default:
 						break;
@@ -1043,8 +1151,8 @@ void add_exhaust(int cn, int len)
 	bu[in].flags 	|= IF_SPELL;
 	bu[in].sprite[1] = BUF_SPR_EXHAUST;
 	bu[in].duration  = bu[in].active = len;
-	bu[in].temp  	 = SK_BLAST;
-	bu[in].power 	 = 255;
+	bu[in].temp  	 = 0;
+	bu[in].power 	 = 300;
 	
 	add_spell(cn, in);
 }
@@ -1124,7 +1232,7 @@ int has_spell_from_item(int cn, int temp)
 	return 0;
 }
 
-// debuff: 1 for normal debuff, 2 for AoE debuff (to remove interference spam)
+// debuff: 1 for normal debuff, 2 to remove interference messages
 int cast_a_spell(int cn, int co, int in, int debuff)
 {
 	int temp, arealog = 0;
@@ -1659,7 +1767,7 @@ void skill_curse(int cn)
 	// Cast AoE or general surround-hit
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (!cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit))
+		if (!cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit, 0))
 			return;
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
@@ -1745,7 +1853,7 @@ void skill_slow(int cn, int flag)
 	// Cast AoE or general surround-hit
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (!cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit))
+		if (!cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit, 0))
 			return;
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
@@ -1837,7 +1945,7 @@ void skill_poison(int cn)
 	// Cast AoE or general surround-hit
 	if ((ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (!cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit))
+		if (!cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit, 0))
 			return;
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
@@ -1898,7 +2006,7 @@ void skill_warcry(cn)
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, SP_COST_WARCRY, SK_WARCRY, 0)) { return; }
 	
-	if (!cast_aoe_spell(cn, 0, SK_WARCRY, power, aoe_power, 0, 0, 0))
+	if (!cast_aoe_spell(cn, 0, SK_WARCRY, power, aoe_power, 0, 0, 0, 0))
 		return;
 	
 	add_exhaust(cn, SK_EXH_WARCRY + TICKS * power/80);
@@ -1918,26 +2026,30 @@ void item_info(int cn, int in, int look)
 		{
 			continue;
 		}
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
-		            at_name[n], it[in].attrib[n][0], it[in].attrib[n][1], it[in].attrib[n][2]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d %3d\n",
+		at_name[n], it[in].attrib[n][0], it[in].attrib[n][1], it[in].attrib[n][2]);
 	}
 
 	if (it[in].hp[0] || it[in].hp[1] || it[in].hp[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
-		            "Hitpoints", it[in].hp[0], it[in].hp[1], it[in].hp[2]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d %3d\n",
+		"Hitpoints", it[in].hp[0], it[in].hp[1], it[in].hp[2]);
 	}
 
 	if (it[in].end[0] || it[in].end[1] || it[in].end[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
-		            "Endurance", it[in].end[0], it[in].end[1], it[in].end[2]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d %3d\n",
+		"Endurance", it[in].end[0], it[in].end[1], it[in].end[2]);
 	}
 
 	if (it[in].mana[0] || it[in].mana[1] || it[in].mana[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
-		            "Mana", it[in].mana[0], it[in].mana[1], it[in].mana[2]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d %3d\n",
+		"Mana", it[in].mana[0], it[in].mana[1], it[in].mana[2]);
 	}
 
 	for (n = 0; n<MAXSKILL; n++)
@@ -1946,36 +2058,42 @@ void item_info(int cn, int in, int look)
 		{
 			continue;
 		}
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
-		            skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1], it[in].skill[n][2]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d %3d\n",
+		skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1], it[in].skill[n][2]);
 	}
 
 	if (it[in].weapon[0] || it[in].weapon[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
-		            "Weapon", it[in].weapon[0], it[in].weapon[1]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Weapon", it[in].weapon[0], it[in].weapon[1]);
 	}
 	if (it[in].armor[0] || it[in].armor[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
-		            "Armor", it[in].armor[0], it[in].armor[1]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Armor", it[in].armor[0], it[in].armor[1]);
 	}
 	if (it[in].light[0] || it[in].light[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
-		            "Light", it[in].light[0], it[in].light[1]);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Light", it[in].light[0], it[in].light[1]);
 	}
 
 	if (it[in].power)
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d",
-		            "Power", it[in].power);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d",
+		"Power", it[in].power);
 	}
 
 	if (it[in].min_rank)
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d",
-		            "Min. Rank", it[in].min_rank);
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d",
+		"Min. Rank", it[in].min_rank);
 	}
 }
 
@@ -1990,11 +2108,17 @@ void char_info(int cn, int co)
 		if ((in = ch[co].spell[n])!=0)
 		{
 			if (bu[in].cost && (ch[cn].flags & CF_GOD))
-				do_char_log(cn, 1, "%s for %dm %ds power of %d (%d)\n",
-							bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60, bu[in].power, bu[in].cost);
+			{
+				do_char_log(cn, 1, 
+				"%s for %dm %ds power of %d (%d)\n",
+				bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60, bu[in].power, bu[in].cost);
+			}
 			else
-				do_char_log(cn, 1, "%s for %dm %ds power of %d\n",
-							bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60, bu[in].power);
+			{
+				do_char_log(cn, 1, 
+				"%s for %dm %ds power of %d\n",
+				bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60, bu[in].power);
+			}
 			flag = 1;
 		}
 	}
@@ -2017,9 +2141,10 @@ void char_info(int cn, int co)
 
 		if (n1!=-1 && n2!=-1)
 		{
-			do_char_log(cn, 1, "%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
-			            skilltab[n1].name, ch[co].skill[n1][0], get_skill_score(co, n1),
-			            skilltab[n2].name, ch[co].skill[n2][0], get_skill_score(co, n2));
+			do_char_log(cn, 1, 
+			"%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
+			skilltab[n1].name, ch[co].skill[n1][0], get_skill_score(co, n1),
+			skilltab[n2].name, ch[co].skill[n2][0], get_skill_score(co, n2));
 			n1 = -1;
 			n2 = -1;
 		}
@@ -2027,18 +2152,22 @@ void char_info(int cn, int co)
 
 	if (n1!=-1)
 	{
-		do_char_log(cn, 1, "%-12.12s %3d/%3d\n",
-		            skilltab[n1].name, ch[co].skill[n1][0], get_skill_score(co, n1));
+		do_char_log(cn, 1, 
+		"%-12.12s %3d/%3d\n",
+		skilltab[n1].name, ch[co].skill[n1][0], get_skill_score(co, n1));
 	}
 
-	do_char_log(cn, 1, "%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
-	            at_name[AT_BRV], ch[co].attrib[AT_BRV][0], get_attrib_score(co, AT_BRV),
-	            at_name[AT_WIL], ch[co].attrib[AT_WIL][0], get_attrib_score(co, AT_WIL));
-	do_char_log(cn, 1, "%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
-	            at_name[AT_INT], ch[co].attrib[AT_INT][0], get_attrib_score(co, AT_INT),
-	            at_name[AT_AGL], ch[co].attrib[AT_AGL][0], get_attrib_score(co, AT_AGL));
-	do_char_log(cn, 1, "%-12.12s %3d/%3d\n",
-	            at_name[AT_STR], ch[co].attrib[AT_STR][0], get_attrib_score(co, AT_STR));
+	do_char_log(cn, 1, 
+	"%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
+	at_name[AT_BRV], ch[co].attrib[AT_BRV][0], get_attrib_score(co, AT_BRV),
+	at_name[AT_WIL], ch[co].attrib[AT_WIL][0], get_attrib_score(co, AT_WIL));
+	do_char_log(cn, 1, 
+	"%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
+	at_name[AT_INT], ch[co].attrib[AT_INT][0], get_attrib_score(co, AT_INT),
+	at_name[AT_AGL], ch[co].attrib[AT_AGL][0], get_attrib_score(co, AT_AGL));
+	do_char_log(cn, 1, 
+	"%-12.12s %3d/%3d\n",
+	at_name[AT_STR], ch[co].attrib[AT_STR][0], get_attrib_score(co, AT_STR));
 
 	do_char_log(cn, 1, " \n");
 }
@@ -2106,314 +2235,118 @@ void skill_identify(int cn)
 
 int spell_scorch(int cn, int co, int power, int flag)
 {
-	int in, n, tmp;
-
+	int in, tmp;
+	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_scorch");
-		return( 0);
-	}
-
-	power = spell_race_mod(spell_immunity(power, get_target_immunity(co)), cn);
+	
+	power = spell_immunity(power, get_target_immunity(co));
+	power = spell_race_mod(power, cn);
 	
 	if (flag)	tmp = 10;
 	else		tmp = 30;
 	
-	strcpy(bu[in].name, "Scorch");
-	bu[in].flags |= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_SCORCH;
-	bu[in].duration  = bu[in].active = SP_DUR_SCORCH(tmp);
-	bu[in].temp  = SK_SCORCH;
-	bu[in].power = power;
-
-	add_spell(co, in);
+	if (!(in = make_new_buff(cn, SK_SCORCH, BUF_SPR_SCORCH, power, SP_DUR_SCORCH(tmp), 0)))
+		return 0;
 	
-	chlog(cn, "Inflicted Scorch on %s", ch[co].name);
-	if (flag)	do_char_log(co, 0, "You have been scorched.\n");
-	else		do_char_log(co, 0, "You were scorched by the blast!\n");
-	
-	if (flag)
-	{
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -150, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		chlog(cn, "Cast Scorch on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-	}
-
-	return 1;
+	return cast_a_spell(cn, co, in, 1+flag);
 }
 void skill_blast(int cn)
 {
-	int n, spellaoe, xf, yf, xt, yt, x, y, count = 0, hit = 0, avgdmg = 0, aoefocus = 0, aoeimm = 0; // Added for AoE Stuff
-	int co, dam, m, co_orig = -1, tmp, base_power, power, cost;
-	int scorch = 0;
-
-	if ((co = ch[cn].skill_target1)) { ; }
-	else if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	else { co = cn; }
-
-	base_power = get_skill_score(cn, SK_BLAST);
+	int power, aoe_power, cost;
+	int count = 0, hit = 0;
+	int co, co_orig = -1;
+	int dam, scorch = 0, avgdmg = 0;
 	
-	if (cn==co && (!ch[cn].skill[SK_DAMAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
-	{ 
-		do_char_log(cn, 0, "You cannot blast yourself!\n"); 
-		return; 
-	}
-	else if ((co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION]) && (!ch[cn].skill[SK_DAMAREA][0] || (ch[cn].flags & CF_AREA_OFF)))
-	{ 
-		do_char_log(cn, 0, "You stop yourself from blasting your companion. That would be silly.\n");
-		return;
-	}
-	else if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	power = get_skill_score(cn, SK_BLAST);
+	power = spell_race_mod(power, cn);
+	
+	aoe_power = get_skill_score(cn, SK_DAMAREA);
+	
+	cost = (power * 2) / 8 + 5;
+	
+	// Dam Area increases spell cost
+	if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (!do_char_can_see(cn, co))
-			{ do_char_log(cn, 0, "You cannot see your target.\n"); return; }
-		if (ch[co].flags & CF_STONED)
-			{ do_char_log(cn, 0, "Your target is lagging. Try again later.\n"); return; }
+		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+	}
+	
+	// Harakim costs less, Sorc costs slightly less, monster cost more mana
+	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)))
+	{
+		cost = cost/3;
+	}
+	else if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_SORCERER))
+	{
+		cost = (cost/3)*2;
+	}
+	else if (!(ch[cn].flags & CF_PLAYER)) 
+	{
+		cost = cost*2;
+	}
+	
+	// Get spell target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLAST, 1, power, 0)))
+		return;
+	
+	// If we have a valid target, cast Poison on them
+	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	{
+		chlog(cn, "Cast Blast on %s", ch[co].name);
 		
-		/* CS, 000209: Remember PvP attacks */
-		remember_pvp(cn, co);
-		
-		power = spell_race_mod(spell_immunity(base_power, get_target_immunity(co)), cn);
 		dam = power * 2;
-		cost = dam / 8 + 5;
-		if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF)) cost = cost * (PROXIMITY_MULTI+get_skill_score(cn, SK_DAMAREA)) / PROXIMITY_MULTI;
 		
-		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
+		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorch
 		if (get_tarot(cn, IT_CH_JUDGE))
 		{
 			dam = dam * 85/100;
 			scorch = 1;
 		}
 		
-		// Harakim costs less, Sorc costs slightly less, monster cost more mana
-		if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)))
-			cost = cost/3;
-		if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_SORCERER))
-			cost = (cost/3)*2;
-		if (!(ch[cn].flags & CF_PLAYER)) 
-			cost = cost*2;
-		//
-		
-		if (is_exhausted(cn)) 					{ return; }
-		if (spellcost(cn, cost, SK_BLAST, 1)) 	{ return; }
-
-		if (!may_attack_msg(cn, co, 1))
-			{ chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co); return; }
-		
-		damage_mshell(co);
-		
-		if (chance(cn, FIVE_PERC_FAIL))
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>get_skill_score(cn, SK_BLAST) + 5)
-			{
-				if (!(ch[co].flags & CF_SENSE))
-					do_char_log(co, 0, "%s tried to cast blast on you but failed.\n", ch[cn].reference);
-				if (!IS_IGNORING_SPELLS(co))
-				{
-					do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-			}
-			if (ch[cn].kindred&KIN_MONSTER) add_exhaust(cn,TICKS*3);
-			return;
-		}
-		//
-		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-		char_play_sound(co, ch[cn].sound + 6, -150, 0);
-		chlog(cn, "Cast Blast on %s", ch[co].name);
-		//
 		tmp = do_hurt(cn, co, dam, 1);
-		if (tmp<1)	do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+		
+		if (tmp<1)
+		{
+			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+		}
 		else
 		{
 			do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
 			do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
 		}
-		//
+		
+		char_play_sound(co, ch[cn].sound + 6, -150, 0);
+		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
 		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 
-		if (scorch) spell_scorch(cn, co, power, 0);
-
+		if (scorch)
+		{
+			spell_scorch(cn, co, power, 0);
+		}
+		
+		avgdmg += tmp;
 		co_orig = co;
-		avgdmg+=tmp;
 		count++;
 		hit++;
 	}
-
+	
+	// Cast AoE or general surround-hit
 	if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		if (co) co_orig = co;
+		if (!cast_aoe_spell(cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg))
+			return;
 		
-		spellaoe = get_skill_score(cn, SK_DAMAREA)/PROXIMITY_CAP; //get_spell_aoe(get_skill_score(cn, SK_DAMAREA));
-		
-		xf = max(1, ch[cn].x - spellaoe);
-		yf = max(1, ch[cn].y - spellaoe);
-		xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
-		yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
-		
-		// Loop through and count the number of targets first
-		for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co && co_orig!=co) 
-		{ 
-			if (!do_surround_check(cn, co, 0)) continue;
-			damage_mshell(co);
-			count++; aoeimm += get_target_immunity(co); 
-		}
-		if (!count)
-		{ 
-			if (co_orig==ch[cn].data[CHD_SHADOWCOPY] || co_orig==ch[cn].data[CHD_COMPANION])
-			{ do_char_log(cn, 0, "You stop yourself from blasting your companion. That would be silly.\n"); return; }
-			else
-			{ do_char_log(cn, 0, "You cannot blast yourself!\n"); return; }
-		}
-		
-		aoeimm /= count;
-		power = spell_race_mod(spell_immunity(get_skill_score(cn, SK_BLAST), aoeimm), cn);
-		dam = power * 2;
-		cost = (dam / 8 + 5) * (PROXIMITY_MULTI+get_skill_score(cn, SK_DAMAREA)) / PROXIMITY_MULTI;
-		//dam = dam/(min(1,count)+1)+dam/(min(1,count)/(min(1,count)/2));
-		dam = dam/2 + dam/max(4, count/2-(get_skill_score(cn, SK_DAMAREA)/40));
-		
-		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
-		if (get_tarot(cn, IT_CH_JUDGE))
-		{
-			dam = dam * 85/100;
-			scorch = 1;
-		}
-		
-		// Harakim costs less mana, monster cost more mana
-		if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM)))
-			cost /= 3;
-		if (!(ch[cn].flags & CF_PLAYER)) 
-			cost *= 2;
-		//
-		if (!hit)
-		{
-			if (is_exhausted(cn)) 					{ return; }
-			if (spellcost(cn, cost, SK_BLAST, 1)) 	{ return; }
-			aoefocus = chance(cn, FIVE_PERC_FAIL);
-		}
-		
-		// Loop through and apply the effect based off the number of targets
-		for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	if ((co = map[x + y * MAPX].ch)) if (cn!=co && co_orig!=co)
-		{
-			remember_pvp(cn, co);
-			if (!do_surround_check(cn, co, 1)) continue;
-			if (aoefocus)
-			{
-				if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-				{
-					if (!(ch[co].flags & CF_SENSE))
-						do_char_log(co, 0, "%s tried to include you in a mass-blast but failed.\n", ch[cn].reference);
-					if (!IS_IGNORING_SPELLS(co))
-						do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-				}
-				else
-					do_char_log(co, 0, "You feel a tingling shockwave from somewhere.\n");
-			}
-			else
-			{
-				do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-				char_play_sound(co, ch[cn].sound + 6, -150, 0);
-				chlog(cn, "Cast Blast on %s", ch[co].name);
-				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-				tmp = do_hurt(cn, co, dam, 1);
-				if (tmp>0) do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-				avgdmg+=tmp;
-				hit++;
-				if (scorch) spell_scorch(cn, co, power, 0);
-			}
-		}
-		if (aoefocus) return;
-		do_char_log(cn, 1, "You unleash a destructive shockwave.\n");
-		do_char_log(cn, 1, "You hit %d of %d creatures in range.\n", hit, count);
-		do_char_log(cn, 1, "You delt an average of %d damage.\n", avgdmg/max(1,hit));
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
-		dam = dam/2 + dam/4;
-		m = ch[cn].x + ch[cn].y * MAPX;
-		if ((co = map[m + 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			power = spell_race_mod(spell_immunity(base_power, get_target_immunity(co)), cn);
-			dam = (power * 2)*3/4; if (scorch) dam = dam * 85/100;
-			
-			damage_mshell(co);
-			chlog(cn, "Cast Blast on %s", ch[co].name);
-			tmp = do_hurt(cn, co, dam, 1);
-			if (tmp<1)	do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-			else
-			{
-				do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
-				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-			}
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-			if (scorch) spell_scorch(cn, co, power, 0);
-		}
-		if ((co = map[m - 1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			power = spell_race_mod(spell_immunity(base_power, get_target_immunity(co)), cn);
-			dam = (power * 2)*3/4; if (scorch) dam = dam * 85/100;
-			
-			damage_mshell(co);
-			chlog(cn, "Cast Blast on %s", ch[co].name);
-			tmp = do_hurt(cn, co, dam, 1);
-			if (tmp<1)	do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-			else
-			{
-				do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
-				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-			}
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-			if (scorch) spell_scorch(cn, co, power, 0);
-		}
-		if ((co = map[m + MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			power = spell_race_mod(spell_immunity(base_power, get_target_immunity(co)), cn);
-			dam = (power * 2)*3/4; if (scorch) dam = dam * 85/100;
-			
-			damage_mshell(co);
-			chlog(cn, "Cast Blast on %s", ch[co].name);
-			tmp = do_hurt(cn, co, dam, 1);
-			if (tmp<1)	do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-			else
-			{
-				do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
-				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-			}
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-			if (scorch) spell_scorch(cn, co, power, 0);
-		}
-		if ((co = map[m - MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
-		{
-			power = spell_race_mod(spell_immunity(base_power, get_target_immunity(co)), cn);
-			dam = (power * 2)*3/4; if (scorch) dam = dam * 85/100;
-			
-			damage_mshell(co);
-			chlog(cn, "Cast Blast on %s", ch[co].name);
-			tmp = do_hurt(cn, co, dam, 1);
-			if (tmp<1)	do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-			else
-			{
-				do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
-				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-			}
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-			if (scorch) spell_scorch(cn, co, power, 0);
-		}
+		surround_cast(cn, co_orig, SK_BLAST, power);
 	}
-	if (scorch) 
+	
+	if (get_tarot(cn, IT_CH_JUDGE))
 	{
 		do_char_log(cn, 1, "Your foes were scorched by your blast!\n");
 	}
-	
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	add_exhaust(cn, SK_EXH_BLAST);
 }
