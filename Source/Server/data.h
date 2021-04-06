@@ -587,10 +587,11 @@ __attribute__ ((packed));
 #define IF_GORN_UNI      (1ull<<43)     // unique check for Gorn 
 #define IF_WP_CLAW       (1ull<<44)     // is a weapon - claw/unarmed
 #define IF_BOOK          (1ull<<45)     // is a book
+#define IF_JEWELERY      (1ull<<46)     // is an accessory
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
-#define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK)
+#define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK|IF_JEWELERY)
 
 #define BUFFSIZE         (sizeof(struct item)*MAXBUFF)
 #define ITEMSIZE         (sizeof(struct item)*MAXITEM)
@@ -648,7 +649,7 @@ struct item
 	unsigned int active;            // 527
 
 	// map stuff
-	unsigned short int x, y;         // 531, current position        NOTE: x=0, y=0 = void
+	unsigned short int x, y;		// 531, current position        NOTE: x=0, y=0 = void
 	unsigned short carried;         // 533, carried by character carried
 	unsigned short sprite_override; // 535, used for potions/spells which change the character sprite
 
@@ -659,21 +660,23 @@ struct item
 
 	char min_rank;                  // minimum rank to wear the item
 	
-	char move_speed[2];				// 
-	char atk_speed[2];				// 
-	char cast_speed[2];				// 
+	char move_speed[2];				// movement speed bonus
+	char atk_speed[2];				// attack speed bonus
+	char cast_speed[2];				// Cast speed bonus
 	
-	char spell_mod[2];				// 
-	char spell_apt[2];				// 
-	char cool_bonus[2];				// 
+	char spell_mod[2];				// spell mod bonus
+	char spell_apt[2];				// spell aptitude bonus
+	char cool_bonus[2];				// cooldown bonus
 	
-	char crit_chance[2];			// 
-	char crit_multi[2];				// 
+	char crit_chance[2];			// Crit chance bonus
+	char crit_multi[2];				// Crit multiplier bonus
 	
-	char to_hit[2];					// 
-	char to_parry[2];				// 
+	char to_hit[2];					// Hit bonus
+	char to_parry[2];				// Parry bonus
 	
-	char future3[19];				// 587
+	unsigned char stack;			// Item stacking
+	
+	char future3[18];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
