@@ -3890,7 +3890,7 @@ int spell_scroll(int cn, int in)
 		ret = spell_haste(cn, co, power);
 		break;
 	case    SK_CURSE:
-		if (chance_base(cn, power, 10, get_target_resistance(co)))
+		if (chance_base(cn, SK_CURSE, 10, get_target_resistance(co), 1))
 		{
 			ret = 1;
 		}
@@ -3900,7 +3900,7 @@ int spell_scroll(int cn, int in)
 		}
 		break;
 	case    SK_SLOW:
-		if (chance_base(cn, power, 12, get_target_resistance(co)))
+		if (chance_base(cn, SK_SLOW, 12, get_target_resistance(co), 1))
 		{
 			ret = 1;
 		}

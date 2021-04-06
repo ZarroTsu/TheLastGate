@@ -111,10 +111,10 @@ struct s_splog splog[60] = {
 		"",
 		""
 	},{ 
-		SK_WEAKEN, 		"Weakness",		"weakness",		"weakening",
-		"",
-		"",
-		""
+		SK_WEAKEN, 		"Weakness",		"weaken",		"weakening",
+		"Your equipment feels heavy.",
+		" was weakened.",
+		" weakened you."
 	},{ 
 		SK_POISON, 		"Poison",		"poison",		"poisoning",
 		"You have been poisoned!",
@@ -146,22 +146,22 @@ struct s_splog splog[60] = {
 		"",
 		""
 	},{ 
-		SK_WEAKEN2, 	"Greater Weakness",	"greater weakness",	"weakening",
-		"",
-		"",
-		""
+		SK_WEAKEN2, 	"Greater Weakness",	"weaken",	"weakening",
+		"Your equipment feels very heavy.",
+		" was badly weakened.",
+		" badly weakened you."
 	},{ 
 		SK_SCORCH, 		"Scorch",		"scorch",		"scorching",
 		"You have been scorched.",
 		" was scorched.",
 		" scorched you."
 	},{ 
-		SK_CURSE2, 		"Greater Curse",	"greater curse",	"cursing",
+		SK_CURSE2, 		"Greater Curse",	"curse",	"cursing",
 		"You have been badly cursed.",
 		" was badly cursed.",
 		" cast greater curse on you."
 	},{ 
-		SK_SLOW2, 		"Greater Slow",		"greater slow",		"slowing",
+		SK_SLOW2, 		"Greater Slow",		"slow",		"slowing",
 		"You have been badly slowed.",
 		" was badly slowed.",
 		" cast greater slow on you."
@@ -232,7 +232,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	else if (!buff && (co = ch[cn].attack_cn)!=0) ;
 	else co = cn;
 	
-	if (in==SK_CLEAVE)
+	if (in==SK_CLEAVE || in==SK_WEAKEN)
 	{
 		need_combat = 1;
 	}
@@ -323,10 +323,11 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		co = cn;
 	}
 	
-	if (usemana && ((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
-		(d20 && chance_base(cn, power, d20, get_target_resistance(co)))))
+	if (in!=SK_CLEAVE && 
+		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
+		(d20 && chance_base(cn, in, d20, get_target_resistance(co), usemana))))
 	{
-		if (cn!=co && (get_skill_score(co, SK_SENSE) > power + 5))
+		if (usemana && cn!=co && (get_skill_score(co, SK_SENSE) > power + 5))
 		{
 			if (!(ch[co].flags & CF_SENSE))
 			{
@@ -338,6 +339,12 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			{
 				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 			}
+		}
+		else
+		{
+			do_char_log(co, 0, 
+			"%s tried to %s you but failed.\n", 
+				ch[cn].reference, splog[in].ref);
 		}
 		if (!buff && (ch[cn].kindred & KIN_MONSTER))
 		{
@@ -666,6 +673,8 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 					case SK_POISON:
 						spell_poison(cn, co, hitpower, 0);
 						break;
+					case SK_WEAKEN:
+						spell_weaken(cn, co, hitpower, 0);
 					default:
 						break;
 				}
@@ -888,11 +897,12 @@ int spellcost(int cn, int cost, int in, int usemana)
 	return 0;
 }
 
-int chance_base(int cn, int skill, int d20, int power)
+int chance_base(int cn, int skill, int d20, int defense, int usemana)
 {
-	int chance, roll, tmp;
-
-	chance = d20 * skill / max(1, power);
+	int chance, roll, tmp, power;
+	
+	power = get_skill_score(cn, skill);
+	chance = d20 * power / max(1, defense);
 
 	if (ch[cn].flags & (CF_PLAYER))
 	{
@@ -902,34 +912,47 @@ int chance_base(int cn, int skill, int d20, int power)
 		}
 	}
 	
-	roll = RANDOM(20); // Lower result is better.
+	// Lower result is better.
+	roll = RANDOM(20);
 	
-	if (ch[cn].flags & (CF_PLAYER)) // Players have small advantage
+	if (usemana)
 	{
-		tmp = RANDOM(20);
-		if (tmp < roll) roll = (tmp+roll)/2;
-	}
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_ADVA) // Book: Castor's Advantage
-	{
-		tmp = RANDOM(20);
-		if (tmp < roll) roll = tmp;
-	}
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV && (d20==10||d20==12)) // Book: Shiva's Malice
-	{
-		tmp = RANDOM(20);
-		if (tmp > roll) roll = tmp;
+		// Book - Castor's Advantage
+		if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_ADVA)
+		{
+			tmp = RANDOM(20);
+			if (tmp < roll) roll = tmp;
+		}
+		
+		// Book - Shiva's Malice
+		if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+		{
+			tmp = RANDOM(20);
+			if (tmp > roll) roll = tmp;
+		}
 	}
 
 	if (chance< 0) { chance =  0; }
 	if (chance>18) { chance = 18; }
 
-	if (roll>chance || power>skill + (skill / 2))
+	if (roll > chance || defense > power + (power / 2))
 	{
 		if (!(ch[cn].flags & (CF_PLAYER)))
 		{
-			add_exhaust(cn, TICKS * 4); // 4 second exhaust for NPCS to keep them from spam-failing
+			// 4 second exhaust for NPCS to keep them from spam-failing
+			add_exhaust(cn, TICKS * 4);
 		}
-		do_char_log(cn, 0, "Your spell fizzled!\n");
+		if (usemana)
+		{
+			do_char_log(cn, 0, 
+			"Your spell fizzled!\n");
+		}
+		else
+		{
+			do_char_log(cn, 0, 
+			"%s resisted your attempt to %s them.\n", 
+				ch[co].reference, splog[skill].ref);
+		}
 		return(-1);
 	}
 	return(0);
@@ -1309,7 +1332,12 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 	{
 		if (!add_spell(co, in))
 		{
-			if (debuff<2)
+			if (debuff<2 && (in==SK_WEAKEN || in==SK_WEAKEN2))
+			{
+				do_char_log(cn, 1, 
+				"Your opponent is already weakened!\n");
+			}
+			else if (debuff<2)
 			{
 				do_char_log(cn, 1, 
 				"Magical interference neutralized the %s's effect.\n", splog[temp].ref);
@@ -2269,7 +2297,7 @@ void skill_identify(int cn)
 		in = 0;
 	}
 
-	if (chance_base(cn, get_skill_score(cn, SK_IDENT), d20, power))
+	if (chance_base(cn, SK_IDENT, d20, power, 1))
 	{
 		return;
 	}
@@ -3381,198 +3409,55 @@ void skill_cleave(int cn)
 
 int spell_weaken(int cn, int co, int power, int flag)
 {
-	int in, n;
-
+	int in;
+	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_weaken");
-		return( 0);
-	}
 	
 	power = spell_immunity(power, get_target_immunity(co));
 	
-	// Tarot Card - Death :: Change Weaken into Weaken II
+	// Tarot Card - Death :: Change Weaken into Greater Weaken
 	if (get_tarot(cn, IT_CH_DEATH))
 	{
-		strcpy(bu[in].name, "Greater Weakness");
-		bu[in].flags |= IF_SPELL;
-		bu[in].armor[1]  = -(power / 6 + 2);
-		bu[in].sprite[1] = BUF_SPR_REND2;
-		bu[in].duration  = bu[in].active = SP_DUR_WEAKEN;
-		bu[in].temp  = SK_WEAKEN2;
-		bu[in].power = power;
-
-		if (!add_spell(co, in))
-		{
-			if (!flag)
-				do_char_log(cn, 1, "Your opponent is already badly weakened!\n");
+		if (!(in = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_WEAKEN, 0)))
 			return 0;
-		}
-		if (get_skill_score(co, SK_SENSE) + 10>power)
-			do_char_log(co, 1, "%s badly weakened you.\n", ch[cn].reference);
-		else
-			do_char_log(co, 0, "Your equipment feels very heavy.\n");
-		if (!flag)
-			do_char_log(cn, 1, "%s was badly weakened.\n", ch[co].name);
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -300, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -300, 0);
-		chlog(cn, "Used Greater Weaken on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		
+		bu[in].armor[1]  = -(power / 6 + 2);
 	}
 	else
 	{
-		strcpy(bu[in].name, "Weakness");
-		bu[in].flags |= IF_SPELL;
+		if (!(in = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0)))
+			return 0;
+		
 		bu[in].weapon[1]  = -(power / 8 + 2);
 		bu[in].armor[1]  = -(power / 8 + 2);
-		bu[in].sprite[1] = BUF_SPR_REND;
-		bu[in].duration  = bu[in].active = SP_DUR_WEAKEN;
-		bu[in].temp  = SK_WEAKEN;
-		bu[in].power = power;
-
-		if (!add_spell(co, in))
-		{
-			if (!flag)
-				do_char_log(cn, 1, "Your opponent is already weakened!\n");
-			return 0;
-		}
-		if (get_skill_score(co, SK_SENSE) + 10>power)
-			do_char_log(co, 1, "%s weakened you.\n", ch[cn].reference);
-		else
-			do_char_log(co, 0, "Your equipment feels heavy.\n");
-		if (!flag)
-			do_char_log(cn, 1, "%s was weakened.\n", ch[co].name);
-		if (!IS_IGNORING_SPELLS(co))
-			do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
-		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
-		char_play_sound(co, ch[cn].sound + 7, -300, 0);
-		char_play_sound(cn, ch[cn].sound + 1, -300, 0);
-		chlog(cn, "Used Weaken on %s", ch[co].name);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	}
-
-	return 1;
+	
+	return cast_a_spell(cn, co, in, 1+flag);
 }
 void skill_weaken(int cn)
 {
 	int d20 = 11;
-	int co, co_orig, m, power, defence, chance, roll, tmp;
-	int cost = SP_COST_WEAKEN;
-
-	if ((co = ch[cn].skill_target1)) { ; }
-	if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	else {
-		do_char_log(cn,0,"But you're not fighting anybody!\n");
+	int power, cost;
+	int co;
+	
+	power = get_skill_score(cn, SK_WEAKEN);
+	cost = SP_COST_WEAKEN;
+	
+	// Tarot Card - Death :: Change Weaken into Greater Weaken
+	if (get_tarot(cn, IT_CH_DEATH)) 
+	{ 
+		cost *= (4 / 3);
+		d20 -= 1;
+	}
+	
+	// Get spell target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_WEAKEN, 0, power, d20)))
 		return;
-	}
-
-	if (!is_facing(cn,co)) {
-		do_char_log(cn,0,"You must be facing your enemy!\n");
-		return;
-	}
 	
-	if (!do_char_can_see(cn, co))
-	{
-		do_char_log(cn, 0, "You cannot see your target.\n");
-		return;
-	}
+	spell_weaken(cn, co, power, 0);
 	
-	if (ch[co].flags&CF_STONED) {
-		do_char_log(cn,0,"Your target is lagging. Try again later.\n");
-		return;
-	}
-
-	if (!may_attack_msg(cn,co,1)) {
-		chlog(cn,"Prevented from attacking %s (%d)",ch[co].name,co);
-		return;
-	}
-
-	/* CS, 000209: Remember PvP attacks */
-	remember_pvp(cn,co);
-	if (is_exhausted(cn)) return;
-	if (get_tarot(cn, IT_CH_DEATH)) cost *= (3/2);
-	if (spellcost(cn, cost, SK_WEAKEN, 0)) return;
-	
-	power 	= get_skill_score(cn, SK_WEAKEN);
-	defence = get_target_resistance(co);
-	chance 	= d20 * power / max(1, defence);
-	if (ch[cn].flags & (CF_PLAYER))
-	{
-		if (ch[cn].luck<0)
-		{
-			chance += ch[cn].luck / 500 - 1;
-		}
-	}
-	
-	if (chance< 0) chance= 0;
-	if (chance>18) chance=18;
-	
-	roll = RANDOM(20);
-	
-	if (ch[cn].flags & (CF_PLAYER)) // Players have small advantage
-	{
-		tmp = RANDOM(20);
-		if (tmp < roll) roll = (tmp+roll)/2;
-	}
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_ADVA) // Book: Castor's Advantage
-	{
-		tmp = RANDOM(20);
-		if (tmp < roll) roll = tmp;
-	}
-	
-	damage_mshell(co);
-	
-	if (roll>chance || defence>power + (power / 2))
-	{
-		do_char_log(co, 0, "%s tried to weaken you but failed.\n", ch[cn].reference);
-		do_char_log(cn, 0, "%s resisted your attempt to weaken them.\n", ch[co].reference);
-		if (!(ch[cn].flags & (CF_PLAYER)))
-		{
-			add_exhaust(cn, TICKS * 4); // 4 second exhaust for NPCS to keep them from spam-failing
-		}
-		return;
-	}
-
-	if (ch[co].flags&CF_IMMORTAL) {
-			do_char_log(cn,0,"Your attempt to weaken an immortal has failed.\n");
-			return;
-	}
-
-	spell_weaken(cn, co, get_skill_score(cn, SK_WEAKEN), 0);
-
-	co_orig=co;
-	m=ch[cn].x+ch[cn].y*MAPX;
-	if ((co=map[m+1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) 
-	{
-		damage_mshell(co);
-		if (power+RANDOM(20)>get_target_resistance(co)+RANDOM(16)) 
-			spell_weaken(cn,co,power, 0);
-	}
-	if ((co=map[m-1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) 
-	{
-		damage_mshell(co);
-		if (power+RANDOM(20)>get_target_resistance(co)+RANDOM(16)) 
-			spell_weaken(cn,co,power, 0);
-	}
-	if ((co=map[m+MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) 
-	{
-		damage_mshell(co);
-		if (power+RANDOM(20)>get_target_resistance(co)+RANDOM(16)) 
-			spell_weaken(cn,co,power, 0);
-	}
-	if ((co=map[m-MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) 
-	{
-		damage_mshell(co);
-		if (power+RANDOM(20)>get_target_resistance(co)+RANDOM(16)) 
-			spell_weaken(cn,co,power, 0);
-	}
+	surround_cast(cn, co, SK_WEAKEN, power);
 	
 	add_exhaust(cn, SK_EXH_WEAKEN);
 }
