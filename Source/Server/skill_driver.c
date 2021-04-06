@@ -282,16 +282,13 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	if (!buff)
 	{
-		// AoE Spells immediately stop processing - everything else is handled by aoe cast
-		if (( in==SK_CURSE || in==SK_SLOW || in==SK_POISON ) &&
-			ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+		// AoE spells forgo failing since there may be targets handled by cast_aoe_spell
+		// The spell cost is set to zero and will be spent in cast_aoe_spell
+		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && 
+			(((in==SK_CURSE || in==SK_SLOW || in==SK_POISON) && ch[cn].skill[SK_HEXAREA][0]) ||
+			((in==SK_POISON || in==SK_BLAST) && ch[cn].skill[SK_DAMAREA][0])))
 		{
-			return co;
-		}
-		else if (( in==SK_POISON || in==SK_BLAST ) &&
-			ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
-		{
-			return co;
+			cost = 0;
 		}
 		else if (cn==co)
 		{
@@ -315,27 +312,30 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 	}
 	
-	if (need_combat && !is_facing(cn,co))
+	if (cn!=co)
 	{
-		do_char_log(cn, 0, "You must be facing your enemy!\n");
-		return 0;
-	}
-	
-	if (!do_char_can_see(cn, co))
-	{
-		do_char_log(cn, 0, "You cannot see your target.\n");
-		return 0;
-	}
-	
-	if (!buff && (ch[co].flags & CF_STONED))
-	{
-		do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
-		return 0;
-	}
-	
-	if (!buff)
-	{
-		remember_pvp(cn, co);
+		if (need_combat && !is_facing(cn,co))
+		{
+			do_char_log(cn, 0, "You must be facing your enemy!\n");
+			return 0;
+		}
+		
+		if (!do_char_can_see(cn, co))
+		{
+			do_char_log(cn, 0, "You cannot see your target.\n");
+			return 0;
+		}
+		
+		if (!buff && (ch[co].flags & CF_STONED))
+		{
+			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+			return 0;
+		}
+		
+		if (!buff)
+		{
+			remember_pvp(cn, co);
+		}
 	}
 	
 	if (is_exhausted(cn))
@@ -348,22 +348,25 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0; 
 	}
 	
-	if (!buff)
+	if (cn!=co)
 	{
-		if (co!=cn && !may_attack_msg(cn, co, 1))
+		if (!buff)
 		{
-			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
-			return 0;
+			if (!may_attack_msg(cn, co, 1))
+			{
+				chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
+				return 0;
+			}
+			damage_mshell(co);
 		}
-		damage_mshell(co);
-	}
-	
-	if (redir && !player_or_ghost(cn, co))
-	{
-		do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", 
-			ch[co].name, ch[cn].name);
 		
-		co = cn;
+		if (redir && !player_or_ghost(cn, co))
+		{
+			do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", 
+				ch[co].name, ch[cn].name);
+			
+			co = cn;
+		}
 	}
 	
 	if (in!=SK_CLEAVE && 
@@ -383,7 +386,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 			}
 		}
-		else if (!buff)
+		else if (!buff && cn!=co)
 		{
 			do_char_log(co, 0, 
 			"%s tried to %s you but failed.\n", 
@@ -401,7 +404,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
-	if (!need_combat && !buff && (ch[co].flags & CF_IMMORTAL))
+	if (cn!=co && !need_combat && !buff && (ch[co].flags & CF_IMMORTAL))
 	{
 		do_char_log(cn, 0, "You lost your focus.\n");
 		return 0;
@@ -413,7 +416,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg)
 {
 	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm = 0, tmp = 0;
-	int no_target = 0, scorch = 0;
+	int no_target = 0, scorch = 0, usemana = 1;
 	
 	if (co)
 	{
@@ -489,12 +492,8 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		}
 	}
 	
-	if (!hit && !no_target)
-	{
-		if (is_exhausted(cn)) return 0;
-		if (spellcost(cn, cost, intemp, 1)) return 0;
-		if (chance(cn, FIVE_PERC_FAIL)) return 0;
-	}
+	if (!hit && !no_target && spellcost(cn, cost, intemp, usemana))
+		return 0;
 	
 	// Then loop through and apply the effect based off the number of targets
 	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	
@@ -1898,28 +1897,6 @@ void skill_curse(int cn)
 	// If we have a valid target, cast Curse on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return 0;
-		}
-		
-		if (ch[co].flags & CF_STONED)
-		{
-			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
-			return 0;
-		}
-		
-		if (is_exhausted(cn))
-		{ 
-			return 0; 
-		}
-		
-		if (spellcost(cn, cost, SK_CURSE, 1))
-		{
-			return 0; 
-		}
-		
 		spell_curse(cn, co, power, 0);
 		
 		co_orig = co;
@@ -2006,28 +1983,6 @@ void skill_slow(int cn, int flag)
 	// If we have a valid target, cast Slow on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return 0;
-		}
-		
-		if (ch[co].flags & CF_STONED)
-		{
-			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
-			return 0;
-		}
-		
-		if (is_exhausted(cn))
-		{ 
-			return 0; 
-		}
-		
-		if (spellcost(cn, cost, SK_SLOW, 1))
-		{
-			return 0; 
-		}
-		
 		spell_slow(cn, co, power, 0);
 		
 		co_orig = co;
@@ -2120,28 +2075,6 @@ void skill_poison(int cn)
 	// If we have a valid target, cast Poison on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return 0;
-		}
-		
-		if (ch[co].flags & CF_STONED)
-		{
-			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
-			return 0;
-		}
-		
-		if (is_exhausted(cn))
-		{ 
-			return 0; 
-		}
-		
-		if (spellcost(cn, cost, SK_POISON, 1))
-		{
-			return 0; 
-		}
-		
 		spell_poison(cn, co, power, 0);
 		
 		co_orig = co;
@@ -2499,28 +2432,6 @@ void skill_blast(int cn)
 	// If we have a valid target, cast Blast on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
-		if (!do_char_can_see(cn, co))
-		{
-			do_char_log(cn, 0, "You cannot see your target.\n");
-			return 0;
-		}
-		
-		if (ch[co].flags & CF_STONED)
-		{
-			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
-			return 0;
-		}
-		
-		if (is_exhausted(cn))
-		{ 
-			return 0; 
-		}
-		
-		if (spellcost(cn, cost, SK_BLAST, 1))
-		{
-			return 0; 
-		}
-		
 		chlog(cn, "Cast Blast on %s", ch[co].name);
 		
 		dam = power * 2;
