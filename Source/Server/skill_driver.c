@@ -24,27 +24,45 @@ char *at_name[5] = {
 struct s_splog splog[60] = {
 	{
 		0, 				"Exhaust", 		"exhaust", 		"exhausting"
+	},{
+		1
+	},{
+		2
+	},{
+		3
+	},{
+		4
+	},{
+		5
+	},{
+		6
+	},{
+		7
+	},{
+		8
+	},{
+		9
+	},{
+		10
 	},{ 
 		SK_MSHIELD,		"Magic Shield",	"magic shield",	"magic shielding",
 		"Magic Shield active!",
 		"'s Magic Shield activated.",
 		" cast magic shield on you."
-	},{ 
-		SK_REPAIR, 		"Repair",		"repair",		"repairing",
-		"",
-		"",
-		""
+	},{
+		12
+	},{
+		SK_REPAIR, 		"Repair",		"repair",		"repairing"
 	},{ 
 		SK_LIGHT, 		"Light",		"light",		"lighting",
 		"You start to emit light.",
 		" starts to emit light.",
 		" cast light on you."
 	},{ 
-		SK_RECALL, 		"Recall",		"recall",		"recalling",
-		0,
-		0,
-		0
-	},{ 
+		SK_RECALL, 		"Recall",		"recall",		"recalling"
+	},{
+		16
+	},{
 		SK_PROTECT,		"Protect",		"protect",		"protecting",
 		"You feel protected.",
 		" is now protected.",
@@ -76,41 +94,56 @@ struct s_splog splog[60] = {
 		" was blessed.",
 		" cast bless on you."
 	},{ 
-		SK_IDENT, 		"Identify",		"identify",		"identifying",
-		"",
-		"",
-		""
-	},{ 
+		SK_IDENT, 		"Identify",		"identify",		"identifying"
+	},{
+		23
+	},{
 		SK_BLAST, 		"Blast",		"blast",		"blasting",
-		"",
-		"",
-		"",
+		"","","",
 		"You unleash a destructive shockwave.",
 		"You feel a tingling shockwave from somewhere.",
 		" tried to include you in a mass-blast but failed."
 	},{ 
-		SK_DISPEL, 		"Dispel",		"dispel",		"dispelling",
-		"",
-		"",
-		""
+		SK_DISPEL, 		"Dispel",		"dispel",		"dispelling"
 	},{ 
 		SK_HEAL, 		"Healing Sickness",	"heal",		"healing",
 		"You have been healed.",
 		" was healed.",
 		" cast heal on you."
-	},{ 
+	},{
+		SK_GHOST
+	},{
 		SK_REGEN, 		"Regen",		"regen",		"regenerating",
 		"You begin regenerating hitpoints!",
 		" starts regenerating.",
 		" cast regen on you."
-	},{ 
+	},{
+		29
+	},{
+		30
+	},{
+		31
+	},{
+		32
+	},{
+		33
+	},{
+		34
+	},{
 		SK_WARCRY, 		"Fear",			"fear",			"scaring",
-		"",
-		"",
-		"You cry out loud and clear.",
-		"",
-		""
-	},{ 
+		"","",
+		"You cry out loud and clear."
+	},{
+		36
+	},{
+		37
+	},{
+		38
+	},{
+		39
+	},{
+		40
+	},{
 		SK_WEAKEN, 		"Weakness",		"weaken",		"weakening",
 		"Your equipment feels heavy.",
 		" was weakened.",
@@ -123,28 +156,27 @@ struct s_splog splog[60] = {
 		"You unleash a powerful mass-poison.",
 		"You feel a toxic aura emanate from somewhere.",
 		" tried to include you in a mass-poison but failed."
-	},{ 
-		SK_SHADOW, 		"Shadow Copy",	"shadow copy",	"shadow copying",
-		"",
-		"",
-		""
+	},{
+		43
+	},{
+		44
+	},{
+		45
+	},{
+		SK_SHADOW, 		"Shadow Copy",	"shadow copy",	"shadow copying"
 	},{ 
 		SK_HASTE, 		"Haste",		"haste",		"hasting",
 		"You suddenly feel faster!",
 		" has been hasted.",
 		" cast haste on you."
+	},{
+		48
+	},{
+		49
+	},{
+		SK_WARCRY2, 	"Stun",			"stun",			"stunning"
 	},{ 
-		SK_WARCRY2, 	"Stun",			"stun",			"stunning",
-		"",
-		"",
-		"",
-		"",
-		""
-	},{ 
-		SK_BLEED, 		"Bleed",		"bleed",		"bleeding",
-		"",
-		"",
-		""
+		SK_BLEED, 		"Bleed",		"bleed",		"bleeding"
 	},{ 
 		SK_WEAKEN2, 	"Greater Weakness",	"weaken",	"weakening",
 		"Your equipment feels very heavy.",
@@ -171,7 +203,7 @@ struct s_splog splog[60] = {
 		"'s Magic Shell activated.",
 		" cast magic shell on you."
 	}
-}
+};
 
 int friend_is_enemy(int cn, int cc)
 {
@@ -369,7 +401,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg)
 {
-	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm;
+	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm, tmp;
 	int no_target = 0, scorch = 0;
 	
 	if (co)
@@ -565,9 +597,12 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	return 1;
 }
 
+int spell_scorch(int cn, int co, int power, int flag);
+int spell_bleed(int cn, int co, int power);
+
 void surround_cast(int cn, int co_orig, int intemp, int power)
 {
-	int m, n, mc, co, hitpower;
+	int m, n, mc, co, hitpower, tmp;
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
@@ -620,7 +655,7 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 				
 				if (scorch)
 				{
-					spell_scorch(cn, co, power, 0);
+					spell_scorch(cn, co, hitpower/2, 0);
 				}
 			}
 			else if (intemp==SK_CLEAVE)
@@ -655,7 +690,7 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 
 				if (bleeding)
 				{
-					spell_bleed(cn, co, dam);
+					spell_bleed(cn, co, hitpower/2);
 				}
 				
 				continue; // skip damage_mshell
@@ -950,8 +985,8 @@ int chance_base(int cn, int skill, int d20, int defense, int usemana)
 		else
 		{
 			do_char_log(cn, 0, 
-			"%s resisted your attempt to %s them.\n", 
-				ch[co].reference, splog[skill].ref);
+			"Your target resisted your attempt to %s them.\n", 
+				splog[skill].ref);
 		}
 		return(-1);
 	}
@@ -1740,8 +1775,9 @@ int spell_heal(int cn, int co, int power)
 			tmp = 4 - bu[in2].cost;
 			power = power * tmp / 4;
 			if (4-tmp) 
+			{
 				do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", 100-tmp*25);
-			break;
+			}
 		}
 	}
 	
@@ -2345,7 +2381,7 @@ int spell_scorch(int cn, int co, int power, int flag)
 }
 void skill_blast(int cn)
 {
-	int power, aoe_power, cost;
+	int power, aoe_power, cost, tmp;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
 	int dam, scorch = 0, avgdmg = 0;
@@ -2413,7 +2449,7 @@ void skill_blast(int cn)
 
 		if (scorch)
 		{
-			spell_scorch(cn, co, power, 0);
+			spell_scorch(cn, co, dam/2, 0);
 		}
 		
 		avgdmg += tmp;
@@ -3336,7 +3372,7 @@ int spell_bleed(int cn, int co, int power)
 }
 void skill_cleave(int cn)
 {
-	int power, cost;
+	int power, cost, tmp;
 	int co, co_orig = -1;
 	int dam, bleeding = 0;
 	
@@ -3391,7 +3427,7 @@ void skill_cleave(int cn)
 
 		if (bleeding)
 		{
-			spell_bleed(cn, co, dam);
+			spell_bleed(cn, co, dam/2);
 		}
 		
 		co_orig = co;

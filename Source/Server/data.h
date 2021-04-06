@@ -713,6 +713,7 @@ struct s_splog
 };
 
 extern struct s_skilltab skilltab[MAXSKILL];
+extern struct s_splog splog[60];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
