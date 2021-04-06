@@ -41,9 +41,9 @@ struct s_splog splog[60] = {
 		" cast light on you."
 	},{ 
 		SK_RECALL, 		"Recall",		"recall",		"recalling",
-		"",
-		"",
-		""
+		0,
+		0,
+		0
 	},{ 
 		SK_PROTECT,		"Protect",		"protect",		"protecting",
 		"You feel protected.",
@@ -210,7 +210,7 @@ int is_exhausted(int cn)
 
 int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana, int power, int d20)
 {
-	int m, co, aoe_spell = 0;
+	int m, co, aoe_spell = 0, need_combat;
 	
 	if (cnts && (ch[cn].flags & CF_PLAYER))
 	{
@@ -232,6 +232,11 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	else if (!buff && (co = ch[cn].attack_cn)!=0) ;
 	else co = cn;
 	
+	if (in==SK_CLEAVE)
+	{
+		need_combat = 1;
+	}
+	
 	if (!buff)
 	{
 		// AoE Spells immediately stop processing - everything else is handled by aoe cast
@@ -247,8 +252,16 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 		else if (cn==co)
 		{
-			do_char_log(cn, 0, 
-			"You cannot %s yourself!\n", splog[in].ref);
+			if (need_combat)
+			{
+				do_char_log(cn, 0, 
+				"But you're not fighting anybody!\n");
+			}
+			else
+			{
+				do_char_log(cn, 0, 
+				"You cannot %s yourself!\n", splog[in].ref);
+			}
 			return 0;
 		}
 		else if (co==ch[cn].data[CHD_SHADOWCOPY] || co==ch[cn].data[CHD_COMPANION])
@@ -257,6 +270,12 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			"You stop yourself from %s your companion. That would be silly.\n", splog[in].act);
 			return 0;
 		}
+	}
+	
+	if (need_combat && !is_facing(cn,co))
+	{
+		do_char_log(cn, 0, "You must be facing your enemy!\n");
+		return 0;
 	}
 	
 	if (!do_char_can_see(cn, co))
@@ -304,8 +323,8 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		co = cn;
 	}
 	
-	if ((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
-		(d20 && chance_base(cn, power, d20, get_target_resistance(co))))
+	if (usemana && ((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
+		(d20 && chance_base(cn, power, d20, get_target_resistance(co)))))
 	{
 		if (cn!=co && (get_skill_score(co, SK_SENSE) > power + 5))
 		{
@@ -332,7 +351,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
-	if (!buff && (ch[co].flags & CF_IMMORTAL))
+	if (!need_combat && !buff && (ch[co].flags & CF_IMMORTAL))
 	{
 		do_char_log(cn, 0, "You lost your focus.\n");
 		return 0;
@@ -558,8 +577,83 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 		}
 		if ((co = map[mc].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
 		{
-			damage_mshell(co);
-			if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20)) 
+			
+			if (intemp==SK_BLAST)
+			{
+				int scorch = 0;
+				
+				chlog(cn, "Cast Blast on %s", ch[co].name);
+				
+				hitpower = spell_immunity(power, get_target_immunity(co)) * 2;
+				hitpower = hitpower/2 + hitpower/4;
+				
+				// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
+				if (get_tarot(cn, IT_CH_JUDGE))
+				{
+					hitpower = hitpower * 85/100;
+					scorch = 1;
+				}
+				
+				tmp = do_hurt(cn, co, hitpower, 1);
+				
+				if (tmp<1)	
+				{
+					do_char_log(cn, 0, 
+					"You cannot penetrate %s's armor.\n", ch[co].reference);
+				}
+				else
+				{
+					do_char_log(cn, 1, 
+					"You blast %s for %d HP.\n", ch[co].reference, tmp);
+					do_char_log(co, 1, 
+					"%s blasted you for %d HP.\n", ch[cn].name, tmp);
+				}
+				
+				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+				
+				if (scorch)
+				{
+					spell_scorch(cn, co, power, 0);
+				}
+			}
+			else if (intemp==SK_CLEAVE)
+			{
+				int bleeding = 0;
+				
+				chlog(cn, "Used Cleave on %s", ch[co].name);
+		
+				hitpower = spell_immunity(power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0)) * 2;
+				hitpower = hitpower/2 + hitpower/4;
+				
+				// Tarot Card - Justice :: Reduce Cleave's damage & inflict Bleed
+				if (get_tarot(cn, IT_CH_JUSTICE))
+				{
+					hitpower = hitpower * 70/100;
+					bleeding = 1;
+				}
+				
+				tmp = do_hurt(cn, co, hitpower, 5);
+				
+				if (tmp<1)
+				{
+					do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+				}
+				else
+				{
+					do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
+					do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+				}
+				
+				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+
+				if (bleeding)
+				{
+					spell_bleed(cn, co, dam);
+				}
+				
+				continue; // skip damage_mshell
+			}
+			else if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20)) 
 			{
 				switch (intemp)
 				{
@@ -572,44 +666,11 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 					case SK_POISON:
 						spell_poison(cn, co, hitpower, 0);
 						break;
-					case SK_BLAST:
-						int scorch = 0;
-						
-						hitpower = spell_immunity(power, get_target_immunity(co)) * 2;
-						hitpower = hitpower/2 + hitpower/4;
-						
-						// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
-						if (get_tarot(cn, IT_CH_JUDGE))
-						{
-							dam = dam * 85/100;
-							scorch = 1;
-						}
-						
-						chlog(cn, "Cast Blast on %s", ch[co].name);
-						tmp = do_hurt(cn, co, dam, 1);
-						if (tmp<1)	
-						{
-							do_char_log(cn, 0, 
-							"You cannot penetrate %s's armor.\n", ch[co].reference);
-						}
-						else
-						{
-							do_char_log(cn, 1, 
-							"You blast %s for %d HP.\n", ch[co].reference, tmp);
-							do_char_log(co, 1, 
-							"%s blasted you for %d HP.\n", ch[cn].name, tmp);
-						}
-						fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-						
-						if (scorch)
-						{
-							spell_scorch(cn, co, power, 0);
-						}
-						break;
 					default:
 						break;
 				}
 			}
+			damage_mshell(co);
 		}
 	}
 }
@@ -1300,13 +1361,16 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 			"Magical interference neutralized the %s's effect.\n", bu[in].name);
 			return 0;
 		}
-		do_char_log(cn, 1, "%s\n", splog[temp].self);
+		if (splog[temp].self)
+		{
+			do_char_log(cn, 1, "%s\n", splog[temp].self);
+			char_play_sound(cn, ch[cn].sound + 1, -150, 0);
+			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		}
 		if (ch[cn].flags & (CF_PLAYER))
 		{
 			chlog(cn, "Cast %s", bu[in].name);
 		}
-		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	if (debuff<2)
 	{
@@ -2429,47 +2493,23 @@ void skill_repair(int cn)
 
 void skill_recall(int cn)
 {
-	int in;
+	int in, power;
 
-	if (is_exhausted(cn))
-	{
+	if (is_exhausted(cn)) { return; }
+	if (spellcost(cn, SP_COST_RECALL, SK_RECALL, 1)) { return; }
+	if (chance(cn, FIVE_PERC_FAIL)) { return; }
+	
+	power = get_skill_score(cn, SK_RECALL);
+	
+	if (!(in = make_new_buff(cn, SK_RECALL, BUF_SPR_RECALL, power, SP_DUR_RECALL(power), 0)))
 		return;
-	}
-
-	if (spellcost(cn, SP_COST_RECALL, SK_RECALL, 1))
-	{
-		return;
-	}
-	if (chance(cn, 18))
-	{
-		return;
-	}
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in skill_recall");
-		return;
-	}
-
-	strcpy(bu[in].name, "Recall");
-	bu[in].flags |= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_RECALL;
-	bu[in].duration  = bu[in].active = SP_DUR_RECALL(get_skill_score(cn, SK_RECALL));
-	bu[in].temp  = SK_RECALL;
-	bu[in].power = get_skill_score(cn, SK_RECALL);
+	
 	bu[in].data[0] = ch[cn].temple_x;
 	bu[in].data[1] = ch[cn].temple_y;
-
-	if (!add_spell(cn, in))
-	{
-		do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
+	
+	if (!cast_a_spell(cn, cn, in, 0))
 		return;
-	}
-	chlog(cn, "Cast Recall");
-
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-
+	
 	add_exhaust(cn, SK_EXH_RECALL);
 }
 
@@ -2861,11 +2901,6 @@ void skill_ghost(int cn)
 		pts += hp_needed(m, ch[cc].hp[3]-1);
 	}
 
-	//for (m = 50; m<ch[cc].end[0]; m++)
-	//{
-	//	pts += end_needed(m, ch[cc].end[3]-1);
-	//}
-
 	for (m = 50; m<ch[cc].mana[0]; m++)
 	{
 		pts += mana_needed(m, ch[cc].mana[3]-1);
@@ -3250,187 +3285,92 @@ void skill_shadow(int cn)
 
 int spell_bleed(int cn, int co, int power)
 {
-	int in, n;
-
+	int in;
+	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
-
-	in = god_create_buff();
-	if (!in)
-	{
-		xlog("god_create_buff failed in spell_bleed");
-		return( 0);
-	}
-
+	
 	power = spell_immunity(power, get_target_immunity(co));
 	
-	strcpy(bu[in].name, "Bleed");
-	bu[in].flags |= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_BLEED;
-	bu[in].duration  = bu[in].active = SP_DUR_BLEED;
-	bu[in].temp  = SK_BLEED;
-	bu[in].power = power;
-	bu[in].cost = cn; // the user of the bleed should earn the kill for the bleed.
-
-	add_spell(co, in);
+	if (!(in = make_new_buff(cn, SK_BLEED, BUF_SPR_BLEED, power, SP_DUR_BLEED, 0)))
+		return 0;
 	
-	chlog(cn, "Inflicted Bleed on %s", ch[co].name);
-	do_char_log(co, 0, "You began bleeding from the cleave!\n");
-
+	// the user of the bleed should earn the kill for the bleed.
+	bu[in].cost = cn;
+	
+	if (add_spell(co, in))
+	{
+		chlog(cn, "Inflicted Bleed on %s", ch[co].name);
+		do_char_log(co, 0, "You began bleeding from the cleave!\n");
+	}
+	
 	return 1;
 }
 void skill_cleave(int cn)
 {
-	int co,dam,m,co_orig,tmp,base_power,power,cost;
-	int bleeding = 0;
-	int in=0;
+	int power, cost;
+	int co, co_orig = -1;
+	int dam, bleeding = 0;
 	
-	if ((co = ch[cn].skill_target1)) { ; }
-	if (ch[cn].attack_cn!=0) { co = ch[cn].attack_cn; }
-	else {
-		do_char_log(cn,0,"But you're not fighting anybody!\n");
-		return;
-	}
-
-	if (!is_facing(cn,co)) {
-		do_char_log(cn,0,"You must be facing your enemy!\n");
-		return;
-	}
+	power = get_skill_score(cn, SK_CLEAVE) + ch[cn].weapon / 4;
 	
-	if (!do_char_can_see(cn, co))
-	{
-		do_char_log(cn, 0, "You cannot see your target.\n");
-		return;
-	}
-	
-	if (ch[co].flags&CF_STONED) {
-		do_char_log(cn,0,"Your target is lagging. Try again later.\n");
-		return;
-	}
-
-	if (!may_attack_msg(cn,co,1)) {
-		chlog(cn,"Prevented from attacking %s (%d)",ch[co].name,co);
-		return;
-	}
-	
-	/* CS, 000209: Remember PvP attacks */
-	remember_pvp(cn,co);
-	
-	if (is_exhausted(cn)) return;
-	
-	base_power = get_skill_score(cn, SK_CLEAVE)+ch[cn].weapon/4;
-	power = spell_immunity(base_power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0));
-	dam = power * 2;
-	
-	cost = dam / 24 + 5;
+	cost = (power * 2) / 24 + 5;
 	
 	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)))
+	{
 		cost = (cost/3)*2;
-	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_WARRIOR))
+	}
+	else if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_WARRIOR))
+	{
 		cost = (cost/6)*5;
-	if (!(ch[cn].flags & CF_PLAYER)) 
+	}
+	else if (!(ch[cn].flags & CF_PLAYER)) 
+	{
 		cost = cost*3/2;
-	
-	if (spellcost(cn, cost, SK_CLEAVE, 0)) return;
-	
-	// Tarot Card - Justice :: Weaken Cleave's damage & inflict Bleed
-	if (get_tarot(cn, IT_CH_JUSTICE))
-	{
-		dam = dam * 70/100;
-		bleeding = 1;
-	}
-
-	do_area_sound(co,0,ch[co].x,ch[co].y,ch[cn].sound+6);
-	char_play_sound(co,ch[cn].sound+6,-300,0);
-
-	chlog(cn,"Used Cleave on %s",ch[co].name);
-
-	tmp=do_hurt(cn,co,dam,5);
-
-	if (tmp<1) do_char_log(cn,0,"You cannot penetrate %s's armor.\n",ch[co].reference);
-	else 
-	{
-		do_char_log(cn,1,"You cleaved %s for %d HP.\n",ch[co].reference,tmp);
-		do_char_log(co,1,"%s cleaved you for %d HP.\n",ch[cn].name,tmp);
 	}
 	
-	fx_add_effect(5,0,ch[co].x,ch[co].y,0);
+	// Get hit target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0)))
+		return;
 	
-	if (bleeding) spell_bleed(cn, co, dam);
-
-	co_orig=co;
-
-	dam=dam/2+dam/4;
-
-	m=ch[cn].x+ch[cn].y*MAPX;
-	if ((co=map[m+1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) {
-		chlog(cn,"Used Cleave on %s",ch[co].name);
+	//
+		chlog(cn, "Used Cleave on %s", ch[co].name);
 		
-		power = spell_immunity(base_power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0));
-		dam = (power * 2)/4*3; if (bleeding) dam = dam * 70/100;
+		dam = spell_immunity(power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0)) * 2;
 		
-		tmp=do_hurt(cn,co,dam,5);
-
-		if (tmp<1) do_char_log(cn,0,"You cannot penetrate %s's armor.\n",ch[co].reference);
-		else 
+		// Tarot Card - Justice :: Reduce Cleave's damage & inflict Bleed
+		if (get_tarot(cn, IT_CH_JUSTICE))
 		{
-			do_char_log(cn,1,"You cleaved %s for %d HP.\n",ch[co].reference,tmp);
-			do_char_log(co,1,"%s cleaved you for %d HP.\n",ch[cn].name,tmp);
+			dam = dam * 70/100;
+			bleeding = 1;
 		}
-		fx_add_effect(5,0,ch[co].x,ch[co].y,0);
-		if (bleeding) spell_bleed(cn, co, dam);
-	}
-	if ((co=map[m-1].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) {
-		chlog(cn,"Used Cleave on %s",ch[co].name);
 		
-		power = spell_immunity(base_power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0));
-		dam = (power * 2)/4*3; if (bleeding) dam = dam * 70/100;
+		tmp = do_hurt(cn, co, dam, 5);
 		
-		tmp=do_hurt(cn,co,dam,5);
-
-		if (tmp<1) do_char_log(cn,0,"You cannot penetrate %s's armor.\n",ch[co].reference);
-		else 
+		if (tmp<1)
 		{
-			do_char_log(cn,1,"You cleaved %s for %d HP.\n",ch[co].reference,tmp);
-			do_char_log(co,1,"%s cleaved you for %d HP.\n",ch[cn].name,tmp);
+			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		}
-		fx_add_effect(5,0,ch[co].x,ch[co].y,0);
-		if (bleeding) spell_bleed(cn, co, dam);
-	}
-	if ((co=map[m+MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) {
-		chlog(cn,"Used Cleave on %s",ch[co].name);
-
-		power = spell_immunity(base_power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0));
-		dam = (power * 2)/4*3; if (bleeding) dam = dam * 70/100;
-
-		tmp=do_hurt(cn,co,dam,5);
-
-		if (tmp<1) do_char_log(cn,0,"You cannot penetrate %s's armor.\n",ch[co].reference);
-		else 
+		else
 		{
-			do_char_log(cn,1,"You cleaved %s for %d HP.\n",ch[co].reference,tmp);
-			do_char_log(co,1,"%s cleaved you for %d HP.\n",ch[cn].name,tmp);
+			do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
+			do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
 		}
-		fx_add_effect(5,0,ch[co].x,ch[co].y,0);
-		if (bleeding) spell_bleed(cn, co, dam);
-	}
-	if ((co=map[m-MAPX].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co) {
-		chlog(cn,"Used Cleave on %s",ch[co].name);
+		
+		char_play_sound(co, ch[cn].sound + 6, -150, 0);
+		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 
-		power = spell_immunity(base_power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0));
-		dam = (power * 2)/4*3; if (bleeding) dam = dam * 70/100;
-
-		tmp=do_hurt(cn,co,dam,5);
-
-		if (tmp<1) do_char_log(cn,0,"You cannot penetrate %s's armor.\n",ch[co].reference);
-		else 
+		if (bleeding)
 		{
-			do_char_log(cn,1,"You cleaved %s for %d HP.\n",ch[co].reference,tmp);
-			do_char_log(co,1,"%s cleaved you for %d HP.\n",ch[cn].name,tmp);
+			spell_bleed(cn, co, dam);
 		}
-		fx_add_effect(5,0,ch[co].x,ch[co].y,0);
-		if (bleeding) spell_bleed(cn, co, dam);
-	}
+		
+		co_orig = co;
+	//
+	
+	surround_cast(cn, co_orig, SK_CLEAVE, power);
+	
 	if (bleeding) 
 	{
 		do_char_log(cn, 1, "Your foes began bleeding from your cleave!\n");
