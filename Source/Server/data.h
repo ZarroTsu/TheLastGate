@@ -495,6 +495,7 @@ struct character
 
 	char lastattack;                // neater display: remembers the last attack animation
 	
+	unsigned char move_speed;		// Bonus to movement speed (added to speed_mod)
 	unsigned char atk_speed;		// Bonus to attacking speed (added to speed_mod)
 	unsigned char cast_speed;		// Bonus to casting speed (added to speed_mod)
 	
@@ -508,7 +509,7 @@ struct character
 	unsigned short to_hit;       	// final chance to hit
 	unsigned short to_parry;       	// final chance to parry
 	
-	char future1[11];               // space for future expansion
+	char future1[10];               // space for future expansion
 
 	short int sprite_override;
 
@@ -657,8 +658,22 @@ struct item
 	char gethit_dam[2];             // 547, damage for hitting this item
 
 	char min_rank;                  // minimum rank to wear the item
-	char future[3];					//		~  3 bytes free space
-	int future3[9];                 // 587	~ 36 bytes free space
+	
+	char move_speed[2];				// 
+	char atk_speed[2];				// 
+	char cast_speed[2];				// 
+	
+	char spell_mod[2];				// 
+	char spell_apt[2];				// 
+	char cool_bonus[2];				// 
+	
+	char crit_chance[2];			// 
+	char crit_multi[2];				// 
+	
+	char to_hit[2];					// 
+	char to_parry[2];				// 
+	
+	char future3[19];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
