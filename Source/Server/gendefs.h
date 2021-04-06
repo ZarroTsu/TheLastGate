@@ -107,10 +107,14 @@
 #define WN_RRING 	11
 #define WN_CHARM2 	12
 
-// Sneaky Packet Hacks
-#define WN_SPEED 	13
-#define WN_SPMOD 	14
-#define WN_CRIT		15
+// Sneaky Packet Hacks		   buf + 5	    buf + 7
+#define WN_SPEED		13  // Speed 	and Attack Speed
+#define WN_SPMOD		14  // Spellmod	and Spellapt
+#define WN_CRIT			15  // Crit Chc	and Crit Mult
+#define WN_DPS			16  // DPH		and DPS
+#define WN_HITPAR		17  // Hit 		and Parry
+#define WN_CLDWN		18  // Cooldown and Cast Speed
+#define WN_LUCK			19  // Luck		and Exp/H
 
 // placement bits
 #define PL_HEAD       1

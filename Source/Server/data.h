@@ -481,9 +481,9 @@ struct character
 	unsigned short stunned;         // is stunned for X ticks
 
 	// misc stuff added later:
-	char speed_mod;                 // race dependent speed modification
+	unsigned short speed_mod;       // race dependent speed modification - between 1 and 36  (future: between 1 and 300)
+	
 	char last_action;               // last action was success/failure (driver_generic level)
-	char unused;
 	char depot_sold;                // items from depot where sold to pay for the rent
 
 	char gethit_dam;                // damage for attacker when hitting this char
@@ -494,11 +494,27 @@ struct character
 	char passwd[16];
 
 	char lastattack;                // neater display: remembers the last attack animation
-	char future1[25];               // space for future expansion							~ possible [4][6] to store meta stats?
+	
+	unsigned char atk_speed;		// Bonus to attacking speed (added to speed_mod)
+	unsigned char cast_speed;		// Bonus to casting speed (added to speed_mod)
+	
+	unsigned short spell_mod;       // race dependent spell modifier - three digit decimal accuracy (1.000)
+	unsigned short spell_apt;       // aptitude for receiving spells
+	unsigned short cool_bonus;      // exhaust cooldown rate - three digit decimal accuracy (1.000)
+	
+	unsigned char crit_chance;     	// chance to deal a critical hit (/2)
+	unsigned char crit_multi;		// multiplier for critical hits
+	
+	unsigned short to_hit;       	// final chance to hit
+	unsigned short to_parry;       	// final chance to parry
+	
+	char future1[11];               // space for future expansion
 
 	short int sprite_override;
 
-	short future2[49];				// 49*2 = 98 bytes of free space - can store int (4)[11] slots for swapping gear sets
+	unsigned int alt_worn[20];		// Alternative gear set in storage for swapping
+
+	char future2[18];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -510,14 +526,13 @@ struct character
 
 	int class;                      // monster class
 
-	int future3[12];
+	char future3[48];
 
 	time_t logout_date;
 
 	// driver data
 	int data[100];
 	char text[10][160];
-
 }
 __attribute__ ((packed));
 
