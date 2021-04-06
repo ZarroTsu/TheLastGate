@@ -509,7 +509,9 @@ struct character
 	unsigned short to_hit;       	// final chance to hit
 	unsigned short to_parry;       	// final chance to parry
 	
-	char future1[10];               // space for future expansion
+	char max_dmg;					// Maximum damage score (normally handled by STR/2)
+	
+	char future1[9];               // space for future expansion
 
 	short int sprite_override;
 
@@ -674,9 +676,11 @@ struct item
 	char to_hit[2];					// Hit bonus
 	char to_parry[2];				// Parry bonus
 	
+	char max_damage[2];				// Maximum damage bonus
+	
 	unsigned char stack;			// Item stacking
 	
-	char future3[18];				// 587
+	char future3[16];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
