@@ -230,7 +230,7 @@ int is_exhausted(int cn)
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_BLAST) { break; }
+		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==1) { break; }
 	}
 	if (n<MAXBUFFS)
 	{
@@ -242,7 +242,7 @@ int is_exhausted(int cn)
 
 int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana, int power, int d20)
 {
-	int m, co, aoe_spell = 0, need_combat;
+	int m, co = 0, aoe_spell = 0, need_combat = 0;
 	
 	if (cnts && (ch[cn].flags & CF_PLAYER))
 	{
@@ -256,13 +256,24 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
-	if ((co = ch[cn].skill_target1)!=0) ;
-	else if (!buff && ch[cn].dir==DX_DOWN  && (co = map[m + 1].ch)!=0) ;
-	else if (!buff && ch[cn].dir==DX_UP    && (co = map[m - 1].ch)!=0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m + MAPX].ch)!=0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT  && (co = map[m - MAPX].ch)!=0) ;
-	else if (!buff && (co = ch[cn].attack_cn)!=0) ;
+	if ((co = ch[cn].skill_target1)) ;
+	else if (!buff && ch[cn].dir==DX_DOWN  && (co = map[m + MAPX].ch)) ;
+	else if (!buff && ch[cn].dir==DX_UP    && (co = map[m - MAPX].ch)) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m + 1].ch)) ;
+	else if (!buff && ch[cn].dir==DX_LEFT  && (co = map[m - 1].ch)) ;
+	else if (!buff && (co = ch[cn].attack_cn)) ;
 	else co = cn;
+	
+	/* Event logging for debug
+	if (co!=cn)
+	{
+		chlog(cn, "Trying to cast %s on %s", splog[in].name, ch[co].name);
+	}
+	else
+	{
+		chlog(cn, "Trying to cast %s on self", splog[in].name);
+	}
+	*/
 	
 	if (in==SK_CLEAVE || in==SK_WEAKEN)
 	{
@@ -316,7 +327,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
-	if (ch[co].flags & CF_STONED)
+	if (!buff && (ch[co].flags & CF_STONED))
 	{
 		do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
 		return 0;
@@ -339,7 +350,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	if (!buff)
 	{
-		if (!may_attack_msg(cn, co, 1))
+		if (co!=cn && !may_attack_msg(cn, co, 1))
 		{
 			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
 			return 0;
@@ -372,7 +383,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 			}
 		}
-		else
+		else if (!buff)
 		{
 			do_char_log(co, 0, 
 			"%s tried to %s you but failed.\n", 
@@ -401,7 +412,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg)
 {
-	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm, tmp;
+	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm = 0, tmp = 0;
 	int no_target = 0, scorch = 0;
 	
 	if (co)
@@ -603,10 +614,16 @@ int spell_bleed(int cn, int co, int power);
 void surround_cast(int cn, int co_orig, int intemp, int power)
 {
 	int m, n, mc, co, hitpower, tmp;
+	int scorch = 0, bleeding = 0;
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
 	hitpower = power/2 + power/4;
+	
+	if (co_orig && co_orig!=cn)
+	{
+		if (is_exhausted(cn)) return;
+	}
 	
 	for (n=0; n<4; n++)
 	{
@@ -622,8 +639,6 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 			
 			if (intemp==SK_BLAST)
 			{
-				int scorch = 0;
-				
 				chlog(cn, "Cast Blast on %s", ch[co].name);
 				
 				hitpower = spell_immunity(power, get_target_immunity(co)) * 2;
@@ -660,8 +675,6 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 			}
 			else if (intemp==SK_CLEAVE)
 			{
-				int bleeding = 0;
-				
 				chlog(cn, "Used Cleave on %s", ch[co].name);
 		
 				hitpower = spell_immunity(power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0)) * 2;
@@ -1270,7 +1283,7 @@ void add_exhaust(int cn, int len)
 	bu[in].flags 	|= IF_SPELL;
 	bu[in].sprite[1] = BUF_SPR_EXHAUST;
 	bu[in].duration  = bu[in].active = len;
-	bu[in].temp  	 = 0;
+	bu[in].temp  	 = 1;
 	bu[in].power 	 = 300;
 	
 	add_spell(cn, in);
@@ -1885,6 +1898,28 @@ void skill_curse(int cn)
 	// If we have a valid target, cast Curse on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
+		if (!do_char_can_see(cn, co))
+		{
+			do_char_log(cn, 0, "You cannot see your target.\n");
+			return 0;
+		}
+		
+		if (ch[co].flags & CF_STONED)
+		{
+			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+			return 0;
+		}
+		
+		if (is_exhausted(cn))
+		{ 
+			return 0; 
+		}
+		
+		if (spellcost(cn, cost, SK_CURSE, 1))
+		{
+			return 0; 
+		}
+		
 		spell_curse(cn, co, power, 0);
 		
 		co_orig = co;
@@ -1971,6 +2006,28 @@ void skill_slow(int cn, int flag)
 	// If we have a valid target, cast Slow on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
+		if (!do_char_can_see(cn, co))
+		{
+			do_char_log(cn, 0, "You cannot see your target.\n");
+			return 0;
+		}
+		
+		if (ch[co].flags & CF_STONED)
+		{
+			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+			return 0;
+		}
+		
+		if (is_exhausted(cn))
+		{ 
+			return 0; 
+		}
+		
+		if (spellcost(cn, cost, SK_SLOW, 1))
+		{
+			return 0; 
+		}
+		
 		spell_slow(cn, co, power, 0);
 		
 		co_orig = co;
@@ -2063,6 +2120,28 @@ void skill_poison(int cn)
 	// If we have a valid target, cast Poison on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
+		if (!do_char_can_see(cn, co))
+		{
+			do_char_log(cn, 0, "You cannot see your target.\n");
+			return 0;
+		}
+		
+		if (ch[co].flags & CF_STONED)
+		{
+			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+			return 0;
+		}
+		
+		if (is_exhausted(cn))
+		{ 
+			return 0; 
+		}
+		
+		if (spellcost(cn, cost, SK_POISON, 1))
+		{
+			return 0; 
+		}
+		
 		spell_poison(cn, co, power, 0);
 		
 		co_orig = co;
@@ -2381,9 +2460,9 @@ int spell_scorch(int cn, int co, int power, int flag)
 }
 void skill_blast(int cn)
 {
-	int power, aoe_power, cost, tmp;
+	int power, aoe_power, cost, tmp = 0;
 	int count = 0, hit = 0;
-	int co, co_orig = -1;
+	int co = 0, co_orig = 0;
 	int dam, scorch = 0, avgdmg = 0;
 	
 	power = get_skill_score(cn, SK_BLAST);
@@ -2417,9 +2496,31 @@ void skill_blast(int cn)
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLAST, 1, power, 0)))
 		return;
 	
-	// If we have a valid target, cast Poison on them
+	// If we have a valid target, cast Blast on them
 	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
 	{
+		if (!do_char_can_see(cn, co))
+		{
+			do_char_log(cn, 0, "You cannot see your target.\n");
+			return 0;
+		}
+		
+		if (ch[co].flags & CF_STONED)
+		{
+			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+			return 0;
+		}
+		
+		if (is_exhausted(cn))
+		{ 
+			return 0; 
+		}
+		
+		if (spellcost(cn, cost, SK_BLAST, 1))
+		{
+			return 0; 
+		}
+		
 		chlog(cn, "Cast Blast on %s", ch[co].name);
 		
 		dam = power * 2;
@@ -2441,6 +2542,7 @@ void skill_blast(int cn)
 		{
 			do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
 			do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
+			avgdmg += tmp;
 		}
 		
 		char_play_sound(co, ch[cn].sound + 6, -150, 0);
@@ -2452,7 +2554,6 @@ void skill_blast(int cn)
 			spell_scorch(cn, co, dam/2, 0);
 		}
 		
-		avgdmg += tmp;
 		co_orig = co;
 		count++;
 		hit++;

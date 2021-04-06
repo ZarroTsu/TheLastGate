@@ -2376,7 +2376,7 @@ int npc_try_spell(int cn, int co, int spell)
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && bu[in].temp==SK_BLAST)
+		if ((in = ch[cn].spell[n]) && bu[in].temp==1)
 		{
 			break;
 		}
