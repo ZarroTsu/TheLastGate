@@ -51,8 +51,10 @@ struct cmap
 	unsigned short ch_nr;
 	unsigned short ch_id;
 	unsigned char ch_proz;          // health in percent
-	unsigned char ch_brv;			// Feb 2020 - dumb hack for bonus animation speed
-	unsigned char ch_agl;			//          - dumb hack
+	unsigned char ch_castspd;		// dumb hack for bonus animation speed
+	unsigned char ch_atkspd;		// dumb hack
+	unsigned char ch_movespd;		// dumb hack (cont.)
+	unsigned char ch_colorize;		// any flags that may warrant a different overhead color
 
 	// for item
 	short int it_sprite;            // basic sprite of item

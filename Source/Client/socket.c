@@ -578,8 +578,10 @@ int sv_setmap(unsigned char *buf,int off)
 	if (buf[1]&128) {
 		map[n].ch_proz=*(unsigned char*)(buf+p); p+=1;
 		// Feb 2020 - Hope this works...
-		map[n].ch_brv=*(unsigned char*)(buf+p); p+=1;
-		map[n].ch_agl=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_castspd=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_atkspd=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_movespd=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_colorize=*(unsigned char*)(buf+p); p+=1;
 		cnt[7]++;
 	}	
 	return p;

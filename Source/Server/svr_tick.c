@@ -2801,10 +2801,13 @@ void plr_change(int nr)
 			buf[1] |= 128;
 			*(unsigned char*)(buf + p) = smap[n].ch_proz;
 			p += 1;
-			// Feb 2020 - Hope this works...
-			*(unsigned char*)(buf + p) = smap[n].ch_brv;
+			*(unsigned char*)(buf + p) = smap[n].ch_castspd;
 			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_agl;
+			*(unsigned char*)(buf + p) = smap[n].ch_atkspd;
+			p += 1;
+			*(unsigned char*)(buf + p) = smap[n].ch_movespd;
+			p += 1;
+			*(unsigned char*)(buf + p) = smap[n].ch_colorize;
 			p += 1;
 		}
 
@@ -3311,18 +3314,18 @@ void plr_getmap_complete(int nr)
 				// Feb 2020 - Hope this works...
 				if (it[ch[co].worn[WN_LHAND]].temp==IT_BOOK_TRAV) // Book: Traveller's Guide
 				{
-					smap[n].ch_brv = get_attrib_score(co, AT_AGL)/28; // Agl - for cast speed
-					smap[n].ch_agl = get_attrib_score(co, AT_BRV)/28; // Brv - for attack speed
+					smap[n].ch_castspd = get_attrib_score(co, AT_AGL)/28; // Agl - for cast speed
+					smap[n].ch_atkspd = get_attrib_score(co, AT_BRV)/28; // Brv - for attack speed
 				}
 				else if ((ch[co].flags & CF_SHADOWCOPY) && IS_PLAYER(ch[co].data[63]))
 				{
-					smap[n].ch_brv = get_attrib_score(ch[co].data[63], AT_BRV)/28; // Brv - for cast speed
-					smap[n].ch_agl = get_attrib_score(ch[co].data[63], AT_AGL)/28; // Agl - for attack speed
+					smap[n].ch_castspd = get_attrib_score(ch[co].data[63], AT_BRV)/28; // Brv - for cast speed
+					smap[n].ch_atkspd = get_attrib_score(ch[co].data[63], AT_AGL)/28; // Agl - for attack speed
 				}
 				else
 				{
-					smap[n].ch_brv = get_attrib_score(co, AT_BRV)/28; // Brv - for cast speed
-					smap[n].ch_agl = get_attrib_score(co, AT_AGL)/28; // Agl - for attack speed
+					smap[n].ch_castspd = get_attrib_score(co, AT_BRV)/28; // Brv - for cast speed
+					smap[n].ch_atkspd = get_attrib_score(co, AT_AGL)/28; // Agl - for attack speed
 				}
 				//
 				smap[n].flags |= ISCHAR;

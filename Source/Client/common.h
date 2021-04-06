@@ -123,8 +123,10 @@ struct cmap {
 	unsigned short ch_nr;			// character id
 	unsigned short ch_id;			// character 'crc'
 	unsigned char ch_proz;
-	unsigned char ch_brv;			// Feb 2020 - dumb hack for bonus animation speed
-	unsigned char ch_agl;			//          - dumb hack
+	unsigned char ch_castspd;		// dumb hack for bonus animation speed
+	unsigned char ch_atkspd;		// dumb hack
+	unsigned char ch_movespd;		// dumb hack (cont.)
+	unsigned char ch_colorize;		// any flags that may warrant a different overhead color
 
 	// for item
 	short int it_sprite;			// basic sprite of item
@@ -170,6 +172,7 @@ struct cplayer {
 	// items carried
 	int item[40];
 	int item_p[40];
+	int item_s[40];  // Stack size of given item
 
 	// items worn
 	int worn[20];

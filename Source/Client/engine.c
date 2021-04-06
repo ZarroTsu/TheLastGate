@@ -1599,13 +1599,13 @@ int speedoMisc(int n)
 		case    0:
 		case    5:
 		case    6:
-			miscSpeedValue -= map[n].ch_agl;
+			miscSpeedValue -= map[n].ch_atkspd;
 			if (miscSpeedValue < 0) miscSpeedValue = 0;
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
 		case    9:
-			miscSpeedValue -= map[n].ch_brv;
+			miscSpeedValue -= map[n].ch_castspd;
 			if (miscSpeedValue < 0) miscSpeedValue = 0;
 			return(speedtab[miscSpeedValue][ctick]);
 			
