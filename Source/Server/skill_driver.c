@@ -386,7 +386,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 			}
 		}
-		else if (!buff && cn!=co)
+		else if (!usemana && !buff && cn!=co)
 		{
 			do_char_log(co, 0, 
 			"%s tried to %s you but failed.\n", 
@@ -1436,7 +1436,7 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 			"Magical interference neutralized the %s's effect.\n", bu[in].name);
 			return 0;
 		}
-		if (splog[temp].self)
+		if (in!=SK_RECALL && in!=SK_IDENT)
 		{
 			do_char_log(cn, 1, "%s\n", splog[temp].self);
 			char_play_sound(cn, ch[cn].sound + 1, -150, 0);

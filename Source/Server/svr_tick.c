@@ -2805,10 +2805,10 @@ void plr_change(int nr)
 			p += 1;
 			*(unsigned char*)(buf + p) = smap[n].ch_atkspd;
 			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_movespd;
-			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_colorize;
-			p += 1;
+			//*(unsigned char*)(buf + p) = smap[n].ch_movespd;
+			//p += 1;
+			//*(unsigned char*)(buf + p) = smap[n].ch_colorize;
+			//p += 1;
 		}
 
 		if (buf[1])   // we found a change (no change found can happen since it_status & ch_status are not transmitted all the time)

@@ -481,9 +481,9 @@ struct character
 	unsigned short stunned;         // is stunned for X ticks
 
 	// misc stuff added later:
-	unsigned short speed_mod;       // race dependent speed modification - between 1 and 36  (future: between 1 and 300)
-	
+	char speed_mod;                 // race dependent speed modification
 	char last_action;               // last action was success/failure (driver_generic level)
+	char unused;
 	char depot_sold;                // items from depot where sold to pay for the rent
 
 	char gethit_dam;                // damage for attacker when hitting this char
@@ -509,7 +509,7 @@ struct character
 	unsigned short to_hit;       	// final chance to hit
 	unsigned short to_parry;       	// final chance to parry
 	
-	char max_dmg;					// Maximum damage score (normally handled by STR/2)
+	char top_damage;				// Maximum damage score (normally handled by STR/2)
 	
 	char future1[9];               // space for future expansion
 
@@ -676,7 +676,7 @@ struct item
 	char to_hit[2];					// Hit bonus
 	char to_parry[2];				// Parry bonus
 	
-	char max_damage[2];				// Maximum damage bonus
+	char top_damage[2];				// Maximum damage bonus for hits
 	
 	unsigned char stack;			// Item stacking
 	
