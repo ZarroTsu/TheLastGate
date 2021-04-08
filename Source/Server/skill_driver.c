@@ -676,7 +676,7 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 			{
 				chlog(cn, "Used Cleave on %s", ch[co].name);
 		
-				hitpower = spell_immunity(power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0)) * 2;
+				hitpower = spell_immunity(power, ch[co].to_parry) * 2;
 				hitpower = hitpower/2 + hitpower/4;
 				
 				// Tarot Card - Justice :: Reduce Cleave's damage & inflict Bleed
@@ -1157,6 +1157,11 @@ int spell_race_mod(int power, int cn)
 	return((int)(power * mod));
 }
 
+int spell_multiplier(int power, int cn)
+{
+	return(power * ch[cn].spell_mod / 100);
+}
+
 int add_spell(int cn, int in)
 {
 	int n, in2, weak = 999, weakest = 99;
@@ -1250,23 +1255,15 @@ int add_spell(int cn, int in)
 
 void add_exhaust(int cn, int len)
 {
-	int in=0, baselen=100;
+	int in = 0, baselen = 100;
 	
 	// Book: Damor's Grudge
 	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO)
 	{
-		baselen=90;
+		baselen = 90;
 	}
 	
-	// Tarot - Magician - Effects of Strength and Intuition are swapped
-	if (get_tarot(cn, IT_CH_MAGI))
-	{
-		len = len*(baselen-max(0,get_attrib_score(cn, AT_STR)-10)/4)/100;
-	}
-	else
-	{
-		len = len*(baselen-max(0,get_attrib_score(cn, AT_INT)-10)/4)/100;
-	}
+	len = len * baselen / max(100, ch[cn].cool_bonus);
 	
 	in = god_create_buff();
 	if (!in)
@@ -1455,21 +1452,6 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 	return 1;
 }
 
-int spellpower(int cn, int power, int in)
-{
-	int pow_wil, pow_int, n, m;
-	int in2 = 0, tarot = 0;
-	
-	if (get_tarot(cn, IT_CH_MAGI))
-		tarot = 1;
-	
-	pow_wil = ch[cn].attrib[AT_WIL][0];
-	pow_int = tarot ? ch[cn].attrib[AT_STR][0] : ch[cn].attrib[AT_INT][0];
-	
-	return (spell_race_mod(pow_wil+pow_int, cn));
-}
-
-// Feb 2020 -- Added to clean up other blocks...
 int spellpower_check(int cn, int co, int power, int in)
 {
 	int tmp;
@@ -1478,10 +1460,10 @@ int spellpower_check(int cn, int co, int power, int in)
 	{
 		if (cn!=co) 
 		{
-			if (IS_COMP_TEMP(co)) 
-				tmp = spellpower(co, power, in)*2+get_attrib_score(cn, AT_WIL)/4;
+			if (IS_COMP_TEMP(co))  // ch[co].spell_apt
+				tmp = ch[co].spell_apt * 2 + get_attrib_score(cn, AT_WIL)/4;
 			else 
-				tmp = spellpower(co, power, in)+get_attrib_score(cn, AT_WIL)/4;
+				tmp = ch[co].spell_apt + get_attrib_score(cn, AT_WIL)/4;
 			
 			if (power>tmp)
 			{
@@ -1491,7 +1473,7 @@ int spellpower_check(int cn, int co, int power, int in)
 		}
 		else if ((ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)) && !(ch[cn].kindred & KIN_SEYAN_DU))
 		{
-			tmp = spellpower(co, power, in);
+			tmp = ch[co].spell_apt;
 			if (power>tmp)
 			{
 				power = tmp;
@@ -1500,7 +1482,7 @@ int spellpower_check(int cn, int co, int power, int in)
 		}
 		else
 		{
-			tmp = spellpower(co, power, in)*2;
+			tmp = ch[co].spell_apt * 2;
 			if (power>tmp)
 			{
 				power = tmp;
@@ -1516,7 +1498,7 @@ int spell_light(int cn, int co, int power)
 {
 	int in;
 	
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	if (!(in = make_new_buff(cn, SK_LIGHT, BUF_SPR_LIGHT, power, SP_DUR_LIGHT, 0))) 
 		return 0;
@@ -1543,7 +1525,7 @@ int spell_protect(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 
 	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) 
 		return 0;
@@ -1577,7 +1559,7 @@ int spell_enhance(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
 	if (!(in = make_new_buff(cn, SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) 
 		return 0;
@@ -1611,7 +1593,7 @@ int spell_bless(int cn, int co, int power)
 {
 	int in, n;
 	
-	power = spellpower_check(cn, co, spell_race_mod(power, cn), 1);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 1);
 	
 	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) 
 		return 0;
@@ -1641,7 +1623,7 @@ int spell_mshield(int cn, int co, int power)
 {
 	int in, ta_cn_cha, ta_co_emp, n, cc;
 	
-	power = spellpower_check(cn, co, spell_race_mod(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
 	ta_cn_cha = get_tarot(cn, IT_CH_CHARIOT);
 	ta_co_emp = get_tarot(co, IT_CH_EMPRESS);
@@ -1737,7 +1719,7 @@ int spell_haste(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn,co,spell_race_mod(power, cn),0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) 
 		return 0;
@@ -1760,7 +1742,7 @@ int spell_regen(int cn, int co, int power)
 {
 	int in;
 	
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	if (!(in = make_new_buff(cn, SK_REGEN, BUF_SPR_REGEN, power, SP_DUR_REGEN, 0))) 
 		return 0;
@@ -1795,7 +1777,7 @@ int spell_heal(int cn, int co, int power)
 	
 	if (cn!=co)
 	{
-		ch[co].a_hp += spell_race_mod(power * 2500, cn);
+		ch[co].a_hp += spell_multiplier(power * 2500, cn);
 	}
 	else
 	{
@@ -1839,7 +1821,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 
 	power = spell_immunity(power, get_target_immunity(co));
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	// Tarot Card - Tower :: Change Curse into Greater Curse
 	if (get_tarot(cn, IT_CH_TOWER))
@@ -1936,7 +1918,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
 	power = spell_immunity(power, get_target_immunity(co));
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	// Tarot Card - Emperor :: Change Slow into Greater Slow
 	if (get_tarot(cn, IT_CH_EMPEROR))
@@ -2023,7 +2005,7 @@ int spell_poison(int cn, int co, int power, int flag)
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
 	power = spell_immunity(power, get_target_immunity(co));
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	dur = SP_DUR_POISON(power);
 	
@@ -2381,7 +2363,7 @@ int spell_scorch(int cn, int co, int power, int flag)
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
 	power = spell_immunity(power, get_target_immunity(co));
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	if (flag)	tmp = 10;
 	else		tmp = 30;
@@ -2399,7 +2381,7 @@ void skill_blast(int cn)
 	int dam, scorch = 0, avgdmg = 0;
 	
 	power = get_skill_score(cn, SK_BLAST);
-	power = spell_race_mod(power, cn);
+	power = spell_multiplier(power, cn);
 	
 	aoe_power = get_skill_score(cn, SK_DAMAREA);
 	
@@ -2634,7 +2616,7 @@ void skill_dispel(int cn)
 		co = cn;
 	}
 
-	power = spell_race_mod(get_skill_score(cn, SK_DISPEL), cn);
+	power = spell_multiplier(get_skill_score(cn, SK_DISPEL), cn);
 
 	// Tarot Card - Hierophant :: Dispel removes positive spells instead of negative spells
 	if (get_tarot(cn, IT_CH_HEIROPH))
@@ -2862,7 +2844,7 @@ void skill_ghost(int cn)
 	
 	// Feb 2020 - better base values  ( 4 -> 5 ; 11 -> 11 )
 	base = (get_skill_score(cn, SK_GHOST) * 5) / 11;
-	base = spell_race_mod(base, cn);
+	base = spell_multiplier(base, cn);
 
 	ch[cc].data[29] = 0;				// reset experience earned
 	ch[cc].data[42] = 65536 + cn;		// set group
@@ -3140,7 +3122,7 @@ void skill_shadow(int cn)
 	
 	// Mod determines how strong the copy is compared to you.
 	// The first 120 points reaches a perfect copy. Beyond 180 points the shadow becomes *stronger* than you.
-	base = spell_race_mod(get_skill_score(cn, SK_SHADOW), cn);
+	base = spell_multiplier(get_skill_score(cn, SK_SHADOW), cn);
 	power = base/8 - 10;
 	
 	if (necronomicon)
@@ -3412,7 +3394,7 @@ void skill_cleave(int cn)
 	//
 		chlog(cn, "Used Cleave on %s", ch[co].name);
 		
-		dam = spell_immunity(power, get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0)) * 2;
+		dam = spell_immunity(power, ch[co].to_parry) * 2;
 		
 		// Tarot Card - Justice :: Reduce Cleave's damage & inflict Bleed
 		if (get_tarot(cn, IT_CH_JUSTICE))

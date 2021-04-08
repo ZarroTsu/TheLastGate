@@ -4723,7 +4723,7 @@ int get_combat_skill(int cn, int flag)
 		}
 	}
 	
-	if (RANDOM(n)<remainder) bonus++;
+	//if (RANDOM(n)<remainder) bonus++;  Commenting this out since this is now handled on char update
 
 	return (bonus);
 }
@@ -5155,21 +5155,6 @@ void do_char_killed(int cn, int co, int pentsolve)
 	// really kill co:
 	x = ch[co].x;
 	y = ch[co].y;
-
-	// check for Guardian Angel
-	/*
-	for (n = wimp = 0; n<20; n++)
-	{
-		if ((in = ch[co].spell[n])!=0)
-		{
-			chlog(co, "spell active: %s, power of %d", it[in].name, it[in].power);
-			if (it[in].temp==SK_WIMPY)
-			{
-				wimp = it[in].power / 2;
-			}
-		}
-	}
-	*/
 	
 	wimp = 0;
 
@@ -5343,55 +5328,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 			{
 				do_char_log(co, 0, "You would have lost experience points, but you're already at the minimum.\n");
 			}
-			
-			/*
-			tmp = ch[co].hp[0] / 10;
-			if (ch[co].hp[0] - tmp<50)
-			{
-				tmp = ch[co].hp[0] - 50;
-			}
-			if (tmp>0)
-			{
-				do_char_log(co, 0, "You lost %d hitpoints permanently.\n", tmp);
-				chlog(co, "Lost %d permanent hitpoints.", tmp);
-				while (tmp)
-				{
-					do_lower_hp(co);
-					tmp--;
-				}
-			}
-			else
-			{
-				do_char_log(co, 0, "You would have lost permanent hitpoints, but you're already at the minimum.\n");
-			}
-
-			tmp = ch[co].mana[0] / 10;
-			if (ch[co].mana[0] - tmp<50)
-			{
-				tmp = ch[co].mana[0] - 50;
-			}
-			if (tmp>0)
-			{
-				do_char_log(co, 0, "You lost %d mana permanently.\n", tmp);
-				chlog(co, "Lost %d permanent mana.", tmp);
-				while (tmp)
-				{
-					do_lower_mana(co);
-					tmp--;
-				}
-			}
-			else
-			{
-				do_char_log(co, 0, "You would have lost permanent mana, but you're already at the minimum.\n");
-			}
-			*/
 		}
-		/*
-		else if (wimp && !(mf & MF_ARENA))
-		{
-			do_char_log(co, 1, "Sometimes a Guardian Angel is really helpful...\n");
-		}
-		*/
 
 		do_update_char(co);
 
@@ -6072,7 +6009,7 @@ int do_surround_check(int cn, int co, int gethit)
 
 void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROUND RATE hit
 {
-	int hit, dam = 0, die, m, odam = 0;
+	int hit, dam = 0, die, m, mc, odam = 0;
 	int chance, s1, s2, bonus = 0, diff, crit_dice, crit_chance, crit_mult, crit_dam=0, in=0, co_orig=-1;
 	int glv, glv_base = 120;
 	int in2 = 0;
@@ -6102,9 +6039,8 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 	add_enemy(co, cn);
 	
 	// s1 = Attacker // s2 = Defender
-	// Added Feb 2020 - Additional bonus for offhand and combat skills
-	s1 = get_fight_skill(cn) + get_offhand_skill(cn, 1) + get_combat_skill(cn, 0);
-	s2 = get_fight_skill(co) + get_offhand_skill(co, 2) + get_combat_skill(co, 0);
+	s1 = ch[cn].to_hit;
+	s2 = ch[co].to_parry;
 
 	if (has_spell_from_item(cn, BUF_IT_DRAG)) s1 += 3;
 	if (has_spell_from_item(co, BUF_IT_DRAG)) s2 += 3;
@@ -6298,28 +6234,9 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 	if (hit)
 	{
 		dam = ch[cn].weapon + RANDOM(9);
-		// Tarot - Magician - Effects of Strength and Intuition are swapped
-		if (get_tarot(cn, IT_CH_MAGI))
+		if (ch[cn].top_damage>3)
 		{
-			if (get_attrib_score(cn, AT_INT)>3)
-			{
-				// Fists of the Heavens
-				if (it[ch[cn].worn[WN_RHAND]].temp==IT_TW_HEAVENS)
-					dam += RANDOM(get_attrib_score(cn, AT_INT));
-				else
-					dam += RANDOM(get_attrib_score(cn, AT_INT) / 2);
-			}
-		}
-		else
-		{
-			if (get_attrib_score(cn, AT_STR)>3)
-			{
-				// Fists of the Heavens
-				if (it[ch[cn].worn[WN_RHAND]].temp==IT_TW_HEAVENS)
-					dam += RANDOM(get_attrib_score(cn, AT_STR));
-				else
-					dam += RANDOM(get_attrib_score(cn, AT_STR) / 2);
-			}
+			dam += RANDOM(ch[cn].top_damage);
 		}
 		
 		// Tarot - Strength - 25% more damage
@@ -6331,45 +6248,17 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		
 		odam 	  = dam;
 		dam 	 += bonus;
-	//	glv_base += bonus;
 		
-		// Feb 2020 - Critical hits!! For sanity's sake, only players and their GCs can get them.
+		// Critical hits!! For sanity's sake, only players and their GCs can get them.
 		// This is deliberately placed after setting odam, so that crits don't make SH dumb
 		if ((ch[cn].flags & (CF_PLAYER | CF_CANCRIT)) || ch[cn].skill[SK_PRECISION][0])
 		{
-			crit_mult	= 3;
-			crit_dice 	= 20000;
-			crit_chance =   200; // 1%
+			crit_dice 	= 10000;
+			crit_chance = ch[cn].crit_chance;
+			crit_mult   = ch[cn].crit_multi;
 			
-			// Improved crit chance for Claws
-			if (it[ch[cn].worn[WN_RHAND]].flags & (IF_WP_CLAW))
-			{
-				crit_chance *= 3; // 3%
-			}
-			// Improved crit chance for Daggers and Twohanders
-			else if (it[ch[cn].worn[WN_RHAND]].flags & (IF_WP_DAGGER | IF_WP_TWOHAND))
-			{
-				crit_chance *= 2; // 2%
-			}
-			else if (ch[cn].flags & (CF_CANCRIT) && IS_PLAYER(ch[cn].data[63]))
-			{
-				crit_chance *= ch[cn].data[2];
-			}
-			
-			// Tarot - Wheel of Fortune - Less crit chance, more crit multi
-			if (get_tarot(cn, IT_CH_WHEEL))
-			{
-				crit_chance /= 2;
-				crit_mult   *= 2;
-			}
-			
-			// Precision skill - more crit chance
-			if (ch[cn].skill[SK_PRECISION][0])
-			{
-				crit_chance += (crit_chance * get_skill_score(cn, SK_PRECISION))/PRECISION_CAP;
-			}
-			
-			if (ch[cn].data[73]) // Way of the Sword
+			 // Book - Way of the Sword
+			if (ch[cn].data[73])
 			{
 				crit_chance += ch[cn].data[73];
 			}
@@ -6459,12 +6348,12 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 				{
 					remember_pvp(cn, co);
 					if (!do_surround_check(cn, co, 1)) continue;
-					if (get_skill_score(cn, SK_SURROUND) + RANDOM(40)>=get_fight_skill(co))
+					if (get_skill_score(cn, SK_SURROUND) + RANDOM(40)>=ch[co].to_parry)
 					{
 						surrBonus = 0;
-						if ((get_skill_score(cn, SK_SURROUND)-get_fight_skill(co))>0)
+						if ((get_skill_score(cn, SK_SURROUND)-ch[co].to_parry)>0)
 						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-get_fight_skill(co)), 20)/20;
+							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-ch[co].to_parry), 20)/20;
 						}
 						surrTotal = surrDam+surrBonus;
 						if (co==co_orig) surrTotal = surrTotal/4*3;
@@ -6484,111 +6373,41 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			{
 				// Regular Surround-hit checks for surrounding targets
 				m = ch[cn].x + ch[cn].y * MAPX;
-				if ((co = map[m + 1].ch)!=0 && ch[co].attack_cn==cn)
+				
+				for (n=0; n<4; n++)
 				{
-					if (	(surround==1 && get_skill_score(cn, SK_SURROUND)  + RANDOM(40)>=get_fight_skill(co)) 
-						|| 	(surround==2 && get_skill_score(cn, SK_SURRSPEED) + RANDOM(20)>=get_fight_skill(co)))
+					switch (n)
 					{
-						surrBonus = 0;
-						if (surround==1 && (get_skill_score(cn, SK_SURROUND)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-get_fight_skill(co)), 20)/20;
-						}
-						if (surround==2 && (get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co)), 40)/40;
-						}
-						surrTotal = surrDam+surrBonus;
-						if (co==co_orig) surrTotal = surrTotal/4*3;
-						do_hurt(cn, co, surrTotal, 4);
-						if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
-						{
-							if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
-							if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
-							if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
-							if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
-							if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
-						}
+						case 0: mc = m + 1; break;
+						case 1: mc = m - 1; break;
+						case 2: mc = m + MAPX; break;
+						case 3: mc = m - MAPX; break;
 					}
-				}
-				if ((co = map[m - 1].ch)!=0 && ch[co].attack_cn==cn)
-				{
-					if (	(surround==1 && get_skill_score(cn, SK_SURROUND)  + RANDOM(40)>=get_fight_skill(co)) 
-						|| 	(surround==2 && get_skill_score(cn, SK_SURRSPEED) + RANDOM(20)>=get_fight_skill(co)))
+					if ((co = map[mc].ch)!=0 && ch[co].attack_cn==cn)
 					{
-						surrBonus = 0;
-						if (surround==1 && (get_skill_score(cn, SK_SURROUND)-get_fight_skill(co))>0)
+						if (	(surround==1 && get_skill_score(cn, SK_SURROUND)  + RANDOM(40)>=ch[co].to_parry) 
+							|| 	(surround==2 && get_skill_score(cn, SK_SURRSPEED) + RANDOM(20)>=ch[co].to_parry))
 						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-get_fight_skill(co)), 20)/20;
-						}
-						if (surround==2 && (get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co)), 40)/40;
-						}
-						surrTotal = surrDam+surrBonus;
-						if (co==co_orig) surrTotal = surrTotal/4*3;
-						do_hurt(cn, co, surrTotal, 4);
-						if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
-						{
-							if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
-							if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
-							if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
-							if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
-							if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
-						}
-					}
-				}
-				if ((co = map[m + MAPX].ch)!=0 && ch[co].attack_cn==cn)
-				{
-					if (	(surround==1 && get_skill_score(cn, SK_SURROUND)  + RANDOM(40)>=get_fight_skill(co)) 
-						|| 	(surround==2 && get_skill_score(cn, SK_SURRSPEED) + RANDOM(20)>=get_fight_skill(co)))
-					{
-						surrBonus = 0;
-						if (surround==1 && (get_skill_score(cn, SK_SURROUND)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-get_fight_skill(co)), 20)/20;
-						}
-						if (surround==2 && (get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co)), 40)/40;
-						}
-						surrTotal = surrDam+surrBonus;
-						if (co==co_orig) surrTotal = surrTotal/4*3;
-						do_hurt(cn, co, surrTotal, 4);
-						if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
-						{
-							if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
-							if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
-							if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
-							if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
-							if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
-						}
-					}
-				}
-				if ((co = map[m - MAPX].ch)!=0 && ch[co].attack_cn==cn)
-				{
-					if (	(surround==1 && get_skill_score(cn, SK_SURROUND)  + RANDOM(40)>=get_fight_skill(co)) 
-						|| 	(surround==2 && get_skill_score(cn, SK_SURRSPEED) + RANDOM(20)>=get_fight_skill(co)))
-					{
-						surrBonus = 0;
-						if (surround==1 && (get_skill_score(cn, SK_SURROUND)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-get_fight_skill(co)), 20)/20;
-						}
-						if (surround==2 && (get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co))>0)
-						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURRSPEED)-get_fight_skill(co)), 40)/40;
-						}
-						surrTotal = surrDam+surrBonus;
-						if (co==co_orig) surrTotal = surrTotal/4*3;
-						do_hurt(cn, co, surrTotal, 4);
-						if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
-						{
-							if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
-							if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
-							if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
-							if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
-							if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
+							surrBonus = 0;
+							if (surround==1 && (get_skill_score(cn, SK_SURROUND)-ch[co].to_parry)>0)
+							{
+								surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-ch[co].to_parry), 20)/20;
+							}
+							if (surround==2 && (get_skill_score(cn, SK_SURRSPEED)-ch[co].to_parry)>0)
+							{
+								surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURRSPEED)-ch[co].to_parry), 40)/40;
+							}
+							surrTotal = surrDam+surrBonus;
+							if (co==co_orig) surrTotal = surrTotal/4*3;
+							do_hurt(cn, co, surrTotal, 4);
+							if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
+							{
+								if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
+								if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
+								if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
+								if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
+								if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
+							}
 						}
 					}
 				}
@@ -6606,9 +6425,9 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		
 		if ((ch[co].flags & CF_PLAYER) && it[ch[co].worn[WN_LHAND]].temp==IT_BOOK_SWOR) // Book: Way of the Sword
 		{
-			// NOTE: A value of 200 is 1%. 20000 is 100%.
+			// NOTE: A value of 100 is 1%. 10000 is 100%.
 			ch[co].data[73]+=50;
-			if (ch[co].data[73]>20000) ch[co].data[73]=20000;
+			if (ch[co].data[73]>10000) ch[co].data[73]=10000;
 		}
 	}
 }
@@ -6972,12 +6791,18 @@ void really_update_char(int cn)
 	int tempWeapon = 0, tempArmor = 0;
 	int hastePower = 0, slowPower = 0, hasteSpeed = 0, slowSpeed = 0, slow2Speed = 0, rootBoots = 0;
 	int attrib[5];
+	int attrib_ex[5];
 	int skill[50];
 	unsigned long long prof;
-	int charmSpec = 0;
+	int charmSpec = 0, gearSpec = 0;
 	int in=0;
-	int speedvalue_one, speedvalue_two;
-
+	//int speedvalue_a = 0, speedvalue_b = 0, speedvalue_c = 0;
+	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0;
+	int spell_mod = 0, spell_apt = 0, spell_cool = 0;
+	int critical_c = 0, critical_m = 0;
+	int hit_rate = 0, parry_rate = 0;
+	int damage_top = 0;
+	
 	prof = prof_start();
 
 	ch[cn].flags &= ~(CF_NOHPREG | CF_NOENDREG | CF_NOMANAREG);
@@ -7041,6 +6866,12 @@ void really_update_char(int cn)
 	light = 0;
 	maxlight = 0;
 	
+	base_spd = spd_move = spd_attack = spd_cast = 0;
+	spell_mod = spell_apt = spell_cool = 0;
+	critical_c = critical_m = 0;
+	hit_rate = parry_rate = 0;
+	damage_top = 0;
+	
 	// Loop through gear slots
 	for (n = 0; n<20; n++)
 	{
@@ -7063,6 +6894,15 @@ void really_update_char(int cn)
 				
 				// Skills
 				for (z = 0; z<MAXSKILL; z++) skill[z] += it[m].skill[z][1];
+				
+				// Meta values
+				base_spd   += it[m].speed[1];
+				spd_move   += it[m].move_speed[1];
+				spd_attack += it[m].atk_speed[1];
+				spd_cast   += it[m].cast_speed[1];
+				spell_mod  += it[m].spell_mod[1];
+				spell_apt  += it[m].spell_apt[1];
+				spell_cool += it[m].cool_bonus[1];
 			}
 			// Otherwise, give normal stat boosts
 			else
@@ -7076,13 +6916,27 @@ void really_update_char(int cn)
 				
 				// Skills
 				for (z = 0; z<MAXSKILL; z++) skill[z] += it[m].skill[z][0];
+				
+				// Meta values
+				base_spd   += it[m].speed[0];
+				spd_move   += it[m].move_speed[0];
+				spd_attack += it[m].atk_speed[0];
+				spd_cast   += it[m].cast_speed[0];
+				spell_mod  += it[m].spell_mod[0];
+				spell_apt  += it[m].spell_apt[0];
+				spell_cool += it[m].cool_bonus[0];
 			}
 			
-			if (it[m].temp==IT_CH_PREIST) charmSpec |= 1;
-			if (it[m].temp==IT_CH_LOVERS) charmSpec |= 2;
-			if (it[m].temp==IT_CH_MAGI)   charmSpec |= 4;
-			if (it[m].temp==IT_CH_HERMIT) charmSpec |= 8;
-			if (it[m].temp==IT_CH_TEMPER) charmSpec |=16;
+			if (it[m].temp==IT_CH_PREIST) 	charmSpec |=  1;
+			if (it[m].temp==IT_CH_LOVERS) 	charmSpec |=  2;
+			if (it[m].temp==IT_CH_MAGI)   	charmSpec |=  4;
+			if (it[m].temp==IT_CH_HERMIT) 	charmSpec |=  8;
+			if (it[m].temp==IT_CH_TEMPER) 	charmSpec |= 16;
+			if (it[m].temp==IT_CH_STRENGTH)	charmSpec |= 32;
+			if (it[m].temp==IT_CH_WHEEL)	charmSpec |= 64;
+			
+			if (it[m].temp==IT_BOOK_TRAV) 	gearSpec |= 1;
+			if (it[m].temp==IT_TW_HEAVENS)	gearSpec |= 2;
 		}
 		
 		// Regular item bonuses
@@ -7115,6 +6969,13 @@ void really_update_char(int cn)
 			{
 				sublight -= it[m].light[1];
 			}
+			
+			// Meta values
+			critical_c += it[m].crit_chance[1];
+			critical_m += it[m].crit_multi[1];
+			hit_rate   += it[m].to_hit[1];
+			parry_rate += it[m].to_parry[1];
+			damage_top += it[m].top_damage[1];
 		}
 		else
 		{
@@ -7146,6 +7007,13 @@ void really_update_char(int cn)
 			{
 				sublight -= it[m].light[0];
 			}
+			
+			// Meta values
+			critical_c += it[m].crit_chance[0];
+			critical_m += it[m].crit_multi[0];
+			hit_rate   += it[m].to_hit[0];
+			parry_rate += it[m].to_parry[0];
+			damage_top += it[m].top_damage[0];
 		}
 	}
 	// Feb 2020 - Store the current armor and weapon values from your gear, before other additions.
@@ -7199,7 +7067,21 @@ void really_update_char(int cn)
 			{
 				sublight -= bu[m].light[1];
 			}
-
+			
+			// Meta values
+			base_spd   += bu[m].speed[1];
+			spd_move   += bu[m].move_speed[1];
+			spd_attack += bu[m].atk_speed[1];
+			spd_cast   += bu[m].cast_speed[1];
+			spell_mod  += bu[m].spell_mod[1];
+			spell_apt  += bu[m].spell_apt[1];
+			spell_cool += bu[m].cool_bonus[1];
+			critical_c += bu[m].crit_chance[1];
+			critical_m += bu[m].crit_multi[1];
+			hit_rate   += bu[m].to_hit[1];
+			parry_rate += bu[m].to_parry[1];
+			damage_top += bu[m].top_damage[1];
+			
 			if (bu[m].temp==SK_WARCRY2)
 			{
 				if (it[ch[cn].worn[WN_FEET]].temp==IT_TW_ROOTS) // Commander's Roots
@@ -7207,8 +7089,6 @@ void really_update_char(int cn)
 					rootBoots = 1;
 					slowPower += 150;
 					ch[cn].stunned = 10000 + 1 + slowPower;
-					//slowPower += 18;
-					//ch[cn].stunned = 2 + slowPower;
 				}
 				else
 					ch[cn].stunned = 1;
@@ -7247,24 +7127,6 @@ void really_update_char(int cn)
 				{
 					ch[cn].stunned = 10000 + 1 + slowPower;
 				}
-				
-				
-				/*
-				if (it[m].temp==SK_SLOW || it[m].temp==SK_SLOW2)
-				{
-					if (!hasSlow)
-					{
-						slowPower += 3;
-						hasSlow = 1;
-					}
-					if (it[ch[cn].worn[WN_FEET]].temp==IT_TW_ROOTS) // Commander's Roots
-						slowPower += it[m].cost/2;
-					else
-						slowPower += it[m].cost;
-				}
-				*/
-				
-				
 			}
 			
 			if (bu[m].temp==666) // Stunned for cutscene
@@ -7494,71 +7356,337 @@ void really_update_char(int cn)
 		light = 250;
 	}
 	ch[cn].light = light;
-
-	// ******************************** Speed mod stuff! ******************************** //
-	// Feb 2020 - ...
-	// Previously the table was between 1 and 20, with 10 being the median.
-	// Now it is between 1 and 36, however the "median" is now 12.
-	// Please note that the previous value of 20 is now 24, and higher values move faster.
-	/*
-			 3 / 24 = 0.125x  frame speed
-			 6 / 24 = 0.250x
-			12 / 24 = 0.500x
-			18 / 24 = 0.750x
-			24 / 24 = 1.000x
-			30 / 24 = 1.250x
-			36 / 24 = 1.500x  (maximum)
-	*/
-	n = 14;
 	
-	// (240 + 240) / 60 = 8
+	// ******************************** Meta mods! ******************************** //
+	// In addition to gear and spells above, these mods may have extra bonuses applied by skills or race.
 	
-	speedvalue_one = get_attrib_score(cn, AT_AGL);
-	speedvalue_two = get_attrib_score(cn, AT_STR);
+	// "attrib" is used to store the base value, mainly for spell aptitude
+	// "attrib_ex" is used to store the mod value, used by everything else.
+	for (n=0;n<5;n++)
+	{
+		attrib[n]    = ch[cn].attrib[n][0];
+		attrib_ex[n] = ch[cn].attrib[n][5];
+	}
 	
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_TRAV) // Book: Traveller's Guide
-		speedvalue_one = get_attrib_score(cn, AT_BRV);
+	// Book - Traveler's Guide :: Swap effects of Braveness and Agility
+	if (gearSpec & 1) 
+	{
+		attrib[AT_BRV] = ch[cn].attrib[AT_AGL][0];
+		attrib[AT_AGL] = ch[cn].attrib[AT_BRV][0];
+		
+		attrib_ex[AT_BRV] = ch[cn].attrib[AT_AGL][5];
+		attrib_ex[AT_AGL] = ch[cn].attrib[AT_BRV][5];
+	}
 	
-	// Tarot - Magician - Effects of Strength and Intuition are swapped
+	// Tarot - Magician :: Swap effects of Strength and Intuition
 	if (charmSpec & 4)
-		speedvalue_two = get_attrib_score(cn, AT_INT);
+	{
+		attrib[AT_INT] = ch[cn].attrib[AT_STR][0];
+		attrib[AT_STR] = ch[cn].attrib[AT_INT][0];
+		
+		attrib_ex[AT_INT] = ch[cn].attrib[AT_STR][5];
+		attrib_ex[AT_STR] = ch[cn].attrib[AT_INT][5];
+	}
 	
-	n += (speedvalue_one+speedvalue_two+hasteSpeed-slowSpeed-slow2Speed)/50 + ch[cn].speed_mod;
+	/*
+		ch[].atk_speed value
+
+		 3 / 24 = 0.125x  frame speed
+		 6 / 24 = 0.250x
+		12 / 24 = 0.500x
+		18 / 24 = 0.750x
+		24 / 24 = 1.000x
+		30 / 24 = 1.250x
+		36 / 24 = 1.500x  (maximum)
+	*/
+	base_spd = 14 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR] + hasteSpeed - slowSpeed - slow2Speed) / 50 + ch[cn].speed_mod;
 	
 	// Additional bonus via speed mode :: Slow, Normal, Fast
-	if (ch[cn].mode==0) n += 2;
-	if (ch[cn].mode==1) n += 4;
-	if (ch[cn].mode==2) n += 6;
+	if (ch[cn].mode==0) base_spd += 2;
+	if (ch[cn].mode==1) base_spd += 4;
+	if (ch[cn].mode==2) base_spd += 6;
 	
-	// Haste and Slow (old)
+	// Clamp base_speed between 1 and SPEED_CAP (36)
+	if (base_spd > SPEED_CAP) 
+	{
+		base_spd = SPEED_CAP;
+	}
+	if (base_spd < 1) 
+	{
+		base_spd = 1;
+	}	
+	ch[cn].speed = SPEED_CAP - base_spd;
+	// Table array is between 0 and 35 and stored in reverse order.
+	// So we take 36, minus our bonus speed values above.
+	
+	
 	/*
-	if (hastePower)	n += hastePower;	
-	if (slowPower)	n -= slowPower;		
+		ch[].move_speed value
 	*/
 	
-	// Tarot - Strength - 20% less action speed
-	if (get_tarot(cn, IT_CH_STRENGTH))
+	if (spd_move > SPEED_CAP)
 	{
-		n = n*80/100;
+		spd_move = SPEED_CAP;
+	}
+	if (spd_move < 0)
+	{
+		spd_move = 0;
+	}
+	ch[cn].move_speed = spd_move;
+	
+	
+	/*
+		ch[].atk_speed value
+	*/
+	
+	spd_attack += attrib_ex[AT_AGL]/28;
+	
+	// Tarot - Strength - 20% less attack speed
+	if (charmSpec & 32)
+	{
+		spd_attack = spd_attack * 80 / 100;
 	}
 	
-	if (n>36) n = 36;
-	if (n<0) n = 0;
-	
-	// Table array is between 0 and 35 and stored in reverse order (for some reason)
-	// So we take 36, minus our bonus speed values above
-	ch[cn].speed = 36 - n;
-	
-	// Shadow copies copy owner speed
-	if ((ch[cn].flags & CF_SHADOWCOPY) && IS_PLAYER(ch[cn].data[63]))
+	// Clamp spd_attack between 0 and SPEED_CAP (36)
+	if (spd_attack > SPEED_CAP)
 	{
-		ch[cn].speed = ch[ch[cn].data[63]].speed;
+		spd_attack = SPEED_CAP;
+	}
+	if (spd_attack < 0)
+	{
+		spd_attack = 0;
+	}
+	ch[cn].atk_speed = spd_attack;
+	
+	
+	/*
+		ch[].cast_speed value
+	*/
+	
+	spd_cast += attrib_ex[AT_BRV]/28;
+	
+	// Clamp spd_cast between 0 and SPEED_CAP (36)
+	if (spd_cast > SPEED_CAP)
+	{
+		spd_cast = SPEED_CAP;
+	}
+	if (spd_cast < 0)
+	{
+		spd_cast = 0;
+	}
+	ch[cn].cast_speed = spd_cast;
+	
+	
+	/*
+		ch[].spell_mod value
+		
+		100 is equal to 1.00 (or 1x power)
+		Upper boundary is 3.00 (3x power) just because any more than that would be ridiculous.
+	*/
+	
+	spell_mod += spell_race_mod(100, cn);
+	
+	// Clamp spell_mod between 0 and 300
+	if (spell_mod > 300)
+	{
+		spell_mod = 300;
+	}
+	if (spell_mod < 0)
+	{
+		spell_mod = 0;
+	}
+	ch[cn].spell_mod = spell_mod;
+	
+	
+	/*
+		ch[].spell_apt value
+	*/
+	
+	spell_apt += attrib[AT_WIL]+attrib[AT_INT];
+	
+	spell_apt = spell_apt * spell_mod / 100;
+	
+	// Clamp spell_apt between 0 and 999
+	if (spell_apt > 999)
+	{
+		spell_apt = 999;
+	}
+	if (spell_apt < 0)
+	{
+		spell_apt = 0;
+	}
+	ch[cn].spell_apt = spell_apt;
+	
+	
+	/*
+		ch[].cool_bonus value
+		
+		dur * 100 / var = skill exhaust
+	*/
+	
+	spell_cool += attrib_ex[AT_INT]/2;
+	
+	// Clamp spell_cool between 0 and 900
+	if (spell_cool > 900)
+	{
+		spell_cool = 900;
+	}
+	if (spell_cool < 0)
+	{
+		spell_cool = 0;
+	}
+	ch[cn].cool_bonus = 100 + spell_cool;
+	
+	
+	/*
+		ch[].crit_chance value
+		
+		Base crit chance is currently determined by what kind of weapon is equipped 
+		(TODO: just make these numbers the weapons have)
+		It is further increased by "Precision" skill score.
+		
+		After this point, crit chance is increased by a factor of 100,
+		so that precision can have a more consistant effect.
+	*/
+	
+	critical_c *= 100;
+	
+	if (ch[cn].skill[SK_PRECISION][0])
+	{
+		critical_c += (critical_c * ch[cn].skill[SK_PRECISION][5])/PRECISION_CAP;
 	}
 	
-	// Clamp between 0 and 35
-	if (ch[cn].speed< 0) ch[cn].speed =  0;
-	if (ch[cn].speed>35) ch[cn].speed = 35;
+	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
+	if (charmSpec & 64)
+	{
+		critical_c /= 2;
+	}
+	
+	// Clamp critical_c between 100 and 10000
+	if (critical_c > 10000)
+	{
+		critical_c = 10000;
+	}
+	if (critical_c < 100)
+	{
+		critical_c = 100;
+	}
+	ch[cn].crit_chance = critical_c;
+	
+	
+	/*
+		ch[].crit_multi value
+		
+		Base crit multiplier is 2x
+	*/
+	
+	critical_m += 100;
+	
+	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
+	if (charmSpec & 64)
+	{
+		critical_m *= 2;
+	}
+	
+	// Clamp critical_m between 0 and 300
+	if (critical_m > 300)
+	{
+		critical_m = 300;
+	}
+	if (critical_m < 0)
+	{
+		critical_m = 0;
+	}
+	ch[cn].crit_multi = 100 + critical_m;
+	
+	
+	/*
+		ch[].to_hit value
+		
+		Determined by base weapon skill, plus dual wield score if dual wielding.
+	*/
+	
+	hit_rate += get_fight_skill(cn);
+	hit_rate += get_offhand_skill(cn, 1);
+	hit_rate += get_combat_skill(cn, 0);
+	
+	// Clamp hit_rate between 0 and 999
+	if (hit_rate > 999)
+	{
+		hit_rate = 999;
+	}
+	if (hit_rate < 0)
+	{
+		hit_rate = 0;
+	}
+	ch[cn].to_hit = hit_rate;
+	
+	
+	/*
+		ch[].to_parry value
+		
+		Determined by base weapon skill, plus shield score if using a shield.
+	*/
+	
+	parry_rate += get_fight_skill(cn);
+	parry_rate += get_offhand_skill(cn, 2);
+	parry_rate += get_combat_skill(cn, 0);
+	
+	// Clamp parry_rate between 0 and 999
+	if (parry_rate > 999)
+	{
+		parry_rate = 999;
+	}
+	if (parry_rate < 0)
+	{
+		parry_rate = 0;
+	}
+	ch[cn].to_parry = parry_rate;
+	
+	
+	/*
+		ch[].top_damage value
+		
+		Determined by STR/2. This is put into a RANDOM(), so "average damage" can be considered WV plus half of this number
+	*/
+	
+	damage_top += attrib_ex[AT_STR]/2;
+	
+	// Weapon - Fist of the Heavens :: Doubles the effectiveness of top-end damage
+	if (gearSpec & 2) 
+	{
+		damage_top *= 2;
+	}
+	
+	// Clamp damage_top between 0 and 999
+	if (damage_top > 999)
+	{
+		damage_top = 999;
+	}
+	if (damage_top < 0)
+	{
+		damage_top = 0;
+	}
+	ch[cn].top_damage = damage_top;
+	
+	// Shadow copies copy owner meta values
+	if ((ch[cn].flags & CF_SHADOWCOPY) && IS_SANECHAR(ch[cn].data[63]))
+	{
+		ch[cn].speed 		= ch[ch[cn].data[63]].speed;
+		ch[cn].move_speed 	= ch[ch[cn].data[63]].move_speed;
+		ch[cn].atk_speed 	= ch[ch[cn].data[63]].atk_speed;
+		ch[cn].cast_speed 	= ch[ch[cn].data[63]].cast_speed;
+		ch[cn].spell_mod 	= ch[ch[cn].data[63]].spell_mod;
+		ch[cn].spell_apt 	= ch[ch[cn].data[63]].spell_apt;
+		ch[cn].cool_bonus 	= ch[ch[cn].data[63]].cool_bonus;
+		ch[cn].crit_chance 	= ch[ch[cn].data[63]].crit_chance;
+		ch[cn].crit_multi 	= ch[ch[cn].data[63]].crit_multi;
+		ch[cn].to_hit 		= ch[ch[cn].data[63]].to_hit;
+		ch[cn].to_parry 	= ch[ch[cn].data[63]].to_parry;
+		ch[cn].top_damage 	= ch[ch[cn].data[63]].top_damage;
+	}
 
+	// Force hp/end/mana to sane values
 	if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
 	{
 		ch[cn].a_hp = ch[cn].hp[5] * 1000;
@@ -7571,7 +7699,8 @@ void really_update_char(int cn)
 	{
 		ch[cn].a_mana = ch[cn].mana[5] * 1000;
 	}
-
+	
+	// Adjust local light score
 	if (oldlight!=ch[cn].light && ch[cn].used==USE_ACTIVE &&
 	    ch[cn].x>0 && ch[cn].x<MAPX && ch[cn].y>0 && ch[cn].y<MAPY &&
 	    map[ch[cn].x + ch[cn].y * MAPX].ch==cn)

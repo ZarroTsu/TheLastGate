@@ -248,7 +248,8 @@ extern unsigned int mapmarker;
 #define CF_AREA_OFF    (1ull<<55)       // Toggle AoE Skills
 #define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
 
-#define AT_CAP		255
+#define AT_CAP				255
+#define SPEED_CAP 			36
 
 #define PROXIMITY_MULTI		(AT_CAP/(3/2))
 #define PROXIMITY_CAP		(AT_CAP/9)
@@ -499,19 +500,18 @@ struct character
 	unsigned char atk_speed;		// Bonus to attacking speed (added to speed_mod)
 	unsigned char cast_speed;		// Bonus to casting speed (added to speed_mod)
 	
-	unsigned short spell_mod;       // race dependent spell modifier - three digit decimal accuracy (1.000)
+	unsigned short spell_mod;       // race dependent spell modifier - two digit decimal accuracy (1.00)
 	unsigned short spell_apt;       // aptitude for receiving spells
-	unsigned short cool_bonus;      // exhaust cooldown rate - three digit decimal accuracy (1.000)
+	unsigned short cool_bonus;      // exhaust cooldown rate
 	
-	unsigned char crit_chance;     	// chance to deal a critical hit (/2)
-	unsigned char crit_multi;		// multiplier for critical hits
+	unsigned short crit_chance;     // chance to deal a critical hit (100 = 1%)
+	unsigned short crit_multi;		// multiplier for critical hits
 	
 	unsigned short to_hit;       	// final chance to hit
 	unsigned short to_parry;       	// final chance to parry
+	unsigned short top_damage;		// Maximum damage score (normally handled by STR/2)
 	
-	char top_damage;				// Maximum damage score (normally handled by STR/2)
-	
-	char future1[9];               // space for future expansion
+	char future1[6];               // space for future expansion
 
 	short int sprite_override;
 
@@ -662,6 +662,7 @@ struct item
 
 	char min_rank;                  // minimum rank to wear the item
 	
+	char speed[2];					// base action speed modifier (for haste and slow)
 	char move_speed[2];				// movement speed bonus
 	char atk_speed[2];				// attack speed bonus
 	char cast_speed[2];				// Cast speed bonus
@@ -680,7 +681,7 @@ struct item
 	
 	unsigned char stack;			// Item stacking
 	
-	char future3[16];				// 587
+	char future3[14];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595

@@ -2174,13 +2174,20 @@ unsigned char speedtab[36][24] =
 
 static inline int speedo(int n)
 {
-	return(speedtab[ch[n].speed][ctick]);
+	int moveSpeedValue;
+	
+	moveSpeedValue = ch[n].speed - ch[n].move_speed;
+	if (moveSpeedValue < 0)
+	{
+		moveSpeedValue = 0;
+	}
+	return(speedtab[moveSpeedValue][ctick]);
 }
-
-// Feb 2020 - better FIGHT speed with better agl, better CAST speed with better int
 static inline int speedoMisc(int n)
 {
-	int miscSpeedValue = ch[n].speed;
+	int miscSpeedValue;
+	
+	miscSpeedValue = ch[n].speed;
 	
 	switch(ch[n].status2)
 	{
@@ -2188,36 +2195,20 @@ static inline int speedoMisc(int n)
 		case    0:
 		case    5:
 		case    6:
-			if (it[ch[n].worn[WN_LHAND]].temp==IT_BOOK_TRAV) // Book: Traveller's Guide
+			miscSpeedValue -= ch[n].atk_speed;
+			if (miscSpeedValue < 0)
 			{
-				miscSpeedValue -= (get_attrib_score(n, AT_BRV))/28;
+				miscSpeedValue = 0;
 			}
-			else if ((ch[n].flags & CF_SHADOWCOPY) && IS_PLAYER(ch[n].data[63]))
-			{
-				miscSpeedValue -= (get_attrib_score(ch[n].data[63], AT_AGL))/28;
-			}
-			else
-			{
-				miscSpeedValue -= (get_attrib_score(n, AT_AGL))/28;
-			}
-			if (miscSpeedValue < 0) miscSpeedValue = 0;
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
 		case    9:
-			if (it[ch[n].worn[WN_LHAND]].temp==IT_BOOK_TRAV) // Book: Traveller's Guide
+			miscSpeedValue -= ch[n].cast_speed;
+			if (miscSpeedValue < 0)
 			{
-				miscSpeedValue -= (get_attrib_score(n, AT_AGL))/28;
+				miscSpeedValue = 0;
 			}
-			else if ((ch[n].flags & CF_SHADOWCOPY) && IS_PLAYER(ch[n].data[63]))
-			{
-				miscSpeedValue -= (get_attrib_score(ch[n].data[63], AT_BRV))/28;
-			}
-			else
-			{
-				miscSpeedValue -= (get_attrib_score(n, AT_BRV))/28;
-			}
-			if (miscSpeedValue < 0) miscSpeedValue = 0;
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// Default - Shouldn't happen but here as a redundancy

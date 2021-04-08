@@ -2345,7 +2345,7 @@ int npc_try_spell(int cn, int co, int spell)
 	
 	// dont cleave if enemy armor is too strong
 	if (spell==SK_CLEAVE && ( ((get_skill_score(cn, SK_CLEAVE) + ch[cn].weapon/4 
-		- max(0, (get_fight_skill(co)+get_offhand_skill(co,2)+get_combat_skill(co,0))/2))) * 2 ) - ch[co].armor < 20/3)
+		- max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3)
 	{
 		return( 0);
 	}

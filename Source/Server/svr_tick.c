@@ -2397,26 +2397,17 @@ void plr_change(int nr)
 			{
 				buf[0] = SV_SETCHAR_WORN;
 				*(unsigned long*)(buf + 1) = n;
-				if (n == WN_SPEED)	*(short int*)(buf + 5) = ch[cn].speed;
-				if (n == WN_SPMOD)	*(short int*)(buf + 5) = spell_race_mod(100, cn);
+				if (n == WN_SPEED)	
+				{
+					*(short int*)(buf + 5) = ch[cn].speed;
+				}
+				if (n == WN_SPMOD)	
+				{
+					*(short int*)(buf + 5) = ch[cn].spell_mod;
+				}
 				if (n == WN_CRIT)
 				{
-					int crit =  100; // 1% chance...
-					int in2 = it[ch[cn].worn[WN_ARMS]].temp;
-					if (it[ch[cn].worn[WN_RHAND]].flags & (IF_WP_CLAW))	
-						crit *= 5;
-					else if (it[ch[cn].worn[WN_RHAND]].flags & (IF_WP_DAGGER | IF_WP_TWOHAND))	
-						crit *= 2;
-					if (in2==IT_GL_SERPENT || in2==IT_GL_SPIDER || in2==IT_GL_CURSED || in2==IT_GL_TITANS)	
-						crit /= 2;
-					if (ch[cn].skill[SK_PRECISION][0])
-						crit = (crit * get_skill_score(cn, SK_PRECISION))/50;
-					if (ch[cn].data[73]) 
-						crit += ch[cn].data[73]/2;
-					crit *= 3;	// ...of 3x damage
-					if (crit>20000)
-						crit = 20000;
-					*(short int*)(buf + 5) = crit + 10000;
+					*(short int*)(buf + 5) = ch[cn].crit_chance * ch[cn].crit_multi / 100;
 				}
 				*(short int*)(buf + 7) = 0;
 				xsend(nr, buf, 9);
@@ -3311,22 +3302,10 @@ void plr_getmap_complete(int nr)
 				{
 					smap[n].ch_proz = 0;
 				}
-				// Feb 2020 - Hope this works...
-				if (it[ch[co].worn[WN_LHAND]].temp==IT_BOOK_TRAV) // Book: Traveller's Guide
-				{
-					smap[n].ch_castspd = get_attrib_score(co, AT_AGL)/28; // Agl - for cast speed
-					smap[n].ch_atkspd = get_attrib_score(co, AT_BRV)/28; // Brv - for attack speed
-				}
-				else if ((ch[co].flags & CF_SHADOWCOPY) && IS_PLAYER(ch[co].data[63]))
-				{
-					smap[n].ch_castspd = get_attrib_score(ch[co].data[63], AT_BRV)/28; // Brv - for cast speed
-					smap[n].ch_atkspd = get_attrib_score(ch[co].data[63], AT_AGL)/28; // Agl - for attack speed
-				}
-				else
-				{
-					smap[n].ch_castspd = get_attrib_score(co, AT_BRV)/28; // Brv - for cast speed
-					smap[n].ch_atkspd = get_attrib_score(co, AT_AGL)/28; // Agl - for attack speed
-				}
+				// Sending packets for speed bonuses.
+				// Used by local client to render frames correctly.
+				smap[n].ch_atkspd = ch[co].atk_speed;
+				smap[n].ch_castspd = ch[co].cast_speed;
 				//
 				smap[n].flags |= ISCHAR;
 				if (ch[co].stunned==1)
