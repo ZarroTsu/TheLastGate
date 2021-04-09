@@ -681,7 +681,9 @@ struct item
 	
 	unsigned char stack;			// Item stacking
 	
-	char future3[14];				// 587
+	short int orig_sprite[2];       // Original sprite value, for restoration by repair
+	
+	char future3[10];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595

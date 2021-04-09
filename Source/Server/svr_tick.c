@@ -2407,7 +2407,7 @@ void plr_change(int nr)
 				}
 				if (n == WN_CRIT)
 				{
-					*(short int*)(buf + 5) = ch[cn].crit_chance * ch[cn].crit_multi / 100;
+					*(short int*)(buf + 5) = 10000 + ch[cn].crit_chance * ch[cn].crit_multi / 100;
 				}
 				*(short int*)(buf + 7) = 0;
 				xsend(nr, buf, 9);

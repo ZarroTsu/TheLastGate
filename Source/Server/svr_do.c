@@ -1589,15 +1589,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing TWOHANDER weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   | Gives: \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |   WV   \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+--------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   12   \n");
-		do_char_log(cn, 1, "Steel       |  16 |  12 |    18 |   24   \n");
-		do_char_log(cn, 1, "Gold        |  26 |  20 |    36 |   36   \n");
-		do_char_log(cn, 1, "Emerald     |  40 |  32 |    54 |   48   \n");
-		do_char_log(cn, 1, "Crystal     |  58 |  48 |    72 |   60   \n");
-		do_char_log(cn, 1, "Titanium    |  80 |  68 |    90 |   72   \n");
+		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | Mlt \n");
+		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  12 |     \n");
+		do_char_log(cn, 1, "Steel       |  16 |  12 |    18 |  24 |   5 \n");
+		do_char_log(cn, 1, "Gold        |  26 |  20 |    36 |  36 |  10 \n");
+		do_char_log(cn, 1, "Emerald     |  40 |  32 |    54 |  48 |  15 \n");
+		do_char_log(cn, 1, "Crystal     |  58 |  48 |    72 |  60 |  20 \n");
+		do_char_log(cn, 1, "Titanium    |  80 |  68 |    90 |  72 |  25 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Twohanders will use both hand slots.\n");
 		do_char_log(cn, 2, "* Twohanders have a critical hit chance of 2%%.\n");
@@ -1610,14 +1610,14 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing GREATAXE weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   | Gives: \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |   WV   \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+--------\n");
-		do_char_log(cn, 1, "Steel       |  12 |  14 |    15 |   28   \n");
-		do_char_log(cn, 1, "Gold        |  20 |  24 |    30 |   42   \n");
-		do_char_log(cn, 1, "Emerald     |  32 |  40 |    45 |   56   \n");
-		do_char_log(cn, 1, "Crystal     |  48 |  62 |    60 |   70   \n");
-		do_char_log(cn, 1, "Titanium    |  68 |  90 |    75 |   84   \n");
+		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | Top \n");
+		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
+		do_char_log(cn, 1, "Steel       |  12 |  14 |    15 |  28 |   2 \n");
+		do_char_log(cn, 1, "Gold        |  20 |  24 |    30 |  42 |   4 \n");
+		do_char_log(cn, 1, "Emerald     |  32 |  40 |    45 |  56 |   6 \n");
+		do_char_log(cn, 1, "Crystal     |  48 |  62 |    60 |  70 |   8 \n");
+		do_char_log(cn, 1, "Titanium    |  68 |  90 |    75 |  84 |  10 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Greataxes will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Axe and Two-Handed skills.\n");
@@ -1734,6 +1734,7 @@ void do_showranklist(int cn)
 	do_char_log(cn, 1, "2nd Lieu     750,750      Baron     57,557,500\n");
 	do_char_log(cn, 1, "1st Lieu   1,251,250      Earl      74,002,500\n");
 	do_char_log(cn, 1, "Captain    2,002,000      Warlord   94,185,000\n");
+	do_char_log(cn, 1, " ???     ???,???,???\n");
 	do_char_log(cn, 1, " \n");
 }
 
@@ -6011,6 +6012,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 {
 	int hit, dam = 0, die, m, mc, odam = 0;
 	int chance, s1, s2, bonus = 0, diff, crit_dice, crit_chance, crit_mult, crit_dam=0, in=0, co_orig=-1;
+	int surrDam, surrBonus, surrTotal, n;
 	int glv, glv_base = 120;
 	int in2 = 0;
 
@@ -6315,8 +6317,6 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		
 		if (surround && ch[cn].skill[SK_SURROUND][0])
 		{
-			int surrDam, surrBonus, surrTotal;
-			
 			surrDam = odam/4*3 + crit_dam/2;
 			glv 	= glv_base/4*3;
 			

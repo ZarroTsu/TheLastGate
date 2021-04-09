@@ -1136,24 +1136,6 @@ int spell_race_mod(int power, int cn)
 	if (globs->newmoon)		{ mod += 0.10; }
 	if (globs->fullmoon)	{ mod += 0.15; }
 	
-	// Amulet of Adepts
-	if (it[ch[cn].worn[WN_NECK]].temp==IT_RD_AMMYTHR)
-	{
-		mod += 0.05;
-	}
-	// Ring of Prophets
-	if (it[ch[cn].worn[WN_LRING]].temp==IT_TW_PROPHET)
-	{
-		if (it[ch[cn].worn[WN_LRING]].active) 	mod += 0.10;
-		else 									mod += 0.05;
-	}
-	// Ring of Prophets
-	if (it[ch[cn].worn[WN_RRING]].temp==IT_TW_PROPHET)
-	{
-		if (it[ch[cn].worn[WN_RRING]].active) 	mod += 0.10;
-		else 									mod += 0.05;
-	}
-	
 	return((int)(power * mod));
 }
 
