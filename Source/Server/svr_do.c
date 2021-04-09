@@ -7398,6 +7398,8 @@ void really_update_char(int cn)
 		24 / 24 = 1.000x
 		30 / 24 = 1.250x
 		36 / 24 = 1.500x  (maximum)
+		
+		(TODO: Make haste and slow hold speed on the buff/debuff itself)
 	*/
 	base_spd = 14 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR] + hasteSpeed - slowSpeed - slow2Speed) / 50 + ch[cn].speed_mod;
 	
@@ -7542,7 +7544,6 @@ void really_update_char(int cn)
 		ch[].crit_chance value
 		
 		Base crit chance is currently determined by what kind of weapon is equipped 
-		(TODO: just make these numbers the weapons have)
 		It is further increased by "Precision" skill score.
 		
 		After this point, crit chance is increased by a factor of 100,

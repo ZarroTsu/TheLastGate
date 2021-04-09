@@ -752,8 +752,21 @@ struct s_splog
 	char senseaoe[100];	// log sense aoe,	ie. " tried to include you in a mass-curse but failed."
 };
 
+#define N_SOULCAT		45
+#define N_SOULBONUS		72
+
+struct s_soulcat
+{
+	int nr;
+	
+	char cost;						// Number of soul levels needed to apply
+	char bonus;						// Number of points granted when applied
+	char weightmulti[N_SOULCAT];	// Weight multiplier per each catalyst type
+};
+
 extern struct s_skilltab skilltab[MAXSKILL];
 extern struct s_splog splog[60];
+extern struct s_soulcat soulcat[N_SOULBONUS];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
