@@ -10,6 +10,17 @@
 
 void look_item_details(int cn, int in)
 {
+	int act, in2 = 0;
+	
+	if (it[in].active)
+	{
+		act = 1;
+	}
+	else
+	{
+		act = 0;
+	}
+	
 	if (it[in].max_age[act] || it[in].max_damage)
 	{
 		if (it[in].damage_state==0)
@@ -137,7 +148,7 @@ void look_extra(int cn, int in)
 	else if (it[in].temp==BUF_IT_AALE)
 		do_char_log(cn, 3, "Grants 15%% reduced endurance costs for its duration.\n");
 	else if (it[in].temp==BUF_IT_DRAG)
-		do_char_log(cn, 3, "Grants a slight increase in hit and parry chance for its duration.\n");
+		do_char_log(cn, 3, "Grants additional critical strike multiplier for its duration.\n");
 	else if (it[in].temp==BUF_IT_MANA)
 		do_char_log(cn, 3, "Grants 15%% reduced mana costs for its duration.\n");
 	

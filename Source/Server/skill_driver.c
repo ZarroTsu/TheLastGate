@@ -1425,7 +1425,7 @@ int cast_a_spell(int cn, int co, int in, int debuff)
 			"Magical interference neutralized the %s's effect.\n", bu[in].name);
 			return 0;
 		}
-		if (in!=SK_RECALL && in!=SK_IDENT)
+		if (temp!=SK_RECALL && temp!=SK_IDENT)
 		{
 			do_char_log(cn, 1, "%s\n", splog[temp].self);
 			char_play_sound(cn, ch[cn].sound + 1, -150, 0);
@@ -2186,17 +2186,24 @@ void item_info(int cn, int in, int look)
 		"%-12.12s %+4d %+4d\n",
 		"Weapon", it[in].weapon[0], it[in].weapon[1]);
 	}
-	if (it[in].top_damage[0] || it[in].top_damage[1])
+	if (it[in].armor[0] || it[in].armor[1])
 	{
 		do_char_log(cn, 1, 
 		"%-12.12s %+4d %+4d\n",
-		"Top Damage", it[in].top_damage[0], it[in].top_damage[1]);
+		"Armor", it[in].armor[0], it[in].armor[1]);
 	}
+	
 	if (it[in].to_hit[0] || it[in].to_hit[1])
 	{
 		do_char_log(cn, 1, 
 		"%-12.12s %+4d %+4d\n",
 		"Hit Bonus", it[in].to_hit[0], it[in].to_hit[1]);
+	}
+	if (it[in].to_parry[0] || it[in].to_parry[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Parry Bonus", it[in].to_parry[0], it[in].to_parry[1]);
 	}
 	if (it[in].crit_chance[0] || it[in].crit_chance[1])
 	{
@@ -2210,18 +2217,11 @@ void item_info(int cn, int in, int look)
 		"%-12.12s %+4d %+4d\n",
 		"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
 	}
-	
-	if (it[in].armor[0] || it[in].armor[1])
+	if (it[in].top_damage[0] || it[in].top_damage[1])
 	{
 		do_char_log(cn, 1, 
 		"%-12.12s %+4d %+4d\n",
-		"Armor", it[in].armor[0], it[in].armor[1]);
-	}
-	if (it[in].to_parry[0] || it[in].to_parry[1])
-	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
-		"Par Bonus", it[in].to_parry[0], it[in].to_parry[1]);
+		"Top Damage", it[in].top_damage[0], it[in].top_damage[1]);
 	}
 	if (it[in].gethit_dam[0] || it[in].gethit_dam[1])
 	{
@@ -2355,6 +2355,8 @@ void char_info(int cn, int co)
 		"%-12.12s %3d/%3d\n",
 		skilltab[n1].name, ch[co].skill[n1][0], get_skill_score(co, n1));
 	}
+	
+	do_char_log(cn, 1, " \n");
 
 	do_char_log(cn, 1, 
 	"%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
@@ -2372,7 +2374,7 @@ void char_info(int cn, int co)
 	
 	do_char_log(cn, 1, 
 	"%-12.12s     %3d  !  %-12.12s     %3d\n",
-	"Hit Rate", ch[co].to_hit, "Parry Rate", to_parry);
+	"Hit Rate", ch[co].to_hit, "Parry Rate", ch[co].to_parry);
 
 	do_char_log(cn, 1, " \n");
 }

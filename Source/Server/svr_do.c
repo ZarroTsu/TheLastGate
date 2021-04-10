@@ -6080,10 +6080,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 	// s1 = Attacker // s2 = Defender
 	s1 = ch[cn].to_hit;
 	s2 = ch[co].to_parry;
-
-	if (has_spell_from_item(cn, BUF_IT_DRAG)) s1 += 3;
-	if (has_spell_from_item(co, BUF_IT_DRAG)) s2 += 3;
-
+	
 	if (globs->flags & GF_MAYHEM)
 	{
 		if (!(ch[cn].flags & CF_PLAYER))
@@ -8717,7 +8714,7 @@ void do_chestsense(int cn, int in)
 
 void do_look_item(int cn, int in)
 {
-	int n, in2, flag = 0, act;
+	int n, flag = 0, act;
 
 	if (it[in].active)
 	{
