@@ -106,7 +106,7 @@
 #define BS_HOUR 		3600
 #define BS_MINS 		(BS_HOUR/60)
 #define BS_RC			  20
-#define BS_COUNTER		  18
+#define BS_COUNTER		  20
 
 // -----
 

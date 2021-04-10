@@ -8,6 +8,91 @@
 
 #include "server.h"
 
+void look_item_details(int cn, int in)
+{
+	if (it[in].max_age[act] || it[in].max_damage)
+	{
+		if (it[in].damage_state==0)
+		{
+			do_char_log(cn, 1, "It's in perfect condition.\n");
+		}
+		else if (it[in].damage_state==1)
+		{
+			do_char_log(cn, 1, "It's showing signs of age.\n");
+		}
+		else if (it[in].damage_state==2)
+		{
+			do_char_log(cn, 1, "It's fairly old.\n");
+		}
+		else if (it[in].damage_state==3)
+		{
+			do_char_log(cn, 1, "It is old.\n");
+		}
+		else if (it[in].damage_state==4)
+		{
+			do_char_log(cn, 0, "It is very old and battered.\n");
+		}
+	}
+	if (IS_BUILDING(cn))
+	{
+		do_char_log(cn, 1, "Temp: %d, Sprite: %d,%d.\n", it[in].temp, it[in].sprite[0], it[in].sprite[1]);
+		do_char_log(cn, 1, "In-Active Age %d of %d.\n", it[in].current_age[0], it[in].max_age[0]);
+		do_char_log(cn, 1, "Active Age %d of %d.\n", it[in].current_age[1], it[in].max_age[1]);
+		do_char_log(cn, 1, "Damage %d of %d.\n", it[in].current_damage, it[in].max_damage);
+		do_char_log(cn, 1, "Active %d of %d.\n", it[in].active, it[in].duration);
+		do_char_log(cn, 1, "Driver=%d [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
+					it[in].driver, it[in].data[0], it[in].data[1], it[in].data[2], it[in].data[3], it[in].data[4],
+					it[in].data[5], it[in].data[6], it[in].data[7], it[in].data[8], it[in].data[9]);
+	}
+	if (ch[cn].flags & CF_GOD)
+	{
+		do_char_log(cn, 2, "ID=%d, Temp=%d, Value: %dG %dS.\n", in, it[in].temp, it[in].value / 100, it[in].value % 100);
+		do_char_log(cn, 2, "active=%d, sprite=%d/%d\n", it[in].active, it[in].sprite[0], it[in].sprite[1]);
+		do_char_log(cn, 2, "max_age=%d/%d, current_age=%d/%d\n", it[in].max_age[0], it[in].max_age[1], it[in].current_age[0], it[in].current_age[1]);
+		do_char_log(cn, 2, "max_damage=%d, current_damage=%d\n", it[in].max_damage, it[in].current_damage);
+	}
+	in2 = ch[cn].citem;
+	/* CS, 000208: Check for sane item */
+	if (IS_SANEITEM(in2))
+	{
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "You compare it with a %s:\n", it[in2].name);
+		if (it[in].weapon[0]>it[in2].weapon[0])
+		{
+			do_char_log(cn, 1, "A %s is the better weapon.\n", it[in].name);
+		}
+		else if (it[in].weapon[0]<it[in2].weapon[0])
+		{
+			do_char_log(cn, 1, "A %s is the better weapon.\n", it[in2].name);
+		}
+		else
+		{
+			do_char_log(cn, 1, "No difference as a weapon.\n");
+		}
+
+		if (it[in].armor[0]>it[in2].armor[0])
+		{
+			do_char_log(cn, 1, "A %s is the better armor.\n", it[in].name);
+		}
+		else if (it[in].armor[0]<it[in2].armor[0])
+		{
+			do_char_log(cn, 1, "A %s is the better armor.\n", it[in2].name);
+		}
+		else
+		{
+			do_char_log(cn, 1, "No difference as armor.\n");
+		}
+	}
+	else
+	{
+		if (it[in].flags & IF_IDENTIFIED)
+		{
+			item_info(cn, in, 1);
+		}
+		do_appraisal(cn, in);
+	}
+}
+
 void look_extra(int cn, int in)
 {
 	do_char_log(cn, 1, "%s\n", it[in].description);
@@ -131,11 +216,7 @@ void look_extra(int cn, int in)
 	else if (it[in].temp==IT_CH_WORLD)
 		do_char_log(cn, 3, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");
 	
-	if (it[in].flags & IF_IDENTIFIED)
-	{
-		item_info(cn, in, 1);
-	}
-	do_appraisal(cn, in);
+	look_item_details(cn, in);
 }
 
 void look_door(int cn, int in)
@@ -172,24 +253,7 @@ void look_door(int cn, int in)
 	{
 		do_char_log(cn, 1, "This door appears to be unlocked.\n");
 	}
-	if (IS_BUILDING(cn))
-	{
-		do_char_log(cn, 1, "Temp: %d, Sprite: %d,%d.\n", it[in].temp, it[in].sprite[0], it[in].sprite[1]);
-		do_char_log(cn, 1, "In-Active Age %d of %d.\n", it[in].current_age[0], it[in].max_age[0]);
-		do_char_log(cn, 1, "Active Age %d of %d.\n", it[in].current_age[1], it[in].max_age[1]);
-		do_char_log(cn, 1, "Damage %d of %d.\n", it[in].current_damage, it[in].max_damage);
-		do_char_log(cn, 1, "Active %d of %d.\n", it[in].active, it[in].duration);
-		do_char_log(cn, 1, "Driver=%d [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
-					it[in].driver, it[in].data[0], it[in].data[1], it[in].data[2], it[in].data[3], it[in].data[4],
-					it[in].data[5], it[in].data[6], it[in].data[7], it[in].data[8], it[in].data[9]);
-	}
-	if (ch[cn].flags & CF_GOD)
-	{
-		do_char_log(cn, 2, "ID=%d, Temp=%d, Value: %dG %dS.\n", in, it[in].temp, it[in].value / 100, it[in].value % 100);
-		do_char_log(cn, 2, "active=%d, sprite=%d/%d\n", it[in].active, it[in].sprite[0], it[in].sprite[1]);
-		do_char_log(cn, 2, "max_age=%d/%d, current_age=%d/%d\n", it[in].max_age[0], it[in].max_age[1], it[in].current_age[0], it[in].current_age[1]);
-		do_char_log(cn, 2, "max_damage=%d, current_damage=%d\n", it[in].max_damage, it[in].current_damage);
-	}
+	look_item_details(cn, in);
 }
 
 void look_rat_eye(int cn, int in)

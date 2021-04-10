@@ -247,6 +247,7 @@ extern unsigned int mapmarker;
 #define CF_APPR_OFF    (1ull<<54)       // Toggle Appraisal
 #define CF_AREA_OFF    (1ull<<55)       // Toggle AoE Skills
 #define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
+#define CF_AUTOLOOT    (1ull<<57)       // Automatic looting
 
 #define AT_CAP				255
 #define SPEED_CAP 			36
@@ -681,9 +682,9 @@ struct item
 	
 	unsigned char stack;			// Item stacking
 	
-	short int orig_sprite[2];       // Original sprite value, for restoration by repair
+	unsigned short orig_temp;       // Original template value, for restoration by repair
 	
-	char future3[10];				// 587
+	char future3[12];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595

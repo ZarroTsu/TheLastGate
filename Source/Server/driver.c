@@ -2877,9 +2877,9 @@ void stronghold_mage_driver(int cn)
 						for (j=0; j<6; j++)
 						{
 							  hp_bonus[j] = (magenum*25)*(5-j)+((magenum*5)*(ch[cn].data[3]-20));
-							attr_bonus[j] = (3+magenum)*(5-j)+((3+magenum)*(ch[cn].data[3]-20))/2;
-							  ws_bonus[j] = (10-magenum*2)*(5-j)+((10-magenum)*(ch[cn].data[3]-20))/3;
-							  wv_bonus[j] = 6*(5-j)+(ch[cn].data[3]-20)/2;
+							attr_bonus[j] = (3+magenum)*(5-j)+((3+magenum)*(ch[cn].data[3]-20));
+							  ws_bonus[j] = (10-magenum*2)*(5-j)+((10-magenum)*(ch[cn].data[3]-20))/4;
+							  wv_bonus[j] = 6*(5-j)+(ch[cn].data[3]-20)/3;
 						}
 						break;
 				}
@@ -2920,7 +2920,7 @@ void stronghold_mage_driver(int cn)
 							{
 								if (ch[co].skill[n][0])
 								{
-									ch[co].skill[n][0] = ch[co].skill[n][0]+attr_bonus[j]<243?ch[co].skill[n][0]+attr_bonus[j]:243;
+									ch[co].skill[n][0] = ch[co].skill[n][0]+attr_bonus[j]/2<243?ch[co].skill[n][0]+attr_bonus[j]/2:243;
 								}
 							}
 							ch[co].weapon = ch[co].weapon+wv_bonus[j]<255?ch[co].weapon+wv_bonus[j]:255;
@@ -2937,13 +2937,13 @@ void stronghold_mage_driver(int cn)
 						char buf[80];
 						for (n = 0; n<5; n++)
 						{
-							ch[co].attrib[n][0] += 2+RANDOM(3+magenum);
+							ch[co].attrib[n][0] += 3+RANDOM(3+magenum);
 						}
 						for (n = 0; n<MAXSKILL; n++)
 						{
 							if (ch[co].skill[n][0])
 							{
-								ch[co].skill[n][0] += 2+RANDOM(3+magenum)*2;
+								ch[co].skill[n][0] += 3+RANDOM(3+magenum)*2;
 							}
 						}
 						sprintf(buf, "Tough %s", ch[co].name);
@@ -2952,7 +2952,7 @@ void stronghold_mage_driver(int cn)
 						sprintf(buf, "the %s", ch[co].name);
 						strncpy(ch[co].reference, buf, 39);
 						ch[co].reference[39] = 0;
-						ch[co].data[26]+= 2+RANDOM(3+magenum)*3/2;
+						ch[co].data[26]+= 3+RANDOM(3+magenum)*3/2;
 						if (!(ch[co].flags & CF_EXTRAEXP)) ch[co].flags |= CF_EXTRAEXP;
 						modified=1;
 					}

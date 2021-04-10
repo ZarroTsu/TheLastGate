@@ -253,9 +253,16 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 
 		if (map[m].flags & MF_DEATHTRAP)
 		{
-			do_char_log(cn, 0, "You entered a Deathtrap. You are dead!\n");
-			chlog(cn, "entered a Deathtrap");
-			do_char_killed(0, cn, 0);
+			if (ch[cn].luck>=100 && RANDOM(10000)<5000 + ch[cn].luck)
+			{
+				do_lucksave(cn, "deathtrap");
+			}
+			else
+			{
+				do_char_log(cn, 0, "You entered a Deathtrap. You are dead!\n");
+				chlog(cn, "entered a Deathtrap");
+				do_char_killed(0, cn, 0);
+			}
 			return;
 		}
 

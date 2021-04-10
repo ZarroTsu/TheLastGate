@@ -233,6 +233,7 @@ void do_area_notify(int cn, int co, int xs, int ys, int type, int dat1, int dat2
 void do_npc_shout(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_shop_char(int cn, int co, int nr);
 void do_give_exp(int cn, int p, int gflag, int rank);
+void do_lucksave(int co, char *deathtype);
 int do_hurt(int cn, int co, int dam, int type);
 void do_staff_log(int font, char *format, ...) __attribute__ ((format(printf, 2, 3)));
 int do_remove_unique(int cn);
@@ -278,6 +279,7 @@ void effect_tick(void);
 int fx_add_effect(int type, int duration, int d1, int d2, int d3);
 
 // -- look --
+void look_item_details(int cn, int in);
 void look_driver(int cn, int in);
 void look_door(int cn, int in);
 

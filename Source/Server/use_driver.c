@@ -306,13 +306,20 @@ int use_create_item3(int cn, int in)
 	n = RANDOM(n);
 	n = it[in].data[n];
 
-	if (n > 100000 && n < 200000)	// Special hack to enable mixed gold rewards
+	// Special hack to enable mixed gold rewards
+	if (n > 100000 && n < 200000)
 	{
 		n -= 100000;
 		do_char_log(cn, 1, "You found %d Gold.\n", n);
 		chlog(cn, "Got %dG from %s", n, it[in].name);
 		ch[cn].gold += n * 100;
 		return(1);
+	}
+	
+	// Special hack to pull all tarot cards from the pool
+	if (n == 1513)
+	{
+		n += RANDOM(22);
 	}
 	
 	if (n<=0 || n>=MAXTITEM)
@@ -1044,6 +1051,7 @@ int use_ladder(int cn, int in)
 int use_bag(int cn, int in)
 {
 	int co, owner;
+	int in2, nr;
 
 	co = it[in].data[0];
 	owner = ch[co].data[CHD_CORPSEOWNER];
@@ -1065,6 +1073,34 @@ int use_bag(int cn, int in)
 	}
 
 	do_char_log(cn, 1, "You search the remains of %s.\n", ch[co].reference);
+	if ((ch[co].flags & CF_BODY) && ch[co].gold)
+	{
+		ch[cn].gold += ch[co].gold;
+		chlog(cn, "Took %dG %dS", ch[co].gold / 100, ch[co].gold % 100);
+		do_char_log(cn, 1, "You took %dG %dS.\n", ch[co].gold / 100, ch[co].gold % 100);
+		ch[co].gold = 0;
+	}
+	if ((ch[co].flags & CF_BODY) && (ch[cn].flags & CF_AUTOLOOT))
+	{
+		for (nr=0; nr<40; nr++)
+		{
+			if ((in2 = ch[co].item[nr])!=0)
+			{
+				god_take_from_char(in2, co);
+				if (god_give_char(in2, cn))
+				{
+					chlog(cn, "Autoloot %s", it[in2].name);
+					do_char_log(cn, 1, "You autoloot a %s.\n", it[in2].reference);
+				}
+				else
+				{
+					god_give_char(in2, co);
+					do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+					break;
+				}
+			}
+		}
+	}
 	do_look_char(cn, co, 0, 0, 1);
 	return(1);
 }
@@ -3137,7 +3173,7 @@ void solved_pentagram(int cn, int in)
 				do_add_light(it[n].x, it[n].y, it[n].light[1] - it[n].light[0]);
 			}
 		}
-		it[n].duration = it[n].active = TICKS * (10 + RANDOM(20));
+		it[n].duration = it[n].active = TICKS * 10 + RANDOM(TICKS*10);
 		
 		for (m = 1; m<4; m++)
 		{
@@ -4867,7 +4903,6 @@ int item_age(int in)
 
 		if (it[in].damage_state>1)
 		{
-
 			st = max(0, 4 - it[in].damage_state);
 
 			if (it[in].armor[0]>st)

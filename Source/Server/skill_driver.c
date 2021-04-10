@@ -423,12 +423,17 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		co_orig = co;
 	}
 	
-	hitpower = power/2 + power/4;
+	hitpower = power;
+	
+	if (intemp==SK_BLAST)
+	{
+		hitpower = power/2 + power/4;
+	}
+	
 	spellaoe = aoe_power/PROXIMITY_CAP;
 	
 	if (intemp==SK_WARCRY)
 	{
-		hitpower = power;
 		spellaoe = aoe_power;
 		no_target = 1;
 	}
@@ -617,7 +622,12 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
-	hitpower = power/2 + power/4;
+	hitpower = power;
+	
+	if (intemp==SK_BLAST || intemp==SK_CLEAVE)
+	{
+		hitpower = power/2 + power/4;
+	}
 	
 	if (co_orig && co_orig!=cn)
 	{
@@ -1182,7 +1192,7 @@ int add_spell(int cn, int in)
 				if (bu[in2].temp==SK_POISON || bu[in2].temp==SK_SLOW || bu[in2].temp==SK_SLOW2 || bu[in2].temp==SK_CURSE2)
 					tickminimum = TICKS*5;
 				
-				if (bu[in].power<bu[in2].power && bu[in2].active>tickminimum)
+				if (bu[in].power<bu[in2].power && bu[in2].active>tickminimum && bu[in2].temp!=SK_LIGHT)
 				{
 					bu[in].used = USE_EMPTY;
 					return 0;
@@ -1907,12 +1917,15 @@ int spell_slow(int cn, int co, int power, int flag)
 	{
 		if (!(in = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0)))
 			return 0;
+		//bu[in].speed[1] = SLOWFORM(power)+150)/2;
 	}
 	else
 	{
 		if (!(in = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_SLOW(power), 0)))
 			return 0;
+		//bu[in].speed[1] = SLOW2FORM(power)+50)/2;
 	}
+	bu[in].cost = power;
 	
 	return cast_a_spell(cn, co, in, 1+flag);
 }
@@ -2173,12 +2186,94 @@ void item_info(int cn, int in, int look)
 		"%-12.12s %+4d %+4d\n",
 		"Weapon", it[in].weapon[0], it[in].weapon[1]);
 	}
+	if (it[in].top_damage[0] || it[in].top_damage[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Top Damage", it[in].top_damage[0], it[in].top_damage[1]);
+	}
+	if (it[in].to_hit[0] || it[in].to_hit[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Hit Bonus", it[in].to_hit[0], it[in].to_hit[1]);
+	}
+	if (it[in].crit_chance[0] || it[in].crit_chance[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Crit Rate", it[in].crit_chance[0], it[in].crit_chance[1]);
+	}
+	if (it[in].crit_multi[0] || it[in].crit_multi[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
+	}
+	
 	if (it[in].armor[0] || it[in].armor[1])
 	{
 		do_char_log(cn, 1, 
 		"%-12.12s %+4d %+4d\n",
 		"Armor", it[in].armor[0], it[in].armor[1]);
 	}
+	if (it[in].to_parry[0] || it[in].to_parry[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Par Bonus", it[in].to_parry[0], it[in].to_parry[1]);
+	}
+	if (it[in].gethit_dam[0] || it[in].gethit_dam[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Reflect", it[in].gethit_dam[0], it[in].gethit_dam[1]);
+	}
+	
+	if (it[in].speed[0] || it[in].speed[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"All Speed", it[in].speed[0], it[in].speed[1]);
+	}
+	if (it[in].move_speed[0] || it[in].move_speed[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Move Speed", it[in].move_speed[0], it[in].move_speed[1]);
+	}
+	if (it[in].atk_speed[0] || it[in].atk_speed[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Atk Speed", it[in].atk_speed[0], it[in].atk_speed[1]);
+	}
+	if (it[in].cast_speed[0] || it[in].cast_speed[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Cast Speed", it[in].cast_speed[0], it[in].cast_speed[1]);
+	}
+	
+	if (it[in].spell_mod[0] || it[in].spell_mod[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Spell Mod", it[in].spell_mod[0], it[in].spell_mod[1]);
+	}
+	if (it[in].spell_apt[0] || it[in].spell_apt[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Spell Apt", it[in].spell_apt[0], it[in].spell_apt[1]);
+	}
+	if (it[in].cool_bonus[0] || it[in].cool_bonus[1])
+	{
+		do_char_log(cn, 1, 
+		"%-12.12s %+4d %+4d\n",
+		"Cooldown", it[in].cool_bonus[0], it[in].cool_bonus[1]);
+	}
+	
 	if (it[in].light[0] || it[in].light[1])
 	{
 		do_char_log(cn, 1, 
@@ -2272,6 +2367,12 @@ void char_info(int cn, int co)
 	do_char_log(cn, 1, 
 	"%-12.12s %3d/%3d\n",
 	at_name[AT_STR], ch[co].attrib[AT_STR][0], get_attrib_score(co, AT_STR));
+	
+	do_char_log(cn, 1, " \n");
+	
+	do_char_log(cn, 1, 
+	"%-12.12s     %3d  !  %-12.12s     %3d\n",
+	"Hit Rate", ch[co].to_hit, "Parry Rate", to_parry);
 
 	do_char_log(cn, 1, " \n");
 }
@@ -2398,7 +2499,7 @@ void skill_blast(int cn)
 	{
 		chlog(cn, "Cast Blast on %s", ch[co].name);
 		
-		dam = power * 2;
+		dam = spell_immunity(power, get_target_immunity(co)) * 2;
 		
 		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorch
 		if (get_tarot(cn, IT_CH_JUDGE))
@@ -2426,7 +2527,7 @@ void skill_blast(int cn)
 
 		if (scorch)
 		{
-			spell_scorch(cn, co, dam/2, 0);
+			spell_scorch(cn, co, power, 0);
 		}
 		
 		co_orig = co;
@@ -2458,6 +2559,7 @@ void skill_blast(int cn)
 void skill_repair(int cn)
 {
 	int in, chan, die, in2, power;
+	int orgt;
 
 	if ((in = ch[cn].citem)==0)
 	{
@@ -2503,15 +2605,41 @@ void skill_repair(int cn)
 
 	if (die<=chan)
 	{
-		in2 = god_create_item(it[in].temp, 0); // Repair by making new item
-		if (!in2)
+		// Repair - option 1: reset values of the item to their originals.
+		// This option is for soulstone items, to allow repairing them without a template.
+		if (IS_SANEITEMPLATE(it[in].orig_temp))
 		{
-			do_char_log(cn, 0, "You failed.\n");
-			return;
+			orgt = it[in].orig_temp;
+			
+			it[in].flags |= IF_UPDATE;
+			
+			it[in].current_damage = 0;
+			it[in].current_age[0] = 0;
+			it[in].current_age[1] = 0;
+			it[in].damage_state = 0;
+			
+			it[in].armor[0] = it_temp[orgt].armor[0];
+			it[in].armor[1] = it_temp[orgt].armor[1];
+			
+			it[in].weapon[0] = it_temp[orgt].weapon[0];
+			it[in].weapon[1] = it_temp[orgt].weapon[1];
+			
+			it[in].sprite[0] = it_temp[orgt].sprite[0];
+			it[in].sprite[1] = it_temp[orgt].sprite[1];
 		}
-		it[in].used  = USE_EMPTY;
-		ch[cn].citem = in2;
-		it[in2].carried = cn;
+		// Repair - option 2: just make a new item
+		else
+		{
+			in2 = god_create_item(it[in].temp, 0);
+			if (!in2)
+			{
+				do_char_log(cn, 0, "You failed.\n");
+				return;
+			}
+			it[in].used  = USE_EMPTY;
+			ch[cn].citem = in2;
+			it[in2].carried = cn;
+		}
 		do_char_log(cn, 1, "Success!\n");
 	}
 	else

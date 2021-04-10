@@ -790,6 +790,26 @@ void do_toggle_appraisal(int cn)
 	}
 }
 
+void do_autoloot(int cn)
+{
+	int cc;
+	ch[cn].flags ^= CF_AUTOLOOT;
+	
+	if (ch[cn].flags & CF_AUTOLOOT)
+	{
+		do_char_log(cn, 1, "You will now automatically loot graves.\n");
+	}
+	else
+	{
+		do_char_log(cn, 1, "You will no longer automatically loot graves.\n");
+	}
+	
+	if (ch[cn].flags & (CF_PLAYER))
+	{
+		chlog(cn, "Set autoloot to %s", (ch[cn].flags & CF_AUTOLOOT) ? "on" : "off");
+	}
+}
+
 void do_sense(int cn)
 {
 	int cc;
@@ -1163,6 +1183,8 @@ void do_help(int cn, char *topic)
 		if (strcmp(topic, "4")==0)
 		{
 			pagenum = 4;
+			
+			do_char_log(cn, 1, "#staff                 list staff stats.\n");
 			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 			do_char_log(cn, 1, "#tell <player> <text>  tells player text.\n");
 			do_char_log(cn, 1, "#trash                 delete item from cursor.\n");
@@ -1184,6 +1206,8 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 3):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			
+			do_char_log(cn, 1, "#notell                you won't hear tells.\n");
 			do_char_log(cn, 1, "#poles <page>          lists unattained poles.\n");
 			do_char_log(cn, 1, "#quest <page>          list available quests.\n");
 			do_char_log(cn, 1, "#rank                  show exp for next rank.\n");
@@ -1198,7 +1222,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#sortdepot <order>     sort depot.\n");
 			do_char_log(cn, 1, "#spear                 list spear stats.\n");
 			do_char_log(cn, 1, "#spellignore           don't attack if spelled.\n");
-			do_char_log(cn, 1, "#staff                 list staff stats.\n");
 		}
 		else if (strcmp(topic, "2")==0)
 		{
@@ -1206,6 +1229,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 2):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#follow <player|self>  you'll follow player.\n");
 			do_char_log(cn, 1, "#garbage               delete item from cursor.\n");
 			if (ch[cn].kindred & (KIN_HARAKIM | KIN_SEYAN_DU | KIN_SUMMONER | KIN_ARCHHARAKIM))
 				do_char_log(cn, 1, "#gcmax                 list ghostcomp maximums.\n");
@@ -1222,7 +1246,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#listskills <page>     list skill attributes.\n");
 			do_char_log(cn, 1, "#max                   list character maximums.\n");
 			do_char_log(cn, 1, "#noshout               you won't hear shouts.\n");
-			do_char_log(cn, 1, "#notell                you won't hear tells.\n");
 		}
 		else
 		{
@@ -1239,6 +1262,7 @@ void do_help(int cn, char *topic)
 			if (ch[cn].skill[SK_SURRAREA][0] || ch[cn].skill[SK_DAMAREA][0] || ch[cn].skill[SK_HEXAREA][0])
 				do_char_log(cn, 1, "#area                  toggle area skills.\n");
 			do_char_log(cn, 1, "#armor                 list armor stats.\n");
+			do_char_log(cn, 1, "#autoloot              automatic grave looting.\n");
 			do_char_log(cn, 1, "#axe                   list axe stats.\n");
 			do_char_log(cn, 1, "#bow                   you'll bow.\n");
 			do_char_log(cn, 1, "#bs                    display BS points.\n");
@@ -1246,7 +1270,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#dagger                list dagger stats.\n");
 			do_char_log(cn, 1, "#dualsword             list dualsword stats.\n");
 			do_char_log(cn, 1, "#fightback             toggle auto-fightback.\n");
-			do_char_log(cn, 1, "#follow <player|self>  you'll follow player.\n");
 		}
 		do_char_log(cn, 1, " \n");
 	}
@@ -1301,7 +1324,7 @@ void do_listmax(int cn)
 
 void do_listgcmax(int cn)
 {
-	int n, co=0;
+	int n, co=0, archbonus=0;
 	
 	if (co = ch[cn].data[CHD_COMPANION])
 	{
@@ -1314,6 +1337,10 @@ void do_listgcmax(int cn)
 	{
 		do_char_log(cn, 0, "You must summon a new companion first.\n");
 	}
+	if (ch[cn].skill[SK_GCMASTERY][0]) 
+		archbonus 	= get_skill_score(cn, SK_GCMASTERY)/6;
+	
+	
 	//                 "!        .         .   |     .         .        !"
 	do_char_log(cn, 1, "Now listing skill maximums for your ghost:\n");
 	do_char_log(cn, 1, " \n");
@@ -1322,7 +1349,7 @@ void do_listgcmax(int cn)
 	{
 		do_char_log(cn, (ch[co].attrib[n][0]==ch[co].attrib[n][2])?2:1, 
 		"%20s  %3d  %3d\n", 
-		at_name[n], ch[co].attrib[n][0], ch[co].attrib[n][2]);
+		at_name[n], ch[co].attrib[n][0], ch[co].attrib[n][2]+archbonus);
 	}
 	//
 	do_char_log(cn, (ch[co].hp[0]==ch[co].hp[2])?2:1, 
@@ -1337,7 +1364,7 @@ void do_listgcmax(int cn)
 		if (ch[co].skill[n][2]) 
 			do_char_log(cn, (ch[co].skill[n][0]==ch[co].skill[n][2])?2:1, 
 				"%20s  %3d  %3d\n", 
-				skilltab[n].name, ch[co].skill[n][0], ch[co].skill[n][2]);
+				skilltab[n].name, ch[co].skill[n][0], ch[co].skill[n][2]+archbonus);
 	}
 	do_char_log(cn, 1, " \n");
 }
@@ -3395,6 +3422,12 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "addban") && f_gi)
 		{
 			god_add_ban(cn, dbatoi(arg[1]));
+			return;
+		}
+		;
+		if (prefix(cmd, "autoloot") && !f_m)
+		{
+			do_autoloot(cn);
 			return;
 		}
 		;
@@ -5673,6 +5706,20 @@ void do_give_exp(int cn, int p, int gflag, int rank)
 	}
 }
 
+void do_lucksave(int co, char *deathtype)
+{
+	ch[co].a_hp  = ch[co].hp[5] * 500;
+	ch[co].luck /= 2;
+	do_char_log(co, 0, "A god reached down and saved you from the %s. You must have done the gods a favor sometime in the past!\n", deathtype);
+		do_area_log(co, 0, ch[co].x, ch[co].y, 0, "A god reached down and saved %s from the %s.\n", ch[co].reference, deathtype);
+	fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+	god_transfer_char(co, ch[co].temple_x, ch[co].temple_y);
+	fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+
+	chlog(co, "Saved by the Gods (new luck=%d)", ch[co].luck);
+	ch[co].data[44]++;
+}
+
 // right now we know only four types: 0=normal, 1=blast, 2=holy water/staff of kill undead, 3=gethit, 4=surroundhit, 5=Cleave
 // returns actual damage done
 int do_hurt(int cn, int co, int dam, int type)
@@ -5896,20 +5943,10 @@ int do_hurt(int cn, int co, int dam, int type)
 	
 	if (ch[co].a_hp - hp_dam<500 && ch[co].luck>=100 && !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[co].luck)
 	{
-		ch[co].a_hp  = ch[co].hp[5] * 500;
-		ch[co].luck /= 2;
-		do_char_log(co, 0, "A god reached down and saved you from the killing blow. You must have done the gods a favor sometime in the past!\n");
-		do_area_log(co, 0, ch[co].x, ch[co].y, 0, "A god reached down and saved %s from the killing blow.\n", ch[co].reference);
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-		god_transfer_char(co, ch[co].temple_x, ch[co].temple_y);
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-
-		chlog(co, "Saved by the Gods (new luck=%d)", ch[co].luck);
-		ch[co].data[44]++;
+		do_lucksave(co, "killing blow");
 
 		do_notify_char(cn, NT_DIDKILL, co, 0, 0, 0);
 		do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEKILL, cn, co, 0, 0);
-
 	}
 	else
 	{
@@ -6270,8 +6307,8 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			if (die<=crit_chance)
 			{
 				ch[cn].data[73]=0;
-				crit_dam  = dam + 1+points2rank(ch[cn].points_tot);
-				crit_dam *= crit_mult;
+				//crit_dam  = dam + 1+points2rank(ch[cn].points_tot);
+				crit_dam *= crit_mult / 100;
 				crit_dam -= dam;
 				
 				do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 8);
@@ -7762,7 +7799,7 @@ int get_race_medi_mod(int cn, int base)
 //       further, it is called ONLY from tick()
 void do_regenerate(int cn)
 {
-	int n, m, in, in2, nohp = 0, noend = 0, nomana = 0, old;
+	int n, m, in, in2, nohp = 0, noend = 0, nomana = 0, old, mf;
 	int hp = 0, mana = 0, uwater = 0, gothp = 0;
 	int poisonpower = 0;
 	int bleedpower = 0;
@@ -7770,12 +7807,17 @@ void do_regenerate(int cn)
 	int hpmult, endmult, manamult;
 	unsigned long long prof;
 	int race_reg = 0, race_res = 0, race_med = 0;
+	int co = -1;
+	int tickcheck = 6000;
+	int tmp = 0;
 
 	// gothp determines how much to counter regen while underwater.
 	// and now, poison too
 
 	// if ((ch[cn].flags&CF_STONED) && !(ch[cn].flags&CF_PLAYER)) ch[cn].flags&=~CF_STONED;
-
+	
+	mf = map[ch[cn].x + ch[cn].y * MAPX].flags;
+	
 	if (ch[cn].flags & CF_STONED)
 		return;
 
@@ -8080,10 +8122,17 @@ void do_regenerate(int cn)
 				}
 				if (ch[cn].a_hp<500)
 				{
-					chlog(cn, "killed by spell: %s", bu[in].name);
-					do_char_log(cn, 0, "The %s killed you!\n", bu[in].name);
-					do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "The %s killed %s.\n", bu[in].name, ch[cn].reference);
-					do_char_killed(0, cn, 0);
+					if (ch[cn].luck>=100 && RANDOM(10000)<5000 + ch[cn].luck)
+					{
+						do_lucksave(cn, bu[in].name);
+					}
+					else
+					{
+						chlog(cn, "killed by spell: %s", bu[in].name);
+						do_char_log(cn, 0, "The %s killed you!\n", bu[in].name);
+						do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "The %s killed %s.\n", bu[in].name, ch[cn].reference);
+						do_char_killed(0, cn, 0);
+					}
 					return;
 				}
 				if (ch[cn].a_end<500)
@@ -8177,9 +8226,9 @@ void do_regenerate(int cn)
 			// Poison
 			if (bu[in].temp==SK_POISON)
 			{
-				int co = bu[in].cost;
-				int tickcheck = 6000;
-				int tmp = 0;
+				co = bu[in].cost;
+				
+				mf = map[ch[cn].x + ch[cn].y * MAPX].flags;
 				
 				if (!IS_SANEPLAYER(co)) co = 0;
 				
@@ -8200,18 +8249,24 @@ void do_regenerate(int cn)
 					poisonpower = poisonpower * 115/100;
 				}
 				
-				ch[cn].a_hp -= poisonpower + gothp/2;
+				if (ch[cn].a_hp - (poisonpower + gothp/2)<500 && ch[cn].luck>=100 
+					&& !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[cn].luck)
+				{
+					do_lucksave(cn, "lethal poisoning");
+				}
+				else
+				{
+					ch[cn].a_hp -= poisonpower + gothp/2;
+				}
 				
 				tickcheck = 6000/max(1,poisonpower);
 				
-				
-				if (co && globs->ticker%tickcheck==0 && co!=cn && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA))
+				if (co && globs->ticker%tickcheck==0 && co!=cn && !(mf & MF_ARENA))
 				{
 					ch[co].points += 1;
 					ch[co].points_tot += 1;
 					//do_check_new_level(co);
 				}
-				
 				
 				if (ch[cn].a_hp<500)
 				{
@@ -8231,7 +8286,7 @@ void do_regenerate(int cn)
 						do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
 						do_char_log(cn, 0, "Oh dear, that poison was fatal. You died...\n");
 					}
-					if (co && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA))
+					if (co && !(mf & MF_ARENA))
 					{
 						tmp = do_char_score(cn);
 						
@@ -8247,7 +8302,7 @@ void do_regenerate(int cn)
 					}
 					do_char_killed(co, cn, 0);
 
-					if (co && co!=cn && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA))
+					if (co && co!=cn && !(mf & MF_ARENA))
 					{
 						do_give_exp(co, tmp, 1, points2rank(ch[cn].points_tot));
 					}
@@ -8258,16 +8313,22 @@ void do_regenerate(int cn)
 			// Bleed
 			if (bu[in].temp==SK_BLEED)
 			{
-				int co = bu[in].cost;
-				int tickcheck = 4000;
-				int tmp = 0;
+				co = bu[in].cost;
 				
 				if (!IS_SANEPLAYER(co)) co = 0;
 				
 				bleedpower = (bu[in].power*250)/(TICKS * 10);
 				if (bleedpower<1) bleedpower = 1;
 				
-				ch[cn].a_hp -= bleedpower + gothp;
+				if (ch[cn].a_hp - (bleedpower + gothp)<500 && ch[cn].luck>=100 
+					&& !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[cn].luck)
+				{
+					do_lucksave(cn, "lethal bleeding");
+				}
+				else
+				{
+					ch[cn].a_hp -= bleedpower + gothp;
+				}
 				
 				tickcheck = 4000/max(1,bleedpower);
 
@@ -8298,7 +8359,7 @@ void do_regenerate(int cn)
 						do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
 						do_char_log(cn, 0, "Oh dear, that bleeding was fatal. You died...\n");
 					}
-					if (co && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA))
+					if (co && !(mf & MF_ARENA))
 					{
 						tmp = do_char_score(cn);
 						
@@ -8314,7 +8375,7 @@ void do_regenerate(int cn)
 					}
 					do_char_killed(co, cn, 0);
 
-					if (co && co!=cn && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA))
+					if (co && co!=cn && !(mf & MF_ARENA))
 					{
 						do_give_exp(co, tmp, 1, points2rank(ch[cn].points_tot));
 					}
@@ -8700,87 +8761,7 @@ void do_look_item(int cn, int in)
 	{
 		do_char_log(cn, 1, "%s\n", it[in].description);
 		do_chestsense(cn, in);
-		if (it[in].max_age[act] || it[in].max_damage)
-		{
-			if (it[in].damage_state==0)
-			{
-				do_char_log(cn, 1, "It's in perfect condition.\n");
-			}
-			else if (it[in].damage_state==1)
-			{
-				do_char_log(cn, 1, "It's showing signs of age.\n");
-			}
-			else if (it[in].damage_state==2)
-			{
-				do_char_log(cn, 1, "It's fairly old.\n");
-			}
-			else if (it[in].damage_state==3)
-			{
-				do_char_log(cn, 1, "It is old.\n");
-			}
-			else if (it[in].damage_state==4)
-			{
-				do_char_log(cn, 0, "It is very old and battered.\n");
-			}
-		}
-		if (IS_BUILDING(cn))
-		{
-			do_char_log(cn, 1, "Temp: %d, Sprite: %d,%d.\n", it[in].temp, it[in].sprite[0], it[in].sprite[1]);
-			do_char_log(cn, 1, "In-Active Age %d of %d.\n", it[in].current_age[0], it[in].max_age[0]);
-			do_char_log(cn, 1, "Active Age %d of %d.\n", it[in].current_age[1], it[in].max_age[1]);
-			do_char_log(cn, 1, "Damage %d of %d.\n", it[in].current_damage, it[in].max_damage);
-			do_char_log(cn, 1, "Active %d of %d.\n", it[in].active, it[in].duration);
-			do_char_log(cn, 1, "Driver=%d [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
-			            it[in].driver, it[in].data[0], it[in].data[1], it[in].data[2], it[in].data[3], it[in].data[4],
-			            it[in].data[5], it[in].data[6], it[in].data[7], it[in].data[8], it[in].data[9]);
-		}
-		if (ch[cn].flags & CF_GOD)
-		{
-			do_char_log(cn, 2, "ID=%d, Temp=%d, Value: %dG %dS.\n", in, it[in].temp, it[in].value / 100, it[in].value % 100);
-			do_char_log(cn, 2, "active=%d, sprite=%d/%d\n", it[in].active, it[in].sprite[0], it[in].sprite[1]);
-			do_char_log(cn, 2, "max_age=%d/%d, current_age=%d/%d\n", it[in].max_age[0], it[in].max_age[1], it[in].current_age[0], it[in].current_age[1]);
-			do_char_log(cn, 2, "max_damage=%d, current_damage=%d\n", it[in].max_damage, it[in].current_damage);
-		}
-		in2 = ch[cn].citem;
-		/* CS, 000208: Check for sane item */
-		if (IS_SANEITEM(in2))
-		{
-			do_char_log(cn, 1, " \n");
-			do_char_log(cn, 1, "You compare it with a %s:\n", it[in2].name);
-			if (it[in].weapon[0]>it[in2].weapon[0])
-			{
-				do_char_log(cn, 1, "A %s is the better weapon.\n", it[in].name);
-			}
-			else if (it[in].weapon[0]<it[in2].weapon[0])
-			{
-				do_char_log(cn, 1, "A %s is the better weapon.\n", it[in2].name);
-			}
-			else
-			{
-				do_char_log(cn, 1, "No difference as a weapon.\n");
-			}
-
-			if (it[in].armor[0]>it[in2].armor[0])
-			{
-				do_char_log(cn, 1, "A %s is the better armor.\n", it[in].name);
-			}
-			else if (it[in].armor[0]<it[in2].armor[0])
-			{
-				do_char_log(cn, 1, "A %s is the better armor.\n", it[in2].name);
-			}
-			else
-			{
-				do_char_log(cn, 1, "No difference as armor.\n");
-			}
-		}
-		else
-		{
-			if (it[in].flags & IF_IDENTIFIED)
-			{
-				item_info(cn, in, 1);
-			}
-			do_appraisal(cn, in);
-		}
+		look_item_details(cn, in);
 		// Remote scan of tombstones
 		if (it[in].temp == IT_TOMBSTONE && it[in].data[0])
 		{

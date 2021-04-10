@@ -2103,6 +2103,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	int stren, rank, ran, i;
 	int known[MAXSKILL] = {0};		// count of total skills in the game
 	int cnt = 0, spen = 1;
+	int orgt = 0;
 	
 	// Loop through skills the player knows and add them to a secondary list.
 	for (i=0;i<MAXSKILL;i++)			// count of total skills in the game
@@ -2176,18 +2177,56 @@ void soultrans_equipment(int cn, int in, int in2)
 		}
 	}
 
-	if (it[in2].temp!=IT_CH_FOOL) it[in2].temp   = 0;
-	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_NOREPAIR | IF_SOULSTONE;
+	orgt = it[in2].temp;
+	
+	// Repair the item
+		it[in2].orig_temp = orgt;
+
+		it[in2].current_damage = 0;
+		it[in2].current_age[0] = 0;
+		it[in2].current_age[1] = 0;
+		it[in2].damage_state = 0;
+		
+		it[in2].armor[0] = it_temp[orgt].armor[0];
+		it[in2].armor[1] = it_temp[orgt].armor[1];
+		
+		it[in2].weapon[0] = it_temp[orgt].weapon[0];
+		it[in2].weapon[1] = it_temp[orgt].weapon[1];
+		
+		it[in2].sprite[0] = it_temp[orgt].sprite[0];
+		it[in2].sprite[1] = it_temp[orgt].sprite[1];
+	//
+	
+	if (it[in2].temp!=IT_CH_FOOL) 
+	{
+		it[in2].temp   = 0;
+	}
+	
+	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
 	it[in2].min_rank = max(it[in].data[0], it[in2].min_rank);
 	it[in2].value -= 1;
 	
 	if (!it[in2].max_damage)
 	{
-		if 		(it[in2].weapon[0]>0) 	it[in2].max_damage = 3500*it[in2].weapon[0];
-		else if	(it[in2].power == 60) 	it[in2].max_damage = 65000;
-		else if	(it[in2].power == 75)	it[in2].max_damage = 85000;
-		else 							it[in2].max_damage = 60000;
+		if (it[in2].weapon[0]>0)
+		{
+			it[in2].max_damage = 2500 * it[in2].weapon[0]/2;
+		}
+		else if (it[in2].power == 60)
+		{
+			it[in2].max_damage = 65000;
+		}
+		else if (it[in2].power == 75)
+		{
+			it[in2].max_damage = 85000;
+		}
+		else
+		{
+			it[in2].max_damage = 60000;
+		}
 	}
+	
+	it[in2].power += it[in].data[0] * 5;
 
 	souldestroy(cn, in);
 
@@ -2222,7 +2261,7 @@ int can_be_soulstoned(int in)
 	{
 		if (temp == valid_ss[n])
 		{
-			if (temp==IT_CH_FOOL&& (it[in].flags & IF_SOULSTONE))
+			if (temp==IT_CH_FOOL && (it[in].flags & IF_SOULSTONE))
 			{
 				return 0;
 			}
