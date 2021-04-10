@@ -262,6 +262,14 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m + 1].ch)) ;
 	else if (!buff && ch[cn].dir==DX_LEFT  && (co = map[m - 1].ch)) ;
 	else if (!buff && (co = ch[cn].attack_cn)) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && (co = map[m + MAPX].ch)) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && (co = map[m - MAPX].ch)) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && (co = map[m + 1].ch)) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && (co = map[m - 1].ch)) ;
+	else if (!buff && ch[cn].dir==DX_UP && (co = map[m + MAPX].ch)) ;
+	else if (!buff && ch[cn].dir==DX_DOWN && (co = map[m - MAPX].ch)) ;
+	else if (!buff && ch[cn].dir==DX_LEFT && (co = map[m + 1].ch)) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m - 1].ch)) ;
 	else co = cn;
 	
 	/* Event logging for debug
