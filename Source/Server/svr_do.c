@@ -1580,12 +1580,12 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "   Weapon   |   Requirements:   | Gives: \n");
 		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |   WV   \n");
 		do_char_log(cn, 1, "------------+-----+-----+-------+--------\n");
-		do_char_log(cn, 1, "Bronze      |  60 |  60 |     1 |    6   \n");
-		do_char_log(cn, 1, "Steel       |  64 |  64 |    15 |   12   \n");
-		do_char_log(cn, 1, "Gold        |  68 |  68 |    30 |   18   \n");
-		do_char_log(cn, 1, "Emerald     |  74 |  74 |    45 |   24   \n");
-		do_char_log(cn, 1, "Crystal     |  80 |  80 |    60 |   30   \n");
-		do_char_log(cn, 1, "Titanium    |  88 |  88 |    75 |   36   \n");
+		do_char_log(cn, 1, "Bronze      |  60 |  60 |     1 |    8   \n");
+		do_char_log(cn, 1, "Steel       |  64 |  64 |    15 |   16   \n");
+		do_char_log(cn, 1, "Gold        |  68 |  68 |    30 |   24   \n");
+		do_char_log(cn, 1, "Emerald     |  74 |  74 |    45 |   32   \n");
+		do_char_log(cn, 1, "Crystal     |  80 |  80 |    60 |   40   \n");
+		do_char_log(cn, 1, "Titanium    |  88 |  88 |    75 |   48   \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Dual-swords use the off-hand slot.\n");
 		do_char_log(cn, 0, "* WV is halved when used by Arch-Templars.\n");
