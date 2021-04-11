@@ -6304,7 +6304,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			if (die<=crit_chance)
 			{
 				ch[cn].data[73]=0;
-				//crit_dam  = dam + 1+points2rank(ch[cn].points_tot);
+				crit_dam  = dam + 1+points2rank(ch[cn].points_tot);
 				crit_dam *= crit_mult / 100;
 				crit_dam -= dam;
 				
@@ -7597,14 +7597,14 @@ void really_update_char(int cn)
 		critical_c /= 2;
 	}
 	
-	// Clamp critical_c between 100 and 10000
+	// Clamp critical_c between 0 and 10000
 	if (critical_c > 10000)
 	{
 		critical_c = 10000;
 	}
-	if (critical_c < 100)
+	if (critical_c < 0)
 	{
-		critical_c = 100;
+		critical_c = 0;
 	}
 	ch[cn].crit_chance = critical_c;
 	
@@ -7623,10 +7623,10 @@ void really_update_char(int cn)
 		critical_m *= 2;
 	}
 	
-	// Clamp critical_m between 0 and 300
-	if (critical_m > 300)
+	// Clamp critical_m between 0 and 800
+	if (critical_m > 800)
 	{
-		critical_m = 300;
+		critical_m = 800;
 	}
 	if (critical_m < 0)
 	{

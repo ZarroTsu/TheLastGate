@@ -2612,7 +2612,7 @@ void stronghold_mage_driver(int cn)
 		if (ch[cn].a_hp<ch[cn].hp[5]*600) ch[cn].a_mana -= ch[cn].mana[5]*333;	ch[cn].a_hp += ch[cn].hp[5]*500;
 		
 		// If there are less than BS_COUNTER monsters in the given group...
-		if (m<BS_COUNTER)
+		if (m<BS_COUNTER+3)
 		{
 			n = 0;
 			

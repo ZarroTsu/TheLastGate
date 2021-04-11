@@ -2159,9 +2159,13 @@ void soultrans_equipment(int cn, int in, int in2)
 		else if (ran==3)
 		{
 			if (it[in2].weapon[0]>0)
-				it[in2].weapon[0] += stren;
+			{
+				it[in2].ss_weapon += stren;
+			}
 			else
-				it[in2].armor[0] += stren;
+			{
+				it[in2].ss_armor += stren;
+			}
 		}
 		else if (ran>=4 && ran<=8) // For every 1 attribute point, it requires 3 base points to use.
 		{
@@ -2187,10 +2191,10 @@ void soultrans_equipment(int cn, int in, int in2)
 		it[in2].current_age[1] = 0;
 		it[in2].damage_state = 0;
 		
-		it[in2].armor[0] = it_temp[orgt].armor[0];
+		it[in2].armor[0] = it_temp[orgt].armor[0] + it[in2].ss_armor;
 		it[in2].armor[1] = it_temp[orgt].armor[1];
 		
-		it[in2].weapon[0] = it_temp[orgt].weapon[0];
+		it[in2].weapon[0] = it_temp[orgt].weapon[0] + it[in2].ss_weapon;
 		it[in2].weapon[1] = it_temp[orgt].weapon[1];
 		
 		it[in2].sprite[0] = it_temp[orgt].sprite[0];

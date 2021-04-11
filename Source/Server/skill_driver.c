@@ -2628,10 +2628,10 @@ void skill_repair(int cn)
 			it[in].current_age[1] = 0;
 			it[in].damage_state = 0;
 			
-			it[in].armor[0] = it_temp[orgt].armor[0];
+			it[in].armor[0] = it_temp[orgt].armor[0] + it[in].ss_armor;
 			it[in].armor[1] = it_temp[orgt].armor[1];
 			
-			it[in].weapon[0] = it_temp[orgt].weapon[0];
+			it[in].weapon[0] = it_temp[orgt].weapon[0] + it[in].ss_weapon;
 			it[in].weapon[1] = it_temp[orgt].weapon[1];
 			
 			it[in].sprite[0] = it_temp[orgt].sprite[0];

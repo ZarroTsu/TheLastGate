@@ -684,7 +684,10 @@ struct item
 	
 	unsigned short orig_temp;       // Original template value, for restoration by repair
 	
-	char future3[12];				// 587
+	char ss_armor;					// Used to store AV on SS gear so it repairs correctly
+	char ss_weapon;					// Used to store WV on SS gear so it repairs correctly
+	
+	char future3[10];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
