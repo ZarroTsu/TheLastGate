@@ -842,10 +842,9 @@ void plr_cmd_stat(int nr)
 	{
 		return;
 	}
-	if (v<0 || v>99)
+	if (v<0 || v>900)
 	{
-		return;                 // sanity checks
-
+		return;				// sanity check
 	}
 	if (n<5)
 	{
@@ -877,6 +876,10 @@ void plr_cmd_stat(int nr)
 	}
 	else
 	{
+		if (v>135)
+		{
+			return;				// sanity check
+		}
 		while (v--)
 		{
 			do_raise_skill(cn, n - 8);
