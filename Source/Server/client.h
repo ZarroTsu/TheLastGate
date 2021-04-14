@@ -51,10 +51,10 @@ struct cmap
 	unsigned short ch_nr;
 	unsigned short ch_id;
 	unsigned char ch_proz;          // health in percent
-	unsigned char ch_castspd;		// dumb hack for bonus animation speed
-	unsigned char ch_atkspd;		// dumb hack
-	unsigned char ch_movespd;		// dumb hack (cont.)
-	unsigned char ch_colorize;		// any flags that may warrant a different overhead color
+	unsigned char ch_castspd;		// animation speed bonus for misc. actions (casting)
+	unsigned char ch_atkspd;		// animation speed bonus for attacking
+	unsigned char ch_movespd;		// animation speed bonus for walking
+	unsigned char ch_fontcolor;		// overhead text font color. 0 = red, 1 = yellow, etc
 
 	// for item
 	short int it_sprite;            // basic sprite of item

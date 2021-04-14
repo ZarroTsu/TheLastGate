@@ -628,7 +628,7 @@ int points2rank(int v)
 	if (v< 74002500)	return(21); // Baron
 	if (v< 94185000)	return(22); // Earl
 	if (v<118755000)	return(23); // Marquess
-						return(23); // Warlord
+						return(24); // Warlord
 }
 
 int rank2points(int v)
@@ -726,6 +726,7 @@ int in_grouprange(int cn, int co)
 int scale_exps2(int cn, int co_rank, int exp)
 {
 	static float scale_tab[RANKS*2+1] = {
+		0.04,					// -25
 		0.04, 0.04, 0.04, 0.04, // -24, -23, -22, -21
 		0.04, 0.04, 0.04, 0.04, // -20, -19, -18, -17
 		0.12, 0.19, 0.26, 0.33, // -16, -15, -14, -13
@@ -740,7 +741,8 @@ int scale_exps2(int cn, int co_rank, int exp)
 		1.90, 2.10, 2.32, 2.56, // + 9, +10, +11, +12
 		2.82, 3.10, 3.40, 3.72, // +13, +14, +15, +16
 		4.00, 4.00, 4.00, 4.00, // +17, +18, +19, +20
-		4.00, 4.00, 4.00, 4.00  // +21, +22, +23, +24
+		4.00, 4.00, 4.00, 4.00, // +21, +22, +23, +24
+		4.00					// +25
 	};
 	int diff;
 
@@ -776,7 +778,8 @@ char *rank_name[RANKS] = {
 	"Major",             	"Lieutenant Colonel", 	"Colonel",				// 12 13 14
 	"Brigadier General", 	"Major General", 		"Lieutenant General",	// 15 16 17
 	"General",           	"Field Marshal", 		"Knight of Astonia",	// 18 19 20
-	"Baron of Astonia", 	"Earl of Astonia", 		"Warlord of Astonia"  	// 21 22 23
+	"Baron of Astonia", 	"Earl of Astonia", 		"Marquess of Astonia", 	// 21 22 23
+	"Warlord of Astonia"  													// 24
 };
 
 char *who_rank_name[RANKS] = {
@@ -787,7 +790,8 @@ char *who_rank_name[RANKS] = {
 	"Major", "LtCol", "Colnl",
 	"BrGen", "MaGen", "LtGen",
 	"Genrl", "FDMAR", "KNIGT",
-	"BARON", " EARL", "WARLD"
+	"BARON", " EARL", "MARQS",
+	"WARLD"
 };
 
 int create_special_item(int temp)

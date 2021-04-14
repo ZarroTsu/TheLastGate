@@ -91,9 +91,11 @@
 // Sanity check on skill number
 #define SANESKILL(s) ((s)>=0 && (s)<MAXSKILL)
 
+// Haste's formula
+#define HASTEFORM(n)		(n/4)
 // Slow's formula (used to degrade)
-#define SLOWFORM(n) (n*3)
+#define SLOWFORM(n)			(n/2)
 // Slow2's formula (used to degrade) 
-#define SLOW2FORM(n) (n*6)
+#define SLOW2FORM(n)		(n/(8/3))
 // Curse2's formula (used to degrade)
-#define CURSE2FORM(p, n) (((p*3/2)-n)/5)
+#define CURSE2FORM(p, n)	(((p*4/3)-n)/5)

@@ -111,10 +111,10 @@
 #define WN_SPEED		13  // Speed 	and Attack Speed
 #define WN_SPMOD		14  // Spellmod	and Spellapt
 #define WN_CRIT			15  // Crit Chc	and Crit Mult
-#define WN_DPS			16  // DPH		and DPS
+#define WN_TOP			16  // TopDmg	and Luck
 #define WN_HITPAR		17  // Hit 		and Parry
 #define WN_CLDWN		18  // Cooldown and Cast Speed
-#define WN_LUCK			19  // Luck		and Exp/H
+#define WN_FLAGS		19  // Special flags
 
 // placement bits
 #define PL_HEAD       1
@@ -223,7 +223,7 @@
 #define SP_DUR_HEAL			( TICKS * 60                      )
 #define SP_DUR_CURSE2		( TICKS * 40                      )
 #define SP_DUR_CURSE		( TICKS * 60 * 2                  )
-#define SP_DUR_SLOW2(a)		( TICKS * 15 / 2 + TICKS * a / 32 )
+#define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
 #define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
 #define SP_DUR_POISON(a)	( TICKS * 20 + TICKS * (a / 6)    )
 #define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 80          )

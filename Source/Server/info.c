@@ -155,7 +155,7 @@ static void unload(void)
 	}
 }
 
-static char *_rank[24] = {
+static char *_rank[25] = {
 	"Private",
 	"Private First Class",
 	"Lance Corporal",
@@ -179,35 +179,37 @@ static char *_rank[24] = {
 	"Knight of Astonia",
 	"Baron of Astonia",
 	"Earl of Astonia",
+	"Marquess of Astonia",
 	"Warlord of Astonia"
 };
 
 static int points2rank(int v)
 {
-	if (v<     250)	return( 0); // Private
-	if (v<    1750)	return( 1); // Private FIrst Class
-	if (v<    7000)	return( 2); // Lance Corporal
-	if (v<   21000)	return( 3); // Corporal
-	if (v<   52500)	return( 4); // Sergeant
-	if (v<  115500)	return( 5); // Staff Sergeant
-	if (v<  231000)	return( 6); // Master Sergeant
-	if (v<  429000)	return( 7); // First Sergeant
-	if (v<  750750)	return( 8); // Sergeant Major
-	if (v< 1251250)	return( 9); // Second Leiutenant
-	if (v< 2002000)	return(10); // First Leiutenant
-	if (v< 3094000)	return(11); // Captain
-	if (v< 4641000)	return(12); // Major
-	if (v< 6783000)	return(13); // Lieutenant Colonel
-	if (v< 9690000)	return(14); // Colonel
-	if (v<13566000)	return(15); // Brigadier General
-	if (v<18653250)	return(16); // Major General
-	if (v<25236750)	return(17); // Lieutenant General
-	if (v<33649000)	return(18); // General
-	if (v<44275000)	return(19); // Field Marshal
-	if (v<57557500)	return(20); // Knight
-	if (v<74002500)	return(21); // Baron
-	if (v<94185000)	return(22); // Earl
-					return(23); // Warlord
+	if (v<      250)	return( 0); // Private
+	if (v<     1750)	return( 1); // Private FIrst Class
+	if (v<     7000)	return( 2); // Lance Corporal
+	if (v<    21000)	return( 3); // Corporal
+	if (v<    52500)	return( 4); // Sergeant
+	if (v<   115500)	return( 5); // Staff Sergeant
+	if (v<   231000)	return( 6); // Master Sergeant
+	if (v<   429000)	return( 7); // First Sergeant
+	if (v<   750750)	return( 8); // Sergeant Major
+	if (v<  1251250)	return( 9); // Second Leiutenant
+	if (v<  2002000)	return(10); // First Leiutenant
+	if (v<  3094000)	return(11); // Captain
+	if (v<  4641000)	return(12); // Major
+	if (v<  6783000)	return(13); // Lieutenant Colonel
+	if (v<  9690000)	return(14); // Colonel
+	if (v< 13566000)	return(15); // Brigadier General
+	if (v< 18653250)	return(16); // Major General
+	if (v< 25236750)	return(17); // Lieutenant General
+	if (v< 33649000)	return(18); // General
+	if (v< 44275000)	return(19); // Field Marshal
+	if (v< 57557500)	return(20); // Knight
+	if (v< 74002500)	return(21); // Baron
+	if (v< 94185000)	return(22); // Earl
+	if (v<118755000)	return(22); // Earl
+						return(23); // Warlord
 }
 
 static char *rank(int pts)

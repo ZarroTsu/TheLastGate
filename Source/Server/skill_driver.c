@@ -765,6 +765,13 @@ int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
 	bu[in].temp  	 = intemp;
 	bu[in].sprite[1] = sptemp;
 	bu[in].power 	 = power;
+	bu[in].data[0]   = cn;
+	bu[in].data[1]   = power;
+	
+	// data[0] = original caster
+	// data[1] = power for values that decay, x on recall
+	// data[2] = y on recall
+	// data[3] = template from item
 	
 	if (ext && !(ch[cn].flags & CF_PLAYER))
 	{
@@ -1187,9 +1194,9 @@ int add_spell(int cn, int in)
 					sick=2;
 				}
 				
-				bu[in].cost = bu[in2].cost + 1;
-				if (bu[in].cost > 3) bu[in].cost = 3;
-				else if (bu[in].cost > sick) bu[in].cost = sick;
+				bu[in].data[1] = bu[in2].data[1] + 1;
+				if (bu[in].data[1] > 3) bu[in].data[1] = 3;
+				else if (bu[in].data[1] > sick) bu[in].data[1] = sick;
 				bu[in2].used = USE_EMPTY;
 				break;
 			}
@@ -1326,7 +1333,7 @@ void spell_from_item(int cn, int in2)
 	
 	bu[in].power 			= it[in2].power;
 	
-	bu[in].data[0]			= it[in2].temp;
+	bu[in].data[3]			= it[in2].temp;
 
 	if (!add_spell(cn, in))
 	{
@@ -1348,7 +1355,7 @@ int has_spell_from_item(int cn, int temp)
 			continue;
 		}
 		in = ch[cn].spell[n];
-		if (bu[in].data[0]==temp)
+		if (bu[in].data[3]==temp)
 		{
 			break;
 		}
@@ -1724,6 +1731,8 @@ int spell_haste(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) 
 		return 0;
 	
+	bu[in].speed[1] = 15 + HASTEFORM(power);
+	
 	return cast_a_spell(cn, co, in, 0);
 }
 void skill_haste(int cn)
@@ -1758,7 +1767,7 @@ int spell_heal(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_HEAL, BUF_SPR_HEALSICK, power, SP_DUR_HEAL, 0))) 
 		return 0;
 	
-	bu[in].cost = 0;
+	bu[in].data[1] = 0;
 	
 	// Every time heal is cast it updates itself and adds 1 to 'cost'
 	if (cast_a_spell(cn, co, in, 0))
@@ -1766,7 +1775,7 @@ int spell_heal(int cn, int co, int power)
 		if ((in2=has_buff(cn, SK_HEAL))!=0)
 		{
 			// Each stack of heal sickness reduces the spell power by 1/4th
-			tmp = 4 - bu[in2].cost;
+			tmp = 4 - bu[in2].data[1];
 			power = power * tmp / 4;
 			if (4-tmp) 
 			{
@@ -1833,7 +1842,6 @@ int spell_curse(int cn, int co, int power, int flag)
 		{
 			bu[in].attrib[n][1] = -(2 + CURSE2FORM(power, (4 - n)));
 		}
-		bu[in].cost = power * 100;
 	}
 	else
 	{
@@ -1925,15 +1933,16 @@ int spell_slow(int cn, int co, int power, int flag)
 	{
 		if (!(in = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0)))
 			return 0;
-		//bu[in].speed[1] = SLOWFORM(power)+150)/2;
+		
+		bu[in].speed[1] = -(30 + SLOW2FORM(power));
 	}
 	else
 	{
 		if (!(in = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_SLOW(power), 0)))
 			return 0;
-		//bu[in].speed[1] = SLOW2FORM(power)+50)/2;
+		
+		bu[in].speed[1] = -(30 + SLOWFORM(power));
 	}
-	bu[in].cost = power;
 	
 	return cast_a_spell(cn, co, in, 1+flag);
 }
@@ -1951,8 +1960,8 @@ void skill_slow(int cn, int flag)
 	// Tarot Card - Emperor :: Change Slow into Greater Slow
 	if (get_tarot(cn, IT_CH_EMPEROR)) 
 	{ 
-		cost *= (4 / 3);
-		d20 -= 1;
+		cost *= (3 / 4);
+		d20 += 1;
 	}
 	
 	// Hex Area increases spell cost
@@ -2020,9 +2029,6 @@ int spell_poison(int cn, int co, int power, int flag)
 	
 	if (!(in = make_new_buff(cn, SK_POISON, BUF_SPR_POISON, power, dur, 0)))
 		return 0;
-	
-	// Special case -- the user of the poison should earn the kill for the poison.
-	bu[in].cost = cn; 
 	
 	return cast_a_spell(cn, co, in, 1+flag);
 }
@@ -2314,11 +2320,11 @@ void char_info(int cn, int co)
 	{
 		if ((in = ch[co].spell[n])!=0)
 		{
-			if (bu[in].cost && (ch[cn].flags & CF_GOD))
+			if (bu[in].data[1] && (ch[cn].flags & CF_GOD))
 			{
 				do_char_log(cn, 1, 
 				"%s for %dm %ds power of %d (%d)\n",
-				bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60, bu[in].power, bu[in].cost);
+				bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60, bu[in].power, bu[in].data[1]);
 			}
 			else
 			{
@@ -2682,8 +2688,8 @@ void skill_recall(int cn)
 	if (!(in = make_new_buff(cn, SK_RECALL, BUF_SPR_RECALL, power, SP_DUR_RECALL(power), 0)))
 		return;
 	
-	bu[in].data[0] = ch[cn].temple_x;
-	bu[in].data[1] = ch[cn].temple_y;
+	bu[in].data[1] = ch[cn].temple_x;
+	bu[in].data[2] = ch[cn].temple_y;
 	
 	if (!cast_a_spell(cn, cn, in, 0))
 		return;
@@ -3472,9 +3478,6 @@ int spell_bleed(int cn, int co, int power)
 	
 	if (!(in = make_new_buff(cn, SK_BLEED, BUF_SPR_BLEED, power, SP_DUR_BLEED, 0)))
 		return 0;
-	
-	// the user of the bleed should earn the kill for the bleed.
-	bu[in].cost = cn;
 	
 	if (add_spell(co, in))
 	{

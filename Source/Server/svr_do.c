@@ -1749,19 +1749,19 @@ void do_showranklist(int cn)
 	do_char_log(cn, 1, "Now listing total exp for each rank:\n");
 	do_char_log(cn, 1, " \n");
 	//                 "!        .         .         .         .        !"
-	do_char_log(cn, 1, "Private            0      Major      3,094,000\n");
-	do_char_log(cn, 1, "Private FC       250      Lieu Col   4,641,000\n");
-	do_char_log(cn, 1, "Lance Corp     1,750      Colonel    6,783,000\n");
-	do_char_log(cn, 1, "Corporal       7,000      Brig Gen   9,690,000\n");
-	do_char_log(cn, 1, "Sergeant      21,000      Major Gen 13,566,000\n");
-	do_char_log(cn, 1, "Staff Serg    52,500      Lieu Gen  18,653,250\n");
-	do_char_log(cn, 1, "Mast Serg    115,500      General   25,236,750\n");
-	do_char_log(cn, 1, "1st Serg     231,000      Field Mar 33,649,000\n");
-	do_char_log(cn, 1, "Serg Major   429,000      Knight    44,275,000\n");
-	do_char_log(cn, 1, "2nd Lieu     750,750      Baron     57,557,500\n");
-	do_char_log(cn, 1, "1st Lieu   1,251,250      Earl      74,002,500\n");
-	do_char_log(cn, 1, "Captain    2,002,000      Warlord   94,185,000\n");
-	do_char_log(cn, 1, " ???     ???,???,???\n");
+	do_char_log(cn, 1, "Private             0    Lieu Col    4,641,000\n");
+	do_char_log(cn, 1, "Private FC        250    Colonel     6,783,000\n");
+	do_char_log(cn, 1, "Lance Corp      1,750    Brig Gen    9,690,000\n");
+	do_char_log(cn, 1, "Corporal        7,000    Major Gen  13,566,000\n");
+	do_char_log(cn, 1, "Sergeant       21,000    Lieu Gen   18,653,250\n");
+	do_char_log(cn, 1, "Staff Serg     52,500    General    25,236,750\n");
+	do_char_log(cn, 1, "Mast Serg     115,500    Field Mar  33,649,000\n");
+	do_char_log(cn, 1, "1st Serg      231,000    Knight     44,275,000\n");
+	do_char_log(cn, 1, "Serg Major    429,000    Baron      57,557,500\n");
+	do_char_log(cn, 1, "2nd Lieu      750,750    Earl       74,002,500\n");
+	do_char_log(cn, 1, "1st Lieu    1,251,250    Marquess   94,185,000\n");
+	do_char_log(cn, 1, "Captain     2,002,000    Warlord   118,755,000\n");
+	do_char_log(cn, 1, "Major       3,094,000    \n");
 	do_char_log(cn, 1, " \n");
 }
 
@@ -6126,22 +6126,6 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 	{
 		s2 -= 10;
 	}
-	else if (ch[co].stunned>=10001 && ch[co].stunned < 20000) // 10000-20000 = Target Slowed
-	{
-		s2 -= (ch[co].stunned-10000)/50;
-	}
-	else if (ch[co].stunned>=20001 && ch[co].stunned < 30000) // 20000-30000 = Target Hasted
-	{
-		s2 += (ch[co].stunned-20000)/30;
-	}
-	     if (ch[cn].stunned>=10001 && ch[cn].stunned < 20000) // 10000-20000 = Attacker Slowed
-	{
-		s1 -= (ch[cn].stunned-10000)/50;
-	}
-	else if (ch[cn].stunned>=20001 && ch[cn].stunned < 30000) // 20000-30000 = Attacker Hasted
-	{
-		s1 += (ch[cn].stunned-20000)/30;
-	}
 	
 	diff = s1 - s2;
 
@@ -6823,7 +6807,7 @@ void really_update_char(int cn)
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0, pigsblood = 0;
 	int heal_hp, heal_end, heal_mana;
 	int tempWeapon = 0, tempArmor = 0;
-	int hastePower = 0, slowPower = 0, hasteSpeed = 0, slowSpeed = 0, slow2Speed = 0, rootBoots = 0;
+	int hastePower = 0, slowPower = 0, hasteSpeed = 0, slowSpeed = 0, slow2Speed = 0;
 	int attrib[5];
 	int attrib_ex[5];
 	int skill[50];
@@ -6971,6 +6955,7 @@ void really_update_char(int cn)
 			
 			if (it[m].temp==IT_BOOK_TRAV) 	gearSpec |= 1;
 			if (it[m].temp==IT_TW_HEAVENS)	gearSpec |= 2;
+			if (it[m].temp==IT_TW_ROOTS)	gearSpec |= 4;
 		}
 		
 		// Regular item bonuses
@@ -7118,48 +7103,14 @@ void really_update_char(int cn)
 			
 			if (bu[m].temp==SK_WARCRY2)
 			{
-				if (it[ch[cn].worn[WN_FEET]].temp==IT_TW_ROOTS) // Commander's Roots
+				// Boots - Commander's Roots :: change 'stun' into raw speed reduction. This is halved later.
+				if (gearSpec & 4)
 				{
-					rootBoots = 1;
-					slowPower += 150;
-					ch[cn].stunned = 10000 + 1 + slowPower;
+					base_spd -= 300;
 				}
 				else
+				{
 					ch[cn].stunned = 1;
-			}
-			
-			if (bu[m].temp==SK_HASTE && !ch[cn].stunned)
-			{
-				hasteSpeed = bu[m].power*3/2+100;
-				hastePower = bu[m].power;
-				ch[cn].stunned = 20000 + 1 + hastePower;  // 20000-30000 = Target Hasted
-			}
-			if ((bu[m].temp==SK_SLOW || bu[m].temp==SK_SLOW2) && (ch[cn].stunned<1 || ch[cn].stunned>10000))
-			{
-				if (it[ch[cn].worn[WN_FEET]].temp==IT_TW_ROOTS) // Commander's Roots
-				{
-					if (bu[m].temp==SK_SLOW)	slowSpeed  = (SLOWFORM(bu[m].cost)+150)/2;
-					if (bu[m].temp==SK_SLOW2)	slow2Speed = (SLOW2FORM(bu[m].cost)+50)/2;
-					slowPower += bu[m].cost/2;
-				}
-				else
-				{
-					if (bu[m].temp==SK_SLOW)	slowSpeed  = SLOWFORM(bu[m].cost)+150;
-					if (bu[m].temp==SK_SLOW2)	slow2Speed = SLOW2FORM(bu[m].cost)+50;
-					slowPower += bu[m].cost;
-				}
-				if (slowPower>999) slowPower=999;
-				// If you're hasted and slowed at the same time...
-				if (ch[cn].stunned>20000)
-				{
-					if (hastePower>slowPower)
-						ch[cn].stunned -= slowPower;
-					else
-						ch[cn].stunned = 10000 + 1 + slowPower - hastePower;
-				}
-				else
-				{
-					ch[cn].stunned = 10000 + 1 + slowPower;
 				}
 			}
 			
@@ -7196,7 +7147,7 @@ void really_update_char(int cn)
 			if (bu[m].temp==205) coconut |= 1;
 			if (bu[m].temp==206) coconut |= 2;
 			
-			if (bu[m].data[0]==BUF_IT_PIGS) pigsblood = 1;
+			if (bu[m].data[3]==BUF_IT_PIGS) pigsblood = 1;
 		}
 	}
 	
@@ -7423,26 +7374,25 @@ void really_update_char(int cn)
 	}
 	
 	/*
-		ch[].atk_speed value
-
-		 3 / 24 = 0.125x  frame speed
-		 6 / 24 = 0.250x
-		12 / 24 = 0.500x
-		18 / 24 = 0.750x
-		24 / 24 = 1.000x
-		30 / 24 = 1.250x
-		36 / 24 = 1.500x  (maximum)
-		
-		(TODO: Make haste and slow hold speed on the buff/debuff itself)
+		ch[].speed value
 	*/
-	base_spd = 14 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR] + hasteSpeed - slowSpeed - slow2Speed) / 50 + ch[cn].speed_mod;
+	// Boots - Commander's Roots :: halves all speed reductions
+	if (gearSpec & 4) 
+	{
+		if (base_spd<0) 	base_spd 	/= 2;
+		if (spd_move<0) 	spd_move 	/= 2;
+		if (spd_attack<0) 	spd_attack 	/= 2;
+		if (spd_cast<0) 	spd_cast 	/= 2;
+	}
+	
+	base_spd = 120 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 6 + ch[cn].speed_mod;
 	
 	// Additional bonus via speed mode :: Slow, Normal, Fast
-	if (ch[cn].mode==0) base_spd += 2;
-	if (ch[cn].mode==1) base_spd += 4;
-	if (ch[cn].mode==2) base_spd += 6;
+	if (ch[cn].mode==0) base_spd += 15;	// old: 14 + 2 = 16/36
+	if (ch[cn].mode==1) base_spd += 30;	// old: 14 + 4 = 18/36
+	if (ch[cn].mode==2) base_spd += 45;	// old: 14 + 6 = 20/36
 	
-	// Clamp base_speed between 1 and SPEED_CAP (36)
+	// Clamp base_speed between 1 and SPEED_CAP (300)
 	if (base_spd > SPEED_CAP) 
 	{
 		base_spd = SPEED_CAP;
@@ -7452,9 +7402,8 @@ void really_update_char(int cn)
 		base_spd = 1;
 	}	
 	ch[cn].speed = SPEED_CAP - base_spd;
-	// Table array is between 0 and 35 and stored in reverse order.
-	// So we take 36, minus our bonus speed values above.
-	
+	// Table array is between 0 and 299 and stored in reverse order.
+	// So we take 300, minus our bonus speed values above.
 	
 	/*
 		ch[].move_speed value
@@ -7475,7 +7424,7 @@ void really_update_char(int cn)
 		ch[].atk_speed value
 	*/
 	
-	spd_attack += attrib_ex[AT_AGL]/28;
+	spd_attack += attrib_ex[AT_AGL]/4;
 	
 	// Tarot - Strength - 20% less attack speed
 	if (charmSpec & 32)
@@ -7483,7 +7432,7 @@ void really_update_char(int cn)
 		spd_attack = spd_attack * 80 / 100;
 	}
 	
-	// Clamp spd_attack between 0 and SPEED_CAP (36)
+	// Clamp spd_attack between 0 and SPEED_CAP (300)
 	if (spd_attack > SPEED_CAP)
 	{
 		spd_attack = SPEED_CAP;
@@ -7499,9 +7448,9 @@ void really_update_char(int cn)
 		ch[].cast_speed value
 	*/
 	
-	spd_cast += attrib_ex[AT_BRV]/28;
+	spd_cast += attrib_ex[AT_BRV]/4;
 	
-	// Clamp spd_cast between 0 and SPEED_CAP (36)
+	// Clamp spd_cast between 0 and SPEED_CAP (300)
 	if (spd_cast > SPEED_CAP)
 	{
 		spd_cast = SPEED_CAP;
@@ -8179,31 +8128,45 @@ void do_regenerate(int cn)
 			{
 				ch[cn].a_hp += bu[in].hp[0];
 				if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
-					ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
+				{
+					ch[cn].a_hp = ch[cn].hp[5] * 1000;
+				}
 			}
 			
-			// Slow countdown
-			if (bu[in].temp==SK_SLOW)
+			// Slow and Curse2 Decay
+			if (bu[in].temp==SK_SLOW || bu[in].temp==SK_CURSE2)
 			{
 				int p = bu[in].power;
-				if (bu[in].active<=bu[in].duration*(bu[in].cost-(p/2))/max(1,(p-(p/2))))
+				if (bu[in].active<=bu[in].duration*(bu[in].data[1]-(p/2))/max(1,(p-(p/2))))
 				{
-					bu[in].cost-=bu[in].power/16;
-					if (bu[in].cost<bu[in].power/2)
-						bu[in].cost = bu[in].power/2;
+					bu[in].data[1] -= p / TICKS;
+					if (bu[in].data[1] > p)		bu[in].data[1] = p;
+					if (bu[in].data[1] < p / 2)	bu[in].data[1] = p / 2;
+					if (bu[in].temp==SK_SLOW)
+					{
+						bu[in].speed[1] = -(30 + SLOWFORM(bu[in].data[1]));
+					}
+					else if (bu[in].temp==SK_CURSE2)
+					{
+						for (n = 0; n<5; n++) 
+						{
+							bu[in].attrib[n][1] = -CURSE2FORM(bu[in].data[1], 4 - n);
+						}
+					}
 					do_update_char(cn);
 				}
 			}
 			
+			/*
 			// Slow2 countdown
 			if (bu[in].temp==SK_SLOW2)
 			{
 				int p = bu[in].power;
-				if (bu[in].active<=bu[in].duration*bu[in].cost/max(1,p))
+				if (bu[in].active<=bu[in].duration*bu[in].data[1]/max(1,p))
 				{
-					bu[in].cost-=bu[in].power/16;
-					if (bu[in].cost<0)
-						bu[in].cost = 0;
+					bu[in].data[1]-=bu[in].power/16;
+					if (bu[in].data[1]<0)
+						bu[in].data[1] = 0;
 					do_update_char(cn);
 				}
 			}
@@ -8212,18 +8175,22 @@ void do_regenerate(int cn)
 			if (bu[in].temp==SK_CURSE2)
 			{
 				int p = bu[in].power;
-				if (bu[in].active<=bu[in].duration*(CURSE2FORM(bu[in].cost/100,0)-(CURSE2FORM(p,0)/2))/max(1,(CURSE2FORM(p,0)-(CURSE2FORM(p,0)/2))))
+				if (bu[in].active<=bu[in].duration*(CURSE2FORM(bu[in].data[1]/100,0)-(CURSE2FORM(p,0)/2))/max(1,(CURSE2FORM(p,0)-(CURSE2FORM(p,0)/2))))
 				{
-					bu[in].cost-=(1000/3);
-					for (n = 0; n<5; n++) bu[in].attrib[n][1] = -CURSE2FORM((bu[in].cost/100),n);
+					bu[in].data[1]-=(1000/3);
+					for (n = 0; n<5; n++) 
+					{
+						bu[in].attrib[n][1] = -CURSE2FORM((bu[in].data[1]/100),n);
+					}
 					do_update_char(cn);
 				}
 			}
+			*/
 			
 			// Poison
 			if (bu[in].temp==SK_POISON)
 			{
-				co = bu[in].cost;
+				co = bu[in].data[0];
 				
 				mf = map[ch[cn].x + ch[cn].y * MAPX].flags;
 				
@@ -8310,7 +8277,7 @@ void do_regenerate(int cn)
 			// Bleed
 			if (bu[in].temp==SK_BLEED)
 			{
-				co = bu[in].cost;
+				co = bu[in].data[0];
 				
 				if (!IS_SANEPLAYER(co)) co = 0;
 				
@@ -8428,7 +8395,7 @@ void do_regenerate(int cn)
 					xo = ch[cn].x;
 					yo = ch[cn].y;
 
-					if (god_transfer_char(cn, bu[in].data[0], bu[in].data[1]))
+					if (god_transfer_char(cn, bu[in].data[1], bu[in].data[2]))
 					{
 						if (!(ch[cn].flags & CF_INVISIBLE))
 						{

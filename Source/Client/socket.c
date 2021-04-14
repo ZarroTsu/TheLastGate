@@ -577,11 +577,12 @@ int sv_setmap(unsigned char *buf,int off)
 	}
 	if (buf[1]&128) {
 		map[n].ch_proz=*(unsigned char*)(buf+p); p+=1;
-		// Feb 2020 - Hope this works...
+		// Additional data received - cast speed, attack speed, move speed, 
+		//   and special font colorization of a given npc
 		map[n].ch_castspd=*(unsigned char*)(buf+p); p+=1;
 		map[n].ch_atkspd=*(unsigned char*)(buf+p); p+=1;
 		map[n].ch_movespd=*(unsigned char*)(buf+p); p+=1;
-		map[n].ch_colorize=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_fontcolor=*(unsigned char*)(buf+p); p+=1;
 		cnt[7]++;
 	}	
 	return p;

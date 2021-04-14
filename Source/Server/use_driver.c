@@ -953,8 +953,8 @@ int teleport2(int cn, int in2)
 	bu[in].duration  = bu[in].active = 180;
 	bu[in].temp  = SK_RECALL;
 	bu[in].power = it[in2].power;
-	bu[in].data[0] = it[in2].data[0];
-	bu[in].data[1] = it[in2].data[1];
+	bu[in].data[1] = it[in2].data[0];
+	bu[in].data[2] = it[in2].data[1];
 
 	if (!add_spell(cn, in))
 	{

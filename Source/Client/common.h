@@ -6,7 +6,7 @@
 	#define MHOST		"192.168.0.11"
 #else
 	#define MNAME		"The Last Gate"
-	#define MHOST		"99.233.166.184"
+	#define MHOST		"99.233.143.153"
 #endif
 
 #define MHELP			"https://github.com/dylanyaga/openMerc/"
@@ -18,6 +18,9 @@
 
 #define MAXSKILL		50  // must match server!
 #define MAXBUFFS		20  // must match server!
+
+#define max(a, b) ((a)>(b) ? (a) : (b))
+#define min(a, b) ((a)<(b) ? (a) : (b))
 
 // wear positions
 #define WN_HEAD			0
@@ -38,10 +41,12 @@
 #define WN_SPEED		13  // Speed 	and Attack Speed
 #define WN_SPMOD		14  // Spellmod	and Spellapt
 #define WN_CRIT			15  // Crit Chc	and Crit Mult
-#define WN_DPS			16  // DPH		and DPS
+#define WN_TOP			16  // TopDmg	and Luck
 #define WN_HITPAR		17  // Hit 		and Parry
 #define WN_CLDWN		18  // Cooldown and Cast Speed
-#define WN_LUCK			19  // Luck		and Exp/H
+#define WN_FLAGS		19  // Special flags
+
+#define SPEED_CAP		300
 
 // placement bits
 #define PL_HEAD			1
@@ -123,10 +128,10 @@ struct cmap {
 	unsigned short ch_nr;			// character id
 	unsigned short ch_id;			// character 'crc'
 	unsigned char ch_proz;
-	unsigned char ch_castspd;		// dumb hack for bonus animation speed
-	unsigned char ch_atkspd;		// dumb hack
-	unsigned char ch_movespd;		// dumb hack (cont.)
-	unsigned char ch_colorize;		// any flags that may warrant a different overhead color
+	unsigned char ch_castspd;		// animation speed bonus for misc. actions (casting)
+	unsigned char ch_atkspd;		// animation speed bonus for attacking
+	unsigned char ch_movespd;		// animation speed bonus for walking
+	unsigned char ch_fontcolor;		// overhead text font color. 0 = red, 1 = yellow, etc
 
 	// for item
 	short int it_sprite;			// basic sprite of item

@@ -860,13 +860,15 @@ void plr_cmd_stat(int nr)
 			do_raise_hp(cn);
 		}
 	}
+	/*
 	else if (n==6)
 	{
 		while (v--)
 		{
-			//do_raise_end(cn);
+			do_raise_end(cn);
 		}
 	}
+	*/
 	else if (n==7)
 	{
 		while (v--)
@@ -2252,6 +2254,7 @@ void plr_change(int nr)
 	struct cmap *cmap;
 	struct cmap *smap;
 	unsigned char   buf[256];
+	int chFlags=0;
 
 	cn   = player[nr].usnr;
 	cpl  = &player[nr].cpl;
@@ -2402,17 +2405,43 @@ void plr_change(int nr)
 				*(unsigned long*)(buf + 1) = n;
 				if (n == WN_SPEED)	
 				{
-					*(short int*)(buf + 5) = ch[cn].speed;
+					*(short int*)(buf + 5) = ch[cn].speed;     // 0 to 300, lower is better
+					*(short int*)(buf + 7) = ch[cn].atk_speed; // additional speed, higher is better
 				}
 				if (n == WN_SPMOD)	
 				{
-					*(short int*)(buf + 5) = ch[cn].spell_mod;
+					*(short int*)(buf + 5) = ch[cn].spell_mod; // 100 = 1%
+					*(short int*)(buf + 7) = ch[cn].spell_apt; // 
 				}
 				if (n == WN_CRIT)
 				{
-					*(short int*)(buf + 5) = 10000 + ch[cn].crit_chance * ch[cn].crit_multi / 100;
+					*(short int*)(buf + 5) = ch[cn].crit_chance; // 100 = 1%
+					*(short int*)(buf + 7) = ch[cn].crit_multi;  // % increase of damage upon a crit
 				}
-				*(short int*)(buf + 7) = 0;
+				if (n == WN_TOP)
+				{
+					*(short int*)(buf + 5) = ch[cn].top_damage; // STR/2 + mods
+					*(short int*)(buf + 7) = ch[cn].luck;
+				}
+				if (n == WN_HITPAR)
+				{
+					*(short int*)(buf + 5) = ch[cn].to_hit;
+					*(short int*)(buf + 7) = ch[cn].to_parry;
+				}
+				if (n == WN_CLDWN)
+				{
+					*(short int*)(buf + 5) = ch[cn].cool_bonus; // 100 + INT/2 + mods
+					*(short int*)(buf + 7) = ch[cn].cast_speed; // BRV/4 + mods
+				}
+				if (n == WN_FLAGS)
+				{
+					chFlags = 0;
+					if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO) 	chFlags += 1;
+					if (get_tarot(cn, IT_CH_STRENGTH)) 					chFlags += 2;
+					*(short int*)(buf + 5) = chFlags;
+					*(short int*)(buf + 7) = 0;
+				}
+				
 				xsend(nr, buf, 9);
 			}
 			else if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
@@ -2799,10 +2828,10 @@ void plr_change(int nr)
 			p += 1;
 			*(unsigned char*)(buf + p) = smap[n].ch_atkspd;
 			p += 1;
-			//*(unsigned char*)(buf + p) = smap[n].ch_movespd;
-			//p += 1;
-			//*(unsigned char*)(buf + p) = smap[n].ch_colorize;
-			//p += 1;
+			*(unsigned char*)(buf + p) = smap[n].ch_movespd;
+			p += 1;
+			*(unsigned char*)(buf + p) = smap[n].ch_colorize;
+			p += 1;
 		}
 
 		if (buf[1])   // we found a change (no change found can happen since it_status & ch_status are not transmitted all the time)
@@ -3309,6 +3338,17 @@ void plr_getmap_complete(int nr)
 				// Used by local client to render frames correctly.
 				smap[n].ch_atkspd = ch[co].atk_speed;
 				smap[n].ch_castspd = ch[co].cast_speed;
+				smap[n].ch_movespd = ch[co].move_speed;
+				if (ch[co].flags & CF_EXTRAEXP)
+				{
+					// Inform the client this is a 'special' enemy by turning their font red
+					smap[n].ch_fontcolor = 0;
+				}
+				else
+				{
+					// Otherwise just display normal yellow font
+					smap[n].ch_fontcolor = 1;
+				}
 				//
 				smap[n].flags |= ISCHAR;
 				if (ch[co].stunned==1)

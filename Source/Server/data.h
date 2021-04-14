@@ -250,7 +250,7 @@ extern unsigned int mapmarker;
 #define CF_AUTOLOOT    (1ull<<57)       // Automatic looting
 
 #define AT_CAP				255
-#define SPEED_CAP 			36
+#define SPEED_CAP 			300
 
 #define PROXIMITY_MULTI		(AT_CAP/(3/2))
 #define PROXIMITY_CAP		(AT_CAP/9)
@@ -350,7 +350,7 @@ extern unsigned int mapmarker;
 #define CHD_ENEMY1ST    80
 #define CHD_ENEMYZZZ    91
 
-#define RANKS 24
+#define RANKS 25
 
 /* level differences permitted for attack / group */
 #define ATTACK_RANGE 3
