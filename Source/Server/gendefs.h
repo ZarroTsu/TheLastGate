@@ -11,8 +11,8 @@
 #define RANDOM(a) (a>0?random()%(a):0)
 #define DATDIR ".dat"
 
-#define VERSION    0x000503
-#define MINVERSION 0x000503
+#define VERSION    0x000504
+#define MINVERSION 0x000504
 
 #define TICKS 18
 #define TICK  (1000000/TICKS)
