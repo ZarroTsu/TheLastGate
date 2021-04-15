@@ -1,5 +1,5 @@
 // Just comment/uncomment this to alter home copy version
-#define HOMECOPY
+//#define HOMECOPY
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
@@ -14,13 +14,11 @@
 
 //#define DOCONVERT	// enable sprite packer
 
-#define TICKS			36
+#define TICKMULTI		2
+#define TICKS			(18*TICKMULTI)
 
 #define MAXSKILL		50  // must match server!
 #define MAXBUFFS		20  // must match server!
-
-#define max(a, b) ((a)>(b) ? (a) : (b))
-#define min(a, b) ((a)<(b) ? (a) : (b))
 
 // wear positions
 #define WN_HEAD			0

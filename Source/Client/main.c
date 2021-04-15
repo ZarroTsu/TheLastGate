@@ -329,12 +329,12 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 					break;
 				case  33:
 					if (logstart<22*8) {
-						logstart+=11; logtimer=TICKS*30;
+						logstart+=11; logtimer=TICKS*30/TICKMULTI;
 					}
 					break;
 				case  34:
 					if (logstart>0) {
-						logstart-=11; logtimer=TICKS*30;
+						logstart-=11; logtimer=TICKS*30/TICKMULTI;
 					}
 					break;
 				// -------- Home

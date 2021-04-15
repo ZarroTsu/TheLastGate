@@ -978,6 +978,7 @@ int chance_base(int cn, int skill, int d20, int defense, int usemana)
 
 	if (ch[cn].flags & (CF_PLAYER))
 	{
+		chance -= 1;
 		if (ch[cn].luck<0)
 		{
 			chance += ch[cn].luck / 500 - 1;
@@ -2704,7 +2705,7 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n])==0)	continue;
-		if (bu[in].temp == SK_BLAST) 	continue;
+		if (bu[in].temp == 1)			continue;
 		if (bu[in].temp == SK_HEAL) 	continue;
 		if (bu[in].temp == SK_SHADOW) 	continue;
 		if (bu[in].temp == SK_BLEED) 	continue;

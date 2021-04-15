@@ -4705,59 +4705,50 @@ int get_fight_skill(int cn)
 // Combat Mastery, Dual Wield and Shield skill checks
 int get_combat_skill(int cn, int flag)
 {
-	int bonus, remainder;
-	int n = 6;
+	int power, bonus;
 
 	if (flag == 1)
 	{
-		if (!ch[cn].skill[SK_DUAL][0]) return 0;
+		power = get_skill_score(cn, SK_DUAL);
+		if (power < 6) return 0;
 		
 		if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER | KIN_SEYAN_DU))
 		{
-			bonus 		= get_skill_score(cn, SK_DUAL)/6;
-			remainder 	= get_skill_score(cn, SK_DUAL)%6;
+			bonus = power/6;
 		}
 		else
 		{	
-			n = 12;
-			bonus 		= get_skill_score(cn, SK_DUAL)/12;
-			remainder 	= get_skill_score(cn, SK_DUAL)%12;
+			bonus = power/12;
 		}
 	}
 	else if (flag == 2)
 	{
-		if (!ch[cn].skill[SK_SHIELD][0]) return 0;
+		power = get_skill_score(cn, SK_SHIELD);
+		if (power < 6) return 0;
 		
 		if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER | KIN_SEYAN_DU))
 		{
-			bonus 		= get_skill_score(cn, SK_SHIELD)/6;
-			remainder 	= get_skill_score(cn, SK_SHIELD)%6;
+			bonus = power/6;
 		}
 		else
 		{	
-			n = 12;
-			bonus 		= get_skill_score(cn, SK_SHIELD)/12;
-			remainder 	= get_skill_score(cn, SK_SHIELD)%12;
+			bonus = power/12;
 		}
 	}
 	else
 	{
-		if (!ch[cn].skill[SK_COMBATM][0]) return 0;
+		power = get_skill_score(cn, SK_COMBATM);
+		if (power < 6) return 0;
 		
 		if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER | KIN_SEYAN_DU))
 		{
-			bonus 		= get_skill_score(cn, SK_COMBATM)/6;
-			remainder 	= get_skill_score(cn, SK_COMBATM)%6;
+			bonus = power/6;
 		}
 		else
 		{	
-			n = 12;
-			bonus 		= get_skill_score(cn, SK_COMBATM)/12;
-			remainder 	= get_skill_score(cn, SK_COMBATM)%12;
+			bonus = power/12;
 		}
 	}
-	
-	//if (RANDOM(n)<remainder) bonus++;  Commenting this out since this is now handled on char update
 
 	return (bonus);
 }
@@ -5521,7 +5512,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 int do_char_can_flee(int cn)
 {
 	int per = 0, co, ste, m, chance;
-	int cn_s, co_s, n;
+	int n;
 
 	for (m = 0; m<4; m++)
 	{
@@ -5557,28 +5548,16 @@ int do_char_can_flee(int cn)
 	}
 	if (ch[cn].escape_timer) { return 0; }
 
-	//co_c = 0;
 	per  = 0;
 
 	for (m = 0; m<4; m++)
 	{
 		if ((co = ch[cn].enemy[m])!=0)
 		{
-			//per += get_skill_score(co, SK_PERCEPT);
-			//per = max(per, ch[co].speed);
-			co_s  = ch[co].speed;
-			co_s -= (ch[co].mode+1)*2;
-			//per   = max(per, get_skill_score(co, SK_PERCEPT)/4 + co_s/2);
-			per += get_skill_score(co, SK_PERCEPT)+co_s;
-			//n++;
+			per += get_skill_score(co, SK_PERCEPT);
 		}
 	}
-	//ste = get_skill_score(cn, SK_STEALTH);
-	//ste = ch[cn].speed;
-	cn_s  = ch[cn].speed;
-	cn_s -= (ch[cn].mode+1)*2;
-	ste   = get_skill_score(cn, SK_STEALTH)+cn_s;
-	//ste   = get_skill_score(cn, SK_STEALTH);
+	ste   = get_skill_score(cn, SK_STEALTH);
 
 	//chance = 9 + (per - ste);
 	chance=ste*15/per;

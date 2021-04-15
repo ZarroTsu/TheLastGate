@@ -2405,40 +2405,40 @@ void plr_change(int nr)
 				*(unsigned long*)(buf + 1) = n;
 				if (n == WN_SPEED)	
 				{
-					*(short int*)(buf + 5) = ch[cn].speed;     // 0 to 300, lower is better
-					*(short int*)(buf + 7) = ch[cn].atk_speed; // additional speed, higher is better
+					*(short int*)(buf + 5) = min(300,ch[cn].speed);     // 0 to 300, lower is better
+					*(short int*)(buf + 7) = min(300,ch[cn].atk_speed); // additional speed, higher is better
 				}
 				if (n == WN_SPMOD)	
 				{
-					*(short int*)(buf + 5) = ch[cn].spell_mod; // 100 = 1%
-					*(short int*)(buf + 7) = ch[cn].spell_apt; // 
+					*(short int*)(buf + 5) = min(300,ch[cn].spell_mod); // 100 = 1%
+					*(short int*)(buf + 7) = min(999,ch[cn].spell_apt); // 
 				}
 				if (n == WN_CRIT)
 				{
-					*(short int*)(buf + 5) = ch[cn].crit_chance; // 100 = 1%
-					*(short int*)(buf + 7) = ch[cn].crit_multi;  // % increase of damage upon a crit
+					*(short int*)(buf + 5) = min(10000,ch[cn].crit_chance); // 100 = 1%
+					*(short int*)(buf + 7) = min(800,ch[cn].crit_multi);  // % increase of damage upon a crit
 				}
 				if (n == WN_TOP)
 				{
-					*(short int*)(buf + 5) = ch[cn].top_damage; // STR/2 + mods
-					*(short int*)(buf + 7) = ch[cn].luck;
+					*(short int*)(buf + 5) = min(999,ch[cn].top_damage); // STR/2 + mods
+					*(short int*)(buf + 7) = min(10000,ch[cn].luck);
 				}
 				if (n == WN_HITPAR)
 				{
-					*(short int*)(buf + 5) = ch[cn].to_hit;
-					*(short int*)(buf + 7) = ch[cn].to_parry;
+					*(short int*)(buf + 5) = min(999,ch[cn].to_hit);
+					*(short int*)(buf + 7) = min(999,ch[cn].to_parry);
 				}
 				if (n == WN_CLDWN)
 				{
-					*(short int*)(buf + 5) = ch[cn].cool_bonus; // 100 + INT/2 + mods
-					*(short int*)(buf + 7) = ch[cn].cast_speed; // BRV/4 + mods
+					*(short int*)(buf + 5) = min(1000,ch[cn].cool_bonus); // 100 + INT/2 + mods
+					*(short int*)(buf + 7) = min(300,ch[cn].cast_speed); // BRV/4 + mods
 				}
 				if (n == WN_FLAGS)
 				{
 					chFlags = 0;
 					if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO) 	chFlags += 1;
 					if (get_tarot(cn, IT_CH_STRENGTH)) 					chFlags += 2;
-					*(short int*)(buf + 5) = chFlags;
+					*(short int*)(buf + 5) = min(30000,chFlags);
 					*(short int*)(buf + 7) = 0;
 				}
 				
@@ -2830,7 +2830,7 @@ void plr_change(int nr)
 			p += 1;
 			*(unsigned char*)(buf + p) = smap[n].ch_movespd;
 			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_colorize;
+			*(unsigned char*)(buf + p) = smap[n].ch_fontcolor;
 			p += 1;
 		}
 
@@ -4256,7 +4256,7 @@ void tick(void)
 	prof_stop(26, prof);
 
 	ctick++;
-	if (ctick>23)	// Feb 2020 - extended from 20 to 24
+	if (ctick>199)	// Feb 2020 - extended from 20 to 24 to 200
 	{
 		ctick = 0;
 	}

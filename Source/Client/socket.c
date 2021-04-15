@@ -800,7 +800,7 @@ void sv_look5(unsigned char *buf)
 		if (!tmplook.autoflag) {
 			show_look=1;
 			look=tmplook;
-			look_timer=10*TICKS;
+			look_timer=10*TICKS/TICKMULTI;
 		}
 		add_look(tmplook.nr,tmplook.name,tmplook.id);
 	}
@@ -1135,7 +1135,7 @@ int tick_do(void)
 	if (!td) td=1;
         
 	lastn=-1;	// reset sv_setmap
-	ctick++; if (ctick>23) ctick=0;		// Feb 2020 - extended ctick array from 20 to 24
+	ctick++; if (ctick>199) ctick=0;		// Feb 2020 - extended ctick array from 20 to 24 to 200
 	
         while (idx<csize) {
 		ret=sv_cmd(buf+idx);

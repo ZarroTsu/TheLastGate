@@ -534,7 +534,7 @@ void game_loop(int sock)
 		tdiff = 1;
 	}
 
-	if (globs->ticker%1==0)
+	if (globs->ticker)
 	{
 		while (panic<500)
 		{

@@ -201,8 +201,8 @@ static int rank_sprite[25]={
 	   10,    11,    12,    13,    14, 
 	   15,    16,    17,    18,    19, 
 	   20,    21,    22,    23,    24, 
-	   25,    26,    27,    28, 16805,
-	16806, 16807,    29, 16808,    30
+	   25,    26,    27,    28,    29,
+	   30,    30,    30,    30,    30
 };
 
 int stat_raised[108]={0,0,0,0,0,0,0,0,0,0,0,0,0,};
@@ -516,7 +516,7 @@ void eng_display_win(int plr_sprite,int init)
 		pl_casts = pl_speed + pl.worn_p[WN_CLDWN]; if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP;
 		
 		// Player Flags from special items
-		pl_flags = pl.worn[WN_CLDWN];
+		pl_flags = pl.worn[WN_FLAGS];
 		pl_basel = 100;
 		pl_dmgml = 100;
 		
@@ -526,12 +526,15 @@ void eng_display_win(int plr_sprite,int init)
 		
 		// Tarot - Strength
 		if (pl_flags & 2)
+		{
 			pl_dmgml = 125;
+		}
 		
 		// Player DPS - pl_dlow, pl_dhigh, pl_dps
 		pl_dlow  = (pl.weapon*pl_dmgml/100)/4;
-		pl_dhigh = ((pl.weapon+8+pl_topdm+6)*pl_critc/10000*pl_critm/100*pl_dmgml/100)/4;
-		pl_dps   = (pl_dlow+pl_dhigh)/2*pl_atksp/100;
+		pl_dhigh = pl.weapon+8+pl_topdm+6;
+		pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4;
+		pl_dps   = ((pl_dlow+pl_dhigh)/2)*pl_atksp;
 		
 		// Player cooldown rate - pl_cdrate
 		pl_cdrate = 100 * pl_basel / max(100, pl_coold);
@@ -541,7 +544,7 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Damage per Sec");
 		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_dps/100,pl_dps%100);
 		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Damage per Hit");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%3d - %3d",pl_dlow,pl_dhigh);
+		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%3d - %3d",pl_dlow,pl_dhigh);
 		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Attack Speed");
 		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
 		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Cooldown Rate");
@@ -549,7 +552,19 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Spell Modifier");
 		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%6d.%02d",pl_spmod/100,pl_spmod%100);
 		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Spell Aptitude");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",pl_spapt);
+		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",pl_spapt);
+		
+		/*
+		#ifdef HOMECOPY
+		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*6,1,"Top Damage");
+		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*6,1,"%9d",pl_topdm);
+		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*7,1,"Crit Chance");
+		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*7,1,"%9d",pl_critc);
+		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*8,1,"Crit Multi");
+		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*8,1,"%9d",pl_critm);
+		#endif
+		*/
+		
 		
 		// Money, Update, Points
 		dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"Money");
@@ -744,7 +759,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
 			
 			if (!show_shop) {
-				copyspritex(ranksprite[points2rank(pl.points_tot)],935,42,0);
+				copyspritex(rank_sprite[points2rank(pl.points_tot)],935,42,0);
 				copyspritex(plr_sprite,935-61,36,0);
 				dd_xputtext(846+(125-strlen(pl.name)*6)/2,157,1,pl.name);
 				dd_xputtext(846+(125-strlen(rank[points2rank(pl.points_tot)])*6)/2,176,1,rank[points2rank(pl.points_tot)]);
@@ -790,7 +805,7 @@ void eng_display_win(int plr_sprite,int init)
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RED);
 
-			copyspritex(ranksprite[points2rank(look.points)],935,42,0);
+			copyspritex(rank_sprite[points2rank(look.points)],935,42,0);
 		}
 
 		if (show_shop) 
@@ -810,7 +825,7 @@ void eng_display_win(int plr_sprite,int init)
 				dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Buy:  %dG %dS",shop.pl_price/100,shop.pl_price%100);
 
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
-			copyspritex(ranksprite[points2rank(shop.points)],935,42,0);
+			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
 			dd_xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
 			dd_xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
 		}
@@ -1709,13 +1724,13 @@ int speedstep(int n,int d,int s,int update)
 
 	while (m) {
 		z--;
-		if (z<0) z=23;	// Feb 2020 - ctick extended from 20 to 24
+		if (z<0) z=199;	// ctick extended from 20 to 24 to 200
 		soft_step++;
 		if (speedtab[speed][z])	m--;
 	}
 	while (1) {
 		z--;
-		if (z<0) z=23;	// Feb 2020 - ctick extended from 20 to 24
+		if (z<0) z=199;	// ctick extended from 20 to 24 to 200
 		if (speedtab[speed][z])	break;
 		soft_step++;
 	}
@@ -1728,7 +1743,7 @@ int speedstep(int n,int d,int s,int update)
 		if (speedtab[speed][z])	m--;
 		if (m<1) break;
 		z++;
-		if (z>23) z=0;	// Feb 2020 - ctick extended from 20 to 24
+		if (z>199) z=0;	// ctick extended from 20 to 24 to 200
 		total_step++;
 	}
 	dist=32*(soft_step)/(total_step+1);
@@ -2338,64 +2353,64 @@ int eng_item(int n)
 		case    1:      return map[n].it_sprite;
 
 			// four sprite animation, 2-step
-		case    2:    if (speedtab[24][ctick]) map[n].it_status++;	// Feb 2020 - adjusted these speedtab values from '10' to '24' (same internal array)
+		case    2:    if (speedtab[200][ctick]) map[n].it_status++;	// adjusted these speedtab values from 10 to 24 to 200
 			return map[n].it_sprite;
 
-		case    3:    if (speedtab[24][ctick]) map[n].it_status++;
+		case    3:    if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+2;
 
-		case    4:    if (speedtab[24][ctick]) map[n].it_status++;
+		case    4:    if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+4;
 
-		case    5:    if (speedtab[24][ctick]) map[n].it_status=2;
+		case    5:    if (speedtab[200][ctick]) map[n].it_status=2;
 			return map[n].it_sprite+6;
 
 			// two sprite animation, 1-step
-		case    6:    if (speedtab[24][ctick]) map[n].it_status++;
+		case    6:    if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite;
 
-		case    7:    if (speedtab[24][ctick]) map[n].it_status=6;
+		case    7:    if (speedtab[200][ctick]) map[n].it_status=6;
 			return map[n].it_sprite+1;
 
 			// eight sprite animation, 1-step
-		case    8:    if (speedtab[24][ctick]) map[n].it_status++;
+		case    8:    if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite;
 
-		case    9:    if (speedtab[24][ctick]) map[n].it_status++;
+		case    9:    if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+1;
 
-		case    10:   if (speedtab[24][ctick]) map[n].it_status++;
+		case    10:   if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+2;
 
-		case    11:   if (speedtab[24][ctick]) map[n].it_status++;
+		case    11:   if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+3;
 
-		case   12:   if (speedtab[24][ctick]) map[n].it_status++;
+		case   12:   if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+4;
 
-		case    13:   if (speedtab[24][ctick]) map[n].it_status++;
+		case    13:   if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+5;
 
-		case    14:   if (speedtab[24][ctick]) map[n].it_status++;
+		case    14:   if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+6;
 
-		case    15:   if (speedtab[24][ctick]) map[n].it_status=8;
+		case    15:   if (speedtab[200][ctick]) map[n].it_status=8;
 			return map[n].it_sprite+7;
 
 			// five sprite animation, 1-step, random
-		case    16:   if (speedtab[24][ctick]) map[n].it_status++;
+		case    16:   if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite;
 
-		case    17:   if (speedtab[24][ctick]) map[n].it_status++;
+		case    17:   if (speedtab[200][ctick]) map[n].it_status++;
 				return map[n].it_sprite+1;
 
-		case    18:   	if (speedtab[24][ctick]) map[n].it_status++;
+		case    18:   	if (speedtab[200][ctick]) map[n].it_status++;
 				return map[n].it_sprite+2;
 
-		case    19:   	if (speedtab[24][ctick]) map[n].it_status++;
+		case    19:   	if (speedtab[200][ctick]) map[n].it_status++;
 				return map[n].it_sprite+3;
 
-		case   20:   	if (speedtab[24][ctick]) map[n].it_status=16;
+		case   20:   	if (speedtab[200][ctick]) map[n].it_status=16;
 				return map[n].it_sprite+4;
 
 		case   21:  return map[n].it_sprite+(ticker&63);
@@ -2476,7 +2491,7 @@ void send_opt(void)
 
 int firstquit=0;
 int wantquit=0;
-int maynotquit=TICKS*5;
+int maynotquit=TICKS*5/TICKMULTI;
 
 void cmd_exit(void)
 {

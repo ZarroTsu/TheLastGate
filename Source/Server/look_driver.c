@@ -191,7 +191,7 @@ void look_extra(int cn, int in)
 	else if (it[in].temp==IT_CH_EMPRESS)
 		do_char_log(cn, 3, "When equipped, Magic Shield will instead be cast on your Ghost Companion when cast by or on you.\n");
 	else if (it[in].temp==IT_CH_EMPEROR)
-		do_char_log(cn, 3, "When equipped, replaces your Slow spell with an increased cost and effectiveness, but a much more rapid decay.\n");
+		do_char_log(cn, 3, "When equipped, replaces your Slow spell with a reduced cost and effectiveness, but it no longer decays and has increased duration.\n");
 	else if (it[in].temp==IT_CH_HEIROPH)
 		do_char_log(cn, 3, "When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n");
 	else if (it[in].temp==IT_CH_LOVERS)
