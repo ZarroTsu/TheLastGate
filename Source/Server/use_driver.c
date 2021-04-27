@@ -3376,8 +3376,6 @@ int use_shrine(int cn, int in)
 	rank = rank * rank * rank * 4;
 	val += RANDOM(val + 1);
 
-//      do_char_log(cn,2,"rank=%d, val=%d\n",rank,val);
-
 	if (val>=rank)
 	{
 		if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
@@ -3389,32 +3387,26 @@ int use_shrine(int cn, int in)
 
 		if (val>=rank * 64)
 		{
-//                      ch[cn].luck+=64;
 			do_char_log(cn, 1, "The gods are madly in love with your offer.\n");
 		}
 		else if (val>=rank * 32)
 		{
-//                      ch[cn].luck+=32;
 			do_char_log(cn, 1, "The gods love your offer very much.\n");
 		}
 		else if (val>=rank * 16)
 		{
-//                      ch[cn].luck+=16;
 			do_char_log(cn, 1, "The gods love your offer.\n");
 		}
 		else if (val>=rank * 8)
 		{
-//                      ch[cn].luck+=8;
 			do_char_log(cn, 1, "The gods are very pleased with your offer.\n");
 		}
 		else if (val>=rank * 4)
 		{
-//                      ch[cn].luck+=4;
 			do_char_log(cn, 1, "The gods are pleased with your offer.\n");
 		}
 		else if (val>=rank * 2)
 		{
-//                      ch[cn].luck+=2;
 			do_char_log(cn, 1, "The gods deemed your offer appropriate.\n");
 		}
 		else

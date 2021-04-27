@@ -1732,7 +1732,7 @@ void do_strongholdpoints(int cn)
 
 void do_showrank(int cn)
 {
-	if (points2rank(ch[cn].points_tot)>=23)
+	if (points2rank(ch[cn].points_tot)>=RANKS-1)
 	{
 		do_char_log(cn, 2, "You are at the maximum rank. Good job.\n");
 	}
@@ -7674,72 +7674,21 @@ void really_update_char(int cn)
 	prof_stop(7, prof);
 }
 
-int get_race_rest_mod(int cn, int base)
-{
-	int kindred;
-	double mod;
-	
-	kindred = ch[cn].kindred;
-
-		 if 	(kindred & KIN_TEMPLAR)		{ mod = 1.500; }
-	else if 	(kindred & KIN_MERCENARY)	{ mod = 1.250; }
-	else if 	(kindred & KIN_HARAKIM)		{ mod = 1.000; }
-
-	else if 	(kindred & KIN_ARCHTEMPLAR)	{ mod = 1.750; }
-	else if 	(kindred & KIN_PUGILIST)	{ mod = 1.625; }
-	else if 	(kindred & KIN_WARRIOR)		{ mod = 1.500; }
-	else if 	(kindred & KIN_SEYAN_DU)	{ mod = 1.375; }
-	else if 	(kindred & KIN_SORCERER)	{ mod = 1.250; }
-	else if 	(kindred & KIN_SUMMONER)	{ mod = 1.125; }
-	else if 	(kindred & KIN_ARCHHARAKIM)	{ mod = 1.000; }
-	else									{ mod = 1.000; }
-	
-	return (int)(base * mod);
-}
-
-int get_race_medi_mod(int cn, int base)
-{
-	int kindred;
-	double mod;
-	
-	kindred = ch[cn].kindred;
-
-		 if 	(kindred & KIN_TEMPLAR)		{ mod = 1.000; }
-	else if 	(kindred & KIN_MERCENARY)	{ mod = 1.250; }
-	else if 	(kindred & KIN_HARAKIM)		{ mod = 1.500; }
-
-	else if 	(kindred & KIN_ARCHTEMPLAR)	{ mod = 1.000; }
-	else if 	(kindred & KIN_PUGILIST)	{ mod = 1.125; }
-	else if 	(kindred & KIN_WARRIOR)		{ mod = 1.250; }
-	else if 	(kindred & KIN_SEYAN_DU)	{ mod = 1.375; }
-	else if 	(kindred & KIN_SORCERER)	{ mod = 1.500; }
-	else if 	(kindred & KIN_SUMMONER)	{ mod = 1.625; }
-	else if 	(kindred & KIN_ARCHHARAKIM)	{ mod = 1.750; }
-	else									{ mod = 1.000; }
-	
-	return (int)(base * mod);
-}
-
 // note: this calculates ALL normal endurance/hp changes.
 //       further, it is called ONLY from tick()
 void do_regenerate(int cn)
 {
+	unsigned long long prof;
 	int n, m, in, in2, nohp = 0, noend = 0, nomana = 0, old, mf;
-	int hp = 0, mana = 0, uwater = 0, gothp = 0;
-	int poisonpower = 0;
-	int bleedpower = 0;
+	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0;
+	int race_reg = 0, race_res = 0, race_med = 0;
+	int poisonpower = 0, bleedpower = 0, tickcheck = 6000;
 	int moonmult = 20;
 	int hpmult, endmult, manamult;
-	unsigned long long prof;
-	int race_reg = 0, race_res = 0, race_med = 0;
 	int co = -1;
-	int tickcheck = 6000;
 	int tmp = 0;
 
-	// gothp determines how much to counter regen while underwater.
-	// and now, poison too
-
-	// if ((ch[cn].flags&CF_STONED) && !(ch[cn].flags&CF_PLAYER)) ch[cn].flags&=~CF_STONED;
+	// gothp determines how much to counter degeneration effects while underwater.
 	
 	mf = map[ch[cn].x + ch[cn].y * MAPX].flags;
 	
@@ -7748,33 +7697,32 @@ void do_regenerate(int cn)
 
 	prof = prof_start();
 
-	if ((globs->flags & GF_MAYHEM) && (ch[cn].flags & (CF_PLAYER)))
-		moonmult = 10;
-	if (globs->newmoon && (ch[cn].flags & CF_PLAYER))// || (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3)))
-		moonmult = 40;
-	if (globs->fullmoon && (ch[cn].flags & CF_PLAYER))// || (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3)))
-		moonmult = 30;
+	if (ch[cn].flags & (CF_PLAYER))
+	{
+		if (globs->flags & GF_MAYHEM)	moonmult = 10;
+		if (globs->fullmoon)			moonmult = 30;
+		if (globs->newmoon)				moonmult = 40;
+		
+		race_reg = get_skill_score(cn, SK_REGEN) * moonmult / 15;
+		race_res = get_skill_score(cn, SK_REST)  * moonmult / 15;
+		race_med = get_skill_score(cn, SK_MEDIT) * moonmult / 15;
+	}
+	else
+	{
+		race_reg = get_skill_score(cn, SK_REGEN) * moonmult / 30;
+		race_res = get_skill_score(cn, SK_REST)  * moonmult / 30;
+		race_med = get_skill_score(cn, SK_MEDIT) * moonmult / 30;
+	}
 
-	if (ch[cn].flags & CF_NOHPREG)
-		nohp = 1;
-	if (ch[cn].flags & CF_NOENDREG)
-		noend = 1;
-	if (ch[cn].flags & CF_NOMANAREG)
-		nomana = 1;
+	if (ch[cn].flags & CF_NOHPREG)		nohp = 1;
+	if (ch[cn].flags & CF_NOENDREG)		noend = 1;
+	if (ch[cn].flags & CF_NOMANAREG)	nomana = 1;
 
-	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER) uwater = 1;
-
-	// Check class and set regen power
-	race_reg = get_skill_score(cn, SK_REGEN) * moonmult / 30;
-	race_res = get_skill_score(cn, SK_REST)  * moonmult / 30;
-	race_med = get_skill_score(cn, SK_MEDIT) * moonmult / 30;
-	
-	race_res = get_race_rest_mod(cn, race_res);
-	race_med = get_race_medi_mod(cn, race_med);
+	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER) 		uwater = 1;
 	
 	hpmult = endmult = manamult = moonmult;
 	
-	// Tarot - Moon - While not full mana, life regen is mana regen
+	// Tarot - Moon :: While not full mana, life regen is mana regen
 	if (get_tarot(cn, IT_CH_MOON))
 	{
 		if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
@@ -7783,7 +7731,7 @@ void do_regenerate(int cn)
 			manamult += hpmult;		hpmult   -= hpmult;
 		}
 	}
-	// Tarot - Sun - While not full life, end regen is life regen
+	// Tarot - Sun :: While not full life, end regen is life regen
 	if (get_tarot(cn, IT_CH_SUN))
 	{
 		if (ch[cn].a_hp<ch[cn].hp[5] * 1000)
@@ -7792,7 +7740,7 @@ void do_regenerate(int cn)
 			hpmult   += endmult;	endmult  -= endmult;
 		}
 	}
-	// Tarot - World - While not full end, mana regen is end regen
+	// Tarot - World :: While not full end, mana regen is end regen
 	if (get_tarot(cn, IT_CH_WORLD))
 	{
 		if (ch[cn].a_end<ch[cn].end[5] * 1000)
@@ -7802,142 +7750,80 @@ void do_regenerate(int cn)
 		}
 	}
 	
+	// Set up basic values to be attributed to player hp/end/mana
+	//   These are the "standing" state values and will be divided down when applied to walk/fight states
+	hp   = (ch[cn].skill[SK_REGEN][0]?race_reg:0) + hpmult   * 2;
+	end  = (ch[cn].skill[SK_REST][0] ?race_res:0) + endmult  * 4;
+	mana = (ch[cn].skill[SK_MEDIT][0]?race_med:0) + manamult * 1;
+	
 	if (ch[cn].stunned!=1)
 	{
 		switch(ch_base_status(ch[cn].status))
 		{
 			// STANDING STATES
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-				if (!nohp)
-				{
-					hp = 1;
-					
-					ch[cn].a_hp 		+= (hpmult * 2); 
-					gothp 				+= (hpmult);
-
-					if (ch[cn].skill[SK_REGEN][0])
-					{
-						ch[cn].a_hp 	+= (race_reg); 
-						gothp 			+= (race_reg/2);
-					}
-				}
-				if (!noend)
-				{
-					ch[cn].a_end 		+= (endmult * 4);
-
-					if (ch[cn].skill[SK_REST][0])
-					{
-						ch[cn].a_end 	+= (race_res);
-					}
-				}
-				if (!nomana && ch[cn].skill[SK_MEDIT][0])
-				{
-					mana = 1;
-					ch[cn].a_mana 		+= (manamult); 
-					ch[cn].a_mana 		+= (race_med);
-				}
+				ch[cn].a_hp 			+= (nohp   ? 0 : hp     ); 
+				gothp 					+= (nohp   ? 0 : hp  / 2);
+				ch[cn].a_end 			+= (noend  ? 0 : end    );
+				ch[cn].a_mana 			+= (nomana ? 0 : mana   ); 
 				break;
 			
 			// WALKING STATES
 			case  16: case  24: case  32: case  40: case  48: case  60: case  72: case  84:
 			case  96: case 100: case 104: case 108: case 112: case 116: case 120: case 124:
 			case 128: case 132: case 136: case 140: case 144: case 148: case 152:
-				if (ch[cn].mode==2)
+				ch[cn].a_hp 			+= (nohp   ? 0 : hp  / 4); 
+				gothp 					+= (nohp   ? 0 : hp  / 8);
+				if (ch[cn].mode==2) // Fast
 				{
-					ch[cn].a_end -= 50;
+					ch[cn].a_end 		+= (noend  ? 0 : end / 4) - 40;
 				}
-				else if (ch[cn].mode==0)
+				if (ch[cn].mode==1) // Normal
 				{
-					if (!noend)
-					{
-						ch[cn].a_end += 25;
-					}
+					ch[cn].a_end 		+= (noend  ? 0 : end / 4);
 				}
-				if (!nohp)
+				if (ch[cn].mode==0) // Slow
 				{
-					hp = 1;
-					
-					ch[cn].a_hp 		+= (hpmult * 2)/3; 
-					gothp 				+= (hpmult)/3;
-
-					if (ch[cn].skill[SK_REGEN][0])
-					{
-						ch[cn].a_hp 	+= (race_reg)/3; 
-						gothp 			+= (race_reg/2)/3;
-					}
+					ch[cn].a_end 		+= (noend  ? 0 : end / 2);
 				}
-				if (!noend)
-				{
-					ch[cn].a_end 		+= (endmult * 4)/3;
-
-					if (ch[cn].skill[SK_REST][0])
-					{
-						ch[cn].a_end 	+= (race_res)/3;
-					}
-				}
-				if (!nomana && ch[cn].skill[SK_MEDIT][0])
-				{
-					mana = 1;
-					ch[cn].a_mana 		+= (manamult)/3; 
-					ch[cn].a_mana 		+= (race_med)/3;
-				}
+				ch[cn].a_mana 			+= (nomana ? 0 : mana/ 4);
 				break;
 			
 			// FIGHTING STATES
 			case 160: case 168: case 176: case 184:
-				if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6)	// attack
+				ch[cn].a_hp 			+= (nohp   ? 0 : hp  / 8); 
+				gothp 					+= (nohp   ? 0 : hp  /16);
+				if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
 				{
-					if (ch[cn].mode==1)
+					if (ch[cn].mode==2) // Fast
 					{
-						ch[cn].a_end -= 20;
+						ch[cn].a_end 	+= (noend  ? 0 : end / 8) - 60;
 					}
-					else if (ch[cn].mode==2)
+					if (ch[cn].mode==1) // Normal
 					{
-						ch[cn].a_end -= 60;
+						ch[cn].a_end 	+= (noend  ? 0 : end / 8) - 20;
+					}
+					if (ch[cn].mode==0) // Slow
+					{
+						ch[cn].a_end 	+= (noend  ? 0 : end / 4);
 					}
 				}
-				else	// misc
+				else // Misc.
 				{
-					if (ch[cn].mode==2)
+					if (ch[cn].mode==2)		// Fast
 					{
-						ch[cn].a_end -= 24;
+						ch[cn].a_end 	+= (noend  ? 0 : end / 4) - 40;
 					}
-					else if (ch[cn].mode==0)
+					if (ch[cn].mode==1)		// Normal
 					{
-						if (!noend)
-						{
-							ch[cn].a_end += 24;
-						}
+						ch[cn].a_end 	+= (noend  ? 0 : end / 4);
 					}
-				}
-				if (!nohp)
-				{
-					hp = 1;
-					
-					ch[cn].a_hp 		+= (hpmult * 2)/6; 
-					gothp 				+= (hpmult)/6;
-
-					if (ch[cn].skill[SK_REGEN][0])
+					if (ch[cn].mode==0)		// Slow
 					{
-						ch[cn].a_hp 	+= (race_reg)/6; 
-						gothp 			+= (race_reg/2)/6;
+						ch[cn].a_end 	+= (noend  ? 0 : end / 2);
 					}
 				}
-				if (!noend)
-				{
-					ch[cn].a_end 		+= (endmult * 4)/6;
-
-					if (ch[cn].skill[SK_REST][0])
-					{
-						ch[cn].a_end 	+= (race_res)/6;
-					}
-				}
-				if (!nomana && ch[cn].skill[SK_MEDIT][0])
-				{
-					mana = 1;
-					ch[cn].a_mana 		+= (manamult)/6; 
-					ch[cn].a_mana 		+= (race_med)/6;
-				}
+				ch[cn].a_mana 			+= (nomana ? 0 : mana/ 8);
 				break;
 			
 			default:
@@ -7945,67 +7831,63 @@ void do_regenerate(int cn)
 				break;
 		}
 	}
-
+	
 	if (ch[cn].flags & CF_UNDEAD)
 	{
 		hp = 450 + points2rank(ch[cn].points_tot) * 25;
 		
 		ch[cn].a_hp	+= hp;
 		gothp 		+= hp/2;
-		
-		hp = 1;
 	}
-
-	// N/A
-	/*
-	if ((in = ch[cn].worn[]) && it[in].temp==9999)
-	{
-		ch[cn].a_hp 	-= 200;
-		ch[cn].a_mana 	+= 200;
-	}
-	*/
-
+	
 	// Special case for the Amulet of Ankhs
 	if (in = ch[cn].worn[WN_NECK])
 	{
-		if (it[in].temp==IT_ANKHAMULET)
+		switch (it[in].temp)
 		{
-			if (ch[cn].skill[SK_REGEN][0]) 	ch[cn].a_hp		+= race_reg/6;
-			if (ch[cn].skill[SK_REST][0]) 	ch[cn].a_end	+= race_res/6;
-			if (ch[cn].skill[SK_MEDIT][0]) 	ch[cn].a_mana	+= race_med/6;
-		}
-		if (it[in].temp==IT_AMBERANKH)
-		{
-			if (ch[cn].skill[SK_REGEN][0]) 	ch[cn].a_hp		+= race_reg/3;
-			if (ch[cn].skill[SK_REST][0]) 	ch[cn].a_end	+= race_res/9;
-			if (ch[cn].skill[SK_MEDIT][0]) 	ch[cn].a_mana	+= race_med/9;
-		}
-		if (it[in].temp==IT_TURQUANKH)
-		{
-			if (ch[cn].skill[SK_REGEN][0]) 	ch[cn].a_hp		+= race_reg/9;
-			if (ch[cn].skill[SK_REST][0]) 	ch[cn].a_end	+= race_res/3;
-			if (ch[cn].skill[SK_MEDIT][0]) 	ch[cn].a_mana	+= race_med/9;
-		}
-		if (it[in].temp==IT_GARNEANKH)
-		{
-			if (ch[cn].skill[SK_REGEN][0]) 	ch[cn].a_hp		+= race_reg/9;
-			if (ch[cn].skill[SK_REST][0]) 	ch[cn].a_end	+= race_res/9;
-			if (ch[cn].skill[SK_MEDIT][0]) 	ch[cn].a_mana	+= race_med/3;
+			case IT_ANKHAMULET: 
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/ 8:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/ 8:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/ 8:0;
+				break;
+			case IT_AMBERANKH: 
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/ 4:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/16:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/16:0;
+				break;
+			case IT_TURQUANKH: 
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/16:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/ 4:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/16:0;
+				break;
+			case IT_GARNEANKH: 
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/16:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/16:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/ 4:0;
+				break;
+			default:
+				break;
 		}
 	}
 	
 	// force to sane values
 	if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
+	{
 		ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
+	}
 	if (ch[cn].a_end>ch[cn].end[5] * 1000)
+	{
 		ch[cn].a_end  = ch[cn].end[5]  * 1000;
+	}
 	if (ch[cn].a_mana>ch[cn].mana[5] * 1000)
+	{
 		ch[cn].a_mana = ch[cn].mana[5] * 1000;
+	}
 
-	if (hp && ch[cn].a_hp<ch[cn].hp[5] * 900)
+	if ((hp && ch[cn].a_hp<ch[cn].hp[5] * 900) || (mana && ch[cn].a_mana<ch[cn].mana[5] * 900))
+	{
 		ch[cn].data[92] = TICKS * 60;
-	if (mana && ch[cn].a_mana<ch[cn].mana[5] * 900)
-		ch[cn].data[92] = TICKS * 60;
+	}
 
 	if (ch[cn].a_end<1500 && ch[cn].mode!=0)
 	{
@@ -8027,7 +7909,6 @@ void do_regenerate(int cn)
 	{
 		if ((in = ch[cn].spell[n])!=0)
 		{
-//          ch[cn].data[92]=TICKS*60;
 			if (bu[in].flags & IF_PERMSPELL || bu[in].temp==206)
 			{
 				if (bu[in].temp==206 && !(bu[in].flags & IF_PERMSPELL))
@@ -8136,36 +8017,6 @@ void do_regenerate(int cn)
 				}
 			}
 			
-			/*
-			// Slow2 countdown
-			if (bu[in].temp==SK_SLOW2)
-			{
-				int p = bu[in].power;
-				if (bu[in].active<=bu[in].duration*bu[in].data[1]/max(1,p))
-				{
-					bu[in].data[1]-=bu[in].power/16;
-					if (bu[in].data[1]<0)
-						bu[in].data[1] = 0;
-					do_update_char(cn);
-				}
-			}
-			
-			// Curse2 countdown
-			if (bu[in].temp==SK_CURSE2)
-			{
-				int p = bu[in].power;
-				if (bu[in].active<=bu[in].duration*(CURSE2FORM(bu[in].data[1]/100,0)-(CURSE2FORM(p,0)/2))/max(1,(CURSE2FORM(p,0)-(CURSE2FORM(p,0)/2))))
-				{
-					bu[in].data[1]-=(1000/3);
-					for (n = 0; n<5; n++) 
-					{
-						bu[in].attrib[n][1] = -CURSE2FORM((bu[in].data[1]/100),n);
-					}
-					do_update_char(cn);
-				}
-			}
-			*/
-			
 			// Poison
 			if (bu[in].temp==SK_POISON)
 			{
@@ -8192,14 +8043,14 @@ void do_regenerate(int cn)
 					poisonpower = poisonpower * 115/100;
 				}
 				
-				if (ch[cn].a_hp - (poisonpower + gothp/2)<500 && ch[cn].luck>=100 
+				if (ch[cn].a_hp - (poisonpower + gothp)<500 && ch[cn].luck>=100 
 					&& !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[cn].luck)
 				{
 					do_lucksave(cn, "lethal poisoning");
 				}
 				else
 				{
-					ch[cn].a_hp -= poisonpower + gothp/2;
+					ch[cn].a_hp -= poisonpower + gothp;
 				}
 				
 				tickcheck = 6000/max(1,poisonpower);
@@ -8208,7 +8059,7 @@ void do_regenerate(int cn)
 				{
 					ch[co].points += 1;
 					ch[co].points_tot += 1;
-					//do_check_new_level(co);
+					do_check_new_level(co);
 				}
 				
 				if (ch[cn].a_hp<500)
@@ -8294,8 +8145,6 @@ void do_regenerate(int cn)
 							do_char_log(cn, 0, "Oh dear, that bleeding was fatal. Somebody killed you...\n");
 						else
 							do_char_log(cn, 0, "Oh dear, that bleeding was fatal. %s killed you...\n", ch[co].name);
-						//do_notify_char(co, NT_DIDKILL, cn, 0, 0, 0);
-						//do_area_notify(co, cn, ch[co].x, ch[co].y, NT_SEEKILL, co, cn, 0, 0);
 					}
 					else
 					{
