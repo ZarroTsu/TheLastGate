@@ -273,7 +273,7 @@ extern unsigned int mapmarker;
 #define SK_DUAL			36
 #define SK_AXE			 4
 #define SK_TWOHAND		 6
-#define SK_COMBATM		37
+#define SK_COMBATM		37	// -> Blind
 //////////////////////////
 #define SK_WEAPONM		38
 #define SK_ARMORM		39
@@ -287,10 +287,10 @@ extern unsigned int mapmarker;
 #define SK_BLAST		24
 //////////////////////////
 #define SK_POISON		42
-#define SK_DAMAREA		43
+#define SK_DAMAREA		43	// -> Pulse
 #define SK_CURSE		20
 #define SK_SLOW			19
-#define SK_HEXAREA		44
+#define SK_HEXAREA		44	// -> Proximity
 #define SK_GHOST		27
 #define SK_GCMASTERY	45
 #define SK_SHADOW		46
@@ -312,12 +312,12 @@ extern unsigned int mapmarker;
 #define SK_PERCEPT		 9
 #define SK_STEALTH		 8
 #define SK_SURROUND		33
-#define SK_SURRAREA		48
-#define SK_SURRSPEED	49
+#define SK_SURRAREA		48	// -> Taunt
+#define SK_SURRSPEED	49	// -> Blink
 #define SK_BARTER		12
 #define SK_SENSE		31
 #define SK_SWIM			10
-#define SK_FOCUS		 7
+#define SK_FOCUS		 7	// -> Razor
 //////////////////////////
 #define SK_WARCRY2  	50
 #define SK_BLEED		51
@@ -326,8 +326,16 @@ extern unsigned int mapmarker;
 #define SK_CURSE2		54
 #define SK_SLOW2		55
 #define SK_MSHELL		56
-//#define SK_REGEN		57
 //////////////////////////
+#define SK_PROX			60
+#define SK_BLIND		61
+#define SK_PULSE		62
+#define SK_TAUNT		63
+#define SK_BLINK		64
+#define SK_RAZOR		65
+//////////////////////////
+
+
 
 /* ch.data[] definitions */
 /* (this list is growing very slowly;

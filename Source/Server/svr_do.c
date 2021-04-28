@@ -4622,14 +4622,6 @@ void remove_enemy(int co)
 
 // "get" functions
 
-int get_attrib_base(int cn, int n)
-{
-	return ( ch[cn].attrib[n][0] );
-}
-int get_skill_base(int cn, int n)
-{
-	return ( ch[cn].skill[n][0] );
-}
 int get_attrib_score(int cn, int n)
 {
 	return ( (ch[cn].attrib[n][4] << 8) | ch[cn].attrib[n][5] );
@@ -7846,24 +7838,24 @@ void do_regenerate(int cn)
 		switch (it[in].temp)
 		{
 			case IT_ANKHAMULET: 
-				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/ 8:0;
-				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/ 8:0;
-				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/ 8:0;
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/12:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/12:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/12:0;
 				break;
 			case IT_AMBERANKH: 
-				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/ 4:0;
-				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/16:0;
-				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/16:0;
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/ 6:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/24:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/24:0;
 				break;
 			case IT_TURQUANKH: 
-				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/16:0;
-				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/ 4:0;
-				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/16:0;
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/24:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/ 6:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/24:0;
 				break;
 			case IT_GARNEANKH: 
-				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/16:0;
-				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/16:0;
-				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/ 4:0;
+				ch[cn].a_hp   += ch[cn].skill[SK_REGEN][0]?race_reg/24:0;
+				ch[cn].a_end  += ch[cn].skill[SK_REST][0] ?race_res/24:0;
+				ch[cn].a_mana += ch[cn].skill[SK_MEDIT][0]?race_med/ 6:0;
 				break;
 			default:
 				break;

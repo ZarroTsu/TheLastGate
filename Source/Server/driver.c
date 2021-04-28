@@ -715,34 +715,34 @@ int npc_quest_check(int cn, int val)
 int convert_skill_for_group(int co, int nr)
 {
 	// Revert to original values if changed
-	if (nr == 38) nr = 18; // WeapM    -> Enhance
-	if (nr == 41) nr = 19; // Weaken   -> Slow
-	if (nr == 33) nr = 20; // Surround -> Curse
-	if (nr == 37) nr = 21; // Combat M -> Bless
-	if (nr ==  5) nr = 16; // Staff    -> Shield
-	if (nr == 25) nr = 32; // Dispel   -> Immun
+	if (nr == SK_WEAPONM)  nr = SK_ENHANCE; // WeapM    -> Enhance
+	if (nr == SK_WEAKEN)   nr = SK_SLOW;    // Weaken   -> Slow
+	if (nr == SK_SURROUND) nr = SK_CURSE;   // Surround -> Curse
+	if (nr == SK_COMBATM)  nr = SK_BLESS;   // Combat M -> Bless
+	if (nr == SK_STAFF)    nr = SK_SHIELD;  // Staff    -> Shield
+	if (nr == SK_DISPEL)   nr = SK_IMMUN;   // Dispel   -> Immun
 	
 	// Hacky flip-flopping
 	if (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
 	{
-		if (nr == 18) nr = 38; // Enhance  -> WeapM
-		if (nr == 19) nr = 41; // Slow     -> Weaken
-		if (nr == 20) nr = 33; // Curse    -> Surround
-		if (nr == 21) nr = 37; // Bless    -> Combat M
+		if (nr == SK_ENHANCE) nr = SK_WEAPONM;  // Enhance  -> WeapM
+		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow     -> Weaken
+		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse    -> Surround
+		if (nr == SK_BLESS)   nr = SK_COMBATM;  // Bless    -> Combat M
 	}
 	if (ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
 	{
-		if (nr == 16) nr =  5; // Shiel    -> Staff
-		if (nr == 32) nr = 25; // Immun    -> Dispel
+		if (nr == SK_SHIELD) nr = SK_STAFF;  // Shiel    -> Staff
+		if (nr == SK_IMMUN)  nr = SK_DISPEL; // Immun    -> Dispel
 	}
 	if (ch[co].kindred & KIN_SEYAN_DU)
 	{
-		if (nr == 18 && ch[co].skill[18][0]) nr = 38;
-		if (nr == 19 && ch[co].skill[19][0]) nr = 41;
-		if (nr == 20 && ch[co].skill[20][0]) nr = 33;
-		if (nr == 21 && ch[co].skill[21][0]) nr = 37;
-		if (nr == 16 && ch[co].skill[16][0]) nr =  5;
-		if (nr == 32 && ch[co].skill[32][0]) nr = 25;
+		if (nr == SK_ENHANCE && ch[co].skill[SK_ENHANCE][0]) nr = SK_WEAPONM;
+		if (nr == SK_SLOW    && ch[co].skill[SK_SLOW][0])    nr = SK_WEAKEN;
+		if (nr == SK_CURSE   && ch[co].skill[SK_CURSE][0])   nr = SK_SURROUND;
+		if (nr == SK_BLESS   && ch[co].skill[SK_BLESS][0])   nr = SK_COMBATM;
+		if (nr == SK_SHIELD  && ch[co].skill[SK_SHIELD][0])  nr = SK_STAFF;
+		if (nr == SK_IMMUN   && ch[co].skill[SK_IMMUN][0])   nr = SK_DISPEL;
 	}
 	 
 	return nr;
@@ -1670,18 +1670,18 @@ int npc_see(int cn, int co)
 					return(0);
 				}
 				
-				if (!ch[co].skill[12][0])
+				if (!ch[co].skill[SK_BARTER][0])
 					do_sayx(cn, "Welcome to Bluebird Tavern, %s. If you're looking for adventure, perhaps approach Jamil. He seems a bit down on his luck.", ch[co].name);
-				else if (!ch[co].skill[15][0])
+				else if (!ch[co].skill[SK_RECALL][0])
 					do_sayx(cn, "Well done, %s. I see Jamil is in a better mood! There may be others around town who need help. If you'd like, say QUEST to me and I shall tell you.", ch[co].name);
-				else if (!ch[co].skill[29][0])
+				else if (!ch[co].skill[SK_REST][0])
 					do_sayx(cn, "Welcome, %s. I've heard great things about you! There may be others around town who need help. If you'd like, say QUEST to me and I shall tell you.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome back, %s. Enjoy your stay!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#woodsguard")==0) // One of the guards to Weeping Woods
 			{
-				if (!ch[co].skill[29][0]) // Rest - if the player has Rest they're probably ok. Probably.
+				if (!ch[co].skill[SK_REST][0]) // Rest - if the player has Rest they're probably ok. Probably.
 					do_sayx(cn, "Hello %s. For the time being, please stay inside Lynbore's walls. You're far too weak to go outside for now!", ch[co].name);
 				else
 					do_sayx(cn, "Hello %s. Are you on your way to Aston? If you find any bandits on the way, please report to Aston's Guard Captain.", ch[co].name);
@@ -1695,14 +1695,14 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill01")==0) //    12		Bartering			( Jamil )
 			{
-				if (!ch[co].skill[12][0])
+				if (!ch[co].skill[SK_BARTER][0])
 					do_sayx(cn, "Hello, %s. Some thieves across the north road stole my gold amulet from me. I'd teach you BARTERING if you could get it back for me.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s! Thanks again for helping me!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill02")==0) //    15		Recall				( Inga )
 			{
-				if (!ch[co].skill[15][0])
+				if (!ch[co].skill[SK_RECALL][0])
 					do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you RECALL.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s.", ch[co].name);
@@ -1710,16 +1710,16 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#skill03")==0) //    18/38	* EW or WM			( Sirjan )
 			{
 				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[18][0]))
+				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_ENHANCE][0]))
 				{
-					if (!ch[co].skill[38][0])
+					if (!ch[co].skill[SK_WEAPONM][0])
 						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you WEAPON MASTERY.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s!", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[18][0])
+					if (!ch[co].skill[SK_ENHANCE][0])
 						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you ENHANCE.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s!", ch[co].name);
@@ -1729,16 +1729,16 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#skill04")==0) // 41/19   	* Weaken or Slow		( Amity )
 			{
 				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[19][0]))
+				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_SLOW][0]))
 				{
-					if (!ch[co].skill[41][0])
+					if (!ch[co].skill[SK_WEAKEN][0])
 						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you WEAKEN.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s! Thanks again!", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[19][0])
+					if (!ch[co].skill[SK_SLOW][0])
 						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you SLOW.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s! Thanks again!", ch[co].name);
@@ -1746,7 +1746,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill05")==0) //    13		Repair				( Jefferson )
 			{
-				if (!ch[co].skill[13][0])
+				if (!ch[co].skill[SK_REPAIR][0])
 					do_sayx(cn, "Bring me the Bronze Ruby Armor Joe stole from me, %s, and I'll teach you REPAIR.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s. Please, make yourself at home.", ch[co].name);
@@ -1761,9 +1761,9 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#skill07")==0) //    32/25	* Immu or Dispel	( Ingrid )
 			{
 				if ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[32][0]))
+				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_IMMUN][0]))
 				{
-					if (!ch[co].skill[25][0])
+					if (!ch[co].skill[SK_DISPEL][0])
 						do_sayx(cn, "Welcome, %s. Bring me the Decorative Sword from the Skeleton Lord and I'll teach you DISPEL.", ch[co].name);
 					else
 						do_sayx(cn, "Welcome, %s.", ch[co].name);
@@ -1771,7 +1771,7 @@ int npc_see(int cn, int co)
 				}
 				else
 				{
-					if (!ch[co].skill[32][0])
+					if (!ch[co].skill[SK_IMMUN][0])
 						do_sayx(cn, "Welcome, %s. Bring me the Decorative Sword from the Skeleton Lord and I'll teach you IMMUNITY.", ch[co].name);
 					else
 						do_sayx(cn, "Welcome, %s.", ch[co].name);
@@ -1780,16 +1780,16 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#skill08")==0) // 33/20   	* Surr or Curse		( Leopold )
 			{
 				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[20][0]))
+				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_CURSE][0]))
 				{
-					if (!ch[co].skill[33][0])
+					if (!ch[co].skill[SK_SURROUND][0])
 						do_sayx(cn, "Hi, %s. Bring me The Spellblade from the Haunted Castle and I'll teach you SURROUND HIT.", ch[co].name);
 					else
 						do_sayx(cn, "Hi, %s.", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[20][0])
+					if (!ch[co].skill[SK_CURSE][0])
 						do_sayx(cn, "Hi, %s. Bring me The Spellblade from the Haunted Castle and I'll teach you CURSE.", ch[co].name);
 					else
 						do_sayx(cn, "Hi, %s.", ch[co].name);
@@ -1797,21 +1797,21 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill09")==0) //    26		Heal				( Gunther )
 			{
-				if (!ch[co].skill[26][0])
+				if (!ch[co].skill[SK_HEAL][0])
 					do_sayx(cn, "Greetings, %s. I would teach you HEAL if you bring me the Amulet of Resistance from the Dungeon of Doors.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s! How are you?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill10")==0) //    31		Sense				( Manfred )
 			{
-				if (!ch[co].skill[31][0])
+				if (!ch[co].skill[SK_SENSE][0])
 					do_sayx(cn, "Hello, %s. If you bring me a silver ring adorned with a small ruby, I'll teach you Sense Magic. You can find these in the mines!", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. Find anything in the mines lately?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill11")==0) //    23		Resist				( Serena )
 			{
-				if (!ch[co].skill[23][0])
+				if (!ch[co].skill[SK_RESIST][0])
 					do_sayx(cn, "Give me the sword from that stone, and I'll teach you RESISTANCE, %s.", ch[co].name);
 				else
 					do_sayx(cn, "%s, welcome. Make yourself at home.", ch[co].name);
@@ -1821,16 +1821,16 @@ int npc_see(int cn, int co)
 				if (ch[co].flags & CF_LOCKPICK)
 				{
 					if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
-					|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[21][0]))
+					|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_BLESS][0]))
 					{
-						if (!ch[co].skill[37][0])
+						if (!ch[co].skill[SK_COMBATM][0])
 							do_sayx(cn, "Greetings, %s. Bring me the Agate Amulet from the Thieves House and I'll teach you COMBAT MASTERY.", ch[co].name);
 						else
 							do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
 					}
 					else
 					{
-						if (!ch[co].skill[21][0])
+						if (!ch[co].skill[SK_BLESS][0])
 							do_sayx(cn, "Greetings, %s. Bring me the Ruby Amulet from the Thieves House and I'll teach you BLESS.", ch[co].name);
 						else
 							do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
@@ -1841,7 +1841,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill13")==0) //    29		Rest				( Gordon )
 			{
-				if (!ch[co].skill[29][0])
+				if (!ch[co].skill[SK_REST][0])
 					do_sayx(cn, "Hello, %s. I am very ill. If you would bring me a Potion of Life, I would teach you REST.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. I am feeling better today.", ch[co].name);
@@ -1849,16 +1849,16 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#skill14")==0) //    16/ 5	* Shield or Staff	( Edna )
 			{
 				if ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[16][0]))
+				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_SHIELD][0]))
 				{
-					if (!ch[co].skill[5][0])
+					if (!ch[co].skill[SK_STAFF][0])
 						do_sayx(cn, "Hello, %s. Bring me the Oak Buckler from the hedge maze next door, and I shall teach you how to use a STAFF!", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s. How goes your training?", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[16][0])
+					if (!ch[co].skill[SK_SHIELD][0])
 						do_sayx(cn, "Hello, %s. Bring me the Oak Buckler from the hedge maze next door, and I shall teach you how to use a SHIELD!", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s. How goes your training?", ch[co].name);
@@ -1866,7 +1866,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill15")==0) //    22		Identify			( Nasir )
 			{
-				if (!ch[co].skill[22][0])
+				if (!ch[co].skill[SK_IDENT][0])
 					do_sayx(cn, "Hello, %s. In the Magic Maze, across from here, Jane has created a cruel weapon. Bring it to me and I shall teach you IDENTIFY.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. Have you identified anything interesting lately?", ch[co].name);
@@ -2014,7 +2014,7 @@ int npc_see(int cn, int co)
 			{
 				if (points2rank(ch[co].points_tot)<15) // Brig Gen
 					do_sayx(cn, "Hello, %s! When you're a little stronger, come see me and I can teach you how to swim.", ch[co].name);
-				else if (!ch[co].skill[10][0])
+				else if (!ch[co].skill[SK_SWIM][0])
 					do_sayx(cn, "Hello, %s! Under the lake in the southern Strange Forest, there's said to be a valuable glittering cleaver. Bring it to me and I will teach you SWIMMING!", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s!", ch[co].name);

@@ -203,8 +203,6 @@ int hp_needed(int v, int diff);
 int mana_needed(int v, int diff);
 int skill_needed(int v, int diff);
 //
-int get_attrib_base(int cn, int n);
-int get_skill_base(int cn, int n);
 int get_attrib_score(int cn, int n);
 int get_skill_score(int cn, int n);
 int get_fight_skill(int cn);
