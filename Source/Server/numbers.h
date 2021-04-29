@@ -430,6 +430,13 @@
 //
 #define BUF_SPR_HEATSTR		419
 #define BUF_SPR_FIRE		487
+//
+#define BUF_SPR_BLIND		93
+#define BUF_SPR_PULSE		93
+#define BUF_SPR_TAUNT		93
+#define BUF_SPR_GUARD		93
+#define BUF_SPR_RAZOR		93
+#define BUF_SPR_RAZOR2		93
 
 // -----
 

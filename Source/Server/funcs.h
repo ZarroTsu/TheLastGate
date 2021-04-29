@@ -353,6 +353,7 @@ int spell_slow(int cn, int co, int power, int flag);
 int spell_poison(int cn, int co, int power, int flag);
 int spell_scorch(int cn, int co, int power, int flag);
 int spell_weaken(int cn, int co, int power, int flag);
+int spell_blind(int cn, int co, int power, int flag);
 int skill_lookup(char *skill);
 int chance_base(int cn, int skill, int d20, int defense, int usemana);
 int player_or_ghost(int cn, int co);

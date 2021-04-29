@@ -204,7 +204,6 @@
 #define SP_COST_WEAKEN		10
 #define SP_COST_BLIND		10
 #define SP_COST_TAUNT		15
-#define SP_COST_BLINK		20
 #define SP_COST_WARCRY		25
 
 #define FIVE_PERC_FAIL		18
@@ -234,10 +233,10 @@
 #define SP_DUR_BLEED		( TICKS * 10                      )
 #define SP_DUR_WEAKEN		( TICKS * 60                      )
 
-#define SP_DUR_BLIND		( TICKS * 60 * 10                 )
-#define SP_DUR_TAUNT		( TICKS * 60 * 10                 )
-#define SP_DUR_PULSE		( TICKS * 60 * 10                 )
-#define SP_DUR_RAZOR		( TICKS * 60 * 10                 )
+#define SP_DUR_BLIND		( TICKS * 60 * 2                  )
+#define SP_DUR_TAUNT		( TICKS *  5                      )
+#define SP_DUR_PULSE		( TICKS * 60 * 2                  )
+#define SP_DUR_RAZOR		( TICKS * 60 * 2                  )
 
 // -------- Skill Exhaustion values -------- //
 #define SK_EXH_MAXIMUM	 	(TICKS * 6)
@@ -251,7 +250,7 @@
 #define SK_EXH_CURSE		(TICKS * 4)
 #define SK_EXH_SLOW			(TICKS * 4)
 #define SK_EXH_POISON		(TICKS * 5)
-#define SK_EXH_WARCRY		(TICKS * 2)
+#define SK_EXH_WARCRY		(TICKS * 3)
 #define SK_EXH_IDENT		(TICKS * 2)
 #define SK_EXH_BLAST		(TICKS * 6)
 #define SK_EXH_RECALL		(TICKS)
@@ -263,9 +262,9 @@
 
 #define SK_EXH_PULSE		(TICKS * 6)
 #define SK_EXH_RAZOR		(TICKS * 6)
-#define SK_EXH_BLIND		(TICKS * 6)
-#define SK_EXH_TAUNT		(TICKS * 6)
-#define SK_EXH_BLINK		(TICKS * 6)
+#define SK_EXH_BLIND		(TICKS * 3)
+#define SK_EXH_TAUNT		(TICKS * 3)
+#define SK_EXH_TRICE		(TICKS * 5)
 
 
 

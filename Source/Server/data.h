@@ -326,13 +326,15 @@ extern unsigned int mapmarker;
 #define SK_CURSE2		54
 #define SK_SLOW2		55
 #define SK_MSHELL		56
+#define SK_GUARD		57
+#define SK_RAZOR2		58
 //////////////////////////
-#define SK_PROX			60
-#define SK_BLIND		61
-#define SK_PULSE		62
-#define SK_TAUNT		63
-#define SK_BLINK		64
-#define SK_RAZOR		65
+#define SK_PROX			44
+#define SK_BLIND		37
+#define SK_PULSE		43
+#define SK_TAUNT		48
+#define SK_TRICE		49
+#define SK_RAZOR		 7
 //////////////////////////
 
 

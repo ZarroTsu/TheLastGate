@@ -283,7 +283,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	}
 	*/
 	
-	if (in==SK_CLEAVE || in==SK_WEAKEN)
+	if (in==SK_CLEAVE || in==SK_WEAKEN || in==SK_TRICE || in==SK_BLIND)
 	{
 		need_combat = 1;
 	}
@@ -377,7 +377,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 	}
 	
-	if (in!=SK_CLEAVE && 
+	if (in!=SK_CLEAVE && in!=SK_TRICE && 
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
 		(d20 && chance_base(cn, in, d20, get_target_resistance(co), usemana))))
 	{
@@ -2713,6 +2713,11 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 		if (bu[in].temp == SK_WEAKEN2) 	continue;
 		if (bu[in].temp == SK_WARCRY) 	continue;
 		if (bu[in].temp == SK_WARCRY2) 	continue;
+		if (bu[in].temp == SK_BLIND) 	continue;
+		if (bu[in].temp == SK_TAUNT) 	continue;
+		if (bu[in].temp == SK_GUARD) 	continue;
+		if (bu[in].temp == SK_RAZOR) 	continue;
+		if (bu[in].temp == SK_RAZOR2) 	continue;
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
@@ -3615,6 +3620,198 @@ void skill_weaken(int cn)
 	
 	add_exhaust(cn, SK_EXH_WEAKEN);
 }
+
+// Blind reduces enemy perception, hit, and parry scores. Uses Endurance.
+// Gets AoE with Proximity skill
+int spell_blind(int cn, int co, int power, int flag)
+{
+	int in;
+	
+	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
+	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	
+	power = spell_immunity(power, get_target_immunity(co));
+	
+	if (!(in = make_new_buff(cn, SK_BLIND, BUF_SPR_BLIND, power, SP_DUR_BLIND, 0)))
+			return 0;
+	
+	bu[in].skill[SK_PERCEPT][1] = -(power/2 + 5);
+	bu[in].to_hit[1]            = -(power/6 + 3);
+	bu[in].to_parry[1]          = -(power/6 + 3);
+	
+	return cast_a_spell(cn, co, in, 1+flag);
+}
+void skill_blind(int cn)
+{
+	int d20 = 14;
+	int power, cost;
+	int co;
+	
+	power = get_skill_score(cn, SK_BLIND);
+	cost = SP_COST_BLIND;
+	
+	// Get spell target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLIND, 0, power, d20)))
+		return;
+	
+	spell_blind(cn, co, power, 0);
+	
+	surround_cast(cn, co, SK_BLIND, power);
+	
+	add_exhaust(cn, SK_EXH_BLIND);
+}
+
+// Pulse causes small bursts of AoE damage over its duration
+// Gets AoE with Proximity skill
+int spell_pulse(int cn, int co, int power)
+{
+	
+}
+void skill_pulse(int cn)
+{
+	
+}
+
+// Taunt pulls targets to the user
+// Grants a defense bonus to Arch Templars and an offense bonus to Brawlers
+// Gets AoE with Proximity skill
+int spell_taunt(int cn, int co, int power)
+{
+	
+}
+void skill_taunt(int cn)
+{
+	
+}
+
+#define TRICE_CNT	3
+
+// Trice teleports behind the enemy/enemies in front of you, damaging them
+// Escapes combat in the process
+// Gets bonus damage from attack speed score
+void skill_trice(int cn)
+{
+	int power, cost, tmp;
+	int co[TRICE_CNT], cc = 1, n, dam;
+	int x, y, m, md, obstructed = 0;
+	
+	power = get_skill_score(cn, SK_TRICE) + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 4;
+	
+	cost = (power * 2) / 30 + 6;
+	
+	// Get (first) hit target - return on failure
+	if (!(co[0] = get_target(cn, 0, 0, 0, cost, SK_TRICE, 0, power, 0)))
+		return;
+	
+	// Set up map specific variables to scope surroundings
+	x = ch[cn].x;
+	y = ch[cn].y;
+	m = XY2M(x, y);
+	if (ch[cn].dir==DX_DOWN) 	md =  MAPX;
+	if (ch[cn].dir==DX_UP) 		md = -MAPX;
+	if (ch[cn].dir==DX_RIGHT) 	md =  1;
+	if (ch[cn].dir==DX_LEFT) 	md = -1;
+	
+	// Check for additional targets
+	for (n = 1; ; n++)
+	{
+		if (n==TRICE_CNT)
+		{
+			obstructed = 1;
+			break;
+		}
+		if (!(co[n] = map[m + md*(n+1)].ch))
+		{
+			// No character on this tile - check for other obstructions
+			if (map[m + md*(n+1)].to_ch || 
+				(map[m + md*(n+1)].it && 
+				(it[map[m + md*(n+1)].it].flags & IF_MOVEBLOCK)) || 
+				(map[m + md*(n+1)].flags & MF_MOVEBLOCK))
+			{
+				obstructed = 1;
+			}
+			else
+			{
+				x = (m + md*(n+1)) % MAPX;
+				y = (m + md*(n+1)) / MAPX;
+			}
+			break;
+		}
+	}
+	
+	cc = n;
+	
+	for (n = 0; n < cc; n++)
+	{
+		chlog(cn, "Used Trice on %s", ch[co[n]].name);
+		
+		dam = spell_immunity(power, ch[co[n]].to_parry) * 2;
+		
+		tmp = do_hurt(cn, co[n], dam, 5);
+		
+		if (tmp<1)
+		{
+			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co[n]].reference);
+		}
+		else
+		{
+			do_char_log(cn, 1, "You sliced %s for %d HP.\n", ch[co[n]].reference, tmp);
+			do_char_log(co[n], 1, "%s sliced you for %d HP.\n", ch[cn].name, tmp);
+		}
+		
+		char_play_sound(co[n], ch[cn].sound + 6, -150, 0);
+		do_area_sound(co[n], 0, ch[co[n]].x, ch[co[n]].y, ch[cn].sound + 6);
+		fx_add_effect(5, 0, ch[co[n]].x, ch[co[n]].y, 0);
+	}
+	
+	if (!obstructed)
+	{
+		god_transfer_char(co, x, y);
+		ch[cn].escape_timer = TICKS*3;
+		for (m = 0; m<4; m++)
+		{
+			ch[cn].enemy[m] = 0;
+		}
+		remove_enemy(cn);
+	}
+	
+	add_exhaust(cn, SK_EXH_TRICE);
+}
+
+// Razor grants a stacking debuff to hits, dealing additional damage when it expires
+// This damage is considered melee and can crit
+int spell_razor(int cn, int co, int power, int flag)
+{
+	int in;
+	
+	if (flag)	// Debuff version
+	{
+		power = spell_immunity(power, ch[co].to_parry);
+		
+		if (!(in = make_new_buff(cn, SK_RAZOR2, BUF_SPR_RAZOR2, power, TICKS, 0))) 
+			return 0;
+	}
+	else		// Buff version
+	{
+		power = spellpower_check(cn, co, power, 0);
+		
+		if (!(in = make_new_buff(cn, SK_RAZOR, BUF_SPR_RAZOR, power, SP_DUR_RAZOR, 0))) 
+			return 0;
+	}
+	
+	return cast_a_spell(cn, co, in, flag);
+}
+void skill_razor(int cn)
+{
+	if (is_exhausted(cn)) 								{ return; }
+	if (spellcost(cn, SP_COST_RAZOR, SK_RAZOR, 1))		{ return; }
+	if (chance(cn, FIVE_PERC_FAIL)) 					{ return; }
+
+	spell_razor(cn, cn, get_skill_score(cn, SK_RAZOR), 0);
+
+	add_exhaust(cn, SK_EXH_RAZOR);
+}
+
 
 void nomagic(int cn)
 {

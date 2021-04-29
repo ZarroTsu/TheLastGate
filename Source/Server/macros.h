@@ -9,12 +9,14 @@
 #define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
 
 // Sanity checks on map locations x and y
-#define SANEX(x)     ((x) >= 0 && (x) < MAPX)
-#define SANEY(y)     ((y) >= 0 && (y) < MAPY)
-#define SANEXY(x, y) (SANEX(x) && SANEY(y))
+#define SANEX(x)     	((x) >= 0 && (x) < MAPX)
+#define SANEY(y)     	((y) >= 0 && (y) < MAPY)
+#define SANEXY(x, y) 	(SANEX(x) && SANEY(y))
 
 // Convert (x,y) coordinates to absolute position
-#define XY2M(x, y) ((x) + (y) * MAPX)
+#define XY2M(x, y) 		((x) + (y) * MAPX)
+#define M2X(m) 			((m) % MAPX)
+#define M2Y(m) 			((m) / MAPX)
 
 // Character 'cn's absolute position
 #define CHPOSM(cn) (XY2M(ch[(cn)].x,ch[(cn)].y))
