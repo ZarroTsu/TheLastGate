@@ -3665,11 +3665,24 @@ void skill_blind(int cn)
 // Gets AoE with Proximity skill
 int spell_pulse(int cn, int co, int power)
 {
+	int in;
 	
+	power = spellpower_check(cn, co, power, 0);
+	
+	if (!(in = make_new_buff(cn, SK_PULSE, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
+		return 0;
+	
+	return cast_a_spell(cn, co, in, flag);
 }
 void skill_pulse(int cn)
 {
-	
+	if (is_exhausted(cn)) 								{ return; }
+	if (spellcost(cn, SP_COST_PULSE, SK_PULSE, 1))		{ return; }
+	if (chance(cn, FIVE_PERC_FAIL)) 					{ return; }
+
+	spell_pulse(cn, cn, get_skill_score(cn, SK_PULSE));
+
+	add_exhaust(cn, SK_EXH_PULSE);
 }
 
 // Taunt pulls targets to the user
@@ -3693,7 +3706,7 @@ void skill_trice(int cn)
 {
 	int power, cost, tmp;
 	int co[TRICE_CNT], cc = 1, n, dam;
-	int x, y, m, md, obstructed = 0;
+	int x, y, m, md, obstructed = 0, newdir = 0;
 	
 	power = get_skill_score(cn, SK_TRICE) + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 4;
 	
@@ -3707,10 +3720,22 @@ void skill_trice(int cn)
 	x = ch[cn].x;
 	y = ch[cn].y;
 	m = XY2M(x, y);
-	if (ch[cn].dir==DX_DOWN) 	md =  MAPX;
-	if (ch[cn].dir==DX_UP) 		md = -MAPX;
-	if (ch[cn].dir==DX_RIGHT) 	md =  1;
-	if (ch[cn].dir==DX_LEFT) 	md = -1;
+	if (ch[cn].dir==DX_DOWN)
+	{
+		md =  MAPX;		newdir = DX_UP;
+	}
+	if (ch[cn].dir==DX_UP)
+	{
+		md = -MAPX;		newdir = DX_DOWN;
+	}
+	if (ch[cn].dir==DX_RIGHT)
+	{
+		md =  1;		newdir = DX_LEFT;
+	}
+	if (ch[cn].dir==DX_LEFT)
+	{
+		md = -1;		newdir = DX_RIGHT;
+	}
 	
 	// Check for additional targets
 	for (n = 1; ; n++)
@@ -3766,13 +3791,19 @@ void skill_trice(int cn)
 	
 	if (!obstructed)
 	{
-		god_transfer_char(co, x, y);
+		cc = ch[cn].attack_cn;
+		god_transfer_char(cn, x, y);
 		ch[cn].escape_timer = TICKS*3;
 		for (m = 0; m<4; m++)
 		{
 			ch[cn].enemy[m] = 0;
 		}
 		remove_enemy(cn);
+		if (cc)
+		{
+			ch[cn].dir = newdir;
+			ch[cn].attack_cn = co[n];
+		}
 	}
 	
 	add_exhaust(cn, SK_EXH_TRICE);
