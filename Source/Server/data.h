@@ -252,9 +252,12 @@ extern unsigned int mapmarker;
 #define AT_CAP				255
 #define SPEED_CAP 			300
 
-#define PROXIMITY_MULTI		(AT_CAP/(3/2))
-#define PROXIMITY_CAP		(AT_CAP/9)
-#define PRECISION_CAP		(AT_CAP/4)
+#define PROX_MULTI		(AT_CAP/(3/2))
+#define PROX_CAP		(AT_CAP/12)
+#define PROX_HIT		(AT_CAP/30)
+#define PROX_POW		(AT_CAP/35)
+
+#define PREC_CAP		(AT_CAP/4)
 
 // Attribute Definitions
 #define AT_BRV 		0

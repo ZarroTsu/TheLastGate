@@ -377,7 +377,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 	}
 	
-	if (in!=SK_CLEAVE && in!=SK_TRICE && 
+	if (in!=SK_CLEAVE && in!=SK_TRICE && in!=SK_TAUNT && 
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
 		(d20 && chance_base(cn, in, d20, get_target_resistance(co), usemana))))
 	{
@@ -423,7 +423,9 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg)
 {
-	int co_orig, spellaoe, xf, yf, xt, yt, x, y, hitpower, aoeimm = 0, tmp = 0;
+	int co_orig, spellaoe, hitpower, aoeimm = 0, tmp = 0;
+	int tmpa, tmph, tmpha, tmpp, tmppa;
+	int xf, yf, xt, yt, xc, yc, x, y;
 	int no_target = 0, scorch = 0, usemana = 1;
 	
 	if (co)
@@ -433,35 +435,50 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	
 	hitpower = power;
 	
-	if (intemp==SK_BLAST)
+	switch (intemp)
 	{
-		hitpower = power/2 + power/4;
+		case SK_WARCRY:
+			spellaoe = aoe_power/(AT_CAP/6) + 6;
+			tmpa     = aoe_power*100/(AT_CAP/6) + 6*100;
+			tmpha    = sqr(aoe_power*100/(AT_CAP/20)+6*200-tmpa)/500;
+			tmppa    = sqr(aoe_power*100/(AT_CAP/25)+6*200-tmpa)/500;
+			no_target = 1;
+			break;
+		case SK_BLAST: 
+			hitpower = power/2 + power/4;
+		default:
+			spellaoe = (aoe_power)/PROX_CAP;
+			tmpa     = (aoe_power)*100/PROX_CAP;
+			tmpha    = sqr(aoe_power*100/PROX_HIT-tmpa)/500;
+			tmppa    = sqr(aoe_power*100/PROX_POW-tmpa)/500;
+			break;
 	}
 	
-	spellaoe = aoe_power/PROXIMITY_CAP;
-	
-	if (intemp==SK_WARCRY)
-	{
-		spellaoe = aoe_power;
-		no_target = 1;
-	}
-	
-	xf = max(1, ch[cn].x - spellaoe);
-	yf = max(1, ch[cn].y - spellaoe);
-	xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
-	yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
+	xc = ch[cn].x;
+	yc = ch[cn].y;
+	xf = max(1, xc - spellaoe);
+	yf = max(1, yc - spellaoe);
+	xt = min(MAPX - 1, xc + 1 + spellaoe);
+	yt = min(MAPY - 1, yc + 1 + spellaoe);
 	
 	// Loop through and count the number of targets first
 	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
-		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
-	{ 
-		if (!do_surround_check(cn, co, 0)) 
+	{
+		// This makes the radius circular instead of square
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(spellaoe) + 1))
 		{
 			continue;
 		}
-		damage_mshell(co);
-		aoeimm += get_target_immunity(co);
-		count++;
+		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
+		{ 
+			if (!do_surround_check(cn, co, 0)) 
+			{
+				continue;
+			}
+			damage_mshell(co);
+			aoeimm += get_target_immunity(co);
+			count++;
+		}
 	}
 	if (!count && !no_target)
 	{ 
@@ -485,7 +502,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	{
 		hitpower = spell_immunity(power, aoeimm) * 2;
 		hitpower = hitpower/2 + hitpower/4;
-		cost = ((power * 2) / 8 + 5) * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+		cost = ((power * 2) / 8 + 5) * (PROX_MULTI + aoe_power) / PROX_MULTI;
 		
 		// Harakim costs less, monster cost more mana
 		if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)))
@@ -508,100 +525,121 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	if (!hit && !no_target && spellcost(cn, cost, intemp, usemana))
 		return 0;
 	
+	tmph = hitpower;
+	tmpp = power;
+	
 	// Then loop through and apply the effect based off the number of targets
 	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)	
-		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 	{
-		if (no_target)
-		{
-			switch (intemp)
-			{
-				case SK_WARCRY:
-					if (warcry(cn, co, power))
-					{
-						do_char_log(co, 0, 
-						"You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
-						hit++;
-					}
-					else
-					{
-						do_char_log(co, 0, 
-						"You hear %s's warcry.\n", ch[cn].reference);
-						continue;
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		else if (!do_surround_check(cn, co, 1)) 
+		// This makes the radius circular instead of square
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(tmpa/100) + 1))
 		{
 			continue;
 		}
-		else if (intemp==SK_BLAST)
+		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 		{
-			chlog(cn, "Cast Blast on %s", ch[co].name);
-			
-			tmp = do_hurt(cn, co, hitpower, 1);
-			
-			if (tmp>0)
+			// Adjust power to the radius - distant targets take a weaker hit
+			hitpower = min(tmph, tmph / max(1, (
+				sqr(abs(xc - x)) + sqr(abs(yc - y))) / (tmpha / 100)));
+			power    = min(tmpp, tmpp / max(1, (
+				sqr(abs(xc - x)) + sqr(abs(yc - y))) / (tmppa / 100)));
+			if (no_target)
 			{
-				do_char_log(co, 1, 
-				"%s blasted you for %d HP.\n", ch[cn].name, tmp);
+				switch (intemp)
+				{
+					case SK_WARCRY:
+						if (warcry(cn, co, power))
+						{
+							do_char_log(co, 0, 
+							"You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
+							hit++;
+						}
+						else
+						{
+							do_char_log(co, 0, 
+							"You hear %s's warcry.\n", ch[cn].reference);
+							continue;
+						}
+						break;
+					default:
+						break;
+				}
 			}
-			
-			char_play_sound(co, ch[cn].sound + 6, -150, 0);
-			do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+			else if (!do_surround_check(cn, co, 1)) 
+			{
+				continue;
+			}
+			else if (intemp==SK_BLAST)
+			{
+				chlog(cn, "Cast Blast on %s", ch[co].name);
+				
+				tmp = do_hurt(cn, co, hitpower, 1);
+				
+				if (tmp>0)
+				{
+					do_char_log(co, 1, 
+					"%s blasted you for %d HP.\n", ch[cn].name, tmp);
+				}
+				
+				char_play_sound(co, ch[cn].sound + 6, -150, 0);
+				do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
+				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 
-			if (scorch)
-			{
-				spell_scorch(cn, co, (power/2 + power/4), 0);
-			}
-			
-			avgdmg += tmp;
-			hit++;
-		}
-		else if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20))
-		{
-			switch (intemp)
-			{
-				case SK_CURSE:
-					spell_curse(cn, co, hitpower, 1);
-					break;
-				case SK_SLOW:
-					spell_slow(cn, co, hitpower, 1);
-					break;
-				case SK_POISON:
-					spell_poison(cn, co, hitpower, 1);
-					break;
-				default:
-					break;
-			}
-			
-			hit++;
-		}
-		else
-		{
-			if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
-			{
-				if (!(ch[co].flags & CF_SENSE))
+				if (scorch)
 				{
-					do_char_log(co, 0, 
-					"%s%s\n", ch[cn].reference, splog[intemp].senseaoe);
+					spell_scorch(cn, co, (power/2 + power/4), 0);
 				}
-				if (!IS_IGNORING_SPELLS(co))
+				
+				avgdmg += tmp;
+				hit++;
+			}
+			else if (power+RANDOM(20) > get_target_resistance(co)+RANDOM(20))
+			{
+				switch (intemp)
 				{
-					do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
+					case SK_CURSE:
+						spell_curse(cn, co, hitpower, 1);
+						break;
+					case SK_SLOW:
+						spell_slow(cn, co, hitpower, 1);
+						break;
+					case SK_POISON:
+						spell_poison(cn, co, hitpower, 1);
+						break;
+					case SK_BLIND:
+						spell_blind(cn, co, hitpower, 1);
+						break;
+					case SK_TAUNT:
+						spell_taunt(cn, co, hitpower, 1);
+						break;
+					default:
+						break;
 				}
+				
+				hit++;
 			}
 			else
 			{
-				do_char_log(co, 0, 
-				"%s\n", splog[intemp].otheraoe);
+				if (cn!=co && get_skill_score(co, SK_SENSE)>power + 5)
+				{
+					if (!(ch[co].flags & CF_SENSE))
+					{
+						do_char_log(co, 0, 
+						"%s%s\n", ch[cn].reference, splog[intemp].senseaoe);
+					}
+					if (!IS_IGNORING_SPELLS(co))
+					{
+						do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
+					}
+				}
+				else
+				{
+					do_char_log(co, 0, 
+					"%s\n", splog[intemp].otheraoe);
+				}
 			}
+			remember_pvp(cn, co);
 		}
-		remember_pvp(cn, co);
 	}
 	do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
 	if (intemp==SK_BLAST)
@@ -740,6 +778,10 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 						break;
 					case SK_WEAKEN:
 						spell_weaken(cn, co, hitpower, 0);
+						break;
+					case SK_BLIND:
+						spell_blind(cn, co, hitpower, 0);
+						break;
 					default:
 						break;
 				}
@@ -1878,7 +1920,7 @@ void skill_curse(int cn)
 	// Hex Area increases spell cost
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
 	
 	// Get spell target - return on failure
@@ -1968,7 +2010,7 @@ void skill_slow(int cn, int flag)
 	// Hex Area increases spell cost
 	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
 	
 	// Get spell target - return on failure
@@ -2057,7 +2099,7 @@ void skill_poison(int cn)
 	// Hex Area and Dam Area increases spell cost
 	if ((ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
 	
 	// Get spell target - return on failure
@@ -2133,7 +2175,7 @@ void skill_warcry(cn)
 	int power, aoe_power;
 	
 	power = get_skill_score(cn, SK_WARCRY);
-	aoe_power = 6 + get_skill_score(cn, SK_WARCRY)/40;
+	aoe_power = get_skill_score(cn, SK_WARCRY);
 	
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, SP_COST_WARCRY, SK_WARCRY, 0)) { return; }
@@ -2490,7 +2532,7 @@ void skill_blast(int cn)
 	// Dam Area increases spell cost
 	if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 	{
-		cost = cost * (PROXIMITY_MULTI + aoe_power) / PROXIMITY_MULTI;
+		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
 	
 	// Harakim costs less, Sorc costs slightly less, monster cost more mana
@@ -2727,8 +2769,8 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 void skill_dispel(int cn)
 {
 	int in, co, n, m, power, ail_pow = 0, success = 0, chanc;
-	int ail[12] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-	int multi = 12;
+	int ail[13] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	int d20 = 12;
 
 	if ((co = ch[cn].skill_target1)) { ; }
 	else { co = cn; }
@@ -2753,7 +2795,7 @@ void skill_dispel(int cn)
 	// Tarot Card - Hierophant :: Dispel removes positive spells instead of negative spells
 	if (get_tarot(cn, IT_CH_HEIROPH))
 	{
-		multi = 9;
+		d20 = 9;
 		// Remove each positive spell in sequence, from most to least expensive
 		for (n = 0; n<MAXBUFFS; n++)
 		{
@@ -2762,10 +2804,13 @@ void skill_dispel(int cn)
 			if (bu[in].temp==SK_BLESS) 		ail[1] = n;
 			if (bu[in].temp==SK_MSHIELD) 	ail[2] = n;
 			if (bu[in].temp==SK_MSHELL) 	ail[3] = n;
-			if (bu[in].temp==SK_REGEN) 		ail[4] = n;
-			if (bu[in].temp==SK_PROTECT) 	ail[5] = n;
-			if (bu[in].temp==SK_ENHANCE) 	ail[6] = n;
-			if (bu[in].temp==SK_LIGHT) 		ail[7] = n;
+			if (bu[in].temp==SK_PULSE) 		ail[4] = n;
+			if (bu[in].temp==SK_RAZOR) 		ail[5] = n;
+			if (bu[in].temp==SK_GUARD) 		ail[6] = n;
+			if (bu[in].temp==SK_REGEN) 		ail[7] = n;
+			if (bu[in].temp==SK_PROTECT) 	ail[8] = n;
+			if (bu[in].temp==SK_ENHANCE) 	ail[9] = n;
+			if (bu[in].temp==SK_LIGHT) 		ail[10] = n;
 		}
 	}
 	else
@@ -2776,23 +2821,24 @@ void skill_dispel(int cn)
 			if ((in = ch[co].spell[n])==0) { continue; }
 			if (bu[in].temp==SK_POISON)		ail[0] = n;
 			if (bu[in].temp==SK_BLEED) 		ail[1] = n;
-			if (bu[in].temp==SK_WARCRY2) 	ail[2] = n;
-			if (bu[in].temp==SK_CURSE2) 	ail[3] = n;
-			if (bu[in].temp==SK_CURSE) 		ail[4] = n;
-			if (bu[in].temp==SK_WARCRY) 	ail[5] = n;
-			if (bu[in].temp==SK_WEAKEN2) 	ail[6] = n;
-			if (bu[in].temp==SK_WEAKEN) 	ail[7] = n;
-			if (bu[in].temp==SK_SLOW2) 		ail[8] = n;
-			if (bu[in].temp==SK_SLOW) 		ail[9] = n;
-			if (bu[in].temp==SK_SCORCH) 	ail[10] = n;
-			if (bu[in].temp==SK_HEAL) 		ail[11] = n;
+			if (bu[in].temp==SK_BLIND) 		ail[2] = n;
+			if (bu[in].temp==SK_WARCRY2) 	ail[3] = n;
+			if (bu[in].temp==SK_CURSE2) 	ail[4] = n;
+			if (bu[in].temp==SK_CURSE) 		ail[5] = n;
+			if (bu[in].temp==SK_WARCRY) 	ail[6] = n;
+			if (bu[in].temp==SK_WEAKEN2) 	ail[7] = n;
+			if (bu[in].temp==SK_WEAKEN) 	ail[8] = n;
+			if (bu[in].temp==SK_SLOW2) 		ail[9] = n;
+			if (bu[in].temp==SK_SLOW) 		ail[10] = n;
+			if (bu[in].temp==SK_SCORCH) 	ail[11] = n;
+			if (bu[in].temp==SK_HEAL) 		ail[12] = n;
 		}
 	}
 	for (m = 0; m<12; m++) if (ail[m]>-1)
 	{
 		in = ch[co].spell[ail[m]];
 		ail_pow = bu[in].power;
-		chanc = multi * power / max(1, ail_pow); if (chanc > 18) chanc = 18;
+		chanc = d20 * power / max(1, ail_pow); if (chanc > 18) chanc = 18;
 		if (chanc<RANDOM(20))
 		{
 			if (!success)
@@ -3643,20 +3689,47 @@ int spell_blind(int cn, int co, int power, int flag)
 }
 void skill_blind(int cn)
 {
-	int d20 = 14;
-	int power, cost;
-	int co;
+	int d20 = 12;
+	int power, aoe_power, cost;
+	int count = 0, hit = 0;
+	int co, co_orig = -1;
 	
 	power = get_skill_score(cn, SK_BLIND);
+	aoe_power = get_skill_score(cn, SK_HEXAREA);
 	cost = SP_COST_BLIND;
+	
+	// Hex Area increases spell cost
+	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	{
+		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
+	}
 	
 	// Get spell target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLIND, 0, power, d20)))
 		return;
 	
-	spell_blind(cn, co, power, 0);
+	// If we have a valid target, cast Slow on them
+	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	{
+		spell_blind(cn, co, power, 0);
+		
+		co_orig = co;
+		count++;
+		hit++;
+	}
 	
-	surround_cast(cn, co, SK_BLIND, power);
+	// Cast AoE or general surround-hit
+	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	{
+		if (!cast_aoe_spell(cn, co, SK_BLIND, power, aoe_power, cost, count, hit, 0))
+			return;
+		
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	}
+	else
+	{
+		surround_cast(cn, co_orig, SK_BLIND, power);
+	}
 	
 	add_exhaust(cn, SK_EXH_BLIND);
 }
@@ -3688,13 +3761,78 @@ void skill_pulse(int cn)
 // Taunt pulls targets to the user
 // Grants a defense bonus to Arch Templars and an offense bonus to Brawlers
 // Gets AoE with Proximity skill
-int spell_taunt(int cn, int co, int power)
+int spell_taunt(int cn, int co, int power, int flag)
 {
+	int in;
 	
+	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
+	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	
+	power = spell_immunity(power, get_target_immunity(co));
+	
+	if (!(in = make_new_buff(cn, SK_TAUNT, BUF_SPR_TAUNT, power, SP_DUR_TAUNT, 0)))
+		return 0;
+	
+	return cast_a_spell(cn, co, in, 1+flag);
+}
+int spell_guard(int cn, int co, int power)
+{
+	int in;
+	
+	power = spellpower_check(cn, co, power, 0);
+	
+	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, SP_DUR_GUARD, 0))) 
+		return 0;
+	
+	return cast_a_spell(cn, co, in, flag);
 }
 void skill_taunt(int cn)
 {
+	int d20 = 11;
+	int power, aoe_power, cost;
+	int count = 0, hit = 0;
+	int co, co_orig = -1;
 	
+	power = get_skill_score(cn, SK_TAUNT);
+	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	cost = SP_COST_TAUNT;
+	
+	// Hex Area increases spell cost
+	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	{
+		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
+	}
+	
+	// Get spell target - return on failure
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20)))
+		return;
+	
+	// If we have a valid target, cast Slow on them
+	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
+	{
+		spell_taunt(cn, co, power, 0);
+		
+		co_orig = co;
+		count++;
+		hit++;
+	}
+	
+	// Cast AoE or general surround-hit
+	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	{
+		if (!cast_aoe_spell(cn, co, SK_TAUNT, power, aoe_power, cost, count, hit, 0))
+			return;
+		
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	}
+	else
+	{
+		surround_cast(cn, co_orig, SK_TAUNT, power);
+	}
+	
+	spell_guard(cn, cn, get_skill_score(cn, SK_TAUNT), 0);
+	
+	add_exhaust(cn, SK_EXH_TAUNT);
 }
 
 #define TRICE_CNT	3

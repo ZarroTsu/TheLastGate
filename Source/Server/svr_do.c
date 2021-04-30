@@ -6311,49 +6311,77 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			
 			if (surround==1 && ch[cn].skill[SK_SURRAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
 			{
-				int surraoe, x, y, xf, yf, xt, yt, count = 1;
+				int surraoe, x, y, xf, yf, xt, yt, xc, yc, count = 1;
+				int tmp_h, tmp_s, tmp_g;
 
-				surraoe = get_skill_score(cn, SK_SURRAREA)/PROXIMITY_CAP; //get_surr_aoe(get_skill_score(cn, SK_SURRAREA));
-
-				xf = max(1, ch[cn].x - surraoe);
-				yf = max(1, ch[cn].y - surraoe);
-				xt = min(MAPX - 1, ch[cn].x + surraoe+1);
-				yt = min(MAPY - 1, ch[cn].y + surraoe+1);
+				surraoe = get_skill_score(cn, SK_SURRAREA)/PROX_CAP;
+				tmp_h   = sqr(aoe_power/PROX_HIT-surraoe)/5;
+				tmp_s   = surrDam;
+				tmp_g   = glv;
+				
+				xc = ch[cn].x;
+				yc = ch[cn].y;
+				xf = max(1, xc - surraoe);
+				yf = max(1, yc - surraoe);
+				xt = min(MAPX - 1, xc + 1 + surraoe);
+				yt = min(MAPY - 1, yc + 1 + surraoe);
 
 				// Loop through and count the number of targets first
-				for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co) 
-				{ 
-					if (!do_surround_check(cn, co, 0)) continue;
-					count++; 
+				for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
+				{
+					// This makes the radius circular instead of square
+					if (sqr(xc - x) + sqr(yc - y) > (sqr(surraoe) + 1))
+					{
+						continue;
+					}
+					if ((co = map[x + y * MAPX].ch) && cn!=co)
+					{ 
+						if (!do_surround_check(cn, co, 0)) continue;
+						count++; 
+					}
 				}
 				
+				/*
 				if (count > 4)
 				{
 					surrDam = odam/4*3 + crit_dam/2 - odam/(100/min(max(1, count-4), 25)); // = 60.00% - 80.00% damage
 					glv 	= glv_base/4*3; - glv_base/(100/min(max(1, count-4), 25));
 				}
+				*/
 
-				for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co)
+				for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
 				{
-					remember_pvp(cn, co);
-					if (!do_surround_check(cn, co, 1)) continue;
-					if (get_skill_score(cn, SK_SURROUND) + RANDOM(40)>=ch[co].to_parry)
+					// This makes the radius circular instead of square
+					if (sqr(xc - x) + sqr(yc - y) > (sqr(surraoe) + 1))
 					{
-						surrBonus = 0;
-						if ((get_skill_score(cn, SK_SURROUND)-ch[co].to_parry)>0)
+						continue;
+					}
+					if ((co = map[x + y * MAPX].ch) && cn!=co)
+					{
+						surrDam = min(tmp_s, tmp_s / max(1, (
+							sqr(abs(xc - x)) + sqr(abs(yc - y))) / tmp_h));
+						glv		= min(tmp_g, tmp_g / max(1, (
+							sqr(abs(xc - x)) + sqr(abs(yc - y))) / tmp_h));
+						remember_pvp(cn, co);
+						if (!do_surround_check(cn, co, 1)) continue;
+						if (get_skill_score(cn, SK_SURROUND) + RANDOM(40)>=ch[co].to_parry)
 						{
-							surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-ch[co].to_parry), 20)/20;
-						}
-						surrTotal = surrDam+surrBonus;
-						if (co==co_orig) surrTotal = surrTotal/4*3;
-						do_hurt(cn, co, surrTotal, 4);
-						if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
-						{
-							if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
-							if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
-							if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
-							if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
-							if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
+							surrBonus = 0;
+							if ((get_skill_score(cn, SK_SURROUND)-ch[co].to_parry)>0)
+							{
+								surrBonus = odam/4 * min(max(1,get_skill_score(cn, SK_SURROUND)-ch[co].to_parry), 20)/20;
+							}
+							surrTotal = surrDam+surrBonus;
+							if (co==co_orig) surrTotal = surrTotal/4*3;
+							do_hurt(cn, co, surrTotal, 4);
+							if (glv_base+RANDOM(20) > get_target_resistance(co)+RANDOM(16) && co!=co_orig)
+							{
+								if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
+								if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
+								if (in==IT_GL_SPIDER ) spell_slow(cn, co, glv, 1);
+								if (in==IT_GL_CURSED ) spell_curse(cn, co, glv, 1);
+								if (in==IT_GL_TITANS ) spell_weaken(cn, co, glv, 1);
+							}
 						}
 					}
 				}
@@ -7508,7 +7536,7 @@ void really_update_char(int cn)
 	
 	if (ch[cn].skill[SK_PRECISION][0])
 	{
-		critical_c += (critical_c * ch[cn].skill[SK_PRECISION][5])/PRECISION_CAP;
+		critical_c += (critical_c * ch[cn].skill[SK_PRECISION][5])/PREC_CAP;
 	}
 	
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi

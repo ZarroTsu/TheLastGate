@@ -8,6 +8,8 @@
 
 #define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
 
+#define sqr(a)			((a) * (a))
+
 // Sanity checks on map locations x and y
 #define SANEX(x)     	((x) >= 0 && (x) < MAPX)
 #define SANEY(y)     	((y) >= 0 && (y) < MAPY)
