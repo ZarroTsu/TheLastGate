@@ -427,6 +427,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	int tmpa, tmph, tmpha, tmpp, tmppa;
 	int xf, yf, xt, yt, xc, yc, x, y;
 	int no_target = 0, scorch = 0, usemana = 1;
+	int obsi = 0;
 	
 	if (co)
 	{
@@ -435,11 +436,17 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	
 	hitpower = power;
 	
+	// Amulet - Obsidian Eye :: Grants +1 radius
+	if (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)
+	{
+		obsi = 1;
+	}
+	
 	switch (intemp)
 	{
 		case SK_WARCRY:
-			spellaoe = aoe_power/(AT_CAP/6) + 6;
-			tmpa     = aoe_power*100/(AT_CAP/6) + 6*100;
+			spellaoe = aoe_power/(AT_CAP/6) + 6 + obsi;
+			tmpa     = aoe_power*100/(AT_CAP/6) + 6*100 + obsi*100;
 			tmpha    = sqr(aoe_power*100/(AT_CAP/20)+6*200-tmpa)/500;
 			tmppa    = sqr(aoe_power*100/(AT_CAP/25)+6*200-tmpa)/500;
 			no_target = 1;
@@ -447,8 +454,8 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		case SK_BLAST: 
 			hitpower = power/2 + power/4;
 		default:
-			spellaoe = (aoe_power)/PROX_CAP;
-			tmpa     = (aoe_power)*100/PROX_CAP;
+			spellaoe = (aoe_power)/PROX_CAP + obsi;
+			tmpa     = (aoe_power)*100/PROX_CAP + obsi*100;
 			tmpha    = sqr(aoe_power*100/PROX_HIT-tmpa)/500;
 			tmppa    = sqr(aoe_power*100/PROX_POW-tmpa)/500;
 			break;
@@ -663,7 +670,7 @@ int spell_bleed(int cn, int co, int power);
 
 void surround_cast(int cn, int co_orig, int intemp, int power)
 {
-	int m, n, mc, co, hitpower, tmp;
+	int m, n, mc, co, hitpower, tmp, tmpmp;
 	int scorch = 0, bleeding = 0;
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
@@ -742,16 +749,27 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 					bleeding = 1;
 				}
 				
-				tmp = do_hurt(cn, co, hitpower, 5);
+				tmpmp = 0;
+				tmp   = do_hurt(cn, co, hitpower, 5);
+				
+				if (get_gear(cn, IT_WP_BRONCHIT))
+				{
+					tmpmp = tmp/10;
+				}
 				
 				if (tmp<1)
 				{
 					do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 				}
-				else
+				else if (tmpmp<1)
 				{
 					do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
 					do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+				}
+				else
+				{
+					do_char_log(cn, 1, "You cleaved %s for %d HP and %d mana.\n", ch[co].reference, tmp, tmpmp);
+					do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
 				}
 				
 				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
@@ -3541,7 +3559,7 @@ int spell_bleed(int cn, int co, int power)
 }
 void skill_cleave(int cn)
 {
-	int power, cost, tmp;
+	int power, cost, tmp, tmpmp;
 	int co, co_orig = -1;
 	int dam, bleeding = 0;
 	
@@ -3578,16 +3596,27 @@ void skill_cleave(int cn)
 			bleeding = 1;
 		}
 		
-		tmp = do_hurt(cn, co, dam, 5);
+		tmpmp = 0;
+		tmp   = do_hurt(cn, co, dam, 5);
+		
+		if (get_gear(cn, IT_WP_BRONCHIT))
+		{
+			tmpmp = tmp/10;
+		}
 		
 		if (tmp<1)
 		{
 			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		}
-		else
+		else if (tmpmp<1)
 		{
 			do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
 			do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+		}
+		else
+		{
+			do_char_log(cn, 1, "You cleaved %s for %d HP and %d mana.\n", ch[co].reference, tmp, tmpmp);
+			do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
 		}
 		
 		char_play_sound(co, ch[cn].sound + 6, -150, 0);

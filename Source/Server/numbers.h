@@ -133,6 +133,11 @@
 #define IT_GREENPILL	 648
 #define IT_BLUEPILL		 649
 
+#define IT_BSCOIN_STAR	 761
+#define IT_BSCOIN_MOON	 762
+#define IT_BSCOIN_NULL	 763
+
+// Unique Amulets
 #define IT_ANKHAMULET	 768
 #define IT_UNS_AMBER	 702
 #define IT_UNS_TURQU	 703
@@ -140,12 +145,16 @@
 #define IT_AMBERANKH	 704
 #define IT_TURQUANKH	 705
 #define IT_GARNEANKH	 706
-
 #define IT_BREATHAMMY	1275
+#define IT_AM_BLOODS	   1
+#define IT_AM_VERDANT	   1
+#define IT_AM_SEABREZ	   1
+#define IT_AM_OBSIDI	   1
 
-#define IT_BSCOIN_STAR	 761
-#define IT_BSCOIN_MOON	 762
-#define IT_BSCOIN_NULL	 763
+// Unique Belts
+#define IT_BL_SOLAR		   1
+#define IT_BL_LUNAR		   1
+#define IT_BL_ECLIPSE	   1
 
 // Tarot Cards - used with WN_CHARM
 #define IT_CH_FOOL		1513
@@ -170,11 +179,34 @@
 #define IT_CH_SUN		1532
 #define IT_CH_JUDGE		1533
 #define IT_CH_WORLD		1534
+#define IT_CH_FOOL_R	   1
+#define IT_CH_MAGI_R	   1
+#define IT_CH_PREIST_R	   1
+#define IT_CH_EMPRES_R     1
+#define IT_CH_EMPERO_R	   1
+#define IT_CH_HEIROP_R	   1
+#define IT_CH_LOVERS_R	   1
+#define IT_CH_CHARIO_R	   1
+#define IT_CH_STRENG_R	   1
+#define IT_CH_HERMIT_R	   1
+#define IT_CH_WHEEL_R	   1
+#define IT_CH_JUSTIC_R	   1
+#define IT_CH_HANGED_R	   1
+#define IT_CH_DEATH_R	   1
+#define IT_CH_TEMPER_R	   1
+#define IT_CH_DEVIL_R	   1
+#define IT_CH_TOWER_R	   1
+#define IT_CH_STAR_R	   1
+#define IT_CH_MOON_R	   1
+#define IT_CH_SUN_R		   1
+#define IT_CH_JUDGE_R	   1
+#define IT_CH_WORLD_R	   1
 
 // TOWER items
 #define IT_TW_CROWN		 981
 #define IT_TW_CLOAK		 982
 #define IT_TW_DREAD		 983
+#define IT_TW_DOUSER	   1
 #define IT_TW_ROOTS		 984
 #define IT_TW_BBELT		 985
 #define IT_TW_OUTSIDE	1197
@@ -187,6 +219,29 @@
 #define IT_GL_CURSED	1116
 #define IT_GL_TITANS	1117
 #define IT_GL_BURNING	1661
+#define IT_GL_SHADOW	   1
+#define IT_GL_BLVIPER	   1
+
+// Special Boot items
+#define IT_BT_NATURES	   1
+
+// Unique weapons
+#define IT_WP_LIFESPRIG	   1
+#define IT_WP_BLOODLET	   1
+#define IT_WP_GEMCUTTER	   1
+#define IT_WP_STARLIGHT	   1
+#define IT_WP_KELPTRID	   1
+#define IT_WP_PHALLENX	   1
+#define IT_WP_LAMEDARG	   1
+#define IT_WP_WHITEODA	   1
+#define IT_WP_EXCALIBUR	   1
+#define IT_WP_FELLNIGHT	   1
+#define IT_WP_BLACKTAC	   1
+#define IT_WP_CRIMRIP	   1
+#define IT_WP_CRESSUN	   1
+#define IT_WP_GILDSHINE	   1
+#define IT_WP_BRONCHIT	   1
+#define IT_WP_VOLCANF	   1
 
 // -----
 
@@ -342,6 +397,8 @@
 #define IT_BOOK_PROD	1657
 #define IT_BOOK_VENO	1658
 #define IT_BOOK_NECR	1659
+#define IT_BOOK_BISH	   1
+#define IT_BOOK_GREA	   1
 
 
 // -------- pop_create_bonus -------- //

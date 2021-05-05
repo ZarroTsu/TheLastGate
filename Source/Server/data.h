@@ -249,7 +249,7 @@ extern unsigned int mapmarker;
 #define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
 #define CF_AUTOLOOT    (1ull<<57)       // Automatic looting
 
-#define AT_CAP				255
+#define AT_CAP				300
 #define SPEED_CAP 			300
 
 #define PROX_MULTI		(AT_CAP/(3/2))

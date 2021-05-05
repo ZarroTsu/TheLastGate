@@ -4659,64 +4659,60 @@ void set_skill_score(int cn, int z, int n)
 	ch[cn].skill[z][5] = n & 0xFF;
 }
 
-int get_fight_skill(int cn)
+int get_fight_skill(int cn, int skill[50])
 {
 	int in;
-
+	
 	in = ch[cn].worn[WN_RHAND];
+	
 	if (!in || it[in].flags & IF_WP_CLAW) 
-		return( get_skill_score(cn, SK_HAND) );
+	{
+		return min(AT_CAP, skill[SK_HAND]);
+	}
 
 	if (it[in].flags & IF_WP_SWORD)
-		return( get_skill_score(cn, SK_SWORD) );
+	{
+		return min(AT_CAP, skill[SK_SWORD]);
+	}
 	
 	if ((it[in].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) // Spear
 	{
-		return(get_skill_score(cn, SK_DAGGER) > get_skill_score(cn, SK_STAFF) ? get_skill_score(cn, SK_DAGGER) : get_skill_score(cn, SK_STAFF));
-		//return(((get_skill_score(cn, SK_DAGGER)+get_skill_score(cn, SK_STAFF))/8)*5);
+		return min(AT_CAP, skill[SK_DAGGER] > skill[SK_STAFF] ? skill[SK_DAGGER] : skill[SK_STAFF];
 	}
 	
 	if (it[in].flags & IF_WP_DAGGER)
-		return( get_skill_score(cn, SK_DAGGER) );
+	{
+		return min(AT_CAP, skill[SK_DAGGER]);
+	}
 	if (it[in].flags & IF_WP_STAFF)
-		return( get_skill_score(cn, SK_STAFF) );
+	{
+		return min(AT_CAP, skill[SK_STAFF]);
+	}
 	
 	if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) // Greataxe
 	{
-		return(get_skill_score(cn, SK_AXE) > get_skill_score(cn, SK_TWOHAND) ? get_skill_score(cn, SK_AXE) : get_skill_score(cn, SK_TWOHAND));
-		//return((get_skill_score(cn, SK_AXE)+get_skill_score(cn, SK_TWOHAND))/2);
+		return min(AT_CAP, skill[SK_AXE] > skill[SK_TWOHAND] ? skill[SK_AXE] : skill[SK_TWOHAND];
 	}
 	if (it[in].flags & IF_WP_AXE)
-		return( get_skill_score(cn, SK_AXE) );
+	{
+		return min(AT_CAP, skill[SK_AXE]);
+	}
 	if (it[in].flags & IF_WP_TWOHAND)
-		return( get_skill_score(cn, SK_TWOHAND) );
+	{
+		return min(AT_CAP, skill[SK_TWOHAND]);
+	}
 
-	return( get_skill_score(cn, SK_HAND) );
+	return min(AT_CAP, skill[SK_HAND]);
 }
 
 // Combat Mastery, Dual Wield and Shield skill checks
-int get_combat_skill(int cn, int flag)
+int get_combat_skill(int cn, int skill[50], int flag)
 {
 	int power, bonus;
 
-	if (flag == 1)
+	if (flag)
 	{
-		power = get_skill_score(cn, SK_DUAL);
-		if (power < 6) return 0;
-		
-		if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER | KIN_SEYAN_DU))
-		{
-			bonus = power/6;
-		}
-		else
-		{	
-			bonus = power/12;
-		}
-	}
-	else if (flag == 2)
-	{
-		power = get_skill_score(cn, SK_SHIELD);
-		if (power < 6) return 0;
+		power = min(AT_CAP, skill[SK_DUAL]);
 		
 		if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER | KIN_SEYAN_DU))
 		{
@@ -4729,8 +4725,7 @@ int get_combat_skill(int cn, int flag)
 	}
 	else
 	{
-		power = get_skill_score(cn, SK_COMBATM);
-		if (power < 6) return 0;
+		power = min(AT_CAP, skill[SK_SHIELD]);
 		
 		if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER | KIN_SEYAN_DU))
 		{
@@ -4744,22 +4739,29 @@ int get_combat_skill(int cn, int flag)
 
 	return (bonus);
 }
-int get_offhand_skill(int cn, int flag)
+int get_offhand_skill(int cn, int skill[50], int flag)
 {
-	int in; 
-	in = ch[cn].worn[WN_LHAND];
+	int in, in2; 
 	
-	// Black Belt
-	if (it[ch[cn].worn[WN_BELT]].temp==IT_TW_BBELT && !in && flag == 2)
-		get_combat_skill(cn, flag);
+	in  = ch[cn].worn[WN_LHAND];
+	in2 = ch[cn].worn[WN_BELT];
+	
+	// Belt - Black Belt :: Shield parry bonus while offhand is empty
+	if (in2 && it[in2].temp == IT_TW_BBELT && !in && !flag)
+	{
+		get_combat_skill(cn, skill, flag);
+	}
 	
 	// No Gear? No bonus
-	if (!in || flag != 1 || flag != 2) return 0;
-	if (flag == 1 && !(it[in].flags & IF_OF_DUALSW)) return 0;
-	if (flag == 2 && !(it[in].flags & IF_OF_SHIELD)) return 0;
+	if (!in || 
+		(flag && !(it[in].flags & IF_OF_DUALSW)) || 
+		(!flag && !(it[in].flags & IF_OF_SHIELD))) 
+	{
+		return 0;
+	}
 	
 	// Otherwise...
-	return get_combat_skill(cn, flag);
+	return get_combat_skill(cn, skill, flag);
 }
 
 // put in an item, see if we're wearing it in a charm slot.
@@ -4772,6 +4774,20 @@ int get_tarot(int cn, int in)
 	
 	if ((ch1 && it[ch1].temp==in) || (ch2 && it[ch2].temp==in)) 
 		return 1;
+	
+	return 0;
+}
+
+// put in an item and a slot, see if we're wearing that in any slot
+int get_gear(int cn, int in)
+{
+	int n, in2;
+	
+	for (n = 0; n <= WN_CHARM2; n++)
+	{
+		if ((in2 = ch[cn].worn[n]) && it[in2].temp == in)
+			return 1;
+	}
 	
 	return 0;
 }
@@ -5902,7 +5918,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	
 	// Cloak - Cloak of Shadows - 20% of damage dealt to end instead
-	if (it[ch[co].worn[WN_CLOAK]].temp==IT_TW_CLOAK)
+	if (get_gear(co, IT_TW_CLOAK))
 	{
 		end_dam = dam*20/100;
 		
@@ -5910,6 +5926,12 @@ int do_hurt(int cn, int co, int dam, int type)
 			end_dam = (ch[co].a_end-500);
 		
 		hp_dam -= end_dam;
+	}
+	
+	// Weapon - Bronchitis :: 10% cleave damage also dealt to mana
+	if (type == 5 && get_gear(cn, IT_WP_BRONCHIT))
+	{
+		mana_dam = hp_dam/10;
 	}
 	
 	if (ch[co].a_hp - hp_dam<500 && ch[co].luck>=100 && !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[co].luck)
@@ -6944,17 +6966,22 @@ void really_update_char(int cn)
 				spell_cool += it[m].cool_bonus[0];
 			}
 			
-			if (it[m].temp==IT_CH_PREIST) 	charmSpec |=  1;
-			if (it[m].temp==IT_CH_LOVERS) 	charmSpec |=  2;
-			if (it[m].temp==IT_CH_MAGI)   	charmSpec |=  4;
-			if (it[m].temp==IT_CH_HERMIT) 	charmSpec |=  8;
-			if (it[m].temp==IT_CH_TEMPER) 	charmSpec |= 16;
-			if (it[m].temp==IT_CH_STRENGTH)	charmSpec |= 32;
-			if (it[m].temp==IT_CH_WHEEL)	charmSpec |= 64;
+			if (it[m].temp==IT_CH_PREIST) 		charmSpec |=   1;
+			if (it[m].temp==IT_CH_LOVERS) 		charmSpec |=   2;
+			if (it[m].temp==IT_CH_MAGI)   		charmSpec |=   4;
+			if (it[m].temp==IT_CH_HERMIT) 		charmSpec |=   8;
+			if (it[m].temp==IT_CH_TEMPER) 		charmSpec |=  16;
+			if (it[m].temp==IT_CH_STRENGTH)		charmSpec |=  32;
+			if (it[m].temp==IT_CH_WHEEL)		charmSpec |=  64;
 			
-			if (it[m].temp==IT_BOOK_TRAV) 	gearSpec |= 1;
-			if (it[m].temp==IT_TW_HEAVENS)	gearSpec |= 2;
-			if (it[m].temp==IT_TW_ROOTS)	gearSpec |= 4;
+			if (it[m].temp==IT_BOOK_TRAV) 		gearSpec  |=   1;
+			if (it[m].temp==IT_TW_HEAVENS)		gearSpec  |=   2;
+			if (it[m].temp==IT_TW_ROOTS)		gearSpec  |=   4;
+			if (it[m].temp==IT_WP_GILDSHINE)	gearSpec  |=   8;
+			if (it[m].temp==IT_WP_KELPTRID)		gearSpec  |=  16;
+			if (it[m].temp==IT_WP_WHITEODA)		gearSpec  |=  32;
+			if (it[m].temp==IT_WP_BLACKTAC)		gearSpec  |=  64;
+			if (it[m].temp==IT_WP_EXCALIBUR)	gearSpec  |= 128;
 		}
 		
 		// Regular item bonuses
@@ -7000,7 +7027,9 @@ void really_update_char(int cn)
 			armor  += it[m].armor[0];
 			
 			// Special case for Templars with Dual Swords... and daggers...
-			if ((it[m].flags & IF_OF_DUALSW) && (ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)))
+			if ((it[m].flags & IF_OF_DUALSW) && 
+				(ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)) &&
+				it[m].temp != IT_WP_FELLNIGHT)
 			{
 				weapon += it[m].weapon[0]/2;
 			}
@@ -7274,57 +7303,7 @@ void really_update_char(int cn)
 			weapon += min(tempWeapon, get_skill_score(cn, SK_WEAPONM)/6);
 		}
 	}
-
-	// Tarot - Lovers
-	if (charmSpec & 2)
-	{
-		int loverSplit = (weapon + armor) / 2;
-		
-		weapon = loverSplit;
-		armor  = loverSplit;
-	}
-	// Tarot - Hermit
-	if (charmSpec & 8)
-	{
-		armor = (armor*110)/100;
-	}
-	// Tarot - Temperance
-	if (charmSpec & 16)
-	{
-		armor = (armor* 80)/100;
-	}
-	//
 	
-	if (armor<0)
-	{
-		armor = 0;
-	}
-	if (armor>250)
-	{
-		armor = 250;
-	}
-	ch[cn].armor = armor;
-
-	if (weapon<0)
-	{
-		weapon = 0;
-	}
-	if (weapon>250)
-	{
-		weapon = 250;
-	}
-	ch[cn].weapon = weapon;
-
-	if (gethit<0)
-	{
-		gethit = 0;
-	}
-	if (gethit>250)
-	{
-		gethit = 250;
-	}
-	ch[cn].gethit_dam = gethit;
-
 	// Maxlight takes your cumulative total of all light sources, minus the highest.
 	// Light is then the highest single light value affecting you, plus half of whatever maxlight is beyond that.
 	maxlight -= light;
@@ -7375,6 +7354,7 @@ void really_update_char(int cn)
 	/*
 		ch[].speed value
 	*/
+	
 	// Boots - Commander's Roots :: halves all speed reductions
 	if (gearSpec & 4) 
 	{
@@ -7382,6 +7362,12 @@ void really_update_char(int cn)
 		if (spd_move<0) 	spd_move 	/= 2;
 		if (spd_attack<0) 	spd_attack 	/= 2;
 		if (spd_cast<0) 	spd_cast 	/= 2;
+	}
+	
+	// Weapon - Kelp Trident :: +10 speed while underwater
+	if ((gearSpec & 16) && (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER))
+	{
+		base_spd += 10;
 	}
 	
 	base_spd = 120 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 6 + ch[cn].speed_mod;
@@ -7536,7 +7522,7 @@ void really_update_char(int cn)
 	
 	if (ch[cn].skill[SK_PRECISION][0])
 	{
-		critical_c += (critical_c * ch[cn].skill[SK_PRECISION][5])/PREC_CAP;
+		critical_c += (critical_c * skill[SK_PRECISION])/PREC_CAP;
 	}
 	
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
@@ -7565,6 +7551,12 @@ void really_update_char(int cn)
 	
 	critical_m += 100;
 	
+	// Weapon - Gildshine :: A third of Bartering is granted as crit multi
+	if (gearSpec & 8) 
+	{
+		critical_m += min(AT_CAP/3, skill[SK_BARTER]/3);
+	}
+	
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
 	if (charmSpec & 64)
 	{
@@ -7589,9 +7581,8 @@ void really_update_char(int cn)
 		Determined by base weapon skill, plus dual wield score if dual wielding.
 	*/
 	
-	hit_rate += get_fight_skill(cn);
-	hit_rate += get_offhand_skill(cn, 1);
-	hit_rate += get_combat_skill(cn, 0);
+	hit_rate += get_fight_skill(cn, skill);
+	hit_rate += get_offhand_skill(cn, skill, 1);
 	
 	// Clamp hit_rate between 0 and 999
 	if (hit_rate > 999)
@@ -7611,9 +7602,8 @@ void really_update_char(int cn)
 		Determined by base weapon skill, plus shield score if using a shield.
 	*/
 	
-	parry_rate += get_fight_skill(cn);
-	parry_rate += get_offhand_skill(cn, 2);
-	parry_rate += get_combat_skill(cn, 0);
+	parry_rate += get_fight_skill(cn, skill);
+	parry_rate += get_offhand_skill(cn, skill, 0);
 	
 	// Clamp parry_rate between 0 and 999
 	if (parry_rate > 999)
@@ -7651,6 +7641,81 @@ void really_update_char(int cn)
 		damage_top = 0;
 	}
 	ch[cn].top_damage = damage_top;
+	
+	/*
+		Weapon and Armor finalized
+		
+		This is moved down here due to fancy unique item functions
+	*/
+	
+	// Weapon - Excalibur :: Additional WV from 10% of total attack speed
+	if (gearSpec & 128)
+	{
+		weapon += min(SPEED_CAP, base_spd + spd_attack)/10;
+	}
+	
+	// Weapon - White Odachi :: Additional AV by spellmod over 100
+	if ((gearSpec & 32) && spell_mod > 100)
+	{
+		armor  += (spell_mod-100);
+	}
+	
+	// Weapon - Black Tachi :: Additional WV by spellmod over 100
+	if ((gearSpec & 64) && spell_mod > 100)
+	{
+		weapon += (spell_mod-100);
+	}
+
+	// Tarot - Lovers
+	if (charmSpec & 2)
+	{
+		int loverSplit = (weapon + armor) / 2;
+		
+		weapon = loverSplit;
+		armor  = loverSplit;
+	}
+	// Tarot - Hermit
+	if (charmSpec & 8)
+	{
+		armor = (armor*110)/100;
+	}
+	// Tarot - Temperance
+	if (charmSpec & 16)
+	{
+		armor = (armor* 80)/100;
+	}
+	//
+	
+	if (armor<0)
+	{
+		armor = 0;
+	}
+	if (armor>250)
+	{
+		armor = 250;
+	}
+	ch[cn].armor = armor;
+
+	if (weapon<0)
+	{
+		weapon = 0;
+	}
+	if (weapon>250)
+	{
+		weapon = 250;
+	}
+	ch[cn].weapon = weapon;
+
+	if (gethit<0)
+	{
+		gethit = 0;
+	}
+	if (gethit>250)
+	{
+		gethit = 250;
+	}
+	ch[cn].gethit_dam = gethit;
+	
 	
 	// Shadow copies copy owner meta values
 	if ((ch[cn].flags & CF_SHADOWCOPY) && IS_SANECHAR(ch[cn].data[63]))
@@ -7767,6 +7832,28 @@ void do_regenerate(int cn)
 		{
 			race_res += race_med;	race_med -= race_med;
 			endmult  += manamult;	manamult -= manamult;
+		}
+	}
+	
+	// Special non-ankh amulets
+	if (in = ch[cn].worn[WN_NECK])
+	{
+		switch (it[in].temp)
+		{
+			case IT_AM_BLOODS: 
+				race_med /= 2;
+				race_reg *= 2;
+				break;
+			case IT_AM_VERDANT: 
+				race_reg /= 2;
+				race_res *= 2;
+				break;
+			case IT_AM_SEABREZ: 
+				race_res /= 2;
+				race_med *= 2;
+				break;
+			default:
+				break;
 		}
 	}
 	
