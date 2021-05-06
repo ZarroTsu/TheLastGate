@@ -116,6 +116,8 @@ struct pdata
 	struct xbutton xbutton[16];
 };
 
+extern int last_skill;
+
 extern struct pdata pdata;
 
 extern struct cplayer pl;

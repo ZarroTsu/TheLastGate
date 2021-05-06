@@ -240,17 +240,17 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, newly casted Ghost Companions and Shadow Copies become undead monsters.\n");
 		break;
 	case IT_BOOK_BISH: 
-		do_char_log(cn, 3, "When equipped, .\n");
+		do_char_log(cn, 3, "When equipped, casting Bless will immediately cast Protect and Enhance as well.\n");
 		break;
 	case IT_BOOK_GREA: 
-		do_char_log(cn, 3, "When equipped, .\n");
+		do_char_log(cn, 3, "When equipped, damage dealt to the duration of your Magic Shield and Magic Shell is halved.\n");
 		break;
 
 	// -------- TAROT CARDS --------
 	
 	case IT_CH_FOOL: 
 		if (!(it[in].flags & IF_SOULSTONE))
-			do_char_log(cn, 3, "You can apply a Soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n");
+			do_char_log(cn, 3, "You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n");
 		break;
 	case IT_CH_MAGI: 
 		do_char_log(cn, 3, "When equipped, secondary effects of Intuition and Strength are swapped.\n");
@@ -316,13 +316,129 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");
 		break;
 		
+	case IT_CH_FOOL_R: 
+		if (!(it[in].flags & IF_SOULSTONE))
+			do_char_log(cn, 3, "You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped. This applies 100%% more soulstone power, but grants equal chance of negative bonuses.\n");
+		break;
+	case IT_CH_MAGI_R: 
+		do_char_log(cn, 3, "When equipped, hit and parry rates are modified by spell modifier. Spell power is no longer modified by spell modifier.\n");
+		break;
+	case IT_CH_PREIST_R: 
+		do_char_log(cn, 3, "When equipped, grants 25%% more maximum HP. 20%% less maximum mana.\n");
+		break;
+	case IT_CH_EMPRES_R: 
+		do_char_log(cn, 3, "When equipped, spells that would target your Ghost Companion are instead applied to you as an additional layer, with 50%% reduced power.\n");
+		break;
+	case IT_CH_EMPERO_R: 
+		do_char_log(cn, 3, "When equipped, Slows dealt and taken ignore 50%% of immunity.\n");
+		break;
+	case IT_CH_HEIROP_R: 
+		do_char_log(cn, 3, "When equipped, Dispel is guaranteed to remove one buff or debuff, but has increased exhaustion duration. Skill modifier instead reduces the duration of this exhaustion.\n");
+		break;
+	case IT_CH_LOVERS_R: 
+		do_char_log(cn, 3, "When equipped, your attributes become the average of all attributes.\n");
+		break;
+	case IT_CH_CHARIO_R: 
+		do_char_log(cn, 3, "When equipped, Magic Shield and Magic Shell grant 20%% more defensive power, but the total duration is reduced by 50%%.\n");
+		break;
+	case IT_CH_STRENG_R: 
+		do_char_log(cn, 3, "When equipped, reduces melee damage by 20%. Deal 25% more damage with critical hits.\n");
+		break;
+	case IT_CH_HERMIT_R: 
+		do_char_log(cn, 3, "When equipped, grants 10%% more Resistance and Immunity. Weapon value is reduced by 15%.\n");
+		break;
+	case IT_CH_WHEEL_R: 
+		do_char_log(cn, 3, "When equipped, grants 20% more armor value. 20%% chance to be hit when you would have parried.\n");
+		break;
+	case IT_CH_JUSTIC_R: 
+		do_char_log(cn, 3, "When equipped, Cleave deals 20%% more damage, but inflicts Bleeding on you for 10 seconds.\n");
+		break;
+	case IT_CH_HANGED_R: 
+		do_char_log(cn, 3, "When equipped, the effects of Resistance and Immunity are swapped.\n");
+		break;
+	case IT_CH_DEATH_R: 
+		do_char_log(cn, 3, "When equipped, Weakens dealt and taken ignore 50%% of immunity.\n");
+		break;
+	case IT_CH_TEMPER_R: 
+		do_char_log(cn, 3, "When equipped, grants 20%% more weapon value. You have a 20%% chance to miss when you would have hit.\n");
+		break;
+	case IT_CH_DEVIL_R: 
+		do_char_log(cn, 3, "When equipped, mana costs are reduced and taken from endurance. Endurance costs are increased and taken from mana.\n");
+		break;
+	case IT_CH_TOWER_R: 
+		do_char_log(cn, 3, "When equipped, Curses dealt and taken ignore 50%% of immunity.\n");
+		break;
+	case IT_CH_STAR_R: 
+		do_char_log(cn, 3, "When equipped, your Heal spell instead costs hitpoints and restores your mana.\n");
+		break;
+	case IT_CH_MOON_R: 
+		do_char_log(cn, 3, "When equipped, mana regeneration is doubled while you are cursed or scared.\n");
+		break;
+	case IT_CH_SUN_R: 
+		do_char_log(cn, 3, "When equipped, life regeneration is doubled while you are weakened or scorched.\n");
+		break;
+	case IT_CH_JUDGE_R: 
+		do_char_log(cn, 3, "When equipped, 20%% of Blast's damage is instead dealt to the target's endurance and mana.\n");
+		break;
+	case IT_CH_WORLD_R: 
+		do_char_log(cn, 3, "When equipped, endurance regeneration is doubled while you are slowed or blinded.\n");
+		break;
+		
 	// -------- UNIQUE ITEMS --------
 		
-	/*
-	case : 
-		
+	
+	case IT_WP_LIFESPRIG: 
+		do_char_log(cn, 3, "When equipped, mana spent is restored as life over 10 seconds. This effect is overwritten by stronger sources.\n");
 		break;
-	*/
+	case IT_WP_BLOODLET: 
+		do_char_log(cn, 3, "When equipped, this weapon can be used to cast 'Bloodletting', costing 25%% of total hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		break;
+	case IT_WP_GEMCUTTER: 
+		do_char_log(cn, 3, "When equipped, stats granted by your ring slots are improved by 17%%.\n");
+		break;
+	case IT_WP_STARLIGHT: 
+		do_char_log(cn, 3, "When equipped, this weapon can be used to cast 'Starlight', costing 25%% of total mana. Starlight grants a self-buff, increasing spell modifier for 60 seconds.\n");
+		break;
+	case IT_WP_KELPTRID: 
+		do_char_log(cn, 3, "When equipped, grants +10 to action speed while underwater.\n");
+		break;
+	case IT_WP_PHALLENX: 
+		do_char_log(cn, 3, "When equipped, this shield can be used to cast 'Phalanx', costing 50%% of total endurance. Phalanx grants a self-buff, reducing damage taken for 60 seconds.\n");
+		break;
+	case IT_WP_LAMEDARG: 
+		if (it[in].data[0]<10000)
+			do_char_log(cn, 3, "Thine worth shall be proven. %d remain.\n", max(0, 10000-it[in].data[0]));
+		else
+			do_char_log(cn, 3, "Thou art worthy. Use when ready.\n");
+		break;
+	case IT_WP_WHITEODA: 
+		do_char_log(cn, 3, "When equipped, grants additional armor value based on total spell modifier.\n");
+		break;
+	case IT_WP_EXCALIBUR: 
+		do_char_log(cn, 3, "When equipped, 10%% of attack speed is granted as additional weapon value.\n");
+		break;
+	case IT_WP_FELLNIGHT: 
+		do_char_log(cn, 3, "When equipped, grants full bonus to weapon value when used by a Templar, Arch-Templar, or Brawler.\n");
+		break;
+	case IT_WP_BLACKTAC: 
+		do_char_log(cn, 3, "When equipped, grants additional weapon value based on total spell modifier.\n");
+		break;
+	case IT_WP_CRIMRIP: 
+		do_char_log(cn, 3, "When equipped, this weapon can be used to cast 'Bloodletting', costing 25%% of total hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		break;
+	case IT_WP_CRESSUN: 
+		do_char_log(cn, 3, "When equipped, endurance spent is restored as life over 5 seconds. This effect is overwritten by stronger sources.\n");
+		break;
+	case IT_WP_GILDSHINE: 
+		do_char_log(cn, 3, "When equipped, grants additional critical hit multiplier based off total Bartering score.\n");
+		break;
+	case IT_WP_BRONCHIT: 
+		do_char_log(cn, 3, "When equipped, 10%% of Cleave's damage is also dealt to the target's mana.\n");
+		break;
+	case IT_WP_VOLCANF: 
+		do_char_log(cn, 3, "When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n");
+		break;
+	
 	default:
 		break;
 	}

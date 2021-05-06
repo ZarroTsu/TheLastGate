@@ -340,7 +340,7 @@ void button_help(int nr)
 		case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: 
 		case 28: case 29: case 30: case 31: 
-			if (last_skill!=-1) 
+			if (last_skill > -1 && last_skill < 50) 
 			{
 				switch (nr)
 				{
@@ -369,7 +369,7 @@ void button_help(int nr)
 				xlog(1,"Right click on a skill/spell first to assign it to a button.");
 			break;
 
-		case 32: 
+		case 32: // Need to adjust these to reflect last_skill value from 50 to 54...
 			xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from weapon skill."); 
 			break;
 		case 33: 
@@ -796,6 +796,7 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most skills and spells. It also improves the speed of casting spells and using skills.",at_name[n]);
+			last_skill = 50;
 			return 1;
 		}
 		// Willpower
@@ -803,6 +804,7 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude.",at_name[n]);
+			last_skill = 51;
 			return 1;
 		}
 		// Intuition
@@ -810,6 +812,7 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
+			last_skill = 52;
 			return 1;
 		}
 		// Agility
@@ -817,6 +820,7 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
+			last_skill = 53;
 			return 1;
 		}
 		// Strength
@@ -824,6 +828,7 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
+			last_skill = 54;
 			return 1;
 		}
 
@@ -844,8 +849,15 @@ int mouse_statbox2(int x,int y,int state)
 	{
 		if (pl.skill[skilltab[n+skill_pos].nr][0]) 
 		{
-        xlog(1,skilltab[n+skill_pos].desc);
-        last_skill=n+skill_pos;
+			xlog(1,skilltab[n+skill_pos].desc);
+			if (last_skill == n+skill_pos)
+			{
+				last_skill = -1;
+			}
+			else
+			{
+				last_skill = n+skill_pos;
+			}
 		}
 	} 
 	else if (state==MS_LB_UP) 

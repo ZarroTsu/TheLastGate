@@ -432,7 +432,7 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 
 int load=0;
 
-void eng_display_win(int plr_sprite,int init)
+void display_meta_from_ls()
 {
 	int pl_speed, pl_atksp;
 	int pl_spmod, pl_spapt;
@@ -442,8 +442,182 @@ void eng_display_win(int plr_sprite,int init)
 	int pl_coold, pl_casts;
 	int pl_flags, pl_basel, pl_dmgml;
 	int pl_dlow, pl_dhigh, pl_dps, pl_cdrate;
-	//int pl_crit, pl_dps, pl_cool, pl_baselen;
-	//int pl_tarot = 100;
+	
+	// Hacky stuff
+	// Player Speed and Attack Speed - WN_SPEED
+	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP;
+	pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP;
+
+	// Player Spell Mod and Spell Apt - WN_SPMOD
+	pl_spmod = pl.worn[WN_SPMOD];
+	pl_spapt = pl.worn_p[WN_SPMOD];
+	
+	// Player Crit chance and Crit Multiplier - WN_CRIT
+	pl_critc = pl.worn[WN_CRIT];
+	pl_critm = pl.worn_p[WN_CRIT];
+	
+	// Player Top damage and Luck - WN_TOP
+	pl_topdm = pl.worn[WN_TOP];
+	pl_luckv = pl.worn_p[WN_TOP];
+	
+	// Player Hit and Parry - WN_HITPAR
+	pl_hitsc = pl.worn[WN_HITPAR];
+	pl_parry = pl.worn_p[WN_HITPAR];
+	
+	// Player Cooldown and Cast Speed - WN_CLDWN
+	pl_coold = pl.worn[WN_CLDWN];
+	pl_casts = pl_speed + pl.worn_p[WN_CLDWN]; if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP;
+	
+	// Player Flags from special items
+	pl_flags = pl.worn[WN_FLAGS];
+	pl_basel = 100;
+	pl_dmgml = 100;
+	
+	// Book - Damor's Grudge
+	if (pl_flags & 1)
+		pl_basel = 90;
+	
+	// Tarot - Strength
+	if (pl_flags & 2)
+	{
+		pl_dmgml = 125;
+	}
+	
+	// Player DPS - pl_dlow, pl_dhigh, pl_dps
+	pl_dlow  = (pl.weapon*pl_dmgml/100)/4;
+	pl_dhigh = pl.weapon+8+pl_topdm+6;
+	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4;
+	pl_dps   = ((pl_dlow+pl_dhigh)/2)*pl_atksp;
+	
+	// Player cooldown rate - pl_cdrate
+	pl_cdrate = 100 * pl_basel / max(100, pl_coold);
+	
+	// Additional skill bonuses for GUI
+	
+	// Spell Proximity		score / (300 / 12)
+	// eImmunity			
+	// eResistance			
+	// Mana cost %			100 * score / 400		// GREAT PRODIGY book 		= 100 * score / 300 
+	// GC potency			(score * 5) / 11 * spellmod
+	// Poison DPS			
+	// Slow Effect			
+	// Curse Effect			
+	// Meditate Val			
+	// Blast DPH			score * 2
+	// Scorch Power			
+	// Pulse DPH			
+	// Pulse Count			
+	// Rest Val				
+	// Razor DPH			
+	// Trice DPH			
+	// Blind Pow			
+	// Swim pow				
+	// Regen Rate			
+	// Cleave DPH			score + weapon / 4 		// JUSTICE card 			= v * 70 / 100
+	// Taunt Pow			
+	// Weaken Pow			
+	// Warcry Pow			
+	
+	// DRAW THE GUI INFO
+	switch (last_skill)
+	{												// ".............." // 
+		case 50: // Braveness - 1. Cast Speed 	2. Crit Chanc	3. Crit Multi	4. Prox Bonus 	5. eImmunity	6. eResist
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cast Speed");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_casts/100,pl_casts%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Crit Chance");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%5d.%02d%%",pl_critc/100,pl_critc%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Crit Multi");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%8d%%",pl_critm);
+			if (pl.skill[44][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Spell Prox.");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"Radius %2d",0);
+			}
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"E.Immunity");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"E.Resist");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			break;									// ".............." // 
+		case 51: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Aptitude Bonus");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",pl.attrib[AT_WIL][5]/4);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Cost %");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Ghost Potency");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Poison DPS");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Slow Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Curse Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			break;									// ".............." // 
+		case 52: // Intuition - 1. Cooldown, 	2. Medit Rate, 	3. Blast DPH	4. Scorch Pow	5. Pulse DPH	6. Pulse Count
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cooldown Rate");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_cdrate/100,pl_cdrate%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Meditate Value");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Blast DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Scorch Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Pulse DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Pulse Count");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			break;									// ".............." // 
+		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Razor DPH	4. Trice DPH	5. Blind Pow	6. Swim Pow
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Rest Value");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Razor DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Trice DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Swimming Value");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			break;									// ".............." // 
+		case 54: // Strength - 	1. Melee DPH, 	2. Regen Rate, 	3. Cleave DPH	4. Taunt Pow	5. Weaken Pow	6. Warcry Pow
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%3d - %3d",pl_dlow,pl_dhigh);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Regenerate Val");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Cleave DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Taunt Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Weaken Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Warcry Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			break;									// ".............." // 
+		default: // Default -	1. Melee DPS,	2. Hit, 		3. Parry, 		 4. Spell Mod	5. Spell Apt 	6. Act Speed
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPS");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_dps/100,pl_dps%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Hit Score");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",pl_hitsc);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Parry Score");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",pl_parry);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Spell Modifier");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%6d.%02d",pl_spmod/100,pl_spmod%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Spell Aptitude");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",pl_spapt);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Action Speed");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",pl_speed/100,pl_speed%100);
+			break;									// ".............." // 
+	}
+	
+	// Draw red rectangle around selected last_skill, for context
+	if (last_skill >= 50)
+	{
+		dd_showbox(6,6+19*(last_skill-50),129,11,(unsigned short)(RED));
+	}
+}
+
+void eng_display_win(int plr_sprite,int init)
+{
 	int y,n,m;
 	char *tmp,buf[50];
 
@@ -490,81 +664,8 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_EN_COUNT_X,	GUI_EN_COUNT_Y,	1,"Endurance         %3d %3d",pl.a_end,pl.end[5]);
 		dd_xputtext(GUI_MP_COUNT_X,	GUI_MP_COUNT_Y,	1,"Mana              %3d %3d",pl.a_mana,pl.mana[5]);
 		
-		// Hacky stuff
-		// Player Speed and Attack Speed - WN_SPEED
-		pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP;
-		pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP;
-
-		// Player Spell Mod and Spell Apt - WN_SPMOD
-		pl_spmod = pl.worn[WN_SPMOD];
-		pl_spapt = pl.worn_p[WN_SPMOD];
-		
-		// Player Crit chance and Crit Multiplier - WN_CRIT
-		pl_critc = pl.worn[WN_CRIT];
-		pl_critm = pl.worn_p[WN_CRIT];
-		
-		// Player Top damage and Luck - WN_TOP
-		pl_topdm = pl.worn[WN_TOP];
-		pl_luckv = pl.worn_p[WN_TOP];
-		
-		// Player Hit and Parry - WN_HITPAR
-		pl_hitsc = pl.worn[WN_HITPAR];
-		pl_parry = pl.worn_p[WN_HITPAR];
-		
-		// Player Cooldown and Cast Speed - WN_CLDWN
-		pl_coold = pl.worn[WN_CLDWN];
-		pl_casts = pl_speed + pl.worn_p[WN_CLDWN]; if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP;
-		
-		// Player Flags from special items
-		pl_flags = pl.worn[WN_FLAGS];
-		pl_basel = 100;
-		pl_dmgml = 100;
-		
-		// Book - Damor's Grudge
-		if (pl_flags & 1)
-			pl_basel = 90;
-		
-		// Tarot - Strength
-		if (pl_flags & 2)
-		{
-			pl_dmgml = 125;
-		}
-		
-		// Player DPS - pl_dlow, pl_dhigh, pl_dps
-		pl_dlow  = (pl.weapon*pl_dmgml/100)/4;
-		pl_dhigh = pl.weapon+8+pl_topdm+6;
-		pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4;
-		pl_dps   = ((pl_dlow+pl_dhigh)/2)*pl_atksp;
-		
-		// Player cooldown rate - pl_cdrate
-		pl_cdrate = 100 * pl_basel / max(100, pl_coold);
-		
-		// DRAW THE GUI INFO
-		// Hidden values
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Damage per Sec");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_dps/100,pl_dps%100);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Damage per Hit");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%3d - %3d",pl_dlow,pl_dhigh);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Attack Speed");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Cooldown Rate");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%6d.%02d",pl_cdrate/100,pl_cdrate%100);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Spell Modifier");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%6d.%02d",pl_spmod/100,pl_spmod%100);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Spell Aptitude");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",pl_spapt);
-		
-		/*
-		#ifdef HOMECOPY
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*6,1,"Top Damage");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*6,1,"%9d",pl_topdm);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*7,1,"Crit Chance");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*7,1,"%9d",pl_critc);
-		dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*8,1,"Crit Multi");
-		dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*8,1,"%9d",pl_critm);
-		#endif
-		*/
-		
+		// display meta stats
+		display_meta_from_ls();
 		
 		// Money, Update, Points
 		dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"Money");
