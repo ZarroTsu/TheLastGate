@@ -4778,6 +4778,32 @@ int get_tarot(int cn, int in)
 	return 0;
 }
 
+// put in an item, see if we're wearing it in the left-hand slot.
+int get_book(int cn, int in)
+{
+	int in2;
+	
+	in2 = ch[cn].worn[WN_LHAND];
+	
+	if (in2 && it[in2].temp == in) 
+		return 1;
+	
+	return 0;
+}
+
+// put in an item, see if we're wearing it in the amulet slot
+int get_neck(int cn, int in)
+{
+	int in2;
+	
+	in2 = ch[cn].worn[WN_NECK];
+	
+	if (in2 && it[in2].temp == in) 
+		return 1;
+	
+	return 0;
+}
+
 // put in an item and a slot, see if we're wearing that in any slot
 int get_gear(int cn, int in)
 {
@@ -5714,7 +5740,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	int tmp = 0, n, in, rank = 0, noexp = 0, halfexp = 0;
 	unsigned long long mf;
 	int hp_dam = 0, end_dam = 0, mana_dam = 0;
-	int scorched = 0;
+	int scorched = 0, guarded = 0;
 
 	mf = map[ch[co].x + ch[co].y * MAPX].flags;
 	if (cn)
@@ -5793,18 +5819,27 @@ int do_hurt(int cn, int co, int dam, int type)
 			}
 			if (bu[in].temp==SK_SCORCH)
 			{
-				scorched = 1;
+				scorched = bu[in].power;
+			}
+			if (bu[in].temp==SK_GUARD)
+			{
+				guarded = bu[in].power;
 			}
 		}
+		//if ((in = ch[cn].spell[n])!=0)
 	}
-
+	
+	if (scorched)
+	{
+		dam = dam * (1000 + scorched) / 1000;
+	}
+	if (guarded)
+	{
+		dam = dam * (1000 - guarded) / 1000;
+	}
+	
 	if (type==0 || type==4)
 	{
-		if (type == 0 && scorched) // Direct Melee hit
-		{
-			dam = dam * 105/100;
-		}
-		
 		dam -= ch[co].armor;
 		if (dam<0)
 		{
@@ -5821,15 +5856,6 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	else
 	{
-		if (type == 1 && scorched) // Blast
-		{
-			dam = dam * 130/100;
-		}
-		if (type == 5 && scorched) // Direct Melee hit
-		{
-			dam = dam * 105/100;
-		}
-		
 		dam -= ch[co].armor;
 		if (dam<0)
 		{
@@ -6103,7 +6129,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 	}
 
 	// Outsider's Eye
-	if (it[ch[co].worn[WN_NECK]].temp!=IT_TW_OUTSIDE)
+	if (!get_neck(co, IT_TW_OUTSIDE))
 	{
 		if (!is_facing(co, cn))
 		{
@@ -6462,7 +6488,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 		do_notify_char(cn, NT_DIDMISS, co, 0, 0, 0);
 		
-		if ((ch[co].flags & CF_PLAYER) && it[ch[co].worn[WN_LHAND]].temp==IT_BOOK_SWOR) // Book: Way of the Sword
+		if ((ch[co].flags & CF_PLAYER) && get_book(co, IT_BOOK_SWOR)) // Book: Way of the Sword
 		{
 			// NOTE: A value of 100 is 1%. 10000 is 100%.
 			ch[co].data[73]+=50;
@@ -7767,7 +7793,7 @@ void do_regenerate(int cn)
 	int n, m, in, in2, nohp = 0, noend = 0, nomana = 0, old, mf;
 	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0;
 	int race_reg = 0, race_res = 0, race_med = 0;
-	int poisonpower = 0, bleedpower = 0, tickcheck = 6000;
+	int degenpower = 0, tickcheck = 6000;
 	int moonmult = 20;
 	int hpmult, endmult, manamult;
 	int co = -1;
@@ -7803,36 +7829,27 @@ void do_regenerate(int cn)
 	if (ch[cn].flags & CF_NOENDREG)		noend = 1;
 	if (ch[cn].flags & CF_NOMANAREG)	nomana = 1;
 
-	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER) 		uwater = 1;
+	if (mf & MF_UWATER) 		uwater = 1;
 	
 	hpmult = endmult = manamult = moonmult;
 	
 	// Tarot - Moon :: While not full mana, life regen is mana regen
-	if (get_tarot(cn, IT_CH_MOON))
+	if (get_tarot(cn, IT_CH_MOON) && (ch[cn].a_mana<ch[cn].mana[5] * 1000))
 	{
-		if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
-		{
-			race_med += race_reg;	race_reg -= race_reg;
-			manamult += hpmult;		hpmult   -= hpmult;
-		}
+		race_med += race_reg;	race_reg -= race_reg;
+		manamult += hpmult;		hpmult   -= hpmult;
 	}
 	// Tarot - Sun :: While not full life, end regen is life regen
-	if (get_tarot(cn, IT_CH_SUN))
+	if (get_tarot(cn, IT_CH_SUN) && (ch[cn].a_hp<ch[cn].hp[5] * 1000))
 	{
-		if (ch[cn].a_hp<ch[cn].hp[5] * 1000)
-		{
-			race_reg += race_res;	race_res -= race_res;
-			hpmult   += endmult;	endmult  -= endmult;
-		}
+		race_reg += race_res;	race_res -= race_res;
+		hpmult   += endmult;	endmult  -= endmult;
 	}
 	// Tarot - World :: While not full end, mana regen is end regen
-	if (get_tarot(cn, IT_CH_WORLD))
+	if (get_tarot(cn, IT_CH_WORLD) && (ch[cn].a_end<ch[cn].end[5] * 1000))
 	{
-		if (ch[cn].a_end<ch[cn].end[5] * 1000)
-		{
-			race_res += race_med;	race_med -= race_med;
-			endmult  += manamult;	manamult -= manamult;
-		}
+		race_res += race_med;	race_med -= race_med;
+		endmult  += manamult;	manamult -= manamult;
 	}
 	
 	// Special non-ankh amulets
@@ -8124,43 +8141,31 @@ void do_regenerate(int cn)
 				}
 			}
 			
-			// Poison
-			if (bu[in].temp==SK_POISON)
+			// Poison & Bleed
+			if (bu[in].temp==SK_POISON || bu[in].temp==SK_BLEED)
 			{
-				co = bu[in].data[0];
-				
-				mf = map[ch[cn].x + ch[cn].y * MAPX].flags;
+				co 			= bu[in].data[0];
+				degenpower 	= bu[in].data[1];
 				
 				if (!IS_SANEPLAYER(co)) co = 0;
+				if (degenpower<1) degenpower = 1;
 				
-				// Cast by a Sorc
-				if (co && (ch[co].flags & CF_PLAYER) && (ch[co].kindred & KIN_SORCERER))
-				{
-					poisonpower = bu[in].power * 6;
-				}
-				// Cast by a Hara or Monster
-				else
-				{
-					poisonpower = bu[in].power * 3;
-				}
-				if (poisonpower<1) poisonpower = 1;
 				
-				if (co && it[ch[co].worn[WN_LHAND]].temp==IT_BOOK_VENO) // Book: Venom Compendium
-				{
-					poisonpower = poisonpower * 115/100;
-				}
-				
-				if (ch[cn].a_hp - (poisonpower + gothp)<500 && ch[cn].luck>=100 
+				if (ch[cn].a_hp - (degenpower + gothp)<500 && ch[cn].luck>=100 
 					&& !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[cn].luck)
 				{
-					do_lucksave(cn, "lethal poisoning");
+					switch (bu[in].temp)
+					{
+						case SK_POISON: 	do_lucksave(cn, "lethal poisoning"); 	break;
+						case SK_BLEED: 		do_lucksave(cn, "lethal bleeding"); 	break;
+					}
 				}
 				else
 				{
-					ch[cn].a_hp -= poisonpower + gothp;
+					ch[cn].a_hp -= degenpower + gothp;
 				}
 				
-				tickcheck = 6000/max(1,poisonpower);
+				tickcheck = 6000/max(1,degenpower);
 				
 				if (co && globs->ticker%tickcheck==0 && co!=cn && !(mf & MF_ARENA))
 				{
@@ -8175,88 +8180,39 @@ void do_regenerate(int cn)
 					
 					if (co)
 					{
-						do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
-						do_char_log(co, 0, "Your poison killed %s.\n", ch[cn].reference);
-						if (ch[co].flags & CF_INVISIBLE)
-							do_char_log(cn, 0, "Oh dear, that poison was fatal. Somebody killed you...\n");
-						else
-							do_char_log(cn, 0, "Oh dear, that poison was fatal. %s killed you...\n", ch[co].name);
+						switch (bu[in].temp)
+						{
+							case SK_POISON:
+								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
+								do_char_log(co, 0, "Your poison killed %s.\n", ch[cn].reference);
+								if (ch[co].flags & CF_INVISIBLE)
+									do_char_log(cn, 0, "Oh dear, that poison was fatal. Somebody killed you...\n");
+								else
+									do_char_log(cn, 0, "Oh dear, that poison was fatal. %s killed you...\n", ch[co].name);
+								break;
+							case SK_BLEED:
+								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
+								do_char_log(co, 0, "Your bleed killed %s.\n", ch[cn].reference);
+								if (ch[co].flags & CF_INVISIBLE)
+									do_char_log(cn, 0, "Oh dear, that bleeding was fatal. Somebody killed you...\n");
+								else
+									do_char_log(cn, 0, "Oh dear, that bleeding was fatal. %s killed you...\n", ch[co].name);
+								break;
+						}
 					}
 					else
 					{
-						do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
-						do_char_log(cn, 0, "Oh dear, that poison was fatal. You died...\n");
-					}
-					if (co && !(mf & MF_ARENA))
-					{
-						tmp = do_char_score(cn);
-						
-						if (!ch[cn].skill[SK_MEDIT][0]) for (m = 0; m<MAXBUFFS; m++) if ((in2 = ch[cn].spell[m])) 
-						if (bu[in2].temp==SK_PROTECT || bu[in2].temp==SK_ENHANCE || bu[in2].temp==SK_BLESS || bu[in2].temp==SK_HASTE)
-							tmp += tmp / 5;
-						
-						if (ch[cn].flags & CF_EXTRAEXP)
-							tmp *= 3;
-						
-						if (!(ch[cn].flags & CF_PLAYER) && ch[cn].data[75]>0 && ch[cn].data[75]<200)
-							tmp *= (100+ch[cn].data[75])/100;
-					}
-					do_char_killed(co, cn, 0);
-
-					if (co && co!=cn && !(mf & MF_ARENA))
-					{
-						do_give_exp(co, tmp, 1, points2rank(ch[cn].points_tot));
-					}
-					return;
-				}
-			}
-			
-			// Bleed
-			if (bu[in].temp==SK_BLEED)
-			{
-				co = bu[in].data[0];
-				
-				if (!IS_SANEPLAYER(co)) co = 0;
-				
-				bleedpower = (bu[in].power*250)/(TICKS * 10);
-				if (bleedpower<1) bleedpower = 1;
-				
-				if (ch[cn].a_hp - (bleedpower + gothp)<500 && ch[cn].luck>=100 
-					&& !(mf & MF_ARENA) && RANDOM(10000)<5000 + ch[cn].luck)
-				{
-					do_lucksave(cn, "lethal bleeding");
-				}
-				else
-				{
-					ch[cn].a_hp -= bleedpower + gothp;
-				}
-				
-				tickcheck = 4000/max(1,bleedpower);
-
-				if (co && globs->ticker%tickcheck==0 && co!=cn && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA))
-				{
-					ch[co].points += 1;
-					ch[co].points_tot += 1;
-					do_check_new_level(co);
-				}
-				
-				if (ch[cn].a_hp<500)
-				{
-					tmp = 0;
-					
-					if (co)
-					{
-						do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
-						do_char_log(co, 0, "Your bleed killed %s.\n", ch[cn].reference);
-						if (ch[co].flags & CF_INVISIBLE)
-							do_char_log(cn, 0, "Oh dear, that bleeding was fatal. Somebody killed you...\n");
-						else
-							do_char_log(cn, 0, "Oh dear, that bleeding was fatal. %s killed you...\n", ch[co].name);
-					}
-					else
-					{
-						do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
-						do_char_log(cn, 0, "Oh dear, that bleeding was fatal. You died...\n");
+						switch (bu[in].temp)
+						{
+							case SK_POISON:
+								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
+								do_char_log(cn, 0, "Oh dear, that poison was fatal. You died...\n");
+								break;
+							case SK_BLEED:
+								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
+								do_char_log(cn, 0, "Oh dear, that bleeding was fatal. You died...\n");
+								break;
+						}
 					}
 					if (co && !(mf & MF_ARENA))
 					{
@@ -8366,7 +8322,7 @@ void do_regenerate(int cn)
 			waterlifeloss = (250 - get_skill_score(cn, SK_SWIM)/3*2);
 		
 		// Amulet of Waterbreathing halves the result
-		if ((in = ch[cn].worn[WN_NECK]) && it[in].temp==IT_BREATHAMMY)
+		if (get_neck(cn, IT_BREATHAMMY))
 			waterlifeloss /= 2;
 		
 		ch[cn].a_hp -= waterlifeloss + gothp;

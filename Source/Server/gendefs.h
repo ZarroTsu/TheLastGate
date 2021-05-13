@@ -111,7 +111,7 @@
 #define WN_SPEED		13  // Speed 	and Attack Speed
 #define WN_SPMOD		14  // Spellmod	and Spellapt
 #define WN_CRIT			15  // Crit Chc	and Crit Mult
-#define WN_TOP			16  // TopDmg	and Luck
+#define WN_TOP			16  // TopDmg	and Reflection
 #define WN_HITPAR		17  // Hit 		and Parry
 #define WN_CLDWN		18  // Cooldown and Cast Speed
 #define WN_FLAGS		19  // Special flags
@@ -224,10 +224,10 @@
 #define SP_DUR_CURSE		( TICKS * 60 * 2                  )
 #define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
 #define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
-#define SP_DUR_POISON(a)	( TICKS * 20 + TICKS * (a / 6)    )
+#define SP_DUR_POISON		( TICKS * 30                      )
 #define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 80          )
 #define SP_DUR_WARCRY		( TICKS * 60                      )
-#define SP_DUR_SCORCH(a)	( TICKS * a                       )
+#define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_RECALL(a)	( max(TICKS / 2, 60 - (a / 4))    )
 #define SP_DUR_SHADOW(a)	( TICKS * 15 + TICKS * a / 10     )
 #define SP_DUR_BLEED		( TICKS * 10                      )
@@ -235,8 +235,10 @@
 
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
 #define SP_DUR_TAUNT		( TICKS *  5                      )
-#define SP_DUR_PULSE		( TICKS * 60 * 2                  )
-#define SP_DUR_RAZOR		( TICKS * 60 * 2                  )
+#define SP_DUR_GUARD		( TICKS * 15                      )
+#define SP_DUR_PULSE		( TICKS * 60 * 1                  )
+#define SP_DUR_RAZOR		( TICKS * 60 * 1                  )
+#define SP_DUR_DOUSE		( TICKS * 20                      )
 
 // -------- Skill Exhaustion values -------- //
 #define SK_EXH_MAXIMUM	 	(TICKS * 6)

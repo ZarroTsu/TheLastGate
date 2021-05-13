@@ -4817,7 +4817,7 @@ void use_driver(int cn, int in, int carried)
 					do_update_char(cn);
 				}
 				
-				if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_ALCH) // Book: Alchemy 101
+				if (get_book(cn, IT_BOOK_ALCH)) // Book: Alchemy 101
 				{
 					thousand = 1500;
 				}

@@ -103,3 +103,7 @@
 #define SLOW2FORM(n)		(n/(8/3))
 // Curse2's formula (used to degrade)
 #define CURSE2FORM(p, n)	(((p*4/3)-n)/5)
+// Poison's formula (damage per tick)
+#define POISONFORM(p, d)	((p * 1500) / d)
+// Bleed's formula (damage per tick)
+#define BLEEDFORM(p, d)		((p * 1000) / d)

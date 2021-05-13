@@ -434,16 +434,18 @@ int load=0;
 
 void display_meta_from_ls()
 {
-	int pl_speed, pl_atksp;
-	int pl_spmod, pl_spapt;
-	int pl_critc, pl_critm;
-	int pl_topdm, pl_luckv;
-	int pl_hitsc, pl_parry;
-	int pl_coold, pl_casts;
-	int pl_flags, pl_basel, pl_dmgml;
-	int pl_dlow, pl_dhigh, pl_dps, pl_cdrate;
+	int pl_speed, pl_atksp, pl_spmod, pl_spapt;
+	int pl_critc, pl_critm, pl_topdm, pl_reflc;
+	int pl_hitsc, pl_parry, pl_coold, pl_casts;
+	int pl_flags, pl_flagb, pl_basel, pl_dmgml;
+	int pl_dlow,  pl_dhigh, pl_dps,   pl_cdrate;
+	int moonmult = 20;
+	int hpmult, endmult, manamult;
+	int race_reg = 0, race_res = 0, race_med = 0;
+	int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
+	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_trice, sk_blind;
+	int sk_water, sk_cleav, sk_taunt, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
 	
-	// Hacky stuff
 	// Player Speed and Attack Speed - WN_SPEED
 	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP;
 	pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP;
@@ -456,9 +458,9 @@ void display_meta_from_ls()
 	pl_critc = pl.worn[WN_CRIT];
 	pl_critm = pl.worn_p[WN_CRIT];
 	
-	// Player Top damage and Luck - WN_TOP
+	// Player Top damage and Reflection - WN_TOP
 	pl_topdm = pl.worn[WN_TOP];
-	pl_luckv = pl.worn_p[WN_TOP];
+	pl_reflc = pl.worn_p[WN_TOP];
 	
 	// Player Hit and Parry - WN_HITPAR
 	pl_hitsc = pl.worn[WN_HITPAR];
@@ -470,18 +472,17 @@ void display_meta_from_ls()
 	
 	// Player Flags from special items
 	pl_flags = pl.worn[WN_FLAGS];
+	pl_flagb = pl.worn_p[WN_FLAGS];
 	pl_basel = 100;
 	pl_dmgml = 100;
 	
-	// Book - Damor's Grudge
-	if (pl_flags & 1)
-		pl_basel = 90;
+	// Book - Damor's Grudge (cooldown bonus)
+	if (pl_flags & (1 <<  0))
+		pl_basel =  90;
 	
-	// Tarot - Strength
-	if (pl_flags & 2)
-	{
+	// Tarot - Strength (damage multiplier)
+	if (pl_flags & (1 <<  1))
 		pl_dmgml = 125;
-	}
 	
 	// Player DPS - pl_dlow, pl_dhigh, pl_dps
 	pl_dlow  = (pl.weapon*pl_dmgml/100)/4;
@@ -492,32 +493,204 @@ void display_meta_from_ls()
 	// Player cooldown rate - pl_cdrate
 	pl_cdrate = 100 * pl_basel / max(100, pl_coold);
 	
-	// Additional skill bonuses for GUI
+	/*
+		Moon multiplier adjustments
+	*/
+	// FULL MOON
+	if (pl_flagb & (1 <<  8))
+	{
+		moonmult = 30;
+	}
+	// NEW MOON
+	if (pl_flagb & (1 <<  9))
+	{
+		moonmult = 40;
+	}
+	hpmult = endmult = manamult = moonmult;
 	
-	// Spell Proximity		score / (300 / 12)
-	// eImmunity			
-	// eResistance			
-	// Mana cost %			100 * score / 400		// GREAT PRODIGY book 		= 100 * score / 300 
-	// GC potency			(score * 5) / 11 * spellmod
-	// Poison DPS			
-	// Slow Effect			
-	// Curse Effect			
-	// Meditate Val			
-	// Blast DPH			score * 2
-	// Scorch Power			
-	// Pulse DPH			
-	// Pulse Count			
-	// Rest Val				
-	// Razor DPH			
-	// Trice DPH			
-	// Blind Pow			
-	// Swim pow				
-	// Regen Rate			
-	// Cleave DPH			score + weapon / 4 		// JUSTICE card 			= v * 70 / 100
-	// Taunt Pow			
-	// Weaken Pow			
-	// Warcry Pow			
+	/*
+		Additional skill bonuses for GUI
+	*/
+	sk_proxi = pl.skill[44][5] / (300/12);
+	sk_ghost = (pl.skill[27][5]*pl_spmod/100) * 5 / 11;
+	sk_poiso = (pl.skill[42][5]*pl_spmod/100) * 15 / 3 * 18;
+	sk_blast = (pl.skill[24][5]*pl_spmod/100) * 2 * 750/1000;
+	sk_scorc = (1000 + (pl.skill[24][5]*pl_spmod/100));
+	sk_douse = -(pl.skill[24][5]*pl_spmod/100);
+	sk_pulse = (pl.skill[43][5]*pl_spmod/100) * 2 * 75/1000;
+	sk_pucnt = 60 / (6 * pl_basel / max(100, pl_coold));
+	sk_razor = (pl.skill[7][5]+pl.weapon/4) * 2 * 75/1000;
+	sk_trice = (pl.skill[49][5]+max(0,(pl_atksp-120))/4) * 750/1000;
+	sk_blind = -(pl.skill[37][5] / 6 + 3);
+	sk_water = 25 * 18;
+	sk_cleav = (pl.skill[40][5]+pl.weapon/4) * 2 * 750/1000;
+	sk_taunt = (1000 - pl.skill[48][5]);
+	sk_warcr = -(2+(pl.skill[35][5]/(10/3)) / 5);
 	
+	// Tarot - Hanged Man (immunity&resistance)
+	if (pl_flags & (1 <<  2))
+	{
+		sk_immun = pl.skill[32][5] + pl.skill[23][5] * 30/100;
+		sk_resis = pl.skill[23][5] * 70/100;
+	}
+	else
+	{
+		sk_immun = pl.skill[32][5];
+		sk_resis = pl.skill[23][5];
+	}
+	
+	// Book - Great Prodigy (concentrate bonus)
+	if (pl_flags & (1 <<  3))
+	{
+		sk_conce = max(1, 100 - 100 * pl.skill[34][5] / 300);
+	}
+	else
+	{
+		sk_conce = max(1, 100 - 100 * pl.skill[34][5] / 400);
+	}
+	
+	// Book - Venom Compendium (poison bonus)
+	if (pl_flags & (1 <<  4))
+	{
+		sk_poiso *= 5 / 4;
+	}
+	
+	// Tarot - Emperor (slow bonus)
+	if (pl_flags & (1 <<  5))
+	{
+		sk_slowv = -(30 + (pl.skill[19][5]*pl_spmod/100)/(8/3));
+	}
+	else
+	{
+		sk_slowv = -(30 + (pl.skill[19][5]*pl_spmod/100)/2);
+	}
+	
+	// Tarot - Tower (curse bonus)
+	if (pl_flags & (1 <<  6))
+	{
+		sk_curse = -(2 + (((pl.skill[20][5]*pl_spmod/100)*4/3)-4)/5);
+	}
+	else
+	{
+		sk_curse = -(2 + ((pl.skill[20][5]*pl_spmod/100)-4)/5);
+	}
+	
+	// Swimming skill
+	if (pl.skill[10][0])
+	{
+		sk_water = (250 - pl.skill[10][5]/3*2) * 18/10;
+	}
+	
+	// Amulet - Water breathing (degen/2)
+	if (pl_flagb & (1 <<  4))
+	{
+		sk_water /= 2;
+	}
+	
+	// Tarot - Justice (Cleave reduction)
+	if (pl_flags & (1 <<  8))
+	{
+		sk_cleav *= 70 / 100;
+	}
+	
+	// Tarot - Temperance (Taunt reduction)
+	if (pl_flags & (1 <<  9))
+	{
+		sk_taunt *= 70 / 100;
+	}
+	
+	// Tarot - Death (Weaken bonus)
+	if (pl_flags & (1 << 10))
+	{
+		sk_weake = -(pl.skill[41][5] / 6 + 2);
+	}
+	else
+	{
+		sk_weake = -(pl.skill[41][5] / 8 + 2);
+	}
+	
+	/*
+		Regeneration stats
+	*/
+	race_reg = pl.skill[28][5] * moonmult / 15;
+	race_res = pl.skill[29][5] * moonmult / 15;
+	race_med = pl.skill[30][5] * moonmult / 15;
+	
+	// Tarot - Moon :: While not full mana, life regen is mana regen
+	if ((pl_flags & (1 << 11)) && (pl.a_mana<pl.mana[5]))
+	{
+		race_med += race_reg;	race_reg -= race_reg;
+		manamult += hpmult;		hpmult   -= hpmult;
+	}
+	// Tarot - Sun :: While not full life, end regen is life regen
+	if ((pl_flags & (1 << 12)) && (pl.a_hp<pl.hp[5]))
+	{
+		race_reg += race_res;	race_res -= race_res;
+		hpmult   += endmult;	endmult  -= endmult;
+	}
+	// Tarot - World :: While not full end, mana regen is end regen
+	if ((pl_flags & (1 << 13)) && (pl.a_end<pl.end[5]))
+	{
+		race_res += race_med;	race_med -= race_med;
+		endmult  += manamult;	manamult -= manamult;
+	}
+	
+	// Amulet - Bloodstone
+	if (pl_flagb & (1 <<  5))
+	{
+		race_med /= 2;
+		race_reg *= 2;
+	}
+	// Amulet - Verdant
+	if (pl_flagb & (1 <<  6))
+	{
+		race_reg /= 2;
+		race_res *= 2;
+	}
+	// Amulet - Sea
+	if (pl_flagb & (1 <<  7))
+	{
+		race_res /= 2;
+		race_med *= 2;
+	}
+		
+	sk_regen = (pl.skill[28][0]?race_reg:0) + hpmult   * 2;
+	sk_restv = (pl.skill[29][0]?race_res:0) + endmult  * 4;
+	sk_medit = (pl.skill[30][0]?race_med:0) + manamult * 1;
+	
+	// Amulet - Standard Ankh
+	if (pl_flagb & (1 <<  0))
+	{
+		sk_regen += pl.skill[28][0]?race_reg/12:0;
+		sk_restv += pl.skill[29][0]?race_res/12:0;
+		sk_medit += pl.skill[30][0]?race_med/12:0;
+	}
+	// Amulet - Amber Ankh (Life)
+	if (pl_flagb & (1 <<  1))
+	{
+		sk_regen += pl.skill[28][0]?race_reg/ 6:0;
+		sk_restv += pl.skill[29][0]?race_res/24:0;
+		sk_medit += pl.skill[30][0]?race_med/24:0;
+	}
+	// Amulet - Turquoise Ankh (End)
+	if (pl_flagb & (1 <<  2))
+	{
+		sk_regen += pl.skill[28][0]?race_reg/24:0;
+		sk_restv += pl.skill[29][0]?race_res/ 6:0;
+		sk_medit += pl.skill[30][0]?race_med/24:0;
+	}
+	// Amulet - Garnet Ankh (Mana)
+	if (pl_flagb & (1 <<  3))
+	{
+		sk_regen += pl.skill[28][0]?race_reg/24:0;
+		sk_restv += pl.skill[29][0]?race_res/24:0;
+		sk_medit += pl.skill[30][0]?race_med/ 6:0;
+	}
+	
+	sk_regen *= 18/10;
+	sk_restv *= 18/10;
+	sk_medit *= 18/10;
+
 	// DRAW THE GUI INFO
 	switch (last_skill)
 	{												// ".............." // 
@@ -528,70 +701,93 @@ void display_meta_from_ls()
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%5d.%02d%%",pl_critc/100,pl_critc%100);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Crit Multi");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%8d%%",pl_critm);
-			if (pl.skill[44][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Spell Prox.");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"Radius %2d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"E.Immunity");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_immun);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"E.Resist");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_resis);
+				if (pl_reflc>0) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Damage Reflect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",pl_reflc);
 			}
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"E.Immunity");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"E.Resist");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
 			break;									// ".............." // 
 		case 51: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Aptitude Bonus");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",pl.attrib[AT_WIL][5]/4);
+				if (pl.skill[34][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Cost %");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_conce/100,sk_conce%100);
+			}	if (pl.skill[27][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Ghost Potency");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Poison DPS");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_ghost);
+			}	if (pl.skill[42][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Poison Degen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%6d.%02d",sk_poiso/100,sk_poiso%100);
+			}	if (pl.skill[19][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Slow Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_slowv);
+			}	if (pl.skill[20][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Curse Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_curse);
+			}
 			break;									// ".............." // 
 		case 52: // Intuition - 1. Cooldown, 	2. Medit Rate, 	3. Blast DPH	4. Scorch Pow	5. Pulse DPH	6. Pulse Count
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cooldown Rate");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_cdrate/100,pl_cdrate%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Meditate Value");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Regen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_medit/100,sk_medit%100);
+				if (pl.skill[24][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Blast DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_blast);
+				// Tarot - Judgement (blast change)
+				if (pl_flags & (1 <<  7)) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Douse Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_douse/1000,sk_douse%1000);
+			}	else {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Scorch Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_scorc/1000,sk_scorc%1000);
+			} }	if (pl.skill[43][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Pulse DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_pulse);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Pulse Count");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_pucnt);
+			}
 			break;									// ".............." // 
-		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Razor DPH	4. Trice DPH	5. Blind Pow	6. Swim Pow
+		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Razor DPH	4. Trice DPH	5. Blind Pow	6. Water Degen
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Rest Value");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Endur. Regen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_restv/100,sk_restv%100);
+				if (pl.skill[7][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Razor DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_razor);
+			}	if (pl.skill[49][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Trice DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_trice);
+			}	if (pl.skill[37][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Swimming Value");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);
+			}
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"UWater Degen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",sk_water/100,sk_water%100);
 			break;									// ".............." // 
 		case 54: // Strength - 	1. Melee DPH, 	2. Regen Rate, 	3. Cleave DPH	4. Taunt Pow	5. Weaken Pow	6. Warcry Pow
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%3d - %3d",pl_dlow,pl_dhigh);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Regenerate Val");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Health Regen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_regen/100,sk_regen%100);
+				if (pl.skill[40][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Cleave DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",0);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Taunt Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_cleav);
+			}	if (pl.skill[48][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Taunt Guard");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_taunt/1000,sk_taunt%1000);
+			}	if (pl.skill[41][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Weaken Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_weake);
+			}	if (pl.skill[35][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Warcry Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",0);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_warcr);
+			}
 			break;									// ".............." // 
 		default: // Default -	1. Melee DPS,	2. Hit, 		3. Parry, 		 4. Spell Mod	5. Spell Apt 	6. Act Speed
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPS");
@@ -614,6 +810,23 @@ void display_meta_from_ls()
 	{
 		dd_showbox(6,6+19*(last_skill-50),129,11,(unsigned short)(RED));
 	}
+	
+	// Draw a moon icon?  261 212
+	/*
+	if (moonmult==40)
+	{
+		// New Moon
+	}
+	if (moonmult==30)
+	{
+		// Full Moon
+	}
+	else
+	{
+		// Standard Moon
+	}
+	*/
+	
 }
 
 void eng_display_win(int plr_sprite,int init)

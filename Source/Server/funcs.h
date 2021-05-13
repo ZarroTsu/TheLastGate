@@ -206,6 +206,7 @@ int skill_needed(int v, int diff);
 int get_attrib_score(int cn, int n);
 int get_skill_score(int cn, int n);
 int get_tarot(int cn, int in);
+int get_book(int cn, int in);
 int get_gear(int cn, int in);
 //
 void do_add_light(int x, int y, int stren);

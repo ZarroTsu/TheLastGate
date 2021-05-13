@@ -2421,7 +2421,7 @@ void plr_change(int nr)
 				if (n == WN_TOP)
 				{
 					*(short int*)(buf + 5) = min(999,ch[cn].top_damage); // STR/2 + mods
-					*(short int*)(buf + 7) = min(10000,ch[cn].luck);
+					*(short int*)(buf + 7) = min(999,ch[cn].gethit_dam);
 				}
 				if (n == WN_HITPAR)
 				{
@@ -2436,10 +2436,33 @@ void plr_change(int nr)
 				if (n == WN_FLAGS)
 				{
 					chFlags = 0;
-					if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO) 	chFlags += 1;
-					if (get_tarot(cn, IT_CH_STRENGTH)) 					chFlags += 2;
-					*(short int*)(buf + 5) = min(30000,chFlags);
-					*(short int*)(buf + 7) = 0;
+					if (get_book(cn, IT_BOOK_DAMO)) 	chFlags += (1 <<  0);
+					if (get_tarot(cn, IT_CH_STRENGTH)) 	chFlags += (1 <<  1);
+					if (get_tarot(cn, IT_CH_HANGED)) 	chFlags += (1 <<  2);
+					if (get_book(cn, IT_BOOK_PROD)) 	chFlags += (1 <<  3);
+					if (get_book(cn, IT_BOOK_VENO)) 	chFlags += (1 <<  4);
+					if (get_tarot(cn, IT_CH_EMPEROR)) 	chFlags += (1 <<  5);
+					if (get_tarot(cn, IT_CH_TOWER)) 	chFlags += (1 <<  6);
+					if (get_tarot(cn, IT_CH_JUDGE)) 	chFlags += (1 <<  7);
+					if (get_tarot(cn, IT_CH_JUSTICE)) 	chFlags += (1 <<  8);
+					if (get_tarot(cn, IT_CH_TEMPER)) 	chFlags += (1 <<  9);
+					if (get_tarot(cn, IT_CH_DEATH)) 	chFlags += (1 << 10);
+					if (get_tarot(cn, IT_CH_MOON)) 		chFlags += (1 << 11);
+					if (get_tarot(cn, IT_CH_SUN)) 		chFlags += (1 << 12);
+					if (get_tarot(cn, IT_CH_WORLD)) 	chFlags += (1 << 13);
+					*(short int*)(buf + 5) = min(32767,chFlags); // max << 14
+					chFlags = 0;
+					if (get_neck(cn, IT_ANKHAMULET)) 	chFlags += (1 <<  0);
+					if (get_neck(cn, IT_AMBERANKH)) 	chFlags += (1 <<  1);
+					if (get_neck(cn, IT_TURQUANKH)) 	chFlags += (1 <<  2);
+					if (get_neck(cn, IT_GARNEANKH)) 	chFlags += (1 <<  3);
+					if (get_neck(cn, IT_BREATHAMMY)) 	chFlags += (1 <<  4);
+					if (get_neck(cn, IT_AM_BLOODS)) 	chFlags += (1 <<  5);
+					if (get_neck(cn, IT_AM_VERDANT)) 	chFlags += (1 <<  6);
+					if (get_neck(cn, IT_AM_SEABREZ)) 	chFlags += (1 <<  7);
+					if (globs->fullmoon)				chFlags += (1 <<  8);
+					if (globs->newmoon)					chFlags += (1 <<  9);
+					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
 				
 				xsend(nr, buf, 9);

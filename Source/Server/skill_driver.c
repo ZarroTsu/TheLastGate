@@ -405,7 +405,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			add_exhaust(cn, TICKS * 4);
 		}
 		// Book: Shiva's Malice :: Curse tries Slow afterward
-		if (in==SK_CURSE && it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+		if (in==SK_CURSE && get_book(cn, IT_BOOK_SHIV))
 		{
 			skill_slow(cn, 0);
 		}
@@ -426,7 +426,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	int co_orig, spellaoe, hitpower, aoeimm = 0, tmp = 0;
 	int tmpa, tmph, tmpha, tmpp, tmppa;
 	int xf, yf, xt, yt, xc, yc, x, y;
-	int no_target = 0, scorch = 0, usemana = 1;
+	int no_target = 0, usemana = 1;
 	int obsi = 0;
 	
 	if (co)
@@ -520,13 +520,6 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		{
 			cost = cost*2;
 		}
-		
-		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
-		if (get_tarot(cn, IT_CH_JUDGE))
-		{
-			hitpower = hitpower * 85/100;
-			scorch = 1;
-		}
 	}
 	
 	if (!hit && !no_target && spellcost(cn, cost, intemp, usemana))
@@ -592,10 +585,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
 				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 
-				if (scorch)
-				{
-					spell_scorch(cn, co, (power/2 + power/4), 0);
-				}
+				spell_scorch(cn, co, power/2+power/4, 0);
 				
 				avgdmg += tmp;
 				hit++;
@@ -671,7 +661,7 @@ int spell_bleed(int cn, int co, int power);
 void surround_cast(int cn, int co_orig, int intemp, int power)
 {
 	int m, n, mc, co, hitpower, tmp, tmpmp;
-	int scorch = 0, bleeding = 0;
+	int bleeding = 0;
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
@@ -706,13 +696,6 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 				hitpower = spell_immunity(power, get_target_immunity(co)) * 2;
 				hitpower = hitpower/2 + hitpower/4;
 				
-				// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorched
-				if (get_tarot(cn, IT_CH_JUDGE))
-				{
-					hitpower = hitpower * 85/100;
-					scorch = 1;
-				}
-				
 				tmp = do_hurt(cn, co, hitpower, 1);
 				
 				if (tmp<1)	
@@ -730,10 +713,7 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 				
 				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 				
-				if (scorch)
-				{
-					spell_scorch(cn, co, hitpower/2, 0);
-				}
+				spell_scorch(cn, co, power/2+power/4, 0);
 			}
 			else if (intemp==SK_CLEAVE)
 			{
@@ -776,7 +756,7 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 
 				if (bleeding)
 				{
-					spell_bleed(cn, co, hitpower/2);
+					spell_bleed(cn, co, hitpower);
 				}
 				
 				continue; // skip damage_mshell
@@ -970,7 +950,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 		{
 			int t;
 			
-			if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_PROD) // Book: Great Prodigy
+			if (get_book(cn, IT_BOOK_PROD)) // Book: Great Prodigy
 			{
 				t = cost * get_skill_score(cn, SK_CONCEN) / 300;
 			}
@@ -1051,14 +1031,14 @@ int chance_base(int cn, int skill, int d20, int defense, int usemana)
 	if (usemana)
 	{
 		// Book - Castor's Advantage
-		if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_ADVA)
+		if (get_book(cn, IT_BOOK_ADVA))
 		{
 			tmp = RANDOM(20);
 			if (tmp < roll) roll = tmp;
 		}
 		
 		// Book - Shiva's Malice
-		if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+		if (get_book(cn, IT_BOOK_SHIV))
 		{
 			tmp = RANDOM(20);
 			if (tmp > roll) roll = tmp;
@@ -1163,7 +1143,7 @@ int get_target_resistance(int co)
 	
 	// Tarot Card - Hanged Man :: Resistance behaves as extra Immunity instead
 	if (get_tarot(co, IT_CH_HANGED))
-		target_resist = (get_skill_score(co, SK_RESIST)*30/100);
+		target_resist = (get_skill_score(co, SK_RESIST)*70/100);
 	else
 		target_resist = get_skill_score(co, SK_RESIST);
 	
@@ -1233,7 +1213,7 @@ int spell_multiplier(int power, int cn)
 int add_spell(int cn, int in)
 {
 	int n, in2, weak = 999, weakest = 99;
-	int m;
+	int m, stack, tickminimum = TICKS*60;
 
 	m = ch[cn].x + ch[cn].y * MAPX;
 	if (map[m].flags & CF_NOMAGIC) { return(0); }
@@ -1244,28 +1224,39 @@ int add_spell(int cn, int in)
 		if ((in2 = ch[cn].spell[n])!=0)
 		{
 			if (bu[in2].used==USE_EMPTY) continue;
-			// Feb 2020 - special case for healing sickness
-			// If you already have the first stack, add a new stack.
-			if (bu[in].temp==SK_HEAL&&bu[in2].temp==SK_HEAL)
+			if (bu[in].temp==SK_HEAL && bu[in2].temp==SK_HEAL)
 			{
-				int sick=3;
+				// Multiple heals stack 'healing sickness' (SK_HEAL), reducing heal power
+				stack=3;
 
-				if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_HOLY) // Book: Holy Etiquette
+				if (get_book(cn, IT_BOOK_HOLY)) // Book: Holy Etiquette
 				{
-					sick=2;
+					stack=2;
 				}
 				
 				bu[in].data[1] = bu[in2].data[1] + 1;
-				if (bu[in].data[1] > 3) bu[in].data[1] = 3;
-				else if (bu[in].data[1] > sick) bu[in].data[1] = sick;
+				if (bu[in].data[1] > 3) 
+				{
+					bu[in].data[1] = 3;
+				}
+				else if (bu[in].data[1] > stack) 
+				{
+					bu[in].data[1] = stack;
+				}
+				bu[in2].used = USE_EMPTY;
+				break;
+			}
+			else if (bu[in].temp==SK_POISON && bu[in2].temp==SK_POISON)
+			{
+				// Multiple poisons stack poison power, up to 3x
+				bu[in].data[1] = min(POISONFORM(bu[in].power, SP_DUR_POISON) * 3, bu[in].data[1] + bu[in2].data[1]);
+				
 				bu[in2].used = USE_EMPTY;
 				break;
 			}
 			else if (bu[in2].temp==bu[in].temp)
 			{
-				int tickminimum = TICKS*60;
-				
-				if (bu[in2].temp==SK_POISON || bu[in2].temp==SK_SLOW || bu[in2].temp==SK_SLOW2 || bu[in2].temp==SK_CURSE2)
+				if (bu[in2].temp==SK_SLOW || bu[in2].temp==SK_SLOW2 || bu[in2].temp==SK_CURSE2)
 					tickminimum = TICKS*5;
 				
 				if (bu[in].power<bu[in2].power && bu[in2].active>tickminimum && bu[in2].temp!=SK_LIGHT)
@@ -1326,7 +1317,7 @@ void add_exhaust(int cn, int len)
 	int in = 0, baselen = 100;
 	
 	// Book: Damor's Grudge
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_DAMO)
+	if (get_book(cn, IT_BOOK_DAMO))
 	{
 		baselen = 90;
 	}
@@ -1830,7 +1821,7 @@ int spell_heal(int cn, int co, int power)
 	
 	bu[in].data[1] = 0;
 	
-	// Every time heal is cast it updates itself and adds 1 to 'cost'
+	// Every time heal is cast it updates itself and adds 1 to data[1]
 	if (cast_a_spell(cn, co, in, 0))
 	{
 		if ((in2=has_buff(cn, SK_HEAL))!=0)
@@ -1969,7 +1960,7 @@ void skill_curse(int cn)
 	}
 	
 	// Book - Shiva's Malice :: Cast Slow after casting Curse
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+	if (get_book(cn, IT_BOOK_SHIV))
 	{
 		skill_slow(cn, 1);
 	}
@@ -2059,7 +2050,7 @@ void skill_slow(int cn, int flag)
 	}
 	
 	// Book - Shiva's Malice :: Extend exhaust after casting both Curse and Slow
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_SHIV)
+	if (get_book(cn, IT_BOOK_SHIV))
 	{
 		add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
 	}
@@ -2072,7 +2063,7 @@ void skill_slow(int cn, int flag)
 // Feb 2020 - Poison
 int spell_poison(int cn, int co, int power, int flag)
 {
-	int in, dur;
+	int in, dur, ppow;
 	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
@@ -2080,16 +2071,22 @@ int spell_poison(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(co));
 	power = spell_multiplier(power, cn);
 	
-	dur = SP_DUR_POISON(power);
+	dur = SP_DUR_POISON; 			// 30 seconds
+	
+	ppow = POISONFORM(power, dur);
 	
 	// Book - Venom Compendium
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_VENO) 
+	if (get_book(cn, IT_BOOK_VENO)) 
 	{
-		dur = dur*70/100; // 70% duration = between 14 and 42 seconds
+		dur 	= dur  * 2/3; 		// 66% duration = 20 seconds
+		ppow 	= ppow * 5/4;		// 25% more damage over time
 	}
 	
 	if (!(in = make_new_buff(cn, SK_POISON, BUF_SPR_POISON, power, dur, 0)))
 		return 0;
+	
+	// Set the decay rate of the poison
+	bu[in].data[1] = ppow;
 	
 	return cast_a_spell(cn, co, in, 1+flag);
 }
@@ -2517,7 +2514,7 @@ void skill_identify(int cn)
 
 int spell_scorch(int cn, int co, int power, int flag)
 {
-	int in, tmp;
+	int in;
 	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
@@ -2525,11 +2522,17 @@ int spell_scorch(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(co));
 	power = spell_multiplier(power, cn);
 	
-	if (flag)	tmp = 10;
-	else		tmp = 30;
-	
-	if (!(in = make_new_buff(cn, SK_SCORCH, BUF_SPR_SCORCH, power, SP_DUR_SCORCH(tmp), 0)))
-		return 0;
+	// Tarot Card - Judgement :: Change Scorch to Douse
+	if (get_tarot(cn, IT_CH_JUDGE))
+	{
+		if (!(in = make_new_buff(cn, SK_DOUSE, BUF_SPR_DOUSE, power, SP_DUR_DOUSE, 0)))
+			return 0;
+	}
+	else
+	{
+		if (!(in = make_new_buff(cn, SK_SCORCH, BUF_SPR_SCORCH, power, SP_DUR_SCORCH, 0)))
+			return 0;
+	}
 	
 	return cast_a_spell(cn, co, in, 1+flag);
 }
@@ -2538,7 +2541,7 @@ void skill_blast(int cn)
 	int power, aoe_power, cost, tmp = 0;
 	int count = 0, hit = 0;
 	int co = 0, co_orig = 0;
-	int dam, scorch = 0, avgdmg = 0;
+	int dam, avgdmg = 0;
 	
 	power = get_skill_score(cn, SK_BLAST);
 	power = spell_multiplier(power, cn);
@@ -2578,13 +2581,6 @@ void skill_blast(int cn)
 		
 		dam = spell_immunity(power, get_target_immunity(co)) * 2;
 		
-		// Tarot Card - Judgement :: Weaken Blast's damage & inflict Scorch
-		if (get_tarot(cn, IT_CH_JUDGE))
-		{
-			dam = dam * 85/100;
-			scorch = 1;
-		}
-		
 		tmp = do_hurt(cn, co, dam, 1);
 		
 		if (tmp<1)
@@ -2602,10 +2598,7 @@ void skill_blast(int cn)
 		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
 		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 
-		if (scorch)
-		{
-			spell_scorch(cn, co, power, 0);
-		}
+		spell_scorch(cn, co, power, 0);
 		
 		co_orig = co;
 		count++;
@@ -2623,11 +2616,6 @@ void skill_blast(int cn)
 	else
 	{
 		surround_cast(cn, co_orig, SK_BLAST, power);
-	}
-	
-	if (get_tarot(cn, IT_CH_JUDGE))
-	{
-		do_char_log(cn, 1, "Your foes were scorched by your blast!\n");
 	}
 	
 	add_exhaust(cn, SK_EXH_BLAST);
@@ -3002,8 +2990,8 @@ void skill_ghost(int cn)
 		return;
 	}
 	
-	if (it[ch[cn].worn[WN_BODY]].temp==IT_TW_DREAD) dreadplate = 1;
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_NECR) necronomicon = 1;
+	if (get_gear(cn, IT_TW_DREAD)) dreadplate = 1;
+	if (get_book(cn, IT_BOOK_NECR)) necronomicon = 1;
 	
 	archgc 		= ch[cn].skill[SK_GCMASTERY][0];
 	if (archgc) 
@@ -3314,7 +3302,7 @@ void skill_shadow(int cn)
 	
 	if (ch[cn].flags & CF_PLAYER) { ch[cn].data[CHD_SHADOWCOPY] = cc; }
 	
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_BOOK_NECR) necronomicon = 1;
+	if (get_book(cn, IT_BOOK_NECR)) necronomicon = 1;
 	
 	// Mod determines how strong the copy is compared to you.
 	// The first 120 points reaches a perfect copy. Beyond 180 points the shadow becomes *stronger* than you.
@@ -3539,15 +3527,22 @@ void skill_shadow(int cn)
 
 int spell_bleed(int cn, int co, int power)
 {
-	int in;
+	int in, dur, bpow;
 	
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
 	power = spell_immunity(power, get_target_immunity(co));
 	
-	if (!(in = make_new_buff(cn, SK_BLEED, BUF_SPR_BLEED, power, SP_DUR_BLEED, 0)))
+	dur = SP_DUR_BLEED; 			// 10 seconds
+	
+	bpow = BLEEDFORM(power, dur);
+	
+	if (!(in = make_new_buff(cn, SK_BLEED, BUF_SPR_BLEED, power, dur, 0)))
 		return 0;
+	
+	// Set the decay rate of the bleed
+	bu[in].data[1] = bpow;
 	
 	if (add_spell(co, in))
 	{
@@ -3625,7 +3620,7 @@ void skill_cleave(int cn)
 
 		if (bleeding)
 		{
-			spell_bleed(cn, co, dam/2);
+			spell_bleed(cn, co, dam);
 		}
 		
 		co_orig = co;

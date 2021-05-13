@@ -8,22 +8,7 @@
 
 #include "server.h"
 
-/*
-   Definition for s_skilltab
-   struct s_skilltab
-   {
-        int nr;
-        char sortkey;
-        char name[40];
-        char desc[200];
-
-        int attrib[3];
-   };
- */
-
-/*
-	AT_BRV	AT_WIL	AT_INT	AT_AGL	AT_STR
-*/
+//		AT_BRV	AT_WIL	AT_INT	AT_AGL	AT_STR
 
 struct s_skilltab skilltab[MAXSKILL] = {
 //	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
@@ -83,57 +68,3 @@ struct s_skilltab skilltab[MAXSKILL] = {
 	{ 49, 'T', "Surround Rate", 	"Improves how often Surround Hit is triggered.", 				{ AT_BRV, AT_AGL, AT_STR }}
 //	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
 };
-
-
-/*
-	OLD skill list just in case...
-//
-struct s_skilltab skilltab[MAXSKILL] = {
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{  0, 'C', "Hand to Hand", 		"Fighting without weapons.", 							{ AT_BRV, AT_AGL, AT_STR }},
-	{  1, 'C', "Karate", 			"Fighting without weapons and doing damage.", 			{ AT_BRV, AT_AGL, AT_STR }},
-	{  2, 'C', "Dagger", 			"Fighting with daggers or similar weapons.", 			{ AT_BRV, AT_AGL, AT_INT }},
-	{  3, 'C', "Sword", 			"Fighting with swords or similar weapons.", 			{ AT_BRV, AT_AGL, AT_STR }},
-	{  4, 'C', "Axe", 				"Fighting with axes or similar weapons.",				{ AT_BRV, AT_STR, AT_STR }},
-	{  5, 'C', "Staff", 			"Fighting with staffs or similar weapons.",				{ AT_AGL, AT_STR, AT_STR }},
-	{  6, 'C', "Two-Handed", 		"Fighting with two-handed weapons.",					{ AT_AGL, AT_STR, AT_STR }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{  7, 'G', "Lock-Picking", 		"Opening doors without keys.",							{ AT_INT, AT_WIL, AT_AGL }},
-	{  8, 'G', "Stealth", 			"Moving without being seen or heard.",					{ AT_INT, AT_WIL, AT_AGL }},
-	{  9, 'G', "Perception", 		"Seeing and hearing.",									{ AT_INT, AT_WIL, AT_AGL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 10, 'M', "Swimming", 			"Moving through water without drowning.",				{ AT_INT, AT_WIL, AT_AGL }},
-	{ 11, 'R', "Magic Shield", 		"Spell: Create a magic shield.",						{ AT_BRV, AT_INT, AT_WIL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 12, 'G', "Bartering", 		"Getting good prices from merchants.",					{ AT_BRV, AT_INT, AT_WIL }},
-	{ 13, 'G', "Repair", 			"Repairing items.",										{ AT_INT, AT_WIL, AT_AGL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 14, 'R', "Light", 			"Spell: Create light.",									{ AT_BRV, AT_INT, AT_WIL }},
-	{ 15, 'R', "Recall", 			"Spell: Teleport to temple.",							{ AT_BRV, AT_INT, AT_WIL }},
-	{ 16, 'R', "Guardian Angel", 	"Spell: Teleport to temple if hp<15%%.",				{ AT_BRV, AT_INT, AT_WIL }},
-	{ 17, 'R', "Protection", 		"Spell: Enhance Armor of target.",						{ AT_BRV, AT_INT, AT_WIL }},
-	{ 18, 'R', "Enhance Weapon", 	"Spell: Enhance Weapon of target.",						{ AT_BRV, AT_INT, AT_WIL }},
-	{ 19, 'R', "Stun", 				"Spell: Make target motionless.",						{ AT_BRV, AT_INT, AT_WIL }},
-	{ 20, 'R', "Curse", 			"Spell: Decrease attributes of target.",				{ AT_BRV, AT_INT, AT_WIL }},
-	{ 21, 'R', "Bless", 			"Spell: Increase attributes of target.",				{ AT_BRV, AT_INT, AT_WIL }},
-	{ 22, 'R', "Identify", 			"Spell: Read stats of item/character.",					{ AT_BRV, AT_INT, AT_WIL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 23, 'G', "Resistance", 		"Resist against magic.",								{ AT_BRV, AT_WIL, AT_STR }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 24, 'R', "Blast", 			"Spell: Inflict injuries to target.",					{ AT_BRV, AT_INT, AT_WIL }},
-	{ 25, 'R', "Dispel Magic", 		"Spell: Removes all magic from target.",				{ AT_BRV, AT_INT, AT_WIL }},
-	{ 26, 'R', "Heal", 				"Spell: Heal injuries.",								{ AT_BRV, AT_INT, AT_WIL }},
-	{ 27, 'R', "Ghost Companion", 	"Spell: Create ghostly slave to assist you.",			{ AT_BRV, AT_INT, AT_WIL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 28, 'B', "Regenerate", 		"Regenerate Hitpoints faster.",							{ AT_STR, AT_STR, AT_STR }},
-	{ 29, 'B', "Rest", 				"Regenerate Endurance faster.",							{ AT_AGL, AT_AGL, AT_AGL }},
-	{ 30, 'B', "Meditate", 			"Regenerate Mana faster.",								{ AT_INT, AT_WIL, AT_WIL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-	{ 31, 'G', "Sense Magic", 		"Find out who casts what at you.",						{ AT_BRV, AT_INT, AT_WIL }},
-	{ 32, 'G', "Immunity", 			"Partial immunity against negative magic.",				{ AT_BRV, AT_AGL, AT_STR }},
-	{ 33, 'G', "Surround Hit", 		"Hit all your enemies at once.",						{ AT_BRV, AT_AGL, AT_STR }},
-	{ 34, 'G', "Concentrate", 		"Reduces mana cost for all spells.",					{ AT_WIL, AT_WIL, AT_WIL }},
-	{ 35, 'G', "Warcry", 			"Frighten all enemies in hearing distance.",			{ AT_BRV, AT_BRV, AT_STR }}
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",	{ //////, //////, ////// }}, //
-};
-*/

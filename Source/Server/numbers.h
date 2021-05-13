@@ -494,6 +494,7 @@
 #define BUF_SPR_GUARD		93
 #define BUF_SPR_RAZOR		93
 #define BUF_SPR_RAZOR2		93
+#define BUF_SPR_DOUSE		93
 
 // -----
 

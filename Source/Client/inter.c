@@ -369,23 +369,92 @@ void button_help(int nr)
 				xlog(1,"Right click on a skill/spell first to assign it to a button.");
 			break;
 
-		case 32: // Need to adjust these to reflect last_skill value from 50 to 54...
-			xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from weapon skill."); 
+		case 32:
+			if (last_skill==50)
+				xlog(1,"Cast Speed is the speed at which casting and action animations occur per second. This is increased by Braveness and other sources of Cast Speed."); 
+			else if (last_skill==51)
+				xlog(1,"Aptitude Bonus grants additional aptitude to target allies when casting friendly spells. This is granted by Willpower."); 
+			else if (last_skill==52)
+				xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed between active Skill and Spell use. This is granted by Intuition."); 
+			else if (last_skill==53)
+				xlog(1,"Attack speed is the speed at which melee attacks are performed. This is increased by Agility and other sources of Attack Speed."); 
+			else if (last_skill==54)
+				xlog(1,"DPH ranges from 1/4 of your Weapon Value, to 1/4 of (your Weapon Value, plus half Strength, plus 14) times your Crit Chance & Crit Multi."); 
+			else
+				xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from your Hit Score."); 
 			break;
 		case 33: 
-			xlog(1,"DPH ranges from 1/4 of (your Weapon Value), to 1/4 of (your Weapon Value, plus half strength, plus 14, times your average crit chance)."); 
+			if (last_skill==50)
+				xlog(1,"Crit Chance is the chance, out of 100.00, that you will inflict a melee critical hit."); 
+			else if (last_skill==51 && pl.skill[34][0])
+				xlog(1,"Cost multiplier of mana for spells, determined by your Concentrate skill."); 
+			else if (last_skill==52)
+				xlog(1,"Rate at which mana is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); 
+			else if (last_skill==53)
+				xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); 
+			else if (last_skill==54)
+				xlog(1,"Rate at which health is regenerated per second. This is improved by the Meditate skill, and can be further adjusted by various items."); 
+			else
+				xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); 
 			break;
 		case 34: 
-			xlog(1,"Attacks per second. This is determined by your Agility score and any increases to action speed."); 
+			if (last_skill==50)
+				xlog(1,"Crit Multi is the damage multiplier upon dealing a successful critical hit."); 
+			else if (last_skill==51 && pl.skill[27][0])
+				xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); 
+			else if (last_skill==52 && pl.skill[24][0])
+				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
+			else if (last_skill==53 && pl.skill[7][0])
+				xlog(1,"Damage granted by your Razor spell one second after hitting a target with melee damage."); 
+			else if (last_skill==54 && pl.skill[40][0])
+				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
+			else
+				xlog(1,"Your Parry Score is the value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill and other sources."); 
 			break;
 		case 35: 
-			xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed. Determined by your Intuition score."); 
+			if (last_skill==50)
+				xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); 
+			else if (last_skill==51 && pl.skill[42][0])
+				xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity. This can be stacked up to three times."); 
+			else if (last_skill==52 && pl.skill[24][0])
+				if (pl.worn[WN_FLAGS] & (1 <<  7))
+					xlog(1,"Effective Spell Modifier reduction granted by Douse, granted by your Blast spell."); 
+				else
+					xlog(1,"Effective damage taken multiplier granted by Scorch, granted by your Blast spell."); 
+			else if (last_skill==53 && pl.skill[49][0])
+				xlog(1,"Damage dealt by your Trice skill, before reduction from target Parry Score and Armor Value."); 
+			else if (last_skill==54 && pl.skill[48][0])
+				xlog(1,"Effective damage taken multiplier during the Guard status, granted by the Taunt skill."); 
+			else
+				xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed. Determined by your Intuition score."); 
 			break;
 		case 36: 
-			xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
+			if (last_skill==50)
+				xlog(1,"Estimated Resistance score. This displays your 'true' Resistance value after adjustments that do not display on the skill list."); 
+			else if (last_skill==51 && pl.skill[19][0])
+				xlog(1,"Effective reduction of target action speed when casting your Slow spell, before reduction from target Immunity."); 
+			else if (last_skill==52 && pl.skill[43][0])
+				xlog(1,"Damage dealt by the Pulse spell to surrounding targets when pulsing, before reduction from target Immunity and Armor Value."); 
+			else if (last_skill==53 && pl.skill[37][0])
+				xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); 
+			else if (last_skill==54 && pl.skill[41][0])
+				xlog(1,"Effective reduction of target Weapon and/or Armor Values when using your Weaken skill, before reduction from target Immunity."); 
+			else
+				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
 			break;
 		case 37: 
-			xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
+			if (last_skill==50 && pl.worn_p[WN_TOP]>0)
+				xlog(1,"Damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); 
+			else if (last_skill==51 && pl.skill[20][0])
+				xlog(1,"Effective reduction of target attributes when casting your Curse spell, before reduction from target Immunity."); 
+			else if (last_skill==52 && pl.skill[43][0])
+				xlog(1,"Number of pulses expected during the duration of your Pulse spell, determined by the rate of pulses from Cooldown Rate."); 
+			else if (last_skill==53)
+				xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); 
+			else if (last_skill==54 && pl.skill[35][0])
+				xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
+			else
+				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
 			break;
 
 		default: break;

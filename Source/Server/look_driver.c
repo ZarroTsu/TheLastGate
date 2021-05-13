@@ -165,7 +165,7 @@ void look_extra(int cn, int in)
 	// -------- BOOT  ITEMS --------
 	
 	case IT_BT_NATURES: 
-		do_char_log(cn, 3, "When equipped, grants improved regeneration rates while walking.\n");
+		do_char_log(cn, 3, "When equipped, grants unreduced regeneration rates while walking.\n");
 		break;
 		
 	// -------- AMMY  ITEMS --------
@@ -190,6 +190,9 @@ void look_extra(int cn, int in)
 		break;
 	case IT_AM_SEABREZ: 
 		do_char_log(cn, 3, "When equipped, penalizes rest, but greatly improves the effect of meditate.\n");
+		break;
+	case IT_AM_OBSIDI: 
+		do_char_log(cn, 3, "When equipped, increases the radius granted by Proximity by 1.\n");
 		break;
 
 	// -------- DRINK ITEMS --------
@@ -292,7 +295,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, replaces your Weaken skill with an increased cost and improved armor reduction, but does not reduce enemy Weapon Value.\n");
 		break;
 	case IT_CH_TEMPER: 
-		do_char_log(cn, 3, "When equipped, 20%% chance to avoid damage when hit, 20%% less Armor Value.\n");
+		do_char_log(cn, 3, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is doubled.\n");
 		break;
 	case IT_CH_DEVIL: 
 		do_char_log(cn, 3, "When equipped, half of all skill and spell costs are instead taken from your Hitpoints.\n");
@@ -310,7 +313,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n");
 		break;
 	case IT_CH_JUDGE: 
-		do_char_log(cn, 3, "When equipped, your Blast spell deals 15%% less damage, but inflicts a debuff which increases damage dealt to the target.\n");
+		do_char_log(cn, 3, "When equipped, your Blast spell no longer inflicts Scorch. It instead inflicts Douse, reducing your target's Spell Modifier for 20 seconds.\n");
 		break;
 	case IT_CH_WORLD: 
 		do_char_log(cn, 3, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");
@@ -348,7 +351,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, grants 10%% more Resistance and Immunity. Weapon value is reduced by 15%.\n");
 		break;
 	case IT_CH_WHEEL_R: 
-		do_char_log(cn, 3, "When equipped, grants 20% more armor value. 20%% chance to be hit when you would have parried.\n");
+		do_char_log(cn, 3, "When equipped, grants 15% more weapon and armor value. 20%% chance to be hit when you would have parried, and 20%% chance to miss when you would have hit.\n");
 		break;
 	case IT_CH_JUSTIC_R: 
 		do_char_log(cn, 3, "When equipped, Cleave deals 20%% more damage, but inflicts Bleeding on you for 10 seconds.\n");
@@ -360,7 +363,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, Weakens dealt and taken ignore 50%% of immunity.\n");
 		break;
 	case IT_CH_TEMPER_R: 
-		do_char_log(cn, 3, "When equipped, grants 20%% more weapon value. You have a 20%% chance to miss when you would have hit.\n");
+		do_char_log(cn, 3, "When equipped, your Taunt skill no longer Guards against damage. Instead, a portion of damage taken while Guarded is restored as endurance and mana.\n");
 		break;
 	case IT_CH_DEVIL_R: 
 		do_char_log(cn, 3, "When equipped, mana costs are reduced and taken from endurance. Endurance costs are increased and taken from mana.\n");
