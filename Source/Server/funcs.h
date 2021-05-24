@@ -256,6 +256,8 @@ void do_ransack_corpse(int cn, int co, char *msg);
 void remember_pvp(int cn, int co);
 void really_update_char(int cn);
 void do_appraisal(int cn, int in);
+void do_trash(int cn);
+void do_swap_gear(int cn);
 
 //-- use --
 void use_driver(int cn, int in, int worn);

@@ -30,6 +30,8 @@ int gui_inv_y[]		= {   5, 106 };
 int gui_equ_x[]		= { 738, 700, 738, 704, 738, 777, 738, 806, 670, 772, 776, 700, 801 };
 int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,  17 };
 
+int gui_equ_s[]		= { 670,   5 };
+
 // Back to the regular Borland defines
 extern int init_done;
 extern unsigned int inv_pos,skill_pos;
@@ -202,7 +204,7 @@ void button_command(int nr)
 	
 	keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
+	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
 
 	switch (nr) 
 	{
@@ -275,7 +277,14 @@ void button_command(int nr)
 		case 28: case 29: case 30: case 31: 
 			if ((sk=pdata.xbutton[nr-16].skill_nr)!=-1) 
 			{
-				cmd3(CL_CMD_SKILL,sk,selected_char,1);
+				if (sk < 50)
+				{
+					cmd3(CL_CMD_SKILL,sk,selected_char,1);
+				}
+				else if (sk >= 100)
+				{
+					cmd3(CL_CMD_INV,6,sk-100,selected_char);
+				}
             } 
 			else 
 				xlog(1,"This button is unassigned. Right click on a skill/spell, then right click on the button to assign it.");
@@ -288,6 +297,7 @@ void button_command(int nr)
 void button_help(int nr)
 {
 	char tmp;
+	char itm[8];
 	
 	switch (nr)
 	{
@@ -340,7 +350,7 @@ void button_help(int nr)
 		case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: 
 		case 28: case 29: case 30: case 31: 
-			if (last_skill > -1 && last_skill < 50) 
+			if (last_skill > -1 && (last_skill < 50 || last_skill > 54)) 
 			{
 				switch (nr)
 				{
@@ -351,18 +361,40 @@ void button_help(int nr)
 					default: tmp = '?'; break;
 				}
 				
-				if (skilltab[last_skill].nr==pdata.xbutton[nr-16].skill_nr) 
+				// Standard shortcut sets
+				if (last_skill < 50)
 				{
-					pdata.xbutton[nr-16].skill_nr=-1;
-					strcpy(pdata.xbutton[nr-16].name,"-");
-					xlog(1,"CTRL-%c, now unassigned.", tmp);
-				} 
-				else 
+					if (skilltab[last_skill].nr==pdata.xbutton[nr-16].skill_nr) 
+					{
+						pdata.xbutton[nr-16].skill_nr=-1;
+						strcpy(pdata.xbutton[nr-16].name,"-");
+						xlog(1,"CTRL-%c (or ALT-%c), now unassigned.", tmp, tmp);
+					} 
+					else 
+					{
+						pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
+						xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].name);
+						strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
+						pdata.xbutton[nr-16].name[7]=0;
+					}
+				}
+				// Inventory shortcuts
+				else if (last_skill >= 100)
 				{
-					pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
-					xlog(1,"CTRL-%c, now %s.", tmp, skilltab[last_skill].name);
-					strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
-					pdata.xbutton[nr-16].name[7]=0;
+					if (pdata.xbutton[nr-16].skill_nr==last_skill)
+					{
+						pdata.xbutton[nr-16].skill_nr=-1;
+						strcpy(pdata.xbutton[nr-16].name,"-");
+						xlog(1,"CTRL-%c (or ALT-%c), now unassigned.", tmp, tmp);
+					}
+					else
+					{
+						pdata.xbutton[nr-16].skill_nr=last_skill;
+						sprintf(itm,"Item %d",last_skill-100);
+						xlog(1,"CTRL-%c (or ALT-%c), now Item %d.", tmp, tmp, last_skill-100);
+						strncpy(pdata.xbutton[nr-16].name,itm,7);
+						pdata.xbutton[nr-16].name[7]=0;
+					}
 				}
 			}
 			else
@@ -405,7 +437,7 @@ void button_help(int nr)
 			else if (last_skill==52 && pl.skill[24][0])
 				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else if (last_skill==53 && pl.skill[7][0])
-				xlog(1,"Damage granted by your Razor spell one second after hitting a target with melee damage."); 
+				xlog(1,"Damage granted by your Razor spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
 			else if (last_skill==54 && pl.skill[40][0])
 				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else
@@ -505,6 +537,7 @@ int mouse_inventory(int x,int y,int mode)
 	keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
 	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
+	if (GetAsyncKeyState(VK_MENU)&0x8000) keys|=4;
 	
 	// money
 	if (x>gui_coin[0] && x<gui_coin[0]+34 && y>gui_coin[1] && y<gui_coin[1]+34) 
@@ -514,75 +547,6 @@ int mouse_inventory(int x,int y,int mode)
 		return 1;
 	}
 	
-	/*
-	if (y>gui_coin_y[0] && y<gui_coin_y[0]+28)
-	{
-		if (x>gui_coin_x[0] && x<gui_coin_x[0]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,1,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"1 silver coin.");
-			hightlight=HL_MONEY;
-			hightlight_sub=1;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-		if (x>gui_coin_x[1] && x<gui_coin_x[1]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,10,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"10 silver coins.");
-			hightlight=HL_MONEY;
-			hightlight_sub=2;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-		if (x>gui_coin_x[2] && x<gui_coin_x[2]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,100,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"1 gold coin.");
-			hightlight=HL_MONEY;
-			hightlight_sub=3;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-		if (x>gui_coin_x[3] && x<gui_coin_x[3]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,1000,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"10 gold coins.");
-			hightlight=HL_MONEY;
-			hightlight_sub=4;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-		if (x>gui_coin_x[4] && x<gui_coin_x[4]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,10000,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"100 gold coins.");
-			hightlight=HL_MONEY;
-			hightlight_sub=5;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-		if (x>gui_coin_x[5] && x<gui_coin_x[5]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,100000,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"1,000 gold coins.");
-			hightlight=HL_MONEY;
-			hightlight_sub=1;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-		if (x>gui_coin_x[6] && x<gui_coin_x[6]+28) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,1000000,selected_char);
-			if (mode==MS_RB_UP) xlog(1,"10,000 gold coins.");
-			hightlight=HL_MONEY;
-			hightlight_sub=2;
-			cursor_type=CT_TAKE;
-			return 1;
-		}
-	}
-	*/
- 	
 	// trashbin
 	if (x>gui_trash[0] && x<gui_trash[0]+34 && y>gui_trash[1] && y<gui_trash[1]+34) 
 	{
@@ -598,7 +562,43 @@ int mouse_inventory(int x,int y,int mode)
 		ty=(y-gui_inv_y[0])/34;
 
 		nr=tx+ty*10;
-		if (keys==1) 
+		if (keys>=2)
+		{
+			if (mode==MS_LB_UP)
+			{
+				// Push or pull item stacks
+				cmd3(CL_CMD_INV,3,nr+inv_pos,selected_char);
+			}
+			else if (mode==MS_RB_UP)
+			{
+				if (last_skill >= 50 && last_skill <= 54)
+				{
+					xlog(3,"Details panel now showing default.");
+				}
+				// Lock item where it is
+				cmd3(CL_CMD_INV,4,nr+inv_pos,selected_char);
+				if (last_skill == 100+nr+inv_pos)
+				{
+					last_skill = -1;
+					xlog(3,"Inventory slot %d no longer selected for shortcut.",nr+inv_pos);
+				}
+				else
+				{
+					last_skill = 100+nr+inv_pos;
+					xlog(3,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+inv_pos);
+				}
+			}
+			if (pl.item[nr+inv_pos]) 
+			{
+				if (pl.citem) cursor_type=CT_NONE;
+				else cursor_type=CT_TAKE;
+			} else 
+			{
+				if (pl.citem) cursor_type=CT_DROP;
+				else cursor_type=CT_NONE;
+			}
+		}
+		else if (keys==1) 
 		{
 			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,0,nr+inv_pos,selected_char);
 			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+inv_pos,0,selected_char);
@@ -625,7 +625,7 @@ int mouse_inventory(int x,int y,int mode)
 		hightlight_sub=nr+inv_pos;
 		return 1;
 	}
-
+	
 	// worn
 	for (n = 0; n < 13; n++)
 	{
@@ -649,6 +649,14 @@ int mouse_inventory(int x,int y,int mode)
 			hightlight_sub= n ;
 			return 1;
 		}
+	}
+	
+	// swap button
+	if (x>gui_equ_s[0] && x<gui_equ_s[0]+17 && y>gui_equ_s[1] && y<gui_equ_s[1]+17) 
+	{
+		if (mode==MS_LB_UP) cmd3(CL_CMD_INV,9,1,selected_char);
+		if (mode==MS_RB_UP) xlog(1,"Swap equipment with a stored alternate set.");
+		return 1;
 	}
 	
 	return 0;
@@ -820,7 +828,7 @@ int mouse_statbox(int x,int y,int state)
 
     keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
+	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
 
     if (state==MS_LB_UP) 
 	{
@@ -838,8 +846,10 @@ int mouse_statbox(int x,int y,int state)
 
 int mouse_statbox2(int x,int y,int state)
 {
-	int n;
+	int n, m;
     extern struct skilltab _skilltab[];
+	int pl_flags, pl_flagb;
+	char *tmp;
 
 	/*
 	if (screen_windowed == 1) {
@@ -865,7 +875,16 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most skills and spells. It also improves the speed of casting spells and using skills.",at_name[n]);
-			last_skill = 50;
+			if (last_skill == 50)
+			{
+				last_skill = -1;
+				xlog(3,"Details panel now showing default.");
+			}
+			else
+			{
+				last_skill = 50;
+				xlog(3,"Details panel now showing for %s.",at_name[n]);
+			}
 			return 1;
 		}
 		// Willpower
@@ -873,7 +892,16 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude.",at_name[n]);
-			last_skill = 51;
+			if (last_skill == 51)
+			{
+				last_skill = -1;
+				xlog(3,"Details panel now showing default.");
+			}
+			else
+			{
+				last_skill = 51;
+				xlog(3,"Details panel now showing for %s.",at_name[n]);
+			}
 			return 1;
 		}
 		// Intuition
@@ -881,7 +909,16 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
-			last_skill = 52;
+			if (last_skill == 52)
+			{
+				last_skill = -1;
+				xlog(3,"Details panel now showing default.");
+			}
+			else
+			{
+				last_skill = 52;
+				xlog(3,"Details panel now showing for %s.",at_name[n]);
+			}
 			return 1;
 		}
 		// Agility
@@ -889,7 +926,16 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
-			last_skill = 53;
+			if (last_skill == 53)
+			{
+				last_skill = -1;
+				xlog(3,"Details panel now showing default.");
+			}
+			else
+			{
+				last_skill = 53;
+				xlog(3,"Details panel now showing for %s.",at_name[n]);
+			}
 			return 1;
 		}
 		// Strength
@@ -897,10 +943,18 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
-			last_skill = 54;
+			if (last_skill == 54)
+			{
+				last_skill = -1;
+				xlog(3,"Details panel now showing default.");
+			}
+			else
+			{
+				last_skill = 54;
+				xlog(3,"Details panel now showing for %s.",at_name[n]);
+			}
 			return 1;
 		}
-
 	}
 	
 	if (x<gui_skl_names[RECT_X1]) return 0;
@@ -913,19 +967,61 @@ int mouse_statbox2(int x,int y,int state)
 	hightlight=HL_STATBOX2;
 	hightlight_sub=n;
 	
+	// Player Flags from special items
+	pl_flags = pl.worn[WN_FLAGS];
+	pl_flagb = pl.worn_p[WN_FLAGS];
+	
 	// Skills
 	if (state==MS_RB_UP) 
 	{
-		if (pl.skill[skilltab[n+skill_pos].nr][0]) 
+		m = skilltab[n+skill_pos].nr;
+		if (pl.skill[m][0]) 
 		{
-			xlog(1,skilltab[n+skill_pos].desc);
+			if (last_skill >= 50 && last_skill <= 54)
+			{
+				xlog(3,"Details panel now showing default.");
+			}
+			
+			if (m==11&&(pl_flagb & (1 << 10))) 			// Magic Shield -> Magic Shell
+			{
+				strcpy(tmp, "Magic Shell");
+				xlog(1,"Use: Applies a buff to yourself, granting temporary resistance and immunity.");
+			}
+			else if (m==19&&(pl_flags & (1 <<  5)))	// Slow -> Greater Slow
+			{
+				strcpy(tmp, "Greater Slow");
+				xlog(1,"Use: Applies a debuff, reducing your target's action speed.");
+			}
+			else if (m==20&&(pl_flags & (1 <<  6)))	// Curse -> Greater Curse
+			{
+				strcpy(tmp, "Greater Slow");
+				xlog(1,"Use: Applies a debuff, reducing your target's attributes.");
+			}
+			else if (m==26&&(pl_flags & (1 << 14)))	// Heal -> Regen
+			{
+				strcpy(tmp, "Regen");
+				xlog(1,"Use: Applies a buff, restoring your target's hitpoints over time.");
+			}
+			else if (m==41&&(pl_flags & (1 << 10)))	// Weaken -> Greater Weaken
+			{
+				strcpy(tmp, "Greater Weaken");
+				xlog(1,"Use: Greatly reduces your foe's armor value.");
+			}
+			else
+			{
+				strcpy(tmp, skilltab[n+skill_pos].name);
+				xlog(1,skilltab[n+skill_pos].desc);
+			}
+			
 			if (last_skill == n+skill_pos)
 			{
 				last_skill = -1;
+				xlog(3,"%s no longer selected for shortcut.",tmp);
 			}
 			else
 			{
 				last_skill = n+skill_pos;
+				xlog(3,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
 			}
 		}
 	} 

@@ -485,6 +485,8 @@ void sv_setchar_item(unsigned char *buf)
 	if (n<0 || n>39) xlog(0,"Invalid setchar item");
 	pl.item[n]=*(short int*)(buf+5);
 	pl.item_p[n]=*(short int*)(buf+7);
+	pl.item_s[n]=*(char*)(buf+9); // stack size
+	pl.item_l[n]=*(char*)(buf+10); // item lock
 
 //	xlog("SV SETCHAR ITEM (%d,%d,%d)",*(unsigned long*)(buf+1),*(short int*)(buf+5),*(short int*)(buf+7));
 }
@@ -497,7 +499,7 @@ void sv_setchar_worn(unsigned char *buf)
 	n=*(unsigned long*)(buf+1);
 	if (n<0 || n>19) xlog(0,"Invalid setchar worn");
 	pl.worn[n]=*(short int*)(buf+5);
-	pl.worn_p[n]=*(short int*)(buf+7);
+	pl.worn_p[n]=*(char*)(buf+7);
 }
 
 void sv_setchar_spell(unsigned char *buf)
@@ -517,6 +519,7 @@ void sv_setchar_obj(unsigned char *buf)
 
 	pl.citem=*(short int*)(buf+1);
 	pl.citem_p=*(short int*)(buf+3);
+	pl.citem_s=*(char*)(buf+5); // stack size
 
 //	xlog("SV SETCHAR OBJ (%d,%d)",*(short int*)(buf+1),*(short int*)(buf+3));
 }
@@ -933,10 +936,10 @@ int sv_cmd(unsigned char *buf)
 
 		case	SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
 		case	SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
-		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 9;
+		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
 		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 9;
 		case	SV_SETCHAR_SPELL:	sv_setchar_spell(buf); return 9;
-		case	SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 5;
+		case	SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 6;
 
 		case	SV_SETMAP3:		return sv_setmap3(buf,20);
 		case	SV_SETMAP4:		return sv_setmap3(buf,0);

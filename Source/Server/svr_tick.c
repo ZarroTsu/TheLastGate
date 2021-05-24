@@ -433,7 +433,7 @@ void plr_cmd_inv(int nr)
 		co = 0;
 	}
 
-	if (what==0)   // normal inventory
+	if (what==0) // 0 - Inventory management - swapping items with other item slots
 	{
 		if (n<0 || n>39)
 		{
@@ -446,12 +446,17 @@ void plr_cmd_inv(int nr)
 
 		tmp = ch[cn].item[n];
 
-		if (IS_SANEITEM(tmp) && it[tmp].temp == IT_LAGSCROLL)
+		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL || ch[cn].item_lock[n])) // Cannot pick up locked items
 		{
 			return;
 		}
+		else if (!IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Clean bad item lock if the item isn't valid
+		{
+			ch[cn].item_lock[n] = 0;
+		}
 
 		do_update_char(cn);
+		
 		if (ch[cn].citem & 0x80000000)
 		{
 			tmp = ch[cn].citem & 0x7fffffff;
@@ -477,7 +482,7 @@ void plr_cmd_inv(int nr)
 		ch[cn].citem = tmp;
 		return;
 	}
-	if (what==1)   // big inventory
+	if (what==1) // 1 - Swap held item with gear slot
 	{
 		if (ch[cn].stunned==1)
 		{
@@ -487,7 +492,7 @@ void plr_cmd_inv(int nr)
 		do_swap_item(cn, n);
 		return;
 	}
-	if (what==2)
+	if (what==2) // 2 - Grab money from purse via coin button(s)
 	{
 		if (ch[cn].stunned==1)
 		{
@@ -512,7 +517,110 @@ void plr_cmd_inv(int nr)
 		do_update_char(cn);
 		return;
 	}
-	if (what==5)
+	if (what==3) // 3 - Push or pull item stacks (CTRL+Left)
+	{
+		if (n<0 || n>39 || IS_BUILDING(cn))
+		{
+			return;                             // sanity check
+		}
+		if (ch[cn].stunned==1)
+		{
+			return;
+		}
+		
+		in  = ch[cn].item[n];
+		tmp = ch[cn].citem;
+		
+		// One of the items is not stackable, abort.
+		if (!(it[in].flags & IF_STACKABLE) || !(it[in].flags & IF_STACKABLE))
+		{
+			return;
+		}
+		
+		// Both items are sane and stackable, and both items are the same template
+		// In this instance we just subtract 1 from held item and add 1 to slot item
+		if (in && tmp && (it[in].flags & IF_STACKABLE) && it[in].temp == it[tmp].temp) 
+		{
+			// Sanity check
+			if (it[tmp].stack < 1) it[tmp].stack = 1;
+			if (it[in].stack < 1)  it[in].stack  = 1;
+			
+			if (it[tmp].stack > 1)
+			{
+				it[tmp].stack--;
+			}
+			else
+			{
+				god_take_from_char(tmp, cn);
+			}
+			it[in].stack++;
+		}
+		// Target slot is sane but held item is not - take from slot stack
+		else if (in && !tmp) 
+		{
+			if (IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Cannot pick up locked items
+			{
+				return;
+			}
+			if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
+			{
+				it[in].stack--;
+				tmp = ch[cn].citem = god_create_item(in, 0);
+				it[tmp].carried = cn;
+				it[tmp].stack = 1;
+			}
+			else
+			{
+				ch[cn].item[n] = tmp;
+				ch[cn].citem = in;
+			}
+		}
+		// Target slot is not valid but held item is - drop from held stack
+		else if (!in && tmp) 
+		{
+			if ((it[tmp].flags & IF_STACKABLE) && it[tmp].stack > 1)
+			{
+				it[tmp].stack--;
+				in = ch[cn].item[n] = god_create_item(tmp, 0);
+				it[in].carried = cn;
+				it[in].stack = 1;
+			}
+			else
+			{
+				ch[cn].citem = in;
+				ch[cn].item[n] = tmp;
+			}
+			ch[cn].item_lock[n] = 0;
+		}
+		do_update_char(cn);
+		return;
+	}
+	if (what==4) // 4 - Lock item in place in inventory so /sort doesn't move it (CTRL+Right)
+	{
+		if (n<0 || n>39 || IS_BUILDING(cn))
+		{
+			return;                             // sanity check
+		}
+		
+		if ((in = ch[cn].item[n])!=0)
+		{
+			if (ch[cn].item_lock[n])
+			{
+				ch[cn].item_lock[n] = 0;
+				do_char_log(cn, 1, "%s, now unlocked.\n", it[in].name);
+			}
+			else
+			{
+				ch[cn].item_lock[n] = 1;
+				do_char_log(cn, 1, "%s, now locked.\n", it[in].name);
+			}
+			
+			do_update_char(cn);
+		}
+		
+		return;
+	}
+	if (what==5) // 5 - Use a given gear piece while it is equipped, such as rings
 	{
 		if (n<0 || n>19 || IS_BUILDING(cn))
 		{
@@ -522,7 +630,7 @@ void plr_cmd_inv(int nr)
 		ch[cn].skill_target1 = co;
 		return;
 	}
-	if (what==6)
+	if (what==6) // 6 - Use an item in your inventory
 	{
 		if (n<0 || n>39 || IS_BUILDING(cn))
 		{
@@ -532,7 +640,7 @@ void plr_cmd_inv(int nr)
 		ch[cn].skill_target1 = co;
 		return;
 	}
-	if (what==7)
+	if (what==7) // 7 - Look at your equipment
 	{
 		if (n<0 || n>19 || IS_BUILDING(cn))
 		{
@@ -544,7 +652,7 @@ void plr_cmd_inv(int nr)
 		}
 		return;
 	}
-	if (what==8)
+	if (what==8) // 8 - Look at your items
 	{
 		if (n<0 || n>39 || IS_BUILDING(cn))
 		{
@@ -556,18 +664,21 @@ void plr_cmd_inv(int nr)
 		}
 		return;
 	}
-	if (what==9)
+	if (what==9) // 9 - Process special command.  0 = Trash,  1 = Swap
 	{
-		if (n<0 || n>39 || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
 		if (ch[cn].stunned==1)
 		{
 			return;
 		}
-		do_trash(cn);
-		do_update_char(cn);
+		if (n==0)
+		{
+			do_trash(cn);
+		}
+		if (n==1)
+		{
+			do_swap_gear(cn);
+		}
+		return;
 	}
 	plog(nr, "Unknown CMD-INV-what %d", what);
 }
@@ -2381,6 +2492,8 @@ void plr_change(int nr)
 							*(short int*)(buf + 5) = it[in].sprite[0];
 						}
 						*(short int*)(buf + 7) = it[in].placement;
+						*(char*)(buf + 9) = it[in].stack;
+						*(char*)(buf + 10) = ch[cn].item_lock[n];
 
 						it[in].flags &= ~IF_UPDATE;
 					}
@@ -2389,8 +2502,10 @@ void plr_change(int nr)
 				{
 					*(short int*)(buf + 5) = 0;
 					*(short int*)(buf + 7) = 0;
+					*(char*)(buf + 9) = 0;
+					*(char*)(buf + 10) = 0;
 				}
-				xsend(nr, buf, 9);
+				xsend(nr, buf, 11);
 
 				cpl->item[n] = in;
 
@@ -2441,15 +2556,16 @@ void plr_change(int nr)
 					if (get_tarot(cn, IT_CH_HANGED)) 	chFlags += (1 <<  2);
 					if (get_book(cn, IT_BOOK_PROD)) 	chFlags += (1 <<  3);
 					if (get_book(cn, IT_BOOK_VENO)) 	chFlags += (1 <<  4);
-					if (get_tarot(cn, IT_CH_EMPEROR)) 	chFlags += (1 <<  5);
-					if (get_tarot(cn, IT_CH_TOWER)) 	chFlags += (1 <<  6);
+					if (get_tarot(cn, IT_CH_EMPEROR)) 	chFlags += (1 <<  5); // Slow -> Slow 2
+					if (get_tarot(cn, IT_CH_TOWER)) 	chFlags += (1 <<  6); // Curse -> Curse 2
 					if (get_tarot(cn, IT_CH_JUDGE)) 	chFlags += (1 <<  7);
 					if (get_tarot(cn, IT_CH_JUSTICE)) 	chFlags += (1 <<  8);
 					if (get_tarot(cn, IT_CH_TEMPER)) 	chFlags += (1 <<  9);
-					if (get_tarot(cn, IT_CH_DEATH)) 	chFlags += (1 << 10);
+					if (get_tarot(cn, IT_CH_DEATH)) 	chFlags += (1 << 10); // Weaken -> Weaken 2
 					if (get_tarot(cn, IT_CH_MOON)) 		chFlags += (1 << 11);
 					if (get_tarot(cn, IT_CH_SUN)) 		chFlags += (1 << 12);
 					if (get_tarot(cn, IT_CH_WORLD)) 	chFlags += (1 << 13);
+					if (get_tarot(cn, IT_CH_STAR)) 		chFlags += (1 << 14); // Heal -> Regen
 					*(short int*)(buf + 5) = min(32767,chFlags); // max << 14
 					chFlags = 0;
 					if (get_neck(cn, IT_ANKHAMULET)) 	chFlags += (1 <<  0);
@@ -2462,6 +2578,7 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_AM_SEABREZ)) 	chFlags += (1 <<  7);
 					if (globs->fullmoon)				chFlags += (1 <<  8);
 					if (globs->newmoon)					chFlags += (1 <<  9);
+					if (get_tarot(cn, IT_CH_CHARIOT)) 	chFlags += (1 << 10); // Shield -> Shell
 					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
 				
@@ -2555,6 +2672,7 @@ void plr_change(int nr)
 					*(short int*)(buf + 1) = 37;
 				}
 				*(short int*)(buf + 3) = 0;
+				*(char*)(buf + 5) = 0;
 			}
 			else if (in)
 			{
@@ -2562,6 +2680,7 @@ void plr_change(int nr)
 				{
 					*(short int*)(buf + 1) = 46;
 					*(short int*)(buf + 3) = 0;
+					*(char*)(buf + 5) = 0;
 				}
 				else
 				{
@@ -2574,6 +2693,7 @@ void plr_change(int nr)
 						*(short int*)(buf + 1) = it[in].sprite[0];
 					}
 					*(short int*)(buf + 3) = it[in].placement;
+					*(char*)(buf + 5) = it[in].stack;
 
 					it[in].flags &= ~IF_UPDATE;
 				}
@@ -2582,8 +2702,9 @@ void plr_change(int nr)
 			{
 				*(short int*)(buf + 1) = 0;
 				*(short int*)(buf + 3) = 0;
+				*(char*)(buf + 5) = 0;
 			}
-			xsend(nr, buf, 5);
+			xsend(nr, buf, 6);
 
 			cpl->citem = in;
 		}
@@ -3895,6 +4016,7 @@ int check_valid(int cn)
 				xlog("Reset item %d (%s,%d) from char %d (%s)",
 				     in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].item[n] = 0;
+				ch[cn].item_lock[n] = 0;
 			}
 		}
 	}

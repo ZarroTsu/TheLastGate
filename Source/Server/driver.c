@@ -4459,6 +4459,7 @@ void update_shop(int cn)
 			{
 				it[in].used = USE_EMPTY;
 				ch[cn].item[n] = 0;
+				ch[cn].item_lock[n] = 0;
 			}
 			else
 			{

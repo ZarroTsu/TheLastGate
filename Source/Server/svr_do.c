@@ -903,6 +903,21 @@ void do_trash(int cn)
 	}
 }
 
+void do_swap_gear(int cn)
+{
+	int n, in;
+	
+	for (n=0; n<20; n++)
+	{
+		in = ch[cn].alt_worn[n];
+		ch[cn].alt_worn[n] = ch[cn].worn[n];
+		ch[cn].worn[n] = in;		
+	}
+	
+	do_char_log(cn, 1, "You swapped your worn gear set.\n");
+	do_update_char(cn);
+}
+
 void do_shout(int cn, char *text)
 {
 	char buf[256];
@@ -2671,6 +2686,12 @@ int qsort_proc(const void *a, const void *b)
 
 	in  = *((int*)a);
 	in2 = *((int*)b);
+	
+	// Locked items stay where they are
+	if ((it[in].flags & IF_ITEMLOCK) || (it[in2].flags & IF_ITEMLOCK))
+	{
+		return( 0);
+	}
 
 	if (!in && !in2)
 	{
@@ -2813,15 +2834,16 @@ void do_sort_depot(int cn, char *arg)
 	}
 
 	order = arg;
-
+	
 	qsort(ch[cn].depot, 62, sizeof(int), qsort_proc);
 
 	do_update_char(cn);
-
 }
 
 void do_sort(int cn, char *arg)
 {
+	int n;
+	
 	if (IS_BUILDING(cn))
 	{
 		do_char_log(cn, 1, "Not in build-mode, dude.");
@@ -2829,11 +2851,20 @@ void do_sort(int cn, char *arg)
 	}
 
 	order = arg;
-
+	
+	// Set temporary item locks before qsort, removing any invalid ones beforehand
+	for (n=0;n<40;n++) 
+	{
+		it[ch[cn].item[n]].flags &= ~IF_ITEMLOCK;
+		if (ch[cn].item_lock[n])
+		{
+			it[ch[cn].item[n]].flags |= IF_ITEMLOCK;
+		}
+	}
+	
 	qsort(ch[cn].item, 40, sizeof(int), qsort_proc);
 
 	do_update_char(cn);
-
 }
 
 void do_depot(int cn, char *topic)

@@ -90,6 +90,7 @@ int use_door(int cn, int in)
 				if (it[in].data[3] && (!it[in].active))
 				{
 					ch[cn].item[n] = 0;
+					ch[cn].item_lock[n] = 0;
 					it[in2].used = USE_EMPTY;
 					do_char_log(cn, 1, "The key vanished.\n");
 				}
@@ -360,6 +361,51 @@ int use_create_item3(int cn, int in)
 	chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
 
 	return(1);
+}
+
+// Stack cursor item onto target item
+void use_stack_items(int cn, int in)
+{
+	int in2, stack_a, stack_b;
+	
+	// Abort if no character (how did we get here??)
+	if (cn==0)
+	{
+		return;
+	}
+	
+	// Abort if there's no cursor item (how did we get here??)
+	if ((in2 = ch[cn].citem)==0)
+	{
+		return;
+	}
+	
+	// Make sure item is held by a char
+	if (it[in].carried==0)
+	{
+		do_char_log(cn, 0, "Too difficult to do on the ground.\n");
+		return;
+	}
+	
+	stack_a = it[in].stack;
+	if (stack_a <  1) stack_a =  1;
+	if (stack_a > 10) stack_a = 10;
+	
+	stack_b = it[in2].stack;
+	if (stack_b <  1) stack_b =  1;
+	if (stack_b > 10) stack_b = 10;
+	
+	// Clean stacking
+	if (stack_a + stack_b <= 10)
+	{
+		it[in].stack = stack_a + stack_b;
+		god_take_from_char(in2, cn);
+	}
+	else
+	{
+		it[in].stack = 10;
+		it[in2].stack = stack_a + stack_b - 10;
+	}
 }
 
 int use_mix_potion(int cn, int in)
@@ -807,6 +853,7 @@ void finish_laby_teleport(int cn, int nr, int exp)
 		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
@@ -838,7 +885,6 @@ void finish_laby_teleport(int cn, int nr, int exp)
 	ch[cn].temple_x = ch[cn].tavern_x = ch[cn].x;
 	ch[cn].temple_y = ch[cn].tavern_y = ch[cn].y;
 }
-
 
 int is_nolab_item(int in)
 {
@@ -887,6 +933,7 @@ int teleport(int cn, int in)
 		if ((in2 = ch[cn].item[n]) && is_nolab_item(in2))
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
@@ -984,6 +1031,7 @@ int use_labyrinth(int cn, int in)
 			if ((in2 = ch[cn].item[n]) && is_nolab_item(in2))
 			{
 				ch[cn].item[n] = 0;
+				ch[cn].item_lock[n] = 0;
 				it[in2].used = USE_EMPTY;
 				do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 			}
@@ -3544,6 +3592,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 		if ((in2 = ch[cn].item[n]) && is_nolab_item(in2))
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
@@ -3573,6 +3622,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
@@ -3833,6 +3883,7 @@ int use_seyan_portal(int cn, int in)
 		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
@@ -3856,12 +3907,43 @@ int use_seyan_portal(int cn, int in)
 
 int spell_scroll(int cn, int in)
 {
-	int spell, power, charges, ret, co;
+	int spell, power, charges, ret, co, value;
+	int in2, stack_a, stack_b;
 
 	spell = it[in].data[0];
 	power = it[in].data[1];
 	charges = it[in].data[2];
-
+	value = it[in].value / charges;
+	
+	// Stack scrolls
+	if ((in2 = ch[cn].citem)!=0 && it[in2].temp==it[in].temp)
+	{
+		stack_a = it[in].data[2];
+		if (stack_a <  1) stack_a =  1;
+		if (stack_a > 10) stack_a = 10;
+		
+		stack_b = it[in2].data[2];
+		if (stack_b <  1) stack_b =  1;
+		if (stack_b > 10) stack_b = 10;
+		
+		// Clean stacking
+		if (stack_a + stack_b <= 10)
+		{
+			charges = stack_a + stack_b;
+			god_take_from_char(in2, cn);
+		}
+		else
+		{
+			charges = 10;
+			it[in2].stack = it[in2].data[2] = stack_a + stack_b - 10;
+		}
+		
+		it[in].stack = it[in].data[2] = charges;
+		it[in].value = value * charges;
+		
+		return 0;
+	}
+	
 	if (!charges)
 	{
 		do_char_log(cn, 0, "Nothing happened!\n");
@@ -3944,8 +4026,8 @@ int spell_scroll(int cn, int in)
 	if (ret)
 	{
 		charges--;
-		it[in].data[2] = charges;
-		it[in].value /= 2;
+		it[in].stack = it[in].data[2] = charges;
+		it[in].value = value * charges;
 		if (charges<1)
 		{
 			return( 1);
@@ -4327,26 +4409,7 @@ int shrine_of_change(int cn, int in)
 		ch[cn].misc_action = DR_IDLE;
 		return(0);
 	}
-
-	/*
-	if (it[in2].temp==148)          // potion of life
-	{
-		if (ch[cn].kindred & KIN_TEMPLAR)
-		{
-			change_to_archtemplar(cn);
-		}
-		else if (ch[cn].kindred & KIN_HARAKIM)
-		{
-			change_to_archharakim(cn);
-		}
-		else
-		{
-			do_char_log(cn, 1, "You are neither Templar nor Harakim.\n");
-		}
-		return(0);
-	}
-	*/
-
+	
 	if (it[in2].temp==127 || it[in2].temp==274)     // greater healing potion
 	{
 		if (ch[cn].kindred & KIN_TEMPLAR)
@@ -4799,7 +4862,12 @@ void use_driver(int cn, int in, int carried)
 					ch[cn].cerrno = ERR_SUCCESS;
 				}
 			}
-			if (carried && (it[in].flags & IF_USEDESTROY))
+			// Item stacking - held items are stackable and the same template
+			if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp)
+			{
+				use_stack_items(cn, in);
+			}
+			else if (carried && (it[in].flags & IF_USEDESTROY))
 			{
 				int thousand = 1000;
 
@@ -4810,12 +4878,6 @@ void use_driver(int cn, int in, int carried)
 				}
 
 				chlog(cn, "Used %s", it[in].name);
-				
-				if (it[in].duration)
-				{
-					spell_from_item(cn, in);
-					do_update_char(cn);
-				}
 				
 				if (get_book(cn, IT_BOOK_ALCH)) // Book: Alchemy 101
 				{
@@ -4830,25 +4892,33 @@ void use_driver(int cn, int in, int carried)
 					ch[cn].a_end += RANDOM(61) * thousand;
 					ch[cn].a_mana += RANDOM(61) * thousand;
 				}
+				
+				// Immediate healing from item
 				ch[cn].a_hp += it[in].hp[0] * thousand;
-				if (ch[cn].a_hp<0)
-				{
-					ch[cn].a_hp = 0;
-				}
+				if (ch[cn].a_hp<0)	 ch[cn].a_hp = 0;
 				ch[cn].a_end += it[in].end[0] * thousand;
-				if (ch[cn].a_end<0)
-				{
-					ch[cn].a_end = 0;
-				}
+				if (ch[cn].a_end<0)	 ch[cn].a_end = 0;
 				ch[cn].a_mana += it[in].mana[0] * thousand;
-				if (ch[cn].a_mana<0)
+				if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
+				
+				// Active item effect
+				if (it[in].duration)
 				{
-					ch[cn].a_mana = 0;
+					spell_from_item(cn, in);
+					do_update_char(cn);
 				}
-
-				it[in].used = USE_EMPTY;
-				god_take_from_char(in, cn);
-
+				
+				// Reduce stack or destroy item
+				if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
+				{
+					it[in].stack--;
+				}
+				else
+				{
+					it[in].used = USE_EMPTY;
+					god_take_from_char(in, cn);
+				}
+				
 				if (ch[cn].a_hp<500)
 				{
 					do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "%s was killed by %s.\n",
@@ -5205,6 +5275,7 @@ void char_item_expire(int cn)
 					if (it[in].damage_state==5)
 					{
 						ch[cn].item[n] = 0;
+						ch[cn].item_lock[n] = 0;
 						it[in].used = USE_EMPTY;
 					}
 				}
@@ -6137,6 +6208,7 @@ int step_portal2_lab13(int cn, int in)
 		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==664)
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 		}
 	}
@@ -6171,6 +6243,7 @@ int step_portal_arena(int cn, int in)
 		{
 			flag = 1;
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in2].used = USE_EMPTY;
 		}
 	}

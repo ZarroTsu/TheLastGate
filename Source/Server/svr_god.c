@@ -247,6 +247,18 @@ int god_create_item(int temp, int godwep)
 
 	it[n] = it_temp[temp];
 	it[n].temp = temp;
+	
+	// Special case to set fresh stackable items to at least 1 stack
+	if (it[n].flags & IF_STACKABLE)
+	{
+		it[n].stack = 1;
+	}
+	
+	// Special case to set stacks for spell scrolls
+	if (it[n].driver==48)
+	{
+		it[n].stack = it[n].data[2];
+	}
 
 	prof_stop(23, prof);
 
@@ -875,9 +887,20 @@ int god_give_char(int in, int cn)
 	}
 	for (n = 0; n<40; n++)
 	{
+		// Find an empty inventory slot
 		if (!ch[cn].item[n])
 		{
 			break;
+		}
+		// Find a stackable item of the same template
+		else if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[ch[cn].item[n]].temp && it[ch[cn].item[n]].stack<10)
+		{
+			if (it[ch[cn].item[n]].stack<1)	it[ch[cn].item[n]].stack=1;
+			if (it[in].stack>1)
+				it[ch[cn].item[n]].stack+=it[in].stack;
+			else
+				it[ch[cn].item[n]].stack++;
+			return(1);
 		}
 	}
 	if (n==40)
@@ -916,6 +939,7 @@ int god_take_from_char(int in, int cn)
 		if (n<40)
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 		}
 		else
 		{
@@ -2172,6 +2196,7 @@ int god_build_start(int cn)
 		{
 			ch[co].item[n] = in;
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			it[in].carried = co;
 		}
 	}
@@ -2196,6 +2221,7 @@ void god_build_stop(int cn)
 	for (n = 0; n<40; n++)
 	{
 		ch[cn].item[n] = 0;
+		ch[cn].item_lock[n] = 0;
 	}
 	ch[cn].citem = 0;
 
@@ -3294,6 +3320,7 @@ void god_destroy_items(int cn)
 		if ((in = ch[cn].item[n])!=0)
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 			if (in>0 && in<MAXITEM)
 			{
 				it[in].used = USE_EMPTY;

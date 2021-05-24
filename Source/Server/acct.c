@@ -1171,6 +1171,7 @@ void view_character_player(LIST *head)
 		if (ch[cn].item[n]<0 || ch[cn].item[n]>=MAXITEM)
 		{
 			ch[cn].item[n] = 0;
+			ch[cn].item_lock[n] = 0;
 		}
 		printf("<tr><td>Item %d</td><td><input type=text name=item%d value=\"%d\" size=10 maxlength=10> (%s)</td></tr>\n",
 				n, n, ch[cn].item[n], ch[cn].item[n] ? it[ch[cn].item[n]].name : "none");

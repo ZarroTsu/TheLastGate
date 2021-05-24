@@ -9,7 +9,7 @@
 	#define MHOST		"99.233.143.153"
 #endif
 
-#define MHELP			"https://github.com/dylanyaga/openMerc/"
+#define MHELP			"https://github.com/ZarroTsu/TheLastGate"
 #define MNEWS			"https://discord.gg/jJbPv2R"
 
 //#define DOCONVERT	// enable sprite packer
@@ -175,7 +175,8 @@ struct cplayer {
 	// items carried
 	int item[40];
 	int item_p[40];
-	int item_s[40];  // Stack size of given item
+	char item_s[40];  // Stack size of given item (0 - 10)
+	char item_l[40];  // Whether or not the given item is locked
 
 	// items worn
 	int worn[20];
@@ -188,7 +189,8 @@ struct cplayer {
 	int armor;
 	int weapon;
 
-	int citem,citem_p;
+	int citem, citem_p;
+	char citem_s;  // Stack size of given item (0 - 10)
 
 	int attack_cn;
 	int goto_x,goto_y;

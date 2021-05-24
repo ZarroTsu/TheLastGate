@@ -198,7 +198,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 
 	keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
+	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
 
 	switch (message) {
 		case WM_SYSKEYDOWN:

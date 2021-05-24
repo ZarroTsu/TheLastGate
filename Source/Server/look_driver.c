@@ -265,7 +265,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, Magic Shield will instead be cast on your Ghost Companion when cast by or on you.\n");
 		break;
 	case IT_CH_EMPEROR: 
-		do_char_log(cn, 3, "When equipped, replaces your Slow spell with a reduced cost and effectiveness, but it no longer decays and has increased duration.\n");
+		do_char_log(cn, 3, "When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n");
 		break;
 	case IT_CH_HEIROPH: 
 		do_char_log(cn, 3, "When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n");
@@ -274,7 +274,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n");
 		break;
 	case IT_CH_CHARIOT: 
-		do_char_log(cn, 3, "When equipped, replaces your Magic Shield with a version which instead grants a temporary Resistance and Immunity effect.\n");
+		do_char_log(cn, 3, "When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n");
 		break;
 	case IT_CH_STRENGTH: 
 		do_char_log(cn, 3, "When equipped, reduces your action speed by 20%%, but grants 25%% more damage with melee attacks.\n");
@@ -292,7 +292,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, 30%% of Resistance is instead used to reduce the strength of incoming enemy spells.\n");
 		break;
 	case IT_CH_DEATH: 
-		do_char_log(cn, 3, "When equipped, replaces your Weaken skill with an increased cost and improved armor reduction, but does not reduce enemy Weapon Value.\n");
+		do_char_log(cn, 3, "When equipped, your Weaken skill is replaced with Greater Weaken. Greater Weaken improves armor reduction, no longer reduces enemy Weapon Value.\n");
 		break;
 	case IT_CH_TEMPER: 
 		do_char_log(cn, 3, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is doubled.\n");
@@ -301,10 +301,10 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, half of all skill and spell costs are instead taken from your Hitpoints.\n");
 		break;
 	case IT_CH_TOWER: 
-		do_char_log(cn, 3, "When equipped, replaces your Curse spell with an increased cost and effectiveness, but it decays and has reduced duration.\n");
+		do_char_log(cn, 3, "When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n");
 		break;
 	case IT_CH_STAR: 
-		do_char_log(cn, 3, "When equipped, replaces your Heal spell with a buff which regenerates the target's Hitpoints over 15 seconds.\n");
+		do_char_log(cn, 3, "When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 15 seconds.\n");
 		break;
 	case IT_CH_MOON: 
 		do_char_log(cn, 3, "When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n");

@@ -543,8 +543,10 @@ struct character
 	int unreach, unreachx, unreachy;
 
 	int class;                      // monster class
-
-	char future3[48];
+	
+	char item_lock[40];				// Used for locking items on the client so /sort ignores them
+	
+	char future3[8];
 
 	time_t logout_date;
 
@@ -605,6 +607,8 @@ __attribute__ ((packed));
 #define IF_WP_CLAW       (1ull<<44)     // is a weapon - claw/unarmed
 #define IF_BOOK          (1ull<<45)     // is a book
 #define IF_JEWELERY      (1ull<<46)     // is an accessory
+#define IF_ITEMLOCK      (1ull<<47)     // locked by client - ignore in sort
+#define IF_STACKABLE     (1ull<<48)     // item can be stacked
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -741,8 +745,13 @@ struct s_skilltab
 {
 	int nr;
 	char sortkey;
+	
 	char name[40];
 	char desc[200];
+	
+	char alt_a[200]; // If something changes the name
+	char alt_b[200]; // If something changes the desc
+	char alt_c[200]; // Extra slot for proximity desc
 
 	int attrib[3];
 };

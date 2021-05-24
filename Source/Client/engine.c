@@ -833,6 +833,7 @@ void eng_display_win(int plr_sprite,int init)
 {
 	int y,n,m;
 	char *tmp,buf[50];
+	int pl_flags, pl_flagb;
 
 	//if (load) dd_xputtext(670,300+MAXTS,1,"%3d%%",load);
 
@@ -852,11 +853,30 @@ void eng_display_win(int plr_sprite,int init)
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
+			// Draw inventory items
 			if (pl.item[n+inv_pos]) {
 				if (hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos)
 					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
 				else
 					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
+				// Draw stack count 
+				if (pl.item_s[n+inv_pos]>0)
+				{
+					copyspritex(4000+pl.item_s[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
+				}
+				// Draw lock icon for locked items
+				if (pl.item_l[n+inv_pos])
+				{
+					copyspritex(4000,261+(n%10)*34,6+(n/10)*34,0);
+				}
+			}
+			// Draw shortcut key names
+			for (m=0; m<16; m++)
+			{
+				if (pdata.xbutton[m].skill_nr>=100)
+				{
+					copyspritex(4010+m,261+(n%10)*34,6+(n/10)*34,0);
+				}
 			}
 		}
 
@@ -943,7 +963,11 @@ void eng_display_win(int plr_sprite,int init)
 			dd_putc(177,8+6*14,1,'-');
 		if (mana_needed(pl.mana[0]+stat_raised[7])!=HIGH_VAL) 
 			dd_xputtext(189,8+6*14,1,"%7d",mana_needed(pl.mana[0]+stat_raised[7]));
-
+		
+		// Player Flags from special items
+		pl_flags = pl.worn[WN_FLAGS];
+		pl_flagb = pl.worn_p[WN_FLAGS];
+		
 		for (n=0; n<10; n++) {
 			m=skilltab[n+skill_pos].nr;
 			if (!pl.skill[m][0]) {
@@ -956,7 +980,18 @@ void eng_display_win(int plr_sprite,int init)
 					dd_xputtext(9,(8+8*14)+n*14,1,"-");
 				continue;
 			}
-			dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
+			if (m==11&&(pl_flagb & (1 << 10))) 			// Magic Shield -> Magic Shell
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Magic Shell");
+			else if (m==19&&(pl_flags & (1 <<  5)))	// Slow -> Greater Slow
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Greater Slow");
+			else if (m==20&&(pl_flags & (1 <<  6)))	// Curse -> Greater Curse
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Greater Curse");
+			else if (m==26&&(pl_flags & (1 << 14)))	// Heal -> Regen
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Regen");
+			else if (m==41&&(pl_flags & (1 << 10)))	// Weaken -> Greater Weaken
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Greater Weaken");
+			else
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
 			if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
 			dd_xputtext(140,(8+8*14)+n*14,1,"%3d",pl.skill[m][5]+stat_raised[n+8+skill_pos]);
 			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 

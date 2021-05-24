@@ -189,37 +189,42 @@ extern struct look shop;
 extern unsigned int show_shop;
 
 #define HL_BUTTONBOX	1
-#define HL_STATBOX	2
-#define HL_BACKPACK	3
+#define HL_STATBOX		2
+#define HL_BACKPACK		3
 #define HL_EQUIPMENT	4
-#define HL_SPELLBOX	5
+#define HL_SPELLBOX		5
 #define HL_CITEM		6
 #define HL_MONEY		7
 #define HL_MAP			8
-#define HL_SHOP		9
-#define HL_STATBOX2	10
+#define HL_SHOP			9
+#define HL_STATBOX2		10
 
 extern int hightlight;
 extern int hightlight_sub;
 
-#define CT_NONE		1
-#define CT_TAKE		2
-#define CT_DROP		3
+#define CT_NONE			1
+#define CT_TAKE			2
+#define CT_DROP			3
 #define CT_USE			4
-#define CT_GIVE		5
-#define CT_WALK		6
+#define CT_GIVE			5
+#define CT_WALK			6
 #define CT_HIT			7
-#define CT_SWAP		8
+#define CT_SWAP			8
 #define CT_SEL			9
 
 struct skilltab
 {
-		int nr;
-		  char sortkey;
-		  char name[40];
-		  char desc[200];
-
-		  int attrib[3];
+	int nr;
+	char sortkey;
+	
+	char name[40];
+	char desc[200];
+	
+	char alt_a[200]; // If something changes the name
+	char alt_b[200]; // If something changes the desc
+	char alt_c[200]; // Extra slot for proximity desc
+	
+	int attrib[3];
 };
 
 extern struct skilltab *skilltab;
