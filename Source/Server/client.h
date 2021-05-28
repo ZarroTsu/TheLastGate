@@ -160,6 +160,8 @@ struct cplayer
 #define CL_CMD_UNIQUE    32
 #define CL_PASSWD        33
 
+#define CL_CMD_WPS       35
+
 #define CL_CMD_CTICK 255
 
 // server message types (unsigned char):
@@ -237,6 +239,8 @@ struct cplayer
 #define SV_SETCHAR_DIR   71
 #define SV_UNIQUE        72
 #define SV_IGNORE        73
+
+#define SV_WAYPOINTS     74
 
 #define SV_SETMAP 128                   // 128-255 are used !!!
 

@@ -229,6 +229,7 @@ void do_notify_char(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_area_notify(int cn, int co, int xs, int ys, int type, int dat1, int dat2, int dat3, int dat4);
 void do_npc_shout(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_shop_char(int cn, int co, int nr);
+void do_waypoint(int cn, int n);
 void do_give_exp(int cn, int p, int gflag, int rank);
 void do_lucksave(int co, char *deathtype);
 int do_hurt(int cn, int co, int dam, int type);

@@ -488,13 +488,18 @@
 #define BUF_SPR_HEATSTR		419
 #define BUF_SPR_FIRE		487
 //
-#define BUF_SPR_BLIND		93
-#define BUF_SPR_PULSE		93
-#define BUF_SPR_TAUNT		93
-#define BUF_SPR_GUARD		93
-#define BUF_SPR_RAZOR		93
-#define BUF_SPR_RAZOR2		93
-#define BUF_SPR_DOUSE		93
+#define BUF_SPR_BLIND		338
+#define BUF_SPR_PULSE		485
+#define BUF_SPR_TAUNT		489
+#define BUF_SPR_GUARD		518
+#define BUF_SPR_RAZOR		519
+#define BUF_SPR_RAZOR2		617
+#define BUF_SPR_DOUSE		618
+//
+#define BUF_SPR_POTION		619
+#define BUF_SPR_POME		790
+#define BUF_SPR_STARL		890
+#define BUF_SPR_FROSTB		471
 
 // -----
 

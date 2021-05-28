@@ -290,6 +290,37 @@ struct area area[] = {
 	{ 301,   21,  371,   91, "Random Dungeon III",             1}
 };
 
+struct waypoint
+{
+	int x, y;
+	char *name;
+	char *desc;
+};
+
+struct waypoint waypoint[MAXWPS] = {
+//    _x_, _y_, "123456789012345678901234567890", 	"..."
+	{ 777, 265, "Lynbore, Tavern", 					"outside the Bluebird Tavern in Lynbore" },
+	{ 739, 393, "Lynbore, East", 					"the beginning of the Weeping Woods, east of Lynbore" },
+	{ 656, 472, "Aston, South", 					"the end of the Weeping Woods, south of Aston" },
+	{ 548, 491, "Aston, Crossroads", 				"the crossroads in the middle of Aston" },
+	{ 550, 399, "Aston, West", 						"the entrance to the Strange Forest, west of Aston" },
+	{ 550, 606, "Aston, East", 						"the entrance to the Autumn Meadow, east of Aston" },
+	{ 686, 517, "Forgotten Canyon", 				"the entrance to the Forgotten Canyon" },
+	{ 357, 714, "Lizard Temple, North", 			"the entrance to the Beryl Jungle, north of the Lizard Temple" },
+	{ 651, 734, "Temple of Osiris", 				"the Temple of Osiris" },
+	{ 512, 512, "Neiseer, West", 					"the entrance to the Basalt Desert, west of Neiseer" },
+	{ 512, 512, "Neiseer", 							"the middle of Neiseer" },
+	{ 512, 512, "Neiseer, North", 					"the entrance to the Burning Plains, north of Neiseer" },
+	{ 785, 106, "Mausoleum, Basement", 				"the basement of the Mausoleum" },
+	{ 661, 347, "Pentagram Quest, Novice", 			"the beginning of the Novice Pentagram Quest" },
+	{ 438, 448, "Pentagram Quest, Earth", 			"the beginning of the Earth Pentagram Quest" },
+	{ 310, 441, "Pentagram Quest, Fire", 			"the beginning of the Fire Pentagram Quest" },
+	{ 303, 377, "Pentagram Quest, Jungle", 			"the beginning of the Jungle Pentagram Quest" },
+	{ 220, 441, "Pentagram Quest, Ice", 			"the beginning of the Ice Pentagram Quest" },
+	{ 265, 235, "Pentagram Quest, Underwater", 		"the beginning of the Underwater Pentagram Quest" },
+	{ 355, 235, "Pentagram Quest, Onyx", 			"the beginning of the Onyx Pentagram Quest" }
+};
+
 // return a description of the area character cn is in
 char *get_area(int cn, int verbose)
 {

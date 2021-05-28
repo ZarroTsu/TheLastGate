@@ -126,6 +126,31 @@ struct skilltab _skilltab[50]={
 //	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
 };
 
+struct wpslist wpslist[MAXWPS]={
+//    nr, "123456789012345678901234567890",	"\"2345678901234567890123456789\""
+	{  0, "Lynbore, Tavern", 				"\"Humble beginnings.\"" },
+	{  1, "Lynbore, East", 					"\"Ghosts and spiders duel.\"" },
+	{  2, "Aston, South", 					"\"The Weeping Woods.\"" },
+	{  3, "Aston, Crossroads", 				"\"Between ivory and violet.\"" },
+	{  4, "Aston, West", 					"\"The Strange Forest.\"" },
+	{  5, "Aston, East", 					"\"The Autumn Meadow.\"" },
+	{  6, "Forgotten Canyon", 				"\"Old secrets echo.\"" },
+	{  7, "Lizard Temple, North", 			"\"The Beryl Jungle.\"" },
+	{  8, "Temple of Osiris", 				"\"Gods toy with greed.\"" },
+	{  9, "Neiseer, West", 					"\"The Basalt Desert.\"" },
+	{ 10, "Neiseer", 						"\"Twilit stars sing sweetly.\"" },
+	{ 11, "Neiseer, North", 				"\"The Burning Plains.\"" },
+	{ 12, "Mausoleum, Basement", 			"\"An accursed tomb.\"" },
+	{ 13, "Pentagram Quest, Novice", 		"\"Endless adventure begins.\"" },
+	{ 14, "Pentagram Quest, Earth", 		"\"Smells of dirt and soot.\"" },
+	{ 15, "Pentagram Quest, Fire", 			"\"Boiling and burning.\"" },
+	{ 16, "Pentagram Quest, Jungle", 		"\"A verdant expanse.\"" },
+	{ 17, "Pentagram Quest, Ice", 			"\"Frozen still for eternity.\"" },
+	{ 18, "Pentagram Quest, Underwater",	"\"Embrace foul waters.\"" },
+	{ 19, "Pentagram Quest, Onyx", 			"\"Depths known only by fear.\"" }
+//    nr, "123456789012345678901234567890",	"123456789012345678901234567890"
+};
+
 int skill_cmp(const void *a,const void *b)
 {
 	const struct skilltab *c,*d;
@@ -202,7 +227,7 @@ static int rank_sprite[25]={
 	   15,    16,    17,    18,    19, 
 	   20,    21,    22,    23,    24, 
 	   25,    26,    27,    28,    29,
-	   30,    30,    30,    30,    30
+	   30,     6,     7,     8,     9
 };
 
 int stat_raised[108]={0,0,0,0,0,0,0,0,0,0,0,0,0,};
@@ -343,10 +368,9 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int    inv_pos=0,			// scrolling position of small inventory
-show_shop=0;
+unsigned int    inv_pos=0,show_shop=0,waypoints=0,show_wps=0;
 
-unsigned int    skill_pos=0;
+unsigned int    skill_pos=0,wps_pos=0;
 
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
@@ -873,9 +897,9 @@ void eng_display_win(int plr_sprite,int init)
 			// Draw shortcut key names
 			for (m=0; m<16; m++)
 			{
-				if (pdata.xbutton[m].skill_nr>=100)
+				if (pdata.xbutton[m].skill_nr==100+n+inv_pos)
 				{
-					copyspritex(4010+m,261+(n%10)*34,6+(n/10)*34,0);
+					copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
 				}
 			}
 		}
@@ -1016,8 +1040,13 @@ void eng_display_win(int plr_sprite,int init)
 	{
 		n=0;
 	}
-	dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_BLU);
-	dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,n,          6,(unsigned short)GUI_BAR_EXP);
+	if (points2rank(pl.points_tot)==24)
+		dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_EXP);
+	else
+	{
+		dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_BLU);
+		dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,n,          6,(unsigned short)GUI_BAR_EXP);
+	}
 	//
 
 	// logtext
@@ -1038,7 +1067,7 @@ void eng_display_win(int plr_sprite,int init)
 	dd_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
 
 	if (init) {
-		if (show_shop) show_look=0;
+		if (show_shop || show_wps) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -1159,24 +1188,57 @@ void eng_display_win(int plr_sprite,int init)
 
 		if (show_shop) 
 		{
-			copyspritex(92,GUI_SHOP_X,GUI_SHOP_Y,0);
+			copyspritex(92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (n=0; n<62; n++) {
 				if (!shop.item[n]) continue;
 				if (hightlight==HL_SHOP && hightlight_sub==n) 
 				{
 					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
 					if (shop.price[n]) 
-						dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Sell: %dG %dS",shop.price[n]/100,shop.price[n]%100);
+					{
+						if (show_shop==1)
+							dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Sell: %dG %dS",shop.price[n]/100,shop.price[n]%100);
+					}
 				} 
 				else copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
 			}
 			if (pl.citem && shop.pl_price)
-				dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Buy:  %dG %dS",shop.pl_price/100,shop.pl_price%100);
+			{
+				if (show_shop==1)
+					dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Buy:  %dG %dS",shop.pl_price/100,shop.pl_price%100);
+				if (show_shop==2) // Black Stronghold
+					dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Buy:  %d Points",shop.pl_price);
+			}
 
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
 			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
 			dd_xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
 			dd_xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
+		}
+		
+		if (show_wps)
+		{
+			copyspritex(5,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			//wps_pos
+			for (n=0; n<8; n++) {
+				m=n+wps_pos;
+				if (hightlight==HL_WAYPOINT && hightlight_sub==n)
+					copyspritex((waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
+				else
+					copyspritex((waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
+				if (waypoints&(1<<m))
+				{
+					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,wpslist[m].name);
+					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,wpslist[m].desc);
+				}
+				else
+				{
+					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,"Unknown Location");
+					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,"\"???\"");
+				}
+			}
+			// Scroll bar
+			dd_showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(wps_pos*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
 		}
 	}
 }
@@ -1465,7 +1527,13 @@ void eng_display(int init)	// optimize me!!!!!
 					set_look_proz(map[m].ch_nr,map[m].ch_id,map[m].ch_proz);
 					if (map[m].ch_fontcolor>=0 && map[m].ch_fontcolor<=3)
 					{
-						txtclr = map[m].ch_fontcolor;
+						// Colors 1 and 0 are flip-flopped in case the color can't be pulled from the server.
+						if (map[m].ch_fontcolor==0)
+							txtclr = 1;
+						else if (map[m].ch_fontcolor==1)
+							txtclr = 0;
+						else
+							txtclr = map[m].ch_fontcolor;
 					}
 					dd_gputtext(x*32,y*32,txtclr,lookup(map[m].ch_nr,map[m].ch_id),xoff+map[m].obj_xoff,yoff+map[m].obj_yoff-8);
 				}
@@ -2912,7 +2980,7 @@ void engine(void)
 		if (look_timer)	look_timer--;
 		else show_look=0;
 
-		if (show_shop && lookstep>QSIZE) {
+		if ((show_shop||show_wps) && lookstep>QSIZE) {
 			cmd1s(CL_CMD_LOOK,shop.nr);
 			lookstep=0;
 		}
@@ -2951,6 +3019,7 @@ void engine(void)
 		if (noshop>0) {
 			noshop--;
 			show_shop=0;
+			show_wps=0;
 		}
 		if (t>GetTickCount() || skipinrow>100) {	// display frame only if we've got enough time
 			eng_display(init);

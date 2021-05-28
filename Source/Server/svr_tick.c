@@ -421,7 +421,7 @@ void plr_cmd_turn(int nr)
 // inventory manipulation... moves citem from/to item or worn - will be done at once
 void plr_cmd_inv(int nr)
 {
-	int what, n, tmp, cn, in, co;
+	int what, n, tmp, tmpv, cn, in, co;
 
 	cn = player[nr].usnr;
 
@@ -547,13 +547,17 @@ void plr_cmd_inv(int nr)
 			
 			if (it[tmp].stack > 1)
 			{
+				tmpv = it[tmp].value / it[tmp].stack;
 				it[tmp].stack--;
+				it[tmp].value = tmpv * it[tmp].stack;
 			}
 			else
 			{
 				god_take_from_char(tmp, cn);
 			}
+			tmpv = it[in].value / it[in].stack;
 			it[in].stack++;
+			it[in].value = tmpv * it[in].stack;
 		}
 		// Target slot is sane but held item is not - take from slot stack
 		else if (in && !tmp) 
@@ -564,10 +568,13 @@ void plr_cmd_inv(int nr)
 			}
 			if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
 			{
+				tmpv = it[in].value / it[in].stack;
 				it[in].stack--;
+				it[in].value = tmpv * it[in].stack;
 				tmp = ch[cn].citem = god_create_item(in, 0);
 				it[tmp].carried = cn;
 				it[tmp].stack = 1;
+				it[tmp].value = tmpv;
 			}
 			else
 			{
@@ -580,10 +587,13 @@ void plr_cmd_inv(int nr)
 		{
 			if ((it[tmp].flags & IF_STACKABLE) && it[tmp].stack > 1)
 			{
+				tmpv = it[tmp].value / it[tmp].stack;
 				it[tmp].stack--;
+				it[tmp].value = tmpv * it[tmp].stack;
 				in = ch[cn].item[n] = god_create_item(tmp, 0);
 				it[in].carried = cn;
 				it[in].stack = 1;
+				it[in].value = tmpv;
 			}
 			else
 			{
@@ -919,6 +929,17 @@ void plr_cmd_shop(int nr)
 	{
 		do_shop_char(cn, co, n);
 	}
+}
+
+void plr_cmd_wps(int nr)
+{
+	int cn, n;
+
+	n = *(unsigned short*)(player[nr].inbuf + 1);
+
+	cn = player[nr].usnr;
+
+	do_waypoint(cn, n);
 }
 
 void plr_cmd_look_item(int nr)
@@ -1503,6 +1524,9 @@ void plr_cmd(int nr)
 
 	case CL_CMD_SHOP:
 		plr_cmd_shop(nr);
+		break;
+	case CL_CMD_WPS:
+		plr_cmd_wps(nr);
 		break;
 	default:
 		plog(nr, "Unknown CL: %d", player[nr].inbuf[0]);
@@ -3486,12 +3510,12 @@ void plr_getmap_complete(int nr)
 				if (ch[co].flags & CF_EXTRAEXP)
 				{
 					// Inform the client this is a 'special' enemy by turning their font red
-					smap[n].ch_fontcolor = 0;
+					smap[n].ch_fontcolor = 1;
 				}
 				else
 				{
 					// Otherwise just display normal yellow font
-					smap[n].ch_fontcolor = 1;
+					smap[n].ch_fontcolor = 0;
 				}
 				//
 				smap[n].flags |= ISCHAR;
@@ -4086,7 +4110,11 @@ int check_valid(int cn)
 
 void check_expire(int cn)
 {
-	int erase = 0, t, month = 60*60*24*30, week = 60*60*24*7, day = 60*60*24;
+	int erase = 0, t, year, week, day;
+	
+	day   = 60*60*24;
+	week  = day*7;
+	year  = day*365;
 
 	t = time(NULL);
 
@@ -4094,36 +4122,36 @@ void check_expire(int cn)
 	{
 		if (ch[cn].points_tot<10000000) 	//  10 million
 		{
-			if (ch[cn].login_date + 6 * month<t)	erase = 1;
+			if (ch[cn].login_date + 1 * year<t)	erase = 1;
 		}
 		else
 		{
-			if (ch[cn].login_date + 12 * month<t)	erase = 1;
+			if (ch[cn].login_date + 3 * year<t)	erase = 1;
 		}
 	}
 	else if (ch[cn].points_tot==0)
 	{
-		if (ch[cn].login_date + 3 * day<t)		erase = 1;
+		if (ch[cn].login_date +   3 * day<t)	erase = 1;
 	}
 	else if (ch[cn].points_tot<10000)		//  10 thousand
 	{
-		if (ch[cn].login_date + 2 * week<t)		erase = 1;
+		if (ch[cn].login_date +   2 * week<t)	erase = 1;
 	}
 	else if (ch[cn].points_tot<100000)		// 100 thousand
 	{
-		if (ch[cn].login_date + 1 * month<t)	erase = 1;
+		if (ch[cn].login_date +   6 * week<t)	erase = 1;
 	}
 	else if (ch[cn].points_tot<1000000) 	//   1 million
 	{
-		if (ch[cn].login_date + 3 * month<t)	erase = 1;
+		if (ch[cn].login_date + 120 *  day<t)	erase = 1;
 	}
 	else if (ch[cn].points_tot<10000000) 	//  10 million
 	{
-		if (ch[cn].login_date + 6 * month<t)	erase = 1;
+		if (ch[cn].login_date +   1 * year<t)	erase = 1;
 	}
 	else
 	{
-		if (ch[cn].login_date + 12 * month<t)	erase = 1;
+		if (ch[cn].login_date +   3 * year<t)	erase = 1;
 	}
 	if (erase)
 	{

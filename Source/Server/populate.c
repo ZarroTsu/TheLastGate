@@ -88,19 +88,20 @@ int pop_create_item(int temp, int cn)
 						gend = "god";
 						godn = "Skua";
 						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].attrib[AT_BRV][0] += 4;
+						it[in].speed[0]     += 10;
 						break;
 					case 2:
 						gend = "goddess";
 						godn = "Kwai";
 						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI;
-						it[in].attrib[AT_STR][0] += 4;
+						it[in].to_hit[0]    += 5;
+						it[in].to_parry[0]  += 5;
 						break;
 					default:
 						gend = "god";
 						godn = "Gorn";
 						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_GORN_UNI;
-						it[in].attrib[AT_WIL][0] += 4;
+						it[in].spell_mod[0] += 5;
 						break;
 				}
 				
@@ -118,6 +119,15 @@ int pop_create_item(int temp, int cn)
 				sprintf(it[in].reference, "%s's %s", godn, refer);
 				sprintf(it[in].description, "%s It has been blessed by the %s %s.", descr, gend, godn);
 				
+				if (is_unique_able(temp) > 54) // Claws
+				{
+					if (godroll==1)
+						it[in].sprite[0] = 3715 + is_unique_able(temp)-55;
+					else if (godroll==2)
+						it[in].sprite[0] = 3721 + is_unique_able(temp)-55;
+					else
+						it[in].sprite[0] = 3727 + is_unique_able(temp)-55;
+				}
 				if (is_unique_able(temp) > 45)
 				{
 					if (godroll==1)

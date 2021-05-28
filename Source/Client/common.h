@@ -19,6 +19,7 @@
 
 #define MAXSKILL		50  // must match server!
 #define MAXBUFFS		20  // must match server!
+#define MAXWPS			20
 
 // wear positions
 #define WN_HEAD			0
@@ -129,7 +130,7 @@ struct cmap {
 	unsigned char ch_castspd;		// animation speed bonus for misc. actions (casting)
 	unsigned char ch_atkspd;		// animation speed bonus for attacking
 	unsigned char ch_movespd;		// animation speed bonus for walking
-	unsigned char ch_fontcolor;		// overhead text font color. 0 = red, 1 = yellow, etc
+	unsigned char ch_fontcolor;		// overhead text font color. 1 = red, 0 = yellow, green/blue same as server
 
 	// for item
 	short int it_sprite;			// basic sprite of item
@@ -171,6 +172,8 @@ struct cplayer {
 
 	// possessions
 	int gold;
+	int bs_points;					// Point total for Black Stronghold
+	int os_points;					// Point total for Osiris
 
 	// items carried
 	int item[40];
@@ -236,6 +239,7 @@ struct cplayer {
 #define CL_CMD_UNIQUE		32
 #define CL_PASSWD			33
 #define CL_RENDERDATA		34
+#define CL_CMD_WPS			35
 #define CL_CMD_CTICK		255
 
 
@@ -313,6 +317,8 @@ struct cplayer {
 #define SV_SETCHAR_DIR				71
 #define SV_UNIQUE					72
 #define SV_IGNORE					73
+
+#define SV_WAYPOINTS				74
 
 #define SV_SETMAP					128
 

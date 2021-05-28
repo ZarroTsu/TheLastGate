@@ -367,6 +367,7 @@ int use_create_item3(int cn, int in)
 void use_stack_items(int cn, int in)
 {
 	int in2, stack_a, stack_b;
+	int value_a, value_b;
 	
 	// Abort if no character (how did we get here??)
 	if (cn==0)
@@ -395,16 +396,23 @@ void use_stack_items(int cn, int in)
 	if (stack_b <  1) stack_b =  1;
 	if (stack_b > 10) stack_b = 10;
 	
+	value_a = it[in].value / stack_a;
+	value_b = it[in2].value / stack_b;
+	
 	// Clean stacking
 	if (stack_a + stack_b <= 10)
 	{
 		it[in].stack = stack_a + stack_b;
+		it[in].value = value_a * it[in].stack;
 		god_take_from_char(in2, cn);
 	}
 	else
 	{
 		it[in].stack = 10;
 		it[in2].stack = stack_a + stack_b - 10;
+		
+		it[in].value  = value_a * it[in].stack;
+		it[in2].value = value_b * it[in2].stack;
 	}
 }
 
@@ -3908,7 +3916,7 @@ int use_seyan_portal(int cn, int in)
 int spell_scroll(int cn, int in)
 {
 	int spell, power, charges, ret, co, value;
-	int in2, stack_a, stack_b;
+	int in2, stack_a, stack_b, tmpv;
 
 	spell = it[in].data[0];
 	power = it[in].data[1];
@@ -3935,7 +3943,9 @@ int spell_scroll(int cn, int in)
 		else
 		{
 			charges = 10;
+			tmpv = it[in2].value / it[in2].data[2];
 			it[in2].stack = it[in2].data[2] = stack_a + stack_b - 10;
+			it[in2].value = tmpv * it[in2].data[2];
 		}
 		
 		it[in].stack = it[in].data[2] = charges;
@@ -4487,6 +4497,27 @@ int explorer_point(int cn, int in)
 	return(1);
 }
 
+int way_point(int cn, int in)
+{
+	int nr;
+
+	if (!(ch[cn].data[76] & it[in].data[0]))
+	{
+		ch[cn].data[76] |= it[in].data[0];
+
+		do_char_log(cn, 0, "You found a new waypoint!\n");
+		ch[cn].luck += 10;
+	}
+	
+	nr = ch[cn].player;
+	
+	buf[0] = SV_WAYPOINTS;
+	*(unsigned int*)(buf + 1) = ch[cn].data[76];
+	xsend(nr, buf, 5);
+
+	return(1);
+}
+
 int use_garbage(int cn, int in)
 {
 	int in2, val;
@@ -4524,6 +4555,7 @@ int use_garbage(int cn, int in)
 void use_driver(int cn, int in, int carried)
 {
 	int ret, m;
+	int thousand, tmp;
 
 	if (in<=0 || in>=MAXITEM)
 	{
@@ -4796,6 +4828,9 @@ void use_driver(int cn, int in, int carried)
 			case 87:
 				ret = 0;
 				break;
+			case 88:						// Waypoint object - use to turn on the WP bit
+				ret = way_point(cn, in);
+				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -4869,7 +4904,7 @@ void use_driver(int cn, int in, int carried)
 			}
 			else if (carried && (it[in].flags & IF_USEDESTROY))
 			{
-				int thousand = 1000;
+				thousand = 1000;
 
 				if (it[in].min_rank>points2rank(ch[cn].points_tot))
 				{
@@ -4911,7 +4946,9 @@ void use_driver(int cn, int in, int carried)
 				// Reduce stack or destroy item
 				if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
 				{
+					tmp = it[in].value / it[in].stack;
 					it[in].stack--;
+					it[in].value = tmp * it[in].stack;
 				}
 				else
 				{

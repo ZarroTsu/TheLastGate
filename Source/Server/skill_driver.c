@@ -379,7 +379,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	if (in!=SK_CLEAVE && in!=SK_TRICE && in!=SK_TAUNT && 
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
-		(d20 && chance_base(cn, in, d20, get_target_resistance(co), usemana))))
+		(d20 && cn!=co && chance_base(cn, in, d20, get_target_resistance(co), usemana))))
 	{
 		if (usemana && cn!=co && (get_skill_score(co, SK_SENSE) > power + 5))
 		{
@@ -921,8 +921,9 @@ int spellcost(int cn, int cost, int in, int usemana)
 {
 	int cotfk_cost = 0;
 	int devil_cost = 0;
+	int t;
 	
-	if (in != SK_BLAST && in != SK_CLEAVE && in != SK_WEAKEN && in != SK_WARCRY)
+	if ((ch[cn].flags & (CF_PLAYER)) && in != SK_BLAST && in != SK_CLEAVE && in != SK_WEAKEN && in != SK_WARCRY)
 		cost = max(SP_COST_BASE, min(cost, cost*get_skill_score(cn, in)/100));
 	
 	// Devil Tarot Card
@@ -948,8 +949,6 @@ int spellcost(int cn, int cost, int in, int usemana)
 		}
 		if (ch[cn].skill[SK_CONCEN][0])
 		{
-			int t;
-			
 			if (get_book(cn, IT_BOOK_PROD)) // Book: Great Prodigy
 			{
 				t = cost * get_skill_score(cn, SK_CONCEN) / 300;

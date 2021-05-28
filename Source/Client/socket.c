@@ -71,7 +71,7 @@ char *logout_reason[]={
 "Client version too old. Update needed.",           //11
 "Aborting on user request.",                        //12
 "this should never show up",                        //13
-"You have been banned for an hour. Enhance your social behaviour before you come back."                 //14
+"You have been banned for an hour. Enhance your social behavior before you come back."                 //14
 };
 
 extern HWND desk_hwnd;
@@ -213,7 +213,7 @@ void so_connect(HWND hwnd)
 		flag=1;
 	}
 
-	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Initialising socket");
+	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Initializing socket");
 	sock=socket(PF_INET,SOCK_STREAM,0);
 	if (sock==-1) {
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not init socket");
@@ -820,25 +820,34 @@ void sv_look6(unsigned char *buf)
 	// buf[14] and buf[15] should be free?
 
 	for (n=s; n<min(62,s+2); n++) {
-		tmplook.item[n]=*(unsigned short *)(buf+2+(n-s)*6);
-		tmplook.price[n]=*(unsigned int *)(buf+4+(n-s)*6);
+		tmplook.item[n]  =*(unsigned short*)(buf+2+(n-s)*6);
+		tmplook.price[n] =*(unsigned int  *)(buf+4+(n-s)*6);
 	}
 	if (n==62) {
-		show_shop=1;
+		show_shop=1+buf[14];
 		shop=tmplook;
 	}
+}
+
+void sv_waypoints(unsigned char *buf)
+{
+	DEBUG("SV WAYPOINTS");
+	
+	waypoints =*(unsigned int *)(buf+1);
+	
+	show_wps=1;
 }
 
 void sv_settarget(unsigned char *buf)
 {
 	DEBUG("SV SETTARGET");
 
-	pl.attack_cn=*(unsigned short*)(buf+1);
-	pl.goto_x=*(unsigned short*)(buf+3);
-	pl.goto_y=*(unsigned short*)(buf+5);
-	pl.misc_action=*(unsigned short*)(buf+7);
-	pl.misc_target1=*(unsigned short*)(buf+9);
-	pl.misc_target2=*(unsigned short*)(buf+11);
+	pl.attack_cn    =*(unsigned short*)(buf+1);
+	pl.goto_x       =*(unsigned short*)(buf+3);
+	pl.goto_y       =*(unsigned short*)(buf+5);
+	pl.misc_action  =*(unsigned short*)(buf+7);
+	pl.misc_target1 =*(unsigned short*)(buf+9);
+	pl.misc_target2 =*(unsigned short*)(buf+11);
 }
 
 void sv_playsound(unsigned char *buf)
@@ -981,6 +990,8 @@ int sv_cmd(unsigned char *buf)
 
 		case  	SV_UNIQUE:             	sv_unique(buf); return 9;
 		case 	SV_IGNORE:		return sv_ignore(buf);
+		
+		case	SV_WAYPOINTS:			sv_waypoints(buf); return 5;
 
 		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;
 	}

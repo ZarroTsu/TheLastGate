@@ -219,7 +219,8 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				case  27: 
 					cmd(CL_CMD_RESET,0,0); 
 					show_shop=0; 
-					noshop=QSIZE*12; 
+					show_wps=0; 
+					noshop=QSIZE*4; 
 					xmove=0; 
 					break;
 				// **************** F-Key Row 1 **************** //

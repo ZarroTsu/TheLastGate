@@ -34,7 +34,7 @@ int gui_equ_s[]		= { 670,   5 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern unsigned int inv_pos,skill_pos;
+extern unsigned int inv_pos,skill_pos,wps_pos;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -1299,8 +1299,7 @@ void mouse_mapbox(int x,int y,int state)
 
 int mouse_shop(int x,int y,int mode)
 {
-	int nr;
-	int tx,ty;
+	int nr,tx,ty;
 
 	if (!show_shop) return 0;
 
@@ -1309,7 +1308,7 @@ int mouse_shop(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			show_shop=0; 
-			noshop=QSIZE*36; 
+			noshop=QSIZE*12; 
 		}
 		return 1;
 	}
@@ -1329,6 +1328,78 @@ int mouse_shop(int x,int y,int mode)
 		hightlight_sub=nr;
 		return 1;
 	}
+	return 0;
+}
+
+int mouse_wps(int x,int y,int mode)
+{
+	int nr, ty, keys;
+	
+	if (!show_wps) return 0;
+	
+	keys=0;
+	if ((GetAsyncKeyState(VK_SHIFT)&0x8000)||(GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
+	
+	// Close Window
+	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
+	{
+		if (mode==MS_LB_UP) 
+		{ 
+			show_wps=0;
+			noshop=QSIZE*12; 
+		}
+		return 1;
+	}
+	
+	// Selecting a Waypoint
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+280-13) && y>(GUI_SHOP_Y+1) && y<(GUI_SHOP_Y+1+280)) 
+	{
+		ty=(y-(GUI_SHOP_Y+1))/35;
+
+		nr=ty+wps_pos;
+		if (mode==MS_LB_UP) 
+		{
+			cmd1(CL_CMD_WPS,nr);
+			show_wps=0;
+			noshop=QSIZE*12; 
+		}
+		if (mode==MS_RB_UP) cmd1(CL_CMD_WPS,nr+32);
+		
+		hightlight=HL_WAYPOINT;
+		hightlight_sub=ty;
+		return 1;
+	}
+	
+	// Scroll up
+	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1) && y<(GUI_SHOP_Y+1+35))
+	{
+		if (keys)
+		{
+			if (wps_pos> 9)	wps_pos -= 8; 
+			else 			wps_pos  = 0;
+		}
+		else
+		{
+			if (wps_pos> 1)	wps_pos -= 2; 
+		}
+		return 1;
+	}
+	
+	// Scroll down
+	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1+280-35) && y<(GUI_SHOP_Y+1+280))
+	{
+		if (keys)
+		{
+			if (wps_pos<(MAXWPS-16))	wps_pos += 8; 
+			else 						wps_pos  = MAXWPS-8;
+		}
+		else
+		{
+			if (wps_pos<(MAXWPS- 8))	wps_pos += 2; 
+		}
+		return 1;
+	}
+	
 	return 0;
 }
 
@@ -1354,6 +1425,7 @@ void mouse(int x,int y,int state)
 	mouse_x=x; mouse_y=y;
 	if (mouse_inventory(x,y,state)) ;
 	else if (mouse_shop(x,y,state)) ;
+	else if (mouse_wps(x,y,state)) ;
 	else if (mouse_buttonbox(x,y,state)) ;
 	else if (mouse_statbox(x,y,state)) ;
 	else if (mouse_statbox2(x,y,state)) ;

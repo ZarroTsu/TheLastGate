@@ -248,6 +248,7 @@ extern unsigned int mapmarker;
 #define CF_AREA_OFF    (1ull<<55)       // Toggle AoE Skills
 #define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
 #define CF_AUTOLOOT    (1ull<<57)       // Automatic looting
+#define CF_BSPOINTS    (1ull<<58)		// Black Stronghold point merchant
 
 #define AT_CAP				300
 #define SPEED_CAP 			300
@@ -546,7 +547,8 @@ struct character
 	
 	char item_lock[40];				// Used for locking items on the client so /sort ignores them
 	
-	char future3[8];
+	int bs_points;					// Point total for Black Stronghold
+	int os_points;					// Point total for Osiris
 
 	time_t logout_date;
 

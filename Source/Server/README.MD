@@ -70,6 +70,7 @@ usage of data for players:
 * `72:`     bad word score
 * '73:'		--Zarro-- for "Way of the Sword" book
 * '75:'		--Zarro-- for spell delays when hit by blast, cleave, or warcry
+* '76:'     --Zarro-- for waypoint storage
 * `80-89:`	seen logging in from these class C nets
 * `90:`     number in database
 * `92:`     reserved

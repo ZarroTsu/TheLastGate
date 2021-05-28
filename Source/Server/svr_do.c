@@ -8926,6 +8926,64 @@ void do_shop_char(int cn, int co, int nr)
 	do_look_char(cn, co, 0, 0, 1);
 }
 
+void do_waypoint(int cn, int nr)
+{
+	extern struct waypoint waypoint[MAXWPS];
+	int i, j, m, in;
+	
+	// Check that the waypoint ID from the client is valid
+	if (nr<0 || nr>=64)
+	{
+		return;
+	}
+	
+	// Check that player is near a waypoint object
+	for (i=-2;i<=2;i++)
+	{
+		for (j=-2;j<=2;j++)
+		{
+			m = (ch[cn].x + i) + (ch[cn].y + j) * MAPX;
+			in = map[m].it;
+			// Check if the map object has the driver we want
+			if (in && it[in].driver == 88)
+				break;
+			else
+				in = 0;
+		}
+		// Check if the map object has the driver we want
+		if (in && it[in].driver == 88)
+			break;
+		else
+			in = 0;
+	}
+	
+	// If there is no waypoint object nearby, return
+	if (!in)
+	{
+		return;
+	}
+
+	// Check that we know this waypoint
+	if (!(ch[cn].data[76]&(1<<nr%32)))
+	{
+		do_char_log(cn, 0, "You must find and use this waypoint in the world before you can return to it!\n");
+		return;
+	}
+	
+	if (nr>=32)
+	{
+		do_char_log(cn, 1, "This will send you to %s.\n", waypoint[nr-32].desc);
+	}
+	else
+	{
+		do_char_log(cn, 1, "The waypoint whisked you away to %s.\n", waypoint[nr%32].name);
+		
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, waypoint[nr%32].x, waypoint[nr%32].y);
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	}
+}
+
 int do_depot_cost(int in)
 {
 	int cost;
@@ -9352,7 +9410,14 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 					spr = it[in].sprite[0];
 					if (ch[co].flags & CF_MERCHANT)
 					{
-						pr = barter(cn, do_item_value(in), 1);
+						if (ch[co].flags & CF_BSPOINTS)
+						{
+							pr = do_item_value(in); // Need to do some sort of special table for BS point costs...
+						}
+						else
+						{
+							pr = barter(cn, do_item_value(in), 1);
+						}
 					}
 					else
 					{
@@ -9367,6 +9432,14 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				*(unsigned int*)(buf + 4 + (m - n) * 6) = pr;
 			}
 			// buf[14] and buf[15] should be free?
+			if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY)) // For the Black Stronghold point shop
+			{
+				*(unsigned char*)(buf + 14) = 1;
+			}
+			else
+			{
+				*(unsigned char*)(buf + 14) = 0;
+			}
 			xsend(nr, buf, 16);
 		}
 

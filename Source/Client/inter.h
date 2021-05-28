@@ -186,7 +186,7 @@ struct look
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int show_shop;
+extern unsigned int show_shop, show_wps, waypoints;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2
@@ -198,6 +198,7 @@ extern unsigned int show_shop;
 #define HL_MAP			8
 #define HL_SHOP			9
 #define HL_STATBOX2		10
+#define HL_WAYPOINT		11
 
 extern int hightlight;
 extern int hightlight_sub;
@@ -229,6 +230,16 @@ struct skilltab
 
 extern struct skilltab *skilltab;
 extern char *at_name[];
+
+struct wpslist
+{
+	int nr;
+	
+	char name[30];
+	char desc[30];
+}
+
+extern struct wpslist wpslist[MAXWPS];
 
 void dd_puttext(int x,int y,int font,char *text);
 void dd_gputc(int xpos,int ypos,int font,int c);

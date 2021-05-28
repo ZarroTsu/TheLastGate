@@ -26,6 +26,7 @@
 #define MAXMISSION 1024
 #define MAXSKILL   50
 #define MAXBUFFS   20
+#define MAXWPS     20
 
 #define MAXTCHARS 4548
 #define MAXTITEM  4548
