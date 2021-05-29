@@ -1,4 +1,4 @@
-all: server respawn password cgi/info.cgi cgi/acct.cgi owner
+all: server respawn password cgi/info.cgi cgi/acct.cgi cgi/mapper.cgi owner
 
 CC=gcc -m32
 DEBUG=-g
@@ -65,6 +65,11 @@ cgi/acct.cgi: acct.c gendefs.h data.h funcs.h .obj/skill.o
 	$(CC) $(CFLAGS) -Icgilib -o acct.cgi acct.c .obj/skill.o cgilib/cgi-lib.a
 	sudo cp acct.cgi $(CGIIMP)/acct.cgi
 	sudo chmod a+rx $(CGIIMP)/acct.cgi
+
+cgi/mapper.cgi: mapper.c gendefs.h data.h
+	$(CC) $(CFLAGS) -Icgilib -o mapper.cgi mapper.c cgilib/cgi-lib.a
+	sudo cp mapper.cgi $(CGIIMP)/mapper.cgi
+	sudo chmod a+rx $(CGIIMP)/mapper.cgi
 
 respawn: respawn.c $(SHEADER)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o respawn respawn.c $(ENDFLAGS)
@@ -159,7 +164,7 @@ password: password.c $(SHEADER)
 	$(CC) $(CFLAGS) -o .obj/rdtsc.o -c rdtsc.S
 
 clean:
-	- sudo rm server password respawn $(CGIIMP)/acct.cgi $(CGIBIN)/info.cgi .obj/*.o
+	- sudo rm server password respawn $(CGIIMP)/acct.cgi $(CGIBIN)/info.cgi $(CGIBIN)/mapper.cgi .obj/*.o
 
 dist:
 	rm -f merc2.tgz

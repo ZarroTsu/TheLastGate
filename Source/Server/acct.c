@@ -1356,6 +1356,8 @@ void view_object(LIST *head)
 			IF_REACTIVATE, (it_temp[in].flags & IF_REACTIVATE) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>No-Repair<br>\n",
 			IF_NOREPAIR, (it_temp[in].flags & IF_NOREPAIR) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Stackable<br>\n",
+			IF_STACKABLE, (it_temp[in].flags & IF_STACKABLE) ? "checked" : "");
 
 	printf("<input type=checkbox name=flags value=%Lu %s>Hidden (data[9])<br>\n",
 			IF_HIDDEN, (it_temp[in].flags & IF_HIDDEN) ? "checked" : "");
@@ -1648,6 +1650,8 @@ void view_item(LIST *head)
 			IF_REACTIVATE, (it[in].flags & IF_REACTIVATE) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>No-Repair<br>\n",
 			IF_NOREPAIR, (it[in].flags & IF_NOREPAIR) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Stackable<br>\n",
+			IF_STACKABLE, (it[in].flags & IF_STACKABLE) ? "checked" : "");
 
 	printf("<input type=checkbox name=flags value=%Lu %s>Hidden (data[9])<br>\n",
 			IF_HIDDEN, (it[in].flags & IF_HIDDEN) ? "checked" : "");
@@ -4410,6 +4414,8 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");
+		printf("Ab Aeterno's super cool map editor<br>\n");
+		printf("<a href=/cgi-imp/mapper.cgi>Online Map Editor</a><br>");
 		break;
 	}
 

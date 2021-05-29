@@ -4223,6 +4223,37 @@ void tick(void)
 	{
 		pop_save_char(globs->ticker % MAXCHARS);
 	}
+	
+	// Process map editor queue
+	int queue_prev = 20; // Process this many after finding the first USE_EMPTY instruction
+	for (int i=0; i<MAX_MAPED_QUEUE; i++) {
+			if (maped_queue[i].used == USE_EMPTY) {
+					queue_prev--;
+					if (queue_prev <= 0) break;
+					continue;
+			}
+
+			xlog("processed maped queue: type=%d, x=%d, y=%d, it_temp=%d",
+					maped_queue[i].op_type, maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp);
+
+			switch(maped_queue[i].op_type) {
+					case MAPED_PLACEITEM: // Place item
+							if (maped_queue[i].it_temp > 0) {
+									build_drop(maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp, -1, 1);
+							}
+					break;
+
+					case MAPED_RMVITEM: // Remove item
+							build_remove(maped_queue[i].x, maped_queue[i].y, -1);
+					break;
+
+					case MAPED_SETFLOOR: // Change floor
+							map[maped_queue[i].x + maped_queue[i].y * MAPX].sprite = maped_queue[i].it_temp;
+					break;
+			}
+			maped_queue[i].used = USE_EMPTY;
+			queue_prev = 20;
+	}
 
 	// send tick to players
 	for (n = 1; n<MAXPLAYER; n++)

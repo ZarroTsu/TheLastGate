@@ -1,0 +1,211 @@
+body {
+    background-color: darkslategray;
+}
+
+body, html {
+    height: 100%;
+    overflow: hidden;
+}
+
+.cv-base {
+    overflow: auto;
+    border: 1px lightgray solid;
+    background-color: black;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    margin: 4px;
+}
+
+.cv-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div-flexmain {
+    display: flex;
+    height: 99%;
+}
+
+#div-grid-sup {
+    flex: 1;
+    display: flex;
+    margin: 0px 0px 8px 4px;
+}
+
+#div-grid-tooltip {
+    color: wheat;
+    font-size: 10pt;
+    margin: 2px;
+    z-index: 3;
+    position: relative;
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#div-palette {
+    border: 1px lightgray solid;
+    margin: 4px;
+    width: 300px;
+    overflow: auto;
+}
+
+#div-mapload {
+    background-color: rgb(40, 40, 40);
+    border: 1px lightgray solid;
+    margin: 2px;
+    color: wheat;
+    font-size: 10pt;
+}
+
+#button-mapload {
+    float: right;
+    margin-top: 10px;
+}
+
+.div-toolbox {
+    height: 40px;
+    border: 1px lightgray solid;
+    margin: 2px;
+    display: flex;
+    align-items: center;
+    background-color: rgb(40, 40, 40);
+}
+
+.toolbox-button {
+    width: 32px;
+    height: 32px;
+    border: 1px lightgray solid;
+    background-color: black;
+    background-size: auto;
+    background-position: center;
+    margin: 2px;
+}
+
+.toolbox-button:hover {
+    border: 1px rgb(0, 153, 255) solid;
+    background-color: gray;
+}
+
+.toolbox-button:focus {
+    outline: 0;
+    outline-style: 0;
+}
+
+.toolbox-grid-button {
+    width: 24px;
+    height: 24px;
+    color: lightgray;
+    font-size: 12pt;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#div-filter, #div-temp-picker {
+    background-color: rgb(40, 40, 40);
+    border: 1px lightgray solid;
+    margin: 0px 2px 2px 2px;
+    color: wheat;
+    font-size: 10pt;
+    padding: 2px;
+}
+
+#div-temp-picker {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button, input[type=text] {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+#div-palette-container {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+    justify-content: center;
+}
+
+#div-canvastable {
+    display: flex;
+    flex: 3;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.temp-cell {
+    width: 64px;
+    height: 64px;
+    border: 1px lightgray solid;
+    margin: 2px;
+    background-color: black;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.temp-cell:hover {
+    background-color: rgb(65, 65, 65);
+    border: 1px rgb(0, 153, 255) solid;
+}
+
+.temp-cell-color {
+    width: 8px;
+    height: 8px;
+    border: 1px lightgray solid;
+    position: relative;
+    top: -1px;
+    left: -1px;
+}
+
+.temp-icon {
+    width: 12px;
+    height: 12px;
+    border: 2px orange solid;
+    border-radius: 100%;
+    margin: auto;
+    pointer-events: none;
+}
+
+.temp-typespan {
+    float: right;
+    color: wheat;
+    font-size: 10pt;
+    margin-top: -1px;
+    margin-right: 2px;
+    pointer-events: none;
+}
+
+.temp-flagspan {
+    color: wheat;
+    font-size: 10pt;
+    text-align: center;
+    margin-top: 8px;
+    display: grid;
+    width: 100%;
+    pointer-events: none;
+}
+
+.rb-border {
+    border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
+    border-image-slice: 1;
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

@@ -793,6 +793,21 @@ struct s_soulcat
 	char weightmulti[N_SOULCAT];	// Weight multiplier per each catalyst type
 };
 
+#define MAX_MAPED_QUEUE         16000
+#define MAPED_QUEUE_SIZE        (sizeof(struct mapedit_queue)*MAX_MAPED_QUEUE)
+
+#define MAPED_PLACEITEM         0
+#define MAPED_RMVITEM           1
+#define MAPED_SETFLOOR          2
+
+struct mapedit_queue
+{
+        unsigned char used;
+        int x, y;
+        char op_type;   // 0-place item, 1-remove item, 2-change floor
+        int it_temp;
+};
+
 extern struct s_skilltab skilltab[MAXSKILL];
 extern struct s_splog splog[60];
 extern struct s_soulcat soulcat[N_SOULBONUS];
@@ -805,3 +820,4 @@ extern struct character *ch_temp;
 extern struct item *it_temp;
 extern struct effect *fx;
 extern struct see_map *  see;
+extern struct mapedit_queue *maped_queue;
