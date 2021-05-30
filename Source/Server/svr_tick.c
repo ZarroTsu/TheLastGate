@@ -4239,7 +4239,7 @@ void tick(void)
 			switch(maped_queue[i].op_type) {
 					case MAPED_PLACEITEM: // Place item
 							if (maped_queue[i].it_temp > 0) {
-									build_drop(maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp, -1, 1);
+									build_drop(maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp);
 							}
 					break;
 

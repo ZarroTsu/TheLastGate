@@ -1374,7 +1374,7 @@ int is_soulstone(int in)
 
 int is_unique_able(int temp)
 {
-	static int uniqueable[54] = {
+	static int uniqueable[60] = {
 	//	Dag  Sta  Spe  Shi  Swo  Dua  Axe  Two  Gre
 		284, 285, 286, 287, 288, 289, 290, 291, 292, // Steel
 		523, 524, 525, 526, 527, 528, 529, 530, 531, // Gold
@@ -1382,11 +1382,11 @@ int is_unique_able(int temp)
 		541, 542, 543, 544, 545, 546, 547, 548, 549, // Crystal
 		572, 573, 574, 575, 576, 577, 578, 579, 580, // Titanium		// 45
 		693, 694, 695, 696, 697, 698, 699, 700, 701  // Adamantium		// 54
-													 // Claws			// 60
+		1779, 1780, 1781, 1782, 1783, 1784			 // Claws			// 60
 	};
 	int n, m=0;
 	
-	for (n = 0; n<54; n++)
+	for (n = 0; n<60; n++)
 	{
 		if (temp==uniqueable[n])
 		{

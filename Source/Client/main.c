@@ -298,7 +298,11 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				case 123: 
 					cmd_exit();
 					break;
-
+				
+				// -------- Insert
+				case 45:
+					cmd3(CL_CMD_INV,9,1,selected_char);
+					break;
 
 				// **************** Text Editor **************** //
 				// -------- Tab

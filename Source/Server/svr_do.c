@@ -1726,23 +1726,24 @@ void do_strongholdpoints(int cn)
 		if (ch[n].temp==CT_BSMAGE3 && is_inline(cn, 3)) { wavenum = ch[n].data[3]; waveprog = ch[n].data[2]; break; }
 	}
 	
-	switch (wavenum)
+	if (wavenum>0)
 	{
-		case -1:   return;
-		case  1: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
-		case  2: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
-		case  3: 	waveprog = 10000*(waveprog-(BS_RC*1))/BS_RC; break;
-		case  4: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
-		case  5: 	waveprog = 10000*(waveprog-(BS_RC*1))/BS_RC; break;
-		case  6: 	waveprog = 10000*(waveprog-(BS_RC*2))/BS_RC; break;
-		case  7: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
-		case  8: 	waveprog = 10000*(waveprog-(BS_RC*1))/BS_RC; break;
-		case  9: 	waveprog = 10000*(waveprog-(BS_RC*2))/BS_RC; break;
-		case 10: 	waveprog = 10000*(waveprog-(BS_RC*3))/BS_RC; break;
-		default:	waveprog = 10000*(waveprog-(BS_RC*(wavenum-11)))/BS_RC; break;
+		switch (wavenum)
+		{
+			case  1: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
+			case  2: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
+			case  3: 	waveprog = 10000*(waveprog-(BS_RC*1))/BS_RC; break;
+			case  4: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
+			case  5: 	waveprog = 10000*(waveprog-(BS_RC*1))/BS_RC; break;
+			case  6: 	waveprog = 10000*(waveprog-(BS_RC*2))/BS_RC; break;
+			case  7: 	waveprog = 10000*(waveprog-(BS_RC*0))/BS_RC; break;
+			case  8: 	waveprog = 10000*(waveprog-(BS_RC*1))/BS_RC; break;
+			case  9: 	waveprog = 10000*(waveprog-(BS_RC*2))/BS_RC; break;
+			case 10: 	waveprog = 10000*(waveprog-(BS_RC*3))/BS_RC; break;
+			default:	waveprog = 10000*(waveprog-(BS_RC*(wavenum-11)))/BS_RC; break;
+		}
+		do_char_log(cn, 3, "Wave %d progress: %3d%%\n", ch[n].data[3], waveprog/100);
 	}
-	
-	do_char_log(cn, 3, "Wave %d progress: %3d%%\n", ch[n].data[3], waveprog/100);
 }
 
 void do_showrank(int cn)
@@ -4855,21 +4856,63 @@ int get_gear(int cn, int in)
 // msg must be a do_char_log() format string like "you see %s in the corpse.\n".
 void do_ransack_corpse(int cn, int co, char *msg)
 {
-	int in, n, t;
+	int in, n, sm, sm2;
+	
+	sm  = get_skill_score(cn, SK_SENSE);
+	sm2 = sm-100;
 
-	// Check for unique weapon in hand
-	if ((in = ch[co].worn[WN_RHAND]) && is_unique(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+	// Check for unique weapon in hands
+	if ((in = ch[co].worn[WN_RHAND]) && is_unique(in) && sm > RANDOM(200))
 	{
-		do_char_log(cn, 0, msg, "a rare weapon");
+		if (sm2>RANDOM(200))
+			do_char_log(cn, 0, msg, "a rare %s", it[in].name);
+		else
+			do_char_log(cn, 0, msg, "a rare weapon");
+	}
+	if ((in = ch[co].worn[WN_LHAND]) && is_unique(in) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			do_char_log(cn, 0, msg, "a rare %s", it[in].name);
+		else
+			do_char_log(cn, 0, msg, "a rare shield");
 	}
 	// Check ring slots for soulstones
-	if ((in = ch[co].worn[WN_LRING]) && is_soulstone(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+	if ((in = ch[co].worn[WN_LRING]) && is_soulstone(in) && sm > RANDOM(200))
 	{
 		do_char_log(cn, 0, msg, "a soulstone");
 	}
-	if ((in = ch[co].worn[WN_RRING]) && is_soulstone(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+	if ((in = ch[co].worn[WN_RRING]) && is_soulstone(in) && sm > RANDOM(200))
 	{
 		do_char_log(cn, 0, msg, "a soulstone");
+	}
+	// Check other accessory slots
+	if ((in = ch[co].worn[WN_NECK]) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+		else
+			do_char_log(cn, 0, msg, "a magical amulet");
+	}
+	if ((in = ch[co].worn[WN_BELT]) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+		else
+			do_char_log(cn, 0, msg, "a magical belt");
+	}
+	if ((in = ch[co].worn[WN_LRING]) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+		else
+			do_char_log(cn, 0, msg, "a magical ring");
+	}
+	if ((in = ch[co].worn[WN_RRING]) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+		else
+			do_char_log(cn, 0, msg, "a magical ring");
 	}
 	// Check for items in inventory
 	/* SH 30.06.00 */
@@ -4879,40 +4922,78 @@ void do_ransack_corpse(int cn, int co, char *msg)
 		{
 			continue;
 		}
-		t = it[in].temp;
 		if(!(it[in].flags & IF_MAGIC))
 		{
 			continue;                      // this item havent 'magic' flag
 		}
-		if (is_unique(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+		if (is_unique(in) && sm > RANDOM(200))
 		{
-			do_char_log(cn, 0, msg, "a rare weapon");
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a rare %s", it[in].name);
+			else
+			{
+				if (it[in].placement & PL_WEAPON)
+					do_char_log(cn, 0, msg, "a rare weapon");
+				else
+					do_char_log(cn, 0, msg, "a rare shield");
+			}
 			continue;
 		}
-		if (is_scroll(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+		if (is_scroll(in) && sm > RANDOM(200))
 		{
-			do_char_log(cn, 0, msg, "a magical scroll");
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+			else
+				do_char_log(cn, 0, msg, "a magical scroll");
 			continue;
 		}
-		if (is_soulstone(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+		if (is_soulstone(in) && sm > RANDOM(200))
 		{
 			do_char_log(cn, 0, msg, "a soulstone");
 			continue;
 		}
-		if (is_potion(in) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+		if (is_potion(in) && sm > RANDOM(200))
 		{
-			do_char_log(cn, 0, msg, "a magical potion");
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+			else
+				do_char_log(cn, 0, msg, "a magical potion");
 			continue;
 		}
-		if ((it[in].placement & 0x00) && get_skill_score(cn, SK_SENSE) > RANDOM(200))
+		if ((it[in].placement & PL_NECK) && sm > RANDOM(200))
 		{
-			do_char_log(cn, 0, msg, " a magical belt");
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+			else
+				do_char_log(cn, 0, msg, "a magical amulet");
+			continue;
+		}
+		if ((it[in].placement & PL_BELT) && sm > RANDOM(200))
+		{
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+			else
+				do_char_log(cn, 0, msg, "a magical belt");
+			continue;
+		}
+		if ((it[in].placement & PL_RING) && sm > RANDOM(200))
+		{
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+			else
+				do_char_log(cn, 0, msg, "a magical ring");
+			continue;
+		}
+		if ((it[in].placement & PL_CHARM) && sm > RANDOM(200))
+		{
+			if (sm2>RANDOM(200))
+				do_char_log(cn, 0, msg, "a(n) %s", it[in].name);
+			else
+				do_char_log(cn, 0, msg, "a tarot card");
 			continue;
 		}
 	}
 }
-
-
 
 // note: cn may be zero!!
 void do_char_killed(int cn, int co, int pentsolve)
@@ -8677,7 +8758,7 @@ int barter(int cn, int opr, int flag) // flag=1 merchant is selling, flag=0 merc
 
 	if (flag)
 	{
-		pr = (opr * 3 - (opr * get_skill_score(cn, SK_BARTER)) / 200)/2;
+		pr = (opr * 4 - (opr * get_skill_score(cn, SK_BARTER)) / 150)/2;
 		if (pr<opr)
 		{
 			pr = opr;
@@ -8685,7 +8766,7 @@ int barter(int cn, int opr, int flag) // flag=1 merchant is selling, flag=0 merc
 	}
 	else
 	{
-		pr = opr / 2 + (opr * get_skill_score(cn, SK_BARTER)) / 400;
+		pr = opr / 2 + (opr * get_skill_score(cn, SK_BARTER)) / 600;
 		if (pr>opr)
 		{
 			pr = opr;
