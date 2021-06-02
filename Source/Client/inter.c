@@ -34,7 +34,7 @@ int gui_equ_s[]		= { 670,   5 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern unsigned int inv_pos,skill_pos,wps_pos;
+extern unsigned int inv_pos,skill_pos,wps_pos,mm_magnify;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -194,6 +194,10 @@ int trans_button(int x,int y)
 	if ( x>260 && y>117+14*3 && x<426 && y<130+14*3 ) return 35;
 	if ( x>260 && y>117+14*4 && x<426 && y<130+14*4 ) return 36;
 	if ( x>260 && y>117+14*5 && x<426 && y<130+14*5 ) return 37;
+	
+	// New Magnify buttons for mini-map
+	if ( x>135 && y>578 && x<152 && y<595 ) return 38;
+	if ( x>135 && y>596 && x<152 && y<613 ) return 39;
 
 	return -1;
 }
@@ -289,6 +293,16 @@ void button_command(int nr)
 			else 
 				xlog(1,"This button is unassigned. Right click on a skill/spell, then right click on the button to assign it.");
 			break;
+		
+		// Magnification buttons for the mini-map
+		case 38:
+			if (keys) mm_magnify = 1;
+			else if (mm_magnify>1) mm_magnify--; 
+			break;
+		case 39:
+			if (keys) mm_magnify = 4;
+			else if (mm_magnify<4) mm_magnify++; 
+			break;
 
 		default: break;
 	}
@@ -339,11 +353,11 @@ void button_help(int nr)
 		
 		// Scroll bar for inventory
 		case 12: xlog(1,"Scroll inventory contents up."); break;
-		case 13: xlog(1,"Scroll inventory contents down"); break;
+		case 13: xlog(1,"Scroll inventory contents down."); break;
 		
 		// Scroll bar for skill list
-		case 14: xlog(1,"Scroll skill list up"); break;
-		case 15: xlog(1,"Scroll skill list down"); break;
+		case 14: xlog(1,"Scroll skill list up."); break;
+		case 15: xlog(1,"Scroll skill list down."); break;
 		
 		// Spell hotkeys
 		case 16: case 17: case 18: case 19:
@@ -487,6 +501,14 @@ void button_help(int nr)
 				xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
 			else
 				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
+			break;
+			
+		// Magnification buttons for the mini-map
+		case 38:
+			xlog(1,"Increase minimap magnification."); 
+			break;
+		case 39:
+			xlog(1,"Decrease minimap magnification."); 
 			break;
 
 		default: break;
@@ -1403,6 +1425,84 @@ int mouse_wps(int x,int y,int mode)
 	return 0;
 }
 
+int mouse_motd(int x,int y,int mode)
+{
+	int nr, tx, ty;
+	
+	if (!show_motd && !show_newp && !show_tuto) return 0;
+	
+	// Close Window
+	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
+	{
+		if (mode==MS_LB_UP) 
+		{ 
+			show_motd=0;
+			show_newp=0;
+			show_tuto=0;
+			noshop=QSIZE*12;
+		}
+		return 1;
+	}
+	
+	// Normal MOTD 'OK' button (closes window)
+	if (show_motd && x>(GUI_SHOP_X+117) && x<(GUI_SHOP_X+164) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
+	{
+		if (mode==MS_LB_UP) 
+		{ 
+			show_motd=0;
+			noshop=QSIZE*12;
+		}
+		return 1;
+	}
+	
+	// [Bottom left button]
+	if (x>(GUI_SHOP_X+11) && x<(GUI_SHOP_X+58) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
+	{
+		// New Player MOTD 'Tutorial' button
+		if (show_newp)
+		{
+			show_newp=0;
+			show_tuto=1; tuto_page=1; tuto_max=3;
+			play_sound("sfx\\click.wav",-1000,0);
+			return 1;
+		}
+		// Tutorial window PREV
+		else if (show_tuto)
+		{
+			tuto_page--; 
+			if (tuto_page<=1) tuto_page=1;
+			else play_sound("sfx\\click.wav",-1000,0);
+			return 1;
+		}
+	}
+	
+	// [Bottom right button]
+	if (x>(GUI_SHOP_X+223) && x<(GUI_SHOP_X+270) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
+	{
+		// New Player MOTD 'OK' button (closes window)
+		if (show_newp)
+		{
+			if (mode==MS_LB_UP) 
+			{
+				//cmd1(CL_CMD_WPS,nr); // Tell server we've skipped the tutorial
+				show_newp=0;
+				noshop=QSIZE*12;
+			}
+			return 1;
+		}
+		// Tutorial window NEXT
+		else if (show_tuto)
+		{
+			tuto_page++; 
+			if (tuto_page>=tuto_max) tuto_page=tuto_max;
+			else play_sound("sfx\\click.wav",-1000,0);
+			return 1;
+		}
+	}
+	
+	return 0;
+}
+
 
 void mouse(int x,int y,int state)
 {
@@ -1426,6 +1526,7 @@ void mouse(int x,int y,int state)
 	if (mouse_inventory(x,y,state)) ;
 	else if (mouse_shop(x,y,state)) ;
 	else if (mouse_wps(x,y,state)) ;
+	else if (mouse_motd(x,y,state)) ;
 	else if (mouse_buttonbox(x,y,state)) ;
 	else if (mouse_statbox(x,y,state)) ;
 	else if (mouse_statbox2(x,y,state)) ;

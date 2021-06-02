@@ -24,6 +24,7 @@ int usedmem=0,usedvid=0;
 char *DDERR;
 extern int do_alpha;
 extern int do_shadow;
+extern int do_darkmode;
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 extern short screen_windowed;
@@ -1871,10 +1872,10 @@ int dd_isvisible(void)
 	return 1;
 }
 
-void dd_show_map(unsigned short *src,int xo,int yo)
+void dd_show_map(unsigned short *src,int xo,int yo,int magnify)
 {
 	unsigned short *dst;
-	int x,y,d,s,wnd_xtra;
+	int x,y,d,s,wnd_xtra,p;
 
 	wnd_xtra=0;
 	if (screen_windowed == 1) {
@@ -1885,14 +1886,19 @@ void dd_show_map(unsigned short *src,int xo,int yo)
 	dst=dd_get_ptr(sur2);
 	if (!dst) return;
 	
-	// Draw the mini-map
-	for (y=0; y<128; y++) {
+	// Draw the mini-map (magnify x magnify)
+	for (y=0; y<128; y++) 
+	{
 		d=(y+wnd_xtra+579)*MAXX+6;
-		s=(y+yo)*MAPX_MAX+xo;
-		for (x=0; x<128; x++) {
-			dst[d++]=src[s++];
+		s=((y/magnify)+yo)*MAPX_MAX+xo;
+		p=s*magnify;
+		for (x=0; x<128; x++) 
+		{
+			dst[d++]=src[s];
+			p++; s=p/magnify;
 		}
 	}
+	
 	dd_release_ptr(sur2);
 }
 

@@ -23,7 +23,7 @@ extern int noshop;
 
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
-int screen_overlay_sprite;
+//int screen_overlay_sprite;
 int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
 short screen_windowed;
 short screen_renderdist;
@@ -63,6 +63,7 @@ int logstart=0;
 int logtimer=0;
 int do_alpha=2;
 int do_shadow=1;
+int do_darkmode=0;
 
 void dd_invalidate_alpha(void);
 
@@ -220,6 +221,9 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 					cmd(CL_CMD_RESET,0,0); 
 					show_shop=0; 
 					show_wps=0; 
+					show_motd=0;
+					show_newp=0;
+					show_tuto=0;
 					noshop=QSIZE*4; 
 					xmove=0; 
 					break;

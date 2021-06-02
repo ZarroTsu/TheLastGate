@@ -291,10 +291,10 @@ extern unsigned int mapmarker;
 #define SK_BLAST		24
 //////////////////////////
 #define SK_POISON		42
-#define SK_DAMAREA		43	// -> Pulse
+#define SK_PULSE		43
 #define SK_CURSE		20
 #define SK_SLOW			19
-#define SK_HEXAREA		44	// -> Prox
+#define SK_PROX			44
 #define SK_GHOST		27
 #define SK_GCMASTERY	45
 #define SK_SHADOW		46
@@ -333,10 +333,9 @@ extern unsigned int mapmarker;
 #define SK_GUARD		57
 #define SK_RAZOR2		58
 #define SK_DOUSE		59
+#define SK_DISPEL2		32
 //////////////////////////
-#define SK_PROX			44
 #define SK_BLIND		37
-#define SK_PULSE		43
 #define SK_TAUNT		48
 #define SK_TRICE		49
 #define SK_RAZOR		 7

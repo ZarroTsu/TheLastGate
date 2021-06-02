@@ -319,6 +319,7 @@ struct cplayer {
 #define SV_IGNORE					73
 
 #define SV_WAYPOINTS				74
+#define SV_SHOWMOTD					75
 
 #define SV_SETMAP					128
 

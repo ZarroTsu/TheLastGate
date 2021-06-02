@@ -54,6 +54,7 @@ produced by Borland Resource Workshop
 
 #define IDC_DOSOUND			15
 #define IDC_DOSHADOW		28
+#define IDC_DODARKMODE			66
 
 #define IDC_WINDOWED    60
 #define IDC_FULLSCREEN  61

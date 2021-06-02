@@ -2232,16 +2232,19 @@ int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 
 int get_spellcost(int cn, int spell)
 {
+	int prox;
+	prox = get_skill_score(cn, SK_PROX);
 	switch(spell)
 	{
 	case    SK_BLAST:
-		return( ((get_skill_score(cn, SK_BLAST)/4+5)*2) * (ch[cn].skill[SK_DAMAREA][0] ? (75+get_skill_score(cn, SK_DAMAREA))/75 : 1) );
+		return( ((get_skill_score(cn, SK_BLAST)/4+5)*2) * (
+			       (ch[cn].kindred & KIN_ARCHHARAKIM) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
 	case    SK_POISON:
-		return( 40 * (ch[cn].skill[SK_HEXAREA][0] ? (150+get_skill_score(cn, SK_HEXAREA)) / 150 : (150+get_skill_score(cn, SK_DAMAREA)) / 150) );
+		return( 40 * ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
 	case    SK_IDENT:
 		return( 20);
 	case    SK_CURSE:
-		return( 35 * (ch[cn].skill[SK_HEXAREA][0] ? (150+get_skill_score(cn, SK_HEXAREA)) / 150 : 1) );
+		return( 35 * ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
 	case    SK_BLESS:
 		return( 35);
 	case    SK_ENHANCE:
@@ -2251,7 +2254,7 @@ int get_spellcost(int cn, int spell)
 	case    SK_LIGHT:
 		return( 5);
 	case    SK_SLOW:
-		return( 20 * (ch[cn].skill[SK_HEXAREA][0] ? (150+get_skill_score(cn, SK_HEXAREA)) / 150 : 1) );
+		return( 20 * ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
 	case    SK_HEAL:
 		return( 25);
 	case    SK_GHOST:
@@ -2378,6 +2381,7 @@ int npc_try_spell(int cn, int co, int spell)
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
+		// Cancel if exhausted
 		if ((in = ch[cn].spell[n]) && bu[in].temp==1)
 		{
 			break;
@@ -2395,10 +2399,16 @@ int npc_try_spell(int cn, int co, int spell)
 	{
 		if ((in = ch[co].spell[n])!=0)
 		{
+			// Cancel if target is already buffed or debuffed (except for heal)
 			if (bu[in].temp==spell && spell!=SK_HEAL
 			&& (bu[in].power + 10)>=spell_immunity(get_skill_score(cn, spell), get_target_immunity(co)) 
 			&& bu[in].active>bu[in].duration / 4 * 3)
 			{
+				break;
+			}
+			// Immunize/Inoculate prevents up to three ailments
+			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
+				(spell==bu[in].data[1] || spell==bu[in].data[2] || spell==bu[in].data[3]))
 				break;
 			}
 		}

@@ -186,7 +186,7 @@ struct look
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int show_shop, show_wps, waypoints;
+extern unsigned int show_shop, show_wps, waypoints, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2

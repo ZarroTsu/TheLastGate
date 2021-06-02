@@ -104,7 +104,10 @@ struct s_splog splog[60] = {
 		"You feel a tingling shockwave from somewhere.",
 		" tried to include you in a mass-blast but failed."
 	},{ 
-		SK_DISPEL, 		"Dispel",		"dispel",		"dispelling"
+		SK_DISPEL, 		"Immunize",		"dispel",		"immunizing",
+		"You became immunized from debuffs!",
+		" was immunized.",
+		" cast dispel on you."
 	},{ 
 		SK_HEAL, 		"Healing Sickness",	"heal",		"healing",
 		"You have been healed.",
@@ -124,7 +127,10 @@ struct s_splog splog[60] = {
 	},{
 		31
 	},{
-		32
+		SK_DISPEL2, 	"Inoculate",	"dispel",		"inoculating",
+		"You became inoculated from buffs!",
+		" was inoculated.",
+		" cast dispel on you."
 	},{
 		33
 	},{
@@ -292,9 +298,9 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	{
 		// AoE spells forgo failing since there may be targets handled by cast_aoe_spell
 		// The spell cost is set to zero and will be spent in cast_aoe_spell
-		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && 
-			(((in==SK_CURSE || in==SK_SLOW || in==SK_POISON) && ch[cn].skill[SK_HEXAREA][0]) ||
-			((in==SK_POISON || in==SK_BLAST) && ch[cn].skill[SK_DAMAREA][0])))
+		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && ch[cn].skill[SK_PROX][0] && 
+			(((ch[cn].kindred & KIN_SORCERER   ) && (in==SK_CURSE || in==SK_SLOW || in==SK_POISON)) ||
+			(((ch[cn].kindred & KIN_ARCHHARAKIM) &&  in==SK_BLAST                                )) ))
 		{
 			cost = 0;
 		}
@@ -688,7 +694,6 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 		}
 		if ((co = map[mc].ch)!=0 && ch[co].attack_cn==cn && co_orig!=co)
 		{
-			
 			if (intemp==SK_BLAST)
 			{
 				chlog(cn, "Cast Blast on %s", ch[co].name);
@@ -1359,7 +1364,7 @@ void spell_from_item(int cn, int in2)
 		xlog("god_create_buff failed in skill_from_item");
 		return;
 	}
-
+	
 	strcpy(bu[in].name, it[in2].name);
 	bu[in].flags |= IF_SPELL;
 
@@ -1374,13 +1379,31 @@ void spell_from_item(int cn, int in2)
 	for (n = 0; n<5; n++) 			{ bu[in].attrib[n][1] = it[in2].attrib[n][1]; }
 	for (n = 0; n<MAXSKILL; n++) 	{ bu[in].skill[n][1]  = it[in2].skill[n][1];  }
 
+	// it[in2].data[0] = display sprite number
 	if (it[in2].data[0]) 	{ bu[in].sprite[1] = it[in2].data[0]; }
 	else 					{ bu[in].sprite[1] = BUF_SPR_GENERIC; }
 	
 	bu[in].duration 		= bu[in].active = it[in2].duration;
 	
+	// it[in2].data[1] = template number for overwriting
 	if (it[in2].data[1]) 	{ bu[in].temp = it[in2].data[1]; }
 	else 					{ bu[in].temp = 101; }
+	
+	// it[in2].data[2] = HP regen over the given duration
+	if (it[in2].data[2])
+	{
+		bu[in].hp[0]		= it[in2].data[2] * 1000 / it[in2].duration;
+	}
+	// it[in2].data[3] = EN regen over the given duration
+	if (it[in2].data[3])
+	{
+		bu[in].end[0]		= it[in2].data[3] * 1000 / it[in2].duration;
+	}
+	// it[in2].data[4] = MP regen over the given duration
+	if (it[in2].data[4])
+	{
+		bu[in].mana[0]		= it[in2].data[4] * 1000 / it[in2].duration;
+	}
 	
 	bu[in].power 			= it[in2].power;
 	
@@ -1419,15 +1442,31 @@ int has_spell_from_item(int cn, int temp)
 }
 
 // debuff: 1 for normal debuff, 2 to remove interference messages
-int cast_a_spell(int cn, int co, int in, int debuff)
+int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 {
-	int temp, arealog = 0;
+	int temp, arealog = 0, n, in2;
 	
 	temp = bu[in].temp;
 	
 	if (temp==SK_LIGHT)
 	{
 		arealog = 1;
+	}
+	
+	// Check for immunize and inoculate from dispel to see if we can grant the spell
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in2 = ch[co].spell[n])!=0)
+		{
+			// Immunize/Inoculate prevents up to three ailments
+			if ((bu[in2].temp==SK_DISPEL || bu[in2].temp==SK_DISPEL2) &&
+				(temp==bu[in2].data[1] || temp==bu[in2].data[2] || temp==bu[in2].data[3]))
+			{
+				if (msg>0) // don't log AoE spells or 'secondary' debuffs
+					do_char_log(cn, 1, "%s neutralized the %s's effect.\n", bu[in2].name, splog[temp].ref);
+				return 0;
+			}
+		}
 	}
 	
 	if (cn!=co)
@@ -1563,7 +1602,7 @@ int spell_light(int cn, int co, int power)
 	
 	bu[in].light[1]  = min(250, power * 4);
 	
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_LIGHT
 }
 void skill_light(int cn)
 {
@@ -1597,7 +1636,7 @@ int spell_protect(int cn, int co, int power)
 		bu[in].armor[1]  = power / 4 + 4;
 	}
 
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_PROTECT
 }
 void skill_protect(int cn)
 {
@@ -1631,7 +1670,7 @@ int spell_enhance(int cn, int co, int power)
 		bu[in].weapon[1] = power / 4 + 4;
 	}
 	
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_ENHANCE
 }
 void skill_enhance(int cn)
 {
@@ -1661,7 +1700,7 @@ int spell_bless(int cn, int co, int power)
 		bu[in].attrib[n][1] = ((power*2/3)-n) / 5 + 3;
 	}
 	
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_BLESS
 }
 void skill_bless(int cn)
 {
@@ -1759,7 +1798,7 @@ int spell_mshield(int cn, int co, int power)
 		}
 	}
 	
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_MSHIELD / SK_MSHELL
 }
 void skill_mshield(int cn)
 {
@@ -1779,12 +1818,12 @@ int spell_haste(int cn, int co, int power)
 	
 	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
-	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE(power), 1))) 
+	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 1))) 
 		return 0;
 	
 	bu[in].speed[1] = 15 + HASTEFORM(power);
 	
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_HASTE
 }
 void skill_haste(int cn)
 {
@@ -1809,7 +1848,7 @@ int spell_regen(int cn, int co, int power)
 	
 	bu[in].hp[0] = (power * 1875) / SP_DUR_REGEN;
 	
-	return cast_a_spell(cn, co, in, 0);
+	return cast_a_spell(cn, co, in, 0, 1); // SK_REGEN
 }
 int spell_heal(int cn, int co, int power)
 {
@@ -1821,7 +1860,7 @@ int spell_heal(int cn, int co, int power)
 	bu[in].data[1] = 0;
 	
 	// Every time heal is cast it updates itself and adds 1 to data[1]
-	if (cast_a_spell(cn, co, in, 0))
+	if (cast_a_spell(cn, co, in, 0, 0)) // SK_HEAL
 	{
 		if ((in2=has_buff(cn, SK_HEAL))!=0)
 		{
@@ -1905,7 +1944,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		}
 	}
 
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_CURSE / SK_CURSE2
 }
 void skill_curse(int cn)
 {
@@ -1913,9 +1952,10 @@ void skill_curse(int cn)
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_SORCERER) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_CURSE);
-	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = SP_COST_CURSE;
 	
 	// Tarot Card - Tower :: Change Curse into Greater Curse
@@ -1925,8 +1965,8 @@ void skill_curse(int cn)
 		d20 -= 1;
 	}
 	
-	// Hex Area increases spell cost
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	// Proximity increases spell cost
+	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
@@ -1946,7 +1986,7 @@ void skill_curse(int cn)
 	}
 	
 	// Cast AoE or general surround-hit
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	if (can_aoe)
 	{
 		if (!cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit, 0))
 			return;
@@ -1995,7 +2035,7 @@ int spell_slow(int cn, int co, int power, int flag)
 		bu[in].speed[1] = -(30 + SLOWFORM(power));
 	}
 	
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_SLOW / SK_SLOW2
 }
 void skill_slow(int cn, int flag)
 {
@@ -2003,9 +2043,10 @@ void skill_slow(int cn, int flag)
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_SORCERER) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_SLOW);
-	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = SP_COST_SLOW;
 	
 	// Tarot Card - Emperor :: Change Slow into Greater Slow
@@ -2015,8 +2056,8 @@ void skill_slow(int cn, int flag)
 		d20 += 1;
 	}
 	
-	// Hex Area increases spell cost
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	// Proximity increases spell cost
+	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
@@ -2036,7 +2077,7 @@ void skill_slow(int cn, int flag)
 	}
 	
 	// Cast AoE or general surround-hit
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	if (can_aoe)
 	{
 		if (!cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit, 0))
 			return;
@@ -2087,7 +2128,7 @@ int spell_poison(int cn, int co, int power, int flag)
 	// Set the decay rate of the poison
 	bu[in].data[1] = ppow;
 	
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_POISON
 }
 void skill_poison(int cn)
 {
@@ -2095,9 +2136,10 @@ void skill_poison(int cn)
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_SORCERER) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_POISON);
-	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = SP_COST_POISON;
 	
 	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & KIN_SORCERER)) 
@@ -2105,13 +2147,8 @@ void skill_poison(int cn)
 		cost /= 2;
 	}
 	
-	if (get_skill_score(cn, SK_DAMAREA) > aoe_power)
-	{
-		aoe_power = get_skill_score(cn, SK_DAMAREA);
-	}
-	
-	// Hex Area and Dam Area increases spell cost
-	if ((ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) && !(ch[cn].flags & CF_AREA_OFF))
+	// Proximity increases spell cost
+	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
@@ -2131,7 +2168,7 @@ void skill_poison(int cn)
 	}
 	
 	// Cast AoE or general surround-hit
-	if ((ch[cn].skill[SK_HEXAREA][0] || ch[cn].skill[SK_DAMAREA][0]) && !(ch[cn].flags & CF_AREA_OFF))
+	if (can_aoe)
 	{
 		if (!cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit, 0))
 			return;
@@ -2214,29 +2251,25 @@ void item_info(int cn, int in, int look)
 		{
 			continue;
 		}
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
 		at_name[n], it[in].attrib[n][0], it[in].attrib[n][1], it[in].attrib[n][2]);
 	}
 
 	if (it[in].hp[0] || it[in].hp[1] || it[in].hp[2])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
 		"Hitpoints", it[in].hp[0], it[in].hp[1], it[in].hp[2]);
 	}
 
 	if (it[in].end[0] || it[in].end[1] || it[in].end[2])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
 		"Endurance", it[in].end[0], it[in].end[1], it[in].end[2]);
 	}
 
 	if (it[in].mana[0] || it[in].mana[1] || it[in].mana[2])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
 		"Mana", it[in].mana[0], it[in].mana[1], it[in].mana[2]);
 	}
 
@@ -2246,123 +2279,126 @@ void item_info(int cn, int in, int look)
 		{
 			continue;
 		}
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
 		skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1], it[in].skill[n][2]);
 	}
 
 	if (it[in].weapon[0] || it[in].weapon[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
-		"Weapon", it[in].weapon[0], it[in].weapon[1]);
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		"Weapon Value", it[in].weapon[0], it[in].weapon[1]);
 	}
 	if (it[in].armor[0] || it[in].armor[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
-		"Armor", it[in].armor[0], it[in].armor[1]);
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		"Armor Value", it[in].armor[0], it[in].armor[1]);
 	}
 	
 	if (it[in].to_hit[0] || it[in].to_hit[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Hit Bonus", it[in].to_hit[0], it[in].to_hit[1]);
 	}
 	if (it[in].to_parry[0] || it[in].to_parry[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Parry Bonus", it[in].to_parry[0], it[in].to_parry[1]);
 	}
 	if (it[in].crit_chance[0] || it[in].crit_chance[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Crit Rate", it[in].crit_chance[0], it[in].crit_chance[1]);
 	}
 	if (it[in].crit_multi[0] || it[in].crit_multi[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
 	}
 	if (it[in].top_damage[0] || it[in].top_damage[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Top Damage", it[in].top_damage[0], it[in].top_damage[1]);
 	}
 	if (it[in].gethit_dam[0] || it[in].gethit_dam[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Reflect", it[in].gethit_dam[0], it[in].gethit_dam[1]);
 	}
 	
 	if (it[in].speed[0] || it[in].speed[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"All Speed", it[in].speed[0], it[in].speed[1]);
 	}
 	if (it[in].move_speed[0] || it[in].move_speed[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Move Speed", it[in].move_speed[0], it[in].move_speed[1]);
 	}
 	if (it[in].atk_speed[0] || it[in].atk_speed[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Atk Speed", it[in].atk_speed[0], it[in].atk_speed[1]);
 	}
 	if (it[in].cast_speed[0] || it[in].cast_speed[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Cast Speed", it[in].cast_speed[0], it[in].cast_speed[1]);
 	}
 	
 	if (it[in].spell_mod[0] || it[in].spell_mod[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Spell Mod", it[in].spell_mod[0], it[in].spell_mod[1]);
 	}
 	if (it[in].spell_apt[0] || it[in].spell_apt[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Spell Apt", it[in].spell_apt[0], it[in].spell_apt[1]);
 	}
 	if (it[in].cool_bonus[0] || it[in].cool_bonus[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
 		"Cooldown", it[in].cool_bonus[0], it[in].cool_bonus[1]);
 	}
 	
 	if (it[in].light[0] || it[in].light[1])
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d %+4d\n",
-		"Light", it[in].light[0], it[in].light[1]);
+		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		"Glow", it[in].light[0], it[in].light[1]);
 	}
-
+	
+	if (it[in].data[2])
+	{
+		do_char_log(cn, 1, "%-12.12s %+4d (%+4d/s)\n",
+		"HP Regen", it[in].data[2], it[in].data[2]/max(1, it[in].duration/TICKS));
+	}
+	if (it[in].data[3])
+	{
+		do_char_log(cn, 1, "%-12.12s %+4d (%+4d/s)\n",
+		"End Regen", it[in].data[3], it[in].data[3]/max(1, it[in].duration/TICKS));
+	}
+	if (it[in].data[4])
+	{
+		do_char_log(cn, 1, "%-12.12s %+4d (%+4d/s)\n",
+		"Mana Regen", it[in].data[4], it[in].data[4]/max(1, it[in].duration/TICKS));
+	}
+	
+	if (it[in].duration)
+	{
+		do_char_log(cn, 1, "%-12.12s %+4d seconds\n",
+		"Duration", it[in].duration/TICKS);
+	}
+	
 	if (it[in].power)
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d",
-		"Power", it[in].power);
+		do_char_log(cn, 1, "%-12.12s %+4d\n",
+		"Item Power", it[in].power);
 	}
 
 	if (it[in].min_rank)
 	{
-		do_char_log(cn, 1, 
-		"%-12.12s %+4d",
+		do_char_log(cn, 1, "%-12.12s %+4d\n",
 		"Min. Rank", it[in].min_rank);
 	}
 }
@@ -2526,6 +2562,8 @@ int spell_scorch(int cn, int co, int power, int flag)
 	{
 		if (!(in = make_new_buff(cn, SK_DOUSE, BUF_SPR_DOUSE, power, SP_DUR_DOUSE, 0)))
 			return 0;
+		
+		bu[m].spell_mod[1] = -(power / 10);
 	}
 	else
 	{
@@ -2533,7 +2571,7 @@ int spell_scorch(int cn, int co, int power, int flag)
 			return 0;
 	}
 	
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 0); // SK_SCORCH / SK_DOUSE
 }
 void skill_blast(int cn)
 {
@@ -2541,16 +2579,15 @@ void skill_blast(int cn)
 	int count = 0, hit = 0;
 	int co = 0, co_orig = 0;
 	int dam, avgdmg = 0;
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_ARCHHARAKIM) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_BLAST);
 	power = spell_multiplier(power, cn);
-	
-	aoe_power = get_skill_score(cn, SK_DAMAREA);
-	
+	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = (power * 2) / 8 + 5;
 	
-	// Dam Area increases spell cost
-	if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	// Proximity increases spell cost
+	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
@@ -2605,7 +2642,7 @@ void skill_blast(int cn)
 	}
 	
 	// Cast AoE or general surround-hit
-	if (ch[cn].skill[SK_DAMAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	if (can_aoe)
 	{
 		if (!cast_aoe_spell(cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg))
 			return;
@@ -2739,7 +2776,7 @@ void skill_recall(int cn)
 	bu[in].data[1] = ch[cn].temple_x;
 	bu[in].data[2] = ch[cn].temple_y;
 	
-	if (!cast_a_spell(cn, cn, in, 0))
+	if (!cast_a_spell(cn, cn, in, 0, 0)) // SK_RECALL
 		return;
 	
 	add_exhaust(cn, SK_EXH_RECALL);
@@ -2771,11 +2808,46 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 	do_update_char(cn);
 }
 
+#define DISPEL_MAX		14
+#define DISPEL_STORE	 3
+
+int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
+{
+	int in, n;
+	
+	// spell_multiplier is already done in skill_dispel
+	
+	if (flag)	// Debuff version
+	{
+		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
+		if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	
+		power = spell_immunity(power, get_target_immunity(co));
+		
+		if (!(in = make_new_buff(cn, SK_DISPEL2, BUF_SPR_INNOCU, power, SP_DUR_DISPEL, 0))) 
+			return 0;
+	}
+	else		// Buff version
+	{
+		power = spellpower_check(cn, co, power, 0);
+		
+		if (!(in = make_new_buff(cn, SK_DISPEL, BUF_SPR_IMMUNI, power, SP_DUR_DISPEL, 0))) 
+			return 0;
+	}
+	
+	for (n=0;n<DISPEL_STORE;n++)
+	{
+		bu[in].data[n+1] = sto[n];
+	}
+	
+	return cast_a_spell(cn, co, in, flag, 1-flag); // SK_DISPEL / SK_DISPEL2
+}
 void skill_dispel(int cn)
 {
-	int in, co, n, m, power, ail_pow = 0, success = 0, chanc;
-	int ail[13] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	int in, co, n, m, base_pow, power, ail_pow = 0, success = 0, chanc, flag;
+	int ail[DISPEL_MAX];
 	int d20 = 12;
+	int sto[DISPEL_STORE];
 
 	if ((co = ch[cn].skill_target1)) { ; }
 	else { co = cn; }
@@ -2794,11 +2866,17 @@ void skill_dispel(int cn)
 		do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", ch[co].name, ch[cn].name);
 		co = cn;
 	}
-
-	power = spell_multiplier(get_skill_score(cn, SK_DISPEL), cn);
-
+	
+	// initialize these arrays
+	for (n=0;n<DISPEL_MAX;n++)   ail[n] = -1;
+	for (n=0;n<DISPEL_STORE;n++) sto[n] =  0;
+	
+	base_pow = power = spell_multiplier(get_skill_score(cn, SK_DISPEL), cn);
+	
 	// Tarot Card - Hierophant :: Dispel removes positive spells instead of negative spells
-	if (get_tarot(cn, IT_CH_HEIROPH))
+	flag = get_tarot(cn, IT_CH_HEIROPH);
+	
+	if (flag)
 	{
 		d20 = 9;
 		// Remove each positive spell in sequence, from most to least expensive
@@ -2812,10 +2890,11 @@ void skill_dispel(int cn)
 			if (bu[in].temp==SK_PULSE) 		ail[4] = n;
 			if (bu[in].temp==SK_RAZOR) 		ail[5] = n;
 			if (bu[in].temp==SK_GUARD) 		ail[6] = n;
-			if (bu[in].temp==SK_REGEN) 		ail[7] = n;
-			if (bu[in].temp==SK_PROTECT) 	ail[8] = n;
-			if (bu[in].temp==SK_ENHANCE) 	ail[9] = n;
-			if (bu[in].temp==SK_LIGHT) 		ail[10] = n;
+			if (bu[in].temp==SK_DISPEL) 	ail[7] = n;
+			if (bu[in].temp==SK_REGEN) 		ail[8] = n;
+			if (bu[in].temp==SK_PROTECT) 	ail[9] = n;
+			if (bu[in].temp==SK_ENHANCE) 	ail[10] = n;
+			if (bu[in].temp==SK_LIGHT) 		ail[11] = n;
 		}
 	}
 	else
@@ -2824,6 +2903,7 @@ void skill_dispel(int cn)
 		for (n = 0; n<MAXBUFFS; n++)
 		{
 			if ((in = ch[co].spell[n])==0) { continue; }
+			
 			if (bu[in].temp==SK_POISON)		ail[0] = n;
 			if (bu[in].temp==SK_BLEED) 		ail[1] = n;
 			if (bu[in].temp==SK_BLIND) 		ail[2] = n;
@@ -2835,11 +2915,12 @@ void skill_dispel(int cn)
 			if (bu[in].temp==SK_WEAKEN) 	ail[8] = n;
 			if (bu[in].temp==SK_SLOW2) 		ail[9] = n;
 			if (bu[in].temp==SK_SLOW) 		ail[10] = n;
-			if (bu[in].temp==SK_SCORCH) 	ail[11] = n;
-			if (bu[in].temp==SK_HEAL) 		ail[12] = n;
+			if (bu[in].temp==SK_DOUSE) 		ail[11] = n;
+			if (bu[in].temp==SK_SCORCH) 	ail[12] = n;
+			if (bu[in].temp==SK_DISPEL2) 	ail[13] = n;
 		}
 	}
-	for (m = 0; m<12; m++) if (ail[m]>-1)
+	for (m = 0; m<DISPEL_MAX; m++) if (ail[m]>-1)
 	{
 		in = ch[co].spell[ail[m]];
 		ail_pow = bu[in].power;
@@ -2863,13 +2944,13 @@ void skill_dispel(int cn)
 			bu[in].used = USE_EMPTY; 
 			ch[co].spell[ail[m]] = 0;
 			do_update_char(co);
-			if (get_tarot(cn, IT_CH_HEIROPH)) remember_pvp(cn,co);
+			if (flag) remember_pvp(cn,co);
 			if (get_skill_score(co, SK_SENSE) + 10>get_skill_score(cn, SK_DISPEL))
 				do_char_log(co, 0, "%s has been dispelled by %s.\n", bu[in].name, ch[cn].reference);
 			else
 				do_char_log(co, 0, "%s has been dispelled.\n", bu[in].name);
 			do_char_log(cn, 1, "Dispelled %s from %s.\n", bu[in].name, ch[co].name);
-			if (get_tarot(cn, IT_CH_HEIROPH) && !(ch[co].flags&(CF_PLAYER))) 
+			if (flag && !(ch[co].flags&(CF_PLAYER))) 
 			{
 				if (!IS_IGNORING_SPELLS(co)) 
 					do_notify_char(co,NT_GOTHIT,cn,0,0,0);
@@ -2884,13 +2965,16 @@ void skill_dispel(int cn)
 			do_char_log(cn, 1, "%s has been removed.\n", bu[in].name);
 		}
 		
-		success = 1;
+		sto[success] = ail[m];
+		
+		success++;
 		power -= ail_pow;
 		if (power < 1) break;
+		if (success>=3) break;
 	}
 	if (!success && n==20)
 	{
-		if (get_tarot(cn, IT_CH_HEIROPH))
+		if (flag)
 		{
 			if (co==cn)	{ do_char_log(cn, 0, "But you aren't positively spelled!\n"); return; }
 			else 		{ do_char_log(cn, 0, "%s isn't positively spelled!\n", ch[co].name); return; }
@@ -2900,6 +2984,10 @@ void skill_dispel(int cn)
 			if (co==cn)	{ do_char_log(cn, 0, "But you aren't negatively spelled!\n"); return; }
 			else 		{ do_char_log(cn, 0, "%s isn't negatively spelled!\n", ch[co].name); return; }
 		}
+	}
+	else
+	{
+		spell_dispel(cn, co, base_pow, sto, flag);
 	}
 	
 	do_update_char(co);
@@ -3661,7 +3749,7 @@ int spell_weaken(int cn, int co, int power, int flag)
 		bu[in].armor[1]  = -(power / 8 + 2);
 	}
 	
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_WEAKEN / SK_WEAKEN2
 }
 void skill_weaken(int cn)
 {
@@ -3708,7 +3796,7 @@ int spell_blind(int cn, int co, int power, int flag)
 	bu[in].to_hit[1]            = -(power/6 + 3);
 	bu[in].to_parry[1]          = -(power/6 + 3);
 	
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_BLIND
 }
 void skill_blind(int cn)
 {
@@ -3716,13 +3804,14 @@ void skill_blind(int cn)
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_WARRIOR) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_BLIND);
-	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = SP_COST_BLIND;
 	
-	// Hex Area increases spell cost
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	// Proximity increases spell cost
+	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
@@ -3742,7 +3831,7 @@ void skill_blind(int cn)
 	}
 	
 	// Cast AoE or general surround-hit
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	if (can_aoe)
 	{
 		if (!cast_aoe_spell(cn, co, SK_BLIND, power, aoe_power, cost, count, hit, 0))
 			return;
@@ -3763,12 +3852,12 @@ int spell_pulse(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, power, 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
 	if (!(in = make_new_buff(cn, SK_PULSE, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	
-	return cast_a_spell(cn, co, in, flag);
+	return cast_a_spell(cn, co, in, 0); // SK_PULSE
 }
 void skill_pulse(int cn)
 {
@@ -3796,18 +3885,18 @@ int spell_taunt(int cn, int co, int power, int flag)
 	if (!(in = make_new_buff(cn, SK_TAUNT, BUF_SPR_TAUNT, power, SP_DUR_TAUNT, 0)))
 		return 0;
 	
-	return cast_a_spell(cn, co, in, 1+flag);
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_TAUNT
 }
 int spell_guard(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, power, 0);
+	power = spellpower_check(cn, co, power, 0, 0);
 	
 	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, SP_DUR_GUARD, 0))) 
 		return 0;
 	
-	return cast_a_spell(cn, co, in, flag);
+	return cast_a_spell(cn, co, in, 0); // SK_GUARD
 }
 void skill_taunt(int cn)
 {
@@ -3815,13 +3904,14 @@ void skill_taunt(int cn)
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_SORCERER) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_TAUNT);
-	aoe_power = get_skill_score(cn, SK_HEXAREA);
+	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = SP_COST_TAUNT;
 	
-	// Hex Area increases spell cost
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	// Proximity increases spell cost
+	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
@@ -3841,7 +3931,7 @@ void skill_taunt(int cn)
 	}
 	
 	// Cast AoE or general surround-hit
-	if (ch[cn].skill[SK_HEXAREA][0] && !(ch[cn].flags & CF_AREA_OFF))
+	if (can_aoe)
 	{
 		if (!cast_aoe_spell(cn, co, SK_TAUNT, power, aoe_power, cost, count, hit, 0))
 			return;
@@ -3978,6 +4068,9 @@ int spell_razor(int cn, int co, int power, int flag)
 	
 	if (flag)	// Debuff version
 	{
+		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
+		if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	
 		power = spell_immunity(power, ch[co].to_parry);
 		
 		if (!(in = make_new_buff(cn, SK_RAZOR2, BUF_SPR_RAZOR2, power, TICKS, 0))) 
@@ -3985,13 +4078,13 @@ int spell_razor(int cn, int co, int power, int flag)
 	}
 	else		// Buff version
 	{
-		power = spellpower_check(cn, co, power, 0);
+		power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 		
 		if (!(in = make_new_buff(cn, SK_RAZOR, BUF_SPR_RAZOR, power, SP_DUR_RAZOR, 0))) 
 			return 0;
 	}
 	
-	return cast_a_spell(cn, co, in, flag);
+	return cast_a_spell(cn, co, in, flag, 1-flag); // SK_RAZOR / SK_RAZOR2
 }
 void skill_razor(int cn)
 {

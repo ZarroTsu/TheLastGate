@@ -218,7 +218,7 @@
 #define SP_DUR_BLESS		( TICKS * 60 * 10                 )
 #define SP_DUR_MSHELL(a)	( a * 128                         )
 #define SP_DUR_MSHIELD(a)	( a * 256                         )
-#define SP_DUR_HASTE(a)		( TICKS * 60 * 2 + TICKS * a * 3  )
+#define SP_DUR_HASTE		( TICKS * 60 * 10                 )
 #define SP_DUR_REGEN		( TICKS * 15                      )
 #define SP_DUR_HEAL			( TICKS * 60                      )
 #define SP_DUR_CURSE2		( TICKS * 40                      )
@@ -234,6 +234,7 @@
 #define SP_DUR_BLEED		( TICKS * 10                      )
 #define SP_DUR_WEAKEN		( TICKS * 60                      )
 
+#define SP_DUR_DISPEL		( TICKS * 15                      )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
 #define SP_DUR_TAUNT		( TICKS *  5                      )
 #define SP_DUR_GUARD		( TICKS * 15                      )

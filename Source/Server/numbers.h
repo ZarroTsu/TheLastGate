@@ -488,6 +488,8 @@
 #define BUF_SPR_HEATSTR		419
 #define BUF_SPR_FIRE		487
 //
+#define BUF_SPR_IMMUNI		497
+#define BUF_SPR_INNOCU		498
 #define BUF_SPR_BLIND		338
 #define BUF_SPR_PULSE		485
 #define BUF_SPR_TAUNT		489

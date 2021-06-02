@@ -58,9 +58,10 @@ extern int quit;
 
 extern int do_alpha;
 extern int do_shadow;
+extern int do_darkmode;
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
-extern int screen_overlay_sprite;
+//extern int screen_overlay_sprite;
 extern int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
 extern short screen_windowed;
 extern short screen_renderdist;
@@ -78,7 +79,7 @@ struct pdata pdata={"","","",0};
 
 extern int domusic,dosound,smode;
 extern char host_addr[];
-static int opmusic,opsound,opshadow;
+static int opmusic,opsound,opshadow,opdarkmode;
 int race=0,sex=0;
 
 static char *new_msg1={
@@ -153,7 +154,7 @@ void setres_800()
 	screen_tileyoff=YPOS_800;
 	screen_viewsize=VIEWSIZE_800;
 	view_subedges=VIEW_SUBEDGES_800;
-	screen_overlay_sprite=GUI_OVERLAY_800;
+	//screen_overlay_sprite=GUI_OVERLAY_800;
 
 	xwalk_nx=XWALK_NX_800;
 	xwalk_ny=XWALK_NY_800;
@@ -173,7 +174,7 @@ void setres_1280()
 	screen_tileyoff=YPOS_1280;
 	screen_viewsize=VIEWSIZE_1280;
 	view_subedges=VIEW_SUBEDGES_1280;
-	screen_overlay_sprite=GUI_OVERLAY_1280;
+	//screen_overlay_sprite=GUI_OVERLAY_1280;
 
 	xwalk_nx=XWALK_NX_1280;
 	xwalk_ny=XWALK_NY_1280;
@@ -199,7 +200,7 @@ void setres_1600()
 	screen_tileyoff=YPOS_1600;
 	screen_viewsize=VIEWSIZE_1600;
 	view_subedges=VIEW_SUBEDGES_1600;
-	screen_overlay_sprite=GUI_OVERLAY_1600;
+	//screen_overlay_sprite=GUI_OVERLAY_1600;
 
 	xwalk_nx=XWALK_NX_1600;
 	xwalk_ny=XWALK_NY_1600;
@@ -233,6 +234,7 @@ void load_options(void)
 		if (read(handle,&do_alpha,sizeof(do_alpha))!=sizeof(do_alpha)) do_alpha=2;
 		if (read(handle,&do_shadow,sizeof(do_shadow))!=sizeof(do_shadow)) do_shadow=1;
 		if (read(handle,&screen_windowed,sizeof(screen_windowed))!=sizeof(screen_windowed)) screen_windowed=1;
+		if (read(handle,&do_darkmode,sizeof(do_darkmode))!=sizeof(do_darkmode)) do_darkmode=0;
 		close(handle);
 	} else flag=1;
 
@@ -241,7 +243,7 @@ void load_options(void)
 		memset(history,0,sizeof(history));
 		memset(hist_len,0,sizeof(hist_len));
 		memset(words,0,sizeof(words));
-		domusic=0; dosound=1; do_alpha=2; do_shadow=1; screen_windowed=1;
+		domusic=0; dosound=1; do_alpha=2; do_shadow=1; screen_windowed=1; do_darkmode=0;
 		memset(&pdata,0,sizeof(pdata));
 		pdata.show_names=1;
 		pdata.hide=1;
@@ -272,6 +274,7 @@ void save_options(void)
 		write(handle,&do_alpha,sizeof(do_alpha));
 		write(handle,&do_shadow,sizeof(do_shadow));
 		write(handle,&screen_windowed,sizeof(screen_windowed));
+		write(handle,&do_darkmode,sizeof(do_darkmode));
 		close(handle);
 	}
 }
@@ -550,6 +553,9 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 			else do_shadow=0;
+			
+			if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
+			else do_darkmode=0;
 
 			GetDlgItemText(hwnd,IDC_CNAME,pdata.cname,79);
 			GetDlgItemText(hwnd,IDC_DESC,pdata.desc,149);
@@ -578,6 +584,8 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					else dosound=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 					else do_shadow=0;
+					if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
+					else do_darkmode=0;
 
 					GetDlgItemText(hwnd,IDC_CNAME,pdata.cname,79);
 					GetDlgItemText(hwnd,IDC_DESC,pdata.desc,158);
@@ -636,6 +644,8 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					else dosound=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 					else do_shadow=0;
+					if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
+					else do_darkmode=0;
 
 					GetDlgItemText(hwnd,IDC_CNAME,pdata.cname,79);
 					GetDlgItemText(hwnd,IDC_DESC,pdata.desc,149);
@@ -696,6 +706,9 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					return 1;
 				case IDC_DOSHADOW:
 					opshadow=1-opshadow; CheckDlgButton(hwnd,IDC_DOSHADOW,opshadow);
+					return 1;
+				case IDC_DODARKMODE:
+					opdarkmode=1-opdarkmode; CheckDlgButton(hwnd,IDC_DODARKMODE,opdarkmode);
 					return 1;
 
 				case IDC_CNAME:
@@ -854,6 +867,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			//CheckDlgButton(hwnd,IDC_DOMUSIC,opmusic);
 			CheckDlgButton(hwnd,IDC_DOSOUND,opsound);
 			CheckDlgButton(hwnd,IDC_DOSHADOW,opshadow);
+			CheckDlgButton(hwnd,IDC_DODARKMODE,opdarkmode);
 
 			SetFocus(GetDlgItem(hwnd,IDOK));
 
@@ -878,7 +892,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 void options(void)
 {
-	opmusic=domusic; opsound=dosound; opshadow=do_shadow;
+	opmusic=domusic; opsound=dosound; opshadow=do_shadow; opdarkmode=do_darkmode;
 
 	if (DialogBox(hinst,MAKEINTRESOURCE(OPTIONS),desk_hwnd,OptionsProc)==-1) {
 		MessageBeep(MB_ICONEXCLAMATION);

@@ -1274,7 +1274,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#allquests <page>      lists all quests.\n");
 			if (ch[cn].flags & CF_APPRAISE)
 				do_char_log(cn, 1, "#appraise              toggle appraise skill.\n");
-			if (ch[cn].skill[SK_SURRAREA][0] || ch[cn].skill[SK_DAMAREA][0] || ch[cn].skill[SK_HEXAREA][0])
+			if (ch[cn].skill[SK_PROX][0])
 				do_char_log(cn, 1, "#area                  toggle area skills.\n");
 			do_char_log(cn, 1, "#armor                 list armor stats.\n");
 			do_char_log(cn, 1, "#autoloot              automatic grave looting.\n");
@@ -3434,7 +3434,7 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
-		if (prefix(cmd, "area") && (ch[cn].skill[SK_SURRAREA][0] || ch[cn].skill[SK_DAMAREA][0] || ch[cn].skill[SK_HEXAREA][0]))
+		if (prefix(cmd, "area") && ch[cn].skill[SK_PROX][0])
 		{
 			do_toggle_aoe(cn);
 			return;

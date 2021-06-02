@@ -22,7 +22,7 @@ extern int cursor_type;
 extern HCURSOR cursor[10];
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
-extern int screen_overlay_sprite;
+//extern int screen_overlay_sprite;
 extern short screen_windowed;
 extern short screen_renderdist;
 
@@ -370,7 +370,9 @@ void eng_init_player(void)
 
 unsigned int    inv_pos=0,show_shop=0,waypoints=0,show_wps=0;
 
-unsigned int    skill_pos=0,wps_pos=0;
+unsigned int    show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
+
+unsigned int    skill_pos=0,wps_pos=0,mm_magnify=1;
 
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
@@ -1067,7 +1069,7 @@ void eng_display_win(int plr_sprite,int init)
 	dd_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
 
 	if (init) {
-		if (show_shop || show_wps) show_look=0;
+		if (show_shop || show_wps || show_motd || show_newp || show_tuto) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -1085,7 +1087,7 @@ void eng_display_win(int plr_sprite,int init)
 			
 			if (pl.worn[WN_CHARM2])
 			{
-				copyspritex(3, 775, 15,  0);
+				copyspritex(3+do_darkmode?18000:0, 775, 15,  0);
 			}
 			
 			// Show your own gear
@@ -1146,7 +1148,7 @@ void eng_display_win(int plr_sprite,int init)
 		} else {
 			if (look.worn[WN_CHARM2])
 			{
-				copyspritex(3, 775, 15,  0);
+				copyspritex(3+do_darkmode?18000:0, 775, 15,  0);
 			}
 			// Look at target gear
 			for (n = 0; n < 13; n++)
@@ -1188,7 +1190,7 @@ void eng_display_win(int plr_sprite,int init)
 
 		if (show_shop) 
 		{
-			copyspritex(92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			copyspritex(92+do_darkmode?18000:0,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (n=0; n<62; n++) {
 				if (!shop.item[n]) continue;
 				if (hightlight==HL_SHOP && hightlight_sub==n) 
@@ -1218,7 +1220,7 @@ void eng_display_win(int plr_sprite,int init)
 		
 		if (show_wps)
 		{
-			copyspritex(5,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			copyspritex(5+do_darkmode?18000:0,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			//wps_pos
 			for (n=0; n<8; n++) {
 				m=n+wps_pos;
@@ -1352,7 +1354,7 @@ void set_look_proz(unsigned short nr,unsigned short id,int proz)
 
 int tile_x=-1,tile_y=-1,tile_type=-1;
 
-void dd_show_map(unsigned short *src,int xo,int yo);
+void dd_show_map(unsigned short *src,int xo,int yo,int magnify);
 
 int autohide(int x,int y)
 {
@@ -1624,20 +1626,25 @@ void eng_display(int init)	// optimize me!!!!!
 
 	if (!selected_visible) selected_char=0;
 
-	copyspritex(screen_overlay_sprite,0,0,0);
+	copyspritex(1+do_darkmode?18000:0,0,0,0);
 
 	if (init) {
+		// Store your position on the map as a white pixel
 		xmap[mapy+mapx*MAPX_MAX]=0xffff;
-
-		mapx-=64;
+		
+		// offsets the minimap draw, so that it begins drawing from 64 tiles to the upper-left of your position,
+		//   drawing 128 x 128 tiles as pixels in dd_show_map.
+		// Added to this, mm_magnify carries a magnification value, which shrinks the tile offsets
+		//   and increases the size of the drawn 'pixels' to fill the 128x128 space.
+		mapx=mapx-(64/max(1,mm_magnify));
 		if (mapx<0)	mapx=0;
-		if (mapx>MAPX_MAX-129) mapx=MAPX_MAX-129;
+		if (mapx>MAPX_MAX-((128/max(1,mm_magnify))+1)) mapx=MAPX_MAX-((128/max(1,mm_magnify))+1);
 
-		mapy=mapy-64;
+		mapy=mapy-(64/max(1,mm_magnify));
 		if (mapy<0)	mapy=0;
-		if (mapy>MAPY_MAX-129) mapy=MAPY_MAX-129;
+		if (mapy>MAPY_MAX-((128/max(1,mm_magnify))+1)) mapy=MAPY_MAX-((128/max(1,mm_magnify))+1);
 
-		dd_show_map(xmap,mapy,mapx);
+		dd_show_map(xmap,mapy,mapx,max(1,mm_magnify));
 	}
 
 	eng_display_win(plr_sprite,init);
@@ -2980,7 +2987,7 @@ void engine(void)
 		if (look_timer)	look_timer--;
 		else show_look=0;
 
-		if ((show_shop||show_wps) && lookstep>QSIZE) {
+		if ((show_shop || show_wps || show_motd || show_newp || show_tuto) && lookstep>QSIZE) {
 			cmd1s(CL_CMD_LOOK,shop.nr);
 			lookstep=0;
 		}
@@ -3020,6 +3027,9 @@ void engine(void)
 			noshop--;
 			show_shop=0;
 			show_wps=0;
+			show_motd=0;
+			show_newp=0;
+			show_tuto=0;
 		}
 		if (t>GetTickCount() || skipinrow>100) {	// display frame only if we've got enough time
 			eng_display(init);

@@ -829,6 +829,30 @@ void sv_look6(unsigned char *buf)
 	}
 }
 
+void sv_showmotd(unsigned char *buf)
+{
+	int n;
+	
+	DEBUG("SV SHOWMOTD");
+	
+	n =*(unsigned char *)(buf+1);
+	
+	if (n>=100)
+	{	// Display tutorial
+		tuto_page=1;
+		show_tuto=(n%100)/10;
+		tuto_max=(n%100)%10;
+	}
+	else if (n)
+	{	// Display NEW PLAYER MotD from server and offer tutorial
+		show_newp=1;
+	}
+	else
+	{	// Display normal MotD from server
+		show_motd=1;
+	}
+}
+
 void sv_waypoints(unsigned char *buf)
 {
 	DEBUG("SV WAYPOINTS");
@@ -992,6 +1016,7 @@ int sv_cmd(unsigned char *buf)
 		case 	SV_IGNORE:		return sv_ignore(buf);
 		
 		case	SV_WAYPOINTS:			sv_waypoints(buf); return 5;
+		case	SV_SHOWMOTD:			sv_showmotd(buf); return 2;
 
 		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;
 	}
