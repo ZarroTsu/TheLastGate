@@ -864,14 +864,14 @@ int create_special_item(int temp)
 			break;
 	}
 	
-	roll=RANDOM(39);
+	roll=RANDOM(42);
 
 	// Pick a suffix, or two if legendary
 	for (n=0;n<=legendary;n++)
 	{
 		while (roll==prev) // avoid picking the same thing twice if legendary
 		{
-			roll=RANDOM(39);
+			roll=RANDOM(42);
 		}
 		prev = roll;
 		
@@ -946,7 +946,8 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
 					if (legendary) suffix = "Pugione"; else suffix = " of the Dagger";
@@ -963,7 +964,8 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
 					if (legendary) suffix = "Virgam"; else suffix = " of the Staff";
@@ -980,7 +982,8 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
 					if (legendary) suffix = "Benedicite"; else suffix = " of Blessing";
@@ -997,7 +1000,8 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
 					if (legendary) suffix = "Maledictum"; else suffix = " of Cursing";
@@ -1014,7 +1018,8 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
 					if (legendary) suffix = "Tarda"; else suffix = " of Slowing";
@@ -1031,11 +1036,12 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
-					if (legendary) suffix = "Ignis"; else suffix = " of Blasting";
-					it[in].skill[SK_BLAST][0] += 3 * mul;
+					if (legendary) suffix = "Praemium"; else suffix = " of Blasting";
+					it[in].skill[SK_BLAST][0] += 4 * mul;
 				}
 				else
 				{
@@ -1048,7 +1054,8 @@ int create_special_item(int temp)
 				if (
 					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
 					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
 				)
 				{
 					if (legendary) suffix = "Familia"; else suffix = " of Company";
@@ -1060,37 +1067,45 @@ int create_special_item(int temp)
 					it[in].skill[SK_SURROUND][0] += 5 * mul;
 				}
 				break;
-			//
 			case 35:
-				if (legendary) suffix = "Sana"; else suffix = " of Healing";
-				it[in].skill[SK_HEAL][0] += 5 * mul;
-				break;
 			case 36:
+				if (
+					temp==IT_HELM_CAST || temp==IT_BODY_CAST || 
+					temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
+					temp==IT_HELM_WIZR || temp==IT_BODY_WIZR ||
+					((temp==IT_HELM_DAMA || temp==IT_BODY_DAMA) && RANDOM(2))
+				)
+				{
+					if (legendary) suffix = "Clypeus"; else suffix = " of Shielding";
+					it[in].skill[SK_MSHIELD][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Furorem"; else suffix = " of Taunting";
+					it[in].skill[SK_TAUNT][0] += 4 * mul;
+				}
+				break;
+			//
+			case 37:
+				if (legendary) suffix = "Caecus"; else suffix = " of Blinding";
+				it[in].skill[SK_BLIND][0] += 4 * mul;
+				break;
+			case 39:
+				if (legendary) suffix = "Sana"; else suffix = " of Healing";
+				it[in].skill[SK_HEAL][0] += 4 * mul;
+				break;
+			case 40:
 				if (legendary) suffix = "Renati"; else suffix = " of Regeneration";
 				it[in].skill[SK_REGEN][0] += 5 * mul;
 				break;
-			case 37:
+			case 41:
 				if (legendary) suffix = "Requiem"; else suffix = " of Resting";
 				it[in].skill[SK_REST][0] += 5 * mul;
 				break;
-			case 38:
+			case 42:
 				if (legendary) suffix = "Meditor"; else suffix = " of Meditation";
 				it[in].skill[SK_MEDIT][0] += 5 * mul;
 				break;
-			/*
-			case 39:
-				suffix = " of Perception";
-				it[in].skill[SK_PERCEPT][0] += 6 * mul;
-				break;
-			case 40:
-				suffix = " of Stealth";
-				it[in].skill[SK_STEALTH][0] += 6 * mul;
-				break;
-			case 41:
-				suffix = " of Swimming";
-				it[in].skill[SK_SWIM][0] += 6 * mul;
-				break;
-			*/
 		}
 	}
 
@@ -1116,6 +1131,8 @@ int create_special_item(int temp)
 		case IT_BODY_ADEP: spr = 197; 	break;
 		case IT_HELM_WIZR: spr = 198; 	break;
 		case IT_BODY_WIZR: spr = 199; 	break;
+		case IT_HELM_DAMA: spr =3733; 	break;
+		case IT_BODY_DAMA: spr =3734; 	break;
 		//
 		default: spr = it[in].sprite[0]; break;
 	}

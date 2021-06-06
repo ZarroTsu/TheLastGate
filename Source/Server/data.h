@@ -256,7 +256,19 @@ extern unsigned int mapmarker;
 #define PROX_MULTI		(AT_CAP/(3/2))
 #define PROX_CAP		(AT_CAP/12)
 #define PROX_HIT		(AT_CAP/30)
-#define PROX_POW		(AT_CAP/35)
+#define PROX_POW		(AT_CAP/36)
+
+#define PRXW_RAD		6
+#define PRXW_CAP		(AT_CAP/ 4)
+#define PRXW_HIT		(AT_CAP/20)
+#define PRXW_POW		(AT_CAP/24)
+
+#define PRXB_RAD		2
+#define PRXB_CAP		(AT_CAP/ 5)
+#define PRXB_HIT		(AT_CAP/15)
+#define PRXB_POW		(AT_CAP/18)
+
+#define PRXP_RAD		2
 
 #define PREC_CAP		(AT_CAP/4)
 
@@ -271,77 +283,71 @@ extern unsigned int mapmarker;
 #define SK_HAND			 0
 #define SK_PRECISION	 1
 #define SK_DAGGER		 2
-#define SK_STAFF		 5
 #define SK_SWORD		 3
-#define SK_SHIELD		16
-#define SK_DUAL			36
 #define SK_AXE			 4
+#define SK_STAFF		 5
 #define SK_TWOHAND		 6
-#define SK_COMBATM		37	// -> Blind
+#define SK_RAZOR		 7
+#define SK_STEALTH		 8
+#define SK_PERCEPT		 9
 //////////////////////////
-#define SK_WEAPONM		38
-#define SK_ARMORM		39
-#define SK_REGEN		28
-#define SK_REST			29
-#define SK_MEDIT		30
-#define SK_CONCEN		34
-#define SK_CLEAVE		40
-#define SK_WEAKEN		41
-#define SK_WARCRY		35
-#define SK_BLAST		24
-//////////////////////////
-#define SK_POISON		42
-#define SK_PULSE		43
-#define SK_CURSE		20
-#define SK_SLOW			19
-#define SK_PROX			44
-#define SK_GHOST		27
-#define SK_GCMASTERY	45
-#define SK_SHADOW		46
-#define SK_BLESS		21
-#define SK_PROTECT		17
-//////////////////////////
-#define SK_ENHANCE		18
+#define SK_SWIM			10
 #define SK_MSHIELD		11
-#define SK_HASTE		47
-#define SK_HEAL			26
-#define SK_DISPEL		25
+#define SK_BARTER		12
+#define SK_REPAIR		13
 #define SK_LIGHT		14
 #define SK_RECALL		15
+#define SK_SHIELD		16
+#define SK_PROTECT		17
+#define SK_ENHANCE		18
+#define SK_SLOW			19
+//////////////////////////
+#define SK_CURSE		20
+#define SK_BLESS		21
 #define SK_IDENT		22
-#define SK_REPAIR		13
 #define SK_RESIST		23
+#define SK_BLAST		24
+#define SK_DISPEL		25
+#define SK_HEAL			26
+#define SK_GHOST		27
+#define SK_REGEN		28
+#define SK_REST			29
 //////////////////////////
-#define SK_IMMUN		32
-#define SK_PERCEPT		 9
-#define SK_STEALTH		 8
-#define SK_SURROUND		33
-#define SK_SURRAREA		48	// -> Taunt
-#define SK_SURRSPEED	49	// -> Trice
-#define SK_BARTER		12
+#define SK_MEDIT		30
 #define SK_SENSE		31
-#define SK_SWIM			10
-#define SK_FOCUS		 7	// -> Razor
+#define SK_IMMUN		32
+#define SK_SURROUND		33
+#define SK_CONCEN		34
+#define SK_WARCRY		35
+#define SK_DUAL			36
+#define SK_BLIND		37
+#define SK_WEAPONM		38
+#define SK_ARMORM		39
 //////////////////////////
-#define SK_WARCRY2  	50
-#define SK_BLEED		51
-#define SK_WEAKEN2		52
-#define SK_SCORCH		53
-#define SK_CURSE2		54
-#define SK_SLOW2		55
-#define SK_MSHELL		56
-#define SK_GUARD		57
-#define SK_RAZOR2		58
-#define SK_DOUSE		59
+#define SK_CLEAVE		40
+#define SK_WEAKEN		41
+#define SK_POISON		42
+#define SK_PULSE		43
+#define SK_PROX			44
+#define SK_GCMASTERY	45
+#define SK_SHADOW		46
+#define SK_HASTE		47
+#define SK_TAUNT		48
+#define SK_LEAP			49
+//////////////////////////
+// Defines for Ailments // - These are OK to match existing skill numbers; see splog[] in skill_driver.c
+#define SK_WARCRY2  	 1
+#define SK_BLEED		 2
+#define SK_WEAKEN2		 3
+#define SK_SCORCH		 4
+#define SK_CURSE2		 5 
+#define SK_SLOW2		 6
+#define SK_RAZOR2		 8
+#define SK_DOUSE		10
+#define SK_MSHELL		12
+#define SK_GUARD		16
 #define SK_DISPEL2		32
 //////////////////////////
-#define SK_BLIND		37
-#define SK_TAUNT		48
-#define SK_TRICE		49
-#define SK_RAZOR		 7
-//////////////////////////
-
-
 
 /* ch.data[] definitions */
 /* (this list is growing very slowly;
@@ -456,7 +462,7 @@ struct character
 	unsigned int worn[20];
 
 	// spells active on character
-	unsigned int spell[MAXBUFFS];
+	unsigned short spell[MAXBUFFS];
 
 	// item currently in hand (mouse cursor)
 	unsigned int citem;
@@ -526,7 +532,9 @@ struct character
 	unsigned short to_parry;       	// final chance to parry
 	unsigned short top_damage;		// Maximum damage score (normally handled by STR/2)
 	
-	char future1[6];               // space for future expansion
+	unsigned short taunted;         // has been taunted by this template
+	
+	char future1[4];               // space for future expansion
 
 	short int sprite_override;
 
@@ -546,8 +554,9 @@ struct character
 	
 	char item_lock[40];				// Used for locking items on the client so /sort ignores them
 	
-	int bs_points;					// Point total for Black Stronghold
-	int os_points;					// Point total for Osiris
+	int waypoints;					// known waypoint flags
+	
+	char future3[4];				// space for future expansion
 
 	time_t logout_date;
 

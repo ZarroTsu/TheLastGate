@@ -1290,9 +1290,12 @@ void dd_load_sprite(int nr)
 		optr=conv_load(nr,&xs,&ys);
 	}
 	if (!optr) {	// not found!
-		sprintf(buf,"Sprite %d is missing",nr);
-		xlog(0,buf);
-		return;
+		//sprintf(buf,"Sprite %d is missing",nr);
+		//xlog(0,buf);
+		fp=load_pnglib(35);
+		if (fp) optr=dd_load_png(fp,&xs,&ys,&alpha,&alphacnt);
+		if (!optr) optr=conv_load(35,&xs,&ys);
+		//return;
 	}
 
 	sprtab[nr].image=optr;

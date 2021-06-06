@@ -49,6 +49,7 @@ extern int stat_raised[];
 extern int stat_points_used;
 extern int noshop;
 extern int do_alpha;
+extern int race;
 
 void dd_invalidate_alpha(void);
 
@@ -386,10 +387,27 @@ void button_help(int nr)
 					} 
 					else 
 					{
-						pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
-						xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].name);
-						strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
-						pdata.xbutton[nr-16].name[7]=0;
+						int pl_flags, pl_flagb;
+						pl_flags = pl.worn[WN_FLAGS];
+						pl_flagb = pl.worn_p[WN_FLAGS];
+						if (	(last_skill==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+								(last_skill==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+								(last_skill==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+								(last_skill==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+								(last_skill==41&&(pl_flags & (1 << 10))) )	// Weaken -> Greater Weaken
+						{
+							pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
+							xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].alt_a);
+							strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
+							pdata.xbutton[nr-16].name[7]=0;
+						}
+						else
+						{
+							pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
+							xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].name);
+							strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
+							pdata.xbutton[nr-16].name[7]=0;
+						}
 					}
 				}
 				// Inventory shortcuts
@@ -468,7 +486,7 @@ void button_help(int nr)
 				else
 					xlog(1,"Effective damage taken multiplier granted by Scorch, granted by your Blast spell."); 
 			else if (last_skill==53 && pl.skill[49][0])
-				xlog(1,"Damage dealt by your Trice skill, before reduction from target Parry Score and Armor Value."); 
+				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value."); 
 			else if (last_skill==54 && pl.skill[48][0])
 				xlog(1,"Effective damage taken multiplier during the Guard status, granted by the Taunt skill."); 
 			else
@@ -1004,30 +1022,28 @@ int mouse_statbox2(int x,int y,int state)
 				xlog(3,"Details panel now showing default.");
 			}
 			
-			if (m==11&&(pl_flagb & (1 << 10))) 			// Magic Shield -> Magic Shell
+			if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+					(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+					(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+					(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+					(m==41&&(pl_flags & (1 << 10))) )	// Weaken -> Greater Weaken
 			{
-				strcpy(tmp, "Magic Shell");
-				xlog(1,"Use: Applies a buff to yourself, granting temporary resistance and immunity.");
+				strcpy(tmp, skilltab[n+skill_pos].alt_a);
+				xlog(1,skilltab[n+skill_pos].alt_b);
 			}
-			else if (m==19&&(pl_flags & (1 <<  5)))	// Slow -> Greater Slow
+			else if (m==44)	// Proximity has special descriptions
 			{
-				strcpy(tmp, "Greater Slow");
-				xlog(1,"Use: Applies a debuff, reducing your target's action speed.");
-			}
-			else if (m==20&&(pl_flags & (1 <<  6)))	// Curse -> Greater Curse
-			{
-				strcpy(tmp, "Greater Slow");
-				xlog(1,"Use: Applies a debuff, reducing your target's attributes.");
-			}
-			else if (m==26&&(pl_flags & (1 << 14)))	// Heal -> Regen
-			{
-				strcpy(tmp, "Regen");
-				xlog(1,"Use: Applies a buff, restoring your target's hitpoints over time.");
-			}
-			else if (m==41&&(pl_flags & (1 << 10)))	// Weaken -> Greater Weaken
-			{
-				strcpy(tmp, "Greater Weaken");
-				xlog(1,"Use: Greatly reduces your foe's armor value.");
+				strcpy(tmp, skilltab[n+skill_pos].name);
+				if (race==4)
+					xlog(1,skilltab[n+skill_pos].desc);
+				else if (race==6)
+					xlog(1,skilltab[n+skill_pos].alt_a);
+				else if (race==8)
+					xlog(1,skilltab[n+skill_pos].alt_b);
+				else if (race==10)
+					xlog(1,skilltab[n+skill_pos].alt_c);
+				else
+					xlog(1,"Passively improves the area-of-effect of various skills and spells.");
 			}
 			else
 			{
@@ -1436,6 +1452,8 @@ int mouse_motd(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{ 
+			if (show_newp) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
+			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
 			show_motd=0;
 			show_newp=0;
 			show_tuto=0;
@@ -1484,7 +1502,7 @@ int mouse_motd(int x,int y,int mode)
 		{
 			if (mode==MS_LB_UP) 
 			{
-				//cmd1(CL_CMD_WPS,nr); // Tell server we've skipped the tutorial
+				cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
 				show_newp=0;
 				noshop=QSIZE*12;
 			}

@@ -595,38 +595,31 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 					if (sex==0) sex=random(2)+1;
 					if (race==0) race=random(3)+1;
-
-					if (sex==1) 
+					
+					pdata.xbutton[0].skill_nr=14; strcpy(pdata.xbutton[0].name,"Light");
+					
+					if (race==1) // Templar
 					{
-						if 			(race== 1)	race=  4;	// M Templar
-						else if 	(race== 2)	race=  6;	// M Mercenary
-						else if 	(race== 3)	race=  8;	// M Harakim
-						/*
-						else if 	(race== 4)	race= 12;	// M Arch-Templar
-						else if 	(race== 5)	race= 14;	// M Pugilist
-						else if 	(race== 6)	race= 16;	// M Warrior
-						else if 	(race== 8)	race= 18;	// M Sorcerer
-						else if 	(race== 9)	race= 20;	// M Summoner
-						else if 	(race==10)	race= 22;	// M Arch-Harakim
-						// */
-						//else if	(race==11)  race=  2;   // M God
-						else 					race=  6;	// M Mercenary
-					} 
-					else 
+						if (sex==1) race=4; else race=5;
+						
+						pdata.xbutton[4].skill_nr=40; strcpy(pdata.xbutton[4].name,"Cleave");
+						pdata.xbutton[7].skill_nr=48; strcpy(pdata.xbutton[7].name,"Taunt");
+					}
+					else if (race==3) // Harakim
 					{
-						if 			(race== 1) 	race=  5;	// F Templar
-						else if 	(race== 2) 	race=  7;	// F Mercenary
-						else if 	(race== 3) 	race=  9;	// F Harakim
-						/*
-						else if 	(race== 4)	race= 13;	// F Arch-Templar
-						else if 	(race== 5)	race= 15;	// F Pugilist
-						else if 	(race== 6)	race= 17;	// F Warrior
-						else if 	(race== 8)	race= 19;	// F Sorcerer
-						else if 	(race== 9)	race= 21;	// F Summoner
-						else if 	(race==10)	race= 23;	// F Arch-Harakim
-						// */
-						//else if	(race==11)  race=  3;   // F God
-						else 					race=  7;	// F Mercenary
+						if (sex==1) race=8; else race=9;
+						
+						pdata.xbutton[5].skill_nr=24; strcpy(pdata.xbutton[5].name,"Blast");
+						pdata.xbutton[9].skill_nr=27; strcpy(pdata.xbutton[9].name,"Ghost C");
+						pdata.xbutton[3].skill_nr=11; strcpy(pdata.xbutton[3].name,"Magic S");
+						pdata.xbutton[2].skill_nr=17; strcpy(pdata.xbutton[2].name,"Protect");
+					}
+					else // Mercenary
+					{
+						if (sex==1) race=6; else race=7;
+						
+						pdata.xbutton[8].skill_nr=37; strcpy(pdata.xbutton[8].name,"Blind");
+						pdata.xbutton[2].skill_nr=17; strcpy(pdata.xbutton[2].name,"Protect");
 					}
 
 					save_options();

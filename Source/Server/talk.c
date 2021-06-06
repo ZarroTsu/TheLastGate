@@ -79,6 +79,7 @@ char *syn[] = {
 	"armour",      "armor",
 	"tulip",       "flower",
 	"rose",        "flower",
+	"orchid",      "flower",
 	"skeletons",   "skeleton",
 	"templars",    "templar",
 	"outlaws",     "outlaw",
@@ -245,7 +246,7 @@ struct know
 // "Answer" values
 //{ Answers for each skill question ("What is ...?")
 #define AN_SK_HAND		"The Hand to Hand skill assists with one's ability to hit and parry while unarmed."
-#define AN_SK_PUGILISM	"Precision is an advanced skill learned by Brawlers. It lets them score critical hits more often."
+#define AN_SK_PRECISION	"Precision is an advanced skill learned by Brawlers. It lets them score critical hits more often."
 #define AN_SK_DAGGER	"The Dagger skill will help with one's ability to hit and parry while using a dagger."
 #define AN_SK_SWORD		"The Sword skill helps with one's ability to hit and parry attacks with a sword."
 #define AN_SK_AXE		"The Axe skill will help with one's ability to hit and parry when using an axe."
@@ -281,19 +282,19 @@ struct know
 #define AN_SK_CONCENT	"Concentrate is an advanced skill learned by powerful mages. It reduces the mana cost of all spells."
 #define AN_SK_WARCRY	"Warcry is an advanced skill learned by powerful fighters. It frightens and stuns all nearby enemies."
 #define AN_SK_DUALW		"The Dual Wield skill provides additional chance to hit enemies when using an off-handed weapons."
-#define AN_SK_COMBATM	"Combat Mastery is a skill used by Templars. It gives them additional chances to hit and parry with any weapon."
+#define AN_SK_BLIND 	"Blind is a skill used by Mercenaries. It blinds and debilitates all nearby enemies."
 #define AN_SK_WEAPONM	"Weapon Mastery is a skill used by Templars. It gives them up to double the weapon value of their weapons."
 #define AN_SK_ARMORM	"Armor Mastery is a skill used by Templars. It gives them up to double the armor value of their armor."
 #define AN_SK_CLEAVE	"Cleave is a powerful skill used by Templars. It allows them to hit their enemies with a powerful blow."
 #define AN_SK_WEAKEN	"Weaken is a powerful skill used by Templars. It allows them to reduce their enemy's weapon and armor values."
 #define AN_SK_POISON	"Poison is an advanced spell learned by powerful mages. It inflicts an ailment that eats away at their target's health."
-#define AN_SK_DAMPROX	"Damage Proximity is an advanced skill learned by powerful Harakim. It grants an area of effect to spells that deal damage."
-#define AN_SK_HEXPROX	"Hex Proximity is an advanced skill learned by Sorcerers. It grants an area of effect to spells that inflict ailments."
+#define AN_SK_PULSE		"Pulse is an advanced skill learned by powerful Harakim. It grants a repeating burst of area damage."
+#define AN_SK_PROX		"Proximity is an advanced skill. It grants a variety of bonuses depending on the class that knows it"
 #define AN_SK_COMPM		"Companion Mastery is an advanced skill learned by Summoners. Their Ghost Companion becomes stronger and learns the Heal spell."
 #define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners and Brawlers. It lets them summon a copy of themself to fight for them."
 #define AN_SK_HASTE		"Haste is an advanced spell learned by Warriors and Sorcerers. It allows them to dramatically speed up their actions."
-#define AN_SK_SURRAREA	"Surround Area is an advanced skill learned by powerful Templar. It grants an area of effect to their Surround Hit skill."
-#define AN_SK_SURRRATE	"Surround Rate is an advanced skill learned by Warriors. It grants an additional chance to trigger Surround Hit."
+#define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
+#define AN_SK_LEAP		"Leap is an advanced skill learned by Warriors. It leaps through enemies, damaging them in the process."
 //}
 //{ "What is ...?" for each race
 #define AN_RA_TEMP		"Templars are powerful fighters. They are not very good with spells, but they have learned to adapt without them."
@@ -531,7 +532,7 @@ struct know
 #define AN_GROLMLB_WHY	"I would like to test this research myself and see just how intelligent the Grolms have or have not become."
 
 #define AN_HERMIT_WHO	"The mad hermit has been alone with his thoughts for many years, but he is a powerful magician."
-#define AN_HERMIT_WHAT	"A red rose. It is quite striking and different than other flowers."
+#define AN_HERMIT_WHAT	"A Pink Orchid. It is quite striking and different than other flowers."
 #define AN_HERMIT_WHER	"In the southern part of the Strange Forest, you may come across a fenced house. It is there."
 #define AN_HERMIT_WHY	"I am an alchemist, you see. I want to progress my studies."
 
@@ -1329,7 +1330,7 @@ struct know know[] = {
 	//{ Generic Answers
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
 	{{"?what", "!hand",       "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HAND, 0},
-	{{"?what", "!precision",  "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PUGILISM, 0},
+	{{"?what", "!precision",  "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PRECISION, 0},
 	{{"?what", "!dagger",     "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_DAGGER, 0},
 	{{"?what", "!sword",      "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SWORD, 0},
 	{{"?what", "!axe",        "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_AXE, 0},
@@ -1365,19 +1366,19 @@ struct know know[] = {
 	{{"?what", "!concentrate",             "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CONCENT, 0},
 	{{"?what", "!warcry",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WARCRY, 0},
 	{{"?what", "!dual", "!wield", "!skill","?", NULL}, 0, AR_GENERAL, 0, AN_SK_DUALW, 0},
-	{{"?what", "!combat", "!mastery",      "?", NULL}, 0, AR_GENERAL, 0, AN_SK_COMBATM, 0},
+	{{"?what", "!blind",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_BLIND, 0},
 	{{"?what", "!weapon", "!mastery",      "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WEAPONM, 0},
 	{{"?what", "!armor", "!mastery",       "?", NULL}, 0, AR_GENERAL, 0, AN_SK_ARMORM, 0},
 	{{"?what", "!cleave",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CLEAVE, 0},
 	{{"?what", "!weaken",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WEAKEN, 0},
 	{{"?what", "!poison",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_POISON, 0},
-	{{"?what", "!damage", "!proximity",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_DAMPROX, 0},
-	{{"?what", "!hex", "!proximity",       "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HEXPROX, 0},
+	{{"?what", "!pulse",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PULSE, 0},
+	{{"?what", "!proximity",               "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PROX, 0},
 	{{"?what", "!companion", "!mastery",   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_COMPM, 0},
 	{{"?what", "!shadow", "!copy",         "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SHADOW, 0},
 	{{"?what", "!haste",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HASTE, 0},
-	{{"?what", "!surround", "!area",       "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SURRAREA, 0},
-	{{"?what", "!surround", "!rate",       "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SURRRATE, 0},
+	{{"?what", "!taunt",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_TAUNT, 0},
+	{{"?what", "!leap",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_LEAP, 0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
 	{{"?what", "!templar",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_TEMP, 0},
 	{{"?what", "!mercenary",               "?", NULL}, 0, AR_GENERAL, 0, AN_RA_MERC, 0},

@@ -20,6 +20,7 @@ extern int dd_cache_hit,dd_cache_miss,MAXCACHE,invisible,cachex,cachey,MAXXOVER;
 extern int pskip,pidle;
 extern int maxmem,usedmem,maxvid,usedvid;
 extern int noshop;
+extern int selected_char;
 
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;

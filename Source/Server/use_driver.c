@@ -336,6 +336,7 @@ int use_create_item3(int cn, int in)
 		case IT_HELM_CRYS:	case IT_BODY_CRYS:	case IT_HELM_TITN:	case IT_BODY_TITN:
 		case IT_HELM_ADAM:	case IT_BODY_ADAM:	case IT_HELM_CAST:	case IT_BODY_CAST:
 		case IT_HELM_ADEP:	case IT_BODY_ADEP:	case IT_HELM_WIZR:	case IT_BODY_WIZR:
+		case IT_HELM_DAMA:	case IT_BODY_DAMA:
 			in2 = create_special_item(n);
 			break;
 
@@ -3991,46 +3992,48 @@ int spell_scroll(int cn, int in)
 
 	switch(spell)
 	{
-	case    SK_LIGHT:
-		ret = spell_light(cn, co, power);
-		break;
-	case    SK_ENHANCE:
-		ret = spell_enhance(cn, co, power);
-		break;
-	case    SK_PROTECT:
-		ret = spell_protect(cn, co, power);
-		break;
-	case    SK_BLESS:
-		ret = spell_bless(cn, co, power);
-		break;
-	case    SK_MSHIELD:
-		ret = spell_mshield(cn, co, power);
-		break;
-	case    SK_HASTE:
-		ret = spell_haste(cn, co, power);
-		break;
-	case    SK_CURSE:
-		if (chance_base(cn, SK_CURSE, 10, get_target_resistance(co), 1))
-		{
-			ret = 1;
-		}
-		else
-		{
-			ret = spell_curse(cn, co, power, 0);
-		}
-		break;
-	case    SK_SLOW:
-		if (chance_base(cn, SK_SLOW, 12, get_target_resistance(co), 1))
-		{
-			ret = 1;
-		}
-		else
-		{
-			ret = spell_slow(cn, co, power, 0);
-		}
-		break;
-	default:
-		ret = 0;
+		case    SK_LIGHT:
+			ret = spell_light(cn, co, power);
+			break;
+		case    SK_ENHANCE:
+			ret = spell_enhance(cn, co, power);
+			break;
+		case    SK_PROTECT:
+			ret = spell_protect(cn, co, power);
+			break;
+		case    SK_BLESS:
+			ret = spell_bless(cn, co, power);
+			break;
+		case    SK_MSHIELD:
+			ret = spell_mshield(cn, co, power);
+			break;
+		case    SK_HASTE:
+			ret = spell_haste(cn, co, power);
+			break;
+		// Blast?
+		case    SK_CURSE:
+			if (chance_base(cn, SK_CURSE, 10, get_target_resistance(co), 1))
+			{
+				ret = 1;
+			}
+			else
+			{
+				ret = spell_curse(cn, co, power, 0);
+			}
+			break;
+		case    SK_SLOW:
+			if (chance_base(cn, SK_SLOW, 12, get_target_resistance(co), 1))
+			{
+				ret = 1;
+			}
+			else
+			{
+				ret = spell_slow(cn, co, power, 0);
+			}
+			break;
+		
+		default:
+			ret = 0;
 	}
 
 	if (ret)
@@ -4499,11 +4502,12 @@ int explorer_point(int cn, int in)
 
 int way_point(int cn, int in)
 {
+	unsigned char buf[256];
 	int nr;
 
-	if (!(ch[cn].data[76] & it[in].data[0]))
+	if (!(ch[cn].waypoints & it[in].data[0]))
 	{
-		ch[cn].data[76] |= it[in].data[0];
+		ch[cn].waypoints |= it[in].data[0];
 
 		do_char_log(cn, 0, "You found a new waypoint!\n");
 		ch[cn].luck += 10;
@@ -4512,8 +4516,7 @@ int way_point(int cn, int in)
 	nr = ch[cn].player;
 	
 	buf[0] = SV_WAYPOINTS;
-	*(unsigned int*)(buf + 1) = ch[cn].data[76];
-	xsend(nr, buf, 5);
+	xsend(nr, buf, 1);
 
 	return(1);
 }

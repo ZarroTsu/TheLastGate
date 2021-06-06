@@ -6,7 +6,7 @@
 	#define MHOST		"192.168.0.11"
 #else
 	#define MNAME		"The Last Gate"
-	#define MHOST		"99.233.143.153"
+	#define MHOST		"thelastgate.ddns.net"
 #endif
 
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"
@@ -18,7 +18,7 @@
 #define TICKS			(18*TICKMULTI)
 
 #define MAXSKILL		50  // must match server!
-#define MAXBUFFS		20  // must match server!
+#define MAXBUFFS		40  // must match server!
 #define MAXWPS			20
 
 // wear positions
@@ -173,7 +173,7 @@ struct cplayer {
 	// possessions
 	int gold;
 	int bs_points;					// Point total for Black Stronghold
-	int os_points;					// Point total for Osiris
+	int waypoints;
 
 	// items carried
 	int item[40];
@@ -240,6 +240,8 @@ struct cplayer {
 #define CL_PASSWD			33
 #define CL_RENDERDATA		34
 #define CL_CMD_WPS			35
+#define CL_CMD_MOTD			36
+#define CL_CMD_BSSHOP		37
 #define CL_CMD_CTICK		255
 
 
@@ -266,6 +268,7 @@ struct cplayer {
 #define SV_SETCHAR_ITEM				23
 #define SV_SETCHAR_WORN				24
 #define SV_SETCHAR_OBJ				25
+#define SV_SETCHAR_WPS				26
 
 #define SV_TICK						27
 
@@ -320,6 +323,12 @@ struct cplayer {
 
 #define SV_WAYPOINTS				74
 #define SV_SHOWMOTD					75
+
+#define SV_MOTD						82
+#define SV_MOTD0					82
+#define SV_MOTD1					83
+#define SV_MOTD2					84
+#define SV_MOTD3					85
 
 #define SV_SETMAP					128
 

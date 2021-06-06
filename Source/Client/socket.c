@@ -229,6 +229,21 @@ void so_connect(HWND hwnd)
 			return;
 		}
 	} else {
+		/*
+		FILE *fp;
+        char str[15];
+     
+        fp = fopen(host_addr, "r");
+        if (fp == NULL)
+        {
+            SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not read web.ip");
+			so_status=0;
+			return;
+        }
+        haddr=inet_addr(fgets(str, 15, fp));
+        fclose(fp);
+		*/
+		
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server address");
 		he=gethostbyname(host_addr);
 		if (!he) {
@@ -237,6 +252,7 @@ void so_connect(HWND hwnd)
 			return;
 		}
 		haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
+		
 	}
 
 	addr.sin_family=AF_INET;
@@ -468,6 +484,13 @@ void sv_setchar_pts(unsigned char *buf)
 	pl.kindred=*(unsigned long*)(buf+9);
 }
 
+void sv_setchar_wps(unsigned char *buf)
+{
+	DEBUG("SV SETCHAR WPS");
+	pl.waypoints=*(unsigned long*)(buf+1);
+	pl.bs_points=*(unsigned long*)(buf+5);
+}
+
 void sv_setchar_gold(unsigned char *buf)
 {
 	DEBUG("SV SETCHAR GOLD");
@@ -675,6 +698,34 @@ void sv_log(unsigned char *buf,int font)
 	}
 }
 
+void sv_motd(unsigned char *buf,int font)
+{
+	static char text[512];
+	static int cnt=0;
+	int n;
+
+	DEBUG("SV MOTD");
+
+	memcpy(text+cnt,buf+1,15);
+	
+	for (n=cnt; n<cnt+15; n++)
+		if (text[n]==10) {
+			text[n]=0;
+			motdlog(text,font);
+			cnt=0;
+			return;
+		}
+	cnt+=15;
+
+	if (cnt>500) {
+		xlog(0,"sv_motd(): cnt too big!");
+
+		text[cnt]=0;
+		xlog(1,text);
+		cnt=0;
+	}
+}
+
 #pragma argsused
 void sv_scroll_right(unsigned char *buf)
 {
@@ -857,8 +908,6 @@ void sv_waypoints(unsigned char *buf)
 {
 	DEBUG("SV WAYPOINTS");
 	
-	waypoints =*(unsigned int *)(buf+1);
-	
 	show_wps=1;
 }
 
@@ -963,11 +1012,12 @@ int sv_cmd(unsigned char *buf)
 		case	SV_SETCHAR_ENDUR:	sv_setchar_endur(buf); return 13;
 		case	SV_SETCHAR_MANA:	sv_setchar_mana(buf); return 13;
 		case	SV_SETCHAR_AHP:		sv_setchar_ahp(buf); return 3;
-		case	SV_SETCHAR_AEND:       	sv_setchar_aend(buf); return 3;
+		case	SV_SETCHAR_AEND:    sv_setchar_aend(buf); return 3;
 		case	SV_SETCHAR_AMANA:	sv_setchar_amana(buf); return 3;
 		case	SV_SETCHAR_DIR:		sv_setchar_dir(buf); return 2;
 
 		case	SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
+		case	SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 9;
 		case	SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
 		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
 		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 9;
@@ -986,6 +1036,11 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOG1:		sv_log(buf,1); break;
 		case	SV_LOG2:		sv_log(buf,2); break;
 		case	SV_LOG3:		sv_log(buf,3); break;
+		
+		case	SV_MOTD0:		sv_motd(buf,0); break;
+		case	SV_MOTD1:		sv_motd(buf,1); break;
+		case	SV_MOTD2:		sv_motd(buf,2); break;
+		case	SV_MOTD3:		sv_motd(buf,3); break;
 
 		case	SV_SCROLL_RIGHT:	sv_scroll_right(buf); return 1;
 		case	SV_SCROLL_LEFT:		sv_scroll_left(buf); return 1;
@@ -1015,7 +1070,7 @@ int sv_cmd(unsigned char *buf)
 		case  	SV_UNIQUE:             	sv_unique(buf); return 9;
 		case 	SV_IGNORE:		return sv_ignore(buf);
 		
-		case	SV_WAYPOINTS:			sv_waypoints(buf); return 5;
+		case	SV_WAYPOINTS:			sv_waypoints(buf); return 1;
 		case	SV_SHOWMOTD:			sv_showmotd(buf); return 2;
 
 		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;

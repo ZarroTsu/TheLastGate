@@ -109,6 +109,26 @@ int npc_cityattack_see(int cn, int co)
 	{
 		return( 1);                     // processed it: we cannot see him, so ignore him
 	}
+	// if we're taunted, try to attack the taunter
+	if (IS_SANECHAR(cn[cn].taunter) && do_char_can_see(cn, cn[cn].taunter))
+	{
+		if (ch[cn].data[0]<2) ch[cn].data[0]=2; // Force the raid state
+		// If our last attempt to attack failed, wander near the taunter
+		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].last_action == ERR_FAILED)
+		{
+			ch[cn].goto_x = ch[co].x + 5 - RANDOM(10);
+			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
+		}
+		// Otherwise, try to attack the taunter
+		else if (ch[cn].attack_cn!=cn[cn].taunter && ch[cn].last_action == ERR_SUCCESS)
+		{
+			ch[cn].attack_cn = cn[cn].taunter;
+			ch[cn].goto_x = 0;
+		}
+		ch[cn].data[58] = 2;
+		ch[cn].data[78] = globs->ticker + TICKS * 5;
+		return(1);
+	}
 	if (ch[cn].data[42]!=ch[co].data[42] && ch[co].data[42]!=60 && ch[cn].data[0]>=2) // only fight if we're raiding
 	{
 		if (!(cc = ch[cn].attack_cn) || npc_dist(cn, co)<npc_dist(cn, cc))
@@ -235,7 +255,7 @@ int npc_cityattack_high(int cn)
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
+				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
 				return( 1);
 			}
 		}
@@ -276,23 +296,41 @@ int npc_cityattack_high(int cn)
 		{
 			return( 1);
 		}
-		if (co && globs->ticker>ch[cn].data[74] + TICKS * 10 && npc_try_spell(cn, co, SK_GHOST))
+		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
 		{
-			ch[cn].data[74] = globs->ticker;
+			ch[cn].data[74] = globs->ticker + TICKS * 10;
+			return(1);
+		}
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_PULSE))
+		{
+			return(1);
+		}
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_RAZOR))
+		{
 			return(1);
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_POISON))
 		{
 			return( 1);
 		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_WARCRY))
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
 		{
-			ch[co].data[75] = globs->ticker + (TICKS*2 + TICKS * get_skill_score(cn, SK_WARCRY)/80)*3/2;
+			ch[cn].data[74] = globs->ticker + TICKS * 10;
+			return( 1);
+		}
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_WARCRY))
+		{
+			ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(get_skill_score(cn, SK_WARCRY))*3/2;
 			return( 1);
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
 		{
-			ch[co].data[75] = globs->ticker + (TICKS * 5)*3/4;
+			ch[co].data[75] = globs->ticker + SK_EXH_CLEAVE/2;
+			return( 1);
+		}
+		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
+		{
+			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
 			return( 1);
 		}
 
@@ -300,7 +338,7 @@ int npc_cityattack_high(int cn)
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
+				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
 				return( 1);
 			}
 		}

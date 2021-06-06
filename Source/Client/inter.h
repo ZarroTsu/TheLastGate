@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000504
+#define VERSION 0x000600
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -186,7 +186,7 @@ struct look
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int show_shop, show_wps, waypoints, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
+extern unsigned int show_shop, show_wps, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2
@@ -237,7 +237,7 @@ struct wpslist
 	
 	char name[30];
 	char desc[30];
-}
+};
 
 extern struct wpslist wpslist[MAXWPS];
 
@@ -250,4 +250,5 @@ void say(char *input);
 void cmd1(int cmd,int x);
 void init_xalloc(void);
 void tlog(char *text,char font);
+void motdlog(char *text,char font);
 void do_msg(void);

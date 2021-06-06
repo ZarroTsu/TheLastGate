@@ -96,6 +96,8 @@ struct cplayer
 
 	// posessions
 	int gold;
+	int bs_points;					// Point total for Black Stronghold
+	int waypoints;
 
 	// items carried
 	int item[40];
@@ -161,6 +163,8 @@ struct cplayer
 #define CL_PASSWD        33
 
 #define CL_CMD_WPS       35
+#define CL_CMD_MOTD      36
+#define CL_CMD_BSSHOP    37
 
 #define CL_CMD_CTICK 255
 
@@ -187,6 +191,7 @@ struct cplayer
 #define SV_SETCHAR_ITEM 23
 #define SV_SETCHAR_WORN 24
 #define SV_SETCHAR_OBJ  25
+#define SV_SETCHAR_WPS  26
 
 #define SV_TICK 27
 
@@ -241,6 +246,13 @@ struct cplayer
 #define SV_IGNORE        73
 
 #define SV_WAYPOINTS     74
+#define SV_SHOWMOTD      75
+
+#define SV_MOTD  82
+#define SV_MOTD0 82
+#define SV_MOTD1 83
+#define SV_MOTD2 84
+#define SV_MOTD3 85
 
 #define SV_SETMAP 128                   // 128-255 are used !!!
 

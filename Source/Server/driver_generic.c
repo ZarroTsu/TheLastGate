@@ -182,10 +182,6 @@ void drv_moveto(int cn, int x, int y)
 {
 	int ret;
 
-	/* why did i do that? it seems identical.
-	   if (ch[cn].flags&(CF_PLAYER)) ret=char_moveto(cn,x,y,0,0,0);
-	   else                          ret=char_moveto(cn,x,y,0,0,0); */
-
 	ret = char_moveto(cn, x, y, 0, 0, 0);
 
 	if (ret)
@@ -579,7 +575,6 @@ void driver_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 	if (ch[cn].stunned==1)
 	{
 		return;                 // stunned players don't get messages...
-
 	}
 	if (!(ch[cn].flags & (CF_PLAYER | CF_USURP)))
 	{
@@ -596,14 +591,14 @@ void driver_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 
 	switch(type)
 	{
-	case    NT_GOTHIT:
-	case    NT_GOTMISS:
-		if (!ch[cn].attack_cn &&
-		    !ch[cn].data[CHD_FIGHTBACK] &&                         // fightback
-		    ch[cn].misc_action!=DR_GIVE)
-		{
-			ch[cn].attack_cn = dat1;
-		}
-		break;
+		case    NT_GOTHIT:
+		case    NT_GOTMISS:
+			if (!ch[cn].attack_cn &&
+				!ch[cn].data[CHD_FIGHTBACK] &&                         // fightback
+				ch[cn].misc_action!=DR_GIVE)
+			{
+				ch[cn].attack_cn = dat1;
+			}
+			break;
 	}
 }

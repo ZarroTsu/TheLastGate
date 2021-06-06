@@ -330,6 +330,7 @@ int god_create_char(int temp, int withitems)
 	ch[n].use_nr = 0;
 	ch[n].misc_action = 0;
 	ch[n].stunned = 0;
+	ch[n].taunted = 0;
 	ch[n].retry = 0;
 	ch[n].dir = DX_DOWN;
 
@@ -2291,12 +2292,12 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x40000000 | MF_NOEXPIRE;
 
 		//ch[cn].item[m++] = 0x20000000 | SPR_TUNDRA_GROUND;
-		ch[cn].item[m++] = 0x20000000 | SPR_DESERT_GROUND;
-		ch[cn].item[m++] = 0x20000000 | SPR_GROUND1;
-		ch[cn].item[m++] = 0x20000000 | SPR_WOOD_GROUND;
-		ch[cn].item[m++] = 0x20000000 | SPR_TAVERN_GROUND;
-		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND1;
-		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND2;
+		ch[cn].item[m++] = 0x20000000 | SPR_DESERT_GROUND;	//  1002
+		ch[cn].item[m++] = 0x20000000 | SPR_GROUND1;		//  1008
+		ch[cn].item[m++] = 0x20000000 | SPR_WOOD_GROUND;	//  1013
+		ch[cn].item[m++] = 0x20000000 | SPR_TAVERN_GROUND;	//  1034
+		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND1;	//  1010
+		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND2;	//  1052
 		ch[cn].item[m++] = 0x20000000 | 1100;
 		ch[cn].item[m++] = 0x20000000 | 1099;
 		ch[cn].item[m++] = 0x20000000 | 1012;

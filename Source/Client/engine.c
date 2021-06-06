@@ -48,8 +48,288 @@ extern int RED,GREEN,BLUE;
 int tput=0;
 
 extern int do_shadow;
+extern int do_darkmode;
 
 void do_msg(void);
+
+// Going to write up the tutorial right here. Unfortunately it takes up a lot of space.
+
+char tutorial_text[6][3][12][43] = { // overall
+	{ // tutorial 1
+		{ // page 1
+			{ "The diamond-shaped space in the middle of" },
+			{ "your screen is the game world." },
+			{ " " },
+			{ "As you move your mouse in this space, it" },
+			{ "will highlight tiles in the world." },
+			{ " " },
+			{ "Right-clicking a tile will rotate your" },
+			{ "character to face that direction." },
+			{ " " },
+			{ "Left-clicking a tile will tell your" },
+			{ "character to travel to that tile." },
+			{ " " }
+		},
+		{ // page 2
+			{ "In the upper right corner of the screen is" },
+			{ "the dialog window." },
+			{ " " },
+			{ "This displays chat messages, system" },
+			{ "messages, and game world events as text." },
+			{ " " },
+			{ "You can type at any time to make text, and" },
+			{ "can press the Enter/Return key to send it." },
+			{ " " },
+			{ "There are also various chat commands that" },
+			{ "can be sent starting with the # or / key," },
+			{ "such as /help or /shout." }
+		},
+		{ // page 3
+			{ "To get started, try approaching Jamil. He" },
+			{ "can be found in the room NORTH of here (to" },
+			{ "the upper left of your screen)." },
+			{ " " },
+			{ "You can click the X in the upper right of" },
+			{ "this dialog window or press the ESCAPE key" },
+			{ "to continue." },
+			{ " " },
+			{ " " },
+			{ " " },
+			{ " " },
+			{ " " }
+		}
+	},
+	{ // tutorial 2
+		{ // page 1
+			{ "Jamil has given you your first quest!" },
+			{ "The Thieves House is located farther to" },
+			{ "the NORTH, outside of this tavern." },
+			{ " " },
+			{ "To leave this tavern, you can click on the" },
+			{ "same tile as the door to open it and stand" },
+			{ "in its frame, revealing tiles beyond it." },
+			{ " " },
+			{ "You can also click inside the black void" },
+			{ "beyond the door, and your character will" },
+			{ "attempt to navigate to that tile if they" },
+			{ "are able to." }
+		},
+		{ // page 2
+			{ "While out in the game world, the CTRL, ALT," },
+			{ "and SHIFT keys change the way clicking" },
+			{ "interacts with the world." },
+			{ " " },
+			{ "The SHIFT key allows interactions with" },
+			{ "objects and items." },
+			{ " " },
+			{ "The CTRL key allows interactions with NPCS" },
+			{ "and monsters." },
+			{ " " },
+			{ "If you are a spellcaster, the ALT key lets" },
+			{ "you highlight a target for your spells." }
+		},
+		{ // page 3
+			{ "For now, feel free to explore, try out the" },
+			{ "controls, maybe test the /help command?" },
+			{ " " },
+			{ "To assist your character, try casting the" },
+			{ "LIGHT spell on the hotkey list in the lower" },
+			{ "right. These spells can also be used by" },
+			{ "holding the CTRL or ALT key, and pressing" },
+			{ "the number or letter shown next to them." },
+			{ " " },
+			{ "If you happen to stumble into combat, your" },
+			{ "character will fight back automatically." },
+			{ " " }
+		}
+	},
+	{ // tutorial 3
+		{ // page 1
+			{ "You got your first kill! You have been" },
+			{ "awarded a bunch experience points." },
+			{ " " },
+			{ "In The Last Gate, experience points are" },
+			{ "put towards an assortment of skills and" },
+			{ "passives which effect your character." },
+			{ " " },
+			{ "The skill list in the upper left should now" },
+			{ "be filled with +'s. Clicking on these will" },
+			{ "allocate some experience toward that skill." },
+			{ " " },
+			{ " " }
+		},
+		{ // page 2
+			{ "You can RIGHT-CLICK on skills on this list" },
+			{ "to see what they do. This will be displayed" },
+			{ "in the dialog window on the right." },
+			{ " " },
+			{ "With your experience allocated, it will NOT" },
+			{ "affect your character until it is applied." },
+			{ " " },
+			{ "To apply this experience, always remember" },
+			{ "to LEFT-CLICK on the 'Update' button at the" },
+			{ "bottom of the list." },
+			{ " " },
+			{ " " }
+		},
+		{ // page 3
+			{ "Here are some helpful tips to raising your" },
+			{ "first character:" },
+			{ " " },
+			{ "Raising the weapon skill that matches your" },
+			{ "weapon, such as AXE, SWORD or DAGGER, can" },
+			{ "improve survivability by making enemies" },
+			{ "miss more often when they strike you." },
+			{ " " },
+			{ "Harakim may also benefit from raising" },
+			{ "spells such as BLAST or GHOST COMPANION," },
+			{ "which get stronger as they increase." },
+			{ " " }
+		}
+	},
+	{ // tutorial 4
+		{ // page 1
+			{ "This particular enemy has dropped a key," },
+			{ "which you'll need to get further inside." },
+			{ " " },
+			{ "To loot their grave and grab the key, you" },
+			{ "can hold down your SHIFT key and LEFT-" },
+			{ "CLICK while highlighting their gravestone." },
+			{ " " },
+			{ "This will open a new window, displaying the" },
+			{ "content of their grave such as what they" },
+			{ "were carrying, their gear, and any money" },
+			{ "they may have had." },
+			{ " " }
+		},
+		{ // page 2
+			{ "If you RIGHT-CLICK on any item in this" },
+			{ "grave window, it will display the item's" },
+			{ "name in the dialog window to the right." },
+			{ " " },
+			{ "You can LEFT-CLICK on any item in this" },
+			{ "grave window to take it, adding it to your" },
+			{ "inventory." },
+			{ " " },
+			{ "Money will be taken automatically and" },
+			{ "added to your carried money." },
+			{ " " },
+			{ " " }
+		},
+		{ // page 3
+			{ "Similarly, RIGHT-CLICKING items in your" },
+			{ "inventory will let you look at them, and" },
+			{ "LEFT-CLICKING items in your inventory will" },
+			{ "use them." },
+			{ " " },
+			{ "Some items, such as keys, will be used" },
+			{ "automatically while they are in your" },
+			{ "inventory. Keys let you walk through locked" },
+			{ "doors as if they were open." },
+			{ " " },
+			{ "Consumable items such as potions will be" },
+			{ "reduced or removed when you use them." }
+		}
+	},
+	{ // tutorial 5
+		{ // page 1
+			{ "You killed the boss of the Thieves Guild!" },
+			{ " " },
+			{ "Jamil's amulet aside, he is also carrying" },
+			{ "additional pieces of armor you can wear." },
+			{ " " },
+			{ "If you hold down the SHIFT key and LEFT-" },
+			{ "CLICK on items in your inventory, you will" },
+			{ "pick that item up and hold it under your" },
+			{ "cursor." },
+			{ " " },
+			{ "You can drop the item on your cursor by" },
+			{ "holding SHIFT and LEFT-CLICKING elsewhere." }
+		},
+		{ // page 2
+			{ "Equipping the armor the thief was carrying" },
+			{ "will grant you additional Armor Value," },
+			{ "which reduces damage taken when being hit." },
+			{ " " },
+			{ "You can also try to equip Jamil's amulet if" },
+			{ "you like, but you might not be able to..." },
+			{ " " },
+			{ "As you explore and your character improves," },
+			{ "you will find new weapons and armor that" },
+			{ "can be equipped. Some can give bonuses to" },
+			{ "your skills and attributes as well." },
+			{ " " }
+		},
+		{ // page 3
+			{ "Your final task is to return to Jamil and" },
+			{ "give back his amulet." },
+			{ " " },
+			{ "While holding an item under your cursor," },
+			{ "holding down the CTRL key and LEFT-CLICKING" },
+			{ "on a character will attempt to give the" },
+			{ "held item to that character." },
+			{ " " },
+			{ "Holding CTRL and LEFT-CLICKING without an" },
+			{ "item on your cursor will instead tell your" },
+			{ "character to begin combat with that target." },
+			{ "Be careful with your clicks!" }
+		}
+	},
+	{ // tutorial 6
+		{ // page 1
+			{ "You have completed your first quest!" },
+			{ " " },
+			{ "Jamil has given you a new skill, as well as" },
+			{ "some more experience points to play around" },
+			{ "with. Spend this however you like!" },
+			{ " " },
+			{ "Of course, Jamil is only the first quest." },
+			{ "There are many NPCs dotted around town who" },
+			{ "may ask for your help when you meet them." },
+			{ " " },
+			{ "The Innkeeper may help you find additional" },
+			{ "quests to try out if you approach him." }
+		},
+		{ // page 2
+			{ "If, on the other hand, you feel like this" },
+			{ "is a good stopping point to take a break" },
+			{ "from the game, you can do so by entering" },
+			{ "the vacant room in the lower right." },
+			{ " " },
+			{ "Although it looks dark and uninviting, this" },
+			{ "will allow your character to safely exit" },
+			{ "the game." },
+			{ " " },
+			{ "Clicking on the 'EXIT' button in the lower" },
+			{ "right will quit the game faster, but this" },
+			{ "may punish you if you try to cheat combat." }
+		},
+		{ // page 3
+			{ "The other buttons in the lower right can" },
+			{ "adjust how the game world is displayed," },
+			{ "each behaving as a toggle for the named" },
+			{ "element in the game world." },
+			{ " " },
+			{ "The 'FAST', 'NORMAL', and 'SLOW' buttons" },
+			{ "adjust movement speed, each carrying their" },
+			{ "own strengths and weaknesses." },
+			{ " " },
+			{ "So we reach the end of this tutorial. We" },
+			{ "hope you have fun in this little world of" },
+			{ "ours, and mayest thou pass The Last Gate!" }
+		}
+	},
+};
+
+int tutorial_image[6][3] = { 
+	{ 18010, 18011, 18012 },
+	{ 18013, 18014, 18015 },
+	{ 18016, 18017, 18018 },
+	{ 18019, 18020, 18021 },
+	{ 18022, 18023, 18024 },
+	{ 18025, 18026, 18027 }
+};
+//
 
 char *at_name[5]={
 	"Braveness",
@@ -67,63 +347,210 @@ char *at_name[5]={
 
 struct skilltab *skilltab;
 struct skilltab _skilltab[50]={
-//		sortkey
-//	{ nr, '/', "name[40]////////",	"desc[200]/////////////////////////////////////////",			{ //////, //////, ////// }}, //
-	{  0, 'C', "Hand to Hand", 		"Your ability to hit and parry while unarmed.", 				{ AT_AGL, AT_AGL, AT_STR }},
-	{  1, 'F', "Precision", 		"Improves your ability to inflict critical hits.", 				{ AT_BRV, AT_AGL, AT_AGL }},
-	{  2, 'D', "Dagger", 			"Your ability to hit and parry with daggers.", 					{ AT_BRV, AT_INT, AT_AGL }},
-	{  3, 'D', "Sword", 			"Your ability to hit and parry with one-handed swords.",		{ AT_BRV, AT_AGL, AT_STR }},
-	{  4, 'D', "Axe", 				"Your ability to hit and parry with axes.", 					{ AT_AGL, AT_STR, AT_STR }},
-	{  5, 'D', "Staff", 			"Your ability to hit and parry with staffs.", 					{ AT_BRV, AT_WIL, AT_STR }},
-	{  6, 'D', "Two-Handed", 		"Your ability to hit and parry with two-handed weapons.", 		{ AT_AGL, AT_AGL, AT_STR }},
-	{  7, 'H', "Focus", 			"You cannot lose focus. Grants a bonus to total spellpower.",	{ AT_BRV, AT_BRV, AT_BRV }},
-	{  8, 'R', "Stealth", 			"Your ability to stay hidden from others' sight.", 				{ AT_INT, AT_AGL, AT_AGL }},
-	{  9, 'R', "Perception", 		"Your ability to see and hear your surroundings.", 				{ AT_WIL, AT_INT, AT_AGL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
-	{ 10, 'U', "Swimming", 			"Prevents the loss of hitpoints while moving underwater.", 		{ AT_WIL, AT_AGL, AT_STR }},
-	{ 11, 'O', "Magic Shield", 		"Use: Applies a buff to yourself, granting temporary armor.", 	{ AT_BRV, AT_WIL, AT_WIL }},
-	{ 12, 'U', "Bartering", 		"Getting good prices while buying or selling.", 				{ AT_BRV, AT_INT, AT_INT }},
-	{ 13, 'P', "Repair", 			"Use: You will try to repair the item under your cursor.", 		{ AT_INT, AT_AGL, AT_STR }},
-	{ 14, 'O', "Light", 			"Use: Make yourself or your target glow in the dark.", 			{ AT_BRV, AT_WIL, AT_INT }},
-	{ 15, 'O', "Recall", 			"Use: Warp yourself to a safe place.", 							{ AT_BRV, AT_WIL, AT_INT }},
-	{ 16, 'D', "Shield", 			"Your ability to score bonus parries while using a shield.", 	{ AT_BRV, AT_WIL, AT_STR }},
-	{ 17, 'O', "Protect", 			"Use: Applies a buff, raising your target's armor value.", 		{ AT_BRV, AT_WIL, AT_WIL }},
-	{ 18, 'O', "Enhance", 			"Use: Applies a buff, raising your target's weapon value.", 	{ AT_BRV, AT_WIL, AT_WIL }},
-	{ 19, 'K', "Slow", 				"Use: Applies a debuff, reducing your target's action speed.", 	{ AT_BRV, AT_INT, AT_INT }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
-	{ 20, 'K', "Curse", 			"Use: Applies a debuff, reducing your target's attributes.", 	{ AT_BRV, AT_INT, AT_INT }},
-	{ 21, 'O', "Bless", 			"Use: Applies a buff, raising your target's attributes.", 		{ AT_BRV, AT_WIL, AT_WIL }},
-	{ 22, 'O', "Identify", 			"Use: Identify the properties of a target or an item.", 		{ AT_BRV, AT_WIL, AT_INT }},
-	{ 23, 'Q', "Resistance", 		"Resists against enemy negative spells.", 						{ AT_BRV, AT_WIL, AT_STR }},
-	{ 24, 'I', "Blast", 			"Use: Damages the selected target and any around you.", 		{ AT_BRV, AT_INT, AT_INT }},
-	{ 25, 'O', "Dispel", 			"Use: Removes debuffs from your target.", 						{ AT_BRV, AT_WIL, AT_INT }},
-	{ 26, 'O', "Heal", 				"Use: Heals your target. Repeat uses lose their full effect.", 	{ AT_BRV, AT_INT, AT_STR }},
-	{ 27, 'M', "Ghost Companion", 	"Use: Summons a companion to follow you and your commands.", 	{ AT_BRV, AT_WIL, AT_INT }},
-	{ 28, 'A', "Regenerate", 		"Regenerating hitpoints, usually while out-of-combat.", 		{ AT_STR, AT_STR, AT_STR }},
-	{ 29, 'A', "Rest", 				"Regenerating endurance, usually while out-of-combat.", 		{ AT_AGL, AT_AGL, AT_AGL }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
-	{ 30, 'B', "Meditate", 			"Regenerating mana, usually while out-of-combat.", 				{ AT_INT, AT_INT, AT_INT }},
-	{ 31, 'U', "Sense Magic", 		"Sensing who or what did something to you.", 					{ AT_BRV, AT_WIL, AT_STR }},
-	{ 32, 'Q', "Immunity", 			"Reduces the strength of enemy negative spells.", 				{ AT_BRV, AT_AGL, AT_STR }},
-	{ 33, 'S', "Surround Hit", 		"Hitting all surrounding enemies, including your front.", 		{ AT_BRV, AT_AGL, AT_STR }},
-	{ 34, 'H', "Concentrate", 		"Reduces the mana cost of spells and abilities.", 				{ AT_WIL, AT_WIL, AT_WIL }},
-	{ 35, 'G', "Warcry", 			"Use: Shout to stun and strike fear into all nearby enemies.", 	{ AT_BRV, AT_STR, AT_STR }},
-	{ 36, 'D', "Dual Wield", 		"Your ability to score bonus hits while dual-wielding.", 		{ AT_BRV, AT_AGL, AT_STR }},
-	{ 37, 'F', "Combat Mastery", 	"Improves your ability to hit and parry with any weapon.", 		{ AT_BRV, AT_AGL, AT_STR }},
-	{ 38, 'D', "Weapon Mastery", 	"Improves the weapon value for your equipped weapon.", 			{ AT_BRV, AT_AGL, AT_STR }},
-	{ 39, 'E', "Armor Mastery", 	"Improves the armor value for your equipped armor.", 			{ AT_BRV, AT_AGL, AT_STR }},
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
-	{ 40, 'G', "Cleave", 			"Use: Strike your foe and deal damage to surrounding enemies.", { AT_BRV, AT_STR, AT_STR }},
-	{ 41, 'G', "Weaken", 			"Use: Reduce your foe's weapon and armor values.", 				{ AT_BRV, AT_AGL, AT_AGL }},
-	{ 42, 'I', "Poison", 			"Use: Poison the selected target and any around you.", 			{ AT_BRV, AT_INT, AT_INT }},
-	{ 43, 'J', "Damage Proximity", 	"Increases the area-of-effect of both Blast and Poison.", 		{ AT_WIL, AT_INT, AT_INT }},
-	{ 44, 'L', "Hex Proximity", 	"Increases the area-of-effect of Poison, Curse and Slow.", 		{ AT_WIL, AT_INT, AT_INT }},
-	{ 45, 'N', "Companion Mastery", "Improves the power and abilities of your ghost companion.", 	{ AT_BRV, AT_WIL, AT_INT }},
-	{ 46, 'N', "Shadow Copy", 		"Use: Summon a doppelganger to attack your enemies with you.", 	{ AT_WIL, AT_AGL, AT_AGL }},
-	{ 47, 'O', "Haste", 			"Use: Applies a buff to yourself, increasing action speed.",	{ AT_BRV, AT_WIL, AT_WIL }},
-	{ 48, 'T', "Surround Area",		"Improves the area-of-effect for Surround Hit.", 				{ AT_BRV, AT_STR, AT_STR }},
-	{ 49, 'T', "Surround Rate", 	"Improves how often Surround Hit is triggered.", 				{ AT_BRV, AT_AGL, AT_STR }}
-//	{ //, '/', "////////////////",	"//////////////////////////////////////////////////",			{ //////, //////, ////// }}, //
+//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{  0, 'C', 	"Hand to Hand", 		"Passive ability to hit and parry while unarmed.", 
+				"", "", "", 
+				{ AT_AGL, AT_AGL, AT_STR }},
+				
+	{  1, 'H', 	"Precision", 			"Passively improves your ability to inflict critical hits.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{  2, 'D', 	"Dagger", 				"Passive ability to hit and parry with a dagger in your main hand.", 
+				"", "", "", 
+				{ AT_WIL, AT_WIL, AT_AGL }},
+				
+	{  3, 'D', 	"Sword", 				"Passive ability to hit and parry with a one-handed sword in your main hand.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{  4, 'D', 	"Axe", 					"Passive ability to hit and parry with an axe in your main hand.", 
+				"", "", "", 
+				{ AT_AGL, AT_STR, AT_STR }},
+				
+	{  5, 'D', 	"Staff", 				"Passive ability to hit and parry with a staff in your main hand.", 
+				"", "", "", 
+				{ AT_INT, AT_INT, AT_STR }},
+				
+	{  6, 'D', 	"Two-Handed", 			"Passive ability to hit and parry with a two-handed weapon in your main hand.", 
+				"", "", "", 
+				{ AT_AGL, AT_AGL, AT_STR }},
+				
+	{  7, 'F', 	"Razor", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_AGL }},
+				
+	{  8, 'H', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
+				"", "", "", 
+				{ AT_INT, AT_AGL, AT_AGL }},
+				
+	{  9, 'H', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
+				"", "", "", 
+				{ AT_INT, AT_INT, AT_AGL }},
+//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{ 10, 'H', 	"Swimming", 			"Passive ability to prevent the loss of hitpoints while you are underwater.", 
+				"", "", "", 
+				{ AT_WIL, AT_AGL, AT_STR }},
+				
+	{ 11, 'F', 	"Magic Shield", 		"Use (Spell): Applies a buff to yourself, granting temporary armor.", 
+				"Magic Shell", 			"Use (Spell): Applies a buff to yourself, granting temporary resistance and immunity.", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
+				
+	{ 12, 'H', 	"Bartering", 			"Passive ability to get better prices while buying or selling.", 
+				"", "", "", 
+				{ AT_BRV, AT_INT, AT_INT }},
+				
+	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.", 
+				"", "", "", 
+				{ AT_INT, AT_AGL, AT_STR }},
+				
+	{ 14, 'F', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 15, 'F', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location, after a brief delay.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 16, 'D', 	"Shield", 				"Passive ability to parry while using a shield.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_STR }},
+				
+	{ 17, 'F', 	"Protect", 				"Use (Spell): Applies a buff to you or your target, raising their armor value.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
+				
+	{ 18, 'F', 	"Enhance", 				"Use (Spell): Applies a buff to you or your target, raising their weapon value.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
+				
+	{ 19, 'F', 	"Slow", 				"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their action speed.", 
+				"Slow (Greater)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their action speed.", "", 
+				{ AT_BRV, AT_INT, AT_INT }},
+//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{ 20, 'F', 	"Curse", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their attributes.", 
+				"Curse (Greater)", 		"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their attributes.", "", 
+				{ AT_BRV, AT_INT, AT_INT }},
+				
+	{ 21, 'F', 	"Bless", 				"Use (Spell): Applies a buff to you or your target, raising their attributes.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
+				
+	{ 22, 'F', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 23, 'H', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_STR }},
+				
+	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", 
+				"Blast (Douse)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, reducing your target's spell modifier.", "", 
+				{ AT_BRV, AT_INT, AT_INT }},
+				
+	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.", 
+				"Dispel (Enemy)", 		"Use (Spell): Removes buffs from your target.", "", 
+				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 26, 'F', 	"Heal", 				"Use (Spell): Heals you or your target. This also applies Healing Sickness, reducing the power of consecutive heals.", 
+				"Heal (Regen)", 		"Use (Spell): Applies a buff to you or your target, granting them health regeneration.", 
+										"Use (Spell): Consumes a portion of your hitpoints to restore your target's mana.", 
+				{ AT_BRV, AT_INT, AT_STR }},
+				
+	{ 27, 'F', 	"Ghost Companion", 		"Use (Spell): Summons a companion to follow you and your commands. Say COMMAND to it for a list of commands.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 28, 'A', 	"Regenerate", 			"Passive ability to recover hitpoints over time.", 
+				"", "", "", 
+				{ AT_STR, AT_STR, AT_STR }},
+				
+	{ 29, 'A', 	"Rest", 				"Passive ability to recover endurance over time.", 
+				"", "", "", 
+				{ AT_AGL, AT_AGL, AT_AGL }},
+//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{ 30, 'B', 	"Meditate", 			"Passive ability to recover mana over time.", 
+				"", "", "", 
+				{ AT_INT, AT_INT, AT_INT }},
+				
+	{ 31, 'H', 	"Sense Magic", 			"Passive ability to sense who or what did something to you, and sense magical item drops.", 
+				"", "", "", 
+				{ AT_WIL, AT_WIL, AT_STR }},
+				
+	{ 32, 'H', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{ 33, 'H', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{ 34, 'H', 	"Concentrate", 			"Passive ability to reduce the mana cost of spells and abilities.", 
+				"", "", "", 
+				{ AT_WIL, AT_WIL, AT_WIL }},
+				
+	{ 35, 'E', 	"Warcry", 				"Use (Skill): Shout to stun and strike fear into all nearby enemies. Has a base radius of 6 tiles.", 
+				"", "", "", 
+				{ AT_BRV, AT_STR, AT_STR }},
+				
+	{ 36, 'D', 	"Dual Wield", 			"Passive ability to hit while using a dual-sword.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 2 tiles.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_AGL }},
+				
+	{ 38, 'G', 	"Weapon Mastery", 		"Passive ability to improve weapon value granted by your equipped weapon.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_AGL }},
+				
+	{ 39, 'H', 	"Armor Mastery", 		"Passive ability to improve armor value granted by your equipped armor.", 
+				"", "", "", 
+				{ AT_BRV, AT_STR, AT_STR }},
+//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies.", 
+				"", "", "", 
+				{ AT_BRV, AT_STR, AT_STR }},
+				
+	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon and armor values.", 
+				"Weaken (Greater)", 	"Use (Skill): Applies a debuff to your foe and surrounding enemies, greatly reducing their armor value.", "", 
+				{ AT_BRV, AT_AGL, AT_AGL }},
+				
+	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, causing them to take damage over time. Stacks up to 3 times.", 
+				"", "", "", 
+				{ AT_BRV, AT_INT, AT_INT }},
+				
+	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes. Has a base radius of 2 tiles.", 
+				"", "", "", 
+				{ AT_BRV, AT_INT, AT_INT }},
+				
+	{ 44, 'H', 	"Proximity", 			"Passively improves the area-of-effect of your Warcry, Taunt, and Surround Hit skills.", // Arch-Templar
+										"Passively improves the hit rate of your Surround Hit skill, and the area-of-effect of your Blind skill.", // Warrior
+										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
+										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
+				{ AT_BRV, AT_BRV, AT_BRV }},
+				
+	{ 45, 'H', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
+				
+	{ 47, 'F', 	"Haste", 				"Use (Spell): Applies a buff to yourself, increasing your action speed.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_AGL }},
+				
+	{ 48, 'E', 	"Taunt",				"Use (Skill): Applies a debuff to your target and surrounding enemies, forcing them to attack you. This also applies a buff to yourself, granting damage resistance.", 
+				"", "", "", 
+				{ AT_BRV, AT_STR, AT_STR }},
+				
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap behind them. This may strike up to three consecutive foes in front of you.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }}
+//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 };
 
 struct wpslist wpslist[MAXWPS]={
@@ -368,7 +795,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int    inv_pos=0,show_shop=0,waypoints=0,show_wps=0;
+unsigned int    inv_pos=0,show_shop=0,show_wps=0;
 
 unsigned int    show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -386,9 +813,12 @@ extern int mouse_x,mouse_y;	// current mouse coordinates
 
 #define XS	49
 #define LL	22
+#define MLL 26
 #define XLL (22*10)
 static char logtext[XLL][60];
 static char logfont[XLL];
+static char motdtext[MLL][60];
+static char motdfont[MLL];
 
 #define MAXTS            20
 
@@ -458,7 +888,7 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 
 int load=0;
 
-void display_meta_from_ls()
+void display_meta_from_ls(void)
 {
 	int pl_speed, pl_atksp, pl_spmod, pl_spapt;
 	int pl_critc, pl_critm, pl_topdm, pl_reflc;
@@ -469,7 +899,7 @@ void display_meta_from_ls()
 	int hpmult, endmult, manamult;
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
-	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_trice, sk_blind;
+	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
 	int sk_water, sk_cleav, sk_taunt, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
 	
 	// Player Speed and Attack Speed - WN_SPEED
@@ -546,7 +976,7 @@ void display_meta_from_ls()
 	sk_pulse = (pl.skill[43][5]*pl_spmod/100) * 2 * 75/1000;
 	sk_pucnt = 60 / (6 * pl_basel / max(100, pl_coold));
 	sk_razor = (pl.skill[7][5]+pl.weapon/4) * 2 * 75/1000;
-	sk_trice = (pl.skill[49][5]+max(0,(pl_atksp-120))/4) * 750/1000;
+	sk_leapv = (pl.skill[49][5]+max(0,(pl_atksp-120))/4) * 750/1000;
 	sk_blind = -(pl.skill[37][5] / 6 + 3);
 	sk_water = 25 * 18;
 	sk_cleav = (pl.skill[40][5]+pl.weapon/4) * 2 * 750/1000;
@@ -778,7 +1208,7 @@ void display_meta_from_ls()
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_pucnt);
 			}
 			break;									// ".............." // 
-		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Razor DPH	4. Trice DPH	5. Blind Pow	6. Water Degen
+		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Razor DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Endur. Regen/s");
@@ -787,8 +1217,8 @@ void display_meta_from_ls()
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Razor DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_razor);
 			}	if (pl.skill[49][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Trice DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_trice);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Leap DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_leapv);
 			}	if (pl.skill[37][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);
@@ -899,7 +1329,7 @@ void eng_display_win(int plr_sprite,int init)
 			// Draw shortcut key names
 			for (m=0; m<16; m++)
 			{
-				if (pdata.xbutton[m].skill_nr==100+n+inv_pos)
+				if (pdata.xbutton[m].skill_nr==100+n+(signed)inv_pos)
 				{
 					copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
 				}
@@ -1006,18 +1436,15 @@ void eng_display_win(int plr_sprite,int init)
 					dd_xputtext(9,(8+8*14)+n*14,1,"-");
 				continue;
 			}
-			if (m==11&&(pl_flagb & (1 << 10))) 			// Magic Shield -> Magic Shell
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Magic Shell");
-			else if (m==19&&(pl_flags & (1 <<  5)))	// Slow -> Greater Slow
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Greater Slow");
-			else if (m==20&&(pl_flags & (1 <<  6)))	// Curse -> Greater Curse
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Greater Curse");
-			else if (m==26&&(pl_flags & (1 << 14)))	// Heal -> Regen
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Regen");
-			else if (m==41&&(pl_flags & (1 << 10)))	// Weaken -> Greater Weaken
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s","Greater Weaken");
+			if (	(m==11&&(pl_flagb & (1 << 10))) || 	// Magic Shield -> Magic Shell
+					(m==19&&(pl_flags & (1 <<  5))) || 	// Slow -> Greater Slow
+					(m==20&&(pl_flags & (1 <<  6))) || 	// Curse -> Greater Curse
+					(m==26&&(pl_flags & (1 << 14))) || 	// Heal -> Regen
+					(m==41&&(pl_flags & (1 << 10)))	)	// Weaken -> Greater Weaken
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
 			else
 				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
+			
 			if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
 			dd_xputtext(140,(8+8*14)+n*14,1,"%3d",pl.skill[m][5]+stat_raised[n+8+skill_pos]);
 			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
@@ -1087,7 +1514,7 @@ void eng_display_win(int plr_sprite,int init)
 			
 			if (pl.worn[WN_CHARM2])
 			{
-				copyspritex(3+do_darkmode?18000:0, 775, 15,  0);
+				copyspritex(do_darkmode?18003:3, 775, 15,  0);
 			}
 			
 			// Show your own gear
@@ -1148,7 +1575,7 @@ void eng_display_win(int plr_sprite,int init)
 		} else {
 			if (look.worn[WN_CHARM2])
 			{
-				copyspritex(3+do_darkmode?18000:0, 775, 15,  0);
+				copyspritex(do_darkmode?18003:3, 775, 15,  0);
 			}
 			// Look at target gear
 			for (n = 0; n < 13; n++)
@@ -1190,7 +1617,7 @@ void eng_display_win(int plr_sprite,int init)
 
 		if (show_shop) 
 		{
-			copyspritex(92+do_darkmode?18000:0,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			copyspritex(do_darkmode?18092:92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (n=0; n<62; n++) {
 				if (!shop.item[n]) continue;
 				if (hightlight==HL_SHOP && hightlight_sub==n) 
@@ -1220,15 +1647,15 @@ void eng_display_win(int plr_sprite,int init)
 		
 		if (show_wps)
 		{
-			copyspritex(5+do_darkmode?18000:0,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			copyspritex(do_darkmode?18005:5,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			//wps_pos
 			for (n=0; n<8; n++) {
 				m=n+wps_pos;
 				if (hightlight==HL_WAYPOINT && hightlight_sub==n)
-					copyspritex((waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
+					copyspritex((pl.waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
 				else
-					copyspritex((waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
-				if (waypoints&(1<<m))
+					copyspritex((pl.waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
+				if (pl.waypoints&(1<<m))
 				{
 					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,wpslist[m].name);
 					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,wpslist[m].desc);
@@ -1241,6 +1668,32 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			// Scroll bar
 			dd_showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(wps_pos*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
+		}
+		
+		if (show_motd)
+		{
+			copyspritex(do_darkmode?18042:42,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			for (y=0; y<MLL; y++) {
+				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,motdfont[y],motdtext[y]);
+			}
+		}
+		
+		if (show_newp)
+		{
+			copyspritex(do_darkmode?18043:43,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			for (y=0; y<MLL; y++) {
+				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,motdfont[y],motdtext[y]);
+			}
+		}
+		
+		if (show_tuto)
+		{
+			copyspritex(do_darkmode?18044:44,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			copyspritex(tutorial_image[show_tuto][tuto_page],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
+			for (y=0;y<12;y++)
+			{
+				dd_xputtext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,1,tutorial_text[show_tuto][tuto_page][y+1]);
+			}
 		}
 	}
 }
@@ -1393,7 +1846,7 @@ void display_floortile(int tile,int light,int x,int y,int xoff,int yoff,int mx,i
 
 void eng_display(int init)	// optimize me!!!!!
 {
-	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr=1;
+	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
 	extern int dd_cache_hit,dd_cache_miss,swap,MAXCACHE;
 	static unsigned short xmap[MAPX_MAX*MAPY_MAX];
 	static xm_flag=1;
@@ -1466,7 +1919,8 @@ void eng_display(int init)	// optimize me!!!!!
 				if (map[m].flags&UWATER) tmp|=512;
 
 				// object
-                if (pdata.hide==0 || (map[m].flags&ISITEM) || autohide(x,y)) {
+                if (pdata.hide==0 || (map[m].flags&ISITEM) || autohide(x,y)) 
+				{
 					int tmp2;
 
 					if (map[m].obj1>16335 && map[m].obj1<16422 && map[m].obj1!=16357 &&
@@ -1489,7 +1943,39 @@ void eng_display(int init)	// optimize me!!!!!
 							copysprite(tmp2,map[m].light|16|tmp,x*32,y*32,xoff,yoff);
 						else 
 							copysprite(tmp2,map[m].light|tmp,x*32,y*32,xoff,yoff);
-					} else {
+					} 
+					
+					else if (map[m].obj1==598 && (
+						(pl.waypoints&(1<< 0) && map[m].back==1002) ||
+						(pl.waypoints&(1<< 1) && map[m].back==1008) ||
+						(pl.waypoints&(1<< 2) && map[m].back==1013) ||
+						(pl.waypoints&(1<< 3) && map[m].back==1034) ||
+						(pl.waypoints&(1<< 4) && map[m].back==1010) ||
+						(pl.waypoints&(1<< 5) && map[m].back==1052) ||
+						(pl.waypoints&(1<< 6) && map[m].back==1100) ||
+						(pl.waypoints&(1<< 7) && map[m].back==1099) ||
+						(pl.waypoints&(1<< 8) && map[m].back==1012) ||
+						(pl.waypoints&(1<< 9) && map[m].back==1109) ||
+						(pl.waypoints&(1<<10) && map[m].back==1118) ||
+						(pl.waypoints&(1<<11) && map[m].back==1141) ||
+						(pl.waypoints&(1<<12) && map[m].back==1158) ||
+						(pl.waypoints&(1<<13) && map[m].back==1145) ||
+						(pl.waypoints&(1<<14) && map[m].back==1014) ||
+						(pl.waypoints&(1<<15) && map[m].back==1005) ||
+						(pl.waypoints&(1<<16) && map[m].back==1006) ||
+						(pl.waypoints&(1<<17) && map[m].back==1007) ||
+						(pl.waypoints&(1<<18) && map[m].back== 402) ||
+						(pl.waypoints&(1<<19) && map[m].back== 500)
+					))
+					{
+						// display waypoints as "lit" if you have that flag.
+						if (hightlight==HL_MAP && tile_type==1 && tile_x==x && tile_y==y) 
+							copysprite(599,map[m].light|16|tmp,x*32,y*32,xoff,yoff);
+						else 
+							copysprite(599,map[m].light|tmp,x*32,y*32,xoff,yoff);
+					}
+					else
+					{
 						if (hightlight==HL_MAP && tile_type==1 && tile_x==x && tile_y==y) 
 							copysprite(map[m].obj1,map[m].light|16|tmp,x*32,y*32,xoff,yoff);
 						else 
@@ -1527,16 +2013,13 @@ void eng_display(int init)	// optimize me!!!!!
 				if ((pdata.show_names|pdata.show_proz) && map[m].ch_nr) 
 				{
 					set_look_proz(map[m].ch_nr,map[m].ch_id,map[m].ch_proz);
-					if (map[m].ch_fontcolor>=0 && map[m].ch_fontcolor<=3)
-					{
-						// Colors 1 and 0 are flip-flopped in case the color can't be pulled from the server.
-						if (map[m].ch_fontcolor==0)
-							txtclr = 1;
-						else if (map[m].ch_fontcolor==1)
-							txtclr = 0;
-						else
-							txtclr = map[m].ch_fontcolor;
-					}
+					// Colors 1 and 0 are flip-flopped in case the color can't be pulled from the server.
+					if (map[m].ch_fontcolor==0)
+						txtclr = 1;
+					else if (map[m].ch_fontcolor==1)
+						txtclr = 0;
+					else
+						txtclr = map[m].ch_fontcolor;
 					dd_gputtext(x*32,y*32,txtclr,lookup(map[m].ch_nr,map[m].ch_id),xoff+map[m].obj_xoff,yoff+map[m].obj_yoff-8);
 				}
 				
@@ -1626,7 +2109,7 @@ void eng_display(int init)	// optimize me!!!!!
 
 	if (!selected_visible) selected_char=0;
 
-	copyspritex(1+do_darkmode?18000:0,0,0,0);
+	copyspritex(do_darkmode?18001:1,0,0,0);
 
 	if (init) {
 		// Store your position on the map as a white pixel
@@ -1691,6 +2174,38 @@ void tlog(char *text,char font)
 		for (n=XS-1; n>0; n--) if (logtext[0][n]==' ') break;
 		if (n!=0) {
 			logtext[0][n]=0; text+=n+1;
+		} else text+=XS-1;
+	}
+}
+
+void motdlog(char *text,char font)
+{
+	int n,panic=0;
+	static int flag=0;
+
+	if (!flag) {
+		for (n=0; n<MLL*60; n++) {
+			motdtext[0][n]=0;
+		}
+		for (n=0; n<MLL; n++) {
+			motdfont[n]=0;
+		}
+		flag=1;
+	}
+
+	if (strlen(text)<1)	return;
+
+	while (panic++<MLL) {
+		do_msg();
+		memmove(motdtext[1],motdtext[0],MLL*60-60);
+		memmove(&motdfont[1],&motdfont[0],MLL-1);
+		memcpy(motdtext[0],text,min(60-1,strlen(text)+1));
+		motdfont[0]=font;
+		motdtext[0][60-1]=0;
+		if (strlen(text)<XS-1) return;
+		for (n=XS-1; n>0; n--) if (motdtext[0][n]==' ') break;
+		if (n!=0) {
+			motdtext[0][n]=0; text+=n+1;
 		} else text+=XS-1;
 	}
 }

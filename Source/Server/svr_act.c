@@ -253,7 +253,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 
 		if (map[m].flags & MF_DEATHTRAP)
 		{
-			if (ch[cn].luck>=100 && RANDOM(10000)<5000 + ch[cn].luck)
+			if (try_lucksave(cn))
 			{
 				do_lucksave(cn, "deathtrap");
 			}
@@ -897,7 +897,7 @@ void plr_misc(int cn)
 	{
 		case    0:
 			// Feb 2020 - regular slash does extra surround check if you have surround-speed
-			if (ch[cn].skill[SK_SURRSPEED][0])
+			if ((ch[cn].kindred & KIN_WARRIOR) && ch[cn].skill[SK_PROX][0])
 				plr_attack(cn, 2);
 			else
 				plr_attack(cn, 0);

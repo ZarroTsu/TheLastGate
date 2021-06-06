@@ -24,11 +24,27 @@
 
 int ctick = 0;
 
+static char intro_msg1_font = 1;
 static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
+static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
-static char intro_msg3[] = {"\n"};
-static char intro_msg4[] = {"Use #help (or /help) to get a listing of the text commands.\n"};
-//static char intro_msg4[]={"WARNING: Lag scrolls will only work if used not later than four minutes after lagging out!\n"};
+static char intro_msg3_font = 3;
+static char intro_msg3[] = {"Current server version is 0.6.0\n"};
+static char intro_msg4_font = 0;
+static char intro_msg4[] = {"OLD CHARACTER EXP HAS BEEN RESET! Make sure you reallocate your exp before heading out!\n"};
+static char intro_msg5_font = 1;
+static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
+
+static char newbi_msg1_font = 1;
+static char newbi_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
+static char newbi_msg2_font = 2;
+static char newbi_msg2[] = {"New to the the game? Click on the TUTORIAL button to take a tour!\n"};
+static char newbi_msg3_font = 1;
+static char newbi_msg3[] = {"You can use /help (or #help) to get a listing of helpful text commands.\n"};
+static char newbi_msg4_font = 3;
+static char newbi_msg4[] = {"If you need assistance, try /shout before you type. This will notify the entire server.\n"};
+static char newbi_msg5_font = 3;
+static char newbi_msg5[] = {"If you need further help or an admin, feel free to join our Discord server using the Discord button on the load menu.\n"};
 
 static inline unsigned int _mcmp(unsigned char *a, unsigned char *b, unsigned int len)
 {
@@ -882,7 +898,7 @@ void plr_cmd_attack(int nr)
 	}
 
 	cn = player[nr].usnr;
-
+	
 	ch[cn].attack_cn = co;
 	ch[cn].goto_x = 0;
 	ch[cn].misc_action = 0;
@@ -940,6 +956,31 @@ void plr_cmd_wps(int nr)
 	cn = player[nr].usnr;
 
 	do_waypoint(cn, n);
+}
+
+void plr_cmd_motd(int nr)
+{
+	int cn, n;
+
+	n = *(unsigned short*)(player[nr].inbuf + 1);
+
+	cn = player[nr].usnr;
+	
+	// this command sets tutorial step in .data[76] - use (ch[cn].data[76]&(1<<n)) to check elsewhere
+	// if this is 1<<16 it skips future tutorials
+	ch[cn].data[76] |= (1<<n);
+}
+
+void plr_cmd_bsshop(int nr)
+{
+	int cn, co, n;
+
+	co = *(unsigned short*)(player[nr].inbuf + 1);
+	n = *(unsigned short*)(player[nr].inbuf + 3);
+
+	cn = player[nr].usnr;
+
+	/* do_shop_char(cn, co, n); */
 }
 
 void plr_cmd_look_item(int nr)
@@ -1528,6 +1569,13 @@ void plr_cmd(int nr)
 	case CL_CMD_WPS:
 		plr_cmd_wps(nr);
 		break;
+	case CL_CMD_MOTD:
+		plr_cmd_motd(nr);
+		break;
+	case CL_CMD_BSSHOP:
+		plr_cmd_bsshop(nr);
+		break;
+	
 	default:
 		plog(nr, "Unknown CL: %d", player[nr].inbuf[0]);
 		break;
@@ -1653,14 +1701,23 @@ void plr_newlogin(int nr)
 
 	plog(nr, "Created new character");
 
-	do_char_log(cn, 1, intro_msg1);
-	do_char_log(cn, 1, " \n");
-	do_char_log(cn, 1, intro_msg2);
-	do_char_log(cn, 1, " \n");
-	do_char_log(cn, 1, intro_msg3);
-	do_char_log(cn, 1, " \n");
-	do_char_log(cn, 1, intro_msg4);
-	do_char_log(cn, 1, " \n");
+	do_char_motd(cn, newbi_msg1_font, newbi_msg1);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, newbi_msg2_font, newbi_msg2);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, newbi_msg3_font, newbi_msg3);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, newbi_msg4_font, newbi_msg4);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, newbi_msg5_font, newbi_msg5);
+	
+	buf[0] = SV_SHOWMOTD;
+	*(unsigned char*)(buf + 1) = 1;
+	xsend(nr, buf, 2);
 
 	if (player[nr].passwd[0] && !(ch[cn].flags & CF_PASSWD))
 	{
@@ -1811,14 +1868,29 @@ void plr_login(int nr)
 
 	plog(nr, "Login successful");
 
-	do_char_log(cn, 1, intro_msg1);
-	do_char_log(cn, 1, " \n");
-	do_char_log(cn, 1, intro_msg2);
-	do_char_log(cn, 1, " \n");
-	do_char_log(cn, 1, intro_msg3);
-	do_char_log(cn, 1, " \n");
-	do_char_log(cn, 1, intro_msg4);
-	do_char_log(cn, 1, " \n");
+	do_char_motd(cn, intro_msg1_font, intro_msg1);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, intro_msg2_font, intro_msg2);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, intro_msg3_font, intro_msg3);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, intro_msg4_font, intro_msg4);
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, 1, " \n");
+	do_char_motd(cn, intro_msg5_font, intro_msg5);
+	
+	buf[0] = SV_SHOWMOTD;
+	*(unsigned char*)(buf + 1) = 0;
+	xsend(nr, buf, 2);
+	
+	// Kill the tutorial if we're a returning player with more than 10k exp
+	if (ch[cn].points_tot>10000 && ch[cn].data[76]<(1<<16))
+	{
+		ch[cn].data[76] |= (1<<16);
+	}
 
 	if (player[nr].passwd[0] && !(ch[cn].flags & CF_PASSWD))
 	{
@@ -1935,6 +2007,7 @@ void plr_logout(int cn, int nr, int reason)
 		ch[cn].use_nr = 0;
 		ch[cn].misc_action = 0;
 		ch[cn].stunned = 0;
+		ch[cn].taunted = 0;
 		ch[cn].retry = 0;
 		for (n = 0; n<13; n++) // reset afk, group and follow
 		{
@@ -2783,6 +2856,19 @@ void plr_change(int nr)
 		cpl->points = ch[cn].points;
 		cpl->points_tot = ch[cn].points_tot;
 		cpl->kindred = ch[cn].kindred;
+	}
+	
+	// waypoints and bspoints
+	if (cpl->waypoints!=ch[cn].waypoints ||
+		cpl->bs_points!=stronghold_points(cn))
+	{
+		buf[0] = SV_SETCHAR_WPS;
+		*(unsigned int*)(buf + 1) = ch[cn].waypoints;
+		*(unsigned int*)(buf + 5) = stronghold_points(cn);
+		xsend(nr, buf, 9);
+		
+		cpl->waypoints = ch[cn].waypoints;
+		cpl->bs_points = stronghold_points(cn);
 	}
 
 	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)

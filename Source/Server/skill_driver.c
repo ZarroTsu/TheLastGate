@@ -21,36 +21,57 @@ char *at_name[5] = {
 	"Strength"
 };
 
-struct s_splog splog[60] = {
+struct s_splog splog[50] = {
 	{
 		0, 				"Exhaust", 		"exhaust", 		"exhausting"
 	},{
-		1
+		SK_WARCRY2, 	"Stun",			"stun",			"stunning"
+	},{ 
+		SK_BLEED, 		"Bleed",		"bleed",		"bleeding"
+	},{ 
+		SK_WEAKEN2, 	"Greater Weakness",	"weaken",	"weakening",
+		"Your equipment feels very heavy.",
+		" was badly weakened.",
+		" badly weakened you."
+	},{ 
+		SK_SCORCH, 		"Scorch",		"scorch",		"scorching",
+		"You have been scorched.",
+		" was scorched.",
+		" scorched you."
+	},{ 
+		SK_CURSE2, 		"Greater Curse",	"curse",	"cursing",
+		"You have been badly cursed.",
+		" was badly cursed.",
+		" cast greater curse on you."
+	},{ 
+		SK_SLOW2, 		"Greater Slow",		"slow",		"slowing",
+		"You have been badly slowed.",
+		" was badly slowed.",
+		" cast greater slow on you."
 	},{
-		2
+		SK_RAZOR,		"Razor",		"razor",		"razoring",
+		"Razor active!",
+		"'s Razor activated.",
+		" cast razor on you."
 	},{
-		3
-	},{
-		4
-	},{
-		5
-	},{
-		6
-	},{
-		7
-	},{
-		8
+		SK_RAZOR2,		"Razor",		"razor",		"razoring"
 	},{
 		9
 	},{
-		10
+		SK_DOUSE,		"Douse",		"douse",		"dousing",
+		"You have been doused.",
+		" was doused.",
+		" cast douse on you."
 	},{ 
 		SK_MSHIELD,		"Magic Shield",	"magic shield",	"magic shielding",
 		"Magic Shield active!",
 		"'s Magic Shield activated.",
 		" cast magic shield on you."
 	},{
-		12
+		SK_MSHELL, 		"Magic Shell",	"magic shell",	"magic shelling",
+		"Magic Shell active!",
+		"'s Magic Shell activated.",
+		" cast magic shell on you."
 	},{
 		SK_REPAIR, 		"Repair",		"repair",		"repairing"
 	},{ 
@@ -61,7 +82,10 @@ struct s_splog splog[60] = {
 	},{ 
 		SK_RECALL, 		"Recall",		"recall",		"recalling"
 	},{
-		16
+		SK_GUARD,		"Guard",		"guard",		"guarding",
+		"You raise your guard.",
+		" rose their guard.",
+		" cast guard on you."
 	},{
 		SK_PROTECT,		"Protect",		"protect",		"protecting",
 		"You feel protected.",
@@ -142,7 +166,9 @@ struct s_splog splog[60] = {
 	},{
 		36
 	},{
-		37
+		SK_BLIND,		"Blind",		"blind",		"blinding",
+		"","",
+		"You kick up a cloud of sand."
 	},{
 		38
 	},{
@@ -163,7 +189,10 @@ struct s_splog splog[60] = {
 		"You feel a toxic aura emanate from somewhere.",
 		" tried to include you in a mass-poison but failed."
 	},{
-		43
+		SK_PULSE,		"Pulse",		"pulse",		"pulsing",
+		"You begin pulsing with energy!",
+		" began pulsing with energy.",
+		" cast pulse on you."
 	},{
 		44
 	},{
@@ -176,38 +205,15 @@ struct s_splog splog[60] = {
 		" has been hasted.",
 		" cast haste on you."
 	},{
-		48
+		SK_TAUNT,		"Taunt",		"taunt",		"taunting",
+		"You're thrown into a blind rage!",
+		" was taunted.",
+		" taunted you with insults.",
+		"You taunt everyone nearby.",
+		"You hear someone yell broad insults.",
+		" tried to include you in a mass-taunt but failed."
 	},{
 		49
-	},{
-		SK_WARCRY2, 	"Stun",			"stun",			"stunning"
-	},{ 
-		SK_BLEED, 		"Bleed",		"bleed",		"bleeding"
-	},{ 
-		SK_WEAKEN2, 	"Greater Weakness",	"weaken",	"weakening",
-		"Your equipment feels very heavy.",
-		" was badly weakened.",
-		" badly weakened you."
-	},{ 
-		SK_SCORCH, 		"Scorch",		"scorch",		"scorching",
-		"You have been scorched.",
-		" was scorched.",
-		" scorched you."
-	},{ 
-		SK_CURSE2, 		"Greater Curse",	"curse",	"cursing",
-		"You have been badly cursed.",
-		" was badly cursed.",
-		" cast greater curse on you."
-	},{ 
-		SK_SLOW2, 		"Greater Slow",		"slow",		"slowing",
-		"You have been badly slowed.",
-		" was badly slowed.",
-		" cast greater slow on you."
-	},{ 
-		SK_MSHELL, 		"Magic Shell",	"magic shell",	"magic shelling",
-		"Magic Shell active!",
-		"'s Magic Shell activated.",
-		" cast magic shell on you."
 	}
 };
 
@@ -289,7 +295,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	}
 	*/
 	
-	if (in==SK_CLEAVE || in==SK_WEAKEN || in==SK_TRICE || in==SK_BLIND)
+	if (in==SK_CLEAVE || in==SK_WEAKEN || in==SK_LEAP || in==SK_BLIND)
 	{
 		need_combat = 1;
 	}
@@ -299,8 +305,9 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		// AoE spells forgo failing since there may be targets handled by cast_aoe_spell
 		// The spell cost is set to zero and will be spent in cast_aoe_spell
 		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && ch[cn].skill[SK_PROX][0] && 
-			(((ch[cn].kindred & KIN_SORCERER   ) && (in==SK_CURSE || in==SK_SLOW || in==SK_POISON)) ||
-			(((ch[cn].kindred & KIN_ARCHHARAKIM) &&  in==SK_BLAST                                )) ))
+			(((ch[cn].kindred & KIN_ARCHTEMPLAR) &&  in==SK_TAUNT                                 ) ||
+			 ((ch[cn].kindred & KIN_SORCERER   ) && (in==SK_CURSE || in==SK_SLOW || in==SK_POISON)) ||
+			 ((ch[cn].kindred & KIN_ARCHHARAKIM) &&  in==SK_BLAST                                 )) )
 		{
 			cost = 0;
 		}
@@ -383,7 +390,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 	}
 	
-	if (in!=SK_CLEAVE && in!=SK_TRICE && in!=SK_TAUNT && 
+	if (in!=SK_CLEAVE && in!=SK_LEAP && in!=SK_TAUNT && in!=SK_BLIND &&
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
 		(d20 && cn!=co && chance_base(cn, in, d20, get_target_resistance(co), usemana))))
 	{
@@ -429,7 +436,8 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg)
 {
-	int co_orig, spellaoe, hitpower, aoeimm = 0, tmp = 0;
+	int co_orig, spellaoe, spellrad, hitpower, aoeimm = 0, tmp = 0;
+	int _cap, _hit, _pow;
 	int tmpa, tmph, tmpha, tmpp, tmppa;
 	int xf, yf, xt, yt, xc, yc, x, y;
 	int no_target = 0, usemana = 1;
@@ -441,6 +449,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	}
 	
 	hitpower = power;
+	aoe_power += 15; // a small extra 'oomph' so the circle is a bit thicker
 	
 	// Amulet - Obsidian Eye :: Grants +1 radius
 	if (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)
@@ -451,21 +460,33 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	switch (intemp)
 	{
 		case SK_WARCRY:
-			spellaoe = aoe_power/(AT_CAP/6) + 6 + obsi;
-			tmpa     = aoe_power*100/(AT_CAP/6) + 6*100 + obsi*100;
-			tmpha    = sqr(aoe_power*100/(AT_CAP/20)+6*200-tmpa)/500;
-			tmppa    = sqr(aoe_power*100/(AT_CAP/25)+6*200-tmpa)/500;
+			spellrad = PRXW_RAD + obsi;
+			_cap = PRXW_CAP;
+			_hit = PRXW_HIT;
+			_pow = PRXW_POW;
+			no_target = 1;
+			break;
+		case SK_BLIND:
+			spellrad = PRXB_RAD + obsi;
+			_cap = PRXB_CAP;
+			_hit = PRXB_HIT;
+			_pow = PRXB_POW;
 			no_target = 1;
 			break;
 		case SK_BLAST: 
 			hitpower = power/2 + power/4;
 		default:
-			spellaoe = (aoe_power)/PROX_CAP + obsi;
-			tmpa     = (aoe_power)*100/PROX_CAP + obsi*100;
-			tmpha    = sqr(aoe_power*100/PROX_HIT-tmpa)/500;
-			tmppa    = sqr(aoe_power*100/PROX_POW-tmpa)/500;
+			spellrad = obsi;
+			_cap = PROX_CAP;
+			_hit = PROX_HIT;
+			_pow = PROX_POW;
 			break;
 	}
+	
+	spellaoe = aoe_power/_cap + spellrad;
+	tmpa     = aoe_power*100/_cap + spellrad*100;
+	tmpha    = sqr(aoe_power*100/_hit-tmpa)/500+spellrad*300;
+	tmppa    = sqr(aoe_power*100/_pow-tmpa)/500+spellrad*300;
 	
 	xc = ch[cn].x;
 	yc = ch[cn].y;
@@ -554,7 +575,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				switch (intemp)
 				{
 					case SK_WARCRY:
-						if (warcry(cn, co, power))
+						if (spell_warcry(cn, co, power))
 						{
 							do_char_log(co, 0, 
 							"You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
@@ -567,6 +588,21 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 							continue;
 						}
 						break;
+					case SK_BLIND:
+						if (spell_blind(cn, co, power))
+						{
+							do_char_log(co, 0, 
+							"%s kicks up a cloud of sand. You feel your eyes fail you.\n", ch[cn].reference);
+							hit++;
+						}
+						else
+						{
+							do_char_log(co, 0, 
+							"%s kicks up a cloud of sand.\n", ch[cn].reference);
+							continue;
+						}
+						break;
+					// Blind
 					default:
 						break;
 				}
@@ -608,9 +644,6 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 						break;
 					case SK_POISON:
 						spell_poison(cn, co, hitpower, 1);
-						break;
-					case SK_BLIND:
-						spell_blind(cn, co, hitpower, 1);
 						break;
 					case SK_TAUNT:
 						spell_taunt(cn, co, hitpower, 1);
@@ -782,8 +815,8 @@ void surround_cast(int cn, int co_orig, int intemp, int power)
 					case SK_WEAKEN:
 						spell_weaken(cn, co, hitpower, 0);
 						break;
-					case SK_BLIND:
-						spell_blind(cn, co, hitpower, 0);
+					case SK_TAUNT:
+						spell_taunt(cn, co, hitpower, 0);
 						break;
 					default:
 						break;
@@ -928,7 +961,9 @@ int spellcost(int cn, int cost, int in, int usemana)
 	int devil_cost = 0;
 	int t;
 	
-	if ((ch[cn].flags & (CF_PLAYER)) && in != SK_BLAST && in != SK_CLEAVE && in != SK_WEAKEN && in != SK_WARCRY)
+	if ((ch[cn].flags & (CF_PLAYER)) && in != SK_BLAST && 
+		in != SK_CLEAVE && in != SK_WEAKEN && in != SK_WARCRY && 
+		in != SK_BLIND && in != SK_TAUNT && in != SK_LEAP)
 		cost = max(SP_COST_BASE, min(cost, cost*get_skill_score(cn, in)/100));
 	
 	// Devil Tarot Card
@@ -1077,7 +1112,7 @@ int chance_base(int cn, int skill, int d20, int defense, int usemana)
 
 int chance(int cn, int d20)
 {
-	if (ch[cn].skill[SK_FOCUS][0]) return(0);
+	// Incorporate braveness here?
 	
 	if (ch[cn].flags & (CF_PLAYER))
 	{
@@ -1197,11 +1232,6 @@ int spell_race_mod(int power, int cn)
 	else if 	(kindred & KIN_SUMMONER)	{ mod = 1.10; }
 	else if 	(kindred & KIN_ARCHHARAKIM)	{ mod = 1.10; }
 	else									{ mod = 1.00; }
-
-	if (ch[cn].skill[SK_FOCUS][0])
-	{
-		mod = (mod*1500+get_skill_score(cn, SK_FOCUS))/1500;
-	}
 	
 	if (globs->newmoon)		{ mod += 0.10; }
 	if (globs->fullmoon)	{ mod += 0.15; }
@@ -1254,6 +1284,15 @@ int add_spell(int cn, int in)
 			{
 				// Multiple poisons stack poison power, up to 3x
 				bu[in].data[1] = min(POISONFORM(bu[in].power, SP_DUR_POISON) * 3, bu[in].data[1] + bu[in2].data[1]);
+				
+				bu[in2].used = USE_EMPTY;
+				break;
+			}
+			else if (bu[in].temp==SK_RAZOR2 && bu[in2].temp==SK_RAZOR2)
+			{
+				// Multiple razors store their expiry time so each can occur
+				bu[in].data[2] = bu[in2].data[1];
+				bu[in].data[1] = bu[in2].active;
 				
 				bu[in2].used = USE_EMPTY;
 				break;
@@ -1419,24 +1458,28 @@ void spell_from_item(int cn, int in2)
 	char_play_sound(cn, ch[cn].sound + 1, -150, 0);
 }
 
+int has_spell(int cn, int temp)
+{
+	int n, in;
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in = ch[cn].spell[n]) && bu[in].temp==temp)
+		{
+			return in;
+		}
+	}
+	return 0;
+}
+
 int has_spell_from_item(int cn, int temp)
 {
 	int n, in;
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if (!ch[cn].spell[n])
+		if ((in = ch[cn].spell[n]) && bu[in].data[3]==temp)
 		{
-			continue;
+			return in;
 		}
-		in = ch[cn].spell[n];
-		if (bu[in].data[3]==temp)
-		{
-			break;
-		}
-	}
-	if (n<MAXBUFFS)
-	{
-		return 1;
 	}
 	return 0;
 }
@@ -1503,11 +1546,18 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 		}
 		if (debuff)
 		{
-			if (!IS_IGNORING_SPELLS(co))
+			if (temp==SK_TAUNT)
 			{
-				do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
+				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 			}
-			do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
+			else
+			{
+				if (!IS_IGNORING_SPELLS(co))
+				{
+					do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
+				}
+				do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
+			}
 		}
 		chlog(cn, "Cast %s on %s", splog[temp].ref, ch[co].name);
 		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
@@ -2183,18 +2233,12 @@ void skill_poison(int cn)
 	add_exhaust(cn, SK_EXH_POISON);
 }
 
-int warcry(int cn, int co, int power)
+int spell_warcry(int cn, int co, int power)
 {
 	int n, in;
 	
-	if (!do_surround_check(cn, co, 1) || get_target_resistance(co)>power)
-	{
-		return 0;
-	}
-	if (!IS_IGNORING_SPELLS(co)) 
-	{ 
-		do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); 
-	}
+	if (!do_surround_check(cn, co, 1) || get_target_resistance(co)>power) { return 0; }
+	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
 	power = spell_immunity(power, get_target_immunity(co));
 	
@@ -2203,6 +2247,7 @@ int warcry(int cn, int co, int power)
 		return 0;
 	
 	add_spell(co, in);
+	//
 	
 	// Add War-Fear
 	if (!(in = make_new_buff(cn, SK_WARCRY, BUF_SPR_WARCRY, power/2, SP_DUR_WARCRY, 0)))
@@ -2214,11 +2259,10 @@ int warcry(int cn, int co, int power)
 	}
 	
 	add_spell(co, in);
+	//
 	
 	chlog(cn, "Used Warcry on %s", ch[co].name);
-	
 	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-	
 	return 1;
 }
 void skill_warcry(cn)
@@ -2226,7 +2270,7 @@ void skill_warcry(cn)
 	int power, aoe_power;
 	
 	power = get_skill_score(cn, SK_WARCRY);
-	aoe_power = get_skill_score(cn, SK_WARCRY);
+	aoe_power = get_skill_score(cn, SK_PROX);
 	
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, SP_COST_WARCRY, SK_WARCRY, 0)) { return; }
@@ -2800,7 +2844,6 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 		if (bu[in].temp == SK_BLIND) 	continue;
 		if (bu[in].temp == SK_TAUNT) 	continue;
 		if (bu[in].temp == SK_GUARD) 	continue;
-		if (bu[in].temp == SK_RAZOR) 	continue;
 		if (bu[in].temp == SK_RAZOR2) 	continue;
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
@@ -3518,8 +3561,6 @@ void skill_shadow(int cn)
 	
 	ch[cc].skill[SK_HAND][0] 	  = max(1,  min(wpnskill+power, powlimit));
 	
-	if (ch[cn].skill[SK_COMBATM][0]) 	
-		ch[cc].skill[SK_COMBATM][0]   = max(0,  min(get_skill_score(cn, SK_COMBATM)+power, powlimit));
 	if (ch[cn].skill[SK_PRECISION][0]) 	
 		ch[cc].skill[SK_PRECISION][0] = max(0,  min(get_skill_score(cn, SK_PRECISION)+power, powlimit));
 	ch[cc].skill[SK_RESIST][0] 	  = max(0,  min(get_skill_score(cn, SK_RESIST)+power, powlimit));
@@ -3780,68 +3821,43 @@ void skill_weaken(int cn)
 
 // Blind reduces enemy perception, hit, and parry scores. Uses Endurance.
 // Gets AoE with Proximity skill
-int spell_blind(int cn, int co, int power, int flag)
+int spell_blind(int cn, int co, int power)
 {
-	int in;
+	int n, in;
 	
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	if (!do_surround_check(cn, co, 1) || get_target_resistance(co)>power) { return 0; }
+	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
 	power = spell_immunity(power, get_target_immunity(co));
 	
+	// Add Blind
 	if (!(in = make_new_buff(cn, SK_BLIND, BUF_SPR_BLIND, power, SP_DUR_BLIND, 0)))
-			return 0;
+		return 0;
 	
 	bu[in].skill[SK_PERCEPT][1] = -(power/2 + 5);
 	bu[in].to_hit[1]            = -(power/6 + 3);
 	bu[in].to_parry[1]          = -(power/6 + 3);
 	
-	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_BLIND
+	add_spell(co, in);
+	//
+	
+	chlog(cn, "Used Blind on %s", ch[co].name);
+	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	return 1;
 }
-void skill_blind(int cn)
+void skill_blind(cn)
 {
-	int d20 = 12;
-	int power, aoe_power, cost;
-	int count = 0, hit = 0;
-	int co, co_orig = -1;
+	int power, aoe_power;
 	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_WARRIOR) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_BLIND);
 	aoe_power = get_skill_score(cn, SK_PROX);
-	cost = SP_COST_BLIND;
 	
-	// Proximity increases spell cost
-	if (can_aoe)
-	{
-		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
-	}
+	if (is_exhausted(cn)) { return; }
+	if (spellcost(cn, SP_COST_BLIND, SK_BLIND, 0)) { return; }
 	
-	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLIND, 0, power, d20)))
+	if (!cast_aoe_spell(cn, 0, SK_BLIND, power, can_aoe?aoe_power:0, 0, 0, 0, 0))
 		return;
-	
-	// If we have a valid target, cast Slow on them
-	if (cn!=co && co!=ch[cn].data[CHD_SHADOWCOPY] && co!=ch[cn].data[CHD_COMPANION])
-	{
-		spell_blind(cn, co, power, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
-	}
-	
-	// Cast AoE or general surround-hit
-	if (can_aoe)
-	{
-		if (!cast_aoe_spell(cn, co, SK_BLIND, power, aoe_power, cost, count, hit, 0))
-			return;
-		
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	}
-	else
-	{
-		surround_cast(cn, co_orig, SK_BLIND, power);
-	}
 	
 	add_exhaust(cn, SK_EXH_BLIND);
 }
@@ -3850,12 +3866,24 @@ void skill_blind(int cn)
 // Gets AoE with Proximity skill
 int spell_pulse(int cn, int co, int power)
 {
-	int in;
+	int in, len, baselen = 100;
+
+	// Book: Damor's Grudge
+	if (get_book(cn, IT_BOOK_DAMO))
+	{
+		baselen = 90;
+	}
+	
+	len = SK_EXH_PULSE * baselen / max(100, ch[cn].cool_bonus);
 	
 	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
 	if (!(in = make_new_buff(cn, SK_PULSE, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
 		return 0;
+	
+	bu[in].data[1] = len; 								// tick rate
+	bu[in].data[2] = globs->ticker + bu[in].data[1]; 	// next tick
+	bu[in].data[3] = PRXP_RAD + (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)?1:0;
 	
 	return cast_a_spell(cn, co, in, 0); // SK_PULSE
 }
@@ -3904,19 +3932,19 @@ void skill_taunt(int cn)
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
-	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_SORCERER) && !(ch[cn].flags & CF_AREA_OFF));
+	int can_aoe = (ch[cn].skill[SK_PROX][0] && (ch[cn].kindred & KIN_ARCHTEMPLAR) && !(ch[cn].flags & CF_AREA_OFF));
 	
 	power = get_skill_score(cn, SK_TAUNT);
 	aoe_power = get_skill_score(cn, SK_PROX);
 	cost = SP_COST_TAUNT;
 	
-	// Proximity increases spell cost
+	// Proximity increases skill cost
 	if (can_aoe)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
 	
-	// Get spell target - return on failure
+	// Get skill target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20)))
 		return;
 	
@@ -3948,23 +3976,28 @@ void skill_taunt(int cn)
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
 
-#define TRICE_CNT	3
+#define LEAP_COUNT	3
 
-// Trice teleports behind the enemy/enemies in front of you, damaging them
+// Leap teleports behind the enemy/enemies in front of you, damaging them
 // Escapes combat in the process
 // Gets bonus damage from attack speed score
-void skill_trice(int cn)
+void skill_leap(int cn)
 {
 	int power, cost, tmp;
-	int co[TRICE_CNT], cc = 1, n, dam;
+	int co[LEAP_COUNT], cc = 1, n, dam;
 	int x, y, m, md, obstructed = 0, newdir = 0;
 	
-	power = get_skill_score(cn, SK_TRICE) + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 4;
+	power = get_skill_score(cn, SK_LEAP) + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 4;
 	
 	cost = (power * 2) / 30 + 6;
 	
+	if (!(ch[cn].flags & CF_PLAYER)) 
+	{
+		cost = cost*3/2;
+	}
+	
 	// Get (first) hit target - return on failure
-	if (!(co[0] = get_target(cn, 0, 0, 0, cost, SK_TRICE, 0, power, 0)))
+	if (!(co[0] = get_target(cn, 0, 0, 0, cost, SK_LEAP, 0, power, 0)))
 		return;
 	
 	// Set up map specific variables to scope surroundings
@@ -3991,7 +4024,7 @@ void skill_trice(int cn)
 	// Check for additional targets
 	for (n = 1; ; n++)
 	{
-		if (n==TRICE_CNT)
+		if (n==LEAP_COUNT)
 		{
 			obstructed = 1;
 			break;
@@ -4019,7 +4052,7 @@ void skill_trice(int cn)
 	
 	for (n = 0; n < cc; n++)
 	{
-		chlog(cn, "Used Trice on %s", ch[co[n]].name);
+		chlog(cn, "Used Leap on %s", ch[co[n]].name);
 		
 		dam = spell_immunity(power, ch[co[n]].to_parry) * 2;
 		
@@ -4057,7 +4090,7 @@ void skill_trice(int cn)
 		}
 	}
 	
-	add_exhaust(cn, SK_EXH_TRICE);
+	add_exhaust(cn, SK_EXH_LEAP);
 }
 
 // Razor grants a stacking debuff to hits, dealing additional damage when it expires
@@ -4075,6 +4108,10 @@ int spell_razor(int cn, int co, int power, int flag)
 		
 		if (!(in = make_new_buff(cn, SK_RAZOR2, BUF_SPR_RAZOR2, power, TICKS, 0))) 
 			return 0;
+		
+		bu[in].data[3] = bu[in].data[2] = bu[in].data[1] = 0;
+		
+		return add_spell(co, in); // SK_RAZOR2
 	}
 	else		// Buff version
 	{
@@ -4082,9 +4119,9 @@ int spell_razor(int cn, int co, int power, int flag)
 		
 		if (!(in = make_new_buff(cn, SK_RAZOR, BUF_SPR_RAZOR, power, SP_DUR_RAZOR, 0))) 
 			return 0;
+		
+		return cast_a_spell(cn, co, in, 0, 1); // SK_RAZOR
 	}
-	
-	return cast_a_spell(cn, co, in, flag, 1-flag); // SK_RAZOR / SK_RAZOR2
 }
 void skill_razor(int cn)
 {
@@ -4096,7 +4133,6 @@ void skill_razor(int cn)
 
 	add_exhaust(cn, SK_EXH_RAZOR);
 }
-
 
 void nomagic(int cn)
 {
@@ -4150,170 +4186,89 @@ int skill_lookup(char *name)
 
 void skill_driver(int cn, int nr)
 {
-	int tmp = 0;
+	int tmp = 0, nmz = 0;
 	
-//      ch[cn].errno=ERR_FAILED;        // will be overriden later if another result is desired
-
 	if (!ch[cn].skill[nr][0])
 	{
 		do_char_log(cn, 0, "You cannot use this skill/spell.\n");
 		return;
 	}
+	
+	nmz = (ch[cn].flags & CF_NOMAGIC);
 
 	switch(nr)
 	{
-		case    SK_LIGHT:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_light(cn);
-			break;
-			
-		case    SK_PROTECT:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_protect(cn);
-			break;
-			
-		case    SK_ENHANCE:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_enhance(cn);
-			break;
-			
-		case    SK_BLESS:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_bless(cn);
-			break;
-			
-		case    SK_CURSE:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_curse(cn);
-			break;
-			
-		case    SK_SLOW:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_slow(cn, 0);
-			break;
-			
-		case    SK_IDENT:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_identify(cn);
-			break;
-			
-		case    SK_BLAST:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_blast(cn);
-			break;
-			
-		case    SK_POISON:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_poison(cn);
-			break;
-			
-		case    SK_REPAIR:
-			skill_repair(cn);
-			break;
-
-		case    SK_RECALL:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_recall(cn);
-			break;
-
-		case    SK_DISPEL:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_dispel(cn);
-			break;
+		case SK_BLIND:		skill_blind(cn);	break;
+		case SK_CLEAVE:		skill_cleave(cn);	break;
+		case SK_LEAP:		skill_leap(cn);		break;
+		case SK_REPAIR:		skill_repair(cn);	break;
+		case SK_TAUNT:		skill_taunt(cn);	break;
+		case SK_WARCRY:		skill_warcry(cn);	break;
+		case SK_WEAKEN:		skill_weaken(cn);	break;	
+		case SK_TAUNT:		skill_taunt(cn);	break;
 		
-		case    SK_HASTE:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_haste(cn);
-			break;
+		case SK_BLAST:		if (nmz) nomagic(cn); else skill_blast(cn);		break;
+		case SK_BLESS:		if (nmz) nomagic(cn); else skill_bless(cn);		break;
+		case SK_CURSE:		if (nmz) nomagic(cn); else skill_curse(cn);		break;
+		case SK_DISPEL:		if (nmz) nomagic(cn); else skill_dispel(cn);	break;
+		case SK_ENHANCE:	if (nmz) nomagic(cn); else skill_enhance(cn);	break;
+		case SK_GHOST:		if (nmz) nomagic(cn); else skill_ghost(cn);		break;
+		case SK_HASTE:		if (nmz) nomagic(cn); else skill_haste(cn);		break;
+		case SK_HEAL:		if (nmz) nomagic(cn); else skill_heal(cn);		break;
+		case SK_IDENT:		if (nmz) nomagic(cn); else skill_identify(cn);	break;
+		case SK_LIGHT:		if (nmz) nomagic(cn); else skill_light(cn); 	break;
+		case SK_MSHIELD:	if (nmz) nomagic(cn); else skill_mshield(cn);	break;
+		case SK_POISON:		if (nmz) nomagic(cn); else skill_poison(cn);	break;
+		case SK_PROTECT:	if (nmz) nomagic(cn); else skill_protect(cn);	break;
+		case SK_PULSE:		if (nmz) nomagic(cn); else skill_pulse(cn);		break;
+		case SK_RAZOR:		if (nmz) nomagic(cn); else skill_razor(cn);		break;
+		case SK_RECALL:		if (nmz) nomagic(cn); else skill_recall(cn);	break;
+		case SK_SHADOW:		if (nmz) nomagic(cn); else skill_shadow(cn);	break;
+		case SK_SLOW:		if (nmz) nomagic(cn); else skill_slow(cn, 0);	break;
 		
-		case    SK_HEAL:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_heal(cn);
-			break;
-
-		case    SK_GHOST:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_ghost(cn);
-			break;
-			
-		case    SK_SHADOW:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_shadow(cn);
-			break;
-			
-		case    SK_MSHIELD:
-			if (ch[cn].flags & CF_NOMAGIC)
-				nomagic(cn);
-			else
-				skill_mshield(cn);
-			break;
-
-		case    SK_IMMUN:
-		case	SK_RESIST:
-			do_char_log(cn, 0, "You use this skill automatically when someone casts negative spells on you.\n");
-			break;
-
-		case    SK_REGEN:
-		case	SK_REST:
-		case    SK_MEDIT:
+		case SK_REGEN:
+		case SK_REST:
+		case SK_MEDIT:
+		case SK_WEAPONM:
+		case SK_ARMORM:
+		case SK_GCMASTERY:
+		case SK_PERCEPT:
+		case SK_PROX:
+		case SK_SENSE:
+		case SK_STEALTH:
 			do_char_log(cn, 0, "You use this skill automatically.\n");
 			break;
-
-		case    SK_DAGGER:
-		case    SK_SWORD:
-		case    SK_AXE:
-		case    SK_STAFF:
-		case    SK_TWOHAND:
-		case    SK_SURROUND:
+			
+		case SK_BARTER:
+			do_char_log(cn, 0, "You use this skill automatically while shopping.\n");
+			break;
+		
+		case SK_HAND:
+		case SK_AXE:
+		case SK_DAGGER:
+		case SK_DUAL:
+		case SK_SHIELD:
+		case SK_STAFF:
+		case SK_SWORD:
+		case SK_TWOHAND:
+		case SK_PRECISION:
+		case SK_SURROUND:
 			do_char_log(cn, 0, "You use this skill automatically when you fight.\n");
 			break;
-
-		case    SK_CONCEN:
+		
+		case SK_CONCEN:
 			do_char_log(cn, 0, "You use this skill automatically when you cast spells.\n");
 			break;
-
-		case    SK_CLEAVE:
-			skill_cleave(cn);
+		
+		case SK_IMMUN:
+		case SK_RESIST:
+			do_char_log(cn, 0, "You use this skill automatically when someone casts negative spells on you.\n");
 			break;
 			
-		case    SK_WEAKEN:
-			skill_weaken(cn);
+		case SK_SWIM:
+			do_char_log(cn, 0, "You use this skill automatically while underwater.\n");
 			break;
-
-		case    SK_WARCRY:
-			skill_warcry(cn);
-			break;
-
+		
 		default:
 			do_char_log(cn, 0, "You cannot use this skill/spell.\n");
 			break;

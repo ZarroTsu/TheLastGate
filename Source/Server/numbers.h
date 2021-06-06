@@ -384,6 +384,8 @@
 #define IT_BODY_ADEP	 349
 #define IT_HELM_WIZR	 352
 #define IT_BODY_WIZR	 354
+#define IT_HELM_DAMA	   0
+#define IT_BODY_DAMA	   0
 
 // ----- Books
 

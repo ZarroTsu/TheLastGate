@@ -718,7 +718,6 @@ int convert_skill_for_group(int co, int nr)
 	if (nr == SK_WEAPONM)  nr = SK_ENHANCE; // WeapM    -> Enhance
 	if (nr == SK_WEAKEN)   nr = SK_SLOW;    // Weaken   -> Slow
 	if (nr == SK_SURROUND) nr = SK_CURSE;   // Surround -> Curse
-	if (nr == SK_COMBATM)  nr = SK_BLESS;   // Combat M -> Bless
 	if (nr == SK_STAFF)    nr = SK_SHIELD;  // Staff    -> Shield
 	if (nr == SK_DISPEL)   nr = SK_IMMUN;   // Dispel   -> Immun
 	
@@ -728,7 +727,6 @@ int convert_skill_for_group(int co, int nr)
 		if (nr == SK_ENHANCE) nr = SK_WEAPONM;  // Enhance  -> WeapM
 		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow     -> Weaken
 		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse    -> Surround
-		if (nr == SK_BLESS)   nr = SK_COMBATM;  // Bless    -> Combat M
 	}
 	if (ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
 	{
@@ -740,7 +738,6 @@ int convert_skill_for_group(int co, int nr)
 		if (nr == SK_ENHANCE && ch[co].skill[SK_ENHANCE][0]) nr = SK_WEAPONM;
 		if (nr == SK_SLOW    && ch[co].skill[SK_SLOW][0])    nr = SK_WEAKEN;
 		if (nr == SK_CURSE   && ch[co].skill[SK_CURSE][0])   nr = SK_SURROUND;
-		if (nr == SK_BLESS   && ch[co].skill[SK_BLESS][0])   nr = SK_COMBATM;
 		if (nr == SK_SHIELD  && ch[co].skill[SK_SHIELD][0])  nr = SK_STAFF;
 		if (nr == SK_IMMUN   && ch[co].skill[SK_IMMUN][0])   nr = SK_DISPEL;
 	}
@@ -904,6 +901,14 @@ int npc_give(int cn, int co, int in, int money)
 		}	
 		else
 		{
+			// Tutorial 6
+			if (ch[cn].temp==118&&ch[co].data[76]<(1<<5))
+			{
+				unsigned char buf[2];
+				buf[0] = SV_SHOWMOTD;
+				*(unsigned char*)(buf + 1) = 163;
+				xsend(ch[co].player, buf, 2);
+			}
 			do_sayx(cn, "Thank you %s. That's the %s I wanted.", ch[co].name, it[in].reference);
 		}
 		
@@ -1530,7 +1535,27 @@ int npc_see(int cn, int co)
 	{
 		indoor2 = 0;
 	}
-
+	
+	// if we're taunted, try to attack the taunter
+	if (IS_SANECHAR(cn[cn].taunter) && do_char_can_see(cn, cn[cn].taunter))
+	{
+		// If our last attempt to attack failed, wander near the taunter
+		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].last_action == ERR_FAILED)
+		{
+			ch[cn].goto_x = ch[co].x + 5 - RANDOM(10);
+			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
+		}
+		// Otherwise, try to attack the taunter
+		else if (ch[cn].attack_cn!=cn[cn].taunter && ch[cn].last_action == ERR_SUCCESS)
+		{
+			ch[cn].attack_cn = cn[cn].taunter;
+			ch[cn].goto_x = 0;
+		}
+		ch[cn].data[58] = 2;
+		ch[cn].data[78] = globs->ticker + TICKS * 5;
+		return(1);
+	}
+	
 	// check if this is an enemy we added to our list earlier
 	if (!ch[cn].attack_cn)   // only attack him if we aren't fighting already
 	{
@@ -1547,7 +1572,7 @@ int npc_see(int cn, int co)
 			}
 		}
 	}
-
+	
 	// check if we need to attack him (by group)
 	if (ch[cn].data[43])
 	{
@@ -1697,6 +1722,15 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill01")==0) //    12		Bartering			( Jamil )
 			{
+				// Tutorial 2
+				if (ch[co].data[76]<(1<<2))
+				{
+					unsigned char buf[2];
+					buf[0] = SV_SHOWMOTD;
+					*(unsigned char*)(buf + 1) = 123;
+					xsend(ch[co].player, buf, 2);
+				}
+				
 				if (!ch[co].skill[SK_BARTER][0])
 					do_sayx(cn, "Hello, %s. Some thieves across the north road stole my gold amulet from me. I'd teach you BARTERING if you could get it back for me.", ch[co].name);
 				else
@@ -1818,25 +1852,14 @@ int npc_see(int cn, int co)
 				else
 					do_sayx(cn, "%s, welcome. Make yourself at home.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#skill12")==0) // 37/21   	* CM or Bless		( Cirrus )
+			else if (strcmp(ch[cn].text[2], "#skill12")==0) //    21   		Bless				( Cirrus )
 			{
 				if (ch[co].flags & CF_LOCKPICK)
 				{
-					if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
-					|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_BLESS][0]))
-					{
-						if (!ch[co].skill[SK_COMBATM][0])
-							do_sayx(cn, "Greetings, %s. Bring me the Agate Amulet from the Thieves House and I'll teach you COMBAT MASTERY.", ch[co].name);
-						else
-							do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
-					}
+					if (!ch[co].skill[SK_BLESS][0])
+						do_sayx(cn, "Greetings, %s. Bring me the Ruby Amulet from the Thieves House and I'll teach you BLESS.", ch[co].name);
 					else
-					{
-						if (!ch[co].skill[SK_BLESS][0])
-							do_sayx(cn, "Greetings, %s. Bring me the Ruby Amulet from the Thieves House and I'll teach you BLESS.", ch[co].name);
-						else
-							do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
-					}
+						do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
 				}
 				else
 					do_sayx(cn, "Please leave me be, %s. I've need of someone who knows how to pick locks, and you quite clearly don't.", ch[co].name);
@@ -1922,7 +1945,7 @@ int npc_see(int cn, int co)
 				if (points2rank(ch[co].points_tot)<8) // Sergeant Major
 					do_sayx(cn, "Hi, %s... I'm very busy at the moment, please come back later.", ch[co].name);
 				else
-					do_sayx(cn, "Hi, %s. There is a mad hermit living in the Strange Forest. He possesses a rare Red Rose in his garden. If you could bring me this rose, I would make you a Pure Rose Potion.", ch[co].name);
+					do_sayx(cn, "Hi, %s. There is a mad hermit living in the Strange Forest. He possesses a rare Pink Orchid in his garden. If you could bring me this rose, I would make you a Pure Orchid Potion.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest108")==0) // 	8 - Swamp / Marline / Rattan Bo
 			{
@@ -2232,47 +2255,41 @@ int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 
 int get_spellcost(int cn, int spell)
 {
-	int prox;
-	prox = get_skill_score(cn, SK_PROX);
+	int prox, kin_hara, kin_sorc;
+	
+	prox = (PROX_MULTI+get_skill_score(cn, SK_PROX))/PROX_MULTI;
+	kin_hara = ((ch[cn].kindred & KIN_ARCHHARAKIM) && ch[cn].skill[SK_PROX][0]);
+	kin_sorc = ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0]);
+	
 	switch(spell)
 	{
-	case    SK_BLAST:
-		return( ((get_skill_score(cn, SK_BLAST)/4+5)*2) * (
-			       (ch[cn].kindred & KIN_ARCHHARAKIM) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
-	case    SK_POISON:
-		return( 40 * ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
-	case    SK_IDENT:
-		return( 20);
-	case    SK_CURSE:
-		return( 35 * ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
-	case    SK_BLESS:
-		return( 35);
-	case    SK_ENHANCE:
-		return( 15);
-	case    SK_PROTECT:
-		return( 15);
-	case    SK_LIGHT:
-		return( 5);
-	case    SK_SLOW:
-		return( 20 * ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0] ? (PROX_MULTI+prox)/PROX_MULTI : 1) );
-	case    SK_HEAL:
-		return( 25);
-	case    SK_GHOST:
-		return( 45);
-	case    SK_MSHIELD:
-		return( 25);
-	case    SK_RECALL:
-		return( 15);
-	case	SK_HASTE:
-		return 75;
-	case	SK_CLEAVE:
-		return ((get_skill_score(cn, SK_CLEAVE)+ch[cn].weapon/4)/12+5)*3/2;
-	case	SK_WEAKEN:
-		return 10;
-	case	SK_WARCRY:
-		return 25;
-	default:
-		return( 9999);
+		case SK_BLIND:		return SP_COST_BLIND;
+		case SK_CLEAVE:		return ((get_skill_score(cn, SK_CLEAVE)+ch[cn].weapon/4)/12+5)*3/2;
+		case SK_LEAP:		return ((get_skill_score(cn, SK_LEAP)+max(0,((SPEED_CAP-ch[cn].speed)+ch[cn].atk_speed-120))/4)/15+6)*3/2;
+		case SK_TAUNT:		return SP_COST_TAUNT;
+		case SK_WEAKEN:		return SP_COST_WEAKEN;
+		case SK_WARCRY:		return SP_COST_WARCRY;
+		
+		case SK_BLAST:		return get_skill_score(cn, SK_BLAST)/4+5)*2 * (kin_hara ? prox : 1);
+		case SK_BLESS:		return SP_COST_BLESS;
+		case SK_CURSE:		return SP_COST_CURSE * (kin_sorc ? prox : 1);
+		case SK_DISPEL:		return SP_COST_DISPEL;
+		case SK_ENHANCE:	return SP_COST_ENHANCE;
+		case SK_GHOST:		return SP_COST_GHOST;
+		case SK_HASTE:		return SP_COST_HASTE;
+		case SK_HEAL:		return SP_COST_HEAL;
+		case SK_IDENT:		return SP_COST_IDENT;
+		case SK_LIGHT:		return SP_COST_LIGHT;
+		case SK_MSHIELD:	return SP_COST_MSHIELD;
+		case SK_POISON:		return SP_COST_POISON * (kin_sorc ? prox : 1);
+		case SK_PROTECT:	return SP_COST_PROTECT;
+		case SK_PULSE:		return SP_COST_PULSE;
+		case SK_RAZOR:		return SP_COST_RAZOR;
+		case SK_RECALL:		return SP_COST_RECALL;
+		case SK_SHADOW:		return SP_COST_SHADOW;
+		case SK_SLOW:		return SP_COST_SLOW * (kin_sorc ? prox : 1);
+		
+		default: return 9999;
 	}
 }
 
@@ -2280,32 +2297,25 @@ int spellflag(int spell)
 {
 	switch(spell)
 	{
-	case    SK_LIGHT:
-		return( SP_LIGHT);
-	case    SK_PROTECT:
-		return( SP_PROTECT);
-	case    SK_ENHANCE:
-		return( SP_ENHANCE);
-	case    SK_BLESS:
-		return( SP_BLESS);
-	case    SK_HEAL:
-		return( SP_HEAL);
-	case    SK_CURSE:
-		return( SP_CURSE);
-	case    SK_SLOW:
-		return( SP_SLOW);
-	case    SK_DISPEL:
-		return( SP_DISPEL);
-	case    SK_WARCRY:
-		return( SP_WARCRY);
-	case    SK_WEAKEN:
-		return( SP_REND);
-	case    SK_POISON:
-		return( SP_POISON);
-	case    SK_HASTE:
-		return( SP_HASTE);
-	default:
-		return( 0);
+		case    SK_BLIND:		return SP_BLIND;
+		case    SK_TAUNT:		return SP_TAUNT;
+		case    SK_WARCRY:		return SP_WARCRY;
+		case    SK_WEAKEN:		return SP_REND;
+		
+		case    SK_BLESS:		return SP_BLESS;
+		case    SK_CURSE:		return SP_CURSE;
+		case    SK_DISPEL:		return SP_DISPEL;
+		case    SK_ENHANCE:		return SP_ENHANCE;
+		case    SK_HASTE:		return SP_HASTE;
+		case    SK_HEAL:		return SP_HEAL;
+		case    SK_LIGHT:		return SP_LIGHT;
+		case    SK_POISON:		return SP_POISON;
+		case    SK_PROTECT:		return SP_PROTECT;
+		case    SK_PULSE;		return SP_PULSE;
+		case    SK_RAZOR;		return SP_RAZOR;
+		case    SK_SLOW:		return SP_SLOW;
+		
+		default:				return 0;
 	}
 }
 
@@ -2354,6 +2364,13 @@ int npc_try_spell(int cn, int co, int spell)
 	{
 		return( 0);
 	}
+	
+	// dont leap if enemy armor is too strong
+	if (spell==SK_LEAP && ( ((get_skill_score(cn, SK_LEAP) + max(0,((SPEED_CAP-ch[cn].speed)+ch[cn].atk_speed-120))/4
+		- max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
+	{
+		return( 0);
+	}
 
 	// dont curse if chances of success are bad
 	if (spell==SK_CURSE && 10 * get_skill_score(cn, SK_CURSE) / max(1, get_target_resistance(co))<7)
@@ -2369,6 +2386,12 @@ int npc_try_spell(int cn, int co, int spell)
 	
 	// dont weaken if chances of success are bad
 	if (spell==SK_WEAKEN && 11 * get_skill_score(cn, SK_WEAKEN) / max(1, get_target_resistance(co))<8)
+	{
+		return( 0);
+	}
+	
+	// dont taunt if chances of success are bad
+	if (spell==SK_TAUNT && 11 * get_skill_score(cn, SK_TAUNT) / max(1, get_target_resistance(co))<10)
 	{
 		return( 0);
 	}
@@ -2417,7 +2440,8 @@ int npc_try_spell(int cn, int co, int spell)
 	if (n==MAXBUFFS)
 	{
 		tmp = spellflag(spell);
-		if (spell==SK_WEAKEN || spell==SK_CLEAVE || spell==SK_WARCRY)
+		if (spell==SK_WEAKEN || spell==SK_CLEAVE || spell==SK_WARCRY || 
+			spell==SK_BLIND || spell==SK_TAUNT || spell==SK_LEAP)
 		{
 			if (end>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
@@ -2448,7 +2472,8 @@ int npc_try_spell(int cn, int co, int spell)
 
 int npc_can_spell(int cn, int co, int spell)
 {
-	if (spell==SK_CLEAVE || spell==SK_WEAKEN || spell==SK_WARCRY)
+	if (spell==SK_CLEAVE || spell==SK_WEAKEN || spell==SK_WARCRY || 
+		spell==SK_BLIND || spell==SK_TAUNT || spell==SK_LEAP)
 	{
 		if (ch[cn].a_end / 1000<get_spellcost(cn, spell))
 		{
@@ -3313,12 +3338,20 @@ int npc_driver_high(int cn)
 		{
 			return( 1);
 		}
-
-		// blast his enemy if our friend is losing and his enemy is our enemy as well
+		
+		// taunt this enemy to pull them off our friend
+		if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
+		{
+			ch[cn].data[74] = globs->ticker + TICKS * 20;
+			return(1);
+		}
+		
+		// blast this enemy if our friend is losing and his enemy is our enemy as well
 		if (cc && ch[co].a_hp<ch[co].hp[5] * 650 && npc_is_enemy(cn, cc))
 		{
-			if (npc_try_spell(cn, cc, SK_BLAST))
+			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, cc, SK_BLAST))
 			{
+				ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
 				return( 1);
 			}
 		}
@@ -3342,7 +3375,7 @@ int npc_driver_high(int cn)
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
+				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
 				return( 1);
 			}
 		}
@@ -3379,27 +3412,47 @@ int npc_driver_high(int cn)
 		{
 			return( 1);
 		}
+		
 		if (co && npc_try_spell(cn, co, SK_CURSE))
 		{
 			return( 1);
 		}
-		if (co && globs->ticker>ch[cn].data[74] + TICKS * 10 && npc_try_spell(cn, co, SK_GHOST))
+		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
 		{
-			ch[cn].data[74] = globs->ticker;
+			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return(1);
+		}
+		if (co && npc_try_spell(cn, cn, SK_PULSE))
+		{
+			return( 1);
+		}
+		if (co && npc_try_spell(cn, cn, SK_RAZOR))
+		{
+			return( 1);
 		}
 		if (co && npc_try_spell(cn, co, SK_POISON))
 		{
 			return( 1);
 		}
-		if (co && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_WARCRY))
+		
+		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
 		{
-			ch[co].data[75] = globs->ticker + (TICKS*2 + TICKS * get_skill_score(cn, SK_WARCRY)/80)*2;
+			ch[cn].data[74] = globs->ticker + TICKS * 15;
+			return( 1);
+		}
+		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_WARCRY))
+		{
+			ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(get_skill_score(cn, SK_WARCRY))*3/2;
 			return( 1);
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
 		{
-			ch[co].data[75] = globs->ticker + (TICKS * 5)*3/4;
+			ch[co].data[75] = globs->ticker + SK_EXH_CLEAVE/2;
+			return( 1);
+		}
+		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
+		{
+			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
 			return( 1);
 		}
 
@@ -3407,7 +3460,7 @@ int npc_driver_high(int cn)
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
+				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
 				return( 1);
 			}
 		}

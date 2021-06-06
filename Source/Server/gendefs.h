@@ -11,8 +11,8 @@
 #define RANDOM(a) (a>0?random()%(a):0)
 #define DATDIR ".dat"
 
-#define VERSION    0x000504
-#define MINVERSION 0x000504
+#define VERSION    0x000600
+#define MINVERSION 0x000600
 
 #define TICKS 18
 #define TICK  (1000000/TICKS)
@@ -25,7 +25,7 @@
 #define MAXEFFECT  4096
 #define MAXMISSION 1024
 #define MAXSKILL   50
-#define MAXBUFFS   20
+#define MAXBUFFS   40
 #define MAXWPS     20
 
 #define MAXTCHARS 4548
@@ -181,6 +181,10 @@
 #define SP_REND    (1u<<9)
 #define SP_POISON  (1u<<10)
 #define SP_HASTE   (1u<<11)
+#define SP_BLIND   (1u<<12)
+#define SP_PULSE   (1u<<13)
+#define SP_TAUNT   (1u<<14)
+#define SP_RAZOR   (1u<<15)
 
 // -------- Spell Cost values -------- //
 #define SP_COST_BASE		 5
@@ -268,7 +272,7 @@
 #define SK_EXH_RAZOR		(TICKS * 6)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_TRICE		(TICKS * 5)
+#define SK_EXH_LEAP			(TICKS * 5)
 
 
 
