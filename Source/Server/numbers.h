@@ -245,69 +245,131 @@
 
 // -----
 
-// Standard flowers; Red, Green, Purple, Yellow, Blue
-#define IT_FLOWER_R		  18
-#define IT_FLOWER_G		 142
-#define IT_FLOWER_P		  46
-#define IT_FLOWER_Y		 140
-#define IT_FLOWER_B		 141
-
-// Jungle flowers; Pink, Cyan, Verdant
-#define IT_FLOWER_JP	 197
-#define IT_FLOWER_JC	 198
-#define IT_FLOWER_JV	 199
-
 #define IT_FLASK		 100
 
-// Standard flower mixtures
-#define IT_MIX_Y___		 143
-#define IT_MIX_B___		 144
-#define IT_MIX_YR__		 145
-#define IT_MIX_YG__		 146
-#define IT_MIX_YP__		 147
-#define IT_MIX_YRG_		 148
-#define IT_MIX_YGP_		 149
-#define IT_MIX_YPR_		 158
-#define IT_MIX_YRGP		 161
+// Standard flowers; Red, Green, Purple, Yellow, Blue, White
+#define IT_FLO_R		  18
+#define IT_FLO_G		 142
+#define IT_FLO_P		  46
+#define IT_FLO_Y		 140
+#define IT_FLO_B		 141
+#define IT_FLO_W		1957
 
-// Jungle flower mixtures
-#define IT_MIX_JP__		 218
-#define IT_MIX_JC__		 219
-#define IT_MIX_JV__		 220
-#define IT_MIX_JPJC		 221
-#define IT_MIX_JCJV		 222
-#define IT_MIX_JVJP		 223
+// Jungle flowers outside lab 2; Magenta, Cyan, Verdant
+#define IT_FLO_M		1961
+#define IT_FLO_C		1962
+#define IT_FLO_V		1963
 
-// Special Flowers
-#define IT_TULIP		1540
-#define IT_ROSE			1542
+// Special Flowers; Tulip, Orchid
+#define IT_FLO_T		1540
+#define IT_FLO_O		1542
+
+// Jungle flowers in lab 2 (1 is Magenta, 2 is Cyan, 3 is Verdant)
+#define IT_FLO_1		 197
+#define IT_FLO_2		 198
+#define IT_FLO_3		 199
+
+// Flower mixtures
+#define IT_MIX_W_		 145
+#define IT_MIX_Y_		 143
+#define IT_MIX_B_		 144
+#define IT_MIX_M_		1966
+#define IT_MIX_C_		1967
+#define IT_MIX_V_		1968
+
+#define IT_MIX_WY		 146
+#define IT_MIX_BW		 147
+#define IT_MIX_MW		 148
+#define IT_MIX_VW		 149
+#define IT_MIX_CW		 158
+#define IT_MIX_BY		 161
+#define IT_MIX_MY		1972
+#define IT_MIX_VY		1973
+#define IT_MIX_CY		1974
+#define IT_MIX_BM		1975
+#define IT_MIX_BV		1976
+#define IT_MIX_BC		1977
+#define IT_MIX_CM		1969
+#define IT_MIX_CV		1970
+#define IT_MIX_MV		1971
+
+// Lab 2 mixtures
+#define IT_MIX_1_		 218
+#define IT_MIX_2_		 219
+#define IT_MIX_3_		 220
+#define IT_MIX_12		 221
+#define IT_MIX_23		 222
+#define IT_MIX_13		 223
 
 // Potions
-#define IT_POT_L_HP		 101
-#define IT_POT_L_EN		 125
-#define IT_POT_L_MP		 102
+#define IT_POT_M_HP		2000
+#define IT_POT_N_HP		 101
+#define IT_POT_G_HP		 127
+#define IT_POT_H_HP		2001
+#define IT_POT_S_HP		2002
+#define IT_POT_C_HP		2003
+#define IT_POT_L_HP		2004
+#define IT_POT_D_HP		2005
+
+#define IT_POT_M_EN		2006
+#define IT_POT_N_EN		 125
+#define IT_POT_G_EN		 273
+#define IT_POT_H_EN		2007
+#define IT_POT_S_EN		2008
+#define IT_POT_C_EN		2009
+#define IT_POT_L_EN		2010
+#define IT_POT_D_EN		2011
+
+#define IT_POT_M_MP		2012
+#define IT_POT_N_MP		 102
+#define IT_POT_G_MP		 131
+#define IT_POT_H_MP		2013
+#define IT_POT_S_MP		2014
+#define IT_POT_C_MP		2015
+#define IT_POT_L_MP		2016
+#define IT_POT_D_MP		2017
+
+#define IT_POT_VITA		 293
+#define IT_POT_CLAR		 294
+#define IT_POT_SAGE		 295
 
 #define IT_POT_RAIN		 274
-
-#define IT_POT_G_HP		 127
-#define IT_POT_G_EN		 273
-#define IT_POT_G_MP		 131
-
-#define IT_POT_HPEN		 293
-#define IT_POT_ENMP		 294
-#define IT_POT_MPHP		 295
-
 #define IT_POT_LIFE		 181
-
 #define IT_POT_DEAD		  99
 
-#define IT_POT_STRE		 135
-#define IT_POT_AGIL		 224
+#define IT_POT_GOLEM	 449
 
-#define IT_POT_GOLM		 449
+#define IT_POT_T		1543
+#define IT_POT_O		1544
+#define IT_POT_PT		1545
+#define IT_POT_PO		1546
 
-#define IT_POT_TULI		1543
-#define IT_POT_ROSE		1544
+#define IT_POT_LAB2		 224
+#define IT_POT_BRV		1978
+#define IT_POT_WIL		1979
+#define IT_POT_INT		1980
+#define IT_POT_AGL		1981
+#define IT_POT_STR		 135
+
+#define IT_POT_EXHP		1982
+#define IT_POT_EXEN		1983
+#define IT_POT_EXMP		1984
+
+#define IT_POT_PRE		1985
+#define IT_POT_EVA		1986
+#define IT_POT_MOB		1987
+#define IT_POT_FRE		1988
+#define IT_POT_MAR		1989
+#define IT_POT_IMM		1990
+#define IT_POT_CLA		1991
+#define IT_POT_THO		1992
+#define IT_POT_BRU		1993
+#define IT_POT_RES		1994
+#define IT_POT_APT		1995
+#define IT_POT_OFF		1996
+#define IT_POT_DEF		1997
+#define IT_POT_PER		1998
+#define IT_POT_STE		1999
 
 // -----
 
@@ -321,6 +383,7 @@
 #define IT_GOLD_RING	1346
 #define IT_PLAT_RING	1347
 
+// Mine gemstones
 #define IT_S_SA			1348
 #define IT_S_RU			1349
 #define IT_S_AM			1350
@@ -356,6 +419,7 @@
 #define IT_F_EM			1376
 #define IT_F_DI			1377
 
+// Mine enemies
 #define IT_E_WK			1465
 #define IT_E_SK			359
 #define IT_E_GO			371

@@ -1424,6 +1424,13 @@ void spell_from_item(int cn, int in2)
 	
 	bu[in].duration 		= bu[in].active = it[in2].duration;
 	
+	// Special case for the Rainbow Potion
+	// CGI Rainbow Potion has a duration of 72, here we give a random ++(0-108)
+	if (it[in2].temp==IT_POT_RAIN)
+	{
+		bu[in].duration 	+= RANDOM(109);
+	}
+	
 	// it[in2].data[1] = template number for overwriting
 	if (it[in2].data[1]) 	{ bu[in].temp = it[in2].data[1]; }
 	else 					{ bu[in].temp = 101; }
@@ -1442,6 +1449,15 @@ void spell_from_item(int cn, int in2)
 	if (it[in2].data[4])
 	{
 		bu[in].mana[0]		= it[in2].data[4] * 1000 / it[in2].duration;
+	}
+	
+	// Special case for the Rainbow Potion
+	// CGI Rainbow Potion heals 40, here we give a random ++(0-80)
+	if (it[in2].temp==IT_POT_RAIN)
+	{
+		bu[in].hp[0]		+= RANDOM(81) * 1000 / it[in2].duration;
+		bu[in].end[0]		+= RANDOM(81) * 1000 / it[in2].duration;
+		bu[in].mana[0]		+= RANDOM(81) * 1000 / it[in2].duration;
 	}
 	
 	bu[in].power 			= it[in2].power;

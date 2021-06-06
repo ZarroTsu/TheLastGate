@@ -1344,10 +1344,21 @@ int npc_cityguard_see(int cn, int co, int flag)
 int is_potion(int in)
 {
 	static int potions[] = {
-		IT_POT_L_HP, IT_POT_L_EN, IT_POT_L_MP, IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP, 
-		IT_POT_HPEN, IT_POT_ENMP, IT_POT_MPHP, IT_POT_RAIN, 
-		IT_POT_LIFE, IT_POT_STRE, IT_POT_AGIL, IT_POT_GOLM
-		};
+		IT_POT_M_HP, IT_POT_N_HP, IT_POT_G_HP, IT_POT_H_HP, 
+		IT_POT_S_HP, IT_POT_C_HP, IT_POT_L_HP, IT_POT_D_HP, 
+		IT_POT_M_EN, IT_POT_N_EN, IT_POT_G_EN, IT_POT_H_EN, 
+		IT_POT_S_EN, IT_POT_C_EN, IT_POT_L_EN, IT_POT_D_EN, 
+		IT_POT_M_MP, IT_POT_N_MP, IT_POT_G_MP, IT_POT_H_MP, 
+		IT_POT_S_MP, IT_POT_C_MP, IT_POT_L_MP, IT_POT_D_MP, 
+		IT_POT_VITA, IT_POT_CLAR, IT_POT_SAGE, IT_POT_LIFE, 
+		IT_POT_T, IT_POT_O, IT_POT_PT, IT_POT_PO, 
+		IT_POT_LAB2, IT_POT_GOLEM, 
+		IT_POT_BRV, IT_POT_WIL, IT_POT_INT, IT_POT_AGL, IT_POT_STR, 
+		IT_POT_EXHP, IT_POT_EXEN, IT_POT_EXMP, 
+		IT_POT_PRE, IT_POT_EVA, IT_POT_MOB, IT_POT_FRE, IT_POT_MAR, 
+		IT_POT_IMM, IT_POT_CLA, IT_POT_THO, IT_POT_BRU, IT_POT_RES, 
+		IT_POT_APT, IT_POT_OFF, IT_POT_DEF, IT_POT_PER, IT_POT_STE, 
+		IT_POT_RAIN };
 	int tn, n;
 
 	tn = it[in].temp;
@@ -3555,7 +3566,7 @@ int npc_driver_high(int cn)
 				}
 				if (ch[cn].data[47] && indoor1==indoor2 && (it[in].flags & IF_TAKE) &&
 				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
-				    do_char_can_see_item(cn, in) && it[in].temp!=IT_FLOWER_R)  // Janitor pickup - ignore red flowers
+				    do_char_can_see_item(cn, in) && it[in].temp!=IT_FLO_R)  // Janitor pickup - ignore red flowers
 				{
 					ch[cn].misc_action  = DR_PICKUP;
 					ch[cn].misc_target1 = x;

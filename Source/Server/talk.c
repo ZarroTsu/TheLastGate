@@ -629,7 +629,7 @@ struct know
 #define AN_LAB2_KEYS	"There are three keys in this gorge. Speak with the merchants, they have some quests for you!"
 #define AN_LAB2_RIDDLES	"There are no riddles here, but the merchants each seek help!"
 #define AN_LAB2_COCO	"The coconut? Well, coconuts grow in trees, you know?"
-#define AN_LAB2_POTION	"You have to mix the Potion of Superior Agility from some flower which grow here."
+#define AN_LAB2_POTION	"You have to mix the Potion of Superior Braveness from some flower which grow here."
 #define AN_LAB2_TEETH	"Lizard's Teeth? I'd assume they have them in their mouths."
 #define AN_LAB2_NECK	"To create the Lizard's Teeth Necklace, you need a leather string and nine teeth."
 
@@ -1316,7 +1316,7 @@ struct know know[] = {
 	{{"!key",                              "?", NULL},  2, AR_LABYRINTH, 0, AN_LAB2_KEYS    , 0},
 	{{"!riddle",                           "?", NULL},  2, AR_LABYRINTH, 0, AN_LAB2_RIDDLES , 0},
 	{{"!where", "!coconut", "?lizard",     "?", NULL},  0,AR_LAB_LIZARD, 400, AN_LAB2_COCO  , 0},
-	{{"!where", "!potion", "?agility",     "?", NULL},  0,AR_LAB_LIZARD, 399, AN_LAB2_POTION, 0},
+	{{"!where", "!potion", "?braveness",   "?", NULL},  0,AR_LAB_LIZARD, 399, AN_LAB2_POTION, 0},
 	{{"!where", "!teeth", "?lizard",       "?", NULL},  0,AR_LAB_LIZARD, 398, AN_LAB2_TEETH , 0},
 	{{"!how", "?teeth", "!necklace",       "?", NULL},  0,AR_LAB_LIZARD, 398, AN_LAB2_NECK  , 0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_LAB_GROLM

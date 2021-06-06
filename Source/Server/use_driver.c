@@ -443,289 +443,698 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_L_HP; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_L_EN; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_L_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_N_HP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_N_EN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_N_MP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_MIX_Y___; 	break;
-			case IT_FLOWER_B: 	in3 = IT_MIX_B___; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_Y_; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_B_; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_W_; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_M_; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_C_; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_V_; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_MIX_JP__; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_MIX_JC__; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_MIX_JV__; 	break;
+			case IT_FLO_T:	in3 = IT_POT_T; 	break;
+			case IT_FLO_O:	in3 = IT_POT_O; 	break;
 			//
-			case IT_TULIP: 		in3 = IT_POT_TULI; 	break;
-			case IT_ROSE: 		in3 = IT_POT_ROSE; 	break;
-			//
-			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
-		}
-	}
-	else if (it[in].temp==IT_MIX_B___)
-	{
-		switch(it[in2].temp)
-		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
-			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLOWER_B: 	in3 = IT_MIX_B___; 	break;
-			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_1:	in3 = IT_MIX_1_; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_2_; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_3_; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_Y___)
+	else if (it[in].temp==IT_MIX_W_)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_MIX_YR__; 	break;
-			case IT_FLOWER_G: 	in3 = IT_MIX_YG__; 	break;
-			case IT_FLOWER_P: 	in3 = IT_MIX_YP__; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_G_HP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_G_EN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_G_MP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_MIX_Y___; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_WY; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_BW; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_MW; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_CW; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_VW; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YR__)
+	else if (it[in].temp==IT_MIX_Y_)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_MIX_YRG_; 	break;
-			case IT_FLOWER_P: 	in3 = IT_MIX_YPR_; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_G_HP; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_BY; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_WY; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_MY; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_CY; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_VY; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YG__)
+	else if (it[in].temp==IT_MIX_B_)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_MIX_YRG_; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_MIX_YGP_; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_G_EN; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_BY; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_BW; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_BM; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_BC; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_BV; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YP__)
+	else if (it[in].temp==IT_MIX_M_)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_MIX_YPR_; 	break;
-			case IT_FLOWER_G: 	in3 = IT_MIX_YGP_; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_G_MP; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_MY; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_BM; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_MW; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_CM; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_CV; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_13; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YRG_)
+	else if (it[in].temp==IT_MIX_C_)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_MIX_YRGP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_HPEN; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_CY; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_BC; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_CW; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_CM; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_CV; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YGP_)
+	else if (it[in].temp==IT_MIX_V_)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_MIX_YRGP; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_ENMP; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_VY; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_BV; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_VW; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_MV; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_CV; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_23; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YPR_)
+	else if (it[in].temp==IT_MIX_WY)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_MIX_YRGP; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_H_HP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_H_EN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_H_MP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_MPHP; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_MOB; 	break;
+			case IT_FLO_C:	in3 = IT_POT_AGL; 	break;
+			case IT_FLO_V:	in3 = IT_POT_FRE; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_MAR; 	break;
+			case IT_FLO_O:	in3 = IT_POT_IMM; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_YRGP)
+	else if (it[in].temp==IT_MIX_BW)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_S_HP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_S_EN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_S_MP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_CLA; 	break;
+			case IT_FLO_C:	in3 = IT_POT_INT; 	break;
+			case IT_FLO_V:	in3 = IT_POT_THO; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_RES; 	break;
+			case IT_FLO_O:	in3 = IT_POT_BRU; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_JP__)
+	else if (it[in].temp==IT_MIX_MW)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_C_HP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_C_EN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_C_MP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_MOB; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_CLA; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_WIL; 	break;
+			case IT_FLO_V:	in3 = IT_POT_APT; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_MIX_JPJC; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_MIX_JVJP; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEF; 	break;
+			case IT_FLO_O:	in3 = IT_POT_OFF; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_JC__)
+	else if (it[in].temp==IT_MIX_VW)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_L_HP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_L_EN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_L_MP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_FRE; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_THO; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_APT; 	break;
+			case IT_FLO_C:	in3 = IT_POT_STR; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_MIX_JPJC; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_MIX_JCJV; 	break;
+			case IT_FLO_T:	in3 = IT_POT_STE; 	break;
+			case IT_FLO_O:	in3 = IT_POT_PER; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_JV__)
+	else if (it[in].temp==IT_MIX_CW)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_EXHP; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_EXEN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_EXMP; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_AGL; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_INT; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_WIL; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_STR; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_MIX_JVJP; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_MIX_JCJV; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_EVA; 	break;
+			case IT_FLO_O:	in3 = IT_POT_PRE; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_JPJC)
+	else if (it[in].temp==IT_MIX_BY)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_AGIL; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_JCJV)
+	else if (it[in].temp==IT_MIX_MY)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_MOB; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_AGIL; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_JVJP)
+	else if (it[in].temp==IT_MIX_VY)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLOWER_R: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_G: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_P: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
 			//
-			case IT_FLOWER_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_FRE; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLOWER_JP: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLOWER_JC: 	in3 = IT_POT_AGIL; 	break;
-			case IT_FLOWER_JV: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_CY)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_AGL; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_BM)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_CLA; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_BV)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_THO; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_BC)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_INT; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_CM)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_WIL; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_BRV; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_CV)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_STR; 	break;
+			case IT_FLO_M:	in3 = IT_POT_BRV; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_MV)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_APT; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_BRV; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_LAB2; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_1_)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_12; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_13; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_2_)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_23; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_3_)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_23; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_21)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_LAB2; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_23)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_13)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_V:	in3 = IT_POT_LAB2; 	break;
+			//
+			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
+			case IT_FLO_2:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -746,6 +1155,8 @@ int use_mix_potion(int cn, int in)
 	it[in].used = USE_EMPTY;
 
 	god_give_char(in3, cn);
+	
+	do_char_log(cn, 0, "You produced a %s.\n", it[in3].name);
 
 	return(1);
 }
@@ -4923,12 +5334,12 @@ void use_driver(int cn, int in, int carried)
 				}
 				
 				// Special case for the Rainbow Potion
-				// CGI Rainbow Potion heals 30, here we give a random ++(0-60)
+				// CGI Rainbow Potion heals 20, here we give a random ++(0-40)
 				if (it[in].temp==IT_POT_RAIN)
 				{
-					ch[cn].a_hp += RANDOM(61) * thousand;
-					ch[cn].a_end += RANDOM(61) * thousand;
-					ch[cn].a_mana += RANDOM(61) * thousand;
+					ch[cn].a_hp += RANDOM(41) * thousand;
+					ch[cn].a_end += RANDOM(41) * thousand;
+					ch[cn].a_mana += RANDOM(41) * thousand;
 				}
 				
 				// Immediate healing from item
