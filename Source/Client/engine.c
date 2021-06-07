@@ -813,10 +813,13 @@ extern int mouse_x,mouse_y;	// current mouse coordinates
 
 #define XS	49
 #define LL	22
-#define MLL 26
 #define XLL (22*10)
 static char logtext[XLL][60];
 static char logfont[XLL];
+
+
+#define XMS	43
+#define MLL 26
 static char motdtext[MLL][60];
 static char motdfont[MLL];
 
@@ -1262,9 +1265,9 @@ void display_meta_from_ls(void)
 	}
 	
 	// Draw red rectangle around selected last_skill, for context
-	if (last_skill >= 50)
+	if (last_skill >= 50 && last_skill <= 54)
 	{
-		dd_showbox(6,6+19*(last_skill-50),129,11,(unsigned short)(RED));
+		dd_showbox(6,6+14*(last_skill-50),129,11,(unsigned short)(RED));
 	}
 	
 	// Draw a moon icon?  261 212
@@ -1674,7 +1677,8 @@ void eng_display_win(int plr_sprite,int init)
 		{
 			copyspritex(do_darkmode?18042:42,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (y=0; y<MLL; y++) {
-				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,motdfont[y],motdtext[y]);
+				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+					motdfont[y],motdtext[y]);
 			}
 		}
 		
@@ -1682,7 +1686,8 @@ void eng_display_win(int plr_sprite,int init)
 		{
 			copyspritex(do_darkmode?18043:43,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (y=0; y<MLL; y++) {
-				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,motdfont[y],motdtext[y]);
+				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+					motdfont[y],motdtext[y]);
 			}
 		}
 		
@@ -1692,7 +1697,8 @@ void eng_display_win(int plr_sprite,int init)
 			copyspritex(tutorial_image[show_tuto][tuto_page],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
 			for (y=0;y<12;y++)
 			{
-				dd_xputtext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,1,tutorial_text[show_tuto][tuto_page][y+1]);
+				dd_xputtext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+					1,tutorial_text[show_tuto][tuto_page][y+1]);
 			}
 		}
 	}
@@ -2182,7 +2188,7 @@ void motdlog(char *text,char font)
 {
 	int n,panic=0;
 	static int flag=0;
-
+	
 	if (!flag) {
 		for (n=0; n<MLL*60; n++) {
 			motdtext[0][n]=0;
@@ -2202,11 +2208,11 @@ void motdlog(char *text,char font)
 		memcpy(motdtext[0],text,min(60-1,strlen(text)+1));
 		motdfont[0]=font;
 		motdtext[0][60-1]=0;
-		if (strlen(text)<XS-1) return;
-		for (n=XS-1; n>0; n--) if (motdtext[0][n]==' ') break;
+		if (strlen(text)<XMS-1) return;
+		for (n=XMS-1; n>0; n--) if (motdtext[0][n]==' ') break;
 		if (n!=0) {
 			motdtext[0][n]=0; text+=n+1;
-		} else text+=XS-1;
+		} else text+=XMS-1;
 	}
 }
 
@@ -2218,6 +2224,17 @@ void xlog(char font,char *format,...)
 	va_start(args,format);
 	vsprintf(buf,format,args);
 	tlog(buf,font);
+	va_end(args);
+}
+
+void mxlog(char font,char *format,...)
+{
+	va_list args;
+	char buf[1024];
+
+	va_start(args,format);
+	vsprintf(buf,format,args);
+	motdlog(buf,font);
 	va_end(args);
 }
 

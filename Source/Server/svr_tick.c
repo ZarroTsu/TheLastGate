@@ -462,7 +462,7 @@ void plr_cmd_inv(int nr)
 
 		tmp = ch[cn].item[n];
 
-		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL || ch[cn].item_lock[n])) // Cannot pick up locked items
+		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL))// || ch[cn].item_lock[n])) // Cannot pick up locked items
 		{
 			return;
 		}
@@ -2769,7 +2769,7 @@ void plr_change(int nr)
 					*(short int*)(buf + 1) = 37;
 				}
 				*(short int*)(buf + 3) = 0;
-				*(char*)(buf + 5) = 0;
+				*(unsigned char*)(buf + 5) = 0;
 			}
 			else if (in)
 			{
@@ -2777,7 +2777,7 @@ void plr_change(int nr)
 				{
 					*(short int*)(buf + 1) = 46;
 					*(short int*)(buf + 3) = 0;
-					*(char*)(buf + 5) = 0;
+					*(unsigned char*)(buf + 5) = 0;
 				}
 				else
 				{
@@ -2790,7 +2790,7 @@ void plr_change(int nr)
 						*(short int*)(buf + 1) = it[in].sprite[0];
 					}
 					*(short int*)(buf + 3) = it[in].placement;
-					*(char*)(buf + 5) = it[in].stack;
+					*(unsigned char*)(buf + 5) = it[in].stack;
 
 					it[in].flags &= ~IF_UPDATE;
 				}
@@ -2799,7 +2799,7 @@ void plr_change(int nr)
 			{
 				*(short int*)(buf + 1) = 0;
 				*(short int*)(buf + 3) = 0;
-				*(char*)(buf + 5) = 0;
+				*(unsigned char*)(buf + 5) = 0;
 			}
 			xsend(nr, buf, 6);
 
@@ -4330,7 +4330,7 @@ void tick(void)
 					break;
 
 					case MAPED_RMVITEM: // Remove item
-							build_remove(maped_queue[i].x, maped_queue[i].y, -1);
+							build_remove(maped_queue[i].x, maped_queue[i].y);
 					break;
 
 					case MAPED_SETFLOOR: // Change floor

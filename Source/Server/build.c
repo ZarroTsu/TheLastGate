@@ -86,7 +86,7 @@ int build_item(int nr, int x, int y)
 
 void build_drop(int x, int y, int in)
 {
-	int nr;
+	int nr, exfloor = 0;
 	static int trees1[15] = {19, 19, 19, 20, 20, 20, 48, 48, 48, 49, 49, 49, 606, 607, 607};
 	static int trees2[15] = {19, 19, 20, 20, 48, 48, 49, 49, 606, 607, 607, 608, 608, 609, 609};
 	
@@ -209,10 +209,37 @@ void build_drop(int x, int y, int in)
 		case 1902:	// hack for random jungle trees
 			in = trees5[RANDOM(5)];
 			break;
+		
+		case 1936: exfloor = 0x20000000 | 1002; 	break;
+		case 1937: exfloor = 0x20000000 | 1008; 	break;
+		case 1938: exfloor = 0x20000000 | 1013; 	break;
+		case 1939: exfloor = 0x20000000 | 1034; 	break;
+		case 1940: exfloor = 0x20000000 | 1010; 	break;
+		case 1941: exfloor = 0x20000000 | 1052; 	break;
+		case 1942: exfloor = 0x20000000 | 1100; 	break;
+		case 1943: exfloor = 0x20000000 | 1099; 	break;
+		case 1944: exfloor = 0x20000000 | 1012; 	break;
+		case 1945: exfloor = 0x20000000 | 1109; 	break;
+		case 1946: exfloor = 0x20000000 | 1118; 	break;
+		case 1947: exfloor = 0x20000000 | 1141; 	break;
+		case 1948: exfloor = 0x20000000 | 1158; 	break;
+		case 1949: exfloor = 0x20000000 | 1145; 	break;
+		case 1950: exfloor = 0x20000000 | 1014; 	break;
+		case 1951: exfloor = 0x20000000 | 1005; 	break;
+		case 1952: exfloor = 0x20000000 | 1006; 	break;
+		case 1953: exfloor = 0x20000000 | 1007; 	break;
+		case 1954: exfloor = 0x20000000 |  402; 	break;
+		case 1955: exfloor = 0x20000000 |  500; 	break;
+		
 		default: 
 			break;
 	}
-
+	
+	if (exfloor)
+	{
+		map[x + y * MAPX].sprite = exfloor;
+	}
+	
 	nr = build_item(in, x, y);
 	if (!nr)
 	{

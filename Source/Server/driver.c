@@ -1397,7 +1397,7 @@ int is_unique_able(int temp)
 		532, 533, 534, 535, 536, 537, 538, 539, 540, // Emerald
 		541, 542, 543, 544, 545, 546, 547, 548, 549, // Crystal
 		572, 573, 574, 575, 576, 577, 578, 579, 580, // Titanium		// 45
-		693, 694, 695, 696, 697, 698, 699, 700, 701  // Adamantium		// 54
+		693, 694, 695, 696, 697, 698, 699, 700, 701, // Adamantium		// 54
 		1779, 1780, 1781, 1782, 1783, 1784			 // Claws			// 60
 	};
 	int n, m=0;
@@ -1548,7 +1548,7 @@ int npc_see(int cn, int co)
 	}
 	
 	// if we're taunted, try to attack the taunter
-	if (IS_SANECHAR(cn[cn].taunter) && do_char_can_see(cn, cn[cn].taunter))
+	if (IS_SANECHAR(ch[cn].taunted) && do_char_can_see(cn, ch[cn].taunted))
 	{
 		// If our last attempt to attack failed, wander near the taunter
 		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].last_action == ERR_FAILED)
@@ -1557,9 +1557,9 @@ int npc_see(int cn, int co)
 			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (ch[cn].attack_cn!=cn[cn].taunter && ch[cn].last_action == ERR_SUCCESS)
+		else if (ch[cn].attack_cn!=ch[cn].taunted && ch[cn].last_action == ERR_SUCCESS)
 		{
-			ch[cn].attack_cn = cn[cn].taunter;
+			ch[cn].attack_cn = ch[cn].taunted;
 			ch[cn].goto_x = 0;
 		}
 		ch[cn].data[58] = 2;
@@ -2281,7 +2281,7 @@ int get_spellcost(int cn, int spell)
 		case SK_WEAKEN:		return SP_COST_WEAKEN;
 		case SK_WARCRY:		return SP_COST_WARCRY;
 		
-		case SK_BLAST:		return get_skill_score(cn, SK_BLAST)/4+5)*2 * (kin_hara ? prox : 1);
+		case SK_BLAST:		return (get_skill_score(cn, SK_BLAST)/4+5)*2 * (kin_hara ? prox : 1);
 		case SK_BLESS:		return SP_COST_BLESS;
 		case SK_CURSE:		return SP_COST_CURSE * (kin_sorc ? prox : 1);
 		case SK_DISPEL:		return SP_COST_DISPEL;
@@ -2322,8 +2322,8 @@ int spellflag(int spell)
 		case    SK_LIGHT:		return SP_LIGHT;
 		case    SK_POISON:		return SP_POISON;
 		case    SK_PROTECT:		return SP_PROTECT;
-		case    SK_PULSE;		return SP_PULSE;
-		case    SK_RAZOR;		return SP_RAZOR;
+		case    SK_PULSE:		return SP_PULSE;
+		case    SK_RAZOR:		return SP_RAZOR;
 		case    SK_SLOW:		return SP_SLOW;
 		
 		default:				return 0;
@@ -2443,6 +2443,7 @@ int npc_try_spell(int cn, int co, int spell)
 			// Immunize/Inoculate prevents up to three ailments
 			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
 				(spell==bu[in].data[1] || spell==bu[in].data[2] || spell==bu[in].data[3]))
+			{
 				break;
 			}
 		}

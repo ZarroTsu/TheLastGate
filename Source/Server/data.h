@@ -336,7 +336,7 @@ extern unsigned int mapmarker;
 #define SK_LEAP			49
 //////////////////////////
 // Defines for Ailments // - These are OK to match existing skill numbers; see splog[] in skill_driver.c
-#define SK_WARCRY2  	 1
+#define SK_EXHAUST  	 1
 #define SK_BLEED		 2
 #define SK_WEAKEN2		 3
 #define SK_SCORCH		 4
@@ -347,6 +347,7 @@ extern unsigned int mapmarker;
 #define SK_MSHELL		12
 #define SK_GUARD		16
 #define SK_DISPEL2		32
+#define SK_WARCRY2  	36
 //////////////////////////
 
 /* ch.data[] definitions */
@@ -816,8 +817,15 @@ struct mapedit_queue
         int it_temp;
 };
 
+struct waypoint
+{
+	int x, y;
+	char *name;
+	char *desc;
+};
+
 extern struct s_skilltab skilltab[MAXSKILL];
-extern struct s_splog splog[60];
+extern struct s_splog splog[50];
 extern struct s_soulcat soulcat[N_SOULBONUS];
 extern struct global *globs;
 extern struct map *map;
@@ -829,3 +837,4 @@ extern struct item *it_temp;
 extern struct effect *fx;
 extern struct see_map *  see;
 extern struct mapedit_queue *maped_queue;
+extern struct waypoint waypoint[MAXWPS];

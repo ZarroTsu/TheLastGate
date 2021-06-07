@@ -4755,7 +4755,7 @@ int get_fight_skill(int cn, int skill[50])
 	
 	if ((it[in].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) // Spear
 	{
-		return min(AT_CAP, skill[SK_DAGGER] > skill[SK_STAFF] ? skill[SK_DAGGER] : skill[SK_STAFF];
+		return min(AT_CAP, skill[SK_DAGGER] > skill[SK_STAFF] ? skill[SK_DAGGER] : skill[SK_STAFF]);
 	}
 	
 	if (it[in].flags & IF_WP_DAGGER)
@@ -4769,7 +4769,7 @@ int get_fight_skill(int cn, int skill[50])
 	
 	if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) // Greataxe
 	{
-		return min(AT_CAP, skill[SK_AXE] > skill[SK_TWOHAND] ? skill[SK_AXE] : skill[SK_TWOHAND];
+		return min(AT_CAP, skill[SK_AXE] > skill[SK_TWOHAND] ? skill[SK_AXE] : skill[SK_TWOHAND]);
 	}
 	if (it[in].flags & IF_WP_AXE)
 	{
@@ -5044,7 +5044,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 // note: cn may be zero!!
 void do_char_killed(int cn, int co, int pentsolve)
 {
-	int n, in, x, y, temp = 0, m, tmp, wimp, cc = 0, fn, r1, r2;
+	int n, in, x, y, temp = 0, m, tmp, tmpg, wimp, cc = 0, fn, r1, r2;
 	unsigned long long mf;
 
 	do_notify_char(co, NT_DIED, cn, 0, 0, 0);
@@ -5427,6 +5427,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 	y = ch[co].y;
 	
 	wimp = 0;
+	tmpg = 0;
 
 	if (mf & MF_ARENA)
 	{
@@ -5468,17 +5469,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 			return; // BAD kludge! But what can we do?
 		}
 
-		ch[cc] = ch[co];
-
-		if (ch[co].gold && wimp!=1) // Skua death
-		{
-			ch[co].gold = 0;
-		}
-		else
-		{
-			ch[cc].gold = 0;
-		}
-
+		ch[cc] = ch[co]; // CC refers to the body, while CO refers to the presently dying character
+		
 		for (n = 0; n<40; n++)
 		{
 			if (!(in = ch[co].item[n]))
@@ -5492,11 +5484,12 @@ void do_char_killed(int cn, int co, int pentsolve)
 				ch[cc].item[n] = 0;
 				continue;
 			}
-			if (wimp<2)
+			if (wimp==0)
 			{
 				ch[co].item[n] = 0;
 				it[in].carried = cc;
 				chlog(co, "Dropped %s (t=%d) in Grave", it[in].name, it[in].temp);
+				tmpg = 1;
 			}
 			else
 			{
@@ -5514,11 +5507,12 @@ void do_char_killed(int cn, int co, int pentsolve)
 			}
 			else
 			{
-				if (wimp<2)
+				if (wimp==0)
 				{
 					ch[co].citem = 0;
 					it[in].carried = cc;
 					chlog(co, "Dropped %s (t=%d) in Grave", it[in].name, it[in].temp);
+					tmpg = 1;
 				}
 				else
 				{
@@ -5545,11 +5539,12 @@ void do_char_killed(int cn, int co, int pentsolve)
 				ch[cc].worn[n] = 0;
 				continue;
 			}
-			if (wimp<2)
+			if (wimp==0)
 			{
 				ch[co].worn[n] = 0;
 				it[in].carried = cc;
 				chlog(co, "Dropped %s (t=%d) in Grave", it[in].name, it[in].temp);
+				tmpg = 1;
 			}
 			else
 			{
@@ -5598,23 +5593,54 @@ void do_char_killed(int cn, int co, int pentsolve)
 		if (!(ch[co].flags & CF_GOD) && wimp==1) // Skua death
 		{
 			// Changed to negative exp
-			tmp = (ch[co].points_tot - rank2points(points2rank(ch[co].points_tot)-1))/40;
-
+			tmp = (ch[co].points_tot - rank2points(points2rank(ch[co].points_tot)-1))/20;
+			
+			if (ch[co].gold)
+			{
+				tmpg = ch[co].gold;
+				ch[co].gold = 0;
+			}
+			else
+			{
+				tmpg = ch[cc].gold = 0;
+			}
+			
 			if (tmp>0)
 			{
-				do_char_log(co, 0, "You lost %d experience points.\n", tmp);
-				chlog(co, "Lost %d exp from death.", tmp);
+				if (tmpg>0)
+				{
+					do_char_log(co, 0, "You lost %d exp and dropped %dG %dS.\n", tmp, tmpg/100, tmpg%100);
+					chlog(co, "Lost %d exp and %dG %dS from death.", tmp, tmpg/100, tmpg%100);
+				}
+				else
+				{
+					do_char_log(co, 0, "You lost %d experience points.\n", tmp);
+					chlog(co, "Lost %d exp from death.", tmp);
+				}
 				ch[co].points_tot -= tmp;
 				ch[co].points -= tmp;
 			}
 			else
 			{
-				do_char_log(co, 0, "You would have lost experience points, but you're already at the minimum.\n");
+				if (tmpg>0)
+					do_char_log(co, 0, 
+					"You dropped %dG %dS. You would have lost experience points, but you're already at the minimum.\n", 
+						tmpg/100, tmpg%100);
+				else
+					do_char_log(co, 0, 
+					"You would have lost experience points, but you're already at the minimum.\n");
 			}
 		}
 		else if (!(ch[co].flags & CF_GOD) && wimp==0) // Purple death
 		{
-			do_char_log(co, 0, "You dropped all your items and gear where you died.\n");
+			if (tmpg)
+			{
+				do_char_log(co, 0, "You dropped your items and equipped gear where you died.\n");
+			}
+			else
+			{
+				do_char_log(co, 0, "A pitiful death.\n");
+			}
 		}
 
 		do_update_char(co);
@@ -6091,13 +6117,13 @@ int do_hurt(int cn, int co, int dam, int type)
 	{
 		dam -= ch[co].armor;
 		if (dam<0)dam = 0;
-		elsedam *= 75;
+		else dam *= 75;
 	}
 	else
 	{
 		dam -= ch[co].armor;
 		if (dam<0)dam = 0;
-		elsedam *= 750;
+		else dam *= 750;
 	}
 
 	if (ch[co].flags & CF_IMMORTAL)
@@ -6593,10 +6619,11 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			if (surround==1 && (ch[cn].kindred & KIN_ARCHTEMPLAR) && ch[cn].skill[SK_PROX][0] && !(ch[cn].flags & CF_AREA_OFF))
 			{
 				int surraoe, x, y, xf, yf, xt, yt, xc, yc, obsi = 0;
-				int tmp_h, tmp_s, tmp_g;
+				int aoe_power, tmp_h, tmp_s, tmp_g;
 				
+				aoe_power = get_skill_score(cn, SK_PROX)+15;
 				obsi 	= (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)?1:0;
-				surraoe = get_skill_score(cn, SK_PROX)/PROX_CAP + obsi;
+				surraoe = aoe_power/PROX_CAP + obsi;
 				tmp_h   = sqr(aoe_power/PROX_HIT-surraoe)/5 + obsi*3;
 				tmp_s   = surrDam;
 				tmp_g   = glv;
@@ -8465,10 +8492,11 @@ void do_regenerate(int cn)
 			if (bu[in].temp==SK_PULSE && globs->ticker>bu[in].data[2])
 			{
 				int pulse_dam, pulse_aoe, pulse_rad, x, y, xf, yf, xt, yt, xc, yc;
-				int tmp_h, tmp_s;
+				int aoe_power, tmp_h, tmp_s;
 				
+				aoe_power = get_skill_score(cn, SK_PROX)+15;
 				pulse_rad = bu[in].data[3];
-				pulse_aoe = get_skill_score(cn, SK_PROX)/(PROX_CAP*2) + pulse_rad;
+				pulse_aoe = aoe_power/(PROX_CAP*2) + pulse_rad;
 				tmp_h   = sqr(aoe_power/PROX_HIT-pulse_aoe)/5+(pulse_rad*3);
 				tmp_s   = bu[in].power;
 				

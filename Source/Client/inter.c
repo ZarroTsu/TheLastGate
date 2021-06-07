@@ -297,12 +297,12 @@ void button_command(int nr)
 		
 		// Magnification buttons for the mini-map
 		case 38:
-			if (keys) mm_magnify = 1;
-			else if (mm_magnify>1) mm_magnify--; 
-			break;
-		case 39:
 			if (keys) mm_magnify = 4;
 			else if (mm_magnify<4) mm_magnify++; 
+			break;
+		case 39:
+			if (keys) mm_magnify = 1;
+			else if (mm_magnify>1) mm_magnify--; 
 			break;
 
 		default: break;
@@ -615,8 +615,9 @@ int mouse_inventory(int x,int y,int mode)
 				{
 					xlog(3,"Details panel now showing default.");
 				}
-				// Lock item where it is
-				cmd3(CL_CMD_INV,4,nr+inv_pos,selected_char);
+				// Lock item where it is ;  TODO: fix /sort server-side before uncommenting
+				//cmd3(CL_CMD_INV,4,nr+inv_pos,selected_char);
+				//pl.item_l[nr+inv_pos] = 1-pl.item_l[nr+inv_pos];
 				if (last_skill == 100+nr+inv_pos)
 				{
 					last_skill = -1;
@@ -1366,6 +1367,13 @@ int mouse_shop(int x,int y,int mode)
 		hightlight_sub=nr;
 		return 1;
 	}
+	
+	// prevent clicking the world behind the menu
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
+	{
+		return 1;
+	}
+	
 	return 0;
 }
 
@@ -1438,6 +1446,12 @@ int mouse_wps(int x,int y,int mode)
 		return 1;
 	}
 	
+	// prevent clicking the world behind the menu
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
+	{
+		return 1;
+	}
+	
 	return 0;
 }
 
@@ -1482,7 +1496,6 @@ int mouse_motd(int x,int y,int mode)
 			show_newp=0;
 			show_tuto=1; tuto_page=1; tuto_max=3;
 			play_sound("sfx\\click.wav",-1000,0);
-			return 1;
 		}
 		// Tutorial window PREV
 		else if (show_tuto)
@@ -1490,8 +1503,9 @@ int mouse_motd(int x,int y,int mode)
 			tuto_page--; 
 			if (tuto_page<=1) tuto_page=1;
 			else play_sound("sfx\\click.wav",-1000,0);
-			return 1;
+			
 		}
+		return 1;
 	}
 	
 	// [Bottom right button]
@@ -1506,7 +1520,7 @@ int mouse_motd(int x,int y,int mode)
 				show_newp=0;
 				noshop=QSIZE*12;
 			}
-			return 1;
+			
 		}
 		// Tutorial window NEXT
 		else if (show_tuto)
@@ -1514,8 +1528,14 @@ int mouse_motd(int x,int y,int mode)
 			tuto_page++; 
 			if (tuto_page>=tuto_max) tuto_page=tuto_max;
 			else play_sound("sfx\\click.wav",-1000,0);
-			return 1;
 		}
+		return 1;
+	}
+	
+	// prevent clicking the world behind the menu
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
+	{
+		return 1;
 	}
 	
 	return 0;

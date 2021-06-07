@@ -133,6 +133,7 @@ int end_needed(int v);
 int mana_needed(int v);
 int skill_needed(int n,int v);
 void xlog(char font,char *format,...);
+void mxlog(char font,char *format,...);
 int play_sound(char *file,int vol,int pan);
 void reset_block(void);
 

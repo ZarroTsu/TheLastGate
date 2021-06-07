@@ -110,7 +110,7 @@ int npc_cityattack_see(int cn, int co)
 		return( 1);                     // processed it: we cannot see him, so ignore him
 	}
 	// if we're taunted, try to attack the taunter
-	if (IS_SANECHAR(cn[cn].taunter) && do_char_can_see(cn, cn[cn].taunter))
+	if (IS_SANECHAR(ch[cn].taunted) && do_char_can_see(cn, ch[cn].taunted))
 	{
 		if (ch[cn].data[0]<2) ch[cn].data[0]=2; // Force the raid state
 		// If our last attempt to attack failed, wander near the taunter
@@ -120,9 +120,9 @@ int npc_cityattack_see(int cn, int co)
 			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (ch[cn].attack_cn!=cn[cn].taunter && ch[cn].last_action == ERR_SUCCESS)
+		else if (ch[cn].attack_cn!=ch[cn].taunted && ch[cn].last_action == ERR_SUCCESS)
 		{
-			ch[cn].attack_cn = cn[cn].taunter;
+			ch[cn].attack_cn = ch[cn].taunted;
 			ch[cn].goto_x = 0;
 		}
 		ch[cn].data[58] = 2;

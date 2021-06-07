@@ -1,5 +1,5 @@
 // Just comment/uncomment this to alter home copy version
-//#define HOMECOPY
+#define HOMECOPY
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
@@ -156,10 +156,12 @@ struct cplayer {
 	// character attributes+abilities
 	// [0]=bare value, [1]=modifier, [2]=total value
 	int attrib[5][6];
-	int skill[100][6];
+	
 	int hp[6];
 	int end[6];
 	int mana[6];
+	
+	int skill[100][6];
 
 	// temporary attributes
 	int a_hp;
@@ -186,8 +188,8 @@ struct cplayer {
 	int worn_p[20];
 
 	// spells ready
-	int spell[MAXBUFFS];
-	int active[20];
+	short spell[MAXBUFFS];
+	char active[MAXBUFFS];
 
 	int armor;
 	int weapon;
@@ -268,7 +270,6 @@ struct cplayer {
 #define SV_SETCHAR_ITEM				23
 #define SV_SETCHAR_WORN				24
 #define SV_SETCHAR_OBJ				25
-#define SV_SETCHAR_WPS				26
 
 #define SV_TICK						27
 
@@ -323,6 +324,7 @@ struct cplayer {
 
 #define SV_WAYPOINTS				74
 #define SV_SHOWMOTD					75
+#define SV_SETCHAR_WPS				76
 
 #define SV_MOTD						82
 #define SV_MOTD0					82

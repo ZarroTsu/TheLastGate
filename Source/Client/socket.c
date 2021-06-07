@@ -542,7 +542,7 @@ void sv_setchar_obj(unsigned char *buf)
 
 	pl.citem=*(short int*)(buf+1);
 	pl.citem_p=*(short int*)(buf+3);
-	pl.citem_s=*(char*)(buf+5); // stack size
+	pl.citem_s=*(unsigned char*)(buf+5); // stack size
 
 //	xlog("SV SETCHAR OBJ (%d,%d)",*(short int*)(buf+1),*(short int*)(buf+3));
 }
@@ -721,7 +721,7 @@ void sv_motd(unsigned char *buf,int font)
 		xlog(0,"sv_motd(): cnt too big!");
 
 		text[cnt]=0;
-		xlog(1,text);
+		mxlog(1,text);
 		cnt=0;
 	}
 }

@@ -1064,7 +1064,7 @@ int use_mix_potion(int cn, int in)
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
-	else if (it[in].temp==IT_MIX_21)
+	else if (it[in].temp==IT_MIX_12)
 	{
 		switch(it[in2].temp)
 		{

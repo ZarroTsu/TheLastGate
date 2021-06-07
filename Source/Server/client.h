@@ -102,18 +102,22 @@ struct cplayer
 	// items carried
 	int item[40];
 	int item_p[40];
+	char item_s[40];  // Stack size of given item (0 - 10)
+	char item_l[40];  // Whether or not the given item is locked
 
 	// items worn
 	int worn[20];
 	int worn_p[20];
-
-	int spell[20];
-	char active[20];
+	
+	// spells ready
+	short spell[MAXBUFFS];
+	char active[MAXBUFFS];
 
 	int weapon;
 	int armor;
 
 	int citem, citem_p;
+	char citem_s;  // Stack size of given item (0 - 10)
 
 	int attack_cn;
 	int goto_x, goto_y;
@@ -191,7 +195,6 @@ struct cplayer
 #define SV_SETCHAR_ITEM 23
 #define SV_SETCHAR_WORN 24
 #define SV_SETCHAR_OBJ  25
-#define SV_SETCHAR_WPS  26
 
 #define SV_TICK 27
 
@@ -247,6 +250,7 @@ struct cplayer
 
 #define SV_WAYPOINTS     74
 #define SV_SHOWMOTD      75
+#define SV_SETCHAR_WPS   76
 
 #define SV_MOTD  82
 #define SV_MOTD0 82

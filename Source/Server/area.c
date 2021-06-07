@@ -290,14 +290,7 @@ struct area area[] = {
 	{ 301,   21,  371,   91, "Random Dungeon III",             1}
 };
 
-struct waypoint
-{
-	int x, y;
-	char *name;
-	char *desc;
-};
-
-struct waypoint waypoint[MAXWPS] = {
+extern struct waypoint waypoint[MAXWPS] = {
 //    _x_, _y_, "123456789012345678901234567890", 	"..."
 	{ 777, 265, "Lynbore, Tavern", 					"outside the Bluebird Tavern in Lynbore" },
 	{ 739, 393, "Lynbore, East", 					"the beginning of the Weeping Woods, east of Lynbore" },

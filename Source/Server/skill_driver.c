@@ -23,9 +23,9 @@ char *at_name[5] = {
 
 struct s_splog splog[50] = {
 	{
-		0, 				"Exhaust", 		"exhaust", 		"exhausting"
+		0
 	},{
-		SK_WARCRY2, 	"Stun",			"stun",			"stunning"
+		SK_EXHAUST, 	"Exhaust",		"exhaust",		"exhausting"
 	},{ 
 		SK_BLEED, 		"Bleed",		"bleed",		"bleeding"
 	},{ 
@@ -164,7 +164,7 @@ struct s_splog splog[50] = {
 		"","",
 		"You cry out loud and clear."
 	},{
-		36
+		SK_WARCRY2, 	"Stun",			"stun",			"stunning"
 	},{
 		SK_BLIND,		"Blind",		"blind",		"blinding",
 		"","",
@@ -217,6 +217,13 @@ struct s_splog splog[50] = {
 	}
 };
 
+int spellcost(int cn, int cost, int in, int usemana);
+void damage_mshell(int co);
+int chance_base(int cn, int skill, int d20, int defense, int usemana);
+int chance(int cn, int d20);
+void add_exhaust(int cn, int len);
+void skill_slow(int cn, int flag);
+
 int friend_is_enemy(int cn, int cc)
 {
 	int co;
@@ -242,7 +249,7 @@ int is_exhausted(int cn)
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==1) { break; }
+		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_EXHAUST) { break; }
 	}
 	if (n<MAXBUFFS)
 	{
@@ -1381,7 +1388,7 @@ void add_exhaust(int cn, int len)
 	bu[in].flags 	|= IF_SPELL;
 	bu[in].sprite[1] = BUF_SPR_EXHAUST;
 	bu[in].duration  = bu[in].active = len;
-	bu[in].temp  	 = 1;
+	bu[in].temp  	 = SK_EXHAUST;
 	bu[in].power 	 = 300;
 	
 	add_spell(cn, in);
@@ -1615,7 +1622,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 	return 1;
 }
 
-int spellpower_check(int cn, int co, int power, int in)
+int spellpower_check(int cn, int co, int power)
 {
 	int tmp;
 	
@@ -1688,7 +1695,7 @@ int spell_protect(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn));
 
 	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) 
 		return 0;
@@ -1722,7 +1729,7 @@ int spell_enhance(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn));
 	
 	if (!(in = make_new_buff(cn, SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) 
 		return 0;
@@ -1756,7 +1763,7 @@ int spell_bless(int cn, int co, int power)
 {
 	int in, n;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 1);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn));
 	
 	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) 
 		return 0;
@@ -1786,7 +1793,7 @@ int spell_mshield(int cn, int co, int power)
 {
 	int in, ta_cn_cha, ta_co_emp, n, cc;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn));
 	
 	ta_cn_cha = get_tarot(cn, IT_CH_CHARIOT);
 	ta_co_emp = get_tarot(co, IT_CH_EMPRESS);
@@ -1882,7 +1889,7 @@ int spell_haste(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn));
 	
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 1))) 
 		return 0;
@@ -2623,7 +2630,7 @@ int spell_scorch(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_DOUSE, BUF_SPR_DOUSE, power, SP_DUR_DOUSE, 0)))
 			return 0;
 		
-		bu[m].spell_mod[1] = -(power / 10);
+		bu[in].spell_mod[1] = -(power / 10);
 	}
 	else
 	{
@@ -2888,7 +2895,7 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
 	}
 	else		// Buff version
 	{
-		power = spellpower_check(cn, co, power, 0);
+		power = spellpower_check(cn, co, power);
 		
 		if (!(in = make_new_buff(cn, SK_DISPEL, BUF_SPR_IMMUNI, power, SP_DUR_DISPEL, 0))) 
 			return 0;
@@ -3892,7 +3899,7 @@ int spell_pulse(int cn, int co, int power)
 	
 	len = SK_EXH_PULSE * baselen / max(100, ch[cn].cool_bonus);
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	power = spellpower_check(cn, co, spell_multiplier(power, cn));
 	
 	if (!(in = make_new_buff(cn, SK_PULSE, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
 		return 0;
@@ -3901,7 +3908,7 @@ int spell_pulse(int cn, int co, int power)
 	bu[in].data[2] = globs->ticker + bu[in].data[1]; 	// next tick
 	bu[in].data[3] = PRXP_RAD + (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)?1:0;
 	
-	return cast_a_spell(cn, co, in, 0); // SK_PULSE
+	return cast_a_spell(cn, co, in, 0, 1); // SK_PULSE
 }
 void skill_pulse(int cn)
 {
@@ -3935,12 +3942,12 @@ int spell_guard(int cn, int co, int power)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, power, 0, 0);
+	//power = spellpower_check(cn, co, power);
 	
 	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, SP_DUR_GUARD, 0))) 
 		return 0;
 	
-	return cast_a_spell(cn, co, in, 0); // SK_GUARD
+	return cast_a_spell(cn, co, in, 0, 0); // SK_GUARD
 }
 void skill_taunt(int cn)
 {
@@ -3987,7 +3994,7 @@ void skill_taunt(int cn)
 		surround_cast(cn, co_orig, SK_TAUNT, power);
 	}
 	
-	spell_guard(cn, cn, get_skill_score(cn, SK_TAUNT), 0);
+	spell_guard(cn, cn, get_skill_score(cn, SK_TAUNT));
 	
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
@@ -4131,7 +4138,7 @@ int spell_razor(int cn, int co, int power, int flag)
 	}
 	else		// Buff version
 	{
-		power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+		power = spellpower_check(cn, co, spell_multiplier(power, cn));
 		
 		if (!(in = make_new_buff(cn, SK_RAZOR, BUF_SPR_RAZOR, power, SP_DUR_RAZOR, 0))) 
 			return 0;
@@ -4221,23 +4228,22 @@ void skill_driver(int cn, int nr)
 		case SK_TAUNT:		skill_taunt(cn);	break;
 		case SK_WARCRY:		skill_warcry(cn);	break;
 		case SK_WEAKEN:		skill_weaken(cn);	break;	
-		case SK_TAUNT:		skill_taunt(cn);	break;
 		
-		case SK_BLAST:		if (nmz) nomagic(cn); else skill_blast(cn);		break;
-		case SK_BLESS:		if (nmz) nomagic(cn); else skill_bless(cn);		break;
-		case SK_CURSE:		if (nmz) nomagic(cn); else skill_curse(cn);		break;
+		case SK_BLAST:		if (nmz) nomagic(cn); else skill_blast(cn);	break;
+		case SK_BLESS:		if (nmz) nomagic(cn); else skill_bless(cn);	break;
+		case SK_CURSE:		if (nmz) nomagic(cn); else skill_curse(cn);	break;
 		case SK_DISPEL:		if (nmz) nomagic(cn); else skill_dispel(cn);	break;
 		case SK_ENHANCE:	if (nmz) nomagic(cn); else skill_enhance(cn);	break;
-		case SK_GHOST:		if (nmz) nomagic(cn); else skill_ghost(cn);		break;
-		case SK_HASTE:		if (nmz) nomagic(cn); else skill_haste(cn);		break;
+		case SK_GHOST:		if (nmz) nomagic(cn); else skill_ghost(cn);	break;
+		case SK_HASTE:		if (nmz) nomagic(cn); else skill_haste(cn);	break;
 		case SK_HEAL:		if (nmz) nomagic(cn); else skill_heal(cn);		break;
 		case SK_IDENT:		if (nmz) nomagic(cn); else skill_identify(cn);	break;
 		case SK_LIGHT:		if (nmz) nomagic(cn); else skill_light(cn); 	break;
 		case SK_MSHIELD:	if (nmz) nomagic(cn); else skill_mshield(cn);	break;
 		case SK_POISON:		if (nmz) nomagic(cn); else skill_poison(cn);	break;
 		case SK_PROTECT:	if (nmz) nomagic(cn); else skill_protect(cn);	break;
-		case SK_PULSE:		if (nmz) nomagic(cn); else skill_pulse(cn);		break;
-		case SK_RAZOR:		if (nmz) nomagic(cn); else skill_razor(cn);		break;
+		case SK_PULSE:		if (nmz) nomagic(cn); else skill_pulse(cn);	break;
+		case SK_RAZOR:		if (nmz) nomagic(cn); else skill_razor(cn);	break;
 		case SK_RECALL:		if (nmz) nomagic(cn); else skill_recall(cn);	break;
 		case SK_SHADOW:		if (nmz) nomagic(cn); else skill_shadow(cn);	break;
 		case SK_SLOW:		if (nmz) nomagic(cn); else skill_slow(cn, 0);	break;
