@@ -144,6 +144,7 @@ void sounder(void *dummy)
 			hr=sb[n]->lpVtbl->GetStatus(sb[n],&status);
 			if (hr!=DS_OK) { sound_error(hr,desk_hwnd,"GetStatus"); continue; }
 			if ((status&DSBSTATUS_PLAYING)==0) {
+				/*
 				if (n==0 && domusic) { // channel 0 is reserved for background music...
 					start[n]=1;
 					switch(song) {
@@ -153,8 +154,9 @@ void sounder(void *dummy)
 					}
 					song++;
 					volume[n]=-300;
-                                        pan[n]=0;
+                    pan[n]=0;
 				}
+				*/
 				used[n]=0;
 			}
 			if (status&DSBSTATUS_PLAYING && n==0 && domusic==0) {

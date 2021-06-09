@@ -785,7 +785,7 @@ int npc_give(int cn, int co, int in, int money)
 		(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD))
 		||
 		(ch[cn].temp==CT_HERBCOLL && 
-		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD))
+		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD || it[in].temp==IT_HERBE))
 		)
 		&& canlearn)
 	{
@@ -873,12 +873,13 @@ int npc_give(int cn, int co, int in, int money)
 			return(0);
 		}
 		else if (ch[cn].temp==CT_HERBCOLL && 
-		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD))
+		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD || it[in].temp==IT_HERBE))
 		{
-			if (it[in].temp==IT_HERBA)			money = 10000;
-			else if (it[in].temp==IT_HERBB)	money = 20000;
-			else if (it[in].temp==IT_HERBC)	money = 30000;
-			else								money = 40000;
+			if (it[in].temp==IT_HERBA)		money = 10000;
+			else if (it[in].temp==IT_HERBB)	money = 15000;
+			else if (it[in].temp==IT_HERBC)	money = 25000;
+			else if (it[in].temp==IT_HERBD)	money = 40000;
+			else							money = 60000;
 			nr = money*3/2;
 			do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			god_take_from_char(in, cn);
@@ -2320,6 +2321,7 @@ int spellflag(int spell)
 		case    SK_HASTE:		return SP_HASTE;
 		case    SK_HEAL:		return SP_HEAL;
 		case    SK_LIGHT:		return SP_LIGHT;
+		case    SK_MSHIELD:		return SP_MSHIELD;
 		case    SK_POISON:		return SP_POISON;
 		case    SK_PROTECT:		return SP_PROTECT;
 		case    SK_PULSE:		return SP_PULSE;
@@ -2416,14 +2418,10 @@ int npc_try_spell(int cn, int co, int spell)
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		// Cancel if exhausted
-		if ((in = ch[cn].spell[n]) && bu[in].temp==1)
+		if ((in = ch[cn].spell[n]) && bu[in].temp==SK_EXHAUST)
 		{
-			break;
+			return 0;
 		}
-	}
-	if (n<MAXBUFFS)
-	{
-		return( 0);
 	}
 
 	mana = ch[cn].a_mana / 1000;
@@ -2434,9 +2432,9 @@ int npc_try_spell(int cn, int co, int spell)
 		if ((in = ch[co].spell[n])!=0)
 		{
 			// Cancel if target is already buffed or debuffed (except for heal)
-			if (bu[in].temp==spell && spell!=SK_HEAL
-			&& (bu[in].power + 10)>=spell_immunity(get_skill_score(cn, spell), get_target_immunity(co)) 
-			&& bu[in].active>bu[in].duration / 4 * 3)
+			if (bu[in].temp==spell && spell!=SK_HEAL && 
+				(bu[in].power + 10)>=spell_immunity(get_skill_score(cn, spell), get_target_immunity(co)) && 
+				bu[in].active>bu[in].duration / 4 * 3)
 			{
 				break;
 			}
@@ -2444,6 +2442,7 @@ int npc_try_spell(int cn, int co, int spell)
 			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
 				(spell==bu[in].data[1] || spell==bu[in].data[2] || spell==bu[in].data[3]))
 			{
+				chlog(cn,"Immunize true (%d)",bu[in].temp);
 				break;
 			}
 		}
@@ -2457,7 +2456,7 @@ int npc_try_spell(int cn, int co, int spell)
 		{
 			if (end>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
-				//chlog(cn,"Trying spell %d on %s (%d)",spell,ch[co].name,co);
+				//chlog(cn,"Trying endu skill %d on %s (%d)",spell,ch[co].name,co);
 				ch[cn].skill_nr = spell;
 				ch[cn].skill_target1 = co;
 				ch[co].data[96] |= tmp;
@@ -2469,7 +2468,7 @@ int npc_try_spell(int cn, int co, int spell)
 		{
 			if (mana>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
-				//chlog(cn,"Trying spell %d on %s (%d)",spell,ch[co].name,co);
+				//chlog(cn,"Trying mana spell %d on %s (%d)",spell,ch[co].name,co);
 				ch[cn].skill_nr = spell;
 				ch[cn].skill_target1 = co;
 				ch[co].data[96] |= tmp;
@@ -3228,7 +3227,7 @@ int npc_driver_high(int cn)
 		{
 			return( 1);
 		}
-		if (get_skill_score(cn, SK_MSHIELD) >= 84) // to avoid persistant awake timers
+		if (get_skill_score(cn, SK_MSHIELD) >= 84) // to avoid persistent awake timers
 		{
 			if (npc_try_spell(cn, cn, SK_MSHIELD))
 			{
@@ -3913,7 +3912,7 @@ int npc_want_item(int cn, int in)
 		}
 	}
 
-	if (it[in].temp==IT_GPOT || it[in].temp==IT_RPOT) // Gpot or Rpot
+	if (it[in].temp==IT_SPOT || it[in].temp==IT_GPOT || it[in].temp==IT_RPOT) // Gpot or Rpot
 	{
 		ch[cn].citem = in;
 		it[in].carried = cn;

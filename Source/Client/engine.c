@@ -817,7 +817,6 @@ extern int mouse_x,mouse_y;	// current mouse coordinates
 static char logtext[XLL][60];
 static char logfont[XLL];
 
-
 #define XMS	43
 #define MLL 26
 static char motdtext[MLL][60];
@@ -1071,9 +1070,9 @@ void display_meta_from_ls(void)
 	/*
 		Regeneration stats
 	*/
-	race_reg = pl.skill[28][5] * moonmult / 15;
-	race_res = pl.skill[29][5] * moonmult / 15;
-	race_med = pl.skill[30][5] * moonmult / 15;
+	race_reg = pl.skill[28][5] * moonmult / 20;
+	race_res = pl.skill[29][5] * moonmult / 20;
+	race_med = pl.skill[30][5] * moonmult / 20;
 	
 	// Tarot - Moon :: While not full mana, life regen is mana regen
 	if ((pl_flags & (1 << 11)) && (pl.a_mana<pl.mana[5]))
@@ -1114,7 +1113,7 @@ void display_meta_from_ls(void)
 	}
 		
 	sk_regen = (pl.skill[28][0]?race_reg:0) + hpmult   * 2;
-	sk_restv = (pl.skill[29][0]?race_res:0) + endmult  * 4;
+	sk_restv = (pl.skill[29][0]?race_res:0) + endmult  * 3;
 	sk_medit = (pl.skill[30][0]?race_med:0) + manamult * 1;
 	
 	// Amulet - Standard Ankh
@@ -1267,7 +1266,7 @@ void display_meta_from_ls(void)
 	// Draw red rectangle around selected last_skill, for context
 	if (last_skill >= 50 && last_skill <= 54)
 	{
-		dd_showbox(6,6+14*(last_skill-50),129,11,(unsigned short)(RED));
+		dd_showbox(5,5+14*(last_skill-50),131,13,(unsigned short)(RED));
 	}
 	
 	// Draw a moon icon?  261 212
@@ -1319,15 +1318,17 @@ void eng_display_win(int plr_sprite,int init)
 				else
 					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
 				// Draw stack count 
-				if (pl.item_s[n+inv_pos]>0)
+				if (pl.item_s[n+inv_pos]>0&&pl.item_s[n+inv_pos]<=10)
 				{
 					copyspritex(4000+pl.item_s[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
 				}
 				// Draw lock icon for locked items
+				/*
 				if (pl.item_l[n+inv_pos])
 				{
 					copyspritex(4000,261+(n%10)*34,6+(n/10)*34,0);
 				}
+				*/
 			}
 			// Draw shortcut key names
 			for (m=0; m<16; m++)
@@ -1698,7 +1699,7 @@ void eng_display_win(int plr_sprite,int init)
 			for (y=0;y<12;y++)
 			{
 				dd_xputtext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
-					1,tutorial_text[show_tuto][tuto_page][y+1]);
+					1,tutorial_text[show_tuto][tuto_page][y]);
 			}
 		}
 	}
@@ -2147,6 +2148,8 @@ void eng_display(int init)	// optimize me!!!!!
 			copyspritex(pl.citem,mouse_x-16,mouse_y-16,16);
 		else
 			copyspritex(pl.citem,mouse_x-16,mouse_y-16,0);
+		if (pl.citem_s>0&&pl.citem_s<=10)
+			copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,0);
 	}
 }
 
@@ -2203,8 +2206,8 @@ void motdlog(char *text,char font)
 
 	while (panic++<MLL) {
 		do_msg();
-		memmove(motdtext[1],motdtext[0],MLL*60-60);
-		memmove(&motdfont[1],&motdfont[0],MLL-1);
+		//memmove(motdtext[1],motdtext[0],MLL*60-60);
+		//memmove(&motdfont[1],&motdfont[0],MLL-1);
 		memcpy(motdtext[0],text,min(60-1,strlen(text)+1));
 		motdfont[0]=font;
 		motdtext[0][60-1]=0;

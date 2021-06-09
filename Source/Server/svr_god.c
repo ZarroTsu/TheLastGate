@@ -888,13 +888,8 @@ int god_give_char(int in, int cn)
 	}
 	for (n = 0; n<40; n++)
 	{
-		// Find an empty inventory slot
-		if (!ch[cn].item[n])
-		{
-			break;
-		}
 		// Find a stackable item of the same template
-		else if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[ch[cn].item[n]].temp && it[ch[cn].item[n]].stack<10)
+		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[ch[cn].item[n]].temp && it[ch[cn].item[n]].stack<10)
 		{
 			if (it[ch[cn].item[n]].stack<1)	it[ch[cn].item[n]].stack=1;
 			if (it[in].stack>1)
@@ -910,6 +905,14 @@ int god_give_char(int in, int cn)
 				it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
 			}
 			return(1);
+		}
+	}
+	for (n = 0; n<40; n++)
+	{
+		// Find an empty inventory slot
+		if (!ch[cn].item[n])
+		{
+			break;
 		}
 	}
 	if (n==40)

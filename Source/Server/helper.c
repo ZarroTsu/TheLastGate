@@ -1111,6 +1111,9 @@ int create_special_item(int temp)
 
 	switch(temp)
 	{
+		//
+		
+		//
 		case IT_HELM_BRNZ: spr = 180; 	break;
 		case IT_BODY_BRNZ: spr = 181; 	break;
 		case IT_HELM_STEL: spr = 182; 	break;

@@ -419,7 +419,7 @@ void use_stack_items(int cn, int in)
 
 int use_mix_potion(int cn, int in)
 {
-	int in2, in3 = 0;
+	int in2, in3 = 0, font = 0;
 
 	if (cn==0)
 	{
@@ -443,23 +443,23 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_N_HP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_N_EN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_N_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_N_HP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_N_EN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_N_MP; 	font=2;	 break;
 			//
-			case IT_FLO_Y: 	in3 = IT_MIX_Y_; 	break;
-			case IT_FLO_B: 	in3 = IT_MIX_B_; 	break;
-			case IT_FLO_W: 	in3 = IT_MIX_W_; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_M_; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_C_; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_V_; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_Y_; 	font=1;	 break;
+			case IT_FLO_B: 	in3 = IT_MIX_B_; 	font=1;	 break;
+			case IT_FLO_W: 	in3 = IT_MIX_W_; 	font=1;	 break;
+			case IT_FLO_M:	in3 = IT_MIX_M_; 	font=1;	 break;
+			case IT_FLO_C:	in3 = IT_MIX_C_; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_V_; 	font=1;	 break;
 			//
-			case IT_FLO_T:	in3 = IT_POT_T; 	break;
-			case IT_FLO_O:	in3 = IT_POT_O; 	break;
+			case IT_FLO_T:	in3 = IT_POT_T; 	font=2;	 break;
+			case IT_FLO_O:	in3 = IT_POT_O; 	font=2;	 break;
 			//
-			case IT_FLO_1:	in3 = IT_MIX_1_; 	break;
-			case IT_FLO_2:	in3 = IT_MIX_2_; 	break;
-			case IT_FLO_3:	in3 = IT_MIX_3_; 	break;
+			case IT_FLO_1:	in3 = IT_MIX_1_; 	font=1;	 break;
+			case IT_FLO_2:	in3 = IT_MIX_2_; 	font=1;	 break;
+			case IT_FLO_3:	in3 = IT_MIX_3_; 	font=1;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -468,16 +468,16 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_G_HP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_G_EN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_G_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_G_HP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_G_EN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_G_MP; 	font=2;	 break;
 			//
-			case IT_FLO_Y: 	in3 = IT_MIX_WY; 	break;
-			case IT_FLO_B: 	in3 = IT_MIX_BW; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_WY; 	font=1;	 break;
+			case IT_FLO_B: 	in3 = IT_MIX_BW; 	font=1;	 break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_MW; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_CW; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_VW; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_MW; 	font=1;	 break;
+			case IT_FLO_C:	in3 = IT_MIX_CW; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_VW; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
@@ -498,11 +498,11 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_B: 	in3 = IT_MIX_BY; 	break;
-			case IT_FLO_W: 	in3 = IT_MIX_WY; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_MY; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_CY; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_VY; 	break;
+			case IT_FLO_B: 	in3 = IT_MIX_BY; 	font=1;	 break;
+			case IT_FLO_W: 	in3 = IT_MIX_WY; 	font=1;	 break;
+			case IT_FLO_M:	in3 = IT_MIX_MY; 	font=1;	 break;
+			case IT_FLO_C:	in3 = IT_MIX_CY; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_VY; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
@@ -522,12 +522,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_Y: 	in3 = IT_MIX_BY; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_BY; 	font=1;	 break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_MIX_BW; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_BM; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_BC; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_BV; 	break;
+			case IT_FLO_W: 	in3 = IT_MIX_BW; 	font=1;	 break;
+			case IT_FLO_M:	in3 = IT_MIX_BM; 	font=1;	 break;
+			case IT_FLO_C:	in3 = IT_MIX_BC; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_BV; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
@@ -547,19 +547,19 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_Y: 	in3 = IT_MIX_MY; 	break;
-			case IT_FLO_B: 	in3 = IT_MIX_BM; 	break;
-			case IT_FLO_W: 	in3 = IT_MIX_MW; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_MY; 	font=1;	 break;
+			case IT_FLO_B: 	in3 = IT_MIX_BM; 	font=1;	 break;
+			case IT_FLO_W: 	in3 = IT_MIX_MW; 	font=1;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_CM; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_CV; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_CM; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_CV; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_2:	in3 = IT_MIX_12; 	break;
-			case IT_FLO_3:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_12; 	font=1;	 break;
+			case IT_FLO_3:	in3 = IT_MIX_13; 	font=1;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -572,18 +572,18 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_Y: 	in3 = IT_MIX_CY; 	break;
-			case IT_FLO_B: 	in3 = IT_MIX_BC; 	break;
-			case IT_FLO_W: 	in3 = IT_MIX_CW; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_CM; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_CY; 	font=1;	 break;
+			case IT_FLO_B: 	in3 = IT_MIX_BC; 	font=1;	 break;
+			case IT_FLO_W: 	in3 = IT_MIX_CW; 	font=1;	 break;
+			case IT_FLO_M:	in3 = IT_MIX_CM; 	font=1;	 break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_CV; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_CV; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_1:	in3 = IT_MIX_13; 	break;
-			case IT_FLO_2:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_1:	in3 = IT_MIX_13; 	font=1;	 break;
+			case IT_FLO_2:	in3 = IT_MIX_23; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
@@ -597,19 +597,19 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_G: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_P: 	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_Y: 	in3 = IT_MIX_VY; 	break;
-			case IT_FLO_B: 	in3 = IT_MIX_BV; 	break;
-			case IT_FLO_W: 	in3 = IT_MIX_VW; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_MV; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_CV; 	break;
+			case IT_FLO_Y: 	in3 = IT_MIX_VY; 	font=1;	 break;
+			case IT_FLO_B: 	in3 = IT_MIX_BV; 	font=1;	 break;
+			case IT_FLO_W: 	in3 = IT_MIX_VW; 	font=1;	 break;
+			case IT_FLO_M:	in3 = IT_MIX_MV; 	font=1;	 break;
+			case IT_FLO_C:	in3 = IT_MIX_CV; 	font=1;	 break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_1:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_1:	in3 = IT_MIX_12; 	font=1;	 break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_3:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_23; 	font=1;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -618,19 +618,19 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_H_HP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_H_EN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_H_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_H_HP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_H_EN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_H_MP; 	font=2;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_B: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_B: 	in3 = IT_POT_LIFE; 	font=2;	 break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_POT_MOB; 	break;
-			case IT_FLO_C:	in3 = IT_POT_AGL; 	break;
-			case IT_FLO_V:	in3 = IT_POT_FRE; 	break;
+			case IT_FLO_M:	in3 = IT_POT_MOB; 	font=2;	 break;
+			case IT_FLO_C:	in3 = IT_POT_AGL; 	font=2;	 break;
+			case IT_FLO_V:	in3 = IT_POT_FRE; 	font=2;	 break;
 			//
-			case IT_FLO_T:	in3 = IT_POT_MAR; 	break;
-			case IT_FLO_O:	in3 = IT_POT_IMM; 	break;
+			case IT_FLO_T:	in3 = IT_POT_MAR; 	font=2;	 break;
+			case IT_FLO_O:	in3 = IT_POT_IMM; 	font=2;	 break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
@@ -643,19 +643,19 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_S_HP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_S_EN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_S_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_S_HP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_S_EN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_S_MP; 	font=2;	 break;
 			//
-			case IT_FLO_Y: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_LIFE; 	font=2;	 break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_POT_CLA; 	break;
-			case IT_FLO_C:	in3 = IT_POT_INT; 	break;
-			case IT_FLO_V:	in3 = IT_POT_THO; 	break;
+			case IT_FLO_M:	in3 = IT_POT_CLA; 	font=2;	 break;
+			case IT_FLO_C:	in3 = IT_POT_INT; 	font=2;	 break;
+			case IT_FLO_V:	in3 = IT_POT_THO; 	font=2;	 break;
 			//
-			case IT_FLO_T:	in3 = IT_POT_RES; 	break;
-			case IT_FLO_O:	in3 = IT_POT_BRU; 	break;
+			case IT_FLO_T:	in3 = IT_POT_RES; 	font=2;	 break;
+			case IT_FLO_O:	in3 = IT_POT_BRU; 	font=2;	 break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
@@ -668,19 +668,19 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_C_HP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_C_EN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_C_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_C_HP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_C_EN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_C_MP; 	font=2;	 break;
 			//
-			case IT_FLO_Y: 	in3 = IT_POT_MOB; 	break;
-			case IT_FLO_B: 	in3 = IT_POT_CLA; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_MOB; 	font=2;	 break;
+			case IT_FLO_B: 	in3 = IT_POT_CLA; 	font=2;	 break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_C:	in3 = IT_POT_WIL; 	break;
-			case IT_FLO_V:	in3 = IT_POT_APT; 	break;
+			case IT_FLO_C:	in3 = IT_POT_WIL; 	font=2;	 break;
+			case IT_FLO_V:	in3 = IT_POT_APT; 	font=2;	 break;
 			//
-			case IT_FLO_T:	in3 = IT_POT_DEF; 	break;
-			case IT_FLO_O:	in3 = IT_POT_OFF; 	break;
+			case IT_FLO_T:	in3 = IT_POT_DEF; 	font=2;	 break;
+			case IT_FLO_O:	in3 = IT_POT_OFF; 	font=2;	 break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
@@ -693,19 +693,19 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_L_HP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_L_EN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_L_MP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_L_HP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_L_EN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_L_MP; 	font=2;	 break;
 			//
-			case IT_FLO_Y: 	in3 = IT_POT_FRE; 	break;
-			case IT_FLO_B: 	in3 = IT_POT_THO; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_FRE; 	font=2;	 break;
+			case IT_FLO_B: 	in3 = IT_POT_THO; 	font=2;	 break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_POT_APT; 	break;
-			case IT_FLO_C:	in3 = IT_POT_STR; 	break;
+			case IT_FLO_M:	in3 = IT_POT_APT; 	font=2;	 break;
+			case IT_FLO_C:	in3 = IT_POT_STR; 	font=2;	 break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_T:	in3 = IT_POT_STE; 	break;
-			case IT_FLO_O:	in3 = IT_POT_PER; 	break;
+			case IT_FLO_T:	in3 = IT_POT_STE; 	font=2;	 break;
+			case IT_FLO_O:	in3 = IT_POT_PER; 	font=2;	 break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
@@ -718,19 +718,19 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_EXHP; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_EXEN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_EXMP; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_EXHP; 	font=2;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_EXEN; 	font=2;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_EXMP; 	font=2;	 break;
 			//
-			case IT_FLO_Y: 	in3 = IT_POT_AGL; 	break;
-			case IT_FLO_B: 	in3 = IT_POT_INT; 	break;
+			case IT_FLO_Y: 	in3 = IT_POT_AGL; 	font=2;	 break;
+			case IT_FLO_B: 	in3 = IT_POT_INT; 	font=2;	 break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_POT_WIL; 	break;
+			case IT_FLO_M:	in3 = IT_POT_WIL; 	font=2;	 break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_V:	in3 = IT_POT_STR; 	break;
+			case IT_FLO_V:	in3 = IT_POT_STR; 	font=2;	 break;
 			//
-			case IT_FLO_T:	in3 = IT_POT_EVA; 	break;
-			case IT_FLO_O:	in3 = IT_POT_PRE; 	break;
+			case IT_FLO_T:	in3 = IT_POT_EVA; 	font=2;	 break;
+			case IT_FLO_O:	in3 = IT_POT_PRE; 	font=2;	 break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
@@ -743,13 +743,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_LIFE; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_LIFE; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -768,13 +768,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_MOB; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_MOB; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -793,13 +793,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_FRE; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_FRE; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -818,13 +818,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_AGL; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_AGL; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -843,13 +843,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_CLA; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_CLA; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -868,13 +868,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_THO; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_THO; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -893,13 +893,13 @@ int use_mix_potion(int cn, int in)
 	{
 		switch(it[in2].temp)
 		{
-			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	break;
-			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	break;
+			case IT_FLO_R: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_G: 	in3 = IT_POT_RAIN; 	font=1;	 break;
+			case IT_FLO_P: 	in3 = IT_POT_RAIN; 	font=1;	 break;
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_INT; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_INT; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
@@ -924,16 +924,16 @@ int use_mix_potion(int cn, int in)
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_WIL; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_WIL; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_V:	in3 = IT_POT_BRV; 	break;
+			case IT_FLO_V:	in3 = IT_POT_BRV; 	font=2;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_2:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_2:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
@@ -949,15 +949,15 @@ int use_mix_potion(int cn, int in)
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_STR; 	break;
-			case IT_FLO_M:	in3 = IT_POT_BRV; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_STR; 	font=2;	 break;
+			case IT_FLO_M:	in3 = IT_POT_BRV; 	font=2;	 break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_1:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_1:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
@@ -974,9 +974,9 @@ int use_mix_potion(int cn, int in)
 			//
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_W: 	in3 = IT_POT_APT; 	break;
+			case IT_FLO_W: 	in3 = IT_POT_APT; 	font=2;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_C:	in3 = IT_POT_BRV; 	break;
+			case IT_FLO_C:	in3 = IT_POT_BRV; 	font=2;	 break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
@@ -984,7 +984,7 @@ int use_mix_potion(int cn, int in)
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_3:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_3:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1001,15 +1001,15 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_13; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_C:	in3 = IT_MIX_13; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_12; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_2:	in3 = IT_MIX_12; 	break;
-			case IT_FLO_3:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_2:	in3 = IT_MIX_12; 	font=1;	 break;
+			case IT_FLO_3:	in3 = IT_MIX_13; 	font=1;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1025,16 +1025,16 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_12; 	break;
-			case IT_FLO_C:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_12; 	font=1;	 break;
+			case IT_FLO_C:	in3 = IT_MIX_23; 	font=1;	 break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_1:	in3 = IT_MIX_12; 	break;
+			case IT_FLO_1:	in3 = IT_MIX_12; 	font=1;	 break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_3:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_3:	in3 = IT_MIX_23; 	font=1;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1050,15 +1050,15 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_MIX_13; 	break;
+			case IT_FLO_M:	in3 = IT_MIX_13; 	font=1;	 break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_V:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_V:	in3 = IT_MIX_23; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_1:	in3 = IT_MIX_13; 	break;
-			case IT_FLO_2:	in3 = IT_MIX_23; 	break;
+			case IT_FLO_1:	in3 = IT_MIX_13; 	font=1;	 break;
+			case IT_FLO_2:	in3 = IT_MIX_23; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
@@ -1076,7 +1076,7 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_C:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_C:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
@@ -1084,7 +1084,7 @@ int use_mix_potion(int cn, int in)
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_3:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_3:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1100,14 +1100,14 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_Y: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_B: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_M:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_M:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_V:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
-			case IT_FLO_1:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_1:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
@@ -1127,13 +1127,13 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_W: 	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_V:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_V:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
 			//
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
-			case IT_FLO_2:	in3 = IT_POT_LAB2; 	break;
+			case IT_FLO_2:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
@@ -1156,7 +1156,7 @@ int use_mix_potion(int cn, int in)
 
 	god_give_char(in3, cn);
 	
-	do_char_log(cn, 0, "You produced a %s.\n", it[in3].name);
+	do_char_log(cn, font, "You produced a %s.\n", it[in3].name);
 
 	return(1);
 }
@@ -1300,6 +1300,7 @@ void finish_laby_teleport(int cn, int nr, int exp)
 
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	god_transfer_char(cn, HOME_TEMPLE_X, HOME_TEMPLE_Y);
+	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 
 	ch[cn].temple_x = ch[cn].tavern_x = ch[cn].x;
@@ -1376,6 +1377,7 @@ int teleport(int cn, int in)
 	{
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		god_transfer_char(cn, it[in].data[0], it[in].data[1]);
+		char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	}
 
@@ -1497,6 +1499,7 @@ int use_labyrinth(int cn, int in)
 			case 12: flag = god_transfer_char(cn, LAB_XIII_X, LAB_XIII_Y); 	break;
 			//
 		}
+		char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	}
 
@@ -4029,6 +4032,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	god_transfer_char(cn, it[in].data[0], it[in].data[1]);
+	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 
 	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
@@ -4320,6 +4324,7 @@ int use_seyan_portal(int cn, int in)
 
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	god_transfer_char(cn, it[in].data[0], it[in].data[1]);
+	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	
 	return(1);
@@ -4662,12 +4667,15 @@ int use_lab8_moneyshrine(int cn, int in)
 	chlog(cn, "offered %dG at %s", offer / 100, it[in].reference);
 
 	ch[cn].citem = 0;
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	god_transfer_char(cn, it[in].data[1], it[in].data[2]);
+	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
 	{
 		ch[cn].a_mana = ch[cn].mana[5] * 1000;
 		do_char_log(cn, 0, "You feel the hand of the Goddess of Magic touch your mind.\n");
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	return(1);
 }
@@ -4899,8 +4907,9 @@ int explorer_point(int cn, int in)
 		exp -= RANDOM(exp/10+1);
 		exp  = min(ch[cn].points_tot / 10, exp);        // not more than 10% of total experience
 		exp += RANDOM(exp/10+1);
-
-		xlog("exp point giving %d (%d) exp, char has %d exp", exp, it[in].data[4], ch[cn].points_tot);
+		
+		chlog(cn, "Found exp point, granting %d (of %d) exp", exp, it[in].data[4]);
+		char_play_sound(cn, ch[cn].sound + 19, -200, 0);
 		do_give_exp(cn, exp, 0, -1);
 	}
 	else
@@ -4922,6 +4931,9 @@ int way_point(int cn, int in)
 
 		do_char_log(cn, 0, "You found a new waypoint!\n");
 		ch[cn].luck += 10;
+		
+		chlog(cn, "Found waypoint %d", it[in].data[0]);
+		char_play_sound(cn, ch[cn].sound + 19, -200, 0);
 	}
 	
 	nr = ch[cn].player;
@@ -5328,6 +5340,13 @@ void use_driver(int cn, int in, int carried)
 
 				chlog(cn, "Used %s", it[in].name);
 				
+				// Active item effect
+				if (it[in].duration)
+				{
+					if (!spell_from_item(cn, in)) return;
+					do_update_char(cn);
+				}
+				
 				if (get_book(cn, IT_BOOK_ALCH)) // Book: Alchemy 101
 				{
 					thousand = 1500;
@@ -5349,13 +5368,6 @@ void use_driver(int cn, int in, int carried)
 				if (ch[cn].a_end<0)	 ch[cn].a_end = 0;
 				ch[cn].a_mana += it[in].mana[0] * thousand;
 				if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
-				
-				// Active item effect
-				if (it[in].duration)
-				{
-					spell_from_item(cn, in);
-					do_update_char(cn);
-				}
 				
 				// Reduce stack or destroy item
 				if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
@@ -6770,6 +6782,11 @@ int step_teleport(int cn, int in)
 	if (cn <= 0)
 	{
 		xlog("step_teleport(): cn = %d", cn);
+		return(-1);
+	}
+	// Only let players trigger floor teleports. This is to avoid janky pathfinding with GCs.
+	if (!IS_PLAYER(cn))
+	{
 		return(-1);
 	}
 	x = it[in].data[0];

@@ -548,7 +548,7 @@ void plr_cmd_inv(int nr)
 		tmp = ch[cn].citem;
 		
 		// One of the items is not stackable, abort.
-		if (!(it[in].flags & IF_STACKABLE) || !(it[in].flags & IF_STACKABLE))
+		if (!(it[in].flags & IF_STACKABLE) || !(it[tmp].flags & IF_STACKABLE))
 		{
 			return;
 		}
@@ -574,11 +574,13 @@ void plr_cmd_inv(int nr)
 			tmpv = it[in].value / it[in].stack;
 			it[in].stack++;
 			it[in].value = tmpv * it[in].stack;
+			
+			do_update_char(cn);
 		}
 		// Target slot is sane but held item is not - take from slot stack
 		else if (in && !tmp) 
 		{
-			if (IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Cannot pick up locked items
+			if (IS_SANEITEM(in) && ch[cn].item_lock[n]) // Cannot pick up locked items
 			{
 				return;
 			}
@@ -587,10 +589,15 @@ void plr_cmd_inv(int nr)
 				tmpv = it[in].value / it[in].stack;
 				it[in].stack--;
 				it[in].value = tmpv * it[in].stack;
-				tmp = ch[cn].citem = god_create_item(in, 0);
+				
+				tmp = god_create_item(in, 0);
+				
+				ch[cn].citem = tmp;
+				it[tmp].x = 0;
+				it[tmp].y = 0;
 				it[tmp].carried = cn;
-				it[tmp].stack = 1;
-				it[tmp].value = tmpv;
+				
+				do_update_char(cn);
 			}
 			else
 			{
@@ -606,10 +613,15 @@ void plr_cmd_inv(int nr)
 				tmpv = it[tmp].value / it[tmp].stack;
 				it[tmp].stack--;
 				it[tmp].value = tmpv * it[tmp].stack;
-				in = ch[cn].item[n] = god_create_item(tmp, 0);
+				
+				in = god_create_item(tmp, 0);
+				
+				ch[cn].item[n] = in;
+				it[in].x = 0;
+				it[in].y = 0;
 				it[in].carried = cn;
-				it[in].stack = 1;
-				it[in].value = tmpv;
+				
+				do_update_char(cn);
 			}
 			else
 			{
@@ -618,7 +630,6 @@ void plr_cmd_inv(int nr)
 			}
 			ch[cn].item_lock[n] = 0;
 		}
-		do_update_char(cn);
 		return;
 	}
 	if (what==4) // 4 - Lock item in place in inventory so /sort doesn't move it (CTRL+Right)
@@ -2510,7 +2521,8 @@ void plr_change(int nr)
 
 		for (n = 0; n<40; n++)
 		{
-			if (cpl->item[n]!=(in = ch[cn].item[n]) || (!IS_BUILDING(cn) && it[in].flags & IF_UPDATE))
+			in = ch[cn].item[n];
+			if (cpl->item[n]!=in || (!IS_BUILDING(cn) && cpl->item_s[n]!=it[in].stack) || (!IS_BUILDING(cn) && it[in].flags & IF_UPDATE))
 			{
 				buf[0] = SV_SETCHAR_ITEM;
 				*(unsigned long*)(buf + 1) = n;
@@ -2577,6 +2589,8 @@ void plr_change(int nr)
 							*(short int*)(buf + 5) = it_temp[in].sprite[0];
 							*(short int*)(buf + 7) = 0;
 						}
+						*(unsigned char*)(buf + 9) = 0;
+						*(unsigned char*)(buf + 10) = 0;
 					}
 					else
 					{
@@ -2589,8 +2603,8 @@ void plr_change(int nr)
 							*(short int*)(buf + 5) = it[in].sprite[0];
 						}
 						*(short int*)(buf + 7) = it[in].placement;
-						*(char*)(buf + 9) = it[in].stack;
-						*(char*)(buf + 10) = ch[cn].item_lock[n];
+						*(unsigned char*)(buf + 9) = it[in].stack;
+						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n];
 
 						it[in].flags &= ~IF_UPDATE;
 					}
@@ -2599,13 +2613,17 @@ void plr_change(int nr)
 				{
 					*(short int*)(buf + 5) = 0;
 					*(short int*)(buf + 7) = 0;
-					*(char*)(buf + 9) = 0;
-					*(char*)(buf + 10) = 0;
+					*(unsigned char*)(buf + 9) = 0;
+					*(unsigned char*)(buf + 10) = 0;
 				}
 				xsend(nr, buf, 11);
 
 				cpl->item[n] = in;
-
+				if (!IS_BUILDING(cn))
+				{
+					cpl->item_s[n]=it[in].stack;
+					cpl->item_l[n]=ch[cn].item_lock[n];
+				}
 			}
 		}
 
@@ -2734,8 +2752,9 @@ void plr_change(int nr)
 				xsend(nr, buf, 9);
 			}
 		}
-
-		if (cpl->citem!=(in = ch[cn].citem) || (!IS_BUILDING(cn) && !(in & 0x80000000) && it[in].flags & IF_UPDATE))
+		
+		in = ch[cn].citem;
+		if (cpl->citem!=in || (!IS_BUILDING(cn) && cpl->citem_s != it[in].stack) || (!IS_BUILDING(cn) && !(in & 0x80000000) && it[in].flags & IF_UPDATE))
 		{
 			buf[0] = SV_SETCHAR_OBJ;
 			if (in & 0x80000000)
@@ -2804,6 +2823,10 @@ void plr_change(int nr)
 			xsend(nr, buf, 6);
 
 			cpl->citem = in;
+			if (!IS_BUILDING(cn))
+			{
+				cpl->citem_s = it[in].stack;
+			}
 		}
 	}
 

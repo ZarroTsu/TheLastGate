@@ -783,6 +783,8 @@ void view_character_template(LIST *head)
 			CF_NOSLEEP, (ch_temp[cn].flags & CF_NOSLEEP) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Merchant<br>\n",
 			CF_MERCHANT, (ch_temp[cn].flags & CF_MERCHANT) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>BS Points<br>\n",
+			CF_BSPOINTS, (ch_temp[cn].flags & CF_BSPOINTS) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Simple Animation<br>\n",
 			CF_SIMPLE, (ch_temp[cn].flags & CF_SIMPLE) ? "checked" : "");
 	// Added new flags

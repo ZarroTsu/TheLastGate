@@ -2055,10 +2055,11 @@ void answer_table(int cn)
 	do_char_log(cn, 1, "Now listing Black Stronghold rewards:\n");
 	do_char_log(cn, 1, " \n");
 	//                 "!        .         .   |     .         .        !"
-	do_char_log(cn, 1, "Say Phrase... | Cost  | Reward... \n");
-	do_char_log(cn, 1, "--------------+-------+------------------------\n");
-	do_char_log(cn, 1, "BUY GOLD        *ALL*   %d gold per point\n", BS_COST_GOLD);
-	do_char_log(cn, 1, "BUY EXP         *ALL*   %d exp per point\n", BS_COST_EXP+2*cnrank);
+	do_char_log(cn, 1, "Say Phrase... |  Cost  | Reward... \n");
+	do_char_log(cn, 1, "--------------+--------+------------------------\n");
+	do_char_log(cn, 1, "BUY GOLD        ALL      %d gold per point\n", BS_COST_GOLD);
+	do_char_log(cn, 1, "BUY EXP         ALL      %d exp per point\n", BS_COST_EXP+2*cnrank);
+	/*
 	do_char_log(cn, 1, "BUY HEAL         %4d   1 Healing Potion\n", BS_COST_HEAL);
 	do_char_log(cn, 1, "BUY MANA         %4d   1 Mana Potion\n", BS_COST_MANA);
 	do_char_log(cn, 1, "BUY END          %4d   1 Endurance Potion\n", BS_COST_END);
@@ -2067,12 +2068,13 @@ void answer_table(int cn)
 	do_char_log(cn, 1, "BUY GEND         %4d   1 Greater Endurance\n", BS_COST_GEND);
 	do_char_log(cn, 1, "BUY RATLING      %4d   1 Ratling Eye Essence\n", BS_COST_RATLING);
 	do_char_log(cn, 1, "BUY GREENLING    %4d   1 Greenling Eye Essence\n", BS_COST_GREENLING);
-  //do_char_log(cn, 1, "BUY SOGLING      %4d   1 Sogling Eye Essence\n", BS_COST_DREADLING);
+    do_char_log(cn, 1, "BUY SOGLING      %4d   1 Sogling Eye Essence\n", BS_COST_DREADLING);
 	do_char_log(cn, 1, "BUY WEAPON1      %4d   Magic weapon, +1 skill\n", BS_COST_WEAPON1+BS_COST_WEAPON1*cnrank);
 	do_char_log(cn, 1, "BUY WEAPON2      %4d   Magic weapon, +2 skill\n", BS_COST_WEAPON2+BS_COST_WEAPON2*cnrank);
 	do_char_log(cn, 1, "BUY WEAPON3      %4d   Magic weapon, +3 skill\n", BS_COST_WEAPON3+BS_COST_WEAPON3*cnrank);
 	do_char_log(cn, 1, "BUY HELMET       %4d   Magic helmet\n", BS_COST_HELMET+BS_COST_HELMET*cnrank*2);
 	do_char_log(cn, 1, "BUY ARMOR        %4d   Magic armor\n", BS_COST_ARMOR+BS_COST_ARMOR*cnrank*2);
+	*/
 	do_char_log(cn, 1, " \n");
 }
 

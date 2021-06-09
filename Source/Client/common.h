@@ -6,7 +6,7 @@
 	#define MHOST		"192.168.0.11"
 #else
 	#define MNAME		"The Last Gate"
-	#define MHOST		"thelastgate.ddns.net"
+	#define MHOST		"web.ip"
 #endif
 
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"

@@ -145,6 +145,26 @@ int so_login(unsigned char *buf,HWND hwnd)
 		ser_ver=*(unsigned char*)(buf+13);
 		ser_ver+=(int)((*(unsigned char*)(buf+14)))<<8;
 		ser_ver+=(int)((*(unsigned char*)(buf+15)))<<16;
+		//
+			pdata.xbutton[0].skill_nr=14; strcpy(pdata.xbutton[0].name,"Light");
+			if (race==4||race==5) // Templar
+			{
+				pdata.xbutton[4].skill_nr=40; strcpy(pdata.xbutton[4].name,"Cleave");
+				pdata.xbutton[7].skill_nr=48; strcpy(pdata.xbutton[7].name,"Taunt");
+			}
+			else if (race==8||race==9) // Harakim
+			{
+				pdata.xbutton[5].skill_nr=24; strcpy(pdata.xbutton[5].name,"Blast");
+				pdata.xbutton[9].skill_nr=27; strcpy(pdata.xbutton[9].name,"Ghost C");
+				pdata.xbutton[3].skill_nr=11; strcpy(pdata.xbutton[3].name,"Magic S");
+				pdata.xbutton[2].skill_nr=17; strcpy(pdata.xbutton[2].name,"Protect");
+			}
+			else // Mercenary
+			{
+				pdata.xbutton[8].skill_nr=37; strcpy(pdata.xbutton[8].name,"Blind");
+				pdata.xbutton[2].skill_nr=17; strcpy(pdata.xbutton[2].name,"Protect");
+			}
+		//
 		save_options();
 		return 1;
 	}
@@ -229,7 +249,7 @@ void so_connect(HWND hwnd)
 			return;
 		}
 	} else {
-		/*
+		
 		FILE *fp;
         char str[15];
      
@@ -242,8 +262,8 @@ void so_connect(HWND hwnd)
         }
         haddr=inet_addr(fgets(str, 15, fp));
         fclose(fp);
-		*/
 		
+		/*
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server address");
 		he=gethostbyname(host_addr);
 		if (!he) {
@@ -252,7 +272,7 @@ void so_connect(HWND hwnd)
 			return;
 		}
 		haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-		
+		*/
 	}
 
 	addr.sin_family=AF_INET;
@@ -508,8 +528,8 @@ void sv_setchar_item(unsigned char *buf)
 	if (n<0 || n>39) xlog(0,"Invalid setchar item");
 	pl.item[n]=*(short int*)(buf+5);
 	pl.item_p[n]=*(short int*)(buf+7);
-	pl.item_s[n]=*(char*)(buf+9); // stack size
-	pl.item_l[n]=*(char*)(buf+10); // item lock
+	pl.item_s[n]=*(unsigned char*)(buf+9); // stack size
+	pl.item_l[n]=*(unsigned char*)(buf+10); // item lock
 
 //	xlog("SV SETCHAR ITEM (%d,%d,%d)",*(unsigned long*)(buf+1),*(short int*)(buf+5),*(short int*)(buf+7));
 }
@@ -522,7 +542,7 @@ void sv_setchar_worn(unsigned char *buf)
 	n=*(unsigned long*)(buf+1);
 	if (n<0 || n>19) xlog(0,"Invalid setchar worn");
 	pl.worn[n]=*(short int*)(buf+5);
-	pl.worn_p[n]=*(char*)(buf+7);
+	pl.worn_p[n]=*(short int*)(buf+7);
 }
 
 void sv_setchar_spell(unsigned char *buf)

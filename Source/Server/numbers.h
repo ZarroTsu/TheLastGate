@@ -124,11 +124,13 @@
 
 #define IT_RPOT			 267
 #define IT_GPOT			 833
+#define IT_SPOT			 833
 
 #define IT_HERBA		1798
 #define IT_HERBB		1799
 #define IT_HERBC		1800
 #define IT_HERBD		1801
+#define IT_HERBE		1965
 
 #define IT_GREENPILL	 648
 #define IT_BLUEPILL		 649
@@ -215,12 +217,12 @@
 
 // Special Glove items
 #define IT_GL_SERPENT	 707
-#define IT_GL_SPIDER	 708
+#define IT_GL_CHILLED	 708
 #define IT_GL_CURSED	1116
 #define IT_GL_TITANS	1117
 #define IT_GL_BURNING	1661
-#define IT_GL_SHADOW		3001
-#define IT_GL_BLVIPER		3002
+#define IT_GL_SHADOW	 709
+#define IT_GL_BLVIPER	2043
 
 // Special Boot items
 #define IT_BT_NATURES	  	3003
@@ -428,6 +430,67 @@
 
 // -----
 
+#define IT_GAXE_STEL	 292
+#define IT_THSW_STEL	 291
+#define IT_AXXE_STEL	 290
+#define IT_SHIE_STEL	 287
+#define IT_SWOR_STEL	 288
+#define IT_DUAL_STEL	 289
+#define IT_DAGG_STEL	 284
+#define IT_STAF_STEL	 285
+#define IT_SPEA_STEL	 286
+#define IT_CLAW_STEL	1779
+#define IT_GAXE_GOLD	 531
+#define IT_THSW_GOLD	 530
+#define IT_AXXE_GOLD	 529
+#define IT_SHIE_GOLD	 526
+#define IT_SWOR_GOLD	 527
+#define IT_DUAL_GOLD	 528
+#define IT_DAGG_GOLD	 523
+#define IT_STAF_GOLD	 524
+#define IT_SPEA_GOLD	 525
+#define IT_CLAW_GOLD	1780
+#define IT_GAXE_EMER	 540
+#define IT_THSW_EMER	 539
+#define IT_AXXE_EMER	 538
+#define IT_SHIE_EMER	 535
+#define IT_SWOR_EMER	 536
+#define IT_DUAL_EMER	 537
+#define IT_DAGG_EMER	 532
+#define IT_STAF_EMER	 533
+#define IT_SPEA_EMER	 534
+#define IT_CLAW_EMER	1781
+#define IT_GAXE_CRYS	 549
+#define IT_THSW_CRYS	 548
+#define IT_AXXE_CRYS	 547
+#define IT_SHIE_CRYS	 544
+#define IT_SWOR_CRYS	 545
+#define IT_DUAL_CRYS	 546
+#define IT_DAGG_CRYS	 541
+#define IT_STAF_CRYS	 542
+#define IT_SPEA_CRYS	 543
+#define IT_CLAW_CRYS	1782
+#define IT_GAXE_TITN	 580
+#define IT_THSW_TITN	 579
+#define IT_AXXE_TITN	 578
+#define IT_SHIE_TITN	 575
+#define IT_SWOR_TITN	 576
+#define IT_DUAL_TITN	 577
+#define IT_DAGG_TITN	 572
+#define IT_STAF_TITN	 573
+#define IT_SPEA_TITN	 574
+#define IT_CLAW_TITN	1783
+#define IT_GAXE_ADAM	 701
+#define IT_THSW_ADAM	 700
+#define IT_AXXE_ADAM	 699
+#define IT_SHIE_ADAM	 696
+#define IT_SWOR_ADAM	 697
+#define IT_DUAL_ADAM	 698
+#define IT_DAGG_ADAM	 693
+#define IT_STAF_ADAM	 694
+#define IT_SPEA_ADAM	 695
+#define IT_CLAW_ADAM	1784
+//
 #define IT_HELM_BRNZ	  51
 #define IT_BODY_BRNZ	  53
 #define IT_HELM_STEL	  56

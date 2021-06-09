@@ -1142,6 +1142,8 @@ void damage_mshell(int co)
 {
 	int tmp = 0, n, in;
 	
+	chlog(co,"Magic Shell damaged.");
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[co].spell[n])!=0)
@@ -1394,21 +1396,21 @@ void add_exhaust(int cn, int len)
 	add_spell(cn, in);
 }
 
-void spell_from_item(int cn, int in2)
+int spell_from_item(int cn, int in2)
 {
 	int in, n;
 
-	if (ch[cn].flags & CF_NOMAGIC)
+	if ((ch[cn].flags & CF_NOMAGIC) && it[in2].data[1]!=102 && it[in2].data[1]!=103)
 	{
-		do_char_log(cn, 0, "The magic didn't work! Must be external influences.\n");
-		return;
+		do_char_log(cn, 0, "The magic didn't work! There must be external influences.\n");
+		return 0;
 	}
 
 	in = god_create_buff();
 	if (!in)
 	{
 		xlog("god_create_buff failed in skill_from_item");
-		return;
+		return 0;
 	}
 	
 	strcpy(bu[in].name, it[in2].name);
@@ -1474,11 +1476,13 @@ void spell_from_item(int cn, int in2)
 	if (!add_spell(cn, in))
 	{
 		do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
-		return;
+		return 1;
 	}
 	do_char_log(cn, 1, "You feel changed.\n");
 
 	char_play_sound(cn, ch[cn].sound + 1, -150, 0);
+	
+	return 1;
 }
 
 int has_spell(int cn, int temp)
@@ -1800,12 +1804,12 @@ int spell_mshield(int cn, int co, int power)
 	
 	if (ta_cn_cha)
 	{
-		in = make_new_buff(cn, SK_MSHELL, BUF_SPR_MSHELL, power, SP_DUR_MSHELL(power), 1);
+		in = make_new_buff(cn, SK_MSHELL, BUF_SPR_MSHELL, power, SP_DUR_MSHELL(power), 0);
 		n = SK_MSHELL;
 	}
 	else
 	{
-		in = make_new_buff(cn, SK_MSHIELD, BUF_SPR_MSHIELD, power, SP_DUR_MSHIELD(power), 1);
+		in = make_new_buff(cn, SK_MSHIELD, BUF_SPR_MSHIELD, power, SP_DUR_MSHIELD(power), 0);
 		n = SK_MSHIELD;
 	}
 	
@@ -2171,6 +2175,30 @@ void skill_slow(int cn, int flag)
 	{
 		add_exhaust(cn, SK_EXH_SLOW);
 	}
+}
+
+int spell_frostburn(int cn, int co, int power)
+{
+	int in, dur, ppow;
+	
+	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
+	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	
+	power = spell_immunity(power, get_target_immunity(co));
+	power = spell_multiplier(power, cn);
+	
+	dur = SP_DUR_FROSTB; 	// 20 seconds
+	
+	ppow = -FROSTBFORM(power, dur);
+	
+	if (!(in = make_new_buff(cn, SK_FROSTB, BUF_SPR_FROSTB, power, dur, 0)))
+		return 0;
+	
+	// Set the decay rate of the frostburn
+	bu[in].end[0]  = ppow;
+	bu[in].mana[0] = ppow;
+	
+	return cast_a_spell(cn, co, in, 2, 0); // SK_FROSTB
 }
 
 // Feb 2020 - Poison
@@ -2625,7 +2653,10 @@ int spell_scorch(int cn, int co, int power, int flag)
 	power = spell_multiplier(power, cn);
 	
 	// Tarot Card - Judgement :: Change Scorch to Douse
-	if (get_tarot(cn, IT_CH_JUDGE))
+	// flag = 0 uses tarot card
+	// flag = 1 always scorches
+	// flag = 2 always douses
+	if ((get_tarot(cn, IT_CH_JUDGE) && flag==0) || flag==2)
 	{
 		if (!(in = make_new_buff(cn, SK_DOUSE, BUF_SPR_DOUSE, power, SP_DUR_DOUSE, 0)))
 			return 0;
@@ -2638,7 +2669,7 @@ int spell_scorch(int cn, int co, int power, int flag)
 			return 0;
 	}
 	
-	return cast_a_spell(cn, co, in, 1+flag, 0); // SK_SCORCH / SK_DOUSE
+	return cast_a_spell(cn, co, in, 2, 0); // SK_SCORCH / SK_DOUSE
 }
 void skill_blast(int cn)
 {
@@ -2868,6 +2899,8 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 		if (bu[in].temp == SK_TAUNT) 	continue;
 		if (bu[in].temp == SK_GUARD) 	continue;
 		if (bu[in].temp == SK_RAZOR2) 	continue;
+		if (bu[in].temp == 102)			continue; // Healing Potion
+		if (bu[in].temp == 103)			continue; // Food and Drink
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
@@ -3038,7 +3071,7 @@ void skill_dispel(int cn)
 		if (power < 1) break;
 		if (success>=3) break;
 	}
-	if (!success && n==20)
+	if (!success && n==MAXBUFFS)
 	{
 		if (flag)
 		{
@@ -3765,8 +3798,8 @@ void skill_cleave(int cn)
 			do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
 		}
 		
-		char_play_sound(co, ch[cn].sound + 6, -150, 0);
-		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
+		char_play_sound(co, ch[cn].sound + 24, -150, 0);
+		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
 		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 
 		if (bleeding)
@@ -4047,12 +4080,12 @@ void skill_leap(int cn)
 	// Check for additional targets
 	for (n = 1; ; n++)
 	{
-		if (n==LEAP_COUNT)
+		if (n>LEAP_COUNT)
 		{
 			obstructed = 1;
 			break;
 		}
-		if (!(co[n] = map[m + md*(n+1)].ch))
+		if (!(co[n-1] = map[m + md*(n+1)].ch))
 		{
 			// No character on this tile - check for other obstructions
 			if (map[m + md*(n+1)].to_ch || 
@@ -4071,7 +4104,7 @@ void skill_leap(int cn)
 		}
 	}
 	
-	cc = n;
+	cc = n-1;
 	
 	for (n = 0; n < cc; n++)
 	{
@@ -4091,8 +4124,8 @@ void skill_leap(int cn)
 			do_char_log(co[n], 1, "%s sliced you for %d HP.\n", ch[cn].name, tmp);
 		}
 		
-		char_play_sound(co[n], ch[cn].sound + 6, -150, 0);
-		do_area_sound(co[n], 0, ch[co[n]].x, ch[co[n]].y, ch[cn].sound + 6);
+		char_play_sound(co[n], ch[cn].sound + 24, -150, 0);
+		do_area_sound(co[n], 0, ch[co[n]].x, ch[co[n]].y, ch[cn].sound + 24);
 		fx_add_effect(5, 0, ch[co[n]].x, ch[co[n]].y, 0);
 	}
 	
@@ -4100,6 +4133,7 @@ void skill_leap(int cn)
 	{
 		cc = ch[cn].attack_cn;
 		god_transfer_char(cn, x, y);
+		char_play_sound(cn, ch[cn].sound + 25, -200, 0);
 		ch[cn].escape_timer = TICKS*3;
 		for (m = 0; m<4; m++)
 		{

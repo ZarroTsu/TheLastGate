@@ -349,6 +349,8 @@ extern unsigned int mapmarker;
 #define SK_DISPEL2		32
 #define SK_WARCRY2  	36
 //////////////////////////
+#define SK_FROSTBURN	44
+#define SK_SLOW3		50
 
 /* ch.data[] definitions */
 /* (this list is growing very slowly;
@@ -539,9 +541,9 @@ struct character
 
 	short int sprite_override;
 
-	unsigned int alt_worn[20];		// Alternative gear set in storage for swapping
+	unsigned int alt_worn[12];		// Alternative gear set in storage for swapping
 
-	char future2[18];				// space for future expansion
+	char future2[50];				// space for future expansion
 
 	unsigned int depot[62];
 

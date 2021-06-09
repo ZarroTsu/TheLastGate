@@ -185,6 +185,7 @@
 #define SP_PULSE   (1u<<13)
 #define SP_TAUNT   (1u<<14)
 #define SP_RAZOR   (1u<<15)
+#define SP_MSHIELD (1u<<16)
 
 // -------- Spell Cost values -------- //
 #define SP_COST_BASE		 5
@@ -272,7 +273,7 @@
 #define SK_EXH_RAZOR		(TICKS * 6)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP			(TICKS * 5)
+#define SK_EXH_LEAP			(TICKS * 6)
 
 
 

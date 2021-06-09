@@ -19,11 +19,11 @@ static int load(void)
         char cwd[128];
 
         // Load map
-        handle=open("../"DATDIR"/map.dat",O_RDWR);
+        handle=open(DATDIR"/map.dat",O_RDWR);
         if (handle==-1) {
             if (getcwd(cwd, sizeof(cwd)) != NULL)
                 fprintf(stderr, "cwd: %s\n", cwd);
-            perror("../"DATDIR"/map.dat");
+            perror(DATDIR"/map.dat");
             return -1;
         }
         map=mmap(NULL,MAPSIZE,PROT_READ|PROT_WRITE,MAP_SHARED,handle,0);
@@ -34,11 +34,11 @@ static int load(void)
         close(handle);
 
         // Load map editor queue
-        handle=open("../"DATDIR"/mapedQ.dat",O_RDWR);
+        handle=open(DATDIR"/mapedQ.dat",O_RDWR);
         if (handle==-1) {
             if (getcwd(cwd, sizeof(cwd)) != NULL)
                 fprintf(stderr, "cwd: %s\n", cwd);
-            perror("../"DATDIR"/mapedQ.dat");
+            perror(DATDIR"/mapedQ.dat");
             return -1;
         }
         maped_queue=mmap(NULL,MAPED_QUEUE_SIZE,PROT_READ|PROT_WRITE,MAP_SHARED,handle,0);
@@ -49,7 +49,7 @@ static int load(void)
         close(handle);
 
         // Load item templates
-        handle=open("../"DATDIR"/titem.dat",O_RDWR);
+        handle=open(DATDIR"/titem.dat",O_RDWR);
         if (handle==-1) {
                 fprintf(stderr,"titem.dat does not exist.\n");
                 return -1;
@@ -63,7 +63,7 @@ static int load(void)
         close(handle);
 
         // Load items
-        handle=open("../"DATDIR"/item.dat",O_RDWR);
+        handle=open(DATDIR"/item.dat",O_RDWR);
         if (handle==-1) {
                 fprintf(stderr,"item.dat does not exist.\n");
                 return -1;
@@ -164,7 +164,7 @@ int main(int argc, char *args[])
     printf("<html><head>\n");
     printf("<meta content=\"text/html;charset=utf-8\" http-equiv=\"Content-Type\">\n");
     printf("<title>v2 Map Editor</title>\n");
-    printf("<link rel=\"stylesheet\" href=\"/assets/scripts/mapper.css\"/>\n");
+    printf("<link rel=\"stylesheet\" href=\"/cgi-imp/assets/scripts/mapper.css\"/>\n");
     printf("<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css\"/>\n");
     printf("<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\"/>\n");
     printf("<script src=\"https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js\"></script>\n");
@@ -185,12 +185,12 @@ int main(int argc, char *args[])
     printf("Y2:<input id=\"inp-map-y2\" style=\"width:40px; margin: 2px;\" type=\"number\" maxlength=\"4\">\n");
     printf("</div>\n");
     printf("<div class=\"div-toolbox\">\n");
-    printf("<button id=\"but-hidew\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/hidew.png')\" onclick=\"toggleWalls(); updateUI();\" title=\"Hide walls\"></button>\n");
-    printf("<button id=\"but-tempfilter\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/filter.png');\" onclick=\"toggleDiv('div-filter'); updateUI();\" title=\"Filter item templates\"></button>\n");
-    printf("<button id=\"but-grid\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/togglegrid.png');\" onclick=\"toggleMapGrid(); updateUI();\" title=\"Toggle map grid\"></button>\n");
-    printf("<button id=\"but-cpicker\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/cpicker.png');\" onclick=\"toggleDiv('div-temp-picker'); updateUI();\" title=\"Change template type and color\"></button>\n");
-    printf("<button id=\"but-displaymode\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/toggle_divs.png');\" onclick=\"toggleViewDivs(); updateUI();\" title=\"Toggle between grid-only and preview-only\"></button>\n");
-    printf("<button id=\"but-toggleflags\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/toggle_flags.png');\" onclick=\"toggleTileFlags(); updateUI();\" title=\"Toggle visibility for tile flags\"></button>\n");
+    printf("<button id=\"but-hidew\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/hidew.png')\" onclick=\"toggleWalls(); updateUI();\" title=\"Hide walls\"></button>\n");
+    printf("<button id=\"but-tempfilter\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/filter.png');\" onclick=\"toggleDiv('div-filter'); updateUI();\" title=\"Filter item templates\"></button>\n");
+    printf("<button id=\"but-grid\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/togglegrid.png');\" onclick=\"toggleMapGrid(); updateUI();\" title=\"Toggle map grid\"></button>\n");
+    printf("<button id=\"but-cpicker\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/cpicker.png');\" onclick=\"toggleDiv('div-temp-picker'); updateUI();\" title=\"Change template type and color\"></button>\n");
+    printf("<button id=\"but-displaymode\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/toggle_divs.png');\" onclick=\"toggleViewDivs(); updateUI();\" title=\"Toggle between grid-only and preview-only\"></button>\n");
+    printf("<button id=\"but-toggleflags\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/toggle_flags.png');\" onclick=\"toggleTileFlags(); updateUI();\" title=\"Toggle visibility for tile flags\"></button>\n");
     printf("<span id=\"span-seltemp\" style=\"color:wheat;font-size:10pt;margin-left:2px;\">Selected: </span>\n");
     printf("</div>\n");
     printf("<div id=\"div-temp-picker\">\n");
@@ -255,14 +255,14 @@ int main(int argc, char *args[])
     printf("</div>\n");
 
     // Load scripts
-    printf("<script src=\"/assets/scripts/cpicker.js\"></script>\n");
-    printf("<script src=\"/assets/scripts/undo_redo.js\"></script>\n");
-    printf("<script src=\"/assets/scripts/canvas_funcs.js\"></script>\n");
-    printf("<script src=\"/assets/scripts/mapper.js\"></script>\n");
+    printf("<script src=\"/cgi-imp/assets/scripts/cpicker.js\"></script>\n");
+    printf("<script src=\"/cgi-imp/assets/scripts/undo_redo.js\"></script>\n");
+    printf("<script src=\"/cgi-imp/assets/scripts/canvas_funcs.js\"></script>\n");
+    printf("<script src=\"/cgi-imp/assets/scripts/mapper.js\"></script>\n");
 
     // Templates and floors
     scriptLoadTemplates();
-    printf("<script src=\"/assets/scripts/load_floors.js\"></script>\n");
+    printf("<script src=\"/cgi-imp/assets/scripts/load_floors.js\"></script>\n");
     printf("<script>loadTemplates();</script>\n");
 
     // UI update

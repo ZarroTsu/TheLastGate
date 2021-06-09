@@ -444,7 +444,7 @@ void button_help(int nr)
 				xlog(1,"Attack speed is the speed at which melee attacks are performed. This is increased by Agility and other sources of Attack Speed."); 
 			else if (last_skill==54)
 				xlog(1,"DPH ranges from 1/4 of your Weapon Value, to 1/4 of (your Weapon Value, plus half Strength, plus 14) times your Crit Chance & Crit Multi."); 
-			else
+			else if (last_skill<50 || last_skill>54)
 				xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from your Hit Score."); 
 			break;
 		case 33: 
@@ -453,12 +453,12 @@ void button_help(int nr)
 			else if (last_skill==51 && pl.skill[34][0])
 				xlog(1,"Cost multiplier of mana for spells, determined by your Concentrate skill."); 
 			else if (last_skill==52)
-				xlog(1,"Rate at which mana is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); 
+				xlog(1,"Rate at which mana is regenerated per second. This is improved by the Meditate skill, and can be further adjusted by various items."); 
 			else if (last_skill==53)
-				xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); 
+				xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); 
 			else if (last_skill==54)
-				xlog(1,"Rate at which health is regenerated per second. This is improved by the Meditate skill, and can be further adjusted by various items."); 
-			else
+				xlog(1,"Rate at which health is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); 
+			else if (last_skill<50 || last_skill>54)
 				xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); 
 			break;
 		case 34: 
@@ -472,7 +472,7 @@ void button_help(int nr)
 				xlog(1,"Damage granted by your Razor spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
 			else if (last_skill==54 && pl.skill[40][0])
 				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else
+			else if (last_skill<50 || last_skill>54)
 				xlog(1,"Your Parry Score is the value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill and other sources."); 
 			break;
 		case 35: 
@@ -489,8 +489,8 @@ void button_help(int nr)
 				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value."); 
 			else if (last_skill==54 && pl.skill[48][0])
 				xlog(1,"Effective damage taken multiplier during the Guard status, granted by the Taunt skill."); 
-			else
-				xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed. Determined by your Intuition score."); 
+			else if (last_skill<50 || last_skill>54)
+				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
 			break;
 		case 36: 
 			if (last_skill==50)
@@ -503,8 +503,8 @@ void button_help(int nr)
 				xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); 
 			else if (last_skill==54 && pl.skill[41][0])
 				xlog(1,"Effective reduction of target Weapon and/or Armor Values when using your Weaken skill, before reduction from target Immunity."); 
-			else
-				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
+			else if (last_skill<50 || last_skill>54)
+				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
 			break;
 		case 37: 
 			if (last_skill==50 && pl.worn_p[WN_TOP]>0)
@@ -517,8 +517,8 @@ void button_help(int nr)
 				xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); 
 			else if (last_skill==54 && pl.skill[35][0])
 				xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
-			else
-				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
+			else if (last_skill<50 || last_skill>54)
+				xlog(1,"Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); 
 			break;
 			
 		// Magnification buttons for the mini-map
@@ -573,6 +573,7 @@ int mouse_inventory(int x,int y,int mode)
 	int nr,keys;
 	int tx,ty;
 	int n;
+	static int firstrclick = 0;
 
 	keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
@@ -626,7 +627,15 @@ int mouse_inventory(int x,int y,int mode)
 				else
 				{
 					last_skill = 100+nr+inv_pos;
-					xlog(3,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+inv_pos);
+					if (firstrclick)
+					{
+						xlog(3,"Inventory slot %d selected for shortcut.",nr+inv_pos);
+					}
+					else
+					{
+						firstrclick++;
+						xlog(3,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+inv_pos);
+					}
 				}
 			}
 			if (pl.item[nr+inv_pos]) 
@@ -890,7 +899,7 @@ int mouse_statbox2(int x,int y,int state)
 	int n, m;
     extern struct skilltab _skilltab[];
 	int pl_flags, pl_flagb;
-	char *tmp;
+	char tmp[200];
 
 	/*
 	if (screen_windowed == 1) {
@@ -1075,7 +1084,7 @@ void cmd(int cmd,int x,int y)
 {
 	unsigned char buf[16];
 
-	play_sound("sfx\\click.wav",-1000,0);
+	play_sound("sfx\\click.wav",CLICKVOL,0);
 
 	buf[0]=(char)cmd;
 	*(unsigned short*)(buf+1)=(short)x;
@@ -1097,7 +1106,7 @@ void cmd3(int cmd,int x,int y,int z)
 {
 	unsigned char buf[16];
 
-	play_sound("sfx\\click.wav",-1000,0);
+	play_sound("sfx\\click.wav",CLICKVOL,0);
 
 	buf[0]=(char)cmd;
 	*(unsigned long*)(buf+1)=x;
@@ -1110,7 +1119,7 @@ void cmd1(int cmd,int x)
 {
 	unsigned char buf[16];
 
-	play_sound("sfx\\click.wav",-1000,0);
+	play_sound("sfx\\click.wav",CLICKVOL,0);
 
 	buf[0]=(char)cmd;
 	*(unsigned int*)(buf+1)=x;
@@ -1406,8 +1415,11 @@ int mouse_wps(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{
 			cmd1(CL_CMD_WPS,nr);
-			show_wps=0;
-			noshop=QSIZE*12; 
+			if (pl.waypoints&(1<<nr))
+			{
+				show_wps=0;
+				noshop=QSIZE*12; 
+			}
 		}
 		if (mode==MS_RB_UP) cmd1(CL_CMD_WPS,nr+32);
 		
@@ -1419,14 +1431,17 @@ int mouse_wps(int x,int y,int mode)
 	// Scroll up
 	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1) && y<(GUI_SHOP_Y+1+35))
 	{
-		if (keys)
+		if (mode==MS_LB_UP) 
 		{
-			if (wps_pos> 9)	wps_pos -= 8; 
-			else 			wps_pos  = 0;
-		}
-		else
-		{
-			if (wps_pos> 1)	wps_pos -= 2; 
+			if (keys)
+			{
+				if (wps_pos> 9)	wps_pos -= 8; 
+				else 			wps_pos  = 0;
+			}
+			else
+			{
+				if (wps_pos> 1)	wps_pos -= 2; 
+			}
 		}
 		return 1;
 	}
@@ -1434,14 +1449,17 @@ int mouse_wps(int x,int y,int mode)
 	// Scroll down
 	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1+280-35) && y<(GUI_SHOP_Y+1+280))
 	{
-		if (keys)
+		if (mode==MS_LB_UP) 
 		{
-			if (wps_pos<(MAXWPS-16))	wps_pos += 8; 
-			else 						wps_pos  = MAXWPS-8;
-		}
-		else
-		{
-			if (wps_pos<(MAXWPS- 8))	wps_pos += 2; 
+			if (keys)
+			{
+				if (wps_pos<(MAXWPS-16))	wps_pos += 8; 
+				else 						wps_pos  = MAXWPS-8;
+			}
+			else
+			{
+				if (wps_pos<(MAXWPS- 8))	wps_pos += 2; 
+			}
 		}
 		return 1;
 	}
@@ -1490,20 +1508,23 @@ int mouse_motd(int x,int y,int mode)
 	// [Bottom left button]
 	if (x>(GUI_SHOP_X+11) && x<(GUI_SHOP_X+58) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
 	{
-		// New Player MOTD 'Tutorial' button
-		if (show_newp)
-		{
-			show_newp=0;
-			show_tuto=1; tuto_page=1; tuto_max=3;
-			play_sound("sfx\\click.wav",-1000,0);
-		}
-		// Tutorial window PREV
-		else if (show_tuto)
-		{
-			tuto_page--; 
-			if (tuto_page<=1) tuto_page=1;
-			else play_sound("sfx\\click.wav",-1000,0);
-			
+		if (mode==MS_LB_UP) 
+		{ 
+			// New Player MOTD 'Tutorial' button
+			if (show_newp)
+			{
+				show_newp=0;
+				show_tuto=1; tuto_page=1; tuto_max=3;
+				play_sound("sfx\\click.wav",CLICKVOL,0);
+			}
+			// Tutorial window PREV
+			else if (show_tuto)
+			{
+				tuto_page--; 
+				if (tuto_page<=1) tuto_page=1;
+				else play_sound("sfx\\click.wav",CLICKVOL,0);
+				
+			}
 		}
 		return 1;
 	}
@@ -1511,23 +1532,23 @@ int mouse_motd(int x,int y,int mode)
 	// [Bottom right button]
 	if (x>(GUI_SHOP_X+223) && x<(GUI_SHOP_X+270) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
 	{
-		// New Player MOTD 'OK' button (closes window)
-		if (show_newp)
+		if (mode==MS_LB_UP) 
 		{
-			if (mode==MS_LB_UP) 
+			// New Player MOTD 'OK' button (closes window)
+			if (show_newp)
 			{
-				cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
-				show_newp=0;
-				noshop=QSIZE*12;
+				
+					cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
+					show_newp=0;
+					noshop=QSIZE*12;
 			}
-			
-		}
-		// Tutorial window NEXT
-		else if (show_tuto)
-		{
-			tuto_page++; 
-			if (tuto_page>=tuto_max) tuto_page=tuto_max;
-			else play_sound("sfx\\click.wav",-1000,0);
+			// Tutorial window NEXT
+			else if (show_tuto)
+			{
+				tuto_page++; 
+				if (tuto_page>=tuto_max) tuto_page=tuto_max;
+				else play_sound("sfx\\click.wav",CLICKVOL,0);
+			}
 		}
 		return 1;
 	}

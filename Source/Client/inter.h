@@ -24,6 +24,8 @@
 
 #define QSIZE			8
 
+#define CLICKVOL		-300
+
 // Rendering distance (Must match server-side)
 #define RENDERDIST			54 			// "TILEX" and "TILEY" in client.h for server-side
 

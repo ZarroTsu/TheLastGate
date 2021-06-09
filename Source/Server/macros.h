@@ -107,3 +107,5 @@
 #define POISONFORM(p, d)	((p * 1500) / d)
 // Bleed's formula (damage per tick)
 #define BLEEDFORM(p, d)		((p * 1000) / d)
+// Frostburn's formula (degen per tick)
+#define FROSTBFORM(p, d)	((p * 1250) / d)

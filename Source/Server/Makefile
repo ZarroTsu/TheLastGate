@@ -38,6 +38,12 @@ structure:
 	sudo chmod a+rwx $(SERVERDIR)/.save
 	sudo chmod a+rwx $(SERVERDIR)/.tmp
 	sudo mkdir -p $(CGIIMP)
+	sudo mkdir -p $(CGIIMP)/assets/
+	sudo cp -r cgi/assets/ $(CGIIMP)/
+	sudo chmod a+rwx $(CGIIMP)/assets
+	sudo chmod a+rwx $(CGIIMP)/assets/scripts
+	sudo chmod a+rwx $(CGIIMP)/assets/sprites
+	sudo chmod a+rwx $(CGIIMP)/assets/ui
 	sudo cp -R Web/* $(WEB)
 	sudo touch $(SERVERDIR)/server.log
 	sudo touch $(SERVERDIR)/server.pid
@@ -164,7 +170,7 @@ password: password.c $(SHEADER)
 	$(CC) $(CFLAGS) -o .obj/rdtsc.o -c rdtsc.S
 
 clean:
-	- sudo rm server password respawn $(CGIIMP)/acct.cgi $(CGIBIN)/info.cgi $(CGIBIN)/mapper.cgi .obj/*.o
+	- sudo rm server password respawn $(CGIIMP)/acct.cgi $(CGIBIN)/info.cgi $(CGIIMP)/mapper.cgi .obj/*.o
 
 dist:
 	rm -f merc2.tgz

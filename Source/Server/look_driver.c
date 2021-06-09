@@ -149,7 +149,7 @@ void look_extra(int cn, int in)
 	case IT_GL_SHADOW: 
 		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict blind on hit, reducing enemy perception, hit and parry.\n");
 		break;
-	case IT_GL_SPIDER: 
+	case IT_GL_CHILLED: 
 		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict slow on hit, reducing enemy action speed.\n");
 		break;
 	case IT_GL_CURSED: 
@@ -345,13 +345,13 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, Magic Shield and Magic Shell grant 20%% more defensive power, but the total duration is reduced by 50%%.\n");
 		break;
 	case IT_CH_STRENG_R: 
-		do_char_log(cn, 3, "When equipped, reduces melee damage by 20%. Deal 25% more damage with critical hits.\n");
+		do_char_log(cn, 3, "When equipped, reduces melee damage by 20%%. Deal 25%% more damage with critical hits.\n");
 		break;
 	case IT_CH_HERMIT_R: 
 		do_char_log(cn, 3, "When equipped, grants 10%% more Resistance and Immunity. Weapon value is reduced by 15%.\n");
 		break;
 	case IT_CH_WHEEL_R: 
-		do_char_log(cn, 3, "When equipped, grants 15% more weapon and armor value. 20%% chance to be hit when you would have parried, and 20%% chance to miss when you would have hit.\n");
+		do_char_log(cn, 3, "When equipped, grants 15%% more weapon and armor value. 20%% chance to be hit when you would have parried, and 20%% chance to miss when you would have hit.\n");
 		break;
 	case IT_CH_JUSTIC_R: 
 		do_char_log(cn, 3, "When equipped, Cleave deals 20%% more damage, but inflicts Bleeding on you for 10 seconds.\n");
