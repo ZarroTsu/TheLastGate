@@ -744,7 +744,7 @@ void view_character_template(LIST *head)
 	printf("<input type=checkbox name=kindred value=%d %s>Arch-Templar<br>\n",
 			KIN_ARCHTEMPLAR, (ch_temp[cn].kindred & KIN_ARCHTEMPLAR) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Brawler<br>\n",
-			KIN_PUGILIST, (ch_temp[cn].kindred & KIN_PUGILIST) ? "checked" : "");
+			KIN_BRAWLER, (ch_temp[cn].kindred & KIN_BRAWLER) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Harakim<br>\n",
 			KIN_HARAKIM, (ch_temp[cn].kindred & KIN_HARAKIM) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Arch-Harakim<br>\n",
@@ -2585,6 +2585,16 @@ void update_character_player(LIST *head)
 		if (tmp)
 		{
 			ch[cn].worn[n] = atoi(tmp);
+		}
+	}
+	
+	for (n = 0; n<12; n++)
+	{
+		sprintf(buf, "alt_worn%d", n);
+		tmp = find_val(head, buf);
+		if (tmp)
+		{
+			ch[cn].alt_worn[n] = atoi(tmp);
 		}
 	}
 

@@ -590,11 +590,15 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					GetDlgItemText(hwnd,IDC_CNAME,pdata.cname,79);
 					GetDlgItemText(hwnd,IDC_DESC,pdata.desc,158);
 					GetDlgItemText(hwnd,IDC_PASS,passwd,15);
-
-					randomize();
-
-					if (sex==0) sex=random(2)+1;
-					if (race==0) race=random(3)+1;
+					
+					if (race==0||sex==0)
+					{
+						if (IsDlgButtonChecked(hwnd,IDC_MALE)) sex=1;
+						if (IsDlgButtonChecked(hwnd,IDC_FEMALE)) sex=2;
+						if (IsDlgButtonChecked(hwnd,IDC_TEMP)) race=1;
+						if (IsDlgButtonChecked(hwnd,IDC_MERC)) race=2;
+						if (IsDlgButtonChecked(hwnd,IDC_HARA)) race=3;
+					}
 					
 					if (race==1) // Templar
 					{
@@ -659,8 +663,9 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					SetDlgItemText(hwnd,IDC_PASS,"");
 					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: OK");
 					//
-					race=0;
-					sex=0;
+					randomize();
+					race=random(2)+1;
+					sex=random(3)+1;
 					update_buttons(hwnd);
 					//
 					return 1;

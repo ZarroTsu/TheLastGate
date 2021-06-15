@@ -148,10 +148,10 @@
 #define IT_TURQUANKH	 705
 #define IT_GARNEANKH	 706
 #define IT_BREATHAMMY	1275
-#define IT_AM_BLOODS		10001
-#define IT_AM_VERDANT	   10002
-#define IT_AM_SEABREZ	   10003
-#define IT_AM_OBSIDI	   10004
+#define IT_AM_BLOODS	2105
+#define IT_AM_VERDANT	2106
+#define IT_AM_SEABREZ	2107
+#define IT_AM_OBSIDI	2108
 
 // Unique Belts
 #define IT_BL_SOLAR		   10005
@@ -183,32 +183,32 @@
 #define IT_CH_WORLD		1534
 #define IT_CH_FOOL_R		20001
 #define IT_CH_MAGI_R	   	20002
-#define IT_CH_PREIST_R	   20003
-#define IT_CH_EMPRES_R     20004
-#define IT_CH_EMPERO_R	   20005
-#define IT_CH_HEIROP_R	   20006
-#define IT_CH_LOVERS_R	   20007
-#define IT_CH_CHARIO_R	   20008
-#define IT_CH_STRENG_R	   20009
-#define IT_CH_HERMIT_R	   200010
-#define IT_CH_WHEEL_R	   200011
-#define IT_CH_JUSTIC_R	   200012
-#define IT_CH_HANGED_R	   200013
-#define IT_CH_DEATH_R	   200014
-#define IT_CH_TEMPER_R	   200015
-#define IT_CH_DEVIL_R	   200016
-#define IT_CH_TOWER_R	   200017
-#define IT_CH_STAR_R	   200018
-#define IT_CH_MOON_R	   200019
-#define IT_CH_SUN_R		   200020
-#define IT_CH_JUDGE_R	   200021
-#define IT_CH_WORLD_R	   200022
+#define IT_CH_PREIST_R		20003
+#define IT_CH_EMPRES_R		20004
+#define IT_CH_EMPERO_R		20005
+#define IT_CH_HEIROP_R		20006
+#define IT_CH_LOVERS_R		20007
+#define IT_CH_CHARIO_R		20008
+#define IT_CH_STRENG_R		20009
+#define IT_CH_HERMIT_R		20010
+#define IT_CH_WHEEL_R		20011
+#define IT_CH_JUSTIC_R		20012
+#define IT_CH_HANGED_R		20013
+#define IT_CH_DEATH_R		20014
+#define IT_CH_TEMPER_R		20015
+#define IT_CH_DEVIL_R		20016
+#define IT_CH_TOWER_R		20017
+#define IT_CH_STAR_R		20018
+#define IT_CH_MOON_R		20019
+#define IT_CH_SUN_R			20020
+#define IT_CH_JUDGE_R		20021
+#define IT_CH_WORLD_R		20022
 
 // TOWER items
 #define IT_TW_CROWN		 981
 #define IT_TW_CLOAK		 982
 #define IT_TW_DREAD		 983
-#define IT_TW_DOUSER	   1
+#define IT_TW_DOUSER		20023
 #define IT_TW_ROOTS		 984
 #define IT_TW_BBELT		 985
 #define IT_TW_OUTSIDE	1197
@@ -225,7 +225,7 @@
 #define IT_GL_BLVIPER	2043
 
 // Special Boot items
-#define IT_BT_NATURES	  	3003
+#define IT_BT_NATURES	 711
 
 // Unique weapons
 #define IT_WP_LIFESPRIG	  	3004
@@ -234,16 +234,16 @@
 #define IT_WP_STARLIGHT	  	3007
 #define IT_WP_KELPTRID	  	3008
 #define IT_WP_PHALLENX	  	3009
-#define IT_WP_LAMEDARG	  	30010
-#define IT_WP_WHITEODA	  	30011
-#define IT_WP_EXCALIBUR	  	30012
-#define IT_WP_FELLNIGHT	  	30013
-#define IT_WP_BLACKTAC	  	30014
-#define IT_WP_CRIMRIP	  	30015
-#define IT_WP_CRESSUN	  	30016
-#define IT_WP_GILDSHINE	  	30017
-#define IT_WP_BRONCHIT	  	30018
-#define IT_WP_VOLCANF	  	30019
+#define IT_WP_LAMEDARG	  	3010
+#define IT_WP_WHITEODA	  	3011
+#define IT_WP_EXCALIBUR	  	3012
+#define IT_WP_FELLNIGHT	  	3013
+#define IT_WP_BLACKTAC	  	3014
+#define IT_WP_CRIMRIP	  	3015
+#define IT_WP_CRESSUN	  	3016
+#define IT_WP_GILDSHINE	  	3017
+#define IT_WP_BRONCHIT	  	3018
+#define IT_WP_VOLCANF	  	3019
 
 // -----
 
@@ -421,11 +421,31 @@
 #define IT_F_EM			1376
 #define IT_F_DI			1377
 
+// New Gemstones
+#define IT_B_SP			2057
+#define IT_B_CI			2058
+#define IT_B_OP			2059
+#define IT_B_AQ			2060
+
+#define IT_H_SP			2061
+#define IT_H_CI			2062
+#define IT_H_OP			2063
+#define IT_H_AQ			2064
+#define IT_H_BE			2065
+#define IT_H_ZI			2066
+
+#define IT_F_SP			2067
+#define IT_F_CI			2068
+#define IT_F_OP			2069
+#define IT_F_AQ			2070
+#define IT_F_BE			2071
+#define IT_F_ZI			2072
+
 // Mine enemies
 #define IT_E_WK			1465
-#define IT_E_SK			359
-#define IT_E_GO			371
-#define IT_E_GA			372
+#define IT_E_SK			 359
+#define IT_E_GO			 371
+#define IT_E_GA			 372
 #define IT_E_MA			1466
 
 // -----
@@ -490,6 +510,16 @@
 #define IT_STAF_ADAM	 694
 #define IT_SPEA_ADAM	 695
 #define IT_CLAW_ADAM	1784
+#define IT_GAXE_DAMA	2052
+#define IT_THSW_DAMA	2051
+#define IT_AXXE_DAMA	2050
+#define IT_SHIE_DAMA	2047
+#define IT_SWOR_DAMA	2048
+#define IT_DUAL_DAMA	2049
+#define IT_DAGG_DAMA	2044
+#define IT_STAF_DAMA	2045
+#define IT_SPEA_DAMA	2046
+#define IT_CLAW_DAMA	2053
 //
 #define IT_HELM_BRNZ	  51
 #define IT_BODY_BRNZ	  53
@@ -511,8 +541,8 @@
 #define IT_BODY_ADEP	 349
 #define IT_HELM_WIZR	 352
 #define IT_BODY_WIZR	 354
-#define IT_HELM_DAMA		4001
-#define IT_BODY_DAMA		4002
+#define IT_HELM_DAMA	2028
+#define IT_BODY_DAMA	2030
 
 // ----- Books
 
@@ -526,8 +556,8 @@
 #define IT_BOOK_PROD	1657
 #define IT_BOOK_VENO	1658
 #define IT_BOOK_NECR	1659
-#define IT_BOOK_BISH		4003
-#define IT_BOOK_GREA		4004
+#define IT_BOOK_BISH	2055
+#define IT_BOOK_GREA	2056
 
 
 // -------- pop_create_bonus -------- //
@@ -574,7 +604,7 @@
 #define IT_RD_AMMYTWO	1793
 #define IT_RD_BELTTWO	1794
 #define IT_RD_AMMYTHR	1795
-#define IT_RD_BELTTHR	1796
+#define IT_RD_BELTTHR	2114
 #define IT_RD_BELTFOU	1797
 
 #define IT_RD_BRV		182

@@ -74,34 +74,40 @@ int pop_create_item(int temp, int cn)
 	
 	if (is_unique_able(temp))
 	{
-		if (!in && ch[cn].alignment<0 && !RANDOM(150))			// Reward a unique weapon
+		if (!in && ch[cn].alignment<0 && !RANDOM(200)) 	// Reward a unique weapon
 		{
-			godroll = RANDOM(3)+1; // Decide which god blessed the weapon. No purple for now.
+			godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
 			
-			in = god_create_item(temp, godroll); // create the item
+			in = god_create_item(temp, godroll); 		// create the item
 			
-			if (in)	// assure the item is created and passed the unique check
+			if (in)										// assure the item is created and passed the unique check
 			{
 				switch (godroll)
 				{
 					case 1:
-						gend = "god";
+						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]     += 10;
+						it[in].speed[0]			+= 10;
 						break;
 					case 2:
-						gend = "goddess";
+						gend = " goddess ";
 						godn = "Kwai";
 						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI;
-						it[in].to_hit[0]    += 5;
-						it[in].to_parry[0]  += 5;
+						it[in].to_hit[0]		+= 5;
+						it[in].to_parry[0]		+= 5;
 						break;
-					default:
-						gend = "god";
+					case 3:
+						gend = " god ";
 						godn = "Gorn";
 						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_GORN_UNI;
-						it[in].spell_mod[0] += 5;
+						it[in].spell_mod[0]		+= 2;
+						break;
+					default:
+						gend = " ";
+						godn = "Purple One";
+						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_PURP_UNI;
+						it[in].top_damage[0]	+= 20;
 						break;
 				}
 				
@@ -117,7 +123,7 @@ int pop_create_item(int temp, int cn)
 				strcpy(descr, it[in].description);
 				sprintf(it[in].name, "%s's %s", godn, name);
 				sprintf(it[in].reference, "%s's %s", godn, refer);
-				sprintf(it[in].description, "%s It has been blessed by the %s %s.", descr, gend, godn);
+				sprintf(it[in].description, "%s It has been blessed by the%s%s.", descr, gend, godn);
 				
 				if (is_unique_able(temp) > 54) // Claws
 				{
@@ -125,17 +131,21 @@ int pop_create_item(int temp, int cn)
 						it[in].sprite[0] = 3715 + is_unique_able(temp)-55;
 					else if (godroll==2)
 						it[in].sprite[0] = 3721 + is_unique_able(temp)-55;
-					else
+					else if (godroll==3)
 						it[in].sprite[0] = 3727 + is_unique_able(temp)-55;
+					else
+						it[in].sprite[0] = 4944 + is_unique_able(temp)-55;
 				}
-				if (is_unique_able(temp) > 45)
+				else if (is_unique_able(temp) > 45)
 				{
 					if (godroll==1)
 						it[in].sprite[0] = 2602 + is_unique_able(temp)-46;
 					else if (godroll==2)
 						it[in].sprite[0] = 2611 + is_unique_able(temp)-46;
-					else
+					else if (godroll==3)
 						it[in].sprite[0] = 2620 + is_unique_able(temp)-46;
+					else
+						it[in].sprite[0] = 4935 + is_unique_able(temp)-46;
 				}
 				else
 				{
@@ -143,8 +153,10 @@ int pop_create_item(int temp, int cn)
 						it[in].sprite[0] =  730 + is_unique_able(temp)-1;
 					else if (godroll==2)
 						it[in].sprite[0] = 2512 + is_unique_able(temp)-1;
-					else
+					else if (godroll==3)
 						it[in].sprite[0] = 2557 + is_unique_able(temp)-1;
+					else
+						it[in].sprite[0] = 4890 + is_unique_able(temp)-1;
 				}
 			}
 			else
@@ -174,195 +186,162 @@ int pop_create_item(int temp, int cn)
 	return(in);
 }
 
+#define POP_GITEM	6
+
 int pop_create_bonus(int cn, int chance)
 {
-	int n;
-
-	// this check removed from here for speed reasons
-	// they are the same as in pop_create_bonus_belt()
-	// if (RANDOM(chance)) return 0;
-
-	if (ch[cn].points_tot>20000000) // 20,000,000
+	int n, rank;
+	
+	// Changing from raw exp to rank for simplicity sake
+	rank = points2rank(ch[cn].points_tot);
+	
+	// Nobility ranks
+	if (rank>=20)
 	{
 		static int gitem[] = {
-			IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, 	// 6 / 40 = 15.0%
-			IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, 	// 6 / 40 = 15.0%
-			IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, 	// 6 / 40 = 15.0%
-			IT_POP_GRING, IT_POP_GRING, IT_POP_GRING, IT_POP_GRING, 								// 4 / 40 = 10.0%
-			IT_POP_PRING, 																			// 1 / 40 =  2.5%
-			IT_POP_VITPT, 																			// 1 / 40 =  2.5%
-			IT_POP_CLAPT,  																			// 1 / 40 =  2.5%
-			IT_POP_SAGPT, 																			// 1 / 40 =  2.5%
-			IT_POP_LIFEP, 																			// 1 / 40 =  2.5%
-			IT_POP_SSPEL, 																			// 1 / 40 =  2.5%
-			IT_POP_SSPEL+1, 																		// 1 / 40 =  2.5%
-			IT_POP_SSPEL+2, 																		// 1 / 40 =  2.5%
-			IT_POP_SSPEL+3, 																		// 1 / 40 =  2.5%
-			IT_POP_SSPEL+4, 																		// 1 / 40 =  2.5%
-			IT_POP_SSPEL+5, 																		// 1 / 40 =  2.5%
-			IT_POP_SSPEL+6, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMFL, 																			// 1 / 40 =  2.5%
-			IT_POP_GEMFL+1, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMFL+2, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMFL+3, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMFL+4, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMFL+5 																			// 1 / 40 =  2.5%
+			IT_POP_SSPEL, 
+			IT_POP_SSPEL+1, IT_POP_SSPEL+2, IT_POP_SSPEL+3, 
+			IT_POP_SSPEL+4, IT_POP_SSPEL+5, IT_POP_SSPEL+6,
+			IT_POP_ISPEL, 
+			IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, 
+			IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6,
+			IT_F_SA, IT_F_RU, IT_F_AM, IT_F_TO, IT_F_EM, IT_F_DI,
+			IT_F_SP, IT_F_CI, IT_F_OP, IT_F_AQ, IT_F_BE, IT_F_ZI,
+			IT_H_SA, IT_H_RU, IT_H_AM, IT_H_TO, IT_H_EM, IT_H_DI,
+			IT_H_SP, IT_H_CI, IT_H_OP, IT_H_AQ, IT_H_BE, IT_H_ZI,
+			IT_PLAT, IT_GOLD, IT_GOLD,
+			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POP_GHEAL, 	// 1 / 4 = 25%
-			IT_POP_GENDU, 	// 1 / 4 = 25%
-			IT_POP_GMANA, 	// 1 / 4 = 25%
-			IT_POP_LIFEP	// 1 / 4 = 25%
+			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
+			IT_POT_H_HP, IT_POT_H_EN, IT_POT_H_MP,
+			IT_POT_S_HP, IT_POT_S_EN, IT_POT_S_MP,
+			IT_POT_C_HP, IT_POT_C_EN, IT_POT_C_MP,
+			IT_POT_L_HP, IT_POT_L_EN, IT_POT_L_MP,
+			IT_FLO_W, IT_FLO_Y, IT_FLO_B, IT_FLO_T, IT_FLO_O, IT_FLO_M, IT_FLO_C, IT_FLO_V,
+			IT_FLASK
 		};
-
-		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
-		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-	else if (ch[cn].points_tot>2000000) // 2,000,000
+	// High officer
+	else if (rank>=16)
 	{
 		static int gitem[] = {
-			IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, IT_POP_GHEAL, 	// 6 / 40 = 15.0%
-			IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, IT_POP_GENDU, 	// 6 / 40 = 15.0%
-			IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, IT_POP_GMANA, 	// 6 / 40 = 15.0%
-			IT_POP_GRING, IT_POP_GRING, IT_POP_GRING, 												// 3 / 40 =  7.5%
-			IT_POP_VITPT, IT_POP_VITPT, 															// 2 / 40 =  5.0%
-			IT_POP_CLAPT, IT_POP_CLAPT, 															// 2 / 40 =  5.0%
-			IT_POP_SAGPT, IT_POP_SAGPT, 															// 2 / 40 =  5.0%
-			IT_POP_ISPEL, 																			// 1 / 40 =  2.5%
-			IT_POP_ISPEL+1, 																		// 1 / 40 =  2.5%
-			IT_POP_ISPEL+2, 																		// 1 / 40 =  2.5%
-			IT_POP_ISPEL+3, 																		// 1 / 40 =  2.5%
-			IT_POP_ISPEL+4, 																		// 1 / 40 =  2.5%
-			IT_POP_ISPEL+5, 																		// 1 / 40 =  2.5%
-			IT_POP_ISPEL+6, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMHU, 																			// 1 / 40 =  2.5%
-			IT_POP_GEMHU+1, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMHU+2, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMHU+3, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMHU+4, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMHU+5 																			// 1 / 40 =  2.5%
+			IT_POP_ISPEL, 
+			IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, 
+			IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6,
+			IT_H_SA, IT_H_RU, IT_H_AM, IT_H_TO, IT_H_EM, IT_H_DI,
+			IT_H_SP, IT_H_CI, IT_H_OP, IT_H_AQ, IT_H_BE, IT_H_ZI,
+			IT_B_SA, IT_B_RU, IT_B_AM, IT_B_TO, IT_B_EM, IT_B_DI,
+			IT_B_SP, IT_B_CI, IT_B_OP, IT_B_AQ,
+			IT_GOLD,
+			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POP_GHEAL, IT_POP_GHEAL, 	// 2 / 10 = 20%
-			IT_POP_GENDU, IT_POP_GENDU, 	// 2 / 10 = 20%
-			IT_POP_GMANA, IT_POP_GMANA, 	// 2 / 10 = 20%
-			IT_POP_VITPT, 					// 1 / 10 = 10%
-			IT_POP_CLAPT, 					// 1 / 10 = 10%
-			IT_POP_SAGPT, 					// 1 / 10 = 10%
-			IT_POP_RAINP 					// 1 / 10 = 10%
+			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
+			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
+			IT_FLO_W, IT_FLO_Y, IT_FLO_B, IT_FLO_T, IT_FLO_O,
+			IT_FLASK
 		};
-
-		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
-		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-	else if (ch[cn].points_tot>200000) // 200,000
+	// Mid officer
+	else if (rank>=12)
 	{
 		static int gitem[] = {
-			IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, IT_POP_HEALP, 	// 6 / 40 = 15.0%
-			IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, IT_POP_ENDUP, 	// 6 / 40 = 15.0%
-			IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, IT_POP_MANAP, 	// 6 / 40 = 15.0%
-			IT_POP_SRING, IT_POP_SRING, 			 												// 2 / 40 =  5.0%
-			IT_POP_GRING, IT_POP_GRING, 															// 2 / 40 =  5.0%
-			IT_POP_RAINP, IT_POP_RAINP,																// 2 / 40 =  5.0%
-			IT_POP_VITPT, 																			// 1 / 40 =  2.5%
-			IT_POP_CLAPT, 																			// 1 / 40 =  2.5%
-			IT_POP_SAGPT, 																			// 1 / 40 =  2.5%
-			IT_POP_ASPEL, 																			// 1 / 40 =  2.5%
-			IT_POP_ASPEL+1, 																		// 1 / 40 =  2.5%
-			IT_POP_ASPEL+2, 																		// 1 / 40 =  2.5%
-			IT_POP_ASPEL+3, 																		// 1 / 40 =  2.5%
-			IT_POP_ASPEL+4, 																		// 1 / 40 =  2.5%
-			IT_POP_ASPEL+5, 																		// 1 / 40 =  2.5%
-			IT_POP_ASPEL+6, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMBG, 																			// 1 / 40 =  2.5%
-			IT_POP_GEMBG+1, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMBG+2, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMBG+3, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMBG+4, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMBG+5 																			// 1 / 40 =  2.5%
+			IT_POP_ISPEL, 
+			IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, 
+			IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6,
+			IT_POP_ASPEL, 
+			IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, 
+			IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6,
+			IT_B_SA, IT_B_RU, IT_B_AM, IT_B_TO, IT_B_EM, IT_B_DI,
+			IT_B_SP, IT_B_CI, IT_B_OP, IT_B_AQ,
+			IT_M_SA, IT_M_RU, IT_M_AM, IT_M_TO, IT_M_EM, IT_M_DI,
+			IT_GOLD, IT_GOLD, IT_SILV,
+			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POP_HEALP, 	// 1 / 4 = 25%
-			IT_POP_ENDUP, 	// 1 / 4 = 25%
-			IT_POP_MANAP, 	// 1 / 4 = 25%
-			IT_POP_RAINP	// 1 / 4 = 25%
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
+			IT_FLO_R, IT_FLO_G, IT_FLO_P, IT_FLO_W, IT_FLO_Y, IT_FLO_B,
+			IT_FLASK
 		};
-
-		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
-		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-	else if (ch[cn].points_tot>20000) // 20,000
+	// Low officer
+	else if (rank>= 8)
 	{
 		static int gitem[] = {
-			IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, 	// 6 / 40 = 15.0%
-			IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, 	// 6 / 40 = 15.0%
-			IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, 	// 6 / 40 = 15.0%
-			IT_POP_SRING, IT_POP_SRING, IT_POP_SRING, 												// 3 / 40 =  7.5%
-			IT_POP_YELFL, IT_POP_YELFL, 															// 2 / 40 =  5.0%
-			IT_POP_BLUFL, IT_POP_BLUFL, 															// 2 / 40 =  5.0%
-			IT_POP_GRING, 																			// 1 / 40 =  2.5%
-			IT_POP_FLASK, 																			// 1 / 40 =  2.5%
-			IT_POP_SPELL, 																			// 1 / 40 =  2.5%
-			IT_POP_SPELL+1, 																		// 1 / 40 =  2.5%
-			IT_POP_SPELL+2, 																		// 1 / 40 =  2.5%
-			IT_POP_SPELL+3, 																		// 1 / 40 =  2.5%
-			IT_POP_SPELL+4, 																		// 1 / 40 =  2.5%
-			IT_POP_SPELL+5, 																		// 1 / 40 =  2.5%
-			IT_POP_SPELL+6, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMMD, 																			// 1 / 40 =  2.5%
-			IT_POP_GEMMD+1, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMMD+2, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMMD+3, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMMD+4, 																		// 1 / 40 =  2.5%
-			IT_POP_GEMMD+5 																			// 1 / 40 =  2.5%
+			IT_POP_ASPEL, 
+			IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, 
+			IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6,
+			IT_M_SA, IT_M_RU, IT_M_AM, IT_M_TO, IT_M_EM, IT_M_DI,
+			IT_S_SA, IT_S_RU, IT_S_AM, IT_S_TO, IT_S_EM, IT_S_DI,
+			IT_GOLD, IT_SILV, IT_SILV,
+			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POP_REDFL, IT_POP_REDFL, 	// 2 / 10 = 20%
-			IT_POP_GREFL, IT_POP_GREFL, 	// 2 / 10 = 20%
-			IT_POP_PURFL, IT_POP_PURFL, 	// 2 / 10 = 20%
-			IT_POP_YELFL, 					// 1 / 10 = 10%
-			IT_POP_BLUFL, 					// 1 / 10 = 10%
-			IT_POP_FLASK, IT_POP_FLASK 		// 2 / 10 = 20%
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			IT_FLO_R, IT_FLO_G, IT_FLO_P, IT_FLO_W, IT_FLO_Y, IT_FLO_B,
+			IT_FLASK
 		};
-
-		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
-		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
+	// Early ranks
+	else if (rank>= 4)
+	{
+		static int gitem[] = {
+			IT_POP_ASPEL, 
+			IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, 
+			IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6,
+			IT_POP_SPELL, 
+			IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, 
+			IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+			IT_S_SA, IT_S_RU, IT_S_AM, IT_S_TO, IT_S_EM, IT_S_DI,
+			IT_SILV,
+			IT_POT_RAIN
+		};
+		static int item[]  = {
+			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			IT_FLO_R, IT_FLO_G, IT_FLO_P, IT_FLO_W,
+			IT_FLASK
+		};
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+	}
+	// Newbie
 	else
 	{
 		static int gitem[] = {
-			IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, IT_POP_REDFL, 	// 4 / 20 = 20%
-			IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, IT_POP_GREFL, 	// 4 / 20 = 20%
-			IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, IT_POP_PURFL, 	// 4 / 20 = 20%
-			IT_POP_FLASK, 												// 1 / 20 =  5%
-			IT_POP_SRING, 												// 1 / 20 =  5%
-			IT_POP_GEMSM, 												// 1 / 20 =  5%
-			IT_POP_GEMSM+1, 											// 1 / 20 =  5%
-			IT_POP_GEMSM+2, 											// 1 / 20 =  5%
-			IT_POP_GEMSM+3, 											// 1 / 20 =  5%
-			IT_POP_GEMSM+4, 											// 1 / 20 =  5%
-			IT_POP_GEMSM+5 												// 1 / 20 =  5%
+			IT_POP_SPELL, 
+			IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, 
+			IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POP_REDFL, 	// 1 / 4 = 25%
-			IT_POP_GREFL, 	// 1 / 4 = 25%
-			IT_POP_PURFL, 	// 1 / 4 = 25%
-			IT_POP_FLASK 	// 1 / 4 = 25%
+			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
+			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
+			IT_FLO_R, IT_FLO_G, IT_FLO_P, 
+			IT_FLASK
 		};
-
-		if (RANDOM(5)) { n = RANDOM(sizeof(item) / sizeof(int)); n = item[n]; }
-		else { n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
 	}
-
+	
 	if (n)
 	{
 		n = god_create_item(n, 0);
 
 		chlog(cn, "got %s (t=%d)", it[n].name, it[n].temp);
 	}
-
 	return(n);
-
 }
 
 /*	Added by SoulHunter  04.04.2000	*/
@@ -1067,6 +1046,15 @@ void pop_remove(void)
 				itc++;
 			}
 		}
+		
+		for (m = 0; m<12; m++)
+		{
+			if ((in = ch[n].alt_worn[m])!=0)
+			{
+				write(h2, &it[in], sizeof(struct item));
+				itc++;
+			}
+		}
 
 		for (m = 0; m<MAXBUFFS; m++)
 		{
@@ -1160,6 +1148,13 @@ void pop_load(void)
 					it[in].used = USE_EMPTY;
 				}
 			}
+			for (m = 0; m<12; m++)
+			{
+				if ((in = ch[n].alt_worn[m])!=0)
+				{
+					it[in].used = USE_EMPTY;
+				}
+			}
 			if ((in = ch[n].citem)!=0)
 			{
 				it[in].used = USE_EMPTY;
@@ -1213,6 +1208,30 @@ void pop_load(void)
 				itc++;
 
 				ch[n].worn[m] = in;
+			}
+		}
+		
+		for (m = 0; m<12; m++)
+		{
+			if (ch[n].alt_worn[m])
+			{
+				for (in = 1; in<MAXITEM; in++)
+				{
+					if (it[in].used==USE_EMPTY)
+					{
+						break;
+					}
+				}
+				if (in==MAXITEM)
+				{
+					xlog("MAXITEM reached.");
+					break;
+				}
+
+				read(h2, &it[in], sizeof(struct item));
+				itc++;
+
+				ch[n].alt_worn[m] = in;
 			}
 		}
 
@@ -1407,6 +1426,16 @@ void pop_save_char(int nr)
 			itc++;
 		}
 	}
+	
+	// save alt_worn items
+	for (m = 0; m<12; m++)
+	{
+		if ((in = ch[nr].alt_worn[m])!=0)
+		{
+			write(h1, &it[in], sizeof(struct item));
+			itc++;
+		}
+	}
 
 	// save depot contents
 	for (m = 0; m<62; m++)
@@ -1465,6 +1494,13 @@ void pop_load_char(int nr)
 		for (m = 0; m<20; m++)
 		{
 			if ((in = ch[nr].worn[m])!=0)
+			{
+				it[in].used = USE_EMPTY;
+			}
+		}
+		for (m = 0; m<12; m++)
+		{
+			if ((in = ch[nr].alt_worn[m])!=0)
 			{
 				it[in].used = USE_EMPTY;
 			}
@@ -1534,6 +1570,30 @@ void pop_load_char(int nr)
 			itc++;
 
 			ch[nr].worn[m] = in;
+		}
+	}
+	
+	for (m = 0; m<12; m++)
+	{
+		if (ch[nr].alt_worn[m])
+		{
+			for (in = 1; in<MAXITEM; in++)
+			{
+				if (it[in].used==USE_EMPTY)
+				{
+					break;
+				}
+			}
+			if (in==MAXITEM)
+			{
+				xlog("MAXITEM reached.");
+				break;
+			}
+
+			read(h1, &it[in], sizeof(struct item));
+			itc++;
+
+			ch[nr].alt_worn[m] = in;
 		}
 	}
 

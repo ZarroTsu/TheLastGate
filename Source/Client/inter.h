@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000600
+#define VERSION 0x000601
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -24,7 +24,7 @@
 
 #define QSIZE			8
 
-#define CLICKVOL		-300
+#define CLICKVOL		100
 
 // Rendering distance (Must match server-side)
 #define RENDERDIST			54 			// "TILEX" and "TILEY" in client.h for server-side

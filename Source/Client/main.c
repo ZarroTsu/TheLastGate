@@ -711,6 +711,15 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	} else {
 		tmp=dd_init(hwnd,screen_width,screen_height);
 	}
+	if (tmp!=0) { // A hacky fix for fullscreen support
+		screen_height=800;
+		if (screen_windowed == 1) {
+			tmp=dd_init_windowed(hwnd,screen_width,screen_height);
+		} else {
+			tmp=dd_init(hwnd,screen_width,screen_height);
+		}
+	}
+	
 	if (tmp!=0) {
 
 		sprintf(buf,"|DDERROR=%d",-tmp);

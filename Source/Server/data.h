@@ -188,7 +188,7 @@ extern unsigned int mapmarker;
 #define KIN_ARCHHARAKIM (1u<<9)
 #define KIN_WARRIOR     (1u<<10)        // arch-merc, warrior
 #define KIN_SORCERER    (1u<<11)        // arch-merc, sorcerer
-#define KIN_PUGILIST    (1u<<12)
+#define KIN_BRAWLER    (1u<<12)
 #define KIN_SUMMONER    (1u<<13)
 
 #define CF_IMMORTAL    (1ull<<0)        // will not suffer any damage
@@ -349,7 +349,7 @@ extern unsigned int mapmarker;
 #define SK_DISPEL2		32
 #define SK_WARCRY2  	36
 //////////////////////////
-#define SK_FROSTBURN	44
+#define SK_FROSTB		44
 #define SK_SLOW3		50
 
 /* ch.data[] definitions */
@@ -622,6 +622,7 @@ __attribute__ ((packed));
 #define IF_JEWELERY      (1ull<<46)     // is an accessory
 #define IF_ITEMLOCK      (1ull<<47)     // locked by client - ignore in sort
 #define IF_STACKABLE     (1ull<<48)     // item can be stacked
+#define IF_PURP_UNI      (1ull<<49)     // unique check for Purple 
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -792,7 +793,7 @@ struct s_splog
 	char senseaoe[100];	// log sense aoe,	ie. " tried to include you in a mass-curse but failed."
 };
 
-#define N_SOULCAT		45
+#define N_SOULCAT		46
 #define N_SOULBONUS		72
 
 struct s_soulcat

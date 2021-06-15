@@ -141,6 +141,7 @@ void npc_malte_low(int cn)
 		break;
 	case    6:
 		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");
+		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 		plr_map_remove(cn);
 		god_destroy_items(cn);
 		ch[cn].used = USE_EMPTY;
@@ -190,6 +191,7 @@ void npc_archeologist_low(int cn)
 		break;
 	case    4:
 		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");
+		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 		plr_map_remove(cn);
 		god_destroy_items(cn);
 		ch[cn].used = USE_EMPTY;

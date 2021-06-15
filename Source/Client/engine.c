@@ -54,7 +54,7 @@ void do_msg(void);
 
 // Going to write up the tutorial right here. Unfortunately it takes up a lot of space.
 
-char tutorial_text[6][3][12][43] = { // overall
+char tutorial_text[6][3][12][45] = { // overall
 	{ // tutorial 1
 		{ // page 1
 			{ "The diamond-shaped space in the middle of" },
@@ -146,7 +146,7 @@ char tutorial_text[6][3][12][43] = { // overall
 	{ // tutorial 3
 		{ // page 1
 			{ "You got your first kill! You have been" },
-			{ "awarded a bunch experience points." },
+			{ "awarded a bunch of experience points." },
 			{ " " },
 			{ "In The Last Gate, experience points are" },
 			{ "put towards an assortment of skills and" },
@@ -714,7 +714,7 @@ int rank2points(int v)
 	if (v==21)	return 57557500;
 	if (v==22)	return 74002500;
 	if (v==23)	return 94185000;
-	if (v==24)	return 118755000;
+	if (v>=24)	return 118755000;
 				return 0;
 }
 
@@ -727,9 +727,9 @@ int points_tolevel(int curr_exp)
 {
         int curr_level, next_level, r, j;  //, p0, p5, p9;
 
-		if (!curr_exp) return 50;	//0 exp
+		if (!curr_exp) return 250;	//0 exp
         curr_level = points2rank(curr_exp);
-        if (curr_level == 24) return 0;
+        if (curr_level == 24) return 118755000;
         next_level = curr_level + 1;
 
 		r = rank2points(next_level);
@@ -1463,10 +1463,8 @@ void eng_display_win(int plr_sprite,int init)
 	// experience bar
 	if (pl.points_tot>0 && points2rank(pl.points_tot)<24) 
 	{
-		n=min(GUI_XPBAR_W,(
-			pl.points_tot-rank2points(points2rank(pl.points_tot))
-			)*GUI_XPBAR_W/(
-			pl.points_tot+points_tolevel(pl.points_tot)-rank2points(points2rank(pl.points_tot))
+		n=min(GUI_XPBAR_W,((unsigned int)(pl.points_tot-rank2points(points2rank(pl.points_tot)))
+			)*GUI_XPBAR_W/((unsigned int)(pl.points_tot+points_tolevel(pl.points_tot)-rank2points(points2rank(pl.points_tot)))
 			));
 	}
 	else 
@@ -1622,15 +1620,21 @@ void eng_display_win(int plr_sprite,int init)
 		if (show_shop) 
 		{
 			copyspritex(do_darkmode?18092:92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			y=0;
 			for (n=0; n<62; n++) {
 				if (!shop.item[n]) continue;
+				if (shop.price[n]) y=1;
 				if (hightlight==HL_SHOP && hightlight_sub==n) 
 				{
 					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (shop.price[n]) 
+					if (shop.price[n])
 					{
-						if (show_shop==1)
-							dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Sell: %dG %dS",shop.price[n]/100,shop.price[n]%100);
+						if (show_shop==1) // Normal shop
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",shop.price[n]/100,shop.price[n]%100);
+						if (show_shop==2) // Black Stronghold
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",shop.price[n]);
+						if (show_shop==3) // Future
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",shop.price[n]);
 					}
 				} 
 				else copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
@@ -1638,9 +1642,16 @@ void eng_display_win(int plr_sprite,int init)
 			if (pl.citem && shop.pl_price)
 			{
 				if (show_shop==1)
-					dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Buy:  %dG %dS",shop.pl_price/100,shop.pl_price%100);
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
+			}
+			if (y)
+			{
+				if (show_shop==1)
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
 				if (show_shop==2) // Black Stronghold
-					dd_xputtext(GUI_SHOP_X+5,GUI_SHOP_Y+299,1,"Buy:  %d Points",shop.pl_price);
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
+				if (show_shop==3) // Future
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
 			}
 
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
@@ -1695,11 +1706,11 @@ void eng_display_win(int plr_sprite,int init)
 		if (show_tuto)
 		{
 			copyspritex(do_darkmode?18044:44,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			copyspritex(tutorial_image[show_tuto][tuto_page],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
+			copyspritex(tutorial_image[show_tuto-1][tuto_page-1],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
 			for (y=0;y<12;y++)
 			{
-				dd_xputtext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
-					1,tutorial_text[show_tuto][tuto_page][y]);
+				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+					1,tutorial_text[show_tuto-1][tuto_page-1][y]);
 			}
 		}
 	}
@@ -2171,7 +2182,9 @@ void tlog(char *text,char font)
 	}
 
 	if (strlen(text)<1)	return;
-
+	
+	// This loop moves previous line of text into the next line of text
+	// with line breaks in mind, this arranges the text lines backwards.
 	while (panic++<XLL) {
 		do_msg();
 		memmove(logtext[1],logtext[0],XLL*60-60);
@@ -2191,6 +2204,7 @@ void motdlog(char *text,char font)
 {
 	int n,panic=0;
 	static int flag=0;
+	static int currline=0;
 	
 	if (!flag) {
 		for (n=0; n<MLL*60; n++) {
@@ -2203,20 +2217,27 @@ void motdlog(char *text,char font)
 	}
 
 	if (strlen(text)<1)	return;
-
+	
+	// Tracking the text array with currline, this should pass to the next line
+	// this will go until currline exceeds 60. As a failsafe, it then resets to 0.
 	while (panic++<MLL) {
 		do_msg();
-		//memmove(motdtext[1],motdtext[0],MLL*60-60);
-		//memmove(&motdfont[1],&motdfont[0],MLL-1);
-		memcpy(motdtext[0],text,min(60-1,strlen(text)+1));
-		motdfont[0]=font;
-		motdtext[0][60-1]=0;
-		if (strlen(text)<XMS-1) return;
-		for (n=XMS-1; n>0; n--) if (motdtext[0][n]==' ') break;
+		
+		if (currline>=59) currline=0;
+		
+		memcpy(motdtext[currline],text,min(60-1,strlen(text)+1));
+		motdfont[currline]=font;
+		motdtext[currline][60-1]=0;
+		
+		if (strlen(text)<XMS-1) break;
+		for (n=XMS-1; n>0; n--) if (motdtext[currline][n]==' ') break;
 		if (n!=0) {
-			motdtext[0][n]=0; text+=n+1;
+			motdtext[currline][n]=0; text+=n+1;
 		} else text+=XMS-1;
+		
+		currline++;
 	}
+	currline++;
 }
 
 void xlog(char font,char *format,...)
@@ -3522,7 +3543,7 @@ void engine(void)
 		if (look_timer)	look_timer--;
 		else show_look=0;
 
-		if ((show_shop || show_wps || show_motd || show_newp || show_tuto) && lookstep>QSIZE) {
+		if ((show_shop) && lookstep>QSIZE) {
 			cmd1s(CL_CMD_LOOK,shop.nr);
 			lookstep=0;
 		}

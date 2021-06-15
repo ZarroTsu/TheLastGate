@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current server version is 0.6.0\n"};
+static char intro_msg3[] = {"Current server version is 0.6.1\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {"OLD CHARACTER EXP HAS BEEN RESET! Make sure you reallocate your exp before heading out!\n"};
 static char intro_msg5_font = 1;
@@ -548,7 +548,7 @@ void plr_cmd_inv(int nr)
 		tmp = ch[cn].citem;
 		
 		// One of the items is not stackable, abort.
-		if (!(it[in].flags & IF_STACKABLE) || !(it[tmp].flags & IF_STACKABLE))
+		if ((in && !(it[in].flags & IF_STACKABLE)) || (tmp && !(it[tmp].flags & IF_STACKABLE)))
 		{
 			return;
 		}
@@ -590,12 +590,12 @@ void plr_cmd_inv(int nr)
 				it[in].stack--;
 				it[in].value = tmpv * it[in].stack;
 				
-				tmp = god_create_item(in, 0);
+				tmp = god_create_item(it[in].temp, 0);
 				
-				ch[cn].citem = tmp;
-				it[tmp].x = 0;
-				it[tmp].y = 0;
+				//it[tmp].x = 0;
+				//it[tmp].y = 0;
 				it[tmp].carried = cn;
+				ch[cn].citem = tmp;
 				
 				do_update_char(cn);
 			}
@@ -614,12 +614,12 @@ void plr_cmd_inv(int nr)
 				it[tmp].stack--;
 				it[tmp].value = tmpv * it[tmp].stack;
 				
-				in = god_create_item(tmp, 0);
+				in = god_create_item(it[tmp].temp, 0);
 				
-				ch[cn].item[n] = in;
-				it[in].x = 0;
-				it[in].y = 0;
+				//it[in].x = 0;
+				//it[in].y = 0;
 				it[in].carried = cn;
+				ch[cn].item[n] = in;
 				
 				do_update_char(cn);
 			}
@@ -1350,7 +1350,7 @@ void plr_cmd_setuser(int nr)
 			{
 				race_name = "a Sorcerer";
 			}
-			else if (ch[cn].kindred & KIN_PUGILIST)
+			else if (ch[cn].kindred & KIN_BRAWLER)
 			{
 				race_name = "a Brawler";
 			}
@@ -1615,7 +1615,7 @@ void char_add_net(int cn, unsigned int net)
 
 void plr_newlogin(int nr)
 {
-	int cn, temp, tmp;
+	int cn, temp, tmp, in, n;
 	unsigned char buf[16];
 
 	if (player[nr].version<MINVERSION)
@@ -1663,10 +1663,10 @@ void plr_newlogin(int nr)
 	ch[cn].points = 0;
 	ch[cn].points_tot = 0;
 	ch[cn].luck = 205;
-
+	
 	globs->players_created++;
 
-	if (!god_drop_char_fuzzy_large(cn, ch[cn].temple_x, ch[cn].temple_y, ch[cn].temple_x, ch[cn].temple_y))
+	if (!god_drop_char_fuzzy_large(cn, ch[cn].temple_x, ch[cn].temple_y-1, ch[cn].temple_x, ch[cn].temple_y-1))
 	{
 		if (!god_drop_char_fuzzy_large(cn, ch[cn].temple_x + 3, ch[cn].temple_y, ch[cn].temple_x, ch[cn].temple_y))
 		{
@@ -1709,7 +1709,36 @@ void plr_newlogin(int nr)
 	buf[0] = SV_TICK;
 	*(unsigned char*)(buf + 1) = (unsigned char)ctick;
 	xsend(nr, buf, 2);
-
+	
+	// grant additional minor potions to start
+	if (temp==CT_TEMP_M || temp==CT_TEMP_F)
+	{
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
+	}
+	else if (temp==CT_MERC_M || temp==CT_MERC_F)
+	{
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+	}
+	else if (temp==CT_HARA_M || temp==CT_HARA_F)
+	{
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+	}
+	
 	plog(nr, "Created new character");
 
 	do_char_motd(cn, newbi_msg1_font, newbi_msg1);
@@ -1734,6 +1763,9 @@ void plr_newlogin(int nr)
 	{
 		god_change_pass(cn, cn, player[nr].passwd);
 	}
+	
+	ch[cn].goto_x = HOME_START_X;
+	ch[cn].goto_y = HOME_START_Y;
 
 	// do_staff_log(2,"New player %s entered the game!\n",ch[cn].name);
 	do_announce(cn, 0, "A new player has entered the game.\n", ch[cn].name);
@@ -1786,13 +1818,15 @@ void plr_login(int nr)
 		plog(nr, "Login as %s who is already active", ch[cn].name);
 		plr_logout(cn, ch[cn].player, LO_IDLE);
 	}
-
+	
+	/*
 	if (ch[cn].flags & CF_KICKED)
 	{
 		plog(nr, "Login as %s denied (kicked)", ch[cn].name);
 		plr_logout(0, nr, LO_KICKED);
 		return;
 	}
+	*/
 
 	if (!(ch[cn].flags & (CF_GOLDEN | CF_GOD)) && god_is_banned(player[nr].addr))
 	{
@@ -2754,7 +2788,9 @@ void plr_change(int nr)
 		}
 		
 		in = ch[cn].citem;
-		if (cpl->citem!=in || (!IS_BUILDING(cn) && cpl->citem_s != it[in].stack) || (!IS_BUILDING(cn) && !(in & 0x80000000) && it[in].flags & IF_UPDATE))
+		if (cpl->citem!=in || 
+			(!IS_BUILDING(cn) && !(in & 0x80000000) && cpl->citem_s != it[in].stack) || 
+			(!IS_BUILDING(cn) && !(in & 0x80000000) && it[in].flags & IF_UPDATE))
 		{
 			buf[0] = SV_SETCHAR_OBJ;
 			if (in & 0x80000000)
@@ -2823,7 +2859,7 @@ void plr_change(int nr)
 			xsend(nr, buf, 6);
 
 			cpl->citem = in;
-			if (!IS_BUILDING(cn))
+			if (!IS_BUILDING(cn) && !(in & 0x80000000))
 			{
 				cpl->citem_s = it[in].stack;
 			}
@@ -2882,16 +2918,19 @@ void plr_change(int nr)
 	}
 	
 	// waypoints and bspoints
-	if (cpl->waypoints!=ch[cn].waypoints ||
-		cpl->bs_points!=stronghold_points(cn))
+	if (cpl->waypoints != ch[cn].waypoints ||
+		cpl->bs_points != stronghold_points(cn) ||
+		cpl->bs_points != 0)
 	{
 		buf[0] = SV_SETCHAR_WPS;
 		*(unsigned int*)(buf + 1) = ch[cn].waypoints;
 		*(unsigned int*)(buf + 5) = stronghold_points(cn);
-		xsend(nr, buf, 9);
+		*(unsigned int*)(buf + 9) = 0;
+		xsend(nr, buf, 13);
 		
 		cpl->waypoints = ch[cn].waypoints;
 		cpl->bs_points = stronghold_points(cn);
+		cpl->os_points = 0;
 	}
 
 	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)
@@ -4179,6 +4218,20 @@ int check_valid(int cn)
 			}
 		}
 	}
+	
+	for (n = 0; n<12; n++)
+	{
+		if ((in = ch[cn].alt_worn[n])!=0)
+		{
+			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
+			{
+				xlog("Reset alt_worn item %d (%s,%d) from char %d (%s)",
+				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				ch[cn].alt_worn[n] = 0;
+			}
+		}
+	}
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n])!=0)

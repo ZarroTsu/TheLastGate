@@ -1366,7 +1366,7 @@ int mouse_shop(int x,int y,int mode)
 		tx=(x-(GUI_SHOP_X  ))/35;
 		ty=(y-(GUI_SHOP_Y+1))/35;
 
-		nr=tx+ty*8;
+		nr=min(62,tx+ty*8);
 		if (mode==MS_LB_UP) cmd(CL_CMD_SHOP,shop.nr,nr);
 		if (mode==MS_RB_UP) cmd(CL_CMD_SHOP,shop.nr,nr+62);
 

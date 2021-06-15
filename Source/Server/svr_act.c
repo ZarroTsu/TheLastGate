@@ -2457,6 +2457,10 @@ static inline int speedo(int n)
 	{
 		moveSpeedValue = 0;
 	}
+	if (moveSpeedValue > 299)
+	{
+		moveSpeedValue = 299;
+	}
 	return(speedtab[moveSpeedValue][ctick]);
 }
 static inline int speedoMisc(int n)
@@ -2476,6 +2480,10 @@ static inline int speedoMisc(int n)
 			{
 				miscSpeedValue = 0;
 			}
+			if (miscSpeedValue > 299)
+			{
+				miscSpeedValue = 299;
+			}
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
@@ -2485,10 +2493,22 @@ static inline int speedoMisc(int n)
 			{
 				miscSpeedValue = 0;
 			}
+			if (miscSpeedValue > 299)
+			{
+				miscSpeedValue = 299;
+			}
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
+			if (miscSpeedValue < 0)
+			{
+				miscSpeedValue = 0;
+			}
+			if (miscSpeedValue > 299)
+			{
+				miscSpeedValue = 299;
+			}
 			return(speedtab[miscSpeedValue][ctick]);
 	}
 }

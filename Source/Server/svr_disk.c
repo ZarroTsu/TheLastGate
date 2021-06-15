@@ -324,6 +324,14 @@ void flush_char(int cn)
 			msync(&it[in], sizeof(struct item), MS_ASYNC);
 		}
 	}
+	
+	for (n = 0; n<12; n++)
+	{
+		if (IS_SANEITEM(in = ch[cn].alt_worn[n]))
+		{
+			msync(&it[in], sizeof(struct item), MS_ASYNC);
+		}
+	}
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{

@@ -224,7 +224,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 			return 0;
 		}
 
-		power = 200;
+		power = 300;
 
 		strcpy(bu[in].name, "Greater Slow");
 		bu[in].flags |= IF_SPELL;
@@ -232,7 +232,10 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 		bu[in].sprite[1] = BUF_SPR_SLOW2;
 		bu[in].duration  = bu[in].active = SP_DUR_SLOW2(power);
 		bu[in].power = power;
-		bu[in].speed[1] = -(30 + SLOW2FORM(power));
+		bu[in].speed[1] 		= -(min(120, 15 + SLOW2FORM(power)/2));
+		bu[in].move_speed[1] 	= -(min(120, 15 + SLOW2FORM(power)/2));
+		bu[in].atk_speed[1] 	= -(min(120, 15 + SLOW2FORM(power)/2));
+		bu[in].cast_speed[1] 	= -(min(120, 15 + SLOW2FORM(power)/2));
 		
 		do_char_log(co, 0, "You have been badly slowed.\n");
 		

@@ -292,9 +292,9 @@ struct area area[] = {
 
 extern struct waypoint waypoint[MAXWPS] = {
 //    _x_, _y_, "123456789012345678901234567890", 	"..."
-	{ 777, 265, "Lynbore, Tavern", 					"outside the Bluebird Tavern in Lynbore" },
+	{ 778, 265, "Lynbore, Tavern", 					"outside the Bluebird Tavern in Lynbore" },
 	{ 739, 393, "Lynbore, East", 					"the beginning of the Weeping Woods, east of Lynbore" },
-	{ 656, 472, "Aston, South", 					"the end of the Weeping Woods, south of Aston" },
+	{ 657, 471, "Aston, South", 					"the end of the Weeping Woods, south of Aston" },
 	{ 548, 491, "Aston, Crossroads", 				"the crossroads in the middle of Aston" },
 	{ 550, 399, "Aston, West", 						"the entrance to the Strange Forest, west of Aston" },
 	{ 550, 606, "Aston, East", 						"the entrance to the Autumn Meadow, east of Aston" },

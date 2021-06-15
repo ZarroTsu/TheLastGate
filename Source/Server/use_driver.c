@@ -327,23 +327,9 @@ int use_create_item3(int cn, int in)
 	{
 		return( 0);
 	}
-
-	switch(n)
-	{
-		// Create an enchanted armor piece
-		case IT_HELM_BRNZ:	case IT_BODY_BRNZ:	case IT_HELM_STEL:	case IT_BODY_STEL:
-		case IT_HELM_GOLD:	case IT_BODY_GOLD:	case IT_HELM_EMER:	case IT_BODY_EMER:
-		case IT_HELM_CRYS:	case IT_BODY_CRYS:	case IT_HELM_TITN:	case IT_BODY_TITN:
-		case IT_HELM_ADAM:	case IT_BODY_ADAM:	case IT_HELM_CAST:	case IT_BODY_CAST:
-		case IT_HELM_ADEP:	case IT_BODY_ADEP:	case IT_HELM_WIZR:	case IT_BODY_WIZR:
-		case IT_HELM_DAMA:	case IT_BODY_DAMA:
-			in2 = create_special_item(n);
-			break;
-
-		default:
-			in2 = god_create_item(n, 0);
-			break;
-	}
+	
+	// Check for magic item variant
+	in2 = get_special_item(n);
 
 	if (!in2)
 	{
@@ -1287,6 +1273,15 @@ void finish_laby_teleport(int cn, int nr, int exp)
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
 	}
+	for (n = 0; n<12; n++)
+	{
+		if ((in2 = ch[cn].alt_worn[n]) && (it[in2].flags & IF_LABYDESTROY))
+		{
+			ch[cn].alt_worn[n] = 0;
+			it[in2].used = USE_EMPTY;
+			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
+		}
+	}
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -1741,6 +1736,65 @@ int use_scroll5(int cn, int in)
 	ch[cn].mana[0] += am;
 
 	do_check_new_level(cn);
+
+	it[in].used = USE_EMPTY;
+	god_take_from_char(in, cn);
+
+	do_update_char(cn);
+
+	return(1);
+}
+
+// Exp Scroll
+int use_scroll6(int cn, int in)
+{
+	int exp;
+
+	exp = it[in].data[0];
+	
+	do_char_log(cn, 1, "Used the scroll of experience.\n");
+	chlog(cn, "used exp scroll, %d exp", exp);
+	do_give_exp(cn, exp, 0, -1);
+
+	it[in].used = USE_EMPTY;
+	god_take_from_char(in, cn);
+
+	do_update_char(cn);
+
+	return(1);
+}
+
+// Luck Scroll
+int use_scroll7(int cn, int in)
+{
+	int luck;
+
+	luck = it[in].data[0];
+	
+	do_char_log(cn, 1, "Used the scroll of luck.\n");
+	chlog(cn, "used luck scroll, %d luck", luck);
+	do_char_log(cn, 2, "You get %d luck.\n", luck);
+	ch[cn].luck += luck;
+
+	it[in].used = USE_EMPTY;
+	god_take_from_char(in, cn);
+
+	do_update_char(cn);
+
+	return(1);
+}
+
+// Gold Scroll
+int use_scroll8(int cn, int in)
+{
+	int gold;
+
+	gold = it[in].data[0];
+	
+	do_char_log(cn, 1, "Used the scroll of gold.\n");
+	chlog(cn, "used gold scroll, %d gold", gold);
+	do_char_log(cn, 2, "You get %dG %dS.\n", gold / 100, gold % 100);
+	ch[cn].gold += gold;
 
 	it[in].used = USE_EMPTY;
 	god_take_from_char(in, cn);
@@ -2710,7 +2764,7 @@ int use_spawn(int cn, int in)
 int use_pile(int cn, int in)
 {
 	int in2, x, y, m, level, tmp, chance;
-	int find_S[11] = { 
+	static int find_S[] = { 
 		IT_SILV, IT_SILV, IT_SILV, // 30% - Silver
 		//
 		IT_S_SA, // 10% - Small Gem
@@ -2723,7 +2777,7 @@ int use_pile(int cn, int in)
 		IT_E_WK, // 10% - Skeleton
 		0
 	};
-	int find_M[51] = { 
+	static int find_M[] = { 
 		IT_SILV, IT_SILV, IT_SILV, IT_SILV, //  8% - Silver
 		//
 		IT_S_SA, IT_S_SA, IT_S_SA, //  6% - Small Gem
@@ -2743,7 +2797,7 @@ int use_pile(int cn, int in)
 		IT_E_SK, IT_E_SK, IT_E_SK, IT_E_SK, IT_E_SK, // 20% - Skeleton
 		0
 	};
-	int find_B[51] = { 
+	static int find_B[] = { 
 		IT_SILV, IT_SILV, IT_SILV, //  6% - Silver
 		IT_GOLD, IT_GOLD, //  4% - Gold
 		//
@@ -2753,19 +2807,24 @@ int use_pile(int cn, int in)
 		IT_M_TO, IT_M_TO, IT_M_TO, //  6% - Medium Gem
 		IT_M_EM, IT_M_EM, IT_M_EM, //  6% - Medium Gem
 		IT_M_DI, IT_M_DI, IT_M_DI, //  6% - Medium Gem
+		//
 		IT_B_SA, IT_B_SA, //  4% - Big Gem
 		IT_B_RU, IT_B_RU, //  4% - Big Gem
 		IT_B_AM, IT_B_AM, //  4% - Big Gem
 		IT_B_TO, IT_B_TO, //  4% - Big Gem
 		IT_B_EM, IT_B_EM, //  4% - Big Gem
 		IT_B_DI, IT_B_DI, //  4% - Big Gem
+		IT_B_SP, IT_B_SP, //  4% - Big Gem
+		IT_B_CI, IT_B_CI, //  4% - Big Gem
+		IT_B_OP, IT_B_OP, //  4% - Big Gem
+		IT_B_AQ, IT_B_AQ, //  4% - Big Gem
 		//
 		IT_E_GO, IT_E_GO, IT_E_GO, IT_E_GO, IT_E_GO, 
 		IT_E_GO, IT_E_GO, IT_E_GO, IT_E_GO, IT_E_GO, 
 		IT_E_GO, IT_E_GO, IT_E_GO, IT_E_GO, IT_E_GO, // 30% - Golem
 		0
 	};
-	int find_H[51] = { 
+	static int find_H[] = { 
 		IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, // 12% - Gold
 		//
 		IT_B_SA, IT_B_SA, //  4% - Big Gem
@@ -2774,12 +2833,23 @@ int use_pile(int cn, int in)
 		IT_B_TO, IT_B_TO, //  4% - Big Gem
 		IT_B_EM, IT_B_EM, //  4% - Big Gem
 		IT_B_DI, IT_B_DI, //  4% - Big Gem
+		IT_B_SP, IT_B_SP, //  4% - Big Gem
+		IT_B_CI, IT_B_CI, //  4% - Big Gem
+		IT_B_OP, IT_B_OP, //  4% - Big Gem
+		IT_B_AQ, IT_B_AQ, //  4% - Big Gem
+		//
 		IT_H_SA, IT_H_SA, //  4% - Huge Gem
 		IT_H_RU, IT_H_RU, //  4% - Huge Gem
 		IT_H_AM, IT_H_AM, //  4% - Huge Gem
 		IT_H_TO, IT_H_TO, //  4% - Huge Gem
 		IT_H_EM, IT_H_EM, //  4% - Huge Gem
 		IT_H_DI, IT_H_DI, //  4% - Huge Gem
+		IT_H_SP, IT_H_SP, //  4% - Huge Gem
+		IT_H_CI, IT_H_CI, //  4% - Huge Gem
+		IT_H_OP, IT_H_OP, //  4% - Huge Gem
+		IT_H_AQ, IT_H_AQ, //  4% - Huge Gem
+		IT_H_BE, IT_H_BE, //  4% - Huge Gem
+		IT_H_ZI, IT_H_ZI, //  4% - Huge Gem
 		//
 		IT_E_GA, IT_E_GA, IT_E_GA, IT_E_GA, IT_E_GA, 
 		IT_E_GA, IT_E_GA, IT_E_GA, IT_E_GA, IT_E_GA, 
@@ -2787,7 +2857,7 @@ int use_pile(int cn, int in)
 		IT_E_GA, IT_E_GA, IT_E_GA, IT_E_GA, IT_E_GA, // 40% - Gargoyle
 		0
 	};
-	int find_F[51] = { 
+	static int find_F[] = { 
 		IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, // 10% - Gold
 		IT_PLAT, IT_PLAT, //  4% - Platinum
 		//
@@ -2797,12 +2867,25 @@ int use_pile(int cn, int in)
 		IT_H_TO, IT_H_TO, //  4% - Huge Gem
 		IT_H_EM, IT_H_EM, //  4% - Huge Gem
 		IT_H_DI, IT_H_DI, //  4% - Huge Gem
+		IT_H_SP, IT_H_SP, //  4% - Huge Gem
+		IT_H_CI, IT_H_CI, //  4% - Huge Gem
+		IT_H_OP, IT_H_OP, //  4% - Huge Gem
+		IT_H_AQ, IT_H_AQ, //  4% - Huge Gem
+		IT_H_BE, IT_H_BE, //  4% - Huge Gem
+		IT_H_ZI, IT_H_ZI, //  4% - Huge Gem
+		//
 		IT_F_SA, //  2% - Flawless Gem
 		IT_F_RU, //  2% - Flawless Gem
 		IT_F_AM, //  2% - Flawless Gem
 		IT_F_TO, //  2% - Flawless Gem
 		IT_F_EM, //  2% - Flawless Gem
 		IT_F_DI, //  2% - Flawless Gem
+		IT_F_SP, //  2% - Flawless Gem
+		IT_F_CI, //  2% - Flawless Gem
+		IT_F_OP, //  2% - Flawless Gem
+		IT_F_AQ, //  2% - Flawless Gem
+		IT_F_BE, //  2% - Flawless Gem
+		IT_F_ZI, //  2% - Flawless Gem
 		//
 		IT_E_MA, IT_E_MA, IT_E_MA, IT_E_MA, IT_E_MA, 
 		IT_E_MA, IT_E_MA, IT_E_MA, IT_E_MA, IT_E_MA, 
@@ -3095,6 +3178,25 @@ int build_ring(int cn, int in)
 			case IT_F_EM: r = 1430; break;
 			case IT_F_DI: r = 1431; break;
 			//
+			case IT_B_SP: r = 2087; break;
+			case IT_B_CI: r = 2088; break;
+			case IT_B_OP: r = 2089; break;
+			case IT_B_AQ: r = 2090; break;
+			//
+			case IT_H_SP: r = 2091; break;
+			case IT_H_CI: r = 2092; break;
+			case IT_H_OP: r = 2093; break;
+			case IT_H_AQ: r = 2094; break;
+			case IT_H_BE: r = 2095; break;
+			case IT_H_ZI: r = 2096; break;
+			//
+			case IT_F_SP: r = 2097; break;
+			case IT_F_CI: r = 2098; break;
+			case IT_F_OP: r = 2099; break;
+			case IT_F_AQ: r = 2100; break;
+			case IT_F_BE: r = 2101; break;
+			case IT_F_ZI: r = 2102; break;
+			//
 			default: 
 				return (0);
 		}
@@ -3133,6 +3235,25 @@ int build_ring(int cn, int in)
 			case IT_H_EM: r = 1412; break;
 			case IT_H_DI: r = 1413; break;
 			//
+			case IT_B_SP: r = 2077; break;
+			case IT_B_CI: r = 2078; break;
+			case IT_B_OP: r = 2079; break;
+			case IT_B_AQ: r = 2080; break;
+			//
+			case IT_H_SP: r = 2081; break;
+			case IT_H_CI: r = 2082; break;
+			case IT_H_OP: r = 2083; break;
+			case IT_H_AQ: r = 2084; break;
+			case IT_H_BE: r = 2085; break;
+			case IT_H_ZI: r = 2086; break;
+			//
+			case IT_F_SP:
+			case IT_F_CI:
+			case IT_F_OP:
+			case IT_F_AQ:
+			case IT_F_BE:
+			case IT_F_ZI:
+			//
 			case IT_F_SA: 
 			case IT_F_RU: 
 			case IT_F_AM: 
@@ -3169,6 +3290,25 @@ int build_ring(int cn, int in)
 			case IT_B_TO: r = 1393; break;
 			case IT_B_EM: r = 1394; break;
 			case IT_B_DI: r = 1395; break;
+			//
+			case IT_B_SP: r = 2073; break;
+			case IT_B_CI: r = 2074; break;
+			case IT_B_OP: r = 2075; break;
+			case IT_B_AQ: r = 2076; break;
+			//
+			case IT_H_SP:
+			case IT_H_CI:
+			case IT_H_OP:
+			case IT_H_AQ:
+			case IT_H_BE:
+			case IT_H_ZI:
+			//
+			case IT_F_SP:
+			case IT_F_CI:
+			case IT_F_OP:
+			case IT_F_AQ:
+			case IT_F_BE:
+			case IT_F_ZI:
 			//
 			case IT_H_SA: 
 			case IT_H_RU: 
@@ -4060,6 +4200,15 @@ int teleport3(int cn, int in)    // out of labyrinth
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
 	}
+	for (n = 0; n<12; n++)
+	{
+		if ((in2 = ch[cn].alt_worn[n]) && (it[in2].flags & IF_LABYDESTROY))
+		{
+			ch[cn].alt_worn[n] = 0;
+			it[in2].used = USE_EMPTY;
+			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
+		}
+	}
 
 	if (ch[cn].kindred & KIN_PURPLE)
 	{
@@ -4189,7 +4338,7 @@ int use_seyan_door(int cn, int in)
 
 int use_seyan_portal(int cn, int in)
 {
-	int in2, n, co, temp;
+	int in2, n, co;
 	//int depotsave[62] = {0};
 
 	if (!cn)
@@ -4203,82 +4352,15 @@ int use_seyan_portal(int cn, int in)
 	}
 	else
 	{
-		// Find a character with appropriate template
-		temp = 848;
-		for (co = 1; co<MAXCHARS; co++)
-		{
-			if (ch[co].used!=USE_ACTIVE)
-			{
-				continue;
-			}
-			if (ch[co].flags & CF_BODY)
-			{
-				continue;
-			}
-			if (ch[co].temp == temp)
-			{
-				break;
-			}
-		}
-		
-		// Backup Depot
-		for (n = 0; n<62; n++)
-		{
-			if ((in2 = ch[cn].depot[n])!=0)
-			{
-				ch[co].depot[n] = in2;
-				ch[cn].depot[n] = 0;
-			}
-		}
-		
 		do_char_log(cn, 0, "The Seyan'Du welcome you among their ranks, %s!\n", ch[cn].name);
 		if (ch[cn].kindred & KIN_MALE)
 		{
-			god_racechange(cn, CT_SEYANDU_M);
+			god_racechange(cn, CT_SEYANDU_M, 0);
 		}
 		else
 		{
-			god_racechange(cn, CT_SEYANDU_F);
+			god_racechange(cn, CT_SEYANDU_F, 0);
 		}
-		
-		// Restore Depot
-		for (n = 0; n<62; n++)
-		{
-			if ((in2 = ch[co].depot[n])!=0)
-			{
-				ch[cn].depot[n] = in2;
-				ch[co].depot[n] = 0;
-			}
-		}
-		
-		// Reset BS flags
-		ch[cn].data[26] = 0;
-		ch[cn].data[27] = 0;
-		ch[cn].data[28] = 0;
-		ch[cn].data[41] = 0;
-		
-		// Reset Pole flags
-		ch[cn].data[46] = 0;
-		ch[cn].data[47] = 0;
-		ch[cn].data[48] = 0;
-		ch[cn].data[49] = 0;
-		
-		// Reset FK flags
-		ch[cn].data[60] = 0;
-		ch[cn].data[61] = 0;
-		ch[cn].data[62] = 0;
-		ch[cn].data[63] = 0;
-		ch[cn].data[70] = 0;
-		
-		// Reset quest flags
-		ch[cn].data[72] = 0;
-		
-		// Reset WotS Book
-		ch[cn].data[73] = 0;
-		
-		// Remove learned flags
-		ch[cn].flags &= ~(CF_APPRAISE);
-		ch[cn].flags &= ~(CF_LOCKPICK);
 		
 		ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
 		ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
@@ -4317,6 +4399,15 @@ int use_seyan_portal(int cn, int in)
 		if ((in2 = ch[cn].worn[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
 			ch[cn].worn[n] = 0;
+			it[in2].used = USE_EMPTY;
+			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
+		}
+	}
+	for (n = 0; n<12; n++)
+	{
+		if ((in2 = ch[cn].alt_worn[n]) && (it[in2].flags & IF_LABYDESTROY))
+		{
+			ch[cn].alt_worn[n] = 0;
 			it[in2].used = USE_EMPTY;
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
@@ -4809,7 +4900,7 @@ int shrine_of_change(int cn, int in)
 		return(0);
 	}
 
-	if ((ch[cn].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR | KIN_PUGILIST | KIN_WARRIOR | KIN_SORCERER | KIN_SUMMONER | KIN_ARCHHARAKIM))
+	if ((ch[cn].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_WARRIOR | KIN_SORCERER | KIN_SUMMONER | KIN_ARCHHARAKIM))
 		&& it[in2].temp>=IT_CH_FOOL && it[in2].temp<=IT_CH_WORLD)	// Tarot cards for slot 2
 	{
 		if (in3 = ch[cn].worn[WN_CHARM])
@@ -4909,7 +5000,7 @@ int explorer_point(int cn, int in)
 		exp += RANDOM(exp/10+1);
 		
 		chlog(cn, "Found exp point, granting %d (of %d) exp", exp, it[in].data[4]);
-		char_play_sound(cn, ch[cn].sound + 19, -200, 0);
+		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
 		do_give_exp(cn, exp, 0, -1);
 	}
 	else
@@ -4922,7 +5013,7 @@ int explorer_point(int cn, int in)
 
 int way_point(int cn, int in)
 {
-	unsigned char buf[256];
+	unsigned char buf[2];
 	int nr;
 
 	if (!(ch[cn].waypoints & it[in].data[0]))
@@ -4933,7 +5024,7 @@ int way_point(int cn, int in)
 		ch[cn].luck += 10;
 		
 		chlog(cn, "Found waypoint %d", it[in].data[0]);
-		char_play_sound(cn, ch[cn].sound + 19, -200, 0);
+		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
 	}
 	
 	nr = ch[cn].player;
@@ -5256,6 +5347,15 @@ void use_driver(int cn, int in, int carried)
 				break;
 			case 88:						// Waypoint object - use to turn on the WP bit
 				ret = way_point(cn, in);
+				break;
+			case 89:						// Exp scroll
+				ret = use_scroll6(cn, in);
+				break;
+			case 90:						// Luck scroll
+				ret = use_scroll7(cn, in);
+				break;
+			case 91:						// Gold scroll
+				ret = use_scroll8(cn, in);
 				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
@@ -6339,6 +6439,17 @@ void item_tick_gc(void)
 					}
 				}
 				if (z<20)
+				{
+					continue;
+				}
+				for (z = 0; z<12; z++)
+				{
+					if (ch[cn].alt_worn[z]==n)
+					{
+						break;
+					}
+				}
+				if (z<12)
 				{
 					continue;
 				}

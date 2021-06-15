@@ -232,6 +232,8 @@ int god_create_item(int temp, int godwep)
 				(godwep == 2 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_KWAI_UNI))
 				||
 				(godwep == 3 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_GORN_UNI))
+				||
+				(godwep == 4 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_PURP_UNI))
 				))
 			{
 				break;
@@ -373,6 +375,27 @@ int god_create_char(int temp, int withitems)
 				tmp = 0;
 			}
 			ch[n].worn[m] = tmp;
+		}
+	}
+	
+	for (m = 0; m<12; m++)
+	{
+		if ((tmp = ch[n].alt_worn[m])!=0)
+		{
+			if (withitems)
+			{
+				tmp = god_create_item(tmp, 0);
+				if (!tmp)
+				{
+					flag = 1;
+				}
+				it[tmp].carried = n;
+			}
+			else
+			{
+				tmp = 0;
+			}
+			ch[n].alt_worn[m] = tmp;
 		}
 	}
 
@@ -962,11 +985,25 @@ int god_take_from_char(int in, int cn)
 					break;
 				}
 			}
-			if (n==20)
+			if (n<20)
 			{
-				return( 0);
+				ch[cn].worn[n] = 0;
 			}
-			ch[cn].worn[n] = 0;
+			else
+			{
+				for (n = 0; n<12; n++)
+				{
+					if (ch[cn].alt_worn[n]==in)
+					{
+						break;
+					}
+				}
+				if (n==12)
+				{
+					return( 0);
+				}
+				ch[cn].alt_worn[n] = 0;
+			}
 		}
 	}
 
@@ -1620,6 +1657,20 @@ void god_cleanslots(int cn)
 	return;
 }
 
+void god_reset_player(int cn, int co)
+{
+	if (co<1 || co>=MAXTCHARS)
+	{
+		do_char_log(cn, 0, "That template number is a bit strange, don't you think so, dude?\n");
+		return;
+	}
+	
+	do_char_log(cn, 1, "Now resetting player %s (%d)\n", ch[co].name, co);
+	god_racechange(co, ch[co].temp, 1);
+	do_char_log(cn, 0, "Done.\n");
+	return;
+}
+
 void god_reset_npcs(int cn)
 {
 	int n;
@@ -2132,6 +2183,15 @@ int god_thrall(int cn, char *spec1, char *spec2)
 		{
 			it[in].used = 0;
 			ch[ct].worn[n] = 0;
+		}
+	}
+	
+	for (n = 0; n<12; n++)
+	{
+		if ((in = ch[ct].alt_worn[n]) && (it[in].flags & IF_LABYDESTROY))
+		{
+			it[in].used = 0;
+			ch[ct].alt_worn[n] = 0;
 		}
 	}
 
@@ -3350,6 +3410,17 @@ void god_destroy_items(int cn)
 			}
 		}
 	}
+	for (n = 0; n<12; n++)
+	{
+		if ((in = ch[cn].alt_worn[n])!=0)
+		{
+			ch[cn].alt_worn[n] = 0;
+			if (in>0 && in<MAXITEM)
+			{
+				it[in].used = USE_EMPTY;
+			}
+		}
+	}
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n])!=0)
@@ -3386,17 +3457,23 @@ void god_destroy_items(int cn)
 	do_update_char(cn);
 }
 
-void god_racechange(int co, int temp)
+void god_racechange(int co, int temp, int keepstuff)
 {
-	int n;
-	struct character old;
+	int n, rank;
+	struct character old, dpt;
 
 	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co))
 	{
 		return;
 	}
-	
-	god_destroy_items(co);
+
+	if (!keepstuff)
+	{
+		dpt = ch[co];
+		god_destroy_items(co);
+		for (n = 0; n<62; n++)
+			ch[co].depot[n] = dpt.depot[n]; // this isn't working
+	}
 	
 	old = ch[co];
 
@@ -3451,36 +3528,134 @@ void god_racechange(int co, int temp)
 	ch[co].status  = old.status;
 	ch[co].status2 = old.status2;
 
-	for (n = 0; n<40; n++)
-	{
-		ch[co].item[n] = 0;
-	}
+	for (n = 0; n<MAXBUFFS; n++) ch[co].spell[n] = 0;
+	for (n = 0; n<100; n++) ch[co].data[n] = old.data[n];
+	for (n = 0; n<62; n++) { ch[co].depot[n] = old.depot[n]; it[ch[co].depot[n]].carried = co;}
 
-	for (n = 0; n<20; n++)
+	if (keepstuff)
 	{
-		ch[co].worn[n] = 0;
+		int hp = 0, mana = 0, attri = 0, exp = 0;
+		
+		exp = old.points_tot;
+		do_char_log(co, 2, "Old exp was %d.\n", exp);
+		ch[co].points_tot = exp;
+		ch[co].points     = exp;
+		rank = points2rank(exp);
+		
+		if (ch[co].kindred & (KIN_MERCENARY | KIN_SORCERER | KIN_WARRIOR | KIN_SEYAN_DU))
+		{
+			hp   = 10;
+			mana = 10;
+		}
+		else if (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+		{
+			hp   = 15;
+			mana = 5;
+		}
+		else if (ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
+		{
+			hp   = 5;
+			mana = 15;
+		}
+		if (rank >= 20)
+		{
+			attri = 1;
+		}
+		
+		ch[co].data[45] = rank;
+		
+		ch[co].hp[1]   = hp * min(20,rank);
+		ch[co].mana[1] = mana * min(20,rank);
+		if (attri)
+		{
+			temp = ch[co].temp;
+			for (n = 0; n<5; n++) 
+				ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri * min(5, max(0,rank-19));
+		}
+		
+		for (n = 0; n<40; n++) {ch[co].item[n] = old.item[n]; it[ch[co].item[n]].carried = co;}
+		for (n = 0; n<20; n++) {ch[co].worn[n] = old.worn[n]; it[ch[co].worn[n]].carried = co;}
+		for (n = 0; n<12; n++) {ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;}
+		
+		// Re-acquire previously learned skills
+		if (old.skill[5][0])  ch[co].skill[5][0]  = 1; // Staff
+		if (old.skill[12][0]) ch[co].skill[12][0] = 1; // Barter
+		if (old.skill[13][0]) ch[co].skill[13][0] = 1; // Repair
+		if (old.skill[15][0]) ch[co].skill[15][0] = 1; // Recall
+		if (old.skill[16][0]) ch[co].skill[16][0] = 1; // Shield
+		if (old.skill[18][0]) ch[co].skill[18][0] = 1; // Enhance
+		if (old.skill[19][0]) ch[co].skill[19][0] = 1; // Slow
+		if (old.skill[20][0]) ch[co].skill[20][0] = 1; // Curse
+		if (old.skill[21][0]) ch[co].skill[21][0] = 1; // Bless
+		if (old.skill[22][0]) ch[co].skill[22][0] = 1; // Identify
+		if (old.skill[23][0]) ch[co].skill[23][0] = 1; // Resistance
+		if (old.skill[25][0]) ch[co].skill[25][0] = 1; // Dispel
+		if (old.skill[26][0]) ch[co].skill[26][0] = 1; // Heal
+		if (old.skill[29][0]) ch[co].skill[29][0] = 1; // Rest
+		if (old.skill[31][0]) ch[co].skill[31][0] = 1; // Sense Magic
+		if (old.skill[32][0]) ch[co].skill[32][0] = 1; // Immunity
+		if (old.skill[33][0]) ch[co].skill[33][0] = 1; // Surround Hit
+		if (old.skill[38][0]) ch[co].skill[38][0] = 1; // Weapon Mastery
+		if (old.skill[41][0]) ch[co].skill[41][0] = 1; // Weaken
+		//
+		if ((ch[co].kindred & KIN_TEMPLAR) 		&& old.skill[37][0])  // Blind    -> Bless  for Templar
+			ch[co].skill[21][0] = 1;
+		if ((ch[co].kindred & KIN_ARCHTEMPLAR) 	&& old.skill[48][0])  // SurrArea -> Warcry for ArchTemplar
+			ch[co].skill[35][0] = 1;
+		if ((ch[co].kindred & KIN_BRAWLER) 		&& old.skill[46][0])  // Shadow   -> Razor  for Brawler
+			ch[co].skill[7][0]  = 1;
+		if ((ch[co].kindred & KIN_WARRIOR) 		&& old.skill[49][0])  // SurrRate -> Leap   for Warrior
+			ch[co].skill[49][0] = 1;
+		if ((ch[co].kindred & KIN_SORCERER) 	&& old.skill[44][0])  // HexArea  -> Poison for Sorcerer
+			ch[co].skill[42][0] = 1;
+		if ((ch[co].kindred & KIN_SUMMONER) 	&& old.skill[46][0])  // Shadow   -> Shadow for Summoner
+			ch[co].skill[46][0] = 1;
+		if ((ch[co].kindred & KIN_ARCHHARAKIM) 	&& old.skill[43][0]) // DamArea   -> Pulse  for ArchHarakim
+			ch[co].skill[43][0] = 1;
+		//
+		ch[co].waypoints = old.waypoints;
 	}
-	
-	for (n = 0; n<62; n++)
+	else
 	{
-		ch[co].depot[n] = 0;
+		for (n = 0; n<40; n++) ch[co].item[n] 		= 0;
+		for (n = 0; n<20; n++) ch[co].worn[n] 		= 0;
+		for (n = 0; n<12; n++) ch[co].alt_worn[n] 	= 0;
+		
+		ch[co].data[18] = 0;      // pentagram experience
+		ch[co].data[20] = 0;      // highest gorge solved
+		ch[co].data[21] = 0;      // seyan'du sword bits
+		ch[co].data[22] = 0;      // arena monster reset
+		ch[co].data[45] = 0;      // current rank
+		
+		// Reset BS flags
+		ch[co].data[26] = 0;
+		ch[co].data[27] = 0;
+		ch[co].data[28] = 0;
+		ch[co].data[41] = 0;
+		
+		// Reset Pole flags
+		ch[co].data[46] = 0;
+		ch[co].data[47] = 0;
+		ch[co].data[48] = 0;
+		ch[co].data[49] = 0;
+		
+		// Reset FK flags
+		ch[co].data[60] = 0;
+		ch[co].data[61] = 0;
+		ch[co].data[62] = 0;
+		ch[co].data[63] = 0;
+		ch[co].data[70] = 0;
+		
+		// Reset quest flags
+		ch[co].data[72] = 0;
+		
+		// Reset WotS Book
+		ch[co].data[73] = 0;
+		
+		// Remove learned flags
+		ch[co].flags &= ~(CF_APPRAISE);
+		ch[co].flags &= ~(CF_LOCKPICK);
 	}
-
-	for (n = 0; n<MAXBUFFS; n++)
-	{
-		ch[co].spell[n] = 0;
-	}
-
-	for (n = 0; n<100; n++)
-	{
-		ch[co].data[n] = old.data[n];
-	}
-
-	ch[co].data[18] = 0;      // pentagram experience
-	ch[co].data[20] = 0;      // highest gorge solved
-	ch[co].data[21] = 0;      // seyan'du sword bits
-	ch[co].data[22] = 0;      // arena monster reset
-	ch[co].data[45] = 0;      // current rank
 
 	do_update_char(co);
 }

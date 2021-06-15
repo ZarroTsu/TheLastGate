@@ -417,9 +417,9 @@ struct know
 #define AN_SKLORD_WHY	"I gifted it to the lord when he was still alive. He has no more use for it now."
 
 #define AN_CASTLE_WHO	"The Haunted Castle was once home to Azrael, an old king of Aston. It is filled with ghosts now."
-#define AN_CASTLE_WHAT	"The Spellblade is a powerful weapon made for the off-hand. It enhances magic spells."
+#define AN_CASTLE_WHAT	"The rusted spikes are a pair of antique bottle openers. They've stood the test of time."
 #define AN_CASTLE_WHER	"The Haunted Castle can be found at the end of Castle Way. It's where the name comes from, after all!"
-#define AN_CASTLE_WHY	"It is a powerful weapon, why wouldn't someone want it?"
+#define AN_CASTLE_WHY	"It seems like something worth collecting to me..."
 #define AN_CASTLE_LOCK	"There are a few locked doors in the Haunted Castle. Perhaps some ghosts hide behind false walls?"
 #define AN_CASTLE_AZR1	"Azrael, the shadow king he was called. He once wore a striking helmet made of black material."
 #define AN_CASTLE_AZR2	"Azrael's corpse was left in his throne. There may be a way inside, but I'd leave him be if I were you!"
@@ -610,7 +610,7 @@ struct know
 #define AN_BS_HELP		"Every few hours a horde of monsters from the stronghold attacks our outposts and gates in the Strange Forest. If you could help PROTECT these places - or enter the STRONGHOLD to stop the monsters - we would REWARD you."
 #define AN_BS_PROT		"Wait near one of the three gates, or the outposts beyond, until the guards shout alert. Then, help them in the fight. They will report your success as POINTS, and you can collect a REWARD here afterward."
 #define AN_BS_REWA		"Depending on your success in fending off the monsters, you can purchase money, potions, experience, or other items. Ask about your POINTS for more information."
-#define AN_BS_POIN		"You have %d points. Say TABLE and I will tell you everything you can purchase."
+#define AN_BS_POIN		"You have %d points. To spend your points, take a look at my inventory."
 #define AN_BS_STRO		"The monsters come from various parts of the Black Stronghold from the NORTH, CENTER, and SOUTH. As far as we know, this magic uses black candles. If you could bring us these black candles, we will REWARD you further."
 #define AN_BS_NORT		"The north gate is the closest to Aston, and fortunately our reports indicate these monsters are weakest. If you are unsure of yourself, this would be a good place to start assisting us."
 #define AN_BS_CENT		"The center gate leads into the Black Stronghold proper, and our reports indicate these monsters are of middling power. If you wish to enter the Black Stronghold, this is where you can approach."
@@ -709,7 +709,7 @@ struct know
 #define SP_FOLLOW    	10
 #define SP_TIME      	11
 #define SP_POINTS    	12
-#define SP_TABLE	   	13
+#define SP_UNLEARN	   	13
 #define SP_TRANSFER  	14
 #define SP_SPELLINFO 	15
 #define SP_QUIET     	16
@@ -727,6 +727,7 @@ struct know
 #define SP_TAROT2		28
 
 // Stronghold
+/*
 #define SP_BUY_GOLD    		601
 #define SP_BUY_EXP    		602
 #define SP_BUY_HEAL 		603
@@ -743,6 +744,7 @@ struct know
 #define SP_BUY_WEAPON3   	614
 #define SP_BUY_HELMET   	615
 #define SP_BUY_ARMOR	   	616
+*/
 
 //}
 
@@ -846,12 +848,12 @@ struct know know[] = {
 	{{"!tell",   "?haunted",  "!castle",   "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHO ,   0},
 	{{"!who",    "?haunted",  "!castle",   "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHO ,   0},
 	{{"!what",   "!sword",                 "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHAT,   0},
-	{{"!what",   "!spellblade",            "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHAT,   0},
+	{{"!what",   "!spikes",                "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHAT,   0},
 	{{"!tell",   "?about",    "!sword",    "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHAT,   0},
-	{{"!tell",   "?about",   "!spellblade","?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHAT,   0},
+	{{"!tell",   "?about",    "!spikes",   "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHAT,   0},
 	{{"!where",  "?haunted",  "!castle",   "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHER,   0},
 	{{"!why",    "?want",     "!sword",    "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHY ,   0},
-	{{"!why",    "?want",   "!spellblade", "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHY ,   0},
+	{{"!why",    "?want",     "!spikes",   "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_WHY ,   0},
 	{{"!locked", "!door",     "?",              NULL},   0, AR_CASTLE,   0, AN_CASTLE_LOCK,   0},
 	{{"!who",    "!azrael",   "?", 				NULL},   0, AR_CASTLE,   0, AN_CASTLE_AZR1,   0},
 	{{"!tell",   "?about",    "!azrael",   "?", NULL},   0, AR_CASTLE,   0, AN_CASTLE_AZR1,   0},
@@ -1165,6 +1167,7 @@ struct know know[] = {
 	{{"!center", "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_CENT,   0},
 	{{"!south",  "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_SOUT,   0},
 	// Black Stronghold Special Answers
+	/*
 	{{"!table",                            "?", NULL}, 0,   AR_STHOLD, 372, NULL, SP_TABLE},
 	{{"!buy", "!money",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GOLD},
 	{{"!buy", "!gold",                          NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GOLD},
@@ -1186,8 +1189,8 @@ struct know know[] = {
 	{{"!buy", "!rat",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_RATLING},
 	{{"!buy", "!greenling",                     NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GREENLING},
 	{{"!buy", "!green",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GREENLING},
-  // {{"!buy", "!sogling",                     NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_DREADLING},
-  // {{"!buy", "!sog",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_DREADLING},
+    {{"!buy", "!sogling",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_DREADLING},
+    {{"!buy", "!sog",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_DREADLING},
 	{{"!buy", "!weapon1",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON1},
 	{{"!buy", "!weap1",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON1},
 	{{"!buy", "!weapon2",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON2},
@@ -1199,6 +1202,7 @@ struct know know[] = {
 	{{"!buy", "!hat",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HELMET},
 	{{"!buy", "!armour",                        NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_ARMOR},
 	{{"!buy", "!armor",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_ARMOR},
+	*/
 	//}
 	//{ Dieties
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		CT_BISHOP
@@ -1236,6 +1240,8 @@ struct know know[] = {
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_LAB_GATE
 	{{"!remove", "?",                           NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_TAROT2},
 	{{"!remove", "?tarot", "?card", "?",        NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_TAROT2},
+	{{"!unlearn", "?",                          NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
+	{{"!unlearn", "?skill",                "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
 	{{"!door",                             "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_DOORS   , 0},
 	{{"!key",                              "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_KEYS    , 0},
 	{{"!riddle",                           "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_RIDDLES , 0},
@@ -1391,20 +1397,7 @@ struct know know[] = {
 	{{"?what", "!summoner",                "?", NULL}, 0, AR_GENERAL, 0, AN_RA_SUMMONER, 0},
 	{{"?what", "!arch", "!harakim",        "?", NULL}, 0, AR_GENERAL, 0, AN_RA_ARCHHARA, 0},
 	//}
-
-/*
-{{"?black", "!stronghold", "!coin", "?", NULL}, 25, AR_STRONGHOLD, 72,  
-"Bring me one of the black candles from the Stronghold, and I'll give you the star part of the coin.", 0},
-{{"?what", "!gate", "?", NULL}, 0, AR_GENERAL, 0,   
-"The last gate of the Labyrinth.", 0},
-{{"?what", "!labyrinth", "?", NULL}, 0, AR_GENERAL, 0,   
-"The Labyrinth. It's a huge maze full of dangers. If you survive it, you'll become a Seyan'Du.", 0},
-{{"?ice", "!egg", NULL}, 0, AR_NEST, 615, 
-"I heard that the ice gargoyles guard an ice egg in their nest. I'd be most grateful if you could bring it to me. But hurry, before it melts!", 0},
-{{"?ice", "!cloak", NULL}, 0, AR_NEST, 615, 
-"The Ice Cloak is a fine piece of armor, but it melts in due time. I can give you one if you obtain an ice egg for me.", 0},
-*/
-
+	
 	// Generic Special Answers
 	{{"!how",	"!are",	"!you",	"?",	NULL},	0,	AR_GENERAL,	0,	NULL,	SP_HEALTH},
 	{{"!who",	"!are",	"!you",	"?",	NULL},	0,	AR_GENERAL,	0,	NULL,	SP_WHOAMI},
@@ -1812,14 +1805,14 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Inga is in need of help. She's a harakim and she lives on First Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)) && !ch[co].skill[38][0])
+	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !ch[co].skill[38][0])
 	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[18][0])
 	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[38][0] && !ch[co].skill[18][0]))
 	{
-		do_sayx(cn, "I hear Sirjan is in need of help. He's mercenary and he lives on First Street.");
+		do_sayx(cn, "I hear Sirjan is in need of help. He's a mercenary and he lives on First Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)) && !ch[co].skill[41][0])
+	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !ch[co].skill[41][0])
 	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[19][0])
 	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[41][0] && !ch[co].skill[19][0])
 	)
@@ -1837,14 +1830,14 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Steven is in need of help. He's a mercenary and he lives on Second Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[32][0])
+	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[32][0])
 	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)) && !ch[co].skill[25][0])
 	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[32][0] && !ch[co].skill[25][0]))
 	{
 		do_sayx(cn, "I hear Ingrid is in need of help. She's a mercenary and she lives on Castle Way.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)) && !ch[co].skill[33][0])
+	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !ch[co].skill[33][0])
 	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[20][0])
 	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[33][0] && !ch[co].skill[20][0])
 	)
@@ -1867,10 +1860,7 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Serena is in need of help. She's a templar and she lives on Second Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST)) && !ch[co].skill[37][0])
-	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[21][0])
-	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[37][0] && !ch[co].skill[21][0])
-	)
+	if (!ch[co].skill[21][0])
 	{
 		do_sayx(cn, "I hear Cirrus is in need of help. You can find him here in the tavern, down the hall in that room over there.");
 		return;
@@ -1880,7 +1870,7 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Gordon is in need of help. He's a harakim and he lives on Shore Crescent.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[16][0])
+	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[16][0])
 	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)) && !ch[co].skill[5][0])
 	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[16][0] && !ch[co].skill[5][0])
 	)
@@ -1946,6 +1936,35 @@ void answer_tarot2(int cn, int co)
 		do_sayx(cn, "But you do not have a secondary card equipped, %s!", ch[co].name);
 	}
 }
+
+void answer_unlearn(int cn, int co)
+{
+	int v = 250000;
+	char *unl = "";
+	
+	if ((ch[co].kindred & KIN_SEYAN_DU) && 
+		(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
+		 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_RAZOR][0]))
+	{
+		if (ch[co].skill[SK_WARCRY][0])	{ ch[co].skill[SK_WARCRY][0] = 0; strcpy(unl, skilltab[SK_WARCRY].name); }
+		if (ch[co].skill[SK_LEAP][0])	{ ch[co].skill[SK_LEAP][0] = 0; strcpy(unl, skilltab[SK_LEAP].name); }
+		if (ch[co].skill[SK_SHADOW][0])	{ ch[co].skill[SK_SHADOW][0] = 0; strcpy(unl, skilltab[SK_SHADOW].name); }
+		if (ch[co].skill[SK_POISON][0])	{ ch[co].skill[SK_POISON][0] = 0; strcpy(unl, skilltab[SK_POISON].name); }
+		if (ch[co].skill[SK_PULSE][0])	{ ch[co].skill[SK_PULSE][0] = 0; strcpy(unl, skilltab[SK_PULSE].name); }
+		if (ch[co].skill[SK_RAZOR][0])	{ ch[co].skill[SK_RAZOR][0] = 0; strcpy(unl, skilltab[SK_RAZOR].name); }
+		ch[co].points_tot -= v;
+		ch[co].points -= v;
+		do_sayx(cn, "Very well, I will remove %s, %s. Close your eyes, and...", unl, ch[co].name);
+		chlog(cn, "GateKeeper: Removed %s from %s, and lowered by %d.", unl, ch[co].name, v);
+		do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl, v);
+	}
+	else if (ch[co].kindred & KIN_SEYAN_DU)
+	{
+		do_sayx(cn, "But you do not have a secondary card equipped, %s!", ch[co].name);
+	}
+}
+
+//
 
 void answer_health(int cn, int co)
 {
@@ -2015,7 +2034,7 @@ void answer_time(int cn, int co)
 }
 
 // Cost table for Black Stronghold Rewards...
-
+/*
 #define BS_COST_GOLD		   2
 #define BS_COST_EXP			  56
 #define BS_COST_HEAL		   5
@@ -2032,7 +2051,7 @@ void answer_time(int cn, int co)
 #define BS_COST_WEAPON3		 125
 #define BS_COST_HELMET		  15
 #define BS_COST_ARMOR		  15
-
+*/
 // </>
 
 int stronghold_points(int cn)
@@ -2047,7 +2066,7 @@ int stronghold_points(int cn)
 			-
 			ch[cn].data[41]);		// used points
 }
-
+/*
 void answer_table(int cn)
 {
 	int cnrank = points2rank(ch[cn].points_tot);
@@ -2059,7 +2078,6 @@ void answer_table(int cn)
 	do_char_log(cn, 1, "--------------+--------+------------------------\n");
 	do_char_log(cn, 1, "BUY GOLD        ALL      %d gold per point\n", BS_COST_GOLD);
 	do_char_log(cn, 1, "BUY EXP         ALL      %d exp per point\n", BS_COST_EXP+2*cnrank);
-	/*
 	do_char_log(cn, 1, "BUY HEAL         %4d   1 Healing Potion\n", BS_COST_HEAL);
 	do_char_log(cn, 1, "BUY MANA         %4d   1 Mana Potion\n", BS_COST_MANA);
 	do_char_log(cn, 1, "BUY END          %4d   1 Endurance Potion\n", BS_COST_END);
@@ -2074,9 +2092,9 @@ void answer_table(int cn)
 	do_char_log(cn, 1, "BUY WEAPON3      %4d   Magic weapon, +3 skill\n", BS_COST_WEAPON3+BS_COST_WEAPON3*cnrank);
 	do_char_log(cn, 1, "BUY HELMET       %4d   Magic helmet\n", BS_COST_HELMET+BS_COST_HELMET*cnrank*2);
 	do_char_log(cn, 1, "BUY ARMOR        %4d   Magic armor\n", BS_COST_ARMOR+BS_COST_ARMOR*cnrank*2);
-	*/
 	do_char_log(cn, 1, " \n");
 }
+*/
 
 void answer_points(int cn, int co, int nr)
 {
@@ -2086,7 +2104,7 @@ void answer_points(int cn, int co, int nr)
 }
 
 // -------- <black stronghold points> -------- //
-
+/*
 void answer_buy_gold(int cn, int co)
 {
 	int pts; pts = stronghold_points(co);
@@ -2322,7 +2340,7 @@ void answer_buy_armor(int cn, int co, int flag, int cost)
 	do_sayx(cn, "There you are, %s. One magic %s. Thank you for your help!", ch[co].name, it[in].reference);
 	chlog(co, "bought %s from cityguard", it[in].reference);
 }
-
+*/
 // -------- </black stronghold points> -------- //
 
 void special_answer(int cn, int co, int spec, char *word, int nr)
@@ -2346,7 +2364,7 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_FOLLOW:		answer_follow(cn, co); break;
 		case SP_TIME:		answer_time(cn, co); break;
 		case SP_POINTS:		answer_points(cn, co, nr); break;
-		case SP_TABLE:		answer_table(co); break;
+		//case SP_TABLE:		answer_table(co); break;
 		case SP_TRANSFER:	answer_transfer(cn, co); break;
 		case SP_SPELLINFO:	answer_spellinfo(cn, co); break;
 		case SP_QUIET:		answer_quiet(cn, co); break;
@@ -2358,7 +2376,9 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_COMMAND:	answer_gccommand(co); break;
 		case SP_TAROT:		answer_tarot(cn, co); break;
 		case SP_TAROT2:		answer_tarot2(cn, co); break;
+		case SP_UNLEARN:	answer_unlearn(cn, co); break;
 		//
+		/*
 		case SP_BUY_GOLD:		answer_buy_gold(cn, co); break;
 		case SP_BUY_EXP:		answer_buy_exp(cn, co); break;
 		case SP_BUY_HEAL:		answer_buy_potion(cn, co, 101, BS_COST_HEAL); break;
@@ -2369,12 +2389,13 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_BUY_GEND:		answer_buy_potion(cn, co, 273, BS_COST_GEND); break;
 		case SP_BUY_RATLING:	answer_buy_potion(cn, co, 267, BS_COST_RATLING); break;
 		case SP_BUY_GREENLING:	answer_buy_potion(cn, co, 833, BS_COST_GREENLING); break;
-	  //case SP_BUY_DREADLING:	answer_buy_potion(cn, co,1479, BS_COST_DREADLING); break;
+	    case SP_BUY_DREADLING:	answer_buy_potion(cn, co,1479, BS_COST_DREADLING); break;
 		case SP_BUY_WEAPON1:	answer_buy_weapon(cn, co,   1, BS_COST_WEAPON1+BS_COST_WEAPON1*corank); break;
 		case SP_BUY_WEAPON2:	answer_buy_weapon(cn, co,   2, BS_COST_WEAPON2+BS_COST_WEAPON2*corank); break;
 		case SP_BUY_WEAPON3:	answer_buy_weapon(cn, co,   3, BS_COST_WEAPON3+BS_COST_WEAPON3*corank); break;
 		case SP_BUY_HELMET:		answer_buy_armor(cn, co,    0, BS_COST_HELMET+BS_COST_HELMET*corank*2); break;
 		case SP_BUY_ARMOR:		answer_buy_armor(cn, co,    1, BS_COST_ARMOR+BS_COST_ARMOR*corank*2); break;
+		*/
 		//
 		default:break;
 	}

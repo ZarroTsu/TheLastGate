@@ -722,7 +722,7 @@ int convert_skill_for_group(int co, int nr)
 	if (nr == SK_DISPEL)   nr = SK_IMMUN;   // Dispel   -> Immun
 	
 	// Hacky flip-flopping
-	if (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
+	if (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
 	{
 		if (nr == SK_ENHANCE) nr = SK_WEAPONM;  // Enhance  -> WeapM
 		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow     -> Weaken
@@ -751,6 +751,7 @@ int npc_give(int cn, int co, int in, int money)
 	int tmp = 0;
 	int qnum = 0;
 	int n, in2 = 0;
+	unsigned char buf[3];
 
 	if (ch[co].flags & (CF_PLAYER | CF_USURP))
 	{
@@ -761,16 +762,23 @@ int npc_give(int cn, int co, int in, int money)
 		return( 0);
 	}
 
-	// MAR 2020 - Special hack for arch skills.
+	// Special hack for arch skills.
 	if ((nr = ch[cn].data[50])!=0)
 	{
 		// Check each arch skill against the race that is intended to learn it.
-		if ((	nr == 48 && !(ch[co].kindred & KIN_ARCHTEMPLAR				)	) 
-		 || (	nr == 43 && !(ch[co].kindred & KIN_ARCHHARAKIM				)	) 
-		 || (	nr == 49 && !(ch[co].kindred & KIN_WARRIOR					)	) 
-		 || (	nr == 44 && !(ch[co].kindred & KIN_SORCERER					)	) 
-		 || (	nr == 46 && !(ch[co].kindred & (KIN_PUGILIST | KIN_SUMMONER))	)
-		 || (	nr ==  7 && !(ch[co].kindred & KIN_SEYAN_DU					)	))
+		if ((	nr == 35 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR)) ) 
+		 || (	nr == 43 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHHARAKIM)) ) 
+		 || (	nr == 49 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_WARRIOR    )) ) 
+		 || (	nr == 42 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_SORCERER   )) ) 
+		 || (	nr == 46 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_SUMMONER   )) )
+		 || (	nr ==  7 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_BRAWLER   )) ))
+			canlearn = 0;
+		
+		// Seyan'du can learn any arch skill, but only one!
+		if ((nr == 35 || nr == 43 || nr == 49 || nr == 42 || nr == 46 || nr ==  7) &&
+			(ch[co].kindred & KIN_SEYAN_DU) && 
+			(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
+			 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_RAZOR][0]))
 			canlearn = 0;
 	}
 
@@ -903,11 +911,11 @@ int npc_give(int cn, int co, int in, int money)
 		else
 		{
 			// Tutorial 6
-			if (ch[cn].temp==118&&ch[co].data[76]<(1<<5))
+			if (ch[cn].temp==118&&ch[co].data[76]<(1<<6))
 			{
-				unsigned char buf[2];
+				chlog(co, "SV_SHOWMOTD tutorial 6");
 				buf[0] = SV_SHOWMOTD;
-				*(unsigned char*)(buf + 1) = 163;
+				*(unsigned char*)(buf + 1) = 106;
 				xsend(ch[co].player, buf, 2);
 			}
 			do_sayx(cn, "Thank you %s. That's the %s I wanted.", ch[co].name, it[in].reference);
@@ -1474,6 +1482,13 @@ int count_uniques(int cn)
 			cnt++;
 		}
 	}
+	for (n = 0; n<12; n++)
+	{
+		if ((in = ch[cn].alt_worn[n]) && is_unique(in))
+		{
+			cnt++;
+		}
+	}
 	for (n = 0; n<62; n++)
 	{
 		if ((in = ch[cn].depot[n]) && is_unique(in))
@@ -1488,6 +1503,7 @@ int npc_see(int cn, int co)
 {
 	int n, n2, idx, indoor1, indoor2;
 	int x1, x2, y1, y2, dist, ret, cnt;
+	unsigned char buf[3];
 
 	if (ch[co].flags & (CF_PLAYER | CF_USURP))
 	{
@@ -1549,22 +1565,22 @@ int npc_see(int cn, int co)
 	}
 	
 	// if we're taunted, try to attack the taunter
-	if (IS_SANECHAR(ch[cn].taunted) && do_char_can_see(cn, ch[cn].taunted))
+	if (ch[cn].taunted && IS_SANECHAR(ch[cn].taunted) && (do_char_can_see(cn, ch[cn].taunted) || ch[cn].data[78]))
 	{
 		// If our last attempt to attack failed, wander near the taunter
-		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].last_action == ERR_FAILED)
+		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
 		{
 			ch[cn].goto_x = ch[co].x + 5 - RANDOM(10);
 			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (ch[cn].attack_cn!=ch[cn].taunted && ch[cn].last_action == ERR_SUCCESS)
+		else if (do_char_can_see(cn, ch[cn].taunted) && ch[cn].attack_cn!=ch[cn].taunted)
 		{
 			ch[cn].attack_cn = ch[cn].taunted;
-			ch[cn].goto_x = 0;
+			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
+			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
 		ch[cn].data[58] = 2;
-		ch[cn].data[78] = globs->ticker + TICKS * 5;
 		return(1);
 	}
 	
@@ -1737,9 +1753,9 @@ int npc_see(int cn, int co)
 				// Tutorial 2
 				if (ch[co].data[76]<(1<<2))
 				{
-					unsigned char buf[2];
+					chlog(co, "SV_SHOWMOTD tutorial 2");
 					buf[0] = SV_SHOWMOTD;
-					*(unsigned char*)(buf + 1) = 123;
+					*(unsigned char*)(buf + 1) = 102;
 					xsend(ch[co].player, buf, 2);
 				}
 				
@@ -1757,7 +1773,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill03")==0) //    18/38	* EW or WM			( Sirjan )
 			{
-				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
+				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
 				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_ENHANCE][0]))
 				{
 					if (!ch[co].skill[SK_WEAPONM][0])
@@ -1776,7 +1792,7 @@ int npc_see(int cn, int co)
 			
 			else if (strcmp(ch[cn].text[2], "#skill04")==0) // 41/19   	* Weaken or Slow		( Amity )
 			{
-				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
+				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
 				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_SLOW][0]))
 				{
 					if (!ch[co].skill[SK_WEAKEN][0])
@@ -1827,18 +1843,18 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill08")==0) // 33/20   	* Surr or Curse		( Leopold )
 			{
-				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_PUGILIST))
+				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
 				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_CURSE][0]))
 				{
 					if (!ch[co].skill[SK_SURROUND][0])
-						do_sayx(cn, "Hi, %s. Bring me The Spellblade from the Haunted Castle and I'll teach you SURROUND HIT.", ch[co].name);
+						do_sayx(cn, "Hi, %s. Bring me a pair of Rusted Spikes from the Haunted Castle and I'll teach you SURROUND HIT.", ch[co].name);
 					else
 						do_sayx(cn, "Hi, %s.", ch[co].name);
 				}
 				else
 				{
 					if (!ch[co].skill[SK_CURSE][0])
-						do_sayx(cn, "Hi, %s. Bring me The Spellblade from the Haunted Castle and I'll teach you CURSE.", ch[co].name);
+						do_sayx(cn, "Hi, %s. Bring me a pair of Rusted Spikes from the Haunted Castle and I'll teach you CURSE.", ch[co].name);
 					else
 						do_sayx(cn, "Hi, %s.", ch[co].name);
 				}
@@ -1992,7 +2008,7 @@ int npc_see(int cn, int co)
 				if (points2rank(ch[co].points_tot)<8) // Sergeant Major
 					do_sayx(cn, "Leave me be, %s.", ch[co].name);
 				else
-					do_sayx(cn, "Hello, %s. I'm researching the Greenlings in the underground. If you could, bring me one of the green plants that grow there... I'd pay you well.", ch[co].name);
+					do_sayx(cn, "Hello, %s. I'm researching the monsters in the underground. If you could, bring me one of the strange plants that grow there... I'd pay you well.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest113")==0) //   13 - UG2 / Monica / Greenl Collector
 			{
@@ -2042,14 +2058,14 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest120")==0) //   13 - UG2 / Danica / Sogl Collector
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
+				if (points2rank(ch[co].points_tot)<15) // Brig Gen
 					do_sayx(cn, "Hi, %s... Um...", ch[co].name);
 				else
 					do_sayx(cn, "Hi, %s... Bring me a completed Sogling Eye Collection, and... would a Sogling Eye Essense be okay...?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill16")==0) //    10   	Swimming			( Lucci )
 			{
-				if (points2rank(ch[co].points_tot)<15) // Brig Gen
+				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
 					do_sayx(cn, "Hello, %s! When you're a little stronger, come see me and I can teach you how to swim.", ch[co].name);
 				else if (!ch[co].skill[SK_SWIM][0])
 					do_sayx(cn, "Hello, %s! Under the lake in the southern Strange Forest, there's said to be a valuable glittering cleaver. Bring it to me and I will teach you SWIMMING!", ch[co].name);
@@ -2057,65 +2073,106 @@ int npc_see(int cn, int co)
 					do_sayx(cn, "Hello, %s!", ch[co].name);
 			}
 			//
-			else if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 48 - Surround Area
-			{
-				if (ch[co].kindred & KIN_ARCHTEMPLAR)
-					do_sayx(cn, "Hello, %s. Please bring me the Star Amulet from the Northern Mountain and I would teach you SURROUND AREA.", ch[co].name);
-				else
-					do_sayx(cn, "Greetings, %s! Did you know Arch-Templars can hit many foes at once?", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#skill22")==0) // Warr - 49 - Surround Rate
-			{
-				if (ch[co].kindred & KIN_WARRIOR)
-					do_sayx(cn, "Hello, %s. Please bring me the Star Amulet from the Northern Mountain and I would teach you SURROUND RATE.", ch[co].name);
-				else
-					do_sayx(cn, "Greetings, %s! Did you know Warriors can hit surrounding foes quite quickly?", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#skill23")==0) // PuSu - 46 - Shadow Copy
-			{
-				if (ch[co].kindred & (KIN_PUGILIST | KIN_SUMMONER))
-					do_sayx(cn, "Hello, %s. Please bring me the Star Amulet from the Northern Mountain and I would teach you SHADOW COPY.", ch[co].name);
-				else
-					do_sayx(cn, "Greetings, %s! Did you know Brawlers and Summoners can create copies from their shadows?", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#skill24")==0) // Sorc - 44 - Hex Proximity
-			{
-				if (ch[co].kindred & KIN_SORCERER)
-					do_sayx(cn, "Hello, %s. Please bring me the Star Amulet from the Northern Mountain and I would teach you HEX PROXIMITY.", ch[co].name);
-				else
-					do_sayx(cn, "Greetings, %s! Did you know Sorcerers can curse and slow many foes at a time?", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#skill25")==0) // ArHr - 43 - Damage Proximity
-			{
-				if (ch[co].kindred & KIN_ARCHHARAKIM)
-					do_sayx(cn, "Hello, %s. Please bring me the Star Amulet from the Northern Mountain and I would teach you DAMAGE PROXIMITY.", ch[co].name);
-				else
-					do_sayx(cn, "Greetings, %s! Did you know Arch-Harakims can harm many foes at once?", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#skill26")==0) // Seyan - 7 - Focus
-			{
-				if (ch[co].kindred & KIN_SEYAN_DU)
-					do_sayx(cn, "Hello, %s. Please bring me the Star Amulet from the Northern Mountain and I would teach you FOCUS.", ch[co].name);
-				else
-					do_sayx(cn, "Greetings, %s! Did you know Seyan'du can focus their minds to improve their spells?", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#gatekeeper13")==0)
-			{
-				if (ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR | KIN_PUGILIST | KIN_WARRIOR | KIN_SORCERER | KIN_SUMMONER | KIN_ARCHHARAKIM))
-					do_sayx(cn, "Congratulations, %s! Now that you have arched, you can donate a secondary tarot card to the shrine and it will apply it too! I can also REMOVE it for you.", ch[co].name);
-				else
-					do_sayx(cn, "Welcome, %s! I'm sure you have many questions. Read the notes in front of me, and you may ask me 'about X' for anything capitalized. I also act as a bank!", ch[co].name);
-			}
 			else 
 			{
-				// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
-				if((ch[cn].temp == CT_PRIEST) && (ch[co].kindred & KIN_PURPLE)) // priest template is 180
+				int knowarch=0;
+				if (ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
+					ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_RAZOR][0])
+					knowarch=1;
+				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
-					do_sayx(cn, "Greetings, %s!", ch[co].name);
+					if (ch[co].kindred & (KIN_ARCHTEMPLAR | KIN_SEYAN_DU))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you WARCRY.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Arch-Templar can strike fear into their enemies with a single shout?", ch[co].name);
 				}
-				else     // if it is not priest or player is not purple we do nothing, NPC will talk as usual
+				else if (strcmp(ch[cn].text[2], "#skill22")==0) // Warr - 49 - Leap
 				{
-					npc_saytext_n(cn, 2, ch[co].name);
+					if (ch[co].kindred & (KIN_WARRIOR | KIN_SEYAN_DU))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LEAP.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Warriors can strike foes fast enough to pass through them?", ch[co].name);
+				}
+				else if (strcmp(ch[cn].text[2], "#skill23")==0) // Summ - 46 - Shadow Copy
+				{
+					if (ch[co].kindred & (KIN_SUMMONER | KIN_SEYAN_DU))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you SHADOW COPY.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Summoners can create copies from their very shadows?", ch[co].name);
+				}
+				else if (strcmp(ch[cn].text[2], "#skill24")==0) // Sorc - 42 - Poison
+				{
+					if (ch[co].kindred & (KIN_SORCERER | KIN_SEYAN_DU))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you POISON.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Sorcerers can inflict vile poisons on their enemies?", ch[co].name);
+				}
+				else if (strcmp(ch[cn].text[2], "#skill25")==0) // ArHr - 43 - Pulse
+				{
+					if (ch[co].kindred & (KIN_ARCHHARAKIM | KIN_SEYAN_DU))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you PULSE.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Arch-Harakim can cause damaging bursts without thinking?", ch[co].name);
+				}
+				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Pugi - 7 - Razor
+				{
+					if (ch[co].kindred & (KIN_BRAWLER | KIN_SEYAN_DU))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you RAZOR.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Brawlers can make the very wind strike foes alongside them?", ch[co].name);
+				}
+				else if (strcmp(ch[cn].text[2], "#gatekeeper13")==0)
+				{
+					if (knowarch && (ch[co].kindred & KIN_SEYAN_DU))
+					{
+						do_sayx(cn, "Hello, %s. Are you happy with the skill you learned? If not, I can remove it for an experience cost of 250,000. Say UNLEARN and I can make it so.", ch[co].name);
+					}
+					else if (ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_WARRIOR | KIN_SORCERER | KIN_SUMMONER | KIN_ARCHHARAKIM))
+						do_sayx(cn, "Congratulations, %s! Now that you have arched, you can donate a secondary tarot card to the shrine and it will apply it too! I can also REMOVE it for you.", ch[co].name);
+					else
+						do_sayx(cn, "Welcome, %s! I'm sure you have many questions. Read the notes in front of me, and you may ask me 'about X' for anything capitalized. I also act as a bank!", ch[co].name);
+				}
+				else 
+				{
+					// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
+					if((ch[cn].temp == CT_PRIEST) && (ch[co].kindred & KIN_PURPLE)) // priest template is 180
+					{
+						do_sayx(cn, "Greetings, %s!", ch[co].name);
+					}
+					else     // if it is not priest or player is not purple we do nothing, NPC will talk as usual
+					{
+						npc_saytext_n(cn, 2, ch[co].name);
+					}
 				}
 			}
 
@@ -2414,11 +2471,24 @@ int npc_try_spell(int cn, int co, int spell)
 	{
 		return( 0);
 	}
-
+	
+	// prevent thralling multiple ghosts
+	if (spell==SK_GHOST)
+	{
+		for (n = 1; n<MAXCHARS; n++)
+		{
+			if (ch[n].used==USE_EMPTY || (ch[n].flags & (CF_PLAYER | CF_USURP))) 
+				continue;
+			if (ch[n].data[63]==cn)
+				return 0;
+		}
+	}
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		// Cancel if exhausted
-		if ((in = ch[cn].spell[n]) && bu[in].temp==SK_EXHAUST)
+		in = ch[cn].spell[n];
+		// Cancel if exhausted                // prevent thralling multiple shadows
+		if (in && (bu[in].temp==SK_EXHAUST || (spell==SK_SHADOW && bu[in].temp==SK_SHADOW)))
 		{
 			return 0;
 		}
@@ -2994,12 +3064,15 @@ void stronghold_mage_driver(int cn)
 								ch[co].skill[n][0] += 3+RANDOM(3+magenum)*2;
 							}
 						}
+						sprintf(buf, "the tough %s", ch[co].name);
+						buf[10] = tolower(buf[10]);
+						strncpy(ch[co].reference, buf, 39);
+						ch[co].reference[39] = 0;
+						
 						sprintf(buf, "Tough %s", ch[co].name);
 						strncpy(ch[co].name, buf, 39);
 						ch[co].name[39] = 0;
-						sprintf(buf, "the %s", ch[co].name);
-						strncpy(ch[co].reference, buf, 39);
-						ch[co].reference[39] = 0;
+						
 						ch[co].data[26]+= 3+RANDOM(3+magenum)*3/2;
 						if (!(ch[co].flags & CF_EXTRAEXP)) ch[co].flags |= CF_EXTRAEXP;
 						modified=1;
@@ -3429,6 +3502,11 @@ int npc_driver_high(int cn)
 			return( 1);
 		}
 		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
+		{
+			ch[cn].data[74] = globs->ticker + TICKS * 10;
+			return(1);
+		}
+		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return(1);

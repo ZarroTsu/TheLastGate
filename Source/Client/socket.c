@@ -113,6 +113,7 @@ int so_login(unsigned char *buf,HWND hwnd)
 	extern int race;
 	static int capcnt;
 	static char mod[256];
+	int n;
 
 	if (buf[0]==SV_CHALLENGE) {	// answer challenges at once
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Login Part I");
@@ -146,6 +147,10 @@ int so_login(unsigned char *buf,HWND hwnd)
 		ser_ver+=(int)((*(unsigned char*)(buf+14)))<<8;
 		ser_ver+=(int)((*(unsigned char*)(buf+15)))<<16;
 		//
+			for (n=0;n<16;n++)
+			{
+				pdata.xbutton[n].skill_nr=-1; strcpy(pdata.xbutton[n].name,"-");
+			}
 			pdata.xbutton[0].skill_nr=14; strcpy(pdata.xbutton[0].name,"Light");
 			if (race==4||race==5) // Templar
 			{
@@ -249,11 +254,11 @@ void so_connect(HWND hwnd)
 			return;
 		}
 	} else {
-		
+		/*
 		FILE *fp;
         char str[15];
      
-        fp = fopen(host_addr, "r");
+        fp = fopen("web.ip", "r");
         if (fp == NULL)
         {
             SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not read web.ip");
@@ -262,8 +267,8 @@ void so_connect(HWND hwnd)
         }
         haddr=inet_addr(fgets(str, 15, fp));
         fclose(fp);
+		*/
 		
-		/*
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server address");
 		he=gethostbyname(host_addr);
 		if (!he) {
@@ -272,7 +277,7 @@ void so_connect(HWND hwnd)
 			return;
 		}
 		haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-		*/
+		
 	}
 
 	addr.sin_family=AF_INET;
@@ -509,6 +514,7 @@ void sv_setchar_wps(unsigned char *buf)
 	DEBUG("SV SETCHAR WPS");
 	pl.waypoints=*(unsigned long*)(buf+1);
 	pl.bs_points=*(unsigned long*)(buf+5);
+	pl.os_points=*(unsigned long*)(buf+9);
 }
 
 void sv_setchar_gold(unsigned char *buf)
@@ -887,15 +893,13 @@ void sv_look6(unsigned char *buf)
 	DEBUG("SV LOOK6");
 
 	s=buf[1];
-	
-	// buf[14] and buf[15] should be free?
 
 	for (n=s; n<min(62,s+2); n++) {
 		tmplook.item[n]  =*(unsigned short*)(buf+2+(n-s)*6);
 		tmplook.price[n] =*(unsigned int  *)(buf+4+(n-s)*6);
 	}
 	if (n==62) {
-		show_shop=1+buf[14];
+		show_shop=1+*(unsigned char*)(buf+14);
 		shop=tmplook;
 	}
 }
@@ -911,8 +915,8 @@ void sv_showmotd(unsigned char *buf)
 	if (n>=100)
 	{	// Display tutorial
 		tuto_page=1;
-		show_tuto=(n%100)/10;
-		tuto_max=(n%100)%10;
+		show_tuto=(n%100);
+		tuto_max=3;
 	}
 	else if (n)
 	{	// Display NEW PLAYER MotD from server and offer tutorial
@@ -1037,7 +1041,7 @@ int sv_cmd(unsigned char *buf)
 		case	SV_SETCHAR_DIR:		sv_setchar_dir(buf); return 2;
 
 		case	SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
-		case	SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 9;
+		case	SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 13;
 		case	SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
 		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
 		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 9;
