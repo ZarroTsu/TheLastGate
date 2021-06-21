@@ -174,7 +174,7 @@ struct s_splog splog[50] = {
 	},{
 		39
 	},{
-		40
+		SK_CLEAVE,		"Cleave",		"cleave",		"cleaving"
 	},{
 		SK_WEAKEN, 		"Weakness",		"weaken",		"weakening",
 		"Your equipment feels heavy.",
@@ -213,7 +213,7 @@ struct s_splog splog[50] = {
 		"You hear someone yell broad insults.",
 		" tried to include you in a mass-taunt but failed."
 	},{
-		49
+		SK_LEAP,		"Leap",			"leap",			"leaping"
 	}
 };
 
@@ -275,7 +275,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
-	if ((co = ch[cn].skill_target1)) ;
+	if (co = ch[cn].skill_target1) ;
 	else if (!buff && ch[cn].dir==DX_DOWN  && (co = map[m + MAPX].ch)) ;
 	else if (!buff && ch[cn].dir==DX_UP    && (co = map[m - MAPX].ch)) ;
 	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m + 1].ch)) ;
@@ -302,7 +302,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	}
 	*/
 	
-	if (in==SK_CLEAVE || in==SK_WEAKEN || in==SK_LEAP || in==SK_BLIND)
+	if (in==SK_CLEAVE || in==SK_WEAKEN || in==SK_BLIND)
 	{
 		need_combat = 1;
 	}
@@ -432,7 +432,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
-	if (cn!=co && !need_combat && !buff && (ch[co].flags & CF_IMMORTAL))
+	if (cn!=co && !need_combat && !buff && (ch[co].flags & CF_IMMORTAL) && in!=SK_LEAP)
 	{
 		do_char_log(cn, 0, "You lost your focus.\n");
 		return 0;
@@ -1505,7 +1505,7 @@ int has_spell_from_item(int cn, int temp)
 	int n, in;
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && bu[in].data[3]==temp)
+		if ((in = ch[cn].spell[n]) && bu[in].temp > 100 && bu[in].data[3]==temp)
 		{
 			return in;
 		}
@@ -1631,7 +1631,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 	return 1;
 }
 
-int spellpower_check(int cn, int co, int power)
+int spellpower_check(int cn, int co, int power, int fromscroll)
 {
 	int tmp;
 	
@@ -1650,7 +1650,7 @@ int spellpower_check(int cn, int co, int power)
 				do_char_log(cn, 1, "Seeing that %s's mind cannot support the power of your spell, you reduced its strength.\n", ch[co].reference);
 			}
 		}
-		else if ((ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !(ch[cn].kindred & KIN_SEYAN_DU))
+		else if (fromscroll)
 		{
 			tmp = ch[co].spell_apt;
 			if (power>tmp)
@@ -1700,11 +1700,11 @@ void skill_light(int cn)
 	add_exhaust(cn, SK_EXH_LIGHT);
 }
 
-int spell_protect(int cn, int co, int power)
+int spell_protect(int cn, int co, int power, int fromscroll)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn));
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
 
 	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) 
 		return 0;
@@ -1729,16 +1729,16 @@ void skill_protect(int cn)
 	if (!(co = get_target(cn, 0, 1, 1, SP_COST_PROTECT, SK_PROTECT, 1, power, 0))) 
 		return;
 
-	spell_protect(cn, co, power);
+	spell_protect(cn, co, power, 0);
 
 	add_exhaust(cn, SK_EXH_PROTECT);
 }
 
-int spell_enhance(int cn, int co, int power)
+int spell_enhance(int cn, int co, int power, int fromscroll)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn));
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
 	
 	if (!(in = make_new_buff(cn, SK_ENHANCE, BUF_SPR_ENHANCE, power, SP_DUR_ENHANCE, 1))) 
 		return 0;
@@ -1763,16 +1763,16 @@ void skill_enhance(int cn)
 	if (!(co = get_target(cn, 0, 1, 1, SP_COST_ENHANCE, SK_ENHANCE, 1, power, 0))) 
 		return;
 	
-	spell_enhance(cn, co, power);
+	spell_enhance(cn, co, power, 0);
 
 	add_exhaust(cn, SK_EXH_ENHANCE); // Half-second
 }
 
-int spell_bless(int cn, int co, int power)
+int spell_bless(int cn, int co, int power, int fromscroll)
 {
 	int in, n;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn));
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
 	
 	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) 
 		return 0;
@@ -1793,16 +1793,16 @@ void skill_bless(int cn)
 	if (!(co = get_target(cn, 0, 1, 1, SP_COST_BLESS, SK_BLESS, 1, power, 0))) 
 		return;
 	
-	spell_bless(cn, co, power);
+	spell_bless(cn, co, power, 0);
 
 	add_exhaust(cn, SK_EXH_BLESS);
 }
 
-int spell_mshield(int cn, int co, int power)
+int spell_mshield(int cn, int co, int power, int fromscroll)
 {
 	int in, ta_cn_cha, ta_co_emp, n, cc;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn));
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
 	
 	ta_cn_cha = get_tarot(cn, IT_CH_CHARIOT);
 	ta_co_emp = get_tarot(co, IT_CH_EMPRESS);
@@ -1888,17 +1888,17 @@ void skill_mshield(int cn)
 	if (spellcost(cn, SP_COST_MSHIELD, SK_MSHIELD, 1))	{ return; }
 	if (chance(cn, FIVE_PERC_FAIL)) 					{ return; }
 
-	spell_mshield(cn, cn, get_skill_score(cn, SK_MSHIELD));
+	spell_mshield(cn, cn, get_skill_score(cn, SK_MSHIELD), 0);
 
 	add_exhaust(cn, SK_EXH_MSHIELD);
 }
 
 // Feb 2020 -- Haste
-int spell_haste(int cn, int co, int power)
+int spell_haste(int cn, int co, int power, int fromscroll)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn));
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
 	
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 1))) 
 		return 0;
@@ -1913,7 +1913,7 @@ void skill_haste(int cn)
 	if (spellcost(cn, SP_COST_HASTE, SK_HASTE, 1))	{ return; }
 	if (chance(cn, FIVE_PERC_FAIL)) 				{ return; }
 
-	spell_haste(cn, cn, get_skill_score(cn, SK_HASTE));
+	spell_haste(cn, cn, get_skill_score(cn, SK_HASTE), 0);
 
 	add_exhaust(cn, SK_EXH_HASTE);
 }
@@ -1945,7 +1945,7 @@ int spell_heal(int cn, int co, int power)
 	// Every time heal is cast it updates itself and adds 1 to data[1]
 	if (cast_a_spell(cn, co, in, 0, 0)) // SK_HEAL
 	{
-		if ((in2=has_buff(cn, SK_HEAL))!=0)
+		if ((in2=has_buff(co, SK_HEAL))!=0)
 		{
 			// Each stack of heal sickness reduces the spell power by 1/4th
 			tmp = 4 - bu[in2].data[1];
@@ -2359,32 +2359,32 @@ void item_info(int cn, int in, int look)
 	// if (!look) {
 	do_char_log(cn, 1, "%s:\n", it[in].name);
 	// }
-	do_char_log(cn, 1, "Stat         Mod0 Mod1 Min\n");
+	do_char_log(cn, 1, "Stat          Mod0   Mod1   Min\n");
 	for (n = 0; n<5; n++)
 	{
 		if (!it[in].attrib[n][0] && !it[in].attrib[n][1] && !it[in].attrib[n][2])
 		{
 			continue;
 		}
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
 		at_name[n], it[in].attrib[n][0], it[in].attrib[n][1], it[in].attrib[n][2]);
 	}
 
 	if (it[in].hp[0] || it[in].hp[1] || it[in].hp[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
 		"Hitpoints", it[in].hp[0], it[in].hp[1], it[in].hp[2]);
 	}
 
 	if (it[in].end[0] || it[in].end[1] || it[in].end[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
 		"Endurance", it[in].end[0], it[in].end[1], it[in].end[2]);
 	}
 
 	if (it[in].mana[0] || it[in].mana[1] || it[in].mana[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
 		"Mana", it[in].mana[0], it[in].mana[1], it[in].mana[2]);
 	}
 
@@ -2394,126 +2394,131 @@ void item_info(int cn, int in, int look)
 		{
 			continue;
 		}
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d %3d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
 		skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1], it[in].skill[n][2]);
 	}
-
-	if (it[in].weapon[0] || it[in].weapon[1])
-	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
-		"Weapon Value", it[in].weapon[0], it[in].weapon[1]);
-	}
+	
 	if (it[in].armor[0] || it[in].armor[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Armor Value", it[in].armor[0], it[in].armor[1]);
+	}
+	if (it[in].weapon[0] || it[in].weapon[1])
+	{
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+		"Weapon Value", it[in].weapon[0], it[in].weapon[1]);
+	}
+	if (it[in].base_crit)
+	{
+		do_char_log(cn, 1, "%-12.12s  %4d%%\n",
+		"Base Crit", it[in].base_crit);
 	}
 	
 	if (it[in].to_hit[0] || it[in].to_hit[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Hit Bonus", it[in].to_hit[0], it[in].to_hit[1]);
 	}
 	if (it[in].to_parry[0] || it[in].to_parry[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Parry Bonus", it[in].to_parry[0], it[in].to_parry[1]);
 	}
 	if (it[in].crit_chance[0] || it[in].crit_chance[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
-		"Crit Rate", it[in].crit_chance[0], it[in].crit_chance[1]);
+		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d\n",
+		"Crit Bonus", it[in].crit_chance[0], it[in].crit_chance[1]);
 	}
 	if (it[in].crit_multi[0] || it[in].crit_multi[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d\n",
 		"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
 	}
 	if (it[in].top_damage[0] || it[in].top_damage[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Top Damage", it[in].top_damage[0], it[in].top_damage[1]);
 	}
 	if (it[in].gethit_dam[0] || it[in].gethit_dam[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Reflect", it[in].gethit_dam[0], it[in].gethit_dam[1]);
 	}
 	
 	if (it[in].speed[0] || it[in].speed[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"All Speed", it[in].speed[0], it[in].speed[1]);
 	}
 	if (it[in].move_speed[0] || it[in].move_speed[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Move Speed", it[in].move_speed[0], it[in].move_speed[1]);
 	}
 	if (it[in].atk_speed[0] || it[in].atk_speed[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Atk Speed", it[in].atk_speed[0], it[in].atk_speed[1]);
 	}
 	if (it[in].cast_speed[0] || it[in].cast_speed[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Cast Speed", it[in].cast_speed[0], it[in].cast_speed[1]);
 	}
 	
 	if (it[in].spell_mod[0] || it[in].spell_mod[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Spell Mod", it[in].spell_mod[0], it[in].spell_mod[1]);
 	}
 	if (it[in].spell_apt[0] || it[in].spell_apt[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Spell Apt", it[in].spell_apt[0], it[in].spell_apt[1]);
 	}
 	if (it[in].cool_bonus[0] || it[in].cool_bonus[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Cooldown", it[in].cool_bonus[0], it[in].cool_bonus[1]);
 	}
 	
 	if (it[in].light[0] || it[in].light[1])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Glow", it[in].light[0], it[in].light[1]);
 	}
 	
 	if (it[in].data[2])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d (%+4d/s)\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"HP Regen", it[in].data[2], it[in].data[2]/max(1, it[in].duration/TICKS));
 	}
 	if (it[in].data[3])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d (%+4d/s)\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"End Regen", it[in].data[3], it[in].data[3]/max(1, it[in].duration/TICKS));
 	}
 	if (it[in].data[4])
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d (%+4d/s)\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"Mana Regen", it[in].data[4], it[in].data[4]/max(1, it[in].duration/TICKS));
 	}
 	
-	if (it[in].duration)
+	if (it[in].duration>0)
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d seconds\n",
+		do_char_log(cn, 1, "%-12.12s  %4d seconds\n",
 		"Duration", it[in].duration/TICKS);
 	}
 	
 	if (it[in].power)
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %4d\n",
 		"Item Power", it[in].power);
 	}
 
 	if (it[in].min_rank)
 	{
-		do_char_log(cn, 1, "%-12.12s %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %4d\n",
 		"Min. Rank", it[in].min_rank);
 	}
 }
@@ -2850,7 +2855,7 @@ void skill_repair(int cn)
 		// Repair - option 2: just make a new item
 		else
 		{
-			in2 = god_create_item(it[in].temp, 0);
+			in2 = god_create_item(it[in].temp);
 			if (!in2)
 			{
 				do_char_log(cn, 0, "You failed.\n");
@@ -2937,7 +2942,7 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
 	}
 	else		// Buff version
 	{
-		power = spellpower_check(cn, co, power);
+		power = spellpower_check(cn, co, power, 0);
 		
 		if (!(in = make_new_buff(cn, SK_DISPEL, BUF_SPR_IMMUNI, power, SP_DUR_DISPEL, 0))) 
 			return 0;
@@ -2954,9 +2959,9 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
 void skill_dispel(int cn)
 {
 	int in, co, n, m, base_pow, power, ail_pow = 0, success = 0, chanc, flag;
-	int ail[DISPEL_MAX];
+	int ail[DISPEL_MAX] = {0};
 	int d20 = 12;
-	int sto[DISPEL_STORE];
+	int sto[DISPEL_STORE] = {0};
 
 	if ((co = ch[cn].skill_target1)) { ; }
 	else { co = cn; }
@@ -3421,7 +3426,7 @@ void skill_ghost(int cn)
 
 void skill_shadow(int cn)
 {
-	int co, cc, cz, n, base = 0, m, idx, in, cost, tmp;
+	int co, cc, cz, n, m, base = 0, idx, in, cost, tmp;
 	int w = 0, powlimit = 250, necronomicon = 0;
 
 	if (IS_BUILDING(cn))
@@ -3568,7 +3573,12 @@ void skill_shadow(int cn)
 	for (n = 0; n<5; n++)
 	{
 		ch[cc].attrib[n][0] = ch[cn].attrib[n][0];
-		ch[cc].attrib[n][1] = ch[cn].attrib[n][1] + get_attrib_score(cn, n) - ch[cn].attrib[n][0];
+		ch[cc].attrib[n][1] = ch[cn].attrib[n][1] + get_attrib_score(cn, n);
+	m = ch[cc].attrib[n][1] - ch[cn].attrib[n][0];
+		if (m<=0)
+			ch[cc].attrib[n][1] = 0;
+		else
+			ch[cc].attrib[n][1] = m;
 	}
 	// For skills, we do the same. The extra step here removes the skill mods from the skills.
 	//  in really_update_char these mods get re-added back again, so it should be identical to owner.
@@ -3584,11 +3594,15 @@ void skill_shadow(int cn)
 		}
 		
 		// set the skill score
-		ch[cc].skill[n][0]  =  ch[cn].skill[n][0];
-		ch[cc].skill[n][1]  =  ch[cn].skill[n][1] + get_skill_score(cn, n) - ch[cn].skill[n][0];
-		ch[cc].skill[n][1] -=  (get_attrib_score(cn, skilltab[n].attrib[0]) +
+		ch[cc].skill[n][0] =    ch[cn].skill[n][0];
+		ch[cc].skill[n][1] =    ch[cn].skill[n][1] + get_skill_score(cn, n) - ch[cn].skill[n][0];
+	m = ch[cc].skill[n][1] -   (get_attrib_score(cn, skilltab[n].attrib[0]) +
 								get_attrib_score(cn, skilltab[n].attrib[1]) +
 								get_attrib_score(cn, skilltab[n].attrib[2])) / 5;
+		if (m<=0)
+			ch[cc].skill[n][1] = 0;
+		else
+			ch[cc].skill[n][1] = m;
 	}
 	
 	// Copy the owner's weapon skill by checking their weapon.
@@ -3954,9 +3968,9 @@ int spell_pulse(int cn, int co, int power)
 		baselen = 90;
 	}
 	
-	len = SK_EXH_PULSE * baselen / max(100, ch[cn].cool_bonus);
+	len = (SK_EXH_PULSE/2) * baselen / max(100, ch[cn].cool_bonus);
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn));
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
 	
 	if (!(in = make_new_buff(cn, SK_PULSE, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
 		return 0;
@@ -3999,11 +4013,18 @@ int spell_taunt(int cn, int co, int power, int flag)
 }
 int spell_guard(int cn, int co, int power)
 {
-	int in;
+	int in, dur;
 	
-	//power = spellpower_check(cn, co, power);
+	dur = SP_DUR_GUARD;
 	
-	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, SP_DUR_GUARD, 0))) 
+	// Tarot - Temperance - 30% less power, 100% more duration
+	if (get_tarot(cn, IT_CH_TEMPER))
+	{
+		power = power * 70/100;
+		dur   = dur * 2;
+	}
+	
+	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, dur, 0))) 
 		return 0;
 	
 	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_GUARD)
@@ -4060,26 +4081,167 @@ void skill_taunt(int cn)
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
 
-#define LEAP_COUNT	3
-
-// Leap teleports behind the enemy/enemies in front of you, damaging them
+// Leap teleports behind your target, damaging them and the enemy you're fighting
 // Escapes combat in the process
 // Gets bonus damage from attack speed score
 void skill_leap(int cn)
 {
-	int power, cost, tmp;
-	int co[LEAP_COUNT], cc = 1, n, dam;
+	int power, cost, cost_dist, cost_pow, tmp;
+	int co, ca, cc, n, dam;
 	int x, y, m, md, obstructed = 0, newdir = 0;
 	
 	power = get_skill_score(cn, SK_LEAP) + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 4;
 	
-	cost = (power * 2) / 30 + 6;
+	// we leap behind 'co' and damage both 'ca' and 'co' in the process
+	if (!(co = get_target(cn, 0, 0, 0, 0, SK_LEAP, 0, power, 0)))
+		return;
+	if (ca = ch[cn].attack_cn) ;
+	else ca = co;
+	
+	if (ca==cn)
+	{
+		do_char_log(cn, 0, 
+		"You cannot leap on yourself!\n");
+	}
+	
+	if (!do_char_can_see(cn, ca))
+	{
+		do_char_log(cn, 0, "You cannot see your target.\n");
+		return 0;
+	}
+	
+	if (ch[ca].flags & CF_STONED)
+	{
+		do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
+		return 0;
+	}
+	
+	// Set up map specific variables to scope surroundings
+	x = ch[co].x;
+	y = ch[co].y;
+	m = XY2M(x, y);
+	if (ch[co].dir==DX_DOWN)	md = -MAPX;
+	if (ch[co].dir==DX_UP)		md =  MAPX;
+	if (ch[co].dir==DX_RIGHT)	md = -1;
+	if (ch[co].dir==DX_LEFT)	md =  1;
+	newdir = ch[co].dir;
+	
+	// Check for obstructions
+	if (map[m + md*(n+1)].to_ch || 
+		(map[m + md*(n+1)].it && (it[map[m + md*(n+1)].it].flags & IF_MOVEBLOCK)) || 
+		(map[m + md*(n+1)].flags & MF_MOVEBLOCK))
+	{
+		co = ca;
+		
+		// try again with local target instead
+		x = ch[co].x;
+		y = ch[co].y;
+		m = XY2M(x, y);
+		if (ch[co].dir==DX_DOWN)	md = -MAPX;
+		if (ch[co].dir==DX_UP)		md =  MAPX;
+		if (ch[co].dir==DX_RIGHT)	md = -1;
+		if (ch[co].dir==DX_LEFT)	md =  1;
+		newdir = ch[co].dir;
+		
+		// Check for obstructions
+		if (map[m + md*(n+1)].to_ch || 
+		(map[m + md*(n+1)].it && (it[map[m + md*(n+1)].it].flags & IF_MOVEBLOCK)) || 
+		(map[m + md*(n+1)].flags & MF_MOVEBLOCK))
+		{
+			obstructed = 1;
+		}
+		else
+		{
+			x = (m + md*(n+1)) % MAPX;
+			y = (m + md*(n+1)) / MAPX;
+		}
+	}
+	else
+	{
+		x = (m + md*(n+1)) % MAPX;
+		y = (m + md*(n+1)) / MAPX;
+	}
+	
+	cost_dist = sqrt(abs(ch[cn].x - x)*abs(ch[cn].x - x) + abs(ch[cn].y - y)*abs(ch[cn].y - y)) + (power/36+5);
+	cost_pow  = (power * 2) / 36 + 6;
+	
+	cost = (cost_dist > cost_pow) ? cost_dist : cost_pow;
 	
 	if (!(ch[cn].flags & CF_PLAYER)) 
 	{
 		cost = cost*3/2;
 	}
 	
+	if (spellcost(cn, cost, SK_LEAP, 0)) return;
+	
+	if (ca!=co && !obstructed)
+	{
+		chlog(cn, "Used Leap on %s and %s", ch[co].name, ch[ca].name);
+		// Damage Fight target (ca)
+		dam = spell_immunity(power, ch[ca].to_parry) * 2;
+		tmp = do_hurt(cn, ca, dam, 5);
+		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[ca].reference);
+		else
+		{
+			do_char_log(cn, 1, "You sliced %s for %d HP.\n", ch[ca].reference, tmp);
+			do_char_log(ca, 1, "%s sliced you for %d HP.\n", ch[cn].name, tmp);
+		}
+		do_area_sound(ca, 0, ch[ca].x, ch[ca].y, ch[cn].sound + 24);
+		fx_add_effect(5, 0, ch[ca].x, ch[ca].y, 0);
+		// Damage leap target (co)
+		dam = spell_immunity(power, ch[co].to_parry) * 2;
+		tmp = do_hurt(cn, co, dam, 5);
+		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+		else
+		{
+			do_char_log(cn, 1, "You sliced %s for %d HP.\n", ch[co].reference, tmp);
+			do_char_log(co, 1, "%s sliced you for %d HP.\n", ch[cn].name, tmp);
+		}
+		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		
+	}
+	else
+	{
+		chlog(cn, "Used Leap on %s", ch[ca].name);
+		// Damage
+		dam = spell_immunity(power, ch[ca].to_parry) * 3;
+		tmp = do_hurt(cn, ca, dam, 5);
+		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[ca].reference);
+		else
+		{
+			do_char_log(cn, 1, "You sliced %s for %d HP.\n", ch[ca].reference, tmp);
+			do_char_log(ca, 1, "%s sliced you for %d HP.\n", ch[cn].name, tmp);
+		}
+		do_area_sound(ca, 0, ch[ca].x, ch[ca].y, ch[cn].sound + 24);
+		fx_add_effect(5, 0, ch[ca].x, ch[ca].y, 0);
+	}
+	char_play_sound(co, ch[cn].sound + 24, -50, 0);
+	
+	if (!obstructed)
+	{
+		cc = ch[cn].attack_cn;
+		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, x, y);
+		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+		ch[cn].escape_timer = TICKS*3;
+		for (m = 0; m<4; m++)
+		{
+			ch[cn].enemy[m] = 0;
+		}
+		remove_enemy(cn);
+		if (cc)
+		{
+			ch[cn].dir = newdir;
+			ch[cn].attack_cn = co;
+		}
+	}
+	
+	add_exhaust(cn, SK_EXH_LEAP);
+	
+	/* Old leap
+	#define LEAP_COUNT	3
+	int co[LEAP_COUNT], cc = 1, n, dam;
 	// Get (first) hit target - return on failure
 	if (!(co[0] = get_target(cn, 0, 0, 0, cost, SK_LEAP, 0, power, 0)))
 		return;
@@ -4157,27 +4319,7 @@ void skill_leap(int cn)
 		do_area_sound(co[n], 0, ch[co[n]].x, ch[co[n]].y, ch[cn].sound + 24);
 		fx_add_effect(5, 0, ch[co[n]].x, ch[co[n]].y, 0);
 	}
-	
-	if (!obstructed)
-	{
-		cc = ch[cn].attack_cn;
-		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
-		god_transfer_char(cn, x, y);
-		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
-		ch[cn].escape_timer = TICKS*3;
-		for (m = 0; m<4; m++)
-		{
-			ch[cn].enemy[m] = 0;
-		}
-		remove_enemy(cn);
-		if (cc)
-		{
-			ch[cn].dir = newdir;
-			ch[cn].attack_cn = co[max(0,n-1)];
-		}
-	}
-	
-	add_exhaust(cn, SK_EXH_LEAP);
+	*/
 }
 
 // Razor grants a stacking debuff to hits, dealing additional damage when it expires
@@ -4196,14 +4338,14 @@ int spell_razor(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_RAZOR2, BUF_SPR_RAZOR2, power, TICKS, 0))) 
 			return 0;
 		
-		bu[in].data[3] = bu[in].data[2] = bu[in].data[1] = 0;
+		bu[in].data[2] = bu[in].data[1] = 0;
 		bu[in].data[4] = 1; // Effects not removed by NMZ (SK_RAZOR2)
 		
 		return add_spell(co, in); // SK_RAZOR2
 	}
 	else		// Buff version
 	{
-		power = spellpower_check(cn, co, spell_multiplier(power, cn));
+		power = spell_multiplier(power, cn);
 		
 		if (!(in = make_new_buff(cn, SK_RAZOR, BUF_SPR_RAZOR, power, SP_DUR_RAZOR, 0))) 
 			return 0;
@@ -4221,7 +4363,7 @@ void skill_razor(int cn)
 
 	power = get_skill_score(cn, SK_RAZOR) + ch[cn].weapon / 4;
 
-	spell_razor(cn, cn, get_skill_score(cn, SK_RAZOR), 0);
+	spell_razor(cn, cn, power, 0);
 
 	add_exhaust(cn, SK_EXH_RAZOR);
 }

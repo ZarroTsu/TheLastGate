@@ -1400,6 +1400,8 @@ void view_object(LIST *head)
 			IF_BOOK, (it_temp[in].flags & IF_BOOK) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Magic<br>\n",
 			IF_MAGIC, (it_temp[in].flags & IF_MAGIC) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Gemstone<br>\n",
+			IF_GEMSTONE, (it_temp[in].flags & IF_GEMSTONE) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Misc<br>\n",
 			IF_MISC, (it_temp[in].flags & IF_MISC) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Claw<br>\n",
@@ -1497,6 +1499,8 @@ void view_object(LIST *head)
 			it_temp[in].armor[0], it_temp[in].armor[1]);
 	printf("<tr><td>Weapon:</td><td><input type=text name=weapon_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=weapon_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].weapon[0], it_temp[in].weapon[1]);
+	printf("<tr><td>Base Crit:</td><td><input type=text name=base_crit value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it_temp[in].base_crit);
 			
 	// New Meta Stuff
 	printf("<tr><td>Base Speed:</td><td><input type=text name=speed_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=speed_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
@@ -1696,6 +1700,8 @@ void view_item(LIST *head)
 			IF_MAGIC, (it[in].flags & IF_MAGIC) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Misc<br>\n",
 			IF_MISC, (it[in].flags & IF_MISC) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Gemstone<br>\n",
+			IF_GEMSTONE, (it[in].flags & IF_GEMSTONE) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Claw<br>\n",
 			IF_WP_CLAW, (it[in].flags & IF_WP_CLAW) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Dagger<br>\n",
@@ -1791,6 +1797,8 @@ void view_item(LIST *head)
 			it[in].armor[0], it[in].armor[1]);
 	printf("<tr><td>Weapon:</td><td><input type=text name=weapon_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=weapon_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].weapon[0], it[in].weapon[1]);
+	printf("<tr><td>Base Crit:</td><td><input type=text name=base_crit value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it[in].base_crit);
 			
 	// New Meta Stuff
 	printf("<tr><td>Base Speed:</td><td><input type=text name=speed_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=speed_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
@@ -3511,6 +3519,17 @@ void update_object(LIST *head)
 	}
 	
 	// New Meta Stuff
+	tmp = find_val(head, "base_crit");
+	if (tmp)
+	{
+		it_temp[in].base_crit = atoi(tmp);
+	}
+	else
+	{
+		printf("BASE_CRIT not specified.\n");
+		return;
+	}
+	
 	tmp = find_val(head, "speed_1");
 	if (tmp)
 	{
@@ -4181,7 +4200,66 @@ void list_objects(LIST *head)
 
 	printf("</table></center>\n");
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+}
 
+void list_objects_gear(LIST *head)
+{
+	int n;
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+
+	printf("<center><table>\n");
+
+	for (n = 1; n<MAXTITEM; n++)
+	{
+		if (it_temp[n].used==USE_EMPTY)
+		{
+			continue;
+		}
+		if (!(it_temp[n].flags & IF_SELLABLE))
+		{
+			continue;
+		}
+
+		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
+				"<td><font size=2>pr: %dG, %dS</font></td><td><font size=2>da0: %d</font></td><td><font size=2>da1: %d</font></td><td><font size=2>da2: %d</font></td><td><font size=2>da3: %d</font></td><td><font size=2>da4: %d</font></td>\n"
+				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
+				n, n, it_temp[n].name,
+				it_temp[n].value / 100, it_temp[n].value % 100, it_temp[n].data[0], it_temp[n].data[1], it_temp[n].data[2], it_temp[n].data[3], it_temp[n].data[4],
+				n, n, n);
+	}
+
+	printf("</table></center>\n");
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+}
+
+void list_objects_crit(LIST *head)
+{
+	int n;
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+
+	printf("<center><table>\n");
+
+	for (n = 1; n<MAXTITEM; n++)
+	{
+		if (it_temp[n].used==USE_EMPTY)
+		{
+			continue;
+		}
+		if (!(it_temp[n].crit_chance[0]))
+		{
+			continue;
+		}
+
+		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
+				"<td><font size=2>pr: %dG, %dS</font></td><td><font size=2>da0: %d</font></td><td><font size=2>da1: %d</font></td><td><font size=2>da2: %d</font></td><td><font size=2>da3: %d</font></td><td><font size=2>da4: %d</font></td>\n"
+				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
+				n, n, it_temp[n].name,
+				it_temp[n].value / 100, it_temp[n].value % 100, it_temp[n].data[0], it_temp[n].data[1], it_temp[n].data[2], it_temp[n].data[3], it_temp[n].data[4],
+				n, n, n);
+	}
+
+	printf("</table></center>\n");
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
 }
 
 void list_items(LIST *head)
@@ -4397,10 +4475,13 @@ int main(int argc, char *args[])
 		save_character_player(head);
 		break;
 	case 30:
-		list_characters_template_pugilism(head);
+		list_objects_gear(head);
 		break;
 	case 31:
 		list_object_drivers(head);
+		break;
+	case 32:
+		list_objects_crit(head);
 		break;
 	case 41:
 		list_characters2_template(head);
@@ -4418,11 +4499,12 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=16>Characters (only with Positive Alignment) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=17>Characters (only Named) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=18>Characters (Non Monster) </a><br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=30>Characters (With sk-1) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=41>Characters (only Grolms, Gargoyles, Icegargs) </a><br><br>\n");
 		printf("This list includes only characters with high IDs for fast access<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=51>New characters (only if they got a high ID)</a><br><br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=21>Object Templates</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=21>Object Templates (All)</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=30>Object Templates (Sellable)</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=32>Object Templates (Have crit_chance)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");

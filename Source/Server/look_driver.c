@@ -110,7 +110,6 @@ void look_extra(int cn, int in)
 	
 	switch (it[in].temp)
 	{
-	
 	// -------- TOWER ITEMS --------
 	
 	case IT_TW_CROWN: // Crown of the First King
@@ -209,6 +208,12 @@ void look_extra(int cn, int in)
 	case BUF_IT_MANA: 
 		do_char_log(cn, 3, "Grants 15%% reduced mana costs for its duration.\n");
 		break;
+	case IT_POT_OFF: 
+		do_char_log(cn, 3, "Grants 10%% more damage dealt for its duration.\n");
+		break;
+	case IT_POT_DEF: 
+		do_char_log(cn, 3, "Grants 10%% less damage taken for its duration.\n");
+		break;
 	
 	// -------- BOOK  ITEMS --------
 	
@@ -280,7 +285,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, reduces your action speed by 20%%, but grants 25%% more damage with melee attacks.\n");
 		break;
 	case IT_CH_HERMIT: 
-		do_char_log(cn, 3, "When equipped, 10%% more Armor Value, 10%% less Resistance and Immunity.\n");
+		do_char_log(cn, 3, "When equipped, 15%% more Armor Value, 10%% less Resistance and Immunity.\n");
 		break;
 	case IT_CH_WHEEL: 
 		do_char_log(cn, 3, "When equipped, your critical hit chance is halved, but your critical hit damage is doubled.\n");
@@ -513,6 +518,37 @@ void look_spell_scroll(int cn, int in)
 	do_char_log(cn, 1, "There are %d charge%s left.\n", n, (n==1 ? "s" : ""));
 }
 
+void look_soulstone(int cn, int in)
+{
+	int t, nt=0;
+	char *tag_name[N_SOULTAGS];
+	
+	if (it[in].data[2])
+	{
+		do_char_log(cn, 2, "Has a focus of %d.\n", it[in].data[2]);
+	}
+	
+	for (t=0;t<N_SOULTAGS;t++)
+	{
+		if (it[in].data[t+3]>0)
+		{
+			tag_name[nt] = get_soulname(it[in].data[t+3]);
+			nt++;
+		}
+	}
+	
+	if (nt)
+	{
+		do_char_log(cn, 1, "This stone has the following tags:\n");
+		for (t=0;t<nt;t++)
+		{
+			do_char_log(cn, 2, "%d. %s:\n", t+1, tag_name[t]);
+		}
+	}
+	
+	look_item_details(cn, in);
+}
+
 void look_driver(int cn, int in)
 {
 	switch(it[in].driver)
@@ -529,6 +565,9 @@ void look_driver(int cn, int in)
 		break;
 	case    48:
 		look_spell_scroll(cn, in);
+		break;
+	case    68:
+		look_soulstone(cn, in);
 		break;
 	default:
 		xlog("Unknown look_driver %d", it[in].driver);

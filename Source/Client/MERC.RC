@@ -30,7 +30,7 @@ FONT 8, "MS Sans Serif"
  AUTORADIOBUTTON "Templar", IDC_TEMP, 176, 104, 60, 12
  AUTORADIOBUTTON "Mercenary", IDC_MERC, 176, 116, 60, 12
  AUTORADIOBUTTON "Harakim", IDC_HARA, 176, 128, 60, 12
- AUTORADIOBUTTON "Null", IDC_ARCH, 176, 143, 60, 12
+ AUTORADIOBUTTON "Null", IDC_ARCH, 176, 143, 100, 12
  //AUTORADIOBUTTON "Arch-Templar", IDC_ARCHTEMPLAR, 176, 96, 60, 12
  //AUTORADIOBUTTON "Brawler", IDC_PUGILIST, 176, 108, 60, 12
  //AUTORADIOBUTTON "Warrior", IDC_WARRIOR, 176, 132, 60, 12
@@ -55,8 +55,8 @@ FONT 8, "MS Sans Serif"
  CHECKBOX "Dark GUI", IDC_DODARKMODE, 176, 209, 60, 12
 }
 1 VERSIONINFO 
-FILEVERSION 1, 0, 0, 0
-PRODUCTVERSION 1, 0, 0, 0
+FILEVERSION 0, 6, 2, 0
+PRODUCTVERSION 0, 6, 2, 0
 FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
 FILEOS VOS_DOS_WINDOWS16
 FILETYPE VFT_APP
@@ -68,12 +68,12 @@ FILETYPE VFT_APP
    VALUE "CompanyName", "n/a\000"
    VALUE "Author", "Zachary 'ZarroTsu' Baillie\000"
    VALUE "FileDescription", "The Last Gate\000"
-   VALUE "FileVersion", "0.1.0\000"
+   VALUE "FileVersion", "0.6.2\000"
    VALUE "InternalName", "TLG\000"
    VALUE "LegalCopyright", "Copyright \251 D.Brockhaus 1997-2001\000"
    VALUE "OriginalFilename", "THELASTGATE.EXE\000"
    VALUE "ProductName", "The Last Gate\000"
-   VALUE "ProductVersion", "0.1.0\000"
+   VALUE "ProductVersion", "0.6.2\000"
    VALUE "Comments", "Beta Test Version\000"
   }
 
@@ -82,12 +82,12 @@ FILETYPE VFT_APP
    VALUE "CompanyName", "n/a\000"
    VALUE "Author", "Zachary 'ZarroTsu' Baillie\000"
    VALUE "FileDescription", "The Last Gate\000"
-   VALUE "FileVersion", "0.1.0\000"
+   VALUE "FileVersion", "0.6.2\000"
    VALUE "InternalName", "TLG\000"
    VALUE "LegalCopyright", "Copyright \251 D.Brockhaus 1997-2001\000"
    VALUE "OriginalFilename", "THELASTGATE.EXE\000"
    VALUE "ProductName", "The Last Gate\000"
-   VALUE "ProductVersion", "0.1.0\000"
+   VALUE "ProductVersion", "0.6.2\000"
    VALUE "Comments", "Beta Test Version\000"
   }
 

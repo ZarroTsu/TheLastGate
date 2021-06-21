@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current server version is 0.6.1\n"};
+static char intro_msg3[] = {"Current client/server version is 0.6.3\n"};
 static char intro_msg4_font = 0;
-static char intro_msg4[] = {"OLD CHARACTER EXP HAS BEEN RESET! Make sure you reallocate your exp before heading out!\n"};
+static char intro_msg4[] = {"OLD CHARACTER EXP WAS RESET JUNE 12th! Make sure you reallocate your exp before heading out!\n"};
 static char intro_msg5_font = 1;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -590,7 +590,7 @@ void plr_cmd_inv(int nr)
 				it[in].stack--;
 				it[in].value = tmpv * it[in].stack;
 				
-				tmp = god_create_item(it[in].temp, 0);
+				tmp = god_create_item(it[in].temp);
 				
 				//it[tmp].x = 0;
 				//it[tmp].y = 0;
@@ -614,7 +614,7 @@ void plr_cmd_inv(int nr)
 				it[tmp].stack--;
 				it[tmp].value = tmpv * it[tmp].stack;
 				
-				in = god_create_item(it[tmp].temp, 0);
+				in = god_create_item(it[tmp].temp);
 				
 				//it[in].x = 0;
 				//it[in].y = 0;
@@ -1713,30 +1713,30 @@ void plr_newlogin(int nr)
 	// grant additional minor potions to start
 	if (temp==CT_TEMP_M || temp==CT_TEMP_F)
 	{
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN); god_give_char(in, cn);
 	}
 	else if (temp==CT_MERC_M || temp==CT_MERC_F)
 	{
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_EN, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_EN); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP); god_give_char(in, cn);
 	}
 	else if (temp==CT_HARA_M || temp==CT_HARA_F)
 	{
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_HP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
-		in = god_create_item(IT_POT_M_MP, 0); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_HP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP); god_give_char(in, cn);
+		in = god_create_item(IT_POT_M_MP); god_give_char(in, cn);
 	}
 	
 	plog(nr, "Created new character");
@@ -1987,22 +1987,6 @@ void plr_logout(int cn, int nr, int reason)
 				do_char_log(cn, 0, "Your belongings dropped to the ground where you stood.\n");
 				do_char_killed(0, cn, 0);
 			}
-			/*
-			else
-			{
-				do_char_log(cn, 0, " \n");
-				if (ch[cn].gold / 10>0)
-				{
-					do_char_log(cn, 0, "A demon grabs your purse and removes %dG, %dS.\n", (ch[cn].gold / 10) / 100, (ch[cn].gold / 10) % 100);
-				}
-				ch[cn].gold -= ch[cn].gold / 10;
-				if ((in = ch[cn].citem) && (in & 0x80000000))
-				{
-					do_char_log(cn, 0, "The demon also takes the money in your hand.\n");
-					ch[cn].citem = 0;
-				}
-			}
-			*/
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 2, "%s left the game without saying goodbye.\n", ch[cn].name);
 		}
 
@@ -2024,7 +2008,7 @@ void plr_logout(int cn, int nr, int reason)
 		{
 			if (abs(ch[cn].x - ch[cn].temple_x) + abs(ch[cn].y - ch[cn].temple_y)>10 && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_NOLAG))
 			{
-				in = god_create_item(IT_LAGSCROLL, 0);
+				in = god_create_item(IT_LAGSCROLL);
 				it[in].data[0] = ch[cn].x;
 				it[in].data[1] = ch[cn].y;
 				it[in].data[2] = globs->ticker;
@@ -3131,8 +3115,8 @@ void plr_change(int nr)
 			p += 2;
 			*(unsigned short*)(buf + p) = smap[n].ch_id;
 			p += 2;
-			*(unsigned char*)(buf + p) = smap[n].ch_speed;
-			p += 1;
+			*(short int*)(buf + p) = smap[n].ch_speed;
+			p += 2;
 		}
 
 		if (cmap[n].ch_proz!=smap[n].ch_proz)
@@ -3140,12 +3124,12 @@ void plr_change(int nr)
 			buf[1] |= 128;
 			*(unsigned char*)(buf + p) = smap[n].ch_proz;
 			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_castspd;
-			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_atkspd;
-			p += 1;
-			*(unsigned char*)(buf + p) = smap[n].ch_movespd;
-			p += 1;
+			*(short int*)(buf + p) = smap[n].ch_castspd;
+			p += 2;
+			*(short int*)(buf + p) = smap[n].ch_atkspd;
+			p += 2;
+			*(short int*)(buf + p) = smap[n].ch_movespd;
+			p += 2;
 			*(unsigned char*)(buf + p) = smap[n].ch_fontcolor;
 			p += 1;
 		}
@@ -3652,7 +3636,7 @@ void plr_getmap_complete(int nr)
 				}
 				// Sending packets for speed bonuses.
 				// Used by local client to render frames correctly.
-				smap[n].ch_atkspd = ch[co].atk_speed;
+				smap[n].ch_atkspd  = ch[co].atk_speed;
 				smap[n].ch_castspd = ch[co].cast_speed;
 				smap[n].ch_movespd = ch[co].move_speed;
 				if (ch[co].flags & CF_EXTRAEXP)

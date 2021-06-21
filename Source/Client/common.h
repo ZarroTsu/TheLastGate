@@ -123,13 +123,13 @@ struct cmap {
 	unsigned short ch_sprite;		// basic sprite of character
 	unsigned char ch_status;		// what the character is doing, animation-wise
 	unsigned char ch_stat_off;
-	unsigned char ch_speed;			// speed of animation
+	short int ch_speed;				// speed of animation
 	unsigned short ch_nr;			// character id
 	unsigned short ch_id;			// character 'crc'
 	unsigned char ch_proz;
-	unsigned char ch_castspd;		// animation speed bonus for misc. actions (casting)
-	unsigned char ch_atkspd;		// animation speed bonus for attacking
-	unsigned char ch_movespd;		// animation speed bonus for walking
+	short int ch_castspd;			// animation speed bonus for misc. actions (casting)
+	short int ch_atkspd;			// animation speed bonus for attacking
+	short int ch_movespd;			// animation speed bonus for walking
 	unsigned char ch_fontcolor;		// overhead text font color. 1 = red, 0 = yellow, green/blue same as server
 
 	// for item

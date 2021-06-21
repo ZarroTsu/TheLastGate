@@ -725,27 +725,6 @@ struct know
 #define SP_MOVE_W      	26
 #define SP_TAROT		27
 #define SP_TAROT2		28
-
-// Stronghold
-/*
-#define SP_BUY_GOLD    		601
-#define SP_BUY_EXP    		602
-#define SP_BUY_HEAL 		603
-#define SP_BUY_MANA   		604
-#define SP_BUY_END   		605
-#define SP_BUY_GHEAL 		606
-#define SP_BUY_GMANA   		607
-#define SP_BUY_GEND   		608
-#define SP_BUY_RATLING 		609
-#define SP_BUY_GREENLING   	610
-#define SP_BUY_DREADLING   	611
-#define SP_BUY_WEAPON1   	612
-#define SP_BUY_WEAPON2   	613
-#define SP_BUY_WEAPON3   	614
-#define SP_BUY_HELMET   	615
-#define SP_BUY_ARMOR	   	616
-*/
-
 //}
 
 // Knowledge table - the big one that handles everything
@@ -1166,43 +1145,6 @@ struct know know[] = {
 	{{"!north",  "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_NORT,   0},
 	{{"!center", "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_CENT,   0},
 	{{"!south",  "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_SOUT,   0},
-	// Black Stronghold Special Answers
-	/*
-	{{"!table",                            "?", NULL}, 0,   AR_STHOLD, 372, NULL, SP_TABLE},
-	{{"!buy", "!money",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GOLD},
-	{{"!buy", "!gold",                          NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GOLD},
-	{{"!buy", "!experience",                    NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_EXP},
-	{{"!buy", "!exp",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_EXP},
-	{{"!buy", "!health",                        NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HEAL},
-	{{"!buy", "!healing",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HEAL},
-	{{"!buy", "!heal",                          NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HEAL},
-	{{"!buy", "!mana",                          NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_MANA},
-	{{"!buy", "!endurance",                     NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_END},
-	{{"!buy", "!end",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_END},
-	{{"!buy", "!ghealth",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GHEAL},
-	{{"!buy", "!ghealing",                      NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GHEAL},
-	{{"!buy", "!gheal",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GHEAL},
-	{{"!buy", "!gmana",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GMANA},
-	{{"!buy", "!gendurance",                    NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GEND},
-	{{"!buy", "!gend",                          NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GEND},
-	{{"!buy", "!ratling",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_RATLING},
-	{{"!buy", "!rat",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_RATLING},
-	{{"!buy", "!greenling",                     NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GREENLING},
-	{{"!buy", "!green",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_GREENLING},
-    {{"!buy", "!sogling",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_DREADLING},
-    {{"!buy", "!sog",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_DREADLING},
-	{{"!buy", "!weapon1",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON1},
-	{{"!buy", "!weap1",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON1},
-	{{"!buy", "!weapon2",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON2},
-	{{"!buy", "!weap2",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON2},
-	{{"!buy", "!weapon3",                       NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON3},
-	{{"!buy", "!weap3",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_WEAPON3},
-	{{"!buy", "!helmet",                        NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HELMET},
-	{{"!buy", "!helm",                          NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HELMET},
-	{{"!buy", "!hat",                           NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_HELMET},
-	{{"!buy", "!armour",                        NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_ARMOR},
-	{{"!buy", "!armor",                         NULL}, 0,   AR_STHOLD, 372, NULL, SP_BUY_ARMOR},
-	*/
 	//}
 	//{ Dieties
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		CT_BISHOP
@@ -2033,30 +1975,9 @@ void answer_time(int cn, int co)
 	        globs->mdyear, globs->mdtime / 3600, (globs->mdtime / 60) % 60);
 }
 
-// Cost table for Black Stronghold Rewards...
-/*
-#define BS_COST_GOLD		   2
-#define BS_COST_EXP			  56
-#define BS_COST_HEAL		   5
-#define BS_COST_MANA		  10
-#define BS_COST_END			  15
-#define BS_COST_GHEAL		  20
-#define BS_COST_GMANA		  40
-#define BS_COST_GEND		  60
-#define BS_COST_RATLING		 400
-#define BS_COST_GREENLING	1600
-#define BS_COST_DREADLING	6400
-#define BS_COST_WEAPON1		  20
-#define BS_COST_WEAPON2		  50
-#define BS_COST_WEAPON3		 125
-#define BS_COST_HELMET		  15
-#define BS_COST_ARMOR		  15
-*/
-// </>
-
-int stronghold_points(int cn)
+int stronghold_points_old(int cn)
 {
-	return(ch[cn].data[26] / 5 	// tier 1
+	return(ch[cn].data[26] / 5 		// tier 1
 			+
 			ch[cn].data[27] 		// tier 2
 			+
@@ -2066,35 +1987,20 @@ int stronghold_points(int cn)
 			-
 			ch[cn].data[41]);		// used points
 }
-/*
-void answer_table(int cn)
+int stronghold_points(int cn)
 {
-	int cnrank = points2rank(ch[cn].points_tot);
-	
-	do_char_log(cn, 1, "Now listing Black Stronghold rewards:\n");
-	do_char_log(cn, 1, " \n");
-	//                 "!        .         .   |     .         .        !"
-	do_char_log(cn, 1, "Say Phrase... |  Cost  | Reward... \n");
-	do_char_log(cn, 1, "--------------+--------+------------------------\n");
-	do_char_log(cn, 1, "BUY GOLD        ALL      %d gold per point\n", BS_COST_GOLD);
-	do_char_log(cn, 1, "BUY EXP         ALL      %d exp per point\n", BS_COST_EXP+2*cnrank);
-	do_char_log(cn, 1, "BUY HEAL         %4d   1 Healing Potion\n", BS_COST_HEAL);
-	do_char_log(cn, 1, "BUY MANA         %4d   1 Mana Potion\n", BS_COST_MANA);
-	do_char_log(cn, 1, "BUY END          %4d   1 Endurance Potion\n", BS_COST_END);
-	do_char_log(cn, 1, "BUY GHEAL        %4d   1 Greater Healing\n", BS_COST_GHEAL);
-	do_char_log(cn, 1, "BUY GMANA        %4d   1 Greater Mana\n", BS_COST_GMANA);
-	do_char_log(cn, 1, "BUY GEND         %4d   1 Greater Endurance\n", BS_COST_GEND);
-	do_char_log(cn, 1, "BUY RATLING      %4d   1 Ratling Eye Essence\n", BS_COST_RATLING);
-	do_char_log(cn, 1, "BUY GREENLING    %4d   1 Greenling Eye Essence\n", BS_COST_GREENLING);
-    do_char_log(cn, 1, "BUY SOGLING      %4d   1 Sogling Eye Essence\n", BS_COST_DREADLING);
-	do_char_log(cn, 1, "BUY WEAPON1      %4d   Magic weapon, +1 skill\n", BS_COST_WEAPON1+BS_COST_WEAPON1*cnrank);
-	do_char_log(cn, 1, "BUY WEAPON2      %4d   Magic weapon, +2 skill\n", BS_COST_WEAPON2+BS_COST_WEAPON2*cnrank);
-	do_char_log(cn, 1, "BUY WEAPON3      %4d   Magic weapon, +3 skill\n", BS_COST_WEAPON3+BS_COST_WEAPON3*cnrank);
-	do_char_log(cn, 1, "BUY HELMET       %4d   Magic helmet\n", BS_COST_HELMET+BS_COST_HELMET*cnrank*2);
-	do_char_log(cn, 1, "BUY ARMOR        %4d   Magic armor\n", BS_COST_ARMOR+BS_COST_ARMOR*cnrank*2);
-	do_char_log(cn, 1, " \n");
+	int p;
+	if (p = stronghold_points_old(cn))
+	{
+		ch[cn].bs_points += p;
+		
+		ch[cn].data[26] = 0;
+		ch[cn].data[27] = 0;
+		ch[cn].data[28] = 0;
+		ch[cn].data[41] = 0;
+	}
+	return ch[cn].bs_points;
 }
-*/
 
 void answer_points(int cn, int co, int nr)
 {
@@ -2102,246 +2008,6 @@ void answer_points(int cn, int co, int nr)
 	pts = stronghold_points(co);
 	do_sayx(cn, know[nr].answer, pts);
 }
-
-// -------- <black stronghold points> -------- //
-/*
-void answer_buy_gold(int cn, int co)
-{
-	int pts; pts = stronghold_points(co);
-	if (pts<1)	{ do_sayx(cn, "But you don't have any points to spend, %s!", ch[co].name); return; }
-	ch[co].data[41] += pts; ch[co].gold += pts * BS_COST_GOLD*100;
-	do_sayx(cn, "There you are, %s. %d gold coins. Thank you for your help!", ch[co].name, pts*BS_COST_GOLD);
-	chlog(co, "bought %d gold from cityguard (%d pts)", pts*BS_COST_GOLD, pts);
-}
-
-void answer_buy_exp(int cn, int co)
-{
-	int corank = points2rank(ch[co].points_tot);
-	int pts; pts = stronghold_points(co);
-	if (pts<1) { do_sayx(cn, "But you don't have any points to spend, %s!", ch[co].name); return; }
-	ch[co].data[41] += pts;	ch[co].points += pts * (BS_COST_EXP+2*corank);	
-	ch[co].points_tot += pts * (BS_COST_EXP+2*corank);	do_check_new_level(co);
-	do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s. Thank you for your help!", ch[co].name);
-	do_char_log(co, 2, "You get %d experience points.\n", pts*(BS_COST_EXP+2*corank));
-	chlog(co, "bought %d exps from cityguard (%d pts)", pts*(BS_COST_EXP+2*corank), pts);
-}
-
-void answer_buy_potion(int cn, int co, int in, int cost)
-{
-	int in2, pts; pts = stronghold_points(co);
-	if (pts<cost) { do_sayx(cn, "But you don't have enough points to spend, %s!", ch[co].name); return; }
-	in2 = god_create_item(in, 0); 
-	if (!god_give_char(in2, co))
-	{
-		do_sayx(cn, "I'm sorry, %s. Your backpack is full. Please clear some room first!", ch[co].name);
-		it[in2].used = USE_EMPTY;
-		return;
-	}
-	ch[co].data[41] += cost; 
-	do_sayx(cn, "There you are, %s. One %s. Thank you for your help!", ch[co].name, it[in2].reference);
-	chlog(co, "bought %s from cityguard", it[in].reference);
-}
-
-int answer_best_weapon_reward(int co, int in)
-{
-	int chk_wil, chk_int, chk_agl, chk_str, gear;
-	static int w_dagger[6] = { 693, 572, 541, 532, 523, 284 };
-	static int w_staff[6]  = { 694, 573, 542, 533, 524, 285 };
-	static int w_spear[6]  = { 695, 574, 543, 534, 525, 286 };
-	static int w_sword[6]  = { 697, 576, 545, 536, 527, 288 };
-	static int w_axe[6]    = { 699, 578, 547, 538, 529, 290 };
-	static int w_twoh[6]   = { 700, 579, 548, 539, 530, 291 };
-	static int w_great[6]  = { 701, 580, 549, 540, 531, 292 };
-	
-	chk_wil = ch[co].attrib[AT_WIL][0];
-	chk_int = ch[co].attrib[AT_INT][0];
-	chk_agl = ch[co].attrib[AT_AGL][0];
-	chk_str = ch[co].attrib[AT_STR][0];
-	
-	gear = 5;
-	
-	if (it[in].flags & IF_WP_SWORD)
-	{
-		if			(chk_agl >= 96 && chk_str >= 82) gear = 0;	// Adamant
-		else if	(chk_agl >= 72 && chk_str >= 60) gear = 1;	// Titanium
-		else if	(chk_agl >= 52 && chk_str >= 42) gear = 2;	// Crystal
-		else if	(chk_agl >= 36 && chk_str >= 28) gear = 3;	// Emerald
-		else if	(chk_agl >= 24 && chk_str >= 18) gear = 4;	// Gold
-		return 	(w_sword[gear]);
-	}
-	else if ((it[in].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) // Spear
-	{
-		if			(chk_wil >=105 && chk_str >= 30) gear = 0;	// Adamant
-		else if	(chk_wil >= 90 && chk_str >= 30) gear = 1;	// Titanium
-		else if	(chk_wil >= 64 && chk_str >= 22) gear = 2;	// Crystal
-		else if	(chk_wil >= 42 && chk_str >= 16) gear = 3;	// Emerald
-		else if	(chk_wil >= 25 && chk_str >= 12) gear = 4;	// Gold
-		return 	(w_spear[gear]);
-	}
-	else if (it[in].flags & IF_WP_DAGGER)
-	{
-		if			(chk_wil >=110 && chk_agl >= 40) gear = 0;	// Adamant
-		else if	(chk_wil >= 82 && chk_agl >= 30) gear = 1;	// Titanium
-		else if	(chk_wil >= 58 && chk_agl >= 22) gear = 2;	// Crystal
-		else if	(chk_wil >= 38 && chk_agl >= 16) gear = 3;	// Emerald
-		else if	(chk_wil >= 22 && chk_agl >= 12) gear = 4;	// Gold
-		return 	(w_dagger[gear]);
-	}
-	else if (it[in].flags & IF_WP_STAFF)
-	{
-		if			(chk_int >=110 && chk_str >= 40) gear = 0;	// Adamant
-		else if	(chk_int >= 82 && chk_str >= 30) gear = 1;	// Titanium
-		else if	(chk_int >= 58 && chk_str >= 22) gear = 2;	// Crystal
-		else if	(chk_int >= 38 && chk_str >= 16) gear = 3;	// Emerald
-		else if	(chk_int >= 22 && chk_str >= 12) gear = 4;	// Gold
-		return 	(w_staff[gear]);
-	}
-	else if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) // Greataxe
-	{
-		if			(chk_agl >= 92 && chk_str >=124) gear = 0;	// Adamant
-		else if	(chk_agl >= 68 && chk_str >= 90) gear = 1;	// Titanium
-		else if	(chk_agl >= 48 && chk_str >= 62) gear = 2;	// Crystal
-		else if	(chk_agl >= 32 && chk_str >= 40) gear = 3;	// Emerald
-		else if	(chk_agl >= 20 && chk_str >= 24) gear = 4;	// Gold
-		return 	(w_great[gear]);
-	}
-	else if (it[in].flags & IF_WP_AXE)
-	{
-		if			(chk_agl >= 82 && chk_str >=115) gear = 0;	// Adamant
-		else if	(chk_agl >= 60 && chk_str >= 85) gear = 1;	// Titanium
-		else if	(chk_agl >= 42 && chk_str >= 60) gear = 2;	// Crystal
-		else if	(chk_agl >= 28 && chk_str >= 40) gear = 3;	// Emerald
-		else if	(chk_agl >= 18 && chk_str >= 25) gear = 4;	// Gold
-		return 	(w_axe[gear]);
-	}
-	else if (it[in].flags & IF_WP_TWOHAND)
-	{
-		if			(chk_agl >= 92 && chk_str >=105) gear = 0;	// Adamant
-		else if	(chk_agl >= 68 && chk_str >= 80) gear = 1;	// Titanium
-		else if	(chk_agl >= 48 && chk_str >= 58) gear = 2;	// Crystal
-		else if	(chk_agl >= 32 && chk_str >= 40) gear = 3;	// Emerald
-		else if	(chk_agl >= 20 && chk_str >= 26) gear = 4;	// Gold
-		return 	(w_twoh[gear]);
-	}
-	
-	return (697);
-}
-
-void answer_buy_weapon(int cn, int co, int stren, int cost)
-{
-	char buf[300];
-	int in, in2, pts; pts = stronghold_points(co);
-	if (pts<cost) { do_sayx(cn, "But you don't have enough points to spend, %s!", ch[co].name); return; }
-	
-	if (in = ch[co].worn[WN_RHAND])
-	{
-		in2 = god_create_item(answer_best_weapon_reward(co, in), 0);
-		if (it[in2].flags & IF_WP_SWORD)
-			it[in2].skill[SK_SWORD][0] += stren;
-		else if ((it[in2].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) // Spear
-		{
-			it[in2].skill[SK_DAGGER][0] += stren;
-			it[in2].skill[SK_STAFF][0] += stren;
-		}
-		else if (it[in2].flags & IF_WP_DAGGER)
-			it[in2].skill[SK_DAGGER][0] += stren;
-		else if (it[in2].flags & IF_WP_STAFF)
-			it[in2].skill[SK_STAFF][0] += stren;
-		else if ((it[in2].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) // Greataxe
-		{
-			it[in2].skill[SK_AXE][0] += stren;
-			it[in2].skill[SK_TWOHAND][0] += stren;
-		}
-		else if (it[in2].flags & IF_WP_AXE)
-			it[in2].skill[SK_AXE][0] += stren;
-		else if (it[in2].flags & IF_WP_TWOHAND)
-			it[in2].skill[SK_TWOHAND][0] += stren;
-		
-		it[in2].temp   = 0;
-		it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_NOREPAIR | IF_SOULSTONE;
-		
-		if (!it[in2].max_damage)
-			it[in2].max_damage = 3500*it[in2].weapon[0]*2;
-		else
-			it[in2].max_damage*=2;
-		
-		if (!god_give_char(in2, co))
-		{
-			do_sayx(cn, "I'm sorry, %s. Your backpack is full. Please clear some room first!", ch[co].name);
-			it[in2].used = USE_EMPTY;
-			return;
-		}
-		ch[co].data[41] += cost;
-	}
-	else
-	{
-		do_sayx(cn, "I'm sorry, %s, but I have no weapons for unarmed fighters!", ch[co].name); return;
-	}
-	do_sayx(cn, "There you are, %s. A +%d %s. Thank you for your help!", ch[co].name, stren, it[in2].reference);
-	do_char_log(co, 0, "You feel yourself form a magical connection with the %s.\n", it[in2].reference);
-	it[in2].data[0] = co;
-	sprintf(buf, "%s Engraved in it are the letters \"%s\".", it[in2].description, ch[co].name);
-	if (strlen(buf)<200)
-	{
-		strcpy(it[in2].description, buf);
-	}
-	chlog(co, "bought %s from cityguard", it[in].reference);
-}
-
-int answer_best_armor_reward(int co, int flag)
-{
-	int chk_wil, chk_int, chk_agl, chk_str, gear;
-	static int a_helm[7] = { 94, 76, 71, 66, 61, 56, 51 };
-	static int a_body[7] = { 96, 78, 73, 68, 63, 58, 53 };
-	static int c_helm[4] = { 352, 347, 342, 337 };
-	static int c_body[4] = { 354, 349, 344, 339 };
-	
-	chk_wil = ch[co].attrib[AT_WIL][0];
-	chk_int = ch[co].attrib[AT_INT][0];
-	chk_agl = ch[co].attrib[AT_AGL][0];
-	chk_str = ch[co].attrib[AT_STR][0];
-	
-	gear = 6; 	// Bronze
-	
-	if ((chk_wil+chk_int)>(chk_agl+chk_str))
-	{
-		gear = 3; 	// Simple
-		
-		if			(chk_wil >= 90 && chk_int >= 90) gear = 0;	// Wizard
-		else if	(chk_wil >= 60 && chk_int >= 60) gear = 1;	// Adept
-		else if	(chk_wil >= 35 && chk_int >= 35) gear = 2;	// Caster
-		
-		if (flag)	return (c_body[gear]);
-		else		return (c_helm[gear]);	
-	}
-	else if	(chk_agl >=105 && chk_str >=105) gear = 0;	// Adamantine
-	else if	(chk_agl >= 84 && chk_str >= 84) gear = 1;	// Titanium
-	else if	(chk_agl >= 64 && chk_str >= 64) gear = 2;	// Crystal
-	else if	(chk_agl >= 48 && chk_str >= 48) gear = 3;	// Emerald
-	else if	(chk_agl >= 34 && chk_str >= 34) gear = 4;	// Gold
-	else if	(chk_agl >= 24 && chk_str >= 24) gear = 5;	// Steel
-	
-	if (flag)	return (a_body[gear]);
-	return (a_helm[gear]);
-}
-
-void answer_buy_armor(int cn, int co, int flag, int cost)
-{
-	int in, pts; pts = stronghold_points(co);
-	if (pts<cost) { do_sayx(cn, "But you don't have enough points to spend, %s!", ch[co].name); return; }
-	in = create_special_item(answer_best_armor_reward(co, flag));
-	if (!god_give_char(in, co))
-	{
-		do_sayx(cn, "I'm sorry, %s. Your backpack is full. Please clear some room first!", ch[co].name);
-		it[in].used = USE_EMPTY;
-		return;
-	}
-	ch[co].data[41] += cost; 
-	do_sayx(cn, "There you are, %s. One magic %s. Thank you for your help!", ch[co].name, it[in].reference);
-	chlog(co, "bought %s from cityguard", it[in].reference);
-}
-*/
-// -------- </black stronghold points> -------- //
 
 void special_answer(int cn, int co, int spec, char *word, int nr)
 {
@@ -2364,7 +2030,6 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_FOLLOW:		answer_follow(cn, co); break;
 		case SP_TIME:		answer_time(cn, co); break;
 		case SP_POINTS:		answer_points(cn, co, nr); break;
-		//case SP_TABLE:		answer_table(co); break;
 		case SP_TRANSFER:	answer_transfer(cn, co); break;
 		case SP_SPELLINFO:	answer_spellinfo(cn, co); break;
 		case SP_QUIET:		answer_quiet(cn, co); break;
@@ -2377,26 +2042,6 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_TAROT:		answer_tarot(cn, co); break;
 		case SP_TAROT2:		answer_tarot2(cn, co); break;
 		case SP_UNLEARN:	answer_unlearn(cn, co); break;
-		//
-		/*
-		case SP_BUY_GOLD:		answer_buy_gold(cn, co); break;
-		case SP_BUY_EXP:		answer_buy_exp(cn, co); break;
-		case SP_BUY_HEAL:		answer_buy_potion(cn, co, 101, BS_COST_HEAL); break;
-		case SP_BUY_MANA:		answer_buy_potion(cn, co, 102, BS_COST_MANA); break;
-		case SP_BUY_END:		answer_buy_potion(cn, co, 125, BS_COST_END); break;
-		case SP_BUY_GHEAL:		answer_buy_potion(cn, co, 127, BS_COST_GHEAL); break;
-		case SP_BUY_GMANA:		answer_buy_potion(cn, co, 131, BS_COST_GMANA); break;
-		case SP_BUY_GEND:		answer_buy_potion(cn, co, 273, BS_COST_GEND); break;
-		case SP_BUY_RATLING:	answer_buy_potion(cn, co, 267, BS_COST_RATLING); break;
-		case SP_BUY_GREENLING:	answer_buy_potion(cn, co, 833, BS_COST_GREENLING); break;
-	    case SP_BUY_DREADLING:	answer_buy_potion(cn, co,1479, BS_COST_DREADLING); break;
-		case SP_BUY_WEAPON1:	answer_buy_weapon(cn, co,   1, BS_COST_WEAPON1+BS_COST_WEAPON1*corank); break;
-		case SP_BUY_WEAPON2:	answer_buy_weapon(cn, co,   2, BS_COST_WEAPON2+BS_COST_WEAPON2*corank); break;
-		case SP_BUY_WEAPON3:	answer_buy_weapon(cn, co,   3, BS_COST_WEAPON3+BS_COST_WEAPON3*corank); break;
-		case SP_BUY_HELMET:		answer_buy_armor(cn, co,    0, BS_COST_HELMET+BS_COST_HELMET*corank*2); break;
-		case SP_BUY_ARMOR:		answer_buy_armor(cn, co,    1, BS_COST_ARMOR+BS_COST_ARMOR*corank*2); break;
-		*/
-		//
 		default:break;
 	}
 }

@@ -624,16 +624,16 @@ int sv_setmap(unsigned char *buf,int off)
 	if (buf[1]&64) {
 		map[n].ch_nr=*(unsigned short*)(buf+p); p+=2;
 		map[n].ch_id=*(unsigned short*)(buf+p); p+=2;
-		map[n].ch_speed=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_speed=*(short int*)(buf+p); p+=2;
 		cnt[6]++;
 	}
 	if (buf[1]&128) {
 		map[n].ch_proz=*(unsigned char*)(buf+p); p+=1;
 		// Additional data received - cast speed, attack speed, move speed, 
 		//   and special font colorization of a given npc
-		map[n].ch_castspd=*(unsigned char*)(buf+p); p+=1;
-		map[n].ch_atkspd=*(unsigned char*)(buf+p); p+=1;
-		map[n].ch_movespd=*(unsigned char*)(buf+p); p+=1;
+		map[n].ch_castspd=*(short int*)(buf+p); p+=2;
+		map[n].ch_atkspd=*(short int*)(buf+p); p+=2;
+		map[n].ch_movespd=*(short int*)(buf+p); p+=2;
 		map[n].ch_fontcolor=*(unsigned char*)(buf+p); p+=1;
 		cnt[7]++;
 	}	

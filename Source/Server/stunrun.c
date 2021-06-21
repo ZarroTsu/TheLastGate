@@ -789,7 +789,7 @@ int npc_stunrun_high(int cn)
 		{
 			if (!ch[cn].citem)
 			{
-				in = god_create_item(718, 0);
+				in = god_create_item(718);
 				ch[cn].citem = in;
 				it[in].carried = cn;
 			}

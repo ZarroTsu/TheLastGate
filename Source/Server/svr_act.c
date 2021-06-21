@@ -102,7 +102,6 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 
 	if (!(ch[cn].flags & CF_BODY))
 	{
-
 		if ((in = map[m].it)!=0 && (it[in].flags & IF_STEPACTION))
 		{
 			ret = step_driver(cn, in);
@@ -245,12 +244,11 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 
 	if (!(ch[cn].flags & CF_BODY))
 	{
-
 		if (ch[cn].light)
 		{
 			do_add_light(ch[cn].x, ch[cn].y, ch[cn].light);
 		}
-
+		
 		if (map[m].flags & MF_DEATHTRAP)
 		{
 			if (try_lucksave(cn))
@@ -265,8 +263,6 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			}
 			return;
 		}
-
-
 	}
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 }
@@ -799,7 +795,7 @@ void plr_drop(int cn)
 	if (in & 0x80000000)
 	{
 		tmp = in & 0x7FFFFFFF;
-		in  = god_create_item(1, 0); // blank template
+		in  = god_create_item(1); // blank template
 		if (!in)
 		{
 			ch[cn].cerrno = ERR_FAILED;

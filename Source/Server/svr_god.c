@@ -193,7 +193,7 @@ int get_free_item(void)
 	return(in);
 }
 
-int god_create_item(int temp, int godwep)
+int god_create_item(int temp)
 {
 	int n, m;
 	unsigned long long prof;
@@ -219,7 +219,8 @@ int god_create_item(int temp, int godwep)
 		prof_stop(23, prof);
 		return(0);
 	}
-
+	
+	/*
 	if ((it_temp[temp].flags & IF_UNIQUE) || godwep)
 	{
 		for (m = 1; m<MAXITEM; m++)
@@ -246,6 +247,7 @@ int god_create_item(int temp, int godwep)
 			return(0);
 		}
 	}
+	*/
 
 	it[n] = it_temp[temp];
 	it[n].temp = temp;
@@ -342,7 +344,7 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp, 0);
+				tmp = god_create_item(tmp);
 				if (!tmp)
 				{
 					flag = 1;
@@ -363,7 +365,7 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp, 0);
+				tmp = god_create_item(tmp);
 				if (!tmp)
 				{
 					flag = 1;
@@ -384,7 +386,7 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp, 0);
+				tmp = god_create_item(tmp);
 				if (!tmp)
 				{
 					flag = 1;
@@ -411,7 +413,7 @@ int god_create_char(int temp, int withitems)
 	{
 		if (withitems)
 		{
-			tmp = god_create_item(tmp, 0);
+			tmp = god_create_item(tmp);
 			if (!tmp)
 			{
 				flag = 1;
@@ -1236,11 +1238,7 @@ void god_info(int cn, int co)
 			            ch[co].data[23], ch[co].data[24], ch[co].data[25]);
 			do_char_log(cn, 3, "Killed %d players outside arena, killed %d shopkeepers.\n",
 			            ch[co].data[29], ch[co].data[40]);
-			do_char_log(cn, 3, "BS: %d (%d) t1 points, %d t2 points, %d (%d) t3 points, %d total used.\n",
-			            ch[co].data[26]/5, ch[co].data[26], 
-						ch[co].data[27], 
-						ch[co].data[28]*5, ch[co].data[28],
-						ch[co].data[41]);
+			do_char_log(cn, 3, "Stronghold: %d total points\n", stronghold_points(co));
 		}
 		do_char_log(cn, 1, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
 			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
@@ -1617,7 +1615,7 @@ void god_create(int cn, int x)
 		do_char_log(cn, 0, "item is not take-able.\n");
 		return;
 	}
-	in = god_create_item(x, 0);
+	in = god_create_item(x);
 	if (in==0)
 	{
 		do_char_log(cn, 0, "god_create_item() failed.\n");
@@ -3472,17 +3470,20 @@ void god_racechange(int co, int temp, int keepstuff)
 		dpt = ch[co];
 		god_destroy_items(co);
 		for (n = 0; n<62; n++)
-			ch[co].depot[n] = dpt.depot[n]; // this isn't working
+		{
+			ch[co].depot[n] = dpt.depot[n];
+			it[ch[co].depot[n]].carried = co;
+		}
 	}
 	
 	old = ch[co];
-
 	ch[co] = ch_temp[temp];
 
-	ch[co].temp  = temp;
-	ch[co].pass1 = old.pass1;
-	ch[co].pass2 = old.pass2;
-	ch[co].gold  = old.gold;
+	ch[co].temp      = temp;
+	ch[co].pass1     = old.pass1;
+	ch[co].pass2     = old.pass2;
+	ch[co].gold      = old.gold;
+	ch[co].bs_points = old.bs_points;
 
 	strcpy(ch[co].name, old.name);
 	strcpy(ch[co].reference, old.name);
@@ -3530,7 +3531,7 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	for (n = 0; n<MAXBUFFS; n++) ch[co].spell[n] = 0;
 	for (n = 0; n<100; n++) ch[co].data[n] = old.data[n];
-	for (n = 0; n<62; n++) { ch[co].depot[n] = old.depot[n]; it[ch[co].depot[n]].carried = co;}
+	for (n = 0; n<62; n++) { ch[co].depot[n] = old.depot[n]; it[ch[co].depot[n]].carried = co; }
 
 	if (keepstuff)
 	{
@@ -3578,41 +3579,34 @@ void god_racechange(int co, int temp, int keepstuff)
 		for (n = 0; n<12; n++) {ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;}
 		
 		// Re-acquire previously learned skills
-		if (old.skill[5][0])  ch[co].skill[5][0]  = 1; // Staff
-		if (old.skill[12][0]) ch[co].skill[12][0] = 1; // Barter
-		if (old.skill[13][0]) ch[co].skill[13][0] = 1; // Repair
-		if (old.skill[15][0]) ch[co].skill[15][0] = 1; // Recall
-		if (old.skill[16][0]) ch[co].skill[16][0] = 1; // Shield
-		if (old.skill[18][0]) ch[co].skill[18][0] = 1; // Enhance
-		if (old.skill[19][0]) ch[co].skill[19][0] = 1; // Slow
-		if (old.skill[20][0]) ch[co].skill[20][0] = 1; // Curse
-		if (old.skill[21][0]) ch[co].skill[21][0] = 1; // Bless
-		if (old.skill[22][0]) ch[co].skill[22][0] = 1; // Identify
-		if (old.skill[23][0]) ch[co].skill[23][0] = 1; // Resistance
-		if (old.skill[25][0]) ch[co].skill[25][0] = 1; // Dispel
-		if (old.skill[26][0]) ch[co].skill[26][0] = 1; // Heal
-		if (old.skill[29][0]) ch[co].skill[29][0] = 1; // Rest
-		if (old.skill[31][0]) ch[co].skill[31][0] = 1; // Sense Magic
-		if (old.skill[32][0]) ch[co].skill[32][0] = 1; // Immunity
-		if (old.skill[33][0]) ch[co].skill[33][0] = 1; // Surround Hit
-		if (old.skill[38][0]) ch[co].skill[38][0] = 1; // Weapon Mastery
-		if (old.skill[41][0]) ch[co].skill[41][0] = 1; // Weaken
-		//
-		if ((ch[co].kindred & KIN_TEMPLAR) 		&& old.skill[37][0])  // Blind    -> Bless  for Templar
-			ch[co].skill[21][0] = 1;
-		if ((ch[co].kindred & KIN_ARCHTEMPLAR) 	&& old.skill[48][0])  // SurrArea -> Warcry for ArchTemplar
-			ch[co].skill[35][0] = 1;
-		if ((ch[co].kindred & KIN_BRAWLER) 		&& old.skill[46][0])  // Shadow   -> Razor  for Brawler
-			ch[co].skill[7][0]  = 1;
-		if ((ch[co].kindred & KIN_WARRIOR) 		&& old.skill[49][0])  // SurrRate -> Leap   for Warrior
-			ch[co].skill[49][0] = 1;
-		if ((ch[co].kindred & KIN_SORCERER) 	&& old.skill[44][0])  // HexArea  -> Poison for Sorcerer
-			ch[co].skill[42][0] = 1;
-		if ((ch[co].kindred & KIN_SUMMONER) 	&& old.skill[46][0])  // Shadow   -> Shadow for Summoner
-			ch[co].skill[46][0] = 1;
-		if ((ch[co].kindred & KIN_ARCHHARAKIM) 	&& old.skill[43][0]) // DamArea   -> Pulse  for ArchHarakim
-			ch[co].skill[43][0] = 1;
-		//
+		if (old.skill[ 5][0] && ch[co].skill[ 5][2]) ch[co].skill[ 5][0] = 1; // Staff
+		if (old.skill[10][0] && ch[co].skill[10][2]) ch[co].skill[10][0] = 1; // Swimming
+		if (old.skill[12][0] && ch[co].skill[12][2]) ch[co].skill[12][0] = 1; // Barter
+		if (old.skill[13][0] && ch[co].skill[13][2]) ch[co].skill[13][0] = 1; // Repair
+		if (old.skill[15][0] && ch[co].skill[15][2]) ch[co].skill[15][0] = 1; // Recall
+		if (old.skill[16][0] && ch[co].skill[16][2]) ch[co].skill[16][0] = 1; // Shield
+		if (old.skill[18][0] && ch[co].skill[18][2]) ch[co].skill[18][0] = 1; // Enhance
+		if (old.skill[19][0] && ch[co].skill[19][2]) ch[co].skill[19][0] = 1; // Slow
+		if (old.skill[20][0] && ch[co].skill[20][2]) ch[co].skill[20][0] = 1; // Curse
+		if (old.skill[21][0] && ch[co].skill[21][2]) ch[co].skill[21][0] = 1; // Bless
+		if (old.skill[22][0] && ch[co].skill[22][2]) ch[co].skill[22][0] = 1; // Identify
+		if (old.skill[23][0] && ch[co].skill[23][2]) ch[co].skill[23][0] = 1; // Resistance
+		if (old.skill[25][0] && ch[co].skill[25][2]) ch[co].skill[25][0] = 1; // Dispel
+		if (old.skill[26][0] && ch[co].skill[26][2]) ch[co].skill[26][0] = 1; // Heal
+		if (old.skill[29][0] && ch[co].skill[29][2]) ch[co].skill[29][0] = 1; // Rest
+		if (old.skill[31][0] && ch[co].skill[31][2]) ch[co].skill[31][0] = 1; // Sense Magic
+		if (old.skill[32][0] && ch[co].skill[32][2]) ch[co].skill[32][0] = 1; // Immunity
+		if (old.skill[33][0] && ch[co].skill[33][2]) ch[co].skill[33][0] = 1; // Surround Hit
+		if (old.skill[38][0] && ch[co].skill[38][2]) ch[co].skill[38][0] = 1; // Weapon Mastery
+		if (old.skill[41][0] && ch[co].skill[41][2]) ch[co].skill[41][0] = 1; // Weaken
+		
+		if (old.skill[ 7][0] && ch[co].skill[ 7][2]) ch[co].skill[ 7][0] = 1; // Razor
+		if (old.skill[35][0] && ch[co].skill[35][2]) ch[co].skill[35][0] = 1; // Warcry
+		if (old.skill[42][0] && ch[co].skill[42][2]) ch[co].skill[42][0] = 1; // Poison
+		if (old.skill[43][0] && ch[co].skill[43][2]) ch[co].skill[43][0] = 1; // Pulse
+		if (old.skill[46][0] && ch[co].skill[46][2]) ch[co].skill[46][0] = 1; // Shadow
+		if (old.skill[49][0] && ch[co].skill[49][2]) ch[co].skill[49][0] = 1; // Leap
+		
 		ch[co].waypoints = old.waypoints;
 	}
 	else
@@ -3628,6 +3622,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[45] = 0;      // current rank
 		
 		// Reset BS flags
+		ch[co].bs_points = 0;
 		ch[co].data[26] = 0;
 		ch[co].data[27] = 0;
 		ch[co].data[28] = 0;

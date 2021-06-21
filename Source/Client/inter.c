@@ -49,7 +49,6 @@ extern int stat_raised[];
 extern int stat_points_used;
 extern int noshop;
 extern int do_alpha;
-extern int race;
 
 void dd_invalidate_alpha(void);
 
@@ -900,6 +899,7 @@ int mouse_statbox2(int x,int y,int state)
     extern struct skilltab _skilltab[];
 	int pl_flags, pl_flagb;
 	char tmp[200];
+	static int firstclick=0;
 
 	/*
 	if (screen_windowed == 1) {
@@ -1044,14 +1044,14 @@ int mouse_statbox2(int x,int y,int state)
 			else if (m==44)	// Proximity has special descriptions
 			{
 				strcpy(tmp, skilltab[n+skill_pos].name);
-				if (race==4)
-					xlog(1,skilltab[n+skill_pos].desc);
-				else if (race==6)
-					xlog(1,skilltab[n+skill_pos].alt_a);
-				else if (race==8)
-					xlog(1,skilltab[n+skill_pos].alt_b);
-				else if (race==10)
-					xlog(1,skilltab[n+skill_pos].alt_c);
+				if (pl.kindred & (1u<<5))
+					xlog(1,skilltab[n+skill_pos].desc); // Arch-Templar
+				else if (pl.kindred & (1u<<10))
+					xlog(1,skilltab[n+skill_pos].alt_a); // Warrior
+				else if (pl.kindred & (1u<<11))
+					xlog(1,skilltab[n+skill_pos].alt_b); // Sorcerer
+				else if (pl.kindred & (1u<<9))
+					xlog(1,skilltab[n+skill_pos].alt_c); // Arch-Harakim
 				else
 					xlog(1,"Passively improves the area-of-effect of various skills and spells.");
 			}
@@ -1069,7 +1069,16 @@ int mouse_statbox2(int x,int y,int state)
 			else
 			{
 				last_skill = n+skill_pos;
-				xlog(3,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
+				if (!firstclick)
+				{
+					xlog(3,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
+					firstclick=1;
+				}
+				else
+				{
+					xlog(3,"%s selected for shortcut.",tmp);
+				}
+				
 			}
 		}
 	} 
@@ -1164,13 +1173,6 @@ void mouse_mapbox(int x,int y,int state)
 				else if ((int)sqrt(pow(xr-xwalk_wx,2)+pow(yr-xwalk_wy,2)) < 12)	xmove=2; // West
 				else if ((int)sqrt(pow(xr-xwalk_sx,2)+pow(yr-xwalk_sy,2)) < 12)	xmove=3; // South
 				else if ((int)sqrt(pow(xr-xwalk_ex,2)+pow(yr-xwalk_ey,2)) < 12)	xmove=4; // East
-				
-				/*mx/=32; my/=32;
-			
-				if (my==screen_viewsize/2 && (mx==2 || mx==3)) xmove=1;
-				if (mx==screen_viewsize/2 && (my==6 || my==7)) xmove=2;
-				if (my==screen_viewsize/2 && (mx==27 || mx==28)) xmove=3;
-				if (mx==screen_viewsize/2 && (my==31 || my==32)) xmove=4;*/
 			}
 			return;
 		}
@@ -1342,8 +1344,10 @@ void mouse_mapbox(int x,int y,int state)
 	}
 }
 
-#define GUI_SHOP_X		((1280/2)-(320/2))
-#define GUI_SHOP_Y		((736/2)-(320/2)+72)
+#ifndef GUI_SHOP_X
+	#define GUI_SHOP_X		((1280/2)-(320/2))
+	#define GUI_SHOP_Y		((736/2)-(320/2)+72)
+#endif
 
 int mouse_shop(int x,int y,int mode)
 {

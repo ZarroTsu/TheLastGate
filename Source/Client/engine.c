@@ -547,7 +547,7 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap behind them. This may strike up to three consecutive foes in front of you.", 
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap behind your target, damaging both. Deals additional damage if only a single enemy is hit.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }}
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
@@ -873,8 +873,10 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 
 //#define GUI_SHOP_X	220
 //#define GUI_SHOP_Y	260
-#define GUI_SHOP_X		((1280/2)-(320/2))
-#define GUI_SHOP_Y		((736/2)-(320/2)+72)
+#ifndef GUI_SHOP_X
+	#define GUI_SHOP_X		((1280/2)-(320/2))
+	#define GUI_SHOP_Y		((736/2)-(320/2)+72)
+#endif
 
 #define GUI_BAR_BLU		0x00B0
 #define GUI_BAR_GRE		0x0B00
@@ -889,6 +891,16 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 //
 
 int load=0;
+
+int at_score(int n)
+{
+	return ( (pl.attrib[n][4] << 8) | pl.attrib[n][5] );
+}
+
+int sk_score(int n)
+{
+	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
+}
 
 void display_meta_from_ls(void)
 {
@@ -969,42 +981,42 @@ void display_meta_from_ls(void)
 	/*
 		Additional skill bonuses for GUI
 	*/
-	sk_proxi = pl.skill[44][5] / (300/12);
-	sk_ghost = (pl.skill[27][5]*pl_spmod/100) * 5 / 11;
-	sk_poiso = (pl.skill[42][5]*pl_spmod/100) * 15 / 3 * 18;
-	sk_blast = (pl.skill[24][5]*pl_spmod/100) * 2 * 750/1000;
-	sk_scorc = (1000 + (pl.skill[24][5]*pl_spmod/100));
-	sk_douse = -(pl.skill[24][5]*pl_spmod/100);
-	sk_pulse = (pl.skill[43][5]*pl_spmod/100) * 2 * 75/1000;
-	sk_pucnt = 60 / (6 * pl_basel / max(100, pl_coold));
-	sk_razor = (pl.skill[7][5]+pl.weapon/4) * 2 * 75/1000;
-	sk_leapv = (pl.skill[49][5]+max(0,(pl_atksp-120))/4) * 750/1000;
-	sk_blind = -(pl.skill[37][5] / 6 + 3);
+	sk_proxi = sk_score(44) / (300/12);
+	sk_ghost = (sk_score(27)*pl_spmod/100) * 5 / 11;
+	sk_poiso = (sk_score(42)*pl_spmod/100) * 15 / 3 * 18;
+	sk_blast = (sk_score(24)*pl_spmod/100) * 2 * 650/1000;
+	sk_scorc = (1000 + (sk_score(24)*pl_spmod/100));
+	sk_douse = -(sk_score(24)*pl_spmod/100);
+	sk_pulse = (sk_score(43)*pl_spmod/100) * 2 * 150/1000;
+	sk_pucnt = 60 / (3 * pl_basel / max(100, pl_coold));
+	sk_razor = ((sk_score(7)+pl.weapon/4)*pl_spmod/100) * 2 * 50/1000;
+	sk_leapv = (sk_score(49)+max(0,(pl_atksp-120))/4) * 750/1000;
+	sk_blind = -(sk_score(37) / 6 + 3);
 	sk_water = 25 * 18;
-	sk_cleav = (pl.skill[40][5]+pl.weapon/4) * 2 * 750/1000;
-	sk_taunt = (1000 - pl.skill[48][5]);
-	sk_warcr = -(2+(pl.skill[35][5]/(10/3)) / 5);
+	sk_cleav = (sk_score(40)+pl.weapon/4) * 2 * 750/1000;
+	sk_taunt = (1000 - sk_score(48));
+	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
 	
 	// Tarot - Hanged Man (immunity&resistance)
 	if (pl_flags & (1 <<  2))
 	{
-		sk_immun = pl.skill[32][5] + pl.skill[23][5] * 30/100;
-		sk_resis = pl.skill[23][5] * 70/100;
+		sk_immun = sk_score(32) + sk_score(23) * 30/100;
+		sk_resis = sk_score(23) * 70/100;
 	}
 	else
 	{
-		sk_immun = pl.skill[32][5];
-		sk_resis = pl.skill[23][5];
+		sk_immun = sk_score(32);
+		sk_resis = sk_score(23);
 	}
 	
 	// Book - Great Prodigy (concentrate bonus)
 	if (pl_flags & (1 <<  3))
 	{
-		sk_conce = max(1, 100 - 100 * pl.skill[34][5] / 300);
+		sk_conce = max(1, 100 - 100 * sk_score(34) / 300);
 	}
 	else
 	{
-		sk_conce = max(1, 100 - 100 * pl.skill[34][5] / 400);
+		sk_conce = max(1, 100 - 100 * sk_score(34) / 400);
 	}
 	
 	// Book - Venom Compendium (poison bonus)
@@ -1016,27 +1028,27 @@ void display_meta_from_ls(void)
 	// Tarot - Emperor (slow bonus)
 	if (pl_flags & (1 <<  5))
 	{
-		sk_slowv = -(30 + (pl.skill[19][5]*pl_spmod/100)/(8/3));
+		sk_slowv = -(30 + (sk_score(19)*pl_spmod/100)/(8/3));
 	}
 	else
 	{
-		sk_slowv = -(30 + (pl.skill[19][5]*pl_spmod/100)/2);
+		sk_slowv = -(30 + (sk_score(19)*pl_spmod/100)/2);
 	}
 	
 	// Tarot - Tower (curse bonus)
 	if (pl_flags & (1 <<  6))
 	{
-		sk_curse = -(2 + (((pl.skill[20][5]*pl_spmod/100)*4/3)-4)/5);
+		sk_curse = -(2 + (((sk_score(20)*pl_spmod/100)*4/3)-4)/5);
 	}
 	else
 	{
-		sk_curse = -(2 + ((pl.skill[20][5]*pl_spmod/100)-4)/5);
+		sk_curse = -(2 + ((sk_score(20)*pl_spmod/100)-4)/5);
 	}
 	
 	// Swimming skill
 	if (pl.skill[10][0])
 	{
-		sk_water = (250 - pl.skill[10][5]/3*2) * 18/10;
+		sk_water = (250 - sk_score(10)/3*2) * 18/10;
 	}
 	
 	// Amulet - Water breathing (degen/2)
@@ -1060,19 +1072,19 @@ void display_meta_from_ls(void)
 	// Tarot - Death (Weaken bonus)
 	if (pl_flags & (1 << 10))
 	{
-		sk_weake = -(pl.skill[41][5] / 6 + 2);
+		sk_weake = -(sk_score(41) / 6 + 2);
 	}
 	else
 	{
-		sk_weake = -(pl.skill[41][5] / 8 + 2);
+		sk_weake = -(sk_score(41) / 8 + 2);
 	}
 	
 	/*
 		Regeneration stats
 	*/
-	race_reg = pl.skill[28][5] * moonmult / 20;
-	race_res = pl.skill[29][5] * moonmult / 20;
-	race_med = pl.skill[30][5] * moonmult / 20;
+	race_reg = sk_score(28) * moonmult / 20;
+	race_res = sk_score(29) * moonmult / 20;
+	race_med = sk_score(30) * moonmult / 20;
 	
 	// Tarot - Moon :: While not full mana, life regen is mana regen
 	if ((pl_flags & (1 << 11)) && (pl.a_mana<pl.mana[5]))
@@ -1170,7 +1182,7 @@ void display_meta_from_ls(void)
 			break;									// ".............." // 
 		case 51: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Aptitude Bonus");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",pl.attrib[AT_WIL][5]/4);
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",at_score(AT_WIL)/4);
 				if (pl.skill[34][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Cost %");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_conce/100,sk_conce%100);
@@ -1383,7 +1395,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
 			//
 			if (pdata.show_stats) dd_xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
-			dd_xputtext(140,(8+n*14),1,"%3d",pl.attrib[n][5]+stat_raised[n]);
+			dd_xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
 			//
 			if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used) 
 				dd_putc(163,8+n*14,1,'+');
@@ -1434,7 +1446,7 @@ void eng_display_win(int plr_sprite,int init)
 				if (m==8||m==23||m==31||m==32) // Stealth, Resistance, Sense-Magic, Immunity -- these are all active even if you don't know them.
 				{
 					dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
-					dd_xputtext(140,(8+8*14)+n*14,0,"%3d",pl.skill[m][5]);
+					dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
 				}
 				else
 					dd_xputtext(9,(8+8*14)+n*14,1,"-");
@@ -1450,7 +1462,7 @@ void eng_display_win(int plr_sprite,int init)
 				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
 			
 			if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
-			dd_xputtext(140,(8+8*14)+n*14,1,"%3d",pl.skill[m][5]+stat_raised[n+8+skill_pos]);
+			dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
 			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
 				dd_putc(163,(8+8*14)+n*14,1,'+');
 			if (stat_raised[n+8+skill_pos]>0) 
@@ -2611,33 +2623,6 @@ unsigned char speedtab[300][200]=
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}
 };
 
-/*
-unsigned char speedsteptab[20][20]=
-{
-//  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-	{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},	//20
-	{4,4,4,4,4,4,4,4,4,2,4,4,4,4,4,4,4,4,4,4},	//19
-	{4,4,4,4,4,2,4,4,4,4,4,4,4,4,2,4,4,4,4,4},	//18
-	{4,4,4,2,4,4,4,4,4,2,4,4,4,4,4,4,2,4,4,4},	//17
-	{4,4,2,4,4,4,4,2,4,4,4,4,2,4,4,4,4,2,4,4},	//16
-	{4,4,2,4,4,4,2,4,4,4,2,4,4,4,2,4,4,4,2,4},	//15
-	{4,2,4,4,2,4,4,4,2,4,4,2,4,4,2,4,4,2,4,4},	//14
-	{4,2,4,4,2,4,4,2,4,4,2,4,4,2,4,4,2,4,4,2},	//13
-	{2,4,4,2,4,4,2,4,2,4,4,2,4,4,2,4,2,4,2,4},	//12
-	{2,4,2,4,2,4,2,4,4,2,4,2,4,2,4,2,4,4,2,4},	//11
-	{4,2,4,2,4,2,4,2,4,2,4,2,4,2,4,2,4,2,4,2},	//10
-	{4,2,4,2,4,2,4,1,3,4,2,4,2,4,2,4,1,2,4,2},	//9
-	{4,1,2,4,1,3,4,2,4,1,2,4,1,3,4,2,4,2,4,2},	//8
-	{2,4,1,3,4,1,3,4,1,3,4,1,3,4,1,3,4,1,3,4},	//7
-	{3,4,1,3,4,1,2,3,4,1,3,4,1,3,4,1,3,4,1,2},	//6
-	{2,3,4,1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4,1},	//5
-	{2,3,4,1,1,2,3,4,1,1,2,3,4,1,1,2,3,4,1,1},	//4
-	{2,3,4,4,1,1,2,2,3,4,1,1,2,2,3,4,4,1,1,2},	 //3
-	{2,3,3,4,4,4,1,1,1,2,2,2,3,3,4,1,1,1,2,2},	//2
-	{3,3,3,3,3,4,4,4,4,4,1,1,1,1,1,2,2,2,2,2}		//1
-};
-*/
-
 int speedo(int n)
 {
 	int moveSpeedValue;
@@ -2646,6 +2631,10 @@ int speedo(int n)
 	if (moveSpeedValue < 0)
 	{
 		moveSpeedValue = 0;
+	}
+	if (moveSpeedValue > 299)
+	{
+		moveSpeedValue = 299;
 	}
 	return speedtab[moveSpeedValue][ctick];
 }
@@ -2667,6 +2656,10 @@ int speedoMisc(int n)
 			{
 				miscSpeedValue = 0;
 			}
+			if (miscSpeedValue > 299)
+			{
+				miscSpeedValue = 299;
+			}
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
@@ -2676,10 +2669,22 @@ int speedoMisc(int n)
 			{
 				miscSpeedValue = 0;
 			}
+			if (miscSpeedValue > 299)
+			{
+				miscSpeedValue = 299;
+			}
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
+			if (miscSpeedValue < 0) 
+			{
+				miscSpeedValue = 0;
+			}
+			if (miscSpeedValue > 299)
+			{
+				miscSpeedValue = 299;
+			}
 			return(speedtab[miscSpeedValue][ctick]);
 	}
 }

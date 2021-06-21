@@ -273,8 +273,8 @@ int dd_init(HWND hwnd,int x,int y)
 		surface.dwSize=sizeof(surface);
 		surface.dwFlags=DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH;
 		surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_VIDEOMEMORY;
-		surface.dwWidth=1280;
-		surface.dwHeight=720;
+		surface.dwWidth=x;  // 1280
+		surface.dwHeight=y; //  720
 
 		dd->lpVtbl->CreateSurface(dd,&surface,&suro,NULL);
 	}
@@ -2244,6 +2244,8 @@ void dd_shadow(int nr,int xpos,int ypos,int xoff,int yoff)
 	ry+=yoff;
 
 	ry+=ys*32-disp;
+	
+	if (rx>screen_width || ry>screen_height || rx<0 || ry<0) return;
 
 	dst=dd_get_ptr(sur2);
 	if (!dst) return;

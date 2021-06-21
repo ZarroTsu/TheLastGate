@@ -177,7 +177,7 @@ int use_create_item(int cn, int in)
 		return( 0);
 	}
 
-	in2 = god_create_item(n, 0);
+	in2 = god_create_item(n);
 
 	if (!god_give_char(in2, cn))
 	{
@@ -262,7 +262,7 @@ int use_create_item2(int cn, int in)
 		return( 0);
 	}
 
-	in2 = god_create_item(n, 0);
+	in2 = god_create_item(n);
 
 	if (!god_give_char(in2, cn))
 	{
@@ -1131,7 +1131,7 @@ int use_mix_potion(int cn, int in)
 		return( 0);
 	}
 
-	in3 = god_create_item(in3, 0);
+	in3 = god_create_item(in3);
 	it[in3].flags |= IF_UPDATE;
 
 	it[in2].used = USE_EMPTY;
@@ -1182,7 +1182,7 @@ int use_chain(int cn, int in)
 
 	in3 = it[in].temp + 1;
 
-	in3 = god_create_item(in3, 0);
+	in3 = god_create_item(in3);
 	it[in3].flags |= IF_UPDATE;
 
 	it[in2].used = USE_EMPTY;
@@ -1222,7 +1222,7 @@ int stone_sword(int cn, int in)
 		return(0);
 	}
 
-	in2 = god_create_item(n, 0);
+	in2 = god_create_item(n);
 
 	chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
 
@@ -1749,6 +1749,12 @@ int use_scroll5(int cn, int in)
 int use_scroll6(int cn, int in)
 {
 	int exp;
+	
+	if (it[in].min_rank>points2rank(ch[cn].points_tot))
+	{
+		do_char_log(cn, 0, "You're not experienced enough to use this (ironically).\n");
+		return;
+	}
 
 	exp = it[in].data[0];
 	
@@ -2364,9 +2370,9 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(3))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA, 0), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND,  0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
+				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2383,8 +2389,8 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(2))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_HP, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_MP, 0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2395,9 +2401,9 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(3))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA, 0), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND,  0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
+				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2423,8 +2429,8 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(2))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_HP, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_MP, 0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2432,11 +2438,11 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(5))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_BRV, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_WIL, 0), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_INT, 0), cc); break;
-				case 3: god_give_char(tmp = god_create_item(IT_RD_AGL, 0), cc); break;
-				case 4: god_give_char(tmp = god_create_item(IT_RD_STR, 0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
+				case 2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
+				case 3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
+				case 4: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2447,9 +2453,9 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(3))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA, 0), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND,  0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
+				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2490,11 +2496,11 @@ int use_crystal_sub(int cn, int in)
 		{
 			switch(RANDOM(5))
 			{
-				case 0: god_give_char(tmp = god_create_item(IT_RD_BRV, 0), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_WIL, 0), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_INT, 0), cc); break;
-				case 3: god_give_char(tmp = god_create_item(IT_RD_AGL, 0), cc); break;
-				case 4: god_give_char(tmp = god_create_item(IT_RD_STR, 0), cc); break;
+				case 0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
+				case 1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
+				case 2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
+				case 3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
+				case 4: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
 			}
 			xlog("  got %s", it[tmp].name);
 		}
@@ -2631,7 +2637,7 @@ int rat_eye(int cn, int in)
 
 		in3 = it[in].data[9];
 
-		in3 = god_create_item(in3, 0);
+		in3 = god_create_item(in3);
 		it[in3].flags |= IF_UPDATE;
 
 		god_take_from_char(in, cn);
@@ -2664,7 +2670,7 @@ int skua_protect(int cn, int in)
 		do_char_log(cn, 0, "He takes away His weapon and replaces it by a common one.\n");
 		spell_from_item(cn, in);
 		it[in].used = USE_EMPTY;
-		in = god_create_item(it[in].data[2], 0);
+		in = god_create_item(it[in].data[2]);
 		it[in].carried = cn;
 		ch[cn].worn[WN_RHAND] = in;
 		it[in].flags |= IF_UPDATE;
@@ -2694,7 +2700,7 @@ int purple_protect(int cn, int in)
 		do_char_log(cn, 0, "He takes away His weapon and replaces it by a common one.\n");
 		spell_from_item(cn, in);
 		it[in].used = USE_EMPTY;
-		in = god_create_item(it[in].data[2], 0);
+		in = god_create_item(it[in].data[2]);
 		it[in].carried = cn;
 		ch[cn].worn[WN_RHAND] = in;
 		it[in].flags |= IF_UPDATE;
@@ -2933,7 +2939,7 @@ int use_pile(int cn, int in)
 		}
 
 		// create it and give it to player (unless it's the monster, then have it attack)
-		in2 = god_create_item(tmp, 0);
+		in2 = god_create_item(tmp);
 		if (it[in2].flags & IF_TAKE)      // takeable object?
 		{
 			god_give_char(in2, cn);
@@ -3334,7 +3340,7 @@ int build_ring(int cn, int in)
 		return( 0);
 	}
 
-	in3 = god_create_item(r, 0);
+	in3 = god_create_item(r);
 	it[in3].flags |= IF_UPDATE;
 
 	if (in2)
@@ -3371,7 +3377,7 @@ int build_ankh(int cn, int in)
 	else
 		return 0;
 	
-	in3 = god_create_item(r, 0);
+	in3 = god_create_item(r);
 	
 	if (in3)
 	{
@@ -3472,7 +3478,7 @@ int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces
 		return(0);
 	}
 
-	in3 = god_create_item(r, 0);
+	in3 = god_create_item(r);
 	it[in3].flags |= IF_UPDATE;
 
 	if (in2)
@@ -3566,8 +3572,8 @@ void boost_char(int cn, int divi)
 	exp  = ch[cn].points_tot / 8 + RANDOM(ch[cn].points_tot / 16 + 1);
 	rank = points2rank(exp);
 	
-	if (rank > 18)
-		rank = 18;
+	if (rank > N_SOULMAX)
+		rank = N_SOULMAX;
 
 	if (rank)
 	{
@@ -3596,18 +3602,33 @@ void boost_char(int cn, int divi)
 		// New
 		if (!(ch[cn].flags & CF_EXTRAEXP)) ch[cn].flags |= CF_EXTRAEXP;
 
-		in = god_create_item(1146, 0);
+		in = god_create_item(1146);
 		if (in)
 		{
 			sprintf(it[in].name, "Soulstone");
 			sprintf(it[in].reference, "soulstone");
 			sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, exp);
-
+			
 			it[in].data[0] = rank;
 			it[in].data[1] = exp;
 			it[in].temp = 0;
 			it[in].driver = 68;
-
+			
+			if (exp>= 6500000)
+			{
+				it[in].data[3] = RANDOM(N_SOULCAT)+1;
+			}
+			if (exp>=14000000)
+			{
+				n = 0;
+				while (n<5)
+				{
+					if ((it[in].data[4] = RANDOM(N_SOULCAT)+1)!=it[in].data[3]) 
+						break;
+					n++;
+				}
+			}
+			
 			god_give_char(in, cn);
 		}
 	}
@@ -4279,7 +4300,7 @@ int use_seyan_shrine(int cn, int in)
 			return(0);
 		}
 
-		in2 = god_create_item(IT_SEYANSWORD, 0);
+		in2 = god_create_item(IT_SEYANSWORD);
 		god_give_char(in2, cn);
 		it[in2].data[0] = cn;
 		do_char_log(cn, 0, "Kwai, the great goddess of war, deemed you worthy to receive a new blade.\n");
@@ -4365,7 +4386,7 @@ int use_seyan_portal(int cn, int in)
 		ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
 		ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 		
-		in2 = god_create_item(IT_SEYANSWORD, 0);
+		in2 = god_create_item(IT_SEYANSWORD);
 		god_give_char(in2, cn);
 		it[in2].data[0] = cn;
 		
@@ -4503,19 +4524,19 @@ int spell_scroll(int cn, int in)
 			ret = spell_light(cn, co, power);
 			break;
 		case    SK_ENHANCE:
-			ret = spell_enhance(cn, co, power);
+			ret = spell_enhance(cn, co, power, 1);
 			break;
 		case    SK_PROTECT:
-			ret = spell_protect(cn, co, power);
+			ret = spell_protect(cn, co, power, 1);
 			break;
 		case    SK_BLESS:
-			ret = spell_bless(cn, co, power);
+			ret = spell_bless(cn, co, power, 1);
 			break;
 		case    SK_MSHIELD:
-			ret = spell_mshield(cn, co, power);
+			ret = spell_mshield(cn, co, power, 1);
 			break;
 		case    SK_HASTE:
-			ret = spell_haste(cn, co, power);
+			ret = spell_haste(cn, co, power, 1);
 			break;
 		// Blast?
 		case    SK_CURSE:
@@ -4671,7 +4692,7 @@ int use_lab8_key(int cn, int in)
 	ch[cn].citem = 0;
 	it[in2].used = USE_EMPTY;
 
-	in3 = god_create_item(in3, 0);
+	in3 = god_create_item(in3);
 	it[in3].flags |= IF_UPDATE;
 	god_give_char(in3, cn);
 
@@ -4710,7 +4731,7 @@ int use_lab8_shrine(int cn, int in)
 
 	chlog(cn, "Offered %s at %s", it[offer].reference, it[in].reference);
 
-	gift = god_create_item(it[in].data[1], 0);
+	gift = god_create_item(it[in].data[1]);
 	if (!god_give_char(gift, cn))
 	{
 		ch[cn].citem = gift;
@@ -5356,6 +5377,12 @@ void use_driver(int cn, int in, int carried)
 				break;
 			case 91:						// Gold scroll
 				ret = use_scroll8(cn, in);
+				break;
+			case 92:
+				ret = use_soulfocus(cn, in);
+				break;
+			case 93:
+				ret = use_soulcatalyst(cn, in);
 				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
@@ -6801,9 +6828,7 @@ int step_portal_arena(int cn, int in)
 	int nr, co, in2, n, flag = 0;
 	int xs, ys, xe, ye, x, y;
 	int money;
-
-	if (!(ch[cn].flags&CF_PLAYER))	{ return(0); }
-
+	
 	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==687)
 	{
 		ch[cn].citem = 0;
@@ -6874,7 +6899,7 @@ int step_portal_arena(int cn, int in)
 
 	ch[co].data[64] = globs->ticker + TICKS * 60 * 5;
 
-	in = god_create_item(IT_ARENANOTE, 0);
+	in = god_create_item(IT_ARENANOTE);
 	god_give_char(in, co);
 	spell_light(co, co, 30);
 
@@ -6893,11 +6918,6 @@ int step_teleport(int cn, int in)
 	if (cn <= 0)
 	{
 		xlog("step_teleport(): cn = %d", cn);
-		return(-1);
-	}
-	// Only let players trigger floor teleports. This is to avoid janky pathfinding with GCs.
-	if (!IS_PLAYER(cn))
-	{
 		return(-1);
 	}
 	x = it[in].data[0];
@@ -7017,6 +7037,12 @@ void step_firefloor_remove(int cn, int in)
 int step_driver(int cn, int in)
 {
 	int ret = 0;
+	
+	// Only let players trigger floor objects
+	if (!IS_PLAYER(cn))
+	{
+		return 0;
+	}
 	
 	switch(it[in].driver)
 	{

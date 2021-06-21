@@ -485,7 +485,7 @@ void update_race(HWND hwnd)
 	else
 	{
 		//  AUTORADIOBUTTON "", IDC_ARCH, 176, 143, 60, 12, WS_DISABLED
-		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,176+88,143+92,60,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,176+88,143+92,100,12,0);
 		
 		CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_ARCH);
 	

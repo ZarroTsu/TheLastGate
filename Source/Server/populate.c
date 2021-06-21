@@ -69,55 +69,58 @@ int pop_create_item(int temp, int cn)
 	int in = 0;
 	int enbl = 0;
 	
-	int godroll = 0;
+	int godroll = 0, bonus = 2;
 	char *gend, *godn, name[60], refer[60], descr[220];
 	
 	if (is_unique_able(temp))
 	{
 		if (!in && ch[cn].alignment<0 && !RANDOM(200)) 	// Reward a unique weapon
-		{
-			godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
-			
-			in = god_create_item(temp, godroll); 		// create the item
-			
-			if (in)										// assure the item is created and passed the unique check
+		{	godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
+			in = god_create_item(temp); 				// create the item
+			if (in)										// assure the item is created
 			{
+				if (it[in].placement & PL_TWOHAND)
+				{
+					bonus = 3;
+				}
+				
 				switch (godroll)
 				{
 					case 1:
 						gend = " god ";
 						godn = "Skua";
-						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]			+= 10;
+						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
+						it[in].speed[0]      +=  8 * bonus/2;
 						break;
 					case 2:
 						gend = " goddess ";
 						godn = "Kwai";
-						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_KWAI_UNI;
-						it[in].to_hit[0]		+= 5;
-						it[in].to_parry[0]		+= 5;
+						it[in].flags |= IF_KWAI_UNI;
+						it[in].to_hit[0]     +=  4 * bonus/2;
+						it[in].to_parry[0]   +=  4 * bonus/2;
 						break;
 					case 3:
 						gend = " god ";
 						godn = "Gorn";
-						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_GORN_UNI;
-						it[in].spell_mod[0]		+= 2;
+						it[in].flags |= IF_GORN_UNI;
+						it[in].spell_mod[0]  +=  2 * bonus/2;
 						break;
 					default:
 						gend = " ";
 						godn = "Purple One";
-						it[in].flags |= IF_UNIQUE | IF_NOREPAIR | IF_PURP_UNI;
-						it[in].top_damage[0]	+= 20;
+						it[in].flags |= IF_PURP_UNI;
+						it[in].top_damage[0] += 20 * bonus/2;
 						break;
 				}
 				
 				if (it[in].flags & IF_OF_SHIELD)
-					it[in].armor[0] += 4;
+					it[in].armor[0]  += 3;
 				else
-					it[in].weapon[0] += 4;
+					it[in].weapon[0] += 3;
 				
-				it[in].max_damage = 0;
-				it[in].flags |= IF_SINGLEAGE;
+				it[in].temp = 0;
+				it[in].max_damage = 2500 * it[in].weapon[0]/2;
+				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
 				strcpy(name, it[in].name);
 				strcpy(refer, it[in].reference);
 				strcpy(descr, it[in].description);
@@ -167,7 +170,7 @@ int pop_create_item(int temp, int cn)
 	}
 	if (!in)
 	{
-		in = god_create_item(temp, 0);
+		in = god_create_item(temp);
 		if (in && it[in].max_damage>0)
 		{
 			if (RANDOM(2))
@@ -337,7 +340,7 @@ int pop_create_bonus(int cn, int chance)
 	
 	if (n)
 	{
-		n = god_create_item(n, 0);
+		n = god_create_item(n);
 
 		chlog(cn, "got %s (t=%d)", it[n].name, it[n].temp);
 	}
@@ -369,7 +372,7 @@ int pop_create_bonus_belt(int cn)
 	}
 	if (n)
 	{
-		n = god_create_item(n, 0);   // creating belt from template
+		n = god_create_item(n);   // creating belt from template
 		if(!n)
 		{
 			return( 0);     // return if failed
@@ -501,7 +504,7 @@ int pop_create_char(int n, int drop)
 	{
 		if ((tmp = ch[cn].item[m])!=0)
 		{
-			tmp = god_create_item(tmp, 0);
+			tmp = god_create_item(tmp);
 			if (!tmp)
 			{
 				flag = 1;
@@ -545,7 +548,7 @@ int pop_create_char(int n, int drop)
 
 	if ((tmp = ch[cn].citem)!=0)
 	{
-		tmp = god_create_item(tmp, 0);
+		tmp = god_create_item(tmp);
 		if (!tmp)
 		{
 			flag = 1;

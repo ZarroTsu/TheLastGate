@@ -312,7 +312,7 @@ void effect_tick(void)
 				map[m].flags &= ~MF_GFX_TOMB;
 				map[m].flags &= ~MF_MOVEBLOCK;
 
-				in = god_create_item(IT_TOMBSTONE, 0);
+				in = god_create_item(IT_TOMBSTONE);
 				it[in].data[0] = co;
 				
 				if (ch[co].data[99])
@@ -477,7 +477,7 @@ void effect_tick(void)
 				in2 = map[m].it;
 				map[m].it = 0;
 
-				in = god_create_item(fx[n].data[2], 0);
+				in = god_create_item(fx[n].data[2]);
 
 				if (!god_drop_item(in, fx[n].data[0], fx[n].data[1]))
 				{

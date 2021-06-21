@@ -11,8 +11,8 @@
 #define RANDOM(a) (a>0?random()%(a):0)
 #define DATDIR ".dat"
 
-#define VERSION    0x000601
-#define MINVERSION 0x000601
+#define VERSION    0x000603
+#define MINVERSION 0x000603
 
 #define TICKS 18
 #define TICK  (1000000/TICKS)
@@ -204,8 +204,8 @@
 #define SP_COST_DISPEL		45
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		50
-#define SP_COST_PULSE		30
-#define SP_COST_RAZOR		40
+#define SP_COST_PULSE		60
+#define SP_COST_RAZOR		20
 
 #define SP_COST_WEAKEN		10
 #define SP_COST_BLIND		10

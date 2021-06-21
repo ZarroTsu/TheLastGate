@@ -47,13 +47,13 @@ struct cmap
 	short int ch_sprite;            // basic sprite of character
 	unsigned char ch_status2;
 	unsigned char ch_status;        // what the character is doing, animation-wise
-	unsigned char ch_speed;         // speed of animation
+	short int ch_speed;         	// speed of animation
 	unsigned short ch_nr;
 	unsigned short ch_id;
 	unsigned char ch_proz;          // health in percent
-	unsigned char ch_castspd;		// animation speed bonus for misc. actions (casting)
-	unsigned char ch_atkspd;		// animation speed bonus for attacking
-	unsigned char ch_movespd;		// animation speed bonus for walking
+	short int ch_castspd;			// animation speed bonus for misc. actions (casting)
+	short int ch_atkspd;			// animation speed bonus for attacking
+	short int ch_movespd;			// animation speed bonus for walking
 	unsigned char ch_fontcolor;		// overhead text font color. 0 = red, 1 = yellow, etc
 
 	// for item

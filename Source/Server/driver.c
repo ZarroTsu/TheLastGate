@@ -800,37 +800,11 @@ int npc_give(int cn, int co, int in, int money)
 		// hack for black candle
 		if (ch[cn].temp==CT_TACTICIAN && (it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3))
 		{
-			int addptsA=0, addptsB=0, addptsC=0;
-			int groupdivide=1;
-			
-			if (it[in].temp==IT_BS_CAN3)		addptsC=it[in].power*20;
-			else if (it[in].temp==IT_BS_CAN2)	addptsB=it[in].power*5;
-			else								addptsA=it[in].power;
-			
-			// <group rewards>
-			for (n = 1; n<MAXCHARS; n++)
-			{
-				if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
-				if (isgroup(n, co) && isgroup(co, n)) groupdivide++;
-			}
-			addptsA/=max(1,groupdivide); if (it[in].temp==IT_BS_CAN1 && addptsA<0) addptsA=1;
-			addptsB/=max(1,groupdivide); if (it[in].temp==IT_BS_CAN2 && addptsB<0) addptsB=1;
-			addptsC/=max(1,groupdivide); if (it[in].temp==IT_BS_CAN3 && addptsC<0) addptsC=1;
-			for (n = 1; n<MAXCHARS; n++)
-			{
-				if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
-				if (isgroup(n, co) && isgroup(co, n))
-				{
-					ch[n].data[26]+=addptsA;
-					ch[n].data[26]+=addptsB;
-					ch[n].data[26]+=addptsC;
-				}
-			}
-			// </group rewards>
-			
-			ch[co].data[26]+=addptsA;
-			ch[co].data[26]+=addptsB;
-			ch[co].data[26]+=addptsC;
+			// TODO: set up one of the item driver data's to hold the exp of the candle instead.
+			//  maybe adjust this data based on the wave the candle is taken?
+			if (it[in].temp==IT_BS_CAN3)		do_give_bspoints(cn, it[in].power*20, 1);
+			else if (it[in].temp==IT_BS_CAN2)	do_give_bspoints(cn, it[in].power* 5, 1);
+			else								do_give_bspoints(cn, it[in].power* 1, 1);
 			
 			god_take_from_char(in, cn);
 			it[in].used = USE_EMPTY;  // silently destroy the item.
@@ -883,11 +857,19 @@ int npc_give(int cn, int co, int in, int money)
 		else if (ch[cn].temp==CT_HERBCOLL && 
 		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD || it[in].temp==IT_HERBE))
 		{
-			if (it[in].temp==IT_HERBA)		money = 10000;
+			if (points2rank(ch[co].points_tot)<8)
+			{
+				do_sayx(cn, "I'm sorry %s, I don't have a use for weeds!", ch[co].name);
+				god_take_from_char(in, cn);
+				god_give_char(in, co);
+				do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
+				return(0);
+			}
+			if (it[in].temp==IT_HERBA)			money = 10000;
 			else if (it[in].temp==IT_HERBB)	money = 15000;
 			else if (it[in].temp==IT_HERBC)	money = 25000;
 			else if (it[in].temp==IT_HERBD)	money = 40000;
-			else							money = 60000;
+			else								money = 60000;
 			nr = money*3/2;
 			do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			god_take_from_char(in, cn);
@@ -962,7 +944,7 @@ int npc_give(int cn, int co, int in, int money)
 					do_sayx(cn, "You will need a lockpick, and I happen to have a spare. Take it, please.");
 					god_take_from_char(in, cn);
 					it[in].used = USE_EMPTY;
-					in = god_create_item(93, 0);
+					in = god_create_item(93);
 					god_give_char(in, co);
 					do_sayx(cn, "You can LOOK at a door and you will be able to tell you how hard it is to pick it.");
 					do_sayx(cn, "If you're able to pick the lock, HOLD the lockpick in your hand and then USE the door.");
@@ -984,7 +966,7 @@ int npc_give(int cn, int co, int in, int money)
 						int div = 4;
 						if (!(ch[n].flags & CF_LOCKPICK))
 						{
-							in = god_create_item(93, 0);
+							in = god_create_item(93);
 							god_give_char(in, n);
 							ch[n].flags |= CF_LOCKPICK;
 							do_char_log(n, 0, "You learned how to pick locks!\n");
@@ -1197,7 +1179,7 @@ int npc_give(int cn, int co, int in, int money)
 			if (!(ch[cn].flags&(CF_BODY))) 
 			{
 				do_sayx(cn, "Here is your %s in exchange.", it_temp[nr].reference);
-				in = god_create_item(nr, 0);
+				in = god_create_item(nr);
 				god_give_char(in, co);
 				if ((nr = ch[cn].data[51])!=0)
 				{
@@ -1424,25 +1406,10 @@ int is_unique_able(int temp)
 
 int is_unique(int in)
 {
-	static int unique[] = {
-	//	Dag  Sta  Spe  Shi  Swo  Dua  Axe  Two  Gre
-		284, 285, 286, 287, 288, 289, 290, 291, 292, // Steel
-		523, 524, 525, 526, 527, 528, 529, 530, 531, // Gold
-		532, 533, 534, 535, 536, 537, 538, 539, 540, // Emerald
-		541, 542, 543, 544, 545, 546, 547, 548, 549, // Crystal
-		572, 573, 574, 575, 576, 577, 578, 579, 580, // Titanium
-		693, 694, 695, 696, 697, 698, 699, 700, 701  // Adamantium
-													 // Claws
-		
-	//	280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 525, 526, // Skua weapons
-	//	527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, // Kwai weapons
-	//	542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, // Gorn weapons
-	//	572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586  // Purp weapons
-	};
-	int n;
-
+	//static int unique[] = {};
+	//int n;
 	if (it[in].flags & IF_UNIQUE) return 1;
-
+	/*
 	for (n = 0; n<ARRAYSIZE(unique); n++)
 	{
 		if (it[in].temp==unique[n] && (it[in].flags & IF_UNIQUE))
@@ -1450,7 +1417,7 @@ int is_unique(int in)
 			return( 1);
 		}
 	}
-
+	*/
 	return(0);
 }
 
@@ -1502,7 +1469,7 @@ int count_uniques(int cn)
 int npc_see(int cn, int co)
 {
 	int n, n2, idx, indoor1, indoor2;
-	int x1, x2, y1, y2, dist, ret, cnt;
+	int x1, x2, y1, y2, dist, ret, cnt, cc;
 	unsigned char buf[3];
 
 	if (ch[co].flags & (CF_PLAYER | CF_USURP))
@@ -1565,18 +1532,18 @@ int npc_see(int cn, int co)
 	}
 	
 	// if we're taunted, try to attack the taunter
-	if (ch[cn].taunted && IS_SANECHAR(ch[cn].taunted) && (do_char_can_see(cn, ch[cn].taunted) || ch[cn].data[78]))
+	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc) || ch[cn].data[78]))
 	{
 		// If our last attempt to attack failed, wander near the taunter
 		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
 		{
-			ch[cn].goto_x = ch[co].x + 5 - RANDOM(10);
-			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
+			ch[cn].goto_x = ch[cc].x + 5 - RANDOM(10);
+			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (do_char_can_see(cn, ch[cn].taunted) && ch[cn].attack_cn!=ch[cn].taunted)
+		else if (do_char_can_see(cn, cc) && ch[cn].attack_cn!=cc)
 		{
-			ch[cn].attack_cn = ch[cn].taunted;
+			ch[cn].attack_cn = cc;
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
@@ -2643,6 +2610,7 @@ void stronghold_mage_driver(int cn)
 	int bs_x, bs_y, bs_group, bs_temp, spawn_temp[60], attr_bonus[6] = {0}, wv_bonus[6] = {0}, hp_bonus[6] = {0}, ws_bonus[6] = {0};
 	int n, m, j, in, co, magenum=0, pts=0, modified=0;
 	int pinline = 0;
+	char buf[80];
 	
 	if (ch[cn].temp==CT_BSMAGE1) magenum = 1;
 	if (ch[cn].temp==CT_BSMAGE2) magenum = 2;
@@ -3043,25 +3011,21 @@ void stronghold_mage_driver(int cn)
 							}
 							ch[co].weapon = ch[co].weapon+wv_bonus[j]<255?ch[co].weapon+wv_bonus[j]:255;
 							ch[co].armor  = ch[co].armor+wv_bonus[j]<255?ch[co].armor+wv_bonus[j]:255;
-							pts = attr_bonus[j]/(3+magenum);
-							if (pts>89) pts=89;
-							ch[co].data[26]+=pts;
 							modified=1;
 						}
 					}
 					//
-					if (ch[cn].data[3]>=7 && !RANDOM(max(1,32-(pinline*2))))
+					if (ch[cn].data[3]>=7 && !RANDOM(max(1,30-(pinline*2))))
 					{
-						char buf[80];
 						for (n = 0; n<5; n++)
 						{
-							ch[co].attrib[n][0] += 3+RANDOM(3+magenum);
+							ch[co].attrib[n][0] += 2+RANDOM(3+magenum);
 						}
 						for (n = 0; n<MAXSKILL; n++)
 						{
 							if (ch[co].skill[n][0])
 							{
-								ch[co].skill[n][0] += 3+RANDOM(3+magenum)*2;
+								ch[co].skill[n][0] += 2+RANDOM(3+magenum)*2;
 							}
 						}
 						sprintf(buf, "the tough %s", ch[co].name);
@@ -3073,8 +3037,36 @@ void stronghold_mage_driver(int cn)
 						strncpy(ch[co].name, buf, 39);
 						ch[co].name[39] = 0;
 						
-						ch[co].data[26]+= 3+RANDOM(3+magenum)*3/2;
-						if (!(ch[co].flags & CF_EXTRAEXP)) ch[co].flags |= CF_EXTRAEXP;
+						if (!(ch[co].flags & CF_EXTRAEXP)) 
+							ch[co].flags |= CF_EXTRAEXP;
+						modified=1;
+					}
+					else if (ch[cn].data[3]>=16 && !RANDOM(max(1,40-(pinline*2))))
+					{
+						for (n = 0; n<5; n++)
+						{
+							ch[co].attrib[n][0] += 4+RANDOM(5+magenum);
+						}
+						for (n = 0; n<MAXSKILL; n++)
+						{
+							if (ch[co].skill[n][0])
+							{
+								ch[co].skill[n][0] += 4+RANDOM(5+magenum)*3;
+							}
+						}
+						sprintf(buf, "the fierce %s", ch[co].name);
+						buf[11] = tolower(buf[11]);
+						strncpy(ch[co].reference, buf, 39);
+						ch[co].reference[39] = 0;
+						
+						sprintf(buf, "Fierce %s", ch[co].name);
+						strncpy(ch[co].name, buf, 39);
+						ch[co].name[39] = 0;
+						
+						if (!(ch[co].flags & CF_EXTRAEXP)) 
+							ch[co].flags |= CF_EXTRAEXP;
+						if (!(ch[co].flags & CF_CANCRIT)) 
+							ch[co].flags |= CF_CANCRIT;
 						modified=1;
 					}
 					if (modified)
@@ -3131,6 +3123,7 @@ void npc_lab_lord_driver(int cn)
 int npc_driver_high(int cn)
 {
 	int x, y, in, co, indoor1, indoor2, cc, in2, n;
+	int mc, m;
 
 	if (ch[cn].data[25])
 	{
@@ -3439,6 +3432,41 @@ int npc_driver_high(int cn)
 				return( 1);
 			}
 		}
+		
+		m = ch[cn].x + ch[cn].y * MAPX;
+		
+		// Check for enemies around our ally and see if they're hitting too
+		//  this is helpful if our ally has fightback turned off
+		for (n=0; n<4; n++)
+		{
+			switch (n)
+			{
+				case 0: mc = m + 1; break;
+				case 1: mc = m - 1; break;
+				case 2: mc = m + MAPX; break;
+				case 3: mc = m - MAPX; break;
+			}
+			if ((cc = map[mc].ch)!=0 && ch[cc].attack_cn==co)
+			{
+				// taunt this enemy to pull them off our friend
+				if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
+				{
+					ch[cn].data[74] = globs->ticker + TICKS * 20;
+					return(1);
+				}
+				
+				// blast this enemy if our friend is losing and his enemy is our enemy as well
+				if (cc && ch[co].a_hp<ch[co].hp[5] * 650 && npc_is_enemy(cn, cc))
+				{
+					if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, cc, SK_BLAST))
+					{
+						ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
+						return( 1);
+					}
+				}
+			}
+		}
+		//
 		ch[cn].data[65] = 0;
 	}
 
@@ -3659,7 +3687,7 @@ int npc_driver_high(int cn)
 				{
 					if (plr_check_target(x + y * MAPX + 1) && !map[x + y * MAPX + 1].it)
 					{
-						in2 = god_create_item(18, 0);
+						in2 = god_create_item(18);
 						it[in2].carried = cn;
 						ch[cn].citem = in2;
 
@@ -4593,7 +4621,7 @@ void update_shop(int cn)
 		{
 			continue;
 		}
-		in = god_create_item(temp, 0);
+		in = god_create_item(temp);
 		if (in)
 		{
 			if (!god_give_char(in, cn))

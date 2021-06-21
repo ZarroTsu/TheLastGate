@@ -118,7 +118,7 @@ void npc_malte_low(int cn)
 		do_sayx(cn, "I found this part of the coin, and I heard that Damor in Aston has another one. Ask him for the 'Black Stronghold Coin'.");
 		ch[cn].data[2] = globs->ticker + TICKS * 5;
 		ch[cn].data[1]++;
-		in = ch[cn].citem = god_create_item(763, 0);
+		in = ch[cn].citem = god_create_item(763);
 		it[in].carried = cn;
 		ch[cn].misc_action  = DR_GIVE;
 		ch[cn].misc_target1 = co;
@@ -173,7 +173,7 @@ void npc_archeologist_low(int cn)
 		do_sayx(cn, "Before the monsters caught me, I found this golden skull. Please take it, if you would.");
 		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
-		in = ch[cn].citem = god_create_item(1617, 0);
+		in = ch[cn].citem = god_create_item(1617);
 		it[in].carried = cn;
 		ch[cn].misc_action  = DR_GIVE;
 		ch[cn].misc_target1 = co;

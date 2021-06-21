@@ -520,9 +520,9 @@ struct character
 
 	char lastattack;                // neater display: remembers the last attack animation
 	
-	unsigned char move_speed;		// Bonus to movement speed (added to speed_mod)
-	unsigned char atk_speed;		// Bonus to attacking speed (added to speed_mod)
-	unsigned char cast_speed;		// Bonus to casting speed (added to speed_mod)
+	char move_speed;		// Bonus to movement speed (added to speed_mod)
+	char atk_speed;		// Bonus to attacking speed (added to speed_mod)
+	char cast_speed;		// Bonus to casting speed (added to speed_mod)
 	
 	unsigned short spell_mod;       // race dependent spell modifier - two digit decimal accuracy (1.00)
 	unsigned short spell_apt;       // aptitude for receiving spells
@@ -537,7 +537,7 @@ struct character
 	
 	unsigned short taunted;         // has been taunted by this template
 	
-	char future1[4];               // space for future expansion
+	int bs_points;					// Black Stronghold points
 
 	short int sprite_override;
 
@@ -623,10 +623,11 @@ __attribute__ ((packed));
 #define IF_ITEMLOCK      (1ull<<47)     // locked by client - ignore in sort
 #define IF_STACKABLE     (1ull<<48)     // item can be stacked
 #define IF_PURP_UNI      (1ull<<49)     // unique check for Purple 
+#define IF_GEMSTONE      (1ull<<50)     // is a gem
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
-#define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK|IF_JEWELERY)
+#define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK|IF_JEWELERY|IF_GEMSTONE)
 
 #define BUFFSIZE         (sizeof(struct item)*MAXBUFF)
 #define ITEMSIZE         (sizeof(struct item)*MAXITEM)
@@ -719,7 +720,9 @@ struct item
 	char ss_armor;					// Used to store AV on SS gear so it repairs correctly
 	char ss_weapon;					// Used to store WV on SS gear so it repairs correctly
 	
-	char future3[10];				// 587
+	unsigned char base_crit;		// base crit chance for weapons
+	
+	char future3[9];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
@@ -793,18 +796,6 @@ struct s_splog
 	char senseaoe[100];	// log sense aoe,	ie. " tried to include you in a mass-curse but failed."
 };
 
-#define N_SOULCAT		46
-#define N_SOULBONUS		72
-
-struct s_soulcat
-{
-	int nr;
-	
-	char cost;						// Number of soul levels needed to apply
-	char bonus;						// Number of points granted when applied
-	char weightmulti[N_SOULCAT];	// Weight multiplier per each catalyst type
-};
-
 #define MAX_MAPED_QUEUE         16000
 #define MAPED_QUEUE_SIZE        (sizeof(struct mapedit_queue)*MAX_MAPED_QUEUE)
 
@@ -827,9 +818,13 @@ struct waypoint
 	char *desc;
 };
 
+#define N_SOULCAT		158
+#define N_SOULBONUS		 70
+#define N_SOULMAX		 24
+#define N_SOULTAGS		  3
+
 extern struct s_skilltab skilltab[MAXSKILL];
 extern struct s_splog splog[50];
-extern struct s_soulcat soulcat[N_SOULBONUS];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;

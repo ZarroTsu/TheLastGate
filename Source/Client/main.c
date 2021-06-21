@@ -203,6 +203,8 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
 
 	switch (message) {
+		case WM_MENUCHAR:
+            return MNC_CLOSE<<16;
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			switch ((int)wParam) 
@@ -216,6 +218,34 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				case  51: if (keys>=2) button_command(18); break;
 				// -------- CTRL + 4
 				case  52: if (keys>=2) button_command(19); break;
+				
+				// **************** Ctrl cases for letter keys **************** //
+				// -------- CTRL + Q
+				case  81: if (keys>=2) button_command(20);break;
+				// -------- CTRL + W
+				case  87: if (keys>=2) button_command(21);break;
+				// -------- CTRL + E
+				case  69: if (keys>=2) button_command(22);break;
+				// -------- CTRL + R
+				case  82: if (keys>=2) button_command(23);break;
+				
+				// -------- CTRL + A
+				case  65: if (keys>=2) button_command(24);break;
+				// -------- CTRL + S
+				case  83: if (keys>=2) button_command(25);break;
+				// -------- CTRL + D
+				case  68: if (keys>=2) button_command(26);break;
+				// -------- CTRL + F
+				case  70: if (keys>=2) button_command(27);break;
+				
+				// -------- CTRL + Z
+				case  90: if (keys>=2) button_command(28);break;
+				// -------- CTRL + X
+				case  88: if (keys>=2) button_command(29);break;
+				// -------- CTRL + C
+				case  67: if (keys>=2) button_command(30);break;
+				// -------- CTRL + V
+				case  86: if (keys>=2) button_command(31);break;
 				
 				// -------- ESC
 				case  27: 
@@ -396,12 +426,6 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 						tabmode=0; tabstart=0;
 					}
 					break;
-/*
-					default:
-						xlog(3,"key=%d",(int)wParam);
-						break;
-*/
-
 			}
 			break;
 
@@ -515,7 +539,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 		case WM_RBUTTONUP:
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_RB_UP);
 			break;
-
+		
 		default:
 			return(DefWindowProc(hWnd, message, wParam, lParam));
 	}
@@ -711,6 +735,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	} else {
 		tmp=dd_init(hwnd,screen_width,screen_height);
 	}
+	/*
 	if (tmp!=0) { // A hacky fix for fullscreen support
 		screen_height=800;
 		if (screen_windowed == 1) {
@@ -719,6 +744,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			tmp=dd_init(hwnd,screen_width,screen_height);
 		}
 	}
+	*/
 	
 	if (tmp!=0) {
 

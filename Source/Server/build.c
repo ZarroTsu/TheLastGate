@@ -38,7 +38,7 @@ int build_item(int nr, int x, int y)
 
 	if (it_temp[nr].flags & (IF_TAKE | IF_LOOK | IF_LOOKSPECIAL | IF_USE | IF_USESPECIAL))
 	{
-		in = god_create_item(nr, 0);
+		in = god_create_item(nr);
 
 		if (it[in].driver==33)
 		{

@@ -47,6 +47,7 @@ int npc_cityattack_gotattack(int cn, int co)
 	if (npc_add_enemy(cn, co, 1))
 	{
 		chlog(cn, "Added %s to kill list for attacking me", ch[co].name);
+		if (ch[cn].data[0]<2) ch[cn].data[0]=2; // Force the raid state
 		/*
 		if (IS_PLAYER(co) || IS_COMP_TEMP(co))
 		{
@@ -111,19 +112,19 @@ int npc_cityattack_see(int cn, int co)
 	}
 	
 	// if we're taunted, try to attack the taunter
-	if (ch[cn].taunted && IS_SANECHAR(ch[cn].taunted) && (do_char_can_see(cn, ch[cn].taunted) || ch[cn].data[78]))
+	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc) || ch[cn].data[78]))
 	{
 		if (ch[cn].data[0]<2) ch[cn].data[0]=2; // Force the raid state
 		// If our last attempt to attack failed, wander near the taunter
 		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
 		{
-			ch[cn].goto_x = ch[co].x + 5 - RANDOM(10);
-			ch[cn].goto_y = ch[co].y + 5 - RANDOM(10);
+			ch[cn].goto_x = ch[cc].x + 5 - RANDOM(10);
+			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (do_char_can_see(cn, ch[cn].taunted) && ch[cn].attack_cn!=ch[cn].taunted)
+		else if (do_char_can_see(cn, cc) && ch[cn].attack_cn!=cc)
 		{
-			ch[cn].attack_cn = ch[cn].taunted;
+			ch[cn].attack_cn = cc;
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
@@ -412,19 +413,6 @@ int npc_cityattack_wait(cn)
 {
 	int n;
 	int bsm1=0, bsm2=0, bsm3=0;
-	/*
-	int t_rone = 0;
-	int t_rtwo = T_RAID/2;
-	int t_rthr = 0;
-	int t_secs = TICKS*2;
-	
-		 if (ch[cn].data[26]>=301 && ch[cn].data[26]<=399 && (globs->mdtime % T_RAID)>=t_rthr && (globs->mdtime % T_RAID)<(t_rthr+t_secs))
-		return 1;
-	else if (ch[cn].data[26]>=201 && ch[cn].data[26]<=299 && (globs->mdtime % T_RAID)>=t_rtwo && (globs->mdtime % T_RAID)<(t_rtwo+t_secs))
-		return 1;
-	else if (ch[cn].data[26]>=101 && ch[cn].data[26]<=199 && (globs->mdtime % T_RAID)>=t_rone && (globs->mdtime % T_RAID)<(t_rone+t_secs))
-		return 1;
-	*/
 	
 	for (n = 1; n<MAXCHARS; n++)
 	{
@@ -434,9 +422,14 @@ int npc_cityattack_wait(cn)
 		if (ch[n].temp==CT_BSMAGE1) bsm1 = ch[n].data[1];
 	}
 	
-	if (ch[cn].data[26]>=301 && ch[cn].data[26]<=399 && bsm3>=BS_COUNTER) return 1;
-	if (ch[cn].data[26]>=201 && ch[cn].data[26]<=299 && bsm2>=BS_COUNTER) return 1;
-	if (ch[cn].data[26]>=101 && ch[cn].data[26]<=199 && bsm1>=BS_COUNTER) return 1;
+	if ( (ch[cn].data[26]>=301 && ch[cn].data[26]<=399 && bsm3>=BS_COUNTER) ||
+	     (ch[cn].data[26]>=201 && ch[cn].data[26]<=299 && bsm2>=BS_COUNTER) ||
+	     (ch[cn].data[26]>=101 && ch[cn].data[26]<=199 && bsm1>=BS_COUNTER) )
+	{
+		ch[cn].goto_x = 0;
+		ch[cn].goto_y = 0;
+		return 1;
+	}
 	
 	return 0;
 }
