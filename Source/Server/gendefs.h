@@ -11,8 +11,8 @@
 #define RANDOM(a) (a>0?random()%(a):0)
 #define DATDIR ".dat"
 
-#define VERSION    0x000603
-#define MINVERSION 0x000603
+#define VERSION    0x000604
+#define MINVERSION 0x000604
 
 #define TICKS 18
 #define TICK  (1000000/TICKS)
@@ -184,7 +184,7 @@
 #define SP_BLIND   (1u<<12)
 #define SP_PULSE   (1u<<13)
 #define SP_TAUNT   (1u<<14)
-#define SP_RAZOR   (1u<<15)
+#define SP_ZEPHYR   (1u<<15)
 #define SP_MSHIELD (1u<<16)
 
 // -------- Spell Cost values -------- //
@@ -205,7 +205,7 @@
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		50
 #define SP_COST_PULSE		60
-#define SP_COST_RAZOR		20
+#define SP_COST_ZEPHYR		20
 
 #define SP_COST_WEAKEN		10
 #define SP_COST_BLIND		10
@@ -244,7 +244,7 @@
 #define SP_DUR_TAUNT		( TICKS *  5                      )
 #define SP_DUR_GUARD		( TICKS * 15                      )
 #define SP_DUR_PULSE		( TICKS * 60 * 1                  )
-#define SP_DUR_RAZOR		( TICKS * 60 * 1                  )
+#define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )
 #define SP_DUR_DOUSE		( TICKS * 20                      )
 #define SP_DUR_FROSTB		( TICKS * 20                      )
 
@@ -270,11 +270,11 @@
 #define SK_EXH_CLEAVE		(TICKS * 5)
 #define SK_EXH_WEAKEN		(TICKS * 3)
 
-#define SK_EXH_PULSE		(TICKS * 6)
-#define SK_EXH_RAZOR		(TICKS * 6)
+#define SK_EXH_PULSE		(TICKS * 5)
+#define SK_EXH_ZEPHYR		(TICKS * 5)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP			(TICKS * 6)
+#define SK_EXH_LEAP(a)		(TICKS * 6 + TICKS * a / 2)
 
 
 

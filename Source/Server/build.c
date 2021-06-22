@@ -262,7 +262,6 @@ void build_drop(int x, int y, int in)
 	}
 }
 
-
 void build_remove(int x, int y)
 {
 	int nr;
@@ -300,4 +299,135 @@ void build_remove(int x, int y)
 	map[x + y * MAPX].it = 0;
 
 	xlog("build: remove item from %d,%d", x, y);
+}
+
+// Copy from X/Y to X/Y
+int build_copy(int fx, int fy, int tx, int ty)
+{
+	int nr, in, act=0;
+
+	if (fx<0 || fx>=MAPX || fy<0 || fy>=MAPY || tx<0 || tx>=MAPX || ty<0 || ty>=MAPY)
+	{
+		xlog("build_copy: location out of bounds");
+		return 0;
+	}
+	
+	// Clean tile
+	build_remove(tx, ty);
+	
+	// Copy floor
+	map[tx + ty * MAPX].sprite = map[fx + fy * MAPX].sprite;
+	
+	// Copy object
+	nr = map[fx + fy * MAPX].it;
+	if (nr)
+	{
+		in = it[nr].temp;
+		act= it[nr].active;
+		nr = build_item(in, tx, ty);
+	}
+	
+	// Copy flags
+	map[tx + ty * MAPX].flags = map[fx + fy * MAPX].flags;
+	
+	if (nr)
+	{
+		it[nr].active = act;
+		if (it[nr].active)
+		{
+			if (it[nr].light[1])
+			{
+				do_add_light(tx, ty, it[nr].light[1]);
+			}
+		}
+		else
+		{
+			if (it[nr].light[0])
+			{
+				do_add_light(tx, ty, it[nr].light[0]);
+			}
+		}
+	}
+	
+	return 1;
+}
+
+int build_copy_rect(int fx, int fy, int tx, int ty, int w, int h)
+{
+	int x, y, try=1;
+	
+	if (fx<0 || fx+w>=MAPX || fy<0 || fy+h>=MAPY || tx<0 || tx+w>=MAPX || ty<0 || ty+h>=MAPY)
+	{
+		xlog("build_copy_rect: location out of bounds");
+		return 0;
+	}
+	
+	for (x=0; x<w; x++)
+	{
+		for (y=0; y<h; y++)
+		{
+			try = build_copy(fx+x, fy+y, tx+x, ty+y);
+			if (!try)
+			{
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
+void build_clean_lights(int fx, int fy, int tx, int ty)
+{
+	int x, y, in, m, cnt1 = 0, cnt2 = 0;
+	
+	if (fx<0 || fx>=MAPX || fy<0 || fy>=MAPY || tx<0 || tx>=MAPX || ty<0 || ty>=MAPY)
+	{
+		xlog("build_clean_lights: location out of bounds");
+		return;
+	}
+	
+	for (y = fy; y<=ty; y++)
+	{
+		for (x = fx; x<=tx; x++)
+		{
+			m = XY2M(x, y);
+			map[m].light  = 0;
+			map[m].dlight = 0;
+		}
+	}
+
+	for (y = fy; y<=ty; y++)
+	{
+		printf("%4d/%4d (%d,%d)\r", y, MAPY, cnt1, cnt2);
+		fflush(stdout);
+		for (x = fx; x<=tx; x++)
+		{
+			m = XY2M(x, y);
+			if (map[m].flags & MF_INDOORS)
+			{
+				cnt2++;
+				compute_dlight(x, y);
+			}
+			if ((in = map[m].it)==0)
+			{
+				continue;
+			}
+			if (it[in].active)
+			{
+				if (it[in].light[1])
+				{
+					do_add_light(x, y, it[in].light[1]);
+					cnt1++;
+				}
+			}
+			else
+			{
+				if (it[in].light[0])
+				{
+					do_add_light(x, y, it[in].light[0]);
+					cnt1++;
+				}
+			}
+		}
+	}
 }

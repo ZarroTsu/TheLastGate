@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.6.3\n"};
+static char intro_msg3[] = {"Current client/server version is 0.6.4\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {"OLD CHARACTER EXP WAS RESET JUNE 12th! Make sure you reallocate your exp before heading out!\n"};
 static char intro_msg5_font = 1;
@@ -1279,7 +1279,7 @@ void plr_cmd_setuser(int nr)
 			}
 			if (flag==3)
 			{
-				reason = "is deemed inapropriate. Please try to choose another name.";
+				reason = "is deemed inappropriate. Please try to choose another name.";
 			}
 
 			if (flag)
@@ -2712,6 +2712,7 @@ void plr_change(int nr)
 					if (globs->fullmoon)				chFlags += (1 <<  8);
 					if (globs->newmoon)					chFlags += (1 <<  9);
 					if (get_tarot(cn, IT_CH_CHARIOT)) 	chFlags += (1 << 10); // Shield -> Shell
+					if (has_buff(cn, SK_ZEPHYR)) 		chFlags += (1 << 11);
 					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
 				

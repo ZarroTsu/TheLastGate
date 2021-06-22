@@ -289,6 +289,9 @@ void look_door(int cn, int in);
 //-- build --
 void build_drop(int x, int y, int in);
 void build_remove(int x, int y);
+int build_copy(int fx, int fy, int tx, int ty);
+int build_copy_rect(int fx, int fy, int tx, int ty, int w, int h);
+void build_clean_lights(int fx, int fy, int tx, int ty);
 void pop_tick(void);
 
 //-- helper --
@@ -387,6 +390,7 @@ void die_companion(int cn);
 int is_potion(int in);
 int is_scroll(int in);
 int is_soulstone(int in);
+int is_gemstone(int in);
 int is_unique_able(int in);
 int is_unique(int in);
 

@@ -605,6 +605,7 @@
 #define IT_RD_BELTTWO	1794
 #define IT_RD_AMMYTHR	1795
 #define IT_RD_BELTTHR	2114
+#define IT_RD_AMMYFOU	2123
 #define IT_RD_BELTFOU	1797
 
 #define IT_RD_BRV		182
@@ -615,6 +616,13 @@
 #define IT_RD_HP		187
 #define IT_RD_EN		188
 #define IT_RD_MP		189
+
+#define IT_RD_SILV1		1390 // +RANDOM(6)
+#define IT_RD_SILV2		2073 // +RANDOM(4)
+#define IT_RD_GOLD1		1402 // +RANDOM(6)
+#define IT_RD_GOLD2		2077 // +RANDOM(4)
+#define IT_RD_PLAT1		1414 // +RANDOM(6)
+#define IT_RD_PLAT2		2087 // +RANDOM(4)
 
 // -------- Buff/Debuff Sprites -------- //
 
@@ -653,8 +661,8 @@
 #define BUF_SPR_PULSE		485
 #define BUF_SPR_TAUNT		489
 #define BUF_SPR_GUARD		518
-#define BUF_SPR_RAZOR		519
-#define BUF_SPR_RAZOR2		617
+#define BUF_SPR_ZEPHYR		519
+#define BUF_SPR_ZEPHYR2		617
 #define BUF_SPR_DOUSE		618
 //
 #define BUF_SPR_POTION		619

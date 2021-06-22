@@ -219,35 +219,6 @@ int god_create_item(int temp)
 		prof_stop(23, prof);
 		return(0);
 	}
-	
-	/*
-	if ((it_temp[temp].flags & IF_UNIQUE) || godwep)
-	{
-		for (m = 1; m<MAXITEM; m++)
-		{
-			if (it[m].used!=USE_EMPTY && it[m].temp==temp && (
-				godwep == 0
-				||
-				(godwep == 1 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_KWAI_UNI) && (it[m].flags & IF_GORN_UNI))
-				||
-				(godwep == 2 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_KWAI_UNI))
-				||
-				(godwep == 3 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_GORN_UNI))
-				||
-				(godwep == 4 && (it[m].flags & IF_UNIQUE) && (it[m].flags & IF_PURP_UNI))
-				))
-			{
-				break;
-			}
-		}
-		
-		if (m<MAXITEM)
-		{
-			prof_stop(23, prof);
-			return(0);
-		}
-	}
-	*/
 
 	it[n] = it_temp[temp];
 	it[n].temp = temp;
@@ -3600,7 +3571,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		if (old.skill[38][0] && ch[co].skill[38][2]) ch[co].skill[38][0] = 1; // Weapon Mastery
 		if (old.skill[41][0] && ch[co].skill[41][2]) ch[co].skill[41][0] = 1; // Weaken
 		
-		if (old.skill[ 7][0] && ch[co].skill[ 7][2]) ch[co].skill[ 7][0] = 1; // Razor
+		if (old.skill[ 7][0] && ch[co].skill[ 7][2]) ch[co].skill[ 7][0] = 1; // Zephyr
 		if (old.skill[35][0] && ch[co].skill[35][2]) ch[co].skill[35][0] = 1; // Warcry
 		if (old.skill[42][0] && ch[co].skill[42][2]) ch[co].skill[42][0] = 1; // Poison
 		if (old.skill[43][0] && ch[co].skill[43][2]) ch[co].skill[43][0] = 1; // Pulse

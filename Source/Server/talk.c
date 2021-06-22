@@ -1886,14 +1886,14 @@ void answer_unlearn(int cn, int co)
 	
 	if ((ch[co].kindred & KIN_SEYAN_DU) && 
 		(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
-		 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_RAZOR][0]))
+		 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_ZEPHYR][0]))
 	{
 		if (ch[co].skill[SK_WARCRY][0])	{ ch[co].skill[SK_WARCRY][0] = 0; strcpy(unl, skilltab[SK_WARCRY].name); }
 		if (ch[co].skill[SK_LEAP][0])	{ ch[co].skill[SK_LEAP][0] = 0; strcpy(unl, skilltab[SK_LEAP].name); }
 		if (ch[co].skill[SK_SHADOW][0])	{ ch[co].skill[SK_SHADOW][0] = 0; strcpy(unl, skilltab[SK_SHADOW].name); }
 		if (ch[co].skill[SK_POISON][0])	{ ch[co].skill[SK_POISON][0] = 0; strcpy(unl, skilltab[SK_POISON].name); }
 		if (ch[co].skill[SK_PULSE][0])	{ ch[co].skill[SK_PULSE][0] = 0; strcpy(unl, skilltab[SK_PULSE].name); }
-		if (ch[co].skill[SK_RAZOR][0])	{ ch[co].skill[SK_RAZOR][0] = 0; strcpy(unl, skilltab[SK_RAZOR].name); }
+		if (ch[co].skill[SK_ZEPHYR][0])	{ ch[co].skill[SK_ZEPHYR][0] = 0; strcpy(unl, skilltab[SK_ZEPHYR].name); }
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
 		do_sayx(cn, "Very well, I will remove %s, %s. Close your eyes, and...", unl, ch[co].name);

@@ -66,17 +66,29 @@ void init_lights(void)
 
 int pop_create_item(int temp, int cn)
 {
-	int in = 0;
-	int enbl = 0;
-	
-	int godroll = 0, bonus = 2;
+	int n, m, in = 0, enbl = 0, godroll = 0, bonus = 2;
 	char *gend, *godn, name[60], refer[60], descr[220];
 	
+	if (!(it_temp[temp].flags & IF_TAKE))
+	{
+		xlog("pop_create_item: bad template number %d", temp);
+		return;
+	}
 	if (is_unique_able(temp))
 	{
-		if (!in && ch[cn].alignment<0 && !RANDOM(200)) 	// Reward a unique weapon
+		if (!in && ch[cn].alignment<0 && !RANDOM(300)) 	// Reward a unique weapon
 		{	godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
-			in = god_create_item(temp); 				// create the item
+			for (m = 1, n = 0; m<MAXITEM; m++)			// Check for up to three copies
+			{
+				if (it[m].used==USE_EMPTY || it[m].orig_temp!=temp) continue;
+				if ((godroll == 1 && (it[m].flags & IF_KWAI_UNI) && (it[m].flags & IF_GORN_UNI)) ||
+					(godroll == 2 && (it[m].flags & IF_KWAI_UNI)) ||
+					(godroll == 3 && (it[m].flags & IF_GORN_UNI)) ||
+					(godroll == 4 && (it[m].flags & IF_PURP_UNI)) ) n++;
+				if (n>=3) break;
+			}
+			if (n<3)
+				in = god_create_item(temp); 			// create the item
 			if (in)										// assure the item is created
 			{
 				if (it[in].placement & PL_TWOHAND)
@@ -114,12 +126,17 @@ int pop_create_item(int temp, int cn)
 				}
 				
 				if (it[in].flags & IF_OF_SHIELD)
-					it[in].armor[0]  += 3;
+				{
+					it[in].armor[0]  += 4 * bonus/2;
+					//it[in].max_damage = 5000 * it[in].armor[0]/2;
+				}
 				else
-					it[in].weapon[0] += 3;
-				
+				{
+					it[in].weapon[0] += 4 * bonus/2;
+					//it[in].max_damage = 5000 * it[in].weapon[0]/2;
+				}
+				it[in].orig_temp = it[in].temp;
 				it[in].temp = 0;
-				it[in].max_damage = 2500 * it[in].weapon[0]/2;
 				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
 				strcpy(name, it[in].name);
 				strcpy(refer, it[in].reference);

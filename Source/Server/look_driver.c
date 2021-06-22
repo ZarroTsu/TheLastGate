@@ -523,6 +523,8 @@ void look_soulstone(int cn, int in)
 	int t, nt=0;
 	char *tag_name[N_SOULTAGS];
 	
+	do_char_log(cn, 1, "%s\n", it[in].description);
+	
 	if (it[in].data[2])
 	{
 		do_char_log(cn, 2, "Has a focus of %d.\n", it[in].data[2]);

@@ -1502,10 +1502,10 @@ void do_listskills(int cn, char *topic)
 		do_char_log(cn, 3, "Poison                 BRV + INT + INT\n");
 		do_char_log(cn, 1, "Protect                BRV + WIL + WIL\n");
 		do_char_log(cn, 3, "Pulse                  BRV + INT + INT\n");
-		do_char_log(cn, 1, "Razor                  BRV + AGL + AGL\n");
-		do_char_log(cn, 3, "Recall                 BRV + WIL + INT\n");
-		do_char_log(cn, 1, "Shadow Copy            BRV + WIL + WIL\n");
-		do_char_log(cn, 3, "Slow                   BRV + INT + INT\n");
+		do_char_log(cn, 1, "Recall                 BRV + WIL + INT\n");
+		do_char_log(cn, 3, "Shadow Copy            BRV + WIL + WIL\n");
+		do_char_log(cn, 1, "Slow                   BRV + INT + INT\n");
+		do_char_log(cn, 3, "Zephyr                 BRV + AGL + AGL\n");
 	}
 	else
 	{
@@ -2353,11 +2353,11 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if (ch[cn].flags & CF_APPRAISE) 	quest1[22] = 1; //     * 	Appraisal			( Richie )
 	if (ch[cn].skill[10][0]) 			quest1[23] = 1;	//    10   	Swimming			( Lucci )	
 	if (	(ch[cn].skill[35][0] && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR)))
-		||	(ch[cn].skill[49][0] && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_WARRIOR)))
+		||	(ch[cn].skill[49][0] && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_BRAWLER)))
 		|| 	(ch[cn].skill[46][0] && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_SUMMONER)))
 		|| 	(ch[cn].skill[42][0] && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_SORCERER)))
 		|| 	(ch[cn].skill[43][0] && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_ARCHHARAKIM)))
-		|| 	(ch[cn].skill[7][0]  && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_BRAWLER)))	)
+		|| 	(ch[cn].skill[7][0]  && (ch[cn].kindred & (KIN_SEYAN_DU | KIN_WARRIOR)))	)
 		quest1[16] = 1;
 	
 	for (n=0;n<32;n++)
@@ -2429,7 +2429,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	//														                                      "!      v .       v .   |     . v       . v      !"
 		if ((ch[cn].kindred & KIN_ARCHTEMPLAR) 	|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
 	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Jamie     Bulwark Aven  * Warcry  %6d\n", (quest1[16])?ex/4:ex); }
-		if ((ch[cn].kindred & KIN_WARRIOR) 		|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
+		if ((ch[cn].kindred & KIN_BRAWLER) 		|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
 	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Terri     Bulwark Aven  * Leap    %6d\n", (quest1[16])?ex/4:ex); }
 		if ((ch[cn].kindred & KIN_SUMMONER) 	|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
 	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Roger     Bulwark Aven  * Shadow  %6d\n", (quest1[16])?ex/4:ex); }
@@ -2437,8 +2437,8 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Boris     Bulwark Aven  * Poison  %6d\n", (quest1[16])?ex/4:ex); }
 		if ((ch[cn].kindred & KIN_ARCHHARAKIM) 	|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
 	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Kaleigh   Bulwark Aven  * Pulse   %6d\n", (quest1[16])?ex/4:ex); }
-		if ((ch[cn].kindred & KIN_BRAWLER) 	|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
-	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Ellis     Bulwark Aven  * Razor   %6d\n", (quest1[16])?ex/4:ex); }
+		if ((ch[cn].kindred & KIN_WARRIOR) 	|| ((ch[cn].kindred & KIN_SEYAN_DU) && !quest1[16]))
+	                         { m++; ex= 50000; if (m<=t && m>n) do_char_log(cn, (quest1[16])?3:1, "BrGen  Ellis     Bulwark Aven  * Zephyr  %6d\n", (quest1[16])?ex/4:ex); }
 	//                                                                                            "!      ^ .       ^ .   |     . ^       . ^      !"
 	}
 	
@@ -3191,12 +3191,16 @@ void do_depot(int cn, char *topic)
 {
 	int n, m, co;
 	int temp = 0;
+	char *chname;
 	
 	if (strcmp(topic, "")!=0)
 	{
+		for (m=0; m<strlen(topic); m++) topic[m] = tolower(topic[m]);
 		for (n = 1; n<MAXCHARS; n++)
 		{
-			if (ch[n].used!=USE_EMPTY && strcmp(toupper(topic), toupper(ch[n].name))==0)	// Character with this name exists
+			if (ch[n].used==USE_EMPTY || !IS_SANEPLAYER(n)) continue;
+			chname = ch[n].name; chname[0] = tolower(chname[0]);
+			if (strcmp(topic, chname)==0)	// Character with this name exists
 			{
 				temp = n;
 				break;
@@ -5313,6 +5317,23 @@ void do_ransack_corpse(int cn, int co, char *msg)
 	{
 		do_char_log(cn, 0, msg, "a soulstone");
 	}
+	// Check ring slots for gems
+	if ((in = ch[co].worn[WN_LRING]) && is_gemstone(in) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			sprintf(dropped, "a %s", it[in].name);
+		else
+			strcpy(dropped, "a magical gem");
+		do_char_log(cn, 0, msg, dropped);
+	}
+	if ((in = ch[co].worn[WN_RRING]) && is_gemstone(in) && sm > RANDOM(200))
+	{
+		if (sm2>RANDOM(200))
+			sprintf(dropped, "a %s", it[in].name);
+		else
+			strcpy(dropped, "a magical gem");
+		do_char_log(cn, 0, msg, dropped);
+	}
 	// Check other accessory slots
 	if ((in = ch[co].worn[WN_NECK]) && sm > RANDOM(200))
 	{
@@ -5330,7 +5351,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 			strcpy(dropped, "a magical belt");
 		do_char_log(cn, 0, msg, dropped);
 	}
-	if ((in = ch[co].worn[WN_LRING]) && sm > RANDOM(200))
+	if ((in = ch[co].worn[WN_LRING]) && !is_soulstone(in) && !is_gemstone(in) && sm > RANDOM(200))
 	{
 		if (sm2>RANDOM(200))
 			sprintf(dropped, "a %s", it[in].name);
@@ -5338,7 +5359,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 			strcpy(dropped, "a magical ring");
 		do_char_log(cn, 0, msg, dropped);
 	}
-	if ((in = ch[co].worn[WN_RRING]) && sm > RANDOM(200))
+	if ((in = ch[co].worn[WN_RRING]) && !is_soulstone(in) && !is_gemstone(in) && sm > RANDOM(200))
 	{
 		if (sm2>RANDOM(200))
 			sprintf(dropped, "a %s", it[in].name);
@@ -5386,6 +5407,14 @@ void do_ransack_corpse(int cn, int co, char *msg)
 			do_char_log(cn, 0, msg, "a soulstone");
 			continue;
 		}
+		if (is_gemstone(in) && sm > RANDOM(200))
+		{
+			if (sm2>RANDOM(200))
+				sprintf(dropped, "a %s", it[in].name);
+			else
+				strcpy(dropped, "a magical gem");
+			do_char_log(cn, 0, msg, dropped);
+		}
 		if (is_potion(in) && sm > RANDOM(200))
 		{
 			if (sm2>RANDOM(200))
@@ -5413,7 +5442,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 			do_char_log(cn, 0, msg, dropped);
 			continue;
 		}
-		if ((it[in].placement & PL_RING) && sm > RANDOM(200))
+		if ((it[in].placement & PL_RING) && !is_soulstone(in) && !is_gemstone(in) && sm > RANDOM(200))
 		{
 			if (sm2>RANDOM(200))
 				sprintf(dropped, "a %s", it[in].name);
@@ -6376,7 +6405,7 @@ void do_lucksave(int cn, char *deathtype)
 	ch[cn].data[44]++;
 }
 
-// dmg types: 0=normal 1=blast 2=hw/soku 3=gethit 4=surround 5=cleave 6=pulse 7=razor
+// dmg types: 0=normal 1=blast 2=hw/soku 3=gethit 4=surround 5=cleave 6=pulse 7=zephyr
 // returns actual damage done
 int do_hurt(int cn, int co, int dam, int type)
 {
@@ -6454,7 +6483,7 @@ int do_hurt(int cn, int co, int dam, int type)
 				}
 			}
 			if (bu[in].temp==SK_SCORCH)	scorched = bu[in].power;
-			if (bu[in].temp==SK_GUARD)	guarded = bu[in].power;
+			if (bu[in].temp==SK_GUARD)	guarded = bu[in].power * ((ch[co].kindred & KIN_SEYAN_DU)?3/4:1);
 			
 			if (bu[in].temp > 100 && bu[in].data[3]==IT_POT_DEF)	defpot = 1;
 		}
@@ -6997,8 +7026,8 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			char_play_sound(co, ch[cn].sound + 4, -150, 0);
 		}
 		
-		// Check if the attacker has Razor
-		in2 = has_spell(cn, SK_RAZOR);
+		// Check if the attacker has Zephyr
+		in2 = has_spell(cn, SK_ZEPHYR);
 		
 		if (surround && ch[cn].skill[SK_SURROUND][0])
 		{
@@ -7110,7 +7139,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 							}
 							if (in2 && co!=co_orig)
 							{
-								spell_razor(cn, co, bu[in2].power/2 + bu[in2].power/4, 1);
+								spell_zephyr(cn, co, bu[in2].power/2 + bu[in2].power/4, 1);
 							}
 						}
 					}
@@ -7119,7 +7148,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		}
 		if (in2)
 		{
-			spell_razor(cn, co_orig, bu[in2].power, 1);
+			spell_zephyr(cn, co_orig, bu[in2].power, 1);
 		}
 	}
 	else
@@ -8748,15 +8777,22 @@ void do_regenerate(int cn)
 				if (bu[in].hp[0]>0)
 				{
 					ch[cn].a_hp += bu[in].hp[0];
+					if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
+						ch[cn].a_hp = ch[cn].hp[5] * 1000;
 				}
 				if (bu[in].end[0]>0)
 				{
 					ch[cn].a_end += bu[in].end[0];
+					if (ch[cn].a_end>ch[cn].end[5] * 1000)
+						ch[cn].a_end = ch[cn].end[5] * 1000;
 				}
 				if (bu[in].mana[0]>0)
 				{
 					ch[cn].a_mana += bu[in].mana[0];
+					if (ch[cn].a_mana>ch[cn].mana[5] * 1000)
+						ch[cn].a_mana = ch[cn].mana[5] * 1000;
 				}
+				
 			}
 			
 			// Regen
@@ -8764,9 +8800,7 @@ void do_regenerate(int cn)
 			{
 				ch[cn].a_hp += bu[in].hp[0];
 				if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
-				{
 					ch[cn].a_hp = ch[cn].hp[5] * 1000;
-				}
 			}
 			
 			// Slow and Curse2 Decay
@@ -9001,47 +9035,17 @@ void do_regenerate(int cn)
 				}
 			}
 			
-			if (bu[in].temp==SK_RAZOR2 && (co = bu[in].data[0]))
+			if (bu[in].temp==SK_ZEPHYR2 && (co = bu[in].data[0]))
 			{
-				int raz_sound = 0, raz_power;
-				int crit_dice, crit_chance, crit_mult, crit_dam = 0, die;
-				
-				raz_power = bu[in].power * 2;
-				
-				chlog(co, "Razor charged with %d base damage", raz_power);
-				
-				if ((bu[in].data[2]==1 || bu[in].data[1]==1 || !bu[in].active) &&
-					((ch[co].flags & (CF_PLAYER | CF_CANCRIT)) || ch[co].skill[SK_PRECISION][0]))
-				{
-					crit_dice 	= 10000;
-					crit_chance = ch[co].crit_chance;
-					crit_mult   = ch[co].crit_multi;
-					
-					 // Book - Way of the Sword
-					if (ch[co].data[73])
-					{
-						crit_chance += ch[co].data[73];
-					}
-					
-					die = RANDOM(crit_dice) + 1;
-					
-					if (die<=crit_chance)
-					{
-						ch[co].data[73]=0;
-						crit_dam  = raz_power + 1+points2rank(ch[co].points_tot);
-						crit_dam *= crit_mult / 100;
-						crit_dam -= raz_power;
-					}
-				}
-				
+				p = 0;
 				if (bu[in].data[2]>0) // Stored extra hit 2
 				{
 					bu[in].data[2]--;
 					if (!bu[in].data[2])
 					{
-						tmp = do_hurt(co, cn, raz_power+crit_dam, 6);
-						raz_sound = 1;
-						chlog(co, "Razor hit %s for %d damage", ch[cn].name, tmp);
+						tmp = do_hurt(co, cn, bu[in].power * 2, 6);
+						p = 1;
+						chlog(co, "Zephyr hit %s for %d damage", ch[cn].name, tmp);
 					}
 				}
 				if (bu[in].data[1]>0) // Stored extra hit 1
@@ -9049,18 +9053,18 @@ void do_regenerate(int cn)
 					bu[in].data[1]--;
 					if (!bu[in].data[1])
 					{
-						tmp = do_hurt(co, cn, raz_power+crit_dam, 6);
-						raz_sound = 1;
-						chlog(co, "Razor hit %s for %d damage", ch[cn].name, tmp);
+						tmp = do_hurt(co, cn, bu[in].power * 2, 6);
+						p = 1;
+						chlog(co, "Zephyr hit %s for %d damage", ch[cn].name, tmp);
 					}
 				}
-				if (!bu[in].active) // Final hit of razor
+				if (!bu[in].active) // Final hit of zephyr
 				{
-					tmp = do_hurt(co, cn, raz_power+crit_dam, 6);
-					raz_sound = 1;
-					chlog(co, "Razor hit %s for %d damage", ch[cn].name, tmp);
+					tmp = do_hurt(co, cn, bu[in].power * 2, 6);
+					p = 1;
+					chlog(co, "Zephyr hit %s for %d damage", ch[cn].name, tmp);
 				}
-				if (raz_sound)
+				if (p)
 				{
 					char_play_sound(cn, ch[co].sound + 20, -150, 0);
 					do_area_sound(cn, 0, ch[cn].x, ch[cn].y, ch[co].sound + 20);
@@ -9094,7 +9098,7 @@ void do_regenerate(int cn)
 					ch[cn].misc_action = 0;
 					ch[cn].dir = DX_DOWN;
 				}
-				else if (bu[in].temp!=SK_RAZOR2)
+				else if (bu[in].temp!=SK_ZEPHYR2)
 				{
 					do_char_log(cn, 0, "%s ran out.\n", bu[in].name);
 				}

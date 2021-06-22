@@ -467,8 +467,8 @@ void button_help(int nr)
 				xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); 
 			else if (last_skill==52 && pl.skill[24][0])
 				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill==53 && pl.skill[7][0])
-				xlog(1,"Damage granted by your Razor spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
+			else if (last_skill==53 && pl.skill[49][0])
+				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value."); 
 			else if (last_skill==54 && pl.skill[40][0])
 				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else if (last_skill<50 || last_skill>54)
@@ -484,8 +484,8 @@ void button_help(int nr)
 					xlog(1,"Effective Spell Modifier reduction granted by Douse, granted by your Blast spell."); 
 				else
 					xlog(1,"Effective damage taken multiplier granted by Scorch, granted by your Blast spell."); 
-			else if (last_skill==53 && pl.skill[49][0])
-				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value."); 
+			else if (last_skill==53 && pl.skill[7][0])
+				xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
 			else if (last_skill==54 && pl.skill[48][0])
 				xlog(1,"Effective damage taken multiplier during the Guard status, granted by the Taunt skill."); 
 			else if (last_skill<50 || last_skill>54)

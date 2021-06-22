@@ -376,7 +376,7 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
-	{  7, 'F', 	"Razor", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay.", 
+	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a bonus to negative spell reduction.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
@@ -547,7 +547,7 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap behind your target, damaging both. Deals additional damage if only a single enemy is hit.", 
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage against single targets. Costs mana if your target is distant.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }}
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
@@ -989,13 +989,29 @@ void display_meta_from_ls(void)
 	sk_douse = -(sk_score(24)*pl_spmod/100);
 	sk_pulse = (sk_score(43)*pl_spmod/100) * 2 * 150/1000;
 	sk_pucnt = 60 / (3 * pl_basel / max(100, pl_coold));
-	sk_razor = ((sk_score(7)+pl.weapon/4)*pl_spmod/100) * 2 * 50/1000;
-	sk_leapv = (sk_score(49)+max(0,(pl_atksp-120))/4) * 750/1000;
-	sk_blind = -(sk_score(37) / 6 + 3);
+	sk_razor = ((sk_score(7)+max(0,(pl_atksp-120))/4)*pl_spmod/100) * 2 * 50/1000;
+	sk_leapv = (sk_score(49)+pl.weapon/4) * 750/1000;
 	sk_water = 25 * 18;
 	sk_cleav = (sk_score(40)+pl.weapon/4) * 2 * 750/1000;
-	sk_taunt = (1000 - sk_score(48));
+	
 	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
+	
+	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
+	{
+		sk_blind = -(sk_score(37) / 6 + 4);
+	}
+	else
+	{
+		sk_blind = -(sk_score(37) / 8 + 3);
+	}
+	if (pl.kindred & (1u<<1))
+	{
+		sk_taunt = (1000 - sk_score(48)*3/4);
+	}
+	else
+	{
+		sk_taunt = (1000 - sk_score(48));
+	}
 	
 	// Tarot - Hanged Man (immunity&resistance)
 	if (pl_flags & (1 <<  2))
@@ -1007,6 +1023,12 @@ void display_meta_from_ls(void)
 	{
 		sk_immun = sk_score(32);
 		sk_resis = sk_score(23);
+	}
+	
+	// Zephyr immunity bonus
+	if (pl_flagb & (1 << 11))
+	{
+		sk_immun *= 6/5;
 	}
 	
 	// Book - Great Prodigy (concentrate bonus)
@@ -1222,17 +1244,17 @@ void display_meta_from_ls(void)
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_pucnt);
 			}
 			break;									// ".............." // 
-		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Razor DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
+		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Zephyr DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Endur. Regen/s");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_restv/100,sk_restv%100);
-				if (pl.skill[7][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Razor DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_razor);
-			}	if (pl.skill[49][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Leap DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_leapv);
+				if (pl.skill[49][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Leap DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_leapv);
+			}	if (pl.skill[7][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Zephyr DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_razor);
 			}	if (pl.skill[37][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);

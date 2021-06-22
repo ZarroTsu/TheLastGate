@@ -308,7 +308,7 @@ int npc_cityattack_high(int cn)
 		{
 			return(1);
 		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_RAZOR))
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_ZEPHYR))
 		{
 			return(1);
 		}
@@ -333,7 +333,7 @@ int npc_cityattack_high(int cn)
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
+			ch[co].data[75] = globs->ticker + SK_EXH_LEAP(0)/2;
 			return( 1);
 		}
 

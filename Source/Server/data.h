@@ -287,7 +287,7 @@ extern unsigned int mapmarker;
 #define SK_AXE			 4
 #define SK_STAFF		 5
 #define SK_TWOHAND		 6
-#define SK_RAZOR		 7
+#define SK_ZEPHYR		 7
 #define SK_STEALTH		 8
 #define SK_PERCEPT		 9
 //////////////////////////
@@ -342,7 +342,7 @@ extern unsigned int mapmarker;
 #define SK_SCORCH		 4
 #define SK_CURSE2		 5 
 #define SK_SLOW2		 6
-#define SK_RAZOR2		 8
+#define SK_ZEPHYR2		 8
 #define SK_DOUSE		10
 #define SK_MSHELL		12
 #define SK_GUARD		16

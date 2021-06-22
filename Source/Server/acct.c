@@ -645,6 +645,53 @@ void list_all_player_characters()
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
 }
 
+void list_all_player_characters_by_class()
+{
+	int n;
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+	printf("Templar:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_TEMPLAR)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Mercenaries:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_MERCENARY)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Harakim:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_HARAKIM)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Seyan'du:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_SEYAN_DU)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Arch Templar:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_ARCHTEMPLAR)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Brawlers:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_BRAWLER)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Warriors:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_WARRIOR)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Sorcerers:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_SORCERER)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Summoners:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_SUMMONER)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Arch Harakim:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].kindred & KIN_ARCHHARAKIM)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+}
+
 void copy_character_template(LIST *head)
 {
 	int cn, n;
@@ -4174,22 +4221,16 @@ void list_new_characters_template(LIST *head)		 // listing characters with high 
 	printf("</table>\n");
 }
 
-void list_objects(LIST *head)
+void list_objects(LIST *head, int flag)
 {
 	int n;
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
-
 	printf("<center><table>\n");
-
 	for (n = 1; n<MAXTITEM; n++)
 	{
-		if (it_temp[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-//				  if (it_temp[n].driver!=23) continue;
-//		if (!(it_temp[n].flags&IF_TAKE)) continue;
-
+		if (it_temp[n].used==USE_EMPTY) continue;
+		if (flag==1 && !(it_temp[n].flags & IF_SELLABLE)) continue;
+		if (flag==2 && !(it_temp[n].flags & IF_JEWELERY)) continue;
 		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
 				"<td><font size=2>pr: %dG, %dS</font></td><td><font size=2>da0: %d</font></td><td><font size=2>da1: %d</font></td><td><font size=2>da2: %d</font></td><td><font size=2>da3: %d</font></td><td><font size=2>da4: %d</font></td>\n"
 				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
@@ -4197,67 +4238,6 @@ void list_objects(LIST *head)
 				it_temp[n].value / 100, it_temp[n].value % 100, it_temp[n].data[0], it_temp[n].data[1], it_temp[n].data[2], it_temp[n].data[3], it_temp[n].data[4],
 				n, n, n);
 	}
-
-	printf("</table></center>\n");
-	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
-}
-
-void list_objects_gear(LIST *head)
-{
-	int n;
-	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
-
-	printf("<center><table>\n");
-
-	for (n = 1; n<MAXTITEM; n++)
-	{
-		if (it_temp[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!(it_temp[n].flags & IF_SELLABLE))
-		{
-			continue;
-		}
-
-		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
-				"<td><font size=2>pr: %dG, %dS</font></td><td><font size=2>da0: %d</font></td><td><font size=2>da1: %d</font></td><td><font size=2>da2: %d</font></td><td><font size=2>da3: %d</font></td><td><font size=2>da4: %d</font></td>\n"
-				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
-				n, n, it_temp[n].name,
-				it_temp[n].value / 100, it_temp[n].value % 100, it_temp[n].data[0], it_temp[n].data[1], it_temp[n].data[2], it_temp[n].data[3], it_temp[n].data[4],
-				n, n, n);
-	}
-
-	printf("</table></center>\n");
-	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
-}
-
-void list_objects_crit(LIST *head)
-{
-	int n;
-	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
-
-	printf("<center><table>\n");
-
-	for (n = 1; n<MAXTITEM; n++)
-	{
-		if (it_temp[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!(it_temp[n].crit_chance[0]))
-		{
-			continue;
-		}
-
-		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
-				"<td><font size=2>pr: %dG, %dS</font></td><td><font size=2>da0: %d</font></td><td><font size=2>da1: %d</font></td><td><font size=2>da2: %d</font></td><td><font size=2>da3: %d</font></td><td><font size=2>da4: %d</font></td>\n"
-				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
-				n, n, it_temp[n].name,
-				it_temp[n].value / 100, it_temp[n].value % 100, it_temp[n].data[0], it_temp[n].data[1], it_temp[n].data[2], it_temp[n].data[3], it_temp[n].data[4],
-				n, n, n);
-	}
-
 	printf("</table></center>\n");
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
 }
@@ -4448,7 +4428,7 @@ int main(int argc, char *args[])
 		view_character_player(head);
 		break;
 	case 21:
-		list_objects(head);
+		list_objects(head, 0);
 		break;
 	case 22:
 		delete_object(head);
@@ -4475,13 +4455,16 @@ int main(int argc, char *args[])
 		save_character_player(head);
 		break;
 	case 30:
-		list_objects_gear(head);
+		list_objects(head, 1);
 		break;
 	case 31:
 		list_object_drivers(head);
 		break;
 	case 32:
-		list_objects_crit(head);
+		list_all_player_characters_by_class();
+		break;
+	case 33:
+		list_objects(head, 2);
 		break;
 	case 41:
 		list_characters2_template(head);
@@ -4493,7 +4476,8 @@ int main(int argc, char *args[])
 		printf("</td></tr></table>\n");
 		printf("<table width=\"80%%\"><tr><td>\n");
 		printf("Player Web Editing (Experimental)<br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=19>All Player Characters </a><br><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=19>Player Characters by ID</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=32>Player Characters by Class</a><br><br>\n");
 		printf("Together those lists include all character-templates<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=11>Characters (without Grolms, Gargoyles, Icegargs)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=16>Characters (only with Positive Alignment) </a><br>\n");
@@ -4504,7 +4488,7 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=51>New characters (only if they got a high ID)</a><br><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=21>Object Templates (All)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=30>Object Templates (Sellable)</a><br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=32>Object Templates (Have crit_chance)</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=33>Object Templates (Jewelery)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");

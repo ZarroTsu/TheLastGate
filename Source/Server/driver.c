@@ -426,6 +426,7 @@ int npc_killed(int cn, int cc, int co)
 		ch[cn].attack_cn = 0;
 	}
 	ch[cn].data[76] = ch[cn].data[77] = ch[cn].data[78] = 0;
+	//npc_activate_rings(cn, 0);
 
 	idx = co | (char_id(co) << 16);
 
@@ -768,17 +769,17 @@ int npc_give(int cn, int co, int in, int money)
 		// Check each arch skill against the race that is intended to learn it.
 		if ((	nr == 35 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR)) ) 
 		 || (	nr == 43 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHHARAKIM)) ) 
-		 || (	nr == 49 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_WARRIOR    )) ) 
+		 || (	nr == 49 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_BRAWLER    )) ) 
 		 || (	nr == 42 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_SORCERER   )) ) 
 		 || (	nr == 46 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_SUMMONER   )) )
-		 || (	nr ==  7 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_BRAWLER   )) ))
+		 || (	nr ==  7 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_WARRIOR   )) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only one!
 		if ((nr == 35 || nr == 43 || nr == 49 || nr == 42 || nr == 46 || nr ==  7) &&
 			(ch[co].kindred & KIN_SEYAN_DU) && 
 			(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
-			 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_RAZOR][0]))
+			 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_ZEPHYR][0]))
 			canlearn = 0;
 	}
 
@@ -800,17 +801,12 @@ int npc_give(int cn, int co, int in, int money)
 		// hack for black candle
 		if (ch[cn].temp==CT_TACTICIAN && (it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3))
 		{
-			// TODO: set up one of the item driver data's to hold the exp of the candle instead.
-			//  maybe adjust this data based on the wave the candle is taken?
-			if (it[in].temp==IT_BS_CAN3)		do_give_bspoints(cn, it[in].power*20, 1);
-			else if (it[in].temp==IT_BS_CAN2)	do_give_bspoints(cn, it[in].power* 5, 1);
-			else								do_give_bspoints(cn, it[in].power* 1, 1);
-			
+			ar = it[in].data[0];
 			god_take_from_char(in, cn);
 			it[in].used = USE_EMPTY;  // silently destroy the item.
 			do_sayx(cn, "Ah, a black candle! Great work, %s! Now we may see peace for a while...", ch[co].name);
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The Tactician was impressed by %s's deed.\n", ch[co].name);
-			
+			do_give_bspoints(cn, ar, 1);
 			ch[co].misc_action = DR_IDLE;
 			return(0);
 		}
@@ -1373,10 +1369,12 @@ int is_scroll(int in)
 
 int is_soulstone(int in)
 {
-	int tn;
-
-	tn = it[in].temp;
 	return (it[in].driver == 68);
+}
+
+int is_gemstone(int in)
+{
+	return (it[in].flags & IF_GEMSTONE);
 }
 
 int is_unique_able(int temp)
@@ -2044,7 +2042,7 @@ int npc_see(int cn, int co)
 			{
 				int knowarch=0;
 				if (ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
-					ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_RAZOR][0])
+					ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_ZEPHYR][0])
 					knowarch=1;
 				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
@@ -2058,17 +2056,17 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s! Did you know Arch-Templar can strike fear into their enemies with a single shout?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill22")==0) // Warr - 49 - Leap
+				else if (strcmp(ch[cn].text[2], "#skill22")==0) // Warr - 7 - Zephyr
 				{
 					if (ch[co].kindred & (KIN_WARRIOR | KIN_SEYAN_DU))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
-							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LEAP.", ch[co].name);
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you ZEPHYR.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Warriors can strike foes fast enough to pass through them?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Warriors can make the very wind strike foes alongside them?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#skill23")==0) // Summ - 46 - Shadow Copy
 				{
@@ -2106,17 +2104,17 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s! Did you know Arch-Harakim can cause damaging bursts without thinking?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Pugi - 7 - Razor
+				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Braw - 49 - Leap
 				{
 					if (ch[co].kindred & (KIN_BRAWLER | KIN_SEYAN_DU))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
-							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you RAZOR.", ch[co].name);
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LEAP.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Brawlers can make the very wind strike foes alongside them?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Brawlers can leap great distances to strike distant foes?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#gatekeeper13")==0)
 				{
@@ -2320,7 +2318,7 @@ int get_spellcost(int cn, int spell)
 		case SK_POISON:		return SP_COST_POISON * (kin_sorc ? prox : 1);
 		case SK_PROTECT:	return SP_COST_PROTECT;
 		case SK_PULSE:		return SP_COST_PULSE;
-		case SK_RAZOR:		return SP_COST_RAZOR;
+		case SK_ZEPHYR:		return SP_COST_ZEPHYR;
 		case SK_RECALL:		return SP_COST_RECALL;
 		case SK_SHADOW:		return SP_COST_SHADOW;
 		case SK_SLOW:		return SP_COST_SLOW * (kin_sorc ? prox : 1);
@@ -2349,7 +2347,7 @@ int spellflag(int spell)
 		case    SK_POISON:		return SP_POISON;
 		case    SK_PROTECT:		return SP_PROTECT;
 		case    SK_PULSE:		return SP_PULSE;
-		case    SK_RAZOR:		return SP_RAZOR;
+		case    SK_ZEPHYR:		return SP_ZEPHYR;
 		case    SK_SLOW:		return SP_SLOW;
 		
 		default:				return 0;
@@ -2574,6 +2572,27 @@ int npc_quaff_potion(int cn, int itemp, int stemp)
 	use_driver(cn, in, 1);
 
 	return(1);
+}
+
+// spark rings - flag=1 for on, flag=0 for off
+void npc_activate_rings(int cn, int flag)
+{
+	int in;
+	
+	if (in = ch[cn].worn[WN_LRING])
+	{
+		if (flag && !it[in].active)
+			use_driver(cn, in, 1);
+		else if (!flag && it[in].active)
+			use_driver(cn, in, 1);
+	}
+	if (in = ch[cn].worn[WN_RRING])
+	{
+		if (flag && !it[in].active)
+			use_driver(cn, in, 1);
+		else if (!flag && it[in].active)
+			use_driver(cn, in, 1);
+	}
 }
 
 void die_companion(int cn)
@@ -3148,6 +3167,7 @@ int npc_driver_high(int cn)
 	if (ch[cn].data[78]<globs->ticker)
 	{
 		ch[cn].data[78] = 0;
+		//npc_activate_rings(cn, 0);
 	}
 
 	// self destruct
@@ -3473,6 +3493,7 @@ int npc_driver_high(int cn)
 	// generic fight-magic management
 	if ((co = ch[cn].attack_cn)!=0 || ch[cn].data[78]) // we're fighting
 	{
+		//npc_activate_rings(cn, 1);
 		/*
 		if (npc_quaff_potion(cn, 833, 254))
 		{
@@ -3543,7 +3564,7 @@ int npc_driver_high(int cn)
 		{
 			return( 1);
 		}
-		if (co && npc_try_spell(cn, cn, SK_RAZOR))
+		if (co && npc_try_spell(cn, cn, SK_ZEPHYR))
 		{
 			return( 1);
 		}
@@ -3569,7 +3590,7 @@ int npc_driver_high(int cn)
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
+			ch[co].data[75] = globs->ticker + SK_EXH_LEAP(0)/2;
 			return( 1);
 		}
 
