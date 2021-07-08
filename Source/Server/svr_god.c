@@ -876,7 +876,7 @@ int god_drop_char_fuzzy_large(int nr, int x, int y, int xs, int ys)
 
 int god_give_char(int in, int cn)
 {
-	int n, tmp;
+	int n, tmp, stacksize;
 
 	if (!IS_SANEITEM(in) || !IS_LIVINGCHAR(cn))
 	{
@@ -890,9 +890,22 @@ int god_give_char(int in, int cn)
 			if (it[ch[cn].item[n]].stack<1)	it[ch[cn].item[n]].stack=1;
 			if (it[in].stack>1)
 			{
-				tmp = it[ch[cn].item[n]].value / it[ch[cn].item[n]].stack;
-				it[ch[cn].item[n]].stack += it[in].stack;
-				it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
+				tmp 		= it[ch[cn].item[n]].value / it[ch[cn].item[n]].stack;
+				stacksize 	= it[ch[cn].item[n]].stack + it[in].stack;
+				
+				if (stacksize > 10)
+				{
+					it[ch[cn].item[n]].stack = 10;
+					it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
+					it[in].stack 	= stacksize-10;
+					it[in].value 	= tmp * it[in].stack;
+					break;
+				}
+				else
+				{
+					it[ch[cn].item[n]].stack += it[in].stack;
+					it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
+				}
 			}
 			else
 			{
@@ -900,6 +913,7 @@ int god_give_char(int in, int cn)
 				it[ch[cn].item[n]].stack++;
 				it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
 			}
+			do_update_char(cn);
 			return(1);
 		}
 	}
@@ -923,7 +937,6 @@ int god_give_char(int in, int cn)
 	it[in].carried = cn;
 
 	do_update_char(cn);
-
 	return(1);
 }
 

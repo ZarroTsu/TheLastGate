@@ -71,6 +71,8 @@ usage of data for players:
 * '73:'		--Zarro-- for "Way of the Sword" book
 * '75:'		--Zarro-- for spell delays when hit by blast, cleave, or warcry
 * '76:'     --Zarro-- for waypoint storage
+* '77:'     --Zarro-- for pentagram quest kill streak
+* '78:'     --Zarro-- store highest pent for kill streak reward
 * `80-89:`	seen logging in from these class C nets
 * `90:`     number in database
 * `92:`     reserved

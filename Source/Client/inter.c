@@ -465,10 +465,10 @@ void button_help(int nr)
 				xlog(1,"Crit Multi is the damage multiplier upon dealing a successful critical hit."); 
 			else if (last_skill==51 && pl.skill[27][0])
 				xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); 
-			else if (last_skill==52 && pl.skill[24][0])
-				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
+			else if (last_skill==52 && pl.skill[42][0])
+				xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity. This can be stacked up to three times."); 
 			else if (last_skill==53 && pl.skill[49][0])
-				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value."); 
+				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else if (last_skill==54 && pl.skill[40][0])
 				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else if (last_skill<50 || last_skill>54)
@@ -477,13 +477,10 @@ void button_help(int nr)
 		case 35: 
 			if (last_skill==50)
 				xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); 
-			else if (last_skill==51 && pl.skill[42][0])
-				xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity. This can be stacked up to three times."); 
+			else if (last_skill==51 && pl.skill[46][0])
+				xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell. Value is listed in seconds."); 
 			else if (last_skill==52 && pl.skill[24][0])
-				if (pl.worn[WN_FLAGS] & (1 <<  7))
-					xlog(1,"Effective Spell Modifier reduction granted by Douse, granted by your Blast spell."); 
-				else
-					xlog(1,"Effective damage taken multiplier granted by Scorch, granted by your Blast spell."); 
+				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else if (last_skill==53 && pl.skill[7][0])
 				xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
 			else if (last_skill==54 && pl.skill[48][0])
@@ -499,7 +496,10 @@ void button_help(int nr)
 			else if (last_skill==52 && pl.skill[43][0])
 				xlog(1,"Damage dealt by the Pulse spell to surrounding targets when pulsing, before reduction from target Immunity and Armor Value."); 
 			else if (last_skill==53 && pl.skill[37][0])
-				xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); 
+				if (pl.worn_p[WN_FLAGS] & (1 << 11))
+					xlog(1,"Effective reduction of target Spell Modifier when using your Blind (Douse) skill, before reduction from target Immunity."); 
+				else
+					xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); 
 			else if (last_skill==54 && pl.skill[41][0])
 				xlog(1,"Effective reduction of target Weapon and/or Armor Values when using your Weaken skill, before reduction from target Immunity."); 
 			else if (last_skill<50 || last_skill>54)
@@ -1012,7 +1012,7 @@ int mouse_statbox2(int x,int y,int state)
 	if (y<gui_skl_names[RECT_Y1]) return 0;
 	if (y>gui_skl_names[RECT_Y2]) return 0;
 
-	n=(y-114)/14;
+	n=(y-gui_skl_names[RECT_Y1])/14;
 
 	hightlight=HL_STATBOX2;
 	hightlight_sub=n;
@@ -1035,7 +1035,10 @@ int mouse_statbox2(int x,int y,int state)
 			if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
 					(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
 					(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+					(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
 					(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+					(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
+					(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
 					(m==41&&(pl_flags & (1 << 10))) )	// Weaken -> Greater Weaken
 			{
 				strcpy(tmp, skilltab[n+skill_pos].alt_a);
@@ -1541,10 +1544,9 @@ int mouse_motd(int x,int y,int mode)
 			// New Player MOTD 'OK' button (closes window)
 			if (show_newp)
 			{
-				
-					cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
-					show_newp=0;
-					noshop=QSIZE*12;
+				cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
+				show_newp=0;
+				noshop=QSIZE*12;
 			}
 			// Tutorial window NEXT
 			else if (show_tuto)

@@ -11,14 +11,14 @@
 #define RANDOM(a) (a>0?random()%(a):0)
 #define DATDIR ".dat"
 
-#define VERSION    0x000604
-#define MINVERSION 0x000604
+#define VERSION    0x000606
+#define MINVERSION 0x000606
 
 #define TICKS 18
 #define TICK  (1000000/TICKS)
 
 #define MAPX       1024
-#define MAPY       1024
+#define MAPY       2048
 #define MAXCHARS   8192
 #define MAXBUFF    65535
 #define MAXITEM    (96*1024)
@@ -204,11 +204,11 @@
 #define SP_COST_DISPEL		45
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		50
-#define SP_COST_PULSE		60
-#define SP_COST_ZEPHYR		20
+#define SP_COST_PULSE		95
+#define SP_COST_ZEPHYR		55
 
 #define SP_COST_WEAKEN		10
-#define SP_COST_BLIND		10
+#define SP_COST_BLIND		20
 #define SP_COST_TAUNT		15
 #define SP_COST_WARCRY		25
 
@@ -242,14 +242,14 @@
 #define SP_DUR_DISPEL		( TICKS * 15                      )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
 #define SP_DUR_TAUNT		( TICKS *  5                      )
-#define SP_DUR_GUARD		( TICKS * 15                      )
-#define SP_DUR_PULSE		( TICKS * 60 * 1                  )
+#define SP_DUR_GUARD		( TICKS * 20                      )
+#define SP_DUR_PULSE		( TICKS * 60 * 2                  )
 #define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )
 #define SP_DUR_DOUSE		( TICKS * 20                      )
 #define SP_DUR_FROSTB		( TICKS * 20                      )
 
 // -------- Skill Exhaustion values -------- //
-#define SK_EXH_MAXIMUM	 	(TICKS * 6)
+#define SK_EXH_MAXIMUM	 	(TICKS * 7)
 #define SK_EXH_LIGHT		(TICKS / 4)
 #define SK_EXH_PROTECT		(TICKS / 2)
 #define SK_EXH_ENHANCE		(TICKS / 2)
@@ -262,7 +262,7 @@
 #define SK_EXH_POISON		(TICKS * 5)
 #define SK_EXH_WARCRY		(TICKS * 3)
 #define SK_EXH_IDENT		(TICKS * 2)
-#define SK_EXH_BLAST		(TICKS * 6)
+#define SK_EXH_BLAST		(TICKS * 7)
 #define SK_EXH_RECALL		(TICKS)
 #define SK_EXH_DISPEL		(TICKS * 4)
 #define SK_EXH_GHOST		(TICKS * 4)
@@ -270,11 +270,11 @@
 #define SK_EXH_CLEAVE		(TICKS * 5)
 #define SK_EXH_WEAKEN		(TICKS * 3)
 
-#define SK_EXH_PULSE		(TICKS * 5)
-#define SK_EXH_ZEPHYR		(TICKS * 5)
+#define SK_EXH_PULSE		(TICKS * 6)
+#define SK_EXH_ZEPHYR		(TICKS * 4)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP(a)		(TICKS * 6 + TICKS * a / 2)
+#define SK_EXH_LEAP			(TICKS * 6)
 
 
 

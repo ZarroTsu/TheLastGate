@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000604
+#define VERSION 0x000606
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -8,7 +8,7 @@
 //#define MAPY			TILEY
 
 #define MAPX_MAX		1024
-#define MAPY_MAX		1024
+#define MAPY_MAX		2048
 
 #define MS_MOVE		    0
 #define MS_LB_DOWN	    1

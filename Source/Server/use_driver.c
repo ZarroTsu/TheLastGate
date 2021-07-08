@@ -1324,6 +1324,65 @@ int is_nolab_item(int in)
 	}
 }
 
+int reward_teleport(int cn, int in)
+{
+	int n=0, in2=0;
+	
+	if (!cn)
+	{
+		return 1;
+	}
+	
+	if (it[in].data[9])
+	{
+		if (it[in].data[9]<12)
+		{
+			if (it[in].data[9]>10 && !RANDOM(40))
+			{
+				switch (RANDOM(5))
+				{	case  0: n = IT_RD_BRV; break;
+					case  1: n = IT_RD_WIL; break;
+					case  2: n = IT_RD_INT; break;
+					case  3: n = IT_RD_AGL; break;
+					default: n = IT_RD_STR; break;
+				}	in2 = god_create_item(n);
+			}
+			else if (it[in].data[9]>5 && !RANDOM(12))
+			{
+				switch (RANDOM(2))
+				{	case  0: n = IT_RD_HP; break;
+					default: n = IT_RD_MP; break;
+				}	in2 = god_create_item(n);
+			}
+			else
+			{
+				switch (RANDOM(2))
+				{	case  0: n = IT_EXPS; break;
+					default: n = IT_LUKS; break;
+				}	in2 = god_create_item(n);
+				it[in2].data[0] = (it[in].data[9]*500 + RANDOM(it[in].data[9]+1)*250) / ((n==IT_LUKS)?25:1);
+			}
+		}
+		else
+		{
+			in2 = god_create_item(n);
+		}
+
+		if (!god_give_char(in2, cn))
+		{
+			do_char_log(cn, 0, "You should tidy up your backpack sometime!\n");
+			it[in2].used = USE_EMPTY;
+		}
+		else
+		{
+			do_char_log(cn, 1, "You got a %s.\n", it[in2].reference);
+			chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
+		}
+	}
+	
+	return teleport(cn, in);
+}
+
 int teleport(int cn, int in)
 {
 	int n, in2;
@@ -1538,7 +1597,8 @@ int use_bag(int cn, int in)
 		return(0);
 	}
 
-	do_char_log(cn, 1, "You search the remains of %s.\n", ch[co].reference);
+	if (!(ch[cn].flags & CF_SYS_OFF))
+		do_char_log(cn, 1, "You search the remains of %s.\n", ch[co].reference);
 	if ((ch[co].flags & CF_BODY) && ch[co].gold)
 	{
 		ch[cn].gold += ch[co].gold;
@@ -1978,13 +2038,10 @@ int use_crystal_sub(int cn, int in)
 	for (z = 0; z<MAXSKILL; z++) { for (m = 1; m<ch[cc].skill[z][0]; m++) { pts += skill_needed(m, 3); } }
 
 	ch[cc].points_tot = pts;
-	ch[cc].gold  = base/2 * (RANDOM(base)+1) + RANDOM(100) + 1;
-	ch[cc].a_hp  = 999999;
-	ch[cc].a_end = 999999;
-	if (ch[cc].skill[SK_MEDIT][0]>0)
-		ch[cc].a_mana = 1000000;
-	else
-		ch[cc].a_mana = RANDOM(4) * RANDOM(4) * RANDOM(4) * RANDOM(4) * RANDOM(4) * RANDOM(4) * 100;
+	ch[cc].gold   = base/2 * (RANDOM(base)+1) + RANDOM(100) + 1;
+	ch[cc].a_hp   = 999999;
+	ch[cc].a_end  = 999999;
+	ch[cc].a_mana = 999999;
 
 	ch[cc].alignment = -RANDOM(7500);
 
@@ -2364,101 +2421,99 @@ int use_crystal_sub(int cn, int in)
 		}
 	}
 	
-	/*
 	// New: Rings with 'big' gems.
 	if (base >= 25)
-	{	if (RANDOM(40)==0 && has_lring==0) // WN_LRING
+	{	if (RANDOM(40)==0 && !ch[cc].worn[WN_LRING])
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); it[tmp].carried = cc; break;
-			}	has_lring = 1; xlog("  got %s", it[tmp].name);
+			{	case  0: tmp = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); break;
+				default: tmp = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); break;
+			}	if (tmp) { ch[cc].worn[WN_LRING] = tmp; it[tmp].carried = cc; xlog("  got %s", it[tmp].name); }
 		}
-		if (RANDOM(40)==0 && has_rring==0) // WN_RRING
+		if (RANDOM(40)==0 && !ch[cc].worn[WN_RRING])
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); it[tmp].carried = cc; break;
-			}	has_rring = 1; xlog("  got %s", it[tmp].name);
+			{	case  0: tmp = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); break;
+				default: tmp = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); break;
+			}	if (tmp) { ch[cc].worn[WN_RRING] = tmp; it[tmp].carried = cc; xlog("  got %s", it[tmp].name); }
 		}
 	}
 	if (base >= 65)
-	{	if (RANDOM(60)==0 && has_lring==0) // WN_LRING
+	{	if (RANDOM(40)==0 && !ch[cc].worn[WN_LRING])
 		{	switch(RANDOM(4))
-			{	case 0: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); it[tmp].carried = cc; break;
-				case 2: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 3: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); it[tmp].carried = cc; break;
-			}	has_lring = 1; xlog("  got %s", it[tmp].name);
+			{	case  0: tmp = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); break;
+				case  1: tmp = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); break;
+				case  2: tmp = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); break;
+				default: tmp = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); break;
+			}	if (tmp) { ch[cc].worn[WN_LRING] = tmp; it[tmp].carried = cc; xlog("  got %s", it[tmp].name); }
 		}
-		if (RANDOM(60)==0 && has_rring==0) // WN_RRING
+		if (RANDOM(40)==0 && !ch[cc].worn[WN_RRING])
 		{	switch(RANDOM(4))
-			{	case 0: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); it[tmp].carried = cc; break;
-				case 2: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 3: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); it[tmp].carried = cc; break;
-			}	has_rring = 1; xlog("  got %s", it[tmp].name);
+			{	case  0: tmp = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); break;
+				case  1: tmp = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); break;
+				case  2: tmp = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); break;
+				default: tmp = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); break;
+			}	if (tmp) { ch[cc].worn[WN_RRING] = tmp; it[tmp].carried = cc; xlog("  got %s", it[tmp].name); }
 		}
 	}
 	if (base >= 105)
-	{	if (RANDOM(80)==0 && has_lring==0) // WN_LRING
+	{	if (RANDOM(40)==0 && !ch[cc].worn[WN_LRING])
 		{	switch(RANDOM(6))
-			{	case 0: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); it[tmp].carried = cc; break;
-				case 2: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 3: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); it[tmp].carried = cc; break;
-				case 4: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_PLAT1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 5: tmp = ch[cc].worn[WN_LRING] = pop_create_item(IT_RD_PLAT2+RANDOM(4), cc); it[tmp].carried = cc; break;
-			}	has_lring = 1; xlog("  got %s", it[tmp].name);
+			{	case  0: tmp = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); break;
+				case  1: tmp = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); break;
+				case  2: tmp = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); break;
+				case  3: tmp = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); break;
+				case  4: tmp = pop_create_item(IT_RD_PLAT1+RANDOM(6), cc); break;
+				default: tmp = pop_create_item(IT_RD_PLAT2+RANDOM(4), cc); break;
+			}	if (tmp) { ch[cc].worn[WN_LRING] = tmp; it[tmp].carried = cc; xlog("  got %s", it[tmp].name); }
 		}
-		if (RANDOM(80)==0 && has_rring==0) // WN_RRING
+		if (RANDOM(40)==0 && !ch[cc].worn[WN_RRING])
 		{	switch(RANDOM(6))
-			{	case 0: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); it[tmp].carried = cc; break;
-				case 2: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 3: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); it[tmp].carried = cc; break;
-				case 4: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_PLAT1+RANDOM(6), cc); it[tmp].carried = cc; break;
-				case 5: tmp = ch[cc].worn[WN_RRING] = pop_create_item(IT_RD_PLAT2+RANDOM(4), cc); it[tmp].carried = cc; break;
-			}	has_rring = 1; xlog("  got %s", it[tmp].name);
+			{	case  0: tmp = pop_create_item(IT_RD_SILV1+RANDOM(6), cc); break;
+				case  1: tmp = pop_create_item(IT_RD_SILV2+RANDOM(4), cc); break;
+				case  2: tmp = pop_create_item(IT_RD_GOLD1+RANDOM(6), cc); break;
+				case  3: tmp = pop_create_item(IT_RD_GOLD2+RANDOM(4), cc); break;
+				case  4: tmp = pop_create_item(IT_RD_PLAT1+RANDOM(6), cc); break;
+				default: tmp = pop_create_item(IT_RD_PLAT2+RANDOM(4), cc); break;
+			}	if (tmp) { ch[cc].worn[WN_RRING] = tmp; it[tmp].carried = cc; xlog("  got %s", it[tmp].name); }
 		}
 	}
-	*/
 
 	if (tier==0) // Tier 0: "base" ranges from   0 -  49
 	{	if (RANDOM(20)==0)
 		{	switch(RANDOM(3))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_HEAL), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_MANA), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_END), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HEAL), cc); break;
+				case  1: god_give_char(tmp = god_create_item(IT_RD_MANA), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_END), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(40)==0 && base>(0+8))
 		{	switch(RANDOM(3))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
+				case  1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		if (RANDOM(60)==0 && base>(0+16))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		if (RANDOM(120)==0 && base>(0+24))
 		{	switch(RANDOM(2))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 	}
 	else if (tier==1) // Tier 1: "base" ranges from  40 -  89
 	{	if (RANDOM(25)==0)
 		{	switch(RANDOM(6))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_HEAL), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_MANA), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_END), cc); break;
-				case 3: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
-				case 4: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
-				case 5: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HEAL), cc); break;
+				case  1: god_give_char(tmp = god_create_item(IT_RD_MANA), cc); break;
+				case  2: god_give_char(tmp = god_create_item(IT_RD_END), cc); break;
+				case  3: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
+				case  4: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(50)==0 && base>(40+6))
@@ -2474,34 +2529,34 @@ int use_crystal_sub(int cn, int in)
 				case  8: god_give_char(tmp = god_create_item(IT_POT_H_MP), cc); break;
 				case  9: god_give_char(tmp = god_create_item(IT_POT_S_MP), cc); break;
 				case 10: god_give_char(tmp = god_create_item(IT_POT_C_MP), cc); break;
-				case 11: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		if (RANDOM(50)==0 && base>(40+12))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(75)==0 && base>(40+18))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		if (RANDOM(100)==0 && base>(40+24))
 		{	switch(RANDOM(2))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(150)==0 && base>(40+30))
 		{	switch(RANDOM(5))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
-				case 3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
-				case 4: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
+				case  1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
+				case  2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
+				case  3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 	}
@@ -2522,7 +2577,7 @@ int use_crystal_sub(int cn, int in)
 				case 11: god_give_char(tmp = god_create_item(IT_POT_H_MP), cc); break;
 				case 12: god_give_char(tmp = god_create_item(IT_POT_S_MP), cc); break;
 				case 13: god_give_char(tmp = god_create_item(IT_POT_C_MP), cc); break;
-				case 14: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(100)==0 && base>(80+4))
@@ -2531,35 +2586,35 @@ int use_crystal_sub(int cn, int in)
 		}
 		if (RANDOM(40)==0 && base>(80+8))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(60)==0 && base>(80+12))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(80)==0 && base>(80+16))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTHR, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTHR, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTHR, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTHR, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		else if (RANDOM(100)==0 && base>(80+24))
 		{	switch(RANDOM(2))
-			{	case 0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYFOU, cc); it[tmp].carried = cc; break;
-				case 1: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTFOU, cc); it[tmp].carried = cc; break;
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYFOU, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTFOU, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 		if (RANDOM(120)==0 && base>(80+20))
 		{	switch(RANDOM(5))
-			{	case 0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
-				case 1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
-				case 2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
-				case 3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
-				case 4: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
+			{	case  0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
+				case  1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
+				case  2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
+				case  3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
+				default: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
 	}
@@ -3775,7 +3830,12 @@ int get_pent_value(int pnum)
 {
 	// Values are multiplied by 10000 here for decimal accuracy.
 	// Apparently each bracket step gets truncated as its own int, who knew?
-	return ( ( pnum*pnum*10000 ) / ( 5*10000+pnum*10000/99 ) +1 );
+	return ( ( pnum*pnum*10000 ) / ( 6*10000+pnum*10000/99 ) +1 );
+}
+
+int get_kill_streak_exp(int k, int p)
+{
+	return ( k*2 + k*(p*p/16)/7 );
 }
 
 void show_pent_count(int cn)
@@ -3839,12 +3899,16 @@ void solved_pentagram(int cn, int in)
 			}
 			*/
 		}
-
-		if (ch[n].data[18])
+		
+		if (ch[n].data[18] || (ch[n].data[77] && ch[n].data[78]))
 		{
-			do_give_exp(n, ch[n].data[18], 0, -1);
-			ch[n].data[18] = 0;
+			do_give_exp(n, ch[n].data[18]+get_kill_streak_exp(ch[n].data[77],ch[n].data[78]), 0, -1);
+			ch[n].data[18] = 0;	ch[n].data[77] = 0;	ch[n].data[78] = 0;
 			do_char_log(n, 1, "Next solve will be at %d pentagrammas.\n", penta_needed);
+		}
+		else if (ch[n].data[77])
+		{
+			ch[n].data[77] = 0;
 		}
 	}
 
@@ -3923,7 +3987,7 @@ int use_pentagram(int cn, int in)
 	v = it[in].data[0];
 	it[in].data[8]  = cn;
 	it[in].duration = -1;
-
+	
 	do_char_log(cn, 1, "You activated the pentagram with the value %d. It is worth %d experience point%s.\n", v, get_pent_value(v), v==1 ? "" : "s");
 
 	for (n = 1; n<MAXITEM; n++)
@@ -3995,7 +4059,7 @@ int use_pentagram(int cn, int in)
 		}
 	}
 
-	if (b[0])
+	if (b[0] && !(ch[cn].flags & CF_SYS_OFF))
 	{
 		do_char_log(cn, 1, "You're holding:\n");
 	}
@@ -4004,15 +4068,23 @@ int use_pentagram(int cn, int in)
 	{
 		if (b[n])
 		{
-			do_char_log(cn, 1, "Pentagram %3d, worth %5d point%s.\n",
-			            bv[n], get_pent_value(bv[n]), bv[n]==1 ? "" : "s");
+			if (!(ch[cn].flags & CF_SYS_OFF))
+				do_char_log(cn, 1, "Pentagram %3d, worth %5d point%s.\n",
+									bv[n], get_pent_value(bv[n]), bv[n]==1 ? "" : "s");
 			exp += get_pent_value(bv[n]); //(bv[n] * bv[n]) / 9 + 1;
 		}
 	}
 	
+	ch[cn].data[78] = bv[0];
 	ch[cn].data[18] = exp;
-	do_char_log(cn, 1, "Your pentagrammas are worth a total of %d experience points. Note that only the highest 5 pentagrammas count towards your experience bonus.\n", exp);
-	do_char_log(cn, 1, "There are %d pentagrammas total, of which %d are active.\n", tot, act);
+	//                 "!        .         .   |     .         .        !"
+	do_char_log(cn, 2, "Your pentagrammas have a total of %d exp.\n", exp);
+	if (r1<9) 
+		do_char_log(cn, 1, "Note that only the highest 5 pentagrammas count towards your experience bonus.\n");
+	do_char_log(cn, 1, "%d of the %d pentagrammas are now active.\n", act, tot);
+	if (ch[cn].data[77]) 
+		do_char_log(cn, 0, "Your kill streak is %d, worth %d exp.\n", 
+			ch[cn].data[77], get_kill_streak_exp(ch[cn].data[77],ch[cn].data[78]));
 
 	chlog(cn, "Activated pentagram %d (%d of %d)", it[in].data[0], act, penta_needed);
 
@@ -4073,7 +4145,7 @@ int use_shrine(int cn, int in)
 		if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
 		{
 			ch[cn].a_mana = ch[cn].mana[5] * 1000;
-			do_char_log(cn, 0, "You feel the hand of the Goddess of Magic touch your mind.\n");
+			do_char_log(cn, 0, "The Goddess of Magic touches your mind.\n");
 			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		}
 
@@ -4121,14 +4193,18 @@ int use_shrine(int cn, int in)
 	}
 	else
 	{
+		m = 0;
+		
 		if (val<rank / 8)
 		{
 			do_char_log(cn, 1, "You have angered the gods with your unworthy gift.\n");
+			m = -2;
 			ch[cn].luck -= 2;
 		}
 		else if (val<rank / 4)
 		{
 			do_char_log(cn, 1, "The gods sneer at your gift.\n");
+			m = -1;
 			ch[cn].luck--;
 		}
 		else if (val<rank / 2)
@@ -4142,28 +4218,17 @@ int use_shrine(int cn, int in)
 	}
 
 	do_char_log(cn, 1, " \n");
-
-	if (ch[cn].luck<-10000)
-	{
-		do_char_log(cn, 1, "You feel that the gods are mad at you.\n");
-	}
-	else if (ch[cn].luck<0)
-	{
-		do_char_log(cn, 1, "You feel that the gods are angry at you.\n");
-	}
-	else if (ch[cn].luck<100)
-	{
-		do_char_log(cn, 1, "You feel that the gods stance towards you is neutral.\n");
-	}
-	else if (ch[cn].luck<1000)
-	{
-		do_char_log(cn, 1, "You feel that the gods are pleased with you.\n");
-	}
-	else
-	{
-		do_char_log(cn, 1, "You feel that the gods are very fond of you.\n");
-	}
-
+	
+	//                                             "!        .         .         .         .        !"
+	if (ch[cn].luck<-5000)		do_char_log(cn, 1, "You feel the gods simply hate you.\n");
+	else if (ch[cn].luck<-2000)	do_char_log(cn, 1, "You feel the gods are mad at you.\n");
+	else if (ch[cn].luck<0)		do_char_log(cn, 1, "You feel the gods are angry at you.\n");
+	else if (ch[cn].luck<100)	do_char_log(cn, 1, "You feel the gods stance towards you is neutral.\n");
+	else if (ch[cn].luck<2000)	do_char_log(cn, 1, "You feel the gods are pleased with you.\n");
+	else if (ch[cn].luck<5000)	do_char_log(cn, 1, "You feel the gods are very fond of you.\n");
+	else						do_char_log(cn, 1, "You feel the gods will save your life one day.\n");
+	do_char_log(cn, 2, "You have %d luck (%+d).\n", ch[cn].luck, m);
+	
 	return(1);
 }
 
@@ -4394,6 +4459,14 @@ int use_seyan_shrine(int cn, int in)
 	}
 
 	it[in2].weapon[0] = 15 + bits * 3;
+	
+	for (n = 0; n<5; n++) 
+	{
+		it[in2].attrib[n][0] = min(5, (bits-(5-n))/5);
+	}
+	if (bits>=31) it[in2].base_crit   += 1;
+	if (bits==32) it[in2].spell_mod[0] = 5;
+	
 	it[in2].flags |= IF_UPDATE;
 	it[in2].temp   = 0;
 
@@ -4597,6 +4670,18 @@ int spell_scroll(int cn, int in)
 			break;
 		case    SK_HASTE:
 			ret = spell_haste(cn, co, power, 1);
+			break;
+		case    SK_IDENT:
+			if (!IS_SANEITEM(in2 = ch[cn].citem)) in2 = 0;
+			if ((in2 && chance_base(cn, SK_IDENT, 18, it[in2].power, 1))
+				|| (!in2 && chance_base(cn, SK_IDENT, 18, get_target_resistance(co), 1)))
+			{
+				ret = 1;
+			}
+			else
+			{
+				ret = spell_identify(cn, co, in2);
+			}
 			break;
 		// Blast?
 		case    SK_CURSE:
@@ -5444,6 +5529,9 @@ void use_driver(int cn, int in, int carried)
 			case 93:
 				ret = use_soulcatalyst(cn, in);
 				break;
+			case 94:						// rewards on use while teleporting. /diffi sets reward tier in drdata[9]
+				ret = reward_teleport(cn, in); 
+				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -5755,8 +5843,16 @@ void item_damage_citem(int cn, int dam)
 
 void item_damage_armor(int cn, int dam)
 {
-	int n;
-
+	int n, in;
+	
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_MSHIELD)
+		{
+			dam -= bu[in].armor[1];
+		}
+	}
+	
 	dam = dam / 4 + 1;
 
 	for (n = 0; n<20; n++)

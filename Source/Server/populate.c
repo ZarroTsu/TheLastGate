@@ -72,7 +72,7 @@ int pop_create_item(int temp, int cn)
 	if (!(it_temp[temp].flags & IF_TAKE))
 	{
 		xlog("pop_create_item: bad template number %d", temp);
-		return;
+		return 0;
 	}
 	if (is_unique_able(temp))
 	{

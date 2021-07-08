@@ -38,13 +38,8 @@ structure:
 	sudo chmod a+rwx $(SERVERDIR)/.save
 	sudo chmod a+rwx $(SERVERDIR)/.tmp
 	sudo mkdir -p $(CGIIMP)
-	sudo mkdir -p $(CGIIMP)/assets/
-	sudo cp -r cgi/assets/ $(CGIIMP)/
-	sudo chmod a+rwx $(CGIIMP)/assets
-	sudo chmod a+rwx $(CGIIMP)/assets/scripts
-	sudo chmod a+rwx $(CGIIMP)/assets/sprites
-	sudo chmod a+rwx $(CGIIMP)/assets/ui
 	sudo cp -R Web/* $(WEB)
+	sudo chmod -R a+rwx $(WEB)/assets/
 	sudo touch $(SERVERDIR)/server.log
 	sudo touch $(SERVERDIR)/server.pid
 

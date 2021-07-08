@@ -432,6 +432,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 		case WM_CHAR:
 			switch ((int)wParam) 
 			{
+				/*
 				// **************** Ctrl cases for letter keys **************** //
 				// -------- CTRL + Q
 				case  17: if (keys>=2) button_command(20);break;
@@ -459,6 +460,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				case   3: if (keys>=2) button_command(30);break;
 				// -------- CTRL + V
 				case  22: if (keys>=2) button_command(31);break;
+				*/
 				
 				// -------- Return Key
 				case 13: 

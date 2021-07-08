@@ -333,7 +333,7 @@ int npc_cityattack_high(int cn)
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_LEAP(0)/2;
+			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
 			return( 1);
 		}
 

@@ -249,6 +249,8 @@ extern unsigned int mapmarker;
 #define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
 #define CF_AUTOLOOT    (1ull<<57)       // Automatic looting
 #define CF_BSPOINTS    (1ull<<58)		// Black Stronghold point merchant
+#define CF_SYS_OFF     (1ull<<59)		// Turns off all system-related messages
+#define CF_OVERRIDE    (1ull<<60)		// Allow overriding friendly spells on self
 
 #define AT_CAP				300
 #define SPEED_CAP 			300

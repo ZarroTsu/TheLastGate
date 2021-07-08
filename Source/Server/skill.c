@@ -40,7 +40,7 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				"", "", "", 
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
-	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a temporary bonus to negative spell reduction.", 
+	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a small bonus to immunity.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
@@ -211,7 +211,7 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target. Deals critical damage against single targets. This additionally costs mana if your target is distant.", 
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target. Deals critical damage against single targets.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }}
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",

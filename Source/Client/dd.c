@@ -648,8 +648,10 @@ void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
 		yf += 4;
 	}
 
-	xt=xf+xs;
-	yt=yf+ys;
+	xt=min(screen_width, xf+xs);
+	yt=min(screen_height, yf+ys);
+	xf=max(0, xf);
+	yf=max(0, yf);
 
 	for (y=yf; y<yt; y++) {
 		for (x=xf,off=y*MAXX+xf; x<xt; x++,off++) {
@@ -1751,13 +1753,17 @@ void dd_gputc(int xpos,int ypos,int font,int c)
 	sprtab[nr].ticker=current_tick;
 
 	for (y=0; y<9; y++) {
-		for (x=0; x<6; x++,tptr++,fptr++) {
-			if (*fptr!=background)
-				*tptr=*fptr;
-		}
-		tptr+=MAXX-6;
-		fptr+=576-6;
-	}
+        if (ypos + y < 0 || ypos + y >= screen_height) continue;
+
+        for (x=0; x<6; x++,tptr++,fptr++) {
+            if (xpos + x < 0 || xpos + x >= screen_width) continue;
+
+            if (*fptr!=background)
+                *tptr=*fptr;
+        }
+        tptr+=MAXX-6;
+        fptr+=576-6;
+    }
 
 	dd_release_ptr(sur2);
 

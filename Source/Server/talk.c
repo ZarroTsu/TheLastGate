@@ -252,7 +252,7 @@ struct know
 #define AN_SK_AXE		"The Axe skill will help with one's ability to hit and parry when using an axe."
 #define AN_SK_STAFF		"The Staff skill will assist with hitting and parrying while using a staff."
 #define AN_SK_TWOHAND	"The Two-Handed skill helps with hitting and parrying when using a two-handed weapon."
-#define AN_SK_FOCUS		"Focus is a rare skill learned by veteran Seyan'du. It improves their ability to cast any spell."
+#define AN_SK_ZEPHYR	"Zephyr is an advanced skill learned by Warriors. It creates blades of wind, dealing extra damage with each hit."
 #define AN_SK_STEALTH	"Stealth is a skill that assists with avoiding fights. With enough stealth, one can appear invisible!"
 #define AN_SK_PERCEPT	"Perception is a skill for seeing and hearing. Some say that with enough investment, one can see in the dark!"
 #define AN_SK_SWIM		"The Swimming skill allows one to survive underwater without drowning."
@@ -294,7 +294,7 @@ struct know
 #define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners and Brawlers. It lets them summon a copy of themself to fight for them."
 #define AN_SK_HASTE		"Haste is an advanced spell learned by Warriors and Sorcerers. It allows them to dramatically speed up their actions."
 #define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
-#define AN_SK_LEAP		"Leap is an advanced skill learned by Warriors. It leaps through enemies, damaging them in the process."
+#define AN_SK_LEAP		"Leap is an advanced skill learned by Brawlers. It leaps through enemies, damaging them in the process."
 //}
 //{ "What is ...?" for each race
 #define AN_RA_TEMP		"Templars are powerful fighters. They are not very good with spells, but they have learned to adapt without them."
@@ -1284,7 +1284,7 @@ struct know know[] = {
 	{{"?what", "!axe",        "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_AXE, 0},
 	{{"?what", "!staff",      "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_STAFF, 0},
 	{{"?what", "!twohand",    "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_TWOHAND, 0},
-	{{"?what", "!focus",      "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_FOCUS, 0},
+	{{"?what", "!zephyr",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_ZEPHYR, 0},
 	{{"?what", "!stealth",    "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_STEALTH, 0},
 	{{"?what", "!perception", "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PERCEPT, 0},
 	{{"?what", "!swimming",   "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SWIM, 0},
@@ -1882,7 +1882,7 @@ void answer_tarot2(int cn, int co)
 void answer_unlearn(int cn, int co)
 {
 	int v = 250000;
-	char *unl = "";
+	char unl[40];
 	
 	if ((ch[co].kindred & KIN_SEYAN_DU) && 
 		(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
@@ -1902,7 +1902,7 @@ void answer_unlearn(int cn, int co)
 	}
 	else if (ch[co].kindred & KIN_SEYAN_DU)
 	{
-		do_sayx(cn, "But you do not have a secondary card equipped, %s!", ch[co].name);
+		do_sayx(cn, "But you do not know an arch skill, %s!", ch[co].name);
 	}
 }
 

@@ -224,18 +224,18 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 			return 0;
 		}
 
-		power = 300;
+		power = 200;
 
 		strcpy(bu[in].name, "Greater Slow");
 		bu[in].flags |= IF_SPELL;
 		bu[in].temp  = SK_SLOW3;
 		bu[in].sprite[1] = BUF_SPR_SLOW2;
-		bu[in].duration  = bu[in].active = SP_DUR_SLOW2(power);
+		bu[in].duration  = bu[in].active = TICKS * 4;
 		bu[in].power = power;
-		bu[in].speed[1] 		= -(min(120, 15 + SLOW2FORM(power)/2));
-		bu[in].move_speed[1] 	= -(min(120, 15 + SLOW2FORM(power)/2));
-		bu[in].atk_speed[1] 	= -(min(120, 15 + SLOW2FORM(power)/2));
-		bu[in].cast_speed[1] 	= -(min(120, 15 + SLOW2FORM(power)/2));
+		bu[in].speed[1] 		= -(min(120, 10 + SLOW2FORM(power)/2));
+		bu[in].move_speed[1] 	= -(min(120, 10 + SLOW2FORM(power)/2));
+		bu[in].atk_speed[1] 	= -(min(120, 10 + SLOW2FORM(power)/2));
+		bu[in].cast_speed[1] 	= -(min(120, 10 + SLOW2FORM(power)/2));
 		
 		do_char_log(co, 0, "You have been badly slowed.\n");
 		
@@ -459,7 +459,7 @@ int npc_shiva_phasing(int cn)
 			strcpy(bu[in].name, "Stun");
 			bu[in].flags |= IF_SPELL;
 			bu[in].sprite[1] = BUF_SPR_WARCRY2;
-			bu[in].duration  = bu[in].active = TICKS*45;
+			bu[in].duration  = bu[in].active = TICKS*48;
 			bu[in].temp  = 666;
 			bu[in].power = 666;
 			
@@ -485,7 +485,7 @@ int npc_shiva_phasing(int cn)
 			it[in2].data[0] = 1;
 		}
 		
-		ch[cn].data[1] = globs->ticker + TICKS * 6;
+		ch[cn].data[1] = globs->ticker + TICKS * 4;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==1)

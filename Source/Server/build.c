@@ -58,7 +58,14 @@ int build_item(int nr, int x, int y)
 			do_area_log(0, 0, x, y, 1, "Respawn point %d, Level %d.\n", m, diffi);
 			it[in].data[0] = m;
 			it[in].data[9] = diffi;   // difficulty level
-			it[in].temp = 0; // make sure it isnt reset when doing #reset
+			it[in].temp = 0; // make sure it isn't reset when doing #reset
+		}
+
+		if (it[in].driver==94)
+		{
+			do_area_log(0, 0, x, y, 1, "Exit portal, Reward %d.\n", diffi);
+			it[in].data[9] = diffi;   // difficulty level
+			it[in].temp = 0; // make sure it isn't reset when doing #reset
 		}
 
 		map[x + y * MAPX].it = in;

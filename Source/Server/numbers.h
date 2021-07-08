@@ -562,31 +562,6 @@
 
 // -------- pop_create_bonus -------- //
 
-#define IT_POP_REDFL	  18
-#define IT_POP_PURFL	  46
-#define IT_POP_GREFL	 142
-#define IT_POP_YELFL	 140
-#define IT_POP_BLUFL	 141
-#define IT_POP_FLASK	 100
-#define IT_POP_HEALP	 101
-#define IT_POP_ENDUP	 125
-#define IT_POP_MANAP	 102
-#define IT_POP_RAINP	 274
-#define IT_POP_GHEAL	 127
-#define IT_POP_GENDU	 273
-#define IT_POP_GMANA	 131
-#define IT_POP_VITPT	 293
-#define IT_POP_CLAPT	 294
-#define IT_POP_SAGPT	 295
-#define IT_POP_LIFEP	 181
-#define IT_POP_SRING	1345
-#define IT_POP_GRING	1346
-#define IT_POP_PRING	1347
-#define IT_POP_GEMSM	1348 // +0 - +5
-#define IT_POP_GEMMD	1354 // +0 - +5
-#define IT_POP_GEMBG	1360 // +0 - +5
-#define IT_POP_GEMHU	1366 // +0 - +5
-#define IT_POP_GEMFL	1372 // +0 - +5
 #define IT_POP_SPELL	1314 // +0 - +6
 #define IT_POP_ASPEL	1321 // +0 - +6
 #define IT_POP_ISPEL	1328 // +0 - +6
@@ -623,6 +598,9 @@
 #define IT_RD_GOLD2		2077 // +RANDOM(4)
 #define IT_RD_PLAT1		1414 // +RANDOM(6)
 #define IT_RD_PLAT2		2087 // +RANDOM(4)
+
+#define IT_EXPS			2124
+#define IT_LUKS			2125
 
 // -------- Buff/Debuff Sprites -------- //
 

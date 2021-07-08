@@ -426,7 +426,7 @@ int npc_killed(int cn, int cc, int co)
 		ch[cn].attack_cn = 0;
 	}
 	ch[cn].data[76] = ch[cn].data[77] = ch[cn].data[78] = 0;
-	//npc_activate_rings(cn, 0);
+	npc_activate_rings(cn, 0);
 
 	idx = co | (char_id(co) << 16);
 
@@ -802,11 +802,11 @@ int npc_give(int cn, int co, int in, int money)
 		if (ch[cn].temp==CT_TACTICIAN && (it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3))
 		{
 			ar = it[in].data[0];
+			do_give_bspoints(co, ar, 1);
 			god_take_from_char(in, cn);
 			it[in].used = USE_EMPTY;  // silently destroy the item.
 			do_sayx(cn, "Ah, a black candle! Great work, %s! Now we may see peace for a while...", ch[co].name);
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The Tactician was impressed by %s's deed.\n", ch[co].name);
-			do_give_bspoints(cn, ar, 1);
 			ch[co].misc_action = DR_IDLE;
 			return(0);
 		}
@@ -834,12 +834,14 @@ int npc_give(int cn, int co, int in, int money)
 			}
 			do_sayx(cn, "A tarot card, I see. Allow me to apply its magic to you, %s.", ch[co].name);
 			god_take_from_char(in, cn);
-			do_char_log(co, 1, "You now have the effects of your %s equipped.\n", it[in].name);
+			if (!(ch[co].flags & CF_SYS_OFF))
+				do_char_log(co, 1, "You now have the effects of your %s equipped.\n", it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
 			if (in2 = ch[co].worn[WN_CHARM])
 			{
 				do_sayx(cn, "I have removed your %s for you as well. Please take it.", it[in2].name);
-				do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in2].name);
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in2].name);
 			}
 			it[in].x = 0;
 			it[in].y = 0;
@@ -2153,11 +2155,11 @@ int npc_see(int cn, int co)
 
 				if (cnt==1)
 				{
-					do_sayx(cn, "I see you have a sword dedicated to the gods. Make good use of it, %s.\n", ch[co].name);
+					do_sayx(cn, "I see you have a weapon dedicated to the gods. Make good use of it, %s.\n", ch[co].name);
 				}
 				else if (cnt>1)
 				{
-					do_sayx(cn, "I see you have several swords dedicated to the gods. They will get angry if you keep more than one, %s.\n", ch[co].name);
+					do_sayx(cn, "I see you have several weapons dedicated to the gods. They will get angry if you keep more than one, %s.\n", ch[co].name);
 				}
 			}
 		}
@@ -3167,7 +3169,7 @@ int npc_driver_high(int cn)
 	if (ch[cn].data[78]<globs->ticker)
 	{
 		ch[cn].data[78] = 0;
-		//npc_activate_rings(cn, 0);
+		npc_activate_rings(cn, 0);
 	}
 
 	// self destruct
@@ -3493,7 +3495,7 @@ int npc_driver_high(int cn)
 	// generic fight-magic management
 	if ((co = ch[cn].attack_cn)!=0 || ch[cn].data[78]) // we're fighting
 	{
-		//npc_activate_rings(cn, 1);
+		npc_activate_rings(cn, 1);
 		/*
 		if (npc_quaff_potion(cn, 833, 254))
 		{
@@ -3590,7 +3592,7 @@ int npc_driver_high(int cn)
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_LEAP(0)/2;
+			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
 			return( 1);
 		}
 

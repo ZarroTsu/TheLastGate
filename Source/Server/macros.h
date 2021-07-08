@@ -98,9 +98,9 @@
 // Haste's formula
 #define HASTEFORM(n)		(n/4)
 // Slow's formula (used to degrade)
-#define SLOWFORM(n)			(n/2)
+#define SLOWFORM(n)			(n/3)
 // Slow2's formula (used to degrade) 
-#define SLOW2FORM(n)		(n/(8/3))
+#define SLOW2FORM(n)		(n/4)
 // Curse2's formula (used to degrade)
 #define CURSE2FORM(p, n)	(((p*4/3)-n)/5)
 // Poison's formula (damage per tick)

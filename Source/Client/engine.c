@@ -376,7 +376,7 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
-	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a bonus to negative spell reduction.", 
+	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a small bonus to immunity.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
@@ -444,8 +444,8 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_STR }},
 				
-	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", 
-				"Blast (Douse)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, reducing your target's spell modifier.", "", 
+	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies.", 
+				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.", 
@@ -497,8 +497,8 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 2 tiles.", 
-				"", "", "", 
+	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their perception and hit and parry rates. Has a base radius of 2 tiles.", 
+				"Blind (Douse)", 		"Use (Skill): Applies a debuff to nearby enemies, reducing their stealth and spell modifier. Has a base radius of 2 tiles.", "", 
 				{ AT_BRV, AT_WIL, AT_AGL }},
 				
 	{ 38, 'G', 	"Weapon Mastery", 		"Passive ability to improve weapon value granted by your equipped weapon.", 
@@ -510,14 +510,14 @@ struct skilltab _skilltab[50]={
 				{ AT_BRV, AT_STR, AT_STR }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies.", 
-				"", "", "", 
+				"Cleave (Bleed)", 		"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
 	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon and armor values.", 
 				"Weaken (Greater)", 	"Use (Skill): Applies a debuff to your foe and surrounding enemies, greatly reducing their armor value.", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
-	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, causing them to take damage over time. Stacks up to 3 times.", 
+	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, reducing their immunity and causing them to take damage over time. Stacks up to 3 times.", 
 				"", "", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
@@ -547,7 +547,7 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage against single targets. Costs mana if your target is distant.", 
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }}
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
@@ -915,10 +915,14 @@ void display_meta_from_ls(void)
 	int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
 	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
 	int sk_water, sk_cleav, sk_taunt, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
+	int sk_shado;
 	
 	// Player Speed and Attack Speed - WN_SPEED
-	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP;
-	pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP;
+	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; 
+	pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; 
+
+	if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP; if (pl_speed < 0) pl_speed = 0;
+	if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP; if (pl_atksp < 0) pl_atksp = 0;
 
 	// Player Spell Mod and Spell Apt - WN_SPMOD
 	pl_spmod = pl.worn[WN_SPMOD];
@@ -938,7 +942,9 @@ void display_meta_from_ls(void)
 	
 	// Player Cooldown and Cast Speed - WN_CLDWN
 	pl_coold = pl.worn[WN_CLDWN];
-	pl_casts = pl_speed + pl.worn_p[WN_CLDWN]; if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP;
+	pl_casts = pl_speed + pl.worn_p[WN_CLDWN]; 
+	
+	if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP; if (pl_casts < 0) pl_casts = 0;
 	
 	// Player Flags from special items
 	pl_flags = pl.worn[WN_FLAGS];
@@ -982,35 +988,36 @@ void display_meta_from_ls(void)
 		Additional skill bonuses for GUI
 	*/
 	sk_proxi = sk_score(44) / (300/12);
-	sk_ghost = (sk_score(27)*pl_spmod/100) * 5 / 11;
-	sk_poiso = (sk_score(42)*pl_spmod/100) * 15 / 3 * 18;
-	sk_blast = (sk_score(24)*pl_spmod/100) * 2 * 650/1000;
-	sk_scorc = (1000 + (sk_score(24)*pl_spmod/100));
-	sk_douse = -(sk_score(24)*pl_spmod/100);
-	sk_pulse = (sk_score(43)*pl_spmod/100) * 2 * 150/1000;
-	sk_pucnt = 60 / (3 * pl_basel / max(100, pl_coold));
-	sk_razor = ((sk_score(7)+max(0,(pl_atksp-120))/4)*pl_spmod/100) * 2 * 50/1000;
-	sk_leapv = (sk_score(49)+pl.weapon/4) * 750/1000;
+	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
+	sk_poiso = sk_score(42)*pl_spmod/100 * 15 / 3 * 18;
+	sk_blast = sk_score(24)*pl_spmod/100 * 2 * 750/1000;
+	sk_scorc = 1000 + sk_score(24)*pl_spmod/100;
+	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * 100/1000;
+	sk_pucnt = (60*2*100 / (3*pl_cdrate));
+	sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/4) * 2 * 50/1000;
+	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * 450/1000;
 	sk_water = 25 * 18;
-	sk_cleav = (sk_score(40)+pl.weapon/4) * 2 * 750/1000;
-	
+	sk_cleav = (sk_score(40)+pl.weapon/4+pl_topdm/4) * 2 * 750/1000;
 	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
+	sk_shado = 10 + sk_score(46)*pl_spmod/600;
 	
 	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
 	{
 		sk_blind = -(sk_score(37) / 6 + 4);
+		sk_douse = -(sk_score(37) / 9 + 2);
 	}
 	else
 	{
 		sk_blind = -(sk_score(37) / 8 + 3);
+		sk_douse = -(sk_score(37) /12 + 1);
 	}
 	if (pl.kindred & (1u<<1))
 	{
-		sk_taunt = (1000 - sk_score(48)*3/4);
+		sk_taunt = (1000 - (sk_score(48)*3/4)/2);
 	}
 	else
 	{
-		sk_taunt = (1000 - sk_score(48));
+		sk_taunt = (1000 - (sk_score(48))/2);
 	}
 	
 	// Tarot - Hanged Man (immunity&resistance)
@@ -1023,12 +1030,6 @@ void display_meta_from_ls(void)
 	{
 		sk_immun = sk_score(32);
 		sk_resis = sk_score(23);
-	}
-	
-	// Zephyr immunity bonus
-	if (pl_flagb & (1 << 11))
-	{
-		sk_immun *= 6/5;
 	}
 	
 	// Book - Great Prodigy (concentrate bonus)
@@ -1044,7 +1045,7 @@ void display_meta_from_ls(void)
 	// Book - Venom Compendium (poison bonus)
 	if (pl_flags & (1 <<  4))
 	{
-		sk_poiso *= 5 / 4;
+		sk_poiso = sk_poiso * 5 / 4;
 	}
 	
 	// Tarot - Emperor (slow bonus)
@@ -1082,13 +1083,13 @@ void display_meta_from_ls(void)
 	// Tarot - Justice (Cleave reduction)
 	if (pl_flags & (1 <<  8))
 	{
-		sk_cleav *= 70 / 100;
+		sk_cleav = sk_cleav * 7 / 10;
 	}
 	
 	// Tarot - Temperance (Taunt reduction)
 	if (pl_flags & (1 <<  9))
 	{
-		sk_taunt *= 70 / 100;
+		sk_taunt = sk_taunt * 7 / 10;
 	}
 	
 	// Tarot - Death (Weaken bonus)
@@ -1179,9 +1180,9 @@ void display_meta_from_ls(void)
 		sk_medit += pl.skill[30][0]?race_med/ 6:0;
 	}
 	
-	sk_regen *= 18/10;
-	sk_restv *= 18/10;
-	sk_medit *= 18/10;
+	sk_regen = sk_regen * 18/10;
+	sk_restv = sk_restv * 18/10;
+	sk_medit = sk_medit * 18/10;
 
 	// DRAW THE GUI INFO
 	switch (last_skill)
@@ -1211,9 +1212,9 @@ void display_meta_from_ls(void)
 			}	if (pl.skill[27][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Ghost Potency");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_ghost);
-			}	if (pl.skill[42][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Poison Degen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%6d.%02d",sk_poiso/100,sk_poiso%100);
+			}	if (pl.skill[46][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Shadow Dur.");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%4d secs",sk_shado);
 			}	if (pl.skill[19][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Slow Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_slowv);
@@ -1227,17 +1228,13 @@ void display_meta_from_ls(void)
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_cdrate/100,pl_cdrate%100);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Regen/s");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_medit/100,sk_medit%100);
-				if (pl.skill[24][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Blast DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_blast);
-				// Tarot - Judgement (blast change)
-				if (pl_flags & (1 <<  7)) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Douse Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_douse/1000,sk_douse%1000);
-			}	else {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Scorch Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_scorc/1000,sk_scorc%1000);
-			} }	if (pl.skill[43][0]) {
+				if (pl.skill[42][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Poison Degen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%6d.%02d",sk_poiso/100,sk_poiso%100);
+			}	if (pl.skill[24][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Blast DPH");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_blast);
+			}	if (pl.skill[43][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Pulse DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_pulse);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Pulse Count");
@@ -1255,10 +1252,13 @@ void display_meta_from_ls(void)
 			}	if (pl.skill[7][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Zephyr DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_razor);
-			}	if (pl.skill[37][0]) {
+			}	if (pl.skill[37][0]) { if (pl_flagb & (1 << 11)) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Douse Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_douse/1000,sk_douse%1000);
+			} else {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);
-			}
+			} }
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"UWater Degen/s");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",sk_water/100,sk_water%100);
 			break;									// ".............." // 

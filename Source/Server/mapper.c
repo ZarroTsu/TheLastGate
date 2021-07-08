@@ -156,15 +156,24 @@ int main(int argc, char *args[])
 {
     LIST *head;
     head = is_form_empty() ? NULL : cgi_input_parse();
+	
+	int result = chdir("/home/merc");
 
+	if(result != 0)
+	{
+		printf("Unable to find /home/merc");
+		exit(1);
+	}
+	
     load();
 
     // Head
     printf("Content-Type: text/html\n\n\n");
     printf("<html><head>\n");
+	//printf("<meta charset=\"utf-8\">"); <META HTTP-EQUIV=\"PRAGMA\" CONTENT=\"NO-CACHE\">
     printf("<meta content=\"text/html;charset=utf-8\" http-equiv=\"Content-Type\">\n");
     printf("<title>v2 Map Editor</title>\n");
-    printf("<link rel=\"stylesheet\" href=\"/cgi-imp/assets/scripts/mapper.css\"/>\n");
+    printf("<link rel=\"stylesheet\" href=\"/assets/scripts/mapper.css\"/>\n");
     printf("<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css\"/>\n");
     printf("<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\"/>\n");
     printf("<script src=\"https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js\"></script>\n");
@@ -185,12 +194,12 @@ int main(int argc, char *args[])
     printf("Y2:<input id=\"inp-map-y2\" style=\"width:40px; margin: 2px;\" type=\"number\" maxlength=\"4\">\n");
     printf("</div>\n");
     printf("<div class=\"div-toolbox\">\n");
-    printf("<button id=\"but-hidew\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/hidew.png')\" onclick=\"toggleWalls(); updateUI();\" title=\"Hide walls\"></button>\n");
-    printf("<button id=\"but-tempfilter\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/filter.png');\" onclick=\"toggleDiv('div-filter'); updateUI();\" title=\"Filter item templates\"></button>\n");
-    printf("<button id=\"but-grid\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/togglegrid.png');\" onclick=\"toggleMapGrid(); updateUI();\" title=\"Toggle map grid\"></button>\n");
-    printf("<button id=\"but-cpicker\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/cpicker.png');\" onclick=\"toggleDiv('div-temp-picker'); updateUI();\" title=\"Change template type and color\"></button>\n");
-    printf("<button id=\"but-displaymode\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/toggle_divs.png');\" onclick=\"toggleViewDivs(); updateUI();\" title=\"Toggle between grid-only and preview-only\"></button>\n");
-    printf("<button id=\"but-toggleflags\" class=\"toolbox-button\" style=\"background-image: url('/cgi-imp/assets/ui/toggle_flags.png');\" onclick=\"toggleTileFlags(); updateUI();\" title=\"Toggle visibility for tile flags\"></button>\n");
+    printf("<button id=\"but-hidew\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/hidew.png')\" onclick=\"toggleWalls(); updateUI();\" title=\"Hide walls\"></button>\n");
+    printf("<button id=\"but-tempfilter\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/filter.png');\" onclick=\"toggleDiv('div-filter'); updateUI();\" title=\"Filter item templates\"></button>\n");
+    printf("<button id=\"but-grid\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/togglegrid.png');\" onclick=\"toggleMapGrid(); updateUI();\" title=\"Toggle map grid\"></button>\n");
+    printf("<button id=\"but-cpicker\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/cpicker.png');\" onclick=\"toggleDiv('div-temp-picker'); updateUI();\" title=\"Change template type and color\"></button>\n");
+    printf("<button id=\"but-displaymode\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/toggle_divs.png');\" onclick=\"toggleViewDivs(); updateUI();\" title=\"Toggle between grid-only and preview-only\"></button>\n");
+    printf("<button id=\"but-toggleflags\" class=\"toolbox-button\" style=\"background-image: url('/assets/ui/toggle_flags.png');\" onclick=\"toggleTileFlags(); updateUI();\" title=\"Toggle visibility for tile flags\"></button>\n");
     printf("<span id=\"span-seltemp\" style=\"color:wheat;font-size:10pt;margin-left:2px;\">Selected: </span>\n");
     printf("</div>\n");
     printf("<div id=\"div-temp-picker\">\n");
@@ -255,14 +264,14 @@ int main(int argc, char *args[])
     printf("</div>\n");
 
     // Load scripts
-    printf("<script src=\"/cgi-imp/assets/scripts/cpicker.js\"></script>\n");
-    printf("<script src=\"/cgi-imp/assets/scripts/undo_redo.js\"></script>\n");
-    printf("<script src=\"/cgi-imp/assets/scripts/canvas_funcs.js\"></script>\n");
-    printf("<script src=\"/cgi-imp/assets/scripts/mapper.js\"></script>\n");
+    printf("<script src=\"/assets/scripts/cpicker.js\"></script>\n");
+    printf("<script src=\"/assets/scripts/undo_redo.js\"></script>\n");
+    printf("<script src=\"/assets/scripts/canvas_funcs.js\"></script>\n");
+    printf("<script src=\"/assets/scripts/mapper.js\"></script>\n");
 
     // Templates and floors
     scriptLoadTemplates();
-    printf("<script src=\"/cgi-imp/assets/scripts/load_floors.js\"></script>\n");
+    printf("<script src=\"/assets/scripts/load_floors.js\"></script>\n");
     printf("<script>loadTemplates();</script>\n");
 
     // UI update
@@ -284,15 +293,15 @@ int main(int argc, char *args[])
             x2 = atoi(find_val(head,"x2"))+1;
             y2 = atoi(find_val(head,"y2"))+1;
 
-            if (x1 < 0 || x1 > 1024 || x1 > x2 || y1 < 0 || y1 > 1024 || y1 > y2 ||
-                x2 < 0 || x2 > 1024 || y2 < 0 || y2 > 1024) {
+            if (x1 < 0 || x1 > MAPX || x1 > x2 || y1 < 0 || y1 > MAPY || y1 > y2 ||
+                x2 < 0 || x2 > MAPX || y2 < 0 || y2 > MAPY) {
                     printf("<script>alert(\"Received invalid input for map area.\");</script>\n");
                     break;
             }
             printf("<script>loadMapCells(%d, %d, %d, %d);\n", x1, y1, x2, y2);
 
-            for (int i=y1; i<y2; i++) {
-                for (int j=x1; j<x2; j++) {
+            for (int i=x1; i<x2; i++) {
+                for (int j=y1; j<y2; j++) {
                     int map_tileid = i + j * MAPX;
                     if (map_tileid < 0 || map_tileid > MAPX * MAPY) continue;
 

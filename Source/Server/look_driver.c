@@ -267,7 +267,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, your maximum life is reduced by 20%%. 20%% of damage taken from hits is instead dealt to your Mana.\n");
 		break;
 	case IT_CH_EMPRESS: 
-		do_char_log(cn, 3, "When equipped, Magic Shield will instead be cast on your Ghost Companion when cast by or on you.\n");
+		do_char_log(cn, 3, "When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n");
 		break;
 	case IT_CH_EMPEROR: 
 		do_char_log(cn, 3, "When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n");
@@ -279,10 +279,10 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n");
 		break;
 	case IT_CH_CHARIOT: 
-		do_char_log(cn, 3, "When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n");
+		do_char_log(cn, 3, "When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n");
 		break;
 	case IT_CH_STRENGTH: 
-		do_char_log(cn, 3, "When equipped, reduces your action speed by 20%%, but grants 25%% more damage with melee attacks.\n");
+		do_char_log(cn, 3, "When equipped, reduces your attack and cast speed by 20%%, but grants 25%% more damage with melee attacks.\n");
 		break;
 	case IT_CH_HERMIT: 
 		do_char_log(cn, 3, "When equipped, 15%% more Armor Value, 10%% less Resistance and Immunity.\n");
@@ -297,7 +297,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, 30%% of Resistance is instead used to reduce the strength of incoming enemy spells.\n");
 		break;
 	case IT_CH_DEATH: 
-		do_char_log(cn, 3, "When equipped, your Weaken skill is replaced with Greater Weaken. Greater Weaken improves armor reduction, no longer reduces enemy Weapon Value.\n");
+		do_char_log(cn, 3, "When equipped, your Weaken skill is replaced with Greater Weaken. Greater Weaken improves armor reduction, but no longer reduces enemy Weapon Value.\n");
 		break;
 	case IT_CH_TEMPER: 
 		do_char_log(cn, 3, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is doubled.\n");
@@ -318,7 +318,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n");
 		break;
 	case IT_CH_JUDGE: 
-		do_char_log(cn, 3, "When equipped, your Blast spell no longer inflicts Scorch. It instead inflicts Douse, reducing your target's Spell Modifier for 20 seconds.\n");
+		do_char_log(cn, 3, "When equipped, your Blast spell deals 15%% less damage, but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n");
 		break;
 	case IT_CH_WORLD: 
 		do_char_log(cn, 3, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");

@@ -203,7 +203,7 @@ static inline int dr_check_target(int m)
 	int in;
 
 	if (((unsigned long)map[m].flags & mapblock) || map[m].ch || map[m].to_ch ||
-	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78))
+	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
 	{
 		return( 0);
 	}
