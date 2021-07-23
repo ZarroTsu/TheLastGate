@@ -326,6 +326,7 @@ struct cplayer {
 #define SV_WAYPOINTS				74
 #define SV_SHOWMOTD					75
 #define SV_SETCHAR_WPS				76
+#define SV_CLEARBOX					77
 
 #define SV_MOTD						82
 #define SV_MOTD0					82

@@ -11,8 +11,8 @@
 #define RANDOM(a) (a>0?random()%(a):0)
 #define DATDIR ".dat"
 
-#define VERSION    0x000606
-#define MINVERSION 0x000606
+#define VERSION    0x000607
+#define MINVERSION 0x000607
 
 #define TICKS 18
 #define TICK  (1000000/TICKS)
@@ -235,7 +235,7 @@
 #define SP_DUR_WARCRY		( TICKS * 60                      )
 #define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_RECALL(a)	( max(TICKS / 2, 60 - (a / 4))    )
-#define SP_DUR_SHADOW(a)	( TICKS * 10 + TICKS * a / 6      )
+#define SP_DUR_SHADOW(a)	( TICKS * 15 + TICKS * a / 5      )
 #define SP_DUR_BLEED		( TICKS * 10                      )
 #define SP_DUR_WEAKEN		( TICKS * 60                      )
 
@@ -249,7 +249,7 @@
 #define SP_DUR_FROSTB		( TICKS * 20                      )
 
 // -------- Skill Exhaustion values -------- //
-#define SK_EXH_MAXIMUM	 	(TICKS * 7)
+#define SK_EXH_MAXIMUM	 	(TICKS * 6)
 #define SK_EXH_LIGHT		(TICKS / 4)
 #define SK_EXH_PROTECT		(TICKS / 2)
 #define SK_EXH_ENHANCE		(TICKS / 2)
@@ -262,7 +262,7 @@
 #define SK_EXH_POISON		(TICKS * 5)
 #define SK_EXH_WARCRY		(TICKS * 3)
 #define SK_EXH_IDENT		(TICKS * 2)
-#define SK_EXH_BLAST		(TICKS * 7)
+#define SK_EXH_BLAST		(TICKS * 6)
 #define SK_EXH_RECALL		(TICKS)
 #define SK_EXH_DISPEL		(TICKS * 4)
 #define SK_EXH_GHOST		(TICKS * 4)

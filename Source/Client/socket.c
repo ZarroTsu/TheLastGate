@@ -935,6 +935,29 @@ void sv_waypoints(unsigned char *buf)
 	show_wps=1;
 }
 
+extern unsigned short ymap[MAPX_MAX*MAPY_MAX];
+
+void sv_clearbox(unsigned char *buf)
+{
+	
+	int xx, yy, x, y, w, h;
+	
+	DEBUG("SV CLEARBOX");
+	
+	x =*(unsigned short*)(buf+1);
+	y =*(unsigned short*)(buf+3);
+	w =*(unsigned short*)(buf+5);
+	h =*(unsigned short*)(buf+7);
+	
+	for (xx=x; xx<x+w; xx++)
+	{
+		for (yy=y; yy<y+h; yy++)
+		{
+			ymap[yy+xx*MAPX_MAX]=1;
+		}
+	}
+}
+
 void sv_settarget(unsigned char *buf)
 {
 	DEBUG("SV SETTARGET");
@@ -1096,6 +1119,8 @@ int sv_cmd(unsigned char *buf)
 		
 		case	SV_WAYPOINTS:			sv_waypoints(buf); return 1;
 		case	SV_SHOWMOTD:			sv_showmotd(buf); return 2;
+		
+		case	SV_CLEARBOX:			sv_clearbox(buf); return 9;
 
 		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;
 	}

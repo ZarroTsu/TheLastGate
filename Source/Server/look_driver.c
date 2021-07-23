@@ -191,7 +191,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, penalizes rest, but greatly improves the effect of meditate.\n");
 		break;
 	case IT_AM_OBSIDI: 
-		do_char_log(cn, 3, "When equipped, increases the radius granted by Proximity by 1.\n");
+		do_char_log(cn, 3, "When equipped, increases the radius of area-of-effect skills by 2.\n");
 		break;
 
 	// -------- DRINK ITEMS --------
@@ -303,7 +303,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is doubled.\n");
 		break;
 	case IT_CH_DEVIL: 
-		do_char_log(cn, 3, "When equipped, half of all skill and spell costs are instead taken from your Hitpoints.\n");
+		do_char_log(cn, 3, "When equipped, 30%% of all skill and spell costs are instead twice taken from your Hitpoints.\n");
 		break;
 	case IT_CH_TOWER: 
 		do_char_log(cn, 3, "When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n");

@@ -863,11 +863,11 @@ int npc_give(int cn, int co, int in, int money)
 				do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
 				return(0);
 			}
-			if (it[in].temp==IT_HERBA)			money = 10000;
-			else if (it[in].temp==IT_HERBB)	money = 15000;
-			else if (it[in].temp==IT_HERBC)	money = 25000;
-			else if (it[in].temp==IT_HERBD)	money = 40000;
-			else								money = 60000;
+			if (it[in].temp==IT_HERBA)			money =  8000;
+			else if (it[in].temp==IT_HERBB)	money = 12000;
+			else if (it[in].temp==IT_HERBC)	money = 20000;
+			else if (it[in].temp==IT_HERBD)	money = 32000;
+			else								money = 64000;
 			nr = money*3/2;
 			do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			god_take_from_char(in, cn);
@@ -1183,7 +1183,6 @@ int npc_give(int cn, int co, int in, int money)
 				{
 					int div = 4;
 					do_sayx(cn, "For your effort, allow me to teach you some mysteries of the world.");
-					if (tmp && ch[cn].temp==713) div=20; // temporary - remove this after Regal's quest item changes
 					do_give_exp(co, tmp ? nr/max(1,div) : nr, 0, -1);
 					// <group rewards>
 					for (n = 1; n<MAXCHARS; n++)
@@ -1193,7 +1192,6 @@ int npc_give(int cn, int co, int in, int money)
 						{
 							div = 4;
 							if (qnum >= 101) tmp = npc_quest_check(n, qnum-101);
-							if (tmp && ch[cn].temp==713) div=20; // temporary - remove this after Regal's quest item changes
 							do_give_exp(n, tmp ? nr/max(1,div) : nr, 0, -1);
 						}
 					}
@@ -1947,28 +1945,28 @@ int npc_see(int cn, int co)
 				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
 					do_sayx(cn, "Welcome, %s. Please make yourself at home.", ch[co].name);
 				else
-					do_sayx(cn, "Welcome, %s. In the Southern Swamp some lizards fashioned themselves a staff called Rattan Bo. Fetch it for me and I'll give you a special Tarot Card.", ch[co].name);
+					do_sayx(cn, "Welcome, %s. In the Southern Swamp some lizards fashioned themselves a staff called Rattan Bo. Fetch it for me and I'll give you a special tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest109")==0) // 	9 - Garg Nest / Rufus / Royal Targe
 			{
 				if (points2rank(ch[co].points_tot)<10) // 1st Lieu
 					do_sayx(cn, "Ahoy, %s.", ch[co].name);
 				else
-					do_sayx(cn, "Ahoy, %s. Ay've a request. Thar's un ol' shield holed away un de Gargoyle Nest. Bring ut to me an I'll reward ye wit a Tarot Card o' Strength.", ch[co].name);
+					do_sayx(cn, "Ahoy, %s. Ay've a request. Thar's un ol' shield holed away un de Gargoyle Nest. Bring ut to me an I'll reward ye wit a tarot card o' Strength.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest110")==0) //   10 - Mine 3 / Gomez / Gold Huge Diamond Ring
 			{
 				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
 					do_sayx(cn, "Ah, welcome %s!", ch[co].name);
 				else
-					do_sayx(cn, "Welcome, %s! Would you mind sparing the time to fetch me a Golden Ring adorned with a Huge Diamond? I'd reward you with this lovely Tarot Card.", ch[co].name);
+					do_sayx(cn, "Welcome, %s! Would you mind sparing the time to fetch me a Golden Ring adorned with a Huge Diamond? I'd reward you with this lovely tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest111")==0) //   11 - Mine 3 / Donna / Garg Statuette
 			{
 				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
 					do_sayx(cn, "Hello, %s. Please don't touch anything.", ch[co].name);
 				else
-					do_sayx(cn, "Hello, %s. In the lowest floor of the mines there's said to be a striking Gargoyle Statuette. I'd reward you with this devilish Tarot Card.", ch[co].name);
+					do_sayx(cn, "Hello, %s. In the lowest floor of the mines there's said to be a striking Gargoyle Statuette. I'd reward you with this devilish tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest112")==0) //   12 - UG2 / Rose / Green Herbs
 			{
@@ -2005,9 +2003,9 @@ int npc_see(int cn, int co)
 				else
 					do_sayx(cn, "Ah, %s. Do come in. I've a request - could you retrive my Sapphire Golden Helmet from the bandits in the Jagged pass? I'd reward you handsomely.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest117")==0) //   17 - Valley / Regal / Dragon's Breath [1142]
+			else if (strcmp(ch[cn].text[2], "#quest117")==0) //   17 - Valley / Regal / Spellblade [1142]
 			{
-				do_sayx(cn, "A visitor? Are you here to challenge me to a duel? If not, fetch me some Dragon's Breath, would you? You can have a book on swords in return.", ch[co].name);
+				do_sayx(cn, "A visitor? Are you here to challenge me to a duel? If not, fetch me the blade from those golems, would you? You can have a book on swords in return.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest118")==0) //   18 - Garg Nest / Shera / Fire Egg
 			{
@@ -2029,6 +2027,20 @@ int npc_see(int cn, int co)
 					do_sayx(cn, "Hi, %s... Um...", ch[co].name);
 				else
 					do_sayx(cn, "Hi, %s... Bring me a completed Sogling Eye Collection, and... would a Sogling Eye Essense be okay...?", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest121")==0) //   20 - Ice Nest / Blanche / Ice Egg
+			{
+				if (points2rank(ch[co].points_tot)<17) // Lieu General
+					do_sayx(cn, "Come back a bit stronger, %s. I may need you to do something for me.", ch[co].name);
+				else
+					do_sayx(cn, "Hello, %s! If you'd bring me the Ice Egg from the Ice Gargoyle Nest, I'd reward you with a Cloak of Ice in return.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest121")==0) //   21 - Ice Nest / Aster / Lion's Paws
+			{
+				if (points2rank(ch[co].points_tot)<14) // Colonel
+					do_sayx(cn, "Good day, %s. Cold out.", ch[co].name);
+				else
+					do_sayx(cn, "Good day, %s. Please find me the Lion's Paws in the Ice Gargoyle Nest, and I would reward you with this magical tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill16")==0) //    10   	Swimming			( Lucci )
 			{
@@ -3441,7 +3453,7 @@ int npc_driver_high(int cn)
 		// taunt this enemy to pull them off our friend
 		if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
 		{
-			ch[cn].data[74] = globs->ticker + TICKS * 20;
+			ch[cn].data[74] = globs->ticker + TICKS * 40;
 			return(1);
 		}
 		
@@ -3455,7 +3467,7 @@ int npc_driver_high(int cn)
 			}
 		}
 		
-		m = ch[cn].x + ch[cn].y * MAPX;
+		m = ch[co].x + ch[co].y * MAPX;
 		
 		// Check for enemies around our ally and see if they're hitting too
 		//  this is helpful if our ally has fightback turned off
@@ -3473,7 +3485,7 @@ int npc_driver_high(int cn)
 				// taunt this enemy to pull them off our friend
 				if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
 				{
-					ch[cn].data[74] = globs->ticker + TICKS * 20;
+					ch[cn].data[74] = globs->ticker + TICKS * 40;
 					return(1);
 				}
 				
@@ -4671,6 +4683,11 @@ void update_shop(int cn)
 				it[in].current_damage = 0;
 				it[in].current_age[0] = 0;
 				it[in].current_age[1] = 0;
+				if (it[in].stack > 1)
+				{
+					it[in].value = it[in].value / it[in].stack;
+					it[in].stack = 1;
+				}
 			}
 		}
 	}

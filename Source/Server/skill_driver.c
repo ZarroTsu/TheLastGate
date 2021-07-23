@@ -1026,7 +1026,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 	// Devil Tarot Card
 	if (get_tarot(cn, IT_CH_DEVIL))
 	{
-		devil_cost=cost*50/100;
+		devil_cost=cost*30/100;
 	}
 	
 	if (usemana>0)
@@ -1039,7 +1039,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 		
 		mana_cost-=cotfk_cost;
 		mana_cost-=devil_cost;
-		hp_cost+=devil_cost;
+		hp_cost+=devil_cost*2;
 		
 		if (has_spell_from_item(cn, BUF_IT_MANA))
 		{
@@ -1085,7 +1085,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 			end_cost = end_cost * 85 / 100;
 		}
 		
-		if ((hp_cost+devil_cost)*1000 > ch[cn].a_hp)
+		if ((hp_cost+devil_cost*2)*1000 > ch[cn].a_hp)
 		{
 			do_char_log(cn, 0, "You don't have enough life.\n");
 			return -1;
@@ -1105,7 +1105,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 	if (usemana==0 || usemana==2)
 	{
 		ch[cn].a_end  -= end_cost*1000;
-		ch[cn].a_hp   -= devil_cost*1000;
+		ch[cn].a_hp   -= devil_cost*2000;
 	}
 	return 0;
 }
@@ -1119,7 +1119,7 @@ int chance_base(int cn, int skill, int d20, int defense, int usemana)
 
 	if (ch[cn].flags & (CF_PLAYER))
 	{
-		chance -= 1;
+		chance += 1;
 		if (ch[cn].luck<0)
 		{
 			chance += ch[cn].luck / 500 - 1;
@@ -1500,7 +1500,21 @@ int spell_from_item(int cn, int in2)
 
 	for (n = 0; n<5; n++) 			{ bu[in].attrib[n][1] = it[in2].attrib[n][1]; }
 	for (n = 0; n<MAXSKILL; n++) 	{ bu[in].skill[n][1]  = it[in2].skill[n][1];  }
-
+	
+	bu[in].gethit_dam[1] 	= it[in2].gethit_dam[1];
+	bu[in].speed[1] 		= it[in2].speed[1];
+	bu[in].move_speed[1] 	= it[in2].move_speed[1];
+	bu[in].atk_speed[1] 	= it[in2].atk_speed[1];
+	bu[in].cast_speed[1] 	= it[in2].cast_speed[1];
+	bu[in].spell_mod[1] 	= it[in2].spell_mod[1];
+	bu[in].spell_apt[1] 	= it[in2].spell_apt[1];
+	bu[in].cool_bonus[1] 	= it[in2].cool_bonus[1];
+	bu[in].crit_chance[1] 	= it[in2].crit_chance[1];
+	bu[in].crit_multi[1] 	= it[in2].crit_multi[1];
+	bu[in].to_hit[1] 		= it[in2].to_hit[1];
+	bu[in].to_parry[1] 		= it[in2].to_parry[1];
+	bu[in].top_damage[1] 	= it[in2].top_damage[1];
+	
 	// it[in2].data[0] = display sprite number
 	if (it[in2].data[0]) 	{ bu[in].sprite[1] = it[in2].data[0]; }
 	else 					{ bu[in].sprite[1] = BUF_SPR_GENERIC; }
@@ -2094,7 +2108,7 @@ void skill_curse(int cn)
 	if (get_tarot(cn, IT_CH_TOWER)) 
 	{ 
 		cost *= (4 / 3);
-		d20 -= 1;
+		d20 += 1;
 	}
 	
 	// Proximity increases spell cost
@@ -2192,7 +2206,7 @@ void skill_slow(int cn, int flag)
 	if (get_tarot(cn, IT_CH_EMPEROR)) 
 	{ 
 		cost *= (3 / 4);
-		d20 += 1;
+		d20 -= 1;
 	}
 	
 	// Proximity increases spell cost
@@ -2299,7 +2313,7 @@ int spell_poison(int cn, int co, int power, int flag)
 }
 void skill_poison(int cn)
 {
-	int d20 = 13;
+	int d20 = 11;
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
@@ -2476,12 +2490,12 @@ void item_info(int cn, int in, int look)
 	}
 	if (it[in].crit_chance[0] || it[in].crit_chance[1])
 	{
-		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d%%\n",
 		"Crit Bonus", it[in].crit_chance[0], it[in].crit_chance[1]);
 	}
 	if (it[in].crit_multi[0] || it[in].crit_multi[1])
 	{
-		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d\n",
+		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d%%\n",
 		"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
 	}
 	if (it[in].top_damage[0] || it[in].top_damage[1])
@@ -2761,9 +2775,7 @@ void skill_blast(int cn)
 	// Harakim costs less, Sorc costs slightly less, monster cost more mana
 	if ((ch[cn].flags & CF_PLAYER) && (ch[cn].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_SORCERER)))
 		cost = cost/3;
-	else if (ch[cn].data[63] && (ch[ch[cn].data[63]].flags & CF_PLAYER)) // Ghost Comp
-		cost = cost/2;
-	else if (!(ch[cn].flags & CF_PLAYER)) 
+	else if (!(ch[cn].flags & CF_PLAYER) && !(ch[cn].data[63] && (ch[ch[cn].data[63]].flags & CF_PLAYER))) 
 		cost = cost*2;
 	
 	// Get spell target - return on failure
@@ -3234,7 +3246,7 @@ void skill_ghost(int cn)
 	
 	archgc 		= ch[cn].skill[SK_GCMASTERY][0];
 	if (archgc) 
-		archbonus 	= get_skill_score(cn, SK_GCMASTERY)/6;
+		archbonus 	= get_skill_score(cn, SK_GCMASTERY)/8;
 	
 	if (dreadplate)
 	{
@@ -3347,13 +3359,11 @@ void skill_ghost(int cn)
 		if (dreadplate) // caster ~ becomes ghost
 		{
 			ch[cc].skill[SK_PULSE][0] = ch[cc].skill[SK_RESIST][0];
-			ch[cc].skill[SK_MEDIT][0] += 60;
 			ch[cc].sprite = 9168;
 		}
 		else			// fighter ~ becomes skeleton
 		{
 			ch[cc].skill[SK_CLEAVE][0] = ch[cc].skill[SK_RESIST][0];
-			ch[cc].skill[SK_REST][0] += 60;
 			ch[cc].sprite = 10192;
 		}
 		ch[cc].data[1] = 3; // BERSERK!!
@@ -3463,8 +3473,8 @@ void skill_ghost(int cn)
 
 void skill_shadow(int cn)
 {
-	int co, cc, cz, n, m, base = 0, idx, in, cost, tmp, is_s = 0;
-	int w = 0, powlimit = 250, necronomicon = 0;
+	int co, cc, cz, n, m, base = 0, idx, in, cost, tmp;
+	int w = 0, necronomicon = 0;
 
 	if (IS_BUILDING(cn))
 	{
@@ -3505,8 +3515,6 @@ void skill_shadow(int cn)
 	}
 	
 	cost = SP_COST_SHADOW;
-	
-	if (ch[cn].kindred & KIN_SEYAN_DU) is_s = 1;
 	
 	if (spellcost(cn, cost, SK_SHADOW, 1)) { return; }
 	
@@ -3601,10 +3609,9 @@ void skill_shadow(int cn)
 	
 	// Copy attributes and skills
 	// These are done this way so that the copy can retain gear and spell bonuses.
-	// Seyan'du have weaker shadows for balance sake.
-	ch[cc].hp[0]   = is_s?ch[cn].hp[5]*7/8  :ch[cn].hp[5];
-	ch[cc].end[0]  = is_s?ch[cn].end[5]*7/8 :ch[cn].end[5];
-	ch[cc].mana[0] = is_s?ch[cn].mana[5]*7/8:ch[cn].mana[5];
+	ch[cc].hp[0]   = ch[cn].hp[5]*(80+base*20/200)/100;
+	ch[cc].end[0]  = ch[cn].end[5]*(80+base*20/200)/100;
+	ch[cc].mana[0] = ch[cn].mana[5]*(80+base*20/200)/100;
 	
 	// For attributes, we store the owner's total score minus current score in [1].
 	//  this will add back together and should produce the same score as the owner has.
@@ -3618,23 +3625,61 @@ void skill_shadow(int cn)
 		else
 			ch[cc].attrib[n][1] = m;
 		
-		if (is_s)
-		{
-			ch[cc].attrib[n][0] = ch[cc].attrib[n][0]*7/8;
-			ch[cc].attrib[n][1] = ch[cc].attrib[n][1]*7/8;
-		}
+		ch[cc].attrib[n][0] = ch[cc].attrib[n][0]*(80+base*20/200)/100;
+		ch[cc].attrib[n][1] = ch[cc].attrib[n][1]*(80+base*20/200)/100;
 	}
 	// For skills, we do the same. The extra step here removes the skill mods from the skills.
 	//  in really_update_char these mods get re-added back again, so it should be identical to owner.
+	
+	in = ch[cn].worn[WN_RHAND];
+	
 	for (n = 0; n<MAXSKILL; n++)
 	{
 		// set these skills to zero
-		if 	(n== 0||n== 2||n== 3||n== 4||n== 5||n== 6||n==16||n==36||n==38||n==39||
-			 n== 7||n==11||n==14||n==15||n==17||n==18||n==21||n==43||n==47||n==10||
-			 n==12||n==13||n==22||n==25||n==26||n==27||n==45||n==46)
+		if (n==16||n==36||n==38||n==39||n== 7||n==11||n==14||n==15||n==17||n==18||n==21||
+			n==43||n==47||n==10||n==12||n==13||n==22||n==25||n==26||n==27||n==45||n==46)
+		{	ch[cc].skill[n][0] = 0;	continue;	}
+		
+		// Remove certain skills depending on held player weapon
+		if (!in || (it[in].flags & IF_WP_CLAW)) 	   // SLOW   CURS   BLAS   BLIN   CLEA   WEAK   TAUN	// Claw/Unarmed
 		{
-			ch[cc].skill[n][0] = 0;
-			continue;
+			if (n== 2||n== 3||n== 4||n== 5||n== 6		||n==19||n==20||n==24||n==37||n==40||n==41||n==48)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if (it[in].flags & IF_WP_SWORD) 																// Sword
+		{
+			if (n== 0||n== 2||n== 4||n== 5||n== 6		       ||n==20||n==24       ||n==40||n==41||n==48)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if ((it[in].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) 							// Spear
+		{
+			if (n== 0||n== 3||n== 4||n== 6				||n==19||n==20              ||n==40||n==41||n==48)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if (it[in].flags & IF_WP_DAGGER)																// Dagger
+		{
+			if (n== 0||n== 3||n== 4||n== 5||n== 6 		              ||n==24||n==37||n==40||n==41||n==48)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if (it[in].flags & IF_WP_STAFF)																// Staff
+		{
+			if (n== 0||n== 2||n== 3||n== 4||n== 6		||n==19              ||n==37||n==40||n==41||n==48)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) 								// Greataxe
+		{
+			if (n== 0||n== 2||n== 3||n== 5				||n==19||n==20||n==24||n==37       ||n==41)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if (it[in].flags & IF_WP_AXE)																	// Axe
+		{
+			if (n== 0||n== 2||n== 3||n== 5||n== 6		||n==19||n==20||n==24||n==37||n==40)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
+		}
+		else if (it[in].flags & IF_WP_TWOHAND)		   // SLOW   CURS   BLAS   BLIN   CLEA   WEAK   TAUN	// Twohander
+		{
+			if (n== 0||n== 2||n== 3||n== 4||n== 5		||n==19||n==20||n==24||n==37              ||n==48)
+			{	ch[cc].skill[n][0] = 0;	continue;	}
 		}
 		
 		// set the skill score
@@ -3648,58 +3693,12 @@ void skill_shadow(int cn)
 		else
 			ch[cc].skill[n][1] = m;
 		
-		if (is_s)
+		if (n!=0 && n!=2 && n!=3 && n!=4 && n!=5 && n!=6)
 		{
-			ch[cc].skill[n][0] = ch[cc].skill[n][0]*7/8;
-			ch[cc].skill[n][1] = ch[cc].skill[n][1]*7/8;
+			ch[cc].skill[n][0] = ch[cc].skill[n][0]*(80+base*20/200)/100;
+			ch[cc].skill[n][1] = ch[cc].skill[n][1]*(80+base*20/200)/100;
 		}
 	}
-	
-	// Copy the owner's weapon skill by checking their weapon.
-		in = ch[cn].worn[WN_RHAND];
-		w = SK_HAND;
-		
-		if (it[in].flags & IF_WP_CLAW)
-			w = SK_HAND;
-		if (it[in].flags & IF_WP_SWORD)
-			w = SK_SWORD;
-		if ((it[in].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) // Spear
-		{
-			if (get_skill_score(cn, SK_DAGGER) > get_skill_score(cn, SK_STAFF))
-				w = SK_DAGGER;
-			else
-				w = SK_STAFF;
-		}
-		if (it[in].flags & IF_WP_DAGGER)
-			w = SK_DAGGER;
-		if (it[in].flags & IF_WP_STAFF)
-			w = SK_STAFF;
-		if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) // Greataxe
-		{
-			if (get_skill_score(cn, SK_AXE) > get_skill_score(cn, SK_TWOHAND))
-				w = SK_AXE;
-			else
-				w = SK_TWOHAND;
-		}
-		if (it[in].flags & IF_WP_AXE)
-			w = SK_AXE;
-		if (it[in].flags & IF_WP_TWOHAND)
-			w = SK_TWOHAND;
-		
-		// Set unarmed equal to owner weapon skill
-		ch[cc].skill[0][0]  =  ch[cn].skill[w][0];
-		ch[cc].skill[0][1]  =  ch[cn].skill[w][1] + get_skill_score(cn, w) - ch[cn].skill[w][0];
-		ch[cc].skill[0][1] -=  (get_attrib_score(cn, skilltab[w].attrib[0]) +
-								get_attrib_score(cn, skilltab[w].attrib[1]) +
-								get_attrib_score(cn, skilltab[w].attrib[2])) / 5;
-		
-		if (is_s)
-		{
-			ch[cc].skill[0][0] = ch[cc].skill[0][0]*7/8;
-			ch[cc].skill[0][1] = ch[cc].skill[0][1]*7/8;
-		}
-	//
-	
 	ch[cc].armor_bonus  = ch[cn].armor;
 	ch[cc].weapon_bonus = ch[cn].weapon;
 	ch[cc].gethit_bonus = ch[cn].gethit_dam;
@@ -3707,7 +3706,7 @@ void skill_shadow(int cn)
 	
 	//
 	
-	ch[cc].points_tot = ch[cn].points_tot;
+	ch[cc].points_tot = ch[cn].points_tot*(80+base*20/200)/100;
 	ch[cc].gold   = 0;
 	ch[cc].a_hp   = 999999;
 	ch[cc].a_end  = 999999;
@@ -3738,7 +3737,7 @@ void skill_shadow(int cn)
 		bu[in].spell_mod[1] 	= ch[cn].spell_mod - spell_race_mod(100, cn);
 		bu[in].spell_apt[1] 	= ch[cn].spell_apt - ((ch[cn].attrib[AT_WIL][0] + 
 									ch[cn].attrib[AT_INT][0]) * ch[cn].spell_mod / 100);
-		bu[in].cool_bonus[1] 	= ch[cn].cool_bonus - get_attrib_score(cn,AT_INT)/2;
+		bu[in].cool_bonus[1] 	= ch[cn].cool_bonus - get_attrib_score(cn,AT_INT)/4;
 		bu[in].crit_chance[1] 	= ch[cn].crit_chance/100;
 		bu[in].crit_multi[1] 	= ch[cn].crit_multi-200;
 		bu[in].top_damage[1] 	= ch[cn].top_damage - get_attrib_score(cn,AT_STR)/2;
@@ -3842,7 +3841,7 @@ void skill_cleave(int cn)
 	}
 	else if (ch[cn].data[63] && (ch[ch[cn].data[63]].flags & CF_PLAYER)) // Ghost Comp
 	{
-		cost = cost/2;
+		cost = 5;
 	}
 	else if (!(ch[cn].flags & CF_PLAYER))
 	{
@@ -4112,7 +4111,7 @@ int spell_taunt(int cn, int co, int power, int flag)
 	
 	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_TAUNT
 }
-int spell_guard(int cn, int co, int power, int count)
+int spell_guard(int cn, int co, int power, int hit)
 {
 	int in, dur;
 	
@@ -4128,14 +4127,14 @@ int spell_guard(int cn, int co, int power, int count)
 	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, dur, 0))) 
 		return 0;
 	
-	bu[in].data[2] = count; // number of targets affected by taunt
+	bu[in].data[2] = hit; 	// number of targets affected by taunt
 	bu[in].data[4] = 1; 	// Effects not removed by NMZ (SK_GUARD)
 	
 	return cast_a_spell(cn, co, in, 0, 0); // SK_GUARD
 }
 void skill_taunt(int cn)
 {
-	int d20 = 11;
+	int d20 = 12;
 	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
@@ -4150,9 +4149,9 @@ void skill_taunt(int cn)
 	{
 		cost = cost * (PROX_MULTI + aoe_power) / PROX_MULTI;
 	}
-	if (ch[cn].data[63] && (ch[ch[cn].data[63]].flags & CF_PLAYER)) // Ghost Comp
+	if (ch[cn].data[63] && IS_SANEPLAYER(ch[cn].data[63])) // Ghost Comp
 	{
-		cost /= 3;
+		cost = 5;
 	}
 	
 	// Get skill target - return on failure
@@ -4182,7 +4181,7 @@ void skill_taunt(int cn)
 		hit += surround_cast(cn, co_orig, SK_TAUNT, power);
 	}
 	
-	spell_guard(cn, cn, get_skill_score(cn, SK_TAUNT), hit);
+	spell_guard(cn, cn, get_skill_score(cn, SK_TAUNT), max(1,hit));
 	
 	add_exhaust(cn, SK_EXH_TAUNT);
 }

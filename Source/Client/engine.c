@@ -990,9 +990,9 @@ void display_meta_from_ls(void)
 	sk_proxi = sk_score(44) / (300/12);
 	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
 	sk_poiso = sk_score(42)*pl_spmod/100 * 15 / 3 * 18;
-	sk_blast = sk_score(24)*pl_spmod/100 * 2 * 750/1000;
+	sk_blast = sk_score(24)*pl_spmod/100 * 2 * 625/1000;
 	sk_scorc = 1000 + sk_score(24)*pl_spmod/100;
-	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * 100/1000;
+	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * 125/1000;
 	sk_pucnt = (60*2*100 / (3*pl_cdrate));
 	sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/4) * 2 * 50/1000;
 	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * 450/1000;
@@ -1323,7 +1323,7 @@ void display_meta_from_ls(void)
 
 void eng_display_win(int plr_sprite,int init)
 {
-	int y,n,m;
+	int y,n,m,pr;
 	char *tmp,buf[50];
 	int pl_flags, pl_flagb;
 
@@ -1661,14 +1661,24 @@ void eng_display_win(int plr_sprite,int init)
 				if (hightlight==HL_SHOP && hightlight_sub==n) 
 				{
 					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (shop.price[n])
+					if (pr = shop.price[n])
 					{
 						if (show_shop==1) // Normal shop
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",shop.price[n]/100,shop.price[n]%100);
+						{
+							if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) 
+							{
+								pr*=10;
+								dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
+							}
+							else
+							{
+								dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
+							}
+						}
 						if (show_shop==2) // Black Stronghold
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",shop.price[n]);
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
 						if (show_shop==3) // Future
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",shop.price[n]);
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
 					}
 				} 
 				else copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
@@ -1896,6 +1906,8 @@ void display_floortile(int tile,int light,int x,int y,int xoff,int yoff,int mx,i
     copysprite(tile,light,x,y,xoff,yoff);
 }
 
+unsigned short ymap[MAPX_MAX*MAPY_MAX];
+
 void eng_display(int init)	// optimize me!!!!!
 {
 	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
@@ -1904,7 +1916,7 @@ void eng_display(int init)	// optimize me!!!!!
 	static xm_flag=1;
 
 	if (xm_flag) {
-		for (m=0; m<MAPX_MAX*MAPY_MAX; m++)	xmap[m]=0;
+		for (m=0; m<MAPX_MAX*MAPY_MAX; m++)	{ xmap[m]=0; ymap[m]=0; }
 		xm_flag=0;
 	}
 
@@ -1941,10 +1953,14 @@ void eng_display(int init)	// optimize me!!!!!
 
 				display_floortile(map[m].back,map[m].light|tmp,x*32,y*32,xoff,yoff,map[x+y*screen_renderdist].x,map[x+y*screen_renderdist].y);
 
-				if (map[m].x<MAPX_MAX && map[m].y<MAPY_MAX && !(map[m].flags&INVIS)) {
-					if (!xmap[map[m].y+map[m].x*MAPX_MAX] || xmap[map[m].y+map[m].x*MAPX_MAX]==0xffff)
-
+				if (map[m].x<MAPX_MAX && map[m].y<MAPY_MAX && !(map[m].flags&INVIS)) 
+				{
+					if (!xmap[map[m].y+map[m].x*MAPX_MAX] || xmap[map[m].y+map[m].x*MAPX_MAX]==0xffff 
+						|| ymap[map[m].y+map[m].x*MAPX_MAX]==1)
+					{
 						xmap[map[m].y+map[m].x*MAPX_MAX]=(unsigned short)get_avgcol(map[m].back);
+						ymap[map[m].y+map[m].x*MAPX_MAX]=0;
+					}
 				}
 
 				if (pl.goto_x==map[m].x && pl.goto_y==map[m].y)

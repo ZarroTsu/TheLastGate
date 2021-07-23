@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.6.6\n"};
+static char intro_msg3[] = {"Current client/server version is 0.6.7\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {"OLD CHARACTER EXP WAS RESET JUNE 12th! Make sure you reallocate your exp before heading out!\n"};
 static char intro_msg5_font = 1;
@@ -2678,7 +2678,7 @@ void plr_change(int nr)
 				}
 				if (n == WN_CLDWN)
 				{
-					*(short int*)(buf + 5) = min(1000,ch[cn].cool_bonus); // 100 + INT/2 + mods
+					*(short int*)(buf + 5) = min(1000,ch[cn].cool_bonus); // 100 + INT/4 + mods
 					*(short int*)(buf + 7) = min(300,ch[cn].cast_speed); // BRV/4 + mods
 				}
 				if (n == WN_FLAGS)

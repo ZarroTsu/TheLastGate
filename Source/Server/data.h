@@ -822,7 +822,7 @@ struct waypoint
 
 #define N_SOULCAT		158
 #define N_SOULBONUS		 70
-#define N_SOULMAX		 24
+#define N_SOULMAX		 48
 #define N_SOULTAGS		  3
 
 extern struct s_skilltab skilltab[MAXSKILL];

@@ -65,7 +65,7 @@ int use_door(int cn, int in)
 		else if ((in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==it[in].data[0])
 		{
 			lock = 1;
-			if (it[in].data[3] && (!it[in].active))
+			if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cn))
 			{
 				ch[cn].citem = 0;
 				it[in2].used = USE_EMPTY;
@@ -87,7 +87,7 @@ int use_door(int cn, int in)
 			if (n<40)
 			{
 				lock = 1;
-				if (it[in].data[3] && (!it[in].active))
+				if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cn))
 				{
 					ch[cn].item[n] = 0;
 					ch[cn].item_lock[n] = 0;
@@ -98,7 +98,6 @@ int use_door(int cn, int in)
 		}
 		if (!lock && (in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].driver==3) // try to pick the lock
 		{
-			
 			skill = it[in2].data[0]; // DrData0 on the lockpick is the bonus power of the pick
 			power = it[in].data[2];  // DrData2 on the door is the difficulty (power) of the door
 			if (!(ch[cn].flags & CF_LOCKPICK))
@@ -1216,7 +1215,7 @@ int stone_sword(int cn, int in)
 		return( 0);
 	}
 
-	if (get_attrib_score(cn, AT_STR)<40)
+	if (get_attrib_score(cn, AT_STR)<it[in].data[1]) // was 40
 	{
 		do_char_log(cn, 0, "You're not strong enough.\n");
 		return(0);
@@ -3094,9 +3093,9 @@ int use_grave(int cn, int in)
 	return(1);
 }
 
-int mine_wall(int in, int x, int y)
+int mine_wall(int in, int x, int y, int dmg)
 {
-	int temp, carried;
+	int temp, carried, tmp;
 
 	if (!in)
 	{
@@ -3125,6 +3124,20 @@ int mine_wall(int in, int x, int y)
 	if (carried)
 	{
 		it[in].flags |= IF_UPDATE;
+	}
+	
+	// Add leftover damage from previous state
+	if (it[in].driver==25)
+	{
+		tmp = it[in].data[1] - dmg;
+		if (tmp<=0)
+		{
+			tmp = mine_wall(in, 0, 0, abs(tmp)) + 1;
+		}
+		else
+		{
+			it[in].data[1] = tmp;
+		}
 	}
 
 	return(it[in].data[2]);
@@ -3190,17 +3203,14 @@ int use_mine(int cn, int in)
 		}
 		ch[cn].a_hp -= 1000;
 	}
-
+	
+	// Damage wall
 	tmp = it[in].data[1] - str;
 	if (tmp<=0)
 	{
-		reset_go(it[in].x, it[in].y);
-		remove_lights(it[in].x, it[in].y);
-
-		tmp = mine_wall(in, 0, 0) + 1;
-
-		reset_go(it[in].x, it[in].y);
-		add_lights(it[in].x, it[in].y);
+		reset_go(it[in].x, it[in].y); remove_lights(it[in].x, it[in].y);
+		tmp = mine_wall(in, 0, 0, abs(tmp)) + 1;
+		reset_go(it[in].x, it[in].y); add_lights(it[in].x, it[in].y);
 	}
 	else
 	{
@@ -3830,12 +3840,12 @@ int get_pent_value(int pnum)
 {
 	// Values are multiplied by 10000 here for decimal accuracy.
 	// Apparently each bracket step gets truncated as its own int, who knew?
-	return ( ( pnum*pnum*10000 ) / ( 6*10000+pnum*10000/99 ) +1 );
+	return ( ( pnum*pnum*10000 ) / ( 7*10000+pnum*10000/99 ) +1 );
 }
 
 int get_kill_streak_exp(int k, int p)
 {
-	return ( k*2 + k*(p*p/16)/7 );
+	return ( k*2 + k*(p*p/16)/8 );
 }
 
 void show_pent_count(int cn)
@@ -4137,7 +4147,7 @@ int use_shrine(int cn, int in)
 	}
 
 	rank = points2rank(ch[cn].points_tot) + 1;
-	rank = rank * rank * rank * 4;
+	rank = rank * rank * 44;
 	val += RANDOM(val + 1);
 
 	if (val>=rank)
@@ -5532,6 +5542,10 @@ void use_driver(int cn, int in, int carried)
 			case 94:						// rewards on use while teleporting. /diffi sets reward tier in drdata[9]
 				ret = reward_teleport(cn, in); 
 				break;
+			case 95:
+			case 96:
+			case 97:
+				ret = 0;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -6250,7 +6264,7 @@ void spiderweb(int in)
 void enemyspawner(int in, int type)
 {
 	int n, cn;
-	int t_ran = 20, count = 3, t_temp = 83, t_dist = 8;
+	int t_ran = 20, count = 3, t_temp = 83, t_dist = 8, m_mult = 0;
 	int wait = 0;
 
 	switch (type)
@@ -6323,6 +6337,18 @@ void enemyspawner(int in, int type)
 			t_temp = CT_GARGNEST + it[in].data[0];
 			t_ran = 30;	count = 2;	t_dist = 8; wait = 0;
 			break;
+		case 17:		// Autumn Xecko enemies
+			t_temp = m_mult = CT_XECKO;
+			t_ran = 30;	count = 2;	t_dist = 8; wait = 0;
+			break;
+		case 18:		// Ice Gargoyle Nest (either floor)
+			t_temp = CT_ICENEST + it[in].data[0];
+			t_ran = 25;	count = 2;	t_dist = 2; wait = 0;
+			break;
+		case 19:		// Ice Gargoyle Nest (either floor) (mixed)
+			t_temp = m_mult = CT_ICENEST + it[in].data[0];
+			t_ran = 25;	count = 2;	t_dist = 2; wait = 0;
+			break;
 		default:
 			return;
 	}
@@ -6338,6 +6364,10 @@ void enemyspawner(int in, int type)
 	
 	for (n = 1; n<(count+1); n++)
 	{
+		if (m_mult && n>1) // force one of each of this mob type
+		{
+			t_temp = m_mult + (n-1);
+		}
 		cn = it[in].data[n];
 		if (cn == 0 || ch[cn].data[0]!=in || ch[cn].used==USE_EMPTY || (ch[cn].flags & CF_BODY))
 		{
@@ -6478,6 +6508,9 @@ void item_tick_expire(void)
 			if (it[in].driver==85)	enemyspawner(in, 14);
 			if (it[in].driver==86)	enemyspawner(in, 15);
 			if (it[in].driver==87)	enemyspawner(in, 16);
+			if (it[in].driver==95)	enemyspawner(in, 17);
+			if (it[in].driver==96)	enemyspawner(in, 18);
+			if (it[in].driver==97)	enemyspawner(in, 19);
 
 			if (it[in].flags & IF_EXPIREPROC)
 			{
@@ -6731,6 +6764,10 @@ void item_tick_gc(void)
 
 void item_tick(void)
 {
+	item_tick_expire();
+	item_tick_expire();
+	item_tick_expire();
+	item_tick_expire();
 	item_tick_expire();
 	item_tick_expire();
 	item_tick_expire();

@@ -1296,6 +1296,11 @@ int create_special_item(int temp)
 		is_mage = 1;
 	//
 	
+	if (it[in].placement & PL_TWOHAND)
+	{
+		mul = 2;
+	}
+	
 	// Special 'Legendary' affixes
 	if (!RANDOM(15))
 	{
@@ -1309,44 +1314,44 @@ int create_special_item(int temp)
 		case  0: 
 		case  1: 
 			if (legendary) pref = "Leo "; else pref = "Lion's ";
-			it[in].attrib[AT_BRV][0] += 3; 
+			it[in].attrib[AT_BRV][0] += 2 * mul + RANDOM(2); 
 			break;
 		case  2: 
 		case  3: 
 			if (legendary) pref = "Anguis "; else pref = "Snake's "; 
-			it[in].attrib[AT_WIL][0] += 3; 
+			it[in].attrib[AT_WIL][0] += 2 * mul + RANDOM(2); 
 			break;
 		case  4: 
 		case  5: 
 			if (legendary) pref = "Ibis "; else pref = "Owl's "; 
-			it[in].attrib[AT_INT][0] += 3; 
+			it[in].attrib[AT_INT][0] += 2 * mul + RANDOM(2); 
 			break;
 		case  6: 
 		case  7: 
 			if (legendary) pref = "Mus "; else pref = "Weasel's "; 
-			it[in].attrib[AT_AGL][0] += 3; 
+			it[in].attrib[AT_AGL][0] += 2 * mul + RANDOM(2); 
 			break;
 		case  8: 
 		case  9: 
 			if (legendary) pref = "Ursa "; else pref = "Bear's "; 
-			it[in].attrib[AT_STR][0] += 3; 
+			it[in].attrib[AT_STR][0] += 2 * mul + RANDOM(2); 
 			break;
 		case 10: 
 		case 11: 
 			if (legendary) pref = "Angelus "; else pref = "Angelic "; 
-			it[in].attrib[AT_BRV][0] += 1; 
-			it[in].attrib[AT_WIL][0] += 1; 
-			it[in].attrib[AT_INT][0] += 1; 
-			it[in].attrib[AT_AGL][0] += 1; 
-			it[in].attrib[AT_STR][0] += 1; 
+			it[in].attrib[AT_BRV][0] += 1 * mul + RANDOM(2); 
+			it[in].attrib[AT_WIL][0] += 1 * mul + RANDOM(2); 
+			it[in].attrib[AT_INT][0] += 1 * mul + RANDOM(2); 
+			it[in].attrib[AT_AGL][0] += 1 * mul + RANDOM(2); 
+			it[in].attrib[AT_STR][0] += 1 * mul + RANDOM(2); 
 			break;
 		case 12: 
 			if (legendary) pref = "Lux "; else pref = "Glowing "; 
-			it[in].light[0] += 20; 
+			it[in].light[0] += 10 * mul + RANDOM(3)*5;
 			break;
 		case 13: 
 			if (legendary) pref = "Deus "; else pref = "Godly "; 
-			mul = 2; 
+			mul *= 2; 
 			break;
 		default: 
 			pref = ""; 
@@ -1370,83 +1375,83 @@ int create_special_item(int temp)
 			case  0:
 			case  1:
 				if (legendary) suffix = "Fortem"; else suffix = " of Braveness";
-				it[in].attrib[AT_BRV][0] += 4 * mul;
+				it[in].attrib[AT_BRV][0] += 2 * mul + RANDOM(2);
 				break;
 			case  2:
 			case  3:
 				if (legendary) suffix = "Autem"; else suffix = " of Willpower";
-				it[in].attrib[AT_WIL][0] += 4 * mul;
+				it[in].attrib[AT_WIL][0] += 2 * mul + RANDOM(2);
 				break;
 			case  4:
 			case  5:
 				if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
-				it[in].attrib[AT_INT][0] += 4 * mul;
+				it[in].attrib[AT_INT][0] += 2 * mul + RANDOM(2);
 				break;
 			case  6:
 			case  7:
 				if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
-				it[in].attrib[AT_AGL][0] += 4 * mul;
+				it[in].attrib[AT_AGL][0] += 2 * mul + RANDOM(2);
 				break;
 			case  8:
 			case  9:
 				if (legendary) suffix = "Viribus"; else suffix = " of Strength";
-				it[in].attrib[AT_STR][0] += 4 * mul;
+				it[in].attrib[AT_STR][0] += 2 * mul + RANDOM(2);
 				break;
 			case 10:
 				if (legendary) suffix = "Callidus"; else suffix = " of the Adept";
-				it[in].attrib[AT_BRV][0] += 2 * mul; 
-				it[in].attrib[AT_WIL][0] += 2 * mul; 
-				it[in].attrib[AT_INT][0] += 2 * mul; 
-				it[in].attrib[AT_AGL][0] += 2 * mul; 
-				it[in].attrib[AT_STR][0] += 2 * mul; 
+				it[in].attrib[AT_BRV][0] += 1 * mul + RANDOM(2); 
+				it[in].attrib[AT_WIL][0] += 1 * mul + RANDOM(2); 
+				it[in].attrib[AT_INT][0] += 1 * mul + RANDOM(2); 
+				it[in].attrib[AT_AGL][0] += 1 * mul + RANDOM(2); 
+				it[in].attrib[AT_STR][0] += 1 * mul + RANDOM(2); 
 				break;
 			case 11:
 			case 12:
 				if (legendary) suffix = "Salutem"; else suffix = " of Hitpoints";
-				it[in].hp[0] += 40 * mul;
+				it[in].hp[0] += 30 * mul + RANDOM(3)*5;
 				break;
 			case 13:
 			case 14:
 				if (legendary) suffix = "Pati"; else suffix = " of Endurance";
-				it[in].end[0] += 20 * mul;
+				it[in].end[0] += 10 * mul + RANDOM(3)*5;
 				break;
 			case 15:
 			case 16:
 				if (legendary) suffix = "Magus"; else suffix = " of Mana";
-				it[in].mana[0] += 40 * mul;
+				it[in].mana[0] += 30 * mul + RANDOM(3)*5;
 				break;
 			case 17:
 				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-				it[in].weapon[0] += 3 * mul;
+				it[in].weapon[0] += 2 * mul + RANDOM(2);
 				break;
 			case 18:
 				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-				it[in].armor[0] += 3 * mul;
+				it[in].armor[0] += 2 * mul + RANDOM(2);
 				break;
 			case 19:
 				if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
-				it[in].skill[SK_IMMUN][0] += 3 * mul;
+				it[in].skill[SK_IMMUN][0] += 2 * mul + RANDOM(2);
 				break;
 			case 20:
 				if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
-				it[in].skill[SK_RESIST][0] += 3 * mul;
+				it[in].skill[SK_RESIST][0] += 2 * mul + RANDOM(2);
 				break;
 			case 21:
 			case 22:
 				if (is_robe || is_spea || is_dagg || (is_dama && m))
 				{
 					if (legendary) suffix = "Pugione"; else suffix = " of the Dagger";
-					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_DAGGER][0] += 2 * mul + RANDOM(2);
 				}
 				else if (is_armor || is_claw || (is_dama && !m))
 				{
 					if (legendary) suffix = "Manibus"; else suffix = " of the Unarmed";
-					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_HAND][0] += 2 * mul + RANDOM(2);
 				}
 				else // gaxe, thsw, axxe, swor, dual, shie, staf
 				{
 					if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
-					it[in].skill[SK_RESIST][0] += 3 * mul;
+					it[in].skill[SK_RESIST][0] += 2 * mul + RANDOM(2);
 					break;
 				}
 				break;
@@ -1455,17 +1460,17 @@ int create_special_item(int temp)
 				if (is_robe || is_spea || is_staf || (is_dama && m))
 				{
 					if (legendary) suffix = "Virgam"; else suffix = " of the Staff";
-					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_STAFF][0] += 2 * mul + RANDOM(2);
 				}
 				else if (is_armor || is_swor || (is_dama && !m))
 				{
 					if (legendary) suffix = "Gladio"; else suffix = " of the Sword";
-					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_SWORD][0] += 2 * mul + RANDOM(2);
 				}
 				else // gaxe, thsw, axxe, dual, claw, shie, dagg
 				{
 					if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
-					it[in].skill[SK_IMMUN][0] += 3 * mul;
+					it[in].skill[SK_IMMUN][0] += 2 * mul + RANDOM(2);
 					break;
 				}
 				break;
@@ -1474,17 +1479,17 @@ int create_special_item(int temp)
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Benedicite"; else suffix = " of Blessing";
-					it[in].skill[SK_BLESS][0] += 4 * mul;
+					it[in].skill[SK_BLESS][0] += 3 * mul + RANDOM(2);
 				}
 				else if (is_armor || is_gaxe || is_axxe || (is_dama && !m))
 				{
 					if (legendary) suffix = "Securis"; else suffix = " of the Axe";
-					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_AXE][0] += 2 * mul + RANDOM(2);
 				}
 				else // thsw, swor, dual, claw
 				{
 					if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-					it[in].armor[0] += 3 * mul;
+					it[in].armor[0] += 2 * mul + RANDOM(2);
 					break;
 				}
 				break;
@@ -1493,17 +1498,17 @@ int create_special_item(int temp)
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Maledictum"; else suffix = " of Cursing";
-					it[in].skill[SK_CURSE][0] += 4 * mul;
+					it[in].skill[SK_CURSE][0] += 3 * mul + RANDOM(2);
 				}
 				else if (is_armor || is_gaxe || is_thsw || (is_dama && !m))
 				{
 					if (legendary) suffix = "Magna"; else suffix = " of the Twohander";
-					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_TWOHAND][0] += 2 * mul + RANDOM(2);
 				}
 				else // axxe, swor, dual, claw
 				{
 					if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-					it[in].weapon[0] += 3 * mul;
+					it[in].weapon[0] += 2 * mul + RANDOM(2);
 					break;
 				}
 				break;
@@ -1512,12 +1517,12 @@ int create_special_item(int temp)
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Tarda"; else suffix = " of Slowing";
-					it[in].skill[SK_SLOW][0] += 4 * mul;
+					it[in].skill[SK_SLOW][0] += 3 * mul + RANDOM(2);
 				}
 				else
 				{
 					if (legendary) suffix = "Adductius"; else suffix = " of Cleaving";
-					it[in].skill[SK_CLEAVE][0] += 4 * mul;
+					it[in].skill[SK_CLEAVE][0] += 3 * mul + RANDOM(2);
 				}
 				break;
 			case 31:
@@ -1525,12 +1530,12 @@ int create_special_item(int temp)
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Praemium"; else suffix = " of Blasting";
-					it[in].skill[SK_BLAST][0] += 4 * mul;
+					it[in].skill[SK_BLAST][0] += 3 * mul + RANDOM(2);
 				}
 				else
 				{
 					if (legendary) suffix = "Infirmi"; else suffix = " of Weakening";
-					it[in].skill[SK_WEAKEN][0] += 4 * mul;
+					it[in].skill[SK_WEAKEN][0] += 3 * mul + RANDOM(2);
 				}
 				break;
 			case 33:
@@ -1538,12 +1543,12 @@ int create_special_item(int temp)
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Familia"; else suffix = " of Company";
-					it[in].skill[SK_GHOST][0] += 4 * mul;
+					it[in].skill[SK_GHOST][0] += 3 * mul + RANDOM(2);
 				}
 				else
 				{
 					if (legendary) suffix = "Regio"; else suffix = " of Surrounding";
-					it[in].skill[SK_SURROUND][0] += 5 * mul;
+					it[in].skill[SK_SURROUND][0] += 3 * mul + RANDOM(2);
 				}
 				break;
 			case 35:
@@ -1551,34 +1556,34 @@ int create_special_item(int temp)
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Clypeus"; else suffix = " of Shielding";
-					it[in].skill[SK_MSHIELD][0] += 4 * mul;
+					it[in].skill[SK_MSHIELD][0] += 3 * mul + RANDOM(2);
 				}
 				else
 				{
 					if (legendary) suffix = "Furorem"; else suffix = " of Taunting";
-					it[in].skill[SK_TAUNT][0] += 4 * mul;
+					it[in].skill[SK_TAUNT][0] += 3 * mul + RANDOM(2);
 				}
 				break;
 			//
 			case 37:
 				if (legendary) suffix = "Caecus"; else suffix = " of Blinding";
-				it[in].skill[SK_BLIND][0] += 4 * mul;
+				it[in].skill[SK_BLIND][0] += 3 * mul + RANDOM(2);
 				break;
 			case 38:
 				if (legendary) suffix = "Renati"; else suffix = " of Regeneration";
-				it[in].skill[SK_REGEN][0] += 5 * mul;
+				it[in].skill[SK_REGEN][0] += 3 * mul + RANDOM(2);
 				break;
 			case 39:
 				if (legendary) suffix = "Requiem"; else suffix = " of Resting";
-				it[in].skill[SK_REST][0] += 5 * mul;
+				it[in].skill[SK_REST][0] += 3 * mul + RANDOM(2);
 				break;
 			case 40:
 				if (legendary) suffix = "Meditor"; else suffix = " of Meditation";
-				it[in].skill[SK_MEDIT][0] += 5 * mul;
+				it[in].skill[SK_MEDIT][0] += 3 * mul + RANDOM(2);
 				break;
 			default: // 41
 				if (legendary) suffix = "Sana"; else suffix = " of Healing";
-				it[in].skill[SK_HEAL][0] += 4 * mul;
+				it[in].skill[SK_HEAL][0] += 3 * mul + RANDOM(2);
 				break;
 		}
 	}
@@ -1679,10 +1684,11 @@ struct npc_class npc_class[] = {
 	{"Gargoyle Knight"			},	// 38
 	{"Gargoyle Mage"			},	// 39
 	//
-	{""},	// 40
-	{""},	// 41
-	{""},	// 42
-	{""},	// 43
+	{"Xecko"                    },	// 40
+	{"Thug"                     },	// 41
+	{"Cultist"                  },	// 42
+	{"Strider"                  },	// 43
+	//
 	{""},	// 44
 	{""},	// 45
 	{""},	// 46
@@ -2737,19 +2743,22 @@ static int soul_bonus[N_SOULBONUS][2] = {
 	{ 2, 1 }  // 69 Reflect
 };
 
-
-#define over_add(a, b) a=(((int)(a)+(int)(b)>120) ? (120) : ((a)+(b)))
-
 void soultrans_equipment(int cn, int in, int in2)
 {
-	int rank, focus, try, r, n, t, m, c=0, s=0, temp=0;
+	int rank, focus, try, r, n, t, m, c=0, s=0, temp=0, bonus=1;
 	char tag[N_SOULTAGS] = {0};
 	char known[N_SOULBONUS] = {0};
 	char selected[N_SOULMAX*N_SOULTAGS*5] = {0};
 	
+	// 0. Check if (in) is twohanded, grant a rank bonus if it is.
+	if (it[in2].placement & PL_TWOHAND)
+	{
+		bonus = 2;
+	}
+	
 	// 1. Set local variables to pull from the soulstone (in)
-	rank   = max(1, min(N_SOULMAX, it[in].data[0]));
-	focus  = (it[in].data[2] > 0 && it[in].data[2] < N_SOULMAX) ? it[in].data[2] : N_SOULMAX;
+	rank   = max(1, min(N_SOULMAX, it[in].data[0]*bonus));
+	focus  = (it[in].data[2] > 0 && it[in].data[2] < 8) ? it[in].data[2] : 8;
 	for (t=0;t<N_SOULTAGS;t++) tag[t] = max(0, min(N_SOULCAT, it[in].data[t+3]));
 	
 	// 2. Loop through known player skills and add to local array
@@ -3228,6 +3237,181 @@ int use_soulcatalyst(int cn, int in)
 	do_char_log(cn, 1, "Nothing happened.\n");
 	return 0;
 }
+
+char *get_map_enemy_name(int kin)
+{
+	switch (kin)
+	{
+		case  1: return "Skeleton";
+		case  2: return "Ghost";
+		case  3: return "Rodent";
+		case  4: return "Undead";
+		case  5: return "Grolm";
+		case  6: return "Skink";
+		case  7: return "Golem";
+		case  8: return "Gargoyle";
+		case  9: return "Ice Garg";
+		case 10: return "Flame";
+		default: return "Weirdo";
+	}
+}
+
+int get_map_enemy_sprite(int kin)
+{
+	switch (kin)
+	{
+		case  1: return 10192; // BS Skeleton
+		case  2: return  9168; // BS Ghost
+		case  3: return 14288; // BS Rodent
+		case  4: return 19408; // BS Undead
+		case  5: return 12240; // BS Grolm
+		case  6: return 13264; // BS Skink
+		case  7: return 17360; // BS Golem
+		case  8: return 18384; // BS Gargoyle
+		case  9: return 21456; // BS Icey
+		case 10: return 22480; // BS Flame
+		default: return  2000;
+	}
+}
+
+char *get_map_enemy_affix(int affix)
+{
+	switch (affix)
+	{
+		case  1: return "tough";
+		case  2: return "fierce";
+		default: return "odd";
+	}
+}
+
+int get_map_enemy_affix_length(int affix)
+{
+	switch (affix)
+	{
+		case  1: return 5;
+		case  2: return 6;
+		default: return 3;
+	}
+}
+
+int get_map_eme[11][60] = { //                    15                                        29
+	{50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,50,50,50,50,50,50,50,50,50}, //  0 : null
+	
+	
+	/*
+	{50, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
+	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,50,50,50,50,35,50,35,50,50}, //  x : bs template
+	*/
+};
+
+int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
+{
+	int co, tmp, pts, n, j;
+	char buf[40];
+	
+	co = pop_create_char(temp, 0);
+	if (!co)
+	{
+		xlog("create char failed in generate_map_enemy()");
+		return 0;
+	}
+	if (!god_drop_char_fuzzy(co, xx, yy))
+	{
+		xlog("drop char failed in generate_map_enemy()");
+		god_destroy_items(co);
+		ch[co].used = USE_EMPTY;
+		return 0;
+	}
+	fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+	
+	// Set name and sprite
+	if (kin)
+	{
+		sprintf(ch[co].name, "%s", get_map_enemy_name(kin));
+		sprintf(ch[co].reference, "the %s", get_map_enemy_name(kin));
+		ch[co].sprite = get_map_enemy_sprite(kin);
+		if (kin==10) // Set Simple Animation
+			ch[co].flags |= CF_SIMPLE;
+	}
+	
+	// Mimic GC code
+	for (n = 0; n<5; n++)
+	{
+		tmp = base * 50 / max(1, get_map_eme[kin][n+50]);
+		ch[co].attrib[n][0] = max(10, min(135, tmp));
+	}
+
+	for (n = 0; n<MAXSKILL; n++)
+	{
+		if (get_map_eme[kin][n])
+		{
+			tmp = base * 50 / max(1, get_map_eme[kin][n]);
+			ch[co].skill[n][0] = max(1, min(135, tmp));
+		}
+	}
+	
+	tmp = base * 50 / max(1, get_map_eme[kin][55]) * 5;	ch[co].hp[0]   	= max(100, min(999, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][56]) * 2;	ch[co].end[0]  	= max(100, min(999, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][57]) * 5;	ch[co].mana[0] 	= max(100, min(999, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][58]) / 2; ch[co].weapon_bonus = max( 12, min(120, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][59]) / 2; ch[co].armor_bonus  = max(  8, min(120, tmp));
+	
+	// Apply flags and Prefix
+	if (affix)
+	{
+		n = get_map_enemy_affix_length(affix);
+		sprintf(buf, "the %s %s", get_map_enemy_affix(affix), ch[co].name); buf[5+n] = tolower(buf[5+n]);
+		strncpy(ch[co].reference, buf, 39); ch[co].reference[39] = 0;
+		
+		sprintf(buf, "%s %s", get_map_enemy_affix(affix), ch[co].name); buf[0] = toupper(buf[0]);
+		strncpy(ch[co].name, buf, 39); ch[co].name[39] = 0;
+		
+		if (!(ch[co].flags & CF_EXTRAEXP)) ch[co].flags |= CF_EXTRAEXP;
+	
+		switch (affix)
+		{
+			case 1:
+				for (n = 0; n<5; n++)
+					ch[co].attrib[n][0] += 3+RANDOM(3);
+				for (n = 0; n<MAXSKILL; n++) if (ch[co].skill[n][0])
+					ch[co].skill[n][0] += 3+RANDOM(3)*2;
+				break;
+			case 2:
+				for (n = 0; n<5; n++)
+					ch[co].attrib[n][0] += 6+RANDOM(5);
+				for (n = 0; n<MAXSKILL; n++) if (ch[co].skill[n][0])
+					ch[co].skill[n][0] += 6+RANDOM(5)*2;
+				if (!(ch[co].flags & CF_CANCRIT))
+					ch[co].flags |= CF_CANCRIT;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	// Calculate experience
+	pts = 0;
+	for (n = 0; n<5; n++) for (j = 10; j<ch[co].attrib[n][0]; j++)
+		pts += attrib_needed(j, 4);
+	for (j = 50; j<ch[co].hp[0]; j++) 
+		pts += hp_needed(j, 4);
+	for (j = 50; j<ch[co].mana[0]; j++) 
+		pts += mana_needed(j, 4);
+	for (n = 0; n<MAXSKILL; n++) for (j = 1; j<ch[co].skill[n][0]; j++)
+		pts += skill_needed(j, 3);
+	ch[co].points_tot = pts;
+	
+	ch[co].gold   = 0;
+	ch[co].a_hp   = 999999;
+	ch[co].a_end  = 999999;
+	ch[co].a_mana = 999999;
+	
+	////
+	
+	return co;
+}
+
 
 int load_mod(void)
 {

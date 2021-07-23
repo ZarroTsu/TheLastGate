@@ -66,7 +66,7 @@ void init_lights(void)
 
 int pop_create_item(int temp, int cn)
 {
-	int n, m, in = 0, enbl = 0, godroll = 0, bonus = 2;
+	int n, m, in = 0, enbl = 0, godroll = 0, bonus = 1;
 	char *gend, *godn, name[60], refer[60], descr[220];
 	
 	if (!(it_temp[temp].flags & IF_TAKE))
@@ -93,7 +93,7 @@ int pop_create_item(int temp, int cn)
 			{
 				if (it[in].placement & PL_TWOHAND)
 				{
-					bonus = 3;
+					bonus = 2;
 				}
 				
 				switch (godroll)
@@ -102,37 +102,37 @@ int pop_create_item(int temp, int cn)
 						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]      +=  8 * bonus/2;
+						it[in].speed[0]      +=  8 * bonus;
 						break;
 					case 2:
 						gend = " goddess ";
 						godn = "Kwai";
 						it[in].flags |= IF_KWAI_UNI;
-						it[in].to_hit[0]     +=  4 * bonus/2;
-						it[in].to_parry[0]   +=  4 * bonus/2;
+						it[in].to_hit[0]     +=  4 * bonus;
+						it[in].to_parry[0]   +=  4 * bonus;
 						break;
 					case 3:
 						gend = " god ";
 						godn = "Gorn";
 						it[in].flags |= IF_GORN_UNI;
-						it[in].spell_mod[0]  +=  2 * bonus/2;
+						it[in].spell_mod[0]  +=  2 * bonus;
 						break;
 					default:
 						gend = " ";
 						godn = "Purple One";
 						it[in].flags |= IF_PURP_UNI;
-						it[in].top_damage[0] += 20 * bonus/2;
+						it[in].top_damage[0] += 20 * bonus;
 						break;
 				}
 				
 				if (it[in].flags & IF_OF_SHIELD)
 				{
-					it[in].armor[0]  += 4 * bonus/2;
+					it[in].armor[0]  += 4 * bonus;
 					//it[in].max_damage = 5000 * it[in].armor[0]/2;
 				}
 				else
 				{
-					it[in].weapon[0] += 4 * bonus/2;
+					it[in].weapon[0] += 4 * bonus;
 					//it[in].max_damage = 5000 * it[in].weapon[0]/2;
 				}
 				it[in].orig_temp = it[in].temp;

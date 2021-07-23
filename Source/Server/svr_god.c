@@ -882,7 +882,7 @@ int god_give_char(int in, int cn)
 	{
 		return( 0);
 	}
-	for (n = 0; n<40; n++)
+	if (IS_PLAYER(cn)) for (n = 0; n<40; n++)
 	{
 		// Find a stackable item of the same template
 		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[ch[cn].item[n]].temp && it[ch[cn].item[n]].stack<10)

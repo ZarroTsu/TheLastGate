@@ -48,7 +48,7 @@ void do_misc(void)
 			continue;
 		}
 
-		if (count_uniques(cn)>1)
+		if (count_uniques(cn)>2)
 		{
 			if (ch[cn].used==USE_ACTIVE)
 			{

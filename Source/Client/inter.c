@@ -1354,9 +1354,12 @@ void mouse_mapbox(int x,int y,int state)
 
 int mouse_shop(int x,int y,int mode)
 {
-	int nr,tx,ty;
+	int nr,tx,ty,keys;
 
 	if (!show_shop) return 0;
+	
+	keys=0;
+	if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
 
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
 	{
@@ -1374,7 +1377,13 @@ int mouse_shop(int x,int y,int mode)
 		ty=(y-(GUI_SHOP_Y+1))/35;
 
 		nr=min(62,tx+ty*8);
-		if (mode==MS_LB_UP) cmd(CL_CMD_SHOP,shop.nr,nr);
+		if (mode==MS_LB_UP) 
+		{
+			if (keys)
+				cmd(CL_CMD_SHOP,shop.nr,nr+124);
+			else
+				cmd(CL_CMD_SHOP,shop.nr,nr);
+		}
 		if (mode==MS_RB_UP) cmd(CL_CMD_SHOP,shop.nr,nr+62);
 
 		if (shop.item[nr])	{ cursor_type=CT_TAKE; }

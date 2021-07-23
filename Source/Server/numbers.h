@@ -70,6 +70,8 @@
 #define CT_SWAMPLIZ		 733
 #define CT_MOUNTVIK		 734
 #define CT_GARGNEST		 735
+#define CT_XECKO		1007
+#define CT_ICENEST		1009
 
 #define CT_GOLEMTRAP	  39
 #define CT_GARGTRAP		  40
