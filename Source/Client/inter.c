@@ -515,7 +515,10 @@ void button_help(int nr)
 			else if (last_skill==53)
 				xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); 
 			else if (last_skill==54 && pl.skill[35][0])
-				xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
+				if (pl.worn_p[WN_FLAGS] & (1 << 12))
+					xlog(1,"Effective bonus to hit and parry score granted to allies when using your Rally skill. Half of this value is granted to yourself as well."); 
+				else
+					xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
 			else if (last_skill<50 || last_skill>54)
 				xlog(1,"Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); 
 			break;
@@ -565,6 +568,9 @@ void reset_block(void)
 		for (n=0; n<20; n++) inv_block[n]=0;
 	}
 	if (pl.worn_p[WN_RHAND]&PL_TWOHAND) inv_block[WN_LHAND]=1;
+	if (pl.worn_p[WN_LHAND]&&(pl.citem_p&PL_WEAPON)&&(pl.citem_p&PL_TWOHAND)) inv_block[WN_RHAND]=1;
+	if (pl.worn_p[WN_LRING]&PL_TWOHAND) inv_block[WN_RRING]=1;
+	if (pl.worn_p[WN_RRING]&PL_TWOHAND) inv_block[WN_LRING]=1;
 }
 
 int mouse_inventory(int x,int y,int mode)
@@ -1039,7 +1045,13 @@ int mouse_statbox2(int x,int y,int state)
 					(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
 					(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
 					(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
-					(m==41&&(pl_flags & (1 << 10))) )	// Weaken -> Greater Weaken
+					(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
+					(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
+					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse
+					(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
+					(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
+					(m==42&&(pl_flagb & (1 << 14)))     // Poison -> Venom
+				)
 			{
 				strcpy(tmp, skilltab[n+skill_pos].alt_a);
 				xlog(1,skilltab[n+skill_pos].alt_b);

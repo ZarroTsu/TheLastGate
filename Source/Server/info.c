@@ -18,6 +18,7 @@
 #include "gendefs.h"
 #include "data.h"
 #include "driver.h"
+#include "macros.h"
 
 struct map *map;
 struct character *ch;
@@ -34,14 +35,14 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "map.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	map = mmap(NULL, MAPSIZE, PROT_READ, MAP_SHARED, handle, 0);
 	if (map==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap map.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
@@ -49,14 +50,14 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "char.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	ch = mmap(NULL, CHARSIZE, PROT_READ, MAP_SHARED, handle, 0);
 	if (ch==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap char.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
@@ -65,14 +66,14 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "buff.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	bu = mmap(NULL, BUFFSIZE, PROT_READ, MAP_SHARED, handle, 0);
 	if (bu==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap buff.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 	//
@@ -81,14 +82,14 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "item.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	it = mmap(NULL, ITEMSIZE, PROT_READ, MAP_SHARED, handle, 0);
 	if (it==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap item.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
@@ -96,14 +97,14 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "effect.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	fx = mmap(NULL, EFFECTSIZE, PROT_READ, MAP_SHARED, handle, 0);
 	if (fx==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap effect.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
@@ -111,18 +112,18 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "global.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	globs = mmap(NULL, sizeof(struct global), PROT_READ, MAP_SHARED, handle, 0);
 	if (globs==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap global.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
-	return(0);
+	return 0;
 }
 
 static void unload(void)
@@ -179,8 +180,8 @@ static char *_rank[25] = {
 
 static int points2rank(int v)
 {
-	if (v<      250)	return( 0); // Private
-	if (v<     1750)	return( 1); // Private FIrst Class
+	if (v<      250)	return 0; // Private
+	if (v<     1750)	return 1; // Private FIrst Class
 	if (v<     7000)	return( 2); // Lance Corporal
 	if (v<    21000)	return( 3); // Corporal
 	if (v<    52500)	return( 4); // Sergeant
@@ -555,7 +556,7 @@ static void char_info(int cn)
 		return;
 	}
 
-	if (ch[cn].kindred & KIN_MALE)
+	if (IS_MALE(cn))
 	{
 		gender = "he";
 		Gender = "He";
@@ -610,7 +611,7 @@ static void char_info(int cn)
 			printf("Rumor has it %s is fairly rich.\n", ch[cn].name);
 		}
 
-		if (ch[cn].kindred & KIN_PURPLE)
+		if (IS_PURPLE(cn))
 		{
 			printf("%s is a follower of the Purple One and killed %d fellow players.\n",
 			       Gender, ch[cn].data[29]);
@@ -924,5 +925,5 @@ int main(int argc, char *args[])
 		"</center><br><br>\n"
 		"</body></html>");
 
-	return(0);
+	return 0;
 }

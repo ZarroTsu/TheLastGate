@@ -43,6 +43,8 @@
 #define CT_BISHOP    	  29
 #define CT_PRIEST    	  30
 #define CT_HERBCOLL		 703
+#define CT_HERBCOLL2	1205
+#define CT_SHIVA_I		 664
 
 #define CT_RD_SKELE		  31
 #define CT_RD_GHOST		  32
@@ -61,6 +63,7 @@
 #define CT_DREADLING	 101
 #define CT_DREADKING	 109
 #define CT_SPIDER		 110
+#define CT_LIZEMPEROR	1200
 
 #define CT_STONEGOLEM	 723
 #define CT_SEASONSMOB	 724
@@ -72,6 +75,11 @@
 #define CT_GARGNEST		 735
 #define CT_XECKO		1007
 #define CT_ICENEST		1009
+#define CT_CULTIST		1023
+#define CT_THUGS		1060
+#define CT_LIZARDKIN	1101
+#define CT_BASALT		1255
+#define CT_TOWER		1260
 
 #define CT_GOLEMTRAP	  39
 #define CT_GARGTRAP		  40
@@ -149,16 +157,20 @@
 #define IT_AMBERANKH	 704
 #define IT_TURQUANKH	 705
 #define IT_GARNEANKH	 706
+#define IT_TRUEANKH		2388
 #define IT_BREATHAMMY	1275
-#define IT_AM_BLOODS	2105
-#define IT_AM_VERDANT	2106
-#define IT_AM_SEABREZ	2107
+#define IT_AM_BLOODS	21050
+#define IT_AM_VERDANT	21060
+#define IT_AM_SEABREZ	21070
 #define IT_AM_OBSIDI	2108
+#define IT_AM_TRUESUN	2295
+#define IT_AM_FALMOON	2296
+#define IT_AM_ECLIPSE	2297
 
 // Unique Belts
-#define IT_BL_SOLAR		   10005
-#define IT_BL_LUNAR		   10006
-#define IT_BL_ECLIPSE	   10007
+#define IT_BL_SOLAR		2395
+#define IT_BL_LUNAR		2396
+#define IT_BL_ECLIPSE	2397
 
 // Tarot Cards - used with WN_CHARM
 #define IT_CH_FOOL		1513
@@ -183,39 +195,49 @@
 #define IT_CH_SUN		1532
 #define IT_CH_JUDGE		1533
 #define IT_CH_WORLD		1534
-#define IT_CH_FOOL_R		20001
-#define IT_CH_MAGI_R	   	20002
-#define IT_CH_PREIST_R		20003
-#define IT_CH_EMPRES_R		20004
-#define IT_CH_EMPERO_R		20005
-#define IT_CH_HEIROP_R		20006
-#define IT_CH_LOVERS_R		20007
-#define IT_CH_CHARIO_R		20008
-#define IT_CH_STRENG_R		20009
-#define IT_CH_HERMIT_R		20010
-#define IT_CH_WHEEL_R		20011
-#define IT_CH_JUSTIC_R		20012
-#define IT_CH_HANGED_R		20013
-#define IT_CH_DEATH_R		20014
-#define IT_CH_TEMPER_R		20015
-#define IT_CH_DEVIL_R		20016
-#define IT_CH_TOWER_R		20017
-#define IT_CH_STAR_R		20018
-#define IT_CH_MOON_R		20019
-#define IT_CH_SUN_R			20020
-#define IT_CH_JUDGE_R		20021
-#define IT_CH_WORLD_R		20022
+#define IT_CH_FOOL_R	2231
+#define IT_CH_MAGI_R	2232
+#define IT_CH_PREIST_R	2233
+#define IT_CH_EMPRES_R	2234
+#define IT_CH_EMPERO_R	2235
+#define IT_CH_HEIROP_R	2236
+#define IT_CH_LOVERS_R	2237
+#define IT_CH_CHARIO_R	2238
+#define IT_CH_STRENG_R	2239
+#define IT_CH_HERMIT_R	2240
+#define IT_CH_WHEEL_R	2241
+#define IT_CH_JUSTIC_R	2242
+#define IT_CH_HANGED_R	2243
+#define IT_CH_DEATH_R	2244
+#define IT_CH_TEMPER_R	2245
+#define IT_CH_DEVIL_R	2246
+#define IT_CH_TOWER_R	2247
+#define IT_CH_STAR_R	2248
+#define IT_CH_MOON_R	2249
+#define IT_CH_SUN_R		2250
+#define IT_CH_JUDGE_R	2251
+#define IT_CH_WORLD_R	2252
 
 // TOWER items
 #define IT_TW_CROWN		 981
 #define IT_TW_CLOAK		 982
 #define IT_TW_DREAD		 983
-#define IT_TW_DOUSER		20023
-#define IT_TW_ROOTS		 984
+#define IT_TW_DOUSER	2394
+#define IT_TW_MARCH		 984
 #define IT_TW_BBELT		 985
 #define IT_TW_OUTSIDE	1197
 #define IT_TW_PROPHET	1201
 #define IT_TW_HEAVENS	1202
+//
+#define IT_TW_ACEDIA	2401
+#define IT_TW_IRA		2402
+#define IT_TW_INVIDIA	2403
+#define IT_TW_GULA		2404
+#define IT_TW_LUXURIA	2405
+#define IT_TW_AVARITIA	2406
+#define IT_TW_SUPERBIA	2407
+#define IT_TW_SINBIND	2400
+#define IT_TW_SINSPR	879
 
 // Special Glove items
 #define IT_GL_SERPENT	 707
@@ -230,22 +252,22 @@
 #define IT_BT_NATURES	 711
 
 // Unique weapons
-#define IT_WP_LIFESPRIG	  	3004
-#define IT_WP_BLOODLET	  	3005
-#define IT_WP_GEMCUTTER	  	3006
-#define IT_WP_STARLIGHT	  	3007
-#define IT_WP_KELPTRID	  	3008
-#define IT_WP_PHALLENX	  	3009
-#define IT_WP_LAMEDARG	  	3010
-#define IT_WP_WHITEODA	  	3011
-#define IT_WP_EXCALIBUR	  	3012
-#define IT_WP_FELLNIGHT	  	3013
-#define IT_WP_BLACKTAC	  	3014
-#define IT_WP_CRIMRIP	  	3015
-#define IT_WP_CRESSUN	  	3016
-#define IT_WP_GILDSHINE	  	3017
-#define IT_WP_BRONCHIT	  	3018
-#define IT_WP_VOLCANF	  	3019
+#define IT_WP_LIFESPRIG	  	30004
+#define IT_WP_BLOODLET	  	30005
+#define IT_WP_GEMCUTTER	  	30006
+#define IT_WP_STARLIGHT	  	30007
+#define IT_WP_KELPTRID	  	30008
+#define IT_WP_PHALLENX	  	30009
+#define IT_WP_LAMEDARG	  	30010
+#define IT_WP_WHITEODA	  	30011
+#define IT_WP_EXCALIBUR	  	30012
+#define IT_WP_FELLNIGHT	  	30013
+#define IT_WP_BLACKTAC	  	30014
+#define IT_WP_CRIMRIP	  	30015
+#define IT_WP_CRESSUN	  	30016
+#define IT_WP_GILDSHINE	  	30017
+#define IT_WP_BRONCHIT	  	30018
+#define IT_WP_VOLCANF	  	30019
 
 // -----
 
@@ -618,11 +640,13 @@
 #define BUF_SPR_CURSE		89
 #define BUF_SPR_SLOW		149
 #define BUF_SPR_POISON		178
+#define BUF_SPR_VENOM		178
 #define BUF_SPR_RECALL		90
 #define BUF_SPR_SHADOW		179
 #define BUF_SPR_REND		224
 #define BUF_SPR_WARCRY		325
 #define BUF_SPR_WARCRY2		91
+#define BUF_SPR_WARCRY3		822
 //
 #define BUF_SPR_BLEED		411
 #define BUF_SPR_REND2		329
@@ -647,7 +671,7 @@
 //
 #define BUF_SPR_POTION		619
 #define BUF_SPR_POME		790
-#define BUF_SPR_STARL		890
+#define BUF_SPR_STARL		895
 #define BUF_SPR_FROSTB		471
 
 // -----
@@ -683,3 +707,15 @@
 #define BS_CAN_3_4		594 + 285 * MAPX
 #define BS_CAN_3_5		602 + 285 * MAPX
 
+//
+
+#define EP_GOLEM1X		926
+#define EP_GOLEM1Y		399
+#define EP_GOLEM2X		930
+#define EP_GOLEM2Y		399
+#define EP_GOLEM3X		936
+#define EP_GOLEM3Y		410
+#define EP_GOLEM4X		936
+#define EP_GOLEM4Y		414
+
+//

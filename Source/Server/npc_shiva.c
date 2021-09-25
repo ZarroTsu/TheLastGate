@@ -51,14 +51,14 @@ int npc_shiva_see(int cn, int co)
 	{
 		idx = co | (char_id(co) << 16);
 
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			if (ch[cn].data[n]==idx)
 			{
 				ch[cn].attack_cn = co;
 				ch[cn].goto_x = 0; // cancel goto (patrol)
 				ch[cn].data[58] = 2;
-				return(1);
+				return 1;
 			}
 		}
 	}
@@ -68,7 +68,7 @@ int npc_shiva_see(int cn, int co)
 	{
 		for (n = 43; n<47; n++)
 		{
-			if (ch[cn].data[n] && ch[co].data[42]==ch[cn].data[n])
+			if (ch[cn].data[n] && ch[co].data[CHD_GROUP]==ch[cn].data[n])
 			{
 				break;
 			}
@@ -76,7 +76,7 @@ int npc_shiva_see(int cn, int co)
 			{
 				break;
 			}
-			if (IS_COMP_TEMP(co) && !ch[co].data[42]) // Give benefit of the doubt to new GC's
+			if (IS_COMP_TEMP(co) && !ch[co].data[CHD_GROUP]) // Give benefit of the doubt to new GC's
 			{
 				break;
 			}
@@ -97,7 +97,7 @@ int npc_shiva_see(int cn, int co)
 			{
 				npc_saytext_n(cn, 1, ch[co].name);
 				chlog(cn, "Added %s to kill list because he's not in my group", ch[co].name);
-				return(1);
+				return 1;
 			}
 			co = ccc;
 		}
@@ -126,7 +126,7 @@ int npc_shiva_gotattack(int cn, int co)
 	if (!do_char_can_see(cn, co))    // we have been attacked but cannot see the attacker
 	{
 		ch[cn].data[78] = globs->ticker + TICKS * 30;
-		return(1);
+		return 1;
 	}
 	
 	// fight back when attacked - all NPCs do this:
@@ -136,7 +136,7 @@ int npc_shiva_gotattack(int cn, int co)
 		chlog(cn, "Added %s to kill list for attacking me", ch[co].name);
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_shiva_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
@@ -215,7 +215,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	
 	// Stun everyone in the room except the final thrall.
 	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co) 
-		if (ch[cn].data[42]!=ch[co].data[42])
+		if (ch[cn].data[CHD_GROUP]!=ch[co].data[CHD_GROUP])
 	{
 		in = god_create_buff();
 		if (!in)
@@ -232,10 +232,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 		bu[in].sprite[1] = BUF_SPR_SLOW2;
 		bu[in].duration  = bu[in].active = TICKS * 4;
 		bu[in].power = power;
-		bu[in].speed[1] 		= -(min(120, 10 + SLOW2FORM(power)/2));
-		bu[in].move_speed[1] 	= -(min(120, 10 + SLOW2FORM(power)/2));
-		bu[in].atk_speed[1] 	= -(min(120, 10 + SLOW2FORM(power)/2));
-		bu[in].cast_speed[1] 	= -(min(120, 10 + SLOW2FORM(power)/2));
+		bu[in].speed[1] 		= -(min(300, 10 + SLOW2FORM(power)));
 		
 		do_char_log(co, 0, "You have been badly slowed.\n");
 		
@@ -268,7 +265,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	
 	ch[cn].data[5] = ch[cn].attack_cn;
 	
-	for (n = 80; n<92; n++) // remove enemy
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
 	{
 		ch[cn].data[n] = 0;
 	}
@@ -474,7 +471,7 @@ int npc_shiva_phasing(int cn)
 		remove_spells(cn);
 		fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].attack_cn = 0;
-		for (n = 80; n<92; n++) // remove enemy
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
 		{
 			ch[cn].data[n] = 0;
 		}
@@ -555,10 +552,26 @@ int npc_shiva_phasing(int cn)
 	}
 	if (timer<=globs->ticker && sub==10)
 	{
-		ch[cx].data[43] = ch[cx].data[42];
-		ch[cn].hp[0] = 10000;
-		do_sayx(cn, "Unhand me at once! ...Stay away from me! No! NO!!");
+		ch[cx].data[43] = ch[cx].data[CHD_GROUP];
+		//ch[cn].hp[0] = 10000;
+		do_sayx(cn, "Unhand me at once! ...Bah!");
+		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ch[cn].data[1] = globs->ticker + TICKS * 1;
 		ch[cn].data[3]++;
+	}
+	if (timer<=globs->ticker && sub==11)
+	{
+		do_sayx(cn, "I shall retreat for now! Kill this other fool instead why don't you!?");
+		// Wipe Shiva's gear so it isn't assumed he got out buck naked or something silly
+		ch[cn].worn[WN_HEAD]  = 0;
+		ch[cn].worn[WN_CLOAK] = 0;
+		ch[cn].worn[WN_BODY]  = 0;
+		ch[cn].worn[WN_ARMS]  = 0;
+		ch[cn].worn[WN_FEET]  = 0;
+		// "kill" Shiva
+		ch[cn].data[3]++;
+		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+		do_char_killed(0, cn, 0);
 	}
 }
 
@@ -638,7 +651,7 @@ int npc_shiva_high(int cn)
 	}
 	
 	// generic spell management
-	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && ch[cn].skill[SK_MEDIT][0] && ch[cn].data[6]==0)
+	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && ch[cn].data[6]==0)
 	{
 		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS)) return 1;
 		if (npc_try_spell(cn, cn, SK_PROTECT)) return 1;
@@ -711,7 +724,7 @@ int npc_shiva_high(int cn)
 			if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
 			if (co && npc_try_spell(cn, co, SK_SLOW)) return 1;
 			if (co && npc_try_spell(cn, co, SK_CURSE)) return 1;
-			if (co && npc_try_spell(cn, co, SK_PULSE)) return 1;
+			if (co && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, co, SK_PULSE)) return 1;
 			if (co && npc_try_spell(cn, co, SK_POISON)) return 1;
 			if (co && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
 			{
@@ -720,7 +733,7 @@ int npc_shiva_high(int cn)
 		}
 	}
 	
-	return(0);
+	return 0;
 }
 
 void npc_shiva_low(int cn)
@@ -755,7 +768,7 @@ void npc_shiva_low(int cn)
 		ch[cn].data[0]=0;
 		ch[cn].data[1]=0;
 		ch[cn].data[3]=0;
-		for (n = 80; n<92; n++) // remove enemy
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
 		{
 			ch[cn].data[n] = 0;
 		}

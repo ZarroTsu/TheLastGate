@@ -150,7 +150,7 @@ int god_create_buff(void)
 	{
 		xlog("god_create_buff (svr_god.c): MAXBUFF reached");
 		prof_stop(46, prof);
-		return(0);
+		return 0;
 	}
 
 	bu[n] = it_temp[1];
@@ -200,7 +200,7 @@ int god_create_item(int temp)
 
 	if (!IS_SANEITEMPLATE(temp))
 	{
-		return( 0);
+		return 0;
 	}
 
 	prof = prof_start();
@@ -209,7 +209,7 @@ int god_create_item(int temp)
 	{
 		xlog("god_create_item(): unused template.");
 		prof_stop(23, prof);
-		return(0);
+		return 0;
 	}
 
 	n = get_free_item();
@@ -217,7 +217,7 @@ int god_create_item(int temp)
 	{
 		xlog("god_create_item (svr_god.c): MAXITEM reached");
 		prof_stop(23, prof);
-		return(0);
+		return 0;
 	}
 
 	it[n] = it_temp[temp];
@@ -255,7 +255,7 @@ int god_create_char(int temp, int withitems)
 	if (n==MAXCHARS)
 	{
 		xlog("god_create_char (svr_god.c): MAXCHARS reached!");
-		return(0);
+		return 0;
 	}
 
 	ch[n] = ch_temp[temp];
@@ -285,15 +285,15 @@ int god_create_char(int temp, int withitems)
 	strcpy(ch[n].reference, ch[n].name);
 
 	sprintf(ch[n].description, "%s is a %s%s%s%s%s. %s%s%s looks somewhat nondescript.",
-	        ch[n].name,
-	        (ch[n].kindred & KIN_TEMPLAR) ? "Templar" : "",
-	        (ch[n].kindred & KIN_HARAKIM) ? "Harakim" : "",
-	        (ch[n].kindred & KIN_MERCENARY) ? "Mercenary" : "",
-	        (ch[n].kindred & KIN_SEYAN_DU) ? "Seyan'Du" : "",
-	        !(ch[n].kindred & (KIN_TEMPLAR | KIN_HARAKIM | KIN_MERCENARY | KIN_SEYAN_DU)) ? "Monster" : "",
-	        (ch[n].kindred & KIN_MALE) ? "He" : "",
-	        (ch[n].kindred & KIN_FEMALE) ? "She" : "",
-	        (ch[n].kindred & KIN_MONSTER) ? "It" : "");
+		ch[n].name,
+		IS_TEMPLAR(n) ? "Templar" : "",
+		IS_MERCENARY(n) ? "Mercenary" : "",
+		IS_HARAKIM(n) ? "Harakim" : "",
+		IS_SEYAN_DU(n) ? "Seyan'Du" : "",
+		!(IS_TEMPLAR(n) || IS_MERCENARY(n) || IS_HARAKIM(n) || IS_SEYAN_DU(n)) ? "Monster" : "",
+		IS_MALE(n) ? "He" : "",
+		IS_FEMALE(n) ? "She" : "",
+		IS_MONSTER(n) ? "It" : "");
 
 	for (m = 0; m<100; m++)
 	{
@@ -402,7 +402,7 @@ int god_create_char(int temp, int withitems)
 	{
 		god_destroy_items(n);
 		ch[n].used = USE_EMPTY;
-		return(0);
+		return 0;
 	}
 
 	ch[n].a_end  = 1000000;
@@ -421,7 +421,7 @@ int god_change_pass(int cn, int co, char *pass)
 	if (co<1 || co>=MAXCHARS)
 	{
 		do_char_log(cn, 0, "Character out of bounds.\n");
-		return(0);
+		return 0;
 	}
 	if (!pass || !*pass)
 	{
@@ -436,7 +436,7 @@ int god_change_pass(int cn, int co, char *pass)
 		chlog(cn, "Removed password");
 		ch[co].flags &= ~CF_PASSWD;
 		bzero(ch[co].passwd, sizeof(ch[co].passwd));
-		return(1);
+		return 1;
 	}
 	memcpy(ch[co].passwd, pass, 15);
 	ch[co].passwd[15] = 0;
@@ -459,7 +459,7 @@ int god_change_pass(int cn, int co, char *pass)
 
 	ch[co].flags |= CF_PASSWD;
 
-	return(1);
+	return 1;
 }
 
 int god_drop_item(int nr, int x, int y)
@@ -468,12 +468,12 @@ int god_drop_item(int nr, int x, int y)
 
 	if (!SANEXY(x, y))
 	{
-		return( 0);
+		return 0;
 	}
 	m = XY2M(x, y);
 	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & (MF_MOVEBLOCK | MF_DEATHTRAP)) || map[m].fsprite)
 	{
-		return( 0);
+		return 0;
 	}
 
 	map[m].it = nr;
@@ -497,7 +497,7 @@ int god_drop_item(int nr, int x, int y)
 		}
 	}
 
-	return(1);
+	return 1;
 }
 
 int god_remove_item(int cn, int nr)
@@ -507,7 +507,7 @@ int god_remove_item(int cn, int nr)
 	in = ch[cn].worn[nr];
 	if (!in)
 	{
-		return( 0);
+		return 0;
 	}
 
 	it[in].x = 0;
@@ -525,109 +525,109 @@ int god_drop_item_fuzzy(int nr, int x, int y)
 {
 	if (god_drop_item(nr, x, y))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(x, y, x + 1, y) && god_drop_item(nr, x + 1, y))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y) && god_drop_item(nr, x - 1, y))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x, y + 1) && god_drop_item(nr, x, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x, y - 1) && god_drop_item(nr, x, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(x, y, x + 1, y + 1) && god_drop_item(nr, x + 1, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 1, y - 1) && god_drop_item(nr, x + 1, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y + 1) && god_drop_item(nr, x - 1, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y - 1) && god_drop_item(nr, x - 1, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(x, y, x + 2, y - 2) && god_drop_item(nr, x + 2, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y - 1) && god_drop_item(nr, x + 2, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y + 0) && god_drop_item(nr, x + 2, y + 0))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y + 1) && god_drop_item(nr, x + 2, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y + 2) && god_drop_item(nr, x + 2, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y - 2) && god_drop_item(nr, x - 2, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y - 1) && god_drop_item(nr, x - 2, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y + 0) && god_drop_item(nr, x - 2, y + 0))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y + 1) && god_drop_item(nr, x - 2, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y + 2) && god_drop_item(nr, x - 2, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y + 2) && god_drop_item(nr, x - 1, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 0, y + 2) && god_drop_item(nr, x + 0, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 1, y + 2) && god_drop_item(nr, x + 1, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y - 2) && god_drop_item(nr, x - 1, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 0, y - 2) && god_drop_item(nr, x + 0, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 1, y - 2) && god_drop_item(nr, x + 1, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int god_drop_char(int cn, int x, int y)
@@ -636,14 +636,14 @@ int god_drop_char(int cn, int x, int y)
 
 	if (x<1 || x>MAPX - 2 || y<1 || y>MAPY - 2)
 	{
-		return( 0);
+		return 0;
 	}
 
 	m = x + y * MAPX;
 	if (map[m].ch || map[m].to_ch || ((in = map[m].it)!=0 && (it[in].flags & IF_MOVEBLOCK)) || (map[m].flags & MF_MOVEBLOCK) ||
 	    (map[m].flags & MF_TAVERN) || (map[m].flags & MF_DEATHTRAP))
 	{
-		return( 0);
+		return 0;
 	}
 
 	ch[cn].x = (unsigned short)x;
@@ -653,225 +653,225 @@ int god_drop_char(int cn, int x, int y)
 
 	plr_map_set(cn);
 
-	return(1);
+	return 1;
 }
 
 int god_drop_char_fuzzy(int nr, int x, int y)
 {
 	if (god_drop_char(nr, x, y))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(x, y, x + 1, y) && god_drop_char(nr, x + 1, y))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y) && god_drop_char(nr, x - 1, y))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x, y + 1) && god_drop_char(nr, x, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x, y - 1) && god_drop_char(nr, x, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(x, y, x + 1, y + 1) && god_drop_char(nr, x + 1, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 1, y - 1) && god_drop_char(nr, x + 1, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y + 1) && god_drop_char(nr, x - 1, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y - 1) && god_drop_char(nr, x - 1, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(x, y, x + 2, y - 2) && god_drop_char(nr, x + 2, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y - 1) && god_drop_char(nr, x + 2, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y + 0) && god_drop_char(nr, x + 2, y + 0))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y + 1) && god_drop_char(nr, x + 2, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 2, y + 2) && god_drop_char(nr, x + 2, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y - 2) && god_drop_char(nr, x - 2, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y - 1) && god_drop_char(nr, x - 2, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y + 0) && god_drop_char(nr, x - 2, y + 0))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y + 1) && god_drop_char(nr, x - 2, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 2, y + 2) && god_drop_char(nr, x - 2, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y + 2) && god_drop_char(nr, x - 1, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 0, y + 2) && god_drop_char(nr, x + 0, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 1, y + 2) && god_drop_char(nr, x + 1, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x - 1, y - 2) && god_drop_char(nr, x - 1, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 0, y - 2) && god_drop_char(nr, x + 0, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(x, y, x + 1, y - 2) && god_drop_char(nr, x + 1, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int god_drop_char_fuzzy_large(int nr, int x, int y, int xs, int ys)
 {
 	if (can_go(xs, ys, x, y) && god_drop_char(nr, x, y))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(xs, ys, x + 1, y) && god_drop_char(nr, x + 1, y))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 1, y) && god_drop_char(nr, x - 1, y))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x, y + 1) && god_drop_char(nr, x, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x, y - 1) && god_drop_char(nr, x, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(xs, ys, x + 1, y + 1) && god_drop_char(nr, x + 1, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 1, y - 1) && god_drop_char(nr, x + 1, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 1, y + 1) && god_drop_char(nr, x - 1, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 1, y - 1) && god_drop_char(nr, x - 1, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (can_go(xs, ys, x + 2, y - 2) && god_drop_char(nr, x + 2, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 2, y - 1) && god_drop_char(nr, x + 2, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 2, y + 0) && god_drop_char(nr, x + 2, y + 0))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 2, y + 1) && god_drop_char(nr, x + 2, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 2, y + 2) && god_drop_char(nr, x + 2, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 2, y - 2) && god_drop_char(nr, x - 2, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 2, y - 1) && god_drop_char(nr, x - 2, y - 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 2, y + 0) && god_drop_char(nr, x - 2, y + 0))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 2, y + 1) && god_drop_char(nr, x - 2, y + 1))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 2, y + 2) && god_drop_char(nr, x - 2, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 1, y + 2) && god_drop_char(nr, x - 1, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 0, y + 2) && god_drop_char(nr, x + 0, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 1, y + 2) && god_drop_char(nr, x + 1, y + 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x - 1, y - 2) && god_drop_char(nr, x - 1, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 0, y - 2) && god_drop_char(nr, x + 0, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 	if (can_go(xs, ys, x + 1, y - 2) && god_drop_char(nr, x + 1, y - 2))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int god_give_char(int in, int cn)
@@ -880,7 +880,7 @@ int god_give_char(int in, int cn)
 
 	if (!IS_SANEITEM(in) || !IS_LIVINGCHAR(cn))
 	{
-		return( 0);
+		return 0;
 	}
 	if (IS_PLAYER(cn)) for (n = 0; n<40; n++)
 	{
@@ -914,7 +914,7 @@ int god_give_char(int in, int cn)
 				it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
 			}
 			do_update_char(cn);
-			return(1);
+			return 1;
 		}
 	}
 	for (n = 0; n<40; n++)
@@ -927,7 +927,7 @@ int god_give_char(int in, int cn)
 	}
 	if (n==40)
 	{
-		return( 0);
+		return 0;
 	}
 
 	ch[cn].item[n] = in;
@@ -937,7 +937,7 @@ int god_give_char(int in, int cn)
 	it[in].carried = cn;
 
 	do_update_char(cn);
-	return(1);
+	return 1;
 }
 
 int god_take_from_char(int in, int cn)
@@ -986,7 +986,7 @@ int god_take_from_char(int in, int cn)
 				}
 				if (n==12)
 				{
-					return( 0);
+					return 0;
 				}
 				ch[cn].alt_worn[n] = 0;
 			}
@@ -999,7 +999,7 @@ int god_take_from_char(int in, int cn)
 
 	do_update_char(cn);
 
-	return(1);
+	return 1;
 }
 
 int god_transfer_char(int cn, int x, int y)
@@ -1008,11 +1008,11 @@ int god_transfer_char(int cn, int x, int y)
 	
 	if (!IS_SANECHAR(cn) || !SANEXY(x, y))
 	{
-		return( 0);
+		return 0;
 	}
 	
-	gc = ch[cn].data[CHD_COMPANION];
-	sc = ch[cn].data[CHD_SHADOWCOPY];
+	gc = ch[cn].data[PCD_COMPANION];
+	sc = ch[cn].data[PCD_SHADOWCOPY];
 	
 	ch[cn].status = 0;
 	ch[cn].attack_cn = 0;
@@ -1031,15 +1031,15 @@ int god_transfer_char(int cn, int x, int y)
 	{
 		if (ch[cn].flags & CF_GCTOME)
 		{
-			if (IS_SANECHAR(gc) && ch[gc].data[63]==cn) god_transfer_char(gc, x, y);
-			if (IS_SANECHAR(sc) && ch[sc].data[63]==cn) god_transfer_char(sc, x, y);
+			if (IS_SANECHAR(gc) && ch[gc].data[CHD_MASTER]==cn) god_transfer_char(gc, x, y);
+			if (IS_SANECHAR(sc) && ch[sc].data[CHD_MASTER]==cn) god_transfer_char(sc, x, y);
 		}
 		return 1;
 	}
 	
 	plr_map_set(cn);
 	
-	return(0);
+	return 0;
 }
 
 /* CS, 991128: GOTO n|e|s|w <nnn> */
@@ -1112,7 +1112,7 @@ void god_goto(int cn, int co, char *cx, char *cy)
 			return;
 		}
 	}
-	do_char_log(cn, 0, "GOTO failed. Dykstra was right (Elrac will explain this comment if you ask nicely).\n");
+	do_char_log(cn, 0, "GOTO failed. Solid object there.\n");
 	return;
 }
 
@@ -1200,18 +1200,18 @@ void god_info(int cn, int co)
 	            ch[co].speed,
 	            ch[co].gold / 100, ch[co].gold % 100,
 	            ch[co].data[13] / 100, ch[co].data[13] % 100);
-	if (IS_PLAYER(co) && IS_PURPLE(co) && ch[co].data[CHD_ATTACKTIME])
+	if (IS_PLAYER(co) && IS_PURPLE(co) && ch[co].data[PCD_ATTACKTIME])
 	{
-		if (IS_IMP(cn) && IS_SANEPLAYER(ch[co].data[CHD_ATTACKVICT]))
+		if (IS_IMP(cn) && IS_SANEPLAYER(ch[co].data[PCD_ATTACKVICT]))
 		{
 			do_char_log(cn, 0, "Last PvP attack: %s, against %s.\n",
-			            ago_string(globs->ticker - ch[co].data[CHD_ATTACKTIME]),
-			            ch[ch[co].data[CHD_ATTACKVICT]].name);
+			            ago_string(globs->ticker - ch[co].data[PCD_ATTACKTIME]),
+			            ch[ch[co].data[PCD_ATTACKVICT]].name);
 		}
 		else
 		{
 			do_char_log(cn, 0, "Last PvP attack: %s.\n",
-			            ago_string(globs->ticker - ch[co].data[CHD_ATTACKTIME]));
+			            ago_string(globs->ticker - ch[co].data[PCD_ATTACKTIME]));
 		}
 	}
 	if (IS_IMP(cn) || IS_USURP(cn))
@@ -1228,7 +1228,7 @@ void god_info(int cn, int co)
 			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
 			            ch[co].data[5], ch[co].data[6], ch[co].data[7], ch[co].data[8], ch[co].data[9]);
 		do_char_log(cn, 3, "Armor=%d, Weapon=%d. Alignment=%d.\n", ch[co].armor, ch[co].weapon, ch[co].alignment);
-		do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[42], group_active(co), ch[co].data[92], ch[co].data[96]);
+		do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[CHD_GROUP], group_active(co), ch[co].data[92], ch[co].data[96]);
 		do_char_log(cn, 3, "Luck=%d, Gethit_Dam=%d.\n", ch[co].luck, ch[co].gethit_dam);
 		do_char_log(cn, 3, "Current Online Time: %dd %dh %dm %ds, Total Online Time: %dd %dh %dm %ds.\n",
 		            ch[co].current_online_time / (TICKS * 60 * 60 * 24),
@@ -1417,7 +1417,7 @@ void god_who(int cn)
 		{
 			showarea = 0;
 		}
-		if ((ch[n].kindred & KIN_PURPLE) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
+		if (IS_PURPLE(n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
 		{
 			showarea = 0;
 		}
@@ -1437,7 +1437,7 @@ void god_who(int cn)
 		{
 			continue;
 		}
-		if (ch[n].data[63] != cn)
+		if (ch[n].data[CHD_MASTER] != cn)
 		{
 			continue;
 		}
@@ -1481,7 +1481,7 @@ void god_implist(int cn)
 		{
 			showarea = 0;
 		}
-		if ((ch[n].kindred & KIN_PURPLE) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
+		if (IS_PURPLE(n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
 		{
 			showarea = 0;
 		}
@@ -1525,7 +1525,7 @@ void user_who(int cn)
 		{
 			showarea = 0;
 		}
-		if ((ch[n].kindred & KIN_PURPLE) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
+		if (IS_PURPLE(n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
 		{
 			showarea = 0;
 		}
@@ -1538,7 +1538,7 @@ void user_who(int cn)
 		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));
 	}
-	if ((gc = ch[cn].data[CHD_COMPANION]) && IS_SANECHAR(gc))
+	if ((gc = ch[cn].data[PCD_COMPANION]) && IS_SANECHAR(gc))
 	{
 		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
 		            gc, ch[gc].name,
@@ -1580,9 +1580,10 @@ void god_top(int cn)
 	}
 }
 
-void god_create(int cn, int x)
+void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 {
-	int in;
+	int in, bonus = 1;
+	char *gend, *godn, name[60], refer[60], descr[220];
 
 	if (x == 0)
 	{
@@ -1599,7 +1600,121 @@ void god_create(int cn, int x)
 		do_char_log(cn, 0, "item is not take-able.\n");
 		return;
 	}
-	in = god_create_item(x);
+	if (!gen_a)
+	{
+		in = god_create_item(x);
+	}
+	else
+	{
+		if (it_temp[x].flags & IF_STACKABLE)
+		{
+			in = god_create_item(x);
+			
+			if (gen_a > 10) gen_a = 10;
+			if (gen_a < 1) gen_a = 1;
+			it[in].stack = gen_a;
+			it[in].value = it[in].value * it[in].stack;
+		}
+		else if (gen_a > 100 && is_unique_able(x))
+		{
+			gen_a -= 100;
+			in = god_create_item(x); 			// create the item
+			if (in)								// assure the item is created
+			{
+				if (it[in].placement & PL_TWOHAND)
+				{
+					bonus = 2;
+				}
+				
+				switch (gen_a)
+				{
+					case 1:
+						gend = " god ";
+						godn = "Skua";
+						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
+						it[in].speed[0]      +=  8 * bonus;
+						break;
+					case 2:
+						gend = " goddess ";
+						godn = "Kwai";
+						it[in].flags |= IF_KWAI_UNI;
+						it[in].to_hit[0]     +=  4 * bonus;
+						it[in].to_parry[0]   +=  4 * bonus;
+						break;
+					case 3:
+						gend = " god ";
+						godn = "Gorn";
+						it[in].flags |= IF_GORN_UNI;
+						it[in].spell_mod[0]  +=  2 * bonus;
+						break;
+					default:
+						gend = " ";
+						godn = "Purple One";
+						it[in].flags |= IF_PURP_UNI;
+						it[in].top_damage[0] += 20 * bonus;
+						break;
+				}
+				
+				if (it[in].flags & IF_OF_SHIELD)
+				{
+					it[in].armor[0]  += 4 * bonus;
+					//it[in].max_damage = 5000 * it[in].armor[0]/2;
+				}
+				else
+				{
+					it[in].weapon[0] += 4 * bonus;
+					//it[in].max_damage = 5000 * it[in].weapon[0]/2;
+				}
+				it[in].orig_temp = it[in].temp;
+				it[in].temp = 0;
+				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
+				strcpy(name, it[in].name);
+				strcpy(refer, it[in].reference);
+				strcpy(descr, it[in].description);
+				sprintf(it[in].name, "%s's %s", godn, name);
+				sprintf(it[in].reference, "%s's %s", godn, refer);
+				sprintf(it[in].description, "%s It has been blessed by the%s%s.", descr, gend, godn);
+				
+				if (is_unique_able(x) > 54) // Claws
+				{
+					if (gen_a==1)
+						it[in].sprite[0] = 3715 + is_unique_able(x)-55;
+					else if (gen_a==2)
+						it[in].sprite[0] = 3721 + is_unique_able(x)-55;
+					else if (gen_a==3)
+						it[in].sprite[0] = 3727 + is_unique_able(x)-55;
+					else
+						it[in].sprite[0] = 4944 + is_unique_able(x)-55;
+				}
+				else if (is_unique_able(x) > 45)
+				{
+					if (gen_a==1)
+						it[in].sprite[0] = 2602 + is_unique_able(x)-46;
+					else if (gen_a==2)
+						it[in].sprite[0] = 2611 + is_unique_able(x)-46;
+					else if (gen_a==3)
+						it[in].sprite[0] = 2620 + is_unique_able(x)-46;
+					else
+						it[in].sprite[0] = 4935 + is_unique_able(x)-46;
+				}
+				else
+				{
+					if (gen_a==1)
+						it[in].sprite[0] =  730 + is_unique_able(x)-1;
+					else if (gen_a==2)
+						it[in].sprite[0] = 2512 + is_unique_able(x)-1;
+					else if (gen_a==3)
+						it[in].sprite[0] = 2557 + is_unique_able(x)-1;
+					else
+						it[in].sprite[0] = 4890 + is_unique_able(x)-1;
+				}
+			}
+		}
+		else
+		{
+			in = get_special_item(x, gen_a, gen_b, gen_c);
+		}
+	}
 	if (in==0)
 	{
 		do_char_log(cn, 0, "god_create_item() failed.\n");
@@ -1649,6 +1764,27 @@ void god_reset_player(int cn, int co)
 	
 	do_char_log(cn, 1, "Now resetting player %s (%d)\n", ch[co].name, co);
 	god_racechange(co, ch[co].temp, 1);
+	do_char_log(cn, 0, "Done.\n");
+	return;
+}
+
+void god_reset_players(int cn)
+{
+	int n;
+	do_char_log(cn, 1, "Now resetting all players...\n");
+	for (n=1;n<MAXCHARS;n++)
+	{
+		if (ch[n].used==USE_EMPTY)
+		{
+			continue;
+		}
+		if (!IS_SANEPLAYER(n))
+		{
+			continue;
+		}
+		
+		god_racechange(n, ch[n].temp, 1);
+	}
 	do_char_log(cn, 0, "Done.\n");
 	return;
 }
@@ -1738,21 +1874,21 @@ int find_next_char(int startcn, char *spec1, char *spec2)
 			}
 		}
 	}
-	return(0);
+	return 0;
 }
 
 int invis(int looker, int target)
 {
 	if (!(ch[target].flags & CF_INVISIBLE))
 	{
-		return( 0);
+		return 0;
 	}
 	if (invis_level(looker)>=invis_level(target))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 
@@ -1968,27 +2104,27 @@ void god_mirror(int cn, char *spec1, char *spec2)
 	ch[cc].sprite = ch[co].sprite;
 	for (i = 0; i<5; i++)
 	{
-		ch[cc].attrib[i][0] = ch[co].attrib[i][0];
+		B_AT(cc, i) = B_AT(co, i);
 	}
 	ch[cc].hp[0]   = ch[co].hp[0];
 	ch[cc].end[0]  = ch[co].end[0];
 	ch[cc].mana[0] = ch[co].mana[0];
 	for (i = 1; i<35; i++)
 	{
-		ch[cc].skill[i][0] = ch[co].skill[i][0];
+		B_SK(cc, i) = B_SK(co, i);
 	}
 
 	if      (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_SEYAN_DU))         // TH -> hand2hand (str,str,agi)
 	{
-		ch[co].skill[0][0] = ch[co].skill[6][0] + bonus + (ch[co].attrib[4][0] - ch[co].attrib[0][0]) / 5;
+		B_SK(co, 0) = B_SK(co, 6) + bonus + (B_AT(co, 4) - B_AT(co, 0)) / 5;
 	}
 	else if (ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM ))                       // Dag-> hand2hand (wil,agi,int)
 	{
-		ch[co].skill[0][0] = ch[co].skill[2][0] + bonus + (ch[co].attrib[2][0] - ch[co].attrib[4][0]) / 5;
+		B_SK(co, 0) = B_SK(co, 2) + bonus + (B_AT(co, 2) - B_AT(co, 4)) / 5;
 	}
 	else if (ch[co].kindred & (KIN_MERCENARY | KIN_SORCERER | KIN_WARRIOR ))          // Swo-> hand2hand (wil,agi,str)
 	{
-		ch[co].skill[0][0] = ch[co].skill[3][0] + bonus;
+		B_SK(co, 0) = B_SK(co, 3) + bonus;
 	}
 
 	ch[co].weapon = ch[cn].weapon;
@@ -2009,14 +2145,14 @@ void god_mirror(int cn, char *spec1, char *spec2)
 }
 
 
-int god_thrall(int cn, char *spec1, char *spec2)
+int god_thrall(int cn, char *spec1, char *spec2, int offset)
 {
 	int co, ct, x, y, n, in;
 
 	if (!*spec1)            // no arguments
 	{
 		do_char_log(cn, 0, "enthrall whom?\n");
-		return(0);
+		return 0;
 	}
 	if (!*spec2)            // only one arg
 	{
@@ -2024,18 +2160,18 @@ int god_thrall(int cn, char *spec1, char *spec2)
 		if (!IS_SANEUSEDCHAR(co))       // bad character number
 		{
 			do_char_log(cn, 0, "No such character.\n");
-			return( 0);
+			return 0;
 		}
 		if (ch[co].flags & CF_BODY)     // dead character
 		{
 			do_char_log(cn, 0, "Character recently deceased; try %d.\n",
 			            ch[co].data[CHD_CORPSEOWNER]);
-			return( 0);
+			return 0;
 		}
 		if (co == cn)                   // self
 		{
 			do_char_log(cn, 0, "You can't enthrall yourself!\n");
-			return(0);
+			return 0;
 		}
 	}
 	else                    // at least 2 args
@@ -2046,7 +2182,7 @@ int god_thrall(int cn, char *spec1, char *spec2)
 			if (atoi(spec2) < 0 || atoi(spec2) >= RANKS)
 			{
 				do_char_log(cn, 0, "No such rank: %s\n", spec2);
-				return(0);
+				return 0;
 			}
 		}
 		else
@@ -2081,7 +2217,7 @@ int god_thrall(int cn, char *spec1, char *spec2)
 			{
 				do_char_log(cn, 0, "Couldn't find a %s %s.\n", spec1, rank_name[atoi(spec2)]);
 			}
-			return(0);
+			return 0;
 		}
 	}
 
@@ -2089,14 +2225,14 @@ int god_thrall(int cn, char *spec1, char *spec2)
 	{
 		do_char_log(cn, 0, "%s is a player, and you can't enthrall players!\n",
 		            ch[co].name);
-		return(0);
+		return 0;
 	}
 
 	if (IS_COMPANION(co))
 	{
 		do_char_log(cn, 0, "%s is a companion/thrall, and you can't enthrall them!\n",
 		            ch[co].name);
-		return(0);
+		return 0;
 	}
 
 	x = ch[cn].x;
@@ -2105,39 +2241,39 @@ int god_thrall(int cn, char *spec1, char *spec2)
 	switch (ch[cn].dir)
 	{
 	case DX_RIGHT:
-		x++;
+		x++; x+=offset;
 		break;
 	case DX_RIGHTUP:
-		x++;
-		y--;
+		x++; x+=offset;
+		y--; y-=offset;
 		break;
 	case DX_UP:
-		y--;
+		y--; y-=offset;
 		break;
 	case DX_LEFTUP:
-		x--;
-		y--;
+		x--; x-=offset;
+		y--; y-=offset;
 		break;
 	case DX_LEFT:
-		x--;
+		x--; x-=offset;
 		break;
 	case DX_LEFTDOWN:
-		x--;
-		y++;
+		x--; x-=offset;
+		y++; y+=offset;
 		break;
 	case DX_DOWN:
-		y++;
+		y++; y+=offset;
 		break;
 	case DX_RIGHTDOWN:
-		y++;
-		x++;
+		y++; y+=offset;
+		x++; x+=offset;
 		break;
 	}
 
 	if (!(ct = god_create_char(ch[co].temp, 1)))
 	{
 		do_char_log(cn, 0, "god_create_char() failed.\n");
-		return(0);
+		return -1;
 	}
 
 	strcpy(ch[ct].name, ch[co].name);
@@ -2147,7 +2283,7 @@ int god_thrall(int cn, char *spec1, char *spec2)
 	/* tricky: make thrall act like a ghost companion */
 	ch[ct].temp = CT_COMPANION;
 	ch[ct].data[64] = globs->ticker + 7 * 24 * 3600 * TICKS; // die in one week if not otherwise
-	ch[ct].data[42] = 65536 + cn;                       // set group
+	ch[ct].data[CHD_GROUP] = 65536 + cn;                       // set group
 	ch[ct].data[59] = 65536 + cn;                       // protect all other members of this group
 
 	/* make thrall harmless */
@@ -2155,7 +2291,7 @@ int god_thrall(int cn, char *spec1, char *spec2)
 	ch[ct].data[36] = 0;    // no walking around
 	ch[ct].data[43] = 0;    // don't attack anyone
 	ch[ct].data[80] = 0;    // no enemies
-	ch[ct].data[63] = cn;   // obey and protect enthraller
+	ch[ct].data[CHD_MASTER] = cn;   // obey and protect enthraller
 
 	ch[ct].flags |= CF_SHUTUP | CF_THRALL;
 
@@ -2197,11 +2333,47 @@ int god_thrall(int cn, char *spec1, char *spec2)
 		do_char_log(cn, 0, "god_drop_char_fuzzy() called from god_thrall() failed.\n");
 		god_destroy_items(ct);
 		ch[ct].used = USE_EMPTY;
-		return(0);
+		return -1;
 	}
-	do_char_log(cn, 1, "%s was enthralled.\n", ch[co].name);
-	chlog(cn, "IMP: enthralled %s.", ch[co].name);
-	return(ct);
+	if (!offset)
+	{
+		do_char_log(cn, 1, "%s was enthralled.\n", ch[co].name);
+		chlog(cn, "IMP: enthralled %s.", ch[co].name);
+	}
+	return ct;
+}
+
+int god_army(int cn, int nmbr, char *spec1, char *spec2)
+{
+	int n, gt=0, offset=0;
+	
+	if (nmbr < 1)
+	{
+		do_char_log(cn, 0, "...How many?\n");
+		return 0;
+	}
+	if (nmbr > 25)
+	{
+		do_char_log(cn, 0, "That might be TOO many...\n");
+		return 0;
+	}
+	
+	if (nmbr > 1) offset++;
+	if (nmbr > 9) offset++;
+	
+	for (n=0;n<nmbr;n++)
+	{
+		if (god_thrall(cn, spec1, spec2, offset))
+			gt++;
+		else 
+			return 0;
+	}
+	
+	if (gt)
+	{
+		do_char_log(cn, 1, "Enthralled %d of those.\n", gt);
+		chlog(cn, "IMP: enthralled %d monsters.", gt);
+	}
 }
 
 
@@ -2227,20 +2399,20 @@ int god_build_start(int cn)
 {
 	int co, n, in;
 
-	if ((co = ch[cn].data[CHD_COMPANION]))
+	if ((co = ch[cn].data[PCD_COMPANION]))
 	{
 		do_char_log(cn, 0, "Get rid of %s first.\n",
 		            ch[co].name);
-		return(0);
+		return 0;
 	}
 	/* Create char to hold inventory */
 	co = god_create_char(1, 0);
 	if (!co)
 	{
 		do_char_log(cn, 0, "Could not create item holder for you.\n");
-		return(0);
+		return 0;
 	}
-	ch[cn].data[CHD_COMPANION] = co;
+	ch[cn].data[PCD_COMPANION] = co;
 
 	/* Transfer inventory */
 	for (n = 0; n<40; n++)
@@ -2264,7 +2436,7 @@ int god_build_start(int cn)
 	ch[cn].flags |= CF_BUILDMODE;
 	do_update_char(cn);
 
-	return(1);
+	return 1;
 }
 
 void god_build_stop(int cn)
@@ -2285,7 +2457,7 @@ void god_build_stop(int cn)
 	do_char_log(cn, 3, "Now out of build mode.\n");
 
 	/* Retrieve inventory from item holder */
-	co = ch[cn].data[CHD_COMPANION];
+	co = ch[cn].data[PCD_COMPANION];
 	if (!co)
 	{
 		do_char_log(cn, 0, "Could not find your item holder!\n");
@@ -2309,7 +2481,7 @@ void god_build_stop(int cn)
 	/* Destroy item holder */
 	plr_map_remove(co);
 	ch[co].used = USE_EMPTY;
-	ch[cn].data[CHD_COMPANION] = 0;
+	ch[cn].data[PCD_COMPANION] = 0;
 
 	do_update_char(cn);
 }
@@ -2373,6 +2545,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 528;
 		ch[cn].item[m++] = 0x20000000 | 529;
 		ch[cn].item[m++] = 0x20000000 | 530;
+		//
 		ch[cn].item[m++] = 0x20000000 | 531;
 		ch[cn].item[m++] = 0x20000000 | 532;
 		ch[cn].item[m++] = 0x20000000 | 533;
@@ -2384,6 +2557,18 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 539;
 		ch[cn].item[m++] = 0x20000000 | 540;
 		ch[cn].item[m++] = 0x20000000 | 541;
+		//
+		ch[cn].item[m++] = 0x20000000 | 5034;
+		ch[cn].item[m++] = 0x20000000 | 5035;
+		ch[cn].item[m++] = 0x20000000 | 5036;
+		ch[cn].item[m++] = 0x20000000 | 5037;
+		ch[cn].item[m++] = 0x20000000 | 5038;
+		ch[cn].item[m++] = 0x20000000 | 5039;
+		ch[cn].item[m++] = 0x20000000 | 5040;
+		ch[cn].item[m++] = 0x20000000 | 5041;
+		ch[cn].item[m++] = 0x20000000 | 5042;
+		ch[cn].item[m++] = 0x20000000 | 5043;
+		ch[cn].item[m++] = 0x20000000 | 5044;
 		break;
 	case 2:
 		ch[cn].item[m++] = 0x20000000 | 542;
@@ -2510,7 +2695,8 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 1690;				// ** Deco
 		ch[cn].item[m++] = 1691;				// ** Deco
 		break;	
-	case 16:	// Snowy
+	case 16:	// Snowy & Emerald
+		ch[cn].item[m++] = 0x20000000 | 808;	// Grey Stone Floor
 		ch[cn].item[m++] = 0x20000000 | 2822;	// Dark Sand
 		ch[cn].item[m++] = 0x20000000 | 2823;	// Snow 1
 		ch[cn].item[m++] = 0x20000000 | 2827;	// Snow 2
@@ -2520,6 +2706,17 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 1693;				// ** Deco
 		ch[cn].item[m++] = 1694;				// ** Deco
 		ch[cn].item[m++] = 1688;				// ** Tree
+		ch[cn].item[m++] = 0x20000000 | 5047;	// Emerald Brick Floor
+		ch[cn].item[m++] = 0x20000000 | 2658;	// Emerald Cave Floor
+		ch[cn].item[m++] = 2208;				// ** 
+		ch[cn].item[m++] = 2209;				// ** 
+		ch[cn].item[m++] = 2210;				// ** 
+		ch[cn].item[m++] = 2211;				// ** 
+		ch[cn].item[m++] = 2212;				// ** 
+		ch[cn].item[m++] = 2213;				// ** 
+		ch[cn].item[m++] = 2214;				// ** 
+		ch[cn].item[m++] = 2215;				// ** 
+		ch[cn].item[m++] = 2216;				// ** 
 		break;	
 	case 17:	// Canyon
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
@@ -2583,6 +2780,40 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 1810;				// ** Edge piece
 		ch[cn].item[m++] = 1811;				// ** Edge piece
 		ch[cn].item[m++] = 1812;				// ** Edge piece
+		break;
+	case 19:	// Tower
+		ch[cn].item[m++] = 3;					// ** Marble
+		ch[cn].item[m++] = 8;					// ** Marble Window
+		ch[cn].item[m++] = 9;					// ** Marble Window
+		ch[cn].item[m++] = 2408;				// ** Marble Window
+		ch[cn].item[m++] = 2409;				// ** Marble Window
+		ch[cn].item[m++] = 0x20000000 | 5524;
+		ch[cn].item[m++] = 0x20000000 | 5525;
+		ch[cn].item[m++] = 0x20000000 | 5526;
+		ch[cn].item[m++] = 0x20000000 | 5527;
+		ch[cn].item[m++] = 0x20000000 | 5528;
+		ch[cn].item[m++] = 0x20000000 | 5529;
+		ch[cn].item[m++] = 0x20000000 | 5530;
+		ch[cn].item[m++] = 0x20000000 | 5531;
+		ch[cn].item[m++] = 0x20000000 | 5532;
+		ch[cn].item[m++] = 0x20000000 | 5533;
+		ch[cn].item[m++] = 0x20000000 | 5534;
+		ch[cn].item[m++] = 0x20000000 | 5535;
+		ch[cn].item[m++] = 0x20000000 | 5536;
+		ch[cn].item[m++] = 0x20000000 | 5537;
+		ch[cn].item[m++] = 0x20000000 | 5538;
+		ch[cn].item[m++] = 0x20000000 | 5539;
+		ch[cn].item[m++] = 0x20000000 | 5540;
+		ch[cn].item[m++] = 0x20000000 | 5541;
+		ch[cn].item[m++] = 0x20000000 | 5542;
+		ch[cn].item[m++] = 0x20000000 | 5543;
+		ch[cn].item[m++] = 0x20000000 | 5544;
+		ch[cn].item[m++] = 0x20000000 | 5545;
+		ch[cn].item[m++] = 0x20000000 | 5546;
+		ch[cn].item[m++] = 0x20000000 | 5547;
+		ch[cn].item[m++] = 0x20000000 | 5548;
+		ch[cn].item[m++] = 0x20000000 | 5549;
+		ch[cn].item[m++] = 0x20000000 | 5585;
 		break;
 	case 20:	// New Brick Walls
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
@@ -2928,7 +3159,7 @@ void god_build(int cn, int x)
 	}
 }
 
-void god_raise_char(int cn, int co, int v)
+void god_raise_char(int cn, int co, int v, int bsp)
 {
 	if (co == 0)
 	{
@@ -2945,14 +3176,26 @@ void god_raise_char(int cn, int co, int v)
 		do_char_log(cn, 0, "Raising by a negative amount??\n");
 		return;
 	}
-	ch[co].points += v;
-	ch[co].points_tot += v;
+	
+	if (bsp)
+	{
+		ch[co].bs_points += v;
 
-	do_char_log(cn, 1, "Raised %s by %d.\n", ch[co].name, v);
-	chlog(cn, "IMP: Raised %s by %d.", ch[co].name, v);
-	do_char_log(co, 0, "You have been rewarded by the gods. You received %d experience points.\n", v);
+		do_char_log(cn, 1, "Awarded %s %d Stronghold Points.\n", ch[co].name, v);
+		chlog(cn, "IMP: Awarded %s %d Stronghold Points.", ch[co].name, v);
+		do_char_log(co, 0, "You have been rewarded by the gods. You received %d black stronghold points.\n", v);
+	}
+	else
+	{
+		ch[co].points += v;
+		ch[co].points_tot += v;
 
-	do_check_new_level(co);
+		do_char_log(cn, 1, "Raised %s by %d.\n", ch[co].name, v);
+		chlog(cn, "IMP: Raised %s by %d.", ch[co].name, v);
+		do_char_log(co, 0, "You have been rewarded by the gods. You received %d experience points.\n", v);
+
+		do_check_new_level(co);
+	}
 }
 
 void god_lower_char(int cn, int co, int v)
@@ -3105,17 +3348,17 @@ void god_skill(int cn, int co, int n, int val)
 		do_char_log(cn, 0, "Character %d is not in the game!\n", co);
 		return;
 	}
-	else if (!SANESKILL(n))
+	else if (!IS_SANESKILL(n))
 	{
 		do_char_log(cn, 0, "Skill number %d out of range.\n", n);
 		return;
 	}
-	else if (val<0 || val>199)
+	else if (val<0 || val>250)
 	{
 		do_char_log(cn, 0, "Skill amount %d out of range.\n", val);
 		return;
 	}
-	ch[co].skill[n][0] = val;
+	B_SK(co, n) = val;
 	do_update_char(co);
 
 	do_char_log(cn, 1, "Set %s of %s to %d.\n", skilltab[n].name, ch[co].name, val);
@@ -3286,7 +3529,7 @@ void god_set_flag(int cn, int co, unsigned long long flag)
 
 	if (flag==CF_STAFF && ch[co].temple_x!=HOME_START_X)
 	{
-		if (ch[co].kindred & KIN_PURPLE)
+		if (IS_PURPLE(co))
 		{
 			ch[co].temple_x = ch[co].tavern_x = HOME_PURPLE_X;
 			ch[co].temple_y = ch[co].tavern_y = HOME_PURPLE_Y;
@@ -3324,6 +3567,9 @@ void god_set_gflag(int cn, int flag)
 	case    GF_SPEEDY:
 		ptr = "speedy";
 		break;
+	case    GF_NEWBS:
+		ptr = "newbs";
+		break;
 
 	default:
 		ptr = "unknown";
@@ -3353,8 +3599,8 @@ void god_set_purple(int cn, int co)
 	/* CS, 000209: Reset last kill time and victim */
 	if (!IS_PURPLE(co))
 	{
-		ch[co].data[CHD_ATTACKTIME] = 0;
-		ch[co].data[CHD_ATTACKVICT] = 0;
+		ch[co].data[PCD_ATTACKTIME] = 0;
+		ch[co].data[PCD_ATTACKVICT] = 0;
 		ch[co].temple_x = HOME_TEMPLE_X;
 		ch[co].temple_y = HOME_TEMPLE_Y;
 	}
@@ -3452,7 +3698,14 @@ void god_racechange(int co, int temp, int keepstuff)
 	if (!keepstuff)
 	{
 		dpt = ch[co];
+		
+		for (n = 0; n<62; n++)
+		{
+			ch[co].depot[n] = 0;
+		}
+		
 		god_destroy_items(co);
+		
 		for (n = 0; n<62; n++)
 		{
 			ch[co].depot[n] = dpt.depot[n];
@@ -3492,11 +3745,7 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].comp_volume = old.comp_volume;
 	ch[co].raw_volume  = old.raw_volume;
 	ch[co].idle = old.idle;
-
-	ch[co].a_end  = 1000000;
-	ch[co].a_hp   = 1000000;
-	ch[co].a_mana = 1000000;
-
+	
 	ch[co].x = old.x;
 	ch[co].y = old.y;
 	ch[co].tox = old.tox;
@@ -3527,17 +3776,17 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].points     = exp;
 		rank = points2rank(exp);
 		
-		if (ch[co].kindred & (KIN_MERCENARY | KIN_SORCERER | KIN_WARRIOR | KIN_SEYAN_DU))
+		if (IS_ANY_MERC(co) || IS_SEYAN_DU(co))
 		{
 			hp   = 10;
 			mana = 10;
 		}
-		else if (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+		else if (IS_ANY_TEMP(co))
 		{
 			hp   = 15;
 			mana = 5;
 		}
-		else if (ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
+		else if (IS_ANY_HARA(co))
 		{
 			hp   = 5;
 			mana = 15;
@@ -3617,16 +3866,19 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[47] = 0;
 		ch[co].data[48] = 0;
 		ch[co].data[49] = 0;
+		ch[co].data[91] = 0;
 		
 		// Reset FK flags
 		ch[co].data[60] = 0;
 		ch[co].data[61] = 0;
 		ch[co].data[62] = 0;
-		ch[co].data[63] = 0;
+		ch[co].data[CHD_MASTER] = 0;
 		ch[co].data[70] = 0;
+		ch[co].data[93] = 0;
 		
 		// Reset quest flags
 		ch[co].data[72] = 0;
+		ch[co].data[94] = 0;
 		
 		// Reset WotS Book
 		ch[co].data[73] = 0;
@@ -3635,6 +3887,10 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].flags &= ~(CF_APPRAISE);
 		ch[co].flags &= ~(CF_LOCKPICK);
 	}
+	
+	ch[co].a_end  = 999999;
+	ch[co].a_hp   = 999999;
+	ch[co].a_mana = 999999;
 
 	do_update_char(co);
 }
@@ -3647,17 +3903,17 @@ int god_save(int cn, int co)
 	if (co == 0)
 	{
 		do_char_log(cn, 0, "No such character.\n");
-		return(0);
+		return 0;
 	}
 	else if (!IS_SANECHAR(co))
 	{
 		do_char_log(cn, 0, "Bad character number: %d\n", co);
-		return(0);
+		return 0;
 	}
 	else if (!IS_PLAYER(co))
 	{
 		do_char_log(cn, 0, "Character %d is not a player.\n", co);
-		return(0);
+		return 0;
 	}
 
 	sprintf(buf, ".save/%s.moa", ch[co].name);
@@ -3666,7 +3922,7 @@ int god_save(int cn, int co)
 	{
 		do_char_log(cn, 0, "Could not open file.\n");
 		perror(buf);
-		return(0);
+		return 0;
 	}
 	write(handle, &co, 4);
 	write(handle, &ch[co].pass1, 4);
@@ -3677,7 +3933,7 @@ int god_save(int cn, int co)
 	do_char_log(cn, 1, "Saved as %s.moa.\n", ch[co].name);
 	chlog(cn, "IMP: Saved %s.", ch[co].name);
 
-	return(1);
+	return 1;
 }
 
 void god_mail_pass(int cn, int co)
@@ -3852,7 +4108,7 @@ void god_set_name(int cn, int co, char *name)
 		do_char_log(cn, 0, "Bad character number: %d\n", co);
 		return;
 	}
-	else if (!IS_GOD(cn) && ch[co].data[63]!=cn)
+	else if (!IS_GOD(cn) && ch[co].data[CHD_MASTER]!=cn)
 	{
 		do_char_log(cn, 0, "Character %d isn't one of your thralls.\n", co);
 		return;
@@ -3918,7 +4174,7 @@ void god_usurp(int cn, int co)
 		ch[cn].tavern_x = ch[cn].x;
 		ch[cn].tavern_y = ch[cn].y;
 		god_transfer_char(cn, 10, 10);
-		if (!ch[cn].data[CHD_AFK])
+		if (!ch[cn].data[PCD_AFK])
 		{
 			do_afk(cn, NULL);
 		}
@@ -4048,7 +4304,7 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 
 	ch[cn].sprite = ch_temp[t].sprite;
 
-	if (ch[cn].kindred & KIN_PURPLE)
+	if (IS_PURPLE(cn))
 	{
 		ch[cn].kindred = ch_temp[t].kindred | KIN_PURPLE;
 	}
@@ -4073,9 +4329,9 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 
 	for (n = 0; n<MAXSKILL; n++)
 	{
-		if (ch[cn].skill[n][0]==0 && ch_temp[t].skill[n][0])
+		if (B_SK(cn, n)==0 && ch_temp[t].skill[n][0])
 		{
-			ch[cn].skill[n][0] = ch_temp[t].skill[n][0];
+			B_SK(cn, n) = ch_temp[t].skill[n][0];
 			xlog("added %s to %s", skilltab[n].name, ch[cn].name);
 		}
 		ch[cn].skill[n][1] = ch_temp[t].skill[n][1];
@@ -4130,7 +4386,7 @@ void god_force(int cn, char *whom, char *text)
 /* CS, 991205: #ENEMY <NPC> <char> */
 void do_enemy(int cn, char *npc, char *victim)
 {
-	int co, cv;
+	int co, cv, cc;
 
 	if (!*npc)
 	{
@@ -4195,7 +4451,8 @@ void do_enemy(int cn, char *npc, char *victim)
 	}
 	if (ch[cn].text[1][0])
 	{
-		do_sayx(co, ch[co].text[1], ch[cv].name);
+		if (!(IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && (ch[cc].flags & CF_SILENCE)))
+			do_sayx(co, ch[co].text[1], ch[cv].name);
 	}
 	chlog(cn, "IMP: Made %s an enemy of %s", ch[cv].name, ch[co].name);
 	chlog(co, "Added %s to kill list (#ENEMY by %s)", ch[cv].name, ch[cn].name);
@@ -4223,7 +4480,7 @@ int god_read_banlist(void)
 	handle = open("banlist.dat", O_RDONLY);
 	if (handle==-1)
 	{
-		return( 0);
+		return 0;
 	}
 
 	read(handle, &maxban, sizeof(maxban));
@@ -4231,7 +4488,7 @@ int god_read_banlist(void)
 
 	close(handle);
 
-	return(1);
+	return 1;
 }
 
 int god_write_banlist(void)
@@ -4241,7 +4498,7 @@ int god_write_banlist(void)
 	handle = open("banlist.dat", O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (handle==-1)
 	{
-		return( 0);
+		return 0;
 	}
 
 	write(handle, &maxban, sizeof(maxban));
@@ -4249,7 +4506,7 @@ int god_write_banlist(void)
 
 	close(handle);
 
-	return(1);
+	return 1;
 }
 
 int god_is_banned(int addr)
@@ -4260,11 +4517,11 @@ int god_is_banned(int addr)
 	{
 		if ((ban[n].addr & 0x00ffffff)==(addr & 0x00ffffff))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int god_add_single_ban(int cn, int co, unsigned int addr)
@@ -4276,7 +4533,7 @@ int god_add_single_ban(int cn, int co, unsigned int addr)
 		if ((ban[n].addr & 0x00ffffff)==(addr & 0x00ffffff))
 		{
 			do_char_log(cn, 2, "%s is already banned\n", ch[co].name);
-			return( 1);
+			return 1;
 		}
 	}
 	for (n = 0; n<maxban; n++)
@@ -4289,7 +4546,7 @@ int god_add_single_ban(int cn, int co, unsigned int addr)
 	if (n + 1==MAXBAN)
 	{
 		do_char_log(cn, 2, "Sorry, ban list is full.\n");
-		return(1);
+		return 1;
 	}
 	strcpy(ban[n].creator, ch[cn].name);
 	strcpy(ban[n].victim, ch[co].name);
@@ -4301,7 +4558,7 @@ int god_add_single_ban(int cn, int co, unsigned int addr)
 
 	do_char_log(cn, 2, "Banned %s (%d.%d.%d.%d)\n", ch[co].name, addr & 255, (addr >> 8) & 255, (addr >> 16) & 255, addr >> 24);
 
-	return(1);
+	return 1;
 }
 
 void god_add_ban(int cn, int co)
@@ -4418,17 +4675,17 @@ int god_is_badname(char *name)
 
 	if (strlen(name)>15)
 	{
-		return( 1);
+		return 1;
 	}
 
 	for (n = 0; n<cursize; n++)
 	{
 		if (strstr(name, badname[n]))
 		{
-			return( 1);
+			return 1;
 		}
 	}
-	return(0);
+	return 0;
 }
 
 void god_shutup(int cn, int co)

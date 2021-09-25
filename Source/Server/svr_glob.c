@@ -91,7 +91,7 @@ void global_tick(void)
 		globs->mdday = 1;
 	}
 
-	if (globs->mdtime<MD_HOUR * 6)
+	if (globs->mdtime<MD_HOUR * 6) // 3600
 	{
 		globs->dlight = 0;
 	}

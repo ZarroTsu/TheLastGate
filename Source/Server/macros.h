@@ -6,8 +6,10 @@
 
  **************************************************************************/
 
-#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
-
+#define max(a, b)		((a)>(b) ? (a) : (b))
+#define min(a, b)		((a)<(b) ? (a) : (b))
+#define RANDOM(a)		(a>0?random()%(a):0)
+#define ARRAYSIZE(a)	(sizeof(a)/sizeof(a[0]))
 #define sqr(a)			((a) * (a))
 
 // Sanity checks on map locations x and y
@@ -68,44 +70,97 @@
 #define IS_BUILDING(cn)        ((ch[(cn)].flags & CF_BUILDMODE) != 0)
 
 // special character group checks
-#define IS_COMPANION(cn) (IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
-#define IS_COMP_TEMP(cn) (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER)
+#define IS_COMPANION(cn) 	(IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
+#define IS_COMP_TEMP(cn) 	(ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER)
+#define IS_PLAYER_GC(cn)  	(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_COMPANION]==(cn))
+#define IS_PLAYER_SC(cn)  	(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_SHADOWCOPY]==(cn))
+#define IS_PLAYER_COMP(cn) 	(IS_PLAYER_GC(cn) || IS_PLAYER_SC(cn))
+#define CN_OWNER(cn) 		(ch[(cn)].data[CHD_MASTER] ? ch[(cn)].data[CHD_MASTER] : 3577)
 
 // Visibility, etc.
-#define IS_INVISIBLE(cn)   ((ch[(cn)].flags & CF_INVISIBLE) != 0)
-#define IS_PURPLE(cn)      ((ch[(cn)].kindred & KIN_PURPLE) != 0)
-#define IS_FEMALE(cn)      ((ch[cn].kindred & KIN_FEMALE) != 0)
-#define HE_SHE(cn)         (IS_FEMALE(cn) ? "she" : "he")
-#define HE_SHE_CAPITAL(cn) (IS_FEMALE(cn) ? "She" : "He")
-#define HIS_HER(cn)        (IS_FEMALE(cn) ? "her" : "his")
-#define HIM_HER(cn)        (IS_FEMALE(cn) ? "her" : "him")
+#define IS_INVISIBLE(cn)	((ch[(cn)].flags & CF_INVISIBLE) != 0)
+#define IS_PURPLE(cn)		((ch[(cn)].kindred & KIN_PURPLE) != 0)
+#define IS_MONSTER(cn)		((ch[(cn)].kindred & KIN_MONSTER) != 0)
+#define IS_MALE(cn)			((ch[(cn)].kindred & KIN_MALE) != 0)
+#define IS_FEMALE(cn)		((ch[(cn)].kindred & KIN_FEMALE) != 0)
+#define HE_SHE(cn)			(IS_FEMALE(cn) ? "she" : "he")
+#define HE_SHE_CAPITAL(cn)	(IS_FEMALE(cn) ? "She" : "He")
+#define HIS_HER(cn)			(IS_FEMALE(cn) ? "her" : "his")
+#define HIM_HER(cn)			(IS_FEMALE(cn) ? "her" : "him")
 
 // Ditto, with sanity check
-#define IS_SANEPLAYER(cn) (IS_SANECHAR(cn) && IS_PLAYER(cn))
-#define IS_SANESTAFF(cn)  (IS_SANECHAR(cn) && IS_STAFF(cn))
-#define IS_SANEGOD(cn)    (IS_SANECHAR(cn) && IS_GOD(cn))
-#define IS_SANEUSURP(cn)  (IS_SANECHAR(cn) && IS_USURP(cn))
+#define IS_SANEPLAYER(cn)	(IS_SANECHAR(cn) && IS_PLAYER(cn))
+#define IS_SANESTAFF(cn)	(IS_SANECHAR(cn) && IS_STAFF(cn))
+#define IS_SANEGOD(cn)		(IS_SANECHAR(cn) && IS_GOD(cn))
+#define IS_SANEUSURP(cn)	(IS_SANECHAR(cn) && IS_USURP(cn))
 // IS_SANENPC is derived. No IS_NPC because of... logic.
-#define IS_SANENPC(cn) (IS_SANECHAR(cn) && !IS_PLAYER(cn))
-#define IS_SANECCP(cn) (IS_SANECHAR(cn) && IS_CCP(cn))
+#define IS_SANENPC(cn)		(IS_SANECHAR(cn) && !IS_PLAYER(cn))
+#define IS_SANECCP(cn)		(IS_SANECHAR(cn) && IS_CCP(cn))
+
+/* RACE CHECKS */
+#define IS_TEMPLAR(cn)		(ch[(cn)].kindred & KIN_TEMPLAR)
+#define IS_MERCENARY(cn)	(ch[(cn)].kindred & KIN_MERCENARY)
+#define IS_HARAKIM(cn)		(ch[(cn)].kindred & KIN_HARAKIM)
+
+#define IS_SEYAN_DU(cn)		(ch[(cn)].kindred & KIN_SEYAN_DU)
+#define IS_ARCHTEMPLAR(cn)	(ch[(cn)].kindred & KIN_ARCHTEMPLAR)
+#define IS_BRAWLER(cn)		(ch[(cn)].kindred & KIN_BRAWLER)
+#define IS_WARRIOR(cn)		(ch[(cn)].kindred & KIN_WARRIOR)
+#define IS_SORCERER(cn)		(ch[(cn)].kindred & KIN_SORCERER)
+#define IS_SUMMONER(cn)		(ch[(cn)].kindred & KIN_SUMMONER)
+#define IS_ARCHHARAKIM(cn)	(ch[(cn)].kindred & KIN_ARCHHARAKIM)
+
+#define IS_ANY_TEMP(cn)		(IS_TEMPLAR(cn) || IS_ARCHTEMPLAR(cn) || IS_BRAWLER(cn))
+#define IS_ANY_MERC(cn)		(IS_MERCENARY(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn))
+#define IS_ANY_HARA(cn)		(IS_HARAKIM(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))
+
+#define IS_ANY_ARCH(cn)		(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_BRAWLER(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))
+
+#define IS_SEYA_OR_ARTM(cn)	(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn))
+#define IS_SEYA_OR_BRWL(cn)	(IS_SEYAN_DU(cn) || IS_BRAWLER(cn))
+#define IS_SEYA_OR_WARR(cn)	(IS_SEYAN_DU(cn) || IS_WARRIOR(cn))
+#define IS_SEYA_OR_SORC(cn)	(IS_SEYAN_DU(cn) || IS_SORCERER(cn))
+#define IS_SEYA_OR_SUMM(cn)	(IS_SEYAN_DU(cn) || IS_SUMMONER(cn))
+#define IS_SEYA_OR_ARHR(cn)	(IS_SEYAN_DU(cn) || IS_ARCHHARAKIM(cn))
+
+#define CAN_ARTM_PROX(cn)	(IS_SEYA_OR_ARTM(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_WARR_PROX(cn)	(IS_SEYA_OR_WARR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_SORC_PROX(cn)	(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_ARHR_PROX(cn)	(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 
 
 /* *** SKILLS *** */
 
 // Sanity check on skill number
-#define SANESKILL(s) ((s)>=0 && (s)<MAXSKILL)
+#define IS_SANESKILL(s) ((s)>=0 && (s)<MAXSKILL)
+
+// Fancy get/setters
+#define B_AT(cn, a)		(ch[(cn)].attrib[(a)][0])
+#define M_AT(cn, a)		(get_attrib_score((cn), (a)))
+#define B_SK(cn, s)		(ch[(cn)].skill[(s)][0])
+#define M_SK(cn, s)		(get_skill_score((cn), (s)))
+
+
 
 // Haste's formula
 #define HASTEFORM(n)		(n/4)
+
 // Slow's formula (used to degrade)
-#define SLOWFORM(n)			(n/3)
+#define SLOWFORM(n)			(n/2*9/10)
+
 // Slow2's formula (used to degrade) 
-#define SLOW2FORM(n)		(n/4)
+#define SLOW2FORM(n)		(n/3*9/10)
+
 // Curse2's formula (used to degrade)
 #define CURSE2FORM(p, n)	(((p*4/3)-n)/5)
+
 // Poison's formula (damage per tick)
+#define S_POISONFORM(p, d)	((p * 1750) / d)
 #define POISONFORM(p, d)	((p * 1500) / d)
+
 // Bleed's formula (damage per tick)
-#define BLEEDFORM(p, d)		((p * 1000) / d)
+#define BLEEDFORM(p, d)		((p * 1250) / d)
+
 // Frostburn's formula (degen per tick)
-#define FROSTBFORM(p, d)	((p * 1250) / d)
+#define FROSTBFORM(p, d)	((p * 1000) / d)
+

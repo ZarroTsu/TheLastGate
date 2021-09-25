@@ -229,6 +229,7 @@ void new_player(int sock)
 	player[n].lasttick2 = globs->ticker;
 	player[n].prio = 0;
 	player[n].ticker_started = 0;
+	player[n].spectating = 0;
 
 	memset(&player[n].cpl, 0, sizeof(struct cplayer));
 	memset(player[n].cmap, 0, sizeof(struct cmap) * TILEX * TILEY);
@@ -288,12 +289,12 @@ int csend(int nr, unsigned char *buf, int len)
 
 	if (nr<1 || nr>=MAXPLAYER)
 	{
-		return( -1);
+		return -1;
 	}
 
 	if (player[nr].sock==0)
 	{
-		return( -1);
+		return -1;
 	}
 
 	while (len)
@@ -313,14 +314,14 @@ int csend(int nr, unsigned char *buf, int len)
 			player[nr].ltick = 0;
 			player[nr].rtick = 0;
 			deflateEnd(&player[nr].zs);
-			return(-1);
+			return -1;
 		}
 
 		player[nr].obuf[player[nr].iptr] = *buf++;
 		player[nr].iptr = tmp;
 		len--;
 	}
-	return(0);
+	return 0;
 }
 
 int pkt_cnt[256];
@@ -905,7 +906,7 @@ int main(int argc, char *args[])
 	if (load())
 	{
 		xlog("load() failed.\n");
-		return(1);
+		return 1;
 	}
 
 	if (globs->flags & GF_DIRTY)
@@ -979,7 +980,7 @@ int main(int argc, char *args[])
 	if (sock==-1)
 	{
 		xlog("socket() failed.\n");
-		return(1);
+		return 1;
 	}
 
 	ioctl(sock, FIONBIO, (u_long*)&one);      // non-blocking mode
@@ -992,13 +993,13 @@ int main(int argc, char *args[])
 	if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)))
 	{
 		xlog("bind() failed.\n");
-		return(1);
+		return 1;
 	}
 
 	if (listen(sock, 5))
 	{
 		xlog("listen() failed.\n");
-		return(1);
+		return 1;
 	}
 
 	for (n = 1; n<MAXPLAYER; n++)
@@ -1016,6 +1017,7 @@ int main(int argc, char *args[])
 		{
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
+		ch[n].data[75] = 0;
 	}
 
 	srand(time(NULL));
@@ -1039,6 +1041,7 @@ int main(int argc, char *args[])
 	reset_changed_items();
 
 	// remove lab items from all players (leave this here for a while!)
+	/*
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (!it[n].used)
@@ -1057,6 +1060,7 @@ int main(int argc, char *args[])
 			xlog("Set %s (%d) max_damage to %d", it[n].name, n, it[n].max_damage);
 		}
 	}
+	*/
 
 	for (n = 1; n<MAXTCHARS; n++)
 	{
@@ -1141,5 +1145,5 @@ int main(int argc, char *args[])
 		fclose(logfp);
 	}
 
-	return(0);
+	return 0;
 }

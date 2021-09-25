@@ -385,14 +385,14 @@ int pop_create_bonus_belt(int cn)
 	rank = points2rank(ch[cn].points_tot);  // private wont get this belt
 	if(!rank)
 	{
-		return( 0);
+		return 0;
 	}
 	if (n)
 	{
 		n = god_create_item(n);   // creating belt from template
 		if(!n)
 		{
-			return( 0);     // return if failed
+			return 0;     // return if failed
 		}
 		// problem is if we keep template for newly created and
 		// then changed item, it sometimes doesnt keep changes
@@ -509,7 +509,7 @@ int pop_create_char(int n, int drop)
 	if (cn==MAXCHARS)
 	{
 		xlog("MAXCHARS reached!\n");
-		return( 0);
+		return 0;
 	}
 
 	ch[cn] = ch_temp[n];
@@ -582,12 +582,12 @@ int pop_create_char(int n, int drop)
 	{
 		god_destroy_items(cn);
 		ch[cn].used = USE_EMPTY;
-		return(0);
+		return 0;
 	}
 
 	ch[cn].a_end = 1000000;
 	ch[cn].a_hp  = 1000000;
-	if (ch[cn].skill[SK_MEDIT][0])
+	if (B_SK(cn, SK_MEDIT))
 	{
 		ch[cn].a_mana = 1000000;
 	}
@@ -599,15 +599,15 @@ int pop_create_char(int n, int drop)
 	ch[cn].data[92] = TICKS * 60;
 
 	chance = 25;
-	if (!ch[cn].skill[SK_MEDIT][0] && ch[cn].a_mana>15 * 100)
+	if (!B_SK(cn, SK_MEDIT) && ch[cn].a_mana>15 * 100)
 	{
 		chance -= 6;
 	}
-	if (!ch[cn].skill[SK_MEDIT][0] && ch[cn].a_mana>30 * 100)
+	if (!B_SK(cn, SK_MEDIT) && ch[cn].a_mana>30 * 100)
 	{
 		chance -= 6;
 	}
-	if (!ch[cn].skill[SK_MEDIT][0] && ch[cn].a_mana>65 * 100)
+	if (!B_SK(cn, SK_MEDIT) && ch[cn].a_mana>65 * 100)
 	{
 		chance -= 6;
 	}
@@ -664,7 +664,7 @@ int pop_create_char(int n, int drop)
 			printf("Could not drop char %d\n", n);
 			god_destroy_items(cn);
 			ch[cn].used = USE_EMPTY;
-			return(0);
+			return 0;
 		}
 	}
 
@@ -812,21 +812,21 @@ void pop_skill(void)
 
 		for (n = 0; n<MAXSKILL; n++)
 		{
-			if (ch[cn].skill[n][0]==0 && ch_temp[t].skill[n][0])
+			if (B_SK(cn, n)==0 && ch_temp[t].skill[n][0])
 			{
-				ch[cn].skill[n][0] = ch_temp[t].skill[n][0];
+				B_SK(cn, n) = ch_temp[t].skill[n][0];
 				xlog("added %s to %s", skilltab[n].name, ch[cn].name);
 			}
-			if (ch_temp[t].skill[n][2]<ch[cn].skill[n][0])
+			if (ch_temp[t].skill[n][2]<B_SK(cn, n))
 			{
-				p = skillcost(ch[cn].skill[n][0], ch[cn].skill[n][3], ch_temp[t].skill[n][2]);
+				p = skillcost(B_SK(cn, n), ch[cn].skill[n][3], ch_temp[t].skill[n][2]);
 				xlog("reduced %s on %s from %d to %d, added %d exp",
 				     skilltab[n].name,
 				     ch[cn].name,
-				     ch[cn].skill[n][0],
+				     B_SK(cn, n),
 				     ch_temp[t].skill[n][2],
 				     p);
-				ch[cn].skill[n][0] = ch_temp[t].skill[n][2];
+				B_SK(cn, n) = ch_temp[t].skill[n][2];
 				ch[cn].points += p;
 			}
 

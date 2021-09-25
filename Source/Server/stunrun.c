@@ -59,7 +59,7 @@ int npc_stunrun_add_seen(int cn, int co)
 		if (ch[cn].data[n]==co)
 		{
 			ch[cn].data[n + 50] = globs->ticker;
-			return(1);
+			return 1;
 		}
 	}
 
@@ -76,7 +76,7 @@ int npc_stunrun_add_seen(int cn, int co)
 		ch[cn].data[n + 50] = globs->ticker;
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_stunrun_gotattack(int cn, int co)
@@ -85,7 +85,7 @@ int npc_stunrun_gotattack(int cn, int co)
 
 	ch[cn].data[20] = co;
 
-	return(1);
+	return 1;
 }
 
 void npc_stunrun_add_fight(int cn, int co)
@@ -128,19 +128,19 @@ int npc_stunrun_seeattack(int cn, int cc, int co)
 		npc_stunrun_add_fight(cn, cc);
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_stunrun_see(int cn, int co)
 {
 	if (!do_char_can_see(cn, co))
 	{
-		return( 1);                     // processed it: we cannot see him, so ignore him
+		return 1;                     // processed it: we cannot see him, so ignore him
 
 	}
 	npc_stunrun_add_seen(cn, co);
 
-	return(1);
+	return 1;
 }
 
 int npc_stunrun_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
@@ -152,34 +152,34 @@ int npc_stunrun_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 	case    NT_GOTMISS:
 		return( npc_stunrun_gotattack(cn, dat1));
 	case    NT_DIDHIT:
-		return( 0);
+		return 0;
 	case    NT_DIDMISS:
-		return( 0);
+		return 0;
 	case    NT_DIDKILL:
-		return( 0);
+		return 0;
 	case    NT_GOTEXP:
-		return( 0);
+		return 0;
 	case    NT_SEEKILL:
-		return( 0);
+		return 0;
 	case    NT_SEEHIT:
 		return( npc_stunrun_seeattack(cn, dat1, dat2));
 	case    NT_SEEMISS:
 		return( npc_stunrun_seeattack(cn, dat1, dat2));
 	case    NT_GIVE:
-		return( 0);
+		return 0;
 	case    NT_SEE:
 		return( npc_stunrun_see(cn, dat1));
 	case    NT_DIED:
-		return( 0);
+		return 0;
 	case    NT_SHOUT:
-		return( 0);
+		return 0;
 	case    NT_HITME:
-		return( 0);
+		return 0;
 
 	default:
 		xlog("Unknown NPC message for %d (%s): %d",
 		     cn, ch[cn].name, type);
-		return( 0);
+		return 0;
 	}
 }
 
@@ -189,11 +189,11 @@ int npc_check_target(int x, int y)
 
 	if (x<1 || x>=MAPX)
 	{
-		return( 0);
+		return 0;
 	}
 	if (y<1 || y>=MAPY)
 	{
-		return( 0);
+		return 0;
 	}
 
 	m = x + y * MAPX;
@@ -201,10 +201,10 @@ int npc_check_target(int x, int y)
 	if (((unsigned long)map[m].flags & (MF_MOVEBLOCK | MF_NOMONST)) || map[m].ch || map[m].to_ch ||
 	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_is_stunned(int cn)
@@ -221,10 +221,10 @@ int npc_is_stunned(int cn)
 
 	if (n<MAXBUFFS)
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_is_blessed(int cn)
@@ -241,10 +241,10 @@ int npc_is_blessed(int cn)
 
 	if (n<MAXBUFFS)
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 struct seen
@@ -274,7 +274,7 @@ int npc_stunrun_high(int cn)
 	{
 		if ((co = ch[cn].data[n]) && IS_SANECHAR(co))
 		{
-			if (ch[co].data[42]==ch[cn].data[42])
+			if (ch[co].data[CHD_GROUP]==ch[cn].data[CHD_GROUP])
 			{
 				seen[maxseen].co = co;
 				seen[maxseen].dist = npc_dist(cn, co);
@@ -291,7 +291,7 @@ int npc_stunrun_high(int cn)
 				seen[maxseen].friend = 0;
 				if (!npc_is_stunned(co))
 				{
-					seen[maxseen].stun = (get_skill_score(cn, SK_SLOW) * 12>get_target_resistance(co) * 10);
+					seen[maxseen].stun = (M_SK(cn, SK_SLOW) * 12>get_target_resistance(cn, co) * 10);
 				}
 				else
 				{
@@ -329,7 +329,7 @@ int npc_stunrun_high(int cn)
 			{
 				if (seen[m].co==co)
 				{
-					if (ch[co].data[42]==ch[cn].data[42])
+					if (ch[co].data[CHD_GROUP]==ch[cn].data[CHD_GROUP])
 					{
 						seen[m].help++;
 						help = max(seen[m].help, help);
@@ -372,7 +372,7 @@ int npc_stunrun_high(int cn)
 			seen[maxseen].co = co;
 			seen[maxseen].dist = npc_dist(cn, co);
 			seen[maxseen].friend = 0;
-			seen[maxseen].stun = (get_skill_score(cn, SK_SLOW) * 12>get_target_resistance(co) * 10);
+			seen[maxseen].stun = (M_SK(cn, SK_SLOW) * 12>get_target_resistance(cn, co) * 10);
 			if (seen[maxseen].stun)
 			{
 				seen[maxseen].stun += 5;
@@ -772,7 +772,7 @@ int npc_stunrun_high(int cn)
 				{
 					for (x = GROLMY_X_1; x<=GROLMY_X_2 && !tmp; x++)
 					{
-						if ((co = map[x + y * MAPX].ch) && ch[co].data[42]!=ch[cn].data[42])
+						if ((co = map[x + y * MAPX].ch) && ch[co].data[CHD_GROUP]!=ch[cn].data[CHD_GROUP])
 						{
 							tmp = 1;
 						}
@@ -857,7 +857,7 @@ int npc_stunrun_high(int cn)
 		ch[cn].data[20] = 0;                                            // forget who hit us
 
 	}
-	return(0);
+	return 0;
 }
 
 void npc_stunrun_low(int cn)

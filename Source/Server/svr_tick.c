@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.6.7\n"};
-static char intro_msg4_font = 0;
-static char intro_msg4[] = {"OLD CHARACTER EXP WAS RESET JUNE 12th! Make sure you reallocate your exp before heading out!\n"};
+static char intro_msg3[] = {"Current client/server version is 0.6.9\n"};
+static char intro_msg4_font = 2;
+static char intro_msg4[] = {"(Nice.)\n"};
 static char intro_msg5_font = 1;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -53,7 +53,7 @@ static inline unsigned int _mcmp(unsigned char *a, unsigned char *b, unsigned in
 	{
 		if (*a!=*b)
 		{
-			return( 1);
+			return 1;
 		}
 		a++;
 		b++;
@@ -64,7 +64,7 @@ static inline unsigned int _mcmp(unsigned char *a, unsigned char *b, unsigned in
 	{
 		if (*(unsigned long *)a!=*(unsigned long *)b)
 		{
-			return( 1);
+			return 1;
 		}
 		a += 4;
 		b += 4;
@@ -75,13 +75,13 @@ static inline unsigned int _mcmp(unsigned char *a, unsigned char *b, unsigned in
 	{
 		if (*a!=*b)
 		{
-			return( 1);
+			return 1;
 		}
 		a++;
 		b++;
 		len--;
 	}
-	return(0);
+	return 0;
 }
 
 // some magic to avoid a lot of casts
@@ -130,7 +130,7 @@ static inline void *_fdiff(unsigned char *a, unsigned char *b, unsigned int len)
 		b++;
 		len--;
 	}
-	return(0);
+	return 0;
 }
 
 // some magic to avoid a lot of casts
@@ -165,7 +165,7 @@ static inline unsigned int _mcpy(unsigned char *a, unsigned char *b, unsigned in
 		b++;
 		len--;
 	}
-	return(0);
+	return 0;
 }
 
 // some magic to avoid a lot of casts
@@ -372,7 +372,8 @@ void plr_cmd_move(int nr)
 
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	ch[cn].attack_cn = 0;
@@ -386,7 +387,8 @@ void plr_cmd_move(int nr)
 void plr_cmd_reset(int nr)
 {
 	int cn;
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	ch[cn].use_nr = 0;
@@ -406,7 +408,8 @@ void plr_cmd_turn(int nr)
 
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	if (IS_BUILDING(cn))
@@ -438,7 +441,8 @@ void plr_cmd_turn(int nr)
 void plr_cmd_inv(int nr)
 {
 	int what, n, tmp, tmpv, cn, in, co;
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	what = *(unsigned long*)(player[nr].inbuf + 1);
@@ -723,7 +727,8 @@ void plr_cmd_inv(int nr)
 void plr_cmd_inv_look(int nr)
 {
 	int n, cn, in;
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	n = *(unsigned short*)(player[nr].inbuf + 1);
@@ -749,7 +754,8 @@ void plr_cmd_mode(int nr)       // speed change, done at once
 {
 	int cn, mode;
 	static char *speedname[3] = {"Slow", "Normal", "Fast"};
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	mode = *(unsigned short*)(player[nr].inbuf + 1);
@@ -772,7 +778,8 @@ void plr_cmd_drop(int nr)
 
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	if (IS_BUILDING(cn))
@@ -843,7 +850,8 @@ void plr_cmd_give(int nr)
 	{
 		return;
 	}
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	ch[cn].attack_cn = 0;
@@ -861,7 +869,8 @@ void plr_cmd_pickup(int nr)
 
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	if (IS_BUILDING(cn))
@@ -883,7 +892,8 @@ void plr_cmd_use(int nr)
 {
 	int x, y;
 	int cn;
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	x = *(unsigned short*)(player[nr].inbuf + 1);
@@ -907,7 +917,8 @@ void plr_cmd_attack(int nr)
 	{
 		return;
 	}
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 	
 	ch[cn].attack_cn = co;
@@ -925,10 +936,11 @@ void plr_cmd_look(int nr, int autoflag)
 	int cn, co;
 
 	co = *(unsigned short*)(player[nr].inbuf + 1);
+	
+	if (player[nr].spectating) return;
+		cn = player[nr].usnr;
 
-	cn = player[nr].usnr;
-
-	if (co & 0x8000)
+	if ((co & 0x8000) && !player[nr].spectating)
 	{
 		do_look_depot(cn, co & 0x7fff);
 	}
@@ -1008,6 +1020,7 @@ void plr_cmd_look_item(int nr)
 
 	in = map[x + y * MAPX].it;
 
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	do_look_item(cn, in);
@@ -1017,6 +1030,7 @@ void plr_cmd_stat(int nr)
 {
 	int n, v, cn;
 
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	n = *(unsigned short*)(player[nr].inbuf + 1);
@@ -1078,7 +1092,8 @@ void plr_cmd_stat(int nr)
 void plr_cmd_skill(int nr)
 {
 	int n, cn, co;
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	n  = *(unsigned long*)(player[nr].inbuf + 1);
@@ -1092,7 +1107,7 @@ void plr_cmd_skill(int nr)
 	{
 		return;
 	}
-	if (!ch[cn].skill[n][0])
+	if (!B_SK(cn, n))
 	{
 		return;
 	}
@@ -1190,7 +1205,8 @@ void plr_cmd_setuser(int nr)
 	int n, cn, pos, flag;
 	char *reason = NULL;
 	char *race_name;
-
+	
+	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
 
 	pos = player[nr].inbuf[2];
@@ -1318,43 +1334,43 @@ void plr_cmd_setuser(int nr)
 		}
 		if (reason != NULL)
 		{
-			if (ch[cn].kindred & KIN_TEMPLAR)
+			if (IS_TEMPLAR(cn))
 			{
 				race_name = "a Templar";
 			}
-			else if (ch[cn].kindred & KIN_HARAKIM)
+			else if (IS_HARAKIM(cn))
 			{
 				race_name = "a Harakim";
 			}
-			else if (ch[cn].kindred & KIN_MERCENARY)
+			else if (IS_MERCENARY(cn))
 			{
 				race_name = "a Mercenary";
 			}
-			else if (ch[cn].kindred & KIN_SEYAN_DU)
+			else if (IS_SEYAN_DU(cn))
 			{
 				race_name = "a Seyan'Du";
 			}
-			else if (ch[cn].kindred & KIN_ARCHHARAKIM)
+			else if (IS_ARCHHARAKIM(cn))
 			{
 				race_name = "an Arch Harakim";
 			}
-			else if (ch[cn].kindred & KIN_ARCHTEMPLAR)
+			else if (IS_ARCHTEMPLAR(cn))
 			{
 				race_name = "an Arch Templar";
 			}
-			else if (ch[cn].kindred & KIN_WARRIOR)
+			else if (IS_WARRIOR(cn))
 			{
 				race_name = "a Warrior";
 			}
-			else if (ch[cn].kindred & KIN_SORCERER)
+			else if (IS_SORCERER(cn))
 			{
 				race_name = "a Sorcerer";
 			}
-			else if (ch[cn].kindred & KIN_BRAWLER)
+			else if (IS_BRAWLER(cn))
 			{
 				race_name = "a Brawler";
 			}
-			else if (ch[cn].kindred & KIN_SUMMONER)
+			else if (IS_SUMMONER(cn))
 			{
 				race_name = "a Summoner";
 			}
@@ -1378,6 +1394,8 @@ void plr_cmd_setuser(int nr)
 
 void plr_idle(int nr)
 {
+	if (player[nr].spectating) return;
+	
 	if (globs->ticker - player[nr].lasttick>TICKS * 60)
 	{
 		plog(nr, "Idle too long (protocol level)");
@@ -1705,6 +1723,7 @@ void plr_newlogin(int nr)
 	player[nr].lasttick = globs->ticker;
 	player[nr].ltick = 0;
 	player[nr].ticker_started = 1;
+	player[nr].spectating = 0;
 
 	buf[0] = SV_TICK;
 	*(unsigned char*)(buf + 1) = (unsigned char)ctick;
@@ -1861,6 +1880,7 @@ void plr_login(int nr)
 	player[nr].lasttick = globs->ticker;
 	player[nr].ltick = 0;
 	player[nr].ticker_started = 1;
+	player[nr].spectating = 0;
 
 	buf[0] = SV_LOGIN_OK;
 	*(unsigned long*)(buf + 1) = VERSION;
@@ -1912,24 +1932,29 @@ void plr_login(int nr)
 	ch[cn].tavern_y = ch[cn].temple_y;
 
 	plog(nr, "Login successful");
-
-	do_char_motd(cn, intro_msg1_font, intro_msg1);
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, intro_msg2_font, intro_msg2);
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, intro_msg3_font, intro_msg3);
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, intro_msg4_font, intro_msg4);
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, 1, " \n");
-	do_char_motd(cn, intro_msg5_font, intro_msg5);
 	
-	buf[0] = SV_SHOWMOTD;
-	*(unsigned char*)(buf + 1) = 0;
-	xsend(nr, buf, 2);
+	if (ch[cn].data[79] != VERSION)
+	{
+		do_char_motd(cn, intro_msg1_font, intro_msg1);
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, intro_msg2_font, intro_msg2);
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, intro_msg3_font, intro_msg3);
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, intro_msg4_font, intro_msg4);
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, 1, " \n");
+		do_char_motd(cn, intro_msg5_font, intro_msg5);
+		
+		buf[0] = SV_SHOWMOTD;
+		*(unsigned char*)(buf + 1) = 0;
+		xsend(nr, buf, 2);
+		
+		ch[cn].data[79] = VERSION;
+	}
 	
 	// Kill the tutorial if we're a returning player with more than 10k exp
 	if (ch[cn].points_tot>10000 && ch[cn].data[76]<(1<<16))
@@ -1989,6 +2014,19 @@ void plr_logout(int cn, int nr, int reason)
 			}
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 2, "%s left the game without saying goodbye.\n", ch[cn].name);
 		}
+		else
+		{
+			for (n = 0; n<MAXBUFFS; n++) // clear poison to avoid dying offline
+			{
+				if ((in = ch[cn].spell[n])==0) { continue; }
+				
+				if (bu[in].temp==SK_VENOM || bu[in].temp==SK_POISON || bu[in].temp==SK_BLEED)
+				{
+					bu[in].used = USE_EMPTY; 
+					ch[cn].spell[n] = 0;
+				}
+			}
+		}
 
 		if (map[ch[cn].x + ch[cn].y * MAPX].ch==cn)
 		{
@@ -2008,6 +2046,18 @@ void plr_logout(int cn, int nr, int reason)
 		{
 			if (abs(ch[cn].x - ch[cn].temple_x) + abs(ch[cn].y - ch[cn].temple_y)>10 && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_NOLAG))
 			{
+				for (n=0;n<40;n++)
+				{
+					if (!(in = ch[cn].item[n]))
+					{
+						continue;
+					}
+					if (it[in].temp==IT_LAGSCROLL)
+					{
+						it[in].used = USE_EMPTY;
+						ch[cn].item[n] = 0;
+					}
+				}
 				in = god_create_item(IT_LAGSCROLL);
 				it[in].data[0] = ch[cn].x;
 				it[in].data[1] = ch[cn].y;
@@ -2059,6 +2109,18 @@ void plr_logout(int cn, int nr, int reason)
 		}
 
 		do_announce(cn, 0, "%s left the game.\n", ch[cn].name);
+		
+		for (n=1;n<MAXCHARS;n++)
+		{
+			if (ch[n].used==USE_EMPTY)
+				continue;
+			if (!IS_SANEPLAYER(n) || !IS_ACTIVECHAR(n))
+				continue;
+			if (player[ch[n].player].spectating == cn)
+			{
+				player[ch[n].player].spectating = 0;
+			}
+		}
 	}
 
 	if (nr && reason && reason!=LO_USURP)
@@ -2329,11 +2391,11 @@ static inline int it_base_status(int n)
 {
 	if (n==0)
 	{
-		return( 0);
+		return 0;
 	}
 	if (n==1)
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (n<6)
@@ -2388,7 +2450,7 @@ int cl_light_26(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 			cmap[m - 1].light = smap[m - 1].light;
 		}
 		xsend(dosend, buf, 16);
-		return(1);
+		return 1;
 	}
 }
 int cl_light_one(int n, int dosend, struct cmap *cmap, struct cmap *smap)
@@ -2408,7 +2470,7 @@ int cl_light_one(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 		//*(unsigned short*)(buf + 1) = (unsigned short)(n | ((unsigned short)(smap[n].light) << 12));
 		cmap[n].light = smap[n].light;
 		xsend(dosend, buf, 6); // 02162020 - changed 3 to 6
-		return(1);
+		return 1;
 	}
 }
 int cl_light_three(int n, int dosend, struct cmap *cmap, struct cmap *smap)
@@ -2443,9 +2505,9 @@ int cl_light_three(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 			cmap[m - 1].light = smap[m - 1].light;
 		}
 		xsend(dosend, buf, 7); // 02162020 - changed 4 to 7
-		return(1);
+		return 1;
 	}
-	return(0);
+	return 0;
 }
 int cl_light_seven(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 {
@@ -2479,7 +2541,7 @@ int cl_light_seven(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 			cmap[m - 1].light = smap[m - 1].light;
 		}
 		xsend(dosend, buf, 9); // 02162020 - changed 6 to 9
-		return(1);
+		return 1;
 	}
 }
 
@@ -2621,6 +2683,8 @@ void plr_change(int nr)
 							*(short int*)(buf + 5) = it[in].sprite[0];
 						}
 						*(short int*)(buf + 7) = it[in].placement;
+						if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
+							*(short int*)(buf + 7) |= PL_WEAPON;
 						*(unsigned char*)(buf + 9) = it[in].stack;
 						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n];
 
@@ -2706,13 +2770,16 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_TURQUANKH)) 	chFlags += (1 <<  2);
 					if (get_neck(cn, IT_GARNEANKH)) 	chFlags += (1 <<  3);
 					if (get_neck(cn, IT_BREATHAMMY)) 	chFlags += (1 <<  4);
-					if (get_neck(cn, IT_AM_BLOODS)) 	chFlags += (1 <<  5);
-					if (get_neck(cn, IT_AM_VERDANT)) 	chFlags += (1 <<  6);
-					if (get_neck(cn, IT_AM_SEABREZ)) 	chFlags += (1 <<  7);
+					if (get_tarot(cn, IT_CH_DEATH_R)) 	chFlags += (1 <<  5); // Zephyr
+					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
+					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
 					if (globs->fullmoon)				chFlags += (1 <<  8);
 					if (globs->newmoon)					chFlags += (1 <<  9);
 					if (get_tarot(cn, IT_CH_EMPRESS)) 	chFlags += (1 << 10); // Shield -> Shell
 					if (get_tarot(cn, IT_CH_CHARIOT)) 	chFlags += (1 << 11); // Blind -> Douse
+					if (get_tarot(cn, IT_CH_EMPERO_R)) 	chFlags += (1 << 12); // Warcry -> Rally
+					if (get_neck(cn, IT_TRUEANKH)) 		chFlags += (1 << 13);
+					if (get_tarot(cn, IT_CH_TOWER_R)) 	chFlags += (1 << 14); // Poison -> Venom
 					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
 				
@@ -2733,6 +2800,8 @@ void plr_change(int nr)
 						*(short int*)(buf + 5) = it[in].sprite[0];
 					}
 					*(short int*)(buf + 7) = it[in].placement;
+					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
+						*(short int*)(buf + 7) |= PL_WEAPON;
 				}
 				else
 				{
@@ -2830,6 +2899,8 @@ void plr_change(int nr)
 						*(short int*)(buf + 1) = it[in].sprite[0];
 					}
 					*(short int*)(buf + 3) = it[in].placement;
+					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
+						*(short int*)(buf + 3) |= PL_WEAPON;
 					*(unsigned char*)(buf + 5) = it[in].stack;
 
 					it[in].flags &= ~IF_UPDATE;
@@ -3120,7 +3191,8 @@ void plr_change(int nr)
 			p += 2;
 		}
 
-		if (cmap[n].ch_proz!=smap[n].ch_proz)
+		if (cmap[n].ch_proz!=smap[n].ch_proz || cmap[n].ch_castspd!=smap[n].ch_castspd || 
+			cmap[n].ch_atkspd!=smap[n].ch_atkspd || cmap[n].ch_movespd!=smap[n].ch_movespd)
 		{
 			buf[1] |= 128;
 			*(unsigned char*)(buf + p) = smap[n].ch_proz;
@@ -3196,12 +3268,12 @@ inline int do_char_calc_light(int cn, int light)
 		light = 64;
 	}
 	
-	if (light==0 && get_skill_score(cn, SK_PERCEPT)>150)
+	if (light==0 && M_SK(cn, SK_PERCEPT)>150)
 	{
 		light = 1;
 	}
 
-	val = light * min(get_skill_score(cn, SK_PERCEPT), 10) / 10;
+	val = light * min(M_SK(cn, SK_PERCEPT), 10) / 10;
 
 	if (val>255)
 	{
@@ -3254,6 +3326,10 @@ static void inline empty_field(struct cmap *smap, int n)
 	smap[n].ch_nr = 0;
 	smap[n].ch_id = 0;
 	smap[n].ch_proz = 0;
+	smap[n].ch_castspd = 0;
+	smap[n].ch_atkspd = 0;
+	smap[n].ch_movespd = 0;
+	smap[n].ch_fontcolor = 0;
 
 	smap[n].it_sprite = 0;
 	smap[n].it_status = 0;
@@ -3372,7 +3448,10 @@ void plr_getmap_complete(int nr)
 	unsigned char do_all = 0;
 	struct cmap * smap;
 
-	cn = player[nr].usnr;
+	if (player[nr].spectating) 
+		cn = player[nr].spectating;
+	else 
+		cn = player[nr].usnr;
 	smap = player[nr].smap;
 
 	ys = ch[cn].y - (TILEY / 2) + YSCUT;
@@ -3660,6 +3739,10 @@ void plr_getmap_complete(int nr)
 				{
 					smap[n].flags |= STUNNED | STONED;
 				}
+				if (ch[co].flags & CF_SHADOWCOPY)
+				{
+					smap[n].flags |= STONED;
+				}
 			}
 			else
 			{
@@ -3726,8 +3809,12 @@ void plr_getmap_fast(int nr)
 	int ys, ye, xs, xe;
 	unsigned char do_all = 0;
 	struct cmap * smap;
-
-	cn = player[nr].usnr;
+	
+	if (player[nr].spectating) 
+		cn = player[nr].spectating;
+	else 
+		cn = player[nr].usnr;
+	
 	smap = player[nr].smap;
 
 	ys = ch[cn].y - (TILEY / 2) + YSCUTF;
@@ -3979,6 +4066,22 @@ void plr_getmap_fast(int nr)
 				{
 					smap[n].ch_proz = 0;
 				}
+				// Sending packets for speed bonuses.
+				// Used by local client to render frames correctly.
+				smap[n].ch_atkspd  = ch[co].atk_speed;
+				smap[n].ch_castspd = ch[co].cast_speed;
+				smap[n].ch_movespd = ch[co].move_speed;
+				if (ch[co].flags & CF_EXTRAEXP)
+				{
+					// Inform the client this is a 'special' enemy by turning their font red
+					smap[n].ch_fontcolor = 1;
+				}
+				else
+				{
+					// Otherwise just display normal yellow font
+					smap[n].ch_fontcolor = 0;
+				}
+				//
 				smap[n].flags |= ISCHAR;
 				if (ch[co].stunned==1)
 				{
@@ -3987,6 +4090,10 @@ void plr_getmap_fast(int nr)
 				if (ch[co].flags & CF_STONED)
 				{
 					smap[n].flags |= STUNNED | STONED;
+				}
+				if (ch[co].flags & CF_SHADOWCOPY)
+				{
+					smap[n].flags |= STONED;
 				}
 			}
 			else
@@ -4084,7 +4191,7 @@ void stone_gc(int cn, int mode)
 	{
 		return;
 	}
-	if (!(co = ch[cn].data[64]))
+	if (!(co = ch[cn].data[PCD_COMPANION]))
 	{
 		return;
 	}
@@ -4092,7 +4199,7 @@ void stone_gc(int cn, int mode)
 	{
 		return;
 	}
-	if (ch[co].data[63]!=cn)
+	if (ch[co].data[CHD_MASTER]!=cn)
 	{
 		return;
 	}
@@ -4142,7 +4249,7 @@ int check_valid(int cn)
 	{
 		chlog(cn, "Killed character %s (%d) for invalid data", ch[cn].name, cn);
 		do_char_killed(0, cn, 0);
-		return(0);
+		return 0;
 	}
 
 	n = ch[cn].x + ch[cn].y * MAPX;
@@ -4161,7 +4268,7 @@ int check_valid(int cn)
 
 	if (IS_BUILDING(cn))
 	{
-		return( 1);
+		return 1;
 	}
 
 	for (n = 0; n<40; n++)
@@ -4245,14 +4352,14 @@ int check_valid(int cn)
 	{
 		int co;
 
-		if (!(co = ch[cn].data[63]) || !IS_ACTIVECHAR(co))
+		if (!(co = ch[cn].data[CHD_MASTER]) || !IS_ACTIVECHAR(co))
 		{
 			ch[cn].flags &= ~CF_STONED;
 			chlog(cn, "oops, stoned removed");
 		}
 	}
 
-	return(1);
+	return 1;
 }
 
 void check_expire(int cn)
@@ -4265,7 +4372,7 @@ void check_expire(int cn)
 
 	t = time(NULL);
 
-	if (ch[cn].kindred & KIN_SEYAN_DU)
+	if (IS_SEYAN_DU(cn))
 	{
 		if (ch[cn].points_tot<10000000) 	//  10 million
 		{
@@ -4319,15 +4426,15 @@ inline int group_active(int cn)
 {
 	if ((ch[cn].flags & (CF_PLAYER | CF_USURP | CF_NOSLEEP)) && ch[cn].used==USE_ACTIVE)
 	{
-		return( 1);
+		return 1;
 	}
 
 	if (ch[cn].data[92])
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 char *strnchr(char *ptr, char c, int len)

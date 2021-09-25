@@ -14,27 +14,27 @@ int can_drop(int m)
 {
 	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & MF_MOVEBLOCK) || (map[m].flags & MF_DEATHTRAP) || map[m].fsprite)
 	{
-		return( 0);
+		return 0;
 	}
-	return(1);
+	return 1;
 }
 
 int is_beam(int in)
 {
 	if (!in)
 	{
-		return( 0);
+		return 0;
 	}
 	if (it[in].temp!=453)
 	{
-		return( 0);
+		return 0;
 	}
 	if (!it[in].active)
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 
@@ -278,7 +278,7 @@ void effect_tick(void)
 							if (temp && (ch[co].flags & CF_RESPAWN))
 							{
 								// Eyeball kings take extra time to respawn
-								if (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING )
+								if (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR )
 								{
 									fx_add_effect(2, TICKS * 60 * 15 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp); // 15 - 20 minutes
 								}
@@ -542,7 +542,7 @@ int fx_add_effect(int type, int duration, int d1, int d2, int d3)
 	}
 	if (n==MAXEFFECT)
 	{
-		return( 0);
+		return 0;
 	}
 
 	fx[n].used = USE_ACTIVE;

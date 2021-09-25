@@ -128,7 +128,7 @@ int ccp_set_enemy(int cn, int co)
 
 	do_char_log(cn, 1, "set enemy %d (%s), strength=%d\n", co, ch[co].name, mem->enemy_strength);
 
-	return(1);
+	return 1;
 }
 
 
@@ -224,7 +224,7 @@ int ccp_raise(int cn)
 
 	for (n = 0; n<5; n++)
 	{
-		if (ch[cn].attrib[n][0]<mem->level)
+		if (B_AT(cn, n)<mem->level)
 		{
 			return( do_raise_attrib(cn, n));
 		}
@@ -232,7 +232,7 @@ int ccp_raise(int cn)
 
 	for (n = 0; n<sizeof(skill) / sizeof(int); n++)
 	{
-		if (ch[cn].skill[skill[n]][0] && ch[cn].skill[skill[n]][0]<mem->level * 2)
+		if (B_SK(cn, skill[n]) && B_SK(cn, skill[n])<mem->level * 2)
 		{
 			return( do_raise_skill(cn, skill[n]));
 		}
@@ -242,7 +242,7 @@ int ccp_raise(int cn)
 
 	do_char_log(cn, 1, "raise new level=%d\n", mem->level);
 
-	return(1);
+	return 1;
 }
 
 void ccp_gotexp(int cn)
@@ -280,9 +280,9 @@ int ccp_at_recall_point(int cn)
 {
 	if (abs(ch[cn].x - ch[cn].temple_x) + abs(ch[cn].y - ch[cn].temple_y)<5)
 	{
-		return( 1);
+		return 1;
 	}
-	return( 0);
+	return 0;
 }
 
 void ccp_goto_sector(int cn)
@@ -411,7 +411,7 @@ void ccp_driver(int cn)
 		return;                                                      // we're busy
 
 	}
-	if (ch[cn].skill[SK_MEDIT][0] && ch[cn].a_mana<ch[cn].mana[5] * 900)
+	if (ch[cn].a_mana<ch[cn].mana[5] * 900)
 	{
 		return;                                                                 // wait for mana regeneration
 	}

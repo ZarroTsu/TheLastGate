@@ -87,18 +87,18 @@ int init_node(void)
 	nmap = calloc(MAPX * MAPY, sizeof(struct node *));
 	if (!nmap)
 	{
-		return( 0);
+		return 0;
 	}
 
 	nodes = malloc(sizeof(struct node) * MAXNODE);
 	if (!nodes)
 	{
-		return( 0);
+		return 0;
 	}
 
 	bad = calloc(MAPX * MAPY, sizeof(struct badtarget));
 
-	return(1);
+	return 1;
 }
 
 int add_node(int x, int y, int dir, int ccost, int cdir)
@@ -108,7 +108,7 @@ int add_node(int x, int y, int dir, int ccost, int cdir)
 
 	if (x<1 || x>=MAPX || y<1 || y>=MAPY)
 	{
-		return( 0);
+		return 0;
 	}
 
 	m = x + y * MAPX;
@@ -119,7 +119,7 @@ int add_node(int x, int y, int dir, int ccost, int cdir)
 	{
 		if (tmp->tcost<=tcost)
 		{
-			return( 0);                     // other node is better or equal, no need to try this one
+			return 0;                     // other node is better or equal, no need to try this one
 
 		}
 		if (!tmp->visited)
@@ -148,7 +148,7 @@ int add_node(int x, int y, int dir, int ccost, int cdir)
 		if (maxnode>=maxstep)
 		{
 			failed = 1;
-			return( 0);
+			return 0;
 		}
 		node = &nodes[maxnode++];
 		node->x = x;
@@ -195,7 +195,7 @@ int add_node(int x, int y, int dir, int ccost, int cdir)
 	// current node -> next
 	node->next = tmp;
 
-	return(1);
+	return 1;
 }
 
 static inline int dr_check_target(int m)
@@ -205,10 +205,10 @@ static inline int dr_check_target(int m)
 	if (((unsigned long)map[m].flags & mapblock) || map[m].ch || map[m].to_ch ||
 	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 /*static int rem_node(struct node *node)
@@ -369,7 +369,7 @@ int astar(int fx, int fy, int cdir)
 		add_suc(node);
 	}
 
-	return(-1);
+	return -1;
 }
 
 int is_bad_target(int x, int y)
@@ -388,36 +388,36 @@ int pathfinder(int cn, int x1, int y1, int flag, int x2, int y2)
 
 	if (ch[cn].x<1 || ch[cn].x>=MAPX)
 	{
-		return( -1);
+		return -1;
 	}
 	if (ch[cn].y<1 || ch[cn].y>=MAPY)
 	{
-		return( -1);
+		return -1;
 	}
 	if (x1<1 || x1>=MAPX)
 	{
-		return( -1);
+		return -1;
 	}
 	if (y1<1 || y1>=MAPY)
 	{
-		return( -1);
+		return -1;
 	}
 	if (x2<0 || x2>=MAPX)
 	{
-		return( -1);
+		return -1;
 	}
 	if (y2<0 || y2>=MAPY)
 	{
-		return( -1);
+		return -1;
 	}
 
 	if (is_bad_target(x1, y1))
 	{
-		return( -1);
+		return -1;
 	}
 
 	ccn = cn;
-	if ((ch[cn].kindred & KIN_MONSTER) && !(ch[cn].flags & (CF_USURP | CF_THRALL)))
+	if (IS_MONSTER(cn) && !(ch[cn].flags & (CF_USURP | CF_THRALL)))
 	{
 		mapblock = MF_NOMONST | MF_MOVEBLOCK;
 	}
@@ -439,7 +439,7 @@ int pathfinder(int cn, int x1, int y1, int flag, int x2, int y2)
 
 	if (flag==0 && !dr_check_target(tx1 + ty1 * MAPX))
 	{
-		return( -1);
+		return -1;
 	}
 
 	if (ch[cn].attack_cn || (!(ch[cn].flags & (CF_PLAYER | CF_USURP)) && ch[cn].data[78]))

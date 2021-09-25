@@ -21,12 +21,12 @@ int build_item(int nr, int x, int y)
 
 	if (x<0 || x>=MAPX || y<0 || y>=MAPY)
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (map[x + y * MAPX].it)
 	{
-		return( 0);
+		return 0;
 	}
 
 	xlog("build: add item %d at %d,%d", nr, x, y);
@@ -85,7 +85,7 @@ int build_item(int nr, int x, int y)
 		{
 			map[x + y * MAPX].flags |= MF_SIGHTBLOCK;
 		}
-		return(0);
+		return 0;
 	}
 
 	return(in);
@@ -127,6 +127,10 @@ void build_drop(int x, int y, int in)
 		{
 			nr += RANDOM(3);
 		}
+		if (nr==5034 && !RANDOM(4))	// hack for green carpet
+		{
+			nr += RANDOM(3);
+		}
 		if (nr==1003)   // hack for jungle ground
 		{
 			nr += RANDOM(4);
@@ -154,6 +158,10 @@ void build_drop(int x, int y, int in)
 		if (nr==170)   // hack for stone ground
 		{
 			nr += RANDOM(6);
+		}
+		if (nr==808)	// hack for greystone ground
+		{
+			nr += RANDOM(4);
 		}
 		if (nr==704)
 		{

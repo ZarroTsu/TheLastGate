@@ -63,19 +63,25 @@ usage of data for players:
 * `65:`     player #ALLOWed to search corpse
 * `66:`     Corpse's owner
 * `67:`     Riddle giver (lab 9)
-* `68:`     Date of last player attack (CHD_ATTACKTIME)
-* `69:`     Last player attacked       (CHD_ATTACKVICT)
+* `68:`     Date of last player attack (PCD_ATTACKTIME)
+* `69:`     Last player attacked       (PCD_ATTACKVICT)
 * `70:`		Flags of killed NPC of certain class (Extended)
 * `71:`     number of says/tells/looks/lights
 * `72:`     bad word score
 * '73:'		--Zarro-- for "Way of the Sword" book
-* '75:'		--Zarro-- for spell delays when hit by blast, cleave, or warcry
+* '74:'     --Zarro-- for spell delays when hit by warcry
+* '75:'		--Zarro-- for spell delays when hit by blast, cleave
 * '76:'     --Zarro-- for waypoint storage
 * '77:'     --Zarro-- for pentagram quest kill streak
 * '78:'     --Zarro-- store highest pent for kill streak reward
+* '79:'     --Zarro-- store latest version to prevent MotD pop-up
 * `80-89:`	seen logging in from these class C nets
 * `90:`     number in database
+* `91:`		--Zarro-- Extended poles
 * `92:`     reserved
+* `93:`		--Zarro-- Extended FKs 2
+* `94:`		--Zarro-- Quests 2
+* `95:`		--Zarro-- current shadow copy
 * `96:`     queued spells
 * `97:`     computation time used last action
 * `98:`     computation time used

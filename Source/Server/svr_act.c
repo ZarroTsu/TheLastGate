@@ -44,11 +44,11 @@ int char_wears_item(int cn, int tmp)
 	{
 		if ((in = ch[cn].worn[n])!=0 && it[in].temp==tmp)
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 void step_desertfloor(int cn)
@@ -219,7 +219,8 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			return;
 		}
 
-		if ((map[m].flags & MF_NOMAGIC) && !char_wears_item(cn, 466) && !char_wears_item(cn, 481)) // Sun amulet or Dark Sun amulet
+		if (((map[m].flags & MF_NOMAGIC) && !char_wears_item(cn, 466) && !char_wears_item(cn, 481) && 
+			!char_wears_item(cn, IT_AM_TRUESUN)) || char_wears_item(cn, IT_AM_FALMOON)) // Sun amulet or Dark Sun amulet
 		{
 			if (!(ch[cn].flags & CF_NOMAGIC))
 			{
@@ -893,7 +894,7 @@ void plr_misc(int cn)
 	{
 		case    0:
 			// Feb 2020 - regular slash does extra surround check if you have surround-speed
-			if ((ch[cn].kindred & KIN_WARRIOR) && ch[cn].skill[SK_PROX][0])
+			if (IS_SEYA_OR_WARR(cn))
 				plr_attack(cn, 2);
 			else
 				plr_attack(cn, 0);
@@ -936,32 +937,32 @@ int plr_check_target(int m)
 {
 	if (map[m].ch || map[m].to_ch)
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (map[m].flags & MF_MOVEBLOCK)
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (map[m].it && (it[map[m].it].flags & IF_MOVEBLOCK))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 int plr_set_target(int m, int cn)
 {
 	if (!plr_check_target(m))
 	{
-		return( 0);
+		return 0;
 	}
 
 	map[m].to_ch = cn;
 
-	return(1);
+	return 1;
 }
 
 

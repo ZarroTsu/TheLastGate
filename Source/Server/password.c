@@ -30,18 +30,18 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "char.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	ch = mmap(NULL, CHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (ch==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap char.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
-	return(0);
+	return 0;
 }
 
 static void unload(void)
@@ -99,5 +99,5 @@ int main(int argc, char *args[])
 
 	unload();
 
-	return(0);
+	return 0;
 }

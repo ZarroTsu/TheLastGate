@@ -27,6 +27,7 @@
 #define GF_CAP        (1<<3)
 #define GF_SPEEDY     (1<<4)
 #define GF_DIRTY      (1<<5)
+#define GF_NEWBS      (1<<6)
 
 struct global
 {
@@ -176,89 +177,90 @@ extern unsigned int mapmarker;
 /* Characters */
 /**************/
 
-#define KIN_MERCENARY   (1u<<0)
-#define KIN_SEYAN_DU    (1u<<1)
-#define KIN_PURPLE      (1u<<2)
-#define KIN_MONSTER     (1u<<3)
-#define KIN_TEMPLAR     (1u<<4)
-#define KIN_ARCHTEMPLAR (1u<<5)
-#define KIN_HARAKIM     (1u<<6)
-#define KIN_MALE        (1u<<7)
-#define KIN_FEMALE      (1u<<8)
-#define KIN_ARCHHARAKIM (1u<<9)
-#define KIN_WARRIOR     (1u<<10)        // arch-merc, warrior
-#define KIN_SORCERER    (1u<<11)        // arch-merc, sorcerer
-#define KIN_BRAWLER    (1u<<12)
+#define KIN_MERCENARY   (1u<< 0)
+#define KIN_SEYAN_DU    (1u<< 1)
+#define KIN_PURPLE      (1u<< 2)
+#define KIN_MONSTER     (1u<< 3)
+#define KIN_TEMPLAR     (1u<< 4)
+#define KIN_ARCHTEMPLAR (1u<< 5)
+#define KIN_HARAKIM     (1u<< 6)
+#define KIN_MALE        (1u<< 7)
+#define KIN_FEMALE      (1u<< 8)
+#define KIN_ARCHHARAKIM (1u<< 9)
+#define KIN_WARRIOR     (1u<<10)  // arch-merc, warrior
+#define KIN_SORCERER    (1u<<11)  // arch-merc, sorcerer
+#define KIN_BRAWLER		(1u<<12)
 #define KIN_SUMMONER    (1u<<13)
 
-#define CF_IMMORTAL    (1ull<<0)        // will not suffer any damage
-#define CF_GOD         (1ull<<1)        // may issue #god commands
-#define CF_CREATOR     (1ull<<2)        // may use #build
-#define CF_BUILDMODE   (1ull<<3)        // does use #build
-#define CF_RESPAWN     (1ull<<4)        // will respawn after death - not for players
-#define CF_PLAYER      (1ull<<5)        // is a player
-#define CF_NEWUSER     (1ull<<6)        // new account created. player may change name
-#define CF_NOTELL      (1ull<<8)        // tell will only work on him if used by a god
-#define CF_NOSHOUT     (1ull<<9)        // shout will only work in him if used by a god
-#define CF_MERCHANT    (1ull<<10)       // will sell his inventory if looked at
-#define CF_STAFF       (1ull<<11)       // member of the staff
-#define CF_NOHPREG     (1ull<<12)       // no hp regeneration
-#define CF_NOENDREG    (1ull<<13)       // no end regeneration
-#define CF_NOMANAREG   (1ull<<14)       // no mana regeneration
-#define CF_INVISIBLE   (1ull<<15)       // character is completely invisible
-#define CF_INFRARED    (1ull<<16)       // sees in the dark
-#define CF_BODY        (1ull<<17)       // dead body
-#define CF_NOSLEEP     (1ull<<18)       // stay awake all the time
-#define CF_UNDEAD      (1ull<<19)       // is undead, can be killed with holy water
-#define CF_NOMAGIC     (1ull<<20)       // no magic zone
-#define CF_STONED      (1ull<<21)       // turned to stone due to lag
-#define CF_USURP       (1ull<<22)       // NPC is being played by player
-#define CF_IMP         (1ull<<23)       // may impersonate monsters
-#define CF_SHUTUP      (1ull<<24)       // player is unable to talk till next day
-#define CF_NODESC      (1ull<<25)       // player cannot change his description
-#define CF_PROF        (1ull<<26)       // profiler listing
-#define CF_SIMPLE      (1ull<<27)       // uses simple animation system (move, turn, 1 attack)
-#define CF_KICKED      (1ull<<28)       // player got kicked, may not login again for a certain time
-#define CF_NOLIST      (1ull<<29)       // dont list character in top ten
-#define CF_NOWHO       (1ull<<30)       // don't list character in #WHO
-#define CF_SPELLIGNORE (1ull<<31)       // ignore spells cast on me
-#define CF_CCP         (1ull<<32)       // Computer Controlled Player, does NOT log out and may have some extra logic
-#define CF_SAFE        (1ull<<33)       // safety measures for gods
-#define CF_NOSTAFF     (1ull<<34)       // #stell will only work if flag off
-#define CF_POH         (1ull<<35)       // clan purples of honor
-#define CF_POH_LEADER  (1ull<<36)       // clan purples of honor
-#define CF_THRALL      (1ull<<37)       // is enthralled NPC
-#define CF_LABKEEPER   (1ull<<38)       // is labkeeper
-#define CF_ISLOOTING   (1ull<<39)       // is currently looting a grave
-#define CF_GOLDEN      (1ull<<40)       // is on "golden list" aka good player
-#define CF_BLACK       (1ull<<41)       // is on "black list" aka bad player
-#define CF_PASSWD      (1ull<<42)       // has passwd set
-#define CF_UPDATE      (1ull<<43)       // client side update needed
-#define CF_SAVEME      (1ull<<44)       // save this player to disk
-#define CF_GREATERGOD  (1ull<<45)       // greater god
-#define CF_GREATERINV  (1ull<<46)       // no one sees me, ever
-#define CF_LOCKPICK    (1ull<<47)       // Ability to use lockpicks and evaluate doors
-#define CF_SHADOWCOPY  (1ull<<48)       // Special flag for shadow copies so you cannot spell them.
-#define CF_SILENCE     (1ull<<49)       // Shuts up NPC greetings so pents isn't as spammy
-#define CF_GCTOME      (1ull<<50)       // Ghost Companion (and Shadow Copy) will automatically teleport with the player
-#define CF_EXTRAEXP    (1ull<<51)		// NPC gives extra exp! Used for STRONG mobs and grind spots
-#define CF_CANCRIT     (1ull<<52)       // Flag to determine if non-players can crit
-#define CF_APPRAISE    (1ull<<53)       // Can see item value
-#define CF_APPR_OFF    (1ull<<54)       // Toggle Appraisal
-#define CF_AREA_OFF    (1ull<<55)       // Toggle AoE Skills
-#define CF_SENSE       (1ull<<56)       // Shuts up NPC sense-magic messages
-#define CF_AUTOLOOT    (1ull<<57)       // Automatic looting
-#define CF_BSPOINTS    (1ull<<58)		// Black Stronghold point merchant
-#define CF_SYS_OFF     (1ull<<59)		// Turns off all system-related messages
-#define CF_OVERRIDE    (1ull<<60)		// Allow overriding friendly spells on self
+#define CF_IMMORTAL		(1ull<< 0)  // will not suffer any damage
+#define CF_GOD			(1ull<< 1)  // may issue #god commands
+#define CF_CREATOR		(1ull<< 2)  // may use #build
+#define CF_BUILDMODE	(1ull<< 3)  // does use #build
+#define CF_RESPAWN		(1ull<< 4)  // will respawn after death - not for players
+#define CF_PLAYER		(1ull<< 5)  // is a player
+#define CF_NEWUSER		(1ull<< 6)  // new account created. player may change name
+#define CF_NOTELL		(1ull<< 8)  // tell will only work on him if used by a god
+#define CF_NOSHOUT		(1ull<< 9)  // shout will only work in him if used by a god
+#define CF_MERCHANT		(1ull<<10)  // will sell his inventory if looked at
+#define CF_STAFF		(1ull<<11)  // member of the staff
+#define CF_NOHPREG		(1ull<<12)  // no hp regeneration
+#define CF_NOENDREG		(1ull<<13)  // no end regeneration
+#define CF_NOMANAREG	(1ull<<14)  // no mana regeneration
+#define CF_INVISIBLE	(1ull<<15)  // character is completely invisible
+#define CF_INFRARED		(1ull<<16)  // sees in the dark
+#define CF_BODY			(1ull<<17)  // dead body
+#define CF_NOSLEEP		(1ull<<18)  // stay awake all the time
+#define CF_UNDEAD		(1ull<<19)  // is undead, can be killed with holy water
+#define CF_NOMAGIC		(1ull<<20)  // no magic zone
+#define CF_STONED		(1ull<<21)  // turned to stone due to lag
+#define CF_USURP		(1ull<<22)  // NPC is being played by player
+#define CF_IMP			(1ull<<23)  // may impersonate monsters
+#define CF_SHUTUP		(1ull<<24)  // player is unable to talk till next day
+#define CF_NODESC		(1ull<<25)  // player cannot change his description
+#define CF_PROF			(1ull<<26)  // profiler listing
+#define CF_SIMPLE		(1ull<<27)  // uses simple animation system (move, turn, 1 attack)
+#define CF_KICKED		(1ull<<28)  // player got kicked, may not login again for a certain time
+#define CF_NOLIST		(1ull<<29)  // dont list character in top ten
+#define CF_NOWHO		(1ull<<30)  // don't list character in #WHO
+#define CF_SPELLIGNORE	(1ull<<31)  // ignore spells cast on me
+#define CF_CCP			(1ull<<32)  // Computer Controlled Player, does NOT log out and may have some extra logic
+#define CF_SAFE			(1ull<<33)  // safety measures for gods
+#define CF_NOSTAFF		(1ull<<34)  // #stell will only work if flag off
+#define CF_POH			(1ull<<35)  // clan purples of honor
+#define CF_POH_LEADER	(1ull<<36)  // clan purples of honor
+#define CF_THRALL		(1ull<<37)  // is enthralled NPC
+#define CF_LABKEEPER	(1ull<<38)  // is labkeeper
+#define CF_ISLOOTING	(1ull<<39)  // is currently looting a grave
+#define CF_GOLDEN		(1ull<<40)  // is on "golden list" aka good player
+#define CF_BLACK		(1ull<<41)  // is on "black list" aka bad player
+#define CF_PASSWD		(1ull<<42)  // has passwd set
+#define CF_UPDATE		(1ull<<43)  // client side update needed
+#define CF_SAVEME		(1ull<<44)  // save this player to disk
+#define CF_GREATERGOD	(1ull<<45)  // greater god
+#define CF_GREATERINV	(1ull<<46)  // no one sees me, ever
+#define CF_LOCKPICK		(1ull<<47)  // Ability to use lockpicks and evaluate doors
+#define CF_SHADOWCOPY	(1ull<<48)  // Special flag for shadow copies so you cannot spell them.
+#define CF_SILENCE		(1ull<<49)  // Shuts up NPC greetings so pents isn't as spammy
+#define CF_GCTOME		(1ull<<50)  // Ghost Companion (and Shadow Copy) will automatically teleport with the player
+#define CF_EXTRAEXP		(1ull<<51)  // NPC gives extra exp! Used for STRONG mobs and grind spots
+#define CF_CANCRIT		(1ull<<52)  // Flag to determine if non-players can crit
+#define CF_APPRAISE		(1ull<<53)  // Can see item value
+#define CF_APPR_OFF		(1ull<<54)  // Toggle Appraisal
+#define CF_AREA_OFF		(1ull<<55)  // Toggle AoE Skills
+#define CF_SENSE		(1ull<<56)  // Shuts up NPC sense-magic messages
+#define CF_AUTOLOOT		(1ull<<57)  // Automatic looting
+#define CF_BSPOINTS		(1ull<<58)  // Black Stronghold point merchant
+#define CF_SYS_OFF		(1ull<<59)  // Turns off all system-related messages
+#define CF_OVERRIDE		(1ull<<60)  // Allow overriding friendly spells on self
+#define CF_ALW_SPECT	(1ull<<61)  // Allow spectating
 
 #define AT_CAP				300
 #define SPEED_CAP 			300
 
-#define PROX_MULTI		(AT_CAP/(3/2))
-#define PROX_CAP		(AT_CAP/12)
-#define PROX_HIT		(AT_CAP/30)
-#define PROX_POW		(AT_CAP/36)
+#define PROX_MULTI		(AT_CAP/ 2)
+#define PROX_CAP		(AT_CAP/10) // 12
+#define PROX_HIT		(AT_CAP/25) // 30
+#define PROX_POW		(AT_CAP/30) // 36
 
 #define PRXW_RAD		6
 #define PRXW_CAP		(AT_CAP/ 4)
@@ -275,11 +277,11 @@ extern unsigned int mapmarker;
 #define PREC_CAP		(AT_CAP/4)
 
 // Attribute Definitions
-#define AT_BRV 		0
-#define AT_WIL 		1
-#define AT_INT 		2
-#define AT_AGL 		3
-#define AT_STR 		4
+#define AT_BRV 			 0
+#define AT_WIL 			 1
+#define AT_INT 			 2
+#define AT_AGL 			 3
+#define AT_STR 			 4
 
 // Skill Definitions    //
 #define SK_HAND			 0
@@ -348,33 +350,45 @@ extern unsigned int mapmarker;
 #define SK_DOUSE		10
 #define SK_MSHELL		12
 #define SK_GUARD		16
+#define SK_VENOM		29
+#define SK_WARCRY3  	30
 #define SK_DISPEL2		32
 #define SK_WARCRY2  	36
 //////////////////////////
 #define SK_FROSTB		44
 #define SK_SLOW3		50
 
-/* ch.data[] definitions */
-/* (this list is growing very slowly;
-   see definitions at the beginning of driver.c for NPCs and
-   README for player characters. */
-#define CHD_AFK         0
-#define CHD_MINGROUP    1
-#define CHD_MAXGROUP    9
-#define CHD_FIGHTBACK   11
-#define CHD_GROUP       42
-#define CHD_MASTER      63
-#define CHD_COMPANION   64
-#define CHD_ALLOW       65
-#define CHD_CORPSEOWNER 66
-#define CHD_RIDDLER     67
-#define CHD_ATTACKTIME  68
-#define CHD_ATTACKVICT  69
-#define CHD_TALKATIVE   71
-#define CHD_SHADOWCOPY  74
-#define CHD_ENEMY1ST    80
-#define CHD_ENEMYZZZ    91
+/*
+	*** ch.data[] definitions ***
+	(this list is growing very slowly;
+	see definitions at the beginning of driver.c for NPCs and
+	README for player characters.
+*/
 
+// Generic CHD values
+#define CHD_GROUP			42
+#define CHD_MASTER			63
+#define CHD_CORPSEOWNER		66
+
+// Player-only values (PCD_)
+#define PCD_AFK				 0
+#define PCD_MINGROUP		 1
+#define PCD_MAXGROUP		 9
+#define PCD_FIGHTBACK		11
+#define PCD_COMPANION		64
+#define PCD_ALLOW			65
+#define PCD_RIDDLER			67
+#define PCD_ATTACKTIME		68
+#define PCD_ATTACKVICT		69
+#define PCD_SHADOWCOPY		95
+
+// Monster-only values (MCD_)
+#define MCD_DESTTIMER		64
+#define MCD_TALKATIVE		71
+#define MCD_ENEMY1ST		80
+#define MCD_ENEMYZZZ		91
+
+//
 #define RANKS 25
 
 /* level differences permitted for attack / group */
@@ -544,7 +558,9 @@ struct character
 	short int sprite_override;
 
 	unsigned int alt_worn[12];		// Alternative gear set in storage for swapping
-
+	
+	
+	
 	char future2[50];				// space for future expansion
 
 	unsigned int depot[62];
@@ -626,6 +642,7 @@ __attribute__ ((packed));
 #define IF_STACKABLE     (1ull<<48)     // item can be stacked
 #define IF_PURP_UNI      (1ull<<49)     // unique check for Purple 
 #define IF_GEMSTONE      (1ull<<50)     // is a gem
+#define IF_IS_KEY        (1ull<<51)     // is a key and decays on rugs
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -698,7 +715,8 @@ struct item
 
 	char min_rank;                  // minimum rank to wear the item
 	
-	char speed[2];					// base action speed modifier (for haste and slow)
+	char future2[2];				
+	
 	char move_speed[2];				// movement speed bonus
 	char atk_speed[2];				// attack speed bonus
 	char cast_speed[2];				// Cast speed bonus
@@ -724,7 +742,9 @@ struct item
 	
 	unsigned char base_crit;		// base crit chance for weapons
 	
-	char future3[9];				// 587
+	short int speed[2];				// base action speed modifier (for haste and slow)
+	
+	char future3[5];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595

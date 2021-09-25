@@ -45,36 +45,36 @@ static inline int check_map_see(int x, int y)
 
 	if (x<=0 || x>=MAPX || y<=0 || y>=MAPY)
 	{
-		return( 0);
+		return 0;
 	}
 
 	m = x + y * MAPX;
 	
 	if (isbuilding)
 	{
-		return(1);
+		return 1;
 	}
 	
 	if (ismonster)
 	{
 		if (map[m].flags & (MF_SIGHTBLOCK | MF_NOMONST))
 		{
-			return( 0);
+			return 0;
 		}
 	}
 	else
 	{
 		if (map[m].flags & MF_SIGHTBLOCK)
 		{
-			return( 0);
+			return 0;
 		}
 	}
 	if (map[m].it && (it[map[m].it].flags & IF_SIGHTBLOCK))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 static inline int check_map_go(int x, int y)
@@ -83,22 +83,22 @@ static inline int check_map_go(int x, int y)
 
 	if (x<=0 || x>=MAPX || y<=0 || y>=MAPY)
 	{
-		return( 0);
+		return 0;
 	}
 
 	m = x + y * MAPX;
 
 	if (map[m].flags & MF_MOVEBLOCK)
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (map[m].it && (it[map[m].it].flags & IF_MOVEBLOCK))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 static inline int close_vis_see(int x, int y, int v)
@@ -106,7 +106,7 @@ static inline int close_vis_see(int x, int y, int v)
 	// 02162020 - updated 20's and 40's for larger client render
 	if (!check_map_see(x, y))
 	{
-		return( 0);
+		return 0;
 	}
 
 	x = x - ox + VISI_SIZE/2;
@@ -114,38 +114,38 @@ static inline int close_vis_see(int x, int y, int v)
 
 	if (visi[(x + 1) + (y) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x - 1) + (y) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x) + (y + 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x) + (y - 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x + 1) + (y + 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x + 1) + (y - 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x - 1) + (y + 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x - 1) + (y - 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 static inline int close_vis_go(int x, int y, int v)
@@ -153,7 +153,7 @@ static inline int close_vis_go(int x, int y, int v)
 	// 02162020 - updated 20's and 40's for larger client render
 	if (!check_map_go(x, y))
 	{
-		return( 0);
+		return 0;
 	}
 
 	x = x - ox + VISI_SIZE/2;
@@ -161,38 +161,38 @@ static inline int close_vis_go(int x, int y, int v)
 
 	if (visi[(x + 1) + (y) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x - 1) + (y) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x) + (y + 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x) + (y - 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x + 1) + (y + 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x + 1) + (y - 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x - 1) + (y + 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 	if (visi[(x - 1) + (y - 1) * VISI_SIZE]==v)
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 static inline int check_vis(int x, int y)
@@ -238,7 +238,7 @@ static inline int check_vis(int x, int y)
 
 	if (best==99)
 	{
-		return( 0);
+		return 0;
 	}
 	else
 	{
@@ -359,7 +359,7 @@ int can_see(int cn, int _fx, int _fy, int tx, int ty, int maxdist)
 		visi = see[cn].vis;
 		if (_fx!=see[cn].x || _fy!=see[cn].y)
 		{
-			if ((ch[cn].kindred & KIN_MONSTER) && !(ch[cn].flags & (CF_USURP | CF_THRALL)))
+			if (IS_MONSTER(cn) && !(ch[cn].flags & (CF_USURP | CF_THRALL)))
 			{
 				ismonster = 1;
 			}
@@ -604,8 +604,8 @@ int char_id(int cn)
 
 int points2rank(int v)
 {
-	if (v<      250)	return( 0); // Private
-	if (v<     1750)	return( 1); // Private FIrst Class
+	if (v<      250)	return 0; // Private
+	if (v<     1750)	return 1; // Private FIrst Class
 	if (v<     7000)	return( 2); // Lance Corporal
 	if (v<    21000)	return( 3); // Corporal
 	if (v<    52500)	return( 4); // Sergeant
@@ -674,7 +674,7 @@ int points_tolevel(int curr_exp)
 	curr_level = points2rank(curr_exp);
 	if (curr_level >= RANKS-1)
 	{
-		return( 0);
+		return 0;
 	}
 	next_level = curr_level + 1;
 
@@ -696,7 +696,7 @@ int points_tolevel(int curr_exp)
 	}
 	if (p0 > (20 * curr_exp))
 	{
-		return( 0);                     // Can't do it
+		return 0;                     // Can't do it
 	}
 	p5++;
 	return(p5);
@@ -814,10 +814,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_claw[n];
-				if (it_temp[z].skill[SK_HAND][2]>ch[cn].skill[SK_HAND][0]) continue;
+				if (it_temp[z].skill[SK_HAND][2]>B_SK(cn, SK_HAND)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -826,10 +826,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_dagger[n];
-				if (it_temp[z].skill[SK_DAGGER][2]>ch[cn].skill[SK_DAGGER][0]) continue;
+				if (it_temp[z].skill[SK_DAGGER][2]>B_SK(cn, SK_DAGGER)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -838,10 +838,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_sword[n];
-				if (it_temp[z].skill[SK_SWORD][2]>ch[cn].skill[SK_SWORD][0]) continue;
+				if (it_temp[z].skill[SK_SWORD][2]>B_SK(cn, SK_SWORD)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -850,10 +850,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_axe[n];
-				if (it_temp[z].skill[SK_AXE][2]>ch[cn].skill[SK_AXE][0]) continue;
+				if (it_temp[z].skill[SK_AXE][2]>B_SK(cn, SK_AXE)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -862,10 +862,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_staff[n];
-				if (it_temp[z].skill[SK_STAFF][2]>ch[cn].skill[SK_STAFF][0]) continue;
+				if (it_temp[z].skill[SK_STAFF][2]>B_SK(cn, SK_STAFF)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -874,10 +874,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_twoh[n];
-				if (it_temp[z].skill[SK_TWOHAND][2]>ch[cn].skill[SK_TWOHAND][0]) continue;
+				if (it_temp[z].skill[SK_TWOHAND][2]>B_SK(cn, SK_TWOHAND)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -886,11 +886,11 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_spear[n];
-				if (it_temp[z].skill[SK_DAGGER][2]>ch[cn].skill[SK_DAGGER][0]) continue;
-				if (it_temp[z].skill[SK_STAFF][2]>ch[cn].skill[SK_STAFF][0]) continue;
+				if (it_temp[z].skill[SK_DAGGER][2]>B_SK(cn, SK_DAGGER)) continue;
+				if (it_temp[z].skill[SK_STAFF][2]>B_SK(cn, SK_STAFF)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -899,11 +899,11 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_great[n];
-				if (it_temp[z].skill[SK_AXE][2]>ch[cn].skill[SK_AXE][0]) continue;
-				if (it_temp[z].skill[SK_TWOHAND][2]>ch[cn].skill[SK_TWOHAND][0]) continue;
+				if (it_temp[z].skill[SK_AXE][2]>B_SK(cn, SK_AXE)) continue;
+				if (it_temp[z].skill[SK_TWOHAND][2]>B_SK(cn, SK_TWOHAND)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -912,10 +912,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_shield[n];
-				if (it_temp[z].skill[SK_SHIELD][2]>ch[cn].skill[SK_SHIELD][0]) continue;
+				if (it_temp[z].skill[SK_SHIELD][2]>B_SK(cn, SK_SHIELD)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -924,10 +924,10 @@ int get_best_weapon(int cn, int v)
 			for (n=0;n<6;n++)
 			{
 				z = w_dsword[n];
-				if (it_temp[z].skill[SK_DUAL][2]>ch[cn].skill[SK_DUAL][0]) continue;
+				if (it_temp[z].skill[SK_DUAL][2]>B_SK(cn, SK_DUAL)) continue;
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -954,7 +954,7 @@ int get_best_armor(int cn, int v)
 				z = a_helm[n];
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -965,7 +965,7 @@ int get_best_armor(int cn, int v)
 				z = a_body[n];
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -976,7 +976,7 @@ int get_best_armor(int cn, int v)
 				z = c_helm[n];
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -987,7 +987,7 @@ int get_best_armor(int cn, int v)
 				z = c_body[n];
 				for (m=0;m<5;m++)
 				{
-					if (it_temp[z].attrib[m][2]>ch[cn].attrib[m][0]) break;
+					if (it_temp[z].attrib[m][2]>B_AT(cn, m)) break;
 				}
 				if (m==5) { in = z; break; }
 			}
@@ -1000,64 +1000,67 @@ int get_best_armor(int cn, int v)
 
 int change_bs_shop_item(int cn, int in)
 {
+	if (!IS_SANEITEM(in))
+		return 0;
+	
 	switch (in)
 	{
 		// Steel Greataxe, change to appropriate 1st skill item
 		case IT_GAXE_STEL:
-			if (ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, 10); // 1. Greataxe
-			else if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER))
+			else if (IS_ANY_MERC(cn))
 				in = get_best_weapon(cn, SK_SWORD); // 1. Sword
-			else if (ch[cn].kindred & (KIN_HARAKIM | KIN_SUMMONER | KIN_ARCHHARAKIM))
+			else if (IS_ANY_HARA(cn))
 				in = get_best_weapon(cn, 7); // 1. Spear
 			else
 				in = 0;
 			break;
 		// Steel twohander, change to appropriate 2nd skill item
 		case IT_THSW_STEL:
-			if (ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, SK_TWOHAND); // 2. Twohander
-			else if (ch[cn].kindred & (KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER))
+			else if (IS_ANY_MERC(cn))
 				in = get_best_weapon(cn, SK_SHIELD); // 2. Shield
-			else if (ch[cn].kindred & (KIN_HARAKIM | KIN_SUMMONER | KIN_ARCHHARAKIM))
+			else if (IS_ANY_HARA(cn))
 				in = get_best_weapon(cn, SK_STAFF); // 2. Staff
 			else
 				in = 0;
 			break;
 		// Steel axe, change to appropriate 3rd skill item
 		case IT_AXXE_STEL:
-			if (ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, SK_AXE); // 3. Axe
-			else if (ch[cn].kindred & KIN_WARRIOR)
+			else if (IS_WARRIOR(cn))
 				in = get_best_weapon(cn, SK_DUAL); // 3. Dual Sword
-			else if (ch[cn].kindred & (KIN_MERCENARY | KIN_SORCERER | KIN_HARAKIM | KIN_SUMMONER | KIN_ARCHHARAKIM))
+			else if (IS_ANY_HARA(cn) || IS_MERCENARY(cn) || IS_SORCERER(cn))
 				in = get_best_weapon(cn, SK_DAGGER); // 3. Dagger
 			else
 				in = 0;
 			break;
 		// Steel claw, change to appropriate 4th skill item
 		case IT_SHIE_STEL:
-			if (ch[cn].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, SK_SHIELD); // 4. Shield
-			else if (ch[cn].kindred & KIN_WARRIOR)
+			else if (IS_WARRIOR(cn))
 				in = get_best_weapon(cn, SK_DAGGER); // 4. Dagger
-			else if (ch[cn].kindred & (KIN_MERCENARY | KIN_SORCERER | KIN_HARAKIM | KIN_SUMMONER | KIN_ARCHHARAKIM))
+			else if (IS_ANY_HARA(cn) || IS_MERCENARY(cn) || IS_SORCERER(cn))
 				in = get_best_weapon(cn, SK_HAND); // 4. Claw
 			else
 				in = 0;
 			break;
 		// Steel sword, change to appropriate 5th skill item
 		case IT_SWOR_STEL:
-			if (ch[cn].kindred & KIN_ARCHTEMPLAR)
+			if (IS_ARCHTEMPLAR(cn))
 				in = get_best_weapon(cn, SK_DUAL); // 5. Dual Sword
-			else if (ch[cn].kindred & (KIN_WARRIOR | KIN_TEMPLAR | KIN_BRAWLER))
+			else if (IS_TEMPLAR(cn) || IS_BRAWLER(cn) || IS_WARRIOR(cn))
 				in = get_best_weapon(cn, SK_HAND); // 5. Claw
 			else
 				in = 0;
 			break;
 		// Steel sword, change to appropriate 6th skill item
 		case IT_DUAL_STEL:
-			if (ch[cn].kindred & KIN_ARCHTEMPLAR)
+			if (IS_ARCHTEMPLAR(cn))
 				in = get_best_weapon(cn, SK_HAND); // 6 Claw
 			else
 				in = 0;
@@ -1085,7 +1088,7 @@ int change_bs_shop_item(int cn, int in)
 	return in;
 }
 
-int get_special_item(int in)
+int get_special_item(int in, int gen_a, int gen_b, int gen_c)
 {
 	int in2;
 	switch(in)
@@ -1112,7 +1115,7 @@ int get_special_item(int in)
 		case IT_HELM_ADAM:	case IT_BODY_ADAM:	case IT_HELM_CAST:	case IT_BODY_CAST:
 		case IT_HELM_ADEP:	case IT_BODY_ADEP:	case IT_HELM_WIZR:	case IT_BODY_WIZR:
 		case IT_HELM_DAMA:	case IT_BODY_DAMA:
-			in2 = create_special_item(in);
+			in2 = create_special_item(in, gen_a, gen_b, gen_c);
 			break;
 
 		default:
@@ -1231,9 +1234,10 @@ int get_special_spr(int temp, int spr)
 	return spr;
 }
 
-int create_special_item(int temp)
+int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 {
-	int in, mul = 1, spr, roll=21, legendary = 0, n, m, prev=-1;
+	// roll is number of prefixes, *3/2
+	int in, mul = 1, spr, roll=36, legendary = 0, n, m, prev=-1;
 	char *pref, *suffix, name[60], newname[80];
 	int is_armor=0, is_robe=0, is_dama=0, is_weap=0, is_mage=0;
 	int is_gaxe=0, is_thsw=0, is_axxe=0, is_shie=0, is_swor=0;
@@ -1242,7 +1246,7 @@ int create_special_item(int temp)
 	in = god_create_item(temp);
 	if (!in)
 	{
-		return( 0);
+		return 0;
 	}
 	
 	it[in].temp = 0;
@@ -1302,54 +1306,110 @@ int create_special_item(int temp)
 	}
 	
 	// Special 'Legendary' affixes
-	if (!RANDOM(15))
+	if (!RANDOM(12) || gen_c)
 	{
 		legendary = 1;
-		roll = 14;
+		roll = 24;
 	}
 	
+	roll = RANDOM(roll);
+	
+	if (gen_a) roll = gen_a;
+	
 	// Pick a prefix
-	switch(RANDOM(roll))
+	switch(roll)
 	{
 		case  0: 
 		case  1: 
 			if (legendary) pref = "Leo "; else pref = "Lion's ";
-			it[in].attrib[AT_BRV][0] += 2 * mul + RANDOM(2); 
+			it[in].attrib[AT_BRV][0] += 4 * mul; 
 			break;
 		case  2: 
 		case  3: 
 			if (legendary) pref = "Anguis "; else pref = "Snake's "; 
-			it[in].attrib[AT_WIL][0] += 2 * mul + RANDOM(2); 
+			it[in].attrib[AT_WIL][0] += 4 * mul; 
 			break;
 		case  4: 
 		case  5: 
 			if (legendary) pref = "Ibis "; else pref = "Owl's "; 
-			it[in].attrib[AT_INT][0] += 2 * mul + RANDOM(2); 
+			it[in].attrib[AT_INT][0] += 4 * mul; 
 			break;
 		case  6: 
 		case  7: 
 			if (legendary) pref = "Mus "; else pref = "Weasel's "; 
-			it[in].attrib[AT_AGL][0] += 2 * mul + RANDOM(2); 
+			it[in].attrib[AT_AGL][0] += 4 * mul; 
 			break;
 		case  8: 
 		case  9: 
 			if (legendary) pref = "Ursa "; else pref = "Bear's "; 
-			it[in].attrib[AT_STR][0] += 2 * mul + RANDOM(2); 
+			it[in].attrib[AT_STR][0] += 4 * mul; 
 			break;
+		//
 		case 10: 
+			if (legendary) pref = "Aquilia "; else pref = "Eagle's "; 
+			it[in].attrib[AT_BRV][0] += 3 * mul; 
+			it[in].attrib[AT_WIL][0] += 3 * mul; 
+			break;
 		case 11: 
-			if (legendary) pref = "Angelus "; else pref = "Angelic "; 
-			it[in].attrib[AT_BRV][0] += 1 * mul + RANDOM(2); 
-			it[in].attrib[AT_WIL][0] += 1 * mul + RANDOM(2); 
-			it[in].attrib[AT_INT][0] += 1 * mul + RANDOM(2); 
-			it[in].attrib[AT_AGL][0] += 1 * mul + RANDOM(2); 
-			it[in].attrib[AT_STR][0] += 1 * mul + RANDOM(2); 
+			if (legendary) pref = "Vespa "; else pref = "Wasp's "; 
+			it[in].attrib[AT_BRV][0] += 3 * mul; 
+			it[in].attrib[AT_INT][0] += 3 * mul; 
 			break;
 		case 12: 
-			if (legendary) pref = "Lux "; else pref = "Glowing "; 
-			it[in].light[0] += 10 * mul + RANDOM(3)*5;
+			if (legendary) pref = "Pardus "; else pref = "Leopard's "; 
+			it[in].attrib[AT_BRV][0] += 3 * mul; 
+			it[in].attrib[AT_AGL][0] += 3 * mul; 
 			break;
 		case 13: 
+			if (legendary) pref = "Tigris "; else pref = "Tiger's "; 
+			it[in].attrib[AT_BRV][0] += 3 * mul; 
+			it[in].attrib[AT_STR][0] += 3 * mul; 
+			break;
+		case 14: 
+			if (legendary) pref = "Ciconia "; else pref = "Crane's "; 
+			it[in].attrib[AT_WIL][0] += 3 * mul; 
+			it[in].attrib[AT_INT][0] += 3 * mul; 
+			break;
+		case 15: 
+			if (legendary) pref = "Lepus "; else pref = "Rabbit's "; 
+			it[in].attrib[AT_WIL][0] += 3 * mul; 
+			it[in].attrib[AT_AGL][0] += 3 * mul; 
+			break;
+		case 16: 
+			if (legendary) pref = "Ranae "; else pref = "Frog's "; 
+			it[in].attrib[AT_WIL][0] += 3 * mul; 
+			it[in].attrib[AT_STR][0] += 3 * mul; 
+			break;
+		case 17: 
+			if (legendary) pref = "Alces "; else pref = "Elk's "; 
+			it[in].attrib[AT_INT][0] += 3 * mul; 
+			it[in].attrib[AT_AGL][0] += 3 * mul; 
+			break;
+		case 18: 
+			if (legendary) pref = "Accipiter "; else pref = "Hawk's "; 
+			it[in].attrib[AT_INT][0] += 3 * mul; 
+			it[in].attrib[AT_STR][0] += 3 * mul; 
+			break;
+		case 19: 
+			if (legendary) pref = "Lupus "; else pref = "Wolf's "; 
+			it[in].attrib[AT_AGL][0] += 3 * mul; 
+			it[in].attrib[AT_STR][0] += 3 * mul; 
+			break;
+		//
+		case 20: 
+			if (legendary) pref = "Angelus "; else pref = "Angelic "; 
+			it[in].attrib[AT_BRV][0] += 2 * mul; 
+			it[in].attrib[AT_WIL][0] += 2 * mul; 
+			it[in].attrib[AT_INT][0] += 2 * mul; 
+			it[in].attrib[AT_AGL][0] += 2 * mul; 
+			it[in].attrib[AT_STR][0] += 2 * mul; 
+			break;
+		case 21: 
+		case 22: 
+			if (legendary) pref = "Lux "; else pref = "Glowing "; 
+			it[in].light[0] += 20 * mul;
+			break;
+		case 23: 
 			if (legendary) pref = "Deus "; else pref = "Godly "; 
 			mul *= 2; 
 			break;
@@ -1358,234 +1418,319 @@ int create_special_item(int temp)
 			break;
 	}
 	
-	roll=RANDOM(42);
+	roll=RANDOM(40);
 
 	// Pick a suffix, or two if legendary
 	for (n=0;n<=legendary;n++)
 	{
 		while (roll==prev) // avoid picking the same thing twice if legendary
 		{
-			roll=RANDOM(42);
+			roll=RANDOM(40);
 		}
-		prev = roll;
 		m=RANDOM(2);
+		
+		if (n==0 && gen_b) roll = gen_b;
+		if (n==1 && gen_c) roll = gen_c;
 		
 		switch(roll)
 		{
 			case  0:
 			case  1:
 				if (legendary) suffix = "Fortem"; else suffix = " of Braveness";
-				it[in].attrib[AT_BRV][0] += 2 * mul + RANDOM(2);
+				it[in].attrib[AT_BRV][0] += 4 * mul;
 				break;
 			case  2:
 			case  3:
-				if (legendary) suffix = "Autem"; else suffix = " of Willpower";
-				it[in].attrib[AT_WIL][0] += 2 * mul + RANDOM(2);
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Autem"; else suffix = " of Willpower";
+					it[in].attrib[AT_WIL][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
+					it[in].attrib[AT_AGL][0] += 4 * mul;
+				}
 				break;
 			case  4:
 			case  5:
-				if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
-				it[in].attrib[AT_INT][0] += 2 * mul + RANDOM(2);
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
+					it[in].attrib[AT_INT][0] += 4 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Viribus"; else suffix = " of Strength";
+					it[in].attrib[AT_STR][0] += 4 * mul;
+				}
 				break;
 			case  6:
+				if (legendary) suffix = "Callidus"; else suffix = " of the Adept";
+				it[in].attrib[AT_BRV][0] += 2 * mul; 
+				it[in].attrib[AT_WIL][0] += 2 * mul; 
+				it[in].attrib[AT_INT][0] += 2 * mul; 
+				it[in].attrib[AT_AGL][0] += 2 * mul; 
+				it[in].attrib[AT_STR][0] += 2 * mul; 
+				break;
 			case  7:
-				if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
-				it[in].attrib[AT_AGL][0] += 2 * mul + RANDOM(2);
+				if (legendary) suffix = "Salutem"; else suffix = " of Hitpoints";
+				it[in].hp[0] += 40 * mul;
 				break;
 			case  8:
+				if (legendary) suffix = "Pati"; else suffix = " of Endurance";
+				it[in].end[0] += 20 * mul;
+				break;
 			case  9:
-				if (legendary) suffix = "Viribus"; else suffix = " of Strength";
-				it[in].attrib[AT_STR][0] += 2 * mul + RANDOM(2);
+				if (legendary) suffix = "Magus"; else suffix = " of Mana";
+				it[in].mana[0] += 40 * mul;
 				break;
 			case 10:
-				if (legendary) suffix = "Callidus"; else suffix = " of the Adept";
-				it[in].attrib[AT_BRV][0] += 1 * mul + RANDOM(2); 
-				it[in].attrib[AT_WIL][0] += 1 * mul + RANDOM(2); 
-				it[in].attrib[AT_INT][0] += 1 * mul + RANDOM(2); 
-				it[in].attrib[AT_AGL][0] += 1 * mul + RANDOM(2); 
-				it[in].attrib[AT_STR][0] += 1 * mul + RANDOM(2); 
+				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
+				it[in].weapon[0] += 3 * mul;
 				break;
 			case 11:
+				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
+				it[in].armor[0] += 3 * mul;
+				break;
 			case 12:
-				if (legendary) suffix = "Salutem"; else suffix = " of Hitpoints";
-				it[in].hp[0] += 30 * mul + RANDOM(3)*5;
+				if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
+				it[in].skill[SK_IMMUN][0] += 3 * mul;
 				break;
 			case 13:
-			case 14:
-				if (legendary) suffix = "Pati"; else suffix = " of Endurance";
-				it[in].end[0] += 10 * mul + RANDOM(3)*5;
-				break;
-			case 15:
-			case 16:
-				if (legendary) suffix = "Magus"; else suffix = " of Mana";
-				it[in].mana[0] += 30 * mul + RANDOM(3)*5;
-				break;
-			case 17:
-				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-				it[in].weapon[0] += 2 * mul + RANDOM(2);
-				break;
-			case 18:
-				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-				it[in].armor[0] += 2 * mul + RANDOM(2);
-				break;
-			case 19:
-				if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
-				it[in].skill[SK_IMMUN][0] += 2 * mul + RANDOM(2);
-				break;
-			case 20:
 				if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
-				it[in].skill[SK_RESIST][0] += 2 * mul + RANDOM(2);
+				it[in].skill[SK_RESIST][0] += 3 * mul;
 				break;
-			case 21:
-			case 22:
+			case 14:
+			case 15:
 				if (is_robe || is_spea || is_dagg || (is_dama && m))
 				{
 					if (legendary) suffix = "Pugione"; else suffix = " of the Dagger";
-					it[in].skill[SK_DAGGER][0] += 2 * mul + RANDOM(2);
+					it[in].skill[SK_DAGGER][0] += 3 * mul;
 				}
 				else if (is_armor || is_claw || (is_dama && !m))
 				{
 					if (legendary) suffix = "Manibus"; else suffix = " of the Unarmed";
-					it[in].skill[SK_HAND][0] += 2 * mul + RANDOM(2);
+					it[in].skill[SK_HAND][0] += 3 * mul;
 				}
 				else // gaxe, thsw, axxe, swor, dual, shie, staf
 				{
 					if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
-					it[in].skill[SK_RESIST][0] += 2 * mul + RANDOM(2);
-					break;
+					it[in].skill[SK_RESIST][0] += 3 * mul;
 				}
 				break;
-			case 23:
-			case 24:
+			case 16:
+			case 17:
 				if (is_robe || is_spea || is_staf || (is_dama && m))
 				{
 					if (legendary) suffix = "Virgam"; else suffix = " of the Staff";
-					it[in].skill[SK_STAFF][0] += 2 * mul + RANDOM(2);
+					it[in].skill[SK_STAFF][0] += 3 * mul;
 				}
 				else if (is_armor || is_swor || (is_dama && !m))
 				{
 					if (legendary) suffix = "Gladio"; else suffix = " of the Sword";
-					it[in].skill[SK_SWORD][0] += 2 * mul + RANDOM(2);
+					it[in].skill[SK_SWORD][0] += 3 * mul;
 				}
 				else // gaxe, thsw, axxe, dual, claw, shie, dagg
 				{
 					if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
-					it[in].skill[SK_IMMUN][0] += 2 * mul + RANDOM(2);
-					break;
+					it[in].skill[SK_IMMUN][0] += 3 * mul;
 				}
 				break;
-			case 25:
-			case 26:
+			case 18:
+			case 19:
 				if (is_robe || is_mage || (is_dama && m))
 				{
-					if (legendary) suffix = "Benedicite"; else suffix = " of Blessing";
-					it[in].skill[SK_BLESS][0] += 3 * mul + RANDOM(2);
+					if (legendary) suffix = "Dispello"; else suffix = " of Dispelling";
+					it[in].skill[SK_DISPEL][0] += 3 * mul;
 				}
 				else if (is_armor || is_gaxe || is_axxe || (is_dama && !m))
 				{
 					if (legendary) suffix = "Securis"; else suffix = " of the Axe";
-					it[in].skill[SK_AXE][0] += 2 * mul + RANDOM(2);
+					it[in].skill[SK_AXE][0] += 3 * mul;
 				}
 				else // thsw, swor, dual, claw
 				{
 					if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-					it[in].armor[0] += 2 * mul + RANDOM(2);
-					break;
+					it[in].armor[0] += 3 * mul;
 				}
 				break;
-			case 27:
-			case 28:
+			case 20:
+			case 21:
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Maledictum"; else suffix = " of Cursing";
-					it[in].skill[SK_CURSE][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_CURSE][0] += 3 * mul;
 				}
 				else if (is_armor || is_gaxe || is_thsw || (is_dama && !m))
 				{
 					if (legendary) suffix = "Magna"; else suffix = " of the Twohander";
-					it[in].skill[SK_TWOHAND][0] += 2 * mul + RANDOM(2);
+					it[in].skill[SK_TWOHAND][0] += 3 * mul;
 				}
 				else // axxe, swor, dual, claw
 				{
 					if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-					it[in].weapon[0] += 2 * mul + RANDOM(2);
-					break;
+					it[in].weapon[0] += 3 * mul;
 				}
 				break;
-			case 29:
-			case 30:
+			case 22:
+			case 23:
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Tarda"; else suffix = " of Slowing";
-					it[in].skill[SK_SLOW][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
 				else
 				{
 					if (legendary) suffix = "Adductius"; else suffix = " of Cleaving";
-					it[in].skill[SK_CLEAVE][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_CLEAVE][0] += 3 * mul;
 				}
 				break;
-			case 31:
-			case 32:
+			case 24:
+			case 25:
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Praemium"; else suffix = " of Blasting";
-					it[in].skill[SK_BLAST][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_BLAST][0] += 3 * mul;
 				}
 				else
 				{
 					if (legendary) suffix = "Infirmi"; else suffix = " of Weakening";
-					it[in].skill[SK_WEAKEN][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				break;
-			case 33:
-			case 34:
+			case 26:
+			case 27:
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Familia"; else suffix = " of Company";
-					it[in].skill[SK_GHOST][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_GHOST][0] += 3 * mul;
 				}
 				else
 				{
 					if (legendary) suffix = "Regio"; else suffix = " of Surrounding";
-					it[in].skill[SK_SURROUND][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_SURROUND][0] += 3 * mul;
 				}
 				break;
-			case 35:
-			case 36:
+			case 28:
+			case 29:
 				if (is_robe || is_mage || (is_dama && m))
 				{
 					if (legendary) suffix = "Clypeus"; else suffix = " of Shielding";
-					it[in].skill[SK_MSHIELD][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_MSHIELD][0] += 3 * mul;
 				}
 				else
 				{
 					if (legendary) suffix = "Furorem"; else suffix = " of Taunting";
-					it[in].skill[SK_TAUNT][0] += 3 * mul + RANDOM(2);
+					it[in].skill[SK_TAUNT][0] += 3 * mul;
+				}
+				break;
+			case 30:
+			case 31:
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Praesidium"; else suffix = " of Protection";
+					it[in].skill[SK_PROTECT][0] += 3 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Fortitudo"; else suffix = " of Toughness";
+					it[in].skill[SK_ARMORM][0] += 3 * mul;
+				}
+				break;
+			case 32:
+			case 33:
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Augendae"; else suffix = " of Enhancing";
+					it[in].skill[SK_ENHANCE][0] += 3 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Acies"; else suffix = " of Sharpness";
+					it[in].skill[SK_WEAPONM][0] += 3 * mul;
+				}
+				break;
+			case 34:
+				if (legendary) suffix = "Benedicite"; else suffix = " of Blessing";
+				it[in].skill[SK_BLESS][0] += 3 * mul;
+				break;
+			case 35:
+				switch (RANDOM(4))
+				{
+					case  0:
+						if (is_robe || is_mage || (is_dama && m))
+						{
+							if (legendary) suffix = "Pulsus"; else suffix = " of Pulsing";
+							it[in].skill[SK_PULSE][0] += 3 * mul;
+						}
+						else
+						{
+							if (legendary) suffix = "Bellum"; else suffix = " of Command";
+							it[in].skill[SK_WARCRY][0] += 3 * mul;
+						}
+						break;
+					case  1:
+						if (is_robe || is_mage || (is_dama && m))
+						{
+							if (legendary) suffix = "Umbra"; else suffix = " of Shadows";
+							it[in].skill[SK_SHADOW][0] += 3 * mul;
+						}
+						else
+						{
+							if (legendary) suffix = "Salio"; else suffix = " of Leaping";
+							it[in].skill[SK_LEAP][0] += 3 * mul;
+						}
+						break;
+					case  2:
+						if (is_robe || is_mage || (is_dama && m))
+						{
+							if (legendary) suffix = "Venenum"; else suffix = " of Poison";
+							it[in].skill[SK_POISON][0] += 3 * mul;
+						}
+						else
+						{
+							if (legendary) suffix = "Ventus"; else suffix = " of Zephyr";
+							it[in].skill[SK_ZEPHYR][0] += 3 * mul;
+						}
+						break;
+					default:
+						if (legendary) suffix = "Propinquitas"; else suffix = " of Proximity";
+						it[in].skill[SK_PROX][0] += 3 * mul;
+						break;
 				}
 				break;
 			//
-			case 37:
+			case 36:
 				if (legendary) suffix = "Caecus"; else suffix = " of Blinding";
-				it[in].skill[SK_BLIND][0] += 3 * mul + RANDOM(2);
+				it[in].skill[SK_BLIND][0] += 3 * mul;
+				break;
+			case 37:
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Renati"; else suffix = " of Regeneration";
+					it[in].skill[SK_REGEN][0] += 3 * mul;
+				}
+				else
+				{
+					if (legendary) suffix = "Meditor"; else suffix = " of Meditation";
+					it[in].skill[SK_MEDIT][0] += 3 * mul;
+				}
 				break;
 			case 38:
-				if (legendary) suffix = "Renati"; else suffix = " of Regeneration";
-				it[in].skill[SK_REGEN][0] += 3 * mul + RANDOM(2);
+				if (legendary) suffix = "Requiem"; else suffix = " of Resting";
+				it[in].skill[SK_REST][0] += 3 * mul;
 				break;
 			case 39:
-				if (legendary) suffix = "Requiem"; else suffix = " of Resting";
-				it[in].skill[SK_REST][0] += 3 * mul + RANDOM(2);
-				break;
-			case 40:
-				if (legendary) suffix = "Meditor"; else suffix = " of Meditation";
-				it[in].skill[SK_MEDIT][0] += 3 * mul + RANDOM(2);
-				break;
-			default: // 41
 				if (legendary) suffix = "Sana"; else suffix = " of Healing";
-				it[in].skill[SK_HEAL][0] += 3 * mul + RANDOM(2);
+				it[in].skill[SK_HEAL][0] += 3 * mul;
+				break;
+			//
+			default:
+				if (legendary) suffix = "Null"; else suffix = " of Nothing";
 				break;
 		}
+		prev = roll;
 	}
 	
 	// Update the item's sprite
@@ -1688,17 +1833,18 @@ struct npc_class npc_class[] = {
 	{"Thug"                     },	// 41
 	{"Cultist"                  },	// 42
 	{"Strider"                  },	// 43
+	{"Lycanthrope"              },	// 44
 	//
-	{""},	// 44
-	{""},	// 45
-	{""},	// 46
-	{""},	// 47
-	{""},	// 48
-	{""},	// 49
-	{""},	// 50
-	{""},	// 51
-	{""},	// 52
-	{""},	// 53
+	{"Lizard Guard"             },	// 45
+	{"Lizard Monk"              },	// 46
+	{"Lizard Priest"            },	// 47
+	//
+	{"Lizard Bandit"            },	// 48
+	{"Lizard Dweller"           },	// 49
+	{"Lizard Retainer"          },	// 50
+	{"Lizard Archmage"          },	// 51
+	{"Lizard Archknight"        },	// 52
+	{"Emerald Golem"            },	// 53
 	//
 	{"Gargoyle Queen"			},	// 54
 	{"Brig. Gen Ice Gargoyle"	},	// 55
@@ -1732,7 +1878,7 @@ struct npc_class npc_class[] = {
 	{"Lizard Worker"			},	// 80
 	{"Lizard Seer"				},	// 81
 	{"Undead"					},	// 82
-	{"Reptite"					},	// 83 *
+	{"Reptite"					},	// 83
 	{"Spellcaster"				},	// 84
 	{"Puppeteer"				},	// 85
 	{"Mad Knight"				},	// 86
@@ -1812,7 +1958,44 @@ struct npc_class npc_class[] = {
 	{"Baron Seagrel"			},	// 156
 	{"Earl Seagrel"				},	// 157
 	{"Earl Onyx Gargoyle"		},	// 158
-	{"Warlord Onyx Gargoyle"	}	// 159
+	{"Marquess Onyx Gargoyle"	},	// 159
+	//
+	{"Draugr"               	},	// 160
+	{"Banshee"              	},	// 161
+	{"Revenant"             	},	// 162
+	{"Hellfire"             	},	// 163
+	//
+	{"Knight Onyx Gargoyle" 	},	// 164
+	{"Baron Onyx Gargoyle"  	},	// 165
+	{"Onyx Gargoyle Queen"  	},	// 166
+	//
+	{"Fallen"               	},	// 167
+	{"Undead Knight"         	},	// 168
+	{"Coal Golem"             	},	// 169
+	{"Gargoyle Archmage"       	},	// 170
+	{"Gargoyle Archknight"  	},	// 171
+	{"Ice Gargoyle Knight"    	},	// 172
+	{"Ice Gargoyle Mage"     	},	// 173
+	{"Drider"               	},	// 174
+	{"Despair"              	},	// 175
+	{"Ice Gargoyle Archknight"	},	// 176
+	{"Ice Gargoyle Archmage"	},	// 177
+	{"Minotaur"             	},	// 178
+	{"Dullahan"             	},	// 179
+	//
+	{"Charred"              	},	// 180
+	{"Basalt Golem"         	},	// 181
+	{"Marauder"             	},	// 182
+	{"Ash Golem"               	},	// 183
+	//
+	{""                     	},	// 184
+	{""                     	},	// 185
+	{""                     	},	// 186
+	{""                     	},	// 187
+	{""                     	},	// 188
+	{""                     	},	// 189
+	{""                     	},	// 190
+	{""                     	}	// 191
 };
 
 int killed_class(int cn, int val)
@@ -1843,15 +2026,22 @@ int killed_class(int cn, int val)
 	else if (val<128)
 	{
 		bit = 1 << (val - 96);
-		tmp = ch[cn].data[63] & bit;
-		ch[cn].data[63] |= bit;
+		tmp = ch[cn].data[CHD_MASTER] & bit;
+		ch[cn].data[CHD_MASTER] |= bit;
 		return(tmp);
 	}
-	else
+	else if (val<160)
 	{
 		bit = 1 << (val - 128);
 		tmp = ch[cn].data[70] & bit;
 		ch[cn].data[70] |= bit;
+		return(tmp);
+	}
+	else
+	{
+		bit = 1 << (val - 160);
+		tmp = ch[cn].data[93] & bit;
+		ch[cn].data[93] |= bit;
 		return(tmp);
 	}
 }
@@ -1892,16 +2082,16 @@ int prefix(char *abbr, char *name)
 {
 	if (!*abbr)
 	{
-		return( 0);
+		return 0;
 	}
 	for (; *abbr; abbr++, name++)
 	{
 		if (*abbr != *name)
 		{
-			return( 0);
+			return 0;
 		}
 	}
-	return(1);
+	return 1;
 }
 
 
@@ -1958,7 +2148,7 @@ int use_labtransfer(int cn, int nr, int exp)
 			{
 				do_char_log(cn, 0, "Sorry, the area is still busy. %s is there.\n", ch[co].name);
 				chlog(cn, "Sorry, the area is still busy. %s is there", ch[co].name);
-				return(0);
+				return 0;
 			}
 		}
 	}
@@ -2004,7 +2194,7 @@ int use_labtransfer(int cn, int nr, int exp)
 		default:
 			do_char_log(cn, 0, "Sorry, could not determine which enemy to send you.\n");
 			chlog(cn, "Sorry, could not determine which enemy to send you");
-			return( 0);
+			return 0;
 	}
 
 
@@ -2012,7 +2202,7 @@ int use_labtransfer(int cn, int nr, int exp)
 	{
 		do_char_log(cn, 0, "Sorry, could not create your enemy.\n");
 		chlog(cn, "Sorry, could not create your enemy");
-		return(0);
+		return 0;
 	}
 
 	if (!god_drop_char(co, LAB_ARENA_BOSS_X, LAB_ARENA_BOSS_Y))
@@ -2021,14 +2211,14 @@ int use_labtransfer(int cn, int nr, int exp)
 		chlog(cn, "Sorry, could not place your enemy");
 		god_destroy_items(co);
 		ch[co].used = USE_EMPTY;
-		return(0);
+		return 0;
 	}
 
 	ch[co].data[64] = globs->ticker + 5 * 60 * TICKS; // die in two minutes if not otherwise
 	ch[co].data[24] = 0;    // do not interfere in fights
 	ch[co].data[36] = 0;    // no walking around
 	ch[co].data[43] = 0;    // don't attack anyone
-	ch[co].data[80] = 0;    // no enemies
+	ch[co].data[MCD_ENEMY1ST] = 0;    // no enemies
 
 	ch[co].data[0] = cn;      // person to make solve
 	ch[co].data[1] = nr;      // labnr
@@ -2044,18 +2234,18 @@ int use_labtransfer(int cn, int nr, int exp)
 		chlog(cn, "Sorry, could not transfer you to your enemy");
 		god_destroy_items(co);
 		ch[co].used = USE_EMPTY;
-		return(0);
+		return 0;
 	}
 	chlog(cn, "Entered Labkeeper room");
 
-	return(1);
+	return 1;
 }
 
 void use_labtransfer2(int cn, int co)
 {
 	int cc;
 
-	if (IS_COMPANION(cn) && (cc = ch[cn].data[63])==ch[co].data[0])
+	if (IS_COMPANION(cn) && (cc = ch[cn].data[CHD_MASTER])==ch[co].data[0])
 	{
 		do_char_log(cc, 0, "Your Companion killed your enemy.\n");
 		finish_laby_teleport(cc, ch[co].data[1], ch[co].data[2]);
@@ -2145,7 +2335,7 @@ int is_badword(char *sentence)
 
 	if (strlen(sentence)>250)
 	{
-		return( 0);
+		return 0;
 	}
 	strcpy(temp, sentence);
 	strlower(temp);
@@ -2154,10 +2344,10 @@ int is_badword(char *sentence)
 	{
 		if (strstr(temp, badword[n]))
 		{
-			return( 1);
+			return 1;
 		}
 	}
-	return(0);
+	return 0;
 }
 
 // checks for "bad" words in player talking and mutes them
@@ -2315,12 +2505,12 @@ int cap(int cn, int nr)
 
 	if (!(globs->flags & GF_CAP))
 	{
-		return( 0);                                             // no cap if feature is turned off
+		return 0;                                             // no cap if feature is turned off
 
 	}
 	if (cn && (ch[cn].flags & (CF_GOD)))
 	{
-		return( 0);                                             // always allow gods to come in all the time
+		return 0;                                             // always allow gods to come in all the time
 
 	}
 	if (cn)
@@ -2338,7 +2528,7 @@ int cap(int cn, int nr)
 
 			if (ch[n].data[CHD_CORPSEOWNER]==cn)
 			{
-				return( 0);                             // always allow corpse retrieval
+				return 0;                             // always allow corpse retrieval
 			}
 		}
 	}
@@ -2392,7 +2582,7 @@ int cap(int cn, int nr)
 
 	if (globs->players_online + place<=CAP)
 	{
-		return( 0);
+		return 0;
 	}
 
 	return(place);
@@ -2740,7 +2930,7 @@ static int soul_bonus[N_SOULBONUS][2] = {
 	{ 1, 3 }, // 66 Crit Chance
 	{ 1, 3 }, // 67 Crit Multi
 	{ 1, 2 }, // 68 Top Damage
-	{ 2, 1 }  // 69 Reflect
+	{ 2, 1 }  // 69 Thorns
 };
 
 void soultrans_equipment(int cn, int in, int in2)
@@ -2749,34 +2939,46 @@ void soultrans_equipment(int cn, int in, int in2)
 	char tag[N_SOULTAGS] = {0};
 	char known[N_SOULBONUS] = {0};
 	char selected[N_SOULMAX*N_SOULTAGS*5] = {0};
+	int atrm[5]={0}, sklm[50]={0};
 	
 	// 0. Check if (in) is twohanded, grant a rank bonus if it is.
 	if (it[in2].placement & PL_TWOHAND)
-	{
 		bonus = 2;
-	}
 	
 	// 1. Set local variables to pull from the soulstone (in)
 	rank   = max(1, min(N_SOULMAX, it[in].data[0]*bonus));
 	focus  = (it[in].data[2] > 0 && it[in].data[2] < 8) ? it[in].data[2] : 8;
-	for (t=0;t<N_SOULTAGS;t++) tag[t] = max(0, min(N_SOULCAT, it[in].data[t+3]));
+	for (t=0;t<N_SOULTAGS;t++) tag[t] = max(0, min(N_SOULCAT-1, it[in].data[t+3]));
 	
 	// 2. Loop through known player skills and add to local array
 	for (n=0;n<N_SOULBONUS;n++)
 	{
 		if ((n<MAXSKILL && ch[cn].skill[n][2]) || n>=MAXSKILL)
 		{
+			// If Seyan, check that we know a given arch skill before adding it to the list.
+			if ((n==SK_ZEPHYR || n==SK_WARCRY || n==SK_POISON || 
+				n==SK_PULSE || n==SK_SHADOW || n==SK_LEAP) && 
+				IS_SEYAN_DU(cn) && !B_SK(cn, n))
+				continue;
+			
 			m = 2;
 			for (t=0;t<N_SOULTAGS;t++)
 			{
 				if (n<60)
+				{
 					m += (soul_cat[tag[t]][n] - 2);
+				}
 				else
-					m=0; if (soul_cat[tag[t]][n]==2) m=1;
+				{
+					m=0; 
+					if (soul_cat[tag[t]][n]==2) 
+						m=1;
+				}
 			}
 			if (m>0)
 			{
-				known[c] = n; c++;
+				known[c] = n; 
+				c++;
 			}
 		}
 	}
@@ -2796,13 +2998,14 @@ void soultrans_equipment(int cn, int in, int in2)
 		r = known[RANDOM(c)];
 		for (t=0;t<N_SOULTAGS;t++)
 		{
-			m = soul_cat[tag[t]-1][r]; // how many entries are we adding?
+			m = soul_cat[tag[t]][r]; // how many entries are we adding?  // [tag[t]-1] ?
 			if (r>=60 && m==0)
 				m = 2;
 		}
 		for (t=0;t<m;t++)
 		{
-			selected[s] = r; s++;
+			selected[s] = r; 
+			s++;
 		}
 	}
 	if (s<1)
@@ -2838,7 +3041,7 @@ void soultrans_equipment(int cn, int in, int in2)
 				else
 				{	
 					it[in2].attrib[n][0] += soul_bonus[r][1]; t=0;
-					it[in2].attrib[n][2] += soul_bonus[r][0]*5;
+					atrm[n] += soul_bonus[r][0]*5;
 				}
 				break;
 				
@@ -2900,7 +3103,7 @@ void soultrans_equipment(int cn, int in, int in2)
 				it[in2].top_damage[0] += soul_bonus[r][1]; t=0;
 				break;
 				
-			case 69:										// Reflect
+			case 69:										// Thorns
 				it[in2].gethit_dam[0] += soul_bonus[r][1]; t=0;
 				break;
 			
@@ -2914,7 +3117,7 @@ void soultrans_equipment(int cn, int in, int in2)
 				else
 				{	
 					it[in2].skill[n][0] += soul_bonus[r][1]; t=0;
-					it[in2].skill[n][2] += soul_bonus[r][0]*5;
+					sklm[n] += soul_bonus[r][0]*5;
 				}
 				break;
 		}
@@ -2923,6 +3126,11 @@ void soultrans_equipment(int cn, int in, int in2)
 			rank -= soul_bonus[r][0];
 		}
 	}
+	for (n=0;n<5;n++) if (atrm[n] && it[in2].attrib[n][0])
+		it[in2].attrib[n][2] = max(it[in2].attrib[n][2], atrm[n]);
+	for (n=0;n<50;n++) if (sklm[n] && it[in2].skill[n][0])
+		it[in2].skill[n][2] = max(it[in2].skill[n][2], sklm[n]);
+	
 	rank = max(1, min(N_SOULMAX, it[in].data[0]));
 	
 	// 5. Repair the transformed item
@@ -2954,10 +3162,11 @@ void soultrans_equipment(int cn, int in, int in2)
 	
 	if (!it[in2].max_damage)
 	{
-		if (it[in2].flags & IF_WEAPON)	it[in2].max_damage = 2500 * it[in2].weapon[0]/2;
-		else if (it[in2].power == 60)	it[in2].max_damage = 65000;
-		else if (it[in2].power == 75)	it[in2].max_damage = 85000;
-		else							it[in2].max_damage = 60000;
+		if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = 2500 * it[in2].weapon[0]/2;
+		else if (it[in2].flags & IF_BOOK)	it[in2].max_damage = 90000;
+		else if (it[in2].power == 60)		it[in2].max_damage = 65000;
+		else if (it[in2].power == 75)		it[in2].max_damage = 85000;
+		else								it[in2].max_damage = 60000;
 	}
 	
 	it[in2].power += rank * 30/4;
@@ -2998,7 +3207,14 @@ int can_be_soulstoned(int in)
 		2038,2039,2040,2041,2042,	// 
 		337, 338, 339, 340, 341, 342, 343, 344, 345, 346,				// Simple, Caster
 		347, 348, 349, 350, 351, 352, 353, 354, 355, 356,				// Adept, Wizard
+		//
+		2033, 2034, 2035, 2036, 2037, // Lizard
+		2038, 2039, 2040, 2041, 2042, // Midnight
+		// books
+		1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 
+		1656, 2045, 2055, 2056, 1657, 1658, 1659,
 		// other
+		2104, 2109, 
 		IT_CH_FOOL
 		};
 	int n, temp;
@@ -3052,7 +3268,9 @@ int use_soulstone(int cn, int in)
 		// Copy Focus
 		if (it[in2].data[2] && RANDOM(2))
 		{
-			it[in].data[2] = it[in2].data[2];
+			it[in].data[2] += RANDOM(it[in2].data[2]);
+			if (it[in].data[2]>8)
+				it[in].data[2] = 0;
 		}
 		
 		// Copy Tags
@@ -3294,15 +3512,52 @@ int get_map_enemy_affix_length(int affix)
 	}
 }
 
-int get_map_eme[11][60] = { //                    15                                        29
-	{50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,50,50,50,50,50,50,50,50,50}, //  0 : null
-	
-	
-	/*
-	{50, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,50,50,50,50,35,50,35,50,50}, //  x : bs template
-	*/
+int get_map_eme[11][60] = {
+//    0              5             10             15            (20)
+	{50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,50,50,50,50,50,50,50,50,50}, //  0 : null
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55,40, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0, 0, 0, 0, 0,60, 0, 0,60,55,50,45,40,35,50,35,49,51}, //  1 : bs skele
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,60, 0, 0, 0, 0, 0,50,50, 0,
+	 40,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55,45,40,50,60,40,50,30,51,49}, //  2 : bs ghost
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,60,
+	  0,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0,40, 0, 0, 0, 0, 0, 0, 0,60,50,45,40,55,35,50,35,50,50}, //  3 : bs rodent
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0,40, 0,60, 0, 0, 0, 0, 0, 0,50,40,55,60,45,30,50,40,52,48}, //  4 : bs undead
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0,60, 0, 0,
+	 40, 0, 0, 0, 0, 0, 0, 0, 0, 0,40,45,60,55,50,30,50,40,46,54}, //  5 : bs grolm
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0,60, 0, 0, 0, 0,40, 0, 0,55,60,45,40,50,40,50,30,54,46}, //  6 : bs skink
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0,40, 0, 0,
+	  0,60, 0, 0, 0, 0, 0, 0, 0, 0,50,60,55,45,40,40,50,30,45,55}, //  7 : bs golem
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,40, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	 60, 0, 0, 0, 0, 0, 0, 0, 0, 0,40,55,50,60,45,35,50,35,47,53}, //  8 : bs garg
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,40,
+	 60,50, 0,55, 0, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,50,40,55,60,35,50,35,53,47}, //  9 : bs icey
+
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
+	  0,50, 0,55,60, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
+	  0, 0, 0,40, 0, 0, 0, 0, 0, 0,45,40,60,50,55,40,50,30,48,52}  // 10 : bs flame
+	 
 };
 
 int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
@@ -3339,7 +3594,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 	for (n = 0; n<5; n++)
 	{
 		tmp = base * 50 / max(1, get_map_eme[kin][n+50]);
-		ch[co].attrib[n][0] = max(10, min(135, tmp));
+		B_AT(co, n) = max(10, min(135, tmp));
 	}
 
 	for (n = 0; n<MAXSKILL; n++)
@@ -3347,7 +3602,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 		if (get_map_eme[kin][n])
 		{
 			tmp = base * 50 / max(1, get_map_eme[kin][n]);
-			ch[co].skill[n][0] = max(1, min(135, tmp));
+			B_SK(co, n) = max(1, min(135, tmp));
 		}
 	}
 	
@@ -3373,15 +3628,15 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 		{
 			case 1:
 				for (n = 0; n<5; n++)
-					ch[co].attrib[n][0] += 3+RANDOM(3);
-				for (n = 0; n<MAXSKILL; n++) if (ch[co].skill[n][0])
-					ch[co].skill[n][0] += 3+RANDOM(3)*2;
+					B_AT(co, n) += 3+RANDOM(3);
+				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
+					B_SK(co, n) += 3+RANDOM(3)*2;
 				break;
 			case 2:
 				for (n = 0; n<5; n++)
-					ch[co].attrib[n][0] += 6+RANDOM(5);
-				for (n = 0; n<MAXSKILL; n++) if (ch[co].skill[n][0])
-					ch[co].skill[n][0] += 6+RANDOM(5)*2;
+					B_AT(co, n) += 6+RANDOM(5);
+				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
+					B_SK(co, n) += 6+RANDOM(5)*2;
 				if (!(ch[co].flags & CF_CANCRIT))
 					ch[co].flags |= CF_CANCRIT;
 				break;
@@ -3392,13 +3647,13 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 	
 	// Calculate experience
 	pts = 0;
-	for (n = 0; n<5; n++) for (j = 10; j<ch[co].attrib[n][0]; j++)
+	for (n = 0; n<5; n++) for (j = 10; j<B_AT(co, n); j++)
 		pts += attrib_needed(j, 4);
 	for (j = 50; j<ch[co].hp[0]; j++) 
 		pts += hp_needed(j, 4);
 	for (j = 50; j<ch[co].mana[0]; j++) 
 		pts += mana_needed(j, 4);
-	for (n = 0; n<MAXSKILL; n++) for (j = 1; j<ch[co].skill[n][0]; j++)
+	for (n = 0; n<MAXSKILL; n++) for (j = 1; j<B_SK(co, n); j++)
 		pts += skill_needed(j, 3);
 	ch[co].points_tot = pts;
 	
@@ -3407,7 +3662,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 	ch[co].a_end  = 999999;
 	ch[co].a_mana = 999999;
 	
-	////
+	do_update_char(co);
 	
 	return co;
 }
@@ -3430,6 +3685,6 @@ int load_mod(void)
 		strcpy(mod, "Live long and prosper!");
 	}
 
-	return(1);
+	return 1;
 }
 

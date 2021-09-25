@@ -66,18 +66,18 @@ int npc_cityattack_gotattack(int cn, int co)
 		}
 		*/
 	}
-	return(1);
+	return 1;
 }
 
 int npc_cityattack_seeattack(int cn, int cc, int co)
 {
 	if (!do_char_can_see(cn, co))
 	{
-		return( 1);                     // processed it: we cannot see the defender, so ignore it
+		return 1;                     // processed it: we cannot see the defender, so ignore it
 	}
 	if (!do_char_can_see(cn, cc))
 	{
-		return( 1);                     // processed it: we cannot see the attacker, so ignore it
+		return 1;                     // processed it: we cannot see the attacker, so ignore it
 	}
 	
 	if (ch[cn].data[31])   // protect char (by temp)
@@ -99,7 +99,7 @@ int npc_cityattack_seeattack(int cn, int cc, int co)
 		if (ch[cn].data[0]<2) ch[cn].data[0]=2; // Force the raid state
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_cityattack_see(int cn, int co)
@@ -108,7 +108,7 @@ int npc_cityattack_see(int cn, int co)
 
 	if (!do_char_can_see(cn, co))
 	{
-		return( 1);                     // processed it: we cannot see him, so ignore him
+		return 1;                     // processed it: we cannot see him, so ignore him
 	}
 	
 	// if we're taunted, try to attack the taunter
@@ -129,21 +129,22 @@ int npc_cityattack_see(int cn, int co)
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
 		ch[cn].data[58] = 2;
-		return(1);
+		return 1;
 	}	
 	
-	if (ch[cn].data[42]!=ch[co].data[42] && ch[co].data[42]!=60 && ch[cn].data[0]>=2) // only fight if we're raiding
+	if (ch[cn].data[CHD_GROUP]!=ch[co].data[CHD_GROUP] && ch[co].data[CHD_GROUP]!=60 && 
+		ch[cn].data[0]>=2) // only fight if we're raiding
 	{
 		if (!(cc = ch[cn].attack_cn) || npc_dist(cn, co)<npc_dist(cn, cc))
 		{
 			ch[cn].attack_cn = co;
 			ch[cn].goto_x = 0;
 			idx = co | (char_id(co) << 16); // so GCs can attack
-			ch[cn].data[80] = idx;			// so GCs can attack
+			ch[cn].data[MCD_ENEMY1ST] = idx;			// so GCs can attack
 		}
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_cityattack_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
@@ -155,34 +156,34 @@ int npc_cityattack_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 	case    NT_GOTMISS:
 		return( npc_cityattack_gotattack(cn, dat1));
 	case    NT_DIDHIT:
-		return( 0);
+		return 0;
 	case    NT_DIDMISS:
-		return( 0);
+		return 0;
 	case    NT_DIDKILL:
-		return( 0);
+		return 0;
 	case    NT_GOTEXP:
-		return( 0);
+		return 0;
 	case    NT_SEEKILL:
-		return( 0);
+		return 0;
 	case    NT_SEEHIT:
 		return( npc_cityattack_seeattack(cn, dat1, dat2));
 	case    NT_SEEMISS:
 		return( npc_cityattack_seeattack(cn, dat1, dat2));
 	case    NT_GIVE:
-		return( 0);
+		return 0;
 	case    NT_SEE:
 		return( npc_cityattack_see(cn, dat1));
 	case    NT_DIED:
-		return( 0);
+		return 0;
 	case    NT_SHOUT:
-		return( 0);
+		return 0;
 	case    NT_HITME:
-		return( 0);
+		return 0;
 
 	default:
 		xlog("Unknown NPC message for %d (%s): %d",
 		     cn, ch[cn].name, type);
-		return( 0);
+		return 0;
 	}
 }
 
@@ -195,36 +196,36 @@ int npc_cityattack_high(int cn)
 	{
 		if (npc_try_spell(cn, cn, SK_HEAL))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
 	// generic spell management
-	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && ch[cn].skill[SK_MEDIT][0])
+	if (ch[cn].a_mana>ch[cn].mana[5] * 850)
 	{
 		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_PROTECT))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_MSHIELD))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_HASTE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_ENHANCE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
@@ -258,96 +259,101 @@ int npc_cityattack_high(int cn)
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
-				return( 1);
+				ch[co].data[75] = globs->ticker + TICKS;
+				return 1;
 			}
 		}
 
 		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_PROTECT))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_MSHIELD))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_HASTE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_ENHANCE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_SLOW))
 		{
-			return(1);
+			return 1;
 		}
 		if (co && is_facing(cn,co) && npc_try_spell(cn, co, SK_WEAKEN))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_CURSE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return(1);
+			return 1;
 		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_PULSE))
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
 		{
-			return(1);
+			return 1;
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_ZEPHYR))
 		{
-			return(1);
+			return 1;
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_POISON))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return( 1);
+			return 1;
 		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_WARCRY))
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && 
+			((!IS_PLAYER(co) && globs->ticker>ch[cn].data[74]) || (IS_PLAYER(co) && globs->ticker>ch[co].data[74])) && 
+			npc_try_spell(cn, co, SK_WARCRY))
 		{
-			ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(get_skill_score(cn, SK_WARCRY))*3/2;
-			return( 1);
+			if (IS_PLAYER(co)) 
+				ch[co].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
+			else
+				ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
+			return 1;
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_CLEAVE/2;
-			return( 1);
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
-			return( 1);
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
 		}
 
 		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
-				return( 1);
+				ch[co].data[75] = globs->ticker + TICKS;
+				return 1;
 			}
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_moveto(int cn, int x, int y)
@@ -356,64 +362,74 @@ int npc_moveto(int cn, int x, int y)
 
 	if (abs(ch[cn].x - x)<3 && abs(ch[cn].y - y)<3)
 	{
-		ch[cn].data[1] = 0;
-		return(1);
+		ch[cn].data[9] = 0;
+		return 1;
 	}
 
-	if (ch[cn].data[1]==0 && npc_check_target(x, y))
+	if (ch[cn].data[9]==0 && npc_check_target(x, y))
 	{
-		ch[cn].data[1]++;
+		ch[cn].data[9]++;
 		ch[cn].goto_x = x;
 		ch[cn].goto_y = y;
-		return(0);
+		return 0;
 	}
 
 	for (dx = 0, try = 1; dx<3; dx++)
 	{
 		for (dy = 0; dy<3; dy++, try++)
 		{
-			if (ch[cn].data[1]<try && npc_check_target(x + dx, y + dy))
+			if (ch[cn].data[9]<try && npc_check_target(x + dx, y + dy))
 			{
-				ch[cn].data[1]++;
+				ch[cn].data[9]++;
 				ch[cn].goto_x = x + dx;
 				ch[cn].goto_y = y + dy;
-				return(0);
+				return 0;
 			}
-			if (ch[cn].data[1]<try && npc_check_target(x - dx, y + dy))
+			if (ch[cn].data[9]<try && npc_check_target(x - dx, y + dy))
 			{
-				ch[cn].data[1]++;
+				ch[cn].data[9]++;
 				ch[cn].goto_x = x - dx;
 				ch[cn].goto_y = y + dy;
-				return(0);
+				return 0;
 			}
-			if (ch[cn].data[1]<try && npc_check_target(x + dx, y - dy))
+			if (ch[cn].data[9]<try && npc_check_target(x + dx, y - dy))
 			{
-				ch[cn].data[1]++;
+				ch[cn].data[9]++;
 				ch[cn].goto_x = x + dx;
 				ch[cn].goto_y = y - dy;
-				return(0);
+				return 0;
 			}
-			if (ch[cn].data[1]<try && npc_check_target(x - dx, y - dy))
+			if (ch[cn].data[9]<try && npc_check_target(x - dx, y - dy))
 			{
-				ch[cn].data[1]++;
+				ch[cn].data[9]++;
 				ch[cn].goto_x = x - dx;
 				ch[cn].goto_y = y - dy;
-				return(0);
+				return 0;
 			}
 
 		}
 	}
 
-	ch[cn].data[1] = 0;
+	ch[cn].data[9] = 0;
 
-	return(0);
+	return 0;
 }
 
 int npc_cityattack_wait(cn)
 {
 	int n;
+	int bsm;
 	int bsm1=0, bsm2=0, bsm3=0;
 	
+	if (globs->flags & GF_NEWBS) 
+	{
+		chlog(cn, "automatically processed wait");
+		ch[cn].goto_x = 0;
+		ch[cn].goto_y = 0;
+		return 1;
+	}
+	
+	// Old
 	for (n = 1; n<MAXCHARS; n++)
 	{
 		if (ch[n].used==USE_EMPTY) continue;

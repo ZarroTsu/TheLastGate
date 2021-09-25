@@ -106,59 +106,88 @@ void look_item_details(int cn, int in)
 
 void look_extra(int cn, int in)
 {
+	int temp;
+	
 	do_char_log(cn, 1, "%s\n", it[in].description);
+	
+	temp = it[in].temp;
 	
 	switch (it[in].temp)
 	{
 	// -------- TOWER ITEMS --------
 	
 	case IT_TW_CROWN: // Crown of the First King
-		do_char_log(cn, 3, "When equipped, 25%% of mana costs are taken from Endurance instead.\n"); 
+		do_char_log(cn, 3, "When equipped, 25%% of mana costs from spells are instead taken from endurance, and 25%% of endurance costs from skills are instead taken from mana. You no longer lose focus.\n"); 
 		break;
 	case IT_TW_CLOAK: // Cloak of Shadows
-		do_char_log(cn, 3, "When equipped, 20%% of damage taken is dealt to Endurance instead.\n");
+		do_char_log(cn, 3, "When equipped, 20%% of damage taken is negated, and half of the negated damage is dealt to Endurance instead.\n");
 		break;
 	case IT_TW_DREAD: // The Dreadplate
-		do_char_log(cn, 3, "When equipped, your ghost companion can cast Blast, but becomes worse in melee combat.\n");
+		do_char_log(cn, 3, "When equipped, your ghost companion is replaced with a spellcaster companion.\n");
 		break;
 	case IT_TW_DOUSER: // Douser Gauntlets
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict douse on hit, reducing enemy spell modifier.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict douse on, reducing enemy spell modifier.\n");
 		break;
-	case IT_TW_ROOTS: // Commander's Roots
-		do_char_log(cn, 3, "When equipped, the effects of Slow and Stun when cast on you are reduced by half.\n");
+	case IT_TW_MARCH: // Commander's March
+		do_char_log(cn, 3, "When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by half.\n");
 		break;
 	case IT_TW_BBELT: // The Black Belt
-		do_char_log(cn, 3, "When equipped, your shield parry bonus is added while your off-hand is empty.\n");
+		do_char_log(cn, 3, "When equipped, get WV from your Hand to Hand skill and 2% base crit if your main hand is empty, half of shield parry bonus if your off-hand is empty, and 4%% total base crit if both hands are empty.\n");
 		break;
 	case IT_TW_OUTSIDE: // Outsider's Eye
 		do_char_log(cn, 3, "When equipped, enemies beside and behind you no longer gain a bonus to hitting you.\n");
 		break;
 	case IT_TW_HEAVENS: // Fists of the Heavens
-		do_char_log(cn, 3, "When equipped, the maximum damage bonus granted by your Strength is doubled.\n");
+		do_char_log(cn, 3, "Uses your highest weapon skill for hit and parry scores. When equipped, your highest attribute score is increased by 20%%.\n");
+		break;
+		
+	case IT_TW_ACEDIA: // Sin Dagger
+		do_char_log(cn, 0, "When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 25%% more buff and debuff duration, but 25%% more skill cooldown.\n");
+		break;
+	case IT_TW_IRA: // Sin Staff
+		do_char_log(cn, 0, "When equipped, your critical hit chance and multiplier effect your Blast spell, but you lose mana over time and cannot deal melee critical hits.\n");
+		break;
+	case IT_TW_INVIDIA: // Sin Spear
+		do_char_log(cn, 0, "When equipped, your ghost companion takes damage instead from hits you take, but it forgets heal and cannot regenerate health.\n");
+		break;
+	case IT_TW_GULA: // Sin Sword
+		do_char_log(cn, 0, "When equipped, you restore health upon hitting, cleaving or blasting an enemy, but you lose hitpoints over time.\n");
+		break;
+	case IT_TW_LUXURIA: // Sin Axe
+		do_char_log(cn, 0, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict stun.\n");
+		break;
+	case IT_TW_AVARITIA: // Sin Twohander
+		do_char_log(cn, 0, "When equipped, your lowest attribute increases critical hit multiplier and your highest attribute increases critical hit chance, but you lose endurance over time.\n");
+		break;
+	case IT_TW_SUPERBIA: // Sin Greataxe
+		break;
+	case IT_TW_SINBIND: // Sinbinder ring
+		do_char_log(cn, 0, "Locks your ring slot.\n");
+		temp = it[in].data[2];
 		break;
 	
 	// -------- GLOVE ITEMS --------
 	
 	case IT_GL_SERPENT: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict poison on hit, dealing damage over time.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict poison, dealing damage over time.\n");
 		break;
 	case IT_GL_BURNING: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict scorch on hit, causing enemies to take additional damage.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict scorch, causing enemies to take additional damage.\n");
 		break;
 	case IT_GL_SHADOW: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict blind on hit, reducing enemy perception, hit and parry.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict blind, reducing enemy perception, hit and parry.\n");
 		break;
 	case IT_GL_CHILLED: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict slow on hit, reducing enemy action speed.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict slow, reducing enemy action speed.\n");
 		break;
 	case IT_GL_CURSED: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict curse on hit, reducing enemy attributes.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict curse, reducing enemy attributes.\n");
 		break;
 	case IT_GL_TITANS: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict weaken on hit, reducing enemy weapon and armor values.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict weaken, reducing enemy weapon and armor values.\n");
 		break;
 	case IT_GL_BLVIPER: 
-		do_char_log(cn, 3, "When equipped, grants a 5%% chance to inflict frostburn on hit, draining enemy endurance and mana.\n");
+		do_char_log(cn, 3, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict frostburn, draining enemy endurance and mana.\n");
 		break;
 		
 	// -------- BOOT  ITEMS --------
@@ -181,6 +210,9 @@ void look_extra(int cn, int in)
 	case IT_GARNEANKH: 
 		do_char_log(cn, 3, "When equipped, grants additional passive regeneration bonuses. Grants improved mana regeneration.\n");
 		break;
+	case IT_TRUEANKH: 
+		do_char_log(cn, 3, "When equipped, grants very strong passive regeneration bonuses.\n");
+		break;
 	case IT_AM_BLOODS: 
 		do_char_log(cn, 3, "When equipped, penalizes meditate, but greatly improves the effect of regenerate.\n");
 		break;
@@ -192,6 +224,21 @@ void look_extra(int cn, int in)
 		break;
 	case IT_AM_OBSIDI: 
 		do_char_log(cn, 3, "When equipped, increases the radius of area-of-effect skills by 2.\n");
+		break;
+	case IT_AM_TRUESUN: 
+		do_char_log(cn, 3, "When equipped, you are immune to areas that would disable your magic.\n");
+		break;
+	case IT_AM_FALMOON: 
+		do_char_log(cn, 3, "When equipped, you cannot cast or receive spells of any kind.\n");
+		break;
+	
+		
+	// -------- BELT  ITEMS --------
+	
+	case IT_BL_SOLAR: 
+	case IT_BL_LUNAR: 
+	case IT_BL_ECLIPSE: 
+		do_char_log(cn, 3, "Grants passive bonuses during the day (6:00 to 18:00), and active bonuses during the night (18:00 to 6:00).\n");
 		break;
 
 	// -------- DRINK ITEMS --------
@@ -242,7 +289,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, improves the effectiveness of the Concentrate skill.\n");
 		break;
 	case IT_BOOK_VENO: 
-		do_char_log(cn, 3, "When equipped, the Poison spell deals 15%% more damage, but has 30%% less duration.\n");
+		do_char_log(cn, 3, "When equipped, the Poison spell deals 25%% more damage, but has 33%% less duration.\n");
 		break;
 	case IT_BOOK_NECR: 
 		do_char_log(cn, 3, "When equipped, newly casted Ghost Companions and Shadow Copies become undead monsters.\n");
@@ -253,147 +300,8 @@ void look_extra(int cn, int in)
 	case IT_BOOK_GREA: 
 		do_char_log(cn, 3, "When equipped, damage dealt to the duration of your Magic Shield and Magic Shell is halved.\n");
 		break;
-
-	// -------- TAROT CARDS --------
 	
-	case IT_CH_FOOL: 
-		if (!(it[in].flags & IF_SOULSTONE))
-			do_char_log(cn, 3, "You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n");
-		break;
-	case IT_CH_MAGI: 
-		do_char_log(cn, 3, "When equipped, secondary effects of Intuition and Strength are swapped.\n");
-		break;
-	case IT_CH_PREIST: 
-		do_char_log(cn, 3, "When equipped, your maximum life is reduced by 20%%. 20%% of damage taken from hits is instead dealt to your Mana.\n");
-		break;
-	case IT_CH_EMPRESS: 
-		do_char_log(cn, 3, "When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n");
-		break;
-	case IT_CH_EMPEROR: 
-		do_char_log(cn, 3, "When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n");
-		break;
-	case IT_CH_HEIROPH: 
-		do_char_log(cn, 3, "When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n");
-		break;
-	case IT_CH_LOVERS: 
-		do_char_log(cn, 3, "When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n");
-		break;
-	case IT_CH_CHARIOT: 
-		do_char_log(cn, 3, "When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n");
-		break;
-	case IT_CH_STRENGTH: 
-		do_char_log(cn, 3, "When equipped, reduces your attack and cast speed by 20%%, but grants 25%% more damage with melee attacks.\n");
-		break;
-	case IT_CH_HERMIT: 
-		do_char_log(cn, 3, "When equipped, 15%% more Armor Value, 10%% less Resistance and Immunity.\n");
-		break;
-	case IT_CH_WHEEL: 
-		do_char_log(cn, 3, "When equipped, your critical hit chance is halved, but your critical hit damage is doubled.\n");
-		break;
-	case IT_CH_JUSTICE: 
-		do_char_log(cn, 3, "When equipped, your Cleave skill deals 30%% less damage, but inflicts a Bleeding effect for 10 seconds.\n");
-		break;
-	case IT_CH_HANGED: 
-		do_char_log(cn, 3, "When equipped, 30%% of Resistance is instead used to reduce the strength of incoming enemy spells.\n");
-		break;
-	case IT_CH_DEATH: 
-		do_char_log(cn, 3, "When equipped, your Weaken skill is replaced with Greater Weaken. Greater Weaken improves armor reduction, but no longer reduces enemy Weapon Value.\n");
-		break;
-	case IT_CH_TEMPER: 
-		do_char_log(cn, 3, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is doubled.\n");
-		break;
-	case IT_CH_DEVIL: 
-		do_char_log(cn, 3, "When equipped, 30%% of all skill and spell costs are instead twice taken from your Hitpoints.\n");
-		break;
-	case IT_CH_TOWER: 
-		do_char_log(cn, 3, "When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n");
-		break;
-	case IT_CH_STAR: 
-		do_char_log(cn, 3, "When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 15 seconds.\n");
-		break;
-	case IT_CH_MOON: 
-		do_char_log(cn, 3, "When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n");
-		break;
-	case IT_CH_SUN: 
-		do_char_log(cn, 3, "When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n");
-		break;
-	case IT_CH_JUDGE: 
-		do_char_log(cn, 3, "When equipped, your Blast spell deals 15%% less damage, but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n");
-		break;
-	case IT_CH_WORLD: 
-		do_char_log(cn, 3, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");
-		break;
-		
-	case IT_CH_FOOL_R: 
-		if (!(it[in].flags & IF_SOULSTONE))
-			do_char_log(cn, 3, "You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped. This applies 100%% more soulstone power, but grants equal chance of negative bonuses.\n");
-		break;
-	case IT_CH_MAGI_R: 
-		do_char_log(cn, 3, "When equipped, hit and parry rates are modified by spell modifier. Spell power is no longer modified by spell modifier.\n");
-		break;
-	case IT_CH_PREIST_R: 
-		do_char_log(cn, 3, "When equipped, grants 25%% more maximum HP. 20%% less maximum mana.\n");
-		break;
-	case IT_CH_EMPRES_R: 
-		do_char_log(cn, 3, "When equipped, spells that would target your Ghost Companion are instead applied to you as an additional layer, with 50%% reduced power.\n");
-		break;
-	case IT_CH_EMPERO_R: 
-		do_char_log(cn, 3, "When equipped, Slows dealt and taken ignore 50%% of immunity.\n");
-		break;
-	case IT_CH_HEIROP_R: 
-		do_char_log(cn, 3, "When equipped, Dispel is guaranteed to remove one buff or debuff, but has increased exhaustion duration. Skill modifier instead reduces the duration of this exhaustion.\n");
-		break;
-	case IT_CH_LOVERS_R: 
-		do_char_log(cn, 3, "When equipped, your attributes become the average of all attributes.\n");
-		break;
-	case IT_CH_CHARIO_R: 
-		do_char_log(cn, 3, "When equipped, Magic Shield and Magic Shell grant 20%% more defensive power, but the total duration is reduced by 50%%.\n");
-		break;
-	case IT_CH_STRENG_R: 
-		do_char_log(cn, 3, "When equipped, reduces melee damage by 20%%. Deal 25%% more damage with critical hits.\n");
-		break;
-	case IT_CH_HERMIT_R: 
-		do_char_log(cn, 3, "When equipped, grants 10%% more Resistance and Immunity. Weapon value is reduced by 15%.\n");
-		break;
-	case IT_CH_WHEEL_R: 
-		do_char_log(cn, 3, "When equipped, grants 15%% more weapon and armor value. 20%% chance to be hit when you would have parried, and 20%% chance to miss when you would have hit.\n");
-		break;
-	case IT_CH_JUSTIC_R: 
-		do_char_log(cn, 3, "When equipped, Cleave deals 20%% more damage, but inflicts Bleeding on you for 10 seconds.\n");
-		break;
-	case IT_CH_HANGED_R: 
-		do_char_log(cn, 3, "When equipped, the effects of Resistance and Immunity are swapped.\n");
-		break;
-	case IT_CH_DEATH_R: 
-		do_char_log(cn, 3, "When equipped, Weakens dealt and taken ignore 50%% of immunity.\n");
-		break;
-	case IT_CH_TEMPER_R: 
-		do_char_log(cn, 3, "When equipped, your Taunt skill no longer Guards against damage. Instead, a portion of damage taken while Guarded is restored as endurance and mana.\n");
-		break;
-	case IT_CH_DEVIL_R: 
-		do_char_log(cn, 3, "When equipped, mana costs are reduced and taken from endurance. Endurance costs are increased and taken from mana.\n");
-		break;
-	case IT_CH_TOWER_R: 
-		do_char_log(cn, 3, "When equipped, Curses dealt and taken ignore 50%% of immunity.\n");
-		break;
-	case IT_CH_STAR_R: 
-		do_char_log(cn, 3, "When equipped, your Heal spell instead costs hitpoints and restores your mana.\n");
-		break;
-	case IT_CH_MOON_R: 
-		do_char_log(cn, 3, "When equipped, mana regeneration is doubled while you are cursed or scared.\n");
-		break;
-	case IT_CH_SUN_R: 
-		do_char_log(cn, 3, "When equipped, life regeneration is doubled while you are weakened or scorched.\n");
-		break;
-	case IT_CH_JUDGE_R: 
-		do_char_log(cn, 3, "When equipped, 20%% of Blast's damage is instead dealt to the target's endurance and mana.\n");
-		break;
-	case IT_CH_WORLD_R: 
-		do_char_log(cn, 3, "When equipped, endurance regeneration is doubled while you are slowed or blinded.\n");
-		break;
-		
 	// -------- UNIQUE ITEMS --------
-		
 	
 	case IT_WP_LIFESPRIG: 
 		do_char_log(cn, 3, "When equipped, mana spent is restored as life over 10 seconds. This effect is overwritten by stronger sources.\n");
@@ -417,7 +325,7 @@ void look_extra(int cn, int in)
 		if (it[in].data[0]<10000)
 			do_char_log(cn, 3, "Thine worth shall be proven. %d remain.\n", max(0, 10000-it[in].data[0]));
 		else
-			do_char_log(cn, 3, "Thou art worthy. Use when ready.\n");
+			do_char_log(cn, 3, "Thou art worthy. Use me when ready.\n");
 		break;
 	case IT_WP_WHITEODA: 
 		do_char_log(cn, 3, "When equipped, grants additional armor value based on total spell modifier.\n");
@@ -447,6 +355,149 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n");
 		break;
 	
+	default:
+		break;
+	}
+	
+	switch (temp)
+	{
+		// -------- TAROT CARDS --------
+	
+	case IT_CH_FOOL: 
+		if (!(it[in].flags & IF_SOULSTONE))
+			do_char_log(cn, 3, "You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n");
+		break;
+	case IT_CH_MAGI: 
+		do_char_log(cn, 3, "When equipped, secondary effects of Intuition and Strength are swapped.\n");
+		break;
+	case IT_CH_PREIST: 
+		do_char_log(cn, 3, "When equipped, your maximum life is reduced by 20%%. 20%% of damage taken from hits is negated, and half of the negated damage is dealt to Mana instead.\n");
+		break;
+	case IT_CH_EMPRESS: 
+		do_char_log(cn, 3, "When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n");
+		break;
+	case IT_CH_EMPEROR: 
+		do_char_log(cn, 3, "When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n");
+		break;
+	case IT_CH_HEIROPH: 
+		do_char_log(cn, 3, "When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n");
+		break;
+	case IT_CH_LOVERS: 
+		do_char_log(cn, 3, "When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n");
+		break;
+	case IT_CH_CHARIOT: 
+		do_char_log(cn, 3, "When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n");
+		break;
+	case IT_CH_STRENGTH: 
+		do_char_log(cn, 3, "When equipped, reduces your attack and cast speed by 20%%, but grants 20%% more damage with melee attacks.\n");
+		break;
+	case IT_CH_HERMIT: 
+		do_char_log(cn, 3, "When equipped, you have 20%% more Armor Value, but 10%% less Resistance and Immunity.\n");
+		break;
+	case IT_CH_WHEEL: 
+		do_char_log(cn, 3, "When equipped, your critical hit chance is reduced by 33%%, but you have 1.5x critical hit multiplier.\n");
+		break;
+	case IT_CH_JUSTICE: 
+		do_char_log(cn, 3, "When equipped, your Cleave skill deals 30%% less damage, but inflicts a Bleeding effect for 10 seconds.\n");
+		break;
+	case IT_CH_HANGED: 
+		do_char_log(cn, 3, "When equipped, 25%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n");
+		break;
+	case IT_CH_DEATH: 
+		do_char_log(cn, 3, "When equipped, your Weaken skill is replaced with Greater Weaken. Greater Weaken improves armor reduction, but no longer reduces enemy Weapon Value.\n");
+		break;
+	case IT_CH_TEMPER: 
+		do_char_log(cn, 3, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is tripled.\n");
+		break;
+	case IT_CH_DEVIL: 
+		do_char_log(cn, 3, "When equipped, 30%% of all skill and spell costs are instead twice taken from your Hitpoints.\n");
+		break;
+	case IT_CH_TOWER: 
+		do_char_log(cn, 3, "When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n");
+		break;
+	case IT_CH_STAR: 
+		do_char_log(cn, 3, "When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n");
+		break;
+	case IT_CH_MOON: 
+		do_char_log(cn, 3, "When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n");
+		break;
+	case IT_CH_SUN: 
+		do_char_log(cn, 3, "When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n");
+		break;
+	case IT_CH_JUDGE: 
+		do_char_log(cn, 3, "When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n");
+		break;
+	case IT_CH_WORLD: 
+		do_char_log(cn, 3, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");
+		break;
+		
+	case IT_CH_FOOL_R: 
+		do_char_log(cn, 3, "When equipped, your attributes become the average of all attributes.\n");
+		break;
+	case IT_CH_MAGI_R: 
+		do_char_log(cn, 3, "When equipped, your concentrate skill instead increases the cost of spells, but it also increases your spell modifier.\n");
+		break;
+	case IT_CH_PREIST_R: 
+		do_char_log(cn, 3, "When equipped, your maximum mana is reduced by 20%% to increase your cooldown bonus by 10%% of the subtracted mana.\n");
+		break;
+	case IT_CH_EMPRES_R:
+		do_char_log(cn, 3, "When equipped, your buffs are applied at 125%% of the target's spell aptitude, but your spell aptitude is halved.\n");
+		break;
+	case IT_CH_EMPERO_R: 
+		do_char_log(cn, 3, "When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n");
+		break;
+	case IT_CH_HEIROP_R: 
+		do_char_log(cn, 3, "When equipped, your Ghost Companion shares the bonus granted to you by your other tarot card slot.\n");
+		break;
+	case IT_CH_LOVERS_R: 
+		do_char_log(cn, 3, "When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n");
+		break;
+	case IT_CH_CHARIO_R: 
+		do_char_log(cn, 3, "When equipped, your debuffs ignore 20%% of target resistance and immunity, but are 25%% weaker once applied.\n");
+		break;
+	case IT_CH_STRENG_R: 
+		do_char_log(cn, 3, "When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n");
+		break;
+	case IT_CH_HERMIT_R: 
+		do_char_log(cn, 3, "When equipped, you may no longer inflict melee critical hits. Instead, your Thorns value has a chance of inflicting a critical hit.\n");
+		break;
+	case IT_CH_WHEEL_R: 
+		do_char_log(cn, 3, "When equipped, you have 20%% more Armor Value, but a 25%% chance to be hit when you would have parried.\n");
+		break;
+	case IT_CH_JUSTIC_R: 
+		do_char_log(cn, 3, "When equipped, your Leap skill deals 30%% less damage, but inflicts a Bleeding effect for 10 seconds\n");
+		break;
+	case IT_CH_HANGED_R: 
+		do_char_log(cn, 3, "When equipped, you have 20%% more Top Damage, but 10%% less Weapon Value.\n");
+		break;
+	case IT_CH_DEATH_R: 
+		do_char_log(cn, 3, "When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n");
+		break;
+	case IT_CH_TEMPER_R: 
+		do_char_log(cn, 3, "When equipped, you gain 5%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n");
+		break;
+	case IT_CH_DEVIL_R: 
+		do_char_log(cn, 3, "When equipped, your Shadow Copy deals 20%% more damage and takes 20%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n");
+		break;
+	case IT_CH_TOWER_R: 
+		do_char_log(cn, 3, "When equipped, your Poison spell is replaced with Venom. Venom deals twice as much damage and reduces enemy Resistance instead of Immunity, but it cannot stack.\n");
+		break;
+	case IT_CH_STAR_R: 
+		do_char_log(cn, 3, "When equipped, your Spell Modifier no longer effects spell power and instead effects your Critical Hit Chance.\n");
+		break;
+	case IT_CH_MOON_R: 
+		do_char_log(cn, 3, "When equipped, the effectiveness of your Meditate skill is tripled while fighting, but zero while stationary.\n");
+		break;
+	case IT_CH_SUN_R: 
+		do_char_log(cn, 3, "When equipped, the effectiveness of your Regenerate skill is tripled while fighting, but zero while stationary.\n");
+		break;
+	case IT_CH_JUDGE_R: 
+		do_char_log(cn, 3, "When equipped, you cannot cast your Pulse spell yourself. Pulse is cast on your Ghost Companion upon creation and is permanent, but 20%% of damage is taken by your Ghost Companion each pulse.\n");
+		break;
+	case IT_CH_WORLD_R: 
+		do_char_log(cn, 3, "When equipped, the effectiveness of your Rest skill is tripled while fighting, but zero while stationary.\n");
+		break;
+		
 	default:
 		break;
 	}
@@ -532,8 +583,10 @@ void look_soulstone(int cn, int in)
 	
 	for (t=0;t<N_SOULTAGS;t++)
 	{
-		if (it[in].data[t+3]>0)
+		if (it[in].data[t+3]>0 && it[in].data[t+3]<N_SOULCAT)
 		{
+			chlog(cn, "look_soulstone : strcpy tag name (%d)", it[in].data[t+3]);
+			//strcpy(tag_name[nt], get_soulname(it[in].data[t+3]));
 			tag_name[nt] = get_soulname(it[in].data[t+3]);
 			nt++;
 		}
@@ -541,6 +594,7 @@ void look_soulstone(int cn, int in)
 	
 	if (nt)
 	{
+		chlog(cn, "look_soulstone : display tag names");
 		do_char_log(cn, 1, "This stone has the following tags:\n");
 		for (t=0;t<nt;t++)
 		{

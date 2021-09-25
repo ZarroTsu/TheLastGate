@@ -46,7 +46,7 @@ int extend(int handle, long sizereq, size_t sizeone, void*templ)
 		}
 		if (buffer == NULL)
 		{
-			return( 0);           // calloc() failure
+			return 0;           // calloc() failure
 		}
 		for (; length < sizereq; length += sizeone)
 		{
@@ -57,7 +57,7 @@ int extend(int handle, long sizereq, size_t sizeone, void*templ)
 			free(buffer);
 		}
 	}
-	return(1); // success
+	return 1; // success
 }
 
 
@@ -82,13 +82,13 @@ int load(void)
 	tmap.sprite = SPR_GROUND1;
 	if (!extend(handle, MAPSIZE, sizeof(struct map), &tmap))
 	{
-		return( -1);
+		return -1;
 	}
 
 	map = mmap(NULL, MAPSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (map==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 	
@@ -119,13 +119,13 @@ int load(void)
 	}
 	if (!extend(handle, CHARSIZE, sizeof(struct character), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 	ch = mmap(NULL, CHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (ch==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
@@ -141,13 +141,13 @@ int load(void)
 	}
 	if (!extend(handle, TCHARSIZE, sizeof(struct character), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 	ch_temp = mmap(NULL, TCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (ch_temp==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
@@ -163,14 +163,14 @@ int load(void)
 	}
 	if (!extend(handle, BUFFSIZE, sizeof(struct item), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 
 	bu = mmap(NULL, BUFFSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (bu==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
@@ -186,14 +186,14 @@ int load(void)
 	}
 	if (!extend(handle, ITEMSIZE, sizeof(struct item), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 
 	it = mmap(NULL, ITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (it==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
@@ -209,13 +209,13 @@ int load(void)
 	}
 	if (!extend(handle, TITEMSIZE, sizeof(struct item), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 	it_temp = mmap(NULL, TITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (it==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
@@ -231,13 +231,13 @@ int load(void)
 	}
 	if (!extend(handle, EFFECTSIZE, sizeof(struct effect), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 	fx = mmap(NULL, EFFECTSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (fx==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
@@ -253,17 +253,17 @@ int load(void)
 	}
 	if (!extend(handle, GLOBSIZE, sizeof(struct global), NULL))
 	{
-		return( -1);
+		return -1;
 	}
 
 	globs = mmap(NULL, sizeof(struct global), PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (globs==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
-	return(0);
+	return 0;
 }
 
 void update(void)

@@ -36,11 +36,11 @@ int is_fillword(char *a)
 	{
 		if (!strcmp(a, fillword[n]))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 // left word is changed into right word before parsing the text
@@ -725,6 +725,7 @@ struct know
 #define SP_MOVE_W      	26
 #define SP_TAROT		27
 #define SP_TAROT2		28
+#define SP_TAROT3		29
 //}
 
 // Knowledge table - the big one that handles everything
@@ -1157,6 +1158,8 @@ struct know know[] = {
 	{{"!who",   "!kwai",                   "?", NULL}, 0,  AR_GENERAL, CT_BISHOP, AN_GOD_KWAI2,   0},
 	{{"!who",   "!purple", "?one",         "?", NULL}, 0,  AR_GENERAL, CT_BISHOP, AN_GOD_PURPLE2, 0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
+	{{"!remove", "?",                           NULL}, 0,  AR_GENERAL, CT_PRIEST,    NULL, SP_TAROT3},
+	{{"!remove", "?tarot", "?card", "?",        NULL}, 0,  AR_GENERAL, CT_PRIEST,    NULL, SP_TAROT3},
 	{{"!who",   "!skua",                   "?", NULL}, 0,   AR_PURPLE,   0, AN_GOD_SKUA3,   0},
 	{{"!who",   "!ankh",                   "?", NULL}, 0,   AR_PURPLE,   0, AN_GOD_ANKH3,   0},
 	{{"!who",   "!ishtar",                 "?", NULL}, 0,   AR_PURPLE,   0, AN_GOD_ISHTAR3, 0},
@@ -1437,15 +1440,15 @@ struct know know[] = {
 
 int obey(int cn, int co)
 {
-	if (ch[cn].data[63]==co)
+	if (ch[cn].data[CHD_MASTER]==co)
 	{
-		return( 1);
+		return 1;
 	}
 	if ((ch[cn].data[26] & ch[co].kindred) && (ch[cn].data[28] & 1))
 	{
 		return( 2);
 	}
-	return(0);
+	return 0;
 }
 
 void answer_spellinfo(int cn, int co)
@@ -1470,21 +1473,21 @@ void answer_spellinfo(int cn, int co)
 	}
 }
 
-void answer_transfer(int cn, int co)
+void answer_transfer(int cn, int co, int msg)
 {
 	int removeshadow = 0, n, in;
 	if (obey(cn, co)==1)
 	{
 		if (ch[cn].flags & CF_SHADOWCOPY) 
 		{
-			ch[co].data[CHD_SHADOWCOPY] = 0;
+			ch[co].data[PCD_SHADOWCOPY] = 0;
 			removeshadow = 1;
 		}
 		else
 		{
-			ch[co].data[CHD_COMPANION] = 0;
+			ch[co].data[PCD_COMPANION] = 0;
 		}
-		do_sayx(cn, "I'd prefer to die in battle, %s. But I shall obey my master.", ch[co].name);
+		if (msg) do_sayx(cn, "I'd prefer to die in battle, %s. But I shall obey my master.", ch[co].name);
 		do_give_exp(co, ch[cn].data[28], 1, -1);
 		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
@@ -1512,7 +1515,7 @@ void answer_follow(int cn, int co)
 
 	if (obey(cn, co)==1)
 	{
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
@@ -1534,7 +1537,7 @@ void answer_wait(int cn, int co)
 
 	if (obey(cn, co)==1)
 	{
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
@@ -1578,7 +1581,7 @@ void answer_stop(int cn, int co)
 
 	if (obey(cn, co))
 	{
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
@@ -1712,7 +1715,7 @@ void answer_attack(int cn, int co, char *text)
 			}
 			ch[cn].attack_cn = bestn;
 			idx = bestn | (char_id(bestn) << 16);
-			ch[cn].data[80] = idx;
+			ch[cn].data[MCD_ENEMY1ST] = idx;
 			do_sayx(cn, "Yes %s, I will kill %s!", ch[co].name, ch[bestn].reference);
 //                      do_sayx(cn,ch[cn].text[1],ch[bestn].name);
 			do_notify_char(bestn, NT_GOTMISS, co, 0, 0, 0);
@@ -1722,47 +1725,47 @@ void answer_attack(int cn, int co, char *text)
 
 void answer_quiet(int cn, int co)
 {
-	if (!ch[cn].data[CHD_TALKATIVE])
+	if (!ch[cn].data[MCD_TALKATIVE])
 	{
-		ch[cn].data[CHD_TALKATIVE] = ch_temp[ch[cn].temp].data[CHD_TALKATIVE];
+		ch[cn].data[MCD_TALKATIVE] = ch_temp[ch[cn].temp].data[MCD_TALKATIVE];
 		do_sayx(cn, "Thank you, %s, for letting me talk again!", ch[co].name);
 	}
 	else
 	{
 		do_sayx(cn, "Yes %s, I will shut up now.", ch[co].name);
-		ch[cn].data[CHD_TALKATIVE] = 0;
+		ch[cn].data[MCD_TALKATIVE] = 0;
 	}
 }
 
 void answer_quest(int cn, int co)
 {
 	// Innkeeper will let you know what quest(s) are next to do, based on what you have learned already.
-	if (!ch[co].skill[12][0])
+	if (!B_SK(co, SK_BARTER))
 	{
 		do_sayx(cn, "Jamil seems down on his luck. You can find him here in the Tavern, at the table over there.");
 		return;
 	}
-	if (!ch[co].skill[15][0])
+	if (!B_SK(co, SK_RECALL))
 	{
 		do_sayx(cn, "I hear Inga is in need of help. She's a harakim and she lives on First Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !ch[co].skill[38][0])
-	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[18][0])
-	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[38][0] && !ch[co].skill[18][0]))
+	if ((IS_ANY_TEMP(co) && !B_SK(co, SK_WEAPONM))
+	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_ENHANCE))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_WEAPONM) && !B_SK(co, SK_ENHANCE)))
 	{
 		do_sayx(cn, "I hear Sirjan is in need of help. He's a mercenary and he lives on First Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !ch[co].skill[41][0])
-	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[19][0])
-	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[41][0] && !ch[co].skill[19][0])
+	if ((IS_ANY_TEMP(co) && !B_SK(co, SK_WEAKEN))
+	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_SLOW))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_WEAKEN) && !B_SK(co, SK_SLOW))
 	)
 	{
 		do_sayx(cn, "I hear Amity is in need of help. She's a harakim and you can find her in Lynbore Library.");
 		return;
 	}
-	if (!ch[co].skill[13][0])
+	if (!B_SK(co, SK_REPAIR))
 	{
 		do_sayx(cn, "I hear Jefferson is in need of help. He's a templar and he lives on Second Street.");
 		return;
@@ -1772,55 +1775,54 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Steven is in need of help. He's a mercenary and he lives on Second Street.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[32][0])
-	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)) && !ch[co].skill[25][0])
-	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[32][0] && !ch[co].skill[25][0]))
+	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co)) && !B_SK(co, SK_IMMUN))
+	 || (IS_ANY_HARA(co) && !B_SK(co, SK_DISPEL))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_IMMUN) && !B_SK(co, SK_DISPEL)))
 	{
 		do_sayx(cn, "I hear Ingrid is in need of help. She's a mercenary and she lives on Castle Way.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER)) && !ch[co].skill[33][0])
-	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[20][0])
-	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[33][0] && !ch[co].skill[20][0])
+	if ((IS_ANY_TEMP(co) && !B_SK(co, SK_SURROUND))
+	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_CURSE))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SURROUND) && !B_SK(co, SK_CURSE))
 	)
 	{
 		do_sayx(cn, "I hear Leopold is in need of help. He's a harakim and he lives on Castle Way.");
 		return;
 	}
-	if (!ch[co].skill[26][0])
+	if (!B_SK(co, SK_HEAL))
 	{
 		do_sayx(cn, "I hear Gunther is in need of help. He's a mercenary and he lives on Castle Way.");
 		return;
 	}
-	if (!ch[co].skill[31][0])
+	if (!B_SK(co, SK_SENSE))
 	{
 		do_sayx(cn, "I hear Manfred is in need of help. He's a templar and he lives on Silver Avenue.");
 		return;
 	}
-	if (!ch[co].skill[23][0])
+	if (!B_SK(co, SK_RESIST))
 	{
 		do_sayx(cn, "I hear Serena is in need of help. She's a templar and she lives on Second Street.");
 		return;
 	}
-	if (!ch[co].skill[21][0])
+	if (!B_SK(co, SK_BLESS))
 	{
 		do_sayx(cn, "I hear Cirrus is in need of help. You can find him here in the tavern, down the hall in that room over there.");
 		return;
 	}
-	if (!ch[co].skill[29][0])
+	if (!B_SK(co, SK_REST))
 	{
 		do_sayx(cn, "I hear Gordon is in need of help. He's a harakim and he lives on Shore Crescent.");
 		return;
 	}
-	if (((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_MERCENARY | KIN_WARRIOR | KIN_SORCERER)) && !ch[co].skill[16][0])
-	 || ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER)) && !ch[co].skill[5][0])
-	 || ((ch[co].kindred & KIN_SEYAN_DU) && !ch[co].skill[16][0] && !ch[co].skill[5][0])
-	)
+	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co)) && !B_SK(co, SK_SHIELD))
+	 || (IS_ANY_HARA(co) && !B_SK(co, SK_STAFF))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SHIELD) && !B_SK(co, SK_STAFF)))
 	{
 		do_sayx(cn, "I hear Edna is in need of help. She's a templar and she lives on Shore Crescent.");
 		return;
 	}
-	if (!ch[co].skill[22][0])
+	if (!B_SK(co, SK_IDENT))
 	{
 		do_sayx(cn, "I hear Nasir is in need of help. He's a harakim and he lives on Shore Crescent.");
 		return;
@@ -1829,19 +1831,26 @@ void answer_quest(int cn, int co)
 	do_sayx(cn, "If you're looking for work, perhaps you should travel to Aston, the capital of Astonia.");
 }
 
-void answer_tarot(int cn, int co)
+void answer_tarot(int cn, int co, int m)
 {
-	int in = 0;
+	int n, in = 0;
 	
-	if (in = ch[co].worn[WN_CHARM])
+	if (in = ch[co].worn[m])
 	{
+		if (m==WN_RRING && it[in].temp!=IT_TW_SINBIND)
+		{
+			do_sayx(cn, "Remove what exactly?");
+			return;
+		}
 		do_sayx(cn, "Very well, %s, I have removed your %s for you.", ch[co].name, it[in].name);
 		if (god_give_char(in, co))
 		{
-			ch[co].worn[WN_CHARM] = 0;
+			ch[co].worn[m] = 0;
 			do_char_log(co, 1, "%s returned the %s to your inventory.\n", ch[cn].reference, it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-			remove_spells(co);
+			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(co, n, 0);
+			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(co, n, 0);
+			remove_all_spells(co);
 		}
 		else
 		{
@@ -1854,53 +1863,28 @@ void answer_tarot(int cn, int co)
 	}
 }
 
-void answer_tarot2(int cn, int co)
-{
-	int in = 0;
-	
-	if (in = ch[co].worn[WN_CHARM2])
-	{
-		do_sayx(cn, "Very well, %s, I have removed your %s for you.", ch[co].name, it[in].name);
-		if (god_give_char(in, co))
-		{
-			ch[co].worn[WN_CHARM2] = 0;
-			do_char_log(co, 1, "%s returned the %s to your inventory.\n", ch[cn].reference, it[in].name);
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-			remove_spells(co);
-		}
-		else
-		{
-			do_sayx(cn, "Or, erm... I would, but your inventory seems a bit full. Please come back less encumbered!");
-		}
-	}
-	else
-	{
-		do_sayx(cn, "But you do not have a secondary card equipped, %s!", ch[co].name);
-	}
-}
-
 void answer_unlearn(int cn, int co)
 {
 	int v = 250000;
 	char unl[40];
 	
-	if ((ch[co].kindred & KIN_SEYAN_DU) && 
-		(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
-		 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_ZEPHYR][0]))
+	if (IS_SEYAN_DU(co) && 
+		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
+		 B_SK(co, SK_POISON) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR)))
 	{
-		if (ch[co].skill[SK_WARCRY][0])	{ ch[co].skill[SK_WARCRY][0] = 0; strcpy(unl, skilltab[SK_WARCRY].name); }
-		if (ch[co].skill[SK_LEAP][0])	{ ch[co].skill[SK_LEAP][0] = 0; strcpy(unl, skilltab[SK_LEAP].name); }
-		if (ch[co].skill[SK_SHADOW][0])	{ ch[co].skill[SK_SHADOW][0] = 0; strcpy(unl, skilltab[SK_SHADOW].name); }
-		if (ch[co].skill[SK_POISON][0])	{ ch[co].skill[SK_POISON][0] = 0; strcpy(unl, skilltab[SK_POISON].name); }
-		if (ch[co].skill[SK_PULSE][0])	{ ch[co].skill[SK_PULSE][0] = 0; strcpy(unl, skilltab[SK_PULSE].name); }
-		if (ch[co].skill[SK_ZEPHYR][0])	{ ch[co].skill[SK_ZEPHYR][0] = 0; strcpy(unl, skilltab[SK_ZEPHYR].name); }
+		if (B_SK(co, SK_WARCRY))	{ B_SK(co, SK_WARCRY) = 0; strcpy(unl, skilltab[SK_WARCRY].name); }
+		if (B_SK(co, SK_LEAP))	{ B_SK(co, SK_LEAP) = 0; strcpy(unl, skilltab[SK_LEAP].name); }
+		if (B_SK(co, SK_SHADOW))	{ B_SK(co, SK_SHADOW) = 0; strcpy(unl, skilltab[SK_SHADOW].name); }
+		if (B_SK(co, SK_POISON))	{ B_SK(co, SK_POISON) = 0; strcpy(unl, skilltab[SK_POISON].name); }
+		if (B_SK(co, SK_PULSE))	{ B_SK(co, SK_PULSE) = 0; strcpy(unl, skilltab[SK_PULSE].name); }
+		if (B_SK(co, SK_ZEPHYR))	{ B_SK(co, SK_ZEPHYR) = 0; strcpy(unl, skilltab[SK_ZEPHYR].name); }
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
 		do_sayx(cn, "Very well, I will remove %s, %s. Close your eyes, and...", unl, ch[co].name);
 		chlog(cn, "GateKeeper: Removed %s from %s, and lowered by %d.", unl, ch[co].name, v);
 		do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl, v);
 	}
-	else if (ch[co].kindred & KIN_SEYAN_DU)
+	else if (IS_SEYAN_DU(co))
 	{
 		do_sayx(cn, "But you do not know an arch skill, %s!", ch[co].name);
 	}
@@ -1942,7 +1926,7 @@ void answer_greeting(int cn, int co)
 /*	simplified by DB 1.5.2000 */
 	if (ch[cn].text[2][0] && ch[cn].text[2][0]!='#')
 	{
-		if((ch[cn].temp == 180) && (ch[co].kindred & KIN_PURPLE))
+		if((ch[cn].temp == 180) && IS_PURPLE(co))
 		{
 			do_sayx(cn, "Greetings, %s!", ch[co].name);
 			return;
@@ -2030,7 +2014,7 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_FOLLOW:		answer_follow(cn, co); break;
 		case SP_TIME:		answer_time(cn, co); break;
 		case SP_POINTS:		answer_points(cn, co, nr); break;
-		case SP_TRANSFER:	answer_transfer(cn, co); break;
+		case SP_TRANSFER:	answer_transfer(cn, co, 1); break;
 		case SP_SPELLINFO:	answer_spellinfo(cn, co); break;
 		case SP_QUIET:		answer_quiet(cn, co); break;
 		case SP_QUEST:		answer_quest(cn, co); break;
@@ -2039,8 +2023,9 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_OFFENSE:	answer_gcmode(cn, co, 2); break;
 		case SP_BERSERK:	answer_gcmode(cn, co, 3); break;
 		case SP_COMMAND:	answer_gccommand(co); break;
-		case SP_TAROT:		answer_tarot(cn, co); break;
-		case SP_TAROT2:		answer_tarot2(cn, co); break;
+		case SP_TAROT:		answer_tarot(cn, co, WN_CHARM); break;
+		case SP_TAROT2:		answer_tarot(cn, co, WN_CHARM2); break;
+		case SP_TAROT3:		answer_tarot(cn, co, WN_RRING); break;
 		case SP_UNLEARN:	answer_unlearn(cn, co); break;
 		default:break;
 	}
@@ -2059,7 +2044,7 @@ void npc_hear(int cn, int co, char *text)
 	// got keyword meaning stop
 	if (!strcasecmp(text, ch[cn].text[6]))
 	{
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
@@ -2080,7 +2065,7 @@ void npc_hear(int cn, int co, char *text)
 	// dont talk to enemies
 	if (!obey(cn, co))
 	{
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			if ((ch[cn].data[n] & 0xffff)==co)
 			{
@@ -2281,7 +2266,7 @@ void npc_hear(int cn, int co, char *text)
 		}
 	}
 
-	talk = ch[cn].data[CHD_TALKATIVE] + name;
+	talk = ch[cn].data[MCD_TALKATIVE] + name;
 	if (obey(cn, co))
 	{
 		talk += 20;

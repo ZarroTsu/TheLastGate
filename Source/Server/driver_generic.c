@@ -15,16 +15,16 @@ int follow_driver(int cn, int co)
 
 	if (co<=0 || co>=MAXCHARS)
 	{
-		return( 0);
+		return 0;
 	}
 	if (ch[co].tox<5 || ch[co].tox>MAPX - 6 || ch[co].toy<5 || ch[co].toy>MAPY - 6)
 	{
-		return( 0);
+		return 0;
 	}
 
-	if (!(IS_COMPANION(cn) && ch[cn].data[63]==co) && !do_char_can_see(cn, co))
+	if (!(IS_COMPANION(cn) && ch[cn].data[CHD_MASTER]==co) && !do_char_can_see(cn, co))
 	{
-		return( 0);
+		return 0;
 	}
 
 	m = ch[co].tox + ch[co].toy * MAPX;
@@ -68,7 +68,7 @@ int follow_driver(int cn, int co)
 		if (ch[cn].dir==dir)
 		{
 			ch[cn].misc_action = DR_IDLE;
-			return( 1);
+			return 1;
 		}
 
 		ch[cn].misc_action = DR_TURN;
@@ -113,7 +113,7 @@ int follow_driver(int cn, int co)
 			ch[cn].misc_action = DR_IDLE;
 			break;
 		}
-		return( 1);
+		return 1;
 	}
 
 	if (plr_check_target(m))
@@ -154,13 +154,13 @@ int follow_driver(int cn, int co)
 	}
 	else
 	{
-		return( 0);
+		return 0;
 	}
 
 	ch[cn].goto_x = m % MAPX;
 	ch[cn].goto_y = m / MAPX;
 
-	return(1);
+	return 1;
 }
 
 void player_driver_med(int cn)
@@ -594,7 +594,7 @@ void driver_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 		case    NT_GOTHIT:
 		case    NT_GOTMISS:
 			if (!ch[cn].attack_cn &&
-				!ch[cn].data[CHD_FIGHTBACK] &&                         // fightback
+				!ch[cn].data[PCD_FIGHTBACK] &&                         // fightback
 				ch[cn].misc_action!=DR_GIVE)
 			{
 				ch[cn].attack_cn = dat1;

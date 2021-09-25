@@ -32,7 +32,7 @@ int npc_malte_gotattack(int cn, int co)
 {
 	int cc;
 
-	if (ch[cn].data[42]!=ch[co].data[42])
+	if (ch[cn].data[CHD_GROUP]!=ch[co].data[CHD_GROUP])
 	{
 		if (!(cc = ch[cn].attack_cn) || npc_dist(cn, co)<npc_dist(cn, cc))
 		{
@@ -41,7 +41,7 @@ int npc_malte_gotattack(int cn, int co)
 		}
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_malte_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
@@ -53,40 +53,40 @@ int npc_malte_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 	case    NT_GOTMISS:
 		return( npc_malte_gotattack(cn, dat1));
 	case    NT_DIDHIT:
-		return( 0);
+		return 0;
 	case    NT_DIDMISS:
-		return( 0);
+		return 0;
 	case    NT_DIDKILL:
-		return( 0);
+		return 0;
 	case    NT_GOTEXP:
-		return( 0);
+		return 0;
 	case    NT_SEEKILL:
-		return( 0);
+		return 0;
 	case    NT_SEEHIT:
-		return( 0);
+		return 0;
 	case    NT_SEEMISS:
-		return( 0);
+		return 0;
 	case    NT_GIVE:
-		return( 0);
+		return 0;
 	case    NT_SEE:
-		return( 0);
+		return 0;
 	case    NT_DIED:
-		return( 0);
+		return 0;
 	case    NT_SHOUT:
-		return( 0);
+		return 0;
 	case    NT_HITME:
-		return( 0);
+		return 0;
 
 	default:
 		xlog("Unknown NPC message for %d (%s): %d",
 		     cn, ch[cn].name, type);
-		return( 0);
+		return 0;
 	}
 }
 
 int npc_malte_high(int cn)
 {
-	return(0);
+	return 0;
 }
 
 void npc_malte_low(int cn)
@@ -104,19 +104,19 @@ void npc_malte_low(int cn)
 	{
 	case    0:
 		do_sayx(cn, "Thank you so much for saving me, %s!", ch[co].name);
-		ch[cn].data[2] = globs->ticker + TICKS * 8;
+		ch[cn].data[2] = globs->ticker + TICKS * 6;
 		ch[cn].data[1]++;
 		ch[cn].misc_action  = DR_TURN;
 		ch[cn].misc_target1 = DX_DOWN;
 		break;
 	case    1:
 		do_sayx(cn, "Before the monsters caught me, I discovered that you need a coin to open certain doors down here.");
-		ch[cn].data[2] = globs->ticker + TICKS * 8;
+		ch[cn].data[2] = globs->ticker + TICKS * 3;
 		ch[cn].data[1]++;
 		break;
 	case    2:
-		do_sayx(cn, "I found this part of the coin, and I heard that Damor in Aston has another one. Ask him for the 'Black Stronghold Coin'.");
-		ch[cn].data[2] = globs->ticker + TICKS * 5;
+		do_sayx(cn, "I found this part of the coin, and I heard there are living flames guarding another.");
+		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
 		in = ch[cn].citem = god_create_item(763);
 		it[in].carried = cn;
@@ -124,18 +124,18 @@ void npc_malte_low(int cn)
 		ch[cn].misc_target1 = co;
 		break;
 	case    3:
-		do_sayx(cn, "Shiva, the mage who creates all the monsters, has the third part of it.");
-		ch[cn].data[2] = globs->ticker + TICKS * 8;
+		do_sayx(cn, "Shiva, the master of the stronghold, has the third part of it.");
+		ch[cn].data[2] = globs->ticker + TICKS * 3;
 		ch[cn].data[1]++;
 		break;
 	case    4:
 		do_sayx(cn, "I have no idea where the other parts are.");
-		ch[cn].data[2] = globs->ticker + TICKS * 8;
+		ch[cn].data[2] = globs->ticker + TICKS * 6;
 		ch[cn].data[1]++;
 		break;
 	case    5:
-		do_sayx(cn, "I will recall now. I have enough of this prison!");
-		ch[cn].data[2] = globs->ticker + TICKS * 6;
+		do_sayx(cn, "I will recall now. I have had enough of this prison!");
+		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 		break;

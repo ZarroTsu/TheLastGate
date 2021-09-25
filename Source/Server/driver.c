@@ -38,6 +38,10 @@
 			  4 : Triggered by croaking floor trap
 			  5 : Temple Sitter -- Notices unique weapon
 			 12 : Lab 12 lord -- spawns helpers when they gain 1 healing sickness stack
+			 13 : Lizard Emperor - Does some fancy shenanigans
+			 14 : Shiva II - Much simplier than Shiva I, just summons monsters occasionally.
+			 20 : Tower XX - Lock doors
+			 30 : Abyss  X - Lock doors
 			10X : BS Tier 1
 			20X : BS Tier 2
 			30X : BS Tier 3
@@ -70,14 +74,14 @@
    61:     time elapsed
    62:     create light: 0=never, 1=when dark, 2=when dark and not resting, 3=when dark and fighting
    63:     obey and protect character X (CHD_MASTER)
-   64:     self destruct in X ticks (CHD_COMPANION??)
+   64:     self destruct in X ticks (PCD_COMPANION??)
    65:     friend is under attack - help by magic etc.
    66:     gives item X in exchange for item from 49
    67:     timeout for greeting
-   68:     value of knowledge (CHD_ATTACKTIME??)
-   69:     follow character X (CHD_ATTACKVICT??)
+   68:     value of knowledge (PCD_ATTACKTIME??)
+   69:     follow character X (PCD_ATTACKVICT??)
    70:     last time we called our god for help
-   71:     talkativity (CHD_TALKATIVE)
+   71:     talkativity (MCD_TALKATIVE)
    72:     area of knowledge
    73:     random walk: max distance to origin
    74:     last time we created a ghost
@@ -118,17 +122,17 @@ int get_frust_x_off(int f)
 	switch(f % 5)
 	{
 	case    0:
-		return( 0);
+		return 0;
 	case    1:
-		return( 1);
+		return 1;
 	case    2:
-		return( -1);
+		return -1;
 	case    3:
 		return( 2);
 	case    4:
 		return( -2);
 	default:
-		return( 0);
+		return 0;
 	}
 }
 
@@ -137,17 +141,17 @@ int get_frust_y_off(int f)
 	switch((f / 5) % 5)
 	{
 	case    0:
-		return( 0);
+		return 0;
 	case    1:
-		return( 1);
+		return 1;
 	case    2:
-		return( -1);
+		return -1;
 	case    3:
 		return( 2);
 	case    4:
 		return( -2);
 	default:
-		return( 0);
+		return 0;
 	}
 }
 
@@ -161,20 +165,27 @@ int npc_add_enemy(int cn, int co, int always)
 	int n, idx, d1, d2, cc;
 
 	// don't attack anyone of the same group. Never, never, never.
-	if (ch[cn].data[42]==ch[co].data[42])
+	if (ch[cn].data[CHD_GROUP]==ch[co].data[CHD_GROUP])
 	{
-		return( 0);
+		return 0;
 	}
+	
+	// Group check for GCs
+	if ((IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || (IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
+	{
+		return 0;
+	}
+	
 	// Group 1 mobs shall not attack ghost companions.
 	// Ishtar said 65536 to 65536+4096, I hope this is OK.
-	if (!always && (ch[cn].data[42] == 1) && (ch[co].data[42] & 0x10000))
+	if (!always && (ch[cn].data[CHD_GROUP] == 1) && (ch[co].data[CHD_GROUP] & 0x10000))
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (!always && (ch[cn].points_tot + 500) * 20<ch[co].points_tot)
 	{
-		return( 0);
+		return 0;
 	}
 
 	ch[cn].data[76] = ch[co].x + ch[co].y * MAPX;
@@ -196,22 +207,22 @@ int npc_add_enemy(int cn, int co, int always)
 
 	idx = co | (char_id(co) << 16);
 
-	for (n = 80; n<92; n++)
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 	{
 		if (ch[cn].data[n]==idx)
 		{
-			return( 0);
+			return 0;
 		}
 	}
 
-	for (n = 91; n>80; n--)
+	for (n = MCD_ENEMYZZZ; n>MCD_ENEMY1ST; n--)
 	{
 		ch[cn].data[n] = ch[cn].data[n - 1];
 	}
 
-	ch[cn].data[80] = idx;
+	ch[cn].data[MCD_ENEMY1ST] = idx;
 
-	return(1);
+	return 1;
 }
 
 int npc_is_enemy(int cn, int co)
@@ -220,15 +231,15 @@ int npc_is_enemy(int cn, int co)
 
 	idx = co | (char_id(co) << 16);
 
-	for (n = 80; n<92; n++)
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 	{
 		if (ch[cn].data[n]==idx)
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_list_enemies(int npc, int cn)
@@ -238,7 +249,7 @@ int npc_list_enemies(int npc, int cn)
 	int cv;
 
 	do_char_log(cn, 2, "Enemies of %s:\n", ch[npc].name);
-	for (n = 80; n<92; n++)
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 	{
 		if ((cv = ch[npc].data[n] & 0xFFFF))
 		{
@@ -249,9 +260,9 @@ int npc_list_enemies(int npc, int cn)
 	if (none)
 	{
 		do_char_log(cn, 2, "-none-\n");
-		return(0);
+		return 0;
 	}
-	return(1);
+	return 1;
 }
 
 int npc_remove_enemy(int npc, int enemy)
@@ -259,7 +270,7 @@ int npc_remove_enemy(int npc, int enemy)
 	int found = 0;
 	int n;
 
-	for (n = CHD_ENEMY1ST; n<=CHD_ENEMYZZZ; n++)
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 	{
 		if ((ch[npc].data[n] & 0xFFFF) == enemy)
 		{
@@ -267,7 +278,7 @@ int npc_remove_enemy(int npc, int enemy)
 		}
 		if (found)
 		{
-			if (n < CHD_ENEMYZZZ)
+			if (n < MCD_ENEMYZZZ)
 			{
 				ch[npc].data[n] = ch[npc].data[n + 1];
 			}
@@ -292,7 +303,7 @@ void npc_saytext_n(int npc, int n, char *name)
 	{
 		if (IS_COMP_TEMP(npc))
 		{
-			if (ch[npc].data[CHD_TALKATIVE] == -10)
+			if (ch[npc].data[MCD_TALKATIVE] == -10)
 			{
 				do_sayx(npc, ch[npc].text[n], name);
 			}
@@ -324,15 +335,15 @@ int npc_gotattack(int cn, int co, int dam)
 
 		cc = god_create_char(CT_PEACEKEEPER, 1);
 		ch[cc].temp = CT_COMPANION;
-		ch[cc].data[42] = 65536 + cn;                       // set group
+		ch[cc].data[CHD_GROUP] = 65536 + cn;                       // set group
 		ch[cc].data[59] = 65536 + cn;                       // protect all other members of this group
 
 		/* make thrall harmless */
 		ch[cc].data[24] = 0;    // do not interfere in fights
 		ch[cc].data[36] = 0;    // no walking around
 		ch[cc].data[43] = 0;    // don't attack anyone
-		ch[cc].data[80] = co | (char_id(co) << 16);   // attacker is enemy
-		ch[cc].data[63] = cn;   // obey and protect enthraller
+		ch[cc].data[MCD_ENEMY1ST] = co | (char_id(co) << 16);   // attacker is enemy
+		ch[cc].data[CHD_MASTER] = cn;   // obey and protect enthraller
 		ch[cc].data[64] = globs->ticker + 120 * TICKS;        // make her vanish after 2 minutes
 		ch[cc].data[70] = globs->ticker + TICKS * 60 * 1;       // and make sure thralled peacies don't summon more than one more
 
@@ -369,7 +380,7 @@ int npc_gotattack(int cn, int co, int dam)
 	if (!do_char_can_see(cn, co))    // we have been attacked but cannot see the attacker
 	{
 		ch[cn].data[78] = globs->ticker + TICKS * 30;
-		return(1);
+		return 1;
 	}
 
 	// fight back when attacked - all NPCs do this:
@@ -385,36 +396,36 @@ int npc_gotattack(int cn, int co, int dam)
 		}
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_gothit(int cn, int co, int dam)
 {
 	if (npc_gotattack(cn, co, dam))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_gotmiss(int cn, int co)
 {
 	if (npc_gotattack(cn, co, 0))
 	{
-		return( 1);
+		return 1;
 	}
-	return(0);
+	return 0;
 }
 
 int npc_didhit(int cn, int co, int dam)
 {
-	return(0);
+	return 0;
 }
 
 int npc_didmiss(int cn, int co)
 {
-	return(0);
+	return 0;
 }
 
 int npc_killed(int cn, int cc, int co)
@@ -427,10 +438,11 @@ int npc_killed(int cn, int cc, int co)
 	}
 	ch[cn].data[76] = ch[cn].data[77] = ch[cn].data[78] = 0;
 	npc_activate_rings(cn, 0);
+	npc_wedge_doors(ch[cn].data[26], 0);
 
 	idx = co | (char_id(co) << 16);
 
-	for (n = 80; n<92; n++) // remove enemy
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
 	{
 		if (ch[cn].data[n]==idx)
 		{
@@ -440,38 +452,38 @@ int npc_killed(int cn, int cc, int co)
 				npc_saytext_n(cn, 0, ch[co].name);
 			}
 			// add killed mob to data so we don't re-add it immediately 
-			if (IS_COMPANION(cn)) ch[cn].data[74] = idx; 
+			if (IS_COMPANION(cn)) ch[cn].data[91] = idx; 
 			ch[cn].data[n] = 0;
-			return(1);
+			return 1;
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_didkill(int cn, int co)
 {
 	if (npc_killed(cn, cn, co))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_gotexp(int cn, int amount)
 {
-	return(0);
+	return 0;
 }
 
 int npc_seekill(int cn, int cc, int co)
 {
 	if (npc_killed(cn, cc, co))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_seeattack(int cn, int cc, int co)
@@ -483,11 +495,11 @@ int npc_seeattack(int cn, int cc, int co)
 
 	if (!do_char_can_see(cn, co))
 	{
-		return( 1);                     // processed it: we cannot see the defender, so ignore it
+		return 1;                     // processed it: we cannot see the defender, so ignore it
 	}
 	if (!do_char_can_see(cn, cc))
 	{
-		return( 1);                     // processed it: we cannot see the attacker, so ignore it
+		return 1;                     // processed it: we cannot see the attacker, so ignore it
 	}
 	if (ch[cn].data[24])   // prevent fight mode
 	{
@@ -530,7 +542,7 @@ int npc_seeattack(int cn, int cc, int co)
 			}
 			chlog(cn, "Added %s to kill list for attacking %s (prevent fight)", ch[c2].name, ch[c3].name);
 		}
-		return(1);
+		return 1;
 	}
 
 	if (ch[cn].data[31])   // protect char (by temp)
@@ -570,14 +582,16 @@ int npc_seeattack(int cn, int cc, int co)
 		}
 	}
 
-	if (ch[cn].data[63] || ch[ch[cn].data[63]].data[CHD_COMPANION] || ch[ch[cn].data[63]].data[CHD_SHADOWCOPY])   // protect char (by nr)
+	if (ch[cn].data[CHD_MASTER] || ch[ch[cn].data[CHD_MASTER]].data[PCD_COMPANION] || ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY])   // protect char (by nr)
 	{
 		ret = 0;
-		if ((co==ch[cn].data[63] || co==ch[ch[cn].data[63]].data[CHD_COMPANION] || co==ch[ch[cn].data[63]].data[CHD_SHADOWCOPY]) && ch[cn].data[1]!=1)
+		if ((co==ch[cn].data[CHD_MASTER] || co==ch[ch[cn].data[CHD_MASTER]].data[PCD_COMPANION] || co==ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY]) && ch[cn].data[1]!=1)
 		{
 			idx = cc | (char_id(cc) << 16);
-			if (IS_COMPANION(cn) && ch[cn].data[74]!=idx)
+			if (IS_COMPANION(cn) && ch[cn].data[91]!=idx)
+			{
 				ret = npc_add_enemy(cn, cc, 1);
+			}
 			if (ret)
 			{
 				if (!(ch[cc].flags & CF_SILENCE))
@@ -591,14 +605,16 @@ int npc_seeattack(int cn, int cc, int co)
 				ch[cn].data[65] = co;
 			}
 		}
-		if ((cc==ch[cn].data[63] || cc==ch[ch[cn].data[63]].data[CHD_COMPANION] || cc==ch[ch[cn].data[63]].data[CHD_SHADOWCOPY]) && ch[cn].data[1]!=1)
+		if ((cc==ch[cn].data[CHD_MASTER] || cc==ch[ch[cn].data[CHD_MASTER]].data[PCD_COMPANION] || cc==ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY]) && ch[cn].data[1]!=1)
 		{
 			idx = co | (char_id(co) << 16);
-			if (IS_COMPANION(cn) && ch[cn].data[74]!=idx)
+			if (IS_COMPANION(cn) && ch[cn].data[91]!=idx)
+			{
 				ret = npc_add_enemy(cn, co, 1);
+			}
 			if (ret)
 			{
-				if ((IS_COMPANION(co) && !(ch[ch[co].data[63]].flags & CF_SILENCE)) || !(ch[co].flags & CF_SILENCE))
+				if ((IS_COMPANION(co) && !(ch[ch[co].data[CHD_MASTER]].flags & CF_SILENCE)) || !(ch[co].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
@@ -614,9 +630,9 @@ int npc_seeattack(int cn, int cc, int co)
 	if (ch[cn].data[59])   // protect by group
 	{
 		ret = 0;
-		if (ch[cn].data[59]==ch[co].data[42])
+		if (ch[cn].data[59]==ch[co].data[CHD_GROUP])
 		{
-			if (ch[cn].temp!=664) ret = npc_add_enemy(cn, cc, 1);
+			if (ch[cn].temp!=CT_SHIVA_I) ret = npc_add_enemy(cn, cc, 1);
 			if (ret)
 			{
 				if (!(ch[cc].flags & CF_SILENCE))
@@ -630,9 +646,9 @@ int npc_seeattack(int cn, int cc, int co)
 				ch[cn].data[65] = co;
 			}
 		}
-		if (ch[cn].data[59]==ch[cc].data[42])
+		if (ch[cn].data[59]==ch[cc].data[CHD_GROUP])
 		{
-			if (ch[cn].temp!=664) ret = npc_add_enemy(cn, co, 1);
+			if (ch[cn].temp!=CT_SHIVA_I) ret = npc_add_enemy(cn, co, 1);
 			if (ret)
 			{
 				if (!(ch[co].flags & CF_SILENCE))
@@ -648,7 +664,7 @@ int npc_seeattack(int cn, int cc, int co)
 		}
 	}
 
-	if (IS_COMP_TEMP(co) && ch[co].data[63]==cn)   // MY ghost companion
+	if (IS_COMP_TEMP(co) && ch[co].data[CHD_MASTER]==cn)   // MY ghost companion
 	{
 		if (!ch[cn].data[65])
 		{
@@ -656,7 +672,7 @@ int npc_seeattack(int cn, int cc, int co)
 		}
 	}
 
-	if (IS_COMP_TEMP(cc) && ch[cc].data[63]==cn)   // MY ghost companion
+	if (IS_COMP_TEMP(cc) && ch[cc].data[CHD_MASTER]==cn)   // MY ghost companion
 	{
 		if (!ch[cn].data[65])
 		{
@@ -664,53 +680,63 @@ int npc_seeattack(int cn, int cc, int co)
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_seehit(int cn, int cc, int co)
 {
 	if (npc_seeattack(cn, cc, co))
 	{
-		return( 1);
+		return 1;
 	}
 	if (npc_see(cn, cc))
 	{
-		return( 1);
+		return 1;
 	}
 	if (npc_see(cn, co))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_seemiss(int cn, int cc, int co)
 {
 	if (npc_seeattack(cn, cc, co))
 	{
-		return( 1);
+		return 1;
 	}
 	if (npc_see(cn, cc))
 	{
-		return( 1);
+		return 1;
 	}
 	if (npc_see(cn, co))
 	{
-		return( 1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_quest_check(int cn, int val)
 {
 	int bit, tmp;
 
-	bit = 1 << (val);
-	tmp = ch[cn].data[72] & bit;
-	ch[cn].data[72] |= bit;
-	return(tmp);
+	if (val<32)
+	{
+		bit = 1 << (val);
+		tmp = ch[cn].data[72] & bit;
+		ch[cn].data[72] |= bit;
+		return(tmp);
+	}
+	else
+	{
+		bit = 1 << (val - 32);
+		tmp = ch[cn].data[94] & bit;
+		ch[cn].data[94] |= bit;
+		return(tmp);
+	}
 }
 
 int convert_skill_for_group(int co, int nr)
@@ -723,24 +749,24 @@ int convert_skill_for_group(int co, int nr)
 	if (nr == SK_DISPEL)   nr = SK_IMMUN;   // Dispel   -> Immun
 	
 	// Hacky flip-flopping
-	if (ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
+	if (IS_ANY_TEMP(co))
 	{
 		if (nr == SK_ENHANCE) nr = SK_WEAPONM;  // Enhance  -> WeapM
 		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow     -> Weaken
 		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse    -> Surround
 	}
-	if (ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
+	if (IS_ANY_HARA(co))
 	{
 		if (nr == SK_SHIELD) nr = SK_STAFF;  // Shiel    -> Staff
 		if (nr == SK_IMMUN)  nr = SK_DISPEL; // Immun    -> Dispel
 	}
-	if (ch[co].kindred & KIN_SEYAN_DU)
+	if (IS_SEYAN_DU(co))
 	{
-		if (nr == SK_ENHANCE && ch[co].skill[SK_ENHANCE][0]) nr = SK_WEAPONM;
-		if (nr == SK_SLOW    && ch[co].skill[SK_SLOW][0])    nr = SK_WEAKEN;
-		if (nr == SK_CURSE   && ch[co].skill[SK_CURSE][0])   nr = SK_SURROUND;
-		if (nr == SK_SHIELD  && ch[co].skill[SK_SHIELD][0])  nr = SK_STAFF;
-		if (nr == SK_IMMUN   && ch[co].skill[SK_IMMUN][0])   nr = SK_DISPEL;
+		if (nr == SK_ENHANCE && B_SK(co, SK_ENHANCE)) nr = SK_WEAPONM;
+		if (nr == SK_SLOW    && B_SK(co, SK_SLOW))    nr = SK_WEAKEN;
+		if (nr == SK_CURSE   && B_SK(co, SK_CURSE))   nr = SK_SURROUND;
+		if (nr == SK_SHIELD  && B_SK(co, SK_SHIELD))  nr = SK_STAFF;
+		if (nr == SK_IMMUN   && B_SK(co, SK_IMMUN))   nr = SK_DISPEL;
 	}
 	 
 	return nr;
@@ -755,49 +781,68 @@ int npc_give(int cn, int co, int in, int money)
 	unsigned char buf[3];
 
 	if (ch[co].flags & (CF_PLAYER | CF_USURP))
-	{
 		ch[cn].data[92] = TICKS * 60;
-	}
 	else if (!group_active(cn))
-	{
-		return( 0);
-	}
+		return 0;
 
 	// Special hack for arch skills.
 	if ((nr = ch[cn].data[50])!=0)
 	{
 		// Check each arch skill against the race that is intended to learn it.
-		if ((	nr == 35 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR)) ) 
-		 || (	nr == 43 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHHARAKIM)) ) 
-		 || (	nr == 49 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_BRAWLER    )) ) 
-		 || (	nr == 42 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_SORCERER   )) ) 
-		 || (	nr == 46 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_SUMMONER   )) )
-		 || (	nr ==  7 && !(ch[co].kindred & (KIN_SEYAN_DU | KIN_WARRIOR   )) ))
+		if (( nr == SK_WARCRY && !IS_SEYA_OR_ARTM(co) )
+		 || ( nr == SK_PULSE  && !IS_SEYA_OR_ARHR(co) )
+		 || ( nr == SK_LEAP   && !IS_SEYA_OR_BRWL(co) )
+		 || ( nr == SK_POISON && !IS_SEYA_OR_SORC(co) )
+		 || ( nr == SK_SHADOW && !IS_SEYA_OR_SUMM(co) )
+		 || ( nr == SK_ZEPHYR && !IS_SEYA_OR_WARR(co) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only one!
-		if ((nr == 35 || nr == 43 || nr == 49 || nr == 42 || nr == 46 || nr ==  7) &&
-			(ch[co].kindred & KIN_SEYAN_DU) && 
-			(ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
-			 ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_ZEPHYR][0]))
+		if ((nr == SK_WARCRY || nr == SK_PULSE || nr == SK_LEAP || 
+			nr == SK_POISON || nr == SK_SHADOW || nr == SK_ZEPHYR) && IS_SEYAN_DU(co) && 
+			(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
+			 B_SK(co, SK_POISON) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR)))
 			canlearn = 0;
 	}
 
-	if (in && 
-		(
+	if (in && (
 		ch[cn].data[49]==it[in].temp 
 		|| 
 		(ch[cn].temp==CT_TACTICIAN && 
 		(it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3)) 
 		||
-		(ch[cn].temp==CT_BISHOP && 
-		(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD))
+		(ch[cn].temp==CT_BISHOP && (
+		(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
+		(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R)))
+		||
+		(ch[cn].temp==CT_PRIEST && it[in].temp==IT_TW_SINBIND && it[in].data[1]==1)
 		||
 		(ch[cn].temp==CT_HERBCOLL && 
-		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD || it[in].temp==IT_HERBE))
-		)
-		&& canlearn)
+		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD))
+		||
+		(ch[cn].temp==CT_HERBCOLL2 && 
+		(it[in].temp==IT_HERBE))
+		) && canlearn)
 	{
+		
+		// Assure the player has inventory space before we do anything
+		if (ch[cn].data[66] || ch[cn].data[50]==50)
+		{
+			for (n = 0; n<40; n++)
+			{
+				// Find an empty inventory slot
+				if (!ch[co].item[n])
+				{
+					break;
+				}
+			}
+			if (n==40)
+			{
+				do_char_log(co, 0, "You get the feeling you should clear some space in your backpack first.\n");
+				return 0;
+			}
+		}
+		
 		// hack for black candle
 		if (ch[cn].temp==CT_TACTICIAN && (it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3))
 		{
@@ -808,9 +853,11 @@ int npc_give(int cn, int co, int in, int money)
 			do_sayx(cn, "Ah, a black candle! Great work, %s! Now we may see peace for a while...", ch[co].name);
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The Tactician was impressed by %s's deed.\n", ch[co].name);
 			ch[co].misc_action = DR_IDLE;
-			return(0);
+			return 0;
 		}
-		else if (ch[cn].temp==CT_BISHOP && (it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD))
+		else if (ch[cn].temp==CT_BISHOP && (
+			(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
+			(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R) ))
 		{
 			if (in2 = ch[co].worn[WN_CHARM2])
 			{
@@ -820,7 +867,7 @@ int npc_give(int cn, int co, int in, int money)
 					god_take_from_char(in, cn);
 					god_give_char(in, co);
 					do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in].name);
-					return(0);
+					return 0;
 				}
 			}
 			if (it[in].temp==IT_CH_FOOL) // special case - need to check equip requirements
@@ -829,47 +876,98 @@ int npc_give(int cn, int co, int in, int money)
 				{
 					god_take_from_char(in, cn);
 					god_give_char(in, co);
-					return(0);
+					return 0;
 				}
 			}
 			do_sayx(cn, "A tarot card, I see. Allow me to apply its magic to you, %s.", ch[co].name);
 			god_take_from_char(in, cn);
-			if (!(ch[co].flags & CF_SYS_OFF))
-				do_char_log(co, 1, "You now have the effects of your %s equipped.\n", it[in].name);
+			do_char_log(co, 1, "You now have the effects of your %s equipped.\n", it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
 			if (in2 = ch[co].worn[WN_CHARM])
 			{
 				do_sayx(cn, "I have removed your %s for you as well. Please take it.", it[in2].name);
-				if (!(ch[co].flags & CF_SYS_OFF))
-					do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in2].name);
+				do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in2].name);
 			}
 			it[in].x = 0;
 			it[in].y = 0;
 			it[in].carried = co;
 			ch[co].citem = in2;
 			ch[co].worn[WN_CHARM] = in;
-			remove_spells(co);
+			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(co, n, 0);
+			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(co, n, 0);
+			remove_all_spells(co);
 			ch[co].misc_action = DR_IDLE;
-			return(0);
+			return 0;
 		}
-		else if (ch[cn].temp==CT_HERBCOLL && 
-		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD || it[in].temp==IT_HERBE))
+		else if (ch[cn].temp==CT_PRIEST && it[in].temp==IT_TW_SINBIND && it[in].data[1]==1)
 		{
-			if (points2rank(ch[co].points_tot)<8)
+			if (((in2 = ch[co].worn[WN_RRING]) && it[in2].temp!=IT_TW_SINBIND) || ch[co].worn[WN_LRING])
+			{
+				do_sayx(cn, "So sorry %s, but could you take the rings you're wearing off first? Thanks.", ch[co].name);
+				god_take_from_char(in, cn);
+				god_give_char(in, co);
+				do_char_log(co, 1, "%s returned the ring to you.\n", ch[cn].reference);
+				return 0;
+			}
+			if (((in2 = ch[co].worn[WN_CHARM]) && it[in].data[2]==it[in2].temp) || ((in2 = ch[co].worn[WN_CHARM2]) && it[in].data[2]==it[in2].temp))
+			{
+				do_sayx(cn, "So sorry %s, but you already have this tarot card's effects on you!", ch[co].name);
+				god_take_from_char(in, cn);
+				god_give_char(in, co);
+				do_char_log(co, 1, "%s returned the ring to you.\n", ch[cn].reference);
+				return 0;
+			}
+			if (it[in].data[2]==IT_CH_FOOL) // special case - need to check equip requirements
+			{
+				if (do_check_fool(co, in)==-1)
+				{
+					god_take_from_char(in, cn);
+					god_give_char(in, co);
+					return 0;
+				}
+			}
+			do_sayx(cn, "A Sinbinder, I see. Allow me to apply its magic to you, %s.", ch[co].name);
+			god_take_from_char(in, cn);
+			do_char_log(co, 1, "The Priest chanted something and the %s slipped on your finger.\n", it[in].name);
+			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			if ((in2 = ch[co].worn[WN_RRING]) && it[in2].temp==IT_TW_SINBIND)
+			{
+				do_sayx(cn, "I have removed your old Sinbinder for you. It's all yours.");
+				do_char_log(co, 1, "%s returned the previous Sinbinder Ring to you.\n", ch[cn].reference);
+			}
+			it[in].x = 0;
+			it[in].y = 0;
+			it[in].carried = co;
+			ch[co].citem = in2;
+			ch[co].worn[WN_RRING] = in;
+			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(co, n, 0);
+			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(co, n, 0);
+			remove_all_spells(co);
+			ch[co].misc_action = DR_IDLE;
+			return 0;
+		}
+		else if ((ch[cn].temp==CT_HERBCOLL && 
+			(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD)) || 
+			(ch[cn].temp==CT_HERBCOLL2 && it[in].temp==IT_HERBE))
+		{
+			if (ch[cn].temp==CT_HERBCOLL && points2rank(ch[co].points_tot)<8)
 			{
 				do_sayx(cn, "I'm sorry %s, I don't have a use for weeds!", ch[co].name);
 				god_take_from_char(in, cn);
 				god_give_char(in, co);
 				do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
-				return(0);
+				return 0;
 			}
-			if (it[in].temp==IT_HERBA)			money =  8000;
-			else if (it[in].temp==IT_HERBB)	money = 12000;
-			else if (it[in].temp==IT_HERBC)	money = 20000;
-			else if (it[in].temp==IT_HERBD)	money = 32000;
-			else								money = 64000;
-			nr = money*3/2;
-			do_sayx(cn, "Here's your payment, and a bit of knowledge.");
+			if (it[in].temp==IT_HERBA)		money =  10000;
+			else if (it[in].temp==IT_HERBB)	money =  15000;
+			else if (it[in].temp==IT_HERBC)	money =  25000;
+			else if (it[in].temp==IT_HERBD)	money =  40000;
+			else							money = 100000;
+			nr = money;
+			if (ch[cn].temp==CT_HERBCOLL2)
+				do_sayx(cn, "Here'sss your payment, and a bit of knowledge.");
+			else
+				do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			god_take_from_char(in, cn);
 			it[in].used = USE_EMPTY;
 			ch[co].gold += money;
@@ -886,7 +984,7 @@ int npc_give(int cn, int co, int in, int money)
 			}
 			// </group rewards>
 			ch[co].misc_action = DR_IDLE;
-			return(0);
+			return 0;
 		}	
 		else
 		{
@@ -908,17 +1006,17 @@ int npc_give(int cn, int co, int in, int money)
 		{
 			nr = convert_skill_for_group(co, nr);
 
-			if (nr==18 && (ch[co].kindred & KIN_SEYAN_DU))
+			if (nr==18 && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Weapon Mastery, %s!", ch[co].name);
-			if (nr==19 && (ch[co].kindred & KIN_SEYAN_DU))
+			if (nr==19 && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Weaken, %s!", ch[co].name);
-			if (nr==20 && (ch[co].kindred & KIN_SEYAN_DU))
+			if (nr==20 && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Surround Hit, %s!", ch[co].name);
-			if (nr==21 && (ch[co].kindred & KIN_SEYAN_DU))
+			if (nr==21 && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Combat Mastery, %s!", ch[co].name);
-			if (nr==16 && (ch[co].kindred & KIN_SEYAN_DU))
+			if (nr==16 && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Staff, %s!", ch[co].name);
-			if (nr==32 && (ch[co].kindred & KIN_SEYAN_DU))
+			if (nr==32 && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Dispel, %s!", ch[co].name);
 			// end hack
 			
@@ -991,7 +1089,7 @@ int npc_give(int cn, int co, int in, int money)
 							bu[in2].used = USE_EMPTY;
 						}
 					}
-					if (ch[co].kindred & KIN_PURPLE)
+					if (IS_PURPLE(co))
 					{
 						do_sayx(cn, "For your effort, I will now set your spawn point to Aston, in the Temple of the Purple One.");
 						do_char_log(n, 0, "Your spawn point was set to the Staffer's Lounge.\n");
@@ -1031,7 +1129,7 @@ int npc_give(int cn, int co, int in, int money)
 							ch[n].gold += money;
 							do_char_log(n, 2, "You received %dG %dS as part of %s's reward.\n", money/100, money%100, ch[co].name);
 							if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr, 0, -1);
-							if (ch[n].kindred & KIN_PURPLE)
+							if (IS_PURPLE(n))
 							{
 								do_char_log(n, 0, "Your spawn point was set to the Temple of the Purple One as part of %s's reward.\n", ch[co].name);
 								ch[n].temple_x = ch[n].tavern_x = HOME_PURPLE_X; 
@@ -1123,7 +1221,7 @@ int npc_give(int cn, int co, int in, int money)
 					god_give_char(in, co);
 					do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
 				}
-				else if (ch[co].skill[nr][0])
+				else if (B_SK(co, nr))
 				{
 					do_sayx(cn, "But you already know %s, %s!", skilltab[nr].name, ch[co].name);
 					if ((nr = ch[cn].data[51])!=0)
@@ -1136,7 +1234,7 @@ int npc_give(int cn, int co, int in, int money)
 				}
 				else
 				{
-					ch[co].skill[nr][0] = 1;
+					B_SK(co, nr) = 1;
 					do_char_log(co, 0, "You learned %s!\n", skilltab[nr].name);
 					do_update_char(co);
 					
@@ -1155,9 +1253,9 @@ int npc_give(int cn, int co, int in, int money)
 					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
 					{
 						nr2 = convert_skill_for_group(n, nr2);
-						if (!ch[n].skill[nr2][0] && ch[n].skill[nr2][2])
+						if (!B_SK(n, nr2) && ch[n].skill[nr2][2])
 						{
-							ch[n].skill[nr2][0] = 1;
+							B_SK(n, nr2) = 1;
 							do_char_log(n, 0, "You learned %s!\n", skilltab[nr2].name);
 							do_update_char(n);
 							div = 1;
@@ -1240,7 +1338,7 @@ int npc_give(int cn, int co, int in, int money)
 				do_sayx(cn, "I'm still riddling %s; please come back later!\n", ch[guesser[idx]].name);
 				god_take_from_char(in, cn);
 				god_give_char(in, co);
-				return(0);
+				return 0;
 			}
 
 			/* ok to destroy the gift now */
@@ -1265,14 +1363,14 @@ int npc_give(int cn, int co, int in, int money)
 		do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_cityguard_see(int cn, int co, int flag)
 {
 	int n;
 
-	if (ch[co].data[42]==601 || ch[co].data[42]==602 || ch[co].data[42]==603)   // shout if enemy in sight (!)
+	if (ch[co].data[CHD_GROUP]==601 || ch[co].data[CHD_GROUP]==602 || ch[co].data[CHD_GROUP]==603)   // shout if enemy in sight (!)
 	{
 		if (ch[cn].data[55] + TICKS * 180<globs->ticker) // shout every 180 seconds
 		{
@@ -1288,34 +1386,34 @@ int npc_cityguard_see(int cn, int co, int flag)
 				{
 					if (flag)
 					{
-						if (ch[co].data[42]==601 
+						if (ch[co].data[CHD_GROUP]==601 
 							  && (is_inline(n, 1) || (
 							     points2rank(ch[n].points_tot)>= 5  // Staff Sergeant
 							  && points2rank(ch[n].points_tot)<= 8))) // Sergeant Major
 							do_char_log(n, 3, "Gate Guard: \"The monsters are approaching the north gate! Alert!\"\n");
-						else if (ch[co].data[42]==602
+						else if (ch[co].data[CHD_GROUP]==602
 							  && (is_inline(n, 2) || (
 							     points2rank(ch[n].points_tot)>= 9  // Second Lieutenant
 							  && points2rank(ch[n].points_tot)<=13))) // Lieutenant Colonel
 							do_char_log(n, 3, "Gate Guard: \"The monsters are approaching the center gate! Alert!\"\n");
-						else if (ch[co].data[42]==603
+						else if (ch[co].data[CHD_GROUP]==603
 							  && (is_inline(n, 3) || (
 							     points2rank(ch[n].points_tot)>=14))) // Colonel
 							do_char_log(n, 3, "Gate Guard: \"The monsters are approaching the south gate! Alert!\"\n");
 					}
 					else
 					{
-						if (ch[co].data[42]==601
+						if (ch[co].data[CHD_GROUP]==601
 							  && (is_inline(n, 1) || (
 							     points2rank(ch[n].points_tot)>= 5  // Staff Sergeant
 							  && points2rank(ch[n].points_tot)<= 8))) // Sergeant Major
 							do_char_log(n, 3, "Outpost Guard: \"The monsters are approaching the north outpost! Alert!\"\n");
-						else if (ch[co].data[42]==602
+						else if (ch[co].data[CHD_GROUP]==602
 							  && (is_inline(n, 2) || (
 							     points2rank(ch[n].points_tot)>= 9  // Second Lieutenant
 							  && points2rank(ch[n].points_tot)<=13))) // Lieutenant Colonel
 							do_char_log(n, 3, "Outpost Guard: \"The monsters are approaching the center outpost! Alert!\"\n");
-						else if (ch[co].data[42]==603
+						else if (ch[co].data[CHD_GROUP]==603
 							  && (is_inline(n, 3) || (
 							     points2rank(ch[n].points_tot)>=14))) // Colonel
 							do_char_log(n, 3, "Outpost Guard: \"The monsters are approaching the south outpost! Alert!\"\n");
@@ -1325,7 +1423,7 @@ int npc_cityguard_see(int cn, int co, int flag)
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int is_potion(int in)
@@ -1353,10 +1451,10 @@ int is_potion(int in)
 	{
 		if (tn == potions[n])
 		{
-			return( 1);
+			return 1;
 		}
 	}
-	return(0);
+	return 0;
 }
 
 int is_scroll(int in)
@@ -1412,11 +1510,11 @@ int is_unique(int in)
 	{
 		if (it[in].temp==unique[n] && (it[in].flags & IF_UNIQUE))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 	*/
-	return(0);
+	return 0;
 }
 
 int count_uniques(int cn)
@@ -1426,7 +1524,7 @@ int count_uniques(int cn)
 	if (IS_BUILDING(cn))
 	{
 		do_char_log(cn, 0, "Not in build mode.\n");
-		return(0);
+		return 0;
 	}
 
 	if ((in = ch[cn].citem) && !(in & 0x80000000) && is_unique(in))
@@ -1466,7 +1564,7 @@ int count_uniques(int cn)
 
 int npc_see(int cn, int co)
 {
-	int n, n2, idx, indoor1, indoor2;
+	int n, n2, m, idx, indoor1, indoor2;
 	int x1, x2, y1, y2, dist, ret, cnt, cc;
 	unsigned char buf[3];
 
@@ -1476,12 +1574,12 @@ int npc_see(int cn, int co)
 	}
 	else if (!group_active(cn))
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (!do_char_can_see(cn, co))
 	{
-		return( 1);                     // processed it: we cannot see him, so ignore him
+		return 1;                     // processed it: we cannot see him, so ignore him
 	}
 	
 	
@@ -1508,7 +1606,7 @@ int npc_see(int cn, int co)
 		}
 		if (ret)
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
@@ -1546,7 +1644,7 @@ int npc_see(int cn, int co)
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
 		ch[cn].data[58] = 2;
-		return(1);
+		return 1;
 	}
 	
 	// check if this is an enemy we added to our list earlier
@@ -1554,14 +1652,14 @@ int npc_see(int cn, int co)
 	{
 		idx = co | (char_id(co) << 16);
 
-		for (n = 80; n<92; n++)
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			if (ch[cn].data[n]==idx)
 			{
 				ch[cn].attack_cn = co;
 				ch[cn].goto_x = 0; // cancel goto (patrol)
 				ch[cn].data[58] = 2;
-				return(1);
+				return 1;
 			}
 		}
 	}
@@ -1571,7 +1669,7 @@ int npc_see(int cn, int co)
 	{
 		for (n = 43; n<47; n++)
 		{
-			if (ch[cn].data[n] && ch[co].data[42]==ch[cn].data[n])
+			if (ch[cn].data[n] && ch[co].data[CHD_GROUP]==ch[cn].data[n])
 			{
 				break;
 			}
@@ -1579,7 +1677,7 @@ int npc_see(int cn, int co)
 			{
 				break;
 			}
-			if (IS_COMP_TEMP(co) && !ch[co].data[42]) // Give benefit of the doubt to new GC's
+			if (IS_COMP_TEMP(co) && !ch[co].data[CHD_GROUP]) // Give benefit of the doubt to new GC's
 			{
 				break;
 			}
@@ -1603,13 +1701,13 @@ int npc_see(int cn, int co)
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
 				chlog(cn, "Added %s to kill list because he's not in my group", ch[co].name);
-				return(1);
+				return 1;
 			}
 			co = ccc;
 		}
 	}
 	
-	if (IS_COMP_TEMP(cn) && ch[cn].data[1]>=2 && ch[co].alignment<0)
+	if (IS_COMP_TEMP(cn) && ch[cn].data[1]>=2 && ((ch[cn].alignment>0 && ch[co].alignment<0) || (ch[cn].alignment<0 && ch[co].alignment>0)))
 	{
 		int mdist, coma, idx2;
 
@@ -1617,14 +1715,14 @@ int npc_see(int cn, int co)
 		{
 			idx = coma | (char_id(coma) << 16);
 			idx2 = co | (char_id(co) << 16);
-			for (n = 80; n<92; n++)
+			for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 			{
-				if (ch[co].data[n]==idx && ch[cn].data[74]!=idx2) // check enemy's kill list. If the master is on it, we fight them.
+				if (ch[co].data[n]==idx && ch[cn].data[91]!=idx2) // check enemy's kill list. If the master is on it, we fight them.
 				{
 					break;
 				}
 			}
-			if (n==92)
+			if (n==MCD_ENEMYZZZ+1)
 			{
 				co = 0;
 			}
@@ -1637,7 +1735,7 @@ int npc_see(int cn, int co)
 				npc_saytext_n(cn, 1, ch[co].name);
 			}
 			chlog(cn, "Added %s to kill list (gc mode %d)", ch[co].name, ch[cn].data[1]);
-			return(1);
+			return 1;
 		}
 	}
 
@@ -1658,14 +1756,14 @@ int npc_see(int cn, int co)
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
 				chlog(cn, "Added %s to kill list because he didn't say the password.", ch[co].name);
-				return(1);
+				return 1;
 			}
 		}
 		else if (dist<=ch[cn].data[93] * 2 && ch[cn].data[94] + TICKS * 15<globs->ticker)
 		{
 			npc_saytext_n(cn, 8, NULL);
 			ch[cn].data[94] = globs->ticker;
-			return(1);
+			return 1;
 		}
 	}
 	
@@ -1687,21 +1785,21 @@ int npc_see(int cn, int co)
 				// Process a short greeting delay if the player has 0 exp (just enough that their name changes first)
 				if (ch[co].points_tot==0 && ch[co].total_online_time < TICKS*6)
 				{
-					return(0);
+					return 0;
 				}
 				
-				if (!ch[co].skill[SK_BARTER][0])
+				if (!B_SK(co, SK_BARTER))
 					do_sayx(cn, "Welcome to Bluebird Tavern, %s. If you're looking for adventure, perhaps approach Jamil. He seems a bit down on his luck.", ch[co].name);
-				else if (!ch[co].skill[SK_RECALL][0])
+				else if (!B_SK(co, SK_RECALL))
 					do_sayx(cn, "Well done, %s. I see Jamil is in a better mood! There may be others around town who need help. If you'd like, say QUEST to me and I shall tell you.", ch[co].name);
-				else if (!ch[co].skill[SK_REST][0])
+				else if (!B_SK(co, SK_REST))
 					do_sayx(cn, "Welcome, %s. I've heard great things about you! There may be others around town who need help. If you'd like, say QUEST to me and I shall tell you.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome back, %s. Enjoy your stay!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#woodsguard")==0) // One of the guards to Weeping Woods
 			{
-				if (!ch[co].skill[SK_REST][0]) // Rest - if the player has Rest they're probably ok. Probably.
+				if (!B_SK(co, SK_REST)) // Rest - if the player has Rest they're probably ok. Probably.
 					do_sayx(cn, "Hello %s. For the time being, please stay inside Lynbore's walls. You're far too weak to go outside for now!", ch[co].name);
 				else
 					do_sayx(cn, "Hello %s. Are you on your way to Aston? If you find any bandits on the way, please report to Aston's Guard Captain.", ch[co].name);
@@ -1724,31 +1822,30 @@ int npc_see(int cn, int co)
 					xsend(ch[co].player, buf, 2);
 				}
 				
-				if (!ch[co].skill[SK_BARTER][0])
+				if (!B_SK(co, SK_BARTER))
 					do_sayx(cn, "Hello, %s. Some thieves across the north road stole my gold amulet from me. I'd teach you BARTERING if you could get it back for me.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s! Thanks again for helping me!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill02")==0) //    15		Recall				( Inga )
 			{
-				if (!ch[co].skill[SK_RECALL][0])
+				if (!B_SK(co, SK_RECALL))
 					do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you RECALL.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill03")==0) //    18/38	* EW or WM			( Sirjan )
 			{
-				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_ENHANCE][0]))
+				if (IS_ANY_TEMP(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_ENHANCE)))
 				{
-					if (!ch[co].skill[SK_WEAPONM][0])
+					if (!B_SK(co, SK_WEAPONM))
 						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you WEAPON MASTERY.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s!", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[SK_ENHANCE][0])
+					if (!B_SK(co, SK_ENHANCE))
 						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you ENHANCE.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s!", ch[co].name);
@@ -1757,17 +1854,16 @@ int npc_see(int cn, int co)
 			
 			else if (strcmp(ch[cn].text[2], "#skill04")==0) // 41/19   	* Weaken or Slow		( Amity )
 			{
-				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_SLOW][0]))
+				if (IS_ANY_TEMP(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_SLOW)))
 				{
-					if (!ch[co].skill[SK_WEAKEN][0])
+					if (!B_SK(co, SK_WEAKEN))
 						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you WEAKEN.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s! Thanks again!", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[SK_SLOW][0])
+					if (!B_SK(co, SK_SLOW))
 						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you SLOW.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s! Thanks again!", ch[co].name);
@@ -1775,7 +1871,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill05")==0) //    13		Repair				( Jefferson )
 			{
-				if (!ch[co].skill[SK_REPAIR][0])
+				if (!B_SK(co, SK_REPAIR))
 					do_sayx(cn, "Bring me the Bronze Ruby Armor Joe stole from me, %s, and I'll teach you REPAIR.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s. Please, make yourself at home.", ch[co].name);
@@ -1789,10 +1885,9 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill07")==0) //    32/25	* Immu or Dispel	( Ingrid )
 			{
-				if ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_IMMUN][0]))
+				if (IS_ANY_HARA(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_IMMUN)))
 				{
-					if (!ch[co].skill[SK_DISPEL][0])
+					if (!B_SK(co, SK_DISPEL))
 						do_sayx(cn, "Welcome, %s. Bring me the Decorative Sword from the Skeleton Lord and I'll teach you DISPEL.", ch[co].name);
 					else
 						do_sayx(cn, "Welcome, %s.", ch[co].name);
@@ -1800,7 +1895,7 @@ int npc_see(int cn, int co)
 				}
 				else
 				{
-					if (!ch[co].skill[SK_IMMUN][0])
+					if (!B_SK(co, SK_IMMUN))
 						do_sayx(cn, "Welcome, %s. Bring me the Decorative Sword from the Skeleton Lord and I'll teach you IMMUNITY.", ch[co].name);
 					else
 						do_sayx(cn, "Welcome, %s.", ch[co].name);
@@ -1808,17 +1903,16 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill08")==0) // 33/20   	* Surr or Curse		( Leopold )
 			{
-				if ((ch[co].kindred & (KIN_TEMPLAR | KIN_ARCHTEMPLAR | KIN_BRAWLER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_CURSE][0]))
+				if (IS_ANY_TEMP(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_CURSE)))
 				{
-					if (!ch[co].skill[SK_SURROUND][0])
+					if (!B_SK(co, SK_SURROUND))
 						do_sayx(cn, "Hi, %s. Bring me a pair of Rusted Spikes from the Haunted Castle and I'll teach you SURROUND HIT.", ch[co].name);
 					else
 						do_sayx(cn, "Hi, %s.", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[SK_CURSE][0])
+					if (!B_SK(co, SK_CURSE))
 						do_sayx(cn, "Hi, %s. Bring me a pair of Rusted Spikes from the Haunted Castle and I'll teach you CURSE.", ch[co].name);
 					else
 						do_sayx(cn, "Hi, %s.", ch[co].name);
@@ -1826,21 +1920,21 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill09")==0) //    26		Heal				( Gunther )
 			{
-				if (!ch[co].skill[SK_HEAL][0])
+				if (!B_SK(co, SK_HEAL))
 					do_sayx(cn, "Greetings, %s. I would teach you HEAL if you bring me the Amulet of Resistance from the Dungeon of Doors.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s! How are you?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill10")==0) //    31		Sense				( Manfred )
 			{
-				if (!ch[co].skill[SK_SENSE][0])
+				if (!B_SK(co, SK_SENSE))
 					do_sayx(cn, "Hello, %s. If you bring me a silver ring adorned with a small ruby, I'll teach you Sense Magic. You can find these in the mines!", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. Find anything in the mines lately?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill11")==0) //    23		Resist				( Serena )
 			{
-				if (!ch[co].skill[SK_RESIST][0])
+				if (!B_SK(co, SK_RESIST))
 					do_sayx(cn, "Give me the sword from that stone, and I'll teach you RESISTANCE, %s.", ch[co].name);
 				else
 					do_sayx(cn, "%s, welcome. Make yourself at home.", ch[co].name);
@@ -1849,7 +1943,7 @@ int npc_see(int cn, int co)
 			{
 				if (ch[co].flags & CF_LOCKPICK)
 				{
-					if (!ch[co].skill[SK_BLESS][0])
+					if (!B_SK(co, SK_BLESS))
 						do_sayx(cn, "Greetings, %s. Bring me the Ruby Amulet from the Thieves House and I'll teach you BLESS.", ch[co].name);
 					else
 						do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
@@ -1859,24 +1953,23 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill13")==0) //    29		Rest				( Gordon )
 			{
-				if (!ch[co].skill[SK_REST][0])
+				if (!B_SK(co, SK_REST))
 					do_sayx(cn, "Hello, %s. I am very ill. If you would bring me a Potion of Life, I would teach you REST.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. I am feeling better today.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill14")==0) //    16/ 5	* Shield or Staff	( Edna )
 			{
-				if ((ch[co].kindred & (KIN_HARAKIM | KIN_ARCHHARAKIM | KIN_SUMMONER))
-				|| ((ch[co].kindred & KIN_SEYAN_DU) && ch[co].skill[SK_SHIELD][0]))
+				if (IS_ANY_HARA(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_SHIELD)))
 				{
-					if (!ch[co].skill[SK_STAFF][0])
+					if (!B_SK(co, SK_STAFF))
 						do_sayx(cn, "Hello, %s. Bring me the Oak Buckler from the hedge maze next door, and I shall teach you how to use a STAFF!", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s. How goes your training?", ch[co].name);
 				}
 				else
 				{
-					if (!ch[co].skill[SK_SHIELD][0])
+					if (!B_SK(co, SK_SHIELD))
 						do_sayx(cn, "Hello, %s. Bring me the Oak Buckler from the hedge maze next door, and I shall teach you how to use a SHIELD!", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s. How goes your training?", ch[co].name);
@@ -1884,7 +1977,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill15")==0) //    22		Identify			( Nasir )
 			{
-				if (!ch[co].skill[SK_IDENT][0])
+				if (!B_SK(co, SK_IDENT))
 					do_sayx(cn, "Hello, %s. In the Magic Maze, across from here, Jane has created a cruel weapon. Bring it to me and I shall teach you IDENTIFY.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. Have you identified anything interesting lately?", ch[co].name);
@@ -1973,7 +2066,7 @@ int npc_see(int cn, int co)
 				if (points2rank(ch[co].points_tot)<8) // Sergeant Major
 					do_sayx(cn, "Leave me be, %s.", ch[co].name);
 				else
-					do_sayx(cn, "Hello, %s. I'm researching the monsters in the underground. If you could, bring me one of the strange plants that grow there... I'd pay you well.", ch[co].name);
+					do_sayx(cn, "Hello, %s. I'm researching the monsters in the underground. If you could, bring me the strange green plants that grow there... I'd pay you well.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest113")==0) //   13 - UG2 / Monica / Greenl Collector
 			{
@@ -2035,32 +2128,96 @@ int npc_see(int cn, int co)
 				else
 					do_sayx(cn, "Hello, %s! If you'd bring me the Ice Egg from the Ice Gargoyle Nest, I'd reward you with a Cloak of Ice in return.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest121")==0) //   21 - Ice Nest / Aster / Lion's Paws
+			else if (strcmp(ch[cn].text[2], "#quest122")==0) //   21 - Ice Nest / Aster / Lion's Paws
 			{
 				if (points2rank(ch[co].points_tot)<14) // Colonel
 					do_sayx(cn, "Good day, %s. Cold out.", ch[co].name);
 				else
 					do_sayx(cn, "Good day, %s. Please find me the Lion's Paws in the Ice Gargoyle Nest, and I would reward you with this magical tarot card.", ch[co].name);
 			}
+			else if (strcmp(ch[cn].text[2], "#quest123")==0) //   22 - Ludolf - Cathedral
+			{
+				if (points2rank(ch[co].points_tot)<11) // Captain
+					do_sayx(cn, "I'm sorry, %s, but I don't have time for kids right now.", ch[co].name);
+				else
+					do_sayx(cn, "Those dang cultists ruined my farm, %s. Bring me their leader's dagger and I would reward you with a tarot card of good fortune.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest124")==0) //   23 - Flanders - Striders
+			{
+				if (points2rank(ch[co].points_tot)<11) // Captain
+					do_sayx(cn, "Howdy do, %s.", ch[co].name);
+				else
+					do_sayx(cn, "Howdy do, %s. A while back I lost a family heirloom to the striders in the east. If you could return it I'd give you my lonely tarot card.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest125")==0) //   24 - Topham - Thugs
+			{
+				if (points2rank(ch[co].points_tot)<11) // Captain
+					do_sayx(cn, "Good day and goodbye, %s.", ch[co].name);
+				else
+					do_sayx(cn, "Good day to you, %s. Those pesky thugs to the far east stole a very sturdy shield from my collection. Return it and I would reward you handsomely.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest126")==0) //   25 - Navarre - Regal/Defender
+			{
+				do_sayx(cn, "Isssh. Human, if you sssee a man named Regal, please defeat him. Bring me hisss sssword, and I would reward you thisss red amulet.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest127")==0) //   26 - Shafira - Shadow Talons
+			{
+				do_sayx(cn, "Hello, human. There isss a ssscary beassst of a lizard in the Emerald Cave we call Ssshadefang. Bring me itsss clawsss, and you may have thisss green amulet.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest128")==0) //   27 - Tsulu - Venom Compendium
+			{
+				do_sayx(cn, "Welcome, human. The foul lizard Venominousss hasss blinded and killed many of our children. Bring me the source of his poisonsss, and I will give you thisss blue amulet.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest129")==0) //   28 - Dracus - Emperor's Crown
+			{
+				do_sayx(cn, "Come in and ssstay quiet. The Lizard Emperor is a fool of a man. Bring me hisss helmet, and you may have thisss yellow amulet, and the honor if our kin.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest130")==0) //   29 - Rassa - Onyx Egg
+			{
+				do_sayx(cn, "Human... Bring me an Onyx Egg from the Onyx Gargoyle Nessst, and I would give you a Cloak of Onyx... If you sssurvive, that isss.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest131")==0) //   30 - Vora - Coral Axe
+			{
+				do_sayx(cn, "...", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest132")==0) //   31 - Makira - Save the Queen
+			{
+				do_sayx(cn, "...", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest133")==0) //   xx - Zorani - Black Plants
+			{
+				do_sayx(cn, "Greetingsss, human! Pleassse bring me rare, black herbsss from treacherousss placesss. I would pay you very well.", ch[co].name);
+			}
 			else if (strcmp(ch[cn].text[2], "#skill16")==0) //    10   	Swimming			( Lucci )
 			{
 				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
 					do_sayx(cn, "Hello, %s! When you're a little stronger, come see me and I can teach you how to swim.", ch[co].name);
-				else if (!ch[co].skill[SK_SWIM][0])
+				else if (!B_SK(co, SK_SWIM))
 					do_sayx(cn, "Hello, %s! Under the lake in the southern Strange Forest, there's said to be a valuable glittering cleaver. Bring it to me and I will teach you SWIMMING!", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s!", ch[co].name);
 			}
 			//
+			else if (strcmp(ch[cn].text[2], "#clara")==0)
+			{
+				if (points2rank(ch[co].points_tot)<18) // General
+					do_sayx(cn, "Get out, %s! Damor doesn't wish to see you!", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#damor")==0)
+			{
+				if (points2rank(ch[co].points_tot)>=18)
+					do_sayx(cn, "%s. It's about time. Bring me a candle from the deepest part of the Black Stronghold, and I would reward you with this amulet.", ch[co].name);
+			}
+			//
 			else 
 			{
 				int knowarch=0;
-				if (ch[co].skill[SK_WARCRY][0] || ch[co].skill[SK_LEAP][0] || ch[co].skill[SK_SHADOW][0] ||
-					ch[co].skill[SK_POISON][0] || ch[co].skill[SK_PULSE][0] || ch[co].skill[SK_ZEPHYR][0])
+				if (B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
+					B_SK(co, SK_POISON) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR))
 					knowarch=1;
 				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
-					if (ch[co].kindred & (KIN_ARCHTEMPLAR | KIN_SEYAN_DU))
+					if (IS_SEYA_OR_ARTM(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2072,7 +2229,7 @@ int npc_see(int cn, int co)
 				}
 				else if (strcmp(ch[cn].text[2], "#skill22")==0) // Warr - 7 - Zephyr
 				{
-					if (ch[co].kindred & (KIN_WARRIOR | KIN_SEYAN_DU))
+					if (IS_SEYA_OR_WARR(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2084,7 +2241,7 @@ int npc_see(int cn, int co)
 				}
 				else if (strcmp(ch[cn].text[2], "#skill23")==0) // Summ - 46 - Shadow Copy
 				{
-					if (ch[co].kindred & (KIN_SUMMONER | KIN_SEYAN_DU))
+					if (IS_SEYA_OR_SUMM(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2096,7 +2253,7 @@ int npc_see(int cn, int co)
 				}
 				else if (strcmp(ch[cn].text[2], "#skill24")==0) // Sorc - 42 - Poison
 				{
-					if (ch[co].kindred & (KIN_SORCERER | KIN_SEYAN_DU))
+					if (IS_SEYA_OR_SORC(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2108,7 +2265,7 @@ int npc_see(int cn, int co)
 				}
 				else if (strcmp(ch[cn].text[2], "#skill25")==0) // ArHr - 43 - Pulse
 				{
-					if (ch[co].kindred & (KIN_ARCHHARAKIM | KIN_SEYAN_DU))
+					if (IS_SEYA_OR_ARHR(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2120,7 +2277,7 @@ int npc_see(int cn, int co)
 				}
 				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Braw - 49 - Leap
 				{
-					if (ch[co].kindred & (KIN_BRAWLER | KIN_SEYAN_DU))
+					if (IS_SEYA_OR_BRWL(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2132,21 +2289,32 @@ int npc_see(int cn, int co)
 				}
 				else if (strcmp(ch[cn].text[2], "#gatekeeper13")==0)
 				{
-					if (knowarch && (ch[co].kindred & KIN_SEYAN_DU))
+					if (knowarch && IS_SEYAN_DU(co))
 					{
 						do_sayx(cn, "Hello, %s. Are you happy with the skill you learned? If not, I can remove it for an experience cost of 250,000. Say UNLEARN and I can make it so.", ch[co].name);
 					}
-					else if (ch[co].kindred & (KIN_SEYAN_DU | KIN_ARCHTEMPLAR | KIN_BRAWLER | KIN_WARRIOR | KIN_SORCERER | KIN_SUMMONER | KIN_ARCHHARAKIM))
+					else if (IS_ANY_ARCH(co))
 						do_sayx(cn, "Congratulations, %s! Now that you have arched, you can donate a secondary tarot card to the shrine and it will apply it too! I can also REMOVE it for you.", ch[co].name);
 					else
 						do_sayx(cn, "Welcome, %s! I'm sure you have many questions. Read the notes in front of me, and you may ask me 'about X' for anything capitalized. I also act as a bank!", ch[co].name);
 				}
 				else 
 				{
-					// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
-					if((ch[cn].temp == CT_PRIEST) && (ch[co].kindred & KIN_PURPLE)) // priest template is 180
+					if (ch[cn].temp == CT_PRIEST)
 					{
-						do_sayx(cn, "Greetings, %s!", ch[co].name);
+						for (m=0;m<40;m++)
+						{
+							if (it[ch[cn].item[n]].temp==IT_TW_SINBIND)
+								break;
+						}
+					}
+					// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
+					if((ch[cn].temp == CT_PRIEST) && (IS_PURPLE(co) || m<40)) // priest template is 180
+					{
+						if (m==40)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Hello there, %s. If you happen to have a working Sinbinder Ring, I could... 'assist' you in putting it on.", ch[co].name);
 					}
 					else     // if it is not priest or player is not purple we do nothing, NPC will talk as usual
 					{
@@ -2169,14 +2337,18 @@ int npc_see(int cn, int co)
 				{
 					do_sayx(cn, "I see you have a weapon dedicated to the gods. Make good use of it, %s.\n", ch[co].name);
 				}
-				else if (cnt>1)
+				else if (cnt==2)
 				{
-					do_sayx(cn, "I see you have several weapons dedicated to the gods. They will get angry if you keep more than one, %s.\n", ch[co].name);
+					do_sayx(cn, "I see you have a few weapons dedicated to the gods. Make good use of them, %s.\n", ch[co].name);
+				}
+				else if (cnt>2)
+				{
+					do_sayx(cn, "I see you have several weapons dedicated to the gods. They will get angry if you keep more than two, %s.\n", ch[co].name);
 				}
 			}
 		}
 	}
-	return(0);
+	return 0;
 }
 
 int npc_died(int cn, int co)
@@ -2209,10 +2381,10 @@ int npc_shout(int cn, int co, int code, int x, int y)
 		ch[cn].goto_x = 0;
 		ch[cn].misc_action = 0;
 
-		return(1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_hitme(int cn, int co)
@@ -2221,7 +2393,7 @@ int npc_hitme(int cn, int co)
 	{
 		if (!do_char_can_see(cn, co))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_add_enemy(cn, co, 1))
 		{
@@ -2230,7 +2402,7 @@ int npc_hitme(int cn, int co)
 				npc_saytext_n(cn, 1, ch[co].name);
 			}
 			chlog(cn, "Added %s to kill list for stepping on trap", ch[co].name);
-			return(1);
+			return 1;
 		}
 	}
 	else if (ch[cn].data[26]==8) // investigate without adding to kill list
@@ -2238,7 +2410,7 @@ int npc_hitme(int cn, int co)
 		for (int try = 0; try < 3; try++)
 			if(npc_moveto(cn, ch[co].frx, ch[co].fry)) break;
 	}
-	return(0);
+	return 0;
 }
 
 int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
@@ -2259,7 +2431,7 @@ int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 			chlog(cn, "unknown special driver %d", ch[cn].data[25]);
 			break;
 		}
-		return(0);
+		return 0;
 	}
 	switch(type)
 	{
@@ -2293,7 +2465,7 @@ int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 		return( npc_hitme(cn, dat1));
 	default:
 		xlog("Unknown NPC message for %d (%s): %d", cn, ch[cn].name, type);
-		return( 0);
+		return 0;
 	}
 }
 
@@ -2305,20 +2477,20 @@ int get_spellcost(int cn, int spell)
 {
 	int prox, kin_hara, kin_sorc;
 	
-	prox = (PROX_MULTI+get_skill_score(cn, SK_PROX))/PROX_MULTI;
-	kin_hara = ((ch[cn].kindred & KIN_ARCHHARAKIM) && ch[cn].skill[SK_PROX][0]);
-	kin_sorc = ((ch[cn].kindred & KIN_SORCERER) && ch[cn].skill[SK_PROX][0]);
+	prox = (PROX_MULTI+M_SK(cn, SK_PROX))/PROX_MULTI;
+	kin_hara = (IS_ARCHHARAKIM(cn) && B_SK(cn, SK_PROX));
+	kin_sorc = (IS_SORCERER(cn) && B_SK(cn, SK_PROX));
 	
 	switch(spell)
 	{
 		case SK_BLIND:		return SP_COST_BLIND;
-		case SK_CLEAVE:		return ((get_skill_score(cn, SK_CLEAVE)+ch[cn].weapon/4)/12+5)*3/2;
-		case SK_LEAP:		return ((get_skill_score(cn, SK_LEAP)+max(0,((SPEED_CAP-ch[cn].speed)+ch[cn].atk_speed-120))/4)/15+6)*3/2;
+		case SK_CLEAVE:		return 20;
+		case SK_LEAP:		return 20;
 		case SK_TAUNT:		return SP_COST_TAUNT;
 		case SK_WEAKEN:		return SP_COST_WEAKEN;
 		case SK_WARCRY:		return SP_COST_WARCRY;
 		
-		case SK_BLAST:		return (get_skill_score(cn, SK_BLAST)/4+5)*2 * (kin_hara ? prox : 1);
+		case SK_BLAST:		return 20 * (kin_hara ? prox : 1);
 		case SK_BLESS:		return SP_COST_BLESS;
 		case SK_CURSE:		return SP_COST_CURSE * (kin_sorc ? prox : 1);
 		case SK_DISPEL:		return SP_COST_DISPEL;
@@ -2370,86 +2542,81 @@ int spellflag(int spell)
 
 int npc_try_spell(int cn, int co, int spell)
 {
-	int mana, end, n, in, tmp;
+	int mana, end, n, in, tmp, cc;
+	int offn, defn;
 
-	if (ch[cn].flags & CF_NOMAGIC)
+	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && spell!=SK_WARCRY && spell!=SK_BLIND)
 	{
-		return( 0);
+		if ((ch[cn].flags & CF_NOMAGIC) || (ch[co].flags & CF_NOMAGIC))
+		{
+			return 0;
+		}
 	}
+	
 	if (ch[co].used!=USE_ACTIVE)
 	{
-		return( 0);
+		return 0;
 	}
 	if (ch[co].flags & CF_BODY)
 	{
-		return( 0);
+		return 0;
 	}
 
-	if (!ch[cn].skill[spell][0]) // we don't know this spell
+	if (!B_SK(cn, spell)) // we don't know this spell
 	{
-		return(0);
+		return 0;
 	}
 	
 	if (ch[co].flags & CF_STONED) // he's stoned, dont spell him
 	{
-		return( 0);                     
+		return 0;                     
 	}
 	
 	if (ch[co].flags & CF_IMMORTAL) // Ignore immortals, or we'd be flailing like morons.
 	{
-		return( 0);
+		return 0;
 	}
+	
+	offn = M_SK(cn, spell);
+	defn = get_target_resistance(cn, co)*10;
+	
+	// Invidia
+	/*
+	if (spell==SK_HEAL && cn==co && IS_COMP_TEMP(cn) && (cc = ch[cn].data[CHD_MASTER]) && IS_SANEPLAYER(cc) && get_gear(cc, IT_TW_INVIDIA))
+	{
+		return 0;
+	}
+	*/
 	
 	// dont blast if enemy armor is too strong
 	// Updated 02/11/2020 - changed the formula to include immunity and allow blasts that would do at least 5 damage.
-	if (spell==SK_BLAST && ( (get_skill_score(cn, SK_BLAST) - max(0, get_target_immunity(co)/2)) * 2 ) - ch[co].armor < 20/3)
+	if (spell==SK_BLAST && ( (offn - max(0, get_target_immunity(cn, co)/2)) * 2 ) - ch[co].armor < 20/3)
 	{
-		return( 0);
+		return 0;
 	}
 	
 	// dont cleave if enemy armor is too strong
-	if (spell==SK_CLEAVE && ( ((get_skill_score(cn, SK_CLEAVE) + ch[cn].weapon/4 
-		- max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
+	if (spell==SK_CLEAVE && ( ((offn + ch[cn].weapon/4 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
 	{
-		return( 0);
+		return 0;
 	}
 	
 	// dont leap if enemy armor is too strong
-	if (spell==SK_LEAP && ( ((get_skill_score(cn, SK_LEAP) + max(0,((SPEED_CAP-ch[cn].speed)+ch[cn].atk_speed-120))/4
+	if (spell==SK_LEAP && ( ((offn + max(0,((SPEED_CAP-ch[cn].speed)+ch[cn].atk_speed-120))/4
 		- max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
 	{
-		return( 0);
+		return 0;
 	}
 
-	// dont curse if chances of success are bad
-	if (spell==SK_CURSE && 10 * get_skill_score(cn, SK_CURSE) / max(1, get_target_resistance(co))<7)
-	{
-		return( 0);
-	}
-	
-	// dont poison if chances of success are bad
-	if (spell==SK_POISON && 13 * get_skill_score(cn, SK_POISON) / max(1, get_target_resistance(co))<8)
-	{
-		return( 0);
-	}
-	
-	// dont weaken if chances of success are bad
-	if (spell==SK_WEAKEN && 11 * get_skill_score(cn, SK_WEAKEN) / max(1, get_target_resistance(co))<8)
-	{
-		return( 0);
-	}
-	
-	// dont taunt if chances of success are bad
-	if (spell==SK_TAUNT && 11 * get_skill_score(cn, SK_TAUNT) / max(1, get_target_resistance(co))<10)
-	{
-		return( 0);
-	}
-
-	// dont slow if chances of success are bad
-	if (spell==SK_SLOW && 12 * get_skill_score(cn, SK_SLOW) / max(1, get_target_resistance(co))<9)
-	{
-		return( 0);
-	}
+	// dont debuff if chances of success are bad
+	if (spell==SK_CURSE  && SP_MULT_CURSE   * offn / max(1, defn)< 7) return 0;
+	if (spell==SK_BLIND  && SP_MULT_BLIND   * offn / max(1, defn)< 7) return 0;
+	if (spell==SK_POISON && SP_MULT_POISON  * offn / max(1, defn)< 8) return 0;
+	if (spell==SK_WEAKEN && SP_MULT_WEAKEN  * offn / max(1, defn)< 8) return 0;
+	if (spell==SK_SLOW   && SP_MULT_SLOW    * offn / max(1, defn)< 9) return 0;
+	if (spell==SK_DISPEL && SP_MULT_DISPEL2 * offn / max(1, defn)< 9) return 0;
+	if (spell==SK_TAUNT  && SP_MULT_TAUNT   * offn / max(1, defn)<10) return 0;
+	if (spell==SK_WARCRY && SP_MULT_WARCRY  * offn / max(1, defn)<10) return 0;
 	
 	// prevent thralling multiple ghosts
 	if (spell==SK_GHOST)
@@ -2458,7 +2625,7 @@ int npc_try_spell(int cn, int co, int spell)
 		{
 			if (ch[n].used==USE_EMPTY || (ch[n].flags & (CF_PLAYER | CF_USURP))) 
 				continue;
-			if (ch[n].data[63]==cn)
+			if (ch[n].data[CHD_MASTER]==cn)
 				return 0;
 		}
 	}
@@ -2482,7 +2649,7 @@ int npc_try_spell(int cn, int co, int spell)
 		{
 			// Cancel if target is already buffed or debuffed (except for heal)
 			if (bu[in].temp==spell && spell!=SK_HEAL && 
-				(bu[in].power + 10)>=spell_immunity(get_skill_score(cn, spell), get_target_immunity(co)) && 
+				(bu[in].power + 10)>=spell_immunity(M_SK(cn, spell), get_target_immunity(cn, co)) && 
 				bu[in].active>bu[in].duration / 4 * 3)
 			{
 				break;
@@ -2510,7 +2677,7 @@ int npc_try_spell(int cn, int co, int spell)
 				ch[cn].skill_target1 = co;
 				ch[co].data[96] |= tmp;
 				fx_add_effect(11, 8, co, tmp, 0);
-				return(1);
+				return 1;
 			}
 		}
 		else
@@ -2522,12 +2689,12 @@ int npc_try_spell(int cn, int co, int spell)
 				ch[cn].skill_target1 = co;
 				ch[co].data[96] |= tmp;
 				fx_add_effect(11, 8, co, tmp, 0);
-				return(1);
+				return 1;
 			}
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_can_spell(int cn, int co, int spell)
@@ -2535,28 +2702,28 @@ int npc_can_spell(int cn, int co, int spell)
 	if (spell==SK_CLEAVE || spell==SK_WEAKEN || spell==SK_WARCRY || 
 		spell==SK_BLIND || spell==SK_TAUNT || spell==SK_LEAP)
 	{
-		if (ch[cn].a_end / 1000<get_spellcost(cn, spell))
+		if (ch[cn].a_end / 1000 < get_spellcost(cn, spell))
 		{
-			return( 0);
+			return 0;
 		}
 	}
 	else
 	{
-		if (ch[cn].a_mana / 1000<get_spellcost(cn, spell))
+		if (ch[cn].a_mana / 1000 < get_spellcost(cn, spell) * (get_tarot(cn, IT_CH_MAGI_R)?3:2)/2)
 		{
-			return( 0);
+			return 0;
 		}
 	}
-	if (ch[cn].skill[spell][0]==0)
+	if (!B_SK(cn, spell))
 	{
-		return( 0);
+		return 0;
 	}
-	if (get_skill_score(co, spell)>get_skill_score(cn, spell))
+	if (M_SK(co, spell)>M_SK(cn, spell))
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_quaff_potion(int cn, int itemp, int stemp)
@@ -2567,7 +2734,7 @@ int npc_quaff_potion(int cn, int itemp, int stemp)
 	{
 		if ((in = ch[cn].spell[n]) && bu[in].temp==stemp)
 		{
-			return( 0);                                         // potion already active
+			return 0;                                         // potion already active
 		}
 	}
 	for (n = 0; n<40; n++)
@@ -2579,13 +2746,88 @@ int npc_quaff_potion(int cn, int itemp, int stemp)
 	}
 	if (n==40)
 	{
-		return( 0);                                                             // no potion :(
+		return 0;                                                             // no potion :(
 	}
 	do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The %s uses a %s.\n", ch[cn].name, it[in].name);
 
 	use_driver(cn, in, 1);
 
-	return(1);
+	return 1;
+}
+
+void npc_wedge_doors(int n, int flag) // flag = wedge the door!
+{
+	int cn, in, x, y;
+	
+	switch (n)
+	{
+		case 13: // Liz Emperor
+			if (flag)
+			{
+				x = 928; y = 423; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x, y-1);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);
+				x = 934; y = 421; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x-1, y);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);
+			}
+			else
+			{
+				in = map[XY2M(928, 423)].it; it[in].data[5] = 0;
+				in = map[XY2M(934, 421)].it; it[in].data[5] = 0;
+			}
+			break;
+		case 14: // Shiva II
+			if (flag)
+			{
+				x = 576; y = 130; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x, y-1);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);
+				x = 568; y = 122; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x+1, y);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);	
+			}
+			else
+			{
+				in = map[XY2M(576, 130)].it; it[in].data[5] = 0;
+				in = map[XY2M(568, 122)].it; it[in].data[5] = 0;
+			}
+			break;
+		case 20: // Tower XX
+			if (flag)
+			{
+				x = 188; y = 202; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x, y+1);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);	
+				x = 188; y = 218; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x, y-1);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);	
+			}
+			else
+			{
+				in = map[XY2M(188, 202)].it; it[in].data[5] = 0;
+				in = map[XY2M(188, 218)].it; it[in].data[5] = 0;
+			}
+			break;
+		case 30: // Abyss X
+			if (flag)
+			{
+				x = 530; y = 160; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x, y+1);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);
+				x = 530; y = 176; cn = map[XY2M(x, y)].ch; if (cn) god_transfer_char(cn, x, y-1);
+				in = map[XY2M(x, y)].it; it[in].active = 0; it[in].data[5] = 16200;
+				reset_go(it[in].x, it[in].y); it[in].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in].x, it[in].y);	
+			}
+			else
+			{
+				in = map[XY2M(530, 160)].it; it[in].data[5] = 0;
+				in = map[XY2M(530, 176)].it; it[in].data[5] = 0;
+			}
+			break;
+		default:
+			break;
+	}
 }
 
 // spark rings - flag=1 for on, flag=0 for off
@@ -2717,7 +2959,7 @@ void stronghold_mage_driver(int cn)
 		{
 			if (ch[n].used!=USE_ACTIVE) continue;
 			if (ch[n].flags & (CF_BODY | CF_RESPAWN)) continue;
-			if (ch[n].data[42]==bs_group) 
+			if (ch[n].data[CHD_GROUP]==bs_group) 
 			{
 				m++;
 				if (ch[n].data[0]<2) j++;
@@ -3008,6 +3250,7 @@ void stronghold_mage_driver(int cn)
 				{
 					modified=0;
 					j = spawn_temp[RANDOM(60)];
+					// ** generate_map_enemy starts here **
 					co = pop_create_char(j, 0);
 					if (!co)
 					{
@@ -3030,16 +3273,16 @@ void stronghold_mage_driver(int cn)
 						{
 							for (n = 0; n<5; n++)
 							{
-								ch[co].attrib[n][0] = ch[co].attrib[n][0]+attr_bonus[j]<248?ch[co].attrib[n][0]+attr_bonus[j]:248;
+								B_AT(co, n) = B_AT(co, n)+attr_bonus[j]<248?B_AT(co, n)+attr_bonus[j]:248;
 							}
-							ch[co].hp[0]       = ch[co].hp[0]+hp_bonus[j]<999?ch[co].hp[0]+hp_bonus[j]:999;
-							ch[co].mana[0]     = ch[co].mana[0]+hp_bonus[j]<999?ch[co].mana[0]+hp_bonus[j]:999;
-							ch[co].skill[n][0] = ch[co].skill[n][0]+ws_bonus[j]<248?ch[co].skill[n][0]+ws_bonus[j]:248;
+							ch[co].hp[0]	= ch[co].hp[0]+hp_bonus[j]<999?ch[co].hp[0]+hp_bonus[j]:999;
+							ch[co].mana[0]	= ch[co].mana[0]+hp_bonus[j]<999?ch[co].mana[0]+hp_bonus[j]:999;
+							B_SK(co, n) 	= B_SK(co, n)+ws_bonus[j]<248?B_SK(co, n)+ws_bonus[j]:248;
 							for (n = 1; n<MAXSKILL; n++)
 							{
-								if (ch[co].skill[n][0])
+								if (B_SK(co, n))
 								{
-									ch[co].skill[n][0] = ch[co].skill[n][0]+attr_bonus[j]/2<243?ch[co].skill[n][0]+attr_bonus[j]/2:243;
+									B_SK(co, n) = B_SK(co, n)+attr_bonus[j]/2<243?B_SK(co, n)+attr_bonus[j]/2:243;
 								}
 							}
 							ch[co].weapon = ch[co].weapon+wv_bonus[j]<255?ch[co].weapon+wv_bonus[j]:255;
@@ -3052,13 +3295,13 @@ void stronghold_mage_driver(int cn)
 					{
 						for (n = 0; n<5; n++)
 						{
-							ch[co].attrib[n][0] += 2+RANDOM(3+magenum);
+							B_AT(co, n) += 2+RANDOM(3+magenum);
 						}
 						for (n = 0; n<MAXSKILL; n++)
 						{
-							if (ch[co].skill[n][0])
+							if (B_SK(co, n))
 							{
-								ch[co].skill[n][0] += 2+RANDOM(3+magenum)*2;
+								B_SK(co, n) += 2+RANDOM(3+magenum)*2;
 							}
 						}
 						sprintf(buf, "the tough %s", ch[co].name);
@@ -3078,13 +3321,13 @@ void stronghold_mage_driver(int cn)
 					{
 						for (n = 0; n<5; n++)
 						{
-							ch[co].attrib[n][0] += 4+RANDOM(5+magenum);
+							B_AT(co, n) += 4+RANDOM(5+magenum);
 						}
 						for (n = 0; n<MAXSKILL; n++)
 						{
-							if (ch[co].skill[n][0])
+							if (B_SK(co, n))
 							{
-								ch[co].skill[n][0] += 4+RANDOM(5+magenum)*3;
+								B_SK(co, n) += 4+RANDOM(5+magenum)*3;
 							}
 						}
 						sprintf(buf, "the fierce %s", ch[co].name);
@@ -3105,17 +3348,19 @@ void stronghold_mage_driver(int cn)
 					if (modified)
 					{
 						pts = 0;
-						for (n = 0; n<5; n++) for (j = 10; j<ch[co].attrib[n][0]; j++)
+						for (n = 0; n<5; n++) for (j = 10; j<B_AT(co, n); j++)
 							pts += attrib_needed(j, 4);
 						for (j = 50; j<ch[co].hp[0]; j++) 
 							pts += hp_needed(j, 4);
 						for (j = 50; j<ch[co].mana[0]; j++) 
 							pts += mana_needed(j, 4);
-						for (n = 0; n<MAXSKILL; n++) for (j = 1; j<ch[co].skill[n][0]; j++)
+						for (n = 0; n<MAXSKILL; n++) for (j = 1; j<B_SK(co, n); j++)
 							pts += skill_needed(j, 3);
 						ch[co].points_tot = pts;
 					}
+					// ** generate_map_enemy ends here **
 				}
+				
 				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 				do_sayx(cn, "Khuzak gurawin duskar!");
 				chlog(cn, "created %d new monsters", n);
@@ -3126,9 +3371,367 @@ void stronghold_mage_driver(int cn)
 	}
 }
 
+/*
+	Stronghold mage version 2
+	Each mage has their own distinct series of waves, pulling from monsters in helper.c
+		via generate_map_enemy(temp, kin, xx, yy, base, affix)
+	
+	Each mage has 15 waves, 10 subwaves, and up to 6 monsters per subwave. 
+		Each subwave has a breif timer between spawns.
+	
+	Waves last until all subwaves have passed and all monsters are killed either by players or NPCs.
+	
+	Mage 1 starts at base 15 adding 1 per wave,
+	Mage 2 starts at base 30 adding 2 per wave,
+	Mage 3 starts at base 60 adding 3 per wave.
+	
+	Valid Monsters:
+	 1: Skeleton	 2: Ghost		 3: Rodent		 4: Undead		 5: Grolm
+	 6: Skink	 	 7: Golem		 8: Gargoyle	 9: Ice Garg	10: Flame
+*/
+
+// stronghold wave sets - [mage][wave][sub][6monster&time]
+static int bs_waves[3][15][9][7] = {
+{		// Mage 1
+	{			// Wave  1
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 4 }
+	}, {		// Wave  2
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 0, 0, 0, 0, TICKS * 8 }
+	}, {		// Wave  3
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 8 }
+	}, {		// Wave  4
+		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 },
+		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 1, 0, 0, 0, TICKS *12 }
+	}, {		// Wave  5
+		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, 
+		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 },
+		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 3, 0, 0, 0, TICKS *12 }
+	}, {		// Wave  6
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 2, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 1, 0, 0, 0, 0, TICKS * 2 },
+		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS *12 }
+	}, {		// Wave  7
+		{ 1, 1, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 1 }, 
+		{ 2, 2, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 },
+		{ 1, 2, 0, 0, 0, 0, TICKS * 1 }, { 4, 0, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 8 }
+	}, {		// Wave  8
+		{ 4, 1, 0, 0, 0, 0, TICKS * 1 }, { 4, 2, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 3 }, 
+		{ 4, 2, 0, 0, 0, 0, TICKS * 1 }, { 4, 1, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 3 },
+		{ 4, 4, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 2 }, { 5, 1, 1, 0, 0, 0, TICKS *12 }
+	}, {		// Wave  9
+		{ 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 1, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 2, 0, 0, 0, 0, TICKS * 2 },
+		{ 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 3, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 4, 4, 0, 0, TICKS *16 }
+	}
+}, {	// Mage 2
+	{			// Wave  1
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 6 }
+	}, {		// Wave  2
+		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, 
+		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 },
+		{ 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 6 }
+	}, {		// Wave  3
+		{ 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 },
+		{ 3, 3, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 6 }
+	}, {		// Wave  4
+		{ 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 2, 4, 0, 0, 0, TICKS * 3 },
+		{ 1, 1, 4, 0, 0, 0, TICKS * 3 }, { 2, 1, 4, 0, 0, 0, TICKS * 3 }, { 2, 2, 4, 0, 0, 0, TICKS * 9 }
+	}, {		// Wave  5
+		{ 3, 1, 1, 0, 0, 0, TICKS * 3 }, { 3, 1, 1, 0, 0, 0, TICKS * 3 }, { 3, 2, 2, 0, 0, 0, TICKS * 3 }, 
+		{ 3, 2, 2, 0, 0, 0, TICKS * 3 }, { 3, 4, 4, 0, 0, 0, TICKS * 3 }, { 3, 4, 4, 0, 0, 0, TICKS * 3 },
+		{ 3, 3, 3, 0, 0, 0, TICKS * 3 }, { 3, 3, 3, 0, 0, 0, TICKS * 3 }, { 3, 5, 5, 0, 0, 0, TICKS * 9 }
+	}, {		// Wave  6
+		{ 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 1, 0, 0, 0, TICKS * 3 }, 
+		{ 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 2, 0, 0, 0, TICKS * 3 },
+		{ 5, 5, 3, 0, 0, 0, TICKS * 3 }, { 5, 5, 4, 0, 0, 0, TICKS * 3 }, { 5, 5, 5, 0, 0, 0, TICKS * 9 }
+	}, {		// Wave  7
+		{ 5, 5, 2, 0, 0, 0, TICKS * 3 }, { 5, 5, 2, 0, 0, 0, TICKS * 5 }, { 5, 5, 1, 1, 0, 0, TICKS * 4 }, 
+		{ 5, 5, 3, 0, 0, 0, TICKS * 3 }, { 5, 5, 3, 0, 0, 0, TICKS * 3 }, { 5, 5, 4, 4, 0, 0, TICKS * 4 },
+		{ 4, 2, 1, 0, 0, 0, TICKS * 3 }, { 4, 1, 2, 0, 0, 0, TICKS * 3 }, { 5, 5, 6, 6, 0, 0, TICKS *12 }
+	}, {		// Wave  8
+		{ 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 7, 3, 3, 0, 0, TICKS * 4 }, 
+		{ 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 7, 6, 6, 0, 0, TICKS * 4 },
+		{ 8, 0, 0, 0, 0, 0, TICKS * 1 }, { 8, 0, 0, 0, 0, 0, TICKS * 1 }, { 8, 8, 7, 7, 0, 0, TICKS *12 }
+	}, {		// Wave  9
+		{ 8, 8, 0, 0, 0, 0, TICKS * 2 }, { 7, 7, 0, 0, 0, 0, TICKS * 2 }, { 8, 8, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 7, 7, 0, 0, 0, 0, TICKS * 2 }, { 6, 6, 6, 6, 0, 0, TICKS * 4 }, { 7, 7, 0, 0, 0, 0, TICKS * 2 },
+		{ 8, 8, 0, 0, 0, 0, TICKS * 2 }, { 7, 7, 0, 0, 0, 0, TICKS * 2 }, { 8, 8, 0, 0, 0, 0, TICKS * 6 }
+	}, {		// Wave 10
+		{ 1, 1, 1, 1, 0, 0, TICKS * 4 }, { 1, 1, 1, 1, 0, 0, TICKS * 4 }, { 1, 1, 1, 1, 0, 0, TICKS * 3 }, 
+		{ 1, 1, 1, 1, 0, 0, TICKS * 3 }, { 1, 1, 1, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS * 2 },
+		{ 1, 1, 1, 0, 0, 0, TICKS * 1 }, { 1, 1, 1, 0, 0, 0, TICKS * 1 }, { 7, 8, 7, 8, 0, 0, TICKS *12 }
+	}, {		// Wave 11
+		{ 1, 2, 4, 4, 0, 0, TICKS * 3 }, { 2, 2, 4, 4, 0, 0, TICKS * 3 }, { 3, 3, 4, 4, 0, 0, TICKS * 5 }, 
+		{ 4, 5, 6, 6, 0, 0, TICKS * 3 }, { 5, 5, 6, 6, 0, 0, TICKS * 3 }, { 7, 7, 6, 6, 0, 0, TICKS * 5 },
+		{ 1, 2, 3, 4, 0, 0, TICKS * 3 }, { 5, 6, 7, 8, 0, 0, TICKS * 3 }, { 2, 4, 6, 8, 0, 0, TICKS *12 }
+	}, {		// Wave 12
+		{ 8, 8, 0, 0, 0, 0, TICKS * 2 }, { 8, 8, 0, 0, 0, 0, TICKS * 1 }, { 8, 8, 8, 0, 0, 0, TICKS * 3 }, 
+		{ 7, 8, 0, 0, 0, 0, TICKS * 2 }, { 6, 8, 0, 0, 0, 0, TICKS * 1 }, { 5, 6, 7, 0, 0, 0, TICKS * 3 },
+		{ 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 3, 4, 0, 0, 0, 0, TICKS * 1 }, { 9, 9, 9, 9, 0, 0, TICKS *12 }
+	}
+}, {	// Mage 3
+	{			// Wave  1
+		{10, 0, 0, 0, 0, 0, TICKS * 1 }, {10, 0, 0, 0, 0, 0, TICKS * 1 }, {10,10, 0, 0, 0, 0, TICKS * 2 }, 
+		{10,10, 0, 0, 0, 0, TICKS * 2 }, {10,10,10, 0, 0, 0, TICKS * 3 }, {10,10,10, 0, 0, 0, TICKS * 3 },
+		{10,10,10,10, 0, 0, TICKS * 4 }, {10,10,10,10, 0, 0, TICKS * 4 }, {10,10,10,10,10, 0, TICKS *10 }
+	}, {		// Wave  2
+		{ 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, 
+		{ 4, 4, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS * 3 }, { 2, 2, 2, 0, 0, 0, TICKS * 3 },
+		{ 1, 1, 1, 0, 0, 0, TICKS * 3 }, { 4, 4, 4, 0, 0, 0, TICKS * 3 }, { 1, 1, 1, 1, 0, 0, TICKS * 8 }
+	}, {		// Wave  3
+		{ 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 2, 0, 0, 0, TICKS * 3 }, 
+		{ 1, 2, 2, 0, 0, 0, TICKS * 3 }, { 2, 2, 2, 0, 0, 0, TICKS * 3 }, { 2, 2, 1, 1, 0, 0, TICKS * 4 },
+		{ 1, 1, 2, 2, 0, 0, TICKS * 4 }, { 1, 2, 2, 4, 0, 0, TICKS * 3 }, { 1, 2, 4, 4, 0, 0, TICKS * 8 }
+	}, {		// Wave  4
+		{ 3, 3, 3, 3, 0, 0, TICKS * 4 }, { 3, 3, 3, 3, 0, 0, TICKS * 4 }, { 3, 3, 3, 3, 0, 0, TICKS * 4 }, 
+		{ 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 0, 0, TICKS * 3 },
+		{ 3, 3, 3, 3, 3, 0, TICKS * 4 }, { 3, 3, 3, 3, 3, 0, TICKS * 4 }, { 3, 3, 3, 3, 3, 0, TICKS *10 }
+	}, {		// Wave  5
+		{ 5, 5, 5, 0, 0, 0, TICKS * 3 }, { 5, 5, 8, 0, 0, 0, TICKS * 3 }, { 5, 8, 8, 0, 0, 0, TICKS * 3 }, 
+		{ 5, 8, 9, 0, 0, 0, TICKS * 3 }, { 8, 8, 9, 0, 0, 0, TICKS * 3 }, { 8, 9, 9, 0, 0, 0, TICKS * 3 },
+		{ 9, 9, 9, 0, 0, 0, TICKS * 3 }, { 5, 5, 8, 9, 0, 0, TICKS * 3 }, { 5, 8, 8, 9, 0, 0, TICKS * 8 }
+	}, {		// Wave  6
+		{ 7, 6, 7, 8, 0, 0, TICKS * 3 }, { 7, 4, 7, 9, 0, 0, TICKS * 3 }, { 7, 6, 7, 8, 0, 0, TICKS * 5 }, 
+		{ 7, 1, 7, 2, 0, 0, TICKS * 3 }, { 7, 3, 7,10, 0, 0, TICKS * 3 }, { 7, 7, 7, 7, 0, 0, TICKS * 5 },
+		{ 7, 5, 7, 5, 0, 0, TICKS * 3 }, { 5, 8, 5, 8, 0, 0, TICKS * 3 }, { 8, 9, 8, 9, 7, 0, TICKS *10 }
+	}, {		// Wave  7
+		{ 1, 2, 3, 4, 0, 0, TICKS * 3 }, { 1, 2, 3, 4, 0, 0, TICKS * 4 }, { 2, 3, 4, 5, 0, 0, TICKS * 3 }, 
+		{ 2, 3, 4, 5, 0, 0, TICKS * 4 }, { 3, 4, 5, 6, 0, 0, TICKS * 3 }, { 3, 4, 5, 6, 0, 0, TICKS * 4 },
+		{ 4, 5, 6, 7, 0, 0, TICKS * 3 }, { 4, 5, 6, 7, 0, 0, TICKS * 4 }, { 5, 6, 7, 8, 0, 0, TICKS * 8 }
+	}, {		// Wave  8
+		{10,10, 8, 8, 0, 0, TICKS * 3 }, {10,10, 8, 8, 0, 0, TICKS * 3 }, {10,10, 8, 8, 8, 0, TICKS * 4 }, 
+		{ 8, 8, 9, 9, 0, 0, TICKS * 3 }, { 8, 8, 9, 9, 0, 0, TICKS * 3 }, { 8, 8, 9, 9, 9, 0, TICKS * 5 },
+		{ 9, 9,10,10, 0, 0, TICKS * 3 }, { 9, 9,10,10, 0, 0, TICKS * 3 }, { 9, 9,10,10,10, 0, TICKS *10 }
+	}, {		// Wave  9
+		{ 6, 6, 6, 7, 0, 0, TICKS * 4 }, { 6, 6, 7, 7, 0, 0, TICKS * 4 }, { 6, 7, 7, 7, 0, 0, TICKS * 4 }, 
+		{ 6, 6, 7, 7, 0, 0, TICKS * 3 }, { 6, 6, 6, 7, 0, 0, TICKS * 3 }, { 5, 6, 6, 6, 7, 0, TICKS * 5 },
+		{ 5, 6, 6, 7, 7, 0, TICKS * 5 }, { 5, 6, 7, 7, 7, 0, TICKS * 4 }, { 5, 5, 5, 6, 7, 0, TICKS *10 }
+	}, {		// Wave 10
+		{ 3, 3, 3, 0, 0, 0, TICKS * 2 }, { 3, 3, 3, 0, 0, 0, TICKS * 2 }, { 3, 3, 3, 3, 0, 0, TICKS * 4 }, 
+		{ 1, 1, 1, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 1, 0, 0, TICKS * 4 },
+		{ 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 1, 1, TICKS *12 }
+	}, {		// Wave 11
+		{ 2, 2, 6, 6, 0, 0, TICKS * 3 }, { 2, 2, 6, 6, 0, 0, TICKS * 3 }, { 2, 2, 7, 7, 0, 0, TICKS * 5 }, 
+		{ 2, 2, 2, 4, 4, 0, TICKS * 5 }, { 2, 2, 5, 5, 0, 0, TICKS * 3 }, { 2, 2, 5, 5, 0, 0, TICKS * 3 },
+		{ 2, 2, 8, 8, 0, 0, TICKS * 5 }, { 2, 2, 2, 2, 2, 0, TICKS * 5 }, { 2, 4, 4, 4, 2, 0, TICKS *10 }
+	}, {		// Wave 12
+		{ 8, 8, 8, 8, 0, 0, TICKS * 4 }, { 8, 8, 8, 9, 0, 0, TICKS * 4 }, { 8, 8, 8,10, 0, 0, TICKS * 4 }, 
+		{ 8, 7, 8, 9, 0, 0, TICKS * 4 }, { 8, 7, 8,10, 0, 0, TICKS * 3 }, { 8, 7, 7, 9, 0, 0, TICKS * 3 },
+		{ 8, 7, 9,10, 0, 0, TICKS * 3 }, { 1, 8, 1, 9,10, 0, TICKS * 3 }, { 2, 2, 1, 1,10,10, TICKS *12 }
+	}, {		// Wave 13
+		{ 4, 4, 2, 3, 1, 0, TICKS * 4 }, { 4, 4, 3, 2, 1, 0, TICKS * 4 }, { 4, 4, 1, 2, 3, 0, TICKS * 6 }, 
+		{ 5, 6, 5, 6, 7, 0, TICKS * 4 }, { 5, 6, 5, 6, 4, 0, TICKS * 4 }, { 5, 6, 5, 6, 8, 0, TICKS * 6 },
+		{10, 9, 8, 7, 6, 0, TICKS * 4 }, { 8, 7, 6, 5, 4, 0, TICKS * 4 }, { 6, 5, 4, 3, 2, 1, TICKS *12 }
+	}, {		// Wave 14
+		{ 1, 1, 1, 1, 1, 0, TICKS * 5 }, { 2, 2, 2, 2, 2, 0, TICKS * 5 }, { 4, 4, 4, 4, 4, 4, TICKS * 6 }, 
+		{ 3, 3, 3, 3, 3, 0, TICKS * 5 }, { 7, 7, 7, 7, 7, 0, TICKS * 5 }, { 6, 6, 6, 6, 6, 6, TICKS * 6 },
+		{ 5, 5, 5, 5, 5, 0, TICKS * 5 }, { 8, 8, 8, 8, 8, 0, TICKS * 5 }, { 9, 9, 9, 9, 9, 9, TICKS *12 }
+	}, {		// Wave 15
+		{ 1, 2, 3, 4, 5, 6, TICKS * 6 }, { 2, 4, 6, 8,10, 2, TICKS * 5 }, { 3, 6, 9, 2, 5, 8, TICKS * 6 }, 
+		{ 4, 8, 2, 6,10, 4, TICKS * 5 }, { 5,10, 5,10, 5,10, TICKS * 6 }, { 6, 2, 8, 4,10, 6, TICKS * 5 },
+		{ 7, 4, 1, 8, 5, 2, TICKS * 6 }, { 8, 6, 4, 2,10, 8, TICKS * 5 }, { 9, 8, 7, 6, 5, 4, TICKS *12 }
+	}
+}
+};
+
+// Remaking the BS mage stuff to be more functionally interesting and consistent
+void stronghold_mage_driver_ver2(int cn)
+{
+	int candleA, candleB, candleC, candleD, candleE;
+	int spawnX, spawnY, magenum, groupnum, spawnT = 347;
+	int p=0, n, m, j, in, co;
+	
+	/*
+		Mage driver data will carry references to pass along to cityattack.c
+		
+		data[0] = whether or not we're active / number of players
+		data[1] = main wave number
+		data[2] = sub wave number
+		data[3] = global time for next event process
+		data[4] = number of enemies spawned so far
+		data[5] = number of enemies killed so far
+		
+		generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]][ch[cn].data[2]][m], spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 0);
+	*/
+	
+	// Assign mage number
+	if (ch[cn].temp==CT_BSMAGE1) magenum = 1;
+	if (ch[cn].temp==CT_BSMAGE2) magenum = 2;
+	if (ch[cn].temp==CT_BSMAGE3) magenum = 3;
+	
+	// Check for players in the area
+	for (n = 1; n<MAXCHARS; n++) 
+	{
+		if (ch[n].used==USE_EMPTY) continue;
+		if (!(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
+		if (is_inline(n, magenum)) p++;
+	}
+	ch[cn].data[0] = p;
+	
+	// Set up candles & spawn coords
+	if (magenum==3)
+	{
+		candleA = BS_CAN_3_1;	candleB = BS_CAN_3_2;	candleC = BS_CAN_3_3;
+		candleD = BS_CAN_3_4;	candleE = BS_CAN_3_5;
+		spawnX = 598;	spawnY = 288;	groupnum = 603;
+	}
+	else if (magenum==2)
+	{
+		candleA = BS_CAN_2_1;	candleB = BS_CAN_2_2;	candleC = BS_CAN_2_3;
+		candleD = BS_CAN_2_4;	candleE = BS_CAN_2_5;
+		spawnX = 576;	spawnY = 288;	groupnum = 602;
+	}
+	else
+	{
+		candleA = BS_CAN_1_1;	candleB = BS_CAN_1_2;	candleC = BS_CAN_1_3;
+		candleD = BS_CAN_1_4;	candleE = BS_CAN_1_5;
+		spawnX = 554;	spawnY = 288;	groupnum = 601;
+	}
+	
+	// If no players...
+	if (p<1)
+	{
+		// Clean up candles once every 6 hours if nobody is there
+		if (globs->mdtime%(BS_HOUR*6)>1 && globs->mdtime%(BS_HOUR*6)<2160 && 
+			ch[cn].data[1]!=0 && ch[cn].data[1]!=1)
+		{
+			if (shiva_activate_candle(cn, in, 0))
+			{
+				if (in = map[candleB].it) it[in].active = it[in].duration;
+				if (in = map[candleC].it) it[in].active = it[in].duration;
+				if (in = map[candleD].it) it[in].active = it[in].duration;
+				if (in = map[candleE].it) it[in].active = it[in].duration;
+				for (n = 1; n<MAXCHARS; n++)
+				{
+					if (ch[n].used==USE_EMPTY) continue;
+					if (ch[n].flags & (CF_PLAYER | CF_USURP)) continue;
+					if (ch[n].data[25]==2 && (ch[n].data[26]>=magenum*100+1 && ch[n].data[26]<=magenum*100+99))
+					{
+						do_char_killed(0, n, 1);
+					}
+				}
+			}
+		}
+		return; // No further process when nobody is in the area
+	}
+	
+	// Pre-process waves
+	if (ch[cn].data[1]==0)
+	{
+		ch[cn].data[1] = 1;
+		ch[cn].data[2] = 1;
+		ch[cn].data[3] = globs->ticker + TICKS * 3;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+	}
+	
+	// Return if time is less than next action
+	if (globs->ticker<ch[cn].data[3])
+		return;
+	
+	// End the series
+	if ((magenum==1 && ch[cn].data[1]==10) ||
+		(magenum==2 && ch[cn].data[1]==13) ||
+		(magenum==3 && ch[cn].data[1]==16))
+	{
+		switch (ch[cn].data[2])
+		{
+			case 1:
+				if (magenum==3)			npc_moveto(cn, 598, 305);
+				else if (magenum==2)	npc_moveto(cn, 576, 305);
+				else					npc_moveto(cn, 554, 305);
+				break;
+			case 2:
+				if (magenum==3)			npc_moveto(cn, 600, 336);
+				else if (magenum==2)	npc_moveto(cn, 576, 336);
+				else					npc_moveto(cn, 554, 336);
+				break;
+			case 3:
+				if (magenum==3)			npc_moveto(cn, 598, 368);
+				else if (magenum==2)	npc_moveto(cn, 576, 368);
+				else					npc_moveto(cn, 554, 368);
+				break;
+			default: break;
+		}
+		
+		ch[cn].data[2]++;
+		ch[cn].data[3] = globs->ticker + TICKS * 10;
+		return;
+	}
+	
+	// Send the wave number to everyone in line & activate candles
+	if (ch[cn].data[2]==1)
+	{
+		if (ch[cn].data[1]== 1 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 1);
+		if (ch[cn].data[1]== 4 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 2);
+		if (ch[cn].data[1]== 7 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 3);
+		if (ch[cn].data[1]==10 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 4);
+		if (ch[cn].data[1]==13 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 5);
+		for (n = 1; n<MAXCHARS; n++) 
+		{
+			if (ch[n].used==USE_EMPTY) continue;
+			if (!IS_PLAYER(n)) continue;
+			if (is_inline(n, magenum)) 
+			{
+				do_char_log(n, 3, " --- WAVE %d BEGINS --- \n", ch[cn].data[1]);
+				if (ch[cn].data[1]>1)
+					ch[n].bs_points += ch[cn].data[1]*ch[cn].data[1]*magenum*5;
+			}
+		}
+	}
+	
+	n=0;
+	// Spawn mobs
+	for (m=0; m<6; m++)	if (bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m])
+	{
+		if (co = generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
+			spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
+			(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0)))
+		{
+			ch[co].flags |= CF_NOSLEEP;
+			ch[co].data[25] = 2;
+			ch[co].data[26] = 101*magenum;
+			ch[co].data[31] = ch[cn].temp;
+			ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = groupnum;
+			ch[co].data[44] = 60;
+			ch[cn].data[4]++;
+			n++;
+		}
+	}
+	
+	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (!((ch[cn].data[2]-1)%2)) do_sayx(cn, "Khuzak gurawin duskar!");
+	chlog(cn, "created %d new monsters", n);
+	
+	// Increment subwave and/or wave number
+	if (ch[cn].data[2]<8)
+	{
+		ch[cn].data[2]++;
+	}
+	else
+	{
+		ch[cn].data[1]++;
+		ch[cn].data[2] = 1;
+	}
+	
+	// Increment ticker storage
+	ch[cn].data[3] = globs->ticker + bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6];
+}
+
 void npc_lab_lord_driver(int cn)
 {
-	int co, in, n;
+	int co, in;
 	
 	if (ch[cn].data[2]==0 && ch[cn].data[0])
 	{
@@ -3153,6 +3756,334 @@ void npc_lab_lord_driver(int cn)
 	}
 }
 
+void npc_emperor_driver(int cn)
+{
+	int co, in, n;
+	int x = 928, y = 408;
+	
+	if (ch[cn].data[2]==0 && ch[cn].data[0])
+	{
+		ch[cn].data[3] = globs->ticker + TICKS*10;
+		ch[cn].data[4] = ch[cn].attack_cn;
+		ch[cn].data[2] = 1;
+		
+		if ((in = map[EP_GOLEM1X+EP_GOLEM1Y*MAPX].it) && !it[in].active)
+		{
+			it[in].active = it[in].duration;
+			co = pop_create_char(ch[cn].data[0], 0);
+			if (!co) 
+			{
+				chlog(cn, "npc_emperor_driver pop failed");
+				return;
+			}
+			ch[co].dir = 1;
+			if (!god_drop_char(co, EP_GOLEM1X, EP_GOLEM1Y))
+			{
+				chlog(cn, "npc_emperor_driver drop failed");
+				god_destroy_items(co); ch[co].used = USE_EMPTY; return;
+			}
+			ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+			ch[co].goto_x = x;
+			ch[co].goto_y = y;
+			ch[co].attack_cn = ch[cn].attack_cn;
+		}
+		if ((in = map[EP_GOLEM2X+EP_GOLEM2Y*MAPX].it) && !it[in].active)
+		{
+			it[in].active = it[in].duration;
+			co = pop_create_char(ch[cn].data[0], 0);
+			if (!co) 
+			{
+				chlog(cn, "npc_emperor_driver pop failed");
+				return;
+			}
+			ch[co].dir = 2;
+			if (!god_drop_char(co, EP_GOLEM2X, EP_GOLEM2Y))
+			{
+				chlog(cn, "npc_emperor_driver drop failed");
+				god_destroy_items(co); ch[co].used = USE_EMPTY; return;
+			}
+			ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+			ch[co].goto_x = x;
+			ch[co].goto_y = y;
+			ch[co].attack_cn = ch[cn].attack_cn;
+		}
+		if ((in = map[EP_GOLEM3X+EP_GOLEM3Y*MAPX].it) && !it[in].active)
+		{
+			it[in].active = it[in].duration;
+			co = pop_create_char(ch[cn].data[0], 0);
+			if (!co) 
+			{
+				chlog(cn, "npc_emperor_driver pop failed");
+				return;
+			}
+			ch[co].dir = 4;
+			if (!god_drop_char(co, EP_GOLEM3X, EP_GOLEM3Y))
+			{
+				chlog(cn, "npc_emperor_driver drop failed");
+				god_destroy_items(co); ch[co].used = USE_EMPTY; return;
+			}
+			ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+			ch[co].goto_x = x;
+			ch[co].goto_y = y;
+			ch[co].attack_cn = ch[cn].attack_cn;
+		}
+		if ((in = map[EP_GOLEM4X+EP_GOLEM4Y*MAPX].it) && !it[in].active)
+		{
+			it[in].active = it[in].duration;
+			co = pop_create_char(ch[cn].data[0], 0);
+			if (!co) 
+			{
+				chlog(cn, "npc_emperor_driver pop failed");
+				return;
+			}
+			ch[co].dir = 3;
+			if (!god_drop_char(co, EP_GOLEM4X, EP_GOLEM4Y))
+			{
+				chlog(cn, "npc_emperor_driver drop failed");
+				god_destroy_items(co); ch[co].used = USE_EMPTY; return;
+			}
+			ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+			ch[co].goto_x = x;
+			ch[co].goto_y = y;
+			ch[co].attack_cn = ch[cn].attack_cn;
+		}
+		
+		do_sayx(cn, "Rissse my conssstructs! Purge thisss filthy outsssider!");
+		chlog(cn, "spawned emerald golems");
+		
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, 928, 416);
+		ch[cn].dir = 3;
+		ch[ch[cn].attack_cn].attack_cn = 0;
+		ch[cn].attack_cn = 0;
+		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
+		{
+			ch[cn].data[n] = 0;
+		}
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		
+		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The %s leapt across the room.\n", ch[cn].name);
+		
+		B_SK(cn, SK_SLOW) = 90;
+		B_SK(cn, SK_CURSE) = 90;
+		
+		ch[cn].a_hp   = 999999;
+		ch[cn].a_end  = 999999;
+		ch[cn].a_mana = 999999;
+	}
+	else if (ch[cn].data[2]==1 && ch[cn].data[4]==0)
+	{
+		ch[cn].data[2] = 2;
+		
+		in = god_create_item(833);
+		god_give_char(in, cn);
+		
+		do_sayx(cn, "Enough of thisss charade! Die!!");
+		
+		npc_quaff_potion(cn, 833, 254);
+		
+		B_SK(cn, SK_ZEPHYR) = 90;
+		
+		ch[cn].a_hp   = 999999;
+		ch[cn].a_end  = 999999;
+		ch[cn].a_mana = 999999;
+	}
+}
+
+void npc_shivab_driver(int cn)
+{
+	int co, in, n;
+	
+	if (ch[cn].data[2]==0)
+	{
+		ch[cn].data[2] = 1;
+		//
+		co = pop_create_char(1244, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 580, 118))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1244, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 573, 118))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1244, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 571, 124))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		
+		do_sayx(cn, "How about a little plague?");
+		chlog(cn, "spawned plagues");
+		
+		ch[ch[cn].attack_cn].attack_cn = 0;
+		ch[cn].attack_cn = 0;
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, 577, 126);
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ch[cn].dir = 3;
+		
+		ch[cn].a_hp   = 999999;
+		ch[cn].a_end  = 999999;
+		ch[cn].a_mana = 999999;
+	}
+	else if (ch[cn].data[2]==1)
+	{
+		ch[cn].data[2] = 2;
+		//
+		co = pop_create_char(1245, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 580, 118))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1245, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 580, 125))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1245, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 574, 127))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		
+		do_sayx(cn, "The pits of hell are quite welcoming this time of year.");
+		chlog(cn, "spawned devils");
+		
+		ch[ch[cn].attack_cn].attack_cn = 0;
+		ch[cn].attack_cn = 0;
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, 572, 121);
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ch[cn].dir = 1;
+		
+		ch[cn].a_hp   = 999999;
+		ch[cn].a_end  = 999999;
+		ch[cn].a_mana = 999999;
+	}
+	else if (ch[cn].data[2]==2)
+	{
+		ch[cn].data[2] = 3;
+		//
+		co = pop_create_char(1246, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 573, 118))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1246, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 571, 124))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1246, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 574, 127))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		
+		do_sayx(cn, "Out with the flame, and in with the cold!");
+		chlog(cn, "spawned hypotherms");
+		
+		ch[ch[cn].attack_cn].attack_cn = 0;
+		ch[cn].attack_cn = 0;
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, 580, 121);
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ch[cn].dir = 2;
+		
+		ch[cn].a_hp   = 999999;
+		ch[cn].a_end  = 999999;
+		ch[cn].a_mana = 999999;
+	}
+	else if (ch[cn].data[2]==3)
+	{
+		ch[cn].data[2] = 4;
+		//
+		co = pop_create_char(1244, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 573, 118))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1245, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 580, 118))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		co = pop_create_char(1246, 0);
+		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
+		if (!god_drop_char(co, 580, 125))
+		{	chlog(cn, "npc_shivab_driver drop failed");
+			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
+		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
+		ch[co].attack_cn = ch[cn].attack_cn;
+		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		//
+		
+		do_sayx(cn, "Let's end this!");
+		chlog(cn, "spawned all three");
+		
+		in = god_create_item(267);
+		god_give_char(in, cn);
+		npc_quaff_potion(cn, 267, 254);
+		
+		ch[ch[cn].attack_cn].attack_cn = 0;
+		ch[cn].attack_cn = 0;
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		god_transfer_char(cn, 572, 126);
+		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ch[cn].dir = 7;
+		
+		ch[cn].a_hp   = 999999;
+		ch[cn].a_end  = 999999;
+		ch[cn].a_mana = 999999;
+	}
+}
+
 int npc_driver_high(int cn)
 {
 	int x, y, in, co, indoor1, indoor2, cc, in2, n;
@@ -3174,14 +4105,13 @@ int npc_driver_high(int cn)
 			chlog(cn, "unknown special driver %d", ch[cn].data[25]);
 			break;
 		}
-		return(0);
+		return 0;
 	}
 
 	// reset panic mode if expired
 	if (ch[cn].data[78]<globs->ticker)
 	{
 		ch[cn].data[78] = 0;
-		npc_activate_rings(cn, 0);
 	}
 
 	// self destruct
@@ -3192,25 +4122,37 @@ int npc_driver_high(int cn)
 			ch[cn].data[64] += globs->ticker;
 		}
 
-		if (ch[cn].data[64]<globs->ticker && (ch[cn].flags&CF_SHADOWCOPY) && IS_PLAYER(ch[cn].data[63]))
+		if (ch[cn].data[64]<globs->ticker && (ch[cn].flags&CF_SHADOWCOPY) && IS_PLAYER(ch[cn].data[CHD_MASTER]))
 		{
-			ch[ch[cn].data[63]].data[CHD_SHADOWCOPY] = 0;
-			do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[63]].name);
-			do_give_exp(ch[cn].data[63], ch[cn].data[28], 1, -1);
-			fx_add_effect(6, 0, ch[ch[cn].data[63]].x, ch[ch[cn].data[63]].y, 0);
+			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
+			do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
+			do_give_exp(ch[cn].data[CHD_MASTER], ch[cn].data[28], 1, -1);
+			fx_add_effect(6, 0, ch[ch[cn].data[CHD_MASTER]].x, ch[ch[cn].data[CHD_MASTER]].y, 0);
 			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 			die_companion(cn);
-			return(1);
+			return 1;
+		}
+		else if (ch[cn].data[64]<globs->ticker && (ch[cn].flags&CF_SHADOWCOPY))
+		{
+			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
+			do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
+			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+			god_destroy_items(cn);
+			plr_map_remove(cn);
+			ch[cn].used = USE_EMPTY;
+			remove_enemy(cn);
+			return 1;
 		}
 
 		if (ch[cn].data[64]<globs->ticker)
 		{
 			do_sayx(cn, "Free!");
+			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 			god_destroy_items(cn);
 			plr_map_remove(cn);
 			ch[cn].used = USE_EMPTY;
 			remove_enemy(cn);
-			return(1);
+			return 1;
 		}
 	}
 
@@ -3222,14 +4164,14 @@ int npc_driver_high(int cn)
 		{
 			chlog(cn, "killed for bad master(%d)", co);
 			die_companion(cn);
-			return(1);
+			return 1;
 		}
 		if (globs->ticker > ch[cn].data[98])
 		{
 			ch[co].luck--;
 			chlog(cn, "Self-destructed because of neglect by %s", ch[co].name);
 			die_companion(cn);
-			return(1);
+			return 1;
 		}
 	}
 
@@ -3246,35 +4188,75 @@ int npc_driver_high(int cn)
 				// Guesser forgets riddler
 				if (IS_SANECHAR(guesser[idx]) && IS_PLAYER(guesser[idx]))
 				{
-					ch[guesser[idx]].data[CHD_RIDDLER] = 0;
+					ch[guesser[idx]].data[PCD_RIDDLER] = 0;
 				}
 				guesser[idx] = 0;
 				do_char_log(cn, 1, "%s tells you: Too late! Too late! Try again some time.\n", ch[cn].name);
 			}
 		}
 	}
-
+	
+	// driver check if low health
+	if (ch[cn].a_hp<ch[cn].hp[5] * 400)
+	{
+		if (ch[cn].data[26]==12)
+		{
+			npc_lab_lord_driver(cn);
+		}
+		else if (ch[cn].data[26]==13)
+		{
+			npc_emperor_driver(cn);
+		}
+		else if (ch[cn].data[26]==14)
+		{
+			npc_shivab_driver(cn);
+		}
+	}
+	
 	// heal us if we're hurt
 	if (ch[cn].a_hp<ch[cn].hp[5] * 600 && !get_tarot(cn, IT_CH_STAR))
 	{
 		if (npc_try_spell(cn, cn, SK_HEAL))
 		{
-			if (ch[cn].data[26]==12)
-			{
-				npc_lab_lord_driver(cn);
-			}
-			return( 1);
+			return 1;
 		}
 		
 		if (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3) 
-			stronghold_mage_driver(cn);
+		{
+			if (globs->flags & GF_NEWBS)
+				stronghold_mage_driver_ver2(cn);
+			else
+				stronghold_mage_driver(cn);
+		}
 	}
 	else if (ch[cn].a_hp<ch[cn].hp[5] * 600 && get_tarot(cn, IT_CH_STAR))
 	{
-		for (n = 0; n<MAXBUFFS; n++) if ((in = ch[cn].spell[n])!=0)	if (bu[in].temp==SK_REGEN) break;
+		for (n = 0; n<MAXBUFFS; n++) if ((in = ch[cn].spell[n])!=0) if (bu[in].temp==SK_REGEN) break;
 		if (n==MAXBUFFS)
 		{
 			if (npc_try_spell(cn, cn, SK_HEAL))
+			{
+				return 1;
+			}
+		}
+	}
+	
+	// Dispel - for self
+	if (B_SK(cn, SK_DISPEL) && !get_tarot(cn, IT_CH_HEIROPH))
+	{
+		for (n = 0, m = 0; n<MAXBUFFS; n++)
+		{
+			if ((in = ch[cn].spell[n])==0) continue;
+			if (bu[in].temp==SK_DISPEL) { m=0; break; }
+			if (bu[in].temp==SK_POISON	|| bu[in].temp==SK_BLEED   || bu[in].temp==SK_BLIND  || 
+				bu[in].temp==SK_WARCRY2 || bu[in].temp==SK_CURSE2  || bu[in].temp==SK_CURSE  || 
+				bu[in].temp==SK_WARCRY  || bu[in].temp==SK_WEAKEN2 || bu[in].temp==SK_WEAKEN || 
+				bu[in].temp==SK_SLOW2   || bu[in].temp==SK_SLOW    || bu[in].temp==SK_DOUSE  || 
+				bu[in].temp==SK_SCORCH  || bu[in].temp==SK_DISPEL2) m++;
+		}
+		if (m>1)
+		{
+			if (npc_try_spell(cn, cn, SK_DISPEL))
 			{
 				return 1;
 			}
@@ -3317,34 +4299,34 @@ int npc_driver_high(int cn)
 	}
 
 	// generic spell management
-	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && ch[cn].skill[SK_MEDIT][0] && !(ch[cn].flags & CF_MERCHANT))
+	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && !(ch[cn].flags & CF_MERCHANT))
 	{
 		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_PROTECT))
 		{
-			return( 1);
+			return 1;
 		}
-		if (get_skill_score(cn, SK_MSHIELD) >= 84) // to avoid persistent awake timers
+		if (M_SK(cn, SK_MSHIELD) >= 84) // to avoid persistent awake timers
 		{
 			if (npc_try_spell(cn, cn, SK_MSHIELD))
 			{
-				return( 1);
+				return 1;
 			}
 		}
 		if (npc_try_spell(cn, cn, SK_HASTE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_ENHANCE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
@@ -3377,12 +4359,12 @@ int npc_driver_high(int cn)
 	{
 		if (npc_try_spell(cn, cn, SK_LIGHT))
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
 	// make sure protected character survives
-	if ((co = ch[cn].data[63])!=0)
+	if ((co = ch[cn].data[CHD_MASTER])!=0)
 	{
 		if (ch[co].a_hp<ch[co].hp[5] * 600 && !get_tarot(cn, IT_CH_STAR)) // he's hurt
 		{
@@ -3397,6 +4379,28 @@ int npc_driver_high(int cn)
 			if (n==MAXBUFFS)
 			{
 				if (npc_try_spell(cn, co, SK_HEAL))
+				{
+					return 1;
+				}
+			}
+		}
+		
+		// Dispel - for friend
+		if (B_SK(cn, SK_DISPEL) && !get_tarot(cn, IT_CH_HEIROPH))
+		{
+			for (n = 0, m = 0; n<MAXBUFFS; n++)
+			{
+				if ((in = ch[co].spell[n])==0) continue;
+				if (bu[in].temp==SK_DISPEL) { m=0; break; }
+				if (bu[in].temp==SK_POISON	|| bu[in].temp==SK_BLEED   || bu[in].temp==SK_BLIND  || 
+					bu[in].temp==SK_WARCRY2 || bu[in].temp==SK_CURSE2  || bu[in].temp==SK_CURSE  || 
+					bu[in].temp==SK_WARCRY  || bu[in].temp==SK_WEAKEN2 || bu[in].temp==SK_WEAKEN || 
+					bu[in].temp==SK_SLOW2   || bu[in].temp==SK_SLOW    || bu[in].temp==SK_DOUSE  || 
+					bu[in].temp==SK_SCORCH  || bu[in].temp==SK_DISPEL2) m++;
+			}
+			if (m>1)
+			{
+				if (npc_try_spell(cn, co, SK_DISPEL))
 				{
 					return 1;
 				}
@@ -3436,25 +4440,47 @@ int npc_driver_high(int cn)
 				}
 			}
 		}
+		
+		// Dispel - for friend
+		if (B_SK(cn, SK_DISPEL) && !get_tarot(cn, IT_CH_HEIROPH))
+		{
+			for (n = 0, m = 0; n<MAXBUFFS; n++)
+			{
+				if ((in = ch[co].spell[n])==0) continue;
+				if (bu[in].temp==SK_DISPEL) { m=0; break; }
+				if (bu[in].temp==SK_POISON	|| bu[in].temp==SK_BLEED   || bu[in].temp==SK_BLIND  || 
+					bu[in].temp==SK_WARCRY2 || bu[in].temp==SK_CURSE2  || bu[in].temp==SK_CURSE  || 
+					bu[in].temp==SK_WARCRY  || bu[in].temp==SK_WEAKEN2 || bu[in].temp==SK_WEAKEN || 
+					bu[in].temp==SK_SLOW2   || bu[in].temp==SK_SLOW    || bu[in].temp==SK_DOUSE  || 
+					bu[in].temp==SK_SCORCH  || bu[in].temp==SK_DISPEL2) m++;
+			}
+			if (m>1)
+			{
+				if (npc_try_spell(cn, co, SK_DISPEL))
+				{
+					return 1;
+				}
+			}
+		}
 
 		if (!npc_can_spell(co, cn, SK_PROTECT) && npc_try_spell(cn, co, SK_PROTECT))
 		{
-			return( 1);
+			return 1;
 		}
 		if (!npc_can_spell(co, cn, SK_ENHANCE) && npc_try_spell(cn, co, SK_ENHANCE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (!npc_can_spell(co, cn, SK_BLESS) && npc_try_spell(cn, co, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 		
 		// taunt this enemy to pull them off our friend
 		if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 40;
-			return(1);
+			return 1;
 		}
 		
 		// blast this enemy if our friend is losing and his enemy is our enemy as well
@@ -3463,7 +4489,7 @@ int npc_driver_high(int cn)
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, cc, SK_BLAST))
 			{
 				ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
-				return( 1);
+				return 1;
 			}
 		}
 		
@@ -3486,7 +4512,7 @@ int npc_driver_high(int cn)
 				if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
 				{
 					ch[cn].data[74] = globs->ticker + TICKS * 40;
-					return(1);
+					return 1;
 				}
 				
 				// blast this enemy if our friend is losing and his enemy is our enemy as well
@@ -3495,7 +4521,7 @@ int npc_driver_high(int cn)
 					if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, cc, SK_BLAST))
 					{
 						ch[co].data[75] = globs->ticker + (TICKS * 6)/2;
-						return( 1);
+						return 1;
 					}
 				}
 			}
@@ -3503,117 +4529,160 @@ int npc_driver_high(int cn)
 		//
 		ch[cn].data[65] = 0;
 	}
-
+	
+	// Liz Emperor
+	if (ch[cn].data[26]==13 && ch[cn].data[4] && globs->ticker>ch[cn].data[3])
+	{
+		ch[cn].attack_cn = ch[cn].data[4];
+		ch[cn].data[3] = 0;
+		ch[cn].data[4] = 0;
+	}
+	
 	// generic fight-magic management
 	if ((co = ch[cn].attack_cn)!=0 || ch[cn].data[78]) // we're fighting
 	{
+		if (ch[cn].data[26]) npc_wedge_doors(ch[cn].data[26], 1);
 		npc_activate_rings(cn, 1);
 		/*
-		if (npc_quaff_potion(cn, 833, 254))
-		{
-			return( 1);                                 // use greenling pot if available
-		}
-		if (npc_quaff_potion(cn, 267, 254))
-		{
-			return( 1);                                 // use ratling pot if available
-		}
+		if (npc_quaff_potion(cn, 1479, 254)) // use spot if available
+			return 1;
+		if (npc_quaff_potion(cn, 833, 254)) // use gpot if available
+			return 1;
+		if (npc_quaff_potion(cn, 267, 254)) // use rpot if available
+			return 1;
 		*/
 		if (co && (ch[cn].a_hp<ch[cn].hp[5] * 600 || !RANDOM(10))) // we're losing
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
-				return( 1);
+				ch[co].data[75] = globs->ticker + TICKS;
+				return 1;
 			}
 		}
 
 		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_PROTECT))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_MSHIELD))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_HASTE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_ENHANCE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (npc_try_spell(cn, cn, SK_BLESS))
 		{
-			return( 1);
+			return 1;
 		}
+		// Dispel - for enemy
+		if (co && B_SK(cn, SK_DISPEL) && get_tarot(cn, IT_CH_HEIROPH))
+		{
+			for (n = 0, m = 0; n<MAXBUFFS; n++)
+			{
+				if ((in = ch[co].spell[n])==0) continue;
+				if (bu[in].temp==SK_DISPEL2) { m=0; break; }
+				if (bu[in].temp==SK_HASTE 	|| bu[in].temp==SK_BLESS   || bu[in].temp==SK_MSHIELD || 
+					bu[in].temp==SK_MSHELL  || bu[in].temp==SK_PULSE   || bu[in].temp==SK_ZEPHYR  || 
+					bu[in].temp==SK_GUARD   || bu[in].temp==SK_DISPEL  || bu[in].temp==SK_REGEN   || 
+					bu[in].temp==SK_PROTECT || bu[in].temp==SK_ENHANCE || bu[in].temp==SK_LIGHT) m++;
+			}
+			if (m>1)
+			{
+				if (npc_try_spell(cn, co, SK_DISPEL))
+				{
+					return 1;
+				}
+			}
+		}
+		//
 		if (co && npc_try_spell(cn, co, SK_SLOW))
 		{
-			return(1);
+			return 1;
 		}
 		if (co && is_facing(cn,co) && npc_try_spell(cn, co, SK_WEAKEN))
 		{
-			return( 1);
+			return 1;
 		}
 		
 		if (co && npc_try_spell(cn, co, SK_CURSE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return(1);
+			return 1;
 		}
 		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return(1);
+			return 1;
 		}
-		if (co && npc_try_spell(cn, cn, SK_PULSE))
+		if (co && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && npc_try_spell(cn, cn, SK_ZEPHYR))
 		{
-			return( 1);
+			return 1;
 		}
 		if (co && npc_try_spell(cn, co, SK_POISON))
 		{
-			return( 1);
+			return 1;
 		}
 		
+		if (co && !is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
+		{
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
 		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 15;
-			return( 1);
+			return 1;
 		}
-		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_WARCRY))
+		if (co && ((!IS_PLAYER(co) && globs->ticker>ch[cn].data[74]) || (IS_PLAYER(co) && globs->ticker>ch[co].data[74])) && 
+			npc_try_spell(cn, co, SK_WARCRY))
 		{
-			ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(get_skill_score(cn, SK_WARCRY))*3/2;
-			return( 1);
+			if (IS_PLAYER(co))
+				ch[co].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
+			else
+				ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
+			return 1;
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_CLEAVE/2;
-			return( 1);
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
 		}
 		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
 		{
-			ch[co].data[75] = globs->ticker + SK_EXH_LEAP/2;
-			return( 1);
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
+		
+		if ((ch[cn].a_end>=ch[cn].end[5]*950) && co && !is_facing(cn,co) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_TAUNT))
+		{
+			ch[cn].data[74] = globs->ticker + TICKS * 30;
+			return 1;
 		}
 
 		if (co && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
-				ch[co].data[75] = globs->ticker + SK_EXH_BLAST/2;
-				return( 1);
+				ch[co].data[75] = globs->ticker + TICKS;
+				return 1;
 			}
 		}
 	}
@@ -3623,7 +4692,7 @@ int npc_driver_high(int cn)
 	{
 		ch[cn].goto_x = ch[cn].x + 5 - RANDOM(10);
 		ch[cn].goto_y = ch[cn].y + 5 - RANDOM(10);
-		return(1);
+		return 1;
 	}
 
 	// are we on protect and want to follow our master?
@@ -3637,26 +4706,26 @@ int npc_driver_high(int cn)
 		{
 			ch[cn].data[58] = 1;
 		}
-		return(1);
+		return 1;
 	}
 
 	if (!ch[cn].data[41] && !ch[cn].data[47])
 	{
-		return( 0);                                     // don't scan if we don't use the information anyway
+		return 0;                                     // don't scan if we don't use the information anyway
 
 	}
 	// save some work. you need to check here if no other work needs to be done!
 	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE)
 	{
-		return( 0);
+		return 0;
 	}
 	if (ch[cn].data[47] && ch[cn].misc_action==DR_PICKUP)
 	{
-		return( 0);
+		return 0;
 	}
 	if (ch[cn].data[47] && ch[cn].misc_action==DR_USE)
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_INDOORS)
@@ -3692,7 +4761,7 @@ int npc_driver_high(int cn)
 						ch[cn].misc_target2 = y;
 						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
 						ch[cn].data[58] = 1;
-						return(1);
+						return 1;
 					}
 
 					if (it[in].active && globs->dlight>200 && !indoor2)
@@ -3702,7 +4771,7 @@ int npc_driver_high(int cn)
 						ch[cn].misc_target2 = y;
 						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
 						ch[cn].data[58] = 1;
-						return(1);
+						return 1;
 					}
 				}
 				if (ch[cn].data[47] && indoor1==indoor2 && (it[in].flags & IF_TAKE) &&
@@ -3714,7 +4783,7 @@ int npc_driver_high(int cn)
 					ch[cn].misc_target2 = y;
 					ch[cn].goto_x = 0;
 					ch[cn].data[58] = 1;
-					return(1);
+					return 1;
 				}
 				if (ch[cn].data[47] && indoor1==indoor2 && (it[in].driver==7) &&
 				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
@@ -3731,14 +4800,14 @@ int npc_driver_high(int cn)
 						ch[cn].misc_target2 = y;
 						ch[cn].goto_x = 0;
 						ch[cn].data[58] = 1;
-						return(1);
+						return 1;
 					}
 				}
 			}
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 
@@ -3831,7 +4900,7 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 		}
 	}
 	
-	return(1);
+	return 1;
 }
 
 // grave looting and friends
@@ -3844,7 +4913,7 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_HEAD:
 		if (!(it[in].placement & PL_HEAD))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3853,7 +4922,7 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_NECK:
 		if (!(it[in].placement & PL_NECK))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3862,7 +4931,7 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_BODY:
 		if (!(it[in].placement & PL_BODY))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3871,7 +4940,7 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_ARMS:
 		if (!(it[in].placement & PL_ARMS))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3880,28 +4949,16 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_BELT:
 		if (!(it[in].placement & PL_BELT))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
 			break;
 		}
-	case    WN_CHARM:
-		return( 0);
-		/*  For now, NPCs will ignore Card items
-		if (!(it[in].placement & PL_CHARM))
-		{
-			return( 0);
-		}
-		else
-		{
-			break;
-		}
-		*/
 	case    WN_FEET:
 		if (!(it[in].placement & PL_FEET))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3910,24 +4967,24 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_LHAND:
 		if (!(it[in].placement & PL_SHIELD))
 		{
-			return( 0);
+			return 0;
 		}
 		else if ((in = ch[cn].worn[WN_RHAND])!=0 && (it[in].placement & PL_TWOHAND))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
 			break;
 		}
 	case    WN_RHAND:
-		if (!(it[in].placement & PL_WEAPON))
+		if (!(it[in].placement & PL_WEAPON) && !((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn)))
 		{
-			return( 0);
+			return 0;
 		}
 		else if ((it[in].placement & PL_TWOHAND) && ch[cn].worn[WN_LHAND])
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3936,7 +4993,7 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_CLOAK:
 		if (!(it[in].placement & PL_CLOAK))
 		{
-			return( 0);
+			return 0;
 		}
 		else
 		{
@@ -3946,17 +5003,25 @@ int npc_check_placement(int cn, int in, int n)
 	case    WN_LRING:
 		if (!(it[in].placement & PL_RING))
 		{
-			return( 0);
+			return 0;
+		}
+		else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && (it[in].placement & PL_TWOHAND))
+		{
+			return 0;
+		}
+		else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && (it[in].placement & PL_TWOHAND))
+		{
+			return 0;
 		}
 		else
 		{
 			break;
 		}
 	default:
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_can_wear_item(int cn, int in)
@@ -3965,41 +5030,41 @@ int npc_can_wear_item(int cn, int in)
 
 	if (in & 0x80000000)
 	{
-		return( 0);
+		return 0;
 	}
 
 	for (m = 0; m<5; m++)
 	{
-		if (it[in].attrib[m][2]>ch[cn].attrib[m][0])
+		if ((unsigned char)it[in].attrib[m][2] > B_AT(cn, m))
 		{
-			return( 0);
+			return 0;
 		}
 	}
 
 	for (m = 0; m<MAXSKILL; m++)
 	{
-		if (it[in].skill[m][2]>ch[cn].skill[m][0])
+		if ((unsigned char)it[in].skill[m][2] > B_SK(cn, m))
 		{
-			return( 0);
+			return 0;
 		}
 	}
 
 	if (it[in].hp[2]>ch[cn].hp[0])
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (it[in].end[2]>ch[cn].end[0])
 	{
-		return( 0);
+		return 0;
 	}
 
 	if (it[in].mana[2]>ch[cn].mana[0])
 	{
-		return( 0);
+		return 0;
 	}
 
-	return(1);
+	return 1;
 }
 
 int npc_item_value(int cn, int in)
@@ -4008,13 +5073,7 @@ int npc_item_value(int cn, int in)
 
 	if (ch[cn].worn[WN_RHAND]==0 && in==0) // Should prevent unarmed npcs from using a bad weapon
 	{
-		score += get_skill_score(cn, SK_HAND) * 5;
-		/*
-		if (ch[cn].skill[SK_PRECISION][0])
-		{
-			score += get_skill_score(cn, SK_PRECISION) * 100;
-		}
-		*/
+		score += M_SK(cn, SK_HAND) * 5;
 	}
 
 	for (n = 0; n<5; n++)
@@ -4040,7 +5099,7 @@ int npc_want_item(int cn, int in)
 {
 	if (ch[cn].item[38])
 	{
-		return( 0);             // hack: dont take more stuff if inventory is almost full
+		return 0;             // hack: dont take more stuff if inventory is almost full
 
 	}
 	if (ch[cn].citem)
@@ -4058,10 +5117,10 @@ int npc_want_item(int cn, int in)
 		ch[cn].citem = in;
 		it[in].carried = cn;
 		do_store_item(cn);
-		return(1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_equip_item(int cn, int in)
@@ -4095,7 +5154,7 @@ int npc_equip_item(int cn, int in)
 						ch[cn].citem = ch[cn].worn[n];
 						if (do_store_item(cn)==-1)
 						{
-							return( 0);                     // stop looting if our backpack is full
+							return 0;                     // stop looting if our backpack is full
 						}
 					}
 
@@ -4103,13 +5162,13 @@ int npc_equip_item(int cn, int in)
 					it[in].carried = cn;
 
 					do_update_char(cn);
-					return(1);
+					return 1;
 				}
 			}
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_loot_grave(int cn, int in)
@@ -4121,7 +5180,7 @@ int npc_loot_grave(int cn, int in)
 		ch[cn].misc_action  = DR_USE;
 		ch[cn].misc_target1 = it[in].x;
 		ch[cn].misc_target2 = it[in].y;
-		return(1);
+		return 1;
 	}
 
 	co = it[in].data[0];
@@ -4134,7 +5193,7 @@ int npc_loot_grave(int cn, int in)
 			{
 				chlog(cn, "got %s from %s's grave", it[in].name, ch[co].name);
 				ch[co].worn[n] = 0;
-				return(1);
+				return 1;
 			}
 		}
 	}
@@ -4146,13 +5205,13 @@ int npc_loot_grave(int cn, int in)
 			{
 				chlog(cn, "got %s from %s's grave", it[in].name, ch[co].name);
 				ch[co].item[n] = 0;
-				return(1);
+				return 1;
 			}
 			if (npc_want_item(cn, in))
 			{
 				chlog(cn, "got %s from %s's grave", it[in].name, ch[co].name);
 				ch[co].item[n] = 0;
-				return(1);
+				return 1;
 			}
 		}
 	}
@@ -4162,10 +5221,10 @@ int npc_loot_grave(int cn, int in)
 		chlog(cn, "got %.2fG from %s's grave", ch[co].gold / 100.0, ch[co].name);
 		ch[cn].gold += ch[co].gold;
 		ch[co].gold  = 0;
-		return(1);
+		return 1;
 	}
 
-	return(0);
+	return 0;
 }
 
 int npc_already_searched_grave(int cn, int in)
@@ -4176,11 +5235,11 @@ int npc_already_searched_grave(int cn, int in)
 	{
 		if (*(int*)(ch[cn].text[9] + n)==in)
 		{
-			return( 1);
+			return 1;
 		}
 	}
 
-	return(0);
+	return 0;
 }
 
 void npc_add_searched_grave(int cn, int in)
@@ -4214,12 +5273,12 @@ int npc_grave_logic(int cn)
 					{
 						ch[cn].flags |= CF_ISLOOTING;
 					}
-					return(1);
+					return 1;
 				}
 			}
 		}
 	}
-	return(0);
+	return 0;
 }
 
 void npc_driver_low(int cn)
@@ -4306,7 +5365,21 @@ void npc_driver_low(int cn)
 			alone = 0;
 		}
 	}
-
+	
+	if (alone && (ch[cn].data[26]==12 || ch[cn].data[26]==14)) // npc_lab_lord_driver / npc_shivab_driver
+		ch[cn].data[2] = 0;
+	
+	if (alone && ch[cn].data[26]==13) // npc_emperor_driver
+	{
+		ch[cn].data[2] = 0;
+		ch[cn].data[3] = 0;
+		ch[cn].data[4] = 0;
+		
+		B_SK(cn, SK_SLOW) = 0;
+		B_SK(cn, SK_CURSE) = 0;
+		B_SK(cn, SK_ZEPHYR) = 0;
+	}
+	
 	if (alone) for (n = 20; n<24; n++) // close door, medium prio -- only if no players nearby
 	{
 		if ((m = ch[cn].data[n])!=0)
@@ -4488,6 +5561,10 @@ void npc_driver_low(int cn)
 
 	if (ch[cn].data[29])    // resting position, lowest prio
 	{
+		npc_activate_rings(cn, 0);
+		npc_wedge_doors(ch[cn].data[26], 0);
+		ch[cn].attack_cn = 0;
+		
 		m = ch[cn].data[29];
 		x = m % MAPX + get_frust_x_off(ch[cn].data[36]);
 		y = m / MAPX + get_frust_y_off(ch[cn].data[36]);
@@ -4592,11 +5669,13 @@ void npc_driver_low(int cn)
 		ch[cn].data[67] = globs->ticker;
 	}
 	
-	if (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3) 
-		stronghold_mage_driver(cn);
-	
-	if (alone && ch[cn].data[26]==12) // npc_lab_lord_driver
-		ch[cn].data[2] = 0;
+	if (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3)
+	{
+		if (globs->flags & GF_NEWBS)
+			stronghold_mage_driver_ver2(cn);
+		else
+			stronghold_mage_driver(cn);
+	}
 }
 
 void update_shop(int cn)

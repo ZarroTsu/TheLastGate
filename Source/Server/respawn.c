@@ -36,14 +36,14 @@ static int load(void)
 			fprintf(stderr, "cwd: %s\n", cwd);
 		}
 		perror(DATDIR "/tchar.dat");
-		return(-1);
+		return -1;
 	}
 
 	ch = mmap(NULL, TCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (ch==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap tchar.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
@@ -51,31 +51,31 @@ static int load(void)
 	if (handle==-1)
 	{
 		fprintf(stderr, "titem.dat does not exist.\n");
-		return(-1);
+		return -1;
 	}
 
 	it = mmap(NULL, TITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (it==(void*)-1)
 	{
 		fprintf(stderr, "cannot mmap titem.dat.\n");
-		return(-1);
+		return -1;
 	}
 	close(handle);
 
 	handle = open(DATDIR "/global.dat", O_RDWR);
 	if (handle==-1)
 	{
-		return( -1);
+		return -1;
 	}
 
 	globs = mmap(NULL, sizeof(struct global), PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
 	if (globs==(void*)-1)
 	{
-		return( -1);
+		return -1;
 	}
 	close(handle);
 
-	return(0);
+	return 0;
 }
 
 static void unload(void)

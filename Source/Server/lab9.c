@@ -480,37 +480,37 @@ int lab9_guesser_says(int cn, char *text)
 	// is the speaker a player?
 	if (!IS_PLAYER(cn))
 	{
-		return( 0);
+		return 0;
 	}
 
 	// does the riddler exist?
-	riddler = ch[cn].data[CHD_RIDDLER];
+	riddler = ch[cn].data[PCD_RIDDLER];
 	if (!IS_SANENPC(riddler))
 	{
-		ch[cn].data[CHD_RIDDLER] = 0;
-		return(0);
+		ch[cn].data[PCD_RIDDLER] = 0;
+		return 0;
 	}
 
 	// is the riddler a certified riddler?
 	ar = ch[riddler].data[72]; // area of knowledge
 	if ((ar < RIDDLE_MIN_AREA) || (ar > RIDDLE_MAX_AREA))
 	{
-		ch[cn].data[CHD_RIDDLER] = 0;
-		return(0);
+		ch[cn].data[PCD_RIDDLER] = 0;
+		return 0;
 	}
 
 	// does the riddler remember the guesser?
 	idx = ar - RIDDLE_MIN_AREA;
 	if (guesser[idx] != cn)
 	{
-		ch[cn].data[CHD_RIDDLER] = 0;
-		return(0);
+		ch[cn].data[PCD_RIDDLER] = 0;
+		return 0;
 	}
 
 	// does the player see the riddler?
 	if (!do_char_can_see(cn, riddler))
 	{
-		return(0);
+		return 0;
 	}
 
 	riddle = &riddles[idx][riddleno[idx] - 1];
@@ -552,13 +552,13 @@ int lab9_guesser_says(int cn, char *text)
 		if (god_transfer_char(cn, destinations[idx].x, destinations[idx].y))
 		{
 			guesser[idx] = 0;
-			ch[cn].data[CHD_RIDDLER] = 0;
+			ch[cn].data[PCD_RIDDLER] = 0;
 		}
 		else
 		{
 			do_sayx(riddler, "Oops! Something went wrong. Please try again a bit later.\n");
 		}
-		return(1);
+		return 1;
 	}
 	else
 	{
@@ -573,9 +573,9 @@ int lab9_guesser_says(int cn, char *text)
 		{
 			do_sayx(riddler, "Sorry, that's not right. Now you'll have to bring me the book again to start over!\n");
 			guesser[idx] = 0;
-			ch[cn].data[CHD_RIDDLER] = 0;
+			ch[cn].data[PCD_RIDDLER] = 0;
 		}
-		return(0);
+		return 0;
 	}
 }
 
@@ -606,7 +606,7 @@ void lab9_pose_riddle(int riddler, int co)
 		}
 		do_sayx(riddler, "%-.*s", q - p, p);
 	}
-	ch[co].data[CHD_RIDDLER] = riddler;
+	ch[co].data[PCD_RIDDLER] = riddler;
 }
 
 int lab9_check_door(int bankno)
@@ -616,7 +616,7 @@ int lab9_check_door(int bankno)
 	if ((bankno < 1) || (bankno > BANKS))
 	{
 		xlog("lab9_check_door(): panic: bad bank number!!");
-		return(0);
+		return 0;
 	}
 	bankidx = bankno - 1;
 
@@ -633,7 +633,7 @@ int lab9_check_door(int bankno)
 		if (!in || (it[in].temp != t))
 		{
 			xlog("lab9_check_door(): panic: no switch at %d!!", m);
-			return(0);
+			return 0;
 		}
 		q = questions[bankidx][n];
 		if ((it[in].data[1] == 0) != switch_questions[bankidx][q - 1].truth)
@@ -647,7 +647,7 @@ int lab9_check_door(int bankno)
 	if (!in)
 	{
 		xlog("lab9_check_door(): panic: no door at %d!!", m);
-		return(0);
+		return 0;
 	}
 	if (correct)
 	{
@@ -660,7 +660,7 @@ int lab9_check_door(int bankno)
 			reset_go(it[in].x, it[in].y);
 			//add_lights(it[in].x, it[in].y);
 		}
-		return(1);
+		return 1;
 	}
 	else
 	{
@@ -675,7 +675,7 @@ int lab9_check_door(int bankno)
 			reset_go(it[in].x, it[in].y);
 			//add_lights(it[in].x, it[in].y);
 		}
-		return(0);
+		return 0;
 	}
 }
 
@@ -746,7 +746,7 @@ int use_lab9_switch(int cn, int in)
 	{
 		do_char_log(cn, 2, "You hear a door open nearby.\n");
 	}
-	return(1);
+	return 1;
 }
 
 /* initialize things with a reset of all switch banks */
@@ -768,7 +768,7 @@ int use_lab9_door(int cn, int in)
 
 	if (map[it[in].x + it[in].y * MAPX].ch)
 	{
-		return( 0);
+		return 0;
 	}
 
 	// This statement allows free movement southward.
@@ -780,7 +780,7 @@ int use_lab9_door(int cn, int in)
 	         ((ch[cn].x > it[in].x) || (ch[cn].y < it[in].y)))
 	{
 		do_char_log(cn, 0, "It's locked and no key will open it.\n");
-		return(0);
+		return 0;
 	}
 	reset_go(it[in].x, it[in].y);
 	remove_lights(it[in].x, it[in].y);
@@ -804,5 +804,5 @@ int use_lab9_door(int cn, int in)
 	add_lights(it[in].x, it[in].y);
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 
-	return(1);
+	return 1;
 }

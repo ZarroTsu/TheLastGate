@@ -419,6 +419,8 @@ struct player
 	char passwd[16];
 
 	int changed_field[TILEX * TILEY]; // IDs of changed fields
+	
+	int spectating;
 };
 
 #define MAXPLAYER 250
