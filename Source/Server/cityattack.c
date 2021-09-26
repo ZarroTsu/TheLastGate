@@ -132,7 +132,7 @@ int npc_cityattack_see(int cn, int co)
 		return 1;
 	}	
 	
-	if (ch[cn].data[CHD_GROUP]!=ch[co].data[CHD_GROUP] && ch[co].data[CHD_GROUP]!=60 && 
+	if (ch[cn].data[CHD_GROUP]!=ch[co].data[CHD_GROUP] && ch[co].data[CHD_GROUP]!=60 && ch[co].temp!=347 && 
 		ch[cn].data[0]>=2) // only fight if we're raiding
 	{
 		if (!(cc = ch[cn].attack_cn) || npc_dist(cn, co)<npc_dist(cn, cc))

@@ -3549,8 +3549,8 @@ static int bs_waves[3][15][9][7] = {
 void stronghold_mage_driver_ver2(int cn)
 {
 	int candleA, candleB, candleC, candleD, candleE;
-	int spawnX, spawnY, magenum, groupnum, spawnT = 347;
-	int p=0, n, m, j, in, co;
+	int spawnX, spawnY, magenum=0, groupnum=601, spawnT = 347;
+	int p=0, n, m, j, in=0, co=0;
 	
 	/*
 		Mage driver data will carry references to pass along to cityattack.c
@@ -3621,6 +3621,11 @@ void stronghold_mage_driver_ver2(int cn)
 						do_char_killed(0, n, 1);
 					}
 				}
+				ch[cn].data[1] = 0;
+				ch[cn].data[2] = 0;
+				ch[cn].data[3] = 0;
+				ch[cn].data[4] = 0;
+				ch[cn].data[5] = 0;
 			}
 		}
 		return; // No further process when nobody is in the area
@@ -3645,17 +3650,18 @@ void stronghold_mage_driver_ver2(int cn)
 		(magenum==2 && ch[cn].data[1]==13) ||
 		(magenum==3 && ch[cn].data[1]==16))
 	{
+		j = 0;
 		switch (ch[cn].data[2])
 		{
 			case 1:
-				if (magenum==3)			npc_moveto(cn, 598, 305);
-				else if (magenum==2)	npc_moveto(cn, 576, 305);
-				else					npc_moveto(cn, 554, 305);
+				if (magenum==3)			j = npc_moveto(cn, 598, 305);
+				else if (magenum==2)	j = npc_moveto(cn, 576, 305);
+				else					j = npc_moveto(cn, 554, 305);
 				break;
 			case 2:
-				if (magenum==3)			npc_moveto(cn, 600, 336);
-				else if (magenum==2)	npc_moveto(cn, 576, 336);
-				else					npc_moveto(cn, 554, 336);
+				if (magenum==3)			j = npc_moveto(cn, 600, 336);
+				else if (magenum==2)	j = npc_moveto(cn, 576, 336);
+				else					j = npc_moveto(cn, 554, 336);
 				break;
 			case 3:
 				if (magenum==3)			npc_moveto(cn, 598, 368);
@@ -3665,8 +3671,11 @@ void stronghold_mage_driver_ver2(int cn)
 			default: break;
 		}
 		
-		ch[cn].data[2]++;
-		ch[cn].data[3] = globs->ticker + TICKS * 10;
+		if (j) 
+		{
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS * 10;
+		}
 		return;
 	}
 	
@@ -3674,10 +3683,10 @@ void stronghold_mage_driver_ver2(int cn)
 	if (ch[cn].data[2]==1)
 	{
 		if (ch[cn].data[1]== 1 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 1);
-		if (ch[cn].data[1]== 4 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 2);
-		if (ch[cn].data[1]== 7 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 3);
-		if (ch[cn].data[1]==10 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 4);
-		if (ch[cn].data[1]==13 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 5);
+		if (ch[cn].data[1]== 3 && (in = map[candleB].it)&&it[in].active) shiva_activate_candle(cn, in, 2);
+		if (ch[cn].data[1]== 5 && (in = map[candleC].it)&&it[in].active) shiva_activate_candle(cn, in, 3);
+		if (ch[cn].data[1]== 7 && (in = map[candleD].it)&&it[in].active) shiva_activate_candle(cn, in, 4);
+		if (ch[cn].data[1]== 9 && (in = map[candleE].it)&&it[in].active) shiva_activate_candle(cn, in, 5);
 		for (n = 1; n<MAXCHARS; n++) 
 		{
 			if (ch[n].used==USE_EMPTY) continue;
@@ -3685,8 +3694,6 @@ void stronghold_mage_driver_ver2(int cn)
 			if (is_inline(n, magenum)) 
 			{
 				do_char_log(n, 3, " --- WAVE %d BEGINS --- \n", ch[cn].data[1]);
-				if (ch[cn].data[1]>1)
-					ch[n].bs_points += ch[cn].data[1]*ch[cn].data[1]*magenum*5;
 			}
 		}
 	}
@@ -3705,6 +3712,7 @@ void stronghold_mage_driver_ver2(int cn)
 			ch[co].data[31] = ch[cn].temp;
 			ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = groupnum;
 			ch[co].data[44] = 60;
+			do_update_char(co);
 			ch[cn].data[4]++;
 			n++;
 		}
@@ -3712,7 +3720,8 @@ void stronghold_mage_driver_ver2(int cn)
 	
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	if (!((ch[cn].data[2]-1)%2)) do_sayx(cn, "Khuzak gurawin duskar!");
-	chlog(cn, "created %d new monsters", n);
+	m = bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6]*3; // this *3 is temporary - fix timers
+	chlog(cn, "created %d new monsters, waiting %d ticks", n, m);
 	
 	// Increment subwave and/or wave number
 	if (ch[cn].data[2]<8)
@@ -3721,12 +3730,27 @@ void stronghold_mage_driver_ver2(int cn)
 	}
 	else
 	{
+		for (n = 1; n<MAXCHARS; n++) 
+		{
+			if (ch[n].used==USE_EMPTY) continue;
+			if (!IS_PLAYER(n)) continue;
+			if (is_inline(n, magenum)) 
+			{
+				do_char_log(n, 3, " --- WAVE %d ENDS --- \n", ch[cn].data[1]);
+				j = ch[cn].data[1]*ch[cn].data[1]*magenum*5;
+				chlog(n, "Gets %d BSP", j);
+				ch[n].bs_points += j;
+				if (!(ch[n].flags & CF_SYS_OFF))
+					do_char_log(n, 2, "You get %d stronghold points.\n", j);
+			}
+		}
+		
 		ch[cn].data[1]++;
 		ch[cn].data[2] = 1;
 	}
 	
 	// Increment ticker storage
-	ch[cn].data[3] = globs->ticker + bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6];
+	ch[cn].data[3] = globs->ticker + m;
 }
 
 void npc_lab_lord_driver(int cn)

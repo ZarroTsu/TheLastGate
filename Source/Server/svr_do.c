@@ -1912,7 +1912,7 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Captn |  12 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "2")==0 || strcmp(topic, "RUBY")==0 || strcmp(topic, "ruby")==0)
@@ -1931,7 +1931,7 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Captn |  12 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "3")==0 || strcmp(topic, "AMETHYST")==0 || strcmp(topic, "amethyst")==0)
@@ -1950,7 +1950,7 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Captn |  12 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "4")==0 || strcmp(topic, "TOPAZ")==0 || strcmp(topic, "topaz")==0)
@@ -1969,7 +1969,7 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Captn |  12 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "5")==0 || strcmp(topic, "EMERALD")==0 || strcmp(topic, "emerald")==0)
@@ -1988,7 +1988,7 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
 		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Captn |  12 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "6")==0 || strcmp(topic, "SPINEL")==0 || strcmp(topic, "spinel")==0)
@@ -2063,9 +2063,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Crit Bonus\n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |  30 |  50 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  35 |  65 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  45 |  75 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Major |  30 |  50 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | Colnl |  35 |  65 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | MaGen |  45 |  75 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "11")==0 || strcmp(topic, "ZIRCON")==0 || strcmp(topic, "zircon")==0)
@@ -2076,9 +2076,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  |  Thorns   \n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |   4 |   6 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |   5 |   8 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Major |   4 |   6 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | Colnl |   5 |   8 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | MaGen |   7 |  10 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else
@@ -2112,14 +2112,14 @@ void do_strongholdpoints(int cn)
 		for (n = 1; n<MAXCHARS; n++) 
 		{
 			if (ch[n].used==USE_EMPTY) continue;
-			if (ch[n].temp==CT_BSMAGE1 && is_inline(cn, 1)) { wavenum = ch[n].data[1]; waveprog = ch[n].data[2]; break; }
-			if (ch[n].temp==CT_BSMAGE2 && is_inline(cn, 2)) { wavenum = ch[n].data[1]; waveprog = ch[n].data[2]; break; }
-			if (ch[n].temp==CT_BSMAGE3 && is_inline(cn, 3)) { wavenum = ch[n].data[1]; waveprog = ch[n].data[2]; break; }
+			if (ch[n].temp==CT_BSMAGE1 && is_inline(cn, 1)) { wavenum = ch[n].data[1]; waveprog = ch[n].data[2]-1; break; }
+			if (ch[n].temp==CT_BSMAGE2 && is_inline(cn, 2)) { wavenum = ch[n].data[1]; waveprog = ch[n].data[2]-1; break; }
+			if (ch[n].temp==CT_BSMAGE3 && is_inline(cn, 3)) { wavenum = ch[n].data[1]; waveprog = ch[n].data[2]-1; break; }
 		}
 		
 		if (wavenum>0)
 		{
-			do_char_log(cn, 3, "Wave %d progress: %3d%%\n", ch[n].data[3], waveprog*10);
+			do_char_log(cn, 3, "Wave %d progress: %3d%%\n", wavenum, waveprog*10);
 		}
 	}
 	else
@@ -2148,7 +2148,7 @@ void do_strongholdpoints(int cn)
 				case 10: 	waveprog = 10000*(waveprog-(BS_RC*3))/BS_RC; break;
 				default:	waveprog = 10000*(waveprog-(BS_RC*(wavenum-11)))/BS_RC; break;
 			}
-			do_char_log(cn, 3, "Wave %d progress: %3d%%\n", ch[n].data[3], waveprog/100);
+			do_char_log(cn, 3, "Wave %d progress: %3d%%\n", wavenum, waveprog/100);
 		}
 	}
 }

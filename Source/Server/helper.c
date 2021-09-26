@@ -3474,6 +3474,24 @@ char *get_map_enemy_name(int kin)
 	}
 }
 
+char *get_map_enemy_desc(int kin)
+{
+	switch (kin)
+	{
+		case  1: return "A skeleton. Its eyes glow a deep red.";
+		case  2: return "A ghost. Its eyes glow a deep red.";
+		case  3: return "A rodent. Its eyes glow a deep red.";
+		case  4: return "An undead. Its eyes glow a deep red.";
+		case  5: return "A grolm. Its eyes glow a deep red.";
+		case  6: return "A skink. Its eyes glow a deep red.";
+		case  7: return "A golem. Its eyes glow a deep red.";
+		case  8: return "A gargoyle. Its eyes glow a deep red.";
+		case  9: return "An ice gargoyle. Its eyes glow a deep red.";
+		case 10: return "A living flame. Its eyes glow a deep red.";
+		default: return "A weirdo. Looks like garbage.";
+	}
+}
+
 int get_map_enemy_sprite(int kin)
 {
 	switch (kin)
@@ -3585,6 +3603,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 	{
 		sprintf(ch[co].name, "%s", get_map_enemy_name(kin));
 		sprintf(ch[co].reference, "the %s", get_map_enemy_name(kin));
+		sprintf(ch[co].description, "%s", get_map_enemy_desc(kin));
 		ch[co].sprite = get_map_enemy_sprite(kin);
 		if (kin==10) // Set Simple Animation
 			ch[co].flags |= CF_SIMPLE;
