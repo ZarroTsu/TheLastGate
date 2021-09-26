@@ -22,6 +22,10 @@ extern int maxmem,usedmem,maxvid,usedvid;
 extern int noshop;
 extern int selected_char;
 
+// Scroll Wheel - using position from other files
+extern unsigned int inv_pos,skill_pos,wps_pos;
+extern int gui_inv_x[],gui_inv_y[],gui_skl_names[];
+
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 //int screen_overlay_sprite;
@@ -140,6 +144,7 @@ int dlg_col,dlg_fcol;
 
 extern int blockcnt,blocktot,blockgc;
 int mx=0,my=0;
+POINT pt;
 
 void say(char *input)
 {
@@ -197,6 +202,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 	PAINTSTRUCT ps;
 	int keys;
 	extern int ser_ver,xmove;
+	static int delta=0; // scrollwheel direction/speed
 
 	keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
@@ -540,6 +546,90 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 
 		case WM_RBUTTONUP:
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_RB_UP);
+			break;
+		
+		//  Adding support for Scroll Wheel
+		case WM_MOUSEWHEEL:
+            if (!(short)(HIWORD(wParam))) return 0;
+			
+			// Fix to grab X/Y for window mode / multi screen
+			pt.x = GET_X_LPARAM(lParam);
+			pt.y = GET_Y_LPARAM(lParam);
+			ScreenToClient(hWnd, &pt);
+
+			mx = pt.x;
+			my = pt.y;
+
+			delta+=(short)(HIWORD(wParam));
+			
+			// Scrolling Down
+			while (delta<=-120) {  	
+
+				//  INVENTORY
+				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1]) 
+				{ 
+					if (inv_pos<10)	inv_pos += 10; 
+				}
+				
+				//  SKILL LIST
+				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
+				{ 
+					if (skill_pos<40)	skill_pos += 1; 
+				}
+
+				//  WAYPOINT PAGE - this was defined in multiple places so one more cant hurt!
+				if (show_wps) {
+					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
+					{
+						if (wps_pos<(MAXWPS- 8))	wps_pos += 1;
+					}
+				}
+				
+				//	CHAT HISTORY - no good position placement so hardcoding
+				if (mx>973 && mx<1275 && my>6 && my<230) 
+				{ 
+					if (logstart>0) 
+					{
+						logstart-=3; logtimer=TICKS*30/TICKMULTI;
+					}
+				}
+				
+				delta+=120;
+			}			
+			
+			// SCROLLING UP
+			while (delta>=120) { 
+
+				//  INVENTORY
+				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1]) 
+				{ 
+					if (inv_pos> 1)	inv_pos -= 10; 
+				}
+				
+				//  SKILL LIST
+				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
+				{ 
+					if (skill_pos>0)	skill_pos -= 1; 
+				}
+
+				//  WAYPOINT PAGE
+				if (show_wps) {
+					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
+					{
+						if (wps_pos>0 )	wps_pos -= 1; 
+					}
+				}
+				
+				//  CHAT HISTORY
+				if (mx>973 && mx<1275 && my>6 && my<230) 
+				{ 
+					if (logstart<22*8) {
+						logstart+=3; logtimer=TICKS*30/TICKMULTI;
+					}
+				}
+
+				delta-=120;
+			}			
 			break;
 		
 		default:
