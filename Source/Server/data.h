@@ -559,9 +559,9 @@ struct character
 
 	unsigned int alt_worn[12];		// Alternative gear set in storage for swapping
 	
+	int os_points;					// Osiris points (for maps?)
 	
-	
-	char future2[50];				// space for future expansion
+	char future2[46];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -577,7 +577,7 @@ struct character
 	
 	int waypoints;					// known waypoint flags
 	
-	char future3[4];				// space for future expansion
+	int tokens;						// for gambling
 
 	time_t logout_date;
 

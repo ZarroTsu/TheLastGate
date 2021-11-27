@@ -45,15 +45,15 @@ usage of data for players:
 * `23:`     overall kill counter - below own rank
 * `24:`     overall kill counter - at own rank
 * `25:`     overall kill counter - above own rank
-* `26:`     black stronghold kill counter - line 1 (low)
-* `27:`     black stronghold kill counter - line 2 (mid)
-* `28:`     black stronghold kill counter - line 3 (high)
+* `26:`     Black Stronghold Kill Counter (to assure wave reward is legit)
+* `27:`     --Zarro-- Gambling: Player hand value & wager
+* `28:`     --Zarro-- Gambling: Dealer hand value & active game
 * `29:`     other players killed outside of arena
 * `30-39:`  soft ignore list
 * `40:`     shopkeepers etc. killed
-* `41:`     black stronghold points already spent
+* `41:`     											// Free!
 * `42:`     group
-* `43:`     black candles returned
+* `43:`     											// Free!
 * `44:`     number of times X was saved by the gods
 * `45:`     level X got hp/end/mana bonus for
 * `46-49:`  Flags of explorer points we visited (1,2,4,8,16)

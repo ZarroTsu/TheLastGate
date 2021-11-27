@@ -215,6 +215,8 @@ struct know
 #define AR_HERBS		224
 #define AR_TARGE		225
 #define AR_SEWER3		226
+//
+#define AR_CASINO		250
 //}
 //{ Neiseer
 #define AR_NEISEE		300		// locations in Neiseer
@@ -614,8 +616,19 @@ struct know
 #define AN_BS_STRO		"The monsters come from various parts of the Black Stronghold from the NORTH, CENTER, and SOUTH. As far as we know, this magic uses black candles. If you could bring us these black candles, we will REWARD you further."
 #define AN_BS_NORT		"The north gate is the closest to Aston, and fortunately our reports indicate these monsters are weakest. If you are unsure of yourself, this would be a good place to start assisting us."
 #define AN_BS_CENT		"The center gate leads into the Black Stronghold proper, and our reports indicate these monsters are of middling power. If you wish to enter the Black Stronghold, this is where you can approach."
-#define AN_BS_SOUT		"The south gate is the farthest from Aston, but our repors indicate these monsters are extremely strong. You should avoid approach, but if you assist us here you will be greatly REWARDed."
+#define AN_BS_SOUT		"The south gate is the farthest from Aston, but our reports indicate these monsters are extremely strong. You should avoid approach, but if you assist us here you will be greatly REWARDed."
 //
+
+//
+#define AN_CS_HELP		"The room on the left offers various GAMES to spend your TOKENS. The room on the right offers PRIZES you can trade TOKENS for."
+#define AN_CS_GAMES		"We offer HIGHROLLER, SNAKEEYES, and BLACKJACK. Most days each game costs 10 tokens to play. During new moons each costs 20 tokens, and during full moons each costs 30."
+#define AN_CS_PRIZES	"Roger offers items you can gamble for, while Jessica offers static items with no risk. All prizes must be purchased using TOKENS."
+#define AN_CS_HROLL		"HIGHROLLER is a game of chance using dice. You guess if the next roll will be HIGHer or LOWer than the previous one. Each successful guess ups the ante until you lose or PAYOUT."
+#define AN_CS_SEYES		"SNAKEEYES is a numbers game using dice. Each ROLL you make adds to your score, but rolling a 1 ends your turn with no score, and rolling two 1's sets your score to 0. First to 100 points wins."
+#define AN_CS_BJACK		"BLACKJACK is a card game where the player and dealer try to reach a high score without going over 21. You may HIT or STAND each turn. Face cards (JQK) are worth 10, and Aces (A) are worth 11 or 1."
+#define AN_CS_PLAY		"Speak to Yugi if you would like to PLAY something."
+//
+
 //}
 //{ Labyrinth Answers
 #define AN_LAB_HELP		"I can help with DOORS, KEYS, and RIDDLES. Let me know!"
@@ -726,6 +739,26 @@ struct know
 #define SP_TAROT		27
 #define SP_TAROT2		28
 #define SP_TAROT3		29
+//
+#define SP_TOKENS		30		// List Tokens
+#define SP_TOKEN_A		31		// Buy 10 Tokens
+#define SP_TOKEN_B		32		// Buy 100 Tokens
+#define SP_TOKEN_C		33		// Buy 1000 Tokens
+#define SP_CASIN_Q		39		// Quit current game with no payout
+//
+#define SP_HROLL_P		40		// Play High Roller
+#define SP_HROLL_H		41		// HIGH
+#define SP_HROLL_L		42		// LOW
+#define SP_HROLL_S		43		// Payout
+//
+#define SP_SEYES_P		50		// Play Snake Eyes
+#define SP_SEYES_R		51		// Roll
+#define SP_SEYES_E		52		// End turn
+//
+#define SP_BJACK_P		60		// Play Blackjack
+#define SP_BJACK_H		61		// Hit
+#define SP_BJACK_S		62		// Stand
+#define SP_BJACK_D		63		// Double Down
 //}
 
 // Knowledge table - the big one that handles everything
@@ -1146,6 +1179,43 @@ struct know know[] = {
 	{{"!north",  "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_NORT,   0},
 	{{"!center", "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_CENT,   0},
 	{{"!south",  "?outpost", "?gate",      "?", NULL}, 0,   AR_STHOLD, 372,     AN_BS_SOUT,   0},
+	//}
+	//{ Casino
+	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc
+	{{"!play", "!highroller",              "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_P},
+	{{"!play", "?high", "!roller",         "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_P},
+	{{"!high",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_H},
+	{{"!low",                              "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_L},
+	{{"!payout",                           "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_S},
+	{{"!pay", "?out",                      "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_S},
+	{{"!play", "!snakeeyes",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
+	{{"!play", "!snake", "?eyes",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
+	{{"!roll",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_R},
+	{{"!end", "?turn",                     "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_E},
+	{{"!play", "!blackjack",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_P},
+	{{"!play", "?black", "!jack",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_P},
+	{{"!hit", "?me",                       "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_H},
+	{{"!stand",                            "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_S},
+	{{"!stay",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_S},
+	{{"!double", "?down",                  "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_D},
+	{{"!stop",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_CASIN_Q},
+	{{"!play",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, AN_CS_GAMES, 0},
+	//
+	{{"!help",                             "!", NULL}, 0,   AR_CASINO,   0,   AN_CS_HELP  ,   0},
+	{{"?what", "!games",                   "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_GAMES ,   0},
+	{{"?what", "!prizes",                  "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_PRIZES,   0},
+	{{"?what", "!highroller",              "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_HROLL ,   0},
+	{{"?what", "?high", "!roller",         "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_HROLL ,   0},
+	{{"?what", "!snakeeyes",               "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_SEYES ,   0},
+	{{"?what", "!snake", "?eyes",          "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_SEYES ,   0},
+	{{"?what", "!blackjack",               "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_BJACK ,   0},
+	{{"?what", "?black", "!jack",          "?", NULL}, 0,   AR_CASINO,   0,   AN_CS_BJACK ,   0},
+	{{"!play",                             "!", NULL}, 0,   AR_CASINO,   0,   AN_CS_PLAY  ,   0},
+	//
+	{{"!tokens",                           "!", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKENS},
+	{{"!buy", "!ten",                      "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_A},
+	{{"!buy", "!hundred",                  "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_B},
+	{{"!buy", "!thousand",                 "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_C},
 	//}
 	//{ Dieties
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		CT_BISHOP
@@ -1890,6 +1960,675 @@ void answer_unlearn(int cn, int co)
 	}
 }
 
+void answer_tokens(int cn, int co, int nr)
+{
+	// Count
+	if (!nr)
+	{
+		do_sayx(cn, "You currently have %d tokens, %s.", ch[co].tokens, ch[co].name);
+		do_sayx(cn, "Each token is worth %d Gold. If you would like to buy some, you can BUY TEN, BUY HUNDRED, or BUY THOUSAND.", TOKEN_RATE);
+	}
+	// Buy
+	else
+	{
+		if (ch[co].gold >= nr)
+		{
+			ch[co].tokens += nr;
+			ch[co].gold -= nr*TOKEN_RATE;
+			do_sayx(cn, "Here you are, %s, %d tokens.", ch[co].name, nr);
+			chlog(co, "Bought %d tokens from %s", nr, ch[cn].name);
+			do_char_log(co, 2, "You got %d tokens. You now have %d.\n", nr, ch[co].tokens);
+		}
+		else
+		{
+			do_sayx(cn, "I'm sorry %s, but it looks like you can't afford that.", ch[co].name);
+		}
+	}
+}
+
+/*
+	Casino
+	
+	Each game has an ID number for reference,
+	1	High Roller
+	2	Snake Eyes
+	3	Blackjack
+	
+	Games use player data [26] and [27] for player and dealer numbers respectively.
+	
+	Currently active game is stored in high bytes in player data. [26]
+	Current wager is stored in high bytes in dealer data. [27]
+	
+	.data[26]<<26	(1 - 63)
+	
+	do_char_log(cn, 1, " \n");
+	//                 "!        .         .         .         .        !"
+	do_char_log(cn, 1, " \n");
+*/
+
+void casino_clear(int co)
+{
+	ch[co].data[26] = 0;
+	ch[co].data[27] = 0;
+}
+
+void casino_win(int co, int p)
+{
+	ch[co].tokens += p;
+	chlog(co, "Got %d tokens", p);
+	do_char_log(co, 2, "You got %d tokens. You now have %d.\n", p, ch[co].tokens);
+	casino_clear(co);
+}
+
+// flag = 0 on first turn, 1 on high, 2 on low
+// return 1 on a bust, 0 on a win
+int casino_hroll_dice(int co, int flag)
+{
+	int r1, r2, r3, rt;
+	int r, p, v, m;
+	
+	r1 = RANDOM(6)+1;
+	r2 = RANDOM(6)+1;
+	r3 = RANDOM(6)+1;
+	rt = r1 + r2 + r3;
+	
+	do_char_log(co, 1, " \n");
+	do_char_log(co, 1, "  The dealer rolled:   %d + %d + %d = %2d\n", r1, r2, r3, rt);
+	
+	if (flag)
+	{
+		r = ch[co].data[26] % (1<<26);
+		p = (ch[co].data[27] % (1<<16)) % (1<<26);
+		v = (ch[co].data[27]>>16) % (1<<26);
+		if (flag==1)	// High roll guess
+		{
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "        You wagered:   HIGHER than %2d\n", r);
+			do_char_log(co, 1, " \n");
+			if (r < rt)
+			{
+				do_char_log(co, 2, "Good guess!\n");
+				do_char_log(co, 1, "The pot was increased by %2d.%dx\n", v/10, v%10);
+				p = p * v / 10;
+				if (v < 30) v++;
+				ch[co].data[27] = p | (v<<16);
+			}
+			else
+			{
+				do_char_log(co, 0, "Bad luck! You lose...\n");
+				casino_clear(co);
+				return 1;
+			}
+		}
+		else				// Low roll guess
+		{
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "        You wagered:    LOWER than %2d\n", r);
+			do_char_log(co, 1, " \n");
+			if (r > rt)
+			{
+				do_char_log(co, 2, "Good guess!\n");
+				do_char_log(co, 1, "The pot was increased by %2d.%dx\n", v/10, v%10);
+				p = p * v / 10;
+				if (v < 30) v++;
+				ch[co].data[27] = p | (v<<16);
+			}
+			else
+			{
+				do_char_log(co, 0, "Bad luck! You lose...\n");
+				casino_clear(co);
+				return 1;
+			}
+		}
+	}
+	
+	ch[co].data[26] = rt | C_CUR_GAME(co)<<26;
+	return 0;
+}
+
+void casino_hroll_pot(int co)
+{
+	int p, v;
+	
+	p = (ch[co].data[27] % (1<<16)) % (1<<26);
+	v = (ch[co].data[27]>>16) % (1<<26);
+	
+	do_char_log(co, 1, " \n");
+	do_char_log(co, 2, "        Current pot: %4d\n", p);
+	do_char_log(co, 2, "  Next win is worth:   %2d.%dx\n", v/10, v%10);
+	do_char_log(co, 1, " \n");
+}
+
+void casino_hroll(int cn, int co, int nr)
+{
+	if (C_CUR_GAME(co) != C_GAME_HR) return;
+	
+	//  Pot stored in data[27]
+	//  Multiplier in data[27] << 16
+	// Roll stored in data[26]
+	
+	switch (nr)
+	{
+		case 0: 	// Starting Turn (Turn 0)
+			ch[co].data[27] |= (15<<16); // Set default multiplier
+			casino_hroll_dice(co, 0);
+			casino_hroll_pot(co);
+			do_char_log(co, 1, "Will you wager HIGH or LOW?\n");
+			break;
+		case 1: 	// Wager HIGH
+			if (casino_hroll_dice(co, 1)) return;
+			casino_hroll_pot(co);
+			do_char_log(co, 1, "The current roll is:               %2d\n", 
+				ch[co].data[26] % (1<<26));
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "Will you wager HIGH or LOW? Or will you PAYOUT?\n");
+			break;
+		case 2: 	// Wager LOW
+			if (casino_hroll_dice(co, 2)) return;
+			casino_hroll_pot(co);
+			do_char_log(co, 1, "The current roll is:               %2d\n", 
+				ch[co].data[26] % (1<<26));
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "Will you wager HIGH or LOW? Or will you PAYOUT?\n");
+			break;
+		case 3: 	// Payout
+			do_char_log(co, 1, "You cashed out. Congrats!\n");
+			casino_win(co, (ch[co].data[27] % (1<<16)) % (1<<26));
+			break;
+		default:
+			break;
+	}
+}
+
+
+// flag = 0 for turn 0, 1 for player roll, 2 for dealer roll
+int casino_seyes_roll(int co, int flag)
+{
+	int r1, r2, rt;
+	int i, w, t;
+	
+	do_char_log(co, 1, " \n");
+	
+	if (!flag)
+	{
+		// First turn we avoid rolling eyes
+		r1 = RANDOM(5)+2;
+		r2 = RANDOM(5)+2;
+		rt = r1 + r2;
+		
+		w = C_CUR_GAME(co);
+		t = (ch[co].data[26]>>16) % (1<<26);
+		ch[co].data[26]  = rt;
+		ch[co].data[26] |= w | t;
+		
+		do_char_log(co, 1, "   You rolled:   %d + %d\n", r1, r2);
+		do_char_log(co, 1, "   Turn Total:         = %3d\n", 
+			(ch[co].data[26] % (1<<16)) % (1<<26));
+	}
+	else if (flag == 1)
+	{
+		w = C_CUR_GAME(co);
+		t = (ch[co].data[26]>>16) % (1<<26);
+		
+		r1 = RANDOM(6)+1;
+		r2 = RANDOM(6)+1;
+		rt = r1 + r2;
+		
+		do_char_log(co, 1, "   You rolled:   %d + %d\n", r1, r2);
+		
+		if (r1 == 1 && r2 == 1)			// Snake Eyes!
+		{
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 0, "Snake Eyes! Your score was reset to 0.\n");
+			ch[co].data[26] = w;
+			return 1;
+		}
+		else if (r1 == 1 || r2 == 1)	// Ace ends turn
+		{
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 0, "Ace! Your turn ends with 0.\n");
+			ch[co].data[26] = w + t;
+			return 1;
+		}
+		
+		ch[co].data[26]  = rt;
+		ch[co].data[26] |= w | t;
+		do_char_log(co, 1, "   Turn Total:         = %3d\n", 
+			(ch[co].data[26] % (1<<16)) % (1<<26));
+	}
+	else
+	{
+		w = C_CUR_WAGER(co);
+		t = (ch[co].data[27]>>16) % (1<<26);
+		
+		for (i = 0, rt = 0; i < 3; i++)
+		{
+			r1 = RANDOM(6)+1;
+			r2 = RANDOM(6)+1;
+			rt += r1 + r2;
+			
+			do_char_log(co, 1, "Dealer rolled:   %d + %d\n", r1, r2);
+			
+			if (r1 == 1 && r2 == 1)			// Snake Eyes!
+			{
+				do_char_log(co, 1, " \n");
+				do_char_log(co, 2, "Snake Eyes! Dealer's score was reset to 0.\n");
+				ch[co].data[27] = w;
+				return 1;
+			}
+			else if (r1 == 1 || r2 == 1)	// Ace ends turn
+			{
+				do_char_log(co, 1, " \n");
+				do_char_log(co, 2, "Ace! Dealer's turn ends with 0.\n");
+				ch[co].data[27] = w + t;
+				return 1;
+			}
+		}
+		
+		ch[co].data[27]  = rt;
+		ch[co].data[27] |= w | t;
+	}
+	
+	return 0;
+}
+
+int casino_seyes_score(int co)
+{
+	int p, d;
+	
+	p = (ch[co].data[26]>>16) % (1<<26);
+	d = (ch[co].data[27]>>16) % (1<<26);
+	
+	do_char_log(co, 1, " \n");
+	do_char_log(co, 1, "   Your Score:           %3d\n", p);
+	do_char_log(co, 1, " Dealer Score:           %3d\n", d);
+	
+	// Check for a win
+	if (p >= 100)
+	{
+		do_char_log(co, 1, " \n");
+		do_char_log(co, 2, "You beat the dealer! You win!\n");
+		casino_win(co, C_CUR_WAGER(co)*25);
+		return 1;
+	}
+	else if (d >= 100)
+	{
+		do_char_log(co, 1, " \n");
+		do_char_log(co, 0, "The dealer beat you. You lose...\n");
+		casino_clear(co);
+		return 1;
+	}
+	
+	return 0;
+}
+
+void casino_seyes(int cn, int co, int nr)
+{
+	if (C_CUR_GAME(co) != C_GAME_SE) return;
+	
+	// Wager stored in data[26]<<26		C_CUR_WAGER(a)
+	// Player current roll: data[26]
+	// Player reserve roll: data[26]<<16
+	// Dealer current roll: data[27]
+	// Dealer reserve roll: data[27]<<16
+	
+	switch (nr)
+	{
+		case 0: 	// Starting Turn (Turn 0)
+			casino_seyes_roll(co, 0);
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "Will you ROLL or END your turn?\n");
+			break;
+		case 1: 	// Make a roll
+			if (casino_seyes_roll(co, 1)) casino_seyes_roll(co, 2);
+			if (casino_seyes_score(co)) return;
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "Will you ROLL or END your turn?\n");
+			break;
+		case 2: 	// End player turn (process win/lose and dealer turn)
+			casino_seyes_roll(co, 2);
+			if (casino_seyes_score(co)) return;
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "Will you ROLL or END your turn?\n");
+			break;
+		default:
+			break;
+	}
+}
+
+// Simple card name converter from 1 thru 13	(0 - 12)
+char *get_card_name(int v)
+{
+	static char *card_name[BJ_NUM_CARDS/2] = {
+		"[A ]","[ 2]","[ 3]","[ 4]","[ 5]",
+		"[ 6]","[ 7]","[ 8]","[ 9]","[10]",
+		"[J ]","[Q ]","[K ]"
+	};
+	return card_name[v%13];
+}
+
+// Pull card total from target dataset v
+int get_card_total(int co, int v)
+{
+	int i, j, total = 0;
+	
+	// Get value of non-ace cards
+	for (i = 0; i < BJ_NUM_CARDS; i++)
+	{
+		if (i%13 == 0) continue;
+		j = 1<<i;
+		if (ch[co].data[v] & j)
+		{
+			if (i%13 > 9)	total += 10; 			// Face cards
+			else			total += (i % 13) + 1;	// Number cards
+		}
+	}
+	
+	// Decide value of aces based on remaining total
+	for (i = 0; i < BJ_NUM_CARDS; i++)
+	{
+		if (i%13 != 0) continue;
+		j = 1<<i;
+		if (ch[co].data[v] & j)
+		{
+			if (total+11 > 21)	total +=  1;
+			else				total += 11;
+		}
+	}
+	
+	return total;
+}
+
+// Draw an unused card
+int get_new_card(int co, int v)
+{
+	int i, j = 0;
+	
+	while (j==0)
+	{
+		i = RANDOM(BJ_NUM_CARDS);
+		if (!(ch[co].data[v] & 1<<i)) j = 1;
+	}
+	return i;
+}
+
+void add_new_card(int co, int v, int flag)
+{
+	int deal;
+	
+	deal = get_new_card(co, v); ch[co].data[v] |= (1 << (deal));
+	
+	if (flag)
+	{
+		do_char_log(co, 1, "The Dealer drew two cards and placed one face down.");
+		deal = get_new_card(co, v); ch[co].data[v] |= (1 << (deal));
+	}
+	else
+	{
+		do_char_log(co, 1, "%s drew: %s\n", (v==26?"       You":"The dealer"), get_card_name(deal));
+	}
+}
+
+// Show hand. Flag is 1 or 2 for Dealer's turn 0.
+void casino_bjack_hands(int co, int flag)
+{
+	int i, j, v = 0;
+	char pcs[9][5] = { "","","","","","","","","" };
+	char dcs[9][5] = { "","","","","","","","","" };
+	
+	// Set Player Cards
+	for (i = 0, j = 0; i < BJ_NUM_CARDS; i++)
+	{
+		if (j >= 9) break;
+		if (ch[co].data[26] & 1<<i)
+		{
+			strcpy(pcs[j], get_card_name(i));
+			j++;
+		}
+	}
+	
+	// Set Dealer Cards
+	for (i = 0, j = 0; i < BJ_NUM_CARDS; i++)
+	{
+		if (j >= 9) break;
+		if (ch[co].data[27] & 1<<i)
+		{
+			if (flag && j == (flag-1)) 				// Turn 0 "total" for Dealer
+			{
+				if (i%13 == 0)	v = 11;				// Ace
+				if (i%13 > 9)	v = 10; 			// Face cards
+				else			v = (i % 13) + 1;	// Number cards
+			}
+			strcpy(dcs[j], get_card_name(i));
+			j++;
+		}
+	}
+	
+	do_char_log(co, 1, " \n");
+	do_char_log(co, 0, "Dealer's Hand:\n");
+	if (flag)
+	{
+		if (flag==2)	do_char_log(co, 0, " [><] %s\n", dcs[(flag-1)]);
+		else			do_char_log(co, 0, " %s [><]\n", dcs[(flag-1)]);
+		do_char_log(co, 0, "                                    TOTAL: %2d\n", v);
+	}
+	else
+	{
+		do_char_log(co, 0, " %s %s %s %s %s %s %s %s %s\n",
+			dcs[0], dcs[1], dcs[2], dcs[3], dcs[4], dcs[5], dcs[6], dcs[7], dcs[8]);
+		do_char_log(co, 0, "                                    TOTAL: %2d\n", get_card_total(co, 27));
+	}
+	do_char_log(co, 1, " \n");
+	do_char_log(co, 2, "Your Hand:\n");
+	do_char_log(co, 2, " %s %s %s %s %s %s %s %s %s\n",
+		pcs[0], pcs[1], pcs[2], pcs[3], pcs[4], pcs[5], pcs[6], pcs[7], pcs[8]);
+	do_char_log(co, 2, "                                    TOTAL: %2d\n", get_card_total(co, 26));
+	do_char_log(co, 1, " \n");
+	//                 "!        .         .         .         .        !"
+}
+
+int casino_bjack_winlose(int co, int stand)
+{
+	if (get_card_total(co, 26) > 21)								// Player busts
+	{
+		do_char_log(co, 0, "You bust. You lose...\n");
+		casino_clear(co);
+		return 1;
+	}
+	if (stand)
+	{
+		if (get_card_total(co, 26) > get_card_total(co, 27))		// Player high
+		{
+			do_char_log(co, 2, "You beat the dealer! You win!\n");
+			casino_win(co, C_CUR_WAGER(co)*20);
+		}
+		else if (get_card_total(co, 27) > 21)						// Dealer busts
+		{
+			do_char_log(co, 2, "The dealer busts! You win!\n");
+			casino_win(co, C_CUR_WAGER(co)*20);
+		}
+		else if (get_card_total(co, 26) < get_card_total(co, 27))	// Dealer high
+		{
+			do_char_log(co, 0, "The dealer beat you. You lose...\n");
+			casino_clear(co);
+		}
+		else if (get_card_total(co, 26) == get_card_total(co, 27))	// Draw
+		{
+			do_char_log(co, 1, "It's a draw. Your bet will be refunded.\n");
+			casino_win(co, C_CUR_WAGER(co)*10);
+		}
+		else														// Contingency (shouldn't happen)
+		{
+			do_char_log(co, 0, "Seems an error occured. Your bet will be refunded.\n");
+			casino_win(co, C_CUR_WAGER(co)*10);
+		}
+		return 1;
+	}
+	return 0;
+}
+
+void casino_bjack(int cn, int co, int nr)
+{
+	int i, j, s = 0;
+	if (C_CUR_GAME(co) != C_GAME_BJ) return;
+	
+	// Check if we're on turn 1
+	if (nr > 0) for (i = 0, j = 0; i < BJ_NUM_CARDS; i++)
+	{
+		if ((ch[co].data[26] & 1<<i) || (ch[co].data[27] & 1<<i)) j++;
+	}
+	
+	switch (nr)
+	{
+		case 0: 	// Starting Turn (Turn 0)
+			add_new_card(co, 27, 1); 				// Dealer's cards
+			add_new_card(co, 26, 0); 				// Player card 1
+			add_new_card(co, 26, 0); 				// Player card 2
+			casino_bjack_hands(co, RANDOM(2)+1); 	// Show table
+			if (get_card_total(co, 26) == 21)		// Player has Blackjack!
+			{
+				if (get_card_total(co, 27) != 21)
+				{
+					do_char_log(co, 2, "You got a Blackjack! Congratulatons!\n");
+					do_area_log(co, 0, ch[cn].x, ch[cn].y, 1, "%s got a Blackjack!\n", ch[co].name);
+					casino_win(co, C_CUR_WAGER(co)*25);
+				}
+				else
+				{
+					do_char_log(co, 1, "The dealer flipped their face-down card.\n");
+					do_char_log(co, 1, "Looks like you both got a Blackjack. Your bet will be refunded.\n");
+					casino_win(co, C_CUR_WAGER(co)*10);
+				}
+				return;
+			}
+			if (get_card_total(co, 26) >= 9 && get_card_total(co, 26) <= 11)
+				do_char_log(co, 1, "Will you HIT, STAND, or DOUBLE down?\n");
+			else
+				do_char_log(co, 1, "Will you HIT or STAND?\n");
+			break;
+		case 1: 	// Hit
+			add_new_card(co, 26, 0);
+			casino_bjack_hands(co, RANDOM(2)+1); 		// Show table
+			if (casino_bjack_winlose(co, 0)) return;	// Check for player bust
+			do_char_log(co, 1, "Will you HIT or STAND?\n");
+			break;
+		case 2: 	// Stand
+			do_char_log(co, 1, "You stand.\n"); 
+			do_char_log(co, 1, "The dealer flipped their face-down card.\n");
+			if (get_card_total(co, 27) < 17) 
+				while (get_card_total(co, 27) < 17) add_new_card(co, 27, 0);
+			else 
+				do_char_log(co, 1, "The dealer stands.\n");
+			casino_bjack_hands(co, 0); 		// Show table
+			casino_bjack_winlose(co, 1);	// Process ending
+			return;
+		case 3: 	// Double-down -- first turn only & total 9, 10, or 11
+			if (!(get_card_total(co, 26) >= 9 && get_card_total(co, 26) <= 11))
+			{
+				do_char_log(co, 1, " \n");
+				do_char_log(co, 0, "You may only double-down with a total of 9, 10, or 11.\n");
+				do_char_log(co, 1, " \n");
+				do_char_log(co, 1, "Will you HIT or STAND?\n");
+				return;
+			}
+			if (j > 4) 
+			{
+				do_char_log(co, 1, " \n");
+				do_char_log(co, 0, "You may only double-down on turn 1.\n");
+				do_char_log(co, 1, " \n");
+				do_char_log(co, 1, "Will you HIT or STAND?\n");
+				return;
+			}
+			do_char_log(co, 1, "You doubled-down with an additional %d tokens.\n", C_CUR_WAGER(co)*10);
+			ch[co].tokens -= C_CUR_WAGER(co)*10;
+			ch[co].data[27] |= C_CUR_WAGER(co)<<26;
+			add_new_card(co, 26, 0);
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "The dealer flipped their face-down card.\n");
+			if (get_card_total(co, 27) < 17) 
+				while (get_card_total(co, 27) < 17) add_new_card(co, 27, 0);
+			else 
+				do_char_log(co, 1, "The dealer stands.\n");
+			casino_bjack_hands(co, 0); 		// Show table
+			casino_bjack_winlose(co, 1);	// Process ending
+			return;
+		default:
+			break;
+	}
+}
+
+void casino_play(int cn, int co, int nr)
+{
+	int v = C_CUR_GAME(co);
+	int wager = 1;
+	
+	if (globs->fullmoon)	wager = 3;
+	if (globs->newmoon)		wager = 2;
+	
+	// Check if there's an active game already...
+	if (v >= 1 && v <= 3)
+	{
+		do_sayx(cn, "Sorry %s, you're busy with a game of %s%s%s already. Did you want to STOP?", 
+			ch[co].name, (v==1 ? "High Roller":""), (v==2 ? "Snake Eyes":""), (v==3 ? "Blackjack":""));
+		return;
+	}
+	
+	// Check if we can afford to play
+	if (wager*10 > ch[co].tokens)
+	{
+		do_sayx(cn, "Sorry %s, seems you don't have enough tokens. You will need %d to play today.", wager*10);
+		return;
+	}
+	
+	// If no games are active, wipe the data clean.
+	casino_clear(co);
+	
+	switch (nr)
+	{
+		case 1:
+			do_sayx(cn, "Okay %s, let's play some High Roller.", ch[co].name);
+			ch[co].data[26] = C_SET_GAME_HR;
+			ch[co].data[27] = wager*10;
+			ch[co].tokens -= wager*10;
+			do_char_log(co, 2, "You paid %d tokens. You now have %d.\n", wager*10, ch[co].tokens);
+			casino_hroll(cn, co, 0);
+			break;
+		case 2:
+			do_sayx(cn, "Okay %s, let's play some Snake Eyes.", ch[co].name);
+			ch[co].data[26] = C_SET_GAME_SE;
+			ch[co].data[27] = (wager<<26);
+			ch[co].tokens -= wager*10;
+			do_char_log(co, 2, "You paid %d tokens. You now have %d.\n", wager*10, ch[co].tokens);
+			casino_seyes(cn, co, 0);
+			break;
+		case 3:
+			do_sayx(cn, "Okay %s, let's play some Black Jack.", ch[co].name);
+			ch[co].data[26] = C_SET_GAME_BJ;
+			ch[co].data[27] = (wager<<26);
+			ch[co].tokens -= wager*10;
+			do_char_log(co, 2, "You paid %d tokens. You now have %d.\n", wager*10, ch[co].tokens);
+			casino_bjack(cn, co, 0);
+			break;
+		default:
+			chlog(co, "Bad game number in casino_play");
+			ch[co].data[27] = 0;
+			break;
+	}
+}
+
+void casino_quit(co)
+{
+	int v = C_CUR_GAME(co);
+	
+	if (v)
+	{
+		do_char_log(co, 0, "You stopped playing %s%s%s and forfeit your %d wager.\n",
+			(v==1 ? "High Roller":""), (v==2 ? "Snake Eyes":""), (v==3 ? "Blackjack":""),
+			C_CUR_WAGER(co));
+	}
+	casino_clear(co);
+}
+
 //
 
 void answer_health(int cn, int co)
@@ -1959,6 +2698,7 @@ void answer_time(int cn, int co)
 	        globs->mdyear, globs->mdtime / 3600, (globs->mdtime / 60) % 60);
 }
 
+/*
 int stronghold_points_old(int cn)
 {
 	return(ch[cn].data[26] / 5 		// tier 1
@@ -1971,6 +2711,7 @@ int stronghold_points_old(int cn)
 			-
 			ch[cn].data[41]);		// used points
 }
+
 int stronghold_points(int cn)
 {
 	int p;
@@ -1985,11 +2726,12 @@ int stronghold_points(int cn)
 	}
 	return ch[cn].bs_points;
 }
+*/
 
 void answer_points(int cn, int co, int nr)
 {
 	int exp, pts;
-	pts = stronghold_points(co);
+	pts = ch[co].bs_points;
 	do_sayx(cn, know[nr].answer, pts);
 }
 
@@ -2027,6 +2769,23 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_TAROT2:		answer_tarot(cn, co, WN_CHARM2); break;
 		case SP_TAROT3:		answer_tarot(cn, co, WN_RRING); break;
 		case SP_UNLEARN:	answer_unlearn(cn, co); break;
+		//
+		case SP_TOKENS:		answer_tokens(cn, co, 0); break;
+		case SP_TOKEN_A:	answer_tokens(cn, co, 10); break;
+		case SP_TOKEN_B:	answer_tokens(cn, co, 100); break;
+		case SP_TOKEN_C:	answer_tokens(cn, co, 1000); break;
+		case SP_HROLL_P:	casino_play(cn, co, 1); break;
+		case SP_SEYES_P:	casino_play(cn, co, 2); break;
+		case SP_BJACK_P:	casino_play(cn, co, 3); break;
+		case SP_HROLL_H:	casino_hroll(cn, co, 1); break;
+		case SP_HROLL_L:	casino_hroll(cn, co, 2); break;
+		case SP_HROLL_S:	casino_hroll(cn, co, 3); break;
+		case SP_SEYES_R:	casino_seyes(cn, co, 1); break;
+		case SP_SEYES_E:	casino_seyes(cn, co, 2); break;
+		case SP_BJACK_H:	casino_bjack(cn, co, 1); break;
+		case SP_BJACK_S:	casino_bjack(cn, co, 2); break;
+		case SP_BJACK_D:	casino_bjack(cn, co, 3); break;
+		case SP_CASIN_Q:	casino_quit(co); break;
 		default:break;
 	}
 }

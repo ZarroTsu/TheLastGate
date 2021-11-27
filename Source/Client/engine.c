@@ -1723,7 +1723,9 @@ void eng_display_win(int plr_sprite,int init)
 						}
 						if (show_shop==2) // Black Stronghold
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
-						if (show_shop==3) // Future
+						if (show_shop==3) // Casino
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
+						if (show_shop==4) // Future
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
 					}
 				} 
@@ -1740,7 +1742,9 @@ void eng_display_win(int plr_sprite,int init)
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
 				if (show_shop==2) // Black Stronghold
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
-				if (show_shop==3) // Future
+				if (show_shop==3) // Casino
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
+				if (show_shop==4) // Future
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
 			}
 

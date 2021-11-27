@@ -317,6 +317,7 @@ int rank2points(int v);
 int points_tolevel(int curr_exp);
 int scale_exps(int cn, int co, int exps);
 int scale_exps2(int cn, int co_rank, int exps);
+int change_casino_shop_item(int in);
 int change_bs_shop_item(int cn, int in);
 int get_special_item(int in, int gen_a, int gen_b, int gen_c);
 int get_special_spr(int in, int spr);
@@ -403,7 +404,7 @@ int is_unique(int in);
 // --- talk ---
 void npc_hear(int cn, int co, char *text);
 void strlower(char *str);
-int stronghold_points(int cn);
+//int stronghold_points(int cn);
 void answer_transfer(int cn, int co, int msg);
 
 // --- area ---

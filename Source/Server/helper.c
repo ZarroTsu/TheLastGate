@@ -941,8 +941,8 @@ int get_best_weapon(int cn, int v)
 int get_best_armor(int cn, int v)
 {
 	int in = 0, n, m, z;
-	static int a_helm[7]   = { 94, 76, 71, 66, 61, 56, 51 };
-	static int a_body[7]   = { 96, 78, 73, 68, 63, 58, 53 };
+	static int a_helm[7]   = { 94, 2028, 76, 71, 66, 61, 56, 51 };
+	static int a_body[7]   = { 96, 2030, 78, 73, 68, 63, 58, 53 };
 	static int c_helm[4]   = { 352, 347, 342, 337 };
 	static int c_body[4]   = { 354, 349, 344, 339 };
 	
@@ -992,6 +992,159 @@ int get_best_armor(int cn, int v)
 				if (m==5) { in = z; break; }
 			}
 			break;
+		default: break;
+	}
+	
+	return in;
+}
+
+int get_casino_potion()
+{	
+	static int item[] = {
+		IT_POT_M_HP, IT_POT_N_HP, IT_POT_G_HP, IT_POT_H_HP, IT_POT_S_HP, IT_POT_C_HP, IT_POT_L_HP, IT_POT_D_HP,
+		IT_POT_M_EN, IT_POT_N_EN, IT_POT_G_EN, IT_POT_H_EN, IT_POT_S_EN, IT_POT_C_EN, IT_POT_L_EN, IT_POT_D_EN, 
+		IT_POT_M_MP, IT_POT_N_MP, IT_POT_G_MP, IT_POT_H_MP, IT_POT_S_MP, IT_POT_C_MP, IT_POT_L_MP, IT_POT_D_MP,
+		IT_POT_VITA, IT_POT_CLAR, IT_POT_SAGE, IT_POT_RAIN, IT_POT_LIFE, IT_POT_DEAD, IT_POT_GOLEM, 
+		IT_POT_BRV, IT_POT_WIL, IT_POT_INT, IT_POT_AGL, IT_POT_STR, IT_POT_EXHP, IT_POT_EXEN, IT_POT_EXMP, 
+		IT_POT_PRE, IT_POT_EVA, IT_POT_MOB, IT_POT_FRE, IT_POT_MAR, IT_POT_IMM, IT_POT_CLA, IT_POT_THO, 
+		IT_POT_BRU, IT_POT_RES, IT_POT_APT, IT_POT_OFF, IT_POT_DEF, IT_POT_PER, IT_POT_STE, 
+		BUF_IT_PIGS, BUF_IT_AALE, BUF_IT_DRAG, BUF_IT_MANA, 
+		IT_RPOT, IT_GPOT, IT_SPOT
+	};
+	return item[RANDOM(sizeof( item) / sizeof(int))];
+}
+
+int get_casino_scroll()
+{
+	static int item[] = {
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
+		
+		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		
+		IT_POP_ISPEL, IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6, 
+		IT_POP_ISPEL, IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6, 
+		
+		IT_POP_SSPEL, IT_POP_SSPEL+1, IT_POP_SSPEL+2, IT_POP_SSPEL+3, IT_POP_SSPEL+4, IT_POP_SSPEL+5, IT_POP_SSPEL+6, 
+		
+		IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, 
+		IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, 
+		
+		IT_RD_HP, IT_RD_HP, IT_RD_HP, 
+		IT_RD_MP, IT_RD_MP, IT_RD_MP, 
+		
+		IT_RD_BRV, IT_RD_WIL, IT_RD_INT, IT_RD_AGL, IT_RD_STR
+	};
+	return item[RANDOM(sizeof( item) / sizeof(int))];
+}
+
+int get_casino_tarot()
+{
+	static int item[] = {
+		IT_CH_FOOL, IT_CH_MAGI, IT_CH_PREIST, IT_CH_EMPRESS, IT_CH_EMPEROR, 
+		IT_CH_HEIROPH, IT_CH_LOVERS, IT_CH_CHARIOT, IT_CH_STRENGTH, IT_CH_HERMIT, 
+		IT_CH_WHEEL, IT_CH_JUSTICE, IT_CH_HANGED, IT_CH_DEATH, IT_CH_TEMPER, 
+		IT_CH_DEVIL, IT_CH_TOWER, IT_CH_STAR, IT_CH_MOON, IT_CH_SUN, IT_CH_JUDGE, IT_CH_WORLD, 
+		IT_CH_FOOL, IT_CH_MAGI, IT_CH_PREIST, IT_CH_EMPRESS, IT_CH_EMPEROR, 
+		IT_CH_HEIROPH, IT_CH_LOVERS, IT_CH_CHARIOT, IT_CH_STRENGTH, IT_CH_HERMIT, 
+		IT_CH_WHEEL, IT_CH_JUSTICE, IT_CH_HANGED, IT_CH_DEATH, IT_CH_TEMPER, 
+		IT_CH_DEVIL, IT_CH_TOWER, IT_CH_STAR, IT_CH_MOON, IT_CH_SUN, IT_CH_JUDGE, IT_CH_WORLD, 
+		IT_CH_FOOL, IT_CH_MAGI, IT_CH_PREIST, IT_CH_EMPRESS, IT_CH_EMPEROR, 
+		IT_CH_HEIROPH, IT_CH_LOVERS, IT_CH_CHARIOT, IT_CH_STRENGTH, IT_CH_HERMIT, 
+		IT_CH_WHEEL, IT_CH_JUSTICE, IT_CH_HANGED, IT_CH_DEATH, IT_CH_TEMPER, 
+		IT_CH_DEVIL, IT_CH_TOWER, IT_CH_STAR, IT_CH_MOON, IT_CH_SUN, IT_CH_JUDGE, IT_CH_WORLD, 
+		
+		IT_CH_FOOL_R, IT_CH_MAGI_R, IT_CH_PREIST_R, IT_CH_EMPRES_R, IT_CH_EMPERO_R, 
+		IT_CH_HEIROP_R, IT_CH_LOVERS_R, IT_CH_CHARIO_R, IT_CH_STRENG_R, IT_CH_HERMIT_R, 
+		IT_CH_WHEEL_R, IT_CH_JUSTIC_R, IT_CH_HANGED_R, IT_CH_DEATH_R, IT_CH_TEMPER_R, 
+		IT_CH_DEVIL_R, IT_CH_TOWER_R, IT_CH_STAR_R, IT_CH_MOON_R, IT_CH_SUN_R, IT_CH_JUDGE_R, IT_CH_WORLD_R
+	};
+	return item[RANDOM(sizeof( item) / sizeof(int))];
+}
+
+int get_casino_ring()
+{
+	static int item[] = {
+		IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, 
+		IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, 
+		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
+		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
+		2073, 2074, 2075, 2076, 
+		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
+		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
+		2073, 2074, 2075, 2076, 
+		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
+		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
+		2073, 2074, 2075, 2076, 
+		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
+		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
+		2073, 2074, 2075, 2076, 
+		
+		IT_GOLD_RING, IT_GOLD_RING, IT_GOLD_RING, 
+		IT_GOLD_RING, IT_GOLD_RING, IT_GOLD_RING, 
+		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
+		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
+		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
+		2085, 2086, 
+		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
+		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
+		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
+		2085, 2086, 
+		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
+		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
+		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
+		2085, 2086, 
+		
+		IT_PLAT_RING, IT_PLAT_RING, 
+		IT_PLAT_RING, IT_PLAT_RING, 
+		1414, 1420, 1426, 1415, 1421, 1427, 1416, 1422, 1428, 
+		1417, 1423, 1429, 1418, 1424, 1430, 1419, 1425, 1431, 
+		2087, 2091, 2097, 2088, 2092, 2098, 2089, 2093, 2099, 
+		2090, 2094, 2100, 2095, 2101, 2102, 
+		1414, 1420, 1426, 1415, 1421, 1427, 1416, 1422, 1428, 
+		1417, 1423, 1429, 1418, 1424, 1430, 1419, 1425, 1431, 
+		2087, 2091, 2097, 2088, 2092, 2098, 2089, 2093, 2099, 
+		2090, 2094, 2100, 2095, 2101, 2102, 
+		
+		1272, 1272, 1272, 1272, 
+		1273, 1273, 1273, 1273, 
+		2399, 2399, 2399, 
+		2381, 2381, 2381, 
+		2103, 2103, 
+		
+		IT_TW_PROPHET, IT_TW_SINBIND
+	};
+	return item[RANDOM(sizeof( item) / sizeof(int))];
+}
+
+// Randomize certain prizes from the casino
+int change_casino_shop_item(int in)
+{
+	if (!IS_SANEITEM(in))
+		return 0;
+	
+	switch (in)
+	{
+		case IT_CASI_POTI:		// Random Potion
+			in = get_casino_potion();
+			break;
+		
+		case IT_CASI_SCRO:		// Random Scroll
+			in = get_casino_scroll();
+			break;
+			
+		case IT_CASI_TARO:		// Random Tarot
+			in = get_casino_tarot();
+			break;
+			
+		case IT_CASI_RING:		// Random Ring
+			in = get_casino_ring();
+			break;
+		
 		default: break;
 	}
 	
@@ -1120,6 +1273,14 @@ int get_special_item(int in, int gen_a, int gen_b, int gen_c)
 
 		default:
 			in2 = god_create_item(in);
+			if (it[in2].temp == IT_EXPS)
+			{
+				it[in2].data[0] = RANDOM(25) * 2000;
+			}
+			else if (it[in2].temp == IT_LUKS)
+			{
+				it[in2].data[0] = RANDOM(25) * 200;
+			}
 			break;
 	}
 	return in2;
@@ -3214,7 +3375,7 @@ int can_be_soulstoned(int in)
 		1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 
 		1656, 2045, 2055, 2056, 1657, 1658, 1659,
 		// other
-		2104, 2109, 
+		2104, 2109, IT_BONEARMOR, 
 		IT_CH_FOOL
 		};
 	int n, temp;
@@ -3470,6 +3631,9 @@ char *get_map_enemy_name(int kin)
 		case  8: return "Gargoyle";
 		case  9: return "Ice Garg";
 		case 10: return "Flame";
+		//
+		
+		//
 		default: return "Weirdo";
 	}
 }
@@ -3488,6 +3652,9 @@ char *get_map_enemy_desc(int kin)
 		case  8: return "A gargoyle. Its eyes glow a deep red.";
 		case  9: return "An ice gargoyle. Its eyes glow a deep red.";
 		case 10: return "A living flame. Its eyes glow a deep red.";
+		//
+		
+		//
 		default: return "A weirdo. Looks like garbage.";
 	}
 }
@@ -3506,6 +3673,9 @@ int get_map_enemy_sprite(int kin)
 		case  8: return 18384; // BS Gargoyle
 		case  9: return 21456; // BS Icey
 		case 10: return 22480; // BS Flame
+		//
+		
+		//
 		default: return  2000;
 	}
 }
@@ -3516,6 +3686,9 @@ char *get_map_enemy_affix(int affix)
 	{
 		case  1: return "tough";
 		case  2: return "fierce";
+		//
+		
+		//
 		default: return "odd";
 	}
 }
@@ -3526,6 +3699,9 @@ int get_map_enemy_affix_length(int affix)
 	{
 		case  1: return 5;
 		case  2: return 6;
+		//
+		
+		//
 		default: return 3;
 	}
 }
@@ -3575,6 +3751,8 @@ int get_map_eme[11][60] = {
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,
 	  0,50, 0,55,60, 0, 0, 0,75,80,75,55, 0, 0, 0, 0, 0, 0, 0, 0,
 	  0, 0, 0,40, 0, 0, 0, 0, 0, 0,45,40,60,50,55,40,50,30,48,52}  // 10 : bs flame
+	//
+	
 	 
 };
 
@@ -3659,6 +3837,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix)
 				if (!(ch[co].flags & CF_CANCRIT))
 					ch[co].flags |= CF_CANCRIT;
 				break;
+			//
+			
+			//
 			default:
 				break;
 		}

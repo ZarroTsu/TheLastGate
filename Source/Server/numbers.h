@@ -113,6 +113,13 @@
 #define CT_BSMAGE3		1006
 #define CT_TACTICIAN	 372
 
+#define CT_ROGER		1314	// Random Rewards
+#define CT_JESSICA		1315	// Static Rewards
+#define CT_KAIBA		1312	// Casino Tokens
+#define CT_YUGI			1313	// Casino Games
+
+#define CT_OSIRIS		8888
+
 #define BS_HOUR 		3600
 #define BS_MINS 		(BS_HOUR/60)
 #define BS_RC			  20
@@ -134,7 +141,7 @@
 
 #define IT_RPOT			 267
 #define IT_GPOT			 833
-#define IT_SPOT			 833
+#define IT_SPOT			1479
 
 #define IT_HERBA		1798
 #define IT_HERBB		1799
@@ -268,6 +275,14 @@
 #define IT_WP_GILDSHINE	  	30017
 #define IT_WP_BRONCHIT	  	30018
 #define IT_WP_VOLCANF	  	30019
+
+// Other
+
+#define IT_MISERRING		10001
+#define IT_FORTERING		10002
+#define IT_GAMBLERFAL		10003
+#define IT_WHITEBELT		10004
+#define IT_BONEARMOR		10005
 
 // -----
 
@@ -583,6 +598,13 @@
 #define IT_BOOK_BISH	2055
 #define IT_BOOK_GREA	2056
 
+// ----- Casino
+
+#define IT_CASI_POTI	2476
+#define IT_CASI_SCRO	2477
+#define IT_CASI_TARO	2478
+#define IT_CASI_RING	2479
+
 
 // -------- pop_create_bonus -------- //
 
@@ -717,5 +739,34 @@
 #define EP_GOLEM3Y		410
 #define EP_GOLEM4X		936
 #define EP_GOLEM4Y		414
+
+//
+
+#define MM_CHUNK_S		 7
+#define MM_MAP_SIZ		 9
+
+// X/Y for map tile chunks
+#define MM_TILE1_X		 2
+#define MM_TILE1_Y		20
+#define MM_TILE2_X		 2 +   8
+#define MM_TILE2_Y		20
+#define MM_TILE3_X		 2
+#define MM_TILE3_Y		20 + 640
+#define MM_TILE4_X		 2 +   8
+#define MM_TILE4_Y		20 + 640
+#define MM_TILE5_X		 2
+#define MM_TILE5_Y		20 + 640*2
+#define MM_TILE6_X		 2 +   8
+#define MM_TILE6_Y		20 + 640*2
+
+// Offset for each individual chunk
+#define MM_TILE_OF		 8
+
+// X/Y for the target where a map is built
+#define MM_TARGETX		  22
+#define MM_TARGETY		1027
+
+// Offset for additional maps
+#define MM_TARG_OF		  77
 
 //

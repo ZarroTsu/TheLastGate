@@ -231,7 +231,9 @@ void look_extra(int cn, int in)
 	case IT_AM_FALMOON: 
 		do_char_log(cn, 3, "When equipped, you cannot cast or receive spells of any kind.\n");
 		break;
-	
+	case IT_GAMBLERFAL: 
+		do_char_log(cn, 3, "When equipped, this item activates for 4 seconds and grants 10 hitpoints upon dealing a critical hit.\n");
+		break;
 		
 	// -------- BELT  ITEMS --------
 	
@@ -239,6 +241,18 @@ void look_extra(int cn, int in)
 	case IT_BL_LUNAR: 
 	case IT_BL_ECLIPSE: 
 		do_char_log(cn, 3, "Grants passive bonuses during the day (6:00 to 18:00), and active bonuses during the night (18:00 to 6:00).\n");
+		break;
+	case IT_WHITEBELT: // The White Belt
+		do_char_log(cn, 3, "When equipped, get WV from your Hand to Hand skill and 1% base crit if your main hand and off hand are empty.\n");
+		break;
+		
+	// -------- RING  ITEMS --------
+		
+	case IT_MISERRING: // Miser Ring
+		do_char_log(cn, 3, "When equipped and activated, grants 50%% more gold from enemies you kill.\n");
+		break;
+	case IT_FORTERING: // Forte Ring
+		do_char_log(cn, 3, "When equipped and activated, grants 50%% more EXP from enemies you kill.\n");
 		break;
 
 	// -------- DRINK ITEMS --------
@@ -353,6 +367,10 @@ void look_extra(int cn, int in)
 		break;
 	case IT_WP_VOLCANF: 
 		do_char_log(cn, 3, "When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n");
+		break;
+		
+	case IT_BONEARMOR: 
+		do_char_log(cn, 0, "Become undead.\n");
 		break;
 	
 	default:

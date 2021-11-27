@@ -164,3 +164,20 @@
 // Frostburn's formula (degen per tick)
 #define FROSTBFORM(p, d)	((p * 1000) / d)
 
+
+/* *** CASINO *** */
+
+#define TOKEN_RATE			10
+
+#define C_CUR_GAME(a)		(ch[(a)].data[26]>>26)
+#define C_CUR_WAGER(a)		(ch[(a)].data[27]>>26)
+
+#define C_GAME_HR			1
+#define C_GAME_SE			2
+#define C_GAME_BJ			3
+
+#define C_SET_GAME_HR		(1<<26)
+#define C_SET_GAME_SE		(2<<26)
+#define C_SET_GAME_BJ		(3<<26)
+
+#define BJ_NUM_CARDS		26

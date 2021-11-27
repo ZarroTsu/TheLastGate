@@ -3,7 +3,7 @@
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
-	#define MHOST		"192.168.0.11"
+	#define MHOST		"10.0.0.66"
 #else
 	#define MNAME		"The Last Gate"
 	#define MHOST		"thelastgate.ddns.net"
@@ -176,6 +176,7 @@ struct cplayer {
 	int gold;
 	int bs_points;  // Point total for Black Stronghold
 	int os_points;  // Points for future content
+	int tokens; 	// Points for gambling
 	int waypoints;
 
 	// items carried
@@ -327,6 +328,7 @@ struct cplayer {
 #define SV_SHOWMOTD					75
 #define SV_SETCHAR_WPS				76
 #define SV_CLEARBOX					77
+#define SV_SETCHAR_TOK				78
 
 #define SV_MOTD						82
 #define SV_MOTD0					82

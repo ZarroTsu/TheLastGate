@@ -1222,7 +1222,7 @@ void god_info(int cn, int co)
 			            ch[co].data[23], ch[co].data[24], ch[co].data[25]);
 			do_char_log(cn, 3, "Killed %d players outside arena, killed %d shopkeepers.\n",
 			            ch[co].data[29], ch[co].data[40]);
-			do_char_log(cn, 3, "Stronghold: %d total points\n", stronghold_points(co));
+			do_char_log(cn, 3, "Stronghold: %d total points\n", ch[co].bs_points);
 		}
 		do_char_log(cn, 1, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
 			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
@@ -3721,6 +3721,8 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].pass2     = old.pass2;
 	ch[co].gold      = old.gold;
 	ch[co].bs_points = old.bs_points;
+	ch[co].os_points = old.os_points;
+	ch[co].tokens    = old.tokens;
 
 	strcpy(ch[co].name, old.name);
 	strcpy(ch[co].reference, old.name);
@@ -3854,12 +3856,14 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[22] = 0;      // arena monster reset
 		ch[co].data[45] = 0;      // current rank
 		
-		// Reset BS flags
+		// Reset BS flags etc.
 		ch[co].bs_points = 0;
+		ch[co].os_points = 0;
+		ch[co].tokens = 0;
 		ch[co].data[26] = 0;
 		ch[co].data[27] = 0;
 		ch[co].data[28] = 0;
-		ch[co].data[41] = 0;
+		//ch[co].data[41] = 0; // Free slot
 		
 		// Reset Pole flags
 		ch[co].data[46] = 0;

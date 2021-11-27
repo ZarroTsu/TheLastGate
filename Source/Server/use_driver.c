@@ -1409,7 +1409,7 @@ void quick_mob_respawn(int dr, int v)
 	
 	for (; m<n; m++)
 	{
-		x++; if (x>y) { x=0; m+=(MAPX-y); }
+		//x++; if (x>y) { x=0; m+=(MAPX-y); }
 		if ((in = map[m].it)==0) 	continue;
 		if (it[in].driver!=dr) 		continue;
 		if (it[in].data[0]!=v) 		continue;
@@ -4618,7 +4618,8 @@ int use_kill_undead(int cn, int in)
 			}
 			if ((co = map[x + y * MAPX].ch)!=0)
 			{
-				if (ch[co].flags & CF_UNDEAD)
+				if ((ch[co].flags & CF_UNDEAD) || 
+					(ch[co].worn[WN_BODY] && it[ch[co].worn[WN_BODY]].temp == IT_BONEARMOR))
 				{
 					do_hurt(cn, co, 500, 2);
 					fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);

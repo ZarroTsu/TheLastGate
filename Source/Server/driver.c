@@ -3394,153 +3394,153 @@ void stronghold_mage_driver(int cn)
 static int bs_waves[3][15][9][7] = {
 {		// Mage 1
 	{			// Wave  1
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, 
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 },
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 4 }
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS *15 }
 	}, {		// Wave  2
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 },
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 0, 0, 0, 0, TICKS * 8 }
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 1, 0, 0, 0, 0, TICKS *10 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 1, 0, 0, 0, 0, TICKS *10 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 1, 0, 0, 0, 0, TICKS *10 }, { 1, 1, 0, 0, 0, 0, TICKS *30 }
 	}, {		// Wave  3
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, 
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 },
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 8 }
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 0, 0, 0, 0, 0, TICKS * 5 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 1, 0, 0, 0, 0, TICKS *10 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 1, 0, 0, 0, 0, TICKS *10 }, { 2, 2, 0, 0, 0, 0, TICKS *30 }
 	}, {		// Wave  4
-		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 },
-		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 1, 0, 0, 0, TICKS *12 }
+		{ 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 1, 0, 0, 0, 0, TICKS *10 }, 
+		{ 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 1, 0, 0, 0, 0, TICKS *10 }, { 2, 2, 0, 0, 0, 0, TICKS *10 },
+		{ 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 2, 0, 0, 0, 0, TICKS *10 }, { 2, 2, 1, 0, 0, 0, TICKS *45 }
 	}, {		// Wave  5
-		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, 
-		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 },
-		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 3, 0, 0, 0, TICKS *12 }
+		{ 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 0, 0, 0, 0, 0, TICKS * 5 }, 
+		{ 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 0, 0, 0, 0, 0, TICKS * 5 },
+		{ 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 3, 3, 0, 0, 0, TICKS *45 }
 	}, {		// Wave  6
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 2, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 1, 0, 0, 0, 0, TICKS * 2 },
-		{ 3, 0, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS *12 }
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 2, 0, 0, 0, 0, TICKS *10 }, 
+		{ 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 1, 0, 0, 0, 0, TICKS *10 },
+		{ 3, 0, 0, 0, 0, 0, TICKS * 5 }, { 3, 3, 0, 0, 0, 0, TICKS *10 }, { 1, 1, 1, 0, 0, 0, TICKS *45 }
 	}, {		// Wave  7
-		{ 1, 1, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 1 }, 
-		{ 2, 2, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 },
-		{ 1, 2, 0, 0, 0, 0, TICKS * 1 }, { 4, 0, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 8 }
+		{ 1, 1, 0, 0, 0, 0, TICKS * 9 }, { 1, 1, 0, 0, 0, 0, TICKS * 9 }, { 2, 2, 0, 0, 0, 0, TICKS * 9 }, 
+		{ 2, 2, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 },
+		{ 1, 2, 0, 0, 0, 0, TICKS * 9 }, { 4, 0, 0, 0, 0, 0, TICKS * 5 }, { 4, 4, 0, 0, 0, 0, TICKS *27 }
 	}, {		// Wave  8
-		{ 4, 1, 0, 0, 0, 0, TICKS * 1 }, { 4, 2, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 3 }, 
-		{ 4, 2, 0, 0, 0, 0, TICKS * 1 }, { 4, 1, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 3 },
-		{ 4, 4, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 2 }, { 5, 1, 1, 0, 0, 0, TICKS *12 }
+		{ 4, 1, 0, 0, 0, 0, TICKS * 9 }, { 4, 2, 0, 0, 0, 0, TICKS * 9 }, { 4, 4, 0, 0, 0, 0, TICKS * 9 }, 
+		{ 4, 2, 0, 0, 0, 0, TICKS * 9 }, { 4, 1, 0, 0, 0, 0, TICKS * 9 }, { 4, 4, 0, 0, 0, 0, TICKS * 9 },
+		{ 4, 4, 0, 0, 0, 0, TICKS * 9 }, { 4, 4, 0, 0, 0, 0, TICKS * 9 }, { 5, 1, 1, 0, 0, 0, TICKS *41 }
 	}, {		// Wave  9
-		{ 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 1, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 2, 0, 0, 0, 0, TICKS * 2 },
-		{ 5, 0, 0, 0, 0, 0, TICKS * 1 }, { 5, 3, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 4, 4, 0, 0, TICKS *16 }
+		{ 5, 0, 0, 0, 0, 0, TICKS * 5 }, { 5, 0, 0, 0, 0, 0, TICKS * 4 }, { 5, 1, 0, 0, 0, 0, TICKS * 9 }, 
+		{ 5, 0, 0, 0, 0, 0, TICKS * 5 }, { 5, 0, 0, 0, 0, 0, TICKS * 4 }, { 5, 2, 0, 0, 0, 0, TICKS * 9 },
+		{ 5, 0, 0, 0, 0, 0, TICKS * 5 }, { 5, 3, 0, 0, 0, 0, TICKS * 9 }, { 5, 5, 4, 4, 0, 0, TICKS *54 }
 	}
 }, {	// Mage 2
 	{			// Wave  1
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 },
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 1, 0, 0, 0, 0, TICKS * 6 }
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 4 }, { 1, 1, 0, 0, 0, 0, TICKS * 9 }, 
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 4 }, { 1, 1, 0, 0, 0, 0, TICKS * 9 },
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 1, 0, 0, 0, 0, 0, TICKS * 4 }, { 1, 1, 0, 0, 0, 0, TICKS *27 }
 	}, {		// Wave  2
-		{ 1, 0, 0, 0, 0, 0, TICKS * 1 }, { 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 0, 0, 0, 0, 0, TICKS * 1 }, 
-		{ 2, 0, 0, 0, 0, 0, TICKS * 1 }, { 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 },
-		{ 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 4, 4, 0, 0, 0, 0, TICKS * 6 }
+		{ 1, 0, 0, 0, 0, 0, TICKS * 5 }, { 2, 0, 0, 0, 0, 0, TICKS * 4 }, { 1, 0, 0, 0, 0, 0, TICKS * 5 }, 
+		{ 2, 0, 0, 0, 0, 0, TICKS * 4 }, { 1, 2, 0, 0, 0, 0, TICKS * 9 }, { 2, 1, 0, 0, 0, 0, TICKS * 9 },
+		{ 1, 2, 0, 0, 0, 0, TICKS * 9 }, { 2, 1, 0, 0, 0, 0, TICKS * 9 }, { 4, 4, 0, 0, 0, 0, TICKS *27 }
 	}, {		// Wave  3
-		{ 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 }, { 3, 3, 0, 0, 0, 0, TICKS * 2 },
-		{ 3, 3, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 1 }, { 3, 3, 0, 0, 0, 0, TICKS * 6 }
+		{ 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 }, 
+		{ 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 },
+		{ 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS * 9 }, { 3, 3, 0, 0, 0, 0, TICKS *27 }
 	}, {		// Wave  4
-		{ 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 2, 4, 0, 0, 0, TICKS * 3 },
-		{ 1, 1, 4, 0, 0, 0, TICKS * 3 }, { 2, 1, 4, 0, 0, 0, TICKS * 3 }, { 2, 2, 4, 0, 0, 0, TICKS * 9 }
+		{ 1, 1, 0, 0, 0, 0, TICKS * 8 }, { 1, 2, 0, 0, 0, 0, TICKS * 8 }, { 2, 2, 0, 0, 0, 0, TICKS * 8 }, 
+		{ 2, 1, 0, 0, 0, 0, TICKS * 8 }, { 1, 1, 0, 0, 0, 0, TICKS * 8 }, { 1, 2, 4, 0, 0, 0, TICKS *12 },
+		{ 1, 1, 4, 0, 0, 0, TICKS *12 }, { 2, 1, 4, 0, 0, 0, TICKS *12 }, { 2, 2, 4, 0, 0, 0, TICKS *36 }
 	}, {		// Wave  5
-		{ 3, 1, 1, 0, 0, 0, TICKS * 3 }, { 3, 1, 1, 0, 0, 0, TICKS * 3 }, { 3, 2, 2, 0, 0, 0, TICKS * 3 }, 
-		{ 3, 2, 2, 0, 0, 0, TICKS * 3 }, { 3, 4, 4, 0, 0, 0, TICKS * 3 }, { 3, 4, 4, 0, 0, 0, TICKS * 3 },
-		{ 3, 3, 3, 0, 0, 0, TICKS * 3 }, { 3, 3, 3, 0, 0, 0, TICKS * 3 }, { 3, 5, 5, 0, 0, 0, TICKS * 9 }
+		{ 3, 1, 1, 0, 0, 0, TICKS *12 }, { 3, 1, 1, 0, 0, 0, TICKS *12 }, { 3, 2, 2, 0, 0, 0, TICKS *12 }, 
+		{ 3, 2, 2, 0, 0, 0, TICKS *12 }, { 3, 4, 4, 0, 0, 0, TICKS *12 }, { 3, 4, 4, 0, 0, 0, TICKS *12 },
+		{ 3, 3, 3, 0, 0, 0, TICKS *12 }, { 3, 3, 3, 0, 0, 0, TICKS *12 }, { 3, 5, 5, 0, 0, 0, TICKS *36 }
 	}, {		// Wave  6
-		{ 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 1, 0, 0, 0, TICKS * 3 }, 
-		{ 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 0, 0, 0, 0, TICKS * 2 }, { 5, 5, 2, 0, 0, 0, TICKS * 3 },
-		{ 5, 5, 3, 0, 0, 0, TICKS * 3 }, { 5, 5, 4, 0, 0, 0, TICKS * 3 }, { 5, 5, 5, 0, 0, 0, TICKS * 9 }
+		{ 5, 5, 0, 0, 0, 0, TICKS * 8 }, { 5, 5, 0, 0, 0, 0, TICKS * 8 }, { 5, 5, 1, 0, 0, 0, TICKS *12 }, 
+		{ 5, 5, 0, 0, 0, 0, TICKS * 8 }, { 5, 5, 0, 0, 0, 0, TICKS * 8 }, { 5, 5, 2, 0, 0, 0, TICKS *12 },
+		{ 5, 5, 3, 0, 0, 0, TICKS *12 }, { 5, 5, 4, 0, 0, 0, TICKS *12 }, { 5, 5, 5, 0, 0, 0, TICKS *36 }
 	}, {		// Wave  7
-		{ 5, 5, 2, 0, 0, 0, TICKS * 3 }, { 5, 5, 2, 0, 0, 0, TICKS * 5 }, { 5, 5, 1, 1, 0, 0, TICKS * 4 }, 
-		{ 5, 5, 3, 0, 0, 0, TICKS * 3 }, { 5, 5, 3, 0, 0, 0, TICKS * 3 }, { 5, 5, 4, 4, 0, 0, TICKS * 4 },
-		{ 4, 2, 1, 0, 0, 0, TICKS * 3 }, { 4, 1, 2, 0, 0, 0, TICKS * 3 }, { 5, 5, 6, 6, 0, 0, TICKS *12 }
+		{ 5, 5, 2, 0, 0, 0, TICKS *12 }, { 5, 5, 2, 0, 0, 0, TICKS *12 }, { 5, 5, 1, 1, 0, 0, TICKS *16 }, 
+		{ 5, 5, 3, 0, 0, 0, TICKS *12 }, { 5, 5, 3, 0, 0, 0, TICKS *12 }, { 5, 5, 4, 4, 0, 0, TICKS *16 },
+		{ 4, 2, 1, 0, 0, 0, TICKS *12 }, { 4, 1, 2, 0, 0, 0, TICKS *12 }, { 5, 5, 6, 6, 0, 0, TICKS *48 }
 	}, {		// Wave  8
-		{ 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 7, 3, 3, 0, 0, TICKS * 4 }, 
-		{ 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 0, 0, 0, 0, 0, TICKS * 1 }, { 7, 7, 6, 6, 0, 0, TICKS * 4 },
-		{ 8, 0, 0, 0, 0, 0, TICKS * 1 }, { 8, 0, 0, 0, 0, 0, TICKS * 1 }, { 8, 8, 7, 7, 0, 0, TICKS *12 }
+		{ 7, 0, 0, 0, 0, 0, TICKS * 4 }, { 7, 0, 0, 0, 0, 0, TICKS * 4 }, { 7, 7, 3, 3, 0, 0, TICKS *16 }, 
+		{ 7, 0, 0, 0, 0, 0, TICKS * 4 }, { 7, 0, 0, 0, 0, 0, TICKS * 4 }, { 7, 7, 6, 6, 0, 0, TICKS *16 },
+		{ 8, 0, 0, 0, 0, 0, TICKS * 4 }, { 8, 0, 0, 0, 0, 0, TICKS * 4 }, { 8, 8, 7, 7, 0, 0, TICKS *48 }
 	}, {		// Wave  9
-		{ 8, 8, 0, 0, 0, 0, TICKS * 2 }, { 7, 7, 0, 0, 0, 0, TICKS * 2 }, { 8, 8, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 7, 7, 0, 0, 0, 0, TICKS * 2 }, { 6, 6, 6, 6, 0, 0, TICKS * 4 }, { 7, 7, 0, 0, 0, 0, TICKS * 2 },
-		{ 8, 8, 0, 0, 0, 0, TICKS * 2 }, { 7, 7, 0, 0, 0, 0, TICKS * 2 }, { 8, 8, 0, 0, 0, 0, TICKS * 6 }
+		{ 8, 8, 0, 0, 0, 0, TICKS * 8 }, { 7, 7, 0, 0, 0, 0, TICKS * 8 }, { 8, 8, 0, 0, 0, 0, TICKS * 8 }, 
+		{ 7, 7, 0, 0, 0, 0, TICKS * 8 }, { 6, 6, 6, 6, 0, 0, TICKS *16 }, { 7, 7, 0, 0, 0, 0, TICKS * 8 },
+		{ 8, 8, 0, 0, 0, 0, TICKS * 8 }, { 7, 7, 0, 0, 0, 0, TICKS * 8 }, { 8, 8, 0, 0, 0, 0, TICKS *24 }
 	}, {		// Wave 10
-		{ 1, 1, 1, 1, 0, 0, TICKS * 4 }, { 1, 1, 1, 1, 0, 0, TICKS * 4 }, { 1, 1, 1, 1, 0, 0, TICKS * 3 }, 
-		{ 1, 1, 1, 1, 0, 0, TICKS * 3 }, { 1, 1, 1, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS * 2 },
-		{ 1, 1, 1, 0, 0, 0, TICKS * 1 }, { 1, 1, 1, 0, 0, 0, TICKS * 1 }, { 7, 8, 7, 8, 0, 0, TICKS *12 }
+		{ 1, 1, 1, 1, 0, 0, TICKS *14 }, { 1, 1, 1, 1, 0, 0, TICKS *14 }, { 1, 1, 1, 1, 0, 0, TICKS *14 }, 
+		{ 1, 1, 1, 1, 0, 0, TICKS *14 }, { 1, 1, 1, 0, 0, 0, TICKS *11 }, { 1, 1, 1, 0, 0, 0, TICKS *11 },
+		{ 1, 1, 1, 0, 0, 0, TICKS *11 }, { 1, 1, 1, 0, 0, 0, TICKS *11 }, { 7, 8, 7, 8, 0, 0, TICKS *42 }
 	}, {		// Wave 11
-		{ 1, 2, 4, 4, 0, 0, TICKS * 3 }, { 2, 2, 4, 4, 0, 0, TICKS * 3 }, { 3, 3, 4, 4, 0, 0, TICKS * 5 }, 
-		{ 4, 5, 6, 6, 0, 0, TICKS * 3 }, { 5, 5, 6, 6, 0, 0, TICKS * 3 }, { 7, 7, 6, 6, 0, 0, TICKS * 5 },
-		{ 1, 2, 3, 4, 0, 0, TICKS * 3 }, { 5, 6, 7, 8, 0, 0, TICKS * 3 }, { 2, 4, 6, 8, 0, 0, TICKS *12 }
+		{ 1, 2, 4, 4, 0, 0, TICKS *14 }, { 2, 2, 4, 4, 0, 0, TICKS *14 }, { 3, 3, 4, 4, 0, 0, TICKS *14 }, 
+		{ 4, 5, 6, 6, 0, 0, TICKS *14 }, { 5, 5, 6, 6, 0, 0, TICKS *14 }, { 7, 7, 6, 6, 0, 0, TICKS *14 },
+		{ 1, 2, 3, 4, 0, 0, TICKS *14 }, { 5, 6, 7, 8, 0, 0, TICKS *14 }, { 2, 4, 6, 8, 0, 0, TICKS *42 }
 	}, {		// Wave 12
-		{ 8, 8, 0, 0, 0, 0, TICKS * 2 }, { 8, 8, 0, 0, 0, 0, TICKS * 1 }, { 8, 8, 8, 0, 0, 0, TICKS * 3 }, 
-		{ 7, 8, 0, 0, 0, 0, TICKS * 2 }, { 6, 8, 0, 0, 0, 0, TICKS * 1 }, { 5, 6, 7, 0, 0, 0, TICKS * 3 },
-		{ 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 3, 4, 0, 0, 0, 0, TICKS * 1 }, { 9, 9, 9, 9, 0, 0, TICKS *12 }
+		{ 8, 8, 0, 0, 0, 0, TICKS * 7 }, { 8, 8, 0, 0, 0, 0, TICKS * 7 }, { 8, 8, 8, 0, 0, 0, TICKS *11 }, 
+		{ 7, 8, 0, 0, 0, 0, TICKS * 7 }, { 6, 8, 0, 0, 0, 0, TICKS * 7 }, { 5, 6, 7, 0, 0, 0, TICKS *11 },
+		{ 1, 2, 0, 0, 0, 0, TICKS * 7 }, { 3, 4, 0, 0, 0, 0, TICKS * 7 }, { 9, 9, 9, 9, 0, 0, TICKS *42 }
 	}
 }, {	// Mage 3
 	{			// Wave  1
-		{10, 0, 0, 0, 0, 0, TICKS * 1 }, {10, 0, 0, 0, 0, 0, TICKS * 1 }, {10,10, 0, 0, 0, 0, TICKS * 2 }, 
-		{10,10, 0, 0, 0, 0, TICKS * 2 }, {10,10,10, 0, 0, 0, TICKS * 3 }, {10,10,10, 0, 0, 0, TICKS * 3 },
-		{10,10,10,10, 0, 0, TICKS * 4 }, {10,10,10,10, 0, 0, TICKS * 4 }, {10,10,10,10,10, 0, TICKS *10 }
+		{10, 0, 0, 0, 0, 0, TICKS * 4 }, {10, 0, 0, 0, 0, 0, TICKS * 4 }, {10,10, 0, 0, 0, 0, TICKS * 7 }, 
+		{10,10, 0, 0, 0, 0, TICKS * 7 }, {10,10,10, 0, 0, 0, TICKS *11 }, {10,10,10, 0, 0, 0, TICKS *11 },
+		{10,10,10,10, 0, 0, TICKS *14 }, {10,10,10,10, 0, 0, TICKS *14 }, {10,10,10,10,10, 0, TICKS *53 }
 	}, {		// Wave  2
-		{ 1, 1, 0, 0, 0, 0, TICKS * 2 }, { 2, 2, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 0, 0, 0, 0, TICKS * 2 }, 
-		{ 4, 4, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS * 3 }, { 2, 2, 2, 0, 0, 0, TICKS * 3 },
-		{ 1, 1, 1, 0, 0, 0, TICKS * 3 }, { 4, 4, 4, 0, 0, 0, TICKS * 3 }, { 1, 1, 1, 1, 0, 0, TICKS * 8 }
+		{ 1, 1, 0, 0, 0, 0, TICKS * 7 }, { 2, 2, 0, 0, 0, 0, TICKS * 7 }, { 1, 1, 0, 0, 0, 0, TICKS * 7 }, 
+		{ 4, 4, 0, 0, 0, 0, TICKS * 7 }, { 1, 1, 1, 0, 0, 0, TICKS *11 }, { 2, 2, 2, 0, 0, 0, TICKS *11 },
+		{ 1, 1, 1, 0, 0, 0, TICKS *11 }, { 4, 4, 4, 0, 0, 0, TICKS *11 }, { 1, 1, 1, 1, 0, 0, TICKS *42 }
 	}, {		// Wave  3
-		{ 1, 2, 0, 0, 0, 0, TICKS * 2 }, { 2, 1, 0, 0, 0, 0, TICKS * 2 }, { 1, 1, 2, 0, 0, 0, TICKS * 3 }, 
-		{ 1, 2, 2, 0, 0, 0, TICKS * 3 }, { 2, 2, 2, 0, 0, 0, TICKS * 3 }, { 2, 2, 1, 1, 0, 0, TICKS * 4 },
-		{ 1, 1, 2, 2, 0, 0, TICKS * 4 }, { 1, 2, 2, 4, 0, 0, TICKS * 3 }, { 1, 2, 4, 4, 0, 0, TICKS * 8 }
+		{ 1, 2, 0, 0, 0, 0, TICKS * 7 }, { 2, 1, 0, 0, 0, 0, TICKS * 7 }, { 1, 1, 2, 0, 0, 0, TICKS *11 }, 
+		{ 1, 2, 2, 0, 0, 0, TICKS *11 }, { 2, 2, 2, 0, 0, 0, TICKS *11 }, { 2, 2, 1, 1, 0, 0, TICKS *14 },
+		{ 1, 1, 2, 2, 0, 0, TICKS *14 }, { 1, 2, 2, 4, 0, 0, TICKS *14 }, { 1, 2, 4, 4, 0, 0, TICKS *42 }
 	}, {		// Wave  4
-		{ 3, 3, 3, 3, 0, 0, TICKS * 4 }, { 3, 3, 3, 3, 0, 0, TICKS * 4 }, { 3, 3, 3, 3, 0, 0, TICKS * 4 }, 
-		{ 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 0, 0, TICKS * 3 },
-		{ 3, 3, 3, 3, 3, 0, TICKS * 4 }, { 3, 3, 3, 3, 3, 0, TICKS * 4 }, { 3, 3, 3, 3, 3, 0, TICKS *10 }
+		{ 3, 3, 3, 3, 0, 0, TICKS *12 }, { 3, 3, 3, 3, 0, 0, TICKS *12 }, { 3, 3, 3, 3, 0, 0, TICKS *12 }, 
+		{ 3, 3, 3, 3, 0, 0, TICKS *12 }, { 3, 3, 3, 3, 0, 0, TICKS *12 }, { 3, 3, 3, 3, 0, 0, TICKS *12 },
+		{ 3, 3, 3, 3, 3, 0, TICKS *15 }, { 3, 3, 3, 3, 3, 0, TICKS *15 }, { 3, 3, 3, 3, 3, 0, TICKS *45 }
 	}, {		// Wave  5
-		{ 5, 5, 5, 0, 0, 0, TICKS * 3 }, { 5, 5, 8, 0, 0, 0, TICKS * 3 }, { 5, 8, 8, 0, 0, 0, TICKS * 3 }, 
-		{ 5, 8, 9, 0, 0, 0, TICKS * 3 }, { 8, 8, 9, 0, 0, 0, TICKS * 3 }, { 8, 9, 9, 0, 0, 0, TICKS * 3 },
-		{ 9, 9, 9, 0, 0, 0, TICKS * 3 }, { 5, 5, 8, 9, 0, 0, TICKS * 3 }, { 5, 8, 8, 9, 0, 0, TICKS * 8 }
+		{ 5, 5, 5, 0, 0, 0, TICKS * 9 }, { 5, 5, 8, 0, 0, 0, TICKS * 9 }, { 5, 8, 8, 0, 0, 0, TICKS * 9 }, 
+		{ 5, 8, 9, 0, 0, 0, TICKS * 9 }, { 8, 8, 9, 0, 0, 0, TICKS * 9 }, { 8, 9, 9, 0, 0, 0, TICKS * 9 },
+		{ 9, 9, 9, 0, 0, 0, TICKS * 9 }, { 5, 5, 8, 9, 0, 0, TICKS *12 }, { 5, 8, 8, 9, 0, 0, TICKS *36 }
 	}, {		// Wave  6
-		{ 7, 6, 7, 8, 0, 0, TICKS * 3 }, { 7, 4, 7, 9, 0, 0, TICKS * 3 }, { 7, 6, 7, 8, 0, 0, TICKS * 5 }, 
-		{ 7, 1, 7, 2, 0, 0, TICKS * 3 }, { 7, 3, 7,10, 0, 0, TICKS * 3 }, { 7, 7, 7, 7, 0, 0, TICKS * 5 },
-		{ 7, 5, 7, 5, 0, 0, TICKS * 3 }, { 5, 8, 5, 8, 0, 0, TICKS * 3 }, { 8, 9, 8, 9, 7, 0, TICKS *10 }
+		{ 7, 6, 7, 8, 0, 0, TICKS *12 }, { 7, 4, 7, 9, 0, 0, TICKS *12 }, { 7, 6, 7, 8, 0, 0, TICKS *12 }, 
+		{ 7, 1, 7, 2, 0, 0, TICKS *12 }, { 7, 3, 7,10, 0, 0, TICKS *12 }, { 7, 7, 7, 7, 0, 0, TICKS *12 },
+		{ 7, 5, 7, 5, 0, 0, TICKS *12 }, { 5, 8, 5, 8, 0, 0, TICKS *12 }, { 8, 9, 8, 9, 7, 0, TICKS *45 }
 	}, {		// Wave  7
-		{ 1, 2, 3, 4, 0, 0, TICKS * 3 }, { 1, 2, 3, 4, 0, 0, TICKS * 4 }, { 2, 3, 4, 5, 0, 0, TICKS * 3 }, 
-		{ 2, 3, 4, 5, 0, 0, TICKS * 4 }, { 3, 4, 5, 6, 0, 0, TICKS * 3 }, { 3, 4, 5, 6, 0, 0, TICKS * 4 },
-		{ 4, 5, 6, 7, 0, 0, TICKS * 3 }, { 4, 5, 6, 7, 0, 0, TICKS * 4 }, { 5, 6, 7, 8, 0, 0, TICKS * 8 }
+		{ 1, 2, 3, 4, 0, 0, TICKS *12 }, { 1, 2, 3, 4, 0, 0, TICKS *12 }, { 2, 3, 4, 5, 0, 0, TICKS *12 }, 
+		{ 2, 3, 4, 5, 0, 0, TICKS *12 }, { 3, 4, 5, 6, 0, 0, TICKS *12 }, { 3, 4, 5, 6, 0, 0, TICKS *12 },
+		{ 4, 5, 6, 7, 0, 0, TICKS *12 }, { 4, 5, 6, 7, 0, 0, TICKS *12 }, { 5, 6, 7, 8, 0, 0, TICKS *36 }
 	}, {		// Wave  8
-		{10,10, 8, 8, 0, 0, TICKS * 3 }, {10,10, 8, 8, 0, 0, TICKS * 3 }, {10,10, 8, 8, 8, 0, TICKS * 4 }, 
-		{ 8, 8, 9, 9, 0, 0, TICKS * 3 }, { 8, 8, 9, 9, 0, 0, TICKS * 3 }, { 8, 8, 9, 9, 9, 0, TICKS * 5 },
-		{ 9, 9,10,10, 0, 0, TICKS * 3 }, { 9, 9,10,10, 0, 0, TICKS * 3 }, { 9, 9,10,10,10, 0, TICKS *10 }
+		{10,10, 8, 8, 0, 0, TICKS *12 }, {10,10, 8, 8, 0, 0, TICKS *12 }, {10,10, 8, 8, 8, 0, TICKS *15 }, 
+		{ 8, 8, 9, 9, 0, 0, TICKS *12 }, { 8, 8, 9, 9, 0, 0, TICKS *12 }, { 8, 8, 9, 9, 9, 0, TICKS *15 },
+		{ 9, 9,10,10, 0, 0, TICKS *12 }, { 9, 9,10,10, 0, 0, TICKS *12 }, { 9, 9,10,10,10, 0, TICKS *45 }
 	}, {		// Wave  9
-		{ 6, 6, 6, 7, 0, 0, TICKS * 4 }, { 6, 6, 7, 7, 0, 0, TICKS * 4 }, { 6, 7, 7, 7, 0, 0, TICKS * 4 }, 
-		{ 6, 6, 7, 7, 0, 0, TICKS * 3 }, { 6, 6, 6, 7, 0, 0, TICKS * 3 }, { 5, 6, 6, 6, 7, 0, TICKS * 5 },
-		{ 5, 6, 6, 7, 7, 0, TICKS * 5 }, { 5, 6, 7, 7, 7, 0, TICKS * 4 }, { 5, 5, 5, 6, 7, 0, TICKS *10 }
+		{ 6, 6, 6, 7, 0, 0, TICKS *12 }, { 6, 6, 7, 7, 0, 0, TICKS *12 }, { 6, 7, 7, 7, 0, 0, TICKS *12 }, 
+		{ 6, 6, 7, 7, 0, 0, TICKS *12 }, { 6, 6, 6, 7, 0, 0, TICKS *12 }, { 5, 6, 6, 6, 7, 0, TICKS *15 },
+		{ 5, 6, 6, 7, 7, 0, TICKS *15 }, { 5, 6, 7, 7, 7, 0, TICKS *15 }, { 5, 5, 5, 6, 7, 0, TICKS *45 }
 	}, {		// Wave 10
-		{ 3, 3, 3, 0, 0, 0, TICKS * 2 }, { 3, 3, 3, 0, 0, 0, TICKS * 2 }, { 3, 3, 3, 3, 0, 0, TICKS * 4 }, 
-		{ 1, 1, 1, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 0, 0, 0, TICKS * 2 }, { 1, 1, 1, 1, 0, 0, TICKS * 4 },
-		{ 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 0, 0, TICKS * 3 }, { 3, 3, 3, 3, 1, 1, TICKS *12 }
+		{ 3, 3, 3, 0, 0, 0, TICKS * 8 }, { 3, 3, 3, 0, 0, 0, TICKS * 7 }, { 3, 3, 3, 3, 0, 0, TICKS *10 }, 
+		{ 1, 1, 1, 0, 0, 0, TICKS * 8 }, { 1, 1, 1, 0, 0, 0, TICKS * 7 }, { 1, 1, 1, 1, 0, 0, TICKS *10 },
+		{ 3, 3, 3, 3, 0, 0, TICKS *10 }, { 3, 3, 3, 3, 0, 0, TICKS *10 }, { 3, 3, 3, 3, 1, 1, TICKS *45 }
 	}, {		// Wave 11
-		{ 2, 2, 6, 6, 0, 0, TICKS * 3 }, { 2, 2, 6, 6, 0, 0, TICKS * 3 }, { 2, 2, 7, 7, 0, 0, TICKS * 5 }, 
-		{ 2, 2, 2, 4, 4, 0, TICKS * 5 }, { 2, 2, 5, 5, 0, 0, TICKS * 3 }, { 2, 2, 5, 5, 0, 0, TICKS * 3 },
-		{ 2, 2, 8, 8, 0, 0, TICKS * 5 }, { 2, 2, 2, 2, 2, 0, TICKS * 5 }, { 2, 4, 4, 4, 2, 0, TICKS *10 }
+		{ 2, 2, 6, 6, 0, 0, TICKS *10 }, { 2, 2, 6, 6, 0, 0, TICKS *10 }, { 2, 2, 7, 7, 0, 0, TICKS *10 }, 
+		{ 2, 2, 2, 4, 4, 0, TICKS *13 }, { 2, 2, 5, 5, 0, 0, TICKS *10 }, { 2, 2, 5, 5, 0, 0, TICKS *10 },
+		{ 2, 2, 8, 8, 0, 0, TICKS *10 }, { 2, 2, 2, 2, 2, 0, TICKS *12 }, { 2, 4, 4, 4, 2, 0, TICKS *39 }
 	}, {		// Wave 12
-		{ 8, 8, 8, 8, 0, 0, TICKS * 4 }, { 8, 8, 8, 9, 0, 0, TICKS * 4 }, { 8, 8, 8,10, 0, 0, TICKS * 4 }, 
-		{ 8, 7, 8, 9, 0, 0, TICKS * 4 }, { 8, 7, 8,10, 0, 0, TICKS * 3 }, { 8, 7, 7, 9, 0, 0, TICKS * 3 },
-		{ 8, 7, 9,10, 0, 0, TICKS * 3 }, { 1, 8, 1, 9,10, 0, TICKS * 3 }, { 2, 2, 1, 1,10,10, TICKS *12 }
+		{ 8, 8, 8, 8, 0, 0, TICKS *10 }, { 8, 8, 8, 9, 0, 0, TICKS *10 }, { 8, 8, 8,10, 0, 0, TICKS *10 }, 
+		{ 8, 7, 8, 9, 0, 0, TICKS *10 }, { 8, 7, 8,10, 0, 0, TICKS *10 }, { 8, 7, 7, 9, 0, 0, TICKS *10 },
+		{ 8, 7, 9,10, 0, 0, TICKS *10 }, { 1, 8, 1, 9,10, 0, TICKS *13 }, { 2, 2, 1, 1,10,10, TICKS *45 }
 	}, {		// Wave 13
-		{ 4, 4, 2, 3, 1, 0, TICKS * 4 }, { 4, 4, 3, 2, 1, 0, TICKS * 4 }, { 4, 4, 1, 2, 3, 0, TICKS * 6 }, 
-		{ 5, 6, 5, 6, 7, 0, TICKS * 4 }, { 5, 6, 5, 6, 4, 0, TICKS * 4 }, { 5, 6, 5, 6, 8, 0, TICKS * 6 },
-		{10, 9, 8, 7, 6, 0, TICKS * 4 }, { 8, 7, 6, 5, 4, 0, TICKS * 4 }, { 6, 5, 4, 3, 2, 1, TICKS *12 }
+		{ 4, 4, 2, 3, 1, 0, TICKS *13 }, { 4, 4, 3, 2, 1, 0, TICKS *12 }, { 4, 4, 1, 2, 3, 0, TICKS *13 }, 
+		{ 5, 6, 5, 6, 7, 0, TICKS *12 }, { 5, 6, 5, 6, 4, 0, TICKS *13 }, { 5, 6, 5, 6, 8, 0, TICKS *12 },
+		{10, 9, 8, 7, 6, 0, TICKS *13 }, { 8, 7, 6, 5, 4, 0, TICKS *12 }, { 6, 5, 4, 3, 2, 1, TICKS *45 }
 	}, {		// Wave 14
-		{ 1, 1, 1, 1, 1, 0, TICKS * 5 }, { 2, 2, 2, 2, 2, 0, TICKS * 5 }, { 4, 4, 4, 4, 4, 4, TICKS * 6 }, 
-		{ 3, 3, 3, 3, 3, 0, TICKS * 5 }, { 7, 7, 7, 7, 7, 0, TICKS * 5 }, { 6, 6, 6, 6, 6, 6, TICKS * 6 },
-		{ 5, 5, 5, 5, 5, 0, TICKS * 5 }, { 8, 8, 8, 8, 8, 0, TICKS * 5 }, { 9, 9, 9, 9, 9, 9, TICKS *12 }
+		{ 1, 1, 1, 1, 1, 0, TICKS *13 }, { 2, 2, 2, 2, 2, 0, TICKS *12 }, { 4, 4, 4, 4, 4, 4, TICKS *15 }, 
+		{ 3, 3, 3, 3, 3, 0, TICKS *13 }, { 7, 7, 7, 7, 7, 0, TICKS *12 }, { 6, 6, 6, 6, 6, 6, TICKS *15 },
+		{ 5, 5, 5, 5, 5, 0, TICKS *13 }, { 8, 8, 8, 8, 8, 0, TICKS *12 }, { 9, 9, 9, 9, 9, 9, TICKS *45 }
 	}, {		// Wave 15
-		{ 1, 2, 3, 4, 5, 6, TICKS * 6 }, { 2, 4, 6, 8,10, 2, TICKS * 5 }, { 3, 6, 9, 2, 5, 8, TICKS * 6 }, 
-		{ 4, 8, 2, 6,10, 4, TICKS * 5 }, { 5,10, 5,10, 5,10, TICKS * 6 }, { 6, 2, 8, 4,10, 6, TICKS * 5 },
-		{ 7, 4, 1, 8, 5, 2, TICKS * 6 }, { 8, 6, 4, 2,10, 8, TICKS * 5 }, { 9, 8, 7, 6, 5, 4, TICKS *12 }
+		{ 1, 2, 3, 4, 5, 6, TICKS *15 }, { 2, 4, 6, 8,10, 2, TICKS *15 }, { 3, 6, 9, 2, 5, 8, TICKS *15 }, 
+		{ 4, 8, 2, 6,10, 4, TICKS *15 }, { 5,10, 5,10, 5,10, TICKS *15 }, { 6, 2, 8, 4,10, 6, TICKS *15 },
+		{ 7, 4, 1, 8, 5, 2, TICKS *15 }, { 8, 6, 4, 2,10, 8, TICKS *15 }, { 9, 8, 7, 6, 5, 4, TICKS *45 }
 	}
 }
 };
@@ -3551,6 +3551,7 @@ void stronghold_mage_driver_ver2(int cn)
 	int candleA, candleB, candleC, candleD, candleE;
 	int spawnX, spawnY, magenum=0, groupnum=601, spawnT = 347;
 	int p=0, n, m, j, in=0, co=0;
+	int cw[4] = {0};
 	
 	/*
 		Mage driver data will carry references to pass along to cityattack.c
@@ -3585,18 +3586,21 @@ void stronghold_mage_driver_ver2(int cn)
 		candleA = BS_CAN_3_1;	candleB = BS_CAN_3_2;	candleC = BS_CAN_3_3;
 		candleD = BS_CAN_3_4;	candleE = BS_CAN_3_5;
 		spawnX = 598;	spawnY = 288;	groupnum = 603;
+		cw[0] = 5; cw[1] = 8; cw[2] = 12; cw[3] = 15;
 	}
 	else if (magenum==2)
 	{
 		candleA = BS_CAN_2_1;	candleB = BS_CAN_2_2;	candleC = BS_CAN_2_3;
 		candleD = BS_CAN_2_4;	candleE = BS_CAN_2_5;
 		spawnX = 576;	spawnY = 288;	groupnum = 602;
+		cw[0] = 4; cw[1] = 7; cw[2] = 10; cw[3] = 12;
 	}
 	else
 	{
 		candleA = BS_CAN_1_1;	candleB = BS_CAN_1_2;	candleC = BS_CAN_1_3;
 		candleD = BS_CAN_1_4;	candleE = BS_CAN_1_5;
 		spawnX = 554;	spawnY = 288;	groupnum = 601;
+		cw[0] = 3; cw[1] = 5; cw[2] = 7; cw[3] =  9;
 	}
 	
 	// If no players...
@@ -3626,6 +3630,7 @@ void stronghold_mage_driver_ver2(int cn)
 				ch[cn].data[3] = 0;
 				ch[cn].data[4] = 0;
 				ch[cn].data[5] = 0;
+				ch[cn].data[43] = 0;
 			}
 		}
 		return; // No further process when nobody is in the area
@@ -3650,6 +3655,7 @@ void stronghold_mage_driver_ver2(int cn)
 		(magenum==2 && ch[cn].data[1]==13) ||
 		(magenum==3 && ch[cn].data[1]==16))
 	{
+		ch[cn].data[43] = groupnum;
 		j = 0;
 		switch (ch[cn].data[2])
 		{
@@ -3682,11 +3688,11 @@ void stronghold_mage_driver_ver2(int cn)
 	// Send the wave number to everyone in line & activate candles
 	if (ch[cn].data[2]==1)
 	{
-		if (ch[cn].data[1]== 1 && (in = map[candleA].it)&&it[in].active) shiva_activate_candle(cn, in, 1);
-		if (ch[cn].data[1]== 3 && (in = map[candleB].it)&&it[in].active) shiva_activate_candle(cn, in, 2);
-		if (ch[cn].data[1]== 5 && (in = map[candleC].it)&&it[in].active) shiva_activate_candle(cn, in, 3);
-		if (ch[cn].data[1]== 7 && (in = map[candleD].it)&&it[in].active) shiva_activate_candle(cn, in, 4);
-		if (ch[cn].data[1]== 9 && (in = map[candleE].it)&&it[in].active) shiva_activate_candle(cn, in, 5);
+		if (ch[cn].data[1]==1     && (in = map[candleA].it) && it[in].active) shiva_activate_candle(cn, in, 1);
+		if (ch[cn].data[1]==cw[0] && (in = map[candleB].it) && it[in].active) shiva_activate_candle(cn, in, 2);
+		if (ch[cn].data[1]==cw[1] && (in = map[candleC].it) && it[in].active) shiva_activate_candle(cn, in, 3);
+		if (ch[cn].data[1]==cw[2] && (in = map[candleD].it) && it[in].active) shiva_activate_candle(cn, in, 4);
+		if (ch[cn].data[1]==cw[3] && (in = map[candleE].it) && it[in].active) shiva_activate_candle(cn, in, 5);
 		for (n = 1; n<MAXCHARS; n++) 
 		{
 			if (ch[n].used==USE_EMPTY) continue;
@@ -3700,27 +3706,31 @@ void stronghold_mage_driver_ver2(int cn)
 	
 	n=0;
 	// Spawn mobs
-	for (m=0; m<6; m++)	if (bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m])
+	for (m=0; m<6; m++)
 	{
-		if (co = generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
-			spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
-			(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0)))
+		if (bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m]>0 && 
+			bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m]<11)
 		{
-			ch[co].flags |= CF_NOSLEEP;
-			ch[co].data[25] = 2;
-			ch[co].data[26] = 101*magenum;
-			ch[co].data[31] = ch[cn].temp;
-			ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = groupnum;
-			ch[co].data[44] = 60;
-			do_update_char(co);
-			ch[cn].data[4]++;
-			n++;
+			if (co = generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
+				spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
+				(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0)))
+			{
+				ch[co].flags |= CF_NOSLEEP;
+				ch[co].data[25] = 2;
+				ch[co].data[26] = 101*magenum;
+				ch[co].data[31] = ch[cn].temp;
+				ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = groupnum;
+				ch[co].data[44] = 60;
+				do_update_char(co);
+				ch[cn].data[4]++;
+				n++;
+			}
 		}
 	}
 	
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	if (!((ch[cn].data[2]-1)%2)) do_sayx(cn, "Khuzak gurawin duskar!");
-	m = bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6]*3; // this *3 is temporary - fix timers
+	m = bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6];
 	chlog(cn, "created %d new monsters, waiting %d ticks", n, m);
 	
 	// Increment subwave and/or wave number
@@ -3734,14 +3744,18 @@ void stronghold_mage_driver_ver2(int cn)
 		{
 			if (ch[n].used==USE_EMPTY) continue;
 			if (!IS_PLAYER(n)) continue;
-			if (is_inline(n, magenum)) 
+			if (is_inline(n, magenum))
 			{
 				do_char_log(n, 3, " --- WAVE %d ENDS --- \n", ch[cn].data[1]);
-				j = ch[cn].data[1]*ch[cn].data[1]*magenum*5;
-				chlog(n, "Gets %d BSP", j);
-				ch[n].bs_points += j;
-				if (!(ch[n].flags & CF_SYS_OFF))
-					do_char_log(n, 2, "You get %d stronghold points.\n", j);
+				if (ch[n].data[26])
+				{
+					j = ch[cn].data[1]*ch[cn].data[1]*magenum*3+ch[n].data[26]*magenum;
+					ch[n].data[26] = 0;
+					chlog(n, "Gets %d BSP", j);
+					ch[n].bs_points += j;
+					if (!(ch[n].flags & CF_SYS_OFF))
+						do_char_log(n, 2, "You get %d stronghold points.\n", j);
+				}
 			}
 		}
 		
@@ -4842,30 +4856,22 @@ int npc_driver_high(int cn)
 int shiva_activate_candle(int cn, int in, int candlenum)
 {
 	int n;
-	/*
-	if (globs->mdtime%(3600*12)>2160) // Once every 12 hours
-	{
-		return 0;
-	}
-	if (ch[cn].data[0]>(globs->mdday*2)+(globs->mdtime/(3600*12))) // Only if the [0] data date is less than today's date
-	{
-		if (ch[cn].data[0]>=299*2 && globs->mdday <= 1) 
-			ch[cn].data[0] = 1; 							// Adjust iteration within boundry
-		return 0;
-	}
-	*/
-	if (candlenum>1 && ch[cn].data[2]<BS_RC)
-	{
-		return 0;
-	}
-	ch[cn].data[2] = 0;
-	if (!candlenum) { ch[cn].data[3] = 0; ch[cn].data[4] = 0; }
 
-	chlog(cn, "Created new candle (%d), time=%d, day=%d, last day=%d", candlenum, globs->mdtime, globs->mdday, ch[cn].data[0]);
-
-	/*
-	ch[cn].data[0] = (globs->mdday*2)+(globs->mdtime/(3600*12))+1; // next iteration
-	*/
+	if (!(globs->flags & GF_NEWBS))
+	{
+		if (candlenum>1 && ch[cn].data[2]<BS_RC)
+		{
+			return 0;
+		}
+		ch[cn].data[2] = 0;
+		if (!candlenum) { ch[cn].data[3] = 0; ch[cn].data[4] = 0; }
+		chlog(cn, "Created new candle (%d), time=%d, day=%d, last day=%d", 
+			candlenum, globs->mdtime, globs->mdday, ch[cn].data[0]);
+	}
+	else
+	{
+		chlog(cn, "Created new candle (%d)", candlenum);
+	}
 
 	it[in].active = 0;
 	if (it[in].light[0]!=it[in].light[1] && it[in].x>0)
@@ -4889,36 +4895,54 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 			{
 				switch (candlenum)
 				{
-					case 0: do_char_log(n, 3, "Tactician: \"The northern stronghold is calming down!\"\n"); break;
-					case 1: do_char_log(n, 3, "Tactician: \"The northern stronghold is starting to stir!\"\n"); break;
-					case 2: do_char_log(n, 3, "Tactician: \"The northern stronghold is growing in numbers!\"\n"); break;
-					case 3: do_char_log(n, 3, "Tactician: \"The northern stronghold is building its forces! Alert!\"\n"); break;
-					case 4: do_char_log(n, 3, "Tactician: \"The northern stronghold is nearing full strength! Alert!\"\n"); break;
-					case 5: do_char_log(n, 3, "Tactician: \"The northern stronghold is at full strength! Alert!\"\n"); break;
+					case 0: 
+						do_char_log(n, 3, "Tactician: \"The northern stronghold is calming down!\"\n"); break;
+					case 1: 
+						do_char_log(n, 3, "Tactician: \"The northern stronghold is starting to stir!\"\n"); break;
+					case 2: 
+						do_char_log(n, 3, "Tactician: \"The northern stronghold is growing in numbers!\"\n"); break;
+					case 3: 
+						do_char_log(n, 3, "Tactician: \"The northern stronghold is building its forces! Alert!\"\n"); break;
+					case 4: 
+						do_char_log(n, 3, "Tactician: \"The northern stronghold is nearing full strength! Alert!\"\n"); break;
+					case 5: 
+						do_char_log(n, 3, "Tactician: \"The northern stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
 			else if (ch[cn].temp==CT_BSMAGE2 && (is_inline(n, 2) || (points2rank(ch[n].points_tot)>=9 && points2rank(ch[n].points_tot)<=13)))
 			{
 				switch (candlenum)
 				{
-					case 0: do_char_log(n, 3, "Tactician: \"The central stronghold is calming down!\"\n"); break;
-					case 1: do_char_log(n, 3, "Tactician: \"The central stronghold is starting to stir!\"\n"); break;
-					case 2: do_char_log(n, 3, "Tactician: \"The central stronghold is growing in numbers!\"\n"); break;
-					case 3: do_char_log(n, 3, "Tactician: \"The central stronghold is building its forces! Alert!\"\n"); break;
-					case 4: do_char_log(n, 3, "Tactician: \"The central stronghold is nearing full strength! Alert!\"\n"); break;
-					case 5: do_char_log(n, 3, "Tactician: \"The central stronghold is at full strength! Alert!\"\n"); break;
+					case 0: 
+						do_char_log(n, 3, "Tactician: \"The central stronghold is calming down!\"\n"); break;
+					case 1: 
+						do_char_log(n, 3, "Tactician: \"The central stronghold is starting to stir!\"\n"); break;
+					case 2: 
+						do_char_log(n, 3, "Tactician: \"The central stronghold is growing in numbers!\"\n"); break;
+					case 3: 
+						do_char_log(n, 3, "Tactician: \"The central stronghold is building its forces! Alert!\"\n"); break;
+					case 4: 
+						do_char_log(n, 3, "Tactician: \"The central stronghold is nearing full strength! Alert!\"\n"); break;
+					case 5: 
+						do_char_log(n, 3, "Tactician: \"The central stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
 			else if (ch[cn].temp==CT_BSMAGE3 && (is_inline(n, 3) || points2rank(ch[n].points_tot)>=14))
 			{
 				switch (candlenum)
 				{
-					case 0: do_char_log(n, 3, "Tactician: \"The southern stronghold has calmed down!\"\n"); break;
-					case 1: do_char_log(n, 3, "Tactician: \"The southern stronghold has started to stir!\"\n"); break;
-					case 2: do_char_log(n, 3, "Tactician: \"The southern stronghold is growing in numbers!\"\n"); break;
-					case 3: do_char_log(n, 3, "Tactician: \"The southern stronghold is building its forces! Alert!\"\n"); break;
-					case 4: do_char_log(n, 3, "Tactician: \"The southern stronghold is nearing full strength! Alert!\"\n"); break;
-					case 5: do_char_log(n, 3, "Tactician: \"The southern stronghold is at full strength! Alert!\"\n"); break;
+					case 0: 
+						do_char_log(n, 3, "Tactician: \"The southern stronghold has calmed down!\"\n"); break;
+					case 1: 
+						do_char_log(n, 3, "Tactician: \"The southern stronghold has started to stir!\"\n"); break;
+					case 2: 
+						do_char_log(n, 3, "Tactician: \"The southern stronghold is growing in numbers!\"\n"); break;
+					case 3: 
+						do_char_log(n, 3, "Tactician: \"The southern stronghold is building its forces! Alert!\"\n"); break;
+					case 4: 
+						do_char_log(n, 3, "Tactician: \"The southern stronghold is nearing full strength! Alert!\"\n"); break;
+					case 5: 
+						do_char_log(n, 3, "Tactician: \"The southern stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
 		}

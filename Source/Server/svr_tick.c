@@ -2973,20 +2973,30 @@ void plr_change(int nr)
 		cpl->kindred = ch[cn].kindred;
 	}
 	
-	// waypoints and bspoints
+	// waypoints, bspoints, ospoints
 	if (cpl->waypoints != ch[cn].waypoints ||
-		cpl->bs_points != stronghold_points(cn) ||
-		cpl->bs_points != 0)
+		cpl->bs_points != ch[cn].bs_points ||
+		cpl->os_points != ch[cn].os_points)
 	{
 		buf[0] = SV_SETCHAR_WPS;
 		*(unsigned int*)(buf + 1) = ch[cn].waypoints;
-		*(unsigned int*)(buf + 5) = stronghold_points(cn);
-		*(unsigned int*)(buf + 9) = 0;
+		*(unsigned int*)(buf + 5) = ch[cn].bs_points;
+		*(unsigned int*)(buf + 9) = ch[cn].os_points;
 		xsend(nr, buf, 13);
 		
 		cpl->waypoints = ch[cn].waypoints;
-		cpl->bs_points = stronghold_points(cn);
-		cpl->os_points = 0;
+		cpl->bs_points = ch[cn].bs_points;
+		cpl->os_points = ch[cn].os_points;
+	}
+	
+	// casino tokens
+	if (cpl->tokens != ch[cn].tokens)
+	{
+		buf[0] = SV_SETCHAR_TOK;
+		*(unsigned int*)(buf + 1) = ch[cn].tokens;
+		xsend(nr, buf, 5);
+		
+		cpl->tokens = ch[cn].tokens;
 	}
 
 	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)

@@ -2105,7 +2105,7 @@ void do_listrings(int cn, char *topic)
 void do_strongholdpoints(int cn)
 {
 	int n, wavenum=0, waveprog=0;
-	do_char_log(cn, 2, "You currently have %d Black Stronghold Points.\n",stronghold_points(cn));
+	do_char_log(cn, 2, "You currently have %d Black Stronghold Points.\n",ch[cn].bs_points);
 	
 	if (globs->flags & GF_NEWBS)
 	{
@@ -6597,13 +6597,11 @@ void do_char_killed(int cn, int co, int pentsolve)
 
 			if (IS_SANECHAR(c2))
 			{
-
 				nr = ch[co].player;
 
 				ch[c2].player = nr;
 				player[nr].usnr = c2;
 				ch[c2].flags &= ~(CF_CCP);
-
 			}
 			else
 			{
@@ -6665,6 +6663,10 @@ void do_char_killed(int cn, int co, int pentsolve)
 		ch[co].taunted = 0;
 		ch[co].retry = 0;
 		ch[co].current_enemy = 0;
+		if (cn && (in = get_gear(cn, IT_MISERRING)) && it[in].active) // 50% more gold with Miser Ring
+		{
+			ch[co].gold = ch[co].gold*3/2;
+		}
 		for (m = 0; m<4; m++)
 		{
 			ch[co].enemy[m] = 0;
@@ -7279,10 +7281,14 @@ int do_hurt(int cn, int co, int dam, int type)
 		
 		if (type!=2 && cn && cn!=co && !(mf & MF_ARENA) && !noexp)
 		{
+			if ((in = get_gear(cn, IT_FORTERING)) && it[in].active) // 50% more exp with Forte Ring
+			{
+				tmp = tmp*3/2;
+			}
 			do_give_exp(cn, tmp, 1, rank);
 			
 			// stronghold points based on the subdriver of the npc
-			if (ch[co].data[26]>=101 && ch[co].data[26]<=399)
+			if ((ch[co].data[26]>=101 && ch[co].data[26]<=399) || ch[co].temp==347)
 			{
 				tmp = do_char_score(co);
 				if (ch[co].flags & CF_CANCRIT)
@@ -7291,6 +7297,11 @@ int do_hurt(int cn, int co, int dam, int type)
 					tmp = max(1, tmp*2/20);
 				else
 					tmp = max(1, tmp/20);
+				
+				if (!IS_PLAYER(cn) && ch[cn].data[CHD_MASTER] && IS_SANEPLAYER(ch[cn].data[CHD_MASTER]))
+					ch[ch[cn].data[CHD_MASTER]].data[26]++;
+				else
+					ch[cn].data[26]++;
 				
 				do_give_bspoints(cn, tmp, 1);
 			}
@@ -7364,7 +7375,7 @@ int do_surround_check(int cn, int co, int gethit)
 int do_crit(int cn, int co, int dam, int msg)
 {
 	int die, crit_dice, crit_chance, crit_mult, crit_dam=0;
-	int defense;
+	int defense, in;
 	
 	crit_dice 	= 10000;
 	crit_chance = ch[cn].crit_chance;
@@ -7390,6 +7401,12 @@ int do_crit(int cn, int co, int dam, int msg)
 		char_play_sound(co, ch[cn].sound + 8, -150, 0);
 		if (msg)
 			do_char_log(cn, 0, "Critical hit!\n");
+		
+		if (in = get_neck(co, IT_GAMBLERFAL))
+		{
+			ch[cn].a_hp += 10000;
+			it[in].active = it[in].duration;
+		}
 	}
 	
 	return max(0, crit_dam - defense);
@@ -7963,7 +7980,8 @@ void do_give(int cn, int co)
 
 	chlog(cn, "Gives %s (%d) to %s (%d)", it[in].name, in, ch[co].name, co);
 
-	if (it[in].driver==31 && (ch[co].flags & CF_UNDEAD))
+	if (it[in].driver==31 && ((ch[co].flags & CF_UNDEAD) || 
+		(ch[co].worn[WN_BODY] && it[ch[co].worn[WN_BODY]].temp == IT_BONEARMOR)))
 	{
 		if (ch[cn].flags & CF_NOMAGIC)
 		{
@@ -8260,7 +8278,7 @@ void really_update_char(int cn)
 	int n, m, t, oldlight, z, sublight = 0, maxlight = 0, co=0;
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0, pigsblood = 0, priestess = 0;
 	int heal_hp, heal_end, heal_mana;
-	int tempWeapon = 0, tempArmor = 0, bbelt = 0;
+	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0;
 	int isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0;
 	int divCursed = 1, divSlowed = 1, divWeaken = 1;
 	int hastePower = 0, slowPower = 0, hasteSpeed = 0, slowSpeed = 0, slow2Speed = 0, sickStacks = 0;
@@ -8446,6 +8464,12 @@ void really_update_char(int cn)
 					critical_b += 2;
 				}
 			}
+		}
+		
+		if (it[m].temp == IT_WHITEBELT && ch[cn].worn[WN_RHAND]==0 && ch[cn].worn[WN_LHAND]==0)
+		{
+			critical_b += 1;
+			wbelt=1;
 		}
 		
 		// Regular item bonuses
@@ -8824,6 +8848,12 @@ void really_update_char(int cn)
 		set_skill_score(cn, z, skill[z]);
 		
 		if (z==0 && bbelt)
+		{
+			weapon     += min(AT_CAP, skill[z])/3;
+			tempWeapon += min(AT_CAP, skill[z])/3;
+		}
+		
+		if (z==0 && wbelt)
 		{
 			weapon     += min(AT_CAP, skill[z])/3;
 			tempWeapon += min(AT_CAP, skill[z])/3;
@@ -9550,7 +9580,7 @@ void do_regenerate(int cn)
 		}
 	}
 	
-	if (ch[cn].flags & CF_UNDEAD)
+	if ((ch[cn].flags & CF_UNDEAD) || ((in = ch[cn].worn[WN_BODY]) && it[in].temp == IT_BONEARMOR))
 	{
 		hp = 450 + points2rank(ch[cn].points_tot) * 25;
 		
@@ -9916,10 +9946,14 @@ void do_regenerate(int cn)
 
 					if (co && co!=cn && !(mf & MF_ARENA))
 					{
+						if ((in2 = get_gear(co, IT_FORTERING)) && it[in2].active) // 50% more exp with Forte Ring
+						{
+							tmp = tmp*3/2;
+						}
 						do_give_exp(co, tmp, 1, rank);
 						
 						// stronghold points based on the subdriver of the npc
-						if (ch[cn].data[26]>=101 && ch[cn].data[26]<=399)
+						if ((ch[cn].data[26]>=101 && ch[cn].data[26]<=399) || ch[cn].temp==347)
 						{
 							tmp = do_char_score(cn);
 							if (ch[cn].flags & CF_CANCRIT)
@@ -9928,6 +9962,12 @@ void do_regenerate(int cn)
 								tmp = max(1, tmp*2/20);
 							else
 								tmp = max(1, tmp/20);
+							
+							if (!IS_PLAYER(co) && ch[co].data[CHD_MASTER] && IS_SANEPLAYER(ch[co].data[CHD_MASTER]))
+								ch[ch[co].data[CHD_MASTER]].data[26]++;
+							else
+								ch[co].data[26]++;
+							
 							do_give_bspoints(co, tmp, 1);
 						}
 					}
@@ -10607,15 +10647,40 @@ void do_shop_char(int cn, int co, int nr)
 					int in2 = 0;
 					if (ch[co].flags & CF_BSPOINTS)
 					{
-						// Adjust certain items into others based on player
-						in2 = change_bs_shop_item(cn, it[in].temp);
-						if (!in2) return;
-						pr = do_item_bsvalue(in2);
-						if (stronghold_points(cn)<pr)
+						// Stronghold items reflected by player stats
+						if (ch[co].temp == CT_TACTICIAN)
 						{
-							do_char_log(cn, 0, "You cannot afford that.\n");
-							return;
+							in2 = change_bs_shop_item(cn, it[in].temp);
+							if (!in2) return;
+							pr = do_item_bsvalue(in2);
+							if (ch[cn].bs_points<pr)
+							{
+								do_char_log(cn, 0, "You cannot afford that.\n");
+								return;
+							}
 						}
+						// Casino items
+						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+						{
+							// Random selection upon purchase
+							if (ch[co].temp == CT_ROGER)
+							{
+								in2 = change_casino_shop_item(it[in].temp);
+								if (!in2) return;
+							}
+							// Static selection upon purchase
+							else
+							{
+								in2 = in;
+							}
+							pr = do_item_bsvalue(in);
+							if (ch[cn].tokens<pr)
+							{
+								do_char_log(cn, 0, "You cannot afford that.\n");
+								return;
+							}
+						}
+						else return;
 					}
 					else if (ch[co].flags & CF_MERCHANT)
 					{
@@ -10637,26 +10702,52 @@ void do_shop_char(int cn, int co, int nr)
 					}
 					if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY))
 					{
-						// Checks for a magic item variant
-						in2 = get_special_item(in2, 0, 0, 0);
-						
-						if (god_give_char(in2, cn))
+						if (ch[co].temp == CT_TACTICIAN)
 						{
-							ch[cn].bs_points -= pr;
-
-							chlog(cn, "Bought %s", it[in2].name);
-							if (!(ch[cn].flags & CF_SYS_OFF))
-								do_char_log(cn, 1, "You bought a %s for %d Points.\n", it[in2].reference, pr);
-
-							tmp = it[in2].temp;
-							if (tmp>0 && tmp<MAXTITEM)
+							// Checks for a magic item variant
+							in2 = get_special_item(in2, 0, 0, 0);
+							
+							if (god_give_char(in2, cn))
 							{
-								it_temp[tmp].t_bought++;
+								ch[cn].bs_points -= pr;
+
+								chlog(cn, "Bought %s", it[in2].name);
+								if (!(ch[cn].flags & CF_SYS_OFF))
+									do_char_log(cn, 1, "You bought a %s for %d Points.\n", it[in2].reference, pr);
+
+								tmp = it[in2].temp;
+								if (tmp>0 && tmp<MAXTITEM)
+								{
+									it_temp[tmp].t_bought++;
+								}
+							}
+							else
+							{
+								do_char_log(cn, 0, "You cannot buy the %s because your inventory is full.\n", it[in].reference);
 							}
 						}
-						else
+						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
 						{
-							do_char_log(cn, 0, "You cannot buy the %s because your inventory is full.\n", it[in].reference);
+							in2 = get_special_item(in2, 0, 0, 0);
+							
+							if (god_give_char(in2, cn))
+							{
+								ch[cn].tokens -= pr;
+
+								chlog(cn, "Bought %s", it[in2].name);
+								if (!(ch[cn].flags & CF_SYS_OFF))
+									do_char_log(cn, 1, "You bought a %s for %d Tokens.\n", it[in2].reference, pr);
+
+								tmp = it[in2].temp;
+								if (tmp>0 && tmp<MAXTITEM)
+								{
+									it_temp[tmp].t_bought++;
+								}
+							}
+							else
+							{
+								do_char_log(cn, 0, "You cannot buy the %s because your inventory is full.\n", it[in].reference);
+							}
 						}
 					}
 					else
@@ -10764,10 +10855,19 @@ void do_shop_char(int cn, int co, int nr)
 					if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY))
 					{
 						int in2;
-						in2 = change_bs_shop_item(cn, it[in].temp);
-						if (!in2) return;
-						do_char_log(cn, 1, "%s:\n", it_temp[in2].name);
-						do_char_log(cn, 1, "%s\n", it_temp[in2].description);
+						if (ch[co].temp == CT_TACTICIAN)
+						{
+							in2 = change_bs_shop_item(cn, it[in].temp);
+							if (!in2) return;
+							do_char_log(cn, 1, "%s:\n", it_temp[in2].name);
+							do_char_log(cn, 1, "%s\n", it_temp[in2].description);
+						}
+						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+						{
+							do_char_log(cn, 1, "%s:\n", it_temp[in].name);
+							do_char_log(cn, 1, "%s\n", it_temp[in].description);
+						}
+						else return;
 					}
 					else
 					{						
@@ -11279,9 +11379,18 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 			if (ch[co].flags & CF_BSPOINTS)
 			{
 				int in2;
-				// Adjust certain items into others based on player
-				in2 = change_bs_shop_item(cn, it[in].temp);
-				pr = do_item_bsvalue(in2);
+				// Stronghold items reflected by player stats
+				if (ch[co].temp == CT_TACTICIAN)
+				{
+					in2 = change_bs_shop_item(cn, it[in].temp);
+					pr = do_item_bsvalue(in2);
+				}
+				// Casino items
+				else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+				{
+					pr = do_item_bsvalue(in);
+				}
+				else pr = 0;
 			}
 			else if (ch[co].flags & CF_MERCHANT)
 				pr = barter(cn, in, 0);
@@ -11322,17 +11431,26 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 					if (ch[co].flags & CF_BSPOINTS)
 					{
 						int in2;
-						// Adjust certain items into others based on player
-						in2 = change_bs_shop_item(cn, it[in].temp);
-						if (in2)
+						// Stronghold items reflected by player stats
+						if (ch[co].temp == CT_TACTICIAN)
 						{
-							pr = do_item_bsvalue(in2);
-							spr = get_special_spr(in2, it_temp[in2].sprite[0]);
+							in2 = change_bs_shop_item(cn, it[in].temp);
+							if (in2)
+							{
+								pr = do_item_bsvalue(in2);
+								spr = get_special_spr(in2, it_temp[in2].sprite[0]);
+							}
+							else
+							{
+								spr = pr = 0;
+							}
 						}
-						else
+						// Casino items
+						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
 						{
-							spr = pr = 0;
+							pr = do_item_bsvalue(in);
 						}
+						else pr = 0;
 					}
 					else if (ch[co].flags & CF_MERCHANT)
 						pr = barter(cn, in, 1);
@@ -11347,7 +11465,16 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				*(unsigned int*)(buf + 4 + (m - n) * 6) = pr;
 			}
 			if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY)) // For the Black Stronghold point shop
-				*(unsigned char*)(buf + 14) = 1;
+			{
+				if (ch[co].temp == CT_TACTICIAN)
+					*(unsigned char*)(buf + 14) = 1;
+				else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+					*(unsigned char*)(buf + 14) = 2;
+				else if (ch[co].temp == CT_OSIRIS)
+					*(unsigned char*)(buf + 14) = 3;
+				else
+					*(unsigned char*)(buf + 14) = 0;
+			}
 			else
 				*(unsigned char*)(buf + 14) = 0;
 			xsend(nr, buf, 16);
@@ -11372,7 +11499,16 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				*(unsigned int*)(buf + 4 + (m - n) * 6) = pr;
 			}
 			if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY)) // For the Black Stronghold point shop
-				*(unsigned char*)(buf + 14) = 1;
+			{
+				if (ch[co].temp == CT_TACTICIAN)
+					*(unsigned char*)(buf + 14) = 1;
+				else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+					*(unsigned char*)(buf + 14) = 2;
+				else if (ch[co].temp == CT_OSIRIS)
+					*(unsigned char*)(buf + 14) = 3;
+				else
+					*(unsigned char*)(buf + 14) = 0;
+			}
 			else
 				*(unsigned char*)(buf + 14) = 0;
 			xsend(nr, buf, 16);
@@ -11417,7 +11553,16 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 		*(unsigned short*)(buf + 2 + 1 * 6) = spr;
 		*(unsigned int*)(buf + 4 + 1 * 6) = pr;
 		if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY)) // For the Black Stronghold point shop
-			*(unsigned char*)(buf + 14) = 1;
+		{
+			if (ch[co].temp == CT_TACTICIAN)
+				*(unsigned char*)(buf + 14) = 1;
+			else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+				*(unsigned char*)(buf + 14) = 2;
+			else if (ch[co].temp == CT_OSIRIS)
+				*(unsigned char*)(buf + 14) = 3;
+			else
+				*(unsigned char*)(buf + 14) = 0;
+		}
 		else
 			*(unsigned char*)(buf + 14) = 0;
 		xsend(nr, buf, 16);
