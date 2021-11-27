@@ -246,8 +246,13 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, get WV from your Hand to Hand skill and 1% base crit if your main hand and off hand are empty.\n");
 		break;
 		
-	// -------- RING  ITEMS --------
+	// -------- CASINO  ITEMS --------
 		
+	case IT_SILVAMMY: 
+	case IT_SILVBELT: 
+		if (!(it[in].flags & IF_SOULSTONE))
+			do_char_log(cn, 3, "Can be soulstoned.\n");
+		break;
 	case IT_MISERRING: // Miser Ring
 		do_char_log(cn, 3, "When equipped and activated, grants 50%% more gold from enemies you kill.\n");
 		break;

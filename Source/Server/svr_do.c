@@ -10660,20 +10660,12 @@ void do_shop_char(int cn, int co, int nr)
 							}
 						}
 						// Casino items
-						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+						else if (ch[co].temp == CT_JESSICA)
 						{
 							// Random selection upon purchase
-							if (ch[co].temp == CT_ROGER)
-							{
-								in2 = change_casino_shop_item(it[in].temp);
-								if (!in2) return;
-							}
-							// Static selection upon purchase
-							else
-							{
-								in2 = in;
-							}
-							pr = do_item_bsvalue(in);
+							in2 = change_casino_shop_item(it[in].temp);
+							if (!in2) return;
+							pr = do_item_bsvalue(it[in].temp);
 							if (ch[cn].tokens<pr)
 							{
 								do_char_log(cn, 0, "You cannot afford that.\n");
@@ -10726,7 +10718,7 @@ void do_shop_char(int cn, int co, int nr)
 								do_char_log(cn, 0, "You cannot buy the %s because your inventory is full.\n", it[in].reference);
 							}
 						}
-						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+						else if (ch[co].temp == CT_JESSICA)
 						{
 							in2 = get_special_item(in2, 0, 0, 0);
 							
@@ -10862,10 +10854,10 @@ void do_shop_char(int cn, int co, int nr)
 							do_char_log(cn, 1, "%s:\n", it_temp[in2].name);
 							do_char_log(cn, 1, "%s\n", it_temp[in2].description);
 						}
-						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+						else if (ch[co].temp == CT_JESSICA)
 						{
-							do_char_log(cn, 1, "%s:\n", it_temp[in].name);
-							do_char_log(cn, 1, "%s\n", it_temp[in].description);
+							do_char_log(cn, 1, "%s:\n", it[in].name);
+							do_char_log(cn, 1, "%s\n", it[in].description);
 						}
 						else return;
 					}
@@ -11386,9 +11378,9 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 					pr = do_item_bsvalue(in2);
 				}
 				// Casino items
-				else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+				else if (ch[co].temp == CT_JESSICA)
 				{
-					pr = do_item_bsvalue(in);
+					pr = do_item_bsvalue(it[in].temp);
 				}
 				else pr = 0;
 			}
@@ -11446,9 +11438,9 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 							}
 						}
 						// Casino items
-						else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+						else if (ch[co].temp == CT_JESSICA)
 						{
-							pr = do_item_bsvalue(in);
+							pr = do_item_bsvalue(it[in].temp);
 						}
 						else pr = 0;
 					}
@@ -11468,7 +11460,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 			{
 				if (ch[co].temp == CT_TACTICIAN)
 					*(unsigned char*)(buf + 14) = 1;
-				else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+				else if (ch[co].temp == CT_JESSICA)
 					*(unsigned char*)(buf + 14) = 2;
 				else if (ch[co].temp == CT_OSIRIS)
 					*(unsigned char*)(buf + 14) = 3;
@@ -11502,7 +11494,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 			{
 				if (ch[co].temp == CT_TACTICIAN)
 					*(unsigned char*)(buf + 14) = 1;
-				else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+				else if (ch[co].temp == CT_JESSICA)
 					*(unsigned char*)(buf + 14) = 2;
 				else if (ch[co].temp == CT_OSIRIS)
 					*(unsigned char*)(buf + 14) = 3;
@@ -11556,7 +11548,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 		{
 			if (ch[co].temp == CT_TACTICIAN)
 				*(unsigned char*)(buf + 14) = 1;
-			else if (ch[co].temp == CT_ROGER || ch[co].temp == CT_JESSICA)
+			else if (ch[co].temp == CT_JESSICA)
 				*(unsigned char*)(buf + 14) = 2;
 			else if (ch[co].temp == CT_OSIRIS)
 				*(unsigned char*)(buf + 14) = 3;

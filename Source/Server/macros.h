@@ -167,7 +167,7 @@
 
 /* *** CASINO *** */
 
-#define TOKEN_RATE			10
+#define TOKEN_RATE			1000
 
 #define C_CUR_GAME(a)		(ch[(a)].data[26]>>26)
 #define C_CUR_WAGER(a)		(ch[(a)].data[27]>>26)

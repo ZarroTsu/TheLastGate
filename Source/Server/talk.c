@@ -621,7 +621,7 @@ struct know
 
 //
 #define AN_CS_HELP		"The room on the left offers various GAMES to spend your TOKENS. The room on the right offers PRIZES you can trade TOKENS for."
-#define AN_CS_GAMES		"We offer HIGHROLLER, SNAKEEYES, and BLACKJACK. Most days each game costs 10 tokens to play. During new moons each costs 20 tokens, and during full moons each costs 30."
+#define AN_CS_GAMES		"We offer HIGHROLLER and BLACKJACK. Most days each game costs 10 tokens to play. During new moons each costs 30 tokens, and during full moons each costs 40."
 #define AN_CS_PRIZES	"Roger offers items you can gamble for, while Jessica offers static items with no risk. All prizes must be purchased using TOKENS."
 #define AN_CS_HROLL		"HIGHROLLER is a game of chance using dice. You guess if the next roll will be HIGHer or LOWer than the previous one. Each successful guess ups the ante until you lose or PAYOUT."
 #define AN_CS_SEYES		"SNAKEEYES is a numbers game using dice. Each ROLL you make adds to your score, but rolling a 1 ends your turn with no score, and rolling two 1's sets your score to 0. First to 100 points wins."
@@ -1188,10 +1188,10 @@ struct know know[] = {
 	{{"!low",                              "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_L},
 	{{"!payout",                           "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_S},
 	{{"!pay", "?out",                      "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_S},
-	{{"!play", "!snakeeyes",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
-	{{"!play", "!snake", "?eyes",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
-	{{"!roll",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_R},
-	{{"!end", "?turn",                     "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_E},
+	//{{"!play", "!snakeeyes",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
+	//{{"!play", "!snake", "?eyes",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
+	//{{"!roll",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_R},
+	//{{"!end", "?turn",                     "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_E},
 	{{"!play", "!blackjack",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_P},
 	{{"!play", "?black", "!jack",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_P},
 	{{"!hit", "?me",                       "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_H},
@@ -1966,7 +1966,7 @@ void answer_tokens(int cn, int co, int nr)
 	if (!nr)
 	{
 		do_sayx(cn, "You currently have %d tokens, %s.", ch[co].tokens, ch[co].name);
-		do_sayx(cn, "Each token is worth %d Gold. If you would like to buy some, you can BUY TEN, BUY HUNDRED, or BUY THOUSAND.", TOKEN_RATE);
+		do_sayx(cn, "Each token is worth %d Gold. If you would like to buy some, you can BUY TEN, BUY HUNDRED, or BUY THOUSAND.", TOKEN_RATE/100);
 	}
 	// Buy
 	else
@@ -2010,13 +2010,14 @@ void casino_clear(int co)
 {
 	ch[co].data[26] = 0;
 	ch[co].data[27] = 0;
+	do_char_log(co, 1, "You have %9d tokens.\n", ch[co].tokens);
 }
 
 void casino_win(int co, int p)
 {
 	ch[co].tokens += p;
 	chlog(co, "Got %d tokens", p);
-	do_char_log(co, 2, "You got %d tokens. You now have %d.\n", p, ch[co].tokens);
+	do_char_log(co, 2, "You got  %9d tokens.\n", p);
 	casino_clear(co);
 }
 
@@ -2157,7 +2158,7 @@ int casino_seyes_roll(int co, int flag)
 		rt = r1 + r2;
 		
 		w = C_CUR_GAME(co);
-		t = (ch[co].data[26]>>16) % (1<<26);
+		t = (ch[co].data[26] % (1<<26))>>16;
 		ch[co].data[26]  = rt;
 		ch[co].data[26] |= w | t;
 		
@@ -2168,7 +2169,7 @@ int casino_seyes_roll(int co, int flag)
 	else if (flag == 1)
 	{
 		w = C_CUR_GAME(co);
-		t = (ch[co].data[26]>>16) % (1<<26);
+		t = (ch[co].data[26] % (1<<26))>>16;
 		
 		r1 = RANDOM(6)+1;
 		r2 = RANDOM(6)+1;
@@ -2187,19 +2188,20 @@ int casino_seyes_roll(int co, int flag)
 		{
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 0, "Ace! Your turn ends with 0.\n");
-			ch[co].data[26] = w + t;
+			ch[co].data[26] = w | t;
 			return 1;
 		}
 		
 		ch[co].data[26]  = rt;
 		ch[co].data[26] |= w | t;
+		
 		do_char_log(co, 1, "   Turn Total:         = %3d\n", 
 			(ch[co].data[26] % (1<<16)) % (1<<26));
 	}
 	else
 	{
 		w = C_CUR_WAGER(co);
-		t = (ch[co].data[27]>>16) % (1<<26);
+		t = (ch[co].data[27] % (1<<26))>>16;
 		
 		for (i = 0, rt = 0; i < 3; i++)
 		{
@@ -2220,7 +2222,7 @@ int casino_seyes_roll(int co, int flag)
 			{
 				do_char_log(co, 1, " \n");
 				do_char_log(co, 2, "Ace! Dealer's turn ends with 0.\n");
-				ch[co].data[27] = w + t;
+				ch[co].data[27] = w | t;
 				return 1;
 			}
 		}
@@ -2484,7 +2486,7 @@ void casino_bjack(int cn, int co, int nr)
 			add_new_card(co, 27, 1); 				// Dealer's cards
 			add_new_card(co, 26, 0); 				// Player card 1
 			add_new_card(co, 26, 0); 				// Player card 2
-			casino_bjack_hands(co, RANDOM(2)+1); 	// Show table
+			casino_bjack_hands(co, 1); 	// Show table
 			if (get_card_total(co, 26) == 21)		// Player has Blackjack!
 			{
 				if (get_card_total(co, 27) != 21)
@@ -2508,7 +2510,7 @@ void casino_bjack(int cn, int co, int nr)
 			break;
 		case 1: 	// Hit
 			add_new_card(co, 26, 0);
-			casino_bjack_hands(co, RANDOM(2)+1); 		// Show table
+			casino_bjack_hands(co, 1); 		// Show table
 			if (casino_bjack_winlose(co, 0)) return;	// Check for player bust
 			do_char_log(co, 1, "Will you HIT or STAND?\n");
 			break;
@@ -2541,7 +2543,8 @@ void casino_bjack(int cn, int co, int nr)
 			}
 			do_char_log(co, 1, "You doubled-down with an additional %d tokens.\n", C_CUR_WAGER(co)*10);
 			ch[co].tokens -= C_CUR_WAGER(co)*10;
-			ch[co].data[27] |= C_CUR_WAGER(co)<<26;
+			ch[co].data[27] &= ~(C_CUR_WAGER(co)<<26);
+			ch[co].data[27] |= C_CUR_WAGER(co)<<27;
 			add_new_card(co, 26, 0);
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 1, "The dealer flipped their face-down card.\n");
@@ -2562,8 +2565,8 @@ void casino_play(int cn, int co, int nr)
 	int v = C_CUR_GAME(co);
 	int wager = 1;
 	
-	if (globs->fullmoon)	wager = 3;
-	if (globs->newmoon)		wager = 2;
+	if (globs->fullmoon)	wager = 4;
+	if (globs->newmoon)		wager = 3;
 	
 	// Check if there's an active game already...
 	if (v >= 1 && v <= 3)

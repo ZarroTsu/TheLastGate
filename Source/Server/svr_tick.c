@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.6.9\n"};
+static char intro_msg3[] = {"Current client/server version is 0.6.10\n"};
 static char intro_msg4_font = 2;
-static char intro_msg4[] = {"(Nice.)\n"};
+static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 1;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 

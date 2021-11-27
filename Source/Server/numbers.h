@@ -113,8 +113,7 @@
 #define CT_BSMAGE3		1006
 #define CT_TACTICIAN	 372
 
-#define CT_ROGER		1314	// Random Rewards
-#define CT_JESSICA		1315	// Static Rewards
+#define CT_JESSICA		1314	// Casino Rewards
 #define CT_KAIBA		1312	// Casino Tokens
 #define CT_YUGI			1313	// Casino Games
 
@@ -278,11 +277,13 @@
 
 // Other
 
-#define IT_MISERRING		10001
-#define IT_FORTERING		10002
-#define IT_GAMBLERFAL		10003
-#define IT_WHITEBELT		10004
-#define IT_BONEARMOR		10005
+#define IT_SILVAMMY			2104
+#define IT_SILVBELT			2109
+#define IT_MISERRING		2482
+#define IT_FORTERING		2483
+#define IT_GAMBLERFAL		2484
+#define IT_WHITEBELT		2486
+#define IT_BONEARMOR		2481
 
 // -----
 
