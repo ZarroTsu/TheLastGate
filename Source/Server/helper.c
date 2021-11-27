@@ -1398,7 +1398,7 @@ int get_special_spr(int temp, int spr)
 int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 {
 	// roll is number of prefixes, *3/2
-	int in, mul = 1, spr, roll=36, legendary = 0, n, m, prev=-1;
+	int in, mul = 1, spr, roll=24, legendary = 0, n, m, prev=-1;
 	char *pref, *suffix, name[60], newname[80];
 	int is_armor=0, is_robe=0, is_dama=0, is_weap=0, is_mage=0;
 	int is_gaxe=0, is_thsw=0, is_axxe=0, is_shie=0, is_swor=0;
@@ -1470,7 +1470,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 	if (!RANDOM(12) || gen_c)
 	{
 		legendary = 1;
-		roll = 24;
+		roll = 16;
 	}
 	
 	roll = RANDOM(roll);
@@ -1507,57 +1507,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 			break;
 		//
 		case 10: 
-			if (legendary) pref = "Aquilia "; else pref = "Eagle's "; 
-			it[in].attrib[AT_BRV][0] += 3 * mul; 
-			it[in].attrib[AT_WIL][0] += 3 * mul; 
-			break;
 		case 11: 
-			if (legendary) pref = "Vespa "; else pref = "Wasp's "; 
-			it[in].attrib[AT_BRV][0] += 3 * mul; 
-			it[in].attrib[AT_INT][0] += 3 * mul; 
-			break;
-		case 12: 
-			if (legendary) pref = "Pardus "; else pref = "Leopard's "; 
-			it[in].attrib[AT_BRV][0] += 3 * mul; 
-			it[in].attrib[AT_AGL][0] += 3 * mul; 
-			break;
-		case 13: 
-			if (legendary) pref = "Tigris "; else pref = "Tiger's "; 
-			it[in].attrib[AT_BRV][0] += 3 * mul; 
-			it[in].attrib[AT_STR][0] += 3 * mul; 
-			break;
-		case 14: 
-			if (legendary) pref = "Ciconia "; else pref = "Crane's "; 
-			it[in].attrib[AT_WIL][0] += 3 * mul; 
-			it[in].attrib[AT_INT][0] += 3 * mul; 
-			break;
-		case 15: 
-			if (legendary) pref = "Lepus "; else pref = "Rabbit's "; 
-			it[in].attrib[AT_WIL][0] += 3 * mul; 
-			it[in].attrib[AT_AGL][0] += 3 * mul; 
-			break;
-		case 16: 
-			if (legendary) pref = "Ranae "; else pref = "Frog's "; 
-			it[in].attrib[AT_WIL][0] += 3 * mul; 
-			it[in].attrib[AT_STR][0] += 3 * mul; 
-			break;
-		case 17: 
-			if (legendary) pref = "Alces "; else pref = "Elk's "; 
-			it[in].attrib[AT_INT][0] += 3 * mul; 
-			it[in].attrib[AT_AGL][0] += 3 * mul; 
-			break;
-		case 18: 
-			if (legendary) pref = "Accipiter "; else pref = "Hawk's "; 
-			it[in].attrib[AT_INT][0] += 3 * mul; 
-			it[in].attrib[AT_STR][0] += 3 * mul; 
-			break;
-		case 19: 
-			if (legendary) pref = "Lupus "; else pref = "Wolf's "; 
-			it[in].attrib[AT_AGL][0] += 3 * mul; 
-			it[in].attrib[AT_STR][0] += 3 * mul; 
-			break;
-		//
-		case 20: 
 			if (legendary) pref = "Angelus "; else pref = "Angelic "; 
 			it[in].attrib[AT_BRV][0] += 2 * mul; 
 			it[in].attrib[AT_WIL][0] += 2 * mul; 
@@ -1565,12 +1515,18 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 			it[in].attrib[AT_AGL][0] += 2 * mul; 
 			it[in].attrib[AT_STR][0] += 2 * mul; 
 			break;
-		case 21: 
-		case 22: 
+		case 12: 
+		case 13: 
 			if (legendary) pref = "Lux "; else pref = "Glowing "; 
 			it[in].light[0] += 20 * mul;
+			it[in].spell_apt[0] += 4 * mul;
 			break;
-		case 23: 
+		case 14: 
+			if (legendary) pref = "Centurio "; else pref = "Centurion's "; 
+			it[in].to_hit[0] += 2 * mul;
+			it[in].to_parry[0] += 2 * mul;
+			break;
+		case 15: 
 			if (legendary) pref = "Deus "; else pref = "Godly "; 
 			mul *= 2; 
 			break;
@@ -1579,14 +1535,14 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 			break;
 	}
 	
-	roll=RANDOM(40);
+	roll=RANDOM(32);
 
 	// Pick a suffix, or two if legendary
 	for (n=0;n<=legendary;n++)
 	{
 		while (roll==prev) // avoid picking the same thing twice if legendary
 		{
-			roll=RANDOM(40);
+			roll=RANDOM(32);
 		}
 		m=RANDOM(2);
 		
@@ -1602,31 +1558,25 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				break;
 			case  2:
 			case  3:
-				if (is_robe || is_mage || (is_dama && m))
-				{
-					if (legendary) suffix = "Autem"; else suffix = " of Willpower";
-					it[in].attrib[AT_WIL][0] += 4 * mul;
-				}
-				else
-				{
-					if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
-					it[in].attrib[AT_AGL][0] += 4 * mul;
-				}
+				if (legendary) suffix = "Autem"; else suffix = " of Willpower";
+				it[in].attrib[AT_WIL][0] += 4 * mul;
 				break;
 			case  4:
 			case  5:
-				if (is_robe || is_mage || (is_dama && m))
-				{
-					if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
-					it[in].attrib[AT_INT][0] += 4 * mul;
-				}
-				else
-				{
-					if (legendary) suffix = "Viribus"; else suffix = " of Strength";
-					it[in].attrib[AT_STR][0] += 4 * mul;
-				}
+				if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
+				it[in].attrib[AT_INT][0] += 4 * mul;
 				break;
 			case  6:
+			case  7:
+				if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
+				it[in].attrib[AT_AGL][0] += 4 * mul;
+				break;
+			case  8:
+			case  9:
+				if (legendary) suffix = "Viribus"; else suffix = " of Strength";
+				it[in].attrib[AT_STR][0] += 4 * mul;
+				break;
+			case 10:
 				if (legendary) suffix = "Callidus"; else suffix = " of the Adept";
 				it[in].attrib[AT_BRV][0] += 2 * mul; 
 				it[in].attrib[AT_WIL][0] += 2 * mul; 
@@ -1634,257 +1584,390 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				it[in].attrib[AT_AGL][0] += 2 * mul; 
 				it[in].attrib[AT_STR][0] += 2 * mul; 
 				break;
-			case  7:
-				if (legendary) suffix = "Salutem"; else suffix = " of Hitpoints";
-				it[in].hp[0] += 40 * mul;
-				break;
-			case  8:
-				if (legendary) suffix = "Pati"; else suffix = " of Endurance";
-				it[in].end[0] += 20 * mul;
-				break;
-			case  9:
-				if (legendary) suffix = "Magus"; else suffix = " of Mana";
-				it[in].mana[0] += 40 * mul;
-				break;
-			case 10:
-				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-				it[in].weapon[0] += 3 * mul;
-				break;
+			//
 			case 11:
-				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-				it[in].armor[0] += 3 * mul;
+				if (legendary) suffix = "Vitale"; else suffix = " of Vitality";
+				it[in].hp[0] += 40 * mul;
+				it[in].skill[SK_REGEN][0] += 3 * mul;
 				break;
 			case 12:
-				if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
-				it[in].skill[SK_IMMUN][0] += 3 * mul;
+				if (legendary) suffix = "Vigor"; else suffix = " of Vigor";
+				it[in].end[0] += 20 * mul;
+				it[in].skill[SK_REST][0] += 3 * mul;
 				break;
 			case 13:
-				if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
-				it[in].skill[SK_RESIST][0] += 3 * mul;
+				if (legendary) suffix = "Spiritus"; else suffix = " of Spirits";
+				it[in].mana[0] += 40 * mul;
+				it[in].skill[SK_MEDIT][0] += 3 * mul;
 				break;
 			case 14:
+				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
+				it[in].weapon[0] += 4 * mul;
+				break;
 			case 15:
-				if (is_robe || is_spea || is_dagg || (is_dama && m))
-				{
-					if (legendary) suffix = "Pugione"; else suffix = " of the Dagger";
-					it[in].skill[SK_DAGGER][0] += 3 * mul;
-				}
-				else if (is_armor || is_claw || (is_dama && !m))
-				{
-					if (legendary) suffix = "Manibus"; else suffix = " of the Unarmed";
-					it[in].skill[SK_HAND][0] += 3 * mul;
-				}
-				else // gaxe, thsw, axxe, swor, dual, shie, staf
-				{
-					if (legendary) suffix = "Resistere"; else suffix = " of Resistance";
-					it[in].skill[SK_RESIST][0] += 3 * mul;
-				}
+				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
+				it[in].armor[0] += 4 * mul;
 				break;
 			case 16:
+				if (legendary) suffix = "Perfugium"; else suffix = " of Harbor";
+				it[in].skill[SK_IMMUN][0] += 3 * mul;
+				it[in].skill[SK_RESIST][0] += 3 * mul;
+				break;
+			//
 			case 17:
-				if (is_robe || is_spea || is_staf || (is_dama && m))
+				if (is_robe || is_spea || is_dagg || (is_dama && m))
 				{
-					if (legendary) suffix = "Virgam"; else suffix = " of the Staff";
-					it[in].skill[SK_STAFF][0] += 3 * mul;
+					if (legendary) suffix = "Occultus"; else suffix = " of Occult";
+					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
-				else if (is_armor || is_swor || (is_dama && !m))
+				else if (is_thsw)
 				{
-					if (legendary) suffix = "Gladio"; else suffix = " of the Sword";
+					if (legendary) suffix = "Concursus"; else suffix = " of Melee";
+					it[in].skill[SK_TWOHAND][0] += 2 * mul;
+					it[in].weapon[0] += 2 * mul;
+				}
+				else if (is_gaxe || is_axxe)
+				{
+					if (legendary) suffix = "Tumultus"; else suffix = " of Uproar";
+					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_TAUNT][0] += 3 * mul;
+				}
+				else if (is_swor)
+				{
+					if (legendary) suffix = "Deceptio"; else suffix = " of Deception";
 					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_POISON][0] += 3 * mul;
 				}
-				else // gaxe, thsw, axxe, dual, claw, shie, dagg
+				else if (is_staf)
 				{
-					if (legendary) suffix = "Immunis"; else suffix = " of Immunity";
-					it[in].skill[SK_IMMUN][0] += 3 * mul;
+					if (legendary) suffix = "Expello"; else suffix = " of Banish";
+					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_SLOW][0] += 3 * mul;
+				}
+				else if (is_shie)
+				{
+					if (legendary) suffix = "Talio"; else suffix = " of Retaliation";
+					it[in].skill[SK_SHIELD][0] += 3 * mul;
+					it[in].gethit_dam[0] += 2 * mul;
+				}
+				else if (is_dual)
+				{
+					if (legendary) suffix = "Talio"; else suffix = " of Retaliation";
+					it[in].skill[SK_DUAL][0] += 3 * mul;
+					it[in].gethit_dam[0] += 2 * mul;
+				}
+				else	// is_claw
+				{
+					if (legendary) suffix = "Rixa"; else suffix = " of Brawling";
+					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				break;
 			case 18:
-			case 19:
-				if (is_robe || is_mage || (is_dama && m))
+				if (is_robe || is_spea || is_dagg || (is_dama && m))
 				{
-					if (legendary) suffix = "Dispello"; else suffix = " of Dispelling";
-					it[in].skill[SK_DISPEL][0] += 3 * mul;
-				}
-				else if (is_armor || is_gaxe || is_axxe || (is_dama && !m))
-				{
-					if (legendary) suffix = "Securis"; else suffix = " of the Axe";
-					it[in].skill[SK_AXE][0] += 3 * mul;
-				}
-				else // thsw, swor, dual, claw
-				{
-					if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-					it[in].armor[0] += 3 * mul;
-				}
-				break;
-			case 20:
-			case 21:
-				if (is_robe || is_mage || (is_dama && m))
-				{
-					if (legendary) suffix = "Maledictum"; else suffix = " of Cursing";
+					if (legendary) suffix = "Cantatrix"; else suffix = " of Hexing";
+					it[in].skill[SK_DAGGER][0] += 3 * mul;
 					it[in].skill[SK_CURSE][0] += 3 * mul;
 				}
-				else if (is_armor || is_gaxe || is_thsw || (is_dama && !m))
+				else if (is_thsw)
 				{
-					if (legendary) suffix = "Magna"; else suffix = " of the Twohander";
-					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					if (legendary) suffix = "Vindex"; else suffix = " of Champions";
+					it[in].skill[SK_TWOHAND][0] += 2 * mul;
+					it[in].base_crit += 1 * mul;
 				}
-				else // axxe, swor, dual, claw
+				else if (is_gaxe || is_axxe)
 				{
-					if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-					it[in].weapon[0] += 3 * mul;
+					if (legendary) suffix = "Feritas"; else suffix = " of Brutality";
+					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_CLEAVE][0] += 3 * mul;
+				}
+				else if (is_swor)
+				{
+					if (legendary) suffix = "Callidus"; else suffix = " of Cunning";
+					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_BLIND][0] += 3 * mul;
+				}
+				else if (is_staf)
+				{
+					if (legendary) suffix = "Reconditus"; else suffix = " of Arcana";
+					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_CURSE][0] += 3 * mul;
+				}
+				else if (is_shie)
+				{
+					if (legendary) suffix = "Scutum"; else suffix = " of Shielding";
+					it[in].skill[SK_SHIELD][0] += 3 * mul;
+					it[in].armor[0] += 2 * mul;
+				}
+				else if (is_dual)
+				{
+					if (legendary) suffix = "Tracto"; else suffix = " of Wielding";
+					it[in].skill[SK_DUAL][0] += 3 * mul;
+					it[in].weapon[0] += 2 * mul;
+				}
+				else	// is_claw
+				{
+					if (legendary) suffix = "Inermis"; else suffix = " of Quarrel";
+					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_TAUNT][0] += 3 * mul;
 				}
 				break;
-			case 22:
-			case 23:
-				if (is_robe || is_mage || (is_dama && m))
+			case 19:
+				if (is_robe || is_spea || is_staf || (is_dama && m))
 				{
-					if (legendary) suffix = "Tarda"; else suffix = " of Slowing";
+					if (legendary) suffix = "Expello"; else suffix = " of Banish";
+					it[in].skill[SK_STAFF][0] += 3 * mul;
 					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
-				else
+				else if (is_claw)
 				{
-					if (legendary) suffix = "Adductius"; else suffix = " of Cleaving";
+					if (legendary) suffix = "Rixa"; else suffix = " of Brawling";
+					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_WEAKEN][0] += 3 * mul;
+				}
+				else if (is_axxe)
+				{
+					if (legendary) suffix = "Concursus"; else suffix = " of Melee";
+					it[in].skill[SK_AXE][0] += 2 * mul;
+					it[in].weapon[0] += 2 * mul;
+				}
+				else if (is_swor)
+				{
+					if (legendary) suffix = "Munitione"; else suffix = " of Fortification";
+					it[in].skill[SK_SWORD][0] += 2 * mul;
+					it[in].armor[0] += 2 * mul;
+				}
+				else if (is_dagg)
+				{
+					if (legendary) suffix = "Occultus"; else suffix = " of Occult";
+					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_SLOW][0] += 3 * mul;
+				}
+				else if (is_shie)
+				{
+					if (legendary) suffix = "Orandi"; else suffix = " of Prayer";
+					it[in].skill[SK_SHIELD][0] += 3 * mul;
+					it[in].skill[SK_RESIST][0] += 3 * mul;
+				}
+				else if (is_dual)
+				{
+					if (legendary) suffix = "Armatus"; else suffix = " of Arming";
+					it[in].skill[SK_DUAL][0] += 3 * mul;
+					it[in].skill[SK_SURROUND][0] += 3 * mul;
+				}
+				else	// is_thsw
+				{
+					if (legendary) suffix = "Inhaere"; else suffix = " of Sparring";
+					it[in].skill[SK_TWOHAND][0] += 3 * mul;
 					it[in].skill[SK_CLEAVE][0] += 3 * mul;
 				}
 				break;
-			case 24:
-			case 25:
+			case 20:
+				if (is_robe || is_spea || is_staf || (is_dama && m))
+				{
+					if (legendary) suffix = "Reconditus"; else suffix = " of Arcana";
+					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_CURSE][0] += 3 * mul;
+				}
+				else if (is_claw)
+				{
+					if (legendary) suffix = "Inermis"; else suffix = " of Quarrel";
+					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_TAUNT][0] += 3 * mul;
+				}
+				else if (is_axxe)
+				{
+					if (legendary) suffix = "Vindex"; else suffix = " of Champions";
+					it[in].skill[SK_AXE][0] += 2 * mul;
+					it[in].base_crit += 1 * mul;
+				}
+				else if (is_swor)
+				{
+					if (legendary) suffix = "Incantator"; else suffix = " of Wizardry";
+					it[in].skill[SK_SWORD][0] += 2 * mul;
+					it[in].spell_mod[0] += 1 * mul;
+				}
+				else if (is_dagg)
+				{
+					if (legendary) suffix = "Cantatrix"; else suffix = " of Hexing";
+					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_CURSE][0] += 3 * mul;
+				}
+				else if (is_shie)
+				{
+					if (legendary) suffix = "Procella"; else suffix = " of Vim";
+					it[in].skill[SK_SHIELD][0] += 3 * mul;
+					it[in].skill[SK_IMMUN][0] += 3 * mul;
+				}
+				else if (is_dual)
+				{
+					if (legendary) suffix = "Festinare"; else suffix = " of Haste";
+					it[in].skill[SK_DUAL][0] += 3 * mul;
+					it[in].skill[SK_HASTE][0] += 3 * mul;
+				}
+				else	// is_thsw
+				{
+					if (legendary) suffix = "Hastiludium"; else suffix = " of Jousting";
+					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_WEAKEN][0] += 3 * mul;
+				}
+				break;
+			case 21:
 				if (is_robe || is_mage || (is_dama && m))
 				{
-					if (legendary) suffix = "Praemium"; else suffix = " of Blasting";
+					if (legendary) suffix = "Mandatum"; else suffix = " of Command";
+					it[in].skill[SK_BLAST][0] += 3 * mul;
+					it[in].skill[SK_GHOST][0] += 3 * mul;
+				}
+				else if (is_claw)
+				{
+					if (legendary) suffix = "Concursus"; else suffix = " of Melee";
+					it[in].skill[SK_HAND][0] += 2 * mul;
+					it[in].weapon[0] += 2 * mul;
+				}
+				else if (is_thsw)
+				{
+					if (legendary) suffix = "Inhaere"; else suffix = " of Sparring";
+					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_CLEAVE][0] += 3 * mul;
+				}
+				else if (is_swor)
+				{
+					if (legendary) suffix = "Vindex"; else suffix = " of Champions";
+					it[in].skill[SK_SWORD][0] += 2 * mul;
+					it[in].base_crit += 1 * mul;
+				}
+				else	// is_axxe
+				{
+					if (legendary) suffix = "Tumultus"; else suffix = " of Uproar";
+					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_TAUNT][0] += 3 * mul;
+				}
+				break;
+			case 22:
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Caeremonia"; else suffix = " of Ceremony";
+					it[in].skill[SK_GHOST][0] += 3 * mul;
+					it[in].skill[SK_MSHIELD][0] += 3 * mul;
+				}
+				else if (is_claw)
+				{
+					if (legendary) suffix = "Vindex"; else suffix = " of Champions";
+					it[in].skill[SK_HAND][0] += 2 * mul;
+					it[in].base_crit += 1 * mul;
+				}
+				else if (is_thsw)
+				{
+					if (legendary) suffix = "Hastiludium"; else suffix = " of Jousting";
+					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_WEAKEN][0] += 3 * mul;
+				}
+				else if (is_swor)
+				{
+					if (legendary) suffix = "Concursus"; else suffix = " of Melee";
+					it[in].skill[SK_SWORD][0] += 2 * mul;
+					it[in].weapon[0] += 2 * mul;
+				}
+				else	// is_axxe
+				{
+					if (legendary) suffix = "Feritas"; else suffix = " of Brutality";
+					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_CLEAVE][0] += 3 * mul;
+				}
+				break;
+			case 23:
+				if (is_robe || is_mage || (is_dama && m))
+				{
+					if (legendary) suffix = "Vis"; else suffix = " of Energy";
+					it[in].skill[SK_MSHIELD][0] += 3 * mul;
 					it[in].skill[SK_BLAST][0] += 3 * mul;
 				}
 				else
 				{
-					if (legendary) suffix = "Infirmi"; else suffix = " of Weakening";
-					it[in].skill[SK_WEAKEN][0] += 3 * mul;
-				}
-				break;
-			case 26:
-			case 27:
-				if (is_robe || is_mage || (is_dama && m))
-				{
-					if (legendary) suffix = "Familia"; else suffix = " of Company";
-					it[in].skill[SK_GHOST][0] += 3 * mul;
-				}
-				else
-				{
-					if (legendary) suffix = "Regio"; else suffix = " of Surrounding";
+					if (legendary) suffix = "Contumacia"; else suffix = " of Defiance";
 					it[in].skill[SK_SURROUND][0] += 3 * mul;
-				}
-				break;
-			case 28:
-			case 29:
-				if (is_robe || is_mage || (is_dama && m))
-				{
-					if (legendary) suffix = "Clypeus"; else suffix = " of Shielding";
-					it[in].skill[SK_MSHIELD][0] += 3 * mul;
-				}
-				else
-				{
-					if (legendary) suffix = "Furorem"; else suffix = " of Taunting";
 					it[in].skill[SK_TAUNT][0] += 3 * mul;
 				}
 				break;
-			case 30:
-			case 31:
+			case 24:
 				if (is_robe || is_mage || (is_dama && m))
 				{
-					if (legendary) suffix = "Praesidium"; else suffix = " of Protection";
-					it[in].skill[SK_PROTECT][0] += 3 * mul;
+					if (legendary) suffix = "Maledictio"; else suffix = " of Unbrance";
+					it[in].skill[SK_CURSE][0] += 3 * mul;
+					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
 				else
 				{
-					if (legendary) suffix = "Fortitudo"; else suffix = " of Toughness";
-					it[in].skill[SK_ARMORM][0] += 3 * mul;
+					if (legendary) suffix = "Debellare"; else suffix = " of Vanquish";
+					it[in].skill[SK_CLEAVE][0] += 3 * mul;
+					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				break;
-			case 32:
-			case 33:
-				if (is_robe || is_mage || (is_dama && m))
+			case 25:
+				if (is_claw || is_gaxe || is_thsw || is_axxe)
 				{
-					if (legendary) suffix = "Augendae"; else suffix = " of Enhancing";
-					it[in].skill[SK_ENHANCE][0] += 3 * mul;
+					if (legendary) suffix = "Impetus"; else suffix = " of Offense";
+					it[in].weapon[0] += 4 * mul;
 				}
-				else
+				else if (is_spea || is_staf || is_dagg)
 				{
-					if (legendary) suffix = "Acies"; else suffix = " of Sharpness";
-					it[in].skill[SK_WEAPONM][0] += 3 * mul;
+					if (legendary) suffix = "Incantator"; else suffix = " of Wizardry";
+					if (is_spea || is_dagg) it[in].skill[SK_DAGGER][0] += 2 * mul;
+					if (is_spea || is_staf) it[in].skill[SK_STAFF][0] += 2 * mul;
+					it[in].spell_mod[0] += 1 * mul;
 				}
-				break;
-			case 34:
-				if (legendary) suffix = "Benedicite"; else suffix = " of Blessing";
-				it[in].skill[SK_BLESS][0] += 3 * mul;
-				break;
-			case 35:
-				switch (RANDOM(4))
+				else	// is_swor
 				{
-					case  0:
-						if (is_robe || is_mage || (is_dama && m))
-						{
-							if (legendary) suffix = "Pulsus"; else suffix = " of Pulsing";
-							it[in].skill[SK_PULSE][0] += 3 * mul;
-						}
-						else
-						{
-							if (legendary) suffix = "Bellum"; else suffix = " of Command";
-							it[in].skill[SK_WARCRY][0] += 3 * mul;
-						}
-						break;
-					case  1:
-						if (is_robe || is_mage || (is_dama && m))
-						{
-							if (legendary) suffix = "Umbra"; else suffix = " of Shadows";
-							it[in].skill[SK_SHADOW][0] += 3 * mul;
-						}
-						else
-						{
-							if (legendary) suffix = "Salio"; else suffix = " of Leaping";
-							it[in].skill[SK_LEAP][0] += 3 * mul;
-						}
-						break;
-					case  2:
-						if (is_robe || is_mage || (is_dama && m))
-						{
-							if (legendary) suffix = "Venenum"; else suffix = " of Poison";
-							it[in].skill[SK_POISON][0] += 3 * mul;
-						}
-						else
-						{
-							if (legendary) suffix = "Ventus"; else suffix = " of Zephyr";
-							it[in].skill[SK_ZEPHYR][0] += 3 * mul;
-						}
-						break;
-					default:
-						if (legendary) suffix = "Propinquitas"; else suffix = " of Proximity";
-						it[in].skill[SK_PROX][0] += 3 * mul;
-						break;
+					if (legendary) suffix = "Deceptio"; else suffix = " of Deception";
+					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_POISON][0] += 3 * mul;
 				}
 				break;
-			//
-			case 36:
-				if (legendary) suffix = "Caecus"; else suffix = " of Blinding";
-				it[in].skill[SK_BLIND][0] += 3 * mul;
-				break;
-			case 37:
-				if (is_robe || is_mage || (is_dama && m))
+			case 26:
+				if (is_claw || is_gaxe || is_thsw || is_axxe)
 				{
-					if (legendary) suffix = "Renati"; else suffix = " of Regeneration";
-					it[in].skill[SK_REGEN][0] += 3 * mul;
+					if (legendary) suffix = "Defendere"; else suffix = " of Defense";
+					it[in].armor[0] += 4 * mul;
 				}
-				else
+				else if (is_spea || is_staf || is_dagg)
 				{
-					if (legendary) suffix = "Meditor"; else suffix = " of Meditation";
-					it[in].skill[SK_MEDIT][0] += 3 * mul;
+					if (legendary) suffix = "Munitione"; else suffix = " of Fortification";
+					if (is_spea || is_dagg) it[in].skill[SK_DAGGER][0] += 2 * mul;
+					if (is_spea || is_staf) it[in].skill[SK_STAFF][0] += 2 * mul;
+					it[in].armor[0] += 2 * mul;
+				}
+				else	// is_swor
+				{
+					if (legendary) suffix = "Callidus"; else suffix = " of Cunning";
+					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_BLIND][0] += 3 * mul;
 				}
 				break;
-			case 38:
-				if (legendary) suffix = "Requiem"; else suffix = " of Resting";
-				it[in].skill[SK_REST][0] += 3 * mul;
+			case 27:
+				if (legendary) suffix = "Acerbita"; else suffix = " of Sharpness";
+				it[in].skill[SK_WEAPONM][0] += 3 * mul;
+				it[in].skill[SK_ENHANCE][0] += 3 * mul;
 				break;
-			case 39:
-				if (legendary) suffix = "Sana"; else suffix = " of Healing";
+			case 28:
+				if (legendary) suffix = "Fortitudo"; else suffix = " of Toughness";
+				it[in].skill[SK_ARMORM][0] += 3 * mul;
+				it[in].skill[SK_PROTECT][0] += 3 * mul;
+				break;
+			case 29:
+				if (legendary) suffix = "Salus"; else suffix = " of Safety";
 				it[in].skill[SK_HEAL][0] += 3 * mul;
+				it[in].skill[SK_SWIM][0] += 3 * mul;
+				break;
+			case 30:
+				if (legendary) suffix = "Chirurgia"; else suffix = " of Surgery";
+				it[in].crit_multi[0] += 5 * mul;
+				break;
+			case 31:
+				if (legendary) suffix = "Acceleratio"; else suffix = " of Acceleration";
+				it[in].speed[0] += 2 * mul;
 				break;
 			//
 			default:
