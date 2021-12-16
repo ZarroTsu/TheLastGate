@@ -1638,7 +1638,7 @@ void act_attack(int cn)         // attack character in front of the character
 	switch(ch[cn].dir)
 	{
 	case    DX_UP:
-		if (ch[cn].y>0)
+		if (ch[cn].x>0)
 		{
 			ch[cn].status  = 160;
 			ch[cn].status2 = v;
@@ -1648,7 +1648,7 @@ void act_attack(int cn)         // attack character in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_DOWN:
-		if (ch[cn].y<MAPY - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 168;
 			ch[cn].status2 = v;
@@ -1658,7 +1658,7 @@ void act_attack(int cn)         // attack character in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_LEFT:
-		if (ch[cn].x>0)
+		if (ch[cn].y>0)
 		{
 			ch[cn].status  = 176;
 			ch[cn].status2 = v;
@@ -1668,7 +1668,7 @@ void act_attack(int cn)         // attack character in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].y<MAPY - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = v;
@@ -1696,7 +1696,7 @@ void act_give(int cn)   // give current object to character in front of the char
 	switch(ch[cn].dir)
 	{
 	case    DX_UP:
-		if (ch[cn].y>0)
+		if (ch[cn].x>0)
 		{
 			ch[cn].status  = 160;
 			ch[cn].status2 = 3;
@@ -1706,7 +1706,7 @@ void act_give(int cn)   // give current object to character in front of the char
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_DOWN:
-		if (ch[cn].y<MAPY - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 168;
 			ch[cn].status2 = 3;
@@ -1716,7 +1716,7 @@ void act_give(int cn)   // give current object to character in front of the char
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_LEFT:
-		if (ch[cn].x>0)
+		if (ch[cn].y>0)
 		{
 			ch[cn].status  = 176;
 			ch[cn].status2 = 3;
@@ -1726,7 +1726,7 @@ void act_give(int cn)   // give current object to character in front of the char
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].y<MAPY - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 3;
@@ -1754,7 +1754,7 @@ void act_bow(int cn)
 	switch(ch[cn].dir)
 	{
 	case    DX_UP:
-		if (ch[cn].y>0)
+		if (ch[cn].x>0)
 		{
 			ch[cn].status  = 160;
 			ch[cn].status2 = 7;
@@ -1764,7 +1764,7 @@ void act_bow(int cn)
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_DOWN:
-		if (ch[cn].y<MAPY - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 168;
 			ch[cn].status2 = 7;
@@ -1774,7 +1774,7 @@ void act_bow(int cn)
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_LEFT:
-		if (ch[cn].x>0)
+		if (ch[cn].y>0)
 		{
 			ch[cn].status  = 176;
 			ch[cn].status2 = 7;
@@ -1784,7 +1784,7 @@ void act_bow(int cn)
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].y<MAPY - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 7;
@@ -1812,7 +1812,7 @@ void act_wave(int cn)
 	switch(ch[cn].dir)
 	{
 	case    DX_UP:
-		if (ch[cn].y>0)
+		if (ch[cn].x>0)
 		{
 			ch[cn].status  = 160;
 			ch[cn].status2 = 8;
@@ -1822,7 +1822,7 @@ void act_wave(int cn)
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_DOWN:
-		if (ch[cn].y<MAPY - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 168;
 			ch[cn].status2 = 8;
@@ -1832,7 +1832,7 @@ void act_wave(int cn)
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_LEFT:
-		if (ch[cn].x>0)
+		if (ch[cn].y>0)
 		{
 			ch[cn].status  = 176;
 			ch[cn].status2 = 8;
@@ -1842,7 +1842,7 @@ void act_wave(int cn)
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].y<MAPY - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 8;
@@ -1939,7 +1939,7 @@ void act_pickup(int cn)         // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 1;
@@ -1967,7 +1967,7 @@ void act_use(int cn)            // get the object in front of the character
 	switch(ch[cn].dir)
 	{
 	case    DX_UP:
-		if (ch[cn].y>0)
+		if (ch[cn].x>0)
 		{
 			ch[cn].status  = 160;
 			ch[cn].status2 = 4;
@@ -1977,7 +1977,7 @@ void act_use(int cn)            // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_DOWN:
-		if (ch[cn].y<MAPY - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 168;
 			ch[cn].status2 = 4;
@@ -1987,7 +1987,7 @@ void act_use(int cn)            // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_LEFT:
-		if (ch[cn].x>0)
+		if (ch[cn].y>0)
 		{
 			ch[cn].status  = 176;
 			ch[cn].status2 = 4;
@@ -1997,7 +1997,7 @@ void act_use(int cn)            // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].y<MAPY - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 4;

@@ -1331,6 +1331,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 5):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#spinel                list spinel rings.\n");
 			do_char_log(cn, 1, "#staff                 list staff stats.\n");
 			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
@@ -1356,6 +1357,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 4):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#rank                  show exp for next rank.\n");
 			do_char_log(cn, 1, "#ranks                 show exp for all ranks.\n");
 			do_char_log(cn, 1, "#ring <type>           list ring stats.\n");
 			do_char_log(cn, 1, "#ruby                  list ruby rings.\n");
@@ -1370,7 +1372,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#sortdepot <order>     sort depot.\n");
 			do_char_log(cn, 1, "#spear                 list spear stats.\n");
 			do_char_log(cn, 1, "#spellignore           don't attack if spelled.\n");
-			do_char_log(cn, 1, "#spinel                list spinel rings.\n");
 		}
 		else if (strcmp(topic, "3")==0)
 		{
@@ -1378,6 +1379,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 3):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#greataxe              list greataxe stats.\n");
 			do_char_log(cn, 1, "#group <player>        group with player.\n");
 			do_char_log(cn, 1, "#gtell <message>       tell to your group.\n");
 			do_char_log(cn, 1, "#ignore <player>       ignore that player.\n");
@@ -1393,7 +1395,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#override              you always spell self.\n");
 			do_char_log(cn, 1, "#poles <page>          lists unattained poles.\n");
 			do_char_log(cn, 1, "#quest <page>          list available quests.\n");
-			do_char_log(cn, 1, "#rank                  show exp for next rank.\n");
 		}
 		else if (strcmp(topic, "2")==0)
 		{
@@ -1404,6 +1405,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#chars                 list local chars and exp.\n");
 			do_char_log(cn, 1, "#citrine               list citrine rings.\n");
 			do_char_log(cn, 1, "#claw                  list claw stats.\n");
+			do_char_log(cn, 1, "#contract              list current contract.\n");
 			do_char_log(cn, 1, "#dagger                list dagger stats.\n");
 			do_char_log(cn, 1, "#diamond               list diamond rings.\n");
 			do_char_log(cn, 1, "#dualsword             list dualsword stats.\n");
@@ -1418,7 +1420,6 @@ void do_help(int cn, char *topic)
 			}
 			do_char_log(cn, 1, "#gctome                gc travels with you.\n");
 			do_char_log(cn, 1, "#gold <amount>         get X gold coins.\n");
-			do_char_log(cn, 1, "#greataxe              list greataxe stats.\n");
 		}
 		else
 		{
@@ -2752,6 +2753,25 @@ void do_listgcbuffs(int cn)
 	do_listbuffs(cn, co);
 }
 
+void do_showcontract(int cn)
+{
+	int x, y, in, maploc;
+	
+	maploc = CONT_NUM(cn);
+	
+	if (!maploc) return;
+	
+	x = MM_TARGETX - 10;
+	y = MM_TARGETY + MM_TARG_OF*(maploc-1);
+	
+	in = map[x + y * MAPX].it;
+	
+	if (in && it[in].driver == 113)
+	{
+		look_contract(cn, in, 0);
+	}
+}
+
 // -------- //
 
 void do_afk(int cn, char *msg)
@@ -3888,7 +3908,7 @@ void do_make_soulstone(int cn, int cexp)
 {
 	int in, rank;
 
-	in = god_create_item(1146);
+	in = god_create_item(IT_SOULSTONE);
 	if (in)
 	{
 		rank = points2rank(cexp);
@@ -4268,6 +4288,12 @@ void do_command(int cn, char *ptr)
 		}
 		break;
 	case 'c':
+		if (prefix(cmd, "contract"))
+		{
+			do_showcontract(cn);
+			return;
+		}
+		;
 		if (prefix(cmd, "cap") && f_g)
 		{
 			set_cap(cn, atoi(arg[1]));
@@ -4473,6 +4499,17 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "gctome") && !f_m)
 		{
 			do_gctome(cn);
+			return;
+		}
+		;
+		if (prefix(cmd, "genma"))
+		{
+			break;
+		}
+		;
+		if (prefix(cmd, "genmap") && f_g)
+		{
+			build_new_map(cn, atoi(arg[1]), atoi(arg[2]), atoi(arg[3]), 0, 0);
 			return;
 		}
 		;
@@ -5777,7 +5814,7 @@ int get_book(int cn, int in)
 	in2 = ch[cn].worn[WN_LHAND];
 	
 	if (in2 && it[in2].temp == in) 
-		return 1;
+		return in2;
 	
 	return 0;
 }
@@ -5790,7 +5827,7 @@ int get_neck(int cn, int in)
 	in2 = ch[cn].worn[WN_NECK];
 	
 	if (in2 && it[in2].temp == in) 
-		return 1;
+		return in2;
 	
 	return 0;
 }
@@ -5803,7 +5840,7 @@ int get_gear(int cn, int in)
 	for (n = 0; n <= WN_CHARM2; n++)
 	{
 		if ((in2 = ch[cn].worn[n]) && it[in2].temp == in)
-			return 1;
+			return in2;
 	}
 	
 	return 0;
@@ -6005,6 +6042,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 	int n, in, x, y, temp = 0, m, tmp, tmpg, wimp, cc = 0, fn, r1, r2, rank;
 	unsigned long long mf;
 	unsigned char buf[3];
+	int os;
 
 	do_notify_char(co, NT_DIED, cn, 0, 0, 0);
 
@@ -6075,7 +6113,26 @@ void do_char_killed(int cn, int co, int pentsolve)
 		{
 			ch[cn].alignment = -7500;
 		}
-
+		
+		// Contract kill progress
+		if (CONT_NUM(cn)) 
+		{
+			os = 0;
+			switch (CONT_SCEN(cn))
+			{
+				case  1: if (IS_CON_NME(co)) { add_map_progress(CONT_NUM(cn)); os++; } break;
+				case  2: if (IS_CON_DIV(co)) { add_map_progress(CONT_NUM(cn)); os++; } break;
+				case  3: if (IS_CON_CRU(co)) { add_map_progress(CONT_NUM(cn)); os++; } break;
+				case  8: if (IS_CON_COW(co)) { add_map_progress(CONT_NUM(cn)); os++; } break;
+				case  9: if (IS_CON_UNI(co)) { add_map_progress(CONT_NUM(cn)); os++; } break;
+				default: break;
+			}
+			if (os && CONT_PROG(cn)>=CONT_GOAL(cn)) 
+				do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+		}
+		
+		if (n = get_gear(cn, IT_WP_LAMEDARG)) it[n].data[0]++;		
+		
 		// becoming purple
 		if (ch[co].temp==CT_PRIEST)   // add all other priests of the purple one here...
 		{
@@ -6183,6 +6240,23 @@ void do_char_killed(int cn, int co, int pentsolve)
 	// a follower (garg, ghost comp or whatever) killed someone or something.
 	if (cn && cn!=co && !(ch[cn].flags & (CF_PLAYER)) && (cc = ch[cn].data[CHD_MASTER])!=0 && (ch[cc].flags & (CF_PLAYER)))
 	{
+		// Contract kill progress
+		if (CONT_NUM(cc)) 
+		{
+			os = 0;
+			switch (CONT_SCEN(cc))
+			{
+				case  1: if (IS_CON_NME(co)) { add_map_progress(CONT_NUM(cc)); os++; } break;
+				case  2: if (IS_CON_DIV(co)) { add_map_progress(CONT_NUM(cc)); os++; } break;
+				case  3: if (IS_CON_CRU(co)) { add_map_progress(CONT_NUM(cc)); os++; } break;
+				case  8: if (IS_CON_COW(co)) { add_map_progress(CONT_NUM(cc)); os++; } break;
+				case  9: if (IS_CON_UNI(co)) { add_map_progress(CONT_NUM(cc)); os++; } break;
+				default: break;
+			}
+			if (os && CONT_PROG(cc)>=CONT_GOAL(cc)) 
+				do_char_log(cc, 2, "That's all of them! You're good to go!\n");
+		}
+		
 		if (!(ch[co].flags & (CF_PLAYER)) && ch[co].alignment==10000)
 		{
 			do_char_log(cc, 0, "A goddess is about to turn your follower into a frog, but notices that you are responsible. You feel her do something to you. Nothing good, that's for sure.\n");
@@ -6470,6 +6544,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 			ch[co].spell[n] = ch[cc].spell[n] = 0;
 			bu[in].used = USE_EMPTY;  // destroy spells all the time
 		}
+		clear_map_buffs(co, 1);
 
 		// move evidence (body) away
 		if (ch[co].x==ch[co].temple_x && ch[co].y==ch[co].temple_y)
@@ -6778,7 +6853,7 @@ int do_char_can_flee(int cn)
 	if (chance< 0) chance =   0; 
 	if (chance>18) chance =  18; 
 	
-	if (RANDOM(20)<=chance)
+	if (RANDOM(20)<=chance && !ch[cn].taunted)
 	{
 		ch[cn].escape_timer = TICKS*3;
 		if (!(ch[cn].flags & CF_SYS_OFF))
@@ -6974,6 +7049,7 @@ void do_lucksave(int cn, char *deathtype)
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
+	clear_map_buffs(cn, 1);
 	
 	chlog(cn, "Saved by the Gods (new luck=%d)", ch[cn].luck);
 	ch[cn].data[44]++;
@@ -6986,7 +7062,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	int tmp = 0, n, in, rank = 0, noexp = 0, halfexp = 0;
 	unsigned long long mf;
 	int hp_dam = 0, end_dam = 0, mana_dam = 0;
-	int scorched = 0, guarded = 0, devRn = 0, devRo = 0;
+	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, phalanx = 0;
 	int offpot = 0, defpot = 0;
 	int thorns, crit_dam = 0;
 
@@ -7070,6 +7146,7 @@ int do_hurt(int cn, int co, int dam, int type)
 			
 			if (bu[in].temp > 100 && bu[in].data[3]==IT_POT_DEF)	defpot = 1;
 			if (bu[in].temp==SK_SHADOW) devRo = bu[in].data[5];
+			if (bu[in].temp==SK_PHALANX) phalanx = bu[in].power;
 		}
 		if ((in = ch[cn].spell[n])!=0)
 		{
@@ -7087,6 +7164,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	if (defpot)		dam = dam *  9/10;
 	if (scorched)	dam = dam * (1000 + scorched) / 1000;
 	if (guarded)	dam = dam * (1000 - guarded ) / 1000;
+	if (phalanx)	dam = dam * (1000 - phalanx ) / 1000;
 	//
 	if (type==3)
 	{
@@ -7100,25 +7178,14 @@ int do_hurt(int cn, int co, int dam, int type)
 		{
 			switch (type)
 			{
-				case 0:
-				case 4:
-					dam *= 250;
-					break;
-				case 6:
-					dam *= 125;
-					break;
-				case 7:
-					dam *=  50;
-					break;
-				case 8:
-					dam *= 450;
-					break;
-				case 1:
-					dam *= 625;
-					break;
-				default: // 2, 5
-					dam *= 750;
-					break;
+				case  1: dam *= DAM_MULT_BLAST;  break; // Blast
+				case  2: dam *= DAM_MULT_HOLYW;  break; // Holy Water / Staff of Kill Undead
+				case  3: dam *= DAM_MULT_THORNS; break; // Thorns
+				case  5: dam *= DAM_MULT_CLEAVE; break; // Cleave
+				case  6: dam *= DAM_MULT_PULSE;  break; // Pulse
+				case  7: dam *= DAM_MULT_ZEPHYR; break; // Zephyr
+				case  8: dam *= DAM_MULT_LEAP;   break; // Leap
+				default: dam *= DAM_MULT_HIT;    break; // Hit / Surround Hit
 			}
 		}
 	}
@@ -7275,15 +7342,18 @@ int do_hurt(int cn, int co, int dam, int type)
 			if (bu[in].temp==SK_PROTECT || bu[in].temp==SK_ENHANCE || bu[in].temp==SK_BLESS || bu[in].temp==SK_HASTE)
 				tmp += tmp / 5;
 			
+			if (bu[in].temp==105) // map exp bonus
+				tmp += tmp / 2;
+			
 			if (ch[co].flags & CF_EXTRAEXP)
 				tmp *= 3;
 		}
 		
 		if (type!=2 && cn && cn!=co && !(mf & MF_ARENA) && !noexp)
 		{
-			if ((in = get_gear(cn, IT_FORTERING)) && it[in].active) // 50% more exp with Forte Ring
+			if ((in = get_gear(cn, IT_FORTERING)) && it[in].active) // 25% more exp with Forte Ring
 			{
-				tmp = tmp*3/2;
+				tmp = tmp*4/3;
 			}
 			do_give_exp(cn, tmp, 1, rank);
 			
@@ -7390,6 +7460,12 @@ int do_crit(int cn, int co, int dam, int msg)
 	
 	die = RANDOM(crit_dice) + 1;
 	
+	if (get_gear(cn, IT_WP_VOLCANF) && has_buff(co, SK_SCORCH))
+	{
+		remove_buff(co, SK_SCORCH);
+		die = 0;
+	}
+	
 	if (die<=crit_chance)
 	{
 		ch[cn].data[73]=0;
@@ -7402,7 +7478,7 @@ int do_crit(int cn, int co, int dam, int msg)
 		if (msg)
 			do_char_log(cn, 0, "Critical hit!\n");
 		
-		if (in = get_neck(co, IT_GAMBLERFAL))
+		if (in = get_neck(cn, IT_GAMBLERFAL))
 		{
 			ch[cn].a_hp += 10000;
 			it[in].active = it[in].duration;
@@ -8286,7 +8362,7 @@ void really_update_char(int cn)
 	int attrib_ex[5];
 	int skill[50];
 	unsigned long long prof;
-	int charmSpec = 0, gearSpec = 0, nightSpec = 0;
+	int charmSpec = 0, gearSpec = 0, nightSpec = 0, gemSpec = 0;
 	int in=0;
 	//int speedvalue_a = 0, speedvalue_b = 0, speedvalue_c = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0;
@@ -8376,50 +8452,51 @@ void really_update_char(int cn)
 			{
 				nightSpec = 1;
 			}
+			if (it[m].temp==IT_WP_GEMCUTTER) gemSpec = 1;
 			
 			// If the item is sparked/active/whatever
 			if (it[m].active || nightSpec)
 			{
 				// Attributes
-				for (z = 0; z<5; z++) attrib[z] += it[m].attrib[z][1];
+				for (z = 0; z<5; z++) attrib[z] += (it[m].attrib[z][1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
-				hp   += it[m].hp[1];
-				end  += it[m].end[1];
-				mana += it[m].mana[1];
+				hp   += (it[m].hp[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				end  += (it[m].end[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				mana += (it[m].mana[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
 				// Skills
-				for (z = 0; z<MAXSKILL; z++) skill[z] += it[m].skill[z][1];
+				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
 				// Meta values
-				base_spd   += ((gearSpec & 4) && it[m].speed[1]<0) ? it[m].speed[1]/2 : it[m].speed[1];
-				spd_move   += ((gearSpec & 4) && it[m].move_speed[1]<0) ? it[m].move_speed[1]/2 : it[m].move_speed[1];
-				spd_attack += ((gearSpec & 4) && it[m].atk_speed[1]<0) ? it[m].atk_speed[1]/2 : it[m].atk_speed[1];
-				spd_cast   += ((gearSpec & 4) && it[m].cast_speed[1]<0) ? it[m].cast_speed[1]/2 : it[m].cast_speed[1];
-				spell_mod  += it[m].spell_mod[1];
-				spell_apt  += it[m].spell_apt[1];
-				spell_cool += it[m].cool_bonus[1];
+				base_spd   += (((gearSpec&4)&&it[m].speed[1]<0)?it[m].speed[1]/2:it[m].speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_move   += (((gearSpec&4)&&it[m].move_speed[1]<0)?it[m].move_speed[1]/2:it[m].move_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_attack += (((gearSpec&4)&&it[m].atk_speed[1]<0)?it[m].atk_speed[1]/2:it[m].atk_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[1]<0)?it[m].cast_speed[1]/2:it[m].cast_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spell_mod  += (it[m].spell_mod[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spell_apt  += (it[m].spell_apt[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spell_cool += (it[m].cool_bonus[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			// Otherwise, give normal stat boosts
 			else
 			{
 				// Attributes
-				for (z = 0; z<5; z++) attrib[z] += it[m].attrib[z][0];
+				for (z = 0; z<5; z++) attrib[z] += (it[m].attrib[z][0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
-				hp   += it[m].hp[0];
-				end  += it[m].end[0];
-				mana += it[m].mana[0];
+				hp   += (it[m].hp[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				end  += (it[m].end[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				mana += (it[m].mana[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
 				// Skills
-				for (z = 0; z<MAXSKILL; z++) skill[z] += it[m].skill[z][0];
+				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
 				// Meta values
-				base_spd   += ((gearSpec & 4) && it[m].speed[0]<0) ? it[m].speed[0]/2 : it[m].speed[0];
-				spd_move   += ((gearSpec & 4) && it[m].move_speed[0]<0) ? it[m].move_speed[0]/2 : it[m].move_speed[0];
-				spd_attack += ((gearSpec & 4) && it[m].atk_speed[0]<0) ? it[m].atk_speed[0]/2 : it[m].atk_speed[0];
-				spd_cast   += ((gearSpec & 4) && it[m].cast_speed[0]<0) ? it[m].cast_speed[0]/2 : it[m].cast_speed[0];
-				spell_mod  += it[m].spell_mod[0];
-				spell_apt  += it[m].spell_apt[0];
-				spell_cool += it[m].cool_bonus[0];
+				base_spd   += (((gearSpec&4)&&it[m].speed[0]<0)?it[m].speed[0]/2:it[m].speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_move   += (((gearSpec&4)&&it[m].move_speed[0]<0)?it[m].move_speed[0]/2:it[m].move_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_attack += (((gearSpec&4)&&it[m].atk_speed[0]<0)?it[m].atk_speed[0]/2:it[m].atk_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[0]<0)?it[m].cast_speed[0]/2:it[m].cast_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spell_mod  += (it[m].spell_mod[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spell_apt  += (it[m].spell_apt[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spell_cool += (it[m].cool_bonus[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			
 			if (it[m].temp==IT_CH_PREIST || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_PREIST)) 	charmSpec |=    1;
@@ -8450,7 +8527,7 @@ void really_update_char(int cn)
 			if (it[m].temp==IT_BOOK_HOLY)		gearSpec  |=  512;
 		}
 		
-		critical_b += it[m].base_crit;
+		critical_b += it[m].base_crit*(((n==10||n==11)&&gemSpec)?7:6)/6;
 		
 		if (it[m].temp == IT_TW_BBELT)
 		{
@@ -8475,86 +8552,85 @@ void really_update_char(int cn)
 		// Regular item bonuses
 		if (it[m].active)
 		{
-			armor  += it[m].armor[1];
+			armor  += it[m].armor[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			
 			// Special case for Templars with Dual Swords...
 			if ((it[m].flags & IF_OF_DUALSW) &&	IS_ANY_TEMP(cn))
 			{
-				weapon += it[m].weapon[1]/2;
+				weapon += it[m].weapon[1]/2*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else if (n == WN_LHAND && (it[m].flags & IF_WP_DAGGER)) // ...and daggers...
 			{
-				weapon += it[m].weapon[1]/4*3;
+				weapon += it[m].weapon[1]/4*3*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else if (n == WN_RHAND && (it[m].flags & IF_OF_SHIELD)) // Special case for AT dual shield memes
 			{
-				weapon += it[m].armor[1]*2;
+				weapon += it[m].armor[1]*2*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else
 			{
-				weapon += it[m].weapon[1];
+				weapon += it[m].weapon[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			
-			gethit += it[m].gethit_dam[1];
+			gethit += it[m].gethit_dam[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			
-			maxlight += it[m].light[1];
+			maxlight += it[m].light[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			if (it[m].light[1]>light)
 			{
-				light = it[m].light[1];
+				light = it[m].light[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else if (it[m].light[1]<0)
 			{
-				sublight -= it[m].light[1];
+				sublight -= it[m].light[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			
 			// Meta values
-			critical_c += it[m].crit_chance[1];
-			critical_m += it[m].crit_multi[1];
-			hit_rate   += it[m].to_hit[1];
-			parry_rate += it[m].to_parry[1];
-			damage_top += it[m].top_damage[1];
+			critical_c += it[m].crit_chance[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			critical_m += it[m].crit_multi[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			hit_rate   += it[m].to_hit[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			parry_rate += it[m].to_parry[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			damage_top += it[m].top_damage[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 		}
 		else
 		{
-			armor  += it[m].armor[0];
+			armor  += it[m].armor[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			
 			// Special case for Templars with Dual Swords...
 			if ((it[m].flags & IF_OF_DUALSW) && IS_ANY_TEMP(cn) && it[m].temp != IT_WP_FELLNIGHT)
 			{
-				weapon += it[m].weapon[0]/2;
+				weapon += it[m].weapon[0]/2*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else if (n == WN_LHAND && (it[m].flags & IF_WP_DAGGER)) // ...and daggers...
 			{
-				weapon += it[m].weapon[0]/4*3;
+				weapon += it[m].weapon[0]/4*3*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else if (n == WN_RHAND && (it[m].flags & IF_OF_SHIELD)) // Special case for AT dual shield memes
 			{
-				weapon += it[m].armor[0]*2;
+				weapon += it[m].armor[0]*2*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else
 			{
-				weapon += it[m].weapon[0];
+				weapon += it[m].weapon[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			
-			gethit += it[m].gethit_dam[0];
+			gethit += it[m].gethit_dam[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			
-			
-			maxlight += it[m].light[0];
+			maxlight += it[m].light[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			if (it[m].light[0]>light)
 			{
-				light = it[m].light[0];
+				light = it[m].light[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			else if (it[m].light[0]<0)
 			{
-				sublight -= it[m].light[0];
+				sublight -= it[m].light[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 			}
 			
 			// Meta values
-			critical_c += it[m].crit_chance[0];
-			critical_m += it[m].crit_multi[0];
-			hit_rate   += it[m].to_hit[0];
-			parry_rate += it[m].to_parry[0];
-			damage_top += it[m].top_damage[0];
+			critical_c += it[m].crit_chance[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			critical_m += it[m].crit_multi[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			hit_rate   += it[m].to_hit[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			parry_rate += it[m].to_parry[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			damage_top += it[m].top_damage[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
 		}
 	}
 	// Feb 2020 - Store the current armor and weapon values from your gear, before other additions.
@@ -9618,6 +9694,8 @@ void do_regenerate(int cn)
 				ch[cn].a_end  += B_SK(cn, SK_REST) ?race_res/ 6:0;
 				ch[cn].a_mana += B_SK(cn, SK_MEDIT)?race_med/ 6:0;
 				break;
+			case IT_GAMBLERFAL:
+				if (it[in].active) it[in].active--;
 			default:
 				break;
 		}
@@ -9940,15 +10018,18 @@ void do_regenerate(int cn)
 						if (bu[in2].temp==SK_PROTECT || bu[in2].temp==SK_ENHANCE || bu[in2].temp==SK_BLESS || bu[in2].temp==SK_HASTE)
 							tmp += tmp / 5;
 						
+						if (bu[in2].temp==105) // map exp bonus
+							tmp += tmp / 2;
+						
 						if (ch[cn].flags & CF_EXTRAEXP)
 							tmp *= 3;
 					}
 
 					if (co && co!=cn && !(mf & MF_ARENA))
 					{
-						if ((in2 = get_gear(co, IT_FORTERING)) && it[in2].active) // 50% more exp with Forte Ring
+						if ((in2 = get_gear(co, IT_FORTERING)) && it[in2].active) // 25% more exp with Forte Ring
 						{
-							tmp = tmp*3/2;
+							tmp = tmp*4/3;
 						}
 						do_give_exp(co, tmp, 1, rank);
 						
@@ -10151,6 +10232,7 @@ void do_regenerate(int cn)
 					ch[cn].use_nr = 0;
 					ch[cn].misc_action = 0;
 					ch[cn].dir = DX_DOWN;
+					clear_map_buffs(cn, 0);
 				}
 				else if (bu[in].temp!=SK_ZEPHYR2)
 				{
@@ -10589,18 +10671,40 @@ void do_shop_char(int cn, int co, int nr)
 		for (n=0;n<9;n++)
 		{
 			in2 = ch[co].data[n];
-			if ((it[in].flags & IF_ARMORS) && (it_temp[in2].flags & IF_ARMORS))		flag = 1;
-			if ((it[in].flags & IF_WEAPON) && (it_temp[in2].flags & IF_WEAPON))		flag = 1;
+			if ((it[in].flags & IF_ARMORS)   && (it_temp[in2].flags & IF_ARMORS))	flag = 1;
+			if ((it[in].flags & IF_WEAPON)   && (it_temp[in2].flags & IF_WEAPON))	flag = 1;
 			if ((it[in].flags & IF_JEWELERY) && (it_temp[in2].flags & IF_JEWELERY))	flag = 1;
-			if ((it[in].flags & IF_MAGIC) && (it_temp[in2].flags & IF_MAGIC))		flag = 1;
-			if ((it[in].flags & IF_BOOK) && (it_temp[in2].flags & IF_BOOK))			flag = 1;
-			if ((it[in].flags & IF_MISC) && (it_temp[in2].flags & IF_MISC))			flag = 1;
+			if ((it[in].flags & IF_MAGIC)    && (it_temp[in2].flags & IF_MAGIC))	flag = 1;
+			if ((it[in].flags & IF_BOOK)     && (it_temp[in2].flags & IF_BOOK))		flag = 1;
+			if ((it[in].flags & IF_MISC)     && (it_temp[in2].flags & IF_MISC))		flag = 1;
 			if ((it[in].flags & IF_GEMSTONE) && (it_temp[in2].flags & IF_GEMSTONE))	flag = 1;
 		}
 		
 		if (ch[co].flags & CF_BSPOINTS)
 		{
-			do_char_log(cn, 0, "%s doesn't buy things.\n", ch[co].name);
+			if (ch[co].temp == CT_TACTICIAN)
+			{
+				if (it[in].data[9] && it[in].data[8]==2)
+				{
+					ch[cn].citem = 0;
+					ch[cn].bs_points += it[in].data[9]/5;
+
+					chlog(cn, "Refunded %s", it[in].name);
+					do_char_log(cn, 1, "You refunded the %s for %d points.\n", it[in].reference,  it[in].data[9]/5);
+					
+					it[in].x = 0;
+					it[in].y = 0;
+					it[in].carried = 0;
+				}
+				else
+				{
+					do_char_log(cn, 0, "%s doesn't buy those.\n", ch[co].name);
+				}
+			}
+			else
+			{
+				do_char_log(cn, 0, "%s doesn't buy things.\n", ch[co].name);
+			}
 			return;
 		}
 		
@@ -10619,8 +10723,15 @@ void do_shop_char(int cn, int co, int nr)
 		ch[cn].citem = 0;
 
 		ch[cn].gold += pr;
-
-		god_give_char(in, co);
+		
+		if (ch[co].temp == CT_CONTRACTOR)
+		{
+			god_take_from_char(in, cn);
+		}
+		else
+		{
+			god_give_char(in, co);
+		}
 		chlog(cn, "Sold %s", it[in].name);
 		do_char_log(cn, 1, "You sold a %s for %dG %dS.\n", it[in].reference, pr / 100, pr % 100);
 
@@ -10672,6 +10783,18 @@ void do_shop_char(int cn, int co, int nr)
 								return;
 							}
 						}
+						// Contract point items
+						else if (ch[co].temp == CT_ADHERENT)
+						{
+							in2 = change_bs_shop_item(cn, it[in].temp);
+							if (!in2) return;
+							pr = do_item_bsvalue(in2);
+							if (ch[cn].os_points<pr)
+							{
+								do_char_log(cn, 0, "You cannot afford that.\n");
+								return;
+							}
+						}
 						else return;
 					}
 					else if (ch[co].flags & CF_MERCHANT)
@@ -10702,6 +10825,7 @@ void do_shop_char(int cn, int co, int nr)
 							if (god_give_char(in2, cn))
 							{
 								ch[cn].bs_points -= pr;
+								it[in2].data[8] = 2;
 
 								chlog(cn, "Bought %s", it[in2].name);
 								if (!(ch[cn].flags & CF_SYS_OFF))
@@ -10725,10 +10849,35 @@ void do_shop_char(int cn, int co, int nr)
 							if (god_give_char(in2, cn))
 							{
 								ch[cn].tokens -= pr;
+								it[in2].data[8] = 3;
 
 								chlog(cn, "Bought %s", it[in2].name);
 								if (!(ch[cn].flags & CF_SYS_OFF))
 									do_char_log(cn, 1, "You bought a %s for %d Tokens.\n", it[in2].reference, pr);
+
+								tmp = it[in2].temp;
+								if (tmp>0 && tmp<MAXTITEM)
+								{
+									it_temp[tmp].t_bought++;
+								}
+							}
+							else
+							{
+								do_char_log(cn, 0, "You cannot buy the %s because your inventory is full.\n", it[in].reference);
+							}
+						}
+						else if (ch[co].temp == CT_ADHERENT)
+						{
+							in2 = get_special_item(in2, 0, 0, 0);
+							
+							if (god_give_char(in2, cn))
+							{
+								ch[cn].os_points -= pr;
+								it[in2].data[8] = 4;
+
+								chlog(cn, "Bought %s", it[in2].name);
+								if (!(ch[cn].flags & CF_SYS_OFF))
+									do_char_log(cn, 1, "You bought a %s for %d Points.\n", it[in2].reference, pr);
 
 								tmp = it[in2].temp;
 								if (tmp>0 && tmp<MAXTITEM)
@@ -10858,6 +11007,13 @@ void do_shop_char(int cn, int co, int nr)
 						{
 							do_char_log(cn, 1, "%s:\n", it[in].name);
 							do_char_log(cn, 1, "%s\n", it[in].description);
+						}
+						else if (ch[co].temp == CT_ADHERENT)
+						{
+							in2 = change_bs_shop_item(cn, it[in].temp);
+							if (!in2) return;
+							do_char_log(cn, 1, "%s:\n", it_temp[in2].name);
+							do_char_log(cn, 1, "%s\n", it_temp[in2].description);
 						}
 						else return;
 					}
@@ -11382,6 +11538,12 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				{
 					pr = do_item_bsvalue(it[in].temp);
 				}
+				// Contract items
+				else if (ch[co].temp == CT_ADHERENT)
+				{
+					in2 = change_bs_shop_item(cn, it[in].temp);
+					pr = do_item_bsvalue(in2);
+				}
 				else pr = 0;
 			}
 			else if (ch[co].flags & CF_MERCHANT)
@@ -11442,6 +11604,20 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 						{
 							pr = do_item_bsvalue(it[in].temp);
 						}
+						// Contract items
+						else if (ch[co].temp == CT_ADHERENT)
+						{
+							in2 = change_bs_shop_item(cn, it[in].temp);
+							if (in2)
+							{
+								pr = do_item_bsvalue(in2);
+								spr = get_special_spr(in2, it_temp[in2].sprite[0]);
+							}
+							else
+							{
+								spr = pr = 0;
+							}
+						}
 						else pr = 0;
 					}
 					else if (ch[co].flags & CF_MERCHANT)
@@ -11462,7 +11638,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 					*(unsigned char*)(buf + 14) = 1;
 				else if (ch[co].temp == CT_JESSICA)
 					*(unsigned char*)(buf + 14) = 2;
-				else if (ch[co].temp == CT_OSIRIS)
+				else if (ch[co].temp == CT_ADHERENT)
 					*(unsigned char*)(buf + 14) = 3;
 				else
 					*(unsigned char*)(buf + 14) = 0;
@@ -11496,7 +11672,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 					*(unsigned char*)(buf + 14) = 1;
 				else if (ch[co].temp == CT_JESSICA)
 					*(unsigned char*)(buf + 14) = 2;
-				else if (ch[co].temp == CT_OSIRIS)
+				else if (ch[co].temp == CT_ADHERENT)
 					*(unsigned char*)(buf + 14) = 3;
 				else
 					*(unsigned char*)(buf + 14) = 0;
@@ -11550,7 +11726,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				*(unsigned char*)(buf + 14) = 1;
 			else if (ch[co].temp == CT_JESSICA)
 				*(unsigned char*)(buf + 14) = 2;
-			else if (ch[co].temp == CT_OSIRIS)
+			else if (ch[co].temp == CT_ADHERENT)
 				*(unsigned char*)(buf + 14) = 3;
 			else
 				*(unsigned char*)(buf + 14) = 0;

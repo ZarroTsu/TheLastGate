@@ -51,9 +51,9 @@ usage of data for players:
 * `29:`     other players killed outside of arena
 * `30-39:`  soft ignore list
 * `40:`     shopkeepers etc. killed
-* `41:`     											// Free!
+* `41:`     --Zarro-- Contract ID, mission, goal, progess
 * `42:`     group
-* `43:`     											// Free!
+* `43:`     --Zarro-- Contract item ID for /who
 * `44:`     number of times X was saved by the gods
 * `45:`     level X got hp/end/mana bonus for
 * `46-49:`  Flags of explorer points we visited (1,2,4,8,16)
@@ -67,7 +67,7 @@ usage of data for players:
 * `69:`     Last player attacked       (PCD_ATTACKVICT)
 * `70:`		Flags of killed NPC of certain class (Extended)
 * `71:`     number of says/tells/looks/lights
-* `72:`     bad word score
+* `72:`     --Zarro-- Quests 1
 * '73:'		--Zarro-- for "Way of the Sword" book
 * '74:'     --Zarro-- for spell delays when hit by warcry
 * '75:'		--Zarro-- for spell delays when hit by blast, cleave

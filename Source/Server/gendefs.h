@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000610
-#define MINVERSION			0x000610
+#define VERSION				0x000700
+#define MINVERSION			0x000700
 
 #define DATDIR				".dat"
 
@@ -54,6 +54,9 @@
 
 #define LAB_ARENA_BOTTOM_X 	 150
 #define LAB_ARENA_BOTTOM_Y 	 130
+
+#define OS_WARP_X			 658
+#define OS_WARP_Y			 727
 
 #define LAB_I_X				  74
 #define LAB_I_Y				  25
@@ -192,14 +195,14 @@
 #define SP_COST_HEAL		25
 #define SP_COST_CURSE		35
 #define SP_COST_SLOW		20
-#define SP_COST_POISON		45
+#define SP_COST_POISON		30
 #define SP_COST_IDENT		20
 #define SP_COST_RECALL		15
-#define SP_COST_DISPEL		45
+#define SP_COST_DISPEL		40
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		60
-#define SP_COST_PULSE		95
-#define SP_COST_ZEPHYR		55
+#define SP_COST_PULSE		65 // reduce?
+#define SP_COST_ZEPHYR		50 // reduce?
 
 #define SP_COST_WEAKEN		10
 #define SP_COST_BLIND		20
@@ -218,13 +221,24 @@
 #define SP_MULT_POISON		115
 #define SP_MULT_POISON2		120
 #define SP_MULT_IDENTIFY	180
-#define SP_MULT_DISPEL		120
-#define SP_MULT_DISPEL2		110
+#define SP_MULT_DISPEL		100
+#define SP_MULT_DISPEL2		 90
 #define SP_MULT_WEAKEN		120
 #define SP_MULT_WEAKEN2		115
 #define SP_MULT_WARCRY		 95
 #define SP_MULT_TAUNT		110
 #define SP_MULT_BLIND		125
+
+// -------- Damage Multipliers -------- //
+
+#define DAM_MULT_HIT		 250
+#define DAM_MULT_BLAST		 625
+#define DAM_MULT_HOLYW		 750
+#define DAM_MULT_THORNS		1000
+#define DAM_MULT_CLEAVE		 750
+#define DAM_MULT_PULSE		 120
+#define DAM_MULT_ZEPHYR		  40
+#define DAM_MULT_LEAP		 450
 
 // -------- Buff Duration values -------- //
 #define SP_DUR_LIGHT		( TICKS * 60 * 30                 )
@@ -258,6 +272,13 @@
 #define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )
 #define SP_DUR_DOUSE		( TICKS * 20                      )
 #define SP_DUR_FROSTB		( TICKS * 20                      )
+#define SP_DUR_POME			( TICKS * 10                      )
+#define SP_DUR_SOL			( TICKS *  5                      )
+#define SP_DUR_STARL		( TICKS * 60                      )
+#define SP_DUR_PHALANX		( TICKS * 60                      )
+
+#define SP_DUR_SHRINE		( TICKS * 60 * 30                 )
+#define SP_DUR_MAPMOD		( TICKS * 60 * 120                )
 
 // -------- Skill Exhaustion values -------- //
 #define SK_EXH_MAXIMUM	 	(TICKS * 8)

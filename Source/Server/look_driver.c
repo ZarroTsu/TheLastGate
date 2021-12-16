@@ -58,7 +58,7 @@ void look_item_details(int cn, int in)
 	if (ch[cn].flags & CF_GOD)
 	{
 		do_char_log(cn, 2, "ID=%d, Temp=%d, Value: %dG %dS.\n", in, it[in].temp, it[in].value / 100, it[in].value % 100);
-		do_char_log(cn, 2, "active=%d, sprite=%d/%d\n", it[in].active, it[in].sprite[0], it[in].sprite[1]);
+		do_char_log(cn, 2, "driver=%d, active=%d, sprite=%d/%d\n", it[in].driver, it[in].active, it[in].sprite[0], it[in].sprite[1]);
 		do_char_log(cn, 2, "max_age=%d/%d, current_age=%d/%d\n", it[in].max_age[0], it[in].max_age[1], it[in].current_age[0], it[in].current_age[1]);
 		do_char_log(cn, 2, "max_damage=%d, current_damage=%d\n", it[in].max_damage, it[in].current_damage);
 	}
@@ -99,6 +99,34 @@ void look_item_details(int cn, int in)
 		if (it[in].flags & IF_IDENTIFIED)
 		{
 			item_info(cn, in, 1);
+			if (can_be_soulstoned(in))
+			{
+				do_char_log(cn, 3, "This item can be Soulstoned.\n");
+			}
+			else if (it[in].flags & IF_SOULSTONE)
+			{
+				do_char_log(cn, 0, "Has been Soulstoned.\n");
+			}
+			else if (it[in].placement && !can_be_soulstoned(in))
+			{
+				do_char_log(cn, 0, "Cannot be Soulstoned.\n");
+			}
+		}
+		if (it[in].flags & IF_AUGMENTED)
+		{
+			do_char_log(cn, 0, "Has been augmented.\n");
+		}
+		if (it[in].flags & IF_EASEUSE)
+		{
+			do_char_log(cn, 0, "Was made easier to use.\n");
+		}
+		if (it[in].flags & IF_DIMINISHED)
+		{
+			do_char_log(cn, 0, "Has had its power diminished.\n");
+		}
+		if (it[in].flags & IF_SOULSPLIT)
+		{
+			do_char_log(cn, 0, "Has been soulsplit.\n");
 		}
 		do_appraisal(cn, in);
 	}
@@ -106,13 +134,13 @@ void look_item_details(int cn, int in)
 
 void look_extra(int cn, int in)
 {
-	int temp;
+	int temp, n, m=0, mm=0;
 	
 	do_char_log(cn, 1, "%s\n", it[in].description);
 	
 	temp = it[in].temp;
 	
-	switch (it[in].temp)
+	switch (temp)
 	{
 	// -------- TOWER ITEMS --------
 	
@@ -232,7 +260,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, you cannot cast or receive spells of any kind.\n");
 		break;
 	case IT_GAMBLERFAL: 
-		do_char_log(cn, 3, "When equipped, this item activates for 4 seconds and grants 10 hitpoints upon dealing a critical hit.\n");
+		do_char_log(cn, 3, "When equipped, grants 10 hitpoints upon dealing a critical hit, but your chance to deal critical hits is reduced for 4 seconds after dealing one.\n");
 		break;
 		
 	// -------- BELT  ITEMS --------
@@ -257,7 +285,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped and activated, grants 50%% more gold from enemies you kill.\n");
 		break;
 	case IT_FORTERING: // Forte Ring
-		do_char_log(cn, 3, "When equipped and activated, grants 50%% more EXP from enemies you kill.\n");
+		do_char_log(cn, 3, "When equipped and activated, grants 25%% more EXP from enemies you kill.\n");
 		break;
 
 	// -------- DRINK ITEMS --------
@@ -337,12 +365,12 @@ void look_extra(int cn, int in)
 	case IT_WP_KELPTRID: 
 		do_char_log(cn, 3, "When equipped, grants +10 to action speed while underwater.\n");
 		break;
-	case IT_WP_PHALLENX: 
+	case IT_WP_PHALANX: 
 		do_char_log(cn, 3, "When equipped, this shield can be used to cast 'Phalanx', costing 50%% of total endurance. Phalanx grants a self-buff, reducing damage taken for 60 seconds.\n");
 		break;
 	case IT_WP_LAMEDARG: 
-		if (it[in].data[0]<10000)
-			do_char_log(cn, 3, "Thine worth shall be proven. %d remain.\n", max(0, 10000-it[in].data[0]));
+		if (it[in].data[0]<REQ_LAME)
+			do_char_log(cn, 3, "Thine worth shall be proven. %d remain.\n", max(0, REQ_LAME-it[in].data[0]));
 		else
 			do_char_log(cn, 3, "Thou art worthy. Use me when ready.\n");
 		break;
@@ -376,6 +404,28 @@ void look_extra(int cn, int in)
 		
 	case IT_BONEARMOR: 
 		do_char_log(cn, 0, "Become undead.\n");
+		break;
+		
+	case IT_OS_BRV:
+	case IT_OS_WIL:
+	case IT_OS_INT:
+	case IT_OS_AGL:
+	case IT_OS_STR:
+		if (temp==IT_OS_BRV) do_char_log(cn, 1, "Grants an implicit +1 to Braveness.\n");
+		if (temp==IT_OS_WIL) do_char_log(cn, 1, "Grants an implicit +1 to Willpower.\n");
+		if (temp==IT_OS_INT) do_char_log(cn, 1, "Grants an implicit +1 to Intuition.\n");
+		if (temp==IT_OS_AGL) do_char_log(cn, 1, "Grants an implicit +1 to Agility.\n");
+		if (temp==IT_OS_STR) do_char_log(cn, 1, "Grants an implicit +1 to Strength.\n");
+		do_char_log(cn, 1, " \n");
+		for (n=0;n<5;n++) m += ch[cn].attrib[n][1];
+		do_char_log(cn, 1, "You have used %d out of 10 greater attribute scrolls.\n", m);
+		break;
+		
+	case IT_OS_SK:
+		do_char_log(cn, 1, "Grants an implicit +1 to %s.\n", skilltab[it[in].data[1]].name);
+		do_char_log(cn, 1, " \n");
+		for (n=0;n<50;n++) { m += ch[cn].skill[n][1]; mm = mm + (ch[cn].skill[n][0]?1:0); }
+		do_char_log(cn, 1, "You have used %d out of %d greater skill scrolls.\n", m, mm);
 		break;
 	
 	default:
@@ -594,9 +644,6 @@ void look_spell_scroll(int cn, int in)
 
 void look_soulstone(int cn, int in)
 {
-	int t, nt=0;
-	char *tag_name[N_SOULTAGS];
-	
 	do_char_log(cn, 1, "%s\n", it[in].description);
 	
 	if (it[in].data[2])
@@ -604,28 +651,48 @@ void look_soulstone(int cn, int in)
 		do_char_log(cn, 2, "Has a focus of %d.\n", it[in].data[2]);
 	}
 	
-	for (t=0;t<N_SOULTAGS;t++)
+	if (it[in].data[3])
 	{
-		if (it[in].data[t+3]>0 && it[in].data[t+3]<N_SOULCAT)
-		{
-			chlog(cn, "look_soulstone : strcpy tag name (%d)", it[in].data[t+3]);
-			//strcpy(tag_name[nt], get_soulname(it[in].data[t+3]));
-			tag_name[nt] = get_soulname(it[in].data[t+3]);
-			nt++;
-		}
-	}
-	
-	if (nt)
-	{
-		chlog(cn, "look_soulstone : display tag names");
-		do_char_log(cn, 1, "This stone has the following tags:\n");
-		for (t=0;t<nt;t++)
-		{
-			do_char_log(cn, 2, "%d. %s:\n", t+1, tag_name[t]);
-		}
+		do_char_log(cn, 0, "Augments use %d of %d rank.\n", it[in].data[3], it[in].data[0]);
 	}
 	
 	look_item_details(cn, in);
+}
+
+void look_contract(int cn, int in, int desc)
+{
+	int rank, tier, mission, flags=0, n, font;
+	
+	if (!it[in].data[1]) it[in].data[1] = RANDOM(MSN_COUNT);
+	
+	mission = it[in].data[1];
+	tier    = it[in].data[2];
+	flags   = it[in].data[3];
+	
+	font = get_tier_font(tier);
+	
+	if (desc)
+	{
+		do_char_log(cn, 1, "A contract. It reads:\n");
+		do_char_log(cn, 1, " \n");
+	}
+	switch (mission)
+	{
+		case  1: do_char_log(cn, font, MSN_CN MSN_01 "\n"); break;
+		case  2: do_char_log(cn, font, MSN_CN MSN_02 "\n"); break;
+		case  3: do_char_log(cn, font, MSN_CN MSN_03 "\n"); break;
+		case  4: do_char_log(cn, font, MSN_CN MSN_04 "\n"); break;
+		case  5: do_char_log(cn, font, MSN_CN MSN_05 "\n"); break;
+		case  6: do_char_log(cn, font, MSN_CN MSN_06 "\n"); break;
+		case  7: do_char_log(cn, font, MSN_CN MSN_07 "\n"); break;
+		case  8: do_char_log(cn, font, MSN_CN MSN_08 "\n"); break;
+		case  9: do_char_log(cn, font, MSN_CN MSN_09 "\n"); break;
+		default: do_char_log(cn, font, MSN_CN MSN_00 "\n"); break;
+	}
+	do_char_log(cn, 1, " \n");
+	if (desc || flags) show_map_flags(cn, flags, tier);
+	if (desc)
+		do_char_log(cn, font, "%s\n", it[in].description);
 }
 
 void look_driver(int cn, int in)
@@ -633,7 +700,14 @@ void look_driver(int cn, int in)
 	switch(it[in].driver)
 	{
 	case     0:
+	case    32:
 	case    52:
+	case    92:
+	case    93:
+	case   110:
+	case   114:
+	case   115:
+	case   116:
 		look_extra(cn, in);
 		break;
 	case     2:
@@ -647,6 +721,9 @@ void look_driver(int cn, int in)
 		break;
 	case    68:
 		look_soulstone(cn, in);
+		break;
+	case   113:
+		look_contract(cn, in, 1);
 		break;
 	default:
 		xlog("Unknown look_driver %d", it[in].driver);

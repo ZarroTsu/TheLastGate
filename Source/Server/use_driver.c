@@ -2056,6 +2056,1055 @@ int use_scroll9(int cn, int in)
 	return 1;
 }
 
+// Greater Stat Scroll
+int use_scrollA(int cn, int in)
+{
+	int nr, n, m=0, mm=0;
+
+	nr = it[in].data[0];
+	
+	if (nr<5)	// Attributes
+	{
+		for (n=0;n<5;n++) m += ch[cn].attrib[n][1];
+		
+		if (m>=10)
+		{
+			do_char_log(cn, 0, "You cannot use any more greater attribute scrolls.\n");
+			return 0;
+		}
+
+		do_char_log(cn, 1, "Raised %s implicitly by one.\n", at_name[nr]);
+		chlog(cn, "Used scroll to raise %s implicitly by one", at_name[nr]);
+		
+		ch[cn].attrib[nr][1]++;
+		
+		do_char_log(cn, 1, "You have used %d out of 10 greater attribute scrolls.\n", m);
+	}
+	else	// Skills
+	{
+		nr = it[in].data[1];
+		
+		for (n=0;n<50;n++) { m += ch[cn].skill[n][1]; mm = mm + (ch[cn].skill[n][0]?1:0); }
+		
+		if (m>=mm)
+		{
+			do_char_log(cn, 0, "You cannot use any more greater skill scrolls.\n");
+			return 0;
+		}
+		
+		if (ch[cn].skill[nr][1]>=10)
+		{
+			do_char_log(cn, 0, "You cannot raise that skill implicitly higher than 10.\n");
+			return 0;
+		}
+
+		do_char_log(cn, 1, "Raised %s implicitly by one.\n", skilltab[nr].name);
+		chlog(cn, "Used scroll to raise %s implicitly by one", skilltab[nr].name);
+		
+		ch[cn].skill[nr][1]++;
+		
+		do_char_log(cn, 1, "You have used %d out of %d greater skill scrolls.\n", m+1, mm);
+	}
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	it[in].used = USE_EMPTY;
+	god_take_from_char(in, cn);
+
+	do_update_char(cn);
+
+	return 1;
+}
+
+// Greater Reset Scroll
+int use_scroll_R(int cn, int in)
+{
+	int n;
+	
+	for (n=0;n<5;n++) ch[cn].attrib[n][1] = 0;
+	for (n=0;n<50;n++) ch[cn].skill[n][1] = 0;
+	
+	do_char_log(cn, 1, "You used the reset scroll. Your implicit bonuses were reset.\n");
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	it[in].used = USE_EMPTY;
+	god_take_from_char(in, cn);
+
+	do_update_char(cn);
+	
+	return 1;
+}
+
+// Sprite change scroll
+int use_scroll_S(int cn, int in)
+{
+	int v;
+	
+	if (it[in].data[1])
+	{
+		v = ch[cn].temp;
+		ch[cn].sprite = ch_temp[v].sprite;
+		do_char_log(cn, 1, "You used the scroll. Your form returned to normal.\n");
+	}
+	else
+	{
+		v = it[in].data[0];
+		ch[cn].sprite = v;
+		do_char_log(cn, 1, "You used the scroll. Your form shifted and changed...\n");
+	}
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	it[in].used = USE_EMPTY;
+	god_take_from_char(in, cn);
+
+	do_update_char(cn);
+}
+
+int use_map_contract(int cn, int in)
+{
+	static int cntrct_1a[] = {
+	//	Ex Enemy	Ex Divin	En Roam		Clr Exp		Clr Luck	Gold Pl
+		0x00000001, 0x00000002, 0x00000100, 0x00100000, 0x00200000, 0x08000000
+	};
+	static int cntrct_1b[] = {
+	//	Underwtr	En Perc		Pl Frag		En Tarot	En Tarot2
+		0x00000008, 0x00000200, 0x00020000, 0x01000000, 0x02000000
+	};
+	static int cntrct_2a[] = {
+	//	Boss En		Clr BSP		Kill Exp	+1 Rank
+		0x00000080, 0x00400000, 0x04000000, 0x10000000
+	};
+	static int cntrct_2b[] = {
+	//	Spikes		Undead		En Sharp	En Forti	En Wiser	Pl Debil
+		0x00000020, 0x00000040, 0x00001000, 0x00002000, 0x00008000, 0x00010000
+	};
+	static int cntrct_3a[] = {
+	//	Ex Chest	Ex Shrine	Ex OSP		+2 Rank
+		0x00000004, 0x00000010, 0x00800000, 0x20000000
+	};
+	static int cntrct_3b[] = {
+	//	En Resis	En Skill	En Haste	Pl Stigm	Pl Hyper
+		0x00000400, 0x00000800, 0x00004000, 0x00040000, 0x00080000
+	};
+	int in2, spr, n, m, panic, font;
+	int rank, tier;
+	char buf[300];
+	unsigned int flags=0;
+	
+	in2 = ch[cn].citem;
+	
+	if (!in2)
+	{
+		return 0;
+	}
+	
+	if (it[in].data[0])
+	{
+		do_char_log(cn, 0, "This contract is already signed.\n");
+		return 0;
+	}
+	
+	switch (it[in2].temp)
+	{
+		case MCT_QUILL_Y: tier = 0; spr = MSP_Y; font = 1; break;
+		case MCT_QUILL_G: tier = 1; spr = MSP_G; font = 2; break;
+		case MCT_QUILL_B: tier = 2; spr = MSP_B; font = 3; break;
+		case MCT_QUILL_R: tier = 3; spr = MSP_R; font = 0; break;
+		default: return 0;
+	}
+	
+	it[in].data[0] = cn;
+	if (!it[in].data[1]) it[in].data[1] = RANDOM(MSN_COUNT);
+	it[in].data[2] = tier;
+	
+	if (tier)
+	{
+		for (n=0;n<tier;n++)
+		{
+			for (panic=0,m=0;panic<99;panic++)
+			{
+				switch (RANDOM(tier)+1)
+				{
+					case  1: m = cntrct_1a[RANDOM(sizeof(cntrct_1a) / sizeof(cntrct_1a[0]))]; break;
+					case  2: m = cntrct_2a[RANDOM(sizeof(cntrct_2a) / sizeof(cntrct_2a[0]))]; break;
+					default: m = cntrct_3a[RANDOM(sizeof(cntrct_3a) / sizeof(cntrct_3a[0]))]; break;
+				}
+				if (!(flags & m))
+				{
+					chlog(cn, "Added %d to flag %d", m, flags);
+					flags |= m;
+					break;
+				}
+				if (panic>9)
+				{
+					chlog(cn, "Panic! Couldn't add flag A to contract");
+					break;
+				}
+			}
+			for (panic=0,m=0;panic<99;panic++)
+			{
+				switch (RANDOM(tier)+1)
+				{
+					case  1: m = cntrct_1b[RANDOM(sizeof(cntrct_1b) / sizeof(cntrct_1b[0]))]; break;
+					case  2: m = cntrct_2b[RANDOM(sizeof(cntrct_2b) / sizeof(cntrct_2b[0]))]; break;
+					default: m = cntrct_3b[RANDOM(sizeof(cntrct_3b) / sizeof(cntrct_3b[0]))]; break;
+				}
+				if (!(flags & m))
+				{
+					chlog(cn, "Added %d to flag %d", m, flags);
+					flags |= m;
+					break;
+				}
+				if (panic>9)
+				{
+					chlog(cn, "Panic! Couldn't add flag B to contract");
+					break;
+				}
+			}
+		}
+	}
+	
+	it[in].data[3] = flags;
+	it[in].sprite[0] = spr;
+	it[in].flags |= IF_UPDATE;
+	
+	sprintf(buf, "Signed, %s.", ch[cn].name);
+	if (strlen(buf)<200)
+	{
+		strcpy(it[in].description, buf);
+	}
+	
+	if (in2)
+	{
+		ch[cn].citem = 0;
+		it[in2].used = USE_EMPTY;
+	}
+	
+	do_char_log(cn, font, "You signed the contract.\n");
+	
+	return 1;
+}
+
+int use_map_artifact(int cn, int in)
+{
+	if (cn==0)
+	{
+		return 0;
+	}
+	if (it[in].active)
+	{
+		return 0;
+	}
+	
+	if (!use_create_item(cn, in)) return 0;
+	
+	// Contract progress
+	if (CONT_SCEN(cn)==4) 
+	{
+		add_map_progress(CONT_NUM(cn));
+		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
+			do_char_log(cn, 2, "You got what you came for! You're good to go!\n");
+	}
+	
+	return 1;
+}
+
+int use_map_pentigram(int cn, int in)
+{
+	int spawnT = 350, v;
+	int co, bf, flags, base, affix=0, tarot, x, y, m, n;
+	
+	if (cn==0)
+	{
+		return 0;
+	}
+	if (it[in].active)
+	{
+		return 0;
+	}
+	
+	x = it[in].x;
+	y = it[in].y;
+	m = x + y * MAPX;
+	
+	base  = max(15, (it[in].data[0]-5)*11/2+15) - 3;
+	flags = it[in].data[1];
+	tarot = it[in].data[2];
+	
+	v = RANDOM(2)+2;
+	
+	for (n=0;n<v;n++)
+	{
+		affix = 0;
+		if (!RANDOM(27)) affix = 3;
+		co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base - RANDOM(8), affix, tarot);
+		if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
+		if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
+		if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/7);
+		if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/7);
+		if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/7);
+		if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/7);
+		if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/7);
+		if (co && (flags & 0x00004000)) ch[co].speed_mod = it[in].data[0]*2;
+		if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
+		{
+			strcpy(bu[bf].name, "* Wisdom");
+			bu[bf].spell_mod[1] = it[in].data[0]; bu[bf].data[4] = 1; add_spell(co, bf);
+		}
+		if (co && (flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
+		{
+			strcpy(bu[bf].name, "* Bonus EXP"); 
+			bu[bf].data[4] = 1; add_spell(co, bf);
+		}
+		ch[co].data[29] = m;
+		ch[co].data[60] = TICKS * 23;
+		if (co) do_update_char(co);
+	}
+	
+	// Contract progress
+	if (CONT_SCEN(cn)==7) 
+	{
+		add_map_progress(CONT_NUM(cn));
+		do_char_log(cn, 1, "You touched the pentagram. That's %d of %d.\n", CONT_PROG(cn), CONT_GOAL(cn));
+		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
+			do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+	}
+	
+	return 1;
+}
+
+int use_map_chest(int cn, int in)
+{
+	// data 0 = rank
+	int in2, n;
+	
+	if (cn==0)
+	{
+		return 0;
+	}
+	if (it[in].active)
+	{
+		return 0;
+	}
+	
+	switch (RANDOM(it[in].data[0]+1))
+	{
+		case  0: 	n = IT_SILVAMMY+RANDOM(2)*5; 				break;
+		case  1: 	n = get_best_worn(cn, WN_HEAD); 			break;
+		case  2: 	n = get_best_worn(cn, WN_BODY); 			break;
+		case  3: 	n = get_best_worn(cn, WN_RHAND); 			break;
+		case  4: 	n = get_best_worn(cn, WN_LHAND); 			break;
+		case  5: 	n = IT_EXPS+RANDOM(2); 						break; 
+		case  6: 	n = IT_POP_SPELL+RANDOM(7); 				break; // Staff Sergeant
+		case  7: 	n = -1000; 									break;
+		case  8: 	n = !RANDOM(3)?(RANDOM(2)?102:125):101; 	break;
+		case  9: 	n = IT_CH_FOOL; 							break;
+		case 10: 	n = IT_POP_ASPEL+RANDOM(7); 				break; // Second Lieutenant
+		case 11: 	n = IT_POT_EXHP+RANDOM(18); 				break;
+		case 12: 	n = IT_RPOT; 								break;
+		case 13: 	n = !RANDOM(3)?(RANDOM(2)?131:273):127; 	break;
+		case 14: 	n = IT_POT_VITA+RANDOM(3); 					break;
+		case 15: 	n = IT_RD_HP+RANDOM(2)*2; 					break;
+		case 16: 	n = IT_POP_ISPEL+RANDOM(7); 				break; // Brigadier General
+		case 17: 	n = IT_BL_SOLAR+RANDOM(2); 					break;
+		case 18: 	n = IT_GPOT; 								break;
+		case 19: 	n = IT_CH_FOOL_R; 							break;
+		case 20: 	n = IT_RD_BRV+RANDOM(5); 					break; 
+		case 21: 	n = IT_POP_SSPEL+RANDOM(7); 				break; // Knight
+		case 22: 	n = IT_POT_D_HP+RANDOM(3)*6; 				break;
+		case 23: 	n = 1243+RANDOM(2)*2; 						break;
+		case 24: 	n = IT_SPOT; 								break;
+		case 25: 	n = IT_OS_BRV+RANDOM(5); 					break; // Warlord
+		case 26: 	n = IT_OS_BRV+RANDOM(5); 					break; 
+		default: 	n = IT_OS_SK; 								break; // Warlord + 2
+	}
+	
+	if (n == IT_CH_FOOL || n == IT_CH_FOOL_R)
+	{
+		n += RANDOM(22);
+	}
+	
+	if (n==-1000)
+	{
+		n = (RANDOM(it[in].data[0])+1)*(RANDOM(it[in].data[0])+1)*(RANDOM(6)+5);
+		do_char_log(cn, 1, "You found %d Gold.\n", n);
+		chlog(cn, "Got %dG from %s", n, it[in].name);
+		ch[cn].gold += n * 100;
+	}
+	else
+	{
+		if (n<=0 || n>=MAXTITEM)
+		{
+			return 0;
+		}
+		
+		in2 = get_special_item(n, 0, 0, 0);
+		
+		if (!in2)
+		{
+			do_char_log(cn, 1, "It's empty...\n");
+		}
+		else
+		{
+			if (n==IT_OS_SK) it[in2].data[1] = RANDOM(50);
+			
+			if (!god_give_char(in2, cn))
+			{
+				do_char_log(cn, 0, "Your backpack is full, so you can't take anything.\n");
+				it[in2].used = USE_EMPTY;
+				return 0;
+			}
+			do_char_log(cn, 1, "You got a %s.\n", it[in2].reference);
+			chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
+		}
+	}
+
+	// Contract progress
+	if (CONT_SCEN(cn)==6)
+	{
+		add_map_progress(CONT_NUM(cn));
+		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
+			do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+	}
+	
+	return 1;
+}
+
+int get_random_backpack_item(int cn)
+{
+	int catalog[40] = {0};
+	int c, n;
+	
+	for (n = 0, c = 0; n<40; n++)
+	{
+		if (catalog[c] = ch[cn].item[n]) c++;
+	}
+	
+	if (!c) return 0;
+	
+	return (catalog[RANDOM(c)]);
+}
+
+int get_random_gear_item(int cn)
+{
+	int catalog[12] = {0};
+	int c, n;
+	
+	for (n = 0, c = 0; n<12; n++)
+	{
+		if (catalog[c] = ch[cn].worn[n]) c++;
+	}
+	
+	if (!c) return 0;
+	
+	return (catalog[RANDOM(c)]);
+}
+
+int use_map_shrine(int cn, int in)
+{
+	// data 0 = type		1=Red	2=Blue	3=Green
+	// data 1 = effect
+	int inc, inr, buff=0, p=0, temp=0, rank, tier, n, m=0, v, c=0, panic=0;
+	int catalog[70] = {0};
+	
+	if (cn==0)
+	{
+		return 0;
+	}
+	if (it[in].active)
+	{
+		return 0;
+	}
+	
+	rank = it[in].data[2];
+	tier = it[in].data[3];
+	
+	switch (it[in].data[0])
+	{
+		case  1:		// Red - Item effects
+			inc = ch[cn].citem;
+			switch (it[in].data[1])
+			{
+				case  1:
+					do_char_log(cn, 0, "Duplicity.\n");
+					if (inc)   temp = it[inc].temp;
+					if (!temp) temp = it[inc].orig_temp;
+					if (!temp) temp = it[get_random_backpack_item(cn)].temp;
+					inr = god_create_item(temp);
+					if (!inr)
+					{
+						do_char_log(cn, 1, "Nothing happened...\n");
+						break;
+					}
+					if (!god_give_char(inr, cn))
+					{
+						do_char_log(cn, 1, "Your backpack is full...\n");
+						it[inr].used = USE_EMPTY;
+						break;
+					}
+					do_char_log(cn, 1, "You got a %s.\n", it[inr].reference);
+					break;
+				case  2:
+					do_char_log(cn, 0, "Augmentation.\n");
+					if (!(it[inc].placement)) inc = get_random_gear_item(cn);
+					if (!inc)
+					{
+						do_char_log(cn, 1, "Nothing happened...\n");
+						break;
+					}
+					if (it[inc].flags & IF_AUGMENTED)
+					{
+						do_char_log(cn, 1, "But it had been done to the %s before.\n", it[inc].reference);
+						break;
+					}
+					if (RANDOM(2))
+					{
+						it[inc].attrib[RANDOM(5)][0] += 1+rank/10;
+					}
+					else
+					{
+						it[inc].skill[RANDOM(50)][0] += 1+rank/10;
+					}
+					it[inc].flags |= IF_AUGMENTED;
+					do_char_log(cn, 1, "Your %s was altered.\n", it[inc].reference);
+					break;
+				case  3:
+					do_char_log(cn, 0, "Power diminished.\n");
+					if (!inc) inc = RANDOM(2)?get_random_backpack_item(cn):get_random_gear_item(cn);
+					if (!inc)
+					{
+						do_char_log(cn, 1, "Nothing happened...\n");
+						break;
+					}
+					if (it[inc].flags & IF_DIMINISHED)
+					{
+						do_char_log(cn, 1, "But it had been done to the %s before.\n", it[inc].reference);
+						break;
+					}
+					it[inc].power = it[inc].power/2;
+					it[inc].flags |= IF_DIMINISHED;
+					do_char_log(cn, 1, "Your %s was altered.\n", it[inc].reference);
+					break;
+				case  4:
+					do_char_log(cn, 0, "An imprint of the soul.\n");
+					if (!inc) inc = RANDOM(2)?get_random_backpack_item(cn):get_random_gear_item(cn);
+					if (!inc)
+					{
+						do_char_log(cn, 1, "Nothing happened...\n");
+						break;
+					}
+					if (it[inc].flags & IF_SOULSPLIT)
+					{
+						do_char_log(cn, 1, "But it had been done to the %s before.\n", it[inc].reference);
+						break;
+					}
+					inr = god_create_item(IT_SOULSTONE);
+					if (!inr)
+					{
+						do_char_log(cn, 1, "Nothing happened...\n");
+						break;
+					}
+					else
+					{
+						if (rank > 24)
+							rank = 24;
+						
+						sprintf(it[inr].name, "Soulstone");
+						sprintf(it[inr].reference, "soulstone");
+						sprintf(it[inr].description, "Level %d soulstone, holding %d exp.", rank, 0);
+						
+						it[inr].data[0] = rank;
+						it[inr].data[1] = 0;
+						it[inr].temp = 0;
+						it[inr].driver = 68;
+						
+						for (n = 0; n < 4; n++)
+						{
+							if (it[inc].attrib[n][0])
+							{
+								it[inr].attrib[n][0] = get_sb(n+50, 1);
+								it[inr].attrib[n][1] = get_sb(n+50, 0)*2;
+								m += get_sb(n+50, 0)*2;
+								catalog[c] = n+50; c++;
+							}
+						}
+						for (n = 0; n < 50; n++)
+						{
+							if (it[inc].skill[n][0])
+							{
+								it[inr].skill[n][0] = get_sb(n, 1);
+								it[inr].skill[n][1] = get_sb(n, 0)*2;
+								m += get_sb(n, 0)*2;
+								catalog[c] = n; c++;
+							}
+						}
+						if (it[inc].hp[0])
+						{
+							n = 55; it[inr].hp[0] = get_sb(n, 1); it[inr].hp[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].end[0])
+						{
+							n = 56; it[inr].end[0] = get_sb(n, 1); it[inr].end[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].mana[0])
+						{
+							n = 57; it[inr].mana[0] = get_sb(n, 1); it[inr].mana[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].weapon[0])
+						{
+							n = 58; it[inr].weapon[0] = get_sb(n, 1); it[inr].weapon[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].armor[0])
+						{
+							n = 59; it[inr].armor[0] = get_sb(n, 1); it[inr].armor[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].move_speed[0])
+						{
+							n = 60; it[inr].move_speed[0] = get_sb(n, 1); it[inr].move_speed[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].atk_speed[0])
+						{
+							n = 61; it[inr].atk_speed[0] = get_sb(n, 1); it[inr].atk_speed[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].cast_speed[0])
+						{
+							n = 62; it[inr].cast_speed[0] = get_sb(n, 1); it[inr].cast_speed[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].spell_mod[0])
+						{
+							n = 63; it[inr].spell_mod[0] = get_sb(n, 1); it[inr].spell_mod[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].spell_apt[0])
+						{
+							n = 64; it[inr].spell_apt[0] = get_sb(n, 1); it[inr].spell_apt[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].cool_bonus[0])
+						{
+							n = 65; it[inr].cool_bonus[0] = get_sb(n, 1); it[inr].cool_bonus[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].crit_chance[0])
+						{
+							n = 66; it[inr].crit_chance[0] = get_sb(n, 1); it[inr].crit_chance[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].crit_multi[0])
+						{
+							n = 67; it[inr].crit_multi[0] = get_sb(n, 1); it[inr].crit_multi[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].top_damage[0])
+						{
+							n = 68; it[inr].top_damage[0] = get_sb(n, 1); it[inr].top_damage[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						if (it[inc].gethit_dam[0])
+						{
+							n = 69; it[inr].gethit_dam[0] = get_sb(n, 1); it[inr].gethit_dam[1] = get_sb(n, 0)*2; 
+							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+						}
+						
+						panic = v = n = 0;
+						
+						if (m) while (m > rank && panic < 9)
+						{
+							v = RANDOM(c);
+							n = v==n?RANDOM(c):v;
+							v = catalog[n];
+							if (v>=50 && v<=54) { m -= it[inr].attrib[v-50][1]; it[inr].attrib[v-50][0] = it[inr].attrib[v-50][1] = 0; }
+							else if (v==55)     { m -= it[inc].hp[1];           it[inc].hp[0]           = it[inc].hp[1]           = 0; }
+							else if (v==56)     { m -= it[inc].end[1];          it[inc].end[0]          = it[inc].end[1]          = 0; }
+							else if (v==57)     { m -= it[inc].mana[1];         it[inc].mana[0]         = it[inc].mana[1]         = 0; }
+							else if (v==58)     { m -= it[inc].weapon[1];       it[inc].weapon[0]       = it[inc].weapon[1]       = 0; }
+							else if (v==59)     { m -= it[inc].armor[1];        it[inc].armor[0]        = it[inc].armor[1]        = 0; }
+							else if (v==60)     { m -= it[inc].move_speed[1];   it[inc].move_speed[0]   = it[inc].move_speed[1]   = 0; }
+							else if (v==61)     { m -= it[inc].atk_speed[1];    it[inc].atk_speed[0]    = it[inc].atk_speed[1]    = 0; }
+							else if (v==62)     { m -= it[inc].cast_speed[1];   it[inc].cast_speed[0]   = it[inc].cast_speed[1]   = 0; }
+							else if (v==63)     { m -= it[inc].spell_mod[1];    it[inc].spell_mod[0]    = it[inc].spell_mod[1]    = 0; }
+							else if (v==64)     { m -= it[inc].spell_apt[1];    it[inc].spell_apt[0]    = it[inc].spell_apt[1]    = 0; }
+							else if (v==65)     { m -= it[inc].cool_bonus[1];   it[inc].cool_bonus[0]   = it[inc].cool_bonus[1]   = 0; }
+							else if (v==66)     { m -= it[inc].crit_chance[1];  it[inc].crit_chance[0]  = it[inc].crit_chance[1]  = 0; }
+							else if (v==67)     { m -= it[inc].crit_multi[1];   it[inc].crit_multi[0]   = it[inc].crit_multi[1]   = 0; }
+							else if (v==68)     { m -= it[inc].top_damage[1];   it[inc].top_damage[0]   = it[inc].top_damage[1]   = 0; }
+							else if (v==69)     { m -= it[inc].gethit_dam[1];   it[inc].gethit_dam[0]   = it[inc].gethit_dam[1]   = 0; }
+							else if (v<50)      { m -= it[inc].skill[v][1];     it[inc].skill[v][0]     = it[inc].skill[v][1]     = 0; }
+							else				{ panic++; }
+							catalog[n] = 99;
+						}
+						
+						it[inr].data[3] = m;
+						it[inr].flags |= IF_IDENTIFIED;
+					}
+					if (!god_give_char(inr, cn))
+					{
+						do_char_log(cn, 1, "Your backpack is full...\n");
+						it[inr].used = USE_EMPTY;
+						break;
+					}
+					it[inc].flags |= IF_SOULSPLIT;
+					do_char_log(cn, 1, "You got a %s.\n", it[inr].reference);
+					break;
+				default:
+					do_char_log(cn, 0, "Ease of use.\n");
+					if (!inc) inc = RANDOM(2)?get_random_backpack_item(cn):get_random_gear_item(cn);
+					if (it[inc].flags & IF_EASEUSE)
+					{
+						do_char_log(cn, 1, "But it had been done to the %s before.\n", it[inc].reference);
+						break;
+					}
+					for (p=0;p<5;p++)
+					{
+						if (it[inc].attrib[p][2]) 
+							it[inc].attrib[p][2] = it[inc].attrib[p][2] * 3/4;
+					}
+					for (p=0;p<50;p++)
+					{
+						if (it[inc].skill[p][2]) 
+							it[inc].skill[p][2] = it[inc].skill[p][2] * 3/4;
+					}
+					if (it[inc].min_rank)
+						it[inc].min_rank = it[inc].min_rank * 3/4;
+					it[inc].flags |= IF_EASEUSE;
+					do_char_log(cn, 1, "Your %s was altered.\n", it[inc].reference);
+					break;
+			}
+			break;
+		case  2:		// Blue - Beneficial buffs
+			v = 104;
+			if (has_buff(cn, v)) v = 105;
+			switch (it[in].data[1])
+			{
+				case  1:
+					if (buff = make_new_buff(cn, v, BUF_SPR_ACCEL, 300, SP_DUR_SHRINE, 0))
+					{
+						strcpy(bu[buff].name, "Shrine of Acceleration");
+						bu[buff].speed[1] = 20; 
+						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
+						do_char_log(cn, 3, "Be accelerated.\n");
+					}
+					break;
+				case  2:
+					if (buff = make_new_buff(cn, v, BUF_SPR_SHARP, 300, SP_DUR_SHRINE, 0))
+					{
+						strcpy(bu[buff].name, "Shrine of Sharpness");
+						bu[buff].weapon[1] = 20; 
+						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
+						do_char_log(cn, 3, "Be sharpened.\n");
+					}
+					break;
+				case  3:
+					if (buff = make_new_buff(cn, v, BUF_SPR_FORTI, 300, SP_DUR_SHRINE, 0))
+					{
+						strcpy(bu[buff].name, "Shrine of Fortify");
+						bu[buff].armor[1] = 20; 
+						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
+						do_char_log(cn, 3, "Be fortified.\n");
+					}
+					break;
+				case  4:
+					if (buff = make_new_buff(cn, v, BUF_SPR_BLSSN, 300, SP_DUR_SHRINE, 0))
+					{
+						strcpy(bu[buff].name, "Shrine of Blessing");
+						for (n = 0; n<5; n++) bu[buff].attrib[n][1] = 20;
+						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
+						do_char_log(cn, 3, "Be blessed.\n");
+					}
+					break;
+				default:
+					if (buff = make_new_buff(cn, v, BUF_SPR_WISDM, 300, SP_DUR_SHRINE, 0))
+					{
+						strcpy(bu[buff].name, "Shrine of Wisdom");
+						bu[buff].spell_mod[1] = 20;
+						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
+						do_char_log(cn, 3, "Be wisened.\n");
+					}
+					break;
+			}
+			char_play_sound(cn, ch[cn].sound + 1, -150, 0);
+			do_char_log(cn, 1, "You were strengthened.\n");
+			break;
+		default:		// Green - Character bonus
+			p = sqrt(rank2points(rank)) * 7 + 7;
+			p -= RANDOM(p/25+1); p += RANDOM(p/25*(tier+1)+1);
+			switch (it[in].data[1])
+			{
+				case  1:
+					p = p/53; ch[cn].luck += p;
+					do_char_log(cn, 2, "Your lucky day.\n");
+					chlog(cn, "Gets %d Luck", p);
+					do_char_log(cn, 1, "You got %d luck.\n", p);
+					break;
+				case  2:
+					p = p*2; ch[cn].gold += p;
+					do_char_log(cn, 2, "Your pockets fill.\n");
+					chlog(cn, "Gets %dG %dS", p / 100, p % 100);
+					do_char_log(cn, 1, "You got %dG %dS.\n", p / 100, p % 100);
+					break;
+				case  3:
+					ch[cn].points += p; ch[cn].points_tot += p;
+					do_char_log(cn, 2, "Inspiration.\n");
+					chlog(cn, "Gets %d EXP", p);
+					do_char_log(cn, 1, "You got %d experience points.\n", p);
+					break;
+				case  4:
+					p = p/47; ch[cn].os_points += p;
+					do_char_log(cn, 2, "Osiris smiles.\n");
+					chlog(cn, "Gets %d OSP", p);
+					do_char_log(cn, 1, "You got %d contract points.\n", p);
+					break;
+				default:
+					p = p/41; ch[cn].bs_points += p;
+					do_char_log(cn, 2, "The stronghold falls.\n");
+					chlog(cn, "Gets %d BSP", p);
+					do_char_log(cn, 1, "You got %d stronghold points.\n", p);
+					break;
+			}
+			break;
+	}
+	
+	// Contract progress
+	if (CONT_SCEN(cn)==5) 
+	{
+		add_map_progress(CONT_NUM(cn));
+		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
+			do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+	}
+	
+	return 1;
+}
+
+int use_map_portal(int cn, int in)
+{
+	int rank, tier, exp, n, luck, bsp, osp;
+	
+	// Check for mission completion
+	if (CONT_PROG(cn) < CONT_GOAL(cn))
+	{
+		do_char_log(cn, 0, "Your contract isn't finished yet!\n");
+		return 0;
+	}
+	
+	//do_char_log(cn, 1, "%d > %d\n", CONT_PROG(cn), CONT_GOAL(cn));
+	
+	rank = it[in].data[0];
+	tier = it[in].data[5];
+	
+	do_char_log(cn, 1, "You completed the area.\n");
+
+	exp = luck = bsp = osp = sqrt(rank2points(rank)) * 7 + 7;
+	exp -= RANDOM(exp/20+1);
+	exp += RANDOM(exp/20*(tier+1)+1);
+	
+	if (it[in].data[1]==1) exp += RANDOM(exp/8) + RANDOM(exp/8);
+	
+	chlog(cn, "Finished map of rank %d tier %d", rank, tier);
+	char_play_sound(cn, ch[cn].sound + 19, 0, 0);
+	
+	chlog(cn, "Gets %d EXP", exp);
+	ch[cn].points += exp;
+	ch[cn].points_tot += exp;
+	
+	if (tier || it[in].data[4]==1)
+	{
+		osp /= 47; 
+		osp -= RANDOM(osp/20+1); 
+		osp += RANDOM(osp/20*(tier+1)+1);
+		
+		if (it[in].data[4]==1 && tier) osp += RANDOM(osp/8) + RANDOM(osp/8);
+		else if (it[in].data[4]==1) osp = RANDOM(osp/8) + RANDOM(osp/8);
+		
+		ch[cn].os_points += osp;
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 2, "You get %d exp and %d contract pts.\n", exp, osp);
+	}
+	else
+	{
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 2, "You get %d experience points.\n", exp);
+	}
+	
+	if (it[in].data[2]==1) // Exit portal grants ex luck
+	{
+		luck /= 53;	
+		luck -= RANDOM(luck/20+1); 
+		luck += RANDOM(luck/20*(tier+1)+1);
+		ch[cn].luck += luck;
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 2, "You get %d additional luck.\n", luck);
+	}
+	if (it[in].data[3]==1) // Exit portal grants ex BSP
+	{
+		bsp /= 41; 
+		bsp -= RANDOM(bsp/20+1); 
+		bsp += RANDOM(bsp/20*(tier+1)+1);
+		ch[cn].bs_points += bsp;
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 2, "You get %d additional stronghold points.\n", bsp);
+	}
+	//
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	god_transfer_char(cn, OS_WARP_X, OS_WARP_Y);
+	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	
+	clear_map_buffs(cn, 0);
+	
+	return 1;
+}
+
+int use_special_spell(int cn, int in)
+{
+	int spell, power, ret, co=0;
+
+	spell = it[in].data[0];
+	
+	if ((co = ch[cn].skill_target1)) ;
+	else co = cn;
+
+	if (!do_char_can_see(cn, co))
+	{
+		do_char_log(cn, 0, "You cannot see your target.\n");
+		return 0;
+	}
+
+	if (spell==SK_BLOODLET)
+	{
+		if (!is_facing(cn, co))
+		{
+			do_char_log(cn, 0, "You must be facing your enemy!\n");
+			return 0;
+		}
+		if (!may_attack_msg(cn, co, 1))
+		{
+			chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
+			return 0;
+		}
+	}
+	else if (!player_or_ghost(cn, co))
+	{
+		do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", ch[co].name, ch[cn].name);
+		co = cn;
+	}
+
+	switch(spell)
+	{
+		case    SK_BLOODLET:
+			if (!get_gear(cn, IT_WP_BLOODLET)) 
+			{
+				do_char_log(cn, 0, "You must equip it first.\n");
+				return 0;
+			}
+			power = ch[cn].hp[5]/4;
+			if (ch[cn].a_hp + 500 < power)
+			{
+				do_char_log(cn, 0, "You dont have enough life.\n");
+				return 0;
+			}
+			ch[cn].a_hp -= power;
+			ret = spell_bloodletting(cn, co, power);
+			break;
+		case    SK_STARLIGHT:
+			if (!get_gear(cn, IT_WP_STARLIGHT)) 
+			{
+				do_char_log(cn, 0, "You must equip it first.\n");
+				return 0;
+			}
+			power = ch[cn].mana[5]/4;
+			if (ch[cn].a_mana + 500 < power)
+			{
+				do_char_log(cn, 0, "You dont have enough mana.\n");
+				return 0;
+			}
+			ch[cn].a_mana -= power;
+			item_damage_worn(cn, WN_RHAND, 500);
+			if (get_gear(cn, IT_WP_LIFESPRIG) && power) spell_pomesol(cn, cn, power, 1);
+			ret = spell_starlight(cn, co, power, 1);
+			break;
+		case    SK_PHALANX:
+			if (!get_gear(cn, IT_WP_PHALANX)) 
+			{
+				do_char_log(cn, 0, "You must equip it first.\n");
+				return 0;
+			}
+			power = ch[cn].end[5]/2;
+			if (ch[cn].a_end + 500 < power)
+			{
+				do_char_log(cn, 0, "You dont have enough endurance.\n");
+				return 0;
+			}
+			ch[cn].a_end -= power;
+			item_damage_worn(cn, WN_LHAND, 500);
+			if (get_gear(cn, IT_WP_CRESSUN) && power) spell_pomesol(cn, cn, power, 0);
+			ret = spell_phalanx(cn, co, power, 1);
+			break;
+		default:
+			ret = 0;
+			break;
+	}
+
+	return ret;
+}
+
+int use_lame(int cn, int in)
+{
+	int in2, worn=0;
+	
+	if (it[in].data[0]<REQ_LAME) 
+	{
+		do_char_log(cn, 3, "Thou art not worthy.\n");
+		return 0;
+	}
+	
+	in2 = god_create_item(IT_WP_EXCALIBUR);
+	
+	if (in2)
+	{
+		char buf[300];
+
+		it[in2].data[0] = cn;
+
+		sprintf(buf, "%s Engraved in it are the letters \"%s\".",
+		        it[in2].description, ch[cn].name);
+		if (strlen(buf)<200)
+		{
+			strcpy(it[in2].description, buf);
+		}
+	}
+	
+	if (ch[cn].worn[WN_RHAND]==in)
+	{
+		god_take_from_char(in, cn);
+		
+		ch[cn].worn[WN_RHAND] = in2;
+
+		it[in2].x = 0;
+		it[in2].y = 0;
+		it[in2].carried = cn;
+
+		do_update_char(cn);
+	}
+	else
+	{
+		god_take_from_char(in, cn);
+		it[in].used = USE_EMPTY;
+		god_give_char(in2, cn);
+	}
+	
+	do_char_log(cn, 1, "My power is yours, worthy one.\n");
+}
+
+//
+
 int use_crystal_sub(int cn, int in)
 {
 	int group, n, cnt, cc, base, pts = 0, m, z, tmp, sbase, miss = 0;
@@ -3483,6 +4532,10 @@ int build_ring(int cn, int in)
 	{
 		t2 = 0;
 	}
+	else if (it[in2].temp==0) // prevents altered gear from being consumed
+	{
+		return 0;
+	}
 	else
 	{
 		t2 = it[in2].temp;
@@ -4044,7 +5097,7 @@ int use_grolm(int cn, int in)
 
 void boost_char(int cn, int divi)
 {
-	int n, in, rank, exp;
+	int n, in, rank, exp, v, m;
 	char buf[80];
 	
 	// Moved up here to prevent Rank 0 soul stones from generating.
@@ -4081,7 +5134,7 @@ void boost_char(int cn, int divi)
 		// New
 		if (!(ch[cn].flags & CF_EXTRAEXP)) ch[cn].flags |= CF_EXTRAEXP;
 
-		in = god_create_item(1146);
+		in = god_create_item(IT_SOULSTONE);
 		if (in)
 		{
 			sprintf(it[in].name, "Soulstone");
@@ -4092,6 +5145,31 @@ void boost_char(int cn, int divi)
 			it[in].data[1] = exp;
 			it[in].temp = 0;
 			it[in].driver = 68;
+			
+			if (rank>7 && !RANDOM(4))
+			{
+				v = RANDOM(70);
+				if (v>=50 && v<=54)	{ it[in].attrib[v-50][0] = get_sb(v, 1); m = it[in].attrib[v-50][1] = get_sb(v, 0)*2; }
+				else if (v==55)     { it[in].hp[0]           = get_sb(v, 1); m = it[in].hp[1]           = get_sb(v, 0)*2; }
+				else if (v==56)     { it[in].end[0]          = get_sb(v, 1); m = it[in].end[1]          = get_sb(v, 0)*2; }
+				else if (v==57)     { it[in].mana[0]         = get_sb(v, 1); m = it[in].mana[1]         = get_sb(v, 0)*2; }
+				else if (v==58)     { it[in].weapon[0]       = get_sb(v, 1); m = it[in].weapon[1]       = get_sb(v, 0)*2; }
+				else if (v==59)     { it[in].armor[0]        = get_sb(v, 1); m = it[in].armor[1]        = get_sb(v, 0)*2; }
+				else if (v==60)     { it[in].move_speed[0]   = get_sb(v, 1); m = it[in].move_speed[1]   = get_sb(v, 0)*2; }
+				else if (v==61)     { it[in].atk_speed[0]    = get_sb(v, 1); m = it[in].atk_speed[1]    = get_sb(v, 0)*2; }
+				else if (v==62)     { it[in].cast_speed[0]   = get_sb(v, 1); m = it[in].cast_speed[1]   = get_sb(v, 0)*2; }
+				else if (v==63)     { it[in].spell_mod[0]    = get_sb(v, 1); m = it[in].spell_mod[1]    = get_sb(v, 0)*2; }
+				else if (v==64)     { it[in].spell_apt[0]    = get_sb(v, 1); m = it[in].spell_apt[1]    = get_sb(v, 0)*2; }
+				else if (v==65)     { it[in].cool_bonus[0]   = get_sb(v, 1); m = it[in].cool_bonus[1]   = get_sb(v, 0)*2; }
+				else if (v==66)     { it[in].crit_chance[0]  = get_sb(v, 1); m = it[in].crit_chance[1]  = get_sb(v, 0)*2; }
+				else if (v==67)     { it[in].crit_multi[0]   = get_sb(v, 1); m = it[in].crit_multi[1]   = get_sb(v, 0)*2; }
+				else if (v==68)     { it[in].top_damage[0]   = get_sb(v, 1); m = it[in].top_damage[1]   = get_sb(v, 0)*2; }
+				else if (v==69)     { it[in].gethit_dam[0]   = get_sb(v, 1); m = it[in].gethit_dam[1]   = get_sb(v, 0)*2; }
+				else                { it[in].skill[v][0]     = get_sb(v, 1); m = it[in].skill[v][1]     = get_sb(v, 0)*2; }
+				
+				it[in].data[3] = m;
+				it[in].flags |= IF_IDENTIFIED;
+			}
 			
 			if (exp>= 6500000 && !RANDOM(8)) it[in].data[2] = 4+RANDOM(4);
 			if (exp>=14000000 && !RANDOM(6)) it[in].data[2] = 3+RANDOM(3);
@@ -5913,6 +6991,39 @@ void use_driver(int cn, int in, int carried)
 				break;
 			case 106:						// Gender scroll
 				ret = use_scroll9(cn, in);
+				break;
+			case 107:
+				ret = use_map_chest(cn, in);
+				break;
+			case 108:
+				ret = use_map_shrine(cn, in);
+				break;
+			case 109:
+				ret = use_map_portal(cn, in);
+				break;
+			case 110:
+				ret = use_scrollA(cn, in);
+				break;
+			case 111:
+				ret = use_map_artifact(cn, in);
+				break;
+			case 112:
+				ret = use_map_pentigram(cn, in);
+				break;
+			case 113:
+				ret = use_map_contract(cn, in);
+				break;
+			case 114:
+				ret = use_special_spell(cn, in);
+				break;
+			case 115:
+				ret = use_lame(cn, in);
+				break;
+			case 116:
+				ret = use_scroll_R(cn, in);
+				break;
+			case 117:
+				ret = use_scroll_S(cn, in);
 				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);

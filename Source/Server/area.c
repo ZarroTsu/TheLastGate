@@ -228,6 +228,7 @@ struct area area[] = {
 	{ 663,  606,  683,  626, "Circle of Fire",                 1},
 	{ 689,  726,  700,  737, "The Oasis",                      3},
 	{ 709,  642,  766,  702, "Empty Outset",                   1},
+	{ 637,  720,  665,  748, "Temple of Osiris",               1},
 	{ 749,  554,  781,  586, "The Tower",                      0},
 	{ 438,   72,  470,  104, "The Tower II",                   0},
 	{ 438,   34,  470,   66, "The Tower III",                  0},
@@ -381,7 +382,8 @@ struct area area[] = {
 	{  91,   21,  115,   45, "Random Dungeon Entrance",        1},
 	{ 131,   21,  201,   91, "Random Dungeon I",               1},
 	{ 216,   21,  286,   91, "Random Dungeon II",              1},
-	{ 301,   21,  371,   91, "Random Dungeon III",             1}
+	{ 301,   21,  371,   91, "Random Dungeon III",             1},
+	{  20, 1025,   73, 1590, "Contract Zone ",                 1}
 };
 
 extern struct waypoint waypoint[MAXWPS] = {
@@ -394,7 +396,7 @@ extern struct waypoint waypoint[MAXWPS] = {
 	{ 550, 606, "Aston, East", 						"the entrance to the Autumn Meadow, east of Aston" },
 	{ 686, 517, "Forgotten Canyon", 				"the entrance to the Forgotten Canyon" },
 	{ 359, 711, "Lizard Temple, North", 			"the entrance to the Beryl Jungle, north of the Lizard Temple" },
-	{ 651, 734, "Temple of Osiris", 				"the Temple of Osiris" },
+	{ 658, 741, "Temple of Osiris", 				"the Temple of Osiris" },
 	{ 512, 512, "Neiseer, West", 					"the entrance to the Basalt Desert, west of Neiseer" },
 	{ 512, 512, "Neiseer", 							"the middle of Neiseer" },
 	{ 512, 512, "Neiseer, North", 					"the entrance to the Burning Plains, north of Neiseer" },
@@ -462,6 +464,12 @@ char *get_area(int cn, int verbose)
 					strcat(buf, ", ");
 				}
 				strcat(buf, area[n].name);
+			}
+			if (area[n].y1==1025 && area[n].y2==1590)
+			{
+				char con[8];
+				sprintf(con, "%d", CONT_NUM(cn));
+				strcat(buf, con);
 			}
 		}
 	}

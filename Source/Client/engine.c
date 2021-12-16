@@ -989,14 +989,14 @@ void display_meta_from_ls(void)
 	*/
 	sk_proxi = sk_score(44) / (300/12);
 	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
-	sk_poiso = sk_score(42)*pl_spmod/100 * 1750 / 30;
-	sk_blast = sk_score(24)*pl_spmod/100 * 2 * 625/1000;
+	sk_poiso = sk_score(42)*pl_spmod/100 * DAM_MULT_POISON / 30;
+	sk_blast = sk_score(24)*pl_spmod/100 * 2 * DAM_MULT_BLAST/1000;
 	sk_scorc = 1000 + sk_score(24)*pl_spmod/100;
-	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * 125/1000;
+	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * DAM_MULT_PULSE/1000;
 	sk_pucnt = (60*2*100 / (3*pl_cdrate));
-	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * 450/1000;
+	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000;
 	sk_water = 25 * 18;
-	sk_cleav = (sk_score(40)+pl.weapon/4+pl_topdm/4) * 2 * 750/1000;
+	sk_cleav = (sk_score(40)+pl.weapon/4+pl_topdm/4) * 2 * DAM_MULT_CLEAVE/1000;
 	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
 	sk_rally = sk_score(35)/10;
 	sk_shado = 15 + sk_score(46)*pl_spmod/500;
@@ -1057,11 +1057,11 @@ void display_meta_from_ls(void)
 	// Tarot - Rev.Death (zephyr)
 	if (pl_flagb & (1 <<  5))
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + pl_reflc*2) * 2 * 50/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + pl_reflc*2) * 2 * DAM_MULT_ZEPHYR/1000;
 	}
 	else
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/4) * 2 * 50/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/4) * 2 * DAM_MULT_ZEPHYR/1000;
 	}
 	
 	// Tarot - Emperor (slow bonus)
@@ -1725,8 +1725,10 @@ void eng_display_win(int plr_sprite,int init)
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
 						if (show_shop==3) // Casino
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
-						if (show_shop==4) // Future
+						if (show_shop==4) // Contract
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
+						if (show_shop==5) // Exp
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
 					}
 				} 
 				else copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
@@ -1744,8 +1746,10 @@ void eng_display_win(int plr_sprite,int init)
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
 				if (show_shop==3) // Casino
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
-				if (show_shop==4) // Future
+				if (show_shop==4) // Contract
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
+				if (show_shop==5) // Exp
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Unspent Exp: %9d",pl.points);
 			}
 
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
@@ -1957,12 +1961,12 @@ void display_floortile(int tile,int light,int x,int y,int xoff,int yoff,int mx,i
 }
 
 unsigned short ymap[MAPX_MAX*MAPY_MAX];
+unsigned short xmap[MAPX_MAX*MAPY_MAX];
 
 void eng_display(int init)	// optimize me!!!!!
 {
 	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
 	extern int dd_cache_hit,dd_cache_miss,swap,MAXCACHE;
-	static unsigned short xmap[MAPX_MAX*MAPY_MAX];
 	static xm_flag=1;
 
 	if (xm_flag) {

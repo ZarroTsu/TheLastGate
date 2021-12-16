@@ -1018,6 +1018,7 @@ int main(int argc, char *args[])
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
 		ch[n].data[75] = 0;
+		clear_map_buffs(n, 1);
 	}
 
 	srand(time(NULL));

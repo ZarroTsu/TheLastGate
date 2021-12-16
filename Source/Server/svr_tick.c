@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.6.10\n"};
+static char intro_msg3[] = {"Current client/server version is 0.7.0\n"};
 static char intro_msg4_font = 2;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 1;
@@ -2096,7 +2096,8 @@ void plr_logout(int cn, int nr, int reason)
 			}
 			ch[cn].data[n] = 0;
 		}
-		ch[cn].data[96] = 0;
+		ch[cn].data[96] = 0;	// Reset Queued spell
+		clear_map_buffs(cn, 1);
 
 		ch[cn].used = USE_NONACTIVE;
 		ch[cn].logout_date = time(NULL);
@@ -4685,13 +4686,6 @@ void tick(void)
 				{
 					ch[n].data[71]--;
 				}
-				// Old badword timer - was [72]
-				/*
-				if ((ch[n].flags & CF_PLAYER) && ch[n].data[x]>0)
-				{
-					ch[n].data[x]--;
-				}
-				*/
 				if ((ch[n].flags & CF_PLAYER) && !(ch[n].flags & CF_INVISIBLE))
 				{
 					plon++;

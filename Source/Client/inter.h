@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000610
+#define VERSION 0x000700
 //
 
 #define MAXSPRITE 2000+(128*1024)

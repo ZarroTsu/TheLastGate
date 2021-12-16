@@ -182,10 +182,13 @@ int npc_add_enemy(int cn, int co, int always)
 	{
 		return 0;
 	}
-
-	if (!always && (ch[cn].points_tot + 500) * 20<ch[co].points_tot)
+	
+	if (points2rank(ch[cn].points_tot)<20)
 	{
-		return 0;
+		if (!always && (ch[cn].points_tot + 500) * 20<ch[co].points_tot)
+		{
+			return 0;
+		}
 	}
 
 	ch[cn].data[76] = ch[co].x + ch[co].y * MAPX;
@@ -808,6 +811,8 @@ int npc_give(int cn, int co, int in, int money)
 	if (in && (
 		ch[cn].data[49]==it[in].temp 
 		|| 
+		(ch[cn].temp==CT_OSIRIS && it[in].temp==MCT_CONTRACT)
+		|| 
 		(ch[cn].temp==CT_TACTICIAN && 
 		(it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3)) 
 		||
@@ -824,7 +829,6 @@ int npc_give(int cn, int co, int in, int money)
 		(it[in].temp==IT_HERBE))
 		) && canlearn)
 	{
-		
 		// Assure the player has inventory space before we do anything
 		if (ch[cn].data[66] || ch[cn].data[50]==50)
 		{
@@ -843,9 +847,24 @@ int npc_give(int cn, int co, int in, int money)
 			}
 		}
 		
-		// hack for black candle
-		if (ch[cn].temp==CT_TACTICIAN && (it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3))
+		if (ch[cn].temp==CT_OSIRIS && it[in].temp==MCT_CONTRACT)
 		{
+			if (!it[in].data[0])
+				do_sayx(cn, "Hmm...");
+			/*
+			else if (co != it[in].data[0])
+				do_sayx(cn, "Don't sour my mood, %s.", ch[co].name);
+			*/
+			else
+				do_sayx(cn, "Very well %s. Show me what you can do!", ch[co].name);
+			god_take_from_char(in, cn);
+			if (start_contract(co, in))
+				do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "%s was whisked away somewhere.\n", ch[co].name);
+			else
+				god_give_char(in, co);
+		}
+		else if (ch[cn].temp==CT_TACTICIAN && (it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3))
+		{	// hack for black candle
 			ar = it[in].data[0];
 			do_give_bspoints(co, ar, 1);
 			god_take_from_char(in, cn);
@@ -1677,7 +1696,7 @@ int npc_see(int cn, int co)
 			{
 				break;
 			}
-			if (IS_COMP_TEMP(co) && !ch[co].data[CHD_GROUP]) // Give benefit of the doubt to new GC's
+			if ((IS_COMP_TEMP(co) || (ch[co].flags & CF_SHADOWCOPY)) && !ch[co].data[CHD_GROUP]) // Give benefit of the doubt to new GC's and SC's
 			{
 				break;
 			}
@@ -3374,7 +3393,7 @@ void stronghold_mage_driver(int cn)
 /*
 	Stronghold mage version 2
 	Each mage has their own distinct series of waves, pulling from monsters in helper.c
-		via generate_map_enemy(temp, kin, xx, yy, base, affix)
+		via generate_map_enemy(temp, kin, xx, yy, base, affix, tarot)
 	
 	Each mage has 15 waves, 10 subwaves, and up to 6 monsters per subwave. 
 		Each subwave has a breif timer between spawns.
@@ -3563,7 +3582,7 @@ void stronghold_mage_driver_ver2(int cn)
 		data[4] = number of enemies spawned so far
 		data[5] = number of enemies killed so far
 		
-		generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]][ch[cn].data[2]][m], spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 0);
+		generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]][ch[cn].data[2]][m], spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 0, 0);
 	*/
 	
 	// Assign mage number
@@ -3713,7 +3732,7 @@ void stronghold_mage_driver_ver2(int cn)
 		{
 			if (co = generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
 				spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
-				(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0)))
+				(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0), 0))
 			{
 				ch[co].flags |= CF_NOSLEEP;
 				ch[co].data[25] = 2;
@@ -5527,7 +5546,7 @@ void npc_driver_low(int cn)
 				x = ch[cn].x - 5 + RANDOM(11);
 				y = ch[cn].y - 5 + RANDOM(11);
 
-				if (x<1 || x>=MAPX || y<1 || y>MAPX)
+				if (x<1 || x>=MAPX || y<1 || y>MAPY)
 				{
 					continue;
 				}
@@ -5593,7 +5612,7 @@ void npc_driver_low(int cn)
 			{
 				return;
 			}
-
+			
 			ch[cn].goto_x = x;
 			ch[cn].goto_y = y;
 			return;

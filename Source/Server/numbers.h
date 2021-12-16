@@ -117,7 +117,9 @@
 #define CT_KAIBA		1312	// Casino Tokens
 #define CT_YUGI			1313	// Casino Games
 
-#define CT_OSIRIS		8888
+#define CT_OSIRIS		 348
+#define CT_CONTRACTOR	 349
+#define CT_ADHERENT		 351
 
 #define BS_HOUR 		3600
 #define BS_MINS 		(BS_HOUR/60)
@@ -201,6 +203,7 @@
 #define IT_CH_SUN		1532
 #define IT_CH_JUDGE		1533
 #define IT_CH_WORLD		1534
+
 #define IT_CH_FOOL_R	2231
 #define IT_CH_MAGI_R	2232
 #define IT_CH_PREIST_R	2233
@@ -258,22 +261,24 @@
 #define IT_BT_NATURES	 711
 
 // Unique weapons
-#define IT_WP_LIFESPRIG	  	30004
-#define IT_WP_BLOODLET	  	30005
-#define IT_WP_GEMCUTTER	  	30006
-#define IT_WP_STARLIGHT	  	30007
-#define IT_WP_KELPTRID	  	30008
-#define IT_WP_PHALLENX	  	30009
-#define IT_WP_LAMEDARG	  	30010
-#define IT_WP_WHITEODA	  	30011
-#define IT_WP_EXCALIBUR	  	30012
-#define IT_WP_FELLNIGHT	  	30013
-#define IT_WP_BLACKTAC	  	30014
-#define IT_WP_CRIMRIP	  	30015
-#define IT_WP_CRESSUN	  	30016
-#define IT_WP_GILDSHINE	  	30017
-#define IT_WP_BRONCHIT	  	30018
-#define IT_WP_VOLCANF	  	30019
+#define IT_WP_LIFESPRIG	  	2512
+#define IT_WP_BLOODLET	  	2514
+#define IT_WP_GEMCUTTER	  	2515
+#define IT_WP_STARLIGHT	  	2519
+#define IT_WP_KELPTRID	  	2520
+#define IT_WP_PHALANX	  	2526 
+#define IT_WP_LAMEDARG	  	2529
+#define IT_WP_WHITEODA	  	2530
+#define IT_WP_EXCALIBUR	  	2532
+#define IT_WP_FELLNIGHT	  	2534
+#define IT_WP_BLACKTAC	  	2535
+#define IT_WP_CRIMRIP	  	2539
+#define IT_WP_CRESSUN	  	2543
+#define IT_WP_GILDSHINE	  	2545
+#define IT_WP_BRONCHIT	  	2551
+#define IT_WP_VOLCANF	  	2552
+
+#define REQ_LAME			1200
 
 // Other
 
@@ -639,6 +644,13 @@
 #define IT_RD_EN		188
 #define IT_RD_MP		189
 
+#define IT_OS_BRV		2496
+#define IT_OS_WIL		2497
+#define IT_OS_INT		2498
+#define IT_OS_AGL		2499
+#define IT_OS_STR		2500
+#define IT_OS_SK		2501
+
 #define IT_RD_SILV1		1390 // +RANDOM(6)
 #define IT_RD_SILV2		2073 // +RANDOM(4)
 #define IT_RD_GOLD1		1402 // +RANDOM(6)
@@ -648,6 +660,10 @@
 
 #define IT_EXPS			2124
 #define IT_LUKS			2125
+
+#define IT_SOULSTONE	1146
+#define IT_SOULCATAL	2502
+#define IT_SOULFOCUS	2503
 
 // -------- Buff/Debuff Sprites -------- //
 
@@ -696,6 +712,18 @@
 #define BUF_SPR_POME		790
 #define BUF_SPR_STARL		895
 #define BUF_SPR_FROSTB		471
+#define BUF_SPR_PHALANX	  16864
+//
+#define BUF_SPR_DEBIL	  16860
+#define BUF_SPR_FRAGI	  16861
+#define BUF_SPR_STIGM	  16862
+#define BUF_SPR_HYPRT	  16863
+//
+#define BUF_SPR_ACCEL	  16764
+#define BUF_SPR_SHARP	  16761
+#define BUF_SPR_FORTI	  16762
+#define BUF_SPR_BLSSN	  16760
+#define BUF_SPR_WISDM	  16763
 
 // -----
 
@@ -743,31 +771,185 @@
 
 //
 
-#define MM_CHUNK_S		 7
-#define MM_MAP_SIZ		 9
-
-// X/Y for map tile chunks
-#define MM_TILE1_X		 2
-#define MM_TILE1_Y		20
-#define MM_TILE2_X		 2 +   8
-#define MM_TILE2_Y		20
-#define MM_TILE3_X		 2
-#define MM_TILE3_Y		20 + 640
-#define MM_TILE4_X		 2 +   8
-#define MM_TILE4_Y		20 + 640
-#define MM_TILE5_X		 2
-#define MM_TILE5_Y		20 + 640*2
-#define MM_TILE6_X		 2 +   8
-#define MM_TILE6_Y		20 + 640*2
-
-// Offset for each individual chunk
-#define MM_TILE_OF		 8
+// Map tile sizes
+#define MAP_TILE_SIZE	   7
+#define MAP_CELL_SIZE	   7
 
 // X/Y for the target where a map is built
 #define MM_TARGETX		  22
 #define MM_TARGETY		1027
 
-// Offset for additional maps
-#define MM_TARG_OF		  77
 
-//
+// Offset for additional maps - padded by 15 to avoid hearing others in adjacent maps
+#define MM_TARG_OF		(MAP_TILE_SIZE*MAP_CELL_SIZE+15)
+
+// Map special object template numbers
+#define MM_CHEST		2489	// dr 107
+#define MM_HOLE_S		2490
+#define MM_HOLE_W		2491
+#define MM_LADD_N		2492
+#define MM_LADD_E		2493
+#define MM_SHRINE		2494	// dr 108
+#define MM_EXIT 		2495	// dr 109
+
+// 16812 Red
+// 16813 Blue
+// 16814 Green
+
+#define NUM_MAP_ENEM	  33
+#define NUM_LEG_ENEM	   7
+
+// Floor sprites
+#define MFL_MINE1		 116
+#define MFL_MINE2		 117
+#define MFL_MINE3		 118
+#define MFL_SAND		 130
+#define MFL_DIRT		 131
+#define MFL_WOOD		 133
+#define MFL_SANDSTONE	 142
+#define MFL_GRANITE		 170
+#define MFL_DARKSTONE	 500
+#define MFL_ROAD		 542
+#define MFL_LGRASS		 551
+#define MFL_BRICK		 558
+#define MFL_LAVA		 704
+#define MFL_GOLEM		 808
+#define MFL_BSROUGH		 950
+#define MFL_BSSMOOTH	 959
+#define MFL_BEACH		1002
+#define MFL_JUNGLE		1003
+#define MFL_BASIC		1008
+#define MFL_EARTH		1014
+#define MFL_DGREY		1052
+#define MFL_LGREY		1100
+#define MFL_DGRASS		1118
+#define MFL_MARBLE		1158
+#define MFL_EMERALD		2658
+#define MFL_SNOW		3020
+#define MFL_LAUTUMN		2828
+#define MFL_DAUTUMN		2832
+#define MFL_CANYON		3538
+#define MFL_LIZARD		5047
+#define MFL_TOWER		5585
+#define MFL_ICE		   16670
+#define MFL_SEWER	   16728
+
+// Wall Templates
+#define MWL_GREY		   2
+#define MWL_MARBLE		   3
+#define MWL_BMARBLE		 122
+#define MWL_EARTH		 150
+#define MWL_SEWER		 249
+#define MWL_RED			 297
+#define MWL_MINE1		 437
+#define MWL_MINE2		 438
+#define MWL_MINE3		 439
+#define MWL_BLACK		 721
+#define MWL_ICE			 807
+#define MWL_GREEN		 821
+#define MWL_TTREE		1467
+#define MWL_FTREE		1468
+#define MWL_SAND	   91551
+#define MWL_GBRICK	    1664
+#define MWL_TBRICK	   91666
+#define MWL_RBRICK	   91670
+#define MWL_CANYON		1674
+#define MWL_SNOW		1675
+#define MWL_DTREE		1684
+#define MWL_SNTREE		1688
+#define MWL_ATTREE		1695
+#define MWL_AFTREE		1696
+#define MWL_RCANYON		1707
+#define MWL_JTREE		1902
+#define MWL_EMERALD		2208
+#define MWL_LIZARD		2214
+
+// Torch Templates
+#define MTR_GROLM		 171
+#define MTR_DGREY		 250
+#define MTR_GOLD		 268
+#define MTR_WHITE		 296
+#define MTR_FIRE		 522
+#define MTR_LGREY		 650
+#define MTR_BOWL		 741
+#define MTR_BLUE		 764
+#define MTR_ICE			 812
+#define MTR_GREEN		 822
+#define MTR_MARBLE		1055
+#define MTR_LAMP		1132
+#define MTR_TRASH		1147
+#define MTR_BLACK		1645
+#define MTR_FPIT		1886
+#define MTR_EMERALD		2210
+
+// Decoration Templates
+#define MAP_NUM_DECO	   4
+#define MDE_MPILLAR		   4
+#define MDE_BMARBLE		 123
+#define MDE_EARTH	   90153
+#define MDE_RUBBLE	   90251
+#define MDE_LAVA	   90517
+#define MDE_ICE		   90809
+#define MDE_BPILLAR		 729
+#define MDE_MTABLE		1052
+#define MDE_FRUIT	   91434
+#define MDE_SBUSH		1440
+#define MDE_SPILLAR		1554
+#define MDE_SAND	   91555
+#define MDE_TBUSH		1591
+#define MDE_BARREL	   91711
+#define MDE_EMERALD		2209
+#define MDE_ESPIKE		2211
+#define MDE_CACTUS	   92567
+
+// Scenery Templates
+#define MAP_NUM_SCEN	   4
+#define MSC_MOSS	   90017
+#define MSC_FLOWER	   90016
+#define MSC_EARTHR	   90156
+#define MSC_JFLOWER	   90201
+#define MSC_JFAUNA	   90232
+#define MSC_AQUATIC	   90230
+#define MSC_LGRASS	   91558
+#define MSC_DGRASS	   91583
+#define MSC_YGRASS	   91586
+#define MSC_PEBBLES		1589
+#define MSC_APLANT	   91689
+#define MSC_SPLANT	   91692
+#define MSC_EMERALD	   92212
+
+// Door Templates
+#define MDR_WOOD_N		  22
+#define MDR_WOOD_E		  84
+#define MDR_DIRT_N		 159
+#define MDR_DIRT_E		 160
+#define MDR_RED_N		 301
+#define MDR_RED_E		 300
+#define MDR_IRON_N		 776
+#define MDR_IRON_E		 773
+#define MDR_MARBLE_N	1062
+#define MDR_MARBLE_E	1063
+#define MDR_ICE_N		1170
+#define MDR_ICE_E		1171
+#define MDR_SAND_N		1561
+#define MDR_SAND_E		1562
+#define MDR_GREEN_N		2216
+#define MDR_GREEN_E		2215
+
+// Contract sprites
+#define MSP_Y			5602
+#define MSP_G			5603
+#define MSP_B			5604
+#define MSP_R			5601
+
+// Contract Templates
+#define MCT_CONTRACT	2507
+#define MCT_QUILL_Y		2508
+#define MCT_QUILL_G		2509
+#define MCT_QUILL_B		2510
+#define MCT_QUILL_R		2511
+
+#define MCT_ARTIFACT	2504
+#define MCT_PENTIGRAM	2506
+
+// to self: add sprites 760 - 762 from OLD for the map pents

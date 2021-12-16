@@ -1227,6 +1227,12 @@ void god_info(int cn, int co)
 		do_char_log(cn, 1, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
 			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
 			            ch[co].data[5], ch[co].data[6], ch[co].data[7], ch[co].data[8], ch[co].data[9]);
+		do_char_log(cn, 1, "CN %d, CS %d, CG %d, CP %d.\n",
+			            CONT_NUM(co), CONT_SCEN(co), CONT_GOAL(co), CONT_PROG(co));
+		//do_char_log(cn, 2, "Current location=%d, Home coords: %d.\n",
+		//	            ch[co].x + ch[co].y * MAPX, ch[co].data[29]);
+		//do_char_log(cn, 1, "Rwalk=%d, Rwalk tm=%d, Rwalk ds=%d.\n",
+		//	            ch[co].data[60], ch[co].data[61], ch[co].data[73]);
 		do_char_log(cn, 3, "Armor=%d, Weapon=%d. Alignment=%d.\n", ch[co].armor, ch[co].weapon, ch[co].alignment);
 		do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[CHD_GROUP], group_active(co), ch[co].data[92], ch[co].data[96]);
 		do_char_log(cn, 3, "Luck=%d, Gethit_Dam=%d.\n", ch[co].luck, ch[co].gethit_dam);
@@ -2504,11 +2510,10 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x40000000 | MF_NOMAGIC;
 		ch[cn].item[m++] = 0x40000000 | MF_DEATHTRAP;
 		ch[cn].item[m++] = 0x40000000 | MF_UWATER;
+		
 		ch[cn].item[m++] = 0x40000000 | MF_NOLAG;
 		ch[cn].item[m++] = 0x40000000 | MF_NOFIGHT;
 		ch[cn].item[m++] = 0x40000000 | MF_NOEXPIRE;
-
-		//ch[cn].item[m++] = 0x20000000 | SPR_TUNDRA_GROUND;
 		ch[cn].item[m++] = 0x20000000 | SPR_DESERT_GROUND;	//  1002
 		ch[cn].item[m++] = 0x20000000 | SPR_GROUND1;		//  1008
 		ch[cn].item[m++] = 0x20000000 | SPR_WOOD_GROUND;	//  1013
@@ -2516,6 +2521,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND1;	//  1010
 		ch[cn].item[m++] = 0x20000000 | SPR_STONE_GROUND2;	//  1052
 		ch[cn].item[m++] = 0x20000000 | 1100;
+		
 		ch[cn].item[m++] = 0x20000000 | 1099;
 		ch[cn].item[m++] = 0x20000000 | 1012;
 		ch[cn].item[m++] = 0x20000000 | 1109;
@@ -2526,12 +2532,17 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 1014;
 		ch[cn].item[m++] = 0x20000000 | 1003;
 		ch[cn].item[m++] = 0x20000000 | 1005;
+		
 		ch[cn].item[m++] = 0x20000000 | 1006;
 		ch[cn].item[m++] = 0x20000000 | 1007;
 		ch[cn].item[m++] = 0x20000000 | 402;
 		ch[cn].item[m++] = 0x20000000 | 500;
 		ch[cn].item[m++] = 0x20000000 | 558;
 		ch[cn].item[m++] = 0x20000000 | 596;
+		//
+		//
+		//
+		//
 		break;
 	case 1:
 		ch[cn].item[m++] = 0x20000000 | 520;
@@ -3863,7 +3874,6 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[26] = 0;
 		ch[co].data[27] = 0;
 		ch[co].data[28] = 0;
-		//ch[co].data[41] = 0; // Free slot
 		
 		// Reset Pole flags
 		ch[co].data[46] = 0;

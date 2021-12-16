@@ -21,6 +21,18 @@
 #define MAXBUFFS		40  // must match server!
 #define MAXWPS			20
 
+// -------- Damage Multipliers -------- //
+
+#define DAM_MULT_HIT		 250
+#define DAM_MULT_BLAST		 625
+#define DAM_MULT_HOLYW		 750
+#define DAM_MULT_THORNS		1000
+#define DAM_MULT_CLEAVE		 750
+#define DAM_MULT_PULSE		 120
+#define DAM_MULT_ZEPHYR		  40
+#define DAM_MULT_LEAP		 450
+#define DAM_MULT_POISON		1800
+
 // wear positions
 #define WN_HEAD			0
 #define WN_NECK			1

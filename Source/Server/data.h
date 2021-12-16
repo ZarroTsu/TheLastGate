@@ -355,8 +355,14 @@ extern unsigned int mapmarker;
 #define SK_DISPEL2		32
 #define SK_WARCRY2  	36
 //////////////////////////
+#define SK_BLOODLET		 9
+#define SK_POME			 9
+#define SK_STARLIGHT	23
+#define SK_PHALANX		31
+#define SK_SOL			33
 #define SK_FROSTB		44
 #define SK_SLOW3		50
+
 
 /*
 	*** ch.data[] definitions ***
@@ -561,7 +567,9 @@ struct character
 	
 	int os_points;					// Osiris points (for maps?)
 	
-	char future2[46];				// space for future expansion
+	char gcm;						// Stores current GC 'mode'
+	
+	char future2[45];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -643,6 +651,10 @@ __attribute__ ((packed));
 #define IF_PURP_UNI      (1ull<<49)     // unique check for Purple 
 #define IF_GEMSTONE      (1ull<<50)     // is a gem
 #define IF_IS_KEY        (1ull<<51)     // is a key and decays on rugs
+#define IF_AUGMENTED     (1ull<<52)     // item was enhanced by a shrine
+#define IF_DIMINISHED    (1ull<<53)     // item was enhanced by a shrine
+#define IF_EASEUSE       (1ull<<54)     // item was enhanced by a shrine
+#define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -840,10 +852,8 @@ struct waypoint
 	char *desc;
 };
 
-#define N_SOULCAT		158
 #define N_SOULBONUS		 70
 #define N_SOULMAX		 48
-#define N_SOULTAGS		  3
 
 extern struct s_skilltab skilltab[MAXSKILL];
 extern struct s_splog splog[50];

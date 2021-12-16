@@ -56,7 +56,7 @@ struct s_splog splog[50] = {
 	},{
 		SK_ZEPHYR2,		"Zephyr",		"zephyr",		"zephyring"
 	},{
-		9
+		SK_POME,		"Pome",			"pome",			"poming"
 	},{
 		SK_DOUSE,		"Douse",		"douse",		"dousing",
 		"You have been doused.",
@@ -120,7 +120,10 @@ struct s_splog splog[50] = {
 	},{ 
 		SK_IDENT, 		"Identify",		"identify",		"identifying"
 	},{
-		23
+		SK_STARLIGHT,	"Starlight",	"starlight",	"starlighting",
+		"You feel wisened.",
+		" was granted starlight.",
+		" cast starlight on you."
 	},{
 		SK_BLAST, 		"Blast",		"blast",		"blasting",
 		"","","",
@@ -158,14 +161,17 @@ struct s_splog splog[50] = {
 		" was rallied.",
 		" rallied you."
 	},{
-		31
+		SK_PHALANX,		"Phalanx",		"phalanx",		"phalanxing",
+		"You feel well defended.",
+		" was granted a phalanx.",
+		" cast phalanx on you."
 	},{
 		SK_DISPEL2, 	"Inoculate",	"dispel",		"inoculating",
 		"You became inoculated from buffs!",
 		" was inoculated.",
 		" cast dispel on you."
 	},{
-		33
+		SK_SOL,			"Sol",			"sol",			"soling"
 	},{
 		34
 	},{
@@ -1048,6 +1054,9 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power)
 					case SK_TAUNT:
 						spell_taunt(cn, co, power, 0);
 						break;
+					case SK_BLOODLET:
+						spell_bleed(cn, co, power);
+						break;
 					default:
 						break;
 				}
@@ -1116,6 +1125,23 @@ int has_buff(int cn, int bu_temp)
 	}
 	
 	return 0;
+}
+
+void remove_buff(int cn, int bu_temp)
+{
+	int in, n;
+	
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in = ch[cn].spell[n])!=0)
+		{
+			if (bu[in].temp==bu_temp)
+			{
+				bu[in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
+			}
+		}
+	}
 }
 
 int is_facing(int cn, int co)
@@ -1304,12 +1330,22 @@ int spellcost(int cn, int cost, int in, int usemana)
 		ch[cn].a_mana -= mana_cost*1000;
 		ch[cn].a_end  -= cotfk_cost*1000;
 		ch[cn].a_hp   -= hp_cost*1000;
+		
+		if (get_gear(cn, IT_WP_LIFESPRIG) && mana_cost)
+			spell_pomesol(cn, cn, mana_cost, 1);
+		if (get_gear(cn, IT_WP_CRESSUN) && cotfk_cost)
+			spell_pomesol(cn, cn, cotfk_cost, 0);
 	}
 	if (usemana==0 || usemana==2)
 	{
 		ch[cn].a_end  -= end_cost*1000;
 		ch[cn].a_mana -= cotfk_cost*1000;
 		ch[cn].a_hp   -= devil_cost*2000;
+		
+		if (get_gear(cn, IT_WP_LIFESPRIG) && cotfk_cost)
+			spell_pomesol(cn, cn, cotfk_cost, 1);
+		if (get_gear(cn, IT_WP_CRESSUN) && end_cost)
+			spell_pomesol(cn, cn, end_cost, 0);
 	}
 	return 0;
 }
@@ -1740,7 +1776,7 @@ int spell_from_item(int cn, int in2)
 	int in, n;
 	
 	// 102 are healing potions, 103 are drinks/food
-	if ((ch[cn].flags & CF_NOMAGIC) && it[in2].data[1]!=102 && it[in2].data[1]!=103)
+	if ((ch[cn].flags & CF_NOMAGIC) && !(it[in2].data[1]>=102 && it[in2].data[1]<=110))
 	{
 		do_char_log(cn, 0, "The magic didn't work! There must be external influences.\n");
 		return 0;
@@ -1828,9 +1864,9 @@ int spell_from_item(int cn, int in2)
 	
 	bu[in].data[3]			= it[in2].temp;
 	
-	if (it[in2].data[1]==102 || it[in2].data[1]==103)
+	if (it[in2].data[1]>=102 && it[in2].data[1]<=110)
 	{
-		bu[in].data[4] = 1; // Effects not removed by NMZ (102, 103)
+		bu[in].data[4] = 1; // Effects not removed by NMZ (102 - 110)
 	}
 
 	if (!add_spell(cn, in))
@@ -2805,48 +2841,92 @@ void skill_warcry(cn)
 
 void item_info(int cn, int in, int look)
 {
-	int n;
-
+	int n, soulstone=0;
+	
+	if (it[in].driver==68 || it[in].driver==92 || it[in].driver==93) soulstone=1;
+	
 	// if (!look) {
 	do_char_log(cn, 1, "%s:\n", it[in].name);
 	// }
-	do_char_log(cn, 1, "Stat          Mod0   Mod1   Min\n");
-	for (n = 0; n<5; n++)
+	if (soulstone)
 	{
-		if (!it[in].attrib[n][0] && !it[in].attrib[n][1] && !it[in].attrib[n][2])
+		do_char_log(cn, 1, "Stat          Mod+   Rank Cost\n");
+		
+		for (n = 0; n<5; n++)
 		{
-			continue;
+			if (!it[in].attrib[n][0] && !it[in].attrib[n][1])
+			{
+				continue;
+			}
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+			at_name[n], it[in].attrib[n][0], it[in].attrib[n][1]);
 		}
-		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
-		at_name[n], it[in].attrib[n][0], it[in].attrib[n][1], (unsigned char)it[in].attrib[n][2]);
-	}
-
-	if (it[in].hp[0] || it[in].hp[1] || it[in].hp[2])
-	{
-		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
-		"Hitpoints", it[in].hp[0], it[in].hp[1], it[in].hp[2]);
-	}
-
-	if (it[in].end[0] || it[in].end[1] || it[in].end[2])
-	{
-		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
-		"Endurance", it[in].end[0], it[in].end[1], it[in].end[2]);
-	}
-
-	if (it[in].mana[0] || it[in].mana[1] || it[in].mana[2])
-	{
-		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
-		"Mana", it[in].mana[0], it[in].mana[1], it[in].mana[2]);
-	}
-
-	for (n = 0; n<MAXSKILL; n++)
-	{
-		if (!it[in].skill[n][0] && !it[in].skill[n][1] && !it[in].skill[n][2])
+		
+		if (it[in].hp[0] || it[in].hp[1])
 		{
-			continue;
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+			"Hitpoints", it[in].hp[0], it[in].hp[1]);
 		}
-		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
-		skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1], (unsigned char)it[in].skill[n][2]);
+		if (it[in].end[0] || it[in].end[1])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+			"Endurance", it[in].end[0], it[in].end[1]);
+		}
+		if (it[in].mana[0] || it[in].mana[1])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+			"Mana", it[in].mana[0], it[in].mana[1]);
+		}
+
+		for (n = 0; n<MAXSKILL; n++)
+		{
+			if (!it[in].skill[n][0] && !it[in].skill[n][1])
+			{
+				continue;
+			}
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+			skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1]);
+		}
+	}
+	else
+	{
+		do_char_log(cn, 1, "Stat          Mod0   Mod1   Min\n");
+	
+		for (n = 0; n<5; n++)
+		{
+			if (!it[in].attrib[n][0] && !it[in].attrib[n][1] && !it[in].attrib[n][2])
+			{
+				continue;
+			}
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
+			at_name[n], it[in].attrib[n][0], it[in].attrib[n][1], (unsigned char)it[in].attrib[n][2]);
+		}
+		
+		if (it[in].hp[0] || it[in].hp[1] || it[in].hp[2])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
+			"Hitpoints", it[in].hp[0], it[in].hp[1], it[in].hp[2]);
+		}
+		if (it[in].end[0] || it[in].end[1] || it[in].end[2])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
+			"Endurance", it[in].end[0], it[in].end[1], it[in].end[2]);
+		}
+		if (it[in].mana[0] || it[in].mana[1] || it[in].mana[2])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
+			"Mana", it[in].mana[0], it[in].mana[1], it[in].mana[2]);
+		}
+
+		for (n = 0; n<MAXSKILL; n++)
+		{
+			if (!it[in].skill[n][0] && !it[in].skill[n][1] && !it[in].skill[n][2])
+			{
+				continue;
+			}
+			do_char_log(cn, 1, "%-12.12s  %+4d   %+4d   %3d\n",
+			skilltab[n].name, it[in].skill[n][0], it[in].skill[n][1], (unsigned char)it[in].skill[n][2]);
+		}
 	}
 	
 	if (it[in].armor[0] || it[in].armor[1])
@@ -2859,7 +2939,7 @@ void item_info(int cn, int in, int look)
 		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Weapon Value", it[in].weapon[0], it[in].weapon[1]);
 	}
-	if (it[in].base_crit)
+	if (it[in].base_crit && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %4d%%\n",
 		"Base Crit", it[in].base_crit);
@@ -2875,15 +2955,31 @@ void item_info(int cn, int in, int look)
 		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Parry Bonus", it[in].to_parry[0], it[in].to_parry[1]);
 	}
-	if (it[in].crit_chance[0] || it[in].crit_chance[1])
+	if (soulstone)
 	{
-		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d%%\n",
-		"Crit Bonus", it[in].crit_chance[0], it[in].crit_chance[1]);
+		if (it[in].crit_chance[0] || it[in].crit_chance[1])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d\n",
+			"Crit Bonus", it[in].crit_chance[0], it[in].crit_chance[1]);
+		}
+		if (it[in].crit_multi[0] || it[in].crit_multi[1])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d\n",
+			"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
+		}
 	}
-	if (it[in].crit_multi[0] || it[in].crit_multi[1])
+	else
 	{
-		do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d%%\n",
-		"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
+		if (it[in].crit_chance[0] || it[in].crit_chance[1])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d%%\n",
+			"Crit Bonus", it[in].crit_chance[0], it[in].crit_chance[1]);
+		}
+		if (it[in].crit_multi[0] || it[in].crit_multi[1])
+		{
+			do_char_log(cn, 1, "%-12.12s  %+4d%%  %+4d%%\n",
+			"Crit Multi", it[in].crit_multi[0], it[in].crit_multi[1]);
+		}
 	}
 	if (it[in].top_damage[0] || it[in].top_damage[1])
 	{
@@ -2939,35 +3035,35 @@ void item_info(int cn, int in, int look)
 		"Glow", it[in].light[0], it[in].light[1]);
 	}
 	
-	if (it[in].data[2])
+	if (it[in].data[2] && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"HP Regen", it[in].data[2], it[in].data[2]/max(1, it[in].duration/TICKS));
 	}
-	if (it[in].data[3])
+	if (it[in].data[3] && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"End Regen", it[in].data[3], it[in].data[3]/max(1, it[in].duration/TICKS));
 	}
-	if (it[in].data[4])
+	if (it[in].data[4] && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"Mana Regen", it[in].data[4], it[in].data[4]/max(1, it[in].duration/TICKS));
 	}
 	
-	if (it[in].duration>0 && it[in].duration<3888000)
+	if (it[in].duration>0 && it[in].duration<3888000 && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %4d seconds\n",
 		"Duration", it[in].duration/TICKS);
 	}
 	
-	if (it[in].power)
+	if (it[in].power && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %4d\n",
 		"Item Power", it[in].power);
 	}
 
-	if (it[in].min_rank)
+	if (it[in].min_rank && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %4d\n",
 		"Min. Rank", it[in].min_rank);
@@ -3007,11 +3103,11 @@ void char_info(int cn, int co)
 
 	for (n = 0; n<MAXSKILL; n++)
 	{
-		if (B_SK(co, n) && n1==-1)
+		if ((B_SK(co, n) || IS_P_SKILL(n)) && n1==-1)
 		{
 			n1 = n;
 		}
-		else if (B_SK(co, n) && n2==-1)
+		else if ((B_SK(co, n) || IS_P_SKILL(n)) && n2==-1)
 		{
 			n2 = n;
 		}
@@ -3784,6 +3880,7 @@ void skill_ghost(int cn)
 	if (IS_PLAYER(cn)) 
 	{
 		ch[cc].flags |= CF_CANCRIT;
+		ch[cc].data[1] = ch[cn].gcm; // set GC mode
 		ch[cc].data[2] = 1; // Base crit chance
 	}
 
@@ -4047,6 +4144,9 @@ void skill_shadow(int cn)
 	ch[cc].data[29] = 0;				// reset experience earned
 	ch[cc].data[CHD_GROUP] = 65536 + cn;		// set group
 	ch[cc].kindred &= ~(KIN_MONSTER);	// Add 'monster' flag
+	
+	if (ch[cn].flags & CF_SIMPLE) ch[cc].flags |= CF_SIMPLE;
+	if (ch[cn].data[42]==1111) ch[co].data[42] = ch[co].data[43] = ch[co].data[59] = 1111;
 
 	if (co)
 	{
@@ -4967,6 +5067,66 @@ void skill_zephyr(int cn)
 	spell_zephyr(cn, cn, M_SK(cn, SK_ZEPHYR), 0);
 
 	add_exhaust(cn, SK_EXH_ZEPHYR);
+}
+
+int spell_pomesol(int cn, int co, int power, int flag)
+{
+	int in, temp, dur;
+	
+	if (flag)
+	{
+		temp = SK_POME;
+		dur = SP_DUR_POME;
+	}
+	else
+	{
+		temp = SK_SOL;
+		dur = SP_DUR_SOL;
+	}
+	
+	if (!(in = make_new_buff(cn, temp, BUF_SPR_POME, power, dur, 1))) 
+		return 0;
+	
+	bu[in].hp[0] = (power * 1000) / dur;
+	
+	return cast_a_spell(cn, co, in, 0, 1); // SK_POME & SK_SOL
+}
+
+int spell_bloodletting(int cn, int co, int power)
+{
+	if (surround_cast(cn, 0, 0, SK_BLOODLET, power))
+	{
+		do_char_log(cn, 1, "Your foes began bleeding!\n");
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int spell_starlight(int cn, int co, int power)
+{
+	int in;
+	
+	if (!(in = make_new_buff(cn, SK_STARLIGHT, BUF_SPR_STARL, power, SP_DUR_STARL, 1))) 
+		return 0;
+	
+	bu[in].spell_mod[1] = power/50+1;
+	
+	return cast_a_spell(cn, co, in, 0, 1); // SK_STARLIGHT
+}
+
+int spell_phalanx(int cn, int co, int power)
+{
+	int in;
+	
+	if (!(in = make_new_buff(cn, SK_PHALANX, BUF_SPR_PHALANX, power, SP_DUR_PHALANX, 1))) 
+		return 0;
+	
+	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_PHALANX)
+	
+	return cast_a_spell(cn, co, in, 0, 1); // SK_PHALANX
 }
 
 /* Look up skills by name. Return the index of the skill in skilltab or -1 if not found.

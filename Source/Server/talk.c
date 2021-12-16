@@ -217,6 +217,7 @@ struct know
 #define AR_SEWER3		226
 //
 #define AR_CASINO		250
+#define AR_OSIRIS		299
 //}
 //{ Neiseer
 #define AR_NEISEE		300		// locations in Neiseer
@@ -621,13 +622,15 @@ struct know
 
 //
 #define AN_CS_HELP		"The room on the left offers various GAMES to spend your TOKENS. The room on the right offers PRIZES you can trade TOKENS for."
-#define AN_CS_GAMES		"We offer HIGHROLLER and BLACKJACK. Most days each game costs 10 tokens to play. During new moons each costs 30 tokens, and during full moons each costs 40."
+#define AN_CS_GAMES		"We offer HIGHROLLER, SNAKEEYES and BLACKJACK. Most days each game costs 10 tokens to play. During new moons each costs 30 tokens, and during full moons each costs 40."
 #define AN_CS_PRIZES	"Roger offers items you can gamble for, while Jessica offers static items with no risk. All prizes must be purchased using TOKENS."
 #define AN_CS_HROLL		"HIGHROLLER is a game of chance using dice. You guess if the next roll will be HIGHer or LOWer than the previous one. Each successful guess ups the ante until you lose or PAYOUT."
 #define AN_CS_SEYES		"SNAKEEYES is a numbers game using dice. Each ROLL you make adds to your score, but rolling a 1 ends your turn with no score, and rolling two 1's sets your score to 0. First to 100 points wins."
 #define AN_CS_BJACK		"BLACKJACK is a card game where the player and dealer try to reach a high score without going over 21. You may HIT or STAND each turn. Face cards (JQK) are worth 10, and Aces (A) are worth 11 or 1."
 #define AN_CS_PLAY		"Speak to Yugi if you would like to PLAY something."
 //
+#define AN_CONTRACT		"Present me with a contract and I will present you with a challenge. Are you up to the task?"
+#define AN_CONT_YES		"Excellent! My contractor may be able to help get you started. For a price, of course."
 
 //}
 //{ Labyrinth Answers
@@ -1188,10 +1191,10 @@ struct know know[] = {
 	{{"!low",                              "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_L},
 	{{"!payout",                           "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_S},
 	{{"!pay", "?out",                      "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_HROLL_S},
-	//{{"!play", "!snakeeyes",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
-	//{{"!play", "!snake", "?eyes",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
-	//{{"!roll",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_R},
-	//{{"!end", "?turn",                     "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_E},
+	{{"!play", "!snakeeyes",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
+	{{"!play", "!snake", "?eyes",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_P},
+	{{"!roll",                             "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_R},
+	{{"!end", "?turn",                     "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_SEYES_E},
 	{{"!play", "!blackjack",               "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_P},
 	{{"!play", "?black", "!jack",          "?", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_P},
 	{{"!hit", "?me",                       "!", NULL}, 0,   AR_CASINO, CT_YUGI, NULL, SP_BJACK_H},
@@ -1216,6 +1219,11 @@ struct know know[] = {
 	{{"!buy", "!ten",                      "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_A},
 	{{"!buy", "!hundred",                  "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_B},
 	{{"!buy", "!thousand",                 "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_C},
+	//}
+	//{ Osiris 
+	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_OSIRIS
+	{{"?what", "!contract",                "?", NULL}, 0,   AR_OSIRIS,   0,    AN_CONTRACT,   0},
+	{{"!yes",                              "!", NULL}, 0,   AR_OSIRIS,   0,    AN_CONT_YES,   0},
 	//}
 	//{ Dieties
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		CT_BISHOP
@@ -1709,6 +1717,7 @@ void answer_move(int cn, int co, int dir)
 void answer_gcmode(int cn, int co, int mode)
 {
 	if (ch[cn].data[1]!=3) ch[cn].data[1] = mode;
+	else return;
 	switch (mode)
 	{
 		case 1: 	do_sayx(cn, "Yes %s, I will now remain passive.", ch[co].name); break;
@@ -1716,6 +1725,7 @@ void answer_gcmode(int cn, int co, int mode)
 		case 3: 	do_sayx(cn, "Yes %s, I will now attack all enemies.", ch[co].name); break;
 		default: 	do_sayx(cn, "Yes %s, I will now defend you.", ch[co].name); break;
 	}
+	ch[cn].gcm = mode;
 }
 
 void answer_attack(int cn, int co, char *text)
@@ -1971,7 +1981,7 @@ void answer_tokens(int cn, int co, int nr)
 	// Buy
 	else
 	{
-		if (ch[co].gold >= nr)
+		if (ch[co].gold >= nr*TOKEN_RATE)
 		{
 			ch[co].tokens += nr;
 			ch[co].gold -= nr*TOKEN_RATE;
@@ -2157,10 +2167,9 @@ int casino_seyes_roll(int co, int flag)
 		r2 = RANDOM(5)+2;
 		rt = r1 + r2;
 		
-		w = C_CUR_GAME(co);
+		w = C_SET_GAME_SE;
 		t = (ch[co].data[26] % (1<<26))>>16;
-		ch[co].data[26]  = rt;
-		ch[co].data[26] |= w | t;
+		ch[co].data[26] = rt + w + (t<<16);
 		
 		do_char_log(co, 1, "   You rolled:   %d + %d\n", r1, r2);
 		do_char_log(co, 1, "   Turn Total:         = %3d\n", 
@@ -2168,12 +2177,13 @@ int casino_seyes_roll(int co, int flag)
 	}
 	else if (flag == 1)
 	{
-		w = C_CUR_GAME(co);
-		t = (ch[co].data[26] % (1<<26))>>16;
+		w = C_SET_GAME_SE;
+		t = ((ch[co].data[26] % (1<<26))>>16);
+		rt = (ch[co].data[26] % (1<<16)) % (1<<26);
 		
 		r1 = RANDOM(6)+1;
 		r2 = RANDOM(6)+1;
-		rt = r1 + r2;
+		rt += r1 + r2;
 		
 		do_char_log(co, 1, "   You rolled:   %d + %d\n", r1, r2);
 		
@@ -2188,19 +2198,17 @@ int casino_seyes_roll(int co, int flag)
 		{
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 0, "Ace! Your turn ends with 0.\n");
-			ch[co].data[26] = w | t;
+			ch[co].data[26] = w + (t<<16);
 			return 1;
 		}
 		
-		ch[co].data[26]  = rt;
-		ch[co].data[26] |= w | t;
+		ch[co].data[26] = rt + w + (t<<16);
 		
-		do_char_log(co, 1, "   Turn Total:         = %3d\n", 
-			(ch[co].data[26] % (1<<16)) % (1<<26));
+		do_char_log(co, 1, "   Turn Total:         = %3d\n", rt);
 	}
 	else
 	{
-		w = C_CUR_WAGER(co);
+		w = C_CUR_WAGER(co)<<26;
 		t = (ch[co].data[27] % (1<<26))>>16;
 		
 		for (i = 0, rt = 0; i < 3; i++)
@@ -2222,13 +2230,12 @@ int casino_seyes_roll(int co, int flag)
 			{
 				do_char_log(co, 1, " \n");
 				do_char_log(co, 2, "Ace! Dealer's turn ends with 0.\n");
-				ch[co].data[27] = w | t;
+				ch[co].data[27] = w + (t<<16);
 				return 1;
 			}
 		}
 		
-		ch[co].data[27]  = rt;
-		ch[co].data[27] |= w | t;
+		ch[co].data[27] = w + ((t+rt)<<16);
 	}
 	
 	return 0;
@@ -2238,8 +2245,8 @@ int casino_seyes_score(int co)
 {
 	int p, d;
 	
-	p = (ch[co].data[26]>>16) % (1<<26);
-	d = (ch[co].data[27]>>16) % (1<<26);
+	p = (ch[co].data[26] % (1<<26))>>16;
+	d = (ch[co].data[27] % (1<<26))>>16;
 	
 	do_char_log(co, 1, " \n");
 	do_char_log(co, 1, "   Your Score:           %3d\n", p);
@@ -2266,6 +2273,8 @@ int casino_seyes_score(int co)
 
 void casino_seyes(int cn, int co, int nr)
 {
+	int w, t;
+	
 	if (C_CUR_GAME(co) != C_GAME_SE) return;
 	
 	// Wager stored in data[26]<<26		C_CUR_WAGER(a)
@@ -2288,6 +2297,9 @@ void casino_seyes(int cn, int co, int nr)
 			do_char_log(co, 1, "Will you ROLL or END your turn?\n");
 			break;
 		case 2: 	// End player turn (process win/lose and dealer turn)
+			w  = C_SET_GAME_SE;
+			t  = ((ch[co].data[26] % (1<<26))>>16) + (ch[co].data[26] % (1<<16)) % (1<<26);
+			ch[co].data[26] = w + (t<<16);
 			casino_seyes_roll(co, 2);
 			if (casino_seyes_score(co)) return;
 			do_char_log(co, 1, " \n");
@@ -2358,6 +2370,8 @@ void add_new_card(int co, int v, int flag)
 {
 	int deal;
 	
+	chlog(co, "add_new_card 1");
+	
 	deal = get_new_card(co, v); ch[co].data[v] |= (1 << (deal));
 	
 	if (flag)
@@ -2369,6 +2383,8 @@ void add_new_card(int co, int v, int flag)
 	{
 		do_char_log(co, 1, "%s drew: %s\n", (v==26?"       You":"The dealer"), get_card_name(deal));
 	}
+	
+	chlog(co, "add_new_card 2");
 }
 
 // Show hand. Flag is 1 or 2 for Dealer's turn 0.
@@ -2389,6 +2405,8 @@ void casino_bjack_hands(int co, int flag)
 		}
 	}
 	
+	chlog(co, "casino_bjack_hands 1");
+	
 	// Set Dealer Cards
 	for (i = 0, j = 0; i < BJ_NUM_CARDS; i++)
 	{
@@ -2405,6 +2423,8 @@ void casino_bjack_hands(int co, int flag)
 			j++;
 		}
 	}
+	
+	chlog(co, "casino_bjack_hands 2");
 	
 	do_char_log(co, 1, " \n");
 	do_char_log(co, 0, "Dealer's Hand:\n");
@@ -2427,10 +2447,13 @@ void casino_bjack_hands(int co, int flag)
 	do_char_log(co, 2, "                                    TOTAL: %2d\n", get_card_total(co, 26));
 	do_char_log(co, 1, " \n");
 	//                 "!        .         .         .         .        !"
+	chlog(co, "casino_bjack_hands 3");
 }
 
 int casino_bjack_winlose(int co, int stand)
 {
+	chlog(co, "casino_bjack_winlose 1");
+	
 	if (get_card_total(co, 26) > 21)								// Player busts
 	{
 		do_char_log(co, 0, "You bust. You lose...\n");
@@ -2466,6 +2489,8 @@ int casino_bjack_winlose(int co, int stand)
 		}
 		return 1;
 	}
+	
+	chlog(co, "casino_bjack_winlose 2");
 	return 0;
 }
 
@@ -2473,6 +2498,8 @@ void casino_bjack(int cn, int co, int nr)
 {
 	int i, j, s = 0;
 	if (C_CUR_GAME(co) != C_GAME_BJ) return;
+	
+	chlog(co, "casino_bjack 1");
 	
 	// Check if we're on turn 1
 	if (nr > 0) for (i = 0, j = 0; i < BJ_NUM_CARDS; i++)
@@ -2483,6 +2510,7 @@ void casino_bjack(int cn, int co, int nr)
 	switch (nr)
 	{
 		case 0: 	// Starting Turn (Turn 0)
+			chlog(co, "casino_bjack CASE 0");
 			add_new_card(co, 27, 1); 				// Dealer's cards
 			add_new_card(co, 26, 0); 				// Player card 1
 			add_new_card(co, 26, 0); 				// Player card 2
@@ -2509,12 +2537,14 @@ void casino_bjack(int cn, int co, int nr)
 				do_char_log(co, 1, "Will you HIT or STAND?\n");
 			break;
 		case 1: 	// Hit
+			chlog(co, "casino_bjack CASE 1");
 			add_new_card(co, 26, 0);
 			casino_bjack_hands(co, 1); 		// Show table
 			if (casino_bjack_winlose(co, 0)) return;	// Check for player bust
 			do_char_log(co, 1, "Will you HIT or STAND?\n");
 			break;
 		case 2: 	// Stand
+			chlog(co, "casino_bjack CASE 2");
 			do_char_log(co, 1, "You stand.\n"); 
 			do_char_log(co, 1, "The dealer flipped their face-down card.\n");
 			if (get_card_total(co, 27) < 17) 
@@ -2525,6 +2555,7 @@ void casino_bjack(int cn, int co, int nr)
 			casino_bjack_winlose(co, 1);	// Process ending
 			return;
 		case 3: 	// Double-down -- first turn only & total 9, 10, or 11
+			chlog(co, "casino_bjack CASE 3");
 			if (!(get_card_total(co, 26) >= 9 && get_card_total(co, 26) <= 11))
 			{
 				do_char_log(co, 1, " \n");
@@ -2543,8 +2574,7 @@ void casino_bjack(int cn, int co, int nr)
 			}
 			do_char_log(co, 1, "You doubled-down with an additional %d tokens.\n", C_CUR_WAGER(co)*10);
 			ch[co].tokens -= C_CUR_WAGER(co)*10;
-			ch[co].data[27] &= ~(C_CUR_WAGER(co)<<26);
-			ch[co].data[27] |= C_CUR_WAGER(co)<<27;
+			ch[co].data[27] += C_CUR_WAGER(co)<<26;
 			add_new_card(co, 26, 0);
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 1, "The dealer flipped their face-down card.\n");
@@ -2579,16 +2609,18 @@ void casino_play(int cn, int co, int nr)
 	// Check if we can afford to play
 	if (wager*10 > ch[co].tokens)
 	{
-		do_sayx(cn, "Sorry %s, seems you don't have enough tokens. You will need %d to play today.", wager*10);
+		do_sayx(cn, "Sorry %s, seems you don't have enough tokens. You will need %d to play today.", ch[co].name, wager*10);
 		return;
 	}
 	
 	// If no games are active, wipe the data clean.
-	casino_clear(co);
+	ch[co].data[26] = 0;
+	ch[co].data[27] = 0;
 	
 	switch (nr)
 	{
 		case 1:
+			chlog(co, "play highroller");
 			do_sayx(cn, "Okay %s, let's play some High Roller.", ch[co].name);
 			ch[co].data[26] = C_SET_GAME_HR;
 			ch[co].data[27] = wager*10;
@@ -2597,6 +2629,7 @@ void casino_play(int cn, int co, int nr)
 			casino_hroll(cn, co, 0);
 			break;
 		case 2:
+			chlog(co, "play snakeeyes");
 			do_sayx(cn, "Okay %s, let's play some Snake Eyes.", ch[co].name);
 			ch[co].data[26] = C_SET_GAME_SE;
 			ch[co].data[27] = (wager<<26);
@@ -2605,6 +2638,7 @@ void casino_play(int cn, int co, int nr)
 			casino_seyes(cn, co, 0);
 			break;
 		case 3:
+			chlog(co, "play blackjack");
 			do_sayx(cn, "Okay %s, let's play some Black Jack.", ch[co].name);
 			ch[co].data[26] = C_SET_GAME_BJ;
 			ch[co].data[27] = (wager<<26);
@@ -2700,36 +2734,6 @@ void answer_time(int cn, int co)
 	        (globs->mdday>3 ? "th" : ""),
 	        globs->mdyear, globs->mdtime / 3600, (globs->mdtime / 60) % 60);
 }
-
-/*
-int stronghold_points_old(int cn)
-{
-	return(ch[cn].data[26] / 5 		// tier 1
-			+
-			ch[cn].data[27] 		// tier 2
-			+
-			ch[cn].data[28] * 5 	// tier 3
-			//+
-			//ch[cn].data[43] * 25 	// candles
-			-
-			ch[cn].data[41]);		// used points
-}
-
-int stronghold_points(int cn)
-{
-	int p;
-	if (p = stronghold_points_old(cn))
-	{
-		ch[cn].bs_points += p;
-		
-		ch[cn].data[26] = 0;
-		ch[cn].data[27] = 0;
-		ch[cn].data[28] = 0;
-		ch[cn].data[41] = 0;
-	}
-	return ch[cn].bs_points;
-}
-*/
 
 void answer_points(int cn, int co, int nr)
 {

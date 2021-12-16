@@ -133,12 +133,33 @@ int npc_stunrun_seeattack(int cn, int cc, int co)
 
 int npc_stunrun_see(int cn, int co)
 {
+	int cc;
+	
 	if (!do_char_can_see(cn, co))
 	{
 		return 1;                     // processed it: we cannot see him, so ignore him
-
 	}
 	npc_stunrun_add_seen(cn, co);
+	
+	// if we're taunted, try to attack the taunter
+	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc) || ch[cn].data[78]))
+	{
+		// If our last attempt to attack failed, wander near the taunter
+		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
+		{
+			ch[cn].goto_x = ch[cc].x + 5 - RANDOM(10);
+			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
+		}
+		// Otherwise, try to attack the taunter
+		else if (do_char_can_see(cn, cc) && ch[cn].attack_cn!=cc)
+		{
+			ch[cn].attack_cn = cc;
+			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
+			ch[cn].data[78] = globs->ticker + TICKS * 5;
+		}
+		ch[cn].data[58] = 2;
+		return 1;
+	}
 
 	return 1;
 }
@@ -432,7 +453,7 @@ int npc_stunrun_high(int cn)
 		ch[cn].mode = 0;
 	}
 
-	if (!done && flee>1 && flee>=help && flee>=stun)
+	if (!done && flee>1 && flee>=help && flee>=stun && !ch[cn].taunted)
 	{
 		if (ch[cn].a_end>15000)
 		{

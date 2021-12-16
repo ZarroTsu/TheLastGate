@@ -285,6 +285,7 @@ int fx_add_effect(int type, int duration, int d1, int d2, int d3);
 
 // -- look --
 void look_item_details(int cn, int in);
+void look_contract(int cn, int in, int desc);
 void look_driver(int cn, int in);
 void look_door(int cn, int in);
 
@@ -295,6 +296,7 @@ int build_copy(int fx, int fy, int tx, int ty);
 int build_copy_rect(int fx, int fy, int tx, int ty, int w, int h);
 void build_clean_lights(int fx, int fy, int tx, int ty);
 void pop_tick(void);
+int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc);
 
 //-- helper --
 void reset_go(int x, int y);
@@ -319,6 +321,7 @@ int scale_exps(int cn, int co, int exps);
 int scale_exps2(int cn, int co_rank, int exps);
 int change_casino_shop_item(int in);
 int change_bs_shop_item(int cn, int in);
+int get_best_worn(int cn, int v);
 int get_special_item(int in, int gen_a, int gen_b, int gen_c);
 int get_special_spr(int in, int spr);
 int create_special_item(int temp, int gen_a, int gen_b, int gen_c);
@@ -341,10 +344,18 @@ int use_soulfocus(int cn, int in);
 int use_soulcatalyst(int cn, int in);
 int load_mod(void);
 void set_cap(int cn, int nr);
-int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix);
+int get_sb(int v, int i);
+int start_contract(int cn, int in);
+int get_tier_font(int tier);
+void show_map_flags(int cn, int flags, int tier);
+void clear_map_buffs(int cn, int flag);
+void add_map_progress(int loc);
+int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, int tarot);
 
 //-- skill_driver --
+int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext);
 int has_buff(int cn, int bu_temp);
+void remove_buff(int cn, int bu_temp);
 int spell_immunity(int power, int immun);
 int spell_race_mod(int power, int cn);
 int friend_is_enemy(int cn, int cc);

@@ -942,10 +942,10 @@ void sv_waypoints(unsigned char *buf)
 }
 
 extern unsigned short ymap[MAPX_MAX*MAPY_MAX];
+extern unsigned short xmap[MAPX_MAX*MAPY_MAX];
 
 void sv_clearbox(unsigned char *buf)
 {
-	
 	int xx, yy, x, y, w, h;
 	
 	DEBUG("SV CLEARBOX");
@@ -959,6 +959,7 @@ void sv_clearbox(unsigned char *buf)
 	{
 		for (yy=y; yy<y+h; yy++)
 		{
+			xmap[yy+xx*MAPX_MAX]=0;
 			ymap[yy+xx*MAPX_MAX]=1;
 		}
 	}
