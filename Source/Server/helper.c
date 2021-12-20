@@ -3022,7 +3022,7 @@ static int soul_bonus[N_SOULBONUS][3] = {
 
 int get_sb(int v, int i)
 {
-	v = max(0, min(N_SOULBONUS, v));
+	v = max(0, min(N_SOULBONUS-1, v));
 	return soul_bonus[v][i];
 }
 
@@ -3107,7 +3107,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	
 	// 4.2  Add the random stats
 	t = 0;
-	while (rank && t < 5)
+	if (rank) while (rank && t < 5)
 	{
 		// 4a. Loop through selected stats and try to pick one.
 		m = 1; r = -1; try = 0;
@@ -3382,6 +3382,7 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	if (!v || m <= get_sb(v-1, 0)*3/2) 
 	{
 		do_char_log(cn, 1, "Nothing happened. Seems this catalyst can't be focused further.\n");
+		chlog(cn, "do_catalyst_focus: v=%d, m=%d", v-1, m);
 		return 0;
 	}
 	if (it[inf].data[0] >= get_sb(v-1, 0)*3/2)
@@ -3390,7 +3391,9 @@ int do_catalyst_focus(int cn, int inf, int inc)
 		return 0;
 	}
 	
-	it[inc].data[3] = m = max(get_sb(v-1, 0)*3/2, min(it[inf].data[0], m));
+	v--;
+	
+	it[inc].data[3] = m = max(get_sb(v, 0)*3/2, min(it[inf].data[0], m));
 	
 	if (v>=50 && v<=54) { it[inc].attrib[v-50][1] = m; }
 	else if (v==55)     { it[inc].hp[1] = m; }
@@ -4307,9 +4310,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			//
 			case 3:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += 5+RANDOM(6);
+					B_AT(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/20);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += 5+RANDOM(6)*2;
+					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/20)*2;
 				ch[co].data[72] = 3;
 				//
 				if (in = god_create_item(IT_SOULCATAL)) make_catalyst(co, in, base);
@@ -4317,9 +4320,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				break;
 			case 4:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += 4+RANDOM(5);
+					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/18);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += 4+RANDOM(5)*2;
+					B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/18)*2;
 				ch[co].data[72] = 4;
 				//
 				if (in = god_create_item(IT_SOULCATAL)) make_catalyst(co, in, base);
@@ -4327,18 +4330,18 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				break;
 			case 5:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += 4+RANDOM(2);
+					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/18);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += 3+RANDOM(3)*2;
+					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/20)*2;
 				ch[co].data[72] = 5;
 				ch[co].data[25] = 1;
 				if (in = god_create_item(IT_SOULFOCUS)) make_focus(co, in, base);
 				break;
 			case 6:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += 7+RANDOM(4);
+					B_AT(co, n) += (B_AT(co, n)/16)+RANDOM(B_AT(co, n)/16);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += 7+RANDOM(4)*2;
+					B_SK(co, n) += (B_AT(co, n)/16)+RANDOM(B_AT(co, n)/16)*2;
 				ch[co].data[72] = 6;
 				if (in = god_create_item(IT_SOULFOCUS)) make_focus(co, in, base);
 				break;
@@ -4370,28 +4373,28 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		in = 0;
 		rank = points2rank(ch[co].points_tot);
 		
-		if (rank>=18 && !RANDOM(40))
+		if (rank>=18 && !RANDOM(45))
 		{
 			static int item[]  = {
 				2515, 2519, 2523, 2527, 2531, 2536, 2540, 2544, 2548, 2552
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=15 && !RANDOM(40))
+		else if (rank>=15 && !RANDOM(50))
 		{
 			static int item[]  = {
 				2514, 2518, 2522, 2526, 2530, 2535, 2539, 2543, 2547, 2551
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=12 && !RANDOM(40))
+		else if (rank>=12 && !RANDOM(55))
 		{
 			static int item[]  = {
 				2513, 2517, 2521, 2525, 2529, 2534, 2538, 2542, 2546, 2550
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (!RANDOM(40))
+		else if (!RANDOM(60))
 		{
 			static int item[]  = {
 				2512, 2516, 2520, 2524, 2528, 2533, 2537, 2541, 2545, 2549

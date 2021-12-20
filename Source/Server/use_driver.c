@@ -2078,7 +2078,7 @@ int use_scrollA(int cn, int in)
 		
 		ch[cn].attrib[nr][1]++;
 		
-		do_char_log(cn, 1, "You have used %d out of 10 greater attribute scrolls.\n", m);
+		do_char_log(cn, 1, "You have used %d out of 10 greater attribute scrolls.\n", m+1);
 	}
 	else	// Skills
 	{
@@ -2213,7 +2213,7 @@ int use_map_contract(int cn, int in)
 	}
 	
 	it[in].data[0] = cn;
-	if (!it[in].data[1]) it[in].data[1] = RANDOM(MSN_COUNT);
+	if (!it[in].data[4]) it[in].data[1] = RANDOM(MSN_COUNT);
 	it[in].data[2] = tier;
 	
 	if (tier)
@@ -2264,6 +2264,7 @@ int use_map_contract(int cn, int in)
 	}
 	
 	it[in].data[3] = flags;
+	it[in].data[4] = 1;
 	it[in].sprite[0] = spr;
 	it[in].flags |= IF_UPDATE;
 	
@@ -2339,11 +2340,11 @@ int use_map_pentigram(int cn, int in)
 		co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base - RANDOM(8), affix, tarot);
 		if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
 		if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
-		if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/7);
-		if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/7);
-		if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/7);
-		if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/7);
-		if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/7);
+		if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
+		if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
+		if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
+		if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
+		if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/8);
 		if (co && (flags & 0x00004000)) ch[co].speed_mod = it[in].data[0]*2;
 		if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
 		{
@@ -2464,6 +2465,8 @@ int use_map_chest(int cn, int in)
 		add_map_progress(CONT_NUM(cn));
 		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
 			do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+		else
+			do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 	}
 	
 	return 1;
@@ -2516,7 +2519,7 @@ int use_map_shrine(int cn, int in)
 	}
 	
 	rank = it[in].data[2];
-	tier = it[in].data[3];
+	tier = it[in].data[3]*4/3;
 	
 	switch (it[in].data[0])
 	{
@@ -2877,6 +2880,8 @@ int use_map_shrine(int cn, int in)
 		add_map_progress(CONT_NUM(cn));
 		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
 			do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+		else
+			do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 	}
 	
 	return 1;
@@ -2896,7 +2901,7 @@ int use_map_portal(int cn, int in)
 	//do_char_log(cn, 1, "%d > %d\n", CONT_PROG(cn), CONT_GOAL(cn));
 	
 	rank = it[in].data[0];
-	tier = it[in].data[5];
+	tier = it[in].data[5]*4/3;
 	
 	do_char_log(cn, 1, "You completed the area.\n");
 

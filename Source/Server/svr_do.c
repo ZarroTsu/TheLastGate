@@ -6129,6 +6129,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 			}
 			if (os && CONT_PROG(cn)>=CONT_GOAL(cn)) 
 				do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+			else if (os)
+				do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 		}
 		
 		if (n = get_gear(cn, IT_WP_LAMEDARG)) it[n].data[0]++;		
@@ -6255,6 +6257,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 			}
 			if (os && CONT_PROG(cc)>=CONT_GOAL(cc)) 
 				do_char_log(cc, 2, "That's all of them! You're good to go!\n");
+			else if (os)
+				do_char_log(cc, 1, "%d down, %d to go.\n", CONT_PROG(cc), (CONT_GOAL(cc)-CONT_PROG(cc)));
 		}
 		
 		if (!(ch[co].flags & (CF_PLAYER)) && ch[co].alignment==10000)
@@ -8447,6 +8451,7 @@ void really_update_char(int cn)
 		// Stat bonuses are only awarded outside of no-magic zones
 		if (!(ch[cn].flags & CF_NOMAGIC))
 		{
+			nightSpec = 0;
 			if ((it[m].temp==IT_BL_SOLAR || it[m].temp==IT_BL_LUNAR || it[m].temp==IT_BL_ECLIPSE) && 
 				(globs->mdtime<3600*6 || globs->mdtime>3600*18)) // Night Time
 			{

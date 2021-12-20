@@ -360,13 +360,13 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 3, "When equipped, stats granted by your ring slots are improved by 17%%.\n");
 		break;
 	case IT_WP_STARLIGHT: 
-		do_char_log(cn, 3, "When equipped, this weapon can be used to cast 'Starlight', costing 25%% of total mana. Starlight grants a self-buff, increasing spell modifier for 60 seconds.\n");
+		do_char_log(cn, 3, "When equipped, this weapon can be used to cast 'Starlight', costing 25%% of total mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n");
 		break;
 	case IT_WP_KELPTRID: 
 		do_char_log(cn, 3, "When equipped, grants +10 to action speed while underwater.\n");
 		break;
 	case IT_WP_PHALANX: 
-		do_char_log(cn, 3, "When equipped, this shield can be used to cast 'Phalanx', costing 50%% of total endurance. Phalanx grants a self-buff, reducing damage taken for 60 seconds.\n");
+		do_char_log(cn, 3, "When equipped, this shield can be used to cast 'Phalanx', costing 50%% of total endurance. Phalanx grants 1%% damage reduction per 10 endurance spent.\n");
 		break;
 	case IT_WP_LAMEDARG: 
 		if (it[in].data[0]<REQ_LAME)
@@ -663,7 +663,8 @@ void look_contract(int cn, int in, int desc)
 {
 	int rank, tier, mission, flags=0, n, font;
 	
-	if (!it[in].data[1]) it[in].data[1] = RANDOM(MSN_COUNT);
+	if (!it[in].data[4]) it[in].data[1] = RANDOM(MSN_COUNT);
+	it[in].data[4] = 1;
 	
 	mission = it[in].data[1];
 	tier    = it[in].data[2];

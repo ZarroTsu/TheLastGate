@@ -278,7 +278,7 @@
 #define IT_WP_BRONCHIT	  	2551
 #define IT_WP_VOLCANF	  	2552
 
-#define REQ_LAME			1200
+#define REQ_LAME		   10000
 
 // Other
 

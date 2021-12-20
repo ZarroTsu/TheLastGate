@@ -171,7 +171,8 @@ int npc_add_enemy(int cn, int co, int always)
 	}
 	
 	// Group check for GCs
-	if ((IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || (IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
+	if ((IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
+		(IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
 	{
 		return 0;
 	}

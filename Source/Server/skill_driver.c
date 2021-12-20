@@ -4142,11 +4142,11 @@ void skill_shadow(int cn)
 		ch[cc].sprite = ch[cn].sprite; // ch[cc].sprite = 15312;
 	}
 	ch[cc].data[29] = 0;				// reset experience earned
-	ch[cc].data[CHD_GROUP] = 65536 + cn;		// set group
+	ch[cc].data[CHD_GROUP] = 65536 + cn;// set group
 	ch[cc].kindred &= ~(KIN_MONSTER);	// Add 'monster' flag
 	
 	if (ch[cn].flags & CF_SIMPLE) ch[cc].flags |= CF_SIMPLE;
-	if (ch[cn].data[42]==1111) ch[co].data[42] = ch[co].data[43] = ch[co].data[59] = 1111;
+	if (ch[cn].data[42]==1100) ch[cc].data[42] = ch[cc].data[43] = ch[cc].data[59] = 1100;
 
 	if (co)
 	{
