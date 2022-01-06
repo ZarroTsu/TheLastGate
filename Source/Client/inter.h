@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000700
+#define VERSION 0x000801
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -93,6 +93,11 @@
 #define GUI_CHAT_XOFF		299  // Chatbox
 
 #define GUI_MINIMAP_YOFF	130  // Minimap
+
+#define FN_RED			0
+#define FN_YEL			1
+#define FN_GRE			2
+#define FN_BLU			3
 
 struct xbutton
 {

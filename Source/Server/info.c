@@ -222,7 +222,7 @@ static char *racename(int kin)
 	if (kin & KIN_ARCHHARAKIM)	return("Archharakim");
 	if (kin & KIN_SORCERER)		return("Sorcerer");
 	if (kin & KIN_WARRIOR)		return("Warrior");
-	if (kin & KIN_BRAWLER)		return("Brawler");
+	if (kin & KIN_SKALD)		return("Skald");
 	if (kin & KIN_SUMMONER)		return("Summoner");
 
 	return("Monster");

@@ -183,6 +183,12 @@ int use_create_item(int cn, int in)
 	}
 
 	in2 = god_create_item(n);
+	
+	if (n==IT_BS_CAN1 || n==IT_BS_CAN2 || n==IT_BS_CAN3)
+	{
+		it[in2].data[0] = it[in].data[1];
+		it[in].data[1] = 0;
+	}
 
 	if (!god_give_char(in2, cn))
 	{
@@ -502,6 +508,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_MIX_2_; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_MIX_3_; 	font=1;	 break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_MIX_3____; font=1;	 break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -526,6 +538,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -552,6 +570,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -576,6 +600,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -602,6 +632,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_MIX_12; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_MIX_13; 	font=1;	 break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -626,6 +662,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_MIX_13; 	font=1;	 break;
 			case IT_FLO_2:	in3 = IT_MIX_23; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -652,6 +694,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_MIX_23; 	font=1;	 break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -676,6 +724,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -702,6 +756,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -726,6 +786,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -752,6 +818,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -776,6 +848,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -802,6 +880,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -826,6 +910,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -852,6 +942,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -876,6 +972,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -902,6 +1004,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -926,6 +1034,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -952,6 +1066,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -976,6 +1096,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1002,6 +1128,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -1026,6 +1158,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_LAB2; 	font=2;	 break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1052,6 +1190,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_MIX_12; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_MIX_13; 	font=1;	 break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -1076,6 +1220,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_MIX_12; 	font=1;	 break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_MIX_23; 	font=1;	 break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1102,6 +1252,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_MIX_23; 	font=1;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -1126,6 +1282,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_LAB2; 	font=2;	 break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1152,6 +1314,12 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_2:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
 			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
 	}
@@ -1176,6 +1344,92 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_1:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_2:	in3 = IT_POT_LAB2; 	font=2;	 break;
 			case IT_FLO_3:	in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_3____)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: case IT_FLO_G: case IT_FLO_P:
+			case IT_FLO_Y: case IT_FLO_B: case IT_FLO_W:
+			case IT_FLO_M: case IT_FLO_C: case IT_FLO_V:
+			case IT_FLO_T: case IT_FLO_O:
+			case IT_FLO_1: case IT_FLO_2: case IT_FLO_3:
+				in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_MIX_32___; font=1;	 break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_32___)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: case IT_FLO_G: case IT_FLO_P:
+			case IT_FLO_Y: case IT_FLO_B: case IT_FLO_W:
+			case IT_FLO_M: case IT_FLO_C: case IT_FLO_V:
+			case IT_FLO_T: case IT_FLO_O:
+			case IT_FLO_1: case IT_FLO_2: case IT_FLO_3:
+				in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_MIX_321__; font=1;	 break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_321__)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: case IT_FLO_G: case IT_FLO_P:
+			case IT_FLO_Y: case IT_FLO_B: case IT_FLO_W:
+			case IT_FLO_M: case IT_FLO_C: case IT_FLO_V:
+			case IT_FLO_T: case IT_FLO_O:
+			case IT_FLO_1: case IT_FLO_2: case IT_FLO_3:
+				in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_MIX_3213_; font=1;	 break;
+			case IT_HERBD:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
+			//
+			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
+		}
+	}
+	else if (it[in].temp==IT_MIX_3213_)
+	{
+		switch(it[in2].temp)
+		{
+			case IT_FLO_R: case IT_FLO_G: case IT_FLO_P:
+			case IT_FLO_Y: case IT_FLO_B: case IT_FLO_W:
+			case IT_FLO_M: case IT_FLO_C: case IT_FLO_V:
+			case IT_FLO_T: case IT_FLO_O:
+			case IT_FLO_1: case IT_FLO_2: case IT_FLO_3:
+				in3 = IT_POT_DEAD; 	break;
+			//
+			case IT_HERBA:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBB:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBC:	in3 = IT_POT_DEAD; 	break;
+			case IT_HERBD:	in3 = IT_POT_DEATH; font=2;	 break;
+			case IT_HERBE:	in3 = IT_POT_DEAD; 	break;
 			//
 			default: do_char_log(cn, 0, "Sorry?\n"); return 0;
 		}
@@ -1432,7 +1686,7 @@ int reward_teleport(int cn, int in)
 	{
 		if (it[in].data[9]<12)
 		{
-			if (it[in].data[9]>10 && !RANDOM(20))
+			if (it[in].data[9]>9 && !RANDOM(16))
 			{
 				switch (RANDOM(5))
 				{	case  0: n = IT_RD_BRV; break;
@@ -1442,7 +1696,7 @@ int reward_teleport(int cn, int in)
 					default: n = IT_RD_STR; break;
 				}	in2 = god_create_item(n);
 			}
-			else if (it[in].data[9]>5 && !RANDOM(10))
+			else if (it[in].data[9]>5 && !RANDOM(12))
 			{
 				switch (RANDOM(2))
 				{	case  0: n = IT_RD_HP; break;
@@ -1451,11 +1705,11 @@ int reward_teleport(int cn, int in)
 			}
 			else
 			{
-				switch (RANDOM(4))
+				switch (RANDOM(8))
 				{	case  0: n = IT_LUKS; break;
 					default: n = IT_EXPS; break;
 				}	in2 = god_create_item(n);
-				it[in2].data[0] = (it[in].data[9]*1000 + RANDOM(it[in].data[9]+6)*250) / ((n==IT_LUKS)?25:1);
+				it[in2].data[0] = (2000 + it[in].data[9]*1000 + RANDOM(it[in].data[9]+10)*200) / ((n==IT_LUKS)?20:1);
 			}
 		}
 		else
@@ -2019,7 +2273,7 @@ int use_scroll9(int cn, int in)
 		ch[cn].kindred |= KIN_MALE; ch[cn].kindred &= ~KIN_FEMALE;
 		if (IS_SEYAN_DU(cn))			ch[cn].sprite =  3024;
 		else if (IS_ARCHTEMPLAR(cn))	ch[cn].sprite = 23504;
-		else if (IS_BRAWLER(cn))		ch[cn].sprite = 26048;
+		else if (IS_SKALD(cn))		ch[cn].sprite = 26048;
 		else if (IS_WARRIOR(cn))		ch[cn].sprite = 25552;
 		else if (IS_SORCERER(cn))		ch[cn].sprite = 28624;
 		else if (IS_SUMMONER(cn))		ch[cn].sprite = 25048;
@@ -2027,13 +2281,14 @@ int use_scroll9(int cn, int in)
 		else if (IS_TEMPLAR(cn))		ch[cn].sprite =  2000;
 		else if (IS_MERCENARY(cn))		ch[cn].sprite =  5072;
 		else if (IS_HARAKIM(cn))		ch[cn].sprite =  4048;
+		else if (IS_BRAVER(cn))		ch[cn].sprite = 27088;
 	}
 	else
 	{	// Change from Male to Female
 		ch[cn].kindred |= KIN_FEMALE; ch[cn].kindred &= ~KIN_MALE;
 		if (IS_SEYAN_DU(cn))			ch[cn].sprite = 11216;
 		else if (IS_ARCHTEMPLAR(cn))	ch[cn].sprite = 24528;
-		else if (IS_BRAWLER(cn))		ch[cn].sprite = 22948;
+		else if (IS_SKALD(cn))		ch[cn].sprite = 22948;
 		else if (IS_WARRIOR(cn))		ch[cn].sprite = 26576;
 		else if (IS_SORCERER(cn))		ch[cn].sprite = 27600;
 		else if (IS_SUMMONER(cn))		ch[cn].sprite = 24048;
@@ -2041,6 +2296,7 @@ int use_scroll9(int cn, int in)
 		else if (IS_TEMPLAR(cn))		ch[cn].sprite =  8144;
 		else if (IS_MERCENARY(cn))		ch[cn].sprite =  5072;
 		else if (IS_HARAKIM(cn))		ch[cn].sprite =  6096;
+		else if (IS_BRAVER(cn))		ch[cn].sprite = 28112;
 	}
 	
 	do_char_log(cn, 1, "Used the scroll of gender swap. It's magic takes hold, and...\n");
@@ -2312,7 +2568,7 @@ int use_map_artifact(int cn, int in)
 int use_map_pentigram(int cn, int in)
 {
 	int spawnT = 350, v;
-	int co, bf, flags, base, affix=0, tarot, x, y, m, n;
+	int co, bf, flags, base, tarot, x, y, m, n;
 	
 	if (cn==0)
 	{
@@ -2327,7 +2583,7 @@ int use_map_pentigram(int cn, int in)
 	y = it[in].y;
 	m = x + y * MAPX;
 	
-	base  = max(15, (it[in].data[0]-5)*11/2+15) - 3;
+	base  = max(15, (it[in].data[0]-5)*11/2+15) - 4;
 	flags = it[in].data[1];
 	tarot = it[in].data[2];
 	
@@ -2335,30 +2591,33 @@ int use_map_pentigram(int cn, int in)
 	
 	for (n=0;n<v;n++)
 	{
-		affix = 0;
-		if (!RANDOM(27)) affix = 3;
-		co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base - RANDOM(8), affix, tarot);
-		if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
-		if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
-		if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
-		if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
-		if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
-		if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
-		if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/8);
-		if (co && (flags & 0x00004000)) ch[co].speed_mod = it[in].data[0]*2;
-		if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
+		co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base - RANDOM(9), 0, tarot);
+		if (!co) continue;
+		if (flags & 0x00000040) ch[co].flags |= CF_UNDEAD;
+		if (flags & 0x00000100) ch[co].data[73] += 6;
+		if (flags & 0x00000200) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
+		if (flags & 0x00000400) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
+		if (flags & 0x00000800) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
+		if (flags & 0x00001000) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
+		if (flags & 0x00002000) ch[co].armor_bonus = max(50, ch[co].armor/8);
+		if (flags & 0x00004000) ch[co].speed_mod = it[in].data[0]*2;
+		if ((flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
 		{
 			strcpy(bu[bf].name, "* Wisdom");
 			bu[bf].spell_mod[1] = it[in].data[0]; bu[bf].data[4] = 1; add_spell(co, bf);
 		}
-		if (co && (flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
+		if ((flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
 		{
 			strcpy(bu[bf].name, "* Bonus EXP"); 
 			bu[bf].data[4] = 1; add_spell(co, bf);
 		}
 		ch[co].data[29] = m;
 		ch[co].data[60] = TICKS * 23;
-		if (co) do_update_char(co);
+		if (!RANDOM(30))
+		{
+			boost_char(co, 5);
+		}
+		do_update_char(co);
 	}
 	
 	// Contract progress
@@ -2367,7 +2626,10 @@ int use_map_pentigram(int cn, int in)
 		add_map_progress(CONT_NUM(cn));
 		do_char_log(cn, 1, "You touched the pentagram. That's %d of %d.\n", CONT_PROG(cn), CONT_GOAL(cn));
 		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
+		{
 			do_char_log(cn, 2, "That's all of them! You're good to go!\n");
+			do_give_exp(cn, get_pent_value(base*3+RANDOM(base)-RANDOM(base)), 0, -1);
+		}
 	}
 	
 	return 1;
@@ -2376,7 +2638,7 @@ int use_map_pentigram(int cn, int in)
 int use_map_chest(int cn, int in)
 {
 	// data 0 = rank
-	int in2, n;
+	int in2, n, rank, tier;
 	
 	if (cn==0)
 	{
@@ -2387,36 +2649,105 @@ int use_map_chest(int cn, int in)
 		return 0;
 	}
 	
-	switch (RANDOM(it[in].data[0]+1))
+	rank = it[in].data[0];
+	tier = it[in].data[1];
+	
+	if (rank <= 8) 			// Sergeants
 	{
-		case  0: 	n = IT_SILVAMMY+RANDOM(2)*5; 				break;
-		case  1: 	n = get_best_worn(cn, WN_HEAD); 			break;
-		case  2: 	n = get_best_worn(cn, WN_BODY); 			break;
-		case  3: 	n = get_best_worn(cn, WN_RHAND); 			break;
-		case  4: 	n = get_best_worn(cn, WN_LHAND); 			break;
-		case  5: 	n = IT_EXPS+RANDOM(2); 						break; 
-		case  6: 	n = IT_POP_SPELL+RANDOM(7); 				break; // Staff Sergeant
-		case  7: 	n = -1000; 									break;
-		case  8: 	n = !RANDOM(3)?(RANDOM(2)?102:125):101; 	break;
-		case  9: 	n = IT_CH_FOOL; 							break;
-		case 10: 	n = IT_POP_ASPEL+RANDOM(7); 				break; // Second Lieutenant
-		case 11: 	n = IT_POT_EXHP+RANDOM(18); 				break;
-		case 12: 	n = IT_RPOT; 								break;
-		case 13: 	n = !RANDOM(3)?(RANDOM(2)?131:273):127; 	break;
-		case 14: 	n = IT_POT_VITA+RANDOM(3); 					break;
-		case 15: 	n = IT_RD_HP+RANDOM(2)*2; 					break;
-		case 16: 	n = IT_POP_ISPEL+RANDOM(7); 				break; // Brigadier General
-		case 17: 	n = IT_BL_SOLAR+RANDOM(2); 					break;
-		case 18: 	n = IT_GPOT; 								break;
-		case 19: 	n = IT_CH_FOOL_R; 							break;
-		case 20: 	n = IT_RD_BRV+RANDOM(5); 					break; 
-		case 21: 	n = IT_POP_SSPEL+RANDOM(7); 				break; // Knight
-		case 22: 	n = IT_POT_D_HP+RANDOM(3)*6; 				break;
-		case 23: 	n = 1243+RANDOM(2)*2; 						break;
-		case 24: 	n = IT_SPOT; 								break;
-		case 25: 	n = IT_OS_BRV+RANDOM(5); 					break; // Warlord
-		case 26: 	n = IT_OS_BRV+RANDOM(5); 					break; 
-		default: 	n = IT_OS_SK; 								break; // Warlord + 2
+		switch (RANDOM(12+tier))
+		{
+			case  0: 
+			case  1:	n = IT_EXPS+RANDOM(2);						break;
+			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
+			case  3:	n = get_best_worn(cn, WN_BODY);				break;
+			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
+			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
+			case  6:	n = IT_POP_SPELL+RANDOM(7);					break;
+			case  7: 	n = IT_POP_ASPEL+RANDOM(7); 				break;
+			case  8:	n = IT_POT_EXHP+RANDOM(18); 				break;
+			case  9:	n = -1000;									break;
+			case 10:	n = !RANDOM(3)?(RANDOM(2)?102:125):101; 	break;
+			case 11: 	n = IT_CH_FOOL; 							break;
+			default:	n = IT_RPOT; 								break;
+		}
+	}
+	else if (rank <= 14) 	// Officers
+	{
+		switch (RANDOM(12+tier))
+		{
+			case  0: 
+			case  1:	n = IT_EXPS+RANDOM(2);						break;
+			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
+			case  3:	n = get_best_worn(cn, WN_BODY);				break;
+			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
+			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
+			case  6:	
+			case  7: 	n = IT_POP_ASPEL+RANDOM(7); 				break;
+			case  8:	n = IT_RPOT; 								break;
+			case  9:	n = -1000;									break;
+			case 10:	n = !RANDOM(3)?(RANDOM(2)?131:273):127; 	break;
+			case 11: 	n = IT_CH_FOOL; 							break;
+			default:	n = IT_RD_HP+RANDOM(2)*2; 					break;
+		}
+	}
+	else if (rank <= 19) 	// Generals
+	{
+		switch (RANDOM(12+tier))
+		{
+			case  0: 
+			case  1:	n = IT_EXPS+RANDOM(2);						break;
+			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
+			case  3:	n = get_best_worn(cn, WN_BODY);				break;
+			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
+			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
+			case  6:	n = IT_POP_ASPEL+RANDOM(7); 				break;
+			case  7: 	n = IT_POP_ISPEL+RANDOM(7); 				break;
+			case  8:	n = IT_POT_VITA+RANDOM(3); 					break;
+			case  9:	n = -1000;									break;
+			case 10:	n = RANDOM(6)?2510:(IT_BL_SOLAR+RANDOM(2));	break;
+			case 11: 	n = IT_CH_FOOL_R; 							break;
+			default:	n = IT_GPOT; 								break;
+		}
+	}
+	else if (rank <= 24)	// Nobles
+	{
+		switch (RANDOM(12+tier))
+		{
+			case  0: 
+			case  1:	n = IT_EXPS+RANDOM(2);						break;
+			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
+			case  3:	n = get_best_worn(cn, WN_BODY);				break;
+			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
+			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
+			case  6:	
+			case  7: 	n = IT_POP_ISPEL+RANDOM(7); 				break;
+			case  8:	n = IT_GPOT; 								break;
+			case  9:	n = -1000;									break;
+			case 10:	n = RANDOM(6)?2511:(1243+RANDOM(2)*2);		break;
+			case 11: 	n = IT_CH_FOOL_R; 							break;
+			default:	n = IT_RD_BRV+RANDOM(5); 					break; 
+		}
+	}
+	else					// Uber
+	{
+		switch (RANDOM(12+tier))
+		{
+			case  0: 
+			case  1:	n = IT_EXPS+RANDOM(2);						break;
+			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
+			case  3:	n = get_best_worn(cn, WN_BODY);				break;
+			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
+			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
+			case  6:	n = IT_POP_ISPEL+RANDOM(7); 				break;
+			case  7: 	n = IT_POP_SSPEL+RANDOM(7); 				break;
+			case  8:	n = IT_SPOT; 								break;
+			case  9:	n = -1000;									break;
+			case 10:	
+			case 11: 	n = IT_POT_D_HP+RANDOM(3)*6; 				break;
+			case 12:	
+			case 13:	n = IT_OS_BRV+RANDOM(5); 					break; 
+			default:	n = IT_OS_SK; 								break; 
+		}
 	}
 	
 	if (n == IT_CH_FOOL || n == IT_CH_FOOL_R)
@@ -2426,7 +2757,7 @@ int use_map_chest(int cn, int in)
 	
 	if (n==-1000)
 	{
-		n = (RANDOM(it[in].data[0])+1)*(RANDOM(it[in].data[0])+1)*(RANDOM(6)+5);
+		n = (RANDOM(rank)+1)*(RANDOM(rank+tier)+1)*(RANDOM(6)+5);
 		do_char_log(cn, 1, "You found %d Gold.\n", n);
 		chlog(cn, "Got %dG from %s", n, it[in].name);
 		ch[cn].gold += n * 100;
@@ -2625,8 +2956,8 @@ int use_map_shrine(int cn, int in)
 							if (it[inc].attrib[n][0])
 							{
 								it[inr].attrib[n][0] = get_sb(n+50, 1);
-								it[inr].attrib[n][1] = get_sb(n+50, 0)*2;
-								m += get_sb(n+50, 0)*2;
+								it[inr].attrib[n][1] = get_sb(n+50, 0);
+								m += get_sb(n+50, 0);
 								catalog[c] = n+50; c++;
 							}
 						}
@@ -2635,85 +2966,130 @@ int use_map_shrine(int cn, int in)
 							if (it[inc].skill[n][0])
 							{
 								it[inr].skill[n][0] = get_sb(n, 1);
-								it[inr].skill[n][1] = get_sb(n, 0)*2;
-								m += get_sb(n, 0)*2;
+								it[inr].skill[n][1] = get_sb(n, 0);
+								m += get_sb(n, 0);
 								catalog[c] = n; c++;
 							}
 						}
 						if (it[inc].hp[0])
 						{
-							n = 55; it[inr].hp[0] = get_sb(n, 1); it[inr].hp[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 55; 
+							it[inr].hp[0] = get_sb(n, 1); 
+							it[inr].hp[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].end[0])
 						{
-							n = 56; it[inr].end[0] = get_sb(n, 1); it[inr].end[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 56; 
+							it[inr].end[0] = get_sb(n, 1); 
+							it[inr].end[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].mana[0])
 						{
-							n = 57; it[inr].mana[0] = get_sb(n, 1); it[inr].mana[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 57; 
+							it[inr].mana[0] = get_sb(n, 1); 
+							it[inr].mana[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].weapon[0])
 						{
-							n = 58; it[inr].weapon[0] = get_sb(n, 1); it[inr].weapon[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 58; 
+							it[inr].weapon[0] = get_sb(n, 1); 
+							it[inr].weapon[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].armor[0])
 						{
-							n = 59; it[inr].armor[0] = get_sb(n, 1); it[inr].armor[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 59; 
+							it[inr].armor[0] = get_sb(n, 1); 
+							it[inr].armor[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].move_speed[0])
 						{
-							n = 60; it[inr].move_speed[0] = get_sb(n, 1); it[inr].move_speed[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 60; 
+							it[inr].move_speed[0] = get_sb(n, 1); 
+							it[inr].move_speed[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].atk_speed[0])
 						{
-							n = 61; it[inr].atk_speed[0] = get_sb(n, 1); it[inr].atk_speed[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 61; 
+							it[inr].atk_speed[0] = get_sb(n, 1); 
+							it[inr].atk_speed[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].cast_speed[0])
 						{
-							n = 62; it[inr].cast_speed[0] = get_sb(n, 1); it[inr].cast_speed[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 62; 
+							it[inr].cast_speed[0] = get_sb(n, 1); 
+							it[inr].cast_speed[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].spell_mod[0])
 						{
-							n = 63; it[inr].spell_mod[0] = get_sb(n, 1); it[inr].spell_mod[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 63; 
+							it[inr].spell_mod[0] = get_sb(n, 1); 
+							it[inr].spell_mod[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].spell_apt[0])
 						{
-							n = 64; it[inr].spell_apt[0] = get_sb(n, 1); it[inr].spell_apt[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 64; 
+							it[inr].spell_apt[0] = get_sb(n, 1); 
+							it[inr].spell_apt[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].cool_bonus[0])
 						{
-							n = 65; it[inr].cool_bonus[0] = get_sb(n, 1); it[inr].cool_bonus[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 65; 
+							it[inr].cool_bonus[0] = get_sb(n, 1); 
+							it[inr].cool_bonus[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].crit_chance[0])
 						{
-							n = 66; it[inr].crit_chance[0] = get_sb(n, 1); it[inr].crit_chance[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 66; 
+							it[inr].crit_chance[0] = get_sb(n, 1); 
+							it[inr].crit_chance[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].crit_multi[0])
 						{
-							n = 67; it[inr].crit_multi[0] = get_sb(n, 1); it[inr].crit_multi[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 67; 
+							it[inr].crit_multi[0] = get_sb(n, 1); 
+							it[inr].crit_multi[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].top_damage[0])
 						{
-							n = 68; it[inr].top_damage[0] = get_sb(n, 1); it[inr].top_damage[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 68; 
+							it[inr].top_damage[0] = get_sb(n, 1); 
+							it[inr].top_damage[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						if (it[inc].gethit_dam[0])
 						{
-							n = 69; it[inr].gethit_dam[0] = get_sb(n, 1); it[inr].gethit_dam[1] = get_sb(n, 0)*2; 
-							m += get_sb(n, 0)*2; catalog[c] = n; c++;
+							n = 69; 
+							it[inr].gethit_dam[0] = get_sb(n, 1); 
+							it[inr].gethit_dam[1] = get_sb(n, 0); 
+							m += get_sb(n, 0); 
+							catalog[c] = n; c++;
 						}
 						
 						panic = v = n = 0;
@@ -2724,22 +3100,22 @@ int use_map_shrine(int cn, int in)
 							n = v==n?RANDOM(c):v;
 							v = catalog[n];
 							if (v>=50 && v<=54) { m -= it[inr].attrib[v-50][1]; it[inr].attrib[v-50][0] = it[inr].attrib[v-50][1] = 0; }
-							else if (v==55)     { m -= it[inc].hp[1];           it[inc].hp[0]           = it[inc].hp[1]           = 0; }
-							else if (v==56)     { m -= it[inc].end[1];          it[inc].end[0]          = it[inc].end[1]          = 0; }
-							else if (v==57)     { m -= it[inc].mana[1];         it[inc].mana[0]         = it[inc].mana[1]         = 0; }
-							else if (v==58)     { m -= it[inc].weapon[1];       it[inc].weapon[0]       = it[inc].weapon[1]       = 0; }
-							else if (v==59)     { m -= it[inc].armor[1];        it[inc].armor[0]        = it[inc].armor[1]        = 0; }
-							else if (v==60)     { m -= it[inc].move_speed[1];   it[inc].move_speed[0]   = it[inc].move_speed[1]   = 0; }
-							else if (v==61)     { m -= it[inc].atk_speed[1];    it[inc].atk_speed[0]    = it[inc].atk_speed[1]    = 0; }
-							else if (v==62)     { m -= it[inc].cast_speed[1];   it[inc].cast_speed[0]   = it[inc].cast_speed[1]   = 0; }
-							else if (v==63)     { m -= it[inc].spell_mod[1];    it[inc].spell_mod[0]    = it[inc].spell_mod[1]    = 0; }
-							else if (v==64)     { m -= it[inc].spell_apt[1];    it[inc].spell_apt[0]    = it[inc].spell_apt[1]    = 0; }
-							else if (v==65)     { m -= it[inc].cool_bonus[1];   it[inc].cool_bonus[0]   = it[inc].cool_bonus[1]   = 0; }
-							else if (v==66)     { m -= it[inc].crit_chance[1];  it[inc].crit_chance[0]  = it[inc].crit_chance[1]  = 0; }
-							else if (v==67)     { m -= it[inc].crit_multi[1];   it[inc].crit_multi[0]   = it[inc].crit_multi[1]   = 0; }
-							else if (v==68)     { m -= it[inc].top_damage[1];   it[inc].top_damage[0]   = it[inc].top_damage[1]   = 0; }
-							else if (v==69)     { m -= it[inc].gethit_dam[1];   it[inc].gethit_dam[0]   = it[inc].gethit_dam[1]   = 0; }
-							else if (v<50)      { m -= it[inc].skill[v][1];     it[inc].skill[v][0]     = it[inc].skill[v][1]     = 0; }
+							else if (v==55)     { m -= it[inr].hp[1];           it[inr].hp[0]           = it[inr].hp[1]           = 0; }
+							else if (v==56)     { m -= it[inr].end[1];          it[inr].end[0]          = it[inr].end[1]          = 0; }
+							else if (v==57)     { m -= it[inr].mana[1];         it[inr].mana[0]         = it[inr].mana[1]         = 0; }
+							else if (v==58)     { m -= it[inr].weapon[1];       it[inr].weapon[0]       = it[inr].weapon[1]       = 0; }
+							else if (v==59)     { m -= it[inr].armor[1];        it[inr].armor[0]        = it[inr].armor[1]        = 0; }
+							else if (v==60)     { m -= it[inr].move_speed[1];   it[inr].move_speed[0]   = it[inr].move_speed[1]   = 0; }
+							else if (v==61)     { m -= it[inr].atk_speed[1];    it[inr].atk_speed[0]    = it[inr].atk_speed[1]    = 0; }
+							else if (v==62)     { m -= it[inr].cast_speed[1];   it[inr].cast_speed[0]   = it[inr].cast_speed[1]   = 0; }
+							else if (v==63)     { m -= it[inr].spell_mod[1];    it[inr].spell_mod[0]    = it[inr].spell_mod[1]    = 0; }
+							else if (v==64)     { m -= it[inr].spell_apt[1];    it[inr].spell_apt[0]    = it[inr].spell_apt[1]    = 0; }
+							else if (v==65)     { m -= it[inr].cool_bonus[1];   it[inr].cool_bonus[0]   = it[inr].cool_bonus[1]   = 0; }
+							else if (v==66)     { m -= it[inr].crit_chance[1];  it[inr].crit_chance[0]  = it[inr].crit_chance[1]  = 0; }
+							else if (v==67)     { m -= it[inr].crit_multi[1];   it[inr].crit_multi[0]   = it[inr].crit_multi[1]   = 0; }
+							else if (v==68)     { m -= it[inr].top_damage[1];   it[inr].top_damage[0]   = it[inr].top_damage[1]   = 0; }
+							else if (v==69)     { m -= it[inr].gethit_dam[1];   it[inr].gethit_dam[0]   = it[inr].gethit_dam[1]   = 0; }
+							else if (v<50)      { m -= it[inr].skill[v][1];     it[inr].skill[v][0]     = it[inr].skill[v][1]     = 0; }
 							else				{ panic++; }
 							catalog[n] = 99;
 						}
@@ -2905,11 +3281,11 @@ int use_map_portal(int cn, int in)
 	
 	do_char_log(cn, 1, "You completed the area.\n");
 
-	exp = luck = bsp = osp = sqrt(rank2points(rank)) * 7 + 7;
+	exp = luck = bsp = osp = sqrt(rank2points(rank)) * 8 + 8;
 	exp -= RANDOM(exp/20+1);
 	exp += RANDOM(exp/20*(tier+1)+1);
 	
-	if (it[in].data[1]==1) exp += RANDOM(exp/8) + RANDOM(exp/8);
+	if (it[in].data[1]==1) exp += exp/4 + RANDOM(exp/4);
 	
 	chlog(cn, "Finished map of rank %d tier %d", rank, tier);
 	char_play_sound(cn, ch[cn].sound + 19, 0, 0);
@@ -2924,8 +3300,8 @@ int use_map_portal(int cn, int in)
 		osp -= RANDOM(osp/20+1); 
 		osp += RANDOM(osp/20*(tier+1)+1);
 		
-		if (it[in].data[4]==1 && tier) osp += RANDOM(osp/8) + RANDOM(osp/8);
-		else if (it[in].data[4]==1) osp = RANDOM(osp/8) + RANDOM(osp/8);
+		if (it[in].data[4]==1 && tier) osp += osp/4 + RANDOM(osp/4);
+		else if (it[in].data[4]==1) osp = osp/4 + RANDOM(osp/4);
 		
 		ch[cn].os_points += osp;
 		if (!(ch[cn].flags & CF_SYS_OFF))
@@ -5267,7 +5643,7 @@ int get_pent_value(int pnum)
 {
 	// Values are multiplied by 10000 here for decimal accuracy.
 	// Apparently each bracket step gets truncated as its own int, who knew?
-	return ( ( pnum*pnum*10000 ) / ( 7*10000+pnum*10000/99 ) +1 );
+	return ( ( pnum*pnum*10000 ) / ( 7*10000 ) + 1 ); // 7*10000+pnum*10000/166
 }
 
 int get_kill_streak_exp(int k, int p)
@@ -5902,8 +6278,8 @@ int use_seyan_shrine(int cn, int in)
 
 		it[in2].weapon[0] = 15 + bits * 3;
 		
-		it[in2].to_hit[0]   = max(0, min(5, (bits-10)/4));
-		it[in2].to_parry[0] = max(0, min(5, (bits- 8)/4));
+		it[in2].to_hit[0]   = max(0, min(15, (bits-2)/2));
+		it[in2].to_parry[0] = max(0, min(15, (bits-1)/2));
 		
 		for (n = 0; n<5; n++) 
 		{
@@ -5912,8 +6288,8 @@ int use_seyan_shrine(int cn, int in)
 		
 		it[in2].crit_multi[0] = max(0, min(25, bits - 5));
 		
-		if (bits>=31) it[in2].base_crit    = 3;
-		if (bits==32) it[in2].spell_mod[0] = 5;
+		if (bits>=31) it[in2].base_crit    =  3;
+		if (bits==32) it[in2].spell_mod[0] = 10;
 		
 		it[in2].flags |= IF_UPDATE;
 		it[in2].temp   = 0;
@@ -5925,8 +6301,8 @@ int use_seyan_shrine(int cn, int in)
 	{
 		it[in3].weapon[0] = 15 + bits * 3;
 		
-		it[in3].to_hit[0]   = max(0, min(5, (bits-10)/4));
-		it[in3].to_parry[0] = max(0, min(5, (bits- 8)/4));
+		it[in3].to_hit[0]   = max(0, min(15, (bits-2)/2));
+		it[in3].to_parry[0] = max(0, min(15, (bits-1)/2));
 		
 		for (n = 0; n<5; n++) 
 		{
@@ -5935,8 +6311,8 @@ int use_seyan_shrine(int cn, int in)
 		
 		it[in3].crit_multi[0] = max(0, min(25, bits - 5));
 		
-		if (bits>=31) it[in3].base_crit    = 3;
-		if (bits==32) it[in3].spell_mod[0] = 5;
+		if (bits>=31) it[in3].base_crit    =  3;
+		if (bits==32) it[in3].spell_mod[0] = 10;
 		
 		it[in3].flags |= IF_UPDATE;
 		it[in3].temp   = 0;
@@ -5970,30 +6346,60 @@ int use_seyan_portal(int cn, int in)
 	{
 		return 0;
 	}
-
-	if (IS_SEYAN_DU(cn))
+	
+	if (it[in].data[2])
 	{
-		do_char_log(cn, 0, "You're already Seyan'Du, aren't you?\n");
+		if (IS_BRAVER(cn))
+		{
+			do_char_log(cn, 0, "You're already a Braver, aren't you?\n");
+		}
+		else
+		{
+			do_char_log(cn, 0, "The Bravers welcome you among their ranks, %s!\n", ch[cn].name);
+			if (IS_MALE(cn))	god_racechange(cn, CT_BRAVER_M, 0);
+			else				god_racechange(cn, CT_BRAVER_F, 0);
+			
+			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
+			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+			
+			in2 = god_create_item(35);
+			god_give_char(in2, cn);
+			
+			/* Announce the player's new race */
+			if (co<MAXCHARS)
+			{
+				char message[100];
+				sprintf(message, "Hear ye, hear ye! %s has is now Braver!", ch[cn].name);
+				do_shout(co, message);
+			}
+		}
 	}
 	else
 	{
-		do_char_log(cn, 0, "The Seyan'Du welcome you among their ranks, %s!\n", ch[cn].name);
-		if (IS_MALE(cn))	god_racechange(cn, CT_SEYANDU_M, 0);
-		else				god_racechange(cn, CT_SEYANDU_F, 0);
-		
-		ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
-		ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
-		
-		in2 = god_create_item(IT_SEYANSWORD);
-		god_give_char(in2, cn);
-		it[in2].data[0] = cn;
-		
-		/* Announce the player's new race */
-		if (co<MAXCHARS)
+		if (IS_SEYAN_DU(cn))
 		{
-			char message[100];
-			sprintf(message, "Hear ye, hear ye! %s has joined the Seyan'du!", ch[cn].name);
-			do_shout(co, message);
+			do_char_log(cn, 0, "You're already a Seyan'Du, aren't you?\n");
+		}
+		else
+		{
+			do_char_log(cn, 0, "The Seyan'Du welcome you among their ranks, %s!\n", ch[cn].name);
+			if (IS_MALE(cn))	god_racechange(cn, CT_SEYANDU_M, 0);
+			else				god_racechange(cn, CT_SEYANDU_F, 0);
+			
+			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
+			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+			
+			in2 = god_create_item(IT_SEYANSWORD);
+			god_give_char(in2, cn);
+			it[in2].data[0] = cn;
+			
+			/* Announce the player's new race */
+			if (co<MAXCHARS)
+			{
+				char message[100];
+				sprintf(message, "Hear ye, hear ye! %s has joined the Seyan'du!", ch[cn].name);
+				do_shout(co, message);
+			}
 		}
 	}
 
@@ -6431,7 +6837,7 @@ void change_to_pugilist(int cn)
 	if (IS_MALE(cn))	god_minor_racechange(cn, CT_PUGILIST_M);
 	else				god_minor_racechange(cn, CT_PUGILIST_F);
 
-	do_char_log(cn, 1, "You are truly worthy to become a Brawler. Congratulations, %s.\n", ch[cn].name);
+	do_char_log(cn, 1, "You are truly worthy to become a Skald. Congratulations, %s.\n", ch[cn].name);
 }
 
 void change_to_summoner(int cn)
@@ -6577,6 +6983,28 @@ int shrine_of_change(int cn, int in)
 		else do_char_log(cn, 1, "You've already arched!\n");
 		return 0;
 	}
+	
+	if (it[in2].temp==IT_POT_DEATH)
+	{
+		if (IS_TEMPLAR(cn) || IS_MERCENARY(cn) || IS_HARAKIM(cn))
+		{
+			if (B_AT(cn, AT_BRV)<60)
+			{
+				do_char_log(cn, 1, "Your braveness is too low. There is still room for improvement.\n");
+				return;
+			}
+			
+			do_char_log(cn, 1, "As you reach out to touch the altar, you suddenly feel light-headed. The world spins around you, and... you can't return.\n");
+			
+			ch[cn].temple_x = ch[cn].tavern_x = BRAVER_WARP_X;
+			ch[cn].temple_y = ch[cn].tavern_y = BRAVER_WARP_Y;
+			
+			god_transfer_char(cn, BRAVER_WARP_X, BRAVER_WARP_Y);
+		}
+		else do_char_log(cn, 1, "You've already arched!\n");
+		return 0;
+	}
+	
 	do_char_log(cn, 1, "Read the notes, my friend.\n");
 	return 0;
 }
@@ -8112,7 +8540,7 @@ void item_tick_expire(void)
 					if (temp && (ch[co].flags & CF_RESPAWN))
 					{
 						// Eyeball kings take extra time to respawn
-						if (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR ) 
+						if (IS_LONG_RESPAWN(temp)) 
 						{
 							fx_add_effect(2, TICKS * 60 * 12 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp); // 12 - 17 minutes
 						}

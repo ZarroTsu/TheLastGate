@@ -279,7 +279,7 @@ void effect_tick(void)
 							if (temp && (ch[co].flags & CF_RESPAWN))
 							{
 								// Eyeball kings take extra time to respawn
-								if (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR )
+								if (IS_LONG_RESPAWN(temp))
 								{
 									fx_add_effect(2, TICKS * 60 * 15 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp); // 15 - 20 minutes
 								}

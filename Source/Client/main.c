@@ -574,7 +574,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				//  SKILL LIST
 				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
 				{ 
-					if (skill_pos<40)	skill_pos += 1; 
+					if (skill_pos<MAXSKILL-10)	skill_pos += 1; 
 				}
 
 				//  WAYPOINT PAGE - this was defined in multiple places so one more cant hurt!

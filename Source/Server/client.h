@@ -171,6 +171,7 @@ struct cplayer
 #define CL_CMD_WPS       35
 #define CL_CMD_MOTD      36
 #define CL_CMD_BSSHOP    37
+#define CL_CMD_QSHOP	 38
 
 #define CL_CMD_CTICK 255
 
@@ -224,11 +225,7 @@ struct cplayer
 #define SV_LOOK5            50
 #define SV_LOOK6            51
 
-#define SV_LOG  52
-#define SV_LOG0 52
-#define SV_LOG1 53
-#define SV_LOG2 54
-#define SV_LOG3 55
+
 
 #define SV_LOAD 56
 #define SV_CAP  57
@@ -261,6 +258,18 @@ struct cplayer
 #define SV_MOTD1 83
 #define SV_MOTD2 84
 #define SV_MOTD3 85
+
+#define SV_LOG  90
+#define SV_LOG0 90
+#define SV_LOG1 91
+#define SV_LOG2 92
+#define SV_LOG3 93
+#define SV_LOG4 94
+#define SV_LOG5 95
+#define SV_LOG6 96
+#define SV_LOG7 97
+#define SV_LOG8 98
+#define SV_LOG9 99
 
 #define SV_SETMAP 128                   // 128-255 are used !!!
 

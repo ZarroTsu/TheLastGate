@@ -188,20 +188,24 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 				return;
 			}
 		}
-		// Heatstroke for lab 6
+		// Heatstroke for lab 6 & Volcano
 		else if (
-			(ch[cn].x>=32 && ch[cn].y>=407 && ch[cn].x<=57 && ch[cn].y<=413) ||
-			(ch[cn].x>=32 && ch[cn].y>=414 && ch[cn].x<=64 && ch[cn].y<=428) ||
-			(ch[cn].x>=22 && ch[cn].y>=429 && ch[cn].x<=64 && ch[cn].y<=450) ||
-			(ch[cn].x>=22 && ch[cn].y>=451 && ch[cn].x<=27 && ch[cn].y<=459) ||
-			(ch[cn].x>=59 && ch[cn].y>=451 && ch[cn].x<=64 && ch[cn].y<=465))
+			(ch[cn].x>=  32 && ch[cn].y>= 407 && ch[cn].x<=  57 && ch[cn].y<= 413) ||
+			(ch[cn].x>=  32 && ch[cn].y>= 414 && ch[cn].x<=  64 && ch[cn].y<= 428) ||
+			(ch[cn].x>=  22 && ch[cn].y>= 429 && ch[cn].x<=  64 && ch[cn].y<= 450) ||
+			(ch[cn].x>=  22 && ch[cn].y>= 451 && ch[cn].x<=  27 && ch[cn].y<= 459) ||
+			(ch[cn].x>=  59 && ch[cn].y>= 451 && ch[cn].x<=  64 && ch[cn].y<= 465) ||
+			(ch[cn].x>= 173 && ch[cn].y>= 921 && ch[cn].x<= 255 && ch[cn].y<=1003) ) // Volcano
 		{
 			if (ch[cn].flags & CF_PLAYER)
 				step_desertfloor(cn);
 		}
 		else if (
-			(ch[cn].x>=65 && ch[cn].y>=406 && ch[cn].x<=81 && ch[cn].y<=466) ||
-			(ch[cn].x>=21 && ch[cn].y>=406 && ch[cn].x<=31 && ch[cn].y<=428))
+			(ch[cn].x>=  65 && ch[cn].y>= 406 && ch[cn].x<=  81 && ch[cn].y<= 466) ||
+			(ch[cn].x>=  21 && ch[cn].y>= 406 && ch[cn].x<=  31 && ch[cn].y<= 428) ||
+			(ch[cn].x>= 206 && ch[cn].y>= 890 && ch[cn].x<= 255 && ch[cn].y<= 920) ||
+			(ch[cn].x>= 562 && ch[cn].y>= 449 && ch[cn].x<= 576 && ch[cn].y<= 461) ||
+			(ch[cn].x>= 507 && ch[cn].y>= 506 && ch[cn].x<= 517 && ch[cn].y<= 518) )
 		{
 			step_desertfloor_remove(cn);
 		}
@@ -1862,7 +1866,7 @@ void act_skill(int cn)
 	if ((ch[cn].flags & CF_SIMPLE))
 	{
 		ch[cn].cerrno = ERR_FAILED;
-		skill_driver(cn, ch[cn].skill_target2);
+		skill_driver(cn, ch[cn].skill_nr);
 		return;
 	}
 
@@ -2485,7 +2489,8 @@ static inline int speedoMisc(int n)
 			
 		// 9 == Use skill, mostly casting
 		case    9:
-			miscSpeedValue -= ch[n].cast_speed;
+			miscSpeedValue  = ch[n].speed*5/4;
+			miscSpeedValue -= ch[n].cast_speed*3/2;
 			if (miscSpeedValue < 0)
 			{
 				miscSpeedValue = 0;

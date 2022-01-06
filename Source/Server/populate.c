@@ -479,10 +479,9 @@ int pop_create_bonus_belt(int cn)
 				it[n].skill[skm][0] += skill_value;
 				if(it[n].skill[skm][0] > 12) it[n].skill[skm][0] = 12;
 				// Check for skills that *all* classes would know, to apply an equip requirement.
-				if (skm == SK_HAND    || skm == SK_REST   || skm == SK_MEDIT 
-				 || skm == SK_HEAL    || skm == SK_LIGHT  || skm == SK_RECALL  
-				 || skm == SK_IDENT   || skm == SK_REPAIR || skm == SK_RESIST 
-				 || skm == SK_PERCEPT || skm == SK_BARTER || skm == SK_SENSE)
+				if (skm == SK_HAND		|| skm == SK_REST    || skm == SK_MEDIT 
+				 || skm == SK_HEAL		|| skm == SK_IDENT   || skm == SK_REPAIR 
+				 || skm == SK_RESIST	|| skm == SK_PERCEPT || skm == SK_BARTER)
 				{
 					it[n].skill[skm][2] = (it[n].skill[skm][0] * RANDOM(7));
 				}

@@ -346,15 +346,15 @@ char *at_name[5]={
 #define AT_STR		4
 
 struct skilltab *skilltab;
-struct skilltab _skilltab[50]={
+struct skilltab _skilltab[52] = {
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{  0, 'C', 	"Hand to Hand", 		"Passive ability to hit and parry while unarmed.", 
 				"", "", "", 
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
-	{  1, 'H', 	"Precision", 			"Passively improves your ability to inflict critical hits.", 
+	{  1, 'G', 	"Precision", 			"Passively improves your ability to inflict critical hits.", 
 				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_STR }},
+				{ AT_BRV, AT_BRV, AT_WIL }},
 				
 	{  2, 'D', 	"Dagger", 				"Passive ability to hit and parry with a dagger in your main hand.", 
 				"", "", "", 
@@ -378,17 +378,17 @@ struct skilltab _skilltab[50]={
 				
 	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a small bonus to immunity.", 
 				"Zephyr (Thorns)", 		"Use (Spell): Applies a self-buff, granting retaliation hits after parrying. This buff also grants a small bonus to resistance.", "", 
-				{ AT_BRV, AT_AGL, AT_AGL }},
+				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{  8, 'H', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
+	{  8, 'G', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
 				"", "", "", 
-				{ AT_INT, AT_AGL, AT_AGL }},
+				{ AT_INT, AT_INT, AT_AGL }},
 				
-	{  9, 'H', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
+	{  9, 'G', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
 				"", "", "", 
 				{ AT_INT, AT_INT, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 10, 'H', 	"Swimming", 			"Passive ability to prevent the loss of hitpoints while you are underwater.", 
+	{ 10, 'G', 	"Swimming", 			"Passive ability to prevent the loss of hitpoints while you are underwater.", 
 				"", "", "", 
 				{ AT_WIL, AT_AGL, AT_STR }},
 				
@@ -396,19 +396,19 @@ struct skilltab _skilltab[50]={
 				"Magic Shell", 			"Use (Spell): Applies a buff to yourself, granting temporary resistance and immunity.", "", 
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
-	{ 12, 'H', 	"Bartering", 			"Passive ability to get better prices while buying or selling.", 
+	{ 12, 'G', 	"Bartering", 			"Passive ability to get better prices while buying or selling.", 
 				"", "", "", 
-				{ AT_BRV, AT_INT, AT_INT }},
+				{ AT_BRV, AT_INT, AT_AGL }},
 				
 	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.", 
 				"", "", "", 
-				{ AT_INT, AT_AGL, AT_STR }},
+				{ AT_INT, AT_STR, AT_STR }},
 				
-	{ 14, 'F', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
-				"", "", "", 
-				{ AT_BRV, AT_WIL, AT_INT }},
+	{ 14, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of endurance over time.", 
+				"Rage (Furious)", 		"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of life over time.", "", 
+				{ AT_BRV, AT_BRV, AT_AGL }},
 				
-	{ 15, 'F', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location, after a brief delay.", 
+	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.", 
 				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
@@ -438,14 +438,14 @@ struct skilltab _skilltab[50]={
 				
 	{ 22, 'F', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.", 
 				"", "", "", 
-				{ AT_BRV, AT_WIL, AT_INT }},
+				{ AT_WIL, AT_WIL, AT_INT }},
 				
-	{ 23, 'H', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
+	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
 				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_STR }},
 				
 	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies.", 
-				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", "", 
+				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", "",  
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.", 
@@ -473,19 +473,19 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_INT, AT_INT, AT_INT }},
 				
-	{ 31, 'H', 	"Sense Magic", 			"Passive ability to sense who or what did something to you, and sense magical item drops.", 
+	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff to cooldown rate, and debuffs nearby enemy cooldown rate. Has a base radius of 5 tiles.", 
 				"", "", "", 
-				{ AT_WIL, AT_WIL, AT_STR }},
+				{ AT_BRV, AT_AGL, AT_AGL }},
 				
-	{ 32, 'H', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
-				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{ 33, 'H', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
+	{ 32, 'G', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{ 34, 'H', 	"Concentrate", 			"Passive ability to reduce the mana cost of spells and abilities.", 
+	{ 33, 'G', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{ 34, 'G', 	"Concentrate", 			"Passive ability to reduce the mana cost of spells and abilities.", 
 				"", "", "", 
 				{ AT_WIL, AT_WIL, AT_WIL }},
 				
@@ -497,43 +497,43 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their perception and hit and parry rates. Has a base radius of 2 tiles.", 
-				"Blind (Douse)", 		"Use (Skill): Applies a debuff to nearby enemies, reducing their stealth and spell modifier. Has a base radius of 2 tiles.", "", 
-				{ AT_BRV, AT_WIL, AT_AGL }},
+	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 4 tiles.", 
+				"Blind (Douse)", 		"Use (Skill): Applies a debuff to nearby enemies, reducing their stealth and spell modifier. Has a base radius of 4 tiles.", "", 
+				{ AT_BRV, AT_INT, AT_AGL }},
 				
-	{ 38, 'G', 	"Weapon Mastery", 		"Passive ability to improve weapon value granted by your equipped weapon.", 
+	{ 38, 'G', 	"Gear Mastery", 		"Passive ability to improve weapon and armor values granted by your equipment.", 
 				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_AGL }},
+				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{ 39, 'H', 	"Armor Mastery", 		"Passive ability to improve armor value granted by your equipped armor.", 
+	{ 39, 'G', 	"Safeguard", 			"Passive ability to reduce damage taken.", 
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies.", 
-				"Cleave (Bleed)", 		"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", "", 
+	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", 
+				"Cleave (Aggravate)",	"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take additional damage.", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon and armor values.", 
-				"Weaken (Greater)", 	"Use (Skill): Applies a debuff to your foe and surrounding enemies, greatly reducing their armor value.", "", 
+	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon value.", 
+				"Weaken (Crush)", 		"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their armor value.", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
-	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, reducing their immunity and causing them to take damage over time. Stacks up to 3 times.", 
-				"Poison (Venom)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their resistance and causing them to take damage over time. Does not stack.", "", 
+	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, causing them to take damage over time. Stacks up to 3 times.", 
+				"Poison (Venom)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their immunity and causing them to take damage over time. Does not stack.", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
-	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes. Has a base radius of 2 tiles.", 
-				"Pulse <Disabled>", 	"Passively applies a buff to your ghost companion, causing a repeating burst of energy to damage nearby foes. Has a base radius of 2 tiles.", "", 
+	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes. Has a base radius of 3 tiles.", 
+				"", "", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
-	{ 44, 'H', 	"Proximity", 			"Passively improves the area-of-effect of your Warcry, Taunt, and Surround Hit skills.", // Arch-Templar
-										"Passively improves the hit rate of your Surround Hit skill, and the area-of-effect of your Blind skill.", // Warrior
+	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of your Warcry, Taunt, and Surround Hit skills.", // Arch-Templar
+										"Passively improves the hit rate of your Surround Hit skill, and the area-of-effect of your Aria skill.", // Braver
 										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
-				{ AT_BRV, AT_BRV, AT_BRV }},
-				
-	{ 45, 'H', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
-				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 45, 'G', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
 				"", "", "", 
@@ -547,10 +547,16 @@ struct skilltab _skilltab[50]={
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy.", 
-				"Leap (Bleed)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy. This also applies a debuff, causing them to take damage over time.", "", 
-				{ AT_BRV, AT_AGL, AT_STR }}
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", 
+				"Leap (Random)", 		"Use (Skill): Strike your foe and leap to a random target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", "", 
+				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
+				"", "", "", 
+				{ 0, 0, 0 }},
+	{ 51, 'H', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location after a brief delay.", 
+				"", "", "", 
+				{ 0, 0, 0 }}
 };
 
 struct wpslist wpslist[MAXWPS]={
@@ -587,17 +593,28 @@ int skill_cmp(const void *a,const void *b)
 
 	m1=c->nr; m2=d->nr;
 	
-	if (m1==99 && m2!=99) return 1;
+	if (m1==99 && m2!=99) return  1;
 	if (m2==99 && m1!=99) return -1;
 	
-	if (pl.skill[m1][0]==0 && pl.skill[m2][0]!=0) return 1;
+	if (pl.skill[m1][0]==0 && pl.skill[m2][0]!=0) return  1;
 	if (pl.skill[m2][0]==0 && pl.skill[m1][0]!=0) return -1;
+	
+	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && 
+		(m1==50||m1==51) && 
+		(m2!=50&&m2!=51)) return -1;
+	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && 
+		(m2==50||m2==51) && 
+		(m1!=50&&m1!=51)) return  1;
 
-	// (m1==8||m1==23||m1==31||m1==32) // Stealth, Resistance, Sense-Magic, Immunity -- these are all active even if you don't know them.
-	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && (m1==8||m1==23||m1==31||m1==32) && (m2!=8&&m2!=23&&m2!=31&&m2!=32)) return -1;
-	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && (m2==8||m2==23||m2==31||m2==32) && (m1!=8&&m1!=23&&m1!=31&&m1!=32)) return 1;
-
-	if (c->sortkey>d->sortkey) return 1;
+	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
+	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && 
+		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==50||m1==51) && 
+		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=50&&m2!=51)) return -1;
+	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && 
+		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==50||m2==51) && 
+		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=50&&m1!=51)) return  1;
+	
+	if (c->sortkey>d->sortkey) return  1;
 	if (c->sortkey<d->sortkey) return -1;
 
 	return strcmp(c->name,d->name);
@@ -942,7 +959,7 @@ void display_meta_from_ls(void)
 	
 	// Player Cooldown and Cast Speed - WN_CLDWN
 	pl_coold = pl.worn[WN_CLDWN];
-	pl_casts = pl_speed + pl.worn_p[WN_CLDWN]; 
+	pl_casts = pl_speed/2 + pl.worn_p[WN_CLDWN]*2; 
 	
 	if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP; if (pl_casts < 0) pl_casts = 0;
 	
@@ -967,7 +984,7 @@ void display_meta_from_ls(void)
 	pl_dps   = (pl_dlow+pl_dhigh)/2*pl_atksp;
 	
 	// Player cooldown rate - pl_cdrate
-	pl_cdrate = 100 * pl_basel / max(100, pl_coold);
+	pl_cdrate = 100 * pl_basel / max(25, pl_coold);
 	
 	/*
 		Moon multiplier adjustments
@@ -1000,6 +1017,8 @@ void display_meta_from_ls(void)
 	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
 	sk_rally = sk_score(35)/10;
 	sk_shado = 15 + sk_score(46)*pl_spmod/500;
+	sk_weake = -(sk_score(41) / 5 + 2);
+	sk_taunt = (1000 - (sk_score(48))/4);
 	
 	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
 	{
@@ -1010,14 +1029,6 @@ void display_meta_from_ls(void)
 	{
 		sk_blind = -(sk_score(37) / 8 + 1);
 		sk_douse = -(sk_score(37) /12 + 1);
-	}
-	if (pl.kindred & (1u<<1))
-	{
-		sk_taunt = (1000 - (sk_score(48)*3/4)/2);
-	}
-	else
-	{
-		sk_taunt = (1000 - (sk_score(48))/2);
 	}
 	
 	// Tarot - Hanged Man (immunity&resistance)
@@ -1097,15 +1108,17 @@ void display_meta_from_ls(void)
 	}
 	
 	// Tarot - Justice (Cleave reduction)
+	/*
 	if (pl_flags & (1 <<  8))
 	{
 		sk_cleav = sk_cleav * 7 / 10;
 	}
+	*/
 	
 	// Tarot - Rev.Justice (Leap reduction)
 	if (pl_flagb & (1 <<  7))
 	{
-		sk_leapv = sk_leapv * 7 / 10;
+		sk_leapv = sk_leapv * 85/100;
 	}
 	
 	// Tarot - Temperance (Taunt reduction)
@@ -1114,22 +1127,14 @@ void display_meta_from_ls(void)
 		sk_taunt = sk_taunt * 7 / 10;
 	}
 	
-	// Tarot - Death (Weaken bonus)
-	if (pl_flags & (1 << 10))
-	{
-		sk_weake = -(sk_score(41) / 6 + 2);
-	}
-	else
-	{
-		sk_weake = -(sk_score(41) / 8 + 2);
-	}
+	
 	
 	/*
 		Regeneration stats
 	*/
-	race_reg = sk_score(28) * moonmult / 20;
-	race_res = sk_score(29) * moonmult / 20;
-	race_med = sk_score(30) * moonmult / 20;
+	race_reg = sk_score(28) * moonmult / 20 + sk_score(28) * pl.hp[5]/2000;
+	race_res = sk_score(29) * moonmult / 20 + sk_score(29) * pl.end[5]/2000;
+	race_med = sk_score(30) * moonmult / 20 + sk_score(30) * pl.mana[5]/2000;
 	
 	// Tarot - Moon :: While not full mana, life regen is mana regen
 	if ((pl_flags & (1 << 11)) && (pl.a_mana<pl.mana[5]))
@@ -1218,25 +1223,25 @@ void display_meta_from_ls(void)
 	// DRAW THE GUI INFO
 	switch (last_skill)
 	{												// ".............." // 
-		case 50: // Braveness - 1. Cast Speed 	2. Crit Chanc	3. Crit Multi	4. Prox Bonus 	5. eImmunity	6. eResist
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cast Speed");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_casts/100,pl_casts%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Crit Chance");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%5d.%02d%%",pl_critc/100,pl_critc%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Crit Multi");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%8d%%",pl_critm);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"E.Immunity");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_immun);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"E.Resist");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_resis);
+		case 60: // Braveness - 1. Cast Speed 	2. Crit Chanc	3. Crit Multi	4. Prox Bonus 	5. eImmunity	6. eResist
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Crit Chance");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%5d.%02d%%",pl_critc/100,pl_critc%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Crit Multi");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%8d%%",pl_critm);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"E.Immunity");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_immun);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"E.Resist");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_resis);
 				if (pl_reflc>0) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Thorns");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",pl_reflc);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Thorns");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",pl_reflc);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"UWater Degen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",sk_water/100,sk_water%100);
 			}
 			break;									// ".............." // 
-		case 51: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Aptitude Bonus");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",at_score(AT_WIL)/4);
+		case 61: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Cast Speed");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",pl_casts/100,pl_casts%100);
 				if (pl.skill[34][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Cost %");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_conce/100,sk_conce%100);
@@ -1246,15 +1251,14 @@ void display_meta_from_ls(void)
 			}	if (pl.skill[46][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Shadow Dur.");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%4d secs",sk_shado);
-			}	if (pl.skill[19][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Slow Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_slowv);
 			}	if (pl.skill[20][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Curse Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_curse);
 			}
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Aptitude Bonus");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",at_score(AT_WIL)/4);
 			break;									// ".............." // 
-		case 52: // Intuition - 1. Cooldown, 	2. Medit Rate, 	3. Blast DPH	4. Scorch Pow	5. Pulse DPH	6. Pulse Count
+		case 62: // Intuition - 1. Cooldown, 	2. Medit Rate, 	3. Blast DPH	4. Scorch Pow	5. Pulse DPH	6. Pulse Count
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cooldown Rate");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_cdrate/100,pl_cdrate%100);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Regen/s");
@@ -1275,7 +1279,7 @@ void display_meta_from_ls(void)
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_pucnt);
 			}
 			break;									// ".............." // 
-		case 53: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Zephyr DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
+		case 63: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Zephyr DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Endur. Regen/s");
@@ -1293,10 +1297,12 @@ void display_meta_from_ls(void)
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);
 			} }
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"UWater Degen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",sk_water/100,sk_water%100);
+			if (pl.skill[19][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Slow Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_slowv);
+			}	
 			break;									// ".............." // 
-		case 54: // Strength - 	1. Melee DPH, 	2. Regen Rate, 	3. Cleave DPH	4. Taunt Pow	5. Weaken Pow	6. Warcry Pow
+		case 64: // Strength - 	1. Melee DPH, 	2. Regen Rate, 	3. Cleave DPH	4. Taunt Pow	5. Weaken Pow	6. Warcry Pow
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%3d - %3d",pl_dlow,pl_dhigh);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Health Regen/s");
@@ -1335,9 +1341,9 @@ void display_meta_from_ls(void)
 	}
 	
 	// Draw red rectangle around selected last_skill, for context
-	if (last_skill >= 50 && last_skill <= 54)
+	if (last_skill >= 60 && last_skill <= 64)
 	{
-		dd_showbox(5,5+14*(last_skill-50),131,13,(unsigned short)(RED));
+		dd_showbox(5,5+14*(last_skill-60),131,13,(unsigned short)(RED));
 	}
 	
 	// Draw a moon icon?  261 212
@@ -1419,7 +1425,7 @@ void eng_display_win(int plr_sprite,int init)
 		}
 
 		// Scroll Bars for Skills and Inventory
-		dd_showbar(234,152+(skill_pos*58)/40+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+		dd_showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
 		dd_showbar(601, 36+(inv_pos * 18)/10, 11,22,(unsigned short)GUI_BAR_GRE);
 
 		// display info-texts
@@ -1501,8 +1507,20 @@ void eng_display_win(int plr_sprite,int init)
 		
 		for (n=0; n<10; n++) {
 			m=skilltab[n+skill_pos].nr;
-			if (!pl.skill[m][0]) {
-				if (m==8||m==23||m==31||m==32) // Stealth, Resistance, Sense-Magic, Immunity -- these are all active even if you don't know them.
+			if (m>=52)
+			{
+				dd_xputtext(9,(8+8*14)+n*14,1,"-");
+			}
+			else if (m>=50)
+			{
+				dd_xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+skill_pos].name);
+				dd_xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
+				continue;
+			}
+			else if (!pl.skill[m][0]) 
+			{
+				// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
+				if (m==8||m==23||m==28||m==29||m==30||m==32) 
 				{
 					dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
 					dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
@@ -2756,7 +2774,8 @@ int speedoMisc(int n)
 			
 		// 9 == Use skill, mostly casting
 		case    9:
-			miscSpeedValue -= map[n].ch_castspd;
+			miscSpeedValue  = map[n].ch_speed*5/4;
+			miscSpeedValue -= map[n].ch_castspd*3/2;
 			if (miscSpeedValue < 0) 
 			{
 				miscSpeedValue = 0;
@@ -2838,662 +2857,714 @@ int eng_char(int n)
 
 	if (map[n].flags&STUNNED) update=0;
 
-	switch (map[n].ch_status) {
-		// idle up
-		case    0:    map[n].obj_xoff=0; map[n].obj_yoff=0;
+	switch (map[n].ch_status) 
+	{
+		case   0:	// idle up
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			return map[n].ch_sprite+0+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			// idle down
-		case    1:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+8+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			// idle left
-		case    2:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+16+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			// idle right
-		case    3:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+24+do_idle(map[n].idle_ani,map[n].ch_sprite);
-
-			// idle left-up
-		case    4:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+32+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			// idle left-down
-		case    5:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+40+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			// idle right-up
-		case    6:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+48+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			// idle right-down
-		case    7:    map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) {
-				map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			}
-			return map[n].ch_sprite+56+do_idle(map[n].idle_ani,map[n].ch_sprite);
-
-			// walk up
-		case    16:
-		case    17:
-		case    18:
-		case    19:
-		case    20:
-		case    21: map[n].obj_xoff=-speedstep(n,16,8,update)/2;
+			tmp=SPF_IDLE_UP+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   1:	// idle down
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_DOWN+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   2:	// idle left
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_LEFT+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   3:	// idle right
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_RIGHT+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   4:	// idle left-up
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_LEFTUP+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   5:	// idle left-down
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_LEFTDOWN+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   6:	// idle right-up
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_RIGHTUP+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		case   7:	// idle right-down
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
+			tmp=SPF_IDLE_RIGHTDOWN+do_idle(map[n].idle_ani,map[n].ch_sprite);
+			break;
+		
+		case  16:	// walk up
+		case  17:
+		case  18:
+		case  19:
+		case  20:
+		case  21: 
+			map[n].obj_xoff=-speedstep(n,16,8,update)/2;
 			map[n].obj_yoff=speedstep(n,16,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-16)+64;
+			tmp=(map[n].ch_status-16)+SPF_WALK_UP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    22: map[n].obj_xoff=-speedstep(n,16,8,update)/2;
+			break;
+		case  22: 
+			map[n].obj_xoff=-speedstep(n,16,8,update)/2;
 			map[n].obj_yoff=speedstep(n,16,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-16)+64;
+			tmp=(map[n].ch_status-16)+SPF_WALK_UP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=16;
-			return tmp;
-		case    23:   map[n].obj_xoff=-speedstep(n,16,8,update)/2;
+			break;
+		case  23:   
+			map[n].obj_xoff=-speedstep(n,16,8,update)/2;
 			map[n].obj_yoff=speedstep(n,16,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-16)+64;
+			tmp=(map[n].ch_status-16)+SPF_WALK_UP;
 			if (speedo(n) && update) map[n].ch_status=16+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// walk down
-		case    24:
-		case    25:
-		case    26:
-		case    27:
-		case    28:
-		case    29: map[n].obj_xoff=speedstep(n,24,8,update)/2;
+			break;
+		
+		case  24:	// walk down
+		case  25:
+		case  26:
+		case  27:
+		case  28:
+		case  29: 
+			map[n].obj_xoff=speedstep(n,24,8,update)/2;
 			map[n].obj_yoff=-speedstep(n,24,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-24)+72;
+			tmp=(map[n].ch_status-24)+SPF_WALK_DOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    30: map[n].obj_xoff=speedstep(n,24,8,update)/2;
+			break;
+		case  30: 
+			map[n].obj_xoff=speedstep(n,24,8,update)/2;
 			map[n].obj_yoff=-speedstep(n,24,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-24)+72;
+			tmp=(map[n].ch_status-24)+SPF_WALK_DOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=24;
-			return tmp;
-		case    31:   map[n].obj_xoff=speedstep(n,24,8,update)/2;
+			break;
+		case  31:   
+			map[n].obj_xoff=speedstep(n,24,8,update)/2;
 			map[n].obj_yoff=-speedstep(n,24,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-24)+72;
+			tmp=(map[n].ch_status-24)+SPF_WALK_DOWN;
 			if (speedo(n) && update) map[n].ch_status=24+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// walk left
-		case    32:
-		case    33:
-		case    34:
-		case    35:
-		case    36:
-		case    37: map[n].obj_xoff=-speedstep(n,32,8,update)/2;
+			break;
+		
+		case  32:	// walk left
+		case  33:
+		case  34:
+		case  35:
+		case  36:
+		case  37: 
+			map[n].obj_xoff=-speedstep(n,32,8,update)/2;
 			map[n].obj_yoff=-speedstep(n,32,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-32)+80;
+			tmp=(map[n].ch_status-32)+SPF_WALK_LEFT;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    38: map[n].obj_xoff=-speedstep(n,32,8,update)/2;
+			break;
+		case  38: 
+			map[n].obj_xoff=-speedstep(n,32,8,update)/2;
 			map[n].obj_yoff=-speedstep(n,32,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-32)+80;
+			tmp=(map[n].ch_status-32)+SPF_WALK_LEFT;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=32;
-			return tmp;
-		case    39:   map[n].obj_xoff=-speedstep(n,32,8,update)/2;
+			break;
+		case  39:   
+			map[n].obj_xoff=-speedstep(n,32,8,update)/2;
 			map[n].obj_yoff=-speedstep(n,32,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-32)+80;
+			tmp=(map[n].ch_status-32)+SPF_WALK_LEFT;
 			if (speedo(n) && update) map[n].ch_status=32+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// walk right
-		case    40:
-		case    41:
-		case    42:
-		case    43:
-		case    44:
-		case    45: map[n].obj_xoff=speedstep(n,40,8,update)/2;
+			break;
+		
+		case  40:	// walk right
+		case  41:
+		case  42:
+		case  43:
+		case  44:
+		case  45: 
+			map[n].obj_xoff=speedstep(n,40,8,update)/2;
 			map[n].obj_yoff=speedstep(n,40,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-40)+88;
+			tmp=(map[n].ch_status-40)+SPF_WALK_RIGHT;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    46: map[n].obj_xoff=speedstep(n,40,8,update)/2;
+			break;
+		case  46: 
+			map[n].obj_xoff=speedstep(n,40,8,update)/2;
 			map[n].obj_yoff=speedstep(n,40,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-40)+88;
+			tmp=(map[n].ch_status-40)+SPF_WALK_RIGHT;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=40;
-			return tmp;
-		case    47:   map[n].obj_xoff=speedstep(n,40,8,update)/2;
+			break;
+		case  47:   
+			map[n].obj_xoff=speedstep(n,40,8,update)/2;
 			map[n].obj_yoff=speedstep(n,40,8,update)/4;
-			tmp=map[n].ch_sprite+(map[n].ch_status-40)+88;
+			tmp=(map[n].ch_status-40)+SPF_WALK_RIGHT;
 			if (speedo(n) && update) map[n].ch_status=40+((speedo(n)>1)?1:0);
-			return tmp;
-
-
-			// left+up
-		case    48:
-		case    49:
-		case    50:
-		case    51:
-		case    52:
-		case    53:
-		case    54:
-		case    55:
-		case    56:
-		case    57:   map[n].obj_xoff=-speedstep(n,48,12,update);
+			break;
+		
+		case  48:	// left+up
+		case  49:
+		case  50:
+		case  51:
+		case  52:
+		case  53:
+		case  54:
+		case  55:
+		case  56:
+		case  57:   
+			map[n].obj_xoff=-speedstep(n,48,12,update);
 			map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-48)*8/12+96;
+			tmp=(map[n].ch_status-48)*8/12+SPF_WALK_LEFTUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    58:   map[n].obj_xoff=-speedstep(n,48,12,update);
+			break;
+		case  58:  
+			map[n].obj_xoff=-speedstep(n,48,12,update);
 			map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-48)*8/12+96;
+			tmp=(map[n].ch_status-48)*8/12+SPF_WALK_LEFTUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=48;
-			return tmp;
-		case    59:   map[n].obj_xoff=-speedstep(n,48,12,update);
+			break;
+		case  59:   
+			map[n].obj_xoff=-speedstep(n,48,12,update);
 			map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-48)*8/12+96;
+			tmp=(map[n].ch_status-48)*8/12+SPF_WALK_LEFTUP;
 			if (speedo(n) && update) map[n].ch_status=48+((speedo(n)>1)?1:0);
-			return tmp;
-
-
-			// left+down
-		case    60:
-		case    61:
-		case    62:
-		case    63:
-		case    64:
-		case    65:
-		case    66:
-		case    67:
-		case    68:
-		case    69:   map[n].obj_xoff=0;
+			break;
+		
+		case  60:	// left+down
+		case  61:
+		case  62:
+		case  63:
+		case  64:
+		case  65:
+		case  66:
+		case  67:
+		case  68:
+		case  69:   
+			map[n].obj_xoff=0;
 			map[n].obj_yoff=-speedstep(n,60,12,update)/2;
-			tmp=map[n].ch_sprite+(map[n].ch_status-60)*8/12+104;
+			tmp=(map[n].ch_status-60)*8/12+SPF_WALK_LEFTDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    70:   map[n].obj_xoff=0;
+			break;
+		case  70:   
+			map[n].obj_xoff=0;
 			map[n].obj_yoff=-speedstep(n,60,12,update)/2;
-			tmp=map[n].ch_sprite+(map[n].ch_status-60)*8/12+104;
+			tmp=(map[n].ch_status-60)*8/12+SPF_WALK_LEFTDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=60;
-			return tmp;
-		case    71:   map[n].obj_xoff=0;
+			break;
+		case  71:   
+			map[n].obj_xoff=0;
 			map[n].obj_yoff=-speedstep(n,60,12,update)/2;
-			tmp=map[n].ch_sprite+(map[n].ch_status-60)*8/12+104;
+			tmp=(map[n].ch_status-60)*8/12+SPF_WALK_LEFTDOWN;
 			if (speedo(n) && update) map[n].ch_status=60+((speedo(n)>1)?1:0);
-			return tmp;
-
-
-			// right+up
-		case    72:
-		case    73:
-		case    74:
-		case    75:
-		case    76:
-		case    77:
-		case    78:
-		case    79:
-		case    80:
-		case    81:   map[n].obj_xoff=0;
+			break;
+		
+		case  72:	// right+up
+		case  73:
+		case  74:
+		case  75:
+		case  76:
+		case  77:
+		case  78:
+		case  79:
+		case  80:
+		case  81:   
+			map[n].obj_xoff=0;
 			map[n].obj_yoff=speedstep(n,72,12,update)/2;
-			tmp=map[n].ch_sprite+(map[n].ch_status-72)*8/12+112;
+			tmp=(map[n].ch_status-72)*8/12+SPF_WALK_RIGHTUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    82:   map[n].obj_xoff=0;
+			break;
+		case  82:   
+			map[n].obj_xoff=0;
 			map[n].obj_yoff=speedstep(n,72,12,update)/2;
-			tmp=map[n].ch_sprite+(map[n].ch_status-72)*8/12+112;
+			tmp=(map[n].ch_status-72)*8/12+SPF_WALK_RIGHTUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=72;
-			return tmp;
-		case    83:   map[n].obj_xoff=0;
+			break;
+		case  83:   
+			map[n].obj_xoff=0;
 			map[n].obj_yoff=speedstep(n,72,12,update)/2;
-			tmp=map[n].ch_sprite+(map[n].ch_status-72)*8/12+112;
+			tmp=(map[n].ch_status-72)*8/12+SPF_WALK_RIGHTUP;
 			if (speedo(n) && update) map[n].ch_status=72+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// right+down
-		case    84:
-		case    85:
-		case    86:
-		case    87:
-		case    88:
-		case    89:
-		case    90:
-		case    91:
-		case    92:
-		case    93:   map[n].obj_xoff=speedstep(n,84,12,update);
+			break;
+		
+		case  84:	// right+down
+		case  85:
+		case  86:
+		case  87:
+		case  88:
+		case  89:
+		case  90:
+		case  91:
+		case  92:
+		case  93:   
+			map[n].obj_xoff=speedstep(n,84,12,update);
 			map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-84)*8/12+120;
+			tmp=(map[n].ch_status-84)*8/12+SPF_WALK_RIGHTDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    94:   map[n].obj_xoff=speedstep(n,84,12,update);
+			break;
+		case  94:   
+			map[n].obj_xoff=speedstep(n,84,12,update);
 			map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-84)*8/12+120;
+			tmp=(map[n].ch_status-84)*8/12+SPF_WALK_RIGHTDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=84;
-			return tmp;
-		case    95:   map[n].obj_xoff=speedstep(n,84,12,update);
+			break;
+		case  95:   
+			map[n].obj_xoff=speedstep(n,84,12,update);
 			map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-84)*8/12+120;
+			tmp=(map[n].ch_status-84)*8/12+SPF_WALK_RIGHTDOWN;
 			if (speedo(n) && update) map[n].ch_status=84+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn up to left-up
-		case    96:
-		case    97: map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-96)+128;
+			break;
+		
+		case  96:	// turn up to left-up
+		case  97: 
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-96)+SPF_TURN_UPLEFTUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case    98: map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-96)+128;
+			break;
+		case  98: 
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-96)+SPF_TURN_UPLEFTUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=96;
-			return tmp;
-		case    99: map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-96)+128;
+			break;
+		case  99: 
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-96)+SPF_TURN_UPLEFTUP;
 			if (speedo(n) && update) map[n].ch_status=96+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn left-up to up
-		case 100:
-		case 101:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-100)+132;
+			break;
+		
+		case 100:	// turn left-up to up
+		case 101:  
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-100)+SPF_TURN_LEFTUPUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 102:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-100)+132;
+			break;
+		case 102:  
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-100)+SPF_TURN_LEFTUPUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=100;
-			return tmp;
-		case 103:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-100)+132;
+			break;
+		case 103:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-100)+SPF_TURN_LEFTUPUP;
 			if (speedo(n) && update) map[n].ch_status=100+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn up to right-up
-		case 104:
-		case 105:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-104)+136;
+			break;
+		
+		case 104:	// turn up to right-up
+		case 105:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-104)+SPF_TURN_UPRIGHTUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 106:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-104)+136;
+			break;
+		case 106:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-104)+SPF_TURN_UPRIGHTUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=104;
-			return tmp;
-		case 107:   tmp=map[n].ch_sprite+(map[n].ch_status-104)+136;
+			break;
+		case 107:   
+			tmp=(map[n].ch_status-104)+SPF_TURN_UPRIGHTUP;
 			if (speedo(n) && update) map[n].ch_status=104+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn right-up to right
-		case 108:
-		case 109:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-108)+140;
+			break;
+		
+		case 108:	// turn right-up to right
+		case 109:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-108)+SPF_TURN_RIGHTUPRIGHT;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 110:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-108)+140;
+			break;
+		case 110:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-108)+SPF_TURN_RIGHTUPRIGHT;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=108;
-			return tmp;
-		case 111:   tmp=map[n].ch_sprite+(map[n].ch_status-108)+140;
+			break;
+		case 111:   
+			tmp=(map[n].ch_status-108)+SPF_TURN_RIGHTUPRIGHT;
 			if (speedo(n) && update) map[n].ch_status=108+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn down to left-down
-		case 112:
-		case 113:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-112)+144;
+			break;
+		
+		case 112:	// turn down to left-down
+		case 113: 
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-112)+SPF_TURN_DOWNLEFTDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 114:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-112)+144;
+			break;
+		case 114: 
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-112)+SPF_TURN_DOWNLEFTDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=112;
-			return tmp;
-		case 115:   tmp=map[n].ch_sprite+(map[n].ch_status-112)+144;
+			break;
+		case 115: 
+			tmp=(map[n].ch_status-112)+SPF_TURN_DOWNLEFTDOWN;
 			if (speedo(n) && update) map[n].ch_status=112+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn left-down to left
-		case 116:
-		case 117:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-116)+148;
+			break;
+		
+		case 116:	// turn left-down to left
+		case 117:  
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-116)+SPF_TURN_LEFTDOWNLEFT;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 118:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-116)+148;
+			break;
+		case 118:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-116)+SPF_TURN_LEFTDOWNLEFT;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=116;
-			return tmp;
-		case 119:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-116)+148;
+			break;
+		case 119:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-116)+SPF_TURN_LEFTDOWNLEFT;
 			if (speedo(n) && update) map[n].ch_status=116+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn down to right-down
-		case 120:
-		case 121:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-120)+152;
+			break;
+		
+		case 120:	// turn down to right-down
+		case 121:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-120)+SPF_TURN_DOWNRIGHTDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 122:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-120)+152;
+			break;
+		case 122:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-120)+SPF_TURN_DOWNRIGHTDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=120;
-			return tmp;
-		case 123:   tmp=map[n].ch_sprite+(map[n].ch_status-120)+152;
+			break;
+		case 123:   
+			tmp=(map[n].ch_status-120)+SPF_TURN_DOWNRIGHTDOWN;
 			if (speedo(n) && update) map[n].ch_status=120+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn right-down to down
-		case 124:
-		case 125:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-124)+156;
+			break;
+		
+		case 124:	// turn right-down to down
+		case 125:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-124)+SPF_TURN_RIGHTDOWNDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 126:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-124)+156;
+			break;
+		case 126:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-124)+SPF_TURN_RIGHTDOWNDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=124;
-			return tmp;
-		case 127:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-124)+156;
+			break;
+		case 127:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-124)+SPF_TURN_RIGHTDOWNDOWN;
 			if (speedo(n) && update) map[n].ch_status=124+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn left to left-up
-		case 128:
-		case 129:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-128)+160;
+			break;
+		
+		case 128:	// turn left to left-up
+		case 129:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-128)+SPF_TURN_LEFTLEFTUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 130:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-128)+160;
+			break;
+		case 130:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-128)+SPF_TURN_LEFTLEFTUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=128;
-			return tmp;
-		case 131:   tmp=map[n].ch_sprite+(map[n].ch_status-128)+160;
+			break;
+		case 131:   
+			tmp=(map[n].ch_status-128)+SPF_TURN_LEFTLEFTUP;
 			if (speedo(n) && update) map[n].ch_status=128+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn left-up to up
-		case 132:
-		case 133:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-132)+164;
+			break;
+		
+		case 132:	// turn left-up to left
+		case 133:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-132)+SPF_TURN_LEFTUPLEFT;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 134:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-132)+164;
+			break;
+		case 134:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-132)+SPF_TURN_LEFTUPLEFT;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=132;
-			return tmp;
-		case 135:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-132)+164;
+			break;
+		case 135:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-132)+SPF_TURN_LEFTUPLEFT;
 			if (speedo(n) && update) map[n].ch_status=132+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn left to left-down
-		case 136:
-		case 137:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-136)+168;
+			break;
+		
+		case 136:	// turn left to left-down
+		case 137:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-136)+SPF_TURN_LEFTLEFTDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 138:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-136)+168;
+			break;
+		case 138:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-136)+SPF_TURN_LEFTLEFTDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=136;
-			return tmp;
-		case 139:   tmp=map[n].ch_sprite+(map[n].ch_status-136)+168;
+			break;
+		case 139:   
+			tmp=(map[n].ch_status-136)+SPF_TURN_LEFTLEFTDOWN;
 			if (speedo(n) && update) map[n].ch_status=136+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn left-down to down
-		case 140:
-		case 141:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-140)+172;
+			break;
+		
+		case 140:	// turn left-down to down
+		case 141:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-140)+SPF_TURN_LEFTDOWNDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 142:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-140)+172;
+			break;
+		case 142:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-140)+SPF_TURN_LEFTDOWNDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=140;
-			return tmp;
-		case 143:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-140)+172;
+			break;
+		case 143:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-140)+SPF_TURN_LEFTDOWNDOWN;
 			if (speedo(n) && update) map[n].ch_status=140+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn right to right-up
-		case 144:
-		case 145:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-144)+176;
+			break;
+		
+		case 144:	// turn right to right-up
+		case 145:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-144)+SPF_TURN_RIGHTRIGHTUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 146:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-144)+176;
+			break;
+		case 146:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-144)+SPF_TURN_RIGHTRIGHTUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=144;
-			return tmp;
-		case 147:   tmp=map[n].ch_sprite+(map[n].ch_status-144)+176;
+			break;
+		case 147:   
+			tmp=(map[n].ch_status-144)+SPF_TURN_RIGHTRIGHTUP;
 			if (speedo(n) && update) map[n].ch_status=144+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn right-up to up
-		case 148:
-		case 149:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-148)+180;
+			break;
+		
+		case 148:	// turn right-up to up
+		case 149:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-148)+SPF_TURN_RIGHTUPUP;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 150:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-148)+180;
+			break;
+		case 150:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-148)+SPF_TURN_RIGHTUPUP;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=148;
-			return tmp;
-		case 151:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-148)+180;
+			break;
+		case 151:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-148)+SPF_TURN_RIGHTUPUP;
 			if (speedo(n) && update) map[n].ch_status=148+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn right to right-down
-		case 152:
-		case 153:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-152)+184;
+			break;
+		
+		case 152:	// turn right to right-down
+		case 153:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-152)+SPF_TURN_RIGHTRIGHTDOWN;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 154:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-152)+184;
+			break;
+		case 154:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-152)+SPF_TURN_RIGHTRIGHTDOWN;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=152;
-			return tmp;
-		case 155:   tmp=map[n].ch_sprite+(map[n].ch_status-152)+184;
+			break;
+		case 155:   
+			tmp=(map[n].ch_status-152)+SPF_TURN_RIGHTRIGHTDOWN;
 			if (speedo(n) && update) map[n].ch_status=152+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// turn right-down to down
-		case 156:
-		case 157:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-156)+188;
+			break;
+		
+		case 156:	// turn right-down to down
+		case 157:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-156)+SPF_TURN_RIGHTDOWNRIGHT;
 			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			return tmp;
-		case 158:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-156)+188;
+			break;
+		case 158:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-156)+SPF_TURN_RIGHTDOWNRIGHT;
 			if (speedo(n)==1 && update) map[n].ch_status++;
 			else if (speedo(n)>1 && update) map[n].ch_status=156;
-			return tmp;
-		case 159:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-156)+188;
+			break;
+		case 159:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-156)+SPF_TURN_RIGHTDOWNRIGHT;
 			if (speedo(n) && update) map[n].ch_status=156+((speedo(n)>1)?1:0);
-			return tmp;
-
-			// misc up
-		case 160:
+			break;
+		
+		case 160:	// misc up
 		case 161:
 		case 162:
 		case 163:
 		case 164:
-		case 165:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-160)+192+((int)(stattab[map[n].ch_stat_off])<<5);
+		case 165:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			return tmp;
-		case 166:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-160)+192+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 166:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=160;
-			return tmp;
-		case 167:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-160)+192+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 167:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=160+((speedoMisc(n)>1)?1:0);
-			return tmp;
-
-			// misc down
-		case 168:
+			break;
+		
+		case 168:	// misc down
 		case 169:
 		case 170:
 		case 171:
 		case 172:
-		case 173:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-168)+200+((int)(stattab[map[n].ch_stat_off])<<5);
+		case 173:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			return tmp;
-		case 174:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-168)+200+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 174:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=168;
-			return tmp;
-		case 175:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-168)+200+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 175:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=168+((speedoMisc(n)>1)?1:0);
-			return tmp;
-
-			// misc left
-		case 176:
+			break;
+		
+		case 176:	// misc left
 		case 177:
 		case 178:
 		case 179:
 		case 180:
-		case 181:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-176)+208+((int)(stattab[map[n].ch_stat_off])<<5);
+		case 181:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			return tmp;
-		case 182:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-176)+208+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 182:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=176;
-			return tmp;
-		case 183:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-176)+208+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 183:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=176+((speedoMisc(n)>1)?1:0);
-			return tmp;
-
-			// misc right
-		case 184:
+			break;
+		
+		case 184:	// misc right
 		case 185:
 		case 186:
 		case 187:
 		case 188:
-		case 189:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-184)+216+((int)(stattab[map[n].ch_stat_off])<<5);
+		case 189:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			return tmp;
-		case 190:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-184)+216+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 190:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=184;
-			return tmp;
-		case 191:   map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=map[n].ch_sprite+(map[n].ch_status-184)+216+((int)(stattab[map[n].ch_stat_off])<<5);
+			break;
+		case 191:   
+			map[n].obj_xoff=0; map[n].obj_yoff=0;
+			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=184+((speedoMisc(n)>1)?1:0);
-			return tmp;
+			break;
 
-		default:        xlog(0,"Unknown ch_status %d",map[n].ch_status);
-			return map[n].ch_sprite;
+		default:        
+			xlog(0,"Unknown ch_status %d",map[n].ch_status);
+			return 0;
 	}
+	
+	return tmp;
 }
 
 int eng_item(int n)
 {
-	switch (map[n].it_status) {
-		case    0:      return map[n].it_sprite;
-		case    1:      return map[n].it_sprite;
+	switch (map[n].it_status) 
+	{
+		case 0: return map[n].it_sprite;
+		case 1: return map[n].it_sprite;
 
 			// four sprite animation, 2-step
-		case    2:    if (speedtab[200][ctick]) map[n].it_status++;	// adjusted these speedtab values from 10 to 24 to 200
+		case 2: if (speedtab[200][ctick]) map[n].it_status++;	// adjusted these speedtab values from 10 to 24 to 200
 			return map[n].it_sprite;
 
-		case    3:    if (speedtab[200][ctick]) map[n].it_status++;
+		case 3: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+2;
 
-		case    4:    if (speedtab[200][ctick]) map[n].it_status++;
+		case 4: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+4;
 
-		case    5:    if (speedtab[200][ctick]) map[n].it_status=2;
+		case 5: if (speedtab[200][ctick]) map[n].it_status=2;
 			return map[n].it_sprite+6;
 
 			// two sprite animation, 1-step
-		case    6:    if (speedtab[200][ctick]) map[n].it_status++;
+		case 6: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite;
 
-		case    7:    if (speedtab[200][ctick]) map[n].it_status=6;
+		case 7: if (speedtab[200][ctick]) map[n].it_status=6;
 			return map[n].it_sprite+1;
 
 			// eight sprite animation, 1-step
-		case    8:    if (speedtab[200][ctick]) map[n].it_status++;
+		case 8: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite;
 
-		case    9:    if (speedtab[200][ctick]) map[n].it_status++;
+		case 9: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+1;
 
-		case    10:   if (speedtab[200][ctick]) map[n].it_status++;
+		case 10: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+2;
 
-		case    11:   if (speedtab[200][ctick]) map[n].it_status++;
+		case 11: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+3;
 
-		case   12:   if (speedtab[200][ctick]) map[n].it_status++;
+		case 12: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+4;
 
-		case    13:   if (speedtab[200][ctick]) map[n].it_status++;
+		case 13: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+5;
 
-		case    14:   if (speedtab[200][ctick]) map[n].it_status++;
+		case 14: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite+6;
 
-		case    15:   if (speedtab[200][ctick]) map[n].it_status=8;
+		case 15: if (speedtab[200][ctick]) map[n].it_status=8;
 			return map[n].it_sprite+7;
 
 			// five sprite animation, 1-step, random
-		case    16:   if (speedtab[200][ctick]) map[n].it_status++;
+		case 16: if (speedtab[200][ctick]) map[n].it_status++;
 			return map[n].it_sprite;
 
-		case    17:   if (speedtab[200][ctick]) map[n].it_status++;
-				return map[n].it_sprite+1;
+		case 17: if (speedtab[200][ctick]) map[n].it_status++;
+			return map[n].it_sprite+1;
 
-		case    18:   	if (speedtab[200][ctick]) map[n].it_status++;
-				return map[n].it_sprite+2;
+		case 18: if (speedtab[200][ctick]) map[n].it_status++;
+			return map[n].it_sprite+2;
 
-		case    19:   	if (speedtab[200][ctick]) map[n].it_status++;
-				return map[n].it_sprite+3;
+		case 19: if (speedtab[200][ctick]) map[n].it_status++;
+			return map[n].it_sprite+3;
 
-		case   20:   	if (speedtab[200][ctick]) map[n].it_status=16;
-				return map[n].it_sprite+4;
+		case 20: if (speedtab[200][ctick]) map[n].it_status=16;
+			return map[n].it_sprite+4;
 
-		case   21:  return map[n].it_sprite+(ticker&63);
+		case 21: 
+			return map[n].it_sprite+(ticker&63);
 
-		default:        xlog(0,"Unknown it_status");
-				return map[n].it_sprite;
+		default: xlog(0,"Unknown it_status");
+			return map[n].it_sprite;
 	}
 }
 
@@ -3523,8 +3594,10 @@ void engine_tick(void)
 
 		// character
 		if (map[n].ch_sprite) {
+			// eng_char has been modified to only pull the animation frame value.  -- Zarro 12/29/2021
 			tmp=eng_char(n);
-			map[n].obj2=tmp;
+			map[n].obj2=map[n].ch_sprite+tmp;
+			//map[n].obj2f=tmp;
 		}
 	}
 }
@@ -3537,26 +3610,26 @@ void send_opt(void)
 
 	buf[0]=CL_CMD_SETUSER;
 
-	switch (state) {
-		case    0:  buf[1]=0; buf[2]=0; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n];
-			xlog(1,"Transfering user data..."); break;
-		case    1: buf[1]=0; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+13]; break;
-		case    2:  buf[1]=0; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+26]; break;
-		case    3:  buf[1]=0; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+39]; break;
-		case    4: buf[1]=0; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+52]; break;
-		case    5: buf[1]=0; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+65]; break;
+	switch (state) 
+	{
+		case  0: buf[1]=0; buf[2]= 0; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n];    xlog(1,"Transfering user data..."); break;
+		case  1: buf[1]=0; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+13]; break;
+		case  2: buf[1]=0; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+26]; break;
+		case  3: buf[1]=0; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+39]; break;
+		case  4: buf[1]=0; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+52]; break;
+		case  5: buf[1]=0; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+65]; break;
 
-		case  6:    buf[1]=1; buf[2]=0; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n]; break;
-		case  7: buf[1]=1; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+13]; break;
-		case  8:    buf[1]=1; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+26]; break;
-		case  9:    buf[1]=1; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+39]; break;
-		case 10: buf[1]=1; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+52]; break;
-		case 11: buf[1]=1; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+65]; break;
+		case  6: buf[1]=1; buf[2]= 0; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n];     break;
+		case  7: buf[1]=1; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+13];  break;
+		case  8: buf[1]=1; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+26];  break;
+		case  9: buf[1]=1; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+39];  break;
+		case 10: buf[1]=1; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+52];  break;
+		case 11: buf[1]=1; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+65];  break;
 
-		case 12:    buf[1]=2; buf[2]=0; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+78]; break;
-		case 13: buf[1]=2; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+91]; break;
-		case 14:    buf[1]=2; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+104]; break;
-		case 15:    buf[1]=2; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+117]; break;
+		case 12: buf[1]=2; buf[2]= 0; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+78];  break;
+		case 13: buf[1]=2; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+91];  break;
+		case 14: buf[1]=2; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+104]; break;
+		case 15: buf[1]=2; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+117]; break;
 		case 16: buf[1]=2; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+130]; break;
 		case 17: buf[1]=2; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+143];
 			pdata.changed=0; save_options();
@@ -3572,11 +3645,13 @@ int maynotquit=TICKS*5/TICKMULTI;
 
 void cmd_exit(void)
 {
-	if (do_exit || !maynotquit) {
+	if (do_exit || !maynotquit) 
+	{
 		quit=1;
 		return;
 	}
-	if (!firstquit) {
+	if (!firstquit) 
+	{
 		xlog(0," ");
 		xlog(0,"(F12) Leaving the game without entering a tavern will cause you to take damage, and possibly lose your life. Click again if you need to leave immediately.");
 		xlog(0,"A tavern will be located near where you entered the game.");
@@ -3584,7 +3659,8 @@ void cmd_exit(void)
 		return;
 	}
 
-	if (!wantquit) {
+	if (!wantquit) 
+	{
 		cmd1(CL_CMD_EXIT,0);
 		wantquit=1;
 		xlog(0," ");
@@ -3604,7 +3680,8 @@ void engine(void)
 	unsigned int t;
 
 	skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
-	for (n=0; n<MAXSKILL; n++) {
+	for (n=0; n<MAXSKILL; n++) 
+	{
 		skilltab[n]=_skilltab[n];
 		skilltab[n].attrib[0]=1;
 	}
@@ -3613,13 +3690,15 @@ void engine(void)
 
 	t=GetTickCount();
 
-	while (!quit) {
+	while (!quit) 
+	{
 		do_msg();
 		if (wantquit && maynotquit)	maynotquit--;
 
 		if (do_ticker && (ticker&15)==0) cmd1s(CL_CMD_CTICK,ticker);
 
-		if (step++>16) {
+		if (step++>16) 
+		{
 			pskip=100.0*(float)skip/(float)frame;
 			pidle=100.0*(float)idle/(float)xtime;
             skip=frame=0;
@@ -3630,7 +3709,8 @@ void engine(void)
 		frame++;
 
 		lookstep++;
-		if (lookat && lookstep>QSIZE*3) {
+		if (lookat && lookstep>QSIZE*3) 
+		{
 			if (lookat>=lookmax || looks[lookat].known==0)
 				cmd1s(CL_CMD_AUTOLOOK,lookat);
 			lookat=0;
@@ -3640,25 +3720,29 @@ void engine(void)
 		if (look_timer)	look_timer--;
 		else show_look=0;
 
-		if ((show_shop) && lookstep>QSIZE) {
+		if ((show_shop) && lookstep>QSIZE) 
+		{
 			cmd1s(CL_CMD_LOOK,shop.nr);
 			lookstep=0;
 		}
 
 		optstep++;
-		if (optstep>4 && pdata.changed) {
+		if (optstep>4 && pdata.changed) 
+		{
 			send_opt();
 			optstep=0;
 		}
 
 		if (xtime>0) xtimer--;
 
-		if (xmove && xtimer<1) {
-			switch (xmove) {
-				case  1:     cmds(CL_CMD_MOVE,map[(RENDERDIST/2-7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2-7)+screen_renderdist*RENDERDIST/2].y); break;
-				case  3:     cmds(CL_CMD_MOVE,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].y); break;
-				case  2:     cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].y); break;
-				case  4:     cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].y); break;
+		if (xmove && xtimer<1) 
+		{
+			switch (xmove) 
+			{
+				case 1: cmds(CL_CMD_MOVE,map[(RENDERDIST/2-7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2-7)+screen_renderdist*RENDERDIST/2].y); break;
+				case 3: cmds(CL_CMD_MOVE,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].y); break;
+				case 2: cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].y); break;
+				case 4: cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].y); break;
 			}
 			xtimer=4;
 		}
@@ -3676,7 +3760,8 @@ void engine(void)
 
 		do_msg();
 
-		if (noshop>0) {
+		if (noshop>0) 
+		{
 			noshop--;
 			show_shop=0;
 			show_wps=0;
@@ -3684,11 +3769,14 @@ void engine(void)
 			show_newp=0;
 			show_tuto=0;
 		}
-		if (t>GetTickCount() || skipinrow>100) {	// display frame only if we've got enough time
+		if (t>GetTickCount() || skipinrow>100)	// display frame only if we've got enough time
+		{
 			eng_display(init);
 			eng_flip(t);
 			skipinrow=0;
-		} else {
+		} 
+		else 
+		{
 			skip++; skipinrow++;
 		}
 

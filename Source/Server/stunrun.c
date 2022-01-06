@@ -36,17 +36,47 @@
 // data[50] to data[70] are safe to use:
 // data[50] to data[69]: timer for seen array
 
-#define GROLMY_X_1	308 // Top left corner of outer door area
-#define GROLMY_X_2	326 // Bottom right corner of outer door area
-#define GROLMY_X_3	325 // Far wander point A
-#define GROLMY_X_4	326 // Far wander point B
-#define GROLMY_X_5	313 // Home on rug
 
-#define GROLMY_Y_1	488 // Top left corner of outer door area
-#define GROLMY_Y_2	496 // Bottom right corner of outer door area
-#define GROLMY_Y_3	454 // Far wander point A
-#define GROLMY_Y_4	455 // Far wander point B
-#define GROLMY_Y_5	511 // Home on rug
+// Top left corner of outer door area
+#define GROLMY_X_1	308
+#define GROLMY_Y_1	488
+
+// Bottom right corner of outer door area
+#define GROLMY_X_2	326
+#define GROLMY_Y_2	496
+
+// Far wander point A
+#define GROLMY_X_3	325
+#define GROLMY_Y_3	454
+
+// Far wander point B
+#define GROLMY_X_4	326
+#define GROLMY_Y_4	455
+
+// Home on rug
+#define GROLMY_X_5	313
+#define GROLMY_Y_5	511
+
+
+// Top left corner of outer door area
+#define SEAGROLMY_X_1	311
+#define SEAGROLMY_Y_1	263
+
+// Bottom right corner of outer door area
+#define SEAGROLMY_X_2	315
+#define SEAGROLMY_Y_2	271
+
+// Far wander point A
+#define SEAGROLMY_X_3	312
+#define SEAGROLMY_Y_3	246
+
+// Far wander point B
+#define SEAGROLMY_X_4	320
+#define SEAGROLMY_Y_4	254
+
+// Home on rug
+#define SEAGROLMY_X_5	313
+#define SEAGROLMY_Y_5	278
 
 
 //{
@@ -774,6 +804,27 @@ int npc_stunrun_high(int cn)
 
 	if (!done)
 	{
+		int x, y, xt1, yt1, xt2, yt2, xt3, yt3, xt4, yt4, xt5, yt5, keyitem;
+		
+		if (ch[cn].data[26]==15) // Seagrel
+		{
+			xt1 = SEAGROLMY_X_1; yt1 = SEAGROLMY_Y_1;
+			xt2 = SEAGROLMY_X_2; yt2 = SEAGROLMY_Y_2;
+			xt3 = SEAGROLMY_X_3; yt3 = SEAGROLMY_Y_3;
+			xt4 = SEAGROLMY_X_4; yt4 = SEAGROLMY_Y_4;
+			xt5 = SEAGROLMY_X_5; yt5 = SEAGROLMY_Y_5;
+			keyitem = 1927;
+		}
+		else // Normal Grolmy
+		{
+			xt1 = GROLMY_X_1; yt1 = GROLMY_Y_1;
+			xt2 = GROLMY_X_2; yt2 = GROLMY_Y_2;
+			xt3 = GROLMY_X_3; yt3 = GROLMY_Y_3;
+			xt4 = GROLMY_X_4; yt4 = GROLMY_Y_4;
+			xt5 = GROLMY_X_5; yt5 = GROLMY_Y_5;
+			keyitem = 718;
+		}
+		
 		if (ch[cn].data[22]==0)         // staying at home
 		{
 			if ((in = ch[cn].citem))
@@ -787,11 +838,9 @@ int npc_stunrun_high(int cn)
 			}
 			if (ch[cn].data[23] + TICKS * 60 * 60<globs->ticker)
 			{
-				int x, y;
-
-				for (y = GROLMY_Y_1, tmp = 0; y<=GROLMY_Y_2 && !tmp; y++)
+				for (y = yt1, tmp = 0; y<=yt2 && !tmp; y++)
 				{
-					for (x = GROLMY_X_1; x<=GROLMY_X_2 && !tmp; x++)
+					for (x = xt1; x<=xt2 && !tmp; x++)
 					{
 						if ((co = map[x + y * MAPX].ch) && ch[co].data[CHD_GROUP]!=ch[cn].data[CHD_GROUP])
 						{
@@ -810,28 +859,28 @@ int npc_stunrun_high(int cn)
 		{
 			if (!ch[cn].citem)
 			{
-				in = god_create_item(718);
+				in = god_create_item(keyitem);
 				ch[cn].citem = in;
 				it[in].carried = cn;
 			}
-			if (abs(ch[cn].x - GROLMY_X_3) + abs(ch[cn].y - GROLMY_Y_3)<20)
+			if (abs(ch[cn].x - xt3) + abs(ch[cn].y - yt3)<20)
 			{
 				ch[cn].data[22] = 2;
 				ch[cn].data[23] = globs->ticker;
 			}
 			else
 			{
-				if (npc_check_target(GROLMY_X_3, GROLMY_Y_3))
+				if (npc_check_target(xt3, yt3))
 				{
-					ch[cn].goto_x = GROLMY_X_3; // Lower pents a
-					ch[cn].goto_y = GROLMY_Y_3;
+					ch[cn].goto_x = xt3; // Lower pents a
+					ch[cn].goto_y = yt3;
 				}
-				else if (npc_check_target(GROLMY_X_4, GROLMY_Y_4))
+				else if (npc_check_target(xt4, yt4))
 				{
-					ch[cn].goto_x = GROLMY_X_4; // Lower pents b
-					ch[cn].goto_y = GROLMY_Y_4;
+					ch[cn].goto_x = xt4; // Lower pents b
+					ch[cn].goto_y = yt4;
 				}
-				if (ch[cn].x>GROLMY_X_2)
+				if (ch[cn].x>xt2)
 				{
 					ch[cn].data[24] = globs->ticker;
 				}
@@ -843,7 +892,7 @@ int npc_stunrun_high(int cn)
 		}
 		if (ch[cn].data[22]==2)         // moving towards home
 		{
-			if (abs(ch[cn].x - GROLMY_X_5) + abs(ch[cn].y - GROLMY_Y_5)<3)
+			if (abs(ch[cn].x - xt5) + abs(ch[cn].y - yt5)<3)
 			{
 				ch[cn].data[22] = 0;
 				ch[cn].data[23] = globs->ticker;
@@ -851,8 +900,8 @@ int npc_stunrun_high(int cn)
 			}
 			else
 			{
-				ch[cn].goto_x = GROLMY_X_5; // Middle of rug
-				ch[cn].goto_y = GROLMY_Y_5;
+				ch[cn].goto_x = xt5; // Middle of rug
+				ch[cn].goto_y = yt5;
 			}
 		}
 	}

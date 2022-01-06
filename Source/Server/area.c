@@ -102,6 +102,7 @@ struct area area[] = {
 	{ 477,  524,  494,  558, "Aston",                          0},
 	{ 491,  559,  494,  586, "Aston",                          0},
 	{ 526,  587,  553,  597, "Aston",                          0},
+	{ 584,  411,  596,  416, "Aston",                          0},
 	{ 538,  417,  542,  586, "Temple Street",                  2},
 	{ 635,  428,  639,  480, "South End",                      2},
 	{ 504,  539,  600,  543, "Rose Street",                    2},
@@ -137,6 +138,7 @@ struct area area[] = {
 	{ 527,  566,  534,  575, "Aster's House",                  0},
 	{ 523,  568,  526,  577, "Aster's House",                  0},
 	{ 496,  431,  507,  439, "Blanche's House",                0},
+	{ 584,  411,  596,  419, "Serena's House",                 0},
 	{ 515,  470,  526,  478, "North Aston Bank",               1},
 	{ 604,  489,  615,  497, "South Aston Bank",               1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
@@ -265,7 +267,8 @@ struct area area[] = {
 	{ 538,  148,  546,  180, "The Abyss Rewards",              3},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 554,  587,  650,  597, "Astonian Farms",                 1},
-	{ 506,  598,  650,  650, "Astonian Farms",                 1},
+	{ 506,  598,  650,  639, "Astonian Farms",                 1},
+	{ 506,  640,  650,  650, "Autumn Meadow",                  1},
 	{ 475,  598,  505,  650, "Autumn Meadow",                  1},
 	{ 443,  651,  650,  717, "Autumn Meadow",                  1},
 	{ 442,  718,  637,  755, "Autumn Meadow",                  1},
@@ -315,6 +318,9 @@ struct area area[] = {
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 165,  756,  205,  796, "The Beryl Jungle",               0},
 	{ 165,  797,  205,  920, "Ashen Channel",                  1},
+	{ 206,  890,  255,  920, "Heated Passage",                 1},
+	{ 173,  921,  255, 1003, "The Volcano",                    3},
+	{ 199,  947,  229,  977, "Summit",                         2},
 	{ 120,  826,  164,  920, "Onyx Gargoyle Nest",             1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 658,  344,  730,  461, "Novice Pentagram Quest",         1},
@@ -378,6 +384,7 @@ struct area area[] = {
 	{ 132,  168,  152,  181, "Lab XIII, Final Preparation",    0},
 	{ 136,  182,  148,  192, "Lab XIII, Final Test",           0},
 	{ 136,  193,  148,  246, "Lab XIII, Final Reward",         0},
+	{ 884,  504,  964,  534, "Hall of Lost Souls",             1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{  91,   21,  115,   45, "Random Dungeon Entrance",        1},
 	{ 131,   21,  201,   91, "Random Dungeon I",               1},

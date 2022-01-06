@@ -249,7 +249,7 @@ struct know
 // "Answer" values
 //{ Answers for each skill question ("What is ...?")
 #define AN_SK_HAND		"The Hand to Hand skill assists with one's ability to hit and parry while unarmed."
-#define AN_SK_PRECISION	"Precision is an advanced skill learned by Brawlers. It lets them score critical hits more often."
+#define AN_SK_PRECISION	"Precision is an advanced skill learned by Bravers. It lets them score critical hits more often."
 #define AN_SK_DAGGER	"The Dagger skill will help with one's ability to hit and parry while using a dagger."
 #define AN_SK_SWORD		"The Sword skill helps with one's ability to hit and parry attacks with a sword."
 #define AN_SK_AXE		"The Axe skill will help with one's ability to hit and parry when using an axe."
@@ -279,25 +279,24 @@ struct know
 #define AN_SK_REGEN		"Regenerate is a skill that allows one to slowly recover their health over time."
 #define AN_SK_REST		"Rest is a skill that allows one to recover their endurance over time."
 #define AN_SK_MEDIT		"Meditate is a skill that allows one to recover their mana over time."
-#define AN_SK_SENSE		"The Sense Magic skill allows one to be more perceptive of items or effects that are magical in nature."
+#define AN_SK_SENSE		"The Sense Magic skill allows one to be perceptive of items or effects that are magical in nature."
 #define AN_SK_IMMUNITY	"Immunity is a skill learned by Templars. It reduces the effectiveness of negative ailments on them."
 #define AN_SK_SURROUND	"Surround Hit is a skill learned by Templars. It allows them to hit everything around them at once!"
 #define AN_SK_CONCENT	"Concentrate is an advanced skill learned by powerful mages. It reduces the mana cost of all spells."
 #define AN_SK_WARCRY	"Warcry is an advanced skill learned by powerful fighters. It frightens and stuns all nearby enemies."
 #define AN_SK_DUALW		"The Dual Wield skill provides additional chance to hit enemies when using an off-handed weapons."
 #define AN_SK_BLIND 	"Blind is a skill used by Mercenaries. It blinds and debilitates all nearby enemies."
-#define AN_SK_WEAPONM	"Weapon Mastery is a skill used by Templars. It gives them up to double the weapon value of their weapons."
-#define AN_SK_ARMORM	"Armor Mastery is a skill used by Templars. It gives them up to double the armor value of their armor."
+#define AN_SK_GEARMAST	"Gear Mastery is a skill used by Templars. It gives them up to double the weapon and armor value of their equipment."
 #define AN_SK_CLEAVE	"Cleave is a powerful skill used by Templars. It allows them to hit their enemies with a powerful blow."
 #define AN_SK_WEAKEN	"Weaken is a powerful skill used by Templars. It allows them to reduce their enemy's weapon and armor values."
 #define AN_SK_POISON	"Poison is an advanced spell learned by powerful mages. It inflicts an ailment that eats away at their target's health."
 #define AN_SK_PULSE		"Pulse is an advanced skill learned by powerful Harakim. It grants a repeating burst of area damage."
 #define AN_SK_PROX		"Proximity is an advanced skill. It grants a variety of bonuses depending on the class that knows it"
 #define AN_SK_COMPM		"Companion Mastery is an advanced skill learned by Summoners. Their Ghost Companion becomes stronger and learns the Heal spell."
-#define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners and Brawlers. It lets them summon a copy of themself to fight for them."
+#define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners. It lets them summon a copy of themself to fight for them."
 #define AN_SK_HASTE		"Haste is an advanced spell learned by Warriors and Sorcerers. It allows them to dramatically speed up their actions."
 #define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
-#define AN_SK_LEAP		"Leap is an advanced skill learned by Brawlers. It leaps through enemies, damaging them in the process."
+#define AN_SK_LEAP		"Leap is an advanced skill learned by Skalds. It leaps through enemies, damaging them in the process."
 //}
 //{ "What is ...?" for each race
 #define AN_RA_TEMP		"Templars are powerful fighters. They are not very good with spells, but they have learned to adapt without them."
@@ -305,7 +304,7 @@ struct know
 #define AN_RA_HARA		"Harakim are powerful spellcasters. They are not very good at combat, and prefer to act from long range."
 #define AN_RA_SEYANDU	"Seyan'du are very powerful and can excel in a large number of things at once."
 #define AN_RA_ARCHTEMP	"Arch-Templar are Templar who have become weapon masters. They can cleave the air so hard that it can fell an entire army."
-#define AN_RA_PUGILIST	"Brawlers are Templars who attack with agility and precision. Their attacks are freightening and their very shadows can assist them."
+#define AN_RA_PUGILIST	"Skalds are Templars who attack with agility and valor. They sing haunting arias and they can leap great distances."
 #define AN_RA_WARRIOR	"Warriors are Merceneries who have preferred melee over spells. They can become very agile and use multiple weapons at once."
 #define AN_RA_SORCERER	"Sorcerers are Merceneries who have preferred spells over melee. They can cast powerful ailments in a wide area instantaniously."
 #define AN_RA_SUMMONER	"Summoners are Harakims who have dedicated their arts to their companion. They can summon their shadows to assist with spellcasting."
@@ -701,7 +700,7 @@ struct know
 #define AN_LABZ_SKILLS	"Each advanced class can learn unique skills that a Seyan'du will never know. Some are quite powerful!"
 #define AN_LABZ_SHRINE	"Yes, the gold shrine against the north wall over there. If you wish, present a given potion as the notes say."
 #define AN_LABZ_TEMPL	"Arch Templars will learn how to warcry and dual wield weapons, and may eventually learn to hit armies in a single slash."
-#define AN_LABZ_BRAWL	"Brawlers will learn how to deal a volley of critical hits, and may eventually learn to copy their very shadow to assist them."
+#define AN_LABZ_BRAWL	"Skalds will learn how to sing arias that reduce exhaustion, and may eventually learn to leap great distances in an instant."
 #define AN_LABZ_WARRI	"Warriors learn the Haste spell, dual wield, and several templar skills. They can learn to hit surrounding foes more quickly."
 #define AN_LABZ_SORCE	"Sorcerers learn the Haste spell, poison, and several harakim skills. They can learn to curse armies in a single word."
 #define AN_LABZ_SUMMO	"Summoners will gain greater mastery over their companions, and may eventually learn to copy their very shadow to assist them."
@@ -1283,8 +1282,8 @@ struct know know[] = {
 	{{"?about", "!arch", "!templars",      "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_TEMPL   , 0},
 	{{"?about", "!archtemplar",            "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_TEMPL   , 0},
 	{{"?about", "!archtemplars",           "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_TEMPL   , 0},
-	{{"?about", "!brawler",                "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_BRAWL   , 0},
-	{{"?about", "!brawlers",               "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_BRAWL   , 0},
+	{{"?about", "!skald",                  "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_BRAWL   , 0},
+	{{"?about", "!skalds",                 "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_BRAWL   , 0},
 	{{"?about", "!warrior",                "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_WARRI   , 0},
 	{{"?about", "!warriors",               "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_WARRI   , 0},
 	{{"?about", "!sorcerer",               "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_SORCE   , 0},
@@ -1396,8 +1395,7 @@ struct know know[] = {
 	{{"?what", "!warcry",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WARCRY, 0},
 	{{"?what", "!dual", "!wield", "!skill","?", NULL}, 0, AR_GENERAL, 0, AN_SK_DUALW, 0},
 	{{"?what", "!blind",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_BLIND, 0},
-	{{"?what", "!weapon", "!mastery",      "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WEAPONM, 0},
-	{{"?what", "!armor", "!mastery",       "?", NULL}, 0, AR_GENERAL, 0, AN_SK_ARMORM, 0},
+	{{"?what", "!gear", "!mastery",        "?", NULL}, 0, AR_GENERAL, 0, AN_SK_GEARMAST, 0},
 	{{"?what", "!cleave",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CLEAVE, 0},
 	{{"?what", "!weaken",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WEAKEN, 0},
 	{{"?what", "!poison",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_POISON, 0},
@@ -1414,7 +1412,7 @@ struct know know[] = {
 	{{"?what", "!harakim",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_HARA, 0},
 	{{"?what", "!seyandu",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_SEYANDU, 0},
 	{{"?what", "!arch", "!templar",        "?", NULL}, 0, AR_GENERAL, 0, AN_RA_ARCHTEMP, 0},
-	{{"?what", "!brawler",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_PUGILIST, 0},
+	{{"?what", "!skald",                   "?", NULL}, 0, AR_GENERAL, 0, AN_RA_PUGILIST, 0},
 	{{"?what", "!warrior",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_WARRIOR, 0},
 	{{"?what", "!sorcerer",                "?", NULL}, 0, AR_GENERAL, 0, AN_RA_SORCERER, 0},
 	{{"?what", "!summoner",                "?", NULL}, 0, AR_GENERAL, 0, AN_RA_SUMMONER, 0},
@@ -1825,19 +1823,22 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "Jamil seems down on his luck. You can find him here in the Tavern, at the table over there.");
 		return;
 	}
-	if (!B_SK(co, SK_RECALL))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_TAUNT))
+	 || (IS_ANY_MERC(co) && !B_SK(co, SK_POISON))
+	 || (IS_ANY_HARA(co) && !B_SK(co, SK_CONCEN))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_TAUNT) && !B_SK(co, SK_POISON) && !B_SK(co, SK_CONCEN)))
 	{
 		do_sayx(cn, "I hear Inga is in need of help. She's a harakim and she lives on First Street.");
 		return;
 	}
-	if ((IS_ANY_TEMP(co) && !B_SK(co, SK_WEAPONM))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_MSHIELD))
 	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_ENHANCE))
-	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_WEAPONM) && !B_SK(co, SK_ENHANCE)))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_ENHANCE)))
 	{
 		do_sayx(cn, "I hear Sirjan is in need of help. He's a mercenary and he lives on First Street.");
 		return;
 	}
-	if ((IS_ANY_TEMP(co) && !B_SK(co, SK_WEAKEN))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_WEAKEN))
 	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_SLOW))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_WEAKEN) && !B_SK(co, SK_SLOW))
 	)
@@ -1856,13 +1857,13 @@ void answer_quest(int cn, int co)
 		return;
 	}
 	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co)) && !B_SK(co, SK_IMMUN))
-	 || (IS_ANY_HARA(co) && !B_SK(co, SK_DISPEL))
+	 || ((IS_ANY_HARA(co) || IS_BRAVER(co)) && !B_SK(co, SK_DISPEL))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_IMMUN) && !B_SK(co, SK_DISPEL)))
 	{
 		do_sayx(cn, "I hear Ingrid is in need of help. She's a mercenary and she lives on Castle Way.");
 		return;
 	}
-	if ((IS_ANY_TEMP(co) && !B_SK(co, SK_SURROUND))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_SURROUND))
 	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_CURSE))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SURROUND) && !B_SK(co, SK_CURSE))
 	)
@@ -1875,7 +1876,7 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Gunther is in need of help. He's a mercenary and he lives on Castle Way.");
 		return;
 	}
-	if (!B_SK(co, SK_SENSE))
+	if (!(ch[co].flags & CF_SENSE))
 	{
 		do_sayx(cn, "I hear Manfred is in need of help. He's a templar and he lives on Silver Avenue.");
 		return;
@@ -1895,7 +1896,7 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Gordon is in need of help. He's a harakim and he lives on Shore Crescent.");
 		return;
 	}
-	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co)) && !B_SK(co, SK_SHIELD))
+	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co) || IS_BRAVER(co)) && !B_SK(co, SK_SHIELD))
 	 || (IS_ANY_HARA(co) && !B_SK(co, SK_STAFF))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SHIELD) && !B_SK(co, SK_STAFF)))
 	{
@@ -1950,14 +1951,16 @@ void answer_unlearn(int cn, int co)
 	
 	if (IS_SEYAN_DU(co) && 
 		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
-		 B_SK(co, SK_POISON) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR)))
+		 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
+		 B_SK(co, SK_RAGE)))
 	{
 		if (B_SK(co, SK_WARCRY))	{ B_SK(co, SK_WARCRY) = 0; strcpy(unl, skilltab[SK_WARCRY].name); }
-		if (B_SK(co, SK_LEAP))	{ B_SK(co, SK_LEAP) = 0; strcpy(unl, skilltab[SK_LEAP].name); }
+		if (B_SK(co, SK_LEAP))		{ B_SK(co, SK_LEAP) = 0; strcpy(unl, skilltab[SK_LEAP].name); }
 		if (B_SK(co, SK_SHADOW))	{ B_SK(co, SK_SHADOW) = 0; strcpy(unl, skilltab[SK_SHADOW].name); }
-		if (B_SK(co, SK_POISON))	{ B_SK(co, SK_POISON) = 0; strcpy(unl, skilltab[SK_POISON].name); }
-		if (B_SK(co, SK_PULSE))	{ B_SK(co, SK_PULSE) = 0; strcpy(unl, skilltab[SK_PULSE].name); }
+		if (B_SK(co, SK_LETHARGY))	{ B_SK(co, SK_LETHARGY) = 0; strcpy(unl, skilltab[SK_LETHARGY].name); }
+		if (B_SK(co, SK_PULSE))		{ B_SK(co, SK_PULSE) = 0; strcpy(unl, skilltab[SK_PULSE].name); }
 		if (B_SK(co, SK_ZEPHYR))	{ B_SK(co, SK_ZEPHYR) = 0; strcpy(unl, skilltab[SK_ZEPHYR].name); }
+		if (B_SK(co, SK_RAGE))		{ B_SK(co, SK_RAGE) = 0; strcpy(unl, skilltab[SK_RAGE].name); }
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
 		do_sayx(cn, "Very well, I will remove %s, %s. Close your eyes, and...", unl, ch[co].name);

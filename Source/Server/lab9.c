@@ -468,6 +468,21 @@ banks[BANKS] = {
 /* The 6 question selected from the 11 available questions per bank. */
 int questions[BANKS][SWITCHES];
 
+void reset_lab9_bookshelf(int riddler)
+{
+	int in;
+	switch (ch[riddler].temp)
+	{
+		case 918: in = 1060; break;
+		case 919: in = 1068; break;
+		case 920: in = 1072; break;
+		case 921: in = 1079; break;
+		case 922: in = 1087; break;
+		default: return;
+	}
+	reset_item(in);
+}
+
 /* Called by do_say() to check for a spoken riddle answer.
    This does not fit in very well with npc_hear(). */
 int lab9_guesser_says(int cn, char *text)
@@ -553,6 +568,7 @@ int lab9_guesser_says(int cn, char *text)
 		{
 			guesser[idx] = 0;
 			ch[cn].data[PCD_RIDDLER] = 0;
+			reset_lab9_bookshelf(riddler);
 		}
 		else
 		{
@@ -574,6 +590,7 @@ int lab9_guesser_says(int cn, char *text)
 			do_sayx(riddler, "Sorry, that's not right. Now you'll have to bring me the book again to start over!\n");
 			guesser[idx] = 0;
 			ch[cn].data[PCD_RIDDLER] = 0;
+			reset_lab9_bookshelf(riddler);
 		}
 		return 0;
 	}

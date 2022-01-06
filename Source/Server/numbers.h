@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define CT_GOD_M		   2
-#define CT_GOD_F		   3
+#define CT_BRAVER_M		   2
+#define CT_BRAVER_F		   3
 
 #define CT_TEMP_M		   4
 #define CT_TEMP_F		   5
@@ -348,6 +348,13 @@
 #define IT_MIX_23		 222
 #define IT_MIX_13		 223
 
+// Deadly Poison
+#define IT_MIX_3____	2580
+#define IT_MIX_32___	2581
+#define IT_MIX_321__	2582
+#define IT_MIX_3213_	2583
+#define IT_POT_DEATH	2584
+
 // Potions
 #define IT_POT_M_HP		2000
 #define IT_POT_N_HP		 101
@@ -679,13 +686,19 @@
 #define BUF_SPR_CURSE		89
 #define BUF_SPR_SLOW		149
 #define BUF_SPR_POISON		178
-#define BUF_SPR_VENOM		178
+#define BUF_SPR_VENOM		1011
 #define BUF_SPR_RECALL		90
 #define BUF_SPR_SHADOW		179
 #define BUF_SPR_REND		224
 #define BUF_SPR_WARCRY		325
 #define BUF_SPR_WARCRY2		91
 #define BUF_SPR_WARCRY3		822
+//
+#define BUF_SPR_RAGE		700
+#define BUF_SPR_ARIA		701
+#define BUF_SPR_ARIA2		702
+#define BUF_SPR_LETHARGY	703
+#define BUF_SPR_AGGRAVATE	1009
 //
 #define BUF_SPR_BLEED		411
 #define BUF_SPR_REND2		329

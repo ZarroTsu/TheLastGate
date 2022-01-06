@@ -77,11 +77,11 @@ static int skillslots[MAXSKILL] = {
 };
 */
 static int skillslots[MAXSKILL] = {
-	 0, 2, 3, 4, 5, 6,16,36,28,29,
-	30,38,39,21,17,18,11,47,40,49,
-	41,35,37,48,24,42,19,20,27,45,
-	46,43, 7,25,14,26,23,32, 9,31,
-	 8, 1,33,34,44,10,12,13,15,22
+	28,29,30, 0, 4, 2,36,16, 5, 3,
+	 6,37,40,49,14,13,48,35,41,24,
+	21,20,25,18,27,47,26,22,15,11,
+	42,17,43,46,19, 7,31,12,45,34,
+	38,32, 9, 1,44,23,39, 8,33,10
 };
 // The order to display item slot fields
 static int itemslots[13] = { 
@@ -679,8 +679,8 @@ void list_all_player_characters_by_class()
 	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_ARCHTEMPLAR(n)) continue;
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
 	}	printf("</table><br>\n");
-	printf("Brawlers:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
-	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_BRAWLER(n)) continue;
+	printf("Skalds:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_SKALD(n)) continue;
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
 	}	printf("</table><br>\n");
 	printf("Warriors:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
@@ -697,6 +697,10 @@ void list_all_player_characters_by_class()
 	}	printf("</table><br>\n");
 	printf("Arch Harakim:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
 	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_ARCHHARAKIM(n)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Bravers:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_BRAVER(n)) continue;
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
 	}	printf("</table><br>\n");
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
@@ -800,8 +804,8 @@ void view_character_template(LIST *head)
 			KIN_TEMPLAR, (ch_temp[cn].kindred & KIN_TEMPLAR) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Arch-Templar<br>\n",
 			KIN_ARCHTEMPLAR, (ch_temp[cn].kindred & KIN_ARCHTEMPLAR) ? "checked" : "");
-	printf("<input type=checkbox name=kindred value=%d %s>Brawler<br>\n",
-			KIN_BRAWLER, (ch_temp[cn].kindred & KIN_BRAWLER) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Skald<br>\n",
+			KIN_SKALD, (ch_temp[cn].kindred & KIN_SKALD) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Harakim<br>\n",
 			KIN_HARAKIM, (ch_temp[cn].kindred & KIN_HARAKIM) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Arch-Harakim<br>\n",
@@ -810,6 +814,8 @@ void view_character_template(LIST *head)
 			KIN_SUMMONER, (ch_temp[cn].kindred & KIN_SUMMONER) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Seyan'Du<br>\n",
 			KIN_SEYAN_DU, (ch_temp[cn].kindred & KIN_SEYAN_DU) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Braver<br>\n",
+			KIN_BRAVER, (ch_temp[cn].kindred & KIN_BRAVER) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Purple<br>\n",
 			KIN_PURPLE, (ch_temp[cn].kindred & KIN_PURPLE) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Monster<br>\n",
@@ -1040,6 +1046,8 @@ void view_character_player(LIST *head)
 			KIN_ARCHHARAKIM, IS_ARCHHARAKIM(cn) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Seyan'Du<br>\n",
 			KIN_SEYAN_DU, IS_SEYAN_DU(cn) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Braver<br>\n",
+			KIN_BRAVER, IS_BRAVER(cn) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Purple<br>\n",
 			KIN_PURPLE, IS_PURPLE(cn) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Monster<br>\n",
@@ -4247,7 +4255,12 @@ void list_objects(LIST *head, int flag)
 		if (it_temp[n].used==USE_EMPTY) continue;
 		if (flag==1 && !(it_temp[n].flags & IF_SELLABLE)) continue;
 		if (flag==2 && !(it_temp[n].flags & IF_JEWELERY)) continue;
-		if (flag==3 && !(it_temp[n].future2[0] || it_temp[n].future2[1])) continue;
+		if (flag==3 && (
+		it_temp[n].skill[14][0]==0 && it_temp[n].skill[14][1]==0 && it_temp[n].skill[14][2]==0 && 
+		it_temp[n].skill[15][0]==0 && it_temp[n].skill[15][1]==0 && it_temp[n].skill[15][2]==0 && 
+		it_temp[n].skill[31][0]==0 && it_temp[n].skill[31][1]==0 && it_temp[n].skill[31][2]==0 && 
+		it_temp[n].skill[39][0]==0 && it_temp[n].skill[39][1]==0 && it_temp[n].skill[39][2]==0 )) 
+			continue;
 		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
 				"<td><font size=2>pr: %dG, %dS</font></td><td><font size=2>da0: %d</font></td><td><font size=2>da1: %d</font></td><td><font size=2>da2: %d</font></td><td><font size=2>da3: %d</font></td><td><font size=2>da4: %d</font></td>\n"
 				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
@@ -4509,7 +4522,7 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=21>Object Templates (All)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=30>Object Templates (Sellable)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=33>Object Templates (Jewelery)</a><br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=34>Object Templates (Speed)</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=34>Object Templates (Sen,Lig,Rec,Arm)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");

@@ -6372,7 +6372,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 	switch (mission)
 	{
 		case  2: mdiv = RANDOM(7)+1; break;
-		case  3: goal = 1; break;
+		//case  3: goal = 1; break;
 		case  4: goal = 1; break;
 		case  7: goal = 5; break;
 		case  8: goal = 1; mspw = RANDOM(5); break;
@@ -6511,6 +6511,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 												break;
 										}
 										it[co].data[0] = rank;
+										it[co].data[1] = tier;
 									}
 									break;
 								case  2: 		// Enemy
@@ -6595,9 +6596,9 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 									co = 0;
 									if (flags & 0x00000080)	// boss at portal
 									{
-										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+5, 4, tarot);
+										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+4, 4, tarot);
 									}
-									if (co && mission==1) goal++;
+									if (co && (mission==1 || mission==3)) goal++;
 									if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
 									if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
 									if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
@@ -6663,12 +6664,12 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 									co=0;
 									if (mission==8 && pn == mspw) // Coward 
 									{
-										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+5, 5, tarot);
+										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+3, 5, tarot);
 									}
 									else if (mission==9 && pn == mspw) // Legend
 									{
 										co = generate_map_enemy(spawnT, 
-											RANDOM(NUM_LEG_ENEM)+11+NUM_MAP_ENEM, x, y, base+10, 6, 3);
+											RANDOM(NUM_LEG_ENEM)+11+NUM_MAP_ENEM, x, y, base+6, 6, 3);
 									}
 									if (co && mission==1) goal++;
 									if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;

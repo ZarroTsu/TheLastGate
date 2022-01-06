@@ -40,6 +40,7 @@
 			 12 : Lab 12 lord -- spawns helpers when they gain 1 healing sickness stack
 			 13 : Lizard Emperor - Does some fancy shenanigans
 			 14 : Shiva II - Much simplier than Shiva I, just summons monsters occasionally.
+			 15 : Sea Grolmy - used to check between this and normal grolmy
 			 20 : Tower XX - Lock doors
 			 30 : Abyss  X - Lock doors
 			10X : BS Tier 1
@@ -171,8 +172,8 @@ int npc_add_enemy(int cn, int co, int always)
 	}
 	
 	// Group check for GCs
-	if ((IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
-		(IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
+	if ((!IS_PLAYER(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
+		(!IS_PLAYER(co) && IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
 	{
 		return 0;
 	}
@@ -388,7 +389,7 @@ int npc_gotattack(int cn, int co, int dam)
 	}
 
 	// fight back when attacked - all NPCs do this:
-	if (ch[cn].data[1]!=1 || ch[cn].a_hp<ch[cn].hp[5] * 600) // passive gc check - only fight back if at risk of dying
+	if (!IS_PLAYER_COMP(cn) || (IS_PLAYER_COMP(cn) && (ch[cn].data[1]!=1 || ch[cn].a_hp<ch[cn].hp[5] * 600))) // passive gc check - only fight back if at risk of dying
 	{
 		if (npc_add_enemy(cn, co, 1))
 		{
@@ -746,7 +747,9 @@ int npc_quest_check(int cn, int val)
 int convert_skill_for_group(int co, int nr)
 {
 	// Revert to original values if changed
-	if (nr == SK_WEAPONM)  nr = SK_ENHANCE; // WeapM    -> Enhance
+	if (nr == SK_POISON)   nr = SK_TAUNT; 	// Poison   -> Taunt
+	if (nr == SK_CONCEN)   nr = SK_TAUNT; 	// Concentr -> Taunt
+	if (nr == SK_MSHIELD)  nr = SK_ENHANCE; // MShield  -> Enhance
 	if (nr == SK_WEAKEN)   nr = SK_SLOW;    // Weaken   -> Slow
 	if (nr == SK_SURROUND) nr = SK_CURSE;   // Surround -> Curse
 	if (nr == SK_STAFF)    nr = SK_SHIELD;  // Staff    -> Shield
@@ -755,18 +758,31 @@ int convert_skill_for_group(int co, int nr)
 	// Hacky flip-flopping
 	if (IS_ANY_TEMP(co))
 	{
-		if (nr == SK_ENHANCE) nr = SK_WEAPONM;  // Enhance  -> WeapM
-		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow     -> Weaken
-		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse    -> Surround
+		if (nr == SK_ENHANCE) nr = SK_MSHIELD;  // Enhance -> MShield
+		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow    -> Weaken
+		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse   -> Surround
+	}
+	if (IS_ANY_MERC(co))
+	{
+		if (nr == SK_TAUNT)   nr = SK_POISON; // Taunt -> Poison
 	}
 	if (IS_ANY_HARA(co))
 	{
-		if (nr == SK_SHIELD) nr = SK_STAFF;  // Shiel    -> Staff
-		if (nr == SK_IMMUN)  nr = SK_DISPEL; // Immun    -> Dispel
+		if (nr == SK_TAUNT)  nr = SK_CONCEN; // Taunt -> Concentr
+		if (nr == SK_SHIELD) nr = SK_STAFF;  // Shiel -> Staff
+		if (nr == SK_IMMUN)  nr = SK_DISPEL; // Immun -> Dispel
+	}
+	if (IS_BRAVER(co))
+	{
+		if (nr == SK_ENHANCE) nr = SK_MSHIELD;  // Enhance -> MShield
+		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow    -> Weaken
+		if (nr == SK_IMMUN)   nr = SK_DISPEL; 	// Immun   -> Dispel
+		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse   -> Surround
 	}
 	if (IS_SEYAN_DU(co))
 	{
-		if (nr == SK_ENHANCE && B_SK(co, SK_ENHANCE)) nr = SK_WEAPONM;
+		if (nr == SK_TAUNT   && B_SK(co, SK_TAUNT))   nr = SK_POISON;
+		if (nr == SK_POISON  && B_SK(co, SK_POISON))  nr = SK_CONCEN;
 		if (nr == SK_SLOW    && B_SK(co, SK_SLOW))    nr = SK_WEAKEN;
 		if (nr == SK_CURSE   && B_SK(co, SK_CURSE))   nr = SK_SURROUND;
 		if (nr == SK_SHIELD  && B_SK(co, SK_SHIELD))  nr = SK_STAFF;
@@ -795,17 +811,20 @@ int npc_give(int cn, int co, int in, int money)
 		// Check each arch skill against the race that is intended to learn it.
 		if (( nr == SK_WARCRY && !IS_SEYA_OR_ARTM(co) )
 		 || ( nr == SK_PULSE  && !IS_SEYA_OR_ARHR(co) )
-		 || ( nr == SK_LEAP   && !IS_SEYA_OR_BRWL(co) )
-		 || ( nr == SK_POISON && !IS_SEYA_OR_SORC(co) )
+		 || ( nr == SK_LEAP   && !IS_SEYA_OR_SKAL(co) )
+		 || ( nr == SK_LETHARGY && !IS_SEYA_OR_SORC(co) )
 		 || ( nr == SK_SHADOW && !IS_SEYA_OR_SUMM(co) )
-		 || ( nr == SK_ZEPHYR && !IS_SEYA_OR_WARR(co) ))
+		 || ( nr == SK_ZEPHYR && !IS_SEYA_OR_WARR(co) )
+		 || ( nr == SK_RAGE && !IS_SEYA_OR_BRAV(co) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only one!
 		if ((nr == SK_WARCRY || nr == SK_PULSE || nr == SK_LEAP || 
-			nr == SK_POISON || nr == SK_SHADOW || nr == SK_ZEPHYR) && IS_SEYAN_DU(co) && 
+			nr == SK_LETHARGY || nr == SK_SHADOW || nr == SK_ZEPHYR || 
+			nr == SK_RAGE) && IS_SEYAN_DU(co) && 
 			(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
-			 B_SK(co, SK_POISON) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR)))
+			 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR ||
+			 B_SK(co, SK_RAGE))))
 			canlearn = 0;
 	}
 
@@ -978,11 +997,11 @@ int npc_give(int cn, int co, int in, int money)
 				do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
 				return 0;
 			}
-			if (it[in].temp==IT_HERBA)		money =  10000;
+			if (it[in].temp==IT_HERBA)			money =  10000;
 			else if (it[in].temp==IT_HERBB)	money =  15000;
 			else if (it[in].temp==IT_HERBC)	money =  25000;
-			else if (it[in].temp==IT_HERBD)	money =  40000;
-			else							money = 100000;
+			else if (it[in].temp==IT_HERBD)	money =  60000;
+			else								money = 120000;
 			nr = money;
 			if (ch[cn].temp==CT_HERBCOLL2)
 				do_sayx(cn, "Here'sss your payment, and a bit of knowledge.");
@@ -1026,17 +1045,17 @@ int npc_give(int cn, int co, int in, int money)
 		{
 			nr = convert_skill_for_group(co, nr);
 
-			if (nr==18 && IS_SEYAN_DU(co))
-				do_sayx(cn, "Bring me the item again to learn Weapon Mastery, %s!", ch[co].name);
-			if (nr==19 && IS_SEYAN_DU(co))
+			if (nr==SK_TAUNT && IS_SEYAN_DU(co))
+				do_sayx(cn, "Bring me the item again to learn Poison, %s!", ch[co].name);
+			if (nr==SK_POISON && IS_SEYAN_DU(co))
+				do_sayx(cn, "Bring me the item once more to learn Concentrate, %s!", ch[co].name);
+			if (nr==SK_SLOW && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Weaken, %s!", ch[co].name);
-			if (nr==20 && IS_SEYAN_DU(co))
+			if (nr==SK_CURSE && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Surround Hit, %s!", ch[co].name);
-			if (nr==21 && IS_SEYAN_DU(co))
-				do_sayx(cn, "Bring me the item again to learn Combat Mastery, %s!", ch[co].name);
-			if (nr==16 && IS_SEYAN_DU(co))
+			if (nr==SK_SHIELD && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Staff, %s!", ch[co].name);
-			if (nr==32 && IS_SEYAN_DU(co))
+			if (nr==SK_IMMUN && IS_SEYAN_DU(co))
 				do_sayx(cn, "Bring me the item again to learn Dispel, %s!", ch[co].name);
 			// end hack
 			
@@ -1178,6 +1197,7 @@ int npc_give(int cn, int co, int in, int money)
 					god_take_from_char(in, cn);
 					god_give_char(in, co);
 					do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
+					return 0;
 				}
 			}
 			else if (nr == 52) // Special value to learn 'Value Appraisal'
@@ -1226,6 +1246,52 @@ int npc_give(int cn, int co, int in, int money)
 				}
 				// </group rewards>
 			}
+			else if (nr == 53) // Sense Magic flag
+			{
+				do_sayx(cn, "Now I'll teach you how to sense magic.");
+				if (ch[co].flags & CF_SENSE)
+				{
+					do_sayx(cn, "But you already know how to sense magic, %s!", ch[co].name);
+					if ((nr = ch[cn].data[51])!=0)
+					{
+						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
+						do_give_exp(co, nr/4, 0, -1);
+					}
+					god_take_from_char(in, cn);
+					it[in].used = USE_EMPTY;  // silently destroy the item.
+				}
+				else
+				{
+					do_sayx(cn, "Simply look at any item in your possession, and you will now know its true value.");
+					god_take_from_char(in, cn);
+					it[in].used = USE_EMPTY;
+					ch[co].flags |= CF_SENSE;
+					do_char_log(co, 0, "You learned how to sense magic!\n");
+					do_update_char(co);
+					if ((nr = ch[cn].data[51])!=0)
+					{
+						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
+						do_give_exp(co, nr, 0, -1);
+					}
+				}
+				// <group rewards>
+				for (n = 1; n<MAXCHARS; n++)
+				{
+					if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
+					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
+					{
+						int div = 4;
+						if (!(ch[n].flags & CF_SENSE))
+						{
+							ch[n].flags |= CF_SENSE;
+							do_char_log(n, 0, "You learned how to sense magic!\n");
+							div = 1;
+						}
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+					}
+				}
+				// </group rewards>
+			}
 			else if ((qnum = nr) >= 101) // Flags for quests which don't teach skills
 			{
 				tmp = npc_quest_check(co, qnum-101); // Returns 0 if not clear, 1 if already cleared
@@ -1240,6 +1306,7 @@ int npc_give(int cn, int co, int in, int money)
 					god_take_from_char(in, cn);
 					god_give_char(in, co);
 					do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
+					return 0;
 				}
 				else if (B_SK(co, nr))
 				{
@@ -1810,7 +1877,7 @@ int npc_see(int cn, int co)
 				
 				if (!B_SK(co, SK_BARTER))
 					do_sayx(cn, "Welcome to Bluebird Tavern, %s. If you're looking for adventure, perhaps approach Jamil. He seems a bit down on his luck.", ch[co].name);
-				else if (!B_SK(co, SK_RECALL))
+				else if (!B_SK(co, SK_REPAIR))
 					do_sayx(cn, "Well done, %s. I see Jamil is in a better mood! There may be others around town who need help. If you'd like, say QUEST to me and I shall tell you.", ch[co].name);
 				else if (!B_SK(co, SK_REST))
 					do_sayx(cn, "Welcome, %s. I've heard great things about you! There may be others around town who need help. If you'd like, say QUEST to me and I shall tell you.", ch[co].name);
@@ -1849,17 +1916,34 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill02")==0) //    15		Recall				( Inga )
 			{
-				if (!B_SK(co, SK_RECALL))
-					do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you RECALL.", ch[co].name);
+				if (IS_ANY_TEMP(co) || IS_BRAVER(co) || (IS_SEYAN_DU(co) && !B_SK(co, SK_TAUNT)))
+				{
+					if (!B_SK(co, SK_TAUNT))
+						do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you TAUNT.", ch[co].name);
+					else
+						do_sayx(cn, "Greetings, %s.", ch[co].name);
+				}
+				else if (IS_ANY_MERC(co) || (IS_SEYAN_DU(co) && !B_SK(co, SK_POISON)))
+				{
+					if (!B_SK(co, SK_POISON))
+						do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you POISON.", ch[co].name);
+					else
+						do_sayx(cn, "Greetings, %s.", ch[co].name);
+				}
 				else
-					do_sayx(cn, "Greetings, %s.", ch[co].name);
+				{
+					if (!B_SK(co, SK_CONCEN))
+						do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you CONCENTRATE.", ch[co].name);
+					else
+						do_sayx(cn, "Greetings, %s.", ch[co].name);
+				}
 			}
 			else if (strcmp(ch[cn].text[2], "#skill03")==0) //    18/38	* EW or WM			( Sirjan )
 			{
-				if (IS_ANY_TEMP(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_ENHANCE)))
+				if (IS_ANY_TEMP(co) || IS_BRAVER(co))
 				{
-					if (!B_SK(co, SK_WEAPONM))
-						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you WEAPON MASTERY.", ch[co].name);
+					if (!B_SK(co, SK_MSHIELD))
+						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you MAGIC SHIELD.", ch[co].name);
 					else
 						do_sayx(cn, "Hello, %s!", ch[co].name);
 				}
@@ -1874,7 +1958,8 @@ int npc_see(int cn, int co)
 			
 			else if (strcmp(ch[cn].text[2], "#skill04")==0) // 41/19   	* Weaken or Slow		( Amity )
 			{
-				if (IS_ANY_TEMP(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_SLOW)))
+				if (IS_ANY_TEMP(co) || IS_BRAVER(co) 
+					|| (IS_SEYAN_DU(co) && B_SK(co, SK_SLOW)))
 				{
 					if (!B_SK(co, SK_WEAKEN))
 						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you WEAKEN.", ch[co].name);
@@ -1905,7 +1990,8 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill07")==0) //    32/25	* Immu or Dispel	( Ingrid )
 			{
-				if (IS_ANY_HARA(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_IMMUN)))
+				if (IS_ANY_HARA(co) || IS_BRAVER(co) 
+					|| (IS_SEYAN_DU(co) && B_SK(co, SK_IMMUN)))
 				{
 					if (!B_SK(co, SK_DISPEL))
 						do_sayx(cn, "Welcome, %s. Bring me the Decorative Sword from the Skeleton Lord and I'll teach you DISPEL.", ch[co].name);
@@ -1923,7 +2009,8 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill08")==0) // 33/20   	* Surr or Curse		( Leopold )
 			{
-				if (IS_ANY_TEMP(co)	|| (IS_SEYAN_DU(co) && B_SK(co, SK_CURSE)))
+				if (IS_ANY_TEMP(co) || IS_BRAVER(co) 
+					|| (IS_SEYAN_DU(co) && B_SK(co, SK_CURSE)))
 				{
 					if (!B_SK(co, SK_SURROUND))
 						do_sayx(cn, "Hi, %s. Bring me a pair of Rusted Spikes from the Haunted Castle and I'll teach you SURROUND HIT.", ch[co].name);
@@ -1941,13 +2028,13 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#skill09")==0) //    26		Heal				( Gunther )
 			{
 				if (!B_SK(co, SK_HEAL))
-					do_sayx(cn, "Greetings, %s. I would teach you HEAL if you bring me the Amulet of Resistance from the Dungeon of Doors.", ch[co].name);
+					do_sayx(cn, "Greetings, %s. I would teach you HEAL if you bring me the Amulet of Immunity from the Dungeon of Doors.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s! How are you?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill10")==0) //    31		Sense				( Manfred )
 			{
-				if (!B_SK(co, SK_SENSE))
+				if (!(ch[co].flags & CF_SENSE)) 
 					do_sayx(cn, "Hello, %s. If you bring me a silver ring adorned with a small ruby, I'll teach you Sense Magic. You can find these in the mines!", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. Find anything in the mines lately?", ch[co].name);
@@ -2023,7 +2110,7 @@ int npc_see(int cn, int co)
 				if (points2rank(ch[co].points_tot)<7) // First Sergeant
 					do_sayx(cn, "Hello... %s. Please come back when you're stronger... I have a request...", ch[co].name);
 				else
-					do_sayx(cn, "Hello... %s. Please bring me a Spider's Fang... from the Webbed Bush south of the Strange Forest... I would give you an Amulet of Immunity in exchange...", ch[co].name);
+					do_sayx(cn, "Hello... %s. Please bring me a Spider's Fang... from the Webbed Bush south of the Strange Forest... I would give you an Amulet of Resistance in exchange...", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest104")==0) // 	4 - Mine 2 / Golem Pot / Moodstone
 			{
@@ -2180,13 +2267,13 @@ int npc_see(int cn, int co)
 			{
 				do_sayx(cn, "Isssh. Human, if you sssee a man named Regal, please defeat him. Bring me hisss sssword, and I would reward you thisss red amulet.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest127")==0) //   26 - Shafira - Shadow Talons
-			{
-				do_sayx(cn, "Hello, human. There isss a ssscary beassst of a lizard in the Emerald Cave we call Ssshadefang. Bring me itsss clawsss, and you may have thisss green amulet.", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#quest128")==0) //   27 - Tsulu - Venom Compendium
+			else if (strcmp(ch[cn].text[2], "#quest127")==0) //   26 - Tsulu - Shadow Talons
 			{
 				do_sayx(cn, "Welcome, human. The foul lizard Venominousss hasss blinded and killed many of our children. Bring me the source of his poisonsss, and I will give you thisss blue amulet.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest128")==0) //   27 - Shafira - Venom Compendium
+			{
+				do_sayx(cn, "Hello, human. There isss a ssscary beassst of a lizard in the Emerald Cave we call Ssshadefang. Bring me itsss clawsss, and you may have thisss green amulet.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest129")==0) //   28 - Dracus - Emperor's Crown
 			{
@@ -2196,13 +2283,13 @@ int npc_see(int cn, int co)
 			{
 				do_sayx(cn, "Human... Bring me an Onyx Egg from the Onyx Gargoyle Nessst, and I would give you a Cloak of Onyx... If you sssurvive, that isss.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest131")==0) //   30 - Vora - Coral Axe
+			else if (strcmp(ch[cn].text[2], "#quest131")==0) //   30 - Makira - Save the Queen
 			{
-				do_sayx(cn, "...", ch[co].name);
+				do_sayx(cn, "Welcome, Human. I would give you thisss belt if you could climb the Volcano to the Eassst and bring me the sssword sssleeping at the sssummit.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest132")==0) //   31 - Makira - Save the Queen
+			else if (strcmp(ch[cn].text[2], "#quest132")==0) //   31 -  Vora - Coral Axe
 			{
-				do_sayx(cn, "...", ch[co].name);
+				do_sayx(cn, "Isssh... Human, bring me... the Coral Axe from the King of the Sssea Pentagram Quessst. I may give you thisss belt in exchange.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest133")==0) //   xx - Zorani - Black Plants
 			{
@@ -2232,8 +2319,9 @@ int npc_see(int cn, int co)
 			else 
 			{
 				int knowarch=0;
-				if (B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
-					B_SK(co, SK_POISON) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR))
+				if (B_SK(co, SK_WARCRY)   || B_SK(co, SK_LEAP)  || B_SK(co, SK_SHADOW) ||
+					B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
+					B_SK(co, SK_RAGE))
 					knowarch=1;
 				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
@@ -2271,17 +2359,17 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s! Did you know Summoners can create copies from their very shadows?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill24")==0) // Sorc - 42 - Poison
+				else if (strcmp(ch[cn].text[2], "#skill24")==0) // Sorc - 42 - Lethargy
 				{
 					if (IS_SEYA_OR_SORC(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
-							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you POISON.", ch[co].name);
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LETHARGY.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Sorcerers can inflict vile poisons on their enemies?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Sorcerers can enter a trance to bypass enemy resistances?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#skill25")==0) // ArHr - 43 - Pulse
 				{
@@ -2295,9 +2383,9 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s! Did you know Arch-Harakim can cause damaging bursts without thinking?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Braw - 49 - Leap
+				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Skal - 49 - Leap
 				{
-					if (IS_SEYA_OR_BRWL(co))
+					if (IS_SEYA_OR_SKAL(co))
 					{
 						if (knowarch)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -2305,7 +2393,19 @@ int npc_see(int cn, int co)
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LEAP.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Brawlers can leap great distances to strike distant foes?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Skalds can leap great distances to strike distant foes?", ch[co].name);
+				}
+				else if (strcmp(ch[cn].text[2], "#skill27")==0) // Brav - 14 - Rage
+				{
+					if (IS_SEYA_OR_BRAV(co))
+					{
+						if (knowarch)
+							do_sayx(cn, "Greetings, %s!", ch[co].name);
+						else
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you RAGE.", ch[co].name);
+					}
+					else
+						do_sayx(cn, "Greetings, %s! Did you know Bravers can force themselves into a furious rage?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#gatekeeper13")==0)
 				{
@@ -2565,7 +2665,8 @@ int npc_try_spell(int cn, int co, int spell)
 	int mana, end, n, in, tmp, cc;
 	int offn, defn;
 
-	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && spell!=SK_WARCRY && spell!=SK_BLIND)
+	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && 
+		spell!=SK_TAUNT && spell!=SK_WARCRY && spell!=SK_BLIND)
 	{
 		if ((ch[cn].flags & CF_NOMAGIC) || (ch[co].flags & CF_NOMAGIC))
 		{
@@ -2679,6 +2780,11 @@ int npc_try_spell(int cn, int co, int spell)
 				(spell==bu[in].data[1] || spell==bu[in].data[2] || spell==bu[in].data[3]))
 			{
 				chlog(cn,"Immunize true (%d)",bu[in].temp);
+				break;
+			}
+			// Poison layer adjustments
+			if (bu[in].temp==spell && spell==SK_POISON && bu[in].active>bu[in].duration/3)
+			{
 				break;
 			}
 		}
@@ -3769,7 +3875,7 @@ void stronghold_mage_driver_ver2(int cn)
 				do_char_log(n, 3, " --- WAVE %d ENDS --- \n", ch[cn].data[1]);
 				if (ch[n].data[26])
 				{
-					j = ch[cn].data[1]*ch[cn].data[1]*magenum*3+ch[n].data[26]*magenum;
+					j = ch[cn].data[1]*ch[cn].data[1]*(magenum==3?4:magenum)*3/2+ch[n].data[26]*(magenum==3?4:magenum);
 					ch[n].data[26] = 0;
 					chlog(n, "Gets %d BSP", j);
 					ch[n].bs_points += j;
@@ -3777,6 +3883,26 @@ void stronghold_mage_driver_ver2(int cn)
 						do_char_log(n, 2, "You get %d stronghold points.\n", j);
 				}
 			}
+		}
+		if ((in = map[candleA].it) && !it[in].active)
+		{
+			it[in].data[1] = ch[cn].data[1]*ch[cn].data[1]*(magenum==3?4:magenum)*2+ch[n].data[26]*(magenum==3?4:magenum);
+		}
+		if ((in = map[candleB].it) && !it[in].active)
+		{
+			it[in].data[1] = ch[cn].data[1]*ch[cn].data[1]*(magenum==3?4:magenum)*2+ch[n].data[26]*(magenum==3?4:magenum);
+		}
+		if ((in = map[candleC].it) && !it[in].active)
+		{
+			it[in].data[1] = ch[cn].data[1]*ch[cn].data[1]*(magenum==3?4:magenum)*2+ch[n].data[26]*(magenum==3?4:magenum);
+		}
+		if ((in = map[candleD].it) && !it[in].active)
+		{
+			it[in].data[1] = ch[cn].data[1]*ch[cn].data[1]*(magenum==3?4:magenum)*2+ch[n].data[26]*(magenum==3?4:magenum);
+		}
+		if ((in = map[candleE].it) && !it[in].active)
+		{
+			it[in].data[1] = ch[cn].data[1]*ch[cn].data[1]*(magenum==3?4:magenum)*2+ch[n].data[26]*(magenum==3?4:magenum);
 		}
 		
 		ch[cn].data[1]++;
@@ -4643,7 +4769,7 @@ int npc_driver_high(int cn)
 			return 1;
 		}
 		// Dispel - for enemy
-		if (co && B_SK(cn, SK_DISPEL) && get_tarot(cn, IT_CH_HEIROPH))
+		if (co && B_SK(cn, SK_DISPEL) && get_tarot(cn, IT_CH_HEIROPH) && !has_buff(co, SK_DISPEL2))
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
 			{

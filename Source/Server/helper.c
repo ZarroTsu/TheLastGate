@@ -1218,7 +1218,7 @@ int change_bs_shop_item(int cn, int in)
 		case IT_GAXE_STEL:
 			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, 10); // 1. Greataxe
-			else if (IS_ANY_MERC(cn))
+			else if (IS_ANY_MERC(cn) || IS_BRAVER(cn))
 				in = get_best_weapon(cn, SK_SWORD); // 1. Sword
 			else if (IS_ANY_HARA(cn))
 				in = get_best_weapon(cn, 7); // 1. Spear
@@ -1233,17 +1233,19 @@ int change_bs_shop_item(int cn, int in)
 				in = get_best_weapon(cn, SK_SHIELD); // 2. Shield
 			else if (IS_ANY_HARA(cn))
 				in = get_best_weapon(cn, SK_STAFF); // 2. Staff
+			else if (IS_BRAVER(cn))
+				in = get_best_weapon(cn, SK_DUAL); // 3. Dual Sword
 			else
 				in = 0;
 			break;
 		// Steel axe, change to appropriate 3rd skill item
 		case IT_AXXE_STEL:
-			if (IS_ANY_TEMP(cn))
+			if (IS_ANY_TEMP(cn) || IS_WARRIOR(cn))
 				in = get_best_weapon(cn, SK_AXE); // 3. Axe
-			else if (IS_WARRIOR(cn))
-				in = get_best_weapon(cn, SK_DUAL); // 3. Dual Sword
 			else if (IS_ANY_HARA(cn) || IS_MERCENARY(cn) || IS_SORCERER(cn))
 				in = get_best_weapon(cn, SK_DAGGER); // 3. Dagger
+			else if (IS_BRAVER(cn))
+				in = get_best_weapon(cn, SK_HAND); // 3. Claw
 			else
 				in = 0;
 			break;
@@ -1252,7 +1254,7 @@ int change_bs_shop_item(int cn, int in)
 			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, SK_SHIELD); // 4. Shield
 			else if (IS_WARRIOR(cn))
-				in = get_best_weapon(cn, SK_DAGGER); // 4. Dagger
+				in = get_best_weapon(cn, SK_DUAL); // 4. Dual Sword
 			else if (IS_ANY_HARA(cn) || IS_MERCENARY(cn) || IS_SORCERER(cn))
 				in = get_best_weapon(cn, SK_HAND); // 4. Claw
 			else
@@ -1260,17 +1262,17 @@ int change_bs_shop_item(int cn, int in)
 			break;
 		// Steel sword, change to appropriate 5th skill item
 		case IT_SWOR_STEL:
-			if (IS_ARCHTEMPLAR(cn))
-				in = get_best_weapon(cn, SK_DUAL); // 5. Dual Sword
-			else if (IS_TEMPLAR(cn) || IS_BRAWLER(cn) || IS_WARRIOR(cn))
+			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, SK_HAND); // 5. Claw
+			else if (IS_WARRIOR(cn))
+				in = get_best_weapon(cn, SK_DAGGER); // 5. Dagger
 			else
 				in = 0;
 			break;
 		// Steel sword, change to appropriate 6th skill item
 		case IT_DUAL_STEL:
-			if (IS_ARCHTEMPLAR(cn))
-				in = get_best_weapon(cn, SK_HAND); // 6 Claw
+			if (IS_WARRIOR(cn))
+				in = get_best_weapon(cn, SK_HAND); // 6. Claw
 			else
 				in = 0;
 			break;
@@ -1654,17 +1656,17 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 			case 11:
 				if (legendary) suffix = "Vitale"; else suffix = " of Vitality";
 				it[in].hp[0] += 40 * mul;
-				it[in].skill[SK_REGEN][0] += 3 * mul;
+				it[in].skill[SK_REGEN][0] += 4 * mul;
 				break;
 			case 12:
 				if (legendary) suffix = "Vigor"; else suffix = " of Vigor";
 				it[in].end[0] += 20 * mul;
-				it[in].skill[SK_REST][0] += 3 * mul;
+				it[in].skill[SK_REST][0] += 4 * mul;
 				break;
 			case 13:
 				if (legendary) suffix = "Spiritus"; else suffix = " of Spirits";
 				it[in].mana[0] += 40 * mul;
-				it[in].skill[SK_MEDIT][0] += 3 * mul;
+				it[in].skill[SK_MEDIT][0] += 4 * mul;
 				break;
 			case 14:
 				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
@@ -1684,7 +1686,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				if (is_robe || is_spea || is_dagg || (is_dama && m))
 				{
 					if (legendary) suffix = "Occultus"; else suffix = " of Occult";
-					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_DAGGER][0] += 2 * mul;
 					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
 				else if (is_thsw)
@@ -1696,19 +1698,19 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else if (is_gaxe || is_axxe)
 				{
 					if (legendary) suffix = "Tumultus"; else suffix = " of Uproar";
-					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_AXE][0] += 2 * mul;
 					it[in].skill[SK_TAUNT][0] += 3 * mul;
 				}
 				else if (is_swor)
 				{
 					if (legendary) suffix = "Deceptio"; else suffix = " of Deception";
-					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_SWORD][0] += 2 * mul;
 					it[in].skill[SK_POISON][0] += 3 * mul;
 				}
 				else if (is_staf)
 				{
 					if (legendary) suffix = "Expello"; else suffix = " of Banish";
-					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_STAFF][0] += 2 * mul;
 					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
 				else if (is_shie)
@@ -1726,7 +1728,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_claw
 				{
 					if (legendary) suffix = "Rixa"; else suffix = " of Brawling";
-					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_HAND][0] += 2 * mul;
 					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				break;
@@ -1734,7 +1736,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				if (is_robe || is_spea || is_dagg || (is_dama && m))
 				{
 					if (legendary) suffix = "Cantatrix"; else suffix = " of Hexing";
-					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_DAGGER][0] += 2 * mul;
 					it[in].skill[SK_CURSE][0] += 3 * mul;
 				}
 				else if (is_thsw)
@@ -1746,19 +1748,19 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else if (is_gaxe || is_axxe)
 				{
 					if (legendary) suffix = "Feritas"; else suffix = " of Brutality";
-					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_AXE][0] += 2 * mul;
 					it[in].skill[SK_CLEAVE][0] += 3 * mul;
 				}
 				else if (is_swor)
 				{
 					if (legendary) suffix = "Callidus"; else suffix = " of Cunning";
-					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_SWORD][0] += 2 * mul;
 					it[in].skill[SK_BLIND][0] += 3 * mul;
 				}
 				else if (is_staf)
 				{
 					if (legendary) suffix = "Reconditus"; else suffix = " of Arcana";
-					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_STAFF][0] += 2 * mul;
 					it[in].skill[SK_CURSE][0] += 3 * mul;
 				}
 				else if (is_shie)
@@ -1776,7 +1778,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_claw
 				{
 					if (legendary) suffix = "Inermis"; else suffix = " of Quarrel";
-					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_HAND][0] += 2 * mul;
 					it[in].skill[SK_TAUNT][0] += 3 * mul;
 				}
 				break;
@@ -1784,13 +1786,13 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				if (is_robe || is_spea || is_staf || (is_dama && m))
 				{
 					if (legendary) suffix = "Expello"; else suffix = " of Banish";
-					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_STAFF][0] += 2 * mul;
 					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
 				else if (is_claw)
 				{
 					if (legendary) suffix = "Rixa"; else suffix = " of Brawling";
-					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_HAND][0] += 2 * mul;
 					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				else if (is_axxe)
@@ -1808,7 +1810,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else if (is_dagg)
 				{
 					if (legendary) suffix = "Occultus"; else suffix = " of Occult";
-					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_DAGGER][0] += 2 * mul;
 					it[in].skill[SK_SLOW][0] += 3 * mul;
 				}
 				else if (is_shie)
@@ -1826,7 +1828,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_thsw
 				{
 					if (legendary) suffix = "Inhaere"; else suffix = " of Sparring";
-					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_TWOHAND][0] += 2 * mul;
 					it[in].skill[SK_CLEAVE][0] += 3 * mul;
 				}
 				break;
@@ -1834,13 +1836,13 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				if (is_robe || is_spea || is_staf || (is_dama && m))
 				{
 					if (legendary) suffix = "Reconditus"; else suffix = " of Arcana";
-					it[in].skill[SK_STAFF][0] += 3 * mul;
+					it[in].skill[SK_STAFF][0] += 2 * mul;
 					it[in].skill[SK_CURSE][0] += 3 * mul;
 				}
 				else if (is_claw)
 				{
 					if (legendary) suffix = "Inermis"; else suffix = " of Quarrel";
-					it[in].skill[SK_HAND][0] += 3 * mul;
+					it[in].skill[SK_HAND][0] += 2 * mul;
 					it[in].skill[SK_TAUNT][0] += 3 * mul;
 				}
 				else if (is_axxe)
@@ -1858,7 +1860,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else if (is_dagg)
 				{
 					if (legendary) suffix = "Cantatrix"; else suffix = " of Hexing";
-					it[in].skill[SK_DAGGER][0] += 3 * mul;
+					it[in].skill[SK_DAGGER][0] += 2 * mul;
 					it[in].skill[SK_CURSE][0] += 3 * mul;
 				}
 				else if (is_shie)
@@ -1876,7 +1878,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_thsw
 				{
 					if (legendary) suffix = "Hastiludium"; else suffix = " of Jousting";
-					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_TWOHAND][0] += 2 * mul;
 					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				break;
@@ -1896,7 +1898,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else if (is_thsw)
 				{
 					if (legendary) suffix = "Inhaere"; else suffix = " of Sparring";
-					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_TWOHAND][0] += 2 * mul;
 					it[in].skill[SK_CLEAVE][0] += 3 * mul;
 				}
 				else if (is_swor)
@@ -1908,7 +1910,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_axxe
 				{
 					if (legendary) suffix = "Tumultus"; else suffix = " of Uproar";
-					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_AXE][0] += 2 * mul;
 					it[in].skill[SK_TAUNT][0] += 3 * mul;
 				}
 				break;
@@ -1928,7 +1930,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else if (is_thsw)
 				{
 					if (legendary) suffix = "Hastiludium"; else suffix = " of Jousting";
-					it[in].skill[SK_TWOHAND][0] += 3 * mul;
+					it[in].skill[SK_TWOHAND][0] += 2 * mul;
 					it[in].skill[SK_WEAKEN][0] += 3 * mul;
 				}
 				else if (is_swor)
@@ -1940,7 +1942,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_axxe
 				{
 					if (legendary) suffix = "Feritas"; else suffix = " of Brutality";
-					it[in].skill[SK_AXE][0] += 3 * mul;
+					it[in].skill[SK_AXE][0] += 2 * mul;
 					it[in].skill[SK_CLEAVE][0] += 3 * mul;
 				}
 				break;
@@ -1988,7 +1990,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_swor
 				{
 					if (legendary) suffix = "Deceptio"; else suffix = " of Deception";
-					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_SWORD][0] += 2 * mul;
 					it[in].skill[SK_POISON][0] += 3 * mul;
 				}
 				break;
@@ -2008,28 +2010,28 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				else	// is_swor
 				{
 					if (legendary) suffix = "Callidus"; else suffix = " of Cunning";
-					it[in].skill[SK_SWORD][0] += 3 * mul;
+					it[in].skill[SK_SWORD][0] += 2 * mul;
 					it[in].skill[SK_BLIND][0] += 3 * mul;
 				}
 				break;
 			case 27:
 				if (legendary) suffix = "Acerbita"; else suffix = " of Sharpness";
-				it[in].skill[SK_WEAPONM][0] += 3 * mul;
+				it[in].skill[SK_GEARMAST][0] += 3 * mul;
 				it[in].skill[SK_ENHANCE][0] += 3 * mul;
 				break;
 			case 28:
 				if (legendary) suffix = "Fortitudo"; else suffix = " of Toughness";
-				it[in].skill[SK_ARMORM][0] += 3 * mul;
+				it[in].skill[SK_GEARMAST][0] += 3 * mul;
 				it[in].skill[SK_PROTECT][0] += 3 * mul;
 				break;
 			case 29:
 				if (legendary) suffix = "Salus"; else suffix = " of Safety";
-				it[in].skill[SK_HEAL][0] += 3 * mul;
-				it[in].skill[SK_SWIM][0] += 3 * mul;
+				it[in].skill[SK_HEAL][0] += 4 * mul;
+				it[in].skill[SK_SWIM][0] += 4 * mul;
 				break;
 			case 30:
 				if (legendary) suffix = "Chirurgia"; else suffix = " of Surgery";
-				it[in].crit_multi[0] += 5 * mul;
+				it[in].crit_multi[0] += 10 * mul;
 				break;
 			case 31:
 				if (legendary) suffix = "Acceleratio"; else suffix = " of Acceleration";
@@ -2298,9 +2300,9 @@ struct npc_class npc_class[] = {
 	{"Basalt Golem"         	},	// 181
 	{"Marauder"             	},	// 182
 	{"Ash Golem"               	},	// 183
+	{"Volcan"                  	},	// 184
+	{"Ignis"                    },	// 185
 	//
-	{""                     	},	// 184
-	{""                     	},	// 185
 	{""                     	},	// 186
 	{""                     	},	// 187
 	{""                     	},	// 188
@@ -3047,8 +3049,8 @@ void soultrans_equipment(int cn, int in, int in2)
 		if ((n<MAXSKILL && ch[cn].skill[n][2]) || n>=MAXSKILL)
 		{
 			// If Seyan, check that we know a given arch skill before adding it to the list.
-			if ((n==SK_ZEPHYR || n==SK_WARCRY || n==SK_POISON || 
-				n==SK_PULSE || n==SK_SHADOW || n==SK_LEAP) && 
+			if ((n==SK_ZEPHYR || n==SK_WARCRY || n==SK_LETHARGY || 
+				n==SK_PULSE || n==SK_SHADOW || n==SK_LEAP || n==SK_RAGE) && 
 				IS_SEYAN_DU(cn) && !B_SK(cn, n))
 				continue;
 			known[c] = n; 
@@ -3083,26 +3085,26 @@ void soultrans_equipment(int cn, int in, int in2)
 	if (it[in].data[3])
 	{
 		for (n=0;n<5;n++)
-		{ it[in2].attrib[n][0] += it[in].attrib[n][0];  atrm[n] += soul_bonus[n][2]*it[in].attrib[n][0]; }
+		{ it[in2].attrib[n][0] += it[in].attrib[n][0]*bonus;  atrm[n] += soul_bonus[n][2]*it[in].attrib[n][0]; }
 		for (n=0;n<50;n++)
-		{ it[in2].skill[n][0] += it[in].skill[n][0];    sklm[n] += soul_bonus[n][2]*it[in].skill[n][0]; }
-		it[in2].hp[0]          += it[in].hp[0];   it[in2].hp[2] += soul_bonus[55][2]*it[in].hp[0]/10;
-		it[in2].end[0]         += it[in].end[0];
-		it[in2].mana[0]        += it[in].mana[0]; it[in2].hp[2] += soul_bonus[57][2]*it[in].mana[0]/10;
+		{ it[in2].skill[n][0] += it[in].skill[n][0]*bonus;    sklm[n] += soul_bonus[n][2]*it[in].skill[n][0]; }
+		it[in2].hp[0]          += it[in].hp[0]*bonus;   it[in2].hp[2] += soul_bonus[55][2]*it[in].hp[0]/10;
+		it[in2].end[0]         += it[in].end[0]*bonus;
+		it[in2].mana[0]        += it[in].mana[0]*bonus; it[in2].hp[2] += soul_bonus[57][2]*it[in].mana[0]/10;
 		
-		it[in2].weapon[0]      += it[in].weapon[0];
-		it[in2].armor[0]       += it[in].armor[0];
+		it[in2].weapon[0]      += it[in].weapon[0]*bonus;
+		it[in2].armor[0]       += it[in].armor[0]*bonus;
 		
-		it[in2].move_speed[0]  += it[in].move_speed[0];
-		it[in2].atk_speed[0]   += it[in].atk_speed[0];
-		it[in2].cast_speed[0]  += it[in].cast_speed[0];
-		it[in2].spell_mod[0]   += it[in].spell_mod[0];
-		it[in2].spell_apt[0]   += it[in].spell_apt[0];
-		it[in2].cool_bonus[0]  += it[in].cool_bonus[0];
-		it[in2].crit_chance[0] += it[in].crit_chance[0];
-		it[in2].crit_multi[0]  += it[in].crit_multi[0];
-		it[in2].top_damage[0]  += it[in].top_damage[0];
-		it[in2].gethit_dam[0]  += it[in].gethit_dam[0];
+		it[in2].move_speed[0]  += it[in].move_speed[0]*bonus;
+		it[in2].atk_speed[0]   += it[in].atk_speed[0]*bonus;
+		it[in2].cast_speed[0]  += it[in].cast_speed[0]*bonus;
+		it[in2].spell_mod[0]   += it[in].spell_mod[0]*bonus;
+		it[in2].spell_apt[0]   += it[in].spell_apt[0]*bonus;
+		it[in2].cool_bonus[0]  += it[in].cool_bonus[0]*bonus;
+		it[in2].crit_chance[0] += it[in].crit_chance[0]*bonus;
+		it[in2].crit_multi[0]  += it[in].crit_multi[0]*bonus;
+		it[in2].top_damage[0]  += it[in].top_damage[0]*bonus;
+		it[in2].gethit_dam[0]  += it[in].gethit_dam[0]*bonus;
 	}
 	
 	// 4.2  Add the random stats
@@ -4118,107 +4120,107 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 	{50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,50,50,50,50,50,50,50,50,50}, //  0 : null
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55,40, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0,60,55,50,45,40,35,50,35,49,51}, //  1 : bs skele
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0,60,55,50,45,40,35,50,35,49,51}, //  1 : bs skele
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,60, 0, 0, 0, 0, 0,50,50, 0,40,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55,45,40,50,60,40,50,30,51,49}, //  2 : bs ghost
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55,45,40,50,60,40,50,30,51,49}, //  2 : bs ghost
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,60, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0, 0,60,50,45,40,55,35,50,35,50,50}, //  3 : bs rodent
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0, 0,60,50,45,40,55,35,50,35,50,50}, //  3 : bs rodent
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0,60, 0, 0, 0, 0, 0, 0,50,40,55,60,45,30,50,40,52,48}, //  4 : bs undead
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0,60, 0, 0, 0, 0, 0, 0,50,40,55,60,45,30,50,40,52,48}, //  4 : bs undead
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0,60, 0, 0,40, 0, 0, 0, 0, 0, 0, 0, 0, 0,40,45,60,55,50,30,50,40,46,54}, //  5 : bs grolm
+	 75, 0, 0, 0, 0, 0, 0,60, 0, 0,40, 0, 0, 0, 0, 0, 0, 0, 0, 0,40,45,60,55,50,30,50,40,46,54}, //  5 : bs grolm
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0, 0, 0,40, 0, 0,55,60,45,40,50,40,50,30,54,46}, //  6 : bs skink
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0, 0, 0,40, 0, 0,55,60,45,40,50,40,50,30,54,46}, //  6 : bs skink
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0,40, 0, 0, 0,60, 0, 0, 0, 0, 0, 0, 0, 0,50,60,55,45,40,40,50,30,45,55}, //  7 : bs golem
+	 75, 0, 0, 0, 0, 0, 0,40, 0, 0, 0,60, 0, 0, 0, 0, 0, 0, 0, 0,50,60,55,45,40,40,50,30,45,55}, //  7 : bs golem
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,40, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0, 0, 0, 0,40,55,50,60,45,35,50,35,47,53}, //  8 : bs garg
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0, 0, 0, 0,40,55,50,60,45,35,50,35,47,53}, //  8 : bs garg
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,40,60,50, 0,55, 0, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,50,40,55,60,35,50,35,53,47}, //  9 : bs icey
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,50,40,55,60,35,50,35,53,47}, //  9 : bs icey
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55,60, 0, 0, 0,75,80,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0,45,40,60,50,55,40,50,30,48,52}, // 10 : bs flame
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0,45,40,60,50,55,40,50,30,48,52}, // 10 : bs flame
 //
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55,55,60, 0, 0, 0, 0, 0, 0,40,45, 0, 0, 0, 0, 0, 0,50, 0,49,52,55,49,45,35,50,35,47,53}, // 11 : Soldier
+	 75, 0,55,60, 0, 0, 0, 0, 0, 0,40,45, 0, 0, 0, 0, 0, 0,50, 0,49,52,55,49,45,35,50,35,47,53}, // 11 : Soldier
 	{40,40, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0,45, 0, 0,75,75,
-	 75,55, 0, 0, 0,55, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0,50, 0, 0,51,44,50,58,47,35,50,35,45,55}, // 12 : Samurai
+	 75, 0, 0, 0, 0,55, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0,50, 0, 0,51,44,50,58,47,35,50,35,45,55}, // 12 : Samurai
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,45, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60,40, 0, 0,50,75,75,
-	 75,55, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0,53,45,44,53,55,38,50,32,53,47}, // 13 : Magi
+	 75, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0,53,45,44,53,55,38,50,32,53,47}, // 13 : Magi
 	{40, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0, 0, 0, 0, 0, 0,50,50,55, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,	0,40,60, 0, 0, 0, 0, 0,45, 0,46,55,51,48,50,36,50,34,50,50}, // 14 : Hunter
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0,40,60, 0, 0, 0, 0, 0,45, 0,46,55,51,48,50,36,50,34,50,50}, // 14 : Hunter
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,45, 0, 0, 0, 0, 0,50,50,50,40,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0,60, 0, 0, 0, 0, 0,	0, 0,55, 0, 0, 0, 0, 0, 0, 0,45,49,43,53,60,39,50,31,50,50}, // 15 : Witch
+	 75, 0, 0, 0,60, 0, 0, 0, 0, 0,	0, 0,55, 0, 0, 0, 0, 0, 0, 0,45,49,43,53,60,39,50,31,50,50}, // 15 : Witch
 	{40,45, 0, 0, 0, 0, 0, 0,40,50, 0, 0, 0, 0, 0, 0, 0,50,50,50, 0,50, 0,60,55, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0,60, 0, 0,	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,54,46,52,44,54,35,50,35,46,54}, // 16 : Ranger
+	 75, 0, 0, 0, 0, 0, 0,60, 0, 0,	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,54,46,52,44,54,35,50,35,46,54}, // 16 : Ranger
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,60, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0,45,40, 0,75,75,
-	 75,55,55, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0,50, 0, 0, 0, 0, 0, 0,51,48,49,52,50,32,50,38,52,48}, // 17 : Cleric
+	 75, 0,55, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0,50, 0, 0, 0, 0, 0, 0,51,48,49,52,50,32,50,38,52,48}, // 17 : Cleric
 	{40, 0, 0, 0, 0, 0, 0,55, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,45, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0,40, 0, 0,60, 0, 0,	0, 0, 0, 0, 0, 0,50, 0, 0, 0,52,54,45,45,54,38,50,32,51,49}, // 18 : Spirit
+	 75, 0, 0, 0,40, 0, 0,60, 0, 0,	0, 0, 0, 0, 0, 0,50, 0, 0, 0,52,54,45,45,54,38,50,32,51,49}, // 18 : Spirit
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,40, 0,50, 0,60,55, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0,50, 0, 0,	0, 0, 0, 0,60, 0, 0,45, 0, 0,45,51,52,51,51,34,50,36,49,51}, // 19 : Bones
+	 75, 0, 0, 0, 0, 0, 0,50, 0, 0,	0, 0, 0, 0,60, 0, 0,45, 0, 0,45,51,52,51,51,34,50,36,49,51}, // 19 : Bones
 	{40, 0, 0, 0, 0, 0, 0,40,50,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,60,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0,55, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,45, 0, 0,50,50,50,50,50,35,50,35,50,50}, // 20 : Wanderer
+	 75, 0, 0,55, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,45, 0, 0,50,50,50,50,50,35,50,35,50,50}, // 20 : Wanderer
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,55,50, 0,60, 0, 0, 0,45,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0,40, 0, 0, 0,50, 0,60,59,50,48,40,53,37,50,33,49,51}, // 21 : Imp
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0,40, 0, 0, 0,50, 0,60,59,50,48,40,53,37,50,33,49,51}, // 21 : Imp
 	{40,55, 0, 0, 0, 0, 0, 0, 0,50, 0,45, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0,40, 0, 0, 0, 0, 0,60,50,48,49,55,57,41,35,50,35,48,52}, // 22 : Gator
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0,40, 0, 0, 0, 0, 0,60,50,48,49,55,57,41,35,50,35,48,52}, // 22 : Gator
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,60, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0,40, 0, 0,	0,55, 0, 0,50, 0,45, 0, 0, 0,60,51,47,43,49,34,50,36,53,47}, // 23 : Swarmling
+	 75, 0, 0, 0, 0, 0, 0,40, 0, 0,	0,55, 0, 0,50, 0,45, 0, 0, 0,60,51,47,43,49,34,50,36,53,47}, // 23 : Swarmling
 	{40, 0, 0, 0, 0, 0, 0,50, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,45, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0,40, 0, 0, 0, 0,	0, 0, 0,55, 0, 0,60, 0, 0, 0,55,50,46,42,57,32,50,38,52,48}, // 24 : Phantom
+	 75, 0, 0, 0, 0,40, 0, 0, 0, 0,	0, 0, 0,55, 0, 0,60, 0, 0, 0,55,50,46,42,57,32,50,38,52,48}, // 24 : Phantom
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0,55, 0,75,75,
-	 75,55,40, 0, 0,60, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0, 0,45, 0,47,53,60,50,40,30,50,40,54,46}, // 25 : Construct
+	 75, 0,40, 0, 0,60, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0, 0,45, 0,47,53,60,50,40,30,50,40,54,46}, // 25 : Construct
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,60, 0, 0, 0, 0, 0,50,50, 0,55,50, 0,60,50, 0,45, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0, 0, 0, 0,54,58,50,46,42,33,50,37,49,51}, // 26 : Daemon
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0, 0, 0, 0,54,58,50,46,42,33,50,37,49,51}, // 26 : Daemon
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,55,40,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55,45, 0, 0, 0, 0,50, 0, 0,	0, 0,60, 0, 0, 0, 0, 0, 0, 0,44,53,51,56,46,33,50,37,50,50}, // 27 : Mummy
+	 75, 0,45, 0, 0, 0, 0,50, 0, 0,	0, 0,60, 0, 0, 0, 0, 0, 0, 0,44,53,51,56,46,33,50,37,50,50}, // 27 : Mummy
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55,55,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,40,60,45,58,41,54,41,56,31,50,39,50,50}, // 28 : Roach
+	 75, 0,55,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,40,60,45,58,41,54,41,56,31,50,39,50,50}, // 28 : Roach
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,45, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55,50, 0, 0, 0, 0, 0, 0, 0,55,50, 0, 0, 0, 0, 0, 0,50, 0,40,48,58,60,44,31,50,39,55,45}, // 29 : Statue
+	 75, 0,50, 0, 0, 0, 0, 0, 0, 0,55,50, 0, 0, 0, 0, 0, 0,50, 0,40,48,58,60,44,31,50,39,55,45}, // 29 : Statue
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60,45,55, 0, 0,75,75,
-	 75,55, 0, 0,60, 0, 0, 0, 0, 0,	0, 0, 0, 0,40, 0,50, 0, 0, 0,50,60,42,47,51,39,50,31,47,53}, // 30 : Jinni
+	 75, 0, 0, 0,60, 0, 0, 0, 0, 0,	0, 0, 0, 0,40, 0,50, 0, 0, 0,50,60,42,47,51,39,50,31,47,53}, // 30 : Jinni
 	{40,50, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0,45, 0,55, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0, 0, 0,40,46,59,54,46,45,34,50,36,47,53}, // 31 : Dragoon
+	 75, 0, 0,45, 0,55, 0, 0, 0, 0,60, 0, 0, 0, 0, 0, 0, 0, 0,40,46,59,54,46,45,34,50,36,47,53}, // 31 : Dragoon
 	{40,60, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0,40, 0, 0, 0,45, 0, 0,50, 0, 0, 0,55, 0, 0, 0, 0, 0,42,56,59,50,43,32,50,38,52,48}, // 32 : Gladiator
+	 75, 0, 0,40, 0, 0, 0,45, 0, 0,50, 0, 0, 0,55, 0, 0, 0, 0, 0,42,56,59,50,43,32,50,38,52,48}, // 32 : Gladiator
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0,60,50, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0,55, 0, 0,	0, 0,45, 0,40, 0, 0, 0, 0, 0,55,47,45,51,52,37,50,33,51,49}, // 33 : Alchemist
+	 75, 0, 0, 0, 0, 0, 0,55, 0, 0,	0, 0,45, 0,40, 0, 0, 0, 0, 0,55,47,45,51,52,37,50,33,51,49}, // 33 : Alchemist
 	{40, 0, 0, 0, 0, 0, 0,60, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0,40, 0, 0, 0, 0,	0,50, 0, 0, 0, 0, 0,55, 0,45,53,47,56,48,46,33,50,37,46,54}, // 34 : Lancer
+	 75, 0, 0, 0, 0,40, 0, 0, 0, 0,	0,50, 0, 0, 0, 0, 0,55, 0,45,53,47,56,48,46,33,50,37,46,54}, // 34 : Lancer
 	{40, 0, 0, 0, 0, 0, 0, 0,60,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0,50,40,75,75,
-	 75,55, 0, 0,45, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0,55, 0, 0, 0, 0,57,40,46,55,52,36,50,34,54,46}, // 35 : Druid
+	 75, 0, 0, 0,45, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0,55, 0, 0, 0, 0,57,40,46,55,52,36,50,34,54,46}, // 35 : Druid
 	{40, 0, 0, 0, 0, 0, 0,40, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55,45,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,55, 0,60,48,54,53,47,48,34,50,36,48,52}, // 36 : Swordsman
+	 75, 0,45,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,55, 0,60,48,54,53,47,48,34,50,36,48,52}, // 36 : Swordsman
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0,55,60, 0,75,75,
-	 75,55, 0, 0, 0,40, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0,41,55,47,59,48,33,50,37,55,45}, // 37 : Paladin
+	 75, 0, 0, 0, 0,40, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0,41,55,47,59,48,33,50,37,55,45}, // 37 : Paladin
 	{40,50, 0, 0, 0, 0, 0,55, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,45,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0,60, 0, 0, 0, 0,	0, 0, 0,40, 0, 0, 0, 0, 0, 0,49,52,53,49,47,36,50,34,45,55}, // 38 : Amazon
+	 75, 0, 0, 0, 0,60, 0, 0, 0, 0,	0, 0, 0,40, 0, 0, 0, 0, 0, 0,49,52,53,49,47,36,50,34,45,55}, // 38 : Amazon
 	{40, 0, 0, 0, 0, 0, 0, 0,45,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55,55, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0,50,60,40, 0,47,57,48,45,53,37,50,33,49,51}, // 39 : Dancer
+	 75, 0,55, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0,50,60,40, 0,47,57,48,45,53,37,50,33,49,51}, // 39 : Dancer
 	{40, 0, 0, 0, 0, 0, 0, 0,55,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,50,50, 0,60, 0, 0, 0,60,75,75,
-	 75,55, 0, 0, 0, 0, 0,40, 0, 0,	0, 0, 0, 0, 0,45, 0, 0, 0, 0,50,42,49,54,55,38,50,32,51,49}, // 40 : Warlock
+	 75, 0, 0, 0, 0, 0, 0,40, 0, 0,	0, 0, 0, 0, 0,45, 0, 0, 0, 0,50,42,49,54,55,38,50,32,51,49}, // 40 : Warlock
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60,45, 0, 0,50,75,75,
-	 75,55, 0, 0,40, 0, 0, 0, 0, 0,	0, 0, 0,55,60, 0, 0, 0, 0, 0,56,43,40,52,59,40,50,30,51,49}, // 41 : Wizard
+	 75, 0, 0, 0,40, 0, 0, 0, 0, 0,	0, 0, 0,55,60, 0, 0, 0, 0, 0,56,43,40,52,59,40,50,30,51,49}, // 41 : Wizard
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60,60,40, 0,55,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0,50,45, 0, 0, 0,52,45,41,54,58,37,50,33,48,52}, // 42 : Mystic
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0,50,45, 0, 0, 0,52,45,41,54,58,37,50,33,48,52}, // 42 : Mystic
 	{40, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,55,50, 0,60, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0,	0,60,40, 0,45, 0, 0, 0, 0, 0,43,46,57,55,49,36,50,34,53,47}, // 43 : Grossling
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0,60,40, 0,45, 0, 0, 0, 0, 0,43,46,57,55,49,36,50,34,53,47}, // 43 : Grossling
 //   30             35             40             45             50             55            (60)
 	{40,50, 0, 0, 0, 0, 0, 0, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,75,
-	 75,55, 0,50, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,45,31,40,35,45,51}, // *1 : Kali
+	 75, 0, 0,50, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,45,31,40,35,45,51}, // *1 : Kali
 	{40, 0, 0, 0, 0, 0, 0, 0,50,44, 0, 0, 0, 0, 0, 0, 0,50,50,45, 0,50, 0,55, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,45,45,45,45,45,30,40,36,46,50}, // *2 : Rundas
+	 75, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,45,45,45,45,45,30,40,36,46,50}, // *2 : Rundas
 	{40, 0, 0, 0, 0, 0, 0,45, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,75,
-	 75,55,45, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0,50, 0, 0,45,45,45,45,45,35,40,31,49,47}, // *3 : Szelanya
+	 75, 0,45, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0,50, 0, 0,45,45,45,45,45,35,40,31,49,47}, // *3 : Szelanya
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0,45, 0, 0,75,75,
-	 75,55, 0,50, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,33,40,33,48,48}, // *4 : Azrael
+	 75, 0, 0,50, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,33,40,33,48,48}, // *4 : Azrael
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0,45,45, 0,75,75,
-	 75,55, 0, 0,50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,34,40,32,51,45}, // *5 : Brighid
+	 75, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,34,40,32,51,45}, // *5 : Brighid
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0,45,75,75,
-	 75,55, 0, 0, 0, 0, 0,45, 0, 0, 0, 0,50, 0, 0,50, 0, 0, 0, 0,45,45,45,45,45,32,40,34,47,49}, // *6 : Nidhogg
+	 75, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0,50, 0, 0,50, 0, 0, 0, 0,45,45,45,45,45,32,40,34,47,49}, // *6 : Nidhogg
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0,45,50, 0,55, 0, 0, 0, 0,75,75,
-	 75,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,50, 0,50, 0, 0, 0,45,45,45,45,45,36,40,30,50,46}  // *7 : Metztli
+	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,50, 0,50, 0, 0, 0,45,45,45,45,45,36,40,30,50,46}  // *7 : Metztli
 };
 
 int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, int tarot)
@@ -4310,9 +4312,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			//
 			case 3:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/20);
+					B_AT(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/18);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/20)*2;
+					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/18)*2;
 				ch[co].data[72] = 3;
 				//
 				if (in = god_create_item(IT_SOULCATAL)) make_catalyst(co, in, base);
@@ -4320,9 +4322,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				break;
 			case 4:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/18);
+					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/18)*2;
+					B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16)*2;
 				ch[co].data[72] = 4;
 				//
 				if (in = god_create_item(IT_SOULCATAL)) make_catalyst(co, in, base);
@@ -4330,18 +4332,18 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				break;
 			case 5:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/18);
+					B_AT(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/20);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/20)*2;
+					B_SK(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/20)*2;
 				ch[co].data[72] = 5;
 				ch[co].data[25] = 1;
 				if (in = god_create_item(IT_SOULFOCUS)) make_focus(co, in, base);
 				break;
 			case 6:
 				for (n = 0; n<5; n++)
-					B_AT(co, n) += (B_AT(co, n)/16)+RANDOM(B_AT(co, n)/16);
+					B_AT(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/22);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
-					B_SK(co, n) += (B_AT(co, n)/16)+RANDOM(B_AT(co, n)/16)*2;
+					B_SK(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/22)*2;
 				ch[co].data[72] = 6;
 				if (in = god_create_item(IT_SOULFOCUS)) make_focus(co, in, base);
 				break;

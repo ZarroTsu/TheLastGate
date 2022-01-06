@@ -10,15 +10,15 @@
 
 //		AT_BRV	AT_WIL	AT_INT	AT_AGL	AT_STR
 
-struct s_skilltab skilltab[MAXSKILL] = {
+struct s_skilltab skilltab[MAXSKILL+2] = {
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{  0, 'C', 	"Hand to Hand", 		"Passive ability to hit and parry while unarmed.", 
 				"", "", "", 
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
-	{  1, 'H', 	"Precision", 			"Passively improves your ability to inflict critical hits.", 
+	{  1, 'G', 	"Precision", 			"Passively improves your ability to inflict critical hits.", 
 				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_STR }},
+				{ AT_BRV, AT_BRV, AT_WIL }},
 				
 	{  2, 'D', 	"Dagger", 				"Passive ability to hit and parry with a dagger in your main hand.", 
 				"", "", "", 
@@ -41,18 +41,18 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
 	{  7, 'F', 	"Zephyr", 				"Use (Spell): Applies a self-buff, granting additional melee hits after a brief delay. This buff also grants a small bonus to immunity.", 
-				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_AGL }},
+				"Zephyr (Thorns)", 		"Use (Spell): Applies a self-buff, granting retaliation hits after parrying. This buff also grants a small bonus to resistance.", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{  8, 'H', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
+	{  8, 'G', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
 				"", "", "", 
-				{ AT_INT, AT_AGL, AT_AGL }},
+				{ AT_INT, AT_INT, AT_AGL }},
 				
-	{  9, 'H', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
+	{  9, 'G', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
 				"", "", "", 
 				{ AT_INT, AT_INT, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 10, 'H', 	"Swimming", 			"Passive ability to prevent the loss of hitpoints while you are underwater.", 
+	{ 10, 'G', 	"Swimming", 			"Passive ability to prevent the loss of hitpoints while you are underwater.", 
 				"", "", "", 
 				{ AT_WIL, AT_AGL, AT_STR }},
 				
@@ -60,19 +60,19 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				"Magic Shell", 			"Use (Spell): Applies a buff to yourself, granting temporary resistance and immunity.", "", 
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
-	{ 12, 'H', 	"Bartering", 			"Passive ability to get better prices while buying or selling.", 
+	{ 12, 'G', 	"Bartering", 			"Passive ability to get better prices while buying or selling.", 
 				"", "", "", 
-				{ AT_BRV, AT_INT, AT_INT }},
+				{ AT_BRV, AT_INT, AT_AGL }},
 				
 	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.", 
 				"", "", "", 
-				{ AT_INT, AT_AGL, AT_STR }},
+				{ AT_INT, AT_STR, AT_STR }},
 				
-	{ 14, 'F', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
-				"", "", "", 
-				{ AT_BRV, AT_WIL, AT_INT }},
+	{ 14, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of endurance over time.", 
+				"Rage (Furious)", 		"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of life over time.", "", 
+				{ AT_BRV, AT_BRV, AT_AGL }},
 				
-	{ 15, 'F', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location, after a brief delay.", 
+	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.", 
 				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
@@ -102,14 +102,14 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				
 	{ 22, 'F', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.", 
 				"", "", "", 
-				{ AT_BRV, AT_WIL, AT_INT }},
+				{ AT_WIL, AT_WIL, AT_INT }},
 				
-	{ 23, 'H', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
+	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
 				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_STR }},
 				
-	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", 
-				"Blast (Douse)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, reducing your target's spell modifier.", "", 
+	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies.", 
+				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", "",  
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.", 
@@ -137,19 +137,19 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				"", "", "", 
 				{ AT_INT, AT_INT, AT_INT }},
 				
-	{ 31, 'H', 	"Sense Magic", 			"Passive ability to sense who or what did something to you, and sense magical item drops.", 
+	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff to cooldown rate, and debuffs nearby enemy cooldown rate.", 
 				"", "", "", 
-				{ AT_WIL, AT_WIL, AT_STR }},
+				{ AT_BRV, AT_AGL, AT_AGL }},
 				
-	{ 32, 'H', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
-				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{ 33, 'H', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
+	{ 32, 'G', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
 				"", "", "", 
 				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{ 34, 'H', 	"Concentrate", 			"Passive ability to reduce the mana cost of spells and abilities.", 
+	{ 33, 'G', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
+				"", "", "", 
+				{ AT_BRV, AT_AGL, AT_STR }},
+				
+	{ 34, 'G', 	"Concentrate", 			"Passive ability to reduce the mana cost of spells and abilities.", 
 				"", "", "", 
 				{ AT_WIL, AT_WIL, AT_WIL }},
 				
@@ -163,41 +163,41 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				
 	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 2 tiles.", 
 				"", "", "", 
-				{ AT_BRV, AT_WIL, AT_AGL }},
+				{ AT_BRV, AT_INT, AT_AGL }},
 				
-	{ 38, 'G', 	"Weapon Mastery", 		"Passive ability to improve weapon value granted by your equipped weapon.", 
+	{ 38, 'G', 	"Gear Mastery", 		"Passive ability to improve weapon and armor values granted by your equipment.", 
 				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_AGL }},
+				{ AT_BRV, AT_AGL, AT_STR }},
 				
-	{ 39, 'H', 	"Armor Mastery", 		"Passive ability to improve armor value granted by your equipped armor.", 
+	{ 39, 'G', 	"Safeguard", 			"Passive ability to reduce damage taken.", 
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies.", 
-				"", "", "", 
+	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", 
+				"Cleave (Aggravate)",	"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take additional damage.", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon and armor values.", 
-				"Weaken (Greater)", 	"Use (Skill): Applies a debuff to your foe and surrounding enemies, greatly reducing their armor value.", "", 
+	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon value.", 
+				"Weaken (Crush)", 		"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their armor value.", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
 	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, causing them to take damage over time. Stacks up to 3 times.", 
-				"", "", "", 
+				"Poison (Venom)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their immunity and causing them to take damage over time. Does not stack.", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes. Has a base radius of 2 tiles.", 
 				"", "", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
-	{ 44, 'H', 	"Proximity", 			"Passively improves the area-of-effect of your Warcry, Taunt, and Surround Hit skills.", // Arch-Templar
+	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of your Warcry, Taunt, and Surround Hit skills.", // Arch-Templar
 										"Passively improves the hit rate of your Surround Hit skill, and the area-of-effect of your Blind skill.", // Warrior
 										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
-				{ AT_BRV, AT_BRV, AT_BRV }},
-				
-	{ 45, 'H', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
-				"", "", "", 
 				{ AT_BRV, AT_WIL, AT_INT }},
+				
+	{ 45, 'G', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
+				"", "", "", 
+				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
 				"", "", "", 
@@ -211,8 +211,14 @@ struct s_skilltab skilltab[MAXSKILL] = {
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target. Deals critical damage against single targets.", 
-				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_STR }}
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", 
+				"Leap (Random)", 		"Use (Skill): Strike your foe and leap to a random target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", "", 
+				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
+				"", "", "", 
+				{ 0, 0, 0 }},
+	{ 51, 'H', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location after a brief delay.", 
+				"", "", "", 
+				{ 0, 0, 0 }}
 };

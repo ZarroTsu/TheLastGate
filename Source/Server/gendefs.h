@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000700
-#define MINVERSION			0x000700
+#define VERSION				0x000801
+#define MINVERSION			0x000800
 
 #define DATDIR				".dat"
 
@@ -57,6 +57,9 @@
 
 #define OS_WARP_X			 658
 #define OS_WARP_Y			 727
+
+#define BRAVER_WARP_X		 959
+#define BRAVER_WARP_Y		 519
 
 #define LAB_I_X				  74
 #define LAB_I_Y				  25
@@ -201,13 +204,15 @@
 #define SP_COST_DISPEL		40
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		60
-#define SP_COST_PULSE		65 // reduce?
-#define SP_COST_ZEPHYR		50 // reduce?
+#define SP_COST_PULSE		65
+#define SP_COST_ZEPHYR		50
+#define SP_COST_LETHARGY	40
 
 #define SP_COST_WEAKEN		10
 #define SP_COST_BLIND		20
 #define SP_COST_TAUNT		16
 #define SP_COST_WARCRY		24
+#define SP_COST_RAGE		20
 
 #define FIVE_PERC_FAIL		18
 #define TEN_PERC_FAIL		17
@@ -236,9 +241,9 @@
 #define DAM_MULT_HOLYW		 750
 #define DAM_MULT_THORNS		1000
 #define DAM_MULT_CLEAVE		 750
-#define DAM_MULT_PULSE		 120
-#define DAM_MULT_ZEPHYR		  40
-#define DAM_MULT_LEAP		 450
+#define DAM_MULT_PULSE		 100
+#define DAM_MULT_ZEPHYR		  25
+#define DAM_MULT_LEAP		 375
 
 // -------- Buff Duration values -------- //
 #define SP_DUR_LIGHT		( TICKS * 60 * 30                 )
@@ -261,8 +266,12 @@
 #define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_RECALL(a)	( max(TICKS / 2, 60 - (a / 4))    )
 #define SP_DUR_SHADOW(a)	( TICKS * 15 + TICKS * a / 5      )
-#define SP_DUR_BLEED		( TICKS * 10                      )
+#define SP_DUR_BLEED		( TICKS * 15                      )
 #define SP_DUR_WEAKEN		( TICKS * 60                      )
+#define SP_DUR_RAGE			( TICKS * 60 * 60 * 2             )
+#define SP_DUR_ARIA			( TICKS * 5                       )
+#define SP_DUR_LETHARGY		( TICKS * 60 * 60 * 2             )
+#define SP_DUR_AGGRAVATE	( TICKS * 20                      )
 
 #define SP_DUR_DISPEL		( TICKS * 15                      )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
@@ -301,12 +310,14 @@
 #define SK_EXH_SHADOW		(TICKS * 4)
 #define SK_EXH_CLEAVE		(TICKS * 5)
 #define SK_EXH_WEAKEN		(TICKS * 3)
+#define SK_EXH_LETHARGY		(TICKS * 4)
 
 #define SK_EXH_PULSE		(TICKS * 6)
 #define SK_EXH_ZEPHYR		(TICKS * 4)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP			(TICKS * 6)
+#define SK_EXH_LEAP			(TICKS * 5)
+#define SK_EXH_RAGE			(TICKS * 4)
 
 
 

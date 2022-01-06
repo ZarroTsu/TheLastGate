@@ -17,8 +17,8 @@
 #define TICKMULTI		2
 #define TICKS			(18*TICKMULTI)
 
-#define MAXSKILL		50  // must match server!
-#define MAXBUFFS		40  // must match server!
+#define MAXSKILL		(50+2)	// must match server!
+#define MAXBUFFS		40		// must match server!
 #define MAXWPS			20
 
 // -------- Damage Multipliers -------- //
@@ -28,9 +28,9 @@
 #define DAM_MULT_HOLYW		 750
 #define DAM_MULT_THORNS		1000
 #define DAM_MULT_CLEAVE		 750
-#define DAM_MULT_PULSE		 120
-#define DAM_MULT_ZEPHYR		  40
-#define DAM_MULT_LEAP		 450
+#define DAM_MULT_PULSE		 100
+#define DAM_MULT_ZEPHYR		  25
+#define DAM_MULT_LEAP		 375
 #define DAM_MULT_POISON		1800
 
 // wear positions
@@ -152,6 +152,7 @@ struct cmap {
 	int back;	// background
 	int obj1;	// item
 	int obj2;	// character
+//	int obj2f;	// character animation frame
 
 	int obj_xoff,obj_yoff;
 	int ovl_xoff,ovl_yoff;
@@ -258,6 +259,7 @@ struct cplayer {
 #define CL_CMD_WPS			35
 #define CL_CMD_MOTD			36
 #define CL_CMD_BSSHOP		37
+#define CL_CMD_QSHOP		38
 #define CL_CMD_CTICK		255
 
 
@@ -311,12 +313,6 @@ struct cplayer {
 #define SV_LOOK5					50
 #define SV_LOOK6					51
 
-#define SV_LOG						52
-#define SV_LOG0						52
-#define SV_LOG1						53
-#define SV_LOG2						54
-#define SV_LOG3						55
-
 #define SV_LOAD                 	56
 #define SV_CAP						57
 #define SV_MOD1						58
@@ -347,6 +343,18 @@ struct cplayer {
 #define SV_MOTD1					83
 #define SV_MOTD2					84
 #define SV_MOTD3					85
+
+#define SV_LOG  90
+#define SV_LOG0 90
+#define SV_LOG1 91
+#define SV_LOG2 92
+#define SV_LOG3 93
+#define SV_LOG4 94
+#define SV_LOG5 95
+#define SV_LOG6 96
+#define SV_LOG7 97
+#define SV_LOG8 98
+#define SV_LOG9 99
 
 #define SV_SETMAP					128
 
@@ -443,6 +451,78 @@ struct cplayer {
 #define SPR_NEWBIE					2048
 #define SPR_CHAR0					2048		// fills 256 slots
 #define SPR_CHAR1					2048		// fills 256 slots
+
+//
+
+#define SPF_IDLE_UP					   0
+#define SPF_IDLE_DOWN				   8
+#define SPF_IDLE_LEFT				  16
+#define SPF_IDLE_RIGHT				  24
+#define SPF_IDLE_LEFTUP				  32
+#define SPF_IDLE_LEFTDOWN			  40
+#define SPF_IDLE_RIGHTUP			  48
+#define SPF_IDLE_RIGHTDOWN			  56
+#define SPF_WALK_UP					  64
+#define SPF_WALK_DOWN				  72
+#define SPF_WALK_LEFT				  80
+#define SPF_WALK_RIGHT				  88
+#define SPF_WALK_LEFTUP				  96
+#define SPF_WALK_LEFTDOWN			 104
+#define SPF_WALK_RIGHTUP			 112
+#define SPF_WALK_RIGHTDOWN			 120
+#define SPF_TURN_UPLEFTUP			 128
+#define SPF_TURN_LEFTUPUP			 132
+#define SPF_TURN_UPRIGHTUP			 136
+#define SPF_TURN_RIGHTUPRIGHT		 140
+#define SPF_TURN_DOWNLEFTDOWN		 144
+#define SPF_TURN_LEFTDOWNLEFT		 148
+#define SPF_TURN_DOWNRIGHTDOWN		 152
+#define SPF_TURN_RIGHTDOWNDOWN		 156
+#define SPF_TURN_LEFTLEFTUP			 160
+#define SPF_TURN_LEFTUPLEFT			 164
+#define SPF_TURN_LEFTLEFTDOWN		 168
+#define SPF_TURN_LEFTDOWNDOWN		 172
+#define SPF_TURN_RIGHTRIGHTUP		 176
+#define SPF_TURN_RIGHTUPUP			 180
+#define SPF_TURN_RIGHTRIGHTDOWN		 184
+#define SPF_TURN_RIGHTDOWNRIGHT		 188
+#define SPF_MISC_UP					 192
+#define SPF_MISC_DOWN				 200
+#define SPF_MISC_LEFT				 208
+#define SPF_MISC_RIGHT				 216
+
+/*
+#define SPOFF_WALK_UP				  16
+#define SPOFF_WALK_DOWN				  24
+#define SPOFF_WALK_LEFT				  32
+#define SPOFF_WALK_RIGHT			  40
+#define SPOFF_WALK_LEFTUP			  48
+#define SPOFF_WALK_LEFTDOWN			  60
+#define SPOFF_WALK_RIGHTUP			  72
+#define SPOFF_WALK_RIGHTDOWN		  84
+#define SPOFF_TURN_UPLEFTUP			  96
+#define SPOFF_TURN_LEFTUPUP			 100
+#define SPOFF_TURN_UPRIGHTUP		 104
+#define SPOFF_TURN_RIGHTUPRIGHT		 108
+#define SPOFF_TURN_DOWNLEFTDOWN		 112
+#define SPOFF_TURN_LEFTDOWNLEFT		 116
+#define SPOFF_TURN_DOWNRIGHTDOWN	 120
+#define SPOFF_TURN_RIGHTDOWNDOWN	 124
+#define SPOFF_TURN_LEFTLEFTUP		 128
+#define SPOFF_TURN_LEFTUPUP			 132
+#define SPOFF_TURN_LEFTLEFTDOWN		 136
+#define SPOFF_TURN_LEFTDOWNDOWN		 140
+#define SPOFF_TURN_RIGHTRIGHTUP		 144
+#define SPOFF_TURN_RIGHTUPUP		 148
+#define SPOFF_TURN_RIGHTRIGHTDOWN	 152
+#define SPOFF_TURN_RIGHTDOWNDOWN	 156
+#define SPOFF_MISC_UP				 160
+#define SPOFF_MISC_DOWN				 168
+#define SPOFF_MISC_LEFT				 176
+#define SPOFF_MISC_RIGHT			 184
+*/
+
+//
 
 #define DR_IDLE						0
 #define DR_DROP						1

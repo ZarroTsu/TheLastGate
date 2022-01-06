@@ -255,22 +255,24 @@ void button_command(int nr)
 			if (keys)
 			{
 				if (skill_pos>11)	skill_pos -= 10; 
-				else 				skill_pos = 0;
+				else 				skill_pos  = 0;
 			}
 			else
 			{
 				if (skill_pos> 1)	skill_pos -= 2; 
+				else				skill_pos  = 0;
 			}
 			break;
 		case 15: 
 			if (keys)
 			{
-				if (skill_pos<30)	skill_pos += 10; 
-				else				skill_pos = 40;
+				if (skill_pos<MAXSKILL-20)	skill_pos += 10; 
+				else						skill_pos  = MAXSKILL-10;
 			}
 			else
 			{
-				if (skill_pos<40)	skill_pos += 2; 
+				if (skill_pos<MAXSKILL-10)	skill_pos += 2; 
+				else						skill_pos  = MAXSKILL-10;
 			}
 			break;
 		
@@ -281,7 +283,7 @@ void button_command(int nr)
 		case 28: case 29: case 30: case 31: 
 			if ((sk=pdata.xbutton[nr-16].skill_nr)!=-1) 
 			{
-				if (sk < 50)
+				if (sk < 60)
 				{
 					cmd3(CL_CMD_SKILL,sk,selected_char,1);
 				}
@@ -364,7 +366,7 @@ void button_help(int nr)
 		case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: 
 		case 28: case 29: case 30: case 31: 
-			if (last_skill > -1 && (last_skill < 50 || last_skill > 54)) 
+			if (last_skill > -1 && (last_skill < 60 || last_skill > 64)) 
 			{
 				switch (nr)
 				{
@@ -376,7 +378,7 @@ void button_help(int nr)
 				}
 				
 				// Standard shortcut sets
-				if (last_skill < 50)
+				if (last_skill < 60)
 				{
 					if (skilltab[last_skill].nr==pdata.xbutton[nr-16].skill_nr) 
 					{
@@ -433,93 +435,93 @@ void button_help(int nr)
 			break;
 
 		case 32:
-			if (last_skill==50)
-				xlog(1,"Cast Speed is the speed at which casting and action animations occur per second. This is increased by Braveness and other sources of Cast Speed."); 
-			else if (last_skill==51)
-				xlog(1,"Aptitude Bonus grants additional aptitude to target allies when casting friendly spells. This is granted by Willpower."); 
-			else if (last_skill==52)
-				xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed between active Skill and Spell use. This is granted by Intuition."); 
-			else if (last_skill==53)
+			if (last_skill==60)
+				xlog(1,"Crit Chance is the chance, out of 100.00, that you will inflict a melee critical hit. Determined by your equipped weapon, and increased by Braveness and other sources of Crit Chance."); 
+			else if (last_skill==61)
+				xlog(1,"Cast Speed is the speed at which casting and action animations occur per second. This is increased by Willpower and other sources of Cast Speed."); 
+			else if (last_skill==62)
+				xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed between active Skill and Spell use. This is granted by Intuition and other sources of Cooldown Rate."); 
+			else if (last_skill==63)
 				xlog(1,"Attack speed is the speed at which melee attacks are performed. This is increased by Agility and other sources of Attack Speed."); 
-			else if (last_skill==54)
+			else if (last_skill==64)
 				xlog(1,"DPH ranges from 1/4 of your Weapon Value, to 1/4 of (your Weapon Value, plus half Strength, plus 14) times your Crit Chance & Crit Multi."); 
-			else if (last_skill<50 || last_skill>54)
+			else if (last_skill<60 || last_skill>64)
 				xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from your Hit Score."); 
 			break;
 		case 33: 
-			if (last_skill==50)
-				xlog(1,"Crit Chance is the chance, out of 100.00, that you will inflict a melee critical hit."); 
-			else if (last_skill==51 && pl.skill[34][0])
+			if (last_skill==60)
+				xlog(1,"Crit Multi is the damage multiplier upon dealing a successful critical hit."); 
+			else if (last_skill==61 && pl.skill[34][0])
 				xlog(1,"Cost multiplier of mana for spells, determined by your Concentrate skill."); 
-			else if (last_skill==52)
+			else if (last_skill==62)
 				xlog(1,"Rate at which mana is regenerated per second. This is improved by the Meditate skill, and can be further adjusted by various items."); 
-			else if (last_skill==53)
+			else if (last_skill==63)
 				xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); 
-			else if (last_skill==54)
+			else if (last_skill==64)
 				xlog(1,"Rate at which health is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); 
-			else if (last_skill<50 || last_skill>54)
+			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); 
 			break;
 		case 34: 
-			if (last_skill==50)
-				xlog(1,"Crit Multi is the damage multiplier upon dealing a successful critical hit."); 
-			else if (last_skill==51 && pl.skill[27][0])
+			if (last_skill==60)
+				xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); 
+			else if (last_skill==61 && pl.skill[27][0])
 				xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); 
-			else if (last_skill==52 && pl.skill[42][0])
+			else if (last_skill==62 && pl.skill[42][0])
 				xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity. This can be stacked up to three times."); 
-			else if (last_skill==53 && pl.skill[49][0])
+			else if (last_skill==63 && pl.skill[49][0])
 				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill==54 && pl.skill[40][0])
+			else if (last_skill==64 && pl.skill[40][0])
 				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill<50 || last_skill>54)
+			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Your Parry Score is the value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill and other sources."); 
 			break;
 		case 35: 
-			if (last_skill==50)
-				xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); 
-			else if (last_skill==51 && pl.skill[46][0])
+			if (last_skill==60)
+				xlog(1,"Estimated Resistance score. This displays your 'true' Resistance value after adjustments that do not display on the skill list."); 
+			else if (last_skill==61 && pl.skill[46][0])
 				xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell. Value is listed in seconds."); 
-			else if (last_skill==52 && pl.skill[24][0])
+			else if (last_skill==62 && pl.skill[24][0])
 				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill==53 && pl.skill[7][0])
+			else if (last_skill==63 && pl.skill[7][0])
 				xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
-			else if (last_skill==54 && pl.skill[48][0])
+			else if (last_skill==64 && pl.skill[48][0])
 				xlog(1,"Effective damage taken multiplier during the Guard status, granted by the Taunt skill."); 
-			else if (last_skill<50 || last_skill>54)
+			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
 			break;
 		case 36: 
-			if (last_skill==50)
-				xlog(1,"Estimated Resistance score. This displays your 'true' Resistance value after adjustments that do not display on the skill list."); 
-			else if (last_skill==51 && pl.skill[19][0])
-				xlog(1,"Effective reduction of target action speed when casting your Slow spell, before reduction from target Immunity."); 
-			else if (last_skill==52 && pl.skill[43][0])
+			if (last_skill==60)
+				xlog(1,"Damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); 
+			else if (last_skill==61 && pl.skill[19][0])
+				xlog(1,"Effective reduction of target attributes when casting your Curse spell, before reduction from target Immunity."); 
+			else if (last_skill==62 && pl.skill[43][0])
 				xlog(1,"Damage dealt by the Pulse spell to surrounding targets when pulsing, before reduction from target Immunity and Armor Value."); 
-			else if (last_skill==53 && pl.skill[37][0])
+			else if (last_skill==63 && pl.skill[37][0])
 				if (pl.worn_p[WN_FLAGS] & (1 << 11))
 					xlog(1,"Effective reduction of target Spell Modifier when using your Blind (Douse) skill, before reduction from target Immunity."); 
 				else
 					xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); 
-			else if (last_skill==54 && pl.skill[41][0])
+			else if (last_skill==64 && pl.skill[41][0])
 				xlog(1,"Effective reduction of target Weapon and/or Armor Values when using your Weaken skill, before reduction from target Immunity."); 
-			else if (last_skill<50 || last_skill>54)
+			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
 			break;
 		case 37: 
-			if (last_skill==50 && pl.worn_p[WN_TOP]>0)
-				xlog(1,"Damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); 
-			else if (last_skill==51 && pl.skill[20][0])
-				xlog(1,"Effective reduction of target attributes when casting your Curse spell, before reduction from target Immunity."); 
-			else if (last_skill==52 && pl.skill[43][0])
-				xlog(1,"Number of pulses expected during the duration of your Pulse spell, determined by the rate of pulses from Cooldown Rate."); 
-			else if (last_skill==53)
+			if (last_skill==60 && pl.worn_p[WN_TOP]>0)
 				xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); 
-			else if (last_skill==54 && pl.skill[35][0])
+			else if (last_skill==61 && pl.skill[20][0])
+				xlog(1,"Aptitude Bonus grants additional aptitude to target allies when casting friendly spells. This is granted by Willpower."); 
+			else if (last_skill==62 && pl.skill[43][0])
+				xlog(1,"Number of pulses expected during the duration of your Pulse spell, determined by the rate of pulses from Cooldown Rate."); 
+			else if (last_skill==63)
+				xlog(1,"Effective reduction of target action speed when casting your Slow spell, before reduction from target Immunity."); 
+			else if (last_skill==64 && pl.skill[35][0])
 				if (pl.worn_p[WN_FLAGS] & (1 << 12))
 					xlog(1,"Effective bonus to hit and parry score granted to allies when using your Rally skill. Half of this value is granted to yourself as well."); 
 				else
 					xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
-			else if (last_skill<50 || last_skill>54)
+			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); 
 			break;
 			
@@ -612,14 +614,20 @@ int mouse_inventory(int x,int y,int mode)
 		{
 			if (mode==MS_LB_UP)
 			{
-				// Push or pull item stacks
-				cmd3(CL_CMD_INV,3,nr+inv_pos,selected_char);
+				if (show_shop)
+				{	// Sell item from inventory
+					cmd3(CL_CMD_QSHOP,shop.nr,nr+inv_pos,selected_char);
+				}
+				else 
+				{	// Push or pull item stacks
+					cmd3(CL_CMD_INV,3,nr+inv_pos,selected_char); 
+				}
 			}
 			else if (mode==MS_RB_UP)
 			{
-				if (last_skill >= 50 && last_skill <= 54)
+				if (last_skill >= 60 && last_skill <= 64)
 				{
-					xlog(3,"Details panel now showing default.");
+					xlog(6,"Details panel now showing default.");
 				}
 				// Lock item where it is ;  TODO: fix /sort server-side before uncommenting
 				//cmd3(CL_CMD_INV,4,nr+inv_pos,selected_char);
@@ -627,19 +635,19 @@ int mouse_inventory(int x,int y,int mode)
 				if (last_skill == 100+nr+inv_pos)
 				{
 					last_skill = -1;
-					xlog(3,"Inventory slot %d no longer selected for shortcut.",nr+inv_pos);
+					xlog(6,"Inventory slot %d no longer selected for shortcut.",nr+inv_pos);
 				}
 				else
 				{
 					last_skill = 100+nr+inv_pos;
 					if (firstrclick)
 					{
-						xlog(3,"Inventory slot %d selected for shortcut.",nr+inv_pos);
+						xlog(6,"Inventory slot %d selected for shortcut.",nr+inv_pos);
 					}
 					else
 					{
 						firstrclick++;
-						xlog(3,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+inv_pos);
+						xlog(6,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+inv_pos);
 					}
 				}
 			}
@@ -931,14 +939,14 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most skills and spells. It also improves the speed of casting spells and using skills.",at_name[n]);
-			if (last_skill == 50)
+			if (last_skill == 60)
 			{
 				last_skill = -1;
 				xlog(3,"Details panel now showing default.");
 			}
 			else
 			{
-				last_skill = 50;
+				last_skill = 60;
 				xlog(3,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
@@ -948,14 +956,14 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude.",at_name[n]);
-			if (last_skill == 51)
+			if (last_skill == 61)
 			{
 				last_skill = -1;
 				xlog(3,"Details panel now showing default.");
 			}
 			else
 			{
-				last_skill = 51;
+				last_skill = 61;
 				xlog(3,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
@@ -965,14 +973,14 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
-			if (last_skill == 52)
+			if (last_skill == 62)
 			{
 				last_skill = -1;
 				xlog(3,"Details panel now showing default.");
 			}
 			else
 			{
-				last_skill = 52;
+				last_skill = 62;
 				xlog(3,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
@@ -982,14 +990,14 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
-			if (last_skill == 53)
+			if (last_skill == 63)
 			{
 				last_skill = -1;
 				xlog(3,"Details panel now showing default.");
 			}
 			else
 			{
-				last_skill = 53;
+				last_skill = 63;
 				xlog(3,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
@@ -999,14 +1007,14 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
-			if (last_skill == 54)
+			if (last_skill == 64)
 			{
 				last_skill = -1;
 				xlog(3,"Details panel now showing default.");
 			}
 			else
 			{
-				last_skill = 54;
+				last_skill = 64;
 				xlog(3,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
@@ -1031,9 +1039,9 @@ int mouse_statbox2(int x,int y,int state)
 	if (state==MS_RB_UP) 
 	{
 		m = skilltab[n+skill_pos].nr;
-		if (pl.skill[m][0]) 
+		if (pl.skill[m][0] || m==50 || m==51) 
 		{
-			if (last_skill >= 50 && last_skill <= 54)
+			if (last_skill >= 60 && last_skill <= 64)
 			{
 				xlog(3,"Details panel now showing default.");
 			}
@@ -1059,10 +1067,8 @@ int mouse_statbox2(int x,int y,int state)
 			else if (m==44)	// Proximity has special descriptions
 			{
 				strcpy(tmp, skilltab[n+skill_pos].name);
-				if (pl.kindred & (1u<<5))
-					xlog(1,skilltab[n+skill_pos].desc); // Arch-Templar
-				else if (pl.kindred & (1u<<10))
-					xlog(1,skilltab[n+skill_pos].alt_a); // Warrior
+				if (pl.kindred & (1u<<14))
+					xlog(1,skilltab[n+skill_pos].alt_a); // Braver
 				else if (pl.kindred & (1u<<11))
 					xlog(1,skilltab[n+skill_pos].alt_b); // Sorcerer
 				else if (pl.kindred & (1u<<9))
@@ -1079,19 +1085,19 @@ int mouse_statbox2(int x,int y,int state)
 			if (last_skill == n+skill_pos)
 			{
 				last_skill = -1;
-				xlog(3,"%s no longer selected for shortcut.",tmp);
+				xlog(6,"%s no longer selected for shortcut.",tmp);
 			}
 			else
 			{
 				last_skill = n+skill_pos;
 				if (!firstclick)
 				{
-					xlog(3,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
+					xlog(6,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
 					firstclick=1;
 				}
 				else
 				{
-					xlog(3,"%s selected for shortcut.",tmp);
+					xlog(6,"%s selected for shortcut.",tmp);
 				}
 				
 			}

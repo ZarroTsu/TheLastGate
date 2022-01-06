@@ -47,7 +47,7 @@
 #define IS_SANEITEMPLATE(tn) ((tn) > 0 && (tn) < MAXTITEM)
 #define IS_SANECTEMPLATE(tn) ((tn) > 0 && (tn) < MAXTCHARS)
 
-
+#define IS_LONG_RESPAWN(temp) (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR || temp==CT_BSMAGE1 || temp==CT_BSMAGE2 || temp==CT_BSMAGE3)
 
 /* *** CHARACTERS *** */
 
@@ -104,24 +104,26 @@
 
 #define IS_SEYAN_DU(cn)		(ch[(cn)].kindred & KIN_SEYAN_DU)
 #define IS_ARCHTEMPLAR(cn)	(ch[(cn)].kindred & KIN_ARCHTEMPLAR)
-#define IS_BRAWLER(cn)		(ch[(cn)].kindred & KIN_BRAWLER)
+#define IS_SKALD(cn)		(ch[(cn)].kindred & KIN_SKALD)
 #define IS_WARRIOR(cn)		(ch[(cn)].kindred & KIN_WARRIOR)
 #define IS_SORCERER(cn)		(ch[(cn)].kindred & KIN_SORCERER)
 #define IS_SUMMONER(cn)		(ch[(cn)].kindred & KIN_SUMMONER)
 #define IS_ARCHHARAKIM(cn)	(ch[(cn)].kindred & KIN_ARCHHARAKIM)
+#define IS_BRAVER(cn)		(ch[(cn)].kindred & KIN_BRAVER)
 
-#define IS_ANY_TEMP(cn)		(IS_TEMPLAR(cn) || IS_ARCHTEMPLAR(cn) || IS_BRAWLER(cn))
+#define IS_ANY_TEMP(cn)		(IS_TEMPLAR(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn))
 #define IS_ANY_MERC(cn)		(IS_MERCENARY(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn))
 #define IS_ANY_HARA(cn)		(IS_HARAKIM(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))
 
-#define IS_ANY_ARCH(cn)		(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_BRAWLER(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))
+#define IS_ANY_ARCH(cn)		(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn) || IS_BRAVER(cn))
 
 #define IS_SEYA_OR_ARTM(cn)	(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn))
-#define IS_SEYA_OR_BRWL(cn)	(IS_SEYAN_DU(cn) || IS_BRAWLER(cn))
+#define IS_SEYA_OR_SKAL(cn)	(IS_SEYAN_DU(cn) || IS_SKALD(cn))
 #define IS_SEYA_OR_WARR(cn)	(IS_SEYAN_DU(cn) || IS_WARRIOR(cn))
 #define IS_SEYA_OR_SORC(cn)	(IS_SEYAN_DU(cn) || IS_SORCERER(cn))
 #define IS_SEYA_OR_SUMM(cn)	(IS_SEYAN_DU(cn) || IS_SUMMONER(cn))
 #define IS_SEYA_OR_ARHR(cn)	(IS_SEYAN_DU(cn) || IS_ARCHHARAKIM(cn))
+#define IS_SEYA_OR_BRAV(cn)	(IS_SEYAN_DU(cn) || IS_BRAVER(cn))
 
 #define CAN_ARTM_PROX(cn)	(IS_SEYA_OR_ARTM(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 #define CAN_WARR_PROX(cn)	(IS_SEYA_OR_WARR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
@@ -142,6 +144,8 @@
 
 #define IS_P_SKILL(a)	(a==8||a==9||a==23||a==32)
 
+#define CAN_SENSE(cn)	((ch[(cn)].flags & CF_SENSE) || !IS_PLAYER(cn))
+
 // Haste's formula
 #define HASTEFORM(n)		(n/4)
 
@@ -156,10 +160,10 @@
 
 // Poison's formula (damage per tick)
 #define S_POISONFORM(p, d)	((p * 1750) / d)
-#define POISONFORM(p, d)	((p * 1500) / d)
+#define POISONFORM(p, d)	((p * 1250) / d)
 
 // Bleed's formula (damage per tick)
-#define BLEEDFORM(p, d)		((p * 1250) / d)
+#define BLEEDFORM(p, d)		((p *  750) / d)
 
 // Frostburn's formula (degen per tick)
 #define FROSTBFORM(p, d)	((p * 1000) / d)
@@ -193,7 +197,7 @@
 
 #define IS_KILL_CON(a)		(CONT_SCEN(a)==1 || CONT_SCEN(a)==2 || CONT_SCEN(a)==3 || CONT_SCEN(a)==8 || CONT_SCEN(a)==9)
 
-#define IS_CON_NME(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]==1)
+#define IS_CON_NME(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]>=1)
 #define IS_CON_DIV(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]==3)
 #define IS_CON_CRU(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]==4)
 #define IS_CON_COW(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]==5)

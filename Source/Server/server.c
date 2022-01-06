@@ -1020,6 +1020,63 @@ int main(int argc, char *args[])
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);
 	}
+	
+	/*
+	// Nuke old skills (REMOVE AFTER UPDATE!)
+	for (n = 0; n<MAXTCHARS; n++)
+	{
+		if (ch_temp[n].used==USE_EMPTY) continue;
+		
+		// Sense Magic Light & Recall
+		ch_temp[n].skill[14][0] = 0;
+		ch_temp[n].skill[15][0] = 0;
+		ch_temp[n].skill[31][0] = 0;
+		
+		// Armor Mastery
+		if (ch_temp[n].skill[39][0]) 
+		{
+			ch_temp[n].skill[38][0] = max(ch_temp[n].skill[38][0], ch_temp[n].skill[39][0]);
+		}
+		ch_temp[n].skill[39][0] = 0;
+		
+		reset_char(n);
+	}
+	
+	// Correct door timers (REMOVE AFTER UPDATE!)
+	for (n = 1; n<MAXTITEM; n++)
+	{
+		if (it_temp[n].used==USE_EMPTY) continue;
+		
+		// get driver
+		if (it_temp[n].driver==2)
+		{
+			if (it_temp[n].data[3])
+			{
+				it_temp[n].duration = 5400;
+			}
+			else if (it_temp[n].data[1])
+			{
+				it_temp[n].duration = 1080;
+			}
+			else
+			{
+				it_temp[n].duration = 2160;
+			}
+			reset_item(n);
+		}
+	}
+	
+	// Decay legacy items
+	for (n = 1; n<MAXITEM; n++)
+	{
+		if (it[n].used==USE_EMPTY) continue;
+		if (it[n].temp==0 && !(it[n].flags & IF_SOULSTONE))
+		{
+			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
+			it[n].max_damage = 100000;
+		}
+	}
+	*/
 
 	srand(time(NULL));
 

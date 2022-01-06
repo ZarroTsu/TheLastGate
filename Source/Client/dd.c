@@ -1733,8 +1733,8 @@ void dd_gputc(int xpos,int ypos,int font,int c)
 	if (c>127) return;
 	c-=32;
 
-	if (font<0 || font>3) return;
-	nr=700+font;
+	if (font<0 || font>9) return;
+	nr=18100+font;
 
 	// image loaded?
 	if (!sprtab[nr].image) dd_load_sprite(nr);
@@ -1801,9 +1801,9 @@ void dd_putc(int xpos,int ypos,char font,int c)
 	if (c>127) return;
 	c-=32;
 
-	if (font<0 || font>3) return;
+	if (font<0 || font>9) return;
 
-	nr=700+font;
+	nr=18100+font;
 
 	// image loaded?
 	if (!sprtab[nr].image) dd_load_sprite(nr);

@@ -26,24 +26,24 @@ int ctick = 0;
 
 static char intro_msg1_font = 1;
 static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
-static char intro_msg2_font = 1;
+static char intro_msg2_font = 5;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.7.0\n"};
-static char intro_msg4_font = 2;
-static char intro_msg4[] = {" \n"};
-static char intro_msg5_font = 1;
+static char intro_msg3[] = {"Current client/server version is 0.8.1\n"};
+static char intro_msg4_font = 0;
+static char intro_msg4[] = {"** EXP WAS RESET ON 01/04/2022! Remember to spend your exp before exploring! **\n"};
+static char intro_msg5_font = 9;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
 static char newbi_msg1_font = 1;
 static char newbi_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
 static char newbi_msg2_font = 2;
 static char newbi_msg2[] = {"New to the the game? Click on the TUTORIAL button to take a tour!\n"};
-static char newbi_msg3_font = 1;
+static char newbi_msg3_font = 5;
 static char newbi_msg3[] = {"You can use /help (or #help) to get a listing of helpful text commands.\n"};
 static char newbi_msg4_font = 3;
 static char newbi_msg4[] = {"If you need assistance, try /shout before you type. This will notify the entire server.\n"};
-static char newbi_msg5_font = 3;
+static char newbi_msg5_font = 9;
 static char newbi_msg5[] = {"If you need further help or an admin, feel free to join our Discord server using the Discord button on the load menu.\n"};
 
 static inline unsigned int _mcmp(unsigned char *a, unsigned char *b, unsigned int len)
@@ -970,6 +970,40 @@ void plr_cmd_shop(int nr)
 	}
 }
 
+void plr_cmd_qshop(int nr)
+{
+	int cn, co, cc, n, tmp;
+	
+	co = *(unsigned long*)(player[nr].inbuf + 1);
+	n  = *(unsigned long*)(player[nr].inbuf + 5);
+	cc = *(unsigned long*)(player[nr].inbuf + 9);
+
+	cn = player[nr].usnr;
+	
+	if (n<0 || n>39) return;
+	if (ch[cn].stunned==1) return;
+	if (IS_BUILDING(cn)) return;
+	if (ch[cn].citem) return;
+	
+	tmp = ch[cn].item[n];
+	
+	if (!IS_SANEITEM(tmp) || (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL))) return;
+	
+	do_update_char(cn);
+	
+	ch[cn].item[n] = 0;
+	ch[cn].citem = tmp;
+
+	if (co & 0x8000)
+	{
+		do_depot_char(cn, co & 0x7fff, n);
+	}
+	else
+	{
+		do_shop_char(cn, co, n);
+	}
+}
+
 void plr_cmd_wps(int nr)
 {
 	int cn, n;
@@ -1107,7 +1141,7 @@ void plr_cmd_skill(int nr)
 	{
 		return;
 	}
-	if (!B_SK(cn, n))
+	if (n!=50 && n!=51 && !B_SK(cn, n))
 	{
 		return;
 	}
@@ -1238,7 +1272,7 @@ void plr_cmd_setuser(int nr)
 		{
 			break;
 		}
-		if (strlen(ch[cn].text[0])>3 &&
+		if (strlen(ch[cn].text[0])>2 &&
 		    strlen(ch[cn].text[0])<38 &&
 		    (ch[cn].flags & CF_NEWUSER))
 		{
@@ -1320,10 +1354,10 @@ void plr_cmd_setuser(int nr)
 		{
 			reason = "is too short";
 		}
-		else if (strstr(ch[cn].description, ch[cn].name)==NULL)
+		/*else if (strstr(ch[cn].description, ch[cn].name)==NULL)
 		{
 			reason = "does not contain your name";
-		}
+		}*/
 		else if (strchr(ch[cn].description, '\"'))
 		{
 			reason = "contains a double quote";
@@ -1366,9 +1400,9 @@ void plr_cmd_setuser(int nr)
 			{
 				race_name = "a Sorcerer";
 			}
-			else if (IS_BRAWLER(cn))
+			else if (IS_SKALD(cn))
 			{
-				race_name = "a Brawler";
+				race_name = "a Skald";
 			}
 			else if (IS_SUMMONER(cn))
 			{
@@ -1395,6 +1429,7 @@ void plr_cmd_setuser(int nr)
 void plr_idle(int nr)
 {
 	if (player[nr].spectating) return;
+	if (IS_BUILDING(player[nr].usnr)) return;
 	
 	if (globs->ticker - player[nr].lasttick>TICKS * 60)
 	{
@@ -1595,6 +1630,9 @@ void plr_cmd(int nr)
 	case CL_CMD_SHOP:
 		plr_cmd_shop(nr);
 		break;
+	case CL_CMD_QSHOP:
+		plr_cmd_qshop(nr);
+		break;
 	case CL_CMD_WPS:
 		plr_cmd_wps(nr);
 		break;
@@ -1666,8 +1704,7 @@ void plr_newlogin(int nr)
 	
 	if (temp!=CT_TEMP_M && temp!=CT_TEMP_F 
 	 && temp!=CT_MERC_M && temp!=CT_MERC_F 
-	 && temp!=CT_HARA_M && temp!=CT_HARA_F
-	 && temp!=CT_GOD_M && temp!=CT_GOD_F)
+	 && temp!=CT_HARA_M && temp!=CT_HARA_F)
 	{
 		temp = CT_MERC_M;
 	}
@@ -3730,7 +3767,11 @@ void plr_getmap_complete(int nr)
 				smap[n].ch_atkspd  = ch[co].atk_speed;
 				smap[n].ch_castspd = ch[co].cast_speed;
 				smap[n].ch_movespd = ch[co].move_speed;
-				if (ch[co].flags & CF_EXTRAEXP)
+				if (IS_PLAYER(co))
+				{
+					smap[n].ch_fontcolor = 5;
+				}
+				else if (ch[co].flags & CF_EXTRAEXP)
 				{
 					// Inform the client this is a 'special' enemy by turning their font red
 					smap[n].ch_fontcolor = 1;
@@ -4082,7 +4123,11 @@ void plr_getmap_fast(int nr)
 				smap[n].ch_atkspd  = ch[co].atk_speed;
 				smap[n].ch_castspd = ch[co].cast_speed;
 				smap[n].ch_movespd = ch[co].move_speed;
-				if (ch[co].flags & CF_EXTRAEXP)
+				if (IS_PLAYER(co))
+				{
+					smap[n].ch_fontcolor = 5;
+				}
+				else if (ch[co].flags & CF_EXTRAEXP)
 				{
 					// Inform the client this is a 'special' enemy by turning their font red
 					smap[n].ch_fontcolor = 1;

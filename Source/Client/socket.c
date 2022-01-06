@@ -151,11 +151,11 @@ int so_login(unsigned char *buf,HWND hwnd)
 			{
 				pdata.xbutton[n].skill_nr=-1; strcpy(pdata.xbutton[n].name,"-");
 			}
-			pdata.xbutton[0].skill_nr=14; strcpy(pdata.xbutton[0].name,"Light");
+			pdata.xbutton[0].skill_nr=50; strcpy(pdata.xbutton[0].name,"Light");
+			pdata.xbutton[15].skill_nr=51; strcpy(pdata.xbutton[15].name,"Recall");
 			if (race==4||race==5) // Templar
 			{
 				pdata.xbutton[4].skill_nr=40; strcpy(pdata.xbutton[4].name,"Cleave");
-				pdata.xbutton[7].skill_nr=48; strcpy(pdata.xbutton[7].name,"Taunt");
 			}
 			else if (race==8||race==9) // Harakim
 			{
@@ -474,7 +474,7 @@ void sv_setchar_skill(unsigned char *buf)
 	pl.skill[n][4]=buf[6];
 	pl.skill[n][5]=buf[7];
 
-	qsort(skilltab,50,sizeof(struct skilltab),skill_cmp);
+	qsort(skilltab,52,sizeof(struct skilltab),skill_cmp);
 }
 
 void sv_setchar_ahp(unsigned char *buf)
@@ -1091,6 +1091,12 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOG1:		sv_log(buf,1); break;
 		case	SV_LOG2:		sv_log(buf,2); break;
 		case	SV_LOG3:		sv_log(buf,3); break;
+		case	SV_LOG4:		sv_log(buf,4); break;
+		case	SV_LOG5:		sv_log(buf,5); break;
+		case	SV_LOG6:		sv_log(buf,6); break;
+		case	SV_LOG7:		sv_log(buf,7); break;
+		case	SV_LOG8:		sv_log(buf,8); break;
+		case	SV_LOG9:		sv_log(buf,9); break;
 		
 		case	SV_MOTD0:		sv_motd(buf,0); break;
 		case	SV_MOTD1:		sv_motd(buf,1); break;

@@ -1778,7 +1778,7 @@ void god_reset_players(int cn)
 {
 	int n;
 	do_char_log(cn, 1, "Now resetting all players...\n");
-	for (n=1;n<MAXCHARS;n++)
+	for (n=2;n<MAXCHARS;n++)
 	{
 		if (ch[n].used==USE_EMPTY)
 		{
@@ -1788,7 +1788,6 @@ void god_reset_players(int cn)
 		{
 			continue;
 		}
-		
 		god_racechange(n, ch[n].temp, 1);
 	}
 	do_char_log(cn, 0, "Done.\n");
@@ -3829,7 +3828,12 @@ void god_racechange(int co, int temp, int keepstuff)
 		if (old.skill[10][0] && ch[co].skill[10][2]) ch[co].skill[10][0] = 1; // Swimming
 		if (old.skill[12][0] && ch[co].skill[12][2]) ch[co].skill[12][0] = 1; // Barter
 		if (old.skill[13][0] && ch[co].skill[13][2]) ch[co].skill[13][0] = 1; // Repair
-		if (old.skill[15][0] && ch[co].skill[15][2]) ch[co].skill[15][0] = 1; // Recall
+		if (old.skill[15][0]) // OLD Recall
+		{
+			if (IS_ANY_TEMP(co) || IS_SEYAN_DU(co) || IS_BRAVER(co)) ch[co].skill[48][0] = 1; // Taunt
+			if (IS_ANY_MERC(co) || IS_SEYAN_DU(co)) ch[co].skill[42][0] = 1; // Poison
+			if (IS_ANY_HARA(co) || IS_SEYAN_DU(co)) ch[co].skill[34][0] = 1; // Concentrate
+		}
 		if (old.skill[16][0] && ch[co].skill[16][2]) ch[co].skill[16][0] = 1; // Shield
 		if (old.skill[18][0] && ch[co].skill[18][2]) ch[co].skill[18][0] = 1; // Enhance
 		if (old.skill[19][0] && ch[co].skill[19][2]) ch[co].skill[19][0] = 1; // Slow
@@ -3840,20 +3844,32 @@ void god_racechange(int co, int temp, int keepstuff)
 		if (old.skill[25][0] && ch[co].skill[25][2]) ch[co].skill[25][0] = 1; // Dispel
 		if (old.skill[26][0] && ch[co].skill[26][2]) ch[co].skill[26][0] = 1; // Heal
 		if (old.skill[29][0] && ch[co].skill[29][2]) ch[co].skill[29][0] = 1; // Rest
-		if (old.skill[31][0] && ch[co].skill[31][2]) ch[co].skill[31][0] = 1; // Sense Magic
 		if (old.skill[32][0] && ch[co].skill[32][2]) ch[co].skill[32][0] = 1; // Immunity
 		if (old.skill[33][0] && ch[co].skill[33][2]) ch[co].skill[33][0] = 1; // Surround Hit
-		if (old.skill[38][0] && ch[co].skill[38][2]) ch[co].skill[38][0] = 1; // Weapon Mastery
+		if (old.skill[38][0]) // OLD Weapon Mastery
+		{
+			if (IS_ANY_TEMP(co)) ch[co].skill[11][0] = 1; 
+		}
 		if (old.skill[41][0] && ch[co].skill[41][2]) ch[co].skill[41][0] = 1; // Weaken
 		
 		if (old.skill[ 7][0] && ch[co].skill[ 7][2]) ch[co].skill[ 7][0] = 1; // Zephyr
 		if (old.skill[35][0] && ch[co].skill[35][2]) ch[co].skill[35][0] = 1; // Warcry
-		if (old.skill[42][0] && ch[co].skill[42][2]) ch[co].skill[42][0] = 1; // Poison
+		if (old.skill[42][0]) ch[co].skill[15][0] = 1; // Poison -> Lethargy
 		if (old.skill[43][0] && ch[co].skill[43][2]) ch[co].skill[43][0] = 1; // Pulse
 		if (old.skill[46][0] && ch[co].skill[46][2]) ch[co].skill[46][0] = 1; // Shadow
 		if (old.skill[49][0] && ch[co].skill[49][2]) ch[co].skill[49][0] = 1; // Leap
 		
+		if (old.skill[31][0]) ch[co].flags |= CF_SENSE; // OLD Sense Magic
+		
+		if (old.flags & CF_APPRAISE) ch[co].flags |= CF_APPRAISE;
+		if (old.flags & CF_LOCKPICK) ch[co].flags |= CF_LOCKPICK;
+		
+		ch[co].bs_points = old.bs_points;
+		ch[co].os_points = old.os_points;
+		ch[co].tokens    = old.tokens;
+		
 		ch[co].waypoints = old.waypoints;
+		god_transfer_char(co, 512, 512);
 	}
 	else
 	{

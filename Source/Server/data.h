@@ -189,8 +189,9 @@ extern unsigned int mapmarker;
 #define KIN_ARCHHARAKIM (1u<< 9)
 #define KIN_WARRIOR     (1u<<10)  // arch-merc, warrior
 #define KIN_SORCERER    (1u<<11)  // arch-merc, sorcerer
-#define KIN_BRAWLER		(1u<<12)
+#define KIN_SKALD		(1u<<12)
 #define KIN_SUMMONER    (1u<<13)
+#define KIN_BRAVER      (1u<<14)
 
 #define CF_IMMORTAL		(1ull<< 0)  // will not suffer any damage
 #define CF_GOD			(1ull<< 1)  // may issue #god commands
@@ -247,12 +248,13 @@ extern unsigned int mapmarker;
 #define CF_APPRAISE		(1ull<<53)  // Can see item value
 #define CF_APPR_OFF		(1ull<<54)  // Toggle Appraisal
 #define CF_AREA_OFF		(1ull<<55)  // Toggle AoE Skills
-#define CF_SENSE		(1ull<<56)  // Shuts up NPC sense-magic messages
+#define CF_SENSEOFF		(1ull<<56)  // Shuts up NPC sense-magic messages
 #define CF_AUTOLOOT		(1ull<<57)  // Automatic looting
 #define CF_BSPOINTS		(1ull<<58)  // Black Stronghold point merchant
 #define CF_SYS_OFF		(1ull<<59)  // Turns off all system-related messages
 #define CF_OVERRIDE		(1ull<<60)  // Allow overriding friendly spells on self
 #define CF_ALW_SPECT	(1ull<<61)  // Allow spectating
+#define CF_SENSE		(1ull<<62)  // Sense Magic Flag		(ch[co].flags & CF_SENSE)
 
 #define AT_CAP				300
 #define SPEED_CAP 			300
@@ -267,12 +269,14 @@ extern unsigned int mapmarker;
 #define PRXW_HIT		(AT_CAP/20)
 #define PRXW_POW		(AT_CAP/24)
 
-#define PRXB_RAD		2
+#define PRXB_RAD		4
 #define PRXB_CAP		(AT_CAP/ 5)
 #define PRXB_HIT		(AT_CAP/15)
 #define PRXB_POW		(AT_CAP/18)
 
-#define PRXP_RAD		2
+#define PRXP_RAD		3
+
+#define PRXA_RAD		5
 
 #define PREC_CAP		(AT_CAP/4)
 
@@ -299,8 +303,8 @@ extern unsigned int mapmarker;
 #define SK_MSHIELD		11
 #define SK_BARTER		12
 #define SK_REPAIR		13
-#define SK_LIGHT		14
-#define SK_RECALL		15
+#define SK_RAGE			14
+#define SK_LETHARGY		15
 #define SK_SHIELD		16
 #define SK_PROTECT		17
 #define SK_ENHANCE		18
@@ -318,15 +322,15 @@ extern unsigned int mapmarker;
 #define SK_REST			29
 //////////////////////////
 #define SK_MEDIT		30
-#define SK_SENSE		31
+#define SK_ARIA			31
 #define SK_IMMUN		32
 #define SK_SURROUND		33
 #define SK_CONCEN		34
 #define SK_WARCRY		35
 #define SK_DUAL			36
 #define SK_BLIND		37
-#define SK_WEAPONM		38
-#define SK_ARMORM		39
+#define SK_GEARMAST		38
+#define SK_SAFEGRD		39
 //////////////////////////
 #define SK_CLEAVE		40
 #define SK_WEAKEN		41
@@ -338,6 +342,9 @@ extern unsigned int mapmarker;
 #define SK_HASTE		47
 #define SK_TAUNT		48
 #define SK_LEAP			49
+//////////////////////////
+#define SK_LIGHT		50
+#define SK_RECALL		51
 //////////////////////////
 // Defines for Ailments // - These are OK to match existing skill numbers; see splog[] in skill_driver.c
 #define SK_EXHAUST  	 1
@@ -354,14 +361,16 @@ extern unsigned int mapmarker;
 #define SK_WARCRY3  	30
 #define SK_DISPEL2		32
 #define SK_WARCRY2  	36
+#define SK_AGGRAVATE	38
+#define SK_ARIA2		39
 //////////////////////////
 #define SK_BLOODLET		 9
 #define SK_POME			 9
 #define SK_STARLIGHT	23
-#define SK_PHALANX		31
+#define SK_PHALANX		34
 #define SK_SOL			33
 #define SK_FROSTB		44
-#define SK_SLOW3		50
+#define SK_SLOW3		52
 
 
 /*
@@ -655,6 +664,7 @@ __attribute__ ((packed));
 #define IF_DIMINISHED    (1ull<<53)     // item was enhanced by a shrine
 #define IF_EASEUSE       (1ull<<54)     // item was enhanced by a shrine
 #define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine
+#define IF_LEGACY        (1ull<<56)     // item was enhanced by a shrine
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -855,8 +865,8 @@ struct waypoint
 #define N_SOULBONUS		 70
 #define N_SOULMAX		 48
 
-extern struct s_skilltab skilltab[MAXSKILL];
-extern struct s_splog splog[50];
+extern struct s_skilltab skilltab[MAXSKILL+2];
+extern struct s_splog splog[52];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
