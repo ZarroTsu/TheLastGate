@@ -30,8 +30,8 @@
 #define DAM_MULT_CLEAVE		 750
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  25
-#define DAM_MULT_LEAP		 375
-#define DAM_MULT_POISON		1800
+#define DAM_MULT_LEAP		 250
+#define DAM_MULT_POISON		1750
 
 // wear positions
 #define WN_HEAD			0

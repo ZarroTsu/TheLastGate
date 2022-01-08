@@ -46,7 +46,7 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 				
 	{  8, 'G', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
 				"", "", "", 
-				{ AT_INT, AT_INT, AT_AGL }},
+				{ AT_INT, AT_AGL, AT_AGL }},
 				
 	{  9, 'G', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
 				"", "", "", 
@@ -54,7 +54,7 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{ 10, 'G', 	"Swimming", 			"Passive ability to prevent the loss of hitpoints while you are underwater.", 
 				"", "", "", 
-				{ AT_WIL, AT_AGL, AT_STR }},
+				{ AT_BRV, AT_WIL, AT_AGL }},
 				
 	{ 11, 'F', 	"Magic Shield", 		"Use (Spell): Applies a buff to yourself, granting temporary armor.", 
 				"Magic Shell", 			"Use (Spell): Applies a buff to yourself, granting temporary resistance and immunity.", "", 
@@ -62,7 +62,7 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 				
 	{ 12, 'G', 	"Bartering", 			"Passive ability to get better prices while buying or selling.", 
 				"", "", "", 
-				{ AT_BRV, AT_INT, AT_AGL }},
+				{ AT_INT, AT_INT, AT_AGL }},
 				
 	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.", 
 				"", "", "", 
@@ -70,7 +70,7 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 				
 	{ 14, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of endurance over time.", 
 				"Rage (Furious)", 		"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of life over time.", "", 
-				{ AT_BRV, AT_BRV, AT_AGL }},
+				{ AT_BRV, AT_BRV, AT_STR }},
 				
 	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.", 
 				"", "", "", 

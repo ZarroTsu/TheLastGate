@@ -931,7 +931,7 @@ void display_meta_from_ls(void)
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
 	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
-	int sk_water, sk_cleav, sk_taunt, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
+	int sk_water, sk_cleav, sk_safeg, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
 	int sk_shado, sk_rally;
 	
 	// Player Speed and Attack Speed - WN_SPEED
@@ -1018,7 +1018,7 @@ void display_meta_from_ls(void)
 	sk_rally = sk_score(35)/10;
 	sk_shado = 15 + sk_score(46)*pl_spmod/500;
 	sk_weake = -(sk_score(41) / 5 + 2);
-	sk_taunt = (1000 - (sk_score(48))/4);
+	sk_safeg = (1000 - (sk_score(39)));
 	
 	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
 	{
@@ -1120,13 +1120,6 @@ void display_meta_from_ls(void)
 	{
 		sk_leapv = sk_leapv * 85/100;
 	}
-	
-	// Tarot - Temperance (Taunt reduction)
-	if (pl_flags & (1 <<  9))
-	{
-		sk_taunt = sk_taunt * 7 / 10;
-	}
-	
 	
 	
 	/*
@@ -1310,9 +1303,9 @@ void display_meta_from_ls(void)
 				if (pl.skill[40][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Cleave DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_cleav);
-			}	if (pl.skill[48][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Taunt Guard");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_taunt/1000,sk_taunt%1000);
+			}	if (pl.skill[39][0]) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Safeguard");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_safeg/1000,sk_safeg%1000);
 			}	if (pl.skill[41][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Weaken Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_weake);
@@ -2809,7 +2802,7 @@ int speedstep(int n,int d,int s,int update)
 	int dist;
 	int z,m;
 
-	speed=map[n].ch_speed;
+	speed=map[n].ch_speed - map[n].ch_movespd;
 	hard_step=map[n].ch_status-d;
 
 	if (!update) return 32*hard_step/s;

@@ -149,7 +149,7 @@ void look_extra(int cn, int in)
 	// -------- TOWER ITEMS --------
 	
 	case IT_TW_CROWN: // Crown of the First King
-		do_char_log(cn, 7, "When equipped, 25%% of mana costs from spells are instead taken from endurance, and 25%% of endurance costs from skills are instead taken from mana. You no longer lose focus.\n"); 
+		do_char_log(cn, 7, "When equipped, 20%% of skill costs are nullified, 25%% of mana costs from spells are taken from endurance, and 25%% of endurance costs from skills are taken from mana. You no longer lose focus.\n"); 
 		break;
 	case IT_TW_CLOAK: // Cloak of Shadows
 		do_char_log(cn, 7, "When equipped, 20%% of damage taken is negated, and half of the negated damage is dealt to Endurance instead.\n");
@@ -161,10 +161,10 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 7, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict douse on, reducing enemy spell modifier.\n");
 		break;
 	case IT_TW_MARCH: // Commander's March
-		do_char_log(cn, 7, "When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by half.\n");
+		do_char_log(cn, 7, "When equipped, Stun is turned into a speed reduction of 2.00, and all other speed reductions are reduced by one third.\n");
 		break;
 	case IT_TW_BBELT: // The Black Belt
-		do_char_log(cn, 7, "When equipped, get WV from your Hand to Hand skill and 2% base crit if your main hand is empty, half of shield parry bonus if your off-hand is empty, and 4%% total base crit if both hands are empty.\n");
+		do_char_log(cn, 7, "When equipped, get WV from your Hand to Hand skill and 2%% base crit if your main hand is empty, half of shield parry bonus if your off-hand is empty, and 4%% total base crit if both hands are empty.\n");
 		break;
 	case IT_TW_OUTSIDE: // Outsider's Eye
 		do_char_log(cn, 7, "When equipped, enemies beside and behind you no longer gain a bonus to hitting you.\n");
@@ -192,6 +192,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 4, "When equipped, your lowest attribute increases critical hit multiplier and your highest attribute increases critical hit chance, but you lose endurance over time.\n");
 		break;
 	case IT_TW_SUPERBIA: // Sin Greataxe
+		do_char_log(cn, 4, "When equipped, the effects of your Heal or Regen spell is halved.\n");
 		break;
 	case IT_TW_SINBIND: // Sinbinder ring
 		do_char_log(cn, 4, "Locks your ring slot.\n");
@@ -275,7 +276,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "Grants passive bonuses during the day (6:00 to 18:00), and active bonuses during the night (18:00 to 6:00).\n");
 		break;
 	case IT_WHITEBELT: // The White Belt
-		do_char_log(cn, 5, "When equipped, get WV from your Hand to Hand skill and 1% base crit if your main hand and off hand are empty.\n");
+		do_char_log(cn, 5, "When equipped, get WV from your Hand to Hand skill and 2%% base crit if your main hand and off hand are empty.\n");
 		break;
 		
 	// -------- CASINO  ITEMS --------
@@ -539,7 +540,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 8, "When equipped, you have 20%% more Armor Value, but a 25%% chance to be hit when you would have parried.\n");
 		break;
 	case IT_CH_JUSTIC_R: 
-		do_char_log(cn, 8, "When equipped, your Leap skill deals 15%% less damage, but has reduced base cooldown and instead chooses a random nearby target.\n");
+		do_char_log(cn, 8, "When equipped, your Leap skill deals 30%% less damage, but has reduced base cooldown and instead chooses a random nearby target.\n");
 		break;
 	case IT_CH_HANGED_R: 
 		do_char_log(cn, 8, "When equipped, you have 20%% more Top Damage, but 10%% less Weapon Value.\n");

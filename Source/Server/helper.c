@@ -3976,6 +3976,8 @@ int get_map_enemy_sprite(int kin)
 		case 41: return 29648; // Wizard
 		case 42: return 30672; // Mystic
 		case 43: return 31696; // Grosser
+		// case 44: return 27088; // 
+		// case 45: return 28112; // 
 		//
 		case 11+NUM_MAP_ENEM+0: return 24528; // Kali
 		case 11+NUM_MAP_ENEM+1: return 26048; // Rundas

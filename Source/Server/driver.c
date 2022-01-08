@@ -1262,7 +1262,7 @@ int npc_give(int cn, int co, int in, int money)
 				}
 				else
 				{
-					do_sayx(cn, "Simply look at any item in your possession, and you will now know its true value.");
+					do_sayx(cn, "You will now notice a magic item when it's dropped if you can see it. Additionally, you may now notice when enemies try to cast spells on you.");
 					god_take_from_char(in, cn);
 					it[in].used = USE_EMPTY;
 					ch[co].flags |= CF_SENSE;

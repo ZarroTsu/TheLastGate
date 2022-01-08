@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000801
-#define MINVERSION			0x000800
+#define VERSION				0x000802
+#define MINVERSION			0x000802
 
 #define DATDIR				".dat"
 
@@ -243,7 +243,7 @@
 #define DAM_MULT_CLEAVE		 750
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  25
-#define DAM_MULT_LEAP		 375
+#define DAM_MULT_LEAP		 250
 
 // -------- Buff Duration values -------- //
 #define SP_DUR_LIGHT		( TICKS * 60 * 30                 )
@@ -264,7 +264,7 @@
 #define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 80          )
 #define SP_DUR_WARCRY		( TICKS * 60                      )
 #define SP_DUR_SCORCH		( TICKS * 20                      )
-#define SP_DUR_RECALL(a)	( max(TICKS / 2, 60 - (a / 4))    )
+#define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
 #define SP_DUR_SHADOW(a)	( TICKS * 15 + TICKS * a / 5      )
 #define SP_DUR_BLEED		( TICKS * 15                      )
 #define SP_DUR_WEAKEN		( TICKS * 60                      )

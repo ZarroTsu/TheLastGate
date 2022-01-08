@@ -485,8 +485,8 @@ void button_help(int nr)
 				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
 			else if (last_skill==63 && pl.skill[7][0])
 				xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
-			else if (last_skill==64 && pl.skill[48][0])
-				xlog(1,"Effective damage taken multiplier during the Guard status, granted by the Taunt skill."); 
+			else if (last_skill==64 && pl.skill[39][0])
+				xlog(1,"Effective damage taken multiplier with Safeguard."); 
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
 			break;
@@ -938,7 +938,7 @@ int mouse_statbox2(int x,int y,int state)
 		n=0;
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
-			xlog(1,"%s improves most skills and spells. It also improves the speed of casting spells and using skills.",at_name[n]);
+			xlog(1,"%s improves most skills and spells. It also improves your critical hit rate.",at_name[n]);
 			if (last_skill == 60)
 			{
 				last_skill = -1;
@@ -955,7 +955,7 @@ int mouse_statbox2(int x,int y,int state)
 		n=1;
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
-			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude.",at_name[n]);
+			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude and the speed of casting spells and using skills.",at_name[n]);
 			if (last_skill == 61)
 			{
 				last_skill = -1;

@@ -1568,7 +1568,7 @@ void do_listskills(int cn, char *topic)
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .   |     .         .        !"
 		do_char_log(cn, 1, "Aria                   BRV + AGL + AGL\n");
-		do_char_log(cn, 5, "Bartering              BRV + INT + AGL\n");
+		do_char_log(cn, 5, "Bartering              INT + INT + AGL\n");
 		do_char_log(cn, 1, "Companion Mastery      BRV + WIL + WIL\n");
 		do_char_log(cn, 5, "Concentrate            WIL + WIL + WIL\n");
 		do_char_log(cn, 1, "Gear Mastery           BRV + AGL + STR\n");
@@ -1578,9 +1578,9 @@ void do_listskills(int cn, char *topic)
 		do_char_log(cn, 1, "Proximity              BRV + WIL + INT\n");
 		do_char_log(cn, 5, "Resistance             BRV + WIL + STR\n");
 		do_char_log(cn, 1, "Safeguard              BRV + STR + STR\n");
-		do_char_log(cn, 5, "Stealth                INT + INT + AGL\n");
+		do_char_log(cn, 5, "Stealth                INT + AGL + AGL\n");
 		do_char_log(cn, 1, "Surround Hit           BRV + AGL + STR\n");
-		do_char_log(cn, 5, "Swimming               WIL + AGL + STR\n");
+		do_char_log(cn, 5, "Swimming               BRV + WIL + AGL\n");
 	}
 	else if (strcmp(topic, "2")==0)
 	{
@@ -1626,7 +1626,7 @@ void do_listskills(int cn, char *topic)
 		do_char_log(cn, 5, "Blind                  BRV + INT + AGL\n");
 		do_char_log(cn, 1, "Cleave                 BRV + STR + STR\n");
 		do_char_log(cn, 5, "Leap                   BRV + AGL + AGL\n");
-		do_char_log(cn, 1, "Rage                   BRV + BRV + AGL\n");
+		do_char_log(cn, 1, "Rage                   BRV + BRV + STR\n");
 		do_char_log(cn, 5, "Repair                 INT + STR + STR\n");
 		do_char_log(cn, 1, "Taunt                  BRV + STR + STR\n");
 		do_char_log(cn, 5, "Warcry                 BRV + STR + STR\n");
@@ -1792,11 +1792,11 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | STR \n");
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
 		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  10 |     \n");
-		do_char_log(cn, 1, "Steel       |  12 |  15 |    16 |  20 |   1 \n");
-		do_char_log(cn, 1, "Gold        |  18 |  25 |    32 |  30 |   1 \n");
-		do_char_log(cn, 1, "Emerald     |  28 |  40 |    48 |  40 |   2 \n");
-		do_char_log(cn, 1, "Crystal     |  42 |  60 |    64 |  50 |   2 \n");
-		do_char_log(cn, 1, "Titanium    |  60 |  85 |    80 |  60 |   3 \n");
+		do_char_log(cn, 1, "Steel       |  12 |  14 |    16 |  20 |   1 \n");
+		do_char_log(cn, 1, "Gold        |  18 |  22 |    32 |  30 |   1 \n");
+		do_char_log(cn, 1, "Emerald     |  28 |  34 |    48 |  40 |   2 \n");
+		do_char_log(cn, 1, "Crystal     |  42 |  50 |    64 |  50 |   2 \n");
+		do_char_log(cn, 1, "Titanium    |  60 |  74 |    80 |  60 |   3 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 
@@ -2525,9 +2525,9 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 
 	//															                                  "!      v .       v .   |     . v       . v      !"
 	if (flag || !quest1[ 0]) { m++; ex=   100; if (m<=t && m>n) do_char_log(cn, (quest1[ 0])?3:1, " Pvt   Jamil     Bluebird Tav  Barterin  %6d\n", (quest1[ 0])?ex/4:ex); }
-	if (flag || !quest1[ 1]) { m++; ex=   200; if (m<=t && m>n) do_char_log(cn, (quest1[ 1])?3:1, " PFC   Inga      First Street  Recall    %6d\n", (quest1[ 1])?ex/4:ex); }
-	if (flag || !quest1[24]) { m++; ex=   200; if (m<=t && m>n) do_char_log(cn, (quest1[24])?3:1, " PFC   Inga      First Street  Recall    %6d\n", (quest1[24])?ex/4:ex); }
-	if (flag || !quest1[25]) { m++; ex=   200; if (m<=t && m>n) do_char_log(cn, (quest1[25])?3:1, " PFC   Inga      First Street  Recall    %6d\n", (quest1[25])?ex/4:ex); }
+	if (flag || !quest1[ 1]) { m++; ex=   200; if (m<=t && m>n) do_char_log(cn, (quest1[ 1])?3:1, " PFC   Inga      First Street  Taunt     %6d\n", (quest1[ 1])?ex/4:ex); }
+	if (flag || !quest1[24]) { m++; ex=   200; if (m<=t && m>n) do_char_log(cn, (quest1[24])?3:1, " PFC   Inga      First Street  Poison    %6d\n", (quest1[24])?ex/4:ex); }
+	if (flag || !quest1[25]) { m++; ex=   200; if (m<=t && m>n) do_char_log(cn, (quest1[25])?3:1, " PFC   Inga      First Street  Concentr  %6d\n", (quest1[25])?ex/4:ex); }
 	if (flag || !quest1[ 2]) { m++; ex=   300; if (m<=t && m>n) do_char_log(cn, (quest1[ 2])?3:1, " PFC   Sirjan    First Street  Enhance   %6d\n", (quest1[ 2])?ex/4:ex); }
 	if (flag || !quest1[ 3]) { m++; ex=   300; if (m<=t && m>n) do_char_log(cn, (quest1[ 3])?3:1, " PFC   Sirjan    First Street  Weapon M  %6d\n", (quest1[ 3])?ex/4:ex); }
 	if (flag || !quest1[ 4]) { m++; ex=   450; if (m<=t && m>n) do_char_log(cn, (quest1[ 4])?3:1, " LCp   Amity     Lynbore Libr  Weaken    %6d\n", (quest1[ 4])?ex/4:ex); }
@@ -2790,8 +2790,7 @@ void do_showcontract(int cn)
 	if (in && it[in].driver == 113)
 	{
 		look_contract(cn, in, 0);
-		do_char_log(cn, 1, " \n");
-		do_char_log(cn, 1, "Progress: %d out of %d.\n", CONT_GOAL(cn), CONT_PROG(cn));
+		do_char_log(cn, 1, "Progress: %d out of %d.\n", CONT_PROG(cn), max(1, CONT_GOAL(cn)));
 	}
 }
 
@@ -2815,7 +2814,7 @@ void do_swap_chars(int cn)
 		do_char_log(cn, 1, "You must be facing someone to swap places with them.\n");
 		return;
 	}
-	if (!IS_PLAYER(co) || !IS_PLAYER_COMP(cn))
+	if (!IS_PLAYER(co) && !IS_PLAYER_COMP(co))
 	{
 		do_char_log(cn, 1, "You must be facing a player or companion.\n");
 		return;
@@ -2826,6 +2825,7 @@ void do_swap_chars(int cn)
 		return;
 	}
 	
+	/*
 	if (ch[cn].goto_x || ch[cn].goto_y)
 	{
 		do_char_log(cn, 1, "You can't do that while moving!\n");
@@ -2836,6 +2836,7 @@ void do_swap_chars(int cn)
 		do_char_log(cn, 1, "You can't do that while your target is moving!\n");
 		return;
 	}
+	*/
 	
 	if (ch[cn].attack_cn)
 	{
@@ -2852,6 +2853,9 @@ void do_swap_chars(int cn)
 	
 	tmp = ch[cn].x; ch[cn].x = ch[co].x; ch[co].x = tmp;
 	tmp = ch[cn].y; ch[cn].y = ch[co].y; ch[co].y = tmp;
+	
+	do_update_char(cn);
+	do_update_char(co);
 	
 	fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 	fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
@@ -5732,14 +5736,21 @@ void set_skill_score(int cn, int z, int n)
 
 int get_fight_skill(int cn, int skill[50])
 {
-	int in;
-	
-	if ((ch[cn].flags & CF_SHADOWCOPY) || get_gear(cn, IT_TW_HEAVENS) || get_gear(cn, IT_SEYANSWORD)) // Rather than pick the matching skill, pick the highest available one
-	{
-		return min(AT_CAP, max(skill[SK_HAND], max(skill[SK_DAGGER], max(skill[SK_SWORD], max(skill[SK_AXE], max(skill[SK_STAFF], skill[SK_TWOHAND]))))));
-	}
+	int in, n, m[6];
 	
 	in = ch[cn].worn[WN_RHAND];
+	
+	if (it[in].temp==IT_TW_HEAVENS || it[in].temp==IT_SEYANSWORD) // Rather than pick the matching skill, pick the highest available one
+	{
+		m[0] = skill[SK_HAND];
+		m[1] = skill[SK_DAGGER];
+		m[2] = skill[SK_SWORD];
+		m[3] = skill[SK_AXE];
+		m[4] = skill[SK_STAFF];
+		m[5] = skill[SK_TWOHAND];
+		for (n = 1; n < 6; ++n) if (m[0] < m[n]) m[0] = m[n];
+		return min(AT_CAP, m[0]);
+	}
 	
 	if (!in || it[in].flags & IF_WP_CLAW) 
 	{
@@ -5795,7 +5806,7 @@ int get_combat_skill(int cn, int skill[50], int flag)
 	{
 		power = min(AT_CAP, skill[SK_DUAL]);
 		
-		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn))
+		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn) || IS_BRAVER(cn))
 		{
 			bonus = power/6;
 		}
@@ -5812,7 +5823,7 @@ int get_combat_skill(int cn, int skill[50], int flag)
 	{
 		power = min(AT_CAP, skill[SK_SHIELD]);
 		
-		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn))
+		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn) || IS_BRAVER(cn))
 		{
 			bonus = power/6;
 		}
@@ -5876,7 +5887,7 @@ int get_tarot(int cn, int in)
 	if (ch[cn].flags & CF_NOMAGIC) return 0;
 	
 	// Hierophant.R - Let GC copy other card effect
-	if (IS_COMP_TEMP(cn) && !(ch[cn].flags & CF_SHADOWCOPY) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]))
+	if (IS_COMP_TEMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]))
 	{
 		ch1 = ch[cc].worn[WN_CHARM];
 		ch2 = ch[cc].worn[WN_CHARM2];
@@ -8574,10 +8585,10 @@ void really_update_char(int cn)
 				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
 				// Meta values
-				base_spd   += (((gearSpec&4)&&it[m].speed[1]<0)?it[m].speed[1]/2:it[m].speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_move   += (((gearSpec&4)&&it[m].move_speed[1]<0)?it[m].move_speed[1]/2:it[m].move_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_attack += (((gearSpec&4)&&it[m].atk_speed[1]<0)?it[m].atk_speed[1]/2:it[m].atk_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[1]<0)?it[m].cast_speed[1]/2:it[m].cast_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				base_spd   += (((gearSpec&4)&&it[m].speed[1]<0)?it[m].speed[1]*2/3:it[m].speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_move   += (((gearSpec&4)&&it[m].move_speed[1]<0)?it[m].move_speed[1]*2/3:it[m].move_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_attack += (((gearSpec&4)&&it[m].atk_speed[1]<0)?it[m].atk_speed[1]*2/3:it[m].atk_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[1]<0)?it[m].cast_speed[1]*2/3:it[m].cast_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				spell_mod  += (it[m].spell_mod[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				spell_apt  += (it[m].spell_apt[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				spell_cool += (it[m].cool_bonus[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
@@ -8596,10 +8607,10 @@ void really_update_char(int cn)
 				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				
 				// Meta values
-				base_spd   += (((gearSpec&4)&&it[m].speed[0]<0)?it[m].speed[0]/2:it[m].speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_move   += (((gearSpec&4)&&it[m].move_speed[0]<0)?it[m].move_speed[0]/2:it[m].move_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_attack += (((gearSpec&4)&&it[m].atk_speed[0]<0)?it[m].atk_speed[0]/2:it[m].atk_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[0]<0)?it[m].cast_speed[0]/2:it[m].cast_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				base_spd   += (((gearSpec&4)&&it[m].speed[0]<0)?it[m].speed[0]*2/3:it[m].speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_move   += (((gearSpec&4)&&it[m].move_speed[0]<0)?it[m].move_speed[0]*2/3:it[m].move_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_attack += (((gearSpec&4)&&it[m].atk_speed[0]<0)?it[m].atk_speed[0]*2/3:it[m].atk_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[0]<0)?it[m].cast_speed[0]*2/3:it[m].cast_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				spell_mod  += (it[m].spell_mod[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				spell_apt  += (it[m].spell_apt[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
 				spell_cool += (it[m].cool_bonus[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
@@ -8651,7 +8662,7 @@ void really_update_char(int cn)
 		
 		if (it[m].temp == IT_WHITEBELT && ch[cn].worn[WN_RHAND]==0 && ch[cn].worn[WN_LHAND]==0)
 		{
-			critical_b += 1;
+			critical_b += 2;
 			wbelt=1;
 		}
 		
@@ -8843,7 +8854,7 @@ void really_update_char(int cn)
 			// Boots - Commander's Roots :: change 'stun' into raw speed reduction.
 			if (gearSpec & 4)
 			{
-				base_spd -= 150;
+				base_spd -= 200;
 				ch[cn].stunned = 0;
 			}
 			else
@@ -9031,14 +9042,14 @@ void really_update_char(int cn)
 		
 		if (z==0 && bbelt)
 		{
-			weapon     += min(AT_CAP, skill[z])/3;
-			tempWeapon += min(AT_CAP, skill[z])/3;
+			weapon     += min(AT_CAP, skill[z])/2;
+			tempWeapon += min(AT_CAP, skill[z])/2;
 		}
 		
 		if (z==0 && wbelt)
 		{
-			weapon     += min(AT_CAP, skill[z])/3;
-			tempWeapon += min(AT_CAP, skill[z])/3;
+			weapon     += min(AT_CAP, skill[z])*2/5;
+			tempWeapon += min(AT_CAP, skill[z])*2/5;
 		}
 	}
 	
@@ -9455,7 +9466,7 @@ void really_update_char(int cn)
 	// Weapon - Excalibur :: Additional WV from 10% of total attack speed
 	if (gearSpec & 128)
 	{
-		weapon += min(SPEED_CAP, base_spd + spd_attack)/10;
+		weapon += (base_spd + spd_attack)/10;
 	}
 	
 	// Weapon - White Odachi :: Additional AV by spellmod over 100
@@ -9523,12 +9534,6 @@ void really_update_char(int cn)
 	}
 	ch[cn].gethit_dam = gethit;
 	//
-	if ((ch[cn].flags & CF_SHADOWCOPY) && IS_SANECHAR(co=ch[cn].data[CHD_MASTER]))
-	{
-		ch[cn].to_hit     = ch[co].to_hit;
-		ch[cn].to_parry   = ch[co].to_parry;
-		ch[cn].gethit_dam = ch[co].gethit_dam;
-	}
 	
 	// Force hp/end/mana to sane values
 	if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
@@ -10469,11 +10474,11 @@ void do_regenerate(int cn)
 	}
 	if (ch[cn].player && get_gear(cn, IT_TW_AVARITIA))
 	{
-		if (ch[cn].a_end>1500) ch[cn].a_end -= 300;	
+		if (ch[cn].a_end>1500) ch[cn].a_end -= 250;	
 	}
 	if (ch[cn].player && get_gear(cn, IT_TW_IRA))
 	{
-		if (ch[cn].a_mana>1500) ch[cn].a_mana -= 325;
+		if (ch[cn].a_mana>1500) ch[cn].a_mana -= 300;
 	}
 
 	// item tear and wear

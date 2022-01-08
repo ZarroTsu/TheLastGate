@@ -26,24 +26,24 @@ int ctick = 0;
 
 static char intro_msg1_font = 1;
 static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
-static char intro_msg2_font = 5;
+static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.8.1\n"};
+static char intro_msg3[] = {"Current client/server version is 0.8.2\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {"** EXP WAS RESET ON 01/04/2022! Remember to spend your exp before exploring! **\n"};
-static char intro_msg5_font = 9;
+static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
 static char newbi_msg1_font = 1;
 static char newbi_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries of Astonia engine by Daniel Brockhaus!\n"};
 static char newbi_msg2_font = 2;
 static char newbi_msg2[] = {"New to the the game? Click on the TUTORIAL button to take a tour!\n"};
-static char newbi_msg3_font = 5;
+static char newbi_msg3_font = 1;
 static char newbi_msg3[] = {"You can use /help (or #help) to get a listing of helpful text commands.\n"};
 static char newbi_msg4_font = 3;
 static char newbi_msg4[] = {"If you need assistance, try /shout before you type. This will notify the entire server.\n"};
-static char newbi_msg5_font = 9;
+static char newbi_msg5_font = 2;
 static char newbi_msg5[] = {"If you need further help or an admin, feel free to join our Discord server using the Discord button on the load menu.\n"};
 
 static inline unsigned int _mcmp(unsigned char *a, unsigned char *b, unsigned int len)
@@ -1407,6 +1407,10 @@ void plr_cmd_setuser(int nr)
 			else if (IS_SUMMONER(cn))
 			{
 				race_name = "a Summoner";
+			}
+			else if (IS_BRAVER(cn))
+			{
+				race_name = "a Braver";
 			}
 			else
 			{
