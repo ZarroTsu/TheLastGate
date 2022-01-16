@@ -769,7 +769,13 @@ int scale_exps(int cn, int co, int exp)
 	return(scale_exps2(cn, points2rank(ch[co].points_tot), exp));
 }
 
-/* CS, 991128: Ranks rearranged for clarity */
+char *class_name[8] = {
+	"Seyan'du",		"Arch-Templar", 
+	"Skald",		"Warrior", 
+	"Sorcerer",		"Summoner", 
+	"Arch-Harakim",	"Braver" 
+};
+
 char *rank_name[RANKS] = {
 	"Private",           	"Private First Class", "Lance Corporal",		//  0  1  2
 	"Corporal",          	"Sergeant", 			"Staff Sergeant",		//  3  4  5
@@ -1343,11 +1349,11 @@ int get_special_item(int in, int gen_a, int gen_b, int gen_c)
 			in2 = god_create_item(in);
 			if (it[in2].temp == IT_EXPS)
 			{
-				it[in2].data[0] = RANDOM(25) * 2000;
+				it[in2].data[0] = 2000 + RANDOM(25) * 2000;
 			}
 			else if (it[in2].temp == IT_LUKS)
 			{
-				it[in2].data[0] = RANDOM(25) * 200;
+				it[in2].data[0] = 200 + RANDOM(25) * 200;
 			}
 			break;
 	}
@@ -3854,6 +3860,8 @@ char *get_map_enemy_name(int kin)
 		case 41: return "Wizard";
 		case 42: return "Mystic";
 		case 43: return "Grosser";
+		case 44: return "Bard";
+		case 45: return "Siren";
 		//
 		case 11+NUM_MAP_ENEM+0: return "Kali";
 		case 11+NUM_MAP_ENEM+1: return "Rundas";
@@ -3915,6 +3923,8 @@ char *get_map_enemy_desc(int kin)
 		case 41: return "A tall man adorn with colorful robes."; // Wizard
 		case 42: return "A woman adorn with foreign clothing and charms."; // Mystic
 		case 43: return "An ugly humanoid lizard, dripping in thick goo."; // Grosser
+		case 44: return "A rugged man in beutiful clothes. He flashes a charming smile."; // Bard
+		case 45: return "A beautiful woman, or so it seems. She calls for you."; // Siren
 		//
 		case 11+NUM_MAP_ENEM+0: return "A large woman wearing cerulean armor. She wears a belt of severed heads, a skirt of blood trailing from them."; // Kali
 		case 11+NUM_MAP_ENEM+1: return "A man adorn in many thick furs, tribal paint smothering his face. He has a wild and disheveled manner in his movements."; // Rundas
@@ -3976,8 +3986,8 @@ int get_map_enemy_sprite(int kin)
 		case 41: return 29648; // Wizard
 		case 42: return 30672; // Mystic
 		case 43: return 31696; // Grosser
-		// case 44: return 27088; // 
-		// case 45: return 28112; // 
+		case 44: return 27088; // Bard
+		case 45: return 28112; // Siren
 		//
 		case 11+NUM_MAP_ENEM+0: return 24528; // Kali
 		case 11+NUM_MAP_ENEM+1: return 26048; // Rundas
@@ -4066,6 +4076,10 @@ void set_map_enemy_tarot(int co, int kin, int tarot)
 				in2 = RANDOM(2)?IT_CH_PREIST_R:IT_CH_HEIROP_R; 	break; // Mystic
 	case 43: 	in  = RANDOM(2)?IT_CH_DEATH:IT_CH_STRENGTH; 
 				in2 = RANDOM(2)?IT_CH_CHARIO_R:IT_CH_TOWER_R; 	break; // Grosser
+	case 44: 	in  = RANDOM(2)?IT_CH_LOVERS:IT_CH_STAR; 
+				in2 = RANDOM(2)?IT_CH_LOVERS_R:IT_CH_PREIST_R; 	break; // Bard
+	case 45: 	in  = RANDOM(2)?IT_CH_TOWER:IT_CH_CHARIOT; 
+				in2 = RANDOM(2)?IT_CH_EMPERO_R:IT_CH_CHARIO_R; 	break; // Siren
 	//
 	case 11+NUM_MAP_ENEM+0: in = IT_CH_JUSTICE;  in2 = IT_CH_JUSTIC_R; break; // Kali
 	case 11+NUM_MAP_ENEM+1: in = IT_CH_STRENGTH; in2 = IT_CH_STRENG_R; break; // Rundas
@@ -4193,13 +4207,13 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 	{40, 0, 0, 0, 0, 0, 0, 0,60,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0,50,40,75,75,
 	 75, 0, 0, 0,45, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0,55, 0, 0, 0, 0,57,40,46,55,52,36,50,34,54,46}, // 35 : Druid
 	{40, 0, 0, 0, 0, 0, 0,40, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75, 0,45,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,55, 0,60,48,54,53,47,48,34,50,36,48,52}, // 36 : Swordsman
+	 75, 0,45,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,55, 0,60,48,54,53,47,48,35,50,36,48,52}, // 36 : Swordsman
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0,55,60, 0,75,75,
 	 75, 0, 0, 0, 0,40, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0,41,55,47,59,48,33,50,37,55,45}, // 37 : Paladin
 	{40,50, 0, 0, 0, 0, 0,55, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,45,50, 0,60, 0, 0, 0, 0,75,75,
 	 75, 0, 0, 0, 0,60, 0, 0, 0, 0,	0, 0, 0,40, 0, 0, 0, 0, 0, 0,49,52,53,49,47,36,50,34,45,55}, // 38 : Amazon
-	{40, 0, 0, 0, 0, 0, 0, 0,45,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
-	 75, 0,55, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0,50,60,40, 0,47,57,48,45,53,37,50,33,49,51}, // 39 : Dancer
+	{40, 0, 0, 0, 0, 0, 0, 0,45,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,80,
+	 75,50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55,60,40, 0,47,57,48,45,53,37,50,35,49,51}, // 39 : Dancer (v2)
 	{40, 0, 0, 0, 0, 0, 0, 0,55,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,50,50, 0,60, 0, 0, 0,60,75,75,
 	 75, 0, 0, 0, 0, 0, 0,40, 0, 0,	0, 0, 0, 0, 0,45, 0, 0, 0, 0,50,42,49,54,55,38,50,32,51,49}, // 40 : Warlock
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60,45, 0, 0,50,75,75,
@@ -4208,6 +4222,10 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0,50,45, 0, 0, 0,52,45,41,54,58,37,50,33,48,52}, // 42 : Mystic
 	{40, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0,55,50, 0,60, 0, 0, 0, 0,75,75,
 	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,	0,60,40, 0,45, 0, 0, 0, 0, 0,43,46,57,55,49,36,50,34,53,47}, // 43 : Grossling
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,55, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0,50, 0,75,80,
+	 75,45,60,40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,49,51,51,49,34,50,35,51,49}, // 44 : Bard
+	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,45,60,50, 0,55, 0, 0, 0, 0,75,80,
+	 75,55, 0, 0, 0,50, 0,40, 0, 0,	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50,51,49,49,51,35,50,33,48,52}, // 45 : Siren
 //   30             35             40             45             50             55            (60)
 	{40,50, 0, 0, 0, 0, 0, 0, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0, 0,75,75,
 	 75, 0, 0,50, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,45,31,40,35,45,51}, // *1 : Kali
@@ -4218,7 +4236,7 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0,45, 0, 0,75,75,
 	 75, 0, 0,50, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,33,40,33,48,48}, // *4 : Azrael
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0,50, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0,45,45, 0,75,75,
-	 75, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,34,40,32,51,45}, // *5 : Brighid
+	 75,50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,45,45,45,45,34,40,32,51,45}, // *5 : Brighid
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,55, 0, 0, 0,45,75,75,
 	 75, 0, 0, 0, 0, 0, 0,45, 0, 0, 0, 0,50, 0, 0,50, 0, 0, 0, 0,45,45,45,45,45,32,40,34,47,49}, // *6 : Nidhogg
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,44, 0, 0, 0, 0, 0, 0, 0,50,50, 0,45,50, 0,55, 0, 0, 0, 0,75,75,

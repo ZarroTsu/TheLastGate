@@ -60,19 +60,19 @@
 
 // Top left corner of outer door area
 #define SEAGROLMY_X_1	311
-#define SEAGROLMY_Y_1	263
+#define SEAGROLMY_Y_1	262
 
 // Bottom right corner of outer door area
-#define SEAGROLMY_X_2	315
+#define SEAGROLMY_X_2	314
 #define SEAGROLMY_Y_2	271
 
 // Far wander point A
-#define SEAGROLMY_X_3	312
-#define SEAGROLMY_Y_3	246
+#define SEAGROLMY_X_3	319
+#define SEAGROLMY_Y_3	241
 
 // Far wander point B
 #define SEAGROLMY_X_4	320
-#define SEAGROLMY_Y_4	254
+#define SEAGROLMY_Y_4	242
 
 // Home on rug
 #define SEAGROLMY_X_5	313
@@ -863,7 +863,7 @@ int npc_stunrun_high(int cn)
 				ch[cn].citem = in;
 				it[in].carried = cn;
 			}
-			if (abs(ch[cn].x - xt3) + abs(ch[cn].y - yt3)<20)
+			if (abs(ch[cn].x - xt3) + abs(ch[cn].y - yt3)<16)
 			{
 				ch[cn].data[22] = 2;
 				ch[cn].data[23] = globs->ticker;

@@ -14,6 +14,8 @@
 #define MD_DAY  (MD_HOUR*24)
 #define MD_YEAR 300
 
+FILE *discordFile;
+
 void pay_rent(void)
 {
 	int cn;
@@ -116,6 +118,12 @@ void global_tick(void)
 
 	globs->newmoon  = 0;
 	globs->fullmoon = 0;
+	
+	if (globs->flags & GF_DISCORD) 
+	{
+		if (!(globs->mdtime % TICKS*5)) discord_who();
+		discord_shout_in();
+	}
 
 	if (tmp==1)
 	{

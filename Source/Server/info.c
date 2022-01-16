@@ -224,6 +224,7 @@ static char *racename(int kin)
 	if (kin & KIN_WARRIOR)		return("Warrior");
 	if (kin & KIN_SKALD)		return("Skald");
 	if (kin & KIN_SUMMONER)		return("Summoner");
+	if (kin & KIN_BRAVER)		return("Braver");
 
 	return("Monster");
 }

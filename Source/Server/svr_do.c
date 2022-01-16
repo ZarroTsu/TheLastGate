@@ -1381,7 +1381,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#shout <text>          to all players.\n");
 			do_char_log(cn, 1, "#skua                  leave purple.\n");
 			do_char_log(cn, 1, "#sort <order>          sort inventory.\n");
-			do_char_log(cn, 1, "#sortdepot <order>     sort depot.\n");
+			do_char_log(cn, 1, "#sortdepot <ord/ch>    sort depot.\n");
 			do_char_log(cn, 1, "#spear                 list spear stats.\n");
 			do_char_log(cn, 1, "#spellignore           don't attack if spelled.\n");
 		}
@@ -1414,7 +1414,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 2):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
-			do_char_log(cn, 1, "#chars                 list local chars and exp.\n");
+			do_char_log(cn, 1, "#chars                 list your chars and xp.\n");
 			do_char_log(cn, 1, "#citrine               list citrine rings.\n");
 			do_char_log(cn, 1, "#claw                  list claw stats.\n");
 			do_char_log(cn, 1, "#contract              list current contract.\n");
@@ -2796,7 +2796,7 @@ void do_showcontract(int cn)
 
 void do_swap_chars(int cn)
 {
-	int m, co, tmp;
+	int m, co, cn_x, cn_y, co_x, co_y;
 	
 	switch(ch[cn].dir)
 	{
@@ -2804,7 +2804,7 @@ void do_swap_chars(int cn)
 		case DX_LEFT: 	m = (ch[cn].x - 1) + (ch[cn].y    ) * MAPX;	break;
 		case DX_UP: 	m = (ch[cn].x    ) + (ch[cn].y - 1) * MAPX;	break;
 		case DX_DOWN: 	m = (ch[cn].x    ) + (ch[cn].y + 1) * MAPX;	break;
-		default: break;
+		default: return;
 	}
 	
 	co = map[m].ch;
@@ -2851,11 +2851,14 @@ void do_swap_chars(int cn)
 	
 	do_char_log(co, 0, "%s swapped places with you.\n", ch[cn].name);
 	
-	tmp = ch[cn].x; ch[cn].x = ch[co].x; ch[co].x = tmp;
-	tmp = ch[cn].y; ch[cn].y = ch[co].y; ch[co].y = tmp;
+	cn_x = ch[cn].x;
+	cn_y = ch[cn].y;
+	co_x = ch[co].x;
+	co_y = ch[co].y;
 	
-	do_update_char(cn);
-	do_update_char(co);
+	god_transfer_char(cn, 13, 13);
+	god_transfer_char(co, cn_x, cn_y);
+	god_transfer_char(cn, co_x, co_y);
 	
 	fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 	fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
@@ -3548,19 +3551,66 @@ int qsort_proc(const void *a, const void *b)
 	return 0;
 }
 
-void do_sort_depot(int cn, char *arg)
+void do_sort_depot(int cn, char *arg, char *arg2)
 {
-	if (IS_BUILDING(cn))
+	int n, m, co;
+	int temp = 0;
+	char chname[40];
+	
+	if (strcmp(arg, "")!=0)
+	{
+		for (m=0; m<strlen(arg); m++) 
+			arg[m] = tolower(arg[m]);
+		for (n = 1; n<MAXCHARS; n++)
+		{
+			if (ch[n].used==USE_EMPTY || !IS_SANEPLAYER(n)) continue;
+			strcpy(chname, ch[n].name); chname[0] = tolower(chname[0]);
+			if (strcmp(arg, chname)==0)	// Character with this name exists
+			{
+				temp = n;
+				break;
+			}
+		}
+	}
+	
+	if (temp) // Sequence above succeeded, second arg is a sort #
+	{
+		order = arg2;
+		co = temp;
+		temp = 0;
+		for (n = 80; n<89; n++)
+		{
+			if (ch[cn].data[n]==0) continue;
+			for (m = 80; m<89; m++)
+			{
+				if (ch[cn].data[m]==0) continue;
+				if (ch[cn].data[n]==ch[co].data[m])
+				{
+					temp=1;
+				}
+			}
+		}
+		if (!temp)
+		{
+			do_char_log(cn, 0, "This is not one of your characters.\n");
+			return;
+		}
+	}
+	else // First arg is just a sort #
+	{
+		order = arg;
+		co = cn;
+	}
+	
+	if (IS_BUILDING(co))
 	{
 		do_char_log(cn, 1, "Not in build-mode, dude.");
 		return;
 	}
-
-	order = arg;
 	
-	qsort(ch[cn].depot, 62, sizeof(int), qsort_proc);
+	qsort(ch[co].depot, 62, sizeof(int), qsort_proc);
 
-	do_update_char(cn);
+	do_update_char(co);
 }
 
 void do_sort(int cn, char *arg)
@@ -3885,8 +3935,9 @@ void do_stat(int cn)
 	            globs->flags & GF_CLOSEENEMY ? "yes" : "no",
 	            globs->flags & GF_CAP ? "yes" : "no",
 	            globs->flags & GF_SPEEDY ? "yes" : "no");
-	do_char_log(cn, 2, "newbs=%s\n",
-	            globs->flags & GF_NEWBS ? "yes" : "no");
+	do_char_log(cn, 2, "newbs=%s, discord=%s\n",
+	            globs->flags & GF_NEWBS ? "yes" : "no",
+				globs->flags & GF_DISCORD ? "yes" : "no");
 }
 
 void do_enter(int cn)
@@ -4181,7 +4232,7 @@ void do_spectate(int cn, int co)
 	player[nr].spectating = co;
 	
 	do_char_log(cn, 0, "Now spectating %s. Use /spectate self to return.\n", ch[co].name);
-	do_char_log(co, 0, "%s is watching you.\n", ch[cn].name);
+	if (!IS_GOD(co)) do_char_log(co, 9, "%s is watching you.\n", ch[cn].name);
 }
 
 void do_command(int cn, char *ptr)
@@ -4495,6 +4546,13 @@ void do_command(int cn, char *ptr)
 			do_char_log(cn, 0, "Pent diffi is now %d.\n", diffi);
 			return;
 		}
+		;
+		if (prefix(cmd, "discord") && f_g)
+		{
+			god_set_gflag(cn, GF_DISCORD);
+			return;
+		}
+		;
 		if (prefix(cmd, "dualsword"))
 		{
 			do_listweapons(cn, "dualsword");
@@ -5098,6 +5156,11 @@ void do_command(int cn, char *ptr)
 			break;
 		}
 		;
+		if (prefix(cmd, "resetite"))
+		{
+			break;
+		}
+		;
 		if (prefix(cmd, "resetplaye"))
 		{
 			break;
@@ -5129,6 +5192,12 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "resetnpcs") && f_gg)
 		{
 			god_reset_npcs(cn);
+			return;
+		}
+		;
+		if (prefix(cmd, "resetitems") && f_gg)
+		{
+			god_reset_items(cn);
 			return;
 		}
 		;
@@ -5260,7 +5329,7 @@ void do_command(int cn, char *ptr)
 		;
 		if (prefix(cmd, "sortdepot"))
 		{
-			do_sort_depot(cn, arg[1]);
+			do_sort_depot(cn, arg[1], arg[2]);
 			return;
 		}
 		;
@@ -5347,12 +5416,14 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
+		
 		if (prefix(cmd, "swap"))
 		{
 			do_swap_chars(cn);
 			return;
 		}
 		;
+		
 		if (prefix(cmd, "sword"))
 		{
 			do_listweapons(cn, "sword");
@@ -7090,7 +7161,7 @@ void do_give_exp(int cn, int p, int gflag, int rank)
 			//do_char_log(cn, 1, "Experience until next rank: %d\n", points_tolevel(ch[cn].points_tot));
 			do_notify_char(cn, NT_GOTEXP, p, 0, 0, 0);
 			do_update_char(cn);
-			do_check_new_level(cn);
+			do_check_new_level(cn, 1);
 		}
 	}
 }
@@ -7156,9 +7227,6 @@ void do_lucksave(int cn, char *deathtype)
 	ch[cn].luck /= 2;
 	do_char_log(cn, 0, "A god reached down and saved you from the %s. You must have done the gods a favor sometime in the past!\n", deathtype);
 		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "A god reached down and saved %s from the %s.\n", ch[cn].reference, deathtype);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
-	god_transfer_char(cn, ch[cn].temple_x, ch[cn].temple_y);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	
 	// Removed spells upon save to prevent nasty scenarios like lingering poisons
 	for (n = 0; n<MAXBUFFS; n++)
@@ -7168,6 +7236,14 @@ void do_lucksave(int cn, char *deathtype)
 		ch[cn].spell[n] = 0;
 	}
 	clear_map_buffs(cn, 1);
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	god_transfer_char(cn, ch[cn].temple_x, ch[cn].temple_y);
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	
+	remove_enemy(cn);
+	
+	ch[cn].escape_timer = TICKS*5;
 	
 	chlog(cn, "Saved by the Gods (new luck=%d)", ch[cn].luck);
 	ch[cn].data[44]++;
@@ -7289,7 +7365,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	//
 	if (type==3)
 	{
-		dam *= 1000;
+		dam *= DAM_MULT_THORNS; 						// Thorns
 	}
 	else
 	{
@@ -7301,7 +7377,6 @@ int do_hurt(int cn, int co, int dam, int type)
 			{
 				case  1: dam *= DAM_MULT_BLAST;  break; // Blast
 				case  2: dam *= DAM_MULT_HOLYW;  break; // Holy Water / Staff of Kill Undead
-				case  3: dam *= DAM_MULT_THORNS; break; // Thorns
 				case  5: dam *= DAM_MULT_CLEAVE; break; // Cleave
 				case  6: dam *= DAM_MULT_PULSE;  break; // Pulse
 				case  7: dam *= DAM_MULT_ZEPHYR; break; // Zephyr
@@ -7326,6 +7401,11 @@ int do_hurt(int cn, int co, int dam, int type)
 
 	if (dam<1)
 	{
+		if ((type==0 || type==4 || type==5 || type==8) && ch[co].gethit_dam>0)
+		{
+			thorns = ch[co].gethit_dam;
+			do_hurt(co, cn, thorns/2 + thorns/4 + RANDOM(thorns/4), 3);
+		}
 		return 0;
 	}
 
@@ -7346,7 +7426,7 @@ int do_hurt(int cn, int co, int dam, int type)
 			{
 				ch[cn].points += tmp;
 				ch[cn].points_tot += tmp;
-				do_check_new_level(cn);
+				do_check_new_level(cn, 1);
 			}
 		}
 	}
@@ -7425,9 +7505,9 @@ int do_hurt(int cn, int co, int dam, int type)
 		ch[co].a_mana -= mana_dam;
 	}
 
-	if (ch[co].a_hp<8000 && ch[co].a_hp>=500)
+	if (ch[co].a_hp<10000 && ch[co].a_hp>=500 && points2rank(ch[co].points_tot)<5)
 	{
-		do_char_log(co, 0, "You're almost dead... Give running a try!\n");
+		do_char_log(co, 0, "You're almost dead... Use a potion, quickly!\n");
 	}
 
 	if (ch[co].a_hp<500)
@@ -7510,7 +7590,7 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 
-	return(dam / 1000);
+	return (dam / 1000);
 }
 
 int do_surround_check(int cn, int co, int gethit)
@@ -7838,7 +7918,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		if (!RANDOM(25)) // 4% chance
 		{
 			glv = glv_base;
-			if (glv_base+glv_base/2+RANDOM(20) > get_target_resistance(cn, co)+RANDOM(10))
+			if (chance_compare(co, glv_base+glv_base/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
 			{
 				in = it[ch[cn].worn[WN_ARMS]].temp;
 				if (in==IT_GL_SERPENT) 
@@ -7917,9 +7997,9 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		}
 		if (!RANDOM(25)) // 4% chance
 		{
-			glv_base += 60;
+			glv_base += 120;
 			glv = glv_base;
-			if (glv_base+glv_base/2+RANDOM(20) > get_target_resistance(cn, co)+RANDOM(10))
+			if (chance_compare(co, glv_base+glv_base/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
 			{
 				in = it[ch[cn].worn[WN_RHAND]].temp;
 				if (in==IT_TW_LUXURIA)
@@ -8013,7 +8093,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 							surrTotal = surrDam+surrBonus;
 							if (co==co_orig) surrTotal = surrTotal/4*3;
 							do_hurt(cn, co, surrTotal, 4);
-							if (glv_base+RANDOM(20) > get_target_resistance(cn, co)+RANDOM(16) && co!=co_orig)
+							if (chance_compare(co, glv_base+glv_base/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(16), 0) && co!=co_orig)
 							{
 								if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
 								if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
@@ -8060,7 +8140,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 							surrTotal = surrDam+surrBonus;
 							if (co==co_orig) surrTotal = surrTotal/4*3;
 							do_hurt(cn, co, surrTotal, 4);
-							if (glv_base+RANDOM(20) > get_target_resistance(cn, co)+RANDOM(16) && co!=co_orig)
+							if (chance_compare(co, glv_base+glv_base/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(16), 0) && co!=co_orig)
 							{
 								if (in==IT_GL_SERPENT) spell_poison(cn, co, glv, 1);
 								if (in==IT_GL_BURNING) spell_scorch(cn, co, glv, 1);
@@ -9321,7 +9401,7 @@ void really_update_char(int cn)
 		so that precision can have a more consistant effect.
 	*/
 	
-	critical_c += attrib_ex[AT_BRV]/2;
+	critical_c += attrib_ex[AT_BRV];
 	
 	critical_b *= 100;
 	
@@ -9362,6 +9442,11 @@ void really_update_char(int cn)
 	*/
 	
 	critical_m += 25 + ava_mult;
+	
+	if (B_SK(cn, SK_PRECISION))
+	{
+		critical_m += skill[SK_PRECISION]/10;
+	}
 	
 	// Weapon - Gildshine :: A third of Bartering is granted as crit multi
 	if (gearSpec & 8) 
@@ -9434,28 +9519,7 @@ void really_update_char(int cn)
 	ch[cn].to_hit   = hit_rate;
 	ch[cn].to_parry = parry_rate;
 	
-	/*
-		ch[].top_damage value
-		
-		Determined by STR/2. This is put into a RANDOM(), so "average damage" can be considered WV plus half of this number
-	*/
 	
-	damage_top = damage_top + attrib_ex[AT_STR]/2;
-	
-	// Tarot - Hanged.R : 20% less WV, 25% more Top Damage
-	if (charmSpec & 16384)
-		damage_top = damage_top * 6/5;
-	
-	// Clamp damage_top between 0 and 999
-	if (damage_top > 999)
-	{
-		damage_top = 999;
-	}
-	if (damage_top < 0)
-	{
-		damage_top = 0;
-	}
-	ch[cn].top_damage = damage_top;
 	
 	/*
 		Weapon and Armor finalized
@@ -9508,9 +9572,10 @@ void really_update_char(int cn)
 	{
 		armor = 0;
 	}
-	if (armor>250)
+	if (armor>255)
 	{
-		armor = 250;
+		gethit += 1+(armor-255)/2;
+		armor = 255;
 	}
 	ch[cn].armor = armor;
 
@@ -9518,9 +9583,10 @@ void really_update_char(int cn)
 	{
 		weapon = 0;
 	}
-	if (weapon>250)
+	if (weapon>255)
 	{
-		weapon = 250;
+		damage_top += 1+(weapon-255)/2;
+		weapon = 255;
 	}
 	ch[cn].weapon = weapon;
 
@@ -9528,12 +9594,35 @@ void really_update_char(int cn)
 	{
 		gethit = 0;
 	}
-	if (gethit>250)
+	if (gethit>255)
 	{
-		gethit = 250;
+		gethit = 255;
 	}
 	ch[cn].gethit_dam = gethit;
 	//
+	
+	/*
+		ch[].top_damage value
+		
+		Determined by STR/2. This is put into a RANDOM(), so "average damage" can be considered WV plus half of this number
+	*/
+	
+	damage_top = damage_top + attrib_ex[AT_STR]/2;
+	
+	// Tarot - Hanged.R : 10% less WV, 20% more Top Damage
+	if (charmSpec & 16384)
+		damage_top = damage_top * 6/5;
+	
+	// Clamp damage_top between 0 and 999
+	if (damage_top > 999)
+	{
+		damage_top = 999;
+	}
+	if (damage_top < 0)
+	{
+		damage_top = 0;
+	}
+	ch[cn].top_damage = damage_top;
 	
 	// Force hp/end/mana to sane values
 	if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
@@ -10143,7 +10232,7 @@ void do_regenerate(int cn)
 				{
 					ch[co].points += 1;
 					ch[co].points_tot += 1;
-					do_check_new_level(co);
+					do_check_new_level(co, 1);
 				}
 				
 				if (ch[cn].a_hp<500)
@@ -10843,7 +10932,7 @@ int barter(int cn, int in, int flag) // flag=1 merchant is selling, flag=0 merch
 
 void do_shop_char(int cn, int co, int nr)
 {
-	int in, pr, in2, flag = 0, tmp, n, stk;
+	int in, pr, in2, flag = 0, tmp, n, stk, orgstk=0, orgval=0;
 
 	if (co<=0 || co>=MAXCHARS || nr<0 || nr>=186)
 	{
@@ -11024,6 +11113,14 @@ void do_shop_char(int cn, int co, int nr)
 							do_char_log(cn, 0, "You cannot afford that.\n");
 							return;
 						}
+						else if (stk && (it[in].flags & IF_STACKABLE) && canstk)
+						{
+							orgstk		  = it[in].stack;
+							orgval        = it[in].value;
+							it[in].stack  = stk;
+							it[in].value *= stk;
+							it[in].flags |= IF_UPDATE;
+						}
 					}
 					else
 					{
@@ -11040,6 +11137,8 @@ void do_shop_char(int cn, int co, int nr)
 							{
 								ch[cn].bs_points -= pr;
 								it[in2].data[8] = 2;
+								
+								if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
 								chlog(cn, "Bought %s", it[in2].name);
 								if (!(ch[cn].flags & CF_SYS_OFF))
@@ -11064,6 +11163,8 @@ void do_shop_char(int cn, int co, int nr)
 							{
 								ch[cn].tokens -= pr;
 								it[in2].data[8] = 3;
+								
+								if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
 								chlog(cn, "Bought %s", it[in2].name);
 								if (!(ch[cn].flags & CF_SYS_OFF))
@@ -11088,6 +11189,8 @@ void do_shop_char(int cn, int co, int nr)
 							{
 								ch[cn].os_points -= pr;
 								it[in2].data[8] = 4;
+								
+								if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
 								chlog(cn, "Bought %s", it[in2].name);
 								if (!(ch[cn].flags & CF_SYS_OFF))
@@ -11114,13 +11217,9 @@ void do_shop_char(int cn, int co, int nr)
 						{
 							if (ch[co].flags & CF_MERCHANT)
 							{
-								if (stk)
-								{
-									it[in].stack  = stk;
-									it[in].value *= stk;
-									it[in].flags |= IF_UPDATE;
-								}
 								ch[cn].gold = max(0, ch[cn].gold - pr);
+								
+								if (it[in].driver==48) it[in].stack = it[in].data[2];
 
 								chlog(cn, "Bought %s", it[in].name);
 								if (!(ch[cn].flags & CF_SYS_OFF))
@@ -11145,6 +11244,12 @@ void do_shop_char(int cn, int co, int nr)
 						}
 						else
 						{
+							if (orgstk)
+							{
+								it[in].stack  = orgstk;
+								it[in].value  = orgval;
+								it[in].flags |= IF_UPDATE;
+							}
 							god_give_char(in, co);
 							if (ch[co].flags & CF_MERCHANT)
 							{
@@ -11165,6 +11270,7 @@ void do_shop_char(int cn, int co, int nr)
 					god_take_from_char(in, co);
 					if (god_give_char(in, cn))
 					{
+						if (it[in].driver==48) it[in].stack = it[in].data[2];
 						chlog(cn, "Took %s", it[in].name);
 						if (!(ch[cn].flags & CF_SYS_OFF))
 							do_char_log(cn, 1, "You took a %s.\n", it[in].reference);
@@ -11183,6 +11289,7 @@ void do_shop_char(int cn, int co, int nr)
 					god_take_from_char(in, co);
 					if (god_give_char(in, cn))
 					{
+						if (it[in].driver==48) it[in].stack = it[in].data[2];
 						chlog(cn, "Took %s", it[in].name);
 						if (!(ch[cn].flags & CF_SYS_OFF))
 							do_char_log(cn, 1, "You took a %s.\n", it[in].reference);
@@ -11559,6 +11666,10 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 	if (godflag || (ch[co].flags & CF_BODY))
 	{
 		p = 1;
+	}
+	else if (player[ch[cn].player].spectating)
+	{
+		p = do_char_can_see(player[ch[cn].player].spectating, co);
 	}
 	else
 	{
@@ -12833,7 +12944,7 @@ int may_attack_msg(int cn, int co, int msg)
 	return 1;
 }
 
-void do_check_new_level(int cn)
+void do_check_new_level(int cn, int announce)
 {
 	int hp = 0, mana = 0, attri = 0, diff, rank, temp, n, oldrank;
 
@@ -12922,31 +13033,26 @@ void do_check_new_level(int cn)
 			do_char_log(cn, 0, "Confident with your progress, the gods will no longer return your items when you die. Be careful!\n");
 		}
 		
-		/* CS, 991203: Announce the player's new rank */
-		temp = IS_PURPLE(cn) ? CT_PRIEST : CT_BISHOP;
-		// Find a character with appropriate template
-		for (n = 1; n<MAXCHARS; n++)
+		if (announce)
 		{
-			if (ch[n].used!=USE_ACTIVE)
+			/* CS, 991203: Announce the player's new rank */
+			temp = IS_PURPLE(cn) ? CT_PRIEST : CT_BISHOP;
+			// Find a character with appropriate template
+			for (n = 1; n<MAXCHARS; n++)
 			{
-				continue;
+				if (ch[n].used!=USE_ACTIVE)	continue;
+				if (ch[n].flags & CF_BODY)	continue;
+				if (ch[n].temp == temp)		break;
 			}
-			if (ch[n].flags & CF_BODY)
+			// Have him yell it out
+			if (n<MAXCHARS)
 			{
-				continue;
+				char message[100];
+				sprintf(message, "Hear ye, hear ye! %s has attained the rank of %s!",
+						ch[cn].name, rank_name[rank]);
+				do_shout(n, message);
+				if (globs->flags & GF_DISCORD) discord_ranked(message);
 			}
-			if (ch[n].temp == temp)
-			{
-				break;
-			}
-		}
-		// Have him yell it out
-		if (n<MAXCHARS)
-		{
-			char message[100];
-			sprintf(message, "Hear ye, hear ye! %s has attained the rank of %s!",
-			        ch[cn].name, rank_name[rank]);
-			do_shout(n, message);
 		}
 
 		ch[cn].hp[1]   = hp * min(20,rank);

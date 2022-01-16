@@ -28,6 +28,7 @@
 #define GF_SPEEDY     (1<<4)
 #define GF_DIRTY      (1<<5)
 #define GF_NEWBS      (1<<6)
+#define GF_DISCORD    (1<<7)
 
 struct global
 {
@@ -278,7 +279,7 @@ extern unsigned int mapmarker;
 
 #define PRXA_RAD		5
 
-#define PREC_CAP		(AT_CAP/4)
+#define PREC_CAP		(AT_CAP/3)
 
 // Attribute Definitions
 #define AT_BRV 			 0
@@ -542,7 +543,7 @@ struct character
 	char unused;
 	char depot_sold;                // items from depot where sold to pay for the rent
 
-	char gethit_dam;                // damage for attacker when hitting this char
+	unsigned char gethit_dam;       // damage for attacker when hitting this char
 	char gethit_bonus;              // race specific bonus for above
 
 	unsigned char light_bonus;      // char emits light all the time

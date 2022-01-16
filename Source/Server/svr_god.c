@@ -1760,6 +1760,19 @@ void god_cleanslots(int cn)
 	return;
 }
 
+void god_reset_items(int cn)
+{
+	int n;
+	
+	do_char_log(cn, 1, "Now resetting all items...\n");
+	for (n = 1; n<MAXTITEM; n++)
+	{
+		if (it_temp[n].used==USE_EMPTY) continue;
+		reset_item(n);
+	}
+	do_char_log(cn, 0, "Done.\n");
+}
+
 void god_reset_player(int cn, int co)
 {
 	if (co<1 || co>=MAXCHARS)
@@ -3204,7 +3217,7 @@ void god_raise_char(int cn, int co, int v, int bsp)
 		chlog(cn, "IMP: Raised %s by %d.", ch[co].name, v);
 		do_char_log(co, 0, "You have been rewarded by the gods. You received %d experience points.\n", v);
 
-		do_check_new_level(co);
+		do_check_new_level(co, 1);
 	}
 }
 
@@ -3580,6 +3593,9 @@ void god_set_gflag(int cn, int flag)
 	case    GF_NEWBS:
 		ptr = "newbs";
 		break;
+	case    GF_DISCORD:
+		ptr = "discord integration";
+		break;
 
 	default:
 		ptr = "unknown";
@@ -3909,8 +3925,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[73] = 0;
 		
 		// Remove learned flags
-		ch[co].flags &= ~(CF_APPRAISE);
-		ch[co].flags &= ~(CF_LOCKPICK);
+		ch[co].flags &= ~(CF_APPRAISE | CF_LOCKPICK | CF_SENSE);
 	}
 	
 	ch[co].a_end  = 999999;
@@ -4365,7 +4380,7 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 	}
 
 	ch[cn].data[45] = 0;      // reset level
-	do_check_new_level(cn);
+	do_check_new_level(cn, 0);
 }
 
 void god_force(int cn, char *whom, char *text)

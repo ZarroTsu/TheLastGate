@@ -36,7 +36,304 @@ struct see_map *see;
 
 FILE *logfp;
 
+FILE *discordWho;
+FILE *discordShoutIn;
+FILE *discordShoutOut;
+FILE *discordRanked;
+FILE *discordTopA;
+FILE *discordTopB;
+//FILE *discordMoon;
+
 char  mod[256];
+
+#define DISC_R  8
+#define DISC_T  5
+
+void discord_top_five(void)
+{
+	int j, n, m, font;
+	int r1, r2, r3, r4;
+	int b[DISC_R][DISC_T], nr[DISC_R][DISC_T];
+	
+	for (j = 0; j<DISC_R; j++) for (m = 0; m<DISC_T; m++)
+	{
+		b[j][m]  = -1;
+		nr[j][m] = -1;
+	}
+	for (j = 0; j<DISC_R; j++) for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used==USE_EMPTY)				continue;
+		if (!(ch[n].flags & (CF_PLAYER)))		continue;
+		if (ch[n].flags & (CF_GOD | CF_NOLIST))	continue;
+		
+		if (j==0 && !IS_SEYAN_DU(n))	continue;
+		if (j==1 && !IS_ARCHTEMPLAR(n))	continue;
+		if (j==2 && !IS_SKALD(n))		continue;
+		if (j==3 && !IS_WARRIOR(n))		continue;
+		if (j==4 && !IS_SORCERER(n))	continue;
+		if (j==5 && !IS_SUMMONER(n))	continue;
+		if (j==6 && !IS_ARCHHARAKIM(n))	continue;
+		if (j==7 && !IS_BRAVER(n))		continue;
+		
+		for (m = 0; m<DISC_T; m++)
+		{
+			if (ch[n].points_tot>b[j][m])
+			{
+				if (m<(DISC_T-1))
+				{
+					memmove(&b[j][m + 1], &b[j][m], ((DISC_T-1) - m) * sizeof(int));
+					memmove(&nr[j][m + 1], &nr[j][m], ((DISC_T-1) - m) * sizeof(int));
+				}
+				b[j][m]  = ch[n].points_tot;
+				nr[j][m] = n;
+				break;
+			}
+		}
+	}
+	
+	discordTopA = fopen("topa.txt", "w");
+	fprintf(discordTopA, "```diff\n");
+	for (j = 0; j<DISC_R/2; j++) 
+	{
+		if (j!=0) fprintf(discordTopA, " \n");
+		switch (j)
+		{
+			case  0: fprintf(discordTopA, "- Top Seyan'du:\n"); break;
+			case  1: fprintf(discordTopA, "- Top Arch-Templar:\n"); break;
+			case  2: fprintf(discordTopA, "- Top Skalds:\n"); break;
+			default: fprintf(discordTopA, "- Top Warriors:\n"); break;
+		}
+		for (m = 0; m<DISC_T; m++)
+		{
+			if (nr[j][m]==-1) continue;
+			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			
+			r1 = ch[nr[j][m]].points_tot / 1000000000;
+			r2 = ch[nr[j][m]].points_tot / 1000000 % 1000;
+			r3 = ch[nr[j][m]].points_tot / 1000 % 1000;
+			r4 = ch[nr[j][m]].points_tot % 1000;
+			
+			if (r1)
+				fprintf(discordTopA, "%c %10.10s    %20.20s    %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r1, r2, r3, r4);
+			else if (r2)
+				fprintf(discordTopA, "%c %10.10s    %20.20s        %3d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r2, r3, r4);
+			else if (r3)
+				fprintf(discordTopA, "%c %10.10s    %20.20s            %3d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r3, r4);
+			else
+				fprintf(discordTopA, "%c %10.10s    %20.20s                %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r4);
+		}
+	}
+	fprintf(discordTopA, "```\n");
+	fflush(discordTopA);
+	fclose(discordTopA);
+	
+	discordTopB = fopen("topb.txt", "w");
+	fprintf(discordTopB, "```diff\n");
+	for (j = DISC_R/2; j<DISC_R; j++) 
+	{
+		if (j!=DISC_R/2) fprintf(discordTopB, " \n");
+		switch (j)
+		{
+			case  4: fprintf(discordTopA, "- Top Sorcerers:\n"); break;
+			case  5: fprintf(discordTopA, "- Top Summoners:\n"); break;
+			case  6: fprintf(discordTopA, "- Top Arch-Harakim:\n"); break;
+			default: fprintf(discordTopA, "- Top Bravers:\n"); break;
+		}
+		for (m = 0; m<DISC_T; m++)
+		{
+			if (nr[j][m]==-1) continue;
+			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			
+			r1 = ch[nr[j][m]].points_tot / 1000000000;
+			r2 = ch[nr[j][m]].points_tot / 1000000 % 1000;
+			r3 = ch[nr[j][m]].points_tot / 1000 % 1000;
+			r4 = ch[nr[j][m]].points_tot % 1000;
+			
+			if (r1)
+				fprintf(discordTopB, "%c %10.10s    %20.20s    %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r1, r2, r3, r4);
+			else if (r2)
+				fprintf(discordTopB, "%c %10.10s    %20.20s        %3d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r2, r3, r4);
+			else if (r3)
+				fprintf(discordTopB, "%c %10.10s    %20.20s            %3d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r3, r4);
+			else
+				fprintf(discordTopB, "%c %10.10s    %20.20s                %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					r4);
+		}
+	}
+	fprintf(discordTopB, "```\n");
+	fflush(discordTopB);
+	fclose(discordTopB);
+}
+
+void discord_gmoon(void)
+{
+	int hour, minute, day, month, year;
+
+	hour = globs->mdtime / (60 * 60);
+	minute = (globs->mdtime / 60) % 60;
+	day = globs->mdday % 28 + 1;
+	month = globs->mdday / 28 + 1;
+	year  = globs->mdyear;
+	
+	//discordMoon = fopen("moon.txt", "w");
+	fprintf(discordWho, "```diff\n");
+	fprintf(discordWho, "It's %d:%02d on the %d%s%s%s%s%s%s%s of the %d%s%s%s%s month of the year %d.\n",
+	            hour, minute,
+	            day,
+	            day==1  ? "st" : "",
+	            day==2  ? "nd" : "",
+	            day==3  ? "rd" : "",
+	            day==21 ? "st" : "",
+	            day==22 ? "nd" : "",
+	            day==23 ? "rd" : "",
+	            (day>3 && day<21) || day>23 ? "th" : "",
+	            month,
+	            month==1 ? "st" : "",
+	            month==2 ? "nd" : "",
+	            month==3 ? "rd" : "",
+	            month>3  ? "th" : "",
+	            year);
+	if 		((globs->mdday % 28) + 1==1)  	fprintf(discordWho, "- New Moon tonight! (+0.10 Spellmod & 100%% faster regen)\n");
+	else if ((globs->mdday % 28) + 1<14)  	fprintf(discordWho, "  The Moon is growing...\n");
+	else if ((globs->mdday % 28) + 1==15) 	fprintf(discordWho, "+ Full Moon tonight! (+0.15 Spellmod & 50%% faster regen)\n");
+	else 								  	fprintf(discordWho, "  The moon is dwindling...\n");
+	fprintf(discordWho, "```\n");
+	//fflush(discordMoon);
+	//fclose(discordMoon);
+}
+
+void discord_who(void)
+{
+	int n, players, gc, font, showarea;
+	
+	// open Discord files
+	discordWho = fopen("who.txt", "w");
+	
+	fprintf(discordWho, "```diff\n");
+	fprintf(discordWho, "Players Online:\n");
+	fprintf(discordWho, "-------------------------------------------------\n");
+	players = 0;
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (!(ch[n].flags & (CF_PLAYER)))
+		{
+			continue;
+		}
+		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & (CF_INVISIBLE | CF_NOWHO)))
+		{
+			continue;
+		}
+		players++;
+		/* color staff and gods green */
+		font = (IS_STAFF(n) || IS_GOD(n)) ? 1 : 0;
+
+		showarea = 1;
+		if (ch[n].flags & CF_GOD)
+		{
+			showarea = 0;
+		}
+		if (IS_PURPLE(n))
+		{
+			showarea = 0;
+		}
+
+		fprintf(discordWho, "%c %.5s %-10.10s%c%c%c %.23s\n",
+					font ? '+' : ' ',
+		            who_rank_name[points2rank(ch[n].points_tot)],
+		            ch[n].name,
+		            IS_PURPLE(n) ? '*' : ' ',
+		            (ch[n].flags & CF_POH) ? '+' : ' ',
+		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
+		            !showarea ? "--------" : get_area(n, 0));
+	}
+	if (players) fprintf(discordWho, "-------------------------------------------------\n");
+	fprintf(discordWho, "%3d player%s online.\n", players, (players != 1) ? "s" : "");
+	fprintf(discordWho, "```\n");
+	
+	discord_gmoon();
+	
+	fflush(discordWho);
+	fclose(discordWho);
+	
+	discord_top_five();
+}
+
+
+
+void discord_shout_in(void)
+{
+	char *text;
+	long length;
+	int  n;
+	
+	discordShoutIn = fopen("shoutin.txt", "r");
+	
+	fseek(discordShoutIn, 0, SEEK_END);
+	length = ftell(discordShoutIn);
+	fseek(discordShoutIn, 0, SEEK_SET);
+	
+	if (length > 200 || length < 2) 
+	{
+		fclose(discordShoutIn);
+		return;
+	}
+	
+	text = malloc(length);
+	if (text)
+	{
+		fread(text, 1, length, discordShoutIn);
+	}
+
+	if (!text || strcmp(text, "$")==0) 
+	{
+		fclose(discordShoutIn);
+		return;
+	}
+	
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if ((ch[n].flags & (CF_PLAYER | CF_USURP)) && ch[n].used==USE_ACTIVE && !(ch[n].flags & CF_NOSHOUT))
+		{
+			do_char_log(n, 8, "%s\n", text);
+		}
+	}
+	xlog("Received /sh from Discord");
+	fclose(discordShoutIn);
+	
+	// Clean file after use
+	discordShoutIn = fopen("shoutin.txt", "w");
+	fprintf(discordShoutIn, "$");
+	fflush(discordShoutIn);
+	fclose(discordShoutIn);
+	xlog("Received /sh from Discord");
+}
+
+void discord_ranked(char *text)
+{
+	discordRanked = fopen("ranked.txt", "w");
+	fprintf(discordRanked, "```diff\n");
+	fprintf(discordRanked, text);
+	fprintf(discordRanked, "```\n");
+	fflush(discordRanked);
+	fclose(discordRanked);
+}
+
+
 
 /* disembodied server log */
 void xlog(char *format, ...)
@@ -1202,6 +1499,12 @@ int main(int argc, char *args[])
 	{
 		fclose(logfp);
 	}
+	fclose(discordWho);
+	fclose(discordShoutIn);
+	fclose(discordShoutOut);
+	fclose(discordRanked);
+	fclose(discordTopA);
+//	fclose(discordMoon);
 
 	return 0;
 }

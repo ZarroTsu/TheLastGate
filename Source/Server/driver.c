@@ -1690,6 +1690,7 @@ int npc_see(int cn, int co)
 			break;
 		default:
 			ret = 0;
+			break;
 		}
 		if (ret)
 		{
@@ -2263,13 +2264,13 @@ int npc_see(int cn, int co)
 				else
 					do_sayx(cn, "Good day to you, %s. Those pesky thugs to the far east stole a very sturdy shield from my collection. Return it and I would reward you handsomely.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest126")==0) //   25 - Navarre - Regal/Defender
-			{
-				do_sayx(cn, "Isssh. Human, if you sssee a man named Regal, please defeat him. Bring me hisss sssword, and I would reward you thisss red amulet.", ch[co].name);
-			}
-			else if (strcmp(ch[cn].text[2], "#quest127")==0) //   26 - Tsulu - Shadow Talons
+			else if (strcmp(ch[cn].text[2], "#quest126")==0) //   25 - Navarre - Shadow Talons
 			{
 				do_sayx(cn, "Welcome, human. The foul lizard Venominousss hasss blinded and killed many of our children. Bring me the source of his poisonsss, and I will give you thisss blue amulet.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest127")==0) //   26 - Tsulu - Regal/Defender
+			{
+				do_sayx(cn, "Isssh. Human, if you sssee a man named Regal, please defeat him. Bring me hisss sssword, and I would reward you thisss red amulet.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest128")==0) //   27 - Shafira - Venom Compendium
 			{
@@ -2662,7 +2663,7 @@ int spellflag(int spell)
 
 int npc_try_spell(int cn, int co, int spell)
 {
-	int mana, end, n, in, tmp, cc;
+	int mana, end, n, in, tmp, cc, truespell;
 	int offn, defn;
 
 	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && 
@@ -2701,43 +2702,50 @@ int npc_try_spell(int cn, int co, int spell)
 	offn = M_SK(cn, spell);
 	defn = get_target_resistance(cn, co)*10;
 	
-	// Invidia
-	/*
-	if (spell==SK_HEAL && cn==co && IS_COMP_TEMP(cn) && (cc = ch[cn].data[CHD_MASTER]) && IS_SANEPLAYER(cc) && get_gear(cc, IT_TW_INVIDIA))
-	{
-		return 0;
-	}
-	*/
+	truespell = spell;
+	
+	// ** Translate spell to truespell based on caster tarot card     
+	
+	if (spell==SK_CURSE  && get_tarot(cn, IT_CH_TOWER))   	truespell = SK_CURSE2;
+	if (spell==SK_BLIND  && get_tarot(cn, IT_CH_CHARIOT)) 	truespell = SK_DOUSE;
+	if (spell==SK_POISON && get_tarot(cn, IT_CH_TOWER_R)) 	truespell = SK_VENOM;
+	if (spell==SK_WEAKEN && get_tarot(cn, IT_CH_DEATH)) 	truespell = SK_WEAKEN2;
+	if (spell==SK_SLOW   && get_tarot(cn, IT_CH_EMPEROR)) 	truespell = SK_SLOW2;
+	
 	
 	// dont blast if enemy armor is too strong
 	// Updated 02/11/2020 - changed the formula to include immunity and allow blasts that would do at least 5 damage.
-	if (spell==SK_BLAST && ( (offn - max(0, get_target_immunity(cn, co)/2)) * 2 ) - ch[co].armor < 20/3)
+	if (truespell==SK_BLAST && ( (offn - max(0, get_target_immunity(cn, co)/2)) * 2 ) - ch[co].armor < 20/3)
 	{
 		return 0;
 	}
 	
 	// dont cleave if enemy armor is too strong
-	if (spell==SK_CLEAVE && ( ((offn + ch[cn].weapon/4 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
+	if (truespell==SK_CLEAVE && ( ((offn + ch[cn].weapon/4 + ch[cn].top_damage/4 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
 	{
 		return 0;
 	}
 	
 	// dont leap if enemy armor is too strong
-	if (spell==SK_LEAP && ( ((offn + max(0,((SPEED_CAP-ch[cn].speed)+ch[cn].atk_speed-120))/4
-		- max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
+	if (truespell==SK_LEAP && ( ((offn + ch[cn].weapon/4 + ch[cn].top_damage/4 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
 	{
 		return 0;
 	}
-
+	
 	// dont debuff if chances of success are bad
-	if (spell==SK_CURSE  && SP_MULT_CURSE   * offn / max(1, defn)< 7) return 0;
-	if (spell==SK_BLIND  && SP_MULT_BLIND   * offn / max(1, defn)< 7) return 0;
-	if (spell==SK_POISON && SP_MULT_POISON  * offn / max(1, defn)< 8) return 0;
-	if (spell==SK_WEAKEN && SP_MULT_WEAKEN  * offn / max(1, defn)< 8) return 0;
-	if (spell==SK_SLOW   && SP_MULT_SLOW    * offn / max(1, defn)< 9) return 0;
-	if (spell==SK_DISPEL && SP_MULT_DISPEL2 * offn / max(1, defn)< 9) return 0;
-	if (spell==SK_TAUNT  && SP_MULT_TAUNT   * offn / max(1, defn)<10) return 0;
-	if (spell==SK_WARCRY && SP_MULT_WARCRY  * offn / max(1, defn)<10) return 0;
+	if (truespell==SK_CURSE   && SP_MULT_CURSE   * offn / max(1, defn)< 7) return 0;
+	if (truespell==SK_CURSE2  && SP_MULT_CURSE2  * offn / max(1, defn)< 7) return 0;
+	if (truespell==SK_BLIND   && SP_MULT_BLIND   * offn / max(1, defn)< 7) return 0;
+	if (truespell==SK_DOUSE   && SP_MULT_BLIND   * offn / max(1, defn)< 7) return 0;
+	if (truespell==SK_POISON  && SP_MULT_POISON  * offn / max(1, defn)< 8) return 0;
+	if (truespell==SK_VENOM   && SP_MULT_POISON2 * offn / max(1, defn)< 8) return 0;
+	if (truespell==SK_WEAKEN  && SP_MULT_WEAKEN  * offn / max(1, defn)< 8) return 0;
+	if (truespell==SK_WEAKEN2 && SP_MULT_WEAKEN2 * offn / max(1, defn)< 8) return 0;
+	if (truespell==SK_SLOW    && SP_MULT_SLOW    * offn / max(1, defn)< 9) return 0;
+	if (truespell==SK_SLOW2   && SP_MULT_SLOW2   * offn / max(1, defn)< 9) return 0;
+	if (truespell==SK_DISPEL  && SP_MULT_DISPEL2 * offn / max(1, defn)< 9) return 0;
+	if (truespell==SK_TAUNT   && SP_MULT_TAUNT   * offn / max(1, defn)<10) return 0;
+	if (truespell==SK_WARCRY  && SP_MULT_WARCRY  * offn / max(1, defn)<10) return 0;
 	
 	// prevent thralling multiple ghosts
 	if (spell==SK_GHOST)
@@ -2769,21 +2777,21 @@ int npc_try_spell(int cn, int co, int spell)
 		if ((in = ch[co].spell[n])!=0)
 		{
 			// Cancel if target is already buffed or debuffed (except for heal)
-			if (bu[in].temp==spell && spell!=SK_HEAL && 
-				(bu[in].power + 10)>=spell_immunity(M_SK(cn, spell), get_target_immunity(cn, co)) && 
+			if (bu[in].temp==truespell && truespell!=SK_HEAL && 
+				(bu[in].power + 10)>=spell_immunity(M_SK(cn, truespell), get_target_immunity(cn, co)) && 
 				bu[in].active>bu[in].duration / 4 * 3)
 			{
 				break;
 			}
 			// Immunize/Inoculate prevents up to three ailments
 			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
-				(spell==bu[in].data[1] || spell==bu[in].data[2] || spell==bu[in].data[3]))
+				(truespell==bu[in].data[1] || truespell==bu[in].data[2] || truespell==bu[in].data[3]))
 			{
 				chlog(cn,"Immunize true (%d)",bu[in].temp);
 				break;
 			}
 			// Poison layer adjustments
-			if (bu[in].temp==spell && spell==SK_POISON && bu[in].active>bu[in].duration/3)
+			if (bu[in].temp==truespell && truespell==SK_POISON && bu[in].active>bu[in].duration/3)
 			{
 				break;
 			}

@@ -213,6 +213,8 @@ int use_create_item(int cn, int in)
 			strcpy(it[in2].description, buf);
 		}
 	}
+	
+	if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
 	if (it[in].driver==54)
 	{
@@ -283,6 +285,8 @@ int use_create_item2(int cn, int in)
 	}
 	do_char_log(cn, 1, "You got a %s.\n", it[in2].reference);
 	chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
+	
+	if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
 	it[in3].used = USE_EMPTY;
 	ch[cn].citem = 0;
@@ -407,6 +411,8 @@ int use_create_item3(int cn, int in)
 	}
 	do_char_log(cn, 1, "You got a %s.\n", it[in2].reference);
 	chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
+	
+	if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
 	return 1;
 }
@@ -1947,7 +1953,7 @@ int use_bag(int cn, int in)
 	owner = ch[co].data[CHD_CORPSEOWNER];
 
 	// prevent grave-robbing by the unauthorized
-	if (owner && owner!=cn && !may_attack_msg(cn, owner, 0) && ch[owner].data[PCD_ALLOW]!=cn && IS_SANEPLAYER(owner))
+	if (owner && owner!=cn && !may_attack_msg(cn, owner, 0) && ch[owner].data[PCD_ALLOW]!=cn && IS_SANEUSEDCHAR(owner) && IS_PLAYER(owner))
 	{
 		do_char_log(cn, 0, "This is %s's grave, not yours. "
 		            "You may only search it with %s permission.\n",
@@ -2051,7 +2057,7 @@ int use_scroll(int cn, int in)
 		ch[cn].points_tot += pts;
 		B_SK(cn, nr)++;
 
-		do_check_new_level(cn);
+		do_check_new_level(cn, 1);
 	}
 	else if (!ch[cn].skill[nr][2])
 	{
@@ -2092,7 +2098,7 @@ int use_scroll2(int cn, int in)
 	ch[cn].points_tot += pts;
 	B_AT(cn, nr)++;
 
-	do_check_new_level(cn);
+	do_check_new_level(cn, 1);
 
 	it[in].used = USE_EMPTY;
 	god_take_from_char(in, cn);
@@ -2124,7 +2130,7 @@ int use_scroll3(int cn, int in)
 	ch[cn].points_tot += pts;
 	ch[cn].hp[0] += am;
 
-	do_check_new_level(cn);
+	do_check_new_level(cn, 1);
 
 	it[in].used = USE_EMPTY;
 	god_take_from_char(in, cn);
@@ -2158,7 +2164,7 @@ int use_scroll4(int cn, int in)
 	*/
 	ch[cn].end[0] += am;
 
-	do_check_new_level(cn);
+	do_check_new_level(cn, 1);
 
 	it[in].used = USE_EMPTY;
 	god_take_from_char(in, cn);
@@ -2190,7 +2196,7 @@ int use_scroll5(int cn, int in)
 	ch[cn].points_tot += pts;
 	ch[cn].mana[0] += am;
 
-	do_check_new_level(cn);
+	do_check_new_level(cn, 1);
 
 	it[in].used = USE_EMPTY;
 	god_take_from_char(in, cn);
@@ -3143,15 +3149,15 @@ int use_map_shrine(int cn, int in)
 					for (p=0;p<5;p++)
 					{
 						if (it[inc].attrib[p][2]) 
-							it[inc].attrib[p][2] = it[inc].attrib[p][2] * 3/4;
+							it[inc].attrib[p][2] = max(0, it[inc].attrib[p][2] - 10);
 					}
 					for (p=0;p<50;p++)
 					{
 						if (it[inc].skill[p][2]) 
-							it[inc].skill[p][2] = it[inc].skill[p][2] * 3/4;
+							it[inc].skill[p][2] = max(0, it[inc].skill[p][2] - 10);
 					}
 					if (it[inc].min_rank)
-						it[inc].min_rank = it[inc].min_rank * 3/4;
+						it[inc].min_rank = max(0, it[inc].min_rank - 2);
 					it[inc].flags |= IF_EASEUSE;
 					do_char_log(cn, 1, "Your %s was altered.\n", it[inc].reference);
 					break;
@@ -3293,6 +3299,10 @@ int use_map_portal(int cn, int in)
 	chlog(cn, "Gets %d EXP", exp);
 	ch[cn].points += exp;
 	ch[cn].points_tot += exp;
+	
+	do_notify_char(cn, NT_GOTEXP, exp, 0, 0, 0);
+	do_update_char(cn);
+	do_check_new_level(cn, 1);
 	
 	if (tier || it[in].data[4]==1)
 	{
@@ -3438,11 +3448,11 @@ int use_special_spell(int cn, int in)
 
 int use_lame(int cn, int in)
 {
-	int in2, worn=0;
+	int in2, in3, worn=0;
 	
 	if (it[in].data[0]<REQ_LAME) 
 	{
-		do_char_log(cn, 3, "Thou art not worthy.\n");
+		do_char_log(cn, 4, "Thou art not worthy.\n");
 		return 0;
 	}
 	
@@ -3464,13 +3474,21 @@ int use_lame(int cn, int in)
 	
 	if (ch[cn].worn[WN_RHAND]==in)
 	{
+		if (!god_give_char(in2, cn))
+		{
+			do_char_log(cn, 0, "Your backpack is full. Make some room.\n");
+			it[in2].used = USE_EMPTY;
+			return 0;
+		}
+		in3 = god_create_item(288); // Steel sword
+		
 		god_take_from_char(in, cn);
 		
-		ch[cn].worn[WN_RHAND] = in2;
+		ch[cn].worn[WN_RHAND] = in3;
 
-		it[in2].x = 0;
-		it[in2].y = 0;
-		it[in2].carried = cn;
+		it[in3].x = 0;
+		it[in3].y = 0;
+		it[in3].carried = cn;
 
 		do_update_char(cn);
 	}
@@ -3481,7 +3499,7 @@ int use_lame(int cn, int in)
 		god_give_char(in2, cn);
 	}
 	
-	do_char_log(cn, 1, "My power is yours, worthy one.\n");
+	do_char_log(cn, 9, "My power is yours, worthy one. You need only grasp it.\n");
 }
 
 //
@@ -6340,11 +6358,29 @@ int use_seyan_door(int cn, int in)
 
 int use_seyan_portal(int cn, int in)
 {
-	int in2, n, co;
+	int in2, n, temp;
 
 	if (!cn)
 	{
 		return 0;
+	}
+	
+	temp = CT_GATEKEEPER;
+	
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used!=USE_ACTIVE)
+		{
+			continue;
+		}
+		if (ch[n].flags & CF_BODY)
+		{
+			continue;
+		}
+		if (ch[n].temp == temp)
+		{
+			break;
+		}
 	}
 	
 	if (it[in].data[2])
@@ -6362,15 +6398,16 @@ int use_seyan_portal(int cn, int in)
 			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 			
-			in2 = god_create_item(35);
-			god_give_char(in2, cn);
+			in2 = god_create_item(35); god_give_char(in2, cn);
+			in2 = god_create_item(36); god_give_char(in2, cn);
 			
 			/* Announce the player's new race */
-			if (co<MAXCHARS)
+			if (n<MAXCHARS)
 			{
 				char message[100];
 				sprintf(message, "Hear ye, hear ye! %s has is now Braver!", ch[cn].name);
-				do_shout(co, message);
+				do_shout(n, message);
+				if (globs->flags & GF_DISCORD) discord_ranked(message);
 			}
 		}
 	}
@@ -6394,11 +6431,12 @@ int use_seyan_portal(int cn, int in)
 			it[in2].data[0] = cn;
 			
 			/* Announce the player's new race */
-			if (co<MAXCHARS)
+			if (n<MAXCHARS)
 			{
 				char message[100];
 				sprintf(message, "Hear ye, hear ye! %s has joined the Seyan'du!", ch[cn].name);
-				do_shout(co, message);
+				do_shout(n, message);
+				if (globs->flags & GF_DISCORD) discord_ranked(message);
 			}
 		}
 	}
@@ -6538,8 +6576,8 @@ int spell_scroll(int cn, int in)
 			break;
 		case    SK_IDENT:
 			if (!IS_SANEITEM(in2 = ch[cn].citem)) in2 = 0;
-			if ((in2 && chance_base(cn, SK_IDENT, SP_MULT_IDENTIFY, it[in2].power, power+100))
-				|| (!in2 && cn!=co && chance_base(cn, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power+100)))
+			if ((in2 && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, it[in2].power, power+100))
+				|| (!in2 && cn!=co && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power+100)))
 			{
 				ret = 1;
 			}
@@ -6550,7 +6588,7 @@ int spell_scroll(int cn, int in)
 			break;
 		// Blast?
 		case    SK_CURSE:
-			if (chance_base(cn, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power+100))
+			if (chance_base(cn, co, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power+100))
 			{
 				ret = 1;
 			}
@@ -6560,7 +6598,7 @@ int spell_scroll(int cn, int in)
 			}
 			break;
 		case    SK_SLOW:
-			if (chance_base(cn, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power+100))
+			if (chance_base(cn, co, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power+100))
 			{
 				ret = 1;
 			}
@@ -6802,6 +6840,30 @@ int use_lab8_moneyshrine(int cn, int in)
 	return 1;
 }
 
+void use_announce_class(int cn, int m)
+{
+	int n, temp;
+	
+	/* CS, 991203: Announce the player's new class */
+	temp = IS_PURPLE(cn) ? CT_PRIEST : CT_BISHOP;
+	// Find a character with appropriate template
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used!=USE_ACTIVE) continue;
+		if (ch[n].flags & CF_BODY)	continue;
+		if (ch[n].temp == temp)		break;
+	}
+	// Have him yell it out
+	if (n<MAXCHARS)
+	{
+		char message[100];
+		sprintf(message, "Hear ye, hear ye! %s cleared the labyrinth and became a %s!",
+				ch[cn].name, class_name[m]);
+		do_shout(n, message);
+		if (globs->flags & GF_DISCORD) discord_ranked(message);
+	}
+}
+
 void change_to_archtemplar(int cn)
 {
 	if (B_AT(cn, AT_AGL)<60)
@@ -6819,6 +6881,7 @@ void change_to_archtemplar(int cn)
 	else				god_minor_racechange(cn, CT_ARCHTEMP_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become an Arch-Templar. Congratulations, %s.\n", ch[cn].name);
+	use_announce_class(cn, 1);
 }
 
 void change_to_pugilist(int cn)
@@ -6838,6 +6901,7 @@ void change_to_pugilist(int cn)
 	else				god_minor_racechange(cn, CT_PUGILIST_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Skald. Congratulations, %s.\n", ch[cn].name);
+	use_announce_class(cn, 2);
 }
 
 void change_to_summoner(int cn)
@@ -6857,6 +6921,7 @@ void change_to_summoner(int cn)
 	else				god_minor_racechange(cn, CT_SUMMONER_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Summoner. Congratulations, %s.\n", ch[cn].name);
+	use_announce_class(cn, 5);
 }
 
 void change_to_archharakim(int cn)
@@ -6876,6 +6941,7 @@ void change_to_archharakim(int cn)
 	else				god_minor_racechange(cn, CT_ARCHHARA_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become an Arch-Harakim. Congratulations, %s.\n", ch[cn].name);
+	use_announce_class(cn, 6);
 }
 
 void change_to_warrior(int cn)
@@ -6895,6 +6961,7 @@ void change_to_warrior(int cn)
 	else				god_minor_racechange(cn, CT_WARRIOR_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Warrior. Congratulations, %s.\n", ch[cn].name);
+	use_announce_class(cn, 3);
 }
 
 void change_to_sorcerer(int cn)
@@ -6914,6 +6981,7 @@ void change_to_sorcerer(int cn)
 	else				god_minor_racechange(cn, CT_SORCERER_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Sorcerer. Congratulations, %s.\n", ch[cn].name);
+	use_announce_class(cn, 4);
 }
 
 int shrine_of_change(int cn, int in)
@@ -7778,6 +7846,8 @@ void item_damage_armor(int cn, int dam)
 			dam -= bu[in].armor[1];
 		}
 	}
+	
+	if (dam<0) return;
 	
 	dam = dam / 4 + 1;
 

@@ -42,6 +42,7 @@
 #define CT_INNKEEPER   	  28
 #define CT_BISHOP    	  29
 #define CT_PRIEST    	  30
+#define CT_GATEKEEPER	 848
 #define CT_HERBCOLL		 703
 #define CT_HERBCOLL2	1205
 #define CT_SHIVA_I		 664
@@ -809,7 +810,7 @@
 // 16813 Blue
 // 16814 Green
 
-#define NUM_MAP_ENEM	  33
+#define NUM_MAP_ENEM	  35
 #define NUM_LEG_ENEM	   7
 
 // Floor sprites

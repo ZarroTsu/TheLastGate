@@ -525,8 +525,8 @@ struct skilltab _skilltab[52] = {
 				"", "", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
-	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of your Warcry, Taunt, and Surround Hit skills.", // Arch-Templar
-										"Passively improves the hit rate of your Surround Hit skill, and the area-of-effect of your Aria skill.", // Braver
+	{ 44, 'G', 	"Proximity", 			"", // Arch-Templar
+										"Passively improves the area-of-effect of your Aria skill.", // Braver
 										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
 				{ AT_BRV, AT_WIL, AT_INT }},
@@ -1233,8 +1233,8 @@ void display_meta_from_ls(void)
 			}
 			break;									// ".............." // 
 		case 61: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Cast Speed");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",pl_casts/100,pl_casts%100);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cast Speed");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_casts/100,pl_casts%100);
 				if (pl.skill[34][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Cost %");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_conce/100,sk_conce%100);
@@ -1245,11 +1245,11 @@ void display_meta_from_ls(void)
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Shadow Dur.");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%4d secs",sk_shado);
 			}	if (pl.skill[20][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Curse Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_curse);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Curse Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_curse);
 			}
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Aptitude Bonus");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%9d",at_score(AT_WIL)/4);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Aptitude Bonus");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",at_score(AT_WIL)/4);
 			break;									// ".............." // 
 		case 62: // Intuition - 1. Cooldown, 	2. Medit Rate, 	3. Blast DPH	4. Scorch Pow	5. Pulse DPH	6. Pulse Count
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cooldown Rate");
@@ -1284,15 +1284,15 @@ void display_meta_from_ls(void)
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Zephyr DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_razor);
 			}	if (pl.skill[37][0]) { if (pl_flagb & (1 << 11)) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Douse Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_douse/1000,sk_douse%1000);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Douse Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%5d.%03d",sk_douse/1000,sk_douse%1000);
 			} else {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);
 			} }
 			if (pl.skill[19][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Slow Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_slowv);
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Slow Effect");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_slowv);
 			}	
 			break;									// ".............." // 
 		case 64: // Strength - 	1. Melee DPH, 	2. Regen Rate, 	3. Cleave DPH	4. Taunt Pow	5. Weaken Pow	6. Warcry Pow

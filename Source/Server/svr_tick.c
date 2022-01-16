@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.8.2\n"};
+static char intro_msg3[] = {"Current client/server version is 0.8.3\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {"** EXP WAS RESET ON 01/04/2022! Remember to spend your exp before exploring! **\n"};
 static char intro_msg5_font = 2;
@@ -937,7 +937,7 @@ void plr_cmd_look(int nr, int autoflag)
 
 	co = *(unsigned short*)(player[nr].inbuf + 1);
 	
-	if (player[nr].spectating) return;
+	if (player[nr].spectating && !autoflag) return;
 		cn = player[nr].usnr;
 
 	if ((co & 0x8000) && !player[nr].spectating)
@@ -2144,6 +2144,7 @@ void plr_logout(int cn, int nr, int reason)
 		ch[cn].logout_date = time(NULL);
 
 		ch[cn].flags |= CF_SAVEME;
+		ch[cn].flags &= ~CF_ALW_SPECT;
 
 		if (IS_BUILDING(cn))
 		{
@@ -3515,7 +3516,8 @@ void plr_getmap_complete(int nr)
 	can_see(cn, ch[cn].x, ch[cn].y, ch[cn].x + 1, ch[cn].y + 1, TILEX/2);
 
 	// check if visibility changed
-	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || mcmp(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE))
+	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || 
+		mcmp(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE))
 	{
 		mcpy(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE);
 		player[nr].vx = see[cn].x;
@@ -3528,14 +3530,15 @@ void plr_getmap_complete(int nr)
 		do_all = 1;
 	}
 
-	for (n = YSCUT * TILEX + XSCUT, m = xs + ys * MAPX, y = ys; y<ye; y++, m += MAPX - TILEX + XSCUT + XECUT, n += XSCUT + XECUT)
+	for (n = YSCUT * TILEX + XSCUT, m = xs + ys * MAPX, y = ys; y<ye; 
+			y++, m += MAPX - TILEX + XSCUT + XECUT, n += XSCUT + XECUT)
 	{
 		for (x = xs; x<xe; x++, n++, m++)
 		{
-
-			if (do_all || map[m].it || map[m].ch || mcmp(&player[nr].xmap[n], &map[m], sizeof(struct map)))   // any change on map data?
+			if (do_all || map[m].it || map[m].ch || 
+				mcmp(&player[nr].xmap[n], &map[m], sizeof(struct map)))		// any change on map data?
 			{
-				mcpy(&player[nr].xmap[n], &map[m], sizeof(struct map));           // remember changed values
+				mcpy(&player[nr].xmap[n], &map[m], sizeof(struct map));		// remember changed values
 			}
 			else
 			{
@@ -3592,58 +3595,34 @@ void plr_getmap_complete(int nr)
 			                    MF_UWATER))
 			{
 				if (map[m].flags & MF_GFX_INJURED)
-				{
 					smap[n].flags |= INJURED;
-				}
 				if (map[m].flags & MF_GFX_INJURED1)
-				{
 					smap[n].flags |= INJURED1;
-				}
 				if (map[m].flags & MF_GFX_INJURED2)
-				{
 					smap[n].flags |= INJURED2;
-				}
 
 				if (map[m].flags & MF_GFX_DEATH)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_DEATH) >> 23;
-				}
 				if (map[m].flags & MF_GFX_TOMB)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_TOMB) >> 23;
-				}
 				if (map[m].flags & MF_GFX_EMAGIC)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_EMAGIC) >> 23;
-				}
 				if (map[m].flags & MF_GFX_GMAGIC)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_GMAGIC) >> 23;
-				}
 				if (map[m].flags & MF_GFX_CMAGIC)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_CMAGIC) >> 23;
-				}
 
 				if (map[m].flags & MF_UWATER)
-				{
 					smap[n].flags |= UWATER;
-				}
 			}
 
 			if (infra)
-			{
 				smap[n].flags |= INFRARED;
-			}
 
 			if (IS_BUILDING(cn))
-			{
 				smap[n].flags2 = (unsigned int)map[m].flags;
-			}
 			else
-			{
 				smap[n].flags2 = 0;
-			}
 
 			tmp = (x - ch[cn].x + VISI_SIZE/2) + (y - ch[cn].y + VISI_SIZE/2) * VISI_SIZE;
 
@@ -3672,71 +3651,23 @@ void plr_getmap_complete(int nr)
 			// --- End of Flags ----- - more flags set in character part further down
 
 			// --- Begin of Light -----
-			if (light>64)
-			{
-				smap[n].light = 0;
-			}
-			else if (light>52)
-			{
-				smap[n].light = 1;
-			}
-			else if (light>40)
-			{
-				smap[n].light = 2;
-			}
-			else if (light>32)
-			{
-				smap[n].light = 3;
-			}
-			else if (light>28)
-			{
-				smap[n].light = 4;
-			}
-			else if (light>24)
-			{
-				smap[n].light = 5;
-			}
-			else if (light>20)
-			{
-				smap[n].light = 6;
-			}
-			else if (light>16)
-			{
-				smap[n].light = 7;
-			}
-			else if (light>14)
-			{
-				smap[n].light = 8;
-			}
-			else if (light>12)
-			{
-				smap[n].light = 9;
-			}
-			else if (light>10)
-			{
-				smap[n].light = 10;
-			}
-			else if (light>8)
-			{
-				smap[n].light = 11;
-			}
-			else if (light>6)
-			{
-				smap[n].light = 12;
-			}
-			else if (light>4)
-			{
-				smap[n].light = 13;
-			}
-			else if (light>2)
-			{
-				smap[n].light = 14;
-			}
-			else
-			{
-				smap[n].light = 15;
-			}
-			// --- End of Flags -----
+			if (light>64)		smap[n].light = 0;
+			else if (light>52)	smap[n].light = 1;
+			else if (light>40)	smap[n].light = 2;
+			else if (light>32)	smap[n].light = 3;
+			else if (light>28)	smap[n].light = 4;
+			else if (light>24)	smap[n].light = 5;
+			else if (light>20)	smap[n].light = 6;
+			else if (light>16)	smap[n].light = 7;
+			else if (light>14)	smap[n].light = 8;
+			else if (light>12)	smap[n].light = 9;
+			else if (light>10)	smap[n].light = 10;
+			else if (light>8)	smap[n].light = 11;
+			else if (light>6)	smap[n].light = 12;
+			else if (light>4)	smap[n].light = 13;
+			else if (light>2)	smap[n].light = 14;
+			else				smap[n].light = 15;
+			// --- End of Light -----
 
 			// --- Begin of ba_sprite  -----
 			smap[n].ba_sprite = map[m].sprite;
@@ -3818,7 +3749,8 @@ void plr_getmap_complete(int nr)
 				smap[n].it_sprite = map[m].fsprite;
 				smap[n].it_status = 0;
 			}
-			else if ((co = map[m].it)!=0 && (!(it[co].flags & (IF_TAKE | IF_HIDDEN)) || (visible && do_char_can_see_item(cn, co))))
+			else if ((co = map[m].it)!=0 && (!(it[co].flags & (IF_TAKE | IF_HIDDEN)) || 
+				(visible && do_char_can_see_item(cn, co))))
 			{
 				if (it[co].active)
 				{
@@ -3882,7 +3814,8 @@ void plr_getmap_fast(int nr)
 	can_see(cn, ch[cn].x, ch[cn].y, ch[cn].x + 1, ch[cn].y + 1, 16);
 
 	// check if visibility changed
-	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || mcmp(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE))
+	if (player[nr].vx!=see[cn].x || player[nr].vy!=see[cn].y || 
+		mcmp(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE))
 	{
 		mcpy(player[nr].visi, see[cn].vis, VISI_SIZE * VISI_SIZE);
 		player[nr].vx = see[cn].x;
@@ -3895,14 +3828,15 @@ void plr_getmap_fast(int nr)
 		do_all = 1;
 	}
 
-	for (n = YSCUTF * TILEX + XSCUTF, m = xs + ys * MAPX, y = ys; y<ye; y++, m += MAPX - TILEX + XSCUTF + XECUTF, n += XSCUTF + XECUTF)
+	for (n = YSCUTF * TILEX + XSCUTF, m = xs + ys * MAPX, y = ys; y<ye; 
+			y++, m += MAPX - TILEX + XSCUTF + XECUTF, n += XSCUTF + XECUTF)
 	{
 		for (x = xs; x<xe; x++, n++, m++)
 		{
-
-			if (do_all || map[m].it || map[m].ch || mcmp(&player[nr].xmap[n], &map[m], sizeof(struct map)))   // any change on map data?
+			if (do_all || map[m].it || map[m].ch || 
+				mcmp(&player[nr].xmap[n], &map[m], sizeof(struct map)))		// any change on map data?
 			{
-				mcpy(&player[nr].xmap[n], &map[m], sizeof(struct map));           // remember changed values
+				mcpy(&player[nr].xmap[n], &map[m], sizeof(struct map));		// remember changed values
 			}
 			else
 			{
@@ -3957,54 +3891,32 @@ void plr_getmap_fast(int nr)
 			                    MF_GFX_CMAGIC))
 			{
 				if (map[m].flags & MF_GFX_INJURED)
-				{
 					smap[n].flags |= INJURED;
-				}
 				if (map[m].flags & MF_GFX_INJURED1)
-				{
 					smap[n].flags |= INJURED1;
-				}
 				if (map[m].flags & MF_GFX_INJURED2)
-				{
 					smap[n].flags |= INJURED2;
-				}
 
 				if (map[m].flags & MF_GFX_DEATH)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_DEATH) >> 23;
-				}
 				if (map[m].flags & MF_GFX_TOMB)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_TOMB) >> 23;
-				}
 				if (map[m].flags & MF_GFX_EMAGIC)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_EMAGIC) >> 23;
-				}
 				if (map[m].flags & MF_GFX_GMAGIC)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_GMAGIC) >> 23;
-				}
 				if (map[m].flags & MF_GFX_CMAGIC)
-				{
 					smap[n].flags |= (map[m].flags & MF_GFX_CMAGIC) >> 23;
-				}
 			}
 
 			if (map[m].flags & MF_UWATER)
-			{
 				smap[n].flags |= UWATER;
-			}
 
 			if (infra)
-			{
 				smap[n].flags |= INFRARED;
-			}
 
 			if (IS_BUILDING(cn))
-			{
 				smap[n].flags2 = (unsigned int)map[m].flags;
-			}
 
 			tmp = (x - ch[cn].x + VISI_SIZE/2) + (y - ch[cn].y + VISI_SIZE/2) * VISI_SIZE;
 
@@ -4030,70 +3942,22 @@ void plr_getmap_fast(int nr)
 				smap[n].flags |= INVIS;
 			}
 
-			if (light>64)
-			{
-				smap[n].light = 0;
-			}
-			else if (light>52)
-			{
-				smap[n].light = 1;
-			}
-			else if (light>40)
-			{
-				smap[n].light = 2;
-			}
-			else if (light>32)
-			{
-				smap[n].light = 3;
-			}
-			else if (light>28)
-			{
-				smap[n].light = 4;
-			}
-			else if (light>24)
-			{
-				smap[n].light = 5;
-			}
-			else if (light>20)
-			{
-				smap[n].light = 6;
-			}
-			else if (light>16)
-			{
-				smap[n].light = 7;
-			}
-			else if (light>14)
-			{
-				smap[n].light = 8;
-			}
-			else if (light>12)
-			{
-				smap[n].light = 9;
-			}
-			else if (light>10)
-			{
-				smap[n].light = 10;
-			}
-			else if (light>8)
-			{
-				smap[n].light = 11;
-			}
-			else if (light>6)
-			{
-				smap[n].light = 12;
-			}
-			else if (light>4)
-			{
-				smap[n].light = 13;
-			}
-			else if (light>2)
-			{
-				smap[n].light = 14;
-			}
-			else
-			{
-				smap[n].light = 15;
-			}
+			if (light>64)		smap[n].light = 0;
+			else if (light>52)	smap[n].light = 1;
+			else if (light>40)	smap[n].light = 2;
+			else if (light>32)	smap[n].light = 3;
+			else if (light>28)	smap[n].light = 4;
+			else if (light>24)	smap[n].light = 5;
+			else if (light>20)	smap[n].light = 6;
+			else if (light>16)	smap[n].light = 7;
+			else if (light>14)	smap[n].light = 8;
+			else if (light>12)	smap[n].light = 9;
+			else if (light>10)	smap[n].light = 10;
+			else if (light>8)	smap[n].light = 11;
+			else if (light>6)	smap[n].light = 12;
+			else if (light>4)	smap[n].light = 13;
+			else if (light>2)	smap[n].light = 14;
+			else				smap[n].light = 15;
 
 			// background
 			smap[n].ba_sprite = map[m].sprite;
@@ -4173,7 +4037,8 @@ void plr_getmap_fast(int nr)
 				smap[n].it_sprite = map[m].fsprite;
 				smap[n].it_status = 0;
 			}
-			else if ((co = map[m].it)!=0 && (!(it[co].flags & (IF_TAKE | IF_HIDDEN)) || (visible && do_char_can_see_item(cn, co))))
+			else if ((co = map[m].it)!=0 && (!(it[co].flags & (IF_TAKE | IF_HIDDEN)) || 
+				(visible && do_char_can_see_item(cn, co))))
 			{
 				if (it[co].active)
 				{

@@ -7,6 +7,9 @@
  **************************************************************************/
 
 // -- server --
+void discord_who(void);
+void discord_shout_in(void);
+void discord_ranked(char *text);
 void xlog(char *format, ...) __attribute__ ((format(printf, 1, 2)));
 void seclog(char *format, ...) __attribute__ ((format(printf, 1, 2)));
 void chlog(int cn, char *format, ...) __attribute__ ((format(printf, 2, 3)));
@@ -249,7 +252,7 @@ int may_attack_msg(int cn, int co, int msg);
 int do_maygive(int cn, int co, int in);
 int do_item_value(int in);
 int do_item_bsvalue(int in);
-void do_check_new_level(int cn);
+void do_check_new_level(int cn, int announce);
 int invis_level(int cn);
 int dbatoi(char *text);
 int dbatoi_self(int cn, char *text);
@@ -308,6 +311,7 @@ int check_dlight(int x, int y);
 void compute_dlight(int x, int y);
 int char_id(int cn);
 void char_item_expire(int cn);
+extern char *class_name[];
 extern char *rank_name[];
 extern char *who_rank_name[];
 int rankdiff(int cn, int co);
@@ -379,6 +383,7 @@ int spell_mshield(int cn, int co, int power, int fromscroll);
 int spell_haste(int cn, int co, int power, int fromscroll);
 int spell_identify(int cn, int co, int in);
 int spell_heal(int cn, int co, int power);
+int chance_compare(int co, int offense, int defense, int usemana);
 int get_target_resistance(int cn, int co);
 int get_target_immunity(int cn, int co);
 int spell_curse(int cn, int co, int power, int flag);
@@ -389,7 +394,7 @@ int spell_weaken(int cn, int co, int power, int flag);
 int spell_blind(int cn, int co, int power, int flag);
 int spell_frostburn(int cn, int co, int power);
 int skill_lookup(char *skill);
-int chance_base(int cn, int skill, int d20, int defense, int usemana);
+int chance_base(int cn, int co, int skill, int d20, int defense, int usemana);
 int player_or_ghost(int cn, int co);
 
 // -- driver --

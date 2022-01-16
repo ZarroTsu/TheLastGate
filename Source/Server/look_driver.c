@@ -377,7 +377,7 @@ void look_extra(int cn, int in)
 		if (it[in].data[0]<REQ_LAME)
 			do_char_log(cn, 5, "Thine worth shall be proven. %d remain.\n", max(0, REQ_LAME-it[in].data[0]));
 		else
-			do_char_log(cn, 6, "Thou art worthy. Use me when ready.\n");
+			do_char_log(cn, 9, "Thou art worthy. Use me when ready.\n");
 		break;
 	case IT_WP_WHITEODA: 
 		do_char_log(cn, 5, "When equipped, grants additional armor value based on total spell modifier.\n");
