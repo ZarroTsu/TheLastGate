@@ -21,25 +21,27 @@ static char *mkp(void)
 {
 	static char buf[40];
 	static char *syl1[] = {
-		"thi", "ar",  "an",   "un",  "iss", "ish", "urs", "ur",
-		"ent", "esh", "ash",  "jey", "jay",
-		"dur", "lon", "lan",  "len", "lun",
-		"so",  "lur", "gar",  "cry", "au",  "dau", "dei",
-		"zir", "zil", "sol",  "luc", "ni",  "bus",
-		"mid", "err", "doo",  "do",  "al",  "ea",  "jac", "ta",
-		"bi",  "vae", "rif",  "tol", "nim", "ru",  "li",
-		"fro", "sam", "beut", "bil", "ga",
-		"nee", "ara", "rho",  "dan", "va",  "lan",
-		"cec", "cic", "cac",  "cuc", "ix",  "vea", "cya",
-		"hie", "bo",  "ni",   "do",  "sar", "phe", "ho",
-		"cos", "sin", "tan",  "mul", "har", "gur", "tar",
+		"thi", "ar",  "an",   "un",  "iss", "ish", "urs",  "ur",
+		"ent", "esh", "ash",  "jey", "jay", "joh", "jan",  "jess",
+		"dur", "lon", "lan",  "len", "lun", "leg", "less", "lar",
+		"so",  "lur", "gar",  "cry", "au",  "dau", "dei",  "das", 
+		"zir", "zil", "sol",  "luc", "nis", "bus", "bat",  "bul", 
+		"mid", "err", "doo",  "do",  "al",  "ea",  "jac",  "ta",
+		"bi",  "vae", "rif",  "tol", "nim", "ru",  "li",   "rid", 
+		"fro", "sam", "beut", "bil", "ga",  "gu",  "gi",  "guy", 
+		"nee", "ara", "rho",  "dan", "va",  "lan", "lay", "larn",
+		"cec", "cic", "cac",  "cuc", "ix",  "vea", "cya", "nya", 
+		"hie", "bo",  "ni",   "do",  "sar", "phe", "ho",  "pho", 
+		"cos", "sin", "tan",  "mul", "har", "gur", "tar", "mar",
 		"a",   "e",   "i",    "o",   "u",   "je",  "ho",  "if",
-		"jai", "coy", "ya",   "pa",  "pul", "pil",
-		"rez", "rel", "rar",  "dom", "rom", "tom",
+		"jai", "coy", "ya",   "pa",  "pul", "pil", "poh", "ruf",
+		"rez", "rel", "rar",  "dom", "rom", "tom", "mom", "dad",
 		"ar",  "ur",  "ir",   "er",  "yr",  "li",  "la",  "lu", "lo"
 	};
 	static char *syl2[] = {
-		"tar", "tur", "kar", "kur", "kan", "tan", "gar", "gur", "run"
+		"tar", "tur", "kar", "kur", "kan", "tan", "gar", "gur", 
+		"run", "sun", "bun", "pun", "won", "gur", "bar", "bas",
+		"ruu", "tsu", "sue", "blu", "sno", "th",  "sh",  "ck"
 	};
 	static char *syl3[] = {
 		"a", "e", "i", "o", "u"
@@ -1368,7 +1370,7 @@ char *int2str(int val)
 
 void god_who(int cn)
 {
-	int n, players, font, showarea;
+	int n, m, players, font, showarea;
 
 	players = 0;
 	do_char_log(cn, 3, "-----------------------------------------------\n");
@@ -1436,17 +1438,18 @@ void god_who(int cn)
 		            int2str(ch[n].points_tot),
 		            !showarea ? "--------" : get_area(n, 0));
 	}
-	/* list player's GC and thralls, if any */
-	for (n = 1; n<MAXCHARS; n++)
+	/* list player's GC and thralls, if any -- limited to 10 entries as to not flood /who by a country mile */
+	for (n = 1, m = 0; n<MAXCHARS; n++)
 	{
-		if ((ch[n].flags & (CF_PLAYER)))
-		{
-			continue;
-		}
-		if (ch[n].data[CHD_MASTER] != cn)
-		{
-			continue;
-		}
+		if (!IS_ACTIVECHAR(n))				continue;
+		if ((ch[n].flags & (CF_PLAYER)))	continue;
+		if (ch[n].data[CHD_MASTER] != cn)	continue;
+		
+		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
+		            n, ch[n].name,
+		            int2str(ch[n].points_tot),
+		            get_area(n, 0));
+		/*
 		do_char_log(cn, 3, "%.5s %-10.10s%c%c%c %.23s\n",
 		            who_rank_name[points2rank(ch[n].points_tot)],
 		            ch[n].name,
@@ -1454,6 +1457,9 @@ void god_who(int cn)
 		            (ch[n].flags & CF_POH) ? '+' : ' ',
 		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
 		            get_area(n, 0));
+		*/
+		m++;
+		if (m>10) break;
 	}
 	do_char_log(cn, 3, "-----------------------------------------------\n");
 	do_char_log(cn, 1, "%3d player%s online.\n",
@@ -1546,10 +1552,19 @@ void user_who(int cn)
 	}
 	if ((gc = ch[cn].data[PCD_COMPANION]) && IS_SANECHAR(gc))
 	{
+		do_char_log(cn, 3, "%.5s %-10.10s%c%c%c %.23s\n",
+		            who_rank_name[points2rank(ch[gc].points_tot)],
+		            ch[gc].name,
+		            IS_PURPLE(gc) ? '*' : ' ',
+		            (ch[gc].flags & CF_POH) ? '+' : ' ',
+		            (ch[gc].flags & CF_POH_LEADER) ? '+' : ' ',
+		            get_area(gc, 0));
+		/*
 		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
 		            gc, ch[gc].name,
 		            int2str(ch[gc].points_tot),
 		            get_area(gc, 0));
+		*/
 	}
 	do_char_log(cn, 1, "-----------------------------------------------\n");
 	do_char_log(cn, 1, "%3d player%s online.\n",
@@ -1572,7 +1587,7 @@ void god_top(int cn)
 	{
 		do_char_log(cn, 1, "New Moon tonight!\n");
 	}
-	else if ((globs->mdday % 28) + 1<14)
+	else if ((globs->mdday % 28) + 1<15)
 	{
 		do_char_log(cn, 1, "The Moon is growing.\n");
 	}
@@ -2300,18 +2315,25 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset)
 
 	/* tricky: make thrall act like a ghost companion */
 	ch[ct].temp = CT_COMPANION;
-	ch[ct].data[64] = globs->ticker + 7 * 24 * 3600 * TICKS; // die in one week if not otherwise
-	ch[ct].data[CHD_GROUP] = 65536 + cn;                       // set group
-	ch[ct].data[59] = 65536 + cn;                       // protect all other members of this group
+	ch[ct].data[64] = globs->ticker + 7 * 24 * 3600 * TICKS;	// die in one week if not otherwise
+	ch[ct].data[CHD_GROUP] = 65500;								// set group
+	ch[ct].data[59] = 65500;									// protect all other members of this group
 
 	/* make thrall harmless */
-	ch[ct].data[24] = 0;    // do not interfere in fights
-	ch[ct].data[36] = 0;    // no walking around
-	ch[ct].data[43] = 0;    // don't attack anyone
-	ch[ct].data[80] = 0;    // no enemies
-	ch[ct].data[CHD_MASTER] = cn;   // obey and protect enthraller
+	ch[ct].data[24] = 0;				// do not interfere in fights
+	ch[ct].data[36] = 0;				// no walking around
+	ch[ct].data[43] = 0;				// don't attack anyone
+	ch[ct].data[80] = 0;				// no enemies
+	ch[ct].data[CHD_MASTER] = cn;		// obey and protect enthraller
+	ch[cn].data[72] = 99;				// grants special talk.c properties
 
 	ch[ct].flags |= CF_SHUTUP | CF_THRALL;
+	
+	if (offset) 
+	{
+		ch[ct].text[1][0] = 0;  		// removes attack message entirely for "army" thralls
+		ch[ct].data[43] = 65500;		// on second thought, *do* attack players if we're part of an army...
+	}
 
 	for (n = 0; n<20; n++)
 	{
@@ -3596,6 +3618,9 @@ void god_set_gflag(int cn, int flag)
 	case    GF_DISCORD:
 		ptr = "discord integration";
 		break;
+	case	GF_STRONGHOLD:
+		ptr = "stronghold";
+		break;
 
 	default:
 		ptr = "unknown";
@@ -4261,7 +4286,7 @@ void god_grolm_info(int cn)
 
 	for (co = 1; co<MAXCHARS; co++)
 	{
-		if (ch[co].temp==498)
+		if (ch[co].temp==478)
 		{
 			break;
 		}
@@ -4270,6 +4295,28 @@ void god_grolm_info(int cn)
 	if (co==MAXCHARS || ch[co].used!=USE_ACTIVE || (ch[co].flags & CF_BODY))
 	{
 		do_char_log(cn, 1, "Grolmy is dead.\n");
+		//return;
+	}
+	else
+	{
+		do_char_log(cn, 2, "Current state=%s, runs=%d, timer=%2.2fm, id=%d.\n",
+			(ch[co].data[22]>=0 || ch[co].data[22]<=2) ? states[ch[co].data[22]] : "unknown",
+			ch[co].data[40],
+			(double)(globs->ticker - ch[co].data[23]) / (TICKS * 60.0),
+			co);
+	}
+				
+	for (co = 1; co<MAXCHARS; co++)
+	{
+		if (ch[co].temp==1321)
+		{
+			break;
+		}
+	}
+
+	if (co==MAXCHARS || ch[co].used!=USE_ACTIVE || (ch[co].flags & CF_BODY))
+	{
+		do_char_log(cn, 1, "SeaGrolmy is dead.\n");
 		return;
 	}
 
@@ -4284,27 +4331,37 @@ void god_grolm_start(int cn)
 {
 	int co;
 
-	for (co = 1; co<MAXCHARS; co++)
-	{
-		if (ch[co].temp==498)
-		{
-			break;
-		}
-	}
-
+	for (co = 1; co<MAXCHARS; co++) if (ch[co].temp==478) break;
 	if (co==MAXCHARS || ch[co].used!=USE_ACTIVE || (ch[co].flags & CF_BODY))
 	{
 		do_char_log(cn, 1, "Grolmy is dead.\n");
-		return;
+		//return;
 	}
-
-	if (ch[co].data[22]!=0)
+	else if (ch[co].data[22]!=0)
 	{
 		do_char_log(cn, 1, "Grolmy is already moving.\n");
+		//return;
+	}
+	else
+	{
+		ch[co].data[22] = 1;
+	}
+	
+	for (co = 1; co<MAXCHARS; co++) if (ch[co].temp==1321) break;
+	if (co==MAXCHARS || ch[co].used!=USE_ACTIVE || (ch[co].flags & CF_BODY))
+	{
+		do_char_log(cn, 1, "SeaGrolmy is dead.\n");
 		return;
 	}
-
-	ch[co].data[22] = 1;
+	else if (ch[co].data[22]!=0)
+	{
+		do_char_log(cn, 1, "SeaGrolmy is already moving.\n");
+		return;
+	}
+	else
+	{
+		ch[co].data[22] = 1;
+	}
 }
 
 void god_gargoyle(int cn)

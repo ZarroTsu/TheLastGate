@@ -29,6 +29,7 @@
 #define GF_DIRTY      (1<<5)
 #define GF_NEWBS      (1<<6)
 #define GF_DISCORD    (1<<7)
+#define GF_STRONGHOLD (1<<8)
 
 struct global
 {
@@ -666,6 +667,7 @@ __attribute__ ((packed));
 #define IF_EASEUSE       (1ull<<54)     // item was enhanced by a shrine
 #define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine
 #define IF_LEGACY        (1ull<<56)     // item was enhanced by a shrine
+#define IF_DUPLICATED    (1ull<<57)     // item was enhanced by a shrine
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)

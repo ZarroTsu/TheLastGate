@@ -209,7 +209,7 @@ void discord_gmoon(void)
 	            month>3  ? "th" : "",
 	            year);
 	if 		((globs->mdday % 28) + 1==1)  	fprintf(discordWho, "- New Moon tonight! (+0.10 Spellmod & 100%% faster regen)\n");
-	else if ((globs->mdday % 28) + 1<14)  	fprintf(discordWho, "  The Moon is growing...\n");
+	else if ((globs->mdday % 28) + 1<15)  	fprintf(discordWho, "  The Moon is growing...\n");
 	else if ((globs->mdday % 28) + 1==15) 	fprintf(discordWho, "+ Full Moon tonight! (+0.15 Spellmod & 50%% faster regen)\n");
 	else 								  	fprintf(discordWho, "  The moon is dwindling...\n");
 	fprintf(discordWho, "```\n");

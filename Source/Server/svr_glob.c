@@ -121,7 +121,7 @@ void global_tick(void)
 	
 	if (globs->flags & GF_DISCORD) 
 	{
-		if (!(globs->mdtime % TICKS*5)) discord_who();
+		if (!(globs->mdtime % 120)) discord_who();
 		discord_shout_in();
 	}
 

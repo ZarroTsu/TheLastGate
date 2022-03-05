@@ -85,6 +85,8 @@ struct area area[] = {
 	{ 842,  295,  848,  300, "Magic Maze",                     1},
 	{ 658,  238,  695,  343, "Lynbore Mines",                  1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
+	{ 661,  505,  667,  513, "Weeping Bend                  ", 1},
+	{ 668,  504,  709,  512, "Weeping Bend                  ", 1},
 	{ 730,  384,  782,  506, "Weeping Woods",                  1},
 	{ 652,  462,  729,  506, "Weeping Woods",                  1},
 	{ 783,  395,  812,  480, "Weeping Woods",                  1},
@@ -216,7 +218,9 @@ struct area area[] = {
 	{ 217,  205,  494,  231, "Northern Mountains",             2},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 783,  482,  852,  505, "Forgotten Canyon",               1},
-	{ 651,  506,  852,  553, "Forgotten Canyon",               1},
+	{ 651,  506,  661,  553, "Forgotten Canyon",               1},
+	{ 662,  514,  714,  553, "Forgotten Canyon",               1},
+	{ 662,  506,  852,  553, "Forgotten Canyon",               1},
 	{ 651,  554,  748,  586, "Forgotten Canyon",               1},
 	{ 782,  554,  852,  586, "Forgotten Canyon",               1},
 	{ 782,  587,  852,  608, "Jagged Pass",                    1},
@@ -414,7 +418,11 @@ extern struct waypoint waypoint[MAXWPS] = {
 	{ 303, 377, "Pentagram Quest, Jungle", 			"the beginning of the Jungle Pentagram Quest" },
 	{ 220, 441, "Pentagram Quest, Ice", 			"the beginning of the Ice Pentagram Quest" },
 	{ 265, 235, "Pentagram Quest, Underwater", 		"the beginning of the Underwater Pentagram Quest" },
-	{ 355, 235, "Pentagram Quest, Onyx", 			"the beginning of the Onyx Pentagram Quest" }
+	{ 355, 235, "Pentagram Quest, Onyx", 			"the beginning of the Onyx Pentagram Quest" },
+	{ 431, 729, "Lizard Temple, South", 			"the entrance to the Lizard Temple, north of the Autumn Meadow" },
+	{ 177, 756, "Lizard Settlement, East", 		    "the north-east end of the Lizard Settlement" },
+	{ 156, 544, "The Emerald Cavern, East", 		"the western side of the Emerald Cavern" },
+	{ 771, 595, "The Tower", 						"the entrance to The Tower" }
 };
 
 // return a description of the area character cn is in

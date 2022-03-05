@@ -46,6 +46,7 @@ int sub_door_driver(int cn, int in)
 int use_door(int cn, int in)
 {
 	int in2, lock = 0, n, skill, power, temp, flags;
+	int cc;
 
 	if (map[it[in].x + it[in].y * MAPX].ch)
 	{
@@ -60,29 +61,31 @@ int use_door(int cn, int in)
 	
 	if (it[in].data[0])
 	{
-		if (cn==0)
+		cc = cn;
+		if (IS_PLAYER_COMP(cc)) cc = ch[cc].data[CHD_MASTER];
+		if (cc==0)
 		{
 			lock = 1;
 		}
 		else if (it[in].data[0]>=65500)
 		{
-			lock = sub_door_driver(cn, in);
+			lock = sub_door_driver(cc, in);
 		}
-		else if ((in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==it[in].data[0])
+		else if ((in2 = ch[cc].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==it[in].data[0])
 		{
 			lock = 1;
-			if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cn))
+			if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cc))
 			{
-				ch[cn].citem = 0;
+				ch[cc].citem = 0;
 				it[in2].used = USE_EMPTY;
-				do_char_log(cn, 1, "The key vanished.\n");
+				do_char_log(cc, 1, "The key vanished.\n");
 			}
 		}
 		else
 		{
 			for (n = 0; n<40; n++)
 			{
-				if ((in2 = ch[cn].item[n])!=0)
+				if ((in2 = ch[cc].item[n])!=0)
 				{
 					if (it[in2].temp==it[in].data[0])
 					{
@@ -93,12 +96,12 @@ int use_door(int cn, int in)
 			if (n<40)
 			{
 				lock = 1;
-				if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cn))
+				if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cc))
 				{
-					ch[cn].item[n] = 0;
-					ch[cn].item_lock[n] = 0;
+					ch[cc].item[n] = 0;
+					ch[cc].item_lock[n] = 0;
 					it[in2].used = USE_EMPTY;
-					do_char_log(cn, 1, "The key vanished.\n");
+					do_char_log(cc, 1, "The key vanished.\n");
 				}
 			}
 		}
@@ -1655,7 +1658,7 @@ void quick_mob_respawn(int dr, int v)
 	{
 		j = 4;
 		y = 105;
-		if (v>5)
+		if (v>4)
 		{
 			m = XY2M(726, 109);
 			n = XY2M(830, 143);
@@ -2423,34 +2426,34 @@ int use_scroll_S(int cn, int in)
 
 int use_map_contract(int cn, int in)
 {
-	static int cntrct_1a[] = {
+	static unsigned int cntrct_1a[6] = {
 	//	Ex Enemy	Ex Divin	En Roam		Clr Exp		Clr Luck	Gold Pl
 		0x00000001, 0x00000002, 0x00000100, 0x00100000, 0x00200000, 0x08000000
 	};
-	static int cntrct_1b[] = {
+	static unsigned int cntrct_1b[5] = {
 	//	Underwtr	En Perc		Pl Frag		En Tarot	En Tarot2
 		0x00000008, 0x00000200, 0x00020000, 0x01000000, 0x02000000
 	};
-	static int cntrct_2a[] = {
+	static unsigned int cntrct_2a[4] = {
 	//	Boss En		Clr BSP		Kill Exp	+1 Rank
 		0x00000080, 0x00400000, 0x04000000, 0x10000000
 	};
-	static int cntrct_2b[] = {
+	static unsigned int cntrct_2b[6] = {
 	//	Spikes		Undead		En Sharp	En Forti	En Wiser	Pl Debil
 		0x00000020, 0x00000040, 0x00001000, 0x00002000, 0x00008000, 0x00010000
 	};
-	static int cntrct_3a[] = {
+	static unsigned int cntrct_3a[4] = {
 	//	Ex Chest	Ex Shrine	Ex OSP		+2 Rank
 		0x00000004, 0x00000010, 0x00800000, 0x20000000
 	};
-	static int cntrct_3b[] = {
+	static unsigned int cntrct_3b[5] = {
 	//	En Resis	En Skill	En Haste	Pl Stigm	Pl Hyper
 		0x00000400, 0x00000800, 0x00004000, 0x00040000, 0x00080000
 	};
-	int in2, spr, n, m, panic, font;
+	int in2, spr, n, panic, font;
 	int rank, tier;
 	char buf[300];
-	unsigned int flags=0;
+	unsigned int flags=0, m=0;
 	
 	in2 = ch[cn].citem;
 	
@@ -2482,13 +2485,13 @@ int use_map_contract(int cn, int in)
 	{
 		for (n=0;n<tier;n++)
 		{
-			for (panic=0,m=0;panic<99;panic++)
+			for (panic=0;panic<99;panic++)
 			{
 				switch (RANDOM(tier)+1)
 				{
-					case  1: m = cntrct_1a[RANDOM(sizeof(cntrct_1a) / sizeof(cntrct_1a[0]))]; break;
-					case  2: m = cntrct_2a[RANDOM(sizeof(cntrct_2a) / sizeof(cntrct_2a[0]))]; break;
-					default: m = cntrct_3a[RANDOM(sizeof(cntrct_3a) / sizeof(cntrct_3a[0]))]; break;
+					case  1: m = cntrct_1a[RANDOM(6)]; break;
+					case  2: m = cntrct_2a[RANDOM(4)]; break;
+					default: m = cntrct_3a[RANDOM(4)]; break;
 				}
 				if (!(flags & m))
 				{
@@ -2496,19 +2499,19 @@ int use_map_contract(int cn, int in)
 					flags |= m;
 					break;
 				}
-				if (panic>9)
+				if (panic>14)
 				{
 					chlog(cn, "Panic! Couldn't add flag A to contract");
 					break;
 				}
 			}
-			for (panic=0,m=0;panic<99;panic++)
+			for (panic=0;panic<99;panic++)
 			{
 				switch (RANDOM(tier)+1)
 				{
-					case  1: m = cntrct_1b[RANDOM(sizeof(cntrct_1b) / sizeof(cntrct_1b[0]))]; break;
-					case  2: m = cntrct_2b[RANDOM(sizeof(cntrct_2b) / sizeof(cntrct_2b[0]))]; break;
-					default: m = cntrct_3b[RANDOM(sizeof(cntrct_3b) / sizeof(cntrct_3b[0]))]; break;
+					case  1: m = cntrct_1b[RANDOM(5)]; break;
+					case  2: m = cntrct_2b[RANDOM(6)]; break;
+					default: m = cntrct_3b[RANDOM(5)]; break;
 				}
 				if (!(flags & m))
 				{
@@ -2516,7 +2519,7 @@ int use_map_contract(int cn, int in)
 					flags |= m;
 					break;
 				}
-				if (panic>9)
+				if (panic>16)
 				{
 					chlog(cn, "Panic! Couldn't add flag B to contract");
 					break;
@@ -2619,7 +2622,7 @@ int use_map_pentigram(int cn, int in)
 		}
 		ch[co].data[29] = m;
 		ch[co].data[60] = TICKS * 23;
-		if (!RANDOM(30))
+		if (!RANDOM(25))
 		{
 			boost_char(co, 5);
 		}
@@ -2751,8 +2754,8 @@ int use_map_chest(int cn, int in)
 			case 10:	
 			case 11: 	n = IT_POT_D_HP+RANDOM(3)*6; 				break;
 			case 12:	
-			case 13:	n = IT_OS_BRV+RANDOM(5); 					break; 
-			default:	n = IT_OS_SK; 								break; 
+			case 13:	n = IT_OS_SK; 								break; 
+			default:	n = IT_OS_BRV+RANDOM(5);					break; 
 		}
 	}
 	
@@ -2875,12 +2878,19 @@ int use_map_shrine(int cn, int in)
 						do_char_log(cn, 1, "Nothing happened...\n");
 						break;
 					}
+					if (it[inc].flags & IF_DUPLICATED)
+					{
+						do_char_log(cn, 1, "But it had been done to the %s before.\n", it[inc].reference);
+						break;
+					}
 					if (!god_give_char(inr, cn))
 					{
 						do_char_log(cn, 1, "Your backpack is full...\n");
 						it[inr].used = USE_EMPTY;
 						break;
 					}
+					it[inc].flags |= IF_DUPLICATED;
+					it[inr].flags |= IF_DUPLICATED;
 					do_char_log(cn, 1, "You got a %s.\n", it[inr].reference);
 					break;
 				case  2:
@@ -2898,11 +2908,15 @@ int use_map_shrine(int cn, int in)
 					}
 					if (RANDOM(2))
 					{
-						it[inc].attrib[RANDOM(5)][0] += 1+rank/10;
+						m = RANDOM(5);
+						it[inc].attrib[m][0] += 1+rank/10;
+						it[inc].attrib[m][1] += 1+rank/10;
 					}
 					else
 					{
-						it[inc].skill[RANDOM(50)][0] += 1+rank/10;
+						m = RANDOM(50);
+						it[inc].skill[m][0] += 1+rank/10;
+						it[inc].skill[m][1] += 1+rank/10;
 					}
 					it[inc].flags |= IF_AUGMENTED;
 					do_char_log(cn, 1, "Your %s was altered.\n", it[inc].reference);
@@ -2961,9 +2975,10 @@ int use_map_shrine(int cn, int in)
 						{
 							if (it[inc].attrib[n][0])
 							{
-								it[inr].attrib[n][0] = get_sb(n+50, 1);
-								it[inr].attrib[n][1] = get_sb(n+50, 0);
-								m += get_sb(n+50, 0);
+								v = min(3, RANDOM(tier)+1);
+								it[inr].attrib[n][0] = get_sb(n+50, 1)*v;
+								it[inr].attrib[n][1] = get_sb(n+50, 0)*v;
+								m += get_sb(n+50, 0)*v;
 								catalog[c] = n+50; c++;
 							}
 						}
@@ -2971,130 +2986,131 @@ int use_map_shrine(int cn, int in)
 						{
 							if (it[inc].skill[n][0])
 							{
-								it[inr].skill[n][0] = get_sb(n, 1);
-								it[inr].skill[n][1] = get_sb(n, 0);
-								m += get_sb(n, 0);
+								v = min(3, RANDOM(tier)+1);
+								it[inr].skill[n][0] = get_sb(n, 1)*v;
+								it[inr].skill[n][1] = get_sb(n, 0)*v;
+								m += get_sb(n, 0)*v;
 								catalog[c] = n; c++;
 							}
 						}
 						if (it[inc].hp[0])
 						{
-							n = 55; 
-							it[inr].hp[0] = get_sb(n, 1); 
-							it[inr].hp[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 55; v = min(3, RANDOM(tier)+1);
+							it[inr].hp[0] = get_sb(n, 1)*v; 
+							it[inr].hp[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].end[0])
 						{
-							n = 56; 
-							it[inr].end[0] = get_sb(n, 1); 
-							it[inr].end[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 56; v = min(3, RANDOM(tier)+1);
+							it[inr].end[0] = get_sb(n, 1)*v; 
+							it[inr].end[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].mana[0])
 						{
-							n = 57; 
-							it[inr].mana[0] = get_sb(n, 1); 
-							it[inr].mana[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 57; v = min(3, RANDOM(tier)+1);
+							it[inr].mana[0] = get_sb(n, 1)*v; 
+							it[inr].mana[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].weapon[0])
 						{
-							n = 58; 
-							it[inr].weapon[0] = get_sb(n, 1); 
-							it[inr].weapon[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 58; v = min(3, RANDOM(tier)+1);
+							it[inr].weapon[0] = get_sb(n, 1)*v; 
+							it[inr].weapon[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].armor[0])
 						{
-							n = 59; 
-							it[inr].armor[0] = get_sb(n, 1); 
-							it[inr].armor[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 59; v = min(3, RANDOM(tier)+1);
+							it[inr].armor[0] = get_sb(n, 1)*v; 
+							it[inr].armor[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].move_speed[0])
 						{
-							n = 60; 
-							it[inr].move_speed[0] = get_sb(n, 1); 
-							it[inr].move_speed[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 60; v = min(3, RANDOM(tier)+1);
+							it[inr].move_speed[0] = get_sb(n, 1)*v; 
+							it[inr].move_speed[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].atk_speed[0])
 						{
-							n = 61; 
-							it[inr].atk_speed[0] = get_sb(n, 1); 
-							it[inr].atk_speed[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 61; v = min(3, RANDOM(tier)+1);
+							it[inr].atk_speed[0] = get_sb(n, 1)*v; 
+							it[inr].atk_speed[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].cast_speed[0])
 						{
-							n = 62; 
-							it[inr].cast_speed[0] = get_sb(n, 1); 
-							it[inr].cast_speed[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 62; v = min(3, RANDOM(tier)+1);
+							it[inr].cast_speed[0] = get_sb(n, 1)*v; 
+							it[inr].cast_speed[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].spell_mod[0])
 						{
-							n = 63; 
-							it[inr].spell_mod[0] = get_sb(n, 1); 
-							it[inr].spell_mod[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 63; v = min(3, RANDOM(tier)+1);
+							it[inr].spell_mod[0] = get_sb(n, 1)*v; 
+							it[inr].spell_mod[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].spell_apt[0])
 						{
-							n = 64; 
-							it[inr].spell_apt[0] = get_sb(n, 1); 
-							it[inr].spell_apt[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 64; v = min(3, RANDOM(tier)+1);
+							it[inr].spell_apt[0] = get_sb(n, 1)*v; 
+							it[inr].spell_apt[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].cool_bonus[0])
 						{
-							n = 65; 
-							it[inr].cool_bonus[0] = get_sb(n, 1); 
-							it[inr].cool_bonus[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 65; v = min(3, RANDOM(tier)+1);
+							it[inr].cool_bonus[0] = get_sb(n, 1)*v; 
+							it[inr].cool_bonus[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].crit_chance[0])
 						{
-							n = 66; 
-							it[inr].crit_chance[0] = get_sb(n, 1); 
-							it[inr].crit_chance[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 66; v = min(3, RANDOM(tier)+1);
+							it[inr].crit_chance[0] = get_sb(n, 1)*v; 
+							it[inr].crit_chance[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].crit_multi[0])
 						{
-							n = 67; 
-							it[inr].crit_multi[0] = get_sb(n, 1); 
-							it[inr].crit_multi[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 67; v = min(3, RANDOM(tier)+1);
+							it[inr].crit_multi[0] = get_sb(n, 1)*v; 
+							it[inr].crit_multi[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].top_damage[0])
 						{
-							n = 68; 
-							it[inr].top_damage[0] = get_sb(n, 1); 
-							it[inr].top_damage[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 68; v = min(3, RANDOM(tier)+1);
+							it[inr].top_damage[0] = get_sb(n, 1)*v; 
+							it[inr].top_damage[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						if (it[inc].gethit_dam[0])
 						{
-							n = 69; 
-							it[inr].gethit_dam[0] = get_sb(n, 1); 
-							it[inr].gethit_dam[1] = get_sb(n, 0); 
-							m += get_sb(n, 0); 
+							n = 69; v = min(3, RANDOM(tier)+1);
+							it[inr].gethit_dam[0] = get_sb(n, 1)*v; 
+							it[inr].gethit_dam[1] = get_sb(n, 0)*v; 
+							m += get_sb(n, 0)*v; 
 							catalog[c] = n; c++;
 						}
 						
@@ -3165,7 +3181,8 @@ int use_map_shrine(int cn, int in)
 			break;
 		case  2:		// Blue - Beneficial buffs
 			v = 104;
-			if (has_buff(cn, v)) v = 105;
+			if (inc = has_buff(cn, 104)) v = 105;
+			if (inc && (inr = has_buff(cn, 105)) && (bu[inc].active < bu[inr].active)) v = 104;
 			switch (it[in].data[1])
 			{
 				case  1:
@@ -3287,11 +3304,11 @@ int use_map_portal(int cn, int in)
 	
 	do_char_log(cn, 1, "You completed the area.\n");
 
-	exp = luck = bsp = osp = sqrt(rank2points(rank)) * 8 + 8;
+	exp = luck = bsp = osp = (IS_ANY_ARCH(cn)?12500:2500) + sqrt(rank2points(rank)) * 3 + 7;
 	exp -= RANDOM(exp/20+1);
 	exp += RANDOM(exp/20*(tier+1)+1);
 	
-	if (it[in].data[1]==1) exp += exp/4 + RANDOM(exp/4);
+	if (it[in].data[1]==1) exp += exp/2 + RANDOM(exp/4);
 	
 	chlog(cn, "Finished map of rank %d tier %d", rank, tier);
 	char_play_sound(cn, ch[cn].sound + 19, 0, 0);
@@ -3310,8 +3327,8 @@ int use_map_portal(int cn, int in)
 		osp -= RANDOM(osp/20+1); 
 		osp += RANDOM(osp/20*(tier+1)+1);
 		
-		if (it[in].data[4]==1 && tier) osp += osp/4 + RANDOM(osp/4);
-		else if (it[in].data[4]==1) osp = osp/4 + RANDOM(osp/4);
+		if (it[in].data[4]==1 && tier) osp += osp/3 + RANDOM(osp/4);
+		else if (it[in].data[4]==1) osp = osp/3 + RANDOM(osp/4);
 		
 		ch[cn].os_points += osp;
 		if (!(ch[cn].flags & CF_SYS_OFF))
@@ -5622,7 +5639,7 @@ int spawn_penta_enemy(int in)
 	ch[cn].data[73] = 8;
 	ch[cn].dir = 1;
 
-	if (!RANDOM(30))
+	if (!RANDOM(25))
 	{
 		boost_char(cn, 5);
 	}
@@ -6310,6 +6327,7 @@ int use_seyan_shrine(int cn, int in)
 		if (bits==32) it[in2].spell_mod[0] = 10;
 		
 		it[in2].flags |= IF_UPDATE;
+		it[in2].orig_temp = IT_SEYANSWORD;
 		it[in2].temp   = 0;
 		
 		sprintf(it[in2].description, "A huge two-handed sword, engraved with runes and magic symbols. It bears the name %s.",
@@ -6333,6 +6351,7 @@ int use_seyan_shrine(int cn, int in)
 		if (bits==32) it[in3].spell_mod[0] = 10;
 		
 		it[in3].flags |= IF_UPDATE;
+		it[in3].orig_temp = IT_SEYANSWORD;
 		it[in3].temp   = 0;
 		
 		sprintf(it[in3].description, "A huge two-handed sword, engraved with runes and magic symbols. It bears the name %s.",

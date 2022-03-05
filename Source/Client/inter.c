@@ -308,6 +308,8 @@ void button_command(int nr)
 
 		default: break;
 	}
+	if (skill_pos>MAXSKILL-10) skill_pos = MAXSKILL-10;
+	if (skill_pos<0) skill_pos = 0;
 }
 
 void button_help(int nr)
@@ -942,12 +944,12 @@ int mouse_statbox2(int x,int y,int state)
 			if (last_skill == 60)
 			{
 				last_skill = -1;
-				xlog(3,"Details panel now showing default.");
+				xlog(6,"Details panel now showing default.");
 			}
 			else
 			{
 				last_skill = 60;
-				xlog(3,"Details panel now showing for %s.",at_name[n]);
+				xlog(6,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
 		}
@@ -959,12 +961,12 @@ int mouse_statbox2(int x,int y,int state)
 			if (last_skill == 61)
 			{
 				last_skill = -1;
-				xlog(3,"Details panel now showing default.");
+				xlog(6,"Details panel now showing default.");
 			}
 			else
 			{
 				last_skill = 61;
-				xlog(3,"Details panel now showing for %s.",at_name[n]);
+				xlog(6,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
 		}
@@ -976,12 +978,12 @@ int mouse_statbox2(int x,int y,int state)
 			if (last_skill == 62)
 			{
 				last_skill = -1;
-				xlog(3,"Details panel now showing default.");
+				xlog(6,"Details panel now showing default.");
 			}
 			else
 			{
 				last_skill = 62;
-				xlog(3,"Details panel now showing for %s.",at_name[n]);
+				xlog(6,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
 		}
@@ -993,12 +995,12 @@ int mouse_statbox2(int x,int y,int state)
 			if (last_skill == 63)
 			{
 				last_skill = -1;
-				xlog(3,"Details panel now showing default.");
+				xlog(6,"Details panel now showing default.");
 			}
 			else
 			{
 				last_skill = 63;
-				xlog(3,"Details panel now showing for %s.",at_name[n]);
+				xlog(6,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
 		}
@@ -1010,12 +1012,12 @@ int mouse_statbox2(int x,int y,int state)
 			if (last_skill == 64)
 			{
 				last_skill = -1;
-				xlog(3,"Details panel now showing default.");
+				xlog(6,"Details panel now showing default.");
 			}
 			else
 			{
 				last_skill = 64;
-				xlog(3,"Details panel now showing for %s.",at_name[n]);
+				xlog(6,"Details panel now showing for %s.",at_name[n]);
 			}
 			return 1;
 		}
@@ -1043,7 +1045,7 @@ int mouse_statbox2(int x,int y,int state)
 		{
 			if (last_skill >= 60 && last_skill <= 64)
 			{
-				xlog(3,"Details panel now showing default.");
+				xlog(6,"Details panel now showing default.");
 			}
 			
 			if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
@@ -1445,7 +1447,7 @@ int mouse_wps(int x,int y,int mode)
 	{
 		ty=(y-(GUI_SHOP_Y+1))/35;
 
-		nr=ty+wps_pos;
+		nr=wpslist[ty+wps_pos].nr;
 		if (mode==MS_LB_UP) 
 		{
 			cmd1(CL_CMD_WPS,nr);

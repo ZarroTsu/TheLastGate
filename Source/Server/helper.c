@@ -811,13 +811,13 @@ int get_best_worn(int cn, int v)
 		switch (v)
 		{
 			case WN_HEAD:
-				if (it[in].attrib[AT_STR][2]>it[in].attrib[AT_INT][2]) 
+				if (it[in].attrib[AT_STR][2]>=it[in].attrib[AT_INT][2]) 
 					n = get_best_armor(cn, 1);
 				else 
 					n = get_best_armor(cn, 3);
 				break;
 			case WN_BODY:
-				if (it[in].attrib[AT_STR][2]>it[in].attrib[AT_INT][2]) 
+				if (it[in].attrib[AT_STR][2]>=it[in].attrib[AT_INT][2]) 
 					n = get_best_armor(cn, 2);
 				else 
 					n = get_best_armor(cn, 4);
@@ -2959,49 +2959,53 @@ static int soul_bonus[N_SOULBONUS][3] = {
 	{ 3, 1, 12 }, //  4 Axe
 	{ 3, 1, 12 }, //  5 Staff
 	{ 3, 1, 12 }, //  6 Two-handed
-	{ 2, 1,  8 }, //  7 Zephyr
+	{ 1, 1,  4 }, //  7 Zephyr
 	{ 1, 1,  4 }, //  8 Stealth
 	{ 1, 1,  4 }, //  9 Perception
+	
 	{ 1, 1,  4 }, // 10 Swimming
-	{ 2, 1,  8 }, // 11 Magic Shield
+	{ 1, 1,  4 }, // 11 Magic Shield
 	{ 1, 1,  4 }, // 12 Bartering
 	{ 1, 1,  4 }, // 13 Repair
-	{ 1, 1,  4 }, // 14 Light
-	{ 1, 1,  4 }, // 15 Recall
-	{ 2, 1,  8 }, // 16 Shield
-	{ 2, 1,  8 }, // 17 Protect
-	{ 2, 1,  8 }, // 18 Enhance
-	{ 2, 1,  8 }, // 19 Slow
-	{ 2, 1,  8 }, // 20 Curse
-	{ 2, 1,  8 }, // 21 Bless
+	{ 1, 1,  4 }, // 14 Rage
+	{ 1, 1,  4 }, // 15 Lethargy
+	{ 1, 2,  2 }, // 16 Shield
+	{ 1, 1,  4 }, // 17 Protect
+	{ 1, 1,  4 }, // 18 Enhance
+	{ 1, 1,  4 }, // 19 Slow
+	
+	{ 1, 1,  4 }, // 20 Curse
+	{ 1, 1,  4 }, // 21 Bless
 	{ 1, 1,  4 }, // 22 Identify
 	{ 2, 1,  8 }, // 23 Resistance
-	{ 2, 1,  8 }, // 24 Blast
+	{ 1, 1,  4 }, // 24 Blast
 	{ 1, 1,  4 }, // 25 Dispel
 	{ 1, 1,  4 }, // 26 Heal
-	{ 2, 1,  8 }, // 27 Ghost Companion
+	{ 1, 1,  4 }, // 27 Ghost Companion
 	{ 1, 1,  4 }, // 28 Regenerate
 	{ 1, 1,  4 }, // 29 Rest
+	
 	{ 1, 1,  4 }, // 30 Meditate
 	{ 1, 1,  4 }, // 31 Sense Magic
 	{ 2, 1,  8 }, // 32 Immunity
 	{ 1, 1,  4 }, // 33 Surround Hit
 	{ 1, 1,  4 }, // 34 Concentrate
-	{ 2, 1,  8 }, // 35 Warcry
-	{ 2, 1,  8 }, // 36 Dual Wield
-	{ 2, 1,  8 }, // 37 Blind
-	{ 1, 1,  4 }, // 38 Weapon Mastery
-	{ 1, 1,  4 }, // 39 Armor Mastery
-	{ 2, 1,  8 }, // 40 Cleave
-	{ 2, 1,  8 }, // 41 Weaken
-	{ 2, 1,  8 }, // 42 Poison
-	{ 2, 1,  8 }, // 43 Pulse
+	{ 1, 1,  4 }, // 35 Warcry
+	{ 1, 2,  2 }, // 36 Dual Wield
+	{ 1, 1,  4 }, // 37 Blind
+	{ 1, 1,  4 }, // 38 Gear Mastery
+	{ 1, 1,  4 }, // 39 Safeguard
+	
+	{ 1, 1,  4 }, // 40 Cleave
+	{ 1, 1,  4 }, // 41 Weaken
+	{ 1, 1,  4 }, // 42 Poison
+	{ 1, 1,  4 }, // 43 Pulse
 	{ 1, 1,  4 }, // 44 Proximity
 	{ 1, 1,  4 }, // 45 Companion Mastery
-	{ 2, 1,  8 }, // 46 Shadow Copy
-	{ 2, 1,  8 }, // 47 Haste
-	{ 2, 1,  8 }, // 48 Taunt
-	{ 2, 1,  8 }, // 49 Leap
+	{ 1, 1,  4 }, // 46 Shadow Copy
+	{ 1, 1,  4 }, // 47 Haste
+	{ 1, 1,  4 }, // 48 Taunt
+	{ 1, 1,  4 }, // 49 Leap
 	
 	{ 2, 1,  8 }, // 50 Braveness
 	{ 2, 1,  8 }, // 51 Willpower
@@ -3013,19 +3017,19 @@ static int soul_bonus[N_SOULBONUS][3] = {
 	{ 1, 5,  0 }, // 56 Endurance
 	{ 1,10, 10 }, // 57 Mana
 	
-	{ 2, 1,  0 }, // 58 Weapon Value
-	{ 2, 1,  0 }, // 59 Armor Value
+	{ 3, 1,  0 }, // 58 Weapon Value
+	{ 3, 1,  0 }, // 59 Armor Value
 	
 	{ 1, 1,  0 }, // 60 Movement Speed
-	{ 1, 1,  0 }, // 61 Attack Speed
-	{ 1, 1,  0 }, // 62 Cast Speed
-	{ 4, 1,  0 }, // 63 Spell Mod
-	{ 1, 1,  0 }, // 64 Spell Apt
+	{ 2, 1,  0 }, // 61 Attack Speed
+	{ 2, 1,  0 }, // 62 Cast Speed
+	{ 6, 1,  0 }, // 63 Spell Mod
+	{ 1, 2,  0 }, // 64 Spell Apt
 	{ 3, 1,  0 }, // 65 Cooldown
-	{ 1, 1,  0 }, // 66 Crit Chance
-	{ 1, 1,  0 }, // 67 Crit Multi
-	{ 1, 1,  0 }, // 68 Top Damage
-	{ 2, 1,  0 }  // 69 Thorns
+	{ 1, 5,  0 }, // 66 Crit Chance
+	{ 1, 6,  0 }, // 67 Crit Multi
+	{ 1, 2,  0 }, // 68 Top Damage
+	{ 3, 1,  0 }  // 69 Thorns
 };
 
 int get_sb(int v, int i)
@@ -3036,9 +3040,10 @@ int get_sb(int v, int i)
 
 void soultrans_equipment(int cn, int in, int in2)
 {
-	int rank, focus, try, r, n, t, m, c=0, s=0, temp=0, bonus=1;
+	int rank, focus, try, r, n, t, m, c=0, s=0, temp=0, bonus=1, catfocus=0, cf=0;
 	char known[N_SOULBONUS] = {0};
-	char selected[N_SOULMAX*8] = {0};
+	char catknown[N_SOULBONUS] = {0};
+	char selected[N_SOULMAX*9] = {0};
 	int atrm[5]={0}, sklm[50]={0};
 	
 	// 0. Check if (in) is twohanded, grant a rank bonus if it is.
@@ -3047,7 +3052,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	
 	// 1. Set local variables to pull from the soulstone (in)
 	rank   = max(1, min(N_SOULMAX, (it[in].data[0]-it[in].data[3])*bonus));
-	focus  = (it[in].data[2] > 0 && it[in].data[2] < 8) ? it[in].data[2] : 8;
+	focus  = (it[in].data[2] > 0 && it[in].data[2] < 9) ? it[in].data[2] : 9;
 	
 	// 2. Loop through known player skills and add to local array
 	for (n=0;n<N_SOULBONUS;n++)
@@ -3070,13 +3075,60 @@ void soultrans_equipment(int cn, int in, int in2)
 		return;
 	}
 	
+	// 2.5. Add catalyzed stats
+	if (it[in].data[3])
+	{
+		for (n=0;n<5;n++)
+		{ 
+			it[in2].attrib[n][0] += it[in].attrib[n][0]*bonus;  atrm[n] += soul_bonus[n][2]*it[in].attrib[n][0]; 
+			if (it[in].attrib[n][0]) { catknown[cf] = n+50; cf++; }
+		}
+		for (n=0;n<50;n++)
+		{ 
+			it[in2].skill[n][0] += it[in].skill[n][0]*bonus;    sklm[n] += soul_bonus[n][2]*it[in].skill[n][0]; 
+			if (it[in].skill[n][0]) { catknown[cf] = n; cf++; }
+		}
+		it[in2].hp[0]          += it[in].hp[0]*bonus;   it[in2].hp[2] += soul_bonus[55][2]*it[in].hp[0]/10;
+		if (it[in].hp[0]) { catknown[cf] = 55; cf++; }
+		it[in2].end[0]         += it[in].end[0]*bonus;
+		if (it[in].end[0]) { catknown[cf] = 56; cf++; }
+		it[in2].mana[0]        += it[in].mana[0]*bonus; it[in2].hp[2] += soul_bonus[57][2]*it[in].mana[0]/10;
+		if (it[in].mana[0]) { catknown[cf] = 57; cf++; }
+		
+		it[in2].ss_weapon      += it[in].weapon[0]*bonus;
+		if (it[in].weapon[0]) { catknown[cf] = 58; cf++; }
+		it[in2].ss_armor       += it[in].armor[0]*bonus;
+		if (it[in].armor[0]) { catknown[cf] = 59; cf++; }
+		
+		it[in2].move_speed[0]  += it[in].move_speed[0]*bonus;	if (it[in].move_speed[0])  { catknown[cf] = 60; cf++; }
+		it[in2].atk_speed[0]   += it[in].atk_speed[0]*bonus;	if (it[in].atk_speed[0])   { catknown[cf] = 61; cf++; }
+		it[in2].cast_speed[0]  += it[in].cast_speed[0]*bonus;	if (it[in].cast_speed[0])  { catknown[cf] = 62; cf++; }
+		it[in2].spell_mod[0]   += it[in].spell_mod[0]*bonus;	if (it[in].spell_mod[0])   { catknown[cf] = 63; cf++; }
+		it[in2].spell_apt[0]   += it[in].spell_apt[0]*bonus;	if (it[in].spell_apt[0])   { catknown[cf] = 64; cf++; }
+		it[in2].cool_bonus[0]  += it[in].cool_bonus[0]*bonus;	if (it[in].cool_bonus[0])  { catknown[cf] = 65; cf++; }
+		it[in2].crit_chance[0] += it[in].crit_chance[0]*bonus;	if (it[in].crit_chance[0]) { catknown[cf] = 66; cf++; }
+		it[in2].crit_multi[0]  += it[in].crit_multi[0]*bonus;	if (it[in].crit_multi[0])  { catknown[cf] = 67; cf++; }
+		it[in2].top_damage[0]  += it[in].top_damage[0]*bonus;	if (it[in].top_damage[0])  { catknown[cf] = 68; cf++; }
+		it[in2].gethit_dam[0]  += it[in].gethit_dam[0]*bonus;	if (it[in].gethit_dam[0])  { catknown[cf] = 69; cf++; }
+		
+		catfocus = cf;
+	}
+	
 	// 3. Select 'focus' number of skills from the known list - duplicates are OK
 	//    We add extras if a catalyst is giving a bonus to the roll odds.
 	try = 0;
 	for (n=0;n<focus;n++)
 	{
 		m = 1;
-		r = known[RANDOM(c)];
+		if (catfocus)
+		{
+			r = catknown[RANDOM(cf)];
+			catfocus--;
+		}
+		else
+		{
+			r = known[RANDOM(c)];
+		}
 		selected[s] = r; 
 		s++;
 	}
@@ -3087,33 +3139,7 @@ void soultrans_equipment(int cn, int in, int in2)
 		return;
 	}
 	
-	// 4.1  Add catalyzed stats
-	if (it[in].data[3])
-	{
-		for (n=0;n<5;n++)
-		{ it[in2].attrib[n][0] += it[in].attrib[n][0]*bonus;  atrm[n] += soul_bonus[n][2]*it[in].attrib[n][0]; }
-		for (n=0;n<50;n++)
-		{ it[in2].skill[n][0] += it[in].skill[n][0]*bonus;    sklm[n] += soul_bonus[n][2]*it[in].skill[n][0]; }
-		it[in2].hp[0]          += it[in].hp[0]*bonus;   it[in2].hp[2] += soul_bonus[55][2]*it[in].hp[0]/10;
-		it[in2].end[0]         += it[in].end[0]*bonus;
-		it[in2].mana[0]        += it[in].mana[0]*bonus; it[in2].hp[2] += soul_bonus[57][2]*it[in].mana[0]/10;
-		
-		it[in2].weapon[0]      += it[in].weapon[0]*bonus;
-		it[in2].armor[0]       += it[in].armor[0]*bonus;
-		
-		it[in2].move_speed[0]  += it[in].move_speed[0]*bonus;
-		it[in2].atk_speed[0]   += it[in].atk_speed[0]*bonus;
-		it[in2].cast_speed[0]  += it[in].cast_speed[0]*bonus;
-		it[in2].spell_mod[0]   += it[in].spell_mod[0]*bonus;
-		it[in2].spell_apt[0]   += it[in].spell_apt[0]*bonus;
-		it[in2].cool_bonus[0]  += it[in].cool_bonus[0]*bonus;
-		it[in2].crit_chance[0] += it[in].crit_chance[0]*bonus;
-		it[in2].crit_multi[0]  += it[in].crit_multi[0]*bonus;
-		it[in2].top_damage[0]  += it[in].top_damage[0]*bonus;
-		it[in2].gethit_dam[0]  += it[in].gethit_dam[0]*bonus;
-	}
-	
-	// 4.2  Add the random stats
+	// 4. Add the random stats
 	t = 0;
 	if (rank) while (rank && t < 5)
 	{
@@ -3387,13 +3413,13 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	v = it[inc].data[4];
 	m = it[inc].data[3];
 	
-	if (!v || m <= get_sb(v-1, 0)*3/2) 
+	if (!v || m <= get_sb(v-1, 0)*3/2)
 	{
 		do_char_log(cn, 1, "Nothing happened. Seems this catalyst can't be focused further.\n");
 		chlog(cn, "do_catalyst_focus: v=%d, m=%d", v-1, m);
 		return 0;
 	}
-	if (it[inf].data[0] >= get_sb(v-1, 0)*3/2)
+	if (it[inf].data[0] >= m)
 	{
 		do_char_log(cn, 1, "Nothing happened. Seems this focus won't improve anything.\n");
 		return 0;
@@ -3923,7 +3949,7 @@ char *get_map_enemy_desc(int kin)
 		case 41: return "A tall man adorn with colorful robes."; // Wizard
 		case 42: return "A woman adorn with foreign clothing and charms."; // Mystic
 		case 43: return "An ugly humanoid lizard, dripping in thick goo."; // Grosser
-		case 44: return "A rugged man in beutiful clothes. He flashes a charming smile."; // Bard
+		case 44: return "A rugged man in beautiful clothes. He flashes a charming smile."; // Bard
 		case 45: return "A beautiful woman, or so it seems. She calls for you."; // Siren
 		//
 		case 11+NUM_MAP_ENEM+0: return "A large woman wearing cerulean armor. She wears a belt of severed heads, a skirt of blood trailing from them."; // Kali

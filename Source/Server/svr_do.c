@@ -1647,14 +1647,14 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
 		do_char_log(cn, 1, "   Weapon   |   Requirements: |     Gives:     \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skl |  WV | AV | AGL \n");
-		do_char_log(cn, 1, "------------+-----+-----+-----+-----+----+-----\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |   1 |  10 |  1 |   1 \n");
-		do_char_log(cn, 1, "Steel       |  15 |  12 |  16 |  20 |  2 |   2 \n");
-		do_char_log(cn, 1, "Gold        |  25 |  18 |  32 |  30 |  3 |   3 \n");
-		do_char_log(cn, 1, "Emerald     |  40 |  28 |  48 |  40 |  4 |   4 \n");
-		do_char_log(cn, 1, "Crystal     |  60 |  42 |  64 |  50 |  5 |   5 \n");
-		do_char_log(cn, 1, "Titanium    |  85 |  60 |  80 |  60 |  6 |   6 \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skl | WV | CrM | ASp \n");
+		do_char_log(cn, 1, "------------+-----+-----+-----+----+-----+-----\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |   1 | 10 |     |     \n");
+		do_char_log(cn, 1, "Steel       |  15 |  12 |  16 | 20 |   6 |   1 \n");
+		do_char_log(cn, 1, "Gold        |  25 |  18 |  32 | 30 |  12 |   2 \n");
+		do_char_log(cn, 1, "Emerald     |  40 |  28 |  48 | 40 |  18 |   3 \n");
+		do_char_log(cn, 1, "Crystal     |  60 |  42 |  64 | 50 |  24 |   4 \n");
+		do_char_log(cn, 1, "Titanium    |  85 |  60 |  80 | 60 |  30 |   5 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Claws will use both hand slots.\n");
 		do_char_log(cn, 2, "* Claws have a critical hit chance of 3%%.\n");
@@ -1672,10 +1672,10 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
 		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   4 |     \n");
 		do_char_log(cn, 1, "Steel       |  12 |  12 |    10 |   8 |   1 \n");
-		do_char_log(cn, 1, "Gold        |  18 |  14 |    20 |  12 |   1 \n");
-		do_char_log(cn, 1, "Emerald     |  30 |  16 |    30 |  16 |   2 \n");
-		do_char_log(cn, 1, "Crystal     |  48 |  20 |    40 |  20 |   2 \n");
-		do_char_log(cn, 1, "Titanium    |  72 |  24 |    50 |  24 |   3 \n");
+		do_char_log(cn, 1, "Gold        |  18 |  14 |    20 |  12 |   2 \n");
+		do_char_log(cn, 1, "Emerald     |  30 |  16 |    30 |  16 |   3 \n");
+		do_char_log(cn, 1, "Crystal     |  48 |  20 |    40 |  20 |   4 \n");
+		do_char_log(cn, 1, "Titanium    |  72 |  24 |    50 |  24 |   5 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Daggers can be used in the off-hand slot.\n");
 		do_char_log(cn, 0, "* WV is reduced by 25%% in the off-hand slot.\n");
@@ -1708,17 +1708,18 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
 		do_char_log(cn, 1, "   Weapon   |  Requirements:  |     Gives:     \n");
-		do_char_log(cn, 1, "    Tier    | WIL | STR | Skl |  WV | AV | BRV \n");
-		do_char_log(cn, 1, "------------+-----+-----+-----+-----+----+-----\n");
-		do_char_log(cn, 1, "Steel       |  16 |  12 |   8 |  18 |  2 |   4 \n");
-		do_char_log(cn, 1, "Gold        |  22 |  14 |  16 |  27 |  3 |   6 \n");
-		do_char_log(cn, 1, "Emerald     |  34 |  16 |  24 |  36 |  4 |   8 \n");
-		do_char_log(cn, 1, "Crystal     |  52 |  20 |  32 |  45 |  5 |  10 \n");
-		do_char_log(cn, 1, "Titanium    |  76 |  24 |  40 |  54 |  6 |  12 \n");
+		do_char_log(cn, 1, "    Tier    | WIL | STR | Skl | WV | AV,BR,H,P \n");
+		do_char_log(cn, 1, "------------+-----+-----+-----+----+-----------\n");
+		do_char_log(cn, 1, "Steel       |  16 |  12 |   8 | 20 |         2 \n");
+		do_char_log(cn, 1, "Gold        |  22 |  14 |  16 | 30 |         3 \n");
+		do_char_log(cn, 1, "Emerald     |  34 |  16 |  24 | 40 |         4 \n");
+		do_char_log(cn, 1, "Crystal     |  52 |  20 |  32 | 50 |         5 \n");
+		do_char_log(cn, 1, "Titanium    |  76 |  24 |  40 | 60 |         6 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Spears will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Dagger and Staff skills.\n");
-		do_char_log(cn, 2, "* Fighting uses the higher of either skill.\n");
+		do_char_log(cn, 1, "* Fighting uses the higher of either skill.\n");
+		do_char_log(cn, 2, "* Spears have a critical hit chance of 2%%.\n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "4")==0 
@@ -1793,10 +1794,10 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
 		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  10 |     \n");
 		do_char_log(cn, 1, "Steel       |  12 |  14 |    16 |  20 |   1 \n");
-		do_char_log(cn, 1, "Gold        |  18 |  22 |    32 |  30 |   1 \n");
-		do_char_log(cn, 1, "Emerald     |  28 |  34 |    48 |  40 |   2 \n");
-		do_char_log(cn, 1, "Crystal     |  42 |  50 |    64 |  50 |   2 \n");
-		do_char_log(cn, 1, "Titanium    |  60 |  74 |    80 |  60 |   3 \n");
+		do_char_log(cn, 1, "Gold        |  18 |  22 |    32 |  30 |   2 \n");
+		do_char_log(cn, 1, "Emerald     |  28 |  34 |    48 |  40 |   3 \n");
+		do_char_log(cn, 1, "Crystal     |  42 |  50 |    64 |  50 |   4 \n");
+		do_char_log(cn, 1, "Titanium    |  60 |  74 |    80 |  60 |   5 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 
@@ -1807,14 +1808,14 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
 		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | Mlt \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | AGL \n");
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
 		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  12 |     \n");
-		do_char_log(cn, 1, "Steel       |  16 |  12 |    18 |  24 |   5 \n");
-		do_char_log(cn, 1, "Gold        |  26 |  20 |    36 |  36 |  10 \n");
-		do_char_log(cn, 1, "Emerald     |  40 |  32 |    54 |  48 |  15 \n");
-		do_char_log(cn, 1, "Crystal     |  58 |  48 |    72 |  60 |  20 \n");
-		do_char_log(cn, 1, "Titanium    |  80 |  68 |    90 |  72 |  25 \n");
+		do_char_log(cn, 1, "Steel       |  16 |  12 |    18 |  24 |   1 \n");
+		do_char_log(cn, 1, "Gold        |  26 |  20 |    36 |  36 |   2 \n");
+		do_char_log(cn, 1, "Emerald     |  40 |  32 |    54 |  48 |   3 \n");
+		do_char_log(cn, 1, "Crystal     |  58 |  48 |    72 |  60 |   4 \n");
+		do_char_log(cn, 1, "Titanium    |  80 |  68 |    90 |  72 |   5 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Twohanders will use both hand slots.\n");
 		do_char_log(cn, 2, "* Twohanders have a critical hit chance of 2%%.\n");
@@ -1830,15 +1831,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
 		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | Top \n");
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
-		do_char_log(cn, 1, "Steel       |  12 |  14 |    15 |  28 |   2 \n");
-		do_char_log(cn, 1, "Gold        |  20 |  24 |    30 |  42 |   4 \n");
-		do_char_log(cn, 1, "Emerald     |  32 |  40 |    45 |  56 |   6 \n");
-		do_char_log(cn, 1, "Crystal     |  48 |  62 |    60 |  70 |   8 \n");
-		do_char_log(cn, 1, "Titanium    |  68 |  90 |    75 |  84 |  10 \n");
+		do_char_log(cn, 1, "Steel       |  12 |  14 |    15 |  28 |   4 \n");
+		do_char_log(cn, 1, "Gold        |  20 |  24 |    30 |  42 |   6 \n");
+		do_char_log(cn, 1, "Emerald     |  32 |  40 |    45 |  56 |   8 \n");
+		do_char_log(cn, 1, "Crystal     |  48 |  62 |    60 |  70 |  10 \n");
+		do_char_log(cn, 1, "Titanium    |  68 |  90 |    75 |  84 |  12 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Greataxes will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Axe and Two-Handed skills.\n");
-		do_char_log(cn, 2, "* Fighting uses the higher of either skill.\n");
+		do_char_log(cn, 1, "* Fighting uses the higher of either skill.\n");
 		do_char_log(cn, 1, " \n");
 	}
 	else
@@ -1902,12 +1903,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   1 |   3 \n");
 		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   2 |   4 \n");
 		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   3 |   5 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  MSg  |   2 |   5 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  SgM  |   3 |   6 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   4 |   7 \n");
-		do_char_log(cn, 1, "Platinum, Big      | 1Lieu |   3 |   7 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Major |   4 |   8 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Colnl |   5 |   9 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  MSg  |   3 |   7 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  SgM  |   4 |   8 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   5 |   9 \n");
+		do_char_log(cn, 1, "Platinum, Big      | 1Lieu |   5 |  11 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | Major |   6 |  12 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Colnl |   7 |  13 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "1")==0 || strcmp(topic, "SAPPHIRE")==0 || strcmp(topic, "sapphire")==0)
@@ -1921,12 +1922,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
 		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
 		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   4 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   6 |  10 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "2")==0 || strcmp(topic, "RUBY")==0 || strcmp(topic, "ruby")==0)
@@ -1940,17 +1941,17 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
 		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
 		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   4 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   6 |  10 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "3")==0 || strcmp(topic, "AMETHYST")==0 || strcmp(topic, "amethyst")==0)
 	{
-		do_char_log(cn, 1, "Now listing RUBY rings:\n");
+		do_char_log(cn, 1, "Now listing AMETHYST rings:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Intuition \n");
@@ -1959,12 +1960,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
 		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
 		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   4 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   6 |  10 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "4")==0 || strcmp(topic, "TOPAZ")==0 || strcmp(topic, "topaz")==0)
@@ -1978,12 +1979,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
 		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
 		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   4 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   6 |  10 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "5")==0 || strcmp(topic, "EMERALD")==0 || strcmp(topic, "emerald")==0)
@@ -1997,12 +1998,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
 		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
 		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   4 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   6 |  10 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   8 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  12 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "6")==0 || strcmp(topic, "SPINEL")==0 || strcmp(topic, "spinel")==0)
@@ -2013,12 +2014,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Spell Apt \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |  10 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |  12 |  16 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |  16 |  20 \n");
-		do_char_log(cn, 1, "Platinum, Big      | Captn |  12 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  18 |  24 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  24 |  30 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
+		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Captn |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      | Captn |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "7")==0 || strcmp(topic, "CITRINE")==0 || strcmp(topic, "citrine")==0)
@@ -2029,12 +2030,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Crit Mult \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   6 |   9 \n");
-		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |   8 |  12 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |  10 |  14 \n");
-		do_char_log(cn, 1, "Platinum, Big      | Captn |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  12 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  15 |  21 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |  12 |  15 \n");
+		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |  17 |  23 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Captn |  22 |  28 \n");
+		do_char_log(cn, 1, "Platinum, Big      | Captn |  22 |  31 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  29 |  38 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  36 |  45 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 || strcmp(topic, "OPAL")==0 || strcmp(topic, "opal")==0)
@@ -2046,11 +2047,11 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
 		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |   6 |  10 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |   8 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Big      | Captn |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  12 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Captn |   9 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      | Captn |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "9")==0 || strcmp(topic, "AQUAMARINE")==0 || strcmp(topic, "aquamarine")==0)
@@ -2061,12 +2062,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  |  Top Dmg  \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   8 |  11 \n");
-		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |   9 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |  12 |  16 \n");
-		do_char_log(cn, 1, "Platinum, Big      | Captn |  10 |  16 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  14 |  20 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  18 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
+		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |   7 |  13 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Captn |  19 |  15 \n");
+		do_char_log(cn, 1, "Platinum, Big      | Captn |   9 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  12 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  15 |  24 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "10")==0 || strcmp(topic, "BERYL")==0 || strcmp(topic, "beryl")==0)
@@ -2077,9 +2078,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Crit Bonus\n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Major |  30 |  50 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Colnl |  35 |  65 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | MaGen |  45 |  75 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |  18 |  24 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | Major |  24 |  33 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Colnl |  30 |  39 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "11")==0 || strcmp(topic, "ZIRCON")==0 || strcmp(topic, "zircon")==0)
@@ -2090,9 +2091,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  |  Thorns   \n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Major |   4 |   6 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Colnl |   5 |   8 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | MaGen |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   4 |   6 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | Major |   5 |   8 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Colnl |   7 |  10 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else
@@ -2248,9 +2249,9 @@ void do_showkwai(int cn, char *topic)
 	if (!kwai[30]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Empty Outset\n"); }
 	if (!kwai[ 5]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Stronghold, South\n"); }
 	if (!kwai[ 9]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Underground III\n"); }
+	if (!kwai[13]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "The Emerald Cavern\n"); }
 	if (!kwai[29]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Ice Gargoyle Nest\n"); }
 	if (!kwai[16]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Jungle Pentagram Quest\n"); }
-	if (!kwai[13]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "The Emerald Cavern\n"); }
 	if (!kwai[ 6]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Mausoleum XI\n"); }
 	if (!kwai[31]) { m++; if (m<=t && m>n) do_char_log(cn, 1, "Onyx Gargoyle Nest\n"); }
 	//
@@ -3935,7 +3936,8 @@ void do_stat(int cn)
 	            globs->flags & GF_CLOSEENEMY ? "yes" : "no",
 	            globs->flags & GF_CAP ? "yes" : "no",
 	            globs->flags & GF_SPEEDY ? "yes" : "no");
-	do_char_log(cn, 2, "newbs=%s, discord=%s\n",
+	do_char_log(cn, 2, "stronghold=%s, newbs=%s, discord=%s\n",
+				globs->flags & GF_STRONGHOLD ? "yes" : "no",
 	            globs->flags & GF_NEWBS ? "yes" : "no",
 				globs->flags & GF_DISCORD ? "yes" : "no");
 }
@@ -4232,7 +4234,7 @@ void do_spectate(int cn, int co)
 	player[nr].spectating = co;
 	
 	do_char_log(cn, 0, "Now spectating %s. Use /spectate self to return.\n", ch[co].name);
-	if (!IS_GOD(co)) do_char_log(co, 9, "%s is watching you.\n", ch[cn].name);
+	if (!IS_GOD(cn)) do_char_log(co, 9, "%s is watching you.\n", ch[cn].name);
 }
 
 void do_command(int cn, char *ptr)
@@ -5410,6 +5412,12 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
+		if (prefix(cmd, "stronghold") && f_g)
+		{
+			god_set_gflag(cn, GF_STRONGHOLD);
+			return;
+		}
+		;
 		if (prefix(cmd, "summon") && f_g)
 		{
 			god_summon(cn, arg[1], arg[2], arg[3]);
@@ -5811,7 +5819,7 @@ int get_fight_skill(int cn, int skill[50])
 	
 	in = ch[cn].worn[WN_RHAND];
 	
-	if (it[in].temp==IT_TW_HEAVENS || it[in].temp==IT_SEYANSWORD) // Rather than pick the matching skill, pick the highest available one
+	if (it[in].temp==IT_TW_HEAVENS || it[in].orig_temp==IT_SEYANSWORD) // Rather than pick the matching skill, pick the highest available one
 	{
 		m[0] = skill[SK_HAND];
 		m[1] = skill[SK_DAGGER];
@@ -8558,7 +8566,7 @@ void really_update_char(int cn)
 	int attrib_ex[5];
 	int skill[50];
 	unsigned long long prof;
-	int charmSpec = 0, gearSpec = 0, nightSpec = 0, gemSpec = 0;
+	int charmSpec = 0, gearSpec = 0, nightSpec = 0, gemCheck = 0, gemSpec = 0;
 	int in=0;
 	//int speedvalue_a = 0, speedvalue_b = 0, speedvalue_c = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0;
@@ -8632,6 +8640,7 @@ void really_update_char(int cn)
 	damage_top = 0;
 	
 	if (get_gear(cn, IT_TW_MARCH)) gearSpec |= 4;
+	if (get_gear(cn, IT_WP_GEMCUTTER)) gemCheck = 1;
 	
 	// Loop through gear slots
 	for (n = 0; n<20; n++)
@@ -8643,57 +8652,60 @@ void really_update_char(int cn)
 		// Stat bonuses are only awarded outside of no-magic zones
 		if (!(ch[cn].flags & CF_NOMAGIC))
 		{
-			nightSpec = 0;
+			nightSpec = 0; gemSpec = 0;
 			if ((it[m].temp==IT_BL_SOLAR || it[m].temp==IT_BL_LUNAR || it[m].temp==IT_BL_ECLIPSE) && 
 				(globs->mdtime<3600*6 || globs->mdtime>3600*18)) // Night Time
 			{
 				nightSpec = 1;
 			}
-			if (it[m].temp==IT_WP_GEMCUTTER) gemSpec = 1;
+			if ((n == WN_LRING || n == WN_RRING) && gemCheck) // Gemcutter
+			{
+				gemSpec = 1;
+			}
 			
 			// If the item is sparked/active/whatever
 			if (it[m].active || nightSpec)
 			{
 				// Attributes
-				for (z = 0; z<5; z++) attrib[z] += (it[m].attrib[z][1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				for (z = 0; z<5; z++) attrib[z] += (it[m].attrib[z][1])*(gemSpec?7:5)/5;
 				
-				hp   += (it[m].hp[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				end  += (it[m].end[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				mana += (it[m].mana[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				hp   += (it[m].hp[1])*(gemSpec?7:5)/5;
+				end  += (it[m].end[1])*(gemSpec?7:5)/5;
+				mana += (it[m].mana[1])*(gemSpec?7:5)/5;
 				
 				// Skills
-				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][1])*(gemSpec?7:5)/5;
 				
 				// Meta values
-				base_spd   += (((gearSpec&4)&&it[m].speed[1]<0)?it[m].speed[1]*2/3:it[m].speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_move   += (((gearSpec&4)&&it[m].move_speed[1]<0)?it[m].move_speed[1]*2/3:it[m].move_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_attack += (((gearSpec&4)&&it[m].atk_speed[1]<0)?it[m].atk_speed[1]*2/3:it[m].atk_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[1]<0)?it[m].cast_speed[1]*2/3:it[m].cast_speed[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spell_mod  += (it[m].spell_mod[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spell_apt  += (it[m].spell_apt[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spell_cool += (it[m].cool_bonus[1])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				base_spd   += (((gearSpec&4)&&it[m].speed[1]<0)?it[m].speed[1]*2/3:it[m].speed[1])*(gemSpec?7:5)/5;
+				spd_move   += (((gearSpec&4)&&it[m].move_speed[1]<0)?it[m].move_speed[1]*2/3:it[m].move_speed[1])*(gemSpec?7:5)/5;
+				spd_attack += (((gearSpec&4)&&it[m].atk_speed[1]<0)?it[m].atk_speed[1]*2/3:it[m].atk_speed[1])*(gemSpec?7:5)/5;
+				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[1]<0)?it[m].cast_speed[1]*2/3:it[m].cast_speed[1])*(gemSpec?7:5)/5;
+				spell_mod  += (it[m].spell_mod[1])*(gemSpec?7:5)/5;
+				spell_apt  += (it[m].spell_apt[1])*(gemSpec?7:5)/5;
+				spell_cool += (it[m].cool_bonus[1])*(gemSpec?7:5)/5;
 			}
 			// Otherwise, give normal stat boosts
 			else
 			{
 				// Attributes
-				for (z = 0; z<5; z++) attrib[z] += (it[m].attrib[z][0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				for (z = 0; z<5; z++) attrib[z] += (it[m].attrib[z][0])*(gemSpec?7:5)/5;
 				
-				hp   += (it[m].hp[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				end  += (it[m].end[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				mana += (it[m].mana[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				hp   += (it[m].hp[0])*(gemSpec?7:5)/5;
+				end  += (it[m].end[0])*(gemSpec?7:5)/5;
+				mana += (it[m].mana[0])*(gemSpec?7:5)/5;
 				
 				// Skills
-				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				for (z = 0; z<MAXSKILL; z++) skill[z] += (it[m].skill[z][0])*(gemSpec?7:5)/5;
 				
 				// Meta values
-				base_spd   += (((gearSpec&4)&&it[m].speed[0]<0)?it[m].speed[0]*2/3:it[m].speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_move   += (((gearSpec&4)&&it[m].move_speed[0]<0)?it[m].move_speed[0]*2/3:it[m].move_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_attack += (((gearSpec&4)&&it[m].atk_speed[0]<0)?it[m].atk_speed[0]*2/3:it[m].atk_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[0]<0)?it[m].cast_speed[0]*2/3:it[m].cast_speed[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spell_mod  += (it[m].spell_mod[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spell_apt  += (it[m].spell_apt[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
-				spell_cool += (it[m].cool_bonus[0])*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				base_spd   += (((gearSpec&4)&&it[m].speed[0]<0)?it[m].speed[0]*2/3:it[m].speed[0])*(gemSpec?7:5)/5;
+				spd_move   += (((gearSpec&4)&&it[m].move_speed[0]<0)?it[m].move_speed[0]*2/3:it[m].move_speed[0])*(gemSpec?7:5)/5;
+				spd_attack += (((gearSpec&4)&&it[m].atk_speed[0]<0)?it[m].atk_speed[0]*2/3:it[m].atk_speed[0])*(gemSpec?7:5)/5;
+				spd_cast   += (((gearSpec&4)&&it[m].cast_speed[0]<0)?it[m].cast_speed[0]*2/3:it[m].cast_speed[0])*(gemSpec?7:5)/5;
+				spell_mod  += (it[m].spell_mod[0])*(gemSpec?7:5)/5;
+				spell_apt  += (it[m].spell_apt[0])*(gemSpec?7:5)/5;
+				spell_cool += (it[m].cool_bonus[0])*(gemSpec?7:5)/5;
 			}
 			
 			if (it[m].temp==IT_CH_PREIST || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_PREIST)) 	charmSpec |=    1;
@@ -8724,7 +8736,7 @@ void really_update_char(int cn)
 			if (it[m].temp==IT_BOOK_HOLY)		gearSpec  |=  512;
 		}
 		
-		critical_b += it[m].base_crit*(((n==10||n==11)&&gemSpec)?7:6)/6;
+		critical_b += it[m].base_crit*(gemSpec?7:5)/5;
 		
 		if (it[m].temp == IT_TW_BBELT)
 		{
@@ -8749,85 +8761,85 @@ void really_update_char(int cn)
 		// Regular item bonuses
 		if (it[m].active)
 		{
-			armor  += it[m].armor[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			armor  += it[m].armor[1]*(gemSpec?7:5)/5;
 			
 			// Special case for Templars with Dual Swords...
 			if ((it[m].flags & IF_OF_DUALSW) &&	IS_ANY_TEMP(cn))
 			{
-				weapon += it[m].weapon[1]/2*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].weapon[1]/2*(gemSpec?7:5)/5;
 			}
 			else if (n == WN_LHAND && (it[m].flags & IF_WP_DAGGER)) // ...and daggers...
 			{
-				weapon += it[m].weapon[1]/4*3*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].weapon[1]/4*3*(gemSpec?7:5)/5;
 			}
 			else if (n == WN_RHAND && (it[m].flags & IF_OF_SHIELD)) // Special case for AT dual shield memes
 			{
-				weapon += it[m].armor[1]*2*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].armor[1]*2*(gemSpec?7:5)/5;
 			}
 			else
 			{
-				weapon += it[m].weapon[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].weapon[1]*(gemSpec?7:5)/5;
 			}
 			
-			gethit += it[m].gethit_dam[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			gethit += it[m].gethit_dam[1]*(gemSpec?7:5)/5;
 			
-			maxlight += it[m].light[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			maxlight += it[m].light[1]*(gemSpec?7:5)/5;
 			if (it[m].light[1]>light)
 			{
-				light = it[m].light[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				light = it[m].light[1]*(gemSpec?7:5)/5;
 			}
 			else if (it[m].light[1]<0)
 			{
-				sublight -= it[m].light[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				sublight -= it[m].light[1]*(gemSpec?7:5)/5;
 			}
 			
 			// Meta values
-			critical_c += it[m].crit_chance[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			critical_m += it[m].crit_multi[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			hit_rate   += it[m].to_hit[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			parry_rate += it[m].to_parry[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			damage_top += it[m].top_damage[1]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			critical_c += it[m].crit_chance[1]*(gemSpec?7:5)/5;
+			critical_m += it[m].crit_multi[1]*(gemSpec?7:5)/5;
+			hit_rate   += it[m].to_hit[1]*(gemSpec?7:5)/5;
+			parry_rate += it[m].to_parry[1]*(gemSpec?7:5)/5;
+			damage_top += it[m].top_damage[1]*(gemSpec?7:5)/5;
 		}
 		else
 		{
-			armor  += it[m].armor[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			armor  += it[m].armor[0]*(gemSpec?7:5)/5;
 			
 			// Special case for Templars with Dual Swords...
 			if ((it[m].flags & IF_OF_DUALSW) && IS_ANY_TEMP(cn) && it[m].temp != IT_WP_FELLNIGHT)
 			{
-				weapon += it[m].weapon[0]/2*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].weapon[0]/2*(gemSpec?7:5)/5;
 			}
 			else if (n == WN_LHAND && (it[m].flags & IF_WP_DAGGER)) // ...and daggers...
 			{
-				weapon += it[m].weapon[0]/4*3*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].weapon[0]/4*3*(gemSpec?7:5)/5;
 			}
 			else if (n == WN_RHAND && (it[m].flags & IF_OF_SHIELD)) // Special case for AT dual shield memes
 			{
-				weapon += it[m].armor[0]*2*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].armor[0]*2*(gemSpec?7:5)/5;
 			}
 			else
 			{
-				weapon += it[m].weapon[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				weapon += it[m].weapon[0]*(gemSpec?7:5)/5;
 			}
 			
-			gethit += it[m].gethit_dam[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			gethit += it[m].gethit_dam[0]*(gemSpec?7:5)/5;
 			
-			maxlight += it[m].light[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			maxlight += it[m].light[0]*(gemSpec?7:5)/5;
 			if (it[m].light[0]>light)
 			{
-				light = it[m].light[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				light = it[m].light[0]*(gemSpec?7:5)/5;
 			}
 			else if (it[m].light[0]<0)
 			{
-				sublight -= it[m].light[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+				sublight -= it[m].light[0]*(gemSpec?7:5)/5;
 			}
 			
 			// Meta values
-			critical_c += it[m].crit_chance[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			critical_m += it[m].crit_multi[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			hit_rate   += it[m].to_hit[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			parry_rate += it[m].to_parry[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
-			damage_top += it[m].top_damage[0]*(((n==10||n==11)&&gemSpec)?7:6)/6;
+			critical_c += it[m].crit_chance[0]*(gemSpec?7:5)/5;
+			critical_m += it[m].crit_multi[0]*(gemSpec?7:5)/5;
+			hit_rate   += it[m].to_hit[0]*(gemSpec?7:5)/5;
+			parry_rate += it[m].to_parry[0]*(gemSpec?7:5)/5;
+			damage_top += it[m].top_damage[0]*(gemSpec?7:5)/5;
 		}
 	}
 	// Feb 2020 - Store the current armor and weapon values from your gear, before other additions.
@@ -9219,10 +9231,10 @@ void really_update_char(int cn)
 		ch[].speed value
 	*/
 	
-	// Weapon - Kelp Trident :: +10 speed while underwater
+	// Weapon - Kelp Trident :: +30 speed while underwater
 	if ((gearSpec & 16) && (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER))
 	{
-		base_spd += 10;
+		base_spd += 30;
 	}
 	
 	base_spd = 120 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 6 + ch[cn].speed_mod;
@@ -9401,7 +9413,7 @@ void really_update_char(int cn)
 		so that precision can have a more consistant effect.
 	*/
 	
-	critical_c += attrib_ex[AT_BRV];
+	critical_c += attrib_ex[AT_BRV]*5/2;
 	
 	critical_b *= 100;
 	
@@ -9438,20 +9450,20 @@ void really_update_char(int cn)
 	/*
 		ch[].crit_multi value
 		
-		Base crit multiplier is 1.25x
+		Base crit multiplier is 1.20x
 	*/
 	
-	critical_m += 25 + ava_mult;
+	critical_m += 20 + ava_mult;
 	
 	if (B_SK(cn, SK_PRECISION))
 	{
 		critical_m += skill[SK_PRECISION]/10;
 	}
 	
-	// Weapon - Gildshine :: A third of Bartering is granted as crit multi
+	// Weapon - Gildshine :: Bartering is granted as crit multi
 	if (gearSpec & 8) 
 	{
-		critical_m += min(AT_CAP/3, skill[SK_BARTER]/3);
+		critical_m += min(AT_CAP, skill[SK_BARTER]);
 	}
 	
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
@@ -10022,7 +10034,7 @@ void do_regenerate(int cn)
 		{
 			if (bu[in].flags & IF_PERMSPELL || bu[in].temp==206)
 			{
-				if (bu[in].temp==206 && !(bu[in].flags & IF_PERMSPELL))
+				if (bu[in].temp==206 && !IS_IN_SUN(ch[cn].x, ch[cn].y))
 					bu[in].active--;
 				
 				if (bu[in].hp[0]!=-1)
@@ -10037,6 +10049,12 @@ void do_regenerate(int cn)
 				{
 					ch[cn].a_mana += bu[in].mana[0];
 				}
+				if (ch[cn].a_hp<1000 && bu[in].hp[0] && bu[in].temp==SK_RAGE)
+				{
+					ch[cn].a_hp = 1000;
+					bu[in].active = 0;
+					chlog(cn, "%s ran out due to lack of hitpoints.", it[in].name);
+				}
 				if (ch[cn].a_hp<500)
 				{
 					if (try_lucksave(cn))
@@ -10045,7 +10063,7 @@ void do_regenerate(int cn)
 					}
 					else
 					{
-						chlog(cn, "killed by spell: %s", bu[in].name);
+						chlog(cn, "killed by: %s", bu[in].name);
 						do_char_log(cn, 0, "The %s killed you!\n", bu[in].name);
 						do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "The %s killed %s.\n", bu[in].name, ch[cn].reference);
 						do_char_killed(0, cn, 0);
@@ -10058,7 +10076,7 @@ void do_regenerate(int cn)
 					if (bu[in].temp != 206)
 					{
 						bu[in].active = 0;
-						chlog(cn, "%s ran out due to lack of endurance", it[in].name);
+						chlog(cn, "%s ran out due to lack of endurance.", it[in].name);
 					}
 				}
 				if (ch[cn].a_mana<500)
@@ -10067,7 +10085,7 @@ void do_regenerate(int cn)
 					if (bu[in].temp != 206)
 					{
 						bu[in].active = 0;
-						chlog(cn, "%s ran out due to lack of mana", it[in].name);
+						chlog(cn, "%s ran out due to lack of mana.", it[in].name);
 					}
 				}
 			}

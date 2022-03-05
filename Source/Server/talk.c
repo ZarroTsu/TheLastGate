@@ -165,6 +165,7 @@ struct know
 
 // "Area" Numbers
 #define AR_GENERAL		  0
+#define AR_THRALL		 99
 //}
 //{ Lynbore
 #define AR_LYNBOR	 	100		// locations in Lynbore
@@ -1123,10 +1124,13 @@ struct know know[] = {
 	{{"!danger", "?south", "!swamp",       "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHO  ,   0},
 	{{"!tell",   "?south", "!swamp",       "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHO  ,   0},
 	{{"!who",    "?south", "!swamp",       "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHO  ,   0},
-	{{"!what",   "?ratling", "!eye",       "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHAT ,   0},
-	{{"!tell","?about","?ratling", "!eye", "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHAT ,   0},
+	{{"!what",   "?rattan", "!bo",         "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHAT ,   0},
+	{{"!tell","?about","?rattan", "!bo",   "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHAT ,   0},
+	{{"!what",   "!staff",                 "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHAT ,   0},
+	{{"!tell","?about","!staff",           "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHAT ,   0},
 	{{"!where",  "?south", "!swamp",       "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHER ,   0},
-	{{"!why", "?want", "?ratling", "!eye", "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHY  ,   0},
+	{{"!why", "?want", "?rattan", "!bo",   "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHY  ,   0},
+	{{"!why", "?want", "!staff",           "?", NULL},   0, AR_SWAMP ,   0, AN_SWAMP_WHY  ,   0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_MOUNT 
 	{{"!danger", "?north", "!mountain",    "?", NULL},   0, AR_MOUNT ,   0, AN_MOUNT_WHO  ,   0},
 	{{"!tell",   "?north", "!mountain",    "?", NULL},   0, AR_MOUNT ,   0, AN_MOUNT_WHO  ,   0},
@@ -1506,6 +1510,14 @@ struct know know[] = {
 	{{"!passive",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_PASSIVE},
 	{{"!offense",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_OFFENSE},
 	
+	// Thrall commands
+	{{"!move","!north",	NULL},	0,	AR_THRALL,	0,	NULL, 	SP_MOVE_N},
+	{{"!move","!east",	NULL},	0,	AR_THRALL,	0,	NULL, 	SP_MOVE_E},
+	{{"!move","!south",	NULL},	0,	AR_THRALL,	0,	NULL, 	SP_MOVE_S},
+	{{"!move","!west",	NULL},	0,	AR_THRALL,	0,	NULL, 	SP_MOVE_W},
+	{{"!move",			NULL},	0,	AR_THRALL,  0, 	NULL, 	SP_MOVE},
+	{{"!follow",		NULL},	0,	AR_THRALL,  0, 	NULL, 	SP_FOLLOW},
+	
 	// Riddle Stuff
 	{{"!riddle",	NULL},	10,	AR_LAB_RIDDLE1, 	899, 	AN_RIDDLE, 	0},
 	{{"!riddle",	NULL},	10,	AR_LAB_RIDDLE2, 	905, 	AN_RIDDLE, 	0},
@@ -1603,7 +1615,7 @@ void answer_follow(int cn, int co)
 		ch[cn].data[69] = co;
 		ch[cn].data[29] = 0;
 
-		do_sayx(cn, "Yes, %s!", ch[co].name);
+		if (!(ch[cn].flags & CF_THRALL)) do_sayx(cn, "Yes, %s!", ch[co].name);
 	}
 }
 
@@ -1682,24 +1694,49 @@ void answer_move(int cn, int co, int dir)
 		
 		if (dir)
 		{
-			switch (dir)
+			if (ch[cn].flags & CF_THRALL) // Thrall movement
 			{
-				case 1: // North
-					ch[cn].goto_x = ch[cn].x-2;
-					ch[cn].goto_y = ch[cn].y;
-					break;
-				case 2: // East
-					ch[cn].goto_x = ch[cn].x;
-					ch[cn].goto_y = ch[cn].y+2;
-					break;
-				case 3: // South
-					ch[cn].goto_x = ch[cn].x+2;
-					ch[cn].goto_y = ch[cn].y;
-					break;
-				case 4: // West
-					ch[cn].goto_x = ch[cn].x;
-					ch[cn].goto_y = ch[cn].y-2;
-					break;
+				switch (dir)
+				{
+					case 1: // North
+						ch[cn].goto_x = ch[cn].x-10;
+						ch[cn].goto_y = ch[cn].y;
+						break;
+					case 2: // East
+						ch[cn].goto_x = ch[cn].x;
+						ch[cn].goto_y = ch[cn].y+10;
+						break;
+					case 3: // South
+						ch[cn].goto_x = ch[cn].x+10;
+						ch[cn].goto_y = ch[cn].y;
+						break;
+					case 4: // West
+						ch[cn].goto_x = ch[cn].x;
+						ch[cn].goto_y = ch[cn].y-10;
+						break;
+				}
+			}
+			else // Standard GC movement
+			{
+				switch (dir)
+				{
+					case 1: // North
+						ch[cn].goto_x = ch[cn].x-2;
+						ch[cn].goto_y = ch[cn].y;
+						break;
+					case 2: // East
+						ch[cn].goto_x = ch[cn].x;
+						ch[cn].goto_y = ch[cn].y+2;
+						break;
+					case 3: // South
+						ch[cn].goto_x = ch[cn].x+2;
+						ch[cn].goto_y = ch[cn].y;
+						break;
+					case 4: // West
+						ch[cn].goto_x = ch[cn].x;
+						ch[cn].goto_y = ch[cn].y-2;
+						break;
+				}
 			}
 		}
 		else
@@ -1708,7 +1745,7 @@ void answer_move(int cn, int co, int dir)
 			ch[cn].goto_y = ch[cn].y + 4 - RANDOM(9);
 		}
 		
-		do_sayx(cn, "Yes master %s!", ch[co].name);
+		if (!(ch[cn].flags & CF_THRALL)) do_sayx(cn, "Yes master %s!", ch[co].name);
 	}
 }
 
@@ -2064,7 +2101,7 @@ int casino_hroll_dice(int co, int flag)
 				do_char_log(co, 2, "Good guess!\n");
 				do_char_log(co, 1, "The pot was increased by %2d.%dx\n", v/10, v%10);
 				p = p * v / 10;
-				if (v < 30) v++;
+				if (v < 50) v+=2;
 				ch[co].data[27] = p | (v<<16);
 			}
 			else
@@ -2260,7 +2297,7 @@ int casino_seyes_score(int co)
 	{
 		do_char_log(co, 1, " \n");
 		do_char_log(co, 2, "You beat the dealer! You win!\n");
-		casino_win(co, C_CUR_WAGER(co)*25);
+		casino_win(co, C_CUR_WAGER(co)*50);
 		return 1;
 	}
 	else if (d >= 100)
@@ -2468,12 +2505,12 @@ int casino_bjack_winlose(int co, int stand)
 		if (get_card_total(co, 26) > get_card_total(co, 27))		// Player high
 		{
 			do_char_log(co, 2, "You beat the dealer! You win!\n");
-			casino_win(co, C_CUR_WAGER(co)*20);
+			casino_win(co, C_CUR_WAGER(co)*30);
 		}
 		else if (get_card_total(co, 27) > 21)						// Dealer busts
 		{
 			do_char_log(co, 2, "The dealer busts! You win!\n");
-			casino_win(co, C_CUR_WAGER(co)*20);
+			casino_win(co, C_CUR_WAGER(co)*30);
 		}
 		else if (get_card_total(co, 26) < get_card_total(co, 27))	// Dealer high
 		{
@@ -2524,7 +2561,7 @@ void casino_bjack(int cn, int co, int nr)
 				{
 					do_char_log(co, 2, "You got a Blackjack! Congratulatons!\n");
 					do_area_log(co, 0, ch[cn].x, ch[cn].y, 1, "%s got a Blackjack!\n", ch[co].name);
-					casino_win(co, C_CUR_WAGER(co)*25);
+					casino_win(co, C_CUR_WAGER(co)*50);
 				}
 				else
 				{

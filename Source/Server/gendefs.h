@@ -6,12 +6,12 @@
 
  **************************************************************************/
 
-#define VERSION				0x000803
-#define MINVERSION			0x000802
+#define VERSION				0x000805
+#define MINVERSION			0x000805
 
 #define DATDIR				".dat"
 
-#define TICKS				18
+#define TICKS				20
 #define TICK				(1000000/TICKS)
 
 #define MAPX				1024
@@ -23,7 +23,7 @@
 #define MAXMISSION			1024
 #define MAXSKILL			  50
 #define MAXBUFFS			  40
-#define MAXWPS				  20
+#define MAXWPS				  24
 
 #define MAXTCHARS			4548
 #define MAXTITEM			4548
@@ -265,7 +265,7 @@
 #define SP_DUR_WARCRY		( TICKS * 60                      )
 #define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
-#define SP_DUR_SHADOW(a)	( TICKS * 15 + TICKS * a / 5      )
+#define SP_DUR_SHADOW(a)	( TICKS * 20 + TICKS * a / 5      )
 #define SP_DUR_BLEED		( TICKS * 15                      )
 #define SP_DUR_WEAKEN		( TICKS * 60                      )
 #define SP_DUR_RAGE			( TICKS * 60 * 60 * 2             )

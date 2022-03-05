@@ -618,9 +618,9 @@ int get_use_mana(int spell)
 		case SK_CLEAVE:
 		case SK_LEAP:
 		case SK_WARCRY:
-			return 1;
-		default:
 			return 0;
+		default:
+			return 1;
 	}
 }
 
@@ -1563,7 +1563,7 @@ int get_target_resistance(int cn, int co)
 	
 	// Lethargy - penetrate
 	if (in = has_buff(cn, SK_LETHARGY))
-		target_resist -= bu[in].power/4;
+		target_resist -= bu[in].power/3;
 	
 	return max(1, target_resist);
 }
@@ -2730,7 +2730,7 @@ void skill_poison(int cn)
 	
 	if (get_tarot(cn, IT_CH_TOWER_R)) d20 = SP_MULT_POISON2;
 	
-	if (IS_PLAYER(cn) && IS_SORCERER(cn)) 
+	if (IS_PLAYER(cn) && IS_ANY_MERC(cn)) 
 	{
 		cost /= 2;
 	}
@@ -2854,7 +2854,7 @@ void skill_warcry(cn)
 	double _cap, tmpa;
 	
 	power = M_SK(cn, SK_WARCRY);
-	aoe_power = M_SK(cn, SK_PROX);
+	aoe_power = M_SK(cn, SK_WARCRY);
 	cost = SP_COST_WARCRY;
 	
 	if (is_exhausted(cn)) { return; }
@@ -2885,16 +2885,20 @@ void skill_warcry(cn)
 		
 		for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch) /*&& co!=cn*/)
 		{
-			// This makes the radius circular instead of square
-			if (sqr(xc - x) + sqr(yc - y) > (sqr(tmpa/100) + 1))
+			if (co != cn)
 			{
-				continue;
+				// This makes the radius circular instead of square
+				if (sqr(xc - x) + sqr(yc - y) > (sqr(tmpa/100) + 1))
+				{
+					continue;
+				}
+				if ((IS_PLAYER(cn) && (!IS_PLAYER(co) || !IS_PLAYER_COMP(co))) || 
+					!IS_PLAYER(cn) && (IS_PLAYER(co) || IS_PLAYER_COMP(co))) continue;
+				if (IS_PURPLE(cn) && IS_PURPLE(co)) continue;
+				if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) continue;
+				m2 = XY2M(ch[co].x, ch[co].y);
+				if (map[m1].flags & map[m2].flags & MF_ARENA) continue;
 			}
-			if ((IS_PLAYER(cn) && !IS_PLAYER(co)) || !IS_PLAYER(cn) && IS_PLAYER(co)) continue;
-			if (IS_PURPLE(cn) && IS_PURPLE(co)) continue;
-			if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) continue;
-			m2 = XY2M(ch[co].x, ch[co].y);
-			if (map[m1].flags & map[m2].flags & MF_ARENA) continue;
 			
 			spell_rally(cn, co, cn==co?power*3/4:power);
 		}
@@ -5217,12 +5221,12 @@ int spell_rage(int cn, int co, int power)
 	if (get_tarot(co, IT_CH_HERMIT_R))
 	{
 		bu[in].weapon[1]      = power/3 + 1;
-		bu[in].hp[0]          = -50;
+		bu[in].hp[0]          = -100;
 	}
 	else
 	{
 		bu[in].weapon[1]      = power/4 + 1;
-		bu[in].end[0]         = -25;
+		bu[in].end[0]         = -50;
 	}
 	bu[in].data[4]        = 1; // Effects not removed by NMZ (SK_RAGE)
 	bu[in].flags |= IF_PERMSPELL;
@@ -5255,7 +5259,7 @@ int spell_lethargy(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_LETHARGY, BUF_SPR_LETHARGY, power, SP_DUR_LETHARGY, 1))) 
 		return 0;
 	
-	bu[in].mana[0] = -50;
+	bu[in].mana[0] = -75;
 	bu[in].flags |= IF_PERMSPELL;
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_LETHARGY

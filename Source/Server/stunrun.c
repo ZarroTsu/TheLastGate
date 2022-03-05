@@ -58,21 +58,21 @@
 #define GROLMY_Y_5	511
 
 
-// Top left corner of outer door area
-#define SEAGROLMY_X_1	311
-#define SEAGROLMY_Y_1	262
+// Top left corner of outer door area - can be a wall, can contain a wall
+#define SEAGROLMY_X_1	309
+#define SEAGROLMY_Y_1	261
 
-// Bottom right corner of outer door area
-#define SEAGROLMY_X_2	314
+// Bottom right corner of outer door area - this outer door coord is checked for a player. No player means we can leave.
+#define SEAGROLMY_X_2	317
 #define SEAGROLMY_Y_2	271
 
 // Far wander point A
-#define SEAGROLMY_X_3	319
-#define SEAGROLMY_Y_3	241
+#define SEAGROLMY_X_3	345
+#define SEAGROLMY_Y_3	284
 
 // Far wander point B
-#define SEAGROLMY_X_4	320
-#define SEAGROLMY_Y_4	242
+#define SEAGROLMY_X_4	346
+#define SEAGROLMY_Y_4	285
 
 // Home on rug
 #define SEAGROLMY_X_5	313
@@ -258,6 +258,7 @@ int npc_check_target(int x, int y)
 	return 1;
 }
 
+/*
 int npc_is_stunned(int cn)
 {
 	int n, in;
@@ -297,6 +298,7 @@ int npc_is_blessed(int cn)
 
 	return 0;
 }
+*/
 
 struct seen
 {
@@ -340,9 +342,9 @@ int npc_stunrun_high(int cn)
 				seen[maxseen].co = co;
 				seen[maxseen].dist = npc_dist(cn, co);
 				seen[maxseen].friend = 0;
-				if (!npc_is_stunned(co))
+				if (!has_buff(co, SK_SLOW))
 				{
-					seen[maxseen].stun = (M_SK(cn, SK_SLOW) * 12>get_target_resistance(cn, co) * 10);
+					seen[maxseen].stun = (M_SK(cn, SK_SLOW) * SP_MULT_SLOW / max(1, get_target_resistance(cn, co)) > 5);
 				}
 				else
 				{
@@ -423,7 +425,7 @@ int npc_stunrun_high(int cn)
 			seen[maxseen].co = co;
 			seen[maxseen].dist = npc_dist(cn, co);
 			seen[maxseen].friend = 0;
-			seen[maxseen].stun = (M_SK(cn, SK_SLOW) * 12>get_target_resistance(cn, co) * 10);
+			seen[maxseen].stun = (M_SK(cn, SK_SLOW) * SP_MULT_SLOW / max(1, get_target_resistance(cn, co)) > 5);
 			if (seen[maxseen].stun)
 			{
 				seen[maxseen].stun += 5;
@@ -464,12 +466,12 @@ int npc_stunrun_high(int cn)
 	ch[cn].misc_action = 0;
 	ch[cn].cerrno = 0;
 
-	if (ch[cn].a_hp<ch[cn].hp[5] * 666)
+	if (ch[cn].a_hp<ch[cn].hp[5] * 600)
 	{
 		flee += 5;
 	}
 
-	if (!done && ch[cn].a_hp<ch[cn].hp[5] * 666)
+	if (!done && ch[cn].a_hp<ch[cn].hp[5] * 600)
 	{
 		done = npc_try_spell(cn, cn, SK_HEAL);
 	}
@@ -771,7 +773,7 @@ int npc_stunrun_high(int cn)
 		{
 			if (seen[n].help>tmp || (seen[n].help && seen[n].help==tmp && seen[n].dist<seen[m].dist))
 			{
-				if (!npc_is_blessed(seen[n].co) || ch[seen[n].co].a_hp<ch[seen[n].co].hp[5] * 400)
+				if (!has_buff(seen[n].co, SK_BLESS) || ch[seen[n].co].a_hp<ch[seen[n].co].hp[5] * 400)
 				{
 					tmp = seen[n].help;
 					m = n;

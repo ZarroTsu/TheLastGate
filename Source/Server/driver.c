@@ -25,7 +25,7 @@
    20-23:  doors to close
    24:     prevent fight mode, -1=defend evil, 0=no interference, 1=defend good
    25:     special driver
-			1: Grolmy
+			1: Grolmy, SeaGrolmy or Timid enemy
 			2: City-attack BS raid npc
 			3: Malte
 			4: Shiva
@@ -40,7 +40,7 @@
 			 12 : Lab 12 lord -- spawns helpers when they gain 1 healing sickness stack
 			 13 : Lizard Emperor - Does some fancy shenanigans
 			 14 : Shiva II - Much simplier than Shiva I, just summons monsters occasionally.
-			 15 : Sea Grolmy - used to check between this and normal grolmy
+			 15 : SeaGrolmy - used to check between this and normal grolmy
 			 20 : Tower XX - Lock doors
 			 30 : Abyss  X - Lock doors
 			10X : BS Tier 1
@@ -161,12 +161,25 @@ int npc_dist(int cn, int co)
 	return(max(abs(ch[cn].x - ch[co].x), abs(ch[cn].y - ch[co].y)));
 }
 
+// Enemy [cn] adds [co] to their kill list
 int npc_add_enemy(int cn, int co, int always)
 {
 	int n, idx, d1, d2, cc;
 
 	// don't attack anyone of the same group. Never, never, never.
 	if (ch[cn].data[CHD_GROUP]==ch[co].data[CHD_GROUP])
+	{
+		return 0;
+	}
+	
+	// Thralled enemies ignore other enemies and vice versa
+	if (ch[cn].data[CHD_GROUP]==65500 || ch[co].data[CHD_GROUP]==65500)
+	{
+		return 0;
+	}
+	
+	// Thralled enemies always ignore their enthraller
+	if (ch[cn].data[CHD_GROUP]==65500 && co == ch[cn].data[CHD_MASTER])
 	{
 		return 0;
 	}
@@ -3021,6 +3034,8 @@ void stronghold_mage_driver(int cn)
 	int pinline = 0;
 	char buf[80];
 	
+	if (!(globs->flags & GF_STRONGHOLD)) return;
+	
 	if (ch[cn].temp==CT_BSMAGE1) magenum = 1;
 	if (ch[cn].temp==CT_BSMAGE2) magenum = 2;
 	if (ch[cn].temp==CT_BSMAGE3) magenum = 3;
@@ -3686,6 +3701,8 @@ void stronghold_mage_driver_ver2(int cn)
 	int spawnX, spawnY, magenum=0, groupnum=601, spawnT = 347;
 	int p=0, n, m, j, in=0, co=0;
 	int cw[4] = {0};
+	
+	if (!(globs->flags & GF_STRONGHOLD)) return;
 	
 	/*
 		Mage driver data will carry references to pass along to cityattack.c

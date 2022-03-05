@@ -15,11 +15,11 @@
 //#define DOCONVERT	// enable sprite packer
 
 #define TICKMULTI		2
-#define TICKS			(18*TICKMULTI)
+#define TICKS			(24*TICKMULTI)
 
 #define MAXSKILL		(50+2)	// must match server!
 #define MAXBUFFS		40		// must match server!
-#define MAXWPS			20
+#define MAXWPS			24
 
 // -------- Damage Multipliers -------- //
 

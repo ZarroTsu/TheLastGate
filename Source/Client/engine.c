@@ -568,8 +568,12 @@ struct wpslist wpslist[MAXWPS]={
 	{  4, "Aston, West", 					"\"The Strange Forest.\"" },
 	{  5, "Aston, East", 					"\"The Autumn Meadow.\"" },
 	{  6, "Forgotten Canyon", 				"\"Old secrets echo.\"" },
+	{ 20, "Lizard Temple, South", 			"\"Where reptiles implore.\"" },
 	{  7, "Lizard Temple, North", 			"\"The Beryl Jungle.\"" },
+	{ 21, "Lizard Settlement, East", 		"\"Betwixt emerald and magma.\"" },
+	{ 22, "The Emerald Cavern, East", 		"\"A feudal audience.\"" },
 	{  8, "Temple of Osiris", 				"\"Gods toy with greed.\"" },
+	{ 23, "The Tower", 						"\"Sky-piercing obelisk.\"" },
 	{  9, "Neiseer, West", 					"\"The Basalt Desert.\"" },
 	{ 10, "Neiseer", 						"\"Twilit stars sing sweetly.\"" },
 	{ 11, "Neiseer, North", 				"\"The Burning Plains.\"" },
@@ -1775,11 +1779,12 @@ void eng_display_win(int plr_sprite,int init)
 			//wps_pos
 			for (n=0; n<8; n++) {
 				m=n+wps_pos;
+				pr = wpslist[m].nr;
 				if (hightlight==HL_WAYPOINT && hightlight_sub==n)
-					copyspritex((pl.waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
+					copyspritex((pl.waypoints&(1<<pr))?4500+pr:4533+pr,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
 				else
-					copyspritex((pl.waypoints&(1<<m))?4500+m:4533+m,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
-				if (pl.waypoints&(1<<m))
+					copyspritex((pl.waypoints&(1<<pr))?4500+pr:4533+pr,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
+				if (pl.waypoints&(1<<pr))
 				{
 					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,wpslist[m].name);
 					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,wpslist[m].desc);
@@ -2079,7 +2084,7 @@ void eng_display(int init)	// optimize me!!!!!
 					} 
 					
 					else if (map[m].obj1==598 && (
-						(pl.waypoints&(1<< 0) && map[m].back==1002) ||
+						(pl.waypoints&(1<< 0) && map[m].back==1002) ||		// waypoint floor hacks - set by server build.c
 						(pl.waypoints&(1<< 1) && map[m].back==1008) ||
 						(pl.waypoints&(1<< 2) && map[m].back==1013) ||
 						(pl.waypoints&(1<< 3) && map[m].back==1034) ||
@@ -2098,7 +2103,11 @@ void eng_display(int init)	// optimize me!!!!!
 						(pl.waypoints&(1<<16) && map[m].back==1006) ||
 						(pl.waypoints&(1<<17) && map[m].back==1007) ||
 						(pl.waypoints&(1<<18) && map[m].back== 402) ||
-						(pl.waypoints&(1<<19) && map[m].back== 500)
+						(pl.waypoints&(1<<19) && map[m].back== 500) ||
+						(pl.waypoints&(1<<20) && map[m].back== 520) ||
+						(pl.waypoints&(1<<21) && map[m].back== 531) ||
+						(pl.waypoints&(1<<22) && map[m].back== 542) ||
+						(pl.waypoints&(1<<23) && map[m].back== 551)
 					))
 					{
 						// display waypoints as "lit" if you have that flag.
@@ -2803,6 +2812,9 @@ int speedstep(int n,int d,int s,int update)
 	int z,m;
 
 	speed=map[n].ch_speed - map[n].ch_movespd;
+	if (speed < 0) speed = 0;
+	if (speed > 299) speed = 299;
+	
 	hard_step=map[n].ch_status-d;
 
 	if (!update) return 32*hard_step/s;

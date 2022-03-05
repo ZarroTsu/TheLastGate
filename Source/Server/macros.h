@@ -246,3 +246,6 @@
 #define CFL_00020000	"  Players are fragile, reducing WV and AV\n"
 #define CFL_00080000	"  Players are hyperthermic, draining EN and MP\n"
 #define CFL_00040000	"  Players are stigmatic, reducing perception\n"
+
+
+#define IS_IN_SUN(x, y) ((x>=32 && y>=407 && x<=57 && y<= 413) || (x>=32 && y>=414 && x<=64 && y<= 428) || (x>=22 && y>=429 && x<=64 && y<=450) || (x>=22 && y>=451 && x<=27 && y<=459) || (x>=59 && y>=451 && x<=64 && y<=465) || (x>=173 && y>=921 && x<=255 && y<=1003))

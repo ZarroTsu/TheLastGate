@@ -64,17 +64,17 @@ void step_desertfloor(int cn)
 	if (n==MAXBUFFS)
 	{
 		in2 = god_create_buff();
-
+		
 		strcpy(bu[in2].name, "Heatstroke");
 		strcpy(bu[in2].reference, "heatstroke");
 		strcpy(bu[in2].description, "Heatstroke.");
-
-		bu[in2].hp[0] = bu[in2].end[0] = bu[in2].mana[0] = -100;
-		bu[in2].active = bu[in2].duration = 1;
-		bu[in2].flags  = IF_SPELL | IF_PERMSPELL;
+		
 		bu[in2].temp = 206;
+		bu[in2].flags = IF_SPELL;
 		bu[in2].sprite[1] = BUF_SPR_HEATSTR;
-
+		bu[in2].hp[0] = bu[in2].end[0] = bu[in2].mana[0] = -100;
+		bu[in2].active = bu[in2].duration = TICKS*15;
+		
 		if (add_spell(cn, in2) && !alreadyhave) 
 			do_char_log(cn, 0, "The heat is making you dizzy...\n");
 	}
@@ -189,17 +189,12 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			}
 		}
 		// Heatstroke for lab 6 & Volcano
-		else if (
-			(ch[cn].x>=  32 && ch[cn].y>= 407 && ch[cn].x<=  57 && ch[cn].y<= 413) ||
-			(ch[cn].x>=  32 && ch[cn].y>= 414 && ch[cn].x<=  64 && ch[cn].y<= 428) ||
-			(ch[cn].x>=  22 && ch[cn].y>= 429 && ch[cn].x<=  64 && ch[cn].y<= 450) ||
-			(ch[cn].x>=  22 && ch[cn].y>= 451 && ch[cn].x<=  27 && ch[cn].y<= 459) ||
-			(ch[cn].x>=  59 && ch[cn].y>= 451 && ch[cn].x<=  64 && ch[cn].y<= 465) ||
-			(ch[cn].x>= 173 && ch[cn].y>= 921 && ch[cn].x<= 255 && ch[cn].y<=1003) ) // Volcano
+		else if (IS_IN_SUN(ch[cn].x, ch[cn].y))
 		{
 			if (ch[cn].flags & CF_PLAYER)
 				step_desertfloor(cn);
 		}
+		/*
 		else if (
 			(ch[cn].x>=  65 && ch[cn].y>= 406 && ch[cn].x<=  81 && ch[cn].y<= 466) ||
 			(ch[cn].x>=  21 && ch[cn].y>= 406 && ch[cn].x<=  31 && ch[cn].y<= 428) ||
@@ -209,6 +204,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		{
 			step_desertfloor_remove(cn);
 		}
+		*/
 
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))
 		{
