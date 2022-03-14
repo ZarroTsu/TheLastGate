@@ -39,6 +39,9 @@
 #define IS_USEDITEM(in)     (IS_USED(it[(in)]))
 #define IS_SANEUSEDITEM(in) (IS_SANEITEM(in) && IS_USEDITEM(in))
 
+#define CAN_SOULSTONE(in)	(it[(in)].flags & IF_CAN_SS)
+#define CAN_ENCHANT(in)		(it[(in)].flags & IF_CAN_EN)
+#define HAS_ENCHANT(in, n)	(it[(in)].enchantment == (n))
 
 
 /* *** TEMPLATES *** */

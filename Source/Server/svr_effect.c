@@ -229,7 +229,8 @@ void effect_tick(void)
 							{
 								// skip if held item template matches current weapon
 								if (it[ch[co].item[z]].temp == it[ch[co].worn[WN_RHAND]].temp && 
-									it[ch[co].item[z]].driver != 92 && it[ch[co].item[z]].driver != 93) 
+									it[ch[co].item[z]].driver != 68 && it[ch[co].item[z]].driver != 92 && 
+									it[ch[co].item[z]].driver != 93 && it[ch[co].item[z]].driver != 118) 
 								{
 									continue;
 								}

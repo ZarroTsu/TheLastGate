@@ -1472,6 +1472,11 @@ void view_object(LIST *head)
 	printf("<input type=checkbox name=flags value=%Lu %s>Misc<br>\n",
 			IF_MISC, (it_temp[in].flags & IF_MISC) ? "checked" : "");
 	printf("<br>\n");
+	printf("<input type=checkbox name=flags value=%Lu %s>Can be Soulstoned<br>\n",
+			IF_CAN_SS, (it_temp[in].flags & IF_CAN_SS) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Can be Enchanted<br>\n",
+			IF_CAN_EN, (it_temp[in].flags & IF_CAN_EN) ? "checked" : "");
+	printf("<br>\n");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Claw<br>\n",
 			IF_WP_CLAW, (it_temp[in].flags & IF_WP_CLAW) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Dagger<br>\n",
@@ -1603,6 +1608,9 @@ void view_object(LIST *head)
 
 	printf("<tr><td>Thorns:</td><td><input type=text name=gethit_dam_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=gethit_dam_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].gethit_dam[0], it_temp[in].gethit_dam[1]);
+	
+	printf("<tr><td>AoE Bonus:</td><td><input type=text name=area_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=area_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it_temp[in].aoe_bonus[0], it_temp[in].aoe_bonus[1]);
 
 	printf("<tr><td>Max Age:</td><td><input type=text name=max_age_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=max_age_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].max_age[0], it_temp[in].max_age[1]);
@@ -1773,6 +1781,11 @@ void view_item(LIST *head)
 	printf("<input type=checkbox name=flags value=%Lu %s>Misc<br>\n",
 			IF_MISC, (it[in].flags & IF_MISC) ? "checked" : "");
 	printf("<br>\n");
+	printf("<input type=checkbox name=flags value=%Lu %s>Can be Soulstoned<br>\n",
+			IF_CAN_SS, (it[in].flags & IF_CAN_SS) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Can be Enchanted<br>\n",
+			IF_CAN_EN, (it[in].flags & IF_CAN_EN) ? "checked" : "");
+	printf("<br>\n");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Claw<br>\n",
 			IF_WP_CLAW, (it[in].flags & IF_WP_CLAW) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Weapon: Dagger<br>\n",
@@ -1904,6 +1917,9 @@ void view_item(LIST *head)
 
 	printf("<tr><td>Thorns:</td><td><input type=text name=gethit_dam_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=gethit_dam_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].gethit_dam[0], it[in].gethit_dam[1]);
+			
+	printf("<tr><td>AoE Bonus:</td><td><input type=text name=area_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=area_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it[in].aoe_bonus[0], it[in].aoe_bonus[1]);
 
 	printf("<tr><td>Max Age:</td><td><input type=text name=max_age_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=max_age_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].max_age[0], it[in].max_age[1]);
@@ -3885,6 +3901,28 @@ void update_object(LIST *head)
 	else
 	{
 		printf("GETHIT_DAM_2 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "area_1");
+	if (tmp)
+	{
+		it_temp[in].aoe_bonus[0] = atoi(tmp);
+	}
+	else
+	{
+		printf("area_1 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "area_2");
+	if (tmp)
+	{
+		it_temp[in].aoe_bonus[1] = atoi(tmp);
+	}
+	else
+	{
+		printf("area_2 not specified.\n");
 		return;
 	}
 

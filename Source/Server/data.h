@@ -580,7 +580,9 @@ struct character
 	
 	char gcm;						// Stores current GC 'mode'
 	
-	char future2[45];				// space for future expansion
+	char aoe_bonus;					// Total AoE bonus from gear
+	
+	char future2[44];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -668,6 +670,9 @@ __attribute__ ((packed));
 #define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine
 #define IF_LEGACY        (1ull<<56)     // item was enhanced by a shrine
 #define IF_DUPLICATED    (1ull<<57)     // item was enhanced by a shrine
+#define IF_CAN_SS		 (1ull<<58)		// item CAN be soulstoned
+#define IF_CAN_EN		 (1ull<<59)		// item CAN be enchanted (talisman)
+#define IF_ENCHANTED	 (1ull<<60)		// item has been enchanted
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -740,7 +745,7 @@ struct item
 
 	char min_rank;                  // minimum rank to wear the item
 	
-	char future2[2];				
+	char aoe_bonus[2];				// Area of Effect bonus
 	
 	char move_speed[2];				// movement speed bonus
 	char atk_speed[2];				// attack speed bonus
@@ -769,7 +774,9 @@ struct item
 	
 	short int speed[2];				// base action speed modifier (for haste and slow)
 	
-	char future3[5];				// 587
+	char enchantment;				// Special effect via talismans
+	
+	char future3[4];				// 587
 
 	int t_bought;                   // 591
 	int t_sold;                     // 595
@@ -865,7 +872,7 @@ struct waypoint
 	char *desc;
 };
 
-#define N_SOULBONUS		 70
+#define N_SOULBONUS		 50
 #define N_SOULMAX		 48
 
 extern struct s_skilltab skilltab[MAXSKILL+2];

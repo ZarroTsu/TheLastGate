@@ -1956,7 +1956,7 @@ int use_bag(int cn, int in)
 	owner = ch[co].data[CHD_CORPSEOWNER];
 
 	// prevent grave-robbing by the unauthorized
-	if (owner && owner!=cn && !may_attack_msg(cn, owner, 0) && ch[owner].data[PCD_ALLOW]!=cn && IS_SANEUSEDCHAR(owner) && IS_PLAYER(owner))
+	if (owner && owner!=cn && !may_attack_msg(cn, owner, 0) && ch[owner].data[PCD_ALLOW]!=cn && IS_SANEUSEDCHAR(owner) && IS_PLAYER(owner) && ch[owner].x)
 	{
 		do_char_log(cn, 0, "This is %s's grave, not yours. "
 		            "You may only search it with %s permission.\n",
@@ -2622,9 +2622,9 @@ int use_map_pentigram(int cn, int in)
 		}
 		ch[co].data[29] = m;
 		ch[co].data[60] = TICKS * 23;
-		if (!RANDOM(25))
+		if (!RANDOM(22))
 		{
-			boost_char(co, 5);
+			boost_char(co, 5, 0);
 		}
 		do_update_char(co);
 	}
@@ -2922,7 +2922,7 @@ int use_map_shrine(int cn, int in)
 					do_char_log(cn, 1, "Your %s was altered.\n", it[inc].reference);
 					break;
 				case  3:
-					do_char_log(cn, 0, "Power diminished.\n");
+					do_char_log(cn, 0, "Diminished complications.\n");
 					if (!inc) inc = RANDOM(2)?get_random_backpack_item(cn):get_random_gear_item(cn);
 					if (!inc)
 					{
@@ -3270,6 +3270,8 @@ int use_map_shrine(int cn, int in)
 					do_char_log(cn, 1, "You got %d stronghold points.\n", p);
 					break;
 			}
+			do_update_char(cn);
+			do_check_new_level(cn, 1);
 			break;
 	}
 	
@@ -3517,6 +3519,23 @@ int use_lame(int cn, int in)
 	}
 	
 	do_char_log(cn, 9, "My power is yours, worthy one. You need only grasp it.\n");
+	
+	return 1;
+}
+
+int use_make_talisman(int cn, int in)
+{
+	int in2;
+	
+	if (it[in].stack < 10) return;
+	
+	in2 = god_create_item(IT_TALISMAN);
+	
+	god_take_from_char(in, cn);
+	it[in].used = USE_EMPTY;
+	god_give_char(in2, cn);
+	
+	return 1;
 }
 
 //
@@ -4658,9 +4677,10 @@ int use_pile(int cn, int in)
 		0
 	};
 	static int find_H[] = { 
-		// 11% - Gold
+		// 10% - Gold
 		IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, 
-		IT_GOLD, 
+		//  1% - Fragment
+		IT_TALISFRAG, 
 		//  4% ea - Big Gem
 		IT_B_SA, IT_B_SA, IT_B_SA, IT_B_SA,    IT_B_RU, IT_B_RU, IT_B_RU, IT_B_RU, 
 		IT_B_AM, IT_B_AM, IT_B_AM, IT_B_AM,    IT_B_TO, IT_B_TO, IT_B_TO, IT_B_TO, 
@@ -4681,10 +4701,12 @@ int use_pile(int cn, int in)
 		0
 	};
 	static int find_F[] = { 
-		//  9% - Gold
-		IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, 
+		//  8% - Gold
+		IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, IT_GOLD, 
 		//  6% - Platinum
 		IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, 
+		//  1% - Fragment
+		IT_TALISFRAG, 
 		//  3% ea - Huge Gem
 		IT_H_SA, IT_H_SA, IT_H_SA,    IT_H_RU, IT_H_RU, IT_H_RU, 
 		IT_H_AM, IT_H_AM, IT_H_AM,    IT_H_TO, IT_H_TO, IT_H_TO, 
@@ -4720,7 +4742,7 @@ int use_pile(int cn, int in)
 	map[m].it = 0;
 
 	// decide what the player's gonna find
-	chance = 6;
+	chance = 5;
 	if (ch[cn].luck<0)			chance++;
 	if (ch[cn].luck<=-500)		chance++;
 	if (ch[cn].luck<=-1000)		chance++;
@@ -4729,7 +4751,7 @@ int use_pile(int cn, int in)
 	if (ch[cn].luck<=-8000)		chance++;
 	
 	if (it[in].data[4]>0) chance-=it[in].data[4];
-	if (chance<2) chance=2;
+	if (chance<1) chance=1;
 
 	if (!RANDOM(chance))   // something there?
 	{
@@ -4754,6 +4776,10 @@ int use_pile(int cn, int in)
 			god_drop_item(in2, x, y);
 			fx_add_effect(9, 16, in2, it[in2].data[0], 0);
 		}
+	}
+	else // Pity reward - a tiny bit of silver
+	{
+		ch[cn].gold += 2+RANDOM(2+level*2);
 	}
 	return 1;
 }
@@ -4908,6 +4934,13 @@ int use_mine(int cn, int in)
 	{
 		it[in].data[1] = tmp;
 	}
+	
+	str = str/80 + RANDOM(str/80) + RANDOM(2);
+	
+	// Grant silent exp based on damage delt
+	ch[cn].points += str; ch[cn].points_tot += str;
+	do_update_char(cn);
+	do_check_new_level(cn, 1);
 
 	return 0;
 }
@@ -5539,8 +5572,11 @@ void boost_char(int cn, int divi)
 				B_SK(cn, n) += RANDOM(B_SK(cn, n) / divi);
 			}
 		}
-
-		sprintf(buf, "Strong %s", ch[cn].name);
+		
+		if (divi==3) 		sprintf(buf, "Lethal %s", ch[cn].name);
+		else if (divi==4) 	sprintf(buf, "Deadly %s", ch[cn].name);
+		else 				sprintf(buf, "Strong %s", ch[cn].name);
+		
 		strncpy(ch[cn].name, buf, 39);
 		ch[cn].name[39] = 0;
 		sprintf(buf, "the %s", ch[cn].name);
@@ -5549,48 +5585,61 @@ void boost_char(int cn, int divi)
 		
 		// New
 		if (!(ch[cn].flags & CF_EXTRAEXP)) ch[cn].flags |= CF_EXTRAEXP;
-
-		in = god_create_item(IT_SOULSTONE);
-		if (in)
+		
+		if (divi==3)
 		{
-			sprintf(it[in].name, "Soulstone");
-			sprintf(it[in].reference, "soulstone");
-			sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, exp);
-			
-			it[in].data[0] = rank;
-			it[in].data[1] = exp;
-			it[in].temp = 0;
-			it[in].driver = 68;
-			
-			if (rank>7 && !RANDOM(4))
+			make_focus(cn, rank);
+		}
+		else if (divi==4)
+		{
+			make_catalyst(cn, rank);
+		}
+		else
+		{
+			in = god_create_item(IT_SOULSTONE);
+			if (in)
 			{
-				v = RANDOM(70);
-				if (v>=50 && v<=54)	{ it[in].attrib[v-50][0] = get_sb(v, 1); m = it[in].attrib[v-50][1] = get_sb(v, 0)*2; }
-				else if (v==55)     { it[in].hp[0]           = get_sb(v, 1); m = it[in].hp[1]           = get_sb(v, 0)*2; }
-				else if (v==56)     { it[in].end[0]          = get_sb(v, 1); m = it[in].end[1]          = get_sb(v, 0)*2; }
-				else if (v==57)     { it[in].mana[0]         = get_sb(v, 1); m = it[in].mana[1]         = get_sb(v, 0)*2; }
-				else if (v==58)     { it[in].weapon[0]       = get_sb(v, 1); m = it[in].weapon[1]       = get_sb(v, 0)*2; }
-				else if (v==59)     { it[in].armor[0]        = get_sb(v, 1); m = it[in].armor[1]        = get_sb(v, 0)*2; }
-				else if (v==60)     { it[in].move_speed[0]   = get_sb(v, 1); m = it[in].move_speed[1]   = get_sb(v, 0)*2; }
-				else if (v==61)     { it[in].atk_speed[0]    = get_sb(v, 1); m = it[in].atk_speed[1]    = get_sb(v, 0)*2; }
-				else if (v==62)     { it[in].cast_speed[0]   = get_sb(v, 1); m = it[in].cast_speed[1]   = get_sb(v, 0)*2; }
-				else if (v==63)     { it[in].spell_mod[0]    = get_sb(v, 1); m = it[in].spell_mod[1]    = get_sb(v, 0)*2; }
-				else if (v==64)     { it[in].spell_apt[0]    = get_sb(v, 1); m = it[in].spell_apt[1]    = get_sb(v, 0)*2; }
-				else if (v==65)     { it[in].cool_bonus[0]   = get_sb(v, 1); m = it[in].cool_bonus[1]   = get_sb(v, 0)*2; }
-				else if (v==66)     { it[in].crit_chance[0]  = get_sb(v, 1); m = it[in].crit_chance[1]  = get_sb(v, 0)*2; }
-				else if (v==67)     { it[in].crit_multi[0]   = get_sb(v, 1); m = it[in].crit_multi[1]   = get_sb(v, 0)*2; }
-				else if (v==68)     { it[in].top_damage[0]   = get_sb(v, 1); m = it[in].top_damage[1]   = get_sb(v, 0)*2; }
-				else if (v==69)     { it[in].gethit_dam[0]   = get_sb(v, 1); m = it[in].gethit_dam[1]   = get_sb(v, 0)*2; }
-				else                { it[in].skill[v][0]     = get_sb(v, 1); m = it[in].skill[v][1]     = get_sb(v, 0)*2; }
+				sprintf(it[in].name, "Soulstone");
+				sprintf(it[in].reference, "soulstone");
+				sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, exp);
 				
-				it[in].data[3] = m;
-				it[in].flags |= IF_IDENTIFIED;
+				it[in].data[0] = rank;
+				it[in].data[1] = exp;
+				it[in].temp = 0;
+				it[in].driver = 68;
+				
+				/*
+				if (rank>7 && !RANDOM(4))
+				{
+					v = RANDOM(70);
+					if (v>=50 && v<=54)	{ it[in].attrib[v-50][0] = get_sb(v, 1); m = it[in].attrib[v-50][1] = get_sb(v, 0)*2; }
+					else if (v==55)     { it[in].hp[0]           = get_sb(v, 1); m = it[in].hp[1]           = get_sb(v, 0)*2; }
+					else if (v==56)     { it[in].end[0]          = get_sb(v, 1); m = it[in].end[1]          = get_sb(v, 0)*2; }
+					else if (v==57)     { it[in].mana[0]         = get_sb(v, 1); m = it[in].mana[1]         = get_sb(v, 0)*2; }
+					else if (v==58)     { it[in].weapon[0]       = get_sb(v, 1); m = it[in].weapon[1]       = get_sb(v, 0)*2; }
+					else if (v==59)     { it[in].armor[0]        = get_sb(v, 1); m = it[in].armor[1]        = get_sb(v, 0)*2; }
+					else if (v==60)     { it[in].move_speed[0]   = get_sb(v, 1); m = it[in].move_speed[1]   = get_sb(v, 0)*2; }
+					else if (v==61)     { it[in].atk_speed[0]    = get_sb(v, 1); m = it[in].atk_speed[1]    = get_sb(v, 0)*2; }
+					else if (v==62)     { it[in].cast_speed[0]   = get_sb(v, 1); m = it[in].cast_speed[1]   = get_sb(v, 0)*2; }
+					else if (v==63)     { it[in].spell_mod[0]    = get_sb(v, 1); m = it[in].spell_mod[1]    = get_sb(v, 0)*2; }
+					else if (v==64)     { it[in].spell_apt[0]    = get_sb(v, 1); m = it[in].spell_apt[1]    = get_sb(v, 0)*2; }
+					else if (v==65)     { it[in].cool_bonus[0]   = get_sb(v, 1); m = it[in].cool_bonus[1]   = get_sb(v, 0)*2; }
+					else if (v==66)     { it[in].crit_chance[0]  = get_sb(v, 1); m = it[in].crit_chance[1]  = get_sb(v, 0)*2; }
+					else if (v==67)     { it[in].crit_multi[0]   = get_sb(v, 1); m = it[in].crit_multi[1]   = get_sb(v, 0)*2; }
+					else if (v==68)     { it[in].top_damage[0]   = get_sb(v, 1); m = it[in].top_damage[1]   = get_sb(v, 0)*2; }
+					else if (v==69)     { it[in].gethit_dam[0]   = get_sb(v, 1); m = it[in].gethit_dam[1]   = get_sb(v, 0)*2; }
+					else                { it[in].skill[v][0]     = get_sb(v, 1); m = it[in].skill[v][1]     = get_sb(v, 0)*2; }
+					
+					it[in].data[3] = m;
+					it[in].flags |= IF_IDENTIFIED;
+				}
+				*/
+				
+				if (exp>= 6500000 && !RANDOM(8)) it[in].data[2] = 4+RANDOM(4);
+				if (exp>=14000000 && !RANDOM(6)) it[in].data[2] = 3+RANDOM(3);
+				
+				god_give_char(in, cn);
 			}
-			
-			if (exp>= 6500000 && !RANDOM(8)) it[in].data[2] = 4+RANDOM(4);
-			if (exp>=14000000 && !RANDOM(6)) it[in].data[2] = 3+RANDOM(3);
-			
-			god_give_char(in, cn);
 		}
 	}
 }
@@ -5638,8 +5687,16 @@ int spawn_penta_enemy(int in)
 	ch[cn].data[60] = TICKS * 60 * 2;
 	ch[cn].data[73] = 8;
 	ch[cn].dir = 1;
-
-	if (!RANDOM(25))
+	
+	if (tmp>=25 && !RANDOM(58-tmp))
+	{
+		boost_char(cn, 3);
+	}
+	else if (tmp>=20 && !RANDOM(53-tmp))
+	{
+		boost_char(cn, 4);
+	}
+	else if (!RANDOM(20))
 	{
 		boost_char(cn, 5);
 	}
@@ -7210,8 +7267,24 @@ void use_driver(int cn, int in, int carried)
 	if (cn && !carried)
 	{
 		ch[cn].cerrno = ERR_FAILED;             // will be overriden later if another result is desired
-
 	}
+	
+	/* commented out for now - there's a logistical issue with using a soulstone on a soulstone...
+	// Hack for talismans
+	if (cn && (it[in].flags & IF_CAN_EN) && (tmp = ch[cn].citem) && it[tmp].driver == 119)
+	{
+		use_enchant_item(cn, tmp, in);
+		return;
+	}
+	
+	// Hack for soulstones
+	if (cn && (it[in].flags & IF_CAN_SS) && (tmp = ch[cn].citem) && it[tmp].driver == 68)
+	{
+		use_soulstone(cn, tmp, in);
+		return;
+	}
+	*/
+	
 	if ((it[in].flags & IF_USE) || !cn)
 	{
 		// check prerequisites (cost, minimum stats etc) !!!
@@ -7438,7 +7511,7 @@ void use_driver(int cn, int in, int carried)
 				ret = use_garbage(cn, in);
 				break;
 			case 68:
-				ret = use_soulstone(cn, in);
+				ret = use_soulstone(cn, in, ch[cn].citem);
 				break;
 			case 69:
 			case 70:
@@ -7545,6 +7618,12 @@ void use_driver(int cn, int in, int carried)
 			case 117:
 				ret = use_scroll_S(cn, in);
 				break;
+			case 118:
+				ret = use_make_talisman(cn, in);
+				break;
+			case 119:
+				ret = use_talisman(cn, in, ch[cn].citem);
+				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -7637,7 +7716,12 @@ void use_driver(int cn, int in, int carried)
 				
 				if (get_book(cn, IT_BOOK_ALCH)) // Book: Alchemy 101
 				{
-					thousand = 1500;
+					thousand = thousand * 3/2;
+				}
+				
+				if (get_enchantment(cn, 2))
+				{
+					thousand = thousand * 5/4;
 				}
 				
 				// Special case for the Rainbow Potion
@@ -8979,6 +9063,11 @@ void start_trap(int cn, int in)
 
 int step_trap(int cn, int in)
 {
+	if (get_enchantment(cn, 3))
+	{
+		return 0;
+	}
+	
 	if (ch[cn].flags & (CF_PLAYER))
 	{
 		start_trap(cn, in);

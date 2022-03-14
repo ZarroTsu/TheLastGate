@@ -673,6 +673,9 @@
 #define IT_SOULCATAL	2502
 #define IT_SOULFOCUS	2503
 
+#define IT_TALISMAN		2608
+#define IT_TALISFRAG	2609
+
 // -------- Buff/Debuff Sprites -------- //
 
 #define BUF_SPR_GENERIC		93

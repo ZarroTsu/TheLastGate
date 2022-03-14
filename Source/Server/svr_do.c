@@ -6038,6 +6038,18 @@ int get_gear(int cn, int in)
 	return 0;
 }
 
+int get_enchantment(int cn, int in)
+{
+	int n, in2, m = 0;
+	
+	for (n = 0; n <= WN_CHARM2; n++)
+	{
+		if ((in2 = ch[cn].worn[n]) && it[in2].enchantment == in) m++;
+	}
+	
+	return m;
+}
+
 //
 
 // For examining a corpse for special stuff at a glance with Sense Magic.
@@ -7031,7 +7043,7 @@ int do_char_can_flee(int cn)
 		remove_enemy(cn);
 		return 1; 
 	}
-	if (ch[cn].escape_timer) { return 0; }
+	if (ch[cn].escape_timer || get_enchantment(cn, 46)) return 0;
 
 	per  = 0;
 
@@ -7393,12 +7405,13 @@ int do_hurt(int cn, int co, int dam, int type)
 			}
 		}
 	}
-
+	
+	if (get_enchantment(co, 35) && !RANDOM(10))
+		dam /= 2;
+	
 	if (ch[co].flags & CF_IMMORTAL)
-	{
 		dam = 0;
-	}
-
+	
 	if (type!=3)
 	{
 		do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
@@ -7471,32 +7484,50 @@ int do_hurt(int cn, int co, int dam, int type)
 	
 	hp_dam = dam;
 	
-	// Tarot - High Priestess - 10% damage dealt to mana instead
+	// Tarot - High Priestess - damage dealt to mana instead
 	if (get_tarot(co, IT_CH_PREIST))
 	{
-		mana_dam = dam/10;
+		mana_dam += dam/10;
 		
 		if (ch[co].a_mana - mana_dam<500)
 			mana_dam = (ch[co].a_mana-500);
 		
 		hp_dam -= mana_dam*2;
 	}
+	if (get_enchantment(co, 23))
+	{
+		mana_dam += dam/10;
+		
+		if (ch[co].a_mana - mana_dam<500)
+			mana_dam = (ch[co].a_mana-500);
+		
+		hp_dam -= mana_dam;
+	}
 	
-	// Cloak - Cloak of Shadows - 10% of damage dealt to end instead
+	// Cloak - Cloak of Shadows - damage dealt to end instead
 	if (get_gear(co, IT_TW_CLOAK))
 	{
-		end_dam = dam/10;
+		end_dam += dam/10;
 		
 		if (ch[co].a_end - end_dam<500)
 			end_dam = (ch[co].a_end-500);
 		
 		hp_dam -= end_dam*2;
 	}
+	if (get_enchantment(co, 16))
+	{
+		end_dam += dam/10;
+		
+		if (ch[co].a_end - end_dam<500)
+			end_dam = (ch[co].a_end-500);
+		
+		hp_dam -= end_dam;
+	}
 	
 	// Weapon - Bronchitis :: 10% cleave damage also dealt to mana
 	if (type == 5 && get_gear(cn, IT_WP_BRONCHIT))
 	{
-		mana_dam = hp_dam/10;
+		mana_dam += hp_dam/10;
 	}
 	
 	if (ch[co].a_hp - hp_dam<500 && !(mf & MF_ARENA) && try_lucksave(co))
@@ -7512,6 +7543,13 @@ int do_hurt(int cn, int co, int dam, int type)
 		ch[co].a_end -= end_dam;
 		ch[co].a_mana -= mana_dam;
 	}
+	
+	// Enchantments
+	if (n = get_enchantment(cn, 49)) ch[cn].a_hp   += n*100;
+	if (n = get_enchantment(cn, 42)) ch[cn].a_end  += n*100;
+	if (n = get_enchantment(co, 43)) ch[co].a_end  += n*200;
+	if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*100;
+	if (n = get_enchantment(co, 39)) ch[co].a_mana += n*200;
 
 	if (ch[co].a_hp<10000 && ch[co].a_hp>=500 && points2rank(ch[co].points_tot)<5)
 	{
@@ -7648,14 +7686,14 @@ int do_surround_check(int cn, int co, int gethit)
 int do_crit(int cn, int co, int dam, int msg)
 {
 	int die, crit_dice, crit_chance, crit_mult, crit_dam=0;
-	int defense, in;
+	int defense=0, in;
 	
 	crit_dice 	= 10000;
 	crit_chance = ch[cn].crit_chance;
 	crit_mult   = ch[cn].crit_multi;
-	defense     = ch[co].armor;
+	//defense     = ch[co].armor;
 	
-	 // Book - Way of the Sword
+	// Book - Way of the Sword
 	if (ch[cn].data[73])
 	{
 		crit_chance += ch[cn].data[73];
@@ -7688,6 +7726,8 @@ int do_crit(int cn, int co, int dam, int msg)
 			it[in].active = it[in].duration;
 		}
 	}
+	
+	if (get_enchantment(co, 47)) crit_dam /= 2;
 	
 	return max(0, crit_dam - defense);
 }
@@ -7881,7 +7921,10 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		chance = 19;
 		bonus  = 20;
 	}
-
+	
+	if (get_enchantment(cn, 41)) chance++;
+	if (get_enchantment(co, 37)) chance--;
+	
 	die = RANDOM(20) + 1;
 	if (die<=chance)
 	{
@@ -8057,7 +8100,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 				double tmp_a, tmp_h, tmp_s, tmp_g;
 				
 				aoe_power = M_SK(cn, SK_PROX)+15;
-				obsi 	= (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)?2:0;
+				obsi 	= ch[cn].aoe_bonus;
 				obsi   += IS_ARCHTEMPLAR(cn)?4:0;
 				surraoe = (aoe_power/PROX_CAP) + obsi;
 				tmp_a	= (double)(aoe_power*100/PROX_CAP + obsi*100);
@@ -8394,6 +8437,12 @@ int do_char_can_see(int cn, int co)
 	{
 		d = (d * (M_SK(co, SK_STEALTH)*2)) / 90;
 	}
+	
+	// Enchant & Idle
+	if (get_enchantment(co, 28) && ch_base_status(ch[co].status)>=0 && ch_base_status(ch[co].status)<=7)
+	{
+		d = d * 5/4;
+	}
 
 	d -= M_SK(cn, SK_PERCEPT) * 4;
 
@@ -8566,7 +8615,8 @@ void really_update_char(int cn)
 	int attrib_ex[5];
 	int skill[50];
 	unsigned long long prof;
-	int charmSpec = 0, gearSpec = 0, nightSpec = 0, gemCheck = 0, gemSpec = 0;
+	int charmSpec = 0, gearSpec = 0, nightSpec = 0, gemCheck = 0, gemSpec = 0, enchantSpec = 0;
+	int moreBrv = 0, moreWil = 0, moreInt = 0, moreAgl = 0, moreStr = 0, moreEnd = 0;
 	int in=0;
 	//int speedvalue_a = 0, speedvalue_b = 0, speedvalue_c = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0;
@@ -8574,6 +8624,7 @@ void really_update_char(int cn)
 	int critical_b = 0, critical_c = 0, critical_m = 0;
 	int hit_rate = 0, parry_rate = 0, loverSplit = 0;
 	int damage_top = 0, ava_crit = 0, ava_mult = 0;
+	int aoe = 0;
 	
 	prof = prof_start();
 
@@ -8684,6 +8735,7 @@ void really_update_char(int cn)
 				spell_mod  += (it[m].spell_mod[1])*(gemSpec?7:5)/5;
 				spell_apt  += (it[m].spell_apt[1])*(gemSpec?7:5)/5;
 				spell_cool += (it[m].cool_bonus[1])*(gemSpec?7:5)/5;
+				aoe += (it[m].aoe_bonus[1])*(gemSpec?7:5)/5;
 			}
 			// Otherwise, give normal stat boosts
 			else
@@ -8706,6 +8758,7 @@ void really_update_char(int cn)
 				spell_mod  += (it[m].spell_mod[0])*(gemSpec?7:5)/5;
 				spell_apt  += (it[m].spell_apt[0])*(gemSpec?7:5)/5;
 				spell_cool += (it[m].cool_bonus[0])*(gemSpec?7:5)/5;
+				aoe += (it[m].aoe_bonus[0])*(gemSpec?7:5)/5;
 			}
 			
 			if (it[m].temp==IT_CH_PREIST || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_PREIST)) 	charmSpec |=    1;
@@ -8734,6 +8787,21 @@ void really_update_char(int cn)
 			if (it[m].temp==IT_WP_EXCALIBUR)	gearSpec  |=  128;
 			if (it[m].temp==IT_TW_AVARITIA)		gearSpec  |=  256;
 			if (it[m].temp==IT_BOOK_HOLY)		gearSpec  |=  512;
+			
+			if (it[m].enchantment==  1)		enchantSpec |=   1;
+			if (it[m].enchantment==  5)		moreBrv++;
+			if (it[m].enchantment== 11)		enchantSpec |=   2;
+			if (it[m].enchantment== 12)		moreWil++;
+			if (it[m].enchantment== 17)		infra = 15;
+			if (it[m].enchantment== 18)		moreEnd++;
+			if (it[m].enchantment== 19)		moreInt++;
+			if (it[m].enchantment== 24)		enchantSpec |=  16;
+			if (it[m].enchantment== 25)		moreAgl++;
+			if (it[m].enchantment== 26)		enchantSpec |=  32;
+			if (it[m].enchantment== 29)		moreStr++;
+			if (it[m].enchantment== 40)		enchantSpec |=  64;
+			if (it[m].enchantment== 44)		enchantSpec |= 128;
+			if (it[m].enchantment== 48)		enchantSpec |= 256;
 		}
 		
 		critical_b += it[m].base_crit*(gemSpec?7:5)/5;
@@ -9001,7 +9069,6 @@ void really_update_char(int cn)
 		if (bu[m].data[3]==BUF_IT_PIGS) pigsblood = 1;
 	}
 	
-	
 	// Special check for heatstroke removal
 	if (coconut==3)
 	{
@@ -9029,7 +9096,6 @@ void really_update_char(int cn)
 		for (z = 0; z<5; z++)
 		{
 			attrib[z] = foolaverage/5;
-			set_attrib_score(cn, z, attrib[z]);
 		}
 	}
 	else
@@ -9037,9 +9103,20 @@ void really_update_char(int cn)
 		for (z = 0; z<5; z++)
 		{
 			attrib[z] = (int)B_AT(cn, z) + (int)ch[cn].attrib[z][1] + attrib[z];
-			set_attrib_score(cn, z, attrib[z]);
 		}
 	}
+	for (z = 0; z<5; z++)
+	{
+		// Enchant: More attributes
+		if (z==0 && moreBrv) attrib[z] = attrib[z]*(100+moreBrv*4)/100;
+		if (z==1 && moreWil) attrib[z] = attrib[z]*(100+moreWil*4)/100;
+		if (z==2 && moreInt) attrib[z] = attrib[z]*(100+moreInt*4)/100;
+		if (z==3 && moreAgl) attrib[z] = attrib[z]*(100+moreAgl*4)/100;
+		if (z==4 && moreStr) attrib[z] = attrib[z]*(100+moreStr*4)/100;
+		
+		set_attrib_score(cn, z, attrib[z]);
+	}
+	
 	// Weapon - Fist of the Heavens :: Doubles best attribute
 	if (gearSpec & 2)
 	{
@@ -9075,6 +9152,7 @@ void really_update_char(int cn)
 	if (ch[cn].a_hp < ch[cn].hp[5]) ch[cn].a_hp += heal_hp;
 
 	end = (int)ch[cn].end[0] + (int)ch[cn].end[1] + end;
+	if (moreEnd) end = end*(5+moreEnd)/5;
 	if (end<10)
 	{
 		end = 10;
@@ -9261,6 +9339,23 @@ void really_update_char(int cn)
 		ch[].move_speed value
 	*/
 	
+	// Enchant: Move speed can't go below 150
+	if (enchantSpec & 32)
+	{
+		if (base_spd + spd_move < 150)
+			spd_move = 150 - (base_spd + spd_move);
+	}
+	// Enchant: 8% more Move speed
+	if (enchantSpec & 64)
+	{
+		spd_move = ((base_spd + spd_move) * 108/100) - base_spd;
+	}
+	// Enchant: 2x Move Speed underwater
+	if ((enchantSpec & 128) && (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER))
+	{
+		spd_move = ((base_spd + spd_move) * 2) - base_spd;
+	}
+	
 	if (spd_move > 120)
 	{
 		spd_move = 120;
@@ -9281,7 +9376,7 @@ void really_update_char(int cn)
 	// Tarot - Strength - 20% less attack speed
 	if (charmSpec & 32)
 	{
-		spd_attack = (base_spd+spd_attack) * 4 / 5 - base_spd;
+		spd_attack = ((base_spd + spd_attack) * 4/5) - base_spd;
 	}
 	
 	// Clamp spd_attack between 0 and SPEED_CAP (300)
@@ -9579,6 +9674,9 @@ void really_update_char(int cn)
 	// Tarot - Temperance.R : 5% more WV per stack of healing sickness on you
 	if (charmSpec & 32768)
 		weapon += weapon * sickStacks/20;
+	// Chest Armor Enchantment
+	if (enchantSpec & 1) 
+		armor = armor * 107/100;
 	
 	if (armor<0)
 	{
@@ -9590,6 +9688,11 @@ void really_update_char(int cn)
 		armor = 255;
 	}
 	ch[cn].armor = armor;
+	
+	// Enchant: AV as extra Resistance
+	if (enchantSpec &  2) set_skill_score(cn, SK_RESIST, skill[SK_RESIST] + armor/10);
+	// Enchant: AV as extra Immunity
+	if (enchantSpec & 16) set_skill_score(cn, SK_IMMUN, skill[SK_IMMUN] + armor/10);
 
 	if (weapon<0)
 	{
@@ -9601,7 +9704,10 @@ void really_update_char(int cn)
 		weapon = 255;
 	}
 	ch[cn].weapon = weapon;
-
+	
+	// Enchant: 2x Thorns
+	if (enchantSpec & 256) gethit *= 2;
+	
 	if (gethit<0)
 	{
 		gethit = 0;
@@ -9612,6 +9718,16 @@ void really_update_char(int cn)
 	}
 	ch[cn].gethit_dam = gethit;
 	//
+	
+	if (aoe<-8)
+	{
+		aoe = -8;
+	}
+	if (aoe>8)
+	{
+		aoe = 8;
+	}
+	ch[cn].aoe_bonus = aoe;
 	
 	/*
 		ch[].top_damage value
@@ -9676,7 +9792,7 @@ void do_aria(int cn)
 	}
 	
 	aoe_power = M_SK(cn, SK_PROX)+15;
-	_rad      = PRXA_RAD + (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)?2:0;
+	_rad      = PRXA_RAD + ch[cn].aoe_bonus;
 	_aoe      = aoe_power/(PROX_CAP*2) + _rad;
 	tmp_a     = (double)(aoe_power*100/(PROX_CAP*2) + _rad*100);
 	
@@ -9736,6 +9852,7 @@ void do_regenerate(int cn)
 	int moonR = 0, sunR = 0, worldR = 0;
 	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, has_sld = 0, has_shl = 0, phalanx = 0, aggravate = 0;
 	int offpot = 0, defpot = 0;
+	int idle = 4;
 
 	// gothp determines how much to counter degeneration effects while underwater.
 	
@@ -9796,6 +9913,19 @@ void do_regenerate(int cn)
 	if (get_tarot(cn, IT_CH_SUN_R))   sunR 	 = 1;
 	if (get_tarot(cn, IT_CH_WORLD_R)) worldR = 1;
 	
+	// Meditate added to Hitpoints
+	if (get_enchantment(cn, 36))
+	{
+		race_reg += race_med;
+		hpmult   += manamult;
+	}
+	// Rest added to mana
+	if (get_enchantment(cn, 45))
+	{
+		race_med += race_res;
+		manamult += endmult;
+	}
+	
 	// Special non-ankh amulets
 	if (in = ch[cn].worn[WN_NECK])
 	{
@@ -9818,6 +9948,9 @@ void do_regenerate(int cn)
 		}
 	}
 	
+	if (get_enchantment(cn, 32))
+		idle = 5;
+	
 	// Set up basic values to be attributed to player hp/end/mana
 	//   These are the "standing" state values and will be divided down when applied to walk/fight states
 	hp   = (B_SK(cn, SK_REGEN)?race_reg:0) + hpmult   * 2;
@@ -9830,10 +9963,10 @@ void do_regenerate(int cn)
 		{
 			// STANDING STATES
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					ch[cn].a_hp 			+= (nohp   ? 0 : hp      * (sunR  ?0:1)); 
-					gothp 					+= (nohp   ? 0 : hp  / 2 * (sunR  ?0:1));
-					ch[cn].a_end 			+= (noend  ? 0 : end     * (worldR?0:1));
-					ch[cn].a_mana 			+= (nomana ? 0 : mana    * (moonR ?0:1)); 
+					ch[cn].a_hp 			+= (nohp   ? 0 : hp      * (sunR  ?0:1) * idle/4); 
+					gothp 					+= (nohp   ? 0 : hp  / 2 * (sunR  ?0:1) * idle/4);
+					ch[cn].a_end 			+= (noend  ? 0 : end     * (worldR?0:1) * idle/4);
+					ch[cn].a_mana 			+= (nomana ? 0 : mana    * (moonR ?0:1) * idle/4); 
 				break;
 			
 			// WALKING STATES

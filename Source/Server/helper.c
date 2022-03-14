@@ -2058,6 +2058,8 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 	it[in].sprite[0]  = spr;
 	it[in].max_damage = 0;
 	it[in].flags |= IF_SINGLEAGE | IF_NOMARKET;
+	it[in].flags &= ~IF_CAN_SS;
+	it[in].flags &= ~IF_CAN_EN;
 	
 	//xlog("create_special_item: strcpy name");
 	
@@ -3005,8 +3007,8 @@ static int soul_bonus[N_SOULBONUS][3] = {
 	{ 1, 1,  4 }, // 46 Shadow Copy
 	{ 1, 1,  4 }, // 47 Haste
 	{ 1, 1,  4 }, // 48 Taunt
-	{ 1, 1,  4 }, // 49 Leap
-	
+	{ 1, 1,  4 }  // 49 Leap
+	/*
 	{ 2, 1,  8 }, // 50 Braveness
 	{ 2, 1,  8 }, // 51 Willpower
 	{ 2, 1,  8 }, // 52 Intuition
@@ -3030,6 +3032,7 @@ static int soul_bonus[N_SOULBONUS][3] = {
 	{ 1, 6,  0 }, // 67 Crit Multi
 	{ 1, 2,  0 }, // 68 Top Damage
 	{ 3, 1,  0 }  // 69 Thorns
+	*/
 };
 
 int get_sb(int v, int i)
@@ -3279,21 +3282,25 @@ void soultrans_equipment(int cn, int in, int in2)
 	if (it[in2].temp!=IT_CH_FOOL) it[in2].temp = 0;
 	
 	// 6. Finalize the item
-	it[in2].flags &= ~IF_NOREPAIR;
+	it[in2].flags &= ~IF_CAN_SS;
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
 	it[in2].min_rank = max(rank, it[in2].min_rank);
 	it[in2].value -= 1;
 	
-	if (!it[in2].max_damage)
+	if (HAS_ENCHANT(in2, 34))
 	{
-		if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = 2500 * it[in2].weapon[0]/2;
-		else if (it[in2].flags & IF_BOOK)	it[in2].max_damage = 90000;
-		else if (it[in2].power == 60)		it[in2].max_damage = 65000;
-		else if (it[in2].power == 75)		it[in2].max_damage = 85000;
-		else								it[in2].max_damage = 60000;
+		it[in2].flags &= ~IF_NOREPAIR;
+		if (!it[in2].max_damage)
+		{
+			if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = 2500 * it[in2].weapon[0]/2;
+			else if (it[in2].flags & IF_BOOK)	it[in2].max_damage = 90000;
+			else if (it[in2].power == 60)		it[in2].max_damage = 65000;
+			else if (it[in2].power == 75)		it[in2].max_damage = 85000;
+			else								it[in2].max_damage = 60000;
+		}
 	}
 	
-	it[in2].power += rank * 30/4;
+	it[in2].power += rank * 5;
 
 	souldestroy(cn, in);
 
@@ -3310,6 +3317,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	}
 }
 
+/*
 int can_be_soulstoned(int in)
 {
 	static int valid_ss[] = {
@@ -3361,6 +3369,7 @@ int can_be_soulstoned(int in)
 	}
 	return 0;
 }
+*/
 
 int do_soulcatalyst(int ins, int inc)
 {
@@ -3374,17 +3383,19 @@ int do_soulcatalyst(int ins, int inc)
 	
 	it[ins].data[3] += it[inc].data[3];
 	it[ins].flags |= IF_IDENTIFIED;
-	
+	/*
 	for (n=0;n<5;n++)
 	{
 		it[ins].attrib[n][0] += it[inc].attrib[n][0];
 		it[ins].attrib[n][1] += it[inc].attrib[n][1];
 	}
+	*/
 	for (n=0;n<50;n++)
 	{
 		it[ins].skill[n][0] += it[inc].skill[n][0];
 		it[ins].skill[n][1] += it[inc].skill[n][1];
 	}
+	/*
 	it[ins].hp[0]   += it[inc].hp[0];   it[ins].hp[1]   += it[inc].hp[1];
 	it[ins].end[0]  += it[inc].end[0];  it[ins].end[1]  += it[inc].end[1];
 	it[ins].mana[0] += it[inc].mana[0]; it[ins].mana[1] += it[inc].mana[1];
@@ -3402,7 +3413,7 @@ int do_soulcatalyst(int ins, int inc)
 	it[ins].crit_multi[0]  += it[inc].crit_multi[0];  it[ins].crit_multi[1]  += it[inc].crit_multi[1];
 	it[ins].top_damage[0]  += it[inc].top_damage[0];  it[ins].top_damage[1]  += it[inc].top_damage[1];
 	it[ins].gethit_dam[0]  += it[inc].gethit_dam[0];  it[ins].gethit_dam[1]  += it[inc].gethit_dam[1];
-	
+	*/
 	return 1;
 }
 
@@ -3413,7 +3424,7 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	v = it[inc].data[4];
 	m = it[inc].data[3];
 	
-	if (!v || m <= get_sb(v-1, 0)*3/2)
+	if (!v || m <= get_sb(v-1, 0))
 	{
 		do_char_log(cn, 1, "Nothing happened. Seems this catalyst can't be focused further.\n");
 		chlog(cn, "do_catalyst_focus: v=%d, m=%d", v-1, m);
@@ -3427,7 +3438,7 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	
 	v--;
 	
-	it[inc].data[3] = m = max(get_sb(v, 0)*3/2, min(it[inf].data[0], m));
+	it[inc].data[3] = m = max(get_sb(v, 0), min(it[inf].data[0], m));
 	
 	if (v>=50 && v<=54) { it[inc].attrib[v-50][1] = m; }
 	else if (v==55)     { it[inc].hp[1] = m; }
@@ -3450,15 +3461,341 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	return 1;
 }
 
-int use_soulstone(int cn, int in)
+int use_talisman(int cn, int in, int in2)
+{	// [in] is talisman, [in2] is the target item
+	int r, n, temp, inds = 0;
+	
+	if (!IS_SANECHAR(cn))	return 0;
+	if (!IS_SANEITEM(in))	return 0;
+	if (!in2)
+	{
+		do_char_log(cn, 1, "Try using something with the talisman. Click on it with an item under your cursor.\n");
+		return 0;
+	}
+	if (!IS_SANEITEM(in2))	return 0;
+	
+	// No enchantment has been set yet; check for gemstones
+	if (!it[in].data[0])
+	{
+		switch (it[in2].temp)
+		{
+			case IT_H_SA: r =  1; break;	case IT_H_RU: r =  2; break;
+			case IT_H_AM: r =  3; break;	case IT_H_TO: r =  4; break;
+			case IT_H_EM: r =  5; break;	case IT_H_DI: r =  6; break;
+			case IT_H_SP: r =  7; break;	case IT_H_CI: r =  8; break;
+			case IT_H_OP: r =  9; break;	case IT_H_AQ: r = 10; break;
+			case IT_H_BE: r = 11; break;	case IT_H_ZI: r = 12; break;
+			default: do_char_log(cn, 0, "That doesn't fit.\n"); return 0;
+		}
+		
+		if (!it[in].data[1])
+		{
+			it[in].data[1] = r;
+			it[in].sprite[0] = 5643+r;
+		}
+		else
+		{
+			// Embeded switches is probably not the best way to go about this, but... it works.
+			// This takes the current gemstone and checks it with the next gemstone to produce an answer #
+			switch (it[in].data[1])
+			{
+			case  1: switch (r)
+				{
+				case  1: r =  1; break; case  2: r =  2; break; case  3: r =  3; break; case  4: r =  4; break;
+				case  5: r =  5; break; case  6: r =  6; break; case  7: r =  7; break; case  8: r =  8; break;
+				case  9: r =  9; break; case 10: r = 10; break; case 11: r = 11; break; case 12: r = 12; break;
+				}	break;
+			case  2: switch (r)
+				{
+				case  1: r =  2; break; case  2: r = 13; break; case  3: r = 14; break; case  4: r = 15; break;
+				case  5: r = 16; break; case  6: r = 17; break; case  7: r = 18; break; case  8: r = 19; break;
+				case  9: r = 20; break; case 10: r = 21; break; case 11: r = 22; break; case 12: r = 23; break;
+				}	break;
+			case  3: switch (r)
+				{
+				case  1: r =  3; break; case  2: r = 14; break; case  3: r = 24; break; case  4: r = 25; break;
+				case  5: r = 26; break; case  6: r = 27; break; case  7: r = 28; break; case  8: r = 29; break;
+				case  9: r = 30; break; case 10: r = 31; break; case 11: r = 32; break; case 12: r = 33; break;
+				}	break;
+			case  4: switch (r)
+				{
+				case  1: r =  4; break; case  2: r = 15; break; case  3: r = 25; break; case  4: r = 34; break;
+				case  5: r = 35; break; case  6: r = 36; break; case  7: r = 37; break; case  8: r = 38; break;
+				case  9: r = 39; break; case 10: r = 40; break; case 11: r = 41; break; case 12: r = 42; break;
+				}	break;
+			case  5: switch (r)
+				{
+				case  1: r =  5; break; case  2: r = 16; break; case  3: r = 26; break; case  4: r = 35; break;
+				case  5: r = 43; break; case  6: r = 44; break; case  7: r = 45; break; case  8: r = 46; break;
+				case  9: r = 47; break; case 10: r = 48; break; case 11: r = 49; break; case 12: r = 50; break;
+				}	break;
+			case  6: switch (r)
+				{
+				case  1: r =  6; break; case  2: r = 17; break; case  3: r = 27; break; case  4: r = 36; break;
+				case  5: r = 44; break; case  6: r = 51; break; case  7: r = 52; break; case  8: r = 53; break;
+				case  9: r = 54; break; case 10: r = 55; break; case 11: r = 56; break; case 12: r = 57; break;
+				}	break;
+			case  7: switch (r)
+				{
+				case  1: r =  7; break; case  2: r = 18; break; case  3: r = 28; break; case  4: r = 37; break;
+				case  5: r = 45; break; case  6: r = 52; break; case  7: r = 58; break; case  8: r = 59; break;
+				case  9: r = 60; break; case 10: r = 61; break; case 11: r = 62; break; case 12: r = 63; break;
+				}	break;
+			case  8: switch (r)
+				{
+				case  1: r =  8; break; case  2: r = 19; break; case  3: r = 29; break; case  4: r = 38; break;
+				case  5: r = 46; break; case  6: r = 53; break; case  7: r = 59; break; case  8: r = 64; break;
+				case  9: r = 65; break; case 10: r = 66; break; case 11: r = 67; break; case 12: r = 68; break;
+				}	break;
+			case  9: switch (r)
+				{
+				case  1: r =  9; break; case  2: r = 20; break; case  3: r = 30; break; case  4: r = 39; break;
+				case  5: r = 47; break; case  6: r = 54; break; case  7: r = 60; break; case  8: r = 65; break;
+				case  9: r = 69; break; case 10: r = 70; break; case 11: r = 71; break; case 12: r = 72; break;
+				}	break;
+			case 10: switch (r)
+				{
+				case  1: r = 10; break; case  2: r = 21; break; case  3: r = 31; break; case  4: r = 40; break;
+				case  5: r = 48; break; case  6: r = 55; break; case  7: r = 61; break; case  8: r = 66; break;
+				case  9: r = 70; break; case 10: r = 73; break; case 11: r = 74; break; case 12: r = 75; break;
+				}	break;
+			case 11: switch (r)
+				{
+				case  1: r = 11; break; case  2: r = 22; break; case  3: r = 32; break; case  4: r = 41; break;
+				case  5: r = 49; break; case  6: r = 56; break; case  7: r = 62; break; case  8: r = 67; break;
+				case  9: r = 71; break; case 10: r = 74; break; case 11: r = 76; break; case 12: r = 77; break;
+				}	break;
+			case 12: switch (r)
+				{
+				case  1: r = 12; break; case  2: r = 23; break; case  3: r = 33; break; case  4: r = 42; break;
+				case  5: r = 50; break; case  6: r = 57; break; case  7: r = 63; break; case  8: r = 68; break;
+				case  9: r = 72; break; case 10: r = 75; break; case 11: r = 77; break; case 12: r = 78; break;
+				}	break;
+			default: break;
+			}
+			
+			it[in].data[0] = r;
+			it[in].data[1] = 0;
+			it[in].sprite[0] = 5655+r;
+		}
+		
+		it[in].flags |= IF_UPDATE;
+		
+		if (in2)
+		{
+			ch[cn].citem = 0;
+			it[in2].used = USE_EMPTY;
+		}
+		
+		return 1;
+	}
+	// Past here we can assume there is an active enchantment
+	
+	if (!CAN_ENCHANT(in2))
+	{
+		do_char_log(cn, 1, "Nothing happened.\n");
+		return 0;
+	}
+	
+	// Check if this enchant can be applied to this item
+	switch (it[in].data[0])
+	{
+		// Only Helmets
+		case  3: case 14: case 22: case 25: case 32: case 60: case 71: 
+			if (!(it[in2].placement & PL_HEAD))
+			{
+				do_char_log(cn, 1, "This can only be applied to Helmets.\n");
+				return 0;
+			}
+			break;
+		
+		// Only Cloaks
+		case  5: case 10: case 21: case 31: case 41: case 56: case 61: 
+			if (!(it[in2].placement & PL_CLOAK))
+			{
+				do_char_log(cn, 1, "This can only be applied to Cloaks.\n");
+				return 0;
+			}
+			break;
+		
+		// Only Chests
+		case  2: case 16: case 23: case 33: case 35: case 74: case 75: 
+			if (!(it[in2].placement & PL_BODY))
+			{
+				do_char_log(cn, 1, "This can only be applied to Body Armors.\n");
+				return 0;
+			}
+			break;
+		
+		// Only Gloves
+		case  8: case 19: case 29: case 38: case 46: case 53: case 59: 
+			if (!(it[in2].placement & PL_ARMS))
+			{
+				do_char_log(cn, 1, "This can only be applied to Gloves.\n");
+				return 0;
+			}
+			break;
+		
+		// Only Boots
+		case  4: case 15: case 37: case 54: case 65: case 70: case 72: 
+			if (!(it[in2].placement & PL_FEET))
+			{
+				do_char_log(cn, 1, "This can only be applied to Boots.\n");
+				return 0;
+			}
+			break;
+		
+		// Only Weapons
+		case 49: case 62: case 66: case 67: case 77: 
+			if (!(it[in2].flags & IF_WEAPON))
+			{
+				do_char_log(cn, 1, "This can only be applied to Weapons.\n");
+				return 0;
+			}
+			break;
+		
+		// Only Armors
+		case  7: case 26: case 52: case 63: case 68: 
+			if (!(it[in2].flags & IF_ARMORS))
+			{
+				do_char_log(cn, 1, "This can only be applied to Armor Pieces.\n");
+				return 0;
+			}
+			break;
+		
+		// Any
+		default: break;
+	}
+	
+	// Apply the enchantment
+	switch (it[in].data[0])
+	{
+		case  1: it[in2].attrib[AT_BRV][0] += 5; break;
+		case  2: it[in2].enchantment =  1; break;
+		case  3: it[in2].enchantment =  2; break;
+		case  4: it[in2].enchantment =  3; break;
+		case  5: it[in2].enchantment =  4; break;
+		case  6: it[in2].enchantment =  5; break;
+		case  7: it[in2].aoe_bonus[0] += 1; break;
+		case  8: it[in2].enchantment =  7; break;
+		case  9: it[in2].move_speed[0] += 6; break;
+		case 10: it[in2].enchantment =  8; break;
+		case 11: it[in2].hp[0] += 35; it[in2].mana[0] += 35; break;
+		case 12: it[in2].ss_weapon += 2; it[in2].ss_armor += 2; break;
+		case 13: it[in2].attrib[AT_WIL][0] += 5; break;
+		case 14: it[in2].enchantment =  9; break;
+		case 15: it[in2].enchantment = 10; break;
+		case 16: it[in2].enchantment = 11; break;
+		case 17: it[in2].enchantment = 12; break;
+		case 18: it[in2].mana[0] += 50; break;
+		case 19: it[in2].enchantment = 13; break;
+		case 20: it[in2].cast_speed[0] += 3; break;
+		case 21: it[in2].enchantment = 14; break;
+		case 22: it[in2].enchantment = 15; break;
+		case 23: it[in2].enchantment = 16; break;
+		case 24: it[in2].attrib[AT_INT][0] += 5; break;
+		case 25: it[in2].enchantment = 17; break;
+		case 26: it[in2].enchantment = 18; break;
+		case 27: it[in2].enchantment = 19; break;
+		case 28: it[in2].spell_mod[0] += 1; break;
+		case 29: it[in2].enchantment = 20; break;
+		case 30: it[in2].cool_bonus[0] += 2; break;
+		case 31: it[in2].enchantment = 21; break;
+		case 32: it[in2].enchantment = 22; break;
+		case 33: it[in2].enchantment = 23; break;
+		case 34: it[in2].attrib[AT_AGL][0] += 5; break;
+		case 35: it[in2].enchantment = 24; break;
+		case 36: it[in2].enchantment = 25; break;
+		case 37: it[in2].enchantment = 26; break;
+		case 38: it[in2].enchantment = 27; break;
+		case 39: it[in2].atk_speed[0] += 3; break;
+		case 40: it[in2].ss_weapon += 3; break;
+		case 41: it[in2].enchantment = 28; break;
+		case 42: it[in2].to_parry[0] += 3; break;
+		case 43: it[in2].attrib[AT_STR][0] += 5; break;
+		case 44: it[in2].enchantment = 29; break;
+		case 45: it[in2].hp[0] += 50; break;
+		case 46: it[in2].enchantment = 30; break;
+		case 47: it[in2].end[0] += 25; break;
+		case 48: it[in2].to_hit[0] += 3; break;
+		case 49: it[in2].base_crit += 1; break;
+		case 50: it[in2].ss_armor += 3; break;
+		case 51: for (n=0;n<5;n++) { it[in2].attrib[n][0] += 2; } break;
+		case 52: it[in2].light[0] += 20; break;
+		case 53: it[in2].enchantment = 31; break;
+		case 54: it[in2].enchantment = 32; break;
+		case 55: it[in2].to_hit[0] += 2; it[in2].to_parry[0] += 2; break;
+		case 56: it[in2].enchantment = 33; break;
+		case 57: it[in2].enchantment = 34; inds = 1; break;
+		case 58: it[in2].spell_apt[0] += 12; break;
+		case 59: it[in2].enchantment = 35; break;
+		case 60: it[in2].enchantment = 36; break;
+		case 61: it[in2].enchantment = 37; break;
+		case 62: it[in2].enchantment = 38; break;
+		case 63: it[in2].enchantment = 39; break;
+		case 64: it[in2].crit_multi[0] += 36; break;
+		case 65: it[in2].enchantment = 40; break;
+		case 66: it[in2].enchantment = 41; break;
+		case 67: it[in2].enchantment = 42; break;
+		case 68: it[in2].enchantment = 43; break;
+		case 69: it[in2].speed[0] += 2; break;
+		case 70: it[in2].enchantment = 44; break;
+		case 71: it[in2].enchantment = 45; break;
+		case 72: it[in2].enchantment = 46; break;
+		case 73: it[in2].top_damage[0] += 12; break;
+		case 74: it[in2].enchantment = 47; break;
+		case 75: it[in2].enchantment = 48; break;
+		case 76: it[in2].crit_chance[0] += 30; break;
+		case 77: it[in2].enchantment = 49; break;
+		case 78: it[in2].gethit_dam[0] += 2; break;
+		default: break;
+	}
+	
+	// Finalize
+	temp = it[in2].temp;
+	
+	it[in2].orig_temp = temp;
+
+	it[in2].current_damage = 0;
+	it[in2].current_age[0] = 0;
+	it[in2].current_age[1] = 0;
+	it[in2].damage_state = 0;
+	
+	it[in2].armor[0] = it_temp[temp].armor[0] + it[in2].ss_armor;
+	it[in2].armor[1] = it_temp[temp].armor[1];
+	
+	it[in2].weapon[0] = it_temp[temp].weapon[0] + it[in2].ss_weapon;
+	it[in2].weapon[1] = it_temp[temp].weapon[1];
+	
+	it[in2].sprite[0] = it_temp[temp].sprite[0];
+	it[in2].sprite[1] = it_temp[temp].sprite[1];
+	
+	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_ENCHANTED | IF_LOOKSPECIAL;
+	it[in2].flags &= ~IF_CAN_EN;
+	
+	if (inds)
+	{
+		it[in2].max_damage = 0;
+		it[in2].flags |= IF_NOREPAIR;
+	}
+	
+	it[in2].value -= 1;
+	it[in2].power += 15;
+	
+	do_char_log(cn, 2, "You enchanted the %s with the talisman.", it[in2].name);
+	souldestroy(cn, in);
+	return 1;
+}
+
+int use_soulstone(int cn, int in, int in2)
 {
-	int in2, rank, c, t, n, m;
+	int rank, c, t, n, m;
 
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
-	if (!(in2 = ch[cn].citem))
+	if (!in2)
 	{
-		do_char_log(cn, 1, "Try using something with the soulstone. Click on the stone with an item under your cursor.\n");
+		do_char_log(cn, 1, "Try using something with the soulstone. Click on it with an item under your cursor.\n");
 		return 0;
 	}
 	if (!IS_SANEITEM(in2))	return 0;
@@ -3545,7 +3882,7 @@ int use_soulstone(int cn, int in)
 			it[in].mana[0] += 10;
 			return 1;
 		default:
-			if (can_be_soulstoned(in2))
+			if (CAN_SOULSTONE(in2))
 			{
 				soultrans_equipment(cn, in, in2);
 				return 1;
@@ -3642,17 +3979,19 @@ int use_soulcatalyst(int cn, int in) // driver 93
 	return 0;
 }
 
-void make_catalyst(int cn, int in, int base)
+void make_catalyst(int cn, int base)
 {
-	int m, v;
+	int m, v, in;
+	
+	in = god_create_item(IT_SOULCATAL);
 	
 	sprintf(it[in].name, "Soul Catalyst");
 	sprintf(it[in].reference, "soul catalyst");
 	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
 	
-	m = (5-RANDOM(base/33+1))+1;
+	m = (5-RANDOM(base/4+1))+1;
 	
-	v = RANDOM(70);
+	v = RANDOM(N_SOULBONUS);
 	if (v>=50 && v<=54) { it[in].attrib[v-50][0] = get_sb(v, 1); m = it[in].attrib[v-50][1] = get_sb(v, 0)*3/2+RANDOM(m); }
 	else if (v==55)     { it[in].hp[0]           = get_sb(v, 1); m = it[in].hp[1]           = get_sb(v, 0)*3/2+RANDOM(m); }
 	else if (v==56)     { it[in].end[0]          = get_sb(v, 1); m = it[in].end[1]          = get_sb(v, 0)*3/2+RANDOM(m); }
@@ -3681,11 +4020,13 @@ void make_catalyst(int cn, int in, int base)
 	chlog(cn, "got soul catalyst");
 }
 
-void make_focus(int cn, int in, int base)
+void make_focus(int cn, int base)
 {
-	int v;
+	int v, in;
 	
-	v = 6 - RANDOM(base/66+3);
+	in = god_create_item(IT_SOULFOCUS);
+	
+	v = 5 - RANDOM(base/8+3);
 					
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
@@ -3697,6 +4038,18 @@ void make_focus(int cn, int in, int base)
 	
 	god_give_char(in, cn);
 	chlog(cn, "got soul focus");
+}
+
+void make_talisfrag(int cn, int n)
+{
+	int in;
+	
+	in = god_create_item(IT_TALISFRAG);
+	
+	it[in].stack = max(1, n);
+	
+	god_give_char(in, cn);
+	chlog(cn, "got talisman fragment(s)");
 }
 
 int start_contract(int cn, int in)
@@ -4363,7 +4716,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/18)*2;
 				ch[co].data[72] = 3;
 				//
-				if (in = god_create_item(IT_SOULCATAL)) make_catalyst(co, in, base);
+				make_talisfrag(co, 1);
 				// 
 				break;
 			case 4:
@@ -4373,7 +4726,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 					B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16)*2;
 				ch[co].data[72] = 4;
 				//
-				if (in = god_create_item(IT_SOULCATAL)) make_catalyst(co, in, base);
+				make_talisfrag(co, 1);
 				//
 				break;
 			case 5:
@@ -4383,7 +4736,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 					B_SK(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/20)*2;
 				ch[co].data[72] = 5;
 				ch[co].data[25] = 1;
-				if (in = god_create_item(IT_SOULFOCUS)) make_focus(co, in, base);
+				//
+				make_talisfrag(co, 2);
+				//
 				break;
 			case 6:
 				for (n = 0; n<5; n++)
@@ -4391,7 +4746,9 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/22)*2;
 				ch[co].data[72] = 6;
-				if (in = god_create_item(IT_SOULFOCUS)) make_focus(co, in, base);
+				//
+				make_talisfrag(co, 3);
+				//
 				break;
 			//
 			default:
@@ -4421,31 +4778,39 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		in = 0;
 		rank = points2rank(ch[co].points_tot);
 		
-		if (rank>=18 && !RANDOM(45))
+		if (rank>=18 && !RANDOM(48))
 		{
 			static int item[]  = {
-				2515, 2519, 2523, 2527, 2531, 2536, 2540, 2544, 2548, 2552
+				2515, 2519, 2523, 2527, 2531, 
+				2536, 2540, 2544, 2548, 2552,
+				2609, 2609, 2609, 2609, 2609
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=15 && !RANDOM(50))
+		else if (rank>=15 && !RANDOM(48))
 		{
 			static int item[]  = {
-				2514, 2518, 2522, 2526, 2530, 2535, 2539, 2543, 2547, 2551
+				2514, 2518, 2522, 2526, 2530, 
+				2535, 2539, 2543, 2547, 2551,
+				2609, 2609, 2609, 2609, 2609
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=12 && !RANDOM(55))
+		else if (rank>=12 && !RANDOM(48))
 		{
 			static int item[]  = {
-				2513, 2517, 2521, 2525, 2529, 2534, 2538, 2542, 2546, 2550
+				2513, 2517, 2521, 2525, 2529, 
+				2534, 2538, 2542, 2546, 2550,
+				2609, 2609, 2609, 2609, 2609
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (!RANDOM(60))
+		else if (!RANDOM(48))
 		{
 			static int item[]  = {
-				2512, 2516, 2520, 2524, 2528, 2533, 2537, 2541, 2545, 2549
+				2512, 2516, 2520, 2524, 2528,
+				2533, 2537, 2541, 2545, 2549,
+				2609, 2609, 2609, 2609, 2609
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}

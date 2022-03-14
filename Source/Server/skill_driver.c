@@ -630,7 +630,6 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	double _cap, _hit, _pow, tmpa, tmph, tmpha, tmpp, tmppa;
 	int xf, yf, xt, yt, xc, yc, x, y;
 	int no_target = 0, usemana = 1;
-	int obsi = 0;
 	
 	if (co)
 	{
@@ -640,16 +639,10 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	hitpower = power;
 	aoe_power += 15; // a small extra 'oomph' so the circle is a bit thicker
 	
-	// Amulet - Obsidian Eye :: Grants +1 radius
-	if (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)
-	{
-		obsi = 2;
-	}
-	
 	switch (intemp)
 	{
 		case SK_WARCRY:
-			spellrad = PRXW_RAD + obsi;
+			spellrad = PRXW_RAD + ch[cn].aoe_bonus;
 			_cap = (double)(PRXW_CAP);
 			_hit = (double)(PRXW_HIT);
 			_pow = (double)(PRXW_POW);
@@ -658,7 +651,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		case SK_TAUNT: if (aoe_power==15) break;
 		case SK_BLIND:
 		case SK_DOUSE:
-			spellrad = PRXB_RAD + obsi;
+			spellrad = PRXB_RAD + ch[cn].aoe_bonus;
 			_cap = (double)(PRXB_CAP);
 			_hit = (double)(PRXB_HIT);
 			_pow = (double)(PRXB_POW);
@@ -667,7 +660,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 		case SK_BLAST: 
 			hitpower = power/2 + power/4;
 		default:
-			spellrad = obsi;
+			spellrad = ch[cn].aoe_bonus;
 			_cap = (double)(PROX_CAP);
 			_hit = (double)(PROX_HIT);
 			_pow = (double)(PROX_POW);
@@ -927,7 +920,7 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power)
 	
 	if (co_orig && co_orig!=cn)
 	{
-		if (is_exhausted(cn)) return 0;
+		if (intemp!=SK_LEAP) if (is_exhausted(cn)) return 0;
 	}
 	
 	usemana = get_use_mana(intemp);
@@ -1259,6 +1252,11 @@ int spellcost(int cn, int cost, int in, int usemana)
 		cost -= cost*20/100;
 	}
 	
+	if (get_enchantment(cn, 22))
+	{
+		cost -= cost*12/100;
+	}
+	
 	mana_cost = end_cost = cost;
 	
 	// Devil Tarot Card
@@ -1483,6 +1481,9 @@ int chance(int cn, int d20)
 	if (get_gear(cn, IT_TW_CROWN))
 		return 0;
 	
+	if (get_enchantment(cn, 15))
+		return 0;
+	
 	if (IS_PLAYER(cn))
 	{
 		// Bad luck gives worse dice
@@ -1663,6 +1664,8 @@ int add_spell(int cn, int in)
 	// Tarot - Chariot.R : 25% weaker debuff spell power
 	if (bu[in].data[5] && IS_SANECHAR(bu[in].data[0]) && get_tarot(bu[in].data[0], IT_CH_CHARIO_R))
 		bu[in].power = bu[in].power * 3/4;
+	if (bu[in].data[5] && get_enchantment(cn, 4))
+		bu[in].power = bu[in].power * 9/10;
 	
 	// Acedia
 	if (IS_SANECHAR(bu[in].data[0]))
@@ -1860,7 +1863,7 @@ void add_exhaust(int cn, int len)
 
 int spell_from_item(int cn, int in2)
 {
-	int in, n;
+	int in, n, thousand = 1000;
 	
 	// 102 are healing potions, 103 are drinks/food
 	if ((ch[cn].flags & CF_NOMAGIC) && !(it[in2].data[1]>=102 && it[in2].data[1]<=110))
@@ -1874,6 +1877,16 @@ int spell_from_item(int cn, int in2)
 	{
 		xlog("god_create_buff failed in skill_from_item");
 		return 0;
+	}
+	
+	if (get_book(cn, IT_BOOK_ALCH)) // Book: Alchemy 101
+	{
+		thousand = thousand * 3/2;
+	}
+	
+	if (get_enchantment(cn, 2))
+	{
+		thousand = thousand * 5/4;
 	}
 	
 	strcpy(bu[in].name, it[in2].name);
@@ -1925,26 +1938,26 @@ int spell_from_item(int cn, int in2)
 	// it[in2].data[2] = HP regen over the given duration
 	if (it[in2].data[2])
 	{
-		bu[in].hp[0]		= it[in2].data[2] * 1000 / it[in2].duration;
+		bu[in].hp[0]		= it[in2].data[2] * thousand / it[in2].duration;
 	}
 	// it[in2].data[3] = EN regen over the given duration
 	if (it[in2].data[3])
 	{
-		bu[in].end[0]		= it[in2].data[3] * 1000 / it[in2].duration;
+		bu[in].end[0]		= it[in2].data[3] * thousand / it[in2].duration;
 	}
 	// it[in2].data[4] = MP regen over the given duration
 	if (it[in2].data[4])
 	{
-		bu[in].mana[0]		= it[in2].data[4] * 1000 / it[in2].duration;
+		bu[in].mana[0]		= it[in2].data[4] * thousand / it[in2].duration;
 	}
 	
 	// Special case for the Rainbow Potion
 	// CGI Rainbow Potion heals 40, here we give a random ++(0-80)
 	if (it[in2].temp==IT_POT_RAIN)
 	{
-		bu[in].hp[0]		+= RANDOM(81) * 1000 / it[in2].duration;
-		bu[in].end[0]		+= RANDOM(81) * 1000 / it[in2].duration;
-		bu[in].mana[0]		+= RANDOM(81) * 1000 / it[in2].duration;
+		bu[in].hp[0]		+= RANDOM(81) * thousand / it[in2].duration;
+		bu[in].end[0]		+= RANDOM(81) * thousand / it[in2].duration;
+		bu[in].mana[0]		+= RANDOM(81) * thousand / it[in2].duration;
 	}
 	
 	bu[in].power 			= it[in2].power;
@@ -2386,11 +2399,13 @@ int spell_regen(int cn, int co, int power)
 }
 int spell_heal(int cn, int co, int power)
 {
-	int in, in2, n, tmp, healing = 2500;
+	int in, in2, n, tmp, healing = 2500, dur = SP_DUR_HEAL;
 	
 	if (!IS_PLAYER(co)) healing = 2000;
 	
-	if (!(in = make_new_buff(cn, SK_HEAL, BUF_SPR_HEALSICK, power, SP_DUR_HEAL, 0))) 
+	if (get_enchantment(co, 9)) dur = dur * 3/4;
+	
+	if (!(in = make_new_buff(cn, SK_HEAL, BUF_SPR_HEALSICK, power, dur, 0))) 
 		return 0;
 	
 	bu[in].data[1] = 0;
@@ -2462,6 +2477,13 @@ int spell_curse(int cn, int co, int power, int flag)
 
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	
+	if (get_enchantment(cn, 20)) power = power*11/10;
+	if (get_enchantment(co, 21)) 
+	{
+		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
+		return 0;
+	}
 	
 	// Tarot Card - Tower :: Change Curse into Greater Curse
 	if (get_tarot(cn, IT_CH_TOWER))
@@ -2556,6 +2578,13 @@ int spell_slow(int cn, int co, int power, int flag)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	
+	if (get_enchantment(cn, 13)) power = power*11/10;
+	if (get_enchantment(co, 14)) 
+	{
+		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
+		return 0;
+	}
 	
 	// Tarot Card - Emperor :: Change Slow into Greater Slow
 	if (get_tarot(cn, IT_CH_EMPEROR))
@@ -2672,6 +2701,8 @@ int spell_poison(int cn, int co, int power, int flag)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	
+	if (get_enchantment(cn, 27)) power = power*11/10;
 	
 	dur = SP_DUR_POISON; 			// 30 seconds
 	
@@ -2849,7 +2880,7 @@ int spell_warcry(int cn, int co, int power, int flag)
 void skill_warcry(cn)
 {
 	int power, aoe_power, cost;
-	int xf, yf, xt, yt, xc, yc, x, y, co, spellaoe, spellrad, obsi=0;
+	int xf, yf, xt, yt, xc, yc, x, y, co, spellaoe, spellrad;
 	int m1, m2;
 	double _cap, tmpa;
 	
@@ -2864,12 +2895,7 @@ void skill_warcry(cn)
 	{
 		aoe_power += 15;
 		
-		if (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)
-		{
-			obsi = 2;
-		}
-		
-		spellrad = PRXW_RAD + obsi;
+		spellrad = PRXW_RAD + ch[cn].aoe_bonus;
 		_cap = (double)(PRXW_CAP);
 		spellaoe = aoe_power/_cap + spellrad;
 		tmpa = (double)(aoe_power*100/_cap + spellrad*100);
@@ -2919,9 +2945,9 @@ void item_info(int cn, int in, int look)
 	
 	if (it[in].driver==68 || it[in].driver==92 || it[in].driver==93) soulstone=1;
 	
-	// if (!look) {
-	do_char_log(cn, 1, "%s:\n", it[in].name);
-	// }
+	if (look<2) {
+		do_char_log(cn, 1, "%s:\n", it[in].name);
+	}
 	if (soulstone)
 	{
 		do_char_log(cn, 1, "Stat          Mod+   Rank Cost\n");
@@ -3066,6 +3092,12 @@ void item_info(int cn, int in, int look)
 		"Thorns", it[in].gethit_dam[0], it[in].gethit_dam[1]);
 	}
 	
+	if (it[in].aoe_bonus[0] || it[in].aoe_bonus[1])
+	{
+		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
+		"AoE Bonus", it[in].aoe_bonus[0], it[in].aoe_bonus[1]);
+	}
+	
 	if (it[in].speed[0] || it[in].speed[1])
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
@@ -3134,7 +3166,7 @@ void item_info(int cn, int in, int look)
 	if (it[in].power && !soulstone)
 	{
 		do_char_log(cn, 1, "%-12.12s  %4d\n",
-		"Item Power", it[in].power);
+		"Complexity", it[in].power);
 	}
 
 	if (it[in].min_rank && !soulstone)
@@ -4515,6 +4547,8 @@ int spell_bleed(int cn, int co, int power)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	
+	if (get_enchantment(cn, 30)) power = power*11/10;
+	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	
 	bpow = BLEEDFORM(power, dur);
@@ -4626,6 +4660,13 @@ int spell_weaken(int cn, int co, int power, int flag)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	
+	if (get_enchantment(cn, 7)) power = power*11/10;
+	if (get_enchantment(co, 8)) 
+	{
+		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
+		return 0;
+	}
+	
 	// Tarot Card - Death :: Change Weaken into Crush
 	if (get_tarot(cn, IT_CH_DEATH))
 	{
@@ -4687,6 +4728,13 @@ int spell_blind(int cn, int co, int power, int flag)
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
+	
+	if (get_enchantment(cn, 31)) power = power*11/10;
+	if (get_enchantment(co, 33)) 
+	{
+		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
+		return 0;
+	}
 	
 	// Tarot Card - Chariot :: Change Blind into Douse
 	if (flag)
@@ -4791,7 +4839,7 @@ int spell_pulse(int cn, int co, int power, int tarot)
 	
 	bu[in].data[1] = len; 								// tick rate
 	bu[in].data[2] = globs->ticker + bu[in].data[1]; 	// next tick
-	bu[in].data[3] = PRXP_RAD + (it[ch[cn].worn[WN_NECK]].temp == IT_AM_OBSIDI)?2:0;
+	bu[in].data[3] = PRXP_RAD + ch[cn].aoe_bonus;
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_PULSE
 }

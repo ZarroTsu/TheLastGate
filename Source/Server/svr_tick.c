@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.8.5\n"};
+static char intro_msg3[] = {"Current client/server version is 0.8.6\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
@@ -2729,7 +2729,7 @@ void plr_change(int nr)
 						if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 							*(short int*)(buf + 7) |= PL_WEAPON;
 						*(unsigned char*)(buf + 9) = it[in].stack;
-						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n];
+						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0);
 
 						it[in].flags &= ~IF_UPDATE;
 					}
@@ -2747,7 +2747,7 @@ void plr_change(int nr)
 				if (!IS_BUILDING(cn))
 				{
 					cpl->item_s[n]=it[in].stack;
-					cpl->item_l[n]=ch[cn].item_lock[n];
+					cpl->item_l[n]=ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0);
 				}
 			}
 		}

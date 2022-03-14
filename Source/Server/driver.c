@@ -2725,6 +2725,10 @@ int npc_try_spell(int cn, int co, int spell)
 	if (spell==SK_WEAKEN && get_tarot(cn, IT_CH_DEATH)) 	truespell = SK_WEAKEN2;
 	if (spell==SK_SLOW   && get_tarot(cn, IT_CH_EMPEROR)) 	truespell = SK_SLOW2;
 	
+	if (spell==SK_WEAKEN && get_enchantment(co,  8)) return 0;
+	if (spell==SK_SLOW   && get_enchantment(co, 14)) return 0;
+	if (spell==SK_CURSE  && get_enchantment(co, 21)) return 0;
+	if (spell==SK_BLIND  && get_enchantment(co, 33)) return 0;
 	
 	// dont blast if enemy armor is too strong
 	// Updated 02/11/2020 - changed the formula to include immunity and allow blasts that would do at least 5 damage.

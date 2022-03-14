@@ -1398,11 +1398,21 @@ void eng_display_win(int plr_sprite,int init)
 				}
 				// Draw lock icon for locked items
 				/*
-				if (pl.item_l[n+inv_pos])
+				if (pl.item_l[n+inv_pos]&1)
 				{
 					copyspritex(4000,261+(n%10)*34,6+(n/10)*34,0);
 				}
 				*/
+				// Draw soulstone icon 
+				if (pl.item_l[n+inv_pos]&2)
+				{
+					copyspritex(4496,261+(n%10)*34,6+(n/10)*34,0);
+				}
+				// Draw talisman icon 
+				if (pl.item_l[n+inv_pos]&4)
+				{
+					copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
+				}
 			}
 			// Draw shortcut key names
 			for (m=0; m<16; m++)

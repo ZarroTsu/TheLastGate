@@ -196,7 +196,7 @@ struct cplayer {
 	int item[40];
 	int item_p[40];
 	char item_s[40];  // Stack size of given item (0 - 10)
-	char item_l[40];  // Whether or not the given item is locked
+	char item_l[40];  // Whether or not the given item is locked or stoned
 
 	// items worn
 	int worn[20];
