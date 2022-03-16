@@ -1630,9 +1630,25 @@ void eng_display_win(int plr_sprite,int init)
 				if (pl.worn[n])
 				{
 					if (hightlight==HL_EQUIPMENT && hightlight_sub==n)
+					{
 						copyspritex(pl.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
+						// Draw soulstone icon 
+						if (pl.worn_p[n]&PL_SOULSTONED)
+							copyspritex(4496, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
+						// Draw talisman icon 
+						if (pl.worn_p[n]&PL_ENCHANTED)
+							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
+					}
 					else
-						copyspritex(pl.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1,  0);
+					{
+						copyspritex(pl.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
+						// Draw soulstone icon 
+						if (pl.worn_p[n]&PL_SOULSTONED)
+							copyspritex(4496, gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
+						// Draw talisman icon 
+						if (pl.worn_p[n]&PL_ENCHANTED)
+							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
+					}
 					
 					if (inv_block[n] && n==WN_CHARM2)
 						copyspritex(4,          gui_equ_x[n]+1, gui_equ_y[n]+1,  0); 
@@ -1687,7 +1703,10 @@ void eng_display_win(int plr_sprite,int init)
 			// Look at target gear
 			for (n = 0; n < 13; n++)
 			{
-				if (look.worn[n]) copyspritex(look.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
+				if (look.worn[n]) 
+				{
+					copyspritex(look.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
+				}
 			}
 			
 			if (look.sprite) copyspritex(look.sprite,935-61,36,0);
@@ -2290,9 +2309,25 @@ void eng_display(int init)	// optimize me!!!!!
 
 	if (init && pl.citem) {
 		if (cursor_type==CT_DROP || cursor_type==CT_SWAP || cursor_type==CT_USE)
+		{
 			copyspritex(pl.citem,mouse_x-16,mouse_y-16,16);
+			// Draw soulstone icon 
+			if (pl.citem_p&PL_SOULSTONED)
+				copyspritex(4496,mouse_x-16,mouse_y-16,16);
+			// Draw talisman icon 
+			if (pl.citem_p&PL_ENCHANTED)
+				copyspritex(4497,mouse_x-16,mouse_y-16,16);
+		}
 		else
+		{
 			copyspritex(pl.citem,mouse_x-16,mouse_y-16,0);
+			// Draw soulstone icon 
+			if (pl.citem_p&PL_SOULSTONED)
+				copyspritex(4496,mouse_x-16,mouse_y-16,0);
+			// Draw talisman icon 
+			if (pl.citem_p&PL_ENCHANTED)
+				copyspritex(4497,mouse_x-16,mouse_y-16,0);
+		}
 		if (pl.citem_s>0&&pl.citem_s<=10)
 			copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,0);
 	}

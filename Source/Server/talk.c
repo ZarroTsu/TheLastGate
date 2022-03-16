@@ -1955,7 +1955,7 @@ void answer_tarot(int cn, int co, int m)
 	
 	if (in = ch[co].worn[m])
 	{
-		if (m==WN_RRING && it[in].temp!=IT_TW_SINBIND)
+		if (m==WN_RRING && it[in].temp!=IT_TW_SINBIND && it[in].orig_temp!=IT_TW_SINBIND)
 		{
 			do_sayx(cn, "Remove what exactly?");
 			return;

@@ -2728,6 +2728,10 @@ void plr_change(int nr)
 						*(short int*)(buf + 7) = it[in].placement;
 						if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 							*(short int*)(buf + 7) |= PL_WEAPON;
+						if (it[in].flags & IF_SOULSTONE)
+							*(short int*)(buf + 7) |= PL_SOULSTONED;
+						if (it[in].flags & IF_ENCHANTED)
+							*(short int*)(buf + 7) |= PL_ENCHANTED;
 						*(unsigned char*)(buf + 9) = it[in].stack;
 						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0);
 
@@ -2845,6 +2849,10 @@ void plr_change(int nr)
 					*(short int*)(buf + 7) = it[in].placement;
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 						*(short int*)(buf + 7) |= PL_WEAPON;
+					if (it[in].flags & IF_SOULSTONE)
+						*(short int*)(buf + 7) |= PL_SOULSTONED;
+					if (it[in].flags & IF_ENCHANTED)
+						*(short int*)(buf + 7) |= PL_ENCHANTED;
 				}
 				else
 				{
@@ -2944,6 +2952,10 @@ void plr_change(int nr)
 					*(short int*)(buf + 3) = it[in].placement;
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 						*(short int*)(buf + 3) |= PL_WEAPON;
+					if (it[in].flags & IF_SOULSTONE)
+						*(short int*)(buf + 3) |= PL_SOULSTONED;
+					if (it[in].flags & IF_ENCHANTED)
+						*(short int*)(buf + 3) |= PL_ENCHANTED;
 					*(unsigned char*)(buf + 5) = it[in].stack;
 
 					it[in].flags &= ~IF_UPDATE;

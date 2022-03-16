@@ -73,6 +73,8 @@
 #define PL_TWOHAND		2048
 #define PL_RING			4096
 //#define PL_CHARM2   8192
+#define PL_SOULSTONED	16384
+#define PL_ENCHANTED	32768
 
 #define DX_RIGHT		1
 #define DX_LEFT			2

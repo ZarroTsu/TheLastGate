@@ -1035,7 +1035,7 @@ void do_swap_gear(int cn)
 	for (n=0; n<12; n++)
 	{
 		if (n==WN_CHARM||n==WN_CHARM2) continue; // don't swap cards!
-		if (it[ch[cn].worn[n]].temp==IT_TW_SINBIND) continue; // don't swap sinbinders!
+		if (it[ch[cn].worn[n]].temp==IT_TW_SINBIND || it[ch[cn].worn[n]].orig_temp==IT_TW_SINBIND) continue; // don't swap sinbinders!
 		in = ch[cn].alt_worn[n];
 		it[in].carried = cn;
 		
@@ -5971,9 +5971,9 @@ int get_tarot(int cn, int in)
 		ch1 = ch[cc].worn[WN_CHARM];
 		ch2 = ch[cc].worn[WN_CHARM2];
 		
-		if (it[ch[cc].worn[WN_LRING]].temp==IT_TW_SINBIND && it[ch[cc].worn[WN_LRING]].data[1]==1) 
+		if ((it[ch[cc].worn[WN_LRING]].temp==IT_TW_SINBIND || it[ch[cc].worn[WN_LRING]].orig_temp==IT_TW_SINBIND) && it[ch[cc].worn[WN_LRING]].data[1]==1) 
 			ch3 = it[ch[cc].worn[WN_LRING]].data[2];
-		if (it[ch[cc].worn[WN_RRING]].temp==IT_TW_SINBIND && it[ch[cc].worn[WN_RRING]].data[1]==1) 
+		if ((it[ch[cc].worn[WN_RRING]].temp==IT_TW_SINBIND || it[ch[cc].worn[WN_RRING]].orig_temp==IT_TW_SINBIND) && it[ch[cc].worn[WN_RRING]].data[1]==1) 
 			ch3 = it[ch[cc].worn[WN_RRING]].data[2];
 		
 		if ((ch1 && it[ch1].temp==IT_CH_HEIROP_R) || (ch2 && it[ch2].temp==IT_CH_HEIROP_R) || (ch3==IT_CH_HEIROP_R))
@@ -5985,9 +5985,9 @@ int get_tarot(int cn, int in)
 	ch1 = ch[cn].worn[WN_CHARM];
 	ch2 = ch[cn].worn[WN_CHARM2];
 	
-	if (it[ch[cn].worn[WN_LRING]].temp==IT_TW_SINBIND && it[ch[cn].worn[WN_LRING]].data[1]==1) 
+	if ((it[ch[cn].worn[WN_LRING]].temp==IT_TW_SINBIND || it[ch[cn].worn[WN_LRING]].orig_temp==IT_TW_SINBIND) && it[ch[cn].worn[WN_LRING]].data[1]==1) 
 		ch3 = it[ch[cn].worn[WN_LRING]].data[2];
-	if (it[ch[cn].worn[WN_RRING]].temp==IT_TW_SINBIND && it[ch[cn].worn[WN_RRING]].data[1]==1) 
+	if ((it[ch[cn].worn[WN_RRING]].temp==IT_TW_SINBIND || it[ch[cn].worn[WN_RRING]].orig_temp==IT_TW_SINBIND) && it[ch[cn].worn[WN_RRING]].data[1]==1) 
 		ch3 = it[ch[cn].worn[WN_RRING]].data[2];
 	
 	if ((ch1 && it[ch1].temp==in) || (ch2 && it[ch2].temp==in) || (ch3==in)) 
@@ -6005,7 +6005,7 @@ int get_book(int cn, int in)
 	
 	in2 = ch[cn].worn[WN_LHAND];
 	
-	if (in2 && it[in2].temp == in) 
+	if (in2 && (it[in2].temp == in || it[in2].orig_temp == in)) 
 		return in2;
 	
 	return 0;
@@ -6018,7 +6018,7 @@ int get_neck(int cn, int in)
 	
 	in2 = ch[cn].worn[WN_NECK];
 	
-	if (in2 && it[in2].temp == in) 
+	if (in2 && (it[in2].temp == in || it[in2].orig_temp == in)) 
 		return in2;
 	
 	return 0;
@@ -6031,7 +6031,7 @@ int get_gear(int cn, int in)
 	
 	for (n = 0; n <= WN_CHARM2; n++)
 	{
-		if ((in2 = ch[cn].worn[n]) && it[in2].temp == in)
+		if ((in2 = ch[cn].worn[n]) && (it[in2].temp == in || it[in2].orig_temp == in))
 			return in2;
 	}
 	
@@ -8761,22 +8761,22 @@ void really_update_char(int cn)
 				aoe += (it[m].aoe_bonus[0])*(gemSpec?7:5)/5;
 			}
 			
-			if (it[m].temp==IT_CH_PREIST || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_PREIST)) 	charmSpec |=    1;
-			if (it[m].temp==IT_CH_LOVERS || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_LOVERS)) 	charmSpec |=    2;
-			if (it[m].temp==IT_CH_MAGI || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_MAGI))   		charmSpec |=    4;
-			if (it[m].temp==IT_CH_HERMIT || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_HERMIT)) 	charmSpec |=    8;
-			if (it[m].temp==IT_CH_FOOL_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_FOOL_R)) 	charmSpec |=   16;
-			if (it[m].temp==IT_CH_STRENGTH || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_STRENGTH))	charmSpec |=   32;
-			if (it[m].temp==IT_CH_WHEEL || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_WHEEL))		charmSpec |=   64;
-			if (it[m].temp==IT_CH_MAGI_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_MAGI_R))		charmSpec |=  128;
-			if (it[m].temp==IT_CH_PREIST_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_PREIST_R))	charmSpec |=  256;
-			if (it[m].temp==IT_CH_EMPRES_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_EMPRES_R))	charmSpec |=  512;
-			if (it[m].temp==IT_CH_LOVERS_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_LOVERS_R))	charmSpec |= 1024;
-			if (it[m].temp==IT_CH_STAR_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_STAR_R))		charmSpec |= 2048;
-			if (it[m].temp==IT_CH_STRENG_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_STRENG_R))	charmSpec |= 4096;
-			if (it[m].temp==IT_CH_WHEEL_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_WHEEL_R))	charmSpec |= 8192;
-			if (it[m].temp==IT_CH_HANGED_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_HANGED_R))	charmSpec |=16384;
-			if (it[m].temp==IT_CH_TEMPER_R || (it[m].temp==IT_TW_SINBIND && it[m].data[2]==IT_CH_TEMPER_R))	charmSpec |=32768;
+			if (it[m].temp==IT_CH_PREIST || (WEARING_SIN(m) && it[m].data[2]==IT_CH_PREIST)) 	charmSpec |=    1;
+			if (it[m].temp==IT_CH_LOVERS || (WEARING_SIN(m) && it[m].data[2]==IT_CH_LOVERS)) 	charmSpec |=    2;
+			if (it[m].temp==IT_CH_MAGI || (WEARING_SIN(m) && it[m].data[2]==IT_CH_MAGI))   		charmSpec |=    4;
+			if (it[m].temp==IT_CH_HERMIT || (WEARING_SIN(m) && it[m].data[2]==IT_CH_HERMIT)) 	charmSpec |=    8;
+			if (it[m].temp==IT_CH_FOOL_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_FOOL_R)) 	charmSpec |=   16;
+			if (it[m].temp==IT_CH_STRENGTH || (WEARING_SIN(m) && it[m].data[2]==IT_CH_STRENGTH))	charmSpec |=   32;
+			if (it[m].temp==IT_CH_WHEEL || (WEARING_SIN(m) && it[m].data[2]==IT_CH_WHEEL))		charmSpec |=   64;
+			if (it[m].temp==IT_CH_MAGI_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_MAGI_R))		charmSpec |=  128;
+			if (it[m].temp==IT_CH_PREIST_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_PREIST_R))	charmSpec |=  256;
+			if (it[m].temp==IT_CH_EMPRES_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_EMPRES_R))	charmSpec |=  512;
+			if (it[m].temp==IT_CH_LOVERS_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_LOVERS_R))	charmSpec |= 1024;
+			if (it[m].temp==IT_CH_STAR_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_STAR_R))		charmSpec |= 2048;
+			if (it[m].temp==IT_CH_STRENG_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_STRENG_R))	charmSpec |= 4096;
+			if (it[m].temp==IT_CH_WHEEL_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_WHEEL_R))	charmSpec |= 8192;
+			if (it[m].temp==IT_CH_HANGED_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_HANGED_R))	charmSpec |=16384;
+			if (it[m].temp==IT_CH_TEMPER_R || (WEARING_SIN(m) && it[m].data[2]==IT_CH_TEMPER_R))	charmSpec |=32768;
 			
 			if (it[m].temp==IT_BOOK_TRAV) 		gearSpec  |=    1;
 			if (it[m].temp==IT_TW_HEAVENS)		gearSpec  |=    2;
@@ -12965,13 +12965,13 @@ int do_swap_item(int cn, int n)
 		return -1;
 	}
 	
-	if (tmp && it[tmp].temp == IT_TW_SINBIND)
+	if (tmp && WEARING_SIN(tmp))
 	{
 		do_char_log(cn, 0, "You cannot equip this ring yourself. Seek the Priest in the Temple of the Purple One for assistance.\n");
 		return -1;
 	}
-	else if ((n==WN_RRING && it[ch[cn].worn[WN_RRING]].temp==IT_TW_SINBIND) || 
-		(n==WN_LRING && it[ch[cn].worn[WN_LRING]].temp==IT_TW_SINBIND))
+	else if ((n==WN_RRING && WEARING_SIN(ch[cn].worn[WN_RRING])) || 
+		(n==WN_LRING && WEARING_SIN(ch[cn].worn[WN_LRING])))
 	{
 		do_char_log(cn, 0, "You cannot remove this ring yourself. Seek the Priest in the Temple of the Purple One for assistance.\n");
 		return -1;

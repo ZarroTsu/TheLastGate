@@ -853,7 +853,7 @@ int npc_give(int cn, int co, int in, int money)
 		(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
 		(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R)))
 		||
-		(ch[cn].temp==CT_PRIEST && it[in].temp==IT_TW_SINBIND && it[in].data[1]==1)
+		(ch[cn].temp==CT_PRIEST && (it[in].temp==IT_TW_SINBIND || it[in].orig_temp==IT_TW_SINBIND) && it[in].data[1]==1)
 		||
 		(ch[cn].temp==CT_HERBCOLL && 
 		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD))
@@ -951,9 +951,9 @@ int npc_give(int cn, int co, int in, int money)
 			ch[co].misc_action = DR_IDLE;
 			return 0;
 		}
-		else if (ch[cn].temp==CT_PRIEST && it[in].temp==IT_TW_SINBIND && it[in].data[1]==1)
+		else if (ch[cn].temp==CT_PRIEST && (it[in].temp==IT_TW_SINBIND || it[in].orig_temp==IT_TW_SINBIND) && it[in].data[1]==1)
 		{
-			if (((in2 = ch[co].worn[WN_RRING]) && it[in2].temp!=IT_TW_SINBIND) || ch[co].worn[WN_LRING])
+			if (((in2 = ch[co].worn[WN_RRING]) && it[in2].temp!=IT_TW_SINBIND && it[in2].orig_temp!=IT_TW_SINBIND) || ch[co].worn[WN_LRING])
 			{
 				do_sayx(cn, "So sorry %s, but could you take the rings you're wearing off first? Thanks.", ch[co].name);
 				god_take_from_char(in, cn);
@@ -982,7 +982,7 @@ int npc_give(int cn, int co, int in, int money)
 			god_take_from_char(in, cn);
 			do_char_log(co, 1, "The Priest chanted something and the %s slipped on your finger.\n", it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-			if ((in2 = ch[co].worn[WN_RRING]) && it[in2].temp==IT_TW_SINBIND)
+			if ((in2 = ch[co].worn[WN_RRING]) && (it[in2].temp==IT_TW_SINBIND || it[in2].orig_temp==IT_TW_SINBIND))
 			{
 				do_sayx(cn, "I have removed your old Sinbinder for you. It's all yours.");
 				do_char_log(co, 1, "%s returned the previous Sinbinder Ring to you.\n", ch[cn].reference);
@@ -2438,7 +2438,7 @@ int npc_see(int cn, int co)
 					{
 						for (m=0;m<40;m++)
 						{
-							if (it[ch[cn].item[n]].temp==IT_TW_SINBIND)
+							if (it[ch[cn].item[n]].temp==IT_TW_SINBIND || it[ch[cn].item[n]].orig_temp==IT_TW_SINBIND)
 								break;
 						}
 					}

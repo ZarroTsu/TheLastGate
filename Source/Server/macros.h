@@ -43,6 +43,8 @@
 #define CAN_ENCHANT(in)		(it[(in)].flags & IF_CAN_EN)
 #define HAS_ENCHANT(in, n)	(it[(in)].enchantment == (n))
 
+#define WEARING_SIN(n)		(it[(m)].temp==IT_TW_SINBIND || it[(m)].orig_temp==IT_TW_SINBIND)
+
 
 /* *** TEMPLATES *** */
 

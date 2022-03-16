@@ -261,6 +261,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	*/
 	
 	ch[cn].a_hp 	= 999999;
+	ch[cn].a_end 	= 999999;
 	ch[cn].a_mana 	= 999999;
 	
 	ch[cn].data[5] = ch[cn].attack_cn;

@@ -6660,16 +6660,20 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 									if (co)
 									{
 										if (mission==5) goal++;
-										i = RANDOM(3);
+										i = RANDOM(5);
 										switch (i)
 										{
-											case  1:	it[co].sprite[0] = 16812; it[co].data[0] = 1; break;
-											case  2:	it[co].sprite[0] = 16813; it[co].data[0] = 2; break;
+											case  1:
+											case  2:	it[co].sprite[0] = 16812; it[co].data[0] = 1; break;
+											case  3:
+											case  4:	it[co].sprite[0] = 16813; it[co].data[0] = 2; break;
 											default:	it[co].sprite[0] = 16814; it[co].data[0] = 3; break;
 										}
 										it[co].data[1] = RANDOM(5);
 										it[co].data[2] = rank;
 										it[co].data[3] = tier;
+										it[co].data[4] = flags;
+										it[co].data[5] = tarot;
 									}
 									break;
 								case  8: 		// Map Entrance Point

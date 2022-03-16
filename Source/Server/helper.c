@@ -3313,7 +3313,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	}
 	else
 	{
-		do_char_log(cn, 2, "You enhanced the %s with a rank %d soulstone.", it[in2].name, rank);
+		do_char_log(cn, 7, "You enhanced the %s with a rank %d soulstone.", it[in2].name, rank);
 	}
 }
 
@@ -3752,9 +3752,16 @@ int use_talisman(int cn, int in, int in2)
 	}
 	
 	// Finalize
-	temp = it[in2].temp;
-	
-	it[in2].orig_temp = temp;
+	if (it[in2].temp)
+	{
+		temp = it[in2].temp;
+		
+		it[in2].orig_temp = temp;
+	}
+	else
+	{
+		temp = it[in2].orig_temp;
+	}
 
 	it[in2].current_damage = 0;
 	it[in2].current_age[0] = 0;
@@ -3803,17 +3810,19 @@ int use_soulstone(int cn, int in, int in2)
 	{
 		// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
 		
-		it[in].data[1] += it[in2].data[1] - RANDOM(it[in2].data[1]/10 + 1);
+		it[in].data[1] += it[in2].data[1] - (RANDOM(it[in2].data[1]/4 + 1)+RANDOM(it[in2].data[1]/4 + 1));
 		rank = points2rank(it[in].data[1]);
 		
 		if (rank > N_SOULMAX) rank = N_SOULMAX;
 		
 		it[in].data[0] = rank;
 		sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, it[in].data[1]);
-
+		
+		do_char_log(cn, 7, "You fed the held soulstone to the one in your bag. It is now level %d.\n", rank);
+		
 		if (rank==N_SOULMAX)
 		{
-			do_char_log(cn, 1, "That's as high as they go.\n");
+			do_char_log(cn, 7, "(That's as high as they go!)\n");
 		}
 		
 		// Copy Focus
@@ -3829,6 +3838,7 @@ int use_soulstone(int cn, int in, int in2)
 	}
 	
 	// Soul Focus
+	/*
 	if (it[in2].driver==92)
 	{
 		// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
@@ -3843,6 +3853,7 @@ int use_soulstone(int cn, int in, int in2)
 		souldestroy(cn, in2);
 		return 1;
 	}
+	*/
 	
 	// Soul Catalyst
 	if (it[in2].driver==93)
@@ -3924,6 +3935,15 @@ int use_soulfocus(int cn, int in) // driver 92
 		return 1;
 	}
 	
+	if (it[in2].driver==92) // Soul Focus
+	{
+		it[in].data[0] = max(1, max(it[in].data[0], it[in2].data[0])-1);
+		sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to reduce its rank cost.", it[in].data[0]);
+		chlog(cn, "used focus on focus");
+		souldestroy(cn, in2);
+		return 1;	
+	}
+	
 	if (it[in2].driver==93) // Soul Catalyst
 	{
 		if (do_catalyst_focus(cn, in, in2))
@@ -3939,9 +3959,35 @@ int use_soulfocus(int cn, int in) // driver 92
 	return 0;
 }
 
+void make_catalyst(int cn, int base)
+{
+	int m, v, in;
+	
+	in = god_create_item(IT_SOULCATAL);
+	
+	sprintf(it[in].name, "Soul Catalyst");
+	sprintf(it[in].reference, "soul catalyst");
+	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
+	
+	m = max(1, 4 - (base/6 + RANDOM(base/6 + 2))) + 1;
+	
+	v = RANDOM(MAXSKILL);
+	it[in].skill[v][0] = get_sb(v, 1); 
+	m = it[in].skill[v][1] = get_sb(v, 0)+RANDOM(m);
+	
+	it[in].data[3] = m;
+	it[in].data[4] = v+1;
+	it[in].temp = 0;
+	it[in].driver = 93;
+	it[in].flags |= IF_IDENTIFIED;
+	
+	god_give_char(in, cn);
+	chlog(cn, "got soul catalyst");
+}
+
 int use_soulcatalyst(int cn, int in) // driver 93
 {
-	int in2, c, t, n, m;
+	int in2, in3, m, v, v1, v2;
 
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
@@ -3974,50 +4020,44 @@ int use_soulcatalyst(int cn, int in) // driver 93
 		}
 		return 0;
 	}
+	
+	if (it[in2].driver==93) // Soul Catalyst
+	{
+		in3 = god_create_item(IT_SOULCATAL);
+		if (in3)
+		{
+			sprintf(it[in3].name, "Soul Catalyst");
+			sprintf(it[in3].reference, "soul catalyst");
+			sprintf(it[in3].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
+			
+			v1 = it[in].data[4]-1;
+			v2 = it[in2].data[4]-1;
+			
+			m = max(it[in].data[3]-get_sb(v1, 0), it[in2].data[3]-get_sb(v2, 0));
+			
+			v = RANDOM(MAXSKILL);
+			it[in3].skill[v][0] = get_sb(v, 1); 
+			m = it[in3].skill[v][1] = get_sb(v, 0) + m;
+			
+			it[in3].data[3] = m;
+			it[in3].data[4] = v+1;
+			it[in3].temp = 0;
+			it[in3].driver = 93;
+			it[in3].flags |= IF_IDENTIFIED;
+			
+			chlog(cn, "used catalyst on catalyst");
+			souldestroy(cn, in);
+			souldestroy(cn, in2);
+			god_give_char(in3, cn);
+			return 1;
+		}
+		return 0;
+	}
+	
+	// 
 
 	do_char_log(cn, 1, "Nothing happened.\n");
 	return 0;
-}
-
-void make_catalyst(int cn, int base)
-{
-	int m, v, in;
-	
-	in = god_create_item(IT_SOULCATAL);
-	
-	sprintf(it[in].name, "Soul Catalyst");
-	sprintf(it[in].reference, "soul catalyst");
-	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
-	
-	m = (5-RANDOM(base/4+1))+1;
-	
-	v = RANDOM(N_SOULBONUS);
-	if (v>=50 && v<=54) { it[in].attrib[v-50][0] = get_sb(v, 1); m = it[in].attrib[v-50][1] = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==55)     { it[in].hp[0]           = get_sb(v, 1); m = it[in].hp[1]           = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==56)     { it[in].end[0]          = get_sb(v, 1); m = it[in].end[1]          = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==57)     { it[in].mana[0]         = get_sb(v, 1); m = it[in].mana[1]         = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==58)     { it[in].weapon[0]       = get_sb(v, 1); m = it[in].weapon[1]       = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==59)     { it[in].armor[0]        = get_sb(v, 1); m = it[in].armor[1]        = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==60)     { it[in].move_speed[0]   = get_sb(v, 1); m = it[in].move_speed[1]   = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==61)     { it[in].atk_speed[0]    = get_sb(v, 1); m = it[in].atk_speed[1]    = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==62)     { it[in].cast_speed[0]   = get_sb(v, 1); m = it[in].cast_speed[1]   = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==63)     { it[in].spell_mod[0]    = get_sb(v, 1); m = it[in].spell_mod[1]    = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==64)     { it[in].spell_apt[0]    = get_sb(v, 1); m = it[in].spell_apt[1]    = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==65)     { it[in].cool_bonus[0]   = get_sb(v, 1); m = it[in].cool_bonus[1]   = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==66)     { it[in].crit_chance[0]  = get_sb(v, 1); m = it[in].crit_chance[1]  = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==67)     { it[in].crit_multi[0]   = get_sb(v, 1); m = it[in].crit_multi[1]   = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==68)     { it[in].top_damage[0]   = get_sb(v, 1); m = it[in].top_damage[1]   = get_sb(v, 0)*3/2+RANDOM(m); }
-	else if (v==69)     { it[in].gethit_dam[0]   = get_sb(v, 1); m = it[in].gethit_dam[1]   = get_sb(v, 0)*3/2+RANDOM(m); }
-	else                { it[in].skill[v][0]     = get_sb(v, 1); m = it[in].skill[v][1]     = get_sb(v, 0)*3/2+RANDOM(m); }
-	
-	it[in].data[3] = m;
-	it[in].data[4] = v+1;
-	it[in].temp = 0;
-	it[in].driver = 93;
-	it[in].flags |= IF_IDENTIFIED;
-	
-	god_give_char(in, cn);
-	chlog(cn, "got soul catalyst");
 }
 
 void make_focus(int cn, int base)
@@ -4026,11 +4066,11 @@ void make_focus(int cn, int base)
 	
 	in = god_create_item(IT_SOULFOCUS);
 	
-	v = 5 - RANDOM(base/8+3);
+	v = max(1, 6 - (base/8 + RANDOM(base/8 + 2)));
 					
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus of %d. Can be used on a soulstone to reduce the number of random results, or a soul catalyst to reduce its rank cost.", v);
+	sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to reduce its rank cost.", v);
 	
 	it[in].data[0] = v;
 	it[in].temp = 0;

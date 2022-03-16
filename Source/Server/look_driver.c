@@ -160,6 +160,8 @@ void look_extra(int cn, int in)
 	
 	temp = it[in].temp;
 	
+	if (!temp && it[in].orig_temp) temp = it[in].orig_temp;
+	
 	switch (temp)
 	{
 	// -------- TOWER ITEMS --------
@@ -804,7 +806,7 @@ void look_talisman(int cn, int in)
 		case  4: do_char_log(cn, 8, "[Boots Only] Cannot trigger floor traps.\n"); break; //  3
 		case  5: do_char_log(cn, 8, "[Cloak Only] 10%% less effect of debuffs on you.\n"); break; //  4
 		case  6: do_char_log(cn, 8, "4%% more total Braveness.\n"); break; //  5
-		case  7: do_char_log(cn, 8, "[Armor Pieces Only]\n"); break;
+		case  7: do_char_log(cn, 8, "[Armor Pieces Only] %-12.12s  %+4d\n", "AoE Bonus", 1); break;
 		case  8: do_char_log(cn, 8, "[Gloves Only] 10%% more effect of Weakens you inflict.\n"); break; //  7
 		case  9: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Move Speed", 6); break;
 		case 10: do_char_log(cn, 8, "[Cloak Only] Cannot be Weakened.\n"); break; //  8
@@ -846,10 +848,10 @@ void look_talisman(int cn, int in)
 		case 46: do_char_log(cn, 8, "[Gloves Only] 10%% more effect of Bleeds you inflict.\n"); break; // 30
 		case 47: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Endurance", 25); break;
 		case 48: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit Bonus", 3); break;
-		case 49: do_char_log(cn, 8, "[Weapons Only]\n"); break;
+		case 49: do_char_log(cn, 8, "[Weapons Only] %-12.12s  %+4d\n", "Base Crit", 1); break;
 		case 50: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Armor Value", 3); break;
 		case 51: do_char_log(cn, 1, "%-12.12s  %+4d\n", "All Attribs", 2); break;
-		case 52: do_char_log(cn, 8, "[Armor Pieces Only]\n"); break;
+		case 52: do_char_log(cn, 8, "[Armor Pieces Only] %-12.12s  %+4d\n", "Glow", 20); break;
 		case 53: do_char_log(cn, 8, "[Gloves Only] 10%% more effect of Blinds you inflict.\n"); break; // 31
 		case 54: do_char_log(cn, 8, "[Boots Only] Grants 25%% stronger regeneration rates while idle.\n"); break; // 32
 		case 55: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit & Parry", 2); break;
