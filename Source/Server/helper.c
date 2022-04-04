@@ -2037,11 +2037,11 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				break;
 			case 30:
 				if (legendary) suffix = "Chirurgia"; else suffix = " of Surgery";
-				it[in].crit_multi[0] += 10 * mul;
+				it[in].crit_multi[0] += 25 * mul;
 				break;
 			case 31:
 				if (legendary) suffix = "Acceleratio"; else suffix = " of Acceleration";
-				it[in].speed[0] += 2 * mul;
+				it[in].speed[0] += 3 * mul;
 				break;
 			//
 			default:
@@ -2311,12 +2311,46 @@ struct npc_class npc_class[] = {
 	{"Volcan"                  	},	// 184
 	{"Ignis"                    },	// 185
 	//
-	{""                     	},	// 186
-	{""                     	},	// 187
-	{""                     	},	// 188
-	{""                     	},	// 189
+	{"Lesser Scorpion"          },	// 186
+	{"Scorpion"                 },	// 187
+	{"Greater Scorpion"         },	// 188
+	//
+	{"Dire Rat"                 },	// 189
+	//
 	{""                     	},	// 190
-	{""                     	}	// 191
+	{""                     	},	// 191
+	{""                     	},	// 192
+	{""                     	},	// 193
+	{""                     	},	// 194
+	{""                     	},	// 195
+	{""                     	},	// 196
+	{""                     	},	// 197
+	{""                     	},	// 198
+	{""                     	},	// 199
+	{""                     	},	// 200
+	{""                     	},	// 201
+	{""                     	},	// 202
+	{""                     	},	// 203
+	{""                     	},	// 204
+	{""                     	},	// 205
+	{""                     	},	// 206
+	{""                     	},	// 207
+	{""                     	},	// 208
+	{""                     	},	// 209
+	{""                     	},	// 210
+	{""                     	},	// 211
+	{""                     	},	// 212
+	{""                     	},	// 213
+	{""                     	},	// 214
+	{""                     	},	// 215
+	{""                     	},	// 216
+	{""                     	},	// 217
+	{""                     	},	// 218
+	{""                     	},	// 219
+	{""                     	},	// 220
+	{""                     	},	// 221
+	{""                     	},	// 222
+	{""                     	}	// 223
 };
 
 int killed_class(int cn, int val)
@@ -2358,11 +2392,18 @@ int killed_class(int cn, int val)
 		ch[cn].data[70] |= bit;
 		return(tmp);
 	}
-	else
+	else if (val<192)
 	{
 		bit = 1 << (val - 160);
 		tmp = ch[cn].data[93] & bit;
 		ch[cn].data[93] |= bit;
+		return(tmp);
+	}
+	else
+	{
+		bit = 1 << (val - 192);
+		tmp = ch[cn].data[73] & bit;
+		ch[cn].data[73] |= bit;
 		return(tmp);
 	}
 }
@@ -3287,7 +3328,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	it[in2].min_rank = max(rank, it[in2].min_rank);
 	it[in2].value -= 1;
 	
-	if (HAS_ENCHANT(in2, 34))
+	if (!HAS_ENCHANT(in2, 34))
 	{
 		it[in2].flags &= ~IF_NOREPAIR;
 		if (!it[in2].max_damage)
@@ -3464,6 +3505,7 @@ int do_catalyst_focus(int cn, int inf, int inc)
 int use_talisman(int cn, int in, int in2)
 {	// [in] is talisman, [in2] is the target item
 	int r, n, temp, inds = 0;
+	int stk, val;
 	
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
@@ -3583,8 +3625,20 @@ int use_talisman(int cn, int in, int in2)
 		
 		if (in2)
 		{
-			ch[cn].citem = 0;
-			it[in2].used = USE_EMPTY;
+			if (it[in2].stack>1)
+			{
+				stk = it[in2].stack;
+				val = it[in2].value / stk;
+				stk--;
+				it[in2].stack = stk;
+				it[in2].value = val * stk;
+				it[in2].flags |= IF_UPDATE;
+			}
+			else
+			{
+				it[in2].used = USE_EMPTY;
+				ch[cn].citem = 0;
+			}
 		}
 		
 		return 1;
@@ -3733,7 +3787,7 @@ int use_talisman(int cn, int in, int in2)
 		case 61: it[in2].enchantment = 37; break;
 		case 62: it[in2].enchantment = 38; break;
 		case 63: it[in2].enchantment = 39; break;
-		case 64: it[in2].crit_multi[0] += 36; break;
+		case 64: it[in2].crit_multi[0] += 25; break;
 		case 65: it[in2].enchantment = 40; break;
 		case 66: it[in2].enchantment = 41; break;
 		case 67: it[in2].enchantment = 42; break;
@@ -3745,7 +3799,7 @@ int use_talisman(int cn, int in, int in2)
 		case 73: it[in2].top_damage[0] += 12; break;
 		case 74: it[in2].enchantment = 47; break;
 		case 75: it[in2].enchantment = 48; break;
-		case 76: it[in2].crit_chance[0] += 30; break;
+		case 76: it[in2].crit_chance[0] += 20; break;
 		case 77: it[in2].enchantment = 49; break;
 		case 78: it[in2].gethit_dam[0] += 2; break;
 		default: break;
@@ -3789,7 +3843,7 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].value -= 1;
 	it[in2].power += 15;
 	
-	do_char_log(cn, 2, "You enchanted the %s with the talisman.", it[in2].name);
+	do_char_log(cn, 2, "You enchanted the %s with the talisman.\n", it[in2].name);
 	souldestroy(cn, in);
 	return 1;
 }
@@ -4756,7 +4810,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 					B_SK(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/18)*2;
 				ch[co].data[72] = 3;
 				//
-				make_talisfrag(co, 1);
+				make_talisfrag(co, RANDOM(2)+1);
 				// 
 				break;
 			case 4:
@@ -4766,7 +4820,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 					B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16)*2;
 				ch[co].data[72] = 4;
 				//
-				make_talisfrag(co, 1);
+				make_talisfrag(co, 2);
 				//
 				break;
 			case 5:
@@ -4777,7 +4831,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				ch[co].data[72] = 5;
 				ch[co].data[25] = 1;
 				//
-				make_talisfrag(co, 2);
+				make_talisfrag(co, RANDOM(2)+2);
 				//
 				break;
 			case 6:

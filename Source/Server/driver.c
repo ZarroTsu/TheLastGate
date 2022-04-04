@@ -807,7 +807,7 @@ int convert_skill_for_group(int co, int nr)
 
 int npc_give(int cn, int co, int in, int money)
 {
-	int nr, ar, canlearn = 1;
+	int nr, ar, canlearn = 1, stsz = 1;
 	int tmp = 0;
 	int qnum = 0;
 	int n, in2 = 0;
@@ -853,13 +853,16 @@ int npc_give(int cn, int co, int in, int money)
 		(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
 		(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R)))
 		||
-		(ch[cn].temp==CT_PRIEST && (it[in].temp==IT_TW_SINBIND || it[in].orig_temp==IT_TW_SINBIND) && it[in].data[1]==1)
+		(ch[cn].temp==CT_PRIEST && IS_SINBINDER(in) && it[in].data[1]==1)
 		||
 		(ch[cn].temp==CT_HERBCOLL && 
 		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD))
 		||
 		(ch[cn].temp==CT_HERBCOLL2 && 
 		(it[in].temp==IT_HERBE))
+		||
+		(ch[cn].temp==CT_SCORPCOLL && 
+		(it[in].temp==IT_SCORL || it[in].temp==IT_SCORP || it[in].temp==IT_SCORG || it[in].temp==IT_SCORQ))
 		) && canlearn)
 	{
 		// Assure the player has inventory space before we do anything
@@ -879,6 +882,9 @@ int npc_give(int cn, int co, int in, int money)
 				return 0;
 			}
 		}
+		
+		if (it[in].stack>1) 
+			stsz = it[in].stack;
 		
 		if (ch[cn].temp==CT_OSIRIS && it[in].temp==MCT_CONTRACT)
 		{
@@ -951,9 +957,9 @@ int npc_give(int cn, int co, int in, int money)
 			ch[co].misc_action = DR_IDLE;
 			return 0;
 		}
-		else if (ch[cn].temp==CT_PRIEST && (it[in].temp==IT_TW_SINBIND || it[in].orig_temp==IT_TW_SINBIND) && it[in].data[1]==1)
+		else if (ch[cn].temp==CT_PRIEST && IS_SINBINDER(in) && it[in].data[1]==1)
 		{
-			if (((in2 = ch[co].worn[WN_RRING]) && it[in2].temp!=IT_TW_SINBIND && it[in2].orig_temp!=IT_TW_SINBIND) || ch[co].worn[WN_LRING])
+			if (((in2 = ch[co].worn[WN_RRING]) && NOT_SINBINDER(in2)) || ch[co].worn[WN_LRING])
 			{
 				do_sayx(cn, "So sorry %s, but could you take the rings you're wearing off first? Thanks.", ch[co].name);
 				god_take_from_char(in, cn);
@@ -982,7 +988,7 @@ int npc_give(int cn, int co, int in, int money)
 			god_take_from_char(in, cn);
 			do_char_log(co, 1, "The Priest chanted something and the %s slipped on your finger.\n", it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-			if ((in2 = ch[co].worn[WN_RRING]) && (it[in2].temp==IT_TW_SINBIND || it[in2].orig_temp==IT_TW_SINBIND))
+			if ((in2 = ch[co].worn[WN_RRING]) && IS_SINBINDER(in2))
 			{
 				do_sayx(cn, "I have removed your old Sinbinder for you. It's all yours.");
 				do_char_log(co, 1, "%s returned the previous Sinbinder Ring to you.\n", ch[cn].reference);
@@ -1000,26 +1006,42 @@ int npc_give(int cn, int co, int in, int money)
 		}
 		else if ((ch[cn].temp==CT_HERBCOLL && 
 			(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD)) || 
-			(ch[cn].temp==CT_HERBCOLL2 && it[in].temp==IT_HERBE))
+			(ch[cn].temp==CT_HERBCOLL2 && it[in].temp==IT_HERBE) ||
+			(ch[cn].temp==CT_SCORPCOLL && (it[in].temp==IT_SCORL || it[in].temp==IT_SCORP || it[in].temp==IT_SCORG || it[in].temp==IT_SCORQ)))
 		{
-			if (ch[cn].temp==CT_HERBCOLL && points2rank(ch[co].points_tot)<8)
+			if ((ch[cn].temp==CT_HERBCOLL || ch[cn].temp==CT_SCORPCOLL) && points2rank(ch[co].points_tot)<8)
 			{
-				do_sayx(cn, "I'm sorry %s, I don't have a use for weeds!", ch[co].name);
+				if (ch[cn].temp==CT_HERBCOLL)
+					do_sayx(cn, "I'm sorry %s, I don't have a use for weeds!", ch[co].name);
+				else
+					do_sayx(cn, "I'm sorry %s, come back a little stronger, eh?", ch[co].name);
 				god_take_from_char(in, cn);
 				god_give_char(in, co);
 				do_char_log(co, 1, "%s did not accept the %s.\n", ch[cn].reference, it[in].name);
 				return 0;
 			}
-			if (it[in].temp==IT_HERBA)			money =  10000;
-			else if (it[in].temp==IT_HERBB)	money =  15000;
-			else if (it[in].temp==IT_HERBC)	money =  25000;
-			else if (it[in].temp==IT_HERBD)	money =  60000;
-			else								money = 120000;
-			nr = money;
+			
+			switch (it[in].temp)
+			{
+				case IT_HERBA: money =  10000*stsz; nr = money; break;
+				case IT_HERBB: money =  15000*stsz; nr = money; break;
+				case IT_HERBC: money =  25000*stsz; nr = money; break;
+				case IT_HERBD: money =  60000*stsz; nr = money; break;
+				case IT_HERBE: money = 120000*stsz; nr = money; break;
+				
+				case IT_SCORL: money =    500*stsz; nr = money*3/2; break;
+				case IT_SCORP: money =   1000*stsz; nr = money; break;
+				case IT_SCORG: money =   2500*stsz; nr = money*3/4; break;
+				case IT_SCORQ: money =  20000*stsz; nr = money*3; break;
+				
+				default: money = 1000*stsz; nr = money; break;
+			}
+			
 			if (ch[cn].temp==CT_HERBCOLL2)
 				do_sayx(cn, "Here'sss your payment, and a bit of knowledge.");
 			else
 				do_sayx(cn, "Here's your payment, and a bit of knowledge.");
+			
 			god_take_from_char(in, cn);
 			it[in].used = USE_EMPTY;
 			ch[co].gold += money;
@@ -1037,7 +1059,7 @@ int npc_give(int cn, int co, int in, int money)
 			// </group rewards>
 			ch[co].misc_action = DR_IDLE;
 			return 0;
-		}	
+		}
 		else
 		{
 			// Tutorial 6
@@ -1327,7 +1349,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, nr/4, 0, -1);
+						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1);
 					}
 					god_take_from_char(in, cn);
 					it[in].used = USE_EMPTY;  // silently destroy the item.
@@ -1341,7 +1363,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1);
 					}
 					god_take_from_char(in, cn);
 					it[in].used = USE_EMPTY;  // silently destroy the item.
@@ -1360,7 +1382,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr2 = ch[cn].data[51])!=0) do_give_exp(n, nr2/max(1,div), 0, -1);
+						if ((nr2 = ch[cn].data[51])!=0) do_give_exp(n, nr2/max(1,div) + (nr*(stsz-1))/4, 0, -1);
 					}
 				}
 				// </group rewards>
@@ -1381,7 +1403,7 @@ int npc_give(int cn, int co, int in, int money)
 				{
 					int div = 4;
 					do_sayx(cn, "For your effort, allow me to teach you some mysteries of the world.");
-					do_give_exp(co, tmp ? nr/max(1,div) : nr, 0, -1);
+					do_give_exp(co, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
 					// <group rewards>
 					for (n = 1; n<MAXCHARS; n++)
 					{
@@ -1390,14 +1412,14 @@ int npc_give(int cn, int co, int in, int money)
 						{
 							div = 4;
 							if (qnum >= 101) tmp = npc_quest_check(n, qnum-101);
-							do_give_exp(n, tmp ? nr/max(1,div) : nr, 0, -1);
+							do_give_exp(n, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
 						}
 					}
 					// </group rewards>
 				}
 			}
 		}
-		else if ((money = ch[cn].data[69])!=0)
+		else if ((money = ch[cn].data[69]*stsz)!=0)
 		{
 			if (money < 10000)
 				do_sayx(cn, "Here is a small token of gratitude, %s.", ch[co].name);
@@ -1410,14 +1432,14 @@ int npc_give(int cn, int co, int in, int money)
 			if ((nr = ch[cn].data[51])!=0)
 			{
 				do_sayx(cn, "As an extra thanks, let me teach you a little something I know.");
-				do_give_exp(co, tmp ? nr/4 : nr, 0, -1);
+				do_give_exp(co, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
 				// <group rewards>
 				for (n = 1; n<MAXCHARS; n++)
 				{
 					if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
 					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
 					{
-						do_give_exp(n, tmp ? nr/4 : nr, 0, -1);
+						do_give_exp(n, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
 					}
 				}
 				// </group rewards>
@@ -2305,9 +2327,23 @@ int npc_see(int cn, int co)
 			{
 				do_sayx(cn, "Isssh... Human, bring me... the Coral Axe from the King of the Sssea Pentagram Quessst. I may give you thisss belt in exchange.", ch[co].name);
 			}
-			else if (strcmp(ch[cn].text[2], "#quest133")==0) //   xx - Zorani - Black Plants
+			else if (strcmp(ch[cn].text[2], "#quest133")==0) //   32 - Oswald - Old Well
+			{
+				if (points2rank(ch[co].points_tot)<10) // 1st Lieu
+					do_sayx(cn, "'Ello, mate.");
+				else
+					do_sayx(cn, "'Ello, mate. Bring me some of the water from the ol' well cistern and I'd reward you with this here leather necklace.");
+			}
+			else if (strcmp(ch[cn].text[2], "#blackherbs")==0) //   xx - Zorani - Black Plants
 			{
 				do_sayx(cn, "Greetingsss, human! Pleassse bring me rare, black herbsss from treacherousss placesss. I would pay you very well.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#scorpions")==0) //   xx - Faiza - Scorpions
+			{
+				if (points2rank(ch[co].points_tot)<8) // SGM
+					do_sayx(cn, "Salutations, %s.", ch[co].name);
+				else
+					do_sayx(cn, "Salutations, %s. There are many scorpions in the canyon and desert south of here. I pay good prices for their heads!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#skill16")==0) //    10   	Swimming			( Lucci )
 			{
@@ -2438,7 +2474,7 @@ int npc_see(int cn, int co)
 					{
 						for (m=0;m<40;m++)
 						{
-							if (it[ch[cn].item[n]].temp==IT_TW_SINBIND || it[ch[cn].item[n]].orig_temp==IT_TW_SINBIND)
+							if (IS_SINBINDER(ch[cn].item[n]))
 								break;
 						}
 					}
@@ -2609,12 +2645,6 @@ int npc_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 
 int get_spellcost(int cn, int spell)
 {
-	int prox, kin_hara, kin_sorc;
-	
-	prox = (PROX_MULTI+M_SK(cn, SK_PROX))/PROX_MULTI;
-	kin_hara = (IS_ARCHHARAKIM(cn) && B_SK(cn, SK_PROX));
-	kin_sorc = (IS_SORCERER(cn) && B_SK(cn, SK_PROX));
-	
 	switch(spell)
 	{
 		case SK_BLIND:		return SP_COST_BLIND;
@@ -2624,9 +2654,9 @@ int get_spellcost(int cn, int spell)
 		case SK_WEAKEN:		return SP_COST_WEAKEN;
 		case SK_WARCRY:		return SP_COST_WARCRY;
 		
-		case SK_BLAST:		return 20 * (kin_hara ? prox : 1);
+		case SK_BLAST:		return 20;
 		case SK_BLESS:		return SP_COST_BLESS;
-		case SK_CURSE:		return SP_COST_CURSE * (kin_sorc ? prox : 1);
+		case SK_CURSE:		return SP_COST_CURSE;
 		case SK_DISPEL:		return SP_COST_DISPEL;
 		case SK_ENHANCE:	return SP_COST_ENHANCE;
 		case SK_GHOST:		return SP_COST_GHOST;
@@ -2635,13 +2665,13 @@ int get_spellcost(int cn, int spell)
 		case SK_IDENT:		return SP_COST_IDENT;
 		case SK_LIGHT:		return SP_COST_LIGHT;
 		case SK_MSHIELD:	return SP_COST_MSHIELD;
-		case SK_POISON:		return SP_COST_POISON * (kin_sorc ? prox : 1);
+		case SK_POISON:		return SP_COST_POISON;
 		case SK_PROTECT:	return SP_COST_PROTECT;
 		case SK_PULSE:		return SP_COST_PULSE;
 		case SK_ZEPHYR:		return SP_COST_ZEPHYR;
 		case SK_RECALL:		return SP_COST_RECALL;
 		case SK_SHADOW:		return SP_COST_SHADOW;
-		case SK_SLOW:		return SP_COST_SLOW * (kin_sorc ? prox : 1);
+		case SK_SLOW:		return SP_COST_SLOW;
 		
 		default: return 9999;
 	}
@@ -2786,8 +2816,8 @@ int npc_try_spell(int cn, int co, int spell)
 		}
 	}
 
-	mana = ch[cn].a_mana / 1000;
-	end = ch[cn].a_end / 1000;
+	mana = (ch[cn].a_mana-500) / 1000;
+	end = (ch[cn].a_end-500) / 1000;
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -2796,7 +2826,7 @@ int npc_try_spell(int cn, int co, int spell)
 			// Cancel if target is already buffed or debuffed (except for heal)
 			if (bu[in].temp==truespell && truespell!=SK_HEAL && 
 				(bu[in].power + 10)>=spell_immunity(M_SK(cn, truespell), get_target_immunity(cn, co)) && 
-				bu[in].active>bu[in].duration / 4 * 3)
+				bu[in].active>bu[in].duration/2)
 			{
 				break;
 			}
@@ -2844,7 +2874,6 @@ int npc_try_spell(int cn, int co, int spell)
 			}
 		}
 	}
-
 	return 0;
 }
 
@@ -2853,14 +2882,14 @@ int npc_can_spell(int cn, int co, int spell)
 	if (spell==SK_CLEAVE || spell==SK_WEAKEN || spell==SK_WARCRY || 
 		spell==SK_BLIND || spell==SK_TAUNT || spell==SK_LEAP)
 	{
-		if (ch[cn].a_end / 1000 < get_spellcost(cn, spell))
+		if ((ch[cn].a_end-500) / 1000 < get_spellcost(cn, spell))
 		{
 			return 0;
 		}
 	}
 	else
 	{
-		if (ch[cn].a_mana / 1000 < get_spellcost(cn, spell) * (get_tarot(cn, IT_CH_MAGI_R)?3:2)/2)
+		if ((ch[cn].a_mana-500) / 1000 < get_spellcost(cn, spell) * (get_tarot(cn, IT_CH_MAGI_R)?3:2)/2)
 		{
 			return 0;
 		}

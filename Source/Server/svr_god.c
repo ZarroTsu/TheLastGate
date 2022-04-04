@@ -3941,13 +3941,11 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[CHD_MASTER] = 0;
 		ch[co].data[70] = 0;
 		ch[co].data[93] = 0;
+		ch[co].data[73] = 0;
 		
 		// Reset quest flags
 		ch[co].data[72] = 0;
 		ch[co].data[94] = 0;
-		
-		// Reset WotS Book
-		ch[co].data[73] = 0;
 		
 		// Remove learned flags
 		ch[co].flags &= ~(CF_APPRAISE | CF_LOCKPICK | CF_SENSE);

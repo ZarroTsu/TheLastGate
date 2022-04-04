@@ -1318,16 +1318,19 @@ int spellcost(int cn, int cost, int in, int usemana)
 		if (hp_cost*1000 > ch[cn].a_hp)
 		{
 			do_char_log(cn, 0, "You don't have enough life.\n");
+			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 		if (cotfk_cost*1000 > ch[cn].a_end)
 		{
 			do_char_log(cn, 0, "You don't have enough endurance.\n");
+			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 		if (mana_cost*1000 > ch[cn].a_mana)
 		{
 			do_char_log(cn, 0, "You don't have enough mana.\n");
+			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 	}
@@ -1350,16 +1353,19 @@ int spellcost(int cn, int cost, int in, int usemana)
 		if ((hp_cost+devil_cost*2)*1000 > ch[cn].a_hp)
 		{
 			do_char_log(cn, 0, "You don't have enough life.\n");
+			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 		if ((end_cost+cotfk_cost)*1000 > ch[cn].a_end)
 		{
 			do_char_log(cn, 0, "You're too exhausted for that right now!\n");
+			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 		if (cotfk_cost*1000 > ch[cn].a_mana)
 		{
 			do_char_log(cn, 0, "You don't have enough mana.\n");
+			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 	}
@@ -3141,23 +3147,23 @@ void item_info(int cn, int in, int look)
 		"Glow", it[in].light[0], it[in].light[1]);
 	}
 	
-	if (it[in].data[2] && !soulstone)
+	if (it[in].data[2] && !soulstone && !it[in].placement)
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"HP Regen", it[in].data[2], it[in].data[2]/max(1, it[in].duration/TICKS));
 	}
-	if (it[in].data[3] && !soulstone)
+	if (it[in].data[3] && !soulstone && !it[in].placement)
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"End Regen", it[in].data[3], it[in].data[3]/max(1, it[in].duration/TICKS));
 	}
-	if (it[in].data[4] && !soulstone)
+	if (it[in].data[4] && !soulstone && !it[in].placement)
 	{
 		do_char_log(cn, 1, "%-12.12s  %+4d (%+4d/s)\n",
 		"Mana Regen", it[in].data[4], it[in].data[4]/max(1, it[in].duration/TICKS));
 	}
 	
-	if (it[in].duration>0 && it[in].duration<3888000 && !soulstone)
+	if (it[in].duration>0 && it[in].duration<3888000 && !soulstone && !it[in].placement)
 	{
 		do_char_log(cn, 1, "%-12.12s  %4d seconds\n",
 		"Duration", it[in].duration/TICKS);
@@ -3268,6 +3274,54 @@ int spell_identify(int cn, int co, int in)
 	{
 		item_info(cn, in, 0);
 		it[in].flags ^= IF_IDENTIFIED;
+		if (CAN_SOULSTONE(in))
+		{
+			do_char_log(cn, 3, "This item can be Soulstoned.\n");
+		}
+		else if (it[in].flags & IF_SOULSTONE)
+		{
+			do_char_log(cn, 7, "Has been Soulstoned.\n");
+		}
+		else if (it[in].placement && !CAN_SOULSTONE(in))
+		{
+			do_char_log(cn, 0, "Cannot be Soulstoned.\n");
+		}
+		if (CAN_ENCHANT(in))
+		{
+			do_char_log(cn, 3, "This item can be Enchanted.\n");
+		}
+		else if (it[in].flags & IF_ENCHANTED)
+		{
+			do_char_log(cn, 8, "Has been Enchanted.\n");
+		}
+		else if (it[in].placement && !CAN_ENCHANT(in))
+		{
+			do_char_log(cn, 0, "Cannot be Enchanted.\n");
+		}
+		if (it[in].flags & IF_AUGMENTED)
+		{
+			do_char_log(cn, 5, "Has been augmented.\n");
+		}
+		if (it[in].flags & IF_EASEUSE)
+		{
+			do_char_log(cn, 5, "Was made easier to use.\n");
+		}
+		if (it[in].flags & IF_DIMINISHED)
+		{
+			do_char_log(cn, 5, "Has had its complexity reduced.\n");
+		}
+		if (it[in].flags & IF_SOULSPLIT)
+		{
+			do_char_log(cn, 5, "Has been soulsplit.\n");
+		}
+		if (it[in].flags & IF_DUPLICATED)
+		{
+			do_char_log(cn, 5, "Has been duplicated.\n");
+		}
+		if (it[in].flags & IF_LEGACY)
+		{
+			do_char_log(cn, 9, "Legacy item.\n");
+		}
 		if (!(it[in].flags & IF_IDENTIFIED))
 		{
 			do_char_log(cn, 1, "Identify data removed from item.\n");
@@ -3505,6 +3559,10 @@ void skill_repair(int cn)
 			{
 				do_char_log(cn, 0, "You failed.\n");
 				return;
+			}
+			if (it[in].flags & IF_IDENTIFIED)
+			{
+				it[in2].flags |= IF_IDENTIFIED;
 			}
 			it[in].used  = USE_EMPTY;
 			ch[cn].citem = in2;
@@ -3893,6 +3951,10 @@ void skill_ghost(int cn)
 		return;
 	}
 	
+	if (get_gear(cn, IT_TW_DREAD)) dreadplate = 1;
+	if (get_book(cn, IT_BOOK_NECR)) necronomicon = 1;
+	if (get_gear(cn, IT_TW_INVIDIA)) invidia = 1;
+	
 	archgc 					= B_SK(cn, SK_GCMASTERY);
 	if (archgc) archbonus 	= M_SK(cn, SK_GCMASTERY);
 	
@@ -3924,10 +3986,6 @@ void skill_ghost(int cn)
 		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
 	}
 	
-	if (get_gear(cn, IT_TW_DREAD)) dreadplate = 1;
-	if (get_book(cn, IT_BOOK_NECR)) necronomicon = 1;
-	if (get_gear(cn, IT_TW_INVIDIA)) invidia = 1;
-
 	if (IS_PLAYER(cn)) ch[cn].data[PCD_COMPANION] = cc;
 	
 	// base is the power of the summon
@@ -4011,10 +4069,12 @@ void skill_ghost(int cn)
 		ch[cc].data[1] = 3; // BERSERK!!
 	}
 	
+	/*
 	if (invidia)
 	{
 		B_SK(cc, SK_HEAL) = 0;
 	}
+	*/
 
 	ch[cc].hp[0]       = max(50, min(ch[cc].hp[2],   base * 5));
 	ch[cc].end[0]      = max(100,min(ch[cc].end[2],  base * 3));
@@ -4096,7 +4156,6 @@ void skill_ghost(int cn)
 		spell_pulse(cn, cc, M_SK(cn, SK_PULSE), 1);
 	}
 	
-	
 	// GC Management notes:
 	// Now you can set the aggro level of your GC using talk commands. This uses data[1].
 	// 0 -- Defense - Normal behavior
@@ -4116,6 +4175,7 @@ void skill_shadow(int cn)
 {
 	int co, cc, cz, n, m, z, base = 1, basedur = 1, idx, in, tmp, pts = 0, sprite = 2000;
 	int archgc = 0, archbonus = 0, archtmp = 0, w = 0, necronomicon = 0, devilR = 0;
+	int dont_atk = 0;
 
 	if (IS_BUILDING(cn))
 	{
@@ -4155,10 +4215,13 @@ void skill_shadow(int cn)
 
 	if (is_exhausted(cn)) return;
 
-	if (co && !may_attack_msg(cn, co, 1))
+	if (co && !may_attack_msg(cn, co, 0))
 	{
+		dont_atk = 1;
+		/*
 		chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
 		return;
+		*/
 	}
 	
 	if (spellcost(cn, SP_COST_SHADOW, SK_SHADOW, 1)) return;
@@ -4169,7 +4232,7 @@ void skill_shadow(int cn)
 			do_area_notify(cn, co, ch[cn].x, ch[cn].y, 
 				NT_SEEMISS, cn, co, M_SK(cn, SK_SHADOW), 0);
 		if (co && cn!=co && CAN_SENSE(co) && 
-			M_SK(co, SK_PERCEPT)>M_SK(cn, SK_SHADOW) + 5)
+			M_SK(co, SK_PERCEPT)>M_SK(cn, SK_SHADOW) + 5 && !dont_atk)
 		{
 			if (!(ch[co].flags & CF_SENSEOFF))
 				do_char_log(co, 0, "%s tried to cast shadow copy on you but failed.\n", 
@@ -4195,7 +4258,7 @@ void skill_shadow(int cn)
 		}
 	}
 
-	if (co)
+	if (co && !dont_atk)
 	{
 		if (cn!=co) 
 			do_area_notify(cn, co, ch[cn].x, ch[cn].y, 
@@ -4253,7 +4316,7 @@ void skill_shadow(int cn)
 	if (ch[cn].data[CHD_GROUP]==1100)   // hacky workaround for map NPCs using SC.
 		ch[cc].data[CHD_GROUP] = ch[cc].data[43] = ch[cc].data[59] = 1100;
 	
-	if (co)
+	if (co && !dont_atk)
 	{
 		ch[cc].attack_cn = co;
 		idx = co | (char_id(co) << 16);
@@ -4463,7 +4526,7 @@ void skill_shadow(int cn)
 	xlog("Created %s (%d) with base %d as Shadow Copy for %s", 
 		ch[cc].name, cc, base, ch[cn].reference);
 	
-	if (co)
+	if (co && !dont_atk)
 	{
 		do_sayx(cc, ch[cc].text[1], ch[co].name);
 	}
@@ -5185,8 +5248,7 @@ void skill_leap(int cn)
 		god_transfer_char(cn, x, y);
 		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].escape_timer = TICKS*3;
-		for (m = 0; m<4; m++)
-			ch[cn].enemy[m] = 0;
+		for (m = 0; m<4; m++) ch[cn].enemy[m] = 0;
 		remove_enemy(cn);
 		ch[cn].dir = newdir;
 		ch[cn].attack_cn = co;

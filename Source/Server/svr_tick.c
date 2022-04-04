@@ -1947,9 +1947,18 @@ void plr_login(int nr)
 			{
 				if (!god_drop_char_fuzzy_large(cn, ch[cn].tavern_x, ch[cn].tavern_y + 3, ch[cn].tavern_x, ch[cn].tavern_y))
 				{
-					plog(nr, "plr_login(): could not drop new character");
-					plr_logout(cn, nr, LO_NOROOM);
-					return;
+					if (!god_drop_char_fuzzy_large(cn, ch[cn].temple_x, ch[cn].temple_y, ch[cn].temple_x, ch[cn].temple_y))
+					{
+						if (!god_drop_char_fuzzy_large(cn, ch[cn].temple_x + 3, ch[cn].temple_y, ch[cn].temple_x, ch[cn].temple_y))
+						{
+							if (!god_drop_char_fuzzy_large(cn, ch[cn].temple_x, ch[cn].temple_y + 3, ch[cn].temple_x, ch[cn].temple_y))
+							{
+								plog(nr, "plr_login(): could not drop new character");
+								plr_logout(cn, nr, LO_NOROOM);
+								return;
+							}
+						}
+					}
 				}
 			}
 		}

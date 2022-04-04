@@ -475,7 +475,7 @@ void use_stack_items(int cn, int in)
 
 int use_mix_potion(int cn, int in)
 {
-	int in2, in3 = 0, font = 0;
+	int in2, in3 = 0, font = 0, stk, val;
 
 	if (cn==0)
 	{
@@ -1451,9 +1451,21 @@ int use_mix_potion(int cn, int in)
 
 	in3 = god_create_item(in3);
 	it[in3].flags |= IF_UPDATE;
-
-	it[in2].used = USE_EMPTY;
-	ch[cn].citem = 0;
+	
+	if (it[in2].stack>1)
+	{
+		stk = it[in2].stack;
+		val = it[in2].value / stk;
+		stk--;
+		it[in2].stack = stk;
+		it[in2].value = val * stk;
+		it[in2].flags |= IF_UPDATE;
+	}
+	else
+	{
+		it[in2].used = USE_EMPTY;
+		ch[cn].citem = 0;
+	}
 
 	god_take_from_char(in, cn);
 	it[in].used = USE_EMPTY;
@@ -1484,7 +1496,7 @@ int use_chain(int cn, int in)
 		do_char_log(cn, 0, "Too difficult to do on the ground.\n");
 		return 0;
 	}
-	if (it[in2].temp!=206)
+	if (it[in2].temp!=it[in].data[1])
 	{
 		do_char_log(cn, 0, "Sorry?\n");
 		return 0;
@@ -1951,6 +1963,7 @@ int use_bag(int cn, int in)
 {
 	int co, owner;
 	int in2, nr;
+	int emptyinv = 0;
 
 	co = it[in].data[0];
 	owner = ch[co].data[CHD_CORPSEOWNER];
@@ -1979,6 +1992,9 @@ int use_bag(int cn, int in)
 		chlog(cn, "Took %dG %dS", ch[co].gold / 100, ch[co].gold % 100);
 		do_char_log(cn, 1, "You took %dG %dS.\n", ch[co].gold / 100, ch[co].gold % 100);
 		ch[co].gold = 0;
+		emptyinv = 1;
+		for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
+		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
 	}
 	if ((ch[co].flags & CF_BODY) && (ch[cn].flags & CF_AUTOLOOT))
 	{
@@ -1991,47 +2007,21 @@ int use_bag(int cn, int in)
 				{
 					chlog(cn, "Autoloot %s", it[in2].name);
 					do_char_log(cn, 1, "You autoloot a %s.\n", it[in2].reference);
+					emptyinv = 1;
 				}
 				else
 				{
 					god_give_char(in2, co);
 					do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+					emptyinv = 0;
 					break;
 				}
 			}
 		}
-		if (nr == 40 && (in2 = ch[co].worn[WN_LRING]) && is_soulstone(in2))
-		{
-			god_take_from_char(in2, co);
-			if (god_give_char(in2, cn))
-			{
-				chlog(cn, "Autoloot %s", it[in2].name);
-				do_char_log(cn, 1, "You autoloot a %s.\n", it[in2].reference);
-			}
-			else
-			{
-				god_give_char(in2, co);
-				do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
-				nr--;
-			}
-		}
-		if (nr == 40 && (in2 = ch[co].worn[WN_RRING]) && is_soulstone(in2))
-		{
-			god_take_from_char(in2, co);
-			if (god_give_char(in2, cn))
-			{
-				chlog(cn, "Autoloot %s", it[in2].name);
-				do_char_log(cn, 1, "You autoloot a %s.\n", it[in2].reference);
-			}
-			else
-			{
-				god_give_char(in2, co);
-				do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
-				nr--;
-			}
-		}
+		for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
+		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
 	}
-	do_look_char(cn, co, 0, 0, 1);
+	if (!emptyinv) do_look_char(cn, co, 0, 0, 1);
 	return 1;
 }
 
@@ -2908,10 +2898,10 @@ int use_map_shrine(int cn, int in)
 				case  1:
 					for (n=0,panic=0;n<c;n++)
 					{
-						if (!(ch[catalog[c]].flags & CF_EXTRAEXP))
+						if (!(ch[catalog[n]].flags & CF_EXTRAEXP))
 						{
 							panic++;
-							boost_char(catalog[c], 6);
+							boost_char(catalog[n], 6);
 						}
 					}
 					if (!panic)		do_char_log(cn, 0, "Nothing happened...\n");
@@ -4406,7 +4396,7 @@ int use_spawn(int cn, int in)
 
 int use_pile(int cn, int in)
 {
-	int in2, x, y, m, level, tmp, chance;
+	int in2, x, y, m, level, tmp = 0, chance;
 	static int find_S[] = { 
 		// 25% - Silver
 		IT_SILV, IT_SILV, IT_SILV, IT_SILV, IT_SILV, 
@@ -4517,14 +4507,13 @@ int use_pile(int cn, int in)
 	{
 		return 0;
 	}
-
-	// destroy this object
-	it[in].used = USE_EMPTY;
+	
+	// Grab pile info
+	level = it[in].data[0];
+	tmp   = it[in].data[5];
 	x = it[in].x;
 	y = it[in].y;
 	m = x + y * MAPX;
-	level = it[in].data[0];
-	map[m].it = 0;
 
 	// decide what the player's gonna find
 	chance = 5;
@@ -4538,7 +4527,7 @@ int use_pile(int cn, int in)
 	if (it[in].data[4]>0) chance-=it[in].data[4];
 	if (chance<1) chance=1;
 
-	if (!RANDOM(chance))   // something there?
+	if (!RANDOM(chance) && !tmp)   // something there?
 	{
 		switch (level)
 		{
@@ -4553,19 +4542,54 @@ int use_pile(int cn, int in)
 		in2 = god_create_item(tmp);
 		if (it[in2].flags & IF_TAKE)      // takeable object?
 		{
-			god_give_char(in2, cn);
-			do_char_log(cn, 0, "You've found a %s!\n", it[in2].reference);
+			if (god_give_char(in2, cn))
+			{
+				// destroy this object
+				it[in].used = USE_EMPTY;
+				map[m].it = 0;
+				do_char_log(cn, 0, "You've found a %s!\n", it[in2].reference);
+			}
+			else
+			{
+				do_char_log(cn, 0, "Your backpack is full, so you can't take the %s.\n", it[in2].reference);
+				it[in2].used = USE_EMPTY;
+				it[in].data[5] = tmp;
+				return 0;
+			}
 		}
 		else     // no? then it's an object which creates a monster
 		{
+			// destroy this object
+			it[in].used = USE_EMPTY;
+			map[m].it = 0;
 			god_drop_item(in2, x, y);
 			fx_add_effect(9, 16, in2, it[in2].data[0], 0);
+		}
+	}
+	else if (tmp)
+	{
+		in2 = god_create_item(tmp);
+		if (god_give_char(in2, cn))
+		{
+			// destroy this object
+			it[in].used = USE_EMPTY;
+			map[m].it = 0;
+			do_char_log(cn, 0, "You've found a %s!\n", it[in2].reference);
+		}
+		else
+		{
+			do_char_log(cn, 0, "Your backpack is full, so you can't take the %s.\n", it[in2].reference);
+			it[in2].used = USE_EMPTY;
+			return 0;
 		}
 	}
 	else // Pity reward - a tiny bit of silver
 	{
 		ch[cn].gold += 2+RANDOM(2+level*2);
+		it[in].used = USE_EMPTY;
+		map[m].it = 0;
 	}
+	
 	return 1;
 }
 
@@ -4758,6 +4782,7 @@ int use_mine_fast(int cn, int in)
 int build_ring(int cn, int in)
 {
 	int t1, t2, in2, r, in3;
+	int stk, val;
 
 	t1 = it[in].temp;
 
@@ -4982,8 +5007,20 @@ int build_ring(int cn, int in)
 
 	if (in2)
 	{
-		ch[cn].citem = 0;
-		it[in2].used = USE_EMPTY;
+		if (it[in2].stack>1)
+		{
+			stk = it[in2].stack;
+			val = it[in2].value / stk;
+			stk--;
+			it[in2].stack = stk;
+			it[in2].value = val * stk;
+			it[in2].flags |= IF_UPDATE;
+		}
+		else
+		{
+			it[in2].used = USE_EMPTY;
+			ch[cn].citem = 0;
+		}
 	}
 
 	god_take_from_char(in, cn);
@@ -5102,13 +5139,11 @@ int place_ankh(int cn, int in)
 
 int build_sinbinder(int cn, int in)
 {
-	int n, t1, t2, in2;
+	int n, t2, in2;
 	char buf[300];
-
-	t1 = it[in].temp;
 	
 	in2 = ch[cn].citem;
-	if (t1!=IT_TW_SINBIND || !in2 || (in2 & 0x80000000) || it[in].data[1])
+	if (NOT_SINBINDER(in) || !in2 || (in2 & 0x80000000) || it[in].data[1])
 	{
 		do_char_log(cn, 1, "Nothing happens.\n");
 		return 0;
@@ -5119,23 +5154,6 @@ int build_sinbinder(int cn, int in)
 	if (t2==IT_CH_FOOL)
 	{
 		for (n=0; n<5; n++) { it[in].attrib[n][0] = it[in2].attrib[n][0]; it[in].attrib[n][2] = it[in2].attrib[n][2]; }
-		it[in].hp[0]          = it[in2].hp[0];
-		it[in].hp[2]          = it[in2].hp[2];
-		it[in].end[0]         = it[in2].end[0];
-		it[in].mana[0]        = it[in2].mana[0];
-		it[in].mana[2]        = it[in2].mana[2];
-		it[in].armor[0]       = it[in2].armor[0];
-		it[in].weapon[0]      = it[in2].weapon[0];
-		it[in].move_speed[0]  = it[in2].move_speed[0];
-		it[in].atk_speed[0]   = it[in2].atk_speed[0];
-		it[in].cast_speed[0]  = it[in2].cast_speed[0];
-		it[in].spell_mod[0]   = it[in2].spell_mod[0];
-		it[in].spell_apt[0]   = it[in2].spell_apt[0];
-		it[in].cool_bonus[0]  = it[in2].cool_bonus[0];
-		it[in].crit_chance[0] = it[in2].crit_chance[0];
-		it[in].crit_multi[0]  = it[in2].crit_multi[0];
-		it[in].top_damage[0]  = it[in2].top_damage[0];
-		it[in].gethit_dam[0]  = it[in2].gethit_dam[0];
 		for (n=0; n<50; n++) { it[in].skill[n][0] = it[in2].skill[n][0]; it[in].skill[n][2] = it[in2].skill[n][2]; }
 	}
 	else if (t2>=IT_CH_MAGI   && t2<=IT_CH_WORLD  ) ;
@@ -7237,7 +7255,7 @@ void use_driver(int cn, int in, int carried)
 			case 52:
 				if (it[in].temp==IT_ANKHAMULET)
 					ret = build_ankh(cn, in);
-				else if (it[in].temp==IT_TW_SINBIND || it[in].orig_temp==IT_TW_SINBIND)
+				else if (IS_SINBINDER(in))
 					ret = build_sinbinder(cn, in);
 				else
 					ret = 0;
@@ -7400,6 +7418,9 @@ void use_driver(int cn, int in, int carried)
 				break;
 			case 119:
 				ret = use_talisman(cn, in, ch[cn].citem);
+				break;
+			case 120:
+				ret = 0;
 				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
@@ -8247,6 +8268,10 @@ void enemyspawner(int in, int type, int flag)
 			t_temp = CT_TOWER + it[in].data[0];
 			t_ran = 12;	count = 1;	t_dist = 0; wait = 1;
 			break;
+		case 25:		// Scorpions
+			t_temp = CT_SCORP + it[in].data[0] + RANDOM(it[in].power);
+			t_ran = 60;	count = 3;	t_dist = 8;	wait = 0;
+			break;
 		default:
 			return;
 	}
@@ -8340,12 +8365,12 @@ void expire_driver(int in)
 	}
 }
 
-#define EXP_TIME (MAPY/4)
+#define EXP_TIME (MAPY/8)
 
 void item_tick_expire(void)
 {
 	static int y = 0;
-	int x, in, m, act, cn;
+	int x, in, m, act, cn, co, nr, emptyinv, emptygear;
 
 	for (x = 0, m = y * MAPX; x<MAPX; x++, m++)
 	{
@@ -8392,23 +8417,18 @@ void item_tick_expire(void)
 			}
 
 			// legacy drivers, replace by IF_EXPIREPROC!
-			if (it[in].driver==33)
-			{
-				pentagram(in);
-			}
-			if (it[in].driver==43)
-			{
-				enemyspawner(in, 0, 0); //spiderweb(in);
-			}
-			if (it[in].driver==56)	enemyspawner(in, 2, 0);
-			if (it[in].driver==71)	enemyspawner(in, 1, 0);
-			if (it[in].driver==72)	enemyspawner(in, 3, 0);
-			if (it[in].driver==73)	enemyspawner(in, 4, 0);
-			if (it[in].driver==74)	enemyspawner(in, 5, 0);
-			if (it[in].driver==75)	enemyspawner(in, 6, 0);
-			if (it[in].driver==76)	enemyspawner(in, 7, 0);
-			if (it[in].driver==79)	enemyspawner(in, 8, 0);
-			if (it[in].driver==80)	enemyspawner(in, 9, 0);
+			if (it[in].driver==33)	pentagram(in);
+			
+			if (it[in].driver==43)	enemyspawner(in,  0, 0); //spiderweb(in);
+			if (it[in].driver==56)	enemyspawner(in,  2, 0);
+			if (it[in].driver==71)	enemyspawner(in,  1, 0);
+			if (it[in].driver==72)	enemyspawner(in,  3, 0);
+			if (it[in].driver==73)	enemyspawner(in,  4, 0);
+			if (it[in].driver==74)	enemyspawner(in,  5, 0);
+			if (it[in].driver==75)	enemyspawner(in,  6, 0);
+			if (it[in].driver==76)	enemyspawner(in,  7, 0);
+			if (it[in].driver==79)	enemyspawner(in,  8, 0);
+			if (it[in].driver==80)	enemyspawner(in,  9, 0);
 			if (it[in].driver==81)	enemyspawner(in, 10, 0);
 			if (it[in].driver==82)	enemyspawner(in, 11, 0);
 			if (it[in].driver==83)	enemyspawner(in, 12, 0);
@@ -8424,6 +8444,7 @@ void item_tick_expire(void)
 			if (it[in].driver==100)	enemyspawner(in, 22, 0);
 			if (it[in].driver==104)	enemyspawner(in, 23, 0);
 			if (it[in].driver==105)	enemyspawner(in, 24, 0);
+			if (it[in].driver==120)	enemyspawner(in, 25, 0);
 
 			if (it[in].flags & IF_EXPIREPROC)
 			{
@@ -8450,23 +8471,30 @@ void item_tick_expire(void)
 			}
 
 			if (it[in].active)
-			{
 				act = 1;
-			}
 			else
-			{
 				act = 0;
+			
+			// Item is grave(bag) && has an owner && owner was not a player && is a "body"
+			if (it[in].driver==7 && (co = it[in].data[0]) && !ch[co].data[99] && (ch[co].flags & CF_BODY))
+			{
+				emptyinv  = 1;
+				emptygear = 1;
+				if (ch[co].gold>99) emptyinv = 0;
+				for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv  = 0;
+				for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptygear = 0;
+				if (emptyinv && emptygear)
+					it[in].current_age[act] += EXP_TIME*32;
+				else if (emptyinv)
+					it[in].current_age[act] += EXP_TIME*2;
 			}
-
+			
 			it[in].current_age[act] += EXP_TIME;      // each place is only checked every MAPY ticks
 			                                          // so we add MAPY instead of one
-
+			
 			if (it[in].flags & IF_LIGHTAGE)
-			{
 				lightage(in, EXP_TIME);
-			}
-
-
+			
 			if (item_age(in) && it[in].damage_state==5)
 			{
 				if (it[in].light[act])
@@ -8682,10 +8710,10 @@ void item_tick(void)
 	item_tick_expire();
 	item_tick_expire();
 	item_tick_expire();
-	//item_tick_expire();
-	//item_tick_expire();
-	//item_tick_expire();
-	//item_tick_expire();
+	item_tick_expire();
+	item_tick_expire();
+	item_tick_expire();
+	item_tick_expire();
 	item_tick_gc();
 }
 

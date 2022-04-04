@@ -43,7 +43,8 @@
 #define CAN_ENCHANT(in)		(it[(in)].flags & IF_CAN_EN)
 #define HAS_ENCHANT(in, n)	(it[(in)].enchantment == (n))
 
-#define WEARING_SIN(n)		(it[(m)].temp==IT_TW_SINBIND || it[(m)].orig_temp==IT_TW_SINBIND)
+#define IS_SINBINDER(in)		(it[(in)].temp==IT_TW_SINBIND || it[(in)].orig_temp==IT_TW_SINBIND)
+#define NOT_SINBINDER(in)		(it[(in)].temp!=IT_TW_SINBIND && it[(in)].orig_temp!=IT_TW_SINBIND)
 
 
 /* *** TEMPLATES *** */
@@ -130,6 +131,7 @@
 #define IS_SEYA_OR_ARHR(cn)	(IS_SEYAN_DU(cn) || IS_ARCHHARAKIM(cn))
 #define IS_SEYA_OR_BRAV(cn)	(IS_SEYAN_DU(cn) || IS_BRAVER(cn))
 
+#define IS_PROX_CLASS(cn)	(B_SK(cn, SK_PROX) || IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_WARRIOR(cn))
 #define CAN_ARTM_PROX(cn)	(IS_SEYA_OR_ARTM(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 #define CAN_WARR_PROX(cn)	(IS_SEYA_OR_WARR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 #define CAN_SORC_PROX(cn)	(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF))

@@ -280,7 +280,7 @@ extern unsigned int mapmarker;
 
 #define PRXA_RAD		5
 
-#define PREC_CAP		(AT_CAP/3)
+#define PREC_CAP		(AT_CAP)
 
 // Attribute Definitions
 #define AT_BRV 			 0

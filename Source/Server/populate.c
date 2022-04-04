@@ -855,7 +855,7 @@ void reset_item(int n)
 		{
 			continue;
 		}
-		if (it[in].flags & (IF_SPELL | IF_STACKABLE | IF_AUGMENTED | IF_DIMINISHED | IF_EASEUSE | IF_SOULSPLIT))
+		if (it[in].flags & (IF_SPELL|IF_STACKABLE|IF_AUGMENTED|IF_DIMINISHED|IF_EASEUSE|IF_SOULSPLIT|IF_ENCHANTED|IF_SOULSTONE))
 		{
 			continue;
 		}

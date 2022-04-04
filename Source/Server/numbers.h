@@ -45,6 +45,7 @@
 #define CT_GATEKEEPER	 848
 #define CT_HERBCOLL		 703
 #define CT_HERBCOLL2	1205
+#define CT_SCORPCOLL    1016
 #define CT_SHIVA_I		 664
 
 #define CT_RD_SKELE		  31
@@ -81,6 +82,7 @@
 #define CT_LIZARDKIN	1101
 #define CT_BASALT		1255
 #define CT_TOWER		1260
+#define CT_SCORP		1330
 
 #define CT_GOLEMTRAP	  39
 #define CT_GARGTRAP		  40
@@ -157,6 +159,11 @@
 #define IT_BSCOIN_STAR	 761
 #define IT_BSCOIN_MOON	 762
 #define IT_BSCOIN_NULL	 763
+
+#define IT_SCORL		2610
+#define IT_SCORP		2611
+#define IT_SCORG		2612
+#define IT_SCORQ		2613
 
 // Unique Amulets
 #define IT_ANKHAMULET	 768

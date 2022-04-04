@@ -304,7 +304,7 @@ struct know
 #define AN_RA_MERC		"Mercenaries are adept at both fighting and spellcasting, but do not excel in either."
 #define AN_RA_HARA		"Harakim are powerful spellcasters. They are not very good at combat, and prefer to act from long range."
 #define AN_RA_SEYANDU	"Seyan'du are very powerful and can excel in a large number of things at once."
-#define AN_RA_ARCHTEMP	"Arch-Templar are Templar who have become weapon masters. They can cleave the air so hard that it can fell an entire army."
+#define AN_RA_ARCHTEMP	"Arch-Templar are Templar who have become masters of war. They can cleave the air so hard that it can fell an entire army."
 #define AN_RA_PUGILIST	"Skalds are Templars who attack with agility and valor. They sing haunting arias and they can leap great distances."
 #define AN_RA_WARRIOR	"Warriors are Merceneries who have preferred melee over spells. They can become very agile and use multiple weapons at once."
 #define AN_RA_SORCERER	"Sorcerers are Merceneries who have preferred spells over melee. They can cast powerful ailments in a wide area instantaniously."
@@ -1955,7 +1955,7 @@ void answer_tarot(int cn, int co, int m)
 	
 	if (in = ch[co].worn[m])
 	{
-		if (m==WN_RRING && it[in].temp!=IT_TW_SINBIND && it[in].orig_temp!=IT_TW_SINBIND)
+		if (m==WN_RRING && NOT_SINBINDER(in))
 		{
 			do_sayx(cn, "Remove what exactly?");
 			return;
