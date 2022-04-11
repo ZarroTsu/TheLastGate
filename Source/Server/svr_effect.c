@@ -270,25 +270,21 @@ void effect_tick(void)
 						}
 						else
 						{
-							int temp;
+							int temp, rtimer = TICKS * 60 *  5 + RANDOM(TICKS * 60 * 1); // 5 - 6 minutes
 
 							temp = ch[co].temp;
 
 							god_destroy_items(co);
 							ch[co].used = USE_EMPTY;
 
-							if (temp && (ch[co].flags & CF_RESPAWN))
+							if (temp && (ch[co].flags & CF_RESPAWN) && !(ch[co].flags & CF_SENSE))
 							{
 								// Eyeball kings take extra time to respawn
 								if (IS_LONG_RESPAWN(temp))
-								{
-									fx_add_effect(2, TICKS * 60 * 15 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp); // 15 - 20 minutes
-								}
-								else
-								{
-									fx_add_effect(2, TICKS * 60 * 4 + RANDOM(TICKS * 60 * 1), ch_temp[temp].x, ch_temp[temp].y, temp); // 4 - 5 minutes
-								}
+									rtimer = TICKS * 60 * 16 + RANDOM(TICKS * 60 * 4); // 16 - 20 minutes
+								fx_add_effect(2, rtimer, ch_temp[temp].x, ch_temp[temp].y, temp);
 								xlog("respawn %d (%s): YES", co, ch[co].name);
+								ch[co].flags |= CF_SENSE;
 							}
 							else
 							{

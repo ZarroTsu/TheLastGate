@@ -554,6 +554,48 @@ void do_announce(int source, int author, char *format, ...)
 	va_end(args);
 }
 
+void do_server_announce(int source, int author, char *format, ...)
+{
+	va_list args;
+	char buf_anon[1024];
+	char buf_named[1024];
+	int  n;
+
+	if (!*format)
+	{
+		return;
+	}
+
+	va_start(args, format);
+	vsprintf(buf_anon, format, args);
+	if (author)
+	{
+		sprintf(buf_named, "[%s] %s", ch[author].name, buf_anon);
+	}
+	else
+	{
+		strcpy(buf_named, buf_anon);
+	}
+
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		/* various tests to exclude listeners (n) */
+		if (!ch[n].player && ch[n].temp!=15)
+		{
+			continue;                              // not a player
+		}
+		if ((source != 0) && (invis_level(source) <= invis_level(n)))
+		{
+			do_log(n, 9, buf_named);
+		}
+		else
+		{
+			do_log(n, 9, buf_anon);
+		}
+	}
+	va_end(args);
+}
+
 void do_caution(int source, int author, char *format, ...)
 {
 	va_list args;
@@ -1348,11 +1390,13 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 5):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#spellignore           don't attack if spelled.\n");
 			do_char_log(cn, 1, "#spinel                list spinel rings.\n");
 			do_char_log(cn, 1, "#staff                 list staff stats.\n");
 			do_char_log(cn, 1, "#swap                  swap with facing player.\n");
 			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
+			do_char_log(cn, 1, "#tarot                 list tarot cards.\n");
 			do_char_log(cn, 1, "#tell <player> <text>  tells player text.\n");
 			do_char_log(cn, 1, "#topaz                 list topaz rings.\n");
 			do_char_log(cn, 1, "#trash                 delete item from cursor.\n");
@@ -1368,6 +1412,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 4):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#quest <page>          list available quests.\n");
 			do_char_log(cn, 1, "#rank                  show exp for next rank.\n");
 			do_char_log(cn, 1, "#ranks                 show exp for all ranks.\n");
 			do_char_log(cn, 1, "#ring <type>           list ring stats.\n");
@@ -1383,7 +1428,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#sort <order>          sort inventory.\n");
 			do_char_log(cn, 1, "#sortdepot <ord/ch>    sort depot.\n");
 			do_char_log(cn, 1, "#spear                 list spear stats.\n");
-			do_char_log(cn, 1, "#spellignore           don't attack if spelled.\n");
 		}
 		else if (strcmp(topic, "3")==0)
 		{
@@ -1391,6 +1435,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 3):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#gold <amount>         get X gold coins.\n");
 			do_char_log(cn, 1, "#greataxe              list greataxe stats.\n");
 			do_char_log(cn, 1, "#group <player>        group with player.\n");
 			do_char_log(cn, 1, "#gtell <message>       tell to your group.\n");
@@ -1406,7 +1451,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#opal                  list opal rings.\n");
 			do_char_log(cn, 1, "#override              you always spell self.\n");
 			do_char_log(cn, 1, "#poles <page>          lists unattained poles.\n");
-			do_char_log(cn, 1, "#quest <page>          list available quests.\n");
 		}
 		else if (strcmp(topic, "2")==0)
 		{
@@ -1414,6 +1458,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 2):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#buff                  display buff timers.\n");
 			do_char_log(cn, 1, "#chars                 list your chars and xp.\n");
 			do_char_log(cn, 1, "#citrine               list citrine rings.\n");
 			do_char_log(cn, 1, "#claw                  list claw stats.\n");
@@ -1431,7 +1476,6 @@ void do_help(int cn, char *topic)
 				do_char_log(cn, 1, "#gcmax                 list ghostcomp maximums.\n");
 			}
 			do_char_log(cn, 1, "#gctome                gc travels with you.\n");
-			do_char_log(cn, 1, "#gold <amount>         get X gold coins.\n");
 		}
 		else
 		{
@@ -1452,10 +1496,10 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#armor                 list armor stats.\n");
 			do_char_log(cn, 1, "#autoloot              automatic grave looting.\n");
 			do_char_log(cn, 1, "#axe                   list axe stats.\n");
+			do_char_log(cn, 1, "#belt                  list belt stats.\n");
 			do_char_log(cn, 1, "#beryl                 list beryl rings.\n");
 			do_char_log(cn, 1, "#bow                   you'll bow.\n");
 			do_char_log(cn, 1, "#bs                    display BS points.\n");
-			do_char_log(cn, 1, "#buff                  display buff timers.\n");
 		}
 		do_char_log(cn, 1, " \n");
 	}
@@ -1890,6 +1934,25 @@ void do_listarmors(int cn, char *topic)
 	do_char_log(cn, 1, " \n");
 }
 
+void do_listbelts(int cn, char *topic)
+{
+	do_char_log(cn, 1, "Now listing belts:\n");
+	do_char_log(cn, 1, " \n");
+	//                 "!        .         .         .         .        !"
+	do_char_log(cn, 1, "  Belt  | Requirements:  |    Gives:           \n");
+	do_char_log(cn, 1, "  Tier  | BR/WI/IN/AG/ST | EN | BR/WI/IN/AG/ST \n");
+	do_char_log(cn, 1, "--------+----------------+----+----------------\n");
+	do_char_log(cn, 1, "Green   |                |  5 |  1             \n");
+	do_char_log(cn, 1, "Gold    |          15    | 10 | -1        3 -1 \n");
+	do_char_log(cn, 1, "Lth/Sil | 12 16 16 12 12 | 10 |  3     1 -1    \n");
+	do_char_log(cn, 1, "Lth/Gld | 12 12 12 16 16 | 15 |     1 -2  1  2 \n");
+	do_char_log(cn, 1, "Sil/Gld | 18 24 24 18 18 | 15 |  2  2  2 -1 -1 \n");
+	do_char_log(cn, 1, "Sil/Red | 18 18 18 24 24 | 20 | -1 -1     2  3 \n");
+	do_char_log(cn, 1, "Gld/Sil | 30 40 40 30 30 | 20 |  2  4  4 -3 -2 \n");
+	do_char_log(cn, 1, "Gld/Red | 30 30 30 40 40 | 25 | -3 -2 -2  5  6 \n");
+	do_char_log(cn, 1, " \n");
+}
+
 void do_listrings(int cn, char *topic)
 {
 	if (strcmp(topic, "0")==0 || strcmp(topic, "DIAMOND")==0 || strcmp(topic, "diamond")==0)
@@ -2113,6 +2176,193 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, " 9 or AQUAMARINE        lists aquamarine rings\n");
 		do_char_log(cn, 1, "10 or BERYL             lists beryl rings\n");
 		do_char_log(cn, 1, "11 or ZIRCON            lists zircon rings\n");
+		do_char_log(cn, 1, " \n");
+	}
+}
+
+void do_listtarots(int cn, char *topic)
+{
+	if (strcmp(topic, "0")==0 || strcmp(topic, "1")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "0 The Fool:\n");
+		do_char_log(cn, 8, DESC_FOOL);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "0 The Fool, Reversed:\n");
+		do_char_log(cn, 8, DESC_FOOL_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "I The Magician:\n");
+		do_char_log(cn, 8, DESC_MAGI);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "I The Magician, Reversed:\n");
+		do_char_log(cn, 8, DESC_MAGI_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "2")==0 || strcmp(topic, "3")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "II The High Priestess:\n");
+		do_char_log(cn, 8, DESC_PREIST);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "II The High Priestess, Reversed:\n");
+		do_char_log(cn, 8, DESC_PREIST_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "III The Empress:\n");
+		do_char_log(cn, 8, DESC_EMPRESS);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "III The Empress, Reversed:\n");
+		do_char_log(cn, 8, DESC_EMPRES_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "4")==0 || strcmp(topic, "5")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "IV The Emperor:\n");
+		do_char_log(cn, 8, DESC_EMPEROR);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "IV The Emperor, Reversed:\n");
+		do_char_log(cn, 8, DESC_EMPERO_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "V The Hierophant:\n");
+		do_char_log(cn, 8, DESC_HEIROPH);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "V The Hierophant, Reversed:\n");
+		do_char_log(cn, 8, DESC_HEIROP_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "6")==0 || strcmp(topic, "7")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "VI The Lovers:\n");
+		do_char_log(cn, 8, DESC_LOVERS);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "VI The Lovers, Reversed:\n");
+		do_char_log(cn, 8, DESC_LOVERS_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "VII The Chariot:\n");
+		do_char_log(cn, 8, DESC_CHARIOT);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "VII The Chariot, Reversed:\n");
+		do_char_log(cn, 8, DESC_CHARIO_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "8")==0 || strcmp(topic, "9")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "VIII Strength:\n");
+		do_char_log(cn, 8, DESC_STRENGTH);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "VIII Strength, Reversed:\n");
+		do_char_log(cn, 8, DESC_STRENG_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "IX The Hermit:\n");
+		do_char_log(cn, 8, DESC_HERMIT);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "IX The Hermit, Reversed:\n");
+		do_char_log(cn, 8, DESC_HERMIT_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "10")==0 || strcmp(topic, "11")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "X Wheel of Fortune:\n");
+		do_char_log(cn, 8, DESC_WHEEL);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "X Wheel of Fortune, Reversed:\n");
+		do_char_log(cn, 8, DESC_WHEEL_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XI Justice:\n");
+		do_char_log(cn, 8, DESC_JUSTICE);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XI Justice, Reversed:\n");
+		do_char_log(cn, 8, DESC_JUSTIC_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "12")==0 || strcmp(topic, "13")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "XII The Hanged Man:\n");
+		do_char_log(cn, 8, DESC_HANGED);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XII The Hanged Man, Reversed:\n");
+		do_char_log(cn, 8, DESC_HANGED_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XIII Death:\n");
+		do_char_log(cn, 8, DESC_DEATH);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XIII Death, Reversed:\n");
+		do_char_log(cn, 8, DESC_DEATH_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "14")==0 || strcmp(topic, "15")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "XIV Temperance:\n");
+		do_char_log(cn, 8, DESC_TEMPER);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XIV Temperance, Reversed:\n");
+		do_char_log(cn, 8, DESC_TEMPER_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XV The Devil:\n");
+		do_char_log(cn, 8, DESC_DEVIL);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XV The Devil, Reversed:\n");
+		do_char_log(cn, 8, DESC_DEVIL_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "16")==0 || strcmp(topic, "17")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "XVI The Tower:\n");
+		do_char_log(cn, 8, DESC_TOWER);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XVI The Tower, Reversed:\n");
+		do_char_log(cn, 8, DESC_TOWER_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XVII The Star:\n");
+		do_char_log(cn, 8, DESC_STAR);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XVII The Star, Reversed:\n");
+		do_char_log(cn, 8, DESC_STAR_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "18")==0 || strcmp(topic, "19")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "XVIII The Moon:\n");
+		do_char_log(cn, 8, DESC_MOON);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XVIII The Moon, Reversed:\n");
+		do_char_log(cn, 8, DESC_MOON_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XIX The Sun:\n");
+		do_char_log(cn, 8, DESC_SUN);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XIX The Sun, Reversed:\n");
+		do_char_log(cn, 8, DESC_SUN_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else if (strcmp(topic, "20")==0 || strcmp(topic, "21")==0)
+	{	//                 "!        .         .         .         .        !"
+		do_char_log(cn, 1, "XX Judgement:\n");
+		do_char_log(cn, 8, DESC_JUDGE);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XX Judgement, Reversed:\n");
+		do_char_log(cn, 8, DESC_JUDGE_R);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XXI The World:\n");
+		do_char_log(cn, 8, DESC_WORLD);
+		do_char_log(cn, 1, " \n");
+		do_char_log(cn, 1, "XXI The World, Reversed:\n");
+		do_char_log(cn, 8, DESC_WORLD_R);
+		do_char_log(cn, 1, " \n");
+	}
+	else
+	{
+		do_char_log(cn, 1, "Use one of the following after #tarot:\n");
+		do_char_log(cn, 1, " \n");
+		//                 "!        .         .   |     .         .        !"
+		do_char_log(cn, 1, " 0 or  1      lists FOOL     and MAGICIAN cards\n");
+		do_char_log(cn, 1, " 2 or  3      lists PRIEST   and EMPRESS  cards\n");
+		do_char_log(cn, 1, " 4 or  5      lists EMPEROR  and HEIROPH  cards\n");
+		do_char_log(cn, 1, " 6 or  7      lists LOVERS   and CHARIOT  cards\n");
+		do_char_log(cn, 1, " 8 or  9      lists STRENGTH and HERMIT   cards\n");
+		do_char_log(cn, 1, "10 or 11      lists WHEEL    and JUSTICE  cards\n");
+		do_char_log(cn, 1, "12 or 13      lists HANGED   and DEATH    cards\n");
+		do_char_log(cn, 1, "14 or 15      lists TEMPER   and DEVIL    cards\n");
+		do_char_log(cn, 1, "16 or 17      lists TOWER    and STAR     cards\n");
+		do_char_log(cn, 1, "18 or 19      lists MOON     and SUN      cards\n");
+		do_char_log(cn, 1, "20 or 21      lists JUDGE    and WORLD    cards\n");
 		do_char_log(cn, 1, " \n");
 	}
 }
@@ -4374,7 +4624,7 @@ void do_command(int cn, char *ptr)
 		;
 		if (prefix(cmd, "announce") && f_gius)
 		{
-			do_announce(cn, cn, "%s\n", args[0]);
+			do_server_announce(cn, cn, "%s\n", args[0]);
 			return;
 		}
 		if (prefix(cmd, "addban") && f_gi)
@@ -4400,6 +4650,12 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "buffs"))
 		{
 			do_listbuffs(cn, cn);
+			return;
+		}
+		;
+		if (prefix(cmd, "belt"))
+		{
+			do_listbelts(cn, arg[1]);
 			return;
 		}
 		;
@@ -5453,6 +5709,12 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
+		if (prefix(cmd, "tarot"))
+		{
+			do_listtarots(cn, arg[1]);
+			return;
+		}
+		;
 		if (prefix(cmd, "tavern") && f_g && !f_m)
 		{
 			god_tavern(cn);
@@ -6052,6 +6314,64 @@ int get_enchantment(int cn, int in)
 }
 
 //
+int is_potion(int in)
+{
+	static int potions[] = {
+		IT_POT_M_HP, IT_POT_N_HP, IT_POT_G_HP, IT_POT_H_HP, 
+		IT_POT_S_HP, IT_POT_C_HP, IT_POT_L_HP, IT_POT_D_HP, 
+		IT_POT_M_EN, IT_POT_N_EN, IT_POT_G_EN, IT_POT_H_EN, 
+		IT_POT_S_EN, IT_POT_C_EN, IT_POT_L_EN, IT_POT_D_EN, 
+		IT_POT_M_MP, IT_POT_N_MP, IT_POT_G_MP, IT_POT_H_MP, 
+		IT_POT_S_MP, IT_POT_C_MP, IT_POT_L_MP, IT_POT_D_MP, 
+		IT_POT_VITA, IT_POT_CLAR, IT_POT_SAGE, IT_POT_LIFE, 
+		IT_POT_T, IT_POT_O, IT_POT_PT, IT_POT_PO, 
+		IT_POT_LAB2, IT_POT_GOLEM, 
+		IT_POT_BRV, IT_POT_WIL, IT_POT_INT, IT_POT_AGL, IT_POT_STR, 
+		IT_POT_EXHP, IT_POT_EXEN, IT_POT_EXMP, 
+		IT_POT_PRE, IT_POT_EVA, IT_POT_MOB, IT_POT_FRE, IT_POT_MAR, 
+		IT_POT_IMM, IT_POT_CLA, IT_POT_THO, IT_POT_BRU, IT_POT_RES, 
+		IT_POT_APT, IT_POT_OFF, IT_POT_DEF, IT_POT_PER, IT_POT_STE, 
+		IT_POT_RAIN };
+	int tn, n;
+
+	tn = it[in].temp;
+	for (n = 0; n<ARRAYSIZE(potions); n++)
+	{
+		if (tn == potions[n])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int is_scroll(int in)
+{
+	int tn;
+
+	tn = it[in].temp;
+	return (((tn >= 1314) && (tn <= 1341)) || ((tn >= 182) && (tn <= 189)));
+}
+
+int is_soulstone(int in)
+{
+	return (it[in].driver == 68);
+}
+
+int is_soulfocus(int in)
+{
+	return (it[in].driver == 92);
+}
+
+int is_soulcat(int in)
+{
+	return (it[in].driver == 93);
+}
+
+int is_gemstone(int in)
+{
+	return (it[in].flags & IF_GEMSTONE);
+}
 
 // For examining a corpse for special stuff at a glance with Sense Magic.
 // msg must be a do_char_log() format string like "you see %s in the corpse.\n".
@@ -6085,6 +6405,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 			strcpy(dropped, "a unique shield");
 		do_char_log(cn, 0, msg, dropped);
 	}
+	/*  Kind of irrelivant now since SS and gems can't be equipped in ring slots any more...
 	// Check ring slots for soulstones
 	if ((in = ch[co].worn[WN_LRING]) && is_soulstone(in) && sm > RANDOM(200))
 	{
@@ -6111,6 +6432,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 			strcpy(dropped, "a magical gem");
 		do_char_log(cn, 0, msg, dropped);
 	}
+	*/
 	// Check other accessory slots
 	if ((in = ch[co].worn[WN_NECK]) && sm > RANDOM(200))
 	{
@@ -6182,6 +6504,16 @@ void do_ransack_corpse(int cn, int co, char *msg)
 		if (is_soulstone(in) && sm > RANDOM(200))
 		{
 			do_char_log(cn, 0, msg, "a soulstone");
+			continue;
+		}
+		if (is_soulfocus(in) && sm > RANDOM(200))
+		{
+			do_char_log(cn, 0, msg, "a soul focus");
+			continue;
+		}
+		if (is_soulcat(in) && sm > RANDOM(200))
+		{
+			do_char_log(cn, 0, msg, "a soul catalyst");
 			continue;
 		}
 		if (is_gemstone(in) && sm > RANDOM(200))
@@ -7358,7 +7690,7 @@ int do_hurt(int cn, int co, int dam, int type)
 			}
 			if (bu[in].temp==SK_SCORCH)		scorched  = 200;
 			if (bu[in].temp==SK_AGGRAVATE)	aggravate = 200;
-			if (bu[in].temp==SK_GUARD) 		guarded   = bu[in].power/4;
+			if (bu[in].temp==SK_GUARD) 		guarded   = bu[in].power;
 			
 			if (bu[in].temp > 100 && bu[in].data[3]==IT_POT_DEF)	defpot = 1;
 			if (bu[in].temp==SK_SHADOW) devRo = bu[in].data[5];
@@ -7372,19 +7704,12 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	// Tarot - Devil.R : Shadow Copy shenanigans
 	if (devRn==1)	dam = dam *  6/ 5; // Attacker bonus 20% more dealt
-	if (devRo==2)	dam = dam *  6/ 5; // Defender minus 20% more taken
 	if (devRn==2)	dam = dam *  4/ 5; // Attacker minus 20% less dealt
-	if (devRo==1)	dam = dam *  4/ 5; // Defender bonus 20% less taken
-	//
+	
 	if (offpot)		dam = dam * 11/10;
-	if (defpot)		dam = dam *  9/10;
 	if (scorched)	dam = dam * (1000 + scorched ) / 1000;
 	if (aggravate)	dam = dam * (1000 + aggravate) / 1000;
-	if (guarded)	dam = dam * (1000 - guarded  ) / 1000;
-	if (phalanx)	dam = dam * (1000 - phalanx  ) / 1000;
-	if (B_SK(co, SK_SAFEGRD))
-		dam = dam * (1000 - M_SK(co,SK_SAFEGRD)/2) / 1000;
-	//
+	
 	if (type==3)
 	{
 		dam *= DAM_MULT_THORNS; 						// Thorns
@@ -7408,6 +7733,16 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
+	// Tarot - Devil.R : Shadow Copy shenanigans
+	if (devRo==1)	dam = dam *  4/ 5; // Defender bonus 20% less taken
+	if (devRo==2)	dam = dam *  6/ 5; // Defender minus 20% more taken
+	
+	if (defpot)		dam = dam *  9/10;
+	if (guarded)	dam = dam * (1000 - guarded  ) / 1000;
+	if (phalanx)	dam = dam * (1000 - phalanx  ) / 1000;
+	
+	if (B_SK(co, SK_SAFEGRD))
+		dam = dam * (1000 - M_SK(co,SK_SAFEGRD)) / 1000;
 	if (get_enchantment(co, 35) && !RANDOM(5))
 		dam /= 2;
 	
@@ -9277,34 +9612,18 @@ void really_update_char(int cn)
 		ava_mult/=2;
 	}
 	
-	// Book - Traveler's Guide :: Equalize effects of Braveness and Agility
+	// Book - Traveler's Guide :: Average effects of Braveness and Agility
 	if (gearSpec & 1) 
 	{
-		if (M_AT(cn, AT_AGL) > M_AT(cn, AT_BRV))
-		{
-			attrib[AT_BRV]    = B_AT(cn, AT_AGL);
-			attrib_ex[AT_BRV] = M_AT(cn, AT_AGL);
-		}
-		else
-		{
-			attrib[AT_AGL]    = B_AT(cn, AT_BRV);
-			attrib_ex[AT_AGL] = M_AT(cn, AT_BRV);
-		}
+		   attrib[AT_BRV] =    attrib[AT_AGL] = (B_AT(cn, AT_BRV) + B_AT(cn, AT_AGL))/2;
+		attrib_ex[AT_BRV] = attrib_ex[AT_AGL] = (M_AT(cn, AT_BRV) + M_AT(cn, AT_AGL))/2;
 	}
 	
-	// Tarot - Magician :: Equalize effects of Strength and Intuition
+	// Tarot - Magician :: Average effects of Strength and Intuition
 	if (charmSpec & 4)
 	{
-		if (M_AT(cn, AT_STR) > M_AT(cn, AT_INT))
-		{
-			attrib[AT_INT]    = B_AT(cn, AT_STR);
-			attrib_ex[AT_INT] = M_AT(cn, AT_STR);
-		}
-		else
-		{
-			attrib[AT_STR]    = B_AT(cn, AT_INT);
-			attrib_ex[AT_STR] = M_AT(cn, AT_INT);
-		}
+		   attrib[AT_INT] =    attrib[AT_STR] = (B_AT(cn, AT_INT) + B_AT(cn, AT_STR))/2;
+		attrib_ex[AT_INT] = attrib_ex[AT_STR] = (M_AT(cn, AT_INT) + M_AT(cn, AT_STR))/2;
 	}
 	
 	/*
@@ -10059,7 +10378,7 @@ void do_regenerate(int cn)
 		hp = 450 + points2rank(ch[cn].points_tot) * 25;
 		
 		ch[cn].a_hp	+= hp;
-		gothp 		+= hp/2;
+		gothp 		+= hp/2 + hp/4;
 	}
 	
 	// Special case for the Amulet of Ankhs
@@ -10364,7 +10683,7 @@ void do_regenerate(int cn)
 				if (guarded)	degendam = degendam * (1000 - guarded  ) / 1000;
 				if (phalanx)	degendam = degendam * (1000 - phalanx  ) / 1000;
 				if (B_SK(cn, SK_SAFEGRD))
-					degendam = degendam * (1000 - M_SK(cn,SK_SAFEGRD)/2) / 1000;
+					degendam = degendam * (1000 - M_SK(cn, SK_SAFEGRD))  / 1000;
 				//
 				
 				if (ch[cn].a_hp - (degendam + gothp)<500 && !(mf & MF_ARENA) && try_lucksave(cn))
@@ -10698,7 +11017,7 @@ void do_regenerate(int cn)
 
 		// Swimming! Was never actually in the base game!
 		if (B_SK(cn, SK_SWIM))
-			waterlifeloss = (250 - M_SK(cn, SK_SWIM)/3*2);
+			waterlifeloss = (250 - M_SK(cn, SK_SWIM)/6*5);
 		
 		// Amulet of Waterbreathing halves the result
 		if (get_neck(cn, IT_BREATHAMMY))

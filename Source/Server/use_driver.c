@@ -5653,7 +5653,7 @@ void solved_pentagram(int cn, int in)
 int use_pentagram(int cn, int in)
 {
 	int n, v, tot = 0, act = 0, b[5] = {0, 0, 0, 0, 0}, bv[5] = {0, 0, 0, 0, 0}, exp = 0, co, m;
-	int r1, r2;
+	int r1, r2, inpents = 0;
 
 	if (it[in].active)
 	{
@@ -5792,6 +5792,25 @@ int use_pentagram(int cn, int in)
 	{
 		solved_pentagram(cn, in);
 		return 0;
+	}
+	else
+	{
+		for (n = 1; n<MAXCHARS; n++) if (is_inpents(n)) inpents++;
+		if (inpents<1) inpents = 1;
+		
+		if (penta_needed > 4+inpents*6 || penta_needed < 1+inpents*4)
+		{
+			penta_needed = penta_needed - (penta_needed-(1+RANDOM(4)+inpents*5));
+			if (act>=penta_needed)
+			{
+				solved_pentagram(cn, in);
+				return 0;
+			}
+			else
+			{
+				do_char_log(cn, 7, "Solve has been changed to %d pentagrammas.\n", penta_needed);
+			}
+		}
 	}
 
 	for (m = 1; m<4; m++)
@@ -6164,6 +6183,7 @@ int use_seyan_shrine(int cn, int in)
 	}
 
 		it[in2].weapon[0] = 15 + bits * 3;
+		it[in2].ss_weapon = bits * 3;
 		
 		it[in2].to_hit[0]   = max(0, min(15, (bits-2)/2));
 		it[in2].to_parry[0] = max(0, min(15, (bits-1)/2));
@@ -6188,6 +6208,7 @@ int use_seyan_shrine(int cn, int in)
 	if (in3 && it[in3].driver==40 && it[in3].data[0]==cn)
 	{
 		it[in3].weapon[0] = 15 + bits * 3;
+		it[in3].ss_weapon = bits * 3;
 		
 		it[in3].to_hit[0]   = max(0, min(15, (bits-2)/2));
 		it[in3].to_parry[0] = max(0, min(15, (bits-1)/2));
@@ -6276,7 +6297,7 @@ int use_seyan_portal(int cn, int in)
 			if (n<MAXCHARS)
 			{
 				char message[100];
-				sprintf(message, "Hear ye, hear ye! %s has is now Braver!", ch[cn].name);
+				sprintf(message, "Hear ye, hear ye! %s is now Braver!", ch[cn].name);
 				do_shout(n, message);
 				if (globs->flags & GF_DISCORD) discord_ranked(message);
 			}
@@ -8170,107 +8191,107 @@ void enemyspawner(int in, int type, int flag)
 	{
 		case 0:			// Spider
 			t_temp = CT_SPIDER + RANDOM(3);
-			t_ran = 60;	count = 3;	t_dist = 8;	wait = 0;
+			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 0;
 			break;
 		case 1:			// Ratling
 			t_temp = CT_RATLING + it[in].data[0];
-			t_ran = 40;	count = 1;	t_dist = 3;	wait = 0;
+			t_ran = EXP_RATE*5;	count = 1;	t_dist = 3;	wait = 0;
 			break;
 		case 2:			// Greenling
 			t_temp = CT_GREENLING + it[in].data[0];
-			t_ran = 30;	count = 2;	t_dist = 8;	wait = 0;
+			t_ran = EXP_RATE*4;	count = 2;	t_dist = 8;	wait = 0;
 			break;
 		case 3:			// Sogling
 			t_temp = CT_DREADLING + it[in].data[0];
-			t_ran = 20;	count = 3;	t_dist = 8;	wait = 0;
+			t_ran = EXP_RATE*3;	count = 3;	t_dist = 8;	wait = 0;
 			break;
 		case 4:			// Thrall / Vampire
 			t_temp = CT_VAMPIRE + it[in].data[0];
-			t_ran =  7;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 5:			// Arachnid
 			t_temp = 418;
-			t_ran = 60;	count = 1;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*6;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 6:			// Tarantula
 			t_temp = 441;
-			t_ran = 45;	count = 3;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*5;	count = 3;	t_dist = 8; wait = 0;
 			break;
 		case 7:			// Robber
 			t_temp = 652;
-			t_ran = 50;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*6;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 8:			// Stone Golems (Forest Gorge)
 			t_temp = CT_STONEGOLEM;
-			t_ran = 50;	count = 3;	t_dist = 8;	wait = 1;
+			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 1;
 			break;
 		case 9:			// Season Gorge Mobs
 			t_temp = CT_SEASONSMOB + it[in].data[0];
-			t_ran = 45;	count = 1;	t_dist = 8;	wait = 1;
+			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8;	wait = 1;
 			break;
 		case 10:		// Ascent Gorge Mobs
 			t_temp = CT_ASCENTMOB + it[in].data[0];
-			t_ran = 40;	count = 1;	t_dist = 8;	wait = 1;
+			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8;	wait = 1;
 			break;
 		case 11:		// Canyon Bandits
 			t_temp = CT_CANYONBNDT;
-			t_ran = 50;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*6;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 12:		// Mud Golems
 			t_temp = CT_MUDGOLEM;
-			t_ran = 45;	count = 1;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 13:		// Swamp Lizards
 			t_temp = CT_SWAMPLIZ;
-			t_ran = 35;	count = 2;	t_dist = 8;	wait = 1;
+			t_ran = EXP_RATE*4;	count = 2;	t_dist = 8;	wait = 1;
 			break;
 		case 14:		// Mountain Vikings
 			t_temp = CT_MOUNTVIK;
-			t_ran = 40;	count = 2;	t_dist = 8;	wait = 1;
+			t_ran = EXP_RATE*5;	count = 2;	t_dist = 8;	wait = 1;
 			break;
 		case 15:		// Gargoyle Nest
 			t_temp = CT_GARGNEST + it[in].data[0];
-			t_ran = 30;	count = 7;	t_dist =12; wait = 0;
+			t_ran = EXP_RATE*4;	count = 7;	t_dist =12; wait = 0;
 			break;
 		case 16:		// Gargoyle Nest Basement
 			t_temp = CT_GARGNEST + it[in].data[0];
-			t_ran = 30;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*4;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 17:		// Autumn Xecko enemies
 			t_temp = m_mult = CT_XECKO;
-			t_ran = 25;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*3;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 18:		// Ice Gargoyle Nest (either floor)			- 96
 			t_temp = CT_ICENEST + it[in].data[0];
-			t_ran = 30;	count = 2;	t_dist = 2; wait = 0;
+			t_ran = EXP_RATE*4;	count = 2;	t_dist = 2; wait = 0;
 			break;
 		case 19:		// Ice Gargoyle Nest (either floor) (mixed)	- 97
 			t_temp = m_mult = CT_ICENEST + it[in].data[0];
-			t_ran = 30;	count = 2;	t_dist = 2; wait = 0;
+			t_ran = EXP_RATE*4;	count = 2;	t_dist = 2; wait = 0;
 			break;
 		case 20:		// Cultists & Lycanthropes
 			t_temp = CT_CULTIST + it[in].data[0];
-			t_ran = 40;	count = 1;	t_dist = 8; wait = 0;
+			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 21:		// Thugs
 			t_temp = CT_THUGS;
-			t_ran = 35;	count = 2;	t_dist =12; wait = 1;
+			t_ran = EXP_RATE*4;	count = 2;	t_dist =12; wait = 1;
 			break;
 		case 22:		// Lizards
 			t_temp = CT_LIZARDKIN + it[in].data[0];
-			t_ran = 28;	count = 1;	t_dist =10; wait = 0;
+			t_ran = EXP_RATE*3;	count = 1;	t_dist =10; wait = 0;
 			break;
 		case 23:		// Basalt mobs
 			t_temp = CT_BASALT + it[in].data[0];
-			t_ran = 24;	count = 2;	t_dist =10; wait = 1;
+			t_ran = EXP_RATE*3;	count = 2;	t_dist =10; wait = 1;
 			break;
 		case 24:		// Tower mobs
 			t_temp = CT_TOWER + it[in].data[0];
-			t_ran = 12;	count = 1;	t_dist = 0; wait = 1;
+			t_ran = EXP_RATE*2;	count = 1;	t_dist = 0; wait = 1;
 			break;
 		case 25:		// Scorpions
 			t_temp = CT_SCORP + it[in].data[0] + RANDOM(it[in].power);
-			t_ran = 60;	count = 3;	t_dist = 8;	wait = 0;
+			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 0;
 			break;
 		default:
 			return;
@@ -8364,8 +8385,6 @@ void expire_driver(int in)
 		default: xlog("unknown expire driver %d for item %s (%d)\n", it[in].driver, it[in].name, in); break;
 	}
 }
-
-#define EXP_TIME (MAPY/8)
 
 void item_tick_expire(void)
 {
@@ -8475,6 +8494,9 @@ void item_tick_expire(void)
 			else
 				act = 0;
 			
+			// Graves have an age timer of 1080 which translates to 60 seconds realtime
+			
+			
 			// Item is grave(bag) && has an owner && owner was not a player && is a "body"
 			if (it[in].driver==7 && (co = it[in].data[0]) && !ch[co].data[99] && (ch[co].flags & CF_BODY))
 			{
@@ -8484,13 +8506,16 @@ void item_tick_expire(void)
 				for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv  = 0;
 				for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptygear = 0;
 				if (emptyinv && emptygear)
-					it[in].current_age[act] += EXP_TIME*32;
+					it[in].current_age[act] += EXP_TIME*EXP_RATE;
 				else if (emptyinv)
 					it[in].current_age[act] += EXP_TIME*2;
+				else
+					it[in].current_age[act] += EXP_TIME;
 			}
-			
-			it[in].current_age[act] += EXP_TIME;      // each place is only checked every MAPY ticks
-			                                          // so we add MAPY instead of one
+			else
+			{
+				it[in].current_age[act] += EXP_TIME;	// each place is only checked every MAPY ticks
+			}											// so we add MAPY instead of one
 			
 			if (it[in].flags & IF_LIGHTAGE)
 				lightage(in, EXP_TIME);
@@ -8507,26 +8532,22 @@ void item_tick_expire(void)
 
 				if (it[in].driver==7)   // tomb
 				{
-					int co, temp;
+					int co, temp, rtimer = TICKS * 60 * 2 + RANDOM(TICKS * 60 * 1); // 2 - 3 minutes
 
 					co = it[in].data[0];
 					temp = ch[co].temp;
 
 					god_destroy_items(co);
 					ch[co].used = USE_EMPTY;
-
-					if (temp && (ch[co].flags & CF_RESPAWN))
+					
+					if (temp && (ch[co].flags & CF_RESPAWN) && !(ch[co].flags & CF_SENSE))
 					{
 						// Eyeball kings take extra time to respawn
 						if (IS_LONG_RESPAWN(temp)) 
-						{
-							fx_add_effect(2, TICKS * 60 * 12 + RANDOM(TICKS * 60 * 5), ch_temp[temp].x, ch_temp[temp].y, temp); // 12 - 17 minutes
-						}
-						else
-						{
-							fx_add_effect(2, TICKS * 60 * 1 + RANDOM(TICKS * 60 * 1), ch_temp[temp].x, ch_temp[temp].y, temp); // 1 - 2 minutes
-						}
+							rtimer = TICKS * 60 * 13 + RANDOM(TICKS * 60 * 4); // 13 - 17 minutes
+						fx_add_effect(2, rtimer, ch_temp[temp].x, ch_temp[temp].y, temp);
 						xlog("respawn %d (%s): YES", co, ch[co].name);
+						ch[co].flags |= CF_SENSE;
 					}
 					else
 					{
@@ -8704,16 +8725,13 @@ void item_tick_gc(void)
 	}
 }
 
+
+
 void item_tick(void)
 {
-	item_tick_expire();
-	item_tick_expire();
-	item_tick_expire();
-	item_tick_expire();
-	item_tick_expire();
-	item_tick_expire();
-	item_tick_expire();
-	item_tick_expire();
+	int n;
+	
+	for (n=0;n<EXP_RATE;n++) item_tick_expire();
 	item_tick_gc();
 }
 

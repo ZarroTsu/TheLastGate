@@ -414,10 +414,6 @@ int npc_is_enemy(int cn, int co);
 int npc_list_enemies(int npc, int cn);
 int npc_remove_enemy(int npc, int enemy);
 void die_companion(int cn);
-int is_potion(int in);
-int is_scroll(int in);
-int is_soulstone(int in);
-int is_gemstone(int in);
 int is_unique_able(int in);
 int is_unique(int in);
 

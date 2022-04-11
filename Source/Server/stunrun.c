@@ -312,15 +312,17 @@ struct seen
 //}
 int npc_stunrun_high(int cn)
 {
-	int n, co, maxseen = 0, m, tmp, done = 0, in;
-	struct seen seen[30];
+	int n, co, maxseen = 0, m, tmp, done = 0, in, sgr = 0;
+	struct seen seen[2][30]; // ** Added [2] here with sgr above, in an attempt to distinguish between grolmy and seagrolmy. idk why this would happen though.
 	int flee = 0;                             // should we flee?
 	int help = 0;                             // should we help someone?
 	int stun = 0;                             // should we stun someone?
 	int up = 0, down = 0, left = 0, right = 0;         // directions to move in
 
 	ch[cn].data[92] = TICKS * 60;
-
+	
+	if (ch[cn].data[26]==15) sgr = 1;
+	
 	//{
 
 	for (n = 0; n<20; n++)
@@ -329,44 +331,44 @@ int npc_stunrun_high(int cn)
 		{
 			if (ch[co].data[CHD_GROUP]==ch[cn].data[CHD_GROUP])
 			{
-				seen[maxseen].co = co;
-				seen[maxseen].dist = npc_dist(cn, co);
-				seen[maxseen].friend = 1;
-				seen[maxseen].stun = 0;
-				seen[maxseen].help = (ch[co].a_hp<ch[co].hp[5] * 400);
-				help = max(seen[maxseen].help, help);
+				seen[sgr][maxseen].co = co;
+				seen[sgr][maxseen].dist = npc_dist(cn, co);
+				seen[sgr][maxseen].friend = 1;
+				seen[sgr][maxseen].stun = 0;
+				seen[sgr][maxseen].help = (ch[co].a_hp<ch[co].hp[5] * 400);
+				help = max(seen[sgr][maxseen].help, help);
 				maxseen++;
 			}
 			else
 			{
-				seen[maxseen].co = co;
-				seen[maxseen].dist = npc_dist(cn, co);
-				seen[maxseen].friend = 0;
+				seen[sgr][maxseen].co = co;
+				seen[sgr][maxseen].dist = npc_dist(cn, co);
+				seen[sgr][maxseen].friend = 0;
 				if (!has_buff(co, SK_SLOW))
 				{
-					seen[maxseen].stun = (M_SK(cn, SK_SLOW) * SP_MULT_SLOW / max(1, get_target_resistance(cn, co)) > 5);
+					seen[sgr][maxseen].stun = (M_SK(cn, SK_SLOW) * SP_MULT_SLOW / max(1, get_target_resistance(cn, co)) > 5);
 				}
 				else
 				{
-					seen[maxseen].stun = 0;
+					seen[sgr][maxseen].stun = 0;
 				}
-				stun = max(seen[maxseen].stun, stun);
-				seen[maxseen].help = 0;
-				if (seen[maxseen].dist<6)
+				stun = max(seen[sgr][maxseen].stun, stun);
+				seen[sgr][maxseen].help = 0;
+				if (seen[sgr][maxseen].dist<6)
 				{
 					flee++;                         // we dont like infights, try to stay away from enemies
 				}
-				if (seen[maxseen].dist<4)
+				if (seen[sgr][maxseen].dist<4)
 				{
 					flee++;
 				}
-				if (seen[maxseen].dist<2)
+				if (seen[sgr][maxseen].dist<2)
 				{
 					flee += 2;
-					if (seen[maxseen].stun)
+					if (seen[sgr][maxseen].stun)
 					{
-						seen[maxseen].stun += 5;
-						stun = max(seen[maxseen].stun, stun);
+						seen[sgr][maxseen].stun += 5;
+						stun = max(seen[sgr][maxseen].stun, stun);
 					}
 				}
 				maxseen++;
@@ -380,20 +382,20 @@ int npc_stunrun_high(int cn)
 		{
 			for (m = 0; m<maxseen; m++)
 			{
-				if (seen[m].co==co)
+				if (seen[sgr][m].co==co)
 				{
 					if (ch[co].data[CHD_GROUP]==ch[cn].data[CHD_GROUP])
 					{
-						seen[m].help++;
-						help = max(seen[m].help, help);
+						seen[sgr][m].help++;
+						help = max(seen[sgr][m].help, help);
 					}
 					else
 					{
-						if (seen[m].stun)
+						if (seen[sgr][m].stun)
 						{
-							seen[m].stun += 2;
+							seen[sgr][m].stun += 2;
 						}
-						stun = max(seen[m].stun, stun);
+						stun = max(seen[sgr][m].stun, stun);
 					}
 					break;
 				}
@@ -406,41 +408,41 @@ int npc_stunrun_high(int cn)
 		flee += 5; // we dont like infights, try to flee if attacked
 		for (m = 0; m<maxseen; m++)
 		{
-			if (seen[m].co==co)
+			if (seen[sgr][m].co==co)
 			{
-				if (seen[m].stun)
+				if (seen[sgr][m].stun)
 				{
-					seen[m].stun += 5;
+					seen[sgr][m].stun += 5;
 				}
 				else
 				{
 					flee += 2;
 				}
-				stun = max(seen[m].stun, stun);
+				stun = max(seen[sgr][m].stun, stun);
 				break;
 			}
 		}
 		if (m==maxseen)
 		{
-			seen[maxseen].co = co;
-			seen[maxseen].dist = npc_dist(cn, co);
-			seen[maxseen].friend = 0;
-			seen[maxseen].stun = (M_SK(cn, SK_SLOW) * SP_MULT_SLOW / max(1, get_target_resistance(cn, co)) > 5);
-			if (seen[maxseen].stun)
+			seen[sgr][maxseen].co = co;
+			seen[sgr][maxseen].dist = npc_dist(cn, co);
+			seen[sgr][maxseen].friend = 0;
+			seen[sgr][maxseen].stun = (M_SK(cn, SK_SLOW) * SP_MULT_SLOW / max(1, get_target_resistance(cn, co)) > 5);
+			if (seen[sgr][maxseen].stun)
 			{
-				seen[maxseen].stun += 5;
+				seen[sgr][maxseen].stun += 5;
 			}
 			else
 			{
 				flee += 2;
 			}
-			stun = max(seen[m].stun, stun);
-			seen[maxseen].help = 0;
+			stun = max(seen[sgr][m].stun, stun);
+			seen[sgr][maxseen].help = 0;
 			maxseen++;
 		}
 	}
 
-	if (ch[cn].a_mana<ch[cn].mana[5] * 125)
+	if (ch[cn].a_mana<ch[cn].mana[5] * 200)
 	{
 		stun -= 3;
 		help -= 3;
@@ -450,11 +452,11 @@ int npc_stunrun_high(int cn)
 //	do_sayx(cn,"-- flee=%d, help=%d, stun=%d ---------",flee,help,stun);
 	/* for (n=0; n<maxseen; n++) {
 	        do_sayx(cn,"%s: dist=%d, friend=%d, stun=%d, help=%d",
-	                ch[seen[n].co].reference,
-	                seen[n].dist,
-	                seen[n].friend,
-	                seen[n].stun,
-	                seen[n].help);
+	                ch[seen[sgr][n].co].reference,
+	                seen[sgr][n].dist,
+	                seen[sgr][n].friend,
+	                seen[sgr][n].stun,
+	                seen[sgr][n].help);
 	   } */
 
 	// reset former orders
@@ -498,9 +500,9 @@ int npc_stunrun_high(int cn)
 
 		for (n = 0; n<maxseen; n++)
 		{
-			if (!seen[n].friend)
+			if (!seen[sgr][n].friend)
 			{
-				if (seen[n].dist<6)
+				if (seen[sgr][n].dist<6)
 				{
 					tmp = -2000;
 				}
@@ -514,7 +516,7 @@ int npc_stunrun_high(int cn)
 				tmp = 150;
 			}
 
-			co = seen[n].co;
+			co = seen[sgr][n].co;
 			if (ch[co].x>ch[cn].x)
 			{
 				right += tmp / (ch[co].x - ch[cn].x);
@@ -750,18 +752,18 @@ int npc_stunrun_high(int cn)
 	{
 		for (m = n = tmp = 0; n<maxseen; n++)
 		{
-			if (seen[n].stun>tmp || (seen[n].stun && seen[n].stun==tmp && seen[n].dist<seen[m].dist))
+			if (seen[sgr][n].stun>tmp || (seen[sgr][n].stun && seen[sgr][n].stun==tmp && seen[sgr][n].dist<seen[sgr][m].dist))
 			{
-				tmp = seen[n].stun;
+				tmp = seen[sgr][n].stun;
 				m = n;
 			}
 		}
 		if (tmp>0)
 		{
-			done = npc_try_spell(cn, seen[m].co, SK_SLOW);
+			done = npc_try_spell(cn, seen[sgr][m].co, SK_SLOW);
 			if (!done)
 			{
-				done = npc_try_spell(cn, seen[m].co, SK_CURSE);
+				done = npc_try_spell(cn, seen[sgr][m].co, SK_CURSE);
 			}
 			ch[cn].data[24] = globs->ticker;
 		}
@@ -771,32 +773,32 @@ int npc_stunrun_high(int cn)
 	{
 		for (m = n = tmp = 0; n<maxseen; n++)
 		{
-			if (seen[n].help>tmp || (seen[n].help && seen[n].help==tmp && seen[n].dist<seen[m].dist))
+			if (seen[sgr][n].help>tmp || (seen[sgr][n].help && seen[sgr][n].help==tmp && seen[sgr][n].dist<seen[sgr][m].dist))
 			{
-				if (!has_buff(seen[n].co, SK_BLESS) || ch[seen[n].co].a_hp<ch[seen[n].co].hp[5] * 400)
+				if (!has_buff(seen[sgr][n].co, SK_BLESS) || ch[seen[sgr][n].co].a_hp<ch[seen[sgr][n].co].hp[5] * 400)
 				{
-					tmp = seen[n].help;
+					tmp = seen[sgr][n].help;
 					m = n;
 				}
 			}
 		}
 		if (tmp>0)
 		{
-			if (ch[seen[m].co].a_hp<ch[seen[m].co].hp[5] * 400)
+			if (ch[seen[sgr][m].co].a_hp<ch[seen[sgr][m].co].hp[5] * 400)
 			{
-				done = npc_try_spell(cn, seen[m].co, SK_HEAL);
+				done = npc_try_spell(cn, seen[sgr][m].co, SK_HEAL);
 			}
 			if (!done)
 			{
-				done = npc_try_spell(cn, seen[m].co, SK_BLESS);
+				done = npc_try_spell(cn, seen[sgr][m].co, SK_BLESS);
 			}
 			if (!done)
 			{
-				done = npc_try_spell(cn, seen[m].co, SK_PROTECT);
+				done = npc_try_spell(cn, seen[sgr][m].co, SK_PROTECT);
 			}
 			if (!done)
 			{
-				done = npc_try_spell(cn, seen[m].co, SK_ENHANCE);
+				done = npc_try_spell(cn, seen[sgr][m].co, SK_ENHANCE);
 			}
 			ch[cn].data[24] = globs->ticker;
 		}
@@ -927,7 +929,6 @@ int npc_stunrun_high(int cn)
 	if (ch[cn].data[21] + TICKS * 2<globs->ticker)
 	{
 		ch[cn].data[20] = 0;                                            // forget who hit us
-
 	}
 	return 0;
 }

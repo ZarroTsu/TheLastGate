@@ -344,7 +344,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, debuffs you cast are more likely to pass resistance checks.\n");
 		break;
 	case IT_BOOK_TRAV: 
-		do_char_log(cn, 5, "When equipped, secondary effects of Braveness and Agility are equal to the higher of the two.\n");
+		do_char_log(cn, 5, "When equipped, secondary effects of Braveness and Agility are equal to the average of the two.\n");
 		break;
 	case IT_BOOK_DAMO: 
 		do_char_log(cn, 5, "When equipped, increases cooldown recovery speed by 11%%.\n");
@@ -453,140 +453,51 @@ void look_extra(int cn, int in)
 	{
 		// -------- TAROT CARDS --------
 	
-	case IT_CH_FOOL: 
-		if (!(it[in].flags & IF_SOULSTONE))
-			do_char_log(cn, 8, "You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n");
-		break;
-	case IT_CH_MAGI: 
-		do_char_log(cn, 8, "When equipped, secondary effects of Intuition and Strength are equal to the higher of the two.\n");
-		break;
-	case IT_CH_PREIST: 
-		do_char_log(cn, 8, "When equipped, your maximum life is reduced by 10%%. 20%% of damage taken from hits is negated, and half of the negated damage is dealt to Mana instead.\n");
-		break;
-	case IT_CH_EMPRESS: 
-		do_char_log(cn, 8, "When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n");
-		break;
-	case IT_CH_EMPEROR: 
-		do_char_log(cn, 8, "When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n");
-		break;
-	case IT_CH_HEIROPH: 
-		do_char_log(cn, 8, "When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n");
-		break;
-	case IT_CH_LOVERS: 
-		do_char_log(cn, 8, "When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n");
-		break;
-	case IT_CH_CHARIOT: 
-		do_char_log(cn, 8, "When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n");
-		break;
-	case IT_CH_STRENGTH: 
-		do_char_log(cn, 8, "When equipped, reduces your attack and cast speed by 20%%, but grants 20%% more damage with melee attacks.\n");
-		break;
-	case IT_CH_HERMIT: 
-		do_char_log(cn, 8, "When equipped, you have 16%% more Armor Value, but 12%% less Resistance and Immunity.\n");
-		break;
-	case IT_CH_WHEEL: 
-		do_char_log(cn, 8, "When equipped, your critical hit chance is reduced by 33%%, but you have 1.5x critical hit multiplier.\n");
-		break;
-	case IT_CH_JUSTICE: 
-		do_char_log(cn, 8, "When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n");
-		break;
-	case IT_CH_HANGED: 
-		do_char_log(cn, 8, "When equipped, 25%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n");
-		break;
-	case IT_CH_DEATH: 
-		do_char_log(cn, 8, "When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n");
-		break;
-	case IT_CH_TEMPER: 
-		do_char_log(cn, 8, "When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is tripled.\n");
-		break;
-	case IT_CH_DEVIL: 
-		do_char_log(cn, 8, "When equipped, 30%% of all skill and spell costs are instead twice taken from your Hitpoints.\n");
-		break;
-	case IT_CH_TOWER: 
-		do_char_log(cn, 8, "When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n");
-		break;
-	case IT_CH_STAR: 
-		do_char_log(cn, 8, "When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n");
-		break;
-	case IT_CH_MOON: 
-		do_char_log(cn, 8, "When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n");
-		break;
-	case IT_CH_SUN: 
-		do_char_log(cn, 8, "When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n");
-		break;
-	case IT_CH_JUDGE: 
-		do_char_log(cn, 8, "When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n");
-		break;
-	case IT_CH_WORLD: 
-		do_char_log(cn, 8, "When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n");
-		break;
-		
-	case IT_CH_FOOL_R: 
-		do_char_log(cn, 8, "When equipped, your attributes become the average of all attributes, plus 10%%.\n");
-		break;
-	case IT_CH_MAGI_R: 
-		do_char_log(cn, 8, "When equipped, your concentrate skill instead increases the cost of spells, but it also increases your spell modifier.\n");
-		break;
-	case IT_CH_PREIST_R: 
-		do_char_log(cn, 8, "When equipped, your maximum mana is reduced by 20%% to increase your cooldown bonus by 10%% of the subtracted mana.\n");
-		break;
-	case IT_CH_EMPRES_R:
-		do_char_log(cn, 8, "When equipped, your buffs are applied at 125%% of the target's spell aptitude, but your spell aptitude is halved.\n");
-		break;
-	case IT_CH_EMPERO_R: 
-		do_char_log(cn, 8, "When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n");
-		break;
-	case IT_CH_HEIROP_R: 
-		do_char_log(cn, 8, "When equipped, your Ghost Companion shares the bonus granted to you by your other tarot card slot.\n");
-		break;
-	case IT_CH_LOVERS_R: 
-		do_char_log(cn, 8, "When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n");
-		break;
-	case IT_CH_CHARIO_R: 
-		do_char_log(cn, 8, "When equipped, your debuffs ignore 20%% of target resistance and immunity, but are 25%% weaker once applied.\n");
-		break;
-	case IT_CH_STRENG_R: 
-		do_char_log(cn, 8, "When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n");
-		break;
-	case IT_CH_HERMIT_R: 
-		do_char_log(cn, 8, "When equipped, your Rage skill grants more Weapon Value, but costs life over time instead of endurance over time.\n");
-		break;
-	case IT_CH_WHEEL_R: 
-		do_char_log(cn, 8, "When equipped, you have 16%% more Armor Value, but a 25%% chance to be hit when you would have parried.\n");
-		break;
-	case IT_CH_JUSTIC_R: 
-		do_char_log(cn, 8, "When equipped, your Leap skill deals 30%% less damage, but has reduced base cooldown and instead chooses a random nearby target.\n");
-		break;
-	case IT_CH_HANGED_R: 
-		do_char_log(cn, 8, "When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n");
-		break;
-	case IT_CH_DEATH_R: 
-		do_char_log(cn, 8, "When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n");
-		break;
-	case IT_CH_TEMPER_R: 
-		do_char_log(cn, 8, "When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n");
-		break;
-	case IT_CH_DEVIL_R: 
-		do_char_log(cn, 8, "When equipped, your Shadow Copy deals 20%% more damage and takes 20%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n");
-		break;
-	case IT_CH_TOWER_R: 
-		do_char_log(cn, 8, "When equipped, your Poison spell is replaced with Venom. Venom deals twice as much damage and reduces enemy Immunity, but it cannot stack.\n");
-		break;
-	case IT_CH_STAR_R: 
-		do_char_log(cn, 8, "When equipped, your Spell Modifier no longer effects spell power and instead effects your Critical Hit Chance.\n");
-		break;
-	case IT_CH_MOON_R: 
-		do_char_log(cn, 8, "When equipped, the effectiveness of your Meditate skill is tripled while fighting, but zero while stationary.\n");
-		break;
-	case IT_CH_SUN_R: 
-		do_char_log(cn, 8, "When equipped, the effectiveness of your Regenerate skill is tripled while fighting, but zero while stationary.\n");
-		break;
-	case IT_CH_JUDGE_R: 
-		do_char_log(cn, 8, "When equipped, you cannot cast your Pulse spell yourself. Pulse is cast on your Ghost Companion upon creation and is permanent, but 20%% of damage is taken by your Ghost Companion each pulse.\n");
-		break;
-	case IT_CH_WORLD_R: 
-		do_char_log(cn, 8, "When equipped, the effectiveness of your Rest skill is tripled while fighting, but zero while stationary.\n");
-		break;
+	case IT_CH_FOOL: if (!(it[in].flags & IF_SOULSTONE)) do_char_log(cn, 8, DESC_FOOL); break;
+	case IT_CH_MAGI: 		do_char_log(cn, 8, DESC_MAGI); 		break;
+	case IT_CH_PREIST: 		do_char_log(cn, 8, DESC_PREIST); 	break;
+	case IT_CH_EMPRESS: 	do_char_log(cn, 8, DESC_EMPRESS); 	break;
+	case IT_CH_EMPEROR: 	do_char_log(cn, 8, DESC_EMPEROR); 	break;
+	case IT_CH_HEIROPH: 	do_char_log(cn, 8, DESC_HEIROPH); 	break;
+	case IT_CH_LOVERS: 		do_char_log(cn, 8, DESC_LOVERS); 	break;
+	case IT_CH_CHARIOT: 	do_char_log(cn, 8, DESC_CHARIOT); 	break;
+	case IT_CH_STRENGTH: 	do_char_log(cn, 8, DESC_STRENGTH); 	break;
+	case IT_CH_HERMIT: 		do_char_log(cn, 8, DESC_HERMIT); 	break;
+	case IT_CH_WHEEL: 		do_char_log(cn, 8, DESC_WHEEL); 	break;
+	case IT_CH_JUSTICE: 	do_char_log(cn, 8, DESC_JUSTICE); 	break;
+	case IT_CH_HANGED: 		do_char_log(cn, 8, DESC_HANGED); 	break;
+	case IT_CH_DEATH: 		do_char_log(cn, 8, DESC_DEATH); 	break;
+	case IT_CH_TEMPER: 		do_char_log(cn, 8, DESC_TEMPER); 	break;
+	case IT_CH_DEVIL: 		do_char_log(cn, 8, DESC_DEVIL); 	break;
+	case IT_CH_TOWER: 		do_char_log(cn, 8, DESC_TOWER); 	break;
+	case IT_CH_STAR: 		do_char_log(cn, 8, DESC_STAR); 		break;
+	case IT_CH_MOON: 		do_char_log(cn, 8, DESC_MOON); 		break;
+	case IT_CH_SUN: 		do_char_log(cn, 8, DESC_SUN); 		break;
+	case IT_CH_JUDGE: 		do_char_log(cn, 8, DESC_JUDGE); 	break;
+	case IT_CH_WORLD: 		do_char_log(cn, 8, DESC_WORLD); 	break;
+	
+	case IT_CH_FOOL_R: 		do_char_log(cn, 8, DESC_FOOL_R);	break;
+	case IT_CH_MAGI_R: 		do_char_log(cn, 8, DESC_MAGI_R);	break;
+	case IT_CH_PREIST_R: 	do_char_log(cn, 8, DESC_PREIST_R);	break;
+	case IT_CH_EMPRES_R: 	do_char_log(cn, 8, DESC_EMPRES_R);	break;
+	case IT_CH_EMPERO_R: 	do_char_log(cn, 8, DESC_EMPERO_R);	break;
+	case IT_CH_HEIROP_R: 	do_char_log(cn, 8, DESC_HEIROP_R);	break;
+	case IT_CH_LOVERS_R: 	do_char_log(cn, 8, DESC_LOVERS_R);	break;
+	case IT_CH_CHARIO_R: 	do_char_log(cn, 8, DESC_CHARIO_R);	break;
+	case IT_CH_STRENG_R: 	do_char_log(cn, 8, DESC_STRENG_R);	break;
+	case IT_CH_HERMIT_R: 	do_char_log(cn, 8, DESC_HERMIT_R);	break;
+	case IT_CH_WHEEL_R: 	do_char_log(cn, 8, DESC_WHEEL_R);	break;
+	case IT_CH_JUSTIC_R: 	do_char_log(cn, 8, DESC_JUSTIC_R);	break;
+	case IT_CH_HANGED_R: 	do_char_log(cn, 8, DESC_HANGED_R);	break;
+	case IT_CH_DEATH_R: 	do_char_log(cn, 8, DESC_DEATH_R);	break;
+	case IT_CH_TEMPER_R: 	do_char_log(cn, 8, DESC_TEMPER_R);	break;
+	case IT_CH_DEVIL_R: 	do_char_log(cn, 8, DESC_DEVIL_R);	break;
+	case IT_CH_TOWER_R: 	do_char_log(cn, 8, DESC_TOWER_R);	break;
+	case IT_CH_STAR_R: 		do_char_log(cn, 8, DESC_STAR_R);	break;
+	case IT_CH_MOON_R: 		do_char_log(cn, 8, DESC_MOON_R);	break;
+	case IT_CH_SUN_R: 		do_char_log(cn, 8, DESC_SUN_R);		break;
+	case IT_CH_JUDGE_R: 	do_char_log(cn, 8, DESC_JUDGE_R);	break;
+	case IT_CH_WORLD_R: 	do_char_log(cn, 8, DESC_WORLD_R);	break;
 		
 	default:
 		break;

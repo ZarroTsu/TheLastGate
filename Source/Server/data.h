@@ -682,6 +682,9 @@ __attribute__ ((packed));
 #define ITEMSIZE         (sizeof(struct item)*MAXITEM)
 #define TITEMSIZE        (sizeof(struct item)*MAXTITEM)
 
+#define EXP_RATE 16
+#define EXP_TIME (MAPY/EXP_RATE)
+
 struct item
 {
 	unsigned char used;             // 1

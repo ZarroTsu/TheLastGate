@@ -175,6 +175,54 @@
 // Frostburn's formula (degen per tick)
 #define FROSTBFORM(p, d)	((p * 1000) / d)
 
+/* Tarot Card Descriptiors (for both r-click and /tarot command) */
+
+#define DESC_FOOL		"You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n"
+#define DESC_MAGI		"When equipped, secondary effects of Intuition and Strength are equal to the average of the two.\n"
+#define DESC_PREIST		"When equipped, your maximum life is reduced by 10%%. 20%% of damage taken from hits is negated, and half of the negated damage is dealt to Mana instead.\n"
+#define DESC_EMPRESS	"When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n"
+#define DESC_EMPEROR	"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
+#define DESC_HEIROPH	"When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n"
+#define DESC_LOVERS		"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
+#define DESC_CHARIOT	"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n"
+#define DESC_STRENGTH	"When equipped, reduces your attack and cast speed by 20%%, but grants 20%% more damage with melee attacks.\n"
+#define DESC_HERMIT		"When equipped, you have 16%% more Armor Value, but 12%% less Resistance and Immunity.\n"
+#define DESC_WHEEL		"When equipped, your critical hit chance is reduced by 33%%, but you have 1.5x critical hit multiplier.\n"
+#define DESC_JUSTICE	"When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
+#define DESC_HANGED		"When equipped, 25%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
+#define DESC_DEATH		"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
+#define DESC_TEMPER		"When equipped, your Taunt skill grants 30%% less Guard power, but Guard duration is tripled.\n"
+#define DESC_DEVIL		"When equipped, 30%% of all skill and spell costs are instead twice taken from your Hitpoints.\n"
+#define DESC_TOWER		"When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n"
+#define DESC_STAR		"When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n"
+#define DESC_MOON		"When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n"
+#define DESC_SUN		"When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n"
+#define DESC_JUDGE		"When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n"
+#define DESC_WORLD		"When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n"
+
+#define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 10%%.\n"
+#define DESC_MAGI_R		"When equipped, your concentrate skill instead increases the cost of spells, but it also increases your spell modifier.\n"
+#define DESC_PREIST_R	"When equipped, your maximum mana is reduced by 20%% to increase your cooldown bonus by 10%% of the subtracted mana.\n"
+#define DESC_EMPRES_R	"When equipped, your buffs are applied at 125%% of the target's spell aptitude, but your spell aptitude is halved.\n"
+#define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
+#define DESC_HEIROP_R	"When equipped, your Ghost Companion shares the bonus granted to you by your other tarot card slot.\n"
+#define DESC_LOVERS_R	"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
+#define DESC_CHARIO_R	"When equipped, your debuffs ignore 20%% of target resistance and immunity, but are 25%% weaker once applied.\n"
+#define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
+#define DESC_HERMIT_R	"When equipped, your Rage skill grants more Weapon Value, but costs life over time instead of endurance over time.\n"
+#define DESC_WHEEL_R	"When equipped, you have 16%% more Armor Value, but a 25%% chance to be hit when you would have parried.\n"
+#define DESC_JUSTIC_R	"When equipped, your Leap skill deals 30%% less damage, but has reduced base cooldown and instead chooses a random nearby target.\n"
+#define DESC_HANGED_R	"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"
+#define DESC_DEATH_R	"When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n"
+#define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
+#define DESC_DEVIL_R	"When equipped, your Shadow Copy deals 20%% more damage and takes 20%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
+#define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals twice as much damage and reduces enemy Immunity, but it cannot stack.\n"
+#define DESC_STAR_R		"When equipped, your Spell Modifier no longer effects spell power and instead effects your Critical Hit Chance.\n"
+#define DESC_MOON_R		"When equipped, the effectiveness of your Meditate skill is tripled while fighting, but zero while stationary.\n"
+#define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate skill is tripled while fighting, but zero while stationary.\n"
+#define DESC_JUDGE_R	"When equipped, you cannot cast your Pulse spell yourself. Pulse is cast on your Ghost Companion upon creation and is permanent, but 20%% of damage is taken by your Ghost Companion each pulse.\n"
+#define DESC_WORLD_R	"When equipped, the effectiveness of your Rest skill is tripled while fighting, but zero while stationary.\n"
+
 
 /* *** CASINO *** */
 

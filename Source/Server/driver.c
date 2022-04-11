@@ -1548,55 +1548,6 @@ int npc_cityguard_see(int cn, int co, int flag)
 	return 0;
 }
 
-int is_potion(int in)
-{
-	static int potions[] = {
-		IT_POT_M_HP, IT_POT_N_HP, IT_POT_G_HP, IT_POT_H_HP, 
-		IT_POT_S_HP, IT_POT_C_HP, IT_POT_L_HP, IT_POT_D_HP, 
-		IT_POT_M_EN, IT_POT_N_EN, IT_POT_G_EN, IT_POT_H_EN, 
-		IT_POT_S_EN, IT_POT_C_EN, IT_POT_L_EN, IT_POT_D_EN, 
-		IT_POT_M_MP, IT_POT_N_MP, IT_POT_G_MP, IT_POT_H_MP, 
-		IT_POT_S_MP, IT_POT_C_MP, IT_POT_L_MP, IT_POT_D_MP, 
-		IT_POT_VITA, IT_POT_CLAR, IT_POT_SAGE, IT_POT_LIFE, 
-		IT_POT_T, IT_POT_O, IT_POT_PT, IT_POT_PO, 
-		IT_POT_LAB2, IT_POT_GOLEM, 
-		IT_POT_BRV, IT_POT_WIL, IT_POT_INT, IT_POT_AGL, IT_POT_STR, 
-		IT_POT_EXHP, IT_POT_EXEN, IT_POT_EXMP, 
-		IT_POT_PRE, IT_POT_EVA, IT_POT_MOB, IT_POT_FRE, IT_POT_MAR, 
-		IT_POT_IMM, IT_POT_CLA, IT_POT_THO, IT_POT_BRU, IT_POT_RES, 
-		IT_POT_APT, IT_POT_OFF, IT_POT_DEF, IT_POT_PER, IT_POT_STE, 
-		IT_POT_RAIN };
-	int tn, n;
-
-	tn = it[in].temp;
-	for (n = 0; n<ARRAYSIZE(potions); n++)
-	{
-		if (tn == potions[n])
-		{
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int is_scroll(int in)
-{
-	int tn;
-
-	tn = it[in].temp;
-	return (((tn >= 1314) && (tn <= 1341)) || ((tn >= 182) && (tn <= 189)));
-}
-
-int is_soulstone(int in)
-{
-	return (it[in].driver == 68);
-}
-
-int is_gemstone(int in)
-{
-	return (it[in].flags & IF_GEMSTONE);
-}
-
 int is_unique_able(int temp)
 {
 	static int uniqueable[60] = {

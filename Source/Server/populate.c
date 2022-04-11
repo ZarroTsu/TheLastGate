@@ -855,7 +855,7 @@ void reset_item(int n)
 		{
 			continue;
 		}
-		if (it[in].flags & (IF_SPELL|IF_STACKABLE|IF_AUGMENTED|IF_DIMINISHED|IF_EASEUSE|IF_SOULSPLIT|IF_ENCHANTED|IF_SOULSTONE))
+		if (it[in].flags & (IF_SPELL|IF_STACKABLE|IF_SOULSPLIT|IF_SOULSTONE))
 		{
 			continue;
 		}
@@ -863,7 +863,23 @@ void reset_item(int n)
 		{
 			xlog(" --> %s (%d) (%d, %d,%d).", it[in].name, in, it[in].carried, it[in].x, it[in].y);
 			// make light calculations and update characters!!!
-
+			
+			if (it[in].flags & (IF_AUGMENTED|IF_DIMINISHED|IF_EASEUSE|IF_ENCHANTED))
+			{
+				if (it[in].flags & (IF_AUGMENTED|IF_DIMINISHED|IF_EASEUSE))
+				{
+					it[in].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
+					it[in].max_damage = 100000;
+				}
+				if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN))
+				{
+					it[in].flags |= IF_UPDATE;
+					it[in].flags &= ~IF_ENCHANTED;
+					it[in].enchantment = 0;
+				}
+				continue;
+			}
+			
 			if ((it_temp[n].flags & (IF_TAKE | IF_LOOK | IF_LOOKSPECIAL | IF_USE | IF_USESPECIAL)) || it[in].carried)
 			{
 				tmp = it_temp[n];
