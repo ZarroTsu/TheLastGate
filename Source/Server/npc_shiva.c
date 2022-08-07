@@ -725,7 +725,7 @@ int npc_shiva_high(int cn)
 			if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
 			if (co && npc_try_spell(cn, co, SK_SLOW)) return 1;
 			if (co && npc_try_spell(cn, co, SK_CURSE)) return 1;
-			if (co && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, co, SK_PULSE)) return 1;
+			if (co && npc_try_spell(cn, co, SK_PULSE)) return 1;
 			if (co && npc_try_spell(cn, co, SK_POISON)) return 1;
 			if (co && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
 			{

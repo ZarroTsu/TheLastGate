@@ -27,7 +27,7 @@
 #define DAM_MULT_BLAST		 625
 #define DAM_MULT_HOLYW		 750
 #define DAM_MULT_THORNS		1000
-#define DAM_MULT_CLEAVE		 750
+#define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  25
 #define DAM_MULT_LEAP		 250
@@ -105,6 +105,7 @@
 #define GMAGIC1			(1U<<25)
 #define CMAGIC			((1U<<28)|(1U<<29)|(1U<<30))
 #define CMAGIC1			(1U<<28)
+#define CRITTED			(1U<<31)
 
 #define MF_MOVEBLOCK	(1U<<0)
 #define MF_SIGHTBLOCK	(1U<<1)

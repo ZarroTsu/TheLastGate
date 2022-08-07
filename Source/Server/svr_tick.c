@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.8.6\n"};
+static char intro_msg3[] = {"Current client/server version is 0.8.9\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
@@ -2827,7 +2827,7 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_GARNEANKH)) 	chFlags += (1 <<  3);
 					if (get_neck(cn, IT_BREATHAMMY)) 	chFlags += (1 <<  4);
 					if (get_tarot(cn, IT_CH_DEATH_R)) 	chFlags += (1 <<  5); // Zephyr
-					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
+					//if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
 					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
 					if (globs->fullmoon)				chFlags += (1 <<  8);
 					if (globs->newmoon)					chFlags += (1 <<  9);
@@ -3608,6 +3608,7 @@ void plr_getmap_complete(int nr)
 			if (map[m].flags & (MF_GFX_INJURED |
 			                    MF_GFX_INJURED1 |
 			                    MF_GFX_INJURED2 |
+								MF_GFX_CRIT |
 			                    MF_GFX_DEATH |
 			                    MF_GFX_TOMB |
 			                    MF_GFX_EMAGIC |
@@ -3615,6 +3616,9 @@ void plr_getmap_complete(int nr)
 			                    MF_GFX_CMAGIC |
 			                    MF_UWATER))
 			{
+				if (map[m].flags & MF_GFX_CRIT)
+					smap[n].flags |= CRITTED;
+				
 				if (map[m].flags & MF_GFX_INJURED)
 					smap[n].flags |= INJURED;
 				if (map[m].flags & MF_GFX_INJURED1)
@@ -3905,12 +3909,16 @@ void plr_getmap_fast(int nr)
 			if (map[m].flags & (MF_GFX_INJURED |
 			                    MF_GFX_INJURED1 |
 			                    MF_GFX_INJURED2 |
+								MF_GFX_CRIT |
 			                    MF_GFX_DEATH |
 			                    MF_GFX_TOMB |
 			                    MF_GFX_EMAGIC |
 			                    MF_GFX_GMAGIC |
 			                    MF_GFX_CMAGIC))
 			{
+				if (map[m].flags & MF_GFX_CRIT)
+					smap[n].flags |= CRITTED;
+				
 				if (map[m].flags & MF_GFX_INJURED)
 					smap[n].flags |= INJURED;
 				if (map[m].flags & MF_GFX_INJURED1)
@@ -4173,7 +4181,7 @@ void plr_tick(int nr)
 		{
 			if (player[nr].ltick>player[nr].rtick + ch[cn].data[19] && !(ch[cn].flags & CF_STONED))
 			{
-				chlog(cn, "Turned to stone due to lag (%.2fs)", (player[nr].ltick - player[nr].rtick) / 18.0);
+				chlog(cn, "Turned to stone due to lag (%.2fs)", (player[nr].ltick - player[nr].rtick) / 20.0);
 				ch[cn].flags |= CF_STONED;
 				stone_gc(cn, 1);
 			}
@@ -4317,42 +4325,21 @@ void check_expire(int cn)
 	year  = day*365;
 
 	t = time(NULL);
-
-	if (IS_SEYAN_DU(cn))
+	
+	if (!IS_SEYAN_DU(cn))
 	{
-		if (ch[cn].points_tot<10000000) 	//  10 million
+		if (ch[cn].points_tot==0)
 		{
-			if (ch[cn].login_date + 1 * year<t)	erase = 1;
+			if (ch[cn].login_date +   3 * day < t) 
+				erase = 1;
 		}
-		else
+		else if (ch[cn].points_tot < 52500) // Staff Sergeant
 		{
-			if (ch[cn].login_date + 3 * year<t)	erase = 1;
+			if (ch[cn].login_date +   3 * week < t)	
+				erase = 1;
 		}
 	}
-	else if (ch[cn].points_tot==0)
-	{
-		if (ch[cn].login_date +   3 * day<t)	erase = 1;
-	}
-	else if (ch[cn].points_tot<10000)		//  10 thousand
-	{
-		if (ch[cn].login_date +   2 * week<t)	erase = 1;
-	}
-	else if (ch[cn].points_tot<100000)		// 100 thousand
-	{
-		if (ch[cn].login_date +   6 * week<t)	erase = 1;
-	}
-	else if (ch[cn].points_tot<1000000) 	//   1 million
-	{
-		if (ch[cn].login_date + 120 *  day<t)	erase = 1;
-	}
-	else if (ch[cn].points_tot<10000000) 	//  10 million
-	{
-		if (ch[cn].login_date +   1 * year<t)	erase = 1;
-	}
-	else
-	{
-		if (ch[cn].login_date +   3 * year<t)	erase = 1;
-	}
+	
 	if (erase)
 	{
 		if (ch[cn].flags & (CF_IMP | CF_GOD))

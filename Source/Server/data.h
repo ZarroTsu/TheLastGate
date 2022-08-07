@@ -15,6 +15,11 @@
 /* Globs */
 /*********/
 
+#define MD_HOUR (TICKS*60*5) // One hour per 5 IRL minutes
+#define MD_MIN	(MD_HOUR/60)
+#define MD_DAY  (MD_HOUR*24)
+#define MD_YEAR 300
+
 // 02162020 - Added for larger client render
 #define VISI_SIZE 60
 
@@ -134,6 +139,8 @@ struct global
 #define MF_GFX_CMAGIC  ((1ULL<<51)|(1ULL<<52)|(1ULL<<53))
 #define MF_GFX_CMAGIC1 (1ULL<<51)
 
+#define MF_GFX_CRIT    (1ULL<<54)
+
 /* CS, 991113: SIZEs in one header */
 #define MAPSIZE (sizeof(struct map)*MAPX*MAPY)
 
@@ -186,7 +193,7 @@ extern unsigned int mapmarker;
 #define KIN_TEMPLAR     (1u<< 4)
 #define KIN_ARCHTEMPLAR (1u<< 5)
 #define KIN_HARAKIM     (1u<< 6)
-#define KIN_MALE        (1u<< 7)
+#define KIN_CLANKWAI    (1u<< 7)
 #define KIN_FEMALE      (1u<< 8)
 #define KIN_ARCHHARAKIM (1u<< 9)
 #define KIN_WARRIOR     (1u<<10)  // arch-merc, warrior
@@ -194,6 +201,7 @@ extern unsigned int mapmarker;
 #define KIN_SKALD		(1u<<12)
 #define KIN_SUMMONER    (1u<<13)
 #define KIN_BRAVER      (1u<<14)
+#define KIN_CLANGORN    (1u<<15)
 
 #define CF_IMMORTAL		(1ull<< 0)  // will not suffer any damage
 #define CF_GOD			(1ull<< 1)  // may issue #god commands
@@ -371,8 +379,11 @@ extern unsigned int mapmarker;
 #define SK_STARLIGHT	23
 #define SK_PHALANX		34
 #define SK_SOL			33
-#define SK_FROSTB		44
-#define SK_SLOW3		52
+#define SK_IMMOLATE		44
+#define SK_IMMOLATE2	45
+#define SK_FROSTB		52
+#define SK_SLOW3		53
+
 
 
 /*
@@ -876,7 +887,7 @@ struct waypoint
 };
 
 #define N_SOULBONUS		 50
-#define N_SOULMAX		 48
+#define N_SOULMAX		 24
 
 extern struct s_skilltab skilltab[MAXSKILL+2];
 extern struct s_splog splog[52];

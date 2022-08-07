@@ -1,0 +1,43 @@
+// **************************************************************** 
+//
+// The Last Gate - SDL2 Client by Zachary "ZarroTsu" Baillie
+// Based on the Mercenaries of Astonia engine by Daniel Brockhaus
+//
+// res.rc
+// Resource file for compiler.
+// Contains version information, icon and cursor pointers.
+//
+// ****************************************************************
+#include <windows.h>
+
+ico_1 ICON 			"tlg.ico"
+cur_1 CURSOR 		"mouse1.cur"
+
+VS_VERSION_INFO VERSIONINFO 
+FILEVERSION 		0, 9, 0
+PRODUCTVERSION 		0, 9, 0
+FILEFLAGSMASK 		VS_FFI_FILEFLAGSMASK
+FILEOS 				VOS_DOS_WINDOWS16
+FILETYPE 			VFT_APP
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904E4"
+		{
+			VALUE "CompanyName", 		"n/a"
+			VALUE "Author", 			"Zachary 'ZarroTsu' Baillie"
+			VALUE "FileDescription", 	"The Last Gate"
+			VALUE "FileVersion", 		"0.9.0"
+			VALUE "InternalName", 		"TLG"
+			VALUE "LegalCopyright", 	"Copyright \251 D.Brockhaus 1997-2001"
+			VALUE "OriginalFilename", 	"THELASTGATE.EXE"
+			VALUE "ProductName", 		"The Last Gate"
+			VALUE "ProductVersion", 	"0.9.0"
+			VALUE "Comments", 			"Beta Test Version"
+		}
+	}
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x409, 1200
+	}
+}

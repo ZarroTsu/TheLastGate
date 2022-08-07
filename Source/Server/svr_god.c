@@ -293,7 +293,7 @@ int god_create_char(int temp, int withitems)
 		IS_HARAKIM(n) ? "Harakim" : "",
 		IS_SEYAN_DU(n) ? "Seyan'Du" : "",
 		!(IS_TEMPLAR(n) || IS_MERCENARY(n) || IS_HARAKIM(n) || IS_SEYAN_DU(n)) ? "Monster" : "",
-		IS_MALE(n) ? "He" : "",
+		!IS_FEMALE(n) ? "He" : "",
 		IS_FEMALE(n) ? "She" : "",
 		IS_MONSTER(n) ? "It" : "");
 
@@ -929,10 +929,16 @@ int god_give_char(int in, int cn)
 	}
 	if (n==40)
 	{
-		return 0;
+		if (ch[cn].citem)
+		{
+			return 0;
+		}
+		ch[cn].citem = in;
 	}
-
-	ch[cn].item[n] = in;
+	else
+	{
+		ch[cn].item[n] = in;
+	}
 
 	it[in].x = 0;
 	it[in].y = 0;
@@ -1202,7 +1208,7 @@ void god_info(int cn, int co)
 	            ch[co].speed,
 	            ch[co].gold / 100, ch[co].gold % 100,
 	            ch[co].data[13] / 100, ch[co].data[13] % 100);
-	if (IS_PLAYER(co) && IS_PURPLE(co) && ch[co].data[PCD_ATTACKTIME])
+	if (IS_PLAYER(co) && (IS_CLANKWAI(co) || IS_CLANGORN(co)) && ch[co].data[PCD_ATTACKTIME])
 	{
 		if (IS_IMP(cn) && IS_SANEPLAYER(ch[co].data[PCD_ATTACKVICT]))
 		{
@@ -1425,16 +1431,15 @@ void god_who(int cn)
 		{
 			showarea = 0;
 		}
-		if (IS_PURPLE(n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
+		if (IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
 		{
 			showarea = 0;
 		}
 
-		do_char_log(cn, font, "%4d: %-10.10s%c%c%c %-8.8s %.18s\n",
+		do_char_log(cn, font, "%4d: %-10.10s%c%c %-8.8s %.19s\n",
 		            n, ch[n].name,
+		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
-		            (ch[n].flags & CF_POH) ? '+' : ' ',
-		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
 		            int2str(ch[n].points_tot),
 		            !showarea ? "--------" : get_area(n, 0));
 	}
@@ -1493,16 +1498,15 @@ void god_implist(int cn)
 		{
 			showarea = 0;
 		}
-		if (IS_PURPLE(n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
+		if (IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
 		{
 			showarea = 0;
 		}
 
-		do_char_log(cn, 1, "%4d: %-10.10s%c%c%c %-8.8s %.18s\n",
+		do_char_log(cn, 1, "%4d: %-10.10s%c%c %-8.8s %.19s\n",
 		            n, ch[n].name,
+		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
-		            (ch[n].flags & CF_POH) ? '+' : ' ',
-		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
 		            int2str(ch[n].points_tot),
 		            !showarea ? "--------" : get_area(n, 0));
 	}
@@ -1537,27 +1541,25 @@ void user_who(int cn)
 		{
 			showarea = 0;
 		}
-		if (IS_PURPLE(n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
+		if (IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
 		{
 			showarea = 0;
 		}
 
-		do_char_log(cn, font, "%.5s %-10.10s%c%c%c %.23s\n",
+		do_char_log(cn, font, "%.5s %-10.10s%c%c %.24s\n",
 		            who_rank_name[points2rank(ch[n].points_tot)],
 		            ch[n].name,
+		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
-		            (ch[n].flags & CF_POH) ? '+' : ' ',
-		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));
 	}
 	if ((gc = ch[cn].data[PCD_COMPANION]) && IS_SANECHAR(gc))
 	{
-		do_char_log(cn, 3, "%.5s %-10.10s%c%c%c %.23s\n",
+		do_char_log(cn, 3, "%.5s %-10.10s%c%c %.24s\n",
 		            who_rank_name[points2rank(ch[gc].points_tot)],
 		            ch[gc].name,
-		            IS_PURPLE(gc) ? '*' : ' ',
-		            (ch[gc].flags & CF_POH) ? '+' : ' ',
-		            (ch[gc].flags & CF_POH_LEADER) ? '+' : ' ',
+		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
+		            IS_PURPLE(n) ? '*' : ' ',
 		            get_area(gc, 0));
 		/*
 		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
@@ -1581,7 +1583,7 @@ void god_top(int cn)
 	            (globs->mdday==2 ? "nd" : ""),
 	            (globs->mdday==3 ? "rd" : ""),
 	            (globs->mdday>3 ? "th" : ""),
-	            globs->mdyear, globs->mdtime / 3600, (globs->mdtime / 60) % 60);
+	            globs->mdyear, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
 
 	if ((globs->mdday % 28) + 1==1)
 	{
@@ -1642,7 +1644,7 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 			in = god_create_item(x); 			// create the item
 			if (in)								// assure the item is created
 			{
-				if (it[in].placement & PL_TWOHAND)
+				if (IS_TWOHAND(in))
 				{
 					bonus = 2;
 				}
@@ -1826,7 +1828,10 @@ void god_reset_npcs(int cn)
 {
 	int n;
 	
-	do_char_log(cn, 1, "Now wiping all npcs...\n");
+	if (cn) 
+		do_char_log(cn, 1, "Now wiping all npcs...\n");
+	else 
+		xlog("Now wiping all npcs...");
 	for (n = 1; n<MAXCHARS; n++)
 	{
 		if (ch[n].used==USE_EMPTY)
@@ -1845,7 +1850,10 @@ void god_reset_npcs(int cn)
 		ch[n].flags = 0;
 		ch[n].used = USE_EMPTY;
 	}
-	do_char_log(cn, 1, "Now resetting npcs...\n");
+	if (cn) 
+		do_char_log(cn, 1, "Now resetting npcs...\n");
+	else
+		xlog("Now resetting npcs...");
 	for (n = 1; n<MAXTCHARS; n++)
 	{
 		if (ch_temp[n].flags & CF_RESPAWN)
@@ -1854,7 +1862,10 @@ void god_reset_npcs(int cn)
 		}
 	}
 	globs->reset_char = 0;
-	do_char_log(cn, 0, "Done.\n");
+	if (cn)
+		do_char_log(cn, 0, "Done.\n");
+	else
+		xlog("Done.");
 	return;
 }
 
@@ -2315,7 +2326,7 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset)
 
 	/* tricky: make thrall act like a ghost companion */
 	ch[ct].temp = CT_COMPANION;
-	ch[ct].data[64] = globs->ticker + 7 * 24 * 3600 * TICKS;	// die in one week if not otherwise
+	ch[ct].data[64] = globs->ticker + 7 * MD_DAY * TICKS;		// die in one week if not otherwise
 	ch[ct].data[CHD_GROUP] = 65500;								// set group
 	ch[ct].data[59] = 65500;									// protect all other members of this group
 
@@ -2328,6 +2339,7 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset)
 	ch[cn].data[72] = 99;				// grants special talk.c properties
 
 	ch[ct].flags |= CF_SHUTUP | CF_THRALL;
+	ch[ct].alignment = -999;
 	
 	if (offset) 
 	{
@@ -2690,8 +2702,6 @@ void god_build_equip(int cn, int x)
 		break;
 	case 13:	// Black Marble Stuff
 		ch[cn].item[m++] = 0x20000000 | 2717;
-		ch[cn].item[m++] = 122;
-		ch[cn].item[m++] = 123;
 		ch[cn].item[m++] = 0x20000000 | 531;
 		ch[cn].item[m++] = 0x20000000 | 532;
 		ch[cn].item[m++] = 0x20000000 | 533;
@@ -2701,8 +2711,26 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 537;
 		ch[cn].item[m++] = 0x20000000 | 538;
 		ch[cn].item[m++] = 0x20000000 | 539;
+		//
 		ch[cn].item[m++] = 0x20000000 | 540;
 		ch[cn].item[m++] = 0x20000000 | 541;
+		ch[cn].item[m++] = 0x20000000 | 5864;
+		ch[cn].item[m++] = 0x20000000 | 5865;
+		ch[cn].item[m++] = 122;
+		ch[cn].item[m++] = 123;
+		ch[cn].item[m++] = 2646;				// Red Marble
+		ch[cn].item[m++] = 2647;
+		ch[cn].item[m++] = 2648;
+		ch[cn].item[m++] = 2649;
+		//
+		ch[cn].item[m++] = 2650;
+		ch[cn].item[m++] = 2651;
+		ch[cn].item[m++] = 2652;				// Green Marble
+		ch[cn].item[m++] = 2653;
+		ch[cn].item[m++] = 2654;
+		ch[cn].item[m++] = 2655;
+		ch[cn].item[m++] = 2656;
+		ch[cn].item[m++] = 2657;
 		break;
 	case 14:	// Grass to Dirt
 		ch[cn].item[m++] = 0x20000000 | 551;	// Grass
@@ -2746,6 +2774,8 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 2823;	// Snow 1
 		ch[cn].item[m++] = 0x20000000 | 2827;	// Snow 2
 		ch[cn].item[m++] = 0x20000000 | 3021;	// Snow 3
+		ch[cn].item[m++] = 0x20000000 | 5965;	// Cold Stone
+		ch[cn].item[m++] = 0x20000000 | 5966;	// Cold Stone
 		ch[cn].item[m++] = 1675;				// ** Wall
 		ch[cn].item[m++] = 1692;				// ** Deco
 		ch[cn].item[m++] = 1693;				// ** Deco
@@ -3071,14 +3101,26 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS; // Indoor flag
 		ch[cn].item[m++] = 0x20000000 | 551;		// Light Grass
 		ch[cn].item[m++] = 0x20000000 | 1118;		// Dark Grass
+		ch[cn].item[m++] = 0x20000000 | 5852;		// Light Grass
+		ch[cn].item[m++] = 0x20000000 | 5856;		// Dark Grass
+		ch[cn].item[m++] = 0x20000000 | 5848;		// Cherry Grass
 		ch[cn].item[m++] = 1467;	// Random Town Tree
 		ch[cn].item[m++] = 1468;	// Random Forest Tree
-		ch[cn].item[m++] = 16;		// Red Flower
-		ch[cn].item[m++] = 45;		// Purple Flower
-		ch[cn].item[m++] = 139;		// Green Flower
 		ch[cn].item[m++] = 17;		// Light moss
 		ch[cn].item[m++] = 47;		// Dark moss
 		//
+		ch[cn].item[m++] = 1558;	// Tall Grass I
+		ch[cn].item[m++] = 1559;	// Tall Grass II
+		ch[cn].item[m++] = 1560;	// Tall Grass III
+		ch[cn].item[m++] = 1583;	// Tall Grass IV
+		ch[cn].item[m++] = 1584;	// Tall Grass V
+		ch[cn].item[m++] = 1585;	// Tall Grass VI
+		ch[cn].item[m++] = 1589;	// Pebbles
+		ch[cn].item[m++] = 16;		// Red Flower
+		ch[cn].item[m++] = 45;		// Purple Flower
+		ch[cn].item[m++] = 139;		// Green Flower
+		//
+		ch[cn].item[m++] = 1956;	// White Flower
 		ch[cn].item[m++] = 137;		// Yellow Flower
 		ch[cn].item[m++] = 138;		// Blue Flower
 		ch[cn].item[m++] = 19;		// Tree I
@@ -3088,13 +3130,14 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 606;		// Tree V
 		ch[cn].item[m++] = 607;		// Tree VI
 		ch[cn].item[m++] = 608;		// Tree VII
-		ch[cn].item[m++] = 609;		// Tree VIII
 		//
+		ch[cn].item[m++] = 609;		// Tree VIII
+		ch[cn].item[m++] = 2645;	// Cherry Tree
 		ch[cn].item[m++] = 1434;	// Apple Tree
 		ch[cn].item[m++] = 1436;	// Pear Tree
 		ch[cn].item[m++] = 1438;	// Berry Bush
 		ch[cn].item[m++] = 1440;	// Bush
-		ch[cn].item[m++] = 611;		// Spider Web
+		ch[cn].item[m++] = 1591;	// Tall Bush
 		break;
 	case 1002:   // ice penta
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
@@ -3134,6 +3177,22 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 1685;
 		ch[cn].item[m++] = 1686;
 		ch[cn].item[m++] = 1687;
+		break;
+	case 1005:
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS; // Indoor flag
+		ch[cn].item[m++] = 0x20000000 | 5860;		// Violet Jungle Floor
+		ch[cn].item[m++] = 2658;
+		ch[cn].item[m++] = 2659;
+		ch[cn].item[m++] = 2660;
+		ch[cn].item[m++] = 2661;
+		ch[cn].item[m++] = 2662;
+		ch[cn].item[m++] = 2663;
+		ch[cn].item[m++] = 2664;
+		ch[cn].item[m++] = 2665;
+		//
+		ch[cn].item[m++] = 2666;
+		ch[cn].item[m++] = 2667;
+		ch[cn].item[m++] = 2668;
 		break;
 	case    1140:
 		ch[cn].item[m++] = 0x20000000 | 17064;
@@ -3650,8 +3709,8 @@ void god_set_purple(int cn, int co)
 	/* CS, 000209: Reset last kill time and victim */
 	if (!IS_PURPLE(co))
 	{
-		ch[co].data[PCD_ATTACKTIME] = 0;
-		ch[co].data[PCD_ATTACKVICT] = 0;
+		//ch[co].data[PCD_ATTACKTIME] = 0;
+		//ch[co].data[PCD_ATTACKVICT] = 0;
 		ch[co].temple_x = HOME_TEMPLE_X;
 		ch[co].temple_y = HOME_TEMPLE_Y;
 	}
@@ -3659,6 +3718,64 @@ void god_set_purple(int cn, int co)
 	{
 		ch[co].temple_x = HOME_PURPLE_X;
 		ch[co].temple_y = HOME_PURPLE_Y;
+	}
+}
+
+void god_set_kwai(int cn, int co)
+{
+	if (co == 0)
+	{
+		do_char_log(cn, 0, "No such character.\n");
+		return;
+	}
+	else if (!IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Bad character number: %d\n", co);
+		return;
+	}
+	ch[co].kindred ^= KIN_CLANKWAI;
+	do_char_log(cn, 1, "%s kwai: %s.\n", ch[co].name, (IS_CLANKWAI(co)) ? "on" : "off");
+	chlog(cn, "IMP: Set kwai status of %s to %s.", ch[co].name, (IS_CLANKWAI(co)) ? "on" : "off");
+	if (!IS_CLANKWAI(co))
+	{
+		ch[co].data[PCD_ATTACKTIME] = 0;
+		ch[co].data[PCD_ATTACKVICT] = 0;
+		ch[co].temple_x = HOME_TEMPLE_X;
+		ch[co].temple_y = HOME_TEMPLE_Y;
+	}
+	else // change this to kwai temple later
+	{
+		ch[co].temple_x = HOME_TEMPLE_X;
+		ch[co].temple_y = HOME_TEMPLE_Y;
+	}
+}
+
+void god_set_gorn(int cn, int co)
+{
+	if (co == 0)
+	{
+		do_char_log(cn, 0, "No such character.\n");
+		return;
+	}
+	else if (!IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Bad character number: %d\n", co);
+		return;
+	}
+	ch[co].kindred ^= KIN_CLANGORN;
+	do_char_log(cn, 1, "%s gorn: %s.\n", ch[co].name, (IS_CLANGORN(co)) ? "on" : "off");
+	chlog(cn, "IMP: Set gorn status of %s to %s.", ch[co].name, (IS_CLANGORN(co)) ? "on" : "off");
+	if (!IS_CLANGORN(co))
+	{
+		ch[co].data[PCD_ATTACKTIME] = 0;
+		ch[co].data[PCD_ATTACKVICT] = 0;
+		ch[co].temple_x = HOME_TEMPLE_X;
+		ch[co].temple_y = HOME_TEMPLE_Y;
+	}
+	else // change this to kwai temple later
+	{
+		ch[co].temple_x = HOME_TEMPLE_X;
+		ch[co].temple_y = HOME_TEMPLE_Y;
 	}
 }
 
@@ -4376,7 +4493,7 @@ void god_gargoyle(int cn)
 
 void god_minor_racechange(int cn, int t) // note: cannot deal with values which are already higher than the new max!
 {
-	int n;
+	int n, tempkin;
 
 	if (!IS_SANECHAR(cn) || !IS_SANECTEMPLATE(t))
 	{
@@ -4398,15 +4515,15 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 	ch[cn].mana[3] = ch_temp[t].mana[3];
 
 	ch[cn].sprite = ch_temp[t].sprite;
-
-	if (IS_PURPLE(cn))
-	{
-		ch[cn].kindred = ch_temp[t].kindred | KIN_PURPLE;
-	}
-	else
-	{
-		ch[cn].kindred = ch_temp[t].kindred;
-	}
+	
+	tempkin = ch[cn].kindred;
+	
+	ch[cn].kindred = ch_temp[t].kindred;
+	
+	if (tempkin & KIN_PURPLE) ch[cn].kindred |= KIN_PURPLE;
+	
+	if (tempkin & KIN_CLANKWAI) ch[cn].kindred |= KIN_CLANKWAI;
+	else if (tempkin & KIN_CLANGORN) ch[cn].kindred |= KIN_CLANGORN;
 
 	ch[cn].temp = t;
 	ch[cn].weapon_bonus = ch_temp[t].weapon_bonus;

@@ -557,7 +557,7 @@ static void char_info(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))
+	if (!IS_FEMALE(cn))
 	{
 		gender = "he";
 		Gender = "He";
@@ -614,8 +614,7 @@ static void char_info(int cn)
 
 		if (IS_PURPLE(cn))
 		{
-			printf("%s is a follower of the Purple One and killed %d fellow players.\n",
-			       Gender, ch[cn].data[29]);
+			printf("%s is a follower of the Purple One.\n", Gender);
 		}
 	}
 }
@@ -705,7 +704,7 @@ static void info(int cn)
 	       (globs->mdday==2 ? "nd" : ""),
 	       (globs->mdday==3 ? "rd" : ""),
 	       (globs->mdday>3 ? "th" : ""),
-	       globs->mdyear, globs->mdtime / 3600, (globs->mdtime / 60) % 60);
+	       globs->mdyear, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
 
 	if (globs->mdday % 28 + 1==1)
 	{

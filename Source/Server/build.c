@@ -5692,7 +5692,7 @@ struct map_flavor map_flavor[] = {
 		{ MSC_JFLOWER, MSC_JFAUNA, MSC_AQUATIC, MSC_AQUATIC }, 
 		{ MDR_DIRT_N, MDR_DIRT_E } }, 
 	{ MFL_SNOW, MWL_SNOW, MTR_FPIT, 0, 							// 07 : Snow
-		{ MDE_ICE, MWL_SNTREE, MWL_SNTREE, MWL_SNTREE }, 
+		{ MDE_ICE, MWL_SNTREE, MWL_SNTREE, MWL_SNTREE },
 		{ MSC_YGRASS, MSC_SPLANT, MSC_SPLANT, MSC_PEBBLES }, 
 		{ MDR_ICE_N, MDR_ICE_E } }, 
 	{ MFL_DAUTUMN, MWL_AFTREE, MTR_GROLM, 0, 					// 08 : Autumn
@@ -5782,7 +5782,47 @@ struct map_flavor map_flavor[] = {
 	{ MFL_DAUTUMN, MWL_CANYON, MTR_BLUE, 0, 					// 29 : Autumn Valley
 		{ MWL_DTREE, MWL_AFTREE, MWL_AFTREE, MDE_SBUSH }, 
 		{ MSC_PEBBLES, MSC_APLANT, MSC_APLANT, MSC_YGRASS }, 
-		{ MDR_RED_N, MDR_RED_E } }
+		{ MDR_RED_N, MDR_RED_E } },
+	{ MFL_VJUNGLE, MWL_VJTREE, MTR_CSTONE, 0, 					// 30 : Violet Jungle
+		{ MDE_CSTONE, MDE_CSTONE, MWL_CSTONE, MWL_VJTREE }, 
+		{ MSC_COLDR, MSC_VFAUNA, MSC_VFAUNA, MSC_VFAUNA }, 
+		{ MDR_COLD_N, MDR_COLD_E } },
+	{ MFL_VJUNGLE, MWL_VJTREE, MTR_BOWL, 1, 					// 31 : Violet Swamp
+		{ MDE_EARTH, MDE_CSTONE, MWL_CSTONE, MWL_VJTREE }, 
+		{ MSC_COLDR, MSC_VFAUNA, MSC_AQUATIC, MSC_AQUATIC }, 
+		{ MDR_DIRT_N, MDR_DIRT_E } },
+	{ MFL_COLDSTONE, MWL_CSTONE, MTR_CSTONE, 1, 				// 32 : Cold Earth
+		{ MDE_CSTONE, MDE_CSTONE, MDE_CSTONE, MDE_CSTONE }, 
+		{ MSC_COLDR, MSC_COLDR, MSC_COLDR, MSC_COLDR }, 
+		{ MDR_COLD_N, MDR_COLD_E } },
+	{ MFL_REDMARB, MWL_REDMARB, MTR_GOLD, 1, 					// 33 : Red Temple
+		{ MDE_REDMARB, MDE_REDMARB, MDE_MTABLE, MDE_MTABLE }, 
+		{ (0x20000000 | MFL_WOOD), (0x20000000 | MFL_WOOD), 0, 0 }, 
+		{ MDR_RED_N, MDR_RED_E } }, 
+	{ MFL_GREMARB, MWL_GREMARB, MTR_GOLD, 1, 					// 34 : Green Temple
+		{ MDE_GREMARB, MDE_GREMARB, MDE_MTABLE, MDE_MTABLE }, 
+		{ (0x20000000 | MFL_WOOD), (0x20000000 | MFL_WOOD), 0, 0 }, 
+		{ MDR_GREEN_N, MDR_GREEN_E } },
+	{ MFL_GOLEM, MWL_BASALT, MTR_FPIT, 0, 						// 35 : Basalt Desert
+		{ MDE_CACTUS, MDE_CACTUS, MDE_CACTUS, MDE_BASALT }, 
+		{ MSC_PEBBLES, (0x20000000 | MFL_DGREY), 0, 0 }, 
+		{ MDR_BASALT_N, MDR_BASALT_E } }, 
+	{ MFL_BSROUGH, MWL_EVIL, MTR_BOWL, 0, 						// 36 : Evil Stronghold
+		{ MDE_EPILLAR, MDE_EPILLAR, MDE_EPILLAR, MDE_EPILLAR }, 
+		{ MSC_PEBBLES, (0x20000000 | MFL_BSSMOOTH), 0, 0 }, 
+		{ MDR_IRON_N, MDR_IRON_E } }, 
+	{ MFL_BSSMOOTH, MWL_EVIL, MTR_BLACK, 1, 					// 37 : Evil Tower
+		{ MDE_EPILLAR, MDE_EPILLAR, MDE_EPILLAR, MDE_EPILLAR }, 
+		{ (0x20000000 | MFL_TOWER), 0, 0, 0 }, 
+		{ MDR_IRON_N, MDR_IRON_E } }, 
+	{ MFL_COLDSTONE, MWL_FIREBRICK, MTR_FIRE, 1, 						// 38 : Burning Bricks
+		{ MWL_CHARCOAL, MWL_CHARCOAL, MDE_LAVA, MDE_LAVA }, 
+		{ MSC_PEBBLES, (0x20000000 | MFL_LAVA), MDE_EARTH, 0 }, 
+		{ MDR_RED_N, MDR_RED_E } }, 
+	{ MFL_SNOW, MWL_ICEBRICK, MTR_ICE, 1, 							// 39 : Cold Bricks
+		{ MWL_SNTREE, MWL_SNTREE, MDE_ICE, MDE_ICE }, 
+		{ MSC_SPLANT, (0x20000000 | MFL_ICE), MDE_CSTONE, 0 }, 
+		{ MDR_COLD_N, MDR_COLD_E } }
 };
 //
 
@@ -5876,8 +5916,9 @@ void build_drop(int x, int y, int in)
 	static int trees4[15] = {1680, 1680, 1681, 1681, 1682, 
 							 1682, 1683, 1683, 1684, 1685, 
 							 1685, 1686, 1686, 1687, 1687};
-							 
+	
 	static int trees5[5] = {200, 236, 237, 238, 239};
+	static int trees6[5] = {5659, 5659, 5660, 5661, 5662};
 
 	if (x<0 || x>=MAPX || y<0 || y>=MAPY)
 	{
@@ -5916,7 +5957,8 @@ void build_drop(int x, int y, int in)
 		{
 			nr += RANDOM(9);
 		}
-		if (nr==551 || nr==2823 || nr==2828)   // hack for grass grounds
+		// hack for grass grounds, parkett ground, greystone ground, flower floors
+		if (nr==551 || nr==2823 || nr==2828 || nr==142 || nr==808 || nr==16670 || nr==5860 || nr==5852 || nr==5856 || nr==5848)	
 		{
 			nr += RANDOM(4);
 		}
@@ -5924,17 +5966,9 @@ void build_drop(int x, int y, int in)
 		{
 			nr += RANDOM(9);
 		}
-		if (nr==142)   // hack for parkett ground
-		{
-			nr += RANDOM(4);
-		}
 		if (nr==170)   // hack for stone ground
 		{
 			nr += RANDOM(6);
-		}
-		if (nr==808)	// hack for greystone ground
-		{
-			nr += RANDOM(4);
 		}
 		if (nr==704)
 		{
@@ -5948,10 +5982,6 @@ void build_drop(int x, int y, int in)
 		if (nr==959)
 		{
 			nr += (x % 3) * 3 + (y % 3);
-		}
-		if (nr==16670)
-		{
-			nr += RANDOM(4);
 		}
 		if (nr==16933)
 		{
@@ -5997,6 +6027,9 @@ void build_drop(int x, int y, int in)
 		case 1902:	// hack for random jungle trees
 			in = trees5[RANDOM(5)];
 			break;
+		case 2658:	// hack for random violet jungle trees
+			in = trees6[RANDOM(5)];
+			break;
 		
 		case 1936: exfloor = 0x20000000 | 1002; 	break;		// waypoint floor hacks - used by client engine.c
 		case 1937: exfloor = 0x20000000 | 1008; 	break;
@@ -6035,6 +6068,9 @@ void build_drop(int x, int y, int in)
 		case 91670:	// map building hack for random red brick
 			in = 1670 + RANDOM(2)*2;
 			break;
+		case 92669:	// map building hack for random basalt wall
+			in = 2669 + RANDOM(3);
+			break;
 		//
 		case 90153:	// map building hack for random earth rock
 			in = 153 + RANDOM(3);
@@ -6056,6 +6092,12 @@ void build_drop(int x, int y, int in)
 			break;
 		case 91711:	// map building hack for random sand block
 			in = 1712 + RANDOM(3); if (in==1712) in--;
+			break;
+		case 92682:	// map building hack for random cold stone rock
+			in = 153 + RANDOM(3);
+			break;
+		case 92673:	// map building hack for random basalt block
+			in = 2673 + RANDOM(3);
 			break;
 		//
 		case 90017:	// map building hack for random moss
@@ -6096,6 +6138,13 @@ void build_drop(int x, int y, int in)
 			break;
 		case 92567: // map building hack for random cacti
 			in = 2567 + RANDOM(4);
+			break;
+		case 92685:	// map building hack for random cold rock
+			in = 156 + RANDOM(2);
+			break;
+			
+		case 92663:	// map building hack for random violet jungle fauna
+			in = 2663 + RANDOM(6);
 			break;
 		
 		default: 
@@ -6402,6 +6451,61 @@ void do_mission_log(int cn, int mission, int rank, int tier)
 	do_char_log(cn, 1, " \n");
 }
 
+void add_monster_flags(int cn, int rank, int flags)
+{
+	int bf;
+	
+	if (flags & 0x00000040) ch[cn].flags |= CF_UNDEAD;
+	if (flags & 0x00000100) ch[cn].data[73] += 6;
+	if (flags & 0x00000200) ch[cn].skill[SK_PERCEPT][1] = max(50, ch[cn].skill[SK_PERCEPT][0]/8);
+	if (flags & 0x00000400) ch[cn].skill[SK_RESIST][1] = max(50, ch[cn].skill[SK_RESIST][0]/8);
+	if (flags & 0x00000800) ch[cn].skill[SK_HAND][1] = max(50, ch[cn].skill[SK_HAND][0]/8);
+	if (flags & 0x00001000) ch[cn].weapon_bonus = max(50, ch[cn].weapon/8);
+	if (flags & 0x00002000) ch[cn].armor_bonus = max(50, ch[cn].armor/8);
+	if (flags & 0x00004000) ch[cn].speed_mod = rank*2;
+	if ((flags & 0x00008000) && (bf = make_new_buff(cn, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
+	{
+		strcpy(bu[bf].name, "* Wisdom");
+		bu[bf].spell_mod[1] = rank; bu[bf].data[4] = 1; add_spell(cn, bf);
+	}
+	if ((flags & 0x04000000) && (bf = make_new_buff(cn, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
+	{
+		strcpy(bu[bf].name, "* Bonus EXP"); 
+		bu[bf].data[4] = 1; add_spell(cn, bf);
+	}
+	do_update_char(cn);
+}
+
+void add_player_flags(int cn, int flags)
+{
+	int bf, m;
+	
+	if ((flags & 0x00010000) && (bf = make_new_buff(cn, 106, BUF_SPR_DEBIL, 300, SP_DUR_MAPMOD, 0)))
+	{
+		strcpy(bu[bf].name, "* Debilitation");
+		for (m = 0; m<5; m++) bu[bf].attrib[m][1] = -(get_attrib_score(cn, m)/8);
+		bu[bf].data[4] = 1; add_spell(cn, bf);
+	}
+	if ((flags & 0x00020000) && (bf = make_new_buff(cn, 107, BUF_SPR_FRAGI, 300, SP_DUR_MAPMOD, 0)))
+	{
+		strcpy(bu[bf].name, "* Fragility");
+		bu[bf].weapon[1] = -(ch[cn].weapon/8); bu[bf].armor[1] = -(ch[cn].armor/8); 
+		bu[bf].data[4] = 1; add_spell(cn, bf);
+	}
+	if ((flags & 0x00040000) && (bf = make_new_buff(cn, 108, BUF_SPR_STIGM, 300, SP_DUR_MAPMOD, 0)))
+	{
+		strcpy(bu[bf].name, "* Stigmatism");
+		bu[bf].skill[SK_PERCEPT][1] = -100;
+		bu[bf].data[4] = 1; add_spell(cn, bf);
+	}
+	if ((flags & 0x00080000) && (bf = make_new_buff(cn, 109, BUF_SPR_HYPRT, 300, SP_DUR_MAPMOD, 0)))
+	{
+		strcpy(bu[bf].name, "* Hyperthermia");
+		bu[bf].end[0] = bu[bf].mana[0] = -111; 
+		bu[bf].data[4] = 1; add_spell(cn, bf);
+	}
+}
+
 // Generate a new map at given coordinates - tries to grab the start point to return it.
 // Warlord is rank 24
 int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
@@ -6410,6 +6514,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 	int n, m, in, x, y, xc, yc, xt, yt, xx, yy, maploc=1;
 	int t, s, f, co, en1, en2, en1c=0, en2c=0, base, spawnT = 350, affix=0, i, j, bf;
 	int tarot = 0, goal = 0, mdiv = 0, mspw = 0, pn = 0;
+	int ngm = 1;
 	
 	// flags
 	// & 0x00000001 Additional enemies			*	(+)	tier 1
@@ -6513,9 +6618,18 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 	// 3) Generate the map
 	m = RANDOM(sizeof(map_layout) / sizeof(map_layout[0]));		// Map layout
 	f = RANDOM(sizeof(map_flavor) / sizeof(map_flavor[0]));		// Map 'flavor' for the tileset
-	en1 = RANDOM(NUM_MAP_ENEM)+11;								// Monster template choice 1
-	en2 = RANDOM(NUM_MAP_ENEM)+11;								// Monster template choice 2
-	base = max(15, (rank-5)*11/2+15);							// Power level of monsters spawned
+	en1 = RANDOM(NUM_MAP_ENEM)+11;									// Monster template choice 1
+	en2 = RANDOM(NUM_MAP_ENEM)+11;									// Monster template choice 2
+	base = max(15, (rank-5) * 5 + 15);								// Power level of monsters spawned
+	
+	for (n = PCD_MINGROUP; n<=PCD_MAXGROUP; n++)
+	{
+		if ((co = ch[cn].data[n]))
+		{
+			if (!isgroup(co, cn))		ch[cn].data[n] = 0;     // throw out defunct group member
+			else if (isnearby(cn, co))	ngm++;
+		}
+	}
 	
 	// For each cell of the layout
 	for (xc = 0; xc < MAP_CELL_SIZE; xc++)
@@ -6596,6 +6710,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 										}
 										it[co].data[0] = rank;
 										it[co].data[1] = tier;
+										it[co].data[2] = ngm;
 									}
 									break;
 								case  2: 		// Enemy
@@ -6603,43 +6718,29 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 								case 13: 		// Extra divine enemy (with flag)
 									if (s==10 && !(flags & 0x00000001)) break;
 									if (s==13 && !(flags & 0x00000002)) break;
-									co = 0; affix = 0;
-									if (s==13 || !RANDOM(20) || (mdiv && mdiv==en1c+en2c)) affix = 3;
-									if (s==10)
+									for (n = 0; n < ngm; n++)
 									{
-										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base, affix, tarot);
+										co = 0; affix = 0;
+										if (s==13 || !RANDOM(20) || (mdiv && mdiv==en1c+en2c)) affix = 3;
+										if (s==10)
+										{
+											co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+1, affix, tarot);
+										}
+										else if (en2c>=5*ngm || !RANDOM(2) && en1c*ngm<5)
+										{
+											en1c++;
+											co = generate_map_enemy(spawnT, en1, x, y, base, affix, tarot);
+										}
+										else
+										{
+											en2c++;
+											co = generate_map_enemy(spawnT, en2, x, y, base, affix, tarot);
+										}
+										if (co && mission==1) goal++;
+										if (co && mission==2 && affix==3) goal++;
+										if (co) add_monster_flags(co, rank, flags);
+										if (s==13) break;
 									}
-									else if (en2c>=5 || !RANDOM(2) && en1c<5)
-									{
-										en1c++;
-										co = generate_map_enemy(spawnT, en1, x, y, base, affix, tarot);
-									}
-									else
-									{
-										en2c++;
-										co = generate_map_enemy(spawnT, en2, x, y, base, affix, tarot);
-									}
-									if (co && mission==1) goal++;
-									if (co && mission==2 && affix==3) goal++;
-									if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
-									if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
-									if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
-									if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
-									if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
-									if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
-									if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/8);
-									if (co && (flags & 0x00004000)) ch[co].speed_mod = rank*2;
-									if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Wisdom");
-										bu[bf].spell_mod[1] = rank; bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co && (flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Bonus EXP"); 
-										bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co) do_update_char(co);
 									break;
 								case  3: 		// Hole / South
 									build_item(MM_LADD_E, x, y);
@@ -6674,6 +6775,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 										it[co].data[3] = tier;
 										it[co].data[4] = flags;
 										it[co].data[5] = tarot;
+										it[co].data[6] = ngm;
 									}
 									break;
 								case  8: 		// Map Entrance Point
@@ -6684,53 +6786,17 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 									co = 0;
 									if (flags & 0x00000080)	// boss at portal
 									{
-										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+4, 4, tarot);
+										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+2, 4, tarot);
 									}
 									if (co && (mission==1 || mission==3)) goal++;
-									if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
-									if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
-									if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
-									if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
-									if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
-									if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
-									if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/8);
-									if (co && (flags & 0x00004000)) ch[co].speed_mod = rank*2;
-									if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Wisdom");
-										bu[bf].spell_mod[1] = rank; bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co && (flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Bonus EXP"); 
-										bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co) do_update_char(co);
+									if (co) add_monster_flags(co, rank, flags);
 									co = 0;
 									if (mission==3)	// 2nd boss at portal
 									{
-										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+5, 4, tarot);
+										co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+3, 4, tarot);
 									}
 									if (co && (mission==1 || mission==3)) goal++;
-									if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
-									if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
-									if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
-									if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
-									if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
-									if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
-									if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/8);
-									if (co && (flags & 0x00004000)) ch[co].speed_mod = rank*2;
-									if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Wisdom");
-										bu[bf].spell_mod[1] = rank; bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co && (flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Bonus EXP"); 
-										bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co) do_update_char(co);
+									if (co) add_monster_flags(co, rank, flags);
 									co = build_item(MM_EXIT, x, y);
 									if (co)
 									{
@@ -6757,28 +6823,10 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 									else if (mission==9 && pn == mspw) // Legend
 									{
 										co = generate_map_enemy(spawnT, 
-											RANDOM(NUM_LEG_ENEM)+11+NUM_MAP_ENEM, x, y, base+6, 6, 3);
+											RANDOM(NUM_LEG_ENEM)+11+NUM_MAP_ENEM, x, y, base+4, 6, 3);
 									}
 									if (co && mission==1) goal++;
-									if (co && (flags & 0x00000040)) ch[co].flags |= CF_UNDEAD;
-									if (co && (flags & 0x00000100)) ch[co].data[73] += 6;
-									if (co && (flags & 0x00000200)) ch[co].skill[SK_PERCEPT][1] = max(50, ch[co].skill[SK_PERCEPT][0]/8);
-									if (co && (flags & 0x00000400)) ch[co].skill[SK_RESIST][1] = max(50, ch[co].skill[SK_RESIST][0]/8);
-									if (co && (flags & 0x00000800)) ch[co].skill[SK_HAND][1] = max(50, ch[co].skill[SK_HAND][0]/8);
-									if (co && (flags & 0x00001000)) ch[co].weapon_bonus = max(50, ch[co].weapon/8);
-									if (co && (flags & 0x00002000)) ch[co].armor_bonus = max(50, ch[co].armor/8);
-									if (co && (flags & 0x00004000)) ch[co].speed_mod = rank*2;
-									if (co && (flags & 0x00008000) && (bf = make_new_buff(co, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Wisdom");
-										bu[bf].spell_mod[1] = rank; bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co && (flags & 0x04000000) && (bf = make_new_buff(co, 105, BUF_SPR_POME, 300, SP_DUR_MAPMOD, 0)))
-									{
-										strcpy(bu[bf].name, "* Bonus EXP"); 
-										bu[bf].data[4] = 1; add_spell(co, bf);
-									}
-									if (co) do_update_char(co);
+									if (co) add_monster_flags(co, rank, flags);
 									if (mission == 7)
 									{
 										co = build_item(MCT_PENTIGRAM, x, y);
@@ -6862,31 +6910,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 					
 					do_mission_log(co, mission, rank, tier);
 					if (flags) show_map_flags(co, flags, tier);
-					
-					if ((flags & 0x00010000) && (bf = make_new_buff(co, 106, BUF_SPR_DEBIL, 300, SP_DUR_MAPMOD, 0)))
-					{
-						strcpy(bu[bf].name, "* Debilitation");
-						for (m = 0; m<5; m++) bu[bf].attrib[m][1] = -(get_attrib_score(co, m)/8);
-						bu[bf].data[4] = 1; add_spell(co, bf);
-					}
-					if ((flags & 0x00020000) && (bf = make_new_buff(co, 107, BUF_SPR_FRAGI, 300, SP_DUR_MAPMOD, 0)))
-					{
-						strcpy(bu[bf].name, "* Fragility");
-						bu[bf].weapon[1] = -(ch[co].weapon/8); bu[bf].armor[1] = -(ch[co].armor/8); 
-						bu[bf].data[4] = 1; add_spell(co, bf);
-					}
-					if ((flags & 0x00040000) && (bf = make_new_buff(co, 108, BUF_SPR_STIGM, 300, SP_DUR_MAPMOD, 0)))
-					{
-						strcpy(bu[bf].name, "* Stigmatism");
-						bu[bf].skill[SK_PERCEPT][1] = -100;
-						bu[bf].data[4] = 1; add_spell(co, bf);
-					}
-					if ((flags & 0x00080000) && (bf = make_new_buff(co, 109, BUF_SPR_HYPRT, 300, SP_DUR_MAPMOD, 0)))
-					{
-						strcpy(bu[bf].name, "* Hyperthermia");
-						bu[bf].end[0] = bu[bf].mana[0] = -111; 
-						bu[bf].data[4] = 1; add_spell(co, bf);
-					}
+					add_player_flags(co, flags);
 				}
 			}
 		}
@@ -6902,31 +6926,7 @@ int build_new_map(int cn, int rank, int flags, int mission, int tier, int inc)
 		
 		do_mission_log(cn, mission, rank, tier);
 		if (flags) show_map_flags(cn, flags, tier);
-		
-		if ((flags & 0x00010000) && (bf = make_new_buff(cn, 106, BUF_SPR_DEBIL, 300, SP_DUR_MAPMOD, 0)))
-		{
-			strcpy(bu[bf].name, "* Debilitation");
-			for (m = 0; m<5; m++) bu[bf].attrib[m][1] = -(get_attrib_score(cn, m)/8);
-			bu[bf].data[4] = 1; add_spell(cn, bf);
-		}
-		if ((flags & 0x00020000) && (bf = make_new_buff(cn, 107, BUF_SPR_FRAGI, 300, SP_DUR_MAPMOD, 0)))
-		{
-			strcpy(bu[bf].name, "* Fragility");
-			bu[bf].weapon[1] = -(ch[cn].weapon/8); bu[bf].armor[1] = -(ch[cn].armor/8); 
-			bu[bf].data[4] = 1; add_spell(cn, bf);
-		}
-		if ((flags & 0x00040000) && (bf = make_new_buff(cn, 108, BUF_SPR_STIGM, 300, SP_DUR_MAPMOD, 0)))
-		{
-			strcpy(bu[bf].name, "* Stigmatism");
-			bu[bf].skill[SK_PERCEPT][1] = -100;
-			bu[bf].data[4] = 1; add_spell(cn, bf);
-		}
-		if ((flags & 0x00080000) && (bf = make_new_buff(cn, 109, BUF_SPR_HYPRT, 300, SP_DUR_MAPMOD, 0)))
-		{
-			strcpy(bu[bf].name, "* Hyperthermia");
-			bu[bf].end[0] = bu[bf].mana[0] = -111; 
-			bu[bf].data[4] = 1; add_spell(cn, bf);
-		}
+		add_player_flags(cn, flags);
 	}
 	else
 	{

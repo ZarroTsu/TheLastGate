@@ -526,7 +526,7 @@ struct skilltab _skilltab[52] = {
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 44, 'G', 	"Proximity", 			"", // Arch-Templar
-										"Passively improves the area-of-effect of your Aria skill.", // Braver
+										"Passively improves the area-of-effect of your Aria and Weaken skills.", // Braver
 										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
 				{ AT_BRV, AT_WIL, AT_INT }},
@@ -612,11 +612,11 @@ int skill_cmp(const void *a,const void *b)
 
 	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
 	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && 
-		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==50||m1==51) && 
-		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=50&&m2!=51)) return -1;
+		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==44||m1==50||m1==51) && 
+		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=44&&m2!=50&&m2!=51)) return -1;
 	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && 
-		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==50||m2==51) && 
-		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=50&&m1!=51)) return  1;
+		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==44||m2==50||m2==51) && 
+		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=44&&m1!=50&&m1!=51)) return  1;
 	
 	if (c->sortkey>d->sortkey) return  1;
 	if (c->sortkey<d->sortkey) return -1;
@@ -1016,7 +1016,7 @@ void display_meta_from_ls(void)
 	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * DAM_MULT_PULSE/1000;
 	sk_pucnt = (60*2*100 / (3*pl_cdrate));
 	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000;
-	sk_water = 25 * 18;
+	sk_water = 25 * TICKS;
 	sk_cleav = (sk_score(40)+pl.weapon/4+pl_topdm/4) * 2 * DAM_MULT_CLEAVE/1000;
 	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
 	sk_rally = sk_score(35)/10;
@@ -1102,7 +1102,7 @@ void display_meta_from_ls(void)
 	// Swimming skill
 	if (pl.skill[10][0])
 	{
-		sk_water = (250 - sk_score(10)/3*2) * 18/10;
+		sk_water = (250 - sk_score(10)/6*5) * 20/10;
 	}
 	
 	// Amulet - Water breathing (degen/2)
@@ -1213,9 +1213,9 @@ void display_meta_from_ls(void)
 		sk_medit += pl.skill[30][0]?race_med/ 6:0;
 	}
 	
-	sk_regen = sk_regen * 18/10;
-	sk_restv = sk_restv * 18/10;
-	sk_medit = sk_medit * 18/10;
+	sk_regen = sk_regen * 20/10;
+	sk_restv = sk_restv * 20/10;
+	sk_medit = sk_medit * 20/10;
 
 	// DRAW THE GUI INFO
 	switch (last_skill)
@@ -1232,9 +1232,9 @@ void display_meta_from_ls(void)
 				if (pl_reflc>0) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Thorns");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",pl_reflc);
+			}
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"UWater Degen/s");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",sk_water/100,sk_water%100);
-			}
 			break;									// ".............." // 
 		case 61: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cast Speed");
@@ -1527,7 +1527,7 @@ void eng_display_win(int plr_sprite,int init)
 			else if (!pl.skill[m][0]) 
 			{
 				// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
-				if (m==8||m==23||m==28||m==29||m==30||m==32) 
+				if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&pl.kindred & (1u<<1))) 
 				{
 					dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
 					dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
@@ -2013,6 +2013,7 @@ void eng_display(int init)	// optimize me!!!!!
 	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
 	extern int dd_cache_hit,dd_cache_miss,swap,MAXCACHE;
 	static xm_flag=1;
+	int inj;
 
 	if (xm_flag) {
 		for (m=0; m<MAPX_MAX*MAPY_MAX; m++)	{ xmap[m]=0; ymap[m]=0; }
@@ -2232,15 +2233,19 @@ void eng_display(int init)	// optimize me!!!!!
 //				if (map[m].flags2&MF_TELEPORT2) copysprite(77,0,x*32,y*32,xoff,yoff);
 				if (map[m].flags2&MF_NOEXPIRE) copysprite(82,0,x*32,y*32,xoff,yoff);
 				if (map[m].flags2&0x80000000) copysprite(72,0,x*32,y*32,xoff,yoff);
-
+				
+				inj = 1079;
+				
+				if (map[m].flags&CRITTED)
+					inj = 1206;
 				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==INJURED)
-					copysprite(1079,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+					copysprite(inj,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
 				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==(INJURED|INJURED1))
-					copysprite(1080,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+					copysprite(inj+1,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
 				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==(INJURED|INJURED2))
-					copysprite(1081,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+					copysprite(inj+2,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
 				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==(INJURED|INJURED1|INJURED2))
-					copysprite(1082,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+					copysprite(inj+3,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
 
 				if (map[m].flags&DEATH) {
 					if (map[m].obj2) copysprite(280+((map[m].flags&DEATH)>>17)-1,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);

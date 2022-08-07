@@ -1,0 +1,15 @@
+gfx/*.png
+gfx/*.bmp
+saves
+00001_old.png
+00011.xcf
+00012.xcf
+merc.exe
+gx00.dat
+gx00.idx
+pnglib.dat
+pnglib.idx
+merc.ilc
+merc.ild
+merc.ilf
+merc.ils

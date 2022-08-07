@@ -1302,11 +1302,12 @@ int change_bs_shop_item(int cn, int in)
 		// Osiris items...
 		case IT_WP_LIFESPRIG:
 			t = time(NULL) / (60*60*24);
-			in += t % 20;
+			in += t % 19;
+			if (in>=IT_WP_LAMEDARG) in++;
 			break;
-		case IT_WP_VOLCANF:
+		case IT_WP_VOLCANF: in--;
 			t = time(NULL) / (60*60*24);
-			in -= t % 20;
+			in -= t % 19;
 			break;
 		
 		default: break;
@@ -1353,7 +1354,7 @@ int get_special_item(int in, int gen_a, int gen_b, int gen_c)
 			}
 			else if (it[in2].temp == IT_LUKS)
 			{
-				it[in2].data[0] = 200 + RANDOM(25) * 200;
+				it[in2].data[0] = 200 + RANDOM(24) * 100;
 			}
 			break;
 	}
@@ -1535,7 +1536,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 		is_mage = 1;
 	//
 	
-	if (it[in].placement & PL_TWOHAND)
+	if (IS_TWOHAND(in))
 	{
 		mul = 2;
 	}
@@ -2317,8 +2318,8 @@ struct npc_class npc_class[] = {
 	//
 	{"Dire Rat"                 },	// 189
 	//
-	{""                     	},	// 190
-	{""                     	},	// 191
+	{"Ancient Gargoyle"         },	// 190
+	{"Dweller"                  },	// 191
 	{""                     	},	// 192
 	{""                     	},	// 193
 	{""                     	},	// 194
@@ -2514,8 +2515,14 @@ int use_labtransfer(int cn, int nr, int exp)
 			}
 		}
 	}
+	
+	if (ch[cn].data[20] >= nr)
+	{
+		finish_laby_teleport(cn, nr, 0);
+		return 1;
+	}
 
-	switch(nr)
+	switch (nr)
 	{
 		case 1:
 			co = pop_create_char(CT_LAB_1_BOSS, 0);
@@ -2745,8 +2752,8 @@ void show_time(int cn)
 {
 	int hour, minute, day, month, year;
 
-	hour = globs->mdtime / (60 * 60);
-	minute = (globs->mdtime / 60) % 60;
+	hour = globs->mdtime / (MD_MIN * 60);
+	minute = (globs->mdtime / MD_MIN) % 60;
 	day = globs->mdday % 28 + 1;
 	month = globs->mdday / 28 + 1;
 	year  = globs->mdyear;
@@ -2989,97 +2996,16 @@ void souldestroy(int cn, int in)
 // data[2] is the 'focus' of the stone; if 0 there is no focus
 // data[3] is the rank consumed by catalyzed stats
 
-// Soulstones are limited to only select from skills the character can learn via skill[n][2]
-// The total the skill can go up to is 	3 + ( skill[n][2] / 15 )
-// The req to equip is 					( score - 3 ) * 15
-
-// Penalty and bonus chart - need X score for Y points, gives Z gear requirement
-static int soul_bonus[N_SOULBONUS][3] = {
-	{ 3, 1, 12 }, //  0 Hand to Hand
-	{ 1, 1,  4 }, //  1 Precision
-	{ 3, 1, 12 }, //  2 Dagger
-	{ 3, 1, 12 }, //  3 Sword
-	{ 3, 1, 12 }, //  4 Axe
-	{ 3, 1, 12 }, //  5 Staff
-	{ 3, 1, 12 }, //  6 Two-handed
-	{ 1, 1,  4 }, //  7 Zephyr
-	{ 1, 1,  4 }, //  8 Stealth
-	{ 1, 1,  4 }, //  9 Perception
-	
-	{ 1, 1,  4 }, // 10 Swimming
-	{ 1, 1,  4 }, // 11 Magic Shield
-	{ 1, 1,  4 }, // 12 Bartering
-	{ 1, 1,  4 }, // 13 Repair
-	{ 1, 1,  4 }, // 14 Rage
-	{ 1, 1,  4 }, // 15 Lethargy
-	{ 1, 2,  2 }, // 16 Shield
-	{ 1, 1,  4 }, // 17 Protect
-	{ 1, 1,  4 }, // 18 Enhance
-	{ 1, 1,  4 }, // 19 Slow
-	
-	{ 1, 1,  4 }, // 20 Curse
-	{ 1, 1,  4 }, // 21 Bless
-	{ 1, 1,  4 }, // 22 Identify
-	{ 2, 1,  8 }, // 23 Resistance
-	{ 1, 1,  4 }, // 24 Blast
-	{ 1, 1,  4 }, // 25 Dispel
-	{ 1, 1,  4 }, // 26 Heal
-	{ 1, 1,  4 }, // 27 Ghost Companion
-	{ 1, 1,  4 }, // 28 Regenerate
-	{ 1, 1,  4 }, // 29 Rest
-	
-	{ 1, 1,  4 }, // 30 Meditate
-	{ 1, 1,  4 }, // 31 Sense Magic
-	{ 2, 1,  8 }, // 32 Immunity
-	{ 1, 1,  4 }, // 33 Surround Hit
-	{ 1, 1,  4 }, // 34 Concentrate
-	{ 1, 1,  4 }, // 35 Warcry
-	{ 1, 2,  2 }, // 36 Dual Wield
-	{ 1, 1,  4 }, // 37 Blind
-	{ 1, 1,  4 }, // 38 Gear Mastery
-	{ 1, 1,  4 }, // 39 Safeguard
-	
-	{ 1, 1,  4 }, // 40 Cleave
-	{ 1, 1,  4 }, // 41 Weaken
-	{ 1, 1,  4 }, // 42 Poison
-	{ 1, 1,  4 }, // 43 Pulse
-	{ 1, 1,  4 }, // 44 Proximity
-	{ 1, 1,  4 }, // 45 Companion Mastery
-	{ 1, 1,  4 }, // 46 Shadow Copy
-	{ 1, 1,  4 }, // 47 Haste
-	{ 1, 1,  4 }, // 48 Taunt
-	{ 1, 1,  4 }  // 49 Leap
-	/*
-	{ 2, 1,  8 }, // 50 Braveness
-	{ 2, 1,  8 }, // 51 Willpower
-	{ 2, 1,  8 }, // 52 Intuition
-	{ 2, 1,  8 }, // 53 Agility
-	{ 2, 1,  8 }, // 54 Strength
-	
-	{ 1,10, 10 }, // 55 Hitpoints
-	{ 1, 5,  0 }, // 56 Endurance
-	{ 1,10, 10 }, // 57 Mana
-	
-	{ 3, 1,  0 }, // 58 Weapon Value
-	{ 3, 1,  0 }, // 59 Armor Value
-	
-	{ 1, 1,  0 }, // 60 Movement Speed
-	{ 2, 1,  0 }, // 61 Attack Speed
-	{ 2, 1,  0 }, // 62 Cast Speed
-	{ 6, 1,  0 }, // 63 Spell Mod
-	{ 1, 2,  0 }, // 64 Spell Apt
-	{ 3, 1,  0 }, // 65 Cooldown
-	{ 1, 5,  0 }, // 66 Crit Chance
-	{ 1, 6,  0 }, // 67 Crit Multi
-	{ 1, 2,  0 }, // 68 Top Damage
-	{ 3, 1,  0 }  // 69 Thorns
-	*/
-};
-
-int get_sb(int v, int i)
+int soul_cap(int r)
 {
-	v = max(0, min(N_SOULBONUS-1, v));
-	return soul_bonus[v][i];
+	switch (r)
+	{
+		case  0: case  2: case  3: case  4:
+		case  5: case  6: case 23: case 32: 
+			return 3;
+		default: 
+			return 6;
+	}
 }
 
 void soultrans_equipment(int cn, int in, int in2)
@@ -3087,15 +3013,16 @@ void soultrans_equipment(int cn, int in, int in2)
 	int rank, focus, try, r, n, t, m, c=0, s=0, temp=0, bonus=1, catfocus=0, cf=0;
 	char known[N_SOULBONUS] = {0};
 	char catknown[N_SOULBONUS] = {0};
-	char selected[N_SOULMAX*9] = {0};
-	int atrm[5]={0}, sklm[50]={0};
+	char selected[N_SOULMAX*2*9] = {0};
+	char added[N_SOULBONUS] = {0};
+	int sklm[50]={0};
 	
 	// 0. Check if (in) is twohanded, grant a rank bonus if it is.
-	if (it[in2].placement & PL_TWOHAND)
+	if (IS_TWOHAND(in2))
 		bonus = 2;
 	
 	// 1. Set local variables to pull from the soulstone (in)
-	rank   = max(1, min(N_SOULMAX, (it[in].data[0]-it[in].data[3])*bonus));
+	rank   = max(0, min(N_SOULMAX*bonus, (it[in].data[0]-it[in].data[3])*bonus));
 	focus  = (it[in].data[2] > 0 && it[in].data[2] < 9) ? it[in].data[2] : 9;
 	
 	// 2. Loop through known player skills and add to local array
@@ -3122,39 +3049,17 @@ void soultrans_equipment(int cn, int in, int in2)
 	// 2.5. Add catalyzed stats
 	if (it[in].data[3])
 	{
-		for (n=0;n<5;n++)
-		{ 
-			it[in2].attrib[n][0] += it[in].attrib[n][0]*bonus;  atrm[n] += soul_bonus[n][2]*it[in].attrib[n][0]; 
-			if (it[in].attrib[n][0]) { catknown[cf] = n+50; cf++; }
-		}
 		for (n=0;n<50;n++)
 		{ 
-			it[in2].skill[n][0] += it[in].skill[n][0]*bonus;    sklm[n] += soul_bonus[n][2]*it[in].skill[n][0]; 
-			if (it[in].skill[n][0]) { catknown[cf] = n; cf++; }
+			it[in2].skill[n][0] += it[in].skill[n][0] * bonus;
+			sklm[n] += 5 * it[in].skill[n][0];
+			added[n] += it[in].skill[n][0];
+			if (it[in].skill[n][0]) 
+			{
+				catknown[cf] = n;
+				cf++;
+			}
 		}
-		it[in2].hp[0]          += it[in].hp[0]*bonus;   it[in2].hp[2] += soul_bonus[55][2]*it[in].hp[0]/10;
-		if (it[in].hp[0]) { catknown[cf] = 55; cf++; }
-		it[in2].end[0]         += it[in].end[0]*bonus;
-		if (it[in].end[0]) { catknown[cf] = 56; cf++; }
-		it[in2].mana[0]        += it[in].mana[0]*bonus; it[in2].hp[2] += soul_bonus[57][2]*it[in].mana[0]/10;
-		if (it[in].mana[0]) { catknown[cf] = 57; cf++; }
-		
-		it[in2].ss_weapon      += it[in].weapon[0]*bonus;
-		if (it[in].weapon[0]) { catknown[cf] = 58; cf++; }
-		it[in2].ss_armor       += it[in].armor[0]*bonus;
-		if (it[in].armor[0]) { catknown[cf] = 59; cf++; }
-		
-		it[in2].move_speed[0]  += it[in].move_speed[0]*bonus;	if (it[in].move_speed[0])  { catknown[cf] = 60; cf++; }
-		it[in2].atk_speed[0]   += it[in].atk_speed[0]*bonus;	if (it[in].atk_speed[0])   { catknown[cf] = 61; cf++; }
-		it[in2].cast_speed[0]  += it[in].cast_speed[0]*bonus;	if (it[in].cast_speed[0])  { catknown[cf] = 62; cf++; }
-		it[in2].spell_mod[0]   += it[in].spell_mod[0]*bonus;	if (it[in].spell_mod[0])   { catknown[cf] = 63; cf++; }
-		it[in2].spell_apt[0]   += it[in].spell_apt[0]*bonus;	if (it[in].spell_apt[0])   { catknown[cf] = 64; cf++; }
-		it[in2].cool_bonus[0]  += it[in].cool_bonus[0]*bonus;	if (it[in].cool_bonus[0])  { catknown[cf] = 65; cf++; }
-		it[in2].crit_chance[0] += it[in].crit_chance[0]*bonus;	if (it[in].crit_chance[0]) { catknown[cf] = 66; cf++; }
-		it[in2].crit_multi[0]  += it[in].crit_multi[0]*bonus;	if (it[in].crit_multi[0])  { catknown[cf] = 67; cf++; }
-		it[in2].top_damage[0]  += it[in].top_damage[0]*bonus;	if (it[in].top_damage[0])  { catknown[cf] = 68; cf++; }
-		it[in2].gethit_dam[0]  += it[in].gethit_dam[0]*bonus;	if (it[in].gethit_dam[0])  { catknown[cf] = 69; cf++; }
-		
 		catfocus = cf;
 	}
 	
@@ -3184,122 +3089,32 @@ void soultrans_equipment(int cn, int in, int in2)
 	}
 	
 	// 4. Add the random stats
-	t = 0;
-	if (rank) while (rank && t < 5)
+	if (rank) while (rank)
 	{
 		// 4a. Loop through selected stats and try to pick one.
-		m = 1; r = -1; try = 0;
-		while (r < 0 && try < 9)
+		r = -1; 
+		try = 0;
+		while (r < 0 && try < 99)
 		{
 			try++;
 			r = selected[RANDOM(s)];
-			if (soul_bonus[r][0] > rank) r = -1;
+			if (added[r] >= soul_cap(r)) r = -1;
 		}
 		if (r<0) break;
 		
 		// 4b. Add the stat to the item
-		switch (r)
-		{
-			case 50: case 51: case 52: case 53: case 54:	// Attributes
-				n = r-50;
-				if ((it[in2].attrib[n][0] + soul_bonus[r][1]) > ch[cn].attrib[n][2]/max(1,soul_bonus[r][0]*5)) 
-				{
-					t++; m=0;
-				}
-				else
-				{	
-					it[in2].attrib[n][0] += soul_bonus[r][1]; t=0;
-					atrm[n] += soul_bonus[r][2];
-				}
-				break;
-				
-			case 55:										// Hitpoints
-				it[in2].hp[0] += soul_bonus[r][1]; t=0;
-				it[in2].hp[2] += soul_bonus[r][2];
-				break;
-				
-			case 56:										// Endurance
-				it[in2].end[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 57:										// Mana
-				it[in2].hp[0] += soul_bonus[r][1]; t=0;
-				it[in2].hp[2] += soul_bonus[r][2];
-				break;
-				
-			case 58:										// Weapon Value
-				it[in2].ss_weapon += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 59:										// Armor Value
-				it[in2].ss_armor += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 60:										// Movement Speed
-				it[in2].move_speed[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 61:										// Attack Speed
-				it[in2].atk_speed[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 62:										// Cast Speed
-				it[in2].cast_speed[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 63:										// Spell Mod
-				it[in2].spell_mod[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 64:										// Spell Apt
-				it[in2].spell_apt[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 65:										// Cooldown
-				it[in2].cool_bonus[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 66:										// Crit Chance
-				it[in2].crit_chance[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 67:										// Crit Multi
-				it[in2].crit_multi[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 68:										// Top Damage
-				it[in2].top_damage[0] += soul_bonus[r][1]; t=0;
-				break;
-				
-			case 69:										// Thorns
-				it[in2].gethit_dam[0] += soul_bonus[r][1]; t=0;
-				break;
-			
-			default:										// Skills
-				n = r;
-				if (n>=50 || 
-					(it[in2].skill[n][0]+soul_bonus[r][1]) > ch[cn].skill[n][2]/max(1,soul_bonus[r][0]*5))
-				{
-					t++; m=0;
-				}
-				else
-				{	
-					it[in2].skill[n][0] += soul_bonus[r][1]; t=0;
-					sklm[n] += soul_bonus[r][2];
-				}
-				break;
-		}
-		if (m) 
-		{
-			rank -= soul_bonus[r][0];
-		}
+		it[in2].skill[r][0] += 1 * bonus;
+		sklm[r] += 5;
+		added[r]++;
+		rank--;
 	}
-	for (n=0;n<5;n++) if (atrm[n] && it[in2].attrib[n][0])
-		it[in2].attrib[n][2] = max(it[in2].attrib[n][2], atrm[n]);
-	for (n=0;n<50;n++) if (sklm[n] && it[in2].skill[n][0])
-		it[in2].skill[n][2] = max(it[in2].skill[n][2], sklm[n]);
+	for (n=0;n<50;n++) 
+	{
+		if (sklm[n] && it[in2].skill[n][0])
+			it[in2].skill[n][2] = max(it[in2].skill[n][2], sklm[n]);
+	}
 	
-	rank = max(1, min(N_SOULMAX, it[in].data[0]));
+	rank = max(1, min(N_SOULMAX*bonus, it[in].data[0]));
 	
 	// 5. Repair the transformed item
 	temp = it[in2].temp;
@@ -3317,8 +3132,11 @@ void soultrans_equipment(int cn, int in, int in2)
 	it[in2].weapon[0] = it_temp[temp].weapon[0] + it[in2].ss_weapon;
 	it[in2].weapon[1] = it_temp[temp].weapon[1];
 	
-	it[in2].sprite[0] = it_temp[temp].sprite[0];
-	it[in2].sprite[1] = it_temp[temp].sprite[1];
+	if (NOT_SINBINDER(in2))
+	{
+		it[in2].sprite[0] = it_temp[temp].sprite[0];
+		it[in2].sprite[1] = it_temp[temp].sprite[1];
+	}
 	
 	if (it[in2].temp!=IT_CH_FOOL) it[in2].temp = 0;
 	
@@ -3350,67 +3168,13 @@ void soultrans_equipment(int cn, int in, int in2)
 	if (t==3)
 	{
 		chlog(cn, "soultrans_equipment error - ran out of tries on rank loop");
-		do_char_log(cn, 2, "Err... Well, it kind of worked...");
+		do_char_log(cn, 2, "Err... Well, it kind of worked...\n");
 	}
 	else
 	{
-		do_char_log(cn, 7, "You enhanced the %s with a rank %d soulstone.", it[in2].name, rank);
+		do_char_log(cn, 7, "You enhanced the %s with a rank %d soulstone.\n", it[in2].name, rank);
 	}
 }
-
-/*
-int can_be_soulstoned(int in)
-{
-	static int valid_ss[] = {
-		// valid weapons
-		32, 33, 34, 35, 36, 37, 38,	1778,					// Bronze
-		284, 285, 286, 287, 288, 289, 290, 291, 292, 1779,	// Steel
-		523, 524, 525, 526, 527, 528, 529, 530, 531, 1780,	// Gold
-		532, 533, 534, 535, 536, 537, 538, 539, 540, 1781,	// Emerald
-		541, 542, 543, 544, 545, 546, 547, 548, 549, 1782,	// Crystal
-		572, 573, 574, 575, 576, 577, 578, 579, 580, 1783,	// Titanium
-		693, 694, 695, 696, 697, 698, 699, 700, 701, 1784,	// Adamant
-		2044,2045,2046,2047,2048,2049,2050,2051,2052,2053,	// Damascus
-		// Map Weapons
-		2513, 2516, 2517, 2518, 2521, 2522, 2523, 2524, 2525, 
-		2527, 2528, 2531, 2533, 2536, 2537, 2538, 2540, 2541, 
-		2542, 2544, 2546, 2547, 2548, 2549, 2550,
-		// valid armors
-		27, 28, 29, 30, 31, 39, 40, 41, 42, 43, 51, 52, 53, 54, 55, 	// Cloth, Leather, Bronze
-		56, 57, 58, 59, 60,	61, 62, 63, 64, 65, 66, 67, 68, 69, 70,		// Steel, Gold, Emerald
-		71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 94, 95, 96, 97, 98, 	// Crystal, Titanium, Adamant
-		2028,2029,2030,2031,2032,	// Damascus
-		2033,2034,2035,2036,2037,	// 
-		2038,2039,2040,2041,2042,	// 
-		337, 338, 339, 340, 341, 342, 343, 344, 345, 346,				// Simple, Caster
-		347, 348, 349, 350, 351, 352, 353, 354, 355, 356,				// Adept, Wizard
-		//
-		2033, 2034, 2035, 2036, 2037, // Lizard
-		2038, 2039, 2040, 2041, 2042, // Midnight
-		// books
-		1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 
-		1656, 2045, 2055, 2056, 1657, 1658, 1659,
-		// other
-		2104, 2109, IT_CH_FOOL
-		};
-	int n, temp;
-	
-	temp = it[in].temp;
-
-	for (n = 0; n<ARRAYSIZE(valid_ss); n++)
-	{
-		if (temp == valid_ss[n])
-		{
-			if (temp==IT_CH_FOOL && (it[in].flags & IF_SOULSTONE))
-			{
-				return 0;
-			}
-			return 1;
-		}
-	}
-	return 0;
-}
-*/
 
 int do_soulcatalyst(int ins, int inc)
 {
@@ -3422,56 +3186,42 @@ int do_soulcatalyst(int ins, int inc)
 		return 0;
 	}
 	
-	it[ins].data[3] += it[inc].data[3];
-	it[ins].flags |= IF_IDENTIFIED;
-	/*
-	for (n=0;n<5;n++)
-	{
-		it[ins].attrib[n][0] += it[inc].attrib[n][0];
-		it[ins].attrib[n][1] += it[inc].attrib[n][1];
-	}
-	*/
+	it[ins].data[3] = 0;
+	
 	for (n=0;n<50;n++)
 	{
 		it[ins].skill[n][0] += it[inc].skill[n][0];
 		it[ins].skill[n][1] += it[inc].skill[n][1];
+		
+		if (it[ins].skill[n][0] > soul_cap(n))
+		{
+			it[ins].skill[n][0] = soul_cap(n);
+			it[ins].skill[n][1] = soul_cap(n)*2;
+		}
+		
+		it[ins].data[3] += it[ins].skill[n][1];
 	}
-	/*
-	it[ins].hp[0]   += it[inc].hp[0];   it[ins].hp[1]   += it[inc].hp[1];
-	it[ins].end[0]  += it[inc].end[0];  it[ins].end[1]  += it[inc].end[1];
-	it[ins].mana[0] += it[inc].mana[0]; it[ins].mana[1] += it[inc].mana[1];
 	
-	it[ins].weapon[0] += it[inc].weapon[0]; it[ins].weapon[1] += it[inc].weapon[1];
-	it[ins].armor[0]   += it[inc].armor[0]; it[ins].armor[1]  += it[inc].armor[1];
+	it[ins].flags |= IF_IDENTIFIED;
 	
-	it[ins].move_speed[0]  += it[inc].move_speed[0];  it[ins].move_speed[1]  += it[inc].move_speed[1];
-	it[ins].atk_speed[0]   += it[inc].atk_speed[0];   it[ins].atk_speed[1]   += it[inc].atk_speed[1];
-	it[ins].cast_speed[0]  += it[inc].cast_speed[0];  it[ins].cast_speed[1]  += it[inc].cast_speed[1];
-	it[ins].spell_mod[0]   += it[inc].spell_mod[0];   it[ins].spell_mod[1]   += it[inc].spell_mod[1];
-	it[ins].spell_apt[0]   += it[inc].spell_apt[0];   it[ins].spell_apt[1]   += it[inc].spell_apt[1];
-	it[ins].cool_bonus[0]  += it[inc].cool_bonus[0];  it[ins].cool_bonus[1]  += it[inc].cool_bonus[1];
-	it[ins].crit_chance[0] += it[inc].crit_chance[0]; it[ins].crit_chance[1] += it[inc].crit_chance[1];
-	it[ins].crit_multi[0]  += it[inc].crit_multi[0];  it[ins].crit_multi[1]  += it[inc].crit_multi[1];
-	it[ins].top_damage[0]  += it[inc].top_damage[0];  it[ins].top_damage[1]  += it[inc].top_damage[1];
-	it[ins].gethit_dam[0]  += it[inc].gethit_dam[0];  it[ins].gethit_dam[1]  += it[inc].gethit_dam[1];
-	*/
 	return 1;
 }
 
 int do_catalyst_focus(int cn, int inf, int inc)
 {
-	int v, m;
+	int v, m, f;
 	
 	v = it[inc].data[4];
-	m = it[inc].data[3];
+	m = it[inc].data[3]/2;
+	f = it[inf].data[0];
 	
-	if (!v || m <= get_sb(v-1, 0))
+	if (!v || m >= soul_cap(v-1))
 	{
 		do_char_log(cn, 1, "Nothing happened. Seems this catalyst can't be focused further.\n");
 		chlog(cn, "do_catalyst_focus: v=%d, m=%d", v-1, m);
 		return 0;
 	}
-	if (it[inf].data[0] >= m)
+	if (f < m)
 	{
 		do_char_log(cn, 1, "Nothing happened. Seems this focus won't improve anything.\n");
 		return 0;
@@ -3479,25 +3229,10 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	
 	v--;
 	
-	it[inc].data[3] = m = max(get_sb(v, 0), min(it[inf].data[0], m));
+	m = min(soul_cap(v), max(f, m));
 	
-	if (v>=50 && v<=54) { it[inc].attrib[v-50][1] = m; }
-	else if (v==55)     { it[inc].hp[1] = m; }
-	else if (v==56)     { it[inc].end[1] = m; }
-	else if (v==57)     { it[inc].mana[1] = m; }
-	else if (v==58)     { it[inc].weapon[1] = m; }
-	else if (v==59)     { it[inc].armor[1] = m; }
-	else if (v==60)     { it[inc].move_speed[1] = m; }
-	else if (v==61)     { it[inc].atk_speed[1] = m; }
-	else if (v==62)     { it[inc].cast_speed[1] = m; }
-	else if (v==63)     { it[inc].spell_mod[1] = m; }
-	else if (v==64)     { it[inc].spell_apt[1] = m; }
-	else if (v==65)     { it[inc].cool_bonus[1] = m; }
-	else if (v==66)     { it[inc].crit_chance[1] = m; }
-	else if (v==67)     { it[inc].crit_multi[1] = m; }
-	else if (v==68)     { it[inc].top_damage[1] = m; }
-	else if (v==69)     { it[inc].gethit_dam[1] = m; }
-	else                { it[inc].skill[v][1] = m; }
+	it[inc].skill[v][0] = m;
+	it[inc].data[3] = it[inc].skill[v][1] = m*2;
 	
 	return 1;
 }
@@ -3505,7 +3240,7 @@ int do_catalyst_focus(int cn, int inf, int inc)
 int use_talisman(int cn, int in, int in2)
 {	// [in] is talisman, [in2] is the target item
 	int r, n, temp, inds = 0;
-	int stk, val;
+	int stk, val, mul = 1;
 	
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
@@ -3527,13 +3262,15 @@ int use_talisman(int cn, int in, int in2)
 			case IT_H_SP: r =  7; break;	case IT_H_CI: r =  8; break;
 			case IT_H_OP: r =  9; break;	case IT_H_AQ: r = 10; break;
 			case IT_H_BE: r = 11; break;	case IT_H_ZI: r = 12; break;
+			case IT_H_PH: r = 13; break;
 			default: do_char_log(cn, 0, "That doesn't fit.\n"); return 0;
 		}
 		
 		if (!it[in].data[1])
 		{
 			it[in].data[1] = r;
-			it[in].sprite[0] = 5643+r;
+			if (r == 13) it[in].sprite[0] = 5871;
+			else		 it[in].sprite[0] = 5643+r;
 		}
 		else
 		{
@@ -3546,79 +3283,100 @@ int use_talisman(int cn, int in, int in2)
 				case  1: r =  1; break; case  2: r =  2; break; case  3: r =  3; break; case  4: r =  4; break;
 				case  5: r =  5; break; case  6: r =  6; break; case  7: r =  7; break; case  8: r =  8; break;
 				case  9: r =  9; break; case 10: r = 10; break; case 11: r = 11; break; case 12: r = 12; break;
+				case 13: r = 79; break;
 				}	break;
 			case  2: switch (r)
 				{
 				case  1: r =  2; break; case  2: r = 13; break; case  3: r = 14; break; case  4: r = 15; break;
 				case  5: r = 16; break; case  6: r = 17; break; case  7: r = 18; break; case  8: r = 19; break;
 				case  9: r = 20; break; case 10: r = 21; break; case 11: r = 22; break; case 12: r = 23; break;
+				case 13: r = 80; break;
 				}	break;
 			case  3: switch (r)
 				{
 				case  1: r =  3; break; case  2: r = 14; break; case  3: r = 24; break; case  4: r = 25; break;
 				case  5: r = 26; break; case  6: r = 27; break; case  7: r = 28; break; case  8: r = 29; break;
 				case  9: r = 30; break; case 10: r = 31; break; case 11: r = 32; break; case 12: r = 33; break;
+				case 13: r = 81; break;
 				}	break;
 			case  4: switch (r)
 				{
 				case  1: r =  4; break; case  2: r = 15; break; case  3: r = 25; break; case  4: r = 34; break;
 				case  5: r = 35; break; case  6: r = 36; break; case  7: r = 37; break; case  8: r = 38; break;
 				case  9: r = 39; break; case 10: r = 40; break; case 11: r = 41; break; case 12: r = 42; break;
+				case 13: r = 82; break;
 				}	break;
 			case  5: switch (r)
 				{
 				case  1: r =  5; break; case  2: r = 16; break; case  3: r = 26; break; case  4: r = 35; break;
 				case  5: r = 43; break; case  6: r = 44; break; case  7: r = 45; break; case  8: r = 46; break;
 				case  9: r = 47; break; case 10: r = 48; break; case 11: r = 49; break; case 12: r = 50; break;
+				case 13: r = 83; break;
 				}	break;
 			case  6: switch (r)
 				{
 				case  1: r =  6; break; case  2: r = 17; break; case  3: r = 27; break; case  4: r = 36; break;
 				case  5: r = 44; break; case  6: r = 51; break; case  7: r = 52; break; case  8: r = 53; break;
 				case  9: r = 54; break; case 10: r = 55; break; case 11: r = 56; break; case 12: r = 57; break;
+				case 13: r = 84; break;
 				}	break;
 			case  7: switch (r)
 				{
 				case  1: r =  7; break; case  2: r = 18; break; case  3: r = 28; break; case  4: r = 37; break;
 				case  5: r = 45; break; case  6: r = 52; break; case  7: r = 58; break; case  8: r = 59; break;
 				case  9: r = 60; break; case 10: r = 61; break; case 11: r = 62; break; case 12: r = 63; break;
+				case 13: r = 85; break;
 				}	break;
 			case  8: switch (r)
 				{
 				case  1: r =  8; break; case  2: r = 19; break; case  3: r = 29; break; case  4: r = 38; break;
 				case  5: r = 46; break; case  6: r = 53; break; case  7: r = 59; break; case  8: r = 64; break;
 				case  9: r = 65; break; case 10: r = 66; break; case 11: r = 67; break; case 12: r = 68; break;
+				case 13: r = 86; break;
 				}	break;
 			case  9: switch (r)
 				{
 				case  1: r =  9; break; case  2: r = 20; break; case  3: r = 30; break; case  4: r = 39; break;
 				case  5: r = 47; break; case  6: r = 54; break; case  7: r = 60; break; case  8: r = 65; break;
 				case  9: r = 69; break; case 10: r = 70; break; case 11: r = 71; break; case 12: r = 72; break;
+				case 13: r = 87; break;
 				}	break;
 			case 10: switch (r)
 				{
 				case  1: r = 10; break; case  2: r = 21; break; case  3: r = 31; break; case  4: r = 40; break;
 				case  5: r = 48; break; case  6: r = 55; break; case  7: r = 61; break; case  8: r = 66; break;
 				case  9: r = 70; break; case 10: r = 73; break; case 11: r = 74; break; case 12: r = 75; break;
+				case 13: r = 88; break;
 				}	break;
 			case 11: switch (r)
 				{
 				case  1: r = 11; break; case  2: r = 22; break; case  3: r = 32; break; case  4: r = 41; break;
 				case  5: r = 49; break; case  6: r = 56; break; case  7: r = 62; break; case  8: r = 67; break;
 				case  9: r = 71; break; case 10: r = 74; break; case 11: r = 76; break; case 12: r = 77; break;
+				case 13: r = 89; break;
 				}	break;
 			case 12: switch (r)
 				{
 				case  1: r = 12; break; case  2: r = 23; break; case  3: r = 33; break; case  4: r = 42; break;
 				case  5: r = 50; break; case  6: r = 57; break; case  7: r = 63; break; case  8: r = 68; break;
 				case  9: r = 72; break; case 10: r = 75; break; case 11: r = 77; break; case 12: r = 78; break;
+				case 13: r = 90; break;
+				}	break;
+			case 13: switch (r)
+				{
+				case  1: r = 79; break; case  2: r = 80; break; case  3: r = 81; break; case  4: r = 82; break;
+				case  5: r = 83; break; case  6: r = 84; break; case  7: r = 85; break; case  8: r = 86; break;
+				case  9: r = 87; break; case 10: r = 88; break; case 11: r = 89; break; case 12: r = 90; break;
+				case 13: r = 91; break;
 				}	break;
 			default: break;
 			}
 			
 			it[in].data[0] = r;
 			it[in].data[1] = 0;
-			it[in].sprite[0] = 5655+r;
+			if (r == 91)	 it[in].sprite[0] = 5872;
+			else if (r > 78) it[in].sprite[0] = 5872+(r-78);
+			else			 it[in].sprite[0] = 5655+r;
 		}
 		
 		it[in].flags |= IF_UPDATE;
@@ -3655,7 +3413,7 @@ int use_talisman(int cn, int in, int in2)
 	switch (it[in].data[0])
 	{
 		// Only Helmets
-		case  3: case 14: case 22: case 25: case 32: case 60: case 71: 
+		case  3: case 14: case 22: case 25: case 32: case 60: case 71: case 82:
 			if (!(it[in2].placement & PL_HEAD))
 			{
 				do_char_log(cn, 1, "This can only be applied to Helmets.\n");
@@ -3664,7 +3422,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Cloaks
-		case  5: case 10: case 21: case 31: case 41: case 56: case 61: 
+		case  5: case 10: case 21: case 31: case 41: case 56: case 61: case 83:
 			if (!(it[in2].placement & PL_CLOAK))
 			{
 				do_char_log(cn, 1, "This can only be applied to Cloaks.\n");
@@ -3673,7 +3431,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Chests
-		case  2: case 16: case 23: case 33: case 35: case 74: case 75: 
+		case  2: case 16: case 23: case 33: case 35: case 74: case 75: case 85:
 			if (!(it[in2].placement & PL_BODY))
 			{
 				do_char_log(cn, 1, "This can only be applied to Body Armors.\n");
@@ -3682,7 +3440,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Gloves
-		case  8: case 19: case 29: case 38: case 46: case 53: case 59: 
+		case  8: case 19: case 29: case 38: case 46: case 53: case 59: case 86:
 			if (!(it[in2].placement & PL_ARMS))
 			{
 				do_char_log(cn, 1, "This can only be applied to Gloves.\n");
@@ -3691,7 +3449,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Boots
-		case  4: case 15: case 37: case 54: case 65: case 70: case 72: 
+		case  4: case 15: case 30: case 37: case 54: case 65: case 70: case 72:
 			if (!(it[in2].placement & PL_FEET))
 			{
 				do_char_log(cn, 1, "This can only be applied to Boots.\n");
@@ -3700,7 +3458,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Weapons
-		case 49: case 62: case 66: case 67: case 77: 
+		case 49: case 62: case 66: case 67: case 77: case 79:
 			if (!(it[in2].flags & IF_WEAPON))
 			{
 				do_char_log(cn, 1, "This can only be applied to Weapons.\n");
@@ -3709,7 +3467,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Armors
-		case  7: case 26: case 52: case 63: case 68: 
+		case  7: case 26: case 52: case 63: case 68: case 80:
 			if (!(it[in2].flags & IF_ARMORS))
 			{
 				do_char_log(cn, 1, "This can only be applied to Armor Pieces.\n");
@@ -3721,87 +3479,106 @@ int use_talisman(int cn, int in, int in2)
 		default: break;
 	}
 	
+	if (IS_TWOHAND(in2))
+	{
+		mul = 2;
+	}
+	
 	// Apply the enchantment
 	switch (it[in].data[0])
 	{
-		case  1: it[in2].attrib[AT_BRV][0] += 5; break;
+		case  1: it[in2].attrib[AT_BRV][0] += 5*mul; break;
 		case  2: it[in2].enchantment =  1; break;
 		case  3: it[in2].enchantment =  2; break;
 		case  4: it[in2].enchantment =  3; break;
 		case  5: it[in2].enchantment =  4; break;
 		case  6: it[in2].enchantment =  5; break;
-		case  7: it[in2].aoe_bonus[0] += 1; break;
+		case  7: it[in2].aoe_bonus[0] += 1*mul; break;
 		case  8: it[in2].enchantment =  7; break;
-		case  9: it[in2].move_speed[0] += 6; break;
+		case  9: it[in2].move_speed[0] += 6*mul; break;
 		case 10: it[in2].enchantment =  8; break;
-		case 11: it[in2].hp[0] += 35; it[in2].mana[0] += 35; break;
-		case 12: it[in2].ss_weapon += 2; it[in2].ss_armor += 2; break;
-		case 13: it[in2].attrib[AT_WIL][0] += 5; break;
+		case 11: it[in2].hp[0] += 35*mul; it[in2].mana[0] += 35*mul; break;
+		case 12: it[in2].ss_weapon += 2*mul; it[in2].ss_armor += 2*mul; break;
+		case 13: it[in2].attrib[AT_WIL][0] += 5*mul; break;
 		case 14: it[in2].enchantment =  9; break;
 		case 15: it[in2].enchantment = 10; break;
 		case 16: it[in2].enchantment = 11; break;
 		case 17: it[in2].enchantment = 12; break;
-		case 18: it[in2].mana[0] += 50; break;
+		case 18: it[in2].mana[0] += 50*mul; break;
 		case 19: it[in2].enchantment = 13; break;
-		case 20: it[in2].cast_speed[0] += 3; break;
+		case 20: it[in2].cast_speed[0] += 3*mul; break;
 		case 21: it[in2].enchantment = 14; break;
 		case 22: it[in2].enchantment = 15; break;
 		case 23: it[in2].enchantment = 16; break;
-		case 24: it[in2].attrib[AT_INT][0] += 5; break;
+		case 24: it[in2].attrib[AT_INT][0] += 5*mul; break;
 		case 25: it[in2].enchantment = 17; break;
 		case 26: it[in2].enchantment = 18; break;
 		case 27: it[in2].enchantment = 19; break;
-		case 28: it[in2].spell_mod[0] += 1; break;
+		case 28: it[in2].spell_mod[0] += 1*mul; break;
 		case 29: it[in2].enchantment = 20; break;
-		case 30: it[in2].cool_bonus[0] += 2; break;
+		case 30: it[in2].enchantment =  6; break;
 		case 31: it[in2].enchantment = 21; break;
 		case 32: it[in2].enchantment = 22; break;
 		case 33: it[in2].enchantment = 23; break;
-		case 34: it[in2].attrib[AT_AGL][0] += 5; break;
+		case 34: it[in2].attrib[AT_AGL][0] += 5*mul; break;
 		case 35: it[in2].enchantment = 24; break;
 		case 36: it[in2].enchantment = 25; break;
 		case 37: it[in2].enchantment = 26; break;
 		case 38: it[in2].enchantment = 27; break;
-		case 39: it[in2].atk_speed[0] += 3; break;
-		case 40: it[in2].ss_weapon += 3; break;
+		case 39: it[in2].atk_speed[0] += 3*mul; break;
+		case 40: it[in2].ss_weapon += 3*mul; break;
 		case 41: it[in2].enchantment = 28; break;
-		case 42: it[in2].to_parry[0] += 3; break;
-		case 43: it[in2].attrib[AT_STR][0] += 5; break;
+		case 42: it[in2].to_parry[0] += 3*mul; break;
+		case 43: it[in2].attrib[AT_STR][0] += 5*mul; break;
 		case 44: it[in2].enchantment = 29; break;
-		case 45: it[in2].hp[0] += 50; break;
+		case 45: it[in2].hp[0] += 50*mul; break;
 		case 46: it[in2].enchantment = 30; break;
-		case 47: it[in2].end[0] += 25; break;
-		case 48: it[in2].to_hit[0] += 3; break;
-		case 49: it[in2].base_crit += 1; break;
-		case 50: it[in2].ss_armor += 3; break;
-		case 51: for (n=0;n<5;n++) { it[in2].attrib[n][0] += 2; } break;
-		case 52: it[in2].light[0] += 20; break;
+		case 47: it[in2].end[0] += 25*mul; break;
+		case 48: it[in2].to_hit[0] += 3*mul; break;
+		case 49: it[in2].base_crit += 1*mul; break;
+		case 50: it[in2].ss_armor += 3*mul; break;
+		case 51: for (n=0;n<5;n++) { it[in2].attrib[n][0] += 2*mul; } break;
+		case 52: it[in2].light[0] += 20*mul; break;
 		case 53: it[in2].enchantment = 31; break;
 		case 54: it[in2].enchantment = 32; break;
-		case 55: it[in2].to_hit[0] += 2; it[in2].to_parry[0] += 2; break;
+		case 55: it[in2].to_hit[0] += 2*mul; it[in2].to_parry[0] += 2*mul; break;
 		case 56: it[in2].enchantment = 33; break;
 		case 57: it[in2].enchantment = 34; inds = 1; break;
-		case 58: it[in2].spell_apt[0] += 12; break;
+		case 58: it[in2].spell_apt[0] += 12*mul; break;
 		case 59: it[in2].enchantment = 35; break;
 		case 60: it[in2].enchantment = 36; break;
 		case 61: it[in2].enchantment = 37; break;
 		case 62: it[in2].enchantment = 38; break;
 		case 63: it[in2].enchantment = 39; break;
-		case 64: it[in2].crit_multi[0] += 25; break;
+		case 64: it[in2].crit_multi[0] += 15*mul; break;
 		case 65: it[in2].enchantment = 40; break;
 		case 66: it[in2].enchantment = 41; break;
 		case 67: it[in2].enchantment = 42; break;
 		case 68: it[in2].enchantment = 43; break;
-		case 69: it[in2].speed[0] += 2; break;
+		case 69: it[in2].speed[0] += 2*mul; break;
 		case 70: it[in2].enchantment = 44; break;
 		case 71: it[in2].enchantment = 45; break;
 		case 72: it[in2].enchantment = 46; break;
-		case 73: it[in2].top_damage[0] += 12; break;
+		case 73: it[in2].top_damage[0] += 12*mul; break;
 		case 74: it[in2].enchantment = 47; break;
 		case 75: it[in2].enchantment = 48; break;
-		case 76: it[in2].crit_chance[0] += 20; break;
+		case 76: it[in2].crit_chance[0] += 12*mul; break;
 		case 77: it[in2].enchantment = 49; break;
-		case 78: it[in2].gethit_dam[0] += 2; break;
+		case 78: it[in2].gethit_dam[0] += 2*mul; break;
+		//
+		case 79: it[in2].enchantment = 50; break;
+		case 80: it[in2].enchantment = 51; break;
+		case 81: it[in2].to_hit[0] -= 2*mul; it[in2].to_parry[0] += 4*mul; break;
+		case 82: it[in2].enchantment = 52; break;
+		case 83: it[in2].enchantment = 53; break;
+		case 84: it[in2].enchantment = 54; break;
+		case 85: it[in2].enchantment = 55; break;
+		case 86: it[in2].enchantment = 56; break;
+		case 87: it[in2].to_hit[0] += 4*mul; it[in2].to_parry[0] -= 2*mul; break;
+		case 88: it[in2].ss_weapon += 2*mul; it[in2].top_damage[0] += 8*mul; break;
+		case 89: it[in2].crit_chance[0] += 8*mul; it[in2].crit_multi[0] += 10*mul; break;
+		case 90: it[in2].ss_armor += 2*mul; it[in2].gethit_dam[0] += 1*mul; break;
+		case 91: it[in2].cool_bonus[0] += 2*mul; break;
 		default: break;
 	}
 	
@@ -3828,8 +3605,11 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].weapon[0] = it_temp[temp].weapon[0] + it[in2].ss_weapon;
 	it[in2].weapon[1] = it_temp[temp].weapon[1];
 	
-	it[in2].sprite[0] = it_temp[temp].sprite[0];
-	it[in2].sprite[1] = it_temp[temp].sprite[1];
+	if (NOT_SINBINDER(in2))
+	{
+		it[in2].sprite[0] = it_temp[temp].sprite[0];
+		it[in2].sprite[1] = it_temp[temp].sprite[1];
+	}
 	
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_ENCHANTED | IF_LOOKSPECIAL;
 	it[in2].flags &= ~IF_CAN_EN;
@@ -3864,8 +3644,8 @@ int use_soulstone(int cn, int in, int in2)
 	{
 		// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
 		
-		it[in].data[1] += it[in2].data[1] - (RANDOM(it[in2].data[1]/4 + 1)+RANDOM(it[in2].data[1]/4 + 1));
-		rank = points2rank(it[in].data[1]);
+		it[in].data[1] += it[in2].data[1] - RANDOM(it[in2].data[1]/10 + 1);
+		rank = points2rank(it[in].data[1]/2);
 		
 		if (rank > N_SOULMAX) rank = N_SOULMAX;
 		
@@ -3890,24 +3670,6 @@ int use_soulstone(int cn, int in, int in2)
 		souldestroy(cn, in2);
 		return 1;
 	}
-	
-	// Soul Focus
-	/*
-	if (it[in2].driver==92)
-	{
-		// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
-		if (it[in].data[2])
-		{
-			do_char_log(cn, 1, "Nothing happened. Seems this stone is already focused.\n");
-			return 0;
-		}
-		
-		it[in].data[2] = it[in2].data[0];
-		
-		souldestroy(cn, in2);
-		return 1;
-	}
-	*/
 	
 	// Soul Catalyst
 	if (it[in2].driver==93)
@@ -3972,27 +3734,19 @@ int use_soulfocus(int cn, int in) // driver 92
 		return 0;
 	}
 	if (!IS_SANEITEM(in2))	return 0;
-
-	if (it[in2].driver==68) // Soulstone
-	{
-		// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
-		if (it[in2].data[2])
-		{
-			do_char_log(cn, 1, "Nothing happened. Seems this stone is already focused.\n");
-			return 0;
-		}
-		
-		it[in2].data[2] = it[in].data[0];
-		
-		chlog(cn, "used focus on soulstone");
-		souldestroy(cn, in);
-		return 1;
-	}
 	
 	if (it[in2].driver==92) // Soul Focus
 	{
-		it[in].data[0] = max(1, max(it[in].data[0], it[in2].data[0])-1);
-		sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to reduce its rank cost.", it[in].data[0]);
+		it[in].data[0] = min(6, min(it[in].data[0], it[in2].data[0])+1);
+		sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to increase its strength.", it[in].data[0]);
+		
+		do_char_log(cn, 7, "You fed the held soul focus to the one in your bag. It is now level %d.\n", it[in].data[0]);
+		
+		if (it[in].data[0]==6)
+		{
+			do_char_log(cn, 7, "(That's as high as they go!)\n");
+		}
+		
 		chlog(cn, "used focus on focus");
 		souldestroy(cn, in2);
 		return 1;	
@@ -4023,13 +3777,16 @@ void make_catalyst(int cn, int base)
 	sprintf(it[in].reference, "soul catalyst");
 	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
 	
-	m = max(1, 4 - (base/6 + RANDOM(base/6 + 2))) + 1;
-	
 	v = RANDOM(MAXSKILL);
-	it[in].skill[v][0] = get_sb(v, 1); 
-	m = it[in].skill[v][1] = get_sb(v, 0)+RANDOM(m);
+	m = max(1, min(soul_cap(v), base/4) - RANDOM(2));
 	
-	it[in].data[3] = m;
+	if (m<1) m=1;
+	if (m>6) m=6;
+	
+	it[in].skill[v][0] = m; 
+	it[in].skill[v][1] = m*2;
+	
+	it[in].data[3] = m*2;
 	it[in].data[4] = v+1;
 	it[in].temp = 0;
 	it[in].driver = 93;
@@ -4084,16 +3841,16 @@ int use_soulcatalyst(int cn, int in) // driver 93
 			sprintf(it[in3].reference, "soul catalyst");
 			sprintf(it[in3].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
 			
-			v1 = it[in].data[4]-1;
-			v2 = it[in2].data[4]-1;
-			
-			m = max(it[in].data[3]-get_sb(v1, 0), it[in2].data[3]-get_sb(v2, 0));
-			
 			v = RANDOM(MAXSKILL);
-			it[in3].skill[v][0] = get_sb(v, 1); 
-			m = it[in3].skill[v][1] = get_sb(v, 0) + m;
+			m = max(1, min(soul_cap(v), max(it[in].data[3]/2, it[in2].data[3]/2)));
 			
-			it[in3].data[3] = m;
+			if (m<1) m=1;
+			if (m>6) m=6;
+			
+			it[in3].skill[v][0] = m; 
+			it[in3].skill[v][1] = m*2;
+			
+			it[in3].data[3] = m*2;
 			it[in3].data[4] = v+1;
 			it[in3].temp = 0;
 			it[in3].driver = 93;
@@ -4120,11 +3877,11 @@ void make_focus(int cn, int base)
 	
 	in = god_create_item(IT_SOULFOCUS);
 	
-	v = max(1, 6 - (base/8 + RANDOM(base/8 + 2)));
+	v = max(1, min(6, base/4));
 					
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to reduce its rank cost.", v);
+	sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to increase its strength.", v);
 	
 	it[in].data[0] = v;
 	it[in].temp = 0;
@@ -4144,6 +3901,31 @@ void make_talisfrag(int cn, int n)
 	
 	god_give_char(in, cn);
 	chlog(cn, "got talisman fragment(s)");
+}
+
+void set_random_text(int cn)
+{
+	switch (RANDOM(4))
+	{
+		case  1:	strcpy(ch[cn].text[0], "An end to your misery, %s!"); break;
+		case  2:	strcpy(ch[cn].text[0], "Took you long enough, %s!"); break;
+		case  3:	strcpy(ch[cn].text[0], "It's about time! Goodbye, %s!"); break;
+		default:	strcpy(ch[cn].text[0], "Yes! Die, %s!"); break;
+	}
+	switch (RANDOM(4))
+	{
+		case  1:	strcpy(ch[cn].text[1], "Something to do! Let's duel to the end, %s!"); break;
+		case  2:	strcpy(ch[cn].text[1], "I hope you know what you're doing, %s!"); break;
+		case  3:	strcpy(ch[cn].text[1], "A worthy foe! Let us shake the void, %s!"); break;
+		default:	strcpy(ch[cn].text[1], "Yahoo! An enemy! Prepare to die, %s!"); break;
+	}
+	switch (RANDOM(4))
+	{
+		case  1:	strcpy(ch[cn].text[3], "Alas, I've lost. Good fight, %s!"); break;
+		case  2:	strcpy(ch[cn].text[3], "Seems this is the end for me. So long, %s."); break;
+		case  3:	strcpy(ch[cn].text[3], "Great fight, %s. I suppose this is goodbye."); break;
+		default:	strcpy(ch[cn].text[3], "Thank you %s! Everything is better than being here."); break;
+	}
 }
 
 int start_contract(int cn, int in)
@@ -4280,6 +4062,29 @@ void add_map_progress(int loc)
 				if (!IS_SANEPLAYER(co))			continue;
 				ch[co].data[41]++;
 				chlog(co, "map progress increased, %d (%d)", CONT_PROG(co), ch[co].data[41]);
+			}
+		}
+	}
+}
+
+void add_map_goal(int loc, int v)
+{
+	int x, xx, y, yy, co;
+	
+	xx = MM_TARGETX;
+	yy = MM_TARGETY + MM_TARG_OF*(loc-1);
+	
+	// 2) Clean the target location
+	for (x = 0; x < MAP_CELL_SIZE*MAP_TILE_SIZE; x++)
+	{
+		for (y = 0; y < MAP_CELL_SIZE*MAP_TILE_SIZE; y++)
+		{
+			if (co = map[(xx+x)+(yy+y)*MAPX].ch)
+			{
+				if (ch[co].used==USE_EMPTY)		continue;
+				if (!IS_SANEPLAYER(co))			continue;
+				ch[co].data[41] += + v<<8;
+				chlog(co, "map goal increased by %d (%d)", v, CONT_GOAL(co));
 			}
 		}
 	}
@@ -4872,7 +4677,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		in = 0;
 		rank = points2rank(ch[co].points_tot);
 		
-		if (rank>=18 && !RANDOM(48))
+		if (rank>=18 && !RANDOM(50))
 		{
 			static int item[]  = {
 				2515, 2519, 2523, 2527, 2531, 
@@ -4881,7 +4686,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=15 && !RANDOM(48))
+		else if (rank>=15 && !RANDOM(50))
 		{
 			static int item[]  = {
 				2514, 2518, 2522, 2526, 2530, 
@@ -4890,7 +4695,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=12 && !RANDOM(48))
+		else if (rank>=12 && !RANDOM(50))
 		{
 			static int item[]  = {
 				2513, 2517, 2521, 2525, 2529, 
@@ -4899,7 +4704,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (!RANDOM(48))
+		else if (!RANDOM(50))
 		{
 			static int item[]  = {
 				2512, 2516, 2520, 2524, 2528,
@@ -4920,29 +4725,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		ch[co].data[30] = ch[co].dir = 1+RANDOM(8);
 		if (!ch[co].data[72]) ch[co].data[72] = 1;
 		if (!RANDOM(6)) ch[co].light_bonus = RANDOM(4)*25+25;
-		switch (RANDOM(4))
-		{
-			case  1:	strcpy(ch[co].text[0], "An end to your misery, %s!"); break;
-			case  2:	strcpy(ch[co].text[0], "Took you long enough, %s!"); break;
-			case  3:	strcpy(ch[co].text[0], "It's about time! Goodbye, %s!"); break;
-			default:	strcpy(ch[co].text[0], "Yes! Die, %s!"); break;
-		}
-		switch (RANDOM(4))
-		{
-			case  1:	strcpy(ch[co].text[1], "Something to do! Let's duel to the end, %s!"); break;
-			case  2:	strcpy(ch[co].text[1], "I hope you know what you're doing, %s!"); break;
-			case  3:	strcpy(ch[co].text[1], "A worthy foe! Let us shake the void, %s!"); break;
-			default:	strcpy(ch[co].text[1], "Yahoo! An enemy! Prepare to die, %s!"); break;
-		}
-		switch (RANDOM(4))
-		{
-			case  1:	strcpy(ch[co].text[3], "Alas, I've lost. Good fight, %s!"); break;
-			case  2:	strcpy(ch[co].text[3], "Seems this is the end for me. So long, %s."); break;
-			case  3:	strcpy(ch[co].text[3], "Great fight, %s. I suppose this is goodbye."); break;
-			default:	strcpy(ch[co].text[3], "Thank you %s! Everything is better than being here."); break;
-		}
-		
-		
+		set_random_text(co);
 	}
 	
 	do_update_char(co);

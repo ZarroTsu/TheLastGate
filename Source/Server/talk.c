@@ -54,6 +54,9 @@ char *syn[] = {
 	"7",           "seven",
 	"8",           "eight",
 	"9",           "nine",
+	"10",          "ten",
+	"11",          "eleven",
+	"12",          "twelve",
 	"n",           "north",
 	"northern",    "north",
 	"e",           "east",
@@ -762,6 +765,19 @@ struct know
 #define SP_BJACK_H		61		// Hit
 #define SP_BJACK_S		62		// Stand
 #define SP_BJACK_D		63		// Double Down
+//
+#define SP_CLAIM_1		101
+#define SP_CLAIM_2		102
+#define SP_CLAIM_3		103
+#define SP_CLAIM_4		104
+#define SP_CLAIM_5		105
+#define SP_CLAIM_6		106
+#define SP_CLAIM_7		107
+#define SP_CLAIM_8		108
+#define SP_CLAIM_9		109
+#define SP_CLAIM_X		110
+#define SP_CLAIM_Y		111
+#define SP_CLAIM_Z		112
 //}
 
 // Knowledge table - the big one that handles everything
@@ -1268,6 +1284,18 @@ struct know know[] = {
 	{{"!remove", "?tarot", "?card", "?",        NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_TAROT2},
 	{{"!unlearn", "?",                          NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
 	{{"!unlearn", "?skill",                "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
+	{{"!claim", "!one",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_1},
+	{{"!claim", "!two",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_2},
+	{{"!claim", "!three",                  "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_3},
+	{{"!claim", "!four",                   "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_4},
+	{{"!claim", "!five",                   "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_5},
+	{{"!claim", "!six",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_6},
+	{{"!claim", "!seven",                  "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_7},
+	{{"!claim", "!eight",                  "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_8},
+	{{"!claim", "!nine",                   "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_9},
+	{{"!claim", "!ten",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_X},
+	{{"!claim", "!eleven",                 "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_Y},
+	{{"!claim", "!twelve",                 "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_Z},
 	{{"!door",                             "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_DOORS   , 0},
 	{{"!key",                              "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_KEYS    , 0},
 	{{"!riddle",                           "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_RIDDLES , 0},
@@ -1550,7 +1578,7 @@ void answer_spellinfo(int cn, int co)
 			if ((in = ch[cn].spell[n]))
 			{
 				do_sayx(cn, "%s, for %dm %ds.",
-				        bu[in].name, bu[in].active / (18 * 60), (bu[in].active / 18) % 60);
+				        bu[in].name, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
 				found = 1;
 			}
 		}
@@ -1615,7 +1643,7 @@ void answer_follow(int cn, int co)
 		ch[cn].data[69] = co;
 		ch[cn].data[29] = 0;
 
-		if (!(ch[cn].flags & CF_THRALL)) do_sayx(cn, "Yes, %s!", ch[co].name);
+		if (!IS_THRALL(cn)) do_sayx(cn, "Yes, %s!", ch[co].name);
 	}
 }
 
@@ -1681,7 +1709,7 @@ void answer_stop(int cn, int co)
 		ch[cn].data[78] = 0;
 		ch[cn].data[27] = globs->ticker;
 
-		do_sayx(cn, "Yes master %s!", ch[co].name);
+		if (!IS_THRALL(cn)) do_sayx(cn, "Yes master %s!", ch[co].name);
 	}
 }
 
@@ -1694,7 +1722,7 @@ void answer_move(int cn, int co, int dir)
 		
 		if (dir)
 		{
-			if (ch[cn].flags & CF_THRALL) // Thrall movement
+			if (IS_THRALL(cn)) // Thrall movement
 			{
 				switch (dir)
 				{
@@ -1745,7 +1773,7 @@ void answer_move(int cn, int co, int dir)
 			ch[cn].goto_y = ch[cn].y + 4 - RANDOM(9);
 		}
 		
-		if (!(ch[cn].flags & CF_THRALL)) do_sayx(cn, "Yes master %s!", ch[co].name);
+		if (!IS_THRALL(cn)) do_sayx(cn, "Yes master %s!", ch[co].name);
 	}
 }
 
@@ -1760,10 +1788,10 @@ void answer_gcmode(int cn, int co, int mode)
 		case 3: 	do_sayx(cn, "Yes %s, I will now attack all enemies.", ch[co].name); break;
 		default: 	do_sayx(cn, "Yes %s, I will now defend you.", ch[co].name); break;
 	}
-	ch[cn].gcm = mode;
+	ch[co].gcm = mode;
 }
 
-void answer_attack(int cn, int co, char *text)
+int answer_attack(int cn, int co, char *text)
 {
 	int n, best = 9999, bestn = 0, dist, idx;
 	char name[50];
@@ -1786,7 +1814,7 @@ void answer_attack(int cn, int co, char *text)
 		name[n] = 0;
 		if (n<1)
 		{
-			return;
+			return 0;
 		}
 
 		for (n = 1; n<MAXCHARS; n++)
@@ -1816,17 +1844,17 @@ void answer_attack(int cn, int co, char *text)
 			if (bestn == co)
 			{
 				do_sayx(cn, "But %s, I would never attack you!", ch[co].name);
-				return;
+				return 0;
 			}
 			if (bestn == cn)
 			{
 				do_sayx(cn, "You want me to attack myself? That's silly, %s!", ch[co].name);
-				return;
+				return 0;
 			}
 			if (!may_attack_msg(co, bestn, 0))
 			{
-				do_sayx(cn, "The Gods would be angry if we did that, you didn't want to anger the Gods, %s did you?.", ch[co].name);
-				return;
+				do_sayx(cn, "The Gods would be angry if we did that, you didn't want to anger the Gods, %s did you?", ch[co].name);
+				return 0;
 			}
 			ch[cn].attack_cn = bestn;
 			idx = bestn | (char_id(bestn) << 16);
@@ -1834,8 +1862,10 @@ void answer_attack(int cn, int co, char *text)
 			do_sayx(cn, "Yes %s, I will kill %s!", ch[co].name, ch[bestn].reference);
 //                      do_sayx(cn,ch[cn].text[1],ch[bestn].name);
 			do_notify_char(bestn, NT_GOTMISS, co, 0, 0, 0);
+			return 1;
 		}
 	}
+	return 0;
 }
 
 void answer_quiet(int cn, int co)
@@ -2008,6 +2038,63 @@ void answer_unlearn(int cn, int co)
 	{
 		do_sayx(cn, "But you do not know an arch skill, %s!", ch[co].name);
 	}
+}
+
+void answer_claim(int cn, int co, int nr)
+{
+	int v = 0, n, m, pole[3]={0}, kwai = 0;
+	
+	if (ch[co].gold < v)
+	{
+		do_sayx(cn, "You don't have enough money for that, %s!", ch[co].name);
+		return;
+	}
+	
+	switch (nr)
+	{
+		case  1: pole[0] = IT_LAB1_POLE1; pole[1] = IT_LAB1_POLE2; pole[2] = IT_LAB1_POLE3; kwai = IT_LAB1_KWAI; break;
+		case  2: pole[0] = IT_LAB2_POLE1; pole[1] = IT_LAB2_POLE2; pole[2] = IT_LAB2_POLE3; kwai = IT_LAB2_KWAI; break;
+		case  3: pole[0] = IT_LAB3_POLE1; pole[1] = IT_LAB3_POLE2; pole[2] = IT_LAB3_POLE3; kwai = IT_LAB3_KWAI; break;
+		case  4: pole[0] = IT_LAB4_POLE1; pole[1] = IT_LAB4_POLE2; pole[2] = IT_LAB4_POLE3; kwai = IT_LAB4_KWAI; break;
+		case  5: pole[0] = IT_LAB5_POLE1; pole[1] = IT_LAB5_POLE2; pole[2] = IT_LAB5_POLE3; kwai = IT_LAB5_KWAI; break;
+		case  6: pole[0] = IT_LAB6_POLE1; pole[1] = IT_LAB6_POLE2; pole[2] = IT_LAB6_POLE3; kwai = IT_LAB6_KWAI; break;
+		case  7: pole[0] = IT_LAB7_POLE1; pole[1] = IT_LAB7_POLE2; pole[2] = IT_LAB7_POLE3; kwai = IT_LAB7_KWAI; break;
+		case  8: pole[0] = IT_LAB8_POLE1; pole[1] = IT_LAB8_POLE2; pole[2] = IT_LAB8_POLE3; kwai = IT_LAB8_KWAI; break;
+		case  9: pole[0] = IT_LAB9_POLE1; pole[1] = IT_LAB9_POLE2; pole[2] = IT_LAB9_POLE3; kwai = IT_LAB9_KWAI; break;
+		case 10: pole[0] = IT_LABX_POLE1; pole[1] = IT_LABX_POLE2; pole[2] = IT_LABX_POLE3; kwai = IT_LABX_KWAI; break;
+		case 11: pole[0] = IT_LABY_POLE1; pole[1] = IT_LABY_POLE2; pole[2] = IT_LABY_POLE3; kwai = IT_LABY_KWAI; break;
+		case 12: pole[0] = IT_LABZ_POLE1; pole[1] = IT_LABZ_POLE2; pole[2] = IT_LABZ_POLE3; kwai = IT_LABZ_KWAI; break;
+		default: return;
+	}
+	
+	for (n=0;n<3;n++)
+	{
+		for (m=1;m<MAXITEM;m++)
+		{
+			if (it[m].used==USE_EMPTY) continue;
+			if (it[m].temp==pole[n])
+			{
+				v += explorer_point(co, m, 0) * 10000;
+				pole[n] = -1;
+			}
+			if (IS_SEYAN_DU(co) && it[m].temp==kwai)
+			{
+				v += use_seyan_shrine(co, m, 1) * 100000;
+				kwai = -1;
+			}
+		}
+	}
+	
+	if (!v) 
+	{
+		do_sayx(cn, "Seems to me you've nothing to claim there, %s!", ch[co].name);
+		return;
+	}
+	
+	do_sayx(cn, "Very well, I have given you those missing rewards, %s.", ch[co].name);
+	
+	ch[co].gold -= v;
+	do_char_log(co, 0, "You handed over %dG %dS.\n", v / 100, v % 100);
 }
 
 void answer_tokens(int cn, int co, int nr)
@@ -2742,7 +2829,7 @@ void answer_greeting(int cn, int co)
 /*	simplified by DB 1.5.2000 */
 	if (ch[cn].text[2][0] && ch[cn].text[2][0]!='#')
 	{
-		if((ch[cn].temp == 180) && IS_PURPLE(co))
+		if((ch[cn].temp == CT_PRIEST) && IS_PURPLE(co))
 		{
 			do_sayx(cn, "Greetings, %s!", ch[co].name);
 			return;
@@ -2772,7 +2859,7 @@ void answer_time(int cn, int co)
 	        (globs->mdday==2 ? "nd" : ""),
 	        (globs->mdday==3 ? "rd" : ""),
 	        (globs->mdday>3 ? "th" : ""),
-	        globs->mdyear, globs->mdtime / 3600, (globs->mdtime / 60) % 60);
+	        globs->mdyear, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
 }
 
 void answer_points(int cn, int co, int nr)
@@ -2833,6 +2920,19 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_BJACK_S:	casino_bjack(cn, co, 2); break;
 		case SP_BJACK_D:	casino_bjack(cn, co, 3); break;
 		case SP_CASIN_Q:	casino_quit(co); break;
+		//
+		case SP_CLAIM_1:	answer_claim(cn, co, 1); break;
+		case SP_CLAIM_2:	answer_claim(cn, co, 2); break;
+		case SP_CLAIM_3:	answer_claim(cn, co, 3); break;
+		case SP_CLAIM_4:	answer_claim(cn, co, 4); break;
+		case SP_CLAIM_5:	answer_claim(cn, co, 5); break;
+		case SP_CLAIM_6:	answer_claim(cn, co, 6); break;
+		case SP_CLAIM_7:	answer_claim(cn, co, 7); break;
+		case SP_CLAIM_8:	answer_claim(cn, co, 8); break;
+		case SP_CLAIM_9:	answer_claim(cn, co, 9); break;
+		case SP_CLAIM_X:	answer_claim(cn, co,10); break;
+		case SP_CLAIM_Y:	answer_claim(cn, co,11); break;
+		case SP_CLAIM_Z:	answer_claim(cn, co,12); break;
 		default:break;
 	}
 }

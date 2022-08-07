@@ -195,16 +195,16 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 4, "When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 25%% more buff and debuff duration, but 25%% more skill cooldown.\n");
 		break;
 	case IT_TW_IRA: // Sin Staff
-		do_char_log(cn, 4, "When equipped, your critical hit chance and multiplier effect your Blast spell, but you lose mana over time and cannot deal melee critical hits.\n");
+		do_char_log(cn, 4, "When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you lose mana over time and cannot deal melee critical hits.\n");
 		break;
 	case IT_TW_INVIDIA: // Sin Spear
-		do_char_log(cn, 4, "When equipped, your ghost companion takes damage instead from hits you take, but it cannot regenerate health.\n");
+		do_char_log(cn, 4, "When equipped, your ghost companion has surround hit AoE, and your shadow copy teleports to new targets, but each cannot regenerate health.\n");
 		break;
 	case IT_TW_GULA: // Sin Sword
 		do_char_log(cn, 4, "When equipped, you restore health upon hitting, cleaving or blasting an enemy, but you lose hitpoints over time.\n");
 		break;
 	case IT_TW_LUXURIA: // Sin Axe
-		do_char_log(cn, 4, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict stun.\n");
+		do_char_log(cn, 4, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict stun.\n");
 		break;
 	case IT_TW_AVARITIA: // Sin Twohander
 		do_char_log(cn, 4, "When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you lose endurance over time.\n");
@@ -220,25 +220,25 @@ void look_extra(int cn, int in)
 	// -------- GLOVE ITEMS --------
 	
 	case IT_GL_SERPENT: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict poison, dealing damage over time.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict poison, dealing damage over time.\n");
 		break;
 	case IT_GL_BURNING: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict scorch, causing enemies to take additional damage.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict scorch, causing enemies to take additional damage.\n");
 		break;
 	case IT_GL_SHADOW: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict blind, reducing enemy perception, hit and parry.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict blind, reducing enemy perception, hit and parry.\n");
 		break;
 	case IT_GL_CHILLED: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict slow, reducing enemy action speed.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict slow, reducing enemy action speed.\n");
 		break;
 	case IT_GL_CURSED: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict curse, reducing enemy attributes.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict curse, reducing enemy attributes.\n");
 		break;
 	case IT_GL_TITANS: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict weaken, reducing enemy weapon value.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict weaken, reducing enemy weapon value.\n");
 		break;
 	case IT_GL_BLVIPER: 
-		do_char_log(cn, 5, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict frostburn, draining enemy endurance and mana.\n");
+		do_char_log(cn, 5, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict frostburn, draining enemy endurance and mana.\n");
 		break;
 		
 	// -------- BOOT  ITEMS --------
@@ -344,7 +344,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, debuffs you cast are more likely to pass resistance checks.\n");
 		break;
 	case IT_BOOK_TRAV: 
-		do_char_log(cn, 5, "When equipped, secondary effects of Braveness and Agility are equal to the average of the two.\n");
+		do_char_log(cn, 5, "When equipped, secondary effects of Braveness and Agility are equal to the higher of the two.\n");
 		break;
 	case IT_BOOK_DAMO: 
 		do_char_log(cn, 5, "When equipped, increases cooldown recovery speed by 11%%.\n");
@@ -371,7 +371,7 @@ void look_extra(int cn, int in)
 	// -------- UNIQUE ITEMS --------
 	
 	case IT_WP_LIFESPRIG: 
-		do_char_log(cn, 5, "When equipped, mana spent is restored as life over 10 seconds. This effect is overwritten by stronger sources.\n");
+		do_char_log(cn, 5, "When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
 		break;
 	case IT_WP_BLOODLET: 
 		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 25%% of total hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
@@ -386,7 +386,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, grants +30 to action speed while underwater.\n");
 		break;
 	case IT_WP_PHALANX: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 50%% of total endurance. Phalanx grants 1%% damage reduction per 10 endurance spent.\n");
+		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 50%% of total endurance. Phalanx grants 1%% damage reduction per 5 endurance spent.\n");
 		break;
 	case IT_WP_LAMEDARG: 
 		if (it[in].data[0]<REQ_LAME)
@@ -407,13 +407,13 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 25%% of total hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
 		break;
 	case IT_WP_CRESSUN: 
-		do_char_log(cn, 5, "When equipped, endurance spent is restored as life over 5 seconds. This effect is overwritten by stronger sources.\n");
+		do_char_log(cn, 5, "When equipped, endurance spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
 		break;
 	case IT_WP_GILDSHINE: 
 		do_char_log(cn, 5, "When equipped, grants additional critical hit multiplier based off total Bartering score.\n");
 		break;
 	case IT_WP_BRONCHIT: 
-		do_char_log(cn, 5, "When equipped, 10%% of Cleave's damage is also dealt to the target's mana.\n");
+		do_char_log(cn, 5, "When equipped, 20%% of Cleave's damage is also dealt to the target's mana.\n");
 		break;
 	case IT_WP_VOLCANF: 
 		do_char_log(cn, 5, "When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n");
@@ -507,35 +507,35 @@ void look_extra(int cn, int in)
 	{
 		switch (it[in].enchantment)
 		{
-		case  1: do_char_log(cn, 8, "10%% more total Armor Value.\n"); break;
+		case  1: do_char_log(cn, 8, "8%% more total Armor Value.\n"); break;
 		case  2: do_char_log(cn, 8, "Healing items are 25%% more effective.\n"); break;
 		case  3: do_char_log(cn, 8, "Cannot trigger floor traps.\n"); break;
 		case  4: do_char_log(cn, 8, "10%% less effect of debuffs on you.\n"); break;
-		case  5: do_char_log(cn, 8, "4%% more total Braveness.\n"); break;
-		//case  6: do_char_log(cn, 8, "+1 Area of Effect.\n"); break;
+		case  5: do_char_log(cn, 8, "%d%% more total Braveness.\n", 4 * (IS_TWOHAND(in)?2:1)); break;
+		case  6: do_char_log(cn, 8, "Stealth is 25%% stronger while moving.\n"); break;
 		case  7: do_char_log(cn, 8, "10%% more effect of Weakens you inflict.\n"); break;
 		case  8: do_char_log(cn, 8, "Cannot be Weakened.\n"); break;
 		case  9: do_char_log(cn, 8, "Reduces Healing Sickness duration on you by 25%%.\n"); break;
 		case 10: do_char_log(cn, 8, "Cannot step on death traps.\n"); break;
 		case 11: do_char_log(cn, 8, "10%% of total Armor Value is granted as additional Resistance.\n"); break;
-		case 12: do_char_log(cn, 8, "4%% more total Willpower.\n"); break;
+		case 12: do_char_log(cn, 8, "%d%% more total Willpower.\n", 4 * (IS_TWOHAND(in)?2:1)); break;
 		case 13: do_char_log(cn, 8, "10%% more effect of Slows you inflict.\n"); break;
 		case 14: do_char_log(cn, 8, "Cannot be Slowed.\n"); break;
 		case 15: do_char_log(cn, 8, "Cannot lose focus.\n"); break;
 		case 16: do_char_log(cn, 8, "10%% of damage taken is dealt to your Endurance instead.\n"); break;
 		case 17: do_char_log(cn, 8, "Grants infravision.\n"); break;
 		case 18: do_char_log(cn, 8, "20%% more maximum Endurance.\n"); break;
-		case 19: do_char_log(cn, 8, "4%% more total Intuition.\n"); break;
+		case 19: do_char_log(cn, 8, "%d%% more total Intuition.\n", 4 * (IS_TWOHAND(in)?2:1)); break;
 		case 20: do_char_log(cn, 8, "10%% more effect of Curses you inflict.\n"); break;
 		case 21: do_char_log(cn, 8, "Cannot be cursed.\n"); break;
 		case 22: do_char_log(cn, 8, "12%% less cost of skills and spells.\n"); break;
 		case 23: do_char_log(cn, 8, "10%% of damage taken is dealt to your Mana instead.\n"); break;
 		case 24: do_char_log(cn, 8, "10%% of total Armor Value is granted as additional Immunity.\n"); break;
-		case 25: do_char_log(cn, 8, "4%% more total Agility.\n"); break;
+		case 25: do_char_log(cn, 8, "%d%% more total Agility.\n", 4 * (IS_TWOHAND(in)?2:1)); break;
 		case 26: do_char_log(cn, 8, "Movement speed cannot fall below 1.50.\n"); break;
 		case 27: do_char_log(cn, 8, "10%% more effect of Poisons you inflict.\n"); break;
 		case 28: do_char_log(cn, 8, "Stealth is 25%% stronger while idle.\n"); break;
-		case 29: do_char_log(cn, 8, "4%% more total Strength.\n"); break;
+		case 29: do_char_log(cn, 8, "%d%% more total Strength.\n", 4 * (IS_TWOHAND(in)?2:1)); break;
 		case 30: do_char_log(cn, 8, "10%% more effect of Bleeds you inflict.\n"); break;
 		case 31: do_char_log(cn, 8, "10%% more effect of Blinds you inflict.\n"); break;
 		case 32: do_char_log(cn, 8, "Grants 25%% stronger regeneration rates while idle.\n"); break;
@@ -544,18 +544,25 @@ void look_extra(int cn, int in)
 		case 35: do_char_log(cn, 8, "20%% chance to half damage taken.\n"); break;
 		case 36: do_char_log(cn, 8, "Your Meditate score is also applied to your Hitpoints.\n"); break;
 		case 37: do_char_log(cn, 8, "5%% additional chance to avoid being hit.\n"); break;
-		case 38: do_char_log(cn, 8, "Restore 1 Mana upon hitting an enemy.\n"); break;
+		case 38: do_char_log(cn, 8, "Restore %d Mana upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)); break;
 		case 39: do_char_log(cn, 8, "Restore 2 Mana upon being hit by an enemy.\n"); break;
 		case 40: do_char_log(cn, 8, "10%% more total Movement Speed.\n"); break;
-		case 41: do_char_log(cn, 8, "5%% additional chance to hit.\n"); break;
-		case 42: do_char_log(cn, 8, "Restore 1 Endurance upon hitting an enemy.\n"); break;
+		case 41: do_char_log(cn, 8, "%d%% additional chance to hit.\n", 5 * (IS_TWOHAND(in)?2:1)); break;
+		case 42: do_char_log(cn, 8, "Restore %d Endurance upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)); break;
 		case 43: do_char_log(cn, 8, "Restore 2 Endurance upon being hit by an enemy.\n"); break;
 		case 44: do_char_log(cn, 8, "Movement Speed is doubled while underwater.\n"); break;
 		case 45: do_char_log(cn, 8, "Your Rest score is also applied to your Mana.\n"); break;
 		case 46: do_char_log(cn, 8, "You can always escape from combat.\n"); break;
 		case 47: do_char_log(cn, 8, "Reduces extra damage taken from enemy critical hits by 50%%.\n"); break;
 		case 48: do_char_log(cn, 8, "50%% more total Thorns score.\n"); break;
-		case 49: do_char_log(cn, 8, "Restore 1 hitpoint upon hitting an enemy.\n"); break;
+		case 49: do_char_log(cn, 8, "Restore %d hitpoint%s upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1), IS_TWOHAND(in)?"s":""); break;
+		case 50: do_char_log(cn, 8, "8%% more total Weapon Value.\n"); break;
+		case 51: do_char_log(cn, 8, "2%% less damage taken from hits.\n"); break;
+		case 52: do_char_log(cn, 8, "Perception is 25%% stronger.\n"); break;
+		case 53: do_char_log(cn, 8, "30%% less damage taken from damage over time.\n"); break;
+		case 54: do_char_log(cn, 8, "2%% more total attributes.\n"); break;
+		case 55: do_char_log(cn, 8, "Total Glow score is reduced to 0.\n"); break;
+		case 56: do_char_log(cn, 8, "10%% more effect of heals and regens you apply.\n"); break;
 		default:break;
 		}
 	}
@@ -709,7 +716,7 @@ void look_talisman(int cn, int in)
 		switch (it[in].data[0])
 		{
 		case  1: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Braveness", 5); break;
-		case  2: do_char_log(cn, 8, "[Chest Only] 10%% more total Armor Value.\n"); break; //  1
+		case  2: do_char_log(cn, 8, "[Chest Only] 8%% more total Armor Value.\n"); break; //  1
 		case  3: do_char_log(cn, 8, "[Helmet Only] Healing items are 25%% more effective.\n"); break; //  2
 		case  4: do_char_log(cn, 8, "[Boots Only] Cannot trigger floor traps.\n"); break; //  3
 		case  5: do_char_log(cn, 8, "[Cloak Only] 10%% less effect of debuffs on you.\n"); break; //  4
@@ -737,7 +744,7 @@ void look_talisman(int cn, int in)
 		case 27: do_char_log(cn, 8, "4%% more total Intuition.\n"); break; // 19
 		case 28: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Spell Mod", 1); break;
 		case 29: do_char_log(cn, 8, "[Gloves Only] 10%% more effect of Curses you inflict.\n"); break; // 20
-		case 30: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Cooldown", 2); break;
+		case 30: do_char_log(cn, 8, "[Boots Only] Stealth is 25%% stronger while moving.\n"); break; //  6
 		case 31: do_char_log(cn, 8, "[Cloak Only] Cannot be cursed.\n"); break; // 21
 		case 32: do_char_log(cn, 8, "[Helmet Only] 12%% less cost of skills and spells.\n"); break; // 22
 		case 33: do_char_log(cn, 8, "[Chest Only] 10%% of damage taken is dealt to your Mana instead.\n"); break; // 23
@@ -771,7 +778,7 @@ void look_talisman(int cn, int in)
 		case 61: do_char_log(cn, 8, "[Cloak Only] 5%% additional chance to avoid being hit.\n"); break; // 37
 		case 62: do_char_log(cn, 8, "[Weapons Only] Restore 1 Mana upon hitting an enemy.\n"); break; // 38
 		case 63: do_char_log(cn, 8, "[Armor Pieces Only] Restore 2 Mana upon being hit by an enemy.\n"); break; // 39
-		case 64: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Multi", 25); break;
+		case 64: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Multi", 15); break;
 		case 65: do_char_log(cn, 8, "[Boots Only] 10%% more total Movement Speed.\n"); break; // 40
 		case 66: do_char_log(cn, 8, "[Weapons Only] 5%% additional chance to hit.\n"); break; // 41
 		case 67: do_char_log(cn, 8, "[Weapons Only] Restore 1 Endurance upon hitting an enemy.\n"); break; // 42
@@ -783,9 +790,27 @@ void look_talisman(int cn, int in)
 		case 73: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Top Damage", 12); break;
 		case 74: do_char_log(cn, 8, "[Chest Only] Reduces extra damage taken from enemy critical hits by 50%%.\n"); break; // 47
 		case 75: do_char_log(cn, 8, "[Chest Only] 50%% more total Thorns score.\n"); break; // 48
-		case 76: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Bonus", 20); break;
+		case 76: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Bonus", 12); break;
 		case 77: do_char_log(cn, 8, "[Weapons Only] Restore 1 hitpoint upon hitting an enemy.\n"); break; // 49
 		case 78: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Thorns", 2); break;
+		case 79: do_char_log(cn, 8, "[Weapons Only] 8%% more total Weapon Value.\n"); break; // 50
+		case 80: do_char_log(cn, 8, "[Armor Pieces Only] 2%% less damage taken from hits.\n"); break; // 51
+		case 81: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Parry", 4);
+				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit", -2); break;
+		case 82: do_char_log(cn, 8, "[Helmet Only] Perception is 25%% stronger.\n"); break; // 52
+		case 83: do_char_log(cn, 8, "[Cloak Only] 30%% less damage taken from damage over time.\n"); break; // 53
+		case 84: do_char_log(cn, 8, "2%% more total attributes.\n"); break; // 54
+		case 85: do_char_log(cn, 8, "[Chest Only] Total Glow score is reduced to 0.\n"); break; // 55
+		case 86: do_char_log(cn, 8, "[Gloves Only] 10%% more effect of heals and regens you apply.\n"); break; // 56
+		case 87: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit", 4);
+				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Parry", -2); break;
+		case 88: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Weapon Value", 2);
+				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Top Damage", 8); break;
+		case 89: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Bonus", 8);
+				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Multi", 10); break;
+		case 90: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Armor Value", 2);
+				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Thorns", 1); break;
+		case 91: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Cooldown", 2); break;
 		default: break;
 		}
 	}
@@ -807,6 +832,7 @@ void look_driver(int cn, int in)
 	{
 	case     0:
 	case    32:
+	case	40:
 	case    52:
 	case    92:
 	case    93:

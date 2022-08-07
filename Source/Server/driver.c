@@ -173,7 +173,7 @@ int npc_add_enemy(int cn, int co, int always)
 	}
 	
 	// Thralled enemies ignore other enemies and vice versa
-	if (ch[cn].data[CHD_GROUP]==65500 || ch[co].data[CHD_GROUP]==65500)
+	if (!IS_PLAYER(co) && !IS_PLAYER_COMP(co) && (ch[cn].data[CHD_GROUP]==65500 || ch[co].data[CHD_GROUP]==65500))
 	{
 		return 0;
 	}
@@ -185,7 +185,8 @@ int npc_add_enemy(int cn, int co, int always)
 	}
 	
 	// Group check for GCs
-	if ((!IS_PLAYER(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
+	if (!IS_THRALL(cn) &&
+		(!IS_PLAYER(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
 		(!IS_PLAYER(co) && IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
 	{
 		return 0;
@@ -198,7 +199,7 @@ int npc_add_enemy(int cn, int co, int always)
 		return 0;
 	}
 	
-	if (points2rank(ch[cn].points_tot)<20)
+	if (points2rank(ch[cn].points_tot)<20 && !IS_THRALL(cn))
 	{
 		if (!always && (ch[cn].points_tot + 500) * 20<ch[co].points_tot)
 		{
@@ -412,6 +413,12 @@ int npc_gotattack(int cn, int co, int dam)
 			}
 			chlog(cn, "Added %s to kill list for attacking me", ch[co].name);
 		}
+		/*
+		else
+		{
+			chlog(cn, "Ignoring %s's attack", ch[co].name);
+		}
+		*/
 	}
 
 	return 1;
@@ -849,7 +856,7 @@ int npc_give(int cn, int co, int in, int money)
 		(ch[cn].temp==CT_TACTICIAN && 
 		(it[in].temp==IT_BS_CAN1 || it[in].temp==IT_BS_CAN2 || it[in].temp==IT_BS_CAN3)) 
 		||
-		(ch[cn].temp==CT_BISHOP && (
+		((ch[cn].temp==CT_BISHOP || ch[cn].temp==CT_KWAIVICAR || ch[cn].temp==CT_GORNPASTOR) && (
 		(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
 		(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R)))
 		||
@@ -879,6 +886,8 @@ int npc_give(int cn, int co, int in, int money)
 			if (n==40)
 			{
 				do_char_log(co, 0, "You get the feeling you should clear some space in your backpack first.\n");
+				god_take_from_char(in, cn);
+				god_give_char(in, co);
 				return 0;
 			}
 		}
@@ -913,7 +922,7 @@ int npc_give(int cn, int co, int in, int money)
 			ch[co].misc_action = DR_IDLE;
 			return 0;
 		}
-		else if (ch[cn].temp==CT_BISHOP && (
+		else if ((ch[cn].temp==CT_BISHOP || ch[cn].temp==CT_KWAIVICAR || ch[cn].temp==CT_GORNPASTOR) && (
 			(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
 			(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R) ))
 		{
@@ -2038,7 +2047,7 @@ int npc_see(int cn, int co)
 				if (ch[co].flags & CF_LOCKPICK)
 				{
 					if (!B_SK(co, SK_BLESS))
-						do_sayx(cn, "Greetings, %s. Bring me the Ruby Amulet from the Thieves House and I'll teach you BLESS.", ch[co].name);
+						do_sayx(cn, "Greetings, %s. Bring me the Agate Amulet from the Thieves House and I'll teach you BLESS.", ch[co].name);
 					else
 						do_sayx(cn, "Leave me be, %s. I've no more to teach you.", ch[co].name);
 				}
@@ -2285,6 +2294,13 @@ int npc_see(int cn, int co)
 				else
 					do_sayx(cn, "'Ello, mate. Bring me some of the water from the ol' well cistern and I'd reward you with this here leather necklace.");
 			}
+			else if (strcmp(ch[cn].text[2], "#quest134")==0) //   33 - Maude - Dwellers
+			{
+				if (points2rank(ch[co].points_tot)<12) // Major
+					do_sayx(cn, "'Ello there, %s.", ch[co].name);
+				else
+					do_sayx(cn, "'Ello there, %s. If you'd bring me the emerald chalice from the Buried Brush, I'd pay you mighty finely.", ch[co].name);
+			}
 			else if (strcmp(ch[cn].text[2], "#blackherbs")==0) //   xx - Zorani - Black Plants
 			{
 				do_sayx(cn, "Greetingsss, human! Pleassse bring me rare, black herbsss from treacherousss placesss. I would pay you very well.", ch[co].name);
@@ -2430,14 +2446,22 @@ int npc_see(int cn, int co)
 						}
 					}
 					// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
-					if((ch[cn].temp == CT_PRIEST) && (IS_PURPLE(co) || m<40)) // priest template is 180
+					if ((ch[cn].temp == CT_PRIEST) && (IS_PURPLE(co) || m<40))
 					{
 						if (m==40)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Hello there, %s. If you happen to have a working Sinbinder Ring, I could... 'assist' you in putting it on.", ch[co].name);
 					}
-					else     // if it is not priest or player is not purple we do nothing, NPC will talk as usual
+					else if ((ch[cn].temp == CT_KWAIVICAR) && !IS_CLANKWAI(co))
+					{
+						do_sayx(cn, "Welcome, %s. Would you like to join clan Kwai? If so, use #kwai to join. But beware! Members of the Gorn clan may attack you!", ch[co].name);
+					}
+					else if ((ch[cn].temp == CT_GORNPASTOR) && !IS_CLANGORN(co))
+					{
+						do_sayx(cn, "Welcome, %s. Would you like to join clan Gorn? If so, use #gorn to join. But beware! Members of the Kwai clan may attack you!", ch[co].name);
+					}
+					else	// NPC will talk as usual
 					{
 						npc_saytext_n(cn, 2, ch[co].name);
 					}
@@ -2678,7 +2702,7 @@ int npc_try_spell(int cn, int co, int spell)
 		return 0;
 	}
 
-	if (!B_SK(cn, spell)) // we don't know this spell
+	if (!B_SK(cn, spell) && spell!=SK_LIGHT && spell!=SK_RECALL) // we don't know this spell
 	{
 		return 0;
 	}
@@ -2785,11 +2809,16 @@ int npc_try_spell(int cn, int co, int spell)
 			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
 				(truespell==bu[in].data[1] || truespell==bu[in].data[2] || truespell==bu[in].data[3]))
 			{
-				chlog(cn,"Immunize true (%d)",bu[in].temp);
+				//chlog(cn,"Immunize true (%d)",bu[in].temp);
 				break;
 			}
 			// Poison layer adjustments
 			if (bu[in].temp==truespell && truespell==SK_POISON && bu[in].active>bu[in].duration/3)
+			{
+				break;
+			}
+			// Don't cast heal if target can't be healed.
+			if (bu[in].temp==truespell && truespell==SK_HEAL && bu[in].data[1] >= 4)
 			{
 				break;
 			}
@@ -3055,7 +3084,7 @@ void stronghold_mage_driver(int cn)
 	if (pinline<1)
 	{
 		// Clean up candles once every 6 hours if nobody is there
-		if (globs->mdtime%(BS_HOUR*6)>1 && globs->mdtime%(BS_HOUR*6)<2160 && ch[cn].data[3]!=0 && ch[cn].data[3]!=1)
+		if (globs->mdtime%(MD_HOUR*6)>1 && globs->mdtime%(MD_HOUR*6)<2160 && ch[cn].data[3]!=0 && ch[cn].data[3]!=1)
 		{
 			if (shiva_activate_candle(cn, in, 0))
 			{
@@ -3082,7 +3111,7 @@ void stronghold_mage_driver(int cn)
 	// b) There is someone here - once per in-game minute
 	// c) Spawn a new candle - once per in-game hour, faster with more people
 	if ((ch[cn].a_hp<ch[cn].hp[5]*600 && ch[cn].a_mana>ch[cn].mana[5]*300)
-		|| (pinline && ch[cn].a_hp>=ch[cn].hp[5]*999 && globs->mdtime%(BS_MINS)==0) 
+		|| (pinline && ch[cn].a_hp>=ch[cn].hp[5]*999 && globs->mdtime%MD_MIN==0) 
 		|| (ch[cn].a_mana>ch[cn].mana[5]*666 && (pinline<1 
 		|| (ch[cn].data[3]<2 && ch[cn].data[2]>=BS_RC*1) || (ch[cn].data[3]< 4 && ch[cn].data[2]>=BS_RC*2)
 		|| (ch[cn].data[3]<7 && ch[cn].data[2]>=BS_RC*3) || (ch[cn].data[3]<11 && ch[cn].data[2]>=BS_RC*4))))
@@ -3742,7 +3771,7 @@ void stronghold_mage_driver_ver2(int cn)
 	if (p<1)
 	{
 		// Clean up candles once every 6 hours if nobody is there
-		if (globs->mdtime%(BS_HOUR*6)>1 && globs->mdtime%(BS_HOUR*6)<2160 && 
+		if (globs->mdtime%(MD_HOUR*6)>1 && globs->mdtime%(MD_HOUR*6)<2160 && 
 			ch[cn].data[1]!=0 && ch[cn].data[1]!=1)
 		{
 			if (shiva_activate_candle(cn, in, 0))
@@ -4821,7 +4850,7 @@ int npc_driver_high(int cn)
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return 1;
 		}
-		if (co && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
+		if (co && npc_try_spell(cn, cn, SK_PULSE))
 		{
 			return 1;
 		}
@@ -5051,17 +5080,17 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 				switch (candlenum)
 				{
 					case 0: 
-						do_char_log(n, 3, "Tactician: \"The northern stronghold is calming down!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is calming down!\"\n"); break;
 					case 1: 
-						do_char_log(n, 3, "Tactician: \"The northern stronghold is starting to stir!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is starting to stir!\"\n"); break;
 					case 2: 
-						do_char_log(n, 3, "Tactician: \"The northern stronghold is growing in numbers!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is growing in numbers!\"\n"); break;
 					case 3: 
-						do_char_log(n, 3, "Tactician: \"The northern stronghold is building its forces! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is building its forces! Alert!\"\n"); break;
 					case 4: 
-						do_char_log(n, 3, "Tactician: \"The northern stronghold is nearing full strength! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is nearing full strength! Alert!\"\n"); break;
 					case 5: 
-						do_char_log(n, 3, "Tactician: \"The northern stronghold is at full strength! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
 			else if (ch[cn].temp==CT_BSMAGE2 && (is_inline(n, 2) || (points2rank(ch[n].points_tot)>=9 && points2rank(ch[n].points_tot)<=13)))
@@ -5069,17 +5098,17 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 				switch (candlenum)
 				{
 					case 0: 
-						do_char_log(n, 3, "Tactician: \"The central stronghold is calming down!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is calming down!\"\n"); break;
 					case 1: 
-						do_char_log(n, 3, "Tactician: \"The central stronghold is starting to stir!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is starting to stir!\"\n"); break;
 					case 2: 
-						do_char_log(n, 3, "Tactician: \"The central stronghold is growing in numbers!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is growing in numbers!\"\n"); break;
 					case 3: 
-						do_char_log(n, 3, "Tactician: \"The central stronghold is building its forces! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is building its forces! Alert!\"\n"); break;
 					case 4: 
-						do_char_log(n, 3, "Tactician: \"The central stronghold is nearing full strength! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is nearing full strength! Alert!\"\n"); break;
 					case 5: 
-						do_char_log(n, 3, "Tactician: \"The central stronghold is at full strength! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
 			else if (ch[cn].temp==CT_BSMAGE3 && (is_inline(n, 3) || points2rank(ch[n].points_tot)>=14))
@@ -5087,17 +5116,17 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 				switch (candlenum)
 				{
 					case 0: 
-						do_char_log(n, 3, "Tactician: \"The southern stronghold has calmed down!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The southern stronghold has calmed down!\"\n"); break;
 					case 1: 
-						do_char_log(n, 3, "Tactician: \"The southern stronghold has started to stir!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The southern stronghold has started to stir!\"\n"); break;
 					case 2: 
-						do_char_log(n, 3, "Tactician: \"The southern stronghold is growing in numbers!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The southern stronghold is growing in numbers!\"\n"); break;
 					case 3: 
-						do_char_log(n, 3, "Tactician: \"The southern stronghold is building its forces! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The southern stronghold is building its forces! Alert!\"\n"); break;
 					case 4: 
-						do_char_log(n, 3, "Tactician: \"The southern stronghold is nearing full strength! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The southern stronghold is nearing full strength! Alert!\"\n"); break;
 					case 5: 
-						do_char_log(n, 3, "Tactician: \"The southern stronghold is at full strength! Alert!\"\n"); break;
+						do_char_log(n, 3, "Tactician shouts: \"The southern stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
 		}
@@ -5172,7 +5201,7 @@ int npc_check_placement(int cn, int in, int n)
 		{
 			return 0;
 		}
-		else if ((in = ch[cn].worn[WN_RHAND])!=0 && (it[in].placement & PL_TWOHAND))
+		else if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))
 		{
 			return 0;
 		}
@@ -5185,7 +5214,7 @@ int npc_check_placement(int cn, int in, int n)
 		{
 			return 0;
 		}
-		else if ((it[in].placement & PL_TWOHAND) && ch[cn].worn[WN_LHAND])
+		else if (IS_TWOHAND(in) && ch[cn].worn[WN_LHAND])
 		{
 			return 0;
 		}
@@ -5208,11 +5237,11 @@ int npc_check_placement(int cn, int in, int n)
 		{
 			return 0;
 		}
-		else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && (it[in].placement & PL_TWOHAND))
+		else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))
 		{
 			return 0;
 		}
-		else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && (it[in].placement & PL_TWOHAND))
+		else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))
 		{
 			return 0;
 		}

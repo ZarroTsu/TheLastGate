@@ -178,6 +178,9 @@ int god_read_banlist(void);
 void god_shutup(int cn, int co);
 void god_cleanslots(int cn);
 void god_reset_greeters(int cn);
+void god_reset_player(int cn, int co);
+void god_reset_players(int cn);
+void god_reset_npcs(int cn);
 void god_reset_ticker(int cn);
 
 // ---- do ----
@@ -268,6 +271,7 @@ void really_update_char(int cn);
 void do_appraisal(int cn, int in);
 void do_trash(int cn);
 void do_swap_gear(int cn);
+void do_force_recall(int cn);
 
 //-- use --
 void use_driver(int cn, int in, int worn);
@@ -277,11 +281,15 @@ void item_damage_armor(int cn, int dam);
 void item_damage_weapon(int cn, int dam);
 void item_damage_citem(int cn, int dam);
 void item_damage_worn(int cn, int n, int dam);
+void item_damage_alt_worn(int cn, int n, int dam);
+void item_damage_held(int cn, int n, int dam);
 int item_age(int in);
 void step_driver_remove(int cn, int in);
 int sub_door_driver(int cn, int in);
 void finish_laby_teleport(int cn, int nr, int exp_pts);
 void show_pent_count(int cn);
+int explorer_point(int cn, int in, int msg);
+int use_seyan_shrine(int cn, int in, int flag);
 
 //-- effect --
 void effect_tick(void);
@@ -350,14 +358,15 @@ int use_soulfocus(int cn, int in);
 int use_soulcatalyst(int cn, int in);
 void make_catalyst(int cn, int base);
 void make_focus(int cn, int base);
+void set_random_text(int cn);
 int load_mod(void);
 void set_cap(int cn, int nr);
-int get_sb(int v, int i);
 int start_contract(int cn, int in);
 int get_tier_font(int tier);
 void show_map_flags(int cn, int flags, int tier);
 void clear_map_buffs(int cn, int flag);
 void add_map_progress(int loc);
+void add_map_goal(int loc, int v);
 int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, int tarot);
 
 //-- skill_driver --

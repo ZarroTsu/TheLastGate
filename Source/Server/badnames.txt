@@ -67,7 +67,6 @@ spell
 seyan
 world
 cool
-two
 status
 movie
 collector
@@ -76,7 +75,6 @@ nobel
 noble
 ragez
 wizard
-frog
 hero
 lord
 intin

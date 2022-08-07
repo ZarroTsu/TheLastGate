@@ -16,16 +16,9 @@
 #include "npc.h"
 
 // 1 in-game hour
-#define T_HOUR 3600
+#define T_HOUR (200 * TICKS)
 // The rate at which raids happen
 #define T_RAID (T_HOUR*4)
-
-// 3600*4 = 21600 / 18 / 60 = 13 minutes IRL
-// 3600*5 = 21600 / 18 / 60 = 16 minutes IRL
-// 3600*6 = 21600 / 18 / 60 = 20 minutes IRL
-// 3600*8 = 28800 / 18 / 60 = 26 minutes irl
-// 3600*9 = 32400 / 18 / 60 = 30 minutes IRL
-
 
 // NOTE: Even though we don't use the data[] array, we may only use it as it is used in driver.c, since a lot
 //	 of other functions rely on the data in there being either absent or correct.
@@ -305,7 +298,7 @@ int npc_cityattack_high(int cn)
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return 1;
 		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_PULSE))
 		{
 			return 1;
 		}

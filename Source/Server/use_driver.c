@@ -299,7 +299,7 @@ int use_create_item2(int cn, int in)
 
 int use_recall_chest(int cn, int in)
 {
-	int in2, n;
+	int in2, n, j = 1;
 	
 	if (cn==0)
 	{
@@ -323,29 +323,22 @@ int use_recall_chest(int cn, int in)
 		}
 	}
 	
-	in2 = god_create_buff();
-
-	strcpy(bu[in2].name, "Recall");
-	strcpy(bu[in2].reference, "recall");
-	strcpy(bu[in2].description, "Recall.");
-
-	bu[in2].flags    |= IF_SPELL;
-	bu[in2].temp      = SK_RECALL;
-	bu[in2].sprite[1] = BUF_SPR_RECALL;
-	bu[in2].power 	  = 999;
-	bu[in2].data[1]   = ch[cn].temple_x;
-	bu[in2].data[2]   = ch[cn].temple_y;
-	bu[in2].data[4]   = 1;
-	bu[in2].duration  = bu[in2].active = 180;
+	if (it[in].power==53)
+	{
+		j = use_create_item(cn, in);
+	}
+	else
+	{
+		j = use_create_item3(cn, in);
+	}
 	
+	if (j)
+	{
+		do_force_recall(cn);
+		return 1;
+	}
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
-	
-	add_spell(cn, in2);
-	
-	if (it[in].power==53) return use_create_item(cn, in);
-		
-	return use_create_item3(cn, in);
+	return 0;
 }
 
 int use_create_item3(int cn, int in)
@@ -1707,7 +1700,7 @@ int reward_teleport(int cn, int in)
 	{
 		if (it[in].data[9]<12)
 		{
-			if (it[in].data[9]>9 && !RANDOM(16))
+			if (it[in].data[9]>9 && !RANDOM(20))
 			{
 				switch (RANDOM(5))
 				{	case  0: n = IT_RD_BRV; break;
@@ -1717,7 +1710,7 @@ int reward_teleport(int cn, int in)
 					default: n = IT_RD_STR; break;
 				}	in2 = god_create_item(n);
 			}
-			else if (it[in].data[9]>5 && !RANDOM(12))
+			else if (it[in].data[9]>5 && !RANDOM(20))
 			{
 				switch (RANDOM(2))
 				{	case  0: n = IT_RD_HP; break;
@@ -1814,7 +1807,7 @@ int teleport(int cn, int in)
 
 	if (it[in].data[2])     // lab-solved teleport
 	{
-		return(use_labtransfer(cn, it[in].data[2], it[in].data[3]));
+		return use_labtransfer(cn, it[in].data[2], it[in].data[3]);
 	}
 	else
 	{
@@ -2074,11 +2067,11 @@ int use_scroll(int cn, int in)
 
 int use_scroll2(int cn, int in)
 {
-	int nr, pts, v;
+	int nr, pts, v, tmp;
 
 	nr = it[in].data[0];
-
 	v = B_AT(cn, nr);
+	
 	if (v>=ch[cn].attrib[nr][2])
 	{
 		do_char_log(cn, 0, "You cannot raise %s any higher.\n", at_name[nr]);
@@ -2092,26 +2085,39 @@ int use_scroll2(int cn, int in)
 	B_AT(cn, nr)++;
 
 	do_check_new_level(cn, 1);
-
-	it[in].used = USE_EMPTY;
-	god_take_from_char(in, cn);
+	
+	if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
+	{
+		tmp = it[in].value / it[in].stack;
+		it[in].stack--;
+		it[in].value = tmp * it[in].stack;
+	}
+	else
+	{
+		it[in].used = USE_EMPTY;
+		god_take_from_char(in, cn);
+	}
 
 	do_update_char(cn);
 
-	return 1;
+	return 0;
 }
 
 int use_scroll3(int cn, int in)
 {
-	int am, pts = 0, v, n;
+	int am, pts = 0, v, n, tmp;
 
 	am = it[in].data[0];
-
 	v = ch[cn].hp[0];
-	if (v>=ch[cn].hp[2])
+	
+	if (v >= ch[cn].hp[2])
 	{
 		do_char_log(cn, 0, "You cannot raise Hitpoints any higher.\n");
 		return 0;
+	}
+	else if (am + v > ch[cn].hp[2])
+	{
+		am = ch[cn].hp[2] - v;
 	}
 	do_char_log(cn, 1, "Raised Hitpoints by %d.\n", am);
 	chlog(cn, "Used scroll to raise Hitpoints by %d", am);
@@ -2125,25 +2131,38 @@ int use_scroll3(int cn, int in)
 
 	do_check_new_level(cn, 1);
 
-	it[in].used = USE_EMPTY;
-	god_take_from_char(in, cn);
+	if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
+	{
+		tmp = it[in].value / it[in].stack;
+		it[in].stack--;
+		it[in].value = tmp * it[in].stack;
+	}
+	else
+	{
+		it[in].used = USE_EMPTY;
+		god_take_from_char(in, cn);
+	}
 
 	do_update_char(cn);
 
-	return 1;
+	return 0;
 }
 
 int use_scroll4(int cn, int in)
 {
-	int am, pts = 0, v, n;
+	int am, pts = 0, v, n, tmp;
 
 	am = it[in].data[0];
-
 	v = ch[cn].end[0];
-	if (v>=ch[cn].end[2])
+	
+	if (v >= ch[cn].end[2])
 	{
 		do_char_log(cn, 0, "You cannot raise Endurance any higher.\n");
 		return 0;
+	}
+	else if (am + v > ch[cn].end[2])
+	{
+		am = ch[cn].end[2] - v;
 	}
 	do_char_log(cn, 1, "Raised Endurance by %d.\n", am);
 	chlog(cn, "Used scroll to raise Endurance by %d", am);
@@ -2159,25 +2178,38 @@ int use_scroll4(int cn, int in)
 
 	do_check_new_level(cn, 1);
 
-	it[in].used = USE_EMPTY;
-	god_take_from_char(in, cn);
+	if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
+	{
+		tmp = it[in].value / it[in].stack;
+		it[in].stack--;
+		it[in].value = tmp * it[in].stack;
+	}
+	else
+	{
+		it[in].used = USE_EMPTY;
+		god_take_from_char(in, cn);
+	}
 
 	do_update_char(cn);
 
-	return 1;
+	return 0;
 }
 
 int use_scroll5(int cn, int in)
 {
-	int am, pts = 0, v, n;
+	int am, pts = 0, v, n, tmp;
 
 	am = it[in].data[0];
-
 	v = ch[cn].mana[0];
-	if (v>=ch[cn].mana[2])
+	
+	if (v >= ch[cn].mana[2])
 	{
 		do_char_log(cn, 0, "You cannot raise Mana any higher.\n");
 		return 0;
+	}
+	else if (am + v > ch[cn].mana[2])
+	{
+		am = ch[cn].mana[2] - v;
 	}
 	do_char_log(cn, 1, "Raised Mana by %d.\n", am);
 	chlog(cn, "Used scroll to raise Mana by %d", am);
@@ -2191,12 +2223,21 @@ int use_scroll5(int cn, int in)
 
 	do_check_new_level(cn, 1);
 
-	it[in].used = USE_EMPTY;
-	god_take_from_char(in, cn);
+	if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
+	{
+		tmp = it[in].value / it[in].stack;
+		it[in].stack--;
+		it[in].value = tmp * it[in].stack;
+	}
+	else
+	{
+		it[in].used = USE_EMPTY;
+		god_take_from_char(in, cn);
+	}
 
 	do_update_char(cn);
 
-	return 1;
+	return 0;
 }
 
 // Exp Scroll
@@ -2269,7 +2310,7 @@ int use_scroll9(int cn, int in)
 {
 	if (IS_FEMALE(cn))
 	{	// Change from Female to Male
-		ch[cn].kindred |= KIN_MALE; ch[cn].kindred &= ~KIN_FEMALE;
+		ch[cn].kindred &= ~KIN_FEMALE;
 		if (IS_SEYAN_DU(cn))			ch[cn].sprite =  3024;
 		else if (IS_ARCHTEMPLAR(cn))	ch[cn].sprite = 23504;
 		else if (IS_SKALD(cn))		ch[cn].sprite = 26048;
@@ -2284,7 +2325,7 @@ int use_scroll9(int cn, int in)
 	}
 	else
 	{	// Change from Male to Female
-		ch[cn].kindred |= KIN_FEMALE; ch[cn].kindred &= ~KIN_MALE;
+		ch[cn].kindred |= KIN_FEMALE;
 		if (IS_SEYAN_DU(cn))			ch[cn].sprite = 11216;
 		else if (IS_ARCHTEMPLAR(cn))	ch[cn].sprite = 24528;
 		else if (IS_SKALD(cn))		ch[cn].sprite = 22948;
@@ -2414,36 +2455,38 @@ int use_scroll_S(int cn, int in)
 	do_update_char(cn);
 }
 
+#define MAX_CON_MODS	10
+
 int use_map_contract(int cn, int in)
 {
-	static unsigned int cntrct_1a[6] = {
+	static int cntrct_1a[6] = {
 	//	Ex Enemy	Ex Divin	En Roam		Clr Exp		Clr Luck	Gold Pl
-		0x00000001, 0x00000002, 0x00000100, 0x00100000, 0x00200000, 0x08000000
+		0,			1,			8,			20,			21,			27
 	};
-	static unsigned int cntrct_1b[5] = {
+	static int cntrct_1b[5] = {
 	//	Underwtr	En Perc		Pl Frag		En Tarot	En Tarot2
-		0x00000008, 0x00000200, 0x00020000, 0x01000000, 0x02000000
+		3,			9,			17,			24,			25
 	};
-	static unsigned int cntrct_2a[4] = {
+	static int cntrct_2a[4] = {
 	//	Boss En		Clr BSP		Kill Exp	+1 Rank
-		0x00000080, 0x00400000, 0x04000000, 0x10000000
+		7,			22,			26,			28
 	};
-	static unsigned int cntrct_2b[6] = {
+	static int cntrct_2b[6] = {
 	//	Spikes		Undead		En Sharp	En Forti	En Wiser	Pl Debil
-		0x00000020, 0x00000040, 0x00001000, 0x00002000, 0x00008000, 0x00010000
+		5,			6,			12,			13,			15,			16
 	};
-	static unsigned int cntrct_3a[4] = {
+	static int cntrct_3a[4] = {
 	//	Ex Chest	Ex Shrine	Ex OSP		+2 Rank
-		0x00000004, 0x00000010, 0x00800000, 0x20000000
+		2,			4,			23,			29
 	};
-	static unsigned int cntrct_3b[5] = {
+	static int cntrct_3b[5] = {
 	//	En Resis	En Skill	En Haste	Pl Stigm	Pl Hyper
-		0x00000400, 0x00000800, 0x00004000, 0x00040000, 0x00080000
+		10,			11,			14,			18,			19
 	};
-	int in2, spr, n, panic, font;
+	int in2, spr, n, j, panic, font, m = 0, fl = 0;
 	int rank, tier;
 	char buf[300];
-	unsigned int flags=0, m=0;
+	int flags[MAX_CON_MODS];
 	
 	in2 = ch[cn].citem;
 	
@@ -2467,6 +2510,8 @@ int use_map_contract(int cn, int in)
 		default: return 0;
 	}
 	
+	for (j=0;j<MAX_CON_MODS;j++) flags[j] = -2;
+	
 	it[in].data[0] = cn;
 	if (!it[in].data[4]) it[in].data[1] = RANDOM(MSN_COUNT);
 	it[in].data[2] = tier;
@@ -2477,48 +2522,50 @@ int use_map_contract(int cn, int in)
 		{
 			for (panic=0;panic<99;panic++)
 			{
-				switch (RANDOM(tier)+1)
+				m = -1;
+				switch (min(3,max(1,RANDOM(tier)+1)))
 				{
 					case  1: m = cntrct_1a[RANDOM(6)]; break;
 					case  2: m = cntrct_2a[RANDOM(4)]; break;
 					default: m = cntrct_3a[RANDOM(4)]; break;
 				}
-				if (!(flags & m))
+				for (j=0;j<MAX_CON_MODS;j++) if (flags[j] == m) break;
+				if (j==MAX_CON_MODS)
 				{
-					chlog(cn, "Added %d to flag %d", m, flags);
-					flags |= m;
-					break;
-				}
-				if (panic>14)
-				{
-					chlog(cn, "Panic! Couldn't add flag A to contract");
+					chlog(cn, "Added %d to flags", m);
+					flags[fl] = m;
+					fl++;
 					break;
 				}
 			}
 			for (panic=0;panic<99;panic++)
 			{
-				switch (RANDOM(tier)+1)
+				m = -1;
+				switch (min(3,max(1,RANDOM(tier)+1)))
 				{
 					case  1: m = cntrct_1b[RANDOM(5)]; break;
 					case  2: m = cntrct_2b[RANDOM(6)]; break;
 					default: m = cntrct_3b[RANDOM(5)]; break;
 				}
-				if (!(flags & m))
+				for (j=0;j<MAX_CON_MODS;j++) if (flags[j] == m) break;
+				if (j==MAX_CON_MODS)
 				{
-					chlog(cn, "Added %d to flag %d", m, flags);
-					flags |= m;
-					break;
-				}
-				if (panic>16)
-				{
-					chlog(cn, "Panic! Couldn't add flag B to contract");
+					chlog(cn, "Added %d to flags", m);
+					flags[fl] = m;
+					fl++;
 					break;
 				}
 			}
 		}
 	}
 	
-	it[in].data[3] = flags;
+	m = 0;
+	
+	if (fl) for (j=0;j<fl;j++) if (flags[j]>=0) m += (1<<flags[j]);
+	
+	chlog(cn, "Added flags %x to contract", m);
+	
+	it[in].data[3] = m;
 	it[in].data[4] = 1;
 	it[in].sprite[0] = spr;
 	it[in].flags |= IF_UPDATE;
@@ -2657,105 +2704,118 @@ int use_map_chest(int cn, int in)
 	{
 		return 0;
 	}
+	for (n = 0; n < 10; n++)
+	{
+		if (it[in].skill[n][0]*100+it[in].skill[n][1] == cn)
+		{
+			do_char_log(cn, 0, "You already opened this chest!\n");
+			return 0;
+		}
+	}
 	
 	rank = it[in].data[0];
 	tier = it[in].data[1];
 	
 	if (rank <= 8) 			// Sergeants
 	{
-		switch (RANDOM(12+tier))
+		switch (RANDOM(12-tier)+tier*2)
 		{
-			case  0: 
-			case  1:	n = IT_EXPS+RANDOM(2);						break;
-			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
-			case  3:	n = get_best_worn(cn, WN_BODY);				break;
-			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
-			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
-			case  6:	n = IT_POP_SPELL+RANDOM(7);					break;
-			case  7: 	n = IT_POP_ASPEL+RANDOM(7); 				break;
-			case  8:	n = IT_POT_EXHP+RANDOM(18); 				break;
-			case  9:	n = -1000;									break;
-			case 10:	n = !RANDOM(3)?(RANDOM(2)?102:125):101; 	break;
-			case 11: 	n = IT_CH_FOOL; 							break;
-			default:	n = IT_RPOT; 								break;
+			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  3: 	n = IT_CH_FOOL; 														break;
+			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			//
+			case  6: 	n = !RANDOM(3)?(RANDOM(2)?102:125):101; 								break;
+			case  7:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  8:	n = IT_POP_SPELL+RANDOM(7);												break;
+			case  9: 	n = IT_POP_ASPEL+RANDOM(7); 											break;
+			case 10:	
+			case 11:	n = -1000;																break;
+			default:	n = RANDOM(1+tier)?IT_RPOT:IT_POT_RAIN;									break;
 		}
 	}
 	else if (rank <= 14) 	// Officers
 	{
-		switch (RANDOM(12+tier))
+		switch (RANDOM(12-tier)+tier*2)
 		{
-			case  0: 
-			case  1:	n = IT_EXPS+RANDOM(2);						break;
-			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
-			case  3:	n = get_best_worn(cn, WN_BODY);				break;
-			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
-			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
-			case  6:	
-			case  7: 	n = IT_POP_ASPEL+RANDOM(7); 				break;
-			case  8:	n = IT_RPOT; 								break;
-			case  9:	n = -1000;									break;
-			case 10:	n = !RANDOM(3)?(RANDOM(2)?131:273):127; 	break;
-			case 11: 	n = IT_CH_FOOL; 							break;
-			default:	n = IT_RD_HP+RANDOM(2)*2; 					break;
+			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  3: 	n = IT_CH_FOOL; 														break;
+			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			//
+			case  6: 	n = !RANDOM(3)?(RANDOM(2)?131:273):127; 								break;
+			case  7:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  8:	
+			case  9: 	n = IT_POP_ASPEL+RANDOM(7); 											break;
+			case 10:	n = RANDOM(2+tier)?IT_RPOT:IT_POT_RAIN; 								break;
+			case 11:	n = -1000;																break;
+			default:	n = RANDOM(1+tier)?IT_RD_HP+RANDOM(2)*2:IT_POT_VITA+RANDOM(3); 			break;
 		}
 	}
 	else if (rank <= 19) 	// Generals
 	{
-		switch (RANDOM(12+tier))
+		switch (RANDOM(12-tier)+tier*2)
 		{
-			case  0: 
-			case  1:	n = IT_EXPS+RANDOM(2);						break;
-			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
-			case  3:	n = get_best_worn(cn, WN_BODY);				break;
-			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
-			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
-			case  6:	n = IT_POP_ASPEL+RANDOM(7); 				break;
-			case  7: 	n = IT_POP_ISPEL+RANDOM(7); 				break;
-			case  8:	n = IT_POT_VITA+RANDOM(3); 					break;
-			case  9:	n = -1000;									break;
-			case 10:	n = RANDOM(6)?2510:(IT_BL_SOLAR+RANDOM(2));	break;
-			case 11: 	n = IT_CH_FOOL_R; 							break;
-			default:	n = IT_GPOT; 								break;
+			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  3: 	n = IT_CH_FOOL_R; 														break;
+			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			//
+			case  6: 	n = RANDOM(2+tier)?IT_RD_HP+RANDOM(2)*2:IT_POT_VITA+RANDOM(3); 			break;
+			case  7:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  8:	n = IT_POP_ASPEL+RANDOM(7); 											break;
+			case  9: 	n = IT_POP_ISPEL+RANDOM(7); 											break;
+			case 10:	n = -1000;																break;
+			case 11:	n = RANDOM(6)?2510:(IT_BL_SOLAR+RANDOM(2));								break;
+			default:	n = RANDOM(1+tier)?IT_GPOT:IT_RPOT;										break;
 		}
 	}
 	else if (rank <= 24)	// Nobles
 	{
-		switch (RANDOM(12+tier))
+		switch (RANDOM(12-tier)+tier*2)
 		{
-			case  0: 
-			case  1:	n = IT_EXPS+RANDOM(2);						break;
-			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
-			case  3:	n = get_best_worn(cn, WN_BODY);				break;
-			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
-			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
-			case  6:	
-			case  7: 	n = IT_POP_ISPEL+RANDOM(7); 				break;
-			case  8:	n = IT_GPOT; 								break;
-			case  9:	n = -1000;									break;
-			case 10:	n = RANDOM(6)?2511:(1243+RANDOM(2)*2);		break;
-			case 11: 	n = IT_CH_FOOL_R; 							break;
-			default:	n = IT_RD_BRV+RANDOM(5); 					break; 
+			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  3: 	n = IT_CH_FOOL_R; 														break;
+			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			//
+			case  6:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  7:	
+			case  8: 	n = IT_POP_ISPEL+RANDOM(7); 											break;
+			case  9:	n = RANDOM(2+tier)?IT_GPOT:IT_RPOT; 									break;
+			case 10:	n = -1000;																break;
+			case 11:	n = RANDOM(6)?2511:(1243+RANDOM(2)*2);									break;
+			default:	n = RANDOM(1+tier)?IT_RD_BRV+RANDOM(5):IT_RD_HP+RANDOM(2)*2; 			break; 
 		}
 	}
 	else					// Uber
 	{
-		switch (RANDOM(12+tier))
+		switch (RANDOM(12-tier)+tier*2)
 		{
-			case  0: 
-			case  1:	n = IT_EXPS+RANDOM(2);						break;
-			case  2:	n = get_best_worn(cn, WN_HEAD);				break;
-			case  3:	n = get_best_worn(cn, WN_BODY);				break;
-			case  4:	n = get_best_worn(cn, WN_RHAND);			break;
-			case  5:	n = get_best_worn(cn, WN_LHAND);			break;
-			case  6:	n = IT_POP_ISPEL+RANDOM(7); 				break;
-			case  7: 	n = IT_POP_SSPEL+RANDOM(7); 				break;
-			case  8:	n = IT_SPOT; 								break;
-			case  9:	n = -1000;									break;
-			case 10:	
-			case 11: 	n = IT_POT_D_HP+RANDOM(3)*6; 				break;
+			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			case  2:	
+			case  3: 	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
+			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
+			//
+			case  6:	n = IT_POP_ISPEL+RANDOM(7); 											break;
+			case  7: 	n = IT_POP_SSPEL+RANDOM(7); 											break;
+			case  8:	n = RANDOM(1+tier)?IT_SPOT:IT_GPOT; 									break;
+			case  9:	n = -1000;																break;
+			case 10:	n = RANDOM(2+tier)?IT_RD_BRV+RANDOM(5):IT_RD_HP+RANDOM(2)*2; 			break;
+			case 11: 	n = IT_POT_D_HP+RANDOM(3)*6; 											break;
 			case 12:	
-			case 13:	n = IT_OS_SK; 								break; 
-			default:	n = IT_OS_BRV+RANDOM(5);					break; 
+			case 13:	n = IT_OS_SK; 															break; 
+			default:	n = IT_OS_BRV+RANDOM(5);												break; 
 		}
 	}
 	
@@ -2766,7 +2826,7 @@ int use_map_chest(int cn, int in)
 	
 	if (n==-1000)
 	{
-		n = (RANDOM(rank+tier)+1)*(RANDOM(rank+tier)+1)*(RANDOM(6)+5);
+		n = max(5, (rank-5) * (rank-5) + (RANDOM(rank/2+tier*5)+1)*(RANDOM(rank/2+tier*5)+1)*(RANDOM(6)+5));
 		do_char_log(cn, 1, "You found %d Gold.\n", n);
 		chlog(cn, "Got %dG from %s", n, it[in].name);
 		ch[cn].gold += n * 100;
@@ -2798,9 +2858,9 @@ int use_map_chest(int cn, int in)
 			chlog(cn, "Got %s from %s", it[in2].name, it[in].name);
 		}
 	}
-
+	
 	// Contract progress
-	if (CONT_SCEN(cn)==6)
+	if (!it[in].data[3] && CONT_SCEN(cn)==6)
 	{
 		add_map_progress(CONT_NUM(cn));
 		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
@@ -2808,8 +2868,19 @@ int use_map_chest(int cn, int in)
 		else
 			do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 	}
+	else if (CONT_SCEN(cn)==6)
+	{
+		do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
+	}
 	
-	return 1;
+	it[in].skill[it[in].data[3]][0] = cn/100;
+	it[in].skill[it[in].data[3]][1] = cn%100;
+	it[in].data[3]++;
+	
+	if (it[in].data[3] >= it[in].data[2]) 
+		return 1;
+	else
+		return 0;
 }
 
 int get_random_backpack_item(int cn)
@@ -2857,6 +2928,14 @@ int use_map_shrine(int cn, int in)
 	if (it[in].active)
 	{
 		return 0;
+	}
+	for (n = 0; n < 10; n++)
+	{
+		if (it[in].skill[n][0]*100+it[in].skill[n][1]==cn)
+		{
+			do_char_log(cn, 0, "You already used this shrine!\n");
+			return 0;
+		}
 	}
 	
 	rank = it[in].data[2];
@@ -2948,9 +3027,13 @@ int use_map_shrine(int cn, int in)
 					break;
 				default:
 					do_char_log(cn, 0, "Cruelty abound.\n");
-					base = max(15, (rank-5)*11/2+15);
+					base = max(15, (rank-5)*5 + 15);
 					use_create_map_nme(tier, flags, base+2, tarot, it[in].x, it[in].y, 4);
 					use_create_map_nme(tier, flags, base+2, tarot, it[in].x, it[in].y, 4);
+					if (CONT_SCEN(cn)==1 || CONT_SCEN(cn)==3)
+					{
+						add_map_goal(maploc, 2);
+					}
 					break;
 			}
 			break;
@@ -3015,7 +3098,7 @@ int use_map_shrine(int cn, int in)
 			switch (it[in].data[1])
 			{
 				case  1:
-					p = p/60; ch[cn].luck += p;
+					p = p/55; ch[cn].luck += p;
 					do_char_log(cn, 2, "Your lucky day.\n");
 					chlog(cn, "Gets %d Luck", p);
 					do_char_log(cn, 1, "You got %d luck.\n", p);
@@ -3033,13 +3116,13 @@ int use_map_shrine(int cn, int in)
 					do_char_log(cn, 1, "You got %d experience points.\n", p);
 					break;
 				case  4:
-					p = p/50; ch[cn].os_points += p;
+					p = p/33; ch[cn].os_points += p;
 					do_char_log(cn, 2, "Osiris smiles.\n");
 					chlog(cn, "Gets %d OSP", p);
 					do_char_log(cn, 1, "You got %d contract points.\n", p);
 					break;
 				default:
-					p = p/40; ch[cn].bs_points += p;
+					p = p/44; ch[cn].bs_points += p;
 					do_char_log(cn, 2, "The stronghold falls.\n");
 					chlog(cn, "Gets %d BSP", p);
 					do_char_log(cn, 1, "You got %d stronghold points.\n", p);
@@ -3051,7 +3134,7 @@ int use_map_shrine(int cn, int in)
 	}
 	
 	// Contract progress
-	if (CONT_SCEN(cn)==5) 
+	if (!it[in].data[7] && CONT_SCEN(cn)==5) 
 	{
 		add_map_progress(CONT_NUM(cn));
 		if (CONT_PROG(cn)>=CONT_GOAL(cn)) 
@@ -3059,8 +3142,19 @@ int use_map_shrine(int cn, int in)
 		else
 			do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 	}
+	else if (CONT_SCEN(cn)==5) 
+	{
+		do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
+	}
 	
-	return 1;
+	it[in].skill[it[in].data[7]][0] = cn/100;
+	it[in].skill[it[in].data[7]][1] = cn%100;
+	it[in].data[7]++;
+	
+	if (it[in].data[7] >= it[in].data[6]) 
+		return 1;
+	else
+		return 0;
 }
 
 int use_map_portal(int cn, int in)
@@ -3190,12 +3284,12 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			power = ch[cn].hp[5]/4;
-			if (ch[cn].a_hp + 500 < power)
+			if (ch[cn].a_hp + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough life.\n");
 				return 0;
 			}
-			ch[cn].a_hp -= power;
+			ch[cn].a_hp -= power*1000;
 			ret = spell_bloodletting(cn, co, power);
 			break;
 		case    SK_STARLIGHT:
@@ -3205,12 +3299,12 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			power = ch[cn].mana[5]/4;
-			if (ch[cn].a_mana + 500 < power)
+			if (ch[cn].a_mana + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough mana.\n");
 				return 0;
 			}
-			ch[cn].a_mana -= power;
+			ch[cn].a_mana -= power*1000;
 			item_damage_worn(cn, WN_RHAND, 500);
 			if (get_gear(cn, IT_WP_LIFESPRIG) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_starlight(cn, co, power, 1);
@@ -3222,12 +3316,12 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			power = ch[cn].end[5]/2;
-			if (ch[cn].a_end + 500 < power)
+			if (ch[cn].a_end + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough endurance.\n");
 				return 0;
 			}
-			ch[cn].a_end -= power;
+			ch[cn].a_end -= power*1000;
 			item_damage_worn(cn, WN_LHAND, 500);
 			if (get_gear(cn, IT_WP_CRESSUN) && power) spell_pomesol(cn, cn, power, 0);
 			ret = spell_phalanx(cn, co, power, 1);
@@ -3309,6 +3403,47 @@ int use_make_talisman(int cn, int in)
 	god_take_from_char(in, cn);
 	it[in].used = USE_EMPTY;
 	god_give_char(in2, cn);
+	
+	return 1;
+}
+
+int use_special_chest(int cn, int in)
+{
+	int cc, in2, n;
+	
+	if (cn==0)			return 0;
+	if (it[in].active)	return 0;
+	
+	cc = god_create_char(1, 0);
+	if (!god_drop_char_fuzzy(cc, 20, 10))
+	{
+		ch[cc].used = USE_EMPTY;
+		do_char_log(cn, 0, "Nothing happened.\n");
+		return 0;
+	}
+	
+	if (!(in2 = it[in].data[0])) return 0;
+	if (in2 == IT_CH_FOOL || in2 == IT_CH_FOOL_R)
+	{
+		for (n = 0; n<5; n++)
+		{
+			it[in].data[n] = in2 + RANDOM(22);
+		}
+	}
+	
+	for (n = 0; n<10; n++)
+	{
+		if (!(in2 = it[in].data[n])) break;
+		in2 = get_special_item(in2, 0, 0, 0);
+		god_give_char(in2, cc);
+	}
+	
+	sprintf(ch[cc].name, "Chest");
+	ch[cc].gcm = 9;
+	ch[cc].data[49] = in;
+	ch[cc].data[64] = globs->ticker + TICKS * 60 * 30;
+	
+	do_look_char(cn, cc, 0, 0, 1);
 	
 	return 1;
 }
@@ -3431,7 +3566,7 @@ int use_crystal_sub(int cn, int in)
 	
 	ch[cc].goto_x = m % MAPX;
 	ch[cc].goto_y = m / MAPX;
-	ch[cc].data[60] = 18 * 20;
+	ch[cc].data[60] = TICKS * 20;
 	ch[cc].data[62] = 1;
 	
 	if (sss)
@@ -3454,28 +3589,7 @@ int use_crystal_sub(int cn, int in)
 		
 		if (!(ch[cc].flags & CF_EXTRAEXP)) ch[cc].flags |= CF_EXTRAEXP;
 	}
-	
-	switch (RANDOM(4))
-	{
-		case  1:	strcpy(ch[cc].text[0], "An end to your misery, %s!"); break;
-		case  2:	strcpy(ch[cc].text[0], "Took you long enough, %s!"); break;
-		case  3:	strcpy(ch[cc].text[0], "It's about time! Goodbye, %s!"); break;
-		default:	strcpy(ch[cc].text[0], "Yes! Die, %s!"); break;
-	}
-	switch (RANDOM(4))
-	{
-		case  1:	strcpy(ch[cc].text[1], "Something to do! Let's duel to the end, %s!"); break;
-		case  2:	strcpy(ch[cc].text[1], "I hope you know what you're doing, %s!"); break;
-		case  3:	strcpy(ch[cc].text[1], "A worthy foe! Let us shake the void, %s!"); break;
-		default:	strcpy(ch[cc].text[1], "Yahoo! An enemy! Prepare to die, %s!"); break;
-	}
-	switch (RANDOM(4))
-	{
-		case  1:	strcpy(ch[cc].text[3], "Alas, I've lost. Good fight, %s!"); break;
-		case  2:	strcpy(ch[cc].text[3], "Seems this is the end for me. So long, %s."); break;
-		case  3:	strcpy(ch[cc].text[3], "Great fight, %s. I suppose this is goodbye."); break;
-		default:	strcpy(ch[cc].text[3], "Thank you %s! Everything is better than being here."); break;
-	}
+	set_random_text(cc);
 	
 	ch[cc].data[48] = 33;
 
@@ -3525,7 +3639,7 @@ int use_crystal_sub(int cn, int in)
 
 	ch[cc].points_tot = pts;
 	ch[cc].gold   = (base/2 * (RANDOM(base)+1) + RANDOM(100) + 1);
-	ch[cc].gold  += RANDOM(1+ch[cc].gold*sss);
+	ch[cc].gold  += ch[cc].gold/2 + RANDOM(1+ch[cc].gold*sss/2);
 	ch[cc].a_hp   = 999999;
 	ch[cc].a_end  = 999999;
 	ch[cc].a_mana = 999999;
@@ -4030,7 +4144,7 @@ int use_crystal_sub(int cn, int in)
 				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(50-sss)==0 && base>(40+6))
+		else if (RANDOM(50-sss*2)==0 && base>(40+6))
 		{	switch(RANDOM(12))
 			{	case  0: god_give_char(tmp = god_create_item(IT_POT_H_HP), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_POT_S_HP), cc); break;
@@ -4052,19 +4166,19 @@ int use_crystal_sub(int cn, int in)
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(75-sss)==0 && base>(40+18))
+		else if (RANDOM(75-sss*3)==0 && base>(40+18))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(100-sss)==0 && base>(40+24))
+		if (RANDOM(100-sss*2)==0 && base>(40+24))
 		{	switch(RANDOM(2))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(150-sss)==0 && base>(40+30))
+		else if (RANDOM(150-sss*5)==0 && base>(40+30))
 		{	switch(RANDOM(5))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
@@ -4094,7 +4208,7 @@ int use_crystal_sub(int cn, int in)
 				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(100-sss)==0 && base>(80+4))
+		else if (RANDOM(100-sss*4)==0 && base>(80+4))
 		{	god_give_char(tmp = god_create_item(1985+RANDOM(15)), cc);
 			xlog("  got %s", it[tmp].name);
 		}
@@ -4116,13 +4230,13 @@ int use_crystal_sub(int cn, int in)
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTHR, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(100-sss)==0 && base>(80+24))
+		else if (RANDOM(100-sss*2)==0 && base>(80+24))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYFOU, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTFOU, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(120-sss)==0 && base>(80+20))
+		if (RANDOM(120-sss*4)==0 && base>(80+20))
 		{	switch(RANDOM(5))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
@@ -4502,6 +4616,33 @@ int use_pile(int cn, int in)
 		IT_E_MA, IT_E_MA, IT_E_MA, IT_E_MA, IT_E_MA, 
 		0
 	};
+	static int find_U[] = { 
+		// 12% - Platinum
+		IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, 
+		IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, IT_PLAT, 
+		//  2% - Fragment
+		IT_TALISFRAG, IT_TALISFRAG, 
+		//  4% ea - Gems
+		IT_F_SA, IT_F_SA, IT_F_SA, IT_F_SA, 
+		IT_F_RU, IT_F_RU, IT_F_RU, IT_F_RU, 
+		IT_F_AM, IT_F_AM, IT_F_AM, IT_F_AM, 
+		IT_F_TO, IT_F_TO, IT_F_TO, IT_F_TO, 
+		IT_F_EM, IT_F_EM, IT_F_EM, IT_F_EM, 
+		IT_F_DI, IT_F_DI, IT_F_DI, IT_F_DI, 
+		IT_F_SP, IT_F_SP, IT_F_SP, IT_F_SP, 
+		IT_F_CI, IT_F_CI, IT_F_CI, IT_F_CI, 
+		IT_F_OP, IT_F_OP, IT_F_OP, IT_F_OP, 
+		IT_F_AQ, IT_F_AQ, IT_F_AQ, IT_F_AQ, 
+		IT_F_BE, IT_F_BE, IT_F_BE, IT_F_BE, 
+		IT_F_ZI, IT_F_ZI, IT_F_ZI, IT_F_ZI, 
+		IT_H_PH, IT_H_PH, IT_H_PH, IT_H_PH, 
+		IT_F_PH, IT_F_PH, IT_F_PH, IT_F_PH, 
+		// 30% - Gargoyle
+		IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, 
+		IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, 
+		IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, 
+		0
+	};
 
 	if (it[in].active)
 	{
@@ -4531,6 +4672,7 @@ int use_pile(int cn, int in)
 	{
 		switch (level)
 		{
+			case 5: 	tmp = RANDOM(ARRAYSIZE(find_U)-1); tmp = find_U[tmp]; break;
 			case 4: 	tmp = RANDOM(ARRAYSIZE(find_F)-1); tmp = find_F[tmp]; break;
 			case 3: 	tmp = RANDOM(ARRAYSIZE(find_H)-1); tmp = find_H[tmp]; break;
 			case 2: 	tmp = RANDOM(ARRAYSIZE(find_B)-1); tmp = find_B[tmp]; break;
@@ -4857,6 +4999,7 @@ int build_ring(int cn, int in)
 			case IT_H_AQ: r = 2094; break;
 			case IT_H_BE: r = 2095; break;
 			case IT_H_ZI: r = 2096; break;
+			case IT_H_PH: r = 2690; break;
 			//
 			case IT_F_SP: r = 2097; break;
 			case IT_F_CI: r = 2098; break;
@@ -4864,6 +5007,7 @@ int build_ring(int cn, int in)
 			case IT_F_AQ: r = 2100; break;
 			case IT_F_BE: r = 2101; break;
 			case IT_F_ZI: r = 2102; break;
+			case IT_F_PH: r = 2691; break;
 			//
 			default: 
 				return (0);
@@ -4914,6 +5058,7 @@ int build_ring(int cn, int in)
 			case IT_H_AQ: r = 2084; break;
 			case IT_H_BE: r = 2085; break;
 			case IT_H_ZI: r = 2086; break;
+			case IT_H_PH: r = 2689; break;
 			//
 			case IT_F_SP:
 			case IT_F_CI:
@@ -4921,6 +5066,7 @@ int build_ring(int cn, int in)
 			case IT_F_AQ:
 			case IT_F_BE:
 			case IT_F_ZI:
+			case IT_F_PH:
 			//
 			case IT_F_SA: 
 			case IT_F_RU: 
@@ -4970,6 +5116,7 @@ int build_ring(int cn, int in)
 			case IT_H_AQ:
 			case IT_H_BE:
 			case IT_H_ZI:
+			case IT_H_PH:
 			//
 			case IT_F_SP:
 			case IT_F_CI:
@@ -4977,6 +5124,7 @@ int build_ring(int cn, int in)
 			case IT_F_AQ:
 			case IT_F_BE:
 			case IT_F_ZI:
+			case IT_F_PH:
 			//
 			case IT_H_SA: 
 			case IT_H_RU: 
@@ -5354,7 +5502,7 @@ void boost_char(int cn, int divi)
 	
 	// Moved up here to prevent Rank 0 soul stones from generating.
 	exp  = ch[cn].points_tot / 5 + RANDOM(ch[cn].points_tot / 20 + 1);
-	rank = points2rank(exp);
+	rank = points2rank(exp/2);
 	
 	if (rank > N_SOULMAX)
 		rank = N_SOULMAX;
@@ -5411,12 +5559,6 @@ void boost_char(int cn, int divi)
 				it[in].data[1] = exp;
 				it[in].temp = 0;
 				it[in].driver = 68;
-				
-				/*
-				if (exp>= 7500000 && !RANDOM(8)) it[in].data[2] = 3+RANDOM(4);
-				if (exp>=15000000 && !RANDOM(6)) it[in].data[2] = 2+RANDOM(3);
-				if (exp>=22500000 && !RANDOM(4)) it[in].data[2] = 1+RANDOM(2);
-				*/
 				
 				god_give_char(in, cn);
 			}
@@ -5483,11 +5625,11 @@ int spawn_penta_enemy(int in)
 	ch[cn].data[73] = 8;
 	ch[cn].dir = 1;
 	
-	if (tmp>=24 && !RANDOM(max(20, 53-tmp)))
+	if (tmp>=22 && !RANDOM(max(30, 58-tmp)))
 	{
 		boost_char(cn, 3);
 	}
-	else if (tmp>=16 && !RANDOM(max(20, 48-tmp)))
+	else if (tmp>=10 && !RANDOM(max(25, 53-tmp)))
 	{
 		boost_char(cn, 4);
 	}
@@ -6097,10 +6239,10 @@ int teleport3(int cn, int in)    // out of labyrinth
 	return 1;
 }
 
-int use_seyan_shrine(int cn, int in)
+int use_seyan_shrine(int cn, int in, int flag)
 {
 	struct item tmp;
-	int in2, in3, n, bits;
+	int in2, in3, n, bits, ret = 0;
 	unsigned int bit;
 
 	if (!cn)
@@ -6117,7 +6259,7 @@ int use_seyan_shrine(int cn, int in)
 	in3 = ch[cn].alt_worn[WN_RHAND];
 	
 	// remove old sword if necessary
-	if (!(in2 = ch[cn].worn[WN_RHAND]) || it[in2].driver!=40 || it[in2].data[0]!=cn)
+	if (!flag && (!(in2 = ch[cn].worn[WN_RHAND]) || it[in2].driver!=40 || it[in2].data[0]!=cn))
 	{
 		if (!in3 || it[in3].driver!=40 || it[in3].data[0]!=cn) for (n = 1; n<MAXITEM; n++)
 		{
@@ -6146,22 +6288,24 @@ int use_seyan_shrine(int cn, int in)
 		if (ch[cn].luck<50)
 		{
 			do_char_log(cn, 0, "Kwai, the great goddess of war, deemed you unworthy to receive a new blade.\n");
-			return 0;
 		}
-
-		in2 = god_create_item(IT_SEYANSWORD);
-		god_give_char(in2, cn);
-		it[in2].data[0] = cn;
-		do_char_log(cn, 0, "Kwai, the great goddess of war, deemed you worthy to receive a new blade.\n");
-		ch[cn].luck -= 50;
+		else
+		{
+			in2 = god_create_item(IT_SEYANSWORD);
+			god_give_char(in2, cn);
+			it[in2].data[0] = cn;
+			do_char_log(cn, 0, "Kwai, the great goddess of war, deemed you worthy to receive a new blade.\n");
+			ch[cn].luck -= 50;
+		}
 	}
 
 	if (!(ch[cn].data[21] & it[in].data[0]))
 	{
 		ch[cn].data[21] |= it[in].data[0];
-
+		
 		do_char_log(cn, 0, "You found a new shrine of Kwai!\n");
 		ch[cn].luck += 10;
+		ret++;
 	}
 
 	for (bits = 0, bit = 1; bit; bit <<= 1)
@@ -6172,12 +6316,12 @@ int use_seyan_shrine(int cn, int in)
 		}
 	}
 	
-	if (bits<32) 
+	if (bits<32 && (!flag || ret)) 
 	{
 		do_char_log(cn, 1, "You have visited %d of the 32 shrines of Kwai.\n", bits);
 		do_char_log(cn, 1, "You may use #kwai to see unvisited shrines.\n");
 	}
-	else
+	else if (!flag || ret)
 	{
 		do_char_log(cn, 1, "You have visited all of the shrines of Kwai!\n", bits);
 	}
@@ -6233,7 +6377,7 @@ int use_seyan_shrine(int cn, int in)
 
 	do_update_char(cn);
 
-	return 0;
+	return ret;
 }
 
 int use_seyan_door(int cn, int in)
@@ -6284,7 +6428,7 @@ int use_seyan_portal(int cn, int in)
 		else
 		{
 			do_char_log(cn, 0, "The Bravers welcome you among their ranks, %s!\n", ch[cn].name);
-			if (IS_MALE(cn))	god_racechange(cn, CT_BRAVER_M, 0);
+			if (!IS_FEMALE(cn))	god_racechange(cn, CT_BRAVER_M, 0);
 			else				god_racechange(cn, CT_BRAVER_F, 0);
 			
 			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
@@ -6312,7 +6456,7 @@ int use_seyan_portal(int cn, int in)
 		else
 		{
 			do_char_log(cn, 0, "The Seyan'Du welcome you among their ranks, %s!\n", ch[cn].name);
-			if (IS_MALE(cn))	god_racechange(cn, CT_SEYANDU_M, 0);
+			if (!IS_FEMALE(cn))	god_racechange(cn, CT_SEYANDU_M, 0);
 			else				god_racechange(cn, CT_SEYANDU_F, 0);
 			
 			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
@@ -6736,8 +6880,11 @@ void use_announce_class(int cn, int m)
 {
 	int n, temp;
 	
-	/* CS, 991203: Announce the player's new class */
-	temp = IS_PURPLE(cn) ? CT_PRIEST : CT_BISHOP;
+	/* Announce the player's new class */
+	if (IS_PURPLE(cn))			temp = CT_PRIEST;
+	else if (IS_CLANKWAI(cn))	temp = CT_KWAIVICAR;
+	else if (IS_CLANGORN(cn))	temp = CT_GORNPASTOR;
+	else						temp = CT_BISHOP;
 	// Find a character with appropriate template
 	for (n = 1; n<MAXCHARS; n++)
 	{
@@ -6769,7 +6916,7 @@ void change_to_archtemplar(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))	god_minor_racechange(cn, CT_ARCHTEMP_M);
+	if (!IS_FEMALE(cn))	god_minor_racechange(cn, CT_ARCHTEMP_M);
 	else				god_minor_racechange(cn, CT_ARCHTEMP_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become an Arch-Templar. Congratulations, %s.\n", ch[cn].name);
@@ -6789,7 +6936,7 @@ void change_to_pugilist(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))	god_minor_racechange(cn, CT_PUGILIST_M);
+	if (!IS_FEMALE(cn))	god_minor_racechange(cn, CT_PUGILIST_M);
 	else				god_minor_racechange(cn, CT_PUGILIST_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Skald. Congratulations, %s.\n", ch[cn].name);
@@ -6809,7 +6956,7 @@ void change_to_summoner(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))	god_minor_racechange(cn, CT_SUMMONER_M);
+	if (!IS_FEMALE(cn))	god_minor_racechange(cn, CT_SUMMONER_M);
 	else				god_minor_racechange(cn, CT_SUMMONER_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Summoner. Congratulations, %s.\n", ch[cn].name);
@@ -6829,7 +6976,7 @@ void change_to_archharakim(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))	god_minor_racechange(cn, CT_ARCHHARA_M);
+	if (!IS_FEMALE(cn))	god_minor_racechange(cn, CT_ARCHHARA_M);
 	else				god_minor_racechange(cn, CT_ARCHHARA_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become an Arch-Harakim. Congratulations, %s.\n", ch[cn].name);
@@ -6849,7 +6996,7 @@ void change_to_warrior(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))	god_minor_racechange(cn, CT_WARRIOR_M);
+	if (!IS_FEMALE(cn))	god_minor_racechange(cn, CT_WARRIOR_M);
 	else				god_minor_racechange(cn, CT_WARRIOR_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Warrior. Congratulations, %s.\n", ch[cn].name);
@@ -6869,7 +7016,7 @@ void change_to_sorcerer(int cn)
 		return;
 	}
 
-	if (IS_MALE(cn))	god_minor_racechange(cn, CT_SORCERER_M);
+	if (!IS_FEMALE(cn))	god_minor_racechange(cn, CT_SORCERER_M);
 	else				god_minor_racechange(cn, CT_SORCERER_F);
 
 	do_char_log(cn, 1, "You are truly worthy to become a Sorcerer. Congratulations, %s.\n", ch[cn].name);
@@ -6969,7 +7116,7 @@ int shrine_of_change(int cn, int in)
 	return 0;
 }
 
-int explorer_point(int cn, int in)
+int explorer_point(int cn, int in, int msg)
 {
 	int exp;
 
@@ -6977,7 +7124,6 @@ int explorer_point(int cn, int in)
 	    !(ch[cn].data[48] & it[in].data[2]) && !(ch[cn].data[49] & it[in].data[3]) && 
 		!(ch[cn].data[91] & it[in].data[5]))
 	{
-
 		ch[cn].data[46] |= it[in].data[0];
 		ch[cn].data[47] |= it[in].data[1];
 		ch[cn].data[48] |= it[in].data[2];
@@ -6998,7 +7144,8 @@ int explorer_point(int cn, int in)
 	}
 	else
 	{
-		do_char_log(cn, 1, "Hmm. Seems somewhat familiar. You've been here before...\n");
+		if (msg) do_char_log(cn, 1, "Hmm. Seems somewhat familiar. You've been here before...\n");
+		return 0;
 	}
 
 	return 1;
@@ -7065,7 +7212,7 @@ int use_garbage(int cn, int in)
 void use_driver(int cn, int in, int carried)
 {
 	int ret, m;
-	int thousand, tmp;
+	int thousand, tmp, stacked = 0;
 
 	if (in<=0 || in>=MAXITEM)
 	{
@@ -7114,8 +7261,13 @@ void use_driver(int cn, int in, int carried)
 				return;
 			}
 		}
-
-		if ((it[in].flags & IF_USESPECIAL) || it[in].temp==1705 || it[in].temp==1706)
+		
+		if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp)
+		{
+			use_stack_items(cn, in);
+			stacked = 1;
+		}
+		else if ((it[in].flags & IF_USESPECIAL) || it[in].temp==1705 || it[in].temp==1706)
 		{
 			switch(it[in].driver)
 			{
@@ -7220,7 +7372,7 @@ void use_driver(int cn, int in, int carried)
 				ret = use_pentagram(cn, in);
 				break;
 			case 34:
-				ret = use_seyan_shrine(cn, in);
+				ret = use_seyan_shrine(cn, in, 0);
 				break;
 			case 35:
 				ret = use_seyan_door(cn, in);
@@ -7294,7 +7446,7 @@ void use_driver(int cn, int in, int carried)
 				ret = 0;
 				break;                        // greenling green ball
 			case 57:
-				ret = explorer_point(cn, in);
+				ret = explorer_point(cn, in, 1);
 				break;
 			case 58:
 				ret = use_grolm(cn, in);
@@ -7443,6 +7595,9 @@ void use_driver(int cn, int in, int carried)
 			case 120:
 				ret = 0;
 				break;
+			case 121:
+				ret = use_special_chest(cn, in);
+				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -7468,7 +7623,6 @@ void use_driver(int cn, int in, int carried)
 		if (!cn)
 		{
 			return;         // item_tick does activate and deactive as well
-
 		}
 		if (it[in].active)
 		{
@@ -7512,7 +7666,7 @@ void use_driver(int cn, int in, int carried)
 			// Item stacking - held items are stackable and the same template
 			if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp)
 			{
-				use_stack_items(cn, in);
+				if (!stacked) use_stack_items(cn, in);
 			}
 			else if (carried && (it[in].flags & IF_USEDESTROY))
 			{
@@ -7717,7 +7871,88 @@ void item_damage_worn(int cn, int n, int dam)
 	}
 }
 
+void item_damage_alt_worn(int cn, int n, int dam)
+{
+	int in;
+
+	if ((in = ch[cn].alt_worn[n])!=0 && it[in].max_damage)
+	{
+		it[in].current_damage += dam;
+		if (item_age(in))
+		{
+			if (it[in].damage_state==1)
+			{
+				do_char_log(cn, 1, "The %s you are using is showing signs of use.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==2)
+			{
+				do_char_log(cn, 1, "The %s you are using was slightly damaged.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==3)
+			{
+				do_char_log(cn, 1, "The %s you are using was damaged.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==4)
+			{
+				do_char_log(cn, 0, "The %s you are using was badly damaged.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==5)
+			{
+				ch[cn].alt_worn[n] = 0;
+				it[in].used = USE_EMPTY;
+				do_char_log(cn, 0, "The %s you were using was destroyed.\n",
+				            it[in].reference);
+			}
+			do_update_char(cn);
+		}
+	}
+}
+
 void item_damage_citem(int cn, int dam)
+{
+	int in;
+
+	if ((in = ch[cn].citem)!=0 && !(in & 0x80000000) && it[in].max_damage)
+	{
+		it[in].current_damage += dam;
+		if (item_age(in))
+		{
+			if (it[in].damage_state==1)
+			{
+				do_char_log(cn, 1, "The %s you are using is showing signs of use.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==2)
+			{
+				do_char_log(cn, 1, "The %s you are using was slightly damaged.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==3)
+			{
+				do_char_log(cn, 1, "The %s you are using was damaged.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==4)
+			{
+				do_char_log(cn, 0, "The %s you are using was badly damaged.\n",
+				            it[in].reference);
+			}
+			else if (it[in].damage_state==5)
+			{
+				ch[cn].citem = 0;
+				it[in].used  = USE_EMPTY;
+				do_char_log(cn, 0, "The %s you were using was destroyed.\n",
+				            it[in].reference);
+			}
+		}
+	}
+}
+
+void item_damage_held(int cn, int n, int dam)
 {
 	int in;
 
@@ -7765,7 +8000,7 @@ void item_damage_armor(int cn, int dam)
 	{
 		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_MSHIELD)
 		{
-			dam -= bu[in].armor[1];
+			dam -= bu[in].armor[1]*2;
 		}
 	}
 	
@@ -8122,7 +8357,7 @@ void pentagram(int in)
 	{
 		return;
 	}
-	if (RANDOM(18))
+	if (RANDOM(TICKS))
 	{
 		return;
 	}

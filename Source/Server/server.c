@@ -184,8 +184,8 @@ void discord_gmoon(void)
 {
 	int hour, minute, day, month, year;
 
-	hour = globs->mdtime / (60 * 60);
-	minute = (globs->mdtime / 60) % 60;
+	hour = globs->mdtime / (MD_MIN * 60);
+	minute = (globs->mdtime / MD_MIN) % 60;
 	day = globs->mdday % 28 + 1;
 	month = globs->mdday / 28 + 1;
 	year  = globs->mdyear;
@@ -247,18 +247,17 @@ void discord_who(void)
 		{
 			showarea = 0;
 		}
-		if (IS_PURPLE(n))
+		if (IS_CLANKWAI(n) || IS_CLANGORN(n))
 		{
 			showarea = 0;
 		}
 
-		fprintf(discordWho, "%c %.5s %-10.10s%c%c%c %.23s\n",
+		fprintf(discordWho, "%c %.5s %-10.10s%c%c %.24s\n",
 					font ? '+' : ' ',
 		            who_rank_name[points2rank(ch[n].points_tot)],
 		            ch[n].name,
+					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
-		            (ch[n].flags & CF_POH) ? '+' : ' ',
-		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));
 	}
 	if (players) fprintf(discordWho, "-------------------------------------------------\n");
@@ -1318,62 +1317,20 @@ int main(int argc, char *args[])
 		clear_map_buffs(n, 1);
 	}
 	
-	/*
-	// Nuke old skills (REMOVE AFTER UPDATE!)
-	for (n = 0; n<MAXTCHARS; n++)
-	{
-		if (ch_temp[n].used==USE_EMPTY) continue;
-		
-		// Sense Magic Light & Recall
-		ch_temp[n].skill[14][0] = 0;
-		ch_temp[n].skill[15][0] = 0;
-		ch_temp[n].skill[31][0] = 0;
-		
-		// Armor Mastery
-		if (ch_temp[n].skill[39][0]) 
-		{
-			ch_temp[n].skill[38][0] = max(ch_temp[n].skill[38][0], ch_temp[n].skill[39][0]);
-		}
-		ch_temp[n].skill[39][0] = 0;
-		
-		reset_char(n);
-	}
-	
-	// Correct door timers (REMOVE AFTER UPDATE!)
-	for (n = 1; n<MAXTITEM; n++)
-	{
-		if (it_temp[n].used==USE_EMPTY) continue;
-		
-		// get driver
-		if (it_temp[n].driver==2)
-		{
-			if (it_temp[n].data[3])
-			{
-				it_temp[n].duration = 5400;
-			}
-			else if (it_temp[n].data[1])
-			{
-				it_temp[n].duration = 1080;
-			}
-			else
-			{
-				it_temp[n].duration = 2160;
-			}
-			reset_item(n);
-		}
-	}
-	
-	// Decay legacy items
+	/* // (vvv REMOVE AFTER UPDATE!!!)
+	// Force remove unusual crit multipliers
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;
-		if (it[n].temp==0 && !(it[n].flags & IF_SOULSTONE))
+		if ((it[n].flags & IF_ENCHANTED) && it[n].orig_temp && 
+			(it[n].crit_multi[0] >= it_temp[it[n].orig_temp].crit_multi[0] || it[n].crit_chance[0] >= it_temp[it[n].orig_temp].crit_chance[0]))
 		{
-			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
-			it[n].max_damage = 100000;
+			it[n].flags |= IF_UPDATE;
+			it[n].crit_chance[0] = it_temp[it[n].orig_temp].crit_chance[0];
+			it[n].crit_multi[0]  = it_temp[it[n].orig_temp].crit_multi[0];
 		}
 	}
-	*/
+	// */ // (^^^ REMOVE AFTER UPDATE!!!)
 
 	srand(time(NULL));
 
@@ -1394,15 +1351,19 @@ int main(int argc, char *args[])
 	init_badwords();
 	god_read_banlist();
 	reset_changed_items();
-
-	// remove lab items from all players (leave this here for a while!)
-	/*
+	
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (!it[n].used)
 		{
 			continue;
 		}
+		if ((it[n].flags & IF_STACKABLE) && it[n].stack == 0)
+		{
+			it[n].stack = 1;
+			it[n].flags |= IF_UPDATE;
+		}
+		/*
 		if (it[n].flags & IF_LABYDESTROY)
 		{
 			tmplabcheck(n);
@@ -1414,9 +1375,9 @@ int main(int argc, char *args[])
 			else 						it[n].max_damage = 60000;
 			xlog("Set %s (%d) max_damage to %d", it[n].name, n, it[n].max_damage);
 		}
+		*/
 	}
-	*/
-
+	
 	for (n = 1; n<MAXTCHARS; n++)
 	{
 		int x, y;
@@ -1440,6 +1401,11 @@ int main(int argc, char *args[])
 			ch_temp[n].data[29] = ch_temp[n].x + ch_temp[n].y * MAPX;
 		}
 	}
+	
+	/*
+	god_reset_npcs(0);
+	init_lights();
+	*/
 
 	globs->flags |= GF_DIRTY;
 

@@ -10,10 +10,6 @@
 
 #include "server.h"
 
-#define MD_HOUR 3600
-#define MD_DAY  (MD_HOUR*24)
-#define MD_YEAR 300
-
 FILE *discordFile;
 
 void pay_rent(void)
@@ -73,6 +69,22 @@ void do_misc(void)
 	}
 }
 
+void init_lights_check(void)
+{
+	int n, players = 0;
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (!(ch[n].flags & (CF_PLAYER)))	continue;
+		if (ch[n].used!=USE_ACTIVE)			continue;
+		players++;
+	}
+	if (!players) 
+	{
+		god_reset_npcs(0);
+		init_lights();
+	}
+}
+
 void global_tick(void)
 {
 	int tmp;
@@ -85,6 +97,7 @@ void global_tick(void)
 		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear);
 		//pay_rent();
 		do_misc();
+		if (!(globs->mdday % 28)) init_lights_check();
 	}
 
 	if (globs->mdday>=MD_YEAR)
@@ -93,7 +106,7 @@ void global_tick(void)
 		globs->mdday = 1;
 	}
 
-	if (globs->mdtime<MD_HOUR * 6) // 3600
+	if (globs->mdtime<MD_HOUR * 6)
 	{
 		globs->dlight = 0;
 	}
@@ -121,7 +134,7 @@ void global_tick(void)
 	
 	if (globs->flags & GF_DISCORD) 
 	{
-		if (!(globs->mdtime % 120)) discord_who();
+		if (!(globs->mdtime % TICKS*10)) discord_who();
 		discord_shout_in();
 	}
 

@@ -91,7 +91,7 @@ int pop_create_item(int temp, int cn)
 				in = god_create_item(temp); 			// create the item
 			if (in)										// assure the item is created
 			{
-				if (it[in].placement & PL_TWOHAND)
+				if (IS_TWOHAND(in))
 				{
 					bonus = 2;
 				}
@@ -208,7 +208,7 @@ int pop_create_item(int temp, int cn)
 
 #define POP_GITEM	6
 
-int pop_create_bonus(int cn, int chance)
+int pop_create_bonus(int cn)
 {
 	int n, rank;
 	
@@ -227,19 +227,15 @@ int pop_create_bonus(int cn, int chance)
 			IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6,
 			IT_F_SA, IT_F_RU, IT_F_AM, IT_F_TO, IT_F_EM, IT_F_DI,
 			IT_F_SP, IT_F_CI, IT_F_OP, IT_F_AQ, IT_F_BE, IT_F_ZI,
-			IT_H_SA, IT_H_RU, IT_H_AM, IT_H_TO, IT_H_EM, IT_H_DI,
-			IT_H_SP, IT_H_CI, IT_H_OP, IT_H_AQ, IT_H_BE, IT_H_ZI,
-			IT_PLAT, IT_GOLD, IT_GOLD,
+			IT_PLAT, IT_PLAT,
+			MCT_CONTRACT, MCT_QUILL_B, MCT_QUILL_R, 
 			IT_POT_RAIN
 		};
 		static int item[]  = {
 			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
-			IT_POT_H_HP, IT_POT_H_EN, IT_POT_H_MP,
-			IT_POT_S_HP, IT_POT_S_EN, IT_POT_S_MP,
-			IT_POT_C_HP, IT_POT_C_EN, IT_POT_C_MP,
-			IT_POT_L_HP, IT_POT_L_EN, IT_POT_L_MP,
-			IT_FLO_W, IT_FLO_Y, IT_FLO_B, IT_FLO_T, IT_FLO_O, IT_FLO_M, IT_FLO_C, IT_FLO_V,
-			IT_FLASK
+			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
+			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
+			MCT_CONTRACT
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
 		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
@@ -251,18 +247,19 @@ int pop_create_bonus(int cn, int chance)
 			IT_POP_ISPEL, 
 			IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, 
 			IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6,
+			IT_F_SA, IT_F_RU, IT_F_AM, IT_F_TO, IT_F_EM, IT_F_DI,
+			IT_F_SP, IT_F_CI, IT_F_OP, IT_F_AQ, IT_F_BE, IT_F_ZI, IT_F_PH,
 			IT_H_SA, IT_H_RU, IT_H_AM, IT_H_TO, IT_H_EM, IT_H_DI,
-			IT_H_SP, IT_H_CI, IT_H_OP, IT_H_AQ, IT_H_BE, IT_H_ZI,
-			IT_B_SA, IT_B_RU, IT_B_AM, IT_B_TO, IT_B_EM, IT_B_DI,
-			IT_B_SP, IT_B_CI, IT_B_OP, IT_B_AQ,
-			IT_GOLD,
+			IT_H_SP, IT_H_CI, IT_H_OP, IT_H_AQ, IT_H_BE, IT_H_ZI, IT_H_PH,
+			IT_PLAT, IT_GOLD, IT_GOLD,
+			MCT_CONTRACT, MCT_QUILL_G, MCT_QUILL_B, 
 			IT_POT_RAIN
 		};
 		static int item[]  = {
 			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
 			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
-			IT_FLO_W, IT_FLO_Y, IT_FLO_B, IT_FLO_T, IT_FLO_O,
-			IT_FLASK
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			MCT_CONTRACT
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
 		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
@@ -277,17 +274,19 @@ int pop_create_bonus(int cn, int chance)
 			IT_POP_ASPEL, 
 			IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, 
 			IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6,
+			IT_H_SA, IT_H_RU, IT_H_AM, IT_H_TO, IT_H_EM, IT_H_DI,
+			IT_H_SP, IT_H_CI, IT_H_OP, IT_H_AQ, IT_H_BE, IT_H_ZI, IT_H_PH,
 			IT_B_SA, IT_B_RU, IT_B_AM, IT_B_TO, IT_B_EM, IT_B_DI,
 			IT_B_SP, IT_B_CI, IT_B_OP, IT_B_AQ,
-			IT_M_SA, IT_M_RU, IT_M_AM, IT_M_TO, IT_M_EM, IT_M_DI,
-			IT_GOLD, IT_GOLD, IT_SILV,
+			IT_GOLD, IT_GOLD, 
+			MCT_CONTRACT, MCT_QUILL_Y, MCT_QUILL_G, 
 			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
-			IT_FLO_R, IT_FLO_G, IT_FLO_P, IT_FLO_W, IT_FLO_Y, IT_FLO_B,
-			IT_FLASK
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
+			IT_POT_RAIN
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
 		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
@@ -299,16 +298,17 @@ int pop_create_bonus(int cn, int chance)
 			IT_POP_ASPEL, 
 			IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, 
 			IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6,
+			IT_B_SA, IT_B_RU, IT_B_AM, IT_B_TO, IT_B_EM, IT_B_DI,
+			IT_B_SP, IT_B_CI, IT_B_OP, IT_B_AQ,
 			IT_M_SA, IT_M_RU, IT_M_AM, IT_M_TO, IT_M_EM, IT_M_DI,
-			IT_S_SA, IT_S_RU, IT_S_AM, IT_S_TO, IT_S_EM, IT_S_DI,
-			IT_GOLD, IT_SILV, IT_SILV,
+			IT_GOLD, IT_GOLD, IT_SILV,
 			IT_POT_RAIN
 		};
 		static int item[]  = {
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
-			IT_FLO_R, IT_FLO_G, IT_FLO_P, IT_FLO_W, IT_FLO_Y, IT_FLO_B,
-			IT_FLASK
+			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
+			IT_POT_RAIN
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
 		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
@@ -323,14 +323,15 @@ int pop_create_bonus(int cn, int chance)
 			IT_POP_SPELL, 
 			IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, 
 			IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+			IT_M_SA, IT_M_RU, IT_M_AM, IT_M_TO, IT_M_EM, IT_M_DI,
 			IT_S_SA, IT_S_RU, IT_S_AM, IT_S_TO, IT_S_EM, IT_S_DI,
-			IT_SILV,
+			IT_GOLD, IT_SILV, IT_SILV,
 			IT_POT_RAIN
 		};
 		static int item[]  = {
-			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
-			IT_FLO_R, IT_FLO_G, IT_FLO_P, IT_FLO_W,
+			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
+			IT_FLO_R, IT_FLO_G, IT_FLO_P,
 			IT_FLASK
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
@@ -343,6 +344,8 @@ int pop_create_bonus(int cn, int chance)
 			IT_POP_SPELL, 
 			IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, 
 			IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+			IT_S_SA, IT_S_RU, IT_S_AM, IT_S_TO, IT_S_EM, IT_S_DI,
+			IT_SILV, IT_SILV,
 			IT_POT_RAIN
 		};
 		static int item[]  = {
@@ -371,19 +374,9 @@ int pop_create_bonus_belt(int cn)
 	                // at start it contains template of 'rainbow_belt'
 	int i, j;
 	int rank, skill_value, skill_number, skm;
-
-
-//	item will be created with chance 1 from 10000
-//	if (RANDOM(10000)) return 0;
-//      it is moved outside the function cause item is rarely created
-//      but function is called each time when NPC respawning.
-//	so it will be much faster if it will check for chances before
-//	the function call
-
-	// MAX_POWER = rank
-	// MAX_SKILLS = rank
+	
 	rank = points2rank(ch[cn].points_tot);  // private wont get this belt
-	if(!rank)
+	if (!rank)
 	{
 		return 0;
 	}
@@ -496,7 +489,7 @@ int pop_create_bonus_belt(int cn)
 
 int pop_create_char(int n, int drop)
 {
-	int cn, tmp, m, flag = 0, hasitems = 0, chance;
+	int cn, tmp, m, flag = 0, hasitems = 0;
 
 	for (cn = 1; cn<MAXCHARS; cn++)
 	{
@@ -597,50 +590,33 @@ int pop_create_char(int n, int drop)
 	ch[cn].dir = DX_DOWN;
 	ch[cn].data[92] = TICKS * 60;
 
-	chance = 25;
-	if (!B_SK(cn, SK_MEDIT) && ch[cn].a_mana>15 * 100)
-	{
-		chance -= 6;
-	}
-	if (!B_SK(cn, SK_MEDIT) && ch[cn].a_mana>30 * 100)
-	{
-		chance -= 6;
-	}
-	if (!B_SK(cn, SK_MEDIT) && ch[cn].a_mana>65 * 100)
-	{
-		chance -= 6;
-	}
-
 	if (ch[cn].alignment<0)
 	{
 		for (m = 0; m<40; m++)
 		{
-			if (ch[cn].item[m]==0 && hasitems)
+			if (ch[cn].item[m]==0 && (hasitems || (RANDOM(2) && ch[cn].temp!=347 && ch[cn].temp!=350)))
 			{
 				// this check placed here for speed reasons
 				// they are the same as in pop_create_bonus_belt()
-				if (RANDOM(chance) == 0)
+				if (!RANDOM(50))
 				{
-					tmp = pop_create_bonus(cn, chance);
+					tmp = pop_create_bonus(cn);
 					if (tmp)
 					{
 						it[tmp].carried = cn;
 						ch[cn].item[m]  = tmp;
 					}
 				}
-				break;
-			}
-		}
-
-/*	Added by SoulHunter  04.04.2000	*/
-		// creating rainbow belts
-		for (m = 0; m<40; m++)
-		{
-			if (ch[cn].item[m]==0 && hasitems)
-			{
-				//	item will be created with chance 1 from 10000
-				// this check placed here for speed reasons
-				if (RANDOM(10000) == 0)
+				if (!RANDOM(50))
+				{
+					tmp = pop_create_bonus(cn);
+					if (tmp)
+					{
+						it[tmp].carried = cn;
+						ch[cn].item[m]  = tmp;
+					}
+				}
+				else if (!RANDOM(5000))
 				{
 					tmp = pop_create_bonus_belt(cn);
 					if (tmp)
@@ -652,8 +628,6 @@ int pop_create_char(int n, int drop)
 				break;
 			}
 		}
-/*	--end	*/
-
 	}
 
 	if (drop)

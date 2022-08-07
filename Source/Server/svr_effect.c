@@ -60,7 +60,7 @@ void effect_tick(void)
 			if (fx[n].duration==0)
 			{
 				fx[n].used = USE_EMPTY;
-				map[fx[n].data[0] + fx[n].data[1] * MAPX].flags &= ~(MF_GFX_INJURED | MF_GFX_INJURED1 | MF_GFX_INJURED2);
+				map[fx[n].data[0] + fx[n].data[1] * MAPX].flags &= ~(MF_GFX_INJURED | MF_GFX_INJURED1 | MF_GFX_INJURED2 | MF_GFX_CRIT);
 			}
 		}
 

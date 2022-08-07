@@ -42,6 +42,8 @@
 #define CT_INNKEEPER   	  28
 #define CT_BISHOP    	  29
 #define CT_PRIEST    	  30
+#define CT_KWAIVICAR    1377
+#define CT_GORNPASTOR   1378
 #define CT_GATEKEEPER	 848
 #define CT_HERBCOLL		 703
 #define CT_HERBCOLL2	1205
@@ -83,6 +85,7 @@
 #define CT_BASALT		1255
 #define CT_TOWER		1260
 #define CT_SCORP		1330
+#define CT_SCORP_Q		1333
 
 #define CT_GOLEMTRAP	  39
 #define CT_GARGTRAP		  40
@@ -124,14 +127,76 @@
 #define CT_CONTRACTOR	 349
 #define CT_ADHERENT		 351
 
-#define BS_HOUR 		3600
-#define BS_MINS 		(BS_HOUR/60)
+#define CT_EALDWULF		1375
+
 #define BS_RC			  20
 #define BS_COUNTER		  18
 
 // -----
 
 #define COMPANION_TIMEOUT (5 * 60 * TICKS)
+
+// -----
+
+#define IT_LAB1_POLE1	940
+#define IT_LAB1_POLE2	952
+#define IT_LAB1_POLE3	965
+#define IT_LAB1_KWAI	770
+
+#define IT_LAB2_POLE1	971
+#define IT_LAB2_POLE2	976
+#define IT_LAB2_POLE3	1042
+#define IT_LAB2_KWAI	1040
+
+#define IT_LAB3_POLE1	1043
+#define IT_LAB3_POLE2	1044
+#define IT_LAB3_POLE3	1096
+#define IT_LAB3_KWAI	1095
+
+#define IT_LAB4_POLE1	1097
+#define IT_LAB4_POLE2	1098
+#define IT_LAB4_POLE3	1107
+#define IT_LAB4_KWAI	1298
+
+#define IT_LAB5_POLE1	1259
+#define IT_LAB5_POLE2	1260
+#define IT_LAB5_POLE3	1271
+#define IT_LAB5_KWAI	1756
+
+#define IT_LAB6_POLE1	1547
+#define IT_LAB6_POLE2	1548
+#define IT_LAB6_POLE3	1549
+#define IT_LAB6_KWAI	1757
+
+#define IT_LAB7_POLE1	1731
+#define IT_LAB7_POLE2	1732
+#define IT_LAB7_POLE3	1733
+#define IT_LAB7_KWAI	1758
+
+#define IT_LAB8_POLE1	1734
+#define IT_LAB8_POLE2	1735
+#define IT_LAB8_POLE3	1736
+#define IT_LAB8_KWAI	1759
+
+#define IT_LAB9_POLE1	1737
+#define IT_LAB9_POLE2	1738
+#define IT_LAB9_POLE3	1739
+#define IT_LAB9_KWAI	1760
+
+#define IT_LABX_POLE1	1740
+#define IT_LABX_POLE2	1741
+#define IT_LABX_POLE3	1742
+#define IT_LABX_KWAI	1761
+
+#define IT_LABY_POLE1	1743
+#define IT_LABY_POLE2	1744
+#define IT_LABY_POLE3	1745
+#define IT_LABY_KWAI	1762
+
+#define IT_LABZ_POLE1	1746
+#define IT_LABZ_POLE2	1747
+#define IT_LABZ_POLE3	1748
+#define IT_LABZ_KWAI	1763
 
 // -----
 
@@ -286,7 +351,7 @@
 #define IT_WP_BRONCHIT	  	2551
 #define IT_WP_VOLCANF	  	2552
 
-#define REQ_LAME		   10000
+#define REQ_LAME		    8000
 
 // Other
 
@@ -493,6 +558,7 @@
 #define IT_H_AQ			2064
 #define IT_H_BE			2065
 #define IT_H_ZI			2066
+#define IT_H_PH			2687
 
 #define IT_F_SP			2067
 #define IT_F_CI			2068
@@ -500,6 +566,7 @@
 #define IT_F_AQ			2070
 #define IT_F_BE			2071
 #define IT_F_ZI			2072
+#define IT_F_PH			2688
 
 // Mine enemies
 #define IT_E_WK			1465
@@ -507,6 +574,7 @@
 #define IT_E_GO			 371
 #define IT_E_GA			 372
 #define IT_E_MA			1466
+#define IT_E_AN			2695
 
 // -----
 
@@ -726,6 +794,7 @@
 #define BUF_SPR_INNOCU		498
 #define BUF_SPR_BLIND		338
 #define BUF_SPR_PULSE		485
+#define BUF_SPR_IMMOLATE	5967
 #define BUF_SPR_TAUNT		489
 #define BUF_SPR_GUARD		518
 #define BUF_SPR_ZEPHYR		519
@@ -857,6 +926,10 @@
 #define MFL_TOWER		5585
 #define MFL_ICE		   16670
 #define MFL_SEWER	   16728
+#define MFL_VJUNGLE		5860
+#define MFL_COLDSTONE	5965
+#define MFL_REDMARB		5864
+#define MFL_GREMARB		5865
 
 // Wall Templates
 #define MWL_GREY		   2
@@ -887,6 +960,15 @@
 #define MWL_JTREE		1902
 #define MWL_EMERALD		2208
 #define MWL_LIZARD		2214
+#define MWL_VJTREE		2658
+#define MWL_CSTONE		2678
+#define MWL_BASALT	   92669
+#define MWL_REDMARB		2646
+#define MWL_GREMARB		2652
+#define MWL_EVIL		2730
+#define MWL_CHARCOAL	2739
+#define MWL_FIREBRICK	2740
+#define MWL_ICEBRICK	2741
 
 // Torch Templates
 #define MTR_GROLM		 171
@@ -905,6 +987,7 @@
 #define MTR_BLACK		1645
 #define MTR_FPIT		1886
 #define MTR_EMERALD		2210
+#define MTR_CSTONE		2681
 
 // Decoration Templates
 #define MAP_NUM_DECO	   4
@@ -925,6 +1008,12 @@
 #define MDE_EMERALD		2209
 #define MDE_ESPIKE		2211
 #define MDE_CACTUS	   92567
+#define MDE_CSTONE	   92682
+#define MDE_APILLAR		2672
+#define MDE_BASALT	   92673
+#define MDE_REDMARB		2647
+#define MDE_GREMARB		2653
+#define MDE_EPILLAR		2734
 
 // Scenery Templates
 #define MAP_NUM_SCEN	   4
@@ -941,6 +1030,8 @@
 #define MSC_APLANT	   91689
 #define MSC_SPLANT	   91692
 #define MSC_EMERALD	   92212
+#define MSC_COLDR	   92685
+#define MSC_VFAUNA	   92663
 
 // Door Templates
 #define MDR_WOOD_N		  22
@@ -959,6 +1050,10 @@
 #define MDR_SAND_E		1562
 #define MDR_GREEN_N		2216
 #define MDR_GREEN_E		2215
+#define MDR_BASALT_N	2676
+#define MDR_BASALT_E	2677
+#define MDR_COLD_N		2679
+#define MDR_COLD_E		2680
 
 // Contract sprites
 #define MSP_Y			5602

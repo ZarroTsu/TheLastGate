@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000806
-#define MINVERSION			0x000806
+#define VERSION				0x000809
+#define MINVERSION			0x000809
 
 #define DATDIR				".dat"
 
@@ -17,7 +17,7 @@
 #define MAPX				1024
 #define MAPY				2048
 #define MAXCHARS			8192
-#define MAXBUFF				65535
+#define MAXBUFF				(40*MAXCHARS)
 #define MAXITEM				(96*1024)
 #define MAXEFFECT			4096
 #define MAXMISSION			1024
@@ -39,6 +39,12 @@
 
 #define HOME_PURPLE_X		 569
 #define HOME_PURPLE_Y		 455
+
+#define HOME_KWAI_X			 707
+#define HOME_KWAI_Y			 856
+
+#define HOME_GORN_X			 795
+#define HOME_GORN_Y			 788
 
 #define HOME_STAFF_X		 512
 #define HOME_STAFF_Y		 512
@@ -206,7 +212,7 @@
 #define SP_COST_DISPEL		40
 #define SP_COST_GHOST		45
 #define SP_COST_SHADOW		60
-#define SP_COST_PULSE		65
+#define SP_COST_PULSE		95
 #define SP_COST_ZEPHYR		50
 #define SP_COST_LETHARGY	40
 
@@ -228,8 +234,8 @@
 #define SP_MULT_POISON		115
 #define SP_MULT_POISON2		120
 #define SP_MULT_IDENTIFY	180
-#define SP_MULT_DISPEL		100
-#define SP_MULT_DISPEL2		 90
+#define SP_MULT_DISPEL		 90
+#define SP_MULT_DISPEL2		 75
 #define SP_MULT_WEAKEN		120
 #define SP_MULT_WEAKEN2		115
 #define SP_MULT_WARCRY		 95
@@ -242,7 +248,7 @@
 #define DAM_MULT_BLAST		 625
 #define DAM_MULT_HOLYW		 750
 #define DAM_MULT_THORNS		1000
-#define DAM_MULT_CLEAVE		 750
+#define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  25
 #define DAM_MULT_LEAP		 250
@@ -265,6 +271,7 @@
 #define SP_DUR_POISON		( TICKS * 30                      )
 #define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 80          )
 #define SP_DUR_WARCRY		( TICKS * 60                      )
+#define SP_DUR_RALLY		( TICKS * 60 * 5                  )
 #define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
 #define SP_DUR_SHADOW(a)	( TICKS * 20 + TICKS * a / 5      )
@@ -275,17 +282,17 @@
 #define SP_DUR_LETHARGY		( TICKS * 60 * 60 * 2             )
 #define SP_DUR_AGGRAVATE	( TICKS * 20                      )
 
-#define SP_DUR_DISPEL		( TICKS * 15                      )
+#define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 10     )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
 #define SP_DUR_TAUNT		( TICKS *  5                      )
-#define SP_DUR_GUARD		( TICKS * 20                      )
-#define SP_DUR_PULSE		( TICKS * 60 * 2                  )
+#define SP_DUR_GUARD		( TICKS * 30                      )
+#define SP_DUR_PULSE		( TICKS * 60 * 5                  )
 #define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )
 #define SP_DUR_DOUSE		( TICKS * 20                      )
 #define SP_DUR_FROSTB		( TICKS * 20                      )
-#define SP_DUR_POME			( TICKS * 10                      )
+#define SP_DUR_POME			( TICKS *  5                      )
 #define SP_DUR_SOL			( TICKS *  5                      )
-#define SP_DUR_STARL		( TICKS * 60                      )
+#define SP_DUR_STARL		( TICKS * 60 * 5                  )
 #define SP_DUR_PHALANX		( TICKS * 60                      )
 
 #define SP_DUR_SHRINE		( TICKS * 60 * 30                 )
