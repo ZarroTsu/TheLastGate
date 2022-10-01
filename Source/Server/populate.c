@@ -213,7 +213,7 @@ int pop_create_bonus(int cn)
 	int n, rank;
 	
 	// Changing from raw exp to rank for simplicity sake
-	rank = points2rank(ch[cn].points_tot);
+	rank = getrank(cn);
 	
 	// Nobility ranks
 	if (rank>=20)
@@ -286,7 +286,7 @@ int pop_create_bonus(int cn)
 			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
-			IT_POT_RAIN
+			MCT_CONTRACT
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
 		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
@@ -302,13 +302,14 @@ int pop_create_bonus(int cn)
 			IT_B_SP, IT_B_CI, IT_B_OP, IT_B_AQ,
 			IT_M_SA, IT_M_RU, IT_M_AM, IT_M_TO, IT_M_EM, IT_M_DI,
 			IT_GOLD, IT_GOLD, IT_SILV,
+			MCT_CONTRACT, MCT_QUILL_Y,
 			IT_POT_RAIN
 		};
 		static int item[]  = {
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
-			IT_POT_RAIN
+			MCT_CONTRACT
 		};
 		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
 		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
@@ -375,7 +376,7 @@ int pop_create_bonus_belt(int cn)
 	int i, j;
 	int rank, skill_value, skill_number, skm;
 	
-	rank = points2rank(ch[cn].points_tot);  // private wont get this belt
+	rank = getrank(cn);  // private wont get this belt
 	if (!rank)
 	{
 		return 0;
@@ -838,9 +839,9 @@ void reset_item(int n)
 			xlog(" --> %s (%d) (%d, %d,%d).", it[in].name, in, it[in].carried, it[in].x, it[in].y);
 			// make light calculations and update characters!!!
 			
-			if (it[in].flags & (IF_AUGMENTED|IF_DIMINISHED|IF_EASEUSE|IF_ENCHANTED))
+			if (it[in].flags & (IF_DIMINISHED|IF_EASEUSE|IF_ENCHANTED))
 			{
-				if (it[in].flags & (IF_AUGMENTED|IF_DIMINISHED|IF_EASEUSE))
+				if (it[in].flags & (IF_DIMINISHED|IF_EASEUSE))
 				{
 					it[in].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
 					it[in].max_damage = 100000;

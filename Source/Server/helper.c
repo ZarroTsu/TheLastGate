@@ -631,6 +631,11 @@ int points2rank(int v)
 						return 24; // Warlord
 }
 
+int getrank(int cn)
+{
+	return points2rank(ch[cn].points_tot);
+}
+
 int rank2points(int v)
 {
 	switch(v)
@@ -704,7 +709,7 @@ int points_tolevel(int curr_exp)
 
 int rankdiff(int cn, int co)
 {
-	return(points2rank(ch[co].points_tot) - points2rank(ch[cn].points_tot));
+	return (getrank(co) - getrank(cn));
 }
 
 int absrankdiff(int cn, int co)
@@ -746,7 +751,7 @@ int scale_exps2(int cn, int co_rank, int exp)
 	};
 	int diff;
 
-	diff = co_rank - points2rank(ch[cn].points_tot);
+	diff = co_rank - getrank(cn);
 
 	diff += RANKS;
 	if (diff<0)
@@ -758,7 +763,7 @@ int scale_exps2(int cn, int co_rank, int exp)
 		diff = RANKS*2;
 	}
 
-//      xlog("scale %d to %d: diff=%d, scale=%f",points2rank(ch[cn].points_tot),co_rank,diff,scale_tab[diff]);
+//      xlog("scale %d to %d: diff=%d, scale=%f",getrank(cn),co_rank,diff,scale_tab[diff]);
 
 	return((int)(exp * scale_tab[diff]));
 
@@ -766,7 +771,7 @@ int scale_exps2(int cn, int co_rank, int exp)
 
 int scale_exps(int cn, int co, int exp)
 {
-	return(scale_exps2(cn, points2rank(ch[co].points_tot), exp));
+	return(scale_exps2(cn, getrank(co), exp));
 }
 
 char *class_name[8] = {
@@ -1316,6 +1321,19 @@ int change_bs_shop_item(int cn, int in)
 	return in;
 }
 
+int change_xp_shop_item(int cn, int nr)
+{
+	int n, m = 0;
+	
+	for (n=0; n<50; n++) 
+	{
+		if (ch[cn].skill[n][0]) m++;
+		if (m > nr) return n<50?n:-1;
+	}
+	
+	return -1;
+}
+
 int get_special_item(int in, int gen_a, int gen_b, int gen_c)
 {
 	int in2;
@@ -1550,7 +1568,7 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 	
 	roll = RANDOM(roll);
 	
-	if (gen_a) roll = gen_a;
+	if (gen_a) roll = max(0, gen_a-1);
 	
 	// Pick a prefix
 	switch(roll)
@@ -1621,8 +1639,8 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 		}
 		m=RANDOM(2);
 		
-		if (n==0 && gen_b) roll = gen_b;
-		if (n==1 && gen_c) roll = gen_c;
+		if (n==0 && gen_b) roll = max(0, gen_b-1);
+		if (n==1 && gen_c) roll = max(0, gen_c-1);
 		
 		switch(roll)
 		{
@@ -2320,15 +2338,17 @@ struct npc_class npc_class[] = {
 	//
 	{"Ancient Gargoyle"         },	// 190
 	{"Dweller"                  },	// 191
-	{""                     	},	// 192
-	{""                     	},	// 193
-	{""                     	},	// 194
-	{""                     	},	// 195
-	{""                     	},	// 196
-	{""                     	},	// 197
-	{""                     	},	// 198
-	{""                     	},	// 199
-	{""                     	},	// 200
+	{"Leaper"                  	},	// 192
+	{"Experiment"             	},	// 193
+	{"Abomination"            	},	// 194
+	//
+	{"Forsaken"                 },	// 195
+	{"Ninja"                    },	// 196
+	{"Assassin"                 },	// 197
+	{"Mahaha"                   },	// 198
+	{"Ijiraq"                   },	// 199
+	{"Smuggler"                 },	// 200
+	//
 	{""                     	},	// 201
 	{""                     	},	// 202
 	{""                     	},	// 203
@@ -2959,35 +2979,25 @@ int cap(int cn, int nr)
 
 int soultransform(int cn, int in, int in2, int temp)
 {
-	god_take_from_char(in, cn);
-	god_take_from_char(in2, cn);
-
-	it[in].used  = USE_EMPTY;
-	it[in2].used = USE_EMPTY;
+	use_consume_item(cn, in, 1);
+	use_consume_item(cn, in2, 1);
 
 	in = god_create_item(temp);
 	god_give_char(in, cn);
 
-	return(in);
+	return in;
 }
 
 int soulrepair(int cn, int in, int in2)
 {
-	god_take_from_char(in, cn);
-	it[in].used = USE_EMPTY;
+	use_consume_item(cn, in, 1);
 
 	it[in2] = it_temp[it[in2].temp];
 	it[in2].carried = cn;
 	it[in2].flags |= IF_UPDATE;
 	it[in2].temp   = 0;
 
-	return(in2);
-}
-
-void souldestroy(int cn, int in)
-{
-	god_take_from_char(in, cn);
-	it[in].used = USE_EMPTY;
+	return in2;
 }
 
 // Soulstones
@@ -3008,7 +3018,147 @@ int soul_cap(int r)
 	}
 }
 
-void soultrans_equipment(int cn, int in, int in2)
+void make_soulstone(int cn, int exp)
+{
+	int in, rank;
+	
+	if (!(in = god_create_item(IT_SOULSTONE)))
+	{
+		chlog(cn, "ERROR in make_soulstone: god_create_item failure");
+		return;
+	}
+	rank = points2rank(exp/max(1, N_SOULFACTOR)); if (rank > N_SOULMAX) rank = N_SOULMAX;
+	
+	sprintf(it[in].name, "Soulstone");
+	sprintf(it[in].reference, "soulstone");
+	sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, exp);
+	
+	it[in].temp    = 0;
+	it[in].driver  = 68;
+	it[in].data[0] = rank;
+	it[in].data[1] = exp;
+	
+	god_give_char(in, cn);	// chlog(cn, "got soulstone");
+}
+
+void merge_soulstone(int cn, int in, int in2)
+{
+	int rank, exp;
+	
+	exp = it[in].data[1];
+	
+	// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
+	exp += it[in2].data[1]; // - RANDOM(it[in2].data[1]/10 + 1);
+	rank = points2rank(exp/max(1, N_SOULFACTOR));
+	
+	if (rank > N_SOULMAX) rank = N_SOULMAX;
+	
+	sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, exp);
+	
+	it[in].data[0] = rank;
+	it[in].data[1] = exp;
+	
+	do_char_log(cn, 7, "You fed the held soulstone to the one in your bag. It is now level %d.\n", rank);
+	if (rank==N_SOULMAX) do_char_log(cn, 7, "(That's as high as they go!)\n");
+	
+	// Copy Focus
+	if (it[in2].data[2])
+	{
+		if (it[in].data[2])
+			it[in].data[2] = min(it[in].data[2], it[in2].data[2]);
+		else
+			it[in].data[2] = it[in2].data[2];
+	}
+}
+
+void make_catalyst(int cn, int n)
+{
+	int in, v;
+	
+	if (!(in = god_create_item(IT_SOULCATAL)))
+	{
+		chlog(cn, "ERROR in make_catalyst: god_create_item failure");
+		return;
+	}
+	
+	v = RANDOM(MAXSKILL);
+	
+	sprintf(it[in].name, "Soul Catalyst");
+	sprintf(it[in].reference, "soul catalyst");
+	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
+	
+	it[in].temp        = 0;
+	it[in].driver      = 93;
+	it[in].data[3]     = 2;
+	it[in].data[4]     = v+1;
+	it[in].flags      |= IF_IDENTIFIED;
+	it[in].flags      |= IF_STACKABLE;
+	it[in].skill[v][0] = 1;
+	it[in].skill[v][1] = 2;
+	
+	it[in].stack = max(1, n);
+	
+	god_give_char(in, cn);	// chlog(cn, "got soul catalyst");
+}
+
+void make_focus(int cn, int exp)
+{
+	int in, v, rank;
+	
+	if (!(in = god_create_item(IT_SOULFOCUS)))
+	{
+		chlog(cn, "ERROR in make_focus: god_create_item failure");
+		return;
+	}
+	rank = points2rank(exp/max(1, N_SOULFACTOR));
+	
+	v = max(4, min(6, 6 - rank/10));
+					
+	sprintf(it[in].name, "Soul Focus");
+	sprintf(it[in].reference, "soul focus");
+	sprintf(it[in].description, "A soul focus of %d. Can be used on a soulstone to narrow the number of random skill rolls.", v);
+	
+	it[in].data[0] = v;
+	it[in].temp = 0;
+	it[in].driver = 92;
+	
+	god_give_char(in, cn);	// chlog(cn, "got soul focus");
+}
+
+void make_talisfrag(int cn, int n)
+{
+	int in;
+	
+	if (!(in = god_create_item(IT_TALISFRAG)))
+	{
+		chlog(cn, "ERROR in make_talisfrag: god_create_item failure");
+		return;
+	}
+	
+	it[in].stack = max(1, n);
+	
+	god_give_char(in, cn);	// chlog(cn, "got talisman fragment(s)");
+}
+
+// Soulstone an item by a given rank
+void create_soultrans_equipment(int cn, int in2, int rank)
+{
+	int in;
+	
+	if (!CAN_SOULSTONE(in2)) return;
+	
+	in = god_create_item(IT_SOULSTONE);
+	if (in)
+	{
+		it[in].data[0] = rank;
+		it[in].temp = 0;
+		it[in].driver = 68;
+	}
+	
+	soultrans_equipment(cn, in, in2, 0);
+}
+
+void soultrans_equipment(int cn, int in, int in2, int flag)
 {
 	int rank, focus, try, r, n, t, m, c=0, s=0, temp=0, bonus=1, catfocus=0, cf=0;
 	char known[N_SOULBONUS] = {0};
@@ -3018,12 +3168,11 @@ void soultrans_equipment(int cn, int in, int in2)
 	int sklm[50]={0};
 	
 	// 0. Check if (in) is twohanded, grant a rank bonus if it is.
-	if (IS_TWOHAND(in2))
-		bonus = 2;
+	if (IS_TWOHAND(in2)) bonus = 2;
 	
 	// 1. Set local variables to pull from the soulstone (in)
 	rank   = max(0, min(N_SOULMAX*bonus, (it[in].data[0]-it[in].data[3])*bonus));
-	focus  = (it[in].data[2] > 0 && it[in].data[2] < 9) ? it[in].data[2] : 9;
+	focus  = (it[in].data[2] > 0 && it[in].data[2] < 8) ? it[in].data[2] : 8;
 	
 	// 2. Loop through known player skills and add to local array
 	for (n=0;n<N_SOULBONUS;n++)
@@ -3042,7 +3191,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	if (c<1)
 	{
 		chlog(cn, "soultrans_equipment failed with zero entries known");
-		do_char_log(cn, 2, "Nothing happens.");
+		if (flag) do_char_log(cn, 2, "Nothing happens.");
 		return;
 	}
 	
@@ -3066,7 +3215,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	// 3. Select 'focus' number of skills from the known list - duplicates are OK
 	//    We add extras if a catalyst is giving a bonus to the roll odds.
 	try = 0;
-	for (n=0;n<focus;n++)
+	for (n=0; n<focus; n++)
 	{
 		m = 1;
 		if (catfocus)
@@ -3084,7 +3233,7 @@ void soultrans_equipment(int cn, int in, int in2)
 	if (s<1)
 	{
 		chlog(cn, "soultrans_equipment failed with zero entries selected");
-		do_char_log(cn, 2, "Nothing happens.");
+		if (flag) do_char_log(cn, 2, "Nothing happens.");
 		return;
 	}
 	
@@ -3103,7 +3252,7 @@ void soultrans_equipment(int cn, int in, int in2)
 		if (r<0) break;
 		
 		// 4b. Add the stat to the item
-		it[in2].skill[r][0] += 1 * bonus;
+		it[in2].skill[r][0] += 1;
 		sklm[r] += 5;
 		added[r]++;
 		rank--;
@@ -3114,7 +3263,7 @@ void soultrans_equipment(int cn, int in, int in2)
 			it[in2].skill[n][2] = max(it[in2].skill[n][2], sklm[n]);
 	}
 	
-	rank = max(1, min(N_SOULMAX*bonus, it[in].data[0]));
+	rank = it[in].data[0];
 	
 	// 5. Repair the transformed item
 	temp = it[in2].temp;
@@ -3161,34 +3310,44 @@ void soultrans_equipment(int cn, int in, int in2)
 	
 	it[in2].power += rank * 5;
 
-	souldestroy(cn, in);
+	use_consume_item(cn, in, 1);
 
 	sprintf(it[in2].description, "A %s enhanced by a rank %d soulstone.", it[in2].name, rank);
 	
 	if (t==3)
 	{
 		chlog(cn, "soultrans_equipment error - ran out of tries on rank loop");
-		do_char_log(cn, 2, "Err... Well, it kind of worked...\n");
+		if (flag) do_char_log(cn, 2, "Err... Well, it kind of worked...\n");
 	}
 	else
 	{
-		do_char_log(cn, 7, "You enhanced the %s with a rank %d soulstone.\n", it[in2].name, rank);
+		if (flag) do_char_log(cn, 7, "You enhanced the %s with a rank %d soulstone.\n", it[in2].name, rank);
 	}
 }
 
-int do_soulcatalyst(int ins, int inc)
+int do_soulcatalyst(int cn, int ins, int inc)
 {
-	int n, m;
+	int n, m, v;
+	
+	v = it[inc].data[4]-1;
 	
 	// Determine the stone's current rank/used rank
 	if (it[ins].data[0] < it[ins].data[3] + it[inc].data[3])
 	{
+		do_char_log(cn, 0, "The soulstone isn't powerful enough for that.\n");
 		return 0;
 	}
+	// Prevent use if the skill we want is maxed already
+	if (it[ins].skill[v][0] + it[inc].data[3]/2 > soul_cap(n))
+	{
+		do_char_log(cn, 0, "This soulstone cannot have that skill raised any higher.\n");
+		return 0;
+	}
+	chlog(cn, "used catalyst on soulstone");
 	
 	it[ins].data[3] = 0;
 	
-	for (n=0;n<50;n++)
+	for (n=0; n<50; n++)
 	{
 		it[ins].skill[n][0] += it[inc].skill[n][0];
 		it[ins].skill[n][1] += it[inc].skill[n][1];
@@ -3201,7 +3360,6 @@ int do_soulcatalyst(int ins, int inc)
 		
 		it[ins].data[3] += it[ins].skill[n][1];
 	}
-	
 	it[ins].flags |= IF_IDENTIFIED;
 	
 	return 1;
@@ -3226,6 +3384,7 @@ int do_catalyst_focus(int cn, int inf, int inc)
 		do_char_log(cn, 1, "Nothing happened. Seems this focus won't improve anything.\n");
 		return 0;
 	}
+	chlog(cn, "used focus on catalyst");
 	
 	v--;
 	
@@ -3235,6 +3394,22 @@ int do_catalyst_focus(int cn, int inf, int inc)
 	it[inc].data[3] = it[inc].skill[v][1] = m*2;
 	
 	return 1;
+}
+
+// Soulstone an item by a given rank
+void create_random_talisman_equipment(int cn, int in2)
+{
+	int in;
+	
+	if (!CAN_ENCHANT(in2)) return;
+	
+	in = god_create_item(IT_TALISMAN);
+	if (in)
+	{
+		it[in].data[0] = RANDOM(91)+1;
+	}
+	
+	use_talisman(cn, in, in2);
 }
 
 int use_talisman(int cn, int in, int in2)
@@ -3381,24 +3556,7 @@ int use_talisman(int cn, int in, int in2)
 		
 		it[in].flags |= IF_UPDATE;
 		
-		if (in2)
-		{
-			if (it[in2].stack>1)
-			{
-				stk = it[in2].stack;
-				val = it[in2].value / stk;
-				stk--;
-				it[in2].stack = stk;
-				it[in2].value = val * stk;
-				it[in2].flags |= IF_UPDATE;
-			}
-			else
-			{
-				it[in2].used = USE_EMPTY;
-				ch[cn].citem = 0;
-			}
-		}
-		
+		use_consume_item(cn, in2, 0);
 		return 1;
 	}
 	// Past here we can assume there is an active enchantment
@@ -3624,7 +3782,7 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].power += 15;
 	
 	do_char_log(cn, 2, "You enchanted the %s with the talisman.\n", it[in2].name);
-	souldestroy(cn, in);
+	use_consume_item(cn, in, 1);
 	return 1;
 }
 
@@ -3640,49 +3798,32 @@ int use_soulstone(int cn, int in, int in2)
 		return 0;
 	}
 	if (!IS_SANEITEM(in2))	return 0;
-	if (it[in2].driver==68)
+	
+	switch (it[in2].driver)
 	{
-		// Remember: in2 is the item on the cursor. It gets applied to the item in inventory.
-		
-		it[in].data[1] += it[in2].data[1] - RANDOM(it[in2].data[1]/10 + 1);
-		rank = points2rank(it[in].data[1]/2);
-		
-		if (rank > N_SOULMAX) rank = N_SOULMAX;
-		
-		it[in].data[0] = rank;
-		sprintf(it[in].description, "Level %d soulstone, holding %d exp.", rank, it[in].data[1]);
-		
-		do_char_log(cn, 7, "You fed the held soulstone to the one in your bag. It is now level %d.\n", rank);
-		
-		if (rank==N_SOULMAX)
-		{
-			do_char_log(cn, 7, "(That's as high as they go!)\n");
-		}
-		
-		// Copy Focus
-		if (it[in2].data[2] && RANDOM(2))
-		{
-			it[in].data[2] += RANDOM(it[in2].data[2]);
-			if (it[in].data[2]>8)
-				it[in].data[2] = 0;
-		}
-
-		souldestroy(cn, in2);
-		return 1;
+		case 68: // Soulstone
+			merge_soulstone(cn, in, in2);
+			use_consume_item(cn, in2, 1);
+			return 1;
+		case 92: // Soul Focus
+			if (it[in].data[2])
+				it[in].data[2] = min(it[in].data[2], it[in2].data[0]);
+			else
+				it[in].data[2] = it[in2].data[0];
+			chlog(cn, "used focus on soulstone");
+			use_consume_item(cn, in2, 1);
+			return 1;
+		case 93: // Soul Catalyst
+			if (do_soulcatalyst(cn, in, in2))
+			{
+				use_consume_item(cn, in2, 0);
+				return 1;
+			}
+			return 0;
+		default:
+			break;
 	}
 	
-	// Soul Catalyst
-	if (it[in2].driver==93)
-	{
-		if (do_soulcatalyst(in, in2))
-		{
-			souldestroy(cn, in2);
-			return 1;
-		}
-		do_char_log(cn, 0, "The soulstone isn't powerful enough for that.\n");
-		return 0;
-	}
-
 	switch(it[in2].temp)
 	{
 		case 18: // red flower
@@ -3701,25 +3842,23 @@ int use_soulstone(int cn, int in, int in2)
 			in = soultransform(cn, in, in2, 102);
 			return 1;
 		case 101: // healing potion
-			souldestroy(cn, in);
+			use_consume_item(cn, in, 1);
 			it[in].hp[0] += 10;
 			return 1;
 		case 102: // mana potion
-			souldestroy(cn, in);
+			use_consume_item(cn, in, 1);
 			it[in].mana[0] += 10;
 			return 1;
 		default:
 			if (CAN_SOULSTONE(in2))
 			{
-				soultrans_equipment(cn, in, in2);
+				soultrans_equipment(cn, in, in2, 1);
 				return 1;
 			}
-			else
-			{
-				do_char_log(cn, 1, "Nothing happened.\n");
-				return 0;
-			}
+			break;
 	}
+	do_char_log(cn, 1, "Nothing happened.\n");
+	return 0;
 }
 
 int use_soulfocus(int cn, int in) // driver 92
@@ -3730,70 +3869,50 @@ int use_soulfocus(int cn, int in) // driver 92
 	if (!IS_SANEITEM(in))	return 0;
 	if (!(in2 = ch[cn].citem))
 	{
-		do_char_log(cn, 1, "Try using this item with a soulstone or catalyst.\n");
+		do_char_log(cn, 1, "Try using this item on a soulstone.\n");
 		return 0;
 	}
 	if (!IS_SANEITEM(in2))	return 0;
 	
-	if (it[in2].driver==92) // Soul Focus
+	switch (it[in2].driver)
 	{
-		it[in].data[0] = min(6, min(it[in].data[0], it[in2].data[0])+1);
-		sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to increase its strength.", it[in].data[0]);
-		
-		do_char_log(cn, 7, "You fed the held soul focus to the one in your bag. It is now level %d.\n", it[in].data[0]);
-		
-		if (it[in].data[0]==6)
-		{
-			do_char_log(cn, 7, "(That's as high as they go!)\n");
-		}
-		
-		chlog(cn, "used focus on focus");
-		souldestroy(cn, in2);
-		return 1;	
-	}
-	
-	if (it[in2].driver==93) // Soul Catalyst
-	{
-		if (do_catalyst_focus(cn, in, in2))
-		{
-			chlog(cn, "used focus on catalyst");
-			souldestroy(cn, in);
+		case 68: // Soulstone
+			if (it[in2].data[2])
+				it[in2].data[2] = min(it[in2].data[2], it[in].data[0]);
+			else
+				it[in2].data[2] = it[in].data[0];
+			chlog(cn, "used focus on soulstone");
+			use_consume_item(cn, in, 1);
 			return 1;
-		}
-		return 0;
+		case 92: // Soul Focus
+			it[in].data[0] = min(3, max(it[in].data[0], it[in2].data[0])-1);
+			sprintf(it[in].description, "A soul focus of %d. Can be used on a soulstone to narrow the number of random skill rolls.", it[in].data[0]);
+			
+			do_char_log(cn, 7, "You fed the held soul focus to the one in your bag. It is now level %d.\n", it[in].data[0]);
+			
+			if (it[in].data[0]==3)
+			{
+				do_char_log(cn, 7, "(That's as low as they go!)\n");
+			}
+			
+			chlog(cn, "used focus on focus");
+			use_consume_item(cn, in2, 1);
+			return 1;
+		case 93: // Soul Catalyst
+			break;
+			/*
+			if (do_catalyst_focus(cn, in, in2))
+			{
+				use_consume_item(cn, in, 1);
+				return 1;
+			}
+			return 0;
+			*/
+		default:
+			break;
 	}
-
 	do_char_log(cn, 1, "Nothing happened.\n");
 	return 0;
-}
-
-void make_catalyst(int cn, int base)
-{
-	int m, v, in;
-	
-	in = god_create_item(IT_SOULCATAL);
-	
-	sprintf(it[in].name, "Soul Catalyst");
-	sprintf(it[in].reference, "soul catalyst");
-	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
-	
-	v = RANDOM(MAXSKILL);
-	m = max(1, min(soul_cap(v), base/4) - RANDOM(2));
-	
-	if (m<1) m=1;
-	if (m>6) m=6;
-	
-	it[in].skill[v][0] = m; 
-	it[in].skill[v][1] = m*2;
-	
-	it[in].data[3] = m*2;
-	it[in].data[4] = v+1;
-	it[in].temp = 0;
-	it[in].driver = 93;
-	it[in].flags |= IF_IDENTIFIED;
-	
-	god_give_char(in, cn);
-	chlog(cn, "got soul catalyst");
 }
 
 int use_soulcatalyst(int cn, int in) // driver 93
@@ -3804,103 +3923,37 @@ int use_soulcatalyst(int cn, int in) // driver 93
 	if (!IS_SANEITEM(in))	return 0;
 	if (!(in2 = ch[cn].citem))
 	{
-		do_char_log(cn, 1, "Try using this item with a soulstone or focus.\n");
+		do_char_log(cn, 1, "Try using this item on a soulstone.\n");
 		return 0;
 	}
 	if (!IS_SANEITEM(in2))	return 0;
-
-	if (it[in2].driver==68)
-	{
-		if (do_soulcatalyst(in2, in))
-		{
-			chlog(cn, "used catalyst on soulstone");
-			souldestroy(cn, in);
-			return 1;
-		}
-		do_char_log(cn, 0, "The soulstone isn't powerful enough for that.\n");
-		return 0;
-	}
 	
-	if (it[in2].driver==92) // Soul Focus
+	switch (it[in2].driver)
 	{
-		if (do_catalyst_focus(cn, in2, in))
-		{
-			chlog(cn, "used focus on catalyst");
-			souldestroy(cn, in2);
-			return 1;
-		}
-		return 0;
+		case 68: // Soulstone
+			if (do_soulcatalyst(cn, in2, in))
+			{
+				use_consume_item(cn, in, 1);
+				return 1;
+			}
+			return 0;
+		case 92: // Soul Focus
+			break;
+			/*
+			if (do_catalyst_focus(cn, in2, in))
+			{
+				use_consume_item(cn, in2, 1);
+				return 1;
+			}
+			return 0;
+			*/
+		case 93: // Soul Catalyst
+			break;
+		default:
+			break;
 	}
-	
-	if (it[in2].driver==93) // Soul Catalyst
-	{
-		in3 = god_create_item(IT_SOULCATAL);
-		if (in3)
-		{
-			sprintf(it[in3].name, "Soul Catalyst");
-			sprintf(it[in3].reference, "soul catalyst");
-			sprintf(it[in3].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
-			
-			v = RANDOM(MAXSKILL);
-			m = max(1, min(soul_cap(v), max(it[in].data[3]/2, it[in2].data[3]/2)));
-			
-			if (m<1) m=1;
-			if (m>6) m=6;
-			
-			it[in3].skill[v][0] = m; 
-			it[in3].skill[v][1] = m*2;
-			
-			it[in3].data[3] = m*2;
-			it[in3].data[4] = v+1;
-			it[in3].temp = 0;
-			it[in3].driver = 93;
-			it[in3].flags |= IF_IDENTIFIED;
-			
-			chlog(cn, "used catalyst on catalyst");
-			souldestroy(cn, in);
-			souldestroy(cn, in2);
-			god_give_char(in3, cn);
-			return 1;
-		}
-		return 0;
-	}
-	
-	// 
-
 	do_char_log(cn, 1, "Nothing happened.\n");
 	return 0;
-}
-
-void make_focus(int cn, int base)
-{
-	int v, in;
-	
-	in = god_create_item(IT_SOULFOCUS);
-	
-	v = max(1, min(6, base/4));
-					
-	sprintf(it[in].name, "Soul Focus");
-	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus of %d. Can be used on a soul catalyst to increase its strength.", v);
-	
-	it[in].data[0] = v;
-	it[in].temp = 0;
-	it[in].driver = 92;
-	
-	god_give_char(in, cn);
-	chlog(cn, "got soul focus");
-}
-
-void make_talisfrag(int cn, int n)
-{
-	int in;
-	
-	in = god_create_item(IT_TALISFRAG);
-	
-	it[in].stack = max(1, n);
-	
-	god_give_char(in, cn);
-	chlog(cn, "got talisman fragment(s)");
 }
 
 void set_random_text(int cn)
@@ -3931,7 +3984,8 @@ void set_random_text(int cn)
 int start_contract(int cn, int in)
 {
 	unsigned long long prof;
-	int rank, tier, mission, flags=0;
+	int rank, tier, mission, fl;
+	int flags[NUM_MAP_POS+NUM_MAP_NEG] = {0};
 	
 	if (cn==0 || !(in && it[in].temp==MCT_CONTRACT))
 	{
@@ -3953,8 +4007,14 @@ int start_contract(int cn, int in)
 	
 	mission = it[in].data[1];
 	tier    = it[in].data[2];
-	flags   = it[in].data[3];
-	rank    = points2rank(ch[cn].points_tot) + tier;
+	rank    = getrank(cn) + tier;
+	
+	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 1;
+	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 2;
+	if ((fl = it[in].data[7]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 3;
+	if ((fl = it[in].data[4]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 1;
+	if ((fl = it[in].data[6]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 2;
+	if ((fl = it[in].data[8]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 3;
 	
 	return build_new_map(cn, rank, flags, mission, tier, in);
 }
@@ -3970,13 +4030,35 @@ int get_tier_font(int tier)
 	}
 }
 
-void show_map_flags(int cn, int flags, int tier)
+int contract_has_flag(int in, int m)
 {
-	int font;
+	if (m < NUM_MAP_POS)
+	{
+		if (it[in].data[3] == m) return 1;
+		if (it[in].data[5] == m) return 2;
+		if (it[in].data[7] == m) return 3;
+	}
+	else
+	{
+		m -= NUM_MAP_POS;
+		if (it[in].data[4] == m) return 1;
+		if (it[in].data[6] == m) return 2;
+		if (it[in].data[8] == m) return 3;
+	}
+	return 0;
+}
+
+void show_map_flags(int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG], int tier)
+{
+	int font, n;
 	
 	font = get_tier_font(tier);
 	
-	if (!flags) 
+	for (n=0; n<NUM_MAP_POS+NUM_MAP_NEG; n++)
+	{
+		if (flags[n]) break;
+	}
+	if (n==NUM_MAP_POS+NUM_MAP_NEG) 
 	{
 		do_char_log(cn, font, "It has no other details.\n"); 
 		do_char_log(cn, font, " \n"); 
@@ -3987,37 +4069,42 @@ void show_map_flags(int cn, int flags, int tier)
 	do_char_log(cn, font, " \n");
 	
 	// Sorted alphabetically
-	if (flags & 0x08000000) do_char_log(cn, font, CFL_08000000);
-	if (flags & 0x00000001) do_char_log(cn, font, CFL_00000001);
-	if (flags & 0x00000020) do_char_log(cn, font, CFL_00000020);
-	if (flags & 0x00000004) do_char_log(cn, font, CFL_00000004);
-	if (flags & 0x00000001) do_char_log(cn, font, CFL_00000002);
-	if (flags & 0x00000010) do_char_log(cn, font, CFL_00000010);
-	if (flags & 0x00000008) do_char_log(cn, font, CFL_00000008);
-	if (flags & 0x10000000) do_char_log(cn, font, CFL_10000000);
-	if (flags & 0x20000000) do_char_log(cn, font, CFL_20000000);
-	if (flags & 0x00000200) do_char_log(cn, font, CFL_00000200);
-	if (flags & 0x00000400) do_char_log(cn, font, CFL_00000400);
-	if (flags & 0x00000040) do_char_log(cn, font, CFL_00000040);
-	if (flags & 0x04000000) do_char_log(cn, font, CFL_04000000);
-	if (flags & 0x00002000) do_char_log(cn, font, CFL_00002000);
-	if (flags & 0x00008000) do_char_log(cn, font, CFL_00008000);
-	if (flags & 0x00000800) do_char_log(cn, font, CFL_00000800);
-	if (flags & 0x00001000) do_char_log(cn, font, CFL_00001000);
-	if (flags & 0x00004000) do_char_log(cn, font, CFL_00004000);
-	if (flags & 0x00000100) do_char_log(cn, font, CFL_00000100);
-	if (flags & 0x01000000) do_char_log(cn, font, CFL_01000000);
-	if (flags & 0x02000000) do_char_log(cn, font, CFL_02000000);
-	if (flags & 0x00000080) do_char_log(cn, font, CFL_00000080);
-	if (flags & 0x00800000) do_char_log(cn, font, CFL_00800000);
-	if (flags & 0x00100000) do_char_log(cn, font, CFL_00100000);
-	if (flags & 0x00200000) do_char_log(cn, font, CFL_00200000);
-	if (flags & 0x00400000) do_char_log(cn, font, CFL_00400000);
-	if (flags & 0x00010000) do_char_log(cn, font, CFL_00010000);
-	if (flags & 0x00020000) do_char_log(cn, font, CFL_00020000);
-	if (flags & 0x00080000) do_char_log(cn, font, CFL_00080000);
-	if (flags & 0x00040000) do_char_log(cn, font, CFL_00040000);
-
+	if (flags[MM_P_DRGM]) do_char_log(cn, font, CFL_P_DRGM, flags[MM_P_DRGM]);
+	if (flags[MM_N_ARUW]) do_char_log(cn, font, CFL_N_ARUW, flags[MM_N_ARUW]*25+25);
+	if (flags[MM_P_AREQ]) do_char_log(cn, font, CFL_P_AREQ, flags[MM_P_AREQ]==3?"numerous":(flags[MM_P_AREQ]==2?"many":"some"));
+	if (flags[MM_P_ARPT]) do_char_log(cn, font, CFL_P_ARPT, flags[MM_P_ARPT]==3?"numerous":(flags[MM_P_ARPT]==2?"many":"some"));
+	if (flags[MM_N_ARDT]) do_char_log(cn, font, CFL_N_ARDT, flags[MM_N_ARDT]==3?"numerous":(flags[MM_N_ARDT]==2?"many":"some"));
+	if (flags[MM_N_ARFL]) do_char_log(cn, font, CFL_N_ARFL, flags[MM_N_ARFL]==3?"numerous":(flags[MM_N_ARFL]==2?"many":"some"));
+	if (flags[MM_P_ARGL]) do_char_log(cn, font, CFL_P_ARGL, flags[MM_P_ARGL]==3?"numerous":(flags[MM_P_ARGL]==2?"many":"some"));
+	if (flags[MM_N_ARSP]) do_char_log(cn, font, CFL_N_ARSP, flags[MM_N_ARSP]==3?"numerous":(flags[MM_N_ARSP]==2?"many":"some"));
+	if (flags[MM_P_CHST]) do_char_log(cn, font, CFL_P_CHST, flags[MM_P_CHST]);
+	if (flags[MM_N_EXDV]) do_char_log(cn, font, CFL_N_EXDV, flags[MM_N_EXDV]);
+	if (flags[MM_N_EXTY]) do_char_log(cn, font, CFL_N_EXTY, flags[MM_N_EXTY]);
+	if (flags[MM_P_SHRN]) do_char_log(cn, font, CFL_P_SHRN, flags[MM_P_SHRN]);
+	if (flags[MM_P_RANK]) do_char_log(cn, font, CFL_P_RANK, flags[MM_P_RANK]);
+	if (flags[MM_N_ENFS]) do_char_log(cn, font, CFL_N_ENFS, flags[MM_N_ENFS]*10);
+	if (flags[MM_N_ENRS]) do_char_log(cn, font, CFL_N_ENRS, flags[MM_N_ENRS]*10);
+	if (flags[MM_N_ENSK]) do_char_log(cn, font, CFL_N_ENSK, flags[MM_N_ENSK]*10);
+	if (flags[MM_N_ENUN]) do_char_log(cn, font, CFL_N_ENUN, flags[MM_N_ENUN]*50);
+	if (flags[MM_P_ENGL]) do_char_log(cn, font, CFL_P_ENGL, flags[MM_P_ENGL]*RATE_P_ENGL);
+	if (flags[MM_P_ENOS]) do_char_log(cn, font, CFL_P_ENOS, flags[MM_P_ENOS]*RATE_P_ENOS);
+	if (flags[MM_P_ENBS]) do_char_log(cn, font, CFL_P_ENBS, flags[MM_P_ENBS]*RATE_P_ENBS);
+	if (flags[MM_N_ENFO]) do_char_log(cn, font, CFL_N_ENFO, flags[MM_N_ENFO]*10);
+	if (flags[MM_N_ENWI]) do_char_log(cn, font, CFL_N_ENWI, flags[MM_N_ENWI]*10);
+	if (flags[MM_N_ENSH]) do_char_log(cn, font, CFL_N_ENSH, flags[MM_N_ENSH]*10);
+	if (flags[MM_N_ENRO]) do_char_log(cn, font, CFL_N_ENRO, flags[MM_N_ENRO]*50);
+	if (flags[MM_N_ENTR]) do_char_log(cn, font, CFL_N_ENTR, flags[MM_N_ENTR]==3?"multiple":(flags[MM_N_ENTR]==2?"reverse":"forward"));
+	if (flags[MM_P_XEXP]) do_char_log(cn, font, CFL_P_XEXP, flags[MM_P_XEXP]*RATE_P_XEXP);
+	if (flags[MM_P_XLUK]) do_char_log(cn, font, CFL_P_XLUK, flags[MM_P_XLUK]*RATE_P_XLUK);
+	if (flags[MM_P_XOSP]) do_char_log(cn, font, CFL_P_XOSP, flags[MM_P_XOSP]*RATE_P_XOSP);
+	if (flags[MM_P_XBSP]) do_char_log(cn, font, CFL_P_XBSP, flags[MM_P_XBSP]*RATE_P_XBSP);
+	if (flags[MM_N_EXEN]) do_char_log(cn, font, CFL_N_EXEN, flags[MM_N_EXEN]);
+	if (flags[MM_N_PLDB]) do_char_log(cn, font, CFL_N_PLDB, flags[MM_N_PLDB]*10);
+	if (flags[MM_N_PLHY]) do_char_log(cn, font, CFL_N_PLHY, flags[MM_N_PLHY]*50);
+	if (flags[MM_N_PLFR]) do_char_log(cn, font, CFL_N_PLFR, flags[MM_N_PLFR]*5);
+	if (flags[MM_N_PLST]) do_char_log(cn, font, CFL_N_PLST, flags[MM_N_PLST]*20);
+	if (flags[MM_P_PLXP]) do_char_log(cn, font, CFL_P_PLXP, flags[MM_P_PLXP]*RATE_P_PLXP);
+	
 	do_char_log(cn, font, " \n");
 }
 
@@ -4593,22 +4680,21 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	
 		switch (affix)
 		{
-			case 1:
+			case 1:												// "Tough" (BS)
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += 3+RANDOM(3);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += 3+RANDOM(3)*2;
 				break;
-			case 2:
+			case 2:												// "Fierce" (BS)
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += 6+RANDOM(5);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += 6+RANDOM(5)*2;
-				if (!(ch[co].flags & CF_CANCRIT))
-					ch[co].flags |= CF_CANCRIT;
+				if (!(ch[co].flags & CF_EXTRACRIT)) ch[co].flags |= CF_EXTRACRIT;
 				break;
 			//
-			case 3:
+			case 3:												// "Divine" (CN)
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/18);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4618,7 +4704,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, RANDOM(2)+1);
 				// 
 				break;
-			case 4:
+			case 4:												// "Cruel"
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4628,7 +4714,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, 2);
 				//
 				break;
-			case 5:
+			case 5:												// "Timid"
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/20);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4639,12 +4725,13 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, RANDOM(2)+2);
 				//
 				break;
-			case 6:
+			case 6:												// Legendary
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/22);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/22)*2;
 				ch[co].data[72] = 6;
+				if (!(ch[co].flags & CF_EXTRACRIT)) ch[co].flags |= CF_EXTRACRIT;
 				//
 				make_talisfrag(co, 3);
 				//
@@ -4675,7 +4762,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	if (ch[co].data[42] == 1100) // Map enemy
 	{
 		in = 0;
-		rank = points2rank(ch[co].points_tot);
+		rank = getrank(co);
 		
 		if (rank>=18 && !RANDOM(50))
 		{

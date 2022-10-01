@@ -748,12 +748,16 @@ void copy_character_template(LIST *head)
 
 //				  if (ch_temp[n].used==USE_EMPTY) continue;
 	printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-			"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+			"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 			n, n,
 			(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 			ch_temp[n].name,
 			(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-			ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+			ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+			ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+			(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+			(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+			n, n);
 
 	printf("</table>\n");
 
@@ -853,8 +857,10 @@ void view_character_template(LIST *head)
 	printf("<input type=checkbox name=flags value=%Lu %s>Simple Animation<br>\n",
 			CF_SIMPLE, (ch_temp[cn].flags & CF_SIMPLE) ? "checked" : "");
 	// Added new flags
-	printf("<input type=checkbox name=flags value=%Lu %s>Extra Kill EXP<br>\n",
+	printf("<input type=checkbox name=flags value=%Lu %s>Extra Kill EXP (2x exp)<br>\n",
 			CF_EXTRAEXP, (ch_temp[cn].flags & CF_EXTRAEXP) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Extra Crit Chance (+2%% base, 1.5x exp)<br>\n",
+			CF_EXTRACRIT, (ch_temp[cn].flags & CF_EXTRACRIT) ? "checked" : "");
 	printf("</td></tr>\n");
 
 	printf("<tr><td valign=top>Alignment</td><td><input type=text name=alignment value=\"%d\" size=10 maxlength=10></td></tr>\n",
@@ -1615,6 +1621,12 @@ void view_object(LIST *head)
 	
 	printf("<tr><td>AoE Bonus:</td><td><input type=text name=area_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=area_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].aoe_bonus[0], it_temp[in].aoe_bonus[1]);
+	
+	printf("<tr><td>Dmg Bonus:</td><td><input type=text name=dmg_bonus_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=dmg_bonus_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it_temp[in].dmg_bonus[0], it_temp[in].dmg_bonus[1]);
+	
+	printf("<tr><td>Dmg Reduction:</td><td><input type=text name=dmg_reduc_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=dmg_reduc_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it_temp[in].dmg_reduction[0], it_temp[in].dmg_reduction[1]);
 
 	printf("<tr><td>Max Age:</td><td><input type=text name=max_age_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=max_age_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].max_age[0], it_temp[in].max_age[1]);
@@ -1924,6 +1936,12 @@ void view_item(LIST *head)
 			
 	printf("<tr><td>AoE Bonus:</td><td><input type=text name=area_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=area_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].aoe_bonus[0], it[in].aoe_bonus[1]);
+			
+	printf("<tr><td>Dmg Bonus:</td><td><input type=text name=dmg_bonus_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=dmg_bonus_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it[in].dmg_bonus[0], it[in].dmg_bonus[1]);
+			
+	printf("<tr><td>Dmg Reduction:</td><td><input type=text name=dmg_reduc_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=dmg_reduc_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it[in].dmg_reduction[0], it[in].dmg_reduction[1]);
 
 	printf("<tr><td>Max Age:</td><td><input type=text name=max_age_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=max_age_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].max_age[0], it[in].max_age[1]);
@@ -3929,6 +3947,50 @@ void update_object(LIST *head)
 		printf("area_2 not specified.\n");
 		return;
 	}
+	
+	tmp = find_val(head, "dmg_bonus_1");
+	if (tmp)
+	{
+		it_temp[in].dmg_bonus[0] = atoi(tmp);
+	}
+	else
+	{
+		printf("dmg_bonus_1 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "dmg_bonus_2");
+	if (tmp)
+	{
+		it_temp[in].dmg_bonus[1] = atoi(tmp);
+	}
+	else
+	{
+		printf("dmg_bonus_2 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "dmg_reduc_1");
+	if (tmp)
+	{
+		it_temp[in].dmg_reduction[0] = atoi(tmp);
+	}
+	else
+	{
+		printf("dmg_reduc_1 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "dmg_reduc_2");
+	if (tmp)
+	{
+		it_temp[in].dmg_reduction[1] = atoi(tmp);
+	}
+	else
+	{
+		printf("dmg_reduc_2 not specified.\n");
+		return;
+	}
 
 	tmp = find_val(head, "max_age_1");
 	if (tmp)
@@ -4085,12 +4147,16 @@ void list_characters_template(LIST *head)    // excludes grolms, gargs, icegargs
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
@@ -4114,12 +4180,16 @@ void list_characters2_template(LIST *head)		// listing grolms,gargs,icegargs onl
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
@@ -4143,19 +4213,23 @@ void list_characters_template_pugilism(LIST *head)    // has pugilism greater th
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
 }
 
-void list_characters_template_good(LIST *head)    // excludes grolms, gargs, icegargs. decides by sprite-nr
+void list_characters_template_align(LIST *head, int flag)    // excludes grolms, gargs, icegargs. decides by sprite-nr
 {
 	int n;
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
@@ -4171,17 +4245,21 @@ void list_characters_template_good(LIST *head)    // excludes grolms, gargs, ice
 		{
 			continue;
 		}
-		if(ch_temp[n].alignment < 0)
+		if ((flag && ch_temp[n].alignment < 0) || (!flag && ch_temp[n].alignment >= 0))
 		{
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
@@ -4205,12 +4283,16 @@ void list_characters_template_non_monster(LIST *head)    // excludes grolms, gar
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
@@ -4252,12 +4334,16 @@ void list_named_characters_template(LIST *head)    // excludes grolms, gargs, ic
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
@@ -4276,12 +4362,16 @@ void list_new_characters_template(LIST *head)		 // listing characters with high 
 			continue;
 		}
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=13&cn=%d>"
-				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
+				"%s%30.30s%s</a></td><td>Pos: %d,%d</td><td>EXP: %'9d</td><td>Alignment: %d</td><td>Group: %d</td><td>%4.4s %4.4s</td><td><a href=/cgi-imp/acct.cgi?step=15&cn=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=12&cn=%d>Delete</a></td></tr>\n",
 				n, n,
 				(ch_temp[n].flags & CF_RESPAWN) ? "<b>" : "",
 				ch_temp[n].name,
 				(ch_temp[n].flags & CF_RESPAWN) ? "</b>" : "",
-				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], n, n);
+				ch_temp[n].x, ch_temp[n].y, ch_temp[n].points_tot, 
+				ch_temp[n].alignment, ch_temp[n].data[CHD_GROUP], 
+				(ch_temp[n].flags & CF_EXTRAEXP) ? "+EXP" : "",
+				(ch_temp[n].flags & CF_EXTRACRIT) ? "CRIT" : "",
+				n, n);
 	}
 
 	printf("</table>\n");
@@ -4484,7 +4574,7 @@ int main(int argc, char *args[])
 		copy_character_template(head);
 		break;
 	case 16:
-		list_characters_template_good(head);
+		list_characters_template_align(head, 1);
 		break;
 	case 17:
 		list_named_characters_template(head);
@@ -4540,6 +4630,9 @@ int main(int argc, char *args[])
 	case 34:
 		list_objects(head, 3);
 		break;
+	case 35:
+		list_characters_template_align(head, 0);
+		break;
 	case 41:
 		list_characters2_template(head);
 		break;
@@ -4555,6 +4648,7 @@ int main(int argc, char *args[])
 		printf("Together those lists include all character-templates<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=11>Characters (without Grolms, Gargoyles, Icegargs)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=16>Characters (only with Positive Alignment) </a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=35>Characters (only with Negative Alignment) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=17>Characters (only Named) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=18>Characters (Non Monster) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=41>Characters (only Grolms, Gargoyles, Icegargs) </a><br><br>\n");

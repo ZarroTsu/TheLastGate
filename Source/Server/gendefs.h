@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000809
-#define MINVERSION			0x000809
+#define VERSION				0x000813
+#define MINVERSION			0x000811
 
 #define DATDIR				".dat"
 
@@ -23,7 +23,7 @@
 #define MAXMISSION			1024
 #define MAXSKILL			  50
 #define MAXBUFFS			  40
-#define MAXWPS				  24
+#define MAXWPS				  26
 
 #define MAXTCHARS			4548
 #define MAXTITEM			4548
@@ -61,11 +61,46 @@
 #define LAB_ARENA_BOTTOM_X 	 150
 #define LAB_ARENA_BOTTOM_Y 	 130
 
-#define OS_WARP_X			 658
-#define OS_WARP_Y			 727
+#define OS_WARP_X			 758
+#define OS_WARP_Y			 981
 
 #define BRAVER_WARP_X		 959
 #define BRAVER_WARP_Y		 519
+
+#define COLOSSEUM1_X		 751
+#define COLOSSEUM1_Y		 933
+#define COLOS1_X1			 733
+#define COLOS1_Y1			 915
+#define COLOS1_X2			 769
+#define COLOS1_Y2			 951
+
+#define COLOSSEUM2_X		 718
+#define COLOSSEUM2_Y		 908
+#define COLOS2_X1			 700
+#define COLOS2_Y1			 890
+#define COLOS2_X2			 736
+#define COLOS2_Y2			 926
+
+#define COLOSSEUM3_X		 784
+#define COLOSSEUM3_Y		 908
+#define COLOS3_X1			 766
+#define COLOS3_Y1			 890
+#define COLOS3_X2			 802
+#define COLOS3_Y2			 926
+
+#define COLOSSEUM4_X		 718
+#define COLOSSEUM4_Y		 958
+#define COLOS4_X1			 700
+#define COLOS4_Y1			 940
+#define COLOS4_X2			 736
+#define COLOS4_Y2			 976
+
+#define COLOSSEUM5_X		 784
+#define COLOSSEUM5_Y		 958
+#define COLOS5_X1			 766
+#define COLOS5_Y1			 940
+#define COLOS5_X2			 802
+#define COLOS5_Y2			 976
 
 #define LAB_I_X				  74
 #define LAB_I_Y				  25
@@ -139,10 +174,10 @@
 #define PL_SOULSTONED	16384
 #define PL_ENCHANTED	32768
 
-#define DX_RIGHT		1
-#define DX_LEFT			2
-#define DX_UP			3
-#define DX_DOWN			4
+#define DX_RIGHT		1		// South
+#define DX_LEFT			2		// North
+#define DX_UP			3		// West
+#define DX_DOWN			4		// East
 #define DX_LEFTUP		5
 #define DX_LEFTDOWN		6
 #define DX_RIGHTUP		7
@@ -194,6 +229,8 @@
 #define SP_TAUNT	(1u<<14)
 #define SP_ZEPHYR	(1u<<15)
 #define SP_MSHIELD	(1u<<16)
+#define SP_RAGE		(1u<<17)
+#define SP_LETHARGY	(1u<<18)
 
 // -------- Spell Cost values -------- //
 #define SP_COST_BASE		 5
@@ -202,18 +239,18 @@
 #define SP_COST_ENHANCE		15
 #define SP_COST_BLESS		35
 #define SP_COST_MSHIELD		25
-#define SP_COST_HASTE		70
+#define SP_COST_HASTE		35
 #define SP_COST_HEAL		25
-#define SP_COST_CURSE		35
+#define SP_COST_CURSE		30
 #define SP_COST_SLOW		20
 #define SP_COST_POISON		30
 #define SP_COST_IDENT		20
-#define SP_COST_RECALL		15
+#define SP_COST_RECALL		10
 #define SP_COST_DISPEL		40
 #define SP_COST_GHOST		45
-#define SP_COST_SHADOW		60
-#define SP_COST_PULSE		95
-#define SP_COST_ZEPHYR		50
+#define SP_COST_SHADOW		50
+#define SP_COST_PULSE		50
+#define SP_COST_ZEPHYR		45
 #define SP_COST_LETHARGY	40
 
 #define SP_COST_WEAKEN		10
@@ -232,7 +269,7 @@
 #define SP_MULT_SLOW		120
 #define SP_MULT_SLOW2		115
 #define SP_MULT_POISON		115
-#define SP_MULT_POISON2		120
+#define SP_MULT_POISON2		110
 #define SP_MULT_IDENTIFY	180
 #define SP_MULT_DISPEL		 90
 #define SP_MULT_DISPEL2		 75
@@ -328,6 +365,6 @@
 #define SK_EXH_LEAP			(TICKS * 5)
 #define SK_EXH_RAGE			(TICKS * 4)
 
-
+#define GLVDICE		4
 
 extern char *at_name[];

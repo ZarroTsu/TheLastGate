@@ -30,8 +30,10 @@ structure:
 	sudo mkdir -p $(SERVERDIR)/.save
 	sudo mkdir -p $(SERVERDIR)/.tmp
 	sudo cp start.sh $(SERVERDIR)/start.sh
+	sudo cp restart.sh $(SERVERDIR)/restart.sh
 	sudo cp shutdown.sh $(SERVERDIR)/shutdown.sh
 	sudo chmod a+x $(SERVERDIR)/start.sh
+	sudo chmod a+x $(SERVERDIR)/restart.sh
 	sudo chmod a+x $(SERVERDIR)/shutdown.sh
 	#sudo cp .dat/*.* $(SERVERDIR)/.dat/
 	sudo chmod -R a+rwx $(SERVERDIR)/.dat/

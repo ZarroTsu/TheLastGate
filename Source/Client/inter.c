@@ -34,7 +34,7 @@ int gui_equ_s[]		= { 670,   5 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern unsigned int inv_pos,skill_pos,wps_pos,mm_magnify;
+extern int inv_pos,skill_pos,wps_pos,mm_magnify;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -1057,10 +1057,11 @@ int mouse_statbox2(int x,int y,int state)
 					(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
 					(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
 					(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
-					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse
+					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
 					(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
 					(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-					(m==42&&(pl_flagb & (1 << 14)))     // Poison -> Venom
+					(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
+					(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
 				)
 			{
 				strcpy(tmp, skilltab[n+skill_pos].alt_a);
@@ -1469,15 +1470,9 @@ int mouse_wps(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{
-			if (keys)
-			{
-				if (wps_pos> 9)	wps_pos -= 8; 
-				else 			wps_pos  = 0;
-			}
-			else
-			{
-				if (wps_pos> 1)	wps_pos -= 2; 
-			}
+			if (keys) 			wps_pos -= 8; 
+			else				wps_pos -= 2; 
+			if (wps_pos < 0) 	wps_pos  = 0;
 		}
 		return 1;
 	}
@@ -1487,15 +1482,9 @@ int mouse_wps(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{
-			if (keys)
-			{
-				if (wps_pos<(MAXWPS-16))	wps_pos += 8; 
-				else 						wps_pos  = MAXWPS-8;
-			}
-			else
-			{
-				if (wps_pos<(MAXWPS- 8))	wps_pos += 2; 
-			}
+			if (keys)					wps_pos += 8;
+			else						wps_pos += 2;
+			if (wps_pos > (MAXWPS-8))	wps_pos  = (MAXWPS-8);
 		}
 		return 1;
 	}

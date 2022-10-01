@@ -254,7 +254,7 @@ extern unsigned int mapmarker;
 #define CF_SILENCE		(1ull<<49)  // Shuts up NPC greetings so pents isn't as spammy
 #define CF_GCTOME		(1ull<<50)  // Ghost Companion (and Shadow Copy) will automatically teleport with the player
 #define CF_EXTRAEXP		(1ull<<51)  // NPC gives extra exp! Used for STRONG mobs and grind spots
-#define CF_CANCRIT		(1ull<<52)  // Flag to determine if non-players can crit
+#define CF_EXTRACRIT	(1ull<<52)  // Flag to determine if non-players can crit
 #define CF_APPRAISE		(1ull<<53)  // Can see item value
 #define CF_APPR_OFF		(1ull<<54)  // Toggle Appraisal
 #define CF_AREA_OFF		(1ull<<55)  // Toggle AoE Skills
@@ -593,7 +593,13 @@ struct character
 	
 	char aoe_bonus;					// Total AoE bonus from gear
 	
-	char future2[44];				// space for future expansion
+	char colosseum;					// Colosseum mode check, resets every 1st
+	char spellfail;					// check for 'Suppression' from NPCs
+	
+	unsigned short dmg_bonus;		// Damage multiplier. Factor of 1:100, where 10000 is the median 100% dealt value.
+	unsigned short dmg_reduction;	// Damage reduction.  Factor of 1:100, where 10000 is the median 100% taken value.
+	
+	char future2[38];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -702,61 +708,61 @@ struct item
 	char name[40];                  // 41
 	char reference[40];             // 81, a pair of boots
 	char description[200];          // 281, A pair of studded leather boots.
-
+	
 	unsigned long long flags;       // 289, s.a.
-
+	
 	unsigned int value;             // 293, value to a merchant
 	unsigned short placement;       // 295, see constants above
-
+	
 	unsigned short temp;            // 297, created from template temp
-
+	
 	unsigned char damage_state;     // 298, has reached damage level X of 5, 0=OK, 4=almost destroyed, 5=destroyed
-
+	
 	// states for non-active [0] and active[1]
 	unsigned int max_age[2];        // 306, maximum age per state
 	unsigned int current_age[2];    // 314, current age in current state
-
+	
 	unsigned int max_damage;        // 318, maximum damage per state
 	unsigned int current_damage;    // 322, current damage in current state
-
+	
 	// modifiers - modifiers apply only when the item is being
 	// worn (wearable objects) or when spell is cast. After duration expires,
 	// the effects are removed.
-
+	
 	// modifiers - modifier [0] applies when the item is being
 	// worn (wearable objects) or is added to the powers (spells) for permanent spells
 	// modifier [1] applies when it is active
 	// modifier [2] is not a modifier but the minimum value that attibute/skill must have to wear or use
 	// the item
-
+	
 	char attrib[5][3];              // 337
-
+	
 	short hp[3];                    // 343
 	short end[3];                   // 349
 	short mana[3];                  // 355
-
+	
 	char skill[50][3];              // 505
-
+	
 	char armor[2];                  // 506
 	char weapon[2];                 // 507
-
+	
 	short light[2];                 // 511
-
+	
 	unsigned int duration;          // 515
 	unsigned int cost;              // 519
 	unsigned int power;             // 523
 	unsigned int active;            // 527
-
+	
 	// map stuff
 	unsigned short int x, y;		// 531, current position        NOTE: x=0, y=0 = void
 	unsigned short carried;         // 533, carried by character carried
 	unsigned short sprite_override; // 535, used for potions/spells which change the character sprite
-
+	
 	short int sprite[2];            // 543
 	unsigned char status[2];        // 545
-
+	
 	char gethit_dam[2];             // 547, damage for hitting this item
-
+	
 	char min_rank;                  // minimum rank to wear the item
 	
 	char aoe_bonus[2];				// Area of Effect bonus
@@ -790,11 +796,12 @@ struct item
 	
 	char enchantment;				// Special effect via talismans
 	
-	char future3[4];				// 587
-
+	char dmg_bonus[2];				// Damage multiplier bonus - Each 1 point is 0.5% bonus.     At 100 points it is a 50% bonus.
+	char dmg_reduction[2];			// Damage reduction bonus  - Each 1 point is 0.5% reduction. At 100 points it is a 50% reduction.
+	
 	int t_bought;                   // 591
 	int t_sold;                     // 595
-
+	
 	unsigned char driver;           // 596, special routines for LOOKSPECIAL and USESPECIAL
 	unsigned int data[10];          // 634, driver data
 
@@ -888,6 +895,57 @@ struct waypoint
 
 #define N_SOULBONUS		 50
 #define N_SOULMAX		 24
+#define N_SOULFACTOR	  2
+
+#define MM_M_DFAE		 1
+#define MM_M_DADE		 2
+#define MM_M_DACE		 3
+#define MM_M_FTAR		 4
+#define MM_M_FASH		 5
+#define MM_M_FACH		 6
+#define MM_M_TAPN		 7
+#define MM_M_DFTC		 8
+#define MM_M_DFTU		 9
+#define MM_M_FTEX		10
+
+#define MM_P_CHST		 0
+#define MM_P_SHRN		 1
+#define MM_P_XEXP		 2
+#define MM_P_XLUK		 3
+#define MM_P_XBSP		 4
+#define MM_P_XOSP		 5
+#define MM_P_PLXP		 6
+#define MM_P_ENBS		 7
+#define MM_P_ENOS		 8
+#define MM_P_ENGL		 9
+#define MM_P_ARGL		10
+#define MM_P_AREQ		11
+#define MM_P_ARPT		12
+#define MM_P_DRGM		13
+#define MM_P_RANK		14
+#define NUM_MAP_POS		15
+
+#define MM_N_EXTY		 0 + NUM_MAP_POS
+#define MM_N_EXDV		 1 + NUM_MAP_POS
+#define MM_N_ARUW		 2 + NUM_MAP_POS
+#define MM_N_ENUN		 3 + NUM_MAP_POS
+#define MM_N_EXEN		 4 + NUM_MAP_POS
+#define MM_N_ENRO		 5 + NUM_MAP_POS
+#define MM_N_ENRS		 6 + NUM_MAP_POS
+#define MM_N_ENSK		 7 + NUM_MAP_POS
+#define MM_N_ENSH		 8 + NUM_MAP_POS
+#define MM_N_ENFO		 9 + NUM_MAP_POS
+#define MM_N_ENFS		10 + NUM_MAP_POS
+#define MM_N_ENWI		11 + NUM_MAP_POS
+#define MM_N_PLDB		12 + NUM_MAP_POS
+#define MM_N_PLFR		13 + NUM_MAP_POS
+#define MM_N_PLST		14 + NUM_MAP_POS
+#define MM_N_PLHY		15 + NUM_MAP_POS
+#define MM_N_ENTR		16 + NUM_MAP_POS
+#define MM_N_ARSP		17 + NUM_MAP_POS
+#define MM_N_ARDT		18 + NUM_MAP_POS
+#define MM_N_ARFL		19 + NUM_MAP_POS
+#define NUM_MAP_NEG		20
 
 extern struct s_skilltab skilltab[MAXSKILL+2];
 extern struct s_splog splog[52];

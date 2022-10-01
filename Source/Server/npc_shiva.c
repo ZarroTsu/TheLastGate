@@ -536,7 +536,7 @@ int npc_shiva_phasing(int cn)
 	}
 	if (timer<=globs->ticker && sub==8)
 	{
-		do_sayx(cx, "IN THE NAME OF MY LORD, KING AEMON OF THE BURNING PLAINS, I SENTENCE YOU MORTALS TO DEATH.");
+		do_sayx(cx, "IN THE NAME OF MY LORD, KING AEMON OF THE ASHEN TUNDRA, I SENTENCE YOU MORTALS TO DEATH.");
 		ch[cn].data[1] = globs->ticker + TICKS * 5;
 		ch[cn].data[3]++;
 	}

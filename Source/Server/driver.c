@@ -199,7 +199,7 @@ int npc_add_enemy(int cn, int co, int always)
 		return 0;
 	}
 	
-	if (points2rank(ch[cn].points_tot)<20 && !IS_THRALL(cn))
+	if (getrank(cn)<20 && !IS_THRALL(cn))
 	{
 		if (!always && (ch[cn].points_tot + 500) * 20<ch[co].points_tot)
 		{
@@ -915,8 +915,7 @@ int npc_give(int cn, int co, int in, int money)
 		{	// hack for black candle
 			ar = it[in].data[0];
 			do_give_bspoints(co, ar, 1);
-			god_take_from_char(in, cn);
-			it[in].used = USE_EMPTY;  // silently destroy the item.
+			use_consume_item(cn, in, 1);
 			do_sayx(cn, "Ah, a black candle! Great work, %s! Now we may see peace for a while...", ch[co].name);
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The Tactician was impressed by %s's deed.\n", ch[co].name);
 			ch[co].misc_action = DR_IDLE;
@@ -1018,7 +1017,7 @@ int npc_give(int cn, int co, int in, int money)
 			(ch[cn].temp==CT_HERBCOLL2 && it[in].temp==IT_HERBE) ||
 			(ch[cn].temp==CT_SCORPCOLL && (it[in].temp==IT_SCORL || it[in].temp==IT_SCORP || it[in].temp==IT_SCORG || it[in].temp==IT_SCORQ)))
 		{
-			if ((ch[cn].temp==CT_HERBCOLL || ch[cn].temp==CT_SCORPCOLL) && points2rank(ch[co].points_tot)<8)
+			if ((ch[cn].temp==CT_HERBCOLL || ch[cn].temp==CT_SCORPCOLL) && getrank(co)<8)
 			{
 				if (ch[cn].temp==CT_HERBCOLL)
 					do_sayx(cn, "I'm sorry %s, I don't have a use for weeds!", ch[co].name);
@@ -1051,8 +1050,7 @@ int npc_give(int cn, int co, int in, int money)
 			else
 				do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			
-			god_take_from_char(in, cn);
-			it[in].used = USE_EMPTY;
+			use_consume_item(cn, in, 1);
 			ch[co].gold += money;
 			do_char_log(co, 2, "You received %dG %dS.\n", money / 100, money % 100);
 			do_give_exp(co, nr, 0, -1);
@@ -1115,14 +1113,12 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, (nr/4), 0, -1);
 					}
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;  // silently destroy the item.
+					use_consume_item(cn, in, 1);
 				}
 				else
 				{
 					do_sayx(cn, "You will need a lockpick, and I happen to have a spare. Take it, please.");
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;
+					use_consume_item(cn, in, 1);
 					in = god_create_item(93);
 					god_give_char(in, co);
 					do_sayx(cn, "You can LOOK at a door and you will be able to tell you how hard it is to pick it.");
@@ -1199,8 +1195,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
 						do_give_exp(co, nr, 0, -1);
 					}
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;
+					use_consume_item(cn, in, 1);
 					
 					// <group rewards>
 					for (n = 1; n<MAXCHARS; n++)
@@ -1255,14 +1250,12 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4, 0, -1);
 					}
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;  // silently destroy the item.
+					use_consume_item(cn, in, 1);
 				}
 				else
 				{
 					do_sayx(cn, "Simply look at any item in your possession, and you will now know its true value.");
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;
+					use_consume_item(cn, in, 1);
 					ch[co].flags |= CF_APPRAISE;
 					do_char_log(co, 0, "You learned how to appraise items!\n");
 					do_update_char(co);
@@ -1301,14 +1294,12 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4, 0, -1);
 					}
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;  // silently destroy the item.
+					use_consume_item(cn, in, 1);
 				}
 				else
 				{
 					do_sayx(cn, "You will now notice a magic item when it's dropped if you can see it. Additionally, you may now notice when enemies try to cast spells on you.");
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;
+					use_consume_item(cn, in, 1);
 					ch[co].flags |= CF_SENSE;
 					do_char_log(co, 0, "You learned how to sense magic!\n");
 					do_update_char(co);
@@ -1360,8 +1351,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1);
 					}
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;  // silently destroy the item.
+					use_consume_item(cn, in, 1);
 				}
 				else
 				{
@@ -1374,8 +1364,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
 						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1);
 					}
-					god_take_from_char(in, cn);
-					it[in].used = USE_EMPTY;  // silently destroy the item.
+					use_consume_item(cn, in, 1);
 				}
 				// <group rewards>
 				for (n = 1; n<MAXCHARS; n++)
@@ -1401,8 +1390,7 @@ int npc_give(int cn, int co, int in, int money)
 		/* items with a return gift */
 		if ((nr = ch[cn].data[66])!=0)
 		{
-			god_take_from_char(in, cn);
-			it[in].used = USE_EMPTY;
+			use_consume_item(cn, in, 1);
 			if (!(ch[cn].flags&(CF_BODY))) 
 			{
 				do_sayx(cn, "Here is your %s in exchange.", it_temp[nr].reference);
@@ -1434,8 +1422,7 @@ int npc_give(int cn, int co, int in, int money)
 				do_sayx(cn, "Here is a small token of gratitude, %s.", ch[co].name);
 			else
 				do_sayx(cn, "Here is your reward in exchange, %s!", ch[co].name);
-			god_take_from_char(in, cn);
-			it[in].used = USE_EMPTY;
+			use_consume_item(cn, in, 1);
 			ch[co].gold += money;
 			do_char_log(co, 2, "You received %dG %dS.\n", money / 100, money % 100);
 			if ((nr = ch[cn].data[51])!=0)
@@ -1473,8 +1460,7 @@ int npc_give(int cn, int co, int in, int money)
 			}
 
 			/* ok to destroy the gift now */
-			god_take_from_char(in, co);
-			it[in].used = USE_EMPTY;
+			use_consume_item(co, in, 1);
 			/* Select and ask a riddle */
 			lab9_pose_riddle(cn, co);
 		}
@@ -1519,34 +1505,34 @@ int npc_cityguard_see(int cn, int co, int flag)
 					{
 						if (ch[co].data[CHD_GROUP]==601 
 							  && (is_inline(n, 1) || (
-							     points2rank(ch[n].points_tot)>= 5  // Staff Sergeant
-							  && points2rank(ch[n].points_tot)<= 8))) // Sergeant Major
+							     getrank(n)>= 5  // Staff Sergeant
+							  && getrank(n)<= 8))) // Sergeant Major
 							do_char_log(n, 3, "Gate Guard: \"The monsters are approaching the north gate! Alert!\"\n");
 						else if (ch[co].data[CHD_GROUP]==602
 							  && (is_inline(n, 2) || (
-							     points2rank(ch[n].points_tot)>= 9  // Second Lieutenant
-							  && points2rank(ch[n].points_tot)<=13))) // Lieutenant Colonel
+							     getrank(n)>= 9  // Second Lieutenant
+							  && getrank(n)<=13))) // Lieutenant Colonel
 							do_char_log(n, 3, "Gate Guard: \"The monsters are approaching the center gate! Alert!\"\n");
 						else if (ch[co].data[CHD_GROUP]==603
 							  && (is_inline(n, 3) || (
-							     points2rank(ch[n].points_tot)>=14))) // Colonel
+							     getrank(n)>=14))) // Colonel
 							do_char_log(n, 3, "Gate Guard: \"The monsters are approaching the south gate! Alert!\"\n");
 					}
 					else
 					{
 						if (ch[co].data[CHD_GROUP]==601
 							  && (is_inline(n, 1) || (
-							     points2rank(ch[n].points_tot)>= 5  // Staff Sergeant
-							  && points2rank(ch[n].points_tot)<= 8))) // Sergeant Major
+							     getrank(n)>= 5  // Staff Sergeant
+							  && getrank(n)<= 8))) // Sergeant Major
 							do_char_log(n, 3, "Outpost Guard: \"The monsters are approaching the north outpost! Alert!\"\n");
 						else if (ch[co].data[CHD_GROUP]==602
 							  && (is_inline(n, 2) || (
-							     points2rank(ch[n].points_tot)>= 9  // Second Lieutenant
-							  && points2rank(ch[n].points_tot)<=13))) // Lieutenant Colonel
+							     getrank(n)>= 9  // Second Lieutenant
+							  && getrank(n)<=13))) // Lieutenant Colonel
 							do_char_log(n, 3, "Outpost Guard: \"The monsters are approaching the center outpost! Alert!\"\n");
 						else if (ch[co].data[CHD_GROUP]==603
 							  && (is_inline(n, 3) || (
-							     points2rank(ch[n].points_tot)>=14))) // Colonel
+							     getrank(n)>=14))) // Colonel
 							do_char_log(n, 3, "Outpost Guard: \"The monsters are approaching the south outpost! Alert!\"\n");
 					}
 				}
@@ -2103,98 +2089,98 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest103")==0) // 	3 - Bush / Fang / Amulet
 			{
-				if (points2rank(ch[co].points_tot)<7) // First Sergeant
+				if (getrank(co)<7) // First Sergeant
 					do_sayx(cn, "Hello... %s. Please come back when you're stronger... I have a request...", ch[co].name);
 				else
 					do_sayx(cn, "Hello... %s. Please bring me a Spider's Fang... from the Webbed Bush south of the Strange Forest... I would give you an Amulet of Resistance in exchange...", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest104")==0) // 	4 - Mine 2 / Golem Pot / Moodstone
 			{
-				if (points2rank(ch[co].points_tot)<7) // First Sergeant
+				if (getrank(co)<7) // First Sergeant
 					do_sayx(cn, "Welcome, %s. When you are stronger, I have a request of you.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s. Deep in the second level of the mines, golems hide a secret spring of mud. If you would bring me a flask of this, I would reward you with a Moodstone Ring.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest105")==0) // 	5 - Penitentiary / Headsman / Belt
 			{
-				if (points2rank(ch[co].points_tot)<8) // Sergeant Major
+				if (getrank(co)<8) // Sergeant Major
 					do_sayx(cn, "Greetings, %s. Please be careful here, the prisoners and guards alike are a rowdy bunch.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s. The warden of this prison is up to no good and has holed himself away in his office. Please bring me evidence of his crimes, and I would reward you.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest106")==0) // 	6 - Grolm Lab / Ruby Axe / Amulet
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Leiu
+				if (getrank(co)<9) // 2nd Leiu
 					do_sayx(cn, "Hello, %s. Have you been to the Pentagram Quest?", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. Deep in the Pentagram quest there is said to be a laboratory guarded by a cowardly grolm. Bring me a Ruby Axe from this lab, and I would reward you.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest107")==0) // 	7 - Hermit / Rose / Potion
 			{
-				if (points2rank(ch[co].points_tot)<8) // Sergeant Major
+				if (getrank(co)<8) // Sergeant Major
 					do_sayx(cn, "Hi, %s... I'm very busy at the moment, please come back later.", ch[co].name);
 				else
 					do_sayx(cn, "Hi, %s. There is a mad hermit living in the Strange Forest. He possesses a rare Pink Orchid in his garden. If you could bring me this rose, I would make you a Pure Orchid Potion.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest108")==0) // 	8 - Swamp / Marline / Rattan Bo
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
+				if (getrank(co)<9) // 2nd Lieu
 					do_sayx(cn, "Welcome, %s. Please make yourself at home.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s. In the Southern Swamp some lizards fashioned themselves a staff called Rattan Bo. Fetch it for me and I'll give you a special tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest109")==0) // 	9 - Garg Nest / Rufus / Royal Targe
 			{
-				if (points2rank(ch[co].points_tot)<10) // 1st Lieu
+				if (getrank(co)<10) // 1st Lieu
 					do_sayx(cn, "Ahoy, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Ahoy, %s. Ay've a request. Thar's un ol' shield holed away un de Gargoyle Nest. Bring ut to me an I'll reward ye wit a tarot card o' Strength.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest110")==0) //   10 - Mine 3 / Gomez / Gold Huge Diamond Ring
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
+				if (getrank(co)<9) // 2nd Lieu
 					do_sayx(cn, "Ah, welcome %s!", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s! Would you mind sparing the time to fetch me a Golden Ring adorned with a Huge Diamond? I'd reward you with this lovely tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest111")==0) //   11 - Mine 3 / Donna / Garg Statuette
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
+				if (getrank(co)<9) // 2nd Lieu
 					do_sayx(cn, "Hello, %s. Please don't touch anything.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. In the lowest floor of the mines there's said to be a striking Gargoyle Statuette. I'd reward you with this devilish tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest112")==0) //   12 - UG2 / Rose / Green Herbs
 			{
-				if (points2rank(ch[co].points_tot)<8) // Sergeant Major
+				if (getrank(co)<8) // Sergeant Major
 					do_sayx(cn, "Leave me be, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s. I'm researching the monsters in the underground. If you could, bring me the strange green plants that grow there... I'd pay you well.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest113")==0) //   13 - UG2 / Monica / Greenl Collector
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
+				if (getrank(co)<9) // 2nd Lieu
 					do_sayx(cn, "Greetings, %s. Are you lost?", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s. If you could bring me a completed Greenling Eye Collection, I would present you a Greenling Eye Essense in return.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest114")==0) //   14 - Canyon / Oscar / Templar Heater
 			{
-				if (points2rank(ch[co].points_tot)<6) // Master Serg
+				if (getrank(co)<6) // Master Serg
 					do_sayx(cn, "Hello, %s.", ch[co].name);
 				else
-					do_sayx(cn, "Hello, %s... Do you have a moment? Could you retreive my Templar Heater from the bandits in the forgotten canyon? I'd give you my Serpentine Amulet in return.", ch[co].name);
+					do_sayx(cn, "Hello, %s... Do you have a moment? Could you retrieve my Templar Heater from the bandits in the forgotten canyon? I'd give you my Serpentine Amulet in return.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest115")==0) //   15 - Archive / Castor / Traveller's Guide
 			{
-				if (points2rank(ch[co].points_tot)<6) // Master Serg
+				if (getrank(co)<6) // Master Serg
 					do_sayx(cn, "Salutations, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Salutations! %s, if you could, please find me an old book called The Traveller's Guide. If you would, I'd give you a signed copy of my own book!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest116")==0) //   16 - Pass / Grover / Gold/Sapph Helmet
 			{
-				if (points2rank(ch[co].points_tot)<7) // First Serg
+				if (getrank(co)<7) // First Serg
 					do_sayx(cn, "Please leave.", ch[co].name);
 				else
 					do_sayx(cn, "Ah, %s. Do come in. I've a request - could you retrive my Sapphire Golden Helmet from the bandits in the Jagged pass? I'd reward you handsomely.", ch[co].name);
@@ -2205,56 +2191,56 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest118")==0) //   18 - Garg Nest / Shera / Fire Egg
 			{
-				if (points2rank(ch[co].points_tot)<13) // Lieu Colonel
+				if (getrank(co)<13) // Lieu Colonel
 					do_sayx(cn, "Hmm... %s, could you come back a little stronger? I may have use of you.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s! If you'd bring me the Fire Egg from the Gargoyle Nest, I'd reward you with a Cloak of Fire of my own creation.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest119")==0) //   19 - Black Stronghold / Tactician / Shiva's Sceptre
 			{
-				if (points2rank(ch[co].points_tot)<12) // Major
+				if (getrank(co)<12) // Major
 					do_sayx(cn, "Greetings, %s. We need HELP against the forces of the Black Stronghold. Will you HELP us?", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s. We need HELP against the forces of the Black Stronghold. Please kill its master, Shiva, and bring me his staff. We'd all be forever in your debt.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest120")==0) //   13 - UG2 / Danica / Sogl Collector
 			{
-				if (points2rank(ch[co].points_tot)<15) // Brig Gen
+				if (getrank(co)<15) // Brig Gen
 					do_sayx(cn, "Hi, %s... Um...", ch[co].name);
 				else
 					do_sayx(cn, "Hi, %s... Bring me a completed Sogling Eye Collection, and... would a Sogling Eye Essense be okay...?", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest121")==0) //   20 - Ice Nest / Blanche / Ice Egg
 			{
-				if (points2rank(ch[co].points_tot)<17) // Lieu General
+				if (getrank(co)<17) // Lieu General
 					do_sayx(cn, "Come back a bit stronger, %s. I may need you to do something for me.", ch[co].name);
 				else
 					do_sayx(cn, "Hello, %s! If you'd bring me the Ice Egg from the Ice Gargoyle Nest, I'd reward you with a Cloak of Ice in return.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest122")==0) //   21 - Ice Nest / Aster / Lion's Paws
 			{
-				if (points2rank(ch[co].points_tot)<14) // Colonel
+				if (getrank(co)<14) // Colonel
 					do_sayx(cn, "Good day, %s. Cold out.", ch[co].name);
 				else
 					do_sayx(cn, "Good day, %s. Please find me the Lion's Paws in the Ice Gargoyle Nest, and I would reward you with this magical tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest123")==0) //   22 - Ludolf - Cathedral
 			{
-				if (points2rank(ch[co].points_tot)<11) // Captain
+				if (getrank(co)<11) // Captain
 					do_sayx(cn, "I'm sorry, %s, but I don't have time for kids right now.", ch[co].name);
 				else
 					do_sayx(cn, "Those dang cultists ruined my farm, %s. Bring me their leader's dagger and I would reward you with a tarot card of good fortune.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest124")==0) //   23 - Flanders - Striders
 			{
-				if (points2rank(ch[co].points_tot)<11) // Captain
+				if (getrank(co)<11) // Captain
 					do_sayx(cn, "Howdy do, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Howdy do, %s. A while back I lost a family heirloom to the striders in the east. If you could return it I'd give you my lonely tarot card.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest125")==0) //   24 - Topham - Thugs
 			{
-				if (points2rank(ch[co].points_tot)<11) // Captain
+				if (getrank(co)<11) // Captain
 					do_sayx(cn, "Good day and goodbye, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Good day to you, %s. Those pesky thugs to the far east stole a very sturdy shield from my collection. Return it and I would reward you handsomely.", ch[co].name);
@@ -2289,17 +2275,59 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest133")==0) //   32 - Oswald - Old Well
 			{
-				if (points2rank(ch[co].points_tot)<10) // 1st Lieu
+				if (getrank(co)<10) // 1st Lieu
 					do_sayx(cn, "'Ello, mate.");
 				else
 					do_sayx(cn, "'Ello, mate. Bring me some of the water from the ol' well cistern and I'd reward you with this here leather necklace.");
 			}
 			else if (strcmp(ch[cn].text[2], "#quest134")==0) //   33 - Maude - Dwellers
 			{
-				if (points2rank(ch[co].points_tot)<12) // Major
+				if (getrank(co)<12) // Major
 					do_sayx(cn, "'Ello there, %s.", ch[co].name);
 				else
 					do_sayx(cn, "'Ello there, %s. If you'd bring me the emerald chalice from the Buried Brush, I'd pay you mighty finely.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest135")==0) //   34 - Brenna - Marauders
+			{
+				if (getrank(co)<15) // Brig Gen
+					do_sayx(cn, "Well howdy, %s.", ch[co].name);
+				else
+					do_sayx(cn, "Well howdy, %s. The marauders in the Empty Outset stole a fancy-lookin' Khopesh. If you'd bring it here, I can give you this Shotel for the trouble.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest136")==0) //   35 - Wicker - Merlin
+			{
+				if (getrank(co)<16) // Major Gen
+					do_sayx(cn, "Hmm... Welcome, I suppose.");
+				else
+					do_sayx(cn, "Hmm... %s, I've been tortured by awful noises coming from Merlin's shop, but I need proof. Find me some, and I would reward you with a Scroll of Mana.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest137")==0) //   36 - Jasper - Smugglers
+			{
+				if (getrank(co)<16) // Major Gen
+					do_sayx(cn, "Howdy, %s. What brings you here?", ch[co].name);
+				else
+					do_sayx(cn, "Howdy, %s. Some smugglers stole mah antique amulet. Bring 'er back and you cun 'ave this here howlin' ol' tarot card.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest138")==0) //   37 - Soyala - Cold Cavern
+			{
+				if (getrank(co)<17) // Lt Gen
+					do_sayx(cn, "Welcome, %s...?", ch[co].name);
+				else
+					do_sayx(cn, "Welcome, %s... The howling cold of the cavern to the north-east hides a shining shield. Bring it and you may have this fiery tarot card.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest139")==0) //   38 - Runa - Ninjas
+			{
+				if (getrank(co)<17) // Lt Gen
+					do_sayx(cn, "Oh, hello %s.", ch[co].name);
+				else
+					do_sayx(cn, "Oh, hello %s. Rumor has it there are ninjas to the north-east. Bring me one of their books and you may have my Solar Belt.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest140")==0) //   39 - Zephan - Ninjas
+			{
+				if (getrank(co)<17) // Lt Gen
+					do_sayx(cn, "Look what the cat dragged in...");
+				else
+					do_sayx(cn, "Well lookie here. %s, bring me the ninja lord's fancy lil' dagger and I'd reward you with this here Lunar Belt!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#blackherbs")==0) //   xx - Zorani - Black Plants
 			{
@@ -2307,14 +2335,21 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#scorpions")==0) //   xx - Faiza - Scorpions
 			{
-				if (points2rank(ch[co].points_tot)<8) // SGM
+				if (getrank(co)<8) // SGM
 					do_sayx(cn, "Salutations, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Salutations, %s. There are many scorpions in the canyon and desert south of here. I pay good prices for their heads!", ch[co].name);
 			}
+			else if (strcmp(ch[cn].text[2], "#bandits")==0) //   xx - Dwyn - Bandits
+			{
+				if (getrank(co)<16) // Major Gen
+					do_sayx(cn, "Greetings, %s. Be wary of the north.", ch[co].name);
+				else
+					do_sayx(cn, "Greetings, %s. I'd like you to halt a smuggler operation north of here. I would reward you for each antique you can retrieve.", ch[co].name);
+			}
 			else if (strcmp(ch[cn].text[2], "#skill16")==0) //    10   	Swimming			( Lucci )
 			{
-				if (points2rank(ch[co].points_tot)<9) // 2nd Lieu
+				if (getrank(co)<9) // 2nd Lieu
 					do_sayx(cn, "Hello, %s! When you're a little stronger, come see me and I can teach you how to swim.", ch[co].name);
 				else if (!B_SK(co, SK_SWIM))
 					do_sayx(cn, "Hello, %s! Under the lake in the southern Strange Forest, there's said to be a valuable glittering cleaver. Bring it to me and I will teach you SWIMMING!", ch[co].name);
@@ -2324,12 +2359,12 @@ int npc_see(int cn, int co)
 			//
 			else if (strcmp(ch[cn].text[2], "#clara")==0)
 			{
-				if (points2rank(ch[co].points_tot)<18) // General
+				if (getrank(co)<18) // General
 					do_sayx(cn, "Get out, %s! Damor doesn't wish to see you!", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#damor")==0)
 			{
-				if (points2rank(ch[co].points_tot)>=18)
+				if (getrank(co)>=18)
 					do_sayx(cn, "%s. It's about time. Bring me a candle from the deepest part of the Black Stronghold, and I would reward you with this amulet.", ch[co].name);
 			}
 			//
@@ -2625,6 +2660,7 @@ int get_spellcost(int cn, int spell)
 		case SK_BLIND:		return SP_COST_BLIND;
 		case SK_CLEAVE:		return 20;
 		case SK_LEAP:		return 20;
+		case SK_RAGE:		return SP_COST_RAGE;
 		case SK_TAUNT:		return SP_COST_TAUNT;
 		case SK_WEAKEN:		return SP_COST_WEAKEN;
 		case SK_WARCRY:		return SP_COST_WARCRY;
@@ -2638,6 +2674,7 @@ int get_spellcost(int cn, int spell)
 		case SK_HASTE:		return SP_COST_HASTE;
 		case SK_HEAL:		return SP_COST_HEAL;
 		case SK_IDENT:		return SP_COST_IDENT;
+		case SK_LETHARGY:	return SP_COST_LETHARGY;
 		case SK_LIGHT:		return SP_COST_LIGHT;
 		case SK_MSHIELD:	return SP_COST_MSHIELD;
 		case SK_POISON:		return SP_COST_POISON;
@@ -2656,24 +2693,26 @@ int spellflag(int spell)
 {
 	switch(spell)
 	{
-		case    SK_BLIND:		return SP_BLIND;
-		case    SK_TAUNT:		return SP_TAUNT;
-		case    SK_WARCRY:		return SP_WARCRY;
-		case    SK_WEAKEN:		return SP_REND;
+		case SK_BLIND:		return SP_BLIND;
+		case SK_RAGE:		return SP_RAGE;
+		case SK_TAUNT:		return SP_TAUNT;
+		case SK_WARCRY:		return SP_WARCRY;
+		case SK_WEAKEN:		return SP_REND;
 		
-		case    SK_BLESS:		return SP_BLESS;
-		case    SK_CURSE:		return SP_CURSE;
-		case    SK_DISPEL:		return SP_DISPEL;
-		case    SK_ENHANCE:		return SP_ENHANCE;
-		case    SK_HASTE:		return SP_HASTE;
-		case    SK_HEAL:		return SP_HEAL;
-		case    SK_LIGHT:		return SP_LIGHT;
-		case    SK_MSHIELD:		return SP_MSHIELD;
-		case    SK_POISON:		return SP_POISON;
-		case    SK_PROTECT:		return SP_PROTECT;
-		case    SK_PULSE:		return SP_PULSE;
-		case    SK_ZEPHYR:		return SP_ZEPHYR;
-		case    SK_SLOW:		return SP_SLOW;
+		case SK_BLESS:		return SP_BLESS;
+		case SK_CURSE:		return SP_CURSE;
+		case SK_DISPEL:		return SP_DISPEL;
+		case SK_ENHANCE:	return SP_ENHANCE;
+		case SK_HASTE:		return SP_HASTE;
+		case SK_HEAL:		return SP_HEAL;
+		case SK_LETHARGY:	return SP_LETHARGY;
+		case SK_LIGHT:		return SP_LIGHT;
+		case SK_MSHIELD:	return SP_MSHIELD;
+		case SK_POISON:		return SP_POISON;
+		case SK_PROTECT:	return SP_PROTECT;
+		case SK_PULSE:		return SP_PULSE;
+		case SK_ZEPHYR:		return SP_ZEPHYR;
+		case SK_SLOW:		return SP_SLOW;
 		
 		default:				return 0;
 	}
@@ -2684,8 +2723,8 @@ int npc_try_spell(int cn, int co, int spell)
 	int mana, end, n, in, tmp, cc, truespell;
 	int offn, defn;
 
-	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && 
-		spell!=SK_TAUNT && spell!=SK_WARCRY && spell!=SK_BLIND)
+	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && 
+		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_RAGE)
 	{
 		if ((ch[cn].flags & CF_NOMAGIC) || (ch[co].flags & CF_NOMAGIC))
 		{
@@ -2727,13 +2766,17 @@ int npc_try_spell(int cn, int co, int spell)
 	if (spell==SK_CURSE  && get_tarot(cn, IT_CH_TOWER))   	truespell = SK_CURSE2;
 	if (spell==SK_BLIND  && get_tarot(cn, IT_CH_CHARIOT)) 	truespell = SK_DOUSE;
 	if (spell==SK_POISON && get_tarot(cn, IT_CH_TOWER_R)) 	truespell = SK_VENOM;
+	if (spell==SK_PULSE  && get_tarot(cn, IT_CH_JUDGE_R)) 	truespell = SK_IMMOLATE;
 	if (spell==SK_WEAKEN && get_tarot(cn, IT_CH_DEATH)) 	truespell = SK_WEAKEN2;
 	if (spell==SK_SLOW   && get_tarot(cn, IT_CH_EMPEROR)) 	truespell = SK_SLOW2;
+	if (spell==SK_WARCRY && get_tarot(cn, IT_CH_EMPERO_R)) 	truespell = SK_WARCRY3;
 	
+	/*
 	if (spell==SK_WEAKEN && get_enchantment(co,  8)) return 0;
 	if (spell==SK_SLOW   && get_enchantment(co, 14)) return 0;
 	if (spell==SK_CURSE  && get_enchantment(co, 21)) return 0;
 	if (spell==SK_BLIND  && get_enchantment(co, 33)) return 0;
+	*/
 	
 	// dont blast if enemy armor is too strong
 	// Updated 02/11/2020 - changed the formula to include immunity and allow blasts that would do at least 5 damage.
@@ -2813,7 +2856,7 @@ int npc_try_spell(int cn, int co, int spell)
 				break;
 			}
 			// Poison layer adjustments
-			if (bu[in].temp==truespell && truespell==SK_POISON && bu[in].active>bu[in].duration/3)
+			if (bu[in].temp==truespell && truespell==SK_VENOM && bu[in].active>bu[in].duration/3)
 			{
 				break;
 			}
@@ -2828,8 +2871,8 @@ int npc_try_spell(int cn, int co, int spell)
 	if (n==MAXBUFFS)
 	{
 		tmp = spellflag(spell);
-		if (spell==SK_WEAKEN || spell==SK_CLEAVE || spell==SK_WARCRY || 
-			spell==SK_BLIND || spell==SK_TAUNT || spell==SK_LEAP)
+		if (spell==SK_WEAKEN || spell==SK_CLEAVE || spell==SK_WARCRY || spell==SK_BLIND || 
+			spell==SK_TAUNT || spell==SK_LEAP || spell==SK_RAGE)
 		{
 			if (end>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
@@ -2859,8 +2902,8 @@ int npc_try_spell(int cn, int co, int spell)
 
 int npc_can_spell(int cn, int co, int spell)
 {
-	if (spell==SK_CLEAVE || spell==SK_WEAKEN || spell==SK_WARCRY || 
-		spell==SK_BLIND || spell==SK_TAUNT || spell==SK_LEAP)
+	if (spell==SK_CLEAVE || spell==SK_WEAKEN || spell==SK_WARCRY || spell==SK_BLIND || 
+		spell==SK_TAUNT || spell==SK_LEAP || spell==SK_RAGE)
 	{
 		if ((ch[cn].a_end-500) / 1000 < get_spellcost(cn, spell))
 		{
@@ -3019,7 +3062,7 @@ void die_companion(int cn)
 	do_char_killed(0, cn, 0);
 }
 
-int is_inline(int cn, int linenum)
+int is_inline(int cn, int ln)
 {
 	int x, y;
 	
@@ -3029,9 +3072,34 @@ int is_inline(int cn, int linenum)
 	x = ch[cn].x;
 	y = ch[cn].y;
 	
-	if (linenum == 1 && x >= 539 && y >= 282 && x <= 562 && y <= 372) return 1; // Line 1
-	if (linenum == 2 && x >= 563 && y >= 282 && x <= 589 && y <= 372) return 1; // Line 2
-	if (linenum == 3 && x >= 590 && y >= 282 && x <= 613 && y <= 372) return 1; // Line 3
+	if (ln == 1 && x >= 539 && y >= 282 && x <= 562 && y <= 372) return 1; // Line 1
+	if (ln == 2 && x >= 563 && y >= 282 && x <= 589 && y <= 372) return 1; // Line 2
+	if (ln == 3 && x >= 590 && y >= 282 && x <= 613 && y <= 372) return 1; // Line 3
+	
+	return 0;
+}
+
+int is_incolosseum(int cn, int ln)
+{
+	int x, y;
+	
+	if (!IS_SANECHAR(cn)) return 0;
+	if (!IS_ACTIVECHAR(cn)) return 0;
+	
+	x = ch[cn].x;
+	y = ch[cn].y;
+	
+	if (ln == 0 && ((x >= 738 && y >= 946 && x <= 746 && y <= 950) ||
+					(x >= 705 && y >= 921 && x <= 713 && y <= 925) ||
+					(x >= 771 && y >= 921 && x <= 779 && y <= 925) ||
+					(x >= 705 && y >= 971 && x <= 713 && y <= 975) ||
+					(x >= 771 && y >= 971 && x <= 779 && y <= 975) )) return 0; // Reward rooms (spectate prevention)
+	
+	if ((ln == 0 || ln == 1) && x >= COLOS1_X1 && y >= COLOS1_Y1 && x <= COLOS1_X2 && y <= COLOS1_Y2) return 1; // Area 1
+	if ((ln == 0 || ln == 2) && x >= COLOS2_X1 && y >= COLOS2_Y1 && x <= COLOS2_X2 && y <= COLOS2_Y2) return 1; // Area 2
+	if ((ln == 0 || ln == 3) && x >= COLOS3_X1 && y >= COLOS3_Y1 && x <= COLOS3_X2 && y <= COLOS3_Y2) return 1; // Area 3
+	if ((ln == 0 || ln == 4) && x >= COLOS4_X1 && y >= COLOS4_Y1 && x <= COLOS4_X2 && y <= COLOS4_Y2) return 1; // Area 4
+	if ((ln == 0 || ln == 5) && x >= COLOS5_X1 && y >= COLOS5_Y1 && x <= COLOS5_X2 && y <= COLOS5_Y2) return 1; // Area 5
 	
 	return 0;
 }
@@ -3503,8 +3571,8 @@ void stronghold_mage_driver(int cn)
 						
 						if (!(ch[co].flags & CF_EXTRAEXP)) 
 							ch[co].flags |= CF_EXTRAEXP;
-						if (!(ch[co].flags & CF_CANCRIT)) 
-							ch[co].flags |= CF_CANCRIT;
+						if (!(ch[co].flags & CF_EXTRACRIT)) 
+							ch[co].flags |= CF_EXTRACRIT;
 						modified=1;
 					}
 					if (modified)
@@ -3711,7 +3779,7 @@ static int bs_waves[3][15][9][7] = {
 void stronghold_mage_driver_ver2(int cn)
 {
 	int candleA, candleB, candleC, candleD, candleE;
-	int spawnX, spawnY, magenum=0, groupnum=601, spawnT = 347;
+	int spawnX, spawnY, magenum=0, groupnum=601;
 	int p=0, n, m, j, in=0, co=0;
 	int cw[4] = {0};
 	
@@ -3727,7 +3795,7 @@ void stronghold_mage_driver_ver2(int cn)
 		data[4] = number of enemies spawned so far
 		data[5] = number of enemies killed so far
 		
-		generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]][ch[cn].data[2]][m], spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 0, 0);
+		generate_map_enemy(347, bs_waves[magenum-1][ch[cn].data[1]][ch[cn].data[2]][m], spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 0, 0);
 	*/
 	
 	// Assign mage number
@@ -3875,7 +3943,7 @@ void stronghold_mage_driver_ver2(int cn)
 		if (bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m]>0 && 
 			bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m]<11)
 		{
-			if (co = generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
+			if (co = generate_map_enemy(347, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
 				spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
 				(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0), 0))
 			{
@@ -3949,6 +4017,427 @@ void stronghold_mage_driver_ver2(int cn)
 	
 	// Increment ticker storage
 	ch[cn].data[3] = globs->ticker + m;
+}
+
+void tell_incolosseum(int anum, char *msg)
+{
+	int n;
+	
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used==USE_EMPTY) continue;
+		if (is_incolosseum(n, anum)) // || (IS_SANEPLAYER(player[n].spectating) && is_incolosseum(player[n].spectating, anum)))
+		{
+			do_char_log(n, 3, "Announcer: \"%s\"\n", msg);
+		}
+	}
+}
+
+void show_colosseum_rewards(int anum, int diffi, int wave)
+{
+	int n;
+	
+	for (n = 1; n<MAXCHARS; n++) 
+	{
+		if (ch[n].used==USE_EMPTY) continue;
+		if (IS_PLAYER(n) && is_incolosseum(n, anum))
+		{
+			if (wave<7) do_char_log(n, 1, "* Your rewards so far:\n");
+			else 		do_char_log(n, 1, "* Final rewards:\n");
+				
+			switch (diffi)
+			{
+				case  1:	// Standard
+					if (wave==1 || wave==2) 
+						do_char_log(n, 1, "    125 Gold\n");
+					if (wave==3 || wave==4) 
+						do_char_log(n, 1, "    375 Gold\n");
+					if (wave>=5) 
+						do_char_log(n, 1, "    750 Gold\n");
+					if (wave>=2) 
+						do_char_log(n, 1, "    1x Ratling Eye Essence\n");
+					if (wave>=4) 
+						do_char_log(n, 1, "    1x Greenling Eye Essence\n");
+					if (wave>=6) 
+						do_char_log(n, 6, "    1x Attribute scroll (random)\n");
+					if (wave==7) 
+					{
+						do_char_log(n, 1, "    1x RARE Titanium weapon\n");
+						do_char_log(n, 9, "    1x +1 Augmentation to any equipable item\n");
+					}
+					break;
+				case  2:	// Cruel
+					if (wave==1 || wave==2) 
+						do_char_log(n, 1, "    250 Gold\n");
+					if (wave==3 || wave==4) 
+						do_char_log(n, 1, "    750 Gold\n");
+					if (wave>=5) 
+						do_char_log(n, 1, "    1500 Gold\n");
+					if (wave==2 || wave==3) 
+						do_char_log(n, 1, "    1x Greenling Eye Essence\n");
+					if (wave>=4) 
+						do_char_log(n, 1, "    2x Greenling Eye Essences\n");
+					if (wave>=6) 
+						do_char_log(n, 6, "    1x Greater skill scroll (random)\n");
+					if (wave==7) 
+					{
+						do_char_log(n, 1, "    1x RARE Damascus weapon\n");
+						do_char_log(n, 9, "    2x +1 Augmentation to any equipable item\n");
+					}
+					break;
+				case  3:	// Merciless
+					if (wave==1 || wave==2) 
+						do_char_log(n, 1, "    500 Gold\n");
+					if (wave==3 || wave==4) 
+						do_char_log(n, 1, "    1500 Gold\n");
+					if (wave>=5) 
+						do_char_log(n, 1, "    3000 Gold\n");
+					if (wave>=2) 
+						do_char_log(n, 1, "    1x Greenling Eye Essence\n");
+					if (wave>=4) 
+						do_char_log(n, 1, "    1x Sogling Eye Essences\n");
+					if (wave>=6) 
+						do_char_log(n, 6, "    1x Greater attribute scroll (random)\n");
+					if (wave==7) 
+					{
+						do_char_log(n, 1, "    1x RARE Adamant weapon\n");
+						do_char_log(n, 9, "    1x +2 Augmentation to any equipable item\n");
+					}
+					break;
+				default:	// Absurd
+					if (wave==1 || wave==2) 
+						do_char_log(n, 1, "    1000 Gold\n");
+					if (wave==3 || wave==4) 
+						do_char_log(n, 1, "    3000 Gold\n");
+					if (wave>=5) 
+						do_char_log(n, 1, "    6000 Gold\n");
+					if (wave==2 || wave==3) 
+						do_char_log(n, 1, "    1x Sogling Eye Essence\n");
+					if (wave>=4) 
+						do_char_log(n, 1, "    2x Sogling Eye Essences\n");
+					if (wave==6) 
+						do_char_log(n, 6, "    1x Greater skill scroll (random)\n");
+					if (wave==7) 
+					{
+						do_char_log(n, 6, "    2x Greater skill scrolls (random)\n");
+						do_char_log(n, 9, "    2x +2 Augmentations to any equipable item\n");
+					}
+					break;
+			}
+			do_char_log(n, 1, " \n");
+		}
+	}
+}
+
+// [tier][wave][4 monster templates & power value]
+static int col_waves[4][7][5] = {
+	{		// Standard
+		{		// Wave 1
+			11, 11, 11, 11, 70		// Brig
+		},{		// Wave 2
+			18, 19, 18, 19, 72
+		},{		// Wave 3
+			15, 40, 15, 40, 74
+		},{		// Wave 4
+			22, 22, 22, 22, 76
+		},{		// Wave 5
+			23, 43, 23, 43, 78
+		},{		// Wave 6
+			35, 35, 42, 35, 80
+		},{		// Wave 7
+			17, 32, 41, 45, 84		// General
+		}
+	},{		// Cruel
+		{		// Wave 1
+			11, 11, 13, 32, 84		// General
+		},{		// Wave 2
+			14, 15, 16, 17, 87
+		},{		// Wave 3
+			12, 22, 22, 36, 90
+		},{		// Wave 4
+			30, 21, 30, 21, 93
+		},{		// Wave 5
+			27, 34, 31, 27, 96
+		},{		// Wave 6
+			39, 38, 39, 38, 99
+		},{		// Wave 7
+			41, 40, 33, 45, 105		// Baron
+		}
+	},{		// Merciless
+		{		// Wave 1
+			11, 17, 11, 17, 105		// Baron
+		},{		// Wave 2
+			28, 28, 28, 28, 108
+		},{		// Wave 3
+			37, 40, 37, 40, 111
+		},{		// Wave 4
+			44, 45, 44, 45, 114
+		},{		// Wave 5
+			20, 39, 19, 18, 117
+		},{		// Wave 6
+			16, 31, 22, 24, 120
+		},{		// Wave 7
+			25, 26, 25, 29, 126		// Marquess
+		}
+	},{		// Absurd
+		{		// Wave 1
+			41, 40, 15, 20, 124		// Marquess
+		},{		// Wave 2
+			21, 29, 26, 30, 128
+		},{		// Wave 3
+			31, 32, 33, 34, 132
+		},{		// Wave 4
+			35, 36, 37, 38, 136
+		},{		// Wave 5
+			39, 42, 12, 52, 140
+		},{		// Wave 6
+			11, 47, 17, 51, 144
+		},{		// Wave 7
+			49, 46, 48, 50, 152		// Warlord+++
+		}
+	}
+};
+
+void spawn_colosseum_rewards(int x, int y, int diffi, int wave)
+{
+	int in;
+	
+	switch (diffi)
+	{
+		case  1: 	// Standard
+			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] =  125; }
+			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_RPOT; }
+			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] =  250; }
+			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_GPOT; }
+			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] =  375; }
+			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_RD_BRV+RANDOM(5); }
+			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_DAGG_TITN; }
+			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 1; it[in].data[1] = 1; }
+			break;
+		case  2: 	// Cruel
+			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] =  250; }
+			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_GPOT; }
+			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] =  500; }
+			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_GPOT; }
+			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] =  750; }
+			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_OS_SK; }
+			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_DAGG_DAMA; }
+			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 1; it[in].data[1] = 2; }
+			break;
+		case  3: 	// Merciless
+			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] =  500; }
+			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_GPOT; }
+			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] = 1000; }
+			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_SPOT; }
+			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] = 1500; }
+			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_OS_BRV+RANDOM(5); }
+			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_DAGG_ADAM; }
+			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 2; it[in].data[1] = 1; }
+			break;
+		default: 	// Absurd
+			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] = 1000; }
+			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_SPOT; }
+			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] = 2000; }
+			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_SPOT; }
+			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] = 3000; }
+			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_OS_SK; }
+			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_OS_SK; }
+			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 2; it[in].data[1] = 2; }
+			break;
+	}
+}
+
+void spawn_colosseum_enemy(int x, int y, int tox, int toy, int parent, int diffi, int wave, int m)
+{
+	int co, try;
+	
+	if (co = generate_map_enemy(347, col_waves[diffi][wave][m], x, y, col_waves[diffi][wave][4], 0, 3))
+	{
+		ch[co].flags |= CF_NOSLEEP;
+		ch[co].data[31] = parent;    // parent template
+		ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = 60;
+		ch[co].data[25] = 0;
+		ch[co].skill[SK_PERCEPT][1] += 15;
+		do_update_char(co);
+		for (try = 0; try < 3; try++)
+			if (npc_moveto(co, tox-2+RANDOM(5), toy-2+RANDOM(5))) break;
+	}
+}
+
+// For the Colosseum NPC(s) to track player progress
+void colosseum_driver(int cn)
+{
+	int n, m=0, i=0, p=0, x, y, anum=0;
+	static int from_xy[5][5][2] = {
+		{ {735,933},{751,949},{767,933},{751,917} },
+		{ {702,908},{718,924},{734,908},{718,892} },
+		{ {768,908},{784,924},{800,908},{784,892} },
+		{ {702,958},{718,974},{734,958},{718,942} },
+		{ {768,958},{784,974},{800,958},{784,942} } };
+		//    N         E         S         W         X
+	static int to_xy[5][5][2] = {
+		{ {747,933},{751,937},{755,933},{751,929},{742,947} },
+		{ {714,908},{718,912},{722,908},{718,904},{709,922} },
+		{ {780,908},{784,912},{788,908},{784,904},{775,922} },
+		{ {714,958},{718,962},{722,958},{718,954},{709,972} },
+		{ {780,958},{784,962},{788,958},{784,954},{775,972} } };
+	
+	/*
+		Announcer driver
+		
+		data[0] = whether or not we're active / number of players
+		data[1] = Wave process number
+		data[2] = Chat process number
+		data[3] = global time for next event process
+		data[4] = remaining monsters
+		
+		generate_map_enemy(spawnT, bs_waves[magenum-1][ch[cn].data[1]][ch[cn].data[2]][m], spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 0, 0);
+	*/
+	
+	// Get announcer number for the local arena
+	if (ch[cn].temp==CT_ANNOU1) anum = 1;
+	if (ch[cn].temp==CT_ANNOU2) anum = 2;
+	if (ch[cn].temp==CT_ANNOU3) anum = 3;
+	if (ch[cn].temp==CT_ANNOU4) anum = 4;
+	if (ch[cn].temp==CT_ANNOU5) anum = 5;
+	
+	// Check for players in the relevant arena
+	for (n = 1; n<MAXCHARS; n++) 
+	{
+		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+		if (IS_PLAYER(n) && is_incolosseum(n, anum) && p == 0) p = ch[n].colosseum;
+		if (!IS_PLAYER(n) && !(IS_COMP_TEMP(n) && IS_SANEPLAYER(ch[n].data[CHD_MASTER])) && is_incolosseum(n, anum)) m++;
+	}
+	ch[cn].data[0] = p;
+	ch[cn].data[4] = m;
+	
+	// Initialize the announcer
+	if (p<1 || ch[cn].data[1]==9)
+	{
+		if (p<1) 
+		{
+			m = ch[cn].data[29];
+			x = m % MAPX;
+			y = m / MAPX;
+			if (ch[cn].x != x) god_transfer_char(cn, x, y); // Teleport back home if necessary
+			ch[cn].data[1] = 9;
+		}
+		else
+		{
+			ch[cn].data[1] = 0;
+		}
+		ch[cn].data[2] = 0;
+		ch[cn].data[3] = globs->ticker + TICKS * 3;
+		ch[cn].data[4] = 0;
+		return; // No further process when nobody is in the area
+	}
+	
+	// Return if time is less than next action
+	if (globs->ticker < ch[cn].data[3])
+		return;
+	
+	// Process by wave number
+	if (ch[cn].data[1]==0) // Fresh start
+	{
+		switch (ch[cn].data[2])
+		{
+			case  0: ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS * 5; chlog(cn, "beginning fresh colosseum (%d)", anum);
+				tell_incolosseum(anum, "Ladies and gentlemen! It's the moment you've all been waiting for! Today, our glorious colosseum has a new challenger!"); break;
+			case  1: ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS * 5;
+				tell_incolosseum(anum, "Can they make it through all seven rounds and claim the grand prize? Or will they resign part-way? Only time will tell!"); break;
+			case  2: ch[cn].data[1]=1; ch[cn].data[2]=0; ch[cn].data[3] = globs->ticker + TICKS / 4;
+				tell_incolosseum(anum, "Let's make some noise! Round 1 starts NOW!!"); break;
+			default: break;
+		}
+	}
+	else if (ch[cn].data[1]>=1 && ch[cn].data[1]<=7) // Waves
+	{
+		switch (ch[cn].data[2])
+		{
+			case  0: 	// Spawn mobs
+				n = anum-1;
+				i = ch[cn].data[0]-1;
+				p = ch[cn].data[1]-1;
+				m = 0; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
+				m = 1; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
+				m = 2; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
+				m = 3; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
+				chlog(cn, "created 4 monsters in colosseum %d", anum);
+				ch[cn].data[2]++;
+				break;
+			case  1: 	// Wait for mobs to die
+				if (ch[cn].data[4]) return; 
+				ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS / 2; break;
+			case  2: 	// Warp after clear
+				x = to_xy[anum-1][0][0];
+				y = to_xy[anum-1][0][1];
+				if (ch[cn].data[1] < 7) quick_teleport(cn, x, y); 
+				ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS * 1; break;
+			case  3:   // Continue check
+				ch[cn].data[3] = globs->ticker + TICKS * 1;
+				if (ch[cn].data[1] == 7)
+				{
+					ch[cn].data[2] = 7;
+					tell_incolosseum(anum, "Round 7 clear! Congratulations!");
+					show_colosseum_rewards(anum, ch[cn].data[0], ch[cn].data[1]);
+				}
+				else
+				{
+					ch[cn].data[2]++;
+					tell_incolosseum(anum, "Round clear! Well done!");
+					show_colosseum_rewards(anum, ch[cn].data[0], ch[cn].data[1]);
+					tell_incolosseum(anum, "Shall we CONTINUE? Or would you like to RESIGN?");
+				}
+				break;
+			case  4: // Wait for reply
+				break;
+			case  5: // Reply: Continue
+				m = ch[cn].data[29];
+				x = m % MAPX;
+				y = m / MAPX;
+				quick_teleport(cn, x, y); 
+				ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS * 2; break;
+			case  6: // Continue
+				ch[cn].data[1]++; ch[cn].data[2]=0; ch[cn].data[3] = globs->ticker + TICKS * 1;
+				switch (ch[cn].data[1])
+				{
+					case  2: tell_incolosseum(anum, "We haven't seen anything yet! Round 2 starts NOW!!"); break;
+					case  3: tell_incolosseum(anum, "They haven't even broken a sweat! Round 3 starts NOW!!"); break;
+					case  4: tell_incolosseum(anum, "Can they keep it up? Round 4 starts NOW!!"); break;
+					case  5: tell_incolosseum(anum, "The crowd cheers loud and wild! Round 5 starts NOW!!"); break;
+					case  6: tell_incolosseum(anum, "Our challenger feels luck on their side! Round 6 starts NOW!!"); break;
+					default: tell_incolosseum(anum, "It's finally time for the main event! The final round starts NOW!!"); break;
+				}
+				break;
+			case  7: // Reply: Quit
+				m = ch[cn].data[29];
+				x = m % MAPX;
+				y = m / MAPX;
+				quick_teleport(cn, x, y); 
+				spawn_colosseum_rewards(to_xy[anum-1][4][0], to_xy[anum-1][4][1], ch[cn].data[0], ch[cn].data[1]);
+				ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS * 2; break;
+			case  8: // Quit / Victory
+				ch[cn].data[2]++;
+				tell_incolosseum(anum, "One last round of applause for our challenger!");
+				x = to_xy[anum-1][4][0];
+				y = to_xy[anum-1][4][1];
+				for (n = 1; n<MAXCHARS; n++) 
+				{
+					if (ch[n].used==USE_EMPTY) continue;
+					if (IS_PLAYER(n) && is_incolosseum(n, anum)) quick_teleport(n, x, y);
+					/*
+					if (IS_PLAYER(n) && IS_SANEPLAYER(player[n].spectating) && is_incolosseum(player[n].spectating, anum) && 
+						!(ch[player[n].spectating].flags & CF_ALW_SPECT))
+					{
+						player[n].spectating = 0;
+						do_char_log(n, 0, "No longer spectating.\n");
+					}
+					*/
+				}
+				break;
+			default: break;
+		}
+	}
 }
 
 void npc_lab_lord_driver(int cn)
@@ -4486,7 +4975,7 @@ int npc_driver_high(int cn)
 	}
 
 	// donate/destroy citem if that's our job
-	if ((in = ch[cn].citem)!=0 && ch[cn].data[47])
+	if ((in = ch[cn].citem)!=0 && ch[cn].data[47]>0 && ch[cn].data[47]<10)
 	{
 		if (it[in].damage_state || (it[in].flags & IF_SHOPDESTROY) || !(it[in].flags & IF_DONATE))
 		{
@@ -4503,7 +4992,7 @@ int npc_driver_high(int cn)
 		}
 	}
 
-	if ((in = ch[cn].item[39])!=0 && ch[cn].data[47])
+	if ((in = ch[cn].item[39])!=0 && ch[cn].data[47]>0 && ch[cn].data[47]<10)
 	{
 		if (it[in].damage_state || (it[in].flags & IF_SHOPDESTROY) || !(it[in].flags & IF_DONATE))
 		{
@@ -4806,6 +5295,28 @@ int npc_driver_high(int cn)
 		{
 			return 1;
 		}
+		if (get_tarot(cn, IT_CH_EMPERO_R) && ch[cn].a_end>ch[cn].end[5]*500 && npc_try_spell(cn, cn, SK_WARCRY))
+		{
+			return 1;
+		}
+		
+		if (co && ch[cn].a_mana>ch[cn].mana[5]*600 && !has_buff(cn, SK_LETHARGY) && npc_try_spell(cn, cn, SK_LETHARGY))
+		{
+			return 1;
+		}
+		if (co && ch[cn].a_end>ch[cn].end[5]*600 && !has_buff(cn, SK_RAGE) && npc_try_spell(cn, cn, SK_RAGE))
+		{
+			return 1;
+		}
+		if (co && ch[cn].a_hp>ch[cn].hp[5]*800 && !has_buff(cn, SK_IMMOLATE) && get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
+		{
+			return 1;
+		}
+		if (ch[cn].a_hp<ch[cn].hp[5]*300 && has_buff(cn, SK_IMMOLATE) && get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
+		{
+			return 1;
+		}
+		
 		// Dispel - for enemy
 		if (co && B_SK(cn, SK_DISPEL) && get_tarot(cn, IT_CH_HEIROPH) && !has_buff(co, SK_DISPEL2))
 		{
@@ -4850,7 +5361,7 @@ int npc_driver_high(int cn)
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return 1;
 		}
-		if (co && npc_try_spell(cn, cn, SK_PULSE))
+		if (co && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
 		{
 			return 1;
 		}
@@ -4868,13 +5379,14 @@ int npc_driver_high(int cn)
 			ch[co].data[75] = globs->ticker + TICKS;
 			return 1;
 		}
-		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
+		if (co && is_near(cn, co, PRXB_RAD-1 + ch[cn].aoe_bonus) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 15;
 			return 1;
 		}
-		if (co && ((!IS_PLAYER(co) && globs->ticker>ch[cn].data[74]) || (IS_PLAYER(co) && globs->ticker>ch[co].data[74])) && 
-			npc_try_spell(cn, co, SK_WARCRY))
+		if (co && is_near(cn, co, PRXW_RAD-1 + ch[cn].aoe_bonus) &&
+			((!IS_PLAYER(co) && globs->ticker>ch[cn].data[74]) || (IS_PLAYER(co) && globs->ticker>ch[co].data[74])) && 
+			!get_tarot(cn, IT_CH_EMPERO_R) && ch[cn].a_end>ch[cn].end[5]*200 && npc_try_spell(cn, co, SK_WARCRY))
 		{
 			if (IS_PLAYER(co))
 				ch[co].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
@@ -4931,21 +5443,20 @@ int npc_driver_high(int cn)
 		return 1;
 	}
 
-	if (!ch[cn].data[41] && !ch[cn].data[47])
+	if (!ch[cn].data[41] && !(ch[cn].data[47]>0 && ch[cn].data[47]<10))
 	{
 		return 0;                                     // don't scan if we don't use the information anyway
-
 	}
 	// save some work. you need to check here if no other work needs to be done!
 	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE)
 	{
 		return 0;
 	}
-	if (ch[cn].data[47] && ch[cn].misc_action==DR_PICKUP)
+	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_PICKUP)
 	{
 		return 0;
 	}
-	if (ch[cn].data[47] && ch[cn].misc_action==DR_USE)
+	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_USE)
 	{
 		return 0;
 	}
@@ -4996,7 +5507,7 @@ int npc_driver_high(int cn)
 						return 1;
 					}
 				}
-				if (ch[cn].data[47] && indoor1==indoor2 && (it[in].flags & IF_TAKE) &&
+				if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && indoor1==indoor2 && (it[in].flags & IF_TAKE) &&
 				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
 				    do_char_can_see_item(cn, in) && it[in].temp!=IT_FLO_R)  // Janitor pickup - ignore red flowers
 				{
@@ -5007,7 +5518,7 @@ int npc_driver_high(int cn)
 					ch[cn].data[58] = 1;
 					return 1;
 				}
-				if (ch[cn].data[47] && indoor1==indoor2 && (it[in].driver==7) &&
+				if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && indoor1==indoor2 && (it[in].driver==7) &&
 				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
 				    do_char_can_see_item(cn, in))
 				{
@@ -5075,7 +5586,7 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 	{
 		if ((ch[n].flags & (CF_PLAYER | CF_USURP)) && ch[n].used==USE_ACTIVE && !(ch[n].flags & CF_NOSHOUT))
 		{
-			if (ch[cn].temp==CT_BSMAGE1 && (is_inline(n, 1) || (points2rank(ch[n].points_tot)>= 5 && points2rank(ch[n].points_tot)<=8)))
+			if (ch[cn].temp==CT_BSMAGE1 && (is_inline(n, 1) || (getrank(n)>= 5 && getrank(n)<=8)))
 			{
 				switch (candlenum)
 				{
@@ -5093,7 +5604,7 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 						do_char_log(n, 3, "Tactician shouts: \"The northern stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
-			else if (ch[cn].temp==CT_BSMAGE2 && (is_inline(n, 2) || (points2rank(ch[n].points_tot)>=9 && points2rank(ch[n].points_tot)<=13)))
+			else if (ch[cn].temp==CT_BSMAGE2 && (is_inline(n, 2) || (getrank(n)>=9 && getrank(n)<=13)))
 			{
 				switch (candlenum)
 				{
@@ -5111,7 +5622,7 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 						do_char_log(n, 3, "Tactician shouts: \"The central stronghold is at full strength! Alert!\"\n"); break;
 				}
 			}
-			else if (ch[cn].temp==CT_BSMAGE3 && (is_inline(n, 3) || points2rank(ch[n].points_tot)>=14))
+			else if (ch[cn].temp==CT_BSMAGE3 && (is_inline(n, 3) || getrank(n)>=14))
 			{
 				switch (candlenum)
 				{
@@ -5551,6 +6062,12 @@ void npc_driver_low(int cn)
 		ch[cn].data[36]++;                                      // increase frust with failed action
 	}
 	
+	if (ch[cn].temp==CT_ANNOU1 || ch[cn].temp==CT_ANNOU2 || ch[cn].temp==CT_ANNOU3 || 
+		ch[cn].temp==CT_ANNOU4 || ch[cn].temp==CT_ANNOU5)
+	{
+		colosseum_driver(cn);
+	}
+	
 	// are we supposed to loot graves?
 	if (ch[cn].alignment<0 &&
 	    (globs->flags & GF_LOOTING) &&
@@ -5793,6 +6310,20 @@ void npc_driver_low(int cn)
 
 	if (ch[cn].data[29])    // resting position, lowest prio
 	{
+		// Turn off toggles when resting
+		if (ch[cn].a_mana<ch[cn].mana[5]*400 && has_buff(cn, SK_LETHARGY) && npc_try_spell(cn, cn, SK_LETHARGY))
+		{
+			return 1;
+		}
+		if (ch[cn].a_end<ch[cn].end[5]*400 && has_buff(cn, SK_RAGE) && npc_try_spell(cn, cn, SK_RAGE))
+		{
+			return 1;
+		}
+		if (ch[cn].a_hp<ch[cn].hp[5]*600 && has_buff(cn, SK_IMMOLATE) && get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
+		{
+			return 1;
+		}
+		
 		npc_activate_rings(cn, 0);
 		npc_wedge_doors(ch[cn].data[26], 0);
 		ch[cn].attack_cn = 0;

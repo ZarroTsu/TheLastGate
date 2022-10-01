@@ -119,6 +119,12 @@
 #define CT_BSMAGE3		1006
 #define CT_TACTICIAN	 372
 
+#define CT_ANNOU1		1396
+#define CT_ANNOU2		1397
+#define CT_ANNOU3		1398
+#define CT_ANNOU4		1399
+#define CT_ANNOU5		1400
+
 #define CT_JESSICA		1314	// Casino Rewards
 #define CT_KAIBA		1312	// Casino Tokens
 #define CT_YUGI			1313	// Casino Games
@@ -128,6 +134,7 @@
 #define CT_ADHERENT		 351
 
 #define CT_EALDWULF		1375
+#define CT_ZANA			1382
 
 #define BS_RC			  20
 #define BS_COUNTER		  18
@@ -351,6 +358,16 @@
 #define IT_WP_BRONCHIT	  	2551
 #define IT_WP_VOLCANF	  	2552
 
+#define IT_WP_QUICKSILV		9991
+#define IT_WP_PUTRIDIRE		2789
+#define IT_WP_BLOODYSCY		2790
+#define IT_WP_FLAGBEAR		9994
+#define IT_WP_RISINGPHO		2791
+#define IT_WP_THEWALL		9996
+#define IT_WP_SOVERIGNS		9997
+#define IT_WP_MJOLNIR		2792
+#define IT_WP_CROSSBLAD	  	2760
+#define IT_WP_GUNGNIR		9999
 #define REQ_LAME		    8000
 
 // Other
@@ -362,6 +379,7 @@
 #define IT_GAMBLERFAL		2484
 #define IT_WHITEBELT		2486
 #define IT_BONEARMOR		2481
+#define IT_ICELOTUS			2796
 
 // -----
 
@@ -686,6 +704,9 @@
 #define IT_BOOK_NECR	1659
 #define IT_BOOK_BISH	2055
 #define IT_BOOK_GREA	2056
+#define IT_BOOK_DEVI	2793
+#define IT_BOOK_BURN	2794
+#define IT_BOOK_VERD	2795
 
 // ----- Casino
 
@@ -864,6 +885,11 @@
 
 //
 
+#define CR_GOLD			2805
+#define CR_ITEM			2806
+#define CR_AUGM			2807
+
+//
 // Map tile sizes
 #define MAP_TILE_SIZE	   7
 #define MAP_CELL_SIZE	   7

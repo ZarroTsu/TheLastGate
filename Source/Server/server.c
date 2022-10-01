@@ -115,19 +115,19 @@ void discord_top_five(void)
 			
 			if (r1)
 				fprintf(discordTopA, "%c %10.10s    %20.20s    %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
 				fprintf(discordTopA, "%c %10.10s    %20.20s        %3d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
 				fprintf(discordTopA, "%c %10.10s    %20.20s            %3d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
 				fprintf(discordTopA, "%c %10.10s    %20.20s                %3d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r4);
 		}
 	}
@@ -159,19 +159,19 @@ void discord_top_five(void)
 			
 			if (r1)
 				fprintf(discordTopB, "%c %10.10s    %20.20s    %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
 				fprintf(discordTopB, "%c %10.10s    %20.20s        %3d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
 				fprintf(discordTopB, "%c %10.10s    %20.20s            %3d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
 				fprintf(discordTopB, "%c %10.10s    %20.20s                %3d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[points2rank(ch[nr[j][m]].points_tot)], 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r4);
 		}
 	}
@@ -254,7 +254,7 @@ void discord_who(void)
 
 		fprintf(discordWho, "%c %.5s %-10.10s%c%c %.24s\n",
 					font ? '+' : ' ',
-		            who_rank_name[points2rank(ch[n].points_tot)],
+		            who_rank_name[getrank(n)],
 		            ch[n].name,
 					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',

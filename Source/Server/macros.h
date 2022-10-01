@@ -35,13 +35,13 @@
 #define IS_USED(x) ((x).used != USE_EMPTY)
 
 // Sanity checks on item numbers
-#define IS_SANEITEM(in)     ((in) > 0 && (in) < MAXITEM)
-#define IS_USEDITEM(in)     (IS_USED(it[(in)]))
-#define IS_SANEUSEDITEM(in) (IS_SANEITEM(in) && IS_USEDITEM(in))
+#define IS_SANEITEM(in)			((in) > 0 && (in) < MAXITEM)
+#define IS_USEDITEM(in)			(IS_USED(it[(in)]))
+#define IS_SANEUSEDITEM(in)		(IS_SANEITEM(in) && IS_USEDITEM(in))
 
-#define CAN_SOULSTONE(in)	(it[(in)].flags & IF_CAN_SS)
-#define CAN_ENCHANT(in)		(it[(in)].flags & IF_CAN_EN)
-#define HAS_ENCHANT(in, n)	(it[(in)].enchantment == (n))
+#define CAN_SOULSTONE(in)		(it[(in)].flags & IF_CAN_SS)
+#define CAN_ENCHANT(in)			(it[(in)].flags & IF_CAN_EN)
+#define HAS_ENCHANT(in, n)		(it[(in)].enchantment == (n))
 
 #define IS_SINBINDER(in)		(it[(in)].temp==IT_TW_SINBIND || it[(in)].orig_temp==IT_TW_SINBIND)
 #define NOT_SINBINDER(in)		(it[(in)].temp!=IT_TW_SINBIND && it[(in)].orig_temp!=IT_TW_SINBIND)
@@ -55,6 +55,9 @@
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
 
 #define IS_TWOHAND(in)			(it[(in)].placement & PL_TWOHAND)
+
+#define IS_SOULSTONED(in)		(it[(in)].flags & IF_SOULSTONE)
+#define IS_ENCHANTED(in)		(it[(in)].flags & IF_ENCHANTED)
 
 
 /* *** TEMPLATES *** */
@@ -181,14 +184,14 @@
 #define CURSE2FORM(p, n)	(((p*4/3)-n)/5)
 
 // Poison's formula (damage per tick)
-#define S_POISONFORM(p, d)	((p * 1750) / d)
-#define POISONFORM(p, d)	((p * 1250) / d)
+#define PL_POISFORM(p, d)	(((p+15) * 3250) / d)
+#define MN_POISFORM(p, d)	(((p+10) * 3250) / d)
 
 // Bleed's formula (damage per tick)
-#define BLEEDFORM(p, d)		((p *  750) / d)
+#define BLEEDFORM(p, d)		(((p+ 5) *  750) / d)
 
 // Frostburn's formula (degen per tick)
-#define FROSTBFORM(p, d)	((p * 1000) / d)
+#define FROSTBFORM(p, d)	(((p+10) * 1000) / d)
 
 /* Tarot Card Descriptiors (for both r-click and /tarot command) */
 
@@ -231,7 +234,7 @@
 #define DESC_DEATH_R	"When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n"
 #define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
 #define DESC_DEVIL_R	"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
-#define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals twice as much damage and reduces enemy Immunity, but it cannot stack.\n"
+#define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
 #define DESC_STAR_R		"When equipped, your Spell Modifier no longer effects spell power and instead effects skill power.\n"
 #define DESC_MOON_R		"When equipped, the effectiveness of your Meditate skill is tripled while fighting, but zero while stationary.\n"
 #define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate skill is tripled while fighting, but zero while stationary.\n"
@@ -286,36 +289,50 @@
 #define MSN_09			"Defeat the unique enemy!"
 
 // 						"!        .         .   |     .         .        !"
-#define CFL_08000000	"  Area contains piles of gold\n"
-#define CFL_00000001	"  Area has additional enemies\n"
-#define CFL_00000020	"  Area has additional spike traps\n"
-#define CFL_00000004	"  Area has an additional chest\n"
-#define CFL_00000002	"  Area has an additional Divine enemy\n"
-#define CFL_00000010	"  Area has an additional shrine\n"
-#define CFL_00000008	"  Area is underwater\n"
-#define CFL_10000000	"  Contract rank is increased by 1\n"
-#define CFL_20000000	"  Contract rank is increased by 2\n"
-#define CFL_00000200	"  Enemies are perceptive\n"
-#define CFL_00000400	"  Enemies are resistant\n"
-#define CFL_00000040	"  Enemies are undead\n"
-#define CFL_04000000	"  Enemies grant additional exp on kill\n"
-#define CFL_00002000	"  Enemies have additional armor value\n"
-#define CFL_00008000	"  Enemies have additional spellmod\n"
-#define CFL_00000800	"  Enemies have additional weapon skill\n"
-#define CFL_00001000	"  Enemies have additional weapon value\n"
-#define CFL_00004000	"  Enemies move faster\n"
-#define CFL_00000100	"  Enemies roam farther\n"
-#define CFL_01000000	"  Enemies use forward tarot cards\n"
-#define CFL_02000000	"  Enemies use reverse tarot cards\n"
-#define CFL_00000080	"  Exit is guarded by an additional Cruel enemy\n"
-#define CFL_00800000	"  Exit portal grants additional contract pts\n"
-#define CFL_00100000	"  Exit portal grants additional exp\n"
-#define CFL_00200000	"  Exit portal grants additional luck\n"
-#define CFL_00400000	"  Exit portal grants additional stronghold pts\n"
-#define CFL_00010000	"  Players are debilitated, reducing attributes\n"
-#define CFL_00020000	"  Players are fragile, reducing WV and AV\n"
-#define CFL_00080000	"  Players are hyperthermic, draining EN and MP\n"
-#define CFL_00040000	"  Players are stigmatic, reducing perception\n"
-
+#define CFL_P_CHST		"  Area has %d additional chests\n"
+#define CFL_P_SHRN		"  Area has %d additional shrines\n"
+#define CFL_P_XEXP		"  Exit grants %d%% more exp\n"
+#define RATE_P_XEXP		20
+#define CFL_P_XLUK		"  Exit grants %d%% of exp as luck\n"
+#define RATE_P_XLUK		2
+#define CFL_P_XBSP		"  Exit grants %d%% of exp as stronghold pts\n"
+#define RATE_P_XBSP		4
+#define CFL_P_XOSP		"  Exit grants %d%% of exp as Osiris pts\n"
+#define RATE_P_XOSP		3
+#define CFL_P_PLXP		"  Players earn %d%% more exp from enemies\n"
+#define RATE_P_PLXP		20
+#define CFL_P_ENBS		"  Enemies grant %d%% of exp as stronghold pts\n"
+#define RATE_P_ENBS		8
+#define CFL_P_ENOS		"  Enemies grant %d%% of exp as Osiris pts\n"
+#define RATE_P_ENOS		6
+#define CFL_P_ENGL		"  Enemies drop %d%% of exp as gold\n"
+#define RATE_P_ENGL		22
+#define CFL_P_ARGL		"  Area contains %s piles of gold\n"
+#define CFL_P_AREQ		"  Area contains %s discarded equipment\n"
+#define CFL_P_ARPT		"  Area contains %s discarded potions\n"
+#define CFL_P_DRGM		"  %d enemies drop an additional huge gem\n"
+#define CFL_P_RANK		"  Contract rank is increased by %d\n"
+// 						"!        .         .   |     .         .        !"
+#define CFL_N_EXTY		"  Area has %d additional enemy spawns\n"
+#define CFL_N_EXDV		"  Area has %d additional divine enemy spawns\n"
+#define CFL_N_ARUW		"  %d%% of area is underwater\n"
+#define CFL_N_ENUN		"  Enemies are %d%% undead\n"
+#define CFL_N_EXEN		"  Exit is guarded by %d cruel enemies\n"
+#define CFL_N_ENRO		"  Enemies roam %d%% farther\n"
+#define CFL_N_ENRS		"  Enemies are %d%% more resistant\n"
+#define CFL_N_ENSK		"  Enemies are %d%% more skillful\n"
+#define CFL_N_ENSH		"  Enemies have %d%% more weapon value\n"
+#define CFL_N_ENFO		"  Enemies have %d%% more armor value\n"
+#define CFL_N_ENFS		"  Enemies are %d%% faster\n"
+#define CFL_N_ENWI		"  Enemies have %d%% more spellmod\n"
+#define CFL_N_PLDB		"  Players are %d%% debilitated\n"
+#define CFL_N_PLFR		"  Players are %d%% more fragile\n"
+#define CFL_N_PLST		"  Players are %d%% stigmatic\n"
+#define CFL_N_PLHY		"  Players are %d%% hyperthermic\n"
+#define CFL_N_ENTR		"  Enemies use %s tarot cards.\n"
+#define CFL_N_ARSP		"  Area contains %s spike traps\n"
+#define CFL_N_ARDT		"  Area contains %s hidden dart traps\n"
+#define CFL_N_ARFL		"  Area contains %s open flames\n"
+// 						"!        .         .   |     .         .        !"
 
 #define IS_IN_SUN(x, y) ((x>=32 && y>=407 && x<=57 && y<= 413) || (x>=32 && y>=414 && x<=64 && y<= 428) || (x>=22 && y>=429 && x<=64 && y<=450) || (x>=22 && y>=451 && x<=27 && y<=459) || (x>=59 && y>=451 && x<=64 && y<=465) || (x>=173 && y>=921 && x<=255 && y<=1003))

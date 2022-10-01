@@ -23,7 +23,7 @@ extern int noshop;
 extern int selected_char;
 
 // Scroll Wheel - using position from other files
-extern unsigned int inv_pos,skill_pos,wps_pos;
+extern int inv_pos,skill_pos,wps_pos;
 extern int gui_inv_x[],gui_inv_y[],gui_skl_names[];
 
 // Screen data, can be shared with other files via extern
@@ -374,13 +374,19 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 					}
 					break;
 				case  33:
-					if (logstart<22*8) {
-						logstart+=11; logtimer=TICKS*30/TICKMULTI;
+					if (logstart<22*8) 
+					{
+						logstart+=11; 
+						if (logstart > 22*8) logstart = 22*8;
+						logtimer=TICKS*30/TICKMULTI;
 					}
 					break;
 				case  34:
-					if (logstart>0) {
-						logstart-=11; logtimer=TICKS*30/TICKMULTI;
+					if (logstart>0) 
+					{
+						logstart-=11; 
+						if (logstart < 0) logstart = 0;
+						logtimer=TICKS*30/TICKMULTI;
 					}
 					break;
 				// -------- Home

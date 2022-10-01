@@ -221,6 +221,8 @@ struct know
 #define AR_SEWER3		226
 //
 #define AR_CASINO		250
+#define AR_COLOSS		260
+#define AR_COLOSA		261
 #define AR_OSIRIS		299
 //}
 //{ Neiseer
@@ -293,7 +295,7 @@ struct know
 #define AN_SK_GEARMAST	"Gear Mastery is a skill used by Templars. It gives them up to double the weapon and armor value of their equipment."
 #define AN_SK_CLEAVE	"Cleave is a powerful skill used by Templars. It allows them to hit their enemies with a powerful blow."
 #define AN_SK_WEAKEN	"Weaken is a powerful skill used by Templars. It allows them to reduce their enemy's weapon and armor values."
-#define AN_SK_POISON	"Poison is an advanced spell learned by powerful mages. It inflicts an ailment that eats away at their target's health."
+#define AN_SK_POISON	"Poison is a powerful spell learned by Mercenaries. It inflicts an ailment that eats away at their target's health."
 #define AN_SK_PULSE		"Pulse is an advanced skill learned by powerful Harakim. It grants a repeating burst of area damage."
 #define AN_SK_PROX		"Proximity is an advanced skill. It grants a variety of bonuses depending on the class that knows it"
 #define AN_SK_COMPM		"Companion Mastery is an advanced skill learned by Summoners. Their Ghost Companion becomes stronger and learns the Heal spell."
@@ -766,6 +768,15 @@ struct know
 #define SP_BJACK_S		62		// Stand
 #define SP_BJACK_D		63		// Double Down
 //
+#define SP_COLOS_1		70
+#define SP_COLOS_2		71
+#define SP_COLOS_3		72
+#define SP_COLOS_4		73
+#define SP_COLOS_5		74
+#define SP_COLOS_6		75
+#define SP_COLOS_7		76
+#define SP_COLOS_8		77
+//
 #define SP_CLAIM_1		101
 #define SP_CLAIM_2		102
 #define SP_CLAIM_3		103
@@ -1071,12 +1082,12 @@ struct know know[] = {
 	{{"!where",  "?mad",    "!hermit",     "?", NULL},   0, AR_HERMIT,   0, AN_HERMIT_WHER,   0},
 	{{"!why",    "?want",   "!flower",     "?", NULL},   0, AR_HERMIT,   0, AN_HERMIT_WHY ,   0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_LAKEBED
-	{{"!danger", "?violet", "!lake",       "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHO ,   0},
-	{{"!tell",   "?violet", "!lake",       "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHO ,   0},
-	{{"!who",    "?violet", "!lake",       "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHO ,   0},
+	{{"!danger", "?lavender", "!lake",     "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHO ,   0},
+	{{"!tell",   "?lavender", "!lake",     "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHO ,   0},
+	{{"!who",    "?lavender", "!lake",     "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHO ,   0},
 	{{"!what",   "!weapon",                "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHAT,   0},
 	{{"!tell",   "?about",  "!weapon",     "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHAT,   0},
-	{{"!where",  "?violet", "!lake",       "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHER,   0},
+	{{"!where",  "?lavender", "!lake",     "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHER,   0},
 	{{"!why",    "?want",   "!weapon",     "?", NULL},   0,AR_LAKEBED,   0,AN_LAKEBED_WHY ,   0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_SEWER1
 	{{"!danger", "!underground",           "?", NULL},   0, AR_SEWER1,   0, AN_SEWER1_WHO ,   0},
@@ -1238,6 +1249,17 @@ struct know know[] = {
 	{{"!buy", "!ten",                      "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_A},
 	{{"!buy", "!hundred",                  "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_B},
 	{{"!buy", "!thousand",                 "?", NULL}, 0,   AR_CASINO, CT_KAIBA, NULL, SP_TOKEN_C},
+	//}
+	//{ Colosseum
+	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_COLOSS
+	{{"!resign",                           "!", NULL}, 0,   AR_COLOSA,   0,    NULL, SP_COLOS_8},
+	{{"!continue",                         "!", NULL}, 0,   AR_COLOSA,   0,    NULL, SP_COLOS_7},
+	{{"?enter", "!absurd",                 "!", NULL}, 0,   AR_COLOSS,   0,    NULL, SP_COLOS_6},
+	{{"?enter", "!merciless",              "!", NULL}, 0,   AR_COLOSS,   0,    NULL, SP_COLOS_5},
+	{{"?enter", "!cruel",                  "!", NULL}, 0,   AR_COLOSS,   0,    NULL, SP_COLOS_4},
+	{{"?enter", "!standard",               "!", NULL}, 0,   AR_COLOSS,   0,    NULL, SP_COLOS_3},
+	{{"!enter",                            "!", NULL}, 0,   AR_COLOSS,   0,    NULL, SP_COLOS_2},
+	{{"!help",                             "?", NULL}, 0,   AR_COLOSS,   0,    NULL, SP_COLOS_1},
 	//}
 	//{ Osiris 
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_OSIRIS
@@ -2123,6 +2145,154 @@ void answer_tokens(int cn, int co, int nr)
 	}
 }
 
+int get_open_colosseum(void)
+{
+	int co=0, in=0, full, ret=0, n, x, y, frx, tox, fry, toy;
+	
+	for (n=1; n<6 && !ret; n++)
+	{
+		full = 0;
+		switch (n)
+		{
+			case  1: frx = COLOS1_X1; tox = COLOS1_X2; fry = COLOS1_Y1; toy = COLOS1_Y2; break;
+			case  2: frx = COLOS2_X1; tox = COLOS2_X2; fry = COLOS2_Y1; toy = COLOS2_Y2; break;
+			case  3: frx = COLOS3_X1; tox = COLOS3_X2; fry = COLOS3_Y1; toy = COLOS3_Y2; break;
+			case  4: frx = COLOS4_X1; tox = COLOS4_X2; fry = COLOS4_Y1; toy = COLOS4_Y2; break;
+			case  5: frx = COLOS5_X1; tox = COLOS5_X2; fry = COLOS5_Y1; toy = COLOS5_Y2; break;
+			default: return 0;
+		}
+		for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+		{
+			// Check if someone's busy in this arena
+			if (IS_SANECHAR(co = map[x + y * MAPX].ch) && IS_PLAYER(co))
+			{
+				full = 1;
+			}
+		}
+		if (!full) for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+		{
+			// Since nobody's here, let's clean up before the loop ends
+			if ((co = map[x + y * MAPX].ch) && !IS_PLAYER(co))
+			{
+				god_destroy_items(co);
+				if (ch[co].used==USE_ACTIVE) plr_map_remove(co);
+				ch[co].flags = 0;
+				ch[co].used = USE_EMPTY;
+			}
+			if ((in = map[x + y * MAPX].it)!=0 && (it[in].flags & IF_USE) && it[in].temp!=2808)
+			{
+				it[in].used = 0;
+				map[x + y * MAPX].it = 0;
+			}
+			ret = n;
+		}
+	}
+	return ret;
+}
+/* 
+	Colosseum talk answers
+	1	HELP
+	2	ENTER
+	3	ENTER STANDARD
+	4	ENTER CRUEL
+	5	ENTER MERCILESS
+*/
+void answer_colosseum(int cn, int co, int nr)
+{
+	int go_colo = 0, v=0, x=512, y=512;
+	
+	switch (nr)
+	{
+		case  1:
+			do_sayx(cn, "Allow me to enlighten you.");
+			//                 "!        .         .   |     .         .        !"
+			do_char_log(co, 1, "  The Colosseum will present 7 fights.\n");
+			do_char_log(co, 1, "  Each victory will add to your final rewards.\n");
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "  After each fight you may CONTINUE or RESIGN.\n");
+			do_char_log(co, 1, "  If you QUIT you get all rewards up to then.\n");
+			do_char_log(co, 1, "  If you CONTINUE you move to the next round.\n");
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 1, "  Say ENTER to participate.\n");
+			do_char_log(co, 0, "  You may only enter once per Astonian month,\n");
+			do_char_log(co, 0, "  resetting on the 1st of each month.\n");
+			do_char_log(co, 1, " \n");
+			break;
+		case  2:
+			do_sayx(cn, "Which would you like to enter?");
+			//                 "!        .         .   |     .         .        !"
+			do_char_log(co, 1, "  STANDARD    Somewhat hard,     %-5.5s - %-5.5s.\n", who_rank_name[15], who_rank_name[18]);
+			do_char_log(co, 1, "    Costs 1000G to enter.\n");
+			do_char_log(co, 1, "    Rw: RPot, GPot, Attrib, +1 Augment.\n");
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 5, "  CRUEL       More difficult,    %-5.5s - %-5.5s.\n", who_rank_name[18], who_rank_name[21]);
+			do_char_log(co, 5, "    Costs 2000G to enter.\n");
+			do_char_log(co, 5, "    Rw: 2x GPots, G.Skill, 2x +1 Augments.\n");
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 0, "  MERCILESS   Very difficult,    %-5.5s - %-5.5s.\n", who_rank_name[21], who_rank_name[23]);
+			do_char_log(co, 0, "    Costs 4000G to enter.\n");
+			do_char_log(co, 0, "    Rw: GPot, SPot, G.Attrib, +2 Augment.\n");
+			do_char_log(co, 1, " \n");
+			do_char_log(co, 8, "  ABSURD      Impossibly hard,   %-5.5s - %-5.5s.\n", who_rank_name[23], who_rank_name[24]);
+			do_char_log(co, 8, "    Costs 8000G to enter.\n");
+			do_char_log(co, 8, "    Rw: 2x SPots, 2x G.Skills, 2x +2 Augments.\n");
+			do_char_log(co, 1, " \n");
+			break;
+		case  7: 	// CONTINUE
+			if (ch[cn].data[2] == 5) break;
+			do_sayx(cn, "Alright! That's what I like to hear!");
+			ch[cn].data[2] = 5; ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		case  8:	// RESIGN
+			if (ch[cn].data[2] == 7) break;
+			do_sayx(cn, "Very well, %s.", ch[co].name);
+			ch[cn].data[2] = 7; ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		default:
+			if (ch[co].colosseum)
+			{
+				do_sayx(cn, "You've already entered once today, %s. Try again tomorrow!", ch[co].name);
+				return;
+			}
+			switch (nr)
+			{
+				case  3: v = 1000; break;
+				case  4: v = 2000; break;
+				case  5: v = 4000; break;
+				default: v = 8000; break;
+			}
+			if (ch[co].gold < v)
+			{
+				do_sayx(cn, "You don't have enough money for that, %s!", ch[co].name);
+				return;
+			}
+			if ((go_colo = get_open_colosseum()) && go_colo<=5)
+			{
+				nr = nr-2;
+				do_sayx(cn, "Very well, %s. Good luck!", ch[co].name);
+				ch[co].gold -= v;
+				ch[co].colosseum = nr;
+				switch (go_colo)
+				{
+					case  1: x = COLOSSEUM1_X; y = COLOSSEUM1_Y; break;
+					case  2: x = COLOSSEUM2_X; y = COLOSSEUM2_Y; break;
+					case  3: x = COLOSSEUM3_X; y = COLOSSEUM3_Y; break;
+					case  4: x = COLOSSEUM4_X; y = COLOSSEUM4_Y; break;
+					default: x = COLOSSEUM5_X; y = COLOSSEUM5_Y; break;
+				}
+				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+				god_transfer_char(co, x, y);
+				char_play_sound(co, ch[co].sound + 22, -150, 0);
+				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			}
+			else
+			{
+				do_sayx(cn, "Seems like the colosseum's full at the moment. Try again later, %s!", ch[co].name);
+			}
+			break;
+	}
+}
+
 /*
 	Casino
 	
@@ -2871,7 +3041,7 @@ void answer_points(int cn, int co, int nr)
 
 void special_answer(int cn, int co, int spec, char *word, int nr)
 {
-	int corank = points2rank(ch[co].points_tot);
+	int corank = getrank(co);
 	switch(spec)
 	{
 		case SP_HEALTH:		answer_health(cn, co); break;
@@ -2921,6 +3091,15 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_BJACK_D:	casino_bjack(cn, co, 3); break;
 		case SP_CASIN_Q:	casino_quit(co); break;
 		//
+		case SP_COLOS_1:	answer_colosseum(cn, co, 1); break;
+		case SP_COLOS_2:	answer_colosseum(cn, co, 2); break;
+		case SP_COLOS_3:	answer_colosseum(cn, co, 3); break;
+		case SP_COLOS_4:	answer_colosseum(cn, co, 4); break;
+		case SP_COLOS_5:	answer_colosseum(cn, co, 5); break;
+		case SP_COLOS_6:	answer_colosseum(cn, co, 6); break;
+		case SP_COLOS_7:	answer_colosseum(cn, co, 7); break;
+		case SP_COLOS_8:	answer_colosseum(cn, co, 8); break;
+		//
 		case SP_CLAIM_1:	answer_claim(cn, co, 1); break;
 		case SP_CLAIM_2:	answer_claim(cn, co, 2); break;
 		case SP_CLAIM_3:	answer_claim(cn, co, 3); break;
@@ -2933,6 +3112,7 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_CLAIM_X:	answer_claim(cn, co,10); break;
 		case SP_CLAIM_Y:	answer_claim(cn, co,11); break;
 		case SP_CLAIM_Z:	answer_claim(cn, co,12); break;
+		//
 		default:break;
 	}
 }

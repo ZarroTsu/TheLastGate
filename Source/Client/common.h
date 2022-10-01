@@ -3,7 +3,7 @@
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
-	#define MHOST		"10.0.0.66"
+	#define MHOST		"tlg.abyss.codes" //"10.0.0.66"
 #else
 	#define MNAME		"The Last Gate"
 	#define MHOST		"thelastgate.ddns.net"
@@ -19,7 +19,7 @@
 
 #define MAXSKILL		(50+2)	// must match server!
 #define MAXBUFFS		40		// must match server!
-#define MAXWPS			24
+#define MAXWPS			26
 
 // -------- Damage Multipliers -------- //
 
@@ -31,7 +31,7 @@
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  25
 #define DAM_MULT_LEAP		 250
-#define DAM_MULT_POISON		1750
+#define DAM_MULT_POISON		3250
 
 // wear positions
 #define WN_HEAD			0

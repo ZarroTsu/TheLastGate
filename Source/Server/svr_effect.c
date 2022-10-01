@@ -407,12 +407,13 @@ void effect_tick(void)
 				{
 					m = fx[n].data[0] + fx[n].data[1] * MAPX;
 					map[m].flags &= ~MF_MOVEBLOCK;
-					if (!pop_create_char(fx[n].data[2], 1) && (ch_temp[fx[n].data[2]].flags & CF_RESPAWN))
+					if (!(cn = pop_create_char(fx[n].data[2], 1)) && (ch_temp[fx[n].data[2]].flags & CF_RESPAWN))
 					{
 						fx[n].type = 2;
 						fx[n].duration = TICKS * 60 * 5;      // try again every 5 minutes
 						map[m].flags &= ~MF_GFX_DEATH;
 					}
+					if (cn && !RANDOM(20)) boost_char(cn, 0);
 				}
 			}
 		}
@@ -431,6 +432,7 @@ void effect_tick(void)
 				if (fx[n].data[1])
 				{
 					cn = pop_create_char(fx[n].data[1], 0);
+					if (cn && !RANDOM(20)) boost_char(cn, 0);
 					god_drop_char(cn, it[in].x, it[in].y);
 					ch[cn].dir = DX_RIGHTUP;
 					plr_reset_status(cn);

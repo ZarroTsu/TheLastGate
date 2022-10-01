@@ -405,7 +405,7 @@ struct skilltab _skilltab[52] = {
 				{ AT_INT, AT_STR, AT_STR }},
 				
 	{ 14, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of endurance over time.", 
-				"Rage (Furious)", 		"Use (Skill): Applies a buff to yourself, improving your Weapon Value at the cost of life over time.", "", 
+				"Rage (Furious)", 		"Use (Skill): Applies a buff to yourself, improving your Top Damage at the cost of endurance over time.", "", 
 				{ AT_BRV, AT_BRV, AT_AGL }},
 				
 	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.", 
@@ -517,12 +517,12 @@ struct skilltab _skilltab[52] = {
 				"Weaken (Crush)", 		"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their armor value.", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
-	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, causing them to take damage over time. Stacks up to 3 times.", 
-				"Poison (Venom)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their immunity and causing them to take damage over time. Does not stack.", "", 
+	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, causing them to take damage over time.", 
+				"Poison (Venom)", 		"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, reducing immunity and causing damage over time. Stacks up to 3 times.", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes. Has a base radius of 3 tiles.", 
-				"", "", "", 
+				"Pulse (Immolate)", 	"Use (Spell): Applies a buff to yourself, causing yourself and nearby enemies to take damage over time. Has a base radius of 3 tiles.", "", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 44, 'G', 	"Proximity", 			"", // Arch-Templar
@@ -576,7 +576,9 @@ struct wpslist wpslist[MAXWPS]={
 	{ 23, "The Tower", 						"\"Sky-piercing obelisk.\"" },
 	{  9, "Neiseer, West", 					"\"The Basalt Desert.\"" },
 	{ 10, "Neiseer", 						"\"Twilit stars sing sweetly.\"" },
-	{ 11, "Neiseer, North", 				"\"The Burning Plains.\"" },
+	{ 25, "Neiseer, South", 				"\"The Raging Rivers.\"" },
+	{ 24, "Neiseer, East", 					"\"The Violet Bog.\"" },
+	{ 11, "Neiseer, North", 				"\"The Ravaged Prairie.\"" },
 	{ 12, "Mausoleum, Basement", 			"\"An accursed tomb.\"" },
 	{ 13, "Pentagram Quest, Novice", 		"\"Endless adventure begins.\"" },
 	{ 14, "Pentagram Quest, Earth", 		"\"Smells of dirt and soot.\"" },
@@ -612,10 +614,10 @@ int skill_cmp(const void *a,const void *b)
 
 	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
 	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && 
-		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==44||m1==50||m1==51) && 
+		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||(m1==44&&pl.kindred & (1u<<1))||m1==50||m1==51) && 
 		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=44&&m2!=50&&m2!=51)) return -1;
 	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && 
-		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==44||m2==50||m2==51) && 
+		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||(m2==44&&pl.kindred & (1u<<1))||m2==50||m2==51) && 
 		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=44&&m1!=50&&m1!=51)) return  1;
 	
 	if (c->sortkey>d->sortkey) return  1;
@@ -816,11 +818,11 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int    inv_pos=0,show_shop=0,show_wps=0;
+unsigned int	show_shop=0,show_wps=0;
 
-unsigned int    show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
+unsigned int	show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
-unsigned int    skill_pos=0,wps_pos=0,mm_magnify=1;
+int				inv_pos=0,skill_pos=0,wps_pos=0,mm_magnify=2;
 
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
@@ -936,7 +938,7 @@ void display_meta_from_ls(void)
 	int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
 	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
 	int sk_water, sk_cleav, sk_safeg, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
-	int sk_shado, sk_rally;
+	int sk_shado, sk_rally, sk_immol;
 	
 	// Player Speed and Attack Speed - WN_SPEED
 	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; 
@@ -1010,10 +1012,11 @@ void display_meta_from_ls(void)
 	*/
 	sk_proxi = sk_score(44) / (300/12);
 	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
-	sk_poiso = sk_score(42)*pl_spmod/100 * DAM_MULT_POISON / 30;
+	sk_poiso = (sk_score(42)*pl_spmod/100 + 15) * DAM_MULT_POISON / 30;
 	sk_blast = sk_score(24)*pl_spmod/100 * 2 * DAM_MULT_BLAST/1000;
 	sk_scorc = 1000 + sk_score(24)*pl_spmod/100;
 	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * DAM_MULT_PULSE/1000;
+	sk_immol = (100 + sk_score(43)*pl_spmod/100) * 2 * ((pl.kindred & (1u<<1))?5:4) * 2;
 	sk_pucnt = (60*2*100 / (3*pl_cdrate));
 	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000;
 	sk_water = 25 * TICKS;
@@ -1060,13 +1063,13 @@ void display_meta_from_ls(void)
 	// Tarot - Rev.Tower
 	if (pl_flagb & (1 << 14))
 	{
-		sk_poiso = sk_poiso * 2;
+		sk_poiso = sk_poiso / 2;
 	}
 	
 	// Book - Venom Compendium (poison bonus)
 	if (pl_flags & (1 <<  4))
 	{
-		sk_poiso = sk_poiso * 5 / 4;
+		sk_poiso = sk_poiso * 4 / 3;
 	}
 	
 	// Tarot - Rev.Death (zephyr)
@@ -1105,26 +1108,23 @@ void display_meta_from_ls(void)
 		sk_water = (250 - sk_score(10)/6*5) * 20/10;
 	}
 	
-	// Amulet - Water breathing (degen/2)
-	if (pl_flagb & (1 <<  4))
+	// Amulet - Water breathing (degen/2)		0 1 1
+	if (!(pl_flagb & (1 <<  0)) && (pl_flagb & (1 <<  1)) && (pl_flagb & (1 <<  2)))
 	{
 		sk_water /= 2;
 	}
 	
-	// Tarot - Justice (Cleave reduction)
-	/*
-	if (pl_flags & (1 <<  8))
+	// Book - Burning
+	if (pl_flagb & (1 << 13))
 	{
-		sk_cleav = sk_cleav * 7 / 10;
+		sk_immol = (100 + (sk_score(43)+pl.hp[5]/40)*pl_spmod/100) * 2 * ((pl.kindred & (1u<<1))?5:4) * 2;
 	}
-	*/
 	
 	// Tarot - Rev.Justice (Leap reduction)
 	if (pl_flagb & (1 <<  7))
 	{
 		sk_leapv = sk_leapv * 85/100;
 	}
-	
 	
 	/*
 		Regeneration stats
@@ -1152,61 +1152,40 @@ void display_meta_from_ls(void)
 		endmult  += manamult;	manamult -= manamult;
 	}
 	
-	/*
-	// Amulet - Bloodstone
-	if (pl_flagb & (1 <<  5))
-	{
-		race_med /= 2;
-		race_reg *= 2;
-	}
-	// Amulet - Verdant
-	if (pl_flagb & (1 <<  6))
-	{
-		race_reg /= 2;
-		race_res *= 2;
-	}
-	// Amulet - Sea
-	if (pl_flagb & (1 <<  7))
-	{
-		race_res /= 2;
-		race_med *= 2;
-	}
-	*/
-		
 	sk_regen = (pl.skill[28][0]?race_reg:0) + hpmult   * 2;
 	sk_restv = (pl.skill[29][0]?race_res:0) + endmult  * 3;
 	sk_medit = (pl.skill[30][0]?race_med:0) + manamult * 1;
 	
-	// Amulet - Standard Ankh
-	if (pl_flagb & (1 <<  0))
+	// Amulet - Standard Ankh			1 0 0
+	if ((pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
 	{
 		sk_regen += pl.skill[28][0]?race_reg/12:0;
 		sk_restv += pl.skill[29][0]?race_res/12:0;
 		sk_medit += pl.skill[30][0]?race_med/12:0;
 	}
-	// Amulet - Amber Ankh (Life)
-	if (pl_flagb & (1 <<  1))
+	// Amulet - Amber Ankh (Life) 		0 1 0
+	if (!(pl_flagb & (1 <<  0)) && (pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
 	{
 		sk_regen += pl.skill[28][0]?race_reg/ 6:0;
 		sk_restv += pl.skill[29][0]?race_res/24:0;
 		sk_medit += pl.skill[30][0]?race_med/24:0;
 	}
-	// Amulet - Turquoise Ankh (End)
-	if (pl_flagb & (1 <<  2))
+	// Amulet - Turquoise Ankh (End)	1 1 0
+	if ((pl_flagb & (1 <<  0)) && (pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
 	{
 		sk_regen += pl.skill[28][0]?race_reg/24:0;
 		sk_restv += pl.skill[29][0]?race_res/ 6:0;
 		sk_medit += pl.skill[30][0]?race_med/24:0;
 	}
-	// Amulet - Garnet Ankh (Mana)
-	if (pl_flagb & (1 <<  3))
+	// Amulet - Garnet Ankh (Mana)		0 0 1
+	if (!(pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && (pl_flagb & (1 <<  2)))
 	{
 		sk_regen += pl.skill[28][0]?race_reg/24:0;
 		sk_restv += pl.skill[29][0]?race_res/24:0;
 		sk_medit += pl.skill[30][0]?race_med/ 6:0;
 	}
-	// Amulet - True Ankh
-	if (pl_flagb & (1 << 13))
+	// Amulet - True Ankh				1 0 1
+	if ((pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && (pl_flagb & (1 <<  2)))
 	{
 		sk_regen += pl.skill[28][0]?race_reg/ 6:0;
 		sk_restv += pl.skill[29][0]?race_res/ 6:0;
@@ -1269,12 +1248,15 @@ void display_meta_from_ls(void)
 			}	if (pl.skill[24][0]) {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Blast DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_blast);
-			}	if (pl.skill[43][0]) {
+			}	if (pl.skill[43][0]) { if (pl_flagb & (1 << 6)) {
+			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Immol Degen/s");
+			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%6d.%02d",sk_immol/100,sk_immol%100);
+				} else {
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Pulse DPH");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_pulse);
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Pulse Count");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_pucnt);
-			}
+			} }
 			break;									// ".............." // 
 		case 63: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Zephyr DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
@@ -1545,10 +1527,11 @@ void eng_display_win(int plr_sprite,int init)
 					(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
 					(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
 					(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
-					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse
+					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
 					(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
 					(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-					(m==42&&(pl_flagb & (1 << 14)))     // Poison -> Venom
+					(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
+					(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
 				)
 				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
 			else
@@ -1747,11 +1730,15 @@ void eng_display_win(int plr_sprite,int init)
 			y=0;
 			for (n=0; n<62; n++) {
 				if (!shop.item[n]) continue;
-				if (shop.price[n]) y=1;
-				if (hightlight==HL_SHOP && hightlight_sub==n) 
+				if ((shop.price[n] - (shop.price[n] & (1<<30)) - (shop.price[n] & (1<<31))) > 0) y=1;
+				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) 
 				{
 					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (pr = shop.price[n])
+					if (shop.price[n] & (1<<30)) // Soulstone
+						copyspritex(4496,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
+					if (shop.price[n] & (1<<31)) // Enchant
+						copyspritex(4497,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
+					if (pr = (shop.price[n] - (shop.price[n] & (1<<30)) - (shop.price[n] & (1<<31))))
 					{
 						if (show_shop==1) // Normal shop
 						{
@@ -1775,7 +1762,14 @@ void eng_display_win(int plr_sprite,int init)
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
 					}
 				} 
-				else copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
+				else 
+				{
+					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
+					if (shop.price[n] & (1<<30)) // Soulstone
+						copyspritex(4496,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
+					if (shop.price[n] & (1<<31)) // Enchant
+						copyspritex(4497,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
+				}
 			}
 			if (pl.citem && shop.pl_price)
 			{
@@ -2113,32 +2107,23 @@ void eng_display(int init)	// optimize me!!!!!
 							copysprite(tmp2,map[m].light|tmp,x*32,y*32,xoff,yoff);
 					} 
 					
-					else if (map[m].obj1==598 && (
-						(pl.waypoints&(1<< 0) && map[m].back==1002) ||		// waypoint floor hacks - set by server build.c
-						(pl.waypoints&(1<< 1) && map[m].back==1008) ||
-						(pl.waypoints&(1<< 2) && map[m].back==1013) ||
-						(pl.waypoints&(1<< 3) && map[m].back==1034) ||
-						(pl.waypoints&(1<< 4) && map[m].back==1010) ||
-						(pl.waypoints&(1<< 5) && map[m].back==1052) ||
-						(pl.waypoints&(1<< 6) && map[m].back==1100) ||
-						(pl.waypoints&(1<< 7) && map[m].back==1099) ||
-						(pl.waypoints&(1<< 8) && map[m].back==1012) ||
-						(pl.waypoints&(1<< 9) && map[m].back==1109) ||
-						(pl.waypoints&(1<<10) && map[m].back==1118) ||
-						(pl.waypoints&(1<<11) && map[m].back==1141) ||
-						(pl.waypoints&(1<<12) && map[m].back==1158) ||
-						(pl.waypoints&(1<<13) && map[m].back==1145) ||
-						(pl.waypoints&(1<<14) && map[m].back==1014) ||
-						(pl.waypoints&(1<<15) && map[m].back==1005) ||
-						(pl.waypoints&(1<<16) && map[m].back==1006) ||
-						(pl.waypoints&(1<<17) && map[m].back==1007) ||
-						(pl.waypoints&(1<<18) && map[m].back== 402) ||
-						(pl.waypoints&(1<<19) && map[m].back== 500) ||
-						(pl.waypoints&(1<<20) && map[m].back== 520) ||
-						(pl.waypoints&(1<<21) && map[m].back== 531) ||
-						(pl.waypoints&(1<<22) && map[m].back== 542) ||
-						(pl.waypoints&(1<<23) && map[m].back== 551)
-					))
+					else if (map[m].obj1==598 && (	// waypoint floor hacks - set by server build.c
+						(pl.waypoints&(1<< 0) && map[m].back==1002) || (pl.waypoints&(1<< 1) && map[m].back==1008) ||
+						(pl.waypoints&(1<< 2) && map[m].back==1013) || (pl.waypoints&(1<< 3) && map[m].back==1034) ||
+						(pl.waypoints&(1<< 4) && map[m].back==1010) || (pl.waypoints&(1<< 5) && map[m].back==1052) ||
+						(pl.waypoints&(1<< 6) && map[m].back==1100) || (pl.waypoints&(1<< 7) && map[m].back==1099) ||
+						(pl.waypoints&(1<< 8) && map[m].back==1012) || (pl.waypoints&(1<< 9) && map[m].back==1109) ||
+						(pl.waypoints&(1<<10) && map[m].back==1118) || (pl.waypoints&(1<<11) && map[m].back==1141) ||
+						(pl.waypoints&(1<<12) && map[m].back==1158) || (pl.waypoints&(1<<13) && map[m].back==1145) ||
+						(pl.waypoints&(1<<14) && map[m].back==1014) || (pl.waypoints&(1<<15) && map[m].back==1005) ||
+						(pl.waypoints&(1<<16) && map[m].back==1006) || (pl.waypoints&(1<<17) && map[m].back==1007) ||
+						(pl.waypoints&(1<<18) && map[m].back== 402) || (pl.waypoints&(1<<19) && map[m].back== 500) ||
+						(pl.waypoints&(1<<20) && map[m].back== 520) || (pl.waypoints&(1<<21) && map[m].back== 531) ||
+						(pl.waypoints&(1<<22) && map[m].back== 542) || (pl.waypoints&(1<<23) && map[m].back== 551) ||
+						(pl.waypoints&(1<<24) && map[m].back== 558) || (pl.waypoints&(1<<25) && map[m].back== 543) ||
+						(pl.waypoints&(1<<26) && map[m].back== 544) || (pl.waypoints&(1<<27) && map[m].back== 545) ||
+						(pl.waypoints&(1<<28) && map[m].back== 546) || (pl.waypoints&(1<<29) && map[m].back== 547) ||
+						(pl.waypoints&(1<<30) && map[m].back== 548) || (pl.waypoints&(1<<31) && map[m].back== 549) ))
 					{
 						// display waypoints as "lit" if you have that flag.
 						if (hightlight==HL_MAP && tile_type==1 && tile_x==x && tile_y==y) 

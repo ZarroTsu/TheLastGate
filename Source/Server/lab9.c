@@ -443,8 +443,8 @@ switch_questions[BANKS][BANK_QUESTIONS] = {
 		{ FALSE, "The Greenling Prince is a Captain."                                              },
 		{ TRUE,  "Eva runs the emerald armor shop in Aston."                                       },
 		{ FALSE, "The pentagram 139 is worth 2766 points."                                         },
-		{ FALSE, "There are 20 Seagrels in the Violet Lakebed"                                     },
-		{ TRUE,  "The robbers in the Strange Forest are lead by a woman named Shion."              },
+		{ FALSE, "There are 20 Seagrels in the Lavender Lakebed"                                   },
+		{ TRUE,  "The robbers in the Strange Forest are led by a woman named Shion."               },
 		{ FALSE, "Cirrus is a fat old man."                                                        }
 	} // end bank 5
 };

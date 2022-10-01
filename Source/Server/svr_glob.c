@@ -66,6 +66,7 @@ void do_misc(void)
 			}
 		}
 		ch[cn].flags &= ~(CF_SHUTUP | CF_NODESC | CF_KICKED);
+		if (!(globs->mdday % 28)) ch[cn].colosseum = 0;
 	}
 }
 

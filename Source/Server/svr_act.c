@@ -194,17 +194,6 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			if (ch[cn].flags & CF_PLAYER)
 				step_desertfloor(cn);
 		}
-		/*
-		else if (
-			(ch[cn].x>=  65 && ch[cn].y>= 406 && ch[cn].x<=  81 && ch[cn].y<= 466) ||
-			(ch[cn].x>=  21 && ch[cn].y>= 406 && ch[cn].x<=  31 && ch[cn].y<= 428) ||
-			(ch[cn].x>= 206 && ch[cn].y>= 890 && ch[cn].x<= 255 && ch[cn].y<= 920) ||
-			(ch[cn].x>= 562 && ch[cn].y>= 449 && ch[cn].x<= 576 && ch[cn].y<= 461) ||
-			(ch[cn].x>= 507 && ch[cn].y>= 506 && ch[cn].x<= 517 && ch[cn].y<= 518) )
-		{
-			step_desertfloor_remove(cn);
-		}
-		*/
 
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))
 		{

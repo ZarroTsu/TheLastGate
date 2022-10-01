@@ -648,8 +648,8 @@ int god_drop_char(int cn, int x, int y)
 		return 0;
 	}
 
-	ch[cn].x = (unsigned short)x;
-	ch[cn].y = (unsigned short)y;
+	ch[cn].x   = (unsigned short)x;
+	ch[cn].y   = (unsigned short)y;
 	ch[cn].tox = (unsigned short)x;
 	ch[cn].toy = (unsigned short)y;
 
@@ -1232,17 +1232,18 @@ void god_info(int cn, int co)
 			            ch[co].data[29], ch[co].data[40]);
 			do_char_log(cn, 3, "Stronghold: %d total points\n", ch[co].bs_points);
 		}
-		do_char_log(cn, 1, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
+		do_char_log(cn, 8, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
 			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
 			            ch[co].data[5], ch[co].data[6], ch[co].data[7], ch[co].data[8], ch[co].data[9]);
-		do_char_log(cn, 1, "CN %d, CS %d, CG %d, CP %d.\n",
+		do_char_log(cn, 7, "CN %d, CS %d, CG %d, CP %d.\n",
 			            CONT_NUM(co), CONT_SCEN(co), CONT_GOAL(co), CONT_PROG(co));
 		//do_char_log(cn, 2, "Current location=%d, Home coords: %d.\n",
 		//	            ch[co].x + ch[co].y * MAPX, ch[co].data[29]);
 		//do_char_log(cn, 1, "Rwalk=%d, Rwalk tm=%d, Rwalk ds=%d.\n",
 		//	            ch[co].data[60], ch[co].data[61], ch[co].data[73]);
 		do_char_log(cn, 3, "Armor=%d, Weapon=%d. Alignment=%d.\n", ch[co].armor, ch[co].weapon, ch[co].alignment);
-		do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[CHD_GROUP], group_active(co), ch[co].data[92], ch[co].data[96]);
+		do_char_log(cn, 3, "DMG_Bonus=%d, DMG_Reduc=%d.\n", ch[co].dmg_bonus, ch[co].dmg_reduction);
+		//do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[CHD_GROUP], group_active(co), ch[co].data[92], ch[co].data[96]);
 		do_char_log(cn, 3, "Luck=%d, Gethit_Dam=%d.\n", ch[co].luck, ch[co].gethit_dam);
 		do_char_log(cn, 3, "Current Online Time: %dd %dh %dm %ds, Total Online Time: %dd %dh %dm %ds.\n",
 		            ch[co].current_online_time / (TICKS * 60 * 60 * 24),
@@ -1456,7 +1457,7 @@ void god_who(int cn)
 		            get_area(n, 0));
 		/*
 		do_char_log(cn, 3, "%.5s %-10.10s%c%c%c %.23s\n",
-		            who_rank_name[points2rank(ch[n].points_tot)],
+		            who_rank_name[getrank(n)],
 		            ch[n].name,
 		            IS_PURPLE(n) ? '*' : ' ',
 		            (ch[n].flags & CF_POH) ? '+' : ' ',
@@ -1547,7 +1548,7 @@ void user_who(int cn)
 		}
 
 		do_char_log(cn, font, "%.5s %-10.10s%c%c %.24s\n",
-		            who_rank_name[points2rank(ch[n].points_tot)],
+		            who_rank_name[getrank(n)],
 		            ch[n].name,
 		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
@@ -1556,7 +1557,7 @@ void user_who(int cn)
 	if ((gc = ch[cn].data[PCD_COMPANION]) && IS_SANECHAR(gc))
 	{
 		do_char_log(cn, 3, "%.5s %-10.10s%c%c %.24s\n",
-		            who_rank_name[points2rank(ch[gc].points_tot)],
+		            who_rank_name[getrank(gc)],
 		            ch[gc].name,
 		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
@@ -1912,7 +1913,7 @@ int find_next_char(int startcn, char *spec1, char *spec2)
 		}
 		else
 		{
-			if (points2rank(ch[n].points_tot) == rank)
+			if (getrank(n) == rank)
 			{
 				return( n);
 			}
@@ -2776,6 +2777,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 3021;	// Snow 3
 		ch[cn].item[m++] = 0x20000000 | 5965;	// Cold Stone
 		ch[cn].item[m++] = 0x20000000 | 5966;	// Cold Stone
+		ch[cn].item[m++] = 0x20000000 | 5970;	// Dead Grass Dirt
 		ch[cn].item[m++] = 1675;				// ** Wall
 		ch[cn].item[m++] = 1692;				// ** Deco
 		ch[cn].item[m++] = 1693;				// ** Deco
@@ -2905,8 +2907,138 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 1671;				// ** Red window
 		ch[cn].item[m++] = 1672;				// ** M.Red
 		ch[cn].item[m++] = 1673;				// ** M.Red window
-		break;	
-	
+		break;
+	case 21:	// New Canyon - Grey
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 1710;				// ** Bridge Rope 1
+		ch[cn].item[m++] = 2817;				// ** Bridge Rope 2
+		ch[cn].item[m++] = 2818;				// ** Bridge Pole N
+		ch[cn].item[m++] = 2819;				// ** Bridge Pole E
+		ch[cn].item[m++] = 2820;				// ** Bridge Pole S
+		ch[cn].item[m++] = 2821;				// ** Bridge Pole W
+		ch[cn].item[m++] = 2822;				// ** Grey Cliff Edge 1
+		ch[cn].item[m++] = 2823;				// ** Grey Cliff Edge 2
+		ch[cn].item[m++] = 2824;				// ** Grey Cliff Edge 3
+		//
+		ch[cn].item[m++] = 0x20000000 | 3614;	// Bridge Floor 1
+		ch[cn].item[m++] = 0x20000000 | 3615;	// Bridge Floor 2
+		ch[cn].item[m++] = 0x20000000 | 6070;	// Bridge Floor 3
+		ch[cn].item[m++] = 0x20000000 | 6071;	// Bridge Floor 4
+		ch[cn].item[m++] = 0x20000000 | 3539;
+		ch[cn].item[m++] = 0x20000000 | 5971;
+		ch[cn].item[m++] = 0x20000000 | 5972;
+		ch[cn].item[m++] = 0x20000000 | 5973;
+		ch[cn].item[m++] = 0x20000000 | 5974;
+		ch[cn].item[m++] = 0x20000000 | 5975;
+		//
+		ch[cn].item[m++] = 0x20000000 | 5976;
+		ch[cn].item[m++] = 0x20000000 | 5977;
+		ch[cn].item[m++] = 0x20000000 | 5978;
+		ch[cn].item[m++] = 0x20000000 | 5979;
+		ch[cn].item[m++] = 0x20000000 | 5980;
+		ch[cn].item[m++] = 0x20000000 | 5981;
+		ch[cn].item[m++] = 0x20000000 | 5982;
+		ch[cn].item[m++] = 0x20000000 | 5983;
+		ch[cn].item[m++] = 0x20000000 | 5984;
+		ch[cn].item[m++] = 0x20000000 | 5985;
+		//
+		ch[cn].item[m++] = 0x20000000 | 5986;
+		ch[cn].item[m++] = 0x20000000 | 5987;
+		ch[cn].item[m++] = 0x20000000 | 5988;
+		ch[cn].item[m++] = 0x20000000 | 5989;
+		break;
+	case 22:	// New Canyon - Brown
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 1710;				// ** Bridge Rope 1
+		ch[cn].item[m++] = 2817;				// ** Bridge Rope 2
+		ch[cn].item[m++] = 2818;				// ** Bridge Pole N
+		ch[cn].item[m++] = 2819;				// ** Bridge Pole E
+		ch[cn].item[m++] = 2820;				// ** Bridge Pole S
+		ch[cn].item[m++] = 2821;				// ** Bridge Pole W
+		ch[cn].item[m++] = 2825;				// ** Brown Cliff Edge 1
+		ch[cn].item[m++] = 2826;				// ** Brown Cliff Edge 2
+		ch[cn].item[m++] = 2827;				// ** Brown Cliff Edge 3
+		//
+		ch[cn].item[m++] = 0x20000000 | 3614;	// Bridge Floor 1
+		ch[cn].item[m++] = 0x20000000 | 3615;	// Bridge Floor 2
+		ch[cn].item[m++] = 0x20000000 | 6070;	// Bridge Floor 3
+		ch[cn].item[m++] = 0x20000000 | 6071;	// Bridge Floor 4
+		ch[cn].item[m++] = 0x20000000 | 3539;
+		ch[cn].item[m++] = 0x20000000 | 5996;
+		ch[cn].item[m++] = 0x20000000 | 5997;
+		ch[cn].item[m++] = 0x20000000 | 5998;
+		ch[cn].item[m++] = 0x20000000 | 5999;
+		ch[cn].item[m++] = 0x20000000 | 6000;
+		//
+		ch[cn].item[m++] = 0x20000000 | 6001;
+		ch[cn].item[m++] = 0x20000000 | 6002;
+		ch[cn].item[m++] = 0x20000000 | 6003;
+		ch[cn].item[m++] = 0x20000000 | 6004;
+		ch[cn].item[m++] = 0x20000000 | 6005;
+		ch[cn].item[m++] = 0x20000000 | 6006;
+		ch[cn].item[m++] = 0x20000000 | 6007;
+		ch[cn].item[m++] = 0x20000000 | 6008;
+		ch[cn].item[m++] = 0x20000000 | 6009;
+		ch[cn].item[m++] = 0x20000000 | 6010;
+		//
+		ch[cn].item[m++] = 0x20000000 | 6011;
+		ch[cn].item[m++] = 0x20000000 | 6012;
+		ch[cn].item[m++] = 0x20000000 | 6013;
+		ch[cn].item[m++] = 0x20000000 | 6014;
+		break;
+	case 23:	// New Canyon - Blue
+		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 1710;				// ** Bridge Rope 1
+		ch[cn].item[m++] = 2817;				// ** Bridge Rope 2
+		ch[cn].item[m++] = 2818;				// ** Bridge Pole N
+		ch[cn].item[m++] = 2819;				// ** Bridge Pole E
+		ch[cn].item[m++] = 2820;				// ** Bridge Pole S
+		ch[cn].item[m++] = 2821;				// ** Bridge Pole W
+		ch[cn].item[m++] = 2828;				// ** Blue Cliff Edge 1
+		ch[cn].item[m++] = 2829;				// ** Blue Cliff Edge 2
+		ch[cn].item[m++] = 2830;				// ** Blue Cliff Edge 3
+		//
+		ch[cn].item[m++] = 0x20000000 | 3614;	// Bridge Floor 1
+		ch[cn].item[m++] = 0x20000000 | 3615;	// Bridge Floor 2
+		ch[cn].item[m++] = 0x20000000 | 6070;	// Bridge Floor 3
+		ch[cn].item[m++] = 0x20000000 | 6071;	// Bridge Floor 4
+		ch[cn].item[m++] = 0x20000000 | 3539;
+		ch[cn].item[m++] = 0x20000000 | 6021;
+		ch[cn].item[m++] = 0x20000000 | 6022;
+		ch[cn].item[m++] = 0x20000000 | 6023;
+		ch[cn].item[m++] = 0x20000000 | 6024;
+		ch[cn].item[m++] = 0x20000000 | 6025;
+		//
+		ch[cn].item[m++] = 0x20000000 | 6026;
+		ch[cn].item[m++] = 0x20000000 | 6027;
+		ch[cn].item[m++] = 0x20000000 | 6028;
+		ch[cn].item[m++] = 0x20000000 | 6029;
+		ch[cn].item[m++] = 0x20000000 | 6030;
+		ch[cn].item[m++] = 0x20000000 | 6031;
+		ch[cn].item[m++] = 0x20000000 | 6032;
+		ch[cn].item[m++] = 0x20000000 | 6033;
+		ch[cn].item[m++] = 0x20000000 | 6034;
+		ch[cn].item[m++] = 0x20000000 | 6035;
+		//
+		ch[cn].item[m++] = 0x20000000 | 6036;
+		ch[cn].item[m++] = 0x20000000 | 6037;
+		ch[cn].item[m++] = 0x20000000 | 6038;
+		ch[cn].item[m++] = 0x20000000 | 6039;
+		break;
+	case 24:	// Wall Decorations
+		ch[cn].item[m++] = 2831;  // Banners
+		ch[cn].item[m++] = 2832;
+		ch[cn].item[m++] = 2833;
+		ch[cn].item[m++] = 2834;
+		ch[cn].item[m++] = 2835;
+		ch[cn].item[m++] = 2836;
+		ch[cn].item[m++] = 2837;
+		ch[cn].item[m++] = 2838;
+		ch[cn].item[m++] = 2839;
+		ch[cn].item[m++] = 2840;
+		ch[cn].item[m++] = 2841;
+		ch[cn].item[m++] = 2842;
+		break;
 	case 25:	// Tables and table-candles
 		ch[cn].item[m++] = 82; 	// Rough Table  w/ leg
 		ch[cn].item[m++] = 83; 	// Rough Table  no leg

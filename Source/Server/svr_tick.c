@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.8.9\n"};
+static char intro_msg3[] = {"Current client/server version is 0.8.19\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
@@ -2070,7 +2070,7 @@ void plr_logout(int cn, int nr, int reason)
 			{
 				if ((in = ch[cn].spell[n])==0) { continue; }
 				
-				if (bu[in].temp==SK_VENOM || bu[in].temp==SK_POISON || bu[in].temp==SK_BLEED)
+				if (bu[in].temp==SK_VENOM || bu[in].temp==SK_POISON || bu[in].temp==SK_BLEED || bu[in].temp==SK_IMMOLATE2)
 				{
 					bu[in].used = USE_EMPTY; 
 					ch[cn].spell[n] = 0;
@@ -2821,20 +2821,25 @@ void plr_change(int nr)
 					if (get_tarot(cn, IT_CH_STAR)) 		chFlags += (1 << 14); // Heal -> Regen
 					*(short int*)(buf + 5) = min(32767,chFlags); // max << 14
 					chFlags = 0;
-					if (get_neck(cn, IT_ANKHAMULET)) 	chFlags += (1 <<  0);
-					if (get_neck(cn, IT_AMBERANKH)) 	chFlags += (1 <<  1);
-					if (get_neck(cn, IT_TURQUANKH)) 	chFlags += (1 <<  2);
-					if (get_neck(cn, IT_GARNEANKH)) 	chFlags += (1 <<  3);
-					if (get_neck(cn, IT_BREATHAMMY)) 	chFlags += (1 <<  4);
+					// Amulets can't all can't be true at the same time - compressing bits saves two flags
+					if (get_neck(cn, IT_ANKHAMULET))  { chFlags += (1 <<  0); }
+					if (get_neck(cn, IT_AMBERANKH))   { chFlags += (1 <<  1); }
+					if (get_neck(cn, IT_TURQUANKH))   { chFlags += (1 <<  1); chFlags += (1 <<  0); }
+					if (get_neck(cn, IT_GARNEANKH))   { chFlags += (1 <<  2); }
+					if (get_neck(cn, IT_TRUEANKH))    { chFlags += (1 <<  2); chFlags += (1 <<  0); }
+					if (get_neck(cn, IT_BREATHAMMY))  { chFlags += (1 <<  2); chFlags += (1 <<  1); }
+					//
+					if (get_tarot(cn, IT_CH_HERMIT_R)) 	chFlags += (1 <<  3); // Rage -> Frenzy
+					//if () 							chFlags += (1 <<  4);
 					if (get_tarot(cn, IT_CH_DEATH_R)) 	chFlags += (1 <<  5); // Zephyr
-					//if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
+					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse -> Immolate
 					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
 					if (globs->fullmoon)				chFlags += (1 <<  8);
 					if (globs->newmoon)					chFlags += (1 <<  9);
 					if (get_tarot(cn, IT_CH_EMPRESS)) 	chFlags += (1 << 10); // Shield -> Shell
 					if (get_tarot(cn, IT_CH_CHARIOT)) 	chFlags += (1 << 11); // Blind -> Douse
 					if (get_tarot(cn, IT_CH_EMPERO_R)) 	chFlags += (1 << 12); // Warcry -> Rally
-					if (get_neck(cn, IT_TRUEANKH)) 		chFlags += (1 << 13);
+					if (get_book(cn, IT_BOOK_BURN)) 	chFlags += (1 << 13); // Burning Book
 					if (get_tarot(cn, IT_CH_TOWER_R)) 	chFlags += (1 << 14); // Poison -> Venom
 					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
@@ -3727,20 +3732,17 @@ void plr_getmap_complete(int nr)
 				smap[n].ch_atkspd  = ch[co].atk_speed;
 				smap[n].ch_castspd = ch[co].cast_speed;
 				smap[n].ch_movespd = ch[co].move_speed;
-				if (IS_PLAYER(co))
-				{
+				// Inform the client that this character is special in some way by changing the overhead font color
+				if (IS_PLAYER(co))														// Players are Orange
 					smap[n].ch_fontcolor = 5;
-				}
-				else if (ch[co].flags & CF_EXTRAEXP)
-				{
-					// Inform the client this is a 'special' enemy by turning their font red
+				else if ((ch[co].flags & CF_EXTRAEXP) && (ch[co].flags & CF_EXTRACRIT))	// Extra EXP AND CRIT are Violet
+					smap[n].ch_fontcolor = 8;
+				else if (ch[co].flags & CF_EXTRAEXP)									// Extra EXP are Red
 					smap[n].ch_fontcolor = 1;
-				}
-				else
-				{
-					// Otherwise just display normal yellow font
+				else if (ch[co].flags & CF_EXTRACRIT)									// Extra Crit are Blue
+					smap[n].ch_fontcolor = 3;
+				else																	// Otherwise yellow
 					smap[n].ch_fontcolor = 0;
-				}
 				//
 				smap[n].flags |= ISCHAR;
 				if (ch[co].stunned==1)

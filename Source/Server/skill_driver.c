@@ -252,8 +252,6 @@ int chance(int cn, int d20);
 void add_exhaust(int cn, int len);
 void skill_slow(int cn, int flag);
 
-#define GLVDICE		4
-
 int check_gloves(int cn, int co, int orig_co, int dr1, int dr2)
 {
 	int in, glv, glv_base = 120;
@@ -353,6 +351,7 @@ int check_gloves(int cn, int co, int orig_co, int dr1, int dr2)
 		if (chance_compare(co, glv_base+glv_base/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
 		{
 			in = it[ch[cn].worn[WN_RHAND]].temp;
+			if (in==0) in = it[ch[cn].worn[WN_RHAND]].orig_temp;
 			if (in==IT_TW_LUXURIA)
 			{
 				if (spell_warcry(cn, co, glv, 1)) 
@@ -555,9 +554,9 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 	}
 	
-	if (in!=SK_CLEAVE && in!=SK_LEAP && in!=SK_TAUNT && in!=SK_BLIND && in!=SK_DOUSE &&
+	if (d20!=-1 && (in!=SK_CLEAVE && in!=SK_LEAP && in!=SK_TAUNT && in!=SK_BLIND && in!=SK_DOUSE &&
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
-		(d20 && cn!=co && chance_base(cn, co, in, d20, get_target_resistance(cn, co), usemana))))
+		(d20 && cn!=co && chance_base(cn, co, in, d20, get_target_resistance(cn, co), usemana)))))
 	{
 		if (!buff && cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEMISS, cn, co, power, 0);
 		if (usemana && cn!=co && (CAN_SENSE(co) && M_SK(co, SK_PERCEPT) > power + 5))
@@ -583,11 +582,19 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		{
 			add_exhaust(cn, TICKS * 4);
 		}
-		// Book: Shiva's Malice :: Curse tries Slow afterward
+		/*
+		// Book: Shiva's Malice :: Curse tries Slow afterward on failure
 		if (in==SK_CURSE && get_book(cn, IT_BOOK_SHIV))
 		{
 			skill_slow(cn, 0);
 		}
+		// Book: Bishop's Manafesto :: Cast Enhance and Protect after Bless after failure
+		if (in==SK_BLESS && get_book(cn, IT_BOOK_BISH))
+		{
+			skill_protect(cn, 0);
+			skill_enhance(cn, 0);
+		}
+		*/
 		return 0;
 	}
 	
@@ -805,30 +812,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			}
 			else if (intemp==SK_BLAST)
 			{
-				chlog(cn, "Cast Blast on %s", ch[co].name);
-				
-				// Ira
-				if (get_gear(cn, IT_TW_IRA)) crit_dam = do_crit(cn, co, hitpower, 1)/2;
-				
-				// Tarot Card - Judgment :: Less damage
-				if (get_tarot(cn, IT_CH_JUDGE))
-					tmp = do_hurt(cn, co, (hitpower+crit_dam)*85/100, 1);
-				else
-					tmp = do_hurt(cn, co, hitpower+crit_dam, 1);
-				
-				if (tmp>0)
-				{
-					if (!(ch[co].flags & CF_SYS_OFF))
-						do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-				}
-				
-				char_play_sound(co, ch[cn].sound + 6, -150, 0);
-				do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-				
-				// Tarot Card - Judgment :: Inflict Scorch
-				if (get_tarot(cn, IT_CH_JUDGE))
-					spell_scorch(cn, co, power/2+power/4, 0);
+				spell_blast(cn, co, power, 0, 1);
 				
 				avgdmg += tmp;
 				hit++;
@@ -937,92 +921,12 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power, int d
 		{
 			if (intemp==SK_BLAST)
 			{
-				chlog(cn, "Cast Blast on %s", ch[co].name);
-				
-				hitpower = spell_immunity(power, get_target_immunity(cn, co)) * 2;
-				hitpower = hitpower/2 + hitpower/4;
-				
-				// Ira
-				if (get_gear(cn, IT_TW_IRA))
-					crit_dam = do_crit(cn, co, hitpower, 1)/2;
-				
-				// Tarot Card - Judgment :: Less damage
-				if (get_tarot(cn, IT_CH_JUDGE))
-					tmp = do_hurt(cn, co, (hitpower+crit_dam)*85/100, 1);
-				else
-					tmp = do_hurt(cn, co, hitpower+crit_dam, 1);
-				
-				if (tmp<1)	
-				{
-					do_char_log(cn, 0, 
-					"You cannot penetrate %s's armor.\n", ch[co].reference);
-				}
-				else
-				{
-					if (!(ch[cn].flags & CF_SYS_OFF))
-						do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
-					if (!(ch[co].flags & CF_SYS_OFF))
-						do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-				}
-				
-				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-				
-				// Tarot Card - Judgment :: Inflict Scorch
-				if (get_tarot(cn, IT_CH_JUDGE))
-					spell_scorch(cn, co, power/2+power/4, 0);
-				
+				spell_blast(cn, co, power, co_orig, 0);
 				check_gloves(cn, co, co_orig, dr1, dr2);
 			}
 			else if (intemp==SK_CLEAVE)
 			{
-				chlog(cn, "Used Cleave on %s", ch[co].name);
-		
-				hitpower = spell_immunity(power, ch[co].to_parry) * 2;
-				hitpower = hitpower/2 + hitpower/4;
-				
-				// Tarot Card - Justice :: 
-				if (get_tarot(cn, IT_CH_JUSTICE))
-				{
-					//hitpower = hitpower * 70/100;
-					aggravate = 1;
-				}
-				
-				tmpmp = 0;
-				tmp   = do_hurt(cn, co, hitpower, 5);
-				
-				if (get_gear(cn, IT_WP_BRONCHIT))
-				{
-					tmpmp = tmp/5;
-				}
-				
-				if (tmp<1)
-				{
-					do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-				}
-				else if (tmpmp<1)
-				{
-					if (!(ch[cn].flags & CF_SYS_OFF))
-						do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
-					if (!(ch[co].flags & CF_SYS_OFF))
-						do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
-				}
-				else
-				{
-					if (!(ch[cn].flags & CF_SYS_OFF))
-						do_char_log(cn, 1, "You cleaved %s for %d HP and %d mana.\n", ch[co].reference, tmp, tmpmp);
-					if (!(ch[co].flags & CF_SYS_OFF))
-						do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
-				}
-				
-				fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-				
-				if (aggravate)
-					spell_aggravate(cn, co, hitpower);
-				else if (tmp)
-					spell_bleed(cn, co, tmp);
-				
-				check_gloves(cn, co, co_orig, dr1, dr2);
-				
+				spell_cleave(cn, co, power, co_orig, dr1, dr2);
 				continue; // skip damage_mshell
 			}
 			else if (intemp==SK_LEAP)
@@ -1233,6 +1137,22 @@ int is_back(int cn, int co)
 	return(ok);
 }
 
+int is_near(int cn, int co, int v)
+{
+	int nx, ny, ox, oy, dist;
+	
+	nx = ch[cn].x;
+	ny = ch[cn].y;
+	ox = ch[co].x;
+	oy = ch[co].y;
+	
+	dist = sqrt(abs(nx - ox)*abs(nx - ox) + abs(ny - oy)*abs(ny - oy));
+	
+	if (dist <= v) return 1;
+	
+	return 0;
+}
+
 int spellcost(int cn, int cost, int in, int usemana)
 {
 	int cotfk_cost = 0, devil_cost = 0, hp_cost = 0;
@@ -1246,14 +1166,9 @@ int spellcost(int cn, int cost, int in, int usemana)
 		cost = max(SP_COST_BASE, min(cost, cost*M_SK(cn, in)/100));
 	}
 	
-	if (get_gear(cn, IT_TW_CROWN))
+	if (get_gear(cn, IT_TW_CROWN) || get_enchantment(cn, 22)) // These are the same slot, so no harm done merging them
 	{
 		cost -= cost*20/100;
-	}
-	
-	if (get_enchantment(cn, 22))
-	{
-		cost -= cost*12/100;
 	}
 	
 	mana_cost = end_cost = cost;
@@ -1457,6 +1372,8 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana)
 
 	if (chance< 0) { chance =  0; }
 	if (chance>18) { chance = 18; }
+	
+	ch[co].spellfail = 0;
 
 	if (roll > chance || defense > power + (power / 2))
 	{
@@ -1467,8 +1384,18 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana)
 		}
 		if (usemana)
 		{
-			do_char_log(cn, 0, 
-			"Your spell fizzled!\n");
+			if (!IS_PLAYER(co))
+			{
+				ch[co].spellfail = 1;
+				do_char_log(cn, 5, 
+				"Your spell was suppressed by your target.\n");
+				return 0;
+			}
+			else
+			{
+				do_char_log(cn, 0, 
+				"Your spell fizzled!\n");
+			}
 		}
 		else if (skill!=SK_BLIND && skill!=SK_DOUSE && skill!=SK_WARCRY)
 		{
@@ -1602,6 +1529,13 @@ int get_target_immunity(int cn, int co)
 			target_immune -= bu[in].power/3;
 	}
 	
+	if (ch[co].spellfail) 
+	{
+		chlog(co, "Suppressed the spell from %s", ch[cn].name);
+		target_immune *= 2;
+		ch[co].spellfail = 0;
+	}
+	
 	return target_immune;
 }
 
@@ -1637,6 +1571,11 @@ int spell_race_mod(int power, int cn)
 	else if	(ch[cn].temp == CT_CASTERCOMP 
 		|| ch[cn].temp == CT_ARCHCASTER)		{ mod = 120; }
 	else										{ mod = 100; }
+	
+	if (kindred & KIN_MONSTER)
+	{
+		mod += (getrank(cn)-4)/2;
+	}
 	
 	if (globs->newmoon)		{ mod += 10; }
 	if (globs->fullmoon)	{ mod += 15; }
@@ -1691,7 +1630,7 @@ int add_spell(int cn, int in)
 	if (bu[in].data[5] && IS_SANECHAR(bu[in].data[0]) && get_tarot(bu[in].data[0], IT_CH_CHARIO_R))
 		bu[in].power = bu[in].power * 3/4;
 	if (bu[in].data[5] && get_enchantment(cn, 4))
-		bu[in].power = bu[in].power * 9/10;
+		bu[in].power = bu[in].power * 4/5;
 	
 	// Acedia
 	if (IS_SANECHAR(bu[in].data[0]))
@@ -1728,17 +1667,13 @@ int add_spell(int cn, int in)
 				bu[in2].used = USE_EMPTY;
 				break;
 			}
-			else if (bu[in].temp==SK_POISON && bu[in2].temp==SK_POISON)
+			else if (bu[in].temp==SK_VENOM && bu[in2].temp==SK_VENOM)
 			{
-				// Multiple poisons stack poison power, up to 3x
-				if (IS_PLAYER(bu[in].data[0]))
-				{
-					bu[in].data[1] = min(S_POISONFORM(bu[in].power, SP_DUR_POISON) * 3, bu[in].data[1] + bu[in2].data[1]);
-				}
-				else
-				{
-					bu[in].data[1] = min(POISONFORM(bu[in].power, SP_DUR_POISON) * 3, bu[in].data[1] + bu[in2].data[1]);
-				}
+				bu[in].data[2] = max(bu[in].data[2], bu[in2].data[2]);
+				bu[in].data[1] = min(bu[in].data[2], bu[in].data[1] + bu[in2].data[1]);
+				bu[in].data[7] = max(bu[in].data[7], bu[in2].data[7]);
+				bu[in].data[6] = min(bu[in].data[7], bu[in].data[6] + bu[in2].data[6]);
+				bu[in].skill[SK_IMMUN][1] = -(bu[in].data[6]);
 				
 				bu[in2].used = USE_EMPTY;
 				break;
@@ -1945,6 +1880,8 @@ int spell_from_item(int cn, int in2)
 	bu[in].to_hit[1] 		= it[in2].to_hit[1];
 	bu[in].to_parry[1] 		= it[in2].to_parry[1];
 	bu[in].top_damage[1] 	= it[in2].top_damage[1];
+	bu[in].dmg_bonus[1] 	= it[in2].dmg_bonus[1];
+	bu[in].dmg_reduction[1] = it[in2].dmg_reduction[1];
 	
 	// it[in2].data[0] = display sprite number
 	if (it[in2].data[0]) 	{ bu[in].sprite[1] = it[in2].data[0]; }
@@ -2245,18 +2182,26 @@ int spell_protect(int cn, int co, int power, int fromscroll)
 
 	return cast_a_spell(cn, co, in, 0, 1); // SK_PROTECT
 }
-void skill_protect(int cn)
+void skill_protect(int cn, int flag)
 {
 	int co, power;
 	
 	power = M_SK(cn, SK_PROTECT);
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_PROTECT, SK_PROTECT, 1, power, 0))) 
+	if (!(co = get_target(cn, 0, 1, 1, flag?0:SP_COST_PROTECT, SK_PROTECT, 1, power, flag?-1:0))) 
 		return;
 
 	spell_protect(cn, co, power, 0);
-
-	add_exhaust(cn, SK_EXH_PROTECT);
+	
+	// Book - Bishop :: cast enhance after if flag says so
+	if (flag)
+	{
+		skill_enhance(cn, 1);
+	}
+	else
+	{
+		add_exhaust(cn, SK_EXH_PROTECT);
+	}
 }
 
 int spell_enhance(int cn, int co, int power, int fromscroll)
@@ -2275,18 +2220,26 @@ int spell_enhance(int cn, int co, int power, int fromscroll)
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_ENHANCE
 }
-void skill_enhance(int cn)
+void skill_enhance(int cn, int flag)
 {
 	int co, power;
 	
 	power = M_SK(cn, SK_ENHANCE);
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_ENHANCE, SK_ENHANCE, 1, power, 0))) 
+	if (!(co = get_target(cn, 0, 1, 1, flag?0:SP_COST_ENHANCE, SK_ENHANCE, 1, power, flag?-1:0))) 
 		return;
 	
 	spell_enhance(cn, co, power, 0);
-
-	add_exhaust(cn, SK_EXH_ENHANCE); // Half-second
+	
+	// Book - Bishop :: add exhaust together
+	if (flag)
+	{
+		add_exhaust(cn, SK_EXH_BLESS+SK_EXH_PROTECT+SK_EXH_ENHANCE);
+	}
+	else
+	{
+		add_exhaust(cn, SK_EXH_ENHANCE); // Half-second
+	}
 }
 
 int spell_bless(int cn, int co, int power, int fromscroll)
@@ -2305,16 +2258,26 @@ int spell_bless(int cn, int co, int power, int fromscroll)
 }
 void skill_bless(int cn)
 {
-	int co, power;
+	int co, power, flag = 0;
+	
+	if (get_book(cn, IT_BOOK_BISH)) flag = 1;
 	
 	power = M_SK(cn, SK_BLESS);
 	
-	if (!(co = get_target(cn, 0, 1, 1, SP_COST_BLESS, SK_BLESS, 1, power, 0))) 
+	if (!(co = get_target(cn, 0, 1, 1, flag?(SP_COST_BLESS+SP_COST_PROTECT+SP_COST_ENHANCE):SP_COST_BLESS, SK_BLESS, 1, power, 0))) 
 		return;
 	
 	spell_bless(cn, co, power, 0);
-
-	add_exhaust(cn, SK_EXH_BLESS);
+	
+	// Book - Bishop :: cast protect next
+	if (flag)
+	{
+		skill_protect(cn, 1);
+	}
+	else
+	{
+		add_exhaust(cn, SK_EXH_BLESS);
+	}
 }
 
 int spell_mshield(int cn, int co, int power, int fromscroll)
@@ -2470,7 +2433,7 @@ void skill_heal(int cn)
 	
 	power = M_SK(cn, SK_HEAL);
 	
-	if (get_enchantment(cn, 56)) power = power * 11/10;
+	if (get_enchantment(cn, 56)) power = power*6/5;
 	
 	if (get_gear(cn, IT_TW_SUPERBIA)) power /= 2;
 	
@@ -2502,12 +2465,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
 	
-	if (get_enchantment(cn, 20)) power = power*11/10;
-	if (get_enchantment(co, 21)) 
-	{
-		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
-		return 0;
-	}
+	if (get_enchantment(cn, 20)) power = power*6/5;
 	
 	// Tarot Card - Tower :: Change Curse into Greater Curse
 	if (get_tarot(cn, IT_CH_TOWER))
@@ -2515,6 +2473,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_CURSE2, 0)))
 			return 0;
 		
+		if (get_enchantment(co, 21)) power = power/5;
 		for (n = 0; n<5; n++) 
 		{
 			bu[in].attrib[n][1] = -(4 + CURSE2FORM(power*11/10, (4 - n)));
@@ -2525,6 +2484,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_CURSE, 0)))
 			return 0;
 		
+		if (get_enchantment(co, 21)) power = power/5;
 		for (n = 0; n<5; n++)
 		{
 			bu[in].attrib[n][1] = -(3 + (power*11/10 - (4 - n)) / 5);
@@ -2537,10 +2497,12 @@ int spell_curse(int cn, int co, int power, int flag)
 void skill_curse(int cn)
 {
 	int d20 = SP_MULT_CURSE;
-	int power, aoe_power, cost;
+	int power, aoe_power, cost, cost2, flag = 0;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
 	int can_aoe = CAN_SORC_PROX(cn);
+	
+	if (get_book(cn, IT_BOOK_SHIV)) flag = 1;
 	
 	power = M_SK(cn, SK_CURSE);
 	aoe_power = M_SK(cn, SK_PROX);
@@ -2551,6 +2513,19 @@ void skill_curse(int cn)
 	{ 
 		cost = cost * 4 / 3;
 		d20 = SP_MULT_CURSE2;
+	}
+	
+	if (flag)
+	{
+		cost2 = SP_COST_SLOW;
+	
+		// Tarot Card - Emperor :: Change Slow into Greater Slow
+		if (get_tarot(cn, IT_CH_EMPEROR)) 
+		{ 
+			cost2 = cost2 * 3 / 4;
+		}
+		
+		cost += cost2;
 	}
 	
 	// Get spell target - return on failure
@@ -2580,8 +2555,8 @@ void skill_curse(int cn)
 		surround_cast(cn, co_orig, 0, SK_CURSE, power, -1, -1);
 	}
 	
-	// Book - Shiva's Malice :: Cast Slow after casting Curse
-	if (get_book(cn, IT_BOOK_SHIV))
+	// Book - Shiva's Malice :: Cast Slow after casting Curse on success
+	if (flag)
 	{
 		skill_slow(cn, 1);
 	}
@@ -2603,12 +2578,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
 	
-	if (get_enchantment(cn, 13)) power = power*11/10;
-	if (get_enchantment(co, 14)) 
-	{
-		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
-		return 0;
-	}
+	if (get_enchantment(cn, 13)) power = power*6/5;
 	
 	// Tarot Card - Emperor :: Change Slow into Greater Slow
 	if (get_tarot(cn, IT_CH_EMPEROR))
@@ -2616,13 +2586,15 @@ int spell_slow(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0)))
 			return 0;
 		
+		if (get_enchantment(co, 14)) power = power/5;
 		bu[in].speed[1] = -(min(300, 15 + SLOW2FORM(power)));
 	}
 	else
 	{
 		if (!(in = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_SLOW(power), 0)))
 			return 0;
-
+		
+		if (get_enchantment(co, 14)) power = power/5;
 		bu[in].speed[1] = -(min(300, 10 + SLOWFORM(power)));
 	}
 	bu[in].data[5] = 1;
@@ -2649,7 +2621,7 @@ void skill_slow(int cn, int flag)
 	}
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SLOW, 1, power, d20)))
+	if (!(co = get_target(cn, 0, 0, 0, flag?0:cost, SK_SLOW, 1, power, flag?-1:d20)))
 		return;
 	
 	// If we have a valid target, cast Slow on them
@@ -2676,7 +2648,7 @@ void skill_slow(int cn, int flag)
 	}
 	
 	// Book - Shiva's Malice :: Extend exhaust after casting both Curse and Slow
-	if (get_book(cn, IT_BOOK_SHIV))
+	if (flag)
 	{
 		add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
 	}
@@ -2726,27 +2698,26 @@ int spell_poison(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
 	
-	if (get_enchantment(cn, 27)) power = power*11/10;
+	if (get_enchantment(cn, 27)) power = power*6/5;
 	
 	dur = SP_DUR_POISON; 			// 30 seconds
-	
-	if (IS_PLAYER(cn))
-	{
-		ppow = S_POISONFORM(power, dur);
-		
-		if (!flag && IS_SEYAN_DU(cn))
-			ppow = ppow * 3/2;
-	}
-	else
-	{
-		ppow = POISONFORM(power, dur);
-	}
 	
 	// Book - Venom Compendium
 	if (get_book(cn, IT_BOOK_VENO)) 
 	{
-		dur 	= dur  * 2/3; 		// 66% duration = 20 seconds
-		ppow 	= ppow * 5/4;		// 25% more damage over time
+		dur 	= dur  * 4/5; 		// 80% duration = 24 seconds = 25% more dps
+	}
+	
+	if (IS_PLAYER(cn))
+	{
+		ppow = PL_POISFORM(power, dur);
+		
+		if (!flag && IS_SEYAN_DU(cn))
+			ppow = ppow * 5/4;
+	}
+	else
+	{
+		ppow = MN_POISFORM(power, dur);
 	}
 	
 	// Tarot - Tower.R : Poison becomes Venom
@@ -2755,17 +2726,18 @@ int spell_poison(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_VENOM, BUF_SPR_VENOM, power, dur, 0)))
 			return 0;
 		
-		// Set the decay rate of the venom
-		bu[in].data[1] = ppow*2;
-		bu[in].skill[SK_IMMUN][1] = -(power/5 + 3);
+		bu[in].data[1] = ppow/2;			// Set the decay rate
+		bu[in].data[2] = ppow/2*3;			// Set the decay maximum
+		bu[in].data[6] = (power/12 + 3);	// Set immunity reduction
+		bu[in].data[7] = (power/12 + 3)*3;	// Set immunity maximum
+		bu[in].skill[SK_IMMUN][1] = -(bu[in].data[6]);
 	}
 	else
 	{
 		if (!(in = make_new_buff(cn, SK_POISON, BUF_SPR_POISON, power, dur, 0)))
 			return 0;
 		
-		// Set the decay rate of the poison
-		bu[in].data[1] = ppow;
+		bu[in].data[1] = ppow;				// Set the decay rate
 	}
 	bu[in].data[5] = 1;
 	
@@ -2857,6 +2829,53 @@ int spell_rally(int cn, int co, int power)
 
 	return cast_a_spell(cn, co, in, 0, 1); // SK_WARCRY3
 }
+int skill_rally(int cn, int power)
+{
+	int aoe_power;
+	int xf, yf,	xt, yt, xc, yc, x, y, co, spellaoe, spellrad;
+	int m1, m2;
+	double _cap, tmpa;
+	
+	aoe_power = power + 15;
+		
+	spellrad = PRXW_RAD + ch[cn].aoe_bonus;
+	_cap = (double)(PRXW_CAP);
+	spellaoe = aoe_power/_cap + spellrad;
+	tmpa = (double)(aoe_power*100/_cap + spellrad*100);
+	
+	xc = ch[cn].x;
+	yc = ch[cn].y;
+	xf = max(1, ch[cn].x - spellaoe);
+	yf = max(1, ch[cn].y - spellaoe);
+	xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
+	yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
+	
+	m1 = XY2M(ch[cn].x, ch[cn].y);
+	
+	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch) /*&& co!=cn*/)
+	{
+		if (co != cn)
+		{
+			// This makes the radius circular instead of square
+			if (sqr(xc - x) + sqr(yc - y) > (sqr(tmpa/100) + 1))
+			{
+				continue;
+			}
+			if ((IS_PLAYER(cn) && !(IS_PLAYER(co) || IS_PLAYER_COMP(co))) || 
+				!IS_PLAYER(cn) && (IS_PLAYER(co) || IS_PLAYER_COMP(co))) continue;
+			//if (IS_PURPLE(cn) && IS_PURPLE(co)) continue;
+			if (IS_OPP_CLAN(cn, co)) continue;
+			if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) continue;
+			m2 = XY2M(ch[co].x, ch[co].y);
+			if ((map[m1].flags & MF_ARENA) && (map[m2].flags & MF_ARENA)) continue;
+		}
+		
+		spell_rally(cn, co, cn==co?power*3/4:power);
+	}
+	do_char_log(cn, 1, "You call for your allies, rallying them to your cause!\n");
+	
+	return 1;
+}
 int spell_warcry(int cn, int co, int power, int flag)
 {
 	int n, in, dur;
@@ -2903,14 +2922,10 @@ int spell_warcry(int cn, int co, int power, int flag)
 }
 void skill_warcry(cn)
 {
-	int power, aoe_power, cost;
-	int xf, yf, xt, yt, xc, yc, x, y, co, spellaoe, spellrad;
-	int m1, m2;
-	double _cap, tmpa;
+	int power, cost;
 	
 	power = M_SK(cn, SK_WARCRY);
 	power = skill_multiplier(power, cn);
-	aoe_power = M_SK(cn, SK_WARCRY);
 	cost = SP_COST_WARCRY;
 	
 	if (is_exhausted(cn)) { return; }
@@ -2918,47 +2933,11 @@ void skill_warcry(cn)
 	
 	if (get_tarot(cn, IT_CH_EMPERO_R))
 	{
-		aoe_power += 15;
-		
-		spellrad = PRXW_RAD + ch[cn].aoe_bonus;
-		_cap = (double)(PRXW_CAP);
-		spellaoe = aoe_power/_cap + spellrad;
-		tmpa = (double)(aoe_power*100/_cap + spellrad*100);
-		
-		xc = ch[cn].x;
-		yc = ch[cn].y;
-		xf = max(1, ch[cn].x - spellaoe);
-		yf = max(1, ch[cn].y - spellaoe);
-		xt = min(MAPX - 1, ch[cn].x + spellaoe+1);
-		yt = min(MAPY - 1, ch[cn].y + spellaoe+1);
-		
-		m1 = XY2M(ch[cn].x, ch[cn].y);
-		
-		for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch) /*&& co!=cn*/)
-		{
-			if (co != cn)
-			{
-				// This makes the radius circular instead of square
-				if (sqr(xc - x) + sqr(yc - y) > (sqr(tmpa/100) + 1))
-				{
-					continue;
-				}
-				if ((IS_PLAYER(cn) && !(IS_PLAYER(co) || IS_PLAYER_COMP(co))) || 
-					!IS_PLAYER(cn) && (IS_PLAYER(co) || IS_PLAYER_COMP(co))) continue;
-				//if (IS_PURPLE(cn) && IS_PURPLE(co)) continue;
-				if (IS_OPP_CLAN(cn, co)) continue;
-				if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) continue;
-				m2 = XY2M(ch[co].x, ch[co].y);
-				if ((map[m1].flags & MF_ARENA) && (map[m2].flags & MF_ARENA)) continue;
-			}
-			
-			spell_rally(cn, co, cn==co?power*3/4:power);
-		}
-		do_char_log(cn, 1, "You call for your allies, rallying them to your cause!\n");
+		skill_rally(cn, power);
 	}
 	else
 	{
-		if (cast_aoe_spell(cn, 0, SK_WARCRY, power, aoe_power, 0, 0, 0, 0, -1, -1) < 0)
+		if (cast_aoe_spell(cn, 0, SK_WARCRY, power, power, 0, 0, 0, 0, -1, -1) < 0)
 			return;
 	}
 	
@@ -3055,6 +3034,18 @@ void item_info(int cn, int in, int look)
 		do_char_log(cn, 1, "%-12.12s  %+4d   %+4d\n",
 		"Parry Bonus", it[in].to_parry[0], it[in].to_parry[1]);
 	}
+	
+	if (it[in].dmg_bonus[0] || it[in].dmg_bonus[1])
+	{
+		do_char_log(cn, 1, "%-12.12s  %+2d.%1d   %+2d.%1d\n",
+		"Dmg Bonus", it[in].dmg_bonus[0]/20, it[in].dmg_bonus[0]/2%10, it[in].dmg_bonus[1]/20, it[in].dmg_bonus[1]/2%10);
+	}
+	if (it[in].dmg_reduction[0] || it[in].dmg_reduction[1])
+	{
+		do_char_log(cn, 1, "%-12.12s  %+2d.%1d   %+2d.%1d\n",
+		"Dmg Reduce", it[in].dmg_reduction[0]/20, it[in].dmg_reduction[0]/2%10, it[in].dmg_reduction[1]/20, it[in].dmg_reduction[1]/2%10);
+	}
+	
 	if (soulstone)
 	{
 		if (it[in].crit_chance[0] || it[in].crit_chance[1])
@@ -3294,7 +3285,7 @@ int spell_identify(int cn, int co, int in)
 		}
 		if (it[in].flags & IF_AUGMENTED)
 		{
-			do_char_log(cn, 5, "Has been augmented.\n");
+			do_char_log(cn, 7, "Has been augmented.\n");
 		}
 		if (it[in].flags & IF_EASEUSE)
 		{
@@ -3389,35 +3380,79 @@ int spell_scorch(int cn, int co, int power, int flag)
 	if (!(in = make_new_buff(cn, SK_SCORCH, BUF_SPR_SCORCH, power, SP_DUR_SCORCH, 0)))
 		return 0;
 	
+	bu[in].dmg_reduction[1] = -(20*2);	// 20% more damage taken
 	bu[in].data[5] = 1;
 	
 	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_SCORCH
 }
+int spell_blast(int cn, int co, int power, int co_orig, int aoe)
+{
+	int hitpower, crit_dam=0, tmp;
+	
+	chlog(cn, "Cast Blast on %s", ch[co].name);
+	
+	hitpower = spell_immunity(power, get_target_immunity(cn, co)) * 2;
+	if (co_orig) hitpower = hitpower/2 + hitpower/4;
+	
+	// Ira
+	if (get_gear(cn, IT_TW_IRA))
+		crit_dam = do_crit(cn, co, hitpower, 1)/2;
+	
+	// Tarot Card - Judgment :: Less damage
+	if (get_tarot(cn, IT_CH_JUDGE))
+		tmp = do_hurt(cn, co, (hitpower+crit_dam)*85/100, 1);
+	else
+		tmp = do_hurt(cn, co, hitpower+crit_dam, 1);
+	
+	if (aoe)
+	{
+		if (tmp>0)
+		{
+			if (!(ch[co].flags & CF_SYS_OFF))
+				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
+		}
+	}
+	else
+	{
+		if (tmp<1)
+		{
+			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+		}
+		else
+		{
+			if (!(ch[cn].flags & CF_SYS_OFF))
+				do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
+			if (!(ch[co].flags & CF_SYS_OFF))
+				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
+		}
+	}
+	
+	if (!co_orig)
+	{
+		char_play_sound(co, ch[cn].sound + 6, -150, 0);
+		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
+	}
+	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	
+	// Tarot Card - Judgment :: Inflict Scorch
+	if (get_tarot(cn, IT_CH_JUDGE)) 
+		spell_scorch(cn, co, hitpower, 0);
+	
+	return 1+tmp;
+}
 void skill_blast(int cn)
 {
 	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int power, aoe_power, cost, tmp = 0, crit_dam=0;
+	int power, aoe_power, cost;
 	int count = 0, hit = 0;
 	int co = 0, co_orig = 0;
-	int dam, avgdmg = 0, critical;
+	int avgdmg = 0;
 	int can_aoe = CAN_ARHR_PROX(cn);
 	
 	power = M_SK(cn, SK_BLAST);
 	power = spell_multiplier(power, cn);
 	aoe_power = M_SK(cn, SK_PROX);
 	cost = (power * 2) / 8 + 5;
-	critical = ch[cn].crit_multi;
-	
-	if (critical > 150)
-	{
-		critical = critical - 150;
-		critical = 150 + critical/2;
-	}
-	if (critical > 200)
-	{
-		critical = critical - 200;
-		critical = 200 + critical/2;
-	}
 	
 	// Harakim & Sorc costs less, monster cost more mana
 	if (IS_PLAYER(cn) && (IS_ANY_HARA(cn) || IS_SORCERER(cn) || IS_BRAVER(cn)))
@@ -3434,40 +3469,7 @@ void skill_blast(int cn)
 	// If we have a valid target, cast Blast on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		chlog(cn, "Cast Blast on %s", ch[co].name);
-		
-		dam = spell_immunity(power, get_target_immunity(cn, co)) * 2;
-		
-		// Ira
-		if (get_gear(cn, IT_TW_IRA))
-			crit_dam = do_crit(cn, co, dam, 1)/2;
-		
-		// Tarot Card - Judgment :: Less damage
-		if (get_tarot(cn, IT_CH_JUDGE))
-			tmp = do_hurt(cn, co, (dam+crit_dam)*85/100, 1);
-		else
-			tmp = do_hurt(cn, co, dam+crit_dam, 1);
-		
-		if (tmp<1)
-		{
-			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-		}
-		else
-		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
-				do_char_log(cn, 1, "You blast %s for %d HP.\n", ch[co].reference, tmp);
-			if (!(ch[co].flags & CF_SYS_OFF))
-				do_char_log(co, 1, "%s blasted you for %d HP.\n", ch[cn].name, tmp);
-			avgdmg += tmp;
-		}
-		
-		char_play_sound(co, ch[cn].sound + 6, -150, 0);
-		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-		
-		// Tarot Card - Judgment :: Inflict Scorch
-		if (get_tarot(cn, IT_CH_JUDGE)) 
-			spell_scorch(cn, co, power, 0);
+		avgdmg = spell_blast(cn, co, power, 0, 0);
 		
 		co_orig = co;
 		count++;
@@ -3759,7 +3761,7 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
 }
 void skill_dispel(int cn)
 {
-	int in, co, n, m, base_pow, power, ail_pow = 0, success = 0, chanc, flag;
+	int in, co, n, m, base_pow, power, ail_pow = 0, success = 0, chanc, flag, verd;
 	int ail[DISPEL_MAX] = {0};
 	int d20 = SP_MULT_DISPEL;
 	int sto[DISPEL_STORE] = {0};
@@ -3778,6 +3780,7 @@ void skill_dispel(int cn)
 	
 	// Tarot Card - Hierophant :: Dispel removes positive spells instead of negative spells
 	flag = get_tarot(cn, IT_CH_HEIROPH);
+	verd = get_book(cn, IT_BOOK_VERD);
 	
 	if (cn!=co)
 	{
@@ -3876,7 +3879,7 @@ void skill_dispel(int cn)
 			else break;
 		}
 		
-		sto[success] = bu[in].temp;
+		if (!verd) sto[success] = bu[in].temp;
 		
 		if (co!=cn)
 		{
@@ -3904,9 +3907,17 @@ void skill_dispel(int cn)
 		}
 		
 		success++;
+		
+		if (verd) 
+		{
+			power -= ail_pow/2;
+			continue;
+		}
+		
 		power -= ail_pow;
+		
 		if (power < 1) break;
-		if (success >=3 || flag) break;
+		if (success >= DISPEL_STORE || flag) break;
 	}
 	
 	do_update_char(co);
@@ -4137,13 +4148,7 @@ void skill_ghost(int cn)
 	}
 
 	ch[cc].data[48] = 33;
-	
-	if (IS_PLAYER(cn)) 
-	{
-		ch[cc].flags  |= CF_CANCRIT;
-		ch[cc].data[1] = ch[cn].gcm;	// set GC mode
-		ch[cc].data[2] = 1;				// Base crit chance
-	}
+	ch[cc].data[1] = ch[cn].gcm;	// set GC mode
 	
 	//{
 	
@@ -4236,7 +4241,7 @@ void skill_ghost(int cn)
 	{
 		do_sayx(cc, ch[cc].text[1], ch[co].name);
 	}
-	else if (points2rank(ch[cc].points_tot) < 6)     // GC not yet Master Sergeant
+	else if (getrank(cc) < 6)     // GC not yet Master Sergeant
 	{
 		do_sayx(cc, "I shall defend you and obey your COMMAND, %s. "
 		        "I will WAIT, FOLLOW, or ATTACK for you and can tell you the TIME. "
@@ -4275,92 +4280,10 @@ void skill_ghost(int cn)
 	add_exhaust(cn, SK_EXH_GHOST);
 }
 
-void skill_shadow(int cn)
+int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 {
-	int co, cc, cz, n, m, z, base = 1, basedur = 1, idx, in, tmp, pts = 0, sprite = 2000;
-	int archgc = 0, archbonus = 0, archtmp = 0, w = 0, necronomicon = 0, devilR = 0;
-	int dont_atk = 0;
-
-	if (IS_BUILDING(cn))
-	{
-		do_char_log(cn, 0, "Not in build mode.\n");
-		return;
-	}
-	
-	if (IS_PLAYER(cn) && (co = ch[cn].data[PCD_SHADOWCOPY]))
-	{
-		if (!IS_SANECHAR(co) || ch[co].data[CHD_MASTER]!=cn || 
-			(ch[co].flags & CF_BODY) || ch[co].used==USE_EMPTY)
-		{
-			co = 0;
-		}
-		if (co && (ch[co].flags & CF_SHADOWCOPY))
-		{
-			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz))
-			{
-				chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
-				if (skill_gc_atk(cn, co, cz) && get_gear(cn, IT_TW_INVIDIA))
-				{
-					god_drop_char_fuzzy(co, ch[cz].x, ch[cz].y);
-				}
-			}
-			else
-			{
-				do_char_log(cn, 1, "You dismissed your Shadow Copy.\n", co);
-				answer_transfer(co, cn, 0);
-			}
-			return;
-		}
-	}
-	
-	co = ch[cn].skill_target1;
-	
-	if (cn==co) co = 0;
-	if (co==ch[cn].data[PCD_SHADOWCOPY] || 
-		co==ch[cn].data[PCD_COMPANION] ) co = 0;
-	
-	// select who's sprite/array we're copying
-	cz = cn;
-	if (co && (IS_PLAYER(cn) || !RANDOM(2))) cz = co;
-	
-	if (co && !do_char_can_see(cn, co))
-	{
-		do_char_log(cn, 0, "You cannot see your target.\n");
-		return;
-	}
-
-	if (is_exhausted(cn)) return;
-
-	if (co && !may_attack_msg(cn, co, 0))
-	{
-		dont_atk = 1;
-		/*
-		chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
-		return;
-		*/
-	}
-	
-	if (spellcost(cn, SP_COST_SHADOW, SK_SHADOW, 1)) return;
-	
-	if (chance(cn, FIVE_PERC_FAIL))
-	{
-		if (co && cn!=co) 
-			do_area_notify(cn, co, ch[cn].x, ch[cn].y, 
-				NT_SEEMISS, cn, co, M_SK(cn, SK_SHADOW), 0);
-		if (co && cn!=co && CAN_SENSE(co) && 
-			M_SK(co, SK_PERCEPT)>M_SK(cn, SK_SHADOW) + 5 && !dont_atk)
-		{
-			if (!(ch[co].flags & CF_SENSEOFF))
-				do_char_log(co, 0, "%s tried to cast shadow copy on you but failed.\n", 
-					ch[cn].reference);
-			if (!IS_IGNORING_SPELLS(co))
-				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-		}
-		return;
-	}
-	
-	archgc 					= B_SK(cn, SK_GCMASTERY);
-	if (archgc) archbonus 	= M_SK(cn, SK_GCMASTERY);
+	int cc, n, m, z, base = 1, basedur = 1, idx, in, tmp, pts = 0, sprite = 2000;
+	int archtmp = 0, w = 0, necronomicon = 0, devilR = 0;
 	
 	cc = god_create_char(CT_COMPANION, 1); 
 	
@@ -4370,7 +4293,7 @@ void skill_shadow(int cn)
 		{
 			ch[cc].used = USE_EMPTY;
 			do_char_log(cn, 0, "The shadow copy could not materialize.\n");
-			return;
+			return 0;
 		}
 	}
 
@@ -4400,26 +4323,11 @@ void skill_shadow(int cn)
 	// Adjust to match the caster
 	if (necronomicon)
 	{
-		/*
-		sprintf(ch[cc].name, "%c%c%c%c%c's Zombie", 
-			ch[cn].name[0], ch[cn].name[1], ch[cn].name[2], ch[cn].name[3], ch[cn].name[4]);
-		*/
 		ch[cc].flags |= CF_UNDEAD;
 		sprite = ch[cc].sprite = 19408;
 	}
 	else
 	{
-		/*
-		if (ch[cn].name[4])
-			sprintf(ch[cc].name, "%c%c%c%c%c's Shadow", 
-				ch[cn].name[0], ch[cn].name[1], ch[cn].name[2], ch[cn].name[3], ch[cn].name[4]);
-		else if (ch[cn].name[3])
-			sprintf(ch[cc].name, "%c%c%c%c's Shadow", 
-				ch[cn].name[0], ch[cn].name[1], ch[cn].name[2], ch[cn].name[3]);
-		else
-			sprintf(ch[cc].name, "%c%c%c's Shadow", 
-				ch[cn].name[0], ch[cn].name[1], ch[cn].name[2]);
-		*/
 		sprite = ch[cc].sprite = ch[cz].sprite;  // ch[cc].sprite = 15312;
 		if (ch[cz].flags & CF_SIMPLE) 	// Set 'simple' animation flag for Flames and Spiders.
 			ch[cc].flags |= CF_SIMPLE;
@@ -4455,12 +4363,6 @@ void skill_shadow(int cn)
 	ch[cc].data[1]  =  2;	// Force offense mode
 	
 	ch[cc].flags |= CF_SHADOWCOPY;
-	
-	if (IS_PLAYER(cn))
-	{
-		ch[cc].flags |= CF_CANCRIT;
-		ch[cc].data[2] = 1;				// Base crit chance
-	}
 	
 	//{
 	
@@ -4608,7 +4510,7 @@ void skill_shadow(int cn)
 		if (!in)
 		{
 			xlog("god_create_buff failed on shadow in skill_shadow");
-			return;
+			return 0;
 		}
 		
 		strcpy(bu[in].name, "Shadow Copy");
@@ -4634,7 +4536,12 @@ void skill_shadow(int cn)
 		
 		bu[in].data[4]   = 1; // Effects not removed by NMZ (SK_SHADOW on Shadow)
 		
-		if (devilR) bu[in].data[5] = 1;
+		if (devilR) // Shadow Copy deals 25%% more damage and takes 25%% less damage
+		{
+			bu[in].dmg_bonus[1]     = (25*2);
+			bu[in].dmg_reduction[1] = (25*2);
+			bu[in].data[5] = 1;
+		}
 		
 		add_spell(cc, in);
 	//
@@ -4668,7 +4575,7 @@ void skill_shadow(int cn)
 		if (!in)
 		{
 			xlog("god_create_buff failed on player in skill_shadow");
-			return;
+			return 0;
 		}
 		
 		strcpy(bu[in].name, "Shadow Copy");
@@ -4679,7 +4586,12 @@ void skill_shadow(int cn)
 		bu[in].power 	 = base;
 		bu[in].data[4]   = 1; // Effects not removed by NMZ (SK_SHADOW on owner)
 		
-		if (devilR) bu[in].data[5] = 2;
+		if (devilR) // Player deals 20%% less damage and takes 20%% more damage
+		{
+			bu[in].dmg_bonus[1]     = -(20*2);
+			bu[in].dmg_reduction[1] = -(20*2);
+			bu[in].data[5] = 2;
+		}
 		
 		add_spell(cn, in);
 	//
@@ -4687,7 +4599,94 @@ void skill_shadow(int cn)
 	fx_add_effect(6, 0, ch[cc].x, ch[cc].y, 0);
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
-	add_exhaust(cn, SK_EXH_SHADOW);
+	return 1;
+}
+void skill_shadow(int cn)
+{
+	int power;
+	int co, cz;
+	int archgc = 0, archbonus = 0, archtmp = 0, w = 0, necronomicon = 0, devilR = 0;
+	int dont_atk = 0;
+
+	if (IS_BUILDING(cn))
+	{
+		do_char_log(cn, 0, "Not in build mode.\n");
+		return;
+	}
+	
+	if (IS_PLAYER(cn) && (co = ch[cn].data[PCD_SHADOWCOPY]))
+	{
+		if (!IS_SANECHAR(co) || ch[co].data[CHD_MASTER]!=cn || 
+			(ch[co].flags & CF_BODY) || ch[co].used==USE_EMPTY)
+		{
+			co = 0;
+		}
+		if (co && (ch[co].flags & CF_SHADOWCOPY))
+		{
+			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz))
+			{
+				chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
+				if (skill_gc_atk(cn, co, cz) && get_gear(cn, IT_TW_INVIDIA))
+				{
+					god_drop_char_fuzzy(co, ch[cz].x, ch[cz].y);
+				}
+			}
+			else
+			{
+				do_char_log(cn, 1, "You dismissed your Shadow Copy.\n", co);
+				answer_transfer(co, cn, 0);
+			}
+			return;
+		}
+	}
+	
+	co = ch[cn].skill_target1;
+	
+	if (cn==co) co = 0;
+	if (co==ch[cn].data[PCD_SHADOWCOPY] || 
+		co==ch[cn].data[PCD_COMPANION] ) co = 0;
+	
+	// select who's sprite/array we're copying
+	cz = cn;
+	if (co && (IS_PLAYER(cn) || !RANDOM(2))) cz = co;
+	
+	if (co && !do_char_can_see(cn, co))
+	{
+		do_char_log(cn, 0, "You cannot see your target.\n");
+		return;
+	}
+
+	if (is_exhausted(cn)) return;
+
+	if (co && !may_attack_msg(cn, co, 0))
+	{
+		dont_atk = 1;
+	}
+	
+	if (spellcost(cn, SP_COST_SHADOW, SK_SHADOW, 1)) return;
+	
+	if (chance(cn, FIVE_PERC_FAIL))
+	{
+		if (co && cn!=co) 
+			do_area_notify(cn, co, ch[cn].x, ch[cn].y, 
+				NT_SEEMISS, cn, co, M_SK(cn, SK_SHADOW), 0);
+		if (co && cn!=co && CAN_SENSE(co) && 
+			M_SK(co, SK_PERCEPT)>M_SK(cn, SK_SHADOW) + 5 && !dont_atk)
+		{
+			if (!(ch[co].flags & CF_SENSEOFF))
+				do_char_log(co, 0, "%s tried to cast shadow copy on you but failed.\n", 
+					ch[cn].reference);
+			if (!IS_IGNORING_SPELLS(co))
+				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
+		}
+		return;
+	}
+	
+	archgc 					= B_SK(cn, SK_GCMASTERY);
+	if (archgc) archbonus 	= M_SK(cn, SK_GCMASTERY);
+	
+	if (spell_shadow(cn, co, cz, archbonus, dont_atk))
+		add_exhaust(cn, SK_EXH_SHADOW);
 }
 
 int spell_aggravate(int cn, int co, int power)
@@ -4704,6 +4703,7 @@ int spell_aggravate(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_AGGRAVATE, BUF_SPR_AGGRAVATE, power, SP_DUR_AGGRAVATE, 0)))
 		return 0;
 	
+	bu[in].dmg_reduction[1] = -(10*2);	// 10% more damage taken
 	bu[in].data[4] = 1; 	// Effects not removed by NMZ (SK_AGGRAVATE)
 	bu[in].data[5] = 1;
 	
@@ -4726,7 +4726,7 @@ int spell_bleed(int cn, int co, int power)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	
-	if (get_enchantment(cn, 30)) power = power*11/10;
+	if (get_enchantment(cn, 30)) power = power*6/5;
 	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	
@@ -4747,12 +4747,69 @@ int spell_bleed(int cn, int co, int power)
 	
 	return 1;
 }
+int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
+{
+	int hitpower, aggravate=0, tmp, tmpmp=0;
+	
+	chlog(cn, "Used Cleave on %s", ch[co].name);
+	
+	hitpower = spell_immunity(power, ch[co].to_parry) * 2;
+	if (co_orig) hitpower = hitpower/2 + hitpower/4;
+	
+	// Tarot Card - Justice :: Inflict Aggravate instead of Bleed
+	if (get_tarot(cn, IT_CH_JUSTICE))
+	{
+		aggravate = 1;
+	}
+	
+	tmp = do_hurt(cn, co, hitpower, 5);
+	
+	if (get_gear(cn, IT_WP_BRONCHIT))
+	{
+		tmpmp = tmp/5;
+	}
+	
+	if (tmp<1)
+	{
+		do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+	}
+	else if (tmpmp<1)
+	{
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
+		if (!(ch[co].flags & CF_SYS_OFF))
+			do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+	}
+	else
+	{
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 1, "You cleaved %s for %d HP and %d mana.\n", ch[co].reference, tmp, tmpmp);
+		if (!(ch[co].flags & CF_SYS_OFF))
+			do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
+	}
+	
+	if (!co_orig)
+	{
+		char_play_sound(co, ch[cn].sound + 24, -50, 0);
+		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
+	}
+	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	
+	if (aggravate)
+		spell_aggravate(cn, co, hitpower);
+	else if (tmp)
+		spell_bleed(cn, co, tmp);
+	
+	check_gloves(cn, co, co_orig, dr1, dr2);
+	
+	if (!co_orig)
+		surround_cast(cn, co, 0, SK_CLEAVE, power, dr1, dr2);
+	
+	return 1;
+}
 void skill_cleave(int cn)
 {
-	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int power, cost, tmp, tmpmp;
-	int co, co_orig = -1;
-	int dam, aggravate = 0;
+	int power, cost, tmp, tmpmp, co, dam, aggravate = 0;
 	
 	chlog(cn, "Uses CLEAVE on %s", ch[co].name);
 	
@@ -4771,60 +4828,7 @@ void skill_cleave(int cn)
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0)))
 		return;
 	
-	//
-		chlog(cn, "Used Cleave on %s", ch[co].name);
-		
-		dam = spell_immunity(power, ch[co].to_parry) * 2;
-		
-		// Tarot Card - Justice :: Reduce Cleave's damage & inflict Bleed
-		if (get_tarot(cn, IT_CH_JUSTICE))
-		{
-			//dam = dam * 70/100;
-			aggravate = 1;
-		}
-		
-		tmpmp = 0;
-		tmp   = do_hurt(cn, co, dam, 5);
-		
-		if (get_gear(cn, IT_WP_BRONCHIT))
-		{
-			tmpmp = tmp/5;
-		}
-		
-		if (tmp<1)
-		{
-			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-		}
-		else if (tmpmp<1)
-		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
-				do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
-			if (!(ch[co].flags & CF_SYS_OFF))
-				do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
-		}
-		else
-		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
-				do_char_log(cn, 1, "You cleaved %s for %d HP and %d mana.\n", ch[co].reference, tmp, tmpmp);
-			if (!(ch[co].flags & CF_SYS_OFF))
-				do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
-		}
-		
-		char_play_sound(co, ch[cn].sound + 24, -50, 0);
-		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-		
-		if (aggravate)
-			spell_aggravate(cn, co, dam);
-		else if (tmp)
-			spell_bleed(cn, co, tmp);
-		
-		check_gloves(cn, co, 0, dr1, dr2);
-		
-		co_orig = co;
-	//
-	
-	surround_cast(cn, co_orig, 0, SK_CLEAVE, power, dr1, dr2);
+	spell_cleave(cn, co, power, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
 	
 	add_exhaust(cn, SK_EXH_CLEAVE);
 }
@@ -4840,12 +4844,7 @@ int spell_weaken(int cn, int co, int power, int flag)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	
-	if (get_enchantment(cn, 7)) power = power*11/10;
-	if (get_enchantment(co, 8)) 
-	{
-		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
-		return 0;
-	}
+	if (get_enchantment(cn, 7)) power = power*6/5;
 	
 	// Tarot Card - Death :: Change Weaken into Crush
 	if (get_tarot(cn, IT_CH_DEATH))
@@ -4853,6 +4852,7 @@ int spell_weaken(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_WEAKEN, 0)))
 			return 0;
 		
+		if (get_enchantment(co, 8)) power = power/5;
 		bu[in].armor[1]  = -(power / 5 + 2);
 	}
 	else
@@ -4860,6 +4860,7 @@ int spell_weaken(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0)))
 			return 0;
 		
+		if (get_enchantment(co, 8)) power = power/5;
 		bu[in].weapon[1]  = -(power / 5 + 2);
 	}
 	
@@ -4932,12 +4933,7 @@ int spell_blind(int cn, int co, int power, int flag)
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	
-	if (get_enchantment(cn, 31)) power = power*11/10;
-	if (get_enchantment(co, 33)) 
-	{
-		do_char_log(cn, 1, "Magical interference neutralized the effect.\n");
-		return 0;
-	}
+	if (get_enchantment(cn, 31)) power = power*6/5;
 	
 	// Tarot Card - Chariot :: Change Blind into Douse
 	if (flag)
@@ -4946,6 +4942,7 @@ int spell_blind(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_DOUSE, BUF_SPR_DOUSE, power, SP_DUR_DOUSE, 0)))
 			return 0;
 		
+		if (get_enchantment(co, 33)) power = power/5;
 		if (IS_ANY_MERC(cn) && !IS_PLAYER(cn))
 		{
 			bu[in].skill[SK_STEALTH][1] = -(power/ 2 + 4);
@@ -4964,6 +4961,7 @@ int spell_blind(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_BLIND, BUF_SPR_BLIND, power, SP_DUR_BLIND, 0)))
 			return 0;
 		
+		if (get_enchantment(co, 33)) power = power/5;
 		if (IS_ANY_MERC(cn) && !IS_PLAYER(cn))
 		{
 			bu[in].skill[SK_PERCEPT][1] = -(power/2 + 4);
@@ -5032,7 +5030,7 @@ int spell_pulse(int cn, int co, int power)
 	
 	len = (SK_EXH_PULSE/2) * baselen / max(100, ch[cn].cool_bonus);
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	power = spell_multiplier(power, cn);
 	
 	if (!(in = make_new_buff(cn, SK_PULSE, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
 		return 0;
@@ -5043,16 +5041,18 @@ int spell_pulse(int cn, int co, int power)
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_PULSE
 }
-int spell_immolate(int cn, int co, int power)
+int spell_immolate(int cn, int co, int power, int flag)
 {
 	int in;
 	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/40;
+	if (!flag) power = spell_multiplier(power, cn);
 	
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	
 	bu[in].hp[0]	= -100;
+	if (flag) bu[in].data[0] = 0;
 	bu[in].data[3] 	= PRXP_RAD + ch[cn].aoe_bonus;
 	
 	bu[in].flags |= IF_PERMSPELL;
@@ -5079,7 +5079,7 @@ void skill_pulse(int cn)
 	// Tarot - Judgement.R : Pulse changed to Immolate
 	if (tarot)
 	{
-		spell_immolate(cn, cn, M_SK(cn, SK_PULSE));
+		spell_immolate(cn, cn, M_SK(cn, SK_PULSE), 0);
 	}
 	else
 	{
@@ -5127,8 +5127,8 @@ int spell_guard(int cn, int co, int power, int hit)
 	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, dur, 0))) 
 		return 0;
 	
-	bu[in].data[2] = hit; 	// number of targets affected by taunt
-	bu[in].data[4] = 1; 	// Effects not removed by NMZ (SK_GUARD)
+	bu[in].dmg_reduction[1] = min(100, power/5);	// 0.5% less damage taken per 5 power
+	bu[in].data[4] = 1; 							// Effects not removed by NMZ (SK_GUARD)
 	
 	return cast_a_spell(cn, co, in, 0, 0); // SK_GUARD
 }
@@ -5176,7 +5176,7 @@ void skill_taunt(int cn)
 		hit += surround_cast(cn, co_orig, 0, SK_TAUNT, power, -1, -1);
 	}
 	
-	if (hit) spell_guard(cn, cn, M_SK(cn, SK_TAUNT), max(1,hit));
+	if (hit) spell_guard(cn, cn, power, max(1,hit));
 	
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
@@ -5473,7 +5473,7 @@ int spell_zephyr(int cn, int co, int power, int flag)
 	}
 	else		// Buff version
 	{
-		power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+		power = spell_multiplier(power, cn);
 		
 		if (!(in = make_new_buff(cn, SK_ZEPHYR, BUF_SPR_ZEPHYR, power, SP_DUR_ZEPHYR, 0))) 
 			return 0;
@@ -5508,9 +5508,9 @@ int spell_rage(int cn, int co, int power)
 	
 	// Tarot - Hermit.R : Rage grants TD instead of WV
 	if (get_tarot(co, IT_CH_HERMIT_R))
-		bu[in].top_damage[1] = power/3 + 1;
+		bu[in].top_damage[1] = power*6/15 + 6;
 	else
-		bu[in].weapon[1]	 = power/6 + 2;
+		bu[in].weapon[1]	 = power*2/15 + 2;
 	
 	bu[in].end[0]         = -50;
 	
@@ -5633,7 +5633,8 @@ int spell_phalanx(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_PHALANX, BUF_SPR_PHALANX, power, SP_DUR_PHALANX, 1))) 
 		return 0;
 	
-	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_PHALANX)
+	bu[in].dmg_reduction[1] = min(100, power*2/5);	// 1% less damage taken per 5 power
+	bu[in].data[4] = 1; 							// Effects not removed by NMZ (SK_PHALANX)
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_PHALANX
 }
@@ -5710,21 +5711,21 @@ void skill_driver(int cn, int nr)
 		case SK_BLESS:		if (nmz) nomagic(cn,0); else skill_bless(cn);		break;
 		case SK_CURSE:		if (nmz) nomagic(cn,0); else skill_curse(cn);		break;
 		case SK_DISPEL:		if (nmz) nomagic(cn,0); else skill_dispel(cn);		break;
-		case SK_ENHANCE:	if (nmz) nomagic(cn,0); else skill_enhance(cn);	break;
+		case SK_ENHANCE:	if (nmz) nomagic(cn,0); else skill_enhance(cn, 0);	break;
 		case SK_GHOST:		if (nmz) nomagic(cn,0); else skill_ghost(cn);		break;
 		case SK_HASTE:		if (nmz) nomagic(cn,0); else skill_haste(cn);		break;
 		case SK_HEAL:		if (nmz) nomagic(cn,0); else skill_heal(cn);		break;
 		case SK_IDENT:		if (nmz) nomagic(cn,0); else skill_identify(cn);	break;
 		case SK_LETHARGY:	if (nmz) nomagic(cn,0); else skill_lethargy(cn);	break;
 		case SK_LIGHT:		if (nmz) nomagic(cn,0); else skill_light(cn);		break;
-		case SK_MSHIELD:	if (nmz) nomagic(cn,0); else skill_mshield(cn);	break;
+		case SK_MSHIELD:	if (nmz) nomagic(cn,0); else skill_mshield(cn);		break;
 		case SK_POISON:		if (nmz) nomagic(cn,0); else skill_poison(cn);		break;
-		case SK_PROTECT:	if (nmz) nomagic(cn,0); else skill_protect(cn);	break;
+		case SK_PROTECT:	if (nmz) nomagic(cn,0); else skill_protect(cn, 0);	break;
 		case SK_PULSE:		if (nmz) nomagic(cn,0); else skill_pulse(cn);		break;
 		case SK_RECALL:		if (nmz) nomagic(cn,0); else skill_recall(cn);		break;
 		case SK_ZEPHYR:		if (nmz) nomagic(cn,0); else skill_zephyr(cn);		break;
 		case SK_SHADOW:		if (nmz) nomagic(cn,0); else skill_shadow(cn);		break;
-		case SK_SLOW:		if (nmz) nomagic(cn,0); else skill_slow(cn, 0);	break;
+		case SK_SLOW:		if (nmz) nomagic(cn,0); else skill_slow(cn, 0);		break;
 		
 		case SK_REGEN:
 		case SK_REST:
