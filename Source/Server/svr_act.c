@@ -771,7 +771,13 @@ void plr_drop(int cn)
 		return;
 	}
 
-	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & MF_MOVEBLOCK))
+	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & (MF_MOVEBLOCK | MF_NOPLAYER)))
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		return;
+	}
+	
+	if (is_atpandium(cn))
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;

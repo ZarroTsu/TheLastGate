@@ -586,7 +586,8 @@ struct wpslist wpslist[MAXWPS]={
 	{ 16, "Pentagram Quest, Jungle", 		"\"A verdant expanse.\"" },
 	{ 17, "Pentagram Quest, Ice", 			"\"Frozen still for eternity.\"" },
 	{ 18, "Pentagram Quest, Underwater",	"\"Embrace foul waters.\"" },
-	{ 19, "Pentagram Quest, Onyx", 			"\"Depths known only by fear.\"" }
+	{ 19, "Pentagram Quest, Onyx", 			"\"Depths known only by fear.\"" },
+	{ 26, "The Burning Plains", 			"\"The archon waits.\"" }
 //    nr, "123456789012345678901234567890",	"123456789012345678901234567890"
 };
 
@@ -1776,6 +1777,13 @@ void eng_display_win(int plr_sprite,int init)
 				if (show_shop==1)
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
+			/*  Sadly this is harder to do than it looks
+			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos) && shop.pl_price)
+			{
+				if (show_shop==1)
+					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
+			}
+			*/
 			if (y)
 			{
 				if (show_shop==1)
@@ -2215,7 +2223,7 @@ void eng_display(int init)	// optimize me!!!!!
 				if (map[m].flags2&MF_DEATHTRAP)	copysprite(73,0,x*32,y*32,xoff,yoff);
 				if (map[m].flags2&MF_NOLAG)	copysprite(57,0,x*32,y*32,xoff,yoff);
 				if (map[m].flags2&MF_ARENA)	copysprite(76,0,x*32,y*32,xoff,yoff);
-//				if (map[m].flags2&MF_TELEPORT2) copysprite(77,0,x*32,y*32,xoff,yoff);
+				if (map[m].flags2&MF_NOPLAYER) copysprite(77,0,x*32,y*32,xoff,yoff);
 				if (map[m].flags2&MF_NOEXPIRE) copysprite(82,0,x*32,y*32,xoff,yoff);
 				if (map[m].flags2&0x80000000) copysprite(72,0,x*32,y*32,xoff,yoff);
 				

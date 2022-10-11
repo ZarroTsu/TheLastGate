@@ -5974,6 +5974,10 @@ void build_drop(int x, int y, int in)
 			static int tab[4] = {704, 659, 660, 688};
 			nr = tab[RANDOM(4)];
 		}
+		if (nr==725)   // randomize lava ground
+		{
+			nr += RANDOM(4);
+		}
 		if (nr==950)
 		{
 			nr += RANDOM(9);
@@ -6054,10 +6058,10 @@ void build_drop(int x, int y, int in)
 		case 2605: exfloor = 0x20000000 |  531; 	break;
 		case 2606: exfloor = 0x20000000 |  542; 	break;
 		case 2607: exfloor = 0x20000000 |  551; 	break;
+		case 2928: exfloor = 0x20000000 |  558; 	break;
+		case 2929: exfloor = 0x20000000 |  543; 	break;
+		case 2930: exfloor = 0x20000000 |  544; 	break;
 		//
-		case 9991: exfloor = 0x20000000 |  558; 	break;
-		case 9992: exfloor = 0x20000000 |  543; 	break;
-		case 9993: exfloor = 0x20000000 |  544; 	break;
 		case 9994: exfloor = 0x20000000 |  545; 	break;
 		case 9995: exfloor = 0x20000000 |  546; 	break;
 		case 9996: exfloor = 0x20000000 |  547; 	break;

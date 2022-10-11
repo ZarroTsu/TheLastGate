@@ -339,7 +339,7 @@ int use_recall_chest(int cn, int in)
 
 int use_create_item3(int cn, int in)
 {
-	int in2, n;
+	int in2, n, v;
 
 	if (cn==0)
 	{
@@ -420,7 +420,15 @@ int use_create_item3(int cn, int in)
 	}
 	
 	// Hack for greater skill scrolls
-	if (n==IT_OS_SK) it[in2].data[1] = RANDOM(50);
+	if (n==IT_OS_SK) 
+	{
+		v = RANDOM(MAXSKILL);
+		
+		sprintf(it[in2].name, "Greater Scroll of (%s)", skilltab[v].name);
+		sprintf(it[in2].reference, "greater scroll of (%s)", skilltab[v].name);
+		
+		it[in2].data[1] = v;
+	}
 	
 	if (!god_give_char(in2, cn))
 	{
@@ -463,6 +471,7 @@ void use_consume_item(int cn, int in, int flag)
 // Stack cursor item onto target item
 void use_stack_items(int cn, int in, int in2)
 {
+	int in3;
 	int stack_a, stack_b;
 	int value_a, value_b;
 	
@@ -482,14 +491,34 @@ void use_stack_items(int cn, int in, int in2)
 	// Special case for Soul catalysts
 	if (it[in].driver == 93 && it[in].data[4] != it[in2].data[4])
 	{
-		do_char_log(cn, 0, "You cannot stack two catalysts with differing skills.\n");
+		if (in3 = make_catalyst(cn, 1))
+		{
+			use_consume_item(cn, in, 0);
+			use_consume_item(cn, in2, 0);
+			do_char_log(cn, 1, "You merged the two and got a %s.\n", it[in3].reference);
+		}
+		else
+		{
+			do_char_log(cn, 0, "Your backpack is too full to do that.\n");
+//			do_char_log(cn, 0, "You cannot stack two catalysts with differing skills.\n");
+		}
 		return;
 	}
 	
 	// Special case for Greater Skill Scrolls
-	if (it[in].driver == 110 && it[in].data[0] != it[in2].data[0] && it[in].data[1] != it[in2].data[1])
+	if (it[in].driver == 110 && it[in].data[0] == 5 && it[in2].data[0] == 5 && it[in].data[1] != it[in2].data[1])
 	{
-		do_char_log(cn, 0, "You cannot stack two greater scrolls with differing skills or abilities.\n");
+		if (in3 = make_gskill(cn))
+		{
+			use_consume_item(cn, in, 0);
+			use_consume_item(cn, in2, 0);
+			do_char_log(cn, 1, "You merged the two and got a %s.\n", it[in3].reference);
+		}
+		else
+		{
+			do_char_log(cn, 0, "Your backpack is too full to do that.\n");
+//			do_char_log(cn, 0, "You cannot stack two greater scrolls with differing skills or abilities.\n");
+		}
 		return;
 	}
 	
@@ -1502,10 +1531,15 @@ int use_mix_potion(int cn, int in)
 	in3 = god_create_item(in3);
 	it[in3].flags |= IF_UPDATE;
 	
+	if (!god_give_char(in3, cn))
+	{
+		do_char_log(cn, 0, "You have no room in your backpack!\n");
+		it[in3].used = USE_EMPTY;
+		return 0;
+	}
+	
 	use_consume_item(cn, in2, 0);
 	use_consume_item(cn, in, 0);
-
-	god_give_char(in3, cn);
 	
 	do_char_log(cn, font, "You produced a %s.\n", it[in3].name);
 
@@ -1981,6 +2015,83 @@ int use_labyrinth(int cn, int in)
 		ch[cn].temple_y = ch[cn].tavern_y = ch[cn].y;
 	}
 
+	return 1;
+}
+
+int use_pandium_teleport(int cn, int in)
+{
+	int nr, co, in2, n, flag = 0;
+	int xs, ys, xe, ye, x, y;
+
+	if (!cn)
+	{
+		return 1;
+	}
+	if (it[in].flags & IF_USEACTIVATE && !(it[in].active))
+	{
+		return 1;
+	}
+	if (ch[cn].pandium_floor[0]==0)
+	{
+		do_char_log(cn, 0, "You are not yet worthy of entry (how did you get in here?).\n");
+		return 1;
+	}
+	chlog(cn, "used pandium's portal");
+	
+	// 0 = target X				283
+	// 1 = target Y				989
+	// 2 = ch check m1		 976141
+	// 3 = ch check m2		1022249
+	// 4 = entry area m1	 954648
+	// 5 = entry area m2	 960798
+	
+	xs = it[in].data[2] % MAPX;
+	ys = it[in].data[2] / MAPX;
+	xe = it[in].data[3] % MAPX;
+	ye = it[in].data[3] / MAPX;
+	
+	for (x = xs; x<=xe; x++)
+	{
+		for (y = ys; y<=ye; y++)
+		{
+			if (co = map[x + y * MAPX].ch)
+			{
+				if (ch[co].temp == CT_PANDIUM) flag = 1;
+				if ((ch[co].temp == CT_PANDIUM && 
+					ch[co].x != ch[co].data[29]%MAPX && 
+					ch[co].y != ch[co].data[29]/MAPX) || IS_PLAYER(co) || IS_PLAYER_COMP(co))
+				{
+					do_char_log(cn, 0, "The trial is busy. Please try again later.\n");
+					return 1;
+				}
+			}
+		}
+	}
+	if (!flag)
+	{
+		do_char_log(cn, 0, "The trial is busy. Please try again later.\n");
+		return 1;
+	}
+	
+	build_clean_lights(269, 975, 297, 1003);
+	
+	xs = it[in].data[4] % MAPX;
+	ys = it[in].data[4] / MAPX;
+	xe = it[in].data[5] % MAPX;
+	ye = it[in].data[5] / MAPX;
+	
+	for (x = xs; x<=xe; x++)
+	{
+		for (y = ys; y<=ye; y++)
+		{
+			if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co) && ch[co].pandium_floor[0]>0)
+			{
+				quick_teleport(co, it[in].data[0], it[in].data[1]);
+				ch[co].dir = 4;
+			}
+		}
+	}
+	
 	return 1;
 }
 
@@ -3232,6 +3343,86 @@ int use_augment_item(int cn, int in)
 	return 1;
 }
 
+int use_pandium_shrine(int cn, int in)
+{
+	int n, cc, tmp=999;
+	
+	if (cn==0)
+	{
+		return 0;
+	}
+	
+	// Abort if already consumed
+	if (it[in].active)
+	{
+		do_char_log(cn, 0, "The magic of this shrine has already been used.\n");
+		return 0;
+	}
+	
+	if (ch[cn].pandium_floor[2]>=it[in].data[0])
+	{
+		do_char_log(cn, 0, "Nothing happened. Seems like you cleared this stage once before.\n");
+		return 1;
+	}
+	
+	if (!IS_ANY_ARCH(cn))
+	{
+		do_char_log(cn, 0, "Despite your best effort to reach this shrine without arching, nothing happened. It was a massive waste of time. Oh well.\n"); 
+		return 1;
+	}
+	
+	switch (it[in].data[0])
+	{
+		case  1:	// Floor 1 Reward
+			for (n=0;n<5;n++) 
+			{
+				ch[cn].limit_break[n][0] += 5;
+				tmp = min(tmp, ch[cn].limit_break[n][0]);
+			}
+			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. Your limit for each attribute was increased to %d.\n", AT_CAP + tmp);
+			break;
+		case  2:	// Floor 5 Reward
+			ch[cn].hp[2]   += 50;
+			ch[cn].mana[2] += 50;
+			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. Your maximum hitpoints and maximum mana have each been increased by 50.\n");
+			break;
+		case  3:	// Floor 10 Reward
+			if 		(IS_SEYAN_DU(cn)) 	 tmp = SK_HASTE;
+			else if (IS_ARCHTEMPLAR(cn)) tmp = SK_DISPEL;
+			else if (IS_SKALD(cn)) 		 tmp = SK_PRECISION;
+			else if (IS_WARRIOR(cn)) 	 tmp = SK_PROX;
+			else if (IS_SORCERER(cn)) 	 tmp = SK_MSHIELD;
+			else if (IS_SUMMONER(cn)) 	 tmp = SK_STEALTH;
+			else if (IS_ARCHHARAKIM(cn)) tmp = SK_GCMASTERY;
+			else if (IS_BRAVER(cn)) 	 tmp = SK_IMMUN;
+			else 
+			{
+				do_char_log(cn, 0, "Nothing happened. (bad data)\n"); 
+				return 1;
+			}
+			ch[cn].skill[tmp][0] =  1;
+			ch[cn].skill[tmp][2] = 75;
+			ch[cn].skill[tmp][3] =  8;
+			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. You learned %s.\n", skilltab[tmp].name);
+			break;
+		case  4:	// Floor 20 Reward
+			ch[cn].end[0]  += 50;
+			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. Your total endurance has been increased by 50.\n");
+			break;
+		case  5:	// Floor 50 Reward
+			ch[cn].limit_break[5][0] += 5;
+			tmp = ch[cn].limit_break[5][0];
+			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. Your limit for each of your skills was increased to %d.\n", AT_CAP + tmp);
+			break;
+		default:
+			do_char_log(cn, 0, "Nothing happened. (bad data)\n");
+			return 1;
+	}
+	ch[cn].pandium_floor[2] = it[in].data[0];
+	
+	return 1;
+}
+
 int use_special_spell(int cn, int in)
 {
 	int spell, power, ret, co=0, buff=0, m, cc;
@@ -3796,7 +3987,7 @@ int use_crystal_sub(int cn, int in)
 	ch[cc].points_tot = pts;
 	ch[cc].gold   = (base/3 * (RANDOM(base)+1) + RANDOM(100) + 1);
 	ch[cc].gold  += ch[cc].gold/2 + RANDOM(1+ch[cc].gold*sss/3);
-	ch[cc].a_hp   = 999999;
+	ch[cc].a_hp   = 9999999;
 	ch[cc].a_end  = 999999;
 	ch[cc].a_mana = 999999;
 
@@ -5691,7 +5882,7 @@ void boost_char(int cn, int type)
 		ch[cn].reference[39] = 0;
 		
 		// Heal to full - in case a red shrine picks a pre-injured monster
-		ch[cn].a_hp 	= 999999;
+		ch[cn].a_hp 	= 9999999;
 		ch[cn].a_end 	= 999999;
 		ch[cn].a_mana 	= 999999;
 		
@@ -7371,7 +7562,8 @@ void use_driver(int cn, int in, int carried)
 			}
 		}
 		
-		if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp)
+		if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp &&
+			(it[in].temp != 0 || it[in].driver == it[ch[cn].citem].driver))
 		{
 			use_stack_items(cn, in, ch[cn].citem);
 			stacked = 1;
@@ -7711,7 +7903,17 @@ void use_driver(int cn, int in, int carried)
 				ret = use_augment_item(cn, in);
 				break;
 			case 123:
+			case 124:
 				ret = 0;
+				break;
+			case 125:
+				ret = use_pandium_shrine(cn, in);
+				break;
+			case 126:
+				ret = 0;
+				break;
+			case 127:
+				ret = use_pandium_teleport(cn, in);
 				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
@@ -7779,7 +7981,8 @@ void use_driver(int cn, int in, int carried)
 				}
 			}
 			// Item stacking - held items are stackable and the same template
-			if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp)
+			if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp &&
+				(it[in].temp != 0 || it[in].driver == it[ch[cn].citem].driver))
 			{
 				if (!stacked) use_stack_items(cn, in, ch[cn].citem);
 			}
@@ -8514,7 +8717,7 @@ void enemyspawner(int in, int type, int flag)
 			t_ran = EXP_RATE*6;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 8:			// Stone Golems (Forest Gorge)
-			t_temp = CT_STONEGOLEM;
+			t_temp = CT_STONEGOLEM + it[in].data[0];
 			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 1;
 			break;
 		case 9:			// Season Gorge Mobs
@@ -8579,10 +8782,10 @@ void enemyspawner(int in, int type, int flag)
 			break;
 		case 24:		// Tower mobs
 			t_temp = CT_TOWER + it[in].data[0];
-			t_ran = EXP_RATE*2;	count = 1;	t_dist = 0; wait = 1;
+			t_ran = EXP_RATE*3;	count = 1;	t_dist = 0; wait = 1;
 			break;
 		case 25:		// Scorpions
-			t_temp = CT_SCORP + it[in].data[0] + RANDOM(it[in].power);
+			t_temp = CT_SCORP + it[in].data[0] + RANDOM(it[in].value);
 			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 0;
 			break;
 		default:
@@ -8640,6 +8843,7 @@ void enemyspawner(int in, int type, int flag)
 			{
 				it[in].data[n] = cn;
 				xlog("enemyspawner: spawned %s at %d %d",ch[cn].name,it[in].x,it[in].y);
+				fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 			}
 			break;
 		}
@@ -8671,11 +8875,46 @@ void expire_blood_penta(int in)
 	}
 }
 
+void expire_explosion(int in)
+{
+	int x, y, m, dam, cn, tmp=0;
+	
+	x   = it[in].x;
+	y   = it[in].y;
+	m   = x + y * MAPX;
+	dam = it[in].data[0];
+	
+	if (it[in].active < it[in].duration)
+	{
+		it[in].active++;
+		if (it[in].active < it[in].duration/2) 			it[in].sprite[1] = 2446 + ((it[in].active%9)?0:1);
+		else if (it[in].active < it[in].duration/4*3) 	it[in].sprite[1] = 2448 + ((it[in].active%6)?0:1);
+		else 											it[in].sprite[1] = 2450 + ((it[in].active%3)?0:1);
+		if (it[in].active == it[in].duration-TICKS && (cn = map[m].ch) && IS_PLAYER(cn)) do_area_sound(0, 0, x, y, 25);
+		
+		return;
+	}
+	
+	if ((cn = map[m].ch) && (IS_PLAYER(cn) || IS_PLAYER_COMP(cn)))
+	{
+		fx_add_effect(5, 0, x, y, 0);
+		tmp = do_hurt(0, cn, dam, 1);
+		if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 1, "An explosion hit you for %d HP.\n", tmp);
+	}
+	do_area_sound(0, 0, x, y, 6);
+	
+	do_add_light(x, y, -it[in].light[1]);
+	it[in].used = 0;
+	map[m].it = 0;
+}
+
 void expire_driver(int in)
 {
 	switch(it[in].driver)
 	{
 		case 49: expire_blood_penta(in); break;
+		case 124: break;
 		default: xlog("unknown expire driver %d for item %s (%d)\n", it[in].driver, it[in].name, in); break;
 	}
 }
@@ -8689,6 +8928,8 @@ void item_tick_expire(void)
 	{
 		if ((in = map[m].it)!=0)
 		{
+			if (it[in].driver==124) continue;
+			
 			if ((it[in].flags & IF_REACTIVATE) && !it[in].active)
 			{
 				if (!map[m].ch && !map[m].to_ch)
@@ -8891,6 +9132,22 @@ noexpire:
 	}
 }
 
+void item_tick_explosions(void)
+{
+	int x, y, frx, fry, tox, toy, m, in;
+	
+	// Pandium arena
+	frx = PANDI_X1; fry = PANDI_Y1; tox = PANDI_X2; toy = PANDI_Y2;
+	for (x = frx; x <= tox; x++) for (y = fry; y <= toy; y++)
+	{
+		m = x + y * MAPX;
+		if (((in = map[m].it)!=0) && it[in].driver==124)
+		{
+			expire_explosion(in);
+		}
+	}
+}
+
 void item_tick_gc(void)
 {
 	static int off = 0, cnt = 0;
@@ -9027,6 +9284,7 @@ void item_tick(void)
 	
 	for (n=0;n<EXP_RATE;n++) item_tick_expire();
 	item_tick_gc();
+	item_tick_explosions();
 }
 
 void trap1(int cn, int in)
@@ -9393,7 +9651,7 @@ int step_portal_arena(int cn, int in)
 		do_char_log(cn, 1, "A winner! You gain one arena-rank!\n");
 		ch[cn].data[22]++;
 		ch[cn].data[23] = 1;
-		money = (ch[cn].data[22]+1)*(ch[cn].data[22]+1)*67;
+		money = ch[cn].data[22]*(ch[cn].data[22]+1)*71;
 		ch[cn].gold += money;
 		do_char_log(cn, 2, "You received %dG %dS.\n", money / 100, money % 100);
 		return 1;
@@ -9436,7 +9694,7 @@ int step_portal_arena(int cn, int in)
 		do_char_log(cn, 1, "Please tell the gods that the arena isn't working.\n");
 		return -1;
 	}
-	boost_char(co, 6);
+	boost_char(co, 2);
 
 	ch[co].data[64] = globs->ticker + TICKS * 60 * 5;
 
@@ -9446,6 +9704,75 @@ int step_portal_arena(int cn, int in)
 
 	ch[cn].data[23] = 0;
 
+	return 1;
+}
+
+int step_portal_pandium(int cn, int in)
+{
+	int nr, co, in2, n, flag = 0, p=0;
+	int xs, ys, xe, ye, x, y;
+	
+	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==2953) // Note of Admission
+	{
+		use_consume_item(cn, in2, 1);
+		flag = 1;
+	}
+	for (n = 0; n<40; n++)
+	{
+		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==2953) // Note of Admission
+		{
+			flag = 1;
+			use_consume_item(cn, in2, 1);
+		}
+	}
+	if (flag && ch[cn].pandium_floor[0]==0)
+	{
+		ch[cn].pandium_floor[0] = ch[cn].pandium_floor[1] = 1;
+		do_char_log(cn, 9, "You are deemed worthy of entry, forevermore.\n");
+	}
+	
+	if (ch[cn].pandium_floor[0]>0)
+	{
+		flag = 1;
+	}
+	
+	if (!flag)
+	{
+		do_char_log(cn, 0, "You are not yet worthy of entry.\n");
+		return -1;
+	}
+	
+	xs = it[in].data[0] % MAPX;
+	ys = it[in].data[0] / MAPX;
+	xe = it[in].data[1] % MAPX;
+	ye = it[in].data[1] / MAPX;
+	
+	for (x = xs; x<=xe; x++)
+	{
+		for (y = ys; y<=ye; y++)
+		{
+			if (map[x + y * MAPX].ch)
+			{
+				p++;
+			}
+			if (p>=3)
+			{
+				do_char_log(cn, 0, "The waiting room is full (3/3). Please come back later.\n");
+				return -1;
+			}
+		}
+	}
+	x = it[in].x;
+	y = it[in].y+1;
+	if (co = map[x + y * MAPX].ch) quick_teleport(co, x-1+RANDOM(3), y+1+RANDOM(3));
+	if (co = map[x + y * MAPX].ch) quick_teleport(co, x-1+RANDOM(3), y+1+RANDOM(3));
+	if (co = map[x + y * MAPX].ch) quick_teleport(co, x-1+RANDOM(3), y+1+RANDOM(3));
+	if (co = map[x + y * MAPX].ch)
+	{
+		do_char_log(cn, 0, "Seems someone's in the way. Please ask them to kindly move their heiny and try again.\n");
+		return -1;
+	}
+	
 	return 1;
 }
 
@@ -9480,21 +9807,29 @@ int step_teleport_silent(int cn, int in)
 							|| (can_go(x, y, x, y - 1) && god_drop_char(cn, x, y - 1)) ) )
 	{
 		ch[cn].dir    = d;
-		ch[cn].tox    = (unsigned short)(x+(d==2?1:(d==1?-1:0)));
-		ch[cn].toy    = (unsigned short)(y+(d==3?1:(d==4?-1:0)));
-		ch[cn].goto_x = (unsigned short)(x+(d==2?2:(d==1?-2:0)));
-		ch[cn].goto_y = (unsigned short)(y+(d==3?2:(d==4?-2:0)));
+		ch[cn].tox    = (unsigned short)(x+(d==1?1:(d==2?-1:0)));
+		ch[cn].toy    = (unsigned short)(y+(d==4?1:(d==3?-1:0)));
+		ch[cn].goto_x = (unsigned short)(x+(d==1?2:(d==2?-2:0)));
+		ch[cn].goto_y = (unsigned short)(y+(d==4?2:(d==3?-2:0)));
 		ret = 1;
 	}
 	
 	if (ret)
 	{
-		if (IS_SANECHAR(gc) && ch[gc].data[CHD_MASTER]==cn) god_transfer_char(gc, x+(d==2?-2:(d==1?2:0)), y+(d==3?-2:(d==4?2:0)));
-		if (IS_SANECHAR(sc) && ch[sc].data[CHD_MASTER]==cn) god_transfer_char(sc, x+(d==2?-2:(d==1?2:0)), y+(d==3?-2:(d==4?2:0)));
+		if (IS_SANECHAR(gc) && ch[gc].data[CHD_MASTER]==cn) god_transfer_char(gc, x+(d==1?-2:(d==2?2:0)), y+(d==4?-2:(d==3?2:0)));
+		if (IS_SANECHAR(sc) && ch[sc].data[CHD_MASTER]==cn) god_transfer_char(sc, x+(d==1?-2:(d==2?2:0)), y+(d==4?-2:(d==3?2:0)));
 		return 2;
 	}
 	
 	plr_map_set(cn);
+	
+	// experimental cleaning - might cause lag but maybe not since it's a small area
+	build_clean_lights(x-7, y-7, x+7, y+7);
+	
+	x = it[in].x;
+	y = it[in].y;
+	
+	build_clean_lights(x-7, y-7, x+7, y+7);
 	
 	return -1;
 }
@@ -9526,7 +9861,7 @@ int step_teleport(int cn, int in)
 	for (j = 0; j<ARRAYSIZE(loc_off); j++)
 	{
 		m2 = m + loc_off[j];
-		if (map[m2].flags & MF_MOVEBLOCK)
+		if (map[m2].flags & (MF_MOVEBLOCK | MF_TAVERN | MF_DEATHTRAP | MF_NOPLAYER))
 		{
 			continue;
 		}
@@ -9539,10 +9874,6 @@ int step_teleport(int cn, int in)
 			continue;
 		}
 		if ((in = map[m2].it)!=0 && (it[in].flags & IF_MOVEBLOCK))
-		{
-			continue;
-		}
-		if (map[m2].flags & (MF_TAVERN | MF_DEATHTRAP))
 		{
 			continue;
 		}
@@ -9600,7 +9931,7 @@ int use_toxic(int cn, int in)
 	bu[in2].active = bu[in2].duration = 1;
 	bu[in2].flags  = IF_SPELL | IF_PERMSPELL;
 	bu[in2].temp = it[in].temp;
-	bu[in2].sprite[1] = BUF_SPR_VENOM;
+	bu[in2].sprite[1] = 1015;
 
 	add_spell(cn, in2);
 
@@ -9682,6 +10013,9 @@ int step_driver(int cn, int in)
 			break;
 		case 123:
 			ret = step_teleport_silent(cn, in);
+			break;
+		case 126:
+			ret = step_portal_pandium(cn, in);
 			break;
 		default:
 			xlog("unknown step driver %d for item %s (%d)", it[in].driver, it[in].name, in);

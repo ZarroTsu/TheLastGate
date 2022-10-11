@@ -71,11 +71,12 @@
 /* *** CHARACTERS *** */
 
 // Sanity checks on character numbers
-#define IS_SANECHAR(cn)     ((cn) > 0 && (cn) < MAXCHARS)
-#define IS_LIVINGCHAR(cn)   (IS_SANECHAR(cn) && ch[(cn)].used != USE_EMPTY)
-#define IS_ACTIVECHAR(cn)   (IS_SANECHAR(cn) && ch[(cn)].used == USE_ACTIVE)
-#define IS_USEDCHAR(cn)     (IS_USED(ch[(cn)]))
-#define IS_SANEUSEDCHAR(cn) (IS_SANECHAR(cn) && IS_USEDCHAR(cn))
+#define IS_SANECHAR(cn)     	((cn) > 0 && (cn) < MAXCHARS)
+#define IS_LIVINGCHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used != USE_EMPTY)
+#define IS_ACTIVECHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used == USE_ACTIVE)
+#define IS_USEDCHAR(cn)     	(IS_USED(ch[(cn)]))
+#define IS_SANEUSEDCHAR(cn) 	(IS_SANECHAR(cn) && IS_USEDCHAR(cn))
+#define IS_ALIVEMASTER(cn, co)	(ch[(cn)].data[CHD_MASTER]==(co) && !(ch[(cn)].flags & CF_BODY) && ch[(cn)].used!=USE_EMPTY)
 
 // flag checks
 #define IS_PLAYER(cn)			((ch[(cn)].flags & CF_PLAYER) != 0)

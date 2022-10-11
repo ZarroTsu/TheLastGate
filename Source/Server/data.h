@@ -115,12 +115,11 @@ struct global
 #define MF_TAVERN     (1ULL<<7)
 #define MF_NOMAGIC    (1ULL<<8)
 #define MF_DEATHTRAP  (1ULL<<9)
+#define MF_NOPLAYER   (1ULL<<10)
+#define MF_ARENA      (1ULL<<11)
 
-#define MF_ARENA (1ULL<<11)
-
-#define MF_NOEXPIRE (1ULL<<13)
-/* CS, 991204: NOFIGHT */
-#define MF_NOFIGHT (1Ull<<14)
+#define MF_NOEXPIRE   (1ULL<<13)
+#define MF_NOFIGHT    (1Ull<<14)
 
 // plus 32 bits for dynamic flags
 #define MF_GFX_INJURED  (1ULL<<32)
@@ -268,6 +267,7 @@ extern unsigned int mapmarker;
 
 #define AT_CAP				300
 #define SPEED_CAP 			300
+#define C_AT_CAP(cn, n)		(AT_CAP + ch[(cn)].limit_break[(n)][0] + ch[(cn)].limit_break[(n)][1])
 
 #define PROX_MULTI		(AT_CAP/ 2)
 #define PROX_CAP		(AT_CAP/10) // 12
@@ -383,7 +383,8 @@ extern unsigned int mapmarker;
 #define SK_IMMOLATE2	45
 #define SK_FROSTB		52
 #define SK_SLOW3		53
-
+#define SK_OPPRESSION	54
+#define SK_OPPRESSED	55
 
 
 /*
@@ -599,7 +600,10 @@ struct character
 	unsigned short dmg_bonus;		// Damage multiplier. Factor of 1:100, where 10000 is the median 100% dealt value.
 	unsigned short dmg_reduction;	// Damage reduction.  Factor of 1:100, where 10000 is the median 100% taken value.
 	
-	char future2[38];				// space for future expansion
+	char limit_break[6][2];			// [0]-[4] for BWAIS, [5] for all skills; [0] is base, [1] for effects from items or (de)buffs
+	unsigned char pandium_floor[3];	// [0] = Solo  [1] = Group  [2] = reward tier obtained
+	
+	char future2[23];				// space for future expansion
 
 	unsigned int depot[62];
 

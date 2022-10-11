@@ -12,7 +12,7 @@
 
 int can_drop(int m)
 {
-	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & MF_MOVEBLOCK) || (map[m].flags & MF_DEATHTRAP) || map[m].fsprite)
+	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & (MF_MOVEBLOCK | MF_DEATHTRAP | MF_NOPLAYER)) || map[m].fsprite)
 	{
 		return 0;
 	}
@@ -261,6 +261,10 @@ void effect_tick(void)
 						{
 							flag = 1;
 						}
+						if (ch[co].temp == CT_PANDIUM)
+						{
+							flag = 0;
+						}
 
 						if (flag)
 						{
@@ -282,6 +286,8 @@ void effect_tick(void)
 								// Eyeball kings take extra time to respawn
 								if (IS_LONG_RESPAWN(temp))
 									rtimer = TICKS * 60 * 16 + RANDOM(TICKS * 60 * 4); // 16 - 20 minutes
+								else if (temp == CT_PANDIUM)
+									rtimer = TICKS * 5;
 								fx_add_effect(2, rtimer, ch_temp[temp].x, ch_temp[temp].y, temp);
 								xlog("respawn %d (%s): YES", co, ch[co].name);
 								ch[co].flags |= CF_SENSE;

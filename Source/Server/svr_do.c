@@ -1072,7 +1072,11 @@ void do_trash(int cn)
 
 void do_swap_gear(int cn)
 {
-	int n, in, in2;
+	int n, in, in2, flag=0;
+	
+	if (it[ch[cn].worn[WN_RHAND]].temp==IT_WP_RISINGPHO || it[ch[cn].worn[WN_RHAND]].orig_temp==IT_WP_RISINGPHO ||
+		it[ch[cn].worn[WN_LHAND]].temp==IT_WP_RISINGPHO || it[ch[cn].worn[WN_LHAND]].orig_temp==IT_WP_RISINGPHO)
+		flag = 1;
 	
 	for (n=0; n<12; n++)
 	{
@@ -1086,6 +1090,14 @@ void do_swap_gear(int cn)
 		
 		ch[cn].worn[n] = in;
 		ch[cn].alt_worn[n] = in2;
+	}
+	
+	if (it[ch[cn].worn[WN_RHAND]].temp!=IT_WP_RISINGPHO && it[ch[cn].worn[WN_RHAND]].orig_temp!=IT_WP_RISINGPHO && 
+		it[ch[cn].worn[WN_LHAND]].temp!=IT_WP_RISINGPHO && it[ch[cn].worn[WN_LHAND]].orig_temp!=IT_WP_RISINGPHO &&
+		flag && has_buff(cn, SK_IMMOLATE))
+	{
+		do_char_log(cn, 1, "Immolate no longer active.\n");
+		remove_buff(cn, SK_IMMOLATE);
 	}
 	
 	do_char_log(cn, 1, "You swapped your worn gear set.\n");
@@ -2672,7 +2684,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole3[23], "Lab VIII, Underwater Go",  44200);
 	m = display_pole(cn, flag, page, m, pole1[21], "Southern Swamp",           45000);
 	m = display_pole(cn, flag, page, m, pole4[20], "Jungle Pentagram Quest",   45000);
-//	m = display_pole(cn, flag, page, m, pole5[14], "Hollow Trench",            48000);
+	m = display_pole(cn, flag, page, m, pole5[14], "Hollow Trench",            48000);
 	m = display_pole(cn, flag, page, m, pole2[ 1], "Gargoyle Nest",            50000);
 	m = display_pole(cn, flag, page, m, pole1[23], "Crumbling Cathedral",      50000);
 	m = display_pole(cn, flag, page, m, pole4[21], "Jungle Pentagram Quest",   50000);
@@ -2720,7 +2732,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole4[29], "Sea Pentagram Quest",     100000);
 	m = display_pole(cn, flag, page, m, pole5[11], "Platinum Mines II",       105000);
 	m = display_pole(cn, flag, page, m, pole4[30], "Onyx Pentagram Quest",    110000);
-//	m = display_pole(cn, flag, page, m, pole5[13], "Smuggler's Hovel",        112000);
+	m = display_pole(cn, flag, page, m, pole5[13], "Smuggler's Hovel",        112000);
 	m = display_pole(cn, flag, page, m, pole2[31], "Underground III",         120000);
 	m = display_pole(cn, flag, page, m, pole2[ 6], "Ice Gargoyle Nest",       120000);
 	m = display_pole(cn, flag, page, m, pole5[ 0], "Seagrel King's Quarters", 120000);
@@ -2730,14 +2742,14 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole2[11], "Tower X",                 125000);
 	m = display_pole(cn, flag, page, m, pole5[12], "Merlin's Laboratory",     128000);
 	m = display_pole(cn, flag, page, m, pole2[10], "Black Stronghold Baseme", 130000);
-//	m = display_pole(cn, flag, page, m, pole5[15], "Cold Cavern",             136000);
-//	m = display_pole(cn, flag, page, m, pole5[16], "Seppuku House",           148000);
+	m = display_pole(cn, flag, page, m, pole5[15], "Cold Cavern",             136000);
+	m = display_pole(cn, flag, page, m, pole5[16], "Seppuku House",           148000);
 	m = display_pole(cn, flag, page, m, pole1[29], "The Emerald Palace",      150000);
 	m = display_pole(cn, flag, page, m, pole1[31], "Onyx Gargoyle Nest",      160000);
+	m = display_pole(cn, flag, page, m, pole5[17], "The Obsidian Fortress",   200000);
 	m = display_pole(cn, flag, page, m, pole2[12], "Tower XX",                275000);
 	m = display_pole(cn, flag, page, m, pole2[13], "Abyss X",                 600000);
 	//
-//	m = display_pole(cn, flag, page, m, pole5[17], "", 0);
 //	m = display_pole(cn, flag, page, m, pole5[18], "", 0);
 //	m = display_pole(cn, flag, page, m, pole5[19], "", 0);
 //	m = display_pole(cn, flag, page, m, pole5[20], "", 0);
@@ -2774,11 +2786,12 @@ int display_quest(int cn, int flag, int page, int m, int req, int quest, int ran
 void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 {
 	int n, m, t, page = 1, ex = 0;
-	int ast = 1, liz = 0, nei = 0, ars = 0;
+	int ast = 1, liz = 0, nei = 0, ars = 0, arc = 0;
 	int quest1[26]={0};
 	int quest2[32]={0}; // ch[cn].data[72]
 	int quest3[32]={0}; // ch[cn].data[94]
 	int questP[32]={0}; // ch[cn].data[20]
+	int questZ[ 6]={0}; // ch[cn].pandium_floor[2]
 	
 	if (strcmp(topic, "2")==0) page = 2;
 	if (strcmp(topic, "3")==0) page = 3;
@@ -2825,10 +2838,16 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 		if (ch[cn].data[20] >= n) 		questP[n] = 1;
 	}
 	if (IS_ANY_ARCH(cn)) questP[13] = 1;
+	for (n=0;n<5;n++)
+	{
+		if (ch[cn].pandium_floor[2]>n) questZ[n] = 1;
+	}
+	if (ch[cn].pandium_floor[0]>=99 || ch[cn].pandium_floor[1]>=99) questZ[6] = 1;
 	
 	if (ch[cn].temple_x==HOME_START_X && !quest2[ 0]) ast = 0;
 	if ((ch[cn].waypoints&(1<<7))     ||  quest2[25]) liz = 1;
 	if ((ch[cn].waypoints&(1<<10))    ||  quest3[ 2]) nei = 1;
+	if ((ch[cn].waypoints&(1<<26))    ||  questZ[ 0]) arc = 1;
 
 	do_char_log(cn, 1, "Now listing available quests (PAGE %d):\n", page);
 	do_char_log(cn, 1, " \n");
@@ -2926,21 +2945,29 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_quest(cn, flag, page, m, liz, quest2[26], 16, "Tsulu",    "Settlement",   "Amulet",    90000);
 	m = display_quest(cn, flag, page, m, liz, quest2[27], 16, "Shafira",  "Settlement",   "Amulet",    90000);
 	//
-	m = display_quest(cn, flag, page, m,!nei, quest3[ 2], 15, "???",      "Neiseer",      "???",      100000);
+	m = display_quest(cn, flag, page, m,!nei, quest3[ 2], 16, "???",      "Neiseer",      "???",      100000);
 	//
 	m = display_quest(cn, flag, page, m, nei, quest3[ 2], 16, "Brenna",   "Victory Road", "DualSwor", 100000); // #135
-//	m = display_quest(cn, flag, page, m, nei, quest3[ 3], 17, "Jasper",   "Ravaged Prai", "Tarot",    125000); // #137
-	m = display_quest(cn, flag, page, m, nei, quest3[ 2], 17, "Wicker",   "Warlock Way",  "Scroll",   135000); // #136
+	m = display_quest(cn, flag, page, m, nei, quest3[ 4], 17, "Jasper",   "Ravaged Prai", "Tarot",    125000); // #137
+	m = display_quest(cn, flag, page, m, nei, quest3[ 3], 17, "Wicker",   "Warlock Way",  "Scroll",   135000); // #136
 	m = display_quest(cn, flag, page, m, liz, quest2[28], 17, "Dracus",   "Settlement",   "Amulet",   150000);
 	m = display_quest(cn, flag, page, m, liz, quest2[30], 17, "Makira",   "Settlement",   "Belt",     150000);
 	m = display_quest(cn, flag, page, m, ast, quest2[20], 18, "Blanche",  "Bulwark Aven", "Cloak",    150000);
-//	m = display_quest(cn, flag, page, m, nei, quest3[ 4], 18, "Soyala",   "Last Avenue",  "Tarot",    160000); // #138
+	m = display_quest(cn, flag, page, m, nei, quest3[ 5], 18, "Soyala",   "Last Avenue",  "Tarot",    160000); // #138
 	m = display_quest(cn, flag, page, m, liz, quest2[31], 18, "Vora",     "Settlement",   "Belt",     175000);
-//	m = display_quest(cn, flag, page, m, nei, quest3[ 5], 19, "Runa",     "Last Avenue",  "Belt",     175000); // #139
-//	m = display_quest(cn, flag, page, m, nei, quest3[ 6], 19, "Zephan",   "Last Avenue",  "Belt",     180000); // #140
+	m = display_quest(cn, flag, page, m, nei, quest3[ 6], 19, "Runa",     "Last Avenue",  "Belt",     175000); // #139
+	m = display_quest(cn, flag, page, m, nei, quest3[ 7], 19, "Zephan",   "Last Avenue",  "Belt",     180000); // #140
 	m = display_quest(cn, flag, page, m, liz, quest2[29], 19, "Rassa",    "Settlement",   "Cloak",    225000);
 	//
-//	m = display_quest(cn, flag, page, m, , quest3[ 7], 0, "", "", "", 0);
+	m = display_quest(cn, flag, page, m,!arc,        questZ[ 0], 24, "???",      "Burning Plai", "???",    0);
+	//
+	m = display_quest(cn, flag, page, m, arc,        questZ[ 0], 24, "Pandium",  "The Archon", "Depth  1", 0);
+	m = display_quest(cn, flag, page, m, questZ[ 0], questZ[ 1], 24, "Pandium",  "The Archon", "Depth  5", 0);
+	m = display_quest(cn, flag, page, m, questZ[ 1], questZ[ 2], 24, "Pandium",  "The Archon", "Depth 10", 0);
+	m = display_quest(cn, flag, page, m, questZ[ 2], questZ[ 3], 24, "Pandium",  "The Archon", "Depth 20", 0);
+	m = display_quest(cn, flag, page, m, questZ[ 3], questZ[ 4], 24, "Pandium",  "The Archon", "Depth 50", 0);
+	m = display_quest(cn, flag, page, m, questZ[ 4], questZ[ 5], 24, "Pandium",  "The Archon", "Depth 99", 0);
+	//
 //	m = display_quest(cn, flag, page, m, , quest3[ 8], 0, "", "", "", 0);
 //	m = display_quest(cn, flag, page, m, , quest3[ 9], 0, "", "", "", 0);
 //	m = display_quest(cn, flag, page, m, , quest3[10], 0, "", "", "", 0);
@@ -6160,9 +6187,9 @@ void set_attrib_score(int cn, int z, int n)
 	{
 		n = 1;
 	}
-	else if (n>AT_CAP)
+	else if (n>C_AT_CAP(cn, z))
 	{
-		n = AT_CAP;
+		n = C_AT_CAP(cn, z);
 	}
 	
 	ch[cn].attrib[z][4] = (n >> 8) & 0xFF;
@@ -6182,9 +6209,9 @@ void set_skill_score(int cn, int z, int n)
 	{
 		n = 1;
 	}
-	else if (n>AT_CAP)
+	else if (n>C_AT_CAP(cn, 5))
 	{
-		n = AT_CAP;
+		n = C_AT_CAP(cn, 5);
 	}
 	
 	ch[cn].skill[z][4] = (n >> 8) & 0xFF;
@@ -6199,7 +6226,7 @@ int get_fight_skill(int cn, int skill[50])
 	
 	if (!in)
 	{
-		return min(AT_CAP, skill[SK_HAND]);
+		return min(C_AT_CAP(cn, 5), skill[SK_HAND]);
 	}
 	
 	if (it[in].temp==IT_TW_HEAVENS || it[in].orig_temp==IT_SEYANSWORD) // Rather than pick the matching skill, pick the highest available one
@@ -6211,52 +6238,52 @@ int get_fight_skill(int cn, int skill[50])
 		m[4] = skill[SK_STAFF];
 		m[5] = skill[SK_TWOHAND];
 		for (n = 1; n < 6; ++n) if (m[0] < m[n]) m[0] = m[n];
-		return min(AT_CAP, m[0]);
+		return min(C_AT_CAP(cn, 5), m[0]);
 	}
 	
 	if (it[in].flags & IF_WP_CLAW) 
 	{
-		return min(AT_CAP, skill[SK_HAND]);
+		return min(C_AT_CAP(cn, 5), skill[SK_HAND]);
 	}
 
 	if (it[in].flags & IF_WP_SWORD)
 	{
-		return min(AT_CAP, skill[SK_SWORD]);
+		return min(C_AT_CAP(cn, 5), skill[SK_SWORD]);
 	}
 	
 	if ((it[in].flags & IF_WP_DAGGER) && (it[in].flags & IF_WP_STAFF)) // Spear
 	{
-		return min(AT_CAP, skill[SK_DAGGER] > skill[SK_STAFF] ? skill[SK_DAGGER] : skill[SK_STAFF]);
+		return min(C_AT_CAP(cn, 5), skill[SK_DAGGER] > skill[SK_STAFF] ? skill[SK_DAGGER] : skill[SK_STAFF]);
 	}
 	
 	if (it[in].flags & IF_WP_DAGGER)
 	{
-		return min(AT_CAP, skill[SK_DAGGER]);
+		return min(C_AT_CAP(cn, 5), skill[SK_DAGGER]);
 	}
 	if (it[in].flags & IF_WP_STAFF)
 	{
-		return min(AT_CAP, skill[SK_STAFF]);
+		return min(C_AT_CAP(cn, 5), skill[SK_STAFF]);
 	}
 	
 	if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND)) // Greataxe
 	{
-		return min(AT_CAP, skill[SK_AXE] > skill[SK_TWOHAND] ? skill[SK_AXE] : skill[SK_TWOHAND]);
+		return min(C_AT_CAP(cn, 5), skill[SK_AXE] > skill[SK_TWOHAND] ? skill[SK_AXE] : skill[SK_TWOHAND]);
 	}
 	if (it[in].flags & IF_WP_AXE)
 	{
-		return min(AT_CAP, skill[SK_AXE]);
+		return min(C_AT_CAP(cn, 5), skill[SK_AXE]);
 	}
 	if (it[in].flags & IF_WP_TWOHAND)
 	{
-		return min(AT_CAP, skill[SK_TWOHAND]);
+		return min(C_AT_CAP(cn, 5), skill[SK_TWOHAND]);
 	}
 	
 	if (it[in].flags & IF_OF_SHIELD)
 	{
-		return min(AT_CAP, skill[SK_SHIELD]);
+		return min(C_AT_CAP(cn, 5), skill[SK_SHIELD]);
 	}
 
-	return min(AT_CAP, skill[SK_HAND]);
+	return min(C_AT_CAP(cn, 5), skill[SK_HAND]);
 }
 
 // Combat Mastery, Dual Wield and Shield skill checks
@@ -6266,7 +6293,7 @@ int get_combat_skill(int cn, int skill[50], int flag)
 
 	if (flag>0)
 	{
-		power = min(AT_CAP, skill[SK_DUAL]);
+		power = min(C_AT_CAP(cn, 5), skill[SK_DUAL]);
 		
 		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn) || IS_BRAVER(cn))
 		{
@@ -6283,7 +6310,7 @@ int get_combat_skill(int cn, int skill[50], int flag)
 	}
 	else
 	{
-		power = min(AT_CAP, skill[SK_SHIELD]);
+		power = min(C_AT_CAP(cn, 5), skill[SK_SHIELD]);
 		
 		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn) || IS_BRAVER(cn))
 		{
@@ -6754,6 +6781,72 @@ void do_char_killed(int cn, int co, int pentsolve)
 	
 	// Un-wedge doors
 	if (!IS_PLAYER(co) && (ch[co].data[26])) npc_wedge_doors(ch[co].data[26], 0);
+	
+	// Special case for Pandium
+	if (co && ch[co].temp==CT_PANDIUM)
+	{
+		grouped = 0;
+		for (n=0;n<3;n++)
+		{
+			if (IS_LIVINGCHAR(cc = ch[co].data[7+n]) && IS_PLAYER(cc) && is_atpandium(cc)) 
+				grouped++;
+		}
+		
+		if (grouped)
+		{
+			char message[4][120];
+			tmp = ch[co].data[1];
+			for (n=0;n<grouped;n++) 
+			{
+				if (IS_LIVINGCHAR(cc = ch[co].data[7+n]) && IS_PLAYER(cc) && is_atpandium(cc))
+				{
+					remove_buff(cc, SK_OPPRESSED);
+					if (grouped==1)
+					{
+						ch[cc].pandium_floor[0] = max(ch[cc].pandium_floor[0], tmp+1);
+					}
+					else
+					{
+						ch[cc].pandium_floor[1] = max(ch[cc].pandium_floor[1], tmp+1);
+					}
+					switch (n)
+					{
+						case  2:
+							spawn_pandium_rewards(cc, tmp, 283, 959);
+							quick_teleport(cc, 283, 955);
+							break;
+						case  1:
+							spawn_pandium_rewards(cc, tmp, 273, 959);
+							quick_teleport(cc, 273, 955);
+							break;
+						default:
+							spawn_pandium_rewards(cc, tmp, 293, 959);
+							quick_teleport(cc, 293, 955);
+							break;
+					}
+					if (tmp==99)
+						do_char_log(cc, 9, "Pandium: \"Claim your crown.\"\n");
+					else if (tmp==1 || tmp==5 || tmp==10 || tmp==20 || tmp==50)
+						do_char_log(cc, 7, "Pandium: \"May we grow ever stronger.\"\n");
+					else
+						do_char_log(cc, 3, "Pandium: \"Rise ever higher.\"\n");
+					if (tmp==99 || tmp==90 || tmp==80 || tmp==70 || tmp==60 || tmp==50 || tmp==40 || tmp==30 || tmp==20 || tmp==10)
+						sprintf(message[n], "%s", ch[cc].name);
+				}
+			}
+			if (tmp==99 || tmp==90 || tmp==80 || tmp==70 || tmp==60 || tmp==50 || tmp==40 || tmp==30 || tmp==20 || tmp==10)
+			{
+				if (grouped == 3)
+					sprintf(message[3], "%s, %s, and %s defeated The Archon Pandium at depth %d!", message[0], message[1], message[2], tmp);
+				else if (grouped == 2)
+					sprintf(message[3], "%s and %s defeated The Archon Pandium at depth %d!", message[0], message[1], tmp);
+				else
+					sprintf(message[3], "%s defeated The Archon Pandium at depth %d!", message[0], tmp);
+				if (globs->flags & GF_DISCORD) discord_ranked(message[3]);
+			}
+		}
+		grouped = 0;
+	}
 
 	// a player killed someone or something.
 	if (cn && cn!=co && (ch[cn].flags & (CF_PLAYER)) && !(mf & MF_ARENA))
@@ -7064,7 +7157,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 	wimp = 0;
 	tmpg = 0;
 
-	if (mf & MF_ARENA)
+	if ((mf & MF_ARENA) || is_atpandium(co))
 	{
 		// Arena death : full save, keep everything
 		wimp = 2;
@@ -7509,6 +7602,20 @@ int do_char_can_flee(int cn)
 		remove_enemy(cn);
 		return 1; 
 	}
+	chance = 0;
+	for (m = 0; m<4; m++)
+	{
+		if ((co = ch[cn].enemy[m])!=0 && (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW))
+		{
+			ch[cn].enemy[m] = 0;
+			chance = 1;
+		}
+	}
+	if (chance) 
+	{ 
+		remove_enemy(cn);
+		return 1; 
+	}
 	if (ch[cn].escape_timer || get_enchantment(cn, 46) || IS_COMP_TEMP(cn)) return 0;
 
 	per  = 0;
@@ -7791,7 +7898,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, phalanx = 0, aggravate = 0;
 	int offpot = 0, defpot = 0;
 	int thorns, crit_dam = 0;
-
+	
 	mf = map[ch[co].x + ch[co].y * MAPX].flags;
 	if (cn)
 	{
@@ -7871,13 +7978,21 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
+	// Easy new method!
+	if (cn) dam = dam * ch[cn].dmg_bonus / 10000;
+	
 	if (type==3)
 	{
+		dam = dam * ch[co].dmg_reduction / 10000;
 		dam *= DAM_MULT_THORNS; 						// Thorns
 	}
 	else
 	{
 		dam -= ch[co].armor;
+		
+		// Easy new method!
+		dam = dam * ch[co].dmg_reduction / 10000;
+		
 		if (dam<0) dam = 0;
 		else
 		{
@@ -7893,10 +8008,6 @@ int do_hurt(int cn, int co, int dam, int type)
 			}
 		}
 	}
-	
-	// Easy new method!
-	dam = dam * ch[cn].dmg_bonus / 10000;
-	dam = dam * ch[co].dmg_reduction / 10000;
 	
 	if (get_enchantment(co, 35) && !RANDOM(5))
 		dam /= 2;
@@ -8607,7 +8718,8 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 			surrDam = odam/4*3 + crit_dam/2;
 			glv 	= glv_base/4*3;
 			
-			if (surround==1 && (IS_SEYA_OR_ARTM(cn) || get_gear(cn, IT_WP_CROSSBLAD)) && !(ch[cn].flags & CF_AREA_OFF))
+			if (surround==1 && (IS_SEYA_OR_ARTM(cn) || get_gear(cn, IT_WP_CROSSBLAD) || 
+				(IS_WARRIOR(cn) && B_SK(cn, SK_PROX))) && !(ch[cn].flags & CF_AREA_OFF))
 			{
 				int surraoe, x, y, xf, yf, xt, yt, xc, yc, obsi = 0, aoe_power;
 				double tmp_a, tmp_h, tmp_s, tmp_g;
@@ -8668,6 +8780,10 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 								if (in==IT_GL_BLVIPER) spell_frostburn(cn, co, glv);
 								if (in==IT_TW_DOUSER ) spell_blind(cn, co, glv, 1);
 								if (in==IT_TW_LUXURIA) spell_warcry(cn, co, glv, 1);
+							}
+							if (in2 && co!=co_orig && !get_tarot(cn, IT_CH_DEATH_R))
+							{
+								spell_zephyr(cn, co, bu[in2].power/2 + bu[in2].power/4, 1);
 							}
 						}
 					}
@@ -9047,7 +9163,7 @@ int do_char_can_see_item(int cn, int in)
 		d += (64 - light) * 3;
 	}
 
-	if (it[in].flags & IF_HIDDEN)
+	if ((it[in].flags & IF_HIDDEN) && !IS_BUILDING(cn))
 	{
 		d += it[in].data[9];
 	}
@@ -9137,6 +9253,7 @@ void really_update_char(int cn)
 	int hit_rate = 0, parry_rate = 0, loverSplit = 0;
 	int damage_top = 0, ava_crit = 0, ava_mult = 0;
 	int aoe = 0, dmg_bns = 10000, dmg_rdc = 10000, reduc_bonus = 0;
+	int suppression = 0;
 	
 	prof = prof_start();
 
@@ -9442,6 +9559,8 @@ void really_update_char(int cn)
 	maxlight += ch[cn].light_bonus;
 	light    += ch[cn].light_bonus;
 	
+	suppression = 0;
+	
 	// Check first for existing debuffs that conflict with other debuffs
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -9547,6 +9666,14 @@ void really_update_char(int cn)
 				ch[cn].stunned = 1;
 			}
 		}
+		if (bu[m].temp==SK_OPPRESSED && bu[m].power>0)
+		{
+			suppression = -(bu[m].power);
+		}
+		if (bu[m].temp==SK_OPPRESSION && bu[m].power>0 && ch[cn].temp == CT_PANDIUM)
+		{
+			suppression = bu[m].power;
+		}
 		
 		if (bu[m].temp==666 && bu[m].power==666) // Stunned for cutscene
 		{
@@ -9556,10 +9683,12 @@ void really_update_char(int cn)
 		if (bu[m].temp==SK_TAUNT)
 		{
 			ch[cn].taunted = bu[m].data[0];
+			if (ch[cn].temp==CT_PANDIUM) ch[cn].taunted = 0; // Special case for Pandium to ignore persistant aggro
 			
 			if (bu[m].active >= bu[m].duration-1) // Fresh taunt
 			{
 				ch[cn].attack_cn = bu[m].data[0];
+				
 			}
 		}
 
@@ -9631,8 +9760,11 @@ void really_update_char(int cn)
 			attrib[z] = (int)B_AT(cn, z) + (int)ch[cn].attrib[z][1] + attrib[z];
 		}
 	}
+	
 	for (z = 0; z<5; z++)
 	{
+		ch[cn].limit_break[z][1] = suppression;
+		
 		// Enchant: More attributes
 		if (z==0 && moreBrv) attrib[z] = attrib[z]*(100+moreBrv*4)/100;
 		if (z==1 && moreWil) attrib[z] = attrib[z]*(100+moreWil*4)/100;
@@ -9643,6 +9775,7 @@ void really_update_char(int cn)
 		
 		set_attrib_score(cn, z, attrib[z]);
 	}
+	ch[cn].limit_break[5][1] = suppression;
 	
 	// Weapon - Fist of the Heavens :: Doubles best attribute
 	if (gearSpec & 2)
@@ -9671,7 +9804,7 @@ void really_update_char(int cn)
 	{
 		hp = 10;
 	}
-	if (hp>999)
+	if (hp>999 && IS_PLAYER(cn))
 	{
 		reduc_bonus = 1000000/max(1, hp*1000/ 999);
 		dmg_rdc = dmg_rdc * reduc_bonus/1000;
@@ -10155,7 +10288,7 @@ void really_update_char(int cn)
 	// Weapon - Gildshine :: Bartering is granted as crit multi
 	if (gearSpec & 8) 
 	{
-		critical_m += min(AT_CAP, skill[SK_BARTER]*2);
+		critical_m += skill[SK_BARTER]*2;
 	}
 	
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
@@ -10461,15 +10594,18 @@ void do_immolate(int cn, int in)
 		{
 			continue;
 		}
-		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co))
+		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co) && cn!=co)
 		{
 			// Prevent from hurting enemies that don't want to hurt you atm
-			idx = cn | (char_id(cn) << 16);
-			for (nn = MCD_ENEMY1ST; nn<=MCD_ENEMYZZZ; nn++)
+			if (!IS_PLAYER(co))
 			{
-				if (ch[co].data[nn]==idx) break;
+				idx = cn | (char_id(cn) << 16);
+				for (nn = MCD_ENEMY1ST; nn<=MCD_ENEMYZZZ; nn++)
+				{
+					if (ch[co].data[nn]==idx) break;
+				}
+				if (nn==MCD_ENEMYZZZ+1) continue;
 			}
-			if (nn==MCD_ENEMYZZZ+1) continue;
 			//
 			if (do_surround_check(cn, co, 1)) 
 			{
@@ -10656,7 +10792,7 @@ void do_regenerate(int cn)
 	
 	if (ch[cn].stunned!=1)
 	{
-		switch(ch_base_status(ch[cn].status))
+		switch (ch_base_status(ch[cn].status))
 		{
 			// STANDING STATES
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
@@ -10997,15 +11133,18 @@ void do_regenerate(int cn)
 					bu[in].data[1] -= p / TICKS;
 					if (bu[in].data[1] > p)		bu[in].data[1] = p;
 					if (bu[in].data[1] < p / 2)	bu[in].data[1] = p / 2;
+					p = bu[in].data[1];
 					if (bu[in].temp==SK_SLOW)
 					{
-						bu[in].speed[1] 		= -(min(300, 10 + SLOWFORM(bu[in].data[1])));
+						if (get_enchantment(cn, 14)) p = p/5;
+						bu[in].speed[1] 		= -(min(300, 10 + SLOWFORM(p)));
 					}
 					else if (bu[in].temp==SK_CURSE2)
 					{
+						if (get_enchantment(cn, 21)) p = p/5;
 						for (m = 0; m<5; m++) 
 						{
-							bu[in].attrib[m][1] = -(2 + CURSE2FORM(bu[in].data[1], (4 - m)));
+							bu[in].attrib[m][1] = -(2 + CURSE2FORM(p, (4 - m)));
 						}
 					}
 					do_update_char(cn);
@@ -11046,10 +11185,10 @@ void do_regenerate(int cn)
 					ch[cn].a_hp -= degendam + gothp;
 				}
 				
-				tickcheck = 7500/max(1,degendam);
+				tickcheck = 7500/max(1,degendam*(ch[cn].flags & CF_EXTRAEXP)?2:1);
 				
-				if (ch[cn].flags & CF_EXTRAEXP)  tickcheck = tickcheck / 2;
-				if (ch[cn].flags & CF_EXTRACRIT) tickcheck = tickcheck / 3*2;
+				//if (ch[cn].flags & CF_EXTRAEXP)  tickcheck = tickcheck / 2;
+				//if (ch[cn].flags & CF_EXTRACRIT) tickcheck = tickcheck / 3*2;
 				
 				if (co && globs->ticker%tickcheck==0 && co!=cn && !(mf & MF_ARENA))
 				{
@@ -11364,6 +11503,7 @@ void do_regenerate(int cn)
 					ch[cn].misc_action = 0;
 					ch[cn].dir = DX_DOWN;
 					clear_map_buffs(cn, 0);
+					remove_buff(cn, SK_OPPRESSED);
 					
 					for (m = 0; m<4; m++) ch[cn].enemy[m] = 0;
 					remove_enemy(cn);
@@ -12743,7 +12883,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				killer = ch_temp[ch[co].data[15]].reference;
 			}
 
-			do_char_log(cn, 1, "%s died %d times, the last time on the day %d of the year %d, killed by %s %s.\n",
+			do_char_log(cn, 5, "%s died %d times, the last time on the day %d of the year %d, killed by %s %s.\n",
 			            ch[co].reference,
 			            ch[co].data[14],
 			            ch[co].data[16] % 300, ch[co].data[16] / 300,
@@ -12757,16 +12897,36 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 			            ch[co].reference,
 			            ch[co].data[44]);
 		}
+		
+		if ((ch[co].flags & (CF_PLAYER)) && (ch[co].pandium_floor[0]>1 || ch[co].pandium_floor[1]>1) && 
+			(!(ch[co].flags & CF_GOD) || (ch[cn].flags & CF_GOD)))
+		{
+			if (ch[co].pandium_floor[0]>1 && ch[co].pandium_floor[0]>=ch[co].pandium_floor[1])
+			{
+				do_char_log(cn, 9, "%s has defeated The Archon Pandium at depth %d.\n",
+			            ch[co].reference, ch[co].pandium_floor[0]-1);
+			}
+			else if (ch[co].pandium_floor[0]>1 && ch[co].pandium_floor[1]>1)
+			{
+				do_char_log(cn, 9, "%s has defeated The Archon Pandium at depth %d in a group, and at depth %d alone.\n",
+			            ch[co].reference, ch[co].pandium_floor[1]-1, ch[co].pandium_floor[0]-1);
+			}
+			else
+			{
+				do_char_log(cn, 9, "%s has defeated The Archon Pandium at depth %d in a group.\n",
+			            ch[co].reference, ch[co].pandium_floor[1]-1);
+			}
+		}
 
 		if ((ch[co].flags & (CF_PLAYER)) && (ch[co].flags & (CF_POH)))
 		{
 			if (ch[co].flags & CF_POH_LEADER)
 			{
-				do_char_log(cn, 0, "%s is a Leader among the Purples of Honor.\n", ch[co].reference);
+				do_char_log(cn, 8, "%s is a Leader among the Purples of Honor.\n", ch[co].reference);
 			}
 			else
 			{
-				do_char_log(cn, 0, "%s is a Purple of Honor.\n", ch[co].reference);
+				do_char_log(cn, 8, "%s is a Purple of Honor.\n", ch[co].reference);
 			}
 		}
 
@@ -13897,8 +14057,8 @@ int do_swap_item(int cn, int n)
 		it[ch[cn].worn[WN_NECK]].active = 0;
 	
 	// Deactivate Immolate when removing Rising Phoenix
-	if ((n==WN_RHAND && it[ch[cn].worn[WN_RHAND]].temp==IT_WP_RISINGPHO) || 
-		(n==WN_LHAND && it[ch[cn].worn[WN_LHAND]].temp==IT_WP_RISINGPHO))
+	if ((n==WN_RHAND && (it[ch[cn].worn[WN_RHAND]].temp==IT_WP_RISINGPHO || it[ch[cn].worn[WN_RHAND]].orig_temp==IT_WP_RISINGPHO)) || 
+		(n==WN_LHAND && (it[ch[cn].worn[WN_LHAND]].temp==IT_WP_RISINGPHO || it[ch[cn].worn[WN_LHAND]].orig_temp==IT_WP_RISINGPHO)))
 	{
 		if (has_buff(cn, SK_IMMOLATE))
 		{

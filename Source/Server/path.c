@@ -423,7 +423,7 @@ int pathfinder(int cn, int x1, int y1, int flag, int x2, int y2)
 	}
 	else
 	{
-		mapblock = MF_MOVEBLOCK;
+		mapblock = MF_MOVEBLOCK | MF_NOPLAYER;
 	}
 	if (!(ch[cn].flags & (CF_PLAYER | CF_USURP)) || get_enchantment(cn, 10))
 	{

@@ -117,7 +117,10 @@ void look_item_details(int cn, int in)
 			}
 			else if (it[in].flags & IF_SOULSTONE)
 			{
-				do_char_log(cn, 7, "Has been Soulstoned.\n");
+				if (it[in].driver==68)
+					do_char_log(cn, 6, "Has been Catalyzed.\n");
+				else
+					do_char_log(cn, 7, "Has been Soulstoned.\n");
 			}
 			else if (it[in].placement && !CAN_SOULSTONE(in))
 			{
@@ -129,7 +132,10 @@ void look_item_details(int cn, int in)
 			}
 			else if (it[in].flags & IF_ENCHANTED)
 			{
-				do_char_log(cn, 8, "Has been Enchanted.\n");
+				if (it[in].driver==68)
+					do_char_log(cn, 7, "Has been Focused.\n");
+				else
+					do_char_log(cn, 8, "Has been Enchanted.\n");
 			}
 			else if (it[in].placement && !CAN_ENCHANT(in))
 			{

@@ -483,6 +483,12 @@ void compute_dlight(int xc, int yc)
 		best = 256;
 	}
 	map[xc + yc * MAPX].dlight = best;
+	
+	// Pandium's arena center
+	if (xc==PANDI_MIDX && yc==PANDI_MIDY)
+	{
+		map[xc + yc * MAPX].dlight = 255;
+	}
 
 	prof_stop(18, prof);
 }
@@ -2349,9 +2355,10 @@ struct npc_class npc_class[] = {
 	{"Ijiraq"                   },	// 199
 	{"Smuggler"                 },	// 200
 	//
-	{""                     	},	// 201
-	{""                     	},	// 202
-	{""                     	},	// 203
+	{"Ashling"              	},	// 201
+	{"Devil" 					},	// 202
+	{"Glass Gargoyle"          	},	// 203
+	//
 	{""                     	},	// 204
 	{""                     	},	// 205
 	{""                     	},	// 206
@@ -3068,37 +3075,69 @@ void merge_soulstone(int cn, int in, int in2)
 			it[in].data[2] = min(it[in].data[2], it[in2].data[2]);
 		else
 			it[in].data[2] = it[in2].data[2];
+		it[in].flags |= IF_ENCHANTED | IF_UPDATE;
 	}
 }
 
-void make_catalyst(int cn, int n)
+int make_gskill(int cn)
+{
+	int in, v;
+	
+	if (!(in = god_create_item(IT_OS_SK)))
+	{
+		chlog(cn, "ERROR in make_gskill: god_create_item failure");
+		return 0;
+	}
+	
+	v = RANDOM(MAXSKILL);
+	
+	sprintf(it[in].name, "Greater Scroll of (%s)", skilltab[v].name);
+	sprintf(it[in].reference, "greater scroll of (%s)", skilltab[v].name);
+	
+	it[in].data[1] = v;
+	
+	if (!god_give_char(in, cn))
+	{
+		it[in].used = USE_EMPTY;
+		return 0;
+	}
+	// chlog(cn, "got g.skill");
+	return in;
+}
+
+int make_catalyst(int cn, int n)
 {
 	int in, v;
 	
 	if (!(in = god_create_item(IT_SOULCATAL)))
 	{
 		chlog(cn, "ERROR in make_catalyst: god_create_item failure");
-		return;
+		return 0;
 	}
 	
 	v = RANDOM(MAXSKILL);
 	
-	sprintf(it[in].name, "Soul Catalyst");
-	sprintf(it[in].reference, "soul catalyst");
+	sprintf(it[in].name, "Soul Catalyst (%s)", skilltab[v].name);
+	sprintf(it[in].reference, "soul catalyst (%s)", skilltab[v].name);
 	sprintf(it[in].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
 	
 	it[in].temp        = 0;
 	it[in].driver      = 93;
 	it[in].data[3]     = 2;
 	it[in].data[4]     = v+1;
-	it[in].flags      |= IF_IDENTIFIED;
-	it[in].flags      |= IF_STACKABLE;
+	it[in].flags      |= IF_IDENTIFIED | IF_STACKABLE;
 	it[in].skill[v][0] = 1;
 	it[in].skill[v][1] = 2;
 	
 	it[in].stack = max(1, n);
 	
-	god_give_char(in, cn);	// chlog(cn, "got soul catalyst");
+	if (!god_give_char(in, cn))
+	{
+		it[in].used = USE_EMPTY;
+		return 0;
+	}
+	// chlog(cn, "got soul catalyst");
+	return in;
 }
 
 void make_focus(int cn, int exp)
@@ -3360,7 +3399,7 @@ int do_soulcatalyst(int cn, int ins, int inc)
 		
 		it[ins].data[3] += it[ins].skill[n][1];
 	}
-	it[ins].flags |= IF_IDENTIFIED;
+	it[ins].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_UPDATE;
 	
 	return 1;
 }
@@ -3810,6 +3849,7 @@ int use_soulstone(int cn, int in, int in2)
 				it[in].data[2] = min(it[in].data[2], it[in2].data[0]);
 			else
 				it[in].data[2] = it[in2].data[0];
+			it[in].flags |= IF_ENCHANTED | IF_UPDATE;
 			chlog(cn, "used focus on soulstone");
 			use_consume_item(cn, in2, 1);
 			return 1;
@@ -3881,6 +3921,7 @@ int use_soulfocus(int cn, int in) // driver 92
 				it[in2].data[2] = min(it[in2].data[2], it[in].data[0]);
 			else
 				it[in2].data[2] = it[in].data[0];
+			it[in2].flags |= IF_ENCHANTED | IF_UPDATE;
 			chlog(cn, "used focus on soulstone");
 			use_consume_item(cn, in, 1);
 			return 1;
@@ -4755,7 +4796,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	ch[co].points_tot = pts;
 	
 	ch[co].gold   = 0;
-	ch[co].a_hp   = 999999;
+	ch[co].a_hp   = 9999999;
 	ch[co].a_end  = 999999;
 	ch[co].a_mana = 999999;
 	

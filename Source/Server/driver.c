@@ -310,6 +310,22 @@ int npc_remove_enemy(int npc, int enemy)
 	return(found);
 }
 
+void npc_remove_all_enemies(int npc)
+{
+	int n;
+	
+	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
+	{
+		ch[npc].data[n] = 0;
+	}
+	ch[npc].attack_cn = 0;
+	ch[npc].goto_x = 0;
+	ch[npc].goto_y = 0;
+	ch[npc].data[76] = 0;
+	ch[npc].data[77] = 0;
+	ch[npc].data[78] = 0;
+}
+
 /* say one of the NPC's canned response messages, with optional name. */
 void npc_saytext_n(int npc, int n, char *name)
 {
@@ -865,11 +881,12 @@ int npc_give(int cn, int co, int in, int money)
 		(ch[cn].temp==CT_HERBCOLL && 
 		(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD))
 		||
-		(ch[cn].temp==CT_HERBCOLL2 && 
-		(it[in].temp==IT_HERBE))
+		(ch[cn].temp==CT_HERBCOLL2 && it[in].temp==IT_HERBE)
 		||
 		(ch[cn].temp==CT_SCORPCOLL && 
 		(it[in].temp==IT_SCORL || it[in].temp==IT_SCORP || it[in].temp==IT_SCORG || it[in].temp==IT_SCORQ))
+		||
+		(ch[cn].temp==CT_ANTIQUECL && it[in].temp==IT_ANTIQ)
 		) && canlearn)
 	{
 		// Assure the player has inventory space before we do anything
@@ -1015,7 +1032,8 @@ int npc_give(int cn, int co, int in, int money)
 		else if ((ch[cn].temp==CT_HERBCOLL && 
 			(it[in].temp==IT_HERBA || it[in].temp==IT_HERBB || it[in].temp==IT_HERBC || it[in].temp==IT_HERBD)) || 
 			(ch[cn].temp==CT_HERBCOLL2 && it[in].temp==IT_HERBE) ||
-			(ch[cn].temp==CT_SCORPCOLL && (it[in].temp==IT_SCORL || it[in].temp==IT_SCORP || it[in].temp==IT_SCORG || it[in].temp==IT_SCORQ)))
+			(ch[cn].temp==CT_SCORPCOLL && (it[in].temp==IT_SCORL || it[in].temp==IT_SCORP || it[in].temp==IT_SCORG || it[in].temp==IT_SCORQ)) ||
+			(ch[cn].temp==CT_ANTIQUECL && it[in].temp==IT_ANTIQ) )
 		{
 			if ((ch[cn].temp==CT_HERBCOLL || ch[cn].temp==CT_SCORPCOLL) && getrank(co)<8)
 			{
@@ -1041,6 +1059,8 @@ int npc_give(int cn, int co, int in, int money)
 				case IT_SCORP: money =   1000*stsz; nr = money; break;
 				case IT_SCORG: money =   2500*stsz; nr = money*3/4; break;
 				case IT_SCORQ: money =  20000*stsz; nr = money*3; break;
+				
+				case IT_ANTIQ: money =   5000*stsz; nr = money; break;
 				
 				default: money = 1000*stsz; nr = money; break;
 			}
@@ -2951,7 +2971,7 @@ int npc_quaff_potion(int cn, int itemp, int stemp)
 	{
 		return 0;                                                             // no potion :(
 	}
-	do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The %s uses a %s.\n", ch[cn].name, it[in].name);
+	do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "%s drinks deep from a magical brew.\n", ch[cn].reference);
 
 	use_driver(cn, in, 1);
 
@@ -3100,6 +3120,21 @@ int is_incolosseum(int cn, int ln)
 	if ((ln == 0 || ln == 3) && x >= COLOS3_X1 && y >= COLOS3_Y1 && x <= COLOS3_X2 && y <= COLOS3_Y2) return 1; // Area 3
 	if ((ln == 0 || ln == 4) && x >= COLOS4_X1 && y >= COLOS4_Y1 && x <= COLOS4_X2 && y <= COLOS4_Y2) return 1; // Area 4
 	if ((ln == 0 || ln == 5) && x >= COLOS5_X1 && y >= COLOS5_Y1 && x <= COLOS5_X2 && y <= COLOS5_Y2) return 1; // Area 5
+	
+	return 0;
+}
+
+int is_atpandium(int cn)
+{
+	int x, y;
+	
+	if (!IS_SANECHAR(cn)) return 0;
+	if (!IS_ACTIVECHAR(cn)) return 0;
+	
+	x = ch[cn].x;
+	y = ch[cn].y;
+	
+	if (x >= PANDI_X1 && y >= PANDI_Y1 && x <= PANDI_X2 && y <= PANDI_Y2) return 1;
 	
 	return 0;
 }
@@ -4026,9 +4061,13 @@ void tell_incolosseum(int anum, char *msg)
 	for (n = 1; n<MAXCHARS; n++)
 	{
 		if (ch[n].used==USE_EMPTY) continue;
-		if (is_incolosseum(n, anum)) // || (IS_SANEPLAYER(player[n].spectating) && is_incolosseum(player[n].spectating, anum)))
+		if (anum<9 && is_incolosseum(n, anum)) // || (IS_SANEPLAYER(player[n].spectating) && is_incolosseum(player[n].spectating, anum)))
 		{
 			do_char_log(n, 3, "Announcer: \"%s\"\n", msg);
+		}
+		else if (anum==9 && is_atpandium(n)) // || (IS_SANEPLAYER(player[n].spectating) && is_incolosseum(player[n].spectating, anum)))
+		{
+			do_char_log(n, 3, "Pandium: \"%s\"\n", msg);
 		}
 	}
 }
@@ -4254,20 +4293,22 @@ void spawn_colosseum_enemy(int x, int y, int tox, int toy, int parent, int diffi
 	if (co = generate_map_enemy(347, col_waves[diffi][wave][m], x, y, col_waves[diffi][wave][4], 0, 3))
 	{
 		ch[co].flags |= CF_NOSLEEP;
-		ch[co].data[31] = parent;    // parent template
+		ch[co].kindred |= KIN_MONSTER;
+		ch[co].data[31] = ch[parent].temp;    // parent template
 		ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = 60;
 		ch[co].data[25] = 0;
 		ch[co].skill[SK_PERCEPT][1] += 15;
 		do_update_char(co);
 		for (try = 0; try < 3; try++)
 			if (npc_moveto(co, tox-2+RANDOM(5), toy-2+RANDOM(5))) break;
+		ch[parent].data[5+m] = co;
 	}
 }
 
 // For the Colosseum NPC(s) to track player progress
 void colosseum_driver(int cn)
 {
-	int n, m=0, i=0, p=0, x, y, anum=0;
+	int n, m=0, i=0, p=0, x, y, anum=0, co=0, try;
 	static int from_xy[5][5][2] = {
 		{ {735,933},{751,949},{767,933},{751,917} },
 		{ {702,908},{718,924},{734,908},{718,892} },
@@ -4358,15 +4399,30 @@ void colosseum_driver(int cn)
 				n = anum-1;
 				i = ch[cn].data[0]-1;
 				p = ch[cn].data[1]-1;
-				m = 0; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
-				m = 1; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
-				m = 2; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
-				m = 3; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], ch[cn].temp, i, p, m);
+				m = 0; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
+				m = 1; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
+				m = 2; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
+				m = 3; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
 				chlog(cn, "created 4 monsters in colosseum %d", anum);
 				ch[cn].data[2]++;
 				break;
 			case  1: 	// Wait for mobs to die
-				if (ch[cn].data[4]) return; 
+				if (ch[cn].data[4]) 
+				{
+					n = anum-1;
+					for (m=0;m<4;m++)
+					{
+						// Try to force NPCs out of spawns if they're not doing anything at the moment.
+						if (IS_SANECHAR(co = ch[cn].data[5+m]) && ch[co].used != USE_EMPTY && 
+							ch_base_status(ch[co].status)>=0 && ch_base_status(ch[co].status)<=7 && // standing still
+							ch[co].x != to_xy[n][m][0] && ch[co].y != to_xy[n][m][1])
+						{
+							npc_moveto(co, to_xy[n][m][0]-2+RANDOM(5), to_xy[n][m][1]-2+RANDOM(5));
+							ch[cn].data[3] = globs->ticker + TICKS;
+						}
+					}
+					return;
+				}
 				ch[cn].data[2]++; ch[cn].data[3] = globs->ticker + TICKS / 2; break;
 			case  2: 	// Warp after clear
 				x = to_xy[anum-1][0][0];
@@ -4437,6 +4493,1371 @@ void colosseum_driver(int cn)
 				break;
 			default: break;
 		}
+	}
+}
+
+#define PANDI_LIMIT 	3
+
+void spawn_pandium_rewards(int cn, int fl, int x, int y)
+{
+	int in, m;
+	
+	m = IT_POT_BRV+RANDOM(5);
+	if (m==1982) m = 135;
+	
+	// Clear any existing chests
+	if ((in = map[x + y * MAPX].it)!=0) { it[in].used = 0; map[x + y * MAPX].it = 0; }
+	//
+	if 		(fl >= 99 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2921; // Obsidian Crown
+	//
+	else if (fl >=  1 && ch[cn].pandium_floor[2] < 1 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 1; // .
+	else if (fl >=  5 && ch[cn].pandium_floor[2] < 2 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 2; //  .
+	else if (fl >= 10 && ch[cn].pandium_floor[2] < 3 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 3; // Permanent buff shrines
+	else if (fl >= 20 && ch[cn].pandium_floor[2] < 4 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 4; //  .
+	else if (fl >= 50 && ch[cn].pandium_floor[2] < 5 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 5; // .
+	//
+	else if (fl == 75 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2924; // Exp Scroll 750,000
+	else if (fl == 25 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2923; // Exp Scroll 250,000
+	//
+	else if (fl%19==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_SPOT;                 // Spot
+	else if (fl%17==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2307;                    // Heavensplitter
+	else if (fl%13==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POP_SSPEL+RANDOM(7);  // Skua scroll
+	else if (fl%11==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2962;                    // Luck scroll
+	else if (fl% 7==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_GPOT;                 // Gpot
+	else if (fl% 5==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_OS_BRV+RANDOM(5);     // Greater attribute scroll
+	else if (fl% 3==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = m;                       // Greater attribute potion
+	else if (fl% 2==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POT_D_HP+RANDOM(3)*6; // Divine potion
+	else if (in = build_item(CR_ITEM, x, y))               it[in].data[0] = IT_OS_SK;                // Greater skill scroll
+	
+	xlog("Spawned Pandium Rewards for %s with floor value of %d", ch[cn].name, fl);
+}
+
+void make_explode(int x, int y, int dmg)
+{
+	int in=0;
+	
+	// it==0 assures there's no existing bomb first.
+	if (map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+	{ 
+		it[in].data[0] = dmg; 
+		do_add_light(x, y, it[in].light[1]);
+	}
+}
+
+void pandium_clean(void)
+{
+	int x, y, in=0;
+	
+	for (x = PANDI_X1; x<=PANDI_X2; x++) for (y = PANDI_Y1; y<=PANDI_Y2; y++)
+	{
+		if (in = map[x + y * MAPX].it)
+		{
+			do_add_light(x, y, -it[in].light[1]);
+			it[in].used = 0;
+			map[x + y * MAPX].it = 0;
+		}
+	}
+}
+
+void pandium_pattern(int fl)
+{
+	int x, y, frx, fry, tox, toy, mdx, mdy;
+	int m, n, off, dmg, rng=0;
+	
+	frx = PANDI_X1; 
+	tox = PANDI_X2; 
+	fry = PANDI_Y1; 
+	toy = PANDI_Y2;
+	mdx = PANDI_MIDX;
+	mdy = PANDI_MIDY;
+	
+	dmg = 450+10*fl;
+	
+	// Do a funny pattern on a prime numbered depth
+	switch (fl)
+	{
+		/*
+			+ - - - - - - - - - - - - - - - - - +	1
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			| X X X X X X X X # X X X X X X X X |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			|                 X                 |
+			+ - - - - - - - - - - - - - - - - - +	score = 33
+		*/
+		case  7:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m!=8 && n!=8) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	2
+			| X                               X |
+			|   X                           X   |
+			|     X                       X     |
+			|       X                   X       |
+			|         X               X         |
+			|           X           X           |
+			|             X       X             |
+			|               X   X               |
+			|                 #                 |
+			|               X   X               |
+			|             X       X             |
+			|           X           X           |
+			|         X               X         |
+			|       X                   X       |
+			|     X                       X     |
+			|   X                           X   |
+			| X                               X |
+			+ - - - - - - - - - - - - - - - - - +	score = 33
+		*/
+		case 11:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m!=n && 16-m != n) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	3
+			|                                   |
+			|                                   |
+			|                                   |
+			|       X X X X X X X X X X X       |
+			|       X                   X       |
+			|       X                   X       |
+			|       X     X X X X X     X       |
+			|       X     X       X     X       |
+			|       X     X   #   X     X       |
+			|       X     X       X     X       |
+			|       X     X X X X X     X       |
+			|       X                   X       |
+			|       X                   X       |
+			|       X X X X X X X X X X X       |
+			|                                   |
+			|                                   |
+			|                                   |
+			+ - - - - - - - - - - - - - - - - - +	score = 57
+		*/
+		case 13:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((!((m)>=3 && (n)>=3 && (m)<=13 && (n)<=13)) || (((m)>=4 && (n)>=4 && (m)<=12 && (n)<=12) &&
+					 !((m)>=6 && (n)>=6 && (m)<=10 && (n)<=10)) || (((m)>=7 && (n)>=7 && (m)<= 9 && (n)<= 9) &&
+					 !((m)>=5 && (n)>=5 && (m)<= 5 && (n)<= 5)) && !(m==8 && n==8)) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	4
+			| X               X               X |
+			|   X           X   X           X   |
+			|     X       X       X       X     |
+			|       X   X           X   X       |
+			|         X               X         |
+			|       X   X           X   X       |
+			|     X       X       X       X     |
+			|   X           X   X           X   |
+			| X               #               X |
+			|   X           X   X           X   |
+			|     X       X       X       X     |
+			|       X   X           X   X       |
+			|         X               X         |
+			|       X   X           X   X       |
+			|     X       X       X       X     |
+			|   X           X   X           X   |
+			| X               X               X |
+			+ - - - - - - - - - - - - - - - - - +	score = 61
+		*/
+		case 17:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m%8!=n && m!=n%8 && m%8!=n%8 && 16-m%8!=n && 16-m!=n%8 && 8-m!=n%8) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	5
+			|                                   |
+			|                                   |
+			|     X X X     X X X     X X X     |
+			|     X X X     X X X     X X X     |
+			|     X X X     X X X     X X X     |
+			|                                   |
+			|                                   |
+			|     X X X     X X X     X X X     |
+			|     X X X     X # X     X X X     |
+			|     X X X     X X X     X X X     |
+			|                                   |
+			|                                   |
+			|     X X X     X X X     X X X     |
+			|     X X X     X X X     X X X     |
+			|     X X X     X X X     X X X     |
+			|                                   |
+			|                                   |
+			+ - - - - - - - - - - - - - - - - - +	score = 81
+		*/
+		case 19:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((m-1)%5==0 || (n-1)%5==0 || (m)%5==0 || (n)%5==0) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	6
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			| X X X X X X X X X X X X X X X X X |
+			| X X X X X X X X # X X X X X X X X |
+			| X X X X X X X X X X X X X X X X X |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			|               X X X               |
+			+ - - - - - - - - - - - - - - - - - +	score = 93
+		*/
+		case 23:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m!=7 && n!=7 && m!=8 && n!=8 && m!=9 && n!=9) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	7
+			|     X       X       X       X     |
+			|     X       X       X       X     |
+			| X X X X X X X X X X X X X X X X X |
+			|     X       X       X       X     |
+			|     X       X       X       X     |
+			|     X       X       X       X     |
+			| X X X X X X X X X X X X X X X X X |
+			|     X       X       X       X     |
+			|     X       X   @   X       X     |
+			|     X       X       X       X     |
+			| X X X X X X X X X X X X X X X X X |
+			|     X       X       X       X     |
+			|     X       X       X       X     |
+			|     X       X       X       X     |
+			| X X X X X X X X X X X X X X X X X |
+			|     X       X       X       X     |
+			|     X       X       X       X     |
+			+ - - - - - - - - - - - - - - - - - +	score = 120
+		*/
+		case 29:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((m+2)%4!=0 && (n+2)%4!=0) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	8
+			|                                   |
+			|                                   |
+			|                                   |
+			|       X X X   X X X   X X X       |
+			|       X X X   X X X   X X X       |
+			|       X X X   X X X   X X X       |
+			|                                   |
+			|       X X X   X X X   X X X       |
+			|       X X X   X # X   X X X       |
+			|       X X X   X X X   X X X       |
+			|                                   |
+			|       X X X   X X X   X X X       |
+			|       X X X   X X X   X X X       |
+			|       X X X   X X X   X X X       |
+			|                                   |
+			|                                   |
+			|                                   |
+			+ - - - - - - - - - - - - - - - - - +	score = 81
+		*/
+		case 31:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m%4==2 || m<=1 || m>=15 || n%4==2 || n<=1 || n>=15) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	9
+			| X X                           X X |
+			| X X X                       X X X |
+			|   X X X                   X X X   |
+			|     X X X               X X X     |
+			|       X X X           X X X       |
+			|         X X X       X X X         |
+			|           X X X   X X X           |
+			|             X X X X X             |
+			|               X # X               |
+			|             X X X X X             |
+			|           X X X   X X X           |
+			|         X X X       X X X         |
+			|       X X X           X X X       |
+			|     X X X               X X X     |
+			|   X X X                   X X X   |
+			| X X X                       X X X |
+			| X X                           X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 93
+		*/
+		case 37:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m  !=n && 16-m   != n && 
+					m+1!=n && 16-m+1 != n && 
+					m-1!=n && 16-m-1 != n ) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	10
+			| X X X X X X X X X X X X X X X X X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X X X X X X X X X X X X X X X X X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X X X X X X X X # X X X X X X X X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X X X X X X X X X X X X X X X X X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X       X       X       X       X |
+			| X X X X X X X X X X X X X X X X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 145
+		*/
+		case 41:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((m)%4!=0 && (n)%4!=0) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	11
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   #   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			|                                   |
+			| X   X   X   X   X   X   X   X   X |
+			+ - - - - - - - - - - - - - - - - - +	score = 81
+		*/
+		case 43:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m%2==1 || n%2==1) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	12
+			|     X X X X X       X X X X X     |
+			|       X X X           X X X       |
+			| X       X       X       X       X |
+			| X X           X X X           X X |
+			| X X X       X X X X X       X X X |
+			| X X           X X X           X X |
+			| X       X       X       X       X |
+			|       X X X           X X X       |
+			|     X X X X X   @   X X X X X     |
+			|       X X X           X X X       |
+			| X       X       X       X       X |
+			| X X           X X X           X X |
+			| X X X       X X X X X       X X X |
+			| X X           X X X           X X |
+			| X       X       X       X       X |
+			|       X X X           X X X       |
+			|     X X X X X       X X X X X     |
+			+ - - - - - - - - - - - - - - - - - +	score = 124
+		*/
+		case 47:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (!((m  )!=   n && (m  )!=   n+1 && (m  )!=   n-1 &&
+					  (m+8)!=   n && (m+8)!=   n+1 && (m+8)!=   n-1 &&
+					  (m-8)!=   n && (m-8)!=   n+1 && (m-8)!=   n-1 &&
+					  (m  )!=16-n && (m  )!=16-n+1 && (m  )!=16-n-1 &&
+					  (m+8)!=16-n && (m+8)!=16-n+1 && (m+8)!=16-n-1 &&
+					  (m-8)!=16-n && (m-8)!=16-n+1 && (m-8)!=16-n-1 )) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	13
+			|                                   |
+			|   X   X   X   X   X   X   X   X   |
+			|     X       X       X       X     |
+			|   X   X   X   X   X   X   X   X   |
+			|         X               X         |
+			|   X   X   X   X   X   X   X   X   |
+			|     X       X       X       X     |
+			|   X   X   X   X   X   X   X   X   |
+			|                 @                 |
+			|   X   X   X   X   X   X   X   X   |
+			|     X       X       X       X     |
+			|   X   X   X   X   X   X   X   X   |
+			|         X               X         |
+			|   X   X   X   X   X   X   X   X   |
+			|     X       X       X       X     |
+			|   X   X   X   X   X   X   X   X   |
+			|                                   |
+			+ - - - - - - - - - - - - - - - - - +	score = 84
+		*/
+		case 53:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (!(((m+2)%4==0 && (n+2)%4==0) || 
+					  ((m+1)%2==0 && (n+1)%2==0) || 
+					  ((m+4)%8==0 && (n+4)%8==0))) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	14
+			| X X   X X   X X   X X   X X   X X |
+			| X X   X X   X X   X X   X X   X X |
+			|                                   |
+			| X X   X X   X X   X X   X X   X X |
+			| X X   X X   X X   X X   X X   X X |
+			|                                   |
+			| X X   X X   X X   X X   X X   X X |
+			| X X   X X   X X   X X   X X   X X |
+			|                 @                 |
+			| X X   X X   X X   X X   X X   X X |
+			| X X   X X   X X   X X   X X   X X |
+			|                                   |
+			| X X   X X   X X   X X   X X   X X |
+			| X X   X X   X X   X X   X X   X X |
+			|                                   |
+			| X X   X X   X X   X X   X X   X X |
+			| X X   X X   X X   X X   X X   X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 144
+		*/
+		case 59:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (m%3==2 || n%3==2) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	15
+			| X X X       X X X X X       X X X |
+			| X X X X       X X X       X X X X |
+			| X X X X X       X       X X X X X |
+			|   X X X X X           X X X X X   |
+			|     X X X X X       X X X X X     |
+			|       X X X           X X X       |
+			| X       X       X       X       X |
+			| X X           X X X           X X |
+			| X X X       X X # X X       X X X |
+			| X X           X X X           X X |
+			| X       X       X       X       X |
+			|       X X X           X X X       |
+			|     X X X X X       X X X X X     |
+			|   X X X X X           X X X X X   |
+			| X X X X X       X       X X X X X |
+			| X X X X       X X X       X X X X |
+			| X X X       X X X X X       X X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 153
+		*/
+		case 61:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (!((m-4)!=   n && (m-4)!=   n+1 && (m-4)!=   n-1 &&
+					  (m+4)!=   n && (m+4)!=   n+1 && (m+4)!=   n-1 &&
+					  (m-4)!=16-n && (m-4)!=16-n+1 && (m-4)!=16-n-1 &&
+					  (m+4)!=16-n && (m+4)!=16-n+1 && (m+4)!=16-n-1 )) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+			
+		/*
+			+ - - - - - - - - - - - - - - - - - +	16
+			| X X X X X X X X X X X X X X X X X |
+			|   X X X X X X X X X X X X X X X   |
+			|     X X X X X X X X X X X X X     |
+			|       X X X X X X X X X X X       |
+			|         X X X X X X X X X         |
+			|           X X X X X X X           |
+			|             X X X X X             |
+			|               X X X               |
+			|                 #                 |
+			|               X X X               |
+			|             X X X X X             |
+			|           X X X X X X X           |
+			|         X X X X X X X X X         |
+			|       X X X X X X X X X X X       |
+			|     X X X X X X X X X X X X X     |
+			|   X X X X X X X X X X X X X X X   |
+			| X X X X X X X X X X X X X X X X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 161
+		*/
+		case 67:
+			rng = RANDOM(2);
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (rng==0 && (((m)>(n) && (16-n)>(m)) || ((m)<(n) && (16-n)<(m)))) continue;
+				if (rng==1 && (((m)<(n) && (16-m)>(n)) || ((m)>(n) && (16-m)<(n)))) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	17
+			|       X X X           X X X       |
+			|         X X X       X X X         |
+			|           X X X   X X X           |
+			| X           X X X X X           X |
+			| X X           X X X           X X |
+			| X X X       X X X X X       X X X |
+			|   X X X   X X X   X X X   X X X   |
+			|     X X X X X       X X X X X     |
+			|       X X X     @     X X X       |
+			|     X X X X X       X X X X X     |
+			|   X X X   X X X   X X X   X X X   |
+			| X X X       X X X X X       X X X |
+			| X X           X X X           X X |
+			| X           X X X X X           X |
+			|           X X X   X X X           |
+			|         X X X       X X X         |
+			|       X X X           X X X       |
+			+ - - - - - - - - - - - - - - - - - +	score = 136
+		*/
+		case 71:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((m-4)!=   n && (m-4)!=   n+1 && (m-4)!=   n-1 &&
+					(m+4)!=   n && (m+4)!=   n+1 && (m+4)!=   n-1 &&
+					(m-4)!=16-n && (m-4)!=16-n+1 && (m-4)!=16-n-1 &&
+					(m+4)!=16-n && (m+4)!=16-n+1 && (m+4)!=16-n-1 ) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	18
+			| X X           X X X           X X |
+			| X X X       X X X X X       X X X |
+			|   X X X   X X X   X X X   X X X   |
+			|     X X X X X       X X X X X     |
+			|       X X X           X X X       |
+			|     X X X X X       X X X X X     |
+			|   X X X   X X X   X X X   X X X   |
+			| X X X       X X X X X       X X X |
+			| X X           X # X           X X |
+			| X X X       X X X X X       X X X |
+			|   X X X   X X X   X X X   X X X   |
+			|     X X X X X       X X X X X     |
+			|       X X X           X X X       |
+			|     X X X X X       X X X X X     |
+			|   X X X   X X X   X X X   X X X   |
+			| X X X       X X X X X       X X X |
+			| X X           X X X           X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 165
+		*/
+		case 73:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((m  )!=(   n) && (m  )!=   n+1 && (m  )!=   n-1 &&
+					(m+8)!=(   n) && (m+8)!=   n+1 && (m+8)!=   n-1 &&
+					(m-8)!=(   n) && (m-8)!=   n+1 && (m-8)!=   n-1 &&
+					(m  )!=(16-n) && (m  )!=16-n+1 && (m  )!=16-n-1 &&
+					(m+8)!=(16-n) && (m+8)!=16-n+1 && (m+8)!=16-n-1 &&
+					(m-8)!=(16-n) && (m-8)!=16-n+1 && (m-8)!=16-n-1 ) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	19
+			| X X X X X X X       X X X X X     |
+			| X X X X X X       X X X X X       |
+			| X X X X X       X X X X X       X |
+			| X X X X       X X X X X       X X |
+			| X X X       X X X X X       X X X |
+			| X X       X X X X X       X X X X |
+			| X       X X X X X       X X X X X |
+			|       X X X X X       X X X X X   |
+			|     X X X X X   @   X X X X X     |
+			|   X X X X X       X X X X X       |
+			| X X X X X       X X X X X       X |
+			| X X X X       X X X X X       X X |
+			| X X X       X X X X X       X X X |
+			| X X       X X X X X       X X X X |
+			| X       X X X X X       X X X X X |
+			|       X X X X X       X X X X X X |
+			|     X X X X X       X X X X X X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 186
+		*/
+		case 79:
+			rng = RANDOM(2);
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (rng==0 && !((m  )!=16-n && (m  )!=16-n+1 && (m  )!=16-n-1 &&
+								(m+8)!=16-n && (m+8)!=16-n+1 && (m+8)!=16-n-1 &&
+								(m-8)!=16-n && (m-8)!=16-n+1 && (m-8)!=16-n-1 )) continue;
+				if (rng==1 && !((m  )!=   n && (m  )!=   n+1 && (m  )!=   n-1 &&
+								(m+8)!=   n && (m+8)!=   n+1 && (m+8)!=   n-1 &&
+								(m-8)!=   n && (m-8)!=   n+1 && (m-8)!=   n-1 )) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	20
+			|                                   |
+			|   X X X X X X X X X X X X X X X   |
+			|   X X X X X X X X X X X X X X X   |
+			|   X X                       X X   |
+			|   X X   X X X X X X X X X   X X   |
+			|   X X   X X X X X X X X X   X X   |
+			|   X X   X X           X X   X X   |
+			|   X X   X X   X X X   X X   X X   |
+			|   X X   X X   X # X   X X   X X   |
+			|   X X   X X   X X X   X X   X X   |
+			|   X X   X X           X X   X X   |
+			|   X X   X X X X X X X X X   X X   |
+			|   X X   X X X X X X X X X   X X   |
+			|   X X                       X X   |
+			|   X X X X X X X X X X X X X X X   |
+			|   X X X X X X X X X X X X X X X   |
+			|                                   |
+			+ - - - - - - - - - - - - - - - - - +	score = 169
+		*/
+		case 83:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (!((((m)>=1 && (n)>=1 && (m)<=15 && (n)<=15) && !((m)>=3 && (n)>=3 && (m)<=13 && (n)<=13)) ||
+					  (((m)>=4 && (n)>=4 && (m)<=12 && (n)<=12) && !((m)>=6 && (n)>=6 && (m)<=10 && (n)<=10)) ||
+					  (((m)>=7 && (n)>=7 && (m)<= 9 && (n)<= 9) && !((m)>=5 && (n)>=5 && (m)<= 5 && (n)<= 5)) )) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	21
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			|                                   |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X # X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			|                                   |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			| X X X X X   X X X X X   X X X X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 225
+		*/
+		case 89:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if ((m+1)%6==0 || (n+1)%6==0) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+		/*
+			+ - - - - - - - - - - - - - - - - - +	22
+			| X X X X X X X X X X X X X X X X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X   X X X   X X X   X X X   X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X X X   X X X X X X X   X X X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X   X X X   X X X   X X X   X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X X X X X X X # X X X X X X X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X   X X X   X X X   X X X   X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X X X   X X X X X X X   X X X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X   X X X   X X X   X X X   X X |
+			| X   X   X   X   X   X   X   X   X |
+			| X X X X X X X X X X X X X X X X X |
+			+ - - - - - - - - - - - - - - - - - +	score = 205
+		*/
+		case 97:
+			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				m = x-frx; n = y-fry;
+				if (((m+2)%4==0 && (n+2)%4==0) || 
+					((m+1)%2==0 && (n+1)%2==0) || 
+					((m+4)%8==0 && (n+4)%8==0) ) continue;
+				make_explode(x, y, dmg);
+			}
+			break;
+			
+		// Non-special cases :: Just make a square in the middle
+		default:
+			// Variable setup for inner explosion box
+			off = 1;
+			if (fl>=10) off = 2; // 5x5
+			if (fl>=25) off = 3; // 7x7
+			if (fl>=50) off = 4; // 9x9
+			if (fl>=75) off = 1; // 3x3*
+			if (fl>=99) off = 2; // 5x5*
+			// Variable setup for x/y offset variance
+			m = 1;
+			if (fl>=16) m = 3;
+			if (fl==25) m = 1;
+			if (fl>=36) m = 5;
+			if (fl==50) m = 1;
+			if (fl>=51) m = 3;
+			if (fl>=61) m = 5;
+			if (fl>=76) m = 1;
+			if (fl>=86) m = 3;
+			if (fl>=91) m = 5;
+			if (fl==99) m = 1;
+			n = RANDOM(m) - (m-1)/2;
+			m = RANDOM(m) - (m-1)/2;
+			// Create inner explosion box
+			for (x = mdx+n-off; x<mdx+n+1+off; x++) for (y = mdy+m-off; y<mdy+m+1+off; y++)
+			{
+				make_explode(x, y, dmg);
+			}
+			// Variable setup for outer explosion box
+			off = 0;
+			if (fl>=75) off = 4; // 9x9
+			if (fl>=99) off = 3; // 7x7
+			// Create outer explosion box
+			if (off) for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
+			{
+				if (x>=mdx-off && x<=mdx+off && y>=mdy-off && y<=mdy+off) continue; // Excludes middle
+				make_explode(x, y, dmg);
+			}
+			break;
+	}
+}
+
+void pandium_driver(int cn) // CT_PANDIUM
+{
+	int n, m, j, p=0, fl=999, x, y, frx, fry, tox, toy, in=0, co=0, dir=0, try=0;
+	int old_p, old_fl;
+	//                   Players     Pandium     Shadow 1    Shadow 2    Shadow 3
+	int go_xy[5][3] = { {283,989,4},{283,995,3},{283,983,4},{277,989,1},{289,989,2} };
+	//					             Pandium     Shadow 1    Shadow 2    Shadow 3
+	static int to_xy[4][3] = {      {283,995,3},{283,983,4},{277,989,1},{289,989,2} };
+	int temp[5] = {0};
+	int ch_in[PANDI_LIMIT] = {0};
+	
+	/*
+		Pandium Fight Driver
+		
+		data[0] = Player/counter
+		data[1] = Floor ID - set by lowest member if grouped
+		data[2] = Phase
+		data[3] = Phase timer
+		data[4] = auto-blast timer
+		data[5] = targeted auto-blast timer
+	*/
+	
+	old_p  = ch[cn].data[0];
+	old_fl = ch[cn].data[1];
+	
+	// Check for players in the relevant arena
+	for (n = 1; n<MAXCHARS; n++) 
+	{
+		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+		if (IS_PLAYER(n) && is_atpandium(n)) try++;
+	}
+	for (n = 1; n<MAXCHARS; n++) 
+	{
+		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+		if (IS_PLAYER(n) && is_atpandium(n))
+		{
+			if (p+1>PANDI_LIMIT) // Too many people! Get outta here!
+			{
+				quick_teleport(n, 512, 512);
+				continue;
+			}
+			ch_in[p] = n;
+			p++;
+			if (try==1) fl = ch[n].pandium_floor[0];
+			else        fl = min(fl, ch[n].pandium_floor[1]); // whoever's floor is smallest
+		}
+	}
+	if (old_p   ==   0) ch[cn].data[0] = p;
+	else if (p  !=   0) p  = old_p;
+	else 				ch[cn].data[0] = 0;
+	
+	if (old_fl  ==   0 || old_fl  == 999) 	ch[cn].data[1] = fl;
+	else if (fl !=   0 && fl != 999) 		fl = old_fl;
+	else 									ch[cn].data[1] = 0;
+	
+	// Pandium's endurance and mana never runs out
+	ch[cn].a_end  = 999999;
+	ch[cn].a_mana = 888888;
+	
+	frx = PANDI_X1; 
+	tox = PANDI_X2; 
+	fry = PANDI_Y1; 
+	toy = PANDI_Y2;
+	
+	// Initialize
+	if (p<1 || ch[cn].data[2]==99)
+	{
+		if (p<1) 
+		{
+			for (x = frx; x<tox; x++) for (y = fry; y<toy; y++)
+			{
+				// Clear any lingering shadows
+				if ((co = map[x + y * MAPX].ch) && !IS_PLAYER(co) && ch[co].temp != CT_PANDIUM)
+				{
+					god_destroy_items(co);
+					if (ch[co].used==USE_ACTIVE) plr_map_remove(co);
+					ch[co].flags = 0;
+					ch[co].used = USE_EMPTY;
+				}
+				// Clear any lingering graves/etc
+				if ((in = map[x + y * MAPX].it)!=0 && (it[in].flags & IF_USE))
+				{
+					it[in].used = 0;
+					map[x + y * MAPX].it = 0;
+				}
+			}
+			ch[cn].a_hp   = 9999999;
+			if (ch[cn].data[2] != 99)
+			{
+				remove_buff(cn, SK_ZEPHYR2);
+				remove_buff(cn, SK_TAUNT);
+				remove_buff(cn, SK_POISON);
+				remove_buff(cn, SK_BLEED);
+				ch[cn].taunted = 0;
+				npc_remove_all_enemies(cn);
+				for (n=0;n<4;n++)
+				{
+					to_xy[n][0] = go_xy[n+1][0];
+					to_xy[n][1] = go_xy[n+1][1];
+					to_xy[n][2] = go_xy[n+1][2];
+				}
+				x = to_xy[0][0];
+				y = to_xy[0][1];
+				ch[cn].dir = to_xy[0][2];
+				ch[cn].data[29] = x + y * MAPX;
+				god_transfer_char(cn, x, y);
+			}
+			ch[cn].data[2] = 99;
+		}
+		else
+		{
+			ch[cn].data[2] = 0;
+			chlog(cn, "Initialized");
+			for (n = 1; n<MAXCHARS; n++) 
+			{
+				if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+				if (IS_PLAYER(n) && is_atpandium(n))
+				{
+					do_char_log(n, 8, "  == The Archon's Trial, Depth %2d ==\n", fl);
+				}
+			}
+		}
+		ch[cn].data[3] = globs->ticker + TICKS / 2;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		return; // No further process when nobody is in the area
+	}
+	
+	if (p && ch[cn].data[2] == 0) // Phase 0
+	{
+		// Assure Pandium is buffed (SK_OPPRESSION) based on floor #
+		// +0.5% damage reduction and +2 to all attributes each 1 power.
+		for (m=0;m<5;m++) ch[cn].attrib[m][1] = (fl+1)*3/2;
+		ch[cn].weapon_bonus          = fl/5 +  1;
+		ch[cn].armor_bonus           = fl/5 + 12;
+		ch[cn].skill[SK_PERCEPT][1]  = 90;
+		ch[cn].skill[SK_SAFEGRD][1]  =  0;
+		ch[cn].skill[SK_IMMUN][1]    = fl;
+		ch[cn].hp[0]                 = 1000+1000*p;
+		ch[cn].a_hp                  = 9999999;
+		if (has_buff(cn, SK_OPPRESSION)) remove_buff(cn, SK_OPPRESSION);
+		in = god_create_buff();
+		strcpy(bu[in].name, "Oppression");
+		strcpy(bu[in].reference, "oppression");
+		strcpy(bu[in].description, "Oppression.");
+		bu[in].power = fl;
+		bu[in].dmg_reduction[1] = min(120, fl+1);
+		bu[in].active = bu[in].duration = 1;
+		bu[in].flags  = IF_SPELL | IF_PERMSPELL;
+		bu[in].temp = SK_OPPRESSION;
+		bu[in].sprite[1] = 1015;
+		add_spell(cn, in);
+		// Grant Pandium new skills based on floor #
+		ch[cn].skill[SK_CURSE][0]    = 0;
+		ch[cn].skill[SK_WEAKEN][0]   = 0;
+		ch[cn].skill[SK_SLOW][0]     = 0;
+		ch[cn].skill[SK_BLIND][0]    = 0;
+		ch[cn].skill[SK_LETHARGY][0] = 0;
+		ch[cn].skill[SK_LEAP][0]     = 0;
+		if (fl>= 9) { ch[cn].skill[SK_CURSE][0]    =  90; }
+		if (fl>=18) { ch[cn].skill[SK_WEAKEN][0]   =  90; }
+		if (fl>=27) { ch[cn].skill[SK_SLOW][0]     =  90; }
+		if (fl>=36) { ch[cn].skill[SK_BLIND][0]    =  90; }
+		if (fl>=45) { ch[cn].skill[SK_LETHARGY][0] =  90; }
+		if (fl>=54) { ch[cn].skill[SK_LEAP][0]     = 105; }
+		if (fl>=63) { ch[cn].skill[SK_CURSE][0]    = 120; }
+		if (fl>=72) { ch[cn].skill[SK_WEAKEN][0]   = 120; }
+		if (fl>=81) { ch[cn].skill[SK_SLOW][0]     = 120; }
+		if (fl>=90) { ch[cn].skill[SK_BLIND][0]    = 120; }
+		if (fl>=99) { ch[cn].skill[SK_LETHARGY][0] = 120; }
+		if (fl>=50)		{ temp[0]=2916; temp[1]=2917; temp[2]=2918; temp[3]=2919; temp[4]=2920; } // Obsidian
+		else if (fl>=25){ temp[0]=  94; temp[1]=  95; temp[2]=  96; temp[3]=  97; temp[4]=  98; } // Adamant
+		else 			{ temp[0]=  76; temp[1]=  77; temp[2]=  78; temp[3]=  79; temp[4]=  80; } // Titanium
+		if (fl>=99) { temp[0]=2921; } // Crown
+		in = ch[cn].worn[WN_HEAD]  = pop_create_item(temp[0], cn); it[in].carried = cn;
+		in = ch[cn].worn[WN_CLOAK] = pop_create_item(temp[1], cn); it[in].carried = cn;
+		in = ch[cn].worn[WN_BODY]  = pop_create_item(temp[2], cn); it[in].carried = cn;
+		in = ch[cn].worn[WN_ARMS]  = pop_create_item(temp[3], cn); it[in].carried = cn;
+		in = ch[cn].worn[WN_FEET]  = pop_create_item(temp[4], cn); it[in].carried = cn;
+		do_update_char(cn);
+		// Assure players in the area are debuffed (SK_OPPRESSED) based on floor #
+		// -2 to all skills and attributes, and -1 to all caps per 1 power (1 pow per 10 floors, starting floor 9).
+		if ((fl+1)/10>0) for (n = 1; n<MAXCHARS; n++) 
+		{
+			if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+			if (IS_PLAYER(n) && is_atpandium(n))
+			{
+				do_char_log(n, 0, "You feel something press down on you.\n", fl);
+				if (has_buff(n, SK_OPPRESSED)) remove_buff(n, SK_OPPRESSED);
+				in = god_create_buff();
+				strcpy(bu[in].name, "Oppressed");
+				strcpy(bu[in].reference, "oppressed");
+				strcpy(bu[in].description, "oppressed.");
+				bu[in].power = (fl+1)/10;
+				for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(60,(fl+1)/10)*2);
+				for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(60,(fl+1)/10)*2);
+				bu[in].active = bu[in].duration = 1;
+				bu[in].flags  = IF_SPELL | IF_PERMSPELL;
+				bu[in].temp = SK_OPPRESSED;
+				bu[in].sprite[1] = 1015;
+				add_spell(n, in);
+				do_update_char(n);
+			}
+			// If we're not in there, wipe off any SK_OPPRESSED
+			// Placed here so it's not checked all the time
+			if (!is_atpandium(n) && has_buff(n, SK_OPPRESSED)) 
+			{
+				remove_buff(n, SK_OPPRESSED);
+				do_update_char(n);
+			}
+		}
+		ch[cn].data[2] = 1;
+		ch[cn].data[3] = globs->ticker + TICKS;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		ch[cn].data[9] = 0;
+		chlog(cn, "beginning depth %d fight vs %d challengers", fl, p);
+	}
+	
+	// Auto-blast timer loop - Starts on depth 10
+	if (ch[cn].data[4] && globs->ticker >= ch[cn].data[4])
+	{
+		for (try=0;try<3;try++)
+		{
+			x = frx + RANDOM(tox-frx+1);
+			y = fry + RANDOM(toy-fry+1);
+			if (map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+			{
+				do_area_sound(0, 0, x, y, 22);
+				it[in].data[0] = 200+10*fl;
+				do_add_light(x, y, it[in].light[1]);
+				break;
+			}
+		}
+		ch[cn].data[4] = globs->ticker + max(1, 1+TICKS - (TICKS*fl/100));
+	}
+	
+	// targeted auto-blast timer loop - Starts on depth 20
+	if (ch[cn].data[5] && globs->ticker >= ch[cn].data[5])
+	{
+		for (n=0;n<PANDI_LIMIT;n++)
+		{
+			if (ch_base_status(ch[ch_in[n]].status) >= 8) continue;
+			try = 0; if (fl>=50) try = 1; // 3x3
+			m   = 1; if (fl>=80) m   = 3; // offset
+			j = RANDOM(m) - (m-1)/2;
+			m = RANDOM(m) - (m-1)/2;
+			for (x = ch[ch_in[n]].x+j-try; x<ch[ch_in[n]].x+j+1+try; x++) for (y = ch[ch_in[n]].y+m-try; y<ch[ch_in[n]].y+m+1+try; y++)
+			{	// Check for clean tile & spawn explosion
+				if (map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y))) 
+				{	
+					if (x==ch[ch_in[n]].x && y==ch[ch_in[n]].y) do_area_sound(0, 0, ch[ch_in[n]].x, ch[ch_in[n]].y, 22);
+					it[in].data[0] = 200+20*fl;
+					do_add_light(x, y, it[in].light[1]);
+				}
+			}
+		}
+		ch[cn].data[5] = globs->ticker + max(TICKS*2, TICKS * 5 - (TICKS*3*fl/100));
+	}
+	
+	// Return if time is less than next action
+	if (globs->ticker < ch[cn].data[3])
+		return;
+	
+	switch (ch[cn].data[2])
+	{
+		case 1: 
+			if (fl>=99) 		tell_incolosseum(9, "Time and again you've stood before me. A king among mortal men.");
+			else if (fl>=51) 	tell_incolosseum(9, "You bore me waiting once again.");
+			else if (fl==50) 	tell_incolosseum(9, "Aemon, my brother... Will you one day find him? Face him? Fight him too?");
+			else if (fl>=20) 	tell_incolosseum(9, "You return once more. And clash we shall.");
+			else if (fl>= 5) 	tell_incolosseum(9, "Together, we grow strong. We pillar above men.");
+			else if (fl>= 2) 	tell_incolosseum(9, "Welcome back. Here to test your limits again?");
+			else  				tell_incolosseum(9, "Fwahaha, a new face in my domain. Welcome, challenger!");
+			ch[cn].data[2]++; 
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 3 - (TICKS*3*fl/100));
+			break;
+		case 2: 
+			if (fl>=99) 		tell_incolosseum(9, "This shall be my greatest test of you. Come! Claim your crown.");
+			else if (fl>=51) 	tell_incolosseum(9, "Let us dance together, ever more.");
+			else if (fl==50) 	tell_incolosseum(9, "You've stood my tests alone. But some day, together, we will clash for the final time. And on that day, Skua shall weep.");
+			else if (fl>=20) 	tell_incolosseum(9, "Know this... Only one of us may stand.");
+			else if (fl>= 5) 	tell_incolosseum(9, "Shall we climb even higher? Come.");
+			else if (fl>= 2) 	tell_incolosseum(9, "Come, then. Let us shake the mountain.");
+			else  				tell_incolosseum(9, "Break yourself upon me so we may grow strong!");
+			for (n=0;n<PANDI_LIMIT;n++) npc_add_enemy(cn, ch_in[n], 1);
+			if (fl<10) 	ch[cn].data[2]=6; // Skip ahead a phase
+			else 		ch[cn].data[2]++; 
+			ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		// 75% HP Breakpoint
+		case 3: 
+			if (ch[cn].a_hp>ch[cn].hp[5]*750) return; // Wait until 75%
+			if (fl>=30)
+			{
+				m = RANDOM(4)+1;
+				to_xy[0][0] = go_xy[m][0];
+				to_xy[0][1] = go_xy[m][1];
+				to_xy[0][2] = go_xy[m][2];
+			}
+			x = to_xy[0][0];
+			y = to_xy[0][1];
+			ch[cn].data[29] = x + y * MAPX;
+			ch[cn].dir      = to_xy[0][2];
+			ch[cn].data[30] = to_xy[0][2];
+			ch[cn].a_hp = ch[cn].hp[5]*750;
+			remove_buff(cn, SK_ZEPHYR2);
+			remove_buff(cn, SK_TAUNT);
+			ch[cn].taunted = 0;
+			npc_remove_all_enemies(cn);
+			quick_teleport(cn, x, y);
+			x = go_xy[0][0];
+			y = go_xy[0][1];
+			for (n=0;n<PANDI_LIMIT;n++) 
+			{
+				remove_buff(ch_in[n], SK_ZEPHYR2);
+				remove_buff(ch_in[n], SK_TAUNT);
+				ch[ch_in[n]].taunted = 0;
+				remove_enemy(ch_in[n]);
+				quick_teleport(ch_in[n], x, y);
+				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
+				{
+					remove_buff(co, SK_ZEPHYR2);
+					remove_buff(co, SK_TAUNT);
+					ch[co].taunted = 0;
+					npc_remove_all_enemies(co);
+					quick_teleport(co, x, y);
+				}
+				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_SHADOWCOPY]) && IS_ALIVEMASTER(co, ch_in[n]))
+				{
+					remove_buff(co, SK_ZEPHYR2);
+					remove_buff(co, SK_TAUNT);
+					ch[co].taunted = 0;
+					npc_remove_all_enemies(co);
+					quick_teleport(co, x, y);
+				}
+			}
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		case 4: 
+			if (fl>=20) tell_incolosseum(9, "I shall tear down the stars and throw them at you.");
+			else  		tell_incolosseum(9, "May the heavens weep, and the sky smolder and fall around us!");
+			ch[cn].skill[SK_SAFEGRD][1] = 30;
+			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+			do_area_sound(0, 0, go_xy[0][0], go_xy[0][1]+1, 21);
+			ch[cn].data[4] = globs->ticker + TICKS * 2;
+			if (fl>=20) ch[cn].data[5] = globs->ticker + TICKS * 2-1;
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 3 - (TICKS*3*fl/100));
+			break;
+		case 5: 
+			if (fl>=20) tell_incolosseum(9, "Choke and burn!");
+			else  		tell_incolosseum(9, "Smolder and dance!");
+			for (n=0;n<PANDI_LIMIT;n++) npc_add_enemy(cn, ch_in[n], 1);
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		// 50% HP Breakpoint
+		case 6: 
+			if (ch[cn].a_hp>ch[cn].hp[5]*500) return; // Wait until 50%
+			if (fl>=30)
+			{
+				m = RANDOM(4)+1;
+				for (n=0;n<4;n++)
+				{
+					to_xy[n][0] = go_xy[m][0];
+					to_xy[n][1] = go_xy[m][1];
+					to_xy[n][2] = go_xy[m][2];
+					m++;
+					if (m>4) m = 1;
+				}
+			}
+			x = to_xy[0][0];
+			y = to_xy[0][1];
+			ch[cn].data[29] = x + y * MAPX;
+			ch[cn].dir      = to_xy[0][2];
+			ch[cn].data[30] = to_xy[0][2];
+			ch[cn].a_hp = ch[cn].hp[5]*500;
+			remove_buff(cn, SK_ZEPHYR2);
+			remove_buff(cn, SK_TAUNT);
+			ch[cn].taunted = 0;
+			npc_remove_all_enemies(cn);
+			quick_teleport(cn, x, y);
+			x = go_xy[0][0];
+			y = go_xy[0][1];
+			for (n=0;n<PANDI_LIMIT;n++) 
+			{
+				remove_buff(ch_in[n], SK_ZEPHYR2);
+				remove_buff(ch_in[n], SK_TAUNT);
+				ch[ch_in[n]].taunted = 0;
+				remove_enemy(ch_in[n]);
+				quick_teleport(ch_in[n], x, y);
+				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
+				{
+					remove_buff(co, SK_ZEPHYR2);
+					remove_buff(co, SK_TAUNT);
+					ch[co].taunted = 0;
+					npc_remove_all_enemies(co);
+					quick_teleport(co, x, y);
+				}
+				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_SHADOWCOPY]) && IS_ALIVEMASTER(co, ch_in[n]))
+				{
+					remove_buff(co, SK_ZEPHYR2);
+					remove_buff(co, SK_TAUNT);
+					ch[co].taunted = 0;
+					npc_remove_all_enemies(co);
+					quick_teleport(co, x, y);
+				}
+			}
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		case 7:
+			if (fl>= 5) tell_incolosseum(9, "May venom and shadows claim you!");
+			else  		tell_incolosseum(9, "Hahaha! Good! I shall hold nothing back!");
+			ch[cn].skill[SK_SAFEGRD][1] = 60;
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS * 1;
+			break;
+		case 8:
+			// Chug potion at half-way point
+			if (fl>=99) n = IT_GPOT;
+			else		n = IT_RPOT;
+			in = god_create_item(n);
+			god_give_char(in, cn);
+			npc_quaff_potion(cn, n, 254);
+			// Learn skills
+			try = 0;
+			if (fl>= 5) { ch[cn].skill[SK_POISON][0] =  90; ch[cn].skill[SK_HASTE][0] =  60; try=1; }
+			if (fl>=10) { ch[cn].skill[SK_POISON][0] =  96; ch[cn].skill[SK_HASTE][0] =  75; try=2; }
+			if (fl>=20) { ch[cn].skill[SK_POISON][0] = 105; ch[cn].skill[SK_HASTE][0] =  90; try=3; }
+			if (fl>=50) { ch[cn].skill[SK_POISON][0] = 112; ch[cn].skill[SK_HASTE][0] = 105; try=3; }
+			if (fl>=75) { ch[cn].skill[SK_POISON][0] = 120; ch[cn].skill[SK_HASTE][0] = 120; try=3; }
+			do_update_char(cn);
+			// Spawn shadows
+			for (n=0;n<try;n++)
+			{
+				co = 1432;
+				     if (try==1) { x = to_xy[1  ][0]; y = to_xy[1  ][1]; dir = to_xy[1  ][2]; }
+				else if (try==2) { x = to_xy[2+n][0]; y = to_xy[2+n][1]; dir = to_xy[2+n][2]; }
+				else 			 { x = to_xy[1+n][0]; y = to_xy[1+n][1]; dir = to_xy[1+n][2]; }
+				co = pop_create_char(co, 0);
+				if (co) 
+				{
+					ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 60;
+					ch[co].flags |= CF_SHADOWCOPY;
+					ch[co].hp[0] = 500 + fl*10;
+					ch[co].a_hp  = 9999999;
+					ch[co].skill[SK_PERCEPT][1]  = 90;
+					ch[co].skill[SK_SAFEGRD][1]  = fl;
+					ch[co].skill[SK_IMMUN][1]    = fl;
+				}
+				else 
+				{ 
+					do_sayx(cn, "driver_pandium create char failed (%d)", ch[cn].data[2]); 
+					continue; 
+				}
+				if (!god_drop_char_fuzzy(co, x, y)) 
+				{ 
+					god_destroy_items(co); 
+					ch[co].used = USE_EMPTY; 
+					continue; 
+				}
+				fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+				ch[co].dir = dir;
+				for (m=0;m<PANDI_LIMIT;m++) ch[co].data[m] = ch_in[n];
+				ch[cn].data[7+n] = co;
+			}
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 2 - (TICKS*2*fl/100));
+			break;
+		case 9:
+			if (fl>= 5) tell_incolosseum(9, "Prepare thyself!");
+			else  		tell_incolosseum(9, "Embrace power eternal!");
+			for (n=0;n<PANDI_LIMIT;n++) 
+			{
+				if (IS_SANECHAR(co = ch[cn].data[7+n]) && ch[co].used != USE_EMPTY)
+				{
+					for (m=0;m<PANDI_LIMIT;m++) npc_add_enemy(co, ch_in[m], 1);
+				}
+				npc_add_enemy(cn, ch_in[n], 1);
+				ch[cn].data[7+n] = ch_in[n]; // Set here for when we die later
+			}
+			if (fl<5) 	ch[cn].data[2]=14; // Skip final phase and wait for end
+			else 		ch[cn].data[2]++; 
+			ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		// 25% HP Breakpoint
+		case 10:
+			if (ch[cn].a_hp>ch[cn].hp[5]*250) return; // Wait until 25%
+			if (fl>=30)
+			{
+				m = RANDOM(4)+1;
+				to_xy[0][0] = go_xy[m][0];
+				to_xy[0][1] = go_xy[m][1];
+				to_xy[0][2] = go_xy[m][2];
+			}
+			x = to_xy[0][0];
+			y = to_xy[0][1];
+			ch[cn].data[29] = x + y * MAPX;
+			ch[cn].dir      = to_xy[0][2];
+			ch[cn].data[30] = to_xy[0][2];
+			ch[cn].a_hp = ch[cn].hp[5]*250;
+			remove_buff(cn, SK_ZEPHYR2);
+			remove_buff(cn, SK_TAUNT);
+			ch[cn].taunted = 0;
+			npc_remove_all_enemies(cn);
+			quick_teleport(cn, x, y);
+			x = go_xy[0][0];
+			y = go_xy[0][1];
+			for (n=0;n<PANDI_LIMIT;n++) 
+			{
+				remove_buff(ch_in[n], SK_ZEPHYR2);
+				remove_buff(ch_in[n], SK_TAUNT);
+				ch[ch_in[n]].taunted = 0;
+				remove_enemy(ch_in[n]);
+				quick_teleport(ch_in[n], x, y);
+				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
+				{
+					remove_buff(co, SK_ZEPHYR2);
+					remove_buff(co, SK_TAUNT);
+					ch[co].taunted = 0;
+					npc_remove_all_enemies(co);
+					quick_teleport(co, x, y);
+				}
+				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_SHADOWCOPY]) && IS_ALIVEMASTER(co, ch_in[n]))
+				{
+					remove_buff(co, SK_ZEPHYR2);
+					remove_buff(co, SK_TAUNT);
+					ch[co].taunted = 0;
+					npc_remove_all_enemies(co);
+					quick_teleport(co, x, y);
+				}
+			}
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS / 2;
+			break;
+		case 11:
+			if (fl== 5) tell_incolosseum(9, "Dodge!");
+			else  		tell_incolosseum(9, "Obliteration.");
+			if (ch[cn].data[4]) ch[cn].data[4] = globs->ticker + TICKS*5+TICKS/2;
+			if (ch[cn].data[5]) ch[cn].data[5] = globs->ticker + TICKS*5+TICKS/2;
+			pandium_clean();
+			ch[cn].skill[SK_SAFEGRD][1] = 90;
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS * 1;
+			break;
+		case 12:
+			pandium_pattern(fl);
+			do_area_sound(0, 0, go_xy[0][0], go_xy[0][1], 14);
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 2 - (TICKS*2*fl/100));
+			break;
+		case 13:
+			if (fl== 5) tell_incolosseum(9, "Let's end this.");
+			else  		tell_incolosseum(9, "Ha ha ha!");
+			for (n=0;n<PANDI_LIMIT;n++) npc_add_enemy(cn, ch_in[n], 1);
+			ch[cn].data[2]++;
+			ch[cn].data[3] = globs->ticker + TICKS * 5;
+			break;
+		// Wait until death
+		default: break;
 	}
 }
 
@@ -4567,10 +5988,7 @@ void npc_emperor_driver(int cn)
 		ch[cn].dir = 3;
 		ch[ch[cn].attack_cn].attack_cn = 0;
 		ch[cn].attack_cn = 0;
-		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
-		{
-			ch[cn].data[n] = 0;
-		}
+		npc_remove_all_enemies(cn);
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		
 		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The %s leapt across the room.\n", ch[cn].name);
@@ -4578,7 +5996,7 @@ void npc_emperor_driver(int cn)
 		B_SK(cn, SK_SLOW) = 90;
 		B_SK(cn, SK_CURSE) = 90;
 		
-		ch[cn].a_hp   = 999999;
+		ch[cn].a_hp   = 9999999;
 		ch[cn].a_end  = 999999;
 		ch[cn].a_mana = 999999;
 	}
@@ -4586,16 +6004,16 @@ void npc_emperor_driver(int cn)
 	{
 		ch[cn].data[2] = 2;
 		
-		in = god_create_item(833);
+		in = god_create_item(IT_RPOT);
 		god_give_char(in, cn);
 		
 		do_sayx(cn, "Enough of thisss charade! Die!!");
 		
-		npc_quaff_potion(cn, 833, 254);
+		npc_quaff_potion(cn, IT_RPOT, 254);
 		
 		B_SK(cn, SK_ZEPHYR) = 90;
 		
-		ch[cn].a_hp   = 999999;
+		ch[cn].a_hp   = 9999999;
 		ch[cn].a_end  = 999999;
 		ch[cn].a_mana = 999999;
 	}
@@ -4647,7 +6065,7 @@ void npc_shivab_driver(int cn)
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].dir = 3;
 		
-		ch[cn].a_hp   = 999999;
+		ch[cn].a_hp   = 9999999;
 		ch[cn].a_end  = 999999;
 		ch[cn].a_mana = 999999;
 	}
@@ -4693,7 +6111,7 @@ void npc_shivab_driver(int cn)
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].dir = 1;
 		
-		ch[cn].a_hp   = 999999;
+		ch[cn].a_hp   = 9999999;
 		ch[cn].a_end  = 999999;
 		ch[cn].a_mana = 999999;
 	}
@@ -4739,7 +6157,7 @@ void npc_shivab_driver(int cn)
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].dir = 2;
 		
-		ch[cn].a_hp   = 999999;
+		ch[cn].a_hp   = 9999999;
 		ch[cn].a_end  = 999999;
 		ch[cn].a_mana = 999999;
 	}
@@ -4778,9 +6196,9 @@ void npc_shivab_driver(int cn)
 		do_sayx(cn, "Let's end this!");
 		chlog(cn, "spawned all three");
 		
-		in = god_create_item(267);
+		in = god_create_item(IT_RPOT);
 		god_give_char(in, cn);
-		npc_quaff_potion(cn, 267, 254);
+		npc_quaff_potion(cn, IT_RPOT, 254);
 		
 		ch[ch[cn].attack_cn].attack_cn = 0;
 		ch[cn].attack_cn = 0;
@@ -4789,7 +6207,7 @@ void npc_shivab_driver(int cn)
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].dir = 7;
 		
-		ch[cn].a_hp   = 999999;
+		ch[cn].a_hp   = 9999999;
 		ch[cn].a_end  = 999999;
 		ch[cn].a_mana = 999999;
 	}
@@ -4905,6 +6323,12 @@ int npc_driver_high(int cn)
 				do_char_log(cn, 1, "%s tells you: Too late! Too late! Try again some time.\n", ch[cn].name);
 			}
 		}
+	}
+	
+	// Guess I'll put this here?
+	if (ch[cn].temp==CT_PANDIUM)
+	{
+		pandium_driver(cn);
 	}
 	
 	// driver check if low health
@@ -6066,6 +7490,11 @@ void npc_driver_low(int cn)
 		ch[cn].temp==CT_ANNOU4 || ch[cn].temp==CT_ANNOU5)
 	{
 		colosseum_driver(cn);
+	}
+	
+	if (ch[cn].temp==CT_PANDIUM)
+	{
+		pandium_driver(cn);
 	}
 	
 	// are we supposed to loot graves?

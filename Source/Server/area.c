@@ -339,6 +339,19 @@ struct area area[] = {
 	{ 173,  921,  255, 1003, "The Volcano",                    3},
 	{ 199,  947,  229,  977, "Summit",                         2},
 	{ 120,  826,  164,  920, "Onyx Gargoyle Nest",             1},
+	{ 281,  844,  297,  848, "The Burning Plains",             2},
+	{ 217,  851,  227,  853, "The Burning Plains",             2},
+	{ 228,  849,  248,  853, "The Burning Plains",             2},
+	{ 264,  849,  297,  853, "The Burning Plains",             2},
+	{ 217,  854,  297,  889, "The Burning Plains",             2},
+	{ 269,  890,  297,  930, "The Burning Plains",             2},
+	{ 217,  767,  280,  848, "The Obsidian Fortress",          0},
+	{ 281,  767,  297,  843, "The Obsidian Fortress",          0},
+	{ 217,  849,  227,  850, "The Obsidian Fortress",          0},
+	{ 249,  849,  263,  853, "The Obsidian Fortress",          0},
+	{ 279,  931,  287,  939, "The Archon's Gate",              3},
+	{ 269,  975,  297, 1003, "The Archon's Trial",             3},
+	{ 269,  953,  297,  961, "The Archon's Reward",            3},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 644,  767,  650,  843, "Neiseer",                        0},
 	{ 651,  767,  851,  877, "Neiseer",                        0},
@@ -499,9 +512,10 @@ extern struct waypoint waypoint[MAXWPS] = {
 	{ 431, 729, "Lizard Temple, South", 			"the entrance to the Lizard Temple, north of the Autumn Meadow" },
 	{ 177, 756, "Lizard Settlement, East", 		    "the north-east end of the Lizard Settlement" },
 	{ 156, 544, "The Emerald Cavern, East", 		"the western side of the Emerald Cavern" },
-	{ 771, 595, "The Tower", 						"the entrance to The Tower" },
-	{ 512, 512, "Neiseer, East", 					"the entrance to the Violet Bog, east of Neiseer" },
-	{ 512, 512, "Neiseer, South", 					"the entrance to the Raging Rivers, south of Neiseer" }
+	{ 771, 595, "The Tower", 						"the entrance to The Tower" },										//   8388608
+	{ 512, 512, "Neiseer, East", 					"the entrance to the Violet Bog, east of Neiseer" },				//  16777216
+	{ 512, 512, "Neiseer, South", 					"the entrance to the Raging Rivers, south of Neiseer" },			//  33554432
+	{ 292, 921, "Burning Plains", 					"the Burning Plains" }												//  67108864
 };
 
 // return a description of the area character cn is in

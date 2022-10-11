@@ -708,7 +708,7 @@ static void info(int cn)
 
 	if (globs->mdday % 28 + 1==1)
 	{
-		printf("New Moon tonight!<br><br>");
+		printf("New Moon in effect!<br><br>");
 	}
 	else if (globs->mdday % 28 + 1<15)
 	{
@@ -716,7 +716,7 @@ static void info(int cn)
 	}
 	else if (globs->mdday % 28 + 1==15)
 	{
-		printf("Full Moon tonight!<br><br>");
+		printf("Full Moon in effect!<br><br>");
 	}
 	else
 	{

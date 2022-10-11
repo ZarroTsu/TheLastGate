@@ -473,7 +473,7 @@ int god_drop_item(int nr, int x, int y)
 		return 0;
 	}
 	m = XY2M(x, y);
-	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & (MF_MOVEBLOCK | MF_DEATHTRAP)) || map[m].fsprite)
+	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & (MF_MOVEBLOCK | MF_DEATHTRAP | MF_NOPLAYER)) || map[m].fsprite)
 	{
 		return 0;
 	}
@@ -878,7 +878,7 @@ int god_drop_char_fuzzy_large(int nr, int x, int y, int xs, int ys)
 
 int god_give_char(int in, int cn)
 {
-	int n, tmp, stacksize;
+	int n, in2, tmp, stacksize, flag=0;
 
 	if (!IS_SANEITEM(in) || !IS_LIVINGCHAR(cn))
 	{
@@ -886,34 +886,38 @@ int god_give_char(int in, int cn)
 	}
 	if (IS_PLAYER(cn)) for (n = 0; n<40; n++)
 	{
+		in2 = ch[cn].item[n];
+		flag = 1;
+		if (it[in].driver == 93 && it[in].data[4] != it[in2].data[4]) flag = 0;
+		if (it[in].driver == 110 && it[in].data[0] == 5 && it[in2].data[0] == 5 && it[in].data[1] != it[in2].data[1]) flag = 0;
 		// Find a stackable item of the same template
-		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[ch[cn].item[n]].temp && it[ch[cn].item[n]].stack<10)
+		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[in2].temp && it[in2].stack<10 && flag)
 		{
-			if (it[ch[cn].item[n]].stack<1)	it[ch[cn].item[n]].stack=1;
+			if (it[in2].stack<1)	it[in2].stack=1;
 			if (it[in].stack>1)
 			{
-				tmp 		= it[ch[cn].item[n]].value / it[ch[cn].item[n]].stack;
-				stacksize 	= it[ch[cn].item[n]].stack + it[in].stack;
+				tmp 		= it[in2].value / it[in2].stack;
+				stacksize 	= it[in2].stack + it[in].stack;
 				
 				if (stacksize > 10)
 				{
-					it[ch[cn].item[n]].stack = 10;
-					it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
+					it[in2].stack = 10;
+					it[in2].value = tmp * it[in2].stack;
 					it[in].stack 	= stacksize-10;
 					it[in].value 	= tmp * it[in].stack;
 					break;
 				}
 				else
 				{
-					it[ch[cn].item[n]].stack += it[in].stack;
-					it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
+					it[in2].stack += it[in].stack;
+					it[in2].value = tmp * it[in2].stack;
 				}
 			}
 			else
 			{
-				tmp = it[ch[cn].item[n]].value / it[ch[cn].item[n]].stack;
-				it[ch[cn].item[n]].stack++;
-				it[ch[cn].item[n]].value = tmp * it[ch[cn].item[n]].stack;
+				tmp = it[in2].value / it[in2].stack;
+				it[in2].stack++;
+				it[in2].value = tmp * it[in2].stack;
 			}
 			do_update_char(cn);
 			return 1;
@@ -1228,6 +1232,8 @@ void god_info(int cn, int co)
 		{
 			do_char_log(cn, 3, "Killed %d NPCs below rank, %d NPCs at rank, %d NPCs above rank.\n",
 			            ch[co].data[23], ch[co].data[24], ch[co].data[25]);
+			do_char_log(cn, 9, "Cleared %d archon floors alone, %d in a group.\n",
+			            ch[co].pandium_floor[0]-1, ch[co].pandium_floor[1]-1);
 			do_char_log(cn, 3, "Killed %d players outside arena, killed %d shopkeepers.\n",
 			            ch[co].data[29], ch[co].data[40]);
 			do_char_log(cn, 3, "Stronghold: %d total points\n", ch[co].bs_points);
@@ -1588,7 +1594,7 @@ void god_top(int cn)
 
 	if ((globs->mdday % 28) + 1==1)
 	{
-		do_char_log(cn, 1, "New Moon tonight!\n");
+		do_char_log(cn, 1, "New Moon in effect!\n");
 	}
 	else if ((globs->mdday % 28) + 1<15)
 	{
@@ -1596,7 +1602,7 @@ void god_top(int cn)
 	}
 	else if ((globs->mdday % 28) + 1==15)
 	{
-		do_char_log(cn, 1, "Full Moon tonight!\n");
+		do_char_log(cn, 1, "Full Moon in effect!\n");
 	}
 	else
 	{
@@ -2561,6 +2567,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x40000000 | MF_NOLAG;
 		ch[cn].item[m++] = 0x40000000 | MF_NOFIGHT;
 		ch[cn].item[m++] = 0x40000000 | MF_NOEXPIRE;
+		ch[cn].item[m++] = 0x40000000 | MF_NOPLAYER;
 		ch[cn].item[m++] = 0x20000000 | SPR_DESERT_GROUND;	//  1002
 		ch[cn].item[m++] = 0x20000000 | SPR_GROUND1;		//  1008
 		ch[cn].item[m++] = 0x20000000 | SPR_WOOD_GROUND;	//  1013
@@ -2796,7 +2803,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 2216;				// ** 
 		break;	
 	case 17:	// Canyon
-		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
 		ch[cn].item[m++] = 1674;				// ** Wall
 		ch[cn].item[m++] = 1710;				// ** Rope
 		ch[cn].item[m++] = 0x20000000 | 3614;
@@ -2909,7 +2916,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 1673;				// ** M.Red window
 		break;
 	case 21:	// New Canyon - Grey
-		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
 		ch[cn].item[m++] = 1710;				// ** Bridge Rope 1
 		ch[cn].item[m++] = 2817;				// ** Bridge Rope 2
 		ch[cn].item[m++] = 2818;				// ** Bridge Pole N
@@ -2948,7 +2955,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 5989;
 		break;
 	case 22:	// New Canyon - Brown
-		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
 		ch[cn].item[m++] = 1710;				// ** Bridge Rope 1
 		ch[cn].item[m++] = 2817;				// ** Bridge Rope 2
 		ch[cn].item[m++] = 2818;				// ** Bridge Pole N
@@ -2987,7 +2994,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 6014;
 		break;
 	case 23:	// New Canyon - Blue
-		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
+		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
 		ch[cn].item[m++] = 1710;				// ** Bridge Rope 1
 		ch[cn].item[m++] = 2817;				// ** Bridge Rope 2
 		ch[cn].item[m++] = 2818;				// ** Bridge Pole N
@@ -4200,8 +4207,8 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].flags &= ~(CF_APPRAISE | CF_LOCKPICK | CF_SENSE);
 	}
 	
+	ch[co].a_hp   = 9999999;
 	ch[co].a_end  = 999999;
-	ch[co].a_hp   = 999999;
 	ch[co].a_mana = 999999;
 
 	do_update_char(co);

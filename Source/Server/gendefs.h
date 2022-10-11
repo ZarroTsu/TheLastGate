@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000813
-#define MINVERSION			0x000811
+#define VERSION				0x000900
+#define MINVERSION			0x000900
 
 #define DATDIR				".dat"
 
@@ -23,7 +23,7 @@
 #define MAXMISSION			1024
 #define MAXSKILL			  50
 #define MAXBUFFS			  40
-#define MAXWPS				  26
+#define MAXWPS				  27
 
 #define MAXTCHARS			4548
 #define MAXTITEM			4548
@@ -101,6 +101,13 @@
 #define COLOS5_Y1			 940
 #define COLOS5_X2			 802
 #define COLOS5_Y2			 976
+
+#define PANDI_X1			 275
+#define PANDI_Y1			 981
+#define PANDI_X2			 291
+#define PANDI_Y2			 997
+#define PANDI_MIDX			 283
+#define PANDI_MIDY			 989
 
 #define LAB_I_X				  74
 #define LAB_I_Y				  25
@@ -287,7 +294,7 @@
 #define DAM_MULT_THORNS		1000
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
-#define DAM_MULT_ZEPHYR		  25
+#define DAM_MULT_ZEPHYR		  50
 #define DAM_MULT_LEAP		 250
 
 // -------- Buff Duration values -------- //

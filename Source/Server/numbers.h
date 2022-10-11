@@ -48,6 +48,7 @@
 #define CT_HERBCOLL		 703
 #define CT_HERBCOLL2	1205
 #define CT_SCORPCOLL    1016
+#define CT_ANTIQUECL    1429
 #define CT_SHIVA_I		 664
 
 #define CT_RD_SKELE		  31
@@ -68,6 +69,8 @@
 #define CT_DREADKING	 109
 #define CT_SPIDER		 110
 #define CT_LIZEMPEROR	1200
+#define CT_PANDIUM		1335
+#define CT_SHADOW		1432
 
 #define CT_STONEGOLEM	 723
 #define CT_SEASONSMOB	 724
@@ -207,6 +210,10 @@
 
 // -----
 
+#define IT_EXPLOSION	2922
+
+// -----
+
 #define IT_SEYANSWORD 	 682
 #define IT_DEADSEYSWORD	 683
 
@@ -236,6 +243,8 @@
 #define IT_SCORP		2611
 #define IT_SCORG		2612
 #define IT_SCORQ		2613
+
+#define IT_ANTIQ		2889
 
 // Unique Amulets
 #define IT_ANKHAMULET	 768
@@ -483,6 +492,7 @@
 #define IT_POT_DEAD		  99
 
 #define IT_POT_GOLEM	 449
+#define IT_POT_ANTI		2127
 
 #define IT_POT_T		1543
 #define IT_POT_O		1544
@@ -888,6 +898,7 @@
 #define CR_GOLD			2805
 #define CR_ITEM			2806
 #define CR_AUGM			2807
+#define CR_BUFF			2925
 
 //
 // Map tile sizes

@@ -260,16 +260,13 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	}
 	*/
 	
-	ch[cn].a_hp 	= 999999;
+	ch[cn].a_hp 	= 9999999;
 	ch[cn].a_end 	= 999999;
 	ch[cn].a_mana 	= 999999;
 	
 	ch[cn].data[5] = ch[cn].attack_cn;
 	
-	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
-	{
-		ch[cn].data[n] = 0;
-	}
+	npc_remove_all_enemies(cn);
 	
 	xo = ch[cn].x;
 	yo = ch[cn].y;
@@ -472,10 +469,7 @@ int npc_shiva_phasing(int cn)
 		remove_spells(cn);
 		fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].attack_cn = 0;
-		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
-		{
-			ch[cn].data[n] = 0;
-		}
+		npc_remove_all_enemies(cn);
 		
 		if (in2 = map[606+233*MAPX].it) // Let's lock that door real quick
 		{
@@ -769,10 +763,7 @@ void npc_shiva_low(int cn)
 		ch[cn].data[0]=0;
 		ch[cn].data[1]=0;
 		ch[cn].data[3]=0;
-		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
-		{
-			ch[cn].data[n] = 0;
-		}
+		npc_remove_all_enemies(cn);
 	}
 	
 	if (ch[cn].data[29] && ch[cn].data[0]==0)    // resting position, lowest prio

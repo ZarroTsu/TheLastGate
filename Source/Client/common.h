@@ -19,7 +19,7 @@
 
 #define MAXSKILL		(50+2)	// must match server!
 #define MAXBUFFS		40		// must match server!
-#define MAXWPS			26
+#define MAXWPS			27
 
 // -------- Damage Multipliers -------- //
 
@@ -117,7 +117,7 @@
 #define MF_TAVERN		(1U<<7)
 #define MF_NOMAGIC		(1U<<8)
 #define MF_DEATHTRAP	(1U<<9)
-
+#define MF_NOPLAYER		(1U<<10)
 #define MF_ARENA		(1U<<11)
 
 #define MF_NOEXPIRE		(1U<<13)

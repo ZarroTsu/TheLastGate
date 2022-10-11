@@ -345,6 +345,7 @@ int main(int argc, char *args[])
                     if (map[map_tileid].flags&(MF_ARENA)) printf("tile.flags.arena = true;\n");
                     if (map[map_tileid].flags&(MF_NOEXPIRE)) printf("tile.flags.noexpire = true;\n");
                     if (map[map_tileid].flags&(MF_NOFIGHT)) printf("tile.flags.nofight = true;\n");
+					if (map[map_tileid].flags&(MF_NOPLAYER)) printf("tile.flags.noplayer = true;\n");
 
                     printf("}\n");
 
@@ -377,6 +378,7 @@ int main(int argc, char *args[])
                         else if (maped_queue[i].it_temp&MF_ARENA) printf("\"flag_arena\";\n");
                         else if (maped_queue[i].it_temp&MF_NOEXPIRE) printf("\"flag_noexpire\";\n");
                         else if (maped_queue[i].it_temp&MF_NOFIGHT) printf("\"flag_nofight\";\n");
+						else if (maped_queue[i].it_temp&MF_NOPLAYER) printf("\"flag_noplayer\";\n");
                         else printf("null;\n");
 
                     } else if (maped_queue[i].op_type == MAPED_SETFLOOR) {
@@ -431,6 +433,7 @@ int main(int argc, char *args[])
                     case 11: x2|=MF_ARENA; break;
                     case 12: x2|=MF_NOEXPIRE; break;
                     case 13: x2|=MF_NOFIGHT; break;
+					case 14: x2|=MF_NOPLAYER; break;
                 }
                 addQueueInstruction(MAPED_PLACEITEM, x, y, x2);
             }

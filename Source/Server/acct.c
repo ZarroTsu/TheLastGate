@@ -215,7 +215,7 @@ static char *player_data_name[100] = {
 	"Last Player Attacked (PCD_ATTACKVICT)", //69
 	"Flags of Killed NPC of Certain Class EX", //70
 	"Number of Says/Tells/Looks/Lights", //71
-	"Quest Flags", //72
+	"Quest Flags 1/2", //72
 	"Unused", //73
 	"Current Shadow Copy", //74
 	"Unused", //75
@@ -237,7 +237,7 @@ static char *player_data_name[100] = {
 	"Unused", //91
 	"Reserved", //92
 	"Unused", //93
-	"Unused", //94
+	"Quest Flags 2/2", //94
 	"Unused", //95
 	"Queued Spells", //96
 	"Computation Time Used Last Action",   //97

@@ -42,12 +42,13 @@ FILE *discordShoutOut;
 FILE *discordRanked;
 FILE *discordTopA;
 FILE *discordTopB;
-//FILE *discordMoon;
+FILE *discordPandium;
 
 char  mod[256];
 
-#define DISC_R  8
-#define DISC_T  5
+#define DISC_R    8
+#define DISC_T    5
+#define DISC_P   15
 
 void discord_top_five(void)
 {
@@ -114,19 +115,19 @@ void discord_top_five(void)
 			r4 = ch[nr[j][m]].points_tot % 1000;
 			
 			if (r1)
-				fprintf(discordTopA, "%c %10.10s    %20.20s    %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+				fprintf(discordTopA, "%c %10.10s   %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
-				fprintf(discordTopA, "%c %10.10s    %20.20s        %3d,%03d,%03d\n", font ? '+' : ' ', 
+				fprintf(discordTopA, "%c %10.10s   %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
-				fprintf(discordTopA, "%c %10.10s    %20.20s            %3d,%03d\n", font ? '+' : ' ', 
+				fprintf(discordTopA, "%c %10.10s   %20.20s         %3d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
-				fprintf(discordTopA, "%c %10.10s    %20.20s                %3d\n", font ? '+' : ' ', 
+				fprintf(discordTopA, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r4);
 		}
@@ -142,10 +143,10 @@ void discord_top_five(void)
 		if (j!=DISC_R/2) fprintf(discordTopB, " \n");
 		switch (j)
 		{
-			case  4: fprintf(discordTopA, "- Top Sorcerers:\n"); break;
-			case  5: fprintf(discordTopA, "- Top Summoners:\n"); break;
-			case  6: fprintf(discordTopA, "- Top Arch-Harakim:\n"); break;
-			default: fprintf(discordTopA, "- Top Bravers:\n"); break;
+			case  4: fprintf(discordTopB, "- Top Sorcerers:\n"); break;
+			case  5: fprintf(discordTopB, "- Top Summoners:\n"); break;
+			case  6: fprintf(discordTopB, "- Top Arch-Harakim:\n"); break;
+			default: fprintf(discordTopB, "- Top Bravers:\n"); break;
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -158,19 +159,19 @@ void discord_top_five(void)
 			r4 = ch[nr[j][m]].points_tot % 1000;
 			
 			if (r1)
-				fprintf(discordTopB, "%c %10.10s    %20.20s    %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+				fprintf(discordTopB, "%c %10.10s   %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
-				fprintf(discordTopB, "%c %10.10s    %20.20s        %3d,%03d,%03d\n", font ? '+' : ' ', 
+				fprintf(discordTopB, "%c %10.10s   %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
-				fprintf(discordTopB, "%c %10.10s    %20.20s            %3d,%03d\n", font ? '+' : ' ', 
+				fprintf(discordTopB, "%c %10.10s   %20.20s         %3d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
-				fprintf(discordTopB, "%c %10.10s    %20.20s                %3d\n", font ? '+' : ' ', 
+				fprintf(discordTopB, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
 					r4);
 		}
@@ -190,7 +191,6 @@ void discord_gmoon(void)
 	month = globs->mdday / 28 + 1;
 	year  = globs->mdyear;
 	
-	//discordMoon = fopen("moon.txt", "w");
 	fprintf(discordWho, "```diff\n");
 	fprintf(discordWho, "It's %d:%02d on the %d%s%s%s%s%s%s%s of the %d%s%s%s%s month of the year %d.\n",
 	            hour, minute,
@@ -208,13 +208,82 @@ void discord_gmoon(void)
 	            month==3 ? "rd" : "",
 	            month>3  ? "th" : "",
 	            year);
-	if 		((globs->mdday % 28) + 1==1)  	fprintf(discordWho, "- New Moon tonight! (+0.10 Spellmod & 100%% faster regen)\n");
+	if 		((globs->mdday % 28) + 1==1)  	fprintf(discordWho, "- New Moon in effect! (+0.10 Spellmod & 100%% faster regen)\n");
 	else if ((globs->mdday % 28) + 1<15)  	fprintf(discordWho, "  The Moon is growing...\n");
-	else if ((globs->mdday % 28) + 1==15) 	fprintf(discordWho, "+ Full Moon tonight! (+0.15 Spellmod & 50%% faster regen)\n");
+	else if ((globs->mdday % 28) + 1==15) 	fprintf(discordWho, "+ Full Moon in effect! (+0.15 Spellmod & 50%% faster regen)\n");
 	else 								  	fprintf(discordWho, "  The moon is dwindling...\n");
 	fprintf(discordWho, "```\n");
-	//fflush(discordMoon);
-	//fclose(discordMoon);
+}
+
+void discord_pandium(void)
+{
+	// pandium.txt
+	int j, n, m, font;
+	int cl;
+	int nr[2][DISC_P];	// Char # solo/group
+	int fl[2][DISC_P];	// Floor # solo/group    ch[n].pandium_floor[0]    ch[n].pandium_floor[1]
+	
+	for (j = 0; j<2; j++) for (m = 0; m<DISC_P; m++)
+	{
+		fl[j][m]  = -1;
+		nr[j][m] = -1;
+	}
+	for (j = 0; j<2; j++) for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used==USE_EMPTY)				continue;
+		if (!(ch[n].flags & (CF_PLAYER)))		continue;
+		if (ch[n].flags & (CF_GOD | CF_NOLIST))	continue;
+		
+		if (ch[n].pandium_floor[j]<=1)	continue;
+		
+		for (m = 0; m<DISC_P; m++)
+		{
+			if (ch[n].pandium_floor[j]>fl[j][m])
+			{
+				if (m<(DISC_P-1))
+				{
+					memmove(&fl[j][m + 1], &fl[j][m], ((DISC_P-1) - m) * sizeof(int));
+					memmove(&nr[j][m + 1], &nr[j][m], ((DISC_P-1) - m) * sizeof(int));
+				}
+				fl[j][m] = ch[n].pandium_floor[j]-1;
+				nr[j][m] = n;
+				break;
+			}
+		}
+	}
+	
+	discordPandium = fopen("pandium.txt", "w");
+	fprintf(discordPandium, "```diff\n");
+	for (j = 0; j<2; j++)
+	{
+		if (j!=0) fprintf(discordPandium, " \n");
+		switch (j)
+		{
+			case  0: fprintf(discordPandium, "- Top Solo Archon Clears:\n"); break;
+			default: fprintf(discordPandium, "- Top Group Archon Clears:\n"); break;
+		}
+		for (m = 0; m<(j?DISC_P:DISC_T); m++)
+		{
+			if (nr[j][m]==-1) continue;
+			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			
+			cl = -1;
+			if (IS_SEYAN_DU(nr[j][m]))    cl = 0;
+			if (IS_ARCHTEMPLAR(nr[j][m])) cl = 1;
+			if (IS_SKALD(nr[j][m]))       cl = 2;
+			if (IS_WARRIOR(nr[j][m]))     cl = 3;
+			if (IS_SORCERER(nr[j][m]))    cl = 4;
+			if (IS_SUMMONER(nr[j][m]))    cl = 5;
+			if (IS_ARCHHARAKIM(nr[j][m])) cl = 6;
+			if (IS_BRAVER(nr[j][m]))      cl = 7;
+
+			fprintf(discordPandium, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
+				ch[nr[j][m]].name, (cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
+		}
+	}
+	fprintf(discordPandium, "```\n");
+	fflush(discordPandium);
+	fclose(discordPandium);
 }
 
 void discord_who(void)
@@ -270,9 +339,8 @@ void discord_who(void)
 	fclose(discordWho);
 	
 	discord_top_five();
+	discord_pandium();
 }
-
-
 
 void discord_shout_in(void)
 {
@@ -1470,7 +1538,7 @@ int main(int argc, char *args[])
 	fclose(discordShoutOut);
 	fclose(discordRanked);
 	fclose(discordTopA);
-//	fclose(discordMoon);
+	fclose(discordPandium);
 
 	return 0;
 }

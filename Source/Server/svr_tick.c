@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.8.19\n"};
+static char intro_msg3[] = {"Current client/server version is 0.9.0\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
@@ -595,6 +595,12 @@ void plr_cmd_inv(int nr)
 				it[in].value = tmpv * it[in].stack;
 				
 				tmp = god_create_item(it[in].temp);
+				
+				if (it[in].driver==110)
+				{
+					it[tmp].data[0] = it[in].data[0];
+					it[tmp].data[1] = it[in].data[1];
+				}
 				
 				//it[tmp].x = 0;
 				//it[tmp].y = 0;
@@ -2666,48 +2672,21 @@ void plr_change(int nr)
 						{
 							switch(in & 0xfffffff)
 							{
-							case    MF_MOVEBLOCK:
-								*(short int*)(buf + 5) = 47;
-								break;
-							case    MF_SIGHTBLOCK:
-								*(short int*)(buf + 5) = 83;
-								break;
-							case    MF_INDOORS:
-								*(short int*)(buf + 5) = 48;
-								break;
-							case    MF_UWATER:
-								*(short int*)(buf + 5) = 50;
-								break;
-							case    MF_NOFIGHT:
-								*(short int*)(buf + 5) = 36;
-								break;
-							case    MF_NOMONST:
-								*(short int*)(buf + 5) = 51;
-								break;
-							case    MF_BANK:
-								*(short int*)(buf + 5) = 52;
-								break;
-							case    MF_TAVERN:
-								*(short int*)(buf + 5) = 53;
-								break;
-							case    MF_NOMAGIC:
-								*(short int*)(buf + 5) = 54;
-								break;
-							case    MF_DEATHTRAP:
-								*(short int*)(buf + 5) = 74;
-								break;
-							case    MF_ARENA:
-								*(short int*)(buf + 5) = 78;
-								break;
-							case    MF_NOEXPIRE:
-								*(short int*)(buf + 5) = 81;
-								break;
-							case    MF_NOLAG:
-								*(short int*)(buf + 5) = 49;
-								break;
-							default:
-								*(short int*)(buf + 5) = 0;
-								break;
+							case MF_MOVEBLOCK:	*(short int*)(buf + 5) = 47; break;
+							case MF_SIGHTBLOCK:	*(short int*)(buf + 5) = 83; break;
+							case MF_INDOORS:	*(short int*)(buf + 5) = 48; break;
+							case MF_UWATER:		*(short int*)(buf + 5) = 50; break;
+							case MF_NOFIGHT:	*(short int*)(buf + 5) = 36; break;
+							case MF_NOMONST:	*(short int*)(buf + 5) = 51; break;
+							case MF_BANK:		*(short int*)(buf + 5) = 52; break;
+							case MF_TAVERN:		*(short int*)(buf + 5) = 53; break;
+							case MF_NOMAGIC:	*(short int*)(buf + 5) = 54; break;
+							case MF_DEATHTRAP:	*(short int*)(buf + 5) = 74; break;
+							case MF_ARENA:		*(short int*)(buf + 5) = 78; break;
+							case MF_NOEXPIRE:	*(short int*)(buf + 5) = 81; break;
+							case MF_NOLAG:		*(short int*)(buf + 5) = 49; break;
+							case MF_NOPLAYER:	*(short int*)(buf + 5) = 79; break;
+							default:			*(short int*)(buf + 5) =  0; break;
 							}
 							*(short int*)(buf + 7) = 0;
 						}
@@ -4094,7 +4073,6 @@ void plr_getmap_fast(int nr)
 			{
 				smap[n].it_sprite = 0;
 				smap[n].it_status = 0;
-
 			}
 		}
 	}
