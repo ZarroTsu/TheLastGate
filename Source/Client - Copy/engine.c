@@ -593,6 +593,7 @@ void eng_display_win(int plr_sprite,int init)
 	int y,n,m,pr;
 	char *tmp,buf[50];
 	int pl_flags, pl_flagb;
+	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
 
 	if (init) {
 		reset_block();
@@ -641,12 +642,49 @@ void eng_display_win(int plr_sprite,int init)
 				}
 			}
 		}
-
-		// spells
-		for (n=0; n<MAXBUFFS; n++) {
-			if (pl.spell[n]) {
-				copyspritex(pl.spell[n],848+(n%6)*20,8+(n/6)*23,15-min(15,pl.active[n]));
+		
+		// Prepare spell icons // pl.spell[n] is the SPRITE of the debuff being received.
+		// This can be used to cheat and split buffs and debuffs into two groups.
+		// buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2];
+		bf = 0;
+		df = 0;
+		for (n=0; n<MAXBUFFS; n++)
+		{
+			buffs[n][0] = 0; debuffs[n][0] = 0;
+			buffs[n][1] = 0; debuffs[n][1] = 0;
+		}
+		// Split buffs and debuffs
+		for (n=0; n<MAXBUFFS; n++)
+		{
+			if (pl.spell[n]) 
+			{
+				switch (pl.spell[n])
+				{
+					case    89: case    91: case    97: case   119: case   149:
+					case   178: case   224: case   225: case   319: case   325:
+					case   329: case   338: case   365: case   411: case   419:
+					case   471: case   487: case   489: case   498: case   617:
+					case   618: case   702: case  1009: case  1011: case  1015:
+					case 16860: case 16861: case 16862: case 16863:
+						debuffs[df][0] = pl.spell[n];
+						debuffs[df][1] = pl.active[n];
+						df++;
+						break;
+					default:
+						buffs[bf][0] = pl.spell[n];
+						buffs[bf][1] = pl.active[n];
+						bf++;
+						break;
+				}
 			}
+		}
+		// Draw buffs and debuffs
+		for (n=0; n<MAXBUFFS; n++)
+		{
+			if (buffs[n][0])
+				copyspritex(  buffs[n][0], 848+(n/5)*20,      8+(n%5)*23, 15-min(15,  buffs[n][1]));
+			if (debuffs[n][0])
+				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, 15-min(15,debuffs[n][1]));
 		}
 
 		// Scroll Bars for Skills and Inventory

@@ -1386,16 +1386,13 @@ int main(int argc, char *args[])
 	}
 	
 	/* // (vvv REMOVE AFTER UPDATE!!!)
-	// Force remove unusual crit multipliers
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;
-		if ((it[n].flags & IF_ENCHANTED) && it[n].orig_temp && 
-			(it[n].crit_multi[0] >= it_temp[it[n].orig_temp].crit_multi[0] || it[n].crit_chance[0] >= it_temp[it[n].orig_temp].crit_chance[0]))
+		if (it[n].orig_temp && it[n].crit_multi[0] != it_temp[it[n].orig_temp].crit_multi[0])
 		{
-			it[n].flags |= IF_UPDATE;
-			it[n].crit_chance[0] = it_temp[it[n].orig_temp].crit_chance[0];
-			it[n].crit_multi[0]  = it_temp[it[n].orig_temp].crit_multi[0];
+			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
+			it[n].max_damage = 100000;
 		}
 	}
 	// */ // (^^^ REMOVE AFTER UPDATE!!!)
@@ -1420,6 +1417,7 @@ int main(int argc, char *args[])
 	god_read_banlist();
 	reset_changed_items();
 	
+	/*
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (!it[n].used)
@@ -1431,7 +1429,6 @@ int main(int argc, char *args[])
 			it[n].stack = 1;
 			it[n].flags |= IF_UPDATE;
 		}
-		/*
 		if (it[n].flags & IF_LABYDESTROY)
 		{
 			tmplabcheck(n);
@@ -1443,8 +1440,9 @@ int main(int argc, char *args[])
 			else 						it[n].max_damage = 60000;
 			xlog("Set %s (%d) max_damage to %d", it[n].name, n, it[n].max_damage);
 		}
-		*/
+		
 	}
+	*/
 	
 	for (n = 1; n<MAXTCHARS; n++)
 	{

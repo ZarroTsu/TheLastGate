@@ -55,6 +55,7 @@
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
 
 #define IS_TWOHAND(in)			(it[(in)].placement & PL_TWOHAND)
+#define IS_USETWOHAND(cn)		(it[ch[(cn)].worn[WN_RHAND]].placement & PL_TWOHAND)
 
 #define IS_SOULSTONED(in)		(it[(in)].flags & IF_SOULSTONE)
 #define IS_ENCHANTED(in)		(it[(in)].flags & IF_ENCHANTED)
@@ -166,14 +167,11 @@
 #define B_AT(cn, a)		(ch[(cn)].attrib[(a)][0])
 #define M_AT(cn, a)		(get_attrib_score((cn), (a)))
 #define B_SK(cn, s)		(ch[(cn)].skill[(s)][0])
-#define M_SK(cn, s)		((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[cn].worn[WN_HEAD], 52)?125:100)/100):get_skill_score((cn), (s)))
+#define M_SK(cn, s)		((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
 
 #define IS_P_SKILL(a)	(a==8||a==9||a==23||a==32)
 
 #define CAN_SENSE(cn)	((ch[(cn)].flags & CF_SENSE) || !IS_PLAYER(cn))
-
-// Haste's formula
-#define HASTEFORM(n)		(n/4)
 
 // Slow's formula (used to degrade)
 #define SLOWFORM(n)			(n/2*9/10)
@@ -185,8 +183,8 @@
 #define CURSE2FORM(p, n)	(((p*4/3)-n)/5)
 
 // Poison's formula (damage per tick)
-#define PL_POISFORM(p, d)	(((p+15) * 3250) / d)
-#define MN_POISFORM(p, d)	(((p+10) * 3250) / d)
+#define PL_POISFORM(p, d)	(((p+15) * 4500) / d)
+#define MN_POISFORM(p, d)	(((p+10) * 3000) / d)
 
 // Bleed's formula (damage per tick)
 #define BLEEDFORM(p, d)		(((p+ 5) *  750) / d)
@@ -208,7 +206,7 @@
 #define DESC_HERMIT		"When equipped, you have 20%% more Armor Value, but 20%% less Resistance and Immunity.\n"
 #define DESC_WHEEL		"When equipped, your critical hit chance is reduced by 33%%, but you have 1.5x critical hit multiplier.\n"
 #define DESC_JUSTICE	"When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
-#define DESC_HANGED		"When equipped, 25%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
+#define DESC_HANGED		"When equipped, 33%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
 #define DESC_DEATH		"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
 #define DESC_TEMPER		"When equipped, your Taunt skill grants 100%% more Guard power, but Guard duration is halved.\n"
 #define DESC_DEVIL		"When equipped, 30%% of all skill and spell costs are instead twice taken from your Hitpoints.\n"
@@ -222,7 +220,7 @@
 #define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 10%%.\n"
 #define DESC_MAGI_R		"When equipped, your concentrate skill instead increases the cost of spells, but it also increases your spell modifier.\n"
 #define DESC_PREIST_R	"When equipped, your maximum mana is reduced by 20%% to increase your cooldown bonus by 10%% of the subtracted mana.\n"
-#define DESC_EMPRES_R	"When equipped, your Lethargy skill grants 50%% more penetration, but costs life over time instead of mana over time.\n"
+#define DESC_EMPRES_R	"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"
 #define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
 #define DESC_HEIROP_R	"When equipped, your Ghost Companion has 25%% more Weapon Value and Armor Value, but has a 25%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R	"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
@@ -230,17 +228,17 @@
 #define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
 #define DESC_HERMIT_R	"When equipped, your Rage skill grants a large bonus to Top Damage instead of Weapon Value.\n"
 #define DESC_WHEEL_R	"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
-#define DESC_JUSTIC_R	"When equipped, your Leap skill deals 20%% less damage, but has reduced base cooldown and instead chooses a random nearby target.\n"
+#define DESC_JUSTIC_R	"When equipped, your Leap skill no longer deals critical damage, has reduced base cooldown, and instead chooses a random nearby target.\n"
 #define DESC_HANGED_R	"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"
 #define DESC_DEATH_R	"When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n"
 #define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
 #define DESC_DEVIL_R	"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
 #define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
 #define DESC_STAR_R		"When equipped, your Spell Modifier no longer effects spell power and instead effects skill power.\n"
-#define DESC_MOON_R		"When equipped, the effectiveness of your Meditate skill is tripled while fighting, but zero while stationary.\n"
-#define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate skill is tripled while fighting, but zero while stationary.\n"
+#define DESC_MOON_R		"When equipped, the effectiveness of your Meditate skill is normalized while fighting, but zero while stationary.\n"
+#define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate skill is normalized while fighting, but zero while stationary.\n"
 #define DESC_JUDGE_R	"When equipped, your Pulse spell is replaced with Immolate. Immolate is a toggle that causes you and surrounding enemies to take damage over time.\n"
-#define DESC_WORLD_R	"When equipped, the effectiveness of your Rest skill is tripled while fighting, but zero while stationary.\n"
+#define DESC_WORLD_R	"When equipped, the effectiveness of your Rest skill is normalized while fighting, but zero while stationary.\n"
 
 
 /* *** CASINO *** */
@@ -293,21 +291,21 @@
 #define CFL_P_CHST		"  Area has %d additional chests\n"
 #define CFL_P_SHRN		"  Area has %d additional shrines\n"
 #define CFL_P_XEXP		"  Exit grants %d%% more exp\n"
-#define RATE_P_XEXP		20
+#define RATE_P_XEXP		25
 #define CFL_P_XLUK		"  Exit grants %d%% of exp as luck\n"
-#define RATE_P_XLUK		2
+#define RATE_P_XLUK		5
 #define CFL_P_XBSP		"  Exit grants %d%% of exp as stronghold pts\n"
-#define RATE_P_XBSP		4
+#define RATE_P_XBSP		10
 #define CFL_P_XOSP		"  Exit grants %d%% of exp as Osiris pts\n"
-#define RATE_P_XOSP		3
+#define RATE_P_XOSP		10
 #define CFL_P_PLXP		"  Players earn %d%% more exp from enemies\n"
 #define RATE_P_PLXP		20
 #define CFL_P_ENBS		"  Enemies grant %d%% of exp as stronghold pts\n"
-#define RATE_P_ENBS		8
+#define RATE_P_ENBS		10
 #define CFL_P_ENOS		"  Enemies grant %d%% of exp as Osiris pts\n"
-#define RATE_P_ENOS		6
+#define RATE_P_ENOS		10
 #define CFL_P_ENGL		"  Enemies drop %d%% of exp as gold\n"
-#define RATE_P_ENGL		22
+#define RATE_P_ENGL		5
 #define CFL_P_ARGL		"  Area contains %s piles of gold\n"
 #define CFL_P_AREQ		"  Area contains %s discarded equipment\n"
 #define CFL_P_ARPT		"  Area contains %s discarded potions\n"

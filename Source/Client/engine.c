@@ -548,7 +548,7 @@ struct skilltab _skilltab[52] = {
 				{ AT_BRV, AT_STR, AT_STR }},
 				
 	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", 
-				"Leap (Random)", 		"Use (Skill): Strike your foe and leap to a random target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", "", 
+				"Leap (Random)", 		"Use (Skill): Strike your foe and leap to a random target. Cooldown can be bypassed by sacrificing life.", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
@@ -776,13 +776,6 @@ int hp_needed(int v)
 	return v*pl.hp[3];
 }
 
-int end_needed(int v)
-{
-	if (v>=pl.end[2]) return HIGH_VAL;
-
-	return v*pl.end[3]/2;
-}
-
 int mana_needed(int v)
 {
 	if (v>=pl.mana[2]) return HIGH_VAL;
@@ -823,7 +816,7 @@ unsigned int	show_shop=0,show_wps=0;
 
 unsigned int	show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
-int				inv_pos=0,skill_pos=0,wps_pos=0,mm_magnify=2;
+int				inv_pos=0,skill_pos=0,wps_pos=0,hudmode=0,mm_magnify=2;
 
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
@@ -856,7 +849,7 @@ static char motdfont[MLL];
 #define GUI_MP_COUNT_X	  9
 #define GUI_MP_COUNT_Y	316
 
-#define GUI_MONEY_X		442
+#define GUI_MONEY_X		267 // 442
 #define GUI_MONEY_Y		114
 
 #define GUI_UPDATE_X	144
@@ -878,9 +871,9 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 #define GUI_F_COL2		1132
 #define GUI_F_COL3		1180
 #define GUI_F_COL4		1228
-#define GUI_F_ROW1		 664
-#define GUI_F_ROW2		 679
-#define GUI_F_ROW3		 694
+#define GUI_F_ROW1		 667
+#define GUI_F_ROW2		 682
+#define GUI_F_ROW3		 697
 
 #define GUI_WV_X		1112
 #define GUI_WV_Y		 261
@@ -926,27 +919,30 @@ int sk_score(int n)
 	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
 }
 
-void display_meta_from_ls(void)
+int pl_speed, pl_atksp, pl_spmod, pl_spapt, pl_movsp;
+int pl_critc, pl_critm, pl_topdm, pl_reflc, pl_aoebn;
+int pl_hitsc, pl_parry, pl_coold, pl_casts, pl_dmgbn;
+int pl_flags, pl_flagb, pl_basel, pl_dmgml, pl_dmgrd;
+int pl_dlow,  pl_dhigh, pl_dps,   pl_cdrate;
+int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
+int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
+int sk_water, sk_cleav, sk_safeg, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
+int sk_shado, sk_rally, sk_immol;
+
+void init_meta_stats(void)
 {
-	int pl_speed, pl_atksp, pl_spmod, pl_spapt;
-	int pl_critc, pl_critm, pl_topdm, pl_reflc;
-	int pl_hitsc, pl_parry, pl_coold, pl_casts;
-	int pl_flags, pl_flagb, pl_basel, pl_dmgml;
-	int pl_dlow,  pl_dhigh, pl_dps,   pl_cdrate;
 	int moonmult = 20;
 	int hpmult, endmult, manamult;
 	int race_reg = 0, race_res = 0, race_med = 0;
-	int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
-	int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
-	int sk_water, sk_cleav, sk_safeg, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
-	int sk_shado, sk_rally, sk_immol;
 	
 	// Player Speed and Attack Speed - WN_SPEED
 	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; 
 	pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; 
-
+	pl_movsp = pl_speed + pl.end[0];
+	
 	if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP; if (pl_speed < 0) pl_speed = 0;
 	if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP; if (pl_atksp < 0) pl_atksp = 0;
+	if (pl_movsp > SPEED_CAP) pl_movsp = SPEED_CAP; if (pl_movsp < 0) pl_movsp = 0;
 
 	// Player Spell Mod and Spell Apt - WN_SPMOD
 	pl_spmod = pl.worn[WN_SPMOD];
@@ -970,6 +966,10 @@ void display_meta_from_ls(void)
 	
 	if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP; if (pl_casts < 0) pl_casts = 0;
 	
+	pl_aoebn = pl.end[1];
+	pl_dmgbn = pl.end[2];
+	pl_dmgrd = pl.end[3];
+	
 	// Player Flags from special items
 	pl_flags = pl.worn[WN_FLAGS];
 	pl_flagb = pl.worn_p[WN_FLAGS];
@@ -985,9 +985,9 @@ void display_meta_from_ls(void)
 		pl_dmgml = 120;
 	
 	// Player DPS - pl_dlow, pl_dhigh, pl_dps
-	pl_dlow  = (pl.weapon*pl_dmgml/100)/4;
+	pl_dlow  = (pl.weapon*pl_dmgml/100)/4*pl_dmgbn/10000;
 	pl_dhigh = pl.weapon+8+pl_topdm+6;
-	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4;
+	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
 	pl_dps   = (pl_dlow+pl_dhigh)/2*pl_atksp;
 	
 	// Player cooldown rate - pl_cdrate
@@ -1025,18 +1025,18 @@ void display_meta_from_ls(void)
 	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
 	sk_rally = sk_score(35)/10;
 	sk_shado = 15 + sk_score(46)*pl_spmod/500;
-	sk_weake = -(sk_score(41) / 5 + 2);
+	sk_weake = -(sk_score(41) / 4 + 2);
 	sk_safeg = (1000 - (sk_score(39)));
 	
 	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
 	{
 		sk_blind = -(sk_score(37) / 6 + 2);
-		sk_douse = -(sk_score(37) / 9 + 2);
+		sk_douse = -(sk_score(37) / 6 + 2);
 	}
 	else
 	{
 		sk_blind = -(sk_score(37) / 8 + 1);
-		sk_douse = -(sk_score(37) /12 + 1);
+		sk_douse = -(sk_score(37) / 8 + 1);
 	}
 	
 	// Tarot - Hanged Man (immunity&resistance)
@@ -1070,7 +1070,7 @@ void display_meta_from_ls(void)
 	// Book - Venom Compendium (poison bonus)
 	if (pl_flags & (1 <<  4))
 	{
-		sk_poiso = sk_poiso * 4 / 3;
+		sk_poiso = sk_poiso * 5 / 4;
 	}
 	
 	// Tarot - Rev.Death (zephyr)
@@ -1080,7 +1080,12 @@ void display_meta_from_ls(void)
 	}
 	else
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/4) * 2 * DAM_MULT_ZEPHYR/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/3) * 2 * DAM_MULT_ZEPHYR/1000;
+	}
+	
+	if (pl.kindred & ((1u<<1) | (1u<<14)))
+	{
+		sk_weake = -(sk_score(41) / 6 + 2);
 	}
 	
 	// Tarot - Emperor (slow bonus)
@@ -1196,9 +1201,63 @@ void display_meta_from_ls(void)
 	sk_regen = sk_regen * 20/10;
 	sk_restv = sk_restv * 20/10;
 	sk_medit = sk_medit * 20/10;
+}
 
-	// DRAW THE GUI INFO
-	switch (last_skill)
+void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
+{
+	int m = 8;
+	
+	if (flag)		m += 8*14;
+	
+					dd_xputtext(9,  m+n*14,font,"%-20.20s", va    );
+	if (vc>=0)		dd_xputtext(140,m+n*14,font,"%4d.%02d", vb, vc);
+	else if (vb>=0)	dd_xputtext(140,m+n*14,font,"%7d",      vb    );
+					dd_xputtext(189,m+n*14,font,"%-7.7s",   ve    );
+}
+
+void show_meta_stats(int n)
+{
+	// 1 = Yellow
+	// 5 = Orange
+	// 0 = Red
+	if (n<7)					// Topmost standard stats
+	{
+		switch (n)
+		{
+			case  0: meta_stat(0,n,1,"Cooldown Duration", 	pl_cdrate/100, 	pl_cdrate%100, 	""); break;
+			//
+			case  2: meta_stat(0,n,1,"Spell Aptitude", 		pl_spapt, 		-1, 			""); break;
+			case  3: meta_stat(0,n,1,"Spell Modifier", 		pl_spmod /100, 	pl_spmod %100, 	""); break;
+			//
+			case  5: meta_stat(0,n,1,"Hit Score", 			pl_hitsc, 		-1, 			""); break;
+			case  6: meta_stat(0,n,1,"Parry Score", 		pl_parry, 		-1, 			""); break;
+			default: break;
+		}
+	}
+	else if (hudmode==1)		// Offense Stats
+	{
+		n-=7;
+		switch (n+skill_pos)
+		{
+			case  0: meta_stat(1,n,1,"", 0, -1, ""); break;
+			default: break;
+		}
+	}
+	else						// Defense Stats
+	{
+		n-=7;
+		switch (n+skill_pos)
+		{
+			case  0: meta_stat(1,n,5,"Speed Values:", 		-1, 			-1, 			""); break;
+			case  1: meta_stat(1,n,1,"Base", 				pl_speed/100,	pl_speed%100, 	""); break;
+			case  2: meta_stat(1,n,1,"Attack", 				pl_atksp/100,	pl_atksp%100, 	""); break;
+			case  3: meta_stat(1,n,1,"Cast", 				pl_casts/100,	pl_casts%100, 	""); break;
+			case  4: meta_stat(1,n,1,"Movement", 			pl_movsp/100, 	pl_movsp%100, 	""); break;
+			default: break;
+		}
+	}
+/*
+	switch (num)
 	{												// ".............." // 
 		case 60: // Braveness - 1. Cast Speed 	2. Crit Chanc	3. Crit Multi	4. Prox Bonus 	5. eImmunity	6. eResist
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Crit Chance");
@@ -1307,41 +1366,12 @@ void display_meta_from_ls(void)
 		default: // Default -	1. Melee DPS,	2. Hit, 		3. Parry, 		 4. Spell Mod	5. Spell Apt 	6. Act Speed
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPS");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_dps/100,pl_dps%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Hit Score");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%9d",pl_hitsc);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Parry Score");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",pl_parry);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Spell Modifier");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%6d.%02d",pl_spmod/100,pl_spmod%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Spell Aptitude");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",pl_spapt);
+			
 			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Action Speed");
 			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",pl_speed/100,pl_speed%100);
 			break;									// ".............." // 
 	}
-	
-	// Draw red rectangle around selected last_skill, for context
-	if (last_skill >= 60 && last_skill <= 64)
-	{
-		dd_showbox(5,5+14*(last_skill-60),131,13,(unsigned short)(RED));
-	}
-	
-	// Draw a moon icon?  261 212
-	/*
-	if (moonmult==40)
-	{
-		// New Moon
-	}
-	if (moonmult==30)
-	{
-		// Full Moon
-	}
-	else
-	{
-		// Standard Moon
-	}
 	*/
-	
 }
 
 void eng_display_win(int plr_sprite,int init)
@@ -1349,6 +1379,7 @@ void eng_display_win(int plr_sprite,int init)
 	int y,n,m,pr;
 	char *tmp,buf[50];
 	int pl_flags, pl_flagb;
+	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
 
 	//if (load) dd_xputtext(670,300+MAXTS,1,"%3d%%",load);
 
@@ -1365,6 +1396,10 @@ void eng_display_win(int plr_sprite,int init)
 		if (pdata.hide)			dd_showbox(GUI_F_COL2,GUI_F_ROW2,45,12,(unsigned short)(RED));
 		if (pdata.show_names)	dd_showbox(GUI_F_COL3,GUI_F_ROW2,45,12,(unsigned short)(RED));
 		if (pdata.show_bars)	dd_showbox(GUI_F_COL4,GUI_F_ROW2,45,12,(unsigned short)(RED));
+		//
+		if (hudmode==0)			dd_showbox(261,182,64,12,(unsigned short)(RED));
+		else if (hudmode==1)	dd_showbox(261,197,64,12,(unsigned short)(RED));
+		else if (hudmode==2)	dd_showbox(261,212,64,12,(unsigned short)(RED));
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
@@ -1397,22 +1432,47 @@ void eng_display_win(int plr_sprite,int init)
 					copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
 				}
 			}
-			// Draw shortcut key names
-			for (m=0; m<16; m++)
+			// Draw shortcut key IDs
+			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)inv_pos)
+				copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
+		}
+
+		// Prepare spell icons // pl.spell[n] is the SPRITE of the debuff being received.
+		// This can be used to cheat and split buffs and debuffs into two groups.
+		// buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2];
+		bf = 0;
+		df = 0;
+		for (n=0; n<MAXBUFFS; n++)
+		{
+			buffs[n][0] = 0; debuffs[n][0] = 0;
+			buffs[n][1] = 0; debuffs[n][1] = 0;
+		}
+		// Split buffs and debuffs
+		for (n=0; n<MAXBUFFS; n++)
+		{
+			if (pl.spell[n]) 
 			{
-				if (pdata.xbutton[m].skill_nr==100+n+(signed)inv_pos)
+				switch (pl.spell[n])
 				{
-					copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
+					case    89: case    91: case    97: case   119: case   149:
+					case   178: case   224: case   225: case   319: case   325:
+					case   329: case   338: case   365: case   411: case   419:
+					case   471: case   487: case   489: case   498: case   617:
+					case   618: case   702: case  1009: case  1011: case  1015:
+					case 16860: case 16861: case 16862: case 16863:
+						debuffs[df][0] = pl.spell[n];
+						debuffs[df][1] = pl.active[n];
+						df++;
+						break;
+					default:
+						buffs[bf][0] = pl.spell[n];
+						buffs[bf][1] = pl.active[n];
+						bf++;
+						break;
 				}
 			}
 		}
-
-		// spells
-		for (n=0; n<MAXBUFFS; n++) {
-			if (pl.spell[n]) {
-				copyspritex(pl.spell[n],848+(n%6)*20,8+(n/6)*23,15-min(15,pl.active[n]));
-			}
-		}
+		
 
 		// Scroll Bars for Skills and Inventory
 		dd_showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
@@ -1424,14 +1484,36 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_EN_COUNT_X,	GUI_EN_COUNT_Y,	1,"Endurance         %3d %3d",pl.a_end,pl.end[5]);
 		dd_xputtext(GUI_MP_COUNT_X,	GUI_MP_COUNT_Y,	1,"Mana              %3d %3d",pl.a_mana,pl.mana[5]);
 		
-		// display meta stats
-		display_meta_from_ls();
+		// Money, BSP, CST, OSP
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"      Money");
+		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y,	1,"%9dG %2dS",pl.gold/100,pl.gold%100);
+		if (pl.bs_points==0)
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1,"        ???");
+		else
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1," Stronghold");
+		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+14,	1,"  %12d",pl.bs_points);
+		if (pl.tokens==0)
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"        ???");
+		else
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"     Casino");
+		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+28,	1,"  %12d",pl.tokens);
+		if (pl.os_points==0)
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"        ???");
+		else
+			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"   Contract");
+		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+42,	1,"  %12d",pl.os_points);
 		
-		// Money, Update, Points
-		dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"Money");
-		dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1,"%9dG %2dS",pl.gold/100,pl.gold%100);
-		dd_xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
-		dd_xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
+		// Update and Update exp
+		if (hudmode==0)
+		{
+			copyspritex(do_darkmode?18099:99, 134, 3,  0);
+			dd_xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
+			dd_xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
+		}
+		else
+		{
+			init_meta_stats();
+		}
 
 		// WV, AV, EXP
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
@@ -1442,110 +1524,122 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 
 		// display spell shortcut buttons
-		for (n=0; n<16; n++) {
-			dd_xputtext(1086+(n%4)*49,591+(n/4)*15,1,pdata.xbutton[n].name);
-		}
-
-		for (n=0; n<5; n++) {
-			dd_xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
-			//
-			if (pdata.show_stats) dd_xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
-			dd_xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
-			//
-			if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used) 
-				dd_putc(163,8+n*14,1,'+');
-			if (stat_raised[n]>0) 
-				dd_putc(177,8+n*14,1,'-');
-			if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])!=HIGH_VAL) 
-				dd_xputtext(189,8+n*14,1,"%7d",attrib_needed(n,pl.attrib[n][0]+stat_raised[n]));
+		for (n=0; n<20; n++) {
+			dd_xputtext(1038+(n%5)*48,600+(n/5)*15,1,pdata.xbutton[n].name);
 		}
 		
-		dd_xputtext(9,8+5*14,1,"Hitpoints");
-		//
-		if (pdata.show_stats) dd_xputtext(117,(8+5*14),3,"%3d",pl.hp[0]+stat_raised[5]);
-		dd_xputtext(140,(8+5*14),1,"%3d",pl.hp[5]+stat_raised[5]);
-		//
-		if (hp_needed(pl.hp[0]+stat_raised[5])<=pl.points-stat_points_used)	
-			dd_putc(163,8+5*14,1,'+');
-		if (stat_raised[5]>0) 
-			dd_putc(177,8+5*14,1,'-');
-		if (hp_needed(pl.hp[0]+stat_raised[5])!=HIGH_VAL) 
-			dd_xputtext(189,8+5*14,1,"%7d",hp_needed(pl.hp[0]+stat_raised[5]));
-		
-		/*
-		dd_xputtext(9, 88,1,"Endurance         %3d",pl.end[5]+stat_raised[6]);
-		if (end_needed(pl.end[0]+stat_raised[6])<=pl.points-stat_points_used) dd_putc(136,88,1,'+');
-		if (stat_raised[6]>0) dd_putc(150,88,1,'-');
-		if (end_needed(pl.end[0]+stat_raised[6])!=HIGH_VAL)	dd_xputtext(162,88,1,"%7d",end_needed(pl.end[0]+stat_raised[6]));
-		*/
-		
-		dd_xputtext(9,8+6*14,1,"Mana");
-		//
-		if (pdata.show_stats) dd_xputtext(117,(8+6*14),3,"%3d",pl.mana[0]+stat_raised[7]);
-		dd_xputtext(140,(8+6*14),1,"%3d",pl.mana[5]+stat_raised[7]);
-		//
-		if (mana_needed(pl.mana[0]+stat_raised[7])<=pl.points-stat_points_used)	
-			dd_putc(163,8+6*14,1,'+');
-		if (stat_raised[7]>0) 
-			dd_putc(177,8+6*14,1,'-');
-		if (mana_needed(pl.mana[0]+stat_raised[7])!=HIGH_VAL) 
-			dd_xputtext(189,8+6*14,1,"%7d",mana_needed(pl.mana[0]+stat_raised[7]));
+		if (hudmode==0)
+		{
+			for (n=0; n<5; n++) {
+				dd_xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
+				//
+				if (pdata.show_stats) dd_xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
+				dd_xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
+				//
+				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used) 
+					dd_putc(163,8+n*14,1,'+');
+				if (stat_raised[n]>0) 
+					dd_putc(177,8+n*14,1,'-');
+				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])!=HIGH_VAL) 
+					dd_xputtext(189,8+n*14,1,"%7d",attrib_needed(n,pl.attrib[n][0]+stat_raised[n]));
+			}
+			
+			dd_xputtext(9,8+5*14,1,"Hitpoints");
+			//
+			if (pdata.show_stats) dd_xputtext(117,(8+5*14),3,"%3d",pl.hp[0]+stat_raised[5]);
+			dd_xputtext(140,(8+5*14),1,"%3d",pl.hp[5]+stat_raised[5]);
+			//
+			if (hp_needed(pl.hp[0]+stat_raised[5])<=pl.points-stat_points_used)	
+				dd_putc(163,8+5*14,1,'+');
+			if (stat_raised[5]>0) 
+				dd_putc(177,8+5*14,1,'-');
+			if (hp_needed(pl.hp[0]+stat_raised[5])!=HIGH_VAL) 
+				dd_xputtext(189,8+5*14,1,"%7d",hp_needed(pl.hp[0]+stat_raised[5]));
+			
+			dd_xputtext(9,8+6*14,1,"Mana");
+			//
+			if (pdata.show_stats) dd_xputtext(117,(8+6*14),3,"%3d",pl.mana[0]+stat_raised[7]);
+			dd_xputtext(140,(8+6*14),1,"%3d",pl.mana[5]+stat_raised[7]);
+			//
+			if (mana_needed(pl.mana[0]+stat_raised[7])<=pl.points-stat_points_used)	
+				dd_putc(163,8+6*14,1,'+');
+			if (stat_raised[7]>0) 
+				dd_putc(177,8+6*14,1,'-');
+			if (mana_needed(pl.mana[0]+stat_raised[7])!=HIGH_VAL) 
+				dd_xputtext(189,8+6*14,1,"%7d",mana_needed(pl.mana[0]+stat_raised[7]));
+		}
+		else
+		{
+			for (n=0; n<7; n++) 
+			{
+				show_meta_stats(n);
+			}
+		}
 		
 		// Player Flags from special items
 		pl_flags = pl.worn[WN_FLAGS];
 		pl_flagb = pl.worn_p[WN_FLAGS];
 		
-		for (n=0; n<10; n++) {
-			m=skilltab[n+skill_pos].nr;
-			if (m>=52)
+		for (n=0; n<10; n++) 
+		{
+			// regular skill tab functionality
+			if (hudmode==0)
 			{
-				dd_xputtext(9,(8+8*14)+n*14,1,"-");
-			}
-			else if (m>=50)
-			{
-				dd_xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+skill_pos].name);
-				dd_xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
-				continue;
-			}
-			else if (!pl.skill[m][0]) 
-			{
-				// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
-				if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&pl.kindred & (1u<<1))) 
+				m=skilltab[n+skill_pos].nr;
+				if (m>=52)
 				{
-					dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
-					dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
-				}
-				else
 					dd_xputtext(9,(8+8*14)+n*14,1,"-");
-				continue;
+				}
+				else if (m>=50)
+				{
+					dd_xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+skill_pos].name);
+					dd_xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
+					continue;
+				}
+				else if (!pl.skill[m][0]) 
+				{
+					// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
+					if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&pl.kindred & (1u<<1))) 
+					{
+						dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
+						dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
+					}
+					else
+						dd_xputtext(9,(8+8*14)+n*14,1,"-");
+					continue;
+				}
+				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+						(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+						(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+						(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
+						(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+						(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
+						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
+						(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
+						(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
+						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
+						(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
+						(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
+						(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
+						(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
+					)
+					dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
+				else
+					dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
+				
+				if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
+				dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
+				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
+					dd_putc(163,(8+8*14)+n*14,1,'+');
+				if (stat_raised[n+8+skill_pos]>0) 
+					dd_putc(177,(8+8*14)+n*14,1,'-');
+				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL)
+					dd_xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
 			}
-			if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-					(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-					(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-					(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
-					(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-					(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-					(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
-					(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-					(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
-					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
-					(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
-					(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-					(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-					(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
-				)
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
 			else
-				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
-			
-			if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
-			dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
-			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
-				dd_putc(163,(8+8*14)+n*14,1,'+');
-			if (stat_raised[n+8+skill_pos]>0) 
-				dd_putc(177,(8+8*14)+n*14,1,'-');
-			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL)
-				dd_xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
+			{
+				show_meta_stats(7+n);
+			}
 		}
 	}
 
@@ -1622,6 +1716,7 @@ void eng_display_win(int plr_sprite,int init)
 						// Draw talisman icon 
 						if (pl.worn_p[n]&PL_ENCHANTED)
 							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
+						
 					}
 					else
 					{
@@ -1633,6 +1728,9 @@ void eng_display_win(int plr_sprite,int init)
 						if (pl.worn_p[n]&PL_ENCHANTED)
 							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
 					}
+					// Draw shortcut key IDs
+					for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==200+n)
+						copyspritex(4011+m,gui_equ_x[n]+1,gui_equ_y[n]+1, 0);
 					
 					if (inv_block[n] && n==WN_CHARM2)
 						copyspritex(4,          gui_equ_x[n]+1, gui_equ_y[n]+1,  0); 
@@ -1723,6 +1821,15 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RED);
 
 			copyspritex(rank_sprite[points2rank(look.points)],935,42,0);
+		}
+		
+		// Draw buffs and debuffs
+		for (n=0; n<MAXBUFFS; n++)
+		{
+			if (buffs[n][0])
+				copyspritex(  buffs[n][0], 848+(n/5)*20,      8+(n%5)*23, 15-min(15,  buffs[n][1]));
+			if (debuffs[n][0])
+				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, 15-min(15,debuffs[n][1]));
 		}
 
 		if (show_shop) 

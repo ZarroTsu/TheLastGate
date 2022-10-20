@@ -830,7 +830,7 @@ int convert_skill_for_group(int co, int nr)
 
 int npc_give(int cn, int co, int in, int money)
 {
-	int nr, ar, canlearn = 1, stsz = 1;
+	int nr, nr2, ar, canlearn = 1, stsz = 1;
 	int tmp = 0;
 	int qnum = 0;
 	int n, in2 = 0;
@@ -854,14 +854,24 @@ int npc_give(int cn, int co, int in, int money)
 		 || ( nr == SK_RAGE && !IS_SEYA_OR_BRAV(co) ))
 			canlearn = 0;
 		
-		// Seyan'du can learn any arch skill, but only one!
-		if ((nr == SK_WARCRY || nr == SK_PULSE || nr == SK_LEAP || 
-			nr == SK_LETHARGY || nr == SK_SHADOW || nr == SK_ZEPHYR || 
-			nr == SK_RAGE) && IS_SEYAN_DU(co) && 
-			(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
-			 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR ||
-			 B_SK(co, SK_RAGE))))
-			canlearn = 0;
+		// Seyan'du can learn any arch skill, but only two!
+		if ((nr == SK_WARCRY || nr == SK_PULSE || nr == SK_LEAP || nr == SK_LETHARGY || 
+			nr == SK_SHADOW || nr == SK_ZEPHYR || nr == SK_RAGE) && IS_SEYAN_DU(co))
+		{
+			canlearn = 2;
+			if (B_SK(co, SK_WARCRY))   canlearn--;
+			if (B_SK(co, SK_LEAP))     canlearn--;
+			if (B_SK(co, SK_SHADOW))   canlearn--;
+			if (B_SK(co, SK_LETHARGY)) canlearn--;
+			if (B_SK(co, SK_PULSE))    canlearn--;
+			if (B_SK(co, SK_ZEPHYR))   canlearn--;
+			if (B_SK(co, SK_RAGE))     canlearn--;
+			
+			if (canlearn>=1) 
+				canlearn = 1;
+			else 
+				canlearn = 0;
+		}
 	}
 
 	if (in && (
@@ -1105,6 +1115,9 @@ int npc_give(int cn, int co, int in, int money)
 		/* quest-requested items */
 		if ((nr = ch[cn].data[50])!=0)
 		{
+			// Mercs and Seyans learn Haste from Regal now.
+			if ((IS_ANY_MERC(co) || IS_SEYAN_DU(co)) && nr == 117) nr = SK_HASTE;
+			
 			nr = convert_skill_for_group(co, nr);
 
 			if (nr==SK_TAUNT && IS_SEYAN_DU(co))
@@ -1353,7 +1366,8 @@ int npc_give(int cn, int co, int in, int money)
 			}
 			else
 			{
-				int nr2 = nr, div = 4;
+				int div = 4;
+				nr2 = nr;
 				do_sayx(cn, "Now I'll teach you %s.", skilltab[nr].name);
 				if (!ch[co].skill[nr2][2])
 				{
@@ -1406,9 +1420,11 @@ int npc_give(int cn, int co, int in, int money)
 				// </group rewards>
 			}
 		}
-
-		/* items with a return gift */
-		if ((nr = ch[cn].data[66])!=0)
+		
+		if ((nr2 = ch[cn].data[50]) && (IS_ANY_MERC(co) || IS_SEYAN_DU(co)) && nr2 == 117) nr2 = SK_HASTE;
+		
+		/* items with a return gift - SK_HASTE is special since we don't want Regal giving a book with the skill */
+		if (nr2 != SK_HASTE && (nr = ch[cn].data[66])!=0)
 		{
 			use_consume_item(cn, in, 1);
 			if (!(ch[cn].flags&(CF_BODY))) 
@@ -1720,7 +1736,7 @@ int npc_see(int cn, int co)
 	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc) || ch[cn].data[78]))
 	{
 		// If our last attempt to attack failed, wander near the taunter
-		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
+		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78] && ch[cn].data[27]!=1)
 		{
 			ch[cn].goto_x = ch[cc].x + 5 - RANDOM(10);
 			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
@@ -2207,7 +2223,18 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest117")==0) //   17 - Valley / Regal / Spellblade [1142]
 			{
-				do_sayx(cn, "A visitor? Are you here to challenge me to a duel? If not, fetch me the blade from those golems, would you? You can have a book on swords in return.", ch[co].name);
+				if (IS_ANY_MERC(co) || IS_SEYAN_DU(co))
+				{
+					if (!B_SK(co, SK_HASTE))
+						do_sayx(cn, "A visitor? Far too inexperienced... Fetch me the blade from those golems, would you? I would teach you HASTE in return.");
+					else
+						do_sayx(cn, "Back again? Are you ready to challenge me to a duel?");
+				}
+				else
+				{
+					do_sayx(cn, "A visitor? Are you here to challenge me to a duel? If not, fetch me the blade from those golems, would you? You can have a book on swords in return.");
+				}
+				
 			}
 			else if (strcmp(ch[cn].text[2], "#quest118")==0) //   18 - Garg Nest / Shera / Fire Egg
 			{
@@ -2391,15 +2418,18 @@ int npc_see(int cn, int co)
 			else 
 			{
 				int knowarch=0;
-				if (B_SK(co, SK_WARCRY)   || B_SK(co, SK_LEAP)  || B_SK(co, SK_SHADOW) ||
-					B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
-					B_SK(co, SK_RAGE))
-					knowarch=1;
+				if (B_SK(co, SK_WARCRY))   knowarch++;
+				if (B_SK(co, SK_LEAP))     knowarch++;
+				if (B_SK(co, SK_SHADOW))   knowarch++;
+				if (B_SK(co, SK_LETHARGY)) knowarch++;
+				if (B_SK(co, SK_PULSE))    knowarch++;
+				if (B_SK(co, SK_ZEPHYR))   knowarch++;
+				if (B_SK(co, SK_RAGE))     knowarch++;
 				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
 					if (IS_SEYA_OR_ARTM(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you WARCRY.", ch[co].name);
@@ -2411,7 +2441,7 @@ int npc_see(int cn, int co)
 				{
 					if (IS_SEYA_OR_WARR(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you ZEPHYR.", ch[co].name);
@@ -2423,7 +2453,7 @@ int npc_see(int cn, int co)
 				{
 					if (IS_SEYA_OR_SUMM(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you SHADOW COPY.", ch[co].name);
@@ -2435,7 +2465,7 @@ int npc_see(int cn, int co)
 				{
 					if (IS_SEYA_OR_SORC(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LETHARGY.", ch[co].name);
@@ -2447,7 +2477,7 @@ int npc_see(int cn, int co)
 				{
 					if (IS_SEYA_OR_ARHR(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you PULSE.", ch[co].name);
@@ -2459,7 +2489,7 @@ int npc_see(int cn, int co)
 				{
 					if (IS_SEYA_OR_SKAL(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LEAP.", ch[co].name);
@@ -2471,7 +2501,7 @@ int npc_see(int cn, int co)
 				{
 					if (IS_SEYA_OR_BRAV(co))
 					{
-						if (knowarch)
+						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you RAGE.", ch[co].name);
@@ -2483,7 +2513,10 @@ int npc_see(int cn, int co)
 				{
 					if (knowarch && IS_SEYAN_DU(co))
 					{
-						do_sayx(cn, "Hello, %s. Are you happy with the skill you learned? If not, I can remove it for an experience cost of 250,000. Say UNLEARN and I can make it so.", ch[co].name);
+						if (knowarch==2)
+							do_sayx(cn, "Hello, %s. Are you happy with the skills you've learned? If not, I can remove them for an experience cost of 250,000. Say UNLEARN and I can make it so.", ch[co].name);
+						else
+							do_sayx(cn, "Hello, %s. Are you happy with the skill you've learned? If not, I can remove it for an experience cost of 250,000. Say UNLEARN and I can make it so.", ch[co].name);
 					}
 					else if (IS_ANY_ARCH(co))
 						do_sayx(cn, "Congratulations, %s! Now that you have arched, you can donate a secondary tarot card to the shrine and it will apply it too! I can also REMOVE it for you.", ch[co].name);
@@ -2740,12 +2773,13 @@ int spellflag(int spell)
 
 int npc_try_spell(int cn, int co, int spell)
 {
-	int mana, end, n, in, tmp, cc, truespell;
-	int offn, defn;
+	int mana, end, n, in, tmp, cc, truespell, usemana = 0;
+	int offn, defn, tpow, tdef, timm;
 
 	if (spell!=SK_CLEAVE && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && 
 		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_RAGE)
 	{
+		usemana = 1;
 		if ((ch[cn].flags & CF_NOMAGIC) || (ch[co].flags & CF_NOMAGIC))
 		{
 			return 0;
@@ -2777,6 +2811,10 @@ int npc_try_spell(int cn, int co, int spell)
 	}
 	
 	offn = M_SK(cn, spell);
+	
+	if (usemana)	offn = spell_multiplier(offn, cn);
+	else			offn = skill_multiplier(offn, cn);
+	
 	defn = get_target_resistance(cn, co)*10;
 	
 	truespell = spell;
@@ -2856,15 +2894,17 @@ int npc_try_spell(int cn, int co, int spell)
 
 	mana = (ch[cn].a_mana-500) / 1000;
 	end = (ch[cn].a_end-500) / 1000;
-
+	tdef = (usemana && get_target_resistance(cn, co) >= offn) ? 1 : 0;
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[co].spell[n])!=0)
 		{
+			tpow = bu[in].power+10;
+			timm = spell_immunity(offn, get_target_immunity(cn, co));
+			timm = tdef ? (timm/2) : timm;
 			// Cancel if target is already buffed or debuffed (except for heal)
-			if (bu[in].temp==truespell && truespell!=SK_HEAL && 
-				(bu[in].power + 10)>=spell_immunity(M_SK(cn, truespell), get_target_immunity(cn, co)) && 
-				bu[in].active>bu[in].duration/2)
+			if (bu[in].temp==truespell && truespell!=SK_HEAL && tpow>=timm && bu[in].active>bu[in].duration/4)
 			{
 				break;
 			}
@@ -2872,11 +2912,10 @@ int npc_try_spell(int cn, int co, int spell)
 			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
 				(truespell==bu[in].data[1] || truespell==bu[in].data[2] || truespell==bu[in].data[3]))
 			{
-				//chlog(cn,"Immunize true (%d)",bu[in].temp);
 				break;
 			}
 			// Poison layer adjustments
-			if (bu[in].temp==truespell && truespell==SK_VENOM && bu[in].active>bu[in].duration/3)
+			if (bu[in].temp==truespell && truespell==SK_VENOM && bu[in].active>bu[in].duration/4)
 			{
 				break;
 			}
@@ -2891,8 +2930,7 @@ int npc_try_spell(int cn, int co, int spell)
 	if (n==MAXBUFFS)
 	{
 		tmp = spellflag(spell);
-		if (spell==SK_WEAKEN || spell==SK_CLEAVE || spell==SK_WARCRY || spell==SK_BLIND || 
-			spell==SK_TAUNT || spell==SK_LEAP || spell==SK_RAGE)
+		if (!usemana)
 		{
 			if (end>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
@@ -3120,6 +3158,26 @@ int is_incolosseum(int cn, int ln)
 	if ((ln == 0 || ln == 3) && x >= COLOS3_X1 && y >= COLOS3_Y1 && x <= COLOS3_X2 && y <= COLOS3_Y2) return 1; // Area 3
 	if ((ln == 0 || ln == 4) && x >= COLOS4_X1 && y >= COLOS4_Y1 && x <= COLOS4_X2 && y <= COLOS4_Y2) return 1; // Area 4
 	if ((ln == 0 || ln == 5) && x >= COLOS5_X1 && y >= COLOS5_Y1 && x <= COLOS5_X2 && y <= COLOS5_Y2) return 1; // Area 5
+	
+	return 0;
+}
+
+// The inner colosseum area for monster stuck checks
+int is_reallyincolosseum(int cn, int ln)
+{
+	int x, y;
+	
+	if (!IS_SANECHAR(cn)) return 0;
+	if (!IS_ACTIVECHAR(cn)) return 0;
+	
+	x = ch[cn].x;
+	y = ch[cn].y;
+	
+	if (ln == 1 && x >= COLOS1_X1+8 && y >= COLOS1_Y1+8 && x <= COLOS1_X2-8 && y <= COLOS1_Y2-8) return 1; // Area 1
+	if (ln == 2 && x >= COLOS2_X1+8 && y >= COLOS2_Y1+8 && x <= COLOS2_X2-8 && y <= COLOS2_Y2-8) return 1; // Area 2
+	if (ln == 3 && x >= COLOS3_X1+8 && y >= COLOS3_Y1+8 && x <= COLOS3_X2-8 && y <= COLOS3_Y2-8) return 1; // Area 3
+	if (ln == 4 && x >= COLOS4_X1+8 && y >= COLOS4_Y1+8 && x <= COLOS4_X2-8 && y <= COLOS4_Y2-8) return 1; // Area 4
+	if (ln == 5 && x >= COLOS5_X1+8 && y >= COLOS5_Y1+8 && x <= COLOS5_X2-8 && y <= COLOS5_Y2-8) return 1; // Area 5
 	
 	return 0;
 }
@@ -4297,10 +4355,11 @@ void spawn_colosseum_enemy(int x, int y, int tox, int toy, int parent, int diffi
 		ch[co].data[31] = ch[parent].temp;    // parent template
 		ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = 60;
 		ch[co].data[25] = 0;
-		ch[co].skill[SK_PERCEPT][1] += 15;
+		ch[co].data[27] = 1;
+		ch[co].skill[SK_PERCEPT][1] = 30;
+		ch[co].goto_x = tox;
+		ch[co].goto_y = toy;
 		do_update_char(co);
-		for (try = 0; try < 3; try++)
-			if (npc_moveto(co, tox-2+RANDOM(5), toy-2+RANDOM(5))) break;
 		ch[parent].data[5+m] = co;
 	}
 }
@@ -4347,7 +4406,7 @@ void colosseum_driver(int cn)
 	{
 		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
 		if (IS_PLAYER(n) && is_incolosseum(n, anum) && p == 0) p = ch[n].colosseum;
-		if (!IS_PLAYER(n) && !(IS_COMP_TEMP(n) && IS_SANEPLAYER(ch[n].data[CHD_MASTER])) && is_incolosseum(n, anum)) m++;
+		if (!IS_PLAYER(n) && !IS_PLAYER_COMP(n) && is_incolosseum(n, anum)) m++;
 	}
 	ch[cn].data[0] = p;
 	ch[cn].data[4] = m;
@@ -4370,6 +4429,11 @@ void colosseum_driver(int cn)
 		ch[cn].data[2] = 0;
 		ch[cn].data[3] = globs->ticker + TICKS * 3;
 		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		ch[cn].data[9] = 0;
 		return; // No further process when nobody is in the area
 	}
 	
@@ -4404,21 +4468,23 @@ void colosseum_driver(int cn)
 				m = 2; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
 				m = 3; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
 				chlog(cn, "created 4 monsters in colosseum %d", anum);
+				ch[cn].data[9] = globs->ticker + TICKS*15;
 				ch[cn].data[2]++;
 				break;
 			case  1: 	// Wait for mobs to die
 				if (ch[cn].data[4]) 
 				{
+					if (globs->ticker < ch[cn].data[9])
+						return;
 					n = anum-1;
 					for (m=0;m<4;m++)
 					{
 						// Try to force NPCs out of spawns if they're not doing anything at the moment.
-						if (IS_SANECHAR(co = ch[cn].data[5+m]) && ch[co].used != USE_EMPTY && 
-							ch_base_status(ch[co].status)>=0 && ch_base_status(ch[co].status)<=7 && // standing still
-							ch[co].x != to_xy[n][m][0] && ch[co].y != to_xy[n][m][1])
+						if (IS_SANECHAR(co = ch[cn].data[5+m]) && ch[co].used != USE_EMPTY && ch[co].temp == 347 &&
+							ch_base_status(ch[co].status)<160 && !is_reallyincolosseum(co, anum))
 						{
-							npc_moveto(co, to_xy[n][m][0]-2+RANDOM(5), to_xy[n][m][1]-2+RANDOM(5));
-							ch[cn].data[3] = globs->ticker + TICKS;
+							quick_teleport(co, to_xy[n][m][0]-2+RANDOM(5), to_xy[n][m][1]-2+RANDOM(5));
+							ch[cn].data[9] = globs->ticker + TICKS*5;
 						}
 					}
 					return;
@@ -4548,7 +4614,7 @@ void pandium_clean(void)
 {
 	int x, y, in=0;
 	
-	for (x = PANDI_X1; x<=PANDI_X2; x++) for (y = PANDI_Y1; y<=PANDI_Y2; y++)
+	for (x = PANDI_X1-1; x<=PANDI_X2+1; x++) for (y = PANDI_Y1-1; y<=PANDI_Y2+1; y++)
 	{
 		if (in = map[x + y * MAPX].it)
 		{
@@ -5425,11 +5491,11 @@ void pandium_driver(int cn) // CT_PANDIUM
 		// Assure Pandium is buffed (SK_OPPRESSION) based on floor #
 		// +0.5% damage reduction and +2 to all attributes each 1 power.
 		for (m=0;m<5;m++) ch[cn].attrib[m][1] = (fl+1)*3/2;
-		ch[cn].weapon_bonus          = fl/5 +  1;
-		ch[cn].armor_bonus           = fl/5 + 12;
+		//ch[cn].weapon_bonus          = (fl+1)/5 +  1;
+		//ch[cn].armor_bonus           = (fl+1)/8 + 12;
 		ch[cn].skill[SK_PERCEPT][1]  = 90;
 		ch[cn].skill[SK_SAFEGRD][1]  =  0;
-		ch[cn].skill[SK_IMMUN][1]    = fl;
+		ch[cn].skill[SK_IMMUN][1]    = (fl+1)/2;
 		ch[cn].hp[0]                 = 1000+1000*p;
 		ch[cn].a_hp                  = 9999999;
 		if (has_buff(cn, SK_OPPRESSION)) remove_buff(cn, SK_OPPRESSION);
@@ -5681,7 +5747,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			quick_teleport(cn, x, y);
 			x = go_xy[0][0];
 			y = go_xy[0][1];
-			for (n=0;n<PANDI_LIMIT;n++) 
+			for (n=0;n<PANDI_LIMIT;n++)
 			{
 				remove_buff(ch_in[n], SK_ZEPHYR2);
 				remove_buff(ch_in[n], SK_TAUNT);
@@ -5740,13 +5806,13 @@ void pandium_driver(int cn) // CT_PANDIUM
 				co = pop_create_char(co, 0);
 				if (co) 
 				{
-					ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 60;
-					ch[co].flags |= CF_SHADOWCOPY;
-					ch[co].hp[0] = 500 + fl*10;
+					ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 20;
+					ch[co].flags |= CF_SHADOWCOPY | CF_NOSLEEP;
+					ch[co].hp[0] = 499 + (fl+1)*5;
 					ch[co].a_hp  = 9999999;
 					ch[co].skill[SK_PERCEPT][1]  = 90;
-					ch[co].skill[SK_SAFEGRD][1]  = fl;
-					ch[co].skill[SK_IMMUN][1]    = fl;
+					ch[co].skill[SK_SAFEGRD][1]  = (fl+1)/2;
+					ch[co].skill[SK_IMMUN][1]    = (fl+1)/2;
 				}
 				else 
 				{ 
@@ -5811,6 +5877,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				remove_buff(ch_in[n], SK_ZEPHYR2);
 				remove_buff(ch_in[n], SK_TAUNT);
 				ch[ch_in[n]].taunted = 0;
+				ch[ch_in[n]].data[74] = globs->ticker + TICKS*6; // prevent warcries
 				remove_enemy(ch_in[n]);
 				quick_teleport(ch_in[n], x, y);
 				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
@@ -5838,6 +5905,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			else  		tell_incolosseum(9, "Obliteration.");
 			if (ch[cn].data[4]) ch[cn].data[4] = globs->ticker + TICKS*5+TICKS/2;
 			if (ch[cn].data[5]) ch[cn].data[5] = globs->ticker + TICKS*5+TICKS/2;
+			ch[cn].data[74] = globs->ticker + TICKS*5+TICKS/2; // prevent warcries
 			pandium_clean();
 			ch[cn].skill[SK_SAFEGRD][1] = 90;
 			ch[cn].data[2]++;
@@ -6724,7 +6792,15 @@ int npc_driver_high(int cn)
 			return 1;
 		}
 		
-		if (co && ch[cn].a_mana>ch[cn].mana[5]*600 && !has_buff(cn, SK_LETHARGY) && npc_try_spell(cn, cn, SK_LETHARGY))
+		if (co && ch[cn].a_mana>ch[cn].mana[5]*600 && !has_buff(cn, SK_LETHARGY) && !get_tarot(cn, IT_CH_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
+		{
+			return 1;
+		}
+		if (co && ch[cn].a_hp>ch[cn].hp[5]*800 && !has_buff(cn, SK_LETHARGY) && get_tarot(cn, IT_CH_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
+		{
+			return 1;
+		}
+		if (co && ch[cn].a_hp<ch[cn].hp[5]*300 && has_buff(cn, SK_LETHARGY) && get_tarot(cn, IT_CH_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
 		{
 			return 1;
 		}
@@ -6848,9 +6924,16 @@ int npc_driver_high(int cn)
 	// did we panic?
 	if (ch[cn].data[78] && !ch[cn].attack_cn && !ch[cn].goto_x)
 	{
-		ch[cn].goto_x = ch[cn].x + 5 - RANDOM(10);
-		ch[cn].goto_y = ch[cn].y + 5 - RANDOM(10);
-		return 1;
+		if (ch[cn].data[27]!=1)
+		{
+			ch[cn].goto_x = ch[cn].x + 5 - RANDOM(10);
+			ch[cn].goto_y = ch[cn].y + 5 - RANDOM(10);
+			return 1;
+		}
+		else
+		{
+			ch[cn].skill[SK_PERCEPT][1] = 120;
+		}
 	}
 
 	// are we on protect and want to follow our master?
@@ -7510,7 +7593,7 @@ void npc_driver_low(int cn)
 	}
 
 	// did someone call help? - high prio
-	if (ch[cn].data[55] && ch[cn].data[55] + TICKS * 120>globs->ticker && ch[cn].data[54])
+	if (ch[cn].data[55] && ch[cn].data[55] + TICKS * 120>globs->ticker && ch[cn].data[54] && ch[cn].data[27]!=1)
 	{
 		m = ch[cn].data[54];
 		ch[cn].goto_x = m % MAPX + get_frust_x_off(globs->ticker);
@@ -7520,7 +7603,7 @@ void npc_driver_low(int cn)
 	}
 
 	// go to last known enemy position and stay there for up to 30 seconds
-	if (ch[cn].data[77] && ch[cn].data[77] + TICKS * 30>globs->ticker)
+	if (ch[cn].data[77] && ch[cn].data[77] + TICKS * 30>globs->ticker && ch[cn].data[27]!=1)
 	{
 		m = ch[cn].data[76];
 		ch[cn].goto_x = m % MAPX + get_frust_x_off(ch[cn].data[36]);
@@ -7645,7 +7728,7 @@ void npc_driver_low(int cn)
 		ch[cn].data[58] = 0;
 		return;
 	}
-	if (ch[cn].data[60])   //random walk, low
+	if (ch[cn].data[60] && ch[cn].data[27]!=1)   //random walk, low
 	{
 		ch[cn].data[58] = 0;
 		if (ch[cn].data[61]<1)
@@ -7737,10 +7820,14 @@ void npc_driver_low(int cn)
 		return;
 	}
 
-	if (ch[cn].data[29])    // resting position, lowest prio
+	if (ch[cn].data[29] && ch[cn].data[27]!=1)    // resting position, lowest prio
 	{
 		// Turn off toggles when resting
-		if (ch[cn].a_mana<ch[cn].mana[5]*400 && has_buff(cn, SK_LETHARGY) && npc_try_spell(cn, cn, SK_LETHARGY))
+		if (ch[cn].a_mana<ch[cn].mana[5]*400 && has_buff(cn, SK_LETHARGY) && !get_tarot(cn, IT_CH_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
+		{
+			return 1;
+		}
+		if (co && ch[cn].a_hp<ch[cn].hp[5]*600 && has_buff(cn, SK_LETHARGY) && get_tarot(cn, IT_CH_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
 		{
 			return 1;
 		}

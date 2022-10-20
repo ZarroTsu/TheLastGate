@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000900
+#define VERSION 0x000903
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -101,9 +101,8 @@
 
 struct xbutton
 {
-   char name[8];
-   int skill_nr;
-//   int skill_strength;
+	char name[8];
+	int skill_nr;
 };
 
 
@@ -120,7 +119,7 @@ struct pdata
 	int show_proz;
 	int show_bars;
 	int show_stats;
-	struct xbutton xbutton[16];
+	struct xbutton xbutton[20];
 };
 
 extern int last_skill;
@@ -136,7 +135,6 @@ void cmd1s(int cmd,int val);
 void add_look(unsigned short nr,char *name,unsigned short id);
 int attrib_needed(int n,int v);
 int hp_needed(int v);
-int end_needed(int v);
 int mana_needed(int v);
 int skill_needed(int n,int v);
 void xlog(char font,char *format,...);
@@ -168,7 +166,7 @@ struct key
 	unsigned int usnr;
 	unsigned int pass1,pass2;
 	char name[40];
-  int race;
+	int race;
 };
 
 struct look
@@ -183,13 +181,13 @@ struct look
 	unsigned int mana;
 	unsigned int a_hp;
 	unsigned int a_end;
-   unsigned int a_mana;
+	unsigned int a_mana;
 	unsigned short nr;
 	unsigned short id;
 	unsigned char extended;
 	unsigned short item[62];
 	unsigned int price[62];
-   unsigned int pl_price;
+	unsigned int pl_price;
 };
 
 extern struct look look;

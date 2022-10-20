@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000900
-#define MINVERSION			0x000900
+#define VERSION				0x000902
+#define MINVERSION			0x000902
 
 #define DATDIR				".dat"
 
@@ -260,10 +260,10 @@
 #define SP_COST_ZEPHYR		45
 #define SP_COST_LETHARGY	40
 
-#define SP_COST_WEAKEN		10
+#define SP_COST_WEAKEN		20
 #define SP_COST_BLIND		20
-#define SP_COST_TAUNT		16
-#define SP_COST_WARCRY		24
+#define SP_COST_TAUNT		15
+#define SP_COST_WARCRY		25
 #define SP_COST_RAGE		20
 
 #define FIVE_PERC_FAIL		18
@@ -278,13 +278,13 @@
 #define SP_MULT_POISON		115
 #define SP_MULT_POISON2		110
 #define SP_MULT_IDENTIFY	180
-#define SP_MULT_DISPEL		 90
+#define SP_MULT_DISPEL		 80
 #define SP_MULT_DISPEL2		 75
-#define SP_MULT_WEAKEN		120
-#define SP_MULT_WEAKEN2		115
+#define SP_MULT_WEAKEN		100
+#define SP_MULT_WEAKEN2		 95
 #define SP_MULT_WARCRY		 95
-#define SP_MULT_TAUNT		110
-#define SP_MULT_BLIND		125
+#define SP_MULT_TAUNT		 80
+#define SP_MULT_BLIND		100
 
 // -------- Damage Multipliers -------- //
 
@@ -313,7 +313,7 @@
 #define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
 #define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
 #define SP_DUR_POISON		( TICKS * 30                      )
-#define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 80          )
+#define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 75          )
 #define SP_DUR_WARCRY		( TICKS * 60                      )
 #define SP_DUR_RALLY		( TICKS * 60 * 5                  )
 #define SP_DUR_SCORCH		( TICKS * 20                      )

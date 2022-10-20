@@ -179,7 +179,7 @@ void god_shutup(int cn, int co);
 void god_cleanslots(int cn);
 void god_reset_greeters(int cn);
 void god_reset_player(int cn, int co);
-void god_reset_players(int cn);
+void god_reset_players(int cn, int r);
 void god_reset_npcs(int cn);
 void god_reset_ticker(int cn);
 
@@ -293,6 +293,7 @@ int sub_door_driver(int cn, int in);
 void finish_laby_teleport(int cn, int nr, int exp_pts);
 void show_pent_count(int cn);
 int explorer_point(int cn, int in, int msg);
+int get_seyan_bits(int cn);
 int use_seyan_shrine(int cn, int in, int flag);
 
 //-- effect --
@@ -424,7 +425,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2);
 int spell_blast(int cn, int co, int power, int co_orig, int aoe);
 int skill_lookup(char *skill);
 int skill_rally(int cn, int power);
-int chance_base(int cn, int co, int skill, int d20, int defense, int usemana);
+int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
 int player_or_ghost(int cn, int co);
 
 // -- driver --

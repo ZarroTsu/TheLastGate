@@ -14,14 +14,11 @@ int gui_update[]	= { 136, 257, 185, 270 };
 int gui_skl_pm[]	= { 160,   6, 184, 255 };
 int gui_skl_names[]	= {   6, 118, 135, 255 };
 
-int gui_f_col[]		= {1080 };
-int gui_f_row[]		= { 662, 678, 694, 587, 602, 617, 632 };
+int gui_f_col[]		= {1083,1035 };
+int gui_f_row[]		= { 666, 681, 696, 596, 611, 626, 641 };
 
 int gui_trash[]		= { 535, 111 };
-int gui_coin[]		= { 437, 143 };
-
-//int gui_coin_x[]	= { 393, 425, 457, 489, 521, 553, 585 };
-//int gui_coin_y[]	= {  77 };
+int gui_coin[]		= { 433, 467, 501, 111 };
 
 int gui_inv_x[]		= { 260, 599 };
 int gui_inv_y[]		= {   5, 106 };
@@ -31,10 +28,11 @@ int gui_equ_x[]		= { 738, 700, 738, 704, 738, 777, 738, 806, 670, 772, 776, 700,
 int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,  17 };
 
 int gui_equ_s[]		= { 670,   5 };
+int gui_hud_b[]		= { 260, 181, 196, 211 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern int inv_pos,skill_pos,wps_pos,mm_magnify;
+extern int inv_pos,skill_pos,wps_pos,hudmode,mm_magnify;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -87,14 +85,14 @@ int trans_button(int x,int y)
 	ty=y-gui_f_row[0];
 	for (n=0; n<4; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
 			hightlight_sub=n;
 			cursor_type=CT_NONE;
 			return n;
 		}
-		tx-=49;
+		tx-=48;
 	}
 
 	// _, Hide, Names, _
@@ -102,14 +100,14 @@ int trans_button(int x,int y)
 	ty=y-gui_f_row[1];
 	for (n=0; n<4; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
 			hightlight_sub=n+4;
 			cursor_type=CT_NONE;
 			return n+4;
 		}
-		tx-=49;
+		tx-=48;
 	}
 
 	// _, _, _, Exit
@@ -117,87 +115,84 @@ int trans_button(int x,int y)
 	ty=y-gui_f_row[2];
 	for (n=0; n<4; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
 			hightlight_sub=n+8;
 			cursor_type=CT_NONE;
 			return n+8;
 		}
-		tx-=49;
+		tx-=48;
 	}
 	
 	// First skill shortcut bar row
-  	tx=x-gui_f_col[0];
+  	tx=x-gui_f_col[1];
 	ty=y-gui_f_row[3];
-	for (n=0; n<4; n++) 
+	for (n=0; n<5; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
 			hightlight_sub=n;
 			cursor_type=CT_NONE;
 			return n+16;
 		}
-		tx-=49;
+		tx-=48;
 	}
 	
 	// Second skill shortcut bar row
-	tx=x-gui_f_col[0];
+	tx=x-gui_f_col[1];
 	ty=y-gui_f_row[4];
-	for (n=0; n<4; n++) 
+	for (n=0; n<5; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
 			hightlight_sub=n+4;
 			cursor_type=CT_NONE;
-			return n+20;
+			return n+21;
 		}
-		tx-=49;
+		tx-=48;
 	}
 	
 	// Third skill shortcut bar row
-	tx=x-gui_f_col[0];
+	tx=x-gui_f_col[1];
 	ty=y-gui_f_row[5];
-	for (n=0; n<4; n++) 
+	for (n=0; n<5; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
 			hightlight_sub=n+8;
 			cursor_type=CT_NONE;
-			return n+24;
+			return n+26;
 		}
-		tx-=49;
+		tx-=48;
 	}
 	
 	// Fourth skill shortcut bar row
-	tx=x-gui_f_col[0];
+	tx=x-gui_f_col[1];
 	ty=y-gui_f_row[6];
-	for (n=0; n<4; n++) 
+	for (n=0; n<5; n++) 
 	{
-		if (tx>=0 && tx<=41 && ty>=0 && ty<=14) 
+		if (tx>=0 && tx<=47 && ty>=0 && ty<=14) 
 		{
 			hightlight=HL_BUTTONBOX;
-			hightlight_sub=n+8;
+			hightlight_sub=n+12;
 			cursor_type=CT_NONE;
-			return n+28;
+			return n+31;
 		}
-		tx-=49;
+		tx-=48;
 	}
 	
-	// New stat boxes
-	if ( x>260 && y>117+14*0 && x<426 && y<130+14*0 ) return 32;
-	if ( x>260 && y>117+14*1 && x<426 && y<130+14*1 ) return 33;
-	if ( x>260 && y>117+14*2 && x<426 && y<130+14*2 ) return 34;
-	if ( x>260 && y>117+14*3 && x<426 && y<130+14*3 ) return 35;
-	if ( x>260 && y>117+14*4 && x<426 && y<130+14*4 ) return 36;
-	if ( x>260 && y>117+14*5 && x<426 && y<130+14*5 ) return 37;
-	
 	// New Magnify buttons for mini-map
-	if ( x>135 && y>578 && x<152 && y<595 ) return 38;
-	if ( x>135 && y>596 && x<152 && y<613 ) return 39;
+	if ( x>135 && y>581 && x<152 && y<598 ) return 42;
+	if ( x>135 && y>599 && x<152 && y<616 ) return 43;
+	
+	// New GUI mode buttons
+	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[1] && y<=gui_hud_b[1]+14 ) return 44;
+	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[2] && y<=gui_hud_b[2]+14 ) return 45;
+	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[3] && y<=gui_hud_b[3]+14 ) return 46;
 
 	return -1;
 }
@@ -277,15 +272,19 @@ void button_command(int nr)
 			break;
 		
 		// Spell hotkeys
-		case 16: case 17: case 18: case 19: 
-		case 20: case 21: case 22: case 23: 
-		case 24: case 25: case 26: case 27: 
-		case 28: case 29: case 30: case 31: 
+		case 16: case 17: case 18: case 19: case 20: 
+		case 21: case 22: case 23: case 24: case 25: 
+		case 26: case 27: case 28: case 29: case 30: 
+		case 31: case 32: case 33: case 34: case 35: 
 			if ((sk=pdata.xbutton[nr-16].skill_nr)!=-1) 
 			{
 				if (sk < 60)
 				{
 					cmd3(CL_CMD_SKILL,sk,selected_char,1);
+				}
+				else if (sk >= 200)
+				{
+					cmd3(CL_CMD_INV,5,sk-200,selected_char);
 				}
 				else if (sk >= 100)
 				{
@@ -297,13 +296,24 @@ void button_command(int nr)
 			break;
 		
 		// Magnification buttons for the mini-map
-		case 38:
+		case 42:
 			if (keys) mm_magnify = 4;
 			else if (mm_magnify<4) mm_magnify++; 
 			break;
-		case 39:
+		case 43:
 			if (keys) mm_magnify = 1;
 			else if (mm_magnify>1) mm_magnify--; 
+			break;
+			
+		// New GUI swap buttons
+		case 44:
+			hudmode = 0;
+			break;
+		case 45:
+			hudmode = 1;
+			break;
+		case 46:
+			hudmode = 2;
 			break;
 
 		default: break;
@@ -364,18 +374,18 @@ void button_help(int nr)
 		case 15: xlog(1,"Scroll skill list down."); break;
 		
 		// Spell hotkeys
-		case 16: case 17: case 18: case 19:
-		case 20: case 21: case 22: case 23:
-		case 24: case 25: case 26: case 27: 
-		case 28: case 29: case 30: case 31: 
+		case 16: case 17: case 18: case 19:	case 20: 
+		case 21: case 22: case 23: case 24: case 25: 
+		case 26: case 27: case 28: case 29: case 30: 
+		case 31: case 32: case 33: case 34: case 35:
 			if (last_skill > -1 && (last_skill < 60 || last_skill > 64)) 
 			{
 				switch (nr)
 				{
-					case 16: tmp = '1'; break; case 17: tmp = '2'; break; case 18: tmp = '3'; break; case 19: tmp = '4'; break;
-					case 20: tmp = 'Q'; break; case 21: tmp = 'W'; break; case 22: tmp = 'E'; break; case 23: tmp = 'R'; break;
-					case 24: tmp = 'A'; break; case 25: tmp = 'S'; break; case 26: tmp = 'D'; break; case 27: tmp = 'F'; break;
-					case 28: tmp = 'Z'; break; case 29: tmp = 'X'; break; case 30: tmp = 'C'; break; case 31: tmp = 'V'; break;
+					case 16: tmp = '1'; break; case 17: tmp = '2'; break; case 18: tmp = '3'; break; case 19: tmp = '4'; break; case 20: tmp = '5'; break; 
+					case 21: tmp = 'Q'; break; case 22: tmp = 'W'; break; case 23: tmp = 'E'; break; case 24: tmp = 'R'; break; case 25: tmp = 'T'; break; 
+					case 26: tmp = 'A'; break; case 27: tmp = 'S'; break; case 28: tmp = 'D'; break; case 29: tmp = 'F'; break; case 30: tmp = 'G'; break; 
+					case 31: tmp = 'Z'; break; case 32: tmp = 'X'; break; case 33: tmp = 'C'; break; case 34: tmp = 'V'; break; case 35: tmp = 'B'; break;
 					default: tmp = '?'; break;
 				}
 				
@@ -413,6 +423,31 @@ void button_help(int nr)
 						}
 					}
 				}
+				// Equipment shortcuts
+				else if (last_skill >= 200)
+				{
+					char gearname[20][8] = {
+						"*Helmet",	"*Neckla",	"*Armor",	"*Gloves",	"*Belt",
+						"*Tarot1",	"*Boots",	"*Offhan",	"*Weapon",	"*Cloak",
+						"*L-Ring",	"*R-Ring",	"*Tarot2",	"?",		"?", 
+						"?", 		"?",		"?",		"?",		"?"
+					};
+					
+					if (pdata.xbutton[nr-16].skill_nr==last_skill)
+					{
+						pdata.xbutton[nr-16].skill_nr=-1;
+						strcpy(pdata.xbutton[nr-16].name,"-");
+						xlog(1,"CTRL-%c (or ALT-%c), now unassigned.", tmp, tmp);
+					}
+					else
+					{
+						pdata.xbutton[nr-16].skill_nr=last_skill;
+						sprintf(itm,"%s",gearname[last_skill-200]);
+						xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, itm);
+						strncpy(pdata.xbutton[nr-16].name,itm,7);
+						pdata.xbutton[nr-16].name[7]=0;
+					}
+				}
 				// Inventory shortcuts
 				else if (last_skill >= 100)
 				{
@@ -426,7 +461,7 @@ void button_help(int nr)
 					{
 						pdata.xbutton[nr-16].skill_nr=last_skill;
 						sprintf(itm,"Item %d",last_skill-100);
-						xlog(1,"CTRL-%c (or ALT-%c), now Item %d.", tmp, tmp, last_skill-100);
+						xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, itm);
 						strncpy(pdata.xbutton[nr-16].name,itm,7);
 						pdata.xbutton[nr-16].name[7]=0;
 					}
@@ -436,7 +471,7 @@ void button_help(int nr)
 				xlog(1,"Right click on a skill/spell first to assign it to a button.");
 			break;
 
-		case 32:
+		case 36:
 			if (last_skill==60)
 				xlog(1,"Crit Chance is the chance, out of 100.00, that you will inflict a melee critical hit. Determined by your equipped weapon, and increased by Braveness and other sources of Crit Chance."); 
 			else if (last_skill==61)
@@ -450,7 +485,7 @@ void button_help(int nr)
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from your Hit Score."); 
 			break;
-		case 33: 
+		case 37: 
 			if (last_skill==60)
 				xlog(1,"Crit Multi is the damage multiplier upon dealing a successful critical hit."); 
 			else if (last_skill==61 && pl.skill[34][0])
@@ -464,7 +499,7 @@ void button_help(int nr)
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); 
 			break;
-		case 34: 
+		case 38: 
 			if (last_skill==60)
 				xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); 
 			else if (last_skill==61 && pl.skill[27][0])
@@ -478,7 +513,7 @@ void button_help(int nr)
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Your Parry Score is the value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill and other sources."); 
 			break;
-		case 35: 
+		case 39: 
 			if (last_skill==60)
 				xlog(1,"Estimated Resistance score. This displays your 'true' Resistance value after adjustments that do not display on the skill list."); 
 			else if (last_skill==61 && pl.skill[46][0])
@@ -492,7 +527,7 @@ void button_help(int nr)
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
 			break;
-		case 36: 
+		case 40: 
 			if (last_skill==60)
 				xlog(1,"Damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); 
 			else if (last_skill==61 && pl.skill[19][0])
@@ -509,7 +544,7 @@ void button_help(int nr)
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
 			break;
-		case 37: 
+		case 41: 
 			if (last_skill==60 && pl.worn_p[WN_TOP]>0)
 				xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); 
 			else if (last_skill==61 && pl.skill[20][0])
@@ -528,11 +563,22 @@ void button_help(int nr)
 			break;
 			
 		// Magnification buttons for the mini-map
-		case 38:
-			xlog(1,"Increase minimap magnification."); 
+		case 42:
+			xlog(1,"Increase minimap magnification.");
 			break;
-		case 39:
-			xlog(1,"Decrease minimap magnification."); 
+		case 43:
+			xlog(1,"Decrease minimap magnification.");
+			break;
+		
+		// New GUI swap buttons
+		case 44:
+			xlog(1,"Makes the left panel display skill scores and experience points (default).");
+			break;
+		case 45:
+			xlog(1,"Makes the left panel display Offense-related statistics, such as attack damage and critical hit rate.");
+			break;
+		case 46:
+			xlog(1,"Makes the left panel display Defense-related statistics, such as eHP and regeneration rates.");
 			break;
 
 		default: break;
@@ -589,11 +635,27 @@ int mouse_inventory(int x,int y,int mode)
 	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
 	if (GetAsyncKeyState(VK_MENU)&0x8000) keys|=4;
 	
-	// money
-	if (x>gui_coin[0] && x<gui_coin[0]+34 && y>gui_coin[1] && y<gui_coin[1]+34) 
+	// money - 10,000.00
+	if (x>gui_coin[0] && x<gui_coin[0]+34 && y>gui_coin[3] && y<gui_coin[3]+34) 
+	{
+		if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,1000000,selected_char);
+		if (mode==MS_RB_UP) xlog(1,"10,000 gold coins.");
+		return 1;
+	}
+	
+	// money -  1,000.00
+	if (x>gui_coin[1] && x<gui_coin[1]+34 && y>gui_coin[3] && y<gui_coin[3]+34) 
 	{
 		if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,100000,selected_char);
 		if (mode==MS_RB_UP) xlog(1,"1,000 gold coins.");
+		return 1;
+	}
+	
+	// money -    100.00
+	if (x>gui_coin[2] && x<gui_coin[2]+34 && y>gui_coin[3] && y<gui_coin[3]+34) 
+	{
+		if (mode==MS_LB_UP) cmd3(CL_CMD_INV,2,10000,selected_char);
+		if (mode==MS_RB_UP) xlog(1,"100 gold coins.");
 		return 1;
 	}
 	
@@ -696,7 +758,42 @@ int mouse_inventory(int x,int y,int mode)
 	{
 		if (x>gui_equ_x[ n ] && x<gui_equ_x[ n ]+33 && y>gui_equ_y[ n ] && y<gui_equ_y[ n ]+33) 
 		{
-			if (keys==1) 
+			if (keys>=2)
+			{
+				if (mode==MS_RB_UP)
+				{
+					char gearname[20][8] = {
+						"*Helmet",	"*Neckla",	"*Armor",	"*Gloves",	"*Belt",
+						"*Tarot1",	"*Boots",	"*Offhan",	"*Weapon",	"*Cloak",
+						"*L-Ring",	"*R-Ring",	"*Tarot2",	"?",		"?", 
+						"?", 		"?",		"?",		"?",		"?"
+					};
+					
+					if (last_skill >= 60 && last_skill <= 64)
+					{
+						xlog(6,"Details panel now showing default.");
+					}
+					if (last_skill == 200+n)
+					{
+						last_skill = -1;
+						xlog(6,"%s equipment slot no longer selected for shortcut.", gearname[n]);
+					}
+					else
+					{
+						last_skill = 200+n;
+						if (firstrclick)
+						{
+							xlog(6,"%s equipment slot selected for shortcut.", gearname[n]);
+						}
+						else
+						{
+							firstrclick++;
+							xlog(6,"%s equipment slot selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.", gearname[n]);
+						}
+					}
+				}
+			}
+			else if (keys==1) 
 			{
 				if 			(mode==MS_LB_UP) cmd3(CL_CMD_INV,1, n ,selected_char);
 				else if 	(mode==MS_RB_UP) cmd3(CL_CMD_INV,7, n ,selected_char);
@@ -812,15 +909,6 @@ int _mouse_statbox(int x,int y,int state)
 			stat_raised[n]++;
 			return 1;
 		} 
-		/*
-		else if (n==6) 
-		{
-			if (end_needed(pl.end[0]+stat_raised[n])>pl.points-stat_points_used) return 1;
-			stat_points_used+=end_needed(pl.end[0]+stat_raised[n]);
-			stat_raised[n]++;
-			return 1;
-		} 
-		*/
 		else if (n==6) 
 		{
 			if (mana_needed(pl.mana[0]+stat_raised[n+1])>pl.points-stat_points_used) return 1;
@@ -860,15 +948,6 @@ int _mouse_statbox(int x,int y,int state)
 			stat_points_used-=hp_needed(pl.hp[0]+stat_raised[n]);
 			return 1;
 		} 
-		/*
-		else if (n==6) 
-		{
-			if (!stat_raised[n]) return 1;
-			stat_raised[n]--;
-			stat_points_used-=end_needed(pl.end[0]+stat_raised[n]);
-			return 1;
-		} 
-		*/
 		else if (n==6) 
 		{
 			if (!stat_raised[n+1]) return 1;
@@ -889,24 +968,27 @@ int _mouse_statbox(int x,int y,int state)
 
 int mouse_statbox(int x,int y,int state)
 {
-    int n,m,keys,ret;
+	int n,m,keys,ret=0;
 
-    keys=0;
+	keys=0;
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
 	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
 
-    if (state==MS_LB_UP) 
+	if (state==MS_LB_UP) 
 	{
-       if (keys&2) m=90;
-       else if (keys&1) m=10;
-       else m=1;
-    } 
+		if (keys&2) m=90;
+		else if (keys&1) m=10;
+		else m=1;
+	} 
 	else 
 		m=1;
+	
+	if (hudmode==0)
+	{
+		for (n=0; n<m; n++) ret=_mouse_statbox(x,y,state);
+	}
 
-    for (n=0; n<m; n++) ret=_mouse_statbox(x,y,state);
-
-    return ret;
+	return ret;
 }
 
 int mouse_statbox2(int x,int y,int state)
@@ -941,16 +1023,6 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most skills and spells. It also improves your critical hit rate.",at_name[n]);
-			if (last_skill == 60)
-			{
-				last_skill = -1;
-				xlog(6,"Details panel now showing default.");
-			}
-			else
-			{
-				last_skill = 60;
-				xlog(6,"Details panel now showing for %s.",at_name[n]);
-			}
 			return 1;
 		}
 		// Willpower
@@ -958,16 +1030,6 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude and the speed of casting spells and using skills.",at_name[n]);
-			if (last_skill == 61)
-			{
-				last_skill = -1;
-				xlog(6,"Details panel now showing default.");
-			}
-			else
-			{
-				last_skill = 61;
-				xlog(6,"Details panel now showing for %s.",at_name[n]);
-			}
 			return 1;
 		}
 		// Intuition
@@ -975,16 +1037,6 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
-			if (last_skill == 62)
-			{
-				last_skill = -1;
-				xlog(6,"Details panel now showing default.");
-			}
-			else
-			{
-				last_skill = 62;
-				xlog(6,"Details panel now showing for %s.",at_name[n]);
-			}
 			return 1;
 		}
 		// Agility
@@ -992,16 +1044,6 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
-			if (last_skill == 63)
-			{
-				last_skill = -1;
-				xlog(6,"Details panel now showing default.");
-			}
-			else
-			{
-				last_skill = 63;
-				xlog(6,"Details panel now showing for %s.",at_name[n]);
-			}
 			return 1;
 		}
 		// Strength
@@ -1009,16 +1051,6 @@ int mouse_statbox2(int x,int y,int state)
 		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
 		{
 			xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
-			if (last_skill == 64)
-			{
-				last_skill = -1;
-				xlog(6,"Details panel now showing default.");
-			}
-			else
-			{
-				last_skill = 64;
-				xlog(6,"Details panel now showing for %s.",at_name[n]);
-			}
 			return 1;
 		}
 	}
@@ -1040,73 +1072,79 @@ int mouse_statbox2(int x,int y,int state)
 	// Skills
 	if (state==MS_RB_UP) 
 	{
-		m = skilltab[n+skill_pos].nr;
-		if (pl.skill[m][0] || m==50 || m==51) 
+		if (hudmode==0)
 		{
-			if (last_skill >= 60 && last_skill <= 64)
+			m = skilltab[n+skill_pos].nr;
+			if (pl.skill[m][0] || m==50 || m==51) 
 			{
-				xlog(6,"Details panel now showing default.");
-			}
-			
-			if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-					(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-					(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-					(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
-					(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-					(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-					(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
-					(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-					(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
-					(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
-					(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
-					(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-					(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-					(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
-				)
-			{
-				strcpy(tmp, skilltab[n+skill_pos].alt_a);
-				xlog(1,skilltab[n+skill_pos].alt_b);
-			}
-			else if (m==44)	// Proximity has special descriptions
-			{
-				strcpy(tmp, skilltab[n+skill_pos].name);
-				if (pl.kindred & (1u<<14))
-					xlog(1,skilltab[n+skill_pos].alt_a); // Braver
-				else if (pl.kindred & (1u<<11))
-					xlog(1,skilltab[n+skill_pos].alt_b); // Sorcerer
-				else if (pl.kindred & (1u<<9))
-					xlog(1,skilltab[n+skill_pos].alt_c); // Arch-Harakim
-				else
-					xlog(1,"Passively improves the area-of-effect of various skills and spells.");
-			}
-			else
-			{
-				strcpy(tmp, skilltab[n+skill_pos].name);
-				xlog(1,skilltab[n+skill_pos].desc);
-			}
-			
-			if (last_skill == n+skill_pos)
-			{
-				last_skill = -1;
-				xlog(6,"%s no longer selected for shortcut.",tmp);
-			}
-			else
-			{
-				last_skill = n+skill_pos;
-				if (!firstclick)
+				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+						(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+						(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+						(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
+						(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+						(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
+						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
+						(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
+						(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
+						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
+						(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
+						(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
+						(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
+						(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
+					)
 				{
-					xlog(6,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
-					firstclick=1;
+					strcpy(tmp, skilltab[n+skill_pos].alt_a);
+					xlog(1,skilltab[n+skill_pos].alt_b);
+				}
+				else if (m==44)	// Proximity has special descriptions
+				{
+					strcpy(tmp, skilltab[n+skill_pos].name);
+					if (pl.kindred & (1u<<14))
+						xlog(1,skilltab[n+skill_pos].alt_a); // Braver
+					else if (pl.kindred & (1u<<11))
+						xlog(1,skilltab[n+skill_pos].alt_b); // Sorcerer
+					else if (pl.kindred & (1u<<9))
+						xlog(1,skilltab[n+skill_pos].alt_c); // Arch-Harakim
+					else
+						xlog(1,"Passively improves the area-of-effect of various skills and spells.");
 				}
 				else
 				{
-					xlog(6,"%s selected for shortcut.",tmp);
+					strcpy(tmp, skilltab[n+skill_pos].name);
+					xlog(1,skilltab[n+skill_pos].desc);
 				}
 				
+				if (last_skill == n+skill_pos)
+				{
+					last_skill = -1;
+					xlog(6,"%s no longer selected for shortcut.",tmp);
+				}
+				else
+				{
+					last_skill = n+skill_pos;
+					if (!firstclick)
+					{
+						xlog(6,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
+						firstclick=1;
+					}
+					else
+					{
+						xlog(6,"%s selected for shortcut.",tmp);
+					}
+					
+				}
 			}
 		}
+		else if (hudmode==1)
+		{
+			
+		}
+		else if (hudmode==2)
+		{
+			
+		}
 	} 
-	else if (state==MS_LB_UP) 
+	else if (state==MS_LB_UP && hudmode==0)
 	{
 		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,skilltab[n+skill_pos].attrib[0]);
 	}

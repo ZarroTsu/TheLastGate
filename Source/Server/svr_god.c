@@ -1811,24 +1811,40 @@ void god_reset_player(int cn, int co)
 	return;
 }
 
-void god_reset_players(int cn)
+void god_reset_players(int cn, int r)
 {
 	int n;
-	do_char_log(cn, 1, "Now resetting all players...\n");
+	
+	if (r>11) r = 0;
+	if (r< 1) r = 0;
+	
+	if (r)
+		do_char_log(cn, 1, "Now resetting select players...\n");
+	else
+		do_char_log(cn, 1, "Now resetting all players...\n");
+	
 	for (n=2;n<MAXCHARS;n++)
 	{
-		if (ch[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!IS_SANEPLAYER(n))
-		{
-			continue;
-		}
+		if (ch[n].used==USE_EMPTY)			continue;
+		if (!IS_SANEPLAYER(n))				continue;
+		//
+		if (r == 1 && !IS_ANY_TEMP(n))		continue;
+		if (r == 2 && !IS_ANY_MERC(n))		continue;
+		if (r == 3 && !IS_ANY_HARA(n))		continue;
+		//
+		if (r == 4 && !IS_SEYAN_DU(n))		continue;
+		if (r == 5 && !IS_ARCHTEMPLAR(n))	continue;
+		if (r == 6 && !IS_SKALD(n))			continue;
+		if (r == 7 && !IS_WARRIOR(n))		continue;
+		if (r == 8 && !IS_SORCERER(n))		continue;
+		if (r == 9 && !IS_SUMMONER(n))		continue;
+		if (r ==10 && !IS_ARCHHARAKIM(n))	continue;
+		if (r ==11 && !IS_BRAVER(n))		continue;
+		//
 		god_racechange(n, ch[n].temp, 1);
 	}
+	
 	do_char_log(cn, 0, "Done.\n");
-	return;
 }
 
 void god_reset_npcs(int cn)
@@ -1873,7 +1889,6 @@ void god_reset_npcs(int cn)
 		do_char_log(cn, 0, "Done.\n");
 	else
 		xlog("Done.");
-	return;
 }
 
 void god_reset_ticker(int cn)
@@ -3994,7 +4009,7 @@ void god_destroy_items(int cn)
 
 void god_racechange(int co, int temp, int keepstuff)
 {
-	int n, rank;
+	int n, rank, tmp;
 	struct character old, dpt;
 
 	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co))
@@ -4143,6 +4158,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		if (old.skill[32][0] && ch[co].skill[32][2]) ch[co].skill[32][0] = 1; // Immunity
 		if (old.skill[33][0] && ch[co].skill[33][2]) ch[co].skill[33][0] = 1; // Surround Hit
 		if (old.skill[41][0] && ch[co].skill[41][2]) ch[co].skill[41][0] = 1; // Weaken
+		if (old.skill[47][0] && ch[co].skill[47][2]) ch[co].skill[47][0] = 1; // Haste
 		
 		if (old.skill[ 7][0] && ch[co].skill[ 7][2]) ch[co].skill[ 7][0] = 1; // Zephyr
 		if (old.skill[35][0] && ch[co].skill[35][2]) ch[co].skill[35][0] = 1; // Warcry
@@ -4161,6 +4177,44 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].tokens    = old.tokens;
 		
 		ch[co].waypoints = old.waypoints;
+		
+		for (n=0;n<5;n++) ch[co].attrib[n][1] = old.attrib[n][1];
+		for (n=0;n<50;n++) ch[co].skill[n][1] = old.skill[n][1];
+		
+		ch[co].pandium_floor[0] = old.pandium_floor[0];
+		ch[co].pandium_floor[1] = old.pandium_floor[1];
+		ch[co].pandium_floor[2] = old.pandium_floor[2];
+		
+		for (n=0;n<5;n++) ch[co].limit_break[n][0] = old.limit_break[n][0];
+		
+		// delete this after reset
+		if (ch[co].pandium_floor[2]>=2)
+		{
+			ch[co].hp[2]   += 50;
+			ch[co].mana[2] += 50;
+		}
+		if (ch[co].pandium_floor[2]>=3)
+		{
+			if 		(IS_SEYAN_DU(co)) 	 tmp = SK_PROX;
+			else if (IS_ARCHTEMPLAR(co)) tmp = SK_DISPEL;
+			else if (IS_SKALD(co)) 		 tmp = SK_PRECISION;
+			else if (IS_WARRIOR(co)) 	 tmp = SK_GEARMAST;
+			else if (IS_SORCERER(co)) 	 tmp = SK_MSHIELD;
+			else if (IS_SUMMONER(co)) 	 tmp = SK_STEALTH;
+			else if (IS_ARCHHARAKIM(co)) tmp = SK_GCMASTERY;
+			else if (IS_BRAVER(co)) 	 tmp = SK_IMMUN;
+			if (tmp)
+			{
+				ch[co].skill[tmp][0] =  1;
+				ch[co].skill[tmp][2] = 75;
+				ch[co].skill[tmp][3] =  8;
+			}
+		}
+		if (ch[co].pandium_floor[2]>=4)
+		{
+			ch[co].end[0]  += 50;
+		}
+		
 		god_transfer_char(co, 512, 512);
 	}
 	else

@@ -247,7 +247,7 @@ struct s_splog splog[52] = {
 
 int spellcost(int cn, int cost, int in, int usemana);
 void damage_mshell(int co);
-int chance_base(int cn, int co, int skill, int d20, int defense, int usemana);
+int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
 int chance(int cn, int d20);
 void add_exhaust(int cn, int len);
 void skill_slow(int cn, int flag);
@@ -413,6 +413,8 @@ void nomagic(int cn, int flag)
 int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana, int power, int d20)
 {
 	int m, co = 0, aoe_spell = 0, need_combat = 0, cc=0;
+	char buf[50];
+	strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
 	
 	if (cnts && IS_PLAYER(cn))
 	{
@@ -459,7 +461,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
-	if (in==SK_CLEAVE || in==SK_WEAKEN)
+	if (in==SK_CLEAVE || (in==SK_WEAKEN && !CAN_BRAV_PROX(cn)))
 	{
 		need_combat = 1;
 	}
@@ -468,10 +470,10 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	{
 		// AoE spells forgo failing since there may be targets handled by cast_aoe_spell
 		// The spell cost is set to zero and will be spent in cast_aoe_spell
-		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && (B_SK(cn, SK_PROX) && ((IS_BRAVER(cn) && in==SK_WEAKEN) || 
+		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && ((B_SK(cn, SK_PROX) && ((IS_BRAVER(cn) && in==SK_WEAKEN) || 
 			(IS_ARCHHARAKIM(cn) && in==SK_BLAST) ||	(IS_SORCERER(cn) && (in==SK_CURSE||in==SK_SLOW||in==SK_POISON)) )) || 
 			(IS_ARCHTEMPLAR(cn) && in==SK_TAUNT) || (IS_WARRIOR(cn) && in==SK_BLIND) ||
-			(IS_SEYAN_DU(cn) && (in==SK_CURSE||in==SK_SLOW||in==SK_POISON||in==SK_TAUNT||in==SK_BLAST||in==SK_WEAKEN)) )
+			(IS_SEYAN_DU(cn) && (in==SK_CURSE||in==SK_SLOW||in==SK_POISON||in==SK_TAUNT||in==SK_BLAST||in==SK_WEAKEN)) ))
 		{
 			cost = 0;
 		}
@@ -556,16 +558,15 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	if (d20!=-1 && (in!=SK_CLEAVE && in!=SK_LEAP && in!=SK_TAUNT && in!=SK_BLIND && in!=SK_DOUSE &&
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
-		(d20 && cn!=co && chance_base(cn, co, in, d20, get_target_resistance(cn, co), usemana)))))
+		(d20 && cn!=co && chance_base(cn, co, in, d20, get_target_resistance(cn, co), usemana, 1)))))
 	{
 		if (!buff && cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEMISS, cn, co, power, 0);
 		if (usemana && cn!=co && (CAN_SENSE(co) && M_SK(co, SK_PERCEPT) > power + 5))
 		{
 			if (!(ch[co].flags & CF_SENSEOFF))
 			{
-				do_char_log(co, 1, 
-				"%s tried to cast %s on you but failed.\n", 
-					ch[cn].reference, splog[in].ref);
+				do_char_log(co, 1, "%s tried to cast %s on you but failed.\n", 
+					buf, splog[in].ref);
 			}
 			if (!buff && !IS_IGNORING_SPELLS(co))
 			{
@@ -574,27 +575,13 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		}
 		else if (!usemana && !buff && cn!=co)
 		{
-			do_char_log(co, 0, 
-			"%s tried to %s you but failed.\n", 
-				ch[cn].reference, splog[in].ref);
+			do_char_log(co, 0, "%s tried to %s you but failed.\n", 
+				buf, splog[in].ref);
 		}
 		if (!buff && !IS_PLAYER(cn))
 		{
 			add_exhaust(cn, TICKS * 4);
 		}
-		/*
-		// Book: Shiva's Malice :: Curse tries Slow afterward on failure
-		if (in==SK_CURSE && get_book(cn, IT_BOOK_SHIV))
-		{
-			skill_slow(cn, 0);
-		}
-		// Book: Bishop's Manafesto :: Cast Enhance and Protect after Bless after failure
-		if (in==SK_BLESS && get_book(cn, IT_BOOK_BISH))
-		{
-			skill_protect(cn, 0);
-			skill_enhance(cn, 0);
-		}
-		*/
 		return 0;
 	}
 	
@@ -633,6 +620,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	double _cap, _hit, _pow, tmpa, tmph, tmpha, tmpp, tmppa;
 	int xf, yf, xt, yt, xc, yc, x, y;
 	int no_target = 0, usemana = 1;
+	char buf[50];
 	
 	if (co)
 	{
@@ -758,13 +746,14 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				sqr(abs(xc - x)) + sqr(abs(yc - y))) / (tmppa / 100))));
 			if (no_target)
 			{
+				strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
 				switch (intemp)
 				{
 					case SK_WARCRY:
 						if (spell_warcry(cn, co, power, 0))
 						{
 							do_char_log(co, 0, 
-							"You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
+								"You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
 							hit++;
 						}
 						else
@@ -778,13 +767,13 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 						if (spell_blind(cn, co, power, 0))
 						{
 							do_char_log(co, 0, 
-							"%s kicks up a cloud of sand. You feel your eyes fail you.\n", ch[cn].reference);
+								"%s kicks up a cloud of sand. You feel your eyes fail you.\n", buf);
 							hit++;
 						}
 						else
 						{
 							if (!(ch[co].flags & CF_SYS_OFF))
-								do_char_log(co, 0, "%s kicks up a cloud of sand.\n", ch[cn].reference);
+								do_char_log(co, 0, "%s kicks up a cloud of sand.\n", buf);
 							continue;
 						}
 						break;
@@ -792,13 +781,13 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 						if (spell_blind(cn, co, power, 1))
 						{
 							do_char_log(co, 0, 
-							"%s kicks up a splash of mud. You're sopping wet.\n", ch[cn].reference);
+								"%s kicks up a splash of mud. You're sopping wet.\n", buf);
 							hit++;
 						}
 						else
 						{
 							if (!(ch[co].flags & CF_SYS_OFF))
-								do_char_log(co, 0, "%s kicks up a splash of mud.\n", ch[cn].reference);
+								do_char_log(co, 0, "%s kicks up a splash of mud.\n", buf);
 							continue;
 						}
 						break;
@@ -842,7 +831,6 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 					default:
 						break;
 				}
-				
 				hit++;
 			}
 			else
@@ -1310,33 +1298,24 @@ int spellcost(int cn, int cost, int in, int usemana)
 
 int chance_compare(int co, int offense, int defense, int usemana)
 {
-	int n, m;
-	
-	n = min(AT_CAP, defense);
-	m = AT_CAP;
-	
-	if (usemana && IS_PLAYER(co))
-	{
-		offense = min(offense, offense*(1000-((n*n*n)/((m*m*m)/1000)))/1000);
-	}
-	
 	if (offense > defense) return 1;
-	
 	return 0;
 }
 
-int chance_base(int cn, int co, int skill, int d20, int defense, int usemana)
+int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg)
 {
 	int chance, roll, tmp, power;
-	int n, m;
-	
-	n = min(AT_CAP, defense);
-	m = AT_CAP;
 	
 	if (usemana>100)
 		power = usemana-100;
 	else
 		power = M_SK(cn, skill);
+	
+	if (!IS_PLAYER(co) && !usemana)
+	{
+		d20 += 25;
+	}
+	
 	chance = d20 * power / max(1, defense*10);
 
 	if (IS_PLAYER(cn))
@@ -1366,8 +1345,6 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana)
 			tmp = RANDOM(20);
 			if (tmp > roll) roll = tmp;
 		}
-		
-		if (IS_PLAYER(co)) chance = min(chance, chance*(1000-((n*n*n)/((m*m*m)/1000)))/1000);
 	}
 
 	if (chance< 0) { chance =  0; }
@@ -1376,7 +1353,7 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana)
 	ch[cn].spellfail = 0;
 	ch[co].spellfail = 0;
 	
-	if (roll > chance || defense > power + (power / 2))
+	if (roll > chance || defense >= power + (power / 2))
 	{
 		if (!IS_PLAYER(cn))
 		{
@@ -1387,25 +1364,29 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana)
 		{
 			if (IS_PLAYER(cn) && !IS_PLAYER(co) && !(ch[cn].flags & CF_OVERRIDE))
 			{
-				ch[cn].spellfail = 1;
+				ch[cn].spellfail = 2;
 				ch[co].spellfail = 1;
-				do_char_log(cn, 5, 
-				"Your spell was suppressed by your target.\n");
+				if (msg) 
+					do_char_log(cn, 5, "Your spell was suppressed by your target.\n");
 				return 0;
 			}
-			else
+			else if (msg) 
 			{
-				do_char_log(cn, 0, 
-				"Your spell fizzled!\n");
+				do_char_log(cn, 0, "Your spell fizzled!\n");
 			}
 		}
-		else if (skill!=SK_BLIND && skill!=SK_DOUSE && skill!=SK_WARCRY)
+		else if (msg)
 		{
-			do_char_log(cn, 0, 
-			"Your target resisted your attempt to %s them.\n", 
-				splog[skill].ref);
+			do_char_log(cn, 0, "Your target resisted your attempt to %s them.\n", splog[skill].ref);
 		}
 		return -1;
+	}
+	if (IS_PLAYER(co) && usemana && defense >= power)
+	{
+		ch[cn].spellfail = 2;
+		ch[co].spellfail = 1;
+		if (msg) 
+			do_char_log(cn, 5, "Your spell was suppressed by your target.\n");
 	}
 	return 0;
 }
@@ -1488,7 +1469,7 @@ int get_target_resistance(int cn, int co)
 	
 	// Tarot Card - Hanged Man :: Resistance behaves as extra Immunity instead
 	if (get_tarot(co, IT_CH_HANGED))
-		target_resist = (M_SK(co, SK_RESIST)*70/100);
+		target_resist = (M_SK(co, SK_RESIST)*2/3);
 	else
 		target_resist = M_SK(co, SK_RESIST);
 	
@@ -1500,7 +1481,7 @@ int get_target_resistance(int cn, int co)
 	if (in = has_buff(cn, SK_LETHARGY))
 	{
 		if (bu[in].data[2])
-			target_resist -= bu[in].power/2;
+			target_resist -= bu[in].power/4;
 		else
 			target_resist -= bu[in].power/3;
 	}
@@ -1514,7 +1495,7 @@ int get_target_immunity(int cn, int co)
 	
 	// Tarot Card - Hanged Man :: Resistance behaves as extra Immunity instead
 	if (get_tarot(co, IT_CH_HANGED))
-		target_immune = M_SK(co, SK_IMMUN) + (M_SK(co, SK_RESIST)*30/100);
+		target_immune = M_SK(co, SK_IMMUN) + (M_SK(co, SK_RESIST)/3);
 	else
 		target_immune = M_SK(co, SK_IMMUN);
 	
@@ -1526,7 +1507,7 @@ int get_target_immunity(int cn, int co)
 	if (in = has_buff(cn, SK_LETHARGY))
 	{
 		if (bu[in].data[2])
-			target_immune -= bu[in].power/2;
+			target_immune -= bu[in].power/4;
 		else
 			target_immune -= bu[in].power/3;
 	}
@@ -1551,7 +1532,7 @@ int spell_race_mod(int power, int cn)
 	
 	kindred = ch[cn].kindred;
 	
-		 if 	(kindred & KIN_TEMPLAR)			{ mod =  60; }
+		 if 	(kindred & KIN_TEMPLAR)			{ mod =  75; }
 	else if 	(kindred & KIN_MERCENARY)		{ mod = 100; }
 	else if 	(kindred & KIN_HARAKIM)			{ mod = 100; }
 
@@ -1682,6 +1663,31 @@ int add_spell(int cn, int in)
 				bu[in2].used = USE_EMPTY;
 				break;
 			}
+			else if (bu[in].temp==SK_IMMOLATE2 && bu[in2].temp==SK_IMMOLATE2)
+			{
+				bu[in2].data[1] = max(bu[in].data[1], bu[in2].data[1]);
+				bu[in2].duration = bu[in2].active = bu[in].duration;
+				
+				bu[in].used = USE_EMPTY;
+				return 0;
+			}
+			else if (bu[in].temp==SK_ARIA && bu[in2].temp==SK_ARIA)
+			{
+				bu[in2].cool_bonus[1] = max(bu[in].cool_bonus[1], bu[in2].cool_bonus[1]);
+				if (IS_SKALD(cn)) bu[in2].dmg_bonus[1] = max(bu[in].dmg_bonus[1], bu[in2].dmg_bonus[1]);
+				bu[in2].duration = bu[in2].active = bu[in].duration;
+				
+				bu[in].used = USE_EMPTY;
+				return 0;
+			}
+			else if (bu[in].temp==SK_ARIA2 && bu[in2].temp==SK_ARIA2)
+			{
+				bu[in2].cool_bonus[1] = min(bu[in].cool_bonus[1], bu[in2].cool_bonus[1]);
+				bu[in2].duration = bu[in2].active = bu[in].duration;
+				
+				bu[in].used = USE_EMPTY;
+				return 0;
+			}
 			else if (bu[in2].temp==bu[in].temp)
 			{
 				if (bu[in2].temp==SK_SLOW || bu[in2].temp==SK_SLOW2 || bu[in2].temp==SK_CURSE2)
@@ -1785,7 +1791,7 @@ void add_exhaust(int cn, int len)
 	if (it[ch[cn].worn[WN_RHAND]].temp==IT_TW_ACEDIA) len = len * 3/4; // less
 	if (it[ch[cn].worn[WN_LHAND]].temp==IT_TW_ACEDIA) len = len * 5/4; // more
 	
-	if (IS_PLAYER(cn) && ch[cn].spellfail)
+	if (ch[cn].spellfail==2)
 	{
 		len = len/2;
 		ch[cn].spellfail = 0;
@@ -1988,13 +1994,28 @@ int has_spell_from_item(int cn, int temp)
 // debuff: 1 for normal debuff, 2 to remove interference messages
 int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 {
-	int temp, arealog = 0, n, in2, li;
+	int temp, arealog = 0, n, in2, li, font=1;
+	char buf[50];
 	
+	strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
 	temp = bu[in].temp;
 	
 	if (temp==SK_LIGHT)
 	{
 		arealog = 1;
+	}
+	
+	if (debuff>0)
+	{
+		if (ch[co].spellfail==1)
+		{
+			font = 4;
+			ch[co].spellfail = 0;
+		}
+		else
+		{
+			font = 0;
+		}
 	}
 	
 	// Check for immunize and inoculate from dispel to see if we can grant the spell
@@ -2031,11 +2052,11 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 		}
 		if (CAN_SENSE(co) && M_SK(co, SK_PERCEPT) + 10 > bu[in].power)
 		{
-			do_char_log(co, 1, "%s%s\n", ch[cn].reference, splog[temp].sense);
+			do_char_log(co, font, "%s%s\n", buf, splog[temp].sense);
 		}
 		else
 		{
-			do_char_log(co, debuff>0?0:1, "%s\n", splog[temp].self);
+			do_char_log(co, font, "%s\n", splog[temp].self);
 		}
 		if (arealog) 
 		{
@@ -2366,7 +2387,9 @@ int spell_haste(int cn, int co, int power, int fromscroll)
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 1))) 
 		return 0;
 	
-	bu[in].speed[1] = min(300, 10 + HASTEFORM(power));
+	bu[in].speed[1]         = min(300, 5 + (power  )/8);
+	bu[in].atk_speed[1] 	= min(127, 5 + (power+4)/8);
+	bu[in].cast_speed[1] 	= min(127, 5 + (power+4)/8);
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_HASTE
 }
@@ -2401,7 +2424,7 @@ int spell_heal(int cn, int co, int power)
 {
 	int in, in2, n, tmp, healing = 2500, dur = SP_DUR_HEAL;
 	
-	if (get_enchantment(co, 9)) dur = dur * 3/4;
+	if (get_enchantment(co, 9)) dur = dur * 2/3;
 	
 	if (!(in = make_new_buff(cn, SK_HEAL, BUF_SPR_HEALSICK, power, dur, 0))) 
 		return 0;
@@ -2475,15 +2498,14 @@ int spell_curse(int cn, int co, int power, int flag)
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
-	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	power = spell_immunity(power, get_target_immunity(cn, co));
 	
 	// Spell suppression
-	if (!IS_PLAYER(co) && ch[co].spellfail) 
+	if (ch[co].spellfail==1) 
 	{
 		chlog(co, "Suppressed the spell");
 		power = power/2;
-		ch[co].spellfail = 0;
 	}
 	
 	if (get_enchantment(cn, 20)) power = power*6/5;
@@ -2497,7 +2519,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		if (get_enchantment(co, 21)) power = power/5;
 		for (n = 0; n<5; n++) 
 		{
-			bu[in].attrib[n][1] = -(4 + CURSE2FORM(power*11/10, (4 - n)));
+			bu[in].attrib[n][1] = -(4 + CURSE2FORM(power, (4 - n)));
 		}
 	}
 	else
@@ -2508,7 +2530,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		if (get_enchantment(co, 21)) power = power/5;
 		for (n = 0; n<5; n++)
 		{
-			bu[in].attrib[n][1] = -(3 + (power*11/10 - (4 - n)) / 5);
+			bu[in].attrib[n][1] = -(3 + (power - (4 - n)) / 5);
 		}
 	}
 	bu[in].data[5] = 1;
@@ -2596,15 +2618,14 @@ int spell_slow(int cn, int co, int power, int flag)
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
-	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	power = spell_immunity(power, get_target_immunity(cn, co));
 	
 	// Spell suppression
-	if (!IS_PLAYER(co) && ch[co].spellfail) 
+	if (ch[co].spellfail==1) 
 	{
 		chlog(co, "Suppressed the spell");
 		power = power/2;
-		ch[co].spellfail = 0;
 	}
 	
 	if (get_enchantment(cn, 13)) power = power*6/5;
@@ -2696,8 +2717,8 @@ int spell_frostburn(int cn, int co, int power)
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
-	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	power = spell_immunity(power, get_target_immunity(cn, co));
 	
 	dur = SP_DUR_FROSTB; 	// 20 seconds
 	
@@ -2724,15 +2745,14 @@ int spell_poison(int cn, int co, int power, int flag)
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
-	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	power = spell_immunity(power, get_target_immunity(cn, co));
 	
 	// Spell suppression
-	if (!IS_PLAYER(co) && ch[co].spellfail) 
+	if (ch[co].spellfail==1) 
 	{
 		chlog(co, "Suppressed the spell");
 		power = power/2;
-		ch[co].spellfail = 0;
 	}
 	
 	if (get_enchantment(cn, 27)) power = power*6/5;
@@ -2748,9 +2768,6 @@ int spell_poison(int cn, int co, int power, int flag)
 	if (IS_PLAYER(cn))
 	{
 		ppow = PL_POISFORM(power, dur);
-		
-		if (!flag && IS_SEYAN_DU(cn))
-			ppow = ppow * 5/4;
 	}
 	else
 	{
@@ -2836,7 +2853,7 @@ int spell_stun(int cn, int co, int power)
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
 	if (!do_surround_check(cn, co, 1) || 
-		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0)) { return 0; }
+		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0)) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
@@ -2899,15 +2916,43 @@ int skill_rally(int cn, int power)
 				continue;
 			}
 			if ((IS_PLAYER(cn) && !(IS_PLAYER(co) || IS_PLAYER_COMP(co))) || 
-				!IS_PLAYER(cn) && (IS_PLAYER(co) || IS_PLAYER_COMP(co))) continue;
+				!IS_PLAYER(cn) && (IS_PLAYER(co) || IS_PLAYER_COMP(co)))
+			{
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "You hear %s rally their allies.\n", ch[cn].reference);
+				continue;
+			}
 			//if (IS_PURPLE(cn) && IS_PURPLE(co)) continue;
-			if (IS_OPP_CLAN(cn, co)) continue;
-			if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) continue;
+			if (IS_OPP_CLAN(cn, co)) 
+			{
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "You hear %s rally their allies.\n", ch[cn].reference);
+				continue;
+			}
+			if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) 
+			{
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "You hear %s rally their allies.\n", ch[cn].reference);
+				continue;
+			}
 			m2 = XY2M(ch[co].x, ch[co].y);
-			if ((map[m1].flags & MF_ARENA) && (map[m2].flags & MF_ARENA)) continue;
+			if ((map[m1].flags & MF_ARENA) && (map[m2].flags & MF_ARENA)) 
+			{
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "You hear %s rally their allies.\n", ch[cn].reference);
+				continue;
+			}
 		}
-		
-		spell_rally(cn, co, cn==co?power*3/4:power);
+		if (spell_rally(cn, co, cn==co?power*3/4:power))
+		{
+			if (cn != co)
+				do_char_log(co, 1, "You hear %s's rally and feel inspired!\n", ch[cn].reference);
+		}
+		else
+		{
+			if (!(ch[co].flags & CF_SYS_OFF))
+				do_char_log(co, 1, "You hear %s's rally, but are somehow uninspired.\n", ch[cn].reference);
+		}
 	}
 	do_char_log(cn, 1, "You call for your allies, rallying them to your cause!\n");
 	
@@ -2919,12 +2964,15 @@ int spell_warcry(int cn, int co, int power, int flag)
 	
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
-	if (!do_surround_check(cn, co, 1) || get_target_resistance(cn, co)>(power*SP_MULT_WARCRY/100)) { return 0; }
+	if (!do_surround_check(cn, co, 1) || 
+		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0)) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	dur = SP_DUR_WARCRY2(power);
+	
+	if (!IS_PLAYER(cn)) dur = dur/2;
 	
 	// Add War-Stun
 	if (!(in = make_new_buff(cn, SK_WARCRY2, BUF_SPR_WARCRY2, power, dur, 0)))
@@ -2939,13 +2987,18 @@ int spell_warcry(int cn, int co, int power, int flag)
 	//
 	
 	// Add War-Fear
-	if (!(in = make_new_buff(cn, SK_WARCRY, BUF_SPR_WARCRY, power/2, SP_DUR_WARCRY, 0)))
+	if (!(in = make_new_buff(cn, SK_WARCRY, BUF_SPR_WARCRY, power, SP_DUR_WARCRY, 0)))
 		return 0;
 	
-	for (n = 0; n<5; n++) 
+	if (IS_PLAYER(cn) && IS_ARCHTEMPLAR(cn))
 	{
-		bu[in].attrib[n][1] = -(2+(power/2-n) / 5);
+		for (n = 0; n<5; n++) bu[in].attrib[n][1] = -(4+((power*5/8)-n) / 5);
 	}
+	else
+	{
+		for (n = 0; n<5; n++) bu[in].attrib[n][1] = -(3+(power/2-n) / 5);
+	}
+	
 	
 	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_WARCRY)
 	bu[in].data[5] = 1;
@@ -3284,6 +3337,9 @@ void char_info(int cn, int co)
 	do_char_log(cn, 1, 
 	"%-12.12s     %3d  !  %-12.12s     %3d\n",
 	"Hit Rate", ch[co].to_hit, "Parry Rate", ch[co].to_parry);
+	do_char_log(cn, 1, 
+	"%-12.12s     %3d  !  %-12.12s     %3d\n",
+	"Weapon Value", ch[co].weapon, "Armor Value", ch[co].armor);
 
 	do_char_log(cn, 1, " \n");
 }
@@ -3399,7 +3455,7 @@ void skill_identify(int cn)
 		in = 0;
 	}
 
-	if (chance_base(cn, co, SK_IDENT, d20, power, 1))
+	if (chance_base(cn, co, SK_IDENT, d20, power, 1, 1))
 	{
 		return;
 	}
@@ -3418,8 +3474,8 @@ int spell_scorch(int cn, int co, int power, int flag)
 	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) 	{ return 0; }
 	if (ch[co].flags & CF_IMMORTAL) 						{ return 0; }
 	
-	power = spell_immunity(power, get_target_immunity(cn, co));
 	power = spell_multiplier(power, cn);
+	power = spell_immunity(power, get_target_immunity(cn, co));
 	
 	if (!(in = make_new_buff(cn, SK_SCORCH, BUF_SPR_SCORCH, power, SP_DUR_SCORCH, 0)))
 		return 0;
@@ -3779,7 +3835,7 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
 	{
 		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 		if (ch[co].flags & CF_IMMORTAL) { return 0; }
-	
+		
 		power = spell_immunity(power, get_target_immunity(cn, co));
 		
 		if (!(in = make_new_buff(cn, SK_DISPEL2, BUF_SPR_INNOCU, power, SP_DUR_DISPEL(power/4), 0))) 
@@ -3837,7 +3893,6 @@ void skill_dispel(int cn)
 				return;
 			}
 		}
-		
 		if (!player_or_ghost(cn, co))
 		{
 			do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", ch[co].name, ch[cn].name);
@@ -4054,13 +4109,20 @@ void skill_ghost(int cn)
 		{
 			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz))
 			{
-				chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
-				skill_gc_atk(cn, co, cz);
+				if (cz == co)
+				{
+					do_char_log(cn, 1, "You dismissed your Ghost Companion.\n", co);
+					answer_transfer(co, cn, 0);
+				}
+				else
+				{
+					chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
+					skill_gc_atk(cn, co, cz);
+				}
 			}
 			else
 			{
-				do_char_log(cn, 1, "You dismissed your Ghost Companion.\n", co);
-				answer_transfer(co, cn, 0);
+				do_char_log(cn, 0, "You may not have more than one Ghost Companion.\n");
 			}
 			return;
 		}
@@ -4670,16 +4732,23 @@ void skill_shadow(int cn)
 		{
 			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz))
 			{
-				chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
-				if (skill_gc_atk(cn, co, cz) && get_gear(cn, IT_TW_INVIDIA))
+				if (cz == co)
 				{
-					god_drop_char_fuzzy(co, ch[cz].x, ch[cz].y);
+					do_char_log(cn, 1, "You dismissed your Shadow Copy.\n", co);
+					answer_transfer(co, cn, 0);
+				}
+				else
+				{
+					chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
+					if (skill_gc_atk(cn, co, cz) && get_gear(cn, IT_TW_INVIDIA))
+					{
+						god_drop_char_fuzzy(co, ch[cz].x, ch[cz].y);
+					}
 				}
 			}
 			else
 			{
-				do_char_log(cn, 1, "You dismissed your Shadow Copy.\n", co);
-				answer_transfer(co, cn, 0);
+				do_char_log(cn, 0, "You may not have more than one Shadow Copy.\n");
 			}
 			return;
 		}
@@ -4687,13 +4756,13 @@ void skill_shadow(int cn)
 	
 	co = ch[cn].skill_target1;
 	
-	if (cn==co) co = 0;
-	if (co==ch[cn].data[PCD_SHADOWCOPY] || 
-		co==ch[cn].data[PCD_COMPANION] ) co = 0;
-	
 	// select who's sprite/array we're copying
 	cz = cn;
 	if (co && (IS_PLAYER(cn) || !RANDOM(2))) cz = co;
+	
+	if (cn==co) co = 0;
+	if (co==ch[cn].data[PCD_SHADOWCOPY] || 
+		co==ch[cn].data[PCD_COMPANION] ) co = 0;
 	
 	if (co && !do_char_can_see(cn, co))
 	{
@@ -4899,7 +4968,10 @@ int spell_weaken(int cn, int co, int power, int flag)
 			return 0;
 		
 		if (get_enchantment(co, 8)) power = power/5;
-		bu[in].armor[1]  = -(power / 5 + 2);
+		if (!IS_PLAYER(cn))
+			bu[in].armor[1]  = max(-127, -(power / 6 + 2));
+		else
+			bu[in].armor[1]  = max(-127, -(power / 4 + 4));
 	}
 	else
 	{
@@ -4907,7 +4979,10 @@ int spell_weaken(int cn, int co, int power, int flag)
 			return 0;
 		
 		if (get_enchantment(co, 8)) power = power/5;
-		bu[in].weapon[1]  = -(power / 5 + 2);
+		if (!IS_PLAYER(cn))
+			bu[in].weapon[1]  = max(-127, -(power / 6 + 2));
+		else
+			bu[in].weapon[1]  = max(-127, -(power / 4 + 4));
 	}
 	
 	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_WEAKEN & SK_WEAKEN2)
@@ -4928,10 +5003,10 @@ void skill_weaken(int cn)
 	aoe_power = M_SK(cn, SK_PROX);
 	cost = SP_COST_WEAKEN;
 	
-	// Tarot Card - Death :: Change Weaken into Greater Weaken
+	// Tarot Card - Death :: Change Weaken into Crush
 	if (get_tarot(cn, IT_CH_DEATH)) 
 	{ 
-		cost *= (4 / 3);
+		cost = cost * 5 / 4;
 		d20 = SP_MULT_WEAKEN2;
 	}
 	
@@ -4969,11 +5044,13 @@ void skill_weaken(int cn)
 // Gets AoE with Proximity skill
 int spell_blind(int cn, int co, int power, int flag)
 {
-	int n, in;
+	int n, in, d20 = SP_MULT_BLIND;
 	
+	if (!IS_PLAYER(co)) d20 += 25;
 	if (ch[co].escape_timer > TICKS*3) 	{ return 0; }
 	if (ch[co].flags & CF_BODY) 		{ return 0; }
-	if (!do_surround_check(cn, co, 1) || get_target_resistance(cn, co)>(power*SP_MULT_BLIND/100)) { return 0; }
+	if (!do_surround_check(cn, co, 1) || 
+		chance_base(cn, co, SK_BLIND, SP_MULT_BLIND, get_target_resistance(cn, co), 0, 0)) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
@@ -4989,15 +5066,15 @@ int spell_blind(int cn, int co, int power, int flag)
 			return 0;
 		
 		if (get_enchantment(co, 33)) power = power/5;
-		if (IS_ANY_MERC(cn) && !IS_PLAYER(cn))
+		if (IS_ANY_MERC(cn) && IS_PLAYER(cn))
 		{
-			bu[in].skill[SK_STEALTH][1] = -(power/ 2 + 4);
-			bu[in].spell_mod[1]         = -(power/ 9 + 2);
+			bu[in].skill[SK_STEALTH][1] = max(-127, -(power/2 + 4));
+			bu[in].spell_mod[1]         = max(-127, -(power/6 + 2));
 		}
 		else
 		{
-			bu[in].skill[SK_STEALTH][1] = -(power/ 3 + 3);
-			bu[in].spell_mod[1]         = -(power/12 + 1);
+			bu[in].skill[SK_STEALTH][1] = max(-127, -(power/3 + 3));
+			bu[in].spell_mod[1]         = max(-127, -(power/8 + 1));
 		}
 		chlog(cn, "Used Douse on %s", ch[co].name);
 	}
@@ -5008,17 +5085,17 @@ int spell_blind(int cn, int co, int power, int flag)
 			return 0;
 		
 		if (get_enchantment(co, 33)) power = power/5;
-		if (IS_ANY_MERC(cn) && !IS_PLAYER(cn))
+		if (IS_ANY_MERC(cn) && IS_PLAYER(cn))
 		{
-			bu[in].skill[SK_PERCEPT][1] = -(power/2 + 4);
-			bu[in].to_hit[1]            = -(power/6 + 2);
-			bu[in].to_parry[1]          = -(power/6 + 2);
+			bu[in].skill[SK_PERCEPT][1] = max(-127, -(power/2 + 4));
+			bu[in].to_hit[1]            = max(-127, -(power/6 + 2));
+			bu[in].to_parry[1]          = max(-127, -(power/6 + 2));
 		}
 		else
 		{
-			bu[in].skill[SK_PERCEPT][1] = -(power/3 + 3);
-			bu[in].to_hit[1]            = -(power/8 + 1);
-			bu[in].to_parry[1]          = -(power/8 + 1);
+			bu[in].skill[SK_PERCEPT][1] = max(-127, -(power/3 + 3));
+			bu[in].to_hit[1]            = max(-127, -(power/8 + 1));
+			bu[in].to_parry[1]          = max(-127, -(power/8 + 1));
 		}
 		chlog(cn, "Used Blind on %s", ch[co].name);
 	}
@@ -5097,7 +5174,7 @@ int spell_immolate(int cn, int co, int power, int flag)
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	
-	bu[in].hp[0]	= -100;
+	bu[in].hp[0]	= -200;
 	if (flag) bu[in].data[0] = 0;
 	bu[in].data[3] 	= PRXP_RAD + ch[cn].aoe_bonus;
 	
@@ -5260,7 +5337,8 @@ void skill_leap(int cn)
 	if (get_tarot(cn, IT_CH_JUSTIC_R))
 	{
 		randomtarg = 1;
-		cooldown -= TICKS;
+		critical = 100;
+		cooldown -= TICKS*2;
 	}
 	
 	if (randomtarg)
@@ -5404,8 +5482,8 @@ void skill_leap(int cn)
 		return;
 	}
 	
-	cost_dist = dist*2 + power / 40 + 3;
-	cost_pow  = power / 20 + 3;
+	cost_dist = dist*2 + power / 60 + 2;
+	cost_pow  = power / 30 + 2;
 	
 	cost = randomtarg?cost_pow:((cost_dist>cost_pow&&!obstructed)?cost_dist:cost_pow);
 	
@@ -5417,7 +5495,6 @@ void skill_leap(int cn)
 		chlog(cn, "Used Leap on %s and %s", ch[co].name, ch[cc].name);
 		// Damage Fight target (cc)
 		dam = spell_immunity(power, ch[cc].to_parry) * 2;
-		if (randomtarg) dam = dam * 8/10;
 		tmp = do_hurt(cn, cc, dam, 8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[cc].reference);
 		else
@@ -5432,7 +5509,6 @@ void skill_leap(int cn)
 		check_gloves(cn, cc, 0, dr1, dr2);
 		// Damage leap target (co)
 		dam = spell_immunity(power, ch[co].to_parry) * 2;
-		if (randomtarg) dam = dam * 8/10;
 		tmp = do_hurt(cn, co, dam, 8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
@@ -5451,7 +5527,6 @@ void skill_leap(int cn)
 		chlog(cn, "Used Leap on %s", ch[co].name);
 		// Damage
 		dam = spell_immunity(power, ch[co].to_parry) * 2 * critical / 100;
-		if (randomtarg) dam = dam * 8/10;
 		tmp = do_hurt(cn, co, dam, 8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
@@ -5503,14 +5578,13 @@ int spell_zephyr(int cn, int co, int power, int flag)
 		if (ch[co].flags & CF_IMMORTAL) { return 0; }
 		
 		if (deathR)
-			power = power + ch[cn].gethit_dam * 2;
+			power = power + ch[cn].gethit_dam * 4;
 		else
 			power = power + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 3;
 		
 		power = spell_immunity(power, get_target_immunity(cn, co));
 		
-		if (!IS_PLAYER(cn))  power = power / 2;
-		if (IS_SEYAN_DU(cn)) power = power * 5/4;
+		if (!IS_PLAYER(cn)) power = power / 2;
 		
 		if (!(in = make_new_buff(cn, SK_ZEPHYR2, BUF_SPR_ZEPHYR2, power, TICKS, 0))) 
 			return 0;
@@ -5562,7 +5636,7 @@ int spell_rage(int cn, int co, int power)
 	else
 		bu[in].weapon[1]	 = power*2/15 + 2;
 	
-	bu[in].end[0]         = -50;
+	bu[in].end[0]         = -75;
 	
 	bu[in].data[4]        = 1; // Effects not removed by NMZ (SK_RAGE)
 	bu[in].flags |= IF_PERMSPELL;
@@ -5596,16 +5670,24 @@ int spell_lethargy(int cn, int co, int power)
 		return 0;
 	
 	// Tarot - Empress.R : Lethargy does life over time instead
-	if (get_tarot(co, IT_CH_EMPRES_R))
+	if (get_tarot(co, IT_CH_EMPRES_R)) 
 	{
-		bu[in].hp[0]	= -100;
-		bu[in].data[2] 	= 1;
+		if (IS_SEYAN_DU(co))
+			bu[in].hp[0]   = -150;
+		else
+			bu[in].hp[0]   = -200;
 	}
 	else
 	{
-		bu[in].mana[0]	= -75;
-		bu[in].data[2] 	= 0;
+		if (IS_SEYAN_DU(co))
+			bu[in].mana[0] = -75;
+		else
+			bu[in].mana[0] = -100;
 	}
+	
+	// Seyan'du get a weaker variant
+	if (IS_SEYAN_DU(co)) bu[in].data[2] = 1;
+	else				 bu[in].data[2] = 0;
 	
 	bu[in].flags |= IF_PERMSPELL;
 	

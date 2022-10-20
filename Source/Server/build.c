@@ -6463,7 +6463,7 @@ void build_item_drop(int x, int y, int v, int cn, int rank)
 		case MM_P_AREQ: // Equipment
 			in = RANDOM(sizeof(item_eq) / sizeof(int));
 			in = god_create_item(item_eq[in]);
-			create_soultrans_equipment(cn, in, min(24, RANDOM(rank)+1));
+			create_soultrans_equipment(cn, in, rank/2+RANDOM(rank/2)+1);
 			break;
 		case MM_P_ARPT: // Potion
 			in = RANDOM(sizeof(item_pt) / sizeof(int));
@@ -6547,7 +6547,7 @@ void add_monster_flags(int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG])
 	// Give gold
 	if (flags[MM_P_ENGL])
 	{
-		ch[cn].gold += do_char_score(cn)*flags[MM_P_ENGL]*RATE_P_ENGL/100;
+		ch[cn].gold += do_char_score(cn)*flags[MM_P_ENGL]*RATE_P_ENGL;
 	}
 	do_update_char(cn);
 }

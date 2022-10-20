@@ -29,9 +29,9 @@
 #define DAM_MULT_THORNS		1000
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
-#define DAM_MULT_ZEPHYR		  25
+#define DAM_MULT_ZEPHYR		  50
 #define DAM_MULT_LEAP		 250
-#define DAM_MULT_POISON		3250
+#define DAM_MULT_POISON		4500
 
 // wear positions
 #define WN_HEAD			0
@@ -48,14 +48,14 @@
 #define WN_RRING		11
 #define WN_CHARM2		12
 
-// Sneaky Packet Hacks		   buf + 5	    buf + 7
-#define WN_SPEED		13  // Speed 	and Attack Speed
-#define WN_SPMOD		14  // Spellmod	and Spellapt
-#define WN_CRIT			15  // Crit Chc	and Crit Mult
-#define WN_TOP			16  // TopDmg	and Luck
-#define WN_HITPAR		17  // Hit 		and Parry
-#define WN_CLDWN		18  // Cooldown and Cast Speed
-#define WN_FLAGS		19  // Special flags
+// Sneaky Packet Hacks		   	buf + 5			buf + 7
+#define WN_SPEED		13  // 	Speed 			Attack Speed
+#define WN_SPMOD		14  // 	Spellmod		Spellapt
+#define WN_CRIT			15  // 	Crit Chc		Crit Mult
+#define WN_TOP			16  // 	TopDmg			gethit_dam
+#define WN_HITPAR		17  // 	Hit 			Parry
+#define WN_CLDWN		18  // 	Cooldown 		Cast Speed
+#define WN_FLAGS		19  // 	Special flags
 
 #define SPEED_CAP		300
 
@@ -204,6 +204,7 @@ struct cplayer {
 	// items worn
 	int worn[20];
 	int worn_p[20];
+	int stat[20];
 
 	// spells ready
 	short spell[MAXBUFFS];

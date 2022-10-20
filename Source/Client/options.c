@@ -249,7 +249,7 @@ void load_options(void)
 		pdata.hide=1;
 		pdata.show_stats=0;
 		pdata.show_bars=0;
-		for (n=0; n<16; n++) {
+		for (n=0; n<20; n++) {
 			pdata.xbutton[n].skill_nr=-1;
 			strcpy(pdata.xbutton[n].name,"-");
 		}
@@ -309,7 +309,7 @@ void load_char(HWND hwnd,char *name)
 		pdata.desc[0]=0;
 		pdata.changed=0;
 
-		for (n=0; n<16; n++) {
+		for (n=0; n<20; n++) {
 			pdata.xbutton[n].skill_nr=-1;
 			strcpy(pdata.xbutton[n].name,"-");
 		}

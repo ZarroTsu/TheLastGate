@@ -2035,26 +2035,36 @@ void answer_tarot(int cn, int co, int m)
 
 void answer_unlearn(int cn, int co)
 {
-	int v = 250000;
-	char unl[40];
+	int v = 250000, n;
+	char unl[7][40];
 	
 	if (IS_SEYAN_DU(co) && 
 		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
 		 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
 		 B_SK(co, SK_RAGE)))
 	{
-		if (B_SK(co, SK_WARCRY))	{ B_SK(co, SK_WARCRY) = 0; strcpy(unl, skilltab[SK_WARCRY].name); }
-		if (B_SK(co, SK_LEAP))		{ B_SK(co, SK_LEAP) = 0; strcpy(unl, skilltab[SK_LEAP].name); }
-		if (B_SK(co, SK_SHADOW))	{ B_SK(co, SK_SHADOW) = 0; strcpy(unl, skilltab[SK_SHADOW].name); }
-		if (B_SK(co, SK_LETHARGY))	{ B_SK(co, SK_LETHARGY) = 0; strcpy(unl, skilltab[SK_LETHARGY].name); }
-		if (B_SK(co, SK_PULSE))		{ B_SK(co, SK_PULSE) = 0; strcpy(unl, skilltab[SK_PULSE].name); }
-		if (B_SK(co, SK_ZEPHYR))	{ B_SK(co, SK_ZEPHYR) = 0; strcpy(unl, skilltab[SK_ZEPHYR].name); }
-		if (B_SK(co, SK_RAGE))		{ B_SK(co, SK_RAGE) = 0; strcpy(unl, skilltab[SK_RAGE].name); }
+		n = 0;
+		if (B_SK(co, SK_WARCRY))   { B_SK(co, SK_WARCRY)   = 0; strcpy(unl[n], skilltab[SK_WARCRY].name);   n++; }
+		if (B_SK(co, SK_LEAP))     { B_SK(co, SK_LEAP)     = 0; strcpy(unl[n], skilltab[SK_LEAP].name);     n++; }
+		if (B_SK(co, SK_SHADOW))   { B_SK(co, SK_SHADOW)   = 0; strcpy(unl[n], skilltab[SK_SHADOW].name);   n++; }
+		if (B_SK(co, SK_LETHARGY)) { B_SK(co, SK_LETHARGY) = 0; strcpy(unl[n], skilltab[SK_LETHARGY].name); n++; }
+		if (B_SK(co, SK_PULSE))    { B_SK(co, SK_PULSE)    = 0; strcpy(unl[n], skilltab[SK_PULSE].name);    n++; }
+		if (B_SK(co, SK_ZEPHYR))   { B_SK(co, SK_ZEPHYR)   = 0; strcpy(unl[n], skilltab[SK_ZEPHYR].name);   n++; }
+		if (B_SK(co, SK_RAGE))     { B_SK(co, SK_RAGE)     = 0; strcpy(unl[n], skilltab[SK_RAGE].name);     n++; }
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
-		do_sayx(cn, "Very well, I will remove %s, %s. Close your eyes, and...", unl, ch[co].name);
-		chlog(cn, "GateKeeper: Removed %s from %s, and lowered by %d.", unl, ch[co].name, v);
-		do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl, v);
+		if (n==2)
+		{
+			do_sayx(cn, "Very well %s, I will remove %s and %s. Close your eyes, and...", ch[co].name, unl[0], unl[1]);
+			chlog(cn, "Gatekeeper: Removed %s and %s from %s, and lowered by %d.", unl[0], unl[1], ch[co].name, v);
+			do_char_log(co, 0, "You no longer know %s and %s. You lost %d experience points.\n", unl[0], unl[1], v);
+		}
+		else
+		{
+			do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, unl[0]);
+			chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", unl[0], ch[co].name, v);
+			do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl[0], v);
+		}
 	}
 	else if (IS_SEYAN_DU(co))
 	{

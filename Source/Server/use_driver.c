@@ -390,7 +390,10 @@ int use_create_item3(int cn, int in)
 	if (it[in].duration == -1 && (n==IT_DAGG_TITN || n==IT_DAGG_DAMA || n==IT_DAGG_ADAM))
 	{
 		// special case for selective rare weapons
-		if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_WP_SWORD)) n += 4;
+		if ((in2 = ch[cn].worn[WN_LHAND]) && (it[in2].flags & IF_OF_DUALSW) && (!RANDOM(2) || !ch[cn].worn[WN_RHAND])) n += 5;
+		else if ((in2 = ch[cn].worn[WN_LHAND]) && (it[in2].flags & IF_OF_SHIELD) && (!RANDOM(2) || !ch[cn].worn[WN_RHAND])) n += 3;
+		else if ((in2 = ch[cn].worn[WN_LHAND]) && (it[in2].flags & IF_WP_DAGGER) && (!RANDOM(2) || !ch[cn].worn[WN_RHAND])) n += 0;
+		else if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_WP_SWORD)) n += 4;
 		else if ((in2 = ch[cn].worn[WN_RHAND]) && ((it[in2].flags & IF_WP_DAGGER) && (it[in2].flags & IF_WP_STAFF))) n += 2;
 		else if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_WP_DAGGER)) n += 0;
 		else if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_WP_STAFF)) n += 1;
@@ -398,8 +401,6 @@ int use_create_item3(int cn, int in)
 		else if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_WP_AXE)) n += 6;
 		else if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_WP_TWOHAND)) n += 7;
 		else if ((in2 = ch[cn].worn[WN_RHAND]) && (it[in2].flags & IF_OF_SHIELD)) n += 3;
-		else if ((in2 = ch[cn].worn[WN_LHAND]) && (it[in2].flags & IF_OF_DUALSW)) n += 5;
-		else if ((in2 = ch[cn].worn[WN_LHAND]) && (it[in2].flags & IF_OF_SHIELD)) n += 3;
 		else 
 		{
 			if (n==IT_DAGG_TITN) n = 1783;
@@ -450,14 +451,14 @@ void use_consume_item(int cn, int in, int flag)
 	int stk, val;
 	
 	// Stackable item check - if the current item is stackable and has a stack, we consume one. Otherwise, destroy the remaining item.
-	if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1 && !flag)
+	if (it[in].stack > 1 && !flag)
 	{
 		stk = it[in].stack;
 		val = it[in].value / stk;
 		stk--;
 		it[in].stack = stk;
 		it[in].value = val * stk;
-		it[in].flags |= IF_UPDATE;
+		it[in].flags |= IF_STACKABLE | IF_UPDATE;
 	}
 	else
 	{
@@ -2059,7 +2060,8 @@ int use_pandium_teleport(int cn, int in)
 				if (ch[co].temp == CT_PANDIUM) flag = 1;
 				if ((ch[co].temp == CT_PANDIUM && 
 					ch[co].x != ch[co].data[29]%MAPX && 
-					ch[co].y != ch[co].data[29]/MAPX) || IS_PLAYER(co) || IS_PLAYER_COMP(co))
+					ch[co].y != ch[co].data[29]/MAPX) || 
+					ch[co].temp == CT_SHADOW || IS_PLAYER(co) || IS_PLAYER_COMP(co))
 				{
 					do_char_log(cn, 0, "The trial is busy. Please try again later.\n");
 					return 1;
@@ -2084,13 +2086,16 @@ int use_pandium_teleport(int cn, int in)
 	{
 		for (y = ys; y<=ye; y++)
 		{
-			if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co) && ch[co].pandium_floor[0]>0)
+			if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co) && ch[co].pandium_floor[0]>0 && 
+				isgroup(cn, co) && isgroup(co, cn))
 			{
 				quick_teleport(co, it[in].data[0], it[in].data[1]);
 				ch[co].dir = 4;
 			}
 		}
 	}
+	quick_teleport(cn, it[in].data[0], it[in].data[1]);
+	ch[cn].dir = 4;
 	
 	return 1;
 }
@@ -3138,7 +3143,7 @@ int use_map_shrine(int cn, int in)
 			switch (it[in].data[1])
 			{
 				case  1:
-					p = p/55; ch[cn].luck += p;
+					p = p/64; ch[cn].luck += p;
 					do_char_log(cn, 2, "Your lucky day.\n");
 					chlog(cn, "Gets %d Luck", p);
 					do_char_log(cn, 1, "You got %d luck.\n", p);
@@ -3156,13 +3161,13 @@ int use_map_shrine(int cn, int in)
 					do_char_log(cn, 1, "You got %d experience points.\n", p);
 					break;
 				case  4:
-					p = p/33; ch[cn].os_points += p;
+					p = p/32; ch[cn].os_points += p;
 					do_char_log(cn, 2, "Osiris smiles.\n");
 					chlog(cn, "Gets %d OSP", p);
 					do_char_log(cn, 1, "You got %d contract points.\n", p);
 					break;
 				default:
-					p = p/44; ch[cn].bs_points += p;
+					p = p/32; ch[cn].bs_points += p;
 					do_char_log(cn, 2, "The stronghold falls.\n");
 					chlog(cn, "Gets %d BSP", p);
 					do_char_log(cn, 1, "You got %d stronghold points.\n", p);
@@ -3387,10 +3392,10 @@ int use_pandium_shrine(int cn, int in)
 			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. Your maximum hitpoints and maximum mana have each been increased by 50.\n");
 			break;
 		case  3:	// Floor 10 Reward
-			if 		(IS_SEYAN_DU(cn)) 	 tmp = SK_HASTE;
+			if 		(IS_SEYAN_DU(cn)) 	 tmp = SK_PROX;
 			else if (IS_ARCHTEMPLAR(cn)) tmp = SK_DISPEL;
 			else if (IS_SKALD(cn)) 		 tmp = SK_PRECISION;
-			else if (IS_WARRIOR(cn)) 	 tmp = SK_PROX;
+			else if (IS_WARRIOR(cn)) 	 tmp = SK_GEARMAST;
 			else if (IS_SORCERER(cn)) 	 tmp = SK_MSHIELD;
 			else if (IS_SUMMONER(cn)) 	 tmp = SK_STEALTH;
 			else if (IS_ARCHHARAKIM(cn)) tmp = SK_GCMASTERY;
@@ -3515,7 +3520,7 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			power = ch[cn].end[5]/2;
+			power = ch[cn].end[5]/3;
 			if (ch[cn].a_end + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough endurance.\n");
@@ -5819,7 +5824,7 @@ void boost_char(int cn, int type)
 	if (ch[cn].alignment < 0 && ch[cn].data[CHD_GROUP] != 13 && ch[cn].data[CHD_GROUP] != 18 &&
 		!(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && getrank(cn) > 4) // Stronger than Sergeant
 	{
-		if (type==0) type = 1+RANDOM(2);
+		if (type==0) type = RANDOM(2)+1;
 		ch[cn].flags |= CF_EXTRAEXP;
 		
 		switch (type)
@@ -6547,11 +6552,51 @@ int teleport3(int cn, int in)    // out of labyrinth
 	return 1;
 }
 
+int get_seyan_bits(int cn)
+{
+	unsigned int bit;
+	int bits;
+	
+	for (bits = 0, bit = 1; bit; bit <<= 1)
+	{
+		if (ch[cn].data[21] & bit)
+		{
+			bits++;
+		}
+	}
+	
+	return bits;
+}
+
+void make_seyan_sword(int cn, int in, int bits)
+{
+	int n;
+	
+	it[in].weapon[0]        = 15 + bits * 3;
+	it[in].ss_weapon        =      bits * 3;
+	
+	it[in].to_hit[0]        = max(0,min( 15, (bits- 2)/2));
+	it[in].to_parry[0]      = max(0,min( 15, (bits- 2)/2));
+	
+	for (n = 0; n<5; n++) 
+		it[in].attrib[n][0] = max(0,min( 15, (bits-17)  ));
+	
+	it[in].crit_chance[0]   = max(0,min(120, (bits- 2)*4));
+	it[in].crit_multi[0]    = max(0,min( 15, (bits- 2)/2));
+	it[in].spell_mod[0]     = max(0,min( 15, (bits- 2)/2));
+	
+	it[in].flags |= IF_UPDATE;
+	it[in].orig_temp = IT_SEYANSWORD;
+	it[in].temp   = 0;
+	
+	sprintf(it[in].description, "A huge two-handed sword, engraved with runes and magic symbols. It bears the name %s.",
+		ch[cn].name);
+}
+
 int use_seyan_shrine(int cn, int in, int flag)
 {
 	struct item tmp;
 	int in2, in3, n, bits, ret = 0;
-	unsigned int bit;
 
 	if (!cn)
 	{
@@ -6616,13 +6661,7 @@ int use_seyan_shrine(int cn, int in, int flag)
 		ret++;
 	}
 
-	for (bits = 0, bit = 1; bit; bit <<= 1)
-	{
-		if (ch[cn].data[21] & bit)
-		{
-			bits++;
-		}
-	}
+	bits = get_seyan_bits(cn);
 	
 	if (bits<32 && (!flag || ret)) 
 	{
@@ -6633,54 +6672,12 @@ int use_seyan_shrine(int cn, int in, int flag)
 	{
 		do_char_log(cn, 1, "You have visited all of the shrines of Kwai!\n", bits);
 	}
-
-		it[in2].weapon[0] = 15 + bits * 3;
-		it[in2].ss_weapon = bits * 3;
-		
-		it[in2].to_hit[0]   = max(0, min(15, (bits-2)/2));
-		it[in2].to_parry[0] = max(0, min(15, (bits-1)/2));
-		
-		for (n = 0; n<5; n++) 
-		{
-			it[in2].attrib[n][0] = max(0, min(5, (bits-(5-n))/5));
-		}
-		
-		it[in2].crit_multi[0] = max(0, min(25, bits - 5));
-		
-		if (bits>=31) it[in2].base_crit    =  3;
-		if (bits==32) it[in2].spell_mod[0] = 10;
-		
-		it[in2].flags |= IF_UPDATE;
-		it[in2].orig_temp = IT_SEYANSWORD;
-		it[in2].temp   = 0;
-		
-		sprintf(it[in2].description, "A huge two-handed sword, engraved with runes and magic symbols. It bears the name %s.",
-	        ch[cn].name);
+	
+	make_seyan_sword(cn, in2, bits);
 	
 	if (in3 && it[in3].driver==40 && it[in3].data[0]==cn)
 	{
-		it[in3].weapon[0] = 15 + bits * 3;
-		it[in3].ss_weapon = bits * 3;
-		
-		it[in3].to_hit[0]   = max(0, min(15, (bits-2)/2));
-		it[in3].to_parry[0] = max(0, min(15, (bits-1)/2));
-		
-		for (n = 0; n<5; n++) 
-		{
-			it[in3].attrib[n][0] = max(0, min(5, (bits-(5-n))/5));
-		}
-		
-		it[in3].crit_multi[0] = max(0, min(25, bits - 5));
-		
-		if (bits>=31) it[in3].base_crit    =  3;
-		if (bits==32) it[in3].spell_mod[0] = 10;
-		
-		it[in3].flags |= IF_UPDATE;
-		it[in3].orig_temp = IT_SEYANSWORD;
-		it[in3].temp   = 0;
-		
-		sprintf(it[in3].description, "A huge two-handed sword, engraved with runes and magic symbols. It bears the name %s.",
-	        ch[cn].name);
+		make_seyan_sword(cn, in3, bits);
 	}
 
 	do_update_char(cn);
@@ -6920,8 +6917,8 @@ int spell_scroll(int cn, int in)
 			break;
 		case    SK_IDENT:
 			if (!IS_SANEITEM(in2 = ch[cn].citem)) in2 = 0;
-			if ((in2 && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, it[in2].power, power+100))
-				|| (!in2 && cn!=co && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power+100)))
+			if ((in2 && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, it[in2].power, power+100, 1))
+				|| (!in2 && cn!=co && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power+100, 1)))
 			{
 				ret = 1;
 			}
@@ -6932,7 +6929,7 @@ int spell_scroll(int cn, int in)
 			break;
 		// Blast?
 		case    SK_CURSE:
-			if (chance_base(cn, co, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power+100))
+			if (chance_base(cn, co, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power+100, 1))
 			{
 				ret = 1;
 			}
@@ -6942,7 +6939,7 @@ int spell_scroll(int cn, int in)
 			}
 			break;
 		case    SK_SLOW:
-			if (chance_base(cn, co, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power+100))
+			if (chance_base(cn, co, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power+100, 1))
 			{
 				ret = 1;
 			}
@@ -6955,7 +6952,7 @@ int spell_scroll(int cn, int in)
 		default:
 			ret = 0;
 	}
-
+	if (ch[co].spellfail==1) ch[co].spellfail = 0;
 	if (ret)
 	{
 		charges--;
@@ -7512,7 +7509,7 @@ int use_garbage(int cn, int in)
 void use_driver(int cn, int in, int carried)
 {
 	int ret, m;
-	int thousand, tmp, stacked = 0;
+	int thousand, tmp;
 
 	if (in<=0 || in>=MAXITEM)
 	{
@@ -7562,11 +7559,12 @@ void use_driver(int cn, int in, int carried)
 			}
 		}
 		
+		// Item stacking - held items are stackable and the same template
 		if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp &&
 			(it[in].temp != 0 || it[in].driver == it[ch[cn].citem].driver))
 		{
 			use_stack_items(cn, in, ch[cn].citem);
-			stacked = 1;
+			return;
 		}
 		else if ((it[in].flags & IF_USESPECIAL) || it[in].temp==1705 || it[in].temp==1706)
 		{
@@ -7980,13 +7978,7 @@ void use_driver(int cn, int in, int carried)
 					ch[cn].cerrno = ERR_SUCCESS;
 				}
 			}
-			// Item stacking - held items are stackable and the same template
-			if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && it[in].temp == it[ch[cn].citem].temp &&
-				(it[in].temp != 0 || it[in].driver == it[ch[cn].citem].driver))
-			{
-				if (!stacked) use_stack_items(cn, in, ch[cn].citem);
-			}
-			else if (carried && (it[in].flags & IF_USEDESTROY))
+			if (carried && (it[in].flags & IF_USEDESTROY))
 			{
 				thousand = 1000;
 
@@ -8012,7 +8004,7 @@ void use_driver(int cn, int in, int carried)
 				
 				if (get_enchantment(cn, 2))
 				{
-					thousand = thousand * 5/4;
+					thousand = thousand * 3/2;
 				}
 				
 				// Special case for the Rainbow Potion
@@ -8887,9 +8879,9 @@ void expire_explosion(int in)
 	if (it[in].active < it[in].duration)
 	{
 		it[in].active++;
-		if (it[in].active < it[in].duration/2) 			it[in].sprite[1] = 2446 + ((it[in].active%9)?0:1);
-		else if (it[in].active < it[in].duration/4*3) 	it[in].sprite[1] = 2448 + ((it[in].active%6)?0:1);
-		else 											it[in].sprite[1] = 2450 + ((it[in].active%3)?0:1);
+		if (it[in].active < it[in].duration/2) 			it[in].sprite[1] = 2448 + ((it[in].active%9)?0:1);
+		else if (it[in].active < it[in].duration/4*3) 	it[in].sprite[1] = 2450 + ((it[in].active%6)?0:1);
+		else 											it[in].sprite[1] = 2452 + ((it[in].active%3)?0:1);
 		if (it[in].active == it[in].duration-TICKS && (cn = map[m].ch) && IS_PLAYER(cn)) do_area_sound(0, 0, x, y, 25);
 		
 		return;
@@ -9136,8 +9128,8 @@ void item_tick_explosions(void)
 {
 	int x, y, frx, fry, tox, toy, m, in;
 	
-	// Pandium arena
-	frx = PANDI_X1; fry = PANDI_Y1; tox = PANDI_X2; toy = PANDI_Y2;
+	// Pandium arena - these are +/- 2 in case a player spawns a 5x5 right at the edge of the arena.
+	frx = PANDI_X1-2; fry = PANDI_Y1-2; tox = PANDI_X2+2; toy = PANDI_Y2+2;
 	for (x = frx; x <= tox; x++) for (y = fry; y <= toy; y++)
 	{
 		m = x + y * MAPX;

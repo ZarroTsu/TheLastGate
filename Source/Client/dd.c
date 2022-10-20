@@ -1898,7 +1898,7 @@ void dd_show_map(unsigned short *src,int xo,int yo,int magnify)
 	// Draw the mini-map (magnify x magnify)
 	for (y=0; y<128; y++) 
 	{
-		d=(y+wnd_xtra+579)*MAXX+6;
+		d=(y+wnd_xtra+582)*MAXX+6;
 		s=((y/magnify)+yo)*MAPX_MAX+xo;
 		p=s*magnify;
 		for (x=0; x<128; x++) 

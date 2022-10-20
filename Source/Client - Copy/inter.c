@@ -265,6 +265,10 @@ void button_command(int nr)
 				{
 					cmd3(CL_CMD_INV,6,sk-100,selected_char);
 				}
+				else if (sk >= 200)
+				{
+					cmd3(CL_CMD_INV,6,sk-100,selected_char);
+				}
             } 
 			else 
 				xlog(1,"This button is unassigned. Right click on a skill/spell, then right click on the button to assign it.");

@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.9.0\n"};
+static char intro_msg3[] = {"Current client/server version is 0.9.2\n"};
 static char intro_msg4_font = 0;
-static char intro_msg4[] = {" \n"};
+static char intro_msg4[] = {"ALL MERCENARIES, SORCERERS, WARRIORS AND SEYAN'DU WERE RESET RECENTLY. REMEMBER TO ALLOCATE YOUR EXP!\n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -2649,8 +2649,28 @@ void plr_change(int nr)
 		}
 
 		plr_change_power(nr, cpl->hp, ch[cn].hp, SV_SETCHAR_HP);
-		plr_change_power(nr, cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
 		plr_change_power(nr, cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
+		
+		if (cpl->end[0] != ch[cn].move_speed || cpl->end[1] != ch[cn].aoe_bonus || 
+			cpl->end[2] != ch[cn].dmg_bonus  || cpl->end[3] != ch[cn].dmg_reduction || 
+			cpl->end[4] != 0 || cpl->end[5] != ch[cn].end[5])
+		{
+			buf[0] = SV_SETCHAR_ENDUR;
+			*(unsigned short*)(buf + 1)  = ch[cn].move_speed;		// char
+			*(unsigned short*)(buf + 3)  = ch[cn].aoe_bonus;		// char
+			*(unsigned short*)(buf + 5)  = ch[cn].dmg_bonus;		// unsigned short
+			*(unsigned short*)(buf + 7)  = ch[cn].dmg_reduction;	// unsigned short
+			*(unsigned short*)(buf + 9)  = 0;
+			*(unsigned short*)(buf + 11) = ch[cn].end[5];
+			xsend(nr, buf, 13);
+			
+			cpl->end[0] = ch[cn].move_speed;
+			cpl->end[1] = ch[cn].aoe_bonus;
+			cpl->end[2] = ch[cn].dmg_bonus;
+			cpl->end[3] = ch[cn].dmg_reduction;
+			cpl->end[4] = 0;
+			cpl->end[5] = ch[cn].end[5];
+		}
 
 		for (n = 0; n<MAXSKILL; n++)
 		{

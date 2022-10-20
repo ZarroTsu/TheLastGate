@@ -23,7 +23,7 @@ extern int noshop;
 extern int selected_char;
 
 // Scroll Wheel - using position from other files
-extern int inv_pos,skill_pos,wps_pos;
+extern int inv_pos,skill_pos,wps_pos,hudmode;
 extern int gui_inv_x[],gui_inv_y[],gui_skl_names[];
 
 // Screen data, can be shared with other files via extern
@@ -224,34 +224,42 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				case  51: if (keys>=2) button_command(18); break;
 				// -------- CTRL + 4
 				case  52: if (keys>=2) button_command(19); break;
+				// -------- CTRL + 5
+				case  53: if (keys>=2) button_command(20); break;
 				
 				// **************** Ctrl cases for letter keys **************** //
 				// -------- CTRL + Q
-				case  81: if (keys>=2) button_command(20);break;
+				case  81: if (keys>=2) button_command(21);break;
 				// -------- CTRL + W
-				case  87: if (keys>=2) button_command(21);break;
+				case  87: if (keys>=2) button_command(22);break;
 				// -------- CTRL + E
-				case  69: if (keys>=2) button_command(22);break;
+				case  69: if (keys>=2) button_command(23);break;
 				// -------- CTRL + R
-				case  82: if (keys>=2) button_command(23);break;
+				case  82: if (keys>=2) button_command(24);break;
+				// -------- CTRL + T
+				case  84: if (keys>=2) button_command(25);break;
 				
 				// -------- CTRL + A
-				case  65: if (keys>=2) button_command(24);break;
+				case  65: if (keys>=2) button_command(26);break;
 				// -------- CTRL + S
-				case  83: if (keys>=2) button_command(25);break;
+				case  83: if (keys>=2) button_command(27);break;
 				// -------- CTRL + D
-				case  68: if (keys>=2) button_command(26);break;
+				case  68: if (keys>=2) button_command(28);break;
 				// -------- CTRL + F
-				case  70: if (keys>=2) button_command(27);break;
+				case  70: if (keys>=2) button_command(29);break;
+				// -------- CTRL + G
+				case  71: if (keys>=2) button_command(30);break;
 				
 				// -------- CTRL + Z
-				case  90: if (keys>=2) button_command(28);break;
+				case  90: if (keys>=2) button_command(31);break;
 				// -------- CTRL + X
-				case  88: if (keys>=2) button_command(29);break;
+				case  88: if (keys>=2) button_command(32);break;
 				// -------- CTRL + C
-				case  67: if (keys>=2) button_command(30);break;
+				case  67: if (keys>=2) button_command(33);break;
 				// -------- CTRL + V
-				case  86: if (keys>=2) button_command(31);break;
+				case  86: if (keys>=2) button_command(34);break;
+				// -------- CTRL + B
+				case  66: if (keys>=2) button_command(35);break;
 				
 				// -------- ESC
 				case  27: 

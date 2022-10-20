@@ -2126,12 +2126,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Crit Mult \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |  10 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |  20 |  26 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |  30 |  36 \n");
-		do_char_log(cn, 1, "Platinum, Big      | Captn |  30 |  39 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  40 |  49 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  50 |  59 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
+		do_char_log(cn, 1, "    Gold, Big      | 2Lieu |  10 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | Captn |  15 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Big      | Captn |  15 |  24 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | LtCol |  20 |  29 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | BrGen |  25 |  34 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 || strcmp(topic, "OPAL")==0 || strcmp(topic, "opal")==0)
@@ -2825,12 +2825,27 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if (B_SK(cn, SK_IDENT))																quest1[20] = 1;	// ( Nasir )
 	if (ch[cn].temple_x!=HOME_START_X)													quest1[21] = 1;	// Get to Aston
 	if (ch[cn].flags & CF_APPRAISE)														quest1[22] = 1; // ( Richie )
-	if (B_SK(cn, SK_SWIM))																quest1[23] = 1;	// ( Lucci )	
-	if ((B_SK(cn, SK_WARCRY) && IS_SEYA_OR_ARTM(cn))	|| (B_SK(cn, SK_LEAP)   && IS_SEYA_OR_SKAL(cn))
-	 || (B_SK(cn, SK_SHADOW) && IS_SEYA_OR_SUMM(cn))	|| (B_SK(cn, SK_POISON) && IS_SEYA_OR_SORC(cn))
-	 || (B_SK(cn, SK_PULSE)  && IS_SEYA_OR_ARHR(cn))	|| (B_SK(cn, SK_ZEPHYR) && IS_SEYA_OR_WARR(cn))
-	 || (B_SK(cn, SK_RAGE)   && IS_SEYA_OR_BRAV(cn)) )									quest1[16] = 1;
+	if (B_SK(cn, SK_SWIM))																quest1[23] = 1;	// ( Lucci )
+	if ((IS_ANY_MERC(cn) || IS_SEYAN_DU(cn)) && B_SK(cn, SK_HASTE))						quest2[16] = 1; // ( Regal )
 	
+	//
+	if ((B_SK(cn, SK_WARCRY) 	&& IS_ARCHTEMPLAR(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_LEAP) 		&& IS_SKALD(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_ZEPHYR) 	&& IS_WARRIOR(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_LETHARGY) 	&& IS_SORCERER(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_SHADOW) 	&& IS_SUMMONER(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_PULSE) 	&& IS_ARCHHARAKIM(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_RAGE) 		&& IS_BRAVER(cn)))			quest1[16] = 1;
+	//
+	if (IS_SEYAN_DU(cn))
+	{
+		n = 0;
+		if (B_SK(cn, SK_WARCRY))   n++;		if (B_SK(cn, SK_LEAP))     n++;
+		if (B_SK(cn, SK_SHADOW))   n++;		if (B_SK(cn, SK_LETHARGY)) n++;
+		if (B_SK(cn, SK_PULSE))    n++;		if (B_SK(cn, SK_ZEPHYR))   n++;
+		if (B_SK(cn, SK_RAGE))     n++;		if (n>=2)  		quest1[16] = 1;
+	}
+	//
 	for (n=0;n<32;n++)
 	{
 		if (ch[cn].data[72] & (1 << n)) quest2[n] = 1;
@@ -2901,7 +2916,11 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_quest(cn, flag, page, m, ast, questP[ 6],  9, "Lab VI",   "Desert Gorge", "-",         95000);
 	m = display_quest(cn, flag, page, m, ast, quest2[ 5], 10, "Roxie",    "Temple Stree", "Amulet",    22500);
 	m = display_quest(cn, flag, page, m, ast, quest1[23], 10, "Lucci",    "Temple Stree", "*Swimmin",  25000);
-	m = display_quest(cn, flag, page, m, ast, quest2[16], 10, "Regal",    "Winding Vall", "Book",      30000);
+	if (IS_ANY_MERC(cn) || IS_SEYAN_DU(cn))
+		m = display_quest(cn, flag, page, m, ast, quest2[16], 10, "Regal","Winding Vall", "*Haste",    30000);
+	else
+		m = display_quest(cn, flag, page, m, ast, quest2[16], 10, "Regal","Winding Vall", "Book",      30000);
+	
 	m = display_quest(cn, flag, page, m, ast, questP[ 7], 10, "Lab VII",  "Light/Dark G", "-",        125000);
 	m = display_quest(cn, flag, page, m, ast, quest2[10], 11, "Donna",    "Merchant's W", "Tarot",     32000);
 	m = display_quest(cn, flag, page, m, ast, quest2[ 9], 11, "Gomez",    "Temple Stree", "Tarot",     40000);
@@ -5597,7 +5616,7 @@ void do_command(int cn, char *ptr)
 		;
 		if (prefix(cmd, "resetplayers") && f_gg)
 		{
-			god_reset_players(cn);
+			god_reset_players(cn, atoi(arg[1]));
 			return;
 		}
 		;
@@ -8032,11 +8051,11 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 		
 		// Enchantments
-		if (n = get_enchantment(cn, 49)) ch[cn].a_hp   += n*100;
-		if (n = get_enchantment(cn, 42)) ch[cn].a_end  += n*100;
-		if (n = get_enchantment(co, 43)) ch[co].a_end  += n*200;
-		if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*100;
-		if (n = get_enchantment(co, 39)) ch[co].a_mana += n*200;
+		if (n = get_enchantment(cn, 49)) ch[cn].a_hp   += n*1000*((IS_USETWOHAND(cn))?2:1);
+		if (n = get_enchantment(cn, 42)) ch[cn].a_end  += n*1000*((IS_USETWOHAND(cn))?2:1);
+		if (n = get_enchantment(co, 43)) ch[co].a_end  += n*2000;
+		if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*1000*((IS_USETWOHAND(cn))?2:1);
+		if (n = get_enchantment(co, 39)) ch[co].a_mana += n*2000;
 		
 		return 0;
 	}
@@ -8161,11 +8180,11 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	
 	// Enchantments
-	if (n = get_enchantment(cn, 49)) ch[cn].a_hp   += n*100;
-	if (n = get_enchantment(cn, 42)) ch[cn].a_end  += n*100;
-	if (n = get_enchantment(co, 43)) ch[co].a_end  += n*200;
-	if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*100;
-	if (n = get_enchantment(co, 39)) ch[co].a_mana += n*200;
+	if (n = get_enchantment(cn, 49)) ch[cn].a_hp   += n*1000*((IS_USETWOHAND(cn))?2:1);
+	if (n = get_enchantment(cn, 42)) ch[cn].a_end  += n*1000*((IS_USETWOHAND(cn))?2:1);
+	if (n = get_enchantment(co, 43)) ch[co].a_end  += n*2000;
+	if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*1000*((IS_USETWOHAND(cn))?2:1);
+	if (n = get_enchantment(co, 39)) ch[co].a_mana += n*2000;
 
 	if (ch[co].a_hp<10000 && ch[co].a_hp>=500 && getrank(co)<5)
 	{
@@ -8174,7 +8193,9 @@ int do_hurt(int cn, int co, int dam, int type)
 
 	if (ch[co].a_hp<500)
 	{
-		do_area_log(cn, co, ch[cn].x, ch[cn].y, 0, "%s is dead!\n", ch[co].reference);
+		char buf[50];
+		strcpy(buf, ch[co].reference); buf[0] = toupper(buf[0]);
+		do_area_log(cn, co, ch[cn].x, ch[cn].y, 0, "%s is dead!\n", buf);
 		if (!(ch[cn].flags & CF_SYS_OFF))
 			do_char_log(cn, 0, "You killed %s.\n", ch[co].reference);
 		if (ch[cn].flags & CF_INVISIBLE)
@@ -8668,6 +8689,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 					else in=0; 
 				}
 			}
+			if (ch[co].spellfail==1) ch[co].spellfail = 0;
 		}
 		if (!RANDOM(20)) // 5% chance
 		{
@@ -8715,11 +8737,19 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 		
 		if (surround && B_SK(cn, SK_SURROUND))
 		{
-			surrDam = odam/4*3 + crit_dam/2;
-			glv 	= glv_base/4*3;
+			if (IS_SKALD(cn))
+			{
+				surrDam = odam + crit_dam/2;
+				glv 	= glv_base;
+			}
+			else
+			{
+				surrDam = odam/4*3 + crit_dam/2;
+				glv 	= glv_base/4*3;
+			}
 			
-			if (surround==1 && (IS_SEYA_OR_ARTM(cn) || get_gear(cn, IT_WP_CROSSBLAD) || 
-				(IS_WARRIOR(cn) && B_SK(cn, SK_PROX))) && !(ch[cn].flags & CF_AREA_OFF))
+			if (surround==1 && (IS_SEYA_OR_ARTM(cn) || get_gear(cn, IT_WP_CROSSBLAD)) && 
+				!(ch[cn].flags & CF_AREA_OFF))
 			{
 				int surraoe, x, y, xf, yf, xt, yt, xc, yc, obsi = 0, aoe_power;
 				double tmp_a, tmp_h, tmp_s, tmp_g;
@@ -8780,6 +8810,7 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 								if (in==IT_GL_BLVIPER) spell_frostburn(cn, co, glv);
 								if (in==IT_TW_DOUSER ) spell_blind(cn, co, glv, 1);
 								if (in==IT_TW_LUXURIA) spell_warcry(cn, co, glv, 1);
+								if (ch[co].spellfail==1) ch[co].spellfail = 0;
 							}
 							if (in2 && co!=co_orig && !get_tarot(cn, IT_CH_DEATH_R))
 							{
@@ -8818,7 +8849,13 @@ void do_attack(int cn, int co, int surround) // surround = 2 means it's a SURROU
 								surrBonus = odam/4 * min(max(1,M_SK(cn, SK_SURROUND)-ch[co].to_parry-20), 20)/20;
 							}
 							surrTotal = surrDam+surrBonus;
-							if (co==co_orig) surrTotal = surrTotal/4*3;
+							if (co==co_orig) 
+							{
+								if (IS_SKALD(cn))
+									surrTotal = surrTotal/2;
+								else
+									surrTotal = surrTotal/4*3;
+							}
 							do_hurt(cn, co, surrTotal, 4);
 							if (chance_compare(co, glv_base+glv_base/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(16), 0) && co!=co_orig)
 							{
@@ -8997,6 +9034,14 @@ int invis_level(int cn)
 	return 1;
 }
 
+int is_walking(int cn)
+{
+	if (ch_base_status(ch[cn].status) >= 16 && ch_base_status(ch[cn].status) <= 152)
+		return 1;
+	
+	return 0;
+}
+
 int do_char_can_see(int cn, int co)
 {
 	int d, d1, d2, light, rd;
@@ -9062,12 +9107,12 @@ int do_char_can_see(int cn, int co)
 	}
 	
 	// Enchant & Idle
-	if (get_enchantment(co, 28) && ch_base_status(ch[co].status)>=0 && ch_base_status(ch[co].status)<=7)
+	if (get_enchantment(co, 28) && !is_walking(co))
 	{
 		d = d * 5/4;
 	}
 	// Enchant & Moving
-	if (get_enchantment(co, 6) && ch_base_status(ch[co].status)>7)
+	if (get_enchantment(co, 6) && is_walking(co))
 	{
 		d = d * 5/4;
 	}
@@ -9232,7 +9277,7 @@ void do_update_char(int cn)
 }
 void really_update_char(int cn)
 {
-	int n, m, t, oldlight, z, sublight = 0, maxlight = 0, co=0;
+	int n, m, t, oldlight, z, sublight = 0, maxlight = 0, co=0, bits=0;
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0, pigsblood = 0, priestess = 0;
 	int heal_hp, heal_end, heal_mana;
 	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0;
@@ -9244,7 +9289,7 @@ void really_update_char(int cn)
 	int skill[50];
 	unsigned long long prof;
 	int charmSpec = 0, gearSpec = 0, nightSpec = 0, gemCheck = 0, gemSpec = 0, enchantSpec = 0;
-	int moreBrv = 0, moreWil = 0, moreInt = 0, moreAgl = 0, moreStr = 0, moreEnd = 0, moreAtt = 0, moreGrd = 0;
+	int moreBrv = 0, moreWil = 0, moreInt = 0, moreAgl = 0, moreStr = 0, moreEnd = 0, moreAtt = 0, moreGrd = 0, moreWV = 0;
 	int in=0;
 	//int speedvalue_a = 0, speedvalue_b = 0, speedvalue_c = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0;
@@ -9324,6 +9369,21 @@ void really_update_char(int cn)
 	if (get_gear(cn, IT_WP_GEMCUTTER)) gemCheck = 1;
 	
 	if (ch[cn].worn[WN_RHAND]==0 && ch[cn].worn[WN_LHAND]==0) critical_b += 1;
+	
+	if (IS_SEYAN_DU(cn) && !get_gear(cn, IT_SEYANSWORD))
+	{
+		bits           = get_seyan_bits(cn);
+		
+		for (z = 0; z<5; z++) 
+			attrib[z] += max(0,min( 5, (bits-17)/3)  );
+		
+		hit_rate      += max(0,min( 5, (bits- 2)/6)  );
+		parry_rate    += max(0,min( 5, (bits- 2)/6)  );
+		
+		critical_c    += max(0,min(40, (bits- 2)*4/3));
+		critical_m    += max(0,min( 5, (bits- 2)/6)  );
+		spell_mod     += max(0,min( 5, (bits- 2)/6)  );
+	}
 	
 	// Loop through gear slots
 	for (n = 0; n<20; n++)
@@ -9419,23 +9479,23 @@ void really_update_char(int cn)
 			if (it[m].temp==IT_BOOK_HOLY 	|| it[m].orig_temp==IT_BOOK_HOLY)		gearSpec  |=  512;
 			
 			if (it[m].enchantment==  1)		enchantSpec |=    1;
-			if (it[m].enchantment==  5)		moreBrv++;
+			if (it[m].enchantment==  5)   { moreBrv++; if (IS_TWOHAND(m)) moreBrv++; }
 			if (it[m].enchantment== 11)		enchantSpec |=    2;
-			if (it[m].enchantment== 12)		moreWil++;
+			if (it[m].enchantment== 12)   { moreWil++; if (IS_TWOHAND(m)) moreWil++; }
 			if (it[m].enchantment== 17)		infra = 15;
-			if (it[m].enchantment== 18)		moreEnd++;
-			if (it[m].enchantment== 19)		moreInt++;
+			if (it[m].enchantment== 18)   { moreEnd++; if (IS_TWOHAND(m)) moreEnd++; }
+			if (it[m].enchantment== 19)   { moreInt++; if (IS_TWOHAND(m)) moreInt++; }
 			if (it[m].enchantment== 24)		enchantSpec |=   16;
-			if (it[m].enchantment== 25)		moreAgl++;
+			if (it[m].enchantment== 25)   { moreAgl++; if (IS_TWOHAND(m)) moreAgl++; }
 			if (it[m].enchantment== 26)		enchantSpec |=   32;
-			if (it[m].enchantment== 29)		moreStr++;
+			if (it[m].enchantment== 29)   { moreStr++; if (IS_TWOHAND(m)) moreStr++; }
 			if (it[m].enchantment== 40)		enchantSpec |=   64;
 			if (it[m].enchantment== 44)		enchantSpec |=  128;
 			if (it[m].enchantment== 48)		enchantSpec |=  256;
-			if (it[m].enchantment== 50)		enchantSpec |=  512;
+			if (it[m].enchantment== 50)	  { moreWV+=6; if (IS_TWOHAND(m)) moreWV+=6; }
 			if (it[m].enchantment== 51)		moreGrd++;
 			if (it[m].enchantment== 55)		enchantSpec |= 1024;
-			if (it[m].enchantment== 54)		moreAtt++;
+			if (it[m].enchantment== 54)   { moreAtt++; if (IS_TWOHAND(m)) moreAtt++; }
 		}
 		
 		critical_b += it[m].base_crit*(gemSpec?7:5)/5;
@@ -9658,7 +9718,7 @@ void really_update_char(int cn)
 			// Boots - Commander's Roots :: change 'stun' into raw speed reduction.
 			if (gearSpec & 4)
 			{
-				base_spd -= 200;
+				base_spd -= 150;
 				ch[cn].stunned = 0;
 			}
 			else
@@ -9692,18 +9752,9 @@ void really_update_char(int cn)
 			}
 		}
 
-		if (bu[m].hp[0]<0)
-		{
-			ch[cn].flags |= CF_NOHPREG;
-		}
-		if (bu[m].end[0]<0)
-		{
-			ch[cn].flags |= CF_NOENDREG;
-		}
-		if (bu[m].mana[0]<0)
-		{
-			ch[cn].flags |= CF_NOMANAREG;
-		}
+		if (bu[m].hp[0]<0)   ch[cn].flags |= CF_NOHPREG;
+		if (bu[m].end[0]<0)  ch[cn].flags |= CF_NOENDREG;
+		if (bu[m].mana[0]<0) ch[cn].flags |= CF_NOMANAREG;
 
 		if (bu[m].sprite_override)
 		{
@@ -9890,19 +9941,23 @@ void really_update_char(int cn)
 	{
 		if (tempWeapon)
 		{
-			if (IS_SKALD(cn))
+			if (IS_PLAYER(cn) && IS_SKALD(cn))
 				weapon += min(tempWeapon*3/2, M_SK(cn, SK_GEARMAST)/4);
-			else if (IS_ANY_TEMP(cn) || IS_BRAVER(cn))
-				weapon += min(tempWeapon, M_SK(cn, SK_GEARMAST)/5);
+			else if (IS_PLAYER(cn) && (IS_ANY_TEMP(cn) || IS_BRAVER(cn)))
+				weapon += min(tempWeapon*6/5, M_SK(cn, SK_GEARMAST)/5);
+			else if (IS_PLAYER(cn) && IS_WARRIOR(cn))
+				weapon += min(tempWeapon*3/4, M_SK(cn, SK_GEARMAST)/8);
 			else
 				weapon += min(tempWeapon, M_SK(cn, SK_GEARMAST)/6);
 		}
 		if (tempArmor)
 		{
-			if (IS_ARCHTEMPLAR(cn))
+			if (IS_PLAYER(cn) && IS_ARCHTEMPLAR(cn))
 				armor += min(tempArmor*3/2, M_SK(cn, SK_GEARMAST)/4);
-			else if (IS_ANY_TEMP(cn) || IS_BRAVER(cn))
-				armor += min(tempArmor, M_SK(cn, SK_GEARMAST)/5);
+			else if (IS_PLAYER(cn) && (IS_ANY_TEMP(cn) || IS_BRAVER(cn)))
+				armor += min(tempArmor*6/5, M_SK(cn, SK_GEARMAST)/5);
+			else if (IS_PLAYER(cn) && IS_WARRIOR(cn))
+				armor += min(tempArmor*3/4, M_SK(cn, SK_GEARMAST)/8);
 			else
 				armor += min(tempArmor, M_SK(cn, SK_GEARMAST)/6);
 		}
@@ -10007,7 +10062,9 @@ void really_update_char(int cn)
 	
 	// Safeguard
 	if (B_SK(cn, SK_SAFEGRD))
-		dmg_rdc = dmg_rdc * (1000 - M_SK(cn,SK_SAFEGRD))/1000;
+	{
+		dmg_rdc = dmg_rdc * (750 - M_SK(cn,SK_SAFEGRD))/750;
+	}
 	
 	// Enchant - [51] less damage taken from hits; 2% per piece
 	if (moreGrd)
@@ -10061,6 +10118,8 @@ void really_update_char(int cn)
 		ch[].move_speed value
 	*/
 	
+	spd_move += 15;
+	
 	// Enchant: Move speed can't go below 150
 	if (enchantSpec & 32)
 	{
@@ -10087,7 +10146,6 @@ void really_update_char(int cn)
 		spd_move = -120;
 	}
 	ch[cn].move_speed = spd_move;
-	
 	
 	/*
 		ch[].atk_speed value
@@ -10278,12 +10336,6 @@ void really_update_char(int cn)
 	
 	critical_m += 25 + ava_mult;
 	
-	/*
-	if (B_SK(cn, SK_PRECISION))
-	{
-		critical_m += skill[SK_PRECISION]/10;
-	}
-	*/
 	
 	// Weapon - Gildshine :: Bartering is granted as crit multi
 	if (gearSpec & 8) 
@@ -10404,8 +10456,10 @@ void really_update_char(int cn)
 	// Chest Armor Enchantment
 	if (enchantSpec & 1) 
 		armor = armor * 27/25;
-	if (enchantSpec & 512) 
-		weapon = weapon * 27/25;
+	if (moreWV) 
+	{
+		weapon = weapon * (moreWV+100) / 100;
+	}
 	
 	if (armor<0)
 	{
@@ -10544,6 +10598,7 @@ void do_aria(int cn)
 		}
 		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co))
 		{
+			in2 = 0;
 			if (do_surround_check(cn, co, 1)) 
 			{
 				aoe_power = spell_immunity(power, get_target_immunity(cn, co));
@@ -10559,6 +10614,8 @@ void do_aria(int cn)
 				// buff version
 				if (!(in2 = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) 
 					continue;
+				
+				if (IS_SKALD(co)) bu[in2].dmg_bonus[1] = power/15;
 				
 				bu[in2].cool_bonus[1] = power;
 				bu[in2].data[4] = 1; // Effects not removed by NMZ (SK_ARIA)
@@ -10596,6 +10653,7 @@ void do_immolate(int cn, int in)
 		}
 		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co) && cn!=co)
 		{
+			in2 = 0;
 			// Prevent from hurting enemies that don't want to hurt you atm
 			if (!IS_PLAYER(co))
 			{
@@ -10674,7 +10732,7 @@ void do_update_permaspells(int cn)
 void do_regenerate(int cn)
 {
 	unsigned long long prof;
-	int n, m, p, in, in2, nohp = 0, noend = 0, nomana = 0, old, mf;
+	int n, m, p, in, in2, nohp = 0, noend = 0, nomana = 0, halfhp = 0, halfend = 0, halfmana = 0, old, mf;
 	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0;
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int degenpower = 0, degendam = 0, tickcheck = 6000;
@@ -10715,9 +10773,9 @@ void do_regenerate(int cn)
 		race_med = M_SK(cn, SK_MEDIT) * moonmult / 30;
 	}
 	
-	if (ch[cn].flags & CF_NOHPREG)		nohp = 1;
-	if (ch[cn].flags & CF_NOENDREG)		noend = 1;
-	if (ch[cn].flags & CF_NOMANAREG)	nomana = 1;
+	if (ch[cn].flags & CF_NOHPREG)		halfhp = 1;
+	if (ch[cn].flags & CF_NOENDREG)		halfend = 1;
+	if (ch[cn].flags & CF_NOMANAREG)	halfmana = 1;
 
 	if (mf & MF_UWATER) 		uwater = 1;
 	
@@ -10749,14 +10807,14 @@ void do_regenerate(int cn)
 	// Meditate added to Hitpoints
 	if (get_enchantment(cn, 36))
 	{
-		race_reg += race_med;
-		hpmult   += manamult;
+		race_reg += race_med/2;
+		hpmult   += manamult/2;
 	}
 	// Rest added to mana
 	if (get_enchantment(cn, 45))
 	{
-		race_med += race_res;
-		manamult += endmult;
+		race_med += race_res/2;
+		manamult += endmult/2;
 	}
 	
 	// Special non-ankh amulets
@@ -10796,10 +10854,10 @@ void do_regenerate(int cn)
 		{
 			// STANDING STATES
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					ch[cn].a_hp 			+= (nohp   ? 0 : hp      * (sunR  ?0:1) * idle/4); 
-					gothp 					+= (nohp   ? 0 : hp  / 2 * (sunR  ?0:1) * idle/4);
-					ch[cn].a_end 			+= (noend  ? 0 : end     * (worldR?0:1) * idle/4);
-					ch[cn].a_mana 			+= (nomana ? 0 : mana    * (moonR ?0:1) * idle/4); 
+					ch[cn].a_hp 			+= (nohp   ? 0 : (hp      * (sunR  ?0:1) * idle/4) / (halfhp   ? 2 : 1)); 
+					gothp 					+= (nohp   ? 0 : (hp  / 2 * (sunR  ?0:1) * idle/4) / (halfhp   ? 2 : 1));
+					ch[cn].a_end 			+= (noend  ? 0 : (end     * (worldR?0:1) * idle/4) / (halfend  ? 2 : 1));
+					ch[cn].a_mana 			+= (nomana ? 0 : (mana    * (moonR ?0:1) * idle/4) / (halfmana ? 2 : 1)); 
 				break;
 			
 			// WALKING STATES
@@ -10808,73 +10866,73 @@ void do_regenerate(int cn)
 			case 128: case 132: case 136: case 140: case 144: case 148: case 152:
 				if (get_gear(cn, IT_BT_NATURES))
 				{
-					ch[cn].a_hp 			+= (nohp   ? 0 : hp     ); 
-					gothp 					+= (nohp   ? 0 : hp  / 2);
+					ch[cn].a_hp 			+= (nohp   ? 0 : (hp     ) / (halfhp   ? 2 : 1)); 
+					gothp 					+= (nohp   ? 0 : (hp  / 2) / (halfhp   ? 2 : 1));
 					if (ch[cn].mode==2) // Fast
 					{
-						ch[cn].a_end 		+= (noend  ? 0 : end    ) - 40;
+						ch[cn].a_end 		+= (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)) - 40;
 					}
 					else
 					{
-						ch[cn].a_end 		+= (noend  ? 0 : end    );
+						ch[cn].a_end 		+= (noend  ? 0 : (end    ) / (halfend  ? 2 : 1));
 					}
-					ch[cn].a_mana 			+= (nomana ? 0 : mana   ); 
+					ch[cn].a_mana 			+= (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1)); 
 				}
 				else
 				{
-					ch[cn].a_hp 			+= (nohp   ? 0 : hp  / 4); 
-					gothp 					+= (nohp   ? 0 : hp  / 8);
+					ch[cn].a_hp 			+= (nohp   ? 0 : (hp  / 4) / (halfhp   ? 2 : 1)); 
+					gothp 					+= (nohp   ? 0 : (hp  / 8) / (halfhp   ? 2 : 1));
 					if (ch[cn].mode==2) // Fast
 					{
-						ch[cn].a_end 		+= (noend  ? 0 : end / 4) - 40;
+						ch[cn].a_end 		+= (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)) - 40;
 					}
 					if (ch[cn].mode==1) // Normal
 					{
-						ch[cn].a_end 		+= (noend  ? 0 : end / 4);
+						ch[cn].a_end 		+= (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1));
 					}
 					if (ch[cn].mode==0) // Slow
 					{
-						ch[cn].a_end 		+= (noend  ? 0 : end / 2);
+						ch[cn].a_end 		+= (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1));
 					}
-					ch[cn].a_mana 			+= (nomana ? 0 : mana/ 4);
+					ch[cn].a_mana 			+= (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1));
 				}
 				break;
 			
 			// FIGHTING STATES
 			case 160: case 168: case 176: case 184:
-				ch[cn].a_hp 			+= (nohp   ? 0 : hp  / 8 * (sunR  ?3:1)); 
-				gothp 					+= (nohp   ? 0 : hp  /16 * (sunR  ?3:1));
+				ch[cn].a_hp 			+= (nohp   ? 0 : (hp  / 8 * (sunR  ?8:1)) / (halfhp   ? 2 : 1)); 
+				gothp 					+= (nohp   ? 0 : (hp  /16 * (sunR  ?8:1)) / (halfhp   ? 2 : 1));
 				if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
 				{
 					if (ch[cn].mode==2) // Fast
 					{
-						ch[cn].a_end 	+= (noend  ? 0 : end / 8 * (worldR?3:1)) - 60;
+						ch[cn].a_end 	+= (noend  ? 0 : (end / 8 * (worldR?8:1)) / (halfend  ? 2 : 1)) - 75;
 					}
 					if (ch[cn].mode==1) // Normal
 					{
-						ch[cn].a_end 	+= (noend  ? 0 : end / 8 * (worldR?3:1)) - 20;
+						ch[cn].a_end 	+= (noend  ? 0 : (end / 8 * (worldR?8:1)) / (halfend  ? 2 : 1)) - 25;
 					}
 					if (ch[cn].mode==0) // Slow
 					{
-						ch[cn].a_end 	+= (noend  ? 0 : end / 4 * (worldR?3:1));
+						ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (worldR?4:1)) / (halfend  ? 2 : 1));
 					}
 				}
 				else // Misc.
 				{
 					if (ch[cn].mode==2)		// Fast
 					{
-						ch[cn].a_end 	+= (noend  ? 0 : end / 4 * (worldR?3:1)) - 40;
+						ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (worldR?4:1)) / (halfend  ? 2 : 1)) - 50;
 					}
 					if (ch[cn].mode==1)		// Normal
 					{
-						ch[cn].a_end 	+= (noend  ? 0 : end / 4 * (worldR?3:1));
+						ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (worldR?4:1)) / (halfend  ? 2 : 1));
 					}
 					if (ch[cn].mode==0)		// Slow
 					{
-						ch[cn].a_end 	+= (noend  ? 0 : end / 2 * (worldR?3:1));
+						ch[cn].a_end 	+= (noend  ? 0 : (end / 2 * (worldR?2:1)) / (halfend  ? 2 : 1));
 					}
 				}
-				ch[cn].a_mana 			+= (nomana ? 0 : mana/ 8 * (moonR ?3:1));
+				ch[cn].a_mana 			+= (nomana ? 0 : (mana/ 8 * (moonR ?8:1)) / (halfmana ? 2 : 1));
 				break;
 			
 			default:
@@ -10893,14 +10951,14 @@ void do_regenerate(int cn)
 			hp = hp*ch[cn].data[47]/100;
 		}
 		
-		ch[cn].a_hp	+= hp;
-		gothp 		+= hp/2;
+		ch[cn].a_hp	+= hp / (halfhp   ? 2 : 1);
+		gothp 		+= hp/4+hp/2;
 	}
 	else if ((in = ch[cn].worn[WN_BODY]) && it[in].temp == IT_BONEARMOR)
 	{
 		hp = 360 + getrank(cn) * 20;
 		
-		ch[cn].a_hp	+= hp;
+		ch[cn].a_hp	+= hp / (halfhp   ? 2 : 1);
 		gothp 		+= hp/2;
 	}
 	
@@ -10910,29 +10968,29 @@ void do_regenerate(int cn)
 		switch (it[in].temp)
 		{
 			case IT_ANKHAMULET: 
-				ch[cn].a_hp   += race_reg/12;
-				ch[cn].a_end  += race_res/12;
-				ch[cn].a_mana += race_med/12;
+				ch[cn].a_hp   += (race_reg/12) / (halfhp   ? 2 : 1);
+				ch[cn].a_end  += (race_res/12) / (halfend  ? 2 : 1);
+				ch[cn].a_mana += (race_med/12) / (halfmana ? 2 : 1);
 				break;
 			case IT_AMBERANKH: 
-				ch[cn].a_hp   += race_reg/ 6;
-				ch[cn].a_end  += race_res/24;
-				ch[cn].a_mana += race_med/24;
+				ch[cn].a_hp   += (race_reg/ 6) / (halfhp   ? 2 : 1);
+				ch[cn].a_end  += (race_res/24) / (halfend  ? 2 : 1);
+				ch[cn].a_mana += (race_med/24) / (halfmana ? 2 : 1);
 				break;
 			case IT_TURQUANKH: 
-				ch[cn].a_hp   += race_reg/24;
-				ch[cn].a_end  += race_res/ 6;
-				ch[cn].a_mana += race_med/24;
+				ch[cn].a_hp   += (race_reg/24) / (halfhp   ? 2 : 1);
+				ch[cn].a_end  += (race_res/ 6) / (halfend  ? 2 : 1);
+				ch[cn].a_mana += (race_med/24) / (halfmana ? 2 : 1);
 				break;
 			case IT_GARNEANKH: 
-				ch[cn].a_hp   += race_reg/24;
-				ch[cn].a_end  += race_res/24;
-				ch[cn].a_mana += race_med/ 6;
+				ch[cn].a_hp   += (race_reg/24) / (halfhp   ? 2 : 1);
+				ch[cn].a_end  += (race_res/24) / (halfend  ? 2 : 1);
+				ch[cn].a_mana += (race_med/ 6) / (halfmana ? 2 : 1);
 				break;
 			case IT_TRUEANKH: 
-				ch[cn].a_hp   += race_reg/ 6;
-				ch[cn].a_end  += race_res/ 6;
-				ch[cn].a_mana += race_med/ 6;
+				ch[cn].a_hp   += (race_reg/ 6) / (halfhp   ? 2 : 1);
+				ch[cn].a_end  += (race_res/ 6) / (halfend  ? 2 : 1);
+				ch[cn].a_mana += (race_med/ 6) / (halfmana ? 2 : 1);
 				break;
 			case IT_GAMBLERFAL:
 				if (it[in].active) 

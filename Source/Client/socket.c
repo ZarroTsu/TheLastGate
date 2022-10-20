@@ -147,27 +147,27 @@ int so_login(unsigned char *buf,HWND hwnd)
 		ser_ver+=(int)((*(unsigned char*)(buf+14)))<<8;
 		ser_ver+=(int)((*(unsigned char*)(buf+15)))<<16;
 		//
-			for (n=0;n<16;n++)
+			for (n=0;n<20;n++)
 			{
 				pdata.xbutton[n].skill_nr=-1; strcpy(pdata.xbutton[n].name,"-");
 			}
-			pdata.xbutton[0].skill_nr=50; strcpy(pdata.xbutton[0].name,"Light");
-			pdata.xbutton[15].skill_nr=51; strcpy(pdata.xbutton[15].name,"Recall");
+			pdata.xbutton[ 0].skill_nr=50; strcpy(pdata.xbutton[ 0].name,"Light");
+			pdata.xbutton[19].skill_nr=51; strcpy(pdata.xbutton[19].name,"Recall");
 			if (race==4||race==5) // Templar
 			{
-				pdata.xbutton[4].skill_nr=40; strcpy(pdata.xbutton[4].name,"Cleave");
+				pdata.xbutton[ 7].skill_nr=40; strcpy(pdata.xbutton[ 7].name,"Cleave");
 			}
 			else if (race==8||race==9) // Harakim
 			{
-				pdata.xbutton[5].skill_nr=24; strcpy(pdata.xbutton[5].name,"Blast");
-				pdata.xbutton[9].skill_nr=27; strcpy(pdata.xbutton[9].name,"Ghost C");
-				pdata.xbutton[3].skill_nr=11; strcpy(pdata.xbutton[3].name,"Magic S");
-				pdata.xbutton[2].skill_nr=17; strcpy(pdata.xbutton[2].name,"Protect");
+				pdata.xbutton[ 7].skill_nr=24; strcpy(pdata.xbutton[ 7].name,"Blast");
+				pdata.xbutton[11].skill_nr=27; strcpy(pdata.xbutton[11].name,"Ghost C");
+				pdata.xbutton[ 4].skill_nr=11; strcpy(pdata.xbutton[ 4].name,"Magic S");
+				pdata.xbutton[ 3].skill_nr=17; strcpy(pdata.xbutton[ 3].name,"Protect");
 			}
 			else // Mercenary
 			{
-				pdata.xbutton[8].skill_nr=37; strcpy(pdata.xbutton[8].name,"Blind");
-				pdata.xbutton[2].skill_nr=17; strcpy(pdata.xbutton[2].name,"Protect");
+				pdata.xbutton[11].skill_nr=37; strcpy(pdata.xbutton[11].name,"Blind");
+				pdata.xbutton[ 3].skill_nr=17; strcpy(pdata.xbutton[ 3].name,"Protect");
 			}
 		//
 		save_options();

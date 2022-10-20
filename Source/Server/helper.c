@@ -2062,7 +2062,8 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 				break;
 			case 30:
 				if (legendary) suffix = "Chirurgia"; else suffix = " of Surgery";
-				it[in].crit_multi[0] += 25 * mul;
+				it[in].crit_chance[0] += 20 * mul;
+				it[in].crit_multi[0]  += 5  * mul;
 				break;
 			case 31:
 				if (legendary) suffix = "Acceleratio"; else suffix = " of Acceleration";
@@ -2344,7 +2345,7 @@ struct npc_class npc_class[] = {
 	//
 	{"Ancient Gargoyle"         },	// 190
 	{"Dweller"                  },	// 191
-	{"Leaper"                  	},	// 192
+	{"Widow"                  	},	// 192
 	{"Experiment"             	},	// 193
 	{"Abomination"            	},	// 194
 	//
@@ -2359,8 +2360,9 @@ struct npc_class npc_class[] = {
 	{"Devil" 					},	// 202
 	{"Glass Gargoyle"          	},	// 203
 	//
-	{""                     	},	// 204
-	{""                     	},	// 205
+	{"Mummy"                    },	// 204
+	{"Toxic Grulge"             },	// 205
+	//
 	{""                     	},	// 206
 	{""                     	},	// 207
 	{""                     	},	// 208
@@ -3108,6 +3110,16 @@ int make_gskill(int cn)
 int make_catalyst(int cn, int n)
 {
 	int in, v;
+	int earlylist[37] = { 
+		SK_HAND, 		SK_DAGGER, 		SK_SWORD, 		SK_AXE, 		SK_STAFF,
+		SK_TWOHAND, 	SK_STEALTH, 	SK_PERCEPT, 	SK_SWIM, 		SK_MSHIELD, 
+		SK_BARTER,	 	SK_REPAIR, 		SK_SHIELD, 		SK_PROTECT, 	SK_ENHANCE, 
+		SK_SLOW, 		SK_CURSE, 		SK_BLESS, 		SK_IDENT, 		SK_RESIST,
+		SK_BLAST, 		SK_DISPEL, 		SK_HEAL, 		SK_GHOST, 		SK_REGEN, 
+		SK_REST, 		SK_MEDIT, 		SK_IMMUN, 		SK_SURROUND, 	SK_CONCEN,
+		SK_BLIND, 		SK_GEARMAST, 	SK_CLEAVE, 		SK_WEAKEN, 		SK_POISON, 
+		SK_HASTE, 		SK_TAUNT };
+
 	
 	if (!(in = god_create_item(IT_SOULCATAL)))
 	{
@@ -3115,7 +3127,14 @@ int make_catalyst(int cn, int n)
 		return 0;
 	}
 	
-	v = RANDOM(MAXSKILL);
+	if (!IS_ANY_ARCH(cn) || (IS_MONSTER(cn) && getrank(cn)<12))
+	{
+		v = earlylist[RANDOM(37)];
+	}
+	else
+	{
+		v = RANDOM(MAXSKILL);
+	}
 	
 	sprintf(it[in].name, "Soul Catalyst (%s)", skilltab[v].name);
 	sprintf(it[in].reference, "soul catalyst (%s)", skilltab[v].name);
@@ -3151,13 +3170,13 @@ void make_focus(int cn, int exp)
 	}
 	rank = points2rank(exp/max(1, N_SOULFACTOR));
 	
-	v = max(4, min(6, 6 - rank/10));
-					
+	//v = max(4, min(6, 6 - rank/10));
+	
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus of %d. Can be used on a soulstone to narrow the number of random skill rolls.", v);
+	sprintf(it[in].description, "A soul focus. It can be used on a soulstone to half the number of random skill rolls.", v);
 	
-	it[in].data[0] = v;
+	it[in].data[0] = 4;
 	it[in].temp = 0;
 	it[in].driver = 92;
 	
@@ -3189,7 +3208,7 @@ void create_soultrans_equipment(int cn, int in2, int rank)
 	in = god_create_item(IT_SOULSTONE);
 	if (in)
 	{
-		it[in].data[0] = rank;
+		it[in].data[0] = min(24, rank);
 		it[in].temp = 0;
 		it[in].driver = 68;
 	}
@@ -3331,7 +3350,7 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 	// 6. Finalize the item
 	it[in2].flags &= ~IF_CAN_SS;
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
-	it[in2].min_rank = max(rank, it[in2].min_rank);
+	it[in2].min_rank = min(24, max(rank, it[in2].min_rank));
 	it[in2].value -= 1;
 	
 	if (!HAS_ENCHANT(in2, 34))
@@ -3747,7 +3766,7 @@ int use_talisman(int cn, int in, int in2)
 		case 61: it[in2].enchantment = 37; break;
 		case 62: it[in2].enchantment = 38; break;
 		case 63: it[in2].enchantment = 39; break;
-		case 64: it[in2].crit_multi[0] += 15*mul; break;
+		case 64: it[in2].crit_multi[0] += 10*mul; break;
 		case 65: it[in2].enchantment = 40; break;
 		case 66: it[in2].enchantment = 41; break;
 		case 67: it[in2].enchantment = 42; break;
@@ -3759,7 +3778,7 @@ int use_talisman(int cn, int in, int in2)
 		case 73: it[in2].top_damage[0] += 12*mul; break;
 		case 74: it[in2].enchantment = 47; break;
 		case 75: it[in2].enchantment = 48; break;
-		case 76: it[in2].crit_chance[0] += 12*mul; break;
+		case 76: it[in2].crit_chance[0] += 16*mul; break;
 		case 77: it[in2].enchantment = 49; break;
 		case 78: it[in2].gethit_dam[0] += 2*mul; break;
 		//
@@ -3773,7 +3792,7 @@ int use_talisman(int cn, int in, int in2)
 		case 86: it[in2].enchantment = 56; break;
 		case 87: it[in2].to_hit[0] += 4*mul; it[in2].to_parry[0] -= 2*mul; break;
 		case 88: it[in2].ss_weapon += 2*mul; it[in2].top_damage[0] += 8*mul; break;
-		case 89: it[in2].crit_chance[0] += 8*mul; it[in2].crit_multi[0] += 10*mul; break;
+		case 89: it[in2].crit_chance[0] += 8*mul; it[in2].crit_multi[0] += 5*mul; break;
 		case 90: it[in2].ss_armor += 2*mul; it[in2].gethit_dam[0] += 1*mul; break;
 		case 91: it[in2].cool_bonus[0] += 2*mul; break;
 		default: break;
@@ -3845,10 +3864,7 @@ int use_soulstone(int cn, int in, int in2)
 			use_consume_item(cn, in2, 1);
 			return 1;
 		case 92: // Soul Focus
-			if (it[in].data[2])
-				it[in].data[2] = min(it[in].data[2], it[in2].data[0]);
-			else
-				it[in].data[2] = it[in2].data[0];
+			it[in].data[2] = 4;
 			it[in].flags |= IF_ENCHANTED | IF_UPDATE;
 			chlog(cn, "used focus on soulstone");
 			use_consume_item(cn, in2, 1);
@@ -3917,25 +3933,14 @@ int use_soulfocus(int cn, int in) // driver 92
 	switch (it[in2].driver)
 	{
 		case 68: // Soulstone
-			if (it[in2].data[2])
-				it[in2].data[2] = min(it[in2].data[2], it[in].data[0]);
-			else
-				it[in2].data[2] = it[in].data[0];
+			it[in2].data[2] = 4;
 			it[in2].flags |= IF_ENCHANTED | IF_UPDATE;
 			chlog(cn, "used focus on soulstone");
 			use_consume_item(cn, in, 1);
 			return 1;
 		case 92: // Soul Focus
-			it[in].data[0] = min(3, max(it[in].data[0], it[in2].data[0])-1);
-			sprintf(it[in].description, "A soul focus of %d. Can be used on a soulstone to narrow the number of random skill rolls.", it[in].data[0]);
-			
-			do_char_log(cn, 7, "You fed the held soul focus to the one in your bag. It is now level %d.\n", it[in].data[0]);
-			
-			if (it[in].data[0]==3)
-			{
-				do_char_log(cn, 7, "(That's as low as they go!)\n");
-			}
-			
+			it[in].data[0] = 4;
+			sprintf(it[in].description, "A soul focus. It can be used on a soulstone to half the number of random skill rolls.");
 			chlog(cn, "used focus on focus");
 			use_consume_item(cn, in2, 1);
 			return 1;
