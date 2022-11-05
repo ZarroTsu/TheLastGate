@@ -602,14 +602,14 @@ void plr_pickup(int cn)
 
 	if (ch[cn].flags & (CF_PLAYER))
 	{
-		for (n = 0; n<40; n++)
+		for (n = 0; n<MAXITEMS; n++)
 		{
 			if (!ch[cn].item[n])
 			{
 				break;
 			}
 		}
-		if (n<40)
+		if (n<MAXITEMS)
 		{
 			ch[cn].item[n] = in;
 		}

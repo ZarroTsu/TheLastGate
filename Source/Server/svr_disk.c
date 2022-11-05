@@ -22,9 +22,11 @@
 struct map *map;
 struct mapedit_queue *maped_queue;
 struct character *ch;
+struct newcharacter *ch_new;
 struct item *bu;
 struct item *it;
 struct character *ch_temp;
+struct newcharacter *ch_temp_new;
 struct item *it_temp;
 struct effect *fx;
 struct global *globs;
@@ -150,6 +152,52 @@ int load(void)
 		return -1;
 	}
 	close(handle);
+	
+	// v DELETE LATER v
+	/** NEWCHAR **/
+	xlog("Loading NEWCHAR: Item size=%d, file size=%dK",
+	     sizeof(struct newcharacter), NEWCHARSIZE >> 10);
+
+	handle = open(DATDIR "/newchar.dat", O_RDWR);
+	if (handle==-1)
+	{
+		xlog("Building newcharacters");
+		handle = open(DATDIR "/newchar.dat", O_RDWR | O_CREAT, 0600);
+	}
+	if (!extend(handle, NEWCHARSIZE, sizeof(struct newcharacter), NULL))
+	{
+		return -1;
+	}
+
+	ch_new = mmap(NULL, NEWCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (ch_new==(void*)-1)
+	{
+		return -1;
+	}
+	close(handle);
+
+	/** NEWTCHAR **/
+	xlog("Loading NEWTCHAR: Item size=%d, file size=%dK",
+	     sizeof(struct newcharacter), NEWTCHARSIZE >> 10);
+
+	handle = open(DATDIR "/newtchar.dat", O_RDWR);
+	if (handle==-1)
+	{
+		xlog("Building newtcharacters");
+		handle = open(DATDIR "/newtchar.dat", O_RDWR | O_CREAT, 0600);
+	}
+	if (!extend(handle, NEWTCHARSIZE, sizeof(struct newcharacter), NULL))
+	{
+		return -1;
+	}
+
+	ch_temp_new = mmap(NULL, NEWTCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (ch_temp_new==(void*)-1)
+	{
+		return -1;
+	}
+	close(handle);
+	// ^ DELETE LATER ^
 
 	/** BUFF - 3/11/2021 **/
 	xlog("Loading BUFF: Item size=%d, file size=%dK",
@@ -309,7 +357,7 @@ void flush_char(int cn)
 
 	msync(&ch[cn], sizeof(struct character), MS_ASYNC);
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (IS_SANEITEM(in = ch[cn].item[n]))
 		{

@@ -223,7 +223,7 @@ void effect_tick(void)
 						co = fx[n].data[2];
 
 						flag = 0;
-						for (z = 0; z<40 && !flag; z++)
+						for (z = 0; z<MAXITEMS && !flag; z++)
 						{
 							if (ch[co].item[z])
 							{

@@ -629,6 +629,173 @@ struct character
 }
 __attribute__ ((packed));
 
+/* CS, 991113: SIZEs in one header */
+#define NEWCHARSIZE  (sizeof(struct newcharacter)*MAXCHARS)
+#define NEWTCHARSIZE (sizeof(struct newcharacter)*MAXTCHARS)
+
+struct newcharacter
+{
+	unsigned char used;					//           1
+	
+	// general
+	char name[40];						// +40,     41
+	char reference[40];					// +40,     81
+	char description[LENDESC];			// +200,   281
+	int kindred;						// +4,     285
+	int player;							// +4,     289
+	unsigned int pass1, pass2;			// +4*2,   297
+	unsigned short sprite;				// +2,     299, sprite base value, 1024 dist
+	unsigned short sound;				// +2,     301, sound base value, 64 dist
+	unsigned long long flags;			// +8,     309
+	short int alignment;				// +2,     311
+	unsigned short temple_x, temple_y;	// +2*2,   315, position of temple for recall and dying
+	unsigned short tavern_x, tavern_y;	// +2*2,   319, position of last temple for re-login
+	unsigned short temp;				// +2,     321, created from template n
+
+	// character stats
+	// [0]=bare value, 0=unknown
+	// [1]=preset modifier, is race/npc dependend
+	// [2]=race specific maximum
+	// [3]=race specific difficulty to raise (0=not raisable, 1=easy ... 10=hard)
+	// [4]=dynamic modifier, depends on equipment and spells (this one is currently not used)
+	// [5]=total value
+
+	unsigned char attrib[5][6];			// +5*6,   351
+	unsigned short hp[6];				// +2*6,   363
+	unsigned short end[6];				// +2*6,   375
+	unsigned short mana[6];				// +2*6,   387
+	unsigned char skill[50][6];			// +50*6,  687
+	unsigned char weapon_bonus;			// +1,     688
+	unsigned char armor_bonus;			// +1,     689
+	int a_hp, a_end, a_mana;			// +4*3,   701, temporary hp, endurance, mana
+	unsigned char light;				// +1,     702, strength of lightsource
+	unsigned char mode;					// +1,     703, 0 = slow, 1 = medium, 2 = fast
+	short int speed;					// +4,     707, character base action speed
+	int points;							// +4,     711, experience points unspent
+	int points_tot;						// +4,     715, experience points total
+	short int armor, weapon;			// +4*2,   723, summary of weapons + armor
+
+	// map stuff
+	short int x, y;						// +4*2,   731, current position x,y NOTE: x=-1, y=-1 = void
+	short int tox, toy;					// +4*2,   739, target coordinated, where the char will be next turn
+	short int frx, fry;					// +4*2,   747, where the char was last turn
+	short int status;					// +4*2,   755, what the character is doing, animation-wise
+	short int status2;					// +4*2,   763, for plr_misc(): what is misc?
+	unsigned char dir;					// +1,     764, direction character is facing
+
+	// posessions
+	int gold;							// +4,     768, carried gold
+	unsigned int item[60];				// +4*60, 1008, items carried
+	unsigned int worn[20];				// +4*20, 1088, items worn
+	unsigned short spell[MAXBUFFS];		// +2*40, 1168, active buffs/debuffs
+	unsigned int citem;					// +4,    1172, item currently in hand (mouse cursor)
+
+	time_t creation_date;				// +8,    1180
+	time_t login_date;					// +8,    1188
+
+	unsigned int addr;					// +4,    1192
+
+	// misc
+	unsigned int current_online_time;	// +4,    1196
+	unsigned int total_online_time;		// +4,    1200
+	unsigned int comp_volume;			// +4,    1204
+	unsigned int raw_volume;			// +4,    1208
+	unsigned int idle;					// +4,    1212
+
+	// generic driver data
+	unsigned short attack_cn;			// +2,    1214, target for attacks, will attack if set (prio 4)
+	unsigned short skill_nr;			// +2,    1216, skill to use/spell to cast, will cast if set (prio 2)
+	unsigned short skill_target1;		// +2,    1218, target for skills/spells
+	unsigned short skill_target2;		// +2,    1220, target for skills/spells
+	unsigned short goto_x, goto_y;		// +2*2,  1224, will goto x,y if set (prio 3)
+	unsigned short use_nr;				// +2,    1226, will use worn item nr if set (prio 1)
+
+	unsigned short misc_action;			// +2,    1228, drop, pickup, use, whatever (prio 5)
+	unsigned short misc_target1;		// +2,    1230, item for misc_action
+	unsigned short misc_target2;		// +2,    1232, location for misc_action
+
+	unsigned short cerrno;				// +2,    1234, error/success indicator for last action (svr_act level)
+
+	unsigned short escape_timer;		// +2,    1236, can try again to escape in X ticks
+	unsigned short enemy[4];			// +2*4,  1244, currently being fought against by these
+	unsigned short current_enemy;		// +2,    1246, currently fighting against X
+
+	unsigned short retry;				// +2,    1248, retry current action X times
+
+	unsigned short stunned;				// +2,    1250, is stunned for X ticks
+
+	// misc stuff added later:
+	char speed_mod;						// +1,    1251, race dependent speed modification
+	char last_action;					// +1,    1252, last action was success/failure (driver_generic level)
+
+	unsigned char gethit_dam;			// +1,    1253, damage for attacker when hitting this char
+	char gethit_bonus;					// +1,    1254, race specific bonus for above
+
+	unsigned char light_bonus;			// +1,    1255, char emits light all the time
+
+	char passwd[16];					// +16,   1271
+
+	char lastattack;					// +1,    1272, neater display: remembers the last attack animation
+	
+	char move_speed;					// +1,    1273, Bonus to movement speed (added to speed_mod)
+	char atk_speed;						// +1,    1274, Bonus to attacking speed (added to speed_mod)
+	char cast_speed;					// +1,    1275, Bonus to casting speed (added to speed_mod)
+	
+	unsigned short spell_mod;			// +2,    1277, race dependent spell modifier - two digit decimal accuracy (1.00)
+	unsigned short spell_apt;			// +2,    1279, aptitude for receiving spells
+	unsigned short cool_bonus;			// +2,    1281, exhaust cooldown rate
+	
+	unsigned short crit_chance;			// +2,    1283, chance to deal a critical hit (100 = 1%)
+	unsigned short crit_multi;			// +2,    1285, multiplier for critical hits
+	
+	unsigned short to_hit;				// +2,    1287, final chance to hit
+	unsigned short to_parry;			// +2,    1289, final chance to parry
+	unsigned short top_damage;			// +2,    1291, Maximum damage score (normally handled by STR/2)
+	
+	unsigned short taunted;				// +2,    1293, has been taunted by this template
+	
+	int bs_points;						// +4,    1297, Black Stronghold points
+
+	short int sprite_override;			// +4,    1301
+
+	unsigned int alt_worn[12];			// +4*12, 1349, Alternative gear set in storage for swapping
+	unsigned int alt_worn2[12];			// +4*12, 1397, Second alternative gear set
+	
+	int os_points;						// +4,    1401, Osiris points (for maps?)
+	
+	char gcm;							// +1,    1402, Stores current GC 'mode'
+	
+	char aoe_bonus;						// +1,    1403, Total AoE bonus from gear
+	
+	char colosseum;						// +1,    1404, Colosseum mode check, resets every 1st
+	char spellfail;						// +1,    1405, check for 'Suppression' from NPCs
+	
+	unsigned short dmg_bonus;			// +2,    1407, Damage multiplier. Factor of 1:100, where 10000 is the median 100% dealt value.
+	unsigned short dmg_reduction;		// +2,    1409, Damage reduction.  Factor of 1:100, where 10000 is the median 100% taken value.
+	
+	char limit_break[6][2];				// +6*2,  1421, [0]-[4] for BWAIS, [5] for all skills; [0] is base, [1] for effects from items or (de)buffs
+	unsigned char pandium_floor[3];		// +3,    1424, [0] = Solo  [1] = Group  [2] = reward tier obtained
+	
+	int waypoints;						// +4,    1428, unlocked waypoint flags
+	int tokens;							// +4,    1432, tokens for casino
+	
+	unsigned int depot[62];				// +4*62, 1680, character storage
+	
+	char future[292];					// +388,  2068, space for future expansion
+
+	int luck;							// +4,    2072, character luck
+
+	int unreach, unreachx, unreachy;	// +4*3,  2084, ???
+
+	int class;							// +4,    2088, monster class id number
+
+	time_t logout_date;					// +8,    2096
+
+	int data[100];						// +4*100, 2496, driver data
+	char text[10][160];					// +10*160, 4096, npc text data
+}
+__attribute__ ((packed));
+
 /*********/
 /* Items */
 /*********/
@@ -964,3 +1131,6 @@ extern struct effect *fx;
 extern struct see_map *  see;
 extern struct mapedit_queue *maped_queue;
 extern struct waypoint waypoint[MAXWPS];
+
+extern struct newcharacter *ch_new;
+extern struct newcharacter *ch_temp_new;

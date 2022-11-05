@@ -82,7 +82,7 @@ int use_door(int cn, int in)
 		}
 		else
 		{
-			for (n = 0; n<40; n++)
+			for (n = 0; n<MAXITEMS; n++)
 			{
 				if ((in2 = ch[cc].item[n])!=0)
 				{
@@ -92,7 +92,7 @@ int use_door(int cn, int in)
 					}
 				}
 			}
-			if (n<40)
+			if (n<MAXITEMS)
 			{
 				lock = 1;
 				if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cc))
@@ -220,6 +220,12 @@ int use_create_item(int cn, int in)
 	{
 		do_area_notify(cn, 0, it[in].x, it[in].y, NT_HITME, cn, 0, 0, 0);
 	}
+	
+	if (it[in2].temp==2921)
+	{
+		it[in2].hp[0] = it[in2].end[0] = it[in2].mana[0] = min(255, max(ch[cn].pandium_floor[0], ch[cn].pandium_floor[1]));
+		it[in2].flags |= IF_UPDATE;
+	}
 
 	return 1;
 }
@@ -307,7 +313,7 @@ int use_recall_chest(int cn, int in)
 		return 0;
 	}
 	
-	for (n=0;n<40;n++)
+	for (n=0;n<MAXITEMS;n++)
 	{
 		if (!(in2 = ch[cn].item[n]))
 		{
@@ -359,7 +365,8 @@ int use_create_item3(int cn, int in)
 	}
 	if (n==0)
 	{
-		return 0;
+		do_char_log(cn, 1, "It's empty...\n");
+		return 1;
 	}
 
 	n = RANDOM(n);
@@ -1651,7 +1658,7 @@ void finish_laby_teleport(int cn, int nr, int exp)
 		it[in2].used = USE_EMPTY;
 		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
@@ -1859,7 +1866,7 @@ int teleport(int cn, int in)
 		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n]) && is_nolab_item(in2))
 		{
@@ -1955,7 +1962,7 @@ int use_labyrinth(int cn, int in)
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
 
-		for (n = 0; n<40; n++)
+		for (n = 0; n<MAXITEMS; n++)
 		{
 			if ((in2 = ch[cn].item[n]) && is_nolab_item(in2))
 			{
@@ -2089,11 +2096,13 @@ int use_pandium_teleport(int cn, int in)
 			if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co) && ch[co].pandium_floor[0]>0 && 
 				isgroup(cn, co) && isgroup(co, cn))
 			{
+				clear_map_buffs(co, 1);
 				quick_teleport(co, it[in].data[0], it[in].data[1]);
 				ch[co].dir = 4;
 			}
 		}
 	}
+	clear_map_buffs(cn, 1);
 	quick_teleport(cn, it[in].data[0], it[in].data[1]);
 	ch[cn].dir = 4;
 	
@@ -2141,12 +2150,12 @@ int use_bag(int cn, int in)
 		do_char_log(cn, 1, "You took %dG %dS.\n", ch[co].gold / 100, ch[co].gold % 100);
 		ch[co].gold = 0;
 		emptyinv = 1;
-		for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
+		for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
 		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
 	}
 	if ((ch[co].flags & CF_BODY) && (ch[cn].flags & CF_AUTOLOOT))
 	{
-		for (nr=0; nr<40; nr++)
+		for (nr=0; nr<MAXITEMS; nr++)
 		{
 			if ((in2 = ch[co].item[nr])!=0)
 			{
@@ -2166,7 +2175,7 @@ int use_bag(int cn, int in)
 				}
 			}
 		}
-		for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
+		for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
 		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
 	}
 	if (!emptyinv) do_look_char(cn, co, 0, 0, 1);
@@ -2928,10 +2937,10 @@ int use_map_chest(int cn, int in)
 
 int get_random_backpack_item(int cn)
 {
-	int catalog[40] = {0};
+	int catalog[MAXITEMS] = {0};
 	int c, n;
 	
-	for (n = 0, c = 0; n<40; n++)
+	for (n = 0, c = 0; n<MAXITEMS; n++)
 	{
 		if (catalog[c] = ch[cn].item[n]) c++;
 	}
@@ -3596,8 +3605,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Immolate power equal to 30% of HP
-			power = ch[cn].hp[5]*3/10;
+			// Immolate power equal to 33% of HP
+			power = ch[cn].hp[5]/3;
 			if (has_buff(cn, SK_IMMOLATE))
 			{
 				do_char_log(cn, 1, "Immolate no longer active.\n");
@@ -6463,7 +6472,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n]) && is_nolab_item(in2))
 		{
@@ -6494,7 +6503,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 		it[in2].used = USE_EMPTY;
 		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
@@ -6788,7 +6797,7 @@ int use_seyan_portal(int cn, int in)
 		it[in2].used = USE_EMPTY;
 		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
 		{
@@ -8457,7 +8466,7 @@ void char_item_expire(int cn)
 
 	clock4++;
 	/* age items in backpack */
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		in = ch[cn].item[n];
 		if (in)
@@ -8889,6 +8898,8 @@ void expire_explosion(int in)
 	
 	if ((cn = map[m].ch) && (IS_PLAYER(cn) || IS_PLAYER_COMP(cn)))
 	{
+		if (IS_PLAYER_COMP(cn)) 
+			dam = dam/2;
 		fx_add_effect(5, 0, x, y, 0);
 		tmp = do_hurt(0, cn, dam, 1);
 		if (!(ch[cn].flags & CF_SYS_OFF))
@@ -9030,7 +9041,7 @@ void item_tick_expire(void)
 				emptyinv  = 1;
 				emptygear = 1;
 				if (ch[co].gold>99) emptyinv = 0;
-				for (nr=0; nr<40; nr++) if (ch[co].item[nr]!=0) emptyinv  = 0;
+				for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]!=0) emptyinv  = 0;
 				for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptygear = 0;
 				if (emptyinv && emptygear)
 					it[in].current_age[act] += EXP_TIME*EXP_RATE;
@@ -9182,14 +9193,14 @@ void item_tick_gc(void)
 		{
 			if (IS_SANECHAR(cn) && ch[cn].used)
 			{
-				for (z = 0; z<40; z++)
+				for (z = 0; z<MAXITEMS; z++)
 				{
 					if (ch[cn].item[z]==n)
 					{
 						break;
 					}
 				}
-				if (z<40)
+				if (z<MAXITEMS)
 				{
 					continue;
 				}
@@ -9475,7 +9486,7 @@ int step_portal1_lab13(int cn, int in)
 		flag = 1;
 	}
 
-	for (n = 0; n<40 && !flag; n++)
+	for (n = 0; n<MAXITEMS && !flag; n++)
 	{
 		if (ch[cn].item[n])
 		{
@@ -9601,7 +9612,7 @@ int step_portal2_lab13(int cn, int in)
 		}
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==664)
 		{
@@ -9629,7 +9640,7 @@ int step_portal_arena(int cn, int in)
 		flag = 1;
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==687)
 		{
@@ -9709,7 +9720,7 @@ int step_portal_pandium(int cn, int in)
 		use_consume_item(cn, in2, 1);
 		flag = 1;
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==2953) // Note of Admission
 		{

@@ -1649,7 +1649,7 @@ void do_listskills(int cn, char *topic)
 		do_char_log(cn, 1, "Companion Mastery      BRV + WIL + WIL\n");
 		do_char_log(cn, 5, "Concentrate            WIL + WIL + WIL\n");
 		do_char_log(cn, 1, "Gear Mastery           BRV + AGL + STR\n");
-		do_char_log(cn, 5, "Immunity               BRV + AGL + STR\n");
+		do_char_log(cn, 5, "Immunity               WIL + AGL + STR\n");
 		do_char_log(cn, 1, "Perception             INT + INT + AGL\n");
 		do_char_log(cn, 5, "Precision              BRV + BRV + WIL\n");
 		do_char_log(cn, 1, "Proximity              BRV + WIL + INT\n");
@@ -1673,7 +1673,7 @@ void do_listskills(int cn, char *topic)
 		do_char_log(cn, 5, "Ghost Companion        BRV + WIL + INT\n");
 		do_char_log(cn, 1, "Haste                  BRV + WIL + AGL\n");
 		do_char_log(cn, 5, "Heal                   BRV + INT + STR\n");
-		do_char_log(cn, 1, "Identify               WIL + WIL + INT\n");
+		do_char_log(cn, 1, "Identify               BRV + WIL + INT\n");
 		do_char_log(cn, 5, "Lethargy               BRV + WIL + INT\n");
 		do_char_log(cn, 1, "Magic Shield           BRV + WIL + WIL\n");
 		do_char_log(cn, 5, "Poison                 BRV + INT + INT\n");
@@ -1785,13 +1785,13 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
 		do_char_log(cn, 1, "   Weapon   |  Requirements:  |     Gives:     \n");
-		do_char_log(cn, 1, "    Tier    | WIL | STR | Skl | WV | AV,BR,H,P \n");
+		do_char_log(cn, 1, "    Tier    | WIL | STR | Skl | WV | AV/BR/H/P \n");
 		do_char_log(cn, 1, "------------+-----+-----+-----+----+-----------\n");
-		do_char_log(cn, 1, "Steel       |  16 |  12 |   8 | 20 |         2 \n");
-		do_char_log(cn, 1, "Gold        |  22 |  14 |  16 | 30 |         3 \n");
-		do_char_log(cn, 1, "Emerald     |  34 |  16 |  24 | 40 |         4 \n");
-		do_char_log(cn, 1, "Crystal     |  52 |  20 |  32 | 50 |         5 \n");
-		do_char_log(cn, 1, "Titanium    |  76 |  24 |  40 | 60 |         6 \n");
+		do_char_log(cn, 1, "Steel       |  16 |  12 |   8 | 20 |         4 \n");
+		do_char_log(cn, 1, "Gold        |  22 |  14 |  16 | 30 |         6 \n");
+		do_char_log(cn, 1, "Emerald     |  34 |  16 |  24 | 40 |         8 \n");
+		do_char_log(cn, 1, "Crystal     |  52 |  20 |  32 | 50 |        10 \n");
+		do_char_log(cn, 1, "Titanium    |  76 |  24 |  40 | 60 |        12 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Spears will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Dagger and Staff skills.\n");
@@ -2648,7 +2648,6 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[16], "Forgotten Canyon",         16000);
 	m = display_pole(cn, flag, page, m, pole1[13], "The Mad Hermit's House",   17500);
 	m = display_pole(cn, flag, page, m, pole1[19], "Abandoned Archives",       18000);
-	m = display_pole(cn, flag, page, m, pole5[ 6], "Scorpion Burrow",          18000);
 	m = display_pole(cn, flag, page, m, pole4[13], "Fire Pentagram Quest",     18000);
 	m = display_pole(cn, flag, page, m, pole3[12], "Lab V, Knight Gorge",      19500);
 	m = display_pole(cn, flag, page, m, pole3[13], "Lab V, Knight Gorge",      19500);
@@ -2671,6 +2670,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole2[24], "Underground II",           32000);
 	m = display_pole(cn, flag, page, m, pole4[17], "Fire Pentagram Quest",     32000);
 	m = display_pole(cn, flag, page, m, pole1[18], "Winding Valley",           32500);
+	m = display_pole(cn, flag, page, m, pole5[ 6], "Scorpion Burrow",          34000);
 	m = display_pole(cn, flag, page, m, pole3[18], "Lab VII, Light/Dark Gor",  34750);
 	m = display_pole(cn, flag, page, m, pole3[19], "Lab VII, Light/Dark Gor",  34750);
 	m = display_pole(cn, flag, page, m, pole3[20], "Lab VII, Light/Dark Gor",  34750);
@@ -2857,7 +2857,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	{
 		if (ch[cn].pandium_floor[2]>n) questZ[n] = 1;
 	}
-	if (ch[cn].pandium_floor[0]>=99 || ch[cn].pandium_floor[1]>=99) questZ[6] = 1;
+	if (ch[cn].pandium_floor[0]>=50 || ch[cn].pandium_floor[1]>=50) questZ[6] = 1;
 	
 	if (ch[cn].temple_x==HOME_START_X && !quest2[ 0]) ast = 0;
 	if ((ch[cn].waypoints&(1<<7))     ||  quest2[25]) liz = 1;
@@ -3732,19 +3732,6 @@ void do_balance(int cn)
 		//            tmp / 100, tmp % 100, (tmp * TICKS) / 100, (tmp * TICKS) % 100);
 		do_char_log(cn, 1, "You currently have %d items in your depot.\n", tmp);
 	}
-
-	if (ch[cn].depot_sold)
-	{
-		do_char_log(cn, 1, "The bank sold %d items from your depot to cover the costs.\n", ch[cn].depot_sold);
-		ch[cn].depot_sold = 0;
-	}
-
-	if (ch[cn].depot_cost)
-	{
-		do_char_log(cn, 1, "%dG %dS were deducted from your bank account as rent for your depot.\n",
-		            ch[cn].depot_cost / 100, ch[cn].depot_cost % 100);
-		ch[cn].depot_cost = 0;
-	}
 }
 
 static char *order = NULL;
@@ -3970,7 +3957,8 @@ void do_sort(int cn, char *arg)
 	order = arg;
 	
 	// Set temporary item locks before qsort, removing any invalid ones beforehand
-	for (n=0;n<40;n++) 
+	/*
+	for (n=0;n<MAXITEMS;n++) 
 	{
 		it[ch[cn].item[n]].flags &= ~IF_ITEMLOCK;
 		if (ch[cn].item_lock[n])
@@ -3978,8 +3966,9 @@ void do_sort(int cn, char *arg)
 			it[ch[cn].item[n]].flags |= IF_ITEMLOCK;
 		}
 	}
+	*/
 	
-	qsort(ch[cn].item, 40, sizeof(int), qsort_proc);
+	qsort(ch[cn].item, MAXITEMS, sizeof(int), qsort_proc);
 
 	do_update_char(cn);
 }
@@ -4167,7 +4156,7 @@ void do_create_note(int cn, char *text)
 
 	chlog(cn, "created note: %s.", text);
 
-	for (m = 0; m<40; m++) // looking for free space in inventory
+	for (m = 0; m<MAXITEMS; m++) // looking for free space in inventory
 	{
 		if (ch[cn].item[m]==0)
 		{
@@ -4945,6 +4934,16 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
+		if (prefix(cmd, "dept") && f_g)
+		{
+			break;
+		}
+		if (prefix(cmd, "depth") && f_g)
+		{
+			god_set_depth(cn, dbatoi_self(cn, arg[1]), atoi(arg[2]), 0);
+			return;
+		}
+		;
 		if (prefix(cmd, "diamond"))
 		{
 			do_listrings(cn, "diamond");
@@ -5065,6 +5064,17 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "gctome") && !f_m)
 		{
 			do_gctome(cn);
+			return;
+		}
+		;
+		if (prefix(cmd, "gdept") && f_g)
+		{
+			break;
+		}
+		;
+		if (prefix(cmd, "gdepth") && f_g)
+		{
+			god_set_depth(cn, dbatoi_self(cn, arg[1]), atoi(arg[2]), 1);
 			return;
 		}
 		;
@@ -6615,7 +6625,7 @@ void do_ransack_corpse(int cn, int co, char *msg)
 		do_char_log(cn, 0, msg, dropped);
 	}
 	// Check for items in inventory
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (!(in = ch[co].item[n]))
 		{
@@ -6804,67 +6814,63 @@ void do_char_killed(int cn, int co, int pentsolve)
 	// Special case for Pandium
 	if (co && ch[co].temp==CT_PANDIUM)
 	{
-		grouped = 0;
-		for (n=0;n<3;n++)
-		{
-			if (IS_LIVINGCHAR(cc = ch[co].data[7+n]) && IS_PLAYER(cc) && is_atpandium(cc)) 
-				grouped++;
-		}
-		
-		if (grouped)
+		if (ch[co].data[32])
 		{
 			char message[4][120];
 			tmp = ch[co].data[1];
-			for (n=0;n<grouped;n++) 
+			for (n=0;n<ch[co].data[32];n++) 
 			{
 				if (IS_LIVINGCHAR(cc = ch[co].data[7+n]) && IS_PLAYER(cc) && is_atpandium(cc))
 				{
 					remove_buff(cc, SK_OPPRESSED);
-					if (grouped==1)
+					if (ch[co].data[32]==1)
 					{
-						ch[cc].pandium_floor[0] = max(ch[cc].pandium_floor[0], tmp+1);
+						tmpg = max(ch[cc].pandium_floor[0], tmp+1);
+						ch[cc].pandium_floor[0] = tmpg;
 					}
 					else
 					{
-						ch[cc].pandium_floor[1] = max(ch[cc].pandium_floor[1], tmp+1);
+						tmpg = max(ch[cc].pandium_floor[1], tmp+1);
+						ch[cc].pandium_floor[1] = tmpg;
 					}
+					if (tmpg > tmp+1) tmpg = 1;
+					
 					switch (n)
 					{
 						case  2:
-							spawn_pandium_rewards(cc, tmp, 283, 959);
+							spawn_pandium_rewards(cc, tmpg-1, 283, 959);
 							quick_teleport(cc, 283, 955);
 							break;
 						case  1:
-							spawn_pandium_rewards(cc, tmp, 273, 959);
+							spawn_pandium_rewards(cc, tmpg-1, 273, 959);
 							quick_teleport(cc, 273, 955);
 							break;
 						default:
-							spawn_pandium_rewards(cc, tmp, 293, 959);
+							spawn_pandium_rewards(cc, tmpg-1, 293, 959);
 							quick_teleport(cc, 293, 955);
 							break;
 					}
-					if (tmp==99)
+					if (tmp>=50 && tmp%5==0)
 						do_char_log(cc, 9, "Pandium: \"Claim your crown.\"\n");
-					else if (tmp==1 || tmp==5 || tmp==10 || tmp==20 || tmp==50)
+					else if (tmp==1 || tmp==10 || tmp==20 || tmp==30 || tmp==40)
 						do_char_log(cc, 7, "Pandium: \"May we grow ever stronger.\"\n");
 					else
 						do_char_log(cc, 3, "Pandium: \"Rise ever higher.\"\n");
-					if (tmp==99 || tmp==90 || tmp==80 || tmp==70 || tmp==60 || tmp==50 || tmp==40 || tmp==30 || tmp==20 || tmp==10)
+					if (tmp%10==0)
 						sprintf(message[n], "%s", ch[cc].name);
 				}
 			}
-			if (tmp==99 || tmp==90 || tmp==80 || tmp==70 || tmp==60 || tmp==50 || tmp==40 || tmp==30 || tmp==20 || tmp==10)
+			if (tmp%10==0)
 			{
-				if (grouped == 3)
+				if (ch[co].data[32] == 3)
 					sprintf(message[3], "%s, %s, and %s defeated The Archon Pandium at depth %d!", message[0], message[1], message[2], tmp);
-				else if (grouped == 2)
+				else if (ch[co].data[32] == 2)
 					sprintf(message[3], "%s and %s defeated The Archon Pandium at depth %d!", message[0], message[1], tmp);
 				else
 					sprintf(message[3], "%s defeated The Archon Pandium at depth %d!", message[0], tmp);
 				if (globs->flags & GF_DISCORD) discord_ranked(message[3]);
 			}
 		}
-		grouped = 0;
 	}
 
 	// a player killed someone or something.
@@ -7176,7 +7182,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 	wimp = 0;
 	tmpg = 0;
 
-	if ((mf & MF_ARENA) || is_atpandium(co))
+	if ((mf & MF_ARENA) || (cn && ch[cn].temp==CT_PANDIUM))
 	{
 		// Arena death : full save, keep everything
 		wimp = 2;
@@ -7225,7 +7231,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 
 		ch[cc] = ch[co]; // CC refers to the body, while CO refers to the presently dying character
 		
-		for (n = 0; n<40; n++)
+		for (n = 0; n<MAXITEMS; n++)
 		{
 			if (!(in = ch[co].item[n]))
 			{
@@ -7561,7 +7567,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 		god_destroy_items(co);
 		ch[co].citem = 0;
 		ch[co].gold  = 0;
-		for (z = 0; z<40; z++)
+		for (z = 0; z<MAXITEMS; z++)
 		{
 			ch[co].item[z] = 0;
 		}
@@ -9801,7 +9807,7 @@ void really_update_char(int cn)
 		for (z = 0; z<5; z++)
 		{
 			attrib[z]  = foolaverage/5;
-			attrib[z] +=  attrib[z]/10;
+			attrib[z] +=  attrib[z]/25*2; // 8%
 		}
 	}
 	else
@@ -9814,19 +9820,19 @@ void really_update_char(int cn)
 	
 	for (z = 0; z<5; z++)
 	{
-		ch[cn].limit_break[z][1] = suppression;
+		ch[cn].limit_break[z][1] = max(-127, min(127, suppression));
 		
 		// Enchant: More attributes
-		if (z==0 && moreBrv) attrib[z] = attrib[z]*(100+moreBrv*4)/100;
-		if (z==1 && moreWil) attrib[z] = attrib[z]*(100+moreWil*4)/100;
-		if (z==2 && moreInt) attrib[z] = attrib[z]*(100+moreInt*4)/100;
-		if (z==3 && moreAgl) attrib[z] = attrib[z]*(100+moreAgl*4)/100;
-		if (z==4 && moreStr) attrib[z] = attrib[z]*(100+moreStr*4)/100;
+		if (z==0 && moreBrv) attrib[z] = attrib[z]*(100+moreBrv*3)/100;
+		if (z==1 && moreWil) attrib[z] = attrib[z]*(100+moreWil*3)/100;
+		if (z==2 && moreInt) attrib[z] = attrib[z]*(100+moreInt*3)/100;
+		if (z==3 && moreAgl) attrib[z] = attrib[z]*(100+moreAgl*3)/100;
+		if (z==4 && moreStr) attrib[z] = attrib[z]*(100+moreStr*3)/100;
 		if (moreAtt) attrib[z] = attrib[z]*(100+moreAtt*2)/100;
 		
 		set_attrib_score(cn, z, attrib[z]);
 	}
-	ch[cn].limit_break[5][1] = suppression;
+	ch[cn].limit_break[5][1] = max(-127, min(127, suppression));
 	
 	// Weapon - Fist of the Heavens :: Doubles best attribute
 	if (gearSpec & 2)
@@ -10094,7 +10100,7 @@ void really_update_char(int cn)
 		base_spd += 30;
 	}
 	
-	base_spd = 120 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 6 + ch[cn].speed_mod;
+	base_spd = 120 + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 8 + ch[cn].speed_mod;
 	
 	// Additional bonus via speed mode :: Slow, Normal, Fast
 	if (ch[cn].mode==0) base_spd += 15;	// old: 14 + 2 = 16/36
@@ -10118,7 +10124,7 @@ void really_update_char(int cn)
 		ch[].move_speed value
 	*/
 	
-	spd_move += 15;
+	spd_move += 20;
 	
 	// Enchant: Move speed can't go below 150
 	if (enchantSpec & 32)
@@ -10346,7 +10352,7 @@ void really_update_char(int cn)
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
 	if (charmSpec & 64)
 	{
-		critical_m = (critical_m + 100) * 3/2 - 100;
+		critical_m = (critical_m + 100) * 4/3 - 100;
 	}
 	
 	// Clamp critical_m between 0 and 800
@@ -10630,7 +10636,7 @@ void do_immolate(int cn, int in)
 	int _aoe, _rad, x, y, xf, yf, xt, yt, xc, yc, aoe_power, in2 = 0, power, co, idx, nn;
 	double tmp_a, tmp_s, tmp_h;
 	
-	tmp_s     = (double)(bu[in].power);
+	tmp_s     = (double)(bu[in].power*2/(IS_PLAYER(cn)?2:3));
 	aoe_power = M_SK(cn, SK_PROX)+15;
 	_rad      = bu[in].data[3];
 	_aoe      = aoe_power/(PROX_CAP*2) + _rad;
@@ -10655,7 +10661,7 @@ void do_immolate(int cn, int in)
 		{
 			in2 = 0;
 			// Prevent from hurting enemies that don't want to hurt you atm
-			if (!IS_PLAYER(co))
+			if (!IS_PLAYER(co) && ch[co].data[25] != 1)
 			{
 				idx = cn | (char_id(cn) << 16);
 				for (nn = MCD_ENEMY1ST; nn<=MCD_ENEMYZZZ; nn++)
@@ -10670,12 +10676,12 @@ void do_immolate(int cn, int in)
 				aoe_power = (int)(double)(min(tmp_s, tmp_s / max(1, (
 							sqr(abs(xc - x)) + sqr(abs(yc - y))) / (tmp_h/100))));
 				aoe_power = spell_immunity(aoe_power, get_target_immunity(cn, co));
-							
+				
 				// debuff version
 				if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, aoe_power, SP_DUR_ARIA, 0))) 
 					continue;
 				
-				bu[in2].data[1] = max(100, 100 + aoe_power*2*(IS_SEYAN_DU(cn)?5:4));
+				bu[in2].data[1] = max(100, 100 + aoe_power*3);
 				bu[in2].data[4] = 1; // Effects not removed by NMZ (SK_IMMOLATE2)
 			}
 			if (co && in2) add_spell(co, in2);
@@ -10709,12 +10715,12 @@ void do_update_permaspells(int cn)
 					if (bu[in].data[0]==0)
 					{
 						power = ch[cn].hp[5]*3/10;
-						if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/40;
+						if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/25;
 					}
 					else
 					{
 						power = M_SK(bu[in].data[0], SK_PULSE);
-						if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/40;
+						if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/25;
 						power = spell_multiplier(power, cn);
 					}
 					bu[in].power = power;
@@ -10744,6 +10750,9 @@ void do_regenerate(int cn)
 	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, has_sld = 0, has_shl = 0, phalanx = 0, aggravate = 0;
 	int offpot = 0, defpot = 0;
 	int idle = 4;
+	char buf[50];
+	
+	strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
 
 	// gothp determines how much to counter degeneration effects while underwater.
 	
@@ -11160,13 +11169,13 @@ void do_regenerate(int cn)
 						ch[cn].temple_y = HOME_PURPLE_Y;
 					}
 					// remove other poisons
-					for (m=0;m<40;m++)
+					for (m=0;m<MAXITEMS;m++)
 					{
 						if ((in2 = ch[cn].item[m]) && it[in2].temp==IT_POT_DEATH)
 							god_take_from_char(in2, cn);
 					}
 					// death
-					do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
+					do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", buf);
 					do_char_log(cn, 0, "Oh dear, that poison was fatal. You died...\n");
 					chlog(cn, "Drank poison and died.", ch[cn].name);
 					do_char_killed(0, cn, 0);
@@ -11195,14 +11204,16 @@ void do_regenerate(int cn)
 					if (bu[in].temp==SK_SLOW)
 					{
 						if (get_enchantment(cn, 14)) p = p/5;
-						bu[in].speed[1] 		= -(min(300, 10 + SLOWFORM(p)));
+						bu[in].speed[1] 		= -(min(300, 10 + SLOWFORM(p)/2));
+						bu[in].atk_speed[1] 	= -(min(127, 10 + SLOWFORM(p)/2));
+						bu[in].cast_speed[1] 	= -(min(127, 10 + SLOWFORM(p)/2));
 					}
 					else if (bu[in].temp==SK_CURSE2)
 					{
 						if (get_enchantment(cn, 21)) p = p/5;
 						for (m = 0; m<5; m++) 
 						{
-							bu[in].attrib[m][1] = -(2 + CURSE2FORM(p, (4 - m)));
+							bu[in].attrib[m][1] = -(5 + CURSE2FORM(p, (4 - m)));
 						}
 					}
 					do_update_char(cn);
@@ -11264,7 +11275,7 @@ void do_regenerate(int cn)
 						switch (bu[in].temp)
 						{
 							case SK_POISON:
-								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
+								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from a nasty poison.\n", buf);
 								if (!(ch[co].flags & CF_SYS_OFF))
 									do_char_log(co, 0, "Your poison killed %s.\n", ch[cn].reference);
 								if (ch[co].flags & CF_INVISIBLE)
@@ -11273,7 +11284,7 @@ void do_regenerate(int cn)
 									do_char_log(cn, 0, "Oh dear, that poison was fatal. %s killed you...\n", ch[co].name);
 								break;
 							case SK_VENOM:
-								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from a nasty venom.\n", ch[cn].reference);
+								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from a nasty venom.\n", buf);
 								if (!(ch[co].flags & CF_SYS_OFF))
 									do_char_log(co, 0, "Your venom killed %s.\n", ch[cn].reference);
 								if (ch[co].flags & CF_INVISIBLE)
@@ -11282,7 +11293,7 @@ void do_regenerate(int cn)
 									do_char_log(cn, 0, "Oh dear, that venom was fatal. %s killed you...\n", ch[co].name);
 								break;
 							case SK_BLEED:
-								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
+								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from their bleeding wound.\n", buf);
 								if (!(ch[co].flags & CF_SYS_OFF))
 									do_char_log(co, 0, "Your bleed killed %s.\n", ch[cn].reference);
 								if (ch[co].flags & CF_INVISIBLE)
@@ -11291,7 +11302,7 @@ void do_regenerate(int cn)
 									do_char_log(cn, 0, "Oh dear, that bleeding was fatal. %s killed you...\n", ch[co].name);
 								break;
 							case SK_IMMOLATE2:
-								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from the terrible heat.\n", ch[cn].reference);
+								do_area_log(co, cn, ch[co].x, ch[co].y, 0, "%s died from the terrible heat.\n", buf);
 								if (!(ch[co].flags & CF_SYS_OFF))
 									do_char_log(co, 0, "Your immolate killed %s.\n", ch[cn].reference);
 								if (ch[co].flags & CF_INVISIBLE)
@@ -11307,19 +11318,19 @@ void do_regenerate(int cn)
 						switch (bu[in].temp)
 						{
 							case SK_POISON:
-								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", ch[cn].reference);
+								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", buf);
 								do_char_log(cn, 0, "Oh dear, that poison was fatal. You died...\n");
 								break;
 							case SK_VENOM:
-								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty venom.\n", ch[cn].reference);
+								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty venom.\n", buf);
 								do_char_log(cn, 0, "Oh dear, that venom was fatal. You died...\n");
 								break;
 							case SK_BLEED:
-								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from their bleeding wound.\n", ch[cn].reference);
+								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from their bleeding wound.\n", buf);
 								do_char_log(cn, 0, "Oh dear, that bleeding was fatal. You died...\n");
 								break;
 							case SK_IMMOLATE2:
-								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from the terrible heat.\n", ch[cn].reference);
+								do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from the terrible heat.\n", buf);
 								do_char_log(cn, 0, "Oh dear, that heat was fatal. You died...\n");
 								break;
 							default: break;
@@ -11918,7 +11929,7 @@ void do_look_item(int cn, int in)
 		act = 0;
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (ch[cn].item[n]==in)
 		{
@@ -12633,6 +12644,7 @@ void do_waypoint(int cn, int nr)
 	{
 		if (!(ch[cn].flags & CF_SYS_OFF))
 			do_char_log(cn, 1, "The waypoint whisked you away to %s.\n", waypoint[nr%32].name);
+		clear_map_buffs(cn, 1);
 		
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		god_transfer_char(cn, waypoint[nr%32].x, waypoint[nr%32].y);
@@ -13135,11 +13147,11 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 
 	if (((ch[co].flags & (CF_MERCHANT | CF_BODY)) || (ch[co].gcm==9)) && !autoflag)
 	{
-		for (n = 0; n<40; n += 2)
+		for (n = 0; n<MAXITEMS; n += 2)
 		{
 			buf[0] = SV_LOOK6;
 			buf[1] = n;
-			for (m = n; m<min(40, n + 2); m++)
+			for (m = n; m<min(MAXITEMS, n + 2); m++)
 			{
 				if ((in = ch[co].item[m])!=0)
 				{
@@ -13518,7 +13530,7 @@ void do_look_player_inventory(int cn, char *cv)
 	do_char_log(cn, 1, "Inventory contents for : %s\n", ch[co].name);
 	do_char_log(cn, 1, "-----------------------------------\n");
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in = ch[co].item[n])!=0)
 		{
@@ -13590,7 +13602,7 @@ void do_steal_player(int cn, char *cv, char *ci)
 	}
 
 	//look through depot and inventory for this item
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (in==ch[co].item[n])
 		{
@@ -13745,7 +13757,7 @@ int do_store_item(int cn)
 		return -1;
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (!ch[cn].item[n])
 		{
@@ -13753,7 +13765,7 @@ int do_store_item(int cn)
 		}
 	}
 
-	if (n==40)
+	if (n==MAXITEMS)
 	{
 		return -1;
 	}

@@ -510,7 +510,7 @@ int pop_create_char(int n, int drop)
 	ch[cn].pass2 = RANDOM(0x3fffffff);
 	ch[cn].temp  = n;
 
-	for (m = 0; m<40; m++)
+	for (m = 0; m<MAXITEMS; m++)
 	{
 		if ((tmp = ch[cn].item[m])!=0)
 		{
@@ -1039,7 +1039,7 @@ void pop_remove(void)
 			continue;
 		}
 
-		for (m = 0; m<40; m++)
+		for (m = 0; m<MAXITEMS; m++)
 		{
 			if ((in = ch[n].item[m])!=0)
 			{
@@ -1137,7 +1137,7 @@ void pop_load(void)
 		if (ch[n].used!=USE_EMPTY)
 		{
 			xlog("Character slot %d to be loaded to not empty!", n);
-			for (m = 0; m<40; m++)
+			for (m = 0; m<MAXITEMS; m++)
 			{
 				if ((in = ch[n].item[m])!=0)
 				{
@@ -1173,7 +1173,7 @@ void pop_load(void)
 		ch[n] = ctmp;
 		chc++;
 
-		for (m = 0; m<40; m++)
+		for (m = 0; m<MAXITEMS; m++)
 		{
 			if (ch[n].item[m])
 			{
@@ -1418,7 +1418,7 @@ void pop_save_char(int nr)
 	chc++;
 
 	// save inventory
-	for (m = 0; m<40; m++)
+	for (m = 0; m<MAXITEMS; m++)
 	{
 		if ((in = ch[nr].item[m])!=0)
 		{
@@ -1487,7 +1487,7 @@ void pop_load_char(int nr)
 	if (ch[nr].used!=USE_EMPTY)
 	{
 		xlog("Character slot %d to be loaded to not empty!", nr);
-		for (m = 0; m<40; m++)
+		for (m = 0; m<MAXITEMS; m++)
 		{
 			if ((in = ch[nr].item[m])!=0)
 			{
@@ -1530,7 +1530,7 @@ void pop_load_char(int nr)
 	ch[nr] = ctmp;
 	chc++;
 
-	for (m = 0; m<40; m++)
+	for (m = 0; m<MAXITEMS; m++)
 	{
 		if (ch[nr].item[m])
 		{
@@ -1660,5 +1660,342 @@ void pop_save_all_chars(void)
 	{
 		ch[n].flags |= CF_SAVEME;
 		pop_save_char(n);
+	}
+}
+
+void pop_copy_to_new_chars(void)
+{
+	int a, b, c;
+	
+	for (a = 1; a<MAXCHARS; a++)
+	{
+		ch_new[a].used = ch[a].used;
+		for (b=0;b<40;b++) 
+		{
+			ch_new[a].name[b] = ch[a].name[b];
+			ch_new[a].reference[b] = ch[a].reference[b];
+		}
+		for (b=0;b<LENDESC;b++) 
+		{
+			ch_new[a].description[b] = ch[a].description[b];
+		}
+		ch_new[a].kindred = ch[a].kindred;
+		ch_new[a].player = ch[a].player;
+		ch_new[a].pass1 = ch[a].pass1;
+		ch_new[a].pass2 = ch[a].pass2;
+		ch_new[a].sprite = ch[a].sprite;
+		ch_new[a].sound = ch[a].sound;
+		ch_new[a].flags = ch[a].flags;
+		ch_new[a].alignment = ch[a].alignment;
+		ch_new[a].temple_x = ch[a].temple_x;
+		ch_new[a].temple_y = ch[a].temple_y;
+		ch_new[a].tavern_x = ch[a].tavern_x;
+		ch_new[a].tavern_y = ch[a].tavern_y;
+		ch_new[a].temp = ch[a].temp;
+		for (b=0;b<5;b++) for (c=0;c<6;c++) 
+		{
+			ch_new[a].attrib[b][c] = ch[a].attrib[b][c];
+		}
+		for (b=0;b<6;b++)
+		{
+			ch_new[a].hp[b] = ch[a].hp[b];
+			ch_new[a].end[b] = ch[a].end[b];
+			ch_new[a].mana[b] = ch[a].mana[b];
+		}
+		for (b=0;b<50;b++) for (c=0;c<6;c++) 
+		{
+			ch_new[a].skill[b][c] = ch[a].skill[b][c];
+		}
+		ch_new[a].weapon_bonus = ch[a].weapon_bonus;
+		ch_new[a].armor_bonus = ch[a].armor_bonus;
+		ch_new[a].a_hp = ch[a].a_hp;
+		ch_new[a].a_end = ch[a].a_end;
+		ch_new[a].a_mana = ch[a].a_mana;
+		ch_new[a].light = ch[a].light;
+		ch_new[a].mode = ch[a].mode;
+		ch_new[a].speed = ch[a].speed;
+		ch_new[a].points = ch[a].points;
+		ch_new[a].points_tot = ch[a].points_tot;
+		ch_new[a].armor = ch[a].armor;
+		ch_new[a].weapon = ch[a].weapon;
+		ch_new[a].x = ch[a].x;
+		ch_new[a].y = ch[a].y;
+		ch_new[a].tox = ch[a].tox;
+		ch_new[a].toy = ch[a].toy;
+		ch_new[a].frx = ch[a].frx;
+		ch_new[a].fry = ch[a].fry;
+		ch_new[a].status = ch[a].status;
+		ch_new[a].status2 = ch[a].status2;
+		ch_new[a].dir = ch[a].dir;
+		ch_new[a].gold = ch[a].gold;
+		for (b=0;b<40;b++)
+		{
+			ch_new[a].item[b] = ch[a].item[b];
+		}
+		for (b=0;b<20;b++)
+		{
+			ch_new[a].worn[b] = ch[a].worn[b];
+		}
+		for (b=0;b<MAXBUFFS;b++)
+		{
+			ch_new[a].spell[b] = ch[a].spell[b];
+		}
+		ch_new[a].citem = ch[a].citem;
+		ch_new[a].creation_date = ch[a].creation_date;
+		ch_new[a].login_date = ch[a].login_date;
+		ch_new[a].addr = ch[a].addr;
+		ch_new[a].current_online_time = ch[a].current_online_time;
+		ch_new[a].total_online_time = ch[a].total_online_time;
+		ch_new[a].comp_volume = ch[a].comp_volume;
+		ch_new[a].raw_volume = ch[a].raw_volume;
+		ch_new[a].idle = ch[a].idle;
+		ch_new[a].attack_cn = ch[a].attack_cn;
+		ch_new[a].skill_nr = ch[a].skill_nr;
+		ch_new[a].skill_target1 = ch[a].skill_target1;
+		ch_new[a].skill_target2 = ch[a].skill_target2;
+		ch_new[a].goto_x = ch[a].goto_x;
+		ch_new[a].goto_y = ch[a].goto_y;
+		ch_new[a].use_nr = ch[a].use_nr;
+		ch_new[a].misc_action = ch[a].misc_action;
+		ch_new[a].misc_target1 = ch[a].misc_target1;
+		ch_new[a].misc_target2 = ch[a].misc_target2;
+		ch_new[a].cerrno = ch[a].cerrno;
+		ch_new[a].escape_timer = ch[a].escape_timer;
+		for (b=0;b<4;b++)
+		{
+			ch_new[a].enemy[b] = ch[a].enemy[b];
+		}
+		ch_new[a].current_enemy = ch[a].current_enemy;
+		ch_new[a].retry = ch[a].retry;
+		ch_new[a].stunned = ch[a].stunned;
+		ch_new[a].speed_mod = ch[a].speed_mod;
+		ch_new[a].last_action = ch[a].last_action;
+		ch_new[a].gethit_dam = ch[a].gethit_dam;
+		ch_new[a].gethit_bonus = ch[a].gethit_bonus;
+		ch_new[a].light_bonus = ch[a].light_bonus;
+		for (b=0;b<16;b++)
+		{
+			ch_new[a].passwd[b] = ch[a].passwd[b];
+		}
+		ch_new[a].lastattack = ch[a].lastattack;
+		ch_new[a].move_speed = ch[a].move_speed;
+		ch_new[a].atk_speed = ch[a].atk_speed;
+		ch_new[a].cast_speed = ch[a].cast_speed;
+		ch_new[a].spell_mod = ch[a].spell_mod;
+		ch_new[a].spell_apt = ch[a].spell_apt;
+		ch_new[a].cool_bonus = ch[a].cool_bonus;
+		ch_new[a].crit_chance = ch[a].crit_chance;
+		ch_new[a].crit_multi = ch[a].crit_multi;
+		ch_new[a].to_hit = ch[a].to_hit;
+		ch_new[a].to_parry = ch[a].to_parry;
+		ch_new[a].top_damage = ch[a].top_damage;
+		ch_new[a].taunted = ch[a].taunted;
+		ch_new[a].bs_points = ch[a].bs_points;
+		ch_new[a].sprite_override = ch[a].sprite_override;
+		for (b=0;b<12;b++)
+		{
+			ch_new[a].alt_worn[b] = ch[a].alt_worn[b];
+		}
+		ch_new[a].os_points = ch[a].os_points;
+		ch_new[a].gcm = ch[a].gcm;
+		ch_new[a].aoe_bonus = ch[a].aoe_bonus;
+		ch_new[a].colosseum = ch[a].colosseum;
+		ch_new[a].spellfail = ch[a].spellfail;
+		ch_new[a].dmg_bonus = ch[a].dmg_bonus;
+		ch_new[a].dmg_reduction = ch[a].dmg_reduction;
+		for (b=0;b<6;b++) for (c=0;c<2;c++)
+		{
+			ch_new[a].limit_break[b][c] = ch[a].limit_break[b][c];
+		}
+		for (b=0;b<6;b++)
+		{
+			ch_new[a].pandium_floor[b] = ch[a].pandium_floor[b];
+		}
+		ch_new[a].waypoints = ch[a].waypoints;
+		ch_new[a].tokens = ch[a].tokens;
+		for (b=0;b<62;b++)
+		{
+			ch_new[a].depot[b] = ch[a].depot[b];
+		}
+		ch_new[a].luck = ch[a].luck;
+		ch_new[a].unreach = ch[a].unreach;
+		ch_new[a].unreachx = ch[a].unreachx;
+		ch_new[a].unreachy = ch[a].unreachy;
+		ch_new[a].class = ch[a].class;
+		ch_new[a].logout_date = ch[a].logout_date;
+		for (b=0;b<100;b++)
+		{
+			ch_new[a].data[b] = ch[a].data[b];
+		}
+		for (b=0;b<10;b++) for (c=0;c<160;c++)
+		{
+			ch_new[a].text[b][c] = ch[a].text[b][c];
+		}
+	}
+	
+	for (a = 1; a<MAXTCHARS; a++)
+	{
+		ch_temp_new[a].used = ch_temp[a].used;
+		for (b=0;b<40;b++) 
+		{
+			ch_temp_new[a].name[b] = ch_temp[a].name[b];
+			ch_temp_new[a].reference[b] = ch_temp[a].reference[b];
+		}
+		for (b=0;b<LENDESC;b++) 
+		{
+			ch_temp_new[a].description[b] = ch_temp[a].description[b];
+		}
+		ch_temp_new[a].kindred = ch_temp[a].kindred;
+		ch_temp_new[a].player = ch_temp[a].player;
+		ch_temp_new[a].pass1 = ch_temp[a].pass1;
+		ch_temp_new[a].pass2 = ch_temp[a].pass2;
+		ch_temp_new[a].sprite = ch_temp[a].sprite;
+		ch_temp_new[a].sound = ch_temp[a].sound;
+		ch_temp_new[a].flags = ch_temp[a].flags;
+		ch_temp_new[a].alignment = ch_temp[a].alignment;
+		ch_temp_new[a].temple_x = ch_temp[a].temple_x;
+		ch_temp_new[a].temple_y = ch_temp[a].temple_y;
+		ch_temp_new[a].tavern_x = ch_temp[a].tavern_x;
+		ch_temp_new[a].tavern_y = ch_temp[a].tavern_y;
+		ch_temp_new[a].temp = ch_temp[a].temp;
+		for (b=0;b<5;b++) for (c=0;c<6;c++) 
+		{
+			ch_temp_new[a].attrib[b][c] = ch_temp[a].attrib[b][c];
+		}
+		for (b=0;b<6;b++)
+		{
+			ch_temp_new[a].hp[b] = ch_temp[a].hp[b];
+			ch_temp_new[a].end[b] = ch_temp[a].end[b];
+			ch_temp_new[a].mana[b] = ch_temp[a].mana[b];
+		}
+		for (b=0;b<50;b++) for (c=0;c<6;c++) 
+		{
+			ch_temp_new[a].skill[b][c] = ch_temp[a].skill[b][c];
+		}
+		ch_temp_new[a].weapon_bonus = ch_temp[a].weapon_bonus;
+		ch_temp_new[a].armor_bonus = ch_temp[a].armor_bonus;
+		ch_temp_new[a].a_hp = ch_temp[a].a_hp;
+		ch_temp_new[a].a_end = ch_temp[a].a_end;
+		ch_temp_new[a].a_mana = ch_temp[a].a_mana;
+		ch_temp_new[a].light = ch_temp[a].light;
+		ch_temp_new[a].mode = ch_temp[a].mode;
+		ch_temp_new[a].speed = ch_temp[a].speed;
+		ch_temp_new[a].points = ch_temp[a].points;
+		ch_temp_new[a].points_tot = ch_temp[a].points_tot;
+		ch_temp_new[a].armor = ch_temp[a].armor;
+		ch_temp_new[a].weapon = ch_temp[a].weapon;
+		ch_temp_new[a].x = ch_temp[a].x;
+		ch_temp_new[a].y = ch_temp[a].y;
+		ch_temp_new[a].tox = ch_temp[a].tox;
+		ch_temp_new[a].toy = ch_temp[a].toy;
+		ch_temp_new[a].frx = ch_temp[a].frx;
+		ch_temp_new[a].fry = ch_temp[a].fry;
+		ch_temp_new[a].status = ch_temp[a].status;
+		ch_temp_new[a].status2 = ch_temp[a].status2;
+		ch_temp_new[a].dir = ch_temp[a].dir;
+		ch_temp_new[a].gold = ch_temp[a].gold;
+		for (b=0;b<40;b++)
+		{
+			ch_temp_new[a].item[b] = ch_temp[a].item[b];
+		}
+		for (b=0;b<20;b++)
+		{
+			ch_temp_new[a].worn[b] = ch_temp[a].worn[b];
+		}
+		for (b=0;b<MAXBUFFS;b++)
+		{
+			ch_temp_new[a].spell[b] = ch_temp[a].spell[b];
+		}
+		ch_temp_new[a].citem = ch_temp[a].citem;
+		ch_temp_new[a].creation_date = ch_temp[a].creation_date;
+		ch_temp_new[a].login_date = ch_temp[a].login_date;
+		ch_temp_new[a].addr = ch_temp[a].addr;
+		ch_temp_new[a].current_online_time = ch_temp[a].current_online_time;
+		ch_temp_new[a].total_online_time = ch_temp[a].total_online_time;
+		ch_temp_new[a].comp_volume = ch_temp[a].comp_volume;
+		ch_temp_new[a].raw_volume = ch_temp[a].raw_volume;
+		ch_temp_new[a].idle = ch_temp[a].idle;
+		ch_temp_new[a].attack_cn = ch_temp[a].attack_cn;
+		ch_temp_new[a].skill_nr = ch_temp[a].skill_nr;
+		ch_temp_new[a].skill_target1 = ch_temp[a].skill_target1;
+		ch_temp_new[a].skill_target2 = ch_temp[a].skill_target2;
+		ch_temp_new[a].goto_x = ch_temp[a].goto_x;
+		ch_temp_new[a].goto_y = ch_temp[a].goto_y;
+		ch_temp_new[a].use_nr = ch_temp[a].use_nr;
+		ch_temp_new[a].misc_action = ch_temp[a].misc_action;
+		ch_temp_new[a].misc_target1 = ch_temp[a].misc_target1;
+		ch_temp_new[a].misc_target2 = ch_temp[a].misc_target2;
+		ch_temp_new[a].cerrno = ch_temp[a].cerrno;
+		ch_temp_new[a].escape_timer = ch_temp[a].escape_timer;
+		for (b=0;b<4;b++)
+		{
+			ch_temp_new[a].enemy[b] = ch_temp[a].enemy[b];
+		}
+		ch_temp_new[a].current_enemy = ch_temp[a].current_enemy;
+		ch_temp_new[a].retry = ch_temp[a].retry;
+		ch_temp_new[a].stunned = ch_temp[a].stunned;
+		ch_temp_new[a].speed_mod = ch_temp[a].speed_mod;
+		ch_temp_new[a].last_action = ch_temp[a].last_action;
+		ch_temp_new[a].gethit_dam = ch_temp[a].gethit_dam;
+		ch_temp_new[a].gethit_bonus = ch_temp[a].gethit_bonus;
+		ch_temp_new[a].light_bonus = ch_temp[a].light_bonus;
+		for (b=0;b<16;b++)
+		{
+			ch_temp_new[a].passwd[b] = ch_temp[a].passwd[b];
+		}
+		ch_temp_new[a].lastattack = ch_temp[a].lastattack;
+		ch_temp_new[a].move_speed = ch_temp[a].move_speed;
+		ch_temp_new[a].atk_speed = ch_temp[a].atk_speed;
+		ch_temp_new[a].cast_speed = ch_temp[a].cast_speed;
+		ch_temp_new[a].spell_mod = ch_temp[a].spell_mod;
+		ch_temp_new[a].spell_apt = ch_temp[a].spell_apt;
+		ch_temp_new[a].cool_bonus = ch_temp[a].cool_bonus;
+		ch_temp_new[a].crit_chance = ch_temp[a].crit_chance;
+		ch_temp_new[a].crit_multi = ch_temp[a].crit_multi;
+		ch_temp_new[a].to_hit = ch_temp[a].to_hit;
+		ch_temp_new[a].to_parry = ch_temp[a].to_parry;
+		ch_temp_new[a].top_damage = ch_temp[a].top_damage;
+		ch_temp_new[a].taunted = ch_temp[a].taunted;
+		ch_temp_new[a].bs_points = ch_temp[a].bs_points;
+		ch_temp_new[a].sprite_override = ch_temp[a].sprite_override;
+		for (b=0;b<12;b++)
+		{
+			ch_temp_new[a].alt_worn[b] = ch_temp[a].alt_worn[b];
+		}
+		ch_temp_new[a].os_points = ch_temp[a].os_points;
+		ch_temp_new[a].gcm = ch_temp[a].gcm;
+		ch_temp_new[a].aoe_bonus = ch_temp[a].aoe_bonus;
+		ch_temp_new[a].colosseum = ch_temp[a].colosseum;
+		ch_temp_new[a].spellfail = ch_temp[a].spellfail;
+		ch_temp_new[a].dmg_bonus = ch_temp[a].dmg_bonus;
+		ch_temp_new[a].dmg_reduction = ch_temp[a].dmg_reduction;
+		for (b=0;b<6;b++) for (c=0;c<2;c++)
+		{
+			ch_temp_new[a].limit_break[b][c] = ch_temp[a].limit_break[b][c];
+		}
+		for (b=0;b<6;b++)
+		{
+			ch_temp_new[a].pandium_floor[b] = ch_temp[a].pandium_floor[b];
+		}
+		ch_temp_new[a].waypoints = ch_temp[a].waypoints;
+		ch_temp_new[a].tokens = ch_temp[a].tokens;
+		for (b=0;b<62;b++)
+		{
+			ch_temp_new[a].depot[b] = ch_temp[a].depot[b];
+		}
+		ch_temp_new[a].luck = ch_temp[a].luck;
+		ch_temp_new[a].unreach = ch_temp[a].unreach;
+		ch_temp_new[a].unreachx = ch_temp[a].unreachx;
+		ch_temp_new[a].unreachy = ch_temp[a].unreachy;
+		ch_temp_new[a].class = ch_temp[a].class;
+		ch_temp_new[a].logout_date = ch_temp[a].logout_date;
+		for (b=0;b<100;b++)
+		{
+			ch_temp_new[a].data[b] = ch_temp[a].data[b];
+		}
+		for (b=0;b<10;b++) for (c=0;c<160;c++)
+		{
+			ch_temp_new[a].text[b][c] = ch_temp[a].text[b][c];
+		}
 	}
 }

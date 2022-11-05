@@ -311,7 +311,7 @@ int god_create_char(int temp, int withitems)
 	ch[n].retry = 0;
 	ch[n].dir = DX_DOWN;
 
-	for (m = 0; m<40; m++)
+	for (m = 0; m<MAXITEMS; m++)
 	{
 		if ((tmp = ch[n].item[m])!=0)
 		{
@@ -884,7 +884,7 @@ int god_give_char(int in, int cn)
 	{
 		return 0;
 	}
-	if (IS_PLAYER(cn)) for (n = 0; n<40; n++)
+	if (IS_PLAYER(cn)) for (n = 0; n<MAXITEMS; n++)
 	{
 		in2 = ch[cn].item[n];
 		flag = 1;
@@ -923,7 +923,7 @@ int god_give_char(int in, int cn)
 			return 1;
 		}
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		// Find an empty inventory slot
 		if (!ch[cn].item[n])
@@ -931,7 +931,7 @@ int god_give_char(int in, int cn)
 			break;
 		}
 	}
-	if (n==40)
+	if (n==MAXITEMS)
 	{
 		if (ch[cn].citem)
 		{
@@ -962,14 +962,14 @@ int god_take_from_char(int in, int cn)
 	}
 	else
 	{
-		for (n = 0; n<40; n++)
+		for (n = 0; n<MAXITEMS; n++)
 		{
 			if (ch[cn].item[n]==in)
 			{
 				break;
 			}
 		}
-		if (n<40)
+		if (n<MAXITEMS)
 		{
 			ch[cn].item[n] = 0;
 			ch[cn].item_lock[n] = 0;
@@ -2387,7 +2387,7 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset)
 		}
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in = ch[ct].item[n]) && (it[in].flags & IF_LABYDESTROY))
 		{
@@ -2489,7 +2489,7 @@ int god_build_start(int cn)
 	ch[cn].data[PCD_COMPANION] = co;
 
 	/* Transfer inventory */
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		in = ch[cn].item[n];
 		if (in)
@@ -2518,7 +2518,7 @@ void god_build_stop(int cn)
 	int co, n, in;
 
 	/* Empty builder's inventory */
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		ch[cn].item[n] = 0;
 		ch[cn].item_lock[n] = 0;
@@ -2539,7 +2539,7 @@ void god_build_stop(int cn)
 	}
 
 	/* Transfer inventory */
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		in = ch[co].item[n];
 		if (in)
@@ -3177,13 +3177,13 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 16655;
 		break;
 	case 701:
-		for (n = 0; n<40; n++)
+		for (n = 0; n<MAXITEMS; n++)
 		{
 			ch[cn].item[m++] = 0x20000000 | (n + 16430);
 		}
 		break;
 	case 702:
-		for (n = 40; n<78; n++)
+		for (n = MAXITEMS; n<78; n++)
 		{
 			ch[cn].item[m++] = 0x20000000 | (n + 16430);
 		}
@@ -3362,7 +3362,7 @@ void god_build_equip(int cn, int x)
 	}
 
 	/* fill inventory with other stuff upward from last item */
-	for (n = x; n<MAXTITEM && m<40; n++)
+	for (n = x; n<MAXTITEM && m<MAXITEMS; n++)
 	{
 		if (it_temp[n].used==USE_EMPTY)
 		{
@@ -3414,6 +3414,36 @@ void god_build(int cn, int x)
 	{
 		// switch to mode x
 		god_build_equip(cn, x);
+	}
+}
+
+void god_set_depth(int cn, int co, int v, int gflag)
+{
+	if (co == 0)
+	{
+		do_char_log(cn, 0, "No such character.\n");
+		return;
+	}
+	else if (!IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Bad character number: %d\n", co);
+		return;
+	}
+	else if (v < 0 || v > 255)
+	{
+		do_char_log(cn, 0, "Invalid depth.\n");
+		return;
+	}
+	
+	if (gflag)
+	{
+		ch[co].pandium_floor[1] = v;
+		do_char_log(cn, 1, "Set %s to Group Pandium depth %d.\n", ch[co].name, v);
+	}
+	else
+	{
+		ch[co].pandium_floor[0] = v;
+		do_char_log(cn, 1, "Set %s to Solo Pandium depth %d.\n", ch[co].name, v);
 	}
 }
 
@@ -3937,7 +3967,7 @@ void god_destroy_items(int cn)
 {
 	int n, in;
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in = ch[cn].item[n])!=0)
 		{
@@ -4131,7 +4161,7 @@ void god_racechange(int co, int temp, int keepstuff)
 				ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri * min(5, max(0,rank-19));
 		}
 		
-		for (n = 0; n<40; n++) {ch[co].item[n] = old.item[n]; it[ch[co].item[n]].carried = co;}
+		for (n = 0; n<MAXITEMS; n++) {ch[co].item[n] = old.item[n]; it[ch[co].item[n]].carried = co;}
 		for (n = 0; n<20; n++) {ch[co].worn[n] = old.worn[n]; it[ch[co].worn[n]].carried = co;}
 		for (n = 0; n<12; n++) {ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;}
 		
@@ -4219,7 +4249,7 @@ void god_racechange(int co, int temp, int keepstuff)
 	}
 	else
 	{
-		for (n = 0; n<40; n++) ch[co].item[n] 		= 0;
+		for (n = 0; n<MAXITEMS; n++) ch[co].item[n] 		= 0;
 		for (n = 0; n<20; n++) ch[co].worn[n] 		= 0;
 		for (n = 0; n<12; n++) ch[co].alt_worn[n] 	= 0;
 		

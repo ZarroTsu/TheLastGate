@@ -1338,6 +1338,12 @@ int main(int argc, char *args[])
 			unload();
 			exit(0);
 		}
+		else if (strcasecmp("copy", args[1])==0)
+		{
+			pop_copy_to_new_chars();
+			unload();
+			exit(0);
+		}
 	}
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);

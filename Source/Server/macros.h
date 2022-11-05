@@ -180,11 +180,11 @@
 #define SLOW2FORM(n)		(n/3*9/10)
 
 // Curse2's formula (used to degrade)
-#define CURSE2FORM(p, n)	(((p*4/3)-n)/5)
+#define CURSE2FORM(p, n)	(((p*5/3)-n)/5)
 
 // Poison's formula (damage per tick)
-#define PL_POISFORM(p, d)	(((p+15) * 4500) / d)
-#define MN_POISFORM(p, d)	(((p+10) * 3000) / d)
+#define PL_POISFORM(p, d)	(((p+ 5) * 4500) / d)
+#define MN_POISFORM(p, d)	(((p   ) * 3000) / d)
 
 // Bleed's formula (damage per tick)
 #define BLEEDFORM(p, d)		(((p+ 5) *  750) / d)
@@ -204,7 +204,7 @@
 #define DESC_CHARIOT	"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n"
 #define DESC_STRENGTH	"When equipped, reduces your attack and cast speed by 15%%, but grants 20%% more damage with melee attacks.\n"
 #define DESC_HERMIT		"When equipped, you have 20%% more Armor Value, but 20%% less Resistance and Immunity.\n"
-#define DESC_WHEEL		"When equipped, your critical hit chance is reduced by 33%%, but you have 1.5x critical hit multiplier.\n"
+#define DESC_WHEEL		"When equipped, your critical hit chance is reduced by 33%%, but you have 33%% more critical hit multiplier.\n"
 #define DESC_JUSTICE	"When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_HANGED		"When equipped, 33%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
 #define DESC_DEATH		"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
@@ -217,7 +217,7 @@
 #define DESC_JUDGE		"When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_WORLD		"When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n"
 
-#define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 10%%.\n"
+#define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 8%%.\n"
 #define DESC_MAGI_R		"When equipped, your concentrate skill instead increases the cost of spells, but it also increases your spell modifier.\n"
 #define DESC_PREIST_R	"When equipped, your maximum mana is reduced by 20%% to increase your cooldown bonus by 10%% of the subtracted mana.\n"
 #define DESC_EMPRES_R	"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"

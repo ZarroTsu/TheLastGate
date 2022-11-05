@@ -902,7 +902,7 @@ int npc_give(int cn, int co, int in, int money)
 		// Assure the player has inventory space before we do anything
 		if (ch[cn].data[66] || ch[cn].data[50]==50)
 		{
-			for (n = 0; n<40; n++)
+			for (n = 0; n<MAXITEMS; n++)
 			{
 				// Find an empty inventory slot
 				if (!ch[co].item[n])
@@ -910,7 +910,7 @@ int npc_give(int cn, int co, int in, int money)
 					break;
 				}
 			}
-			if (n==40)
+			if (n==MAXITEMS)
 			{
 				do_char_log(co, 0, "You get the feeling you should clear some space in your backpack first.\n");
 				god_take_from_char(in, cn);
@@ -1635,7 +1635,7 @@ int count_uniques(int cn)
 	{
 		cnt++;
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in = ch[cn].item[n]) && is_unique(in))
 		{
@@ -2527,16 +2527,16 @@ int npc_see(int cn, int co)
 				{
 					if (ch[cn].temp == CT_PRIEST)
 					{
-						for (m=0;m<40;m++)
+						for (m=0;m<MAXITEMS;m++)
 						{
 							if (IS_SINBINDER(ch[cn].item[n]))
 								break;
 						}
 					}
 					// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
-					if ((ch[cn].temp == CT_PRIEST) && (IS_PURPLE(co) || m<40))
+					if ((ch[cn].temp == CT_PRIEST) && (IS_PURPLE(co) || m<MAXITEMS))
 					{
-						if (m==40)
+						if (m==MAXITEMS)
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
 							do_sayx(cn, "Hello there, %s. If you happen to have a working Sinbinder Ring, I could... 'assist' you in putting it on.", ch[co].name);
@@ -2900,7 +2900,7 @@ int npc_try_spell(int cn, int co, int spell)
 	{
 		if ((in = ch[co].spell[n])!=0)
 		{
-			tpow = bu[in].power+10;
+			tpow = bu[in].power+15;
 			timm = spell_immunity(offn, get_target_immunity(cn, co));
 			timm = tdef ? (timm/2) : timm;
 			// Cancel if target is already buffed or debuffed (except for heal)
@@ -4574,16 +4574,17 @@ void spawn_pandium_rewards(int cn, int fl, int x, int y)
 	// Clear any existing chests
 	if ((in = map[x + y * MAPX].it)!=0) { it[in].used = 0; map[x + y * MAPX].it = 0; }
 	//
-	if 		(fl >= 99 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2921; // Obsidian Crown
+	if 		((fl >= 50 && fl%5==0) && (in = build_item(CR_ITEM, x, y))) { it[in].power=53; it[in].data[0] = 2921; } // Obsidian Crown
 	//
 	else if (fl >=  1 && ch[cn].pandium_floor[2] < 1 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 1; // .
-	else if (fl >=  5 && ch[cn].pandium_floor[2] < 2 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 2; //  .
-	else if (fl >= 10 && ch[cn].pandium_floor[2] < 3 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 3; // Permanent buff shrines
-	else if (fl >= 20 && ch[cn].pandium_floor[2] < 4 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 4; //  .
-	else if (fl >= 50 && ch[cn].pandium_floor[2] < 5 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 5; // .
+	else if (fl >= 10 && ch[cn].pandium_floor[2] < 2 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 2; //  .
+	else if (fl >= 20 && ch[cn].pandium_floor[2] < 3 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 3; // Permanent buff shrines
+	else if (fl >= 30 && ch[cn].pandium_floor[2] < 4 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 4; //  .
+	else if (fl >= 40 && ch[cn].pandium_floor[2] < 5 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 5; // .
 	//
-	else if (fl == 75 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2924; // Exp Scroll 750,000
-	else if (fl == 25 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2923; // Exp Scroll 250,000
+	else if (fl == 45 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2924; // Exp Scroll 750,000
+	else if (fl == 15 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2923; // Exp Scroll 250,000
+	else if (fl ==  0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 0;    // You get nothing. You lose. Good day, sir.
 	//
 	else if (fl%19==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_SPOT;                 // Spot
 	else if (fl%17==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2307;                    // Heavensplitter
@@ -4637,7 +4638,7 @@ void pandium_pattern(int fl)
 	mdx = PANDI_MIDX;
 	mdy = PANDI_MIDY;
 	
-	dmg = 450+10*fl;
+	dmg = 400+40*fl;
 	
 	// Do a funny pattern on a prime numbered depth
 	switch (fl)
@@ -4692,7 +4693,7 @@ void pandium_pattern(int fl)
 			| X                               X |
 			+ - - - - - - - - - - - - - - - - - +	score = 33
 		*/
-		case 11:
+		case  9:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4721,7 +4722,7 @@ void pandium_pattern(int fl)
 			|                                   |
 			+ - - - - - - - - - - - - - - - - - +	score = 57
 		*/
-		case 13:
+		case 11:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4752,7 +4753,7 @@ void pandium_pattern(int fl)
 			| X               X               X |
 			+ - - - - - - - - - - - - - - - - - +	score = 61
 		*/
-		case 17:
+		case 13:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4781,7 +4782,7 @@ void pandium_pattern(int fl)
 			|                                   |
 			+ - - - - - - - - - - - - - - - - - +	score = 81
 		*/
-		case 19:
+		case 15:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4810,7 +4811,7 @@ void pandium_pattern(int fl)
 			|               X X X               |
 			+ - - - - - - - - - - - - - - - - - +	score = 93
 		*/
-		case 23:
+		case 17:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4839,7 +4840,7 @@ void pandium_pattern(int fl)
 			|     X       X       X       X     |
 			+ - - - - - - - - - - - - - - - - - +	score = 120
 		*/
-		case 29:
+		case 19:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4868,7 +4869,7 @@ void pandium_pattern(int fl)
 			|                                   |
 			+ - - - - - - - - - - - - - - - - - +	score = 81
 		*/
-		case 31:
+		case 21:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4897,7 +4898,7 @@ void pandium_pattern(int fl)
 			| X X                           X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 93
 		*/
-		case 37:
+		case 23:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4928,7 +4929,7 @@ void pandium_pattern(int fl)
 			| X X X X X X X X X X X X X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 145
 		*/
-		case 41:
+		case 25:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4957,7 +4958,7 @@ void pandium_pattern(int fl)
 			| X   X   X   X   X   X   X   X   X |
 			+ - - - - - - - - - - - - - - - - - +	score = 81
 		*/
-		case 43:
+		case 27:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -4986,7 +4987,7 @@ void pandium_pattern(int fl)
 			|     X X X X X       X X X X X     |
 			+ - - - - - - - - - - - - - - - - - +	score = 124
 		*/
-		case 47:
+		case 29:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5020,7 +5021,7 @@ void pandium_pattern(int fl)
 			|                                   |
 			+ - - - - - - - - - - - - - - - - - +	score = 84
 		*/
-		case 53:
+		case 31:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5051,7 +5052,7 @@ void pandium_pattern(int fl)
 			| X X   X X   X X   X X   X X   X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 144
 		*/
-		case 59:
+		case 33:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5080,7 +5081,7 @@ void pandium_pattern(int fl)
 			| X X X       X X X X X       X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 153
 		*/
-		case 61:
+		case 35:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5113,7 +5114,7 @@ void pandium_pattern(int fl)
 			| X X X X X X X X X X X X X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 161
 		*/
-		case 67:
+		case 37:
 			rng = RANDOM(2);
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
@@ -5144,7 +5145,7 @@ void pandium_pattern(int fl)
 			|       X X X           X X X       |
 			+ - - - - - - - - - - - - - - - - - +	score = 136
 		*/
-		case 71:
+		case 39:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5176,7 +5177,7 @@ void pandium_pattern(int fl)
 			| X X           X X X           X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 165
 		*/
-		case 73:
+		case 41:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5210,7 +5211,7 @@ void pandium_pattern(int fl)
 			|     X X X X X       X X X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 186
 		*/
-		case 79:
+		case 43:
 			rng = RANDOM(2);
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
@@ -5245,7 +5246,7 @@ void pandium_pattern(int fl)
 			|                                   |
 			+ - - - - - - - - - - - - - - - - - +	score = 169
 		*/
-		case 83:
+		case 45:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5276,7 +5277,7 @@ void pandium_pattern(int fl)
 			| X X X X X   X X X X X   X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 225
 		*/
-		case 89:
+		case 47:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5305,7 +5306,7 @@ void pandium_pattern(int fl)
 			| X X X X X X X X X X X X X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 205
 		*/
-		case 97:
+		case 49:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5321,22 +5322,21 @@ void pandium_pattern(int fl)
 			// Variable setup for inner explosion box
 			off = 1;
 			if (fl>=10) off = 2; // 5x5
-			if (fl>=25) off = 3; // 7x7
-			if (fl>=50) off = 4; // 9x9
-			if (fl>=75) off = 1; // 3x3*
-			if (fl>=99) off = 2; // 5x5*
+			if (fl>=20) off = 3; // 7x7
+			if (fl>=30) off = 4; // 9x9
+			if (fl>=40) off = 1; // 3x3*
+			if (fl>=50) off = 2; // 5x5*
 			// Variable setup for x/y offset variance
 			m = 1;
-			if (fl>=16) m = 3;
-			if (fl==25) m = 1;
-			if (fl>=36) m = 5;
+			if (fl>=15) m = 3;
+			if (fl==20) m = 1;
+			if (fl>=25) m = 5;
+			if (fl==30) m = 1;
+			if (fl>=35) m = 3;
+			if (fl==40) m = 1;
+			if (fl>=45) m = 5;
 			if (fl==50) m = 1;
-			if (fl>=51) m = 3;
-			if (fl>=61) m = 5;
-			if (fl>=76) m = 1;
-			if (fl>=86) m = 3;
-			if (fl>=91) m = 5;
-			if (fl==99) m = 1;
+			if (fl>=55) m = 3;
 			n = RANDOM(m) - (m-1)/2;
 			m = RANDOM(m) - (m-1)/2;
 			// Create inner explosion box
@@ -5346,8 +5346,8 @@ void pandium_pattern(int fl)
 			}
 			// Variable setup for outer explosion box
 			off = 0;
-			if (fl>=75) off = 4; // 9x9
-			if (fl>=99) off = 3; // 7x7
+			if (fl>=40) off = 4; // 9x9
+			if (fl>=50) off = 3; // 7x7
 			// Create outer explosion box
 			if (off) for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
@@ -5361,7 +5361,7 @@ void pandium_pattern(int fl)
 void pandium_driver(int cn) // CT_PANDIUM
 {
 	int n, m, j, p=0, fl=999, x, y, frx, fry, tox, toy, in=0, co=0, dir=0, try=0;
-	int old_p, old_fl;
+	int old_p, old_fl, old_try;
 	//                   Players     Pandium     Shadow 1    Shadow 2    Shadow 3
 	int go_xy[5][3] = { {283,989,4},{283,995,3},{283,983,4},{277,989,1},{289,989,2} };
 	//					             Pandium     Shadow 1    Shadow 2    Shadow 3
@@ -5380,8 +5380,9 @@ void pandium_driver(int cn) // CT_PANDIUM
 		data[5] = targeted auto-blast timer
 	*/
 	
-	old_p  = ch[cn].data[0];
-	old_fl = ch[cn].data[1];
+	old_p   = ch[cn].data[0];
+	old_fl  = ch[cn].data[1];
+	old_try = ch[cn].data[32];
 	
 	// Check for players in the relevant arena
 	for (n = 1; n<MAXCHARS; n++) 
@@ -5412,6 +5413,10 @@ void pandium_driver(int cn) // CT_PANDIUM
 	if (old_fl  ==   0 || old_fl  == 999) 	ch[cn].data[1] = fl;
 	else if (fl !=   0 && fl != 999) 		fl = old_fl;
 	else 									ch[cn].data[1] = 0;
+	
+	if (old_try  ==  0) ch[cn].data[32] = try;
+	else if (try !=  0) try = old_try;
+	else 				ch[cn].data[32] = 0;
 	
 	// Pandium's endurance and mana never runs out
 	ch[cn].a_end  = 999999;
@@ -5483,6 +5488,10 @@ void pandium_driver(int cn) // CT_PANDIUM
 		ch[cn].data[3] = globs->ticker + TICKS / 2;
 		ch[cn].data[4] = 0;
 		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		ch[cn].data[9] = 0;
 		return; // No further process when nobody is in the area
 	}
 	
@@ -5490,12 +5499,11 @@ void pandium_driver(int cn) // CT_PANDIUM
 	{
 		// Assure Pandium is buffed (SK_OPPRESSION) based on floor #
 		// +0.5% damage reduction and +2 to all attributes each 1 power.
-		for (m=0;m<5;m++) ch[cn].attrib[m][1] = (fl+1)*3/2;
-		//ch[cn].weapon_bonus          = (fl+1)/5 +  1;
-		//ch[cn].armor_bonus           = (fl+1)/8 + 12;
+		ch[cn].weapon_bonus          = min(127, fl/5 +  1);
+		ch[cn].armor_bonus           = min(127, fl/5 + 12);
 		ch[cn].skill[SK_PERCEPT][1]  = 90;
 		ch[cn].skill[SK_SAFEGRD][1]  =  0;
-		ch[cn].skill[SK_IMMUN][1]    = (fl+1)/2;
+		ch[cn].skill[SK_IMMUN][1]    = min(125, fl/2);
 		ch[cn].hp[0]                 = 1000+1000*p;
 		ch[cn].a_hp                  = 9999999;
 		if (has_buff(cn, SK_OPPRESSION)) remove_buff(cn, SK_OPPRESSION);
@@ -5503,8 +5511,13 @@ void pandium_driver(int cn) // CT_PANDIUM
 		strcpy(bu[in].name, "Oppression");
 		strcpy(bu[in].reference, "oppression");
 		strcpy(bu[in].description, "Oppression.");
+		for (m=0;m<5;m++) 
+		{
+			ch[cn].attrib[m][1] = min(127, fl);
+			bu[in].attrib[m][1] = min(127, fl);
+		}
 		bu[in].power = fl;
-		bu[in].dmg_reduction[1] = min(120, fl+1);
+		bu[in].dmg_reduction[1] = min(127, fl);
 		bu[in].active = bu[in].duration = 1;
 		bu[in].flags  = IF_SPELL | IF_PERMSPELL;
 		bu[in].temp = SK_OPPRESSION;
@@ -5517,21 +5530,17 @@ void pandium_driver(int cn) // CT_PANDIUM
 		ch[cn].skill[SK_BLIND][0]    = 0;
 		ch[cn].skill[SK_LETHARGY][0] = 0;
 		ch[cn].skill[SK_LEAP][0]     = 0;
-		if (fl>= 9) { ch[cn].skill[SK_CURSE][0]    =  90; }
-		if (fl>=18) { ch[cn].skill[SK_WEAKEN][0]   =  90; }
-		if (fl>=27) { ch[cn].skill[SK_SLOW][0]     =  90; }
-		if (fl>=36) { ch[cn].skill[SK_BLIND][0]    =  90; }
-		if (fl>=45) { ch[cn].skill[SK_LETHARGY][0] =  90; }
-		if (fl>=54) { ch[cn].skill[SK_LEAP][0]     = 105; }
-		if (fl>=63) { ch[cn].skill[SK_CURSE][0]    = 120; }
-		if (fl>=72) { ch[cn].skill[SK_WEAKEN][0]   = 120; }
-		if (fl>=81) { ch[cn].skill[SK_SLOW][0]     = 120; }
-		if (fl>=90) { ch[cn].skill[SK_BLIND][0]    = 120; }
-		if (fl>=99) { ch[cn].skill[SK_LETHARGY][0] = 120; }
-		if (fl>=50)		{ temp[0]=2916; temp[1]=2917; temp[2]=2918; temp[3]=2919; temp[4]=2920; } // Obsidian
-		else if (fl>=25){ temp[0]=  94; temp[1]=  95; temp[2]=  96; temp[3]=  97; temp[4]=  98; } // Adamant
+		if (fl>= 4) { ch[cn].skill[SK_CURSE][0]    = min(150, 90+fl/3); }
+		if (fl>= 8) { ch[cn].skill[SK_WEAKEN][0]   = min(150, 90+fl/3); }
+		if (fl>=12) { ch[cn].skill[SK_CLEAVE][0]   = min(150, 90+fl/5); }
+		if (fl>=16) { ch[cn].skill[SK_SLOW][0]     = min(150, 90+fl/3); }
+		if (fl>=20) { ch[cn].skill[SK_BLIND][0]    = min(150, 90+fl/5); }
+		if (fl>=24) { ch[cn].skill[SK_LETHARGY][0] = min(150, 90+fl/4); }
+		if (fl>=28) { ch[cn].skill[SK_LEAP][0]     = min(150, 90+fl/4); }
+		if (fl>=32)		{ temp[0]=2916; temp[1]=2917; temp[2]=2918; temp[3]=2919; temp[4]=2920; } // Obsidian
+		else if (fl>=16){ temp[0]=  94; temp[1]=  95; temp[2]=  96; temp[3]=  97; temp[4]=  98; } // Adamant
 		else 			{ temp[0]=  76; temp[1]=  77; temp[2]=  78; temp[3]=  79; temp[4]=  80; } // Titanium
-		if (fl>=99) { temp[0]=2921; } // Crown
+		if (fl>=50) { temp[0]=2921; } // Crown
 		in = ch[cn].worn[WN_HEAD]  = pop_create_item(temp[0], cn); it[in].carried = cn;
 		in = ch[cn].worn[WN_CLOAK] = pop_create_item(temp[1], cn); it[in].carried = cn;
 		in = ch[cn].worn[WN_BODY]  = pop_create_item(temp[2], cn); it[in].carried = cn;
@@ -5539,8 +5548,8 @@ void pandium_driver(int cn) // CT_PANDIUM
 		in = ch[cn].worn[WN_FEET]  = pop_create_item(temp[4], cn); it[in].carried = cn;
 		do_update_char(cn);
 		// Assure players in the area are debuffed (SK_OPPRESSED) based on floor #
-		// -2 to all skills and attributes, and -1 to all caps per 1 power (1 pow per 10 floors, starting floor 9).
-		if ((fl+1)/10>0) for (n = 1; n<MAXCHARS; n++) 
+		// -2 to all skills and attributes, and -1 to all caps per 1 power (1 pow per 5 floors, starting floor 5).
+		if (fl/5>0) for (n = 1; n<MAXCHARS; n++) 
 		{
 			if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
 			if (IS_PLAYER(n) && is_atpandium(n))
@@ -5551,9 +5560,9 @@ void pandium_driver(int cn) // CT_PANDIUM
 				strcpy(bu[in].name, "Oppressed");
 				strcpy(bu[in].reference, "oppressed");
 				strcpy(bu[in].description, "oppressed.");
-				bu[in].power = (fl+1)/10;
-				for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(60,(fl+1)/10)*2);
-				for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(60,(fl+1)/10)*2);
+				bu[in].power = fl/5;
+				for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl/5)*2);
+				for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl/5)*2);
 				bu[in].active = bu[in].duration = 1;
 				bu[in].flags  = IF_SPELL | IF_PERMSPELL;
 				bu[in].temp = SK_OPPRESSED;
@@ -5590,22 +5599,22 @@ void pandium_driver(int cn) // CT_PANDIUM
 			if (map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
 			{
 				do_area_sound(0, 0, x, y, 22);
-				it[in].data[0] = 200+10*fl;
+				it[in].data[0] = 200+20*fl;
 				do_add_light(x, y, it[in].light[1]);
 				break;
 			}
 		}
-		ch[cn].data[4] = globs->ticker + max(1, 1+TICKS - (TICKS*fl/100));
+		ch[cn].data[4] = globs->ticker + max(1, 1+TICKS - (TICKS*fl/50));
 	}
 	
-	// targeted auto-blast timer loop - Starts on depth 20
+	// targeted auto-blast timer loop - Starts on depth 15
 	if (ch[cn].data[5] && globs->ticker >= ch[cn].data[5])
 	{
 		for (n=0;n<PANDI_LIMIT;n++)
 		{
 			if (ch_base_status(ch[ch_in[n]].status) >= 8) continue;
-			try = 0; if (fl>=50) try = 1; // 3x3
-			m   = 1; if (fl>=80) m   = 3; // offset
+			try = 0; if (fl>=25) try = 1; // 3x3
+			m   = 1; if (fl>=40) m   = 3; // offset
 			j = RANDOM(m) - (m-1)/2;
 			m = RANDOM(m) - (m-1)/2;
 			for (x = ch[ch_in[n]].x+j-try; x<ch[ch_in[n]].x+j+1+try; x++) for (y = ch[ch_in[n]].y+m-try; y<ch[ch_in[n]].y+m+1+try; y++)
@@ -5613,12 +5622,12 @@ void pandium_driver(int cn) // CT_PANDIUM
 				if (map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y))) 
 				{	
 					if (x==ch[ch_in[n]].x && y==ch[ch_in[n]].y) do_area_sound(0, 0, ch[ch_in[n]].x, ch[ch_in[n]].y, 22);
-					it[in].data[0] = 200+20*fl;
+					it[in].data[0] = 200+40*fl;
 					do_add_light(x, y, it[in].light[1]);
 				}
 			}
 		}
-		ch[cn].data[5] = globs->ticker + max(TICKS*2, TICKS * 5 - (TICKS*3*fl/100));
+		ch[cn].data[5] = globs->ticker + max(TICKS, TICKS * 5 - (TICKS*3*fl/50));
 	}
 	
 	// Return if time is less than next action
@@ -5628,21 +5637,25 @@ void pandium_driver(int cn) // CT_PANDIUM
 	switch (ch[cn].data[2])
 	{
 		case 1: 
-			if (fl>=99) 		tell_incolosseum(9, "Time and again you've stood before me. A king among mortal men.");
-			else if (fl>=51) 	tell_incolosseum(9, "You bore me waiting once again.");
-			else if (fl==50) 	tell_incolosseum(9, "Aemon, my brother... Will you one day find him? Face him? Fight him too?");
-			else if (fl>=20) 	tell_incolosseum(9, "You return once more. And clash we shall.");
+			if (fl>=52) 		tell_incolosseum(9, "Fight.");
+			else if (fl==51) 	tell_incolosseum(9, "I lied.");
+			else if (fl==50) 	tell_incolosseum(9, "Time and again you've stood before me. A king among mortal men.");
+			else if (fl>=34) 	tell_incolosseum(9, "You bore me waiting once again.");
+			else if (fl==33) 	tell_incolosseum(9, "Aemon, my brother... Will you one day find him? Face him? Fight him too?");
+			else if (fl>=10) 	tell_incolosseum(9, "You return once more. And clash we shall.");
 			else if (fl>= 5) 	tell_incolosseum(9, "Together, we grow strong. We pillar above men.");
 			else if (fl>= 2) 	tell_incolosseum(9, "Welcome back. Here to test your limits again?");
 			else  				tell_incolosseum(9, "Fwahaha, a new face in my domain. Welcome, challenger!");
 			ch[cn].data[2]++; 
-			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 3 - (TICKS*3*fl/100));
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 3 - (TICKS*3*fl/50));
 			break;
 		case 2: 
-			if (fl>=99) 		tell_incolosseum(9, "This shall be my greatest test of you. Come! Claim your crown.");
-			else if (fl>=51) 	tell_incolosseum(9, "Let us dance together, ever more.");
-			else if (fl==50) 	tell_incolosseum(9, "You've stood my tests alone. But some day, together, we will clash for the final time. And on that day, Skua shall weep.");
-			else if (fl>=20) 	tell_incolosseum(9, "Know this... Only one of us may stand.");
+			if (fl>=52) 		;
+			else if (fl==51) 	tell_incolosseum(9, "May we clash and drive eachother's strength, forevermore.");
+			else if (fl==50) 	tell_incolosseum(9, "This shall be my greatest test of you. Come! Claim your crown.");
+			else if (fl>=34) 	tell_incolosseum(9, "Let us dance together, ever more.");
+			else if (fl==33) 	tell_incolosseum(9, "You've stood my tests alone. But some day, together, we will clash for the final time. And on that day, Skua shall weep.");
+			else if (fl>=10) 	tell_incolosseum(9, "Know this... Only one of us may stand.");
 			else if (fl>= 5) 	tell_incolosseum(9, "Shall we climb even higher? Come.");
 			else if (fl>= 2) 	tell_incolosseum(9, "Come, then. Let us shake the mountain.");
 			else  				tell_incolosseum(9, "Break yourself upon me so we may grow strong!");
@@ -5654,7 +5667,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 		// 75% HP Breakpoint
 		case 3: 
 			if (ch[cn].a_hp>ch[cn].hp[5]*750) return; // Wait until 75%
-			if (fl>=30)
+			if (fl>=20)
 			{
 				m = RANDOM(4)+1;
 				to_xy[0][0] = go_xy[m][0];
@@ -5702,19 +5715,21 @@ void pandium_driver(int cn) // CT_PANDIUM
 			ch[cn].data[3] = globs->ticker + TICKS / 2;
 			break;
 		case 4: 
-			if (fl>=20) tell_incolosseum(9, "I shall tear down the stars and throw them at you.");
-			else  		tell_incolosseum(9, "May the heavens weep, and the sky smolder and fall around us!");
+			if (fl>=40) 		tell_incolosseum(9, "Fire everlasting.");
+			else if (fl>=15) 	tell_incolosseum(9, "I shall tear down the stars and throw them at you.");
+			else  				tell_incolosseum(9, "May the heavens weep, and the sky smolder and fall around us!");
 			ch[cn].skill[SK_SAFEGRD][1] = 30;
 			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 			do_area_sound(0, 0, go_xy[0][0], go_xy[0][1]+1, 21);
 			ch[cn].data[4] = globs->ticker + TICKS * 2;
-			if (fl>=20) ch[cn].data[5] = globs->ticker + TICKS * 2-1;
+			if (fl>=15) ch[cn].data[5] = globs->ticker + TICKS * 2-1;
 			ch[cn].data[2]++;
-			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 3 - (TICKS*3*fl/100));
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 3 - (TICKS*3*fl/50));
 			break;
 		case 5: 
-			if (fl>=20) tell_incolosseum(9, "Choke and burn!");
-			else  		tell_incolosseum(9, "Smolder and dance!");
+			if (fl>=40) 		;
+			else if (fl>=15) 	tell_incolosseum(9, "Choke and burn!");
+			else  				tell_incolosseum(9, "Smolder and dance!");
 			for (n=0;n<PANDI_LIMIT;n++) npc_add_enemy(cn, ch_in[n], 1);
 			ch[cn].data[2]++;
 			ch[cn].data[3] = globs->ticker + TICKS / 2;
@@ -5722,7 +5737,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 		// 50% HP Breakpoint
 		case 6: 
 			if (ch[cn].a_hp>ch[cn].hp[5]*500) return; // Wait until 50%
-			if (fl>=30)
+			if (fl>=20)
 			{
 				m = RANDOM(4)+1;
 				for (n=0;n<4;n++)
@@ -5783,7 +5798,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			break;
 		case 8:
 			// Chug potion at half-way point
-			if (fl>=99) n = IT_GPOT;
+			if (fl>=50) n = IT_GPOT;
 			else		n = IT_RPOT;
 			in = god_create_item(n);
 			god_give_char(in, cn);
@@ -5792,9 +5807,9 @@ void pandium_driver(int cn) // CT_PANDIUM
 			try = 0;
 			if (fl>= 5) { ch[cn].skill[SK_POISON][0] =  90; ch[cn].skill[SK_HASTE][0] =  60; try=1; }
 			if (fl>=10) { ch[cn].skill[SK_POISON][0] =  96; ch[cn].skill[SK_HASTE][0] =  75; try=2; }
-			if (fl>=20) { ch[cn].skill[SK_POISON][0] = 105; ch[cn].skill[SK_HASTE][0] =  90; try=3; }
-			if (fl>=50) { ch[cn].skill[SK_POISON][0] = 112; ch[cn].skill[SK_HASTE][0] = 105; try=3; }
-			if (fl>=75) { ch[cn].skill[SK_POISON][0] = 120; ch[cn].skill[SK_HASTE][0] = 120; try=3; }
+			if (fl>=15) { ch[cn].skill[SK_POISON][0] = 105; ch[cn].skill[SK_HASTE][0] =  90; try=3; }
+			if (fl>=20) { ch[cn].skill[SK_POISON][0] = 112; ch[cn].skill[SK_HASTE][0] = 105; try=3; }
+			if (fl>=30) { ch[cn].skill[SK_POISON][0] = 120; ch[cn].skill[SK_HASTE][0] = 120; try=3; }
 			do_update_char(cn);
 			// Spawn shadows
 			for (n=0;n<try;n++)
@@ -5808,11 +5823,11 @@ void pandium_driver(int cn) // CT_PANDIUM
 				{
 					ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 20;
 					ch[co].flags |= CF_SHADOWCOPY | CF_NOSLEEP;
-					ch[co].hp[0] = 499 + (fl+1)*5;
+					ch[co].hp[0] = 500 + fl*10;
 					ch[co].a_hp  = 9999999;
 					ch[co].skill[SK_PERCEPT][1]  = 90;
-					ch[co].skill[SK_SAFEGRD][1]  = (fl+1)/2;
-					ch[co].skill[SK_IMMUN][1]    = (fl+1)/2;
+					ch[co].skill[SK_SAFEGRD][1]  = min(127, fl);
+					ch[co].skill[SK_IMMUN][1]    = min(127, fl/2);
 				}
 				else 
 				{ 
@@ -5831,7 +5846,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				ch[cn].data[7+n] = co;
 			}
 			ch[cn].data[2]++;
-			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 2 - (TICKS*2*fl/100));
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 2 - (TICKS*2*fl/50));
 			break;
 		case 9:
 			if (fl>= 5) tell_incolosseum(9, "Prepare thyself!");
@@ -5852,7 +5867,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 		// 25% HP Breakpoint
 		case 10:
 			if (ch[cn].a_hp>ch[cn].hp[5]*250) return; // Wait until 25%
-			if (fl>=30)
+			if (fl>=20)
 			{
 				m = RANDOM(4)+1;
 				to_xy[0][0] = go_xy[m][0];
@@ -5915,7 +5930,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			pandium_pattern(fl);
 			do_area_sound(0, 0, go_xy[0][0], go_xy[0][1], 14);
 			ch[cn].data[2]++;
-			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 2 - (TICKS*2*fl/100));
+			ch[cn].data[3] = globs->ticker + max(TICKS, TICKS * 2 - (TICKS*2*fl/50));
 			break;
 		case 13:
 			if (fl== 5) tell_incolosseum(9, "Let's end this.");
@@ -7447,7 +7462,7 @@ int npc_loot_grave(int cn, int in)
 			}
 		}
 	}
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in = ch[co].item[n]))
 		{

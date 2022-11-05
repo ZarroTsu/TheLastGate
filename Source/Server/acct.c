@@ -957,7 +957,7 @@ void view_character_template(LIST *head)
 				weartext[m], m, ch_temp[cn].worn[m], ch_temp[cn].worn[m] ? it_temp[ch_temp[cn].worn[m]].name : "none");
 	}
 	
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (ch_temp[cn].item[n]<0 || ch_temp[cn].item[n]>=MAXTITEM)
 		{
@@ -1243,7 +1243,7 @@ void view_character_player(LIST *head)
 				weartext[m], m, ch[cn].worn[m], ch[cn].worn[m] ? it[ch[cn].worn[m]].name : "none");
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if (ch[cn].item[n]<0 || ch[cn].item[n]>=MAXITEM)
 		{
@@ -2715,7 +2715,7 @@ void update_character_player(LIST *head)
 		}
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		sprintf(buf, "item%d", n);
 		tmp = find_val(head, buf);
@@ -3244,7 +3244,7 @@ void update_character_template(LIST *head)
 		}
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		sprintf(buf, "item%d", n);
 		tmp = find_val(head, buf);

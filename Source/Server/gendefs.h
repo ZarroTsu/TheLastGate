@@ -22,6 +22,7 @@
 #define MAXEFFECT			4096
 #define MAXMISSION			1024
 #define MAXSKILL			  50
+#define MAXITEMS			  40
 #define MAXBUFFS			  40
 #define MAXWPS				  27
 

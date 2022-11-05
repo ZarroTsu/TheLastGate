@@ -803,7 +803,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			{
 				tmp = spell_blast(cn, co, power, 0, 1);
 				
-				avgdmg += tmp;
+				avgdmg += max(0, tmp-1);
 				hit++;
 				
 				check_gloves(cn, co, co_orig, dr1, dr2);
@@ -865,7 +865,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			do_char_log(cn, 1, 
 				"You hit %d of %d creatures in range.\n", hit, count);
 			do_char_log(cn, 1, 
-				"You delt an average of %d damage.\n", avgdmg/max(1,hit));
+				"You dealt an average of %d damage.\n", max(0, (avgdmg-1)/max(1,hit)) );
 		}
 	}
 	else
@@ -1362,7 +1362,7 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 		}
 		if (usemana)
 		{
-			if (IS_PLAYER(cn) && !IS_PLAYER(co) && !(ch[cn].flags & CF_OVERRIDE))
+			if (IS_PLAYER(cn) && !IS_PLAYER(co) && skill!=SK_IDENT && !(ch[cn].flags & CF_OVERRIDE))
 			{
 				ch[cn].spellfail = 2;
 				ch[co].spellfail = 1;
@@ -1381,7 +1381,7 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 		}
 		return -1;
 	}
-	if (IS_PLAYER(co) && usemana && defense >= power)
+	if (IS_PLAYER(co) && skill!=SK_IDENT && usemana && defense >= power)
 	{
 		ch[cn].spellfail = 2;
 		ch[co].spellfail = 1;
@@ -2387,9 +2387,9 @@ int spell_haste(int cn, int co, int power, int fromscroll)
 	if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 1))) 
 		return 0;
 	
-	bu[in].speed[1]         = min(300, 5 + (power  )/8);
-	bu[in].atk_speed[1] 	= min(127, 5 + (power+4)/8);
-	bu[in].cast_speed[1] 	= min(127, 5 + (power+4)/8);
+	bu[in].speed[1]         = min(300, 10 + (power  )/ 6);
+	bu[in].atk_speed[1] 	= min(127,  5 + (power+6)/12);
+	bu[in].cast_speed[1] 	= min(127,  5 + (power+6)/12);
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_HASTE
 }
@@ -2505,7 +2505,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	if (ch[co].spellfail==1) 
 	{
 		chlog(co, "Suppressed the spell");
-		power = power/2;
+		power = (power - (power * (M_AT(co, AT_WIL) - M_AT(cn, AT_WIL)) / 600))/2;
 	}
 	
 	if (get_enchantment(cn, 20)) power = power*6/5;
@@ -2519,7 +2519,7 @@ int spell_curse(int cn, int co, int power, int flag)
 		if (get_enchantment(co, 21)) power = power/5;
 		for (n = 0; n<5; n++) 
 		{
-			bu[in].attrib[n][1] = -(4 + CURSE2FORM(power, (4 - n)));
+			bu[in].attrib[n][1] = -(5 + CURSE2FORM(power, (4 - n)));
 		}
 	}
 	else
@@ -2625,7 +2625,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	if (ch[co].spellfail==1) 
 	{
 		chlog(co, "Suppressed the spell");
-		power = power/2;
+		power = (power - (power * (M_AT(co, AT_WIL) - M_AT(cn, AT_WIL)) / 600))/2;
 	}
 	
 	if (get_enchantment(cn, 13)) power = power*6/5;
@@ -2637,7 +2637,7 @@ int spell_slow(int cn, int co, int power, int flag)
 			return 0;
 		
 		if (get_enchantment(co, 14)) power = power/5;
-		bu[in].speed[1] = -(min(300, 15 + SLOW2FORM(power)));
+		bu[in].speed[1] = -(min(300, 30 + SLOW2FORM(power)));
 	}
 	else
 	{
@@ -2645,7 +2645,9 @@ int spell_slow(int cn, int co, int power, int flag)
 			return 0;
 		
 		if (get_enchantment(co, 14)) power = power/5;
-		bu[in].speed[1] = -(min(300, 10 + SLOWFORM(power)));
+		bu[in].speed[1] 		= -(min(300, 20 + SLOWFORM(power)*2/3));
+		bu[in].atk_speed[1] 	= -(min(127, 10 + SLOWFORM(power)/3));
+		bu[in].cast_speed[1] 	= -(min(127, 10 + SLOWFORM(power)/3));
 	}
 	bu[in].data[5] = 1;
 	
@@ -2738,7 +2740,7 @@ int spell_frostburn(int cn, int co, int power)
 // Feb 2020 - Poison
 int spell_poison(int cn, int co, int power, int flag)
 {
-	int in, dur, ppow;
+	int in, dur, ppow, venommod;
 	
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
@@ -2752,7 +2754,7 @@ int spell_poison(int cn, int co, int power, int flag)
 	if (ch[co].spellfail==1) 
 	{
 		chlog(co, "Suppressed the spell");
-		power = power/2;
+		power = (power - (power * (M_AT(co, AT_WIL) - M_AT(cn, AT_WIL)) / 600))/2;
 	}
 	
 	if (get_enchantment(cn, 27)) power = power*6/5;
@@ -2768,10 +2770,12 @@ int spell_poison(int cn, int co, int power, int flag)
 	if (IS_PLAYER(cn))
 	{
 		ppow = PL_POISFORM(power, dur);
+		venommod = 3;
 	}
 	else
 	{
 		ppow = MN_POISFORM(power, dur);
+		venommod = 2;
 	}
 	
 	// Tarot - Tower.R : Poison becomes Venom
@@ -2782,8 +2786,8 @@ int spell_poison(int cn, int co, int power, int flag)
 		
 		bu[in].data[1] = ppow/2;			// Set the decay rate
 		bu[in].data[2] = ppow/2*3;			// Set the decay maximum
-		bu[in].data[6] = (power/12 + 3);	// Set immunity reduction
-		bu[in].data[7] = (power/12 + 3)*3;	// Set immunity maximum
+		bu[in].data[6] = (power/12 + 3)*venommod/3;   // Set immunity reduction
+		bu[in].data[7] = (power/12 + 3)*venommod/3*3; // Set immunity maximum
 		bu[in].skill[SK_IMMUN][1] = -(bu[in].data[6]);
 	}
 	else
@@ -3261,8 +3265,11 @@ void item_info(int cn, int in, int look)
 void char_info(int cn, int co)
 {
 	int n, in, flag = 0, n1 = -1, n2 = -1;
-
-	do_char_log(cn, 1, "%s:\n", ch[co].name);
+	
+	if (IS_PLAYER_COMP(co))
+		do_char_log(cn, 1, "%s (power of %d (%d) +%d):\n", ch[co].name, ch[co].data[6], ch[co].data[7], ch[co].data[8]);
+	else
+		do_char_log(cn, 1, "%s:\n", ch[co].name);
 	do_char_log(cn, 1, " \n");
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -3707,7 +3714,7 @@ void skill_repair(int cn)
 				c++;
 			}
 		}
-		for (n=0;n<40;n++)
+		for (n=0;n<MAXITEMS;n++)
 		{
 			if ((in = ch[cn].item[n])==0) continue;
 			if (it[in].flags & IF_NOREPAIR) continue;
@@ -3893,7 +3900,7 @@ void skill_dispel(int cn)
 				return;
 			}
 		}
-		if (!player_or_ghost(cn, co))
+		else if (!player_or_ghost(cn, co))
 		{
 			do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", ch[co].name, ch[cn].name);
 			co = cn;
@@ -4122,7 +4129,9 @@ void skill_ghost(int cn)
 			}
 			else
 			{
-				do_char_log(cn, 0, "You may not have more than one Ghost Companion.\n");
+				do_char_log(cn, 5, "You recalled your Ghost Companion.\n");
+				quick_teleport(co, ch[cn].x, ch[cn].y);
+				add_exhaust(cn, TICKS*2);
 			}
 			return;
 		}
@@ -4216,18 +4225,21 @@ void skill_ghost(int cn)
 	
 	// base is the power of the summon
 	base = spell_multiplier(M_SK(cn, SK_GHOST), cn);
+	ch[cc].data[6] = base;
 	base = base * 5 / 11;
+	ch[cc].data[7] = base;
+	ch[cc].data[8] = archbonus;
 
 	ch[cc].data[29] = 0;                 // reset experience earned
 	ch[cc].data[CHD_GROUP] = 65536 + cn; // set group
-	ch[cc].kindred &= ~(KIN_MONSTER);    // Add 'monster' flag
+	ch[cc].kindred &= ~(KIN_MONSTER);    // Remove 'Monster' flag
 	
 	strcpy(ch[cc].text[0], "#14#Yes! %s buys the farm!");
 	strcpy(ch[cc].text[1], "#13#Yahoo! An enemy! Prepare to die, %s!");
 	strcpy(ch[cc].text[3], "My successor will avenge me, %s!");
 	
 	if (invidia)
-		ch[cc].kindred &= ~(KIN_ARCHTEMPLAR);
+		ch[cc].kindred |= KIN_ARCHTEMPLAR;
 	
 	if (co)
 	{
@@ -4253,7 +4265,7 @@ void skill_ghost(int cn)
 		ch[cc].data[MCD_TALKATIVE] = 0;
 		ch[cc].flags |= CF_SILENCE;
 	}
-
+	
 	ch[cc].data[48] = 33;
 	ch[cc].data[1] = ch[cn].gcm;	// set GC mode
 	
@@ -4272,7 +4284,7 @@ void skill_ghost(int cn)
 		tmp = tmp * 5 / max(1, ch[cc].skill[n][3]);
 		if (ch[cc].skill[n][2])
 		{
-			B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/9, tmp);
+			B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/10, tmp);
 			archtmp++;
 		}
 	}
@@ -4301,31 +4313,31 @@ void skill_ghost(int cn)
 
 	// calculate experience
 	for (z = 0; z<5; z++) for (m = 10; m<B_AT(cc, z); m++)
-		pts += attrib_needed(m, ch[cc].attrib[z][3]-2);
+		pts += attrib_needed(m, 4);
 	
 	for (m = 50; m<ch[cc].hp[0]; m++)
-		pts += hp_needed(m, ch[cc].hp[3]-1);
+		pts += hp_needed(m, 4);
 
 	for (m = 50; m<ch[cc].mana[0]; m++)
-		pts += mana_needed(m, ch[cc].mana[3]-1);
+		pts += mana_needed(m, 4);
 
 	for (z = 0; z<MAXSKILL; z++) for (m = 1; m<B_SK(cc, z); m++)
-		pts += skill_needed(m, ch[cc].skill[z][3]-1);
+		pts += skill_needed(m, 3);
 	//
 	
 	if (dreadplate)
 	{
 		ch[cc].weapon_bonus = max( 8, 
-			                  min(48+(archbonus)/30, base*5/9+8));
-		ch[cc].armor_bonus  = max( 8, 
-			                  min(48+(archbonus-15)/30, base*5/9+8));
+			                  min(54+(archbonus)/20, base*5/7+8));
+		ch[cc].armor_bonus  = max(12, 
+			                  min(60+(archbonus+10)/20, base*5/6+6));
 	}
 	else
 	{
 		ch[cc].weapon_bonus = max(12, 
-			                  min(72+(archbonus)/30, base*5/7+12));
-		ch[cc].armor_bonus  = max(10, 
-			                  min(64+(archbonus-15)/30, base*5/6+10));
+			                  min(80+(archbonus)/20, base*5/6+6));
+		ch[cc].armor_bonus  = max(8, 
+			                  min(72+(archbonus+10)/20, base*5/7+8));
 	}
 	if (hermit)
 	{
@@ -4421,7 +4433,10 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 	
 	// basedur is how long the copy lasts; base is the power of the summon
 	basedur = base = spell_multiplier(M_SK(cn, SK_SHADOW), cn);
+	ch[cc].data[6] = base;
 	base = base * 5 / 11;
+	ch[cc].data[7] = base;
+	ch[cc].data[8] = archbonus;
 	
 	ch[cc].data[29] = 0;				// reset experience earned
 	ch[cc].data[CHD_GROUP] = 65536 + cn;// set group
@@ -4474,7 +4489,8 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 	//{
 	
 	// 1. Determine scores we want based off target sprite
-	ch[cc].skill[SK_MEDIT][2] = 60; ch[cc].skill[SK_MEDIT][3] = 7;
+	ch[cc].skill[SK_MEDIT][2] = 90;   ch[cc].skill[SK_MEDIT][3]   = 6;
+	ch[cc].skill[SK_SAFEGRD][2] = 75; ch[cc].skill[SK_SAFEGRD][3] = 7;
 	ch[cc].mana[2] = ch[cc].hp[2];
 	switch (sprite)
 	{
@@ -4484,8 +4500,8 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		case 23504: 
 		case 24528: 
 		case 26048: 
-			ch[cc].skill[SK_CLEAVE][2] = 105; ch[cc].skill[SK_CLEAVE][3] = 3;
-			ch[cc].skill[SK_WEAKEN][2] =  90; ch[cc].skill[SK_WEAKEN][3] = 4;
+			ch[cc].skill[SK_CLEAVE][2] = 120; ch[cc].skill[SK_CLEAVE][3] = 4;
+			ch[cc].skill[SK_WEAKEN][2] = 105; ch[cc].skill[SK_WEAKEN][3] = 5;
 			ch[cc].skill[SK_MEDIT][2]  =   0; ch[cc].skill[SK_MEDIT][3]  = 0;
 			ch[cc].mana[2] = 0;
 			break;
@@ -4496,8 +4512,8 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		case 26576: 
 		case 27600: 
 		case 28624: 
-			ch[cc].skill[SK_POISON][2] = 105; ch[cc].skill[SK_POISON][3] = 3;
-			ch[cc].skill[SK_CURSE][2]  =  90; ch[cc].skill[SK_CURSE][3]  = 4;
+			ch[cc].skill[SK_POISON][2] = 120; ch[cc].skill[SK_POISON][3] = 4;
+			ch[cc].skill[SK_CURSE][2]  = 105; ch[cc].skill[SK_CURSE][3]  = 5;
 			break;
 		
 		case  4048: // Harakim Group (Default Summoner)
@@ -4506,8 +4522,8 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		case 25048: 
 		case 29648: 
 		case 30672: 
-			ch[cc].skill[SK_BLAST][2]  = 105; ch[cc].skill[SK_BLAST][3]  = 3;
-			ch[cc].skill[SK_SLOW][2]   =  90; ch[cc].skill[SK_SLOW][3]   = 4;
+			ch[cc].skill[SK_BLAST][2]  = 120; ch[cc].skill[SK_BLAST][3]  = 4;
+			ch[cc].skill[SK_SLOW][2]   = 105; ch[cc].skill[SK_SLOW][3]   = 5;
 			break;
 		
 		case  3024: // Seyan'du Group (Default Seyan'du)
@@ -4516,41 +4532,41 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		case 28112: 
 		case 17360: 
 		case 15312: 
-			ch[cc].skill[SK_CLEAVE][2] = 105; ch[cc].skill[SK_CLEAVE][3] = 3;
-			ch[cc].skill[SK_CURSE][2]  =  90; ch[cc].skill[SK_CURSE][3]  = 4;
+			ch[cc].skill[SK_CLEAVE][2] = 120; ch[cc].skill[SK_CLEAVE][3] = 4;
+			ch[cc].skill[SK_CURSE][2]  = 105; ch[cc].skill[SK_CURSE][3]  = 5;
 			break;
 		
 		case  9168: // Dead Group (& Necronomicon)
 		case 10192: //  Blast & Weaken
 		case 19408: 
-			ch[cc].skill[SK_BLAST][2]  = 105; ch[cc].skill[SK_BLAST][3]  = 3;
-			ch[cc].skill[SK_WEAKEN][2] =  90; ch[cc].skill[SK_WEAKEN][3] = 4;
+			ch[cc].skill[SK_BLAST][2]  = 120; ch[cc].skill[SK_BLAST][3]  = 4;
+			ch[cc].skill[SK_WEAKEN][2] = 105; ch[cc].skill[SK_WEAKEN][3] = 5;
 			break;
 		
 		case 14288: // Vermin Group
 		case 31696: //  Poison & Weaken
 		case 20432: 
-			ch[cc].skill[SK_POISON][2] = 105; ch[cc].skill[SK_POISON][3] = 3;
-			ch[cc].skill[SK_WEAKEN][2] =  90; ch[cc].skill[SK_WEAKEN][3] = 4;
+			ch[cc].skill[SK_POISON][2] = 120; ch[cc].skill[SK_POISON][3] = 4;
+			ch[cc].skill[SK_WEAKEN][2] = 105; ch[cc].skill[SK_WEAKEN][3] = 5;
 			break;
 		
 		case 13264: // Lizard Group
 					//  Poison & Slow
-			ch[cc].skill[SK_POISON][2] = 105; ch[cc].skill[SK_POISON][3] = 3;
-			ch[cc].skill[SK_SLOW][2]   =  90; ch[cc].skill[SK_SLOW][3]   = 4;
+			ch[cc].skill[SK_POISON][2] = 120; ch[cc].skill[SK_POISON][3] = 4;
+			ch[cc].skill[SK_SLOW][2]   = 105; ch[cc].skill[SK_SLOW][3]   = 5;
 			break;
 		
 		case 12240: // Gargoyle Group
 		case 18384: //  Cleave & Slow
 		case 21456: 
-			ch[cc].skill[SK_CLEAVE][2] = 105; ch[cc].skill[SK_CLEAVE][3] = 3;
-			ch[cc].skill[SK_SLOW][2]   =  90; ch[cc].skill[SK_SLOW][3]   = 4;
+			ch[cc].skill[SK_CLEAVE][2] = 120; ch[cc].skill[SK_CLEAVE][3] = 4;
+			ch[cc].skill[SK_SLOW][2]   = 105; ch[cc].skill[SK_SLOW][3]   = 5;
 			break;
 		
 		case 22480: // Misc. Group (Flame)
 		default:	//  Blast & Slow
-			ch[cc].skill[SK_BLAST][2]  = 105; ch[cc].skill[SK_BLAST][3]  = 3;
-			ch[cc].skill[SK_SLOW][2]   =  90; ch[cc].skill[SK_SLOW][3]   = 4;
+			ch[cc].skill[SK_BLAST][2]  = 120; ch[cc].skill[SK_BLAST][3]  = 4;
+			ch[cc].skill[SK_SLOW][2]   = 105; ch[cc].skill[SK_SLOW][3]   = 5;
 			break;
 	}
 	
@@ -4568,7 +4584,7 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		tmp = tmp * 5 / max(1, ch[cc].skill[n][3]);
 		if (ch[cc].skill[n][2])
 		{
-			B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/9, tmp);
+			B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/10, tmp);
 			archtmp++;
 		}
 	}
@@ -4578,31 +4594,28 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		ch[cc].data[1] = 3; // BERSERK!!
 	}
 
-	ch[cc].hp[0]   	   = max( 50, min(ch[cc].hp[2],   base * 5));
-	ch[cc].end[0]  	   = max(100, min(ch[cc].end[2],  base * 3));
-	if (ch[cc].mana[2])
-		ch[cc].mana[0] = max( 50, min(ch[cc].mana[2], base * 4));
-	else
-		ch[cc].mana[0] = 0;
+	ch[cc].hp[0]   = max( 50, min(ch[cc].hp[2],   base * 5));
+	ch[cc].end[0]  = max(100, min(ch[cc].end[2],  base * 3));
+	ch[cc].mana[0] = max( 50, min(ch[cc].mana[2], base * 4));
 
 	// calculate experience
 	for (z = 0; z<5; z++) for (m = 10; m<B_AT(cc, z); m++)
-		pts += attrib_needed(m, ch[cc].attrib[z][3]-2);
+		pts += attrib_needed(m, 4);
 	
 	for (m = 50; m<ch[cc].hp[0]; m++)
-		pts += hp_needed(m, ch[cc].hp[3]-1);
+		pts += hp_needed(m, 4);
 
 	for (m = 50; m<ch[cc].mana[0]; m++)
-		pts += mana_needed(m, ch[cc].mana[3]-1);
+		pts += mana_needed(m, 4);
 
 	for (z = 0; z<MAXSKILL; z++) for (m = 1; m<B_SK(cc, z); m++)
-		pts += skill_needed(m, ch[cc].skill[z][3]-1);
+		pts += skill_needed(m, 3);
 	//
 	
 	ch[cc].weapon_bonus = max(12, 
-						  min(72+(archbonus)/30, base*5/7+12));
-	ch[cc].armor_bonus  = max(10, 
-						  min(64+(archbonus-15)/30, base*5/6+10));
+						  min(80+(archbonus)/20, base*5/6+6));
+	ch[cc].armor_bonus  = max(8, 
+						  min(72+(archbonus+10)/20, base*5/7+8));
 
 	ch[cc].points_tot = pts;
 	ch[cc].gold       = 0;
@@ -4742,13 +4755,15 @@ void skill_shadow(int cn)
 					chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
 					if (skill_gc_atk(cn, co, cz) && get_gear(cn, IT_TW_INVIDIA))
 					{
-						god_drop_char_fuzzy(co, ch[cz].x, ch[cz].y);
+						quick_teleport(co, ch[cz].x, ch[cz].y);
 					}
 				}
 			}
 			else
 			{
-				do_char_log(cn, 0, "You may not have more than one Shadow Copy.\n");
+				do_char_log(cn, 5, "You recalled your Shadow Copy.\n");
+				quick_teleport(co, ch[cn].x, ch[cn].y);
+				add_exhaust(cn, TICKS*2);
 			}
 			return;
 		}
@@ -5168,7 +5183,7 @@ int spell_immolate(int cn, int co, int power, int flag)
 {
 	int in;
 	
-	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/40;
+	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/25;
 	if (!flag) power = spell_multiplier(power, cn);
 	
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 

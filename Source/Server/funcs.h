@@ -42,6 +42,7 @@ void reset_changed_items(void);
 void pop_save_all_chars(void);
 void pop_save_char(int nr);
 void pop_load_all_chars(void);
+void pop_copy_to_new_chars(void);
 
 // -- tick --
 void tick(void);
@@ -136,6 +137,7 @@ int god_cmp_item2tmp(int in, int tmp);
 int god_getitemtmp(int in);
 void god_drdata(int cn, int co, int n, int val);
 void god_destroy_items(int cn);
+void god_set_depth(int cn, int co, int v, int gflag);
 void god_raise_char(int cn, int co, int v, int bsp);
 void god_lower_char(int cn, int co, int v);
 void god_donate_item(int in, int place);

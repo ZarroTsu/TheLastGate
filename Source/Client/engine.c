@@ -922,11 +922,11 @@ int sk_score(int n)
 int pl_speed, pl_atksp, pl_spmod, pl_spapt, pl_movsp;
 int pl_critc, pl_critm, pl_topdm, pl_reflc, pl_aoebn;
 int pl_hitsc, pl_parry, pl_coold, pl_casts, pl_dmgbn;
-int pl_flags, pl_flagb, pl_basel, pl_dmgml, pl_dmgrd;
+int pl_flags, pl_flagb, pl_flagc, pl_basel, pl_dmgml, pl_dmgrd;
 int pl_dlow,  pl_dhigh, pl_dps,   pl_cdrate;
 int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
 int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
-int sk_water, sk_cleav, sk_safeg, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
+int sk_water, sk_cleav, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
 int sk_shado, sk_rally, sk_immol;
 
 void init_meta_stats(void)
@@ -969,6 +969,7 @@ void init_meta_stats(void)
 	pl_aoebn = pl.end[1];
 	pl_dmgbn = pl.end[2];
 	pl_dmgrd = pl.end[3];
+	pl_flagc = pl.end[4];
 	
 	// Player Flags from special items
 	pl_flags = pl.worn[WN_FLAGS];
@@ -1026,7 +1027,6 @@ void init_meta_stats(void)
 	sk_rally = sk_score(35)/10;
 	sk_shado = 15 + sk_score(46)*pl_spmod/500;
 	sk_weake = -(sk_score(41) / 4 + 2);
-	sk_safeg = (1000 - (sk_score(39)));
 	
 	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
 	{
@@ -1209,28 +1209,38 @@ void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
 	
 	if (flag)		m += 8*14;
 	
-					dd_xputtext(9,  m+n*14,font,"%-20.20s", va    );
-	if (vc>=0)		dd_xputtext(140,m+n*14,font,"%4d.%02d", vb, vc);
-	else if (vb>=0)	dd_xputtext(140,m+n*14,font,"%7d",      vb    );
-					dd_xputtext(189,m+n*14,font,"%-7.7s",   ve    );
+					  dd_xputtext(9,  m+n*14,font,"%-20.20s", va    );
+	if (vc>=0)		  dd_xputtext(140,m+n*14,font,"%4d.%02d", vb, vc);
+	else if (vb>=0)	  dd_xputtext(140,m+n*14,font,"%7d",      vb    );
+	else if (flag==2) dd_xputtext(140,m+n*14,font,"%7d",      vb    );
+					  dd_xputtext(189,m+n*14,font,"%-7.7s",   ve    );
 }
 
 void show_meta_stats(int n)
 {
-	// 1 = Yellow
-	// 5 = Orange
+	// Font Colors:
 	// 0 = Red
+	// 1 = Yellow
+	// 2 = Green
+	// 3 = Blue
+	// 4 = Pink
+	// 5 = Orange
+	// 6 = Lime
+	// 7 = Skyblue
+	// 8 = Violet
+	// 9 = White
+	
 	if (n<7)					// Topmost standard stats
 	{
 		switch (n)
 		{
-			case  0: meta_stat(0,n,1,"Cooldown Duration", 	pl_cdrate/100, 	pl_cdrate%100, 	""); break;
+			case  0: meta_stat(0,n,1,"Cooldown Duration", 	pl_cdrate/100, 	pl_cdrate%100, 	"x"); break;
+			case  1: meta_stat(0,n,1,"Spell Aptitude", 		pl_spapt, 		-1, 			""); break;
+			case  2: meta_stat(0,n,1,"Spell Modifier", 		pl_spmod /100, 	pl_spmod %100, 	"x"); break;
+			case  3: meta_stat(0,n,1,"Base Speed", 			pl_speed/100,	pl_speed%100, 	""); break;
 			//
-			case  2: meta_stat(0,n,1,"Spell Aptitude", 		pl_spapt, 		-1, 			""); break;
-			case  3: meta_stat(0,n,1,"Spell Modifier", 		pl_spmod /100, 	pl_spmod %100, 	""); break;
-			//
-			case  5: meta_stat(0,n,1,"Hit Score", 			pl_hitsc, 		-1, 			""); break;
-			case  6: meta_stat(0,n,1,"Parry Score", 		pl_parry, 		-1, 			""); break;
+			case  5: meta_stat(0,n,5,"Hit Score", 			pl_hitsc, 		-1, 			""); break;
+			case  6: meta_stat(0,n,5,"Parry Score", 		pl_parry, 		-1, 			""); break;
 			default: break;
 		}
 	}
@@ -1239,7 +1249,39 @@ void show_meta_stats(int n)
 		n-=7;
 		switch (n+skill_pos)
 		{
-			case  0: meta_stat(1,n,1,"", 0, -1, ""); break;
+			case  0: meta_stat(1,n,0,"  Passive Stats:", -1, -1, ""); break;
+			//
+			case  1: meta_stat(1,n,5,"Est. Melee DPS", pl_dps/100, pl_dps%100, ""); break;
+			case  2: meta_stat(1,n,1,"Melee  Floor  Damage", pl_dlow, -1, ""); break;
+			case  3: meta_stat(1,n,1,"Melee Ceiling Damage", pl_dhigh, -1, ""); break;
+			//
+			case  5: meta_stat(1,n,1,"Damage Bonus", pl_dmgbn/100, pl_dmgbn%100, "%"); break;
+			//
+			case  7: meta_stat(1,n,5,"Critical Chance", 	pl_critc/100,	pl_critc%100,	"%"); break;
+			case  8: meta_stat(1,n,5,"Critical Multiplier", pl_critm, 		-1, 			"%"); break;
+			//
+			case 10: meta_stat(1,n,1,"Attack Speed", 		pl_atksp/100,	pl_atksp%100, 	""); break;
+			case 11: meta_stat(1,n,1,"  Cast Speed", 		pl_casts/100,	pl_casts%100, 	""); break;
+			//
+			case 13: if (pl_aoebn) meta_stat(1,n,1,"Total AoE Bonus", pl_aoebn, -1, ""); break;
+			//
+			case 15: meta_stat(1,n,0,"  Active Stats:", -1, -1, ""); break;
+			//
+			case 16: if (pl.skill[40][0]) meta_stat(2,n,5,"Cleave Hit Damage", sk_cleav, -1, ""); break;
+			case 17: if (pl.skill[49][0]) meta_stat(2,n,5,"Leap Hit Damage", sk_leapv, -1, ""); break;
+			//
+			case 18: if (pl.skill[24][0]) meta_stat(2,n,1,"Blast Hit Damage", sk_blast, -1, ""); break;
+			
+			case 19: if (pl.skill[42][0]) meta_stat(2,n,1, (pl_flagb & (1 << 14))?"Venom Degen":"Poison Degen", sk_poiso/100, sk_poiso%100, "/s"); break;
+			case 20: if (pl.skill[43][0] || (pl_flagc & (1 << 13))) { 
+					 if ((pl_flagb & (1 << 6)) || (pl_flagc & (1 << 13))) { meta_stat(2,n,1,"Immolate Degen", sk_immol/100, sk_immol%100, "/s"); }
+					 else 						  { meta_stat(2,n,1,"Pulse Hit Damage", sk_pulse, -1, ""); } } break;
+			case 21: if (pl.skill[43][0] && !(pl_flagb & (1 << 6))) meta_stat(2,n,1,"Pulse Count", sk_pucnt, -1, ""); break;
+			case 22: if (pl.skill[ 7][0]) meta_stat(2,n,1,"Zephyr Hit Damage", sk_razor, -1, ""); break;
+			//
+			case 23: if (pl.skill[27][0]) meta_stat(2,n,5,"Ghost Comp Potency", 	sk_ghost, 		-1, 			""); break;
+			case 24: if (pl.skill[46][0]) meta_stat(2,n,5,"Shadow Duration", 	sk_shado, 		-1, 			"Seconds"); break;
+			//
 			default: break;
 		}
 	}
@@ -1248,130 +1290,45 @@ void show_meta_stats(int n)
 		n-=7;
 		switch (n+skill_pos)
 		{
-			case  0: meta_stat(1,n,5,"Speed Values:", 		-1, 			-1, 			""); break;
-			case  1: meta_stat(1,n,1,"Base", 				pl_speed/100,	pl_speed%100, 	""); break;
-			case  2: meta_stat(1,n,1,"Attack", 				pl_atksp/100,	pl_atksp%100, 	""); break;
-			case  3: meta_stat(1,n,1,"Cast", 				pl_casts/100,	pl_casts%100, 	""); break;
-			case  4: meta_stat(1,n,1,"Movement", 			pl_movsp/100, 	pl_movsp%100, 	""); break;
+			case  0: meta_stat(1,n,0,"  Passive Stats:", -1, -1, ""); break;
+			//
+			case  1: meta_stat(1,n,5,"Health Regen Rate", sk_regen/100,sk_regen%100, "/s"); break;
+			case  2: meta_stat(1,n,5,"Endurance Regen Rate", sk_restv/100,sk_restv%100, "/s"); break;
+			case  3: meta_stat(1,n,5,"Mana Regen Rate", sk_medit/100,sk_medit%100, "/s"); break;
+			//
+			case  5: meta_stat(1,n,1,"Damage Reduction", pl_dmgrd/100, pl_dmgrd%100, "%"); break;
+			//
+			case  7: meta_stat(1,n,5,"Effective Immunity", 	sk_immun, 		-1, 			""); break;
+			case  8: meta_stat(1,n,5,"Effective Resistance",sk_resis, 		-1, 			""); break;
+			//
+			case 10: meta_stat(1,n,1,"Movement Speed", 		pl_movsp/100, 	pl_movsp%100, 	""); break;
+			//
+			case 13: if (pl.skill[34][0]) meta_stat(1,n,1,"Mana Cost", 			sk_conce/100,	sk_conce%100, 	"%"); break;
+			case 14: meta_stat(1,n,1,"Aptitude Bonus", at_score(AT_WIL)/4, -1, 		""); break;
+			//
+			case 16: meta_stat(2,n,1,"Underwater Degen", 	sk_water/100,	sk_water%100, 	"/s"); break;
+			//
+			case 18: if (pl_reflc>0) meta_stat(1,n,5,"Thorns Score", 		pl_reflc, 		-1, 			""); break;
+			//
+			case 20: meta_stat(1,n,0,"  Active Stats:", -1, -1, ""); break;
+			//
+			case 21: if (pl.skill[37][0]) {
+					 if (pl_flagb & (1 << 11)) { meta_stat(2,n,5,"Douse Effect", sk_douse/1000, sk_douse%1000, ""); } // Need to adjust Douse from 3 deimal places to 2
+					 else					   { meta_stat(2,n,5,"Blind Effect", sk_blind, -1, ""); } } break;
+			case 22: if (pl.skill[35][0]) {
+					 if (pl_flagb & (1 << 12)) { meta_stat(2,n,5,"Rally Effect", sk_rally, -1, ""); }
+					 else					   { meta_stat(2,n,5,"Warcry Effect", sk_warcr, -1, ""); } } break;
+			case 23: if (pl.skill[41][0]) meta_stat(2,n,5,"Weaken Effect", sk_weake, -1, ""); break;
+			//
+			case 24: if (pl.skill[20][0]) meta_stat(2,n,1,"Curse Effect", 		sk_curse, 		-1, 			""); break;
+			case 25: if (pl.skill[19][0]) meta_stat(2,n,1,"Slow Effect", sk_slowv, -1, ""); break;
+			//
+			
+//			case  0: meta_stat(1,n,1,"", 0, -1, ""); break;
+			
 			default: break;
 		}
 	}
-/*
-	switch (num)
-	{												// ".............." // 
-		case 60: // Braveness - 1. Cast Speed 	2. Crit Chanc	3. Crit Multi	4. Prox Bonus 	5. eImmunity	6. eResist
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Crit Chance");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%5d.%02d%%",pl_critc/100,pl_critc%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Crit Multi");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%8d%%",pl_critm);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"E.Immunity");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_immun);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"E.Resist");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_resis);
-				if (pl_reflc>0) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Thorns");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",pl_reflc);
-			}
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"UWater Degen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",sk_water/100,sk_water%100);
-			break;									// ".............." // 
-		case 61: // Willpower - 1. Apt Bonus, 	2. Mana reduce, 3. GC Power		4. Poison DPS	5. Slow Pow 	6. Curse Pow
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cast Speed");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_casts/100,pl_casts%100);
-				if (pl.skill[34][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Cost %");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_conce/100,sk_conce%100);
-			}	if (pl.skill[27][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Ghost Potency");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_ghost);
-			}	if (pl.skill[46][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Shadow Dur.");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%4d secs",sk_shado);
-			}	if (pl.skill[20][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Curse Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_curse);
-			}
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Aptitude Bonus");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",at_score(AT_WIL)/4);
-			break;									// ".............." // 
-		case 62: // Intuition - 1. Cooldown, 	2. Medit Rate, 	3. Blast DPH	4. Scorch Pow	5. Pulse DPH	6. Pulse Count
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Cooldown Rate");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_cdrate/100,pl_cdrate%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Mana Regen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_medit/100,sk_medit%100);
-				if (pl.skill[42][0]) { if (pl_flagb & (1 << 14)) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Venom Degen/s");
-				} else {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Poison Degen/s");
-				}
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%6d.%02d",sk_poiso/100,sk_poiso%100);
-			}	if (pl.skill[24][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Blast DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_blast);
-			}	if (pl.skill[43][0]) { if (pl_flagb & (1 << 6)) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Immol Degen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%6d.%02d",sk_immol/100,sk_immol%100);
-				} else {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Pulse DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_pulse);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Pulse Count");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_pucnt);
-			} }
-			break;									// ".............." // 
-		case 63: // Agility - 	1. Atk Speed, 	2. Rest Rate, 	3. Zephyr DPH	4. Leap DPH	5. Blind Pow	6. Water Degen
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Attack Speed");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_atksp/100,pl_atksp%100);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Endur. Regen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_restv/100,sk_restv%100);
-				if (pl.skill[49][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Leap DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_leapv);
-			}	if (pl.skill[7][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Zephyr DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%9d",sk_razor);
-			}	if (pl.skill[37][0]) { if (pl_flagb & (1 << 11)) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Douse Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%5d.%03d",sk_douse/1000,sk_douse%1000);
-			} else {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Blind Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_blind);
-			} }
-			if (pl.skill[19][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Slow Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_slowv);
-			}	
-			break;									// ".............." // 
-		case 64: // Strength - 	1. Melee DPH, 	2. Regen Rate, 	3. Cleave DPH	4. Taunt Pow	5. Weaken Pow	6. Warcry Pow
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%3d - %3d",pl_dlow,pl_dhigh);
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*1,1,"Health Regen/s");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*1,1,"%6d.%02d",sk_regen/100,sk_regen%100);
-				if (pl.skill[40][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*2,1,"Cleave DPH");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*2,1,"%9d",sk_cleav);
-			}	if (pl.skill[39][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*3,1,"Safeguard");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*3,1,"%5d.%03d",sk_safeg/1000,sk_safeg%1000);
-			}	if (pl.skill[41][0]) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*4,1,"Weaken Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*4,1,"%9d",sk_weake);
-			}	if (pl.skill[35][0]) { if (pl_flagb & (1 << 12)) {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Rally Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_rally);
-			} else {
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Warcry Effect");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%9d",sk_warcr);
-			} }
-			break;									// ".............." // 
-		default: // Default -	1. Melee DPS,	2. Hit, 		3. Parry, 		 4. Spell Mod	5. Spell Apt 	6. Act Speed
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*0,1,"Est. Melee DPS");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*0,1,"%6d.%02d",pl_dps/100,pl_dps%100);
-			
-			dd_xputtext(GUI_DPS_X,    GUI_DPS_Y+14*5,1,"Action Speed");
-			dd_xputtext(GUI_DPS_X+103,GUI_DPS_Y+14*5,1,"%6d.%02d",pl_speed/100,pl_speed%100);
-			break;									// ".............." // 
-	}
-	*/
 }
 
 void eng_display_win(int plr_sprite,int init)

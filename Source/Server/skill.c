@@ -102,7 +102,7 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 				
 	{ 22, 'F', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.", 
 				"", "", "", 
-				{ AT_WIL, AT_WIL, AT_INT }},
+				{ AT_BRV, AT_WIL, AT_INT }},
 				
 	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
 				"", "", "", 
@@ -143,7 +143,7 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 				
 	{ 32, 'G', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
 				"", "", "", 
-				{ AT_BRV, AT_AGL, AT_STR }},
+				{ AT_WIL, AT_AGL, AT_STR }},
 				
 	{ 33, 'G', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
 				"", "", "", 

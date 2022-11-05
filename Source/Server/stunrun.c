@@ -840,7 +840,7 @@ int npc_stunrun_high(int cn)
 			{
 				ch[cn].data[23] = globs->ticker;                // init
 			}
-			if (ch[cn].data[23] + TICKS * 60 * 60<globs->ticker)
+			if (ch[cn].data[23] + TICKS * 60 * 20 < globs->ticker)
 			{
 				for (y = yt1, tmp = 0; y<=yt2 && !tmp; y++)
 				{

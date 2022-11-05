@@ -2102,7 +2102,7 @@ void plr_logout(int cn, int nr, int reason)
 		{
 			if (abs(ch[cn].x - ch[cn].temple_x) + abs(ch[cn].y - ch[cn].temple_y)>10 && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_NOLAG))
 			{
-				for (n=0;n<40;n++)
+				for (n=0;n<MAXITEMS;n++)
 				{
 					if (!(in = ch[cn].item[n]))
 					{
@@ -2653,14 +2653,32 @@ void plr_change(int nr)
 		
 		if (cpl->end[0] != ch[cn].move_speed || cpl->end[1] != ch[cn].aoe_bonus || 
 			cpl->end[2] != ch[cn].dmg_bonus  || cpl->end[3] != ch[cn].dmg_reduction || 
-			cpl->end[4] != 0 || cpl->end[5] != ch[cn].end[5])
+			cpl->end[5] != ch[cn].end[5])
 		{
+			chFlags = 0;
+			if (get_enchantment(cn, 36)) 	chFlags += (1 <<  0); // Half med to HP
+			if (get_enchantment(cn, 45)) 	chFlags += (1 <<  1); // Half end to MP
+			if (get_enchantment(cn,  7)) 	chFlags += (1 <<  2); // 20% more weaken effect
+			if (get_enchantment(cn, 13)) 	chFlags += (1 <<  3); // 20% more slow effect
+			if (get_enchantment(cn, 20)) 	chFlags += (1 <<  4); // 20% more curse effect
+			if (get_enchantment(cn, 27)) 	chFlags += (1 <<  5); // 20% more poison effect
+			if (get_enchantment(cn, 30)) 	chFlags += (1 <<  6); // 20% more bleed effect
+			if (get_enchantment(cn, 31)) 	chFlags += (1 <<  7); // 20% more blind effect
+			if (get_enchantment(cn, 56)) 	chFlags += (1 <<  8); // 20% more heal effect
+			if (get_enchantment(cn, 16) || 
+				get_enchantment(cn, 23)) 	chFlags += (1 <<  9); // 20% damage shifted to end/mana (20% more eHP)
+			if (get_enchantment(cn, 35)) 	chFlags += (1 << 10); // 20% chance to half damage taken (10% more eHP)
+			if (get_enchantment(cn, 37)) 	chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
+			if (get_enchantment(cn, 53)) 	chFlags += (1 << 12); // 30% less damage taken from DoT (30% more DoT eHP)
+			if (get_gear(cn, IT_WP_RISINGPHO)) chFlags += (1 << 13); // Immolate skill, based off HP
+//			if () 	chFlags += (1 << 14);
+			
 			buf[0] = SV_SETCHAR_ENDUR;
 			*(unsigned short*)(buf + 1)  = ch[cn].move_speed;		// char
 			*(unsigned short*)(buf + 3)  = ch[cn].aoe_bonus;		// char
 			*(unsigned short*)(buf + 5)  = ch[cn].dmg_bonus;		// unsigned short
 			*(unsigned short*)(buf + 7)  = ch[cn].dmg_reduction;	// unsigned short
-			*(unsigned short*)(buf + 9)  = 0;
+			*(unsigned short*)(buf + 9)  = min(32767,chFlags); 		// max << 14
 			*(unsigned short*)(buf + 11) = ch[cn].end[5];
 			xsend(nr, buf, 13);
 			
@@ -2668,7 +2686,7 @@ void plr_change(int nr)
 			cpl->end[1] = ch[cn].aoe_bonus;
 			cpl->end[2] = ch[cn].dmg_bonus;
 			cpl->end[3] = ch[cn].dmg_reduction;
-			cpl->end[4] = 0;
+			cpl->end[4] = min(32767,chFlags); 	// max << 14
 			cpl->end[5] = ch[cn].end[5];
 		}
 
@@ -2677,7 +2695,7 @@ void plr_change(int nr)
 			plr_change_stat(nr, cpl->skill[n], ch[cn].skill[n], SV_SETCHAR_SKILL, n);
 		}
 
-		for (n = 0; n<40; n++)
+		for (n = 0; n<MAXITEMS; n++)
 		{
 			in = ch[cn].item[n];
 			if (cpl->item[n]!=in || (!IS_BUILDING(cn) && cpl->item_s[n]!=it[in].stack) || (!IS_BUILDING(cn) && it[in].flags & IF_UPDATE))
@@ -2829,7 +2847,7 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_BREATHAMMY))  { chFlags += (1 <<  2); chFlags += (1 <<  1); }
 					//
 					if (get_tarot(cn, IT_CH_HERMIT_R)) 	chFlags += (1 <<  3); // Rage -> Frenzy
-					//if () 							chFlags += (1 <<  4);
+					if (get_tarot(cn, IT_CH_CHARIO_R)) 	chFlags += (1 <<  4); // Debuffs 25% weaker
 					if (get_tarot(cn, IT_CH_DEATH_R)) 	chFlags += (1 <<  5); // Zephyr
 					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse -> Immolate
 					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
@@ -4225,7 +4243,7 @@ int check_valid(int cn)
 		return 1;
 	}
 
-	for (n = 0; n<40; n++)
+	for (n = 0; n<MAXITEMS; n++)
 	{
 		if ((in = ch[cn].item[n])!=0)
 		{
