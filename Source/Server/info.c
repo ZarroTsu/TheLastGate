@@ -580,11 +580,11 @@ static void char_info(int cn)
 		printf("solved %d parts of the Labyrinth.\n",
 		       ch[cn].data[20]);
 
-		if (ch[cn].data[25]>ch[cn].data[24] + ch[cn].data[23])
+		if (ch[cn].data[23] > 10000)
 		{
 			printf("%s is said to be very brave.\n", Gender);
 		}
-		else if (ch[cn].data[25] + ch[cn].data[24]>ch[cn].data[23])
+		else if (ch[cn].data[23] > 1000)
 		{
 			printf("%s is said to be brave.\n", Gender);
 		}

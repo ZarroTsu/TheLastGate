@@ -811,6 +811,26 @@ char *who_rank_name[RANKS] = {
 	"WARLD"
 };
 
+int st_learned_skill(int st_val, int v)
+{	// Returns the bitwise value of the parsed value v from the input value st_val
+	return ( (st_val>>((12-v)+4))%2 );
+}
+
+int st_skill_pts_have(int st_val)
+{	// Returns the available skill points
+	return ( st_val%16 );
+}
+
+int st_skill_pts_all(int st_val)
+{	// Returns the available skill points plus spent skill points
+	int n, m = 0;
+	for (n=0;n<12;n++)
+	{
+		m += st_learned_skill(st_val, n+1);
+	}
+	return ( m + st_skill_pts_have(st_val) );
+}
+
 int get_best_worn(int cn, int v)
 {
 	int n = -1000, in;
@@ -2015,15 +2035,15 @@ struct npc_class npc_class[] = {
 	//
 	{"Mummy"                    },	// 204
 	{"Toxic Grulge"             },	// 205
+	{"Kelpie"                   },	// 206
 	//
-	{""                     	},	// 206
 	{""                     	},	// 207
 	{""                     	},	// 208
 	{""                     	},	// 209
 	{""                     	},	// 210
-	{""                     	},	// 211
-	{""                     	},	// 212
-	{""                     	},	// 213
+	{"Dwarf"                    },	// 211
+	{"Pirate"                   },	// 212
+	{"F.Marshal Gargoyle"       },	// 213
 	{""                     	},	// 214
 	{""                     	},	// 215
 	{""                     	},	// 216
@@ -2206,42 +2226,24 @@ int use_labtransfer(int cn, int nr, int exp)
 
 	switch (nr)
 	{
-		case 1:
-			co = pop_create_char(CT_LAB_1_BOSS, 0);
-			break;                                          // grolms
-		case 2:
-			co = pop_create_char(CT_LAB_2_BOSS, 0);
-			break;                                          // lizard
-		case 3:
-			co = pop_create_char(CT_LAB_3_BOSS, 0);
-			break;                                          // spellcaster
-		case 4:
-			co = pop_create_char(CT_LAB_4_BOSS, 0);
-			break;                                          // knight
-		case 5:
-			co = pop_create_char(CT_LAB_5_BOSS, 0);
-			break;                                          // undead
-		case 6:
-			co = pop_create_char(CT_LAB_6_BOSS, 0);
-			break;                                          // light&dark
-		case 7:
-			co = pop_create_char(CT_LAB_7_BOSS, 0);
-			break;                                          // underwater
-		case 8:
-			co = pop_create_char(CT_LAB_8_BOSS, 0);
-			break;                                          // forest / golem
-		case 9:
-			co = pop_create_char(CT_LAB_9_BOSS, 0);
-			break;                                          // riddle
-		case 10:
-			co = pop_create_char(CT_LAB10_BOSS, 0);
-			break;                                          // seasons
-		case 11:
-			co = pop_create_char(CT_LAB11_BOSS, 0);
-			break;                                          // seasons
-		case 12:
-			co = pop_create_char(CT_LAB12_BOSS, 0);
-			break;                                          // seasons
+		case  1: co = pop_create_char(CT_LAB_1_BOSS, 0); break; // grolms
+		case  2: co = pop_create_char(CT_LAB_2_BOSS, 0); break; // lizard
+		case  3: co = pop_create_char(CT_LAB_3_BOSS, 0); break; // spellcaster
+		case  4: co = pop_create_char(CT_LAB_4_BOSS, 0); break; // knight
+		case  5: co = pop_create_char(CT_LAB_5_BOSS, 0); break; // undead
+		case  6: co = pop_create_char(CT_LAB_6_BOSS, 0); break; // desert
+		case  7: co = pop_create_char(CT_LAB_7_BOSS, 0); break; // light&dark
+		case  8: co = pop_create_char(CT_LAB_8_BOSS, 0); break; // underwater
+		case  9: co = pop_create_char(CT_LAB_9_BOSS, 0); break; // riddle
+		case 10: co = pop_create_char(CT_LAB10_BOSS, 0); break; // forest / golem
+		case 11: co = pop_create_char(CT_LAB11_BOSS, 0); break; // seasons
+		case 12: co = pop_create_char(CT_LAB12_BOSS, 0); break; // ascent
+		case 13: co = pop_create_char(CT_LAB14_BOSS, 0); break; // miners
+		case 14: co = pop_create_char(CT_LAB15_BOSS, 0); break; // vantablack
+		case 15: co = pop_create_char(CT_LAB16_BOSS, 0); break; // pirates
+		case 16: co = pop_create_char(CT_LAB17_BOSS, 0); break; // gargoyles
+		case 17: co = pop_create_char(CT_LAB18_BOSS, 0); break; // commandment
+		case 18: co = pop_create_char(CT_LAB19_BOSS, 0); break; // divinity
 		default:
 			do_char_log(cn, 0, "Sorry, could not determine which enemy to send you.\n");
 			chlog(cn, "Sorry, could not determine which enemy to send you");
@@ -2265,7 +2267,7 @@ int use_labtransfer(int cn, int nr, int exp)
 		return 0;
 	}
 
-	ch[co].data[64] = globs->ticker + 5 * 60 * TICKS; // die in two minutes if not otherwise
+	ch[co].data[64] = globs->ticker + 5 * 60 * TICKS; // die in five minutes if not otherwise
 	ch[co].data[24] = 0;    // do not interfere in fights
 	ch[co].data[36] = 0;    // no walking around
 	ch[co].data[43] = 0;    // don't attack anyone
@@ -2300,7 +2302,7 @@ void use_labtransfer2(int cn, int co)
 	{
 		do_char_log(cc, 0, "Your Companion killed your enemy.\n");
 		finish_laby_teleport(cc, ch[co].data[1], ch[co].data[2]);
-		god_transfer_char(cn, HOME_TEMPLE_X, HOME_TEMPLE_Y);
+		god_transfer_char(cn, ch[cc].x, ch[cc].y);
 		chlog(cc, "Labkeeper room solved by GC");
 		return;
 	}
@@ -2711,9 +2713,16 @@ void make_soulstone(int cn, int exp)
 	god_give_char(in, cn);	// chlog(cn, "got soulstone");
 }
 
-void merge_soulstone(int cn, int in, int in2)
+int merge_soulstone(int cn, int in, int in2)
 {
 	int rank, exp;
+	
+	// Prevent use if the soulstone is maxed already
+	if (it[in].data[0] > N_SOULMAX)
+	{
+		do_char_log(cn, 0, "It wouldn't have any effect.\n");
+		return 0;
+	}
 	
 	exp = it[in].data[1];
 	
@@ -2740,6 +2749,8 @@ void merge_soulstone(int cn, int in, int in2)
 			it[in].data[2] = it[in2].data[2];
 		it[in].flags |= IF_ENCHANTED | IF_UPDATE;
 	}
+	
+	return 1;
 }
 
 int make_gskill(int cn)
@@ -2768,9 +2779,9 @@ int make_gskill(int cn)
 	return in;
 }
 
-int make_catalyst(int cn, int n)
+int make_catalyst(int cn, int n, int v)
 {
-	int in, v;
+	int in;
 	int earlylist[37] = { 
 		SK_HAND, 		SK_DAGGER, 		SK_SWORD, 		SK_AXE, 		SK_STAFF,
 		SK_TWOHAND, 	SK_STEALTH, 	SK_PERCEPT, 	SK_SWIM, 		SK_MSHIELD, 
@@ -2788,13 +2799,16 @@ int make_catalyst(int cn, int n)
 		return 0;
 	}
 	
-	if (!IS_ANY_ARCH(cn) || (IS_MONSTER(cn) && getrank(cn)<12))
+	if (!v)
 	{
-		v = earlylist[RANDOM(37)];
-	}
-	else
-	{
-		v = RANDOM(MAXSKILL);
+		if (!IS_ANY_ARCH(cn) || (IS_MONSTER(cn) && getrank(cn)<12))
+		{
+			v = earlylist[RANDOM(37)];
+		}
+		else
+		{
+			v = RANDOM(MAXSKILL);
+		}
 	}
 	
 	sprintf(it[in].name, "Soul Catalyst (%s)", skilltab[v].name);
@@ -2835,7 +2849,7 @@ void make_focus(int cn, int exp)
 	
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus. It can be used on a soulstone to half the number of random skill rolls.", v);
+	sprintf(it[in].description, "A soul focus. It can be used on a soulstone to increase its level by 3, but only once.", v);
 	
 	it[in].data[0] = 4;
 	it[in].temp = 0;
@@ -2891,7 +2905,7 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 	
 	// 1. Set local variables to pull from the soulstone (in)
 	rank   = max(0, min(N_SOULMAX*bonus, (it[in].data[0]-it[in].data[3])*bonus));
-	focus  = (it[in].data[2] > 0 && it[in].data[2] < 8) ? it[in].data[2] : 8;
+	focus  = 8;
 	
 	// 2. Loop through known player skills and add to local array
 	for (n=0;n<N_SOULBONUS;n++)
@@ -2931,50 +2945,53 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 		catfocus = cf;
 	}
 	
-	// 3. Select 'focus' number of skills from the known list - duplicates are OK
-	//    We add extras if a catalyst is giving a bonus to the roll odds.
-	try = 0;
-	for (n=0; n<focus; n++)
+	if (rank) 
 	{
-		m = 1;
-		if (catfocus)
-		{
-			r = catknown[RANDOM(cf)];
-			catfocus--;
-		}
-		else
-		{
-			r = known[RANDOM(c)];
-		}
-		selected[s] = r; 
-		s++;
-	}
-	if (s<1)
-	{
-		chlog(cn, "soultrans_equipment failed with zero entries selected");
-		if (flag) do_char_log(cn, 2, "Nothing happens.");
-		return;
-	}
-	
-	// 4. Add the random stats
-	if (rank) while (rank)
-	{
-		// 4a. Loop through selected stats and try to pick one.
-		r = -1; 
+		// 3. Select 'focus' number of skills from the known list - duplicates are OK
+		//    We add extras if a catalyst is giving a bonus to the roll odds.
 		try = 0;
-		while (r < 0 && try < 99)
+		for (n=0; n<focus; n++)
 		{
-			try++;
-			r = selected[RANDOM(s)];
-			if (added[r] >= soul_cap(r)) r = -1;
+			m = 1;
+			if (catfocus)
+			{
+				r = catknown[catfocus-1];
+				catfocus--;
+			}
+			else
+			{
+				r = known[RANDOM(c)];
+			}
+			selected[s] = r; 
+			s++;
 		}
-		if (r<0) break;
+		if (s<1)
+		{
+			chlog(cn, "soultrans_equipment failed with zero entries selected");
+			if (flag) do_char_log(cn, 2, "Nothing happens.");
+			return;
+		}
 		
-		// 4b. Add the stat to the item
-		it[in2].skill[r][0] += 1;
-		sklm[r] += 5;
-		added[r]++;
-		rank--;
+		// 4. Add the random stats
+		while (rank)
+		{
+			// 4a. Loop through selected stats and try to pick one.
+			r = -1; 
+			try = 0;
+			while (r < 0 && try < 99)
+			{
+				try++;
+				r = selected[RANDOM(s)];
+				if (added[r] >= soul_cap(r)) r = -1;
+			}
+			if (r<0) break;
+			
+			// 4b. Add the stat to the item
+			it[in2].skill[r][0] += 1;
+			sklm[r] += 5;
+			added[r]++;
+			rank--;
+		}
 	}
 	for (n=0;n<50;n++) 
 	{
@@ -3011,7 +3028,7 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 	// 6. Finalize the item
 	it[in2].flags &= ~IF_CAN_SS;
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
-	it[in2].min_rank = min(24, max(rank, it[in2].min_rank));
+	it[in2].min_rank = min(24, max(rank-3, it[in2].min_rank));
 	it[in2].value -= 1;
 	
 	if (!HAS_ENCHANT(in2, 34))
@@ -3084,6 +3101,35 @@ int do_soulcatalyst(int cn, int ins, int inc)
 	return 1;
 }
 
+int do_soulfocus(int cn, int ins)
+{
+	int rank, exp;
+	
+	// Prevent use if already focused
+	if (it[ins].flags & IF_ENCHANTED)
+	{
+		do_char_log(cn, 0, "This soulstone cannot be focused again.\n");
+		return 0;
+	}
+	chlog(cn, "used focus on soulstone");
+	
+	rank = it[ins].data[0] + 3;
+	exp = rank2points(rank)*N_SOULFACTOR;
+	
+	sprintf(it[ins].description, "Level %d soulstone, holding %d exp.", rank, exp);
+	
+	it[ins].data[0] = rank;
+	it[ins].data[1] = exp;
+	
+	do_char_log(cn, 7, "You fed the soul focus to the soulstone. It is now level %d.\n", rank);
+	if (rank==N_SOULMAX) do_char_log(cn, 7, "(That's as high as they go!)\n");
+	if (rank>N_SOULMAX) do_char_log(cn, 7, "(You've broken the limit!)\n");
+	
+	it[ins].flags |= IF_ENCHANTED | IF_UPDATE;
+	
+	return 1;
+}
+
 int do_catalyst_focus(int cn, int inf, int inc)
 {
 	int v, m, f;
@@ -3129,6 +3175,33 @@ void create_random_talisman_equipment(int cn, int in2)
 	}
 	
 	use_talisman(cn, in, in2);
+}
+
+int set_enchantment(int cn, int v)
+{
+	int in;
+	in = ch[cn].citem;
+	
+	if (!in)
+	{
+		do_char_log(cn, 1, "You need an item for that.\n");
+		return 0;
+	}
+	
+	it[in].enchantment = v;
+	
+	if (v)
+	{
+		it[in].flags |= IF_UPDATE | IF_IDENTIFIED | IF_ENCHANTED | IF_LOOKSPECIAL;
+		it[in].flags &= ~IF_CAN_EN;
+	}
+	else
+	{
+		it[in].flags |= IF_UPDATE | IF_IDENTIFIED | IF_CAN_EN;
+		it[in].flags &= ~IF_ENCHANTED;
+	}
+	
+	return 1;
 }
 
 int use_talisman(int cn, int in, int in2)
@@ -3290,7 +3363,7 @@ int use_talisman(int cn, int in, int in2)
 	switch (it[in].data[0])
 	{
 		// Only Helmets
-		case  3: case 14: case 22: case 25: case 32: case 60: case 71: case 82:
+		case  3: case 14: case 25: case 32: case 60: case 71: case 82:
 			if (!(it[in2].placement & PL_HEAD))
 			{
 				do_char_log(cn, 1, "This can only be applied to Helmets.\n");
@@ -3299,7 +3372,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Cloaks
-		case  5: case 10: case 21: case 31: case 41: case 56: case 61: case 83:
+		case  5: case 10: case 21: case 31: case 41: case 56: case 61:
 			if (!(it[in2].placement & PL_CLOAK))
 			{
 				do_char_log(cn, 1, "This can only be applied to Cloaks.\n");
@@ -3308,7 +3381,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Chests
-		case  2: case 16: case 23: case 33: case 35: case 74: case 75: case 85:
+		case  2: case 16: case 23: case 33: case 35: case 74: case 75:
 			if (!(it[in2].placement & PL_BODY))
 			{
 				do_char_log(cn, 1, "This can only be applied to Body Armors.\n");
@@ -3317,7 +3390,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Gloves
-		case  8: case 19: case 29: case 38: case 46: case 53: case 59: case 86:
+		case  8: case 19: case 29: case 38: case 46: case 53: case 86:
 			if (!(it[in2].placement & PL_ARMS))
 			{
 				do_char_log(cn, 1, "This can only be applied to Gloves.\n");
@@ -3326,7 +3399,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Boots
-		case  4: case 15: case 30: case 37: case 54: case 65: case 70: case 72:
+		case  4: case 15: case 30: case 37: case 65: case 70: case 72:
 			if (!(it[in2].placement & PL_FEET))
 			{
 				do_char_log(cn, 1, "This can only be applied to Boots.\n");
@@ -3334,8 +3407,17 @@ int use_talisman(int cn, int in, int in2)
 			}
 			break;
 		
+		// Only Jewellery
+		case 22: case 54: case 79: case 80: case 83: case 85:
+			if (!(it[in2].placement & PL_NECK) && !(it[in2].placement & PL_BELT) && !(it[in2].placement & PL_RING))
+			{
+				do_char_log(cn, 1, "This can only be applied to Jewellery.\n");
+				return 0;
+			}
+			break;
+		
 		// Only Weapons
-		case 49: case 62: case 66: case 67: case 77: case 79:
+		case 49: case 62: case 66: case 67: case 77:
 			if (!(it[in2].flags & IF_WEAPON))
 			{
 				do_char_log(cn, 1, "This can only be applied to Weapons.\n");
@@ -3344,7 +3426,7 @@ int use_talisman(int cn, int in, int in2)
 			break;
 		
 		// Only Armors
-		case  7: case 26: case 52: case 63: case 68: case 80:
+		case  7: case 26: case 52: case 63: case 68:
 			if (!(it[in2].flags & IF_ARMORS))
 			{
 				do_char_log(cn, 1, "This can only be applied to Armor Pieces.\n");
@@ -3521,15 +3603,19 @@ int use_soulstone(int cn, int in, int in2)
 	switch (it[in2].driver)
 	{
 		case 68: // Soulstone
-			merge_soulstone(cn, in, in2);
-			use_consume_item(cn, in2, 1);
-			return 1;
+			if (merge_soulstone(cn, in, in2))
+			{
+				use_consume_item(cn, in2, 1);
+				return 1;
+			}
+			return 0;
 		case 92: // Soul Focus
-			it[in].data[2] = 4;
-			it[in].flags |= IF_ENCHANTED | IF_UPDATE;
-			chlog(cn, "used focus on soulstone");
-			use_consume_item(cn, in2, 1);
-			return 1;
+			if (do_soulfocus(cn, in))
+			{
+				use_consume_item(cn, in2, 1);
+				return 1;
+			}
+			return 0;
 		case 93: // Soul Catalyst
 			if (do_soulcatalyst(cn, in, in2))
 			{
@@ -3594,17 +3680,21 @@ int use_soulfocus(int cn, int in) // driver 92
 	switch (it[in2].driver)
 	{
 		case 68: // Soulstone
-			it[in2].data[2] = 4;
-			it[in2].flags |= IF_ENCHANTED | IF_UPDATE;
-			chlog(cn, "used focus on soulstone");
-			use_consume_item(cn, in, 1);
-			return 1;
+			if (do_soulfocus(cn, in2))
+			{
+				use_consume_item(cn, in, 1);
+				return 1;
+			}
+			return 0;
 		case 92: // Soul Focus
+			break;
+			/*
 			it[in].data[0] = 4;
-			sprintf(it[in].description, "A soul focus. It can be used on a soulstone to half the number of random skill rolls.");
+			sprintf(it[in].description, "A soul focus. It can be used on a soulstone to increase its level by 3, but only once.");
 			chlog(cn, "used focus on focus");
 			use_consume_item(cn, in2, 1);
 			return 1;
+			*/
 		case 93: // Soul Catalyst
 			break;
 			/*
@@ -3640,7 +3730,7 @@ int use_soulcatalyst(int cn, int in) // driver 93
 		case 68: // Soulstone
 			if (do_soulcatalyst(cn, in2, in))
 			{
-				use_consume_item(cn, in, 1);
+				use_consume_item(cn, in, 0);
 				return 1;
 			}
 			return 0;
@@ -3915,7 +4005,7 @@ char *get_map_enemy_name(int kin)
 		case 24: return "Phantom";
 		case 25: return "Construct";
 		case 26: return "Daemon";
-		case 27: return "Mummy";
+		case 27: return "Dwindle";
 		case 28: return "Roach";
 		case 29: return "Statue";
 		case 30: return "Jinni";
@@ -3978,7 +4068,7 @@ char *get_map_enemy_desc(int kin)
 		case 24: return "A walking set of living clothes."; // Phantom
 		case 25: return "A hulking monster made of bits of scrap."; // Construct
 		case 26: return "A large demon with flaming fur and menacing wings."; // Daemon
-		case 27: return "A humanoid wrapped in dark bandages, shambling limply."; // Mummy
+		case 27: return "A ghastly humanoid, warped skin on bone and little else."; // Dwindle
 		case 28: return "A massive insect with a glossy shell."; // Roach
 		case 29: return "A living statue adorned with glossy stone wings."; // Statue
 		case 30: return "A spirit of living flames."; // Jinni
@@ -4041,7 +4131,7 @@ int get_map_enemy_sprite(int kin)
 		case 24: return 15312; // Phantom
 		case 25: return 17360; // Construct
 		case 26: return 18384; // Daemon
-		case 27: return 19408; // Mummy
+		case 27: return 19408; // Dwindle
 		case 28: return 20432; // Roach
 		case 29: return 21456; // Statue
 		case 30: return 22480; // Jinni
@@ -4085,7 +4175,7 @@ void set_map_enemy_tarot(int co, int kin, int tarot)
 	case 11: 	in  = RANDOM(2)?IT_CH_JUSTICE:IT_CH_TEMPER; 
 				in2 = RANDOM(2)?IT_CH_WHEEL_R:IT_CH_HANGED_R; 	break; // Soldier
 	case 12: 	in  = RANDOM(2)?IT_CH_JUSTICE:IT_CH_WHEEL; 
-				in2 = RANDOM(2)?IT_CH_EMPERO_R:IT_CH_PREIST_R; 	break; // Samurai
+				in2 = RANDOM(2)?IT_CH_EMPERO_R:IT_CH_MAGI_R; 	break; // Samurai
 	case 13: 	in  = RANDOM(2)?IT_CH_JUDGE:IT_CH_PREIST; 
 				in2 = RANDOM(2)?IT_CH_MAGI_R:IT_CH_JUDGE_R; 	break; // Magi
 	case 14: 	in  = RANDOM(2)?IT_CH_EMPEROR:IT_CH_DEATH; 
@@ -4115,7 +4205,7 @@ void set_map_enemy_tarot(int co, int kin, int tarot)
 	case 26: 	in  = RANDOM(2)?IT_CH_EMPRESS:IT_CH_STAR; 
 				in2 = RANDOM(2)?IT_CH_TEMPER_R:IT_CH_STAR_R; 	break; // Daemon
 	case 27: 	in  = RANDOM(2)?IT_CH_EMPEROR:IT_CH_TOWER; 
-				in2 = RANDOM(2)?IT_CH_CHARIO_R:IT_CH_SUN_R; 	break; // Mummy
+				in2 = RANDOM(2)?IT_CH_CHARIO_R:IT_CH_SUN_R; 	break; // Dwindle
 	case 28: 	in  = RANDOM(2)?IT_CH_TEMPER:IT_CH_HANGED; 
 				in2 = RANDOM(2)?IT_CH_STRENG_R:IT_CH_SUN_R; 	break; // Roach
 	case 29: 	in  = RANDOM(2)?IT_CH_TEMPER:IT_CH_EMPRESS; 
@@ -4137,19 +4227,19 @@ void set_map_enemy_tarot(int co, int kin, int tarot)
 	case 37: 	in  = RANDOM(2)?IT_CH_EMPRESS:IT_CH_STRENGTH; 
 				in2 = RANDOM(2)?IT_CH_EMPRES_R:IT_CH_EMPERO_R; 	break; // Paladin
 	case 38: 	in  = RANDOM(2)?IT_CH_WHEEL:IT_CH_STRENGTH; 
-				in2 = RANDOM(2)?IT_CH_PREIST_R:IT_CH_DEATH_R; 	break; // Amazon
+				in2 = RANDOM(2)?IT_CH_MAGI_R:IT_CH_DEATH_R; 	break; // Amazon
 	case 39: 	in  = RANDOM(2)?IT_CH_TEMPER:IT_CH_HANGED; 
 				in2 = RANDOM(2)?IT_CH_DEVIL_R:IT_CH_STAR_R; 	break; // Dancer
 	case 40: 	in  = RANDOM(2)?IT_CH_MAGI:IT_CH_PREIST; 
 				in2 = RANDOM(2)?IT_CH_HEIROP_R:IT_CH_SUN_R; 	break; // Warlock
 	case 41: 	in  = RANDOM(2)?IT_CH_JUDGE:IT_CH_PREIST; 
-				in2 = RANDOM(2)?IT_CH_PREIST_R:IT_CH_JUDGE_R; 	break; // Wizard
+				in2 = RANDOM(2)?IT_CH_MAGI_R:IT_CH_JUDGE_R; 	break; // Wizard
 	case 42: 	in  = RANDOM(2)?IT_CH_HEIROPH:IT_CH_PREIST; 
-				in2 = RANDOM(2)?IT_CH_PREIST_R:IT_CH_HEIROP_R; 	break; // Mystic
+				in2 = RANDOM(2)?IT_CH_MAGI_R:IT_CH_HEIROP_R; 	break; // Mystic
 	case 43: 	in  = RANDOM(2)?IT_CH_DEATH:IT_CH_STRENGTH; 
 				in2 = RANDOM(2)?IT_CH_CHARIO_R:IT_CH_TOWER_R; 	break; // Grosser
 	case 44: 	in  = RANDOM(2)?IT_CH_LOVERS:IT_CH_STAR; 
-				in2 = RANDOM(2)?IT_CH_LOVERS_R:IT_CH_PREIST_R; 	break; // Bard
+				in2 = RANDOM(2)?IT_CH_LOVERS_R:IT_CH_MAGI_R; 	break; // Bard
 	case 45: 	in  = RANDOM(2)?IT_CH_TOWER:IT_CH_CHARIOT; 
 				in2 = RANDOM(2)?IT_CH_EMPERO_R:IT_CH_CHARIO_R; 	break; // Siren
 	//
@@ -4159,7 +4249,7 @@ void set_map_enemy_tarot(int co, int kin, int tarot)
 	case 11+NUM_MAP_ENEM+3: in = IT_CH_HEIROPH;  in2 = IT_CH_HEIROP_R; break; // Azrael
 	case 11+NUM_MAP_ENEM+4: in = IT_CH_STAR;     in2 = IT_CH_STAR_R;   break; // Brighid
 	case 11+NUM_MAP_ENEM+5: in = IT_CH_CHARIOT;  in2 = IT_CH_CHARIO_R; break; // Nidhogg
-	case 11+NUM_MAP_ENEM+6: in = IT_CH_PREIST;   in2 = IT_CH_PREIST_R; break; // Metztli
+	case 11+NUM_MAP_ENEM+6: in = IT_CH_MAGI;     in2 = IT_CH_MAGI_R;   break; // Metztli
 	//
 	default: break;
 	}
@@ -4261,7 +4351,7 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,60, 0, 0, 0, 0, 0,50,50, 0,55,50, 0,60,50, 0,45, 0,75,75,
 	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0,40, 0, 0, 0, 0, 0, 0, 0, 0, 0,54,58,50,46,42,33,50,37,49,51}, // 26 : Daemon
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50,55,40,50, 0,60, 0, 0, 0, 0,75,75,
-	 75, 0,45, 0, 0, 0, 0,50, 0, 0,	0, 0,60, 0, 0, 0, 0, 0, 0, 0,44,53,51,56,46,33,50,37,50,50}, // 27 : Mummy
+	 75, 0,45, 0, 0, 0, 0,50, 0, 0,	0, 0,60, 0, 0, 0, 0, 0, 0, 0,44,53,51,56,46,33,50,37,50,50}, // 27 : Dwindle
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
 	 75, 0,55,50, 0, 0, 0, 0, 0, 0,	0, 0, 0, 0, 0, 0, 0,40,60,45,58,41,54,41,56,31,50,39,50,50}, // 28 : Roach
 	{40, 0, 0, 0, 0, 0, 0, 0, 0,50, 0,45, 0, 0, 0, 0, 0,50,50, 0, 0,50, 0,60, 0, 0, 0, 0,75,75,
@@ -4351,7 +4441,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	for (n = 0; n<5; n++)
 	{
 		tmp = base * 50 / max(1, get_map_eme[kin][n+50]);
-		B_AT(co, n) = max(10, min(135, tmp));
+		B_AT(co, n) = max(10, min(150, tmp));
 	}
 
 	for (n = 0; n<MAXSKILL; n++)
@@ -4359,15 +4449,15 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		if (get_map_eme[kin][n])
 		{
 			tmp = base * 50 / max(1, get_map_eme[kin][n]);
-			B_SK(co, n) = max(1, min(135, tmp));
+			B_SK(co, n) = max(1, min(150, tmp));
 		}
 	}
 	
 	tmp = base * 50 / max(1, get_map_eme[kin][55]) * 5;	ch[co].hp[0]   	= max(100, min(999, tmp));
 	tmp = base * 50 / max(1, get_map_eme[kin][56]) * 2;	ch[co].end[0]  	= max(100, min(999, tmp));
 	tmp = base * 50 / max(1, get_map_eme[kin][57]) * 5;	ch[co].mana[0] 	= max(100, min(999, tmp));
-	tmp = base * 50 / max(1, get_map_eme[kin][58]) / 2; ch[co].weapon_bonus = max( 12, min(120, tmp));
-	tmp = base * 50 / max(1, get_map_eme[kin][59]) / 2; ch[co].armor_bonus  = max(  8, min(120, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][58]) / 2; ch[co].weapon_bonus = max( 12, min(150, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][59]) / 2; ch[co].armor_bonus  = max(  8, min(150, tmp));
 	
 	chlog(co, "created map mob");
 	
@@ -4471,7 +4561,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		in = 0;
 		rank = getrank(co);
 		
-		if (rank>=18 && !RANDOM(50))
+		if (rank>=18 && try_boost(50))
 		{
 			static int item[]  = {
 				2515, 2519, 2523, 2527, 2531, 
@@ -4480,7 +4570,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=15 && !RANDOM(50))
+		else if (rank>=15 && try_boost(50))
 		{
 			static int item[]  = {
 				2514, 2518, 2522, 2526, 2530, 
@@ -4489,7 +4579,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=12 && !RANDOM(50))
+		else if (rank>=12 && try_boost(50))
 		{
 			static int item[]  = {
 				2513, 2517, 2521, 2525, 2529, 
@@ -4498,7 +4588,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (!RANDOM(50))
+		else if (try_boost(50))
 		{
 			static int item[]  = {
 				2512, 2516, 2520, 2524, 2528,

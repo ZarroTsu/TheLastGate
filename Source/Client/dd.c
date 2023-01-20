@@ -1896,12 +1896,12 @@ void dd_show_map(unsigned short *src,int xo,int yo,int magnify)
 	if (!dst) return;
 	
 	// Draw the mini-map (magnify x magnify)
-	for (y=0; y<128; y++) 
+	for (x=0; x<128; x++) 
 	{
-		d=(y+wnd_xtra+582)*MAXX+6;
-		s=((y/magnify)+yo)*MAPX_MAX+xo;
+		d=(x+wnd_xtra+582)*MAXX+6;
+		s=((x/magnify)+xo)*MAPX_MAX+yo;
 		p=s*magnify;
-		for (x=0; x<128; x++) 
+		for (y=0; y<128; y++) 
 		{
 			dst[d++]=src[s];
 			p++; s=p/magnify;

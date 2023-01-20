@@ -559,6 +559,235 @@ struct skilltab _skilltab[52] = {
 				{ 0, 0, 0 }}
 };
 
+struct sk_tree sk_tree[8][12]={
+	{	// Seyan'du
+		{ "Sharpness", 				"+2 to Weapon Value.", 	// W
+		  6601,						"" },
+		{ "Expertise", 				"+1 to All Attributes.", 	// N
+		  6602,						"" },
+		{ "Toughness", 				"+2 to Armor Value.", 	// E
+		  6603,						"" },
+		{ "Absolution", 			"0.25%% more damage dealt for each buff", 	// WS
+		  6604,						"or debuff on you." },
+		{ "Vanquisher", 			"8%% more total Weapon Value.", 	// WW
+		  6605,						"" },
+		{ "Scorn", 					"Your debuffs ignore 20%% of enemy", 	// WN
+		  6606,						"Resistance when cast." },
+		{ "Determination", 			"Gain 1 additional Hit and Parry for", 	// NW
+		  6607,						"every 60 total Attributes." },
+		{ "Jack of All Trades", 	"2%% more total Attributes.", 	// NN
+		  6608,						"" },
+		{ "Redemption", 			"Companions have Hit and Parry scores", 	// NE
+		  6609,						"equal to yours, and learn Regen." },
+		{ "Enigmatic", 				"20%% reduced effect of debuffs on you.", 	// EN
+		  6610,						"" },
+		{ "Steelskin", 				"8%% more total Armor Value.", 	// EE
+		  6611,						"" },
+		{ "Penance", 				"0.5%% less damage taken for each buff", 	// ES
+		  6612,						"or debuff on you." }
+	}, // "         '         '  ",	"         '         '         '         "
+	{	// Arch Templar
+		{ "Spiked", 				"+4 to Thorns.", 	// W
+		  6613,						"" },
+		{ "Might", 					"+3 to Strength.", 	// N
+		  6614,						"" },
+		{ "Bulwark", 				"+2 to Armor Value.", 	// E
+		  6615,						"" },
+		{ "Serrated Blades", 		"Cleave deals additional damage based on", 	// WS
+		  6616,						"your total Thorns." },
+		{ "Sharkskin", 				"12%% more total Thorns.", 	// WW
+		  6617,						"" },
+		{ "Retaliation", 			"Your Thorns can now trigger on a", 	// WN
+		  6618,						"parried hit with 10%% power." },
+		{ "Overlord", 				"0.5%% more effect of Warcry and Rally", 	// NW
+		  6619,						"for every 10 total Strength." },
+		{ "Overwhelming Strength", 	"+10 to Strength Limit.", 	// NN
+		  6620,						"" },
+		{ "Censure", 				"Taunt reduces enemy Hit score by 5%%", 	// NE
+		  6621,						"for its duration." },
+		{ "Bastion", 				"20%% of total Resistance is granted as", 	// EN
+		  6622,						"extra Immunity." },
+		{ "Unbreakable", 			"8%% more total Armor Value.", 	// EE
+		  6623,						"" },
+		{ "Rampart", 				"50%% more Parry granted by your Shield", 	// ES
+		  6624,						"skill." }
+	}, // "         '         '  ", "         '         '         '         "
+	{	// Skald
+		{ "Maiming", 				"+4 to Top Damage.", 	// W
+		  6625,						"" },
+		{ "Dexterity", 				"+3 to Agility.", 	// N
+		  6626,						"" },
+		{ "Persistance", 			"+20 Endurance.", 	// E
+		  6627,						"" },
+		{ "Nocturne", 				"15%% increased effect of Aria.", 	// WS
+		  6628,						"" },
+		{ "Ravager", 				"8%% more total Top Damage.", 	// WW
+		  6629,						"" },
+		{ "Preparation", 			"Your Top Damage is rolled an additional", 	// WN
+		  6630,						"time, using the higher result." },
+		{ "Slaying", 				"+2%% Critical Multiplier for every 10", 	// NW
+		  6631,						"total Agility." },
+		{ "Overwhelming Agility", 	"+10 to Agility Limit.", 	// NN
+		  6632,						"" },
+		{ "Finesse", 				"All weapon skills use the attributes", 	// NE
+		  6633,						"Agility + Agility + Strength." },
+		{ "Impact", 				"Weaken and Crush also reduce enemy", 	// EN
+		  6634,						"critical hit chance." },
+		{ "Perseverance", 			"12%% more total Endurance.", 	// EE
+		  6635,						"" },
+		{ "Tenacity", 				"10%% of damage taken is dealt to your", 	// ES
+		  6636,						"Endurance instead." }
+	}, // "         '         '  ", "         '         '         '         "
+	{	// Warrior
+		{ "Rapidity", 				"+4 to Attack Speed.", 	// W
+		  6637,						"" },
+		{ "Ruffian", 				"+2 to Strength & +2 to Agility.", 	// N
+		  6638,						"" },
+		{ "Passion", 				"+3 to Spell Aptitude.", 	// E
+		  6639,						"" },
+		{ "Alacrity", 				"Zephyr deals 20%% more damage.", 	// WS
+		  6640,						"" },
+		{ "Swiftness", 				"8%% more total Attack Speed.", 	// WW
+		  6641,						"" },
+		{ "Intensity", 				"+0.01 to Spell Modifier.", 	// WN
+		  6642,						"" },
+		{ "Antagonizer", 			"0.5%% more effect of Blind and Douse", 	// NW
+		  6643,						"for every 10 total Strength." },
+		{ "Harrier", 				"3%% more total Agility and Strength.", 	// NN
+		  6644,						"" },
+		{ "Butchery", 				"1%% more effect of Cleave for every", 	// NE
+		  6645,						"10 total Strength." },
+		{ "Champion", 				"Enemies beside and behind you no longer", 	// EN
+		  6646,						"gain a bonus to hitting you." },
+		{ "Zealotry", 				"12%% more total Spell Aptitude.", 	// EE
+		  6647,						"" },
+		{ "Fervor", 				"0.5%% less damage taken per 10 Spell", 	// ES
+		  6648,						"Aptitude." }
+	}, // "         '         '  ", "         '         '         '         "
+	{	// Sorcerer
+		{ "Expansiveness", 			"+1 to Area of Effect.", 	// W
+		  6649,						"" },
+		{ "Potency", 				"+2 to Willpower & +2 to Intuition.", 	// N
+		  6650,						"" },
+		{ "Quickstep", 				"+4 to Movement Speed.", 	// E
+		  6651,						"" },
+		{ "Tormenter", 				"Poison deals damage 10%% faster.", 	// WS
+		  6652,						"" },
+		{ "Grandiosity", 			"20%% more total Area of Effect.", 	// WW
+		  6653,						"" },
+		{ "Brilliance", 			"+0.01 to Spell Modifier.", 	// WN
+		  6654,						"" },
+		{ "Coordination", 			"1%% more effect of Lethargy for every", 	// NW
+		  6655,						"10 total Willpower." },
+		{ "Pragmatic", 				"2%% more total Willpower and Intuition.", 	// NN
+		  6656,						"" },
+		{ "Hex Master", 			"0.4%% more effect of Curse and Slow", 	// NE
+		  6657,						"for every 10 total Intuition." },
+		{ "Nimble", 				"You no longer have a parry penalty if", 	// EN
+		  6658,						"hit while not fighting." },
+		{ "Fleet-footed", 			"12%% more total Movement Speed.", 	// EE
+		  6659,						"" },
+		{ "Acceleration", 			"Haste grants 20%% more move speed to", 	// ES
+		  6660,						"you, and it can now be cast on allies." }
+	}, // "         '         '  ", "         '         '         '         "
+	{	// Summoner
+		{ "Nimbleness", 			"+4 to Cast Speed.", 	// W
+		  6661,						"" },
+		{ "Wisdom", 				"+3 to Willpower.", 	// N
+		  6662,						"" },
+		{ "Vitality", 				"+40 Hitpoints.", 	// E
+		  6663,						"" },
+		{ "Tactician", 				"Your Attack Speed is equal to your Cast", 	// WS
+		  6664,						"Speed." },
+		{ "Spellslinger", 			"8%% more total Cast Speed.", 	// WW
+		  6665,						"" },
+		{ "Harpooner", 				"15%% more Hit and Parry score while", 	// WN
+		  6666,						"using a Spear." },
+		{ "Mysticism", 				"All spell skills use the attributes", 	// NW
+		  6667,						"Willpower + Willpower + Intuition." },
+		{ "Overwhelming Willpower", "+10 to Willpower Limit.", 	// NN
+		  6668,						"" },
+		{ "Shaper", 				"1%% more effect of Shadow Copy for", 	// NE
+		  6669,						"every 10 total Willpower." },
+		{ "Diviner", 				"Ghost Companions inherit the effects of", 	// EN
+		  6670,						"your tarot cards." },
+		{ "Constitution", 			"12%% more total Hitpoints.", 	// EE
+		  6671,						"" },
+		{ "Protector", 				"Magic Shield and Magic Shell are also", 	// ES
+		  6672,						"cast on your active companions." }
+	}, // "         '         '  ", "         '         '         '         "
+	{	// Arch Harakim
+		{ "Composure", 				"+4 to Cooldown Rate.", 	// W
+		  6673,						"" },
+		{ "Intellect", 				"+3 to Intuition.", 	// N
+		  6674,						"" },
+		{ "Wellspring", 			"+40 Mana.", 	// E
+		  6675,						"" },
+		{ "Destroyer", 				"Blast deals full damage with its area", 	// WS
+		  6676,						"of effect." },
+		{ "Serenity", 				"4%% more total Cooldown Rate.", 	// WW
+		  6677,						"" },
+		{ "Strategist", 			"You suffer no cooldown if a spell is", 	// WN
+		  6678,						"suppressed." },
+		{ "Psychosis", 				"1%% more effect of Pulse and Immolate", 	// NW
+		  6679,						"for every 10 total Intuition." },
+		{ "Overwhelming Intuition", "+10 to Intuition Limit.", 	// NN
+		  6680,						"" },
+		{ "Wizardry", 				"All spell skills use the attributes", 	// NE
+		  6681,						"Willpower + Intuition + Intuition." },
+		{ "Flow", 					"15%% of overcapped Mana is granted as", 	// EN
+		  6682,						"additional Hitpoints." },
+		{ "Perpetuity", 			"8%% more total Mana.", 	// EE
+		  6683,						"" },
+		{ "Resourcefulness", 		"10%% of damage taken is dealt to your", 	// ES
+		  6684,						"Mana instead." }
+	}, // "         '         '  ", "         '         '         '         "
+	{	// Braver
+		{ "Accuracy", 				"+2 to Hit Score.", 	// W
+		  6685,						"" },
+		{ "Boldness", 				"+3 to Braveness.", 	// N
+		  6686,						"" },
+		{ "Avoidance", 				"+2 to Parry Score.", 	// E
+		  6687,						"" },
+		{ "Assassination", 			"15%% increased effect of Precision.", 	// WS
+		  6688,						"" },
+		{ "Rigor", 					"4%% more total Hit Score.", 	// WW
+		  6689,						"" },
+		{ "Deftness", 				"50%% reduced damage taken from", 	// WN
+		  6690,						"triggering enemy Thorns." },
+		{ "Wrath", 					"1%% more effect of Rage for every 10", 	// NW
+		  6691,						"total Braveness." },
+		{ "Overwhelming Braveness", "+10 to Braveness Limit.", 	// NN
+		  6692,						"" },
+		{ "Virtuosity", 			"All weapon skills use the attributes", 	// NE
+		  6693,						"Braveness + Braveness + Agility." },
+		{ "Resilience", 			"20%% less effect of Healing Sickness", 	// EN
+		  6694,						"on you." },
+		{ "Flexibility", 			"4%% more total Parry Score.", 	// EE
+		  6695,						"" },
+		{ "Litheness", 				"50%% reduced extra damage taken from", 	// ES
+		  6696,						"enemy Critical Hits." }
+	} // "         '         '  ", "         '         '         '         "
+};
+
+#define ST_OFFSET_IC		-12
+#define ST_OFFSET_HL		-31
+
+struct sk_icon sk_icon[12]={
+	{  96, 165 }, // W
+	{ 140,  89 }, // N
+	{ 184, 165 }, // E
+	{  96, 216 }, // WS
+	{  52, 190 }, // WW
+	{  52, 140 }, // WN
+	{  96,  64 }, // NW
+	{ 140,  38 }, // NN
+	{ 184,  64 }, // NE
+	{ 228, 140 }, // EN
+	{ 228, 190 }, // EE
+	{ 184, 216 }  // ES
+};
+
 struct wpslist wpslist[MAXWPS]={
 //    nr, "123456789012345678901234567890",	"\"2345678901234567890123456789\""
 	{  0, "Lynbore, Tavern", 				"\"Humble beginnings.\"" },
@@ -615,10 +844,10 @@ int skill_cmp(const void *a,const void *b)
 
 	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
 	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && 
-		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||(m1==44&&pl.kindred & (1u<<1))||m1==50||m1==51) && 
+		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||(m1==44&&IS_SEYAN_DU)||m1==50||m1==51) && 
 		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=44&&m2!=50&&m2!=51)) return -1;
 	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && 
-		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||(m2==44&&pl.kindred & (1u<<1))||m2==50||m2==51) && 
+		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||(m2==44&&IS_SEYAN_DU)||m2==50||m2==51) && 
 		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=44&&m1!=50&&m1!=51)) return  1;
 	
 	if (c->sortkey>d->sortkey) return  1;
@@ -812,7 +1041,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	show_shop=0,show_wps=0;
+unsigned int	show_shop=0,show_wps=0,show_tree=0;
 
 unsigned int	show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -909,6 +1138,26 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 
 int load=0;
 
+int st_learned_skill(int st_val, int v)
+{	// Returns the bitwise value of the parsed value v from the input value st_val
+	return ( (st_val>>((12-v)+4))%2 );
+}
+
+int st_skill_pts_have(int st_val)
+{	// Returns the available skill points
+	return ( st_val%16 );
+}
+
+int st_skill_pts_all(int st_val)
+{	// Returns the available skill points plus spent skill points
+	int n, m = 0;
+	for (n=0;n<12;n++)
+	{
+		m += st_learned_skill(st_val, n+1);
+	}
+	return ( m + st_skill_pts_have(st_val) );
+}
+
 int at_score(int n)
 {
 	return ( (pl.attrib[n][4] << 8) | pl.attrib[n][5] );
@@ -919,15 +1168,19 @@ int sk_score(int n)
 	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
 }
 
-int pl_speed, pl_atksp, pl_spmod, pl_spapt, pl_movsp;
+int pl_speed, pl_atksp, pl_spmod, pl_skmod, pl_spapt, pl_movsp;
 int pl_critc, pl_critm, pl_topdm, pl_reflc, pl_aoebn;
 int pl_hitsc, pl_parry, pl_coold, pl_casts, pl_dmgbn;
 int pl_flags, pl_flagb, pl_flagc, pl_basel, pl_dmgml, pl_dmgrd;
-int pl_dlow,  pl_dhigh, pl_dps,   pl_cdrate;
+int pl_dlow,  pl_dhigh, pl_dps,   pl_hitdm, pl_cdrate;
 int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
-int sk_blast, sk_scorc, sk_douse, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
+int sk_blast, sk_scorc, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
 int sk_water, sk_cleav, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
-int sk_shado, sk_rally, sk_immol;
+int sk_shado, sk_rally, sk_immol, sk_shadd;
+int pl_ehp,   cri_leap, sk_bleed, sk_rage,  sk_letha;
+int sk_bless, sk_enhan, sk_prote, sk_mshie, sk_mdura, sk_haste, sk_healr;
+int coo_clea, coo_leap, coo_blas, coo_pois, coo_puls, coo_zeph, coo_ghos, coo_shad;
+int coo_blin, coo_warc, coo_weak, coo_curs, coo_slow;
 
 void init_meta_stats(void)
 {
@@ -946,6 +1199,7 @@ void init_meta_stats(void)
 
 	// Player Spell Mod and Spell Apt - WN_SPMOD
 	pl_spmod = pl.worn[WN_SPMOD];
+	pl_skmod = 100;
 	pl_spapt = pl.worn_p[WN_SPMOD];
 	
 	// Player Crit chance and Crit Multiplier - WN_CRIT
@@ -989,7 +1243,8 @@ void init_meta_stats(void)
 	pl_dlow  = (pl.weapon*pl_dmgml/100)/4*pl_dmgbn/10000;
 	pl_dhigh = pl.weapon+8+pl_topdm+6;
 	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_dps   = (pl_dlow+pl_dhigh)/2*pl_atksp;
+	pl_hitdm = (pl_dlow+pl_dhigh)/2;
+	pl_dps   = pl_hitdm*pl_atksp;
 	
 	// Player cooldown rate - pl_cdrate
 	pl_cdrate = 100 * pl_basel / max(25, pl_coold);
@@ -1009,34 +1264,56 @@ void init_meta_stats(void)
 	}
 	hpmult = endmult = manamult = moonmult;
 	
+	// Reverse Star
+	if (pl_flagc & (1 << 10))
+	{
+		pl_skmod = pl_spmod;
+		pl_spmod = 100;
+	}
+	
 	/*
 		Additional skill bonuses for GUI
 	*/
 	sk_proxi = sk_score(44) / (300/12);
 	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
-	sk_poiso = (sk_score(42)*pl_spmod/100 + 15) * DAM_MULT_POISON / 30;
+	sk_poiso = (sk_score(42)*pl_spmod/100 + 5) * DAM_MULT_POISON / 300;
 	sk_blast = sk_score(24)*pl_spmod/100 * 2 * DAM_MULT_BLAST/1000;
 	sk_scorc = 1000 + sk_score(24)*pl_spmod/100;
-	sk_pulse = sk_score(43)*pl_spmod/100 * 2 * DAM_MULT_PULSE/1000;
-	sk_immol = (100 + sk_score(43)*pl_spmod/100) * 2 * ((pl.kindred & (1u<<1))?5:4) * 2;
+	sk_pulse = (sk_score(43)+(sk_score(43)*(T_ARHR_SK(7)?at_score(AT_INT)/1000:0)))*pl_spmod/100 * 2 * DAM_MULT_PULSE/1000;
+	sk_immol = (100 + sk_score(43)*pl_spmod/100) * 2 * (IS_SEYAN_DU?5:4) * 2;
 	sk_pucnt = (60*2*100 / (3*pl_cdrate));
-	sk_leapv = (sk_score(49)+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000;
+	sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000;
 	sk_water = 25 * TICKS;
-	sk_cleav = (sk_score(40)+pl.weapon/4+pl_topdm/4) * 2 * DAM_MULT_CLEAVE/1000;
-	sk_warcr = -(2+(sk_score(35)/(10/3)) / 5);
-	sk_rally = sk_score(35)/10;
-	sk_shado = 15 + sk_score(46)*pl_spmod/500;
-	sk_weake = -(sk_score(41) / 4 + 2);
+	sk_cleav = ((sk_score(40)+(sk_score(40)*(T_WARR_SK(9)?at_score(AT_STR)/1000:0)))*pl_skmod/100+pl.weapon/4+pl_topdm/4+(T_ARTM_SK(4)?pl_reflc:0)) * 2 * DAM_MULT_CLEAVE/1000;
+	sk_warcr = -(2+((sk_score(35)+(sk_score(35)*(T_ARTM_SK(7)?at_score(AT_STR)/2000:0)))*pl_skmod/100/(10/3)) / 5);
+	sk_rally = sk_score(35)*pl_skmod/100/10;
+	sk_shado = (sk_score(46)+(sk_score(46)*(T_SUMM_SK(9)?at_score(AT_WIL)/1000:0)))*pl_spmod/100 * 5 / 11;
+	sk_shadd = 15 + (sk_score(46)+(sk_score(46)*(T_SUMM_SK(9)?at_score(AT_WIL)/1000:0)))*pl_spmod/500;
+	sk_weake = -(sk_score(41)*pl_skmod/100 / 4 + 2);
 	
-	if (pl.kindred & ((1u<<0) | (1u<<10) | (1u<<11)))
+	cri_leap = pl_critm;
+	if (cri_leap > 175) { cri_leap=cri_leap-175; cri_leap=175+cri_leap/2; }
+	if (cri_leap > 250) { cri_leap=cri_leap-250; cri_leap=250+cri_leap/2; }
+	
+	sk_bleed = (sk_cleav + 5) * DAM_MULT_BLEED / 150;
+	sk_rage  = (sk_score(14)+(sk_score(14)*(T_BRAV_SK(7)?at_score(AT_BRV)/1000:0)))*pl_skmod/100*((pl_flagb&(1<<3))?6:2)/15+((pl_flagb&(1<<3))?6:2);
+	sk_letha = (sk_score(15)+(sk_score(15)*(T_SORC_SK(7)?at_score(AT_WIL)/1000:0)))*pl_spmod/100/(IS_SEYAN_DU?4:3);
+	sk_bless = min(127, (sk_score(21)*2/3) / 5 + 3);
+	sk_enhan = min(127, (IS_SEYAN_DU?(sk_score(18)/6+3):(sk_score(18)/4+4)));
+	sk_prote = min(127, (IS_SEYAN_DU?(sk_score(17)/6+3):(sk_score(17)/4+4)));
+	sk_mdura = sk_score(11) * ((pl_flagb&(1<<10))?128:256);
+	sk_mshie = min(127, (IS_SEYAN_DU?(sk_mdura/((pl_flagb&(1<<10))?768:1536)+1):(sk_mdura/((pl_flagb&(1<<10))?512:1024)+1)));
+	sk_mdura = sk_mdura/20;
+	sk_haste = min(300, 10 + (sk_score(47))/ 6) + min(127, 5 + (sk_score(47)+6)/12);
+	sk_healr = ((pl_flags&(1<<14))?sk_score(26)*1875/20:sk_score(26)*2500)/1000;
+	
+	if (IS_MERCENARY || IS_WARRIOR || IS_SORCERER)
 	{
-		sk_blind = -(sk_score(37) / 6 + 2);
-		sk_douse = -(sk_score(37) / 6 + 2);
+		sk_blind = -((sk_score(37)+(sk_score(37)*(T_WARR_SK(7)?at_score(AT_AGL)/2000:0)))*pl_skmod/100 / 6 + 2);
 	}
 	else
 	{
-		sk_blind = -(sk_score(37) / 8 + 1);
-		sk_douse = -(sk_score(37) / 8 + 1);
+		sk_blind = -(sk_score(37)*pl_skmod/100 / 8 + 1);
 	}
 	
 	// Tarot - Hanged Man (immunity&resistance)
@@ -1061,29 +1338,27 @@ void init_meta_stats(void)
 		sk_conce = max(1, 100 - 100 * sk_score(34) / 400);
 	}
 	
-	// Tarot - Rev.Tower
-	if (pl_flagb & (1 << 14))
-	{
-		sk_poiso = sk_poiso / 2;
-	}
-	
 	// Book - Venom Compendium (poison bonus)
 	if (pl_flags & (1 <<  4))
-	{
 		sk_poiso = sk_poiso * 5 / 4;
-	}
+	// Tree - 10% faster = 11.1% more damage
+	if (T_SORC_SK(4))
+		sk_poiso = sk_poiso * 10 / 9;
+	// Tarot - Rev.Tower (Venom)
+	if (pl_flagb & (1 << 14))
+		sk_poiso = sk_poiso / 2;
 	
 	// Tarot - Rev.Death (zephyr)
 	if (pl_flagb & (1 <<  5))
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + pl_reflc*2) * 2 * DAM_MULT_ZEPHYR/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + pl_reflc*2) * 2 * DAM_MULT_ZEPHYR/1000 * (T_WARR_SK(4)?120:100)/100;
 	}
 	else
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/3) * 2 * DAM_MULT_ZEPHYR/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/3) * 2 * DAM_MULT_ZEPHYR/1000 * (T_WARR_SK(4)?120:100)/100;
 	}
 	
-	if (pl.kindred & ((1u<<1) | (1u<<14)))
+	if (IS_SEYAN_DU || IS_BRAVER)
 	{
 		sk_weake = -(sk_score(41) / 6 + 2);
 	}
@@ -1091,21 +1366,21 @@ void init_meta_stats(void)
 	// Tarot - Emperor (slow bonus)
 	if (pl_flags & (1 <<  5))
 	{
-		sk_slowv = -(30 + (sk_score(19)*pl_spmod/100)/4);
+		sk_slowv = -(30 + ((sk_score(19)+(sk_score(19)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)/4);
 	}
 	else
 	{
-		sk_slowv = -(30 + (sk_score(19)*pl_spmod/100)/3);
+		sk_slowv = -(30 + ((sk_score(19)+(sk_score(19)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)/3);
 	}
 	
 	// Tarot - Tower (curse bonus)
 	if (pl_flags & (1 <<  6))
 	{
-		sk_curse = -(2 + (((sk_score(20)*pl_spmod/100)*5/4)-4)/5);
+		sk_curse = -(2 + ((((sk_score(20)+(sk_score(20)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)*5/4)-4)/5);
 	}
 	else
 	{
-		sk_curse = -(2 + ((sk_score(20)*pl_spmod/100)-4)/5);
+		sk_curse = -(2 + (((sk_score(20)+(sk_score(20)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)-4)/5);
 	}
 	
 	// Swimming skill
@@ -1123,14 +1398,28 @@ void init_meta_stats(void)
 	// Book - Burning
 	if (pl_flagb & (1 << 13))
 	{
-		sk_immol = (100 + (sk_score(43)+pl.hp[5]/40)*pl_spmod/100) * 2 * ((pl.kindred & (1u<<1))?5:4) * 2;
+		sk_immol = (100 + (sk_score(43)+pl.hp[5]/40)*pl_spmod/100) * 2 * (IS_SEYAN_DU?5:4) * 2;
 	}
 	
 	// Tarot - Rev.Justice (Leap reduction)
 	if (pl_flagb & (1 <<  7))
-	{
 		sk_leapv = sk_leapv * 85/100;
-	}
+	cri_leap = sk_leapv*((pl_flagb&(1<<7))?100:cri_leap)/100;
+	
+	if (pl_flagc & (1<<2)) // 20% more weaken effect
+		sk_weake = sk_weake * 6/5;
+	if (pl_flagc & (1<<3)) // 20% more slow effect
+		sk_slowv = sk_slowv * 6/5;
+	if (pl_flagc & (1<<4)) // 20% more curse effect
+		sk_curse = sk_curse * 6/5;
+	if (pl_flagc & (1<<5)) // 20% more poison effect
+		sk_poiso = sk_poiso * 6/5;
+	if (pl_flagc & (1<<6)) // 20% more bleed effect
+		sk_bleed = sk_bleed * 6/5;
+	if (pl_flagc & (1<<7)) // 20% more blind effect
+		sk_blind = sk_blind * 6/5;
+	if (pl_flagc & (1<<8)) // 20% more heal effect
+		sk_healr = sk_healr * 6/5;
 	
 	/*
 		Regeneration stats
@@ -1156,6 +1445,19 @@ void init_meta_stats(void)
 	{
 		race_res += race_med;	race_med -= race_med;
 		endmult  += manamult;	manamult -= manamult;
+	}
+	
+	// Meditate added to Hitpoints
+	if (pl_flagc & (1<<0))
+	{
+		race_reg += race_med/2;
+		hpmult   += manamult/2;
+	}
+	// Rest added to mana
+	if (pl_flagc & (1<<1))
+	{
+		race_med += race_res/2;
+		manamult += endmult/2;
 	}
 	
 	sk_regen = (pl.skill[28][0]?race_reg:0) + hpmult   * 2;
@@ -1201,6 +1503,33 @@ void init_meta_stats(void)
 	sk_regen = sk_regen * 20/10;
 	sk_restv = sk_restv * 20/10;
 	sk_medit = sk_medit * 20/10;
+	
+	coo_clea = 500 * pl_cdrate / 100;
+	coo_leap = (500 - ((pl_flagb&(1<<7))?200:0)) * pl_cdrate / 100;
+	coo_blas = 600 * pl_cdrate / 100;
+	coo_pois = 500 * pl_cdrate / 100;
+	coo_puls = 600 * pl_cdrate / 100;
+	coo_zeph = 400 * pl_cdrate / 100;
+	coo_ghos = 800 * pl_cdrate / 100;
+	coo_shad = 400 * pl_cdrate / 100;
+	coo_blin = 300 * pl_cdrate / 100;
+	coo_warc = 300 * pl_cdrate / 100;
+	coo_weak = 300 * pl_cdrate / 100;
+	coo_curs = 400 * pl_cdrate / 100;
+	coo_slow = 400 * pl_cdrate / 100;
+	
+	pl_ehp = pl.hp[5]*10000/pl_dmgrd;
+	
+	if (pl_flagc & (1<<9)) // 20% damage shifted to end/mana
+		pl_ehp = pl_ehp * 100 /  80;
+	if (pl_flagc & (1<<11)) // 5% chance to not be hit by melee
+		pl_ehp = pl_ehp * 100 /  95;
+	if (pl_flagc & (1<<12)) // 10% damage shifted to end/mana
+		pl_ehp = pl_ehp * 100 /  90;
+	if (pl_flagc & (1<<14)) // 20% damage null/shifted to endurance
+		pl_ehp = pl_ehp * 100 /  80;
+	if (pl_flags & (1<<9)) // 20% damage null/shifted to mana
+		pl_ehp = pl_ehp * 100 /  80;
 }
 
 void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
@@ -1234,13 +1563,13 @@ void show_meta_stats(int n)
 	{
 		switch (n)
 		{
-			case  0: meta_stat(0,n,1,"Cooldown Duration", 	pl_cdrate/100, 	pl_cdrate%100, 	"x"); break;
-			case  1: meta_stat(0,n,1,"Spell Aptitude", 		pl_spapt, 		-1, 			""); break;
-			case  2: meta_stat(0,n,1,"Spell Modifier", 		pl_spmod /100, 	pl_spmod %100, 	"x"); break;
-			case  3: meta_stat(0,n,1,"Base Speed", 			pl_speed/100,	pl_speed%100, 	""); break;
-			//
-			case  5: meta_stat(0,n,5,"Hit Score", 			pl_hitsc, 		-1, 			""); break;
-			case  6: meta_stat(0,n,5,"Parry Score", 		pl_parry, 		-1, 			""); break;
+			case  0: meta_stat(0,n,1,"Cooldown Duration", pl_cdrate/100, pl_cdrate%100, "x"); break;
+			case  1: meta_stat(0,n,4,"Spell Aptitude",    pl_spapt,      -1,            "" ); break;
+			case  2: meta_stat(0,n,4,"Spell Modifier",    pl_spmod /100, pl_spmod %100, "x"); break;
+			case  3: meta_stat(0,n,6,"Base Action Speed", pl_speed/100,  pl_speed%100,  "" ); break;
+			case  4: meta_stat(0,n,6,"Movement Speed",    pl_movsp/100,  pl_movsp%100,  "" ); break;
+			case  5: meta_stat(0,n,7,"Hit Score",         pl_hitsc,      -1,            "" ); break;
+			case  6: meta_stat(0,n,7,"Parry Score",       pl_parry,      -1,            "" ); break;
 			default: break;
 		}
 	}
@@ -1249,38 +1578,70 @@ void show_meta_stats(int n)
 		n-=7;
 		switch (n+skill_pos)
 		{
-			case  0: meta_stat(1,n,0,"  Passive Stats:", -1, -1, ""); break;
+			case  0: meta_stat(1,n,9,"  Passive Stats:",     -1,           -1,           ""       ); break;
+			case  1: if (pl_dmgbn!=10000)
+					 meta_stat(1,n,1,"Damage Multiplier",    pl_dmgbn/100, pl_dmgbn%100, "%"      ); break;
+			case  2: meta_stat(1,n,7,"Est. Melee DPS",       pl_dps/100,   pl_dps%100,   ""       ); break;
+			case  3: meta_stat(1,n,5,"Est. Melee Hit Dmg",   pl_hitdm,     -1,           ""       ); break;
+			case  4: meta_stat(1,n,5,"Critical Multiplier",  pl_critm,     -1,           "%"      ); break;
+			case  5: meta_stat(1,n,5,"Critical Chance",      pl_critc/100, pl_critc%100, "%"      ); break;
+			case  6: meta_stat(1,n,5,"Melee Ceiling Damage", pl_dhigh,     -1,           ""       ); break;
+			case  7: meta_stat(1,n,5,"Melee  Floor  Damage", pl_dlow,      -1,           ""       ); break;
+			case  8: meta_stat(1,n,6,"Attack Speed",         pl_atksp/100, pl_atksp%100, ""       ); break;
+			case  9: meta_stat(1,n,6,"  Cast Speed",         pl_casts/100, pl_casts%100, ""       ); break;
+			case 10: if (pl_reflc>0)
+					 meta_stat(1,n,1,"Thorns Score",         pl_reflc,     -1,           ""       ); break;
+			case 11: if (pl.skill[34][0])
+					 meta_stat(1,n,4,"Mana Cost Multiplier", sk_conce/100, sk_conce%100, "%"      ); break;
+			case 12: if (pl_aoebn)
+					 meta_stat(1,n,1,"Total AoE Bonus",      pl_aoebn,     -1,           "Tiles"  ); break;
 			//
-			case  1: meta_stat(1,n,5,"Est. Melee DPS", pl_dps/100, pl_dps%100, ""); break;
-			case  2: meta_stat(1,n,1,"Melee  Floor  Damage", pl_dlow, -1, ""); break;
-			case  3: meta_stat(1,n,1,"Melee Ceiling Damage", pl_dhigh, -1, ""); break;
-			//
-			case  5: meta_stat(1,n,1,"Damage Bonus", pl_dmgbn/100, pl_dmgbn%100, "%"); break;
-			//
-			case  7: meta_stat(1,n,5,"Critical Chance", 	pl_critc/100,	pl_critc%100,	"%"); break;
-			case  8: meta_stat(1,n,5,"Critical Multiplier", pl_critm, 		-1, 			"%"); break;
-			//
-			case 10: meta_stat(1,n,1,"Attack Speed", 		pl_atksp/100,	pl_atksp%100, 	""); break;
-			case 11: meta_stat(1,n,1,"  Cast Speed", 		pl_casts/100,	pl_casts%100, 	""); break;
-			//
-			case 13: if (pl_aoebn) meta_stat(1,n,1,"Total AoE Bonus", pl_aoebn, -1, ""); break;
-			//
-			case 15: meta_stat(1,n,0,"  Active Stats:", -1, -1, ""); break;
-			//
-			case 16: if (pl.skill[40][0]) meta_stat(2,n,5,"Cleave Hit Damage", sk_cleav, -1, ""); break;
-			case 17: if (pl.skill[49][0]) meta_stat(2,n,5,"Leap Hit Damage", sk_leapv, -1, ""); break;
-			//
-			case 18: if (pl.skill[24][0]) meta_stat(2,n,1,"Blast Hit Damage", sk_blast, -1, ""); break;
-			
-			case 19: if (pl.skill[42][0]) meta_stat(2,n,1, (pl_flagb & (1 << 14))?"Venom Degen":"Poison Degen", sk_poiso/100, sk_poiso%100, "/s"); break;
-			case 20: if (pl.skill[43][0] || (pl_flagc & (1 << 13))) { 
-					 if ((pl_flagb & (1 << 6)) || (pl_flagc & (1 << 13))) { meta_stat(2,n,1,"Immolate Degen", sk_immol/100, sk_immol%100, "/s"); }
-					 else 						  { meta_stat(2,n,1,"Pulse Hit Damage", sk_pulse, -1, ""); } } break;
-			case 21: if (pl.skill[43][0] && !(pl_flagb & (1 << 6))) meta_stat(2,n,1,"Pulse Count", sk_pucnt, -1, ""); break;
-			case 22: if (pl.skill[ 7][0]) meta_stat(2,n,1,"Zephyr Hit Damage", sk_razor, -1, ""); break;
-			//
-			case 23: if (pl.skill[27][0]) meta_stat(2,n,5,"Ghost Comp Potency", 	sk_ghost, 		-1, 			""); break;
-			case 24: if (pl.skill[46][0]) meta_stat(2,n,5,"Shadow Duration", 	sk_shado, 		-1, 			"Seconds"); break;
+			case 16: meta_stat(1,n,9,"  Active Stats:",      -1,           -1,           ""       ); break;
+			case 17: if (pl.skill[40][0])
+					 meta_stat(2,n,5,"Cleave Hit Damage",    sk_cleav,     -1,           ""       ); break;
+			case 18: if (pl.skill[40][0] && !(pl_flags&(1<<8)))
+					 meta_stat(2,n,5,"Cleave Bleed Degen",   sk_bleed/100, sk_bleed%100, "/s"     ); break;
+			case 19: if (pl.skill[40][0])
+					 meta_stat(2,n,5,"Cleave Cooldown",      coo_clea/100, coo_clea%100, "Seconds"); break;
+			case 20: if (pl.skill[49][0])
+					 meta_stat(2,n,1,"Leap Crit Damage",     cri_leap,     -1,           ""       ); break;
+			case 21: if (pl.skill[49][0])
+					 meta_stat(2,n,1,"Leap Hit Damage",      sk_leapv,     -1,           ""       ); break;
+			case 22: if (pl.skill[49][0])
+					 meta_stat(2,n,1,"Leap Cooldown",        coo_leap/100, coo_leap%100, "Seconds"); break;
+			case 23: if (pl.skill[14][0])
+					 meta_stat(2,n,5,"Rage Effect",          sk_rage,-1,(pl_flagb&(1<<3))?"Top Dmg":"WV"); break;
+			case 24: if (pl.skill[24][0]) 
+					 meta_stat(2,n,4,"Blast Hit Damage",     sk_blast,     -1,           ""       ); break;
+			case 25: if (pl.skill[24][0])
+					 meta_stat(2,n,4,"Blast Cooldown",       coo_blas/100, coo_blas%100, "Seconds"); break;
+			case 26: if (pl.skill[15][0]) 
+					 meta_stat(2,n,1,"Lethargy Effect",      sk_letha,     -1,           "I/R Pen"); break;
+			case 27: if (pl.skill[42][0])
+					 meta_stat(2,n,4,(pl_flagb&(1<<14))?"Venom Degen":"Poison Degen",sk_poiso/100,sk_poiso%100,"/s"); break;
+			case 28: if (pl.skill[42][0])
+					 meta_stat(2,n,4,(pl_flagb&(1<<14))?"Venom Cooldown":"Poison Cooldown",coo_pois/100,coo_pois%100,"Seconds"); break;
+			case 29: if (pl.skill[43][0]  ||(pl_flagc&(1<<13))) { 
+					 if ((pl_flagb&(1<<6))||(pl_flagc&(1<<13))) { meta_stat(2,n,1,"Immolate Degen",sk_immol/100,sk_immol%100,"/s"); }
+					 else                                       { meta_stat(2,n,1,"Pulse Hit Damage",sk_pulse,-1,""); } } break;
+			case 30: if (pl.skill[43][0] && !(pl_flagb&(1<<6)))
+					 meta_stat(2,n,1,"Pulse Count",          sk_pucnt,     -1,           ""       ); break;
+			case 31: if (pl.skill[43][0]  ||(pl_flagc&(1<<13)))
+					 meta_stat(2,n,1,((pl_flagb&(1<<6))||(pl_flagc&(1<<13)))?"Immolate Cooldown":"Pulse Cooldown",coo_puls/100,coo_puls%100,"Seconds"); break;
+			case 32: if (pl.skill[ 7][0])
+					 meta_stat(2,n,6,"Zephyr Hit Damage",    sk_razor,     -1,           ""       ); break;
+			case 33: if (pl.skill[ 7][0])
+					 meta_stat(2,n,6,"Zephyr Cooldown",      coo_zeph/100, coo_zeph%100, "Seconds"); break;
+			case 34: if (pl.skill[27][0])
+					 meta_stat(2,n,1,"Ghost Comp Potency", 	 sk_ghost,     -1,           ""       ); break;
+			case 35: if (pl.skill[27][0])
+					 meta_stat(2,n,1,"Ghost Comp Cooldown",  coo_ghos/100, coo_ghos%100, "Seconds"); break;
+			case 36: if (pl.skill[46][0])
+					 meta_stat(2,n,4,"Shadow Copy Potency",  sk_shado,     -1,           ""       ); break;
+			case 37: if (pl.skill[46][0])
+					 meta_stat(2,n,4,"Shadow Copy Duration", sk_shadd,     -1,           "Seconds"); break;
+			case 38: if (pl.skill[46][0])
+					 meta_stat(2,n,4,"Shadow Copy Cooldown", coo_shad/100, coo_shad%100, "Seconds"); break;
 			//
 			default: break;
 		}
@@ -1290,42 +1651,75 @@ void show_meta_stats(int n)
 		n-=7;
 		switch (n+skill_pos)
 		{
-			case  0: meta_stat(1,n,0,"  Passive Stats:", -1, -1, ""); break;
+			case  0: meta_stat(1,n,9,"  Passive Stats:",     -1,           -1,           ""       ); break;
+			case  1: if (pl_dmgrd!=10000)
+					 meta_stat(1,n,1,"Damage Reduction",     pl_dmgrd/100, pl_dmgrd%100, "%"      ); break;
+			case  2: if (pl_dmgrd!=10000)
+					 meta_stat(1,n,7,"Effective Hitpoints",  pl_ehp,       -1,           ""       ); break;
+			case  3: meta_stat(1,n,5,"Health Regen Rate",    sk_regen/100, sk_regen%100, "/s"     ); break;
+			case  4: meta_stat(1,n,6,"Endurance Regen Rate", sk_restv/100, sk_restv%100, "/s"     ); break;
+			case  5: meta_stat(1,n,4,"Mana Regen Rate",      sk_medit/100, sk_medit%100, "/s"     ); break;
+			case  6: meta_stat(1,n,1,"Effective Immunity",   sk_immun,     -1,           ""       ); break;
+			case  7: meta_stat(1,n,1,"Effective Resistance", sk_resis,     -1,           ""       ); break;
+			case  8: meta_stat(1,n,6,"Attack Speed",         pl_atksp/100, pl_atksp%100, ""       ); break;
+			case  9: meta_stat(1,n,6,"  Cast Speed",         pl_casts/100, pl_casts%100, ""       ); break;
+			case 10: if (pl_reflc>0)
+					 meta_stat(1,n,1,"Thorns Score",         pl_reflc,     -1,           ""       ); break;
+			case 11: if (pl.skill[34][0])
+					 meta_stat(1,n,4,"Mana Cost Multiplier", sk_conce/100, sk_conce%100, "%"      ); break;
+			case 12: if (pl_aoebn)
+					 meta_stat(1,n,4,"Total AoE Bonus",      pl_aoebn,     -1,           "Tiles"  ); break;
+			case 13: meta_stat(1,n,4,"Buffing Apt Bonus",    at_score(AT_WIL)/4, -1,     ""       ); break;
+			case 14: meta_stat(2,n,1,"Underwater Degen",     sk_water/100, sk_water%100, "/s"     ); break;
 			//
-			case  1: meta_stat(1,n,5,"Health Regen Rate", sk_regen/100,sk_regen%100, "/s"); break;
-			case  2: meta_stat(1,n,5,"Endurance Regen Rate", sk_restv/100,sk_restv%100, "/s"); break;
-			case  3: meta_stat(1,n,5,"Mana Regen Rate", sk_medit/100,sk_medit%100, "/s"); break;
+			case 16: meta_stat(1,n,9,"  Active Stats:",      -1,           -1,           ""       ); break;
+			case 17: if (pl.skill[21][0])
+					 meta_stat(2,n,1,"Bless Effect",         sk_bless,     -1,           "Attribs"); break;
+			case 18: if (pl.skill[18][0])
+					 meta_stat(2,n,1,"Enhance Effect",       sk_enhan,     -1,           "WV"     ); break;
+			case 19: if (pl.skill[17][0])
+					 meta_stat(2,n,1,"Protect Effect",       sk_prote,     -1,           "AV"     ); break;
+			case 20: if (pl.skill[11][0])
+					 meta_stat(2,n,4,(pl_flagb&(1<<10))?"M.Shell Effect":"M.Shield Effect", sk_mshie, -1, (pl_flagb&(1<<10))?"Res&Imm":"AV"); break;
+			case 21: if (pl.skill[11][0])
+					 meta_stat(2,n,4,(pl_flagb&(1<<10))?"M.Shell Duration":"M.Shield Duration", sk_mdura, -1, "Seconds"); break;
+			case 22: if (pl.skill[47][0])
+					 meta_stat(2,n,6,"Haste Effect",         sk_haste,     -1,           "Speed"  ); break;
+			case 23: if (pl.skill[26][0])
+					 meta_stat(2,n,1,(pl_flags&(1<<14))?"Regen Effect":"Heal Effect",sk_healr,-1,(pl_flags&(1<<14))?"/s":""); break;
+			case 24: if (pl.skill[37][0])  {
+					 if (pl_flagb&(5<<11)) { meta_stat(2,n,5,"Douse Effect", sk_blind/100, sk_blind%100, ""); }
+					 else                  { meta_stat(2,n,5,"Blind Effect", sk_blind,     -1,           ""); } } break;
+			case 25: if (pl.skill[37][0])
+					 meta_stat(2,n,5,(pl_flagb&(1<<11))?"Douse Cooldown":"Blind Cooldown", coo_blin/100, coo_blin%100, "Seconds"); break;
+			case 26: if (pl.skill[35][0])  {
+					 if (pl_flagb&(1<<12)) { meta_stat(2,n,5,"Rally Effect",  sk_rally, -1, "Hit/Par"); }
+					 else                  { meta_stat(2,n,5,"Warcry Effect", sk_warcr, -1, "Attribs"); } } break;
+			case 27: if (pl.skill[35][0])
+					 meta_stat(2,n,1,(pl_flagb&(1<<12))?"Rally Cooldown":"Warcry Cooldown", coo_warc/100, coo_warc%100, "Seconds"); break;
+			case 28: if (pl.skill[41][0])
+					 meta_stat(2,n,5,(pl_flags&(1<<10))?"Crush Effect":"Weaken Effect", sk_weake, -1, (pl_flags&(1<<10))?"AV":"WV"); break;
+			case 29: if (pl.skill[41][0])
+					 meta_stat(2,n,5,(pl_flags&(1<<10))?"Crush Cooldown":"Weaken Cooldown", coo_weak/100, coo_weak%100, "Seconds"); break;
+			case 30: if (pl.skill[20][0])
+					 meta_stat(2,n,1,"Curse Effect",         sk_curse,     -1,           "Attribs"); break;
+			case 31: if (pl.skill[20][0])
+					 meta_stat(2,n,1,"Curse Cooldown",       coo_curs/100, coo_curs%100, "Seconds"); break;
+			case 32: if (pl.skill[19][0])
+					 meta_stat(2,n,4,"Slow Effect",          sk_slowv,     -1,           "Speed"  ); break;
+			case 33: if (pl.skill[19][0])
+					 meta_stat(2,n,4,"Slow Cooldown",        coo_slow/100, coo_slow%100, "Seconds"); break;
+			case 34: if (pl.skill[27][0])
+					 meta_stat(2,n,1,"Ghost Comp Potency", 	 sk_ghost,     -1,           ""       ); break;
+			case 35: if (pl.skill[27][0])
+					 meta_stat(2,n,1,"Ghost Comp Cooldown",  coo_ghos/100, coo_ghos%100, "Seconds"); break;
+			case 36: if (pl.skill[46][0])
+					 meta_stat(2,n,4,"Shadow Copy Potency",  sk_shado,     -1,           ""       ); break;
+			case 37: if (pl.skill[46][0])
+					 meta_stat(2,n,4,"Shadow Copy Duration", sk_shadd,     -1,           "Seconds"); break;
+			case 38: if (pl.skill[46][0])
+					 meta_stat(2,n,4,"Shadow Copy Cooldown", coo_shad/100, coo_shad%100, "Seconds"); break;
 			//
-			case  5: meta_stat(1,n,1,"Damage Reduction", pl_dmgrd/100, pl_dmgrd%100, "%"); break;
-			//
-			case  7: meta_stat(1,n,5,"Effective Immunity", 	sk_immun, 		-1, 			""); break;
-			case  8: meta_stat(1,n,5,"Effective Resistance",sk_resis, 		-1, 			""); break;
-			//
-			case 10: meta_stat(1,n,1,"Movement Speed", 		pl_movsp/100, 	pl_movsp%100, 	""); break;
-			//
-			case 13: if (pl.skill[34][0]) meta_stat(1,n,1,"Mana Cost", 			sk_conce/100,	sk_conce%100, 	"%"); break;
-			case 14: meta_stat(1,n,1,"Aptitude Bonus", at_score(AT_WIL)/4, -1, 		""); break;
-			//
-			case 16: meta_stat(2,n,1,"Underwater Degen", 	sk_water/100,	sk_water%100, 	"/s"); break;
-			//
-			case 18: if (pl_reflc>0) meta_stat(1,n,5,"Thorns Score", 		pl_reflc, 		-1, 			""); break;
-			//
-			case 20: meta_stat(1,n,0,"  Active Stats:", -1, -1, ""); break;
-			//
-			case 21: if (pl.skill[37][0]) {
-					 if (pl_flagb & (1 << 11)) { meta_stat(2,n,5,"Douse Effect", sk_douse/1000, sk_douse%1000, ""); } // Need to adjust Douse from 3 deimal places to 2
-					 else					   { meta_stat(2,n,5,"Blind Effect", sk_blind, -1, ""); } } break;
-			case 22: if (pl.skill[35][0]) {
-					 if (pl_flagb & (1 << 12)) { meta_stat(2,n,5,"Rally Effect", sk_rally, -1, ""); }
-					 else					   { meta_stat(2,n,5,"Warcry Effect", sk_warcr, -1, ""); } } break;
-			case 23: if (pl.skill[41][0]) meta_stat(2,n,5,"Weaken Effect", sk_weake, -1, ""); break;
-			//
-			case 24: if (pl.skill[20][0]) meta_stat(2,n,1,"Curse Effect", 		sk_curse, 		-1, 			""); break;
-			case 25: if (pl.skill[19][0]) meta_stat(2,n,1,"Slow Effect", sk_slowv, -1, ""); break;
-			//
-			
-//			case  0: meta_stat(1,n,1,"", 0, -1, ""); break;
-			
 			default: break;
 		}
 	}
@@ -1471,6 +1865,14 @@ void eng_display_win(int plr_sprite,int init)
 		{
 			init_meta_stats();
 		}
+		
+		// Display Skill Tree button if applicable - a similar check is required in inter.c
+		if (st_skill_pts_all(pl.tree_points)>0)
+		{
+			if (st_skill_pts_have(pl.tree_points)>0 && !show_tree)
+				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(GetTickCount()%16))*2)));
+			copyspritex(do_darkmode?18004:18002, 339, 179,  0);
+		}
 
 		// WV, AV, EXP
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
@@ -1556,7 +1958,7 @@ void eng_display_win(int plr_sprite,int init)
 				else if (!pl.skill[m][0]) 
 				{
 					// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
-					if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&pl.kindred & (1u<<1))) 
+					if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&IS_SEYAN_DU)) 
 					{
 						dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
 						dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
@@ -1638,7 +2040,7 @@ void eng_display_win(int plr_sprite,int init)
 	dd_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
 
 	if (init) {
-		if (show_shop || show_wps || show_motd || show_newp || show_tuto) show_look=0;
+		if (show_shop || show_wps || show_tree || show_motd || show_newp || show_tuto) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -1892,6 +2294,51 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			// Scroll bar
 			dd_showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(wps_pos*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
+		}
+		
+		if (show_tree)
+		{
+			copyspritex(do_darkmode?18007:18006,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element HL_SKTREE
+			if      (IS_SEYAN_DU)    m = 0;
+			else if (IS_ARCHTEMPLAR) m = 1;
+			else if (IS_SKALD)       m = 2;
+			else if (IS_WARRIOR)     m = 3;
+			else if (IS_SORCERER)    m = 4;
+			else if (IS_SUMMONER)    m = 5;
+			else if (IS_ARCHHARAKIM) m = 6;
+			else                     m = 7;
+			for (n=0; n<12; n++) {
+				if (hightlight==HL_SKTREE && hightlight_sub==n)
+					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC,16);
+				else
+					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
+				if (st_learned_skill(pl.tree_points, n+1))
+				{
+					switch (n)
+					{
+						case  3: case 11: 
+							copyspritex(18111,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+						case  0: case  4: 
+							copyspritex(18112,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+						case  5: case  6: 
+							copyspritex(18113,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+						case  1: case  7: 
+							copyspritex(18114,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+						case  8: case  9: 
+							copyspritex(18115,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+						default: 
+							copyspritex(18116,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+					}
+				}
+			}
+			copyspritex(6600,GUI_SHOP_X+140+ST_OFFSET_IC,GUI_SHOP_Y+140+ST_OFFSET_IC, 0);
+			dd_xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.tree_points),st_skill_pts_all(pl.tree_points));
+			if (hightlight==HL_SKTREE)
+			{
+				dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_tree[m][hightlight_sub].name);
+				dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_tree[m][hightlight_sub].dsc1);
+				dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_tree[m][hightlight_sub].dsc2);
+			}
 		}
 		
 		if (show_motd)
@@ -2354,13 +2801,13 @@ void eng_display(int init)	// optimize me!!!!!
 		//   and increases the size of the drawn 'pixels' to fill the 128x128 space.
 		mapx=mapx-(64/max(1,mm_magnify));
 		if (mapx<0)	mapx=0;
-		if (mapx>MAPX_MAX-((128/max(1,mm_magnify))+1)) mapx=MAPX_MAX-((128/max(1,mm_magnify))+1);
+		if (mapx>1024-((128/max(1,mm_magnify))+1)) mapx=1024-((128/max(1,mm_magnify))+1);
 
 		mapy=mapy-(64/max(1,mm_magnify));
 		if (mapy<0)	mapy=0;
 		if (mapy>MAPY_MAX-((128/max(1,mm_magnify))+1)) mapy=MAPY_MAX-((128/max(1,mm_magnify))+1);
 
-		dd_show_map(xmap,mapy,mapx,max(1,mm_magnify));
+		dd_show_map(xmap,mapx,mapy,max(1,mm_magnify));
 	}
 
 	eng_display_win(plr_sprite,init);
@@ -3877,6 +4324,7 @@ void engine(void)
 			noshop--;
 			show_shop=0;
 			show_wps=0;
+			show_tree=0;
 			show_motd=0;
 			show_newp=0;
 			show_tuto=0;

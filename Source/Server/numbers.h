@@ -89,6 +89,7 @@
 #define CT_TOWER		1260
 #define CT_SCORP		1330
 #define CT_SCORP_Q		1333
+#define CT_KELPIE		1446
 
 #define CT_GOLEMTRAP	  39
 #define CT_GARGTRAP		  40
@@ -111,6 +112,18 @@
 #define CT_LAB12_BOSS	 728	// Barbarian
 
 #define CT_LAB13_KEEP	 849
+
+#define CT_LAB14_BOSS	1453	// Dwarf
+#define CT_LAB15_BOSS	1455	// Vampire
+#define CT_LAB16_BOSS	1457	// Pirate
+#define CT_LAB17_BOSS	1462	// Onyx Gargoyle
+#define CT_LAB18_BOSS	9996	// 
+#define CT_LAB19_BOSS	9997	// 
+
+#define CT_DRACULA		1456
+#define CT_PIRATELORD	1459
+
+//
 
 #define CT_ARENA_FIRST	  42
 #define CT_ARENA_LAST	  70
@@ -820,6 +833,8 @@
 //
 #define BUF_SPR_HEATSTR		419
 #define BUF_SPR_FIRE		487
+#define BUF_SPR_COLD		3494
+#define BUF_SPR_VANTA		3493
 //
 #define BUF_SPR_IMMUNI		497
 #define BUF_SPR_INNOCU		498

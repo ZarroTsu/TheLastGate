@@ -49,6 +49,7 @@ extern int noshop;
 extern int do_alpha;
 
 void dd_invalidate_alpha(void);
+int st_skill_pts_all(int st_val);
 
 int hightlight=0;
 int hightlight_sub=0;
@@ -193,6 +194,8 @@ int trans_button(int x,int y)
 	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[1] && y<=gui_hud_b[1]+14 ) return 44;
 	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[2] && y<=gui_hud_b[2]+14 ) return 45;
 	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[3] && y<=gui_hud_b[3]+14 ) return 46;
+	
+	if ( x>=339+2 && x<=339+30 && y>=179 && y<=179+30 ) return 47;
 
 	return -1;
 }
@@ -314,6 +317,13 @@ void button_command(int nr)
 			break;
 		case 46:
 			hudmode = 2;
+			break;
+		
+		case 47:
+			if (st_skill_pts_all(pl.tree_points)>0 && !show_tree)
+				show_tree = 1;
+			else
+				show_tree = 0;
 			break;
 
 		default: break;
@@ -470,7 +480,7 @@ void button_help(int nr)
 			else
 				xlog(1,"Right click on a skill/spell first to assign it to a button.");
 			break;
-
+/*
 		case 36:
 			if (last_skill==60)
 				xlog(1,"Crit Chance is the chance, out of 100.00, that you will inflict a melee critical hit. Determined by your equipped weapon, and increased by Braveness and other sources of Crit Chance."); 
@@ -561,7 +571,7 @@ void button_help(int nr)
 			else if (last_skill<60 || last_skill>64)
 				xlog(1,"Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); 
 			break;
-			
+*/
 		// Magnification buttons for the mini-map
 		case 42:
 			xlog(1,"Increase minimap magnification.");
@@ -991,6 +1001,174 @@ int mouse_statbox(int x,int y,int state)
 	return ret;
 }
 
+extern int pl_dmgbn, pl_reflc, pl_aoebn, pl_flags, pl_flagb, pl_flagc, pl_dmgrd;
+
+void meta_stat_descs(int n)
+{
+	if (n<7)					// Topmost standard stats
+	{
+		switch (n)
+		{
+			case  0: xlog(1,"Cooldown Duration is the multiplier that cooldown from skills is applied with, the lower the better. Affected by Cooldown Rate."); break;
+			case  1: xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); break;
+			case  2: xlog(1,"Spell Modifier is a multiplier which affects the strength of spells you cast. Determined by your character class.");  break;
+			case  3: xlog(1,"Base Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); break;
+			case  4: xlog(1,"Movement Speed is the speed at which your character runs around Astonia."); break;
+			case  5: xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); break;
+			case  6: xlog(1,"Your Parry Score is the value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill and other sources."); break;
+			default: break;
+		}
+	}
+	else if (hudmode==1)		// Offense Stats
+	{
+		n-=7;
+		switch (n+skill_pos)
+		{
+			case  1: if (pl_dmgbn!=10000)
+					 xlog(1,"Damage Multiplier is the final multiplier for all damage you deal."); break;
+			case  2: xlog(1,"Melee DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from your Hit Score."); break;
+			case  3: xlog(1,"Melee Hit Dmg ranges from 1/4 of your Weapon Value, to 1/4 of (your Weapon Value, plus half Strength, plus 14) times your Crit Chance & Crit Multi."); break;
+			case  4: xlog(1,"Critical Multiplier is the damage multiplier upon dealing a successful critical hit."); break;
+			case  5: xlog(1,"Critical Chance is the chance, out of 100.00, that you will inflict a melee critical hit. Determined by your equipped weapon, and increased by Braveness and other sources of Crit Chance."); break;
+			case  6: xlog(1,"Melee Ceiling Damage is the highest possible damage a melee hit may deal. This is affected by increases to Top Damage and your critical hit scores."); break;
+			case  7: xlog(1,"Melee Floor Damage is the lowest possible damage a melee hit may deal. Determined by 1/4 of your Weapon Value."); break;
+			case  8: xlog(1,"Attack speed is the speed at which melee attacks are performed. This is increased by Agility and other sources of Attack Speed."); break;
+			case  9: xlog(1,"Cast Speed is the speed at which casting and action animations occur per second. This is increased by Willpower and other sources of Cast Speed."); break;
+			case 10: if (pl_reflc>0)
+					 xlog(1,"Thorns is damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); break;
+			case 11: if (pl.skill[34][0])
+					 xlog(1,"Mana Cost Multiplier is the multiplier of mana for spells, determined by your Concentrate skill."); break;
+			case 12: if (pl_aoebn)
+					 xlog(1,"Total AoE Bonus is a flat increase to area-of-effect skills."); break;
+			//
+			case 17: if (pl.skill[40][0])
+					 xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); break;
+			case 18: if (pl.skill[40][0] && !(pl_flags&(1<<8)))
+					 xlog(1,"Effective damage over time dealt by Bleeding caused by Cleave, before reduction from target Parry Score, Armor Value and Immunity."); break;
+			case 19: if (pl.skill[40][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Cleave skill."); break;
+			case 20: if (pl.skill[49][0])
+					 xlog(1,"Damage dealt by your Leap skill when your target is the same as the enemy you're fighting."); break;
+			case 21: if (pl.skill[49][0])
+					 xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); break;
+			case 22: if (pl.skill[49][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Leap skill."); break;
+			case 23: if (pl.skill[14][0])
+					 xlog(1,"Effective increase to %s granted while under the effect of your Rage skill.", (pl_flagb&(1<<3))?"Top Damage":"Weapon Value"); break;
+			case 24: if (pl.skill[24][0]) 
+					 xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); break;
+			case 25: if (pl.skill[24][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Blast spell."); break;
+			case 26: if (pl.skill[15][0]) 
+					 xlog(1,"Effective penetration of target Immunity and Resistance when casting debuffs."); break;
+			case 27: if (pl.skill[42][0]) {
+					 if (pl_flagb&(1<<14)) xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity.");
+					 else xlog(1,"Effective damage over time dealt by each individual stack of your Venom spell, before reduction from target Immunity. This can be stacked up to three times."); } break;
+			case 28: if (pl.skill[42][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your %s spell.", (pl_flagb&(1<<14))?"Venom":"Poison"); break;
+			case 29: if (pl.skill[43][0]  ||(pl_flagc&(1<<13))) { 
+					 if ((pl_flagb&(1<<6))||(pl_flagc&(1<<13))) { xlog(1,"Effective damage over time dealt to nearby enemies while affected by Immolate, before reduction from enemy Immunity."); }
+					 else                                       { xlog(1,"Damage dealt by the Pulse spell to surrounding targets when pulsing, before reduction from target Immunity and Armor Value."); } } break;
+			case 30: if (pl.skill[43][0] && !(pl_flagb&(1<<6)))
+					 xlog(1,"Number of pulses expected during the duration of your Pulse spell, determined by the rate of pulses from Cooldown Rate."); break;
+			case 31: if (pl.skill[43][0]  ||(pl_flagc&(1<<13)))
+					 xlog(1,"Skill exhaustion duration expected upon using your %s spell.", ((pl_flagb&(1<<6))||(pl_flagc&(1<<13)))?"Immolate":"Pulse"); break;
+			case 32: if (pl.skill[ 7][0])
+					 xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); break;
+			case 33: if (pl.skill[ 7][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Zephyr spell."); break;
+			case 34: if (pl.skill[27][0])
+					 xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); break;
+			case 35: if (pl.skill[27][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Ghost Companion spell."); break;
+			case 36: if (pl.skill[46][0])
+					 xlog(1,"Effective power of your Shadow Copy, granted by your Shadow Copy spell. A higher number grants a stronger companion."); break;
+			case 37: if (pl.skill[46][0])
+					 xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell."); break;
+			case 38: if (pl.skill[46][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Shadow Copy spell."); break;
+			//
+			default: break;
+		}
+	}
+	else						// Defense Stats
+	{
+		n-=7;
+		switch (n+skill_pos)
+		{
+			case  1: if (pl_dmgrd!=10000)
+					 xlog(1,"Damage Reduction is the final multiplier for all damage you take."); break;
+			case  2: if (pl_dmgrd!=10000)
+					 xlog(1,"Your effective total hitpoints, taken by dividing your maximum hitpoints by your damage reduction multiplier, as well as any effects which nullify damage or transfer it to endurance or mana."); break;
+			case  3: xlog(1,"Rate at which health is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); break;
+			case  4: xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); break;
+			case  5: xlog(1,"Rate at which mana is regenerated per second. This is improved by the Meditate skill, and can be further adjusted by various items."); break;
+			case  6: xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); break;
+			case  7: xlog(1,"Estimated Resistance score. This displays your 'true' Resistance value after adjustments that do not display on the skill list.");  break;
+			case  8: xlog(1,"Attack speed is the speed at which melee attacks are performed. This is increased by Agility and other sources of Attack Speed."); break;
+			case  9: xlog(1,"Cast Speed is the speed at which casting and action animations occur per second. This is increased by Willpower and other sources of Cast Speed."); break;
+			case 10: if (pl_reflc>0)
+					 xlog(1,"Thorns is damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); break;
+			case 11: if (pl.skill[34][0])
+					 xlog(1,"Mana Cost Multiplier is the multiplier of mana for spells, determined by your Concentrate skill."); break;
+			case 12: if (pl_aoebn)
+					 xlog(1,"Total AoE Bonus is a flat increase to area-of-effect skills."); break;
+			case 13: xlog(1,"Aptitude Bonus granted to target allies when casting friendly spells. This is granted by Willpower."); break;
+			case 14: xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); break;
+			//
+			case 17: if (pl.skill[21][0])
+					 xlog(1,"Estimated increase to attributes granted by your Bless spell."); break;
+			case 18: if (pl.skill[18][0])
+					 xlog(1,"Effective increase to Weapon Value granted by your Enhance spell."); break;
+			case 19: if (pl.skill[17][0])
+					 xlog(1,"Effective increase to Armor Value granted by your Protect spell."); break;
+			case 20: if (pl.skill[11][0])
+					 xlog(1,"Effective increase to %s granted by your Magic %s spell. Decreases as you %s.", (pl_flagb&(1<<10))?"Resistance and Immunity Scores,":"Armor Value", (pl_flagb&(1<<10))?"Shell":"Shield", (pl_flagb&(1<<10))?"take or avoid debuffs":"take damage"); break;
+			case 21: if (pl.skill[11][0])
+					 xlog(1,"Estimated duration of your Magic %s, not including reductions from %s.", (pl_flagb&(1<<10))?"Shell":"Shield", (pl_flagb&(1<<10))?"taking or avoid debuffs":"taking damage"); break;
+			case 22: if (pl.skill[47][0])
+					 xlog(1,"Estimated increase to Speed granted by your Haste spell."); break;
+			case 23: if (pl.skill[26][0])
+					 xlog(1,"Effective %s expected when casting your %s spell.", (pl_flags&(1<<14))?"healing over time":"flat healing", (pl_flags&(1<<14))?"Regen":"Heal"); break;
+			case 24: if (pl.skill[37][0])  {
+					 if (pl_flagb&(5<<11)) { xlog(1,"Effective reduction of target Spell Modifier when using your Blind (Douse) skill, before reduction from target Immunity."); }
+					 else                  { xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); } } break;
+			case 25: if (pl.skill[37][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your %s skill.", (pl_flagb&(1<<11))?"Douse":"Blind"); break;
+			case 26: if (pl.skill[35][0])  {
+					 if (pl_flagb&(1<<12)) { xlog(1,"Effective bonus to hit and parry score granted to allies when using your Rally skill. Half of this value is granted to yourself as well."); }
+					 else                  { xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); } } break;
+			case 27: if (pl.skill[35][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your %s skill.", (pl_flagb&(1<<12))?"Rally":"Warcry"); break;
+			case 28: if (pl.skill[41][0]) {
+					 if (pl_flags&(1<<10)) xlog(1,"Effective reduction of target Armor Value when using your Crush skill, before reduction from target Immunity.");
+					 else xlog(1,"Effective reduction of target Weapon Value when using your Weaken skill, before reduction from target Immunity."); } break;
+			case 29: if (pl.skill[41][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your %s skill.", (pl_flags&(1<<10))?"Crush":"Weaken"); break;
+			case 30: if (pl.skill[20][0])
+					 xlog(1,"Effective reduction of target attributes when casting your Curse spell, before reduction from target Immunity."); break;
+			case 31: if (pl.skill[20][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Curse spell."); break;
+			case 32: if (pl.skill[19][0])
+					 xlog(1,"Effective reduction of target action speed when casting your Slow spell, before reduction from target Immunity."); break;
+			case 33: if (pl.skill[19][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Slow spell."); break;
+			case 34: if (pl.skill[27][0])
+					 xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); break;
+			case 35: if (pl.skill[27][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Ghost Companion spell."); break;
+			case 36: if (pl.skill[46][0])
+					 xlog(1,"Effective power of your Shadow Copy, granted by your Shadow Copy spell. A higher number grants a stronger companion."); break;
+			case 37: if (pl.skill[46][0])
+					 xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell."); break;
+			case 38: if (pl.skill[46][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Shadow Copy spell."); break;
+			//
+			default: break;
+		}
+	}
+}
+
 int mouse_statbox2(int x,int y,int state)
 {
 	int n, m;
@@ -1018,39 +1196,60 @@ int mouse_statbox2(int x,int y,int state)
 		// 5, 19		136, 32
 		// 5, 33		136, 46
 		
-		// Braveness
-		n=0;
-		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
+		n=0; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Braveness
 		{
-			xlog(1,"%s improves most skills and spells. It also improves your critical hit rate.",at_name[n]);
+			if (hudmode==0)
+				xlog(1,"%s improves most skills and spells. It also improves your critical hit rate.",at_name[n]);
+			else
+				meta_stat_descs(n);
 			return 1;
 		}
-		// Willpower
-		n=1;
-		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
+		n=1; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Willpower
 		{
-			xlog(1,"%s improves most support spells. Improves support spells cast on players with lower aptitude and the speed of casting spells and using skills.",at_name[n]);
+			if (hudmode==0)
+				xlog(1,"%s improves most support spells. It also improves the speed of casting spells and using skills, and helps overwhelm spell suppression.",at_name[n]);
+			else
+				meta_stat_descs(n);
 			return 1;
 		}
-		// Intuition
-		n=2;
-		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
+		n=2; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Intuition
 		{
-			xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
+			if (hudmode==0)
+				xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
+			else
+				meta_stat_descs(n);
 			return 1;
 		}
-		// Agility
-		n=3;
-		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
+		n=3; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Agility
 		{
-			xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
+			if (hudmode==0)
+				xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
+			else
+				meta_stat_descs(n);
 			return 1;
 		}
-		// Strength
-		n=4;
-		if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n )
+		n=4; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Strength
 		{
-			xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
+			if (hudmode==0)
+				xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
+			else
+				meta_stat_descs(n);
+			return 1;
+		}
+		n=5; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Hitpoints
+		{
+			if (hudmode==0)
+				xlog(1,"Your Hitpoints.");
+			else
+				meta_stat_descs(n);
+			return 1;
+		}
+		n=6; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Mana
+		{
+			if (hudmode==0)
+				xlog(1,"Your Mana.");
+			else
+				meta_stat_descs(n);
 			return 1;
 		}
 	}
@@ -1099,11 +1298,11 @@ int mouse_statbox2(int x,int y,int state)
 				else if (m==44)	// Proximity has special descriptions
 				{
 					strcpy(tmp, skilltab[n+skill_pos].name);
-					if (pl.kindred & (1u<<14))
+					if (IS_BRAVER)
 						xlog(1,skilltab[n+skill_pos].alt_a); // Braver
-					else if (pl.kindred & (1u<<11))
+					else if (IS_SORCERER)
 						xlog(1,skilltab[n+skill_pos].alt_b); // Sorcerer
-					else if (pl.kindred & (1u<<9))
+					else if (IS_ARCHHARAKIM)
 						xlog(1,skilltab[n+skill_pos].alt_c); // Arch-Harakim
 					else
 						xlog(1,"Passively improves the area-of-effect of various skills and spells.");
@@ -1137,11 +1336,11 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		else if (hudmode==1)
 		{
-			
+			meta_stat_descs(n+7);
 		}
 		else if (hudmode==2)
 		{
-			
+			meta_stat_descs(n+7);
 		}
 	} 
 	else if (state==MS_LB_UP && hudmode==0)
@@ -1425,7 +1624,7 @@ int mouse_shop(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			show_shop=0; 
-			noshop=QSIZE*12; 
+			noshop=QSIZE*3; 
 		}
 		return 1;
 	}
@@ -1476,7 +1675,6 @@ int mouse_wps(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			show_wps=0;
-			noshop=QSIZE*12; 
 		}
 		return 1;
 	}
@@ -1493,7 +1691,7 @@ int mouse_wps(int x,int y,int mode)
 			if (pl.waypoints&(1<<nr))
 			{
 				show_wps=0;
-				noshop=QSIZE*12; 
+				noshop=QSIZE*3; 
 			}
 		}
 		if (mode==MS_RB_UP) cmd1(CL_CMD_WPS,nr+32);
@@ -1536,6 +1734,51 @@ int mouse_wps(int x,int y,int mode)
 	return 0;
 }
 
+int mouse_tree(int x, int y, int mode)
+{
+	int nr, n, keys;
+	
+	if (!show_tree) return 0;
+	
+	keys=0;
+	if ((GetAsyncKeyState(VK_SHIFT)&0x8000)||(GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
+	
+	// Close Window
+	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
+	{
+		if (mode==MS_LB_UP) 
+		{ 
+			show_tree=0;
+		}
+		return 1;
+	}
+	
+	// Figure out which skill icon we may be moused over
+	for (nr=0;nr<12;nr++)
+	{
+		if ((int)sqrt(pow(x-(GUI_SHOP_X+sk_icon[nr].x),2)+pow(y-(GUI_SHOP_Y+sk_icon[nr].y),2)) < 14) break;
+	}
+	
+	// Selecting a skill icon
+	if (nr<12) 
+	{
+		if (mode==MS_LB_UP) cmd1(CL_CMD_TREE,nr);
+		if (mode==MS_RB_UP) cmd1(CL_CMD_TREE,nr+12);
+		
+		hightlight=HL_SKTREE;
+		hightlight_sub=nr;
+		return 1;
+	}
+	
+	// prevent clicking the world behind the menu
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
+	{
+		return 1;
+	}
+	
+	return 0;
+}
+
 int mouse_motd(int x,int y,int mode)
 {
 	int nr, tx, ty;
@@ -1552,7 +1795,7 @@ int mouse_motd(int x,int y,int mode)
 			show_motd=0;
 			show_newp=0;
 			show_tuto=0;
-			noshop=QSIZE*12;
+			noshop=QSIZE*3;
 		}
 		return 1;
 	}
@@ -1563,7 +1806,7 @@ int mouse_motd(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			show_motd=0;
-			noshop=QSIZE*12;
+			noshop=QSIZE*3;
 		}
 		return 1;
 	}
@@ -1602,7 +1845,7 @@ int mouse_motd(int x,int y,int mode)
 			{
 				cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
 				show_newp=0;
-				noshop=QSIZE*12;
+				noshop=QSIZE*3;
 			}
 			// Tutorial window NEXT
 			else if (show_tuto)
@@ -1647,6 +1890,7 @@ void mouse(int x,int y,int state)
 	if (mouse_inventory(x,y,state)) ;
 	else if (mouse_shop(x,y,state)) ;
 	else if (mouse_wps(x,y,state)) ;
+	else if (mouse_tree(x,y,state)) ;
 	else if (mouse_motd(x,y,state)) ;
 	else if (mouse_buttonbox(x,y,state)) ;
 	else if (mouse_statbox(x,y,state)) ;

@@ -266,10 +266,11 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 					cmd(CL_CMD_RESET,0,0); 
 					show_shop=0; 
 					show_wps=0; 
+					show_tree=0;
 					show_motd=0;
 					show_newp=0;
 					show_tuto=0;
-					noshop=QSIZE*4; 
+					noshop=QSIZE*3; 
 					xmove=0; 
 					break;
 				// **************** F-Key Row 1 **************** //
@@ -609,7 +610,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				}
 				
 				delta+=120;
-			}			
+			}
 			
 			// SCROLLING UP
 			while (delta>=120) { 

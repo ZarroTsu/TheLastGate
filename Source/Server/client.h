@@ -103,6 +103,8 @@ struct cplayer
 	int tokens;		// Points for gambling
 	int waypoints;
 
+	unsigned short tree_points;
+
 	// items carried
 	int item[40];
 	int item_p[40];
@@ -135,16 +137,16 @@ struct cplayer
 
 // client message types (unsigned char):
 
-#define CL_EMPTY         0
-#define CL_NEWLOGIN      1
-#define CL_LOGIN         2
-#define CL_CHALLENGE     3
-#define CL_PERF_REPORT   4
-#define CL_CMD_MOVE      5
-#define CL_CMD_PICKUP    6
-#define CL_CMD_ATTACK    7
-#define CL_CMD_MODE      8
-#define CL_CMD_INV       9
+#define CL_EMPTY          0
+#define CL_NEWLOGIN       1
+#define CL_LOGIN          2
+#define CL_CHALLENGE      3
+#define CL_PERF_REPORT    4
+#define CL_CMD_MOVE       5
+#define CL_CMD_PICKUP     6
+#define CL_CMD_ATTACK     7
+#define CL_CMD_MODE       8
+#define CL_CMD_INV        9
 #define CL_CMD_STAT      10
 #define CL_CMD_DROP      11
 #define CL_CMD_GIVE      12
@@ -173,33 +175,34 @@ struct cplayer
 #define CL_CMD_WPS       35
 #define CL_CMD_MOTD      36
 #define CL_CMD_BSSHOP    37
-#define CL_CMD_QSHOP	 38
+#define CL_CMD_QSHOP     38
+#define CL_CMD_TREE      39
 
-#define CL_CMD_CTICK 255
+#define CL_CMD_CTICK    255
 
 // server message types (unsigned char):
 
-#define SV_EMPTY         0
-#define SV_CHALLENGE     1
-#define SV_NEWPLAYER     2
-#define SV_SETCHAR_NAME1 3
-#define SV_SETCHAR_NAME2 4
-#define SV_SETCHAR_NAME3 5
-#define SV_SETCHAR_MODE  6
+#define SV_EMPTY             0
+#define SV_CHALLENGE         1
+#define SV_NEWPLAYER         2
+#define SV_SETCHAR_NAME1     3
+#define SV_SETCHAR_NAME2     4
+#define SV_SETCHAR_NAME3     5
+#define SV_SETCHAR_MODE      6
 
-#define SV_SETCHAR_ATTRIB 7
-#define SV_SETCHAR_SKILL  8
+#define SV_SETCHAR_ATTRIB    7
+#define SV_SETCHAR_SKILL     8
 
-#define SV_SETCHAR_HP    12
-#define SV_SETCHAR_ENDUR 13
-#define SV_SETCHAR_MANA  14
+#define SV_SETCHAR_HP       12
+#define SV_SETCHAR_ENDUR    13
+#define SV_SETCHAR_MANA     14
 
-#define SV_SETCHAR_AHP  20
-#define SV_SETCHAR_PTS  21
-#define SV_SETCHAR_GOLD 22
-#define SV_SETCHAR_ITEM 23
-#define SV_SETCHAR_WORN 24
-#define SV_SETCHAR_OBJ  25
+#define SV_SETCHAR_AHP      20
+#define SV_SETCHAR_PTS      21
+#define SV_SETCHAR_GOLD     22
+#define SV_SETCHAR_ITEM     23
+#define SV_SETCHAR_WORN     24
+#define SV_SETCHAR_OBJ      25
 
 #define SV_TICK 27
 
@@ -227,33 +230,31 @@ struct cplayer
 #define SV_LOOK5            50
 #define SV_LOOK6            51
 
+#define SV_LOAD             56
+#define SV_CAP              57
 
+#define SV_MOD1             58
+#define SV_MOD2             59
+#define SV_MOD3             60
+#define SV_MOD4             61
+#define SV_MOD5             62
+#define SV_MOD6             63
+#define SV_MOD7             64
+#define SV_MOD8             65
+#define SV_SETMAP4          66
+#define SV_SETMAP5          67
+#define SV_SETMAP6          68
+#define SV_SETCHAR_AEND     69
+#define SV_SETCHAR_AMANA    70
+#define SV_SETCHAR_DIR      71
+#define SV_UNIQUE           72
+#define SV_IGNORE           73
 
-#define SV_LOAD 56
-#define SV_CAP  57
-
-#define SV_MOD1          58
-#define SV_MOD2          59
-#define SV_MOD3          60
-#define SV_MOD4          61
-#define SV_MOD5          62
-#define SV_MOD6          63
-#define SV_MOD7          64
-#define SV_MOD8          65
-#define SV_SETMAP4       66
-#define SV_SETMAP5       67
-#define SV_SETMAP6       68
-#define SV_SETCHAR_AEND  69
-#define SV_SETCHAR_AMANA 70
-#define SV_SETCHAR_DIR   71
-#define SV_UNIQUE        72
-#define SV_IGNORE        73
-
-#define SV_WAYPOINTS     74
-#define SV_SHOWMOTD      75
-#define SV_SETCHAR_WPS   76
-#define SV_CLEARBOX      77
-#define SV_SETCHAR_TOK   78
+#define SV_WAYPOINTS        74
+#define SV_SHOWMOTD         75
+#define SV_SETCHAR_WPS      76
+#define SV_CLEARBOX         77
+#define SV_SETCHAR_TOK      78
 
 #define SV_MOTD  82
 #define SV_MOTD0 82

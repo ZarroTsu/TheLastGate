@@ -92,6 +92,15 @@ void step_desertfloor_remove(int cn)
 	bu[in2].flags &= ~(IF_PERMSPELL);
 }
 
+void step_vantablack(int cn)
+{
+	if (!has_buff(cn, 215))
+	{
+		debuff_vantablack(cn);
+		do_char_log(cn, 0, "You feel a terrible curse wash over you.\n");
+	}
+}
+
 void plr_map_set(int cn)        // set character to map and remove target character
 {
 	int m, in, ret, x, y;
@@ -193,6 +202,11 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		{
 			if (ch[cn].flags & CF_PLAYER)
 				step_desertfloor(cn);
+		}
+		else if (IS_IN_VANTA(ch[cn].x, ch[cn].y))
+		{
+			if (ch[cn].flags & CF_PLAYER)
+				step_vantablack(cn);
 		}
 
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))

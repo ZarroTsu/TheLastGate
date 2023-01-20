@@ -208,7 +208,8 @@ void discord_gmoon(void)
 	            month==3 ? "rd" : "",
 	            month>3  ? "th" : "",
 	            year);
-	if 		((globs->mdday % 28) + 1==1)  	fprintf(discordWho, "- New Moon in effect! (+0.10 Spellmod & 100%% faster regen)\n");
+	if 		(IS_GLOB_MAYHEM)				fprintf(discordWho, "- Holiday Mayhem in effect! (Monsters bolster in darkness)\n");
+	else if ((globs->mdday % 28) + 1==1)  	fprintf(discordWho, "+ New Moon in effect! (+0.10 Spellmod & 100%% faster regen)\n");
 	else if ((globs->mdday % 28) + 1<15)  	fprintf(discordWho, "  The Moon is growing...\n");
 	else if ((globs->mdday % 28) + 1==15) 	fprintf(discordWho, "+ Full Moon in effect! (+0.15 Spellmod & 50%% faster regen)\n");
 	else 								  	fprintf(discordWho, "  The moon is dwindling...\n");
@@ -250,6 +251,12 @@ void discord_pandium(void)
 				break;
 			}
 		}
+	}
+	
+	for (m = 0; m<3; m++)
+	{
+		if (IS_SANEPLAYER(nr[0][m])) globs->top_ps[m] = nr[0][m];
+		if (IS_SANEPLAYER(nr[1][m])) globs->top_pg[m] = nr[1][m];
 	}
 	
 	discordPandium = fopen("pandium.txt", "w");
@@ -1387,6 +1394,11 @@ int main(int argc, char *args[])
 		{
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
+		/* // (vvv REMOVE AFTER UPDATE!!!)
+		ch[n].data[23] = ch[n].data[23] + ch[n].data[24] + ch[n].data[25];
+		ch[n].data[24] = 0;
+		ch[n].data[25] = 0;
+		// */ // (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);
 	}

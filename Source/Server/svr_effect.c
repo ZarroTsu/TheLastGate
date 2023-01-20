@@ -288,6 +288,8 @@ void effect_tick(void)
 									rtimer = TICKS * 60 * 16 + RANDOM(TICKS * 60 * 4); // 16 - 20 minutes
 								else if (temp == CT_PANDIUM)
 									rtimer = TICKS * 5;
+								if (IS_GLOB_MAYHEM)
+									rtimer = rtimer/2;
 								fx_add_effect(2, rtimer, ch_temp[temp].x, ch_temp[temp].y, temp);
 								xlog("respawn %d (%s): YES", co, ch[co].name);
 								ch[co].flags |= CF_SENSE;
@@ -419,7 +421,7 @@ void effect_tick(void)
 						fx[n].duration = TICKS * 60 * 5;      // try again every 5 minutes
 						map[m].flags &= ~MF_GFX_DEATH;
 					}
-					if (cn && !RANDOM(20)) boost_char(cn, 0);
+					if (cn && try_boost(20)) boost_char(cn, 0);
 				}
 			}
 		}
@@ -438,7 +440,7 @@ void effect_tick(void)
 				if (fx[n].data[1])
 				{
 					cn = pop_create_char(fx[n].data[1], 0);
-					if (cn && !RANDOM(20)) boost_char(cn, 0);
+					if (cn && try_boost(20)) boost_char(cn, 0);
 					god_drop_char(cn, it[in].x, it[in].y);
 					ch[cn].dir = DX_RIGHTUP;
 					plr_reset_status(cn);

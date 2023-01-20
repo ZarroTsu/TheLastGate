@@ -423,68 +423,61 @@ int pop_create_bonus_belt(int cn)
 		{
 			case 0:
 				it[n].attrib[AT_BRV][0] += skill_value; 								// this line is how much it will raise attribute
-				if(it[n].attrib[AT_BRV][0] > 12) it[n].attrib[AT_BRV][0] = 12; 			// this will check for max level = 12 and will down it back to 12
+				if (it[n].attrib[AT_BRV][0] > 12) it[n].attrib[AT_BRV][0] = 12; 			// this will check for max level = 12 and will down it back to 12
 				it[n].attrib[AT_BRV][2] = 10 + (it[n].attrib[AT_BRV][0] * RANDOM(7)); 	// this line will set requirements
 				break;
 			case 1:
 				it[n].attrib[AT_WIL][0] += skill_value;
-				if(it[n].attrib[AT_WIL][0] > 12) it[n].attrib[AT_WIL][0] = 12;
+				if (it[n].attrib[AT_WIL][0] > 12) it[n].attrib[AT_WIL][0] = 12;
 				it[n].attrib[AT_WIL][2] = 10 + (it[n].attrib[AT_WIL][0] * RANDOM(7));
 				break;
 			case 2:
 				it[n].attrib[AT_INT][0] += skill_value;
-				if(it[n].attrib[AT_INT][0] > 12) it[n].attrib[AT_INT][0] = 12;
+				if (it[n].attrib[AT_INT][0] > 12) it[n].attrib[AT_INT][0] = 12;
 				it[n].attrib[AT_INT][2] = 10 + (it[n].attrib[AT_INT][0] * RANDOM(7));
 				break;
 			case 3:
 				it[n].attrib[AT_AGL][0] += skill_value;
-				if(it[n].attrib[AT_AGL][0] > 12) it[n].attrib[AT_AGL][0] = 12;
+				if (it[n].attrib[AT_AGL][0] > 12) it[n].attrib[AT_AGL][0] = 12;
 				it[n].attrib[AT_AGL][2] = 10 + (it[n].attrib[AT_AGL][0] * RANDOM(7));
 				break;
 			case 4:
 				it[n].attrib[AT_STR][0] += skill_value;
-				if(it[n].attrib[AT_STR][0] > 12) it[n].attrib[AT_STR][0] = 12;
+				if (it[n].attrib[AT_STR][0] > 12) it[n].attrib[AT_STR][0] = 12;
 				it[n].attrib[AT_STR][2] = 10 + (it[n].attrib[AT_STR][0] * RANDOM(7));
 				break;
 			case 5:
-				it[n].hp[0] += (skill_value * 5);
-				if(it[n].hp[0] > 60) it[n].hp[0] = 60;
-				it[n].hp[2] = 50 + (it[n].hp[0] * RANDOM(7));
+				it[n].hp[0] += (skill_value * 10);
+				if (it[n].hp[0] > 120) it[n].hp[0] = 120;
+				it[n].hp[2] = 50 + (it[n].hp[0] * RANDOM(9));
 				break;
 			case 6:
-				it[n].end[0] += (skill_value * 5)/2;
-				if(it[n].end[0] > 30) it[n].end[0] = 30;
+				it[n].end[0] += (skill_value * 10)/2;
+				if (it[n].end[0] > 60) it[n].end[0] = 60;
 				break;
 			case 7:
-				it[n].mana[0] += (skill_value * 5);
-				if(it[n].mana[0] > 60) it[n].mana[0] = 60;
-				it[n].mana[2] = 50 + (it[n].mana[0] * RANDOM(7));
+				it[n].mana[0] += (skill_value * 10);
+				if (it[n].mana[0] > 120) it[n].mana[0] = 120;
+				it[n].mana[2] = 50 + (it[n].mana[0] * RANDOM(9));
 				break;
 			case 8:
 				it[n].armor[0] += (skill_value+1)/2;
-				if(it[n].armor[0] > 6) it[n].armor[0] = 6;
+				if (it[n].armor[0] > 6) it[n].armor[0] = 6;
 				break;
 			case 9:
 				it[n].weapon[0] += (skill_value+1)/2;
-				if(it[n].weapon[0] > 6) it[n].armor[0] = 6;
+				if (it[n].weapon[0] > 6) it[n].armor[0] = 6;
 				break;
 			default:
 				skm = skill_number-10;
 				it[n].skill[skm][0] += skill_value;
-				if(it[n].skill[skm][0] > 12) it[n].skill[skm][0] = 12;
-				// Check for skills that *all* classes would know, to apply an equip requirement.
-				if (skm == SK_HAND		|| skm == SK_REST    || skm == SK_MEDIT 
-				 || skm == SK_HEAL		|| skm == SK_IDENT   || skm == SK_REPAIR 
-				 || skm == SK_RESIST	|| skm == SK_PERCEPT || skm == SK_BARTER)
-				{
-					it[n].skill[skm][2] = (it[n].skill[skm][0] * RANDOM(7));
-				}
+				if (it[n].skill[skm][0] > 12) it[n].skill[skm][0] = 12;
+				it[n].skill[skm][2] = (it[n].skill[skm][0] * RANDOM(5));
 				break;
 		}
 	}
 
 	return(n);
-
 }
 /*	--end	*/
 
@@ -599,7 +592,7 @@ int pop_create_char(int n, int drop)
 			{
 				// this check placed here for speed reasons
 				// they are the same as in pop_create_bonus_belt()
-				if (!RANDOM(50))
+				if (try_boost(50))
 				{
 					tmp = pop_create_bonus(cn);
 					if (tmp)
@@ -608,7 +601,7 @@ int pop_create_char(int n, int drop)
 						ch[cn].item[m]  = tmp;
 					}
 				}
-				if (!RANDOM(50))
+				if (try_boost(50))
 				{
 					tmp = pop_create_bonus(cn);
 					if (tmp)
@@ -617,7 +610,7 @@ int pop_create_char(int n, int drop)
 						ch[cn].item[m]  = tmp;
 					}
 				}
-				else if (!RANDOM(5000))
+				else if (try_boost(5000))
 				{
 					tmp = pop_create_bonus_belt(cn);
 					if (tmp)

@@ -1230,8 +1230,7 @@ void god_info(int cn, int co)
 	{
 		if (IS_PLAYER(co))
 		{
-			do_char_log(cn, 3, "Killed %d NPCs below rank, %d NPCs at rank, %d NPCs above rank.\n",
-			            ch[co].data[23], ch[co].data[24], ch[co].data[25]);
+			do_char_log(cn, 3, "Killed %d NPCs.\n", ch[co].data[23]);
 			do_char_log(cn, 9, "Cleared %d archon floors alone, %d in a group.\n",
 			            ch[co].pandium_floor[0]-1, ch[co].pandium_floor[1]-1);
 			do_char_log(cn, 3, "Killed %d players outside arena, killed %d shopkeepers.\n",
@@ -2690,6 +2689,12 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 173;
 		ch[cn].item[m++] = 0x20000000 | 174;
 		ch[cn].item[m++] = 0x20000000 | 175;
+		ch[cn].item[m++] = 0x20000000 | 6544;
+		ch[cn].item[m++] = 0x20000000 | 6546;
+		ch[cn].item[m++] = 0x20000000 | 6547;
+		ch[cn].item[m++] = 0x20000000 | 6548;
+		ch[cn].item[m++] = 0x20000000 | 6552;
+		ch[cn].item[m++] = 0x20000000 | 6553;
 		break;
 	case 11:	// Grass to Dark Grass
 		ch[cn].item[m++] = 0x20000000 | 551;
@@ -3417,11 +3422,33 @@ void god_build(int cn, int x)
 	}
 }
 
+void god_reset_all_depths(int cn)
+{
+	int n;
+	
+	for (n=2;n<MAXCHARS;n++)
+	{
+		if (ch[n].used==USE_EMPTY) continue;
+		if (!IS_PLAYER(n)) continue;
+		if (ch[n].pandium_floor[0] > 0 || ch[n].pandium_floor[1] > 0)
+		{
+			ch[n].pandium_floor[0] = 1;
+			ch[n].pandium_floor[1] = 1;
+		}
+	}
+	if (cn) do_char_log(cn, 1, "Done.\n");
+}
+
 void god_set_depth(int cn, int co, int v, int gflag)
 {
 	if (co == 0)
 	{
 		do_char_log(cn, 0, "No such character.\n");
+		return;
+	}
+	if (co == 9999)
+	{
+		god_reset_all_depths(cn);
 		return;
 	}
 	else if (!IS_SANECHAR(co))
@@ -3655,8 +3682,8 @@ void god_skill(int cn, int co, int n, int val)
 
 void god_donate_item(int in, int place)
 {
-	static int don_x[] = {760, 505, 579}; // Tavern X, Skua X, Purple X
-	static int don_y[] = {261, 512, 455}; // Tavern Y, Skua Y, Purple Y
+	static int don_x[] = {760, 505, 579, 707, 795}; // Tav, Skua, Purp, Kwai, Gorn
+	static int don_y[] = {261, 512, 455, 863, 781}; // Tav, Skua, Purp, Kwai, Gorn
 	int x, y;
 
 	if (!IS_SANEUSEDITEM(in))
@@ -3664,15 +3691,15 @@ void god_donate_item(int in, int place)
 		xlog("Attempt to god_donate_item %d", in);
 		return;
 	}
-	if (place<1 || place>3)
+	if (place==6)
 	{
 		place = RANDOM(2)+1;
 	}
 
-	x = don_x[place];
-	y = don_y[place];
+	x = don_x[place-1];
+	y = don_y[place-1];
 
-	if (!god_drop_item_fuzzy(in, x, y))
+	if (place==7 || !god_drop_item_fuzzy(in, x, y))
 	{
 		it[in].used = USE_EMPTY;
 	}
@@ -4218,6 +4245,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		for (n=0;n<5;n++) ch[co].limit_break[n][0] = old.limit_break[n][0];
 		
 		// delete this after reset
+		/*
 		if (ch[co].pandium_floor[2]>=2)
 		{
 			ch[co].hp[2]   += 50;
@@ -4244,6 +4272,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		{
 			ch[co].end[0]  += 50;
 		}
+		*/
 		
 		god_transfer_char(co, 512, 512);
 	}
@@ -4273,6 +4302,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[48] = 0;
 		ch[co].data[49] = 0;
 		ch[co].data[91] = 0;
+		ch[co].data[24] = 0;
 		
 		// Reset FK flags
 		ch[co].data[60] = 0;

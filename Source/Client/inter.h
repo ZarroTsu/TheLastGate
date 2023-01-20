@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000903
+#define VERSION 0x000A00
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -7,7 +7,7 @@
 //#define MAPX			TILEX
 //#define MAPY			TILEY
 
-#define MAPX_MAX		1024
+#define MAPX_MAX		2048
 #define MAPY_MAX		2048
 
 #define MS_MOVE		    0
@@ -192,7 +192,7 @@ struct look
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int show_shop, show_wps, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
+extern unsigned int show_shop, show_wps, show_tree, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2
@@ -205,6 +205,7 @@ extern unsigned int show_shop, show_wps, show_motd, show_newp, show_tuto, tuto_p
 #define HL_SHOP			9
 #define HL_STATBOX2		10
 #define HL_WAYPOINT		11
+#define HL_SKTREE		12
 
 extern int hightlight;
 extern int hightlight_sub;
@@ -245,7 +246,23 @@ struct wpslist
 	char desc[30];
 };
 
+struct sk_tree
+{
+	char name[30];
+	char dsc1[40];
+	int icon;
+	char dsc2[40];
+};
+
+struct sk_icon
+{
+	int x;
+	int y;
+};
+
 extern struct wpslist wpslist[MAXWPS];
+extern struct sk_tree sk_tree[8][12];
+extern struct sk_icon sk_icon[12];
 
 void dd_puttext(int x,int y,int font,char *text);
 void dd_gputc(int xpos,int ypos,int font,int c);

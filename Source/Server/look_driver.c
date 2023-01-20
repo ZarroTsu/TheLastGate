@@ -210,7 +210,7 @@ void look_extra(int cn, int in)
 		break;
 		
 	case IT_TW_ACEDIA: // Sin Dagger
-		do_char_log(cn, 4, "When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 25%% more buff and debuff duration, but 25%% more skill cooldown.\n");
+		do_char_log(cn, 4, "When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n");
 		break;
 	case IT_TW_IRA: // Sin Staff
 		do_char_log(cn, 4, "When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you lose mana over time and cannot deal melee critical hits.\n");
@@ -262,7 +262,7 @@ void look_extra(int cn, int in)
 	// -------- BOOT  ITEMS --------
 	
 	case IT_BT_NATURES: 
-		do_char_log(cn, 5, "When equipped, grants unreduced regeneration rates while walking.\n");
+		do_char_log(cn, 5, "When equipped, grants 33%% more regeneration rates while idle.\n");
 		break;
 		
 	// -------- AMMY  ITEMS --------
@@ -592,10 +592,10 @@ void look_extra(int cn, int in)
 		case 29: do_char_log(cn, 8, "%d%% more total Strength.\n", 3 * (IS_TWOHAND(in)?2:1)); break;
 		case 30: do_char_log(cn, 8, "20%% more effect of Bleeds you inflict.\n"); break;
 		case 31: do_char_log(cn, 8, "20%% more effect of Blinds you inflict.\n"); break;
-		case 32: do_char_log(cn, 8, "Grants 25%% stronger regeneration rates while idle.\n"); break;
+		case 32: do_char_log(cn, 8, "Grants unreduced regeneration rates while walking.\n"); break;
 		case 33: do_char_log(cn, 8, "Blinds inflicted on you are 80%% weaker.\n"); break;
 		case 34: do_char_log(cn, 8, "Item is indestructible.\n"); break;
-		case 35: do_char_log(cn, 8, "20%% chance to half damage taken.\n"); break;
+		case 35: do_char_log(cn, 8, "8%% chance to half damage taken.\n"); break;
 		case 36: do_char_log(cn, 8, "Half of your Meditate score is also applied to your Hitpoints.\n"); break;
 		case 37: do_char_log(cn, 8, "5%% additional chance to avoid being hit.\n"); break;
 		case 38: do_char_log(cn, 8, "Restore %d Mana upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)); break;
@@ -610,10 +610,10 @@ void look_extra(int cn, int in)
 		case 47: do_char_log(cn, 8, "Reduces extra damage taken from enemy critical hits by 50%%.\n"); break;
 		case 48: do_char_log(cn, 8, "50%% more total Thorns score.\n"); break;
 		case 49: do_char_log(cn, 8, "Restore %d hitpoint%s upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1), IS_TWOHAND(in)?"s":""); break;
-		case 50: do_char_log(cn, 8, "%d%% more total Weapon Value.\n", (IS_TWOHAND(in)?12:6)); break;
-		case 51: do_char_log(cn, 8, "2%% less damage taken from hits.\n"); break;
+		case 50: do_char_log(cn, 8, "1%% more damage dealt.\n"); break;
+		case 51: do_char_log(cn, 8, "2%% less damage taken.\n"); break;
 		case 52: do_char_log(cn, 8, "Perception is 25%% stronger.\n"); break;
-		case 53: do_char_log(cn, 8, "30%% less damage taken from damage over time.\n"); break;
+		case 53: do_char_log(cn, 8, "10%% reduced damage taken from damage over time.\n"); break;
 		case 54: do_char_log(cn, 8, "%d%% more total attributes.\n", 2 * (IS_TWOHAND(in)?2:1)); break;
 		case 55: do_char_log(cn, 8, "Total Glow score is reduced to 0.\n"); break;
 		case 56: do_char_log(cn, 8, "20%% more effect of heals and regens you apply.\n"); break;
@@ -799,7 +799,7 @@ void look_talisman(int cn, int in)
 		case 19: do_char_log(cn, 8, "[Gloves Only] 20%% more effect of Slows you inflict.\n"); break; // 13
 		case 20: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Cast Speed", 3); break;
 		case 21: do_char_log(cn, 8, "[Cloak Only] Slows inflicted on you are 80%% weaker.\n"); break; // 14
-		case 22: do_char_log(cn, 8, "[Helmet Only] Cannot lose focus.\n"); break; // 15
+		case 22: do_char_log(cn, 8, "[Jewellery Only] Cannot lose focus.\n"); break; // 15
 		case 23: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken is dealt to your Endurance instead.\n"); break; // 16
 		case 24: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Intuition", 4); break;
 		case 25: do_char_log(cn, 8, "[Helmet Only] Grants infravision.\n"); break; // 17
@@ -831,12 +831,12 @@ void look_talisman(int cn, int in)
 		case 51: do_char_log(cn, 1, "%-12.12s  %+4d\n", "All Attribs", 2); break;
 		case 52: do_char_log(cn, 8, "[Armor Pieces Only] %-12.12s  %+4d\n", "Glow", 20); break;
 		case 53: do_char_log(cn, 8, "[Gloves Only] 20%% more effect of Blinds you inflict.\n"); break; // 31
-		case 54: do_char_log(cn, 8, "[Boots Only] Grants 25%% stronger regeneration rates while idle.\n"); break; // 32
+		case 54: do_char_log(cn, 8, "[Jewellery Only] Grants unreduced regeneration rates while walking.\n"); break; // 32
 		case 55: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit & Parry", 2); break;
 		case 56: do_char_log(cn, 8, "[Cloak Only] Blinds inflicted on you are 80%% weaker.\n"); break; // 33
 		case 57: do_char_log(cn, 8, "Item is indestructible.\n"); break; // 34
 		case 58: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Spell Apt", 12); break;
-		case 59: do_char_log(cn, 8, "[Gloves Only] 20%% chance to half damage taken.\n"); break; // 35
+		case 59: do_char_log(cn, 8, "8%% chance to half damage taken.\n"); break; // 35
 		case 60: do_char_log(cn, 8, "[Helmet Only] Half of your Meditate score is also applied to your Hitpoints.\n"); break; // 36
 		case 61: do_char_log(cn, 8, "[Cloak Only] 5%% additional chance to avoid being hit.\n"); break; // 37
 		case 62: do_char_log(cn, 8, "[Weapons Only] Restore 1 Mana upon hitting an enemy.\n"); break; // 38
@@ -856,14 +856,14 @@ void look_talisman(int cn, int in)
 		case 76: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Bonus", 16); break;
 		case 77: do_char_log(cn, 8, "[Weapons Only] Restore 1 hitpoint upon hitting an enemy.\n"); break; // 49
 		case 78: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Thorns", 2); break;
-		case 79: do_char_log(cn, 8, "[Weapons Only] 6%% more total Weapon Value.\n"); break; // 50
-		case 80: do_char_log(cn, 8, "[Armor Pieces Only] 2%% less damage taken from hits.\n"); break; // 51
+		case 79: do_char_log(cn, 8, "[Jewellery Only] 1%% more damage dealt.\n"); break; // 50
+		case 80: do_char_log(cn, 8, "[Jewellery Only] 2%% less damage taken.\n"); break; // 51
 		case 81: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Parry", 4);
 				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit", -2); break;
 		case 82: do_char_log(cn, 8, "[Helmet Only] Perception is 33%% stronger.\n"); break; // 52
-		case 83: do_char_log(cn, 8, "[Cloak Only] 30%% less damage taken from damage over time.\n"); break; // 53
+		case 83: do_char_log(cn, 8, "[Jewellery Only] 10%% reduced damage taken from damage over time.\n"); break; // 53
 		case 84: do_char_log(cn, 8, "2%% more total attributes.\n"); break; // 54
-		case 85: do_char_log(cn, 8, "[Chest Only] Total Glow score is reduced to 0.\n"); break; // 55
+		case 85: do_char_log(cn, 8, "[Jewellery Only] Total Glow score is reduced to 0.\n"); break; // 55
 		case 86: do_char_log(cn, 8, "[Gloves Only] 20%% more effect of heals and regens you apply.\n"); break; // 56
 		case 87: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit", 4);
 				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Parry", -2); break;

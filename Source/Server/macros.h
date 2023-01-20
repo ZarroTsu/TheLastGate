@@ -6,33 +6,34 @@
 
  **************************************************************************/
 
-#define max(a, b)		((a)>(b) ? (a) : (b))
-#define min(a, b)		((a)<(b) ? (a) : (b))
-#define RANDOM(a)		(a>0?random()%(a):0)
-#define ARRAYSIZE(a)	(sizeof(a)/sizeof(a[0]))
-#define sqr(a)			((a) * (a))
+#define max(a, b)				((a)>(b) ? (a) : (b))
+#define min(a, b)				((a)<(b) ? (a) : (b))
+#define RANDOM(a)				(a>0?random()%(a):0)
+#define ARRAYSIZE(a)			(sizeof(a)/sizeof(a[0]))
+#define sqr(a)					((a) * (a))
 
 // Sanity checks on map locations x and y
-#define SANEX(x)     	((x) >= 0 && (x) < MAPX)
-#define SANEY(y)     	((y) >= 0 && (y) < MAPY)
-#define SANEXY(x, y) 	(SANEX(x) && SANEY(y))
+#define SANEX(x)     			((x) >= 0 && (x) < MAPX)
+#define SANEY(y)     			((y) >= 0 && (y) < MAPY)
+#define SANEXY(x, y) 			(SANEX(x) && SANEY(y))
 
 // Convert (x,y) coordinates to absolute position
-#define XY2M(x, y) 		((x) + (y) * MAPX)
-#define M2X(m) 			((m) % MAPX)
-#define M2Y(m) 			((m) / MAPX)
+#define XY2M(x, y) 				((x) + (y) * MAPX)
+#define M2X(m) 					((m) % MAPX)
+#define M2Y(m) 					((m) / MAPX)
 
 // Character 'cn's absolute position
-#define CHPOSM(cn) (XY2M(ch[(cn)].x,ch[(cn)].y))
+#define CHPOSM(cn) 				(XY2M(ch[(cn)].x,ch[(cn)].y))
 
-
+/* *** GLOBALS *** */
+#define IS_GLOB_MAYHEM			(globs->flags & GF_MAYHEM)
 
 /* *** ITEMS *** */
 
 // Use flag check on a STRUCTURE ELEMENT (works for characters too)
 // DB: i dont know how it might fail... but i've added some parents anyway. here and in other places.
 // DB: looked fairly safe before, so no need to worry
-#define IS_USED(x) ((x).used != USE_EMPTY)
+#define IS_USED(x) 				((x).used != USE_EMPTY)
 
 // Sanity checks on item numbers
 #define IS_SANEITEM(in)			((in) > 0 && (in) < MAXITEM)
@@ -64,10 +65,10 @@
 /* *** TEMPLATES *** */
 
 // Sanity checks on item templates
-#define IS_SANEITEMPLATE(tn) ((tn) > 0 && (tn) < MAXTITEM)
-#define IS_SANECTEMPLATE(tn) ((tn) > 0 && (tn) < MAXTCHARS)
+#define IS_SANEITEMPLATE(tn) 	((tn) > 0 && (tn) < MAXTITEM)
+#define IS_SANECTEMPLATE(tn) 	((tn) > 0 && (tn) < MAXTCHARS)
 
-#define IS_LONG_RESPAWN(temp) (temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR || temp==CT_BSMAGE1 || temp==CT_BSMAGE2 || temp==CT_BSMAGE3 || temp==CT_SCORP_Q)
+#define IS_LONG_RESPAWN(temp) 	(temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR || temp==CT_BSMAGE1 || temp==CT_BSMAGE2 || temp==CT_BSMAGE3 || temp==CT_SCORP_Q)
 
 /* *** CHARACTERS *** */
 
@@ -92,105 +93,115 @@
 #define IS_THRALL(cn)			((ch[(cn)].flags & CF_THRALL) || ch[(cn)].data[CHD_GROUP] == 65500)
 
 // special character group checks
-#define IS_COMPANION(cn) 	(IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
-#define IS_COMP_TEMP(cn) 	(ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER)
-#define IS_PLAYER_GC(cn)  	(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_COMPANION]==(cn))
-#define IS_PLAYER_SC(cn)  	(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_SHADOWCOPY]==(cn))
-#define IS_PLAYER_COMP(cn) 	((IS_PLAYER_GC(cn) || IS_PLAYER_SC(cn)) && !IS_THRALL(cn))
-#define CN_OWNER(cn) 		(ch[(cn)].data[CHD_MASTER] ? ch[(cn)].data[CHD_MASTER] : 3577)
+#define IS_COMPANION(cn) 		(IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
+#define IS_COMP_TEMP(cn) 		(ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER)
+#define IS_PLAYER_GC(cn)  		(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_COMPANION]==(cn))
+#define IS_PLAYER_SC(cn)  		(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_SHADOWCOPY]==(cn))
+#define IS_PLAYER_COMP(cn) 		((IS_PLAYER_GC(cn) || IS_PLAYER_SC(cn)) && !IS_THRALL(cn))
+#define CN_OWNER(cn) 			(ch[(cn)].data[CHD_MASTER] ? ch[(cn)].data[CHD_MASTER] : 3577)
 
 // Visibility, etc.
-#define IS_INVISIBLE(cn)	((ch[(cn)].flags & CF_INVISIBLE) != 0)
-#define IS_PURPLE(cn)		((ch[(cn)].kindred & KIN_PURPLE) != 0)
-#define IS_MONSTER(cn)		((ch[(cn)].kindred & KIN_MONSTER) != 0)
-#define IS_FEMALE(cn)		((ch[(cn)].kindred & KIN_FEMALE) != 0)
-#define IS_CLANKWAI(cn)		((ch[(cn)].kindred & KIN_CLANKWAI) != 0)
-#define IS_CLANGORN(cn)		((ch[(cn)].kindred & KIN_CLANGORN) != 0)
-#define HE_SHE(cn)			(IS_FEMALE(cn) ? "she" : "he")
-#define HE_SHE_CAPITAL(cn)	(IS_FEMALE(cn) ? "She" : "He")
-#define HIS_HER(cn)			(IS_FEMALE(cn) ? "her" : "his")
-#define HIM_HER(cn)			(IS_FEMALE(cn) ? "her" : "him")
+#define IS_INVISIBLE(cn)		((ch[(cn)].flags & CF_INVISIBLE) != 0)
+#define IS_PURPLE(cn)			((ch[(cn)].kindred & KIN_PURPLE) != 0)
+#define IS_MONSTER(cn)			((ch[(cn)].kindred & KIN_MONSTER) != 0)
+#define IS_FEMALE(cn)			((ch[(cn)].kindred & KIN_FEMALE) != 0)
+#define IS_CLANKWAI(cn)			((ch[(cn)].kindred & KIN_CLANKWAI) != 0)
+#define IS_CLANGORN(cn)			((ch[(cn)].kindred & KIN_CLANGORN) != 0)
+#define HE_SHE(cn)				(IS_FEMALE(cn) ? "she" : "he")
+#define HE_SHE_CAPITAL(cn)		(IS_FEMALE(cn) ? "She" : "He")
+#define HIS_HER(cn)				(IS_FEMALE(cn) ? "her" : "his")
+#define HIM_HER(cn)				(IS_FEMALE(cn) ? "her" : "him")
 
-#define IS_OPP_CLAN(cn, co)	((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)))
+#define IS_OPP_CLAN(cn, co)		((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)))
 
 // Ditto, with sanity check
-#define IS_SANEPLAYER(cn)	(IS_SANECHAR(cn) && IS_PLAYER(cn))
-#define IS_SANESTAFF(cn)	(IS_SANECHAR(cn) && IS_STAFF(cn))
-#define IS_SANEGOD(cn)		(IS_SANECHAR(cn) && IS_GOD(cn))
-#define IS_SANEUSURP(cn)	(IS_SANECHAR(cn) && IS_USURP(cn))
+#define IS_SANEPLAYER(cn)		(IS_SANECHAR(cn) && IS_PLAYER(cn))
+#define IS_SANESTAFF(cn)		(IS_SANECHAR(cn) && IS_STAFF(cn))
+#define IS_SANEGOD(cn)			(IS_SANECHAR(cn) && IS_GOD(cn))
+#define IS_SANEUSURP(cn)		(IS_SANECHAR(cn) && IS_USURP(cn))
 // IS_SANENPC is derived. No IS_NPC because of... logic.
-#define IS_SANENPC(cn)		(IS_SANECHAR(cn) && !IS_PLAYER(cn))
-#define IS_SANECCP(cn)		(IS_SANECHAR(cn) && IS_CCP(cn))
+#define IS_SANENPC(cn)			(IS_SANECHAR(cn) && !IS_PLAYER(cn))
+#define IS_SANECCP(cn)			(IS_SANECHAR(cn) && IS_CCP(cn))
 
 /* RACE CHECKS */
-#define IS_TEMPLAR(cn)		(ch[(cn)].kindred & KIN_TEMPLAR)
-#define IS_MERCENARY(cn)	(ch[(cn)].kindred & KIN_MERCENARY)
-#define IS_HARAKIM(cn)		(ch[(cn)].kindred & KIN_HARAKIM)
+#define IS_TEMPLAR(cn)			(ch[(cn)].kindred & KIN_TEMPLAR)
+#define IS_MERCENARY(cn)		(ch[(cn)].kindred & KIN_MERCENARY)
+#define IS_HARAKIM(cn)			(ch[(cn)].kindred & KIN_HARAKIM)
 
-#define IS_SEYAN_DU(cn)		(ch[(cn)].kindred & KIN_SEYAN_DU)
-#define IS_ARCHTEMPLAR(cn)	(ch[(cn)].kindred & KIN_ARCHTEMPLAR)
-#define IS_SKALD(cn)		(ch[(cn)].kindred & KIN_SKALD)
-#define IS_WARRIOR(cn)		(ch[(cn)].kindred & KIN_WARRIOR)
-#define IS_SORCERER(cn)		(ch[(cn)].kindred & KIN_SORCERER)
-#define IS_SUMMONER(cn)		(ch[(cn)].kindred & KIN_SUMMONER)
-#define IS_ARCHHARAKIM(cn)	(ch[(cn)].kindred & KIN_ARCHHARAKIM)
-#define IS_BRAVER(cn)		(ch[(cn)].kindred & KIN_BRAVER)
+#define IS_SEYAN_DU(cn)			(ch[(cn)].kindred & KIN_SEYAN_DU)
+#define IS_ARCHTEMPLAR(cn)		(ch[(cn)].kindred & KIN_ARCHTEMPLAR)
+#define IS_SKALD(cn)			(ch[(cn)].kindred & KIN_SKALD)
+#define IS_WARRIOR(cn)			(ch[(cn)].kindred & KIN_WARRIOR)
+#define IS_SORCERER(cn)			(ch[(cn)].kindred & KIN_SORCERER)
+#define IS_SUMMONER(cn)			(ch[(cn)].kindred & KIN_SUMMONER)
+#define IS_ARCHHARAKIM(cn)		(ch[(cn)].kindred & KIN_ARCHHARAKIM)
+#define IS_BRAVER(cn)			(ch[(cn)].kindred & KIN_BRAVER)
 
-#define IS_ANY_TEMP(cn)		(IS_TEMPLAR(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn))
-#define IS_ANY_MERC(cn)		(IS_MERCENARY(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn))
-#define IS_ANY_HARA(cn)		(IS_HARAKIM(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))
+#define IS_ANY_TEMP(cn)			(IS_TEMPLAR(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn))
+#define IS_ANY_MERC(cn)			(IS_MERCENARY(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn))
+#define IS_ANY_HARA(cn)			(IS_HARAKIM(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))
 
-#define IS_ANY_ARCH(cn)		(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn) || IS_BRAVER(cn))
+#define IS_ANY_ARCH(cn)			(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn) || IS_BRAVER(cn))
 
-#define IS_SEYA_OR_ARTM(cn)	(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn))
-#define IS_SEYA_OR_SKAL(cn)	(IS_SEYAN_DU(cn) || IS_SKALD(cn))
-#define IS_SEYA_OR_WARR(cn)	(IS_SEYAN_DU(cn) || IS_WARRIOR(cn))
-#define IS_SEYA_OR_SORC(cn)	(IS_SEYAN_DU(cn) || IS_SORCERER(cn))
-#define IS_SEYA_OR_SUMM(cn)	(IS_SEYAN_DU(cn) || IS_SUMMONER(cn))
-#define IS_SEYA_OR_ARHR(cn)	(IS_SEYAN_DU(cn) || IS_ARCHHARAKIM(cn))
-#define IS_SEYA_OR_BRAV(cn)	(IS_SEYAN_DU(cn) || IS_BRAVER(cn))
+#define IS_SEYA_OR_ARTM(cn)		(IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn))
+#define IS_SEYA_OR_SKAL(cn)		(IS_SEYAN_DU(cn) || IS_SKALD(cn))
+#define IS_SEYA_OR_WARR(cn)		(IS_SEYAN_DU(cn) || IS_WARRIOR(cn))
+#define IS_SEYA_OR_SORC(cn)		(IS_SEYAN_DU(cn) || IS_SORCERER(cn))
+#define IS_SEYA_OR_SUMM(cn)		(IS_SEYAN_DU(cn) || IS_SUMMONER(cn))
+#define IS_SEYA_OR_ARHR(cn)		(IS_SEYAN_DU(cn) || IS_ARCHHARAKIM(cn))
+#define IS_SEYA_OR_BRAV(cn)		(IS_SEYAN_DU(cn) || IS_BRAVER(cn))
 
-#define IS_PROX_CLASS(cn)	(B_SK(cn, SK_PROX) || IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_WARRIOR(cn))
-#define CAN_ARTM_PROX(cn)	(IS_SEYA_OR_ARTM(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_WARR_PROX(cn)	(IS_SEYA_OR_WARR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_SORC_PROX(cn)	(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_ARHR_PROX(cn)	(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_BRAV_PROX(cn)	(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define IS_PROX_CLASS(cn)		(B_SK(cn, SK_PROX) || IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_WARRIOR(cn))
+#define CAN_ARTM_PROX(cn)		(IS_SEYA_OR_ARTM(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_WARR_PROX(cn)		(IS_SEYA_OR_WARR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_SORC_PROX(cn)		(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_ARHR_PROX(cn)		(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_BRAV_PROX(cn)		(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 
 
 /* *** SKILLS *** */
 
 // Sanity check on skill number
-#define IS_SANESKILL(s) ((s)>=0 && (s)<MAXSKILL)
+#define IS_SANESKILL(s) 		((s)>=0 && (s)<MAXSKILL)
 
 // Fancy get/setters
-#define B_AT(cn, a)		(ch[(cn)].attrib[(a)][0])
-#define M_AT(cn, a)		(get_attrib_score((cn), (a)))
-#define B_SK(cn, s)		(ch[(cn)].skill[(s)][0])
-#define M_SK(cn, s)		((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
+#define B_AT(cn, a)				(ch[(cn)].attrib[(a)][0])
+#define M_AT(cn, a)				(get_attrib_score((cn), (a)))
+#define B_SK(cn, s)				(ch[(cn)].skill[(s)][0])
+#define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
 
-#define IS_P_SKILL(a)	(a==8||a==9||a==23||a==32)
+#define T_SK(cn, a)				(IS_SANEPLAYER(cn)  && st_learned_skill(ch[(cn)].tree_points, (a)))
+#define T_SEYA_SK(cn, a)		(IS_SEYAN_DU(cn)    && T_SK((cn), (a)))
+#define T_ARTM_SK(cn, a)		(IS_ARCHTEMPLAR(cn) && T_SK((cn), (a)))
+#define T_SKAL_SK(cn, a)		(IS_SKALD(cn)       && T_SK((cn), (a)))
+#define T_WARR_SK(cn, a)		(IS_WARRIOR(cn)     && T_SK((cn), (a)))
+#define T_SORC_SK(cn, a)		(IS_SORCERER(cn)    && T_SK((cn), (a)))
+#define T_SUMM_SK(cn, a)		(IS_SUMMONER(cn)    && T_SK((cn), (a)))
+#define T_ARHR_SK(cn, a)		(IS_ARCHHARAKIM(cn) && T_SK((cn), (a)))
+#define T_BRAV_SK(cn, a)		(IS_BRAVER(cn)      && T_SK((cn), (a)))
 
-#define CAN_SENSE(cn)	((ch[(cn)].flags & CF_SENSE) || !IS_PLAYER(cn))
+#define IS_P_SKILL(a)			(a==8||a==9||a==23||a==32)
+
+#define CAN_SENSE(cn)			((ch[(cn)].flags & CF_SENSE) || !IS_PLAYER(cn))
 
 // Slow's formula (used to degrade)
-#define SLOWFORM(n)			(n/2*9/10)
+#define SLOWFORM(n)				(n/2*9/10)
 
 // Slow2's formula (used to degrade) 
-#define SLOW2FORM(n)		(n/3*9/10)
+#define SLOW2FORM(n)			(n/3*9/10)
 
 // Curse2's formula (used to degrade)
-#define CURSE2FORM(p, n)	(((p*5/3)-n)/5)
+#define CURSE2FORM(p, n)		(((p*5/3)-n)/5)
 
 // Poison's formula (damage per tick)
-#define PL_POISFORM(p, d)	(((p+ 5) * 4500) / d)
-#define MN_POISFORM(p, d)	(((p   ) * 3000) / d)
+#define PL_POISFORM(p, d)		(((p+ 5) * 4500) / d)
+#define MN_POISFORM(p, d)		(((p   ) * 3000) / d)
 
 // Bleed's formula (damage per tick)
-#define BLEEDFORM(p, d)		(((p+ 5) *  750) / d)
+#define BLEEDFORM(p, d)			(((p+ 5) *  750) / d)
 
 // Frostburn's formula (degen per tick)
-#define FROSTBFORM(p, d)	(((p+10) * 1000) / d)
+#define FROSTBFORM(p, d)		(((p+10) * 1000) / d)
 
 /* Tarot Card Descriptiors (for both r-click and /tarot command) */
 
@@ -218,11 +229,11 @@
 #define DESC_WORLD		"When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n"
 
 #define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 8%%.\n"
-#define DESC_MAGI_R		"When equipped, your concentrate skill instead increases the cost of spells, but it also increases your spell modifier.\n"
-#define DESC_PREIST_R	"When equipped, your maximum mana is reduced by 20%% to increase your cooldown bonus by 10%% of the subtracted mana.\n"
+#define DESC_MAGI_R		"When equipped, your Concentrate skill no longer reduces the Mana cost of skills, and instead increases your Cooldown rate.\n"
+#define DESC_PREIST_R	"When equipped, your HP and MP limits are now 800, and natural overcap effects are disabled. Overcapped HP now increases damage taken by 1%% per 50. Overcapped MP now increases mana costs by 1%% per 20. Overcapping either resource now increases damage dealt by 1%% per 100.\n"
 #define DESC_EMPRES_R	"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"
 #define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
-#define DESC_HEIROP_R	"When equipped, your Ghost Companion has 25%% more Weapon Value and Armor Value, but has a 25%% chance to miss when it should have hit.\n"
+#define DESC_HEIROP_R	"When equipped, your Ghost Companion has 20%% more Weapon Value and Armor Value, but has a 25%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R	"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
 #define DESC_CHARIO_R	"When equipped, your debuffs ignore 20%% of target resistance and immunity, but are 25%% weaker once applied.\n"
 #define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
@@ -234,7 +245,7 @@
 #define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
 #define DESC_DEVIL_R	"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
 #define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
-#define DESC_STAR_R		"When equipped, your Spell Modifier no longer effects spell power and instead effects skill power.\n"
+#define DESC_STAR_R		"When equipped, your base Spell Modifier is 0.90. Your Spell Modifier no longer effects spell power and instead effects skill power.\n"
 #define DESC_MOON_R		"When equipped, the effectiveness of your Meditate skill is normalized while fighting, but zero while stationary.\n"
 #define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate skill is normalized while fighting, but zero while stationary.\n"
 #define DESC_JUDGE_R	"When equipped, your Pulse spell is replaced with Immolate. Immolate is a toggle that causes you and surrounding enemies to take damage over time.\n"
@@ -334,4 +345,5 @@
 #define CFL_N_ARFL		"  Area contains %s open flames\n"
 // 						"!        .         .   |     .         .        !"
 
-#define IS_IN_SUN(x, y) ((x>=32 && y>=407 && x<=57 && y<= 413) || (x>=32 && y>=414 && x<=64 && y<= 428) || (x>=22 && y>=429 && x<=64 && y<=450) || (x>=22 && y>=451 && x<=27 && y<=459) || (x>=59 && y>=451 && x<=64 && y<=465) || (x>=173 && y>=921 && x<=255 && y<=1003))
+#define IS_IN_SUN(x, y) 	((x>=32 && y>=407 && x<=57 && y<= 413) || (x>=32 && y>=414 && x<=64 && y<= 428) || (x>=22 && y>=429 && x<=64 && y<=450) || (x>=22 && y>=451 && x<=27 && y<=459) || (x>=59 && y>=451 && x<=64 && y<=465) || (x>=173 && y>=921 && x<=255 && y<=1003))
+#define IS_IN_VANTA(x, y) 	((x>=94 && y>=1135 && x<=182 && y<= 1223))

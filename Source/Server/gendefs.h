@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000902
-#define MINVERSION			0x000902
+#define VERSION				0x000A00
+#define MINVERSION			0x000A00
 
 #define DATDIR				".dat"
 
@@ -136,6 +136,21 @@
 #define LAB_XII_Y			 993
 #define LAB_XIII_X			 142
 #define LAB_XIII_Y			 160
+//
+#define LAB_XIV_X			 118
+#define LAB_XIV_Y			 1095
+#define LAB_XV_X			 133
+#define LAB_XV_Y			 1152
+#define LAB_XVI_X			 145
+#define LAB_XVI_Y			 1276
+#define LAB_XVII_X			 163
+#define LAB_XVII_Y			 1398
+#define LAB_XVIII_X			 512
+#define LAB_XVIII_Y			 512
+#define LAB_XIX_X			 512
+#define LAB_XIX_Y			 512
+#define LAB_XX_X			 512
+#define LAB_XX_Y			 512
 
 #define CNTSAY				(TICKS)
 #define MAXSAY				(TICKS*7)
@@ -279,8 +294,8 @@
 #define SP_MULT_POISON		115
 #define SP_MULT_POISON2		110
 #define SP_MULT_IDENTIFY	180
-#define SP_MULT_DISPEL		 80
-#define SP_MULT_DISPEL2		 75
+#define SP_MULT_DISPEL		 90
+#define SP_MULT_DISPEL2		 85
 #define SP_MULT_WEAKEN		100
 #define SP_MULT_WEAKEN2		 95
 #define SP_MULT_WARCRY		 95
@@ -327,7 +342,7 @@
 #define SP_DUR_LETHARGY		( TICKS * 60 * 60 * 2             )
 #define SP_DUR_AGGRAVATE	( TICKS * 20                      )
 
-#define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 10     )
+#define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
 #define SP_DUR_TAUNT		( TICKS *  5                      )
 #define SP_DUR_GUARD		( TICKS * 30                      )

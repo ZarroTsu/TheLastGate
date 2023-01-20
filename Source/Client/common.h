@@ -1,5 +1,5 @@
 // Just comment/uncomment this to alter home copy version
-#define HOMECOPY
+//#define HOMECOPY
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
@@ -32,6 +32,29 @@
 #define DAM_MULT_ZEPHYR		  50
 #define DAM_MULT_LEAP		 250
 #define DAM_MULT_POISON		4500
+#define DAM_MULT_BLEED		 750
+
+#define IS_TEMPLAR			(pl.kindred & (1u<< 4))
+#define IS_MERCENARY		(pl.kindred & (1u<< 0))
+#define IS_HARAKIM			(pl.kindred & (1u<< 6))
+#define IS_SEYAN_DU			(pl.kindred & (1u<< 1))
+#define IS_ARCHTEMPLAR		(pl.kindred & (1u<< 5))
+#define IS_SKALD			(pl.kindred & (1u<<12))
+#define IS_WARRIOR			(pl.kindred & (1u<<10))
+#define IS_SORCERER			(pl.kindred & (1u<<11))
+#define IS_SUMMONER			(pl.kindred & (1u<<13))
+#define IS_ARCHHARAKIM		(pl.kindred & (1u<< 9))
+#define IS_BRAVER			(pl.kindred & (1u<<14))
+
+#define T_SK(a)				(st_learned_skill(pl.tree_points, (a)))
+#define T_SEYA_SK(a)		(IS_SEYAN_DU    && T_SK(a))
+#define T_ARTM_SK(a)		(IS_ARCHTEMPLAR && T_SK(a))
+#define T_SKAL_SK(a)		(IS_SKALD       && T_SK(a))
+#define T_WARR_SK(a)		(IS_WARRIOR     && T_SK(a))
+#define T_SORC_SK(a)		(IS_SORCERER    && T_SK(a))
+#define T_SUMM_SK(a)		(IS_SUMMONER    && T_SK(a))
+#define T_ARHR_SK(a)		(IS_ARCHHARAKIM && T_SK(a))
+#define T_BRAV_SK(a)		(IS_BRAVER      && T_SK(a))
 
 // wear positions
 #define WN_HEAD			0
@@ -195,6 +218,8 @@ struct cplayer {
 	int tokens; 	// Points for gambling
 	int waypoints;
 
+	unsigned short tree_points;
+
 	// items carried
 	int item[40];
 	int item_p[40];
@@ -264,6 +289,7 @@ struct cplayer {
 #define CL_CMD_MOTD			36
 #define CL_CMD_BSSHOP		37
 #define CL_CMD_QSHOP		38
+#define CL_CMD_TREE			39
 #define CL_CMD_CTICK		255
 
 

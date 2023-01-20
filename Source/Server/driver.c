@@ -2266,7 +2266,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest122")==0) //   21 - Ice Nest / Aster / Lion's Paws
 			{
-				if (getrank(co)<14) // Colonel
+				if (getrank(co)<13) // Lt Col
 					do_sayx(cn, "Good day, %s. Cold out.", ch[co].name);
 				else
 					do_sayx(cn, "Good day, %s. Please find me the Lion's Paws in the Ice Gargoyle Nest, and I would reward you with this magical tarot card.", ch[co].name);
@@ -2329,7 +2329,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#quest134")==0) //   33 - Maude - Dwellers
 			{
-				if (getrank(co)<12) // Major
+				if (getrank(co)<13) // Lt Col
 					do_sayx(cn, "'Ello there, %s.", ch[co].name);
 				else
 					do_sayx(cn, "'Ello there, %s. If you'd bring me the emerald chalice from the Buried Brush, I'd pay you mighty finely.", ch[co].name);
@@ -2339,7 +2339,7 @@ int npc_see(int cn, int co)
 				if (getrank(co)<15) // Brig Gen
 					do_sayx(cn, "Well howdy, %s.", ch[co].name);
 				else
-					do_sayx(cn, "Well howdy, %s. The marauders in the Empty Outset stole a fancy-lookin' Khopesh. If you'd bring it here, I can give you this Shotel for the trouble.", ch[co].name);
+					do_sayx(cn, "Well howdy, %s. The marauders in the Empty Outset stole a fancy-lookin' Khopesh. If you'd bring it here, I can give you this hardy tarot card for the trouble.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest136")==0) //   35 - Wicker - Merlin
 			{
@@ -2375,6 +2375,27 @@ int npc_see(int cn, int co)
 					do_sayx(cn, "Look what the cat dragged in...");
 				else
 					do_sayx(cn, "Well lookie here. %s, bring me the ninja lord's fancy lil' dagger and I'd reward you with this here Lunar Belt!", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest141")==0) //   40 - Rikus - Ziggurat
+			{
+				if (getrank(co)<15) // Brig Gen
+					do_sayx(cn, "Greetings, %s.", ch[co].name);
+				else
+					do_sayx(cn, "Greetings, %s. A foul necromancer is raising an army in the Ziggurat in the Basalt Desert. Bring me their dagger, and I would reward you with this dubious tarot card.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest142")==0) //   41 - Charlotte - Widower
+			{
+				if (getrank(co)<16) // Major Gen
+					do_sayx(cn, "Greetings...");
+				else
+					do_sayx(cn, "Greetings, %s... There is a witch hiding to the south whose foul magics have twisted adventurers. Bring me her memoire, and I will give you this venomous tarot card.", ch[co].name);
+			}
+			else if (strcmp(ch[cn].text[2], "#quest143")==0) //   42 - Marco - Bluebeard
+			{
+				if (getrank(co)<16) // Major Gen
+					do_sayx(cn, "Ahoy, %s.", ch[co].name);
+				else
+					do_sayx(cn, "Ahoy there, %s. There be a pirate named ol' Blue Beard to the cavern south o' here. Bring me his sword, and I would give you this angry ol' tarot card in return.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#blackherbs")==0) //   xx - Zorani - Black Plants
 			{
@@ -2904,7 +2925,7 @@ int npc_try_spell(int cn, int co, int spell)
 			timm = spell_immunity(offn, get_target_immunity(cn, co));
 			timm = tdef ? (timm/2) : timm;
 			// Cancel if target is already buffed or debuffed (except for heal)
-			if (bu[in].temp==truespell && truespell!=SK_HEAL && tpow>=timm && bu[in].active>bu[in].duration/4)
+			if (bu[in].temp==truespell && truespell!=SK_HEAL /*&& tpow>=timm*/ && bu[in].active>bu[in].duration/4)
 			{
 				break;
 			}
@@ -4038,7 +4059,7 @@ void stronghold_mage_driver_ver2(int cn)
 		{
 			if (co = generate_map_enemy(347, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
 				spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
-				(ch[cn].data[1]>10&&!RANDOM(20))?2:((ch[cn].data[1]>5&&!RANDOM(20))?1:0), 0))
+				(ch[cn].data[1]>10&&try_boost(20))?2:((ch[cn].data[1]>5&&try_boost(20))?1:0), 0))
 			{
 				ch[co].flags |= CF_NOSLEEP;
 				ch[co].data[25] = 2;
@@ -4056,6 +4077,7 @@ void stronghold_mage_driver_ver2(int cn)
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	if (!((ch[cn].data[2]-1)%2)) do_sayx(cn, "Khuzak gurawin duskar!");
 	m = bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6];
+	if (IS_GLOB_MAYHEM) m = m - m / 4;
 	chlog(cn, "created %d new monsters, waiting %d ticks", n, m);
 	
 	// Increment subwave and/or wave number
@@ -4357,8 +4379,7 @@ void spawn_colosseum_enemy(int x, int y, int tox, int toy, int parent, int diffi
 		ch[co].data[25] = 0;
 		ch[co].data[27] = 1;
 		ch[co].skill[SK_PERCEPT][1] = 30;
-		ch[co].goto_x = tox;
-		ch[co].goto_y = toy;
+		npc_moveto(co, tox, toy);
 		do_update_char(co);
 		ch[parent].data[5+m] = co;
 	}
@@ -4406,7 +4427,8 @@ void colosseum_driver(int cn)
 	{
 		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
 		if (IS_PLAYER(n) && is_incolosseum(n, anum) && p == 0) p = ch[n].colosseum;
-		if (!IS_PLAYER(n) && !IS_PLAYER_COMP(n) && is_incolosseum(n, anum)) m++;
+		if (!IS_PLAYER(n) && !IS_PLAYER_COMP(n) && 
+			is_incolosseum(n, anum) && ch[n].data[CHD_GROUP]==60) m++;
 	}
 	ch[cn].data[0] = p;
 	ch[cn].data[4] = m;
@@ -4468,7 +4490,7 @@ void colosseum_driver(int cn)
 				m = 2; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
 				m = 3; spawn_colosseum_enemy(from_xy[n][m][0], from_xy[n][m][1], to_xy[n][m][0], to_xy[n][m][1], cn, i, p, m);
 				chlog(cn, "created 4 monsters in colosseum %d", anum);
-				ch[cn].data[9] = globs->ticker + TICKS*15;
+				ch[cn].data[9] = globs->ticker + TICKS*20;
 				ch[cn].data[2]++;
 				break;
 			case  1: 	// Wait for mobs to die
@@ -4481,9 +4503,10 @@ void colosseum_driver(int cn)
 					{
 						// Try to force NPCs out of spawns if they're not doing anything at the moment.
 						if (IS_SANECHAR(co = ch[cn].data[5+m]) && ch[co].used != USE_EMPTY && ch[co].temp == 347 &&
-							ch_base_status(ch[co].status)<160 && !is_reallyincolosseum(co, anum))
+							(ch_base_status(ch[co].status) < 8) && !is_reallyincolosseum(co, anum) && ch[co].data[9]==0)
 						{
 							quick_teleport(co, to_xy[n][m][0]-2+RANDOM(5), to_xy[n][m][1]-2+RANDOM(5));
+							ch[co].data[9] = 1;
 							ch[cn].data[9] = globs->ticker + TICKS*5;
 						}
 					}
@@ -5513,8 +5536,8 @@ void pandium_driver(int cn) // CT_PANDIUM
 		strcpy(bu[in].description, "Oppression.");
 		for (m=0;m<5;m++) 
 		{
-			ch[cn].attrib[m][1] = min(127, fl);
-			bu[in].attrib[m][1] = min(127, fl);
+			ch[cn].attrib[m][1] = min(127, fl*3/2);
+			bu[in].attrib[m][1] = min(127, fl*3/2);
 		}
 		bu[in].power = fl;
 		bu[in].dmg_reduction[1] = min(127, fl);
@@ -6970,7 +6993,7 @@ int npc_driver_high(int cn)
 		return 0;                                     // don't scan if we don't use the information anyway
 	}
 	// save some work. you need to check here if no other work needs to be done!
-	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE)
+	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE && ch[cn].data[58]==1)
 	{
 		return 0;
 	}
@@ -7009,7 +7032,7 @@ int npc_driver_high(int cn)
 
 				if (it[in].temp==ch[cn].data[41])
 				{
-					if (!it[in].active && (globs->dlight<200 || indoor2))
+					if (it[in].temp==3079 && it[in].active) // Vantablack candles
 					{
 						ch[cn].misc_action  = DR_USE;
 						ch[cn].misc_target1 = x;
@@ -7018,8 +7041,16 @@ int npc_driver_high(int cn)
 						ch[cn].data[58] = 1;
 						return 1;
 					}
-
-					if (it[in].active && globs->dlight>200 && !indoor2)
+					if (!it[in].active && (globs->dlight<200 || indoor2) && it[in].temp!=3079)
+					{
+						ch[cn].misc_action  = DR_USE;
+						ch[cn].misc_target1 = x;
+						ch[cn].misc_target2 = y;
+						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
+						ch[cn].data[58] = 1;
+						return 1;
+					}
+					if (it[in].active && globs->dlight>200 && !indoor2 && it[in].temp!=3079)
 					{
 						ch[cn].misc_action  = DR_USE;
 						ch[cn].misc_target1 = x;
@@ -7042,7 +7073,7 @@ int npc_driver_high(int cn)
 				}
 				if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && indoor1==indoor2 && (it[in].driver==7) &&
 				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
-				    do_char_can_see_item(cn, in))
+				    do_char_can_see_item(cn, in) && ch[cn].temp != 1454 && ch[cn].temp != 1455)
 				{
 					if (plr_check_target(x + y * MAPX + 1) && !map[x + y * MAPX + 1].it)
 					{

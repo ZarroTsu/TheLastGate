@@ -222,3 +222,111 @@ struct s_skilltab skilltab[MAXSKILL+2] = {
 				"", "", "", 
 				{ 0, 0, 0 }}
 };
+
+struct sk_tree sk_tree[8][12]={
+	{	// Seyan'du
+		{ "Sharpness", 				"+2 to Weapon Value." },
+		{ "Expertise", 				"+1 to All Attributes."},
+		{ "Toughness", 				"+2 to Armor Value."},
+		{ "Absolution", 			"0.25% more damage dealt for each buff or debuff on you."},
+		{ "Vanquisher", 			"8% more total Weapon Value."},
+		{ "Scorn", 					"Your debuffs ignore 20% of enemy Resistance when cast."},
+		{ "Determination", 			"Gain 1 additional Hit and Parry for every 60 total Attributes."},
+		{ "Jack of All Trades", 	"2% more total Attributes."},
+		{ "Redemption", 			"Companions have Hit and Parry scores equal to yours, and learn Regen."},
+		{ "Enigmatic", 				"20% reduced effect of debuffs on you."},
+		{ "Steelskin", 				"8% more total Armor Value."},
+		{ "Penance", 				"0.5% less damage taken for each buff or debuff on you."}
+	},{	// Arch Templar
+		{ "Spiked", 				"+4 to Thorns."},
+		{ "Might", 					"+3 to Strength."},
+		{ "Bulwark", 				"+2 to Armor Value."},
+		{ "Serrated Blades", 		"Cleave deals additional damage based on your total Thorns."},
+		{ "Sharkskin", 				"12% more total Thorns."},
+		{ "Retaliation", 			"Your Thorns can now trigger on a parried hit with 10% power."},
+		{ "Overlord", 				"0.5% more effect of Warcry and Rally for every 10 total Strength."},
+		{ "Overwhelming Strength", 	"+10 to Strength Limit."},
+		{ "Censure", 				"Taunt reduces enemy Hit score by 5% for its duration."},
+		{ "Bastion", 				"20% of total Resistance is granted as extra Immunity."},
+		{ "Unbreakable", 			"8% more total Armor Value."},
+		{ "Rampart", 				"50% more Parry granted by your Shield skill."}
+	},{	// Skald
+		{ "Maiming", 				"+4 to Top Damage."},
+		{ "Dexterity", 				"+3 to Agility."},
+		{ "Persistance", 			"+20 Endurance."},
+		{ "Nocturne", 				"15% increased effect of Aria."},
+		{ "Ravager", 				"8% more total Top Damage."},
+		{ "Preparation", 			"Your Top Damage is rolled an additional time, using the higher result."},
+		{ "Slaying", 				"+2% Critical Multiplier for every 10 total Agility."},
+		{ "Overwhelming Agility", 	"+10 to Agility Limit."},
+		{ "Finesse", 				"All weapon skills use the attributes Agility + Agility + Strength."},
+		{ "Impact", 				"Weaken and Crush also reduce enemy critical hit chance."},
+		{ "Perseverance", 			"12% more total Endurance."},
+		{ "Tenacity", 				"10% of damage taken is dealt to your Endurance instead."}
+	},{	// Warrior
+		{ "Rapidity", 				"+4 to Attack Speed."},
+		{ "Ruffian", 				"+2 to Strength & +2 to Agility."},
+		{ "Passion", 				"+3 to Spell Aptitude."},
+		{ "Alacrity", 				"Zephyr deals 20% more damage."},
+		{ "Swiftness", 				"8% more total Attack Speed."},
+		{ "Intensity", 				"+0.01 to Spell Modifier."},
+		{ "Antagonizer", 			"0.5% more effect of Blind and Douse for every 10 total Strength."},
+		{ "Harrier", 				"3% more total Agility and Strength."},
+		{ "Butchery", 				"1% more effect of Cleave for every 10 total Strength."},
+		{ "Champion", 				"Enemies beside and behind you no longer gain a bonus to hitting you."},
+		{ "Zealotry", 				"12% more total Spell Aptitude."},
+		{ "Fervor", 				"0.5% less damage taken per 10 Spell Aptitude."}
+	},{	// Sorcerer
+		{ "Expansiveness", 			"+1 to Area of Effect."},
+		{ "Potency", 				"+2 to Willpower & +2 to Intuition."},
+		{ "Quickstep", 				"+4 to Movement Speed."},
+		{ "Tormenter", 				"Poison deals damage 10% faster."},
+		{ "Grandiosity", 			"20% more total Area of Effect."},
+		{ "Brilliance", 			"+0.01 to Spell Modifier."},
+		{ "Coordination", 			"1% more effect of Lethargy for every 10 total Willpower."},
+		{ "Pragmatic", 				"2% more total Willpower and Intuition."},
+		{ "Hex Master", 			"0.4% more effect of Curse and Slow for every 10 total Intuition."},
+		{ "Nimble", 				"You no longer have a parry penalty if hit while not fighting."},
+		{ "Fleet-footed", 			"12% more total Movement Speed."},
+		{ "Acceleration", 			"Haste grants 20% more move speed to you, and it can now be cast on allies."}
+	},{	// Summoner
+		{ "Nimbleness", 			"+4 to Cast Speed."},
+		{ "Wisdom", 				"+3 to Willpower."},
+		{ "Vitality", 				"+40 Hitpoints."},
+		{ "Tactician", 				"Your Attack Speed is equal to your Cast Speed."},
+		{ "Spellslinger", 			"8% more total Cast Speed."},
+		{ "Harpooner", 				"15% more Hit and Parry score while using a Spear."},
+		{ "Mysticism", 				"All spell skills use the attributes Willpower + Willpower + Intuition."},
+		{ "Overwhelming Willpower", "+10 to Willpower Limit."},
+		{ "Shaper", 				"1% more effect of Shadow Copy for every 10 total Willpower."},
+		{ "Diviner", 				"Ghost Companions inherit the effects of your tarot cards."},
+		{ "Constitution", 			"12% more total Hitpoints."},
+		{ "Protector", 				"Magic Shield and Magic Shell are also cast on your active companions."}
+	},{	// Arch Harakim
+		{ "Composure", 				"+4 to Cooldown Rate."},
+		{ "Intellect", 				"+3 to Intuition."},
+		{ "Wellspring", 			"+40 Mana."},
+		{ "Destroyer", 				"Blast deals full damage with its area of effect."},
+		{ "Serenity", 				"4% more total Cooldown Rate."},
+		{ "Strategist", 			"You suffer no cooldown if a spell is suppressed."},
+		{ "Psychosis", 				"1% more effect of Pulse and Immolate for every 10 total Intuition."},
+		{ "Overwhelming Intuition", "+10 to Intuition Limit."},
+		{ "Wizardry", 				"All spell skills use the attributes Willpower + Intuition + Intuition."},
+		{ "Flow", 					"15% of overcapped Mana is granted as additional Hitpoints."},
+		{ "Perpetuity", 			"8% more total Mana."},
+		{ "Resourcefulness", 		"10% of damage taken is dealt to your Mana instead."}
+	},{	// Braver
+		{ "Accuracy", 				"+2 to Hit Score."},
+		{ "Boldness", 				"+3 to Braveness."},
+		{ "Avoidance", 				"+2 to Parry Score."},
+		{ "Assassination", 			"15% increased effect of Precision."},
+		{ "Rigor", 					"4% more total Hit Score."},
+		{ "Deftness", 				"50% reduced damage taken from triggering enemy Thorns."},
+		{ "Wrath", 					"1% more effect of Rage for every 10 total Braveness."},
+		{ "Overwhelming Braveness", "+10 to Braveness Limit."},
+		{ "Virtuosity", 			"All weapon skills use the attributes Braveness + Braveness + Agility."},
+		{ "Resilience", 			"20% less effect of Healing Sickness on you."},
+		{ "Flexibility", 			"4% more total Parry Score."},
+		{ "Litheness", 				"50% reduced extra damage taken from enemy Critical Hits."}
+	}
+};

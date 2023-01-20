@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.9.2\n"};
-static char intro_msg4_font = 0;
-static char intro_msg4[] = {"ALL MERCENARIES, SORCERERS, WARRIORS AND SEYAN'DU WERE RESET RECENTLY. REMEMBER TO ALLOCATE YOUR EXP!\n"};
+static char intro_msg3[] = {"Current client/server version is 0.10.0\n"};
+static char intro_msg4_font = 1;
+static char intro_msg4[] = {"The Uber Labyrinth is now open in Neiseer. Good luck!\n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -440,7 +440,7 @@ void plr_cmd_turn(int nr)
 // inventory manipulation... moves citem from/to item or worn - will be done at once
 void plr_cmd_inv(int nr)
 {
-	int what, n, tmp, tmpv, cn, in, co;
+	int what, n, m, tmp, tmpv, cn, in, co;
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
@@ -590,16 +590,41 @@ void plr_cmd_inv(int nr)
 			}
 			if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
 			{
+				if (it[in].temp)
+				{
+					tmp = god_create_item(it[in].temp);
+				}
+				else if (it[in].orig_temp)
+				{
+					tmp = god_create_item(it[in].orig_temp);
+					it[tmp].orig_temp = tmp;
+					it[tmp].temp = 0;
+				}
+				else
+				{
+					return;
+				}
+				
 				tmpv = it[in].value / it[in].stack;
 				it[in].stack--;
 				it[in].value = tmpv * it[in].stack;
-				
-				tmp = god_create_item(it[in].temp);
 				
 				if (it[in].driver==110)
 				{
 					it[tmp].data[0] = it[in].data[0];
 					it[tmp].data[1] = it[in].data[1];
+				}
+				if (it[in].driver== 93)
+				{
+					it[tmp].data[0] = it[in].data[0];
+					it[tmp].data[1] = it[in].data[1];
+					it[tmp].data[3] = it[in].data[3];
+					it[tmp].data[4] = it[in].data[4];
+					for (m=0; m<50; m++)
+					{
+						it[tmp].skill[m][0] = it[in].skill[m][0];
+						it[tmp].skill[m][1] = it[in].skill[m][1];
+					}
 				}
 				
 				//it[tmp].x = 0;
@@ -1019,6 +1044,17 @@ void plr_cmd_wps(int nr)
 	cn = player[nr].usnr;
 
 	do_waypoint(cn, n);
+}
+
+void plr_cmd_tree(int nr)
+{
+	int cn, n;
+
+	n = *(unsigned short*)(player[nr].inbuf + 1);
+
+	cn = player[nr].usnr;
+
+	do_treeupdate(cn, n);
 }
 
 void plr_cmd_motd(int nr)
@@ -1645,6 +1681,9 @@ void plr_cmd(int nr)
 		break;
 	case CL_CMD_WPS:
 		plr_cmd_wps(nr);
+		break;
+	case CL_CMD_TREE:
+		plr_cmd_tree(nr);
 		break;
 	case CL_CMD_MOTD:
 		plr_cmd_motd(nr);
@@ -2656,22 +2695,23 @@ void plr_change(int nr)
 			cpl->end[5] != ch[cn].end[5])
 		{
 			chFlags = 0;
-			if (get_enchantment(cn, 36)) 	chFlags += (1 <<  0); // Half med to HP
-			if (get_enchantment(cn, 45)) 	chFlags += (1 <<  1); // Half end to MP
-			if (get_enchantment(cn,  7)) 	chFlags += (1 <<  2); // 20% more weaken effect
-			if (get_enchantment(cn, 13)) 	chFlags += (1 <<  3); // 20% more slow effect
-			if (get_enchantment(cn, 20)) 	chFlags += (1 <<  4); // 20% more curse effect
-			if (get_enchantment(cn, 27)) 	chFlags += (1 <<  5); // 20% more poison effect
-			if (get_enchantment(cn, 30)) 	chFlags += (1 <<  6); // 20% more bleed effect
-			if (get_enchantment(cn, 31)) 	chFlags += (1 <<  7); // 20% more blind effect
-			if (get_enchantment(cn, 56)) 	chFlags += (1 <<  8); // 20% more heal effect
+			if (get_enchantment(cn, 36)) 		chFlags += (1 <<  0); // Half med to HP
+			if (get_enchantment(cn, 45)) 		chFlags += (1 <<  1); // Half end to MP
+			if (get_enchantment(cn,  7)) 		chFlags += (1 <<  2); // 20% more weaken effect
+			if (get_enchantment(cn, 13)) 		chFlags += (1 <<  3); // 20% more slow effect
+			if (get_enchantment(cn, 20)) 		chFlags += (1 <<  4); // 20% more curse effect
+			if (get_enchantment(cn, 27)) 		chFlags += (1 <<  5); // 20% more poison effect
+			if (get_enchantment(cn, 30)) 		chFlags += (1 <<  6); // 20% more bleed effect
+			if (get_enchantment(cn, 31)) 		chFlags += (1 <<  7); // 20% more blind effect
+			if (get_enchantment(cn, 56)) 		chFlags += (1 <<  8); // 20% more heal effect
 			if (get_enchantment(cn, 16) || 
-				get_enchantment(cn, 23)) 	chFlags += (1 <<  9); // 20% damage shifted to end/mana (20% more eHP)
-			if (get_enchantment(cn, 35)) 	chFlags += (1 << 10); // 20% chance to half damage taken (10% more eHP)
-			if (get_enchantment(cn, 37)) 	chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
-			if (get_enchantment(cn, 53)) 	chFlags += (1 << 12); // 30% less damage taken from DoT (30% more DoT eHP)
-			if (get_gear(cn, IT_WP_RISINGPHO)) chFlags += (1 << 13); // Immolate skill, based off HP
-//			if () 	chFlags += (1 << 14);
+				get_enchantment(cn, 23)) 		chFlags += (1 <<  9); // 20% damage shifted to end/mana (20% more eHP)
+			if (get_tarot(cn, IT_CH_STAR_R)) 	chFlags += (1 << 10); // Reverse Star changes spellmod behavior
+			if (get_enchantment(cn, 37)) 		chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
+			if (T_SKAL_SK(cn, 12) ||
+				T_ARHR_SK(cn, 12)) 				chFlags += (1 << 12); // 10% damage shifted to end/mana (10% more eHP)
+			if (get_gear(cn, IT_WP_RISINGPHO)) 	chFlags += (1 << 13); // Immolate skill, based off HP
+			if (get_gear(cn, IT_TW_CLOAK)) 		chFlags += (1 << 14); // 20% damage shifted to end (20% more eHP)
 			
 			buf[0] = SV_SETCHAR_ENDUR;
 			*(unsigned short*)(buf + 1)  = ch[cn].move_speed;		// char
@@ -2830,7 +2870,7 @@ void plr_change(int nr)
 					if (get_tarot(cn, IT_CH_TOWER)) 	chFlags += (1 <<  6); // Curse -> Curse 2
 					if (get_tarot(cn, IT_CH_JUDGE)) 	chFlags += (1 <<  7);
 					if (get_tarot(cn, IT_CH_JUSTICE)) 	chFlags += (1 <<  8);
-					if (get_tarot(cn, IT_CH_TEMPER)) 	chFlags += (1 <<  9);
+					if (get_tarot(cn, IT_CH_PREIST)) 	chFlags += (1 <<  9); // 20% eHP
 					if (get_tarot(cn, IT_CH_DEATH)) 	chFlags += (1 << 10); // Weaken -> Weaken 2
 					if (get_tarot(cn, IT_CH_MOON)) 		chFlags += (1 << 11);
 					if (get_tarot(cn, IT_CH_SUN)) 		chFlags += (1 << 12);
@@ -3076,13 +3116,15 @@ void plr_change(int nr)
 	}
 	
 	// casino tokens
-	if (cpl->tokens != ch[cn].tokens)
+	if (cpl->tokens != ch[cn].tokens || cpl->tree_points != ch[cn].tree_points)
 	{
 		buf[0] = SV_SETCHAR_TOK;
 		*(unsigned int*)(buf + 1) = ch[cn].tokens;
-		xsend(nr, buf, 5);
+		*(unsigned short*)(buf + 5) = ch[cn].tree_points;
+		xsend(nr, buf, 7);
 		
 		cpl->tokens = ch[cn].tokens;
+		cpl->tree_points = ch[cn].tree_points;
 	}
 
 	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)
@@ -3364,12 +3406,22 @@ inline int do_char_calc_light(int cn, int light)
 		light = 64;
 	}
 	
-	if (light==0 && M_SK(cn, SK_PERCEPT)>150)
+	if (IS_GLOB_MAYHEM)
 	{
-		light = 1;
+		if (light==0 && M_SK(cn, SK_PERCEPT)>225 && !has_buff(cn, 215))
+		{
+			light = 1;
+		}
+		val = light * min(M_SK(cn, SK_PERCEPT)/3*2, 10) / 10;
 	}
-
-	val = light * min(M_SK(cn, SK_PERCEPT), 10) / 10;
+	else
+	{
+		if (light==0 && M_SK(cn, SK_PERCEPT)>150 && !has_buff(cn, 215))
+		{
+			light = 1;
+		}
+		val = light * min(M_SK(cn, SK_PERCEPT), 10) / 10;
+	}
 
 	if (val>255)
 	{
@@ -4195,7 +4247,7 @@ void plr_tick(int nr)
 	{
 		cn = player[nr].usnr;
 
-		if (cn && ch[cn].data[19] && (ch[cn].flags & CF_PLAYER))
+		if (cn && ch[cn].data[19] && (ch[cn].flags & CF_PLAYER) && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_NOLAG))
 		{
 			if (player[nr].ltick>player[nr].rtick + ch[cn].data[19] && !(ch[cn].flags & CF_STONED))
 			{
@@ -4598,7 +4650,7 @@ void tick(void)
 			continue;
 		}
 
-		if (ch[n].data[92]>0)
+		if (!IS_PLAYER(n) && ch[n].data[92]>0)
 		{
 			ch[n].data[92]--;               // reduce single awake
 		}

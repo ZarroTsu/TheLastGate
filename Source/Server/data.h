@@ -97,6 +97,8 @@ struct global
 	unsigned long long unique;
 
 	int cap;
+	unsigned int top_ps[3];
+	unsigned int top_pg[3];
 };
 
 
@@ -603,7 +605,11 @@ struct character
 	char limit_break[6][2];			// [0]-[4] for BWAIS, [5] for all skills; [0] is base, [1] for effects from items or (de)buffs
 	unsigned char pandium_floor[3];	// [0] = Solo  [1] = Group  [2] = reward tier obtained
 	
-	char future2[23];				// space for future expansion
+	unsigned short mana_cost;		// Mana cost multiplier.  Factor of 1:100, where 10000 is the median 100%.
+	
+	unsigned short tree_points;		// Points allocated (upper 12 bits) and available (lower 4 bits)
+	
+	char future2[19];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -770,18 +776,19 @@ struct newcharacter
 	char colosseum;						// +1,    1404, Colosseum mode check, resets every 1st
 	char spellfail;						// +1,    1405, check for 'Suppression' from NPCs
 	
-	unsigned short dmg_bonus;			// +2,    1407, Damage multiplier. Factor of 1:100, where 10000 is the median 100% dealt value.
-	unsigned short dmg_reduction;		// +2,    1409, Damage reduction.  Factor of 1:100, where 10000 is the median 100% taken value.
+	unsigned short dmg_bonus;			// +2,    1407, Damage multiplier.    Factor of 1:100, where 10000 is the median 100% dealt value
+	unsigned short dmg_reduction;		// +2,    1409, Damage reduction.     Factor of 1:100, where 10000 is the median 100% taken value
+	unsigned short mana_cost;			// +2,    1411, Mana cost multiplier. Factor of 1:100, where 10000 is the median 100%
 	
-	char limit_break[6][2];				// +6*2,  1421, [0]-[4] for BWAIS, [5] for all skills; [0] is base, [1] for effects from items or (de)buffs
-	unsigned char pandium_floor[3];		// +3,    1424, [0] = Solo  [1] = Group  [2] = reward tier obtained
+	char limit_break[6][2];				// +6*2,  1423, [0]-[4] for BWAIS, [5] for all skills; [0] is base, [1] for effects from items or (de)buffs
+	unsigned char pandium_floor[3];		// +3,    1426, [0] = Solo  [1] = Group  [2] = reward tier obtained
 	
-	int waypoints;						// +4,    1428, unlocked waypoint flags
-	int tokens;							// +4,    1432, tokens for casino
+	int waypoints;						// +4,    1430, unlocked waypoint flags
+	int tokens;							// +4,    1434, tokens for casino
 	
-	unsigned int depot[62];				// +4*62, 1680, character storage
+	unsigned int depot[62];				// +4*62, 1682, character storage
 	
-	char future[292];					// +388,  2068, space for future expansion
+	char future[290];					// +388,  2068, space for future expansion
 
 	int luck;							// +4,    2072, character luck
 
@@ -1064,6 +1071,12 @@ struct waypoint
 	char *desc;
 };
 
+struct sk_tree
+{
+	char *name;
+	char *desc;
+};
+
 #define N_SOULBONUS		 50
 #define N_SOULMAX		 24
 #define N_SOULFACTOR	  2
@@ -1131,6 +1144,7 @@ extern struct effect *fx;
 extern struct see_map *  see;
 extern struct mapedit_queue *maped_queue;
 extern struct waypoint waypoint[MAXWPS];
+extern struct sk_tree sk_tree[8][12];
 
 extern struct newcharacter *ch_new;
 extern struct newcharacter *ch_temp_new;

@@ -242,7 +242,9 @@ struct area area[] = {
 	{ 689,  726,  700,  737, "The Oasis",                      3},
 	{ 709,  642,  766,  702, "Empty Outset",                   1},
 	{ 976,  372, 1004,  394, "Outset Den",                     1},
-	{ 637,  720,  665,  748, "Temple of Osiris",               1},
+	{ 639,  720,  665,  748, "The Basalt Ziggurat",            0},
+	{ 666,  730,  672,  738, "The Basalt Ziggurat",            0},
+	{ 936,  549, 1005,  618, "The Basalt Ziggurat",            0},
 	{ 749,  554,  781,  586, "The Tower",                      0},
 	{ 438,   72,  470,  104, "The Tower II",                   0},
 	{ 438,   34,  470,   66, "The Tower III",                  0},
@@ -413,7 +415,14 @@ struct area area[] = {
 	{ 630,  889,  676,  972, "Hidden Village",                 1},
 	{ 677,  889,  686, 1003, "Hidden Village",                 1},
 	{ 630,  973,  676, 1003, "Seppuku House",                  1},
-	{ 852,  720,  924,  877, "Dueling Rapids",                 1},
+	{ 852,  720,  924,  836, "Raging Rivers",                  1},
+	{ 871,  837,  924,  840, "Raging Rivers",                  1},
+	{ 890,  841,  924,  847, "Raging Rivers",                  1},
+	{ 895,  848,  924,  855, "Raging Rivers",                  1},
+	{ 852,  837,  870,  840, "The Widow's Nest",               0},
+	{ 852,  841,  889,  847, "The Widow's Nest",               0},
+	{ 852,  848,  894,  855, "The Widow's Nest",               0},
+	{ 852,  856,  924,  877, "The Widow's Nest",               0},
 	{ 864,  630,  924,  719, "Wellspring Chasm",               1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 658,  344,  730,  461, "Novice Pentagram Quest",         1},
@@ -477,6 +486,10 @@ struct area area[] = {
 	{ 132,  168,  152,  181, "Lab XIII, Final Preparation",    0},
 	{ 136,  182,  148,  192, "Lab XIII, Final Test",           0},
 	{ 136,  193,  148,  246, "Lab XIII, Final Reward",         0},
+	{  93, 1025,  157, 1113, "Lab XIV, Miner's Gorge",         0},
+	{  93, 1134,  183, 1224, "Lab XV, Vantablack Gorge",       0},
+	{  93, 1245,  185, 1337, "Lab XVI, Pirate's Gorge",        0},
+	{  93, 1358,  168, 1452, "Lab XVII, Gargoyle's Gorge",     0},
 	{ 884,  504,  964,  534, "Hall of Lost Souls",             1},
 	{ 738,  972,  764, 1003, "Temple of Osiris",               1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
@@ -514,7 +527,7 @@ extern struct waypoint waypoint[MAXWPS] = {
 	{ 156, 544, "The Emerald Cavern, East", 		"the western side of the Emerald Cavern" },
 	{ 771, 595, "The Tower", 						"the entrance to The Tower" },										//   8388608
 	{ 512, 512, "Neiseer, East", 					"the entrance to the Violet Bog, east of Neiseer" },				//  16777216
-	{ 512, 512, "Neiseer, South", 					"the entrance to the Raging Rivers, south of Neiseer" },			//  33554432
+	{ 867, 813, "Neiseer, South", 					"the entrance to the Raging Rivers, south of Neiseer" },			//  33554432
 	{ 292, 921, "Burning Plains", 					"the Burning Plains" }												//  67108864
 };
 

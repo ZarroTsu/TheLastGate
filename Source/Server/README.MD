@@ -42,9 +42,9 @@ usage of data for players:
 * `20:`     highest gorge solved
 * `21:`     seyan'du sword: bits of shrines already used
 * `22:`     current monster in arena
-* `23:`     overall kill counter - below own rank
-* `24:`     overall kill counter - at own rank
-* `25:`     overall kill counter - above own rank
+* `23:`     overall kill counter
+* `24:`     --Zarro-- Extended poles 2
+* `25:`     --Zarro-- FREE
 * `26:`     Black Stronghold Kill Counter (to assure wave reward is legit)
 * `27:`     --Zarro-- Gambling: Player hand value & wager
 * `28:`     --Zarro-- Gambling: Dealer hand value & active game
@@ -78,7 +78,7 @@ usage of data for players:
 * `80-89:`	seen logging in from these class C nets
 * `90:`     number in database
 * `91:`		--Zarro-- Extended poles
-* `92:`     reserved
+* `92:`     weird unusable sleep timer slot
 * `93:`		--Zarro-- Extended FKs 2
 * `94:`		--Zarro-- Quests 2
 * `95:`		--Zarro-- current shadow copy

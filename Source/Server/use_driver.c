@@ -130,9 +130,14 @@ int use_door(int cn, int in)
 		}
 		if (it[in].data[1] && !lock)
 		{
-			do_char_log(cn, 0, "It's locked and you don't have the right key.\n");
+			if (it[in].data[2]==999)
+				do_char_log(cn, 0, "It's locked and no key will open it.\n");
+			else
+				do_char_log(cn, 0, "It's locked and you don't have the right key.\n");
 			return 0;
 		}
+		else if (it[in].data[2]==999 && !lock)
+			return 0;
 	}
 	reset_go(it[in].x, it[in].y);
 	remove_lights(it[in].x, it[in].y);
@@ -345,7 +350,7 @@ int use_recall_chest(int cn, int in)
 
 int use_create_item3(int cn, int in)
 {
-	int in2, n, v;
+	int in2, n, m, v;
 
 	if (cn==0)
 	{
@@ -416,6 +421,72 @@ int use_create_item3(int cn, int in)
 		}
 		in2 = get_special_item(n, 0, 0, RANDOM(32)+1);
 	}
+	/*
+	else if ((n >= 284 && n <= 292) || n==1779 ||
+			 (n >= 523 && n <= 531) || n==1780 ||
+			 (n >= 532 && n <= 540) || n==1781 ||
+			 (n >= 541 && n <= 549) || n==1782 ||
+			 (n >= 572 && n <= 580) || n==1783 ||
+			 (n >= 693 && n <= 701) || n==1784 ||
+			 (n >=2044 && n <=2053) )
+	{
+		IT_DAGG_STEL
+		IT_DAGG_GOLD
+		IT_DAGG_EMER
+		IT_DAGG_CRYS
+		IT_DAGG_TITN
+		IT_DAGG_ADAM
+		IT_DAGG_DAMA
+		
+		m = RANDOM(60);
+		
+		if (IS_TEMPLAR(cn)) 	m = RANDOM(5);
+		if (IS_MERCENARY(cn)) 	m = RANDOM(4);
+		if (IS_HARAKIM(cn)) 	m = RANDOM(3);
+		if (IS_BRAVER(cn)) 		m = RANDOM(4);
+		
+		if ((n >= 284 && n <= 292) || n==1779) // Steel
+		{
+			if (IS_TEMPLAR(cn)) switch (m)
+			{
+				case 0: 
+					n = ; break;
+				case 1:
+					n = ; break;
+				case 2:
+					n = ; break;
+				case 3:
+					n = ; break;
+				default:
+					n = ; break;
+			}
+		}
+		if ((n >= 523 && n <= 531) || n==1780) // Gold
+		{
+			
+		}
+		if ((n >= 532 && n <= 540) || n==1781) // Emerald
+		{
+			
+		}
+		if ((n >= 541 && n <= 549) || n==1782) // Crystal
+		{
+			
+		}
+		if ((n >= 572 && n <= 580) || n==1783) // Titanium
+		{
+			
+		}
+		if ((n >= 693 && n <= 701) || n==1784) // Adamant
+		{
+			
+		}
+		if (n >=2044 && n <=2053) // Damascus
+		{
+			
+		}
+	}
+	*/
 	else
 	{
 		in2 = get_special_item(n, 0, 0, 0);
@@ -499,7 +570,7 @@ void use_stack_items(int cn, int in, int in2)
 	// Special case for Soul catalysts
 	if (it[in].driver == 93 && it[in].data[4] != it[in2].data[4])
 	{
-		if (in3 = make_catalyst(cn, 1))
+		if (in3 = make_catalyst(cn, 1, 0))
 		{
 			use_consume_item(cn, in, 0);
 			use_consume_item(cn, in2, 0);
@@ -1638,19 +1709,24 @@ int stone_sword(int cn, int in)
 
 void finish_laby_teleport(int cn, int nr, int exp)
 {
-	int n, in2;
+	int n, in2, xt, yt;
 
 	if (ch[cn].data[20]<nr)
 	{
 		ch[cn].data[20] = nr;
-		do_char_log(cn, 0, "You have solved the %d%s%s%s%s part of the Labyrinth.\n", nr,
+		do_char_log(cn, 0, "You have solved the %d%s%s%s%s part of the Labyrinth.\n", nr+((nr>=13)?1:0),
 		            nr==1 ? "st" : "",
 		            nr==2 ? "nd" : "",
 		            nr==3 ? "rd" : "",
 		            nr>=4 ? "th" : "");
 
 		do_give_exp(cn, exp, 0, -1);
-		chlog(cn, "Solved Labyrinth Part %d", nr);
+		chlog(cn, "Solved Labyrinth Part %d", nr+((nr>=13)?1:0));
+		if (nr>=13)
+		{
+			do_char_log(cn, 7, "You earned 1 skill point.\n");
+			ch[cn].tree_points++;
+		}
 	}
 	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
 	{
@@ -1696,9 +1772,15 @@ void finish_laby_teleport(int cn, int nr, int exp)
 			do_char_log(cn, 1, "Your %s vanished.\n", bu[in2].name);
 		}
 	}
+	
+	if (IS_PURPLE(cn)) { xt = HOME_PURPLE_X; yt = HOME_PURPLE_Y; }
+	else if (IS_CLANKWAI(cn)) { xt = HOME_KWAI_X; yt = HOME_KWAI_Y; }
+	else if (IS_CLANGORN(cn)) { xt = HOME_GORN_X; yt = HOME_GORN_Y; }
+	else if (ch[cn].flags & CF_STAFF) { xt = HOME_STAFF_X; yt = HOME_STAFF_Y; }
+	else { xt = HOME_TEMPLE_X; yt = HOME_TEMPLE_Y; }
 
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
-	god_transfer_char(cn, HOME_TEMPLE_X, HOME_TEMPLE_Y);
+	god_transfer_char(cn, xt, yt);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 
@@ -1781,7 +1863,7 @@ int reward_teleport(int cn, int in)
 	{
 		if (it[in].data[9]<12)
 		{
-			if (it[in].data[9]>9 && !RANDOM(20))
+			if (it[in].data[9]>9 && try_boost(20))
 			{
 				switch (RANDOM(5))
 				{	case  0: n = IT_RD_BRV; break;
@@ -1791,7 +1873,7 @@ int reward_teleport(int cn, int in)
 					default: n = IT_RD_STR; break;
 				}	in2 = god_create_item(n);
 			}
-			else if (it[in].data[9]>5 && !RANDOM(20))
+			else if (it[in].data[9]>5 && try_boost(20))
 			{
 				switch (RANDOM(2))
 				{	case  0: n = IT_RD_HP; break;
@@ -1949,6 +2031,24 @@ int teleport2(int cn, int in2)
 	return 1;
 }
 
+void debuff_vantablack(int cn)
+{
+	int in;
+	
+	in = god_create_buff();
+	
+	strcpy(bu[in].name, "darkness");
+	strcpy(bu[in].reference, "darkness");
+	strcpy(bu[in].description, "darkness.");
+	
+	bu[in].active = bu[in].duration = 1;
+	bu[in].flags  = IF_SPELL | IF_PERMSPELL;
+	bu[in].temp = 215;
+	bu[in].sprite[1] = BUF_SPR_VANTA;
+	
+	add_spell(cn, in);
+}
+
 int use_labyrinth(int cn, int in)
 {
 	int n, in2, flag = 0;
@@ -1983,38 +2083,66 @@ int use_labyrinth(int cn, int in)
 		}
 	}
 	
-	if (ch[cn].data[20]>=13)
+	if (it[in].data[0]==1)
 	{
-		do_char_log(cn, 0, "You have already solved all existing parts of the labyrinth. Please come back later.\n");
-	}
-	else if (ch[cn].temple_x==HOME_START_X)
-	{
-		do_char_log(cn, 0, "It seems you haven't turned in the Guard Captain's request yet. Do that first and come back.\n");
+		if (ch[cn].data[20]>=16)
+		{
+			do_char_log(cn, 0, "You have already solved all existing parts of the labyrinth. Please come back later.\n");
+		}
+		else if (!IS_ANY_ARCH(cn))
+		{
+			do_char_log(cn, 0, "You must arch before you can proceed.\n");
+		}
+		else
+		{
+			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			switch(ch[cn].data[20])
+			{
+				case 12: flag = god_transfer_char(cn, LAB_XIV_X,   LAB_XIV_Y); 		break;
+				case 13: flag = god_transfer_char(cn, LAB_XV_X,    LAB_XV_Y);		break;
+				case 14: flag = god_transfer_char(cn, LAB_XVI_X,   LAB_XVI_Y); 		break;
+				case 15: flag = god_transfer_char(cn, LAB_XVII_X,  LAB_XVII_Y); 	break;
+				case 16: flag = god_transfer_char(cn, LAB_XVIII_X, LAB_XVIII_Y); 	break;
+				case 17: flag = god_transfer_char(cn, LAB_XIX_X,   LAB_XIX_Y); 		break;
+				//
+				default: flag = god_transfer_char(cn, LAB_XX_X,    LAB_XX_Y); 		break;
+				//
+			}
+			char_play_sound(cn, ch[cn].sound + 22, -150, 0);
+			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		}
 	}
 	else
-	{
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
-		switch(ch[cn].data[20])
+	{	
+		if (ch[cn].temple_x==HOME_START_X)
 		{
-			case  0: flag = god_transfer_char(cn, LAB_I_X,    LAB_I_Y); 	break;
-			case  1: flag = god_transfer_char(cn, LAB_II_X,   LAB_II_Y); 	break;
-			case  2: flag = god_transfer_char(cn, LAB_III_X,  LAB_III_Y); 	break;
-			case  3: flag = god_transfer_char(cn, LAB_IV_X,   LAB_IV_Y); 	break;
-			case  4: flag = god_transfer_char(cn, LAB_V_X,    LAB_V_Y); 	break;
-			case  5: flag = god_transfer_char(cn, LAB_VI_X,   LAB_VI_Y); 	break;
-			//
-			case  6: flag = god_transfer_char(cn, LAB_VII_X,  LAB_VII_Y); 	break;
-			case  7: flag = god_transfer_char(cn, LAB_VIII_X, LAB_VIII_Y); 	break;
-			case  8: flag = god_transfer_char(cn, LAB_IX_X,   LAB_IX_Y); 	break;
-			case  9: flag = god_transfer_char(cn, LAB_X_X,    LAB_X_Y); 	break;
-			case 10: flag = god_transfer_char(cn, LAB_XI_X,   LAB_XI_Y); 	break;
-			case 11: flag = god_transfer_char(cn, LAB_XII_X,  LAB_XII_Y); 	break;
-			//
-			case 12: flag = god_transfer_char(cn, LAB_XIII_X, LAB_XIII_Y); 	break;
-			//
+			do_char_log(cn, 0, "It seems you haven't turned in the Guard Captain's request yet. Do that first and come back.\n");
 		}
-		char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		else
+		{
+			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			switch(ch[cn].data[20])
+			{
+				case  0: flag = god_transfer_char(cn, LAB_I_X,    LAB_I_Y); 	break;
+				case  1: flag = god_transfer_char(cn, LAB_II_X,   LAB_II_Y); 	break;
+				case  2: flag = god_transfer_char(cn, LAB_III_X,  LAB_III_Y); 	break;
+				case  3: flag = god_transfer_char(cn, LAB_IV_X,   LAB_IV_Y); 	break;
+				case  4: flag = god_transfer_char(cn, LAB_V_X,    LAB_V_Y); 	break;
+				case  5: flag = god_transfer_char(cn, LAB_VI_X,   LAB_VI_Y); 	break;
+				//
+				case  6: flag = god_transfer_char(cn, LAB_VII_X,  LAB_VII_Y); 	break;
+				case  7: flag = god_transfer_char(cn, LAB_VIII_X, LAB_VIII_Y); 	break;
+				case  8: flag = god_transfer_char(cn, LAB_IX_X,   LAB_IX_Y); 	break;
+				case  9: flag = god_transfer_char(cn, LAB_X_X,    LAB_X_Y); 	break;
+				case 10: flag = god_transfer_char(cn, LAB_XI_X,   LAB_XI_Y); 	break;
+				case 11: flag = god_transfer_char(cn, LAB_XII_X,  LAB_XII_Y); 	break;
+				//
+				default: flag = god_transfer_char(cn, LAB_XIII_X, LAB_XIII_Y); 	break;
+				//
+			}
+			char_play_sound(cn, ch[cn].sound + 22, -150, 0);
+			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		}
 	}
 
 	if (flag)
@@ -2023,6 +2151,68 @@ int use_labyrinth(int cn, int in)
 		ch[cn].temple_y = ch[cn].tavern_y = ch[cn].y;
 	}
 
+	return 1;
+}
+
+int use_item_pedestal(int cn, int in)
+{
+	int in2, in3;
+	
+	// it[in].data[0] = item we want
+	// it[in].data[1] = door to open
+	// it[in].data[2] = adjacent pedestal to check (1)
+	// it[in].data[3] = adjacent pedestal to check (2)
+	// it[in].data[4] = adjacent pedestal to check (3)
+	// it[in].data[5] = adjacent pedestal to check (4)
+	// it[in].data[6] = break on fail
+	
+	// Abort if already active
+	if (it[in].active)
+	{
+		return 0;
+	}
+	if ((in2 = ch[cn].citem)==0)
+	{
+		do_char_log(cn, 0, "It looks like something goes here...\n");
+		return 0;
+	}
+	if (it[in2].temp != it[in].data[0])
+	{
+		if (it[in].data[6] && it[in2].temp >= 2996 && it[in2].temp <= 2999)
+		{
+			do_char_log(cn, 0, "You clumsily break the geode while trying to wedge into place.\n");
+			use_consume_item(cn, in2, 1);
+		}
+		else
+		{
+			do_char_log(cn, 0, "That doesn't fit.\n");
+		}
+		return 0;
+	}
+	
+	use_consume_item(cn, in2, 1);
+	
+	if (it[in].data[2] && !(it[map[it[in].data[2]].it].active)) return 1;
+	if (it[in].data[3] && !(it[map[it[in].data[3]].it].active)) return 1;
+	if (it[in].data[4] && !(it[map[it[in].data[4]].it].active)) return 1;
+	if (it[in].data[5] && !(it[map[it[in].data[5]].it].active)) return 1;
+	
+	in3 = map[it[in].data[1]].it;
+	
+	if (!it[in3].active)
+	{
+		do_area_sound(0, 0, it[in].x, it[in].y, 10);
+		use_driver(0, in3, 0);
+		it[in3].active = it[in3].duration;
+		if (it[in3].light[0]!=it[in3].light[1])
+		{
+			do_add_light(it[in3].x, it[in3].y, it[in3].light[1] - it[in3].light[0]);
+		}
+		do_area_log(0, 0, ch[cn].x, ch[cn].y, 1, "The door opens.\n");
+	}
+	else
+		it[in3].active = it[in3].duration;
+	
 	return 1;
 }
 
@@ -2517,6 +2707,39 @@ int use_scrollA(int cn, int in)
 	return 1;
 }
 
+// Pandium Reward scroll
+int use_scroll_B(int cn, int in)
+{
+	int n, in2;
+	
+	switch (RANDOM(4))
+	{
+		case  0:	n = 2797;	break;
+		case  1:	n = 2798;	break;
+		case  2:	n = 2799;	break;
+		default:	n = 2792;	break;
+	}
+	
+	in2 = god_create_item(n);
+	
+	if (!god_give_char(in2, cn))
+	{
+		do_char_log(cn, 0, "Your backpack is full.\n");
+		it[in2].used = USE_EMPTY;
+		return 0;
+	}
+	
+	do_char_log(cn, 1, "You got a %s.\n", it[in2].reference);
+	chlog(cn, "Got %s from a reward scroll", it[in2].name);
+	
+	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	
+	use_consume_item(cn, in, 0);
+	do_update_char(cn);
+	
+	return 1;
+}
+
 // Greater Reset Scroll
 int use_scroll_R(int cn, int in)
 {
@@ -2723,7 +2946,7 @@ int use_map_pentigram(int cn, int in)
 		if (!co) continue;
 		ch[co].data[29] = m;
 		ch[co].data[60] = TICKS * 23;
-		if (!RANDOM(20)) boost_char(co, 0);
+		if (try_boost(20)) boost_char(co, 0);
 	}
 	
 	// Contract progress
@@ -3907,7 +4130,7 @@ int use_crystal_sub(int cn, int in)
 	else
 		warsorc=0;
 	
-	if (!RANDOM(25)) sss = 15;
+	if (try_boost(24)) sss = 15;
 
 	cc = god_create_char(tmp, 0);
 	if (!god_drop_char_fuzzy(cc, it[in].x, it[in].y))
@@ -3919,9 +4142,12 @@ int use_crystal_sub(int cn, int in)
 
 	ch[cc].data[CHD_GROUP] = group;
 	
+	n = 0;
 	do
 	{
 		m = RANDOM(64) + 128 + (RANDOM(64) + 64) * MAPX;
+		n++;
+		if (n>99) return 0;
 	}
 	while (!plr_check_target(m));
 	
@@ -4001,6 +4227,8 @@ int use_crystal_sub(int cn, int in)
 	ch[cc].points_tot = pts;
 	ch[cc].gold   = (base/3 * (RANDOM(base)+1) + RANDOM(100) + 1);
 	ch[cc].gold  += ch[cc].gold/2 + RANDOM(1+ch[cc].gold*sss/3);
+	if (IS_GLOB_MAYHEM) 
+		ch[cc].gold *= 2;
 	ch[cc].a_hp   = 9999999;
 	ch[cc].a_end  = 999999;
 	ch[cc].a_mana = 999999;
@@ -4402,7 +4630,7 @@ int use_crystal_sub(int cn, int in)
 		tmp = RANDOM(43); if (tmp>=21) tmp+=IT_CH_FOOL_R-21; else tmp+=IT_CH_MAGI;
 		tmp = pop_create_item(tmp, cc); ch[cc].worn[WN_CHARM] = tmp; it[tmp].carried = cc;
 		xlog("  got %s", it[tmp].name);
-		make_catalyst(cc, 1);
+		make_catalyst(cc, 1, 0);
 	}
 	
 	// New: Rings with 'big' gems.
@@ -5000,6 +5228,10 @@ int use_pile(int cn, int in)
 		IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, IT_E_AN, 
 		0
 	};
+	static int findD1[] = { 2996, 3040, 0 };
+	static int findD2[] = { 2997, 3040, 0 };
+	static int findD3[] = { 2998, 3040, 0 };
+	static int findD4[] = { 2999, 3040, 0 };
 
 	if (it[in].active)
 	{
@@ -5029,6 +5261,10 @@ int use_pile(int cn, int in)
 	{
 		switch (level)
 		{
+			case 9: 	tmp = RANDOM(ARRAYSIZE(findD4)-1); tmp = findD4[tmp]; break;
+			case 8: 	tmp = RANDOM(ARRAYSIZE(findD3)-1); tmp = findD3[tmp]; break;
+			case 7: 	tmp = RANDOM(ARRAYSIZE(findD2)-1); tmp = findD2[tmp]; break;
+			case 6: 	tmp = RANDOM(ARRAYSIZE(findD1)-1); tmp = findD1[tmp]; break;
 			case 5: 	tmp = RANDOM(ARRAYSIZE(find_U)-1); tmp = find_U[tmp]; break;
 			case 4: 	tmp = RANDOM(ARRAYSIZE(find_F)-1); tmp = find_F[tmp]; break;
 			case 3: 	tmp = RANDOM(ARRAYSIZE(find_H)-1); tmp = find_H[tmp]; break;
@@ -5303,6 +5539,12 @@ int build_ring(int cn, int in)
 	if 			(t1==IT_SILV && t2==0) r = IT_SILV_RING;
 	else if 	(t1==IT_GOLD && t2==0) r = IT_GOLD_RING;
 	else if 	(t1==IT_PLAT && t2==0) r = IT_PLAT_RING;
+	// Coconut
+	else if (t1==3087 && t2==3089) 
+	{
+		do_char_log(cn, 1, "You found a key inside the golden coconut.\n");
+		r = 3085;
+	}
 	//
 	else if (t1==IT_PLAT_RING)
 	{
@@ -5633,6 +5875,13 @@ int build_sinbinder(int cn, int in)
 	{
 		for (n=0; n<5; n++) { it[in].attrib[n][0] = it[in2].attrib[n][0]; it[in].attrib[n][2] = it[in2].attrib[n][2]; }
 		for (n=0; n<50; n++) { it[in].skill[n][0] = it[in2].skill[n][0]; it[in].skill[n][2] = it[in2].skill[n][2]; }
+		it[in].flags |= IF_IDENTIFIED;
+		if (it[in2].enchantment) 
+		{
+			it[in].enchantment = it[in2].enchantment;
+			it[in].flags |= IF_ENCHANTED | IF_LOOKSPECIAL;
+			it[in].flags &= ~IF_CAN_EN;
+		}
 	}
 	else if (t2>=IT_CH_MAGI   && t2<=IT_CH_WORLD  ) ;
 	else if (t2>=IT_CH_FOOL_R && t2<=IT_CH_WORLD_R) ;
@@ -5823,6 +6072,20 @@ int use_grolm(int cn, int in)
 	return 1;
 }
 
+int respawn_check(int v)
+{
+	if (IS_GLOB_MAYHEM)
+		return (RANDOM(v/2));
+	return (RANDOM(v));
+}
+
+int try_boost(int v)
+{
+	if (IS_GLOB_MAYHEM) 
+		return (!RANDOM(v/2));
+	return (!RANDOM(v));
+}
+
 void boost_char(int cn, int type)
 {
 	int n, in, divi = 1, exp, v, m;
@@ -5844,7 +6107,7 @@ void boost_char(int cn, int type)
 				break;
 			case  2:
 				sprintf(buf, "Mighty %s", ch[cn].name); divi = 5;
-				make_catalyst(cn, 1);
+				make_catalyst(cn, 1, 0);
 				break;
 			case  3:
 				sprintf(buf, "Lethal %s", ch[cn].name); divi = 4;
@@ -5853,7 +6116,7 @@ void boost_char(int cn, int type)
 				break;
 			case  4:
 				sprintf(buf, "Deadly %s", ch[cn].name); divi = 4;
-				make_catalyst(cn, 2);
+				make_catalyst(cn, 2, 0);
 				break;
 			case  5:
 				sprintf(buf, "Bloody %s", ch[cn].name); divi = 6;
@@ -5869,7 +6132,7 @@ void boost_char(int cn, int type)
 				sprintf(buf, "Potent %s", ch[cn].name); divi = 4;
 				if (!(ch[cn].flags & CF_EXTRACRIT)) ch[cn].flags |= CF_EXTRACRIT;
 				make_soulstone(cn, exp);
-				make_catalyst(cn, 1);
+				make_catalyst(cn, 1, 0);
 				break;
 			default: return;
 		}
@@ -5948,7 +6211,7 @@ int spawn_penta_enemy(int in)
 	ch[cn].data[73] = 8;
 	ch[cn].dir = 1;
 	
-	if (!RANDOM(20)) boost_char(cn, 0);
+	if (try_boost(20)) boost_char(cn, 0);
 
 	if (!god_drop_char_fuzzy(cn, it[in].x, it[in].y))
 	{
@@ -6083,7 +6346,10 @@ void solved_pentagram(int cn, int in)
 				do_add_light(it[n].x, it[n].y, it[n].light[1] - it[n].light[0]);
 			}
 		}
-		it[n].duration = it[n].active = TICKS * 10 + RANDOM(TICKS*10);
+		if (IS_GLOB_MAYHEM)
+			it[n].duration = it[n].active = TICKS *  5 + RANDOM(TICKS* 5);
+		else
+			it[n].duration = it[n].active = TICKS * 10 + RANDOM(TICKS*10);
 		
 		for (m = 1; m<4; m++)
 		{
@@ -7431,13 +7697,14 @@ int explorer_point(int cn, int in, int msg)
 
 	if (!(ch[cn].data[46] & it[in].data[0]) && !(ch[cn].data[47] & it[in].data[1]) &&
 	    !(ch[cn].data[48] & it[in].data[2]) && !(ch[cn].data[49] & it[in].data[3]) && 
-		!(ch[cn].data[91] & it[in].data[5]))
+		!(ch[cn].data[91] & it[in].data[5]) && !(ch[cn].data[24] & it[in].data[6]))
 	{
 		ch[cn].data[46] |= it[in].data[0];
 		ch[cn].data[47] |= it[in].data[1];
 		ch[cn].data[48] |= it[in].data[2];
 		ch[cn].data[49] |= it[in].data[3];
 		ch[cn].data[91] |= it[in].data[5];
+		ch[cn].data[24] |= it[in].data[6];
 
 		do_char_log(cn, 0, "You found a new exploration point!\n");
 		ch[cn].luck += 10;
@@ -7921,6 +8188,15 @@ void use_driver(int cn, int in, int carried)
 				break;
 			case 127:
 				ret = use_pandium_teleport(cn, in);
+				break;
+			case 128:
+				ret = use_scroll_B(cn, in);
+				break;
+			case 129:
+				ret = 0;
+				break;
+			case 130:
+				ret = use_item_pedestal(cn, in);
 				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
@@ -8662,7 +8938,7 @@ void pentagram(int in)
 	{
 		return;
 	}
-	if (RANDOM(TICKS))
+	if (respawn_check(TICKS))
 	{
 		return;
 	}
@@ -8681,120 +8957,124 @@ void enemyspawner(int in, int type, int flag)
 {
 	int n, cn;
 	int t_ran = 20, count = 3, t_temp = 83, t_dist = 8, m_mult = 0;
-	int wait = 0;
+	int wait = 0, expire = EXP_RATE*2;
 
 	switch (type)
 	{
 		case 0:			// Spider
 			t_temp = CT_SPIDER + RANDOM(3);
-			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 0;
+			t_ran = expire*6;	count = 3;	t_dist = 8;	wait = 0;
 			break;
 		case 1:			// Ratling
 			t_temp = CT_RATLING + it[in].data[0];
-			t_ran = EXP_RATE*5;	count = 1;	t_dist = 3;	wait = 0;
+			t_ran = expire*5;	count = 1;	t_dist = 3;	wait = 0;
 			break;
 		case 2:			// Greenling
 			t_temp = CT_GREENLING + it[in].data[0];
-			t_ran = EXP_RATE*4;	count = 2;	t_dist = 8;	wait = 0;
+			t_ran = expire*4;	count = 2;	t_dist = 8;	wait = 0;
 			break;
 		case 3:			// Sogling
 			t_temp = CT_DREADLING + it[in].data[0];
-			t_ran = EXP_RATE*3;	count = 3;	t_dist = 8;	wait = 0;
+			t_ran = expire*3;	count = 3;	t_dist = 8;	wait = 0;
 			break;
 		case 4:			// Thrall / Vampire
 			t_temp = CT_VAMPIRE + it[in].data[0];
-			t_ran = EXP_RATE;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = expire;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 5:			// Arachnid
 			t_temp = 418;
-			t_ran = EXP_RATE*6;	count = 1;	t_dist = 8; wait = 0;
+			t_ran = expire*6;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 6:			// Tarantula
 			t_temp = 441;
-			t_ran = EXP_RATE*5;	count = 3;	t_dist = 8; wait = 0;
+			t_ran = expire*5;	count = 3;	t_dist = 8; wait = 0;
 			break;
 		case 7:			// Robber
 			t_temp = 652;
-			t_ran = EXP_RATE*6;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = expire*6;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 8:			// Stone Golems (Forest Gorge)
 			t_temp = CT_STONEGOLEM + it[in].data[0];
-			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 1;
+			t_ran = expire*6;	count = 3;	t_dist = 8;	wait = 1;
 			break;
 		case 9:			// Season Gorge Mobs
 			t_temp = CT_SEASONSMOB + it[in].data[0];
-			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8;	wait = 1;
+			t_ran = expire*5;	count = 1;	t_dist = 8;	wait = 1;
 			break;
 		case 10:		// Ascent Gorge Mobs
 			t_temp = CT_ASCENTMOB + it[in].data[0];
-			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8;	wait = 1;
+			t_ran = expire*5;	count = 1;	t_dist = 8;	wait = 1;
 			break;
 		case 11:		// Canyon Bandits
 			t_temp = CT_CANYONBNDT;
-			t_ran = EXP_RATE*6;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = expire*6;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 12:		// Mud Golems
 			t_temp = CT_MUDGOLEM;
-			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8; wait = 0;
+			t_ran = expire*5;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 13:		// Swamp Lizards
 			t_temp = CT_SWAMPLIZ;
-			t_ran = EXP_RATE*4;	count = 2;	t_dist = 8;	wait = 1;
+			t_ran = expire*4;	count = 2;	t_dist = 8;	wait = 1;
 			break;
 		case 14:		// Mountain Vikings
 			t_temp = CT_MOUNTVIK;
-			t_ran = EXP_RATE*5;	count = 2;	t_dist = 8;	wait = 1;
+			t_ran = expire*5;	count = 2;	t_dist = 8;	wait = 1;
 			break;
 		case 15:		// Gargoyle Nest
 			t_temp = CT_GARGNEST + it[in].data[0];
-			t_ran = EXP_RATE*4;	count = 7;	t_dist =12; wait = 0;
+			t_ran = expire*4;	count = 7;	t_dist =12; wait = 0;
 			break;
 		case 16:		// Gargoyle Nest Basement
 			t_temp = CT_GARGNEST + it[in].data[0];
-			t_ran = EXP_RATE*4;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = expire*4;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 17:		// Autumn Xecko enemies
 			t_temp = m_mult = CT_XECKO;
-			t_ran = EXP_RATE*3;	count = 2;	t_dist = 8; wait = 0;
+			t_ran = expire*3;	count = 2;	t_dist = 8; wait = 0;
 			break;
 		case 18:		// Ice Gargoyle Nest (either floor)			- 96
 			t_temp = CT_ICENEST + it[in].data[0];
-			t_ran = EXP_RATE*4;	count = 2;	t_dist = 2; wait = 0;
+			t_ran = expire*4;	count = 2;	t_dist = 2; wait = 0;
 			break;
 		case 19:		// Ice Gargoyle Nest (either floor) (mixed)	- 97
 			t_temp = m_mult = CT_ICENEST + it[in].data[0];
-			t_ran = EXP_RATE*4;	count = 2;	t_dist = 2; wait = 0;
+			t_ran = expire*4;	count = 2;	t_dist = 2; wait = 0;
 			break;
 		case 20:		// Cultists & Lycanthropes
 			t_temp = CT_CULTIST + it[in].data[0];
-			t_ran = EXP_RATE*5;	count = 1;	t_dist = 8; wait = 0;
+			t_ran = expire*5;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 21:		// Thugs
 			t_temp = CT_THUGS;
-			t_ran = EXP_RATE*4;	count = 2;	t_dist =12; wait = 1;
+			t_ran = expire*4;	count = 2;	t_dist =12; wait = 1;
 			break;
 		case 22:		// Lizards
 			t_temp = CT_LIZARDKIN + it[in].data[0];
-			t_ran = EXP_RATE*3;	count = 1;	t_dist =10; wait = 0;
+			t_ran = expire*3;	count = 1;	t_dist =10; wait = 0;
 			break;
 		case 23:		// Basalt mobs
 			t_temp = CT_BASALT + it[in].data[0];
-			t_ran = EXP_RATE*3;	count = 2;	t_dist =10; wait = 1;
+			t_ran = expire*3;	count = 2;	t_dist =10; wait = 1;
 			break;
 		case 24:		// Tower mobs
 			t_temp = CT_TOWER + it[in].data[0];
-			t_ran = EXP_RATE*3;	count = 1;	t_dist = 0; wait = 1;
+			t_ran = expire*3;	count = 1;	t_dist = 0; wait = 1;
 			break;
 		case 25:		// Scorpions
 			t_temp = CT_SCORP + it[in].data[0] + RANDOM(it[in].value);
-			t_ran = EXP_RATE*6;	count = 3;	t_dist = 8;	wait = 0;
+			t_ran = expire*6;	count = 3;	t_dist = 8;	wait = 0;
+			break;
+		case 26:		// Kelpies
+			t_temp = CT_KELPIE + it[in].data[0];
+			t_ran = expire*4;	count = 4;	t_dist =15;	wait = 1;
 			break;
 		default:
 			return;
 	}
 
-	if (!flag && it[in].active)		return;
-	if (!flag && RANDOM(t_ran))		return;
+	if (!flag && it[in].active)				return;
+	if (!flag && respawn_check(t_ran))		return;
 	
 	for (n = 1; n<(count+1); n++)
 	{
@@ -8823,7 +9103,10 @@ void enemyspawner(int in, int type, int flag)
 			ch[cn].data[73] = t_dist;
 			if (it[in].power)
 			{
-				ch[cn].data[30] = ch[cn].dir = it[in].power;
+				if (it[in].power==9)
+					ch[cn].data[30] = ch[cn].dir = RANDOM(8)+1;
+				else
+					ch[cn].data[30] = ch[cn].dir = it[in].power;
 				ch[cn].data[60] = 0;
 			}
 			else
@@ -8831,7 +9114,7 @@ void enemyspawner(int in, int type, int flag)
 				ch[cn].dir = 1;
 				ch[cn].data[60] = TICKS * 60 * 2;
 			}
-			if (!RANDOM(20)) boost_char(cn, 0);
+			if (try_boost(20)) boost_char(cn, 0);
 			
 			if (!god_drop_char_fuzzy(cn, it[in].x, it[in].y))
 			{
@@ -9002,6 +9285,7 @@ void item_tick_expire(void)
 			if (it[in].driver==104)	enemyspawner(in, 23, 0);
 			if (it[in].driver==105)	enemyspawner(in, 24, 0);
 			if (it[in].driver==120)	enemyspawner(in, 25, 0);
+			if (it[in].driver==129)	enemyspawner(in, 26, 0);
 
 			if (it[in].flags & IF_EXPIREPROC)
 			{
@@ -9055,7 +9339,7 @@ void item_tick_expire(void)
 				it[in].current_age[act] += EXP_TIME;	// each place is only checked every MAPY ticks
 			}											// so we add MAPY instead of one
 			
-			if (it[in].flags & IF_LIGHTAGE)
+			if ((it[in].flags & IF_LIGHTAGE) || (it[in].max_age[act] && it[in].light[act] && IS_IN_VANTA(x, y)))
 				lightage(in, EXP_TIME);
 			
 			if (item_age(in) && it[in].damage_state==5)
@@ -9083,6 +9367,10 @@ void item_tick_expire(void)
 						// Eyeball kings take extra time to respawn
 						if (IS_LONG_RESPAWN(temp)) 
 							rtimer = TICKS * 60 * 13 + RANDOM(TICKS * 60 * 4); // 13 - 17 minutes
+						else if (temp == CT_PANDIUM)
+							rtimer = TICKS * 5;
+						if (IS_GLOB_MAYHEM)
+							rtimer = rtimer/2;
 						fx_add_effect(2, rtimer, ch_temp[temp].x, ch_temp[temp].y, temp);
 						xlog("respawn %d (%s): YES", co, ch[co].name);
 						ch[co].flags |= CF_SENSE;
@@ -9653,7 +9941,6 @@ int step_portal_arena(int cn, int in)
 	{
 		do_char_log(cn, 1, "A winner! You gain one arena-rank!\n");
 		ch[cn].data[22]++;
-		ch[cn].data[23] = 1;
 		money = ch[cn].data[22]*(ch[cn].data[22]+1)*71;
 		ch[cn].gold += money;
 		do_char_log(cn, 2, "You received %dG %dS.\n", money / 100, money % 100);
@@ -9704,8 +9991,6 @@ int step_portal_arena(int cn, int in)
 	in = god_create_item(IT_ARENANOTE);
 	god_give_char(in, co);
 	spell_light(co, co, 30);
-
-	ch[cn].data[23] = 0;
 
 	return 1;
 }

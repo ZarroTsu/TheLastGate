@@ -521,6 +521,7 @@ void sv_setchar_tok(unsigned char *buf)
 {
 	DEBUG("SV SETCHAR TOK");
 	pl.tokens=*(unsigned long*)(buf+1);
+	pl.tree_points=*(unsigned short*)(buf+5);
 }
 
 void sv_setchar_gold(unsigned char *buf)
@@ -1072,7 +1073,7 @@ int sv_cmd(unsigned char *buf)
 
 		case	SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
 		case	SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 13;
-		case	SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 5;
+		case	SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 7;
 		case	SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
 		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
 		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 9;

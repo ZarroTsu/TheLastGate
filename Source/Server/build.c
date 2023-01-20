@@ -5932,15 +5932,8 @@ void build_drop(int x, int y, int in)
 	if (in & 0x20000000)
 	{
 		nr = in & 0xfffffff;
-		if (nr==520 && !RANDOM(4))	// hack for red carpet
-		{
-			nr += RANDOM(3);
-		}
-		if (nr==531 && !RANDOM(4))	// hack for purple carpet
-		{
-			nr += RANDOM(3);
-		}
-		if (nr==5034 && !RANDOM(4))	// hack for green carpet
+		// hack for carpets
+		if ((nr==520 || nr==531 || nr==5034) && !RANDOM(4))
 		{
 			nr += RANDOM(3);
 		}
@@ -5952,35 +5945,29 @@ void build_drop(int x, int y, int in)
 				nr++;
 			}
 		}
-		if (nr==542)   // hack for street ground
+		// hack for street ground, parkett ground
+		if (nr==542 || nr==133 || nr==950)   
 		{
 			nr += RANDOM(9);
 		}
 		// hack for grass grounds, parkett ground, greystone ground, flower floors
-		if (nr==551 || nr==2823 || nr==2828 || nr==142 || nr==808 || nr==16670 || nr==5860 || nr==5852 || nr==5856 || nr==5848)	
+		if (nr==551 || nr==2823 || nr==2828 || nr==142 || nr==725 || nr==808 || nr==6548 || 
+			nr==16670 || nr==5860 || nr==5852 || nr==5856 || nr==5848)	
 		{
 			nr += RANDOM(4);
-		}
-		if (nr==133)   // hack for parkett ground
-		{
-			nr += RANDOM(9);
 		}
 		if (nr==170)   // hack for stone ground
 		{
 			nr += RANDOM(6);
 		}
+		if (nr==6544)   // hack for dark mine ground
+		{
+			nr += RANDOM(2);
+		}
 		if (nr==704)
 		{
 			static int tab[4] = {704, 659, 660, 688};
 			nr = tab[RANDOM(4)];
-		}
-		if (nr==725)   // randomize lava ground
-		{
-			nr += RANDOM(4);
-		}
-		if (nr==950)
-		{
-			nr += RANDOM(9);
 		}
 		if (nr==959)
 		{
@@ -6739,7 +6726,7 @@ int build_new_map(int cn, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], int miss
 	f = RANDOM(sizeof(map_flavor) / sizeof(map_flavor[0]));		// Map 'flavor' for the tileset
 	en1 = RANDOM(NUM_MAP_ENEM)+11;								// Monster template choice 1
 	en2 = RANDOM(NUM_MAP_ENEM)+11;								// Monster template choice 2
-	base = max(15, (rank-5) * 5 + 15);							// Power level of monsters spawned
+	base = max(10, (rank-5) * 11/2 + 10);						// Power level of monsters spawned
 	clflp = RANDOM(2);											// Randomly flip the X/Y layout of the map
 	shr_rng = RANDOM(3);										// Randomize shrine placement
 	if (flags[MM_P_CHST]) xch_rng = RANDOM(3);
@@ -6899,7 +6886,7 @@ int build_new_map(int cn, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], int miss
 										for (n = 0; n < ngm; n++)
 										{
 											co = 0; affix = 0;
-											if (s==13 || !RANDOM(20) || (mdiv && mdiv==en1c+en2c)) affix = 3;
+											if (s==13 || try_boost(20) || (mdiv && mdiv==en1c+en2c)) affix = 3;
 											if (s==10)
 											{
 												co = generate_map_enemy(spawnT, RANDOM(NUM_MAP_ENEM)+11, x, y, base+1, affix, tarot);

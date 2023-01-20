@@ -86,6 +86,18 @@ void init_lights_check(void)
 	}
 }
 
+void global_pandium_rewards(void)
+{
+	int n;
+	for (n=0;n<3;n++)
+	{
+		if (IS_SANEPLAYER(globs->top_ps[n])) god_give_char(god_create_item(2974), globs->top_ps[n]);
+		if (IS_SANEPLAYER(globs->top_pg[n])) god_give_char(god_create_item(2974), globs->top_pg[n]);
+		globs->top_ps[n] = 0;
+		globs->top_pg[n] = 0;
+	}
+}
+
 void global_tick(void)
 {
 	int tmp;
@@ -103,29 +115,50 @@ void global_tick(void)
 
 	if (globs->mdday>=MD_YEAR)
 	{
+		char message[100];
 		globs->mdyear++;
 		globs->mdday = 1;
+		
+		if (globs->mdyear%5==0)
+		{
+			sprintf(message, "A new year begins in Astonia! All Archon records have been reset, and rewards have been granted to the top competitors.");
+			if (globs->flags & GF_DISCORD) discord_ranked(message);
+			global_pandium_rewards();
+			god_reset_all_depths(0);
+		}
+		else
+		{
+			sprintf(message, "A new year begins in Astonia!");
+			if (globs->flags & GF_DISCORD) discord_ranked(message);
+		}
 	}
-
-	if (globs->mdtime<MD_HOUR * 6)
+	
+	if (IS_GLOB_MAYHEM)
 	{
 		globs->dlight = 0;
-	}
-	else if (globs->mdtime<MD_HOUR * 7)
-	{
-		globs->dlight = (globs->mdtime - MD_HOUR * 6) * 255 / MD_HOUR;
-	}
-	else if (globs->mdtime<MD_HOUR * 22)
-	{
-		globs->dlight = 255;
-	}
-	else if (globs->mdtime<MD_HOUR * 23)
-	{
-		globs->dlight = (MD_HOUR * 23 - globs->mdtime) * 255 / MD_HOUR;
 	}
 	else
 	{
-		globs->dlight = 0;
+		if (globs->mdtime<MD_HOUR * 6)
+		{
+			globs->dlight = 0;
+		}
+		else if (globs->mdtime<MD_HOUR * 7)
+		{
+			globs->dlight = (globs->mdtime - MD_HOUR * 6) * 255 / MD_HOUR;
+		}
+		else if (globs->mdtime<MD_HOUR * 22)
+		{
+			globs->dlight = 255;
+		}
+		else if (globs->mdtime<MD_HOUR * 23)
+		{
+			globs->dlight = (MD_HOUR * 23 - globs->mdtime) * 255 / MD_HOUR;
+		}
+		else
+		{
+			globs->dlight = 0;
+		}
 	}
 
 	tmp = globs->mdday % 28 + 1;
@@ -138,7 +171,12 @@ void global_tick(void)
 		if (!(globs->mdtime % TICKS*10)) discord_who();
 		discord_shout_in();
 	}
-
+	
+	if (IS_GLOB_MAYHEM)
+	{
+		return;
+	}
+	
 	if (tmp==1)
 	{
 		globs->newmoon = 1;
@@ -148,7 +186,7 @@ void global_tick(void)
 	{
 		globs->fullmoon = 1;
 	}
-
+	
 	if (tmp>14)
 	{
 		tmp = 28 - tmp;
