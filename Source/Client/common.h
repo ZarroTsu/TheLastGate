@@ -1,5 +1,5 @@
 // Just comment/uncomment this to alter home copy version
-//#define HOMECOPY
+#define HOMECOPY
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"

@@ -328,10 +328,11 @@ void discord_who(void)
 			showarea = 0;
 		}
 
-		fprintf(discordWho, "%c %.5s %-10.10s%c%c %.24s\n",
+		fprintf(discordWho, "%c %.5s %-10.10s %c%c%c %.26s\n",
 					font ? '+' : ' ',
 		            who_rank_name[getrank(n)],
 		            ch[n].name,
+					(ch[n].rebirth & 1) ? '+' : ' ',
 					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));

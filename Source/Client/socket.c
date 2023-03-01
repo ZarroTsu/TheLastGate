@@ -902,11 +902,12 @@ void sv_look6(unsigned char *buf)
 	s=buf[1];
 
 	for (n=s; n<min(62,s+2); n++) {
-		tmplook.item[n]  =*(unsigned short*)(buf+2+(n-s)*6);
-		tmplook.price[n] =*(unsigned int  *)(buf+4+(n-s)*6);
+		tmplook.item[n]   =*(unsigned short*)(buf+2+(n-s)*6);
+		tmplook.price[n]  =*(unsigned int  *)(buf+4+(n-s)*6);
+		tmplook.item_p[n] =*(unsigned char *)(buf+14+(n-s));
 	}
 	if (n==62) {
-		show_shop=1+*(unsigned char*)(buf+14);
+		show_shop=1+*(unsigned char*)(buf+14); // gold slot bit
 		shop=tmplook;
 	}
 }

@@ -1097,6 +1097,33 @@ int npc_give(int cn, int co, int in, int money)
 			ch[co].misc_action = DR_IDLE;
 			return 0;
 		}
+		else if (ch[cn].temp==CT_ISHTAR || ch[cn].temp==CT_ANKH || ch[cn].temp==CT_KWAI || ch[cn].temp==CT_GORN)
+		{
+			do_sayx(cn, "Thank you %s. That's the %s I wanted.", ch[co].name, it[in].reference);
+			use_consume_item(cn, in, 1);
+			// Check for player Chalice item to upgrade, or otherwise award the worst one.
+			if (n = has_item(co, IT_CHALICE3)) nr = IT_CHALICE4;
+			else if (n = has_item(co, IT_CHALICE2)) nr = IT_CHALICE3;
+			else if (n = has_item(co, IT_CHALICE1)) nr = IT_CHALICE2;
+			else nr = IT_CHALICE1;
+			//
+			if (!(ch[cn].flags&(CF_BODY)))
+			{
+				if (nr == IT_CHALICE1) 
+				{
+					do_sayx(cn, "Here is your %s in exchange.", it_temp[nr].reference);
+				}
+				else 
+				{
+					do_sayx(cn, "I shall improve your %s in exchange.", it[n].reference);
+					use_consume_item(co, n, 1);
+				}
+				in = god_create_item(nr);
+				god_give_char(in, co);
+			}
+			ch[co].misc_action = DR_IDLE;
+			return 0;
+		}
 		else
 		{
 			// Tutorial 6
@@ -1792,7 +1819,22 @@ int npc_see(int cn, int co)
 			int ccc;
 			if (ch[cn].data[95]==2 && ch[cn].data[93])   // attack distance
 			{
-				dist = max(abs((ch[cn].data[29] % MAPX) - ch[co].x), abs((ch[cn].data[29] / MAPX) - ch[co].y));
+				if (ch[cn].temp==1498||ch[cn].temp==1499) // Enforcers only check the direction they face
+				{
+					switch (ch[cn].dir)
+					{
+						case  1: dist = max(0, ch[co].x - (ch[cn].data[29] % MAPX)); if (abs((ch[cn].data[29] / MAPX) - ch[co].y)!=0) dist=9; break; // south (x++)
+						case  2: dist = max(0, (ch[cn].data[29] % MAPX) - ch[co].x); if (abs((ch[cn].data[29] / MAPX) - ch[co].y)!=0) dist=9; break; // north (x--)
+						case  3: dist = max(0, (ch[cn].data[29] / MAPX) - ch[co].y); if (abs((ch[cn].data[29] % MAPX) - ch[co].x)!=0) dist=9; break; // west (y--)
+						case  4: dist = max(0, ch[co].y - (ch[cn].data[29] / MAPX)); if (abs((ch[cn].data[29] % MAPX) - ch[co].x)!=0) dist=9; break; // east (y++)
+						default: dist = 9; break;
+					}
+					if (dist==0) dist = 9;
+				}
+				else
+				{
+					dist = max(abs((ch[cn].data[29] % MAPX) - ch[co].x), abs((ch[cn].data[29] / MAPX) - ch[co].y));
+				}
 				if (dist>ch[cn].data[93])
 				{
 					ccc = co;
@@ -2849,6 +2891,7 @@ int npc_try_spell(int cn, int co, int spell)
 	if (spell==SK_WEAKEN && get_tarot(cn, IT_CH_DEATH)) 	truespell = SK_WEAKEN2;
 	if (spell==SK_SLOW   && get_tarot(cn, IT_CH_EMPEROR)) 	truespell = SK_SLOW2;
 	if (spell==SK_WARCRY && get_tarot(cn, IT_CH_EMPERO_R)) 	truespell = SK_WARCRY3;
+	if (spell==SK_HEAL   && get_tarot(cn, IT_CH_STAR)) 		truespell = SK_REGEN;
 	
 	/*
 	if (spell==SK_WEAKEN && get_enchantment(co,  8)) return 0;
@@ -2925,7 +2968,7 @@ int npc_try_spell(int cn, int co, int spell)
 			timm = spell_immunity(offn, get_target_immunity(cn, co));
 			timm = tdef ? (timm/2) : timm;
 			// Cancel if target is already buffed or debuffed (except for heal)
-			if (bu[in].temp==truespell && truespell!=SK_HEAL /*&& tpow>=timm*/ && bu[in].active>bu[in].duration/4)
+			if (bu[in].temp==spell && spell!=SK_HEAL /*&& tpow>=timm*/ && bu[in].active>bu[in].duration/4)
 			{
 				break;
 			}
@@ -2941,7 +2984,7 @@ int npc_try_spell(int cn, int co, int spell)
 				break;
 			}
 			// Don't cast heal if target can't be healed.
-			if (bu[in].temp==truespell && truespell==SK_HEAL && bu[in].data[1] >= 4)
+			if (bu[in].temp==spell && spell==SK_HEAL && bu[in].data[1] >= 4)
 			{
 				break;
 			}
@@ -4377,7 +4420,8 @@ void spawn_colosseum_enemy(int x, int y, int tox, int toy, int parent, int diffi
 		ch[co].data[31] = ch[parent].temp;    // parent template
 		ch[co].data[CHD_GROUP] = ch[co].data[43] = ch[co].data[59] = 60;
 		ch[co].data[25] = 0;
-		ch[co].data[27] = 1;
+//		ch[co].data[27] = 1;
+		ch[co].data[29] = tox+toy*MAPX;
 		ch[co].skill[SK_PERCEPT][1] = 30;
 		npc_moveto(co, tox, toy);
 		do_update_char(co);
@@ -4502,12 +4546,18 @@ void colosseum_driver(int cn)
 					for (m=0;m<4;m++)
 					{
 						// Try to force NPCs out of spawns if they're not doing anything at the moment.
-						if (IS_SANECHAR(co = ch[cn].data[5+m]) && ch[co].used != USE_EMPTY && ch[co].temp == 347 &&
-							(ch_base_status(ch[co].status) < 8) && !is_reallyincolosseum(co, anum) && ch[co].data[9]==0)
+						if (IS_SANECHAR(co = ch[cn].data[5+m]))
 						{
-							quick_teleport(co, to_xy[n][m][0]-2+RANDOM(5), to_xy[n][m][1]-2+RANDOM(5));
-							ch[co].data[9] = 1;
-							ch[cn].data[9] = globs->ticker + TICKS*5;
+							if (ch[co].used != USE_EMPTY && ch[co].temp == 347 && !is_reallyincolosseum(co, anum) && ch[co].data[9]>=TICKS*5)
+							{
+								quick_teleport(co, to_xy[n][m][0]-2+RANDOM(5), to_xy[n][m][1]-2+RANDOM(5));
+								ch[co].data[9] = 0;
+								ch[cn].data[9] = globs->ticker + TICKS*5;
+							}
+							else
+							{
+								ch[co].data[9]++;
+							}
 						}
 					}
 					return;
@@ -5381,6 +5431,20 @@ void pandium_pattern(int fl)
 	}
 }
 
+void clean_and_go(int cn, int x, int y, int z, int hpm)
+{
+	ch[cn].data[29] = x + y * MAPX;
+	ch[cn].dir      = z;
+	ch[cn].data[30] = z;
+	ch[cn].a_hp = ch[cn].hp[5]*hpm;
+	remove_buff(cn, SK_ZEPHYR2);
+	remove_buff(cn, SK_TAUNT);
+	ch[cn].taunted = 0;
+	npc_remove_all_enemies(cn);
+	quick_teleport(cn, x, y);
+	chlog(cn, "clean_and_go %d, %d", x, y);
+}
+
 void pandium_driver(int cn) // CT_PANDIUM
 {
 	int n, m, j, p=0, fl=999, x, y, frx, fry, tox, toy, in=0, co=0, dir=0, try=0;
@@ -5491,6 +5555,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				y = to_xy[0][1];
 				ch[cn].dir = to_xy[0][2];
 				ch[cn].data[29] = x + y * MAPX;
+				ch[cn].data[30] = 3;
 				god_transfer_char(cn, x, y);
 			}
 			ch[cn].data[2] = 99;
@@ -5554,11 +5619,11 @@ void pandium_driver(int cn) // CT_PANDIUM
 		ch[cn].skill[SK_LETHARGY][0] = 0;
 		ch[cn].skill[SK_LEAP][0]     = 0;
 		if (fl>= 4) { ch[cn].skill[SK_CURSE][0]    = min(150, 90+fl/3); }
-		if (fl>= 8) { ch[cn].skill[SK_WEAKEN][0]   = min(150, 90+fl/3); }
+		if (fl>= 8) { ch[cn].skill[SK_WEAKEN][0]   = min(150, 80+fl/3); }
 		if (fl>=12) { ch[cn].skill[SK_CLEAVE][0]   = min(150, 90+fl/5); }
-		if (fl>=16) { ch[cn].skill[SK_SLOW][0]     = min(150, 90+fl/3); }
-		if (fl>=20) { ch[cn].skill[SK_BLIND][0]    = min(150, 90+fl/5); }
-		if (fl>=24) { ch[cn].skill[SK_LETHARGY][0] = min(150, 90+fl/4); }
+		if (fl>=16) { ch[cn].skill[SK_SLOW][0]     = min(150, 85+fl/3); }
+		if (fl>=20) { ch[cn].skill[SK_BLIND][0]    = min(150, 75+fl/5); }
+		if (fl>=24) { ch[cn].skill[SK_LETHARGY][0] = min(150, 30+fl/4); }
 		if (fl>=28) { ch[cn].skill[SK_LEAP][0]     = min(150, 90+fl/4); }
 		if (fl>=32)		{ temp[0]=2916; temp[1]=2917; temp[2]=2918; temp[3]=2919; temp[4]=2920; } // Obsidian
 		else if (fl>=16){ temp[0]=  94; temp[1]=  95; temp[2]=  96; temp[3]=  97; temp[4]=  98; } // Adamant
@@ -5697,17 +5762,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				to_xy[0][1] = go_xy[m][1];
 				to_xy[0][2] = go_xy[m][2];
 			}
-			x = to_xy[0][0];
-			y = to_xy[0][1];
-			ch[cn].data[29] = x + y * MAPX;
-			ch[cn].dir      = to_xy[0][2];
-			ch[cn].data[30] = to_xy[0][2];
-			ch[cn].a_hp = ch[cn].hp[5]*750;
-			remove_buff(cn, SK_ZEPHYR2);
-			remove_buff(cn, SK_TAUNT);
-			ch[cn].taunted = 0;
-			npc_remove_all_enemies(cn);
-			quick_teleport(cn, x, y);
+			clean_and_go(cn, to_xy[0][0], to_xy[0][1], to_xy[0][2], 750);
 			x = go_xy[0][0];
 			y = go_xy[0][1];
 			for (n=0;n<PANDI_LIMIT;n++) 
@@ -5772,17 +5827,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 					if (m>4) m = 1;
 				}
 			}
-			x = to_xy[0][0];
-			y = to_xy[0][1];
-			ch[cn].data[29] = x + y * MAPX;
-			ch[cn].dir      = to_xy[0][2];
-			ch[cn].data[30] = to_xy[0][2];
-			ch[cn].a_hp = ch[cn].hp[5]*500;
-			remove_buff(cn, SK_ZEPHYR2);
-			remove_buff(cn, SK_TAUNT);
-			ch[cn].taunted = 0;
-			npc_remove_all_enemies(cn);
-			quick_teleport(cn, x, y);
+			clean_and_go(cn, to_xy[0][0], to_xy[0][1], to_xy[0][2], 500);
 			x = go_xy[0][0];
 			y = go_xy[0][1];
 			for (n=0;n<PANDI_LIMIT;n++)
@@ -5828,11 +5873,11 @@ void pandium_driver(int cn) // CT_PANDIUM
 			npc_quaff_potion(cn, n, 254);
 			// Learn skills
 			try = 0;
-			if (fl>= 5) { ch[cn].skill[SK_POISON][0] =  90; ch[cn].skill[SK_HASTE][0] =  60; try=1; }
-			if (fl>=10) { ch[cn].skill[SK_POISON][0] =  96; ch[cn].skill[SK_HASTE][0] =  75; try=2; }
-			if (fl>=15) { ch[cn].skill[SK_POISON][0] = 105; ch[cn].skill[SK_HASTE][0] =  90; try=3; }
-			if (fl>=20) { ch[cn].skill[SK_POISON][0] = 112; ch[cn].skill[SK_HASTE][0] = 105; try=3; }
-			if (fl>=30) { ch[cn].skill[SK_POISON][0] = 120; ch[cn].skill[SK_HASTE][0] = 120; try=3; }
+			if (fl>= 5) { ch[cn].skill[SK_POISON][0] =  90; ch[cn].skill[SK_HASTE][0] = 60; try=1; }
+			if (fl>=10) { ch[cn].skill[SK_POISON][0] =  96; ch[cn].skill[SK_HASTE][0] = 68; try=2; }
+			if (fl>=15) { ch[cn].skill[SK_POISON][0] = 105; ch[cn].skill[SK_HASTE][0] = 75; try=3; }
+			if (fl>=20) { ch[cn].skill[SK_POISON][0] = 112; ch[cn].skill[SK_HASTE][0] = 82; try=3; }
+			if (fl>=30) { ch[cn].skill[SK_POISON][0] = 120; ch[cn].skill[SK_HASTE][0] = 90; try=3; }
 			do_update_char(cn);
 			// Spawn shadows
 			for (n=0;n<try;n++)
@@ -5897,17 +5942,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				to_xy[0][1] = go_xy[m][1];
 				to_xy[0][2] = go_xy[m][2];
 			}
-			x = to_xy[0][0];
-			y = to_xy[0][1];
-			ch[cn].data[29] = x + y * MAPX;
-			ch[cn].dir      = to_xy[0][2];
-			ch[cn].data[30] = to_xy[0][2];
-			ch[cn].a_hp = ch[cn].hp[5]*250;
-			remove_buff(cn, SK_ZEPHYR2);
-			remove_buff(cn, SK_TAUNT);
-			ch[cn].taunted = 0;
-			npc_remove_all_enemies(cn);
-			quick_teleport(cn, x, y);
+			clean_and_go(cn, to_xy[0][0], to_xy[0][1], to_xy[0][2], 250);
 			x = go_xy[0][0];
 			y = go_xy[0][1];
 			for (n=0;n<PANDI_LIMIT;n++) 
@@ -5961,6 +5996,449 @@ void pandium_driver(int cn) // CT_PANDIUM
 			for (n=0;n<PANDI_LIMIT;n++) npc_add_enemy(cn, ch_in[n], 1);
 			ch[cn].data[2]++;
 			ch[cn].data[3] = globs->ticker + TICKS * 5;
+			break;
+		// Wait until death
+		default: break;
+	}
+}
+
+void change_the_arena(int v, int frx, int fry, int tox, int toy)
+{
+	int x, y, a, b, c, d, in;
+	
+	a = MWL_MARBLE;
+	b = MTR_WHITE;
+	c = MFL_MARBLE;
+	d = 520; // red carpet
+	
+	switch (v)
+	{
+		case 1:
+			a = MWL_EARTH;
+			b = MTR_GROLM;
+			c = MFL_JUNGLE;
+			d = 531; // purple carpet
+			break;
+		case 2:
+			a = MWL_RED;
+			b = MTR_GOLD;
+			c = MFL_BRICK;
+			d = 5034; // green carpet
+			break;
+		case 3:
+			a = MWL_ICE;
+			b = MTR_ICE;
+			c = MFL_SNOW;
+			d = 531; // purple carpet
+			break;
+		case 4:
+			a = MWL_BLACK;
+			b = MTR_BOWL;
+			c = MFL_BSSMOOTH;
+			break;
+		default:
+			break;
+	}
+	
+	for (x=frx; x<=tox; x++) for (y=fry; y<=toy; y++)
+	{
+		if (x==frx&&y>=fry&&y<=toy) build_drop(x, y, a);
+		if (x>=frx&&x<=tox&&y==fry) build_drop(x, y, a);
+		if (x==tox&&y>=fry&&y<=toy) build_drop(x, y, a);
+		if (x>=frx&&x<=tox&&y==toy) build_drop(x, y, a);
+		if ((in=map[x+y*MAPX].it)!=0 && (it[in].flags & IF_LOOK)) { build_remove(x, y); build_drop(x, y, b); }
+		build_drop(x, y, 0x20000000 | c);
+		if (x> 199&&x<209&&y>1549&&y<1559)	build_drop(x, y, 0x20000000 | d + 0); // carpet
+		if (x==199&&y==1549) 				build_drop(x, y, 0x20000000 | d + 3); // carpet corner
+		if (x==199&&y>1549&&y<1559) 		build_drop(x, y, 0x20000000 | d + 4); // carpet edge
+		if (x==199&&y==1559) 				build_drop(x, y, 0x20000000 | d + 5); // carpet corner
+		if (x> 199&&x<209&&y==1559) 		build_drop(x, y, 0x20000000 | d + 6); // carpet edge
+		if (x==209&&y==1559) 				build_drop(x, y, 0x20000000 | d + 7); // carpet corner
+		if (x==209&&y>1549&&y<1559) 		build_drop(x, y, 0x20000000 | d + 8); // carpet edge
+		if (x==209&&y==1549) 				build_drop(x, y, 0x20000000 | d + 9); // carpet corner
+		if (x> 199&&x<209&&y==1549) 		build_drop(x, y, 0x20000000 | d +10); // carpet edge
+	}
+}
+
+void gatekeeper_driver(int cn) // CT_LAB20_KEEP
+{
+	int n, m, x, y, frx, fry, tox, toy, try, co, in, p=0;
+	static int go_xy[8][3] = { {211,1554,2},{208,1554,2},{204,1547,4},{204,1550,4},
+							   {197,1554,1},{200,1554,1},{204,1561,3},{204,1558,3} };
+	/*
+		Uber GK Fight Driver
+		
+		data[0] = Player
+		data[1] = Phase
+		data[2] = Phase timer
+		data[3] = Cascade timer
+		data[4] = Cascade type
+		data[5] = Cascade tile offset & ender
+		data[6] = data[7] = Shadow trace for deletion
+		data[8] = M data for Cascade alignment
+	*/
+	
+	// Check for players
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+		if (IS_PLAYER(n) && IS_IN_TLG(ch[n].x, ch[n].y)) { p = n; break; }
+	}
+	ch[cn].data[0] = p;
+	
+	frx = TLG_X1; 
+	tox = TLG_X2; 
+	fry = TLG_Y1; 
+	toy = TLG_Y2;
+	
+	// Initialize
+	if (p<1 || ch[cn].data[1]==99)
+	{
+		if (p<1) 
+		{
+			for (x = frx; x<tox; x++) for (y = fry; y<toy; y++)
+			{
+				// Clear any lingering shadows
+				if ((co = map[x + y * MAPX].ch) && !IS_PLAYER(co) && ch[co].temp != CT_LAB20_KEEP)
+				{
+					god_destroy_items(co);
+					if (ch[co].used==USE_ACTIVE) plr_map_remove(co);
+					ch[co].flags = 0;
+					ch[co].used = USE_EMPTY;
+				}
+				// Clear any lingering graves/etc
+				if ((in = map[x + y * MAPX].it)!=0 && (it[in].flags & IF_USE))
+				{
+					it[in].used = 0;
+					map[x + y * MAPX].it = 0;
+				}
+			}
+			ch[cn].a_hp   = 9999999;
+			if (ch[cn].data[1] != 99)
+			{
+				change_the_arena(0, frx, fry, tox, toy);
+				remove_buff(cn, SK_ZEPHYR2);
+				remove_buff(cn, SK_TAUNT);
+				remove_buff(cn, SK_POISON);
+				remove_buff(cn, SK_BLEED);
+				ch[cn].taunted = 0;
+				npc_remove_all_enemies(cn);
+				x = go_xy[7][0];
+				y = go_xy[7][1]-1;
+				ch[cn].dir = go_xy[7][2];
+				ch[cn].data[30] = go_xy[7][2];
+				ch[cn].data[29] = x + y * MAPX;
+				god_transfer_char(cn, x, y);
+			}
+			ch[cn].data[1] = 99;
+		}
+		else
+		{
+			chlog(cn, "Initialized");
+			ch[cn].data[1] = 0;
+		}
+		ch[cn].data[2] = globs->ticker + TICKS / 2;
+		ch[cn].data[3] = 0;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		return; // No further process when nobody is in the area
+	}
+	
+	if (p && ch[cn].data[1] == 0) // Phase 0
+	{
+		ch[cn].skill[SK_ZEPHYR][0]   = 0;
+		ch[cn].skill[SK_LETHARGY][0] = 0;
+		ch[cn].skill[SK_WARCRY][0]   = 0;
+		ch[cn].skill[SK_PULSE][0]    = 0;
+		ch[cn].skill[SK_SHADOW][0]   = 0;
+		ch[cn].skill[SK_LEAP][0]     = 0;
+		//
+		in = ch[cn].worn[WN_CHARM]; it[in].x = 0; it[in].y = 0; it[in].carried = 0; ch[cn].worn[WN_CHARM] = 0;
+		do_update_char(cn);
+		//
+		ch[cn].data[1] = 1;
+		ch[cn].data[2] = globs->ticker + TICKS;
+		ch[cn].data[3] = 0;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		chlog(cn, "beginning gk fight");
+	}
+	
+	// Cascading blast timer loop
+	if (ch[cn].data[4] && ch[cn].data[3] && globs->ticker >= ch[cn].data[3])
+	{
+		for (try=0;try<3;try++)
+		{
+			switch (ch[cn].data[4])
+			{
+				case  1: x = (TLG_X2-1) - ch[cn].data[5]; y = M2Y(ch[cn].data[8]); break;
+				case  2: x = M2X(ch[cn].data[8]); y = (TLG_Y1+1) + ch[cn].data[5]; break;
+				case  3: x = (TLG_X1+1) + ch[cn].data[5]; y = M2Y(ch[cn].data[8]); break;
+				case  4: x = M2X(ch[cn].data[8]); y = (TLG_Y2-1) - ch[cn].data[5]; break;
+				default: break;
+			}
+			// Single line sweep
+			if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+			{
+				do_area_sound(0, 0, x, y, 22);
+				it[in].duration = 40; it[in].data[0] = 450+100*ch[cn].data[4];
+				do_add_light(x, y, it[in].light[1]);
+				try = 9;
+			}
+			// Three line sweep
+			if (ch[cn].data[4]>=2)
+			{
+				switch (ch[cn].data[4])	{ case 2: x-=1; y-=2; break; case 3: x-=2; y-=1; break; case 4: x-=1; y+=2; break; default: break; }
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 440+90*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				switch (ch[cn].data[4]) { case 2: x+=2; break; case 3: y+=2; break; case 4: x+=2; break; default: break; }
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 440+90*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+			}
+			// Five line sweep
+			if (ch[cn].data[4]==3)
+			{
+				x-=2; y-=3;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 430+80*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				y+=4;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 430+80*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+			}
+			// Three three line sweeps
+			if (ch[cn].data[4]==4)
+			{
+				x-=5; y-=2;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 450+100*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				x-=1; y+=2;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 440+90*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				x+=2;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 440+90*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				x+=7; y-=2;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 450+100*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				x-=1; y+=2;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 440+90*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+				x+=2;
+				if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
+				{	it[in].duration = 40; it[in].data[0] = 440+90*ch[cn].data[4]; do_add_light(x, y, it[in].light[1]);	}
+			}
+		}
+		ch[cn].data[3] = globs->ticker + 1;
+		ch[cn].data[5]++;
+		if (ch[cn].data[5]>24) // End of the line
+		{
+			ch[cn].data[3] = 0;
+			ch[cn].data[4] = 0;
+			ch[cn].data[5] = 0;
+		}
+	}
+	
+	// Return if time is less than next action
+	if (globs->ticker < ch[cn].data[2])
+		return;
+	
+	switch (ch[cn].data[1])
+	{
+		case 1: 
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Welcome, champion. To beyond the coveted Last Gate. The last challenge -- my last challenge to you. You've journeyed far... Now, step forward and take the first strike.");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + 1;
+			break;
+		case 2: 
+			if (!ch[cn].attack_cn) return;
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Let's begin!");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS;
+			break;
+		// Breakpoint 1: 80% Health
+		case 3: 
+			if (ch[cn].a_hp>ch[cn].hp[5]*800) return; // Wait until 80%
+			clean_and_go(cn, go_xy[0][0], go_xy[0][1], go_xy[0][2], 800);
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Stalwart. Strong. The labyrinth has tested your might and muscle well, my friend.");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 2;
+			break;
+		case 4:
+			clean_and_go(cn, go_xy[0][0], min(max(ch[p].y,1549),1559), go_xy[0][2], 800);
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Let's try something new!");
+			ch[cn].skill_nr = SK_MSHIELD; ch[cn].skill_target1 = cn; ch[cn].data[96] |= SP_MSHIELD; fx_add_effect(11, 8, cn, SP_MSHIELD, 0);
+			//
+			in = ch[cn].worn[WN_CHARM]; it[in].x = 0; it[in].y = 0; it[in].carried = 0;
+			in = ch[cn].worn[WN_CHARM]  = pop_create_item(IT_CH_DEATH, cn); it[in].carried = cn;
+			ch[cn].skill[SK_WARCRY][0]   = 90;
+			do_update_char(cn);
+			//
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS / 4;
+			break;
+		case 5:
+			change_the_arena(1, frx, fry, tox, toy);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 3;
+			ch[cn].data[3] = 1;
+			ch[cn].data[4] = 1;
+			ch[cn].data[8] = XY2M(ch[cn].x, ch[cn].y);
+			break;
+		case 6:
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Ha!");
+			clean_and_go(cn, go_xy[1][0], go_xy[1][1], go_xy[1][2], 800);
+			npc_add_enemy(cn, p, 1);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS;
+			break;
+		// Breakpoint 2: 60% Health
+		case 7: 
+			if (ch[cn].a_hp>ch[cn].hp[5]*600) return; // Wait until 60%
+			clean_and_go(cn, go_xy[2][0], go_xy[2][1], go_xy[2][2], 600);
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Intuitive. Wise. The labyrinth has tested your reason and understanding, truly.");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 2;
+			break;
+		case 8:
+			clean_and_go(cn, min(max(ch[p].x,200),208), go_xy[2][1], go_xy[2][2], 600);
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Show me what you've got!");
+			ch[cn].skill_nr = SK_MSHIELD; ch[cn].skill_target1 = cn; ch[cn].data[96] |= SP_MSHIELD; fx_add_effect(11, 8, cn, SP_MSHIELD, 0);
+			//
+			in = ch[cn].worn[WN_CHARM]; it[in].x = 0; it[in].y = 0; it[in].carried = 0;
+			in = ch[cn].worn[WN_CHARM]  = pop_create_item(IT_CH_TOWER, cn); it[in].carried = cn;
+			ch[cn].skill[SK_PULSE][0]    = 90;
+			do_update_char(cn);
+			//
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS / 4;
+			break;
+		case 9:
+			change_the_arena(2, frx, fry, tox, toy);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 3;
+			ch[cn].data[3] = 1;
+			ch[cn].data[4] = 2;
+			ch[cn].data[8] = XY2M(ch[cn].x, ch[cn].y);
+			break;
+		case 10:
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Ha!");
+			clean_and_go(cn, go_xy[3][0], go_xy[3][1], go_xy[3][2], 600);
+			npc_add_enemy(cn, p, 1);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS;
+			break;
+		// Breakpoint 3: 40% Health
+		case 11: 
+			if (ch[cn].a_hp>ch[cn].hp[5]*400) return; // Wait until 40%
+			clean_and_go(cn, go_xy[4][0], go_xy[4][1], go_xy[4][2], 400);
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Dexterous. Agile. The labyrinth has tested your ability to navigate its tests.");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 2;
+			break;
+		case 12:
+			clean_and_go(cn, go_xy[4][0], min(max(ch[p].y,1551),1557), go_xy[4][2], 400);
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "How much further shall you travel?");
+			ch[cn].skill_nr = SK_MSHIELD; ch[cn].skill_target1 = cn; ch[cn].data[96] |= SP_MSHIELD; fx_add_effect(11, 8, cn, SP_MSHIELD, 0);
+			//
+			in = ch[cn].worn[WN_CHARM]; it[in].x = 0; it[in].y = 0; it[in].carried = 0;
+			in = ch[cn].worn[WN_CHARM]  = pop_create_item(IT_CH_EMPEROR, cn); it[in].carried = cn;
+			ch[cn].skill[SK_ZEPHYR][0]   = 90;
+			ch[cn].skill[SK_LEAP][0]     = 90;
+			do_update_char(cn);
+			//
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS / 4;
+			break;
+		case 13:
+			change_the_arena(3, frx, fry, tox, toy);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 3;
+			ch[cn].data[3] = 1;
+			ch[cn].data[4] = 3;
+			ch[cn].data[8] = XY2M(ch[cn].x, ch[cn].y);
+			break;
+		case 14:
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Ha!");
+			clean_and_go(cn, go_xy[5][0], go_xy[5][1], go_xy[5][2], 400);
+			npc_add_enemy(cn, p, 1);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS;
+			break;
+		// Breakpoint 4: 20% Health - Add shadows for the sweep
+		case 15: 
+			if (ch[cn].a_hp>ch[cn].hp[5]*200) return; // Wait until 20%
+			clean_and_go(cn, go_xy[6][0], go_xy[6][1], go_xy[6][2], 200);
+			//
+			co = pop_create_char(1432, 0); x = go_xy[6][0]-4; y = go_xy[6][1];
+			if (co) { ch[cn].data[6] = co; ch[co].flags |= CF_SHADOWCOPY | CF_NOSLEEP; ch[co].a_hp = 525; ch[co].sprite = ch[cn].sprite; }
+			if (!god_drop_char_fuzzy(co, x, y)) { god_destroy_items(co); ch[co].used = USE_EMPTY; }
+			fx_add_effect(12, 0, x, y, 0); ch[co].dir = go_xy[6][2];
+			//
+			co = pop_create_char(1432, 0); x = go_xy[6][0]+4; y = go_xy[6][1];
+			if (co) { ch[cn].data[7] = co; ch[co].flags |= CF_SHADOWCOPY | CF_NOSLEEP; ch[co].a_hp = 525; ch[co].sprite = ch[cn].sprite; }
+			if (!god_drop_char_fuzzy(co, x, y)) { god_destroy_items(co); ch[co].used = USE_EMPTY; }
+			fx_add_effect(12, 0, x, y, 0); ch[co].dir = go_xy[6][2];
+			//
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Brave. Willing. The labyrinth has challenged your guile and mettle time and again!");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 2;
+			break;
+		case 16:
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Let's bring this fight to a close, shall we?");
+			ch[cn].skill_nr = SK_MSHIELD; ch[cn].skill_target1 = cn; ch[cn].data[96] |= SP_MSHIELD; fx_add_effect(11, 8, cn, SP_MSHIELD, 0);
+			ch[ch[cn].data[6]].skill_nr = SK_MSHIELD; ch[ch[cn].data[6]].skill_target1 = ch[cn].data[6]; 
+				ch[ch[cn].data[6]].data[96] |= SP_MSHIELD; fx_add_effect(11, 8, ch[cn].data[6], SP_MSHIELD, 0);
+			ch[ch[cn].data[7]].skill_nr = SK_MSHIELD; ch[ch[cn].data[7]].skill_target1 = ch[cn].data[7]; 
+				ch[ch[cn].data[7]].data[96] |= SP_MSHIELD; fx_add_effect(11, 8, ch[cn].data[7], SP_MSHIELD, 0);
+			//
+			in = ch[cn].worn[WN_CHARM]; it[in].x = 0; it[in].y = 0; it[in].carried = 0;
+			in = ch[cn].worn[WN_CHARM]  = pop_create_item(IT_CH_JUDGE, cn); it[in].carried = cn;
+			ch[cn].skill[SK_LETHARGY][0] = 90;
+			do_update_char(cn);
+			//
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS / 4;
+			break;
+		case 17:
+			change_the_arena(4, frx, fry, tox, toy);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS * 3;
+			ch[cn].data[3] = 1;
+			ch[cn].data[4] = 4;
+			ch[cn].data[8] = XY2M(ch[cn].x, ch[cn].y);
+			break;
+		case 18:
+			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Ha!");
+			//
+			if (IS_SANECHAR(co = ch[cn].data[6]))
+			{
+				god_destroy_items(co);
+				if (ch[co].used==USE_ACTIVE) plr_map_remove(co);
+				ch[co].flags = 0;
+				ch[co].used = USE_EMPTY;
+				ch[cn].data[6] = 0;
+			}
+			fx_add_effect(12, 0, go_xy[6][0]-4, go_xy[6][1], 0);
+			if (IS_SANECHAR(co = ch[cn].data[7]))
+			{
+				god_destroy_items(co);
+				if (ch[co].used==USE_ACTIVE) plr_map_remove(co);
+				ch[co].flags = 0;
+				ch[co].used = USE_EMPTY;
+				ch[cn].data[7] = 0;
+			}
+			fx_add_effect(12, 0, go_xy[6][0]+4, go_xy[6][1], 0);
+			//
+			clean_and_go(cn, go_xy[7][0], go_xy[7][1], go_xy[7][2], 200);
+			npc_add_enemy(cn, p, 1);
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + TICKS;
 			break;
 		// Wait until death
 		default: break;
@@ -6436,6 +6914,10 @@ int npc_driver_high(int cn)
 	{
 		pandium_driver(cn);
 	}
+	if (ch[cn].temp==CT_LAB20_KEEP)
+	{
+		gatekeeper_driver(cn);
+	}
 	
 	// driver check if low health
 	if (ch[cn].a_hp<ch[cn].hp[5] * 400)
@@ -6455,7 +6937,7 @@ int npc_driver_high(int cn)
 	}
 	
 	// heal us if we're hurt
-	if (ch[cn].a_hp<ch[cn].hp[5] * 600 && !get_tarot(cn, IT_CH_STAR))
+	if ((ch[cn].a_hp<ch[cn].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || get_tarot(cn, IT_CH_STAR))) || ch[cn].a_hp<ch[cn].hp[5] * 400)
 	{
 		if (npc_try_spell(cn, cn, SK_HEAL))
 		{
@@ -6468,17 +6950,6 @@ int npc_driver_high(int cn)
 				stronghold_mage_driver_ver2(cn);
 			else
 				stronghold_mage_driver(cn);
-		}
-	}
-	else if (ch[cn].a_hp<ch[cn].hp[5] * 600 && get_tarot(cn, IT_CH_STAR))
-	{
-		for (n = 0; n<MAXBUFFS; n++) if ((in = ch[cn].spell[n])!=0) if (bu[in].temp==SK_REGEN) break;
-		if (n==MAXBUFFS)
-		{
-			if (npc_try_spell(cn, cn, SK_HEAL))
-			{
-				return 1;
-			}
 		}
 	}
 	
@@ -6607,22 +7078,11 @@ int npc_driver_high(int cn)
 	// make sure protected character survives
 	if ((co = ch[cn].data[CHD_MASTER])!=0)
 	{
-		if (ch[co].a_hp<ch[co].hp[5] * 600 && !get_tarot(cn, IT_CH_STAR)) // he's hurt
+		if ((ch[co].a_hp<ch[co].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || get_tarot(cn, IT_CH_STAR))) || ch[co].a_hp<ch[co].hp[5] * 400) // he's hurt
 		{
 			if (npc_try_spell(cn, co, SK_HEAL))
 			{
 				return 1;
-			}
-		}
-		else if (ch[co].a_hp<ch[co].hp[5] * 600 && get_tarot(cn, IT_CH_STAR))
-		{
-			for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n])!=0)	if (bu[in].temp==SK_REGEN) break;
-			if (n==MAXBUFFS)
-			{
-				if (npc_try_spell(cn, co, SK_HEAL))
-				{
-					return 1;
-				}
 			}
 		}
 		
@@ -6663,22 +7123,11 @@ int npc_driver_high(int cn)
 			}
 		}
 
-		if (ch[co].a_hp<ch[co].hp[5] * 600 && !get_tarot(cn, IT_CH_STAR)) // he's hurt
+		if ((ch[co].a_hp<ch[co].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || get_tarot(cn, IT_CH_STAR))) || ch[co].a_hp<ch[co].hp[5] * 400) // he's hurt
 		{
 			if (npc_try_spell(cn, co, SK_HEAL))
 			{
 				return 1;
-			}
-		}
-		else if (ch[co].a_hp<ch[co].hp[5] * 600 && get_tarot(cn, IT_CH_STAR))
-		{
-			for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n])!=0)	if (bu[in].temp==SK_REGEN) break;
-			if (n==MAXBUFFS)
-			{
-				if (npc_try_spell(cn, co, SK_HEAL))
-				{
-					return 1;
-				}
 			}
 		}
 		
@@ -7626,6 +8075,11 @@ void npc_driver_low(int cn)
 		pandium_driver(cn);
 	}
 	
+	if (ch[cn].temp==CT_LAB20_KEEP)
+	{
+		gatekeeper_driver(cn);
+	}
+	
 	// are we supposed to loot graves?
 	if (ch[cn].alignment<0 &&
 	    (globs->flags & GF_LOOTING) &&
@@ -7899,7 +8353,8 @@ void npc_driver_low(int cn)
 		{
 			ch[cn].goto_x = x;
 			ch[cn].goto_y = y;
-			if (!(ch[cn].flags & CF_MERCHANT))
+			if (!(ch[cn].flags & CF_MERCHANT) && ch[cn].temp!=CT_ANNOU1 && ch[cn].temp!=CT_ANNOU2 && 
+				       ch[cn].temp!=CT_ANNOU3 && ch[cn].temp!=CT_ANNOU4 && ch[cn].temp!=CT_ANNOU5)
 			{
 				ch[cn].data[9]++;
 				if (ch[cn].data[9]>TICKS*60*5) // We haven't been able to return home for the past 5 minutes.
@@ -7932,7 +8387,8 @@ void npc_driver_low(int cn)
 			return;
 		}
 		
-		if (!(ch[cn].flags & CF_MERCHANT)) 
+		if (!(ch[cn].flags & CF_MERCHANT) && ch[cn].temp!=CT_ANNOU1 && ch[cn].temp!=CT_ANNOU2 && 
+				   ch[cn].temp!=CT_ANNOU3 && ch[cn].temp!=CT_ANNOU4 && ch[cn].temp!=CT_ANNOU5) 
 			ch[cn].data[9]=0;
 
 		if (ch[cn].dir!=ch[cn].data[30])
@@ -7979,6 +8435,8 @@ void npc_driver_low(int cn)
 			}
 			return;
 		}
+		if (ch[cn].temp==1498||ch[cn].temp==1499) // Enforcer reset
+			npc_remove_all_enemies(cn);
 	}
 
 	// reset talked-to list

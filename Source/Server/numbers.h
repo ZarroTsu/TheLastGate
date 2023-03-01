@@ -117,11 +117,18 @@
 #define CT_LAB15_BOSS	1455	// Vampire
 #define CT_LAB16_BOSS	1457	// Pirate
 #define CT_LAB17_BOSS	1462	// Onyx Gargoyle
-#define CT_LAB18_BOSS	9996	// 
-#define CT_LAB19_BOSS	9997	// 
+#define CT_LAB18_BOSS	1498	// Enforcer
+#define CT_LAB19_BOSS	1518	// The Purple One
+
+#define CT_LAB20_KEEP	1545	// Uber Gatekeeper
 
 #define CT_DRACULA		1456
 #define CT_PIRATELORD	1459
+#define CT_SKUA			1513
+#define CT_ISHTAR		1514
+#define CT_ANKH			1515
+#define CT_KWAI			1516
+#define CT_GORN			1517
 
 //
 
@@ -159,67 +166,109 @@
 
 #define COMPANION_TIMEOUT (5 * 60 * TICKS)
 
-// -----
+// ----- Laby poles & shrines, for recollection purposes
 
-#define IT_LAB1_POLE1	940
-#define IT_LAB1_POLE2	952
-#define IT_LAB1_POLE3	965
-#define IT_LAB1_KWAI	770
+#define IT_LAB1_POLE1	 940
+#define IT_LAB1_POLE2	 952
+#define IT_LAB1_POLE3	 965
+#define IT_LAB1_KWAI	 770
+#define IT_LAB1_RB		3146
 
-#define IT_LAB2_POLE1	971
-#define IT_LAB2_POLE2	976
+#define IT_LAB2_POLE1	 971
+#define IT_LAB2_POLE2	 976
 #define IT_LAB2_POLE3	1042
 #define IT_LAB2_KWAI	1040
+#define IT_LAB2_RB		3147
 
 #define IT_LAB3_POLE1	1043
 #define IT_LAB3_POLE2	1044
 #define IT_LAB3_POLE3	1096
 #define IT_LAB3_KWAI	1095
+#define IT_LAB3_RB		3148
 
 #define IT_LAB4_POLE1	1097
 #define IT_LAB4_POLE2	1098
 #define IT_LAB4_POLE3	1107
 #define IT_LAB4_KWAI	1298
+#define IT_LAB4_RB		3149
 
 #define IT_LAB5_POLE1	1259
 #define IT_LAB5_POLE2	1260
 #define IT_LAB5_POLE3	1271
 #define IT_LAB5_KWAI	1756
+#define IT_LAB5_RB		3150
 
 #define IT_LAB6_POLE1	1547
 #define IT_LAB6_POLE2	1548
 #define IT_LAB6_POLE3	1549
 #define IT_LAB6_KWAI	1757
+#define IT_LAB6_RB		3151
 
 #define IT_LAB7_POLE1	1731
 #define IT_LAB7_POLE2	1732
 #define IT_LAB7_POLE3	1733
 #define IT_LAB7_KWAI	1758
+#define IT_LAB7_RB		3152
 
 #define IT_LAB8_POLE1	1734
 #define IT_LAB8_POLE2	1735
 #define IT_LAB8_POLE3	1736
 #define IT_LAB8_KWAI	1759
+#define IT_LAB8_RB		3153
 
 #define IT_LAB9_POLE1	1737
 #define IT_LAB9_POLE2	1738
 #define IT_LAB9_POLE3	1739
 #define IT_LAB9_KWAI	1760
+#define IT_LAB9_RB		3154
 
 #define IT_LABX_POLE1	1740
 #define IT_LABX_POLE2	1741
 #define IT_LABX_POLE3	1742
 #define IT_LABX_KWAI	1761
+#define IT_LABX_RB		3155
 
 #define IT_LABY_POLE1	1743
 #define IT_LABY_POLE2	1744
 #define IT_LABY_POLE3	1745
 #define IT_LABY_KWAI	1762
+#define IT_LABY_RB		3156
 
 #define IT_LABZ_POLE1	1746
 #define IT_LABZ_POLE2	1747
 #define IT_LABZ_POLE3	1748
 #define IT_LABZ_KWAI	1763
+#define IT_LABZ_RB		3157
+
+#define IT_LABA_POLE1	3057
+#define IT_LABA_POLE2	3058
+#define IT_LABA_POLE3	3059
+#define IT_LABA_RB		3158
+
+#define IT_LABB_POLE1	3060
+#define IT_LABB_POLE2	3061
+#define IT_LABB_POLE3	3062
+#define IT_LABB_RB		3159
+
+#define IT_LABC_POLE1	3063
+#define IT_LABC_POLE2	3064
+#define IT_LABC_POLE3	3065
+#define IT_LABC_RB		3160
+
+#define IT_LABD_POLE1	3066
+#define IT_LABD_POLE2	3067
+#define IT_LABD_POLE3	3068
+#define IT_LABD_RB		3161
+
+#define IT_LABE_POLE1	3069
+#define IT_LABE_POLE2	3070
+#define IT_LABE_POLE3	3071
+#define IT_LABE_RB		3162
+
+#define IT_LABF_POLE1	3072
+#define IT_LABF_POLE2	3073
+#define IT_LABF_POLE3	3074
+#define IT_LABF_RB		3163
 
 // -----
 
@@ -231,7 +280,7 @@
 #define IT_DEADSEYSWORD	 683
 
 #define IT_ARENANOTE	 687
-
+#define IT_SEYANKEY		 664
 #define IT_TOMBSTONE 	 170
 #define IT_LAGSCROLL 	 500
 
@@ -402,6 +451,18 @@
 #define IT_WHITEBELT		2486
 #define IT_BONEARMOR		2481
 #define IT_ICELOTUS			2796
+
+#define IT_COMMAND1			3126
+#define IT_COMMAND2			3127
+#define IT_COMMAND3			3128
+#define IT_COMMAND4			3129
+#define IT_CHALICE1			3191
+#define IT_CHALICE2			3192
+#define IT_CHALICE3			3193
+#define IT_CHALICE4			3194
+#define IT_CHALICE5			3195
+#define IT_XIXDOOR			3186
+#define IT_XIXDARKSUN		3187
 
 // -----
 

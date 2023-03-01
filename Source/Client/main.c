@@ -66,7 +66,7 @@ int tabmode=0;
 int tabstart=0;
 int logstart=0;
 int logtimer=0;
-int do_alpha=2;
+int do_alpha=0;
 int do_shadow=1;
 int do_darkmode=0;
 

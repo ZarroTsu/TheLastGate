@@ -44,7 +44,7 @@ usage of data for players:
 * `22:`     current monster in arena
 * `23:`     overall kill counter
 * `24:`     --Zarro-- Extended poles 2
-* `25:`     --Zarro-- FREE
+* `25:`     --Zarro-- Bone Armor AV storage
 * `26:`     Black Stronghold Kill Counter (to assure wave reward is legit)
 * `27:`     --Zarro-- Gambling: Player hand value & wager
 * `28:`     --Zarro-- Gambling: Dealer hand value & active game
@@ -68,7 +68,7 @@ usage of data for players:
 * `70:`		Flags of killed NPC of certain class (Extended)
 * `71:`     number of says/tells/looks/lights
 * `72:`     --Zarro-- Quests 1
-* '73:'		--Zarro-- for "Way of the Sword" book
+* '73:'		--Zarro-- Extended FKs 3
 * '74:'     --Zarro-- for spell delays when hit by warcry
 * '75:'		--Zarro-- for spell delays when hit by blast, cleave
 * '76:'     --Zarro-- for waypoint storage

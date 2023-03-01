@@ -642,8 +642,8 @@ int god_drop_char(int cn, int x, int y)
 	}
 
 	m = x + y * MAPX;
-	if (map[m].ch || map[m].to_ch || ((in = map[m].it)!=0 && (it[in].flags & IF_MOVEBLOCK)) || (map[m].flags & MF_MOVEBLOCK) ||
-	    (map[m].flags & MF_TAVERN) || (map[m].flags & MF_DEATHTRAP))
+	if (map[m].ch || map[m].to_ch || (IS_SANEITEM(in = map[m].it) && (it[in].flags & IF_MOVEBLOCK)) || (map[m].flags & MF_MOVEBLOCK) ||
+	    (map[m].flags & MF_TAVERN) || (map[m].flags & MF_DEATHTRAP) || (IS_PLAYER(cn) && (map[m].flags & MF_NOPLAYER)))
 	{
 		return 0;
 	}
@@ -1442,8 +1442,9 @@ void god_who(int cn)
 			showarea = 0;
 		}
 
-		do_char_log(cn, font, "%4d: %-10.10s%c%c %-8.8s %.19s\n",
+		do_char_log(cn, font, "%4d %-10.10s%c%c%c %-8.8s %.19s\n",
 		            n, ch[n].name,
+					(ch[n].rebirth & 1) ? '+' : ' ',
 		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
 		            int2str(ch[n].points_tot),
@@ -1552,20 +1553,22 @@ void user_who(int cn)
 			showarea = 0;
 		}
 
-		do_char_log(cn, font, "%.5s %-10.10s%c%c %.24s\n",
+		do_char_log(cn, font, "%.5s %-10.10s %c%c%c %.26s\n",
 		            who_rank_name[getrank(n)],
 		            ch[n].name,
+					(ch[n].rebirth & 1) ? '+' : ' ',
 		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));
 	}
 	if ((gc = ch[cn].data[PCD_COMPANION]) && IS_SANECHAR(gc))
 	{
-		do_char_log(cn, 3, "%.5s %-10.10s%c%c %.24s\n",
+		do_char_log(cn, 3, "%.5s %-10.10s %c%c%c %.26s\n",
 		            who_rank_name[getrank(gc)],
 		            ch[gc].name,
-		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-		            IS_PURPLE(n) ? '*' : ' ',
+					(ch[gc].rebirth & 1) ? '+' : ' ',
+		            IS_CLANKWAI(gc) ? 'K' : (IS_CLANGORN(gc) ? 'G' : ' '),
+		            IS_PURPLE(gc) ? '*' : ' ',
 		            get_area(gc, 0));
 		/*
 		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
@@ -1741,7 +1744,7 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 		}
 		else
 		{
-			in = get_special_item(x, gen_a, gen_b, gen_c);
+			in = get_special_item(cn, x, gen_a, gen_b, gen_c);
 		}
 	}
 	if (in==0)
@@ -3474,6 +3477,35 @@ void god_set_depth(int cn, int co, int v, int gflag)
 	}
 }
 
+void god_give_points(int cn, int co, int v)
+{
+	if (co == 0)
+	{
+		do_char_log(cn, 0, "No such character.\n");
+		return;
+	}
+	else if (!IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Bad character number: %d\n", co);
+		return;
+	}
+	else if (v < 0)
+	{
+		do_char_log(cn, 0, "Raising by a negative amount??\n");
+		return;
+	}
+	else if (v > 7)
+	{
+		v = 7;
+	}
+	
+	ch[co].tree_points = v;
+	
+	do_char_log(cn, 1, "Set %s tree points to %d.\n", ch[co].name, v);
+	chlog(cn, "IMP: Set %s tree points to %d.", ch[co].name, v);
+	do_char_log(co, 0, "You have been compensated by the gods. Your tree points were set to %d.\n", v);
+}
+
 void god_raise_char(int cn, int co, int v, int bsp)
 {
 	if (co == 0)
@@ -4066,7 +4098,8 @@ void god_destroy_items(int cn)
 
 void god_racechange(int co, int temp, int keepstuff)
 {
-	int n, rank, tmp;
+	struct item tmp;
+	int n, rank;
 	struct character old, dpt;
 
 	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co))
@@ -4136,7 +4169,7 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	ch[co].mode = old.mode;
 	ch[co].used = USE_ACTIVE;
-	ch[co].player = old.player;
+	ch[co].player = old.player; old.player = 0;
 	ch[co].alignment = 0;
 	ch[co].luck    = old.luck;
 	ch[co].light   = old.light;
@@ -4149,81 +4182,98 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	if (keepstuff)
 	{
-		int hp = 0, mana = 0, attri = 0, exp = 0;
+		int hp = 0, mana = 0, attri = 0, exp = 0, bits = 0;
 		
-		exp = old.points_tot;
-		do_char_log(co, 2, "Old exp was %d.\n", exp);
-		ch[co].points_tot = exp;
-		ch[co].points     = exp;
-		rank = points2rank(exp);
+		if (keepstuff==1)
+		{
+			exp = old.points_tot;
+			do_char_log(co, 2, "Old exp was %d.\n", exp);
+			ch[co].points_tot = exp;
+			ch[co].points     = exp;
+			rank = points2rank(exp);
+			
+			if (IS_ANY_MERC(co) || IS_SEYAN_DU(co) || IS_BRAVER(co))
+			{
+				hp   = 10;
+				mana = 10;
+			}
+			else if (IS_ANY_TEMP(co))
+			{
+				hp   = 15;
+				mana = 5;
+			}
+			else if (IS_ANY_HARA(co))
+			{
+				hp   = 5;
+				mana = 15;
+			}
+			if (rank >= 20)
+			{
+				attri = 1;
+			}
+			
+			ch[co].data[45] = rank;
+			
+			ch[co].hp[1]   = hp * min(20,rank);
+			ch[co].mana[1] = mana * min(20,rank);
+			
+			bits = get_rebirth_bits(co);
+			if (attri || bits)
+			{
+				temp = ch[co].temp;
+				for (n = 0; n<5; n++) 
+					ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+				for (n = 0; n<50; n++) 
+					if (ch[co].skill[n][2] && bits) ch[co].skill[n][2] = ch_temp[temp].skill[n][2] + min(5,max(0,bits/6));
+			}
+			
+			ch[co].rebirth = old.rebirth;
+		}
+		else
+		{
+			ch[co].data[18] = 0;      // pentagram experience
+			ch[co].data[20] = 0;      // highest gorge solved
+			ch[co].data[21] = 0;      // seyan'du sword bits
+			ch[co].data[22] = 0;      // arena monster reset
+			ch[co].data[45] = 0;      // current rank
+			
+			// Reset Pole flags
+			ch[co].data[46] = 0;
+			ch[co].data[47] = 0;
+			ch[co].data[48] = 0;
+			ch[co].data[49] = 0;
+			ch[co].data[91] = 0;
+			ch[co].data[24] = 0;
+			
+			// Reset quest flags
+			ch[co].data[72] = 0;
+			ch[co].data[94] = 0;
+			
+			// Set rebirth flag
+			ch[co].rebirth = 1;
+			
+			for (n = 1; n<MAXITEM; n++)
+			{
+				if (it[n].used!=USE_ACTIVE) continue;
+				if (it[n].driver!=40) continue;
+				if (it[n].data[0]!=co) continue;
+				tmp = it_temp[IT_DEADSEYSWORD];
+				tmp.x = it[n].x;
+				tmp.y = it[n].y;
+				tmp.carried = it[n].carried;
+				tmp.temp = IT_DEADSEYSWORD;
+				it[n] = tmp;
+				it[n].flags |= IF_UPDATE;
+			}
+		}
 		
-		if (IS_ANY_MERC(co) || IS_SEYAN_DU(co) || IS_BRAVER(co))
-		{
-			hp   = 10;
-			mana = 10;
-		}
-		else if (IS_ANY_TEMP(co))
-		{
-			hp   = 15;
-			mana = 5;
-		}
-		else if (IS_ANY_HARA(co))
-		{
-			hp   = 5;
-			mana = 15;
-		}
-		if (rank >= 20)
-		{
-			attri = 1;
-		}
-		
-		ch[co].data[45] = rank;
-		
-		ch[co].hp[1]   = hp * min(20,rank);
-		ch[co].mana[1] = mana * min(20,rank);
-		if (attri)
-		{
-			temp = ch[co].temp;
-			for (n = 0; n<5; n++) 
-				ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri * min(5, max(0,rank-19));
-		}
-		
+		ch[co].citem = old.citem;
 		for (n = 0; n<MAXITEMS; n++) {ch[co].item[n] = old.item[n]; it[ch[co].item[n]].carried = co;}
 		for (n = 0; n<20; n++) {ch[co].worn[n] = old.worn[n]; it[ch[co].worn[n]].carried = co;}
 		for (n = 0; n<12; n++) {ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;}
 		
 		// Re-acquire previously learned skills
-		if (old.skill[ 5][0] && ch[co].skill[ 5][2]) ch[co].skill[ 5][0] = 1; // Staff
-		if (old.skill[10][0] && ch[co].skill[10][2]) ch[co].skill[10][0] = 1; // Swimming
-		if (old.skill[12][0] && ch[co].skill[12][2]) ch[co].skill[12][0] = 1; // Barter
-		if (old.skill[13][0] && ch[co].skill[13][2]) ch[co].skill[13][0] = 1; // Repair
-		if (old.skill[48][0] && ch[co].skill[48][2]) ch[co].skill[48][0] = 1; // Taunt
-		if (old.skill[42][0] && ch[co].skill[42][2]) ch[co].skill[42][0] = 1; // Poison
-		if (old.skill[34][0] && ch[co].skill[34][2]) ch[co].skill[34][0] = 1; // Concentrate
-		if (old.skill[16][0] && ch[co].skill[16][2]) ch[co].skill[16][0] = 1; // Shield
-		if (old.skill[18][0] && ch[co].skill[18][2]) ch[co].skill[18][0] = 1; // Enhance
-		if ((IS_ANY_TEMP(co) || IS_BRAVER(co)) && 
-			old.skill[11][0] && ch[co].skill[11][2]) ch[co].skill[11][0] = 1; // MShield (For T/B)
-		if (old.skill[19][0] && ch[co].skill[19][2]) ch[co].skill[19][0] = 1; // Slow
-		if (old.skill[20][0] && ch[co].skill[20][2]) ch[co].skill[20][0] = 1; // Curse
-		if (old.skill[21][0] && ch[co].skill[21][2]) ch[co].skill[21][0] = 1; // Bless
-		if (old.skill[22][0] && ch[co].skill[22][2]) ch[co].skill[22][0] = 1; // Identify
-		if (old.skill[23][0] && ch[co].skill[23][2]) ch[co].skill[23][0] = 1; // Resistance
-		if (old.skill[25][0] && ch[co].skill[25][2]) ch[co].skill[25][0] = 1; // Dispel
-		if (old.skill[26][0] && ch[co].skill[26][2]) ch[co].skill[26][0] = 1; // Heal
-		if (old.skill[29][0] && ch[co].skill[29][2]) ch[co].skill[29][0] = 1; // Rest
-		if (old.skill[32][0] && ch[co].skill[32][2]) ch[co].skill[32][0] = 1; // Immunity
-		if (old.skill[33][0] && ch[co].skill[33][2]) ch[co].skill[33][0] = 1; // Surround Hit
-		if (old.skill[41][0] && ch[co].skill[41][2]) ch[co].skill[41][0] = 1; // Weaken
-		if (old.skill[47][0] && ch[co].skill[47][2]) ch[co].skill[47][0] = 1; // Haste
-		
-		if (old.skill[ 7][0] && ch[co].skill[ 7][2]) ch[co].skill[ 7][0] = 1; // Zephyr
-		if (old.skill[35][0] && ch[co].skill[35][2]) ch[co].skill[35][0] = 1; // Warcry
-		if (old.skill[15][0] && ch[co].skill[15][2]) ch[co].skill[15][0] = 1; // Lethargy
-		if (old.skill[43][0] && ch[co].skill[43][2]) ch[co].skill[43][0] = 1; // Pulse
-		if (old.skill[46][0] && ch[co].skill[46][2]) ch[co].skill[46][0] = 1; // Shadow
-		if (old.skill[49][0] && ch[co].skill[49][2]) ch[co].skill[49][0] = 1; // Leap
-		if (old.skill[14][0] && ch[co].skill[14][2]) ch[co].skill[14][0] = 1; // Rage
+		for (n = 0; n<50; n++) if (old.skill[n][0] && ch[co].skill[n][2]) ch[co].skill[n][0] = 1;
 		
 		if (old.flags & CF_SENSE)    ch[co].flags |= CF_SENSE;
 		if (old.flags & CF_APPRAISE) ch[co].flags |= CF_APPRAISE;
@@ -4242,43 +4292,59 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].pandium_floor[1] = old.pandium_floor[1];
 		ch[co].pandium_floor[2] = old.pandium_floor[2];
 		
-		for (n=0;n<5;n++) ch[co].limit_break[n][0] = old.limit_break[n][0];
-		
-		// delete this after reset
-		/*
-		if (ch[co].pandium_floor[2]>=2)
+		if (ch[co].pandium_floor[2] >= 2)
 		{
+			chlog(co, "Pandium Floor 2 : OK");
 			ch[co].hp[2]   += 50;
 			ch[co].mana[2] += 50;
 		}
-		if (ch[co].pandium_floor[2]>=3)
+		if (ch[co].pandium_floor[2] >= 3)
 		{
-			if 		(IS_SEYAN_DU(co)) 	 tmp = SK_PROX;
-			else if (IS_ARCHTEMPLAR(co)) tmp = SK_DISPEL;
-			else if (IS_SKALD(co)) 		 tmp = SK_PRECISION;
-			else if (IS_WARRIOR(co)) 	 tmp = SK_GEARMAST;
-			else if (IS_SORCERER(co)) 	 tmp = SK_MSHIELD;
-			else if (IS_SUMMONER(co)) 	 tmp = SK_STEALTH;
-			else if (IS_ARCHHARAKIM(co)) tmp = SK_GCMASTERY;
-			else if (IS_BRAVER(co)) 	 tmp = SK_IMMUN;
-			if (tmp)
+			n = 0;
+			if 		(IS_SEYAN_DU(co)) 	 n = SK_PROX;
+			else if (IS_ARCHTEMPLAR(co)) n = SK_DISPEL;
+			else if (IS_SKALD(co)) 		 n = SK_PRECISION;
+			else if (IS_WARRIOR(co)) 	 n = SK_GEARMAST;
+			else if (IS_SORCERER(co)) 	 n = SK_MSHIELD;
+			else if (IS_SUMMONER(co)) 	 n = SK_STEALTH;
+			else if (IS_ARCHHARAKIM(co)) n = SK_GCMASTERY;
+			else if (IS_BRAVER(co)) 	 n = SK_IMMUN;
+			if (n)
 			{
-				ch[co].skill[tmp][0] =  1;
-				ch[co].skill[tmp][2] = 75;
-				ch[co].skill[tmp][3] =  8;
+				ch[co].skill[n][0] =  1;
+				ch[co].skill[n][2] = 75 + (bits?min(5,max(0,bits/6)):0);
+				ch[co].skill[n][3] =  8;
+				chlog(co, "Pandium Floor 3 : OK");
 			}
 		}
-		if (ch[co].pandium_floor[2]>=4)
+		if (ch[co].pandium_floor[2] >= 4)
 		{
+			chlog(co, "Pandium Floor 4 : OK");
 			ch[co].end[0]  += 50;
 		}
-		*/
 		
-		god_transfer_char(co, 512, 512);
+		ch[co].tree_points = old.tree_points;
+		
+		for (n=0;n<5;n++) ch[co].limit_break[n][0] = old.limit_break[n][0];
+		
+		if (keepstuff==1) 
+		{
+			god_transfer_char(co, HOME_TEMPLE_X, HOME_TEMPLE_Y);
+		}
+		else
+		{
+			ch[co].temple_x = ch[co].tavern_x = HOME_START_X;
+			ch[co].temple_y = ch[co].tavern_y = HOME_START_Y;
+		
+			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			god_transfer_char(co, HOME_START_X, HOME_START_Y);
+			char_play_sound(co, ch[co].sound + 22, -150, 0);
+			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+		}
 	}
 	else
 	{
-		for (n = 0; n<MAXITEMS; n++) ch[co].item[n] 		= 0;
+		for (n = 0; n<MAXITEMS; n++) ch[co].item[n] = 0;
 		for (n = 0; n<20; n++) ch[co].worn[n] 		= 0;
 		for (n = 0; n<12; n++) ch[co].alt_worn[n] 	= 0;
 		
@@ -4308,7 +4374,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[60] = 0;
 		ch[co].data[61] = 0;
 		ch[co].data[62] = 0;
-		ch[co].data[CHD_MASTER] = 0;
+		ch[co].data[63] = 0;
 		ch[co].data[70] = 0;
 		ch[co].data[93] = 0;
 		ch[co].data[73] = 0;

@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000A00
-#define MINVERSION			0x000A00
+#define VERSION				0x000A06
+#define MINVERSION			0x000A06
 
 #define DATDIR				".dat"
 
@@ -138,19 +138,26 @@
 #define LAB_XIII_Y			 160
 //
 #define LAB_XIV_X			 118
-#define LAB_XIV_Y			 1095
+#define LAB_XIV_Y			1095
 #define LAB_XV_X			 133
-#define LAB_XV_Y			 1152
+#define LAB_XV_Y			1152
 #define LAB_XVI_X			 145
-#define LAB_XVI_Y			 1276
+#define LAB_XVI_Y			1276
 #define LAB_XVII_X			 163
-#define LAB_XVII_Y			 1398
-#define LAB_XVIII_X			 512
-#define LAB_XVIII_Y			 512
-#define LAB_XIX_X			 512
-#define LAB_XIX_Y			 512
-#define LAB_XX_X			 512
-#define LAB_XX_Y			 512
+#define LAB_XVII_Y			1398
+#define LAB_XVIII_X			  98
+#define LAB_XVIII_Y			1478
+#define LAB_XIX_X			 256
+#define LAB_XIX_Y			1665
+#define LAB_XX_X			 204
+#define LAB_XX_Y			1481
+//
+#define TLG_X1				 194
+#define TLG_Y1				1544
+#define TLG_X2				 214
+#define TLG_Y2				1564
+#define TLG_MIDX			 204
+#define TLG_MIDY			1554
 
 #define CNTSAY				(TICKS)
 #define MAXSAY				(TICKS*7)
@@ -344,7 +351,6 @@
 
 #define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
-#define SP_DUR_TAUNT		( TICKS *  5                      )
 #define SP_DUR_GUARD		( TICKS * 30                      )
 #define SP_DUR_PULSE		( TICKS * 60 * 5                  )
 #define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )

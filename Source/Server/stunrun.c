@@ -250,7 +250,7 @@ int npc_check_target(int x, int y)
 	m = x + y * MAPX;
 
 	if (((unsigned long)map[m].flags & (MF_MOVEBLOCK | MF_NOMONST)) || map[m].ch || map[m].to_ch ||
-	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
+	    (IS_SANEITEM(in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
 	{
 		return 0;
 	}

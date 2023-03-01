@@ -464,14 +464,14 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Blast, with power based on your weapon value and top damage, ignoring spell modifier.\n");
 		break;
 	case IT_WP_CROSSBLAD: 
-		do_char_log(cn, 5, "When equipped, Surround Hit has a base radius of 2.\n");
+		do_char_log(cn, 5, "When equipped, Surround Hit has a base radius of 4.\n");
 		break;
 	case IT_WP_GUNGNIR: 
 		do_char_log(cn, 5, "When equipped, bleeding you inflict deals twice as much damage.\n");
 		break;
 	
 	case IT_BONEARMOR: 
-		do_char_log(cn, 4, "Become undead.\n");
+		do_char_log(cn, 5, "When equipped, all armor is converted to health regeneration.\n");
 		break;
 	case IT_ICELOTUS: 
 		do_char_log(cn, 4, "You may only equip one Ice Lotus at a time.\n");

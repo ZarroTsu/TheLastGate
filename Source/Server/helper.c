@@ -29,6 +29,8 @@ static char  _visi[VISI_SIZE * VISI_SIZE]; // 02162020 - updated from 40x40 to 6
 static int   ox = 0, oy = 0;
 static char  ismonster = 0;
 static char  isbuilding = 0;
+static char  isinfrapot = 0;
+static char  withoutcn = 0;
 
 static inline void add_vis(int x, int y, int v)
 {
@@ -55,9 +57,23 @@ static inline int check_map_see(int x, int y)
 		return 1;
 	}
 	
-	if (ismonster)
+	if (ismonster && isinfrapot)
+	{
+		if ((map[m].flags & MF_SIGHTBLOCK) && (map[m].flags & MF_MOVEBLOCK) || (map[m].flags & MF_NOMONST))
+		{
+			return 0;
+		}
+	}
+	else if (ismonster)
 	{
 		if (map[m].flags & (MF_SIGHTBLOCK | MF_NOMONST))
+		{
+			return 0;
+		}
+	}
+	else if (isinfrapot || withoutcn)
+	{
+		if ((map[m].flags & MF_SIGHTBLOCK) && (map[m].flags & MF_MOVEBLOCK))
 		{
 			return 0;
 		}
@@ -356,6 +372,7 @@ int can_see(int cn, int _fx, int _fy, int tx, int ty, int maxdist)
 
 	if (cn)
 	{
+		withoutcn = 0;
 		visi = see[cn].vis;
 		if (_fx!=see[cn].x || _fy!=see[cn].y)
 		{
@@ -374,6 +391,14 @@ int can_see(int cn, int _fx, int _fy, int tx, int ty, int maxdist)
 			else
 			{
 				isbuilding = 0;
+			}
+			if ((((ch[(cn)].flags & CF_IGN_SB) != 0) || IS_MONSTER(cn)) && IS_IN_ZRAK(ch[cn].x, ch[cn].y))
+			{
+				isinfrapot = 1;
+			}
+			else
+			{
+				isinfrapot = 0;
 			}
 			can_map_see(_fx, _fy, maxdist);
 			see[cn].x = _fx;
@@ -397,6 +422,9 @@ int can_see(int cn, int _fx, int _fy, int tx, int ty, int maxdist)
 		if (ox!=_fx || oy!=_fy)
 		{
 			ismonster = 0;
+			isinfrapot = 0;
+			isbuilding = 0;
+			withoutcn = 1;
 			can_map_see(_fx, _fy, maxdist);
 		}
 	}
@@ -1360,7 +1388,7 @@ int change_xp_shop_item(int cn, int nr)
 	return -1;
 }
 
-int get_special_item(int in, int gen_a, int gen_b, int gen_c)
+int get_special_item(int cn, int in, int gen_a, int gen_b, int gen_c)
 {
 	int in2;
 	switch(in)
@@ -1394,11 +1422,13 @@ int get_special_item(int in, int gen_a, int gen_b, int gen_c)
 			in2 = god_create_item(in);
 			if (it[in2].temp == IT_EXPS)
 			{
-				it[in2].data[0] = 2000 + RANDOM(25) * 2000;
+				it[in2].data[0] = 200*(getrank(cn)+1) + RANDOM(getrank(cn)+6) * 2000;
+				it[in2].min_rank = max(0, getrank(cn)-3);
 			}
 			else if (it[in2].temp == IT_LUKS)
 			{
-				it[in2].data[0] = 200 + RANDOM(24) * 100;
+				it[in2].data[0] = 20*(getrank(cn)+1) + RANDOM(getrank(cn)+6) * 100;
+				it[in2].min_rank = max(0, getrank(cn)-3);
 			}
 			break;
 	}
@@ -2044,9 +2074,9 @@ struct npc_class npc_class[] = {
 	{"Dwarf"                    },	// 211
 	{"Pirate"                   },	// 212
 	{"F.Marshal Gargoyle"       },	// 213
-	{""                     	},	// 214
-	{""                     	},	// 215
-	{""                     	},	// 216
+	{"Enforcer"                 },	// 214
+	{"Scaleling"                },	// 215
+	{"Dragon"                   },	// 216
 	{""                     	},	// 217
 	{""                     	},	// 218
 	{""                     	},	// 219
@@ -3017,7 +3047,7 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 	it[in2].weapon[0] = it_temp[temp].weapon[0] + it[in2].ss_weapon;
 	it[in2].weapon[1] = it_temp[temp].weapon[1];
 	
-	if (NOT_SINBINDER(in2))
+	if (temp && NOT_SINBINDER(in2))
 	{
 		it[in2].sprite[0] = it_temp[temp].sprite[0];
 		it[in2].sprite[1] = it_temp[temp].sprite[1];
@@ -3030,22 +3060,15 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
 	it[in2].min_rank = min(24, max(rank-3, it[in2].min_rank));
 	it[in2].value -= 1;
+	it[in2].power += rank * 5;
 	
 	if (!HAS_ENCHANT(in2, 34))
 	{
 		it[in2].flags &= ~IF_NOREPAIR;
-		if (!it[in2].max_damage)
-		{
-			if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = 2500 * it[in2].weapon[0]/2;
-			else if (it[in2].flags & IF_BOOK)	it[in2].max_damage = 90000;
-			else if (it[in2].power == 60)		it[in2].max_damage = 65000;
-			else if (it[in2].power == 75)		it[in2].max_damage = 85000;
-			else								it[in2].max_damage = 60000;
-		}
+		if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = it[in2].power * 4000;
+		else								it[in2].max_damage = it[in2].power * 1000;
 	}
 	
-	it[in2].power += rank * 5;
-
 	use_consume_item(cn, in, 1);
 
 	sprintf(it[in2].description, "A %s enhanced by a rank %d soulstone.", it[in2].name, rank);
@@ -3564,7 +3587,7 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].weapon[0] = it_temp[temp].weapon[0] + it[in2].ss_weapon;
 	it[in2].weapon[1] = it_temp[temp].weapon[1];
 	
-	if (NOT_SINBINDER(in2))
+	if (temp && NOT_SINBINDER(in2))
 	{
 		it[in2].sprite[0] = it_temp[temp].sprite[0];
 		it[in2].sprite[1] = it_temp[temp].sprite[1];
@@ -3581,6 +3604,13 @@ int use_talisman(int cn, int in, int in2)
 	
 	it[in2].value -= 1;
 	it[in2].power += 15;
+	
+	if ((it[in2].flags & IF_SOULSTONE) && !HAS_ENCHANT(in2, 34))
+	{
+		it[in2].flags &= ~IF_NOREPAIR;
+		if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = it[in2].power * 4000;
+		else								it[in2].max_damage = it[in2].power * 1000;
+	}
 	
 	do_char_log(cn, 2, "You enchanted the %s with the talisman.\n", it[in2].name);
 	use_consume_item(cn, in, 1);

@@ -29,7 +29,7 @@ void plr_map_remove(int cn)     // remove character from map
 
 	if (!(ch[cn].flags & CF_BODY))
 	{
-		if ((in = map[m].it)!=0 && (it[in].flags & IF_STEPACTION))
+		if (IS_SANEITEM(in = map[m].it) && (it[in].flags & IF_STEPACTION))
 		{
 			step_driver_remove(cn, in);
 		}
@@ -96,14 +96,53 @@ void step_vantablack(int cn)
 {
 	if (!has_buff(cn, 215))
 	{
+		remove_buff(cn, SK_LIGHT);
 		debuff_vantablack(cn);
 		do_char_log(cn, 0, "You feel a terrible curse wash over you.\n");
 	}
 }
 
+void step_oppressed(int cn, int fl)
+{
+	int in, m;
+	
+	if (in = has_buff(cn, SK_OPPRESSED2))
+	{
+		if (bu[in].power != fl)
+		{
+			bu[in].power = fl;
+			for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl)*2);
+			for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl)*2);
+			do_char_log(cn, 0, "You feel the pressure on you shift.\n");
+			do_update_char(cn);
+		}
+	}
+	else
+	{
+		in = god_create_buff();
+		
+		strcpy(bu[in].name, "Oppressed");
+		strcpy(bu[in].reference, "oppressed");
+		strcpy(bu[in].description, "oppressed.");
+		
+		bu[in].power = fl;
+		for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl)*2);
+		for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl)*2);
+		
+		bu[in].active = bu[in].duration = 1;
+		bu[in].flags  = IF_SPELL | IF_PERMSPELL;
+		bu[in].temp = SK_OPPRESSED2;
+		bu[in].sprite[1] = 1015;
+		
+		add_spell(cn, in);
+		
+		do_char_log(cn, 0, "You feel something press down on you.\n");
+	}
+}
+
 void plr_map_set(int cn)        // set character to map and remove target character
 {
-	int m, in, ret, x, y;
+	int m, n, in, ret, x, y;
 	int to_x, to_y;
 	int x_offset=0, y_offset=0;
 
@@ -111,7 +150,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 
 	if (!(ch[cn].flags & CF_BODY))
 	{
-		if ((in = map[m].it)!=0 && (it[in].flags & IF_STEPACTION))
+		if (IS_SANEITEM(in = map[m].it) && (it[in].flags & IF_STEPACTION))
 		{
 			ret = step_driver(cn, in);
 			if (ret==1)
@@ -140,11 +179,18 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 					ch[cn].goto_x = 0;
 					ch[cn].goto_y = 0;
 					ch[cn].misc_action = 0;
-
+					
 					if (ch[cn].light)
 					{
 						do_add_light(ch[cn].x, ch[cn].y, ch[cn].light);
 					}
+					
+					/*
+					//reset_go(ch[cn].x, ch[cn].y);
+					remove_lights(ch[cn].x, ch[cn].y);
+					//reset_go(ch[cn].x, ch[cn].y);
+					add_lights(ch[cn].x, ch[cn].y);
+					*/
 					return;
 				}
 				else
@@ -180,7 +226,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 				ch[cn].goto_x = 0;
 				ch[cn].goto_y = 0;
 				ch[cn].misc_action = 0;
-
+				
 				if (ch[cn].light)
 				{
 					do_add_light(ch[cn].x, ch[cn].y, ch[cn].light);
@@ -197,16 +243,11 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 				return;
 			}
 		}
-		// Heatstroke for lab 6 & Volcano
-		else if (IS_IN_SUN(ch[cn].x, ch[cn].y))
+		else if (IS_SANEPLAYER(cn) || IS_PLAYER_COMP(cn))
 		{
-			if (ch[cn].flags & CF_PLAYER)
-				step_desertfloor(cn);
-		}
-		else if (IS_IN_VANTA(ch[cn].x, ch[cn].y))
-		{
-			if (ch[cn].flags & CF_PLAYER)
-				step_vantablack(cn);
+			if (IS_IN_SUN(ch[cn].x, ch[cn].y)) 				step_desertfloor(cn); // Heatstroke for lab 6 & Volcano
+			else if (IS_IN_VANTA(ch[cn].x, ch[cn].y)) 		step_vantablack(cn);
+			else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y)) 	step_oppressed(cn, n);
 		}
 
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))
@@ -223,7 +264,8 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		}
 
 		if (((map[m].flags & MF_NOMAGIC) && !char_wears_item(cn, 466) && !char_wears_item(cn, 481) && 
-			!char_wears_item(cn, IT_AM_TRUESUN)) || char_wears_item(cn, IT_AM_FALMOON)) // Sun amulet or Dark Sun amulet
+			!char_wears_item(cn, IT_AM_TRUESUN)) || (IS_MONSTER(cn) && IS_IN_XIX(ch[cn].x, ch[cn].y)) || 
+			char_wears_item(cn, IT_AM_FALMOON)) // Sun amulet or Dark Sun amulet
 		{
 			if (!(ch[cn].flags & CF_NOMAGIC))
 			{
@@ -252,7 +294,6 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		{
 			do_add_light(ch[cn].x, ch[cn].y, ch[cn].light);
 		}
-		
 		if (map[m].flags & MF_DEATHTRAP)
 		{
 			if (try_lucksave(cn))
@@ -483,7 +524,7 @@ void plr_attack(int cn, int surround)
 
 void plr_give(int cn)
 {
-	int co, x, y;
+	int co, x, y, in;
 
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 
@@ -518,6 +559,12 @@ void plr_give(int cn)
 	if (!co)
 	{
 		do_char_log(cn, 2, "Your target moved away!\n");
+		return;
+	}
+	
+	if (IS_PLAYER(co) && (in = ch[cn].citem) && !(in & 0x80000000) &&
+		(it[in].temp==IT_COMMAND1 || it[in].temp==IT_COMMAND2 || it[in].temp==IT_COMMAND3 || it[in].temp==IT_COMMAND4))
+	{
 		return;
 	}
 
@@ -778,7 +825,7 @@ void plr_drop(int cn)
 		return;
 	}
 
-	if ((in2 = map[m].it)!=0 && (it[in2].flags & IF_STEPACTION))
+	if (IS_SANEITEM(in2 = map[m].it) && (it[in2].flags & IF_STEPACTION))
 	{
 		step_driver(cn, in2);
 		ch[cn].cerrno = ERR_FAILED;
@@ -944,6 +991,7 @@ void plr_misc(int cn)
 
 int plr_check_target(int m)
 {
+	int mt;
 	if (map[m].ch || map[m].to_ch)
 	{
 		return 0;
@@ -954,7 +1002,7 @@ int plr_check_target(int m)
 		return 0;
 	}
 
-	if (map[m].it && (it[map[m].it].flags & IF_MOVEBLOCK))
+	if (IS_SANEITEM(mt = map[m].it) && (it[mt].flags & IF_MOVEBLOCK))
 	{
 		return 0;
 	}
@@ -991,6 +1039,12 @@ void act_move_up(int cn)
 		return;
 	}
 	if (ch[cn].dir!=DX_UP)
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		return;
+	}
+
+	if (IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND1)) // Lab 18 - Cannot move West
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;
@@ -1132,6 +1186,12 @@ void act_move_leftup(int cn)
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
+	
+	if (IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND1)) // Lab 18 - Cannot move West
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		return;
+	}
 
 	if (!do_char_can_flee(cn))
 	{
@@ -1224,6 +1284,12 @@ void act_move_rightup(int cn)
 		return;
 	}
 	if (ch[cn].dir!=DX_RIGHTUP)
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		return;
+	}
+	
+	if (IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND1)) // Lab 18 - Cannot move West
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;
@@ -2023,9 +2089,17 @@ void act_use(int cn)            // get the object in front of the character
 
 void act_drop(int cn)           // drops the current object in front of the character
 {
+	int in;
+	
 	ch[cn].cerrno = ERR_NONE;
 
 	if (!do_char_can_flee(cn) || (ch[cn].flags & CF_SIMPLE))
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		return;
+	}
+	if ((in = ch[cn].citem) && !(in & 0x80000000) &&
+		it[in].temp==IT_COMMAND1 || it[in].temp==IT_COMMAND2 || it[in].temp==IT_COMMAND3 || it[in].temp==IT_COMMAND4)
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;

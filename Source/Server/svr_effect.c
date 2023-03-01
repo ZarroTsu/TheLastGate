@@ -261,7 +261,7 @@ void effect_tick(void)
 						{
 							flag = 1;
 						}
-						if (ch[co].temp == CT_PANDIUM)
+						if (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_LAB20_KEEP)
 						{
 							flag = 0;
 						}
@@ -286,7 +286,7 @@ void effect_tick(void)
 								// Eyeball kings take extra time to respawn
 								if (IS_LONG_RESPAWN(temp))
 									rtimer = TICKS * 60 * 16 + RANDOM(TICKS * 60 * 4); // 16 - 20 minutes
-								else if (temp == CT_PANDIUM)
+								else if (temp == CT_PANDIUM || temp == CT_LAB20_KEEP)
 									rtimer = TICKS * 5;
 								if (IS_GLOB_MAYHEM)
 									rtimer = rtimer/2;

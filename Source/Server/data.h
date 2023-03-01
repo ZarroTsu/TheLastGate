@@ -266,6 +266,7 @@ extern unsigned int mapmarker;
 #define CF_OVERRIDE		(1ull<<60)  // Allow overriding friendly spells on self
 #define CF_ALW_SPECT	(1ull<<61)  // Allow spectating
 #define CF_SENSE		(1ull<<62)  // Sense Magic Flag		(ch[co].flags & CF_SENSE)
+#define CF_IGN_SB		(1ull<<63)  // Ignore sightblack tiles with no !move present
 
 #define AT_CAP				300
 #define SPEED_CAP 			300
@@ -387,6 +388,8 @@ extern unsigned int mapmarker;
 #define SK_SLOW3		53
 #define SK_OPPRESSION	54
 #define SK_OPPRESSED	55
+#define SK_DIVINITY		56
+#define SK_OPPRESSED2	57
 
 
 /*
@@ -608,8 +611,9 @@ struct character
 	unsigned short mana_cost;		// Mana cost multiplier.  Factor of 1:100, where 10000 is the median 100%.
 	
 	unsigned short tree_points;		// Points allocated (upper 12 bits) and available (lower 4 bits)
+	unsigned int rebirth;			// Rebirth state (bit 1) and collected poles.
 	
-	char future2[19];				// space for future expansion
+	char future2[15];				// space for future expansion
 
 	unsigned int depot[62];
 

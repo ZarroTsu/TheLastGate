@@ -148,6 +148,14 @@ int use_door(int cn, int in)
 	{
 		it[in].flags &= ~(IF_MOVEBLOCK | IF_SIGHTBLOCK);
 		it[in].data[1] = 0;
+		if (it[in].temp==IT_XIXDOOR && !has_item(cn, IT_CHALICE5) && !has_buff(cn, SK_DIVINITY))
+		{
+			do_area_log(0, 0, ch[cn].x, ch[cn].y, 3, "Skua: \"Beware, %s. The Purple One lies beyond that portal. You may try, but I fear you may not be prepared to best them yet...\"\n", ch[cn].name);
+		}
+		else if (it[in].temp==IT_XIXDOOR && has_item(cn, IT_CHALICE5) && !has_buff(cn, SK_DIVINITY))
+		{
+			do_area_log(0, 0, ch[cn].x, ch[cn].y, 3, "Skua: \"Be sure to drink deep of the chalice before you proceed, %s!\"\n", ch[cn].name);
+		}
 	}
 	else
 	{
@@ -218,6 +226,11 @@ int use_create_item(int cn, int in)
 			strcpy(it[in2].description, buf);
 		}
 	}
+	
+	if (it[in2].temp==IT_COMMAND1) do_area_log(0, 0, ch[cn].x, ch[cn].y, 7, "Thou shalt not move west.\n");
+	if (it[in2].temp==IT_COMMAND2) do_area_log(0, 0, ch[cn].x, ch[cn].y, 7, "Thou shalt not cross the color green.\n");
+	if (it[in2].temp==IT_COMMAND3) do_area_log(0, 0, ch[cn].x, ch[cn].y, 7, "Thou shalt not see beyond torchlight.\n");
+	if (it[in2].temp==IT_COMMAND4) do_area_log(0, 0, ch[cn].x, ch[cn].y, 7, "Thou shalt not pass between two golden candles.\n");
 	
 	if (it[in2].driver==48) it[in2].stack = it[in2].data[2];
 
@@ -419,7 +432,7 @@ int use_create_item3(int cn, int in)
 			if (n==IT_DAGG_DAMA) n = 2053;
 			if (n==IT_DAGG_ADAM) n = 1784;
 		}
-		in2 = get_special_item(n, 0, 0, RANDOM(32)+1);
+		in2 = get_special_item(cn, n, 0, 0, RANDOM(32)+1);
 	}
 	/*
 	else if ((n >= 284 && n <= 292) || n==1779 ||
@@ -489,7 +502,7 @@ int use_create_item3(int cn, int in)
 	*/
 	else
 	{
-		in2 = get_special_item(n, 0, 0, 0);
+		in2 = get_special_item(cn, n, 0, 0, 0);
 	}
 
 	if (!in2)
@@ -1722,7 +1735,7 @@ void finish_laby_teleport(int cn, int nr, int exp)
 
 		do_give_exp(cn, exp, 0, -1);
 		chlog(cn, "Solved Labyrinth Part %d", nr+((nr>=13)?1:0));
-		if (nr>=13)
+		if (nr>=13 && st_skill_pts_all(ch[cn].tree_points)<nr-12)
 		{
 			do_char_log(cn, 7, "You earned 1 skill point.\n");
 			ch[cn].tree_points++;
@@ -1887,6 +1900,7 @@ int reward_teleport(int cn, int in)
 					default: n = IT_EXPS; break;
 				}	in2 = god_create_item(n);
 				it[in2].data[0] = (2000 + it[in].data[9]*1000 + RANDOM(it[in].data[9]+10)*200) / ((n==IT_LUKS)?20:1);
+				it[in2].min_rank = max(0, getrank(cn)-3);
 			}
 		}
 		else
@@ -2085,9 +2099,9 @@ int use_labyrinth(int cn, int in)
 	
 	if (it[in].data[0]==1)
 	{
-		if (ch[cn].data[20]>=16)
+		if (ch[cn].data[20]<=11)
 		{
-			do_char_log(cn, 0, "You have already solved all existing parts of the labyrinth. Please come back later.\n");
+			do_char_log(cn, 0, "You must clear the previous labyrinth before you can proceed.\n");
 		}
 		else if (!IS_ANY_ARCH(cn))
 		{
@@ -2345,9 +2359,25 @@ int use_bag(int cn, int in)
 	}
 	if ((ch[co].flags & CF_BODY) && (ch[cn].flags & CF_AUTOLOOT))
 	{
+		if (IS_SANEITEM(in2 = ch[co].citem))
+		{
+			god_take_from_char(in2, co);
+			if (god_give_char(in2, cn))
+			{
+				chlog(cn, "Autoloot %s", it[in2].name);
+				do_char_log(cn, 1, "You autoloot a %s.\n", it[in2].reference);
+				emptyinv = 1;
+			}
+			else
+			{
+				god_give_char(in2, co);
+				do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+				emptyinv = 0;
+			}
+		}
 		for (nr=0; nr<MAXITEMS; nr++)
 		{
-			if ((in2 = ch[co].item[nr])!=0)
+			if (IS_SANEITEM(in2 = ch[co].item[nr]))
 			{
 				god_take_from_char(in2, co);
 				if (god_give_char(in2, cn))
@@ -2995,13 +3025,13 @@ int use_map_chest(int cn, int in)
 		{
 			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
-			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  2:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  3: 	n = IT_CH_FOOL; 														break;
 			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
 			//
 			case  6: 	n = !RANDOM(3)?(RANDOM(2)?102:125):101; 								break;
-			case  7:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  7:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  8:	n = IT_POP_SPELL+RANDOM(7);												break;
 			case  9: 	n = IT_POP_ASPEL+RANDOM(7); 											break;
 			case 10:	
@@ -3024,7 +3054,7 @@ int use_map_chest(int cn, int in)
 			case  7:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
 			case  8:	
 			case  9: 	n = IT_POP_ASPEL+RANDOM(7); 											break;
-			case 10:	n = RANDOM(2+tier)?IT_RPOT:IT_POT_RAIN; 								break;
+			case 10:	n = RANDOM(1+tier)?IT_RPOT:IT_POT_RAIN; 								break;
 			case 11:	n = -1000;																break;
 			default:	n = RANDOM(1+tier)?IT_RD_HP+RANDOM(2)*2:IT_POT_VITA+RANDOM(3); 			break;
 		}
@@ -3035,18 +3065,18 @@ int use_map_chest(int cn, int in)
 		{
 			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
-			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  2:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  3: 	n = IT_CH_FOOL_R; 														break;
 			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
 			//
-			case  6: 	n = RANDOM(2+tier)?IT_RD_HP+RANDOM(2)*2:IT_POT_VITA+RANDOM(3); 			break;
-			case  7:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  6: 	n = RANDOM(2+tier)?(IT_RD_HP+RANDOM(2)*2):(IT_POT_VITA+RANDOM(3)); 		break;
+			case  7:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  8:	n = IT_POP_ASPEL+RANDOM(7); 											break;
 			case  9: 	n = IT_POP_ISPEL+RANDOM(7); 											break;
 			case 10:	n = -1000;																break;
-			case 11:	n = RANDOM(6)?2510:(IT_BL_SOLAR+RANDOM(2));								break;
-			default:	n = RANDOM(1+tier)?IT_GPOT:IT_RPOT;										break;
+			case 11:	n = 2510;																break;
+			default:	n = RANDOM(tier)?IT_GPOT:(RANDOM(1+tier)?IT_RPOT:IT_POT_RAIN);			break;
 		}
 	}
 	else if (rank <= 24)	// Nobles
@@ -3055,15 +3085,15 @@ int use_map_chest(int cn, int in)
 		{
 			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
-			case  2:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  2:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  3: 	n = IT_CH_FOOL_R; 														break;
 			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
 			//
-			case  6:	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  6:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  7:	
 			case  8: 	n = IT_POP_ISPEL+RANDOM(7); 											break;
-			case  9:	n = RANDOM(2+tier)?IT_GPOT:IT_RPOT; 									break;
+			case  9:	n = RANDOM(1+tier)?IT_GPOT:IT_RPOT; 									break;
 			case 10:	n = -1000;																break;
 			case 11:	n = RANDOM(6)?2511:(1243+RANDOM(2)*2);									break;
 			default:	n = RANDOM(1+tier)?IT_RD_BRV+RANDOM(5):IT_RD_HP+RANDOM(2)*2; 			break; 
@@ -3076,18 +3106,18 @@ int use_map_chest(int cn, int in)
 			case  0:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  1:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
 			case  2:	
-			case  3: 	n = RANDOM(2)?IT_EXPS+RANDOM(2):IT_EXPS;								break;
+			case  3: 	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
 			case  4:	n = RANDOM(2)?get_best_worn(cn, WN_HEAD):get_best_worn(cn, WN_BODY);	break;
 			case  5:	n = RANDOM(2)?get_best_worn(cn, WN_RHAND):get_best_worn(cn, WN_LHAND);	break;
 			//
 			case  6:	n = IT_POP_ISPEL+RANDOM(7); 											break;
 			case  7: 	n = IT_POP_SSPEL+RANDOM(7); 											break;
-			case  8:	n = RANDOM(1+tier)?IT_SPOT:IT_GPOT; 									break;
+			case  8:	n = RANDOM(tier)?IT_SPOT:(RANDOM(1+tier)?IT_GPOT:IT_RPOT); 				break;
 			case  9:	n = -1000;																break;
-			case 10:	n = RANDOM(2+tier)?IT_RD_BRV+RANDOM(5):IT_RD_HP+RANDOM(2)*2; 			break;
+			case 10:	n = RANDOM(2+tier)?(IT_RD_BRV+RANDOM(5)):(IT_RD_HP+RANDOM(2)*2); 		break;
 			case 11: 	n = IT_POT_D_HP+RANDOM(3)*6; 											break;
 			case 12:	
-			case 13:	n = IT_OS_SK; 															break; 
+			case 13:	n = RANDOM(tier)?IT_OS_SK:2511; 										break; 
 			case 14:
 			case 15:	n = IT_OS_BRV+RANDOM(5);												break; 
 			default:	n = IT_OS_SK; 															break; 
@@ -3110,10 +3140,10 @@ int use_map_chest(int cn, int in)
 	{
 		if (n<=0 || n>=MAXTITEM)
 		{
-			return 0;
+			n = IT_POT_RAIN;
 		}
 		
-		in2 = get_special_item(n, 0, 0, 0);
+		in2 = get_special_item(cn, n, 0, 0, 0);
 		
 		if (!in2)
 		{
@@ -3582,7 +3612,7 @@ int use_augment_item(int cn, int in)
 
 int use_pandium_shrine(int cn, int in)
 {
-	int n, cc, tmp=999;
+	int n, cc, tmp=999, bits = 0;
 	
 	if (cn==0)
 	{
@@ -3637,8 +3667,9 @@ int use_pandium_shrine(int cn, int in)
 				do_char_log(cn, 0, "Nothing happened. (bad data)\n"); 
 				return 1;
 			}
+			bits = get_rebirth_bits(cn);
 			ch[cn].skill[tmp][0] =  1;
-			ch[cn].skill[tmp][2] = 75;
+			ch[cn].skill[tmp][2] = 75 + (bits?min(5,max(0,bits/6)):0);
 			ch[cn].skill[tmp][3] =  8;
 			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. You learned %s.\n", skilltab[tmp].name);
 			break;
@@ -3698,7 +3729,7 @@ int use_special_spell(int cn, int in)
 	switch(spell)
 	{
 		case    SK_BLOODLET:
-			if (!get_gear(cn, IT_WP_BLOODLET)) 
+			if (!get_gear(cn, IT_WP_BLOODLET) && !get_gear(cn, IT_WP_CRIMRIP))
 			{
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
@@ -4001,7 +4032,7 @@ int use_special_chest(int cn, int in)
 	for (n = 0; n<10; n++)
 	{
 		if (!(in2 = it[in].data[n])) break;
-		in2 = get_special_item(in2, 0, 0, 0);
+		in2 = get_special_item(cn, in2, 0, 0, 0);
 		god_give_char(in2, cc);
 	}
 	
@@ -5033,7 +5064,7 @@ int purple_protect(int cn, int in)
 
 int use_lever(int cn, int in)
 {
-	int in2, m;
+	int in2, m, n;
 
 	m = it[in].data[0];
 	in2 = map[m].it;
@@ -5047,10 +5078,10 @@ int use_lever(int cn, int in)
 		return 0;
 	}
 	
-	if (it[in].data[1])
-	{
+	if (it[in].data[1]==1)
 		do_area_log(0, 0, ch[cn].x, ch[cn].y, 1, "You hear something open nearby.\n");
-	}
+	if (it[in].data[1]==2)
+		do_area_log(0, 0, ch[cn].x, ch[cn].y, 1, "You hear the echoes of many things opening.\n");
 	
 	do_area_sound(0, 0, it[in].x, it[in].y, 10);
 	use_driver(0, in2, 0);
@@ -5058,6 +5089,19 @@ int use_lever(int cn, int in)
 	if (it[in2].light[0]!=it[in2].light[1])
 	{
 		do_add_light(it[in2].x, it[in2].y, it[in2].light[1] - it[in2].light[0]);
+	}
+	
+	for (n=2;n<=9;n++)
+	{
+		if (!it[in].data[n]) break;
+		m = it[in].data[n];
+		in2 = map[m].it;
+		use_driver(0, in2, 0);
+		it[in2].active = it[in2].duration;
+		if (it[in2].light[0]!=it[in2].light[1])
+		{
+			do_add_light(it[in2].x, it[in2].y, it[in2].light[1] - it[in2].light[0]);
+		}
 	}
 
 	return 1;
@@ -6703,8 +6747,7 @@ int use_kill_undead(int cn, int in)
 			}
 			if ((co = map[x + y * MAPX].ch)!=0)
 			{
-				if ((ch[co].flags & CF_UNDEAD) || 
-					(ch[co].worn[WN_BODY] && it[ch[co].worn[WN_BODY]].temp == IT_BONEARMOR))
+				if (ch[co].flags & CF_UNDEAD)
 				{
 					do_hurt(cn, co, 500, 2);
 					fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
@@ -6798,6 +6841,8 @@ int teleport3(int cn, int in)    // out of labyrinth
 		}
 	}
 	
+	if (has_buff(cn, SK_DIVINITY)) remove_buff(cn, SK_DIVINITY);
+	
 	if (IS_CLANKWAI(cn))
 	{
 		ch[cn].temple_x = ch[cn].tavern_x = HOME_KWAI_X;
@@ -6808,7 +6853,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 		ch[cn].temple_x = ch[cn].tavern_x = HOME_GORN_X;
 		ch[cn].temple_y = ch[cn].tavern_y = HOME_GORN_Y;
 	}
-	if (IS_PURPLE(cn))
+	else if (IS_PURPLE(cn))
 	{
 		ch[cn].temple_x = ch[cn].tavern_x = HOME_PURPLE_X;
 		ch[cn].temple_y = ch[cn].tavern_y = HOME_PURPLE_Y;
@@ -6833,12 +6878,8 @@ int get_seyan_bits(int cn)
 	int bits;
 	
 	for (bits = 0, bit = 1; bit; bit <<= 1)
-	{
 		if (ch[cn].data[21] & bit)
-		{
 			bits++;
-		}
-	}
 	
 	return bits;
 }
@@ -6873,10 +6914,8 @@ int use_seyan_shrine(int cn, int in, int flag)
 	struct item tmp;
 	int in2, in3, n, bits, ret = 0;
 
-	if (!cn)
-	{
-		return 0;
-	}
+	if (!cn) return 0;
+	if (!in) return 0;
 
 	if (!IS_SEYAN_DU(cn))
 	{
@@ -6941,7 +6980,7 @@ int use_seyan_shrine(int cn, int in, int flag)
 	if (bits<32 && (!flag || ret)) 
 	{
 		do_char_log(cn, 1, "You have visited %d of the 32 shrines of Kwai.\n", bits);
-		do_char_log(cn, 1, "You may use #kwai to see unvisited shrines.\n");
+		do_char_log(cn, 1, "You may use #shrine to see unvisited shrines.\n");
 	}
 	else if (!flag || ret)
 	{
@@ -7600,7 +7639,8 @@ void change_to_sorcerer(int cn)
 
 int shrine_of_change(int cn, int in)
 {
-	int n, in2, in3 = 0;
+	int n, in2, in3 = 0, flag=0, rebirth = it[in].data[0];
+	char msg[120];
 
 	if (!cn)
 	{
@@ -7612,7 +7652,7 @@ int shrine_of_change(int cn, int in)
 		do_char_log(cn, 1, "Read the notes, my friend.\n");
 		return 0;
 	}
-
+	
 	if (IS_ANY_ARCH(cn) && ((it[in2].temp>=IT_CH_FOOL && it[in2].temp<=IT_CH_WORLD) || 
 		(it[in2].temp>=IT_CH_FOOL_R && it[in2].temp<=IT_CH_WORLD_R)))	// Tarot cards for slot 2
 	{
@@ -7648,53 +7688,173 @@ int shrine_of_change(int cn, int in)
 		return 0;
 	}
 	
-	if (it[in2].temp==127 || it[in2].temp==274)     // greater healing potion
+	if (rebirth && (it[in2].temp==IT_POT_LIFE || it[in].data[1])) // potion of life
 	{
-		if (IS_TEMPLAR(cn))			change_to_archtemplar(cn);
-		else if (IS_MERCENARY(cn))	change_to_warrior(cn);
-		else if (IS_HARAKIM(cn))	change_to_summoner(cn);
-		else do_char_log(cn, 1, "You've already arched!\n");
-		return 0;
-	}
-
-	if (it[in2].temp==131 || it[in2].temp==273)     // greater mana potion
-	{
-		if (IS_TEMPLAR(cn))			change_to_pugilist(cn);
-		else if (IS_MERCENARY(cn))	change_to_sorcerer(cn);
-		else if (IS_HARAKIM(cn))	change_to_archharakim(cn);
-		else do_char_log(cn, 1, "You've already arched!\n");
-		return 0;
-	}
-	
-	if (it[in2].temp==IT_POT_DEATH)
-	{
-		if (IS_TEMPLAR(cn) || IS_MERCENARY(cn) || IS_HARAKIM(cn))
+		if ((ch[cn].rebirth & 1) && !it[in].data[1])
 		{
-			if (B_AT(cn, AT_BRV)<60)
-			{
-				do_char_log(cn, 1, "Your braveness is too low. There is still room for improvement.\n");
-				return;
-			}
-			
-			do_char_log(cn, 1, "As you reach out to touch the altar, you suddenly feel light-headed. The world spins around you, and... you can't return.\n");
-			
-			ch[cn].temple_x = ch[cn].tavern_x = BRAVER_WARP_X;
-			ch[cn].temple_y = ch[cn].tavern_y = BRAVER_WARP_Y;
-			
-			god_transfer_char(cn, BRAVER_WARP_X, BRAVER_WARP_Y);
+			do_char_log(cn, 1, "You already did that!\n");
+			return 0;
 		}
-		else do_char_log(cn, 1, "You've already arched!\n");
+		for (n=0;n<5;n++)
+		{
+			if (B_AT(cn, n)<ch[cn].attrib[n][2] && !it[in].data[1])
+			{
+				do_char_log(cn, 1, "Your %s is too low. There is still room for improvement.\n", at_name[n]);
+				return 0;
+			}
+		}
+		
+		for (n = 0; n<12 && !flag; n++)
+		{
+			if (n==WN_CHARM||n==WN_CHARM2) continue;
+			if (ch[cn].worn[n])
+			{
+				flag = 1;
+			}
+			if (ch[cn].alt_worn[n])
+			{
+				flag = 1;
+			}
+		}
+
+		if (flag)
+		{
+			do_char_log(cn, 0, "You may not rebirth unless you first remove your equipment.\n");
+			return -1;
+		}
+		
+		sprintf(msg, "%s has completed their journey and claimed their rebirth!", ch[cn].name);
+		if (globs->flags & GF_DISCORD) discord_ranked(msg);
+		
+		do_char_log(cn, 1, "As you offer the potion to the altar, you suddenly feel light-headed. The world spins around you, and...\n");
+		do_char_log(cn, 9, "You've been reborn. You can now find hidden points of exploration.\n");
+		
+		god_racechange(cn, ch[cn].temp, 2);
 		return 0;
+	}
+	else
+	{
+		if (it[in2].temp==IT_POT_G_HP) // greater healing potion
+		{
+			if (IS_TEMPLAR(cn))			change_to_archtemplar(cn);
+			else if (IS_MERCENARY(cn))	change_to_warrior(cn);
+			else if (IS_HARAKIM(cn))	change_to_summoner(cn);
+			else do_char_log(cn, 1, "You've already arched!\n");
+			return 0;
+		}
+
+		if (it[in2].temp==IT_POT_G_MP) // greater mana potion
+		{
+			if (IS_TEMPLAR(cn))			change_to_pugilist(cn);
+			else if (IS_MERCENARY(cn))	change_to_sorcerer(cn);
+			else if (IS_HARAKIM(cn))	change_to_archharakim(cn);
+			else do_char_log(cn, 1, "You've already arched!\n");
+			return 0;
+		}
+		
+		if (it[in2].temp==IT_POT_DEATH) // potion of death
+		{
+			if (IS_TEMPLAR(cn) || IS_MERCENARY(cn) || IS_HARAKIM(cn))
+			{
+				if (B_AT(cn, AT_BRV)<60)
+				{
+					do_char_log(cn, 1, "Your braveness is too low. There is still room for improvement.\n");
+					return 0;
+				}
+				
+				do_char_log(cn, 1, "As you reach out to touch the altar, you suddenly feel light-headed. The world spins around you, and... you can't return.\n");
+				
+				ch[cn].temple_x = ch[cn].tavern_x = BRAVER_WARP_X;
+				ch[cn].temple_y = ch[cn].tavern_y = BRAVER_WARP_Y;
+				
+				god_transfer_char(cn, BRAVER_WARP_X, BRAVER_WARP_Y);
+			}
+			else do_char_log(cn, 1, "You've already arched!\n");
+			return 0;
+		}
 	}
 	
 	do_char_log(cn, 1, "Read the notes, my friend.\n");
 	return 0;
 }
 
+int get_rebirth_bits(int cn)
+{
+	unsigned int bit;
+	int bits;
+	
+	for (bits = 0, bit = 2; bit; bit <<= 1)
+		if (ch[cn].rebirth & bit)
+			bits++;
+	
+	return bits;
+}
+
+int rebirth_explorer_point(int cn, int in, int msg)
+{
+	int n, bits, rank, attri = 0;
+	
+	if (!(ch[cn].rebirth & 1))
+	{
+		do_char_log(cn, 0, "Nothing happened. You're not sure you should be able to see this.\n");
+		return 0;
+	}
+	if (!(ch[cn].rebirth & it[in].data[8]))
+	{
+		ch[cn].rebirth |= it[in].data[8];
+		
+		do_char_log(cn, 0, "You found a new rebirth exploration point!\n");
+		ch[cn].luck += 10;
+		
+		rank = getrank(cn);
+		bits = get_rebirth_bits(cn);
+		
+		if (rank >= 20) attri = 1;
+		
+		for (n = 0; n<5; n++) 
+			ch[cn].attrib[n][2] = ch_temp[ch[cn].temp].attrib[n][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+		for (n = 0; n<50; n++) 
+			if (ch[cn].skill[n][2]) ch[cn].skill[n][2] = ch_temp[ch[cn].temp].skill[n][2] + min(5,max(0,bits/6));
+		if (ch[cn].pandium_floor[2] >= 3)
+		{
+			n = 0;
+			if 		(IS_SEYAN_DU(cn)) 	 n = SK_PROX;
+			else if (IS_ARCHTEMPLAR(cn)) n = SK_DISPEL;
+			else if (IS_SKALD(cn)) 		 n = SK_PRECISION;
+			else if (IS_WARRIOR(cn)) 	 n = SK_GEARMAST;
+			else if (IS_SORCERER(cn)) 	 n = SK_MSHIELD;
+			else if (IS_SUMMONER(cn)) 	 n = SK_STEALTH;
+			else if (IS_ARCHHARAKIM(cn)) n = SK_GCMASTERY;
+			else if (IS_BRAVER(cn)) 	 n = SK_IMMUN;
+			ch[cn].skill[n][2] = 75 + min(5,max(0,bits/6));
+		}
+		
+		if (bits%6)
+			do_char_log(cn, 9, "Your %s maximum and %s limit each went up by 1.\n", at_name[(bits-1)%6], at_name[(bits-1)%6]);
+		else
+			do_char_log(cn, 9, "Your skill maximums and skill limits each went up by 1.\n");
+		
+		do_update_char(cn);
+	}
+	else
+	{
+		if (msg) do_char_log(cn, 1, "Hmm. Seems somewhat familiar. You've been here before...\n");
+		return 0;
+	}
+
+	return 1;
+}
+
 int explorer_point(int cn, int in, int msg)
 {
 	int exp;
-
+	
+	if (!cn) return 0;
+	if (!in) return 0;
+	
+	if (it[in].data[8]) 
+		return rebirth_explorer_point(cn, in, msg);
+	
 	if (!(ch[cn].data[46] & it[in].data[0]) && !(ch[cn].data[47] & it[in].data[1]) &&
 	    !(ch[cn].data[48] & it[in].data[2]) && !(ch[cn].data[49] & it[in].data[3]) && 
 		!(ch[cn].data[91] & it[in].data[5]) && !(ch[cn].data[24] & it[in].data[6]))
@@ -7710,9 +7870,10 @@ int explorer_point(int cn, int in, int msg)
 		ch[cn].luck += 10;
 
 		exp  = it[in].data[4];
-		exp -= RANDOM(exp/10+1);
+		if (ch[cn].rebirth & 1) exp = exp/2;
+		exp -= RANDOM(exp/20+1);
 		exp  = min(ch[cn].points_tot / 10, exp);        // not more than 10% of total experience
-		exp += RANDOM(exp/10+1);
+		exp += RANDOM(exp/19+1);
 		
 		chlog(cn, "Found exp point, granting %d (of %d) exp", exp, it[in].data[4]);
 		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
@@ -8310,7 +8471,7 @@ void use_driver(int cn, int in, int carried)
 				if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
 				
 				// Reduce stack or destroy item
-				use_consume_item(cn, in, 0);
+				if (it[in].temp!=IT_CHALICE5) use_consume_item(cn, in, 0);
 				
 				if (ch[cn].a_hp<500)
 				{
@@ -8595,36 +8756,21 @@ void item_damage_armor(int cn, int dam)
 
 	for (n = 0; n<20; n++)
 	{
-		if (n!=WN_RHAND && n!=WN_LHAND && n!=WN_CHARM && n!=WN_CHARM2)
-		{
-			if (RANDOM(3))
-			{
-				item_damage_worn(cn, n, dam);
-			}
-		}
-		else if ((n==WN_LHAND && (it[ch[cn].worn[WN_LHAND]].flags & IF_OF_SHIELD)) || (n==WN_RHAND && (it[ch[cn].worn[WN_RHAND]].flags & IF_OF_SHIELD)))
-		{
-			if (RANDOM(3))
-			{
-				item_damage_worn(cn, n, dam);
-			}
-		}
+		if (IS_SANEITEM(in = ch[cn].worn[n]) && it[in].driver == 60)
+			continue;
+		if (n!=WN_RHAND && n!=WN_LHAND && n!=WN_CHARM && n!=WN_CHARM2 && RANDOM(3))
+			item_damage_worn(cn, n, dam);
+		else if (((n==WN_LHAND && (it[ch[cn].worn[WN_LHAND]].flags & IF_OF_SHIELD)) || (n==WN_RHAND && (it[ch[cn].worn[WN_RHAND]].flags & IF_OF_SHIELD))) && RANDOM(3))
+			item_damage_worn(cn, n, dam);
 	}
 }
 
 void item_damage_weapon(int cn, int dam)
 {
 	dam = dam / 4 + 1;
-	if (it[ch[cn].worn[WN_LHAND]].flags & IF_OF_DUALSW)
+	if ((it[ch[cn].worn[WN_LHAND]].flags & IF_OF_DUALSW) && RANDOM(2))
 	{
-		if (RANDOM(2))
-		{
-			item_damage_worn(cn, WN_LHAND, dam);
-			return;
-		}
-	}
-	if (it[ch[cn].worn[WN_RHAND]].flags & IF_OF_SHIELD)
-	{
+		item_damage_worn(cn, WN_LHAND, dam);
 		return;
 	}
 	item_damage_worn(cn, WN_RHAND, dam);
@@ -8758,11 +8904,6 @@ void char_item_expire(int cn)
 
 			if ((act==0 && (it[in].flags & IF_ALWAYSEXP1)) || (act==1 && (it[in].flags & IF_ALWAYSEXP2)))
 			{
-				// fire/ice cloak ages more slowly when not worn or held
-				if (it[in].driver == 60 && (clock4 % 4 != 0))
-				{
-					continue;
-				}
 				it[in].current_age[act]++;
 				if (it[in].flags & IF_LIGHTAGE)
 				{
@@ -9212,7 +9353,7 @@ void item_tick_expire(void)
 
 	for (x = 0, m = y * MAPX; x<MAPX; x++, m++)
 	{
-		if ((in = map[m].it)!=0)
+		if (IS_SANEITEM(in = map[m].it))
 		{
 			if (it[in].driver==124) continue;
 			
@@ -9367,7 +9508,7 @@ void item_tick_expire(void)
 						// Eyeball kings take extra time to respawn
 						if (IS_LONG_RESPAWN(temp)) 
 							rtimer = TICKS * 60 * 13 + RANDOM(TICKS * 60 * 4); // 13 - 17 minutes
-						else if (temp == CT_PANDIUM)
+						else if (temp == CT_PANDIUM || temp == CT_LAB20_KEEP)
 							rtimer = TICKS * 5;
 						if (IS_GLOB_MAYHEM)
 							rtimer = rtimer/2;
@@ -9403,7 +9544,7 @@ noexpire:
 				globs->lost_cnt++;
 			}
 		}
-		if ((in = map[m].it)!=0)
+		if (IS_SANEITEM(in = map[m].it))
 		{
 			if (it[in].x!=x || it[in].y!=y || it[in].used!=USE_ACTIVE)
 			{
@@ -9432,7 +9573,17 @@ void item_tick_explosions(void)
 	for (x = frx; x <= tox; x++) for (y = fry; y <= toy; y++)
 	{
 		m = x + y * MAPX;
-		if (((in = map[m].it)!=0) && it[in].driver==124)
+		if (IS_SANEITEM(in = map[m].it) && it[in].driver==124)
+		{
+			expire_explosion(in);
+		}
+	}
+	// Gatekeeper arena
+	frx = 195; fry = 1545; tox = 213; toy = 1563;
+	for (x = frx; x <= tox; x++) for (y = fry; y <= toy; y++)
+	{
+		m = x + y * MAPX;
+		if (IS_SANEITEM(in = map[m].it) && it[in].driver==124)
 		{
 			expire_explosion(in);
 		}
@@ -9763,9 +9914,14 @@ int step_portal1_lab13(int cn, int in)
 	int flag = 0;
 	int n;
 
-	if (!IS_HARAKIM(cn) && !IS_TEMPLAR(cn) && !IS_MERCENARY(cn))
+	if (IS_IN_XIII(ch[cn].x, ch[cn].y) && (!IS_HARAKIM(cn) && !IS_TEMPLAR(cn) && !IS_MERCENARY(cn)))
 	{
 		do_char_log(cn, 0, "This portal opens only for Templars, Mercenaries and Harakim.\n");
+		return -1;
+	}
+	else if (IS_IN_XX(ch[cn].x, ch[cn].y) && st_skill_pts_all(ch[cn].tree_points)>=7)
+	{
+		do_char_log(cn, 0, "You have already cleared this challenge!\n");
 		return -1;
 	}
 
@@ -9786,6 +9942,10 @@ int step_portal1_lab13(int cn, int in)
 	{
 		if (n==WN_CHARM||n==WN_CHARM2) continue;
 		if (ch[cn].worn[n])
+		{
+			flag = 1;
+		}
+		if (ch[cn].alt_worn[n])
 		{
 			flag = 1;
 		}
@@ -9818,36 +9978,25 @@ int step_portal2_lab13(int cn, int in)
 	{
 		return -1;
 	}
-
-	for (x = 137; x<=147 && !flag; x++) // Within the boundry of the victory walk
+	
+	if (IS_IN_XIII(ch[cn].x, ch[cn].y))
 	{
-		for (y = 194; y<=245 && !flag; y++)
+		for (x= 136; x<= 148 && !flag; x++) for (y= 182; y<= 240 && !flag; y++)
 		{
 			if ((co = map[x + y * MAPX].ch)!=0 && co!=cn && (ch[co].flags & (CF_PLAYER)))
-			{
 				flag = 1;
-			}
-			// 664 is the key for XIII to turn seyan
-			if ((in2 = map[x + y * MAPX].it)!=0 && (it[in2].temp==664 || it[in2].temp==IT_TOMBSTONE))
-			{
+			if ((in2 = map[x + y * MAPX].it)!=0 && (it[in2].temp==IT_SEYANKEY || it[in2].temp==IT_TOMBSTONE))
 				flag = 2;
-			}
 		}
 	}
-
-	for (x = 136; x<=148 && !flag; x++) // Within the boundry of the keeper room
+	else if (IS_IN_XX(ch[cn].x, ch[cn].y))
 	{
-		for (y = 182; y<=193 && !flag; y++)
+		for (x= 194; x<= 214 && !flag; x++) for (y=1503; y<=1564 && !flag; y++)
 		{
 			if ((co = map[x + y * MAPX].ch)!=0 && co!=cn && (ch[co].flags & (CF_PLAYER)))
-			{
 				flag = 1;
-			}
-			// 664 is the key for XIII to turn seyan
-			if ((in2 = map[x + y * MAPX].it)!=0 && (it[in2].temp==664 || it[in2].temp==IT_TOMBSTONE))
-			{
+			if ((in2 = map[x + y * MAPX].it)!=0 && (it[in2].temp==IT_TOMBSTONE))
 				flag = 2;
-			}
 		}
 	}
 
@@ -9865,19 +10014,20 @@ int step_portal2_lab13(int cn, int in)
 
 	for (n = flag = 0; n<MAXCHARS; n++)
 	{
-		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & CF_BODY))
-		{
-			continue;
-		}
-		if (ch[n].temp!=CT_LAB13_KEEP) // Gatekeeper template
-		{
-			continue;
-		}
-		if (ch[n].a_hp>ch[n].hp[5] * 900 && ch[n].a_mana>ch[n].mana[5] * 900)
+		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & CF_BODY)) continue;
+		if (ch[n].temp!=CT_LAB13_KEEP && ch[n].temp!=CT_LAB20_KEEP) continue;
+		if (IS_IN_XIII(ch[cn].x, ch[cn].y) && ch[n].temp==CT_LAB13_KEEP && 
+			ch[n].a_hp>ch[n].hp[5] * 900 && ch[n].a_mana>ch[n].mana[5] * 900)
 		{
 			flag = 1;
+			break;
 		}
-		break;
+		if (IS_IN_XX(ch[cn].x, ch[cn].y) && ch[n].temp==CT_LAB20_KEEP && 
+			ch[n].a_hp>ch[n].hp[5] * 900 && ch[n].a_mana>ch[n].mana[5] * 900)
+		{
+			flag = 2;
+			break;
+		}
 	}
 	if (!flag)
 	{
@@ -9885,7 +10035,7 @@ int step_portal2_lab13(int cn, int in)
 		return -1;
 	}
 
-	if (!it[12042].data[1]) // coord of exit door
+	if (flag==1 && !it[12042].data[1]) // coord of exit door
 	{
 		do_char_log(cn, 0, "The doors aren't closed again yet. Please try again in a few minutes.\n");
 		return -1;
@@ -9902,12 +10052,12 @@ int step_portal2_lab13(int cn, int in)
 
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==664)
+		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==IT_SEYANKEY)
 		{
 			use_consume_item(cn, in2, 1);
 		}
 	}
-	if ((in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==664)
+	if ((in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==IT_SEYANKEY)
 	{
 		use_consume_item(cn, in2, 1);
 	}
@@ -10161,7 +10311,7 @@ int step_teleport(int cn, int in)
 		{
 			continue;
 		}
-		if ((in = map[m2].it)!=0 && (it[in].flags & IF_MOVEBLOCK))
+		if (IS_SANEITEM(in = map[m2].it) && (it[in].flags & IF_MOVEBLOCK))
 		{
 			continue;
 		}

@@ -57,6 +57,12 @@ char *syn[] = {
 	"10",          "ten",
 	"11",          "eleven",
 	"12",          "twelve",
+	"14",          "fourteen",
+	"15",          "fifteen",
+	"16",          "sixteen",
+	"17",          "seventeen",
+	"18",          "eighteen",
+	"19",          "nineteen",
 	"n",           "north",
 	"northern",    "north",
 	"e",           "east",
@@ -789,6 +795,12 @@ struct know
 #define SP_CLAIM_X		110
 #define SP_CLAIM_Y		111
 #define SP_CLAIM_Z		112
+#define SP_CLAIM_A		114
+#define SP_CLAIM_B		115
+#define SP_CLAIM_C		116
+#define SP_CLAIM_D		117
+#define SP_CLAIM_E		118
+#define SP_CLAIM_F		119
 //}
 
 // Knowledge table - the big one that handles everything
@@ -1336,6 +1348,12 @@ struct know know[] = {
 	{{"!claim", "!ten",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_X},
 	{{"!claim", "!eleven",                 "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_Y},
 	{{"!claim", "!twelve",                 "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_Z},
+	{{"!claim", "!fourteen",               "?", NULL}, 20, AR_LABYRINTH, 0,    NULL, SP_CLAIM_A},
+	{{"!claim", "!fifteen",                "?", NULL}, 20, AR_LABYRINTH, 0,    NULL, SP_CLAIM_B},
+	{{"!claim", "!sixteen",                "?", NULL}, 20, AR_LABYRINTH, 0,    NULL, SP_CLAIM_C},
+	{{"!claim", "!seventeen",              "?", NULL}, 20, AR_LABYRINTH, 0,    NULL, SP_CLAIM_D},
+	{{"!claim", "!eighteen",               "?", NULL}, 20, AR_LABYRINTH, 0,    NULL, SP_CLAIM_E},
+	{{"!claim", "!nineteen",               "?", NULL}, 20, AR_LABYRINTH, 0,    NULL, SP_CLAIM_F},
 	{{"!door",                             "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_DOORS   , 0},
 	{{"!key",                              "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_KEYS    , 0},
 	{{"!riddle",                           "?", NULL}, 13, AR_LABYRINTH, 0, AN_LABZ_RIDDLES , 0},
@@ -2092,47 +2110,71 @@ void answer_unlearn(int cn, int co)
 
 void answer_claim(int cn, int co, int nr)
 {
-	int v = 0, n, m, pole[3]={0}, kwai = 0;
-	
-	if (ch[co].gold < v)
-	{
-		do_sayx(cn, "You don't have enough money for that, %s!", ch[co].name);
-		return;
-	}
+	int v = 0, n, m, pole[3]={0}, kwai = 0, rbirth = 0;
+	int tpole[3]={0}, tkwai=0, trbirth=0;
 	
 	switch (nr)
 	{
-		case  1: pole[0] = IT_LAB1_POLE1; pole[1] = IT_LAB1_POLE2; pole[2] = IT_LAB1_POLE3; kwai = IT_LAB1_KWAI; break;
-		case  2: pole[0] = IT_LAB2_POLE1; pole[1] = IT_LAB2_POLE2; pole[2] = IT_LAB2_POLE3; kwai = IT_LAB2_KWAI; break;
-		case  3: pole[0] = IT_LAB3_POLE1; pole[1] = IT_LAB3_POLE2; pole[2] = IT_LAB3_POLE3; kwai = IT_LAB3_KWAI; break;
-		case  4: pole[0] = IT_LAB4_POLE1; pole[1] = IT_LAB4_POLE2; pole[2] = IT_LAB4_POLE3; kwai = IT_LAB4_KWAI; break;
-		case  5: pole[0] = IT_LAB5_POLE1; pole[1] = IT_LAB5_POLE2; pole[2] = IT_LAB5_POLE3; kwai = IT_LAB5_KWAI; break;
-		case  6: pole[0] = IT_LAB6_POLE1; pole[1] = IT_LAB6_POLE2; pole[2] = IT_LAB6_POLE3; kwai = IT_LAB6_KWAI; break;
-		case  7: pole[0] = IT_LAB7_POLE1; pole[1] = IT_LAB7_POLE2; pole[2] = IT_LAB7_POLE3; kwai = IT_LAB7_KWAI; break;
-		case  8: pole[0] = IT_LAB8_POLE1; pole[1] = IT_LAB8_POLE2; pole[2] = IT_LAB8_POLE3; kwai = IT_LAB8_KWAI; break;
-		case  9: pole[0] = IT_LAB9_POLE1; pole[1] = IT_LAB9_POLE2; pole[2] = IT_LAB9_POLE3; kwai = IT_LAB9_KWAI; break;
-		case 10: pole[0] = IT_LABX_POLE1; pole[1] = IT_LABX_POLE2; pole[2] = IT_LABX_POLE3; kwai = IT_LABX_KWAI; break;
-		case 11: pole[0] = IT_LABY_POLE1; pole[1] = IT_LABY_POLE2; pole[2] = IT_LABY_POLE3; kwai = IT_LABY_KWAI; break;
-		case 12: pole[0] = IT_LABZ_POLE1; pole[1] = IT_LABZ_POLE2; pole[2] = IT_LABZ_POLE3; kwai = IT_LABZ_KWAI; break;
+		case  1: pole[0]=IT_LAB1_POLE1; pole[1]=IT_LAB1_POLE2; pole[2]=IT_LAB1_POLE3; rbirth=IT_LAB1_RB; kwai=IT_LAB1_KWAI; break;
+		case  2: pole[0]=IT_LAB2_POLE1; pole[1]=IT_LAB2_POLE2; pole[2]=IT_LAB2_POLE3; rbirth=IT_LAB2_RB; kwai=IT_LAB2_KWAI; break;
+		case  3: pole[0]=IT_LAB3_POLE1; pole[1]=IT_LAB3_POLE2; pole[2]=IT_LAB3_POLE3; rbirth=IT_LAB3_RB; kwai=IT_LAB3_KWAI; break;
+		case  4: pole[0]=IT_LAB4_POLE1; pole[1]=IT_LAB4_POLE2; pole[2]=IT_LAB4_POLE3; rbirth=IT_LAB4_RB; kwai=IT_LAB4_KWAI; break;
+		case  5: pole[0]=IT_LAB5_POLE1; pole[1]=IT_LAB5_POLE2; pole[2]=IT_LAB5_POLE3; rbirth=IT_LAB5_RB; kwai=IT_LAB5_KWAI; break;
+		case  6: pole[0]=IT_LAB6_POLE1; pole[1]=IT_LAB6_POLE2; pole[2]=IT_LAB6_POLE3; rbirth=IT_LAB6_RB; kwai=IT_LAB6_KWAI; break;
+		case  7: pole[0]=IT_LAB7_POLE1; pole[1]=IT_LAB7_POLE2; pole[2]=IT_LAB7_POLE3; rbirth=IT_LAB7_RB; kwai=IT_LAB7_KWAI; break;
+		case  8: pole[0]=IT_LAB8_POLE1; pole[1]=IT_LAB8_POLE2; pole[2]=IT_LAB8_POLE3; rbirth=IT_LAB8_RB; kwai=IT_LAB8_KWAI; break;
+		case  9: pole[0]=IT_LAB9_POLE1; pole[1]=IT_LAB9_POLE2; pole[2]=IT_LAB9_POLE3; rbirth=IT_LAB9_RB; kwai=IT_LAB9_KWAI; break;
+		case 10: pole[0]=IT_LABX_POLE1; pole[1]=IT_LABX_POLE2; pole[2]=IT_LABX_POLE3; rbirth=IT_LABX_RB; kwai=IT_LABX_KWAI; break;
+		case 11: pole[0]=IT_LABY_POLE1; pole[1]=IT_LABY_POLE2; pole[2]=IT_LABY_POLE3; rbirth=IT_LABY_RB; kwai=IT_LABY_KWAI; break;
+		case 12: pole[0]=IT_LABZ_POLE1; pole[1]=IT_LABZ_POLE2; pole[2]=IT_LABZ_POLE3; rbirth=IT_LABZ_RB; kwai=IT_LABZ_KWAI; break;
+		case 14: pole[0]=IT_LABA_POLE1; pole[1]=IT_LABA_POLE2; pole[2]=IT_LABA_POLE3; rbirth=IT_LABA_RB; break;
+		case 15: pole[0]=IT_LABB_POLE1; pole[1]=IT_LABB_POLE2; pole[2]=IT_LABB_POLE3; rbirth=IT_LABB_RB; break;
+		case 16: pole[0]=IT_LABC_POLE1; pole[1]=IT_LABC_POLE2; pole[2]=IT_LABC_POLE3; rbirth=IT_LABC_RB; break;
+		case 17: pole[0]=IT_LABD_POLE1; pole[1]=IT_LABD_POLE2; pole[2]=IT_LABD_POLE3; rbirth=IT_LABD_RB; break;
+		case 18: pole[0]=IT_LABE_POLE1; pole[1]=IT_LABE_POLE2; pole[2]=IT_LABE_POLE3; rbirth=IT_LABE_RB; break;
+		case 19: pole[0]=IT_LABF_POLE1; pole[1]=IT_LABF_POLE2; pole[2]=IT_LABF_POLE3; rbirth=IT_LABF_RB; break;
 		default: return;
 	}
 	
-	for (n=0;n<3;n++)
+	chlog(co, "Starting claim command");
+	
+	for (m=1;m<MAXITEM;m++)
 	{
-		for (m=1;m<MAXITEM;m++)
+		if (it[m].used==USE_EMPTY) continue;
+		for (n=0;n<3;n++) if (pole[n] && it[m].temp==pole[n])
 		{
-			if (it[m].used==USE_EMPTY) continue;
-			if (it[m].temp==pole[n])
+			if (!(ch[co].data[46] & it[m].data[0]) && !(ch[co].data[47] & it[m].data[1]) &&
+				!(ch[co].data[48] & it[m].data[2]) && !(ch[co].data[49] & it[m].data[3]) && 
+				!(ch[co].data[91] & it[m].data[5]) && !(ch[co].data[24] & it[m].data[6]))
 			{
-				v += explorer_point(co, m, 0) * 10000;
-				pole[n] = -1;
-			}
-			if (IS_SEYAN_DU(co) && it[m].temp==kwai)
-			{
-				v += use_seyan_shrine(co, m, 1) * 100000;
-				kwai = -1;
+				v += nr * 5000;
+				tpole[n] = m;
 			}
 		}
+		if (kwai && it[m].temp==kwai && IS_SEYAN_DU(co))
+		{
+			if (!(ch[co].data[21] & it[m].data[0]))
+			{
+				v += nr * 50000;
+				tkwai = m;
+			}
+		}
+		if (rbirth && it[m].temp==rbirth && (ch[co].rebirth & 1))
+		{
+			if (!(ch[co].rebirth & it[m].data[8]))
+			{
+				v += nr * 250000;
+				trbirth = m;
+			}
+		}
+	}
+	
+	chlog(co, "Exiting claim loop");
+	
+	if (ch[co].gold < v)
+	{
+		do_sayx(cn, "You don't have enough money for that, %s! (Need %d gold)", ch[co].name, v/100);
+		return;
 	}
 	
 	if (!v) 
@@ -2141,10 +2183,16 @@ void answer_claim(int cn, int co, int nr)
 		return;
 	}
 	
-	do_sayx(cn, "Very well, I have given you those missing rewards, %s.", ch[co].name);
+	do_sayx(cn, "Very well, I will give you those missing rewards, %s.", ch[co].name);
+	
+	for (n=0;n<3;n++) { if (IS_SANEITEM(m = tpole[n])) explorer_point(co, m, 0); }
+	if (IS_SANEITEM(m = tkwai)) use_seyan_shrine(co, m, 1);
+	if (IS_SANEITEM(m = trbirth)) explorer_point(co, m, 0);
 	
 	ch[co].gold -= v;
 	do_char_log(co, 0, "You handed over %dG %dS.\n", v / 100, v % 100);
+	
+	do_update_char(co);
 }
 
 void answer_tokens(int cn, int co, int nr)
@@ -2207,7 +2255,7 @@ int get_open_colosseum(void)
 				ch[co].flags = 0;
 				ch[co].used = USE_EMPTY;
 			}
-			if ((in = map[x + y * MAPX].it)!=0 && (it[in].flags & IF_USE) && it[in].temp!=2808)
+			if (IS_SANEITEM(in = map[x + y * MAPX].it) && (it[in].flags & IF_USE) && it[in].temp!=2808)
 			{
 				it[in].used = 0;
 				map[x + y * MAPX].it = 0;
@@ -3140,6 +3188,12 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_CLAIM_X:	answer_claim(cn, co,10); break;
 		case SP_CLAIM_Y:	answer_claim(cn, co,11); break;
 		case SP_CLAIM_Z:	answer_claim(cn, co,12); break;
+		case SP_CLAIM_A:	answer_claim(cn, co,14); break;
+		case SP_CLAIM_B:	answer_claim(cn, co,15); break;
+		case SP_CLAIM_C:	answer_claim(cn, co,16); break;
+		case SP_CLAIM_D:	answer_claim(cn, co,17); break;
+		case SP_CLAIM_E:	answer_claim(cn, co,18); break;
+		case SP_CLAIM_F:	answer_claim(cn, co,19); break;
 		//
 		default:break;
 	}

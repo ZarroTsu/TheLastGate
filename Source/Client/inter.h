@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000A00
+#define VERSION 0x000A06
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -186,6 +186,7 @@ struct look
 	unsigned short id;
 	unsigned char extended;
 	unsigned short item[62];
+	unsigned char item_p[62];
 	unsigned int price[62];
 	unsigned int pl_price;
 };

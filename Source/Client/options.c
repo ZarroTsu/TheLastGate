@@ -59,6 +59,7 @@ extern int quit;
 extern int do_alpha;
 extern int do_shadow;
 extern int do_darkmode;
+extern int gamma;
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 //extern int screen_overlay_sprite;
@@ -231,19 +232,21 @@ void load_options(void)
 		if (read(handle,&dosound,sizeof(dosound))!=sizeof(dosound)) flag=1;
 		if (read(handle,&pdata,sizeof(pdata))!=sizeof(pdata)) flag=1;
 		if (read(handle,&okey,sizeof(okey))!=sizeof(okey)) flag=1;
-		if (read(handle,&do_alpha,sizeof(do_alpha))!=sizeof(do_alpha)) do_alpha=2;
+		if (read(handle,&gamma,sizeof(gamma))!=sizeof(gamma)) gamma=5000;
 		if (read(handle,&do_shadow,sizeof(do_shadow))!=sizeof(do_shadow)) do_shadow=1;
 		if (read(handle,&screen_windowed,sizeof(screen_windowed))!=sizeof(screen_windowed)) screen_windowed=1;
 		if (read(handle,&do_darkmode,sizeof(do_darkmode))!=sizeof(do_darkmode)) do_darkmode=0;
 		close(handle);
 	} else flag=1;
+	
+	do_alpha=0;
 
 	if (flag) {
 		/* flag=1; */
 		memset(history,0,sizeof(history));
 		memset(hist_len,0,sizeof(hist_len));
 		memset(words,0,sizeof(words));
-		domusic=0; dosound=1; do_alpha=2; do_shadow=1; screen_windowed=1; do_darkmode=0;
+		domusic=0; dosound=1; do_alpha=0; do_shadow=1; screen_windowed=1; do_darkmode=0; gamma=5000;
 		memset(&pdata,0,sizeof(pdata));
 		pdata.show_names=1;
 		pdata.hide=1;
@@ -256,6 +259,8 @@ void load_options(void)
 		memset(&okey,0,sizeof(okey));
 		strcpy(okey.name,"New Account");
 	}
+	
+	if (gamma>6000 || gamma<5000) gamma=5000;
 }
 
 void save_options(void)
@@ -271,7 +276,7 @@ void save_options(void)
 		write(handle,&dosound,sizeof(dosound));
 		write(handle,&pdata,sizeof(pdata));
 		write(handle,&okey,sizeof(okey));
-		write(handle,&do_alpha,sizeof(do_alpha));
+		write(handle,&gamma,sizeof(gamma));
 		write(handle,&do_shadow,sizeof(do_shadow));
 		write(handle,&screen_windowed,sizeof(screen_windowed));
 		write(handle,&do_darkmode,sizeof(do_darkmode));

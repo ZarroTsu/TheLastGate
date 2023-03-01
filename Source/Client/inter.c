@@ -310,7 +310,8 @@ void button_command(int nr)
 			
 		// New GUI swap buttons
 		case 44:
-			hudmode = 0;
+			if (hudmode == 0) hudmode = 3;
+			else hudmode = 0;
 			break;
 		case 45:
 			hudmode = 1;
@@ -480,98 +481,7 @@ void button_help(int nr)
 			else
 				xlog(1,"Right click on a skill/spell first to assign it to a button.");
 			break;
-/*
-		case 36:
-			if (last_skill==60)
-				xlog(1,"Crit Chance is the chance, out of 100.00, that you will inflict a melee critical hit. Determined by your equipped weapon, and increased by Braveness and other sources of Crit Chance."); 
-			else if (last_skill==61)
-				xlog(1,"Cast Speed is the speed at which casting and action animations occur per second. This is increased by Willpower and other sources of Cast Speed."); 
-			else if (last_skill==62)
-				xlog(1,"Cooldown Rate is the rate at which Skill Exhaustion is removed between active Skill and Spell use. This is granted by Intuition and other sources of Cooldown Rate."); 
-			else if (last_skill==63)
-				xlog(1,"Attack speed is the speed at which melee attacks are performed. This is increased by Agility and other sources of Attack Speed."); 
-			else if (last_skill==64)
-				xlog(1,"DPH ranges from 1/4 of your Weapon Value, to 1/4 of (your Weapon Value, plus half Strength, plus 14) times your Crit Chance & Crit Multi."); 
-			else if (last_skill<60 || last_skill>64)
-				xlog(1,"DPS is the average of your damage per hit, times your attack speed. Does not account for bonus damage from your Hit Score."); 
-			break;
-		case 37: 
-			if (last_skill==60)
-				xlog(1,"Crit Multi is the damage multiplier upon dealing a successful critical hit."); 
-			else if (last_skill==61 && pl.skill[34][0])
-				xlog(1,"Cost multiplier of mana for spells, determined by your Concentrate skill."); 
-			else if (last_skill==62)
-				xlog(1,"Rate at which mana is regenerated per second. This is improved by the Meditate skill, and can be further adjusted by various items."); 
-			else if (last_skill==63)
-				xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); 
-			else if (last_skill==64)
-				xlog(1,"Rate at which health is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); 
-			else if (last_skill<60 || last_skill>64)
-				xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); 
-			break;
-		case 38: 
-			if (last_skill==60)
-				xlog(1,"Estimated Immunity score. This displays your 'true' Immunity value after adjustments that do not display on the skill list."); 
-			else if (last_skill==61 && pl.skill[27][0])
-				xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); 
-			else if (last_skill==62 && pl.skill[42][0])
-				xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity. This can be stacked up to three times."); 
-			else if (last_skill==63 && pl.skill[49][0])
-				xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill==64 && pl.skill[40][0])
-				xlog(1,"Damage dealt by your Cleave skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill<60 || last_skill>64)
-				xlog(1,"Your Parry Score is the value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill and other sources."); 
-			break;
-		case 39: 
-			if (last_skill==60)
-				xlog(1,"Estimated Resistance score. This displays your 'true' Resistance value after adjustments that do not display on the skill list."); 
-			else if (last_skill==61 && pl.skill[46][0])
-				xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell. Value is listed in seconds."); 
-			else if (last_skill==62 && pl.skill[24][0])
-				xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); 
-			else if (last_skill==63 && pl.skill[7][0])
-				xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); 
-			else if (last_skill==64 && pl.skill[39][0])
-				xlog(1,"Effective damage taken multiplier with Safeguard."); 
-			else if (last_skill<60 || last_skill>64)
-				xlog(1,"Spell Modifier is determined by your character class and affects all spells."); 
-			break;
-		case 40: 
-			if (last_skill==60)
-				xlog(1,"Damage dealt to attackers when you are successfully hit (even if you take no damage). Does not damage attackers if they fail to hit you."); 
-			else if (last_skill==61 && pl.skill[19][0])
-				xlog(1,"Effective reduction of target attributes when casting your Curse spell, before reduction from target Immunity."); 
-			else if (last_skill==62 && pl.skill[43][0])
-				xlog(1,"Damage dealt by the Pulse spell to surrounding targets when pulsing, before reduction from target Immunity and Armor Value."); 
-			else if (last_skill==63 && pl.skill[37][0])
-				if (pl.worn_p[WN_FLAGS] & (1 << 11))
-					xlog(1,"Effective reduction of target Spell Modifier when using your Blind (Douse) skill, before reduction from target Immunity."); 
-				else
-					xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); 
-			else if (last_skill==64 && pl.skill[41][0])
-				xlog(1,"Effective reduction of target Weapon and/or Armor Values when using your Weaken skill, before reduction from target Immunity."); 
-			else if (last_skill<60 || last_skill>64)
-				xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); 
-			break;
-		case 41: 
-			if (last_skill==60 && pl.worn_p[WN_TOP]>0)
-				xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); 
-			else if (last_skill==61 && pl.skill[20][0])
-				xlog(1,"Aptitude Bonus grants additional aptitude to target allies when casting friendly spells. This is granted by Willpower."); 
-			else if (last_skill==62 && pl.skill[43][0])
-				xlog(1,"Number of pulses expected during the duration of your Pulse spell, determined by the rate of pulses from Cooldown Rate."); 
-			else if (last_skill==63)
-				xlog(1,"Effective reduction of target action speed when casting your Slow spell, before reduction from target Immunity."); 
-			else if (last_skill==64 && pl.skill[35][0])
-				if (pl.worn_p[WN_FLAGS] & (1 << 12))
-					xlog(1,"Effective bonus to hit and parry score granted to allies when using your Rally skill. Half of this value is granted to yourself as well."); 
-				else
-					xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); 
-			else if (last_skill<60 || last_skill>64)
-				xlog(1,"Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); 
-			break;
-*/
+		
 		// Magnification buttons for the mini-map
 		case 42:
 			xlog(1,"Increase minimap magnification.");
@@ -861,7 +771,7 @@ int _mouse_statbox(int x,int y,int state)
 
 	// Update Button
 	if (	x>gui_update[RECT_X1] 	&& y>gui_update[RECT_Y1] 
-		&&  x<gui_update[RECT_X2] 	&& y<gui_update[RECT_Y2])
+		&&  x<gui_update[RECT_X2] 	&& y<gui_update[RECT_Y2] && hudmode!=1 && hudmode!=2)
 	{
 		hightlight=HL_STATBOX;
 		hightlight_sub=0;
@@ -899,27 +809,27 @@ int _mouse_statbox(int x,int y,int state)
 
 	if (x<172) { // raise
 		if (state==MS_RB_UP) {
-			if (n<5) xlog(1,"Raise %s.",at_name[n]);
-			else if (n==5) xlog(1,"Raise Hitpoints.");
-			else if (n==6) xlog(1,"Raise Mana."); 	// xlog(1,"Raise Endurance.");
+			if (n<5 && hudmode==0) xlog(1,"Raise %s.",at_name[n]);
+			else if (n==5 && hudmode==0) xlog(1,"Raise Hitpoints.");
+			else if (n==6 && hudmode==0) xlog(1,"Raise Mana."); 	// xlog(1,"Raise Endurance.");
 			else if (n==7) return 1; 				// xlog(1,"Raise Mana.");
-			else xlog(1,"Raise %s.",skilltab[n-8+skill_pos].name);
+			else if (n>=8 && hudmode!=1 && hudmode!=2) xlog(1,"Raise %s.",skilltab[n-8+skill_pos].name);
 			return 1;
 		}
 		if (state!=MS_LB_UP) return 1;
 
-		if (n<5) {
+		if (n<5 && hudmode==0) {
 			if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])>pl.points-stat_points_used) return 1;
 			stat_points_used+=attrib_needed(n,pl.attrib[n][0]+stat_raised[n]);
 			stat_raised[n]++;
 			return 1;
-		} else if (n==5) {
+		} else if (n==5 && hudmode==0) {
 			if (hp_needed(pl.hp[0]+stat_raised[n])>pl.points-stat_points_used) return 1;
 			stat_points_used+=hp_needed(pl.hp[0]+stat_raised[n]);
 			stat_raised[n]++;
 			return 1;
 		} 
-		else if (n==6) 
+		else if (n==6 && hudmode==0) 
 		{
 			if (mana_needed(pl.mana[0]+stat_raised[n+1])>pl.points-stat_points_used) return 1;
 			stat_points_used+=mana_needed(pl.mana[0]+stat_raised[n+1]);
@@ -927,7 +837,7 @@ int _mouse_statbox(int x,int y,int state)
 			return 1;
 		} 
 		else if (n==7) return 1;
-		else {
+		else if (n>=8 && hudmode!=1 && hudmode!=2) {
 			m=skilltab[n-8+skill_pos].nr;
 			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+skill_pos])>pl.points-stat_points_used) return 1;
 			stat_points_used+=skill_needed(m,pl.skill[m][0]+stat_raised[n+skill_pos]);
@@ -938,27 +848,27 @@ int _mouse_statbox(int x,int y,int state)
 	else 
 	{ // lower
 		if (state==MS_RB_UP) {
-			if (n<5) xlog(1,"Lower %s.",at_name[n]);
-			else if (n==5) xlog(1,"Lower Hitpoints.");
-			else if (n==6) xlog(1,"Lower Mana."); 	// xlog(1,"Lower Endurance.");
+			if (n<5 && hudmode==0) xlog(1,"Lower %s.",at_name[n]);
+			else if (n==5 && hudmode==0) xlog(1,"Lower Hitpoints.");
+			else if (n==6 && hudmode==0) xlog(1,"Lower Mana."); 	// xlog(1,"Lower Endurance.");
 			else if (n==7) return 1; 				// xlog(1,"Lower Mana.");
-			else xlog(1,"Lower %s.",skilltab[n-8+skill_pos].name);
+			else if (n>=8 && hudmode!=1 && hudmode!=2) xlog(1,"Lower %s.",skilltab[n-8+skill_pos].name);
 			return 1;
 		}
 		if (state!=MS_LB_UP) return 1;
 
-		if (n<5) {
+		if (n<5 && hudmode==0) {
 			if (!stat_raised[n]) return 1;
 			stat_raised[n]--;
 			stat_points_used-=attrib_needed(n,pl.attrib[n][0]+stat_raised[n]);
 			return 1;
-		} else if (n==5) {
+		} else if (n==5 && hudmode==0) {
 			if (!stat_raised[n]) return 1;
 			stat_raised[n]--;
 			stat_points_used-=hp_needed(pl.hp[0]+stat_raised[n]);
 			return 1;
 		} 
-		else if (n==6) 
+		else if (n==6 && hudmode==0) 
 		{
 			if (!stat_raised[n+1]) return 1;
 			stat_raised[n+1]--;
@@ -966,7 +876,7 @@ int _mouse_statbox(int x,int y,int state)
 			return 1;
 		} 
 		else if (n==7) return 1;
-		else {
+		else if (n>=8 && hudmode!=1 && hudmode!=2) {
 			if (!stat_raised[n+skill_pos]) return 1;
 			m=skilltab[n-8+skill_pos].nr;
 			stat_raised[n+skill_pos]--;
@@ -993,7 +903,7 @@ int mouse_statbox(int x,int y,int state)
 	else 
 		m=1;
 	
-	if (hudmode==0)
+	if (hudmode==0 || hudmode==3)
 	{
 		for (n=0; n<m; n++) ret=_mouse_statbox(x,y,state);
 	}
@@ -1010,8 +920,9 @@ void meta_stat_descs(int n)
 		switch (n)
 		{
 			case  0: xlog(1,"Cooldown Duration is the multiplier that cooldown from skills is applied with, the lower the better. Affected by Cooldown Rate."); break;
-			case  1: xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and Spell Modifier."); break;
-			case  2: xlog(1,"Spell Modifier is a multiplier which affects the strength of spells you cast. Determined by your character class.");  break;
+			case  1: xlog(1,"Spell Aptitude is how powerful a spell you can receive from any source. Determined by Willpower, Intuition, and base class Spell Modifier."); break;
+			case  2: if (pl_flagc&(1<<10)) xlog(1,"Skill Modifier is a multiplier which effects the strength of skills you use.");
+					 else xlog(1,"Spell Modifier is a multiplier which effects the strength of spells you cast. Determined by your character class."); break;
 			case  3: xlog(1,"Base Action speed is the base speed at which ALL actions are performed. Determined by Agility and Strength."); break;
 			case  4: xlog(1,"Movement Speed is the speed at which your character runs around Astonia."); break;
 			case  5: xlog(1,"Your Hit Score is the value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill and other sources."); break;
@@ -1098,7 +1009,7 @@ void meta_stat_descs(int n)
 		{
 			case  1: if (pl_dmgrd!=10000)
 					 xlog(1,"Damage Reduction is the final multiplier for all damage you take."); break;
-			case  2: if (pl_dmgrd!=10000)
+			case  2: if (pl_dmgrd!=10000||(pl_flagc&(1<<9|1<<11|1<<12|1<<14))||(pl_flags&(1<<9)))
 					 xlog(1,"Your effective total hitpoints, taken by dividing your maximum hitpoints by your damage reduction multiplier, as well as any effects which nullify damage or transfer it to endurance or mana."); break;
 			case  3: xlog(1,"Rate at which health is regenerated per second. This is improved by the Regenerate skill, and can be further adjusted by various items."); break;
 			case  4: xlog(1,"Rate at which endurance is regenerated per second. This is improved by the Rest skill, and can be further adjusted by various items."); break;
@@ -1271,7 +1182,7 @@ int mouse_statbox2(int x,int y,int state)
 	// Skills
 	if (state==MS_RB_UP) 
 	{
-		if (hudmode==0)
+		if (hudmode==0 || hudmode==3)
 		{
 			m = skilltab[n+skill_pos].nr;
 			if (pl.skill[m][0] || m==50 || m==51) 
@@ -1343,7 +1254,7 @@ int mouse_statbox2(int x,int y,int state)
 			meta_stat_descs(n+7);
 		}
 	} 
-	else if (state==MS_LB_UP && hudmode==0)
+	else if (state==MS_LB_UP && (hudmode==0 || hudmode==3))
 	{
 		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,skilltab[n+skill_pos].attrib[0]);
 	}
@@ -1762,7 +1673,11 @@ int mouse_tree(int x, int y, int mode)
 	// Selecting a skill icon
 	if (nr<12) 
 	{
-		if (mode==MS_LB_UP) cmd1(CL_CMD_TREE,nr);
+		if (mode==MS_LB_UP) 
+		{
+			if (keys) cmd1(CL_CMD_TREE,nr+24);
+			else cmd1(CL_CMD_TREE,nr);
+		}
 		if (mode==MS_RB_UP) cmd1(CL_CMD_TREE,nr+12);
 		
 		hightlight=HL_SKTREE;

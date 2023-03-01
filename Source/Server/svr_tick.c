@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.10.0\n"};
+static char intro_msg3[] = {"Current client/server version is 0.10.6\n"};
 static char intro_msg4_font = 1;
 static char intro_msg4[] = {"The Uber Labyrinth is now open in Neiseer. Good luck!\n"};
 static char intro_msg5_font = 2;
@@ -1718,6 +1718,54 @@ void char_add_net(int cn, unsigned int net)
 	ch[cn].data[80] = net;
 }
 
+void char_remove_net(int cn, int co)
+{
+	int n, m;
+	
+	if (co<=0 || co>=MAXCHARS || !IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Error: Bad ID.\n");
+		return;
+	}
+	
+	for (n = 80; n<89; n++)
+	{
+		ch[cn].data[n] = 0;
+	}
+	
+	do_char_log(cn, 1, "Done.\n");
+}
+
+void char_remove_same_nets(int cn, int co)
+{
+	int cc, n, m;
+	
+	if (co<=0 || co>=MAXCHARS || !IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Error: Bad ID.\n");
+		return;
+	}
+	
+	for (cc = 1; cc<MAXCHARS; cc++)
+	{
+		if (ch[cc].used==USE_EMPTY || !IS_SANEPLAYER(cc)) continue;
+		for (n = 80; n<89; n++)
+		{
+			if (ch[cc].data[n]==0) continue;
+			for (m = 80; m<89; m++)
+			{
+				if (ch[co].data[m]==0) continue;
+				if (ch[cc].data[n]==ch[co].data[m])
+				{
+					ch[cc].data[n] = 0;
+				}
+			}
+		}
+	}
+	
+	do_char_log(cn, 1, "Done.\n");
+}
+
 void plr_newlogin(int nr)
 {
 	int cn, temp, tmp, in, n;
@@ -2791,13 +2839,8 @@ void plr_change(int nr)
 						{
 							*(short int*)(buf + 5) = it[in].sprite[0];
 						}
-						*(short int*)(buf + 7) = it[in].placement;
-						if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
-							*(short int*)(buf + 7) |= PL_WEAPON;
-						if (it[in].flags & IF_SOULSTONE)
-							*(short int*)(buf + 7) |= PL_SOULSTONED;
-						if (it[in].flags & IF_ENCHANTED)
-							*(short int*)(buf + 7) |= PL_ENCHANTED;
+						*(short int*)(buf + 7) = 0;
+						if (IS_SOULCAT(in)) *(short int*)(buf + 7) = it[in].data[4];
 						*(unsigned char*)(buf + 9) = it[in].stack;
 						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0);
 
@@ -2887,7 +2930,7 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_BREATHAMMY))  { chFlags += (1 <<  2); chFlags += (1 <<  1); }
 					//
 					if (get_tarot(cn, IT_CH_HERMIT_R)) 	chFlags += (1 <<  3); // Rage -> Frenzy
-					if (get_tarot(cn, IT_CH_CHARIO_R)) 	chFlags += (1 <<  4); // Debuffs 25% weaker
+					if (get_gear(cn, IT_BONEARMOR)) 	chFlags += (1 <<  4); // Bone Armor
 					if (get_tarot(cn, IT_CH_DEATH_R)) 	chFlags += (1 <<  5); // Zephyr
 					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse -> Immolate
 					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
@@ -3127,17 +3170,26 @@ void plr_change(int nr)
 		cpl->tree_points = ch[cn].tree_points;
 	}
 
-	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)
+	if (cpl->gold!=ch[cn].gold || ((get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].data[25]) 
+		|| (!get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].armor)) || cpl->weapon!=ch[cn].weapon)
 	{
 		buf[0] = SV_SETCHAR_GOLD;
 		*(unsigned long*)(buf + 1) = ch[cn].gold;
-		*(unsigned long*)(buf + 5) = ch[cn].armor;
+		if (get_gear(cn, IT_BONEARMOR))
+		{
+			*(unsigned long*)(buf + 5) = ch[cn].data[25];
+			cpl->armor  = ch[cn].data[25];
+		}
+		else
+		{
+			*(unsigned long*)(buf + 5) = ch[cn].armor;
+			cpl->armor  = ch[cn].armor;
+		}
 		*(unsigned long*)(buf + 9) = ch[cn].weapon;
 		xsend(nr, buf, 13);
 
 		cpl->gold = ch[cn].gold;
 		cpl->weapon = ch[cn].weapon;
-		cpl->armor  = ch[cn].armor;
 	}
 
 	if ((ch[cn].flags & CF_GOD) && (globs->ticker & 31)==0)
@@ -3408,7 +3460,7 @@ inline int do_char_calc_light(int cn, int light)
 	
 	if (IS_GLOB_MAYHEM)
 	{
-		if (light==0 && M_SK(cn, SK_PERCEPT)>225 && !has_buff(cn, 215))
+		if (light==0 && M_SK(cn, SK_PERCEPT)>225 && !has_buff(cn, 215) && !(IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND3)))
 		{
 			light = 1;
 		}
@@ -3416,7 +3468,7 @@ inline int do_char_calc_light(int cn, int light)
 	}
 	else
 	{
-		if (light==0 && M_SK(cn, SK_PERCEPT)>150 && !has_buff(cn, 215))
+		if (light==0 && M_SK(cn, SK_PERCEPT)>150 && !has_buff(cn, 215) && !(IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND3)))
 		{
 			light = 1;
 		}
@@ -3845,7 +3897,7 @@ void plr_getmap_complete(int nr)
 				smap[n].it_sprite = map[m].fsprite;
 				smap[n].it_status = 0;
 			}
-			else if ((co = map[m].it)!=0 && (!(it[co].flags & (IF_TAKE | IF_HIDDEN)) || 
+			else if (IS_SANEITEM(co = map[m].it) && (!(it[co].flags & (IF_TAKE | IF_HIDDEN)) || 
 				(visible && do_char_can_see_item(cn, co))))
 			{
 				if (it[co].active)

@@ -246,7 +246,7 @@ struct s_splog splog[52] = {
 };
 
 int spellcost(int cn, int cost, int in, int usemana);
-void damage_mshell(int co);
+void damage_mshell(int co, int dam);
 int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
 int chance(int cn, int d20);
 void add_exhaust(int cn, int len);
@@ -455,7 +455,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	}
 	*/
 	
-	if (usemana && (ch[co].flags & CF_NOMAGIC)) 
+	if (usemana && (ch[co].flags & CF_NOMAGIC) && !(IS_IN_CAROV(ch[co].x, ch[co].y)))
 	{
 		nomagic(cn, 1);
 		return 0;
@@ -544,7 +544,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 				chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
 				return 0;
 			}
-			damage_mshell(co);
+			damage_mshell(co, power);
 		}
 		
 		if (redir && !player_or_ghost(cn, co))
@@ -646,10 +646,10 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			_cap = (double)(PRXB_CAP);
 			_hit = (double)(PRXB_HIT);
 			_pow = (double)(PRXB_POW);
-			no_target = 1;
+			if (intemp!=SK_TAUNT) no_target = 1;
 			break;
 		case SK_BLAST: 
-			if (!T_ARHR_SK(cn, 4)) hitpower = power/2 + power/4;
+			hitpower = power/2 + power/4;
 		default:
 			spellrad = ch[cn].aoe_bonus;
 			_cap = (double)(PROX_CAP);
@@ -684,7 +684,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			{
 				continue;
 			}
-			damage_mshell(co);
+			damage_mshell(co, power);
 			aoeimm += get_target_immunity(cn, co);
 			count++;
 		}
@@ -710,7 +710,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 	if (intemp==SK_BLAST)
 	{
 		hitpower = spell_immunity(power, aoeimm) * 2;
-		if (!T_ARHR_SK(cn, 4)) hitpower = hitpower/2 + hitpower/4;
+		hitpower = hitpower/2 + hitpower/4;
 		cost = ((power * 2) / 8 + 5) * (PROX_MULTI + aoe_power) / PROX_MULTI;
 		
 		// Harakim costs less, monster cost more mana
@@ -968,7 +968,7 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power, int d
 						break;
 				}
 			}
-			damage_mshell(co);
+			damage_mshell(co, power);
 			hit++;
 		}
 	}
@@ -1391,7 +1391,7 @@ int chance(int cn, int d20)
 	return 0;
 }
 
-void damage_mshell(int co)
+void damage_mshell(int co, int dam)
 {
 	int tmp = 0, n, in;
 	
@@ -1404,9 +1404,10 @@ void damage_mshell(int co)
 			if (bu[in].temp==SK_MSHELL)
 			{
 				if (IS_SEYA_OR_BRAV(co))
-					tmp = (bu[in].active / 768 + 1)*5;
+					tmp = bu[in].active / 768 + 1;
 				else
-					tmp = (bu[in].active / 512 + 1)*5;
+					tmp = bu[in].active / 512 + 1;
+				tmp = (dam + tmp - get_target_resistance(0, co)) * 5;
 
 				if (tmp>0)
 				{
@@ -1436,6 +1437,9 @@ void damage_mshell(int co)
 			}
 		}
 	}
+	
+	if (IS_SANEITEM(in = ch[co].worn[WN_CLOAK]) && it[in].driver == 60 && RANDOM(3))
+		item_damage_worn(co, WN_CLOAK, dam);
 }
 
 int get_target_resistance(int cn, int co)
@@ -1448,21 +1452,24 @@ int get_target_resistance(int cn, int co)
 	else
 		target_resist = M_SK(co, SK_RESIST);
 	
-	// Tarot - Chariot.R : 25% res/imm penetration
-	if (get_tarot(cn, IT_CH_CHARIO_R))
-		target_resist = target_resist * 4/5;
-	
-	// Lethargy - penetrate
-	if (in = has_buff(cn, SK_LETHARGY))
+	if (IS_SANECHAR(cn))
 	{
-		if (bu[in].data[2])
-			target_resist -= bu[in].power/4;
-		else
-			target_resist -= bu[in].power/3;
+		// Tarot - Chariot.R : 25% res/imm penetration
+		if (get_tarot(cn, IT_CH_CHARIO_R))
+			target_resist = target_resist * 4/5;
+		
+		// Lethargy - penetrate
+		if (in = has_buff(cn, SK_LETHARGY))
+		{
+			if (bu[in].data[2])
+				target_resist -= bu[in].power/4;
+			else
+				target_resist -= bu[in].power/3;
+		}
+		
+		// Tree - seya
+		if (T_SEYA_SK(cn, 6)) target_resist = target_resist*4/5;
 	}
-	
-	// Tree - seya
-	if (T_SEYA_SK(cn, 6)) target_resist = target_resist*4/5;
 	
 	return max(1, target_resist);
 }
@@ -2445,7 +2452,7 @@ int spell_heal(int cn, int co, int power)
 		{
 			// Each stack of heal sickness reduces the spell power by 1/4th
 			tmp = 4 - bu[in2].data[1];
-			power = power * tmp * (T_BRAV_SK(co, 10)?80:100) / 400;
+			power = power * tmp * (T_BRAV_SK(co, 10)?75:100) / 400;
 			if (4-tmp) 
 			{
 				do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", 100-tmp*25);
@@ -3534,7 +3541,7 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 	chlog(cn, "Cast Blast on %s", ch[co].name);
 	
 	hitpower = spell_immunity(power, get_target_immunity(cn, co)) * 2;
-	if (co_orig && !T_ARHR_SK(cn, 4)) hitpower = hitpower/2 + hitpower/4;
+	if (co_orig) hitpower = hitpower/2 + hitpower/4;
 	
 	// Ira
 	if (get_gear(cn, IT_TW_IRA))
@@ -3585,7 +3592,7 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 void skill_blast(int cn)
 {
 	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int power, aoe_power, cost;
+	int power, aoe_power, cost, exhst = SK_EXH_BLAST;
 	int count = 0, hit = 0;
 	int co = 0, co_orig = 0;
 	int avgdmg = 0;
@@ -3623,17 +3630,21 @@ void skill_blast(int cn)
 	// Cast AoE or general surround-hit
 	if (can_aoe)
 	{
-		if (cast_aoe_spell(cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg, dr1, dr2) < 0)
+		if ((hit = cast_aoe_spell(cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg, dr1, dr2)) < 0)
 			return;
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
-		surround_cast(cn, co_orig, 0, SK_BLAST, power, dr1, dr2);
+		hit += surround_cast(cn, co_orig, 0, SK_BLAST, power, dr1, dr2);
 	}
 	
-	add_exhaust(cn, SK_EXH_BLAST);
+	// Tree - cooldown reduced by # hit
+	if (T_ARHR_SK(cn, 4))
+		exhst = max(SK_EXH_BLAST/4, exhst - hit*5);
+	
+	add_exhaust(cn, exhst);
 }
 
 int item_repair(int cn, int in, int power, int n, int flag)
@@ -3842,6 +3853,7 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 	{
 		if ((in = ch[cn].spell[n])==0)	continue;
 		if (bu[in].temp == 1)			continue;
+		if (bu[in].temp == SK_DIVINITY) continue;
 		if (bu[in].data[4] == 1)		continue; // Effects not removed by NMZ
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
@@ -3907,7 +3919,7 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag)
 }
 void skill_dispel(int cn)
 {
-	int in, co, n, m, base_pow, power, ail_pow = 0, success = 0, chanc, flag, verd;
+	int in, co, n, m, base_pow, power, ail_pow = 0, success = 0, chanc, flag, verd, ismon=0;
 	int ail[DISPEL_MAX] = {0};
 	int d20 = SP_MULT_DISPEL;
 	int sto[DISPEL_STORE] = {0};
@@ -3927,6 +3939,8 @@ void skill_dispel(int cn)
 	// Tarot Card - Hierophant :: Dispel removes positive spells instead of negative spells
 	flag = get_tarot(cn, IT_CH_HEIROPH);
 	verd = get_book(cn, IT_BOOK_VERD);
+	
+	if (!IS_PLAYER(co) && !IS_PLAYER_COMP(co)) ismon = 1;
 	
 	if (cn!=co)
 	{
@@ -3981,23 +3995,23 @@ void skill_dispel(int cn)
 		{
 			if ((in = ch[co].spell[n])==0) { continue; }
 			
-			if (bu[in].temp==SK_VENOM)		ail[0] = n;
-			if (bu[in].temp==SK_POISON)		ail[1] = n;
-			if (bu[in].temp==SK_BLEED) 		ail[2] = n;
-			if (bu[in].temp==SK_FROSTB) 	ail[3] = n;
-			if (bu[in].temp==SK_BLIND) 		ail[4] = n;
-			if (bu[in].temp==SK_WARCRY2) 	ail[5] = n;
-			if (bu[in].temp==SK_CURSE2) 	ail[6] = n;
-			if (bu[in].temp==SK_CURSE) 		ail[7] = n;
-			if (bu[in].temp==SK_WARCRY) 	ail[8] = n;
-			if (bu[in].temp==SK_WEAKEN2) 	ail[9] = n;
-			if (bu[in].temp==SK_WEAKEN) 	ail[10] = n;
-			if (bu[in].temp==SK_SLOW2) 		ail[11] = n;
-			if (bu[in].temp==SK_SLOW) 		ail[12] = n;
-			if (bu[in].temp==SK_DOUSE) 		ail[13] = n;
-			if (bu[in].temp==SK_AGGRAVATE) 	ail[14] = n;
-			if (bu[in].temp==SK_SCORCH) 	ail[15] = n;
-			if (bu[in].temp==SK_DISPEL2) 	ail[16] = n;
+			if (!ismon && bu[in].temp==SK_VENOM)	ail[0] = n;
+			if (!ismon && bu[in].temp==SK_POISON)	ail[1] = n;
+			if (!ismon && bu[in].temp==SK_BLEED) 	ail[2] = n;
+			if (!ismon && bu[in].temp==SK_FROSTB) 	ail[3] = n;
+			if (bu[in].temp==SK_BLIND) 				ail[4] = n;
+			if (bu[in].temp==SK_WARCRY2) 			ail[5] = n;
+			if (bu[in].temp==SK_CURSE2) 			ail[6] = n;
+			if (bu[in].temp==SK_CURSE) 				ail[7] = n;
+			if (bu[in].temp==SK_WARCRY) 			ail[8] = n;
+			if (bu[in].temp==SK_WEAKEN2) 			ail[9] = n;
+			if (bu[in].temp==SK_WEAKEN) 			ail[10] = n;
+			if (bu[in].temp==SK_SLOW2) 				ail[11] = n;
+			if (bu[in].temp==SK_SLOW) 				ail[12] = n;
+			if (bu[in].temp==SK_DOUSE) 				ail[13] = n;
+			if (bu[in].temp==SK_AGGRAVATE) 			ail[14] = n;
+			if (bu[in].temp==SK_SCORCH) 			ail[15] = n;
+			if (bu[in].temp==SK_DISPEL2) 			ail[16] = n;
 		}
 	}
 	for (m = 0; m<DISPEL_MAX; m++) if (ail[m]>-1)
@@ -4323,8 +4337,15 @@ void skill_ghost(int cn)
 		tmp = tmp * 5 / max(1, ch[cc].skill[n][3]);
 		if (ch[cc].skill[n][2])
 		{
-			B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/10, tmp);
-			archtmp++;
+			if (n==0)
+			{
+				B_SK(cc, n) = min(ch[cc].skill[n][2]+archbonus*3/20, tmp);
+			}
+			else
+			{
+				B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/10, tmp);
+				archtmp++;
+			}
 		}
 	}
 	
@@ -4554,8 +4575,6 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		case 26048: 
 			ch[cc].skill[SK_CLEAVE][2] = 120; ch[cc].skill[SK_CLEAVE][3] = 4;
 			ch[cc].skill[SK_WEAKEN][2] = 105; ch[cc].skill[SK_WEAKEN][3] = 5;
-			ch[cc].skill[SK_MEDIT][2]  =   0; ch[cc].skill[SK_MEDIT][3]  = 0;
-			ch[cc].mana[2] = 0;
 			break;
 		
 		case  5072: // Mercenary Group
@@ -4636,8 +4655,15 @@ int spell_shadow(int cn, int co, int cz, int archbonus, int dont_atk)
 		tmp = tmp * 5 / max(1, ch[cc].skill[n][3]);
 		if (ch[cc].skill[n][2])
 		{
-			B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/10, tmp);
-			archtmp++;
+			if (n==0)
+			{
+				B_SK(cc, n) = min(ch[cc].skill[n][2]+archbonus*3/20, tmp);
+			}
+			else
+			{
+				B_SK(cc, n) = min(ch[cc].skill[n][2]+(archbonus-archtmp)/10, tmp);
+				archtmp++;
+			}
 		}
 	}
 	
@@ -4953,7 +4979,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	chlog(cn, "Used Cleave on %s", ch[co].name);
 	
 	if (T_ARTM_SK(cn, 4)) hitpower = hitpower + ch[cn].gethit_dam;
-	if (T_WARR_SK(cn, 9)) hitpower = hitpower + (hitpower * M_AT(cn, AT_STR)/1000);
+	if (T_WARR_SK(cn, 9)) hitpower = hitpower + (hitpower * M_AT(cn, AT_STR)/500);
 	hitpower = spell_immunity(power, ch[co].to_parry) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
 	
@@ -5295,7 +5321,7 @@ void skill_pulse(int cn)
 	if (chance(cn, FIVE_PERC_FAIL)) 					{ return; }
 	
 	power = M_SK(cn, SK_PULSE);
-	if (T_ARHR_SK(cn, 7)) power = power + (power * M_AT(cn, AT_INT)/1000);
+	if (T_ARHR_SK(cn, 7)) power = power + (power * M_AT(cn, AT_INT)/500);
 	
 	// Tarot - Judgement.R : Pulse changed to Immolate
 	if (tarot)
@@ -5315,7 +5341,7 @@ void skill_pulse(int cn)
 // Gets AoE with Proximity skill
 int spell_taunt(int cn, int co, int power, int flag)
 {
-	int in, dur = SP_DUR_TAUNT;
+	int in;
 	
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
@@ -5328,17 +5354,8 @@ int spell_taunt(int cn, int co, int power, int flag)
 	if (get_tarot(cn, IT_CH_CHARIO_R)) 	power = power*3/4;
 	if (get_enchantment(co, 4)) 		power = power*4/5;
 	
-	if (power < get_target_resistance(cn, co))
-	{
-		dur = dur * max(1, 100 - (get_target_resistance(cn, co) - power)) / 100;
-	}
-	
-	if (!(in = make_new_buff(cn, SK_TAUNT, BUF_SPR_TAUNT, power, dur, 0)))
+	if (!(in = make_new_buff(cn, SK_TAUNT, BUF_SPR_TAUNT, power, max(TICKS/4, power), 0)))
 		return 0;
-	
-	// Tree
-	if (T_ARTM_SK(cn, 9))
-		bu[in].to_hit[1] = -(ch[co].to_hit/20);
 	
 	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_TAUNT)
 	bu[in].data[5] = 1;
@@ -5423,33 +5440,28 @@ void skill_leap(int cn)
 	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
 	int power, aoepower, cost, dist, cost_dist, cost_pow, tmp, critical;
 	int co, cc=0, dam;
-	int x, y, m, md, obstructed = 0, newdir = 0, randomtarg = 0, cooldown = SK_EXH_LEAP;
+	int x, y, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0, cooldown = SK_EXH_LEAP;
 	int dist_target=0, same_target=0;
 	int xc, yc, xf, yf, xt, yt, c;
 	int catalog[64] = { 0 };
 	
 	power = M_SK(cn, SK_LEAP) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
 	power = skill_multiplier(power, cn);
-	aoepower = 8 + ch[cn].aoe_bonus;
+	aoepower = 10 + ch[cn].aoe_bonus;
 	critical = ch[cn].crit_multi;
 	
-	if (critical > 175)
+	if (critical > 200)
 	{
-		critical = critical - 175;
-		critical = 175 + critical/2;
-	}
-	if (critical > 250)
-	{
-		critical = critical - 250;
-		critical = 250 + critical/2;
+		critical = critical - 200;
+		critical = 200 + critical/2;
 	}
 	
 	// Tarot Card - Justice.R :: Reduce base cooldown & make target random
 	if (get_tarot(cn, IT_CH_JUSTIC_R))
 	{
 		randomtarg = 1;
-		critical = 100;
-		cooldown -= TICKS*2;
+		critical = 100 + (critical-100)/2;
+		cooldown = cooldown/2;
 	}
 	
 	if (randomtarg)
@@ -5504,8 +5516,25 @@ void skill_leap(int cn)
 	
 	if (cc==cn)
 	{
-		do_char_log(cn, 0, "You cannot leap on yourself!\n");
-		return;
+		if (ch[cn].goto_x)
+		{
+			x = ch[cn].goto_x;
+			y = ch[cn].goto_y;
+			fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+			god_transfer_char(cn, x, y);
+			fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+			ch[cn].escape_timer = TICKS*3;
+			for (m = 0; m<4; m++) ch[cn].enemy[m] = 0;
+			remove_enemy(cn);
+			ch[cn].goto_x = 0;
+			add_exhaust(cn, cooldown);
+			return;
+		}
+		else
+		{
+			do_char_log(cn, 0, "You cannot leap on yourself!\n");
+			return;
+		}
 	}
 	
 	if (dist_target && !do_char_can_see(cn, co))
@@ -5538,10 +5567,10 @@ void skill_leap(int cn)
 	}
 	
 	// Check for obstructions
-	if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) ||
-	   (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
-	   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER)) ||
-	   (map[m + md].it && (it[map[m + md].it].flags & IF_MOVEBLOCK)))
+	if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) || (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
+	   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && (!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
+	   (IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
+	   (IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)))
 	{
 		// try again with target back
 		if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md = -MAPX;		newdir = DX_DOWN;	}
@@ -5550,10 +5579,10 @@ void skill_leap(int cn)
 		if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md =  1;		newdir = DX_LEFT;	}
 		
 		// Check for obstructions
-		if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) ||
-		   (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
-		   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER)) ||
-		   (map[m + md].it && (it[map[m + md].it].flags & IF_MOVEBLOCK)))
+		if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) || (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
+		   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && (!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
+		   (IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
+		   (IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)))
 		{
 			// try again with local target instead
 			co = cc;  
@@ -5564,10 +5593,10 @@ void skill_leap(int cn)
 			if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md =  1;		newdir = DX_LEFT;	}
 			
 			// Check for obstructions
-			if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) ||
-			   (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
-			   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER)) ||
-			   (map[m + md].it && (it[map[m + md].it].flags & IF_MOVEBLOCK)))
+			if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) || (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
+			   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && (!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
+			   (IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
+			   (IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)))
 			{
 				obstructed = 1;
 			}

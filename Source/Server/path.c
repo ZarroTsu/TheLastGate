@@ -203,7 +203,7 @@ static inline int dr_check_target(int m)
 	int in;
 
 	if (((unsigned long)map[m].flags & mapblock) || map[m].ch || map[m].to_ch ||
-	    ((in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
+	    (IS_SANEITEM(in = map[m].it) && (it[in].flags & IF_MOVEBLOCK) && it[in].driver!=2 && it[in].driver!=77 && it[in].driver!=78 && it[in].driver!=94))
 	{
 		return 0;
 	}
@@ -419,11 +419,19 @@ int pathfinder(int cn, int x1, int y1, int flag, int x2, int y2)
 	ccn = cn;
 	if (IS_MONSTER(cn) && !(ch[cn].flags & (CF_USURP | CF_THRALL)))
 	{
-		mapblock = MF_NOMONST | MF_MOVEBLOCK;
+		mapblock = MF_MOVEBLOCK | MF_NOMONST;
+	}
+	else if (IS_IN_XVIII(x1, y1) && has_item(cn, IT_COMMAND2))
+	{
+		mapblock = MF_MOVEBLOCK | MF_BANK;
+	}
+	else if (!IS_IN_XVIII(x1, y1) || has_item(cn, IT_COMMAND4))
+	{
+		mapblock = MF_MOVEBLOCK | MF_NOPLAYER;
 	}
 	else
 	{
-		mapblock = MF_MOVEBLOCK | MF_NOPLAYER;
+		mapblock = MF_MOVEBLOCK;
 	}
 	if (!(ch[cn].flags & (CF_PLAYER | CF_USURP)) || get_enchantment(cn, 10))
 	{

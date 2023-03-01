@@ -49,6 +49,8 @@ void tick(void);
 void player_exit(int nr);
 void plr_logout(int cn, int nr, int reason);
 void cl_list(void);
+void char_remove_net(int cn, int co);
+void char_remove_same_nets(int cn, int co);
 
 // -- disk --
 void update(void);
@@ -139,6 +141,7 @@ void god_drdata(int cn, int co, int n, int val);
 void god_destroy_items(int cn);
 void god_reset_all_depths(int cn);
 void god_set_depth(int cn, int co, int v, int gflag);
+void god_give_points(int cn, int co, int v);
 void god_raise_char(int cn, int co, int v, int bsp);
 void god_lower_char(int cn, int co, int v);
 void god_donate_item(int in, int place);
@@ -220,6 +223,7 @@ int get_tarot(int cn, int in);
 int get_book(int cn, int in);
 int get_gear(int cn, int in);
 int get_enchantment(int cn, int in);
+int has_item(int cn, int temp);
 //
 void do_add_light(int x, int y, int stren);
 int do_store_item(int cn);
@@ -300,6 +304,7 @@ void finish_laby_teleport(int cn, int nr, int exp_pts);
 void debuff_vantablack(int cn);
 void show_pent_count(int cn);
 int explorer_point(int cn, int in, int msg);
+int get_rebirth_bits(int cn);
 int get_seyan_bits(int cn);
 int use_seyan_shrine(int cn, int in, int flag);
 
@@ -354,7 +359,7 @@ int st_learned_skill(int st_val, int v);
 int st_skill_pts_have(int st_val);
 int st_skill_pts_all(int st_val);
 int get_best_worn(int cn, int v);
-int get_special_item(int in, int gen_a, int gen_b, int gen_c);
+int get_special_item(int cn, int in, int gen_a, int gen_b, int gen_c);
 int get_special_spr(int in, int spr);
 int create_special_item(int temp, int gen_a, int gen_b, int gen_c);
 int killed_class(int cn, int val);

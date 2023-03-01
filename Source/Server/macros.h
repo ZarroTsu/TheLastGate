@@ -51,6 +51,7 @@
 #define IS_SOULSTONE(in)		(it[(in)].driver==68)
 #define IS_SOULFOCUS(in)		(it[(in)].driver==92)
 #define IS_SOULCAT(in)			(it[(in)].driver==93)
+#define IS_TAROT(in)			((it[(in)].temp>=IT_CH_FOOL && it[(in)].temp<=IT_CH_WORLD) || (it[(in)].temp>=IT_CH_FOOL_R && it[(in)].temp<=IT_CH_WORLD_R))
 
 #define IS_CONTRACT(in)			(it[(in)].temp==MCT_CONTRACT)
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
@@ -214,7 +215,7 @@
 #define DESC_LOVERS		"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
 #define DESC_CHARIOT	"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n"
 #define DESC_STRENGTH	"When equipped, reduces your attack and cast speed by 15%%, but grants 20%% more damage with melee attacks.\n"
-#define DESC_HERMIT		"When equipped, you have 20%% more Armor Value, but 20%% less Resistance and Immunity.\n"
+#define DESC_HERMIT		"When equipped, you have 15%% more Armor Value, but 20%% less Resistance and Immunity.\n"
 #define DESC_WHEEL		"When equipped, your critical hit chance is reduced by 33%%, but you have 33%% more critical hit multiplier.\n"
 #define DESC_JUSTICE	"When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_HANGED		"When equipped, 33%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
@@ -233,13 +234,13 @@
 #define DESC_PREIST_R	"When equipped, your HP and MP limits are now 800, and natural overcap effects are disabled. Overcapped HP now increases damage taken by 1%% per 50. Overcapped MP now increases mana costs by 1%% per 20. Overcapping either resource now increases damage dealt by 1%% per 100.\n"
 #define DESC_EMPRES_R	"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"
 #define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
-#define DESC_HEIROP_R	"When equipped, your Ghost Companion has 20%% more Weapon Value and Armor Value, but has a 25%% chance to miss when it should have hit.\n"
+#define DESC_HEIROP_R	"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R	"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
 #define DESC_CHARIO_R	"When equipped, your debuffs ignore 20%% of target resistance and immunity, but are 25%% weaker once applied.\n"
 #define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
 #define DESC_HERMIT_R	"When equipped, your Rage skill grants a large bonus to Top Damage instead of Weapon Value.\n"
 #define DESC_WHEEL_R	"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
-#define DESC_JUSTIC_R	"When equipped, your Leap skill no longer deals critical damage, has reduced base cooldown, and instead chooses a random nearby target.\n"
+#define DESC_JUSTIC_R	"When equipped, your Leap skill deals halved critical damage, has halved base cooldown, and instead chooses a random nearby target.\n"
 #define DESC_HANGED_R	"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"
 #define DESC_DEATH_R	"When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n"
 #define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
@@ -345,5 +346,14 @@
 #define CFL_N_ARFL		"  Area contains %s open flames\n"
 // 						"!        .         .   |     .         .        !"
 
-#define IS_IN_SUN(x, y) 	((x>=32 && y>=407 && x<=57 && y<= 413) || (x>=32 && y>=414 && x<=64 && y<= 428) || (x>=22 && y>=429 && x<=64 && y<=450) || (x>=22 && y>=451 && x<=27 && y<=459) || (x>=59 && y>=451 && x<=64 && y<=465) || (x>=173 && y>=921 && x<=255 && y<=1003))
-#define IS_IN_VANTA(x, y) 	((x>=94 && y>=1135 && x<=182 && y<= 1223))
+#define IS_IN_SUN(x, y) 	((x>=  32&&y>= 407&&x<=  57&&y<= 413)||(x>=  32&&y>= 414&&x<=  64&&y<= 428)||(x>=  22&&y>= 429&&x<=  64&&y<= 450)||(x>=  22&&y>= 451&&x<=  27&&y<= 459)||(x>=  59&&y>= 451&&x<=  64&&y<= 465)||(x>= 173&&y>= 921&&x<= 255&&y<=1003))
+#define IS_IN_ABYSS(x, y)	((x>=438&&y>=110&&x<=470&&y<=142)?1:((x>=438&&y>=148&&x<=470&&y<=180)?2:((x>=476&&y>=148&&x<=508&&y<=180)?3:((x>=476&&y>=110&&x<=508&&y<=142)?4:((x>=476&&y>= 72&&x<=508&&y<=104)?5:((x>=476&&y>= 34&&x<=508&&y<= 66)?6:((x>=514&&y>= 34&&x<=546&&y<= 66)?7:((x>=514&&y>= 72&&x<=546&&y<=104)?8:((x>=514&&y>=110&&x<=546&&y<=142)?9:((x>=523&&y>=148&&x<=537&&y<=180)?10:0))))))))))
+#define IS_IN_XIII(x, y) 	((x>= 132&&y>= 153&&x<= 152&&y<= 240))
+#define IS_IN_VANTA(x, y) 	((x>=  94&&y>=1135&&x<= 182&&y<=1223))
+#define IS_IN_XVIII(x, y) 	((x>=  94&&y>=1474&&x<= 171&&y<=1564))
+#define IS_IN_XIX(x, y) 	((x>=  94&&y>=1587&&x<= 260&&y<=1753))
+#define IS_IN_ZRAK(x, y) 	((x>=  94&&y>=1587&&x<= 185&&y<=1670))
+#define IS_IN_BOJ(x, y) 	((x>= 203&&y>=1587&&x<= 260&&y<=1670))
+#define IS_IN_CAROV(x, y) 	((x>= 178&&y>=1687&&x<= 260&&y<=1753))
+#define IS_IN_XX(x, y) 		((x>= 194&&y>=1474&&x<= 214&&y<=1533))
+#define IS_IN_TLG(x, y) 	((x>= 195&&y>=1545&&x<= 213&&y<=1563))

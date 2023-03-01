@@ -572,7 +572,7 @@ int pop_create_char(int n, int drop)
 	}
 
 	ch[cn].a_end = 1000000;
-	ch[cn].a_hp  = 1000000;
+	ch[cn].a_hp  = 9999999;
 	if (B_SK(cn, SK_MEDIT))
 	{
 		ch[cn].a_mana = 1000000;

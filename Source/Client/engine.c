@@ -563,39 +563,39 @@ struct sk_tree sk_tree[8][12]={
 	{	// Seyan'du
 		{ "Sharpness", 				"+2 to Weapon Value.", 	// W
 		  6601,						"" },
-		{ "Expertise", 				"+1 to All Attributes.", 	// N
+		{ "Expertise", 				"+2 to All Attributes.", 	// N
 		  6602,						"" },
 		{ "Toughness", 				"+2 to Armor Value.", 	// E
 		  6603,						"" },
-		{ "Absolution", 			"0.25%% more damage dealt for each buff", 	// WS
+		{ "Absolution", 			"0.5%% more damage dealt for each buff", 	// WS
 		  6604,						"or debuff on you." },
-		{ "Vanquisher", 			"8%% more total Weapon Value.", 	// WW
+		{ "Vanquisher", 			"6%% more total Weapon Value.", 	// WW
 		  6605,						"" },
 		{ "Scorn", 					"Your debuffs ignore 20%% of enemy", 	// WN
-		  6606,						"Resistance when cast." },
+		  6606,						"Resistance." },
 		{ "Determination", 			"Gain 1 additional Hit and Parry for", 	// NW
-		  6607,						"every 60 total Attributes." },
+		  6607,						"every 100 total Attributes." },
 		{ "Jack of All Trades", 	"2%% more total Attributes.", 	// NN
 		  6608,						"" },
 		{ "Redemption", 			"Companions have Hit and Parry scores", 	// NE
 		  6609,						"equal to yours, and learn Regen." },
 		{ "Enigmatic", 				"20%% reduced effect of debuffs on you.", 	// EN
 		  6610,						"" },
-		{ "Steelskin", 				"8%% more total Armor Value.", 	// EE
+		{ "Steelskin", 				"6%% more total Armor Value.", 	// EE
 		  6611,						"" },
 		{ "Penance", 				"0.5%% less damage taken for each buff", 	// ES
 		  6612,						"or debuff on you." }
 	}, // "         '         '  ",	"         '         '         '         "
 	{	// Arch Templar
-		{ "Spiked", 				"+4 to Thorns.", 	// W
+		{ "Spiked", 				"+5 to Thorns.", 	// W
 		  6613,						"" },
-		{ "Might", 					"+3 to Strength.", 	// N
+		{ "Might", 					"+4 to Strength.", 	// N
 		  6614,						"" },
-		{ "Bulwark", 				"+2 to Armor Value.", 	// E
+		{ "Bulwark", 				"+3 to Armor Value.", 	// E
 		  6615,						"" },
 		{ "Serrated Blades", 		"Cleave deals additional damage based on", 	// WS
 		  6616,						"your total Thorns." },
-		{ "Sharkskin", 				"12%% more total Thorns.", 	// WW
+		{ "Sharkskin", 				"20%% more total Thorns.", 	// WW
 		  6617,						"" },
 		{ "Retaliation", 			"Your Thorns can now trigger on a", 	// WN
 		  6618,						"parried hit with 10%% power." },
@@ -607,25 +607,25 @@ struct sk_tree sk_tree[8][12]={
 		  6621,						"for its duration." },
 		{ "Bastion", 				"20%% of total Resistance is granted as", 	// EN
 		  6622,						"extra Immunity." },
-		{ "Unbreakable", 			"8%% more total Armor Value.", 	// EE
+		{ "Unbreakable", 			"9%% more total Armor Value.", 	// EE
 		  6623,						"" },
 		{ "Rampart", 				"50%% more Parry granted by your Shield", 	// ES
 		  6624,						"skill." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Skald
-		{ "Maiming", 				"+4 to Top Damage.", 	// W
+		{ "Maiming", 				"+5 to Top Damage.", 	// W
 		  6625,						"" },
-		{ "Dexterity", 				"+3 to Agility.", 	// N
+		{ "Dexterity", 				"+4 to Agility.", 	// N
 		  6626,						"" },
 		{ "Persistance", 			"+20 Endurance.", 	// E
 		  6627,						"" },
-		{ "Nocturne", 				"15%% increased effect of Aria.", 	// WS
+		{ "Nocturne", 				"20%% increased effect of Aria.", 	// WS
 		  6628,						"" },
-		{ "Ravager", 				"8%% more total Top Damage.", 	// WW
+		{ "Ravager", 				"20%% more total Top Damage.", 	// WW
 		  6629,						"" },
 		{ "Preparation", 			"Your Top Damage is rolled an additional", 	// WN
 		  6630,						"time, using the higher result." },
-		{ "Slaying", 				"+2%% Critical Multiplier for every 10", 	// NW
+		{ "Slaying", 				"+2.5%% Critical Multiplier for every 10", 	// NW
 		  6631,						"total Agility." },
 		{ "Overwhelming Agility", 	"+10 to Agility Limit.", 	// NN
 		  6632,						"" },
@@ -633,33 +633,33 @@ struct sk_tree sk_tree[8][12]={
 		  6633,						"Agility + Agility + Strength." },
 		{ "Impact", 				"Weaken and Crush also reduce enemy", 	// EN
 		  6634,						"critical hit chance." },
-		{ "Perseverance", 			"12%% more total Endurance.", 	// EE
+		{ "Perseverance", 			"20%% more total Endurance.", 	// EE
 		  6635,						"" },
 		{ "Tenacity", 				"10%% of damage taken is dealt to your", 	// ES
 		  6636,						"Endurance instead." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Warrior
-		{ "Rapidity", 				"+4 to Attack Speed.", 	// W
+		{ "Rapidity", 				"+5 to Attack Speed.", 	// W
 		  6637,						"" },
-		{ "Ruffian", 				"+2 to Strength & +2 to Agility.", 	// N
+		{ "Ruffian", 				"+3 to Strength & +3 to Agility.", 	// N
 		  6638,						"" },
-		{ "Passion", 				"+3 to Spell Aptitude.", 	// E
+		{ "Passion", 				"+5 to Spell Aptitude.", 	// E
 		  6639,						"" },
 		{ "Alacrity", 				"Zephyr deals 20%% more damage.", 	// WS
 		  6640,						"" },
-		{ "Swiftness", 				"8%% more total Attack Speed.", 	// WW
+		{ "Swiftness", 				"10%% more total Attack Speed.", 	// WW
 		  6641,						"" },
-		{ "Intensity", 				"+0.01 to Spell Modifier.", 	// WN
+		{ "Intensity", 				"+2 to Spell Modifier.", 	// WN
 		  6642,						"" },
 		{ "Antagonizer", 			"0.5%% more effect of Blind and Douse", 	// NW
-		  6643,						"for every 10 total Strength." },
+		  6643,						"for every 10 total Agility." },
 		{ "Harrier", 				"3%% more total Agility and Strength.", 	// NN
 		  6644,						"" },
-		{ "Butchery", 				"1%% more effect of Cleave for every", 	// NE
+		{ "Butchery", 				"2%% more effect of Cleave for every", 	// NE
 		  6645,						"10 total Strength." },
 		{ "Champion", 				"Enemies beside and behind you no longer", 	// EN
 		  6646,						"gain a bonus to hitting you." },
-		{ "Zealotry", 				"12%% more total Spell Aptitude.", 	// EE
+		{ "Zealotry", 				"20%% more total Spell Aptitude.", 	// EE
 		  6647,						"" },
 		{ "Fervor", 				"0.5%% less damage taken per 10 Spell", 	// ES
 		  6648,						"Aptitude." }
@@ -667,87 +667,87 @@ struct sk_tree sk_tree[8][12]={
 	{	// Sorcerer
 		{ "Expansiveness", 			"+1 to Area of Effect.", 	// W
 		  6649,						"" },
-		{ "Potency", 				"+2 to Willpower & +2 to Intuition.", 	// N
+		{ "Potency", 				"+3 to Willpower & +3 to Intuition.", 	// N
 		  6650,						"" },
-		{ "Quickstep", 				"+4 to Movement Speed.", 	// E
+		{ "Quickstep", 				"+5 to Movement Speed.", 	// E
 		  6651,						"" },
 		{ "Tormenter", 				"Poison deals damage 10%% faster.", 	// WS
 		  6652,						"" },
 		{ "Grandiosity", 			"20%% more total Area of Effect.", 	// WW
 		  6653,						"" },
-		{ "Brilliance", 			"+0.01 to Spell Modifier.", 	// WN
+		{ "Brilliance", 			"+1 to Spell Modifier.", 	// WN
 		  6654,						"" },
 		{ "Coordination", 			"1%% more effect of Lethargy for every", 	// NW
 		  6655,						"10 total Willpower." },
-		{ "Pragmatic", 				"2%% more total Willpower and Intuition.", 	// NN
+		{ "Pragmatic", 				"3%% more total Willpower and Intuition.", 	// NN
 		  6656,						"" },
 		{ "Hex Master", 			"0.4%% more effect of Curse and Slow", 	// NE
 		  6657,						"for every 10 total Intuition." },
 		{ "Nimble", 				"You no longer have a parry penalty if", 	// EN
 		  6658,						"hit while not fighting." },
-		{ "Fleet-footed", 			"12%% more total Movement Speed.", 	// EE
+		{ "Fleet-footed", 			"20%% more total Movement Speed.", 	// EE
 		  6659,						"" },
 		{ "Acceleration", 			"Haste grants 20%% more move speed to", 	// ES
 		  6660,						"you, and it can now be cast on allies." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Summoner
-		{ "Nimbleness", 			"+4 to Cast Speed.", 	// W
+		{ "Nimbleness", 			"+5 to Cast Speed.", 	// W
 		  6661,						"" },
-		{ "Wisdom", 				"+3 to Willpower.", 	// N
+		{ "Wisdom", 				"+4 to Willpower.", 	// N
 		  6662,						"" },
-		{ "Vitality", 				"+40 Hitpoints.", 	// E
+		{ "Vitality", 				"+20 Hitpoints.", 	// E
 		  6663,						"" },
-		{ "Tactician", 				"Your Attack Speed is equal to your Cast", 	// WS
-		  6664,						"Speed." },
-		{ "Spellslinger", 			"8%% more total Cast Speed.", 	// WW
+		{ "Tactician", 				"Increases and multipliers to Cast Speed", 	// WS
+		  6664,						"also affect Attack Speed." },
+		{ "Spellslinger", 			"10%% more total Cast Speed.", 	// WW
 		  6665,						"" },
-		{ "Harpooner", 				"15%% more Hit and Parry score while", 	// WN
+		{ "Harpooner", 				"20%% more Hit and Parry score while", 	// WN
 		  6666,						"using a Spear." },
 		{ "Mysticism", 				"All spell skills use the attributes", 	// NW
-		  6667,						"Willpower + Willpower + Intuition." },
+		  6667,						"(BRV+INT)/2 + Willpower + Willpower." },
 		{ "Overwhelming Willpower", "+10 to Willpower Limit.", 	// NN
 		  6668,						"" },
 		{ "Shaper", 				"1%% more effect of Shadow Copy for", 	// NE
 		  6669,						"every 10 total Willpower." },
 		{ "Diviner", 				"Ghost Companions inherit the effects of", 	// EN
 		  6670,						"your tarot cards." },
-		{ "Constitution", 			"12%% more total Hitpoints.", 	// EE
+		{ "Constitution", 			"20%% more total Hitpoints.", 	// EE
 		  6671,						"" },
 		{ "Protector", 				"Magic Shield and Magic Shell are also", 	// ES
 		  6672,						"cast on your active companions." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Arch Harakim
-		{ "Composure", 				"+4 to Cooldown Rate.", 	// W
+		{ "Composure", 				"+5 to Cooldown Rate.", 	// W
 		  6673,						"" },
-		{ "Intellect", 				"+3 to Intuition.", 	// N
+		{ "Intellect", 				"+4 to Intuition.", 	// N
 		  6674,						"" },
-		{ "Wellspring", 			"+40 Mana.", 	// E
+		{ "Wellspring", 			"+20 Mana.", 	// E
 		  6675,						"" },
-		{ "Destroyer", 				"Blast deals full damage with its area", 	// WS
-		  6676,						"of effect." },
-		{ "Serenity", 				"4%% more total Cooldown Rate.", 	// WW
+		{ "Destroyer", 				"Blast has its base cooldown reduced", 	// WS
+		  6676,						"for each enemy hit by it." },
+		{ "Serenity", 				"10%% more total Cooldown Rate.", 	// WW
 		  6677,						"" },
 		{ "Strategist", 			"You suffer no cooldown if a spell is", 	// WN
 		  6678,						"suppressed." },
-		{ "Psychosis", 				"1%% more effect of Pulse and Immolate", 	// NW
+		{ "Psychosis", 				"2%% more effect of Pulse and Immolate", 	// NW
 		  6679,						"for every 10 total Intuition." },
 		{ "Overwhelming Intuition", "+10 to Intuition Limit.", 	// NN
 		  6680,						"" },
 		{ "Wizardry", 				"All spell skills use the attributes", 	// NE
-		  6681,						"Willpower + Intuition + Intuition." },
-		{ "Flow", 					"15%% of overcapped Mana is granted as", 	// EN
+		  6681,						"(BRV+WIL)/2 + Intuition + Intuition." },
+		{ "Flow", 					"50%% of overcapped Mana is granted as", 	// EN
 		  6682,						"additional Hitpoints." },
-		{ "Perpetuity", 			"8%% more total Mana.", 	// EE
+		{ "Perpetuity", 			"20%% more total Mana.", 	// EE
 		  6683,						"" },
 		{ "Resourcefulness", 		"10%% of damage taken is dealt to your", 	// ES
 		  6684,						"Mana instead." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Braver
-		{ "Accuracy", 				"+2 to Hit Score.", 	// W
+		{ "Accuracy", 				"+3 to Hit Score.", 	// W
 		  6685,						"" },
-		{ "Boldness", 				"+3 to Braveness.", 	// N
+		{ "Boldness", 				"+4 to Braveness.", 	// N
 		  6686,						"" },
-		{ "Avoidance", 				"+2 to Parry Score.", 	// E
+		{ "Avoidance", 				"+3 to Parry Score.", 	// E
 		  6687,						"" },
 		{ "Assassination", 			"15%% increased effect of Precision.", 	// WS
 		  6688,						"" },
@@ -760,8 +760,8 @@ struct sk_tree sk_tree[8][12]={
 		{ "Overwhelming Braveness", "+10 to Braveness Limit.", 	// NN
 		  6692,						"" },
 		{ "Virtuosity", 			"All weapon skills use the attributes", 	// NE
-		  6693,						"Braveness + Braveness + Agility." },
-		{ "Resilience", 			"20%% less effect of Healing Sickness", 	// EN
+		  6693,						"(AGL+STR)/2 + Braveness + Braveness." },
+		{ "Resilience", 			"25%% less effect of Healing Sickness", 	// EN
 		  6694,						"on you." },
 		{ "Flexibility", 			"4%% more total Parry Score.", 	// EE
 		  6695,						"" },
@@ -1169,10 +1169,10 @@ int sk_score(int n)
 }
 
 int pl_speed, pl_atksp, pl_spmod, pl_skmod, pl_spapt, pl_movsp;
-int pl_critc, pl_critm, pl_topdm, pl_reflc, pl_aoebn;
+int pl_critc, pl_critm, pl_topdm, pl_topd2, pl_reflc, pl_aoebn;
 int pl_hitsc, pl_parry, pl_coold, pl_casts, pl_dmgbn;
 int pl_flags, pl_flagb, pl_flagc, pl_basel, pl_dmgml, pl_dmgrd;
-int pl_dlow,  pl_dhigh, pl_dps,   pl_hitdm, pl_cdrate;
+int pl_dlow,  pl_dhigh, pl_dps,   pl_hitdm, pl_cdrate, pl_armor;
 int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
 int sk_blast, sk_scorc, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
 int sk_water, sk_cleav, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
@@ -1242,8 +1242,9 @@ void init_meta_stats(void)
 	// Player DPS - pl_dlow, pl_dhigh, pl_dps
 	pl_dlow  = (pl.weapon*pl_dmgml/100)/4*pl_dmgbn/10000;
 	pl_dhigh = pl.weapon+8+pl_topdm+6;
+	pl_topd2 = ((pl_topdm*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
 	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_hitdm = (pl_dlow+pl_dhigh)/2;
+	pl_hitdm = (pl_dlow+pl_dhigh+(T_SKAL_SK(6)?pl_topd2/2:0))/2;
 	pl_dps   = pl_hitdm*pl_atksp;
 	
 	// Player cooldown rate - pl_cdrate
@@ -1265,7 +1266,7 @@ void init_meta_stats(void)
 	hpmult = endmult = manamult = moonmult;
 	
 	// Reverse Star
-	if (pl_flagc & (1 << 10))
+	if (pl_flagc&(1<<10))
 	{
 		pl_skmod = pl_spmod;
 		pl_spmod = 100;
@@ -1292,20 +1293,19 @@ void init_meta_stats(void)
 	sk_weake = -(sk_score(41)*pl_skmod/100 / 4 + 2);
 	
 	cri_leap = pl_critm;
-	if (cri_leap > 175) { cri_leap=cri_leap-175; cri_leap=175+cri_leap/2; }
-	if (cri_leap > 250) { cri_leap=cri_leap-250; cri_leap=250+cri_leap/2; }
+	if (cri_leap > 200) { cri_leap=cri_leap-200; cri_leap=200+cri_leap/2; }
 	
 	sk_bleed = (sk_cleav + 5) * DAM_MULT_BLEED / 150;
 	sk_rage  = (sk_score(14)+(sk_score(14)*(T_BRAV_SK(7)?at_score(AT_BRV)/1000:0)))*pl_skmod/100*((pl_flagb&(1<<3))?6:2)/15+((pl_flagb&(1<<3))?6:2);
 	sk_letha = (sk_score(15)+(sk_score(15)*(T_SORC_SK(7)?at_score(AT_WIL)/1000:0)))*pl_spmod/100/(IS_SEYAN_DU?4:3);
-	sk_bless = min(127, (sk_score(21)*2/3) / 5 + 3);
-	sk_enhan = min(127, (IS_SEYAN_DU?(sk_score(18)/6+3):(sk_score(18)/4+4)));
-	sk_prote = min(127, (IS_SEYAN_DU?(sk_score(17)/6+3):(sk_score(17)/4+4)));
-	sk_mdura = sk_score(11) * ((pl_flagb&(1<<10))?128:256);
+	sk_bless = min(127, (sk_score(21)*pl_spmod/100*2/3) / 5 + 3);
+	sk_enhan = min(127, (IS_SEYAN_DU?(sk_score(18)*pl_spmod/100/6+3):(sk_score(18)*pl_spmod/100/4+4)));
+	sk_prote = min(127, (IS_SEYAN_DU?(sk_score(17)*pl_spmod/100/6+3):(sk_score(17)*pl_spmod/100/4+4)));
+	sk_mdura = sk_score(11)*pl_spmod/100 * ((pl_flagb&(1<<10))?128:256);
 	sk_mshie = min(127, (IS_SEYAN_DU?(sk_mdura/((pl_flagb&(1<<10))?768:1536)+1):(sk_mdura/((pl_flagb&(1<<10))?512:1024)+1)));
 	sk_mdura = sk_mdura/20;
-	sk_haste = min(300, 10 + (sk_score(47))/ 6) + min(127, 5 + (sk_score(47)+6)/12);
-	sk_healr = ((pl_flags&(1<<14))?sk_score(26)*1875/20:sk_score(26)*2500)/1000;
+	sk_haste = min(300, 10 + (sk_score(47)*pl_spmod/100)/ 6) + min(127, 5 + (sk_score(47)+6)/12);
+	sk_healr = ((pl_flags&(1<<14))?sk_score(26)*pl_spmod/100*1875/20:sk_score(26)*pl_spmod/100*2500)/1000;
 	
 	if (IS_MERCENARY || IS_WARRIOR || IS_SORCERER)
 	{
@@ -1319,8 +1319,8 @@ void init_meta_stats(void)
 	// Tarot - Hanged Man (immunity&resistance)
 	if (pl_flags & (1 <<  2))
 	{
-		sk_immun = sk_score(32) + sk_score(23) * 25/100;
-		sk_resis = sk_score(23) * 75/100;
+		sk_immun = sk_score(32) + sk_score(23)/3;
+		sk_resis = sk_score(23) * 2/3;
 	}
 	else
 	{
@@ -1402,9 +1402,7 @@ void init_meta_stats(void)
 	}
 	
 	// Tarot - Rev.Justice (Leap reduction)
-	if (pl_flagb & (1 <<  7))
-		sk_leapv = sk_leapv * 85/100;
-	cri_leap = sk_leapv*((pl_flagb&(1<<7))?100:cri_leap)/100;
+	cri_leap = sk_leapv*((pl_flagb&(1<<7))?(100+((cri_leap-100)/2)):(cri_leap))/100;
 	
 	if (pl_flagc & (1<<2)) // 20% more weaken effect
 		sk_weake = sk_weake * 6/5;
@@ -1464,6 +1462,14 @@ void init_meta_stats(void)
 	sk_restv = (pl.skill[29][0]?race_res:0) + endmult  * 3;
 	sk_medit = (pl.skill[30][0]?race_med:0) + manamult * 1;
 	
+	pl_armor = pl.armor;
+	
+	if (pl_flagb&(1<<4)) // Undead Armor
+	{
+		sk_regen += pl_armor * 10;
+		pl_armor = 0;
+	}
+	
 	// Amulet - Standard Ankh			1 0 0
 	if ((pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
 	{
@@ -1505,8 +1511,8 @@ void init_meta_stats(void)
 	sk_medit = sk_medit * 20/10;
 	
 	coo_clea = 500 * pl_cdrate / 100;
-	coo_leap = (500 - ((pl_flagb&(1<<7))?200:0)) * pl_cdrate / 100;
-	coo_blas = 600 * pl_cdrate / 100;
+	coo_leap = (500 - ((pl_flagb&(1<<7))?250:0)) * pl_cdrate / 100;
+	coo_blas = (600-T_ARHR_SK(4)*25) * pl_cdrate / 100;
 	coo_pois = 500 * pl_cdrate / 100;
 	coo_puls = 600 * pl_cdrate / 100;
 	coo_zeph = 400 * pl_cdrate / 100;
@@ -1565,7 +1571,8 @@ void show_meta_stats(int n)
 		{
 			case  0: meta_stat(0,n,1,"Cooldown Duration", pl_cdrate/100, pl_cdrate%100, "x"); break;
 			case  1: meta_stat(0,n,4,"Spell Aptitude",    pl_spapt,      -1,            "" ); break;
-			case  2: meta_stat(0,n,4,"Spell Modifier",    pl_spmod /100, pl_spmod %100, "x"); break;
+			case  2: if (pl_flagc&(1<<10)) meta_stat(0,n,5,"Skill Modifier", pl_skmod /100, pl_skmod %100, "x");
+					 else meta_stat(0,n,4,"Spell Modifier", pl_spmod /100, pl_spmod %100, "x"); break;
 			case  3: meta_stat(0,n,6,"Base Action Speed", pl_speed/100,  pl_speed%100,  "" ); break;
 			case  4: meta_stat(0,n,6,"Movement Speed",    pl_movsp/100,  pl_movsp%100,  "" ); break;
 			case  5: meta_stat(0,n,7,"Hit Score",         pl_hitsc,      -1,            "" ); break;
@@ -1654,7 +1661,7 @@ void show_meta_stats(int n)
 			case  0: meta_stat(1,n,9,"  Passive Stats:",     -1,           -1,           ""       ); break;
 			case  1: if (pl_dmgrd!=10000)
 					 meta_stat(1,n,1,"Damage Reduction",     pl_dmgrd/100, pl_dmgrd%100, "%"      ); break;
-			case  2: if (pl_dmgrd!=10000)
+			case  2: if (pl_dmgrd!=10000||(pl_flagc&(1<<9|1<<11|1<<12|1<<14))||(pl_flags&(1<<9)))
 					 meta_stat(1,n,7,"Effective Hitpoints",  pl_ehp,       -1,           ""       ); break;
 			case  3: meta_stat(1,n,5,"Health Regen Rate",    sk_regen/100, sk_regen%100, "/s"     ); break;
 			case  4: meta_stat(1,n,6,"Endurance Regen Rate", sk_restv/100, sk_restv%100, "/s"     ); break;
@@ -1751,6 +1758,7 @@ void eng_display_win(int plr_sprite,int init)
 		if (hudmode==0)			dd_showbox(261,182,64,12,(unsigned short)(RED));
 		else if (hudmode==1)	dd_showbox(261,197,64,12,(unsigned short)(RED));
 		else if (hudmode==2)	dd_showbox(261,212,64,12,(unsigned short)(RED));
+		else if (hudmode==3)	dd_showbox(261,182,64,12,(unsigned short)(GREEN));
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
@@ -1781,6 +1789,11 @@ void eng_display_win(int plr_sprite,int init)
 				if (pl.item_l[n+inv_pos]&4)
 				{
 					copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
+				}
+				// Draw catalyst name
+				if (pl.item_p[n+inv_pos])
+				{
+					copyspritex(6999+pl.item_p[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
 				}
 			}
 			// Draw shortcut key IDs
@@ -1855,16 +1868,16 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+42,	1,"  %12d",pl.os_points);
 		
 		// Update and Update exp
-		if (hudmode==0)
+		if (hudmode==0||hudmode==3)
 		{
 			copyspritex(do_darkmode?18099:99, 134, 3,  0);
 			dd_xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
 			dd_xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
 		}
-		else
-		{
-			init_meta_stats();
-		}
+		if (hudmode==3)
+			copyspritex(do_darkmode?18098:18097, 134, 3,  0);
+		
+		init_meta_stats();
 		
 		// Display Skill Tree button if applicable - a similar check is required in inter.c
 		if (st_skill_pts_all(pl.tree_points)>0)
@@ -1878,7 +1891,7 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y,1,   "%11d",pl.weapon);
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y+14,1,"Armor Value");
-		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl.armor);
+		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl_armor);
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 
@@ -1942,7 +1955,7 @@ void eng_display_win(int plr_sprite,int init)
 		for (n=0; n<10; n++) 
 		{
 			// regular skill tab functionality
-			if (hudmode==0)
+			if (hudmode==0||hudmode==3)
 			{
 				m=skilltab[n+skill_pos].nr;
 				if (m>=52)
@@ -2075,7 +2088,6 @@ void eng_display_win(int plr_sprite,int init)
 						// Draw talisman icon 
 						if (pl.worn_p[n]&PL_ENCHANTED)
 							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
-						
 					}
 					else
 					{
@@ -2205,9 +2217,11 @@ void eng_display_win(int plr_sprite,int init)
 						copyspritex(4496,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
 					if (shop.price[n] & (1<<31)) // Enchant
 						copyspritex(4497,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
+					if (shop.item_p[n])
+						copyspritex(6999+shop.item_p[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
 					if (pr = (shop.price[n] - (shop.price[n] & (1<<30)) - (shop.price[n] & (1<<31))))
 					{
-						if (show_shop==1) // Normal shop
+						if (show_shop>=1 && show_shop<=101) // Normal shop
 						{
 							if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) 
 							{
@@ -2219,13 +2233,13 @@ void eng_display_win(int plr_sprite,int init)
 								dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
 							}
 						}
-						if (show_shop==2) // Black Stronghold
+						if (show_shop==102) // Black Stronghold
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
-						if (show_shop==3) // Casino
+						if (show_shop==103) // Casino
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
-						if (show_shop==4) // Contract
+						if (show_shop==104) // Contract
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
-						if (show_shop==5) // Exp
+						if (show_shop==105) // Exp
 							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
 					}
 				} 
@@ -2236,31 +2250,33 @@ void eng_display_win(int plr_sprite,int init)
 						copyspritex(4496,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
 					if (shop.price[n] & (1<<31)) // Enchant
 						copyspritex(4497,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
+					if (shop.item_p[n])
+						copyspritex(6999+shop.item_p[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
 				}
 			}
 			if (pl.citem && shop.pl_price)
 			{
-				if (show_shop==1)
+				if (show_shop>=1 && show_shop<=101)
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			/*  Sadly this is harder to do than it looks
 			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos) && shop.pl_price)
 			{
-				if (show_shop==1)
+				if (show_shop>=1 && show_shop<=101)
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			*/
 			if (y)
 			{
-				if (show_shop==1)
+				if (show_shop>=1 && show_shop<=101)
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
-				if (show_shop==2) // Black Stronghold
+				if (show_shop==102) // Black Stronghold
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
-				if (show_shop==3) // Casino
+				if (show_shop==103) // Casino
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
-				if (show_shop==4) // Contract
+				if (show_shop==104) // Contract
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
-				if (show_shop==5) // Exp
+				if (show_shop==105) // Exp
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Unspent Exp: %9d",pl.points);
 			}
 

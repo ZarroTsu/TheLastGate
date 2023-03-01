@@ -703,6 +703,10 @@ void list_all_player_characters_by_class()
 	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_BRAVER(n)) continue;
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
 	}	printf("</table><br>\n");
+	printf("REBIRTH:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].rebirth & 1)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
 }
 
