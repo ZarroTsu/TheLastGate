@@ -547,8 +547,8 @@ struct skilltab _skilltab[52] = {
 				"", "", "", 
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage if they are the same enemy. Cooldown can be bypassed by sacrificing life.", 
-				"Leap (Random)", 		"Use (Skill): Strike your foe and leap to a random target. Cooldown can be bypassed by sacrificing life.", "", 
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning them if they are at full health. Cooldown can be bypassed at an additional cost.", 
+				"Leap (Random)", 		"Use (Skill): Strike your foe and leap to a random target, dealing critical damage if they are at full health. Cooldown can be bypassed at an additional cost.", "", 
 				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
@@ -629,8 +629,8 @@ struct sk_tree sk_tree[8][12]={
 		  6631,						"total Agility." },
 		{ "Overwhelming Agility", 	"+10 to Agility Limit.", 	// NN
 		  6632,						"" },
-		{ "Finesse", 				"All weapon skills use the attributes", 	// NE
-		  6633,						"Agility + Agility + Strength." },
+		{ "Finesse", 				"All melee skills use the attributes", 	// NE
+		  6633,						"(STR+BRV/2) + Agility + Agility." },
 		{ "Impact", 				"Weaken and Crush also reduce enemy", 	// EN
 		  6634,						"critical hit chance." },
 		{ "Perseverance", 			"20%% more total Endurance.", 	// EE
@@ -1187,6 +1187,7 @@ void init_meta_stats(void)
 	int moonmult = 20;
 	int hpmult, endmult, manamult;
 	int race_reg = 0, race_res = 0, race_med = 0;
+	int len = 100;
 	
 	// Player Speed and Attack Speed - WN_SPEED
 	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; 
@@ -1291,9 +1292,6 @@ void init_meta_stats(void)
 	sk_shado = (sk_score(46)+(sk_score(46)*(T_SUMM_SK(9)?at_score(AT_WIL)/1000:0)))*pl_spmod/100 * 5 / 11;
 	sk_shadd = 15 + (sk_score(46)+(sk_score(46)*(T_SUMM_SK(9)?at_score(AT_WIL)/1000:0)))*pl_spmod/500;
 	sk_weake = -(sk_score(41)*pl_skmod/100 / 4 + 2);
-	
-	cri_leap = pl_critm;
-	if (cri_leap > 200) { cri_leap=cri_leap-200; cri_leap=200+cri_leap/2; }
 	
 	sk_bleed = (sk_cleav + 5) * DAM_MULT_BLEED / 150;
 	sk_rage  = (sk_score(14)+(sk_score(14)*(T_BRAV_SK(7)?at_score(AT_BRV)/1000:0)))*pl_skmod/100*((pl_flagb&(1<<3))?6:2)/15+((pl_flagb&(1<<3))?6:2);
@@ -1402,7 +1400,7 @@ void init_meta_stats(void)
 	}
 	
 	// Tarot - Rev.Justice (Leap reduction)
-	cri_leap = sk_leapv*((pl_flagb&(1<<7))?(100+((cri_leap-100)/2)):(cri_leap))/100;
+	cri_leap = sk_leapv*pl_critm/100;
 	
 	if (pl_flagc & (1<<2)) // 20% more weaken effect
 		sk_weake = sk_weake * 6/5;
@@ -1464,9 +1462,9 @@ void init_meta_stats(void)
 	
 	pl_armor = pl.armor;
 	
-	if (pl_flagb&(1<<4)) // Undead Armor
+	if (pl_flagb&(1<<4)) // Bone Armor
 	{
-		sk_regen += pl_armor * 10;
+		sk_regen += pl_armor * 25 / 2;
 		pl_armor = 0;
 	}
 	
@@ -1510,19 +1508,23 @@ void init_meta_stats(void)
 	sk_restv = sk_restv * 20/10;
 	sk_medit = sk_medit * 20/10;
 	
-	coo_clea = 500 * pl_cdrate / 100;
-	coo_leap = (500 - ((pl_flagb&(1<<7))?250:0)) * pl_cdrate / 100;
-	coo_blas = (600-T_ARHR_SK(4)*25) * pl_cdrate / 100;
-	coo_pois = 500 * pl_cdrate / 100;
-	coo_puls = 600 * pl_cdrate / 100;
-	coo_zeph = 400 * pl_cdrate / 100;
-	coo_ghos = 800 * pl_cdrate / 100;
-	coo_shad = 400 * pl_cdrate / 100;
-	coo_blin = 300 * pl_cdrate / 100;
-	coo_warc = 300 * pl_cdrate / 100;
-	coo_weak = 300 * pl_cdrate / 100;
-	coo_curs = 400 * pl_cdrate / 100;
-	coo_slow = 400 * pl_cdrate / 100;
+	// Acedia - Sprite 5556
+	if (pl.worn[WN_RHAND] == 5556) len = len * 3/4; // less
+	if (pl.worn[WN_LHAND] == 5556) len = len * 6/4; // more
+	
+	coo_clea = 500 * pl_cdrate / 100 * len / 100;
+	coo_leap = (600 - ((pl_flagb&(1<<7))?300:0)) * pl_cdrate / 100 * len / 100;
+	coo_blas = (600-T_ARHR_SK(4)*25) * pl_cdrate / 100 * len / 100;
+	coo_pois = 500 * pl_cdrate / 100 * len / 100;
+	coo_puls = 600 * pl_cdrate / 100 * len / 100;
+	coo_zeph = 400 * pl_cdrate / 100 * len / 100;
+	coo_ghos = 800 * pl_cdrate / 100 * len / 100;
+	coo_shad = 400 * pl_cdrate / 100 * len / 100;
+	coo_blin = 300 * pl_cdrate / 100 * len / 100;
+	coo_warc = 300 * pl_cdrate / 100 * len / 100;
+	coo_weak = 300 * pl_cdrate / 100 * len / 100;
+	coo_curs = 400 * pl_cdrate / 100 * len / 100;
+	coo_slow = 400 * pl_cdrate / 100 * len / 100;
 	
 	pl_ehp = pl.hp[5]*10000/pl_dmgrd;
 	

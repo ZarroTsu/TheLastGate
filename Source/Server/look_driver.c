@@ -231,7 +231,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 4, "When equipped, the effects of your Heal or Regen spell is halved.\n");
 		break;
 	case IT_TW_SINBIND: // Sinbinder ring
-		do_char_log(cn, 4, "Locks your ring slot.\n");
+		do_char_log(cn, 4, "You may only equip one Sinbinder at a time.\n");
 		temp = it[in].data[2];
 		break;
 	
@@ -291,9 +291,6 @@ void look_extra(int cn, int in)
 	case IT_AM_SEABREZ: 
 		do_char_log(cn, 5, "When equipped, penalizes rest, but greatly improves the effect of meditate.\n");
 		break;
-	case IT_AM_OBSIDI: 
-		do_char_log(cn, 5, "When equipped, increases the radius of area-of-effect skills by 2.\n");
-		break;
 	case IT_AM_TRUESUN: 
 		do_char_log(cn, 5, "When equipped, you are immune to areas that would disable your magic.\n");
 		break;
@@ -301,7 +298,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, you cannot cast or receive spells of any kind.\n");
 		break;
 	case IT_GAMBLERFAL: 
-		do_char_log(cn, 5, "When equipped, grants 10 hitpoints upon dealing a critical hit, but your chance to deal critical hits is reduced for 4 seconds after dealing one.\n");
+		do_char_log(cn, 5, "When equipped, grants 20 hitpoints upon dealing a critical hit, but your chance to deal critical hits is reduced for 4 seconds after dealing one.\n");
 		break;
 		
 	// -------- BELT  ITEMS --------
@@ -338,7 +335,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "Grants 15%% reduced endurance costs for its duration.\n");
 		break;
 	case BUF_IT_DRAG: 
-		do_char_log(cn, 5, "Grants additional critical strike multiplier for its duration.\n");
+		do_char_log(cn, 5, "Grants 1 reduced maximum healing sickness stack for its duration.\n");
 		break;
 	case BUF_IT_MANA: 
 		do_char_log(cn, 5, "Grants 15%% reduced mana costs for its duration.\n");
@@ -383,7 +380,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, this book can be used to freely cast Shadow Copy.\n");
 		break;
 	case IT_BOOK_BURN: 
-		do_char_log(cn, 5, "When equipped, your Immolate spell gains 1 additional base power per 20 total hitpoints.\n");
+		do_char_log(cn, 5, "When equipped, your Immolate spell gains 1 additional base power per 20 uncapped hitpoints.\n");
 		break;
 	case IT_BOOK_VERD: 
 		do_char_log(cn, 5, "When equipped, your Dispel spell loses power less quickly and has no removal limit, but no longer immunizes or inoculates.\n");
@@ -395,19 +392,19 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
 		break;
 	case IT_WP_BLOODLET: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 25%% of total hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 30%% of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
 		break;
 	case IT_WP_GEMCUTTER: 
 		do_char_log(cn, 5, "When equipped, stats granted by your ring slots are improved by 40%%.\n");
 		break;
 	case IT_WP_STARLIGHT: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Starlight', costing 25%% of total mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Starlight', costing 30%% of uncapped mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n");
 		break;
 	case IT_WP_KELPTRID: 
 		do_char_log(cn, 5, "When equipped, grants +30 to action speed while underwater.\n");
 		break;
 	case IT_WP_PHALANX: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 33%% of total endurance. Phalanx grants 1%% damage reduction per 5 endurance spent.\n");
+		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 30%% of uncapped endurance. Phalanx grants 1%% damage reduction per 5 endurance spent.\n");
 		break;
 	case IT_WP_LAMEDARG: 
 		if (it[in].data[0]<REQ_LAME)
@@ -419,13 +416,13 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, grants additional armor value based on total spell modifier.\n");
 		break;
 	case IT_WP_EXCALIBUR: 
-		do_char_log(cn, 5, "When equipped, 10%% of attack speed is granted as additional weapon value.\n");
+		do_char_log(cn, 5, "When equipped, 12%% of uncapped attack speed is granted as additional weapon value.\n");
 		break;
 	case IT_WP_BLACKTAC: 
 		do_char_log(cn, 5, "When equipped, grants additional weapon value based on total spell modifier.\n");
 		break;
 	case IT_WP_CRIMRIP: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 25%% of total hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 30%% of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
 		break;
 	case IT_WP_CRESSUN: 
 		do_char_log(cn, 5, "When equipped, endurance spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
@@ -443,16 +440,16 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, this weapon grants full damage and shield parry while in the offhand.\n");
 		break;
 	case IT_WP_PUTRIDIRE: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Poison, with power equal to 30%% of your total mana.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Poison, with power equal to 30%% of your uncapped mana.\n");
 		break;
 	case IT_WP_BLOODYSCY: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Cleave, with power equal to 30%% of your total hitpoints.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Cleave, with power equal to 30%% of your uncapped hitpoints.\n");
 		break;
 	case IT_WP_FLAGBEAR: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Rally, with power equal to your total endurance.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Rally, with power equal to your uncapped endurance.\n");
 		break;
 	case IT_WP_RISINGPHO: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to freely cast Immolate, with power equal to 35%% of your total hitpoints, ignoring spell modifier.\n");
+		do_char_log(cn, 5, "When equipped, this shield can be used to freely cast Immolate, with power equal to 30%% of your uncapped hitpoints, ignoring spell modifier.\n");
 		break;
 	case IT_WP_THEWALL: 
 		do_char_log(cn, 5, "When equipped, your Cleave skill is replaced with Shield Bash. Shield Bash uses AV for damage and inflicts Stun instead of Bleeding.\n");
@@ -610,10 +607,10 @@ void look_extra(int cn, int in)
 		case 47: do_char_log(cn, 8, "Reduces extra damage taken from enemy critical hits by 50%%.\n"); break;
 		case 48: do_char_log(cn, 8, "50%% more total Thorns score.\n"); break;
 		case 49: do_char_log(cn, 8, "Restore %d hitpoint%s upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1), IS_TWOHAND(in)?"s":""); break;
-		case 50: do_char_log(cn, 8, "1%% more damage dealt.\n"); break;
+		case 50: do_char_log(cn, 8, "2%% more damage dealt.\n"); break;
 		case 51: do_char_log(cn, 8, "2%% less damage taken.\n"); break;
 		case 52: do_char_log(cn, 8, "Perception is 25%% stronger.\n"); break;
-		case 53: do_char_log(cn, 8, "10%% reduced damage taken from damage over time.\n"); break;
+		case 53: do_char_log(cn, 8, "15%% reduced damage taken from damage over time.\n"); break;
 		case 54: do_char_log(cn, 8, "%d%% more total attributes.\n", 2 * (IS_TWOHAND(in)?2:1)); break;
 		case 55: do_char_log(cn, 8, "Total Glow score is reduced to 0.\n"); break;
 		case 56: do_char_log(cn, 8, "20%% more effect of heals and regens you apply.\n"); break;
@@ -856,12 +853,12 @@ void look_talisman(int cn, int in)
 		case 76: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Bonus", 16); break;
 		case 77: do_char_log(cn, 8, "[Weapons Only] Restore 1 hitpoint upon hitting an enemy.\n"); break; // 49
 		case 78: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Thorns", 2); break;
-		case 79: do_char_log(cn, 8, "[Jewellery Only] 1%% more damage dealt.\n"); break; // 50
+		case 79: do_char_log(cn, 8, "[Jewellery Only] 2%% more damage dealt.\n"); break; // 50
 		case 80: do_char_log(cn, 8, "[Jewellery Only] 2%% less damage taken.\n"); break; // 51
 		case 81: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Parry", 4);
 				 do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit", -2); break;
 		case 82: do_char_log(cn, 8, "[Helmet Only] Perception is 33%% stronger.\n"); break; // 52
-		case 83: do_char_log(cn, 8, "[Jewellery Only] 10%% reduced damage taken from damage over time.\n"); break; // 53
+		case 83: do_char_log(cn, 8, "[Jewellery Only] 15%% reduced damage taken from damage over time.\n"); break; // 53
 		case 84: do_char_log(cn, 8, "2%% more total attributes.\n"); break; // 54
 		case 85: do_char_log(cn, 8, "[Jewellery Only] Total Glow score is reduced to 0.\n"); break; // 55
 		case 86: do_char_log(cn, 8, "[Gloves Only] 20%% more effect of heals and regens you apply.\n"); break; // 56

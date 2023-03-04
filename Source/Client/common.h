@@ -30,7 +30,7 @@
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  50
-#define DAM_MULT_LEAP		 250
+#define DAM_MULT_LEAP		 375
 #define DAM_MULT_POISON		4500
 #define DAM_MULT_BLEED		 750
 

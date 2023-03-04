@@ -259,7 +259,7 @@ struct sk_tree sk_tree[8][12]={
 		{ "Preparation", 			"Your Top Damage is rolled an additional time, using the higher result."},
 		{ "Slaying", 				"+2.5% Critical Multiplier for every 10 total Agility."},
 		{ "Overwhelming Agility", 	"+10 to Agility Limit."},
-		{ "Finesse", 				"All weapon skills use the attributes Agility + Agility + Strength."},
+		{ "Finesse", 				"All melee skills use the attributes (STR+BRV/2) + Agility + Agility."},
 		{ "Impact", 				"Weaken and Crush also reduce enemy critical hit chance."},
 		{ "Perseverance", 			"20% more total Endurance."},
 		{ "Tenacity", 				"10% of damage taken is dealt to your Endurance instead."}

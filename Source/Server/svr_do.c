@@ -4607,16 +4607,17 @@ void do_make_sstone_gear(int cn, int n, int val)
 	it[in].skill[n][0] = val;
 	it[in].skill[n][2] = val*5;
 	
-	it[in].flags &= ~IF_NOREPAIR;
+	it[in].min_rank = min(24, max(val-3, it[in].min_rank));
+	it[in].value -= 1;
+	it[in].power += val * 5;
+	
 	it[in].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
 	
-	if (!it[in].max_damage)
+	if (!HAS_ENCHANT(in, 34))
 	{
-		if (it[in].flags & IF_WEAPON)		it[in].max_damage = 2500 * it[in].weapon[0]/2;
-		else if (it[in].flags & IF_BOOK)	it[in].max_damage = 90000;
-		else if (it[in].power == 60)		it[in].max_damage = 65000;
-		else if (it[in].power == 75)		it[in].max_damage = 85000;
-		else								it[in].max_damage = 60000;
+		it[in].flags &= ~IF_NOREPAIR;
+		if (it[in].flags & IF_WEAPON)		it[in].max_damage = it[in].power * 4000;
+		else								it[in].max_damage = it[in].power * 1000;
 	}
 }
 
@@ -4709,8 +4710,12 @@ void do_become_skua(int cn)
 			}
 		}
 		
-		if ((ch[cn].x >= 499 && ch[cn].x <= 531 && ch[cn].y >= 504 && ch[cn].y <= 520)
-		 || (ch[cn].x >= 505 && ch[cn].x <= 519 && ch[cn].y >= 492 && ch[cn].y <= 535))
+		if ((ch[cn].x >= 499 && ch[cn].x <= 531 && ch[cn].y >= 504 && ch[cn].y <= 520)  // Skua
+		 || (ch[cn].x >= 505 && ch[cn].x <= 519 && ch[cn].y >= 492 && ch[cn].y <= 535)  // Skua
+		 || (ch[cn].x >= 773 && ch[cn].x <= 817 && ch[cn].y >= 780 && ch[cn].y <= 796)  // Gorn
+		 || (ch[cn].x >= 787 && ch[cn].x <= 803 && ch[cn].y >= 775 && ch[cn].y <= 812)  // Gorn
+		 || (ch[cn].x >= 685 && ch[cn].x <= 729 && ch[cn].y >= 848 && ch[cn].y <= 864)  // Kwai
+		 || (ch[cn].x >= 699 && ch[cn].x <= 715 && ch[cn].y >= 832 && ch[cn].y <= 868)) // Kwai
 		{
 			if (IS_PURPLE(cn))
 			{
@@ -7451,7 +7456,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 	wimp = 0;
 	tmpg = 0;
 
-	if ((mf & MF_ARENA) || is_atpandium(co))
+	if ((mf & MF_ARENA) || is_atpandium(co) || is_incolosseum(co, 0))
 	{
 		// Arena death : full save, keep everything
 		wimp = 2;
@@ -8341,6 +8346,13 @@ int do_hurt(int cn, int co, int dam, int type)
 		if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*1000*((IS_USETWOHAND(cn))?2:1);
 		if (n = get_enchantment(co, 39)) ch[co].a_mana += n*2000;
 		
+		// force to sane values
+		if (ch[cn].a_hp>ch[cn].hp[5] * 1000)     ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
+		if (ch[cn].a_end>ch[cn].end[5] * 1000)   ch[cn].a_end  = ch[cn].end[5]  * 1000;
+		if (ch[co].a_end>ch[co].end[5] * 1000)   ch[co].a_end  = ch[co].end[5]  * 1000;
+		if (ch[cn].a_mana>ch[cn].mana[5] * 1000) ch[cn].a_mana = ch[cn].mana[5] * 1000;
+		if (ch[co].a_mana>ch[co].mana[5] * 1000) ch[co].a_mana = ch[co].mana[5] * 1000;
+		
 		return 0;
 	}
 
@@ -8487,6 +8499,13 @@ int do_hurt(int cn, int co, int dam, int type)
 	if (n = get_enchantment(co, 43)) ch[co].a_end  += n*2000;
 	if (n = get_enchantment(cn, 38)) ch[cn].a_mana += n*1000*((IS_USETWOHAND(cn))?2:1);
 	if (n = get_enchantment(co, 39)) ch[co].a_mana += n*2000;
+	
+	// force to sane values
+	if (ch[cn].a_hp>ch[cn].hp[5] * 1000)     ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
+	if (ch[cn].a_end>ch[cn].end[5] * 1000)   ch[cn].a_end  = ch[cn].end[5]  * 1000;
+	if (ch[co].a_end>ch[co].end[5] * 1000)   ch[co].a_end  = ch[co].end[5]  * 1000;
+	if (ch[cn].a_mana>ch[cn].mana[5] * 1000) ch[cn].a_mana = ch[cn].mana[5] * 1000;
+	if (ch[co].a_mana>ch[co].mana[5] * 1000) ch[co].a_mana = ch[co].mana[5] * 1000;
 
 	if (ch[co].a_hp<10000 && ch[co].a_hp>=500 && getrank(co)<5)
 	{
@@ -8666,7 +8685,7 @@ int do_crit(int cn, int co, int dam, int msg)
 		
 		if (in = get_neck(cn, IT_GAMBLERFAL))
 		{
-			ch[cn].a_hp += 10000;
+			ch[cn].a_hp += 20000;
 			if (!it[in].active) do_update_char(cn);
 			it[in].active = it[in].duration;
 		}
@@ -10069,6 +10088,7 @@ void really_update_char(int cn)
 		spell_mod  += bu[m].spell_mod[1];
 		spell_apt  += bu[m].spell_apt[1];
 		spell_cool += bu[m].cool_bonus[1];
+		if (bu[m].temp==SK_ARIA || bu[m].temp==SK_ARIA2) spell_cool += bu[m].cool_bonus[1];
 		critical_c += bu[m].crit_chance[1];
 		critical_m += bu[m].crit_multi[1];
 		hit_rate   += bu[m].to_hit[1];
@@ -10284,6 +10304,7 @@ void really_update_char(int cn)
 	{
 		end = 10;
 	}
+	ch[cn].end[4] = end;
 	if (end>999)
 	{
 		end = 999;
@@ -10298,6 +10319,7 @@ void really_update_char(int cn)
 	{
 		mana = 10;
 	}
+	ch[cn].mana[4] = mana;
 	// Tarot - Priestess.R : HP/Mana limits reduced, overcap inverted, damage increased
 	if (charmSpec & 256)
 	{
@@ -10331,6 +10353,7 @@ void really_update_char(int cn)
 	{
 		hp = 10;
 	}
+	ch[cn].hp[4] = hp;
 	// Tarot - Priestess.R : HP/Mana limits reduced, overcap inverted, damage increased
 	if (charmSpec & 256)
 	{
@@ -10374,9 +10397,9 @@ void really_update_char(int cn)
 	{
 		skill[z] = (int)B_SK(cn, z) + (int)ch[cn].skill[z][1] + skill[z];
 		
-		if ((z==0||z==2||z==3||z==4||z==5||z==6)
+		if ((z==0||z==2||z==3||z==4||z==5||z==6||z==16||z==33||z==38||z==40||z==41||z==48||z==49)
 			&& T_SKAL_SK(cn, 9))
-			skill[z] += ((int)M_AT(cn, AT_AGL)+(int)M_AT(cn, AT_AGL)+(int)M_AT(cn, AT_STR))/5;
+			skill[z] += ((int)((M_AT(cn, AT_BRV)+M_AT(cn, AT_STR))/2)+(int)M_AT(cn, AT_AGL)+(int)M_AT(cn, AT_AGL))/5;
 		else if ((z==0||z==2||z==3||z==4||z==5||z==6)
 			&& T_BRAV_SK(cn, 9))
 			skill[z] += ((int)((M_AT(cn, AT_AGL)+M_AT(cn, AT_STR))/2)+(int)M_AT(cn, AT_BRV)+(int)M_AT(cn, AT_BRV))/5;
@@ -10774,9 +10797,9 @@ void really_update_char(int cn)
 		dmg_bns = dmg_bns * (10000 + priestess)/10000; // 1% per 100
 	}
 	
-	// Enchant - [50] more damage dealt with hits; 1% per piece
+	// Enchant - [50] more damage dealt with hits; 2% per piece
 	if (moreDmg)
-		dmg_bns = dmg_bns * (100 + moreDmg)/100;
+		dmg_bns = dmg_bns * (100 + moreDmg*2)/100;
 	
 	// Sanity checks
 	if (dmg_bns > 30000)	// Maximum 300% damage output
@@ -10974,10 +10997,10 @@ void really_update_char(int cn)
 		This is moved down here due to fancy unique item functions
 	*/
 	
-	// Weapon - Excalibur :: Additional WV from 10% of total attack speed
+	// Weapon - Excalibur :: Additional WV from 12% of total attack speed
 	if (gearSpec & 128)
 	{
-		weapon += (base_spd + spd_attack)/10;
+		weapon += (base_spd + spd_attack)*12/100;
 	}
 	
 	// Weapon - White Odachi :: Additional AV by spellmod over 100
@@ -11149,11 +11172,11 @@ void do_aria(int cn)
 	
 	if (IS_SKALD(cn))
 	{
-		power = M_SK(cn, SK_ARIA)*(T_SKAL_SK(cn,4)?120:100)/200;
+		power = M_SK(cn, SK_ARIA)*(T_SKAL_SK(cn,4)?120:100)/100;
 	}
 	else // Braver
 	{
-		power = M_SK(cn, SK_ARIA)/8;
+		power = M_SK(cn, SK_ARIA)/4;
 	}
 	
 	aoe_power = M_SK(cn, SK_PROX)+15;
@@ -11178,14 +11201,14 @@ void do_aria(int cn)
 		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co))
 		{
 			in2 = 0;
-			if (do_surround_check(cn, co, 1)) 
+			if ((cn!=co) && do_surround_check(cn, co, 1)) 
 			{
 				aoe_power = spell_immunity(power, get_target_immunity(cn, co));
 				// debuff version
 				if (!(in2 = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, aoe_power, SP_DUR_ARIA, 0))) 
 					continue;
 				
-				bu[in2].cool_bonus[1] = -(aoe_power);
+				bu[in2].cool_bonus[1] = max(-127, -(aoe_power/4 + 1));
 				bu[in2].data[4] = 1; // Effects not removed by NMZ (SK_ARIA2)
 			}
 			else
@@ -11194,9 +11217,9 @@ void do_aria(int cn)
 				if (!(in2 = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) 
 					continue;
 				
-				if (IS_SKALD(co)) bu[in2].dmg_bonus[1] = power*2/15;
+				if (IS_SKALD(co)) bu[in2].dmg_bonus[1] = min(127, power/15);
 				
-				bu[in2].cool_bonus[1] = power*2;
+				bu[in2].cool_bonus[1] = min(127, power/4 + 1);
 				bu[in2].data[4] = 1; // Effects not removed by NMZ (SK_ARIA)
 			}
 			if (co && in2) add_spell(co, in2);
@@ -11254,7 +11277,7 @@ void do_immolate(int cn, int in)
 				if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, aoe_power, SP_DUR_ARIA, 0))) 
 					continue;
 				
-				bu[in2].data[1] = max(100, 100 + aoe_power*3);
+				bu[in2].data[1] = max(100, 100 + (IS_PLAYER(cn))?(aoe_power*4):(aoe_power*3));
 				bu[in2].data[4] = 1; // Effects not removed by NMZ (SK_IMMOLATE2)
 			}
 			if (co && in2) add_spell(co, in2);
@@ -11540,7 +11563,7 @@ void do_regenerate(int cn)
 	}
 	if (IS_PLAYER(cn) && ch[cn].data[25])
 	{
-		hp = ch[cn].data[25] * 10;
+		hp = ch[cn].data[25] * 25 / 2;
 		
 		ch[cn].a_hp	+= hp / (halfhp   ? 2 : 1);
 		gothp 		+= hp/2;
@@ -11856,8 +11879,8 @@ void do_regenerate(int cn)
 					if (co) degendam = degendam * ch[co].dmg_bonus / 10000;
 							degendam = degendam * ch[cn].dmg_reduction / 10000;
 					
-					if (tmp = get_enchantment(cn, 53)) 
-						degendam = degendam * max(5, 10-tmp)/10;
+					if (tmp = get_enchantment(cn, 53))
+						degendam = degendam * max(25, 100-(tmp*15))/100;
 					
 					if (ch[cn].a_hp - (degendam + gothp)<500 && !(mf & MF_ARENA) && try_lucksave(cn) && !(ch[cn].flags & CF_IMMORTAL))
 					{
@@ -12252,6 +12275,20 @@ void do_regenerate(int cn)
 	if (ch[cn].player && get_gear(cn, IT_TW_IRA))
 	{
 		if (ch[cn].a_mana>1500) ch[cn].a_mana -= 200;
+	}
+	
+	// force to sane values
+	if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
+	{
+		ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
+	}
+	if (ch[cn].a_end>ch[cn].end[5] * 1000)
+	{
+		ch[cn].a_end  = ch[cn].end[5]  * 1000;
+	}
+	if (ch[cn].a_mana>ch[cn].mana[5] * 1000)
+	{
+		ch[cn].a_mana = ch[cn].mana[5] * 1000;
 	}
 
 	// item tear and wear

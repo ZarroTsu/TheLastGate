@@ -6,7 +6,7 @@
 
  **************************************************************************/
 
-#define VERSION				0x000A06
+#define VERSION				0x000A08
 #define MINVERSION			0x000A06
 
 #define DATDIR				".dat"
@@ -318,7 +318,7 @@
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  50
-#define DAM_MULT_LEAP		 250
+#define DAM_MULT_LEAP		 375
 
 // -------- Buff Duration values -------- //
 #define SP_DUR_LIGHT		( TICKS * 60 * 30                 )
@@ -391,7 +391,7 @@
 #define SK_EXH_ZEPHYR		(TICKS * 4)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP			(TICKS * 5)
+#define SK_EXH_LEAP			(TICKS * 6)
 #define SK_EXH_RAGE			(TICKS * 4)
 
 #define GLVDICE		4

@@ -3702,20 +3702,20 @@ int use_special_spell(int cn, int in)
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
-	if (IS_SANECHAR(co = ch[cn].skill_target1)) ;
-	else if (!buff && ch[cn].dir==DX_DOWN  && (co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_UP    && (co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT  && (co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && IS_SANECHAR(co = ch[cn].attack_cn)) ;
-	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && (co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && (co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && (co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && (co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_UP && (co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_DOWN && (co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT && (co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	if (IS_LIVINGCHAR(co = ch[cn].skill_target1)) ;
+	else if (!buff && ch[cn].dir==DX_DOWN  && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP    && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT  && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && IS_LIVINGCHAR(co = ch[cn].attack_cn)) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_DOWN && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
 	else co = cn;
 	
 	if (is_exhausted(cn)) return 0;
@@ -3734,7 +3734,13 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			power = ch[cn].hp[5]/4;
+			if (co == cn)
+			{
+				do_char_log(cn, 0, "You can't do that to yourself!\n");
+				return 0;
+			}
+			// Bloodletting power equal to 30% of uncapped HP
+			power = ch[cn].hp[5] * 30 / 100;
 			if (ch[cn].a_hp + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough life.\n");
@@ -3760,7 +3766,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			power = ch[cn].mana[5]/4;
+			// Starlight power equal to 30% of uncapped mana
+			power = ch[cn].mana[4] * 30 / 100;
 			if (ch[cn].a_mana + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough mana.\n");
@@ -3783,7 +3790,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			power = ch[cn].end[5]/3;
+			// Phalanx power equal to 30% of uncapped endurance
+			power = ch[cn].end[4] * 30 / 100;
 			if (ch[cn].a_end + 500 < power*1000)
 			{
 				do_char_log(cn, 0, "You dont have enough endurance.\n");
@@ -3807,8 +3815,13 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Poison power equal to 30% of total mana
-			power = ch[cn].mana[5]*3/10;
+			if (co == cn)
+			{
+				do_char_log(cn, 0, "You can't do that to yourself!\n");
+				return 0;
+			}
+			// Poison power equal to 30% of uncapped mana
+			power = ch[cn].mana[4] * 30 / 100;
 			if (!may_attack_msg(cn, co, 1))
 			{
 				chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
@@ -3825,8 +3838,13 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Cleave power equal to 30% of total hitpoints
-			power = ch[cn].hp[5]*3/10;
+			if (co == cn)
+			{
+				do_char_log(cn, 0, "You can't do that to yourself!\n");
+				return 0;
+			}
+			// Cleave power equal to 30% of uncapped hitpoints
+			power = ch[cn].hp[4] * 30 / 100;
 			if (!is_facing(cn, co))
 			{
 				do_char_log(cn, 0, "You must be facing your enemy!\n");
@@ -3847,8 +3865,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Rally power equal to 100% of endurance
-			power = ch[cn].end[5];
+			// Rally power equal to 100% of uncapped endurance
+			power = ch[cn].end[4];
 			item_damage_worn(cn, WN_RHAND, 500);
 			ret = skill_rally(cn, power);
 			if (ret) add_exhaust(cn, SK_EXH_WARCRY/2);
@@ -3859,8 +3877,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Immolate power equal to 33% of HP
-			power = ch[cn].hp[5]/3;
+			// Immolate power equal to 30% of uncapped HP
+			power = ch[cn].hp[4] * 30 / 100;
 			if (has_buff(cn, SK_IMMOLATE))
 			{
 				do_char_log(cn, 1, "Immolate no longer active.\n");
@@ -3878,7 +3896,12 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Blast power equal to WV
+			if (co == cn)
+			{
+				do_char_log(cn, 0, "You can't do that to yourself!\n");
+				return 0;
+			}
+			// Blast power equal to WV + TD
 			power = ch[cn].weapon + RANDOM(ch[cn].top_damage);
 			if (!may_attack_msg(cn, co, 1))
 			{
@@ -7142,7 +7165,7 @@ int use_seyan_portal(int cn, int in)
 int spell_scroll(int cn, int in)
 {
 	int spell, power, charges, ret, co=0, value;
-	int in2, stack_a, stack_b, tmpv;
+	int in2, stack_a, stack_b, tmpv, m, buff = 0;
 
 	spell = it[in].data[0];
 	power = it[in].data[1];
@@ -7185,8 +7208,26 @@ int spell_scroll(int cn, int in)
 		do_char_log(cn, 0, "Nothing happened!\n");
 		return 0;
 	}
+	
+	if (spell!=SK_CURSE && spell!=SK_SLOW) 
+		buff = 1;
+	
+	m = ch[cn].x + ch[cn].y * MAPX;
 
-	if ((co = ch[cn].skill_target1)) ;
+	if (IS_LIVINGCHAR(co = ch[cn].skill_target1)) ;
+	else if (!buff && ch[cn].dir==DX_DOWN  && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP    && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT  && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && IS_LIVINGCHAR(co = ch[cn].attack_cn)) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_DOWN && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
 	else co = cn;
 
 	if (!do_char_can_see(cn, co))

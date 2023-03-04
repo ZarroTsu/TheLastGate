@@ -1934,7 +1934,7 @@ void act_wave(int cn)
 
 void act_skill(int cn)
 {
-	if ((ch[cn].flags & CF_SIMPLE))
+	if ((ch[cn].flags & CF_SIMPLE) || ch[cn].skill_nr==SK_LEAP)
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		skill_driver(cn, ch[cn].skill_nr);

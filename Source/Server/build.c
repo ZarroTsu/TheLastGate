@@ -6430,13 +6430,40 @@ void build_money_pile(int v, int x, int y)
 void build_item_drop(int x, int y, int v, int cn, int rank)
 {
 	int in = 0, m;
-	static int item_eq[]  = {
-		 572,  573,  574,  575,  576,  577,  578,  579,  580, 1783,
-		 693,  694,  695,  696,  697,  698,  699,  700,  701, 1784,
-		2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053,
-		  71,   72,   73,   74,   75,   76,   77,   78,   79,   80,
-		  94,   95,   96,   97,   98,  347,  348,  349,  350,  351,
-		 352,  353,  354,  355,  356, 2028, 2029, 2030, 2031, 2032
+	static int item_eq1[]  = {
+		  56,   57,   58,   59,   60,   61,   62,   63,   64,   65,  // Steel, Gold Armor
+		 342,  343,  344,  345,  346,                                // Caster armor
+		 284,  285,  286,  287,  288,  289,  290,  291,  292, 1779,  // Steel Weapons
+		 523,  524,  525,  526,  527,  528,  529,  530,  531, 1780,  // Gold Weapons
+		 532,  533,  534,  535,  536,  537,  538,  539,  540, 1781   // Emerald Weapons
+	};
+	static int item_eq2[]  = {
+		  61,   62,   63,   64,   65,   66,   67,   68,   69,   70,  // Gold, Emerald Armor
+		 342,  343,  344,  345,  346,  347,  348,  349,  350,  351,  // Caster, Adept armor
+		 523,  524,  525,  526,  527,  528,  529,  530,  531, 1780,  // Gold Weapons
+		 532,  533,  534,  535,  536,  537,  538,  539,  540, 1781,  // Emerald Weapons
+		 541,  542,  543,  544,  545,  546,  547,  548,  549, 1782   // Crystal Weapons
+	};
+	static int item_eq3[]  = {
+		  66,   67,   68,   69,   70,   71,   72,   73,   74,   75,  // Emerald, Crystal Armor
+		 347,  348,  349,  350,  351,                                // Adept armor
+		 532,  533,  534,  535,  536,  537,  538,  539,  540, 1781,  // Emerald Weapons
+		 541,  542,  543,  544,  545,  546,  547,  548,  549, 1782,  // Crystal Weapons
+		 572,  573,  574,  575,  576,  577,  578,  579,  580, 1783   // Titanium Weapons
+	};
+	static int item_eq4[]  = {
+		  71,   72,   73,   74,   75,   76,   77,   78,   79,   80,  // Crystal, Titanium armor
+		 347,  348,  349,  350,  351,  352,  353,  354,  355,  356,  // Adept, Wizard armor
+		 541,  542,  543,  544,  545,  546,  547,  548,  549, 1782,  // Crystal Weapons
+		 572,  573,  574,  575,  576,  577,  578,  579,  580, 1783,  // Titanium Weapons
+		2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053   // Damascus Weapons
+	};
+	static int item_eq5[]  = {
+		  76,   77,   78,   79,   80,   94,   95,   96,   97,   98,  // Titanium, Adamant armor
+		 352,  353,  354,  355,  356, 2028, 2029, 2030, 2031, 2032,  // Wizard, Damascus armor
+		 572,  573,  574,  575,  576,  577,  578,  579,  580, 1783,  // Titanium Weapons
+		2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053,  // Damascus Weapons
+		 693,  694,  695,  696,  697,  698,  699,  700,  701, 1784   // Adamant Weapons
 	};
 	static int item_pt[]  = {
 		IT_MIX_WY, IT_MIX_BW, IT_MIX_MW, IT_MIX_VW, 
@@ -6448,8 +6475,11 @@ void build_item_drop(int x, int y, int v, int cn, int rank)
 	switch (v)
 	{
 		case MM_P_AREQ: // Equipment
-			in = RANDOM(sizeof(item_eq) / sizeof(int));
-			in = god_create_item(item_eq[in]);
+			if (rank>20)      { in = RANDOM(sizeof(item_eq5) / sizeof(int)); in = god_create_item(item_eq5[in]); }
+			else if (rank>16) { in = RANDOM(sizeof(item_eq4) / sizeof(int)); in = god_create_item(item_eq4[in]); }
+			else if (rank>12) { in = RANDOM(sizeof(item_eq3) / sizeof(int)); in = god_create_item(item_eq3[in]); }
+			else if (rank> 8) { in = RANDOM(sizeof(item_eq2) / sizeof(int)); in = god_create_item(item_eq2[in]); }
+			else              { in = RANDOM(sizeof(item_eq1) / sizeof(int)); in = god_create_item(item_eq1[in]); }
 			create_soultrans_equipment(cn, in, rank/2+RANDOM(rank/2)+1);
 			break;
 		case MM_P_ARPT: // Potion

@@ -428,20 +428,20 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	
-	if (IS_SANECHAR(co = ch[cn].skill_target1)) ;
-	else if (!buff && ch[cn].dir==DX_DOWN  && (co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_UP    && (co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT  && (co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && IS_SANECHAR(co = ch[cn].attack_cn)) ;
-	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && (co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && (co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && (co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && (co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_UP && (co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_DOWN && (co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT && (co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && (co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	if (IS_LIVINGCHAR(co = ch[cn].skill_target1)) ;
+	else if (!buff && ch[cn].dir==DX_DOWN  && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP    && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT  && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && IS_LIVINGCHAR(co = ch[cn].attack_cn)) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_DOWN && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
 	else co = cn;
 	
 	/* Event logging for debug
@@ -924,6 +924,12 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power, int d
 				hitpower = spell_immunity(power, ch[co].to_parry) * 2;
 				hitpower = hitpower/2 + hitpower/4;
 				
+				if (ch[co].a_hp >= ch[co].hp[5]*950) 
+				{
+					hitpower = hitpower * ch[cn].crit_multi / 100;
+					if (!get_tarot(cn, IT_CH_JUSTIC_R)) spell_warcry(cn, co, hitpower/2, 1);
+				}
+				
 				tmp = do_hurt(cn, co, hitpower, 8);
 				
 				if (tmp<1)
@@ -1169,13 +1175,13 @@ int spellcost(int cn, int cost, int in, int usemana)
 	
 	if (in == SK_LEAP && (in2 = has_buff(cn, SK_EXHAUST)))
 	{
-		hp_cost += bu[in2].active/2;
+		end_cost += bu[in2].active/4;
 		
 		// Crown of the First King
-		if (get_gear(cn, IT_TW_CROWN))
-		{
-			hp_cost -= hp_cost*20/100;
-		}
+		//if (get_gear(cn, IT_TW_CROWN))
+		//{
+		//	hp_cost -= hp_cost*20/100;
+		//}
 	}
 	
 	if (usemana>0)
@@ -1613,6 +1619,8 @@ int add_spell(int cn, int in)
 				stack=3;
 
 				if (get_book(cn, IT_BOOK_HOLY)) // Book: Holy Etiquette
+					stack--;
+				if (has_spell_from_item(cn, BUF_IT_DRAG)) // Dragon's Breath
 					stack--;
 				if (get_tarot(cn, IT_CH_TEMPER_R)) // Tarot - Temperance.R : +1 stack max
 					stack++;
@@ -3008,7 +3016,7 @@ int spell_warcry(int cn, int co, int power, int flag)
 	power = spell_immunity(power, get_target_immunity(cn, co));
 	
 	if (T_SEYA_SK(co, 10))				power = power*4/5;
-	if (T_ARTM_SK(cn,  7)) 				power = power + (power * M_AT(cn, AT_STR)/2000);
+	if (!flag && T_ARTM_SK(cn,  7)) 	power = power + (power * M_AT(cn, AT_STR)/2000);
 	if (get_tarot(cn, IT_CH_CHARIO_R)) 	power = power*3/4;
 	if (get_enchantment(co, 4)) 		power = power*4/5;
 	
@@ -5289,14 +5297,21 @@ int spell_immolate(int cn, int co, int power, int flag)
 {
 	int in;
 	
-	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[5]/25;
+	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[4]/20;
 	if (!flag) power = spell_multiplier(power, cn);
 	
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	
-	bu[in].hp[0]	= -200;
-	if (flag) bu[in].data[0] = 0;
+	if (flag) 
+	{
+		bu[in].data[0] = 0;
+		bu[in].hp[0]   = -250;
+	}
+	else
+	{
+		bu[in].hp[0]   = -200;
+	}
 	bu[in].data[3] 	= PRXP_RAD + ch[cn].aoe_bonus;
 	
 	bu[in].flags |= IF_PERMSPELL;
@@ -5432,6 +5447,19 @@ void skill_taunt(int cn)
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
 
+int invalid_leap(int cn, int m, int md)
+{
+	int mt;
+	
+	return (IS_LIVINGCHAR(map[m + md].ch) || 
+		IS_LIVINGCHAR(map[m + md].to_ch) || 
+		(map[m + md].flags & MF_MOVEBLOCK) || 
+		(IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
+		(!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && 
+			(!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
+		(IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
+		(IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)));
+}
 // Leap teleports behind your target, damaging them and the enemy you're fighting
 // Escapes combat in the process
 // Gets bonus damage from attack speed score
@@ -5441,7 +5469,7 @@ void skill_leap(int cn)
 	int power, aoepower, cost, dist, cost_dist, cost_pow, tmp, critical;
 	int co, cc=0, dam;
 	int x, y, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0, cooldown = SK_EXH_LEAP;
-	int dist_target=0, same_target=0;
+	int dist_target=0, same_target=0, dostun=1;
 	int xc, yc, xf, yf, xt, yt, c;
 	int catalog[64] = { 0 };
 	
@@ -5450,19 +5478,16 @@ void skill_leap(int cn)
 	aoepower = 10 + ch[cn].aoe_bonus;
 	critical = ch[cn].crit_multi;
 	
-	if (critical > 200)
-	{
-		critical = critical - 200;
-		critical = 200 + critical/2;
-	}
-	
 	// Tarot Card - Justice.R :: Reduce base cooldown & make target random
 	if (get_tarot(cn, IT_CH_JUSTIC_R))
 	{
 		randomtarg = 1;
-		critical = 100 + (critical-100)/2;
+		//critical = 100 + (critical-100)/2;
 		cooldown = cooldown/2;
+		dostun = 0;
 	}
+	
+	if (IS_MONSTER(cn)) dostun = 0;
 	
 	if (randomtarg)
 	{
@@ -5551,26 +5576,14 @@ void skill_leap(int cn)
 	
 	// Set up map specific variables to scope surroundings
 	x = ch[co].x;  y = ch[co].y;  m = XY2M(x, y);
-	if (dist_target) // Hit the front of distant targets
-	{
-		if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md =  MAPX;		newdir = DX_UP;		}
-		if (ch[co].dir==DX_UP    || ch[co].dir==DX_LEFTUP)		{	md = -MAPX;		newdir = DX_DOWN;	}
-		if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md =  1;		newdir = DX_LEFT;	}
-		if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md = -1;		newdir = DX_RIGHT;	}
-	}
-	else		// Hit the back of local target
-	{
-		if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md = -MAPX;		newdir = DX_DOWN;	}
-		if (ch[co].dir==DX_UP    || ch[co].dir==DX_LEFTUP)		{	md =  MAPX;		newdir = DX_UP;		}
-		if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md = -1;		newdir = DX_RIGHT;	}
-		if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md =  1;		newdir = DX_LEFT;	}
-	}
 	
+	if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md =  MAPX;		newdir = DX_UP;		}
+	if (ch[co].dir==DX_UP    || ch[co].dir==DX_LEFTUP)		{	md = -MAPX;		newdir = DX_DOWN;	}
+	if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md =  1;		newdir = DX_LEFT;	}
+	if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md = -1;		newdir = DX_RIGHT;	}
+		
 	// Check for obstructions
-	if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) || (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
-	   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && (!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
-	   (IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
-	   (IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)))
+	if (invalid_leap(cn, m, md))
 	{
 		// try again with target back
 		if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md = -MAPX;		newdir = DX_DOWN;	}
@@ -5578,27 +5591,26 @@ void skill_leap(int cn)
 		if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md = -1;		newdir = DX_RIGHT;	}
 		if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md =  1;		newdir = DX_LEFT;	}
 		
-		// Check for obstructions
-		if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) || (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
-		   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && (!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
-		   (IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
-		   (IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)))
+		if (invalid_leap(cn, m, md))
 		{
-			// try again with local target instead
-			co = cc;  
-			x = ch[co].x;  y = ch[co].y;  m = XY2M(x, y);
-			if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md = -MAPX;		newdir = DX_DOWN;	}
-			if (ch[co].dir==DX_UP    || ch[co].dir==DX_LEFTUP)		{	md =  MAPX;		newdir = DX_UP;		}
-			if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md = -1;		newdir = DX_RIGHT;	}
-			if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md =  1;		newdir = DX_LEFT;	}
+			// try with side
+			if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md =  1;		newdir = DX_LEFT;	}
+			if (ch[co].dir==DX_UP    || ch[co].dir==DX_LEFTUP)		{	md = -1;		newdir = DX_RIGHT;	}
+			if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md =  MAPX;		newdir = DX_UP;		}
+			if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md = -MAPX;		newdir = DX_DOWN;	}
 			
-			// Check for obstructions
-			if (map[m + md].to_ch || (map[m + md].flags & MF_MOVEBLOCK) || (IS_MONSTER(cn) && (map[m + md].flags & MF_NOMONST)) ||
-			   (!IS_MONSTER(cn) && (map[m + md].flags & MF_NOPLAYER) && (!IS_IN_XVIII(M2X(m + md), M2Y(m + md)) || has_item(cn, IT_COMMAND4))) ||
-			   (IS_IN_XVIII(M2X(m + md), M2Y(m + md)) && has_item(cn, IT_COMMAND2) && (map[m + md].flags & MF_BANK)) ||
-			   (IS_SANEITEM(mt = map[m + md].it) && (it[mt].flags & IF_MOVEBLOCK)))
+			if (invalid_leap(cn, m, md))
 			{
-				obstructed = 1;
+				// try with other side
+				if (ch[co].dir==DX_DOWN  || ch[co].dir==DX_RIGHTDOWN)	{	md = -1;		newdir = DX_RIGHT;	}
+				if (ch[co].dir==DX_UP    || ch[co].dir==DX_LEFTUP)		{	md =  1;		newdir = DX_LEFT;	}
+				if (ch[co].dir==DX_RIGHT || ch[co].dir==DX_RIGHTUP)		{	md = -MAPX;		newdir = DX_DOWN;	}
+				if (ch[co].dir==DX_LEFT  || ch[co].dir==DX_LEFTDOWN)	{	md =  MAPX;		newdir = DX_UP;		}
+				
+				if (invalid_leap(cn, m, md))
+				{
+					obstructed = 1;
+				}
 			}
 		}
 	}
@@ -5635,6 +5647,11 @@ void skill_leap(int cn)
 		chlog(cn, "Used Leap on %s and %s", ch[co].name, ch[cc].name);
 		// Damage Fight target (cc)
 		dam = spell_immunity(power, ch[cc].to_parry) * 2;
+		if (ch[cc].a_hp >= ch[cc].hp[5]*950) 
+		{
+			dam = dam * critical / 100;
+			if (dostun) spell_warcry(cn, cc, dam/2, 1);
+		}
 		tmp = do_hurt(cn, cc, dam, 8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[cc].reference);
 		else
@@ -5649,6 +5666,11 @@ void skill_leap(int cn)
 		check_gloves(cn, cc, 0, dr1, dr2);
 		// Damage leap target (co)
 		dam = spell_immunity(power, ch[co].to_parry) * 2;
+		if (ch[co].a_hp >= ch[co].hp[5]*950) 
+		{
+			dam = dam * critical / 100;
+			if (dostun) spell_warcry(cn, co, dam/2, 1);
+		}
 		tmp = do_hurt(cn, co, dam, 8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
@@ -5666,7 +5688,12 @@ void skill_leap(int cn)
 	{
 		chlog(cn, "Used Leap on %s", ch[co].name);
 		// Damage
-		dam = spell_immunity(power, ch[co].to_parry) * 2 * critical / 100;
+		dam = spell_immunity(power, ch[co].to_parry) * 2;
+		if (ch[co].a_hp >= ch[co].hp[5]*950) 
+		{
+			dam = dam * critical / 100;
+			if (dostun) spell_warcry(cn, co, dam/2, 1);
+		}
 		tmp = do_hurt(cn, co, dam, 8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
@@ -5684,7 +5711,7 @@ void skill_leap(int cn)
 	
 	surround_cast(cn, co, cc, SK_LEAP, power, dr1, dr2);
 	
-	if (!obstructed)
+	if (co!=ch[cn].attack_cn && !obstructed)
 	{
 		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 		god_transfer_char(cn, x, y);

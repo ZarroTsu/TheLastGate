@@ -6042,11 +6042,14 @@ void change_the_arena(int v, int frx, int fry, int tox, int toy)
 	
 	for (x=frx; x<=tox; x++) for (y=fry; y<=toy; y++)
 	{
+		// outer wall change
 		if (x==frx&&y>=fry&&y<=toy) build_drop(x, y, a);
 		if (x>=frx&&x<=tox&&y==fry) build_drop(x, y, a);
 		if (x==tox&&y>=fry&&y<=toy) build_drop(x, y, a);
 		if (x>=frx&&x<=tox&&y==toy) build_drop(x, y, a);
-		if ((in=map[x+y*MAPX].it)!=0 && (it[in].flags & IF_LOOK)) { build_remove(x, y); build_drop(x, y, b); }
+		// candle change
+		if ((in=map[x+y*MAPX].it)!=0 && it[in].driver!=124 && (it[in].flags & IF_LOOK)) { build_remove(x, y); build_drop(x, y, b); }
+		// floor change
 		build_drop(x, y, 0x20000000 | c);
 		if (x> 199&&x<209&&y>1549&&y<1559)	build_drop(x, y, 0x20000000 | d + 0); // carpet
 		if (x==199&&y==1549) 				build_drop(x, y, 0x20000000 | d + 3); // carpet corner

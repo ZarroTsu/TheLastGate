@@ -240,7 +240,7 @@
 #define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
 #define DESC_HERMIT_R	"When equipped, your Rage skill grants a large bonus to Top Damage instead of Weapon Value.\n"
 #define DESC_WHEEL_R	"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
-#define DESC_JUSTIC_R	"When equipped, your Leap skill deals halved critical damage, has halved base cooldown, and instead chooses a random nearby target.\n"
+#define DESC_JUSTIC_R	"When equipped, your Leap skill has halved base cooldown and instead chooses a random nearby target, but no longer inflicts stun on a critical hit.\n"
 #define DESC_HANGED_R	"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"
 #define DESC_DEATH_R	"When equipped, your Zephyr skill grants a bonus to Resistance instead of Immunity. Zephyr triggers on parry instead of on hit, and earns a damage bonus from Thorns instead of Attack Speed.\n"
 #define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
