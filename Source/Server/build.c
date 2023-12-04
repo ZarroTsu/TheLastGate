@@ -5905,7 +5905,7 @@ int build_item(int nr, int x, int y)
 
 void build_drop(int x, int y, int in)
 {
-	int nr, exfloor = 0;
+	int nr, exfloor = 0, m;
 	static int trees1[15] = {19, 19, 19, 20, 20, 20, 48, 48, 48, 49, 49, 49, 606, 607, 607};
 	static int trees2[15] = {19, 19, 20, 20, 48, 48, 49, 49, 606, 607, 607, 608, 608, 609, 609};
 	
@@ -5916,8 +5916,9 @@ void build_drop(int x, int y, int in)
 							 1682, 1683, 1683, 1684, 1685, 
 							 1685, 1686, 1686, 1687, 1687};
 	
-	static int trees5[5] = {200, 236, 237, 238, 239};
+	static int trees5[5] = { 200,  236,  237,  238,  239};
 	static int trees6[5] = {2659, 2659, 2660, 2661, 2662};
+	static int trees7[5] = {3293, 3293, 3294, 3295, 3296};
 
 	if (x<0 || x>=MAPX || y<0 || y>=MAPY)
 	{
@@ -5952,7 +5953,7 @@ void build_drop(int x, int y, int in)
 		}
 		// hack for grass grounds, parkett ground, greystone ground, flower floors
 		if (nr==551 || nr==2823 || nr==2828 || nr==142 || nr==725 || nr==808 || nr==6548 || 
-			nr==16670 || nr==5860 || nr==5852 || nr==5856 || nr==5848)	
+			nr==16670 || nr==5860 || nr==5852 || nr==5856 || nr==5848 || nr==6866)	
 		{
 			nr += RANDOM(4);
 		}
@@ -5992,9 +5993,26 @@ void build_drop(int x, int y, int in)
 			nr = abs((x-y)%4);
 			nr = tab[nr];
 		}
-
-		map[x + y * MAPX].sprite = nr;
-		return;
+		if (nr==6871)  // hack to build a jungle automatically
+		{
+			static int tab[6] = {3297, 3298, 3299, 3300, 3301, 3302};
+			
+			m = x + y * MAPX;
+			
+			build_remove(x, y);
+			if ((x == 889 || x == 988 || y == 1028 || y == 2012) && RANDOM(3)) in = 3292;
+			else if ((x == 890 || x == 987 || y == 1029 || y == 2011) && !RANDOM(3)) in = 3292;
+			else if (!RANDOM(27)) in = 3305;
+			else if (!RANDOM(23)) in = tab[RANDOM(6)];
+			else if ((x >= 895 && x <= 982 && y >= 1034 && y <= 2006) && !(x%(7+RANDOM(3))) && !(y%(7+RANDOM(3))) && !RANDOM(3)) { if (!RANDOM(3)) in = 3307; else in = 3310; }
+			else if ((x >= 895 && x <= 982 && y >= 1034 && y <= 2006) && !(x%(7+RANDOM(3))) && !(y%(7+RANDOM(3))) && !RANDOM(3)) in = 3311;
+			else return;
+		}
+		else
+		{
+			map[x + y * MAPX].sprite = nr;
+			return;
+		}
 	}
 	
 	switch (in)
@@ -6019,6 +6037,9 @@ void build_drop(int x, int y, int in)
 			break;
 		case 2658:	// hack for random violet jungle trees
 			in = trees6[RANDOM(5)];
+			break;
+		case 3305:	// hack for random red jungle trees
+			in = trees7[RANDOM(5)];
 			break;
 		
 		case 1936: exfloor = 0x20000000 | 1002; 	break;		// waypoint floor hacks - used by client engine.c

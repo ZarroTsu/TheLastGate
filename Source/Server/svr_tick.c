@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.10.8\n"};
-static char intro_msg4_font = 1;
-static char intro_msg4[] = {"The Uber Labyrinth is now open in Neiseer. Good luck!\n"};
+static char intro_msg3[] = {"Current client/server version is 0.11.4\n"};
+static char intro_msg4_font = 0;
+static char intro_msg4[] = {"Character exp has been refunded! Be sure to re-spend your exp before exploring!!\n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -1183,7 +1183,7 @@ void plr_cmd_skill(int nr)
 	{
 		return;
 	}
-	if (n!=50 && n!=51 && !B_SK(cn, n))
+	if (n!=50 && n!=51 && n!=52 && n!=53 && n!=54 && !B_SK(cn, n))
 	{
 		return;
 	}
@@ -1453,6 +1453,10 @@ void plr_cmd_setuser(int nr)
 			else if (IS_BRAVER(cn))
 			{
 				race_name = "a Braver";
+			}
+			else if (IS_LYCANTH(cn))
+			{
+				race_name = "a Lycanthrope";
 			}
 			else
 			{
@@ -1909,7 +1913,7 @@ void plr_newlogin(int nr)
 	do_char_motd(cn, newbi_msg5_font, newbi_msg5);
 	
 	buf[0] = SV_SHOWMOTD;
-	*(unsigned char*)(buf + 1) = 1;
+	*(unsigned char*)(buf + 1) = 99;
 	xsend(nr, buf, 2);
 
 	if (player[nr].passwd[0] && !(ch[cn].flags & CF_PASSWD))
@@ -2931,8 +2935,8 @@ void plr_change(int nr)
 					//
 					if (get_tarot(cn, IT_CH_HERMIT_R)) 	chFlags += (1 <<  3); // Rage -> Frenzy
 					if (get_gear(cn, IT_BONEARMOR)) 	chFlags += (1 <<  4); // Bone Armor
-					if (get_tarot(cn, IT_CH_DEATH_R)) 	chFlags += (1 <<  5); // Zephyr
-					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse -> Immolate
+					if (get_gear(cn, IT_WP_THEWALL)) 	chFlags += (1 <<  5); // The Wall
+					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
 					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
 					if (globs->fullmoon)				chFlags += (1 <<  8);
 					if (globs->newmoon)					chFlags += (1 <<  9);
@@ -2967,6 +2971,8 @@ void plr_change(int nr)
 						*(short int*)(buf + 7) |= PL_SOULSTONED;
 					if (it[in].flags & IF_ENCHANTED)
 						*(short int*)(buf + 7) |= PL_ENCHANTED;
+					if (it[in].flags & IF_CORRUPTED)
+						*(short int*)(buf + 7) |= PL_CORRUPTED;
 				}
 				else
 				{
@@ -3070,6 +3076,8 @@ void plr_change(int nr)
 						*(short int*)(buf + 3) |= PL_SOULSTONED;
 					if (it[in].flags & IF_ENCHANTED)
 						*(short int*)(buf + 3) |= PL_ENCHANTED;
+					if (it[in].flags & IF_CORRUPTED)
+						*(short int*)(buf + 3) |= PL_CORRUPTED;
 					*(unsigned char*)(buf + 5) = it[in].stack;
 
 					it[in].flags &= ~IF_UPDATE;
@@ -3451,14 +3459,14 @@ void char_play_sound(int cn, int sound, int vol, int pan)
 
 inline int do_char_calc_light(int cn, int light)
 {
-	int val;
+	int val, infv = 5;
 	
 	if (IS_BUILDING(cn))
 	{
 		light = 64;
 	}
 	
-	if (IS_GLOB_MAYHEM)
+	if (IS_GLOB_MAYHEM || IS_IN_SANG(ch[cn].x, ch[cn].y))
 	{
 		if (light==0 && M_SK(cn, SK_PERCEPT)>225 && !has_buff(cn, 215) && !(IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND3)))
 		{
@@ -3479,10 +3487,18 @@ inline int do_char_calc_light(int cn, int light)
 	{
 		val = 255;
 	}
-
-	if ((ch[cn].flags & CF_INFRARED) && val<5)
+	
+	if (ch[cn].flags & CF_INFRARED)
 	{
-		val = 5;
+		if (M_SK(cn, SK_PERCEPT)> 20) infv = 4;
+		if (M_SK(cn, SK_PERCEPT)> 40) infv = 3;
+		if (M_SK(cn, SK_PERCEPT)> 60) infv = 2;
+		if (M_SK(cn, SK_PERCEPT)> 80) infv = 1;
+		if (M_SK(cn, SK_PERCEPT)>150) infv = 0;
+	}
+	if ((ch[cn].flags & CF_INFRARED) && val<infv)
+	{
+		val = infv;
 	}
 
 	return(val);
@@ -3642,7 +3658,7 @@ static void inline empty_field(struct cmap *smap, int n)
 
 void plr_getmap_complete(int nr)
 {
-	int cn, co, light, tmp, visible, infra = 0;
+	int cn, co, light, tmp, visible, infra = 0, infv = 5;
 	int x, y, n, m;
 	int ys, ye, xs, xe;
 	unsigned char do_all = 0;
@@ -3706,7 +3722,15 @@ void plr_getmap_complete(int nr)
 
 			light = max(map[m].light, tmp);
 			light = do_char_calc_light(cn, light);
-			if (light<=5 && (ch[cn].flags & CF_INFRARED))
+			if (ch[cn].flags & CF_INFRARED)
+			{
+				if (M_SK(cn, SK_PERCEPT)> 20) infv = 4;
+				if (M_SK(cn, SK_PERCEPT)> 40) infv = 3;
+				if (M_SK(cn, SK_PERCEPT)> 60) infv = 2;
+				if (M_SK(cn, SK_PERCEPT)> 80) infv = 1;
+				if (M_SK(cn, SK_PERCEPT)>150) infv = 0;
+			}
+			if (light<=infv && (ch[cn].flags & CF_INFRARED))
 			{
 				infra = 1;
 			}
@@ -3874,9 +3898,13 @@ void plr_getmap_complete(int nr)
 				{
 					smap[n].flags |= STUNNED | STONED;
 				}
-				if (ch[co].flags & CF_SHADOWCOPY)
+				if (IS_SHADOW(co))
 				{
 					smap[n].flags |= STONED;
+				}
+				if (IS_BLOODY(co))
+				{
+					smap[n].flags |= BLOODY;
 				}
 			}
 			else
@@ -3940,7 +3968,7 @@ void plr_getmap_complete(int nr)
 
 void plr_getmap_fast(int nr)
 {
-	int cn, co, light, tmp, visible, infra = 0;
+	int cn, co, light, tmp, visible, infra = 0, infv = 5;
 	int x, y, n, m;
 	int ys, ye, xs, xe;
 	unsigned char do_all = 0;
@@ -4003,7 +4031,15 @@ void plr_getmap_fast(int nr)
 
 			light = max(map[m].light, tmp);
 			light = do_char_calc_light(cn, light);
-			if (light<=5 && (ch[cn].flags & CF_INFRARED))
+			if (ch[cn].flags & CF_INFRARED)
+			{
+				if (M_SK(cn, SK_PERCEPT)> 20) infv = 4;
+				if (M_SK(cn, SK_PERCEPT)> 40) infv = 3;
+				if (M_SK(cn, SK_PERCEPT)> 60) infv = 2;
+				if (M_SK(cn, SK_PERCEPT)> 80) infv = 1;
+				if (M_SK(cn, SK_PERCEPT)>150) infv = 0;
+			}
+			if (light<=infv && (ch[cn].flags & CF_INFRARED))
 			{
 				infra = 1;
 			}
@@ -4167,9 +4203,13 @@ void plr_getmap_fast(int nr)
 				{
 					smap[n].flags |= STUNNED | STONED;
 				}
-				if (ch[co].flags & CF_SHADOWCOPY)
+				if (IS_SHADOW(co))
 				{
 					smap[n].flags |= STONED;
+				}
+				if (IS_BLOODY(co))
+				{
+					smap[n].flags |= BLOODY;
 				}
 			}
 			else
@@ -4448,7 +4488,7 @@ void check_expire(int cn)
 
 	t = time(NULL);
 	
-	if (!IS_SEYA_OR_BRAV(cn) && !(ch[cn].rebirth & 1))
+	if (!IS_SEYA_OR_BRAV(cn) && !IS_LYCANTH(cn) && !(ch[cn].rebirth & 1))
 	{
 		if (ch[cn].points_tot==0)
 		{

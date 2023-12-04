@@ -72,7 +72,9 @@ void step_desertfloor(int cn)
 		bu[in2].temp = 206;
 		bu[in2].flags = IF_SPELL;
 		bu[in2].sprite[1] = BUF_SPR_HEATSTR;
-		bu[in2].hp[0] = bu[in2].end[0] = bu[in2].mana[0] = -100;
+		bu[in2].hp[0]   = -50;
+		bu[in2].end[0]  = -50;
+		bu[in2].mana[0] = -25;
 		bu[in2].active = bu[in2].duration = TICKS*15;
 		
 		if (add_spell(cn, in2) && !alreadyhave) 
@@ -132,7 +134,7 @@ void step_oppressed(int cn, int fl)
 		bu[in].active = bu[in].duration = 1;
 		bu[in].flags  = IF_SPELL | IF_PERMSPELL;
 		bu[in].temp = SK_OPPRESSED2;
-		bu[in].sprite[1] = 1015;
+		bu[in].sprite[1] = min(6780, 6761+fl-1);
 		
 		add_spell(cn, in);
 		
@@ -559,12 +561,6 @@ void plr_give(int cn)
 	if (!co)
 	{
 		do_char_log(cn, 2, "Your target moved away!\n");
-		return;
-	}
-	
-	if (IS_PLAYER(co) && (in = ch[cn].citem) && !(in & 0x80000000) &&
-		(it[in].temp==IT_COMMAND1 || it[in].temp==IT_COMMAND2 || it[in].temp==IT_COMMAND3 || it[in].temp==IT_COMMAND4))
-	{
 		return;
 	}
 
@@ -1934,7 +1930,7 @@ void act_wave(int cn)
 
 void act_skill(int cn)
 {
-	if ((ch[cn].flags & CF_SIMPLE) || ch[cn].skill_nr==SK_LEAP)
+	if ((ch[cn].flags & CF_SIMPLE))
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		skill_driver(cn, ch[cn].skill_nr);
@@ -2042,7 +2038,7 @@ void act_use(int cn)            // get the object in front of the character
 	switch(ch[cn].dir)
 	{
 	case    DX_UP:
-		if (ch[cn].x>0)
+		if (ch[cn].y>0)
 		{
 			ch[cn].status  = 160;
 			ch[cn].status2 = 4;
@@ -2052,7 +2048,7 @@ void act_use(int cn)            // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_DOWN:
-		if (ch[cn].x<MAPX - 1)
+		if (ch[cn].y<MAPY - 1)
 		{
 			ch[cn].status  = 168;
 			ch[cn].status2 = 4;
@@ -2062,7 +2058,7 @@ void act_use(int cn)            // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_LEFT:
-		if (ch[cn].y>0)
+		if (ch[cn].x>0)
 		{
 			ch[cn].status  = 176;
 			ch[cn].status2 = 4;
@@ -2072,7 +2068,7 @@ void act_use(int cn)            // get the object in front of the character
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPY - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 4;
@@ -2094,12 +2090,6 @@ void act_drop(int cn)           // drops the current object in front of the char
 	ch[cn].cerrno = ERR_NONE;
 
 	if (!do_char_can_flee(cn) || (ch[cn].flags & CF_SIMPLE))
-	{
-		ch[cn].cerrno = ERR_FAILED;
-		return;
-	}
-	if ((in = ch[cn].citem) && !(in & 0x80000000) &&
-		it[in].temp==IT_COMMAND1 || it[in].temp==IT_COMMAND2 || it[in].temp==IT_COMMAND3 || it[in].temp==IT_COMMAND4)
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;
@@ -2138,7 +2128,7 @@ void act_drop(int cn)           // drops the current object in front of the char
 			ch[cn].cerrno = ERR_FAILED;
 		} break;
 	case    DX_RIGHT:
-		if (ch[cn].y<MAPX - 1)
+		if (ch[cn].x<MAPX - 1)
 		{
 			ch[cn].status  = 184;
 			ch[cn].status2 = 2;

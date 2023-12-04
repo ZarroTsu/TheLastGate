@@ -18,7 +18,7 @@
 #define STONED   (1u<<3)
 #define INFRARED (1u<<4)
 #define UWATER   (1u<<5)
-
+#define BLOODY   (1u<<6) // New
 #define ISUSABLE (1u<<7)
 #define ISITEM   (1u<<8)
 #define ISCHAR   (1u<<9)

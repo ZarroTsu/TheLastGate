@@ -275,7 +275,7 @@ void drv_useto(int cn, int x, int y)
 	m  = x + y * MAPX;
 	in = map[m].it;
 
-	if (ret && (!in || it[in].driver!=25))
+	if (ret && (!in || (it[in].driver!=25 && it[in].driver!=132)))
 	{
 		ch[cn].misc_action = DR_IDLE;
 	}

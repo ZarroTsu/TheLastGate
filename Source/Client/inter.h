@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000A08
+#define VERSION 0x000B04
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -193,7 +193,7 @@ struct look
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int show_shop, show_wps, show_tree, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
+extern unsigned int show_shop, show_wps, show_tree, show_book, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2
@@ -231,7 +231,6 @@ struct skilltab
 	
 	char alt_a[200]; // If something changes the name
 	char alt_b[200]; // If something changes the desc
-	char alt_c[200]; // Extra slot for proximity desc
 	
 	int attrib[3];
 };
@@ -262,7 +261,7 @@ struct sk_icon
 };
 
 extern struct wpslist wpslist[MAXWPS];
-extern struct sk_tree sk_tree[8][12];
+extern struct sk_tree sk_tree[9][12];
 extern struct sk_icon sk_icon[12];
 
 void dd_puttext(int x,int y,int font,char *text);

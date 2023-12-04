@@ -58,17 +58,17 @@ usage of data for players:
 * `45:`     level X got hp/end/mana bonus for
 * `46-49:`  Flags of explorer points we visited (1,2,4,8,16)
 * `50-59:`  hard ignore list
-* `60-63:`  Flags of killed NPC of certain class
+* `60-63:`  FKs   1/*, 2/*, 3/*, 4/*
 * `64:`     current ghost companion
-* `65:`     player #ALLOWed to search corpse
+* `65:`     player #ALLOWed to search corpse // used for purple priest timer to free up dr67
 * `66:`     Corpse's owner
-* `67:`     Riddle giver (lab 9)
+* `67:`     --Zarro-- FKs 8/*
 * `68:`     Date of last player attack (PCD_ATTACKTIME)
 * `69:`     Last player attacked       (PCD_ATTACKVICT)
-* `70:`		Flags of killed NPC of certain class (Extended)
+* `70:`		--Zarro-- FKs 5/*
 * `71:`     number of says/tells/looks/lights
 * `72:`     --Zarro-- Quests 1
-* '73:'		--Zarro-- Extended FKs 3
+* '73:'		--Zarro-- FKs 7/*
 * '74:'     --Zarro-- for spell delays when hit by warcry
 * '75:'		--Zarro-- for spell delays when hit by blast, cleave
 * '76:'     --Zarro-- for waypoint storage
@@ -79,7 +79,7 @@ usage of data for players:
 * `90:`     number in database
 * `91:`		--Zarro-- Extended poles
 * `92:`     weird unusable sleep timer slot
-* `93:`		--Zarro-- Extended FKs 2
+* `93:`		--Zarro-- FKs 6/*
 * `94:`		--Zarro-- Quests 2
 * `95:`		--Zarro-- current shadow copy
 * `96:`     queued spells

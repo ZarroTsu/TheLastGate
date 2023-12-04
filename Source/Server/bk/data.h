@@ -885,7 +885,7 @@ struct waypoint
 #define N_SOULMAX		 48
 
 extern struct s_skilltab skilltab[MAXSKILL+2];
-extern struct s_splog splog[52];
+extern struct s_splog splog[59];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;

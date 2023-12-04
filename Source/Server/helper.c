@@ -808,11 +808,12 @@ int scale_exps(int cn, int co, int exp)
 	return(scale_exps2(cn, getrank(co), exp));
 }
 
-char *class_name[8] = {
+char *class_name[9] = {
 	"Seyan'du",		"Arch-Templar", 
 	"Skald",		"Warrior", 
 	"Sorcerer",		"Summoner", 
-	"Arch-Harakim",	"Braver" 
+	"Arch-Harakim",	"Braver", 
+	"Lycanthrope"
 };
 
 char *rank_name[RANKS] = {
@@ -1287,6 +1288,8 @@ int change_bs_shop_item(int cn, int in)
 				in = get_best_weapon(cn, SK_SWORD); // 1. Sword
 			else if (IS_ANY_HARA(cn))
 				in = get_best_weapon(cn, 7); // 1. Spear
+			else if (IS_LYCANTH(cn))
+				in = get_best_weapon(cn, SK_HAND); // 1. Claw
 			else
 				in = 0;
 			break;
@@ -1368,6 +1371,42 @@ int change_bs_shop_item(int cn, int in)
 			t = time(NULL) / (60*60*24);
 			in -= t % 19;
 			break;
+		case IT_WP_SUNSWORD:
+			t = time(NULL) / (60*60*24);
+			t = t % 12;
+			switch (t)
+			{
+				case  1: in = 2005; break;
+				case  2: in = 3202; break;
+				case  3: in = 2006; break;
+				case  4: in = 3203; break;
+				case  5: in = 2017; break;
+				case  6: in = 3204; break;
+				case  7: in = 2000; break;
+				case  8: in = 3205; break;
+				case  9: in = 2011; break;
+				case 10: in = 3206; break;
+				case 11: in = 2012; break;
+				default: break;
+			}
+			break;
+		case 1985:
+			t = time(NULL) / (60*60*24);
+			in += t % 15;
+			break;
+		case 1793:
+			t = time(NULL) / (60*60*24);
+			in += t % 2;
+			break;
+		case 1928:
+			t = time(NULL) / (60*60*24);
+			in += t % 7;
+			break;
+		case  186:
+		case 2511:
+			t = time(NULL) / (60*60*24);
+			in -= t % 5;
+			break;
 		
 		default: break;
 	}
@@ -1415,6 +1454,8 @@ int get_special_item(int cn, int in, int gen_a, int gen_b, int gen_c)
 		case IT_HELM_ADAM:	case IT_BODY_ADAM:	case IT_HELM_CAST:	case IT_BODY_CAST:
 		case IT_HELM_ADEP:	case IT_BODY_ADEP:	case IT_HELM_WIZR:	case IT_BODY_WIZR:
 		case IT_HELM_DAMA:	case IT_BODY_DAMA:
+		case IT_HELM_LIZR:	case IT_BODY_LIZR:	case IT_HELM_AZUR:	case IT_BODY_AZUR:
+		case IT_HELM_MIDN:	case IT_BODY_MIDN:	case IT_HELM_IVOR:	case IT_BODY_IVOR:
 			in2 = create_special_item(in, gen_a, gen_b, gen_c);
 			break;
 
@@ -1536,6 +1577,15 @@ int get_special_spr(int temp, int spr)
 		case IT_HELM_DAMA: spr = 3733; break;
 		case IT_BODY_DAMA: spr = 3734; break;
 		//
+		case IT_HELM_LIZR: spr = 3472; break;
+		case IT_BODY_LIZR: spr = 3473; break;
+		case IT_HELM_MIDN: spr = 3474; break;
+		case IT_BODY_MIDN: spr = 3475; break;
+		case IT_HELM_AZUR: spr = 3476; break;
+		case IT_BODY_AZUR: spr = 3477; break;
+		case IT_HELM_IVOR: spr = 3478; break;
+		case IT_BODY_IVOR: spr = 3479; break;
+		//
 		default: break;
 	}
 	
@@ -1565,10 +1615,12 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 	if (temp==IT_HELM_BRNZ || temp==IT_BODY_BRNZ || temp==IT_HELM_STEL || temp==IT_BODY_STEL || 
 		temp==IT_HELM_GOLD || temp==IT_BODY_GOLD || temp==IT_HELM_EMER || temp==IT_BODY_EMER || 
 		temp==IT_HELM_CRYS || temp==IT_BODY_CRYS || temp==IT_HELM_TITN || temp==IT_BODY_TITN || 
-		temp==IT_HELM_ADAM || temp==IT_BODY_ADAM)
+		temp==IT_HELM_ADAM || temp==IT_BODY_ADAM || temp==IT_HELM_LIZR || temp==IT_BODY_LIZR || 
+		temp==IT_HELM_AZUR || temp==IT_BODY_AZUR)
 		is_armor = 1;
 	if (temp==IT_HELM_CAST || temp==IT_BODY_CAST || temp==IT_HELM_ADEP || temp==IT_BODY_ADEP || 
-		temp==IT_HELM_WIZR || temp==IT_BODY_WIZR)
+		temp==IT_HELM_WIZR || temp==IT_BODY_WIZR || temp==IT_HELM_MIDN || temp==IT_BODY_MIDN || 
+		temp==IT_HELM_IVOR || temp==IT_BODY_IVOR)
 		is_robe = 1;
 	if (temp==IT_HELM_DAMA || temp==IT_BODY_DAMA)
 		is_dama = 1;
@@ -1834,117 +1886,118 @@ struct npc_class
 struct npc_class npc_class[] = {
 	{""							},	// 0  --  Stays blank (null)
 	//
-	{"Weak Thief"				},	// 1
-	{"Crawler"					},	// 2
-	{"Weak Skeleton"			},	// 3
-	{"Weak Harakim"				},	// 4
-	{"Weak Outlaw"				},	// 5
-	{"Skeleton"					},	// 6
-	{"Weak Ghost"				},	// 7
-	{"Outlaw"					},	// 8
-	{"Thief"					},	// 9
-	{"Creeper"					},	// 10
+	{"Weak Thief"				},	//   1
+	{"Crawler"					},	//   2
+	{"Weak Skeleton"			},	//   3
+	{"Weak Harakim"				},	//   4
+	{"Weak Outlaw"				},	//   5
+	{"Skeleton"					},	//   6
+	{"Weak Ghost"				},	//   7
+	{"Outlaw"					},	//   8
+	{"Thief"					},	//   9
+	{"Creeper"					},	//  10
 	//
-	{"Weak Spider"				},	// 11
-	{"Spider"					},	// 12
-	{"Strong Spider"			},	// 13
-	{"Ghost"					},	// 14
-	{"Bandit"					},	// 15
+	{"Weak Spider"				},	//  11
+	{"Spider"					},	//  12
+	{"Strong Spider"			},	//  13
+	{"Ghost"					},	//  14
+	{"Bandit"					},	//  15
 	//
-	{"Arachnid"					},	// 16
-	{"Templar"					},	// 17
-	{"Strong Skeleton"          },	// 18
-	{"Tarantula"                },	// 19
-	{"Strong Templar"           },	// 20
-	{"Strong Harakim"           },	// 21
-	{"First Lieu. Grolm"		},	// 22
-	{"First Lieu. Seagrel"      },	// 23
-	{"Robber"					},	// 24
-	{"Very Strong Skeleton"		},	// 25
+	{"Arachnid"					},	//  16
+	{"Templar"					},	//  17
+	{"Strong Skeleton"          },	//  18
+	{"Tarantula"                },	//  19
+	{"Strong Templar"           },	//  20
+	{"Strong Harakim"           },	//  21
+	{"First Lieu. Grolm"		},	//  22
+	{"First Lieu. Seagrel"      },	//  23
+	{"Robber"					},	//  24
+	{"Very Strong Skeleton"		},	//  25
 	//
-	{"Strong Bandit"			},	// 26
-	{"Mud Golem"				},	// 27
-	{"Specter"					},	// 28
-	{"Grudge"					},	// 29
-	{"Swamp Lizard"				},	// 30
-	{"Viking"					},	// 31
-	{"Wraith"					},	// 32
-	{"Wight"					},	// 33
-	{"Demilich"					},	// 34
+	{"Strong Bandit"			},	//  26
+	{"Mud Golem"				},	//  27
+	{"Spectre"					},	//  28
+	{"Grudge"					},	//  29
+	{"Swamp Lizard"				},	//  30
+	{"Viking"					},	//  31		-- 1/8 -- data[60]
+	{"Wraith"					},	//  32
+	{"Wight"					},	//  33
 	//
-	{"Strong Undead"			},	// 35
-	{"Living Flame"				},	// 36
-	{"Colonel Ice Gargoyle"		},	// 37
+	{"Lt.Colonel Ice Gargoyle"	},	//  34
 	//
-	{"Gargoyle Knight"			},	// 38
-	{"Gargoyle Mage"			},	// 39
+	{"Strong Undead"			},	//  35
+	{"Living Flame"				},	//  36
+	{"Colonel Ice Gargoyle"		},	//  37
 	//
-	{"Xecko"                    },	// 40
-	{"Thug"                     },	// 41
-	{"Cultist"                  },	// 42
-	{"Strider"                  },	// 43
-	{"Lycanthrope"              },	// 44
+	{"Gargoyle Knight"			},	//  38
+	{"Gargoyle Mage"			},	//  39
 	//
-	{"Lizard Guard"             },	// 45
-	{"Lizard Monk"              },	// 46
-	{"Lizard Priest"            },	// 47
+	{"Xecko"                    },	//  40
+	{"Thug"                     },	//  41
+	{"Cultist"                  },	//  42
+	{"Strider"                  },	//  43
+	{"Lycanthrope"              },	//  44
 	//
-	{"Lizard Bandit"            },	// 48
-	{"Lizard Dweller"           },	// 49
-	{"Lizard Retainer"          },	// 50
-	{"Lizard Archmage"          },	// 51
-	{"Lizard Archknight"        },	// 52
-	{"Emerald Golem"            },	// 53
+	{"Lizard Guard"             },	//  45
+	{"Lizard Monk"              },	//  46
+	{"Lizard Priest"            },	//  47
 	//
-	{"Gargoyle Queen"			},	// 54
-	{"Brig. Gen Ice Gargoyle"	},	// 55
-	{"Major Gen Ice Gargoyle"	},	// 56
-	{"Lieu. Gen Ice Gargoyle"	},	// 57
-	{"General Ice Gargoyle"		},	// 58
-	{"Ice Gargoyle Queen"		},	// 59
+	{"Lizard Bandit"            },	//  48
+	{"Lizard Dweller"           },	//  49
+	{"Lizard Retainer"          },	//  50
+	{"Lizard Archmage"          },	//  51
+	{"Lizard Archknight"        },	//  52
+	{"Emerald Golem"            },	//  53
 	//
-	{"Second Lieu. Thrall"		},	// 60
-	{"First Lieu. Thrall"		},	// 61
-	{"Captain Thrall"			},	// 62
-	{"Major Thrall"				},	// 63
-	{"Lt.Colonel Thrall"		},	// 64
-	{"Colonel Vampire"			},	// 65
-	{"Brig. General Vampire"	},	// 66
-	{"Major General Vampire"	},	// 67
-	{"Lieu. General Vampire"	},	// 68
-	{"General Vampire"			},	// 69
-	{"F.Marshal Vampire"		},	// 70
+	{"Gargoyle Queen"			},	//  54
+	{"Brig. Gen Ice Gargoyle"	},	//  55
+	{"Major Gen Ice Gargoyle"	},	//  56
+	{"Lieu. Gen Ice Gargoyle"	},	//  57
+	{"General Ice Gargoyle"		},	//  58
+	{"Ice Gargoyle Queen"		},	//  59
 	//
-	{"Weak Skeleton Miner"		},	// 71
-	{"Skeleton Miner"			},	// 72
-	{"Silver Golem"				},	// 73
-	{"Magma Gargoyle"			},	// 74
-	{"Marble Golem"				},	// 75
+	{"Second Lieu. Thrall"		},	//  60
+	{"First Lieu. Thrall"		},	//  61
+	{"Captain Thrall"			},	//  62
+	{"Major Thrall"				},	//  63		-- 2/8 -- data[61]
+	{"Lt.Colonel Thrall"		},	//  64
+	{"Colonel Vampire"			},	//  65
+	{"Brig. General Vampire"	},	//  66
+	{"Major General Vampire"	},	//  67
+	{"Lieu. General Vampire"	},	//  68
+	{"General Vampire"			},	//  69
+	{"F.Marshal Vampire"		},	//  70
 	//
-	{"Grolm Soldier"			},	// 76
-	{"Grolm Mage"				},	// 77
-	{"Grolm King"				},	// 78
-	{"Lizard Youth"				},	// 79
-	{"Lizard Worker"			},	// 80
-	{"Lizard Seer"				},	// 81
-	{"Undead"					},	// 82
-	{"Reptite"					},	// 83
-	{"Spellcaster"				},	// 84
-	{"Puppeteer"				},	// 85
-	{"Mad Knight"				},	// 86
-	{"Old Bones"				},	// 87
-	{"Sand Golem"				},	// 88
-	{"Pharoh"					},	// 89
-	{"Undead King"				},	// 90
-	{"Stone Golem"				},	// 91
-	{"Librarian"				},	// 92
-	{"Golemancer"				},	// 93
-	{"Grolm Trapper"			},	// 94
-	{"Weaver"					},	// 95
-	{"Iguana"					},	// 96
-	{"Wood Golem"				},	// 97
-	{"Sculpture"				},	// 98
-	{"Barbarian"				},	// 99
+	{"Weak Skeleton Miner"		},	//  71
+	{"Skeleton Miner"			},	//  72
+	{"Silver Golem"				},	//  73
+	{"Magma Gargoyle"			},	//  74
+	{"Marble Golem"				},	//  75
+	//
+	{"Grolm Soldier"			},	//  76
+	{"Grolm Mage"				},	//  77
+	{"Grolm King"				},	//  78
+	{"Lizard Youth"				},	//  79
+	{"Lizard Worker"			},	//  80
+	{"Lizard Seer"				},	//  81
+	{"Undead"					},	//  82
+	{"Reptite"					},	//  83
+	{"Spellcaster"				},	//  84
+	{"Puppeteer"				},	//  85
+	{"Mad Knight"				},	//  86
+	{"Old Bones"				},	//  87
+	{"Sand Golem"				},	//  88
+	{"Pharoh"					},	//  89
+	{"Undead King"				},	//  90
+	{"Stone Golem"				},	//  91
+	{"Librarian"				},	//  92
+	{"Golemancer"				},	//  93
+	{"Grolm Trapper"			},	//  94
+	{"Weaver"					},	//  95		-- 3/8 -- data[62]
+	{"Iguana"					},	//  96
+	{"Wood Golem"				},	//  97
+	{"Sculpture"				},	//  98
+	{"Barbarian"				},	//  99
 	{"Magmaling"				},	// 100
 	//
 	{"Ratling"					},	// 101
@@ -1975,7 +2028,7 @@ struct npc_class npc_class[] = {
 	{"Sogling Knight"			},	// 124
 	{"Sogling Baron"			},	// 125
 	{"Sogling Count"			},	// 126
-	{"Sogling Duke"				},	// 127
+	{"Sogling Duke"				},	// 127		-- 4/8 -- data[63]
 	{"Sogling Prince"			},	// 128
 	{"Sogling King"				},	// 129
 	{"Sogling Archmage"			},	// 130
@@ -2008,7 +2061,7 @@ struct npc_class npc_class[] = {
 	{"Baron Seagrel"			},	// 156
 	{"Earl Seagrel"				},	// 157
 	{"Earl Onyx Gargoyle"		},	// 158
-	{"Marquess Onyx Gargoyle"	},	// 159
+	{"Marquess Onyx Gargoyle"	},	// 159		-- 5/8 -- data[70]
 	//
 	{"Draugr"               	},	// 160
 	{"Banshee"              	},	// 161
@@ -2047,7 +2100,7 @@ struct npc_class npc_class[] = {
 	{"Dire Rat"                 },	// 189
 	//
 	{"Ancient Gargoyle"         },	// 190
-	{"Dweller"                  },	// 191
+	{"Dweller"                  },	// 191		-- 6/8 -- data[93]
 	{"Widow"                  	},	// 192
 	{"Experiment"             	},	// 193
 	{"Abomination"            	},	// 194
@@ -2067,77 +2120,115 @@ struct npc_class npc_class[] = {
 	{"Toxic Grulge"             },	// 205
 	{"Kelpie"                   },	// 206
 	//
-	{""                     	},	// 207
-	{""                     	},	// 208
-	{""                     	},	// 209
-	{""                     	},	// 210
+	{"General Onyx Gargoyle" 	},	// 207
+	{"F.Marshal Onyx Gargoyle" 	},	// 208
+	//
+	{"Cryskull"                 },	// 209
+	{"Snow Gargoyle"            },	// 210
+	//
 	{"Dwarf"                    },	// 211
 	{"Pirate"                   },	// 212
 	{"F.Marshal Gargoyle"       },	// 213
 	{"Enforcer"                 },	// 214
 	{"Scaleling"                },	// 215
 	{"Dragon"                   },	// 216
-	{""                     	},	// 217
-	{""                     	},	// 218
-	{""                     	},	// 219
-	{""                     	},	// 220
-	{""                     	},	// 221
-	{""                     	},	// 222
-	{""                     	}	// 223
+	//
+	{"Dimling"                 	},	// 217
+	{"Dimling Pawn"             },	// 218
+	{"Dimling Rook"             },	// 219
+	{"Dimling Jack"             },	// 220
+	{"Dimling Queen"            },	// 221
+	//
+	{"Toxic Gargoyle"           },	// 222
+	{"Vileling"               	},	// 223		-- 7/8 -- data[73]
+	{"Living Armor"         	},	// 224
+	{"Skyfire"              	},	// 225
+	//
+	{""                     	},	// 226
+	{""                     	},	// 227
+	{""                     	},	// 228
+	{""                     	},	// 229
+	{""                     	},	// 230
+	{""                     	},	// 231
+	{""                     	},	// 232
+	{""                     	},	// 233
+	{""                     	},	// 234
+	{""                     	},	// 235
+	{""                     	},	// 236
+	{""                     	},	// 237
+	{""                     	},	// 238
+	{""                     	},	// 239
+	{""                     	},	// 240
+	{""                     	},	// 241
+	{""                     	},	// 242
+	{""                     	},	// 243
+	{""                     	},	// 244
+	{""                     	},	// 245
+	{""                     	},	// 246
+	{""                     	},	// 247
+	{""                     	},	// 248
+	{""                     	},	// 249
+	{""                     	},	// 250
+	{""                     	},	// 251
+	{""                     	},	// 252
+	{""                     	},	// 253
+	{""                     	},	// 254
+	{""                     	}	// 255		-- 8/8 -- data[67]
 };
 
 int killed_class(int cn, int val)
 {
 	int bit, tmp;
+	
+	if (val > 1024) return 1;
 
 	if (val<32)
 	{
 		bit = 1 << (val);
-		tmp = ch[cn].data[60] & bit;
-		ch[cn].data[60] |= bit;
-		return(tmp);
+		tmp = ch[cn].data[60] & bit; ch[cn].data[60] |= bit;
+		return tmp;
 	}
 	else if (val<64)
 	{
 		bit = 1 << (val - 32);
-		tmp = ch[cn].data[61] & bit;
-		ch[cn].data[61] |= bit;
-		return(tmp);
+		tmp = ch[cn].data[61] & bit; ch[cn].data[61] |= bit;
+		return tmp;
 	}
 	else if (val<96)
 	{
 		bit = 1 << (val - 64);
-		tmp = ch[cn].data[62] & bit;
-		ch[cn].data[62] |= bit;
-		return(tmp);
+		tmp = ch[cn].data[62] & bit; ch[cn].data[62] |= bit;
+		return tmp;
 	}
 	else if (val<128)
 	{
 		bit = 1 << (val - 96);
-		tmp = ch[cn].data[CHD_MASTER] & bit;
-		ch[cn].data[CHD_MASTER] |= bit;
-		return(tmp);
+		tmp = ch[cn].data[63] & bit; ch[cn].data[63] |= bit;
+		return tmp;
 	}
 	else if (val<160)
 	{
 		bit = 1 << (val - 128);
-		tmp = ch[cn].data[70] & bit;
-		ch[cn].data[70] |= bit;
-		return(tmp);
+		tmp = ch[cn].data[70] & bit; ch[cn].data[70] |= bit;
+		return tmp;
 	}
 	else if (val<192)
 	{
 		bit = 1 << (val - 160);
-		tmp = ch[cn].data[93] & bit;
-		ch[cn].data[93] |= bit;
-		return(tmp);
+		tmp = ch[cn].data[93] & bit; ch[cn].data[93] |= bit;
+		return tmp;
+	}
+	else if (val<224)
+	{
+		bit = 1 << (val - 192);
+		tmp = ch[cn].data[73] & bit; ch[cn].data[73] |= bit;
+		return tmp;
 	}
 	else
 	{
-		bit = 1 << (val - 192);
-		tmp = ch[cn].data[73] & bit;
-		ch[cn].data[73] |= bit;
-		return(tmp);
+		bit = 1 << (val - 224);
+		tmp = ch[cn].data[67] & bit; ch[cn].data[67] |= bit;
+		return tmp;
 	}
 }
 
@@ -2703,7 +2794,7 @@ int soulrepair(int cn, int in, int in2)
 int is_half_soul(int r)
 {
 	if (r == SK_HAND  || r == SK_DAGGER  || r == SK_SWORD   || r == SK_AXE      || 
-		r == SK_STAFF || r == SK_TWOHAND || r == SK_RESIST  || r == SK_IMMUN    ||
+		r == SK_STAFF || r == SK_TWOHAND || r == SK_RESIST  || r == SK_IMMUN    || r == SK_METABOLISM ||
 		r == SK_BLESS || r == SK_ENHANCE || r == SK_PROTECT || r == SK_GEARMAST )
 	{
 		return 1;
@@ -2814,11 +2905,11 @@ int make_catalyst(int cn, int n, int v)
 	int in;
 	int earlylist[37] = { 
 		SK_HAND, 		SK_DAGGER, 		SK_SWORD, 		SK_AXE, 		SK_STAFF,
-		SK_TWOHAND, 	SK_STEALTH, 	SK_PERCEPT, 	SK_SWIM, 		SK_MSHIELD, 
-		SK_BARTER,	 	SK_REPAIR, 		SK_SHIELD, 		SK_PROTECT, 	SK_ENHANCE, 
-		SK_SLOW, 		SK_CURSE, 		SK_BLESS, 		SK_IDENT, 		SK_RESIST,
+		SK_TWOHAND, 	SK_STEALTH, 	SK_PERCEPT, 	SK_METABOLISM, 	SK_MSHIELD, 
+		SK_ECONOM,	 	SK_REPAIR, 		SK_SHIELD, 		SK_PROTECT, 	SK_ENHANCE, 
+		SK_SLOW, 		SK_CURSE, 		SK_BLESS, 		SK_RESIST,
 		SK_BLAST, 		SK_DISPEL, 		SK_HEAL, 		SK_GHOST, 		SK_REGEN, 
-		SK_REST, 		SK_MEDIT, 		SK_IMMUN, 		SK_SURROUND, 	SK_CONCEN,
+		SK_REST, 		SK_MEDIT, 		SK_IMMUN, 		SK_SURROUND, 	SK_TACTICS,
 		SK_BLIND, 		SK_GEARMAST, 	SK_CLEAVE, 		SK_WEAKEN, 		SK_POISON, 
 		SK_HASTE, 		SK_TAUNT };
 
@@ -2866,20 +2957,20 @@ int make_catalyst(int cn, int n, int v)
 
 void make_focus(int cn, int exp)
 {
-	int in, v, rank;
+	int in; // , v, rank;
 	
 	if (!(in = god_create_item(IT_SOULFOCUS)))
 	{
 		chlog(cn, "ERROR in make_focus: god_create_item failure");
 		return;
 	}
-	rank = points2rank(exp/max(1, N_SOULFACTOR));
+	//rank = points2rank(exp/max(1, N_SOULFACTOR));
 	
 	//v = max(4, min(6, 6 - rank/10));
 	
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus. It can be used on a soulstone to increase its level by 3, but only once.", v);
+	sprintf(it[in].description, "A soul focus. It can be used on a soulstone to increase its level by 3, but only once.");
 	
 	it[in].data[0] = 4;
 	it[in].temp = 0;
@@ -2943,8 +3034,8 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 		if ((n<MAXSKILL && ch[cn].skill[n][2]) || n>=MAXSKILL)
 		{
 			// If Seyan, check that we know a given arch skill before adding it to the list.
-			if ((n==SK_ZEPHYR || n==SK_WARCRY || n==SK_LETHARGY || 
-				n==SK_PULSE || n==SK_SHADOW || n==SK_LEAP || n==SK_RAGE) && 
+			if ((n==SK_ZEPHYR || n==SK_WARCRY || n==SK_LETHARGY || n==SK_PULSE || 
+				 n==SK_GCMASTERY || n==SK_LEAP || n==SK_FINESSE || n==SK_RAGE) && 
 				IS_SEYAN_DU(cn) && !B_SK(cn, n))
 				continue;
 			known[c] = n; 
@@ -3614,6 +3705,268 @@ int use_talisman(int cn, int in, int in2)
 	
 	do_char_log(cn, 2, "You enchanted the %s with the talisman.\n", it[in2].name);
 	use_consume_item(cn, in, 1);
+	return 1;
+}
+
+int use_corruptor(int cn, int in, int in2)
+{
+	int r, n, m, temp, inds = 0;
+	int stk, val, mul = 1;
+	
+	if (!IS_SANECHAR(cn))	return 0;
+	if (!IS_SANEITEM(in))	return 0;
+	if (!in2)
+	{
+		do_char_log(cn, 1, "Try using something with the talisman. Click on it with an item under your cursor.\n");
+		return 0;
+	}
+	if (!IS_SANEITEM(in2))	return 0;
+	
+	if ((it[in2].flags & IF_CORRUPTED) || (!(it[in2].placement)))
+	{
+		do_char_log(cn, 1, "Nothing happened.\n");
+		return 0;
+	}
+	
+	if (IS_TWOHAND(in2))
+	{
+		mul = 2;
+	}
+	
+	switch (RANDOM(10))
+	{
+		case  1:
+			for (n=0;n<5;n++)
+			{
+				it[in2].attrib[n][0] += 2 * mul; it[in2].attrib[n][1] += 2 * mul;
+			}
+			it[in2].to_hit[0]   += -2 * mul; 	it[in2].to_hit[1]   += -2 * mul;
+			it[in2].to_parry[0] += -2 * mul;	it[in2].to_parry[1] += -2 * mul;
+			break;
+		case  2:
+			for (n=0;n<5;n++)
+			{
+				it[in2].attrib[n][0] += 2 * mul; it[in2].attrib[n][1] += 2 * mul;
+			}
+			it[in2].weapon[0] += -2 * mul; 		it[in2].weapon[1] += -2 * mul;
+			it[in2].armor[0]  += -2 * mul; 		it[in2].armor[1]  += -2 * mul;
+			break;
+		case  3:
+			for (n=0;n<5;n++)
+			{
+				it[in2].attrib[n][0] += -2 * mul; it[in2].attrib[n][1] += -2 * mul;
+			}
+			n = RANDOM(50);
+			it[in2].skill[n][0] += 5 * mul; 	it[in2].skill[n][1] += 5 * mul;
+			break;
+		case  4:
+			for (n=0;n<5;n++)
+			{
+				it[in2].attrib[n][0] += -2 * mul; it[in2].attrib[n][1] += -2 * mul;
+			}
+			n = RANDOM(5);
+			it[in2].attrib[n][0] += 7 * mul; 	it[in2].attrib[n][1] += 7 * mul;
+			break;
+		case  5:
+			m = temp = 0;
+			for (n=0;n<5;n++)
+			{
+				temp += it[in2].attrib[n][2];
+			}
+			if (temp)
+			{
+				for (n=0;n<5;n++)
+				{
+					m = min(120, RANDOM(temp));
+					it[in2].attrib[n][2] = m;
+					temp = max(0, temp - m);
+				}
+			}
+			else
+			{
+				for (n=0;n<5;n++)
+				{
+					it[in2].attrib[n][0] += -3 * mul; it[in2].attrib[n][1] += -3 * mul;
+				}
+				it[in2].to_hit[0]   += 3 * mul; it[in2].to_hit[1]   += 3 * mul;
+			}
+			break;
+		case  6:
+			m = temp = 0;
+			for (n=0;n<50;n++)
+			{
+				temp += it[in2].skill[n][2];
+			}
+			if (temp)
+			{
+				for (n=0;n<50;n++)
+				{
+					m = min(120, RANDOM(temp));
+					it[in2].skill[n][2] = m;
+					temp = max(0, temp - m);
+				}
+			}
+			else
+			{
+				for (n=0;n<5;n++)
+				{
+					it[in2].attrib[n][0] += -3 * mul; it[in2].attrib[n][1] += -3 * mul;
+				}
+				it[in2].to_parry[0]   += 3 * mul; it[in2].to_parry[1]   += 3 * mul;
+			}
+			break;
+		case  7:
+			for (n=0;n<5;n++)
+			{
+				it[in2].attrib[n][0] += -3 * mul; it[in2].attrib[n][1] += -3 * mul;
+			}
+			if (it[in].flags & IF_WEAPON)
+			{
+				it[in2].weapon[0] += 3 * mul; it[in2].weapon[1] += 3 * mul;
+			}
+			else if (it[in].flags & IF_ARMORS)
+			{
+				it[in2].armor[0]  += 3 * mul; it[in2].armor[1]  += 3 * mul;
+			}
+			else if (it[in2].placement & PL_NECK)
+			{
+				it[in2].spell_mod[0] += 3; it[in2].spell_mod[1] += 3;
+			}
+			else if (it[in2].placement & PL_BELT)
+			{
+				it[in2].enchantment = 111;
+				if (RANDOM(2)) it[in2].cost = 1514 + RANDOM(21);
+				else           it[in2].cost = 2231 + RANDOM(22);
+			}
+			else if (it[in2].placement & PL_CHARM)
+			{
+				it[in2].to_hit[0]   += 2; it[in2].to_hit[1]   += 2;
+				it[in2].to_parry[0] += 2; it[in2].to_parry[1] += 2;
+			}
+			else
+			{
+				it[in2].weapon[0] += 2 * mul; it[in2].weapon[1] += 2 * mul;
+				it[in2].armor[0]  += 2 * mul; it[in2].armor[1]  += 2 * mul;
+			}
+			break;
+		case  8:
+			if (it[in].flags & IF_WEAPON)
+			{
+				it[in2].hp[0]     += -45 * mul; it[in2].hp[1]     += -45 * mul;
+				it[in2].mana[0]   += -45 * mul; it[in2].mana[1]   += -45 * mul;
+				it[in2].weapon[0] +=   3 * mul; it[in2].weapon[1] +=   3 * mul;
+			}
+			else if (it[in].flags & IF_ARMORS)
+			{
+				it[in2].hp[0]     += -45 * mul; it[in2].hp[1]     += -45 * mul;
+				it[in2].mana[0]   += -45 * mul; it[in2].mana[1]   += -45 * mul;
+				it[in2].armor[0]  +=   3 * mul; it[in2].armor[1]  +=   3 * mul;
+			}
+			else if (it[in2].placement & PL_NECK)
+			{
+				it[in2].hp[0]   	+= -75; it[in2].hp[1]   += -75;
+				it[in2].spell_mod[0] += 2; it[in2].spell_mod[1] += 2;
+			}
+			else if (it[in2].placement & PL_BELT)
+			{
+				it[in2].hp[0]   += -25; it[in2].hp[1]   += -25;
+				it[in2].end[0]  +=  25; it[in2].end[1]  +=  25;
+				it[in2].mana[0] += -25; it[in2].mana[1] += -25;
+			}
+			else if (it[in2].placement & PL_CHARM)
+			{
+				it[in2].hp[0]   	+= -75; it[in2].hp[1]       += -75;
+				it[in2].to_hit[0]   +=   2; it[in2].to_hit[1]   +=   2;
+				it[in2].to_parry[0] +=   2;	it[in2].to_parry[1] +=   2;
+			}
+			else
+			{
+				it[in2].hp[0]     += -45 * mul; it[in2].hp[1]     += -45 * mul;
+				it[in2].mana[0]   += -45 * mul; it[in2].mana[1]   += -45 * mul;
+				it[in2].weapon[0] +=   2 * mul; it[in2].weapon[1] +=   2 * mul;
+				it[in2].armor[0]  +=   2 * mul; it[in2].armor[1]  +=   2 * mul;
+			}
+			break;
+		case  9:
+			if (it[in].flags & IF_WEAPON)
+			{
+				it[in2].to_hit[0]     += -2 * mul; it[in2].to_hit[1]     += -2 * mul;
+				it[in2].to_parry[0]   += -2 * mul; it[in2].to_parry[1]   += -2 * mul;
+				it[in2].top_damage[0] +=  7 * mul; it[in2].top_damage[1] +=  7 * mul;
+			}
+			else if (it[in].flags & IF_ARMORS)
+			{
+				it[in2].armor[0]       += -3 * mul; it[in2].armor[1]       += -3 * mul;
+				it[in2].gethit_dam[0]  +=  2 * mul; it[in2].gethit_dam[1]  +=  2 * mul;
+			}
+			else if (it[in2].placement & PL_NECK)
+			{
+				it[in2].mana[0]   	 += -75; it[in2].mana[1]      += -75;
+				it[in2].spell_mod[0] +=   2; it[in2].spell_mod[1] +=   2;
+			}
+			else if (it[in2].placement & PL_BELT)
+			{
+				it[in2].hp[0]   +=  25; it[in2].hp[1]   +=  25;
+				it[in2].end[0]  += -25; it[in2].end[1]  += -25;
+				it[in2].mana[0] +=  25; it[in2].mana[1] +=  25;
+			}
+			else if (it[in2].placement & PL_CHARM)
+			{
+				it[in2].mana[0]   	+= -75; it[in2].mana[1]     += -75;
+				it[in2].to_hit[0]   +=   2; it[in2].to_hit[1]   +=   2;
+				it[in2].to_parry[0] +=   2;	it[in2].to_parry[1] +=   2;
+			}
+			else
+			{
+				it[in2].end[0]    -= 45 * mul; it[in2].end[1]    -= 45 * mul;
+				it[in2].weapon[0] +=  2 * mul; it[in2].weapon[1] +=  2 * mul;
+				it[in2].armor[0]  +=  2 * mul; it[in2].armor[1]  +=  2 * mul;
+			}
+			break;
+		default:
+			m = 0;
+			temp = -1;
+			for (n=0;n<55;n++)
+			{
+				if (n>=5) 
+				{
+					if (m >= it[in2].skill[n-5][0] && m >= it[in2].skill[n-5][1]) continue;
+					m = max(m, max(it[in2].skill[n-5][0], it[in2].skill[n-5][1]));
+				}
+				else
+				{
+					if (m >= it[in2].attrib[n][0] && m >= it[in2].attrib[n][1]) continue;
+					m = max(m, max(it[in2].attrib[n][0], it[in2].attrib[n][1]));
+				}
+				temp = n;
+			}
+			if (temp == -1)
+			{
+				it[in2].end[0]   	+= 20; it[in2].end[1]      += 20;
+				it[in2].to_hit[0]   += -1; it[in2].to_hit[1]   += -1;
+				it[in2].to_parry[0] += -1; it[in2].to_parry[1] += -1;
+				break;
+			}
+			if (temp < 5)
+			{
+				it[in2].attrib[temp][0] = 0; it[in2].attrib[temp][1] = 0;
+			}
+			else
+			{
+				it[in2].skill[temp-5][0] = 0; it[in2].skill[temp-5][1] = 0;
+			}
+			it[in2].max_damage = 0;
+			break;
+	}
+	
+	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_CORRUPTED | IF_LOOKSPECIAL | IF_NOREPAIR | IF_SHOPDESTROY;
+	it[in2].flags &= ~IF_CAN_SS;
+	it[in2].flags &= ~IF_CAN_EN;
+	it[in2].value  = 1;
+	it[in2].power += 7;
+	
+	do_char_log(cn, 2, "You corrupted the %s.\n", it[in2].name);
+	use_consume_item(cn, in, 0);
 	return 1;
 }
 
@@ -4458,9 +4811,34 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	// Set name and sprite
 	if (kin)
 	{
-		sprintf(ch[co].name, "%s", get_map_enemy_name(kin));
-		sprintf(ch[co].reference, "the %s", get_map_enemy_name(kin));
-		sprintf(ch[co].description, "%s", get_map_enemy_desc(kin));
+		if (affix==7)
+		{
+			for (n = 0; n < 40; n++)
+			{
+				ch[co].name[n] = 0;
+			}
+			m = 6 + RANDOM(4);
+			for (n = 0; n < m; n++)
+			{
+				ch[co].name[n] = 33 + RANDOM(94);
+			}
+			sprintf(ch[co].reference, "the sanguine creature");
+			switch (RANDOM(6))
+			{
+				case  1: sprintf(ch[co].description, "A strange creature covered in something red."); break;
+				case  2: sprintf(ch[co].description, "a sTrange cReature cOvered iN sOmething rEd."); break;
+				case  3: sprintf(ch[co].description, "A $tr@ng3 crrrrrrr c0vered in coVere_ ##NUL."); break;
+				case  4: sprintf(ch[co].description, "it hurts."); break;
+				case  5: sprintf(ch[co].description, "It's you. Your face, your eyes... bleeding."); break;
+				default: sprintf(ch[co].description, "bEfore yOu sTands tHe sAnguine cReature."); break;
+			}
+		}
+		else
+		{
+			sprintf(ch[co].name, "%s", get_map_enemy_name(kin));
+			sprintf(ch[co].reference, "the %s", get_map_enemy_name(kin));
+			sprintf(ch[co].description, "%s", get_map_enemy_desc(kin));
+		}
 		ch[co].sprite = get_map_enemy_sprite(kin);
 		if (kin==10||kin==28||kin==30) // Set Simple Animation
 			ch[co].flags |= CF_SIMPLE;
@@ -4471,7 +4849,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	for (n = 0; n<5; n++)
 	{
 		tmp = base * 50 / max(1, get_map_eme[kin][n+50]);
-		B_AT(co, n) = max(10, min(150, tmp));
+		B_AT(co, n) = max(10, min(200, tmp));
 	}
 
 	for (n = 0; n<MAXSKILL; n++)
@@ -4479,22 +4857,22 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		if (get_map_eme[kin][n])
 		{
 			tmp = base * 50 / max(1, get_map_eme[kin][n]);
-			B_SK(co, n) = max(1, min(150, tmp));
+			B_SK(co, n) = max(1, min(200, tmp));
 		}
 	}
 	
 	tmp = base * 50 / max(1, get_map_eme[kin][55]) * 5;	ch[co].hp[0]   	= max(100, min(999, tmp));
 	tmp = base * 50 / max(1, get_map_eme[kin][56]) * 2;	ch[co].end[0]  	= max(100, min(999, tmp));
 	tmp = base * 50 / max(1, get_map_eme[kin][57]) * 5;	ch[co].mana[0] 	= max(100, min(999, tmp));
-	tmp = base * 50 / max(1, get_map_eme[kin][58]) / 2; ch[co].weapon_bonus = max( 12, min(150, tmp));
-	tmp = base * 50 / max(1, get_map_eme[kin][59]) / 2; ch[co].armor_bonus  = max(  8, min(150, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][58]) / 2; ch[co].weapon_bonus = max( 12, min(200, tmp));
+	tmp = base * 50 / max(1, get_map_eme[kin][59]) / 2; ch[co].armor_bonus  = max(  8, min(200, tmp));
 	
 	chlog(co, "created map mob");
 	
 	// Apply flags and Prefix
 	if (affix)
 	{
-		if (n = get_map_enemy_affix_length(affix))
+		if (affix != 7 && (n = get_map_enemy_affix_length(affix)))
 		{
 			sprintf(buf, "the %s %s", get_map_enemy_affix(affix), ch[co].name); buf[5+n] = tolower(buf[5+n]);
 			strncpy(ch[co].reference, buf, 39); ch[co].reference[39] = 0;
@@ -4563,6 +4941,31 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, 3);
 				//
 				break;
+			case 7:												// Sanguine
+				ch[co].kindred |= KIN_BLOODY;
+				ch[co].flags |= CF_SILENCE | CF_INFRARED;
+				switch (RANDOM(4))
+				{
+					case  1:	strcpy(ch[co].text[0], "dddddd%saaaaaaaaaaaaa"); break;
+					case  2:	strcpy(ch[co].text[0], "#9#gOoodbye, goo0db, ggggg, %s!"); break;
+					case  3:	strcpy(ch[co].text[0], ")AFA0 (((! !!! %s##%%!"); break;
+					default:	strcpy(ch[co].text[0], "HA HA HA HA HA HA HA"); break;
+				}
+				switch (RANDOM(4))
+				{
+					case  1:	strcpy(ch[co].text[1], "%s is the one the one the one the one"); break;
+					case  2:	strcpy(ch[co].text[1], "##### %s ##### !!! !!"); break;
+					case  3:	strcpy(ch[co].text[1], "hhhhh eh lll pp mmm mmm mmm mmm mmm"); break;
+					default:	strcpy(ch[co].text[1], "#9#ggggggk"); break;
+				}
+				switch (RANDOM(4))
+				{
+					case  1:	strcpy(ch[co].text[3], "%s thank you thAnk yUk thhh thh"); break;
+					case  2:	strcpy(ch[co].text[3], "#9#AAAAAAAAHH!!!"); break;
+					case  3:	strcpy(ch[co].text[3], "^&%%&^%%^&%%&^%%&%%&%%"); break;
+					default:	strcpy(ch[co].text[3], "My $$S$S loves me very vEry veRY &&!!"); break;
+				}
+				break;
 			//
 			default:
 				break;
@@ -4572,11 +4975,11 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	// Calculate experience
 	pts = 0;
 	for (n = 0; n<5; n++) for (j = 10; j<B_AT(co, n); j++)
-		pts += attrib_needed(j, 4);
+		pts += attrib_needed(j, 3);
 	for (j = 50; j<ch[co].hp[0]; j++) 
-		pts += hp_needed(j, 4);
+		pts += hp_needed(j, 3);
 	for (j = 50; j<ch[co].mana[0]; j++) 
-		pts += mana_needed(j, 4);
+		pts += mana_needed(j, 3);
 	for (n = 0; n<MAXSKILL; n++) for (j = 1; j<B_SK(co, n); j++)
 		pts += skill_needed(j, 3);
 	ch[co].points_tot = pts;
@@ -4586,7 +4989,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	ch[co].a_end  = 999999;
 	ch[co].a_mana = 999999;
 	
-	if (ch[co].data[42] == 1100) // Map enemy
+	if (ch[co].data[42] == 1100 && affix != 7) // Map enemy
 	{
 		in = 0;
 		rank = getrank(co);
@@ -4635,11 +5038,34 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			chlog(co, "got a %s", it[in].name);
 		}
 		
+		in = 0;
+		
+		if (try_boost(50))
+		{
+			in = pop_create_bonus(co);
+		}
+		else if (try_boost(4000))
+		{
+			in = pop_create_bonus_belt(co);
+		}
+		if (in)
+		{
+			god_give_char(in, co);
+			chlog(co, "got a %s", it[in].name);
+		}
+		
 		ch[co].data[29] = xx + yy * MAPX;
 		ch[co].data[30] = ch[co].dir = 1+RANDOM(8);
 		if (!ch[co].data[72]) ch[co].data[72] = 1;
 		if (!RANDOM(6)) ch[co].light_bonus = RANDOM(4)*25+25;
 		set_random_text(co);
+	}
+	
+	if (ch[co].sprite == 22480) ch[co].light_bonus = 200;
+	if (ch[co].sprite == 14288 || ch[co].sprite == 31696)
+	{
+		ch[co].light_bonus = 0;
+		ch[co].flags |= CF_INFRARED;
 	}
 	
 	do_update_char(co);

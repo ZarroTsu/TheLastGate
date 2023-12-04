@@ -17,7 +17,7 @@
 #define TICKMULTI		2
 #define TICKS			(24*TICKMULTI)
 
-#define MAXSKILL		(50+2)	// must match server!
+#define MAXSKILL		(50+5)	// must match server!
 #define MAXBUFFS		40		// must match server!
 #define MAXWPS			27
 
@@ -30,7 +30,7 @@
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  50
-#define DAM_MULT_LEAP		 375
+#define DAM_MULT_LEAP		 500
 #define DAM_MULT_POISON		4500
 #define DAM_MULT_BLEED		 750
 
@@ -45,6 +45,11 @@
 #define IS_SUMMONER			(pl.kindred & (1u<<13))
 #define IS_ARCHHARAKIM		(pl.kindred & (1u<< 9))
 #define IS_BRAVER			(pl.kindred & (1u<<14))
+#define IS_LYCANTH			(pl.kindred & (1u<<16))
+#define IS_SHIFTED			(pl.kindred & (1u<<17))
+#define KNOW_IDENTIFY		(pl.kindred & (1u<<18))
+#define IS_SHADOW			(pl.kindred & (1u<<19))
+#define IS_BLOODY			(pl.kindred & (1u<<20))
 
 #define T_SK(a)				(st_learned_skill(pl.tree_points, (a)))
 #define T_SEYA_SK(a)		(IS_SEYAN_DU    && T_SK(a))
@@ -55,6 +60,7 @@
 #define T_SUMM_SK(a)		(IS_SUMMONER    && T_SK(a))
 #define T_ARHR_SK(a)		(IS_ARCHHARAKIM && T_SK(a))
 #define T_BRAV_SK(a)		(IS_BRAVER      && T_SK(a))
+#define T_LYCA_SK(a)		(IS_LYCANTH     && T_SK(a))
 
 // wear positions
 #define WN_HEAD			0
@@ -95,7 +101,7 @@
 #define PL_CLOAK		1024
 #define PL_TWOHAND		2048
 #define PL_RING			4096
-//#define PL_CHARM2   8192
+#define PL_CORRUPTED	8192
 #define PL_SOULSTONED	16384
 #define PL_ENCHANTED	32768
 
@@ -110,7 +116,7 @@
 #define STONED			(1u<<3)
 #define INFRARED		(1u<<4)
 #define UWATER			(1u<<5)
-
+#define BLOODY			(1u<<6)
 #define ISUSABLE		(1u<<7)
 #define ISITEM			(1u<<8)
 #define ISCHAR			(1u<<9)

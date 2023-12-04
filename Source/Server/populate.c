@@ -371,10 +371,10 @@ int pop_create_bonus(int cn)
 /*	Added by SoulHunter  04.04.2000	*/
 int pop_create_bonus_belt(int cn)
 {
-	int n = 1106;   // value to store id-number of created belt
+	int n = 3340;   // value to store id-number of created belt
 	                // at start it contains template of 'rainbow_belt'
 	int i, j;
-	int rank, skill_value, skill_number, skm;
+	int rank, skill_value, skill_number, skm, armor=0, weapon=0, thorn=0, aoe=0, spmod=0, tryspm=0, tryaoe=0;
 	
 	rank = getrank(cn);  // private wont get this belt
 	if (!rank)
@@ -402,9 +402,116 @@ int pop_create_bonus_belt(int cn)
 		chlog(cn, ", with rank %d, got %s (t=%d)", rank, it[n].name, it[n].temp);
 	}
 
-	j = RANDOM(rank+1)+1; // how many skills will be in belt?
+	j = rank/2+1 + RANDOM(rank/2+1); // how many skills will be in belt?
 	it[n].power += 5 * j;     // counting power of item, *remind* power = 10 in template
 	it[n].value += 10000 * j; // counting price value, value = 100 in template
+	
+	// Random attributes
+	for(i = 0; i < j; i++)
+	{
+		skill_number = RANDOM(5);
+		//if (!it[n].attrib[skill_number][0]) it[n].attrib[skill_number][0] += 1;
+		it[n].attrib[skill_number][0] += 1;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		if (it[n].attrib[i][0]) it[n].attrib[i][2] = max(0,(j-6)/3 * 5) + max(0, (it[n].attrib[i][0]/2) * 5);
+	}
+	
+	// Random skills
+	for(i = 0; i < j; i++)
+	{
+		skill_number = RANDOM(60);
+		
+		switch(skill_number)
+		{
+			case 50:
+				if (!it[n].hp[0]) it[n].hp[0] += 10;
+				it[n].hp[0] += 10;
+				break;
+			case 51:
+				if (!it[n].end[0]) it[n].end[0] += 15;
+				it[n].end[0] += 5;
+				break;
+			case 52:
+				if (!it[n].mana[0]) it[n].mana[0] += 10;
+				it[n].mana[0] += 10;
+				break;
+			case 53:
+				if (!armor) armor += 1;
+				armor += 1;
+				break;
+			case 54:
+				if (!weapon) weapon += 1;
+				weapon += 1;
+				break;
+			case 55:
+				if (!spmod) spmod += 1;
+				spmod += 1;
+				tryspm++;
+				if (!spmod%4) tryspm=0;
+				break;
+			case 56:
+				if (!it[n].speed[0]) it[n].speed[0] += 1;
+				it[n].speed[0] += 1;
+				break;
+			case 57:
+				if (!thorn) thorn += 1;
+				thorn += 1;
+				break;
+			case 58:
+				if (!it[n].crit_chance[0]) it[n].crit_chance[0] += 5;
+				it[n].crit_chance[0] += 5;
+				break;
+			case 59:
+				if (!aoe) aoe += 1;
+				aoe += 1;
+				tryaoe++;
+				if (!tryaoe%4) tryaoe=0;
+				break;
+			default:
+				skm = 2;
+				if (skill_number == 0 || skill_number == 2 || skill_number == 3 || 
+					skill_number == 4 || skill_number == 5 || skill_number == 6 || 
+					skill_number ==16 || skill_number ==36) skm = 1;
+				if (!it[n].skill[skill_number][0] && skm==2) it[n].skill[skill_number][0] += skm;
+				it[n].skill[skill_number][0] += 1;
+				break;
+		}
+	}
+	j = 0;
+	if (armor%2)	j++;
+	if (weapon%2)	j++;
+	if (thorn%2)	j++;
+	if (spmod%4)	j+=tryspm;
+	if (aoe%4)		j+=tryaoe;
+	
+	if (it[n].hp[0])   it[n].hp[2]   = 50 + it[n].hp[0]/2;
+	if (it[n].mana[0]) it[n].mana[2] = 50 + it[n].mana[0]/2;
+	
+	it[n].armor[0]      += armor/2;
+	it[n].weapon[0]     += weapon/2;
+	it[n].gethit_dam[0] += thorn/2;
+	it[n].spell_mod[0]  += spmod/3;
+	it[n].aoe_bonus[0]  += aoe/3;
+	
+	// cleanup remaining numbers
+	if (j) for(i = 0; i < j; i++)
+	{
+		skill_number = RANDOM(50);
+		skm = 2;
+		if (skill_number == 0 || skill_number == 2 || skill_number == 3 || 
+			skill_number == 4 || skill_number == 5 || skill_number == 6 || 
+			skill_number ==16 || skill_number ==36) skm = 1;
+		if (!it[n].skill[skill_number][0] && skm==2) it[n].skill[skill_number][0] += skm;
+		it[n].skill[skill_number][0] += 1;
+	}
+	
+	it[n].flags |= IF_CAN_EN;
+	
+	// Vanilla
+	/*
+	
 	// here we decide which skills will be in belt, not more than rank
 	for(i = 0; i < j; i++)
 	{
@@ -421,50 +528,50 @@ int pop_create_bonus_belt(int cn)
 		// templar/seyan, but i dont want this
 		switch(skill_number)
 		{
-			case 0:
+			case  0:
 				it[n].attrib[AT_BRV][0] += skill_value; 								// this line is how much it will raise attribute
 				if (it[n].attrib[AT_BRV][0] > 12) it[n].attrib[AT_BRV][0] = 12; 			// this will check for max level = 12 and will down it back to 12
 				it[n].attrib[AT_BRV][2] = 10 + (it[n].attrib[AT_BRV][0] * RANDOM(7)); 	// this line will set requirements
 				break;
-			case 1:
+			case  1:
 				it[n].attrib[AT_WIL][0] += skill_value;
 				if (it[n].attrib[AT_WIL][0] > 12) it[n].attrib[AT_WIL][0] = 12;
 				it[n].attrib[AT_WIL][2] = 10 + (it[n].attrib[AT_WIL][0] * RANDOM(7));
 				break;
-			case 2:
+			case  2:
 				it[n].attrib[AT_INT][0] += skill_value;
 				if (it[n].attrib[AT_INT][0] > 12) it[n].attrib[AT_INT][0] = 12;
 				it[n].attrib[AT_INT][2] = 10 + (it[n].attrib[AT_INT][0] * RANDOM(7));
 				break;
-			case 3:
+			case  3:
 				it[n].attrib[AT_AGL][0] += skill_value;
 				if (it[n].attrib[AT_AGL][0] > 12) it[n].attrib[AT_AGL][0] = 12;
 				it[n].attrib[AT_AGL][2] = 10 + (it[n].attrib[AT_AGL][0] * RANDOM(7));
 				break;
-			case 4:
+			case  4:
 				it[n].attrib[AT_STR][0] += skill_value;
 				if (it[n].attrib[AT_STR][0] > 12) it[n].attrib[AT_STR][0] = 12;
 				it[n].attrib[AT_STR][2] = 10 + (it[n].attrib[AT_STR][0] * RANDOM(7));
 				break;
-			case 5:
+			case  5:
 				it[n].hp[0] += (skill_value * 10);
 				if (it[n].hp[0] > 120) it[n].hp[0] = 120;
 				it[n].hp[2] = 50 + (it[n].hp[0] * RANDOM(9));
 				break;
-			case 6:
+			case  6:
 				it[n].end[0] += (skill_value * 10)/2;
 				if (it[n].end[0] > 60) it[n].end[0] = 60;
 				break;
-			case 7:
+			case  7:
 				it[n].mana[0] += (skill_value * 10);
 				if (it[n].mana[0] > 120) it[n].mana[0] = 120;
 				it[n].mana[2] = 50 + (it[n].mana[0] * RANDOM(9));
 				break;
-			case 8:
+			case  8:
 				it[n].armor[0] += (skill_value+1)/2;
 				if (it[n].armor[0] > 6) it[n].armor[0] = 6;
 				break;
-			case 9:
+			case  9:
 				it[n].weapon[0] += (skill_value+1)/2;
 				if (it[n].weapon[0] > 6) it[n].armor[0] = 6;
 				break;
@@ -476,7 +583,7 @@ int pop_create_bonus_belt(int cn)
 				break;
 		}
 	}
-
+	*/
 	return(n);
 }
 /*	--end	*/
@@ -590,8 +697,6 @@ int pop_create_char(int n, int drop)
 		{
 			if (ch[cn].item[m]==0 && (hasitems || (RANDOM(2) && ch[cn].temp!=347 && ch[cn].temp!=350)))
 			{
-				// this check placed here for speed reasons
-				// they are the same as in pop_create_bonus_belt()
 				if (try_boost(50))
 				{
 					tmp = pop_create_bonus(cn);
@@ -610,7 +715,7 @@ int pop_create_char(int n, int drop)
 						ch[cn].item[m]  = tmp;
 					}
 				}
-				else if (try_boost(5000))
+				if (try_boost(4000))
 				{
 					tmp = pop_create_bonus_belt(cn);
 					if (tmp)
@@ -663,13 +768,13 @@ void reset_char(int n)
 	{
 		for (m = 10; m<ch_temp[n].attrib[z][0]; m++)
 		{
-			pts += attrib_needed(m, 4);
+			pts += attrib_needed(m, 3);
 		}
 	}
 
 	for (m = 50; m<ch_temp[n].hp[0]; m++)
 	{
-		pts += hp_needed(m, 4);
+		pts += hp_needed(m, 3);
 	}
 
 	//for (m = 50; m<ch_temp[n].end[0]; m++)
@@ -679,7 +784,7 @@ void reset_char(int n)
 
 	for (m = 50; m<ch_temp[n].mana[0]; m++)
 	{
-		pts += mana_needed(m, 4);
+		pts += mana_needed(m, 3);
 	}
 
 	for (z = 0; z<MAXSKILL; z++)

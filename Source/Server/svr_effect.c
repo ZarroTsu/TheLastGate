@@ -309,7 +309,6 @@ void effect_tick(void)
 			fx[n].duration++;
 			if (fx[n].duration==29)
 			{
-
 				fx[n].used = USE_EMPTY;
 
 				co = fx[n].data[2];
@@ -323,7 +322,11 @@ void effect_tick(void)
 				
 				if (ch[co].data[99])
 				{
-					it[in].max_age[0] *= 4;
+					it[in].max_age[0] *= 8;
+				}
+				if (ch[co].flags & CF_EXTRACRIT)
+				{
+					it[in].max_age[0] *= 2;
 				}
 
 				sprintf(it[in].description, "Here rests %s, killed by %s on the %d%s%s%s%s day of the Year %d.",
@@ -422,6 +425,10 @@ void effect_tick(void)
 						map[m].flags &= ~MF_GFX_DEATH;
 					}
 					if (cn && try_boost(20)) boost_char(cn, 0);
+					if (cn && (ch[cn].flags & CF_MERCHANT) && !(ch[cn].flags & CF_BSPOINTS))
+					{
+						update_shop(cn);
+					}
 				}
 			}
 		}
@@ -460,7 +467,8 @@ void effect_tick(void)
 				m = fx[n].data[0] + fx[n].data[1] * MAPX;
 
 				// check if object isnt allowed to respawn (supporting beams for mine)
-				if (is_beam(map[m].it) ||
+				if (fx[n].data[2] != IT_SANGCRYS3 && fx[n].data[2] != IT_SANGCRYS4 && 
+					(is_beam(map[m].it) ||
 				    is_beam(map[m - 1].it) || is_beam(map[m + 1].it) ||
 				    is_beam(map[m - MAPX].it) || is_beam(map[m + MAPX].it) ||
 
@@ -477,7 +485,7 @@ void effect_tick(void)
 				    is_beam(map[m - 1 - 2 * MAPX].it) || is_beam(map[m + 1 - 2 * MAPX].it) ||
 
 				    is_beam(map[m - 2 + 2 * MAPX].it) || is_beam(map[m + 2 + 2 * MAPX].it) ||
-				    is_beam(map[m - 2 - 2 * MAPX].it) || is_beam(map[m + 2 - 2 * MAPX].it))
+				    is_beam(map[m - 2 - 2 * MAPX].it) || is_beam(map[m + 2 - 2 * MAPX].it)))
 				{
 					fx[n].duration = TICKS * 60 * 15;
 					continue;

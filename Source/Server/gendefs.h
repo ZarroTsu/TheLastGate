@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000A08
-#define MINVERSION			0x000A06
+#define VERSION				0x000B04
+#define MINVERSION			0x000B04
 
 #define DATDIR				".dat"
 
@@ -67,6 +67,9 @@
 
 #define BRAVER_WARP_X		 959
 #define BRAVER_WARP_Y		 519
+
+#define LYCAN_WARP_X		 889
+#define LYCAN_WARP_Y		 485
 
 #define COLOSSEUM1_X		 751
 #define COLOSSEUM1_Y		 933
@@ -201,6 +204,7 @@
 #define PL_CLOAK		1024
 #define PL_TWOHAND		2048
 #define PL_RING			4096
+#define PL_CORRUPTED	8192
 #define PL_SOULSTONED	16384
 #define PL_ENCHANTED	32768
 
@@ -306,8 +310,8 @@
 #define SP_MULT_WEAKEN		100
 #define SP_MULT_WEAKEN2		 95
 #define SP_MULT_WARCRY		 95
-#define SP_MULT_TAUNT		 80
-#define SP_MULT_BLIND		100
+#define SP_MULT_TAUNT		100
+#define SP_MULT_BLIND		120
 
 // -------- Damage Multipliers -------- //
 
@@ -318,7 +322,7 @@
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  50
-#define DAM_MULT_LEAP		 375
+#define DAM_MULT_LEAP		 500
 
 // -------- Buff Duration values -------- //
 #define SP_DUR_LIGHT		( TICKS * 60 * 30                 )
@@ -336,6 +340,7 @@
 #define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
 #define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
 #define SP_DUR_POISON		( TICKS * 30                      )
+#define SP_DUR_PLAGUE		( TICKS * 60 * 2                  )
 #define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 75          )
 #define SP_DUR_WARCRY		( TICKS * 60                      )
 #define SP_DUR_RALLY		( TICKS * 60 * 5                  )
@@ -348,11 +353,13 @@
 #define SP_DUR_ARIA			( TICKS * 5                       )
 #define SP_DUR_LETHARGY		( TICKS * 60 * 60 * 2             )
 #define SP_DUR_AGGRAVATE	( TICKS * 20                      )
+#define SP_DUR_CALMRAGE		( TICKS * 60 * 60 * 2             )
 
 #define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
 #define SP_DUR_BLIND		( TICKS * 60 * 2                  )
 #define SP_DUR_GUARD		( TICKS * 30                      )
 #define SP_DUR_PULSE		( TICKS * 60 * 5                  )
+#define SP_DUR_SHOCK		( TICKS * 60 * 2                  )
 #define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )
 #define SP_DUR_DOUSE		( TICKS * 20                      )
 #define SP_DUR_FROSTB		( TICKS * 20                      )
@@ -365,7 +372,7 @@
 #define SP_DUR_MAPMOD		( TICKS * 60 * 120                )
 
 // -------- Skill Exhaustion values -------- //
-#define SK_EXH_MAXIMUM	 	(TICKS * 8)
+#define SK_EXH_MAXIMUM	 	(TICKS *10)
 #define SK_EXH_LIGHT		(TICKS / 4)
 #define SK_EXH_PROTECT		(TICKS / 2)
 #define SK_EXH_ENHANCE		(TICKS / 2)
@@ -391,8 +398,9 @@
 #define SK_EXH_ZEPHYR		(TICKS * 4)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP			(TICKS * 6)
+#define SK_EXH_LEAP			(TICKS * 5)
 #define SK_EXH_RAGE			(TICKS * 4)
+#define SK_EXH_SHIFT		(TICKS *10)
 
 #define GLVDICE		4
 

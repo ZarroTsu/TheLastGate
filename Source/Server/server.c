@@ -42,11 +42,12 @@ FILE *discordShoutOut;
 FILE *discordRanked;
 FILE *discordTopA;
 FILE *discordTopB;
+FILE *discordTopC;
 FILE *discordPandium;
 
 char  mod[256];
 
-#define DISC_R    8
+#define DISC_R    9
 #define DISC_T    5
 #define DISC_P   15
 
@@ -75,6 +76,7 @@ void discord_top_five(void)
 		if (j==5 && !IS_SUMMONER(n))	continue;
 		if (j==6 && !IS_ARCHHARAKIM(n))	continue;
 		if (j==7 && !IS_BRAVER(n))		continue;
+		if (j==8 && !IS_LYCANTH(n))		continue;
 		
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -94,15 +96,14 @@ void discord_top_five(void)
 	
 	discordTopA = fopen("topa.txt", "w");
 	fprintf(discordTopA, "```diff\n");
-	for (j = 0; j<DISC_R/2; j++) 
+	for (j = 0; j<DISC_R/3; j++) 
 	{
 		if (j!=0) fprintf(discordTopA, " \n");
 		switch (j)
 		{
 			case  0: fprintf(discordTopA, "- Top Seyan'du:\n"); break;
 			case  1: fprintf(discordTopA, "- Top Arch-Templar:\n"); break;
-			case  2: fprintf(discordTopA, "- Top Skalds:\n"); break;
-			default: fprintf(discordTopA, "- Top Warriors:\n"); break;
+			default: fprintf(discordTopA, "- Top Skalds:\n"); break;
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -138,15 +139,14 @@ void discord_top_five(void)
 	
 	discordTopB = fopen("topb.txt", "w");
 	fprintf(discordTopB, "```diff\n");
-	for (j = DISC_R/2; j<DISC_R; j++) 
+	for (j = DISC_R/3; j<DISC_R/3*2; j++) 
 	{
-		if (j!=DISC_R/2) fprintf(discordTopB, " \n");
+		if (j!=DISC_R/3) fprintf(discordTopB, " \n");
 		switch (j)
 		{
+			case  3: fprintf(discordTopA, "- Top Warriors:\n"); break;
 			case  4: fprintf(discordTopB, "- Top Sorcerers:\n"); break;
-			case  5: fprintf(discordTopB, "- Top Summoners:\n"); break;
-			case  6: fprintf(discordTopB, "- Top Arch-Harakim:\n"); break;
-			default: fprintf(discordTopB, "- Top Bravers:\n"); break;
+			default: fprintf(discordTopB, "- Top Summoners:\n"); break;
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -179,6 +179,49 @@ void discord_top_five(void)
 	fprintf(discordTopB, "```\n");
 	fflush(discordTopB);
 	fclose(discordTopB);
+	
+	discordTopC = fopen("topc.txt", "w");
+	fprintf(discordTopC, "```diff\n");
+	for (j = DISC_R/3*2; j<DISC_R; j++) 
+	{
+		if (j!=DISC_R/3*2) fprintf(discordTopC, " \n");
+		switch (j)
+		{
+			case  6: fprintf(discordTopB, "- Top Arch-Harakim:\n"); break;
+			case  7: fprintf(discordTopB, "- Top Bravers:\n"); break;
+			default: fprintf(discordTopC, "- Top Lycanthropes:\n"); break;
+		}
+		for (m = 0; m<DISC_T; m++)
+		{
+			if (nr[j][m]==-1) continue;
+			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			
+			r1 = ch[nr[j][m]].points_tot / 1000000000;
+			r2 = ch[nr[j][m]].points_tot / 1000000 % 1000;
+			r3 = ch[nr[j][m]].points_tot / 1000 % 1000;
+			r4 = ch[nr[j][m]].points_tot % 1000;
+			
+			if (r1)
+				fprintf(discordTopC, "%c %10.10s   %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+					r1, r2, r3, r4);
+			else if (r2)
+				fprintf(discordTopC, "%c %10.10s   %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+					r2, r3, r4);
+			else if (r3)
+				fprintf(discordTopC, "%c %10.10s   %20.20s         %3d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+					r3, r4);
+			else
+				fprintf(discordTopC, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+					r4);
+		}
+	}
+	fprintf(discordTopC, "```\n");
+	fflush(discordTopC);
+	fclose(discordTopC);
 }
 
 void discord_gmoon(void)
@@ -221,38 +264,41 @@ void discord_pandium(void)
 	// pandium.txt
 	int j, n, m, font;
 	int cl;
-	int nr[2][DISC_P];	// Char # solo/group
-	int fl[2][DISC_P];	// Floor # solo/group    ch[n].pandium_floor[0]    ch[n].pandium_floor[1]
+	int nr[3][DISC_P];	// Char # solo/group
+	int fl[3][DISC_P];	// Floor # solo/group    ch[n].pandium_floor[0]    ch[n].pandium_floor[1]    ch[n].greydepth
 	
-	for (j = 0; j<2; j++) for (m = 0; m<DISC_P; m++)
+	for (j = 0; j<3; j++) for (m = 0; m<DISC_P; m++)
 	{
-		fl[j][m]  = -1;
+		fl[j][m] = -1;
 		nr[j][m] = -1;
 	}
-	for (j = 0; j<2; j++) for (n = 1; n<MAXCHARS; n++)
+	for (j = 0; j<3; j++) for (n = 1; n<MAXCHARS; n++)
 	{
 		if (ch[n].used==USE_EMPTY)				continue;
 		if (!(ch[n].flags & (CF_PLAYER)))		continue;
 		if (ch[n].flags & (CF_GOD | CF_NOLIST))	continue;
 		
-		if (ch[n].pandium_floor[j]<=1)	continue;
+		if (j!=2 && ch[n].pandium_floor[j]<=1)	continue;
+		if (j==2 && ch[n].greydepth<=0) 		continue;
 		
 		for (m = 0; m<DISC_P; m++)
 		{
-			if (ch[n].pandium_floor[j]>fl[j][m])
+			if ((j!=2 && ch[n].pandium_floor[j]>fl[j][m]) || (j==2 && ch[n].greydepth>fl[j][m]))
 			{
 				if (m<(DISC_P-1))
 				{
 					memmove(&fl[j][m + 1], &fl[j][m], ((DISC_P-1) - m) * sizeof(int));
 					memmove(&nr[j][m + 1], &nr[j][m], ((DISC_P-1) - m) * sizeof(int));
 				}
-				fl[j][m] = ch[n].pandium_floor[j]-1;
+				if (j!=2)      fl[j][m] = ch[n].pandium_floor[j]-1;
+				else if (j==2) fl[j][m] = ch[n].greydepth;
 				nr[j][m] = n;
 				break;
 			}
 		}
 	}
 	
+	// Top 3 Pandium - for rewards
 	for (m = 0; m<3; m++)
 	{
 		if (IS_SANEPLAYER(nr[0][m])) globs->top_ps[m] = nr[0][m];
@@ -267,7 +313,9 @@ void discord_pandium(void)
 		switch (j)
 		{
 			case  0: fprintf(discordPandium, "- Top Solo Archon Clears:\n"); break;
-			default: fprintf(discordPandium, "- Top Group Archon Clears:\n"); break;
+			case  1: fprintf(discordPandium, "- Top Group Archon Clears:\n"); break;
+			case  2: fprintf(discordPandium, "- Highest Evergrey Weald Aggregate:\n"); break;
+			default: break;
 		}
 		for (m = 0; m<(j?DISC_P:DISC_T); m++)
 		{
@@ -283,6 +331,7 @@ void discord_pandium(void)
 			if (IS_SUMMONER(nr[j][m]))    cl = 5;
 			if (IS_ARCHHARAKIM(nr[j][m])) cl = 6;
 			if (IS_BRAVER(nr[j][m]))      cl = 7;
+			if (IS_LYCANTH(nr[j][m]))     cl = 8;
 
 			fprintf(discordPandium, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
 				ch[nr[j][m]].name, (cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
@@ -1395,10 +1444,8 @@ int main(int argc, char *args[])
 		{
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
-		/* // (vvv REMOVE AFTER UPDATE!!!)
-		ch[n].data[23] = ch[n].data[23] + ch[n].data[24] + ch[n].data[25];
-		ch[n].data[24] = 0;
-		ch[n].data[25] = 0;
+		// (vvv REMOVE AFTER UPDATE!!!)
+		//ch[n].data[67] = 0;
 		// */ // (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);

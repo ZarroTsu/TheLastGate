@@ -474,7 +474,7 @@ void sv_setchar_skill(unsigned char *buf)
 	pl.skill[n][4]=buf[6];
 	pl.skill[n][5]=buf[7];
 
-	qsort(skilltab,52,sizeof(struct skilltab),skill_cmp);
+	qsort(skilltab,55,sizeof(struct skilltab),skill_cmp);
 }
 
 void sv_setchar_ahp(unsigned char *buf)
@@ -501,11 +501,26 @@ void sv_setchar_dir(unsigned char *buf)
 	pl.dir=*(unsigned char*)(buf+1);
 }
 
+extern int stat_raised[];
+extern int stat_points_used;
+
 void sv_setchar_pts(unsigned char *buf)
 {
+	int n;
+	
 	DEBUG("SV SETCHAR PTS");
 	pl.points=*(unsigned long*)(buf+1);
 	pl.points_tot=*(unsigned long*)(buf+5);
+	
+	if (pl.kindred != *(unsigned long*)(buf+9))
+	{
+		stat_points_used=0;
+		for (n=0; n<108; n++) 
+		{
+			stat_raised[n]=0;
+		}
+	}
+	
 	pl.kindred=*(unsigned long*)(buf+9);
 }
 
@@ -883,7 +898,7 @@ void sv_look5(unsigned char *buf)
 	for (n=0; n<15; n++) tmplook.name[n]=buf[n+1];
 	tmplook.name[15]=0;
 
-	if (!tmplook.extended) {
+	if (!(tmplook.extended & 1)) {
 		if (!tmplook.autoflag) {
 			show_look=1;
 			look=tmplook;
@@ -926,9 +941,15 @@ void sv_showmotd(unsigned char *buf)
 		show_tuto=(n%100);
 		tuto_max=3;
 	}
-	else if (n)
+	else if (n==99)
 	{	// Display NEW PLAYER MotD from server and offer tutorial
 		show_newp=1;
+	}
+	else if (n)
+	{
+		show_book=n;
+		tuto_page=1;
+		tuto_max=3;
 	}
 	else
 	{	// Display normal MotD from server

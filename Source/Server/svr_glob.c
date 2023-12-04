@@ -31,6 +31,76 @@ void pay_rent(void)
 	}
 }
 
+void sanguine_spawners(int cn)
+{
+	int in, n = 0, m = 0, j = 0;
+	int ina[999] = {0};
+	int inb[999] = {0};
+	int x=0, y=0, rank=0;
+	
+	if (cn)
+	{
+		rank = getrank(cn) + ((ch[cn].rebirth & 1)?1:0);
+		y = 1028 + (rank-5)*30;
+	}
+	
+	for (in = 1; in<MAXITEM; in++)
+	{
+		if (it[in].used==USE_EMPTY) continue;
+		if (it[in].temp==IT_SANGCRYS4)
+		{
+			if (cn && it[in].y < y)  continue;
+			inb[m] = in;
+			m++;
+			continue;
+		}
+		if (cn) continue;
+		if (it[in].temp==IT_SANGCRYS1)
+		{
+			j++;
+			continue;
+		}
+		if (it[in].temp==IT_SANGCRYS3)
+		{
+			ina[n] = in;
+			n++;
+			continue;
+		}
+	}
+	
+	if (m > 0)
+	{
+		m = RANDOM(m);
+		in = inb[m];
+		if (in)
+		{
+			x = it[in].x;
+			y = it[in].y;
+			reset_go(x, y); remove_lights(x, y);
+			build_remove(x, y);
+			build_drop(x, y, IT_SANGCRYS2);
+			reset_go(x, y); add_lights(x, y);
+		}
+	}
+	
+	if (cn || j > 13) return;
+	
+	if (n > 0)
+	{
+		n = RANDOM(n);
+		in = ina[n];
+		if (in)
+		{
+			x = it[in].x;
+			y = it[in].y;
+			reset_go(x, y); remove_lights(x, y);
+			build_remove(x, y);
+			build_drop(x, y, IT_SANGCRYS1);
+			reset_go(x, y); add_lights(x, y);
+		}
+	}
+}
+
 void do_misc(void)
 {
 	int cn;
@@ -89,6 +159,9 @@ void init_lights_check(void)
 void global_pandium_rewards(void)
 {
 	int n;
+	
+	xlog("Attemping Pandium Rewards");
+	
 	for (n=0;n<3;n++)
 	{
 		if (IS_SANEPLAYER(globs->top_ps[n])) god_give_char(god_create_item(2974), globs->top_ps[n]);
@@ -96,6 +169,8 @@ void global_pandium_rewards(void)
 		globs->top_ps[n] = 0;
 		globs->top_pg[n] = 0;
 	}
+	
+	xlog("Pandium Rewards complete.");
 }
 
 void global_tick(void)
@@ -109,6 +184,7 @@ void global_tick(void)
 		globs->mdtime = 0;
 		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear);
 		//pay_rent();
+		sanguine_spawners(0);
 		do_misc();
 		if (!(globs->mdday % 28)) init_lights_check();
 	}
@@ -121,10 +197,18 @@ void global_tick(void)
 		
 		if (globs->mdyear%5==0)
 		{
-			sprintf(message, "A new year begins in Astonia! All Archon records have been reset, and rewards have been granted to the top competitors.");
+			sprintf(message, "A new year begins in Astonia! Archon records have been reset, and rewards have been distributed!");
 			if (globs->flags & GF_DISCORD) discord_ranked(message);
 			global_pandium_rewards();
-			god_reset_all_depths(0);
+			if (globs->mdyear%10==0) 
+			{
+				sprintf(message, "A new year begins in Astonia! Archon records have been reset, and rewards have been distributed!");
+				god_reset_all_depths(0);
+			}
+			else
+			{
+				sprintf(message, "A new year begins in Astonia! Archon rewards have been distributed!");
+			}
 		}
 		else
 		{

@@ -71,7 +71,7 @@ int use_door(int cn, int in)
 		{
 			lock = sub_door_driver(cc, in);
 		}
-		else if ((in2 = ch[cc].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==it[in].data[0])
+		else if (IS_SANEITEM(in2 = ch[cc].citem) && !(in2 & 0x80000000) && it[in2].temp==it[in].data[0])
 		{
 			lock = 1;
 			if (it[in].data[3] && (!it[in].active) && IS_PLAYER(cc))
@@ -88,6 +88,7 @@ int use_door(int cn, int in)
 				{
 					if (it[in2].temp==it[in].data[0])
 					{
+						if ((it[in2].flags & IF_IS_KEY) && it[in2].data[0]) it[in2].data[1] = 1;
 						break;
 					}
 				}
@@ -102,7 +103,7 @@ int use_door(int cn, int in)
 				}
 			}
 		}
-		if (!lock && (in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].driver==3) // try to pick the lock
+		if (!lock && IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].driver==3) // try to pick the lock
 		{
 			skill = it[in2].data[0]; // DrData0 on the lockpick is the bonus power of the pick
 			power = it[in].data[2];  // DrData2 on the door is the difficulty (power) of the door
@@ -432,74 +433,39 @@ int use_create_item3(int cn, int in)
 			if (n==IT_DAGG_DAMA) n = 2053;
 			if (n==IT_DAGG_ADAM) n = 1784;
 		}
-		in2 = get_special_item(cn, n, 0, 0, RANDOM(32)+1);
+		in2 = get_special_item(cn, n, 0, 0, RANDOM(20)+1);
 	}
-	/*
-	else if ((n >= 284 && n <= 292) || n==1779 ||
-			 (n >= 523 && n <= 531) || n==1780 ||
-			 (n >= 532 && n <= 540) || n==1781 ||
-			 (n >= 541 && n <= 549) || n==1782 ||
-			 (n >= 572 && n <= 580) || n==1783 ||
-			 (n >= 693 && n <= 701) || n==1784 ||
-			 (n >=2044 && n <=2053) )
+	else if (n==IT_DAGG_STEL||n==IT_DAGG_GOLD||n==IT_DAGG_EMER||n==IT_DAGG_CRYS||n==IT_DAGG_TITN||n==IT_DAGG_DAMA||n==IT_DAGG_ADAM)
 	{
-		IT_DAGG_STEL
-		IT_DAGG_GOLD
-		IT_DAGG_EMER
-		IT_DAGG_CRYS
-		IT_DAGG_TITN
-		IT_DAGG_ADAM
-		IT_DAGG_DAMA
+		int item_target[10] = { 0 };
+		int item_reward[200] = { 0 };
+		int wpn = 0;
 		
-		m = RANDOM(60);
+		if (n==IT_DAGG_STEL) { item_target[0]=IT_GAXE_STEL;item_target[1]=IT_THSW_STEL;item_target[2]=IT_AXXE_STEL;item_target[3]=IT_SHIE_STEL;item_target[4]=IT_SWOR_STEL;item_target[5]=IT_DUAL_STEL;item_target[6]=IT_DAGG_STEL;item_target[7]=IT_STAF_STEL;item_target[8]=IT_SPEA_STEL;item_target[9]=IT_CLAW_STEL; }
+		if (n==IT_DAGG_GOLD) { item_target[0]=IT_GAXE_GOLD;item_target[1]=IT_THSW_GOLD;item_target[2]=IT_AXXE_GOLD;item_target[3]=IT_SHIE_GOLD;item_target[4]=IT_SWOR_GOLD;item_target[5]=IT_DUAL_GOLD;item_target[6]=IT_DAGG_GOLD;item_target[7]=IT_STAF_GOLD;item_target[8]=IT_SPEA_GOLD;item_target[9]=IT_CLAW_GOLD; }
+		if (n==IT_DAGG_EMER) { item_target[0]=IT_GAXE_EMER;item_target[1]=IT_THSW_EMER;item_target[2]=IT_AXXE_EMER;item_target[3]=IT_SHIE_EMER;item_target[4]=IT_SWOR_EMER;item_target[5]=IT_DUAL_EMER;item_target[6]=IT_DAGG_EMER;item_target[7]=IT_STAF_EMER;item_target[8]=IT_SPEA_EMER;item_target[9]=IT_CLAW_EMER; }
+		if (n==IT_DAGG_CRYS) { item_target[0]=IT_GAXE_CRYS;item_target[1]=IT_THSW_CRYS;item_target[2]=IT_AXXE_CRYS;item_target[3]=IT_SHIE_CRYS;item_target[4]=IT_SWOR_CRYS;item_target[5]=IT_DUAL_CRYS;item_target[6]=IT_DAGG_CRYS;item_target[7]=IT_STAF_CRYS;item_target[8]=IT_SPEA_CRYS;item_target[9]=IT_CLAW_CRYS; }
+		if (n==IT_DAGG_TITN) { item_target[0]=IT_GAXE_TITN;item_target[1]=IT_THSW_TITN;item_target[2]=IT_AXXE_TITN;item_target[3]=IT_SHIE_TITN;item_target[4]=IT_SWOR_TITN;item_target[5]=IT_DUAL_TITN;item_target[6]=IT_DAGG_TITN;item_target[7]=IT_STAF_TITN;item_target[8]=IT_SPEA_TITN;item_target[9]=IT_CLAW_TITN; }
+		if (n==IT_DAGG_DAMA) { item_target[0]=IT_GAXE_DAMA;item_target[1]=IT_THSW_DAMA;item_target[2]=IT_AXXE_DAMA;item_target[3]=IT_SHIE_DAMA;item_target[4]=IT_SWOR_DAMA;item_target[5]=IT_DUAL_DAMA;item_target[6]=IT_DAGG_DAMA;item_target[7]=IT_STAF_DAMA;item_target[8]=IT_SPEA_DAMA;item_target[9]=IT_CLAW_DAMA; }
+		if (n==IT_DAGG_ADAM) { item_target[0]=IT_GAXE_ADAM;item_target[1]=IT_THSW_ADAM;item_target[2]=IT_AXXE_ADAM;item_target[3]=IT_SHIE_ADAM;item_target[4]=IT_SWOR_ADAM;item_target[5]=IT_DUAL_ADAM;item_target[6]=IT_DAGG_ADAM;item_target[7]=IT_STAF_ADAM;item_target[8]=IT_SPEA_ADAM;item_target[9]=IT_CLAW_ADAM; }
 		
-		if (IS_TEMPLAR(cn)) 	m = RANDOM(5);
-		if (IS_MERCENARY(cn)) 	m = RANDOM(4);
-		if (IS_HARAKIM(cn)) 	m = RANDOM(3);
-		if (IS_BRAVER(cn)) 		m = RANDOM(4);
+		if (B_SK(cn, SK_TWOHAND) && B_SK(cn, SK_AXE)) 	{ for (m=0;m<(max(B_SK(cn, SK_TWOHAND), B_SK(cn, SK_AXE))/6);m++) { item_reward[wpn] = item_target[0]; wpn++; } }
+		if (B_SK(cn, SK_TWOHAND)) 						{ for (m=0;m<(    B_SK(cn, SK_TWOHAND)                   /6);m++) { item_reward[wpn] = item_target[1]; wpn++; } }
+		if (B_SK(cn, SK_AXE)) 							{ for (m=0;m<(    B_SK(cn, SK_AXE)                       /6);m++) { item_reward[wpn] = item_target[2]; wpn++; } }
+		if (B_SK(cn, SK_SHIELD)) 						{ for (m=0;m<(    B_SK(cn, SK_SHIELD)                    /6);m++) { item_reward[wpn] = item_target[3]; wpn++; } }
+		if (B_SK(cn, SK_SWORD)) 						{ for (m=0;m<(    B_SK(cn, SK_SWORD)                     /6);m++) { item_reward[wpn] = item_target[4]; wpn++; } }
+		if (B_SK(cn, SK_DUAL)) 							{ for (m=0;m<(    B_SK(cn, SK_DUAL)                      /6);m++) { item_reward[wpn] = item_target[5]; wpn++; } }
+		if (B_SK(cn, SK_DAGGER)) 						{ for (m=0;m<(    B_SK(cn, SK_DAGGER)                    /6);m++) { item_reward[wpn] = item_target[6]; wpn++; } }
+		if (B_SK(cn, SK_STAFF)) 						{ for (m=0;m<(    B_SK(cn, SK_STAFF)                     /6);m++) { item_reward[wpn] = item_target[7]; wpn++; } }
+		if (B_SK(cn, SK_STAFF) && B_SK(cn, SK_DAGGER)) 	{ for (m=0;m<(max(B_SK(cn, SK_STAFF),B_SK(cn, SK_DAGGER))/6);m++) { item_reward[wpn] = item_target[8]; wpn++; } }
+		if (B_SK(cn, SK_HAND)) 							{ for (m=0;m<(    B_SK(cn, SK_HAND)                      /6);m++) { item_reward[wpn] = item_target[9]; wpn++; } }
 		
-		if ((n >= 284 && n <= 292) || n==1779) // Steel
+		if (wpn) 
 		{
-			if (IS_TEMPLAR(cn)) switch (m)
-			{
-				case 0: 
-					n = ; break;
-				case 1:
-					n = ; break;
-				case 2:
-					n = ; break;
-				case 3:
-					n = ; break;
-				default:
-					n = ; break;
-			}
-		}
-		if ((n >= 523 && n <= 531) || n==1780) // Gold
-		{
-			
-		}
-		if ((n >= 532 && n <= 540) || n==1781) // Emerald
-		{
-			
-		}
-		if ((n >= 541 && n <= 549) || n==1782) // Crystal
-		{
-			
-		}
-		if ((n >= 572 && n <= 580) || n==1783) // Titanium
-		{
-			
-		}
-		if ((n >= 693 && n <= 701) || n==1784) // Adamant
-		{
-			
-		}
-		if (n >=2044 && n <=2053) // Damascus
-		{
-			
+			n = item_reward[RANDOM(wpn)];
+			in2 = get_special_item(cn, n, 0, 0, 0);
 		}
 	}
-	*/
 	else
 	{
 		in2 = get_special_item(cn, n, 0, 0, 0);
@@ -803,7 +769,7 @@ int use_mix_potion(int cn, int in)
 			case IT_FLO_W: 	in3 = IT_MIX_MW; 	font=1;	 break;
 			case IT_FLO_M:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_C:	in3 = IT_MIX_CM; 	font=1;	 break;
-			case IT_FLO_V:	in3 = IT_MIX_CV; 	font=1;	 break;
+			case IT_FLO_V:	in3 = IT_MIX_MV; 	font=1;	 break;
 			//
 			case IT_FLO_T:	in3 = IT_POT_DEAD; 	break;
 			case IT_FLO_O:	in3 = IT_POT_DEAD; 	break;
@@ -1741,7 +1707,7 @@ void finish_laby_teleport(int cn, int nr, int exp)
 			ch[cn].tree_points++;
 		}
 	}
-	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
 	{
 		ch[cn].citem = 0;
 		it[in2].used = USE_EMPTY;
@@ -1899,7 +1865,7 @@ int reward_teleport(int cn, int in)
 				{	case  0: n = IT_LUKS; break;
 					default: n = IT_EXPS; break;
 				}	in2 = god_create_item(n);
-				it[in2].data[0] = (2000 + it[in].data[9]*1000 + RANDOM(it[in].data[9]+10)*200) / ((n==IT_LUKS)?20:1);
+				it[in2].data[0] = (2000 + it[in].data[9]*1000 + RANDOM(it[in].data[9]+10)*200) / ((n==IT_LUKS)?50:1);
 				it[in2].min_rank = max(0, getrank(cn)-3);
 			}
 		}
@@ -1944,7 +1910,7 @@ int reward_teleport(int cn, int in)
 
 int teleport(int cn, int in)
 {
-	int n, in2;
+	int n, in2, rank, x, y;
 
 	if (!cn)
 	{
@@ -1952,6 +1918,45 @@ int teleport(int cn, int in)
 	}
 	if (it[in].flags & IF_USEACTIVATE && !(it[in].active))
 	{
+		return 1;
+	}
+	
+	if (it[in].temp == IT_SANGPORT)
+	{
+		// ((x>= 888&&y>=1027&&x<= 989&&y<=2013))
+		// y starts at 1028  // ends at 2012  // = 984 width
+		// rank = (it[in].y - 1028) / 30 + 5;
+		// base = max(11, (it[in].y - 1028)*2/11 + 11);
+		// 11/2 = 5.5 per 1 rank
+		// = 32 tiles per rank, 30 ranks
+		
+		rank = getrank(cn) + ((ch[cn].rebirth & 1)?1:0);
+		
+		x = 908 + RANDOM(62);
+		y = min(2000, max(1036, 1028 + 16 + (rank-12)*31 - RANDOM(6) + RANDOM(6)));
+		
+		switch (RANDOM(5))
+		{
+			case  1: do_char_log(cn, 1, "Everything spins. Where...?\n"); break;
+			case  2: do_char_log(cn, 1, "Your fingertips laugh at you.\n"); break;
+			case  3: do_char_log(cn, 1, "The sky turns grey and the ground turns grey.\n"); break;
+			case  4: do_char_log(cn, 1, "sKua cAnnot rEach yOu hEre.\n"); break;
+			default: do_char_log(cn, 1, "An absolutely normal day begins again.\n"); break;
+		}
+		quick_teleport(cn, x, y);
+		
+		x = it[in].x;
+		y = it[in].y;
+		
+		fx_add_effect(12, 0, x, y, 0);
+		do_area_sound(cn, 0, x, y, 21);
+		reset_go(x, y); remove_lights(x, y);
+		build_remove(x, y);
+		build_drop(x, y, IT_SANGCRYS3);
+		reset_go(x, y); add_lights(x, y);
+		sanguine_spawners(cn);
+		sanguine_spawners(cn);
+		sanguine_spawners(cn);
 		return 1;
 	}
 
@@ -2395,6 +2400,26 @@ int use_bag(int cn, int in)
 				}
 			}
 		}
+		for (nr=0; nr<12; nr++)
+		{
+			if (IS_SANEITEM(in2 = ch[co].worn[nr]) && (it[in2].flags&IF_SHOPDESTROY))
+			{
+				god_take_from_char(in2, co);
+				if (god_give_char(in2, cn))
+				{
+					chlog(cn, "Autoloot %s", it[in2].name);
+					do_char_log(cn, 1, "You autoloot a %s.\n", it[in2].reference);
+					emptyinv = 1;
+				}
+				else
+				{
+					god_give_char(in2, co);
+					do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+					emptyinv = 0;
+					break;
+				}
+			}
+		}
 		for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
 		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
 	}
@@ -2742,12 +2767,12 @@ int use_scroll_B(int cn, int in)
 {
 	int n, in2;
 	
-	switch (RANDOM(4))
+	switch (RANDOM(3))
 	{
 		case  0:	n = 2797;	break;
 		case  1:	n = 2798;	break;
 		case  2:	n = 2799;	break;
-		default:	n = 2792;	break;
+		default: break;
 	}
 	
 	in2 = god_create_item(n);
@@ -2802,6 +2827,21 @@ int use_scroll_S(int cn, int in)
 	else
 	{
 		v = it[in].data[0];
+		if (IS_FEMALE(cn))
+		{
+			switch (v)
+			{
+				case  3024: v = 11216; break; // Seyan'du
+				case 23504: v = 24528; break; // Arch Temp
+				case 26048: v = 22948; break; // Skald
+				case 25552: v = 26576; break; // Warrior
+				case 28624: v = 27600; break; // Sorcerer
+				case 25048: v = 24048; break; // Summoner
+				case 29648: v = 30672; break; // Arch Hara
+				case 27088: v = 28112; break; // Braver
+				default: break;
+			}
+		}
 		ch[cn].sprite = v;
 		do_char_log(cn, 1, "You used the scroll. Your form shifted and changed...\n");
 	}
@@ -3656,12 +3696,13 @@ int use_pandium_shrine(int cn, int in)
 		case  3:	// Floor 10 Reward
 			if 		(IS_SEYAN_DU(cn)) 	 tmp = SK_PROX;
 			else if (IS_ARCHTEMPLAR(cn)) tmp = SK_DISPEL;
-			else if (IS_SKALD(cn)) 		 tmp = SK_PRECISION;
+			else if (IS_SKALD(cn)) 		 tmp = SK_BLIND;
 			else if (IS_WARRIOR(cn)) 	 tmp = SK_GEARMAST;
 			else if (IS_SORCERER(cn)) 	 tmp = SK_MSHIELD;
-			else if (IS_SUMMONER(cn)) 	 tmp = SK_STEALTH;
-			else if (IS_ARCHHARAKIM(cn)) tmp = SK_GCMASTERY;
-			else if (IS_BRAVER(cn)) 	 tmp = SK_IMMUN;
+			else if (IS_SUMMONER(cn)) 	 tmp = SK_IMMUN;
+			else if (IS_ARCHHARAKIM(cn)) tmp = SK_POISON;
+			else if (IS_BRAVER(cn)) 	 tmp = SK_TACTICS;
+			else if (IS_LYCANTH(cn)) 	 tmp = SK_HASTE;
 			else 
 			{
 				do_char_log(cn, 0, "Nothing happened. (bad data)\n"); 
@@ -3902,7 +3943,7 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			// Blast power equal to WV + TD
-			power = ch[cn].weapon + RANDOM(ch[cn].top_damage);
+			power = (ch[cn].weapon + RANDOM(ch[cn].top_damage)) * 2;
 			if (!may_attack_msg(cn, co, 1))
 			{
 				chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
@@ -3911,8 +3952,13 @@ int use_special_spell(int cn, int in)
 			item_damage_worn(cn, WN_RHAND, 500);
 			if (get_gear(cn, IT_WP_LIFESPRIG) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_blast(cn, co, power, 0, 0);
-			if (ret) surround_cast(cn, co, 0, SK_BLAST, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
-			if (ret) add_exhaust(cn, SK_EXH_BLAST/2);
+			if (ret) 
+			{
+				spell_charge(cn, cn, power);
+				spell_shock(cn, co, power);
+				surround_cast(cn, co, 0, SK_MJOLNIR, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
+				add_exhaust(cn, SK_EXH_BLAST/2);
+			}
 			break;
 		case    SK_SHADOW: 
 			if (!get_gear(cn, IT_BOOK_DEVI)) 
@@ -3931,7 +3977,7 @@ int use_special_spell(int cn, int in)
 				{
 					cc = 0;
 				}
-				if (cc && (ch[cc].flags & CF_SHADOWCOPY))
+				if (cc && IS_SHADOW(cc))
 				{
 					if ((co = ch[cn].skill_target1) && do_char_can_see(cn, co))
 					{
@@ -4273,9 +4319,9 @@ int use_crystal_sub(int cn, int in)
 	ch[cc].mana[0] = max(50, min(ch[cc].mana[2], base * 5 + tier * 125 + RANDOM(50) + RANDOM(50)*tier)) + sss*5*(tier+1);
 
 	// calculate experience
-	for (z = 0; z<5; z++) { for (m = 10; m<B_AT(cc, z); m++) { pts += attrib_needed(m, 4); } }
-	for (m = 50; m<ch[cc].hp[0]; m++) { pts += hp_needed(m, 4); }
-	for (m = 50; m<ch[cc].mana[0]; m++) { pts += mana_needed(m, 4); }
+	for (z = 0; z<5; z++) { for (m = 10; m<B_AT(cc, z); m++) { pts += attrib_needed(m, 3); } }
+	for (m = 50; m<ch[cc].hp[0]; m++) { pts += hp_needed(m, 3); }
+	for (m = 50; m<ch[cc].mana[0]; m++) { pts += mana_needed(m, 3); }
 	for (z = 0; z<MAXSKILL; z++) { for (m = 1; m<B_SK(cc, z); m++) { pts += skill_needed(m, 3); } }
 
 	ch[cc].points_tot = pts;
@@ -4751,20 +4797,20 @@ int use_crystal_sub(int cn, int in)
 				default: god_give_char(tmp = god_create_item(IT_RD_END), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(40-sss)==0 && base>(0+8))
+		else if (RANDOM(40-sss*2)==0 && base>(0+8))
 		{	switch(RANDOM(3))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(60-sss)==0 && base>(0+16))
+		if (RANDOM(40-sss)==0 && base>(0+16))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(120-sss)==0 && base>(0+24))
+		if (RANDOM(100-sss*2)==0 && base>(0+24))
 		{	switch(RANDOM(2))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
@@ -4772,7 +4818,7 @@ int use_crystal_sub(int cn, int in)
 		}
 	}
 	else if (tier==1) // Tier 1: "base" ranges from  40 -  89
-	{	if (RANDOM(25-sss)==0)
+	{	if (RANDOM(20-sss)==0)
 		{	switch(RANDOM(6))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HEAL), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_MANA), cc); break;
@@ -4782,7 +4828,7 @@ int use_crystal_sub(int cn, int in)
 				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(50-sss*2)==0 && base>(40+6))
+		else if (RANDOM(40-sss*2)==0 && base>(40+6))
 		{	switch(RANDOM(12))
 			{	case  0: god_give_char(tmp = god_create_item(IT_POT_H_HP), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_POT_S_HP), cc); break;
@@ -4798,25 +4844,31 @@ int use_crystal_sub(int cn, int in)
 				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(50-sss)==0 && base>(40+12))
+		if (RANDOM(40-sss)==0 && base>(40+12))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(75-sss*3)==0 && base>(40+18))
+		else if (RANDOM(60-sss*2)==0 && base>(40+18))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(100-sss*2)==0 && base>(40+24))
+		else if (RANDOM(80-sss*3)==0 && base>(40+18))
+		{	switch(RANDOM(2))
+			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_BL_SOLAR, cc); it[tmp].carried = cc; break;
+				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_BL_LUNAR, cc); it[tmp].carried = cc; break;
+			}	xlog("  got %s", it[tmp].name);
+		}
+		if (RANDOM(100-sss*4)==0 && base>(40+24))
 		{	switch(RANDOM(2))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(150-sss*5)==0 && base>(40+30))
+		else if (RANDOM(120-sss*5)==0 && base>(40+30))
 		{	switch(RANDOM(5))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
@@ -4831,7 +4883,7 @@ int use_crystal_sub(int cn, int in)
 		{	switch(RANDOM(15))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
-				case  2: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
+				case  2: god_give_char(tmp = god_create_item(IT_RD_GEND ), cc); break;
 				case  3: god_give_char(tmp = god_create_item(IT_POT_H_HP), cc); break;
 				case  4: god_give_char(tmp = god_create_item(IT_POT_S_HP), cc); break;
 				case  5: god_give_char(tmp = god_create_item(IT_POT_C_HP), cc); break;
@@ -4846,7 +4898,7 @@ int use_crystal_sub(int cn, int in)
 				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(100-sss*4)==0 && base>(80+4))
+		else if (RANDOM(40-sss*2)==0 && base>(80+4))
 		{	god_give_char(tmp = god_create_item(1985+RANDOM(15)), cc);
 			xlog("  got %s", it[tmp].name);
 		}
@@ -4856,25 +4908,25 @@ int use_crystal_sub(int cn, int in)
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(60-sss)==0 && base>(80+12))
+		else if (RANDOM(60-sss*2)==0 && base>(80+12))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(80-sss)==0 && base>(80+16))
+		else if (RANDOM(80-sss*3)==0 && base>(80+16))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTHR, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTHR, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		else if (RANDOM(100-sss*2)==0 && base>(80+24))
+		else if (RANDOM(100-sss*4)==0 && base>(80+24))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYFOU, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTFOU, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name);
 		}
-		if (RANDOM(120-sss*4)==0 && base>(80+20))
+		if (RANDOM(120-sss*5)==0 && base>(80+20))
 		{	switch(RANDOM(5))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_BRV), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_WIL), cc); break;
@@ -5489,6 +5541,195 @@ int mine_state(int x, int y)
 	return(it[in].data[2]);
 }
 
+int inflict_sanguine(int cn, int in)
+{
+	int in2=0, y, rank, power = 0;
+	
+	if (cn)
+	{
+		rank = getrank(cn) - 5;
+		y = 1028 + 16 + (rank-12)*33;
+		if (it[in].y > 1028 && it[in].y < y)
+		{
+			power += (y - it[in].y)/2;
+		}
+	}
+	
+	if (in2 = has_buff(cn, SK_SANGUINE))
+	{
+		power += bu[in2].power;
+		switch (RANDOM(5))
+		{
+			case  1: do_char_log(cn, 0, "Embrace the fire licks your tongue hurts.\n"); break;
+			case  2: do_char_log(cn, 0, "YOu fEel jUst fIne.\n"); break;
+			case  3: do_char_log(cn, 0, "The red reddens.\n"); break;
+			case  4: do_char_log(cn, 0, "You think you should stop.\n"); break;
+			default: do_char_log(cn, 0, "Pain burns in your chest.\n"); break;
+		}
+	}
+	else
+	{
+		do_char_log(cn, 0, "You feel overwhelmed by... something.\n");
+	}
+	
+	if (!it[in].data[0])
+	{
+		power += max(1, (it[in].y - 1028) / 27 + 11);
+	}
+	else
+	{
+		power += getrank(cn) + ((ch[cn].rebirth & 1)?1:0);
+	}
+	
+	if (power > 999) power = 999;
+	
+	if (in2)
+	{
+		bu[in2].power    = power;
+		bu[in2].hp[0]    = -(power/3);
+		bu[in2].end[0]   = -(power/9);
+		bu[in2].mana[0]  = -(power/6);
+		bu[in2].dmg_reduction[1] = -min(127, power/9);	// x% more damage taken
+		bu[in2].dmg_bonus[1]     = -min(127, power/9);	// x% less damage dealt
+		bu[in2].active = bu[in2].duration = TICKS * 60 * 2;
+		return 0;
+	}
+
+	in2 = god_create_buff();
+
+	strcpy(bu[in2].name, "Sanguine Scourge");
+	strcpy(bu[in2].reference, "sanguine scourge");
+	strcpy(bu[in2].description, "Sanguine scourge.");
+	
+	bu[in2].power    = power;
+	bu[in2].hp[0]    = -(power/3);
+	bu[in2].end[0]   = -(power/9);
+	bu[in2].mana[0]  = -(power/6);
+	bu[in2].dmg_reduction[1] = -min(127, power/9);		// x% more damage taken
+	bu[in2].dmg_bonus[1]     = -min(127, power/9);	// x% less damage dealt
+	bu[in2].active = bu[in2].duration = TICKS * 60 * 2;
+	bu[in2].flags  = IF_SPELL | IF_PERMSPELL;
+	bu[in2].temp = SK_SANGUINE;
+	bu[in2].sprite[1] = BUF_SPR_SANGUINE;
+
+	add_spell(cn, in2);
+
+	return 1;
+}
+
+int shatter_sanguine_crystal(int cn, int in, int x, int y)
+{
+	int temp, carried, tmp, m=0, in2;
+
+	if (!in)
+	{
+		return 0;
+	}
+	
+	fx_add_effect(12, 0, x, y, 0);
+	char_play_sound(cn, 21, -150, 0);
+	do_area_sound(cn, 0, x, y, 21);
+	fx_add_effect(10, TICKS*60*59*3 + RANDOM(TICKS*60*61), x, y, it[in].power);
+	inflict_sanguine(cn, in);
+	
+	if (it[in].data[0] && getrank(cn)>12)
+	{
+		temp = it[in].data[0];
+		x = it[in].x;
+		y = it[in].y;
+		carried = it[in].carried;
+
+		it[in] = it_temp[temp];
+		it[in].x = x;
+		it[in].y = y;
+		it[in].carried = carried;
+		it[in].temp = temp;
+		
+		if (carried)
+		{
+			it[in].flags |= IF_UPDATE;
+		}
+	}
+	else
+	{
+		if (it[in].y>1028) 
+		{
+			if (in2 = has_buff(cn, SK_SANGUINE)) m = bu[in2].power;
+			ch[cn].greydepth = max(ch[cn].greydepth, (it[in].y - 1028)/3 + m/2);
+		}
+		
+		build_remove(x, y);
+		in2 = god_create_item(IT_CORRUPTOR);
+		if (in2)
+		{
+			m = x + y * MAPX;
+			map[m].it = in2;
+			it[in2].x = (short)x;
+			it[in2].y = (short)y;
+		}
+		else
+		{
+			do_char_log(cn, 0, "eRror.\n");
+		}
+	}
+	
+	return 1;
+}
+
+int use_sanguine_crystal(int cn, int in)
+{
+	int tmp, wil, x, y, base, rank, co;
+	
+	wil = M_AT(cn, AT_WIL)/2 + 31;
+	
+	// substract endurance
+	if (ch[cn].a_end<1500)
+	{
+		do_char_log(cn, 0, "You're too exhausted to continue attacking.\n");
+		ch[cn].misc_action = DR_IDLE;
+		return 0;
+	}
+	
+	ch[cn].a_end -= 1000;
+	
+	if (ch[cn].worn[WN_RHAND]) item_damage_weapon(cn, wil / 10);
+	
+	char_play_sound(cn, 11, -150, 0);
+	do_area_sound(cn, 0, ch[cn].x, ch[cn].y, 11);
+	
+	// Damage crystal
+	tmp = it[in].data[1] - wil;
+	if (tmp<=0)
+	{
+		reset_go(it[in].x, it[in].y); remove_lights(it[in].x, it[in].y);
+		shatter_sanguine_crystal(cn, in, it[in].x, it[in].y);
+		reset_go(it[in].x, it[in].y); add_lights(it[in].x, it[in].y);
+	}
+	else
+	{
+		it[in].data[1] = tmp;
+		rank = getrank(cn) + ((ch[cn].rebirth & 1)?1:0);
+		if (!RANDOM(29 - rank))
+		{
+			// Spawn a mob nearby
+			x = it[in].x - 4 + RANDOM(9);
+			y = it[in].y - 4 + RANDOM(9);
+			base = max(10, (rank-5) * 6 + 10 + ((ch[cn].rebirth & 1)?1:0));
+			co = generate_map_enemy(350, RANDOM(NUM_MAP_ENEM)+11, x, y, base+RANDOM(2), 7, RANDOM(4));
+			ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 5;
+		}
+	}
+	
+	wil = wil/80 + RANDOM(wil/80) + RANDOM(2);
+	
+	// Grant silent exp based on damage delt
+	ch[cn].points += wil; ch[cn].points_tot += wil;
+	do_update_char(cn);
+	do_check_new_level(cn, 1);
+	
+	return 0;
+}
+
 int use_mine(int cn, int in)
 {
 	int tmp, in2, str;
@@ -6047,6 +6288,9 @@ int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces and
 	// Eclipse belt
 	else if 	(t1==IT_BL_SOLAR && t2==IT_BL_LUNAR)	r = IT_BL_ECLIPSE;
 	else if 	(t1==IT_BL_LUNAR && t2==IT_BL_SOLAR)	r = IT_BL_ECLIPSE;
+	// Gemini belt
+	else if 	(t1==IT_BL_RED  && t2==IT_BL_BLUE)		r = IT_BL_GEMINI;
+	else if 	(t1==IT_BL_BLUE && t2==IT_BL_RED )		r = IT_BL_GEMINI;
 	//
 	else
 	{
@@ -6161,13 +6405,14 @@ void boost_char(int cn, int type)
 	exp  = ch[cn].points_tot / 5 + RANDOM(ch[cn].points_tot / 20 + 1);
 	
 	if (ch[cn].alignment < 0 && ch[cn].data[CHD_GROUP] != 13 && ch[cn].data[CHD_GROUP] != 18 &&
-		!(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && getrank(cn) > 4) // Stronger than Sergeant
+		!(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && (getrank(cn) > 4 || type==6)) // Stronger than Sergeant
 	{
-		if (type==0) type = RANDOM(2)+1;
+		if (type==0) type = RANDOM(3);
 		ch[cn].flags |= CF_EXTRAEXP;
 		
 		switch (type)
 		{
+			case  0:
 			case  1:
 				sprintf(buf, "Strong %s", ch[cn].name); divi = 5;
 				make_soulstone(cn, exp);
@@ -6198,8 +6443,8 @@ void boost_char(int cn, int type)
 			case  6:
 				sprintf(buf, "Potent %s", ch[cn].name); divi = 4;
 				if (!(ch[cn].flags & CF_EXTRACRIT)) ch[cn].flags |= CF_EXTRACRIT;
-				make_soulstone(cn, exp);
-				make_catalyst(cn, 1, 0);
+				//make_soulstone(cn, exp);
+				//make_catalyst(cn, 1, 0);
 				break;
 			default: return;
 		}
@@ -6829,7 +7074,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 
-	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
 	{
 		ch[cn].citem = 0;
 		it[in2].used = USE_EMPTY;
@@ -6914,15 +7159,15 @@ void make_seyan_sword(int cn, int in, int bits)
 	it[in].weapon[0]        = 15 + bits * 3;
 	it[in].ss_weapon        =      bits * 3;
 	
-	it[in].to_hit[0]        = max(0,min( 15, (bits- 2)/2));
-	it[in].to_parry[0]      = max(0,min( 15, (bits- 2)/2));
+	it[in].to_hit[0]        = max(0,min( 10, (bits- 2)/3));
+	it[in].to_parry[0]      = max(0,min( 10, (bits- 2)/3));
 	
 	for (n = 0; n<5; n++) 
-		it[in].attrib[n][0] = max(0,min( 15, (bits-17)  ));
+		it[in].attrib[n][0] = max(0,min( 15, (bits-17)));
 	
-	it[in].crit_chance[0]   = max(0,min(120, (bits- 2)*4));
-	it[in].crit_multi[0]    = max(0,min( 15, (bits- 2)/2));
-	it[in].spell_mod[0]     = max(0,min( 15, (bits- 2)/2));
+	it[in].crit_chance[0]   = max(0,min(100, (bits- 2)*10/3));
+	it[in].crit_multi[0]    = max(0,min( 20, (bits- 2)*2/3));
+	it[in].spell_mod[0]     = max(0,min( 10, (bits- 2)/3));
 	
 	it[in].flags |= IF_UPDATE;
 	it[in].orig_temp = IT_SEYANSWORD;
@@ -6935,10 +7180,11 @@ void make_seyan_sword(int cn, int in, int bits)
 int use_seyan_shrine(int cn, int in, int flag)
 {
 	struct item tmp;
-	int in2, in3, n, bits, ret = 0;
+	int in2=0, in3=0, n, bits=0, ret = 0;
 
 	if (!cn) return 0;
-	if (!in) return 0;
+	if (!IS_SANEITEM(in)) return 0;
+	if (it[in].driver!=34) return 0;
 
 	if (!IS_SEYAN_DU(cn))
 	{
@@ -7010,9 +7256,9 @@ int use_seyan_shrine(int cn, int in, int flag)
 		do_char_log(cn, 1, "You have visited all of the shrines of Kwai!\n", bits);
 	}
 	
-	make_seyan_sword(cn, in2, bits);
+	if (!flag && in2) make_seyan_sword(cn, in2, bits);
 	
-	if (in3 && it[in3].driver==40 && it[in3].data[0]==cn)
+	if (!flag && in3 && it[in3].driver==40 && it[in3].data[0]==cn)
 	{
 		make_seyan_sword(cn, in3, bits);
 	}
@@ -7061,7 +7307,39 @@ int use_seyan_portal(int cn, int in)
 		}
 	}
 	
-	if (it[in].data[2])
+	if (it[in].data[2]==2)
+	{
+		if (IS_LYCANTH(cn))
+		{
+			do_char_log(cn, 0, "You're already a Lycanthrope, aren't you?\n");
+		}
+		else
+		{
+			do_char_log(cn, 0, "The Lycanthropes welcome you among their ranks, %s!\n", ch[cn].name);
+			if (!IS_FEMALE(cn))	
+			{
+				god_racechange(cn, CT_LYCANTHROPE, 0);
+			}
+			else
+			{
+				god_racechange(cn, CT_LYCANTHROPE, 0);
+				ch[cn].kindred |= KIN_FEMALE;
+			}
+			
+			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
+			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+			
+			/* Announce the player's new race */
+			if (n<MAXCHARS)
+			{
+				char message[100];
+				sprintf(message, "Hear ye, hear ye! %s was twisted into a Lycanthrope!", ch[cn].name);
+				do_shout(n, message);
+				if (globs->flags & GF_DISCORD) discord_ranked(message);
+			}
+		}
+	}
+	else if (it[in].data[2]==1)
 	{
 		if (IS_BRAVER(cn))
 		{
@@ -7119,7 +7397,7 @@ int use_seyan_portal(int cn, int in)
 		}
 	}
 
-	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
 	{
 		ch[cn].citem = 0;
 		it[in2].used = USE_EMPTY;
@@ -7724,7 +8002,7 @@ int shrine_of_change(int cn, int in)
 		ch[cn].worn[WN_CHARM2] = in2;
 		if (n = ch[cn].data[PCD_COMPANION])  answer_transfer(cn, n, 0);
 		if (n = ch[cn].data[PCD_SHADOWCOPY]) answer_transfer(cn, n, 0);
-		remove_all_spells(cn);
+		remove_all_spells(cn, 0);
 		ch[cn].misc_action = DR_IDLE;
 		return 0;
 	}
@@ -7813,6 +8091,32 @@ int shrine_of_change(int cn, int in)
 			else do_char_log(cn, 1, "You've already arched!\n");
 			return 0;
 		}
+		
+		if (it[in2].temp==IT_CHROMEYE) // chromatic eye
+		{
+			if (IS_TEMPLAR(cn) || IS_MERCENARY(cn) || IS_HARAKIM(cn))
+			{
+				if (ch[cn].hp[0]<300)
+				{
+					do_char_log(cn, 1, "Your hitpoints are too low. There is still room for improvement.\n");
+					return 0;
+				}
+				if (ch[cn].mana[0]<300)
+				{
+					do_char_log(cn, 1, "Your mana is too low. There is still room for improvement.\n");
+					return 0;
+				}
+				
+				do_char_log(cn, 1, "As you reach out to touch the altar, you suddenly feel light-headed. The world spins around you, and...\n");
+				
+				ch[cn].temple_x = ch[cn].tavern_x = LYCAN_WARP_X;
+				ch[cn].temple_y = ch[cn].tavern_y = LYCAN_WARP_Y;
+				
+				god_transfer_char(cn, LYCAN_WARP_X, LYCAN_WARP_Y);
+			}
+			else do_char_log(cn, 1, "You've already arched!\n");
+			return 0;
+		}
 	}
 	
 	do_char_log(cn, 1, "Read the notes, my friend.\n");
@@ -7861,12 +8165,13 @@ int rebirth_explorer_point(int cn, int in, int msg)
 			n = 0;
 			if 		(IS_SEYAN_DU(cn)) 	 n = SK_PROX;
 			else if (IS_ARCHTEMPLAR(cn)) n = SK_DISPEL;
-			else if (IS_SKALD(cn)) 		 n = SK_PRECISION;
+			else if (IS_SKALD(cn)) 		 n = SK_BLIND;
 			else if (IS_WARRIOR(cn)) 	 n = SK_GEARMAST;
 			else if (IS_SORCERER(cn)) 	 n = SK_MSHIELD;
-			else if (IS_SUMMONER(cn)) 	 n = SK_STEALTH;
-			else if (IS_ARCHHARAKIM(cn)) n = SK_GCMASTERY;
-			else if (IS_BRAVER(cn)) 	 n = SK_IMMUN;
+			else if (IS_SUMMONER(cn)) 	 n = SK_IMMUN;
+			else if (IS_ARCHHARAKIM(cn)) n = SK_POISON;
+			else if (IS_BRAVER(cn)) 	 n = SK_TACTICS;
+			else if (IS_LYCANTH(cn)) 	 n = SK_HASTE;
 			ch[cn].skill[n][2] = 75 + min(5,max(0,bits/6));
 		}
 		
@@ -7891,7 +8196,8 @@ int explorer_point(int cn, int in, int msg)
 	int exp;
 	
 	if (!cn) return 0;
-	if (!in) return 0;
+	if (!IS_SANEITEM(in)) return 0;
+	if (it[in].driver!=57) return 0;
 	
 	if (it[in].data[8]) 
 		return rebirth_explorer_point(cn, in, msg);
@@ -7914,7 +8220,7 @@ int explorer_point(int cn, int in, int msg)
 		if (ch[cn].rebirth & 1) exp = exp/2;
 		exp -= RANDOM(exp/20+1);
 		exp  = min(ch[cn].points_tot / 10, exp);        // not more than 10% of total experience
-		exp += RANDOM(exp/19+1);
+		exp += RANDOM(exp/20+1);
 		
 		chlog(cn, "Found exp point, granting %d (of %d) exp", exp, it[in].data[4]);
 		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
@@ -8400,6 +8706,15 @@ void use_driver(int cn, int in, int carried)
 			case 130:
 				ret = use_item_pedestal(cn, in);
 				break;
+			case 131:
+				ret = use_hole_lycanth(cn, in);
+				break;
+			case 132:
+				ret = use_sanguine_crystal(cn, in);
+				break;
+			case 133:
+				ret = use_corruptor(cn, in, ch[cn].citem);
+				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -8703,7 +9018,7 @@ void item_damage_citem(int cn, int dam)
 {
 	int in;
 
-	if ((in = ch[cn].citem)!=0 && !(in & 0x80000000) && it[in].max_damage)
+	if (IS_SANEITEM(in = ch[cn].citem) && !(in & 0x80000000) && it[in].max_damage)
 	{
 		it[in].current_damage += dam;
 		if (item_age(in))
@@ -8743,7 +9058,7 @@ void item_damage_held(int cn, int n, int dam)
 {
 	int in;
 
-	if ((in = ch[cn].citem)!=0 && !(in & 0x80000000) && it[in].max_damage)
+	if (IS_SANEITEM(in = ch[cn].citem) && !(in & 0x80000000) && it[in].max_damage)
 	{
 		it[in].current_damage += dam;
 		if (item_age(in))
@@ -9135,6 +9450,93 @@ void pentagram(int in)
 	}
 }
 
+void sanguinespawner(int in, int rank)
+{
+	int n, m, cn, base, count = 3;
+	int x, y, frx, fry, tox, toy;
+	
+	if (it[in].temp == IT_SANGCRYS4) count = 1;
+	
+	if (!it[in].data[0] || count == 1)
+	{
+		// y starts at 1028  // ends at 2012  // = 984 width
+		base = max(49, (it[in].y - 1028)*2/13 + 49);
+	}
+	else
+	{
+		frx = it[in].x-23; fry = it[in].y-23; tox = it[in].x+23; toy = it[in].y+23;
+		if (!rank) 
+		{
+			for (x = frx; x <= tox; x++) for (y = fry; y <= toy; y++)
+			{
+				m = x + y * MAPX;
+				if (IS_SANEPLAYER(cn = map[m].ch) && !IS_GOD(cn))
+				{
+					rank = getrank(cn) + ((ch[cn].rebirth & 1)?1:0);
+					it[in].data[8] = 0;
+				}
+			}
+		}
+		
+		if (!rank) 
+		{
+			it[in].data[8]++;
+			if (it[in].data[8] > 300)
+			{
+				it[in].data[8] = 0;
+				for (n = 3; n < 3+count; n++)
+				{
+					cn = it[in].data[n];
+					if (cn && ch[cn].data[0]==in && ch[cn].used!=USE_EMPTY && !IS_PLAYER(cn))
+					{
+						fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+						god_destroy_items(cn);
+						ch[cn].used = USE_EMPTY;
+						it[in].data[n] = 0;
+					}
+				}
+			}
+			return;
+		}
+		
+		base = max(10, (rank-5) * 11/2 + 10);
+	}
+	
+	if (count == 3 && (it[in].data[3] && it[in].data[4] && it[in].data[5]) && RANDOM(23 - min(10, rank/2))) return;
+	if (count == 1 && (it[in].data[3]) && RANDOM(27 - min(10, rank/2))) return;
+	
+	for (n = 3; n < 3+count; n++)
+	{
+		cn = it[in].data[n];
+		if (cn == 0 || ch[cn].data[0]!=in || ch[cn].used==USE_EMPTY || (ch[cn].flags & CF_BODY))
+		{
+			if ((ch[cn].flags & CF_BODY) && ch[cn].used!=USE_EMPTY)
+			{
+				continue;
+			}
+			cn = generate_map_enemy(350, RANDOM(NUM_MAP_ENEM)+11, it[in].x, it[in].y, base+RANDOM(2), 7, RANDOM(4));
+			if (!cn)
+			{
+				it[in].data[n] = 0;
+				xlog("sanguinespawner: generate_map_enemy failed (%d)", cn);
+				continue;
+			}
+			it[in].data[n] = cn;
+			ch[cn].flags &= ~CF_RESPAWN;
+			ch[cn].flags &= ~CF_NOSLEEP;
+			//ch[cn].gold     = 7 + ((1 + RANDOM(rank*3)) * (2 + RANDOM(rank*2)) * (3 + RANDOM(rank)))/7;
+			ch[cn].data[0]  = in;
+			ch[cn].data[29] = it[in].x + it[in].y * MAPX;
+			ch[cn].data[73] = 11;
+			ch[cn].data[30] = ch[cn].dir = RANDOM(8)+1;
+			ch[cn].data[60] = TICKS * 60 * 2;
+			ch[cn].armor_bonus  += base/4;
+			ch[cn].weapon_bonus += base/4;
+			break;
+		}
+	}
+}
+
 void enemyspawner(int in, int type, int flag)
 {
 	int n, cn;
@@ -9228,7 +9630,7 @@ void enemyspawner(int in, int type, int flag)
 			t_ran = expire*5;	count = 1;	t_dist = 8; wait = 0;
 			break;
 		case 21:		// Thugs
-			t_temp = CT_THUGS;
+			t_temp = CT_THUGS + it[in].data[0];
 			t_ran = expire*4;	count = 2;	t_dist =12; wait = 1;
 			break;
 		case 22:		// Lizards
@@ -9396,7 +9798,16 @@ void item_tick_expire(void)
 	{
 		if (IS_SANEITEM(in = map[m].it))
 		{
-			if (it[in].driver==124) continue;
+			if (it[in].driver==124) 
+			{
+				if (m < 524800)
+				{
+					do_add_light(x, y, -it[in].light[1]);
+					it[in].used = 0;
+					map[m].it = 0;
+				}
+				continue;
+			}
 			
 			if ((it[in].flags & IF_REACTIVATE) && !it[in].active)
 			{
@@ -9468,6 +9879,8 @@ void item_tick_expire(void)
 			if (it[in].driver==105)	enemyspawner(in, 24, 0);
 			if (it[in].driver==120)	enemyspawner(in, 25, 0);
 			if (it[in].driver==129)	enemyspawner(in, 26, 0);
+			
+//			if (it[in].driver==132) sanguinespawner(in, 0); // tbd
 
 			if (it[in].flags & IF_EXPIREPROC)
 			{
@@ -10011,6 +10424,70 @@ int step_portal1_lab13(int cn, int in)
 	return 1;
 }
 
+int use_hole_lycanth(int cn, int in)
+{
+	int x, y, co, n, flag = 0, in2;
+	
+	for (x= 909; x<= 937 && !flag; x++) for (y= 479; y<= 491 && !flag; y++)
+	{
+		if ((co = map[x + y * MAPX].ch)!=0 && co!=cn && (ch[co].flags & (CF_PLAYER)))
+			flag = 1;
+		if ((in2 = map[x + y * MAPX].it)!=0 && (it[in2].temp==IT_LYCANKEY || it[in2].temp==IT_TOMBSTONE))
+			flag = 2;
+	}
+	
+	if (flag==2)
+	{
+		do_char_log(cn, 0, "The Outcast's Test is waiting for a certain item to expire, please try again later.\n");
+		return 0;
+	}
+
+	if (flag)
+	{
+		do_char_log(cn, 0, "You may not pass while another player is inside.\n");
+		return 0;
+	}
+	
+	for (n = flag = 0; n<MAXCHARS; n++)
+	{
+		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & CF_BODY)) continue;
+		if (ch[n].temp!=CT_LYCAN_KEEP) continue;
+		if (ch[n].temp==CT_LYCAN_KEEP && ch[n].a_hp>ch[n].hp[5]*900 && ch[n].a_mana>ch[n].mana[5]*900)
+		{
+			flag = 1;
+			break;
+		}
+	}
+	if (!flag)
+	{
+		do_char_log(cn, 0, "The Outcast is currently busy. Please try again in a few minutes.\n");
+		return 0;
+	}
+	
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in2 = ch[cn].spell[n])!=0)
+		{
+			bu[in2].used = USE_EMPTY;
+			ch[cn].spell[n] = 0;
+		}
+	}
+	for (n = 0; n<MAXITEMS; n++)
+	{
+		if ((in2 = ch[cn].item[n])!=0 && it[in2].temp==IT_LYCANKEY)
+		{
+			use_consume_item(cn, in2, 1);
+		}
+	}
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==IT_LYCANKEY)
+	{
+		use_consume_item(cn, in2, 1);
+	}
+	do_update_char(cn);
+	
+	return use_ladder(cn, in);
+}
+
 int step_portal2_lab13(int cn, int in)
 {
 	int x, y, co, n, flag = 0, in2;
@@ -10043,7 +10520,7 @@ int step_portal2_lab13(int cn, int in)
 
 	if (flag==2)
 	{
-		do_char_log(cn, 0, "The Final Test is waiting for a certain item to expire, please try again later.\n");
+		do_char_log(cn, 0, "The Keeper's Test is waiting for a certain item to expire, please try again later.\n");
 		return -1;
 	}
 
@@ -10084,9 +10561,9 @@ int step_portal2_lab13(int cn, int in)
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0)
+		if ((in2 = ch[cn].spell[n])!=0)
 		{
-			bu[in].used = USE_EMPTY;
+			bu[in2].used = USE_EMPTY;
 			ch[cn].spell[n] = 0;
 		}
 	}
@@ -10098,7 +10575,7 @@ int step_portal2_lab13(int cn, int in)
 			use_consume_item(cn, in2, 1);
 		}
 	}
-	if ((in2 = ch[cn].citem)!=0 && !(in2 & 0x80000000) && it[in2].temp==IT_SEYANKEY)
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==IT_SEYANKEY)
 	{
 		use_consume_item(cn, in2, 1);
 	}
@@ -10113,7 +10590,7 @@ int step_portal_arena(int cn, int in)
 	int xs, ys, xe, ye, x, y;
 	int money;
 	
-	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==687)
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==687)
 	{
 		use_consume_item(cn, in2, 1);
 		flag = 1;
@@ -10175,7 +10652,7 @@ int step_portal_arena(int cn, int in)
 		do_char_log(cn, 1, "Please tell the gods that the arena isn't working.\n");
 		return -1;
 	}
-	boost_char(co, 2);
+	boost_char(co, 6);
 
 	ch[co].data[64] = globs->ticker + TICKS * 60 * 5;
 
@@ -10191,7 +10668,7 @@ int step_portal_pandium(int cn, int in)
 	int nr, co, in2, n, flag = 0, p=0;
 	int xs, ys, xe, ye, x, y;
 	
-	if ((in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==2953) // Note of Admission
+	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && it[in2].temp==2953) // Note of Admission
 	{
 		use_consume_item(cn, in2, 1);
 		flag = 1;

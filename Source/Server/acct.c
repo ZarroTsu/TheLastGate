@@ -67,21 +67,12 @@ char *at_name[5] = {
 };
 
 // The order to display skill fields
-/*
 static int skillslots[MAXSKILL] = {
-	 0, 1, 2, 5, 3,16,36, 4, 6,37,
-	38,39,28,29,30,34,40,41,35,24,
-	42,43,20,19,44,27,45,46,21,17,
-	18,11,47,26,25,14,15,22,13,23,
-	32, 9, 8,33,48,49,12,31,10, 7
-};
-*/
-static int skillslots[MAXSKILL] = {
-	28,29,30, 0, 4, 2,36,16, 5, 3,
-	 6,37,40,49,14,13,48,35,41,24,
-	21,20,25,18,27,47,26,22,15,11,
-	42,17,43,46,19, 7,31,12,45,34,
-	38,32, 9, 1,44,23,39, 8,33,10
+	28,29,30, 0,12, 4, 2,36,16, 5,
+	 3, 6,37,40,49,22,13,48,35,41,
+	24,21,20,25,18,27,47,26,15,11,
+	42,17,43,46,19,31,45,34,14,38,
+	32,10, 9, 1,44,23,39, 8,33, 7
 };
 // The order to display item slot fields
 static int itemslots[13] = { 
@@ -703,8 +694,43 @@ void list_all_player_characters_by_class()
 	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_BRAVER(n)) continue;
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
 	}	printf("</table><br>\n");
+	printf("Lycanthropes:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !IS_LYCANTH(n)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
 	printf("REBIRTH:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
 	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || !(ch[n].rebirth & 1)) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+}
+
+void list_all_player_characters_by_pandium()
+{
+	int n;
+	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
+	printf("Cleared Depth 40:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || ch[n].pandium_floor[2]!=5) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Cleared Depth 30:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || ch[n].pandium_floor[2]!=4) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Cleared Depth 20:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || ch[n].pandium_floor[2]!=3) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Cleared Depth 10:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || ch[n].pandium_floor[2]!=2) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Cleared Depth 1:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || ch[n].pandium_floor[2]!=1) continue;
+		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
+	}	printf("</table><br>\n");
+	printf("Uncleared:<br><table>\n"); for (n = 1; n<MAXCHARS; n++)
+	{	if (!(ch[n].flags & (CF_PLAYER)) || ch[n].used==USE_EMPTY || ch[n].pandium_floor[2]!=0) continue;
 		printf("<tr><td>%d:</td><td><a href=/cgi-imp/acct.cgi?step=20&cn=%d>%s</a></td></tr>", n, n, ch[n].name);
 	}	printf("</table><br>\n");
 	printf("<center><a href=/cgi-imp/acct.cgi>Home</a></center><br><br>\n");
@@ -824,6 +850,8 @@ void view_character_template(LIST *head)
 			KIN_SEYAN_DU, (ch_temp[cn].kindred & KIN_SEYAN_DU) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Braver<br>\n",
 			KIN_BRAVER, (ch_temp[cn].kindred & KIN_BRAVER) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Lycanthrope<br>\n",
+			KIN_LYCANTH, (ch_temp[cn].kindred & KIN_LYCANTH) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Purple<br>\n",
 			KIN_PURPLE, (ch_temp[cn].kindred & KIN_PURPLE) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Monster<br>\n",
@@ -834,6 +862,10 @@ void view_character_template(LIST *head)
 			KIN_CLANKWAI, (ch_temp[cn].kindred & KIN_CLANKWAI) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Clan Gorn<br>\n",
 			KIN_CLANGORN, (ch_temp[cn].kindred & KIN_CLANGORN) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Shadow<br>\n",
+			KIN_SHADOW, (ch_temp[cn].kindred & KIN_SHADOW) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Bloody<br>\n",
+			KIN_BLOODY, (ch_temp[cn].kindred & KIN_BLOODY) ? "checked" : "");
 	printf("</td></tr>\n");
 
 	printf("<tr><td valign=top>Sprite base:</td><td><input type=text name=sprite value=\"%d\" size=10 maxlength=10></td></tr>\n",
@@ -860,7 +892,6 @@ void view_character_template(LIST *head)
 			CF_BSPOINTS, (ch_temp[cn].flags & CF_BSPOINTS) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Simple Animation<br>\n",
 			CF_SIMPLE, (ch_temp[cn].flags & CF_SIMPLE) ? "checked" : "");
-	// Added new flags
 	printf("<input type=checkbox name=flags value=%Lu %s>Extra Kill EXP (2x exp)<br>\n",
 			CF_EXTRAEXP, (ch_temp[cn].flags & CF_EXTRAEXP) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Extra Crit Chance (+2%% base, 1.5x exp)<br>\n",
@@ -1060,6 +1091,8 @@ void view_character_player(LIST *head)
 			KIN_SEYAN_DU, IS_SEYAN_DU(cn) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Braver<br>\n",
 			KIN_BRAVER, IS_BRAVER(cn) ? "checked" : "");
+	printf("<input type=checkbox name=kindred value=%d %s>Lycanthrope<br>\n",
+			KIN_LYCANTH, IS_LYCANTH(cn) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Purple<br>\n",
 			KIN_PURPLE, IS_PURPLE(cn) ? "checked" : "");
 	printf("<input type=checkbox name=kindred value=%d %s>Monster<br>\n",
@@ -1119,8 +1152,8 @@ void view_character_player(LIST *head)
 	printf("<input type=checkbox name=flags value=%Lu %s>Do Not List on Who<br>\n", CF_NOWHO, (ch[cn].flags & CF_NOWHO) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Spell Ignore<br>\n", CF_SPELLIGNORE, (ch[cn].flags & CF_SPELLIGNORE) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>No Staff Tells<br>\n", CF_NOSTAFF, (ch[cn].flags & CF_NOSTAFF) ? "checked" : "");
-	printf("<input type=checkbox name=flags value=%Lu %s>Is POH<br>\n", CF_POH, (ch[cn].flags & CF_POH) ? "checked" : "");
-	printf("<input type=checkbox name=flags value=%Lu %s>Is POH Leader<br>\n", CF_POH_LEADER, (ch[cn].flags & CF_POH_LEADER) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Is POH<br>\n", KIN_POH, (ch[cn].kindred & KIN_POH) ? "checked" : "");
+	printf("<input type=checkbox name=flags value=%Lu %s>Is POH Leader<br>\n", KIN_POH_LEADER, (ch[cn].kindred & KIN_POH_LEADER) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Is Looting<br>\n", CF_ISLOOTING, (ch[cn].flags & CF_ISLOOTING) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Gold List<br>\n", CF_GOLDEN, (ch[cn].flags & CF_GOLDEN) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Black List<br>\n", CF_BLACK, (ch[cn].flags & CF_BLACK) ? "checked" : "");
@@ -4637,6 +4670,9 @@ int main(int argc, char *args[])
 	case 35:
 		list_characters_template_align(head, 0);
 		break;
+	case 36:
+		list_all_player_characters_by_pandium();
+		break;
 	case 41:
 		list_characters2_template(head);
 		break;
@@ -4649,6 +4685,7 @@ int main(int argc, char *args[])
 		printf("Player Web Editing (Experimental)<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=19>Player Characters by ID</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=32>Player Characters by Class</a><br><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=36>Player Characters by Pandium Clears</a><br><br>\n");
 		printf("Together those lists include all character-templates<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=11>Characters (without Grolms, Gargoyles, Icegargs)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=16>Characters (only with Positive Alignment) </a><br>\n");

@@ -299,11 +299,11 @@ void display_meta_from_ls(void)
 	// Tarot - Rev.Death (zephyr)
 	if (pl_flagb & (1 <<  5))
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + pl_reflc*2) * 2 * DAM_MULT_ZEPHYR/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + pl_reflc*4) * 2 * DAM_MULT_ZEPHYR/1000;
 	}
 	else
 	{
-		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/4) * 2 * DAM_MULT_ZEPHYR/1000;
+		sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/3) * 2 * DAM_MULT_ZEPHYR/1000;
 	}
 	
 	// Tarot - Emperor (slow bonus)

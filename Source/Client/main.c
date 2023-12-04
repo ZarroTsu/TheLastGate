@@ -267,6 +267,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 					show_shop=0; 
 					show_wps=0; 
 					show_tree=0;
+					show_book=0;
 					show_motd=0;
 					show_newp=0;
 					show_tuto=0;

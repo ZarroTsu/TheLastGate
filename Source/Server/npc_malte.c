@@ -104,7 +104,7 @@ void npc_malte_low(int cn)
 	{
 	case    0:
 		do_sayx(cn, "Thank you so much for saving me, %s!", ch[co].name);
-		ch[cn].data[2] = globs->ticker + TICKS * 6;
+		ch[cn].data[2] = globs->ticker + TICKS * 5;
 		ch[cn].data[1]++;
 		ch[cn].misc_action  = DR_TURN;
 		ch[cn].misc_target1 = DX_DOWN;
@@ -130,16 +130,25 @@ void npc_malte_low(int cn)
 		break;
 	case    4:
 		do_sayx(cn, "I have no idea where the other parts are.");
-		ch[cn].data[2] = globs->ticker + TICKS * 6;
+		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
 		break;
 	case    5:
+		do_sayx(cn, "Here, I've writen down everything I know about this place in my notes. Keep them safe.");
+		ch[cn].data[2] = globs->ticker + TICKS * 5;
+		ch[cn].data[1]++;
+		in = ch[cn].citem = god_create_item(3337);
+		it[in].carried = cn;
+		ch[cn].misc_action  = DR_GIVE;
+		ch[cn].misc_target1 = co;
+		break;
+	case    6:
 		do_sayx(cn, "I will recall now. I have had enough of this prison!");
 		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 		break;
-	case    6:
+	case    7:
 		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");
 		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 		plr_map_remove(cn);

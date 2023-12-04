@@ -412,9 +412,9 @@ switch_questions[BANKS][BANK_QUESTIONS] = {
 	{ // bank 3
 		{ TRUE,  "Manfred gives the quest for sense magic."                                        },
 		{ FALSE, "Leopold wants you to bring him a Ratling Fighters Eye."                          },
-		{ TRUE,  "The priest in the Temple of the Purple One is a Master Sergeant."                },
+		{ FALSE,  "The priest in the Temple of the Purple One is a Master Sergeant."                },
 		{ TRUE,  "23 ghosts roam the Haunted Castle in Lynbore."                                   },
-		{ FALSE, "Garna runs her shop right at the entrance to the mines."                         },
+		{ TRUE, "Gina runs her shop right at the entrance to the mines."                         },
 		{ FALSE, "A gold ring adorned with a huge ruby raises your Intuition by 24 if activated."  },
 		{ TRUE,  "Jefferson is a Second Lieutenant."                                               },
 		{ FALSE, "Sarah wields a golden dagger."                                                   },
@@ -494,6 +494,11 @@ int lab9_guesser_says(int cn, char *text)
 
 	// is the speaker a player?
 	if (!IS_PLAYER(cn))
+	{
+		return 0;
+	}
+	
+	if (!IS_IN_IX(ch[cn].x, ch[cn].y))
 	{
 		return 0;
 	}

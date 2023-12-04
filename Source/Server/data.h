@@ -197,12 +197,20 @@ extern unsigned int mapmarker;
 #define KIN_CLANKWAI    (1u<< 7)
 #define KIN_FEMALE      (1u<< 8)
 #define KIN_ARCHHARAKIM (1u<< 9)
-#define KIN_WARRIOR     (1u<<10)  // arch-merc, warrior
-#define KIN_SORCERER    (1u<<11)  // arch-merc, sorcerer
+#define KIN_WARRIOR     (1u<<10)
+#define KIN_SORCERER    (1u<<11)
 #define KIN_SKALD		(1u<<12)
 #define KIN_SUMMONER    (1u<<13)
 #define KIN_BRAVER      (1u<<14)
 #define KIN_CLANGORN    (1u<<15)
+#define KIN_LYCANTH     (1u<<16)
+#define KIN_SHIFTED     (1u<<17)  // Lycanthrope shift ability toggle
+#define KIN_IDENTIFY    (1u<<18)  // Know identify		(ch[co].kindred & KIN_IDENTIFY)
+#define KIN_POH			(1u<<19)  // clan purples of honor
+#define KIN_POH_LEADER	(1u<<20)  // clan purples of honor
+#define KIN_SHADOW		(1u<<21)  // Special flag for shadow copies so you cannot spell them.
+#define KIN_BLOODY		(1u<<22)  // Special flag for bloody enemies
+// Kindred up to (1u<<31) !
 
 #define CF_IMMORTAL		(1ull<< 0)  // will not suffer any damage
 #define CF_GOD			(1ull<< 1)  // may issue #god commands
@@ -238,8 +246,8 @@ extern unsigned int mapmarker;
 #define CF_CCP			(1ull<<32)  // Computer Controlled Player, does NOT log out and may have some extra logic
 #define CF_SAFE			(1ull<<33)  // safety measures for gods
 #define CF_NOSTAFF		(1ull<<34)  // #stell will only work if flag off
-#define CF_POH			(1ull<<35)  // clan purples of honor
-#define CF_POH_LEADER	(1ull<<36)  // clan purples of honor
+//#define CF_			(1ull<<35)  // 
+//#define CF_			(1ull<<36)  // 
 #define CF_THRALL		(1ull<<37)  // is enthralled NPC
 #define CF_LABKEEPER	(1ull<<38)  // is labkeeper
 #define CF_ISLOOTING	(1ull<<39)  // is currently looting a grave
@@ -251,7 +259,7 @@ extern unsigned int mapmarker;
 #define CF_GREATERGOD	(1ull<<45)  // greater god
 #define CF_GREATERINV	(1ull<<46)  // no one sees me, ever
 #define CF_LOCKPICK		(1ull<<47)  // Ability to use lockpicks and evaluate doors
-#define CF_SHADOWCOPY	(1ull<<48)  // Special flag for shadow copies so you cannot spell them.
+//#define CF_			(1ull<<48)  //
 #define CF_SILENCE		(1ull<<49)  // Shuts up NPC greetings so pents isn't as spammy
 #define CF_GCTOME		(1ull<<50)  // Ghost Companion (and Shadow Copy) will automatically teleport with the player
 #define CF_EXTRAEXP		(1ull<<51)  // NPC gives extra exp! Used for STRONG mobs and grind spots
@@ -312,11 +320,11 @@ extern unsigned int mapmarker;
 #define SK_STEALTH		 8
 #define SK_PERCEPT		 9
 //////////////////////////
-#define SK_SWIM			10
+#define SK_METABOLISM	10
 #define SK_MSHIELD		11
-#define SK_BARTER		12
+#define SK_TACTICS		12 // was SK_BARTER
 #define SK_REPAIR		13
-#define SK_RAGE			14
+#define SK_FINESSE		14 // was SK_RAGE
 #define SK_LETHARGY		15
 #define SK_SHIELD		16
 #define SK_PROTECT		17
@@ -325,7 +333,7 @@ extern unsigned int mapmarker;
 //////////////////////////
 #define SK_CURSE		20
 #define SK_BLESS		21
-#define SK_IDENT		22
+#define SK_RAGE			22 // was SK_IDENT
 #define SK_RESIST		23
 #define SK_BLAST		24
 #define SK_DISPEL		25
@@ -338,7 +346,7 @@ extern unsigned int mapmarker;
 #define SK_ARIA			31
 #define SK_IMMUN		32
 #define SK_SURROUND		33
-#define SK_CONCEN		34
+#define SK_ECONOM		34 // was SK_CONCEN
 #define SK_WARCRY		35
 #define SK_DUAL			36
 #define SK_BLIND		37
@@ -356,8 +364,12 @@ extern unsigned int mapmarker;
 #define SK_TAUNT		48
 #define SK_LEAP			49
 //////////////////////////
+#define SK_SHIFT		54
+#define SK_IDENT		52
 #define SK_LIGHT		50
 #define SK_RECALL		51
+#define SK_FEROC		53
+#define SK_CALM			55
 //////////////////////////
 // Defines for Ailments // - These are OK to match existing skill numbers; see splog[] in skill_driver.c
 #define SK_EXHAUST  	 1
@@ -369,6 +381,7 @@ extern unsigned int mapmarker;
 #define SK_ZEPHYR2		 8
 #define SK_DOUSE		10
 #define SK_MSHELL		12
+#define SK_PLAGUE		14
 #define SK_GUARD		16
 #define SK_VENOM		29
 #define SK_WARCRY3  	30
@@ -384,12 +397,17 @@ extern unsigned int mapmarker;
 #define SK_SOL			33
 #define SK_IMMOLATE		44
 #define SK_IMMOLATE2	45
-#define SK_FROSTB		52
-#define SK_SLOW3		53
-#define SK_OPPRESSION	54
-#define SK_OPPRESSED	55
-#define SK_DIVINITY		56
-#define SK_OPPRESSED2	57
+#define SK_FROSTB		56
+#define SK_SHOCK		57
+#define SK_CHARGE		58
+#define SK_SLOW3		59
+#define SK_DIVINITY		60
+#define SK_OPPRESSION	61
+#define SK_OPPRESSED	62
+#define SK_OPPRESSED2	63
+#define SK_PULSE2		64
+#define SK_MJOLNIR		65
+#define SK_SANGUINE	   219
 
 
 /*
@@ -411,7 +429,7 @@ extern unsigned int mapmarker;
 #define PCD_FIGHTBACK		11
 #define PCD_COMPANION		64
 #define PCD_ALLOW			65
-#define PCD_RIDDLER			67
+#define PCD_RIDDLER			65
 #define PCD_ATTACKTIME		68
 #define PCD_ATTACKVICT		69
 #define PCD_SHADOWCOPY		95
@@ -467,14 +485,14 @@ struct character
 	// [1]=preset modifier, is race/npc dependend
 	// [2]=race specific maximum
 	// [3]=race specific difficulty to raise (0=not raisable, 1=easy ... 10=hard)
-	// [4]=dynamic modifier, depends on equipment and spells (this one is currently not used)
+	// [4]=total value upper bit
 	// [5]=total value
 
 	unsigned char attrib[5][6];     // 351
 
-	unsigned short hp[6];           // 363
-	unsigned short end[6];          // 375
-	unsigned short mana[6];         // 387
+	unsigned short hp[6];           // 363	// [4] used for overcap value
+	unsigned short end[6];          // 375	// [4] used for overcap value
+	unsigned short mana[6];         // 387	// [4] used for overcap value
 
 	unsigned char skill[50][6];     // 687
 
@@ -613,7 +631,9 @@ struct character
 	unsigned short tree_points;		// Points allocated (upper 12 bits) and available (lower 4 bits)
 	unsigned int rebirth;			// Rebirth state (bit 1) and collected poles.
 	
-	char future2[15];				// space for future expansion
+	unsigned short greydepth;		// Depth reached for Evergrey
+	
+	char future2[13];				// space for future expansion
 
 	unsigned int depot[62];
 
@@ -872,6 +892,7 @@ __attribute__ ((packed));
 #define IF_CAN_SS		 (1ull<<58)		// item CAN be soulstoned
 #define IF_CAN_EN		 (1ull<<59)		// item CAN be enchanted (talisman)
 #define IF_ENCHANTED	 (1ull<<60)		// item has been enchanted
+#define IF_CORRUPTED	 (1ull<<61)		// item has been corrupted
 
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
@@ -1025,8 +1046,7 @@ struct s_skilltab
 	
 	char alt_a[200]; // If something changes the name
 	char alt_b[200]; // If something changes the desc
-	char alt_c[200]; // Extra slot for proximity desc
-
+	
 	int attrib[3];
 };
 
@@ -1135,8 +1155,8 @@ struct sk_tree
 #define MM_N_ARFL		19 + NUM_MAP_POS
 #define NUM_MAP_NEG		20
 
-extern struct s_skilltab skilltab[MAXSKILL+2];
-extern struct s_splog splog[52];
+extern struct s_skilltab skilltab[MAXSKILL+5];
+extern struct s_splog splog[66];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
@@ -1148,7 +1168,7 @@ extern struct effect *fx;
 extern struct see_map *  see;
 extern struct mapedit_queue *maped_queue;
 extern struct waypoint waypoint[MAXWPS];
-extern struct sk_tree sk_tree[8][12];
+extern struct sk_tree sk_tree[9][12];
 
 extern struct newcharacter *ch_new;
 extern struct newcharacter *ch_temp_new;

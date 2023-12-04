@@ -270,9 +270,9 @@ struct know
 #define AN_SK_ZEPHYR	"Zephyr is an advanced skill learned by Warriors. It creates blades of wind, dealing extra damage with each hit."
 #define AN_SK_STEALTH	"Stealth is a skill that assists with avoiding fights. With enough stealth, one can appear invisible!"
 #define AN_SK_PERCEPT	"Perception is a skill for seeing and hearing. Some say that with enough investment, one can see in the dark!"
-#define AN_SK_SWIM		"The Swimming skill allows one to survive underwater without drowning."
+#define AN_SK_SWIM		"The Metabolism skill allows one to survive underwater without drowning, and reduces damage taken from vile poisons."
 #define AN_SK_MSHIELD	"Magic Shield is a spell learned by Harakims. It provides an added layer of defense that degrades over time."
-#define AN_SK_BARTER	"Bartering will help you haggle with shopkeepers, letting you sell for more and buy for less."
+#define AN_SK_ECONOM	"Economize will help you haggle with shopkeepers, and reduces the mana cost of spells."
 #define AN_SK_REPAIR	"Repair, when used while holding an item, allows one to try to repair it."
 #define AN_SK_LIGHT		"Light is the most simple spell. It allows one, or their target, to begin glowing."
 #define AN_SK_RECALL	"Recall is a spell that allows one to return to a place they call safe, be it a tavern or temple."
@@ -294,7 +294,6 @@ struct know
 #define AN_SK_SENSE		"The Sense Magic skill allows one to be perceptive of items or effects that are magical in nature."
 #define AN_SK_IMMUNITY	"Immunity is a skill learned by Templars. It reduces the effectiveness of negative ailments on them."
 #define AN_SK_SURROUND	"Surround Hit is a skill learned by Templars. It allows them to hit everything around them at once!"
-#define AN_SK_CONCENT	"Concentrate is an advanced skill learned by powerful mages. It reduces the mana cost of all spells."
 #define AN_SK_WARCRY	"Warcry is an advanced skill learned by powerful fighters. It frightens and stuns all nearby enemies."
 #define AN_SK_DUALW		"The Dual Wield skill provides additional chance to hit enemies when using an off-handed weapons."
 #define AN_SK_BLIND 	"Blind is a skill used by Mercenaries. It blinds and debilitates all nearby enemies."
@@ -711,12 +710,12 @@ struct know
 #define AN_LABZ_KWAI	"Kwai, the goddess of war. She birthed the tribe of Seyan'du long, long ago in her quest to vanquish The Purple One."
 #define AN_LABZ_SKILLS	"Each advanced class can learn unique skills that a Seyan'du will never know. Some are quite powerful!"
 #define AN_LABZ_SHRINE	"Yes, the gold shrine against the north wall over there. If you wish, present a given potion as the notes say."
-#define AN_LABZ_TEMPL	"Arch Templars will learn how to warcry and dual wield weapons, and may eventually learn to hit armies in a single slash."
+#define AN_LABZ_TEMPL	"Arch Templars will learn how to warcry and dual wield shields, and may eventually learn to hit armies in a single slash."
 #define AN_LABZ_BRAWL	"Skalds will learn how to sing arias that reduce exhaustion, and may eventually learn to leap great distances in an instant."
-#define AN_LABZ_WARRI	"Warriors learn the Haste spell, dual wield, and several templar skills. They can learn to hit surrounding foes more quickly."
-#define AN_LABZ_SORCE	"Sorcerers learn the Haste spell, poison, and several harakim skills. They can learn to curse armies in a single word."
+#define AN_LABZ_WARRI	"Warriors learn dual wield and several templar skills. They can learn to hit surrounding foes more quickly."
+#define AN_LABZ_SORCE	"Sorcerers learn mass-cursing and several harakim skills. They can learn to embolden their debuffs to pierce enemy resistances."
 #define AN_LABZ_SUMMO	"Summoners will gain greater mastery over their companions, and may eventually learn to copy their very shadow to assist them."
-#define AN_LABZ_HARAK	"Arch Harakim will learn how to concentrate and poison foes, and may eventually learn to blast armies in a single word."
+#define AN_LABZ_HARAK	"Arch Harakim will learn how to blast armies in a single word, and can learn to cause cascading waves of damage."
 
 //}
 //{ Special answers
@@ -1457,9 +1456,9 @@ struct know know[] = {
 	{{"?what", "!zephyr",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_ZEPHYR, 0},
 	{{"?what", "!stealth",    "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_STEALTH, 0},
 	{{"?what", "!perception", "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PERCEPT, 0},
-	{{"?what", "!swimming",   "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SWIM, 0},
+	{{"?what", "!metabolism", "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SWIM, 0},
 	{{"?what", "!magic", "!shield",        "?", NULL}, 0, AR_GENERAL, 0, AN_SK_MSHIELD, 0},
-	{{"?what", "!bartering",               "?", NULL}, 0, AR_GENERAL, 0, AN_SK_BARTER, 0},
+	{{"?what", "!economize",               "?", NULL}, 0, AR_GENERAL, 0, AN_SK_ECONOM, 0},
 	{{"?what", "!repair",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_REPAIR, 0},
 	{{"?what", "!light",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_LIGHT, 0},
 	{{"?what", "!recall",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_RECALL, 0},
@@ -1481,7 +1480,6 @@ struct know know[] = {
 	{{"?what", "!sense", "!magic",         "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SENSE, 0},
 	{{"?what", "!immunity",                "?", NULL}, 0, AR_GENERAL, 0, AN_SK_IMMUNITY, 0},
 	{{"?what", "!surround", "!hit",        "?", NULL}, 0, AR_GENERAL, 0, AN_SK_SURROUND, 0},
-	{{"?what", "!concentrate",             "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CONCENT, 0},
 	{{"?what", "!warcry",                  "?", NULL}, 0, AR_GENERAL, 0, AN_SK_WARCRY, 0},
 	{{"?what", "!dual", "!wield", "!skill","?", NULL}, 0, AR_GENERAL, 0, AN_SK_DUALW, 0},
 	{{"?what", "!blind",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_BLIND, 0},
@@ -1652,7 +1650,7 @@ void answer_transfer(int cn, int co, int msg)
 	int removeshadow = 0, n, in;
 	if (obey(cn, co)==1)
 	{
-		if (ch[cn].flags & CF_SHADOWCOPY) 
+		if (IS_SHADOW(cn)) 
 		{
 			ch[co].data[PCD_SHADOWCOPY] = 0;
 			removeshadow = 1;
@@ -1943,27 +1941,27 @@ void answer_quiet(int cn, int co)
 void answer_quest(int cn, int co)
 {
 	// Innkeeper will let you know what quest(s) are next to do, based on what you have learned already.
-	if (!B_SK(co, SK_BARTER))
+	if (!B_SK(co, SK_ECONOM))
 	{
 		do_sayx(cn, "Jamil seems down on his luck. You can find him here in the Tavern, at the table over there.");
 		return;
 	}
-	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_TAUNT))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co) || IS_LYCANTH(co)) && !B_SK(co, SK_TAUNT))
 	 || (IS_ANY_MERC(co) && !B_SK(co, SK_POISON))
-	 || (IS_ANY_HARA(co) && !B_SK(co, SK_CONCEN))
-	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_TAUNT) && !B_SK(co, SK_POISON) && !B_SK(co, SK_CONCEN)))
+	 || (IS_ANY_HARA(co) && !B_SK(co, SK_STAFF))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_TAUNT) && !B_SK(co, SK_POISON) && !B_SK(co, SK_STAFF)))
 	{
 		do_sayx(cn, "I hear Inga is in need of help. She's a harakim and she lives on First Street.");
 		return;
 	}
 	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_MSHIELD))
-	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_ENHANCE))
+	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co) || IS_LYCANTH(co)) && !B_SK(co, SK_ENHANCE))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_ENHANCE)))
 	{
 		do_sayx(cn, "I hear Sirjan is in need of help. He's a mercenary and he lives on First Street.");
 		return;
 	}
-	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_WEAKEN))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co) || IS_LYCANTH(co)) && !B_SK(co, SK_WEAKEN))
 	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_SLOW))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_WEAKEN) && !B_SK(co, SK_SLOW))
 	)
@@ -1981,14 +1979,14 @@ void answer_quest(int cn, int co)
 		do_sayx(cn, "I hear Steven is in need of help. He's a mercenary and he lives on Second Street.");
 		return;
 	}
-	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co)) && !B_SK(co, SK_IMMUN))
+	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co) || IS_LYCANTH(co)) && !B_SK(co, SK_IMMUN))
 	 || ((IS_ANY_HARA(co) || IS_BRAVER(co)) && !B_SK(co, SK_DISPEL))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_IMMUN) && !B_SK(co, SK_DISPEL)))
 	{
 		do_sayx(cn, "I hear Ingrid is in need of help. She's a mercenary and she lives on Castle Way.");
 		return;
 	}
-	if (((IS_ANY_TEMP(co) || IS_BRAVER(co)) && !B_SK(co, SK_SURROUND))
+	if (((IS_ANY_TEMP(co) || IS_BRAVER(co) || IS_LYCANTH(co)) && !B_SK(co, SK_SURROUND))
 	 || ((IS_ANY_MERC(co) || IS_ANY_HARA(co)) && !B_SK(co, SK_CURSE))
 	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SURROUND) && !B_SK(co, SK_CURSE))
 	)
@@ -2022,13 +2020,13 @@ void answer_quest(int cn, int co)
 		return;
 	}
 	if (((IS_ANY_TEMP(co) || IS_ANY_MERC(co) || IS_BRAVER(co)) && !B_SK(co, SK_SHIELD))
-	 || (IS_ANY_HARA(co) && !B_SK(co, SK_STAFF))
-	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SHIELD) && !B_SK(co, SK_STAFF)))
+	 || ((IS_ANY_HARA(co) || IS_LYCANTH(co)) && !B_SK(co, SK_TACTICS))
+	 || (IS_SEYAN_DU(co) && !B_SK(co, SK_SHIELD) && !B_SK(co, SK_TACTICS)))
 	{
 		do_sayx(cn, "I hear Edna is in need of help. She's a templar and she lives on Shore Crescent.");
 		return;
 	}
-	if (!B_SK(co, SK_IDENT))
+	if (!(ch[co].kindred & KIN_IDENTIFY))
 	{
 		do_sayx(cn, "I hear Nasir is in need of help. He's a harakim and he lives on Shore Crescent.");
 		return;
@@ -2056,7 +2054,7 @@ void answer_tarot(int cn, int co, int m)
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
 			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(co, n, 0);
 			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(co, n, 0);
-			remove_all_spells(co);
+			remove_all_spells(co, 0);
 		}
 		else
 		{
@@ -2075,17 +2073,18 @@ void answer_unlearn(int cn, int co)
 	char unl[7][40];
 	
 	if (IS_SEYAN_DU(co) && 
-		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_SHADOW) ||
+		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_GCMASTERY) ||
 		 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
-		 B_SK(co, SK_RAGE)))
+		 B_SK(co, SK_FINESSE) || B_SK(co, SK_RAGE)))
 	{
 		n = 0;
 		if (B_SK(co, SK_WARCRY))   { B_SK(co, SK_WARCRY)   = 0; strcpy(unl[n], skilltab[SK_WARCRY].name);   n++; }
 		if (B_SK(co, SK_LEAP))     { B_SK(co, SK_LEAP)     = 0; strcpy(unl[n], skilltab[SK_LEAP].name);     n++; }
-		if (B_SK(co, SK_SHADOW))   { B_SK(co, SK_SHADOW)   = 0; strcpy(unl[n], skilltab[SK_SHADOW].name);   n++; }
+		if (B_SK(co, SK_GCMASTERY)){ B_SK(co, SK_GCMASTERY)= 0; strcpy(unl[n], skilltab[SK_GCMASTERY].name);n++; }
 		if (B_SK(co, SK_LETHARGY)) { B_SK(co, SK_LETHARGY) = 0; strcpy(unl[n], skilltab[SK_LETHARGY].name); n++; }
 		if (B_SK(co, SK_PULSE))    { B_SK(co, SK_PULSE)    = 0; strcpy(unl[n], skilltab[SK_PULSE].name);    n++; }
 		if (B_SK(co, SK_ZEPHYR))   { B_SK(co, SK_ZEPHYR)   = 0; strcpy(unl[n], skilltab[SK_ZEPHYR].name);   n++; }
+		if (B_SK(co, SK_FINESSE))  { B_SK(co, SK_FINESSE)  = 0; strcpy(unl[n], skilltab[SK_FINESSE].name);  n++; }
 		if (B_SK(co, SK_RAGE))     { B_SK(co, SK_RAGE)     = 0; strcpy(unl[n], skilltab[SK_RAGE].name);     n++; }
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
@@ -2141,30 +2140,36 @@ void answer_claim(int cn, int co, int nr)
 	for (m=1;m<MAXITEM;m++)
 	{
 		if (it[m].used==USE_EMPTY) continue;
-		for (n=0;n<3;n++) if (pole[n] && it[m].temp==pole[n])
+		for (n=0;n<3;n++) 
 		{
-			if (!(ch[co].data[46] & it[m].data[0]) && !(ch[co].data[47] & it[m].data[1]) &&
-				!(ch[co].data[48] & it[m].data[2]) && !(ch[co].data[49] & it[m].data[3]) && 
-				!(ch[co].data[91] & it[m].data[5]) && !(ch[co].data[24] & it[m].data[6]))
+			if (pole[n] && it[m].temp==pole[n] && it[m].driver==57)
 			{
-				v += nr * 5000;
-				tpole[n] = m;
+				if (!(ch[co].data[46] & it[m].data[0]) && !(ch[co].data[47] & it[m].data[1]) &&
+					!(ch[co].data[48] & it[m].data[2]) && !(ch[co].data[49] & it[m].data[3]) && 
+					!(ch[co].data[91] & it[m].data[5]) && !(ch[co].data[24] & it[m].data[6]))
+				{
+					v += nr * 5000;
+					tpole[n] = m;
+					continue;
+				}
 			}
 		}
-		if (kwai && it[m].temp==kwai && IS_SEYAN_DU(co))
+		if (IS_SEYAN_DU(co) && kwai && it[m].temp==kwai && it[m].driver==34)
 		{
 			if (!(ch[co].data[21] & it[m].data[0]))
 			{
 				v += nr * 50000;
 				tkwai = m;
+				continue;
 			}
 		}
-		if (rbirth && it[m].temp==rbirth && (ch[co].rebirth & 1))
+		if ((ch[co].rebirth & 1) && rbirth && it[m].temp==rbirth && it[m].driver==57)
 		{
 			if (!(ch[co].rebirth & it[m].data[8]))
 			{
 				v += nr * 250000;
 				trbirth = m;
+				continue;
 			}
 		}
 	}
@@ -2185,9 +2190,13 @@ void answer_claim(int cn, int co, int nr)
 	
 	do_sayx(cn, "Very well, I will give you those missing rewards, %s.", ch[co].name);
 	
-	for (n=0;n<3;n++) { if (IS_SANEITEM(m = tpole[n])) explorer_point(co, m, 0); }
-	if (IS_SANEITEM(m = tkwai)) use_seyan_shrine(co, m, 1);
-	if (IS_SANEITEM(m = trbirth)) explorer_point(co, m, 0);
+	chlog(co, "Processing claim...");
+	
+	for (n=0;n<3;n++) { if (tpole[n] && IS_SANEITEM(m = tpole[n])) explorer_point(co, m, 0); }
+	if (tkwai   && IS_SANEITEM(m = tkwai)) use_seyan_shrine(co, m, 1);
+	if (trbirth && IS_SANEITEM(m = trbirth)) explorer_point(co, m, 0);
+	
+	chlog(co, "Claim complete.");
 	
 	ch[co].gold -= v;
 	do_char_log(co, 0, "You handed over %dG %dS.\n", v / 100, v % 100);
@@ -2433,9 +2442,15 @@ int casino_hroll_dice(int co, int flag)
 			{
 				do_char_log(co, 2, "Good guess!\n");
 				do_char_log(co, 1, "The pot was increased by %2d.%dx\n", v/10, v%10);
-				p = p * v / 10;
+				p = min(65535, p * v / 10);
 				if (v < 50) v+=2;
 				ch[co].data[27] = p | (v<<16);
+				if (p * v / 10 > 65535)
+				{
+					do_char_log(co, 1, "The pot grew so large you were forced to cashed out. Congrats!\n");
+					casino_win(co, (ch[co].data[27] % (1<<16)) % (1<<26));
+					return 1;
+				}
 			}
 			else
 			{
@@ -2453,9 +2468,15 @@ int casino_hroll_dice(int co, int flag)
 			{
 				do_char_log(co, 2, "Good guess!\n");
 				do_char_log(co, 1, "The pot was increased by %2d.%dx\n", v/10, v%10);
-				p = p * v / 10;
+				p = min(65535, p * v / 10);
 				if (v < 30) v++;
 				ch[co].data[27] = p | (v<<16);
+				if (p * v / 10 > 65535)
+				{
+					do_char_log(co, 1, "The pot grew so large you were forced to cashed out. Congrats!\n");
+					casino_win(co, (ch[co].data[27] % (1<<16)) % (1<<26));
+					return 1;
+				}
 			}
 			else
 			{

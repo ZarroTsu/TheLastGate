@@ -459,7 +459,7 @@ int pathfinder(int cn, int x1, int y1, int flag, int x2, int y2)
 		maxstep = max(abs(ch[cn].x - x1), abs(ch[cn].y - y1)) * 8 + 100;
 	}
 
-	if (ch[cn].temp==478 || ch[cn].temp==1321)
+	if (ch[cn].temp==478 || ch[cn].temp==1321 || ch[cn].temp==CT_NULLAN || ch[cn].temp==CT_DVOID)
 	{
 		maxstep += 4000;                // hack for grolmy (stunrun.c)
 	}

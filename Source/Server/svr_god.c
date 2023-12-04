@@ -140,6 +140,28 @@ int get_free_buff(void)
 	return(in);
 }
 
+int god_copy_buff(int in)
+{
+	int n, m;
+	unsigned long long prof;
+
+	prof = prof_start();
+
+	n = get_free_buff();
+	if (!n)
+	{
+		xlog("god_copy_buff (svr_god.c): MAXBUFF reached");
+		prof_stop(46, prof);
+		return 0;
+	}
+
+	bu[n] = bu[in];
+
+	prof_stop(46, prof);
+
+	return(n);
+}
+
 int god_create_buff(void)
 {
 	int n, m;
@@ -1466,8 +1488,8 @@ void god_who(int cn)
 		            who_rank_name[getrank(n)],
 		            ch[n].name,
 		            IS_PURPLE(n) ? '*' : ' ',
-		            (ch[n].flags & CF_POH) ? '+' : ' ',
-		            (ch[n].flags & CF_POH_LEADER) ? '+' : ' ',
+		            (ch[n].kindred & KIN_POH) ? '+' : ' ',
+		            (ch[n].kindred & KIN_POH_LEADER) ? '+' : ' ',
 		            get_area(n, 0));
 		*/
 		m++;
@@ -1817,7 +1839,7 @@ void god_reset_players(int cn, int r)
 {
 	int n;
 	
-	if (r>11) r = 0;
+	if (r>12) r = 0;
 	if (r< 1) r = 0;
 	
 	if (r)
@@ -1830,9 +1852,9 @@ void god_reset_players(int cn, int r)
 		if (ch[n].used==USE_EMPTY)			continue;
 		if (!IS_SANEPLAYER(n))				continue;
 		//
-		if (r == 1 && !IS_ANY_TEMP(n))		continue;
-		if (r == 2 && !IS_ANY_MERC(n))		continue;
-		if (r == 3 && !IS_ANY_HARA(n))		continue;
+		if (r == 1 && !IS_TEMPLAR(n))		continue;
+		if (r == 2 && !IS_MERCENARY(n))		continue;
+		if (r == 3 && !IS_HARAKIM(n))		continue;
 		//
 		if (r == 4 && !IS_SEYAN_DU(n))		continue;
 		if (r == 5 && !IS_ARCHTEMPLAR(n))	continue;
@@ -1842,6 +1864,7 @@ void god_reset_players(int cn, int r)
 		if (r == 9 && !IS_SUMMONER(n))		continue;
 		if (r ==10 && !IS_ARCHHARAKIM(n))	continue;
 		if (r ==11 && !IS_BRAVER(n))		continue;
+		if (r ==12 && !IS_LYCANTH(n))		continue;
 		//
 		god_racechange(n, ch[n].temp, 1);
 	}
@@ -1902,6 +1925,26 @@ void god_reset_ticker(int cn)
 	globs->mdyear 	= 0;
 	do_char_log(cn, 0, "The ticker is now %d\nCheck #time for further details.\n", globs->ticker);
 	return;
+}
+
+void god_reset_grey(int cn)
+{
+	int n;
+	
+	if (cn) 
+		do_char_log(cn, 1, "Now resetting greywood depth...\n");
+	else
+		xlog("Now resetting greywood depth...");
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used==USE_EMPTY)	continue;
+		if (!IS_SANEPLAYER(n))		continue;
+		ch[n].greydepth = 0;
+	}
+	if (cn)
+		do_char_log(cn, 0, "Done.\n");
+	else
+		xlog("Done.");
 }
 
 int find_next_char(int startcn, char *spec1, char *spec2)
@@ -2828,12 +2871,15 @@ void god_build_equip(int cn, int x)
 	case 17:	// Canyon
 		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
 		ch[cn].item[m++] = 1674;				// ** Wall
+		ch[cn].item[m++] = 3255;				// ** Canyon wall vines 1
+		ch[cn].item[m++] = 3256;				// ** Canyon wall vines 2
 		ch[cn].item[m++] = 1710;				// ** Rope
 		ch[cn].item[m++] = 0x20000000 | 3614;
 		ch[cn].item[m++] = 0x20000000 | 3615;
 		ch[cn].item[m++] = 0x20000000 | 3538;
 		ch[cn].item[m++] = 0x20000000 | 3539;
 		ch[cn].item[m++] = 0x20000000 | 3540;
+		//
 		ch[cn].item[m++] = 0x20000000 | 3541;
 		ch[cn].item[m++] = 0x20000000 | 3542;
 		ch[cn].item[m++] = 0x20000000 | 3543;
@@ -2844,6 +2890,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 3548;
 		ch[cn].item[m++] = 0x20000000 | 3549;
 		ch[cn].item[m++] = 0x20000000 | 3550;
+		//
 		ch[cn].item[m++] = 0x20000000 | 3551;
 		ch[cn].item[m++] = 0x20000000 | 3552;
 		ch[cn].item[m++] = 0x20000000 | 3553;
@@ -2854,6 +2901,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 3558;
 		ch[cn].item[m++] = 0x20000000 | 3559;
 		ch[cn].item[m++] = 0x20000000 | 3560;
+		//
 		ch[cn].item[m++] = 0x20000000 | 3561;
 		ch[cn].item[m++] = 0x20000000 | 3562;
 		ch[cn].item[m++] = 0x20000000 | 3563;
@@ -2927,16 +2975,37 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 3021;
 		ch[cn].item[m++] = 1662;				// ** Grey
 		ch[cn].item[m++] = 1663;				// ** Grey window
+		ch[cn].item[m++] = 3237;				// ** Grey vines 1
+		ch[cn].item[m++] = 3238;				// ** Grey vines 2
 		ch[cn].item[m++] = 1664;				// ** M.Grey
 		ch[cn].item[m++] = 1665;				// ** M.Grey window
+		ch[cn].item[m++] = 3239;				// ** M.Grey vines 1
+		ch[cn].item[m++] = 3240;				// ** M.Grey vines 2
+		//
 		ch[cn].item[m++] = 1666;				// ** Tan
 		ch[cn].item[m++] = 1667;				// ** Tan window
+		ch[cn].item[m++] = 3241;				// ** Tan vines 1
+		ch[cn].item[m++] = 3242;				// ** Tan vines 2
 		ch[cn].item[m++] = 1668;				// ** M.Tan
 		ch[cn].item[m++] = 1669;				// ** M.Tan window
+		ch[cn].item[m++] = 3243;				// ** M.Tan vines 1
+		ch[cn].item[m++] = 3244;				// ** M.Tan vines 2
 		ch[cn].item[m++] = 1670;				// ** Red
 		ch[cn].item[m++] = 1671;				// ** Red window
+		//
+		ch[cn].item[m++] = 3245;				// ** Red vines 1
+		ch[cn].item[m++] = 3246;				// ** Red vines 2
 		ch[cn].item[m++] = 1672;				// ** M.Red
 		ch[cn].item[m++] = 1673;				// ** M.Red window
+		ch[cn].item[m++] = 3247;				// ** M.Red vines 1
+		ch[cn].item[m++] = 3248;				// ** M.Red vines 2
+		ch[cn].item[m++] = 3235;				// ** Mud
+		ch[cn].item[m++] = 3249;				// ** Mud vines 1
+		ch[cn].item[m++] = 3250;				// ** Mud vines 2
+		ch[cn].item[m++] = 3236;				// ** Pale
+		//
+		ch[cn].item[m++] = 3251;				// ** Pale vines 1
+		ch[cn].item[m++] = 3252;				// ** Pale vines 2
 		break;
 	case 21:	// New Canyon - Grey
 		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
@@ -3015,6 +3084,7 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 0x20000000 | 6012;
 		ch[cn].item[m++] = 0x20000000 | 6013;
 		ch[cn].item[m++] = 0x20000000 | 6014;
+		
 		break;
 	case 23:	// New Canyon - Blue
 		ch[cn].item[m++] = 0x40000000 | MF_MOVEBLOCK;
@@ -3069,21 +3139,77 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 2841;
 		ch[cn].item[m++] = 2842;
 		break;
-	case 25:	// Tables and table-candles
-		ch[cn].item[m++] = 82; 	// Rough Table  w/ leg
-		ch[cn].item[m++] = 83; 	// Rough Table  no leg
-		ch[cn].item[m++] = 81; 	// Rough G.Candle  w/ leg
-		ch[cn].item[m++] = 85; 	// Rough G.Candle  no leg
-		ch[cn].item[m++] = 175; // Rough B.Candle  w/ leg
-		ch[cn].item[m++] = 176; // Rough B.Candle  no leg
-		ch[cn].item[m++] = 298; // Smooth Table  w/ leg
-		ch[cn].item[m++] = 299; // Smooth Table  no leg
-		ch[cn].item[m++] = 26; 	// Smooth G.Candle  w/ leg
-		ch[cn].item[m++] = 88; 	// Smooth G.Candle  no leg
-		ch[cn].item[m++] = 177; // Smooth B.Candle  w/ leg
-		ch[cn].item[m++] = 178; // Smooth B.Candle  no leg
+	case 25:	// Tables and furniture
+		ch[cn].item[m++] = 5; 		// Unlit Gold Candle
+		ch[cn].item[m++] = 7; 		// Unlit Blue Candle
+		ch[cn].item[m++] = 268; 	// Lit Gold Candle
+		ch[cn].item[m++] = 764; 	// Lit Blue Candle
+		ch[cn].item[m++] = 1055; 	// Lit Marble Candle
+		ch[cn].item[m++] = 296; 	// White Candle
+		ch[cn].item[m++] = 1645;	// Black Candle
+		ch[cn].item[m++] = 741; 	// Fire Bowl
+		ch[cn].item[m++] = 1886;	// Fire Pit
+		ch[cn].item[m++] = 1148;	// Fire
+		//
+		ch[cn].item[m++] = 3303;	// Round Table 1
+		ch[cn].item[m++] = 3304;	// Round Table 2
+		ch[cn].item[m++] = 1052; 	// Marble Table 3
+		ch[cn].item[m++] = 1050; 	// Marble Table 1
+		ch[cn].item[m++] = 1051; 	// Marble Table 2
+		ch[cn].item[m++] = 82; 		// Rough Table  w/ leg
+		ch[cn].item[m++] = 83; 		// Rough Table  no leg
+		ch[cn].item[m++] = 81; 		// Rough G.Candle  w/ leg
+		ch[cn].item[m++] = 85; 		// Rough G.Candle  no leg
+		ch[cn].item[m++] = 175; 	// Rough B.Candle  w/ leg
+		//
+		ch[cn].item[m++] = 176; 	// Rough B.Candle  no leg
+		ch[cn].item[m++] = 298; 	// Smooth Table  w/ leg
+		ch[cn].item[m++] = 299; 	// Smooth Table  no leg
+		ch[cn].item[m++] = 26; 		// Smooth G.Candle  w/ leg
+		ch[cn].item[m++] = 88; 		// Smooth G.Candle  no leg
+		ch[cn].item[m++] = 177; 	// Smooth B.Candle  w/ leg
+		ch[cn].item[m++] = 178; 	// Smooth B.Candle  no leg
+		ch[cn].item[m++] = 3288;	// Chair 1
+		ch[cn].item[m++] = 3289;	// Chair 2
+		ch[cn].item[m++] = 3290;	// Chair 3
+		//
+		ch[cn].item[m++] = 3291;	// Chair 4
+		ch[cn].item[m++] = 3287;	// Stool
+		ch[cn].item[m++] = 3283;	// Bed 1
+		ch[cn].item[m++] = 3284;	// Bed 2
+		ch[cn].item[m++] = 3285;	// Bed 3
+		ch[cn].item[m++] = 3286;	// Bed 4
 		break;
-		
+	case 26:	// Crumbling brick walls
+		ch[cn].item[m++] = 3257;				// ** Grey tall crumble vines
+		ch[cn].item[m++] = 3258;				// ** Grey tall crumble
+		ch[cn].item[m++] = 3259;				// ** Grey short crumble
+		ch[cn].item[m++] = 3260;				// ** M.Grey tall crumble vines
+		ch[cn].item[m++] = 3261;				// ** M.Grey tall crumble
+		ch[cn].item[m++] = 3262;				// ** M.Grey short crumble
+		ch[cn].item[m++] = 3263;				// ** Tan tall crumble vines
+		ch[cn].item[m++] = 3264;				// ** Tan tall crumble
+		ch[cn].item[m++] = 3265;				// ** Tan short crumble
+		ch[cn].item[m++] = 3266;				// ** M.Tan tall crumble vines
+		//
+		ch[cn].item[m++] = 3267;				// ** M.Tan tall crumble
+		ch[cn].item[m++] = 3268;				// ** M.Tan short crumble
+		ch[cn].item[m++] = 3269;				// ** Red tall crumble vines
+		ch[cn].item[m++] = 3270;				// ** Red tall crumble
+		ch[cn].item[m++] = 3271;				// ** Red short crumble
+		ch[cn].item[m++] = 3272;				// ** M.Red tall crumble vines
+		ch[cn].item[m++] = 3273;				// ** M.Red tall crumble
+		ch[cn].item[m++] = 3274;				// ** M.Red short crumble
+		ch[cn].item[m++] = 3275;				// ** Mud tall crumble vines
+		ch[cn].item[m++] = 3276;				// ** Mud tall crumble
+		//
+		ch[cn].item[m++] = 3277;				// ** Mud short crumble
+		ch[cn].item[m++] = 3278;				// ** Pale tall crumble vines
+		ch[cn].item[m++] = 3279;				// ** Pale tall crumble
+		ch[cn].item[m++] = 3280;				// ** Pale short crumble
+		ch[cn].item[m++] = 3281;				// ** D.Red tall crumble
+		ch[cn].item[m++] = 3282;				// ** D.Red short crumble
+		break;
 	case 300:
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS;
 		ch[cn].item[m++] = 0x20000000 | 116;
@@ -3124,6 +3250,8 @@ void god_build_equip(int cn, int x)
 		ch[cn].item[m++] = 448;
 		ch[cn].item[m++] = 450;
 		ch[cn].item[m++] = 451;
+		ch[cn].item[m++] = 3253;				// ** Dirt wall, vines
+		ch[cn].item[m++] = 3254;				// ** Dirt wall, vines
 		break;
 	case 301:
 		ch[cn].item[m++] = 0x20000000 | 704;
@@ -3343,18 +3471,33 @@ void god_build_equip(int cn, int x)
 	case 1005:
 		ch[cn].item[m++] = 0x40000000 | MF_INDOORS; // Indoor flag
 		ch[cn].item[m++] = 0x20000000 | 5860;		// Violet Jungle Floor
-		ch[cn].item[m++] = 2658;
+		ch[cn].item[m++] = 0x20000000 | 6866;		// Grey Jungle Floor
+		ch[cn].item[m++] = 0x20000000 | 6871;		// Grey Jungle Builder
+		ch[cn].item[m++] = 2658; // Random Violet Tree
 		ch[cn].item[m++] = 2659;
 		ch[cn].item[m++] = 2660;
 		ch[cn].item[m++] = 2661;
 		ch[cn].item[m++] = 2662;
 		ch[cn].item[m++] = 2663;
 		ch[cn].item[m++] = 2664;
-		ch[cn].item[m++] = 2665;
 		//
+		ch[cn].item[m++] = 2665;
 		ch[cn].item[m++] = 2666;
 		ch[cn].item[m++] = 2667;
 		ch[cn].item[m++] = 2668;
+		ch[cn].item[m++] = 3292; // Grey dirt wall
+		ch[cn].item[m++] = 3305; // Random Grey Tree
+		ch[cn].item[m++] = 3293;
+		ch[cn].item[m++] = 3294;
+		ch[cn].item[m++] = 3295;
+		ch[cn].item[m++] = 3296;
+		//
+		ch[cn].item[m++] = 3297;
+		ch[cn].item[m++] = 3298;
+		ch[cn].item[m++] = 3299;
+		ch[cn].item[m++] = 3300;
+		ch[cn].item[m++] = 3301;
+		ch[cn].item[m++] = 3302;
 		break;
 	case    1140:
 		ch[cn].item[m++] = 0x20000000 | 17064;
@@ -3432,11 +3575,15 @@ void god_reset_all_depths(int cn)
 	for (n=2;n<MAXCHARS;n++)
 	{
 		if (ch[n].used==USE_EMPTY) continue;
-		if (!IS_PLAYER(n)) continue;
+		if (!IS_SANEPLAYER(n)) continue;
 		if (ch[n].pandium_floor[0] > 0 || ch[n].pandium_floor[1] > 0)
 		{
 			ch[n].pandium_floor[0] = 1;
 			ch[n].pandium_floor[1] = 1;
+		}
+		if (ch[n].greydepth > 0)
+		{
+			ch[n].greydepth = 0;
 		}
 	}
 	if (cn) do_char_log(cn, 1, "Done.\n");
@@ -3842,12 +3989,6 @@ void god_set_flag(int cn, int co, unsigned long long flag)
 	case    CF_SAFE:
 		ptr = "safe";
 		break;
-	case    CF_POH:
-		ptr = "purple of honor";
-		break;
-	case    CF_POH_LEADER:
-		ptr = "poh leader";
-		break;
 	case    CF_GOLDEN:
 		ptr = "golden list";
 		break;
@@ -4106,6 +4247,11 @@ void god_racechange(int co, int temp, int keepstuff)
 	{
 		return;
 	}
+	
+	if (IS_LYCANTH(co) && IS_SHIFTED(co))
+	{
+		skill_shift(co,1); // this will hopefully avoid issues with continuity...
+	}
 
 	if (!keepstuff)
 	{
@@ -4192,17 +4338,19 @@ void god_racechange(int co, int temp, int keepstuff)
 			ch[co].points     = exp;
 			rank = points2rank(exp);
 			
+			ch[co].rebirth = old.rebirth;
+			
 			if (IS_ANY_MERC(co) || IS_SEYAN_DU(co) || IS_BRAVER(co))
 			{
 				hp   = 10;
 				mana = 10;
 			}
-			else if (IS_ANY_TEMP(co))
+			else if (IS_ANY_TEMP(co) || (IS_LYCANTH(co)&&!IS_SHIFTED(co)))
 			{
 				hp   = 15;
 				mana = 5;
 			}
-			else if (IS_ANY_HARA(co))
+			else if (IS_ANY_HARA(co) || (IS_LYCANTH(co)&&IS_SHIFTED(co)))
 			{
 				hp   = 5;
 				mana = 15;
@@ -4220,14 +4368,11 @@ void god_racechange(int co, int temp, int keepstuff)
 			bits = get_rebirth_bits(co);
 			if (attri || bits)
 			{
-				temp = ch[co].temp;
 				for (n = 0; n<5; n++) 
 					ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
 				for (n = 0; n<50; n++) 
 					if (ch[co].skill[n][2] && bits) ch[co].skill[n][2] = ch_temp[temp].skill[n][2] + min(5,max(0,bits/6));
 			}
-			
-			ch[co].rebirth = old.rebirth;
 		}
 		else
 		{
@@ -4254,16 +4399,22 @@ void god_racechange(int co, int temp, int keepstuff)
 			
 			for (n = 1; n<MAXITEM; n++)
 			{
-				if (it[n].used!=USE_ACTIVE) continue;
-				if (it[n].driver!=40) continue;
-				if (it[n].data[0]!=co) continue;
-				tmp = it_temp[IT_DEADSEYSWORD];
-				tmp.x = it[n].x;
-				tmp.y = it[n].y;
-				tmp.carried = it[n].carried;
-				tmp.temp = IT_DEADSEYSWORD;
-				it[n] = tmp;
-				it[n].flags |= IF_UPDATE;
+				if (it[n].used==USE_EMPTY) continue;
+				if (it[n].driver==40 && it[n].data[0]==co)
+				{
+					tmp = it_temp[IT_DEADSEYSWORD];
+					tmp.x = it[n].x;
+					tmp.y = it[n].y;
+					tmp.carried = it[n].carried;
+					tmp.temp = IT_DEADSEYSWORD;
+					it[n] = tmp;
+					it[n].flags |= IF_UPDATE;
+				}
+				if (it[n].driver==33 && it[n].data[8]==co)
+				{
+					it[n].data[8] = 0;
+					it[n].duration = it[n].active = TICKS * 5 + RANDOM(TICKS*5);
+				}
 			}
 		}
 		
@@ -4273,11 +4424,13 @@ void god_racechange(int co, int temp, int keepstuff)
 		for (n = 0; n<12; n++) {ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;}
 		
 		// Re-acquire previously learned skills
-		for (n = 0; n<50; n++) if (old.skill[n][0] && ch[co].skill[n][2]) ch[co].skill[n][0] = 1;
+		for (n = 0; n<50; n++) if (ch[co].skill[n][0]==0 && old.skill[n][0] && ch[co].skill[n][2])
+			ch[co].skill[n][0] = 1;
 		
 		if (old.flags & CF_SENSE)    ch[co].flags |= CF_SENSE;
 		if (old.flags & CF_APPRAISE) ch[co].flags |= CF_APPRAISE;
 		if (old.flags & CF_LOCKPICK) ch[co].flags |= CF_LOCKPICK;
+		if (old.kindred & KIN_IDENTIFY) ch[co].kindred |= KIN_IDENTIFY;
 		
 		ch[co].bs_points = old.bs_points;
 		ch[co].os_points = old.os_points;
@@ -4292,6 +4445,13 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].pandium_floor[1] = old.pandium_floor[1];
 		ch[co].pandium_floor[2] = old.pandium_floor[2];
 		
+		for (n=0;n<6;n++) ch[co].limit_break[n][0] = old.limit_break[n][0];
+		
+		if (ch[co].pandium_floor[2] >= 1 && ch[co].limit_break[0][0] < 5)
+		{
+			chlog(co, "Pandium Floor 1 : FIX");
+			for (n=0;n<5;n++) ch[co].limit_break[n][0] = 5;
+		}
 		if (ch[co].pandium_floor[2] >= 2)
 		{
 			chlog(co, "Pandium Floor 2 : OK");
@@ -4303,12 +4463,13 @@ void god_racechange(int co, int temp, int keepstuff)
 			n = 0;
 			if 		(IS_SEYAN_DU(co)) 	 n = SK_PROX;
 			else if (IS_ARCHTEMPLAR(co)) n = SK_DISPEL;
-			else if (IS_SKALD(co)) 		 n = SK_PRECISION;
+			else if (IS_SKALD(co)) 		 n = SK_BLIND;
 			else if (IS_WARRIOR(co)) 	 n = SK_GEARMAST;
 			else if (IS_SORCERER(co)) 	 n = SK_MSHIELD;
-			else if (IS_SUMMONER(co)) 	 n = SK_STEALTH;
-			else if (IS_ARCHHARAKIM(co)) n = SK_GCMASTERY;
-			else if (IS_BRAVER(co)) 	 n = SK_IMMUN;
+			else if (IS_SUMMONER(co)) 	 n = SK_IMMUN;
+			else if (IS_ARCHHARAKIM(co)) n = SK_POISON;
+			else if (IS_BRAVER(co)) 	 n = SK_TACTICS;
+			else if (IS_LYCANTH(co)) 	 n = SK_HASTE;
 			if (n)
 			{
 				ch[co].skill[n][0] =  1;
@@ -4322,10 +4483,13 @@ void god_racechange(int co, int temp, int keepstuff)
 			chlog(co, "Pandium Floor 4 : OK");
 			ch[co].end[0]  += 50;
 		}
+		if (ch[co].pandium_floor[2] >= 5 && ch[co].limit_break[5][0] < 5)
+		{
+			chlog(co, "Pandium Floor 5 : FIX");
+			ch[co].limit_break[5][0] = 5;
+		}
 		
 		ch[co].tree_points = old.tree_points;
-		
-		for (n=0;n<5;n++) ch[co].limit_break[n][0] = old.limit_break[n][0];
 		
 		if (keepstuff==1) 
 		{
@@ -4378,6 +4542,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[70] = 0;
 		ch[co].data[93] = 0;
 		ch[co].data[73] = 0;
+		ch[co].data[67] = 0;
 		
 		// Reset quest flags
 		ch[co].data[72] = 0;
@@ -4385,6 +4550,26 @@ void god_racechange(int co, int temp, int keepstuff)
 		
 		// Remove learned flags
 		ch[co].flags &= ~(CF_APPRAISE | CF_LOCKPICK | CF_SENSE);
+		
+		for (n = 1; n<MAXITEM; n++)
+		{
+			if (it[n].used==USE_EMPTY) continue;
+			if (it[n].driver==40 && it[n].data[0]==co)
+			{
+				tmp = it_temp[IT_DEADSEYSWORD];
+				tmp.x = it[n].x;
+				tmp.y = it[n].y;
+				tmp.carried = it[n].carried;
+				tmp.temp = IT_DEADSEYSWORD;
+				it[n] = tmp;
+				it[n].flags |= IF_UPDATE;
+			}
+			if (it[n].driver==33 && it[n].data[8]==co)
+			{
+				it[n].data[8] = 0;
+				it[n].duration = it[n].active = TICKS * 5 + RANDOM(TICKS*5);
+			}
+		}
 	}
 	
 	ch[co].a_hp   = 9999999;
@@ -4812,7 +4997,7 @@ void god_gargoyle(int cn)
 
 void god_minor_racechange(int cn, int t) // note: cannot deal with values which are already higher than the new max!
 {
-	int n, tempkin;
+	int n, tempkin, tempflags;
 
 	if (!IS_SANECHAR(cn) || !IS_SANECTEMPLATE(t))
 	{
@@ -4836,6 +5021,7 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 	ch[cn].sprite = ch_temp[t].sprite;
 	
 	tempkin = ch[cn].kindred;
+	tempflags = ch[cn].flags;
 	
 	ch[cn].kindred = ch_temp[t].kindred;
 	
@@ -4843,6 +5029,8 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 	
 	if (tempkin & KIN_CLANKWAI) ch[cn].kindred |= KIN_CLANKWAI;
 	else if (tempkin & KIN_CLANGORN) ch[cn].kindred |= KIN_CLANGORN;
+	
+	if (tempkin & KIN_IDENTIFY) ch[cn].kindred |= KIN_IDENTIFY;
 
 	ch[cn].temp = t;
 	ch[cn].weapon_bonus = ch_temp[t].weapon_bonus;

@@ -24,12 +24,14 @@ void pkt_list(void);
 unsigned long long rdtsc(void);
 
 // -- global --
+void sanguine_spawners(int cn);
 void global_tick(void);
 
 // -- populate --
 void populate(void);
 void pop_remove(void);
 void init_lights(void);
+int pop_create_bonus(int cn);
 int pop_create_bonus_belt(int cn);
 int pop_create_char(int n, int drop);
 void pop_wipe(void);
@@ -108,7 +110,7 @@ int char_wears_item(int cn, int tmp);
 
 // --- god ---
 void god_init_freelist(void);
-
+int god_copy_buff(int in);
 int god_create_buff(void);
 int god_create_item(int temp);
 int god_create_char(int temp, int withitems);
@@ -188,6 +190,7 @@ void god_reset_player(int cn, int co);
 void god_reset_players(int cn, int r);
 void god_reset_npcs(int cn);
 void god_reset_ticker(int cn);
+void god_reset_grey(int cn);
 
 // ---- do ----
 void do_log(int cn, int font, char *text);
@@ -384,6 +387,7 @@ void create_soultrans_equipment(int cn, int in, int rank);
 void create_random_talisman_equipment(int cn, int in2);
 int set_enchantment(int cn, int v);
 int use_talisman(int cn, int in, int in2);
+int use_corruptor(int cn, int in, int in2);
 int use_soulstone(int cn, int in, int in2);
 int use_soulfocus(int cn, int in);
 int use_soulcatalyst(int cn, int in);
@@ -403,6 +407,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext);
 int has_buff(int cn, int bu_temp);
 void remove_buff(int cn, int bu_temp);
+int spell_metabolism(int power, int metabolism);
 int spell_immunity(int power, int immun);
 int spell_race_mod(int power, int cn);
 int friend_is_enemy(int cn, int cc);
@@ -415,7 +420,7 @@ int has_spell_from_item(int cn, int temp);
 int add_spell(int cn, int in);
 void remove_shadow(int cn);
 void remove_spells(int cn);
-void remove_all_spells(int cn);
+void remove_all_spells(int cn, int flag);
 int is_facing(int cn, int co);
 int is_back(int cn, int co);
 int is_near(int cn, int co, int v);
@@ -427,9 +432,11 @@ int spell_mshield(int cn, int co, int power, int fromscroll);
 int spell_haste(int cn, int co, int power, int fromscroll);
 int spell_identify(int cn, int co, int in);
 int spell_heal(int cn, int co, int power);
+int skill_plague(int cn, int co, int flag);
 int chance_compare(int co, int offense, int defense, int usemana);
 int get_target_resistance(int cn, int co);
 int get_target_immunity(int cn, int co);
+int get_target_metabolism(int co);
 int spell_curse(int cn, int co, int power, int flag);
 int spell_slow(int cn, int co, int power, int flag);
 int spell_poison(int cn, int co, int power, int flag);
@@ -439,8 +446,12 @@ int spell_blind(int cn, int co, int power, int flag);
 int spell_frostburn(int cn, int co, int power);
 int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2);
 int spell_blast(int cn, int co, int power, int co_orig, int aoe);
+int spell_shock(int cn, int co, int power);
+int spell_charge(int cn, int co, int power);
 int skill_lookup(char *skill);
 int skill_rally(int cn, int power);
+void skill_leap(int cn, int flag);
+void skill_shift(int cn, int force);
 int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
 int player_or_ghost(int cn, int co);
 

@@ -39,6 +39,8 @@
 #define CT_CASTERCOMP	  26
 #define CT_ARCHCASTER  	  27
 
+#define CT_LYCANTHROPE	1554
+
 #define CT_INNKEEPER   	  28
 #define CT_BISHOP    	  29
 #define CT_PRIEST    	  30
@@ -112,6 +114,7 @@
 #define CT_LAB12_BOSS	 728	// Barbarian
 
 #define CT_LAB13_KEEP	 849
+#define CT_LYCAN_KEEP	1555
 
 #define CT_LAB14_BOSS	1453	// Dwarf
 #define CT_LAB15_BOSS	1455	// Vampire
@@ -158,6 +161,8 @@
 
 #define CT_EALDWULF		1375
 #define CT_ZANA			1382
+#define CT_NULLAN		1557
+#define CT_DVOID		1558
 
 #define BS_RC			  20
 #define BS_COUNTER		  18
@@ -273,6 +278,12 @@
 // -----
 
 #define IT_EXPLOSION	2922
+#define IT_SANGPORT		3308
+#define IT_SANGCRYS1	3306
+#define IT_SANGCRYS2	3307
+#define IT_SANGCRYS3	3309
+#define IT_SANGCRYS4	3310
+#define IT_CORRUPTOR	3312
 
 // -----
 
@@ -281,6 +292,7 @@
 
 #define IT_ARENANOTE	 687
 #define IT_SEYANKEY		 664
+#define IT_LYCANKEY		3231
 #define IT_TOMBSTONE 	 170
 #define IT_LAGSCROLL 	 500
 
@@ -330,6 +342,10 @@
 #define IT_BL_SOLAR		2395
 #define IT_BL_LUNAR		2396
 #define IT_BL_ECLIPSE	2397
+
+#define IT_BL_RED		 628
+#define IT_BL_BLUE		3341
+#define IT_BL_GEMINI	3342
 
 // Tarot Cards - used with WN_CHARM
 #define IT_CH_FOOL		1513
@@ -429,7 +445,7 @@
 #define IT_WP_BRONCHIT	  	2551
 #define IT_WP_VOLCANF	  	2552
 
-#define IT_WP_QUICKSILV		9991
+#define IT_WP_QUICKSILV		3372
 #define IT_WP_PUTRIDIRE		2789
 #define IT_WP_BLOODYSCY		2790
 #define IT_WP_FLAGBEAR		9994
@@ -441,6 +457,8 @@
 #define IT_WP_GUNGNIR		9999
 #define REQ_LAME		    8000
 
+#define IT_WP_SUNSWORD		3201
+
 // Other
 
 #define IT_SILVAMMY			2104
@@ -450,6 +468,20 @@
 #define IT_GAMBLERFAL		2484
 #define IT_WHITEBELT		2486
 #define IT_BONEARMOR		2481
+
+#define IT_SIGNET_TE		3343
+#define IT_SIGNET_MR		3344
+#define IT_SIGNET_HA		3345
+#define IT_SIGNET_AT		3346
+#define IT_SIGNET_SK		3347
+#define IT_SIGNET_WA		3348
+#define IT_SIGNET_SO		3349
+#define IT_SIGNET_SU		3350
+#define IT_SIGNET_AH		3351
+#define IT_SIGNET_SE		3352
+#define IT_SIGNET_BR		3353
+#define IT_SIGNET_LY		3354
+#define IT_SIGNET_XX		3355
 #define IT_ICELOTUS			2796
 
 #define IT_COMMAND1			3126
@@ -463,6 +495,8 @@
 #define IT_CHALICE5			3195
 #define IT_XIXDOOR			3186
 #define IT_XIXDARKSUN		3187
+
+#define IT_CHROMEYE			3227
 
 // -----
 
@@ -686,7 +720,7 @@
 #define IT_SHIE_STEL	 287
 #define IT_SWOR_STEL	 288
 #define IT_DUAL_STEL	 289
-#define IT_DAGG_STEL	 284
+#define IT_DAGG_STEL	 284 //
 #define IT_STAF_STEL	 285
 #define IT_SPEA_STEL	 286
 #define IT_CLAW_STEL	1779
@@ -696,7 +730,7 @@
 #define IT_SHIE_GOLD	 526
 #define IT_SWOR_GOLD	 527
 #define IT_DUAL_GOLD	 528
-#define IT_DAGG_GOLD	 523
+#define IT_DAGG_GOLD	 523 //
 #define IT_STAF_GOLD	 524
 #define IT_SPEA_GOLD	 525
 #define IT_CLAW_GOLD	1780
@@ -706,7 +740,7 @@
 #define IT_SHIE_EMER	 535
 #define IT_SWOR_EMER	 536
 #define IT_DUAL_EMER	 537
-#define IT_DAGG_EMER	 532
+#define IT_DAGG_EMER	 532 //
 #define IT_STAF_EMER	 533
 #define IT_SPEA_EMER	 534
 #define IT_CLAW_EMER	1781
@@ -716,7 +750,7 @@
 #define IT_SHIE_CRYS	 544
 #define IT_SWOR_CRYS	 545
 #define IT_DUAL_CRYS	 546
-#define IT_DAGG_CRYS	 541
+#define IT_DAGG_CRYS	 541 //
 #define IT_STAF_CRYS	 542
 #define IT_SPEA_CRYS	 543
 #define IT_CLAW_CRYS	1782
@@ -726,7 +760,7 @@
 #define IT_SHIE_TITN	 575
 #define IT_SWOR_TITN	 576
 #define IT_DUAL_TITN	 577
-#define IT_DAGG_TITN	 572
+#define IT_DAGG_TITN	 572 //
 #define IT_STAF_TITN	 573
 #define IT_SPEA_TITN	 574
 #define IT_CLAW_TITN	1783
@@ -736,7 +770,7 @@
 #define IT_SHIE_ADAM	 696
 #define IT_SWOR_ADAM	 697
 #define IT_DUAL_ADAM	 698
-#define IT_DAGG_ADAM	 693
+#define IT_DAGG_ADAM	 693 //
 #define IT_STAF_ADAM	 694
 #define IT_SPEA_ADAM	 695
 #define IT_CLAW_ADAM	1784
@@ -746,7 +780,7 @@
 #define IT_SHIE_DAMA	2047
 #define IT_SWOR_DAMA	2048
 #define IT_DUAL_DAMA	2049
-#define IT_DAGG_DAMA	2044
+#define IT_DAGG_DAMA	2044 //
 #define IT_STAF_DAMA	2045
 #define IT_SPEA_DAMA	2046
 #define IT_CLAW_DAMA	2053
@@ -773,6 +807,14 @@
 #define IT_BODY_WIZR	 354
 #define IT_HELM_DAMA	2028
 #define IT_BODY_DAMA	2030
+#define IT_HELM_LIZR	2033
+#define IT_BODY_LIZR	2035
+#define IT_HELM_MIDN	2038
+#define IT_BODY_MIDN	2040
+#define IT_HELM_AZUR	3322
+#define IT_BODY_AZUR	3324
+#define IT_HELM_IVOR	3327
+#define IT_BODY_IVOR	3329
 
 // ----- Books
 
@@ -791,6 +833,9 @@
 #define IT_BOOK_DEVI	2793
 #define IT_BOOK_BURN	2794
 #define IT_BOOK_VERD	2795
+#define IT_BOOK_MALT	3337
+#define IT_BOOK_GRAN	3338
+
 
 // ----- Casino
 
@@ -866,11 +911,12 @@
 #define BUF_SPR_BLESS		88
 #define BUF_SPR_MSHIELD		95
 #define BUF_SPR_HASTE		94
-#define BUF_SPR_HEALSICK	119
+#define BUF_SPR_HEALSICK	6721
 #define BUF_SPR_CURSE		89
 #define BUF_SPR_SLOW		149
 #define BUF_SPR_POISON		178
-#define BUF_SPR_VENOM		1011
+#define BUF_SPR_VENOM		6731
+#define BUF_SPR_PLAGUE		1015
 #define BUF_SPR_RECALL		90
 #define BUF_SPR_SHADOW		179
 #define BUF_SPR_REND		224
@@ -879,10 +925,14 @@
 #define BUF_SPR_WARCRY3		822
 //
 #define BUF_SPR_RAGE		700
+#define BUF_SPR_CALM		1011
 #define BUF_SPR_ARIA		701
 #define BUF_SPR_ARIA2		702
 #define BUF_SPR_LETHARGY	703
 #define BUF_SPR_AGGRAVATE	1009
+#define BUF_SPR_SHIFT		119
+#define BUF_SPR_SHOCK		6741
+#define BUF_SPR_CHARGE		6746
 //
 #define BUF_SPR_BLEED		411
 #define BUF_SPR_REND2		329
@@ -896,6 +946,7 @@
 #define BUF_SPR_FIRE		487
 #define BUF_SPR_COLD		3494
 #define BUF_SPR_VANTA		3493
+#define BUF_SPR_SANGUINE	617
 //
 #define BUF_SPR_IMMUNI		497
 #define BUF_SPR_INNOCU		498
@@ -905,7 +956,7 @@
 #define BUF_SPR_TAUNT		489
 #define BUF_SPR_GUARD		518
 #define BUF_SPR_ZEPHYR		519
-#define BUF_SPR_ZEPHYR2		617
+#define BUF_SPR_ZEPHYR2		6726
 #define BUF_SPR_DOUSE		618
 //
 #define BUF_SPR_POTION		619

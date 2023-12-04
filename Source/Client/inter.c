@@ -959,44 +959,46 @@ void meta_stat_descs(int n)
 			case 19: if (pl.skill[40][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Cleave skill."); break;
 			case 20: if (pl.skill[49][0])
-					 xlog(1,"Damage dealt by your Leap skill when your target is the same as the enemy you're fighting."); break;
+					 xlog(1,"Damage dealt by your Leap skill if your target is at or near maximum hitpoints."); break;
 			case 21: if (pl.skill[49][0])
 					 xlog(1,"Damage dealt by your Leap skill, before reduction from target Parry Score and Armor Value. Surrounding targets take 3/4 of this value."); break;
 			case 22: if (pl.skill[49][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Leap skill."); break;
-			case 23: if (pl.skill[14][0])
-					 xlog(1,"Effective increase to %s granted while under the effect of your Rage skill.", (pl_flagb&(1<<3))?"Top Damage":"Weapon Value"); break;
-			case 24: if (pl.skill[24][0]) 
+			case 23: if (pl.skill[22][0] && !IS_SHIFTED)
+					 xlog(1,"Effective increase to top damage granted while under the effect of your Rage skill."); break;
+			case 24: if (pl.skill[22][0] && !IS_SHIFTED)
+					 xlog(1,"Effective multiplier to damage over time granted while under the effect of your Rage skill."); break;
+			case 25: if (pl.skill[24][0]) 
 					 xlog(1,"Damage dealt by your Blast spell, before reduction from target Immunity and Armor Value. Surrounding targets take 3/4 of this value."); break;
-			case 25: if (pl.skill[24][0])
+			case 26: if (pl.skill[24][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Blast spell."); break;
-			case 26: if (pl.skill[15][0]) 
+			case 27: if (pl.skill[15][0]) 
 					 xlog(1,"Effective penetration of target Immunity and Resistance when casting debuffs."); break;
-			case 27: if (pl.skill[42][0]) {
+			case 28: if (pl.skill[42][0]) {
 					 if (pl_flagb&(1<<14)) xlog(1,"Effective damage over time dealt by your Poison spell, before reduction from target Immunity.");
 					 else xlog(1,"Effective damage over time dealt by each individual stack of your Venom spell, before reduction from target Immunity. This can be stacked up to three times."); } break;
-			case 28: if (pl.skill[42][0])
+			case 29: if (pl.skill[42][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your %s spell.", (pl_flagb&(1<<14))?"Venom":"Poison"); break;
-			case 29: if (pl.skill[43][0]  ||(pl_flagc&(1<<13))) { 
-					 if ((pl_flagb&(1<<6))||(pl_flagc&(1<<13))) { xlog(1,"Effective damage over time dealt to nearby enemies while affected by Immolate, before reduction from enemy Immunity."); }
-					 else                                       { xlog(1,"Damage dealt by the Pulse spell to surrounding targets when pulsing, before reduction from target Immunity and Armor Value."); } } break;
-			case 30: if (pl.skill[43][0] && !(pl_flagb&(1<<6)))
+			case 30: if (pl.skill[43][0]) { 
+					 if (pl_flagb&(1<<6)) { xlog(1,"Healing caused by the Pulse spell to surrounding allies when pulsing."); }
+					 else                 { xlog(1,"Damage dealt by the Pulse spell to surrounding enemies when pulsing, before reduction from target Immunity and Armor Value."); } } break;
+			case 31: if (pl.skill[43][0])
 					 xlog(1,"Number of pulses expected during the duration of your Pulse spell, determined by the rate of pulses from Cooldown Rate."); break;
-			case 31: if (pl.skill[43][0]  ||(pl_flagc&(1<<13)))
-					 xlog(1,"Skill exhaustion duration expected upon using your %s spell.", ((pl_flagb&(1<<6))||(pl_flagc&(1<<13)))?"Immolate":"Pulse"); break;
-			case 32: if (pl.skill[ 7][0])
-					 xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); break;
+			case 32: if (pl.skill[43][0])
+					 xlog(1,"Skill exhaustion duration expected upon using your Pulse spell."); break;
 			case 33: if (pl.skill[ 7][0])
-					 xlog(1,"Skill exhaustion duration expected upon using your Zephyr spell."); break;
-			case 34: if (pl.skill[27][0])
+					 xlog(1,"Damage granted by your Zephyr spell, before reduction from target Parry Score and Armor Value. This occurs one second after a successful hit."); break;
+			case 34: if (pl_flagc&(1<<13))
+					 xlog(1,"Effective damage over time dealt to nearby enemies while affected by Immolate, before reduction from enemy Immunity."); break;
+			case 36: if (pl.skill[27][0])
 					 xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); break;
-			case 35: if (pl.skill[27][0])
+			case 37: if (pl.skill[27][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Ghost Companion spell."); break;
-			case 36: if (pl.skill[46][0])
-					 xlog(1,"Effective power of your Shadow Copy, granted by your Shadow Copy spell. A higher number grants a stronger companion."); break;
-			case 37: if (pl.skill[46][0])
-					 xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell."); break;
 			case 38: if (pl.skill[46][0])
+					 xlog(1,"Effective power of your Shadow Copy, granted by your Shadow Copy spell. A higher number grants a stronger companion."); break;
+			case 39: if (pl.skill[46][0])
+					 xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell."); break;
+			case 40: if (pl.skill[46][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Shadow Copy spell."); break;
 			//
 			default: break;
@@ -1025,7 +1027,7 @@ void meta_stat_descs(int n)
 			case 12: if (pl_aoebn)
 					 xlog(1,"Total AoE Bonus is a flat increase to area-of-effect skills."); break;
 			case 13: xlog(1,"Aptitude Bonus granted to target allies when casting friendly spells. This is granted by Willpower."); break;
-			case 14: xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Swimming skill, and can be further reduced by other items."); break;
+			case 14: xlog(1,"Rate at which health is lost while underwater. This can be reduced by the Metabolism skill, and can be further reduced by other items."); break;
 			//
 			case 17: if (pl.skill[21][0])
 					 xlog(1,"Estimated increase to attributes granted by your Bless spell."); break;
@@ -1039,40 +1041,44 @@ void meta_stat_descs(int n)
 					 xlog(1,"Estimated duration of your Magic %s, not including reductions from %s.", (pl_flagb&(1<<10))?"Shell":"Shield", (pl_flagb&(1<<10))?"taking or avoid debuffs":"taking damage"); break;
 			case 22: if (pl.skill[47][0])
 					 xlog(1,"Estimated increase to Speed granted by your Haste spell."); break;
-			case 23: if (pl.skill[26][0])
+			case 23: if (pl.skill[22][0] && IS_SHIFTED)
+					 xlog(1,"Effective reduction to incoming top damage granted while under the effect of your Calm skill."); break;
+			case 24: if (pl.skill[22][0] && IS_SHIFTED)
+					 xlog(1,"Effective multiplier to incoming damage over time granted while under the effect of your Calm skill."); break;
+			case 25: if (pl.skill[26][0])
 					 xlog(1,"Effective %s expected when casting your %s spell.", (pl_flags&(1<<14))?"healing over time":"flat healing", (pl_flags&(1<<14))?"Regen":"Heal"); break;
-			case 24: if (pl.skill[37][0])  {
+			case 26: if (pl.skill[37][0])  {
 					 if (pl_flagb&(5<<11)) { xlog(1,"Effective reduction of target Spell Modifier when using your Blind (Douse) skill, before reduction from target Immunity."); }
 					 else                  { xlog(1,"Effective reduction of target Hit and Parry Scores when using your Blind skill, before reduction from target Immunity."); } } break;
-			case 25: if (pl.skill[37][0])
+			case 27: if (pl.skill[37][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your %s skill.", (pl_flagb&(1<<11))?"Douse":"Blind"); break;
-			case 26: if (pl.skill[35][0])  {
+			case 28: if (pl.skill[35][0])  {
 					 if (pl_flagb&(1<<12)) { xlog(1,"Effective bonus to hit and parry score granted to allies when using your Rally skill. Half of this value is granted to yourself as well."); }
 					 else                  { xlog(1,"Effective reduction of target attributes when using your Warcry skill, before reduction from target Immunity."); } } break;
-			case 27: if (pl.skill[35][0])
+			case 29: if (pl.skill[35][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your %s skill.", (pl_flagb&(1<<12))?"Rally":"Warcry"); break;
-			case 28: if (pl.skill[41][0]) {
+			case 30: if (pl.skill[41][0]) {
 					 if (pl_flags&(1<<10)) xlog(1,"Effective reduction of target Armor Value when using your Crush skill, before reduction from target Immunity.");
 					 else xlog(1,"Effective reduction of target Weapon Value when using your Weaken skill, before reduction from target Immunity."); } break;
-			case 29: if (pl.skill[41][0])
+			case 31: if (pl.skill[41][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your %s skill.", (pl_flags&(1<<10))?"Crush":"Weaken"); break;
-			case 30: if (pl.skill[20][0])
+			case 32: if (pl.skill[20][0])
 					 xlog(1,"Effective reduction of target attributes when casting your Curse spell, before reduction from target Immunity."); break;
-			case 31: if (pl.skill[20][0])
+			case 33: if (pl.skill[20][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Curse spell."); break;
-			case 32: if (pl.skill[19][0])
+			case 34: if (pl.skill[19][0])
 					 xlog(1,"Effective reduction of target action speed when casting your Slow spell, before reduction from target Immunity."); break;
-			case 33: if (pl.skill[19][0])
+			case 35: if (pl.skill[19][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Slow spell."); break;
-			case 34: if (pl.skill[27][0])
+			case 36: if (pl.skill[27][0])
 					 xlog(1,"Effective power of your Ghost Companion, granted by your Ghost Companion spell. A higher number grants a stronger companion."); break;
-			case 35: if (pl.skill[27][0])
+			case 37: if (pl.skill[27][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Ghost Companion spell."); break;
-			case 36: if (pl.skill[46][0])
-					 xlog(1,"Effective power of your Shadow Copy, granted by your Shadow Copy spell. A higher number grants a stronger companion."); break;
-			case 37: if (pl.skill[46][0])
-					 xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell."); break;
 			case 38: if (pl.skill[46][0])
+					 xlog(1,"Effective power of your Shadow Copy, granted by your Shadow Copy spell. A higher number grants a stronger companion."); break;
+			case 39: if (pl.skill[46][0])
+					 xlog(1,"Effective duration of your Shadow Copy, granted by your Shadow Copy spell."); break;
+			case 40: if (pl.skill[46][0])
 					 xlog(1,"Skill exhaustion duration expected upon using your Shadow Copy spell."); break;
 			//
 			default: break;
@@ -1185,7 +1191,7 @@ int mouse_statbox2(int x,int y,int state)
 		if (hudmode==0 || hudmode==3)
 		{
 			m = skilltab[n+skill_pos].nr;
-			if (pl.skill[m][0] || m==50 || m==51) 
+			if (pl.skill[m][0] || m==50 || m==51 || (m==52 && KNOW_IDENTIFY) || ((m==53 || m==54) && IS_LYCANTH))
 			{
 				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
 						(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
@@ -1193,14 +1199,15 @@ int mouse_statbox2(int x,int y,int state)
 						(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
 						(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
 						(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Bleed
+						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
 						(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-						(m== 7&&(pl_flagb & (1 <<  5))) ||  // Zephyr
-						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Immolate
+						(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
+						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
 						(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
 						(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
 						(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-						(m==14&&(pl_flagb & (1 <<  3)))     // Rage -> Frenzy
+						(m==14&&(pl_flagb & (1 <<  3))) ||  // Finesse invert
+						(m==22&&IS_SHIFTED)
 					)
 				{
 					strcpy(tmp, skilltab[n+skill_pos].alt_a);
@@ -1210,11 +1217,11 @@ int mouse_statbox2(int x,int y,int state)
 				{
 					strcpy(tmp, skilltab[n+skill_pos].name);
 					if (IS_BRAVER)
-						xlog(1,skilltab[n+skill_pos].alt_a); // Braver
+						xlog(1,skilltab[n+skill_pos].desc); // Braver
 					else if (IS_SORCERER)
-						xlog(1,skilltab[n+skill_pos].alt_b); // Sorcerer
+						xlog(1,skilltab[n+skill_pos].alt_a); // Sorcerer
 					else if (IS_ARCHHARAKIM)
-						xlog(1,skilltab[n+skill_pos].alt_c); // Arch-Harakim
+						xlog(1,skilltab[n+skill_pos].alt_b); // Arch-Harakim
 					else
 						xlog(1,"Passively improves the area-of-effect of various skills and spells.");
 				}
@@ -1682,6 +1689,58 @@ int mouse_tree(int x, int y, int mode)
 		
 		hightlight=HL_SKTREE;
 		hightlight_sub=nr;
+		return 1;
+	}
+	
+	// prevent clicking the world behind the menu
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
+	{
+		return 1;
+	}
+	
+	return 0;
+}
+
+int mouse_book(int x,int y,int mode)
+{
+	int nr, tx, ty;
+	
+	if (!show_book) return 0;
+	
+	// Close Window
+	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
+	{
+		if (mode==MS_LB_UP) 
+		{ 
+			if (show_newp) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
+			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
+			show_book=0;
+			noshop=QSIZE*3;
+		}
+		return 1;
+	}
+	
+	// [Bottom left button]
+	if (x>(GUI_SHOP_X+11) && x<(GUI_SHOP_X+58) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
+	{
+		if (mode==MS_LB_UP) 
+		{ 
+			tuto_page--; 
+			if (tuto_page<=1) tuto_page=1;
+			else play_sound("sfx\\click.wav",CLICKVOL,0);
+		}
+		return 1;
+	}
+	
+	// [Bottom right button]
+	if (x>(GUI_SHOP_X+223) && x<(GUI_SHOP_X+270) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
+	{
+		if (mode==MS_LB_UP) 
+		{
+			tuto_page++; 
+			if (tuto_page>=tuto_max) tuto_page=tuto_max;
+			else play_sound("sfx\\click.wav",CLICKVOL,0);
+		}
 		return 1;
 	}
 	
