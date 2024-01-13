@@ -8,7 +8,7 @@
 
 #define max(a, b)				((a)>(b) ? (a) : (b))
 #define min(a, b)				((a)<(b) ? (a) : (b))
-#define RANDOM(a)				(a>0?random()%(a):0)
+#define RANDOM(a)				(a>1?random()%(a):0)
 #define ARRAYSIZE(a)			(sizeof(a)/sizeof(a[0]))
 #define sqr(a)					((a) * (a))
 
@@ -71,7 +71,7 @@
 #define IS_SANEITEMPLATE(tn) 	((tn) > 0 && (tn) < MAXTITEM)
 #define IS_SANECTEMPLATE(tn) 	((tn) > 0 && (tn) < MAXTCHARS)
 
-#define IS_LONG_RESPAWN(temp) 	(temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR || temp==CT_BSMAGE1 || temp==CT_BSMAGE2 || temp==CT_BSMAGE3 || temp==CT_SCORP_Q)
+#define IS_LONG_RESPAWN(temp) 	(temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR || temp==CT_VILEQUEEN || temp==CT_BSMAGE1 || temp==CT_BSMAGE2 || temp==CT_BSMAGE3 || temp==CT_SCORP_Q)
 
 /* *** CHARACTERS *** */
 
@@ -211,7 +211,7 @@
 #define BLEEDFORM(p, d)			(((p+ 5) *  750) / d)
 
 // Plague's formula
-#define PLAGUEFORM(p, d)		(((p+ 5) * 2250) / d)
+#define PLAGUEFORM(p, d)		(((p+ 5) * 2000) / d)
 
 // Frostburn's formula (degen per tick)
 #define FROSTBFORM(p, d)		(((p+10) * 1000) / d)

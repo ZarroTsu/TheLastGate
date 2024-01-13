@@ -1430,6 +1430,9 @@ int change_xp_shop_item(int cn, int nr)
 int get_special_item(int cn, int in, int gen_a, int gen_b, int gen_c)
 {
 	int in2;
+	
+	if (!in) return 0;
+	
 	switch(in)
 	{
 		// Create an enchanted weapon
@@ -1684,43 +1687,46 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 		case  0: 
 		case  1: 
 			if (legendary) pref = "Leo "; else pref = "Lion's ";
-			it[in].attrib[AT_BRV][0] += 4 * mul; 
+			it[in].attrib[AT_BRV][0] += 4 * mul;
 			break;
 		case  2: 
 		case  3: 
-			if (legendary) pref = "Anguis "; else pref = "Snake's "; 
-			it[in].attrib[AT_WIL][0] += 4 * mul; 
+			if (legendary) pref = "Anguis "; else pref = "Snake's ";
+			it[in].attrib[AT_WIL][0] += 4 * mul;
 			break;
 		case  4: 
 		case  5: 
-			if (legendary) pref = "Ibis "; else pref = "Owl's "; 
-			it[in].attrib[AT_INT][0] += 4 * mul; 
+			if (legendary) pref = "Ibis "; else pref = "Owl's ";
+			it[in].attrib[AT_INT][0] += 4 * mul;
 			break;
 		case  6: 
 		case  7: 
-			if (legendary) pref = "Mus "; else pref = "Weasel's "; 
-			it[in].attrib[AT_AGL][0] += 4 * mul; 
+			if (legendary) pref = "Mus "; else pref = "Weasel's ";
+			it[in].attrib[AT_AGL][0] += 4 * mul;
 			break;
 		case  8: 
 		case  9: 
-			if (legendary) pref = "Ursa "; else pref = "Bear's "; 
-			it[in].attrib[AT_STR][0] += 4 * mul; 
+			if (legendary) pref = "Ursa "; else pref = "Bear's ";
+			it[in].attrib[AT_STR][0] += 4 * mul;
 			break;
 		//
 		case 10: 
 		case 11: 
-			if (legendary) pref = "Angelus "; else pref = "Angelic "; 
-			it[in].attrib[AT_BRV][0] += 2 * mul; 
-			it[in].attrib[AT_WIL][0] += 2 * mul; 
-			it[in].attrib[AT_INT][0] += 2 * mul; 
-			it[in].attrib[AT_AGL][0] += 2 * mul; 
-			it[in].attrib[AT_STR][0] += 2 * mul; 
+			if (legendary) pref = "Angelus "; else pref = "Angelic ";
+			it[in].attrib[AT_BRV][0] += 2 * mul;
+			it[in].attrib[AT_WIL][0] += 2 * mul;
+			it[in].attrib[AT_INT][0] += 2 * mul;
+			it[in].attrib[AT_AGL][0] += 2 * mul;
+			it[in].attrib[AT_STR][0] += 2 * mul;
 			break;
 		case 12: 
-		case 13: 
 			if (legendary) pref = "Lux "; else pref = "Glowing "; 
 			it[in].light[0]     += 20 * mul;
-			it[in].spell_apt[0] +=  4 * mul;
+			it[in].spell_apt[0] +=  5 * mul;
+			break;
+		case 13: 
+			if (legendary) pref = "Lepus "; else pref = "Rabbit's "; 
+			it[in].speed[0] += 4 * mul;
 			break;
 		case 14: 
 			if (legendary) pref = "Centurio "; else pref = "Centurion's "; 
@@ -1755,74 +1761,74 @@ int create_special_item(int temp, int gen_a, int gen_b, int gen_c)
 			case  0:
 			case  1:
 				if (legendary) suffix = "Fortem"; else suffix = " of Braveness";
-				it[in].attrib[AT_BRV][0] += 4 * mul;
+				it[in].attrib[AT_BRV][0] += (9 * mul)/2;
 				break;
 			case  2:
 			case  3:
 				if (legendary) suffix = "Autem"; else suffix = " of Willpower";
-				it[in].attrib[AT_WIL][0] += 4 * mul;
+				it[in].attrib[AT_WIL][0] += (9 * mul)/2;
 				break;
 			case  4:
 			case  5:
 				if (legendary) suffix = "Intuitio"; else suffix = " of Intuition";
-				it[in].attrib[AT_INT][0] += 4 * mul;
+				it[in].attrib[AT_INT][0] += (9 * mul)/2;
 				break;
 			case  6:
 			case  7:
 				if (legendary) suffix = "Agilitas"; else suffix = " of Agility";
-				it[in].attrib[AT_AGL][0] += 4 * mul;
+				it[in].attrib[AT_AGL][0] += (9 * mul)/2;
 				break;
 			case  8:
 			case  9:
 				if (legendary) suffix = "Viribus"; else suffix = " of Strength";
-				it[in].attrib[AT_STR][0] += 4 * mul;
+				it[in].attrib[AT_STR][0] += (9 * mul)/2;
 				break;
 			case 10:
 			case 11:
 				if (legendary) suffix = "Callidus"; else suffix = " of the Adept";
-				it[in].attrib[AT_BRV][0] += 2 * mul; 
-				it[in].attrib[AT_WIL][0] += 2 * mul; 
-				it[in].attrib[AT_INT][0] += 2 * mul; 
-				it[in].attrib[AT_AGL][0] += 2 * mul; 
-				it[in].attrib[AT_STR][0] += 2 * mul; 
+				it[in].attrib[AT_BRV][0] += (5 * mul)/2; 
+				it[in].attrib[AT_WIL][0] += (5 * mul)/2; 
+				it[in].attrib[AT_INT][0] += (5 * mul)/2; 
+				it[in].attrib[AT_AGL][0] += (5 * mul)/2; 
+				it[in].attrib[AT_STR][0] += (5 * mul)/2; 
 				break;
 			//
 			case 12:
 				if (legendary) suffix = "Vitale"; else suffix = " of Vitality";
 				it[in].hp[0] += 40 * mul;
-				it[in].skill[SK_REGEN][0] += 4 * mul;
+				it[in].skill[SK_REGEN][0] += (9 * mul)/2;
 				break;
 			case 13:
 				if (legendary) suffix = "Vigor"; else suffix = " of Vigor";
 				it[in].end[0] += 20 * mul;
-				it[in].skill[SK_REST][0]  += 4 * mul;
+				it[in].skill[SK_REST][0]  += (9 * mul)/2;
 				break;
 			case 14:
 				if (legendary) suffix = "Spiritus"; else suffix = " of Spirits";
 				it[in].mana[0] += 40 * mul;
-				it[in].skill[SK_MEDIT][0] += 4 * mul;
+				it[in].skill[SK_MEDIT][0] += (9 * mul)/2;
 				break;
 			case 15:
 				if (legendary) suffix = "Impetus"; else suffix = " of Offense";
-				it[in].weapon[0] += 4 * mul;
+				it[in].weapon[0] += (7 * mul)/2;
 				break;
 			case 16:
 				if (legendary) suffix = "Defendere"; else suffix = " of Defense";
-				it[in].armor[0] += 4 * mul;
+				it[in].armor[0] += (7 * mul)/2;
 				break;
 			case 17:
 				if (legendary) suffix = "Perfugium"; else suffix = " of Resisting";
-				it[in].skill[SK_IMMUN][0]  += 3 * mul;
-				it[in].skill[SK_RESIST][0] += 3 * mul;
+				it[in].skill[SK_IMMUN][0]  += (7 * mul)/2;
+				it[in].skill[SK_RESIST][0] += (7 * mul)/2;
 				break;
 			case 18:
 				if (legendary) suffix = "Incantator"; else suffix = " of Wizardry";
-				it[in].spell_mod[0] += 1 * mul;
+				it[in].spell_mod[0] += (3 * mul)/2;
 				break;
 			case 19:
 				if (legendary) suffix = "Bellum"; else suffix = " of Battle";
-				it[in].to_hit[0]   += 3 * mul;
-				it[in].to_parry[0] += 3 * mul;
+				it[in].to_hit[0]   += (5 * mul)/2;
+				it[in].to_parry[0] += (5 * mul)/2;
 				break;
 			//
 			default:
@@ -3617,7 +3623,7 @@ int use_talisman(int cn, int in, int in2)
 		case 55: it[in2].to_hit[0] += 2*mul; it[in2].to_parry[0] += 2*mul; break;
 		case 56: it[in2].enchantment = 33; break;
 		case 57: it[in2].enchantment = 34; inds = 1; break;
-		case 58: it[in2].spell_apt[0] += 12*mul; break;
+		case 58: it[in2].spell_apt[0] += 6*mul; break;
 		case 59: it[in2].enchantment = 35; break;
 		case 60: it[in2].enchantment = 36; break;
 		case 61: it[in2].enchantment = 37; break;

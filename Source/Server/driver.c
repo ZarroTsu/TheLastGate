@@ -412,7 +412,7 @@ int npc_gotattack(int cn, int co, int dam)
 		}
 	}
 
-	if (!do_char_can_see(cn, co))    // we have been attacked but cannot see the attacker
+	if (!do_char_can_see(cn, co, 0))    // we have been attacked but cannot see the attacker
 	{
 		ch[cn].data[78] = globs->ticker + TICKS * 30;
 		return 1;
@@ -423,9 +423,18 @@ int npc_gotattack(int cn, int co, int dam)
 	{
 		if (npc_add_enemy(cn, co, 1))
 		{
-			if (!(ch[co].flags & CF_SILENCE))
+			if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 			{
-				npc_saytext_n(cn, 1, ch[co].name);
+				if (IS_PLAYER_COMP(cn))
+				{
+					if (ch[cn].data[55]+TICKS*2<globs->ticker)
+					{
+						ch[cn].data[55] = globs->ticker;
+						npc_saytext_n(cn, 1, ch[co].name);
+					}
+				}
+				else
+					npc_saytext_n(cn, 1, ch[co].name);
 			}
 			chlog(cn, "Added %s to kill list for attacking me", ch[co].name);
 		}
@@ -534,11 +543,11 @@ int npc_seeattack(int cn, int cc, int co)
 
 	ch[cn].data[92] = TICKS * 60 * 10;
 
-	if (!do_char_can_see(cn, co))
+	if (!do_char_can_see(cn, co, 0))
 	{
 		return 1;                     // processed it: we cannot see the defender, so ignore it
 	}
-	if (!do_char_can_see(cn, cc))
+	if (!do_char_can_see(cn, cc, 0))
 	{
 		return 1;                     // processed it: we cannot see the attacker, so ignore it
 	}
@@ -577,7 +586,7 @@ int npc_seeattack(int cn, int cc, int co)
 		}
 		if (ret)
 		{
-			if (!(ch[c2].flags & CF_SILENCE))
+			if (!(ch[c2].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 			{
 				npc_saytext_n(cn, 1, ch[c2].name);
 			}
@@ -594,7 +603,7 @@ int npc_seeattack(int cn, int cc, int co)
 			ret = npc_add_enemy(cn, cc, 1);
 			if (ret)
 			{
-				if (!(ch[cc].flags & CF_SILENCE))
+				if (!(ch[cc].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[cc].name);
 				}
@@ -610,7 +619,7 @@ int npc_seeattack(int cn, int cc, int co)
 			ret = npc_add_enemy(cn, co, 1);
 			if (ret)
 			{
-				if (!(ch[co].flags & CF_SILENCE))
+				if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
@@ -635,7 +644,7 @@ int npc_seeattack(int cn, int cc, int co)
 			}
 			if (ret)
 			{
-				if (!(ch[cc].flags & CF_SILENCE))
+				if (!(ch[cc].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[cc].name);
 				}
@@ -655,7 +664,7 @@ int npc_seeattack(int cn, int cc, int co)
 			}
 			if (ret)
 			{
-				if ((IS_COMPANION(co) && !(ch[ch[co].data[CHD_MASTER]].flags & CF_SILENCE)) || !(ch[co].flags & CF_SILENCE))
+				if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
@@ -676,7 +685,7 @@ int npc_seeattack(int cn, int cc, int co)
 			if (ch[cn].temp!=CT_SHIVA_I) ret = npc_add_enemy(cn, cc, 1);
 			if (ret)
 			{
-				if (!(ch[cc].flags & CF_SILENCE))
+				if (!(ch[cc].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[cc].name);
 				}
@@ -692,7 +701,7 @@ int npc_seeattack(int cn, int cc, int co)
 			if (ch[cn].temp!=CT_SHIVA_I) ret = npc_add_enemy(cn, co, 1);
 			if (ret)
 			{
-				if (!(ch[co].flags & CF_SILENCE))
+				if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
@@ -776,6 +785,24 @@ int npc_quest_check(int cn, int val)
 		bit = 1 << (val - 32);
 		tmp = ch[cn].data[94] & bit;
 		ch[cn].data[94] |= bit;
+		return(tmp);
+	}
+}
+
+int npc_quest_cleared(int cn, int val)
+{
+	int bit, tmp;
+
+	if (val<32)
+	{
+		bit = 1 << (val);
+		tmp = ch[cn].data[72] & bit;
+		return(tmp);
+	}
+	else
+	{
+		bit = 1 << (val - 32);
+		tmp = ch[cn].data[94] & bit;
 		return(tmp);
 	}
 }
@@ -1437,6 +1464,51 @@ int npc_give(int cn, int co, int in, int money)
 				}
 				// </group rewards>
 			}
+			else if (nr == 55) // Special value to learn 'Spell Knowledge'
+			{
+				do_sayx(cn, "Now I'll teach you how to understand spell effects.");
+				if (ch[co].flags & CF_KNOWSPELL)
+				{
+					do_sayx(cn, "But you already know how to understand spell effects, %s!", ch[co].name);
+					if ((nr = ch[cn].data[51])!=0)
+					{
+						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
+						do_give_exp(co, nr/4, 0, -1);
+					}
+					use_consume_item(cn, in, 1);
+				}
+				else
+				{
+					do_sayx(cn, "Simply cast identify or use the #buffs command, and you will now know what each spell is doing to you!");
+					use_consume_item(cn, in, 1);
+					ch[co].flags |= CF_KNOWSPELL;
+					do_char_log(co, 0, "You learned how to understand spell effects!\n");
+					do_update_char(co);
+					if ((nr = ch[cn].data[51])!=0)
+					{
+						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
+						do_give_exp(co, nr, 0, -1);
+					}
+				}
+				// <group rewards>
+				for (n = 1; n<MAXCHARS; n++)
+				{
+					if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
+					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
+					{
+						int div = 4;
+						if (!(ch[n].flags & CF_KNOWSPELL))
+						{
+							ch[n].flags |= CF_KNOWSPELL;
+							do_char_log(n, 0, "You learned how to understand spell effects!\n");
+							do_update_char(n);
+							div = 1;
+						}
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+					}
+				}
+				// </group rewards>
+			}
 			else if ((qnum = nr) >= 101) // Flags for quests which don't teach skills
 			{
 				tmp = npc_quest_check(co, qnum-101); // Returns 0 if not clear, 1 if already cleared
@@ -1896,7 +1968,7 @@ int npc_see(int cn, int co)
 		return 0;
 	}
 
-	if (!do_char_can_see(cn, co))
+	if (!do_char_can_see(cn, co, 0))
 	{
 		return 1;                     // processed it: we cannot see him, so ignore him
 	}
@@ -1948,7 +2020,7 @@ int npc_see(int cn, int co)
 	}
 	
 	// if we're taunted, try to attack the taunter
-	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc) || ch[cn].data[78]))
+	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc, 0) || ch[cn].data[78]))
 	{
 		// If our last attempt to attack failed, wander near the taunter
 		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78] && ch[cn].data[27]!=1)
@@ -1957,7 +2029,7 @@ int npc_see(int cn, int co)
 			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (do_char_can_see(cn, cc) && ch[cn].attack_cn!=cc)
+		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
 			ch[cn].attack_cn = cc;
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
@@ -2031,7 +2103,7 @@ int npc_see(int cn, int co)
 			}
 			if (co && npc_add_enemy(cn, co, 0))
 			{
-				if (!(ch[co].flags & CF_SILENCE))
+				if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
@@ -2065,8 +2137,9 @@ int npc_see(int cn, int co)
 		
 		if (co && npc_add_enemy(cn, co, 1))
 		{
-			if (!(ch[co].flags & CF_SILENCE))
+			if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE) && ch[cn].data[55]+TICKS*2<globs->ticker)
 			{
+				ch[cn].data[55] = globs->ticker;
 				npc_saytext_n(cn, 1, ch[co].name);
 			}
 			chlog(cn, "Added %s to kill list (gc mode %d)", ch[co].name, ch[cn].data[1]);
@@ -2086,7 +2159,7 @@ int npc_see(int cn, int co)
 		{
 			if (npc_add_enemy(cn, co, 0))
 			{
-				if (!(ch[co].flags & CF_SILENCE))
+				if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 				{
 					npc_saytext_n(cn, 1, ch[co].name);
 				}
@@ -2365,6 +2438,15 @@ int npc_see(int cn, int co)
 					do_sayx(cn, "Hello, %s. Have you identified anything interesting lately?", ch[co].name);
 			}
 			//
+			else if (strcmp(ch[cn].text[2], "#quest055")==0) // 	55 - Iggy / Mine 3 / Devil's Doorway
+			{
+				if (getrank(co)<13) // Lt Col
+					do_sayx(cn, "Greetings and salutations, %s! Come back later, would you? I'm very busy!", ch[co].name);
+				else if (!(ch[co].flags & CF_KNOWSPELL))
+					do_sayx(cn, "Greetings and salutations, %s! I'm in need of a very odd book which I believe you may find in the deepest part of the Mines. Bring it to me, and I would teach you how to better understand the effects of spells!", ch[co].name);
+				else
+					do_sayx(cn, "Greetings and salutations, %s! No, my hair isn't on fire this time, thanks for asking!", ch[co].name);
+			}
 			else if (strcmp(ch[cn].text[2], "#quest100")==0) // 	0 - Mansion / Shield / Appraisal
 			{
 				if (!(ch[co].flags & CF_APPRAISE))
@@ -2667,7 +2749,7 @@ int npc_see(int cn, int co)
 				if (getrank(co)<11) // Captain
 					do_sayx(cn, "Greetings, %s. Enter the room to my left to take a break.", ch[co].name);
 				else
-					do_sayx(cn, "Greetings, %s. There have been sightings of a living gargoyle made of snow to the east, carrying a Sapphire Chalice. Bring this calice back to me, and I will reward you well.", ch[co].name);
+					do_sayx(cn, "Greetings, %s. There have been sightings of a living gargoyle made of snow to the east, carrying a Sapphire Chalice. Bring this chalice back to me, and I will reward you well.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest147")==0) //   47 - Superintendant - Thugs 2
 			{
@@ -2709,14 +2791,18 @@ int npc_see(int cn, int co)
 			//
 			else if (strcmp(ch[cn].text[2], "#quest156")==0) //   56 - Brye - Temple in the Sky
 			{
-				if (getrank(co)<19) // FDM
+				if (npc_quest_cleared(co, 156))
+					do_sayx(cn, "Welcome, %s. Thanks again!", ch[co].name);
+				else if (getrank(co)<19) // FDM
 					do_sayx(cn, "Welcome, %s.", ch[co].name);
 				else
 					do_sayx(cn, "Welcome, %s. Legends tell of a temple floating on the clouds, and a legendary shield housed deep inside. If you found it for me, I would give you a Scroll of Strength for your efforts. Alas...", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest157")==0) //   57 - Hamako - Coral Axe
 			{
-				if (getrank(co)<19) // FDM
+				if (npc_quest_cleared(co, 157))
+					do_sayx(cn, "Greetings, %s. Do you need anything of me?", ch[co].name);
+				else if (getrank(co)<19) // FDM
 					do_sayx(cn, "Greetings, %s. Please don't touch anything.", ch[co].name);
 				else
 					do_sayx(cn, "Greetings, %s. Long ago I fought a nasty Seagrel King deep in the Pentagram Quest. If you could defeat it, and bring me its axe, I would give you a Scroll of Braveness in return.", ch[co].name);
@@ -2983,13 +3069,13 @@ int npc_hitme(int cn, int co)
 {
 	if (ch[cn].data[26]==4 || (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3))   // generic or candle-keeper
 	{
-		if (!do_char_can_see(cn, co))
+		if (!do_char_can_see(cn, co, 0))
 		{
 			return 1;
 		}
 		if (npc_add_enemy(cn, co, 1))
 		{
-			if (!(ch[co].flags & CF_SILENCE))
+			if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 			{
 				npc_saytext_n(cn, 1, ch[co].name);
 			}
@@ -5895,6 +5981,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 		ch[cn].skill[SK_PERCEPT][1]  = 90;
 		ch[cn].skill[SK_SAFEGRD][1]  =  0;
 		ch[cn].skill[SK_IMMUN][1]    = min(125, fl/2);
+		ch[cn].skill[SK_AXE][0]      = ch[cn].skill[SK_TWOHAND][0]  = 120 - min(100, fl);
 		ch[cn].hp[0]                 = 1000+1000*p;
 		ch[cn].a_hp                  = 9999999;
 		if (has_buff(cn, SK_OPPRESSION)) remove_buff(cn, SK_OPPRESSION);
@@ -5904,8 +5991,8 @@ void pandium_driver(int cn) // CT_PANDIUM
 		strcpy(bu[in].description, "Oppression.");
 		for (m=0;m<5;m++) 
 		{
-			ch[cn].attrib[m][1] = min(127, fl*3/2);
-			bu[in].attrib[m][1] = min(127, fl*3/2);
+			ch[cn].attrib[m][1] = min(127, fl*5/4);
+			bu[in].attrib[m][1] = min(127, fl*5/4);
 		}
 		bu[in].power = fl;
 		bu[in].dmg_reduction[1] = min(127, fl);

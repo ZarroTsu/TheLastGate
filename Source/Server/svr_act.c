@@ -113,8 +113,8 @@ void step_oppressed(int cn, int fl)
 		if (bu[in].power != fl)
 		{
 			bu[in].power = fl;
-			for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl)*2);
-			for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl)*2);
+			for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl));
+			for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl));
 			do_char_log(cn, 0, "You feel the pressure on you shift.\n");
 			do_update_char(cn);
 		}
@@ -128,8 +128,8 @@ void step_oppressed(int cn, int fl)
 		strcpy(bu[in].description, "oppressed.");
 		
 		bu[in].power = fl;
-		for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl)*2);
-		for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl)*2);
+		for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl));
+		for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl));
 		
 		bu[in].active = bu[in].duration = 1;
 		bu[in].flags  = IF_SPELL | IF_PERMSPELL;

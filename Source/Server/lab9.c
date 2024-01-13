@@ -528,7 +528,7 @@ int lab9_guesser_says(int cn, char *text)
 	}
 
 	// does the player see the riddler?
-	if (!do_char_can_see(cn, riddler))
+	if (!do_char_can_see(cn, riddler, 0))
 	{
 		return 0;
 	}

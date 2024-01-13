@@ -71,6 +71,7 @@
 #define CT_DREADKING	 109
 #define CT_SPIDER		 110
 #define CT_LIZEMPEROR	1200
+#define CT_VILEQUEEN	1589
 #define CT_PANDIUM		1335
 #define CT_SHADOW		1432
 

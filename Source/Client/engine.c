@@ -608,8 +608,8 @@ struct sk_tree sk_tree[9][12]={
 		  6618,						"parried hit with 10%% power." },
 		{ "Overlord", 				"0.5%% more effect of Warcry and Rally", 	// NW
 		  6619,						"for every 10 total Strength." },
-		{ "Overwhelming Strength", 	"+10 to Strength Limit.", 	// NN
-		  6620,						"" },
+		{ "Overwhelming Strength", 	"3%% increased total Strength.", 	// NN
+		  6620,						"+10 to Strength Limit." },
 		{ "Censure", 				"Taunt reduces enemy Hit score by 5%%", 	// NE
 		  6621,						"for its duration." },
 		{ "Bastion", 				"20%% of total Resistance is granted as", 	// EN
@@ -632,10 +632,10 @@ struct sk_tree sk_tree[9][12]={
 		  6629,						"" },
 		{ "Enthusiasm", 			"Your Aria additionally grants nearby", 	// WN
 		  6630,						"allies 10%% of your Weapon Value." },
-		{ "Slaying", 				"+2.5%% Critical Multiplier for every 10", 	// NW
+		{ "Slaying", 				"+3%% Critical Multiplier for every 10", 	// NW
 		  6631,						"total Agility." },
-		{ "Overwhelming Agility", 	"+10 to Agility Limit.", 	// NN
-		  6632,						"" },
+		{ "Overwhelming Agility", 	"3%% increased total Agility.", 	// NN
+		  6632,						"+10 to Agility Limit." },
 		{ "Acumen", 				"All melee skills use the attributes", 	// NE
 		  6633,						"(STR+BRV/2) + Agility + Agility." },
 		{ "Impact", 				"Weaken and Crush also reduce enemy", 	// EN
@@ -660,15 +660,15 @@ struct sk_tree sk_tree[9][12]={
 		  6642,						"" },
 		{ "Antagonizer", 			"0.5%% more effect of Blind and Douse", 	// NW
 		  6643,						"for every 10 total Agility." },
-		{ "Harrier", 				"3%% more total Agility and Strength.", 	// NN
-		  6644,						"" },
+		{ "Harrier", 				"3%% increased total Agility and", 	// NN
+		  6644,						"Strength." },
 		{ "Butchery", 				"2%% more effect of Cleave for every", 	// NE
 		  6645,						"10 total Strength." },
 		{ "Champion", 				"Enemies beside and behind you no longer", 	// EN
 		  6646,						"gain a bonus to hitting you." },
 		{ "Zealotry", 				"20%% more total Spell Aptitude.", 	// EE
 		  6647,						"" },
-		{ "Fervor", 				"0.5%% less damage taken per 10 Spell", 	// ES
+		{ "Fervor", 				"2%% less damage taken per 10 Spell", 	// ES
 		  6648,						"Aptitude." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Sorcerer
@@ -686,8 +686,8 @@ struct sk_tree sk_tree[9][12]={
 		  6654,						"" },
 		{ "Coordination", 			"1%% more effect of Lethargy for every", 	// NW
 		  6655,						"10 total Willpower." },
-		{ "Pragmatic", 				"3%% more total Willpower and Intuition.", 	// NN
-		  6656,						"" },
+		{ "Pragmatic", 				"3%% increased total Willpower and", 	// NN
+		  6656,						"Intuition." },
 		{ "Hex Master", 			"0.4%% more effect of Curse and Slow", 	// NE
 		  6657,						"for every 10 total Intuition." },
 		{ "Nimble", 				"You no longer have a parry penalty if", 	// EN
@@ -712,8 +712,8 @@ struct sk_tree sk_tree[9][12]={
 		  6666,						"using a Spear." },
 		{ "Mysticism", 				"All spell skills use the attributes", 	// NW
 		  6667,						"(BRV+INT)/2 + Willpower + Willpower." },
-		{ "Overwhelming Willpower", "+10 to Willpower Limit.", 	// NN
-		  6668,						"" },
+		{ "Overwhelming Willpower", "3%% increased total Willpower.", 	// NN
+		  6668,						"+10 to Willpower Limit." },
 		{ "Shaper", 				"1%% more effect of Shadow Copy for", 	// NE
 		  6669,						"every 10 total Willpower." },
 		{ "Diviner", 				"Ghost Companions inherit the effects of", 	// EN
@@ -738,8 +738,8 @@ struct sk_tree sk_tree[9][12]={
 		  6678,						"suppressed." },
 		{ "Psychosis", 				"2%% more effect of Pulse for every 10", 	// NW
 		  6679,						"total Intuition." },
-		{ "Overwhelming Intuition", "+10 to Intuition Limit.", 	// NN
-		  6680,						"" },
+		{ "Overwhelming Intuition", "3%% increased total Intuition.", 	// NN
+		  6680,						"+10 to Intuition Limit." },
 		{ "Wizardry", 				"All spell skills use the attributes", 	// NE
 		  6681,						"(BRV+WIL)/2 + Intuition + Intuition." },
 		{ "Flow", 					"50%% of overcapped Mana is granted as", 	// EN
@@ -764,11 +764,11 @@ struct sk_tree sk_tree[9][12]={
 		  6690,						"triggering enemy Thorns." },
 		{ "Perfectionism", 			"1%% more effect of Finesse for every 10", 	// NW
 		  6691,						"total Braveness." },
-		{ "Overwhelming Braveness", "+10 to Braveness Limit.", 	// NN
-		  6692,						"" },
+		{ "Overwhelming Braveness", "3%% increased total Braveness.", 	// NN
+		  6692,						"+10 to Braveness Limit." },
 		{ "Virtuosity", 			"All weapon skills use the attributes", 	// NE
 		  6693,						"(AGL+STR)/2 + Braveness + Braveness." },
-		{ "Resilience", 			"25%% less effect of Healing Sickness", 	// EN
+		{ "Resilience", 			"40%% less effect of Healing Sickness", 	// EN
 		  6694,						"on you." },
 		{ "Flexibility", 			"4%% more total Parry Score.", 	// EE
 		  6695,						"" },
@@ -782,24 +782,24 @@ struct sk_tree sk_tree[9][12]={
 		  6698,						"" },
 		{ "Insight", 				"+2 to Spell Modifier.", 	// E
 		  6699,						"" },
-		{ "Lust", 					"While in Ratling form, 5%% of damage", 	// WS
-		  6700,						"dealt is restored as hitpoints." },
+		{ "Lust", 					"Ferocity grants +1%% base crit chance", 	// WS
+		  6700,						"per empty gear slot." },
 		{ "Ravager", 				"20%% more total Top Damage.", 	// WW
 		  6701,						"" },
 		{ "Greed", 					"Your Top Damage is rolled an additional", 	// WN
 		  6702,						"time, using the higher result." },
-		{ "Wrath", 					"1%% more effect of Rage for every 50", 	// NW
+		{ "Wrath", 					"1%% more effect of Rage & Calm per 40", 	// NW
 		  6703,						"missing Hitpoints, Endurance, and Mana." },
-		{ "Gluttony", 				"10%% more Hitpoints, Endurance, and", 	// NN
-		  6704,						"Mana." },
-		{ "Sloth", 					"1%% more effect of Calm for every 50", 	// NE
-		  6705,						"missing Hitpoints, Endurance, and Mana." },
+		{ "Gluttony", 				"10%% more Hitpoints, Endurance, and Mana.", 	// NN
+		  6704,						"" },
+		{ "Sloth", 					"10%% of damage dealt is restored as", 	// NE
+		  6705,						"Hitpoints, Endurance, and Mana." },
 		{ "Pride", 					"Your debuffs ignore 20%% of enemy", 	// EN
 		  6706,						"Immunity." },
 		{ "Madness", 				"+3 to Spell Modifier.", 	// EE
 		  6707,						"" },
-		{ "Envy", 					"While in Greenling form, 5%% of damage", 	// ES
-		  6708,						"dealt is restored as mana." }
+		{ "Envy", 					"Ferocity grants +1 Spell Modifier per", 	// ES
+		  6708,						"empty gear slot." }
 	} // "         '         '  ", "         '         '         '         "
 };
 
@@ -1208,27 +1208,29 @@ int sk_score(int n)
 	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
 }
 
-int pl_speed, pl_atksp, pl_spmod, pl_skmod, pl_spapt, pl_movsp;
-int pl_critc, pl_critm, pl_topdm, pl_topd2, pl_reflc, pl_aoebn;
-int pl_hitsc, pl_parry, pl_coold, pl_casts, pl_dmgbn;
-int pl_flags, pl_flagb, pl_flagc, pl_basel, pl_dmgml, pl_dmgrd;
-int pl_dlow,  pl_dhigh, pl_dps,   pl_hitdm, pl_cdrate, pl_armor;
-int sk_proxi, sk_immun, sk_resis, sk_conce, sk_ghost, sk_poiso, sk_slowv, sk_curse;
-int sk_blast, sk_scorc, sk_pulse, sk_pucnt, sk_razor, sk_leapv, sk_blind;
-int sk_water, sk_cleav, sk_weake, sk_warcr, sk_regen, sk_restv, sk_medit;
-int sk_shado, sk_rally, sk_immol, sk_shadd, sk_metab;
-int pl_ehp,   cri_leap, sk_bleed, sk_rage,  sk_calm,  sk_letha;
-int sk_hem,   sk_rage2, sk_calm2;
-int sk_bless, sk_enhan, sk_prote, sk_mshie, sk_mdura, sk_haste, sk_healr;
-int coo_clea, coo_leap, coo_blas, coo_pois, coo_puls, coo_ghos, coo_shad;
-int coo_blin, coo_warc, coo_weak, coo_curs, coo_slow;
+int pl_speed=0, pl_atksp=0, pl_spmod=0, pl_skmod=0, pl_spapt=0, pl_movsp=0;
+int pl_critc=0, pl_critm=0, pl_topdm=0, pl_topd2=0, pl_reflc=0, pl_aoebn=0;
+int pl_hitsc=0, pl_parry=0, pl_coold=0, pl_casts=0, pl_dmgbn=0;
+int pl_flags=0, pl_flagb=0, pl_flagc=0, pl_basel=0, pl_dmgml=0, pl_dmgrd=0;
+int pl_dlow=0,  pl_dhigh=0, pl_dps=0,   pl_hitdm=0, pl_cdrate=0, pl_armor=0;
+int sk_proxi=0, sk_immun=0, sk_resis=0, sk_conce=0, sk_ghost=0, sk_poiso=0, sk_slowv=0, sk_curse=0;
+int sk_blast=0, sk_scorc=0, sk_pulse=0, sk_pucnt=0, sk_razor=0, sk_leapv=0, sk_blind=0;
+int sk_water=0, sk_cleav=0, sk_weake=0, sk_warcr=0, sk_regen=0, sk_restv=0, sk_medit=0;
+int sk_shado=0, sk_rally=0, sk_immol=0, sk_shadd=0, sk_metab=0;
+int pl_ehp=0,   cri_leap=0, sk_bleed=0, sk_rage=0,  sk_calm=0,  sk_letha=0;
+int sk_hem=0,   sk_rage2=0, sk_calm2=0;
+int sk_bless=0, sk_enhan=0, sk_prote=0, sk_mshie=0, sk_mdura=0, sk_haste=0, sk_healr=0;
+int coo_clea=0, coo_leap=0, coo_blas=0, coo_pois=0, coo_puls=0, coo_ghos=0, coo_shad=0;
+int coo_blin=0, coo_warc=0, coo_weak=0, coo_curs=0, coo_slow=0;
 
 void init_meta_stats(void)
 {
 	int moonmult = 20;
-	int hpmult, endmult, manamult;
+	int hpmult=0, endmult=0, manamult=0;
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int len = 100;
+	
+	if (pl.worn[WN_SPMOD]==NULL) return;
 	
 	// Player Speed and Attack Speed - WN_SPEED
 	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; 
@@ -1338,12 +1340,12 @@ void init_meta_stats(void)
 	
 	sk_rage  = sk_rage2 = sk_score(22);
 	if (T_LYCA_SK(9)) sk_rage = sk_rage + (sk_rage * sk_hem / 500);
-	sk_rage2 = 10000 * (1000 + (IS_SEYAN_DU?(sk_rage/3):(sk_rage/2))) / 1000;
+	sk_rage2 = 10000 * (1000 + (IS_SEYAN_DU?(sk_rage*2/3):(sk_rage))) / 1000;
 	sk_rage  = min(127, IS_SEYAN_DU?(sk_rage/6 + 5):(sk_rage/4 + 5));
 	
 	sk_calm  = sk_calm2 = sk_score(22);
 	if (T_LYCA_SK(7)) sk_calm = sk_calm + (sk_calm * sk_hem / 500);
-	sk_calm2 = 10000 * (1000 - (IS_SEYAN_DU?(sk_calm/3):(sk_calm/2))) / 1000;
+	sk_calm2 = 10000 * (1000 - (IS_SEYAN_DU?(sk_calm*2/3):(sk_calm))) / 1000;
 	sk_calm  = min(127, IS_SEYAN_DU?(sk_calm/6 + 5):(sk_calm/4 + 5)) * -1;
 	
 	sk_letha = (sk_score(15)+(sk_score(15)*(T_SORC_SK(7)?at_score(AT_WIL)/1000:0)))*pl_spmod/100/(IS_SEYAN_DU?4:3);
@@ -1563,13 +1565,14 @@ void init_meta_stats(void)
 	sk_medit = sk_medit * 20/10;
 	
 	// add *pl_dmgbn/10000 to damage values for the HUD
-	sk_cleav = sk_cleav*pl_dmgbn/10000;
-	sk_leapv = sk_leapv*pl_dmgbn/10000;
-	sk_blast = sk_blast*pl_dmgbn/10000;
-	sk_poiso = sk_poiso*pl_dmgbn/10000;
-	if (!(pl_flagb&(1<<6))) sk_pulse = sk_pulse*pl_dmgbn/10000;
-	sk_razor = sk_razor*pl_dmgbn/10000;
-	sk_immol = sk_immol*pl_dmgbn/10000;
+	sk_cleav = sk_cleav*pl_dmgbn/10000*pl_dmgml/100;
+	sk_leapv = sk_leapv*pl_dmgbn/10000*pl_dmgml/100;
+	sk_blast = sk_blast*pl_dmgbn/10000*pl_dmgml/100;
+	sk_poiso = sk_poiso*pl_dmgbn/10000*pl_dmgml/100;
+	if (!(pl_flagb&(1<<6))) sk_pulse = sk_pulse*pl_dmgbn/10000*pl_dmgml/100;
+	sk_razor = sk_razor*pl_dmgbn/10000*pl_dmgml/100;
+	sk_immol = sk_immol*pl_dmgbn/10000*pl_dmgml/100;
+	pl_reflc = pl_reflc*pl_dmgbn/10000*pl_dmgml/100;
 	
 	cri_leap = sk_leapv*pl_critm/100;
 	
@@ -1631,6 +1634,8 @@ void show_meta_stats(int n)
 	// 8 = Violet
 	// 9 = White
 	
+	if (pl.worn[WN_SPMOD]==NULL) return;
+	
 	if (n<7)					// Topmost standard stats
 	{
 		switch (n)
@@ -1671,15 +1676,15 @@ void show_meta_stats(int n)
 			//
 			case 16: meta_stat(1,n,9,"  Active Stats:",      -1,           -1,           ""       ); break;
 			case 17: if (pl.skill[40][0])
-					 meta_stat(2,n,5,"Cleave Hit Damage",    sk_cleav*pl_dmgbn/10000*pl_dmgml/100,     -1,           ""       ); break;
+					 meta_stat(2,n,5,"Cleave Hit Damage",    sk_cleav,     -1,           ""       ); break;
 			case 18: if (pl.skill[40][0] && !(pl_flags&(1<<8)))
 					 meta_stat(2,n,5,"Cleave Bleed Degen",   sk_bleed/100, sk_bleed%100, "/s"     ); break;
 			case 19: if (pl.skill[40][0])
 					 meta_stat(2,n,5,"Cleave Cooldown",      coo_clea/100, coo_clea%100, "Seconds"); break;
 			case 20: if (pl.skill[49][0])
-					 meta_stat(2,n,1,"Leap Crit Damage",     cri_leap*pl_dmgbn/10000*pl_dmgml/100,     -1,           ""       ); break;
+					 meta_stat(2,n,1,"Leap Crit Damage",     cri_leap,     -1,           ""       ); break;
 			case 21: if (pl.skill[49][0])
-					 meta_stat(2,n,1,"Leap Hit Damage",      sk_leapv*pl_dmgbn/10000*pl_dmgml/100,     -1,           ""       ); break;
+					 meta_stat(2,n,1,"Leap Hit Damage",      sk_leapv,     -1,           ""       ); break;
 			case 22: if (pl.skill[49][0])
 					 meta_stat(2,n,1,"Leap Cooldown",        coo_leap/100, coo_leap%100, "Seconds"); break;
 			case 23: if (pl.skill[22][0]) {
@@ -1687,7 +1692,7 @@ void show_meta_stats(int n)
 			case 24: if (pl.skill[22][0]) {
 				if (!IS_SHIFTED) meta_stat(2,n,5,"Rage DoT Bonus", sk_rage2/100, sk_rage2%100, "%"); } break;
 			case 25: if (pl.skill[24][0]) 
-					 meta_stat(2,n,4,"Blast Hit Damage",     sk_blast*pl_dmgbn/10000*pl_dmgml/100,     -1,           ""       ); break;
+					 meta_stat(2,n,4,"Blast Hit Damage",     sk_blast,     -1,           ""       ); break;
 			case 26: if (pl.skill[24][0])
 					 meta_stat(2,n,4,"Blast Cooldown",       coo_blas/100, coo_blas%100, "Seconds"); break;
 			case 27: if (pl.skill[15][0]) 
@@ -1698,13 +1703,13 @@ void show_meta_stats(int n)
 					 meta_stat(2,n,4,(pl_flagb&(1<<14))?"Venom Cooldown":"Poison Cooldown",coo_pois/100,coo_pois%100,"Seconds"); break;
 			case 30: if (pl.skill[43][0]) {
 					 if (pl_flagb&(1<<6)) { meta_stat(2,n,1,"Pulse Hit Heal",sk_pulse,-1,""); }
-					 else                 { meta_stat(2,n,1,"Pulse Hit Damage",sk_pulse*pl_dmgbn/10000*pl_dmgml/100,-1,""); } } break;
+					 else                 { meta_stat(2,n,1,"Pulse Hit Damage",sk_pulse,-1,""); } } break;
 			case 31: if (pl.skill[43][0])
 					 meta_stat(2,n,1,"Pulse Count",          sk_pucnt,     -1,           ""       ); break;
 			case 32: if (pl.skill[43][0])
 					 meta_stat(2,n,1,"Pulse Cooldown",       coo_puls/100,coo_puls%100,  "Seconds"); break;
 			case 33: if (pl.skill[ 7][0])
-					 meta_stat(2,n,6,"Zephyr Hit Damage",    sk_razor*pl_dmgbn/10000*pl_dmgml/100,     -1,           ""       ); break;
+					 meta_stat(2,n,6,"Zephyr Hit Damage",    sk_razor,     -1,           ""       ); break;
 			case 34: if (pl_flagc&(1<<13))
 					 meta_stat(2,n,1,"Immolate Degen",       sk_immol/100,sk_immol%100,  "/s"     ); break;
 			case 36: if (pl.skill[27][0])
@@ -2731,7 +2736,7 @@ void eng_display(int init)	// optimize me!!!!!
 				{
 					int tmp2;
 
-					if (map[m].obj1>16335 && map[m].obj1<16422 && map[m].obj1!=16357 &&
+					if (map[m].obj1>=16350 && map[m].obj1< 16422 && map[m].obj1!=16357 &&
 						map[m].obj1!=16365 && map[m].obj1!=16373 && map[m].obj1!=16381 &&
 						map[m].obj1!=16357 && map[m].obj1!=16389 && map[m].obj1!=16397 &&
 						map[m].obj1!=16405 && map[m].obj1!=16413 && map[m].obj1!=16421 &&

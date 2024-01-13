@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000B04
+#define VERSION 0x000B07
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -249,9 +249,9 @@ struct wpslist
 struct sk_tree
 {
 	char name[30];
-	char dsc1[40];
+	char dsc1[42];
 	int icon;
-	char dsc2[40];
+	char dsc2[42];
 };
 
 struct sk_icon

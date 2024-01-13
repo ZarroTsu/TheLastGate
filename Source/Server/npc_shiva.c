@@ -41,7 +41,7 @@ int npc_shiva_see(int cn, int co)
 	{
 		return 0;
 	}
-	if (!do_char_can_see(cn, co))
+	if (!do_char_can_see(cn, co, 0))
 	{
 		return 1;                     // processed it: we cannot see him, so ignore him
 	}
@@ -123,7 +123,7 @@ int npc_shiva_gotattack(int cn, int co)
 	
 	ch[cn].data[92] = TICKS * 60 * 10;
 
-	if (!do_char_can_see(cn, co))    // we have been attacked but cannot see the attacker
+	if (!do_char_can_see(cn, co, 0))    // we have been attacked but cannot see the attacker
 	{
 		ch[cn].data[78] = globs->ticker + TICKS * 30;
 		return 1;

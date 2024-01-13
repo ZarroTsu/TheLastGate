@@ -147,12 +147,12 @@ void npc_stunrun_add_fight(int cn, int co)
 
 int npc_stunrun_seeattack(int cn, int cc, int co)
 {
-	if (do_char_can_see(cn, co))
+	if (do_char_can_see(cn, co, 0))
 	{
 		npc_stunrun_add_seen(cn, co);
 		npc_stunrun_add_fight(cn, co);
 	}
-	if (do_char_can_see(cn, cc))
+	if (do_char_can_see(cn, cc, 0))
 	{
 		npc_stunrun_add_seen(cn, cc);
 		npc_stunrun_add_fight(cn, cc);
@@ -165,14 +165,14 @@ int npc_stunrun_see(int cn, int co)
 {
 	int cc;
 	
-	if (!do_char_can_see(cn, co))
+	if (!do_char_can_see(cn, co, 0))
 	{
 		return 1;                     // processed it: we cannot see him, so ignore him
 	}
 	npc_stunrun_add_seen(cn, co);
 	
 	// if we're taunted, try to attack the taunter
-	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc) || ch[cn].data[78]))
+	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc, 0) || ch[cn].data[78]))
 	{
 		// If our last attempt to attack failed, wander near the taunter
 		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
@@ -181,7 +181,7 @@ int npc_stunrun_see(int cn, int co)
 			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
 		}
 		// Otherwise, try to attack the taunter
-		else if (do_char_can_see(cn, cc) && ch[cn].attack_cn!=cc)
+		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
 			ch[cn].attack_cn = cc;
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;

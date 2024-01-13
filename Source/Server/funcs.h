@@ -197,7 +197,7 @@ void do_log(int cn, int font, char *text);
 int do_surround_check(int cn, int co, int gethit);
 int do_crit(int cn, int co, int dam, int msg);
 void do_attack(int cn, int co, int surround);
-int do_char_can_see(int cn, int co);
+int do_char_can_see(int cn, int co, int flag);
 int do_char_can_see_item(int cn, int in);
 void do_update_char(int cn);
 void do_regenerate(int cn);
@@ -404,6 +404,7 @@ void add_map_goal(int loc, int v);
 int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, int tarot);
 
 //-- skill_driver --
+int spellcost(int cn, int cost, int in, int usemana);
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext);
 int has_buff(int cn, int bu_temp);
 void remove_buff(int cn, int bu_temp);

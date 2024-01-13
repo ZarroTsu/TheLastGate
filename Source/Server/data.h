@@ -246,8 +246,8 @@ extern unsigned int mapmarker;
 #define CF_CCP			(1ull<<32)  // Computer Controlled Player, does NOT log out and may have some extra logic
 #define CF_SAFE			(1ull<<33)  // safety measures for gods
 #define CF_NOSTAFF		(1ull<<34)  // #stell will only work if flag off
-//#define CF_			(1ull<<35)  // 
-//#define CF_			(1ull<<36)  // 
+#define CF_KNOWSPELL	(1ull<<35)  // #buff will show details
+#define CF_KNOW_OFF		(1ull<<36)  // toggle #buff showing additional details
 #define CF_THRALL		(1ull<<37)  // is enthralled NPC
 #define CF_LABKEEPER	(1ull<<38)  // is labkeeper
 #define CF_ISLOOTING	(1ull<<39)  // is currently looting a grave

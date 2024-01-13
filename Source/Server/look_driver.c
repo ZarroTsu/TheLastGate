@@ -405,19 +405,19 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
 		break;
 	case IT_WP_BLOODLET: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 30%% of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
 		break;
 	case IT_WP_GEMCUTTER: 
 		do_char_log(cn, 5, "When equipped, stats granted by your ring slots are improved by 40%%.\n");
 		break;
 	case IT_WP_STARLIGHT: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Starlight', costing 30%% of uncapped mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Starlight', costing 1/3 of uncapped mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n");
 		break;
 	case IT_WP_KELPTRID: 
 		do_char_log(cn, 5, "When equipped, grants +30 to action speed while underwater.\n");
 		break;
 	case IT_WP_PHALANX: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 30%% of uncapped endurance. Phalanx grants 1%% damage reduction per 5 endurance spent.\n");
+		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 1%% damage reduction per 5 endurance spent.\n");
 		break;
 	case IT_WP_LAMEDARG: 
 		if (it[in].data[0]<REQ_LAME)
@@ -435,7 +435,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, grants additional weapon value based on total spell modifier.\n");
 		break;
 	case IT_WP_CRIMRIP: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 30%% of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
 		break;
 	case IT_WP_CRESSUN: 
 		do_char_log(cn, 5, "When equipped, endurance spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
@@ -453,16 +453,16 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, this weapon grants full damage and shield parry while in the offhand.\n");
 		break;
 	case IT_WP_PUTRIDIRE: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Poison, with power equal to 30%% of your uncapped mana.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Poison, with power equal to 1/3 of your uncapped mana.\n");
 		break;
 	case IT_WP_BLOODYSCY: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Cleave, with power equal to 30%% of your uncapped hitpoints.\n");
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Cleave, with power equal to 1/3 of your uncapped hitpoints.\n");
 		break;
 	case IT_WP_FLAGBEAR: 
 		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Rally, with power equal to your uncapped endurance.\n");
 		break;
 	case IT_WP_RISINGPHO: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to freely cast Immolate, with power equal to 30%% of your uncapped hitpoints, ignoring spell modifier.\n");
+		do_char_log(cn, 5, "When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints, ignoring spell modifier.\n");
 		break;
 	case IT_WP_THEWALL: 
 		do_char_log(cn, 5, "When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n");
@@ -632,8 +632,8 @@ void look_extra(int cn, int in)
 		case 45: do_char_log(cn, 8, "Half of your Rest score is also applied to your Mana.\n"); break;
 		case 46: do_char_log(cn, 8, "You can always escape from combat.\n"); break;
 		case 47: do_char_log(cn, 8, "Reduces extra damage taken from enemy critical hits by 50%%.\n"); break;
-		case 48: do_char_log(cn, 8, "50%% more total Thorns score.\n"); break;
-		case 49: do_char_log(cn, 8, "Restore %s hitpoints upon hitting an enemy.\n", (IS_TWOHAND(in)?"1":"0.5")); break;
+		case 48: do_char_log(cn, 8, "30%% more total Thorns score.\n"); break;
+		case 49: do_char_log(cn, 8, "Restore %d hitpoints upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)); break;
 		case 50: do_char_log(cn, 8, "2%% more damage dealt.\n"); break;
 		case 51: do_char_log(cn, 8, "2%% less damage taken.\n"); break;
 		case 52: do_char_log(cn, 8, "Perception is 25%% stronger.\n"); break;
@@ -910,7 +910,7 @@ void look_talisman(int cn, int in)
 		case 55: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Hit & Parry", 2); break;
 		case 56: do_char_log(cn, 8, "[Cloak Only] Blinds inflicted on you are 80%% weaker.\n"); break; // 33
 		case 57: do_char_log(cn, 8, "Item is indestructible.\n"); break; // 34
-		case 58: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Spell Apt", 12); break;
+		case 58: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Spell Apt", 6); break;
 		case 59: do_char_log(cn, 8, "8%% chance to half damage taken.\n"); break; // 35
 		case 60: do_char_log(cn, 8, "[Helmet Only] Half of your Meditate score is also applied to your Hitpoints.\n"); break; // 36
 		case 61: do_char_log(cn, 8, "[Cloak Only] 5%% additional chance to avoid being hit.\n"); break; // 37
@@ -927,9 +927,9 @@ void look_talisman(int cn, int in)
 		case 72: do_char_log(cn, 8, "[Boots Only] You can always escape from combat.\n"); break; // 46
 		case 73: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Top Damage", 12); break;
 		case 74: do_char_log(cn, 8, "[Chest Only] Reduces extra damage taken from enemy critical hits by 50%%.\n"); break; // 47
-		case 75: do_char_log(cn, 8, "[Chest Only] 50%% more total Thorns score.\n"); break; // 48
+		case 75: do_char_log(cn, 8, "[Chest Only] 30%% more total Thorns score.\n"); break; // 48
 		case 76: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Crit Bonus", 16); break;
-		case 77: do_char_log(cn, 8, "[Weapons Only] Restore 0.5 hitpoints upon hitting an enemy.\n"); break; // 49
+		case 77: do_char_log(cn, 8, "[Weapons Only] Restore 1 hitpoints upon hitting an enemy.\n"); break; // 49
 		case 78: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Thorns", 2); break;
 		case 79: do_char_log(cn, 8, "[Jewellery Only] 2%% more damage dealt.\n"); break; // 50
 		case 80: do_char_log(cn, 8, "[Jewellery Only] 2%% less damage taken.\n"); break; // 51

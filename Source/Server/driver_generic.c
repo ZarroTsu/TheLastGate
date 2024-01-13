@@ -22,7 +22,7 @@ int follow_driver(int cn, int co)
 		return 0;
 	}
 
-	if (!(IS_COMPANION(cn) && ch[cn].data[CHD_MASTER]==co) && !do_char_can_see(cn, co))
+	if (!(IS_COMPANION(cn) && ch[cn].data[CHD_MASTER]==co) && !do_char_can_see(cn, co, 0))
 	{
 		return 0;
 	}

@@ -188,7 +188,7 @@ void ccp_seen(int cn, int co)
 		return;
 	}
 
-	if (!do_char_can_see(cn, co))
+	if (!do_char_can_see(cn, co, 0))
 	{
 		return;
 	}
@@ -375,7 +375,7 @@ void ccp_driver(int cn)
 	}
 
 	// dont fight enemy if no longer visible
-	if (mem->fighting && !do_char_can_see(cn, mem->fighting))
+	if (mem->fighting && !do_char_can_see(cn, mem->fighting, 0))
 	{
 		mem->fighting = 0;
 	}

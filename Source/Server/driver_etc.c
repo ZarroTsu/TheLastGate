@@ -396,7 +396,7 @@ int char_attack_char(int cn, int co)
 		return -1;
 	}
 
-	if (ch[co].used!=USE_ACTIVE || do_char_can_see(cn, co)==0 || cn==co || (ch[co].flags & CF_BODY) || (ch[co].flags & CF_STONED))
+	if (ch[co].used!=USE_ACTIVE || do_char_can_see(cn, co, 0)==0 || cn==co || (ch[co].flags & CF_BODY) || (ch[co].flags & CF_STONED))
 	{
 		return -1;
 	}
@@ -515,7 +515,7 @@ int char_give_char(int cn, int co)
 		return -1;
 	}
 
-	if (ch[co].used!=USE_ACTIVE || do_char_can_see(cn, co)==0 || cn==co)
+	if (ch[co].used!=USE_ACTIVE || do_char_can_see(cn, co, 0)==0 || cn==co)
 	{
 		return -1;
 	}

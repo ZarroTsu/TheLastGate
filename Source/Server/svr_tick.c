@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.11.4\n"};
+static char intro_msg3[] = {"Current client/server version is 0.11.7\n"};
 static char intro_msg4_font = 0;
-static char intro_msg4[] = {"Character exp has been refunded! Be sure to re-spend your exp before exploring!!\n"};
+static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -2392,7 +2392,6 @@ inline int ch_base_status(int n)
 	if (n<16)
 	{
 		return( n);     // unassigned!!
-
 	}
 	if (n<24)
 	{
@@ -2409,7 +2408,6 @@ inline int ch_base_status(int n)
 	if (n<48)
 	{
 		return( 40);    // walk right
-
 	}
 	if (n<60)
 	{
@@ -2426,7 +2424,6 @@ inline int ch_base_status(int n)
 	if (n<96)
 	{
 		return( 84);    // walk right+down
-
 	}
 	if (n<100)
 	{
@@ -2640,7 +2637,6 @@ int cl_light_three(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 	}
 	else
 	{
-
 		buf[0] = SV_SETMAP5;
 		*(unsigned int*)(buf+1)=n;
 		*(unsigned char*)(buf+5)=smap[n].light;
@@ -2697,7 +2693,7 @@ int cl_light_seven(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 // check for any changed values in player data and send them to the client
 void plr_change(int nr)
 {
-	int cn, n, in, p, lastn = -1;
+	int cn, n, m, in, p, lastn = -1;
 	struct cplayer *cpl;
 	struct cmap *cmap;
 	struct cmap *smap;
@@ -2722,7 +2718,7 @@ void plr_change(int nr)
 			xsend(nr, buf, 16);
 			buf[0] = SV_SETCHAR_NAME3;
 			mcpy(buf + 1, ch[cn].name + 30, 10);
-			*(unsigned long*)(buf + 11) = ch[cn].temp;
+			*(unsigned long*)(buf + 11) = (unsigned long)(ch[cn].temp);
 			xsend(nr, buf, 16);
 			mcpy(cpl->name, ch[cn].name, 40);
 		}
@@ -2766,10 +2762,10 @@ void plr_change(int nr)
 			if (get_gear(cn, IT_TW_CLOAK)) 		chFlags += (1 << 14); // 20% damage shifted to end (20% more eHP)
 			
 			buf[0] = SV_SETCHAR_ENDUR;
-			*(unsigned short*)(buf + 1)  = ch[cn].move_speed;		// char
-			*(unsigned short*)(buf + 3)  = ch[cn].aoe_bonus;		// char
-			*(unsigned short*)(buf + 5)  = ch[cn].dmg_bonus;		// unsigned short
-			*(unsigned short*)(buf + 7)  = ch[cn].dmg_reduction;	// unsigned short
+			*(unsigned short*)(buf + 1)  = (unsigned short)(ch[cn].move_speed);		// char
+			*(unsigned short*)(buf + 3)  = (unsigned short)(ch[cn].aoe_bonus);		// char
+			*(unsigned short*)(buf + 5)  = (unsigned short)(ch[cn].dmg_bonus);		// unsigned short
+			*(unsigned short*)(buf + 7)  = (unsigned short)(ch[cn].dmg_reduction);	// unsigned short
 			*(unsigned short*)(buf + 9)  = min(32767,chFlags); 		// max << 14
 			*(unsigned short*)(buf + 11) = ch[cn].end[5];
 			xsend(nr, buf, 13);
@@ -2845,8 +2841,8 @@ void plr_change(int nr)
 						}
 						*(short int*)(buf + 7) = 0;
 						if (IS_SOULCAT(in)) *(short int*)(buf + 7) = it[in].data[4];
-						*(unsigned char*)(buf + 9) = it[in].stack;
-						*(unsigned char*)(buf + 10) = ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0);
+						*(unsigned char*)(buf + 9)  = (unsigned char)(it[in].stack);
+						*(unsigned char*)(buf + 10) = (unsigned char)(ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0));
 
 						it[in].flags &= ~IF_UPDATE;
 					}
@@ -2877,33 +2873,33 @@ void plr_change(int nr)
 				*(unsigned long*)(buf + 1) = n;
 				if (n == WN_SPEED)	
 				{
-					*(short int*)(buf + 5) = min(300,ch[cn].speed);     // 0 to 300, lower is better
-					*(short int*)(buf + 7) = min(300,ch[cn].atk_speed); // additional speed, higher is better
+					*(short int*)(buf + 5) = (short int)(max(0,min(300,ch[cn].speed)));     // 0 to 300, lower is better
+					*(short int*)(buf + 7) = (short int)(max(0,min(300,ch[cn].atk_speed))); // additional speed, higher is better
 				}
 				if (n == WN_SPMOD)	
 				{
-					*(short int*)(buf + 5) = min(300,ch[cn].spell_mod); // 100 = 1%
-					*(short int*)(buf + 7) = min(999,ch[cn].spell_apt); // 
+					*(short int*)(buf + 5) = (short int)(max(0,min(300,ch[cn].spell_mod))); // 100 = 1%
+					*(short int*)(buf + 7) = (short int)(max(0,min(999,ch[cn].spell_apt))); // 
 				}
 				if (n == WN_CRIT)
 				{
-					*(short int*)(buf + 5) = min(10000,ch[cn].crit_chance); // 100 = 1%
-					*(short int*)(buf + 7) = min(800,ch[cn].crit_multi);  // % increase of damage upon a crit
+					*(short int*)(buf + 5) = (short int)(max(0,min(10000,ch[cn].crit_chance))); // 100 = 1%
+					*(short int*)(buf + 7) = (short int)(max(0,min(800,ch[cn].crit_multi)));  // % increase of damage upon a crit
 				}
 				if (n == WN_TOP)
 				{
-					*(short int*)(buf + 5) = min(999,ch[cn].top_damage); // STR/2 + mods
-					*(short int*)(buf + 7) = min(999,ch[cn].gethit_dam);
+					*(short int*)(buf + 5) = (short int)(max(0,min(999,ch[cn].top_damage))); // STR/2 + mods
+					*(short int*)(buf + 7) = (short int)(max(0,min(999,ch[cn].gethit_dam)));
 				}
 				if (n == WN_HITPAR)
 				{
-					*(short int*)(buf + 5) = min(999,ch[cn].to_hit);
-					*(short int*)(buf + 7) = min(999,ch[cn].to_parry);
+					*(short int*)(buf + 5) = (short int)(max(0,min(999,ch[cn].to_hit)));
+					*(short int*)(buf + 7) = (short int)(max(0,min(999,ch[cn].to_parry)));
 				}
 				if (n == WN_CLDWN)
 				{
-					*(short int*)(buf + 5) = min(1000,ch[cn].cool_bonus); // 100 + INT/4 + mods
-					*(short int*)(buf + 7) = min(300,ch[cn].cast_speed); // BRV/4 + mods
+					*(short int*)(buf + 5) = (short int)(max(0,min(1000,ch[cn].cool_bonus))); // 100 + INT/4 + mods
+					*(short int*)(buf + 7) = (short int)(max(0,min(300,ch[cn].cast_speed))); // BRV/4 + mods
 				}
 				if (n == WN_FLAGS)
 				{
@@ -3140,9 +3136,9 @@ void plr_change(int nr)
 	    cpl->kindred!=ch[cn].kindred)
 	{
 		buf[0] = SV_SETCHAR_PTS;
-		*(unsigned long*)(buf + 1) = ch[cn].points;
-		*(unsigned long*)(buf + 5) = ch[cn].points_tot;
-		*(unsigned int*)(buf + 9)  = ch[cn].kindred;
+		*(unsigned long*)(buf + 1) = (unsigned long)(ch[cn].points);
+		*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].points_tot);
+		*(unsigned int*)(buf + 9)  = (unsigned int)(ch[cn].kindred);
 		xsend(nr, buf, 13);
 
 		cpl->points = ch[cn].points;
@@ -3156,9 +3152,9 @@ void plr_change(int nr)
 		cpl->os_points != ch[cn].os_points)
 	{
 		buf[0] = SV_SETCHAR_WPS;
-		*(unsigned int*)(buf + 1) = ch[cn].waypoints;
-		*(unsigned int*)(buf + 5) = ch[cn].bs_points;
-		*(unsigned int*)(buf + 9) = ch[cn].os_points;
+		*(unsigned int*)(buf + 1) = (unsigned int)(ch[cn].waypoints);
+		*(unsigned int*)(buf + 5) = (unsigned int)(ch[cn].bs_points);
+		*(unsigned int*)(buf + 9) = (unsigned int)(ch[cn].os_points);
 		xsend(nr, buf, 13);
 		
 		cpl->waypoints = ch[cn].waypoints;
@@ -3170,8 +3166,8 @@ void plr_change(int nr)
 	if (cpl->tokens != ch[cn].tokens || cpl->tree_points != ch[cn].tree_points)
 	{
 		buf[0] = SV_SETCHAR_TOK;
-		*(unsigned int*)(buf + 1) = ch[cn].tokens;
-		*(unsigned short*)(buf + 5) = ch[cn].tree_points;
+		*(unsigned int*)(buf + 1)   = (unsigned int)(ch[cn].tokens);
+		*(unsigned short*)(buf + 5) = (unsigned short)(ch[cn].tree_points);
 		xsend(nr, buf, 7);
 		
 		cpl->tokens = ch[cn].tokens;
@@ -3182,18 +3178,18 @@ void plr_change(int nr)
 		|| (!get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].armor)) || cpl->weapon!=ch[cn].weapon)
 	{
 		buf[0] = SV_SETCHAR_GOLD;
-		*(unsigned long*)(buf + 1) = ch[cn].gold;
+		*(unsigned long*)(buf + 1) = (unsigned long)(ch[cn].gold);
 		if (get_gear(cn, IT_BONEARMOR))
 		{
-			*(unsigned long*)(buf + 5) = ch[cn].data[25];
+			*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].data[25]);
 			cpl->armor  = ch[cn].data[25];
 		}
 		else
 		{
-			*(unsigned long*)(buf + 5) = ch[cn].armor;
+			*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].armor);
 			cpl->armor  = ch[cn].armor;
 		}
-		*(unsigned long*)(buf + 9) = ch[cn].weapon;
+		*(unsigned long*)(buf + 9) = (unsigned long)(ch[cn].weapon);
 		xsend(nr, buf, 13);
 
 		cpl->gold = ch[cn].gold;
@@ -3849,7 +3845,7 @@ void plr_getmap_complete(int nr)
 			// --- End of ba_sprite -----
 
 			// --- Begin of Character ----- - also sets flags
-			if (visible && (co = map[m].ch)!=0 && (tmp = do_char_can_see(cn, co))!=0)
+			if (visible && (co = map[m].ch)!=0 && (tmp = do_char_can_see(cn, co, 0))!=0)
 			{
 				if (!ch[co].sprite_override)
 				{
@@ -4151,7 +4147,7 @@ void plr_getmap_fast(int nr)
 			smap[n].ba_sprite = map[m].sprite;
 
 			// character
-			if (visible && (co = map[m].ch)!=0 && (tmp = do_char_can_see(cn, co))!=0)
+			if (visible && (co = map[m].ch)!=0 && (tmp = do_char_can_see(cn, co, 0))!=0)
 			{
 				if (!ch[co].sprite_override)
 				{

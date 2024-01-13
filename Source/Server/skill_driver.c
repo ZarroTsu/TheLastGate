@@ -271,7 +271,6 @@ struct s_splog splog[66] = {
 	}
 };
 
-int spellcost(int cn, int cost, int in, int usemana);
 void damage_mshell(int co, int dam);
 int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
 int chance(int cn, int d20);
@@ -536,7 +535,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			return 0;
 		}
 		
-		if (!do_char_can_see(cn, co))
+		if (!do_char_can_see(cn, co, 0))
 		{
 			do_char_log(cn, 0, "You cannot see your target.\n");
 			return 0;
@@ -647,7 +646,7 @@ int get_use_mana(int spell)
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg, int dr1, int dr2)
 {
 	int co_orig, spellaoe, spellrad, hitpower, aoeimm = 0, tmp = 0, crit_dam=0;
-	double _cap, _hit, _pow, tmpa, tmph, tmpha, tmpp, tmppa;
+	double _cap, _hit, _pow, tmpa, tmph, tmpha, tmpp, tmppa, tmppl=0;
 	int xf, yf, xt, yt, xc, yc, x, y, n, in, in2;
 	int no_target = 0, usemana = 1;
 	char buf[50];
@@ -683,6 +682,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 			xc = ch[co_orig].x; // plague origin is the infected
 			yc = ch[co_orig].y;
 			no_target = 1;
+			tmppl = power;
 			break;
 		case SK_WARCRY:
 			spellrad = PRXW_RAD + ch[cn].aoe_bonus;
@@ -800,7 +800,7 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 				switch (intemp)
 				{
 					case SK_PLAGUE:
-						if (do_surround_check(cn, co, 0) && do_char_can_see(co_orig, co) && spell_plague(cn, co, power))
+						if (do_surround_check(cn, co, 0) && do_char_can_see(co_orig, co, 1) && spell_plague(cn, co, tmppl))
 						{
 							for (n = 0; n<MAXBUFFS; n++)
 							{
@@ -808,6 +808,12 @@ int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cos
 								if (bu[in].data[5]==1 && bu[in].temp!=SK_SHADOW && !has_buff(co, bu[in].temp))
 								{
 									in2 = copy_buff(in);
+									if (bu[in2].data[7] > -1) // 20% more damage per spread
+									{
+										if (bu[in2].data[7] < 5) bu[in2].data[7]++;
+										tmp = 100 + bu[in2].data[7]*20;
+										bu[in2].data[1] = bu[in2].data[6] * tmp / 100;
+									}
 									add_spell(co, in2);
 								}
 							}
@@ -2245,8 +2251,12 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 		}
 		if (temp!=SK_RECALL && temp!=SK_IDENT)
 		{
-			if (temp==SK_LIGHT && li<0)
-				do_char_log(cn, 1, "You stop emitting light.\n");
+			if (li<0)
+			{
+				if (temp==SK_LIGHT) do_char_log(cn, 1, "You stop emitting light.\n");
+				if (temp==SK_RAGE)  do_char_log(cn, 1, "Rage no longer active.\n");
+				if (temp==SK_CALM)  do_char_log(cn, 1, "Calm no longer active.\n");
+			}
 			else
 				do_char_log(cn, 1, "%s\n", splog[temp].self);
 			char_play_sound(cn, ch[cn].sound + 1, -150, 0);
@@ -2339,44 +2349,6 @@ void skill_light(int cn)
 	add_exhaust(cn, SK_EXH_LIGHT);
 }
 
-int spell_protect(int cn, int co, int power, int fromscroll)
-{
-	int in;
-	
-	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
-
-	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) 
-		return 0;
-
-	if (IS_SEYA_OR_BRAV(co))
-		bu[in].armor[1] = min(127, power / 6 + 3);
-	else
-		bu[in].armor[1] = min(127, power / 4 + 4);
-
-	return cast_a_spell(cn, co, in, 0, 1); // SK_PROTECT
-}
-void skill_protect(int cn, int flag)
-{
-	int co, power;
-	
-	power = M_SK(cn, SK_PROTECT);
-	
-	if (!(co = get_target(cn, 0, 1, 1, flag?0:SP_COST_PROTECT, SK_PROTECT, 1, power, flag?-1:0))) 
-		return;
-
-	spell_protect(cn, co, power, 0);
-	
-	// Book - Bishop :: cast enhance after if flag says so
-	if (flag)
-	{
-		skill_enhance(cn, 1);
-	}
-	else
-	{
-		add_exhaust(cn, SK_EXH_PROTECT);
-	}
-}
-
 int spell_enhance(int cn, int co, int power, int fromscroll)
 {
 	int in;
@@ -2415,6 +2387,48 @@ void skill_enhance(int cn, int flag)
 	}
 }
 
+int spell_protect(int cn, int co, int power, int fromscroll)
+{
+	int in;
+	
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
+
+	if (!(in = make_new_buff(cn, SK_PROTECT, BUF_SPR_PROTECT, power, SP_DUR_PROTECT, 1))) 
+		return 0;
+
+	if (IS_SEYA_OR_BRAV(co))
+		bu[in].armor[1] = min(127, power / 6 + 3);
+	else
+		bu[in].armor[1] = min(127, power / 4 + 4);
+
+	return cast_a_spell(cn, co, in, 0, 1); // SK_PROTECT
+}
+void skill_protect(int cn, int flag)
+{
+	int co, power;
+	
+	power = M_SK(cn, SK_PROTECT);
+	
+	if (!(co = get_target(cn, 0, 1, 1, flag?0:SP_COST_PROTECT, SK_PROTECT, 1, power, flag?-1:0))) 
+		return;
+
+	spell_protect(cn, co, power, 0);
+	
+	// Book - Bishop :: cast enhance after if flag says so
+	if (flag && B_SK(cn, SK_ENHANCE))
+	{
+		skill_enhance(cn, 1);
+	}
+	else if (flag)
+	{
+		add_exhaust(cn, SK_EXH_BLESS+SK_EXH_PROTECT);
+	}
+	else
+	{
+		add_exhaust(cn, SK_EXH_PROTECT);
+	}
+}
+
 int spell_bless(int cn, int co, int power, int fromscroll)
 {
 	int in, n;
@@ -2443,9 +2457,13 @@ void skill_bless(int cn)
 	spell_bless(cn, co, power, 0);
 	
 	// Book - Bishop :: cast protect next
-	if (flag)
+	if (flag && B_SK(cn, SK_PROTECT))
 	{
 		skill_protect(cn, 1);
+	}
+	else if (flag && B_SK(cn, SK_ENHANCE))
+	{
+		skill_enhance(cn, 1);
 	}
 	else
 	{
@@ -2604,10 +2622,10 @@ int spell_heal(int cn, int co, int power)
 		{
 			// Each stack of heal sickness reduces the spell power by 1/4th
 			tmp = 4 - bu[in2].data[1];
-			power = power * tmp * (T_BRAV_SK(co, 10)?75:100) / 400;
+			power = power * tmp * (T_BRAV_SK(co, 10)?60:100) / 400;
 			if (4-tmp) 
 			{
-				do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", (T_BRAV_SK(co, 10)?(100-tmp*25*3/4):(100-tmp*25)));
+				do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", (T_BRAV_SK(co, 10)?(100-tmp*25*6/10):(100-tmp*25)));
 			}
 		}
 	}
@@ -2659,6 +2677,7 @@ void speed_plague(int co, int in)
 	if (bu[in].data[5] != 3)
 	{
 		bu[in].data[1] *= 4;
+		bu[in].data[6] *= 4;
 		bu[in].active  /= 2;
 		bu[in].data[5]  = 3;
 	}
@@ -2695,6 +2714,8 @@ int spell_plague(int cn, int co, int flag)
 	
 	bu[in].data[1] = ppow;				// Set the decay rate
 	bu[in].data[5] = flag;
+	bu[in].data[6] = ppow;				// Backup decay rate
+	bu[in].data[7] = -1;
 	
 	do_char_log(co, 0, "The plague spreads through you.\n");
 	
@@ -3204,8 +3225,8 @@ int spell_warcry(int cn, int co, int power, int flag)
 	
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
-	if (!do_surround_check(cn, co, 1) || 
-		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0)) { return 0; }
+	if (flag != 2 && (!do_surround_check(cn, co, 1) || 
+		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0))) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
@@ -3518,15 +3539,109 @@ void char_info(int cn, int co)
 		{
 			if (bu[in].data[1] && (ch[cn].flags & CF_GOD))
 			{
-				do_char_log(cn, 1, 
-				"%s for %dm %ds power of %d (%d)\n",
-				bu[in].name, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60, bu[in].power, bu[in].data[1]);
+				do_char_log(cn, 1, "%s for %dm %ds power of %d (%d)\n", 
+					bu[in].name, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60, bu[in].power, bu[in].data[1]);
 			}
 			else
 			{
-				do_char_log(cn, 1, 
-				"%s for %dm %ds power of %d\n",
-				bu[in].name, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60, bu[in].power);
+				do_char_log(cn, 1, "%s for %dm %ds power of %d\n", bu[in].name, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60, bu[in].power);
+				if ((ch[cn].flags & CF_KNOWSPELL) && !(ch[cn].flags & CF_KNOW_OFF))
+				{
+					switch (bu[in].temp)
+					{
+						case SK_LIGHT:
+							do_char_log(cn, 6, " : %+d Glow\n", bu[in].light[1]); 
+							break;
+						case SK_MSHIELD: 
+						case SK_PROTECT:
+						case SK_WEAKEN2:
+							do_char_log(cn, 6, " : %+d Armor Value\n", bu[in].armor[1]);
+							break;
+						case SK_ENHANCE: 
+						case SK_WEAKEN:
+							do_char_log(cn, 6, " : %+d Weapon Value\n", bu[in].weapon[1]);
+							break;
+						case SK_SLOW:
+						case SK_SLOW2:
+						case SK_HASTE:
+							if (bu[in].speed[1])      do_char_log(cn, 6, " : %+d Speed\n",        bu[in].speed[1]);
+							if (bu[in].atk_speed[1])  do_char_log(cn, 6, " : %+d Attack Speed\n", bu[in].atk_speed[1]);
+							if (bu[in].cast_speed[1]) do_char_log(cn, 6, " : %+d Cast Speed\n",   bu[in].cast_speed[1]);
+							break;
+						case SK_CURSE:
+						case SK_CURSE2:
+						case SK_BLESS:
+						case SK_WARCRY:
+							do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0][1]); 
+							do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1][1]); 
+							do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2][1]); 
+							do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3][1]); 
+							do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4][1]);
+							break;
+						case SK_REGEN: // bu[in].hp[0]
+							do_char_log(cn, 6, " : %+d.%02d HP/sec\n", bu[in].hp[0]/50, bu[in].hp[0]%50); break;
+						case SK_ARIA:
+						case SK_ARIA2:
+							do_char_log(cn, 6, " : %+d Cooldown Rate\n", bu[in].cool_bonus[1]);
+							if (bu[in].dmg_bonus[1])
+								do_char_log(cn, 6, " : %+d.%02d%% Damage Dealt\n", bu[in].dmg_bonus[1]/20, bu[in].dmg_bonus[1]/2%10);
+							break;
+						case SK_WARCRY3:
+						case SK_BLIND:
+							do_char_log(cn, 6, " : %+d Hit Score\n",   bu[in].to_hit[1]); 
+							do_char_log(cn, 6, " : %+d Parry Score\n", bu[in].to_parry[1]); 
+							if (bu[in].skill[SK_PERCEPT][1])
+								do_char_log(cn, 6, " : %+d Perception\n",  bu[in].skill[SK_PERCEPT][1]);
+							break;
+						case SK_DOUSE:
+							do_char_log(cn, 6, " : %+d Spell Modifier\n", bu[in].spell_mod[1]);
+							do_char_log(cn, 6, " : %+d Stealth\n",        bu[in].skill[SK_STEALTH][1]);
+							break;
+						case SK_MSHELL:
+							do_char_log(cn, 6, " : %+d Resistance\n", bu[in].skill[SK_RESIST][1]);
+							do_char_log(cn, 6, " : %+d Immunity\n",   bu[in].skill[SK_IMMUN][1]);
+							break;
+						case SK_GUARD:
+						case SK_AGGRAVATE:
+						case SK_SCORCH:
+						case SK_SHOCK:
+						case SK_CHARGE:
+							if (bu[in].dmg_reduction[1]) 
+								do_char_log(cn, 6, " : %+d.%02d%% Damage Taken\n", -1*bu[in].dmg_reduction[1]/2, (-100*bu[in].dmg_reduction[1]/2)%100);
+							if (bu[in].dmg_bonus[1]) 
+								do_char_log(cn, 6, " : %+d.%02d%% Damage Dealt\n", bu[in].dmg_bonus[1]/2, (100*bu[in].dmg_bonus[1]/2)%100);
+							break;
+						case SK_LETHARGY:
+							if (bu[in].data[2])
+								do_char_log(cn, 6, " : %+d Res Piercing\n", bu[in].power/4);
+							else
+								do_char_log(cn, 6, " : %+d Res Piercing\n", bu[in].power/3);
+							break;
+						case SK_RAGE:
+							do_char_log(cn, 6, " : %+d Top Damage\n", bu[in].top_damage[1]);
+							do_char_log(cn, 6, " : +%d.%02d%% DoT Dealt\n", 100*(2000+bu[in].data[4])/2000, (10000*(2000+bu[in].data[4])/2000)%100); break;
+						case SK_CALM:
+							do_char_log(cn, 6, " : %+d Top Damage Taken\n", bu[in].data[3]*-1);
+							do_char_log(cn, 6, " : %d.%02d%% DoT Taken\n", 100*(2000-bu[in].data[4])/2000, (10000*(2000-bu[in].data[4])/2000)%100); break;
+						case 254: // R/G/S Essence
+							do_char_log(cn, 6, " : %+d to each attribute\n", bu[in].attrib[0][1]);
+							if (bu[in].skill[SK_GEARMAST][1])
+								do_char_log(cn, 6, " : %+d to some skills\n",    bu[in].skill[SK_GEARMAST][1]);
+							break;
+						case SK_WARCRY2:
+							do_char_log(cn, 6, " : Stunned!\n");
+							break;
+						case SK_TAUNT:
+							do_char_log(cn, 6, " : Taunted!\n");
+							break;
+						case SK_POISON:
+						case SK_BLEED:
+						case SK_PLAGUE:
+						case SK_VENOM:
+							break;
+						default: break;
+					}
+				}
 			}
 			flag = 1;
 		}
@@ -4092,6 +4207,8 @@ void remove_all_spells(int cn, int flag) // Card turn-ins & Lycan Shifting
 			if (bu[in].temp == SK_CHARGE)   continue;
 			if (bu[in].temp == SK_WARCRY3)  continue;
 			if (bu[in].temp == SK_DIVINITY) continue;
+			if (bu[in].temp == SK_RAGE) 	continue;
+			if (bu[in].temp == SK_CALM) 	continue;
 			if (bu[in].temp == 635) continue; // Infrared 1
 			if (bu[in].temp == 637) continue; // Infrared 2
 			if (bu[in].temp == 639) continue; // Infrared 3
@@ -4161,7 +4278,7 @@ void skill_dispel(int cn)
 	if ((co = ch[cn].skill_target1)) { ; }
 	else { co = cn; }
 	
-	if (!do_char_can_see(cn, co))
+	if (!do_char_can_see(cn, co, 0))
 	{
 		do_char_log(cn, 0, "You cannot see your target.\n");
 		return;
@@ -4408,7 +4525,7 @@ void skill_ghost(int cn)
 		}
 		if (co && !IS_SHADOW(co))
 		{
-			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz))
+			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz, 0))
 			{
 				if (cz == co)
 				{
@@ -4437,7 +4554,7 @@ void skill_ghost(int cn)
 	if (co==ch[cn].data[PCD_SHADOWCOPY] || 
 		co==ch[cn].data[PCD_COMPANION] ) co = 0;
 
-	if (co && !do_char_can_see(cn, co))
+	if (co && !do_char_can_see(cn, co, 0))
 	{
 		do_char_log(cn, 0, "You cannot see your target.\n");
 		return;
@@ -4519,7 +4636,10 @@ void skill_ghost(int cn)
 	// base is the power of the summon
 	base = spell_multiplier(M_SK(cn, SK_GHOST), cn);
 	ch[cc].data[6] = base;
-	base = base * 5 / 11;
+	if (IS_MONSTER(cn)) 
+		base = base * 4 / 11;
+	else 
+		base = base * 5 / 11;
 	ch[cc].data[7] = base;
 	ch[cc].data[8] = archbonus;
 
@@ -4659,7 +4779,7 @@ void skill_ghost(int cn)
 			                  min(72+(archbonus+10)/20, base*5/6+8));
 	}
 
-	ch[cc].points_tot = pts/2;
+	ch[cc].points_tot = pts;
 	ch[cc].gold       = 0;
 	ch[cc].a_hp       = 9999999;
 	ch[cc].a_end      = 999999;
@@ -5078,7 +5198,7 @@ void skill_shadow(int cn)
 		}
 		if (co && IS_SHADOW(co))
 		{
-			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz))
+			if ((cz = ch[cn].skill_target1) && do_char_can_see(cn, cz, 0))
 			{
 				if (cz == co)
 				{
@@ -5114,7 +5234,7 @@ void skill_shadow(int cn)
 	if (co==ch[cn].data[PCD_SHADOWCOPY] || 
 		co==ch[cn].data[PCD_COMPANION] ) co = 0;
 	
-	if (co && !do_char_can_see(cn, co))
+	if (co && !do_char_can_see(cn, co, 0))
 	{
 		do_char_log(cn, 0, "You cannot see your target.\n");
 		return;
@@ -5262,7 +5382,13 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 			do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
 	}
 	
-	if (in = has_buff(co, SK_PLAGUE)) speed_plague(co, in);
+	//if (in = has_buff(co, SK_PLAGUE)) speed_plague(co, in); 
+	
+	// Plague spreading
+	if ((in = has_buff(co, SK_PLAGUE)) && IS_SANECHAR(bu[in].data[0]))
+	{
+		skill_plague(bu[in].data[0], co, bu[in].data[5]);
+	}
 	
 	if (!co_orig)
 	{
@@ -5327,7 +5453,7 @@ int spell_bash(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	{
 		if (!(ch[cn].flags & CF_SYS_OFF)) do_char_log(cn, 1, "You bashed %s for %d HP.\n", ch[co].reference, tmp);
 		if (!(ch[co].flags & CF_SYS_OFF)) do_char_log(co, 1, "%s bashed you for %d HP.\n", ch[cn].name, tmp);
-		spell_warcry(cn, co, tmp, 1);
+		spell_warcry(cn, co, tmp, 2);
 	}
 	
 	if (!co_orig)
@@ -5636,25 +5762,15 @@ int spell_pulse(int cn, int co, int power, int tarot)
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_PULSE
 }
-int spell_immolate(int cn, int co, int power, int flag)
+int spell_immolate(int cn, int co, int power)
 {
 	int in;
 	
-	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[4]/20;
-	if (!flag) power = spell_multiplier(power, cn);
-	
+	if (get_book(cn, IT_BOOK_BURN)) power = power + ch[cn].hp[4]/20;	
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	
-	if (flag) 
-	{
-		bu[in].data[0] = 0;
-		bu[in].hp[0]   = -250;
-	}
-	else
-	{
-		bu[in].hp[0]   = -200;
-	}
+	bu[in].hp[0]   = -300;
 	bu[in].data[3] 	= PRXP_RAD + ch[cn].aoe_bonus;
 	
 	bu[in].flags |= IF_PERMSPELL;
@@ -5819,8 +5935,7 @@ void skill_leap(int cn, int flag)
 		randomtarg = 1;
 		dostun = 0;
 	}
-	
-	if (IS_MONSTER(cn)) dostun = 0;
+	if (IS_MONSTER(cn) || has_buff(cn, SK_EXHAUST)) dostun = 0;
 	
 	if (randomtarg)
 	{
@@ -5841,7 +5956,7 @@ void skill_leap(int cn, int flag)
 			}
 			if (IS_SANECHAR(co = map[x + y * MAPX].ch) && cn!=co)
 			{
-				if (!do_char_can_see(cn, co)) continue;
+				if (!do_char_can_see(cn, co, 0)) continue;
 				if (do_surround_check(cn, co, 1))
 				{
 					catalog[c] = co;
@@ -5894,7 +6009,7 @@ void skill_leap(int cn, int flag)
 		}
 	}
 	
-	if (dist_target && !do_char_can_see(cn, co))
+	if (dist_target && !do_char_can_see(cn, co, 0))
 	{
 		if (!flag) do_char_log(cn, 0, "You cannot see your target.\n");
 		return;
@@ -6003,8 +6118,9 @@ void skill_leap(int cn, int flag)
 		if (ch[cc].a_hp >= ch[cc].hp[5]*950) 
 		{
 			dam = dam * critical / 100;
-			if (dostun) spell_warcry(cn, cc, dam/2, 1);
+			if (dostun) spell_warcry(cn, cc, dam/2, 2);
 		}
+		else if (dostun) spell_warcry(cn, cc, dam/2, 1);
 		tmp = do_hurt(cn, cc, dam, randomtarg?0:8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[cc].reference);
 		else
@@ -6022,8 +6138,9 @@ void skill_leap(int cn, int flag)
 		if (ch[co].a_hp >= ch[co].hp[5]*950) 
 		{
 			dam = dam * critical / 100;
-			if (dostun) spell_warcry(cn, co, dam/2, 1);
+			if (dostun) spell_warcry(cn, co, dam/2, 2);
 		}
+		else if (dostun) spell_warcry(cn, co, dam/2, 1);
 		tmp = do_hurt(cn, co, dam, randomtarg?0:8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
@@ -6045,8 +6162,9 @@ void skill_leap(int cn, int flag)
 		if (ch[co].a_hp >= ch[co].hp[5]*950) 
 		{
 			dam = dam * critical / 100;
-			if (dostun) spell_warcry(cn, co, dam/2, 1);
+			if (dostun) spell_warcry(cn, co, dam/2, 2);
 		}
+		else if (dostun) spell_warcry(cn, co, dam/2, 1);
 		tmp = do_hurt(cn, co, dam, randomtarg?0:8);
 		if (tmp<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
@@ -6324,7 +6442,7 @@ int spell_calm(int cn, int co, int power)
 	if (get_tarot(co, IT_CH_HERMIT_R)) 
 	{
 		bu[in].data[2] = 2;
-		bu[in].hp[0]   = -(ch[co].a_end /2000);
+		bu[in].end[0]  = -(ch[co].a_end /2000);
 	}
 	else
 	{
@@ -6332,21 +6450,21 @@ int spell_calm(int cn, int co, int power)
 		bu[in].mana[0] = -(ch[co].a_mana/2000);
 	}
 	
-	if (T_LYCA_SK(co, 9))
+	if (T_LYCA_SK(co, 7))
 	{
 		tmp = ((ch[co].hp[5]*1000 - ch[co].a_hp)/1000) + ((ch[co].end[5]*1000 - ch[co].a_end)/1000) + ((ch[co].mana[5]*1000 - ch[co].a_mana)/1000);
-		power = power + (power * tmp / 5000);
+		power = power + (power * tmp / 4000);
 	}
 	
 	if (IS_SEYAN_DU(co))
 	{
 		bu[in].data[3] 			= min(127, power/ 6 + 5);
-		bu[in].data[4]			= power/3;
+		bu[in].data[4]			= power*2/3;
 	}
 	else
 	{
 		bu[in].data[3] 			= min(127, power/ 4 + 5);
-		bu[in].data[4]			= power/2;
+		bu[in].data[4]			= power*2/2;
 	}
 	
 	bu[in].flags |= IF_PERMSPELL;
@@ -6365,7 +6483,7 @@ int spell_rage(int cn, int co, int power)
 	if (get_tarot(co, IT_CH_HERMIT_R)) 
 	{
 		bu[in].data[2] = 2;
-		bu[in].mana[0] = -(ch[co].a_end /2000);
+		bu[in].end[0]  = -(ch[co].a_end /2000);
 	}
 	else
 	{
@@ -6376,18 +6494,18 @@ int spell_rage(int cn, int co, int power)
 	if (T_LYCA_SK(co, 7))
 	{
 		tmp = ((ch[co].hp[5]*1000 - ch[co].a_hp)/1000) + ((ch[co].end[5]*1000 - ch[co].a_end)/1000) + ((ch[co].mana[5]*1000 - ch[co].a_mana)/1000);
-		power = power + (power * tmp / 5000);
+		power = power + (power * tmp / 4000);
 	}
 	
 	if (IS_SEYAN_DU(co))
 	{
 		bu[in].top_damage[1] 	= min(127, power/ 6 + 5);
-		bu[in].data[4]			= power/3;
+		bu[in].data[4]			= power*2/3;
 	}
 	else
 	{
 		bu[in].top_damage[1] 	= min(127, power/ 4 + 5);
-		bu[in].data[4]			= power/2;
+		bu[in].data[4]			= power*2/2;
 	}
 	
 	bu[in].flags |= IF_PERMSPELL;
@@ -6402,17 +6520,27 @@ void skill_rage(int cn)
 	power = skill_multiplier(power, cn);
 	
 	if (is_exhausted(cn)) 							{ return; }
-	if (has_buff(cn, SK_RAGE))
+	if (!IS_SHIFTED(cn) && has_buff(cn, SK_RAGE))
 	{
 		do_char_log(cn, 1, "Rage no longer active.\n");
 		remove_buff(cn, SK_RAGE);
+		if ((in = has_buff(cn, SK_CALM)) && (bu[in].active>(bu[in].duration-TICKS*5)))
+		{
+			do_char_log(cn, 1, "Calm no longer active.\n");
+			remove_buff(cn, SK_CALM);
+		}
 		do_update_char(cn);
 		return;
 	}
-	if (has_buff(cn, SK_CALM))
+	if (IS_SHIFTED(cn) && has_buff(cn, SK_CALM))
 	{
 		do_char_log(cn, 1, "Calm no longer active.\n");
 		remove_buff(cn, SK_CALM);
+		if ((in = has_buff(cn, SK_RAGE)) && (bu[in].active>(bu[in].duration-TICKS*5)))
+		{
+			do_char_log(cn, 1, "Rage no longer active.\n");
+			remove_buff(cn, SK_RAGE);
+		}
 		do_update_char(cn);
 		return;
 	}
