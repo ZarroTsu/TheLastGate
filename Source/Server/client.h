@@ -104,6 +104,8 @@ struct cplayer
 	int waypoints;
 
 	unsigned short tree_points;
+	unsigned char tree_node[12];
+	unsigned short os_tree;
 
 	// items carried
 	int item[40];
@@ -114,6 +116,7 @@ struct cplayer
 	// items worn
 	int worn[20];
 	int worn_p[20];
+	char worn_s[20];   // Stack size
 	
 	// spells ready
 	short spell[MAXBUFFS];
@@ -255,6 +258,7 @@ struct cplayer
 #define SV_SETCHAR_WPS      76
 #define SV_CLEARBOX         77
 #define SV_SETCHAR_TOK      78
+#define SV_SETCHAR_TRE      79
 
 #define SV_MOTD  82
 #define SV_MOTD0 82

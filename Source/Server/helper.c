@@ -459,18 +459,6 @@ int can_go(int _fx, int _fy, int tx, int ty)
 	return(tmp);
 }
 
-/* moved to svr_tick for speed reasons
-   int check_dlight(int x,int y)
-   {
-        int m;
-
-        m=x+y*MAPX;
-
-        if (!(map[m].flags&MF_INDOORS)) return globs->dlight;
-
-        return (globs->dlight*map[m].dlight)/256;
-   } */
-
 void compute_dlight(int xc, int yc)
 {
 	int xs, ys, xe, ye, x, y, v, d, best = 0, m;
@@ -498,7 +486,15 @@ void compute_dlight(int xc, int yc)
 				{
 					continue;
 				}
-				d = 256 / (v * (abs(xc - x) + abs(yc - y)));
+				if (IS_IN_DW(M2X(m), M2Y(m)))
+				{
+					if  (map[m].flags & MF_TOUCHED) d = 200;
+					else continue;
+				}
+				else
+				{
+					d = 256 / (v * (abs(xc - x) + abs(yc - y)));
+				}
 				if (d>best)
 				{
 					best = d;
@@ -663,6 +659,17 @@ int points2rank(int v)
 	if (v< 94185000)	return 22; // Earl
 	if (v<118755000)	return 23; // Marquess
 						return 24; // Warlord
+}
+
+// 1!3 =   168 x 8 =  1344
+// 2!5 =   924 x 4 =  3696
+// 3!7 =  3432 x 2 =  6864
+// 4!9 = 10010 x 1 = 10010
+
+int getitemrank(int in, int flag)
+{
+	if (flag) return points2rank(it[in].cost*125/max(1,flag));
+	else      return points2rank(it[in].cost*250);
 }
 
 int getrank(int cn)
@@ -860,6 +867,36 @@ int st_skill_pts_all(int st_val)
 	return ( m + st_skill_pts_have(st_val) );
 }
 
+int st_skillnum(int cn, int v, int n)
+{
+	if (v <   1) return 0;
+	if (n >= 12) return 0;
+	if (n <   0)
+	{
+		if (ch[cn].tree_node[v-1] == 0 || n == -1)
+			return st_learned_skill(ch[cn].tree_points, v);
+		return 0;
+	}
+	
+	if (st_learned_skill(ch[cn].tree_points, n+1) && ch[cn].tree_node[n] == v)
+		return 1;
+	
+	return 0;
+}
+
+int st_skillcount(int cn, int v)
+{
+	int n, in, count = 0;
+	
+	if (!IS_SANEPLAYER(cn)) return 0;
+	
+	for (n=0; n<12; n++) count += st_skillnum(cn, v, n);
+	if ((in = ch[cn].worn[WN_CHARM])  && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
+	if ((in = ch[cn].worn[WN_CHARM2]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
+	
+	return count;
+}
+
 int get_best_worn(int cn, int v)
 {
 	int n = -1000, in;
@@ -883,25 +920,27 @@ int get_best_worn(int cn, int v)
 					n = get_best_armor(cn, 4);
 				break;
 			case WN_RHAND:
-				if ((it[in].flags & SK_DAGGER) && (it[in].flags & IF_WP_STAFF))
+				if (IS_WPSPEAR(in))
 					n = get_best_weapon(cn, 7);
-				else if ((it[in].flags & IF_WP_AXE) && (it[in].flags & IF_WP_TWOHAND))
+				else if (IS_WPGAXE(in))
 					n = get_best_weapon(cn, 10);
-				else if (it[in].flags & IF_WP_DAGGER)
+				else if (IS_WPDAGGER(in))
 					n = get_best_weapon(cn, SK_DAGGER);
-				else if (it[in].flags & IF_WP_SWORD)
+				else if (IS_WPSWORD(in))
 					n = get_best_weapon(cn, SK_SWORD);
-				else if (it[in].flags & IF_WP_AXE)
+				else if (IS_WPAXE(in))
 					n = get_best_weapon(cn, SK_AXE);
-				else if (it[in].flags & IF_WP_STAFF)
+				else if (IS_WPSTAFF(in))
 					n = get_best_weapon(cn, SK_STAFF);
-				else if (it[in].flags & IF_WP_TWOHAND)
+				else if (IS_WPTWOHAND(in))
 					n = get_best_weapon(cn, SK_TWOHAND);
+				else if (IS_WPSHIELD(in))
+					n = get_best_weapon(cn, SK_SHIELD);
 				else 
 					n = get_best_weapon(cn, SK_HAND);
 				break;
 			case WN_LHAND:
-				if (it[in].flags & IF_OF_DUALSW)
+				if (IS_WPDUALSW(in))
 					n = get_best_weapon(cn, SK_DUAL);
 				else 
 					n = get_best_weapon(cn, SK_SHIELD);
@@ -3000,6 +3039,19 @@ void make_talisfrag(int cn, int n)
 	god_give_char(in, cn);	// chlog(cn, "got talisman fragment(s)");
 }
 
+void make_corruptor(int cn)
+{
+	int in;
+	
+	if (!(in = god_create_item(IT_CORRUPTOR)))
+	{
+		chlog(cn, "ERROR in make_corruptor: god_create_item failure");
+		return;
+	}
+	
+	god_give_char(in, cn);
+}
+
 // Soulstone an item by a given rank
 void create_soultrans_equipment(int cn, int in2, int rank)
 {
@@ -3714,265 +3766,60 @@ int use_talisman(int cn, int in, int in2)
 	return 1;
 }
 
-int use_corruptor(int cn, int in, int in2)
+int use_corruptor(int cn, int in)
 {
-	int r, n, m, temp, inds = 0;
-	int stk, val, mul = 1;
+	int in2;
 	
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
-	if (!in2)
+	
+	if (it[in].data[0])
 	{
-		do_char_log(cn, 1, "Try using something with the talisman. Click on it with an item under your cursor.\n");
-		return 0;
+		if (!IS_SANEITEM(in2 = ch[cn].citem))
+		{
+			do_char_log(cn, 1, "Try using a tarot card with the item. Or you can try using it on your skill tree...\n");
+			return 0;
+		}
+		
+		if ((it[in2].flags & IF_CORRUPTED) || (!(it[in2].placement)))
+		{
+			do_char_log(cn, 1, "Nothing happened.\n");
+			return 0;
+		}
+		
+		if (!IS_TAROT(in2))
+		{
+			do_char_log(cn, 1, "Hmm... Didn't work. Seems like this only works with tarot cards.\n");
+			return 0;
+		}
+		
+		if (it[in2].cost = it[in].data[0]) {}
+		else it[in2].cost = RANDOM(NUM_CORR)+1;
+		
+		it[in2].flags |= IF_UPDATE | IF_CORRUPTED | IF_SHOPDESTROY;
+		it[in2].power += 60;
+		
+		do_char_log(cn, 2, "You corrupted the card with %s.\n", sk_corrupt[it[in].data[0]-1]);
 	}
-	if (!IS_SANEITEM(in2))	return 0;
-	
-	if ((it[in2].flags & IF_CORRUPTED) || (!(it[in2].placement)))
+	else
 	{
-		do_char_log(cn, 1, "Nothing happened.\n");
-		return 0;
+		in2 = god_create_item(IT_CORRUPTOR);
+		
+		it[in2].flags  &= ~(IF_STACKABLE);
+		it[in2].stack   = 0;
+		it[in2].data[0] = RANDOM(NUM_CORR)+1;
+		it[in2].flags  |= (IF_LOOKSPECIAL | IF_SOULSTONE | IF_UPDATE);
+		
+		if (!god_give_char(in2, cn))
+		{
+			do_char_log(cn, 0, "Your backpack is full.\n");
+			it[in2].used = USE_EMPTY;
+			return 0;
+		}
+		do_char_log(cn, 1, "The %s was empowered with %s.\n", it[in2].reference, sk_corrupt[it[in2].data[0]-1]);
 	}
-	
-	if (IS_TWOHAND(in2))
-	{
-		mul = 2;
-	}
-	
-	switch (RANDOM(10))
-	{
-		case  1:
-			for (n=0;n<5;n++)
-			{
-				it[in2].attrib[n][0] += 2 * mul; it[in2].attrib[n][1] += 2 * mul;
-			}
-			it[in2].to_hit[0]   += -2 * mul; 	it[in2].to_hit[1]   += -2 * mul;
-			it[in2].to_parry[0] += -2 * mul;	it[in2].to_parry[1] += -2 * mul;
-			break;
-		case  2:
-			for (n=0;n<5;n++)
-			{
-				it[in2].attrib[n][0] += 2 * mul; it[in2].attrib[n][1] += 2 * mul;
-			}
-			it[in2].weapon[0] += -2 * mul; 		it[in2].weapon[1] += -2 * mul;
-			it[in2].armor[0]  += -2 * mul; 		it[in2].armor[1]  += -2 * mul;
-			break;
-		case  3:
-			for (n=0;n<5;n++)
-			{
-				it[in2].attrib[n][0] += -2 * mul; it[in2].attrib[n][1] += -2 * mul;
-			}
-			n = RANDOM(50);
-			it[in2].skill[n][0] += 5 * mul; 	it[in2].skill[n][1] += 5 * mul;
-			break;
-		case  4:
-			for (n=0;n<5;n++)
-			{
-				it[in2].attrib[n][0] += -2 * mul; it[in2].attrib[n][1] += -2 * mul;
-			}
-			n = RANDOM(5);
-			it[in2].attrib[n][0] += 7 * mul; 	it[in2].attrib[n][1] += 7 * mul;
-			break;
-		case  5:
-			m = temp = 0;
-			for (n=0;n<5;n++)
-			{
-				temp += it[in2].attrib[n][2];
-			}
-			if (temp)
-			{
-				for (n=0;n<5;n++)
-				{
-					m = min(120, RANDOM(temp));
-					it[in2].attrib[n][2] = m;
-					temp = max(0, temp - m);
-				}
-			}
-			else
-			{
-				for (n=0;n<5;n++)
-				{
-					it[in2].attrib[n][0] += -3 * mul; it[in2].attrib[n][1] += -3 * mul;
-				}
-				it[in2].to_hit[0]   += 3 * mul; it[in2].to_hit[1]   += 3 * mul;
-			}
-			break;
-		case  6:
-			m = temp = 0;
-			for (n=0;n<50;n++)
-			{
-				temp += it[in2].skill[n][2];
-			}
-			if (temp)
-			{
-				for (n=0;n<50;n++)
-				{
-					m = min(120, RANDOM(temp));
-					it[in2].skill[n][2] = m;
-					temp = max(0, temp - m);
-				}
-			}
-			else
-			{
-				for (n=0;n<5;n++)
-				{
-					it[in2].attrib[n][0] += -3 * mul; it[in2].attrib[n][1] += -3 * mul;
-				}
-				it[in2].to_parry[0]   += 3 * mul; it[in2].to_parry[1]   += 3 * mul;
-			}
-			break;
-		case  7:
-			for (n=0;n<5;n++)
-			{
-				it[in2].attrib[n][0] += -3 * mul; it[in2].attrib[n][1] += -3 * mul;
-			}
-			if (it[in].flags & IF_WEAPON)
-			{
-				it[in2].weapon[0] += 3 * mul; it[in2].weapon[1] += 3 * mul;
-			}
-			else if (it[in].flags & IF_ARMORS)
-			{
-				it[in2].armor[0]  += 3 * mul; it[in2].armor[1]  += 3 * mul;
-			}
-			else if (it[in2].placement & PL_NECK)
-			{
-				it[in2].spell_mod[0] += 3; it[in2].spell_mod[1] += 3;
-			}
-			else if (it[in2].placement & PL_BELT)
-			{
-				it[in2].enchantment = 111;
-				if (RANDOM(2)) it[in2].cost = 1514 + RANDOM(21);
-				else           it[in2].cost = 2231 + RANDOM(22);
-			}
-			else if (it[in2].placement & PL_CHARM)
-			{
-				it[in2].to_hit[0]   += 2; it[in2].to_hit[1]   += 2;
-				it[in2].to_parry[0] += 2; it[in2].to_parry[1] += 2;
-			}
-			else
-			{
-				it[in2].weapon[0] += 2 * mul; it[in2].weapon[1] += 2 * mul;
-				it[in2].armor[0]  += 2 * mul; it[in2].armor[1]  += 2 * mul;
-			}
-			break;
-		case  8:
-			if (it[in].flags & IF_WEAPON)
-			{
-				it[in2].hp[0]     += -45 * mul; it[in2].hp[1]     += -45 * mul;
-				it[in2].mana[0]   += -45 * mul; it[in2].mana[1]   += -45 * mul;
-				it[in2].weapon[0] +=   3 * mul; it[in2].weapon[1] +=   3 * mul;
-			}
-			else if (it[in].flags & IF_ARMORS)
-			{
-				it[in2].hp[0]     += -45 * mul; it[in2].hp[1]     += -45 * mul;
-				it[in2].mana[0]   += -45 * mul; it[in2].mana[1]   += -45 * mul;
-				it[in2].armor[0]  +=   3 * mul; it[in2].armor[1]  +=   3 * mul;
-			}
-			else if (it[in2].placement & PL_NECK)
-			{
-				it[in2].hp[0]   	+= -75; it[in2].hp[1]   += -75;
-				it[in2].spell_mod[0] += 2; it[in2].spell_mod[1] += 2;
-			}
-			else if (it[in2].placement & PL_BELT)
-			{
-				it[in2].hp[0]   += -25; it[in2].hp[1]   += -25;
-				it[in2].end[0]  +=  25; it[in2].end[1]  +=  25;
-				it[in2].mana[0] += -25; it[in2].mana[1] += -25;
-			}
-			else if (it[in2].placement & PL_CHARM)
-			{
-				it[in2].hp[0]   	+= -75; it[in2].hp[1]       += -75;
-				it[in2].to_hit[0]   +=   2; it[in2].to_hit[1]   +=   2;
-				it[in2].to_parry[0] +=   2;	it[in2].to_parry[1] +=   2;
-			}
-			else
-			{
-				it[in2].hp[0]     += -45 * mul; it[in2].hp[1]     += -45 * mul;
-				it[in2].mana[0]   += -45 * mul; it[in2].mana[1]   += -45 * mul;
-				it[in2].weapon[0] +=   2 * mul; it[in2].weapon[1] +=   2 * mul;
-				it[in2].armor[0]  +=   2 * mul; it[in2].armor[1]  +=   2 * mul;
-			}
-			break;
-		case  9:
-			if (it[in].flags & IF_WEAPON)
-			{
-				it[in2].to_hit[0]     += -2 * mul; it[in2].to_hit[1]     += -2 * mul;
-				it[in2].to_parry[0]   += -2 * mul; it[in2].to_parry[1]   += -2 * mul;
-				it[in2].top_damage[0] +=  7 * mul; it[in2].top_damage[1] +=  7 * mul;
-			}
-			else if (it[in].flags & IF_ARMORS)
-			{
-				it[in2].armor[0]       += -3 * mul; it[in2].armor[1]       += -3 * mul;
-				it[in2].gethit_dam[0]  +=  2 * mul; it[in2].gethit_dam[1]  +=  2 * mul;
-			}
-			else if (it[in2].placement & PL_NECK)
-			{
-				it[in2].mana[0]   	 += -75; it[in2].mana[1]      += -75;
-				it[in2].spell_mod[0] +=   2; it[in2].spell_mod[1] +=   2;
-			}
-			else if (it[in2].placement & PL_BELT)
-			{
-				it[in2].hp[0]   +=  25; it[in2].hp[1]   +=  25;
-				it[in2].end[0]  += -25; it[in2].end[1]  += -25;
-				it[in2].mana[0] +=  25; it[in2].mana[1] +=  25;
-			}
-			else if (it[in2].placement & PL_CHARM)
-			{
-				it[in2].mana[0]   	+= -75; it[in2].mana[1]     += -75;
-				it[in2].to_hit[0]   +=   2; it[in2].to_hit[1]   +=   2;
-				it[in2].to_parry[0] +=   2;	it[in2].to_parry[1] +=   2;
-			}
-			else
-			{
-				it[in2].end[0]    -= 45 * mul; it[in2].end[1]    -= 45 * mul;
-				it[in2].weapon[0] +=  2 * mul; it[in2].weapon[1] +=  2 * mul;
-				it[in2].armor[0]  +=  2 * mul; it[in2].armor[1]  +=  2 * mul;
-			}
-			break;
-		default:
-			m = 0;
-			temp = -1;
-			for (n=0;n<55;n++)
-			{
-				if (n>=5) 
-				{
-					if (m >= it[in2].skill[n-5][0] && m >= it[in2].skill[n-5][1]) continue;
-					m = max(m, max(it[in2].skill[n-5][0], it[in2].skill[n-5][1]));
-				}
-				else
-				{
-					if (m >= it[in2].attrib[n][0] && m >= it[in2].attrib[n][1]) continue;
-					m = max(m, max(it[in2].attrib[n][0], it[in2].attrib[n][1]));
-				}
-				temp = n;
-			}
-			if (temp == -1)
-			{
-				it[in2].end[0]   	+= 20; it[in2].end[1]      += 20;
-				it[in2].to_hit[0]   += -1; it[in2].to_hit[1]   += -1;
-				it[in2].to_parry[0] += -1; it[in2].to_parry[1] += -1;
-				break;
-			}
-			if (temp < 5)
-			{
-				it[in2].attrib[temp][0] = 0; it[in2].attrib[temp][1] = 0;
-			}
-			else
-			{
-				it[in2].skill[temp-5][0] = 0; it[in2].skill[temp-5][1] = 0;
-			}
-			it[in2].max_damage = 0;
-			break;
-	}
-	
-	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_CORRUPTED | IF_LOOKSPECIAL | IF_NOREPAIR | IF_SHOPDESTROY;
-	it[in2].flags &= ~IF_CAN_SS;
-	it[in2].flags &= ~IF_CAN_EN;
-	it[in2].value  = 1;
-	it[in2].power += 7;
-	
-	do_char_log(cn, 2, "You corrupted the %s.\n", it[in2].name);
 	use_consume_item(cn, in, 0);
+	
 	return 1;
 }
 
@@ -4170,8 +4017,9 @@ void set_random_text(int cn)
 int start_contract(int cn, int in)
 {
 	unsigned long long prof;
-	int rank, tier, mission, fl;
+	int cc, rank, tier, mission, fl, bonus=0;
 	int flags[NUM_MAP_POS+NUM_MAP_NEG] = {0};
+	int r1=1, r2=2, r3=3;
 	
 	if (cn==0 || !(in && it[in].temp==MCT_CONTRACT))
 	{
@@ -4183,26 +4031,26 @@ int start_contract(int cn, int in)
 		do_char_log(cn, 0, "This contract hasn't been signed yet. Find a coloured quill and use it on the contract to sign it.\n");
 		return 0;
 	}
-	/*
-	else if (cn != it[in].data[0])
-	{
-		do_char_log(cn, 0, "This contract isn't yours.\n");
-		return 0;
-	}
-	*/
+	
+	cc		= it[in].data[0];
+	
+	if (T_OS_TREE(cc, 2)) bonus++;
+	if (T_OS_TREE(cc, 8)) bonus++;
 	
 	mission = it[in].data[1];
 	tier    = it[in].data[2];
-	rank    = getrank(cn) + tier;
+	rank    = getrank(cn) + tier + bonus;
 	
-	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 1;
-	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 2;
-	if ((fl = it[in].data[7]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 3;
-	if ((fl = it[in].data[4]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 1;
-	if ((fl = it[in].data[6]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 2;
-	if ((fl = it[in].data[8]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 3;
+	if (T_OS_TREE(cc, 9)) r1 = r2 = r3 = 3;
 	
-	return build_new_map(cn, rank, flags, mission, tier, in);
+	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r1;
+	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r2;
+	if ((fl = it[in].data[7]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r3;
+	if ((fl = it[in].data[4]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = r1;
+	if ((fl = it[in].data[6]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = r2;
+	if ((fl = it[in].data[8]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = r3;
+	
+	return build_new_map(cn, cc, rank, flags, mission, tier, in);
 }
 
 int get_tier_font(int tier)
@@ -4794,9 +4642,9 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 	 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,45,50, 0,50, 0, 0, 0,45,45,45,45,45,36,40,30,50,46}  // *7 : Metztli
 };
 
-int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, int tarot)
+int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int affix, int tarot)
 {
-	int co, tmp, pts, n, m, j, in, v, rank;
+	int co, tmp, pts, n, m, j, in, v, rank, tbelt=1, hasloot=0;
 	char buf[40];
 	
 	co = pop_create_char(temp, 0);
@@ -4812,12 +4660,12 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		ch[co].used = USE_EMPTY;
 		return 0;
 	}
-	fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+	if (affix!=7) fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
 	
 	// Set name and sprite
 	if (kin)
 	{
-		if (affix==7)
+		if (affix==8)
 		{
 			for (n = 0; n < 40; n++)
 			{
@@ -4838,6 +4686,12 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				case  5: sprintf(ch[co].description, "It's you. Your face, your eyes... bleeding."); break;
 				default: sprintf(ch[co].description, "bEfore yOu sTands tHe sAnguine cReature."); break;
 			}
+		}
+		else if (affix==7)
+		{
+			sprintf(ch[co].name, "Shade");
+			sprintf(ch[co].reference, "the shadow creature");
+			sprintf(ch[co].description, "A featureless void. It glides through the darkness with otherworldly speed.");
 		}
 		else
 		{
@@ -4878,7 +4732,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	// Apply flags and Prefix
 	if (affix)
 	{
-		if (affix != 7 && (n = get_map_enemy_affix_length(affix)))
+		if (affix != 8 && affix != 7 && (n = get_map_enemy_affix_length(affix)))
 		{
 			sprintf(buf, "the %s %s", get_map_enemy_affix(affix), ch[co].name); buf[5+n] = tolower(buf[5+n]);
 			strncpy(ch[co].reference, buf, 39); ch[co].reference[39] = 0;
@@ -4891,13 +4745,13 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	
 		switch (affix)
 		{
-			case 1:												// "Tough" (BS)
+			case  1:												// "Tough" (BS)
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += 3+RANDOM(3);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += 3+RANDOM(3)*2;
 				break;
-			case 2:												// "Fierce" (BS)
+			case  2:												// "Fierce" (BS)
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += 6+RANDOM(5);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4905,7 +4759,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				if (!(ch[co].flags & CF_EXTRACRIT)) ch[co].flags |= CF_EXTRACRIT;
 				break;
 			//
-			case 3:												// "Divine" (CN)
+			case  3:												// "Divine" (CN)
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/20)+RANDOM(B_AT(co, n)/18);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4915,17 +4769,27 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, RANDOM(2)+1);
 				// 
 				break;
-			case 4:												// "Cruel"
+			case  4:												// "Cruel"
+			case 14:
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16)*2;
 				ch[co].data[72] = 4;
-				//
-				make_talisfrag(co, 2);
-				//
+				if (affix==14)
+				{
+					for (n = 0; n<5; n++)
+						B_AT(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16);
+					for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
+						B_SK(co, n) += (B_AT(co, n)/18)+RANDOM(B_AT(co, n)/16)*2;
+					make_talisfrag(co, 4);
+				}
+				else
+				{
+					make_talisfrag(co, 2);
+				}
 				break;
-			case 5:												// "Timid"
+			case  5:												// "Timid"
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/20);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4936,7 +4800,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, RANDOM(2)+2);
 				//
 				break;
-			case 6:												// Legendary
+			case  6:												// Legendary
 				for (n = 0; n<5; n++)
 					B_AT(co, n) += (B_AT(co, n)/22)+RANDOM(B_AT(co, n)/22);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
@@ -4947,9 +4811,22 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 				make_talisfrag(co, 3);
 				//
 				break;
-			case 7:												// Sanguine
+			case  7:												// Darkwood Shadow
+				ch[co].kindred |= KIN_SHADOW;
+				ch[co].flags |= CF_SILENCE | CF_INFRARED | CF_EXTRACRIT;
+				ch[co].speed_mod = 120;
+				ch[co].skill[SK_PERCEPT][1] = 30;
+				switch (RANDOM(6))
+				{
+					case  1:	strcpy(ch[co].text[1], "%s..."); break;
+					case  2:	strcpy(ch[co].text[1], "...%s..."); break;
+					case  3:	strcpy(ch[co].text[1], "...%s."); break;
+					default:	break;
+				}
+				break;
+			case  8:												// Sanguine
 				ch[co].kindred |= KIN_BLOODY;
-				ch[co].flags |= CF_SILENCE | CF_INFRARED;
+				ch[co].flags |= CF_SILENCE | CF_INFRARED | CF_SIMPLE;
 				switch (RANDOM(4))
 				{
 					case  1:	strcpy(ch[co].text[0], "dddddd%saaaaaaaaaaaaa"); break;
@@ -4971,6 +4848,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 					case  3:	strcpy(ch[co].text[3], "^&%%&^%%^&%%&^%%&%%&%%"); break;
 					default:	strcpy(ch[co].text[3], "My $$S$S loves me very vEry veRY &&!!"); break;
 				}
+				make_corruptor(co);
 				break;
 			//
 			default:
@@ -4995,12 +4873,15 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 	ch[co].a_end  = 999999;
 	ch[co].a_mana = 999999;
 	
-	if (ch[co].data[42] == 1100 && affix != 7) // Map enemy
+	if (temp == 350 && affix != 7 && affix != 8) // Map enemy
 	{
 		in = 0;
 		rank = getrank(co);
 		
-		if (rank>=18 && try_boost(50))
+		if (T_OS_TREE(cn, 1)) tbelt += 2;
+		if (T_OS_TREE(cn, 5)) tbelt += 2;
+		
+		if (rank>=18 && try_boost(40))
 		{
 			static int item[]  = {
 				2515, 2519, 2523, 2527, 2531, 
@@ -5009,7 +4890,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=15 && try_boost(50))
+		else if (rank>=15 && try_boost(40))
 		{
 			static int item[]  = {
 				2514, 2518, 2522, 2526, 2530, 
@@ -5018,7 +4899,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (rank>=12 && try_boost(50))
+		else if (rank>=12 && try_boost(40))
 		{
 			static int item[]  = {
 				2513, 2517, 2521, 2525, 2529, 
@@ -5027,7 +4908,7 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 			};
 			in = RANDOM(sizeof(item) / sizeof(int)); in = item[in];
 		}
-		else if (try_boost(50))
+		else if (try_boost(40))
 		{
 			static int item[]  = {
 				2512, 2516, 2520, 2524, 2528,
@@ -5039,25 +4920,41 @@ int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, i
 		
 		if (in)
 		{
-			in = god_create_item(in);
+			in = pop_create_item(in, co);
 			god_give_char(in, co);
 			chlog(co, "got a %s", it[in].name);
+			hasloot=1;
 		}
 		
 		in = 0;
 		
-		if (try_boost(50))
+		if (try_boost(40))
 		{
 			in = pop_create_bonus(co);
+			god_give_char(in, co);
+			hasloot=1;
 		}
-		else if (try_boost(4000))
+		if (try_boost(500))
+		{
+			in = pop_create_bonus(co);
+			god_give_char(in, co);
+			hasloot=1;
+		}
+		if (try_boost(6000/max(1,tbelt)))
 		{
 			in = pop_create_bonus_belt(co);
-		}
-		if (in)
-		{
 			god_give_char(in, co);
-			chlog(co, "got a %s", it[in].name);
+			hasloot=1;
+		}
+		
+		if (!ch[co].citem && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+		{
+			if (in = god_create_item(IT_CORRUPTOR))
+			{
+				ch[co].citem = in;
+				it[in].carried = co;
+				it[in].cost = 555;
+			}
 		}
 		
 		ch[co].data[29] = xx + yy * MAPX;

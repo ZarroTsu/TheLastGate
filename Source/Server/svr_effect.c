@@ -221,51 +221,62 @@ void effect_tick(void)
 					if (m)
 					{
 						co = fx[n].data[2];
-
 						flag = 0;
-						for (z = 0; z<MAXITEMS && !flag; z++)
+						
+						if (ch[co].citem && (it[ch[co].citem].temp==IT_CORRUPTOR) && (it[ch[co].citem].cost==555))
 						{
-							if (ch[co].item[z])
+							reset_go(M2X(m), M2Y(m));
+							remove_lights(M2X(m), M2Y(m));
+							fx_add_effect(12, 0,  M2X(m), M2Y(m), 0);
+							build_item(3308, M2X(m), M2Y(m));
+							reset_go(M2X(m), M2Y(m));
+							add_lights(M2X(m), M2Y(m));
+						}
+						else
+						{
+							for (z = 0; z<MAXITEMS && !flag; z++)
 							{
-								// skip if held item template matches current weapon
-								if (it[ch[co].item[z]].temp == it[ch[co].worn[WN_RHAND]].temp && 
-									it[ch[co].item[z]].driver != 68 && it[ch[co].item[z]].driver != 92 && 
-									it[ch[co].item[z]].driver != 93 && it[ch[co].item[z]].driver != 118) 
+								if (ch[co].item[z])
+								{
+									// skip if held item template matches current weapon
+									if (it[ch[co].item[z]].temp>0 && it[ch[co].item[z]].temp == it[ch[co].worn[WN_RHAND]].temp && 
+										it[ch[co].item[z]].driver != 68 && it[ch[co].item[z]].driver != 92 && 
+										it[ch[co].item[z]].driver != 93 && it[ch[co].item[z]].driver != 118) 
+									{
+										continue;
+									}
+									
+									flag = 1;
+									break;
+								}
+							}
+							for (z = 0; z<20 && !flag; z++)
+							{
+								// skip weapon slot
+								if (z == WN_RHAND && !(ch[co].worn[z] && IS_UNIQUE(ch[co].worn[z])))
 								{
 									continue;
 								}
 								
-								flag = 1;
-								break;
+								if (ch[co].worn[z])
+								{
+									flag = 1;
+									break;
+								}
 							}
-						}
-						for (z = 0; z<20 && !flag; z++)
-						{
-							// skip weapon slot
-							if (z == WN_RHAND && !(ch[co].worn[z] && is_unique(ch[co].worn[z])))
-							{
-								continue;
-							}
-							
-							if (ch[co].worn[z])
+							if (ch[co].citem)
 							{
 								flag = 1;
-								break;
+							}
+							if (ch[co].gold)
+							{
+								flag = 1;
+							}
+							if (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_LAB20_KEEP)
+							{
+								flag = 0;
 							}
 						}
-						if (ch[co].citem)
-						{
-							flag = 1;
-						}
-						if (ch[co].gold)
-						{
-							flag = 1;
-						}
-						if (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_LAB20_KEEP)
-						{
-							flag = 0;
-						}
-
 						if (flag)
 						{
 							map[m].flags |= MF_MOVEBLOCK;
@@ -526,15 +537,12 @@ void effect_tick(void)
 			fx[n].duration++;
 			if (fx[n].duration==19)
 			{
-
 				fx[n].used = 0;
-
 				m = fx[n].data[0] + fx[n].data[1] * MAPX;
 				map[m].flags &= ~MF_GFX_DEATH;
 			}
 			else
 			{
-
 				m = fx[n].data[0] + fx[n].data[1] * MAPX;
 				map[m].flags &= ~MF_GFX_DEATH;
 				map[m].flags |= ((unsigned long long)fx[n].duration) << 40;
@@ -547,7 +555,7 @@ void effect_tick(void)
 
 int fx_add_effect(int type, int duration, int d1, int d2, int d3)
 {
-	int n;
+	int n, m;
 
 	for (n = 1; n<MAXEFFECT; n++)
 	{
@@ -559,6 +567,13 @@ int fx_add_effect(int type, int duration, int d1, int d2, int d3)
 	if (n==MAXEFFECT)
 	{
 		return 0;
+	}
+	
+	if (type==6 || type==7)	// Hide cast flashes for shadows
+	{
+		m = d1 + d2 * MAPX;
+		if (IS_SANECHAR(m = map[m].ch) && ch[m].temp==347 && IS_SHADOW(m))
+			return 0;
 	}
 
 	fx[n].used = USE_ACTIVE;

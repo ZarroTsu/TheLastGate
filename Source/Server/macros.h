@@ -47,22 +47,66 @@
 #define IS_SINBINDER(in)		(it[(in)].temp==IT_TW_SINBIND || it[(in)].orig_temp==IT_TW_SINBIND)
 #define NOT_SINBINDER(in)		(it[(in)].temp!=IT_TW_SINBIND && it[(in)].orig_temp!=IT_TW_SINBIND)
 
+#define IS_MAGICITEM(in)		(it[(in)].flags & IF_MAGIC)
+#define IS_UNIQUE(in)			(it[(in)].flags & IF_UNIQUE)
 #define IS_GEMSTONE(in)			(it[(in)].flags & IF_GEMSTONE)
 #define IS_SOULSTONE(in)		(it[(in)].driver==68)
 #define IS_SOULFOCUS(in)		(it[(in)].driver==92)
 #define IS_SOULCAT(in)			(it[(in)].driver==93)
 #define IS_TAROT(in)			((it[(in)].temp>=IT_CH_FOOL && it[(in)].temp<=IT_CH_WORLD) || (it[(in)].temp>=IT_CH_FOOL_R && it[(in)].temp<=IT_CH_WORLD_R))
-
 #define IS_CONTRACT(in)			(it[(in)].temp==MCT_CONTRACT)
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
 
+int is_apotion(int in);
+int is_ascroll(int in);
+
+#define IS_POTION(in)			(is_apotion(in))
+#define IS_SCROLL(in)			(is_ascroll(in))
+
+#define IS_WPDAGGER(in)			((it[(in)].flags & IF_WP_DAGGER) && !(it[(in)].flags & IF_WP_STAFF))
+#define IS_WPSTAFF(in)			((it[(in)].flags & IF_WP_STAFF) && !(it[(in)].flags & IF_WP_DAGGER))
+#define IS_WPSPEAR(in)			((it[(in)].flags & IF_WP_DAGGER) && (it[(in)].flags & IF_WP_STAFF))
+#define IS_WPSHIELD(in)			(it[(in)].flags & IF_OF_SHIELD)
+#define IS_WPSWORD(in)			(it[(in)].flags & IF_WP_SWORD)
+#define IS_WPDUALSW(in)			(it[(in)].flags & IF_OF_DUALSW)
+#define IS_WPCLAW(in)			(it[(in)].flags & IF_WP_CLAW)
+#define IS_WPAXE(in)			((it[(in)].flags & IF_WP_AXE) && !(it[(in)].flags & IF_WP_TWOHAND))
+#define IS_WPTWOHAND(in)		((it[(in)].flags & IF_WP_TWOHAND) && !(it[(in)].flags & IF_WP_AXE))
+#define IS_WPGAXE(in)			((it[(in)].flags & IF_WP_AXE) && (it[(in)].flags & IF_WP_TWOHAND))
+
+#define IS_EQHEAD(in)			(it[(in)].placement & PL_HEAD)
+#define IS_EQNECK(in)			(it[(in)].placement & PL_NECK)
+#define IS_EQBODY(in)			(it[(in)].placement & PL_BODY)
+#define IS_EQARMS(in)			(it[(in)].placement & PL_ARMS)
+#define IS_EQBELT(in)			(it[(in)].placement & PL_BELT)
+#define IS_EQCHARM(in)			(it[(in)].placement & PL_CHARM)
+#define IS_EQFEET(in)			(it[(in)].placement & PL_FEET)
+#define IS_EQWEAPON(in)			(it[(in)].placement & PL_WEAPON)
+#define IS_EQDUALSW(in)			((it[(in)].placement & PL_SHIELD) && (it[(in)].flags & IF_OF_DUALSW))
+#define IS_EQSHIELD(in)			((it[(in)].placement & PL_SHIELD) && (it[(in)].flags & IF_OF_SHIELD))
+#define IS_EQCLOAK(in)			(it[(in)].placement & PL_CLOAK)
+#define IS_EQRING(in)			(it[(in)].placement & PL_RING)
+
+
 #define IS_TWOHAND(in)			(it[(in)].placement & PL_TWOHAND)
+#define IS_OFFHAND(in)			(it[(in)].placement & PL_SHIELD)
 #define IS_USETWOHAND(cn)		(it[ch[(cn)].worn[WN_RHAND]].placement & PL_TWOHAND)
 
 #define IS_SOULSTONED(in)		(it[(in)].flags & IF_SOULSTONE)
 #define IS_ENCHANTED(in)		(it[(in)].flags & IF_ENCHANTED)
+#define IS_SOULCHANTED(in)		(IS_SOULSTONED(in) && IS_ENCHANTED(in))
 
-#define IS_ONLYONERING(in)		((it[(in)].temp>=IT_SIGNET_TE&&it[(in)].temp<=IT_SIGNET_XX)||it[(in)].temp==IT_ICELOTUS)
+#define IS_ONLYONERING(in)		((it[(in)].temp>=IT_SIGNET_TE&&it[(in)].temp<=IT_SIGN_SKUA)||(it[(in)].temp>=IT_SIGN_SHOU&&it[(in)].temp<=IT_SIGN_SCRE)||it[(in)].temp==IT_ICELOTUS)
+
+#define IS_SKUAWEAP(in)			((it[(in)].flags & IF_KWAI_UNI) &&  (it[(in)].flags & IF_GORN_UNI) && !(it[(in)].flags & IF_PURP_UNI))
+#define IS_GORNWEAP(in)			((it[(in)].flags & IF_GORN_UNI) && !(it[(in)].flags & IF_KWAI_UNI) && !(it[(in)].flags & IF_PURP_UNI))
+#define IS_KWAIWEAP(in)			((it[(in)].flags & IF_KWAI_UNI) && !(it[(in)].flags & IF_GORN_UNI) && !(it[(in)].flags & IF_PURP_UNI))
+#define IS_PURPWEAP(in)			((it[(in)].flags & IF_PURP_UNI) && !(it[(in)].flags & IF_GORN_UNI) && !(it[(in)].flags & IF_KWAI_UNI))
+#define IS_OSIRWEAP(in)			((it[(in)].flags & IF_PURP_UNI) &&  (it[(in)].flags & IF_GORN_UNI) && !(it[(in)].flags & IF_KWAI_UNI))
+#define IS_GODWEAPON(in)		(IS_SKUAWEAP(in) || IS_GORNWEAP(in) || IS_KWAIWEAP(in) || IS_PURPWEAP(in))
+
+#define IS_RANSACKGEAR(in)		(IS_EQNECK(in) || IS_EQBELT(in) || IS_EQRING(in) || IS_SOULSTONED(in) || IS_ENCHANTED(in) || IS_UNIQUE(in))
+#define IS_MAGICDROP(in)		(IS_MAGICITEM(in) && IS_RANSACKGEAR(in))
 
 
 /* *** TEMPLATES *** */
@@ -94,6 +138,7 @@
 #define IS_CCP(cn)				((ch[(cn)].flags & CF_CCP) != 0)
 #define IS_BUILDING(cn)			((ch[(cn)].flags & CF_BUILDMODE) != 0)
 #define IS_THRALL(cn)			((ch[(cn)].flags & CF_THRALL) || ch[(cn)].data[CHD_GROUP] == 65500)
+#define IS_RB(cn)				((ch[(cn)].rebirth & 1) != 0)
 
 // special character group checks
 #define IS_COMPANION(cn) 		(IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
@@ -179,16 +224,18 @@
 #define B_SK(cn, s)				(ch[(cn)].skill[(s)][0])
 #define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
 
-#define T_SK(cn, a)				(IS_SANEPLAYER(cn)  && st_learned_skill(ch[(cn)].tree_points, (a)))
-#define T_SEYA_SK(cn, a)		(IS_SEYAN_DU(cn)    && T_SK((cn), (a)))
-#define T_ARTM_SK(cn, a)		(IS_ARCHTEMPLAR(cn) && T_SK((cn), (a)))
-#define T_SKAL_SK(cn, a)		(IS_SKALD(cn)       && T_SK((cn), (a)))
-#define T_WARR_SK(cn, a)		(IS_WARRIOR(cn)     && T_SK((cn), (a)))
-#define T_SORC_SK(cn, a)		(IS_SORCERER(cn)    && T_SK((cn), (a)))
-#define T_SUMM_SK(cn, a)		(IS_SUMMONER(cn)    && T_SK((cn), (a)))
-#define T_ARHR_SK(cn, a)		(IS_ARCHHARAKIM(cn) && T_SK((cn), (a)))
-#define T_BRAV_SK(cn, a)		(IS_BRAVER(cn)      && T_SK((cn), (a)))
-#define T_LYCA_SK(cn, a)		(IS_LYCANTH(cn)     && T_SK((cn), (a)))
+#define T_SK(cn, a)				(IS_SANEPLAYER(cn)  && st_skillnum((cn), (a), (-1)))
+#define T_SKT(cn, a)			(IS_SANEPLAYER(cn)  && st_skillnum((cn), (a), (-2)))
+#define T_SEYA_SK(cn, a)		(IS_SEYAN_DU(cn)    && T_SKT((cn), (a)))
+#define T_ARTM_SK(cn, a)		(IS_ARCHTEMPLAR(cn) && T_SKT((cn), (a)))
+#define T_SKAL_SK(cn, a)		(IS_SKALD(cn)       && T_SKT((cn), (a)))
+#define T_WARR_SK(cn, a)		(IS_WARRIOR(cn)     && T_SKT((cn), (a)))
+#define T_SORC_SK(cn, a)		(IS_SORCERER(cn)    && T_SKT((cn), (a)))
+#define T_SUMM_SK(cn, a)		(IS_SUMMONER(cn)    && T_SKT((cn), (a)))
+#define T_ARHR_SK(cn, a)		(IS_ARCHHARAKIM(cn) && T_SKT((cn), (a)))
+#define T_BRAV_SK(cn, a)		(IS_BRAVER(cn)      && T_SKT((cn), (a)))
+#define T_LYCA_SK(cn, a)		(IS_LYCANTH(cn)     && T_SKT((cn), (a)))
+#define T_OS_TREE(cn, a)		(IS_SANEPLAYER(cn)  && st_learned_skill(ch[(cn)].os_tree, (a)))
 
 #define IS_P_SKILL(a)			(a==8||a==9||a==23||a==32)
 
@@ -204,17 +251,17 @@
 #define CURSE2FORM(p, n)		(((p*5/3)-n)/5)
 
 // Poison's formula (damage per tick)
-#define PL_POISFORM(p, d)		(((p+ 5) * 4500) / d)
-#define MN_POISFORM(p, d)		(((p   ) * 3000) / d)
+#define PL_POISFORM(p, d)		(((p+ 5) * 4500) / max(1, d))
+#define MN_POISFORM(p, d)		(((p   ) * 3000) / max(1, d))
 
 // Bleed's formula (damage per tick)
-#define BLEEDFORM(p, d)			(((p+ 5) *  750) / d)
+#define BLEEDFORM(p, d)			(((p+ 5) *  750) / max(1, d))
 
 // Plague's formula
-#define PLAGUEFORM(p, d)		(((p+ 5) * 2000) / d)
+#define PLAGUEFORM(p, d)		(((p+ 5) * 2000) / max(1, d))
 
 // Frostburn's formula (degen per tick)
-#define FROSTBFORM(p, d)		(((p+10) * 1000) / d)
+#define FROSTBFORM(p, d)		(((p+10) * 1000) / max(1, d))
 
 #define IS_DISPELABLE1(tmp)		((tmp)==SK_BLIND || (tmp)==SK_WARCRY2 || (tmp)==SK_CURSE2 || (tmp)==SK_CURSE || (tmp)==SK_WARCRY || (tmp)==SK_WEAKEN2 || (tmp)==SK_WEAKEN || (tmp)==SK_SLOW2 || (tmp)==SK_SLOW || (tmp)==SK_DOUSE || (tmp)==SK_AGGRAVATE || (tmp)==SK_SCORCH || (tmp)==SK_DISPEL2)
 #define IS_DISPELABLE2(tmp)		((tmp)==SK_HASTE || (tmp)==SK_BLESS || (tmp)==SK_MSHIELD || (tmp)==SK_MSHELL || (tmp)==SK_PULSE || (tmp)==SK_ZEPHYR || (tmp)==SK_GUARD || (tmp)==SK_DISPEL || (tmp)==SK_REGEN || (tmp)==SK_PROTECT || (tmp)==SK_ENHANCE || (tmp)==SK_LIGHT)
@@ -223,7 +270,7 @@
 
 #define DESC_FOOL		"You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n"
 #define DESC_MAGI		"When equipped, secondary effects of Intuition and Strength are equal to the higher of the two.\n"
-#define DESC_PREIST		"When equipped, your maximum life is reduced by 10%%. 20%% of damage taken from hits is negated, and half of the negated damage is dealt to Mana instead.\n"
+#define DESC_PREIST		"When equipped, 20%% of damage taken from hits is dealt to Mana instead.\n"
 #define DESC_EMPRESS	"When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n"
 #define DESC_EMPEROR	"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
 #define DESC_HEIROPH	"When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n"
@@ -246,7 +293,7 @@
 
 #define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 8%%.\n"
 #define DESC_MAGI_R		"When equipped, your Economize skill no longer reduces the Mana cost of skills, and instead increases your Cooldown rate.\n"
-#define DESC_PREIST_R	"When equipped, your HP and MP limits are now 800, and natural overcap effects are disabled. Overcapped HP now increases damage taken by 1%% per 50. Overcapped MP now increases mana costs by 1%% per 20. Overcapping either resource now increases damage dealt by 1%% per 100.\n"
+#define DESC_PREIST_R	"When equipped, your Magic Shield and Magic Shell are now passive and regenerate quickly, but are more fragile. You cannot gain Magic Shield or Magic Shell from other sources.\n"
 #define DESC_EMPRES_R	"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"
 #define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
 #define DESC_HEIROP_R	"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
@@ -262,11 +309,10 @@
 #define DESC_DEVIL_R	"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
 #define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
 #define DESC_STAR_R		"When equipped, your base Spell Modifier is 0.90. Your Spell Modifier no longer effects spell power and instead effects skill power.\n"
-#define DESC_MOON_R		"When equipped, the effectiveness of your Meditate skill is normalized while fighting, but zero while stationary.\n"
-#define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate skill is normalized while fighting, but zero while stationary.\n"
+#define DESC_MOON_R		"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but no longer grants its bonus at full mana and instead grants it at low mana. You lose 0.2%% of current mana per second per 50 uncapped mana.\n"
+#define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate, Rest, and Meditate skills behave as if stationary while fighting, but as if fighting while stationary.\n"
 #define DESC_JUDGE_R	"When equipped, your Pulse spell no longer deals damage to enemies and instead heals allies with each pulse. It inflicts Charge instead of Shock to allies, granting them additional damage and damage reduction.\n"
-#define DESC_WORLD_R	"When equipped, the effectiveness of your Rest skill is normalized while fighting, but zero while stationary.\n"
-
+#define DESC_WORLD_R	"When equipped, 50%% of damage taken is dealt to Endurance instead. All cost effects which would use Endurance instead use Mana, and all skills grant their Mana costs as Endurance on use. You lose 20%% of current endurance per second.\n"
 
 /* *** CASINO *** */
 
@@ -374,3 +420,5 @@
 #define IS_IN_XX(x, y) 		((x>= 194&&y>=1474&&x<= 214&&y<=1533))
 #define IS_IN_TLG(x, y) 	((x>= 195&&y>=1545&&x<= 213&&y<=1563))
 #define IS_IN_SANG(x, y)	((x>= 888&&y>=1027&&x<= 989&&y<=2013))
+#define IS_IN_DW(x, y)		((x>=  21&&y>=1776&&x<= 273&&y<=2028))
+#define IS_IN_INDW(x, y)	((x>=  24&&y>=1779&&x<= 270&&y<=2025))

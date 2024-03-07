@@ -321,10 +321,26 @@ void button_command(int nr)
 			break;
 		
 		case 47:
-			if (st_skill_pts_all(pl.tree_points)>0 && !show_tree)
-				show_tree = 1;
+			show_shop=0;
+			show_wps =0;
+			show_book=0;
+			show_motd=0;
+			show_newp=0;
+			show_tuto=0;
+			if (keys)
+			{
+				if (st_skill_pts_all(pl.os_tree)>0 && show_tree!=2)
+					show_tree = 2;
+				else
+					show_tree = 0;
+			}
 			else
-				show_tree = 0;
+			{
+				if (st_skill_pts_all(pl.tree_points)>0 && show_tree!=1)
+					show_tree = 1;
+				else
+					show_tree = 0;
+			}
 			break;
 
 		default: break;
@@ -1680,12 +1696,24 @@ int mouse_tree(int x, int y, int mode)
 	// Selecting a skill icon
 	if (nr<12) 
 	{
-		if (mode==MS_LB_UP) 
+		if (show_tree==2)
 		{
-			if (keys) cmd1(CL_CMD_TREE,nr+24);
-			else cmd1(CL_CMD_TREE,nr);
+			if (mode==MS_LB_UP) 
+			{
+				if (keys) cmd1(CL_CMD_TREE,nr+60);
+				else cmd1(CL_CMD_TREE,nr+36);
+			}
+			if (mode==MS_RB_UP) cmd1(CL_CMD_TREE,nr+48);
 		}
-		if (mode==MS_RB_UP) cmd1(CL_CMD_TREE,nr+12);
+		else
+		{
+			if (mode==MS_LB_UP) 
+			{
+				if (keys) cmd1(CL_CMD_TREE,nr+24);
+				else cmd1(CL_CMD_TREE,nr);
+			}
+			if (mode==MS_RB_UP) cmd1(CL_CMD_TREE,nr+12);
+		}
 		
 		hightlight=HL_SKTREE;
 		hightlight_sub=nr;
@@ -1862,9 +1890,9 @@ void mouse(int x,int y,int state)
 
 	mouse_x=x; mouse_y=y;
 	if (mouse_inventory(x,y,state)) ;
+	else if (mouse_tree(x,y,state)) ;
 	else if (mouse_shop(x,y,state)) ;
 	else if (mouse_wps(x,y,state)) ;
-	else if (mouse_tree(x,y,state)) ;
 	else if (mouse_motd(x,y,state)) ;
 	else if (mouse_buttonbox(x,y,state)) ;
 	else if (mouse_statbox(x,y,state)) ;

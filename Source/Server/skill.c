@@ -230,7 +230,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				{ 0, 0, 0 }}
 };
 
-struct sk_tree sk_tree[9][12]={
+struct sk_tree sk_tree[10][12]={
 	{	// Seyan'du
 		{ "Sharpness", 				"+2 to Weapon Value." },
 		{ "Expertise", 				"+2 to All Attributes."},
@@ -269,7 +269,7 @@ struct sk_tree sk_tree[9][12]={
 		{ "Acumen", 				"All melee skills use the attributes (STR+BRV/2) + Agility + Agility."},
 		{ "Impact", 				"Weaken and Crush also reduce enemy critical hit chance."},
 		{ "Perseverance", 			"20% more total Endurance."},
-		{ "Tenacity", 				"10% of damage taken is dealt to your Endurance instead."}
+		{ "Tenacity", 				"20% of damage taken is dealt to your Endurance instead."}
 	},{	// Warrior
 		{ "Rapidity", 				"+5 to Attack Speed."},
 		{ "Ruffian", 				"+3 to Strength & +3 to Agility."},
@@ -321,7 +321,7 @@ struct sk_tree sk_tree[9][12]={
 		{ "Wizardry", 				"All spell skills use the attributes (BRV+WIL)/2 + Intuition + Intuition."},
 		{ "Flow", 					"50% of overcapped Mana is granted as additional Hitpoints."},
 		{ "Perpetuity", 			"20% more total Mana."},
-		{ "Resourcefulness", 		"10% of damage taken is dealt to your Mana instead."}
+		{ "Resourcefulness", 		"20% of damage taken is dealt to your Mana instead."}
 	},{	// Braver
 		{ "Accuracy", 				"+3 to Hit Score."},
 		{ "Boldness", 				"+4 to Braveness."},
@@ -346,7 +346,131 @@ struct sk_tree sk_tree[9][12]={
 		{ "Gluttony", 				"10% more Hitpoints, Endurance, and Mana."},
 		{ "Sloth", 					"10% of damage dealt is restored as Hitpoints, Endurance, and Mana."},
 		{ "Pride", 					"Your debuffs ignore 20% of enemy Immunity."},
-		{ "Madness", 				"+3 to Spell Modifier"},
+		{ "Madness", 				"+3 to Spell Modifier."},
 		{ "Envy", 					"Ferocity grants +1 Spell Modifier per empty gear slot."}
+	},{	// Contract
+		{ "Reward", 				"200% increased chance of finding Rainbow Belts in contracts signed by you."},
+		{ "Challenge", 				"+1 to rank of contracts signed by you."},
+		{ "Army", 					"+1 enemy per spawn in contracts signed by you."},
+		{ "Hope", 					"20% increased effect of rewards from green shrines in contracts signed by you."},
+		{ "Opalescence", 			"200% increased chance of finding Rainbow Belts in contracts signed by you."},
+		{ "Scholar", 				"20% more clear experience from contracts signed by you."},
+		{ "Fate", 					"20% more effect of blue shrines in contracts signed by you."},
+		{ "Hubris", 				"+1 to rank of contracts signed by you."},
+		{ "Binding", 				"Contracts signed by you always grant tier 3 effects from quills."},
+		{ "Destiny", 				"Red shrines produce harder enemies with more rewards in contracts signed by you."},
+		{ "Swarm", 					"+1 enemy per spawn in contracts signed by you."},
+		{ "Incentive", 				"Enemies grant an additional 5% of exp as Contract Pts in contracts signed by you."}
 	}
+};
+
+struct sk_tree sk_corrupt[NUM_CORR]={
+	{ "Sharpness", 				"(+1) to Weapon Value." },
+	{ "Expertise", 				"(+1) to All Attributes."},
+	{ "Toughness", 				"(+1) to Armor Value."},
+	{ "Absolution", 			"(0.2%) more damage dealt for each buff or debuff on you."},
+	{ "Vindication", 			"(2%) of Total Armor Value granted as extra Weapon Value."}, // *
+	{ "Scorn", 					"Your debuffs ignore (5%) of enemy Resistance."},
+	{ "Courage", 				"Gain (1) additional Hit and Parry for every 150 missing hitpoints."}, // *
+	{ "Master of None", 		"(+1) to all skill limits."}, // *
+	{ "Necromancy",				"(2%) more Companion Hit and Parry scores."}, // *
+	{ "Enigmatic", 				"(5%) reduced effect of debuffs on you."},
+	{ "Barkskin", 				"(2%) of Total Weapon Value granted as extra Armor Value."}, // *
+	{ "Penance", 				"(0.2%) less damage taken for each buff or debuff on you."},
+	{ "Spiked", 				"(+2) to Thorns."},
+	{ "Might", 					"(+2) to Strength."},
+	{ "Ironskin", 				"Gain (1) additional Armor Value for every 200 total Attributes."}, // *
+	{ "Decapitation",			"Cleave kills enemies left below (2%) remaining health."}, // *
+	{ "Sharkskin", 				"(5%) more total Thorns."},
+	{ "Razor Shell",			"(10%) of Shield Armor Value is granted as extra Thorns."}, // *
+	{ "Overlord", 				"(0.2%) more effect of Warcry and Rally for every 10 total Strength."},
+	{ "Overwhelming Strength", 	"(2%) increased total Strength. (+1) to Strength Limit."},
+	{ "Towering", 				"(8%) more Armor Value from Shields."}, // *
+	{ "Bastion", 				"(4%) of total Resistance is granted as extra Immunity."},
+	{ "Unbreakable", 			"(3%) more total Armor Value."},
+	{ "Deflecting",				"(5%) of Shield Armor Value is granted as extra Parry Score."}, // *
+	{ "Force", 					"Gain (1) additional Weapon Value for every 200 total Attributes."}, // *
+	{ "Dexterity", 				"(+2) to Agility."},
+	{ "Persistance", 			"(+10) Endurance."},
+	{ "Nocturne", 				"(5%) increased effect of Aria."},
+	{ "Valor", 					"(3%) more total Weapon Value."},
+	{ "Blade Dancer", 			"(8%) more Weapon Value from Dual Swords."}, // *
+	{ "Slaying", 				"(+1%) Critical Multiplier for every 10 total Agility."},
+	{ "Overwhelming Agility", 	"(2%) increased total Agility. (+1) to Agility Limit."},
+	{ "Axeman", 				"(2%) more damage dealt while using an Axe or Greataxe."}, // *
+	{ "Overwhelm", 				"(5%) increased effect of Weaken and Crush."}, // *
+	{ "Perseverance", 			"(5%) more total Endurance."},
+	{ "Recycle", 				"(10%) of Endurance spent is granted as additional Mana."}, // *
+	{ "Rapidity", 				"(+2) to Attack Speed."},
+	{ "Ruffian", 				"(+1) to Strength & (+1) to Agility."},
+	{ "Passion", 				"(+2) to Spell Aptitude."},
+	{ "Alacrity", 				"Zephyr deals (5%) more damage."},
+	{ "Swiftness", 				"(3%) more total Attack Speed."},
+	{ "Full Moon", 				"(10%) increased effect of bonuses granted during Full Moons."}, // *
+	{ "Antagonizer", 			"(0.2%) more effect of Blind and Douse for every 10 total Agility."},
+	{ "Harrier", 				"(1%) increased total Agility and Strength."},
+	{ "Butchery", 				"(1%) more effect of Cleave for every 10 total Strength."},
+	{ "Conqueror", 				"(5%) more damage dealt to enemies beside or behind you."}, // *
+	{ "Zealotry", 				"(5%) more total Spell Aptitude."},
+	{ "Fervor", 				"(0.5%) less damage taken per 10 Spell Aptitude."},
+	{ "Expansiveness", 			"(+1) to Area of Effect."},
+	{ "Potency", 				"(+1) to Willpower & (+1) to Intuition."},
+	{ "Quickstep", 				"(+2) to Movement Speed."},
+	{ "Tormenter", 				"Poison deals damage (5%) faster."},
+	{ "Grandiosity", 			"(10%) more total Area of Effect."},
+	{ "New Moon", 				"(10%) increased effect of bonuses granted during New Moons."}, // *
+	{ "Coordination", 			"(0.3%) more effect of Lethargy for every 10 total Willpower."},
+	{ "Pragmatic", 				"(1%) increased total Willpower and Intuition."},
+	{ "Hex Master", 			"(0.1%) more effect of Curse and Slow for every 10 total Intuition."},
+	{ "Adroitness", 			"(5%) less damage taken from enemies beside or behind you."}, // *
+	{ "Fleet-footed", 			"(3%) more total Movement Speed."},
+	{ "Acceleration", 			"Haste grants (10%) more move speed to you."},
+	{ "Nimbleness", 			"(+2) to Cast Speed."},
+	{ "Wisdom", 				"(+2) to Willpower."},
+	{ "Vitality", 				"(+10) Hitpoints."},
+	{ "Denial", 				"(5%) chance to not be hit when you should have been."}, // *
+	{ "Spellslinger", 			"(3%) more total Cast Speed."},
+	{ "Harpooner", 				"(5%) more Hit and Parry score while using a Spear."},
+	{ "Waning", 				"Spells gain an additional (10%) of Willpower towards attribute bonuses."}, // *
+	{ "Overwhelming Willpower", "(2%) increased total Willpower. (+1) to Willpower Limit."},
+	{ "Shaper", 				"(0.5%) more effect of Shadow Copy for every 10 total Willpower."},
+	{ "Wraithlord", 			"(2%) of damage dealt by you is granted to your Companions as Hitpoints."}, // *
+	{ "Constitution", 			"(5%) more total Hitpoints."},
+	{ "Barrier", 				"Magic Shields and Shells affecting you take 10% reduced damage from enemies."}, // *
+	{ "Composure", 				"(+2) to Cooldown Rate."},
+	{ "Intellect", 				"(+2) to Intuition."},
+	{ "Wellspring", 			"(+10) Mana."},
+	{ "Detonation", 			"Blast kills enemies left below (2%) remaining health."}, // *
+	{ "Serenity", 				"(5%) more total Cooldown Rate."},
+	{ "Refrigerate", 			"(3%) chance for skills to have no cooldown."}, // *
+	{ "Psychosis", 				"(1%) more effect of Pulse for every 10 total Intuition."},
+	{ "Overwhelming Intuition", "(2%) increased total Intuition. (+1) to Intuition Limit."},
+	{ "Waxing", 				"Spells gain an additional (10%) of Intuition towards attribute bonuses."}, // *
+	{ "Flow", 					"(10%) of overcapped Mana is granted as additional Hitpoints."},
+	{ "Perpetuity", 			"(5%) more total Mana."},
+	{ "Repurpose", 				"(10%) of Mana spent is granted as additional Endurance."}, // *
+	{ "Accuracy", 				"(+1) to Hit Score."},
+	{ "Boldness", 				"(+2) to Braveness."},
+	{ "Avoidance", 				"(+1) to Parry Score."},
+	{ "Assassination", 			"(5%) increased effect of Precision."},
+	{ "Rigor", 					"(1%) more total Hit Score."},
+	{ "Rebuke", 				"(5%) of damage taken from enemy thorns is reflected."}, // *
+	{ "Perfectionism", 			"(0.5%) more effect of Finesse for every 10 total Braveness."},
+	{ "Overwhelming Braveness", "(2%) increased total Braveness. (+1) to Braveness Limit."},
+	{ "Swordsman", 				"(2%) less damage taken while using a Sword or Twohander."}, // *
+	{ "Mending", 				"(10%) increased effect of Heal and Regen."}, // *
+	{ "Flexibility", 			"(1%) more total Parry Score."},
+	{ "Revoke", 				"(5%) of damage taken from enemy critical hits is reflected."}, // *
+	{ "Maiming", 				"(+2) to Top Damage."},
+	{ "Feast", 					"(+5) Hitpoints, Endurance, and Mana."},
+	{ "Half Moon", 				"(5%) increased effect of bonuses granted during Moons."}, // *
+	{ "Lustful", 				"(+1%) base crit chance per empty ring slot."},
+	{ "Ravager", 				"(5%) more total Top Damage"},
+	{ "Culling", 				"Critical Hits kill enemies left below (2%) remaining health."}, // *
+	{ "Wrath", 					"(0.5%) more effect of Rage & Calm per 40 missing Hitpoints, Endurance, and Mana."},
+	{ "Gluttony", 				"(3%) more Hitpoints, Endurance, and Mana."},
+	{ "Sloth", 					"(2%) of damage dealt is restored as Hitpoints, Endurance, and Mana."},
+	{ "Pride", 					"Your debuffs ignore (5%) of enemy Immunity."},
+	{ "Madness", 				"(+1) to Spell Modifier"},
+	{ "Envious", 				"(+1) Spell Modifier per empty ring slot."}
 };

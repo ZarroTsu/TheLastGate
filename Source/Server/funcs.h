@@ -205,7 +205,7 @@ int do_lookup_char_self(char *name, int cn);
 void do_admin_log(int source, char *format, ...);
 void do_imp_log(int font, char *format, ...);
 void do_announce(int source, int author, char *format, ...);
-
+int do_showbuffs(int cn, int co);
 int do_raise_attrib(int cn, int nr);
 int do_raise_skill(int cn, int nr);
 int do_raise_hp(int cn);
@@ -261,8 +261,6 @@ void do_unique_info(int cn);
 void do_look_depot(int cn, int co);
 void do_depot_char(int cn, int co, int nr);
 void do_sort(int cn, char *arg);
-int do_depot_cost(int in);
-void do_pay_depot(int cn);
 int may_attack_msg(int cn, int co, int msg);
 int do_maygive(int cn, int co, int in);
 int do_item_value(int in);
@@ -305,6 +303,7 @@ void step_driver_remove(int cn, int in);
 int sub_door_driver(int cn, int in);
 void finish_laby_teleport(int cn, int nr, int exp_pts);
 void debuff_vantablack(int cn);
+void debuff_dwlight(int cn);
 void show_pent_count(int cn);
 int explorer_point(int cn, int in, int msg);
 int get_rebirth_bits(int cn);
@@ -329,8 +328,10 @@ int build_copy_rect(int fx, int fy, int tx, int ty, int w, int h);
 void build_clean_lights(int fx, int fy, int tx, int ty);
 int build_item(int nr, int x, int y);
 void pop_tick(void);
-void add_monster_flags(int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG]);
-int build_new_map(int cn, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], int mission, int tier, int inc);
+void add_monster_flags(int cc, int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG]);
+int build_new_map(int cn, int cc, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], int mission, int tier, int inc);
+void build_dw_square(int cn, int x, int y);
+void check_build_dw(int cn);
 
 //-- helper --
 void reset_go(int x, int y);
@@ -350,6 +351,7 @@ int absrankdiff(int cn, int co);
 int in_attackrange(int cn, int co);
 int in_grouprange(int cn, int co);
 int points2rank(int v);
+int getitemrank(int in, int flag);
 int getrank(int cn);
 int rank2points(int v);
 int points_tolevel(int curr_exp);
@@ -361,6 +363,8 @@ int change_xp_shop_item(int cn, int nr);
 int st_learned_skill(int st_val, int v);
 int st_skill_pts_have(int st_val);
 int st_skill_pts_all(int st_val);
+int st_skillnum(int cn, int v, int n);
+int st_skillcount(int cn, int v);
 int get_best_worn(int cn, int v);
 int get_special_item(int cn, int in, int gen_a, int gen_b, int gen_c);
 int get_special_spr(int in, int spr);
@@ -378,6 +382,7 @@ void effectlist(int cn);
 void init_badwords(void);
 int is_badword(char *sentence);
 int cap(int cn, int nr);
+int is_half_soul(int r);
 void make_soulstone(int cn, int exp);
 int make_gskill(int cn);
 int make_catalyst(int cn, int n, int v);
@@ -387,7 +392,7 @@ void create_soultrans_equipment(int cn, int in, int rank);
 void create_random_talisman_equipment(int cn, int in2);
 int set_enchantment(int cn, int v);
 int use_talisman(int cn, int in, int in2);
-int use_corruptor(int cn, int in, int in2);
+int use_corruptor(int cn, int in);
 int use_soulstone(int cn, int in, int in2);
 int use_soulfocus(int cn, int in);
 int use_soulcatalyst(int cn, int in);
@@ -401,7 +406,7 @@ void show_map_flags(int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG], int tier);
 void clear_map_buffs(int cn, int flag);
 void add_map_progress(int loc);
 void add_map_goal(int loc, int v);
-int generate_map_enemy(int temp, int kin, int xx, int yy, int base, int affix, int tarot);
+int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int affix, int tarot);
 
 //-- skill_driver --
 int spellcost(int cn, int cost, int in, int usemana);
@@ -457,6 +462,7 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 int player_or_ghost(int cn, int co);
 
 // -- driver --
+int npc_moveto(int cn, int x, int y);
 int is_inline(int cn, int ln);
 int is_incolosseum(int cn, int ln);
 int is_atpandium(int cn);
@@ -474,7 +480,7 @@ int npc_remove_enemy(int npc, int enemy);
 void npc_remove_all_enemies(int npc);
 void die_companion(int cn);
 int is_unique_able(int in);
-int is_unique(int in);
+int is_osiris_weap(int in);
 
 // --- talk ---
 void npc_hear(int cn, int co, char *text);

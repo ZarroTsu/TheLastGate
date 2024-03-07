@@ -76,15 +76,15 @@ int pop_create_item(int temp, int cn)
 	}
 	if (is_unique_able(temp))
 	{
-		if (!in && ch[cn].alignment<0 && !RANDOM(300)) 	// Reward a unique weapon
+		if (!in && ch[cn].alignment<0 && !RANDOM(1000)) // Reward a unique weapon
 		{	godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
 			for (m = 1, n = 0; m<MAXITEM; m++)			// Check for up to three copies
 			{
 				if (it[m].used==USE_EMPTY || it[m].orig_temp!=temp) continue;
-				if ((godroll == 1 && (it[m].flags & IF_KWAI_UNI) && (it[m].flags & IF_GORN_UNI)) ||
-					(godroll == 2 && (it[m].flags & IF_KWAI_UNI)) ||
-					(godroll == 3 && (it[m].flags & IF_GORN_UNI)) ||
-					(godroll == 4 && (it[m].flags & IF_PURP_UNI)) ) n++;
+				if ((godroll == 1 && IS_SKUAWEAP(m)) ||
+					(godroll == 2 && IS_KWAIWEAP(m)) ||
+					(godroll == 3 && IS_GORNWEAP(m)) ||
+					(godroll == 4 && IS_PURPWEAP(m)) ) n++;
 				if (n>=3) break;
 			}
 			if (n<3)
@@ -102,42 +102,43 @@ int pop_create_item(int temp, int cn)
 						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]      +=  8 * bonus;
+						it[in].speed[0]      +=  9 * bonus/2;
 						break;
 					case 2:
 						gend = " goddess ";
 						godn = "Kwai";
 						it[in].flags |= IF_KWAI_UNI;
-						it[in].to_hit[0]     +=  4 * bonus;
-						it[in].to_parry[0]   +=  4 * bonus;
+						it[in].to_hit[0]     +=  2 * bonus;
+						it[in].to_parry[0]   +=  2 * bonus;
 						break;
 					case 3:
 						gend = " god ";
 						godn = "Gorn";
 						it[in].flags |= IF_GORN_UNI;
-						it[in].spell_mod[0]  +=  2 * bonus;
+						it[in].spell_mod[0]  +=  3 * bonus/2;
 						break;
 					default:
 						gend = " ";
 						godn = "Purple One";
 						it[in].flags |= IF_PURP_UNI;
-						it[in].top_damage[0] += 20 * bonus;
+						it[in].top_damage[0] += 15 * bonus;
 						break;
 				}
+				if (it_temp[temp].armor[0] && it_temp[temp].weapon[0])
+				{
+					it[in].armor[0]  += 1 + 1 * bonus;
+					it[in].weapon[0] += 1 + 1 * bonus;
+				}
+				else if (it_temp[temp].armor[0])
+					it[in].armor[0]  += 2 + 2 * bonus;
+				else if (it_temp[temp].weapon[0])
+					it[in].weapon[0] += 2 + 2 * bonus;
 				
-				if (it[in].flags & IF_OF_SHIELD)
-				{
-					it[in].armor[0]  += 4 * bonus;
-					//it[in].max_damage = 5000 * it[in].armor[0]/2;
-				}
-				else
-				{
-					it[in].weapon[0] += 4 * bonus;
-					//it[in].max_damage = 5000 * it[in].weapon[0]/2;
-				}
 				it[in].orig_temp = it[in].temp;
 				it[in].temp = 0;
+				it[in].max_damage = 0;
 				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
+				it[in].flags &= ~(IF_CAN_SS | IF_CAN_EN);
 				strcpy(name, it[in].name);
 				strcpy(refer, it[in].reference);
 				strcpy(descr, it[in].description);
@@ -179,10 +180,29 @@ int pop_create_item(int temp, int cn)
 						it[in].sprite[0] = 4890 + is_unique_able(temp)-1;
 				}
 			}
-			else
+		}
+	}
+	if ((m = is_osiris_weap(temp)) && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
+	{
+		in = god_create_item(temp);		// create the item
+		if (in)							// assure the item is created
+		{
+			it[in].orig_temp = it[in].temp;
+			it[in].temp = 0;
+			it[in].max_damage = 0;
+			it[in].stack = 2 + m/2 + RANDOM((m*3+1)/2);
+			switch (m)
 			{
-				in = 0;
+				case  4: it[in].data[0] = 1; // 4!9 = 10010 x 1 = 10010k
+				case  3: it[in].data[0] = 2; // 3!7 =  3432 x 2 =  6864k
+				case  2: it[in].data[0] = 4; // 2!5 =   924 x 4 =  3696k
+				default: it[in].data[0] = 8; // 1!3 =   168 x 8 =  1344k
 			}
+			it[in].data[1] = it[in].data[2] = it[in].data[3] = it[in].data[4] = 0;
+			it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_NOREPAIR | IF_PURP_UNI | IF_GORN_UNI;
+			it[in].flags &= ~IF_CAN_SS;
+			strcpy(descr, it[in].description);
+			sprintf(it[in].description, "%s It has been blessed by the god Osiris.", descr);
 		}
 	}
 	if (!in)
@@ -200,13 +220,13 @@ int pop_create_item(int temp, int cn)
 	}
 	else
 	{
-		xlog("%s got unique item %s.", ch[cn].name, it[in].name);
+		xlog("%s got blessed %s.", ch[cn].name, it[in].name);
 	}
 
-	return(in);
+	return in;
 }
 
-#define POP_GITEM	6
+#define POP_GITEM	8
 
 int pop_create_bonus(int cn)
 {
@@ -590,7 +610,7 @@ int pop_create_bonus_belt(int cn)
 
 int pop_create_char(int n, int drop)
 {
-	int cn, tmp, m, flag = 0, hasitems = 0;
+	int cn, tmp, m, j=0, flag = 0, hasitems = 0, hasloot = 0;
 
 	for (cn = 1; cn<MAXCHARS; cn++)
 	{
@@ -633,6 +653,53 @@ int pop_create_char(int n, int drop)
 	{
 		if ((tmp = ch[cn].worn[m])!=0)
 		{
+			if (m == WN_RHAND && n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE && !RANDOM(4)) // Vampire equipment adjustment
+			{
+				int randm = RANDOM(9);
+				if (tmp==IT_CLAW_STEL) tmp = IT_DAGG_STEL + randm;
+				if (tmp==IT_CLAW_GOLD) tmp = IT_DAGG_GOLD + randm;
+				if (tmp==IT_CLAW_EMER) tmp = IT_DAGG_EMER + randm;
+				if (tmp==IT_CLAW_CRYS) tmp = IT_DAGG_CRYS + randm;
+				if (tmp==IT_CLAW_TITN) tmp = IT_DAGG_TITN + randm;
+				if (tmp==IT_CLAW_DAMA) tmp = IT_DAGG_DAMA + randm;
+				if (tmp==IT_CLAW_ADAM) tmp = IT_DAGG_ADAM + randm;
+				switch (randm)
+				{
+					case  0: // Dagger
+						ch[cn].skill[SK_DAGGER][0]  = ch[cn].skill[SK_HAND][0];
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  1: // Staff
+						ch[cn].skill[SK_STAFF][0]   = ch[cn].skill[SK_HAND][0]+3;
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  2: // Spear
+						ch[cn].skill[SK_DAGGER][0]  = ch[cn].skill[SK_HAND][0]-3;
+						ch[cn].skill[SK_STAFF][0]   = ch[cn].skill[SK_HAND][0]-3;
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  4: // Sword
+						ch[cn].skill[SK_SWORD][0]   = ch[cn].skill[SK_HAND][0]+3;
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  6: // Axe
+						ch[cn].skill[SK_AXE][0]     = ch[cn].skill[SK_HAND][0];
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  7: // Twohander
+						ch[cn].skill[SK_TWOHAND][0] = ch[cn].skill[SK_HAND][0];
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  8: // Greataxe
+						ch[cn].skill[SK_AXE][0]     = ch[cn].skill[SK_HAND][0];
+						ch[cn].skill[SK_TWOHAND][0] = ch[cn].skill[SK_HAND][0];
+						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					default:
+						tmp = ch[cn].worn[m];
+						break;
+				}
+			}
 			tmp = pop_create_item(tmp, cn);
 			if (!tmp)
 			{
@@ -644,6 +711,10 @@ int pop_create_char(int n, int drop)
 				it[tmp].carried = cn;
 				ch[cn].worn[m]  = tmp;
 				hasitems = 1;
+				if (it[tmp].temp==0)
+				{
+					hasloot = 1;
+				}
 			}
 		}
 	}
@@ -697,31 +768,37 @@ int pop_create_char(int n, int drop)
 		{
 			if (ch[cn].item[m]==0 && (hasitems || (RANDOM(2) && ch[cn].temp!=347 && ch[cn].temp!=350)))
 			{
-				if (try_boost(50))
+				j = m;
+				if (try_boost(40))
 				{
 					tmp = pop_create_bonus(cn);
 					if (tmp)
 					{
 						it[tmp].carried = cn;
-						ch[cn].item[m]  = tmp;
+						ch[cn].item[j]  = tmp;
+						j++; if (j>=40) break;
+						hasloot = 1;
 					}
 				}
-				if (try_boost(50))
+				if (ch[cn].item[j]==0 && try_boost(500))
 				{
 					tmp = pop_create_bonus(cn);
 					if (tmp)
 					{
 						it[tmp].carried = cn;
-						ch[cn].item[m]  = tmp;
+						ch[cn].item[j]  = tmp;
+						j++; if (j>=40) break;
+						hasloot = 1;
 					}
 				}
-				if (try_boost(4000))
+				if (ch[cn].item[j]==0 && try_boost(6000))
 				{
 					tmp = pop_create_bonus_belt(cn);
 					if (tmp)
 					{
 						it[tmp].carried = cn;
-						ch[cn].item[m]  = tmp;
+						ch[cn].item[j]  = tmp;
+						hasloot = 1;
 					}
 				}
 				break;
@@ -737,6 +814,21 @@ int pop_create_char(int n, int drop)
 			god_destroy_items(cn);
 			ch[cn].used = USE_EMPTY;
 			return 0;
+		}
+	}
+	
+	if (ch[cn].alignment>=0 || ch[cn].gold > 20000 || (ch[cn].flags & CF_EXTRACRIT) || getrank(cn)<9)
+	{
+		hasloot = 1;
+	}
+	
+	if (!ch[cn].citem && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+	{
+		if (tmp = god_create_item(IT_CORRUPTOR))
+		{
+			ch[cn].citem = tmp;
+			it[tmp].carried = cn;
+			it[tmp].cost = 555;
 		}
 	}
 

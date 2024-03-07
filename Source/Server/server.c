@@ -116,20 +116,36 @@ void discord_top_five(void)
 			r4 = ch[nr[j][m]].points_tot % 1000;
 			
 			if (r1)
-				fprintf(discordTopA, "%c %10.10s   %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
-				fprintf(discordTopA, "%c %10.10s   %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
-				fprintf(discordTopA, "%c %10.10s   %20.20s         %3d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s         %3d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
-				fprintf(discordTopA, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r4);
 		}
 	}
@@ -159,20 +175,36 @@ void discord_top_five(void)
 			r4 = ch[nr[j][m]].points_tot % 1000;
 			
 			if (r1)
-				fprintf(discordTopB, "%c %10.10s   %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
-				fprintf(discordTopB, "%c %10.10s   %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
-				fprintf(discordTopB, "%c %10.10s   %20.20s         %3d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s         %3d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
-				fprintf(discordTopB, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r4);
 		}
 	}
@@ -202,20 +234,36 @@ void discord_top_five(void)
 			r4 = ch[nr[j][m]].points_tot % 1000;
 			
 			if (r1)
-				fprintf(discordTopC, "%c %10.10s   %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
-				fprintf(discordTopC, "%c %10.10s   %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
-				fprintf(discordTopC, "%c %10.10s   %20.20s         %3d,%03d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s         %3d,%03d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
-				fprintf(discordTopC, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, rank_name[getrank(nr[j][m])], 
+				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					rank_name[getrank(nr[j][m])], 
 					r4);
 		}
 	}
@@ -279,11 +327,10 @@ void discord_pandium(void)
 		if (ch[n].flags & (CF_GOD | CF_NOLIST))	continue;
 		
 		if (j!=2 && ch[n].pandium_floor[j]<=1)	continue;
-		if (j==2 && ch[n].greydepth<=0) 		continue;
 		
 		for (m = 0; m<DISC_P; m++)
 		{
-			if ((j!=2 && ch[n].pandium_floor[j]>fl[j][m]) || (j==2 && ch[n].greydepth>fl[j][m]))
+			if (j!=2 && ch[n].pandium_floor[j]>fl[j][m])
 			{
 				if (m<(DISC_P-1))
 				{
@@ -291,7 +338,6 @@ void discord_pandium(void)
 					memmove(&nr[j][m + 1], &nr[j][m], ((DISC_P-1) - m) * sizeof(int));
 				}
 				if (j!=2)      fl[j][m] = ch[n].pandium_floor[j]-1;
-				else if (j==2) fl[j][m] = ch[n].greydepth;
 				nr[j][m] = n;
 				break;
 			}
@@ -333,8 +379,12 @@ void discord_pandium(void)
 			if (IS_BRAVER(nr[j][m]))      cl = 7;
 			if (IS_LYCANTH(nr[j][m]))     cl = 8;
 
-			fprintf(discordPandium, "%c %10.10s   %20.20s             %3d\n", font ? '+' : ' ', 
-				ch[nr[j][m]].name, (cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
+			fprintf(discordPandium, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+				ch[nr[j][m]].name, 
+				IS_RB(nr[j][m]) ? '+' : ' ',
+				IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+				IS_PURPLE(nr[j][m]) ? '*' : ' ',
+				(cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
 		}
 	}
 	fprintf(discordPandium, "```\n");
@@ -381,7 +431,7 @@ void discord_who(void)
 					font ? '+' : ' ',
 		            who_rank_name[getrank(n)],
 		            ch[n].name,
-					(ch[n].rebirth & 1) ? '+' : ' ',
+					IS_RB(n) ? '+' : ' ',
 					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));
@@ -1445,8 +1495,7 @@ int main(int argc, char *args[])
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
 		// (vvv REMOVE AFTER UPDATE!!!)
-		//ch[n].data[67] = 0;
-		// */ // (^^^ REMOVE AFTER UPDATE!!!)
+		// (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);
 	}
@@ -1486,27 +1535,13 @@ int main(int argc, char *args[])
 	/*
 	for (n = 1; n<MAXITEM; n++)
 	{
-		if (!it[n].used)
+		if (!it[n].used) continue;
+		if ((it[n].flags & IF_CAN_SS) || (it[n].flags & IF_CAN_EN)) 
 		{
-			continue;
+			it[n].flags &= ~(IF_CAN_SS | IF_CAN_EN);
+			it[n].max_damage = 0;
+			it[n].flags |= IF_NOREPAIR;
 		}
-		if ((it[n].flags & IF_STACKABLE) && it[n].stack == 0)
-		{
-			it[n].stack = 1;
-			it[n].flags |= IF_UPDATE;
-		}
-		if (it[n].flags & IF_LABYDESTROY)
-		{
-			tmplabcheck(n);
-		}
-		if ((it[n].flags & IF_SOULSTONE) && it[n].max_damage==0)
-		{
-			if 		(it[n].power == 60) it[n].max_damage = 65000;
-			else if	(it[n].power == 75)	it[n].max_damage = 85000;
-			else 						it[n].max_damage = 60000;
-			xlog("Set %s (%d) max_damage to %d", it[n].name, n, it[n].max_damage);
-		}
-		
 	}
 	*/
 	

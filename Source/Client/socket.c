@@ -537,6 +537,18 @@ void sv_setchar_tok(unsigned char *buf)
 	DEBUG("SV SETCHAR TOK");
 	pl.tokens=*(unsigned long*)(buf+1);
 	pl.tree_points=*(unsigned short*)(buf+5);
+	pl.os_tree=*(unsigned short*)(buf+7);
+}
+
+void sv_setchar_tre(unsigned char *buf)
+{
+	int n;
+	DEBUG("SV SETCHAR TRE");
+	
+	n = *(unsigned char*)(buf+1);
+	if (n<0 || n>11) xlog(0,"Invalid setchar tre");
+	
+	pl.tree_node[n]=*(unsigned char*)(buf+2);
 }
 
 void sv_setchar_gold(unsigned char *buf)
@@ -554,6 +566,7 @@ void sv_setchar_item(unsigned char *buf)
 
 	n=*(unsigned long*)(buf+1);
 	if (n<0 || n>39) xlog(0,"Invalid setchar item");
+	
 	pl.item[n]=*(short int*)(buf+5);
 	pl.item_p[n]=*(short int*)(buf+7);
 	pl.item_s[n]=*(unsigned char*)(buf+9); // stack size
@@ -571,6 +584,7 @@ void sv_setchar_worn(unsigned char *buf)
 	if (n<0 || n>19) xlog(0,"Invalid setchar worn");
 	pl.worn[n]=*(short int*)(buf+5);
 	pl.worn_p[n]=*(short int*)(buf+7);
+	pl.worn_s[n]=*(unsigned char*)(buf+9);
 }
 
 void sv_setchar_spell(unsigned char *buf)
@@ -925,6 +939,15 @@ void sv_look6(unsigned char *buf)
 		show_shop=1+*(unsigned char*)(buf+14); // gold slot bit
 		shop=tmplook;
 	}
+	if (show_shop)
+	{
+		show_wps =0;
+		show_book=0;
+		show_motd=0;
+		show_newp=0;
+		show_tuto=0;
+		show_tree=0;
+	}
 }
 
 void sv_showmotd(unsigned char *buf)
@@ -1095,10 +1118,11 @@ int sv_cmd(unsigned char *buf)
 
 		case	SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
 		case	SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 13;
-		case	SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 7;
+		case	SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 9;
+		case	SV_SETCHAR_TRE:		sv_setchar_tre(buf); return 3;
 		case	SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
 		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
-		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 9;
+		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 10;
 		case	SV_SETCHAR_SPELL:	sv_setchar_spell(buf); return 9;
 		case	SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 6;
 

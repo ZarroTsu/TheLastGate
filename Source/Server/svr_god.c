@@ -1466,7 +1466,7 @@ void god_who(int cn)
 
 		do_char_log(cn, font, "%4d %-10.10s%c%c%c %-8.8s %.19s\n",
 		            n, ch[n].name,
-					(ch[n].rebirth & 1) ? '+' : ' ',
+					IS_RB(n) ? '+' : ' ',
 		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
 		            int2str(ch[n].points_tot),
@@ -1578,7 +1578,7 @@ void user_who(int cn)
 		do_char_log(cn, font, "%.5s %-10.10s %c%c%c %.26s\n",
 		            who_rank_name[getrank(n)],
 		            ch[n].name,
-					(ch[n].rebirth & 1) ? '+' : ' ',
+					IS_RB(n) ? '+' : ' ',
 		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',
 		            !showarea ? "--------" : get_area(n, 0));
@@ -1588,7 +1588,7 @@ void user_who(int cn)
 		do_char_log(cn, 3, "%.5s %-10.10s %c%c%c %.26s\n",
 		            who_rank_name[getrank(gc)],
 		            ch[gc].name,
-					(ch[gc].rebirth & 1) ? '+' : ' ',
+					IS_RB(gc) ? '+' : ' ',
 		            IS_CLANKWAI(gc) ? 'K' : (IS_CLANGORN(gc) ? 'G' : ' '),
 		            IS_PURPLE(gc) ? '*' : ' ',
 		            get_area(gc, 0));
@@ -1636,7 +1636,7 @@ void god_top(int cn)
 
 void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 {
-	int in, bonus = 1;
+	int in, m, bonus = 1;
 	char *gend, *godn, name[60], refer[60], descr[220];
 
 	if (x == 0)
@@ -1686,42 +1686,43 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]      +=  8 * bonus;
+						it[in].speed[0]      +=  9 * bonus/2;
 						break;
 					case 2:
 						gend = " goddess ";
 						godn = "Kwai";
 						it[in].flags |= IF_KWAI_UNI;
-						it[in].to_hit[0]     +=  4 * bonus;
-						it[in].to_parry[0]   +=  4 * bonus;
+						it[in].to_hit[0]     +=  2 * bonus;
+						it[in].to_parry[0]   +=  2 * bonus;
 						break;
 					case 3:
 						gend = " god ";
 						godn = "Gorn";
 						it[in].flags |= IF_GORN_UNI;
-						it[in].spell_mod[0]  +=  2 * bonus;
+						it[in].spell_mod[0]  +=  3 * bonus/2;
 						break;
 					default:
 						gend = " ";
 						godn = "Purple One";
 						it[in].flags |= IF_PURP_UNI;
-						it[in].top_damage[0] += 20 * bonus;
+						it[in].top_damage[0] += 15 * bonus;
 						break;
 				}
+				if (it_temp[x].armor[0] && it_temp[x].weapon[0])
+				{
+					it[in].armor[0]  += 1 + 1 * bonus;
+					it[in].weapon[0] += 1 + 1 * bonus;
+				}
+				else if (it_temp[x].armor[0])
+					it[in].armor[0]  += 2 + 2 * bonus;
+				else if (it_temp[x].weapon[0])
+					it[in].weapon[0] += 2 + 2 * bonus;
 				
-				if (it[in].flags & IF_OF_SHIELD)
-				{
-					it[in].armor[0]  += 4 * bonus;
-					//it[in].max_damage = 5000 * it[in].armor[0]/2;
-				}
-				else
-				{
-					it[in].weapon[0] += 4 * bonus;
-					//it[in].max_damage = 5000 * it[in].weapon[0]/2;
-				}
 				it[in].orig_temp = it[in].temp;
 				it[in].temp = 0;
+				it[in].max_damage = 0;
 				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
+				it[in].flags &= ~(IF_CAN_SS | IF_CAN_EN);
 				strcpy(name, it[in].name);
 				strcpy(refer, it[in].reference);
 				strcpy(descr, it[in].description);
@@ -1762,6 +1763,29 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 					else
 						it[in].sprite[0] = 4890 + is_unique_able(x)-1;
 				}
+			}
+		}
+		else if (gen_a > 100 && (m = is_osiris_weap(x)) && (it_temp[x].flags & IF_CAN_SS))
+		{
+			in = god_create_item(x);		// create the item
+			if (in)							// assure the item is created
+			{
+				it[in].orig_temp = it[in].temp;
+				it[in].temp = 0;
+				it[in].max_damage = 0;
+				it[in].stack = 3 + (m-1)*2;
+				switch (m)
+				{
+					case  4: it[in].data[0] = 1; // 4!9 = 10010 x 1 = 10010k
+					case  3: it[in].data[0] = 2; // 3!7 =  3432 x 2 =  6864k
+					case  2: it[in].data[0] = 4; // 2!5 =   924 x 4 =  3696k
+					default: it[in].data[0] = 8; // 1!3 =   168 x 8 =  1344k
+				}
+				it[in].data[1] = it[in].data[2] = it[in].data[3] = it[in].data[4] = 0;
+				it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_NOREPAIR | IF_PURP_UNI | IF_GORN_UNI;
+				it[in].flags &= ~IF_CAN_SS;
+				strcpy(descr, it[in].description);
+				sprintf(it[in].description, "%s It has been blessed by the god Osiris.", descr);
 			}
 		}
 		else
@@ -1925,26 +1949,6 @@ void god_reset_ticker(int cn)
 	globs->mdyear 	= 0;
 	do_char_log(cn, 0, "The ticker is now %d\nCheck #time for further details.\n", globs->ticker);
 	return;
-}
-
-void god_reset_grey(int cn)
-{
-	int n;
-	
-	if (cn) 
-		do_char_log(cn, 1, "Now resetting greywood depth...\n");
-	else
-		xlog("Now resetting greywood depth...");
-	for (n = 1; n<MAXCHARS; n++)
-	{
-		if (ch[n].used==USE_EMPTY)	continue;
-		if (!IS_SANEPLAYER(n))		continue;
-		ch[n].greydepth = 0;
-	}
-	if (cn)
-		do_char_log(cn, 0, "Done.\n");
-	else
-		xlog("Done.");
 }
 
 int find_next_char(int startcn, char *spec1, char *spec2)
@@ -3581,10 +3585,6 @@ void god_reset_all_depths(int cn)
 			ch[n].pandium_floor[0] = 1;
 			ch[n].pandium_floor[1] = 1;
 		}
-		if (ch[n].greydepth > 0)
-		{
-			ch[n].greydepth = 0;
-		}
 	}
 	if (cn) do_char_log(cn, 1, "Done.\n");
 }
@@ -3671,13 +3671,21 @@ void god_raise_char(int cn, int co, int v, int bsp)
 		return;
 	}
 	
-	if (bsp)
+	if (bsp==1)
 	{
 		ch[co].bs_points += v;
 
 		do_char_log(cn, 1, "Awarded %s %d Stronghold Points.\n", ch[co].name, v);
 		chlog(cn, "IMP: Awarded %s %d Stronghold Points.", ch[co].name, v);
 		do_char_log(co, 0, "You have been rewarded by the gods. You received %d black stronghold points.\n", v);
+	}
+	else if (bsp==2)
+	{
+		ch[co].os_points += v;
+
+		do_char_log(cn, 1, "Awarded %s %d Contract Points.\n", ch[co].name, v);
+		chlog(cn, "IMP: Awarded %s %d Contract Points.", ch[co].name, v);
+		do_char_log(co, 0, "You have been rewarded by the gods. You received %d contract points.\n", v);
 	}
 	else
 	{

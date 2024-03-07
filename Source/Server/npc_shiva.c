@@ -266,6 +266,10 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	
 	ch[cn].data[5] = ch[cn].attack_cn;
 	
+	remove_buff(cn, SK_ZEPHYR2);
+	remove_buff(cn, SK_TAUNT);
+	ch[cn].taunted = 0;
+	remove_enemy(cn);
 	npc_remove_all_enemies(cn);
 	
 	xo = ch[cn].x;
@@ -454,7 +458,7 @@ int npc_shiva_phasing(int cn)
 			strcpy(bu[in].name, "Stun");
 			bu[in].flags |= IF_SPELL;
 			bu[in].sprite[1] = BUF_SPR_WARCRY2;
-			bu[in].duration  = bu[in].active = TICKS*48;
+			bu[in].duration  = bu[in].active = TICKS*32;
 			bu[in].temp  = 666;
 			bu[in].power = 666;
 			
@@ -469,12 +473,19 @@ int npc_shiva_phasing(int cn)
 		remove_spells(cn);
 		fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
 		ch[cn].attack_cn = 0;
+		remove_buff(cn, SK_ZEPHYR2);
+		remove_buff(cn, SK_TAUNT);
+		remove_buff(cn, SK_POISON);
+		remove_buff(cn, SK_BLEED);
+		ch[cn].taunted = 0;
+		remove_enemy(cn);
 		npc_remove_all_enemies(cn);
 		
 		if (in2 = map[606+233*MAPX].it) // Let's lock that door real quick
 		{
 			ch[cn].data[4] = it[in2].data[0];
-			it[in2].data[0] = 1;
+			it[in2].active = 0; it[in2].data[5] = TICKS * 60 * 15;
+			reset_go(it[in2].x, it[in2].y); it[in2].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in2].x, it[in2].y);
 		}
 		
 		ch[cn].data[1] = globs->ticker + TICKS * 4;
@@ -483,13 +494,13 @@ int npc_shiva_phasing(int cn)
 	if (timer<=globs->ticker && sub==1)
 	{
 		do_sayx(cx, "YOU, WHO DARES SPEAK ILL OF OUR MASTER.");
-		ch[cn].data[1] = globs->ticker + TICKS * 5;
+		ch[cn].data[1] = globs->ticker + TICKS * 4;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==2)
 	{
 		do_sayx(cx, "YOU, WHO DARES CALL UPON OUR POWER.");
-		ch[cn].data[1] = globs->ticker + TICKS * 3;
+		ch[cn].data[1] = globs->ticker + TICKS * 2;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==3)
@@ -505,7 +516,7 @@ int npc_shiva_phasing(int cn)
 	if (timer<=globs->ticker && sub==4)
 	{
 		do_sayx(cn, "I absolutely will not! I enthralled YOU! I am your master! I command you to release me at once!!");
-		ch[cn].data[1] = globs->ticker + TICKS * 5;
+		ch[cn].data[1] = globs->ticker + TICKS * 4;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==5)
@@ -513,25 +524,25 @@ int npc_shiva_phasing(int cn)
 		do_sayx(cx, "YOU ARE BUT A WHELPLING IN THE FACE OF HIS MAJESTY.");
 		ch[cx].goto_x = 603;
 		ch[cx].goto_y = 228;
-		ch[cn].data[1] = globs->ticker + TICKS * 3;
+		ch[cn].data[1] = globs->ticker + TICKS * 2;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==6)
 	{
 		do_sayx(cn, "What the devil are you talking about, 'His majesty'??");
-		ch[cn].data[1] = globs->ticker + TICKS * 5;
+		ch[cn].data[1] = globs->ticker + TICKS * 2;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==7)
 	{
 		do_sayx(cx, "...");
-		ch[cn].data[1] = globs->ticker + TICKS * 5;
+		ch[cn].data[1] = globs->ticker + TICKS * 4;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==8)
 	{
 		do_sayx(cx, "IN THE NAME OF MY LORD, KING AEMON OF THE ASHEN TUNDRA, I SENTENCE YOU MORTALS TO DEATH.");
-		ch[cn].data[1] = globs->ticker + TICKS * 5;
+		ch[cn].data[1] = globs->ticker + TICKS * 3;
 		ch[cn].data[3]++;
 	}
 	if (timer<=globs->ticker && sub==9)
@@ -540,7 +551,7 @@ int npc_shiva_phasing(int cn)
 		ch[cx].attack_cn = cn;
 		if (in2 = map[606+233*MAPX].it) // Let's unlock that door now
 		{
-			it[in2].data[0] = ch[cn].data[4];
+			it[in2].data[5] = 0;
 		}
 		ch[cn].data[1] = globs->ticker + TICKS * 2;
 		ch[cn].data[3]++;
@@ -763,6 +774,11 @@ void npc_shiva_low(int cn)
 		ch[cn].data[0]=0;
 		ch[cn].data[1]=0;
 		ch[cn].data[3]=0;
+		remove_buff(cn, SK_ZEPHYR2);
+		remove_buff(cn, SK_TAUNT);
+		remove_buff(cn, SK_POISON);
+		remove_buff(cn, SK_BLEED);
+		ch[cn].taunted = 0;
 		npc_remove_all_enemies(cn);
 	}
 	

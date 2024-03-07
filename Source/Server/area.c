@@ -567,6 +567,7 @@ struct area area[] = {
 	{ 131,   21,  201,   91, "Random Dungeon I",               1},
 	{ 216,   21,  286,   91, "Random Dungeon II",              1},
 	{ 301,   21,  371,   91, "Random Dungeon III",             1},
+	{  21, 1776,  273, 2028, "The Underdark",                  0},
 	{ 888, 1027,  989, 2013, "The Evergrey Weald",             0},
 	{  20, 1025,   73, 1590, "Contract Zone ",                 1}
 };

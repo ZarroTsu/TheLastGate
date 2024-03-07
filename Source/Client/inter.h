@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000B07
+#define VERSION 0x000B0A
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -261,7 +261,7 @@ struct sk_icon
 };
 
 extern struct wpslist wpslist[MAXWPS];
-extern struct sk_tree sk_tree[9][12];
+extern struct sk_tree sk_tree[10][12];
 extern struct sk_icon sk_icon[12];
 
 void dd_puttext(int x,int y,int font,char *text);

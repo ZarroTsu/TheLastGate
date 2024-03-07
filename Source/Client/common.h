@@ -61,6 +61,7 @@
 #define T_ARHR_SK(a)		(IS_ARCHHARAKIM && T_SK(a))
 #define T_BRAV_SK(a)		(IS_BRAVER      && T_SK(a))
 #define T_LYCA_SK(a)		(IS_LYCANTH     && T_SK(a))
+#define T_OS_TREE(a)		(st_learned_skill(pl.os_tree, (a)))
 
 // wear positions
 #define WN_HEAD			0
@@ -225,6 +226,8 @@ struct cplayer {
 	int waypoints;
 
 	unsigned short tree_points;
+	unsigned char tree_node[12];
+	unsigned short os_tree;
 
 	// items carried
 	int item[40];
@@ -235,7 +238,7 @@ struct cplayer {
 	// items worn
 	int worn[20];
 	int worn_p[20];
-	int stat[20];
+	char worn_s[20];   // Stack size
 
 	// spells ready
 	short spell[MAXBUFFS];
@@ -373,6 +376,7 @@ struct cplayer {
 #define SV_SETCHAR_WPS				76
 #define SV_CLEARBOX					77
 #define SV_SETCHAR_TOK				78
+#define SV_SETCHAR_TRE				79
 
 #define SV_MOTD						82
 #define SV_MOTD0					82

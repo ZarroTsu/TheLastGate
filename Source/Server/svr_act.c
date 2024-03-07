@@ -142,6 +142,89 @@ void step_oppressed(int cn, int fl)
 	}
 }
 
+void step_dw(int cn)
+{
+	int x, y, m, co, in=0, in2=0, rank, base;
+	
+	if (!IS_SANEPLAYER(cn)) return;
+	if (ch[cn].flags & CF_INVISIBLE) return;
+	
+	if (in = has_buff(cn, SK_DWLIGHT)) { ; }
+	else
+	{
+		if (has_buff(cn, SK_LIGHT)) remove_buff(cn, SK_LIGHT);
+		debuff_dwlight(cn);
+		return;
+	}
+	
+	x = ch[cn].x;
+	y = ch[cn].y;
+	m = XY2M(x, y);
+	
+	if (IS_IN_INDW(x, y) && !(map[m].flags & MF_TOUCHED) && !(map[m].flags & MF_INDOORS))
+	{
+		if (in && bu[in].power>1)
+		{
+			map[m].flags   |= MF_TOUCHED;
+			bu[in].power--;
+			if (!(bu[in].power%2))
+			{
+				bu[in].light[1]--;
+				do_update_char(cn);
+			}
+			
+			if (!(bu[in].power%11))
+			{
+				rank = getrank(cn) + (IS_RB(cn)?1:0);
+				
+				// Spawn a mob to give chase
+				if (!RANDOM(2))
+				{
+					x = ch[cn].x - 11 + RANDOM(23);
+					y = ch[cn].y - 11 + (RANDOM(2)?23:0);
+				}
+				else
+				{
+					x = ch[cn].x - 11 + (RANDOM(2)?23:0);
+					y = ch[cn].y - 11 + RANDOM(23);
+				}
+				if (IS_IN_INDW(x, y))
+				{
+					base = max(9, (rank-5) * 6 + 9 + (IS_RB(cn)?1:0));
+					co = generate_map_enemy(cn, 350, RANDOM(NUM_MAP_ENEM)+11, x, y, base, 7, 1+RANDOM(2));
+					ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 5;
+					ch[co].sprite = ch[cn].sprite;
+					x = (ch[cn].goto_x)?(ch[cn].goto_x):(ch[cn].x);
+					y = (ch[cn].goto_y)?(ch[cn].goto_y):(ch[cn].y);
+					if (npc_add_enemy(co, cn, 1) && !(ch[cn].flags & CF_SILENCE)) npc_saytext_n(co, 1, ch[cn].name);
+					npc_moveto(co, x, y);
+				}
+			}
+		}
+		else if (in && bu[in].power==1)
+		{
+			map[m].flags   |= MF_TOUCHED;
+			bu[in].power = 0;
+			bu[in].light[1] = 0;
+			do_update_char(cn);
+			
+			reset_go(ch[cn].x, ch[cn].y);
+			remove_lights(ch[cn].x, ch[cn].y);
+			fx_add_effect(12, 0, x, y, 0);
+			in2 = build_item(190, x, y);
+			it[in2].light[0] = 60;
+			reset_go(ch[cn].x, ch[cn].y);
+			add_lights(ch[cn].x, ch[cn].y);
+			
+			char_play_sound(cn, ch[cn].sound + 22, -150, 0);
+			ch[cn].goto_x = 0;
+			ch[cn].goto_y = 0;
+			ch[cn].misc_action = 0;
+		}
+	}
+	check_build_dw(cn);
+}
+
 void plr_map_set(int cn)        // set character to map and remove target character
 {
 	int m, n, in, ret, x, y;
@@ -250,6 +333,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			if (IS_IN_SUN(ch[cn].x, ch[cn].y)) 				step_desertfloor(cn); // Heatstroke for lab 6 & Volcano
 			else if (IS_IN_VANTA(ch[cn].x, ch[cn].y)) 		step_vantablack(cn);
 			else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y)) 	step_oppressed(cn, n);
+			else if (IS_IN_DW(ch[cn].x, ch[cn].y))			step_dw(cn);
 		}
 
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))

@@ -33,6 +33,8 @@ void look_item_details(int cn, int in)
 		act = 0;
 	}
 	
+	
+	
 	if (it[in].max_age[act] || it[in].max_damage)
 	{
 		if (it[in].damage_state==0)
@@ -121,6 +123,13 @@ void look_item_details(int cn, int in)
 				{
 					do_char_log(cn, 3, "This item can be Soulstoned.\n");
 				}
+				else if (IS_OSIRWEAP(in))
+				{
+					if (it[in].stack)
+						do_char_log(cn, 3, "May be further enhanced by Osiris.\n");
+					else
+						do_char_log(cn, 7, "Has been enhanced by Osiris.\n");
+				}
 				else if (it[in].flags & IF_SOULSTONE)
 				{
 					if (it[in].driver==68)
@@ -141,13 +150,36 @@ void look_item_details(int cn, int in)
 					if (it[in].driver==68)
 						do_char_log(cn, 7, "Has been Focused.\n");
 					else
-						do_char_log(cn, 8, "Has been Enchanted.\n");
+					{
+						int colr = 8;
+						if (it[in].enchantment>=57&&it[in].enchantment<=60) colr = 7;
+						if (it[in].enchantment>=61&&it[in].enchantment<=64) colr = 5;
+						if (it[in].enchantment>=65&&it[in].enchantment<=68) colr = 6;
+						if (it[in].enchantment>=69&&it[in].enchantment<=72) colr = 8;
+						if (it[in].enchantment>=73&&it[in].enchantment<=76) colr = 9;
+						do_char_log(cn, colr, "Has been Enchanted.\n");
+					}
 				}
 				else if (it[in].placement && !CAN_ENCHANT(in))
 				{
 					do_char_log(cn, 0, "Cannot be Enchanted.\n");
 				}
 			}
+		}
+		if (IS_GODWEAPON(in))
+		{
+			do_char_log(cn, 5, "Level %d. Next level in %d kills.\n", 
+				getitemrank(in, 0), rank2points(max(1, getitemrank(in, 0)))/250 - it[in].cost);
+		}
+		if (IS_OSIRWEAP(in) && it[in].stack)
+		{
+			do_char_log(cn, 5, "%d more blessing%s. Next in %d kills.\n", 
+				it[in].stack, (it[in].stack>1?"s":""), rank2points(max(0, getitemrank(in, it[in].data[0])))/125*it[in].data[0] - it[in].cost);
+		}
+		if (it[in].stack==10 && ((it[in].flags & IF_WEAPON) || (it[in].flags & IF_OF_SHIELD)))
+		{
+			it[in].flags |= IF_UPDATE | IF_IDENTIFIED | IF_ENCHANTED | IF_LOOKSPECIAL;
+			it[in].flags &= ~IF_CAN_EN;
 		}
 		if (it[in].flags & IF_AUGMENTED)
 		{
@@ -195,13 +227,13 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 7, "When equipped, 25%% of skill costs are nullified, 25%% of mana costs from spells are taken from endurance, and 25%% of endurance costs from skills are taken from mana. You no longer lose focus.\n"); 
 		break;
 	case IT_TW_CLOAK: // Cloak of Shadows
-		do_char_log(cn, 7, "When equipped, 20%% of damage taken is negated, and half of the negated damage is dealt to Endurance instead.\n");
+		do_char_log(cn, 7, "When equipped, 10%% of damage taken from hits is dealt to Endurance instead.\n");
 		break;
 	case IT_TW_DREAD: // The Dreadplate
 		do_char_log(cn, 7, "When equipped, your ghost companion is replaced with a spellcaster companion.\n");
 		break;
 	case IT_TW_DOUSER: // Douser Gauntlets
-		do_char_log(cn, 7, "When equipped, grants a 20%% chance on skill hit and a 4%% chance on melee hit to inflict douse on, reducing enemy spell modifier.\n");
+		do_char_log(cn, 7, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n");
 		break;
 	case IT_TW_MARCH: // Commander's March
 		do_char_log(cn, 7, "When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by one third.\n");
@@ -235,11 +267,54 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 4, "When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you lose endurance over time.\n");
 		break;
 	case IT_TW_SUPERBIA: // Sin Greataxe
-		do_char_log(cn, 4, "When equipped, the effects of your Heal or Regen spell is halved.\n");
+		do_char_log(cn, 4, "When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n");
 		break;
 	case IT_TW_SINBIND: // Sinbinder ring
 		do_char_log(cn, 4, "You may only equip one Sinbinder at a time.\n");
 		temp = it[in].data[2];
+		break;
+	
+	// -------- DW SIGNETS --------
+	
+	case IT_SIGN_SKUA:
+		do_char_log(cn, 7, "When equipped, all negative values on gear become positive.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SHOU:
+		do_char_log(cn, 7, "When equipped, your Warcry and Rally also raise your Guard.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SLAY:
+		do_char_log(cn, 7, "When equipped, your Leap kills enemies left below 10%% remaining health.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_STOR:
+		do_char_log(cn, 7, "When equipped, your Blind and Douse also applies a stack of Zephyr.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SICK:
+		do_char_log(cn, 7, "When equipped, your Poisons last twice as long.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SHAD:
+		do_char_log(cn, 7, "When equipped, your Shadow Copy can summon Shadow Copies.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SPAR:
+		do_char_log(cn, 7, "When equipped, your Blast hits an additional nearby target when its cooldown expires.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SYMM:
+		do_char_log(cn, 7, "When equipped, this ring will copy the effects of your other ring slot.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SONG:
+		do_char_log(cn, 7, "When equipped, your Aria additionally grants nearby allies 10% of your Armor Value.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
+		break;
+	case IT_SIGN_SCRE:
+		do_char_log(cn, 7, "When equipped, your Curse also inflicts Aggravate.\n");
+		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	
 	// -------- GLOVE ITEMS --------
@@ -481,7 +556,7 @@ void look_extra(int cn, int in)
 		break;
 	
 	case IT_BONEARMOR: 
-		do_char_log(cn, 5, "When equipped, all armor is converted to health regeneration.\n");
+		do_char_log(cn, 5, "When equipped, all armor value is converted to rapid health regeneration.\n");
 		break;
 	
 	case IT_SIGNET_TE:
@@ -496,7 +571,6 @@ void look_extra(int cn, int in)
 	case IT_SIGNET_SE:
 	case IT_SIGNET_BR:
 	case IT_SIGNET_LY:
-	case IT_SIGNET_XX:
 	case IT_ICELOTUS: 
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
@@ -581,7 +655,7 @@ void look_extra(int cn, int in)
 		break;
 	}
 	
-	if ((it[in].flags & IF_ENCHANTED) || (it[in].flags & IF_CORRUPTED))
+	if (it[in].flags & IF_ENCHANTED)
 	{
 		switch (it[in].enchantment)
 		{
@@ -600,14 +674,14 @@ void look_extra(int cn, int in)
 		case 13: do_char_log(cn, 8, "20%% more effect of Slows you inflict.\n"); break;
 		case 14: do_char_log(cn, 8, "Slows inflicted on you are 80%% weaker.\n"); break;
 		case 15: do_char_log(cn, 8, "Cannot lose focus.\n"); break;
-		case 16: do_char_log(cn, 8, "20%% of damage taken is dealt to your Endurance instead.\n"); break;
+		case 16: do_char_log(cn, 8, "20%% of damage taken from hits is dealt to your Endurance instead.\n"); break;
 		case 17: do_char_log(cn, 8, "Grants infravision.\n"); break;
 		case 18: do_char_log(cn, 8, "20%% more maximum Endurance.\n"); break;
 		case 19: do_char_log(cn, 8, "%d%% more total Intuition.\n", 3 * (IS_TWOHAND(in)?2:1)); break;
 		case 20: do_char_log(cn, 8, "20%% more effect of Curses you inflict.\n"); break;
 		case 21: do_char_log(cn, 8, "Curses inflicted on you are 80%% weaker.\n"); break;
 		case 22: do_char_log(cn, 8, "20%% less cost of skills and spells.\n"); break;
-		case 23: do_char_log(cn, 8, "20%% of damage taken is dealt to your Mana instead.\n"); break;
+		case 23: do_char_log(cn, 8, "20%% of damage taken from hits is dealt to your Mana instead.\n"); break;
 		case 24: do_char_log(cn, 8, "10%% of total Armor Value is granted as additional Immunity.\n"); break;
 		case 25: do_char_log(cn, 8, "%d%% more total Agility.\n", 3 * (IS_TWOHAND(in)?2:1)); break;
 		case 26: do_char_log(cn, 8, "Movement speed cannot fall below 1.50.\n"); break;
@@ -641,59 +715,47 @@ void look_extra(int cn, int in)
 		case 54: do_char_log(cn, 8, "%d%% more total attributes.\n", 2 * (IS_TWOHAND(in)?2:1)); break;
 		case 55: do_char_log(cn, 8, "Total Glow score is reduced to 0.\n"); break;
 		case 56: do_char_log(cn, 8, "20%% more effect of heals and regens you apply.\n"); break;
+		// Skua
+		case 57: do_char_log(cn, 7, "25%% of Armor Value granted by Magic Shield is granted as additional Weapon Value.\n"); break;
+		case 58: do_char_log(cn, 7, "4%% of total Glow score is granted as additional spell modifier.\n"); break;
+		case 59: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict slow, reducing enemy action speed.\n"); break;
+		case 60: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict scorch, causing enemies to take additional damage.\n"); break;
+		// Kwai
+		case 61: do_char_log(cn, 5, "3%% of total hit score is granted as extra parry score.\n"); break;
+		case 62: do_char_log(cn, 5, "3%% of total parry score is granted as extra hit score.\n"); break;
+		case 63: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict curse, reducing enemy attributes.\n"); break;
+		case 64: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict weaken, reducing enemy weapon value.\n"); break;
+		// Gorn
+		case 65: do_char_log(cn, 6, "20%% of damage dealt with hits is also dealt to enemy mana.\n"); break;
+		case 66: do_char_log(cn, 6, "Damage dealt with damage over time is restored as hitpoints at a rate equal to experience gain.\n"); break;
+		case 67: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict poison, dealing damage over time.\n"); break;
+		case 68: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n"); break;
+		// Purple
+		case 69: do_char_log(cn, 8, "5%% of damage dealt with hits is restored as hitpoints, endurance, and mana.\n"); break;
+		case 70: do_char_log(cn, 8, "Sacrifice 10%% of current endurance on hit to deal that much additional damage.\n"); break;
+		case 71: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict blind, reducing enemy perception, hit and parry.\n"); break;
+		case 72: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict frostburn, draining enemy endurance and mana.\n"); break;
+		// Offhand
+		case 73: do_char_log(cn, 9, "Restore 2 Hitpoints upon being hit by an enemy.\n"); break;
+		case 74: do_char_log(cn, 9, "10%% of weapon value is granted as additional rapid mana regeneration.\n"); break;
+		case 75: do_char_log(cn, 9, "Your lowest attribute score is increased by 20%%.\n"); break;
+		case 76: do_char_log(cn, 9, "Reduces extra damage taken from enemy critical hits by 50%%.\n"); break;
 		//
-		case 111: 
-		switch (it[in].cost)
-		{
-			case IT_CH_MAGI: 		do_char_log(cn, 0, DESC_MAGI); 		break;
-			case IT_CH_PREIST: 		do_char_log(cn, 0, DESC_PREIST); 	break;
-			case IT_CH_EMPRESS: 	do_char_log(cn, 0, DESC_EMPRESS); 	break;
-			case IT_CH_EMPEROR: 	do_char_log(cn, 0, DESC_EMPEROR); 	break;
-			case IT_CH_HEIROPH: 	do_char_log(cn, 0, DESC_HEIROPH); 	break;
-			case IT_CH_LOVERS: 		do_char_log(cn, 0, DESC_LOVERS); 	break;
-			case IT_CH_CHARIOT: 	do_char_log(cn, 0, DESC_CHARIOT); 	break;
-			case IT_CH_STRENGTH: 	do_char_log(cn, 0, DESC_STRENGTH); 	break;
-			case IT_CH_HERMIT: 		do_char_log(cn, 0, DESC_HERMIT); 	break;
-			case IT_CH_WHEEL: 		do_char_log(cn, 0, DESC_WHEEL); 	break;
-			case IT_CH_JUSTICE: 	do_char_log(cn, 0, DESC_JUSTICE); 	break;
-			case IT_CH_HANGED: 		do_char_log(cn, 0, DESC_HANGED); 	break;
-			case IT_CH_DEATH: 		do_char_log(cn, 0, DESC_DEATH); 	break;
-			case IT_CH_TEMPER: 		do_char_log(cn, 0, DESC_TEMPER); 	break;
-			case IT_CH_DEVIL: 		do_char_log(cn, 0, DESC_DEVIL); 	break;
-			case IT_CH_TOWER: 		do_char_log(cn, 0, DESC_TOWER); 	break;
-			case IT_CH_STAR: 		do_char_log(cn, 0, DESC_STAR); 		break;
-			case IT_CH_MOON: 		do_char_log(cn, 0, DESC_MOON); 		break;
-			case IT_CH_SUN: 		do_char_log(cn, 0, DESC_SUN); 		break;
-			case IT_CH_JUDGE: 		do_char_log(cn, 0, DESC_JUDGE); 	break;
-			case IT_CH_WORLD: 		do_char_log(cn, 0, DESC_WORLD); 	break;
-			
-			case IT_CH_FOOL_R: 		do_char_log(cn, 0, DESC_FOOL_R);	break;
-			case IT_CH_MAGI_R: 		do_char_log(cn, 0, DESC_MAGI_R);	break;
-			case IT_CH_PREIST_R: 	do_char_log(cn, 0, DESC_PREIST_R);	break;
-			case IT_CH_EMPRES_R: 	do_char_log(cn, 0, DESC_EMPRES_R);	break;
-			case IT_CH_EMPERO_R: 	do_char_log(cn, 0, DESC_EMPERO_R);	break;
-			case IT_CH_HEIROP_R: 	do_char_log(cn, 0, DESC_HEIROP_R);	break;
-			case IT_CH_LOVERS_R: 	do_char_log(cn, 0, DESC_LOVERS_R);	break;
-			case IT_CH_CHARIO_R: 	do_char_log(cn, 0, DESC_CHARIO_R);	break;
-			case IT_CH_STRENG_R: 	do_char_log(cn, 0, DESC_STRENG_R);	break;
-			case IT_CH_HERMIT_R: 	do_char_log(cn, 0, DESC_HERMIT_R);	break;
-			case IT_CH_WHEEL_R: 	do_char_log(cn, 0, DESC_WHEEL_R);	break;
-			case IT_CH_JUSTIC_R: 	do_char_log(cn, 0, DESC_JUSTIC_R);	break;
-			case IT_CH_HANGED_R: 	do_char_log(cn, 0, DESC_HANGED_R);	break;
-			case IT_CH_DEATH_R: 	do_char_log(cn, 0, DESC_DEATH_R);	break;
-			case IT_CH_TEMPER_R: 	do_char_log(cn, 0, DESC_TEMPER_R);	break;
-			case IT_CH_DEVIL_R: 	do_char_log(cn, 0, DESC_DEVIL_R);	break;
-			case IT_CH_TOWER_R: 	do_char_log(cn, 0, DESC_TOWER_R);	break;
-			case IT_CH_STAR_R: 		do_char_log(cn, 0, DESC_STAR_R);	break;
-			case IT_CH_MOON_R: 		do_char_log(cn, 0, DESC_MOON_R);	break;
-			case IT_CH_SUN_R: 		do_char_log(cn, 0, DESC_SUN_R);		break;
-			case IT_CH_JUDGE_R: 	do_char_log(cn, 0, DESC_JUDGE_R);	break;
-			case IT_CH_WORLD_R: 	do_char_log(cn, 0, DESC_WORLD_R);	break;
-			default:break;
-		}
-		break;
 		default:break;
 		}
+	}
+	if (it[in].temp == IT_CORRUPTOR)
+	{
+		if (it[in].data[0])
+		{
+			do_char_log(cn, 1, "%s:\n", sk_corrupt[it[in].data[0]-1].name);
+			do_char_log(cn, 4, "%s\n", sk_corrupt[it[in].data[0]-1].desc);
+		}
+		do_char_log(cn, 1, "Maybe you could use it on something?\n");
+	}
+	if ((it[in].flags & IF_CORRUPTED) && it[in].cost)
+	{
+		do_char_log(cn, 4, "%s\n", sk_corrupt[it[in].cost-1].desc);
 	}
 	
 	look_item_details(cn, in);
@@ -782,20 +844,24 @@ void look_soulstone(int cn, int in)
 
 void look_contract(int cn, int in, int desc)
 {
-	int rank, tier, mission, fl, n, font;
+	int cc, rank, tier, mission, fl, n, font;
 	int flags[NUM_MAP_POS+NUM_MAP_NEG] = {0};
+	int r1=1, r2=2, r3=3;
 	
 	if (!it[in].data[1]) it[in].data[1] = RANDOM(MSN_COUNT)+1;
 	
+	cc      = it[in].data[0];
 	mission = it[in].data[1];
 	tier    = it[in].data[2];
 	
-	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 1;
-	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 2;
-	if ((fl = it[in].data[7]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = 3;
-	if ((fl = it[in].data[4]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 1;
-	if ((fl = it[in].data[6]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 2;
-	if ((fl = it[in].data[8]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = 3;
+	if (T_OS_TREE(cc, 9)) r1 = r2 = r3 = 3;
+	
+	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r1;
+	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r2;
+	if ((fl = it[in].data[7]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r3;
+	if ((fl = it[in].data[4]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = r1;
+	if ((fl = it[in].data[6]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = r2;
+	if ((fl = it[in].data[8]) && fl > 0 && fl < NUM_MAP_NEG+1) flags[fl-1+NUM_MAP_POS] = r3;
 	
 	font = get_tier_font(tier);
 	
@@ -875,7 +941,7 @@ void look_talisman(int cn, int in)
 		case 20: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Cast Speed", 3); break;
 		case 21: do_char_log(cn, 8, "[Cloak Only] Slows inflicted on you are 80%% weaker.\n"); break; // 14
 		case 22: do_char_log(cn, 8, "[Jewellery Only] Cannot lose focus.\n"); break; // 15
-		case 23: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken is dealt to your Endurance instead.\n"); break; // 16
+		case 23: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken from hits is dealt to your Endurance instead.\n"); break; // 16
 		case 24: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Intuition", 4); break;
 		case 25: do_char_log(cn, 8, "[Helmet Only] Grants infravision.\n"); break; // 17
 		case 26: do_char_log(cn, 8, "[Armor Pieces Only] 20%% more maximum Endurance.\n"); break; // 18
@@ -885,7 +951,7 @@ void look_talisman(int cn, int in)
 		case 30: do_char_log(cn, 8, "[Boots Only] Stealth is 25%% stronger while moving.\n"); break; //  6
 		case 31: do_char_log(cn, 8, "[Cloak Only] Curses inflicted on you are 80%% weaker.\n"); break; // 21
 		case 32: do_char_log(cn, 8, "[Helmet Only] 20%% less cost of skills and spells.\n"); break; // 22
-		case 33: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken is dealt to your Mana instead.\n"); break; // 23
+		case 33: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken from hits is dealt to your Mana instead.\n"); break; // 23
 		case 34: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Agility", 4); break;
 		case 35: do_char_log(cn, 8, "[Chest Only] 10%% of total Armor Value is granted as additional Immunity.\n"); break; // 24
 		case 36: do_char_log(cn, 8, "3%% more total Agility.\n"); break; // 25

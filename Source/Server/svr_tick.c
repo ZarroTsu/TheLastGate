@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.11.7\n"};
+static char intro_msg3[] = {"Current client/server version is 0.11.10\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
@@ -2757,9 +2757,9 @@ void plr_change(int nr)
 			if (get_tarot(cn, IT_CH_STAR_R)) 	chFlags += (1 << 10); // Reverse Star changes spellmod behavior
 			if (get_enchantment(cn, 37)) 		chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
 			if (T_SKAL_SK(cn, 12) ||
-				T_ARHR_SK(cn, 12)) 				chFlags += (1 << 12); // 10% damage shifted to end/mana (10% more eHP)
+				T_ARHR_SK(cn, 12)) 				chFlags += (1 << 12); // 20% damage shifted to end/mana (20% more eHP)
 			if (get_gear(cn, IT_WP_RISINGPHO)) 	chFlags += (1 << 13); // Immolate skill, based off HP
-			if (get_gear(cn, IT_TW_CLOAK)) 		chFlags += (1 << 14); // 20% damage shifted to end (20% more eHP)
+			if (get_gear(cn, IT_TW_CLOAK)) 		chFlags += (1 << 14); // 10% damage shifted to end (10% more eHP)
 			
 			buf[0] = SV_SETCHAR_ENDUR;
 			*(unsigned short*)(buf + 1)  = (unsigned short)(ch[cn].move_speed);		// char
@@ -2842,7 +2842,7 @@ void plr_change(int nr)
 						*(short int*)(buf + 7) = 0;
 						if (IS_SOULCAT(in)) *(short int*)(buf + 7) = it[in].data[4];
 						*(unsigned char*)(buf + 9)  = (unsigned char)(it[in].stack);
-						*(unsigned char*)(buf + 10) = (unsigned char)(ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0));
+						*(unsigned char*)(buf + 10) = (unsigned char)(ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0));
 
 						it[in].flags &= ~IF_UPDATE;
 					}
@@ -2860,7 +2860,7 @@ void plr_change(int nr)
 				if (!IS_BUILDING(cn))
 				{
 					cpl->item_s[n]=it[in].stack;
-					cpl->item_l[n]=ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0);
+					cpl->item_l[n]=ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0);
 				}
 			}
 		}
@@ -2929,7 +2929,7 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_TRUEANKH))    { chFlags += (1 <<  2); chFlags += (1 <<  0); }
 					if (get_neck(cn, IT_BREATHAMMY))  { chFlags += (1 <<  2); chFlags += (1 <<  1); }
 					//
-					if (get_tarot(cn, IT_CH_HERMIT_R)) 	chFlags += (1 <<  3); // Rage -> Frenzy
+					if (get_tarot(cn, DESC_PREIST_R)) 	chFlags += (1 <<  3); // 
 					if (get_gear(cn, IT_BONEARMOR)) 	chFlags += (1 <<  4); // Bone Armor
 					if (get_gear(cn, IT_WP_THEWALL)) 	chFlags += (1 <<  5); // The Wall
 					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
@@ -2944,7 +2944,7 @@ void plr_change(int nr)
 					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
 				
-				xsend(nr, buf, 9);
+				xsend(nr, buf, 10);
 			}
 			else if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
 			{
@@ -2969,13 +2969,15 @@ void plr_change(int nr)
 						*(short int*)(buf + 7) |= PL_ENCHANTED;
 					if (it[in].flags & IF_CORRUPTED)
 						*(short int*)(buf + 7) |= PL_CORRUPTED;
+					*(unsigned char*)(buf + 9) = it[in].stack;
 				}
 				else
 				{
 					*(short int*)(buf + 5) = 0;
 					*(short int*)(buf + 7) = 0;
+					*(unsigned char*)(buf + 9) = 0;
 				}
-				xsend(nr, buf, 9);
+				xsend(nr, buf, 10);
 
 				cpl->worn[n]  = in;
 				it[in].flags &= ~IF_UPDATE;
@@ -3163,26 +3165,42 @@ void plr_change(int nr)
 	}
 	
 	// casino tokens
-	if (cpl->tokens != ch[cn].tokens || cpl->tree_points != ch[cn].tree_points)
+	if (cpl->tokens != ch[cn].tokens || cpl->tree_points != ch[cn].tree_points || cpl->os_tree != ch[cn].os_tree)
 	{
 		buf[0] = SV_SETCHAR_TOK;
 		*(unsigned int*)(buf + 1)   = (unsigned int)(ch[cn].tokens);
 		*(unsigned short*)(buf + 5) = (unsigned short)(ch[cn].tree_points);
-		xsend(nr, buf, 7);
+		*(unsigned short*)(buf + 7) = (unsigned short)(ch[cn].os_tree);
+		xsend(nr, buf, 9);
 		
-		cpl->tokens = ch[cn].tokens;
+		cpl->tokens      = ch[cn].tokens;
 		cpl->tree_points = ch[cn].tree_points;
+		cpl->os_tree     = ch[cn].os_tree;
+	}
+	
+	// tree nodes
+	for (n = 0; n<12; n++)
+	{
+		if (cpl->tree_node[n] != ch[cn].tree_node[n])
+		{
+			buf[0] = SV_SETCHAR_TRE;
+			*(unsigned char*)(buf + 1) = n;
+			*(unsigned char*)(buf + 2) = (unsigned char)(ch[cn].tree_node[n]);
+			xsend(nr, buf, 3);
+			
+			cpl->tree_node[n] = ch[cn].tree_node[n];
+		}
 	}
 
-	if (cpl->gold!=ch[cn].gold || ((get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].data[25]) 
+	if (cpl->gold!=ch[cn].gold || ((get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].gigaregen[0]) 
 		|| (!get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].armor)) || cpl->weapon!=ch[cn].weapon)
 	{
 		buf[0] = SV_SETCHAR_GOLD;
 		*(unsigned long*)(buf + 1) = (unsigned long)(ch[cn].gold);
 		if (get_gear(cn, IT_BONEARMOR))
 		{
-			*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].data[25]);
-			cpl->armor  = ch[cn].data[25];
+			*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].gigaregen[0]);
+			cpl->armor  = ch[cn].gigaregen[0];
 		}
 		else
 		{
@@ -3462,7 +3480,11 @@ inline int do_char_calc_light(int cn, int light)
 		light = 64;
 	}
 	
-	if (IS_GLOB_MAYHEM || IS_IN_SANG(ch[cn].x, ch[cn].y))
+	if (IS_IN_DW(ch[cn].x, ch[cn].y))
+	{
+		val = light * min(M_SK(cn, SK_PERCEPT)/3*2, 10) / 10;
+	}
+	else if (IS_GLOB_MAYHEM)
 	{
 		if (light==0 && M_SK(cn, SK_PERCEPT)>225 && !has_buff(cn, 215) && !(IS_IN_XVIII(ch[cn].x, ch[cn].y) && has_item(cn, IT_COMMAND3)))
 		{
@@ -3508,20 +3530,30 @@ inline int check_dlight(int x, int y)
 
 	if (!(map[m].flags & MF_INDOORS))
 	{
-		return( globs->dlight);
+		if (IS_IN_DW(x, y))
+		{
+			if  (map[m].flags & MF_TOUCHED) return (200 * map[m].dlight) / 256;
+			return 0;
+		}
+		return globs->dlight;
 	}
 
-	return((globs->dlight * map[m].dlight) / 256);
+	return (globs->dlight * map[m].dlight) / 256;
 }
 
 inline int check_dlightm(int m)
 {
 	if (!(map[m].flags & MF_INDOORS))
 	{
-		return( globs->dlight);
+		if (IS_IN_DW(M2X(m), M2Y(m)))
+		{
+			if  (map[m].flags & MF_TOUCHED) return (200 * map[m].dlight) / 256;
+			return 0;
+		}
+		return globs->dlight;
 	}
 
-	return((globs->dlight * map[m].dlight) / 256);
+	return (globs->dlight * map[m].dlight) / 256;
 }
 
 static void inline empty_field(struct cmap *smap, int n)
@@ -4484,7 +4516,7 @@ void check_expire(int cn)
 
 	t = time(NULL);
 	
-	if (!IS_SEYA_OR_BRAV(cn) && !IS_LYCANTH(cn) && !(ch[cn].rebirth & 1))
+	if (!IS_SEYA_OR_BRAV(cn) && !IS_LYCANTH(cn) && !IS_RB(cn))
 	{
 		if (ch[cn].points_tot==0)
 		{

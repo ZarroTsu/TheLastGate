@@ -12,25 +12,6 @@
 
 FILE *discordFile;
 
-void pay_rent(void)
-{
-	int cn;
-
-	for (cn = 1; cn<MAXCHARS; cn++)
-	{
-		if (ch[cn].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!(ch[cn].flags & (CF_PLAYER)))
-		{
-			continue;
-		}
-
-		do_pay_depot(cn);
-	}
-}
-
 void sanguine_spawners(int cn)
 {
 	int in, n = 0, m = 0, j = 0;
@@ -40,7 +21,7 @@ void sanguine_spawners(int cn)
 	
 	if (cn)
 	{
-		rank = getrank(cn) + ((ch[cn].rebirth & 1)?1:0);
+		rank = getrank(cn) + (IS_RB(cn)?1:0);
 		y = 1028 + (rank-5)*30;
 	}
 	
@@ -183,7 +164,6 @@ void global_tick(void)
 		globs->mdday++;
 		globs->mdtime = 0;
 		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear);
-		//pay_rent();
 		sanguine_spawners(0);
 		do_misc();
 		if (!(globs->mdday % 28)) init_lights_check();

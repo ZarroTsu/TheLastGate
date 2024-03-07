@@ -63,6 +63,7 @@
 
 #define CT_UNDEAD		  71
 #define CT_VAMPIRE		  72
+#define CT_LASTVAMPIRE	  82
 #define CT_RATLING		  83
 #define CT_RATKING		  91
 #define CT_GREENLING	  92
@@ -482,7 +483,18 @@
 #define IT_SIGNET_SE		3352
 #define IT_SIGNET_BR		3353
 #define IT_SIGNET_LY		3354
-#define IT_SIGNET_XX		3355
+
+#define IT_SIGN_SKUA		3355
+#define IT_SIGN_SHOU		3425
+#define IT_SIGN_SLAY		3426
+#define IT_SIGN_STOR		3427
+#define IT_SIGN_SICK		3428
+#define IT_SIGN_SHAD		3429
+#define IT_SIGN_SPAR		3430
+#define IT_SIGN_SYMM		3431
+#define IT_SIGN_SONG		3432
+#define IT_SIGN_SCRE		3433
+
 #define IT_ICELOTUS			2796
 
 #define IT_COMMAND1			3126
@@ -837,7 +849,6 @@
 #define IT_BOOK_MALT	3337
 #define IT_BOOK_GRAN	3338
 
-
 // ----- Casino
 
 #define IT_CASI_POTI	2476
@@ -884,6 +895,7 @@
 #define IT_OS_AGL		2499
 #define IT_OS_STR		2500
 #define IT_OS_SK		2501
+#define IT_OS_SP		3423
 
 #define IT_RD_SILV1		1390 // +RANDOM(6)
 #define IT_RD_SILV2		2073 // +RANDOM(4)
@@ -1197,6 +1209,7 @@
 #define MSC_EMERALD	   92212
 #define MSC_COLDR	   92685
 #define MSC_VFAUNA	   92663
+#define MSC_RFAUNA	   93297
 
 // Door Templates
 #define MDR_WOOD_N		  22
@@ -1237,3 +1250,41 @@
 #define MCT_PENTIGRAM	2506
 
 // to self: add sprites 760 - 762 from OLD for the map pents
+
+// Darkwood
+#define DW_TILE_SIZE	  19
+#define DW_CELL_SIZE	  13
+
+#define DW_TARGETX		  24
+#define DW_TARGETY		1779
+
+#define DW_CHANCE		 500
+
+#define DW_INBOUND(x,y)		((x)>=0&&(y)>=0&&(x)<DW_CELL_SIZE&&(y)<DW_CELL_SIZE)
+
+#define DW_FL_CEA		  808	//+4	Dark Grey Floor
+#define DW_FL_CEB		  133	//+9	Wood Floor
+#define DW_FL_NWA		16670	//+4	Ice Floor
+#define DW_FL_NWB		  558	//		Red Brick Floor
+#define DW_FL_NEA		 6548	//+4	Evil Grass Floor
+#define DW_FL_NEB		 1100	//		Light Grey Floor
+#define DW_FL_SEA		  704	//+4	Black Magma Floor
+#define DW_FL_SEB		 1014	//		Red Earth Floor
+#define DW_FL_SWA		 6866	//+4	Evil Jungle Floor
+#define DW_FL_SWB		 5965	//		Blue Earth Floor
+
+#define DW_GETFLOOR(a,b)	(((a)>=(b)&&(a)<((b)+9)) || ((b==704 && (a==704 || a==659 || a==660 || a==688))))
+
+#define DW_WL_CEA		90249	//+4	-- Random dark wall chunk
+#define DW_WL_CEB		 1672	//+9	Mixed Brick
+#define DW_WL_NWA		90807	//+4	-- Random ice wall chunk
+#define DW_WL_NWB		  297	//		Dark Red Brick
+#define DW_WL_NEA		 1468	//+4	-- Random tree
+#define DW_WL_NEB		 1670	//		Red Brick
+#define DW_WL_SEA		90515	//+4	-- Random fire wall chunk
+#define DW_WL_SEB		 1662	//		Grey Brick
+#define DW_WL_SWA		 3305	//+4	-- Random evil jungle tree
+#define DW_WL_SWB		 1668	//		Mixed Tan Brick
+
+// 522 fire torch
+// 812	ice torch

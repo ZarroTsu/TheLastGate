@@ -119,7 +119,7 @@ struct global
 #define MF_DEATHTRAP  (1ULL<<9)
 #define MF_NOPLAYER   (1ULL<<10)
 #define MF_ARENA      (1ULL<<11)
-
+#define MF_TOUCHED	  (1ULL<<12)
 #define MF_NOEXPIRE   (1ULL<<13)
 #define MF_NOFIGHT    (1Ull<<14)
 
@@ -408,6 +408,7 @@ extern unsigned int mapmarker;
 #define SK_PULSE2		64
 #define SK_MJOLNIR		65
 #define SK_SANGUINE	   219
+#define SK_DWLIGHT     220
 
 
 /*
@@ -631,13 +632,15 @@ struct character
 	unsigned short tree_points;		// Points allocated (upper 12 bits) and available (lower 4 bits)
 	unsigned int rebirth;			// Rebirth state (bit 1) and collected poles.
 	
-	unsigned short greydepth;		// Depth reached for Evergrey
+	unsigned char gigaregen[3];		// Special regen source values.
 	
-	char future2[13];				// space for future expansion
+	char tree_node[12];
 
 	unsigned int depot[62];
-
-	int depot_cost;
+	
+	unsigned short os_tree;			// Points allocated (upper 12 bits) and available (lower 4 bits)
+	
+	char future[2];
 
 	int luck;
 
@@ -905,6 +908,8 @@ __attribute__ ((packed));
 #define EXP_RATE 16
 #define EXP_TIME (MAPY/EXP_RATE)
 
+#define NUM_CORR 108
+
 struct item
 {
 	unsigned char used;             // 1
@@ -1104,6 +1109,7 @@ struct sk_tree
 #define N_SOULBONUS		 50
 #define N_SOULMAX		 24
 #define N_SOULFACTOR	  2
+#define N_ITEMMAX		 10
 
 #define MM_M_DFAE		 1
 #define MM_M_DADE		 2
@@ -1168,7 +1174,8 @@ extern struct effect *fx;
 extern struct see_map *  see;
 extern struct mapedit_queue *maped_queue;
 extern struct waypoint waypoint[MAXWPS];
-extern struct sk_tree sk_tree[9][12];
+extern struct sk_tree sk_tree[10][12];
+extern struct sk_tree sk_corrupt[NUM_CORR];
 
 extern struct newcharacter *ch_new;
 extern struct newcharacter *ch_temp_new;

@@ -1783,20 +1783,20 @@ void answer_move(int cn, int co, int dir)
 				switch (dir)
 				{
 					case 1: // North
-						ch[cn].goto_x = ch[cn].x-10;
+						ch[cn].goto_x = ch[cn].x-12;
 						ch[cn].goto_y = ch[cn].y;
 						break;
 					case 2: // East
 						ch[cn].goto_x = ch[cn].x;
-						ch[cn].goto_y = ch[cn].y+10;
+						ch[cn].goto_y = ch[cn].y+12;
 						break;
 					case 3: // South
-						ch[cn].goto_x = ch[cn].x+10;
+						ch[cn].goto_x = ch[cn].x+12;
 						ch[cn].goto_y = ch[cn].y;
 						break;
 					case 4: // West
 						ch[cn].goto_x = ch[cn].x;
-						ch[cn].goto_y = ch[cn].y-10;
+						ch[cn].goto_y = ch[cn].y-12;
 						break;
 				}
 			}
@@ -1805,20 +1805,20 @@ void answer_move(int cn, int co, int dir)
 				switch (dir)
 				{
 					case 1: // North
-						ch[cn].goto_x = ch[cn].x-2;
+						ch[cn].goto_x = ch[cn].x-4;
 						ch[cn].goto_y = ch[cn].y;
 						break;
 					case 2: // East
 						ch[cn].goto_x = ch[cn].x;
-						ch[cn].goto_y = ch[cn].y+2;
+						ch[cn].goto_y = ch[cn].y+4;
 						break;
 					case 3: // South
-						ch[cn].goto_x = ch[cn].x+2;
+						ch[cn].goto_x = ch[cn].x+4;
 						ch[cn].goto_y = ch[cn].y;
 						break;
 					case 4: // West
 						ch[cn].goto_x = ch[cn].x;
-						ch[cn].goto_y = ch[cn].y-2;
+						ch[cn].goto_y = ch[cn].y-4;
 						break;
 				}
 			}
@@ -2163,7 +2163,7 @@ void answer_claim(int cn, int co, int nr)
 				continue;
 			}
 		}
-		if ((ch[co].rebirth & 1) && rbirth && it[m].temp==rbirth && it[m].driver==57)
+		if (IS_RB(co) && rbirth && it[m].temp==rbirth && it[m].driver==57)
 		{
 			if (!(ch[co].rebirth & it[m].data[8]))
 			{
