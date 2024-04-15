@@ -2,8 +2,11 @@ Source/Client/TheLastGate/*
 Source/Server/.vscode/*
 *.moa
 *.cgi
+*.zip
 Source/Server/\.obj/
 Source/Server/password
 Source/Server/respawn
 Source/Server/server
 datBK/*
+Source/NewClient
+Source/Server/Web
