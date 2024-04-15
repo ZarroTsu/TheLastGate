@@ -912,6 +912,7 @@ int god_give_char(int in, int cn)
 		flag = 1;
 		if (it[in].driver == 93 && it[in].data[4] != it[in2].data[4]) flag = 0;
 		if (it[in].driver == 110 && it[in].data[0] == 5 && it[in2].data[0] == 5 && it[in].data[1] != it[in2].data[1]) flag = 0;
+		if (it[in].driver == 133 && it[in].data[0] != it[in2].data[0]) flag = 0;
 		// Find a stackable item of the same template
 		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[in2].temp && it[in2].stack<10 && flag)
 		{
@@ -994,7 +995,7 @@ int god_take_from_char(int in, int cn)
 		if (n<MAXITEMS)
 		{
 			ch[cn].item[n] = 0;
-			ch[cn].item_lock[n] = 0;
+		//	ch[cn].item_lock[n] = 0;
 		}
 		else
 		{
@@ -1776,10 +1777,10 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 				it[in].stack = 3 + (m-1)*2;
 				switch (m)
 				{
-					case  4: it[in].data[0] = 1; // 4!9 = 10010 x 1 = 10010k
-					case  3: it[in].data[0] = 2; // 3!7 =  3432 x 2 =  6864k
-					case  2: it[in].data[0] = 4; // 2!5 =   924 x 4 =  3696k
-					default: it[in].data[0] = 8; // 1!3 =   168 x 8 =  1344k
+					case  4: it[in].data[0] = 1; // 4!9 = 5005 x 1 = 5005k
+					case  3: it[in].data[0] = 2; // 3!7 = 1716 x 2 = 3432k
+					case  2: it[in].data[0] = 4; // 2!5 =  462 x 4 = 1848k
+					default: it[in].data[0] = 8; // 1!3 =   84 x 8 =  672k
 				}
 				it[in].data[1] = it[in].data[2] = it[in].data[3] = it[in].data[4] = 0;
 				it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_NOREPAIR | IF_PURP_UNI | IF_GORN_UNI;
@@ -1791,6 +1792,11 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 		else
 		{
 			in = get_special_item(cn, x, gen_a, gen_b, gen_c);
+		}
+		if (in && x == IT_CORRUPTOR && gen_b)
+		{
+			it[in].data[0] = gen_b;
+			it[in].flags  |= (IF_LOOKSPECIAL | IF_SOULSTONE | IF_UPDATE);
 		}
 	}
 	if (in==0)
@@ -2545,7 +2551,7 @@ int god_build_start(int cn)
 		{
 			ch[co].item[n] = in;
 			ch[cn].item[n] = 0;
-			ch[cn].item_lock[n] = 0;
+		//	ch[cn].item_lock[n] = 0;
 			it[in].carried = co;
 		}
 	}
@@ -2570,7 +2576,7 @@ void god_build_stop(int cn)
 	for (n = 0; n<MAXITEMS; n++)
 	{
 		ch[cn].item[n] = 0;
-		ch[cn].item_lock[n] = 0;
+	//	ch[cn].item_lock[n] = 0;
 	}
 	ch[cn].citem = 0;
 
@@ -4180,7 +4186,7 @@ void god_destroy_items(int cn)
 		if ((in = ch[cn].item[n])!=0)
 		{
 			ch[cn].item[n] = 0;
-			ch[cn].item_lock[n] = 0;
+		//	ch[cn].item_lock[n] = 0;
 			if (in>0 && in<MAXITEM)
 			{
 				it[in].used = USE_EMPTY;
@@ -4230,11 +4236,24 @@ void god_destroy_items(int cn)
 	}
 	if (ch[cn].flags & CF_PLAYER)
 	{
+		/*
 		for (n = 0; n<62; n++)
 		{
-			if ((in = ch[cn].depot[n])!=0)
+//	//	//	if ((in = ch[cn].depot[n])!=0)
 			{
-				ch[cn].depot[n] = 0;
+//	//	//	//	ch[cn].depot[n] = 0;
+				if (in>0 && in<MAXITEM)
+				{
+					it[in].used = USE_EMPTY;
+				}
+			}
+		}
+		*/
+		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
+		{
+			if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)
+			{
+				st[cn].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
 				if (in>0 && in<MAXITEM)
 				{
 					it[in].used = USE_EMPTY;
@@ -4249,7 +4268,8 @@ void god_racechange(int co, int temp, int keepstuff)
 {
 	struct item tmp;
 	int n, rank;
-	struct character old, dpt;
+	struct character old, old_dpt;
+	struct storage dpt;
 
 	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co))
 	{
@@ -4263,23 +4283,32 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	if (!keepstuff)
 	{
-		dpt = ch[co];
-		
+		old_dpt = ch[co];
+		dpt = st[co];
+		/*
 		for (n = 0; n<62; n++)
-		{
-			ch[co].depot[n] = 0;
-		}
+//	//	//	ch[co].depot[n] = 0;
+		*/
+		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
+			st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
 		
 		god_destroy_items(co);
-		
+		/*
 		for (n = 0; n<62; n++)
 		{
-			ch[co].depot[n] = dpt.depot[n];
-			it[ch[co].depot[n]].carried = co;
+//	//	//	ch[co].depot[n] = old_dpt.depot[n];
+//	//	//	it[ch[co].depot[n]].carried = co;
+		}
+		*/
+		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
+		{
+			st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = dpt.depot[n/ST_SLOTS][n%ST_SLOTS];
+			it[st[co].depot[n/ST_SLOTS][n%ST_SLOTS]].carried = co;
 		}
 	}
 	
 	old = ch[co];
+	dpt = st[co];
 	ch[co] = ch_temp[temp];
 
 	ch[co].temp      = temp;
@@ -4332,7 +4361,12 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	for (n = 0; n<MAXBUFFS; n++) ch[co].spell[n] = 0;
 	for (n = 0; n<100; n++) ch[co].data[n] = old.data[n];
-	for (n = 0; n<62; n++) { ch[co].depot[n] = old.depot[n]; it[ch[co].depot[n]].carried = co; }
+//	for (n = 0; n<62; n++) { ch[co].depot[n] = old.depot[n]; it[ch[co].depot[n]].carried = co; }
+	for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
+	{ 
+		st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = dpt.depot[n/ST_SLOTS][n%ST_SLOTS];
+		it[st[co].depot[n/ST_SLOTS][n%ST_SLOTS]].carried = co;
+	}
 
 	if (keepstuff)
 	{
@@ -4429,8 +4463,11 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].citem = old.citem;
 		for (n = 0; n<MAXITEMS; n++) {ch[co].item[n] = old.item[n]; it[ch[co].item[n]].carried = co;}
 		for (n = 0; n<20; n++) {ch[co].worn[n] = old.worn[n]; it[ch[co].worn[n]].carried = co;}
-		for (n = 0; n<12; n++) {ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;}
-		
+		for (n = 0; n<12; n++) 
+		{
+			ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;
+			ch[co].tree_node[n] = old.tree_node[n];
+		}
 		// Re-acquire previously learned skills
 		for (n = 0; n<50; n++) if (ch[co].skill[n][0]==0 && old.skill[n][0] && ch[co].skill[n][2])
 			ch[co].skill[n][0] = 1;

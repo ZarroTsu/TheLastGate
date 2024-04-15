@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.11.10\n"};
+static char intro_msg3[] = {"Current client/server version is 0.12.2\n"};
 static char intro_msg4_font = 0;
 static char intro_msg4[] = {" \n"};
 static char intro_msg5_font = 2;
@@ -455,7 +455,7 @@ void plr_cmd_inv(int nr)
 
 	if (what==0) // 0 - Inventory management - swapping items with other item slots
 	{
-		if (n<0 || n>39)
+		if (n<0 || n>(MAXITEMS-1))
 		{
 			return;                 // sanity check
 		}
@@ -466,14 +466,17 @@ void plr_cmd_inv(int nr)
 
 		tmp = ch[cn].item[n];
 
-		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL))// || ch[cn].item_lock[n])) // Cannot pick up locked items
+		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL))
+			// || ch[cn].item_lock[n])) // Cannot pick up locked items
 		{
 			return;
 		}
-		else if (!IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Clean bad item lock if the item isn't valid
+		/*
+	//	else if (!IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Clean bad item lock if the item isn't valid
 		{
-			ch[cn].item_lock[n] = 0;
+		//	ch[cn].item_lock[n] = 0;
 		}
+		*/
 
 		do_update_char(cn);
 		
@@ -539,7 +542,7 @@ void plr_cmd_inv(int nr)
 	}
 	if (what==3) // 3 - Push or pull item stacks (CTRL+Left)
 	{
-		if (n<0 || n>39 || IS_BUILDING(cn))
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
 		{
 			return;                             // sanity check
 		}
@@ -584,10 +587,12 @@ void plr_cmd_inv(int nr)
 		// Target slot is sane but held item is not - take from slot stack
 		else if (in && !tmp) 
 		{
-			if (IS_SANEITEM(in) && ch[cn].item_lock[n]) // Cannot pick up locked items
+			/*
+		//	if (IS_SANEITEM(in) && ch[cn].item_lock[n]) // Cannot pick up locked items
 			{
 				return;
 			}
+			*/
 			if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
 			{
 				if (it[in].temp)
@@ -663,27 +668,28 @@ void plr_cmd_inv(int nr)
 				ch[cn].citem = in;
 				ch[cn].item[n] = tmp;
 			}
-			ch[cn].item_lock[n] = 0;
+		//	ch[cn].item_lock[n] = 0;
 		}
 		return;
 	}
+	/*
 	if (what==4) // 4 - Lock item in place in inventory so /sort doesn't move it (CTRL+Right)
 	{
-		if (n<0 || n>39 || IS_BUILDING(cn))
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
 		{
 			return;                             // sanity check
 		}
 		
 		if ((in = ch[cn].item[n])!=0)
 		{
-			if (ch[cn].item_lock[n])
+		//	if (ch[cn].item_lock[n])
 			{
-				ch[cn].item_lock[n] = 0;
+		//		ch[cn].item_lock[n] = 0;
 				do_char_log(cn, 1, "%s, now unlocked.\n", it[in].name);
 			}
 			else
 			{
-				ch[cn].item_lock[n] = 1;
+		//		ch[cn].item_lock[n] = 1;
 				do_char_log(cn, 1, "%s, now locked.\n", it[in].name);
 			}
 			
@@ -692,6 +698,7 @@ void plr_cmd_inv(int nr)
 		
 		return;
 	}
+	*/
 	if (what==5) // 5 - Use a given gear piece while it is equipped, such as rings
 	{
 		if (n<0 || n>19 || IS_BUILDING(cn))
@@ -704,7 +711,7 @@ void plr_cmd_inv(int nr)
 	}
 	if (what==6) // 6 - Use an item in your inventory
 	{
-		if (n<0 || n>39 || IS_BUILDING(cn))
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
 		{
 			return;                             // sanity check
 		}
@@ -726,7 +733,7 @@ void plr_cmd_inv(int nr)
 	}
 	if (what==8) // 8 - Look at your items
 	{
-		if (n<0 || n>39 || IS_BUILDING(cn))
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
 		{
 			return;                             // sanity check
 		}
@@ -764,7 +771,7 @@ void plr_cmd_inv_look(int nr)
 
 	n = *(unsigned short*)(player[nr].inbuf + 1);
 
-	if (n<0 || n>39)
+	if (n<0 || n>(MAXITEMS-1))
 	{
 		return;                 // sanity check
 	}
@@ -1011,7 +1018,7 @@ void plr_cmd_qshop(int nr)
 
 	cn = player[nr].usnr;
 	
-	if (n<0 || n>39) return;
+	if (n<0 || n>(MAXITEMS-1)) return;
 	if (ch[cn].stunned==1) return;
 	if (IS_BUILDING(cn)) return;
 	if (ch[cn].citem) return;
@@ -1027,7 +1034,7 @@ void plr_cmd_qshop(int nr)
 
 	if (co & 0x8000)
 	{
-		do_depot_char(cn, co & 0x7fff, n);
+		do_depot_char(cn, co & 0x7fff, n+cc*64);
 	}
 	else
 	{
@@ -1479,7 +1486,11 @@ void plr_cmd_setuser(int nr)
 void plr_idle(int nr)
 {
 	if (player[nr].spectating) return;
-	if (IS_BUILDING(player[nr].usnr)) return;
+	if (IS_SANECHAR(player[nr].usnr))
+	{
+		if (IS_BUILDING(player[nr].usnr)) return;
+		if (IS_IN_TEMPLE(ch[player[nr].usnr].x, ch[player[nr].usnr].y)) return;
+	}
 	
 	if (globs->ticker - player[nr].lasttick>TICKS * 60)
 	{
@@ -2299,10 +2310,13 @@ void plr_state(int nr)
 		deflateEnd(&player[nr].zs);
 	}
 
-	if (globs->ticker - player[nr].lasttick>TICKS * 60)
+	if (!player[nr].spectating && !IS_BUILDING(player[nr].usnr) && !IS_IN_TEMPLE(ch[player[nr].usnr].x, ch[player[nr].usnr].y))
 	{
-		plog(nr, "Idle timeout");
-		plr_logout(0, nr, LO_IDLE);
+		if (globs->ticker - player[nr].lasttick>TICKS * 60)
+		{
+			plog(nr, "Idle timeout");
+			plr_logout(0, nr, LO_IDLE);
+		}
 	}
 
 	switch(player[nr].state)
@@ -2842,7 +2856,7 @@ void plr_change(int nr)
 						*(short int*)(buf + 7) = 0;
 						if (IS_SOULCAT(in)) *(short int*)(buf + 7) = it[in].data[4];
 						*(unsigned char*)(buf + 9)  = (unsigned char)(it[in].stack);
-						*(unsigned char*)(buf + 10) = (unsigned char)(ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0));
+						*(unsigned char*)(buf + 10) = (unsigned char)((ch[cn].item_lock[n]?0:0)+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0));
 
 						it[in].flags &= ~IF_UPDATE;
 					}
@@ -2860,7 +2874,7 @@ void plr_change(int nr)
 				if (!IS_BUILDING(cn))
 				{
 					cpl->item_s[n]=it[in].stack;
-					cpl->item_l[n]=ch[cn].item_lock[n]+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0);
+					cpl->item_l[n]=(ch[cn].item_lock[n]?0:0)+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0);
 				}
 			}
 		}
@@ -3483,6 +3497,11 @@ inline int do_char_calc_light(int cn, int light)
 	if (IS_IN_DW(ch[cn].x, ch[cn].y))
 	{
 		val = light * min(M_SK(cn, SK_PERCEPT)/3*2, 10) / 10;
+		if (val>255)
+		{
+			val = 255;
+		}
+		return val;
 	}
 	else if (IS_GLOB_MAYHEM)
 	{
@@ -3758,7 +3777,7 @@ void plr_getmap_complete(int nr)
 				if (M_SK(cn, SK_PERCEPT)> 80) infv = 1;
 				if (M_SK(cn, SK_PERCEPT)>150) infv = 0;
 			}
-			if (light<=infv && (ch[cn].flags & CF_INFRARED))
+			if (light<=infv && (ch[cn].flags & CF_INFRARED) && !IS_IN_DW(ch[cn].x, ch[cn].y))
 			{
 				infra = 1;
 			}
@@ -4067,7 +4086,7 @@ void plr_getmap_fast(int nr)
 				if (M_SK(cn, SK_PERCEPT)> 80) infv = 1;
 				if (M_SK(cn, SK_PERCEPT)>150) infv = 0;
 			}
-			if (light<=infv && (ch[cn].flags & CF_INFRARED))
+			if (light<=infv && (ch[cn].flags & CF_INFRARED) && !IS_IN_DW(ch[cn].x, ch[cn].y))
 			{
 				infra = 1;
 			}
@@ -4424,20 +4443,33 @@ int check_valid(int cn)
 				xlog("Reset item %d (%s,%d) from char %d (%s)",
 				     in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].item[n] = 0;
-				ch[cn].item_lock[n] = 0;
+			//	ch[cn].item_lock[n] = 0;
 			}
 		}
 	}
-
+	/*
 	for (n = 0; n<62; n++)
 	{
-		if ((in = ch[cn].depot[n])!=0)
+//	//	if ((in = ch[cn].depot[n])!=0)
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
 				xlog("Reset depot item %d (%s,%d) from char %d (%s)",
 				     in, it[in].name, it[in].used, cn, ch[cn].name);
-				ch[cn].depot[n] = 0;
+//	//	//	//	ch[cn].depot[n] = 0;
+			}
+		}
+	}
+	*/
+	for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
+	{
+		if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)
+		{
+			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
+			{
+				xlog("Reset depot item %d (%s,%d) from char %d (%s)",
+				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				st[cn].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
 			}
 		}
 	}

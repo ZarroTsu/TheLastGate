@@ -66,7 +66,7 @@ void init_lights(void)
 
 int pop_create_item(int temp, int cn)
 {
-	int n, m, in = 0, enbl = 0, godroll = 0, bonus = 1;
+	int n = 0, m, in = 0, enbl = 0, godroll = 0, bonus = 1;
 	char *gend, *godn, name[60], refer[60], descr[220];
 	
 	if (!(it_temp[temp].flags & IF_TAKE))
@@ -78,6 +78,7 @@ int pop_create_item(int temp, int cn)
 	{
 		if (!in && ch[cn].alignment<0 && !RANDOM(1000)) // Reward a unique weapon
 		{	godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
+			/*
 			for (m = 1, n = 0; m<MAXITEM; m++)			// Check for up to three copies
 			{
 				if (it[m].used==USE_EMPTY || it[m].orig_temp!=temp) continue;
@@ -87,8 +88,8 @@ int pop_create_item(int temp, int cn)
 					(godroll == 4 && IS_PURPWEAP(m)) ) n++;
 				if (n>=3) break;
 			}
-			if (n<3)
-				in = god_create_item(temp); 			// create the item
+			if (n<3)*/
+			in = god_create_item(temp); 			// create the item
 			if (in)										// assure the item is created
 			{
 				if (IS_TWOHAND(in))
@@ -193,10 +194,10 @@ int pop_create_item(int temp, int cn)
 			it[in].stack = 2 + m/2 + RANDOM((m*3+1)/2);
 			switch (m)
 			{
-				case  4: it[in].data[0] = 1; // 4!9 = 10010 x 1 = 10010k
-				case  3: it[in].data[0] = 2; // 3!7 =  3432 x 2 =  6864k
-				case  2: it[in].data[0] = 4; // 2!5 =   924 x 4 =  3696k
-				default: it[in].data[0] = 8; // 1!3 =   168 x 8 =  1344k
+				case  4: it[in].data[0] = 1; // 4!9 = 5005 x 1 = 5005k
+				case  3: it[in].data[0] = 2; // 3!7 = 1716 x 2 = 3432k
+				case  2: it[in].data[0] = 4; // 2!5 =  462 x 4 = 1848k
+				default: it[in].data[0] = 8; // 1!3 =   84 x 8 =  672k
 			}
 			it[in].data[1] = it[in].data[2] = it[in].data[3] = it[in].data[4] = 0;
 			it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_NOREPAIR | IF_PURP_UNI | IF_GORN_UNI;
@@ -632,7 +633,7 @@ int pop_create_char(int n, int drop)
 
 	for (m = 0; m<MAXITEMS; m++)
 	{
-		if ((tmp = ch[cn].item[m])!=0)
+		if (tmp = ch[cn].item[m])
 		{
 			tmp = god_create_item(tmp);
 			if (!tmp)
@@ -653,7 +654,7 @@ int pop_create_char(int n, int drop)
 	{
 		if ((tmp = ch[cn].worn[m])!=0)
 		{
-			if (m == WN_RHAND && n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE && !RANDOM(4)) // Vampire equipment adjustment
+			if (m == WN_RHAND && n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE && !RANDOM(2)) // Vampire equipment adjustment
 			{
 				int randm = RANDOM(9);
 				if (tmp==IT_CLAW_STEL) tmp = IT_DAGG_STEL + randm;
@@ -822,7 +823,7 @@ int pop_create_char(int n, int drop)
 		hasloot = 1;
 	}
 	
-	if (!ch[cn].citem && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+	if (!IS_LABY_MOB(cn) && !ch[cn].citem && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 	{
 		if (tmp = god_create_item(IT_CORRUPTOR))
 		{
@@ -1200,12 +1201,12 @@ void pop_wipe(void)
 
 void pop_remove(void)
 {
-	int h1, h2, h3, n, m, in, chc = 0, itc = 0;
+	int h1, h2, h3, n, m, m2, in, chc = 0, itc = 0;
 
 	xlog("Saving players...");
 
-	h1 = open(".tmp/char.dat", O_RDWR | O_CREAT | O_TRUNC, 0600);
-	h2 = open(".tmp/item.dat", O_RDWR | O_CREAT | O_TRUNC, 0600);
+	h1 = open(".tmp/char.dat",   O_RDWR | O_CREAT | O_TRUNC, 0600);
+	h2 = open(".tmp/item.dat",   O_RDWR | O_CREAT | O_TRUNC, 0600);
 	h3 = open(".tmp/global.dat", O_RDWR | O_CREAT | O_TRUNC, 0600);
 
 	if (h1==-1 || h2==-1 || h3==-1)
@@ -1216,64 +1217,42 @@ void pop_remove(void)
 
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (ch[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!(ch[n].flags & (CF_PLAYER)))
-		{
-			continue;
-		}
-		if (ch[n].flags & CF_BODY)
-		{
-			continue;
-		}
+		if (ch[n].used==USE_EMPTY)			continue;
+		if (!(ch[n].flags & (CF_PLAYER)))	continue;
+		if (ch[n].flags & CF_BODY)			continue;
 
-		for (m = 0; m<MAXITEMS; m++)
+		for (m = 0; m<MAXITEMS; m++) if ((in = ch[n].item[m])!=0)
 		{
-			if ((in = ch[n].item[m])!=0)
-			{
-				write(h2, &it[in], sizeof(struct item));
-				itc++;
-			}
+			write(h2, &it[in], sizeof(struct item));
+			itc++;
 		}
-
-		for (m = 0; m<20; m++)
+		for (m = 0; m<20; m++) if ((in = ch[n].worn[m])!=0)
 		{
-			if ((in = ch[n].worn[m])!=0)
-			{
-				write(h2, &it[in], sizeof(struct item));
-				itc++;
-			}
+			write(h2, &it[in], sizeof(struct item));
+			itc++;
 		}
-		
-		for (m = 0; m<12; m++)
+		for (m = 0; m<12; m++) if ((in = ch[n].alt_worn[m])!=0)
 		{
-			if ((in = ch[n].alt_worn[m])!=0)
-			{
-				write(h2, &it[in], sizeof(struct item));
-				itc++;
-			}
+			write(h2, &it[in], sizeof(struct item));
+			itc++;
 		}
-
-		for (m = 0; m<MAXBUFFS; m++)
+		for (m = 0; m<MAXBUFFS; m++) if ((in = ch[n].spell[m])!=0)
 		{
-			if ((in = ch[n].spell[m])!=0)
-			{
-				write(h2, &bu[in], sizeof(struct item));
-				itc++;
-			}
+			write(h2, &bu[in], sizeof(struct item));
+			itc++;
 		}
-
-		for (m = 0; m<62; m++)
+		/*
+//	//	for (m = 0; m<62; m++) if ((in = ch[n].depot[m])!=0)
 		{
-			if ((in = ch[n].depot[m])!=0)
-			{
-				write(h2, &it[in], sizeof(struct item));
-				itc++;
-			}
+			write(h2, &it[in], sizeof(struct item));
+			itc++;
 		}
-
+		*/
+		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if ((in = st[n].depot[m/ST_SLOTS][m%ST_SLOTS])!=0)
+		{
+			write(h2, &it[in], sizeof(struct item));
+			itc++;
+		}
 		ch[n].data[99] = n;
 		write(h1, &ch[n], sizeof(struct character));
 		chc++;
@@ -1318,178 +1297,97 @@ void pop_load(void)
 
 	while (1)
 	{
-		if (read(h1, &ctmp, sizeof(struct character))<1)
-		{
-			break;
-		}
+		if (read(h1, &ctmp, sizeof(struct character))<1) break;
 		n = ctmp.data[99];
-
 		if (ch[n].used!=USE_EMPTY)
 		{
 			xlog("Character slot %d to be loaded to not empty!", n);
-			for (m = 0; m<MAXITEMS; m++)
-			{
-				if ((in = ch[n].item[m])!=0)
-				{
-					it[in].used = USE_EMPTY;
-				}
-			}
-			for (m = 0; m<MAXBUFFS; m++)
-			{
-				if ((in = ch[n].spell[m])!=0)
-				{
-					bu[in].used = USE_EMPTY;
-				}
-			}
-			for (m = 0; m<20; m++)
-			{
-				if ((in = ch[n].worn[m])!=0)
-				{
-					it[in].used = USE_EMPTY;
-				}
-			}
-			for (m = 0; m<12; m++)
-			{
-				if ((in = ch[n].alt_worn[m])!=0)
-				{
-					it[in].used = USE_EMPTY;
-				}
-			}
-			if ((in = ch[n].citem)!=0)
-			{
-				it[in].used = USE_EMPTY;
-			}
+			for (m = 0; m<MAXITEMS; m++)	if ((in = ch[n].item[m])!=0)		it[in].used = USE_EMPTY;
+			for (m = 0; m<MAXBUFFS; m++)	if ((in = ch[n].spell[m])!=0)		bu[in].used = USE_EMPTY;
+			for (m = 0; m<20; m++)			if ((in = ch[n].worn[m])!=0)		it[in].used = USE_EMPTY;
+			for (m = 0; m<12; m++)			if ((in = ch[n].alt_worn[m])!=0)	it[in].used = USE_EMPTY;
+											if ((in = ch[n].citem)!=0)			it[in].used = USE_EMPTY;
 		}
 		ch[n] = ctmp;
 		chc++;
-
-		for (m = 0; m<MAXITEMS; m++)
+		for (m = 0; m<MAXITEMS; m++) if (ch[n].item[m])
 		{
-			if (ch[n].item[m])
+			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+			if (in==MAXITEM)
 			{
-				for (in = 1; in<MAXITEM; in++)
-				{
-					if (it[in].used==USE_EMPTY)
-					{
-						break;
-					}
-				}
-				if (in==MAXITEM)
-				{
-					xlog("MAXITEM reached.");
-					break;
-				}
-
-				read(h2, &it[in], sizeof(struct item));
-				itc++;
-
-				ch[n].item[m] = in;
+				xlog("MAXITEM reached.");
+				break;
 			}
+			read(h2, &it[in], sizeof(struct item));
+			itc++;
+			ch[n].item[m] = in;
 		}
-
-		for (m = 0; m<20; m++)
+		for (m = 0; m<20; m++) if (ch[n].worn[m])
 		{
-			if (ch[n].worn[m])
+			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+			if (in==MAXITEM)
 			{
-				for (in = 1; in<MAXITEM; in++)
-				{
-					if (it[in].used==USE_EMPTY)
-					{
-						break;
-					}
-				}
-				if (in==MAXITEM)
-				{
-					xlog("MAXITEM reached.");
-					break;
-				}
-
-				read(h2, &it[in], sizeof(struct item));
-				itc++;
-
-				ch[n].worn[m] = in;
+				xlog("MAXITEM reached.");
+				break;
 			}
+
+			read(h2, &it[in], sizeof(struct item));
+			itc++;
+
+			ch[n].worn[m] = in;
 		}
-		
-		for (m = 0; m<12; m++)
+		for (m = 0; m<12; m++) if (ch[n].alt_worn[m])
 		{
-			if (ch[n].alt_worn[m])
+			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+			if (in==MAXITEM)
 			{
-				for (in = 1; in<MAXITEM; in++)
-				{
-					if (it[in].used==USE_EMPTY)
-					{
-						break;
-					}
-				}
-				if (in==MAXITEM)
-				{
-					xlog("MAXITEM reached.");
-					break;
-				}
-
-				read(h2, &it[in], sizeof(struct item));
-				itc++;
-
-				ch[n].alt_worn[m] = in;
+				xlog("MAXITEM reached.");
+				break;
 			}
+			read(h2, &it[in], sizeof(struct item));
+			itc++;
+			ch[n].alt_worn[m] = in;
 		}
-
-		for (m = 0; m<MAXBUFFS; m++)
+		for (m = 0; m<MAXBUFFS; m++) if (ch[n].spell[m])
 		{
-			if (ch[n].spell[m])
+			for (in = 1; in<MAXBUFF; in++) if (bu[in].used==USE_EMPTY) break;
+			if (in==MAXBUFF)
 			{
-				for (in = 1; in<MAXBUFF; in++)
-				{
-					if (bu[in].used==USE_EMPTY)
-					{
-						break;
-					}
-				}
-				if (in==MAXBUFF)
-				{
-					xlog("MAXBUFF reached.");
-					break;
-				}
-
-				read(h2, &bu[in], sizeof(struct item));
-				itc++;
-
-				ch[n].spell[m] = in;
+				xlog("MAXBUFF reached.");
+				break;
 			}
+			read(h2, &bu[in], sizeof(struct item));
+			itc++;
+			ch[n].spell[m] = in;
 		}
-
-		for (m = 0; m<62; m++)
+		/*
+//	//	for (m = 0; m<62; m++) if (ch[n].depot[m])
 		{
-			if (ch[n].depot[m])
+			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+			if (in==MAXITEM)
 			{
-				for (in = 1; in<MAXITEM; in++)
-				{
-					if (it[in].used==USE_EMPTY)
-					{
-						break;
-					}
-				}
-				if (in==MAXITEM)
-				{
-					xlog("MAXITEM reached.");
-					break;
-				}
-
-				read(h2, &it[in], sizeof(struct item));
-				itc++;
-
-				ch[n].depot[m] = in;
+				xlog("MAXITEM reached.");
+				break;
 			}
+			read(h2, &it[in], sizeof(struct item));
+			itc++;
+//	//		ch[n].depot[m] = in;
 		}
-		if (ch[n].flags & (CF_PLAYER))
+		*/
+		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if (st[n].depot[m/ST_SLOTS][m%ST_SLOTS])
 		{
-			globs->players_created++;                      // this is useless now (?)
+			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+			if (in==MAXITEM)
+			{
+				xlog("MAXITEM reached.");
+				break;
+			}
+			read(h2, &it[in], sizeof(struct item));
+			itc++;
+			st[n].depot[m/ST_SLOTS][m%ST_SLOTS] = in;
 		}
-		else
-		{
-			map[ch[n].x + ch[n].y * MAPX].ch = n;
-		}
+		if (ch[n].flags & (CF_PLAYER)) 	globs->players_created++;
+		else							map[ch[n].x + ch[n].y * MAPX].ch = n;
 	}
 
 	read(h3, globs, sizeof(struct global));
@@ -1581,9 +1479,7 @@ void pop_save_char(int nr)
 	unsigned long long prof;
 
 	if (ch[nr].used==USE_EMPTY || !(ch[nr].flags & (CF_PLAYER)) || (ch[nr].flags & CF_BODY) || !(ch[nr].flags & CF_SAVEME))
-	{
 		return;
-	}
 
 	prof = prof_start();
 
@@ -1606,45 +1502,38 @@ void pop_save_char(int nr)
 	ch[nr].data[99] = nr;
 	write(h1, &ch[nr], sizeof(struct character));
 	chc++;
-
-	// save inventory
-	for (m = 0; m<MAXITEMS; m++)
-	{
-		if ((in = ch[nr].item[m])!=0)
-		{
-			write(h1, &it[in], sizeof(struct item));
-			itc++;
-		}
-	}
-
-	// save worn items
-	for (m = 0; m<20; m++)
-	{
-		if ((in = ch[nr].worn[m])!=0)
-		{
-			write(h1, &it[in], sizeof(struct item));
-			itc++;
-		}
-	}
 	
-	// save alt_worn items
-	for (m = 0; m<12; m++)
+	// save inventory
+	for (m = 0; m<MAXITEMS; m++) if ((in = ch[nr].item[m])!=0)
 	{
-		if ((in = ch[nr].alt_worn[m])!=0)
-		{
-			write(h1, &it[in], sizeof(struct item));
-			itc++;
-		}
+		write(h1, &it[in], sizeof(struct item));
+		itc++;
 	}
-
-	// save depot contents
-	for (m = 0; m<62; m++)
+	// save worn items
+	for (m = 0; m<20; m++) if ((in = ch[nr].worn[m])!=0)
 	{
-		if ((in = ch[nr].depot[m])!=0)
-		{
-			write(h1, &it[in], sizeof(struct item));
-			itc++;
-		}
+		write(h1, &it[in], sizeof(struct item));
+		itc++;
+	}
+	// save alt_worn items
+	for (m = 0; m<12; m++) if ((in = ch[nr].alt_worn[m])!=0)
+	{
+		write(h1, &it[in], sizeof(struct item));
+		itc++;
+	}
+	/*
+	// save depot contents
+//	for (m = 0; m<62; m++) if ((in = ch[nr].depot[m])!=0)
+	{
+		write(h1, &it[in], sizeof(struct item));
+		itc++;
+	}
+	*/
+	// save new depot contents
+	for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if ((in = st[nr].depot[m/ST_SLOTS][m%ST_SLOTS])!=0)
+	{
+		write(h1, &it[in], sizeof(struct item));
+		itc++;
 	}
 
 	close(h1);
@@ -1677,157 +1566,85 @@ void pop_load_char(int nr)
 	if (ch[nr].used!=USE_EMPTY)
 	{
 		xlog("Character slot %d to be loaded to not empty!", nr);
-		for (m = 0; m<MAXITEMS; m++)
-		{
-			if ((in = ch[nr].item[m])!=0)
-			{
-				it[in].used = USE_EMPTY;
-			}
-		}
-		for (m = 0; m<MAXBUFFS; m++)
-		{
-			if ((in = ch[nr].spell[m])!=0)
-			{
-				bu[in].used = USE_EMPTY;
-			}
-		}
-		for (m = 0; m<20; m++)
-		{
-			if ((in = ch[nr].worn[m])!=0)
-			{
-				it[in].used = USE_EMPTY;
-			}
-		}
-		for (m = 0; m<12; m++)
-		{
-			if ((in = ch[nr].alt_worn[m])!=0)
-			{
-				it[in].used = USE_EMPTY;
-			}
-		}
-		for (m = 0; m<62; m++)
-		{
-			if ((in = ch[nr].depot[m])!=0)
-			{
-				it[in].used = USE_EMPTY;
-			}
-		}
-		if ((in = ch[nr].citem)!=0)
-		{
-			it[in].used = USE_EMPTY;
-		}
+		for (m = 0; m<MAXITEMS; m++) 			if ((in = ch[nr].item[m])!=0) 						it[in].used = USE_EMPTY;
+		for (m = 0; m<MAXBUFFS; m++) 			if ((in = ch[nr].spell[m])!=0) 						bu[in].used = USE_EMPTY;
+		for (m = 0; m<20; m++) 					if ((in = ch[nr].worn[m])!=0) 						it[in].used = USE_EMPTY;
+		for (m = 0; m<12; m++) 					if ((in = ch[nr].alt_worn[m])!=0) 					it[in].used = USE_EMPTY;
+//	//	for (m = 0; m<62; m++) 					if ((in = ch[nr].depot[m])!=0) 						it[in].used = USE_EMPTY;
+		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) 	if ((in = st[nr].depot[m/ST_SLOTS][m%ST_SLOTS])!=0) it[in].used = USE_EMPTY;
+												if ((in = ch[nr].citem)!=0) 						it[in].used = USE_EMPTY;
 	}
 	ch[nr] = ctmp;
 	chc++;
 
-	for (m = 0; m<MAXITEMS; m++)
+	for (m = 0; m<MAXITEMS; m++) if (ch[nr].item[m])
 	{
-		if (ch[nr].item[m])
+		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+		if (in==MAXITEM)
 		{
-			for (in = 1; in<MAXITEM; in++)
-			{
-				if (it[in].used==USE_EMPTY)
-				{
-					break;
-				}
-			}
-			if (in==MAXITEM)
-			{
-				xlog("MAXITEM reached.");
-				break;
-			}
-
-			read(h1, &it[in], sizeof(struct item));
-			itc++;
-
-			ch[nr].item[m] = in;
+			xlog("MAXITEM reached.");
+			break;
 		}
+		read(h1, &it[in], sizeof(struct item));
+		itc++;
+		ch[nr].item[m] = in;
 	}
-
 	for (m = 0; m<MAXBUFFS; m++)
 	{
 		ch[nr].spell[m] = 0;
 	}
-
-	for (m = 0; m<20; m++)
+	for (m = 0; m<20; m++) if (ch[nr].worn[m])
 	{
-		if (ch[nr].worn[m])
+		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+		if (in==MAXITEM)
 		{
-			for (in = 1; in<MAXITEM; in++)
-			{
-				if (it[in].used==USE_EMPTY)
-				{
-					break;
-				}
-			}
-			if (in==MAXITEM)
-			{
-				xlog("MAXITEM reached.");
-				break;
-			}
-
-			read(h1, &it[in], sizeof(struct item));
-			itc++;
-
-			ch[nr].worn[m] = in;
+			xlog("MAXITEM reached.");
+			break;
 		}
+		read(h1, &it[in], sizeof(struct item));
+		itc++;
+		ch[nr].worn[m] = in;
 	}
-	
-	for (m = 0; m<12; m++)
+	for (m = 0; m<12; m++) if (ch[nr].alt_worn[m])
 	{
-		if (ch[nr].alt_worn[m])
+		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+		if (in==MAXITEM)
 		{
-			for (in = 1; in<MAXITEM; in++)
-			{
-				if (it[in].used==USE_EMPTY)
-				{
-					break;
-				}
-			}
-			if (in==MAXITEM)
-			{
-				xlog("MAXITEM reached.");
-				break;
-			}
-
-			read(h1, &it[in], sizeof(struct item));
-			itc++;
-
-			ch[nr].alt_worn[m] = in;
+			xlog("MAXITEM reached.");
+			break;
 		}
+		read(h1, &it[in], sizeof(struct item));
+		itc++;
+		ch[nr].alt_worn[m] = in;
 	}
-
-	for (m = 0; m<62; m++)
+	/*
+//	for (m = 0; m<62; m++) if (ch[nr].depot[m])
 	{
-		if (ch[nr].depot[m])
+		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+		if (in==MAXITEM)
 		{
-			for (in = 1; in<MAXITEM; in++)
-			{
-				if (it[in].used==USE_EMPTY)
-				{
-					break;
-				}
-			}
-			if (in==MAXITEM)
-			{
-				xlog("MAXITEM reached.");
-				break;
-			}
-
-			read(h1, &it[in], sizeof(struct item));
-			itc++;
-
-			ch[nr].depot[m] = in;
+			xlog("MAXITEM reached.");
+			break;
 		}
+		read(h1, &it[in], sizeof(struct item));
+		itc++;
+//	//	ch[nr].depot[m] = in;
 	}
-	if (ch[nr].flags & (CF_PLAYER))
+	*/
+	for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if (st[nr].depot[m/ST_SLOTS][m%ST_SLOTS])
 	{
-		globs->players_created++;                       // this is useless now (?)
+		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
+		if (in==MAXITEM)
+		{
+			xlog("MAXITEM reached.");
+			break;
+		}
+		read(h1, &it[in], sizeof(struct item));
+		itc++;
+		st[nr].depot[m/ST_SLOTS][m%ST_SLOTS] = in;
 	}
-	else
-	{
-		map[ch[nr].x + ch[nr].y * MAPX].ch = nr;
-	}
+	if (ch[nr].flags & (CF_PLAYER)) globs->players_created++;
+	else							map[ch[nr].x + ch[nr].y * MAPX].ch = nr;
 
 	close(h1);
 }
@@ -1853,6 +1670,7 @@ void pop_save_all_chars(void)
 	}
 }
 
+/* // This needs to be updated if this does eventually happen... But it's not necessary right now.
 void pop_copy_to_new_chars(void)
 {
 	int a, b, c;
@@ -2003,10 +1821,10 @@ void pop_copy_to_new_chars(void)
 		}
 		ch_new[a].waypoints = ch[a].waypoints;
 		ch_new[a].tokens = ch[a].tokens;
-		for (b=0;b<62;b++)
-		{
-			ch_new[a].depot[b] = ch[a].depot[b];
-		}
+//	//	for (b=0;b<62;b++)
+//	//	{
+//	//	//	ch_new[a].depot[b] = ch[a].depot[b];
+//	//	}
 		ch_new[a].luck = ch[a].luck;
 		ch_new[a].unreach = ch[a].unreach;
 		ch_new[a].unreachx = ch[a].unreachx;
@@ -2169,10 +1987,10 @@ void pop_copy_to_new_chars(void)
 		}
 		ch_temp_new[a].waypoints = ch_temp[a].waypoints;
 		ch_temp_new[a].tokens = ch_temp[a].tokens;
-		for (b=0;b<62;b++)
-		{
-			ch_temp_new[a].depot[b] = ch_temp[a].depot[b];
-		}
+//	//	for (b=0;b<62;b++)
+//	//	{
+//	//	//	ch_temp_new[a].depot[b] = ch_temp[a].depot[b];
+//	//	}
 		ch_temp_new[a].luck = ch_temp[a].luck;
 		ch_temp_new[a].unreach = ch_temp[a].unreach;
 		ch_temp_new[a].unreachx = ch_temp[a].unreachx;
@@ -2189,3 +2007,4 @@ void pop_copy_to_new_chars(void)
 		}
 	}
 }
+*/

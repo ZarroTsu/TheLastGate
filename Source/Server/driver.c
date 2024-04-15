@@ -935,14 +935,7 @@ int npc_give(int cn, int co, int in, int money)
 		// Assure the player has inventory space before we do anything
 		if (ch[cn].data[66] || ch[cn].data[50]==50)
 		{
-			for (n = 0; n<MAXITEMS; n++)
-			{
-				// Find an empty inventory slot
-				if (!ch[co].item[n])
-				{
-					break;
-				}
-			}
+			for (n = 0; n<MAXITEMS; n++) if (!ch[co].item[n]) break;
 			if (n==MAXITEMS)
 			{
 				do_char_log(co, 0, "You get the feeling you should clear some space in your backpack first.\n");
@@ -1114,16 +1107,14 @@ int npc_give(int cn, int co, int in, int money)
 				do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			
 			use_consume_item(cn, in, 1);
-			ch[co].gold += money;
-			do_char_log(co, 2, "You received %dG %dS.\n", money / 100, money % 100);
-			do_give_exp(co, nr, 0, -1);
+			do_give_exp(co, nr, 0, -1, money);
 			// <group rewards>
 			for (n = 1; n<MAXCHARS; n++)
 			{
 				if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
 				if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
 				{
-					do_give_exp(n, nr, 0, -1);
+					do_give_exp(n, nr, 0, -1, 0);
 				}
 			}
 			// </group rewards>
@@ -1204,7 +1195,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, (nr/4), 0, -1);
+						do_give_exp(co, (nr/4), 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1222,7 +1213,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr, 0, -1, 0);
 					}
 				}
 				// <group rewards>
@@ -1240,7 +1231,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_char_log(n, 0, "You learned how to pick locks!\n");
 							div = 1;
 						}
-						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1286,7 +1277,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 					
@@ -1299,7 +1290,7 @@ int npc_give(int cn, int co, int in, int money)
 						{
 							ch[n].gold += money;
 							do_char_log(n, 2, "You received %dG %dS as part of %s's reward.\n", money/100, money%100, ch[co].name);
-							if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr, 0, -1);
+							if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr, 0, -1, 0);
 							if (IS_PURPLE(n))
 							{
 								do_char_log(n, 0, "Your spawn point was set to the Temple of the Purple One as part of %s's reward.\n", ch[co].name);
@@ -1341,7 +1332,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, nr/4, 0, -1);
+						do_give_exp(co, nr/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1355,7 +1346,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr, 0, -1, 0);
 					}
 				}
 				// <group rewards>
@@ -1372,7 +1363,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1398,7 +1389,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr, 0, -1, 0);
 					}
 				}
 				// <group rewards>
@@ -1415,7 +1406,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1429,7 +1420,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, nr/4, 0, -1);
+						do_give_exp(co, nr/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1442,7 +1433,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr, 0, -1, 0);
 					}
 				}
 				// <group rewards>
@@ -1459,7 +1450,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1473,7 +1464,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, nr/4, 0, -1);
+						do_give_exp(co, nr/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1487,7 +1478,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr, 0, -1);
+						do_give_exp(co, nr, 0, -1, 0);
 					}
 				}
 				// <group rewards>
@@ -1504,7 +1495,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1);
+						if ((nr = ch[cn].data[51])!=0) do_give_exp(n, nr/max(1,div), 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1538,7 +1529,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1);
+						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1552,7 +1543,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1);
+						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1570,7 +1561,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr2 = ch[cn].data[51])!=0) do_give_exp(n, nr2/max(1,div) + (nr*(stsz-1))/4, 0, -1);
+						if ((nr2 = ch[cn].data[51])!=0) do_give_exp(n, nr2/max(1,div) + (nr*(stsz-1))/4, 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1600,7 +1591,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
-						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1);
+						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1616,7 +1607,7 @@ int npc_give(int cn, int co, int in, int money)
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
-						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1);
+						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1, 0);
 					}
 					use_consume_item(cn, in, 1);
 				}
@@ -1637,7 +1628,7 @@ int npc_give(int cn, int co, int in, int money)
 							do_update_char(n);
 							div = 1;
 						}
-						if ((nr2 = ch[cn].data[51])!=0) do_give_exp(n, nr2/max(1,div) + (nr*(stsz-1))/4, 0, -1);
+						if ((nr2 = ch[cn].data[51])!=0) do_give_exp(n, nr2/max(1,div) + (nr*(stsz-1))/4, 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1708,7 +1699,7 @@ int npc_give(int cn, int co, int in, int money)
 				{
 					int div = 4;
 					do_sayx(cn, "For your effort, allow me to teach you some mysteries of the world.");
-					do_give_exp(co, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
+					do_give_exp(co, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
 					// <group rewards>
 					for (n = 1; n<MAXCHARS; n++)
 					{
@@ -1717,7 +1708,7 @@ int npc_give(int cn, int co, int in, int money)
 						{
 							div = 4;
 							if (qnum >= 101) tmp = npc_quest_check(n, qnum-101);
-							do_give_exp(n, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
+							do_give_exp(n, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
 						}
 					}
 					// </group rewards>
@@ -1736,14 +1727,14 @@ int npc_give(int cn, int co, int in, int money)
 			if ((nr = ch[cn].data[51])!=0)
 			{
 				do_sayx(cn, "As an extra thanks, let me teach you a little something I know.");
-				do_give_exp(co, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
+				do_give_exp(co, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
 				// <group rewards>
 				for (n = 1; n<MAXCHARS; n++)
 				{
 					if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
 					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
 					{
-						do_give_exp(n, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1);
+						do_give_exp(n, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
 					}
 				}
 				// </group rewards>
@@ -1788,6 +1779,25 @@ int npc_give(int cn, int co, int in, int money)
 		{
 			ch[cn].sprite = 15312; ch[co].class  = 0;
 			do_char_log(co, 1, "Your ghost companion's form returned to normal.\n");
+		}
+		else if (ch[cn].sprite == it[in].data[0])
+		{
+			int v;
+			v = it[in].data[0];
+			switch (v)
+			{
+				case  3024: v = 11216; break; // Seyan'du
+				case 23504: v = 24528; break; // Arch Temp
+				case 26048: v = 22948; break; // Skald
+				case 25552: v = 26576; break; // Warrior
+				case 28624: v = 27600; break; // Sorcerer
+				case 25048: v = 24048; break; // Summoner
+				case 29648: v = 30672; break; // Arch Hara
+				case 27088: v = 28112; break; // Braver
+				default: break;
+			}
+			ch[cn].sprite = ch[co].class = v;
+			do_char_log(co, 1, "Your ghost companion's form shifts and changes...\n");
 		}
 		else
 		{
@@ -1909,45 +1919,16 @@ int is_unique_able(int temp)
 int count_uniques(int cn)
 {
 	int n, in, cnt = 0;
-
-	if (IS_BUILDING(cn))
-	{
-		do_char_log(cn, 0, "Not in build mode.\n");
-		return 0;
-	}
-
-	if (IS_SANEITEM(in = ch[cn].citem) && !(in & 0x80000000) && IS_UNIQUE(in))
-	{
-		cnt++;
-	}
-	for (n = 0; n<MAXITEMS; n++)
-	{
-		if ((in = ch[cn].item[n]) && IS_UNIQUE(in))
-		{
-			cnt++;
-		}
-	}
-	for (n = 0; n<20; n++)
-	{
-		if ((in = ch[cn].worn[n]) && IS_UNIQUE(in))
-		{
-			cnt++;
-		}
-	}
-	for (n = 0; n<12; n++)
-	{
-		if ((in = ch[cn].alt_worn[n]) && IS_UNIQUE(in))
-		{
-			cnt++;
-		}
-	}
-	for (n = 0; n<62; n++)
-	{
-		if ((in = ch[cn].depot[n]) && IS_UNIQUE(in))
-		{
-			cnt++;
-		}
-	}
+	
+	if (IS_BUILDING(cn)) return 0;
+	
+	if (IS_SANEITEM(in = ch[cn].citem) && !(in & 0x80000000) && IS_UNIQUE(in))									cnt++;
+	for (n = 0; n<MAXITEMS; n++)			if ((in = ch[cn].item[n]) && IS_UNIQUE(in)) 						cnt++;
+	for (n = 0; n<20; n++)					if ((in = ch[cn].worn[n]) && IS_UNIQUE(in))							cnt++;
+	for (n = 0; n<12; n++)					if ((in = ch[cn].alt_worn[n]) && IS_UNIQUE(in))						cnt++;
+//	for (n = 0; n<62; n++)					if ((in = ch[cn].depot[n]) && IS_UNIQUE(in))						cnt++;
+	for (n = 0; n<ST_PAGES*ST_SLOTS; n++) 	if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]) && IS_UNIQUE(in)) 	cnt++;
+	
 	return(cnt);
 }
 
@@ -2970,11 +2951,7 @@ int npc_see(int cn, int co)
 				{
 					if (ch[cn].temp == CT_PRIEST)
 					{
-						for (m=0;m<MAXITEMS;m++)
-						{
-							if (IS_SINBINDER(ch[cn].item[n]))
-								break;
-						}
+						for (m=0;m<MAXITEMS;m++) if (IS_SINBINDER(ch[cn].item[n])) break;
 					}
 					// here is message filter, if talking NPC is priest and player char is PURPLE we greet him
 					if ((ch[cn].temp == CT_PRIEST) && (IS_PURPLE(co) || m<MAXITEMS))
@@ -3335,7 +3312,7 @@ int npc_try_spell(int cn, int co, int spell)
 	{
 		in = ch[cn].spell[n];
 		// Cancel if exhausted                // prevent thralling multiple shadows
-		if (in && (bu[in].temp==SK_EXHAUST || (spell==SK_SHADOW && bu[in].temp==SK_SHADOW)))
+		if (in && (bu[in].temp==SK_EXHAUST))
 		{
 			return 0;
 		}
@@ -7229,9 +7206,22 @@ int npc_driver_high(int cn)
 		if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn) && IS_PLAYER(ch[cn].data[CHD_MASTER]))
 		{
 			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
-			do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
-			do_give_exp(ch[cn].data[CHD_MASTER], ch[cn].data[28], 1, -1);
+			if (IS_SANECHAR(ch[cn].data[CHD_MASTER])) 
+				do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
+			do_give_exp(ch[cn].data[CHD_MASTER], ch[cn].data[28], 1, -1, 0);
 			fx_add_effect(6, 0, ch[ch[cn].data[CHD_MASTER]].x, ch[ch[cn].data[CHD_MASTER]].y, 0);
+			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+			die_companion(cn);
+			return 1;
+		}
+		else if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn) && IS_PLAYER_SC(ch[cn].data[CHD_MASTER]) && IS_PLAYER(ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER]))
+		{
+			if (ch[ch[cn].data[CHD_MASTER]].data[9] == 2) ch[ch[cn].data[CHD_MASTER]].data[9] = 1;
+			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
+			if (IS_SANECHAR(ch[cn].data[CHD_MASTER])) 
+				do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
+			do_give_exp(ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER], ch[cn].data[28], 1, -1, 0);
+			fx_add_effect(6, 0, ch[ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER]].x, ch[ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER]].y, 0);
 			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 			die_companion(cn);
 			return 1;
@@ -7239,7 +7229,8 @@ int npc_driver_high(int cn)
 		else if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn))
 		{
 			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
-			do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
+			if (IS_SANECHAR(ch[cn].data[CHD_MASTER])) 
+				do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
 			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 			god_destroy_items(cn);
 			plr_map_remove(cn);
@@ -7430,28 +7421,58 @@ int npc_driver_high(int cn)
 			return 1;
 		}
 	}
-
-	// generic endurance management
-	if (ch[cn].data[58]>1 && ch[cn].a_end>10000)
+	
+	if (IS_PLAYER_COMP(cn) && ch[cn].data[1]<2 && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]))
 	{
-		if (ch[cn].mode!=2)
+		// companion endurance management
+		if (ch[cn].a_end>10000)
 		{
-			ch[cn].mode = 2;
+			if (ch[co].mode==2 && ch[cn].mode!=2)
+			{
+				ch[cn].mode = 2;
+				do_update_char(cn);
+			}
+			if (ch[co].mode==1 && ch[cn].mode!=1)
+			{
+				ch[cn].mode = 1;
+				do_update_char(cn);
+			}
+			if (ch[co].mode==0 && ch[cn].mode!=0)
+			{
+				ch[cn].mode = 0;
+				do_update_char(cn);
+			}
+		}
+		else if (ch[cn].mode!=0)
+		{
+			ch[cn].mode = 0;
 			do_update_char(cn);
 		}
 	}
-	else if (ch[cn].data[58]==1 && ch[cn].a_end>10000)
+	else
 	{
-		if (ch[cn].mode!=1)
+		// generic endurance management
+		if (ch[cn].data[58]>1 && ch[cn].a_end>10000)
 		{
-			ch[cn].mode = 1;
+			if (ch[cn].mode!=2)
+			{
+				ch[cn].mode = 2;
+				do_update_char(cn);
+			}
+		}
+		else if (ch[cn].data[58]==1 && ch[cn].a_end>10000)
+		{
+			if (ch[cn].mode!=1)
+			{
+				ch[cn].mode = 1;
+				do_update_char(cn);
+			}
+		}
+		else if (ch[cn].mode!=0)
+		{
+			ch[cn].mode = 0;
 			do_update_char(cn);
 		}
-	}
-	else if (ch[cn].mode!=0)
-	{
-		ch[cn].mode = 0;
-		do_update_char(cn);
 	}
 
 	// create light
@@ -7718,10 +7739,22 @@ int npc_driver_high(int cn)
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return 1;
 		}
-		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
+		if ((IS_COMPANION(cn) && ch[cn].data[9] == 1))
 		{
-			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return 1;
+			if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
+			{
+				ch[cn].data[9] = 2;
+				ch[cn].data[74] = globs->ticker + TICKS * 10;
+				return 1;
+			}
+		}
+		else
+		{
+			if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
+			{
+				ch[cn].data[74] = globs->ticker + TICKS * 10;
+				return 1;
+			}
 		}
 		if (co && !get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
 		{
@@ -8329,7 +8362,7 @@ int npc_loot_grave(int cn, int in)
 	}
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		if ((in = ch[co].item[n]))
+		if (in = ch[co].item[n])
 		{
 			if (npc_equip_item(cn, in))
 			{
@@ -8929,7 +8962,7 @@ void update_shop(int cn)
 			{
 				it[in].used = USE_EMPTY;
 				ch[cn].item[n] = 0;
-				ch[cn].item_lock[n] = 0;
+			//	ch[cn].item_lock[n] = 0;
 			}
 			else
 			{

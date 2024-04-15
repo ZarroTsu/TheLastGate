@@ -7770,7 +7770,6 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 	{
 		if (!SANEXY(xx+xt, yy+yt)) continue;
 		m = XY2M(xx+xt, yy+yt);
-		if (map[m].flags & MF_TOUCHED) touched++;
 		if (co = map[m].ch)
 		{
 			if (ch[co].used==USE_EMPTY) continue;
@@ -7796,8 +7795,7 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 	{
 		build_remove(xx+xt, yy+yt);
 		build_drop(xx+xt, yy+yt, 1);
-		reset_go(xx+xt, yy+yt);
-		remove_lights(xx+xt, yy+yt);
+		
 		m = XY2M(xx+xt, yy+yt);
 		
 		if (DW_GETFLOOR(map[m].sprite, DW_FL_CEB)) build_drop(xx+xt, yy+yt, 0x20000000 | DW_FL_CEA);
@@ -7826,7 +7824,7 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 		}
 	}
 	
-	if (!flag && !((xx + yy/2)%2) && !RANDOM(4))	// Render an event tile
+	if (!flag && !((xx + yy*DW_CELL_SIZE)%5) && !RANDOM(2))	// Render an event tile
 	{
 		j  = RANDOM(sizeof(dw_tile) / sizeof(dw_tile[0]));
 		fl = RANDOM(2);
@@ -7960,8 +7958,11 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 		build_dw_random(xx, yy, xx+DW_TILE_SIZE, yy+DW_TILE_SIZE, 0);
 		build_dw_random(xx, yy, xx+DW_TILE_SIZE, yy+DW_TILE_SIZE, 1);
 	}
-	for (xt=0; xt<DW_TILE_SIZE; xt++) for (yt=0; yt<DW_TILE_SIZE; yt++)
+	build_clean_lights(xx-2, yy-2, xx+DW_TILE_SIZE+2, yy+DW_TILE_SIZE+2);
+	for (xt=2; xt<DW_TILE_SIZE; xt+=5) for (yt=2; yt<DW_TILE_SIZE; yt+=5)
 	{
+		reset_go(xx+xt, yy+yt);
+		remove_lights(xx+xt, yy+yt);
 		reset_go(xx+xt, yy+yt);
 		add_lights(xx+xt, yy+yt);
 	}

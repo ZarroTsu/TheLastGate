@@ -64,7 +64,7 @@ struct character
 	int gold;
 
 	// items carried
-	int item[40];
+	int item[MAXITEMS];
 
 	// items worn
 	int worn[10];

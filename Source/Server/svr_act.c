@@ -163,17 +163,19 @@ void step_dw(int cn)
 	
 	if (IS_IN_INDW(x, y) && !(map[m].flags & MF_TOUCHED) && !(map[m].flags & MF_INDOORS))
 	{
+		map[m].flags   |= MF_TOUCHED;
 		if (in && bu[in].power>1)
 		{
-			map[m].flags   |= MF_TOUCHED;
 			bu[in].power--;
+			/*
 			if (!(bu[in].power%2))
 			{
 				bu[in].light[1]--;
 				do_update_char(cn);
 			}
+			*/
 			
-			if (!(bu[in].power%11))
+			if (!(bu[in].power%21))
 			{
 				rank = getrank(cn) + (IS_RB(cn)?1:0);
 				
@@ -203,16 +205,43 @@ void step_dw(int cn)
 		}
 		else if (in && bu[in].power==1)
 		{
-			map[m].flags   |= MF_TOUCHED;
 			bu[in].power = 0;
 			bu[in].light[1] = 0;
 			do_update_char(cn);
 			
 			reset_go(ch[cn].x, ch[cn].y);
 			remove_lights(ch[cn].x, ch[cn].y);
-			fx_add_effect(12, 0, x, y, 0);
-			in2 = build_item(190, x, y);
+			
+			if (can_drop(m))						;
+			else if (can_drop(m + 1))				m += 1;
+			else if (can_drop(m - 1))				m += -1;
+			else if (can_drop(m + MAPX))			m += MAPX;
+			else if (can_drop(m - MAPX))			m += -MAPX;
+			else if (can_drop(m + 1 + MAPX))		m += 1 + MAPX;
+			else if (can_drop(m + 1 - MAPX))		m += 1 - MAPX;
+			else if (can_drop(m - 1 + MAPX))		m += -1 + MAPX;
+			else if (can_drop(m - 1 - MAPX))		m += -1 - MAPX;
+			else if (can_drop(m + 2))				m += 2;
+			else if (can_drop(m - 2))				m += -2;
+			else if (can_drop(m + 2 * MAPX))		m += 2 * MAPX;
+			else if (can_drop(m - 2 * MAPX))		m += -2 * MAPX;
+			else if (can_drop(m + 2 + MAPX))		m += 2 + MAPX;
+			else if (can_drop(m + 2 - MAPX))		m += 2 - MAPX;
+			else if (can_drop(m - 2 + MAPX))		m += -2 + MAPX;
+			else if (can_drop(m - 2 - MAPX))		m += -2 - MAPX;
+			else if (can_drop(m + 1 + 2 * MAPX))	m += 1 + 2 * MAPX;
+			else if (can_drop(m + 1 - 2 * MAPX))	m += 1 - 2 * MAPX;
+			else if (can_drop(m - 1 + 2 * MAPX))	m += -1 + 2 * MAPX;
+			else if (can_drop(m - 1 - 2 * MAPX))	m += -1 - 2 * MAPX;
+			else if (can_drop(m + 2 + 2 * MAPX))	m += 2 + 2 * MAPX;
+			else if (can_drop(m + 2 - 2 * MAPX))	m += 2 - 2 * MAPX;
+			else if (can_drop(m - 2 + 2 * MAPX))	m += -2 + 2 * MAPX;
+			else if (can_drop(m - 2 - 2 * MAPX))	m += -2 - 2 * MAPX;
+			
+			fx_add_effect(12, 0, M2X(m), M2Y(m), 0);
+			in2 = build_item(190, M2X(m), M2Y(m));
 			it[in2].light[0] = 60;
+			
 			reset_go(ch[cn].x, ch[cn].y);
 			add_lights(ch[cn].x, ch[cn].y);
 			
@@ -2174,6 +2203,12 @@ void act_drop(int cn)           // drops the current object in front of the char
 	ch[cn].cerrno = ERR_NONE;
 
 	if (!do_char_can_flee(cn) || (ch[cn].flags & CF_SIMPLE))
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		return;
+	}
+	
+	if (IS_IN_DW(ch[cn].x, ch[cn].y))
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;

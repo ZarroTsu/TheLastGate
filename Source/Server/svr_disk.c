@@ -23,6 +23,7 @@ struct map *map;
 struct mapedit_queue *maped_queue;
 struct character *ch;
 struct newcharacter *ch_new;
+struct storage *st;
 struct item *bu;
 struct item *it;
 struct character *ch_temp;
@@ -153,8 +154,31 @@ int load(void)
 	}
 	close(handle);
 	
+	/** STORAGE **/
+	xlog("Loading STORAGE: Item size=%d, file size=%dK",
+	     sizeof(struct storage), STORESIZE >> 10);
+
+	handle = open(DATDIR "/storage.dat", O_RDWR);
+	if (handle==-1)
+	{
+		xlog("Building tcharacters");
+		handle = open(DATDIR "/storage.dat", O_RDWR | O_CREAT, 0600);
+	}
+	if (!extend(handle, STORESIZE, sizeof(struct storage), NULL))
+	{
+		return -1;
+	}
+
+	st = mmap(NULL, STORESIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (st==(void*)-1)
+	{
+		return -1;
+	}
+	close(handle);
+	
 	// v DELETE LATER v
 	/** NEWCHAR **/
+	/*
 	xlog("Loading NEWCHAR: Item size=%d, file size=%dK",
 	     sizeof(struct newcharacter), NEWCHARSIZE >> 10);
 
@@ -177,6 +201,7 @@ int load(void)
 	close(handle);
 
 	/** NEWTCHAR **/
+	/*
 	xlog("Loading NEWTCHAR: Item size=%d, file size=%dK",
 	     sizeof(struct newcharacter), NEWTCHARSIZE >> 10);
 
@@ -196,7 +221,8 @@ int load(void)
 	{
 		return -1;
 	}
-	close(handle);
+	close(handle); 
+	*/
 	// ^ DELETE LATER ^
 
 	/** BUFF - 3/11/2021 **/
@@ -357,45 +383,12 @@ void flush_char(int cn)
 
 	msync(&ch[cn], sizeof(struct character), MS_ASYNC);
 
-	for (n = 0; n<MAXITEMS; n++)
-	{
-		if (IS_SANEITEM(in = ch[cn].item[n]))
-		{
-			msync(&it[in], sizeof(struct item), MS_ASYNC);
-		}
-	}
-
-	for (n = 0; n<20; n++)
-	{
-		if (IS_SANEITEM(in = ch[cn].worn[n]))
-		{
-			msync(&it[in], sizeof(struct item), MS_ASYNC);
-		}
-	}
-	
-	for (n = 0; n<12; n++)
-	{
-		if (IS_SANEITEM(in = ch[cn].alt_worn[n]))
-		{
-			msync(&it[in], sizeof(struct item), MS_ASYNC);
-		}
-	}
-
-	for (n = 0; n<MAXBUFFS; n++)
-	{
-		if (IS_SANEITEM(in = ch[cn].spell[n]))
-		{
-			msync(&bu[in], sizeof(struct item), MS_ASYNC);
-		}
-	}
-
-	for (n = 0; n<62; n++)
-	{
-		if (IS_SANEITEM(in = ch[cn].depot[n]))
-		{
-			msync(&it[in], sizeof(struct item), MS_ASYNC);
-		}
-	}
+	for (n = 0; n<MAXITEMS; n++)			if (IS_SANEITEM(in = ch[cn].item[n]))						msync(&it[in], sizeof(struct item), MS_ASYNC);
+	for (n = 0; n<20; n++)					if (IS_SANEITEM(in = ch[cn].worn[n]))						msync(&it[in], sizeof(struct item), MS_ASYNC);
+	for (n = 0; n<12; n++)					if (IS_SANEITEM(in = ch[cn].alt_worn[n]))					msync(&it[in], sizeof(struct item), MS_ASYNC);
+	for (n = 0; n<MAXBUFFS; n++)			if (IS_SANEITEM(in = ch[cn].spell[n]))						msync(&bu[in], sizeof(struct item), MS_ASYNC);
+//	for (n = 0; n<62; n++)					if (IS_SANEITEM(in = ch[cn].depot[n]))						msync(&it[in], sizeof(struct item), MS_ASYNC);
+	for (n = 0; n<ST_PAGES*ST_SLOTS; n++) 	if (IS_SANEITEM(in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]))	msync(&it[in], sizeof(struct item), MS_ASYNC);
 }
 
 void flush(void)

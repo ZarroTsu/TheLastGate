@@ -24,7 +24,6 @@ void pkt_list(void);
 unsigned long long rdtsc(void);
 
 // -- global --
-void sanguine_spawners(int cn);
 void global_tick(void);
 
 // -- populate --
@@ -44,7 +43,7 @@ void reset_changed_items(void);
 void pop_save_all_chars(void);
 void pop_save_char(int nr);
 void pop_load_all_chars(void);
-void pop_copy_to_new_chars(void);
+//void pop_copy_to_new_chars(void);
 
 // -- tick --
 void tick(void);
@@ -227,7 +226,7 @@ int get_book(int cn, int in);
 int get_gear(int cn, int in);
 int get_enchantment(int cn, int in);
 int has_item(int cn, int temp);
-//
+char *itemvowel(int in, int flag);
 void do_add_light(int x, int y, int stren);
 int do_store_item(int cn);
 int do_check_fool(int cn, int in);
@@ -251,7 +250,7 @@ void do_npc_shout(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_shop_char(int cn, int co, int nr);
 void do_waypoint(int cn, int n);
 void do_treeupdate(int cn, int n);
-void do_give_exp(int cn, int p, int gflag, int rank);
+void do_give_exp(int cn, int p, int gflag, int rank, int money);
 int try_lucksave(int cn);
 void do_lucksave(int cn, char *deathtype);
 int do_hurt(int cn, int co, int dam, int type);
@@ -264,7 +263,6 @@ void do_sort(int cn, char *arg);
 int may_attack_msg(int cn, int co, int msg);
 int do_maygive(int cn, int co, int in);
 int do_item_value(int in);
-int do_item_bsvalue(int in);
 void do_check_new_level(int cn, int announce);
 int invis_level(int cn);
 int dbatoi(char *text);
@@ -311,6 +309,7 @@ int get_seyan_bits(int cn);
 int use_seyan_shrine(int cn, int in, int flag);
 
 //-- effect --
+int can_drop(int m);
 void effect_tick(void);
 int fx_add_effect(int type, int duration, int d1, int d2, int d3);
 
@@ -351,13 +350,14 @@ int absrankdiff(int cn, int co);
 int in_attackrange(int cn, int co);
 int in_grouprange(int cn, int co);
 int points2rank(int v);
-int getitemrank(int in, int flag);
+int getitemrank(int in, int v);
 int getrank(int cn);
 int rank2points(int v);
 int points_tolevel(int curr_exp);
 int scale_exps(int cn, int co, int exps);
 int scale_exps2(int cn, int co_rank, int exps);
 int change_casino_shop_item(int in);
+int get_nullandvoid(int n);
 int change_bs_shop_item(int cn, int in);
 int change_xp_shop_item(int cn, int nr);
 int st_learned_skill(int st_val, int v);

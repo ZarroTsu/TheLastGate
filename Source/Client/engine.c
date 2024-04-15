@@ -662,7 +662,7 @@ struct sk_tree sk_tree[10][12]={
 		  6643,						"for every 10 total Agility." },
 		{ "Harrier", 				"3%% increased total Agility and", 	// NN
 		  6644,						"Strength." },
-		{ "Butchery", 				"2%% more effect of Cleave for every", 	// NE
+		{ "Butchery", 				"0.5%% more effect of Cleave for every", 	// NE
 		  6645,						"10 total Strength." },
 		{ "Champion", 				"Enemies beside and behind you no longer", 	// EN
 		  6646,						"gain a bonus to hitting you." },
@@ -678,17 +678,17 @@ struct sk_tree sk_tree[10][12]={
 		  6650,						"" },
 		{ "Quickstep", 				"+5 to Movement Speed.", 	// E
 		  6651,						"" },
-		{ "Tormenter", 				"Poison deals damage 10%% faster.", 	// WS
+		{ "Tormenter", 				"Poison deals damage 20%% faster.", 	// WS
 		  6652,						"" },
 		{ "Grandiosity", 			"20%% more total Area of Effect.", 	// WW
 		  6653,						"" },
 		{ "Brilliance", 			"+1 to Spell Modifier.", 	// WN
 		  6654,						"" },
-		{ "Coordination", 			"1%% more effect of Lethargy for every", 	// NW
+		{ "Coordination", 			"0.5%% more effect of Lethargy for every", 	// NW
 		  6655,						"10 total Willpower." },
 		{ "Pragmatic", 				"3%% increased total Willpower and", 	// NN
 		  6656,						"Intuition." },
-		{ "Hex Master", 			"0.4%% more effect of Curse and Slow", 	// NE
+		{ "Hex Master", 			"0.5%% more effect of Curse and Slow", 	// NE
 		  6657,						"for every 10 total Intuition." },
 		{ "Nimble", 				"You no longer have a parry penalty if", 	// EN
 		  6658,						"hit while not fighting." },
@@ -714,10 +714,10 @@ struct sk_tree sk_tree[10][12]={
 		  6667,						"(BRV+INT)/2 + Willpower + Willpower." },
 		{ "Overwhelming Willpower", "3%% increased total Willpower.", 	// NN
 		  6668,						"+10 to Willpower Limit." },
-		{ "Shaper", 				"1%% more effect of Shadow Copy for", 	// NE
+		{ "Shaper", 				"0.5%% more effect of Shadow Copy for", 	// NE
 		  6669,						"every 10 total Willpower." },
-		{ "Diviner", 				"Ghost Companions inherit the effects of", 	// EN
-		  6670,						"your tarot cards." },
+		{ "Diviner", 				"Ghost Companions inherit your Dispel", 	// EN
+		  6670,						"and the effects of your tarot cards." },
 		{ "Constitution", 			"20%% more total Hitpoints.", 	// EE
 		  6671,						"" },
 		{ "Protector", 				"Magic Shield and Magic Shell are also", 	// ES
@@ -732,17 +732,17 @@ struct sk_tree sk_tree[10][12]={
 		  6675,						"" },
 		{ "Destroyer", 				"Blast has its base cooldown reduced", 	// WS
 		  6676,						"for each enemy hit by it." },
-		{ "Serenity", 				"10%% more total Cooldown Rate.", 	// WW
+		{ "Serenity", 				"5%% more total Cooldown Rate.", 	// WW
 		  6677,						"" },
 		{ "Strategist", 			"You suffer no cooldown if a spell is", 	// WN
 		  6678,						"suppressed." },
-		{ "Psychosis", 				"2%% more effect of Pulse for every 10", 	// NW
+		{ "Psychosis", 				"0.5%% more effect of Pulse for every 10", 	// NW
 		  6679,						"total Intuition." },
 		{ "Overwhelming Intuition", "3%% increased total Intuition.", 	// NN
 		  6680,						"+10 to Intuition Limit." },
 		{ "Wizardry", 				"All spell skills use the attributes", 	// NE
 		  6681,						"(BRV+WIL)/2 + Intuition + Intuition." },
-		{ "Flow", 					"50%% of overcapped Mana is granted as", 	// EN
+		{ "Flow", 					"25%% of overcapped Mana is granted as", 	// EN
 		  6682,						"additional Hitpoints." },
 		{ "Perpetuity", 			"20%% more total Mana.", 	// EE
 		  6683,						"" },
@@ -756,13 +756,13 @@ struct sk_tree sk_tree[10][12]={
 		  6686,						"" },
 		{ "Avoidance", 				"+3 to Parry Score.", 	// E
 		  6687,						"" },
-		{ "Assassination", 			"15%% increased effect of Precision.", 	// WS
+		{ "Assassination", 			"20%% increased effect of Precision.", 	// WS
 		  6688,						"" },
 		{ "Rigor", 					"4%% more total Hit Score.", 	// WW
 		  6689,						"" },
 		{ "Deftness", 				"50%% reduced damage taken from", 	// WN
 		  6690,						"triggering enemy Thorns." },
-		{ "Perfectionism", 			"1%% more effect of Finesse for every 10", 	// NW
+		{ "Perfectionism", 			"0.5%% more effect of Finesse for every 10", 	// NW
 		  6691,						"total Braveness." },
 		{ "Overwhelming Braveness", "3%% increased total Braveness.", 	// NN
 		  6692,						"+10 to Braveness Limit." },
@@ -788,7 +788,7 @@ struct sk_tree sk_tree[10][12]={
 		  6701,						"" },
 		{ "Greed", 					"Your Top Damage is rolled an additional", 	// WN
 		  6702,						"time, using the higher result." },
-		{ "Wrath", 					"1%% more effect of Rage & Calm per 40", 	// NW
+		{ "Wrath", 					"0.5%% more effect of Rage & Calm per 50", 	// NW
 		  6703,						"missing Hitpoints, Endurance, and Mana." },
 		{ "Gluttony", 				"10%% more Hitpoints, Endurance, and Mana.", 	// NN
 		  6704,						"" },
@@ -844,8 +844,8 @@ struct sk_tree sk_corrupt[108]={
 	{ "* Scorn *", 					"Your debuffs ignore 5%% of enemy",
 	  6606,							"Resistance." },
 	{ "* Courage *", 				"Gain 1 additional Hit and Parry for",			// *
-	  6607,							"every 150 missing hitpoints." },
-	{ "* Master of None *", 		"+1 to all skill limits.",
+	  6607,							"every 100 missing hitpoints." },
+	{ "* Master of None *", 		"+2 to all skill limits.",
 	  6608,							"" },
 	{ "* Necromancy *", 			"2%% more Companion Hit and Parry scores.",		// *
 	  6609,							"" },
@@ -922,14 +922,14 @@ struct sk_tree sk_corrupt[108]={
 	  6643,							"for every 10 total Agility." },
 	{ "* Harrier *", 				"1%% increased total Agility and",
 	  6644,							"Strength." },
-	{ "* Butchery *", 				"1%% more effect of Cleave for every",
+	{ "* Butchery *", 				"0.2%% more effect of Cleave for every",
 	  6645,							"10 total Strength." },
 	{ "* Conqueror *", 				"5%% more damage dealt to enemies beside",		// *
 	  6646,							"or behind you." },
 	{ "* Zealotry *", 				"5%% more total Spell Aptitude.",
 	  6647,							"" },
-	{ "* Fervor *", 				"0.5%% less damage taken per 10 Spell",
-	  6648,							"Aptitude." },
+	{ "* Crusade *", 				"+1 Skill Modifier per 50 Spell Aptitude.",
+	  6648,							"" },
 //    "         '         '      ", "         '         '         '         ' "
 	{ "* Expansiveness *", 			"+1 to Area of Effect.",
 	  6649,							"" },
@@ -943,11 +943,11 @@ struct sk_tree sk_corrupt[108]={
 	  6653,							"" },
 	{ "* New Moon *", 				"10%% increased effect of bonuses granted",		// *
 	  6654,							"during New Moons." },
-	{ "* Coordination *", 			"0.3%% more effect of Lethargy for every",
+	{ "* Coordination *", 			"0.2%% more effect of Lethargy for every",
 	  6655,							"10 total Willpower." },
 	{ "* Pragmatic *", 				"1%% increased total Willpower and",
 	  6656,							"Intuition." },
-	{ "* Hex Master *", 			"0.1%% more effect of Curse and Slow",
+	{ "* Hex Master *", 			"0.2%% more effect of Curse and Slow",
 	  6657,							"for every 10 total Intuition." },
 	{ "* Adroitness *", 			"5%% less damage taken from enemies beside",	// *
 	  6658,							"or behind you." },
@@ -966,13 +966,13 @@ struct sk_tree sk_corrupt[108]={
 	  6664,							"have been." },
 	{ "* Spellslinger *", 			"3%% more total Cast Speed.",
 	  6665,							"" },
-	{ "* Harpooner *", 				"5%% more Hit and Parry score while",
-	  6666,							"using a Spear." },
+	{ "* Training *", 				"5%% more effective surround hit modifier",
+	  6666,							"while using a Spear." },
 	{ "* Waning *", 				"Spells gain an additional 10%% of",			// *
 	  6667,							"Willpower towards attribute bonuses." },
 	{ "* Overwhelming Willpower *",	"2%% increased total Willpower.",
 	  6668,							"+1 to Willpower Limit." },
-	{ "* Shaper *", 				"0.5%% more effect of Shadow Copy for",
+	{ "* Shaper *", 				"0.2%% more effect of Shadow Copy for",
 	  6669,							"every 10 total Willpower." },
 	{ "* Wraithlord *", 			"2%% of damage dealt by you is granted",		// *
 	  6670,							"to your Companions as Hitpoints." },
@@ -989,11 +989,11 @@ struct sk_tree sk_corrupt[108]={
 	  6675,							"" },
 	{ "* Detonation *", 			"Blast kills enemies left below",				// *
 	  6676,							"2%% remaining health." },
-	{ "* Serenity *", 				"5%% more total Cooldown Rate.",
+	{ "* Serenity *", 				"2%% more total Cooldown Rate.",
 	  6677,							"" },
 	{ "* Refrigerate *", 			"3%% chance for skills to have no",				// *
 	  6678,							"cooldown." },
-	{ "* Psychosis *", 				"1%% more effect of Pulse for every 10",
+	{ "* Psychosis *", 				"0.2%% more effect of Pulse for every 10",
 	  6679,							"total Intuition." },
 	{ "* Overwhelming Intuition *",	"2%% increased total Intuition.",
 	  6680,							"+1 to Intuition Limit." },
@@ -1018,7 +1018,7 @@ struct sk_tree sk_corrupt[108]={
 	  6689,							"" },
 	{ "* Rebuke *", 				"5%% of damage taken from enemy thorns",		// *
 	  6690,							"is reflected." },
-	{ "* Perfectionism *", 			"0.5%% more effect of Finesse for every 10",
+	{ "* Perfectionism *", 			"0.2%% more effect of Finesse for every 10",
 	  6691,							"total Braveness." },
 	{ "* Overwhelming Braveness *",	"2%% increased total Braveness.",
 	  6692,							"+1 to Braveness Limit." },
@@ -1043,7 +1043,7 @@ struct sk_tree sk_corrupt[108]={
 	  6701,							"" },
 	{ "* Culling *", 				"Critical Hits kill enemies left below",		// *
 	  6702,							"2%% remaining health." },
-	{ "* Wrath *", 					"0.5%% more effect of Rage & Calm per 40",
+	{ "* Wrath *", 					"0.2%% more effect of Rage & Calm per 50",
 	  6703,							"missing Hitpoints, Endurance, and Mana." },
 	{ "* Gluttony *", 				"3%% more Hitpoints, Endurance, and Mana.",
 	  6704,							"" },
@@ -1163,7 +1163,7 @@ int xoff=0,yoff=0;
 
 extern int selected_char;
 
-struct look look={0,{0,0,0,0,0,0,0,0,0,0},0,0,"",0,0,0,0};
+struct look look={0,{0},0,0,"",0,0,0,0};
 
 // ************* CHARACTER ****************
 
@@ -1335,7 +1335,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	show_shop=0,show_wps=0,show_tree=0;
+unsigned int	show_shop=0,show_wps=0,show_tree=0,dept_page=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -1505,7 +1505,7 @@ void init_meta_stats(void)
 	pl_critm = pl.worn_p[WN_CRIT];
 	
 	// Player Top damage and Reflection - WN_TOP
-	pl_topdm = pl.worn[WN_TOP];
+	pl_topdm = pl.worn[WN_TOP]+6+8;
 	pl_reflc = pl.worn_p[WN_TOP];
 	
 	// Player Hit and Parry - WN_HITPAR
@@ -1539,10 +1539,10 @@ void init_meta_stats(void)
 	
 	// Player DPS - pl_dlow, pl_dhigh, pl_dps
 	pl_dlow  = (pl.weapon*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_dhigh = pl.weapon+8+pl_topdm+6;
-	pl_topd2 = ((pl_topdm*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
+	pl_dhigh = pl.weapon+pl_topdm;
+	pl_topd2 = ((pl_topdm+pl_topdm*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
 	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_hitdm = (pl_dlow+pl_dhigh+(T_SKAL_SK(6)?pl_topd2/2:0))/2;
+	pl_hitdm = (pl_dlow+pl_dhigh+(T_LYCA_SK(6)?pl_topd2/2:0))/2;
 	pl_dps   = pl_hitdm*pl_atksp;
 	
 	// Player cooldown rate - pl_cdrate
@@ -1942,9 +1942,9 @@ void show_meta_stats(int n)
 			case 22: if (pl.skill[49][0])
 					 meta_stat(2,n,1,"Leap Cooldown",        coo_leap/100, coo_leap%100, "Seconds"); break;
 			case 23: if (pl.skill[22][0]) {
-				if (!IS_SHIFTED) meta_stat(2,n,5,"Rage TD Bonus",  sk_rage, -1,          "Top Dmg"); } break;
+					 meta_stat(2,n,5,"Rage TD Bonus",  sk_rage, -1,          "Top Dmg"); } break;
 			case 24: if (pl.skill[22][0]) {
-				if (!IS_SHIFTED) meta_stat(2,n,5,"Rage DoT Bonus", sk_rage2/100, sk_rage2%100, "%"); } break;
+					 meta_stat(2,n,5,"Rage DoT Bonus", sk_rage2/100, sk_rage2%100, "%"); } break;
 			case 25: if (pl.skill[24][0]) 
 					 meta_stat(2,n,4,"Blast Hit Damage",     sk_blast,     -1,           ""       ); break;
 			case 26: if (pl.skill[24][0])
@@ -2020,9 +2020,9 @@ void show_meta_stats(int n)
 			case 22: if (pl.skill[47][0])
 					 meta_stat(2,n,6,"Haste Effect",         sk_haste,     -1,           "Speed"  ); break;
 			case 23: if (pl.skill[22][0]) {
-				if (IS_SHIFTED) meta_stat(2,n,5,"Calm TD Taken", sk_calm,    -1,         "Top Dmg"); } break;
+					 meta_stat(2,n,5,"Calm TD Taken", sk_calm,    -1,         "Top Dmg"); } break;
 			case 24: if (pl.skill[22][0]) {
-				if (IS_SHIFTED) meta_stat(2,n,5,"Calm DoT Taken", sk_calm2/100, sk_calm2%100, "%" ); } break;
+					 meta_stat(2,n,5,"Calm DoT Taken", sk_calm2/100, sk_calm2%100, "%" ); } break;
 			case 25: if (pl.skill[26][0])
 					 meta_stat(2,n,1,(pl_flags&(1<<14))?"Regen Effect":"Heal Effect",sk_healr,-1,(pl_flags&(1<<14))?"/s":""); break;
 			case 26: if (pl.skill[37][0])  {
@@ -2065,7 +2065,7 @@ void show_meta_stats(int n)
 
 void eng_display_win(int plr_sprite,int init)
 {
-	int y,n,m,v,pr;
+	int y,n,m,v,pr,hh,xx,yy;
 	char *tmp,buf[50];
 	int pl_flags, pl_flagb;
 	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
@@ -2110,7 +2110,7 @@ void eng_display_win(int plr_sprite,int init)
 					// Draw talisman icon 
 					if (pl.item_l[n+inv_pos]&4)
 						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw talisman icon 
+					// Draw corruption icon 
 					if (pl.item_l[n+inv_pos]&8)
 						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,16);
 					// Draw catalyst name
@@ -2135,7 +2135,7 @@ void eng_display_win(int plr_sprite,int init)
 					// Draw talisman icon 
 					if (pl.item_l[n+inv_pos]&4)
 						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw talisman icon 
+					// Draw corruption icon 
 					if (pl.item_l[n+inv_pos]&8)
 						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,0);
 					// Draw catalyst name
@@ -2189,7 +2189,7 @@ void eng_display_win(int plr_sprite,int init)
 		
 		// Scroll Bars for Skills and Inventory
 		dd_showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
-		dd_showbar(601, 36+(inv_pos * 18)/10, 11,22,(unsigned short)GUI_BAR_GRE);
+		dd_showbar(601, 36+(inv_pos *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
 
 		// display info-texts
 		// HP, EN, MA below the skill list
@@ -2579,56 +2579,80 @@ void eng_display_win(int plr_sprite,int init)
 			if (debuffs[n][0])
 				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, 15-min(15,debuffs[n][1]));
 		}
-
-		if (show_shop) 
+		
+		if (show_shop==111) // New Depot
+		{
+			copyspritex(do_darkmode?18094:18093,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
+			for (n=0; n<64; n++)
+			{
+				if (!shop.depot[dept_page][n]) continue;
+				
+				hh = 0;
+				xx = GUI_SHOP_X+6+(n%8)*34;
+				yy = GUI_SHOP_Y+6+(n/8)*34;
+				
+				if (!pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n) hh = 16;
+				
+				copyspritex(shop.depot[dept_page][n],xx,yy,hh);												// Draw Item
+				if (shop.depot_f[dept_page][n] & 1) copyspritex(4496,xx,yy,hh); 							// Draw SS
+				if (shop.depot_f[dept_page][n] & 2) copyspritex(4497,xx,yy,hh); 							// Draw EN
+				if (shop.depot_f[dept_page][n] & 4) copyspritex(6881,xx,yy,hh); 							// Draw CR
+				if (shop.depot_c[dept_page][n])		copyspritex(6999+shop.depot_c[dept_page][n],xx,yy,hh);	// Draw CA
+				if (shop.depot_s[dept_page][n]>0&&shop.depot_s[dept_page][n]<=10)							// Draw Stack
+					copyspritex(4000+shop.depot_s[dept_page][n],xx,yy,hh);
+			}
+			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
+			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
+			dd_xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
+			dd_xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
+			
+			// Depot Page Buttons
+			xx = GUI_SHOP_X+7 + (dept_page%4)*68;
+			yy = GUI_SHOP_Y+281 + (dept_page/4)*17;
+			dd_showbox(xx,yy,63,12,(unsigned short)(GREEN));
+		}
+		else if (show_shop) 
 		{
 			copyspritex(do_darkmode?18092:92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			y=0;
-			for (n=0; n<62; n++) {
+			for (n=0; n<62; n++) 
+			{
 				if (!shop.item[n]) continue;
+				
+				hh = 0;
+				xx = GUI_SHOP_X+2+(n%8)*35;
+				yy = GUI_SHOP_Y+2+(n/8)*35;
+				
 				if ((shop.price[n] - (shop.price[n] & (1<<30)) - (shop.price[n] & (1<<31))) > 0) y=1;
-				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) 
+				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) hh = 16;
+				
+				copyspritex(shop.item[n],xx,yy,hh);
+				if (shop.price[n] & (1<<30))       copyspritex(4496,xx,yy,hh); 
+				if (shop.price[n] & (1<<31))       copyspritex(4497,xx,yy,hh);
+				if (shop.item_p[n]) copyspritex(6999+shop.item_p[n],xx,yy,hh);
+				
+				if (hh && (pr = (shop.price[n] - (shop.price[n]&(1<<30)) - (shop.price[n]&(1<<31)))))
 				{
-					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (shop.price[n] & (1<<30)) // Soulstone
-						copyspritex(4496,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (shop.price[n] & (1<<31)) // Enchant
-						copyspritex(4497,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (shop.item_p[n])
-						copyspritex(6999+shop.item_p[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,16);
-					if (pr = (shop.price[n] - (shop.price[n] & (1<<30)) - (shop.price[n] & (1<<31))))
+					if (show_shop>=1 && show_shop<=101) // Normal shop
 					{
-						if (show_shop>=1 && show_shop<=101) // Normal shop
+						if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) 
 						{
-							if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) 
-							{
-								pr*=10;
-								dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
-							}
-							else
-							{
-								dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
-							}
+							pr*=10;
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
 						}
-						if (show_shop==102) // Black Stronghold
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
-						if (show_shop==103) // Casino
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
-						if (show_shop==104) // Contract
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
-						if (show_shop==105) // Exp
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
+						else
+						{
+							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
+						}
 					}
-				} 
-				else 
-				{
-					copyspritex(shop.item[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
-					if (shop.price[n] & (1<<30)) // Soulstone
-						copyspritex(4496,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
-					if (shop.price[n] & (1<<31)) // Enchant
-						copyspritex(4497,GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
-					if (shop.item_p[n])
-						copyspritex(6999+shop.item_p[n],GUI_SHOP_X+2+(n%8)*35,GUI_SHOP_Y+2+(n/8)*35,0);
+					if (show_shop==102) // Black Stronghold
+						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
+					if (show_shop==103) // Casino
+						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
+					if (show_shop==104) // Contract
+						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
+					if (show_shop==105) // Exp
+						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
 				}
 			}
 			if (pl.citem && shop.pl_price)
@@ -2754,7 +2778,7 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			if (hightlight==HL_SKTREE)
 			{
-				if (v = pl.tree_node[hightlight_sub])
+				if (m<9 && (v = pl.tree_node[hightlight_sub]))
 				{
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_corrupt[v-1].name);
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_corrupt[v-1].dsc1);
@@ -4676,7 +4700,7 @@ void cmd_exit(void)
 }
 
 int noshop=0;
-extern int xmove;
+extern int xmove,xxtimer;
 extern int do_ticker;
 
 void engine(void)
@@ -4757,8 +4781,10 @@ void engine(void)
 				case 3: cmds(CL_CMD_MOVE,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].y); break;
 				case 2: cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].y); break;
 				case 4: cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].y); break;
+				default: break;
 			}
 			xtimer=4;
+			if (xxtimer++>1000) xmove=xxtimer=0;
 		}
 
 		panic=0;

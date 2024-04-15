@@ -1660,7 +1660,7 @@ void answer_transfer(int cn, int co, int msg)
 			ch[co].data[PCD_COMPANION] = 0;
 		}
 		if (msg) do_sayx(cn, "I'd prefer to die in battle, %s. But I shall obey my master.", ch[co].name);
-		do_give_exp(co, ch[cn].data[28], 1, -1);
+		do_give_exp(co, ch[cn].data[28], 1, -1, 0);
 		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 		die_companion(cn);

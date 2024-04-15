@@ -108,14 +108,14 @@ struct cplayer
 	unsigned short os_tree;
 
 	// items carried
-	int item[40];
-	int item_p[40];
-	char item_s[40];  // Stack size of given item (0 - 10)
-	char item_l[40];  // Whether or not the given item is locked
+	int    item[MAXITEMS];
+	int  item_p[MAXITEMS];
+	char item_s[MAXITEMS];  // Stack size of given item (0 - 10)
+	char item_l[MAXITEMS];  // Whether or not the given item is locked
 
 	// items worn
-	int worn[20];
-	int worn_p[20];
+	int    worn[20];
+	int  worn_p[20];
 	char worn_s[20];   // Stack size
 	
 	// spells ready
@@ -232,6 +232,7 @@ struct cplayer
 #define SV_MSG              49
 #define SV_LOOK5            50
 #define SV_LOOK6            51
+#define SV_LOOK7            52
 
 #define SV_LOAD             56
 #define SV_CAP              57

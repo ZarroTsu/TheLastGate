@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000B0A
-#define MINVERSION			0x000B0A
+#define VERSION				0x000C02
+#define MINVERSION			0x000C00
 
 #define DATDIR				".dat"
 
@@ -22,7 +22,7 @@
 #define MAXEFFECT			4096
 #define MAXMISSION			1024
 #define MAXSKILL			  50
-#define MAXITEMS			  40
+#define MAXITEMS			  60
 #define MAXBUFFS			  40
 #define MAXWPS				  27
 

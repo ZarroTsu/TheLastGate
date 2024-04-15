@@ -44,7 +44,7 @@ usage of data for players:
 * `22:`     current monster in arena
 * `23:`     overall kill counter
 * `24:`     --Zarro-- Extended poles 2
-* `25:`     --Zarro-- Bone Armor AV storage
+* `25:`     --Zarro-- Underdark entry M storage
 * `26:`     Black Stronghold Kill Counter (to assure wave reward is legit)
 * `27:`     --Zarro-- Gambling: Player hand value & wager
 * `28:`     --Zarro-- Gambling: Dealer hand value & active game

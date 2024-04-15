@@ -49,6 +49,7 @@
 
 #define IS_MAGICITEM(in)		(it[(in)].flags & IF_MAGIC)
 #define IS_UNIQUE(in)			(it[(in)].flags & IF_UNIQUE)
+#define IS_QUESTITEM(in)		((it[(in)].flags & IF_SHOPDESTROY) || (it[(in)].flags & IF_LABYDESTROY) || (it[(in)].flags & IF_NODEPOT))
 #define IS_GEMSTONE(in)			(it[(in)].flags & IF_GEMSTONE)
 #define IS_SOULSTONE(in)		(it[(in)].driver==68)
 #define IS_SOULFOCUS(in)		(it[(in)].driver==92)
@@ -212,6 +213,7 @@ int is_ascroll(int in);
 #define CAN_ARHR_PROX(cn)		(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 #define CAN_BRAV_PROX(cn)		(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 
+#define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]>=1300 && ch[(cn)].data[CHD_GROUP]<=1320)
 
 /* *** SKILLS *** */
 
@@ -224,8 +226,8 @@ int is_ascroll(int in);
 #define B_SK(cn, s)				(ch[(cn)].skill[(s)][0])
 #define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
 
-#define T_SK(cn, a)				(IS_SANEPLAYER(cn)  && st_skillnum((cn), (a), (-1)))
-#define T_SKT(cn, a)			(IS_SANEPLAYER(cn)  && st_skillnum((cn), (a), (-2)))
+#define T_SK(cn, a)				(IS_SANECHAR(cn)    && st_skillnum((cn), (a), (-1)))
+#define T_SKT(cn, a)			(IS_SANECHAR(cn)    && st_skillnum((cn), (a), (-2)))
 #define T_SEYA_SK(cn, a)		(IS_SEYAN_DU(cn)    && T_SKT((cn), (a)))
 #define T_ARTM_SK(cn, a)		(IS_ARCHTEMPLAR(cn) && T_SKT((cn), (a)))
 #define T_SKAL_SK(cn, a)		(IS_SKALD(cn)       && T_SKT((cn), (a)))
@@ -312,7 +314,7 @@ int is_ascroll(int in);
 #define DESC_MOON_R		"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but no longer grants its bonus at full mana and instead grants it at low mana. You lose 0.2%% of current mana per second per 50 uncapped mana.\n"
 #define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate, Rest, and Meditate skills behave as if stationary while fighting, but as if fighting while stationary.\n"
 #define DESC_JUDGE_R	"When equipped, your Pulse spell no longer deals damage to enemies and instead heals allies with each pulse. It inflicts Charge instead of Shock to allies, granting them additional damage and damage reduction.\n"
-#define DESC_WORLD_R	"When equipped, 50%% of damage taken is dealt to Endurance instead. All cost effects which would use Endurance instead use Mana, and all skills grant their Mana costs as Endurance on use. You lose 20%% of current endurance per second.\n"
+#define DESC_WORLD_R	"When equipped, 50%% of damage taken is dealt to Endurance instead. All Endurance costs instead use Mana, and all skills grant Endurance on use. You lose 40%% of current endurance per second, mitigated by your Rest skill.\n"
 
 /* *** CASINO *** */
 
@@ -407,6 +409,13 @@ int is_ascroll(int in);
 #define CFL_N_ARFL		"  Area contains %s open flames\n"
 // 						"!        .         .   |     .         .        !"
 
+#define IS_IN_SKUA(x, y)	((x>= 499&&x<= 531&&y>= 504&&y<= 520)||(x>= 505&&x<= 519&&y>= 492&&y<= 535))
+#define IS_IN_GORN(x, y)	((x>= 773&&x<= 817&&y>= 780&&y<= 796)||(x>= 787&&x<= 803&&y>= 775&&y<= 812))
+#define IS_IN_KWAI(x, y)	((x>= 685&&x<= 729&&y>= 848&&y<= 864)||(x>= 699&&x<= 715&&y>= 832&&y<= 868))
+#define IS_IN_PURP(x, y)	((x>= 549&&x<= 585&&y>= 448&&y<= 462)||(x>= 564&&x<= 575&&y>= 463&&y<= 474))
+#define IS_IN_TEMPLE(x, y)	(IS_IN_SKUA(x, y) || IS_IN_GORN(x, y) || IS_IN_KWAI(x, y) || IS_IN_PURP(x, y))
+
+#define IS_IN_BRAV(x, y)	((x>= 884&&y>= 504&&x<= 964&&y<= 534))
 #define IS_IN_SUN(x, y) 	((x>=  32&&y>= 407&&x<=  57&&y<= 413)||(x>=  32&&y>= 414&&x<=  64&&y<= 428)||(x>=  22&&y>= 429&&x<=  64&&y<= 450)||(x>=  22&&y>= 451&&x<=  27&&y<= 459)||(x>=  59&&y>= 451&&x<=  64&&y<= 465)||(x>= 173&&y>= 921&&x<= 255&&y<=1003))
 #define IS_IN_ABYSS(x, y)	((x>=438&&y>=110&&x<=470&&y<=142)?1:((x>=438&&y>=148&&x<=470&&y<=180)?2:((x>=476&&y>=148&&x<=508&&y<=180)?3:((x>=476&&y>=110&&x<=508&&y<=142)?4:((x>=476&&y>= 72&&x<=508&&y<=104)?5:((x>=476&&y>= 34&&x<=508&&y<= 66)?6:((x>=514&&y>= 34&&x<=546&&y<= 66)?7:((x>=514&&y>= 72&&x<=546&&y<=104)?8:((x>=514&&y>=110&&x<=546&&y<=142)?9:((x>=523&&y>=148&&x<=537&&y<=180)?10:0))))))))))
 #define IS_IN_IX(x, y) 		((x>=  21&&y>= 657&&x<= 125&&y<= 706))

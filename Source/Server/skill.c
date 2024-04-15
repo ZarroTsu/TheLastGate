@@ -279,7 +279,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Intensity", 				"+2 to Spell Modifier."},
 		{ "Antagonizer", 			"0.5% more effect of Blind and Douse for every 10 total Agility."},
 		{ "Harrier", 				"3% increased total Agility and Strength."},
-		{ "Butchery", 				"2% more effect of Cleave for every 10 total Strength."},
+		{ "Butchery", 				"0.5% more effect of Cleave for every 10 total Strength."},
 		{ "Champion", 				"Enemies beside and behind you no longer gain a bonus to hitting you."},
 		{ "Zealotry", 				"20% more total Spell Aptitude."},
 		{ "Fervor", 				"2% less damage taken per 10 Spell Aptitude."}
@@ -287,12 +287,12 @@ struct sk_tree sk_tree[10][12]={
 		{ "Expansiveness", 			"+1 to Area of Effect."},
 		{ "Potency", 				"+3 to Willpower & +3 to Intuition."},
 		{ "Quickstep", 				"+5 to Movement Speed."},
-		{ "Tormenter", 				"Poison deals damage 10% faster."},
+		{ "Tormenter", 				"Poison deals damage 20% faster."},
 		{ "Grandiosity", 			"20% more total Area of Effect."},
 		{ "Brilliance", 			"+2 to Spell Modifier."},
-		{ "Coordination", 			"1% more effect of Lethargy for every 10 total Willpower."},
+		{ "Coordination", 			"0.5% more effect of Lethargy for every 10 total Willpower."},
 		{ "Pragmatic", 				"3% increased total Willpower and Intuition."},
-		{ "Hex Master", 			"0.4% more effect of Curse and Slow for every 10 total Intuition."},
+		{ "Hex Master", 			"0.5% more effect of Curse and Slow for every 10 total Intuition."},
 		{ "Nimble", 				"You no longer have a parry penalty if hit while not fighting."},
 		{ "Fleet-footed", 			"20% more total Movement Speed."},
 		{ "Acceleration", 			"Haste grants 20% more move speed to you, and it can now be cast on allies."}
@@ -305,8 +305,8 @@ struct sk_tree sk_tree[10][12]={
 		{ "Harpooner", 				"20% more Hit and Parry score while using a Spear."},
 		{ "Mysticism", 				"All spell skills use the attributes (BRV+INT)/2 + Willpower + Willpower."},
 		{ "Overwhelming Willpower", "3% increased total Willpower. +10 to Willpower Limit."},
-		{ "Shaper", 				"1% more effect of Shadow Copy for every 10 total Willpower."},
-		{ "Diviner", 				"Ghost Companions inherit the effects of your tarot cards."},
+		{ "Shaper", 				"0.5% more effect of Shadow Copy for every 10 total Willpower."},
+		{ "Diviner", 				"Ghost Companions inherit your Dispel and the effects of your tarot cards."},
 		{ "Constitution", 			"20% more total Hitpoints."},
 		{ "Protector", 				"Magic Shield and Magic Shell are also cast on your active companions."}
 	},{	// Arch Harakim
@@ -314,22 +314,22 @@ struct sk_tree sk_tree[10][12]={
 		{ "Intellect", 				"+4 to Intuition."},
 		{ "Wellspring", 			"+20 Mana."},
 		{ "Destroyer", 				"Blast has its base cooldown reduced for each enemy hit by it."},
-		{ "Serenity", 				"10% more total Cooldown Rate."},
+		{ "Serenity", 				"5% more total Cooldown Rate."},
 		{ "Strategist", 			"You suffer no cooldown if a spell is suppressed."},
-		{ "Psychosis", 				"2% more effect of Pulse for every 10 total Intuition."},
+		{ "Psychosis", 				"0.5% more effect of Pulse for every 10 total Intuition."},
 		{ "Overwhelming Intuition", "3% increased total Intuition. +10 to Intuition Limit."},
 		{ "Wizardry", 				"All spell skills use the attributes (BRV+WIL)/2 + Intuition + Intuition."},
-		{ "Flow", 					"50% of overcapped Mana is granted as additional Hitpoints."},
+		{ "Flow", 					"25% of overcapped Mana is granted as additional Hitpoints."},
 		{ "Perpetuity", 			"20% more total Mana."},
 		{ "Resourcefulness", 		"20% of damage taken is dealt to your Mana instead."}
 	},{	// Braver
 		{ "Accuracy", 				"+3 to Hit Score."},
 		{ "Boldness", 				"+4 to Braveness."},
 		{ "Avoidance", 				"+3 to Parry Score."},
-		{ "Assassination", 			"15% increased effect of Precision."},
+		{ "Assassination", 			"20% increased effect of Precision."},
 		{ "Rigor", 					"4% more total Hit Score."},
 		{ "Deftness", 				"50% reduced damage taken from triggering enemy Thorns."},
-		{ "Perfectionism", 			"1% more effect of Finesse for every 10 total Braveness."},
+		{ "Perfectionism", 			"0.5% more effect of Finesse for every 10 total Braveness."},
 		{ "Overwhelming Braveness", "3% increased total Braveness. +10 to Braveness Limit."},
 		{ "Virtuosity", 			"All weapon skills use the attributes (AGL+STR)/2 + Braveness + Braveness."},
 		{ "Resilience", 			"40% less effect of Healing Sickness on you."},
@@ -342,7 +342,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Lust", 					"Ferocity grants +1% base crit chance per empty gear slot."},
 		{ "Ravager", 				"20% more total Top Damage"},
 		{ "Greed", 					"Your Top Damage is rolled an additional time, using the higher result."},
-		{ "Wrath", 					"1% more effect of Rage & Calm per 40 missing Hitpoints, Endurance, and Mana."},
+		{ "Wrath", 					"0.5% more effect of Rage & Calm per 50 missing Hitpoints, Endurance, and Mana."},
 		{ "Gluttony", 				"10% more Hitpoints, Endurance, and Mana."},
 		{ "Sloth", 					"10% of damage dealt is restored as Hitpoints, Endurance, and Mana."},
 		{ "Pride", 					"Your debuffs ignore 20% of enemy Immunity."},
@@ -371,8 +371,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Absolution", 			"(0.2%) more damage dealt for each buff or debuff on you."},
 	{ "Vindication", 			"(2%) of Total Armor Value granted as extra Weapon Value."}, // *
 	{ "Scorn", 					"Your debuffs ignore (5%) of enemy Resistance."},
-	{ "Courage", 				"Gain (1) additional Hit and Parry for every 150 missing hitpoints."}, // *
-	{ "Master of None", 		"(+1) to all skill limits."}, // *
+	{ "Courage", 				"Gain (1) additional Hit and Parry for every 100 missing hitpoints."}, // *
+	{ "Master of None", 		"(+2) to all skill limits."}, // *
 	{ "Necromancy",				"(2%) more Companion Hit and Parry scores."}, // *
 	{ "Enigmatic", 				"(5%) reduced effect of debuffs on you."},
 	{ "Barkskin", 				"(2%) of Total Weapon Value granted as extra Armor Value."}, // *
@@ -409,19 +409,19 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Full Moon", 				"(10%) increased effect of bonuses granted during Full Moons."}, // *
 	{ "Antagonizer", 			"(0.2%) more effect of Blind and Douse for every 10 total Agility."},
 	{ "Harrier", 				"(1%) increased total Agility and Strength."},
-	{ "Butchery", 				"(1%) more effect of Cleave for every 10 total Strength."},
+	{ "Butchery", 				"(0.2%) more effect of Cleave for every 10 total Strength."},
 	{ "Conqueror", 				"(5%) more damage dealt to enemies beside or behind you."}, // *
 	{ "Zealotry", 				"(5%) more total Spell Aptitude."},
-	{ "Fervor", 				"(0.5%) less damage taken per 10 Spell Aptitude."},
+	{ "Crusade", 				"(+1) Skill Modifier per 50 Spell Aptitude."},
 	{ "Expansiveness", 			"(+1) to Area of Effect."},
 	{ "Potency", 				"(+1) to Willpower & (+1) to Intuition."},
 	{ "Quickstep", 				"(+2) to Movement Speed."},
 	{ "Tormenter", 				"Poison deals damage (5%) faster."},
 	{ "Grandiosity", 			"(10%) more total Area of Effect."},
 	{ "New Moon", 				"(10%) increased effect of bonuses granted during New Moons."}, // *
-	{ "Coordination", 			"(0.3%) more effect of Lethargy for every 10 total Willpower."},
+	{ "Coordination", 			"(0.2%) more effect of Lethargy for every 10 total Willpower."},
 	{ "Pragmatic", 				"(1%) increased total Willpower and Intuition."},
-	{ "Hex Master", 			"(0.1%) more effect of Curse and Slow for every 10 total Intuition."},
+	{ "Hex Master", 			"(0.2%) more effect of Curse and Slow for every 10 total Intuition."},
 	{ "Adroitness", 			"(5%) less damage taken from enemies beside or behind you."}, // *
 	{ "Fleet-footed", 			"(3%) more total Movement Speed."},
 	{ "Acceleration", 			"Haste grants (10%) more move speed to you."},
@@ -430,10 +430,10 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Vitality", 				"(+10) Hitpoints."},
 	{ "Denial", 				"(5%) chance to not be hit when you should have been."}, // *
 	{ "Spellslinger", 			"(3%) more total Cast Speed."},
-	{ "Harpooner", 				"(5%) more Hit and Parry score while using a Spear."},
+	{ "Training", 				"(5%) more effective surround hit modifier while using a Spear."},
 	{ "Waning", 				"Spells gain an additional (10%) of Willpower towards attribute bonuses."}, // *
 	{ "Overwhelming Willpower", "(2%) increased total Willpower. (+1) to Willpower Limit."},
-	{ "Shaper", 				"(0.5%) more effect of Shadow Copy for every 10 total Willpower."},
+	{ "Shaper", 				"(0.2%) more effect of Shadow Copy for every 10 total Willpower."},
 	{ "Wraithlord", 			"(2%) of damage dealt by you is granted to your Companions as Hitpoints."}, // *
 	{ "Constitution", 			"(5%) more total Hitpoints."},
 	{ "Barrier", 				"Magic Shields and Shells affecting you take 10% reduced damage from enemies."}, // *
@@ -441,9 +441,9 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Intellect", 				"(+2) to Intuition."},
 	{ "Wellspring", 			"(+10) Mana."},
 	{ "Detonation", 			"Blast kills enemies left below (2%) remaining health."}, // *
-	{ "Serenity", 				"(5%) more total Cooldown Rate."},
+	{ "Serenity", 				"(2%) more total Cooldown Rate."},
 	{ "Refrigerate", 			"(3%) chance for skills to have no cooldown."}, // *
-	{ "Psychosis", 				"(1%) more effect of Pulse for every 10 total Intuition."},
+	{ "Psychosis", 				"(0.2%) more effect of Pulse for every 10 total Intuition."},
 	{ "Overwhelming Intuition", "(2%) increased total Intuition. (+1) to Intuition Limit."},
 	{ "Waxing", 				"Spells gain an additional (10%) of Intuition towards attribute bonuses."}, // *
 	{ "Flow", 					"(10%) of overcapped Mana is granted as additional Hitpoints."},
@@ -455,7 +455,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Assassination", 			"(5%) increased effect of Precision."},
 	{ "Rigor", 					"(1%) more total Hit Score."},
 	{ "Rebuke", 				"(5%) of damage taken from enemy thorns is reflected."}, // *
-	{ "Perfectionism", 			"(0.5%) more effect of Finesse for every 10 total Braveness."},
+	{ "Perfectionism", 			"(0.2%) more effect of Finesse for every 10 total Braveness."},
 	{ "Overwhelming Braveness", "(2%) increased total Braveness. (+1) to Braveness Limit."},
 	{ "Swordsman", 				"(2%) less damage taken while using a Sword or Twohander."}, // *
 	{ "Mending", 				"(10%) increased effect of Heal and Regen."}, // *
@@ -467,7 +467,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Lustful", 				"(+1%) base crit chance per empty ring slot."},
 	{ "Ravager", 				"(5%) more total Top Damage"},
 	{ "Culling", 				"Critical Hits kill enemies left below (2%) remaining health."}, // *
-	{ "Wrath", 					"(0.5%) more effect of Rage & Calm per 40 missing Hitpoints, Endurance, and Mana."},
+	{ "Wrath", 					"(0.2%) more effect of Rage & Calm per 50 missing Hitpoints, Endurance, and Mana."},
 	{ "Gluttony", 				"(3%) more Hitpoints, Endurance, and Mana."},
 	{ "Sloth", 					"(2%) of damage dealt is restored as Hitpoints, Endurance, and Mana."},
 	{ "Pride", 					"Your debuffs ignore (5%) of enemy Immunity."},

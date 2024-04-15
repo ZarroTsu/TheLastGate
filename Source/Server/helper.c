@@ -635,7 +635,7 @@ int char_id(int cn)
 int points2rank(int v)
 {
 	if (v<      250)	return  0; // Private
-	if (v<     1750)	return  1; // Private FIrst Class
+	if (v<     1750)	return  1; // Private First Class
 	if (v<     7000)	return  2; // Lance Corporal
 	if (v<    21000)	return  3; // Corporal
 	if (v<    52500)	return  4; // Sergeant
@@ -661,15 +661,14 @@ int points2rank(int v)
 						return 24; // Warlord
 }
 
-// 1!3 =   168 x 8 =  1344
-// 2!5 =   924 x 4 =  3696
-// 3!7 =  3432 x 2 =  6864
-// 4!9 = 10010 x 1 = 10010
+// 1!3 =   168 x 8 =  1344/2 =  672
+// 2!5 =   924 x 4 =  3696/2 = 1848
+// 3!7 =  3432 x 2 =  6864/2 = 3432
+// 4!9 = 10010 x 1 = 10010/2 = 5005
 
-int getitemrank(int in, int flag)
+int getitemrank(int in, int v)
 {
-	if (flag) return points2rank(it[in].cost*125/max(1,flag));
-	else      return points2rank(it[in].cost*250);
+	return points2rank(it[in].cost*250/max(1,v));
 }
 
 int getrank(int cn)
@@ -869,8 +868,14 @@ int st_skill_pts_all(int st_val)
 
 int st_skillnum(int cn, int v, int n)
 {
+	int co;
+	
 	if (v <   1) return 0;
 	if (n >= 12) return 0;
+	
+	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4)
+		cn = co;
+	
 	if (n <   0)
 	{
 		if (ch[cn].tree_node[v-1] == 0 || n == -1)
@@ -886,13 +891,22 @@ int st_skillnum(int cn, int v, int n)
 
 int st_skillcount(int cn, int v)
 {
-	int n, in, count = 0;
+	int co, n, in, count = 0;
 	
 	if (!IS_SANEPLAYER(cn)) return 0;
 	
+	if (IS_PLAYER_SC(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4)
+		cn = co;
+	
 	for (n=0; n<12; n++) count += st_skillnum(cn, v, n);
+	
+	if (IS_PLAYER_GC(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && T_SUMM_SK(co, 10))
+		cn = co;
+	
 	if ((in = ch[cn].worn[WN_CHARM])  && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
 	if ((in = ch[cn].worn[WN_CHARM2]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
+	if (IS_SINBINDER(in = ch[cn].worn[WN_LRING]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
+	if (IS_SINBINDER(in = ch[cn].worn[WN_RRING]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
 	
 	return count;
 }
@@ -1310,6 +1324,28 @@ int change_casino_shop_item(int in)
 	return in;
 }
 
+int get_nullandvoid(int n)
+{
+	int t;
+	
+	t = time(NULL) / (60*60*2);
+	
+	if (t % 2)
+	{
+		if (n)
+			return CT_NULLAN;
+		else
+			return CT_DVOID;
+	}
+	else
+	{
+		if (!n)
+			return CT_NULLAN;
+		else
+			return CT_DVOID;
+	}
+}
+
 int change_bs_shop_item(int cn, int in)
 {
 	int t;
@@ -1323,10 +1359,10 @@ int change_bs_shop_item(int cn, int in)
 		case IT_GAXE_STEL:
 			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, 10); // 1. Greataxe
+			else if (IS_ANY_HARA(cn) || IS_SORCERER(cn))
+				in = get_best_weapon(cn, 7); // 1. Spear
 			else if (IS_ANY_MERC(cn) || IS_BRAVER(cn))
 				in = get_best_weapon(cn, SK_SWORD); // 1. Sword
-			else if (IS_ANY_HARA(cn))
-				in = get_best_weapon(cn, 7); // 1. Spear
 			else if (IS_LYCANTH(cn))
 				in = get_best_weapon(cn, SK_HAND); // 1. Claw
 			else
@@ -1336,10 +1372,10 @@ int change_bs_shop_item(int cn, int in)
 		case IT_THSW_STEL:
 			if (IS_ANY_TEMP(cn))
 				in = get_best_weapon(cn, SK_TWOHAND); // 2. Twohander
+			else if (IS_ANY_HARA(cn) || IS_SORCERER(cn))
+				in = get_best_weapon(cn, SK_STAFF); // 2. Staff
 			else if (IS_ANY_MERC(cn))
 				in = get_best_weapon(cn, SK_SHIELD); // 2. Shield
-			else if (IS_ANY_HARA(cn))
-				in = get_best_weapon(cn, SK_STAFF); // 2. Staff
 			else if (IS_BRAVER(cn))
 				in = get_best_weapon(cn, SK_DUAL); // 3. Dual Sword
 			else
@@ -1362,7 +1398,9 @@ int change_bs_shop_item(int cn, int in)
 				in = get_best_weapon(cn, SK_SHIELD); // 4. Shield
 			else if (IS_WARRIOR(cn))
 				in = get_best_weapon(cn, SK_DUAL); // 4. Dual Sword
-			else if (IS_ANY_HARA(cn) || IS_MERCENARY(cn) || IS_SORCERER(cn))
+			else if (IS_SORCERER(cn))
+				in = get_best_weapon(cn, SK_SWORD); // 4. Staff
+			else if (IS_ANY_HARA(cn) || IS_MERCENARY(cn))
 				in = get_best_weapon(cn, SK_HAND); // 4. Claw
 			else
 				in = 0;
@@ -1373,12 +1411,14 @@ int change_bs_shop_item(int cn, int in)
 				in = get_best_weapon(cn, SK_HAND); // 5. Claw
 			else if (IS_WARRIOR(cn))
 				in = get_best_weapon(cn, SK_DAGGER); // 5. Dagger
+			else if (IS_SORCERER(cn))
+				in = get_best_weapon(cn, SK_SHIELD); // 5. Shield
 			else
 				in = 0;
 			break;
 		// Steel sword, change to appropriate 6th skill item
 		case IT_DUAL_STEL:
-			if (IS_WARRIOR(cn))
+			if (IS_WARRIOR(cn) || IS_SORCERER(cn))
 				in = get_best_weapon(cn, SK_HAND); // 6. Claw
 			else
 				in = 0;
@@ -1436,6 +1476,7 @@ int change_bs_shop_item(int cn, int in)
 		case 1793:
 			t = time(NULL) / (60*60*24);
 			in += t % 2;
+			if (in == 1796) in = 2114;
 			break;
 		case 1928:
 			t = time(NULL) / (60*60*24);
@@ -1445,6 +1486,10 @@ int change_bs_shop_item(int cn, int in)
 		case 2511:
 			t = time(NULL) / (60*60*24);
 			in -= t % 5;
+			break;
+		case 3425:
+			t = time(NULL) / (60*60*24);
+			in += t % 9;
 			break;
 		
 		default: break;
@@ -3039,7 +3084,7 @@ void make_talisfrag(int cn, int n)
 	god_give_char(in, cn);	// chlog(cn, "got talisman fragment(s)");
 }
 
-void make_corruptor(int cn)
+void make_corruptor(int cn, int n)
 {
 	int in;
 	
@@ -3048,6 +3093,8 @@ void make_corruptor(int cn)
 		chlog(cn, "ERROR in make_corruptor: god_create_item failure");
 		return;
 	}
+	
+	it[in].stack = max(1, n);
 	
 	god_give_char(in, cn);
 }
@@ -3805,8 +3852,6 @@ int use_corruptor(int cn, int in)
 	{
 		in2 = god_create_item(IT_CORRUPTOR);
 		
-		it[in2].flags  &= ~(IF_STACKABLE);
-		it[in2].stack   = 0;
 		it[in2].data[0] = RANDOM(NUM_CORR)+1;
 		it[in2].flags  |= (IF_LOOKSPECIAL | IF_SOULSTONE | IF_UPDATE);
 		
@@ -4808,7 +4853,14 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 				ch[co].data[72] = 6;
 				if (!(ch[co].flags & CF_EXTRACRIT)) ch[co].flags |= CF_EXTRACRIT;
 				//
-				make_talisfrag(co, 3);
+				if (!RANDOM(6) && (in = god_create_item(3425+RANDOM(9))))
+				{
+					god_give_char(in, co);
+					chlog(co, "got %s", itemvowel(in, 0));
+					hasloot=1;
+				}
+				else
+					make_talisfrag(co, 3);
 				//
 				break;
 			case  7:												// Darkwood Shadow
@@ -4848,7 +4900,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 					case  3:	strcpy(ch[co].text[3], "^&%%&^%%^&%%&^%%&%%&%%"); break;
 					default:	strcpy(ch[co].text[3], "My $$S$S loves me very vEry veRY &&!!"); break;
 				}
-				make_corruptor(co);
+				make_corruptor(co, 2);
 				break;
 			//
 			default:
@@ -4922,7 +4974,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 		{
 			in = pop_create_item(in, co);
 			god_give_char(in, co);
-			chlog(co, "got a %s", it[in].name);
+			chlog(co, "got %s", itemvowel(in, 0));
 			hasloot=1;
 		}
 		
@@ -4947,7 +4999,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 			hasloot=1;
 		}
 		
-		if (!ch[co].citem && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+		if (!IS_LABY_MOB(co) && !ch[co].citem && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 		{
 			if (in = god_create_item(IT_CORRUPTOR))
 			{
@@ -4964,8 +5016,9 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 		set_random_text(co);
 	}
 	
-	if (ch[co].sprite == 22480) ch[co].light_bonus = 200;
-	if (ch[co].sprite == 14288 || ch[co].sprite == 31696)
+	if (affix==8) ch[co].light_bonus = 5;
+	if (ch[co].sprite == 22480 && affix!=7) ch[co].light_bonus = 200;
+	else if (ch[co].sprite == 14288 || ch[co].sprite == 31696)
 	{
 		ch[co].light_bonus = 0;
 		ch[co].flags |= CF_INFRARED;

@@ -1,5 +1,5 @@
 //
-#define VERSION 0x000B0A
+#define VERSION 0x000C02
 //
 
 #define MAXSPRITE 2000+(128*1024)
@@ -189,11 +189,15 @@ struct look
 	unsigned char item_p[62];
 	unsigned int price[62];
 	unsigned int pl_price;
+	unsigned short  depot[8][64];	// New! Depot list
+	unsigned char depot_s[8][64];	//      Depot stacks
+	unsigned char depot_f[8][64];	//      Depot flags
+	unsigned char depot_c[8][64];	//      Depot catalyst #
 };
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int show_shop, show_wps, show_tree, show_book, show_motd, show_newp, show_tuto, tuto_page, tuto_max;
+extern unsigned int show_shop, show_wps, show_tree, show_book, show_motd, show_newp, show_tuto, tuto_page, tuto_max, dept_page;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2

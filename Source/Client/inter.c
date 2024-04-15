@@ -57,7 +57,7 @@ int cursor_type=CT_NONE;
 int selected_char=0;
 int last_skill=-1;
 
-int xmove=0;
+int xmove=0,xxtimer=0;
 
 void cmd(int cmd,int x,int y);
 void cmd3(int cmd,int x,int y,int z);
@@ -224,7 +224,7 @@ void button_command(int nr)
 		case  8: break;
 		case  9: break;
 		case 10: break;
-		case 11: xmove=0; cmd_exit(); break; // exit
+		case 11: xmove=xxtimer=0; cmd_exit(); break; // exit
 
 		// Scroll bar for inventory
 		case 12: 
@@ -234,17 +234,19 @@ void button_command(int nr)
 			}
 			else
 			{
-				if (inv_pos> 1)	inv_pos -= 10; 
+				if (inv_pos> 1)
+					inv_pos -= 10; 
 			}
 			break;
 		case 13: 
 			if (keys)
 			{
-				inv_pos = 10; 
+				inv_pos = MAXITEMS-30; 
 			}
 			else
 			{
-				if (inv_pos<10)	inv_pos += 10; 
+				if (inv_pos<MAXITEMS-30)
+					inv_pos += 10; 
 			}
 			break;
 
@@ -616,7 +618,7 @@ int mouse_inventory(int x,int y,int mode)
 			{
 				if (show_shop)
 				{	// Sell item from inventory
-					cmd3(CL_CMD_QSHOP,shop.nr,nr+inv_pos,selected_char);
+					cmd3(CL_CMD_QSHOP,shop.nr,nr+inv_pos,dept_page);
 				}
 				else 
 				{	// Push or pull item stacks
@@ -777,6 +779,7 @@ int _mouse_statbox(int x,int y,int state)
 {
 	int n,m;
 
+	/* ***
 	if (screen_windowed == 1) {
         y-=3;
     }
@@ -784,6 +787,7 @@ int _mouse_statbox(int x,int y,int state)
 	{
 		y-=1;
 	}
+	*/
 
 	// Update Button
 	if (	x>gui_update[RECT_X1] 	&& y>gui_update[RECT_Y1] 
@@ -1109,7 +1113,7 @@ int mouse_statbox2(int x,int y,int state)
 	int pl_flags, pl_flagb;
 	char tmp[200];
 	static int firstclick=0;
-
+	
 	/*
 	if (screen_windowed == 1) {
         y-=1;
@@ -1350,7 +1354,7 @@ void mouse_mapbox(int x,int y,int state)
 
 	x+=176-16;
 	y+=8;
-
+	
 	if (screen_windowed == 1) {
         y+=4;
     }
@@ -1364,10 +1368,10 @@ void mouse_mapbox(int x,int y,int state)
 			// Clicking auto-walk buttons
 			if (state==MS_LB_UP) 
 			{
-				if 		((int)sqrt(pow(xr-xwalk_nx,2)+pow(yr-xwalk_ny,2)) < 12)	xmove=1; // North
-				else if ((int)sqrt(pow(xr-xwalk_wx,2)+pow(yr-xwalk_wy,2)) < 12)	xmove=2; // West
-				else if ((int)sqrt(pow(xr-xwalk_sx,2)+pow(yr-xwalk_sy,2)) < 12)	xmove=3; // South
-				else if ((int)sqrt(pow(xr-xwalk_ex,2)+pow(yr-xwalk_ey,2)) < 12)	xmove=4; // East
+				if 		((int)sqrt(pow(xr-xwalk_nx,2)+pow(yr-xwalk_ny,2)) < 12)	{ xmove=1; xxtimer=0; } // North
+				else if ((int)sqrt(pow(xr-xwalk_wx,2)+pow(yr-xwalk_wy,2)) < 12)	{ xmove=2; xxtimer=0; } // West
+				else if ((int)sqrt(pow(xr-xwalk_sx,2)+pow(yr-xwalk_sy,2)) < 12)	{ xmove=3; xxtimer=0; } // South
+				else if ((int)sqrt(pow(xr-xwalk_ex,2)+pow(yr-xwalk_ey,2)) < 12)	{ xmove=4; xxtimer=0; } // East
 			}
 			return;
 		}
@@ -1385,8 +1389,8 @@ void mouse_mapbox(int x,int y,int state)
 //  xlog("ch_sprite=%d, nr=%d, id=%d",map[m].ch_sprite,map[m].ch_nr,map[m].ch_id);
 
 	if (pl.citem==46) { // build
-		if (state==MS_RB_UP) { xmove=0; cmd(CL_CMD_DROP,map[m].x,map[m].y); }
-		if (state==MS_LB_UP) { xmove=0; cmd(CL_CMD_PICKUP,map[m].x,map[m].y); }
+		if (state==MS_RB_UP) { xmove=xxtimer=0; cmd(CL_CMD_DROP,map[m].x,map[m].y); }
+		if (state==MS_LB_UP) { xmove=xxtimer=0; cmd(CL_CMD_PICKUP,map[m].x,map[m].y); }
 		tile_type=0; tile_x=mx; tile_y=my;
 		hightlight=HL_MAP;
 		return;
@@ -1401,8 +1405,8 @@ void mouse_mapbox(int x,int y,int state)
 		tile_x=mx; tile_y=my;
 		tile_type=0;
 
-		if (state==MS_RB_UP) { xmove=0; cmd(CL_CMD_TURN,map[m].x,map[m].y); }
-		if (state==MS_LB_UP) { xmove=0; cmd(CL_CMD_MOVE,map[m].x,map[m].y); }
+		if (state==MS_RB_UP) { xmove=xxtimer=0; cmd(CL_CMD_TURN,map[m].x,map[m].y); }
+		if (state==MS_LB_UP) { xmove=xxtimer=0; cmd(CL_CMD_MOVE,map[m].x,map[m].y); }
 		hightlight=HL_MAP;
 		cursor_type=CT_WALK;
 		return;
@@ -1443,15 +1447,15 @@ void mouse_mapbox(int x,int y,int state)
 		else if (map[m].flags&ISITEM) { hightlight=HL_MAP; if (map[m].flags&ISUSABLE) cursor_type=CT_USE; else cursor_type=CT_TAKE; }
 
 		if (pl.citem && !(map[m].flags&ISITEM)) {
-			if (state==MS_LB_UP) { xmove=0; cmd(CL_CMD_DROP,map[m].x,map[m].y); }
+			if (state==MS_LB_UP) { xmove=xxtimer=0; cmd(CL_CMD_DROP,map[m].x,map[m].y); }
 			tile_type=0;
 		}
 		if ((map[m].flags&ISITEM)) {
 			if (state==MS_LB_UP) {
-				if (map[m].flags&ISUSABLE) { xmove=0; cmd(CL_CMD_USE,map[m].x,map[m].y); noshop=0; }
-				else { xmove=0; cmd(CL_CMD_PICKUP,map[m].x,map[m].y); }
+				if (map[m].flags&ISUSABLE) { xmove=xxtimer=0; cmd(CL_CMD_USE,map[m].x,map[m].y); noshop=0; }
+				else { xmove=xxtimer=0; cmd(CL_CMD_PICKUP,map[m].x,map[m].y); }
 			}
-			if (state==MS_RB_UP) { xmove=0; cmd(CL_CMD_LOOK_ITEM,map[m].x,map[m].y); }
+			if (state==MS_RB_UP) { xmove=xxtimer=0; cmd(CL_CMD_LOOK_ITEM,map[m].x,map[m].y); }
 			tile_type=1;
 		}
 		return;
@@ -1493,9 +1497,9 @@ void mouse_mapbox(int x,int y,int state)
 		}
 
 		if (map[m].flags&ISCHAR) {
-			if (pl.citem && state==MS_LB_UP) { xmove=0; cmd1(CL_CMD_GIVE,map[m].ch_nr); }
-			else if (state==MS_LB_UP) { xmove=0; cmd1(CL_CMD_ATTACK,map[m].ch_nr); }
-			else if (state==MS_RB_UP) { xmove=0; cmd1(CL_CMD_LOOK,map[m].ch_nr); noshop=0; }
+			if (pl.citem && state==MS_LB_UP) { xmove=xxtimer=0; cmd1(CL_CMD_GIVE,map[m].ch_nr); }
+			else if (state==MS_LB_UP) { xmove=xxtimer=0; cmd1(CL_CMD_ATTACK,map[m].ch_nr); }
+			else if (state==MS_RB_UP) { xmove=xxtimer=0; cmd1(CL_CMD_LOOK,map[m].ch_nr); noshop=0; }
 			tile_type=2;
 		}
 	}
@@ -1532,8 +1536,8 @@ void mouse_mapbox(int x,int y,int state)
 
 		if (map[m].flags&ISCHAR) {
 			cursor_type=CT_SEL;
-			if (state==MS_LB_UP) { xmove=0; if (selected_char==map[m].ch_nr) selected_char=0; else selected_char=map[m].ch_nr; }
-			else if (state==MS_RB_UP) { xmove=0; cmd1(CL_CMD_LOOK,map[m].ch_nr); noshop=0; }
+			if (state==MS_LB_UP) { xmove=xxtimer=0; if (selected_char==map[m].ch_nr) selected_char=0; else selected_char=map[m].ch_nr; }
+			else if (state==MS_RB_UP) { xmove=xxtimer=0; cmd1(CL_CMD_LOOK,map[m].ch_nr); noshop=0; }
 			tile_type=2;
 		} else if (state==MS_LB_UP) selected_char=0;
 	}
@@ -1548,25 +1552,21 @@ int mouse_shop(int x,int y,int mode)
 {
 	int nr,tx,ty,keys;
 
-	if (!show_shop) return 0;
+	if (!show_shop)     return 0;
+	if (show_shop>=111) return 0;
 	
 	keys=0;
 	if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
-
+	
+	// [X]
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
+	{	if (mode==MS_LB_UP) { show_shop=0; noshop=QSIZE*3; } return 1;	}
+	
+	// Shop Contents
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+280))
 	{
-		if (mode==MS_LB_UP) 
-		{ 
-			show_shop=0; 
-			noshop=QSIZE*3; 
-		}
-		return 1;
-	}
-
-	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1) && y<(GUI_SHOP_Y+1+292)) 
-	{
-		tx=(x-(GUI_SHOP_X  ))/35;
-		ty=(y-(GUI_SHOP_Y+1))/35;
+		tx=(x-(GUI_SHOP_X))/35;
+		ty=(y-(GUI_SHOP_Y))/35;
 
 		nr=min(62,tx+ty*8);
 		if (mode==MS_LB_UP) 
@@ -1582,6 +1582,51 @@ int mouse_shop(int x,int y,int mode)
 		else if (pl.citem)	{ cursor_type=CT_DROP; }
 		hightlight=HL_SHOP;
 		hightlight_sub=nr;
+		return 1;
+	}
+	
+	// prevent clicking the world behind the menu
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
+	{	return 1;	}
+	
+	return 0;
+}
+
+int mouse_depot(int x,int y,int mode)
+{
+	int n,m,nr,tx,ty;
+
+	if (show_shop!=111) return 0;
+	
+	// [X]
+	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
+	{	if (mode==MS_LB_UP) { show_shop=0; noshop=QSIZE*3; } return 1;	}
+	
+	// Depot Contents
+	if (x>(GUI_SHOP_X+4) && x<(GUI_SHOP_X+276) && y>(GUI_SHOP_Y+4) && y<(GUI_SHOP_Y+276))
+	{
+		tx=(x-(GUI_SHOP_X+4))/34;
+		ty=(y-(GUI_SHOP_Y+4))/34;
+
+		nr=min(512,dept_page*64+tx+ty*8);
+		if (mode==MS_LB_UP) cmd(CL_CMD_SHOP,shop.nr,nr);
+		if (mode==MS_RB_UP) cmd(CL_CMD_SHOP,shop.nr,nr+8*64);
+
+		if (shop.depot[nr/64][nr%64])	{ cursor_type=CT_TAKE; }
+		else if (pl.citem)	{ cursor_type=CT_DROP; }
+		hightlight=HL_SHOP;
+		hightlight_sub=nr;
+		return 1;
+	}
+	
+	// Depot Page Buttons
+	for (n=0;n<4;n++) for (m=0;m<2;m++) if (x>(GUI_SHOP_X+7+68*n) && x<(GUI_SHOP_X+70+68*n) && y>(GUI_SHOP_Y+281+17*m) && y<(GUI_SHOP_Y+293+17*m))
+	{
+		if (mode==MS_LB_UP)
+		{
+			dept_page = n+m*4;
+			play_sound("sfx\\click.wav",CLICKVOL,0);
+		}
 		return 1;
 	}
 	
@@ -1614,9 +1659,9 @@ int mouse_wps(int x,int y,int mode)
 	}
 	
 	// Selecting a Waypoint
-	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+280-13) && y>(GUI_SHOP_Y+1) && y<(GUI_SHOP_Y+1+280)) 
+	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+280-13) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+280)) 
 	{
-		ty=(y-(GUI_SHOP_Y+1))/35;
+		ty=(y-(GUI_SHOP_Y))/35;
 
 		nr=wpslist[ty+wps_pos].nr;
 		if (mode==MS_LB_UP) 
@@ -1636,7 +1681,7 @@ int mouse_wps(int x,int y,int mode)
 	}
 	
 	// Scroll up
-	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1) && y<(GUI_SHOP_Y+1+35))
+	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+35))
 	{
 		if (mode==MS_LB_UP) 
 		{
@@ -1648,7 +1693,7 @@ int mouse_wps(int x,int y,int mode)
 	}
 	
 	// Scroll down
-	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+1+280-35) && y<(GUI_SHOP_Y+1+280))
+	if (x>(GUI_SHOP_X+280-13) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y+280-35) && y<(GUI_SHOP_Y+280))
 	{
 		if (mode==MS_LB_UP) 
 		{
@@ -1869,29 +1914,30 @@ int mouse_motd(int x,int y,int mode)
 	return 0;
 }
 
-
 void mouse(int x,int y,int state)
 {
 	if (!init_done) return;
 
 	hightlight=0;
 	cursor_type=CT_NONE;
-
+	
+	
 	if (screen_windowed == 1) {
 		// Adjust position when windowed
 		//y += 4;
 		x += 2;
-		y += 1;
+		y += 2;
 	}
 	else
 	{
-		y -= 2;
+		//y -= 2;
 	}
 
 	mouse_x=x; mouse_y=y;
 	if (mouse_inventory(x,y,state)) ;
 	else if (mouse_tree(x,y,state)) ;
 	else if (mouse_shop(x,y,state)) ;
+	else if (mouse_depot(x,y,state)) ;
 	else if (mouse_wps(x,y,state)) ;
 	else if (mouse_motd(x,y,state)) ;
 	else if (mouse_buttonbox(x,y,state)) ;

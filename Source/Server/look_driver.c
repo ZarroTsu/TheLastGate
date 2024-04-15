@@ -113,57 +113,54 @@ void look_item_details(int cn, int in)
 		if (it[in].flags & IF_IDENTIFIED)
 		{
 			item_info(cn, in, 1);
+			if (CAN_SOULSTONE(in))
+			{
+				do_char_log(cn, 3, "This item can be Soulstoned.\n");
+			}
+			else if (IS_OSIRWEAP(in))
+			{
+				if (it[in].stack)
+					do_char_log(cn, 3, "May be further enhanced by Osiris.\n");
+				else
+					do_char_log(cn, 7, "Has been enhanced by Osiris.\n");
+			}
+			else if (it[in].flags & IF_SOULSTONE)
+			{
+				if (it[in].driver==68)
+					do_char_log(cn, 6, "Has been Catalyzed.\n");
+				else
+					do_char_log(cn, 7, "Has been Soulstoned.\n");
+			}
+			else if (it[in].placement && !CAN_SOULSTONE(in))
+			{
+				do_char_log(cn, 0, "Cannot be Soulstoned.\n");
+			}
+			if (CAN_ENCHANT(in))
+			{
+				do_char_log(cn, 3, "This item can be Enchanted.\n");
+			}
+			else if (it[in].flags & IF_ENCHANTED)
+			{
+				if (it[in].driver==68)
+					do_char_log(cn, 7, "Has been Focused.\n");
+				else
+				{
+					int colr = 8;
+					if (it[in].enchantment>=57&&it[in].enchantment<=60) colr = 7;
+					if (it[in].enchantment>=61&&it[in].enchantment<=64) colr = 5;
+					if (it[in].enchantment>=65&&it[in].enchantment<=68) colr = 6;
+					if (it[in].enchantment>=69&&it[in].enchantment<=72) colr = 8;
+					if (it[in].enchantment>=73&&it[in].enchantment<=76) colr = 9;
+					do_char_log(cn, colr, "Has been Enchanted.\n");
+				}
+			}
+			else if (it[in].placement && !CAN_ENCHANT(in))
+			{
+				do_char_log(cn, 0, "Cannot be Enchanted.\n");
+			}
 			if (it[in].flags & IF_CORRUPTED)
 			{
-				do_char_log(cn, 0, "Corrupted.\n");
-			}
-			else
-			{
-				if (CAN_SOULSTONE(in))
-				{
-					do_char_log(cn, 3, "This item can be Soulstoned.\n");
-				}
-				else if (IS_OSIRWEAP(in))
-				{
-					if (it[in].stack)
-						do_char_log(cn, 3, "May be further enhanced by Osiris.\n");
-					else
-						do_char_log(cn, 7, "Has been enhanced by Osiris.\n");
-				}
-				else if (it[in].flags & IF_SOULSTONE)
-				{
-					if (it[in].driver==68)
-						do_char_log(cn, 6, "Has been Catalyzed.\n");
-					else
-						do_char_log(cn, 7, "Has been Soulstoned.\n");
-				}
-				else if (it[in].placement && !CAN_SOULSTONE(in))
-				{
-					do_char_log(cn, 0, "Cannot be Soulstoned.\n");
-				}
-				if (CAN_ENCHANT(in))
-				{
-					do_char_log(cn, 3, "This item can be Enchanted.\n");
-				}
-				else if (it[in].flags & IF_ENCHANTED)
-				{
-					if (it[in].driver==68)
-						do_char_log(cn, 7, "Has been Focused.\n");
-					else
-					{
-						int colr = 8;
-						if (it[in].enchantment>=57&&it[in].enchantment<=60) colr = 7;
-						if (it[in].enchantment>=61&&it[in].enchantment<=64) colr = 5;
-						if (it[in].enchantment>=65&&it[in].enchantment<=68) colr = 6;
-						if (it[in].enchantment>=69&&it[in].enchantment<=72) colr = 8;
-						if (it[in].enchantment>=73&&it[in].enchantment<=76) colr = 9;
-						do_char_log(cn, colr, "Has been Enchanted.\n");
-					}
-				}
-				else if (it[in].placement && !CAN_ENCHANT(in))
-				{
-					do_char_log(cn, 0, "Cannot be Enchanted.\n");
-				}
+				do_char_log(cn, 4, "Has been Corrupted.\n");
 			}
 		}
 		if (IS_GODWEAPON(in))
@@ -174,7 +171,7 @@ void look_item_details(int cn, int in)
 		if (IS_OSIRWEAP(in) && it[in].stack)
 		{
 			do_char_log(cn, 5, "%d more blessing%s. Next in %d kills.\n", 
-				it[in].stack, (it[in].stack>1?"s":""), rank2points(max(0, getitemrank(in, it[in].data[0])))/125*it[in].data[0] - it[in].cost);
+				it[in].stack, (it[in].stack>1?"s":""), rank2points(max(0, getitemrank(in, it[in].data[0])))/250*it[in].data[0] - it[in].cost);
 		}
 		if (it[in].stack==10 && ((it[in].flags & IF_WEAPON) || (it[in].flags & IF_OF_SHIELD)))
 		{
@@ -289,7 +286,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_STOR:
-		do_char_log(cn, 7, "When equipped, your Blind and Douse also applies a stack of Zephyr.\n");
+		do_char_log(cn, 7, "When equipped, your Blind and Douse also applies a stack of Zephyr every 5 seconds.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SICK:
@@ -309,7 +306,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SONG:
-		do_char_log(cn, 7, "When equipped, your Aria additionally grants nearby allies 10% of your Armor Value.\n");
+		do_char_log(cn, 7, "When equipped, your Aria additionally grants nearby allies 10%% of your Armor Value.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SCRE:
@@ -744,7 +741,7 @@ void look_extra(int cn, int in)
 		default:break;
 		}
 	}
-	if (it[in].temp == IT_CORRUPTOR)
+	if (it[in].driver == 133)
 	{
 		if (it[in].data[0])
 		{

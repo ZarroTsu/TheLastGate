@@ -528,7 +528,7 @@ struct character
 	int gold;
 
 	// items carried
-	unsigned int item[40];
+	unsigned int olditem[40]; //
 
 	// items worn
 	unsigned int worn[20];
@@ -636,7 +636,8 @@ struct character
 	
 	char tree_node[12];
 
-	unsigned int depot[62];
+	unsigned int item[60]; 			// MAXITEMS = 60
+	unsigned int olddepot[2];
 	
 	unsigned short os_tree;			// Points allocated (upper 12 bits) and available (lower 4 bits)
 	
@@ -827,6 +828,20 @@ struct newcharacter
 
 	int data[100];						// +4*100, 2496, driver data
 	char text[10][160];					// +10*160, 4096, npc text data
+}
+__attribute__ ((packed));
+
+/**********/
+/* Depots */
+/**********/
+
+#define STORESIZE  (sizeof(struct storage)*MAXCHARS)
+#define ST_PAGES	 8
+#define ST_SLOTS	64
+
+struct storage
+{
+	unsigned int depot[ST_PAGES][ST_SLOTS]; // 4*8*64=2048
 }
 __attribute__ ((packed));
 
@@ -1166,6 +1181,7 @@ extern struct s_splog splog[66];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
+extern struct storage *st;
 extern struct item *bu;
 extern struct item *it;
 extern struct character *ch_temp;

@@ -1316,7 +1316,7 @@ int see_hit = 0, see_miss = 0;
 
 int main(int argc, char *args[])
 {
-	int sock, n, one = 1, doleave = 0, ltimer = 0;
+	int sock, n, m, one = 1, doleave = 0, ltimer = 0;
 	struct sockaddr_in addr;
 	int pidfile;
 	char pid_str[10];
@@ -1445,12 +1445,14 @@ int main(int argc, char *args[])
 			unload();
 			exit(0);
 		}
+		/*
 		else if (strcasecmp("copy", args[1])==0)
 		{
 			pop_copy_to_new_chars();
 			unload();
 			exit(0);
 		}
+		*/
 	}
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -1494,8 +1496,21 @@ int main(int argc, char *args[])
 		{
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
-		// (vvv REMOVE AFTER UPDATE!!!)
-		// (^^^ REMOVE AFTER UPDATE!!!)
+		/* // (vvv REMOVE AFTER UPDATE!!!)
+		if (IS_PLAYER(n)) 
+		{
+			for (m=0;m<62;m++)
+			{
+				st[n].depot[0][m] = ch[n].depot[m];
+				ch[n].depot[m] = 0;
+			}
+			for (m=0;m<40;m++)
+			{
+				ch[n].depot[m] = ch[n].item[m];
+				ch[n].item[m] = 0;
+			}
+		}
+		*/ // (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);
 	}
@@ -1504,7 +1519,7 @@ int main(int argc, char *args[])
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;
-		if (it[n].orig_temp && it[n].crit_multi[0] != it_temp[it[n].orig_temp].crit_multi[0])
+		if (it[n].orig_temp && !it[n].orig_temp)
 		{
 			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
 			it[n].max_damage = 100000;
@@ -1553,6 +1568,17 @@ int main(int argc, char *args[])
 		{
 			continue;
 		}
+		
+		/* // (vvv REMOVE AFTER UPDATE!!!)
+		for (m=0;m<40;m++)
+		{
+			if (ch_temp[n].olditem[m])
+			{
+				ch_temp[n].item[m] = ch_temp[n].olditem[m];
+				ch_temp[n].olditem[m] = 0;
+			}
+		}
+		*/ // (^^^ REMOVE AFTER UPDATE!!!)
 
 		x = ch_temp[n].data[29] % MAPX;
 		y = ch_temp[n].data[29] / MAPX;

@@ -25,6 +25,7 @@ extern int selected_char;
 // Scroll Wheel - using position from other files
 extern int inv_pos,skill_pos,wps_pos,hudmode;
 extern int gui_inv_x[],gui_inv_y[],gui_skl_names[];
+extern unsigned int dept_page;
 
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
@@ -201,7 +202,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 {
 	PAINTSTRUCT ps;
 	int keys;
-	extern int ser_ver,xmove;
+	extern int ser_ver,xmove,xxtimer;
 	static int delta=0; // scrollwheel direction/speed
 
 	keys=0;
@@ -272,7 +273,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 					show_newp=0;
 					show_tuto=0;
 					noshop=QSIZE*3; 
-					xmove=0; 
+					xmove=xxtimer=0; 
 					break;
 				// **************** F-Key Row 1 **************** //
 				// -------- F1
@@ -584,20 +585,32 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				//  INVENTORY
 				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1]) 
 				{ 
-					if (inv_pos<10)	inv_pos += 10; 
+					if (inv_pos<MAXITEMS-30)
+						inv_pos+=10; 
 				}
 				
 				//  SKILL LIST
 				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
 				{ 
-					if (skill_pos<MAXSKILL-10)	skill_pos += 1; 
+					if (skill_pos<MAXSKILL-10)
+						skill_pos++; 
 				}
 
 				//  WAYPOINT PAGE - this was defined in multiple places so one more cant hurt!
 				if (show_wps) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
 					{
-						if (wps_pos<(MAXWPS- 8))	wps_pos += 1;
+						if (wps_pos<(MAXWPS- 8))
+							wps_pos++;
+					}
+				}
+				
+				// DEPOT PAGE
+				if (show_shop==111) {
+					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
+					{
+						if (dept_page<7)
+							dept_page++;
 					}
 				}
 				
@@ -619,28 +632,42 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				//  INVENTORY
 				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1]) 
 				{ 
-					if (inv_pos> 1)	inv_pos -= 10; 
+					if (inv_pos> 1)	
+						inv_pos-=10; 
 				}
 				
 				//  SKILL LIST
 				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
 				{ 
-					if (skill_pos>0)	skill_pos -= 1; 
+					if (skill_pos>0)
+						skill_pos--; 
 				}
 
 				//  WAYPOINT PAGE
 				if (show_wps) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
 					{
-						if (wps_pos>0 )	wps_pos -= 1; 
+						if (wps_pos>0 )
+							wps_pos--; 
+					}
+				}
+				
+				// DEPOT PAGE
+				if (show_shop==111) {
+					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
+					{
+						if (dept_page>0)
+							dept_page--;
 					}
 				}
 				
 				//  CHAT HISTORY
 				if (mx>973 && mx<1275 && my>6 && my<230) 
 				{ 
-					if (logstart<22*8) {
-						logstart+=3; logtimer=TICKS*30/TICKMULTI;
+					if (logstart<22*8) 
+					{
+						logstart+=3; 
+						logtimer=TICKS*30/TICKMULTI;
 					}
 				}
 

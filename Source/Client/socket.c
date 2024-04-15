@@ -565,7 +565,7 @@ void sv_setchar_item(unsigned char *buf)
 	DEBUG("SV SETCHAR ITEM");
 
 	n=*(unsigned long*)(buf+1);
-	if (n<0 || n>39) xlog(0,"Invalid setchar item");
+	if (n<0 || n>(MAXITEMS-1)) xlog(0,"Invalid setchar item");
 	
 	pl.item[n]=*(short int*)(buf+5);
 	pl.item_p[n]=*(short int*)(buf+7);
@@ -593,7 +593,7 @@ void sv_setchar_spell(unsigned char *buf)
 	DEBUG("SV SETCHAR SPELL");
 
 	n=*(unsigned long*)(buf+1);
-	if (n<0 || n>MAXBUFFS-1) xlog(0,"Invalid setchar spell");
+	if (n<0 || n>(MAXBUFFS-1)) xlog(0,"Invalid setchar spell");
 	pl.spell[n]=*(short int*)(buf+5);
 	pl.active[n]=*(short int*)(buf+7);
 }
@@ -950,6 +950,36 @@ void sv_look6(unsigned char *buf)
 	}
 }
 
+void sv_look7(unsigned char *buf)
+{
+	int n,s;
+
+	DEBUG("SV LOOK7");
+
+	n=buf[1];
+	s=buf[2];
+
+	  tmplook.depot[n][s] =*(unsigned short*)(buf+3);
+	tmplook.depot_s[n][s] =*(unsigned char *)(buf+5);
+	tmplook.depot_f[n][s] =*(unsigned char *)(buf+6);
+	tmplook.depot_c[n][s] =*(unsigned char *)(buf+7);
+	
+	if (n==7 && s==63)
+	{
+		show_shop=111;
+		shop=tmplook;
+	}
+	if (show_shop)
+	{
+		show_wps =0;
+		show_book=0;
+		show_motd=0;
+		show_newp=0;
+		show_tuto=0;
+		show_tree=0;
+	}
+}
+
 void sv_showmotd(unsigned char *buf)
 {
 	int n;
@@ -1166,6 +1196,7 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOOK4:				sv_look4(buf); break;
 		case	SV_LOOK5:				sv_look5(buf); break;
 		case	SV_LOOK6:				sv_look6(buf); break;
+		case	SV_LOOK7:				sv_look7(buf); return 8;
 
 		case	SV_SETTARGET:			sv_settarget(buf); return 13;
 

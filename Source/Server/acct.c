@@ -21,17 +21,15 @@
 #include "data.h"
 #include "macros.h"
 
-
-
 /* CS, 991113: TCHARSIZE and TITEMSIZE now in data.h */
 
 struct character *ch_temp;
 struct character *ch;
+struct storage *st;
 struct item *bu;
 struct item *it;
 struct item *it_temp;
 struct global *globs;
-
 
 // struct character *ch_temp;
 // struct item *it_temp;
@@ -490,6 +488,30 @@ static int web_load(void)
 	if (ch_temp==(void*)-1)
 	{
 		fprintf(stderr, "Unable to mmap TCHAR");
+		return -1;
+	}
+	close(handle);
+	
+	/** STORAGE **/
+	fprintf(stderr, "Loading STORAGE: Item size=%d, file size=%dK",
+			 sizeof(struct storage), STORESIZE >> 10);
+
+	handle = open(DATDIR "/storage.dat", O_RDWR);
+	if (handle==-1)
+	{
+		fprintf(stderr, "Unable to load STORAGE");
+		return -1;
+	}
+	if (!extend(handle, STORESIZE, sizeof(struct storage), NULL))
+	{
+		fprintf(stderr, "Unable to extend STORAGE");
+		return -1;
+	}
+
+	st = mmap(NULL, STORESIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (st==(void*)-1)
+	{
+		fprintf(stderr, "Unable to mmap STORAGE");
 		return -1;
 	}
 	close(handle);
@@ -1009,8 +1031,11 @@ void view_character_template(LIST *head)
 		{
 			continue;
 		}
-		printf("<tr><td>[%3d] %s</td><td><input type=text name=drdata%d value=\"%d\" size=35 maxlength=75></td></tr>\n",
-				n, data_name[n], n, ch_temp[cn].data[n]);
+		printf("<tr><td>[%3d] %s</td><td><input type=text name=drdata%d value=\"%d\" size=35 maxlength=75> %s%s%s</td></tr>\n",
+				n, data_name[n], n, ch_temp[cn].data[n], 
+				(n<10&&ch_temp[cn].data[n]) ? "(" : "",
+				(n<10&&ch_temp[cn].data[n]) ? it_temp[ch_temp[cn].data[n]].name : "",
+				(n<10&&ch_temp[cn].data[n]) ? ")" : "");
 	}
 
 	printf("<tr><td>Driver Texts:</td></tr>\n");
@@ -4414,6 +4439,12 @@ void list_new_characters_template(LIST *head)		 // listing characters with high 
 	printf("</table>\n");
 }
 
+int startsWith(const char *a, const char *b)
+{
+   if (strncmp(a, b, strlen(b)) == 0) return 1;
+   return 0;
+}
+
 void list_objects(LIST *head, int flag)
 {
 	int n;
@@ -4425,6 +4456,10 @@ void list_objects(LIST *head, int flag)
 		if (flag==1 && !(it_temp[n].flags & IF_SELLABLE)) continue;
 		if (flag==2 && !(it_temp[n].flags & IF_JEWELERY)) continue;
 		if (flag==3 && !(it_temp[n].duration)) continue;
+		if (flag==4)
+		{
+			if (!(startsWith(it_temp[n].reference, "a ") || startsWith(it_temp[n].reference, "an ") || startsWith(it_temp[n].reference, "the "))) continue;
+		}
 		printf("<tr><td style=\"text-align:right;\">%d:&ensp;</td><td><a href=/cgi-imp/acct.cgi?step=23&in=%d>%30.30s</a></td>\n"
 				"<td><font size=2>p:%d.%02dG</font></td><td><font size=2>t:%dm%02ds(%dt)</font></td><td><font size=2>d0:%d</font></td><td><font size=2>d1:%d</font></td><td><font size=2>d2:%d</font></td><td><font size=2>d3: %d</font></td><td><font size=2>d4: %d</font></td>\n"
 				"<td><a href=/cgi-imp/acct.cgi?step=25&in=%d>Copy</a></td><td><a href=/cgi-imp/acct.cgi?step=22&in=%d>Delete</a></td><td>&nbsp;:%d</td></tr>\n",
@@ -4673,6 +4708,9 @@ int main(int argc, char *args[])
 	case 36:
 		list_all_player_characters_by_pandium();
 		break;
+	case 37:
+		list_objects(head, 4);
+		break;
 	case 41:
 		list_characters2_template(head);
 		break;
@@ -4699,6 +4737,7 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=30>Object Templates (Sellable)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=33>Object Templates (Jewelery)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=34>Object Templates (Duration)</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=37>Object Templates (Janky Reference)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");

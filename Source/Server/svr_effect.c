@@ -99,106 +99,31 @@ void effect_tick(void)
 				{
 					plr_map_remove(fx[n].data[2]);
 
-					if (can_drop(m))
-					{
-						;
-					}
-					else if (can_drop(m + 1))
-					{
-						m += 1;
-					}
-					else if (can_drop(m - 1))
-					{
-						m += -1;
-					}
-					else if (can_drop(m + MAPX))
-					{
-						m += MAPX;
-					}
-					else if (can_drop(m - MAPX))
-					{
-						m += -MAPX;
-					}
-					else if (can_drop(m + 1 + MAPX))
-					{
-						m += 1 + MAPX;
-					}
-					else if (can_drop(m + 1 - MAPX))
-					{
-						m += 1 - MAPX;
-					}
-					else if (can_drop(m - 1 + MAPX))
-					{
-						m += -1 + MAPX;
-					}
-					else if (can_drop(m - 1 - MAPX))
-					{
-						m += -1 - MAPX;
-					}
-					else if (can_drop(m + 2))
-					{
-						m += 2;
-					}
-					else if (can_drop(m - 2))
-					{
-						m += -2;
-					}
-					else if (can_drop(m + 2 * MAPX))
-					{
-						m += 2 * MAPX;
-					}
-					else if (can_drop(m - 2 * MAPX))
-					{
-						m += -2 * MAPX;
-					}
-					else if (can_drop(m + 2 + MAPX))
-					{
-						m += 2 + MAPX;
-					}
-					else if (can_drop(m + 2 - MAPX))
-					{
-						m += 2 - MAPX;
-					}
-					else if (can_drop(m - 2 + MAPX))
-					{
-						m += -2 + MAPX;
-					}
-					else if (can_drop(m - 2 - MAPX))
-					{
-						m += -2 - MAPX;
-					}
-					else if (can_drop(m + 1 + 2 * MAPX))
-					{
-						m += 1 + 2 * MAPX;
-					}
-					else if (can_drop(m + 1 - 2 * MAPX))
-					{
-						m += 1 - 2 * MAPX;
-					}
-					else if (can_drop(m - 1 + 2 * MAPX))
-					{
-						m += -1 + 2 * MAPX;
-					}
-					else if (can_drop(m - 1 - 2 * MAPX))
-					{
-						m += -1 - 2 * MAPX;
-					}
-					else if (can_drop(m + 2 + 2 * MAPX))
-					{
-						m += 2 + 2 * MAPX;
-					}
-					else if (can_drop(m + 2 - 2 * MAPX))
-					{
-						m += 2 - 2 * MAPX;
-					}
-					else if (can_drop(m - 2 + 2 * MAPX))
-					{
-						m += -2 + 2 * MAPX;
-					}
-					else if (can_drop(m - 2 - 2 * MAPX))
-					{
-						m += -2 - 2 * MAPX;
-					}
+					if (can_drop(m))						;
+					else if (can_drop(m + 1))				m += 1;
+					else if (can_drop(m - 1))				m += -1;
+					else if (can_drop(m + MAPX))			m += MAPX;
+					else if (can_drop(m - MAPX))			m += -MAPX;
+					else if (can_drop(m + 1 + MAPX))		m += 1 + MAPX;
+					else if (can_drop(m + 1 - MAPX))		m += 1 - MAPX;
+					else if (can_drop(m - 1 + MAPX))		m += -1 + MAPX;
+					else if (can_drop(m - 1 - MAPX))		m += -1 - MAPX;
+					else if (can_drop(m + 2))				m += 2;
+					else if (can_drop(m - 2))				m += -2;
+					else if (can_drop(m + 2 * MAPX))		m += 2 * MAPX;
+					else if (can_drop(m - 2 * MAPX))		m += -2 * MAPX;
+					else if (can_drop(m + 2 + MAPX))		m += 2 + MAPX;
+					else if (can_drop(m + 2 - MAPX))		m += 2 - MAPX;
+					else if (can_drop(m - 2 + MAPX))		m += -2 + MAPX;
+					else if (can_drop(m - 2 - MAPX))		m += -2 - MAPX;
+					else if (can_drop(m + 1 + 2 * MAPX))	m += 1 + 2 * MAPX;
+					else if (can_drop(m + 1 - 2 * MAPX))	m += 1 - 2 * MAPX;
+					else if (can_drop(m - 1 + 2 * MAPX))	m += -1 + 2 * MAPX;
+					else if (can_drop(m - 1 - 2 * MAPX))	m += -1 - 2 * MAPX;
+					else if (can_drop(m + 2 + 2 * MAPX))	m += 2 + 2 * MAPX;
+					else if (can_drop(m + 2 - 2 * MAPX))	m += 2 - 2 * MAPX;
+					else if (can_drop(m - 2 + 2 * MAPX))	m += -2 + 2 * MAPX;
+					else if (can_drop(m - 2 - 2 * MAPX))	m += -2 - 2 * MAPX;
 					else
 					{
 						int temp;
@@ -228,7 +153,8 @@ void effect_tick(void)
 							reset_go(M2X(m), M2Y(m));
 							remove_lights(M2X(m), M2Y(m));
 							fx_add_effect(12, 0,  M2X(m), M2Y(m), 0);
-							build_item(3308, M2X(m), M2Y(m));
+							z = build_item(IT_SANGPORT, M2X(m), M2Y(m));
+							it[z].duration = TICKS * 60 * 60;
 							reset_go(M2X(m), M2Y(m));
 							add_lights(M2X(m), M2Y(m));
 						}
@@ -253,15 +179,31 @@ void effect_tick(void)
 							for (z = 0; z<20 && !flag; z++)
 							{
 								// skip weapon slot
-								if (z == WN_RHAND && !(ch[co].worn[z] && IS_UNIQUE(ch[co].worn[z])))
-								{
-									continue;
-								}
-								
 								if (ch[co].worn[z])
 								{
-									flag = 1;
-									break;
+									if (z == WN_RHAND)
+									{
+										if (IS_UNIQUE(ch[co].worn[z]) || IS_QUESTITEM(ch[co].worn[z]))
+										{
+											flag = 1;
+											break;
+										}
+										continue;
+									}
+									if (z == WN_LHAND)
+									{
+										if (IS_UNIQUE(ch[co].worn[z]) || IS_QUESTITEM(ch[co].worn[z]))
+										{
+											flag = 1;
+											break;
+										}
+										continue;
+									}
+									if (ch[co].gcm != 90)
+									{
+										flag = 1;
+										break;
+									}
 								}
 							}
 							if (ch[co].citem)
@@ -436,7 +378,7 @@ void effect_tick(void)
 						map[m].flags &= ~MF_GFX_DEATH;
 					}
 					if (cn && try_boost(20)) boost_char(cn, 0);
-					if (cn && (ch[cn].flags & CF_MERCHANT) && !(ch[cn].flags & CF_BSPOINTS))
+					if (cn && (ch[cn].flags & CF_MERCHANT) && !(ch[cn].flags & CF_BSPOINTS) && ch[cn].temp!=CT_NULLAN && ch[cn].temp!=CT_DVOID)
 					{
 						update_shop(cn);
 					}
@@ -569,12 +511,14 @@ int fx_add_effect(int type, int duration, int d1, int d2, int d3)
 		return 0;
 	}
 	
+	/*
 	if (type==6 || type==7)	// Hide cast flashes for shadows
 	{
 		m = d1 + d2 * MAPX;
 		if (IS_SANECHAR(m = map[m].ch) && ch[m].temp==347 && IS_SHADOW(m))
 			return 0;
 	}
+	*/
 
 	fx[n].used = USE_ACTIVE;
 

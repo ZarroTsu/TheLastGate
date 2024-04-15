@@ -22,6 +22,7 @@
 
 struct map *map;
 struct character *ch;
+struct storage *st;
 struct item *bu;
 struct item *it;
 struct effect *fx;

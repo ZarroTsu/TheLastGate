@@ -154,6 +154,16 @@ void global_pandium_rewards(void)
 	xlog("Pandium Rewards complete.");
 }
 
+void reset_daily_shops(void)
+{
+	int n;
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (ch[n].used!=USE_ACTIVE) continue;
+		if (ch[n].temp==CT_NULLAN)  update_shop(n);
+	}
+}
+
 void global_tick(void)
 {
 	int tmp;
@@ -164,7 +174,8 @@ void global_tick(void)
 		globs->mdday++;
 		globs->mdtime = 0;
 		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear);
-		sanguine_spawners(0);
+		reset_daily_shops();
+		//sanguine_spawners(0);
 		do_misc();
 		if (!(globs->mdday % 28)) init_lights_check();
 	}
