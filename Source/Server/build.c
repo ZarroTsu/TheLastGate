@@ -7185,7 +7185,7 @@ int add_map_shrine(int x, int y, int mission, int goal, int rank, int tier, int 
 			case  2:	it[co].sprite[0] = 16813; it[co].data[0] = 2; break;
 			default:	it[co].sprite[0] = 16814; it[co].data[0] = 3; break;
 		}
-		it[co].data[1] = RANDOM(5);
+		it[co].data[1] = RANDOM(6);
 		it[co].data[2] = rank;
 		it[co].data[3] = tier;
 		it[co].data[4] = cont_in;

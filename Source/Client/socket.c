@@ -45,6 +45,7 @@ int ticker=0;
 extern short screen_renderdist;
 
 extern char host_addr[];
+extern char host_proxy[];
 extern int host_port;
 
 extern struct key okey;
@@ -223,6 +224,7 @@ void so_connect(HWND hwnd)
 	static int flag=0;
 	unsigned long haddr;
 	int one=1,tmp;
+	int useproxy=0;
 
 	if (so_status) return;
 	so_status=1;
@@ -246,49 +248,127 @@ void so_connect(HWND hwnd)
 		return;
 	}
 
-	if (isdigit(host_addr[0])) {
+	if (isdigit(host_addr[0])) 
+	{
 		haddr=inet_addr(host_addr);
-		if (haddr==INADDR_NONE) {
-			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Illegal IP Address");
-			so_status=0;
-			return;
+		if (haddr==INADDR_NONE) 
+		{
+			useproxy=1;
+			if (isdigit(host_proxy[0])) 
+			{
+				haddr=inet_addr(host_proxy);
+				if (haddr==INADDR_NONE) 
+				{
+					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Illegal IP Address");
+					so_status=0;
+					return;
+				}
+			}
+			else
+			{
+				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address (bad target IP)");
+				he=gethostbyname(host_proxy);
+				if (!he)
+				{
+					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown (bad target IP)");
+					so_status=0;
+					return;
+				}
+				else
+				{
+					haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
+				}
+			}
 		}
-	} else {
-		/*
-		FILE *fp;
-        char str[15];
-     
-        fp = fopen("web.ip", "r");
-        if (fp == NULL)
-        {
-            SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not read web.ip");
-			so_status=0;
-			return;
-        }
-        haddr=inet_addr(fgets(str, 15, fp));
-        fclose(fp);
-		*/
-		
+	} 
+	else 
+	{
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server address");
 		he=gethostbyname(host_addr);
-		if (!he) {
-			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown");
-			so_status=0;
-			return;
+		if (!he)
+		{
+			useproxy=1;
+			if (isdigit(host_proxy[0])) 
+			{
+				haddr=inet_addr(host_proxy);
+				if (haddr==INADDR_NONE) 
+				{
+					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Illegal IP Address");
+					so_status=0;
+					return;
+				}
+			}
+			else
+			{
+				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address");
+				he=gethostbyname(host_proxy);
+				if (!he)
+				{
+					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown");
+					so_status=0;
+					return;
+				}
+				else
+				{
+					haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
+				}
+			}
 		}
-		haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-		
+		else
+		{
+			haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
+		}
 	}
-
+	
 	addr.sin_family=AF_INET;
 	addr.sin_port=htons(host_port);
 	addr.sin_addr.s_addr=haddr;
 
 	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Connecting to server");
-	if (connect(sock,(struct sockaddr *)&addr,sizeof(addr))) {
-		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not establish connection");
-		so_status=0;
-		return;
+	if (connect(sock,(struct sockaddr *)&addr,sizeof(addr)))
+	{
+		if (!useproxy)
+		{
+			if (isdigit(host_proxy[0])) 
+			{
+				haddr=inet_addr(host_proxy);
+				if (haddr==INADDR_NONE) 
+				{
+					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR on retry: Illegal IP Address");
+					so_status=0;
+					return;
+				}
+			}
+			else
+			{
+				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address on retry");
+				he=gethostbyname(host_proxy);
+				if (!he)
+				{
+					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown on retry");
+					so_status=0;
+					return;
+				}
+				haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
+			}
+			addr.sin_family=AF_INET;
+			addr.sin_port=htons(host_port);
+			addr.sin_addr.s_addr=haddr;
+
+			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Connecting to server by proxy");
+			if (connect(sock,(struct sockaddr *)&addr,sizeof(addr)))
+			{
+				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not establish connection");
+				so_status=0;
+				return;
+			}
+		}
+		else
+		{
+			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not establish connection");
+			so_status=0;
+			return;
+		}
 	}
 
 	if (passwd[0]) {
@@ -596,6 +676,18 @@ void sv_setchar_spell(unsigned char *buf)
 	if (n<0 || n>(MAXBUFFS-1)) xlog(0,"Invalid setchar spell");
 	pl.spell[n]=*(short int*)(buf+5);
 	pl.active[n]=*(short int*)(buf+7);
+}
+
+void sv_setchar_location1(unsigned char *buf)
+{
+	DEBUG("SV SETCHAR LOCA1");
+	memcpy(pl.location,buf+1,10);
+}
+
+void sv_setchar_location2(unsigned char *buf)
+{
+	DEBUG("SV SETCHAR LOCA2");
+	memcpy(pl.location+10,buf+1,10);
 }
 
 void sv_setchar_obj(unsigned char *buf)
@@ -966,7 +1058,7 @@ void sv_look7(unsigned char *buf)
 	
 	if (n==7 && s==63)
 	{
-		show_shop=111;
+		show_shop=112;
 		shop=tmplook;
 	}
 	if (show_shop)
@@ -978,6 +1070,44 @@ void sv_look7(unsigned char *buf)
 		show_tuto=0;
 		show_tree=0;
 	}
+}
+
+void sv_look8(unsigned char *buf)	// Blacksmith
+{
+	int n;
+	
+	DEBUG("SV LOOK8");
+	
+	n =*(unsigned char*)(buf+1);
+	shop.nr=*(unsigned short*)(buf+2);
+	
+	if (n>5||n<0)	return;
+	else if (n==5)	show_shop=111;	// Is armour
+	else if (n==4)	show_shop=110;	// Is weapon
+	else
+	{
+		  pl.sitem[n]=*(unsigned short*)(buf+4); // Item sprite
+		pl.sitem_s[n]=*(unsigned char *)(buf+6); // Item stack
+		pl.sitem_f[n]=*(unsigned char *)(buf+7); // Item flags
+	}
+	
+	if (show_shop)
+	{
+		show_wps =0;
+		show_book=0;
+		show_motd=0;
+		show_newp=0;
+		show_tuto=0;
+		show_tree=0;
+	}
+}
+
+extern int noshop;
+
+void sv_closeshop(unsigned char *buf)
+{
+	DEBUG("SV CLOSESHOP");
+	show_shop=0; noshop=QSIZE*3;
 }
 
 void sv_showmotd(unsigned char *buf)
@@ -1155,6 +1285,8 @@ int sv_cmd(unsigned char *buf)
 		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 10;
 		case	SV_SETCHAR_SPELL:	sv_setchar_spell(buf); return 9;
 		case	SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 6;
+		case	SV_SETCHAR_LOCA1:	sv_setchar_location1(buf); return 11;
+		case	SV_SETCHAR_LOCA2:	sv_setchar_location2(buf); return 11;
 
 		case	SV_SETMAP3:		return sv_setmap3(buf,20);
 		case	SV_SETMAP4:		return sv_setmap3(buf,0);
@@ -1197,6 +1329,9 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOOK5:				sv_look5(buf); break;
 		case	SV_LOOK6:				sv_look6(buf); break;
 		case	SV_LOOK7:				sv_look7(buf); return 8;
+		case	SV_LOOK8:				sv_look8(buf); return 8;
+		
+		case	SV_CLOSESHOP:			sv_closeshop(buf); return 1;
 
 		case	SV_SETTARGET:			sv_settarget(buf); return 13;
 

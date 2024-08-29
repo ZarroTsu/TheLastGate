@@ -259,7 +259,7 @@ extern unsigned int mapmarker;
 #define CF_GREATERGOD	(1ull<<45)  // greater god
 #define CF_GREATERINV	(1ull<<46)  // no one sees me, ever
 #define CF_LOCKPICK		(1ull<<47)  // Ability to use lockpicks and evaluate doors
-//#define CF_			(1ull<<48)  //
+#define CF_FIGHT_OFF	(1ull<<48)  // Fightback on/off
 #define CF_SILENCE		(1ull<<49)  // Shuts up NPC greetings so pents isn't as spammy
 #define CF_GCTOME		(1ull<<50)  // Ghost Companion (and Shadow Copy) will automatically teleport with the player
 #define CF_EXTRAEXP		(1ull<<51)  // NPC gives extra exp! Used for STRONG mobs and grind spots
@@ -296,6 +296,7 @@ extern unsigned int mapmarker;
 #define PRXB_POW		(AT_CAP/18)
 
 #define PRXP_RAD		3
+#define PRXL_RAD		2
 
 #define PRXA_RAD		5
 
@@ -407,6 +408,9 @@ extern unsigned int mapmarker;
 #define SK_OPPRESSED2	63
 #define SK_PULSE2		64
 #define SK_MJOLNIR		65
+#define SK_SACRIFICE	66
+#define SK_OBLITERATE	67
+#define SK_SLAM			68
 #define SK_SANGUINE	   219
 #define SK_DWLIGHT     220
 
@@ -427,7 +431,6 @@ extern unsigned int mapmarker;
 #define PCD_AFK				 0
 #define PCD_MINGROUP		 1
 #define PCD_MAXGROUP		 9
-#define PCD_FIGHTBACK		11
 #define PCD_COMPANION		64
 #define PCD_ALLOW			65
 #define PCD_RIDDLER			65
@@ -483,7 +486,7 @@ struct character
 
 	// character stats
 	// [0]=bare value, 0=unknown
-	// [1]=preset modifier, is race/npc dependend
+	// [1]=preset modifier, is race/npc dependent
 	// [2]=race specific maximum
 	// [3]=race specific difficulty to raise (0=not raisable, 1=easy ... 10=hard)
 	// [4]=total value upper bit
@@ -526,9 +529,12 @@ struct character
 
 	// posessions
 	int gold;
-
-	// items carried
-	unsigned int olditem[40]; //
+	
+	unsigned int blacksmith[4]; // blacksmith carry slots
+	
+	unsigned short smithnum;
+	
+	unsigned char olditem[142]; // free slots
 
 	// items worn
 	unsigned int worn[20];
@@ -902,11 +908,11 @@ __attribute__ ((packed));
 #define IF_GEMSTONE      (1ull<<50)     // is a gem
 #define IF_IS_KEY        (1ull<<51)     // is a key and decays on rugs
 #define IF_AUGMENTED     (1ull<<52)     // item was enhanced by a shrine
-#define IF_DIMINISHED    (1ull<<53)     // item was enhanced by a shrine
+#define IF_WHETSTONED    (1ull<<53)     // item was enhanced by a shrine	- Unused, repurpose.
 #define IF_EASEUSE       (1ull<<54)     // item was enhanced by a shrine
-#define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine
+#define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine	- Unused, repurpose.
 #define IF_LEGACY        (1ull<<56)     // item was enhanced by a shrine
-#define IF_DUPLICATED    (1ull<<57)     // item was enhanced by a shrine
+#define IF_DUPLICATED    (1ull<<57)     // item was enhanced by a shrine	- Unused, repurpose.
 #define IF_CAN_SS		 (1ull<<58)		// item CAN be soulstoned
 #define IF_CAN_EN		 (1ull<<59)		// item CAN be enchanted (talisman)
 #define IF_ENCHANTED	 (1ull<<60)		// item has been enchanted
@@ -915,6 +921,7 @@ __attribute__ ((packed));
 #define IF_WEAPON        (IF_WP_SWORD|IF_WP_DAGGER|IF_WP_AXE|IF_WP_STAFF|IF_WP_TWOHAND|IF_OF_DUALSW|IF_WP_CLAW)
 #define IF_ARMORS	     (IF_ARMOR|IF_OF_SHIELD)
 #define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK|IF_JEWELERY|IF_GEMSTONE)
+#define IF_DIRTY         (IF_SOULSTONE|IF_AUGMENTED|IF_WHETSTONED|IF_EASEUSE|IF_LEGACY|IF_ENCHANTED|IF_CORRUPTED|IF_KWAI_UNI|IF_GORN_UNI|IF_PURP_UNI|IF_UNIQUE)
 
 #define BUFFSIZE         (sizeof(struct item)*MAXBUFF)
 #define ITEMSIZE         (sizeof(struct item)*MAXITEM)

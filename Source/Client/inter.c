@@ -616,11 +616,11 @@ int mouse_inventory(int x,int y,int mode)
 		{
 			if (mode==MS_LB_UP)
 			{
-				if (show_shop)
+				if (show_shop && show_shop != 110 && show_shop != 111)
 				{	// Sell item from inventory
 					cmd3(CL_CMD_QSHOP,shop.nr,nr+inv_pos,dept_page);
 				}
-				else 
+				else
 				{	// Push or pull item stacks
 					cmd3(CL_CMD_INV,3,nr+inv_pos,selected_char); 
 				}
@@ -1355,9 +1355,11 @@ void mouse_mapbox(int x,int y,int state)
 	x+=176-16;
 	y+=8;
 	
+	/*
 	if (screen_windowed == 1) {
-        y+=4;
-    }
+		y+=4;
+	}
+	*/
 
 	dist_diff=(screen_renderdist-screen_viewsize)/2;
 
@@ -1553,9 +1555,64 @@ int mouse_shop(int x,int y,int mode)
 	int nr,tx,ty,keys;
 
 	if (!show_shop)     return 0;
-	if (show_shop>=111) return 0;
+	if (show_shop>=112) return 0;
 	
 	keys=0;
+	
+	if (show_shop==110 || show_shop==111) // Blacksmith
+	{
+		if (GetAsyncKeyState(VK_SHIFT)&0x8000)   keys|=1;
+		if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
+		if (GetAsyncKeyState(VK_MENU)&0x8000)    keys|=4;
+	
+		// [X]
+		if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y+80) && y<(GUI_SHOP_Y+94)) 
+		{	if (mode==MS_LB_UP) { show_shop=0; noshop=QSIZE*3; } return 1;	}
+		
+		nr = -1;
+		
+		if (     x>(GUI_SHOP_X+ 44) && x<(GUI_SHOP_X+ 79) && y>(GUI_SHOP_Y+123) && y<(GUI_SHOP_Y+158))	nr = 0;	// Left item
+		if (pl.sitem[1]==17357)	{
+			if ( x>(GUI_SHOP_X+123) && x<(GUI_SHOP_X+158) && y>(GUI_SHOP_Y+ 97) && y<(GUI_SHOP_Y+132))	nr = 1;	// Top-Middle item
+			if ( x>(GUI_SHOP_X+123) && x<(GUI_SHOP_X+158) && y>(GUI_SHOP_Y+149) && y<(GUI_SHOP_Y+184))	nr = 2;	// Bottom-Middle item
+		}
+		else if (x>(GUI_SHOP_X+123) && x<(GUI_SHOP_X+158) && y>(GUI_SHOP_Y+123) && y<(GUI_SHOP_Y+158))	nr = 1;	// Middle item
+		if (     x>(GUI_SHOP_X+202) && x<(GUI_SHOP_X+237) && y>(GUI_SHOP_Y+123) && y<(GUI_SHOP_Y+158))	nr = 3;	// Right item
+		
+		if (     x>(GUI_SHOP_X+ 35) && x<(GUI_SHOP_X+ 82) && y>(GUI_SHOP_Y+211) && y<(GUI_SHOP_Y+225))	nr = 4;	// Left button
+		if (     x>(GUI_SHOP_X+117) && x<(GUI_SHOP_X+164) && y>(GUI_SHOP_Y+211) && y<(GUI_SHOP_Y+225))	nr = 5;	// Middle button
+		if (     x>(GUI_SHOP_X+199) && x<(GUI_SHOP_X+246) && y>(GUI_SHOP_Y+211) && y<(GUI_SHOP_Y+225))	nr = 6;	// Right button
+		
+		if (nr > -1 && nr < 4)		// Item clicks
+		{
+			if (mode==MS_LB_UP)
+			{
+				if (keys == 2 || keys == 4)
+					cmd(CL_CMD_SMITH,shop.nr,nr+16);
+				else if (keys == 1)
+					cmd(CL_CMD_SMITH,shop.nr,nr);
+			}
+			if (mode==MS_RB_UP)
+				cmd(CL_CMD_SMITH,shop.nr,nr+8);
+			hightlight=HL_SHOP;
+			hightlight_sub=nr;
+			return 1;
+		}
+		if (nr > 3 && nr < 7)		// Button clicks
+		{
+			if (pl.sitem[1]!=17356 && (nr == 4 || nr == 6)) return 0;
+			if (mode==MS_LB_UP)
+				cmd(CL_CMD_SMITH,shop.nr,nr);
+			if (mode==MS_RB_UP)
+				cmd(CL_CMD_SMITH,shop.nr,nr+8);
+			return 1;
+		}
+		// prevent clicking the world behind the menu
+		if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y+80) && y<(GUI_SHOP_Y+236))
+			return 1;
+		
+		return 0;
+	}
 	if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
 	
 	// [X]
@@ -1587,7 +1644,7 @@ int mouse_shop(int x,int y,int mode)
 	
 	// prevent clicking the world behind the menu
 	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+281) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+316))
-	{	return 1;	}
+		return 1;
 	
 	return 0;
 }
@@ -1596,7 +1653,7 @@ int mouse_depot(int x,int y,int mode)
 {
 	int n,m,nr,tx,ty;
 
-	if (show_shop!=111) return 0;
+	if (show_shop!=112) return 0;
 	
 	// [X]
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
@@ -1922,6 +1979,7 @@ void mouse(int x,int y,int state)
 	cursor_type=CT_NONE;
 	
 	
+	/*
 	if (screen_windowed == 1) {
 		// Adjust position when windowed
 		//y += 4;
@@ -1932,6 +1990,7 @@ void mouse(int x,int y,int state)
 	{
 		//y -= 2;
 	}
+	*/
 
 	mouse_x=x; mouse_y=y;
 	if (mouse_inventory(x,y,state)) ;

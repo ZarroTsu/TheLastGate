@@ -45,6 +45,7 @@ void cmd(int cmd,int x,int y);
 
 int quit=0;
 char host_addr[84]={MHOST};
+char host_proxy[84]={MPROXY};
 int host_port=5555;
 
 extern char path[];
@@ -606,7 +607,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				}
 				
 				// DEPOT PAGE
-				if (show_shop==111) {
+				if (show_shop==112) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
 					{
 						if (dept_page<7)
@@ -653,7 +654,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				}
 				
 				// DEPOT PAGE
-				if (show_shop==111) {
+				if (show_shop==112) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
 					{
 						if (dept_page>0)

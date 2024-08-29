@@ -593,12 +593,8 @@ void driver_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 	{
 		case    NT_GOTHIT:
 		case    NT_GOTMISS:
-			if (!ch[cn].attack_cn &&
-				!ch[cn].data[PCD_FIGHTBACK] &&                         // fightback
-				ch[cn].misc_action!=DR_GIVE)
-			{
+			if (!ch[cn].attack_cn && WILL_FIGHTBACK(cn))
 				ch[cn].attack_cn = dat1;
-			}
 			break;
 	}
 }

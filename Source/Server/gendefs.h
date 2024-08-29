@@ -6,13 +6,15 @@
 
  **************************************************************************/
 
-#define VERSION				0x000C02
-#define MINVERSION			0x000C00
+#define VERSION				0x000D01
+#define MINVERSION			0x000D00
 
 #define DATDIR				".dat"
 
 #define TICKS				20
 #define TICK				(1000000/TICKS)
+
+#define GAMEYEAR			  40
 
 #define MAPX				1024
 #define MAPY				2048
@@ -306,12 +308,12 @@
 #define SP_MULT_POISON2		110
 #define SP_MULT_IDENTIFY	180
 #define SP_MULT_DISPEL		 90
-#define SP_MULT_DISPEL2		 85
-#define SP_MULT_WEAKEN		100
-#define SP_MULT_WEAKEN2		 95
+#define SP_MULT_DISPEL2		 80
+#define SP_MULT_WEAKEN		110
+#define SP_MULT_WEAKEN2		105
 #define SP_MULT_WARCRY		 95
 #define SP_MULT_TAUNT		100
-#define SP_MULT_BLIND		120
+#define SP_MULT_BLIND		125
 
 // -------- Damage Multipliers -------- //
 
@@ -322,85 +324,85 @@
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  50
-#define DAM_MULT_LEAP		 500
+#define DAM_MULT_LEAP		 375
+#define DAM_MULT_RLEAP		 150
 
 // -------- Buff Duration values -------- //
+#define SP_DUR_MAPMOD		( TICKS * 60 * 60 * 2             )
+#define SP_DUR_SHRINE		( TICKS * 60 * 30                 )
 #define SP_DUR_LIGHT		( TICKS * 60 * 30                 )
-#define SP_DUR_MONSTERS		( TICKS * 60 * 20                 )
+#define SP_DUR_MONSTERS		( TICKS * 60 * 30                 )
 #define SP_DUR_PROTECT		( TICKS * 60 * 10                 )
 #define SP_DUR_ENHANCE		( TICKS * 60 * 10                 )
 #define SP_DUR_BLESS		( TICKS * 60 * 10                 )
-#define SP_DUR_MSHELL(a)	( a * 128                         )
-#define SP_DUR_MSHIELD(a)	( a * 256                         )
 #define SP_DUR_HASTE		( TICKS * 60 * 10                 )
-#define SP_DUR_REGEN		( TICKS * 20                      )
-#define SP_DUR_HEAL			( TICKS * 60                      )
-#define SP_DUR_CURSE2		( TICKS * 40                      )
-#define SP_DUR_CURSE		( TICKS * 60 * 2                  )
-#define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
-#define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
-#define SP_DUR_POISON		( TICKS * 30                      )
-#define SP_DUR_PLAGUE		( TICKS * 60 * 2                  )
-#define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 75          )
-#define SP_DUR_WARCRY		( TICKS * 60                      )
-#define SP_DUR_RALLY		( TICKS * 60 * 5                  )
-#define SP_DUR_SCORCH		( TICKS * 20                      )
-#define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
-#define SP_DUR_SHADOW(a)	( TICKS * 20 + TICKS * a / 5      )
-#define SP_DUR_BLEED		( TICKS * 15                      )
-#define SP_DUR_WEAKEN		( TICKS * 60                      )
-#define SP_DUR_RAGE			( TICKS * 60 * 60 * 2             )
-#define SP_DUR_ARIA			( TICKS * 5                       )
-#define SP_DUR_LETHARGY		( TICKS * 60 * 60 * 2             )
-#define SP_DUR_AGGRAVATE	( TICKS * 20                      )
-#define SP_DUR_CALMRAGE		( TICKS * 60 * 60 * 2             )
+#define SP_DUR_RALLY		( TICKS * 60 * 10                 )
+#define SP_DUR_PULSE		( TICKS * 60 * 10                 )
+#define SP_DUR_ZEPHYR		( TICKS * 60 * 10                 )
+#define SP_DUR_STARL		( TICKS * 60 * 10                 )
+#define SP_DUR_PHALANX		( TICKS * 60 * 10                 )
 
-#define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
-#define SP_DUR_BLIND		( TICKS * 60 * 2                  )
+#define SP_DUR_CURSE		( TICKS * 60 *  2                 )
+#define SP_DUR_PLAGUE		( TICKS * 60 *  2                 )
+#define SP_DUR_WARCRY		( TICKS * 60 *  2                 )
+#define SP_DUR_WEAKEN		( TICKS * 60 *  2                 )
+#define SP_DUR_BLIND		( TICKS * 60 *  2                 )
+#define SP_DUR_SHOCK		( TICKS * 60 *  2                 )
+#define SP_DUR_DOUSE		( TICKS * 60 *  2                 )
+#define SP_DUR_FROSTB		( TICKS * 60 *  2                 )
+
+#define SP_DUR_CURSE2		( TICKS * 60                      )
+#define SP_DUR_HEAL			( TICKS * 60                      )
+#define SP_DUR_POISON		( TICKS * 30                      )
 #define SP_DUR_GUARD		( TICKS * 30                      )
-#define SP_DUR_PULSE		( TICKS * 60 * 5                  )
-#define SP_DUR_SHOCK		( TICKS * 60 * 2                  )
-#define SP_DUR_ZEPHYR		( TICKS * 60 * 5                  )
-#define SP_DUR_DOUSE		( TICKS * 20                      )
-#define SP_DUR_FROSTB		( TICKS * 20                      )
+#define SP_DUR_SCORCH		( TICKS * 20                      )
+#define SP_DUR_AGGRAVATE	( TICKS * 20                      )
+#define SP_DUR_REGEN		( TICKS * 20                      )
+#define SP_DUR_BLEED		( TICKS * 15                      )
 #define SP_DUR_POME			( TICKS *  5                      )
 #define SP_DUR_SOL			( TICKS *  5                      )
-#define SP_DUR_STARL		( TICKS * 60 * 5                  )
-#define SP_DUR_PHALANX		( TICKS * 60                      )
+#define SP_DUR_ARIA			( TICKS *  5                      )
+#define SP_DUR_RAGE			( TICKS *  5                      )
+#define SP_DUR_LETHARGY		( TICKS *  5                      )
 
-#define SP_DUR_SHRINE		( TICKS * 60 * 30                 )
-#define SP_DUR_MAPMOD		( TICKS * 60 * 120                )
+#define SP_DUR_MSHELL(a)	( a * 128                         )
+#define SP_DUR_MSHIELD(a)	( a * 256                         )
+#define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
+#define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
+#define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 75          )
+#define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
+#define SP_DUR_SHADOW(a)	( TICKS * 20 + TICKS * a / 5      )
+#define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
 
 // -------- Skill Exhaustion values -------- //
 #define SK_EXH_MAXIMUM	 	(TICKS *10)
-#define SK_EXH_LIGHT		(TICKS / 4)
+#define SK_EXH_LIGHT		(TICKS / 2)
 #define SK_EXH_PROTECT		(TICKS / 2)
 #define SK_EXH_ENHANCE		(TICKS / 2)
-#define SK_EXH_BLESS		(TICKS)
-#define SK_EXH_MSHIELD		(TICKS * 3)
-#define SK_EXH_HASTE		(TICKS * 3)
-#define SK_EXH_HEAL			(TICKS * 3)
-#define SK_EXH_CURSE		(TICKS * 4)
-#define SK_EXH_SLOW			(TICKS * 4)
-#define SK_EXH_POISON		(TICKS * 5)
-#define SK_EXH_WARCRY		(TICKS * 3)
-#define SK_EXH_IDENT		(TICKS * 2)
-#define SK_EXH_BLAST		(TICKS * 6)
-#define SK_EXH_RECALL		(TICKS)
-#define SK_EXH_DISPEL		(TICKS * 4)
-#define SK_EXH_GHOST		(TICKS * 8)
-#define SK_EXH_SHADOW		(TICKS * 4)
-#define SK_EXH_CLEAVE		(TICKS * 5)
+#define SK_EXH_BLESS		(TICKS / 2)
+#define SK_EXH_HASTE		(TICKS / 2)
+#define SK_EXH_RECALL		(TICKS / 2)
+#define SK_EXH_ZEPHYR		(TICKS / 2)
+#define SK_EXH_RAGE			(TICKS / 2)
+#define SK_EXH_PULSE		(TICKS / 2)
+#define SK_EXH_IDENT		(TICKS / 2)
+#define SK_EXH_LETHARGY		(TICKS * 2)
+#define SK_EXH_MSHIELD		(TICKS * 2)
+#define SK_EXH_HEAL			(TICKS * 2)
 #define SK_EXH_WEAKEN		(TICKS * 3)
-#define SK_EXH_LETHARGY		(TICKS * 4)
-
-#define SK_EXH_PULSE		(TICKS * 6)
-#define SK_EXH_ZEPHYR		(TICKS * 4)
+#define SK_EXH_WARCRY		(TICKS * 3)
 #define SK_EXH_BLIND		(TICKS * 3)
 #define SK_EXH_TAUNT		(TICKS * 3)
-#define SK_EXH_LEAP			(TICKS * 5)
-#define SK_EXH_RAGE			(TICKS * 4)
-#define SK_EXH_SHIFT		(TICKS *10)
+#define SK_EXH_CURSE		(TICKS * 4)
+#define SK_EXH_SLOW			(TICKS * 4)
+#define SK_EXH_DISPEL		(TICKS * 4)
+#define SK_EXH_SHADOW		(TICKS * 4)
+#define SK_EXH_CLEAVE		(TICKS * 5)
+#define SK_EXH_POISON		(TICKS * 5)
+#define SK_EXH_LEAP			(TICKS * 6)
+#define SK_EXH_BLAST		(TICKS * 6)
+#define SK_EXH_GHOST		(TICKS * 8)
+#define SK_EXH_SHIFT		(TICKS * 8)
 
 #define GLVDICE		4
 

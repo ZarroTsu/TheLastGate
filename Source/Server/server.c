@@ -280,7 +280,7 @@ void discord_gmoon(void)
 	minute = (globs->mdtime / MD_MIN) % 60;
 	day = globs->mdday % 28 + 1;
 	month = globs->mdday / 28 + 1;
-	year  = globs->mdyear;
+	year  = globs->mdyear + GAMEYEAR;
 	
 	fprintf(discordWho, "```diff\n");
 	fprintf(discordWho, "It's %d:%02d on the %d%s%s%s%s%s%s%s of the %d%s%s%s%s month of the year %d.\n",
@@ -1496,21 +1496,8 @@ int main(int argc, char *args[])
 		{
 			plr_logout(n, 0, LO_SHUTDOWN);
 		}
-		/* // (vvv REMOVE AFTER UPDATE!!!)
-		if (IS_PLAYER(n)) 
-		{
-			for (m=0;m<62;m++)
-			{
-				st[n].depot[0][m] = ch[n].depot[m];
-				ch[n].depot[m] = 0;
-			}
-			for (m=0;m<40;m++)
-			{
-				ch[n].depot[m] = ch[n].item[m];
-				ch[n].item[m] = 0;
-			}
-		}
-		*/ // (^^^ REMOVE AFTER UPDATE!!!)
+		// (vvv REMOVE AFTER UPDATE!!!)
+		// */ // (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);
 	}

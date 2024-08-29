@@ -386,8 +386,8 @@ void flush_char(int cn)
 	for (n = 0; n<MAXITEMS; n++)			if (IS_SANEITEM(in = ch[cn].item[n]))						msync(&it[in], sizeof(struct item), MS_ASYNC);
 	for (n = 0; n<20; n++)					if (IS_SANEITEM(in = ch[cn].worn[n]))						msync(&it[in], sizeof(struct item), MS_ASYNC);
 	for (n = 0; n<12; n++)					if (IS_SANEITEM(in = ch[cn].alt_worn[n]))					msync(&it[in], sizeof(struct item), MS_ASYNC);
+	for (n = 0; n<4; n++)					if (IS_SANEITEM(in = ch[cn].blacksmith[n]))					msync(&it[in], sizeof(struct item), MS_ASYNC);
 	for (n = 0; n<MAXBUFFS; n++)			if (IS_SANEITEM(in = ch[cn].spell[n]))						msync(&bu[in], sizeof(struct item), MS_ASYNC);
-//	for (n = 0; n<62; n++)					if (IS_SANEITEM(in = ch[cn].depot[n]))						msync(&it[in], sizeof(struct item), MS_ASYNC);
 	for (n = 0; n<ST_PAGES*ST_SLOTS; n++) 	if (IS_SANEITEM(in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]))	msync(&it[in], sizeof(struct item), MS_ASYNC);
 }
 

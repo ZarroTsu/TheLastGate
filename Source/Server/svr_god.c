@@ -910,8 +910,8 @@ int god_give_char(int in, int cn)
 	{
 		in2 = ch[cn].item[n];
 		flag = 1;
-		if (it[in].driver == 93 && it[in].data[4] != it[in2].data[4]) flag = 0;
-		if (it[in].driver == 110 && it[in].data[0] == 5 && it[in2].data[0] == 5 && it[in].data[1] != it[in2].data[1]) flag = 0;
+		if (IS_MATCH_CAT(in, in2)) flag = 0;
+		if (IS_MATCH_GSC(in, in2)) flag = 0;
 		if (it[in].driver == 133 && it[in].data[0] != it[in2].data[0]) flag = 0;
 		// Find a stackable item of the same template
 		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[in2].temp && it[in2].stack<10 && flag)
@@ -985,13 +985,7 @@ int god_take_from_char(int in, int cn)
 	}
 	else
 	{
-		for (n = 0; n<MAXITEMS; n++)
-		{
-			if (ch[cn].item[n]==in)
-			{
-				break;
-			}
-		}
+		for (n = 0; n<MAXITEMS; n++) if (ch[cn].item[n]==in) break;
 		if (n<MAXITEMS)
 		{
 			ch[cn].item[n] = 0;
@@ -999,31 +993,30 @@ int god_take_from_char(int in, int cn)
 		}
 		else
 		{
-			for (n = 0; n<20; n++)
-			{
-				if (ch[cn].worn[n]==in)
-				{
-					break;
-				}
-			}
+			for (n = 0; n<20; n++) if (ch[cn].worn[n]==in) break;
 			if (n<20)
 			{
 				ch[cn].worn[n] = 0;
 			}
 			else
 			{
-				for (n = 0; n<12; n++)
+				for (n = 0; n<12; n++) if (ch[cn].alt_worn[n]==in) break;
+				if (n<12)
 				{
-					if (ch[cn].alt_worn[n]==in)
+					ch[cn].alt_worn[n] = 0;
+				}
+				else
+				{
+					for (n = 0; n<4; n++) if (ch[cn].blacksmith[n]==in) break;
+					if (n<4)
 					{
-						break;
+						ch[cn].blacksmith[n] = 0;
+					}
+					else
+					{
+						return 0;
 					}
 				}
-				if (n==12)
-				{
-					return 0;
-				}
-				ch[cn].alt_worn[n] = 0;
 			}
 		}
 	}
@@ -1615,7 +1608,7 @@ void god_top(int cn)
 	            (globs->mdday==2 ? "nd" : ""),
 	            (globs->mdday==3 ? "rd" : ""),
 	            (globs->mdday>3 ? "th" : ""),
-	            globs->mdyear, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
+	            globs->mdyear+GAMEYEAR, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
 
 	if ((globs->mdday % 28) + 1==1)
 	{
@@ -4215,6 +4208,17 @@ void god_destroy_items(int cn)
 			}
 		}
 	}
+	for (n = 0; n<4; n++)
+	{
+		if ((in = ch[cn].blacksmith[n])!=0)
+		{
+			ch[cn].blacksmith[n] = 0;
+			if (in>0 && in<MAXITEM)
+			{
+				it[in].used = USE_EMPTY;
+			}
+		}
+	}
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n])!=0)
@@ -4285,21 +4289,9 @@ void god_racechange(int co, int temp, int keepstuff)
 	{
 		old_dpt = ch[co];
 		dpt = st[co];
-		/*
-		for (n = 0; n<62; n++)
-//	//	//	ch[co].depot[n] = 0;
-		*/
 		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 			st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
-		
 		god_destroy_items(co);
-		/*
-		for (n = 0; n<62; n++)
-		{
-//	//	//	ch[co].depot[n] = old_dpt.depot[n];
-//	//	//	it[ch[co].depot[n]].carried = co;
-		}
-		*/
 		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 		{
 			st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = dpt.depot[n/ST_SLOTS][n%ST_SLOTS];
@@ -4361,9 +4353,8 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	for (n = 0; n<MAXBUFFS; n++) ch[co].spell[n] = 0;
 	for (n = 0; n<100; n++) ch[co].data[n] = old.data[n];
-//	for (n = 0; n<62; n++) { ch[co].depot[n] = old.depot[n]; it[ch[co].depot[n]].carried = co; }
 	for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
-	{ 
+	{
 		st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = dpt.depot[n/ST_SLOTS][n%ST_SLOTS];
 		it[st[co].depot[n/ST_SLOTS][n%ST_SLOTS]].carried = co;
 	}
@@ -4468,13 +4459,16 @@ void god_racechange(int co, int temp, int keepstuff)
 			ch[co].alt_worn[n] = old.alt_worn[n]; it[ch[co].alt_worn[n]].carried = co;
 			ch[co].tree_node[n] = old.tree_node[n];
 		}
+		for (n = 0; n<4; n++) {ch[co].blacksmith[n] = old.blacksmith[n]; it[ch[co].blacksmith[n]].carried = co;}
+		ch[co].os_tree   = old.os_tree;
+		
 		// Re-acquire previously learned skills
 		for (n = 0; n<50; n++) if (ch[co].skill[n][0]==0 && old.skill[n][0] && ch[co].skill[n][2])
 			ch[co].skill[n][0] = 1;
 		
-		if (old.flags & CF_SENSE)    ch[co].flags |= CF_SENSE;
-		if (old.flags & CF_APPRAISE) ch[co].flags |= CF_APPRAISE;
-		if (old.flags & CF_LOCKPICK) ch[co].flags |= CF_LOCKPICK;
+		if (old.flags & CF_SENSE)       ch[co].flags   |= CF_SENSE;
+		if (old.flags & CF_APPRAISE)    ch[co].flags   |= CF_APPRAISE;
+		if (old.flags & CF_LOCKPICK)    ch[co].flags   |= CF_LOCKPICK;
 		if (old.kindred & KIN_IDENTIFY) ch[co].kindred |= KIN_IDENTIFY;
 		
 		ch[co].bs_points = old.bs_points;
@@ -4508,11 +4502,11 @@ void god_racechange(int co, int temp, int keepstuff)
 			n = 0;
 			if 		(IS_SEYAN_DU(co)) 	 n = SK_PROX;
 			else if (IS_ARCHTEMPLAR(co)) n = SK_DISPEL;
-			else if (IS_SKALD(co)) 		 n = SK_BLIND;
+			else if (IS_SKALD(co)) 		 n = SK_PRECISION;
 			else if (IS_WARRIOR(co)) 	 n = SK_GEARMAST;
 			else if (IS_SORCERER(co)) 	 n = SK_MSHIELD;
 			else if (IS_SUMMONER(co)) 	 n = SK_IMMUN;
-			else if (IS_ARCHHARAKIM(co)) n = SK_POISON;
+			else if (IS_ARCHHARAKIM(co)) n = SK_SHIELD;
 			else if (IS_BRAVER(co)) 	 n = SK_TACTICS;
 			else if (IS_LYCANTH(co)) 	 n = SK_HASTE;
 			if (n)
@@ -4556,6 +4550,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		for (n = 0; n<MAXITEMS; n++) ch[co].item[n] = 0;
 		for (n = 0; n<20; n++) ch[co].worn[n] 		= 0;
 		for (n = 0; n<12; n++) ch[co].alt_worn[n] 	= 0;
+		for (n = 0; n<4; n++)  ch[co].blacksmith[n]	= 0;
 		
 		ch[co].data[18] = 0;      // pentagram experience
 		ch[co].data[20] = 0;      // highest gorge solved
@@ -5051,15 +5046,12 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 
 	chlog(cn, "Changed into %s", ch_temp[t].name);
 
-	ch[cn].hp[1] = ch_temp[t].hp[1];
 	ch[cn].hp[2] = ch_temp[t].hp[2];
 	ch[cn].hp[3] = ch_temp[t].hp[3];
 
-	ch[cn].end[1] = ch_temp[t].end[1];
 	ch[cn].end[2] = ch_temp[t].end[2];
 	ch[cn].end[3] = ch_temp[t].end[3];
 
-	ch[cn].mana[1] = ch_temp[t].mana[1];
 	ch[cn].mana[2] = ch_temp[t].mana[2];
 	ch[cn].mana[3] = ch_temp[t].mana[3];
 
@@ -5086,7 +5078,6 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 
 	for (n = 0; n<5; n++)
 	{
-		ch[cn].attrib[n][1] = ch_temp[t].attrib[n][1];
 		ch[cn].attrib[n][2] = ch_temp[t].attrib[n][2];
 		ch[cn].attrib[n][3] = ch_temp[t].attrib[n][3];
 	}
@@ -5098,7 +5089,6 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 			B_SK(cn, n) = ch_temp[t].skill[n][0];
 			xlog("added %s to %s", skilltab[n].name, ch[cn].name);
 		}
-		ch[cn].skill[n][1] = ch_temp[t].skill[n][1];
 		ch[cn].skill[n][2] = ch_temp[t].skill[n][2];
 		ch[cn].skill[n][3] = ch_temp[t].skill[n][3];
 	}

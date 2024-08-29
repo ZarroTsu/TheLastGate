@@ -28,6 +28,12 @@
 /* *** GLOBALS *** */
 #define IS_GLOB_MAYHEM			(globs->flags & GF_MAYHEM)
 
+/* *** ANIMATION *** */
+#define A_ST(cn)				(ch_base_status(ch[(cn)].status))
+#define IS_CNSTANDING(cn)		(A_ST(cn)>=  0&&A_ST(cn)<=  7)
+#define IS_CNWALKING(cn)		(A_ST(cn)== 16||A_ST(cn)== 24||A_ST(cn)== 32||A_ST(cn)== 40||A_ST(cn)== 48||A_ST(cn)== 60||A_ST(cn)== 72||A_ST(cn)== 84||A_ST(cn)== 96||A_ST(cn)==100||A_ST(cn)==104||A_ST(cn)==108||A_ST(cn)==112||A_ST(cn)==116||A_ST(cn)==120||A_ST(cn)==124||A_ST(cn)==128||A_ST(cn)==132||A_ST(cn)==136||A_ST(cn)==140||A_ST(cn)==144||A_ST(cn)==148||A_ST(cn)==152)
+#define IS_CNFIGHTING(cn)		(A_ST(cn)==160||A_ST(cn)==168||A_ST(cn)==176||A_ST(cn)==184)
+
 /* *** ITEMS *** */
 
 // Use flag check on a STRUCTURE ELEMENT (works for characters too)
@@ -51,12 +57,18 @@
 #define IS_UNIQUE(in)			(it[(in)].flags & IF_UNIQUE)
 #define IS_QUESTITEM(in)		((it[(in)].flags & IF_SHOPDESTROY) || (it[(in)].flags & IF_LABYDESTROY) || (it[(in)].flags & IF_NODEPOT))
 #define IS_GEMSTONE(in)			(it[(in)].flags & IF_GEMSTONE)
-#define IS_SOULSTONE(in)		(it[(in)].driver==68)
-#define IS_SOULFOCUS(in)		(it[(in)].driver==92)
-#define IS_SOULCAT(in)			(it[(in)].driver==93)
+#define IS_SOULSTONE(in)		(it[(in)].driver== 68)
+#define IS_SOULFOCUS(in)		(it[(in)].driver== 92)
+#define IS_SOULCAT(in)			(it[(in)].driver== 93)
+#define IS_GSCROLL(in)			(it[(in)].driver==110)
+#define IS_CORRUPTOR(in)		(it[(in)].driver==133)
 #define IS_TAROT(in)			((it[(in)].temp>=IT_CH_FOOL && it[(in)].temp<=IT_CH_WORLD) || (it[(in)].temp>=IT_CH_FOOL_R && it[(in)].temp<=IT_CH_WORLD_R))
 #define IS_CONTRACT(in)			(it[(in)].temp==MCT_CONTRACT)
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
+
+#define IS_MATCH_CAT(in, in2)	(IS_SOULCAT(in)   && it[(in)].data[4] != it[(in2)].data[4])
+#define IS_MATCH_GSC(in, in2)	(IS_GSCROLL(in)   && it[(in)].data[1] != it[(in2)].data[1] && it[(in)].data[0] == 5 && it[(in2)].data[0] == 5)
+#define IS_MATCH_COR(in, in2)	(IS_CORRUPTOR(in) && it[(in)].data[0] != it[(in2)].data[0] && it[(in)].data[0] != 0 && it[(in2)].data[0] != 0)
 
 int is_apotion(int in);
 int is_ascroll(int in);
@@ -119,6 +131,8 @@ int is_ascroll(int in);
 #define IS_LONG_RESPAWN(temp) 	(temp==CT_RATKING || temp==CT_GREENKING || temp==CT_DREADKING || temp==CT_LIZEMPEROR || temp==CT_VILEQUEEN || temp==CT_BSMAGE1 || temp==CT_BSMAGE2 || temp==CT_BSMAGE3 || temp==CT_SCORP_Q)
 
 /* *** CHARACTERS *** */
+
+#define WILL_FIGHTBACK(cn)		(!(ch[(cn)].flags & CF_FIGHT_OFF) && ch[(cn)].misc_action != DR_GIVE)
 
 // Sanity checks on character numbers
 #define IS_SANECHAR(cn)     	((cn) > 0 && (cn) < MAXCHARS)
@@ -209,11 +223,11 @@ int is_ascroll(int in);
 #define IS_PROX_CLASS(cn)		(B_SK(cn, SK_PROX) || IS_SEYAN_DU(cn) || IS_ARCHTEMPLAR(cn) || IS_WARRIOR(cn))
 #define CAN_ARTM_PROX(cn)		(IS_SEYA_OR_ARTM(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
 #define CAN_WARR_PROX(cn)		(IS_SEYA_OR_WARR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_SORC_PROX(cn)		(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_ARHR_PROX(cn)		(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
-#define CAN_BRAV_PROX(cn)		(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF))
+#define CAN_SORC_PROX(cn)		(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
+#define CAN_ARHR_PROX(cn)		(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
+#define CAN_BRAV_PROX(cn)		(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
 
-#define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]>=1300 && ch[(cn)].data[CHD_GROUP]<=1320)
+#define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]==13)
 
 /* *** SKILLS *** */
 
@@ -242,6 +256,8 @@ int is_ascroll(int in);
 #define IS_P_SKILL(a)			(a==8||a==9||a==23||a==32)
 
 #define CAN_SENSE(cn)			((ch[(cn)].flags & CF_SENSE) || !IS_PLAYER(cn))
+
+#define SP_SUPPRESS(p, cn, co)	(max(0,(p-(p*(M_AT(co,AT_WIL)-M_AT(cn, AT_WIL))/500+M_SK(co,SK_RESIST)/20))/2))
 
 // Slow's formula (used to degrade)
 #define SLOWFORM(n)				(n/2*9/10)
@@ -275,7 +291,7 @@ int is_ascroll(int in);
 #define DESC_PREIST		"When equipped, 20%% of damage taken from hits is dealt to Mana instead.\n"
 #define DESC_EMPRESS	"When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n"
 #define DESC_EMPEROR	"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
-#define DESC_HEIROPH	"When equipped, your Dispel spell will no longer affect you or your allies, and instead removes enemy buffs.\n"
+#define DESC_HEIROPH	"When equipped, Immunize and Inoculate from your Dispel spell lasts four times as long, but your Dispel spell can only remove a single buff or debuff at a time.\n"
 #define DESC_LOVERS		"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
 #define DESC_CHARIOT	"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n"
 #define DESC_STRENGTH	"When equipped, reduces your attack speed, cast speed, and cooldown recovery speed by 15%%, but grants 20%% more damage with hits.\n"
@@ -286,7 +302,7 @@ int is_ascroll(int in);
 #define DESC_DEATH		"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
 #define DESC_TEMPER		"When equipped, your Taunt skill grants 100%% more Guard power, but Guard duration is halved.\n"
 #define DESC_DEVIL		"When equipped, 33%% of all skill and spell costs are instead taken from your Hitpoints.\n"
-#define DESC_TOWER		"When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays and has reduced duration.\n"
+#define DESC_TOWER		"When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays over time and has a reduced duration.\n"
 #define DESC_STAR		"When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n"
 #define DESC_MOON		"When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n"
 #define DESC_SUN		"When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n"
@@ -300,11 +316,11 @@ int is_ascroll(int in);
 #define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
 #define DESC_HEIROP_R	"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R	"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
-#define DESC_CHARIO_R	"When equipped, your debuffs ignore 20%% of target resistance and immunity, but are 25%% weaker once applied.\n"
+#define DESC_CHARIO_R	"When equipped, your debuffs ignore 25%% of target resistance and immunity, but are 20%% weaker once applied.\n"
 #define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
 #define DESC_HERMIT_R	"When equipped, your Rage and Calm skills instead cost endurance over time.\n"
 #define DESC_WHEEL_R	"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
-#define DESC_JUSTIC_R	"When equipped, your Leap skill triggers three times per use choosing random nearby targets, but no longer inflicts stun and no longer hits surrounding targets.\n"
+#define DESC_JUSTIC_R	"When equipped, your Leap skill no longer repeats. Leap now always deals a critical hit and stuns everything it hits.\n"
 #define DESC_HANGED_R	"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"
 #define DESC_DEATH_R	"When equipped, your Zephyr skill no longer triggers on hit, and instead triggers when an enemy attacks you.\n"
 #define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"

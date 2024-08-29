@@ -3126,7 +3126,7 @@ void answer_time(int cn, int co)
 	        (globs->mdday==2 ? "nd" : ""),
 	        (globs->mdday==3 ? "rd" : ""),
 	        (globs->mdday>3 ? "th" : ""),
-	        globs->mdyear, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
+	        globs->mdyear+GAMEYEAR, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
 }
 
 void answer_points(int cn, int co, int nr)

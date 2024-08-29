@@ -79,7 +79,6 @@ struct pdata pdata={"","","",0};
 //--------------
 
 extern int domusic,dosound,smode;
-extern char host_addr[];
 static int opmusic,opsound,opshadow,opdarkmode;
 int race=0,sex=0;
 

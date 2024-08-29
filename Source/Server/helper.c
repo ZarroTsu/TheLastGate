@@ -907,6 +907,8 @@ int st_skillcount(int cn, int v)
 	if ((in = ch[cn].worn[WN_CHARM2]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
 	if (IS_SINBINDER(in = ch[cn].worn[WN_LRING]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
 	if (IS_SINBINDER(in = ch[cn].worn[WN_RRING]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
+	if ((n = ch[cn].worn[WN_LRING]) && (it[n].temp==IT_SIGN_SYMM) && IS_SINBINDER(in = ch[cn].worn[WN_RRING]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
+	if ((n = ch[cn].worn[WN_RRING]) && (it[n].temp==IT_SIGN_SYMM) && IS_SINBINDER(in = ch[cn].worn[WN_LRING]) && (it[in].flags & IF_CORRUPTED) && it[in].cost == v) count++;
 	
 	return count;
 }
@@ -956,6 +958,8 @@ int get_best_worn(int cn, int v)
 			case WN_LHAND:
 				if (IS_WPDUALSW(in))
 					n = get_best_weapon(cn, SK_DUAL);
+				else if (IS_WPDAGGER(in))
+					n = get_best_weapon(cn, SK_DAGGER);
 				else 
 					n = get_best_weapon(cn, SK_SHIELD);
 				break;
@@ -1190,27 +1194,18 @@ int get_casino_potion()
 int get_casino_scroll()
 {
 	static int item[] = {
-		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
-		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
-		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
-		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6, 
-		
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
 		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
-		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
-		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
-		
 		IT_POP_ISPEL, IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6, 
-		IT_POP_ISPEL, IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6, 
-		
 		IT_POP_SSPEL, IT_POP_SSPEL+1, IT_POP_SSPEL+2, IT_POP_SSPEL+3, IT_POP_SSPEL+4, IT_POP_SSPEL+5, IT_POP_SSPEL+6, 
 		
-		IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, 
-		IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, 
+		IT_EXPS, IT_LUKS, IT_RD_HP, IT_RD_MP, 2475,
 		
-		IT_RD_HP, IT_RD_HP, IT_RD_HP, 
-		IT_RD_MP, IT_RD_MP, IT_RD_MP, 
+		2120, 2121, 2122, 2488, 2923, 2924, 2962, 
+		1928, 1929, 1930, 1931, 1932, 1933, 1934, 
 		
-		IT_RD_BRV, IT_RD_WIL, IT_RD_INT, IT_RD_AGL, IT_RD_STR
+		IT_RD_BRV, IT_RD_WIL, IT_RD_INT, IT_RD_AGL, IT_RD_STR,
+		IT_OS_BRV, IT_OS_WIL, IT_OS_INT, IT_OS_AGL, IT_OS_STR,
 	};
 	return item[RANDOM(sizeof( item) / sizeof(int))];
 }
@@ -1222,19 +1217,10 @@ int get_casino_tarot()
 		IT_CH_HEIROPH, IT_CH_LOVERS, IT_CH_CHARIOT, IT_CH_STRENGTH, IT_CH_HERMIT, 
 		IT_CH_WHEEL, IT_CH_JUSTICE, IT_CH_HANGED, IT_CH_DEATH, IT_CH_TEMPER, 
 		IT_CH_DEVIL, IT_CH_TOWER, IT_CH_STAR, IT_CH_MOON, IT_CH_SUN, IT_CH_JUDGE, IT_CH_WORLD, 
-		IT_CH_FOOL, IT_CH_MAGI, IT_CH_PREIST, IT_CH_EMPRESS, IT_CH_EMPEROR, 
-		IT_CH_HEIROPH, IT_CH_LOVERS, IT_CH_CHARIOT, IT_CH_STRENGTH, IT_CH_HERMIT, 
-		IT_CH_WHEEL, IT_CH_JUSTICE, IT_CH_HANGED, IT_CH_DEATH, IT_CH_TEMPER, 
-		IT_CH_DEVIL, IT_CH_TOWER, IT_CH_STAR, IT_CH_MOON, IT_CH_SUN, IT_CH_JUDGE, IT_CH_WORLD, 
-		IT_CH_FOOL, IT_CH_MAGI, IT_CH_PREIST, IT_CH_EMPRESS, IT_CH_EMPEROR, 
-		IT_CH_HEIROPH, IT_CH_LOVERS, IT_CH_CHARIOT, IT_CH_STRENGTH, IT_CH_HERMIT, 
-		IT_CH_WHEEL, IT_CH_JUSTICE, IT_CH_HANGED, IT_CH_DEATH, IT_CH_TEMPER, 
-		IT_CH_DEVIL, IT_CH_TOWER, IT_CH_STAR, IT_CH_MOON, IT_CH_SUN, IT_CH_JUDGE, IT_CH_WORLD, 
-		
 		IT_CH_FOOL_R, IT_CH_MAGI_R, IT_CH_PREIST_R, IT_CH_EMPRES_R, IT_CH_EMPERO_R, 
 		IT_CH_HEIROP_R, IT_CH_LOVERS_R, IT_CH_CHARIO_R, IT_CH_STRENG_R, IT_CH_HERMIT_R, 
 		IT_CH_WHEEL_R, IT_CH_JUSTIC_R, IT_CH_HANGED_R, IT_CH_DEATH_R, IT_CH_TEMPER_R, 
-		IT_CH_DEVIL_R, IT_CH_TOWER_R, IT_CH_STAR_R, IT_CH_MOON_R, IT_CH_SUN_R, IT_CH_JUDGE_R, IT_CH_WORLD_R
+		IT_CH_DEVIL_R, IT_CH_TOWER_R, IT_CH_STAR_R, IT_CH_MOON_R, IT_CH_SUN_R, IT_CH_JUDGE_R, IT_CH_WORLD_R 
 	};
 	return item[RANDOM(sizeof( item) / sizeof(int))];
 }
@@ -1242,52 +1228,30 @@ int get_casino_tarot()
 int get_casino_ring()
 {
 	static int item[] = {
-		IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, 
-		IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, IT_SILV_RING, 
-		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
-		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
-		2073, 2074, 2075, 2076, 
-		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
-		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
-		2073, 2074, 2075, 2076, 
-		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
-		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
-		2073, 2074, 2075, 2076, 
+		IT_SILV_RING, 
 		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
 		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
 		2073, 2074, 2075, 2076, 
 		
-		IT_GOLD_RING, IT_GOLD_RING, IT_GOLD_RING, 
-		IT_GOLD_RING, IT_GOLD_RING, IT_GOLD_RING, 
+		IT_GOLD_RING, 
 		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
 		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
 		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
-		2085, 2086, 
-		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
-		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
-		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
-		2085, 2086, 
-		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
-		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
-		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
-		2085, 2086, 
+		2085, 2086, 2689, 
 		
-		IT_PLAT_RING, IT_PLAT_RING, 
-		IT_PLAT_RING, IT_PLAT_RING, 
+		IT_PLAT_RING, 
 		1414, 1420, 1426, 1415, 1421, 1427, 1416, 1422, 1428, 
 		1417, 1423, 1429, 1418, 1424, 1430, 1419, 1425, 1431, 
 		2087, 2091, 2097, 2088, 2092, 2098, 2089, 2093, 2099, 
-		2090, 2094, 2100, 2095, 2101, 2102, 
-		1414, 1420, 1426, 1415, 1421, 1427, 1416, 1422, 1428, 
-		1417, 1423, 1429, 1418, 1424, 1430, 1419, 1425, 1431, 
-		2087, 2091, 2097, 2088, 2092, 2098, 2089, 2093, 2099, 
-		2090, 2094, 2100, 2095, 2101, 2102, 
+		2090, 2094, 2100, 2095, 2101, 2102, 2690, 2691, 
 		
-		1272, 1272, 1272, 1272, 
-		1273, 1273, 1273, 1273, 
-		2399, 2399, 2399, 
-		2381, 2381, 2381, 
-		2103, 2103, 
+		1272, 1273, 2399, 2381, 2103, 2482, 2483,
+		
+		3343, 3344, 3345, 
+		3346, 3347, 3348, 3349, 3350, 3351, 3352, 3353, 3354, 
+		
+		3355, 
+		3425, 3426, 3427, 3428, 3429, 3430, 3431, 3432, 3433,
 		
 		IT_TW_PROPHET, IT_TW_SINBIND
 	};
@@ -1570,108 +1534,115 @@ int get_special_spr(int temp, int spr)
 	// Return the sprite that we want for the magic/rare item
 	switch(temp)
 	{
-		case IT_DAGG_STEL: spr = 4950; break;
-		case IT_STAF_STEL: spr = 4951; break;
-		case IT_SPEA_STEL: spr = 4952; break;
-		case IT_SHIE_STEL: spr = 4953; break;
-		case IT_SWOR_STEL: spr = 4954; break;
-		case IT_DUAL_STEL: spr = 4955; break;
-		case IT_AXXE_STEL: spr = 4956; break;
-		case IT_THSW_STEL: spr = 4957; break;
-		case IT_GAXE_STEL: spr = 4958; break;
-		case IT_DAGG_GOLD: spr = 4959; break;
-		case IT_STAF_GOLD: spr = 4960; break;
-		case IT_SPEA_GOLD: spr = 4961; break;
-		case IT_SHIE_GOLD: spr = 4962; break;
-		case IT_SWOR_GOLD: spr = 4963; break;
-		case IT_DUAL_GOLD: spr = 4964; break;
-		case IT_AXXE_GOLD: spr = 4965; break;
-		case IT_THSW_GOLD: spr = 4966; break;
-		case IT_GAXE_GOLD: spr = 4967; break;
-		case IT_DAGG_EMER: spr = 4968; break;
-		case IT_STAF_EMER: spr = 4969; break;
-		case IT_SPEA_EMER: spr = 4970; break;
-		case IT_SHIE_EMER: spr = 4971; break;
-		case IT_SWOR_EMER: spr = 4972; break;
-		case IT_DUAL_EMER: spr = 4973; break;
-		case IT_AXXE_EMER: spr = 4974; break;
-		case IT_THSW_EMER: spr = 4975; break;
-		case IT_GAXE_EMER: spr = 4976; break;
-		case IT_DAGG_CRYS: spr = 4977; break;
-		case IT_STAF_CRYS: spr = 4978; break;
-		case IT_SPEA_CRYS: spr = 4979; break;
-		case IT_SHIE_CRYS: spr = 4980; break;
-		case IT_SWOR_CRYS: spr = 4981; break;
-		case IT_DUAL_CRYS: spr = 4982; break;
-		case IT_AXXE_CRYS: spr = 4983; break;
-		case IT_THSW_CRYS: spr = 4984; break;
-		case IT_GAXE_CRYS: spr = 4985; break;
-		case IT_DAGG_TITN: spr = 4986; break;
-		case IT_STAF_TITN: spr = 4987; break;
-		case IT_SPEA_TITN: spr = 4988; break;
-		case IT_SHIE_TITN: spr = 4989; break;
-		case IT_SWOR_TITN: spr = 4990; break;
-		case IT_DUAL_TITN: spr = 4991; break;
-		case IT_AXXE_TITN: spr = 4992; break;
-		case IT_THSW_TITN: spr = 4993; break;
-		case IT_GAXE_TITN: spr = 4994; break;
-		case IT_DAGG_ADAM: spr = 4995; break;
-		case IT_STAF_ADAM: spr = 4996; break;
-		case IT_SPEA_ADAM: spr = 4997; break;
-		case IT_SHIE_ADAM: spr = 4998; break;
-		case IT_SWOR_ADAM: spr = 4999; break;
-		case IT_DUAL_ADAM: spr = 5000; break;
-		case IT_AXXE_ADAM: spr = 5001; break;
-		case IT_THSW_ADAM: spr = 5002; break;
-		case IT_GAXE_ADAM: spr = 5003; break;
-		case IT_CLAW_STEL: spr = 5004; break;
-		case IT_CLAW_GOLD: spr = 5005; break;
-		case IT_CLAW_EMER: spr = 5006; break;
-		case IT_CLAW_CRYS: spr = 5007; break;
-		case IT_CLAW_TITN: spr = 5008; break;
-		case IT_CLAW_ADAM: spr = 5009; break;
-		case IT_DAGG_DAMA: spr = 5010; break;
-		case IT_STAF_DAMA: spr = 5011; break;
-		case IT_SPEA_DAMA: spr = 5012; break;
-		case IT_SHIE_DAMA: spr = 5013; break;
-		case IT_SWOR_DAMA: spr = 5014; break;
-		case IT_DUAL_DAMA: spr = 5015; break;
-		case IT_AXXE_DAMA: spr = 5016; break;
-		case IT_THSW_DAMA: spr = 5017; break;
-		case IT_GAXE_DAMA: spr = 5018; break;
-		case IT_CLAW_DAMA: spr = 5019; break;
+		case IT_DAGG_STEL: spr = IT_SPR_DAGG_STEL; break;
+		case IT_STAF_STEL: spr = IT_SPR_STAF_STEL; break;
+		case IT_SPEA_STEL: spr = IT_SPR_SPEA_STEL; break;
+		case IT_SHIE_STEL: spr = IT_SPR_SHIE_STEL; break;
+		case IT_SWOR_STEL: spr = IT_SPR_SWOR_STEL; break;
+		case IT_DUAL_STEL: spr = IT_SPR_DUAL_STEL; break;
+		case IT_AXXE_STEL: spr = IT_SPR_AXXE_STEL; break;
+		case IT_THSW_STEL: spr = IT_SPR_THSW_STEL; break;
+		case IT_GAXE_STEL: spr = IT_SPR_GAXE_STEL; break;
 		//
-		case IT_HELM_BRNZ: spr =  180; break;
-		case IT_BODY_BRNZ: spr =  181; break;
-		case IT_HELM_STEL: spr =  182; break;
-		case IT_BODY_STEL: spr =  183; break;
-		case IT_HELM_GOLD: spr =  184; break;
-		case IT_BODY_GOLD: spr =  185; break;
-		case IT_HELM_EMER: spr =  186; break;
-		case IT_BODY_EMER: spr =  187; break;
-		case IT_HELM_CRYS: spr =  188; break;
-		case IT_BODY_CRYS: spr =  189; break;
-		case IT_HELM_TITN: spr =  190; break;
-		case IT_BODY_TITN: spr =  191; break;
-		case IT_HELM_ADAM: spr =  192; break;
-		case IT_BODY_ADAM: spr =  193; break;
-		case IT_HELM_CAST: spr =  194; break;
-		case IT_BODY_CAST: spr =  195; break;
-		case IT_HELM_ADEP: spr =  196; break;
-		case IT_BODY_ADEP: spr =  197; break;
-		case IT_HELM_WIZR: spr =  198; break;
-		case IT_BODY_WIZR: spr =  199; break;
-		case IT_HELM_DAMA: spr = 3733; break;
-		case IT_BODY_DAMA: spr = 3734; break;
+		case IT_DAGG_GOLD: spr = IT_SPR_DAGG_GOLD; break;
+		case IT_STAF_GOLD: spr = IT_SPR_STAF_GOLD; break;
+		case IT_SPEA_GOLD: spr = IT_SPR_SPEA_GOLD; break;
+		case IT_SHIE_GOLD: spr = IT_SPR_SHIE_GOLD; break;
+		case IT_SWOR_GOLD: spr = IT_SPR_SWOR_GOLD; break;
+		case IT_DUAL_GOLD: spr = IT_SPR_DUAL_GOLD; break;
+		case IT_AXXE_GOLD: spr = IT_SPR_AXXE_GOLD; break;
+		case IT_THSW_GOLD: spr = IT_SPR_THSW_GOLD; break;
+		case IT_GAXE_GOLD: spr = IT_SPR_GAXE_GOLD; break;
 		//
-		case IT_HELM_LIZR: spr = 3472; break;
-		case IT_BODY_LIZR: spr = 3473; break;
-		case IT_HELM_MIDN: spr = 3474; break;
-		case IT_BODY_MIDN: spr = 3475; break;
-		case IT_HELM_AZUR: spr = 3476; break;
-		case IT_BODY_AZUR: spr = 3477; break;
-		case IT_HELM_IVOR: spr = 3478; break;
-		case IT_BODY_IVOR: spr = 3479; break;
+		case IT_DAGG_EMER: spr = IT_SPR_DAGG_EMER; break;
+		case IT_STAF_EMER: spr = IT_SPR_STAF_EMER; break;
+		case IT_SPEA_EMER: spr = IT_SPR_SPEA_EMER; break;
+		case IT_SHIE_EMER: spr = IT_SPR_SHIE_EMER; break;
+		case IT_SWOR_EMER: spr = IT_SPR_SWOR_EMER; break;
+		case IT_DUAL_EMER: spr = IT_SPR_DUAL_EMER; break;
+		case IT_AXXE_EMER: spr = IT_SPR_AXXE_EMER; break;
+		case IT_THSW_EMER: spr = IT_SPR_THSW_EMER; break;
+		case IT_GAXE_EMER: spr = IT_SPR_GAXE_EMER; break;
+		//
+		case IT_DAGG_CRYS: spr = IT_SPR_DAGG_CRYS; break;
+		case IT_STAF_CRYS: spr = IT_SPR_STAF_CRYS; break;
+		case IT_SPEA_CRYS: spr = IT_SPR_SPEA_CRYS; break;
+		case IT_SHIE_CRYS: spr = IT_SPR_SHIE_CRYS; break;
+		case IT_SWOR_CRYS: spr = IT_SPR_SWOR_CRYS; break;
+		case IT_DUAL_CRYS: spr = IT_SPR_DUAL_CRYS; break;
+		case IT_AXXE_CRYS: spr = IT_SPR_AXXE_CRYS; break;
+		case IT_THSW_CRYS: spr = IT_SPR_THSW_CRYS; break;
+		case IT_GAXE_CRYS: spr = IT_SPR_GAXE_CRYS; break;
+		//
+		case IT_DAGG_TITN: spr = IT_SPR_DAGG_TITN; break;
+		case IT_STAF_TITN: spr = IT_SPR_STAF_TITN; break;
+		case IT_SPEA_TITN: spr = IT_SPR_SPEA_TITN; break;
+		case IT_SHIE_TITN: spr = IT_SPR_SHIE_TITN; break;
+		case IT_SWOR_TITN: spr = IT_SPR_SWOR_TITN; break;
+		case IT_DUAL_TITN: spr = IT_SPR_DUAL_TITN; break;
+		case IT_AXXE_TITN: spr = IT_SPR_AXXE_TITN; break;
+		case IT_THSW_TITN: spr = IT_SPR_THSW_TITN; break;
+		case IT_GAXE_TITN: spr = IT_SPR_GAXE_TITN; break;
+		//
+		case IT_DAGG_ADAM: spr = IT_SPR_DAGG_ADAM; break;
+		case IT_STAF_ADAM: spr = IT_SPR_STAF_ADAM; break;
+		case IT_SPEA_ADAM: spr = IT_SPR_SPEA_ADAM; break;
+		case IT_SHIE_ADAM: spr = IT_SPR_SHIE_ADAM; break;
+		case IT_SWOR_ADAM: spr = IT_SPR_SWOR_ADAM; break;
+		case IT_DUAL_ADAM: spr = IT_SPR_DUAL_ADAM; break;
+		case IT_AXXE_ADAM: spr = IT_SPR_AXXE_ADAM; break;
+		case IT_THSW_ADAM: spr = IT_SPR_THSW_ADAM; break;
+		case IT_GAXE_ADAM: spr = IT_SPR_GAXE_ADAM; break;
+		//
+		case IT_CLAW_STEL: spr = IT_SPR_CLAW_STEL; break;
+		case IT_CLAW_GOLD: spr = IT_SPR_CLAW_GOLD; break;
+		case IT_CLAW_EMER: spr = IT_SPR_CLAW_EMER; break;
+		case IT_CLAW_CRYS: spr = IT_SPR_CLAW_CRYS; break;
+		case IT_CLAW_TITN: spr = IT_SPR_CLAW_TITN; break;
+		case IT_CLAW_ADAM: spr = IT_SPR_CLAW_ADAM; break;
+		//
+		case IT_DAGG_DAMA: spr = IT_SPR_DAGG_DAMA; break;
+		case IT_STAF_DAMA: spr = IT_SPR_STAF_DAMA; break;
+		case IT_SPEA_DAMA: spr = IT_SPR_SPEA_DAMA; break;
+		case IT_SHIE_DAMA: spr = IT_SPR_SHIE_DAMA; break;
+		case IT_SWOR_DAMA: spr = IT_SPR_SWOR_DAMA; break;
+		case IT_DUAL_DAMA: spr = IT_SPR_DUAL_DAMA; break;
+		case IT_AXXE_DAMA: spr = IT_SPR_AXXE_DAMA; break;
+		case IT_THSW_DAMA: spr = IT_SPR_THSW_DAMA; break;
+		case IT_GAXE_DAMA: spr = IT_SPR_GAXE_DAMA; break;
+		case IT_CLAW_DAMA: spr = IT_SPR_CLAW_DAMA; break;
+		//
+		case IT_HELM_BRNZ: spr = IT_SPR_HELM_BRNZ; break;
+		case IT_BODY_BRNZ: spr = IT_SPR_BODY_BRNZ; break;
+		case IT_HELM_STEL: spr = IT_SPR_HELM_STEL; break;
+		case IT_BODY_STEL: spr = IT_SPR_BODY_STEL; break;
+		case IT_HELM_GOLD: spr = IT_SPR_HELM_GOLD; break;
+		case IT_BODY_GOLD: spr = IT_SPR_BODY_GOLD; break;
+		case IT_HELM_EMER: spr = IT_SPR_HELM_EMER; break;
+		case IT_BODY_EMER: spr = IT_SPR_BODY_EMER; break;
+		case IT_HELM_CRYS: spr = IT_SPR_HELM_CRYS; break;
+		case IT_BODY_CRYS: spr = IT_SPR_BODY_CRYS; break;
+		case IT_HELM_TITN: spr = IT_SPR_HELM_TITN; break;
+		case IT_BODY_TITN: spr = IT_SPR_BODY_TITN; break;
+		case IT_HELM_ADAM: spr = IT_SPR_HELM_ADAM; break;
+		case IT_BODY_ADAM: spr = IT_SPR_BODY_ADAM; break;
+		case IT_HELM_CAST: spr = IT_SPR_HELM_CAST; break;
+		case IT_BODY_CAST: spr = IT_SPR_BODY_CAST; break;
+		case IT_HELM_ADEP: spr = IT_SPR_HELM_ADEP; break;
+		case IT_BODY_ADEP: spr = IT_SPR_BODY_ADEP; break;
+		case IT_HELM_WIZR: spr = IT_SPR_HELM_WIZR; break;
+		case IT_BODY_WIZR: spr = IT_SPR_BODY_WIZR; break;
+		case IT_HELM_DAMA: spr = IT_SPR_HELM_DAMA; break;
+		case IT_BODY_DAMA: spr = IT_SPR_BODY_DAMA; break;
+		//
+		case IT_HELM_LIZR: spr = IT_SPR_HELM_LIZR; break;
+		case IT_BODY_LIZR: spr = IT_SPR_BODY_LIZR; break;
+		case IT_HELM_MIDN: spr = IT_SPR_HELM_MIDN; break;
+		case IT_BODY_MIDN: spr = IT_SPR_BODY_MIDN; break;
+		case IT_HELM_AZUR: spr = IT_SPR_HELM_AZUR; break;
+		case IT_BODY_AZUR: spr = IT_SPR_BODY_AZUR; break;
+		case IT_HELM_IVOR: spr = IT_SPR_HELM_IVOR; break;
+		case IT_BODY_IVOR: spr = IT_SPR_BODY_IVOR; break;
 		//
 		default: break;
 	}
@@ -2234,10 +2205,11 @@ struct npc_class npc_class[] = {
 	{"Living Armor"         	},	// 224
 	{"Skyfire"              	},	// 225
 	//
-	{""                     	},	// 226
-	{""                     	},	// 227
-	{""                     	},	// 228
-	{""                     	},	// 229
+	{"Knight Antediluvian"      },	// 226
+	{"Baron Antediluvian"       },	// 227
+	{"Earl Antediluvian"        },	// 228
+	{"Marquess Antediluvian"    },	// 229
+	//
 	{""                     	},	// 230
 	{""                     	},	// 231
 	{""                     	},	// 232
@@ -2651,7 +2623,7 @@ void show_time(int cn)
 	minute = (globs->mdtime / MD_MIN) % 60;
 	day = globs->mdday % 28 + 1;
 	month = globs->mdday / 28 + 1;
-	year  = globs->mdyear;
+	year  = globs->mdyear + GAMEYEAR;
 
 	do_char_log(cn, 1, "It's %d:%02d on the %d%s%s%s%s%s%s%s of the %d%s%s%s%s month of the year %d.\n",
 	            hour, minute,
@@ -2854,8 +2826,8 @@ int cap(int cn, int nr)
 
 int soultransform(int cn, int in, int in2, int temp)
 {
-	use_consume_item(cn, in, 1);
-	use_consume_item(cn, in2, 1);
+	use_consume_item(cn, in, 0);
+	use_consume_item(cn, in2, 0);
 
 	in = god_create_item(temp);
 	god_give_char(in, cn);
@@ -2865,7 +2837,7 @@ int soultransform(int cn, int in, int in2, int temp)
 
 int soulrepair(int cn, int in, int in2)
 {
-	use_consume_item(cn, in, 1);
+	use_consume_item(cn, in, 0);
 
 	it[in2] = it_temp[it[in2].temp];
 	it[in2].carried = cn;
@@ -3097,6 +3069,8 @@ void make_corruptor(int cn, int n)
 	it[in].stack = max(1, n);
 	
 	god_give_char(in, cn);
+	
+	return in;
 }
 
 // Soulstone an item by a given rank
@@ -3265,7 +3239,7 @@ void soultrans_equipment(int cn, int in, int in2, int flag)
 		else								it[in2].max_damage = it[in2].power * 1000;
 	}
 	
-	use_consume_item(cn, in, 1);
+	use_consume_item(cn, in, 0);
 
 	sprintf(it[in2].description, "A %s enhanced by a rank %d soulstone.", it[in2].name, rank);
 	
@@ -3567,7 +3541,7 @@ int use_talisman(int cn, int in, int in2)
 		
 		it[in].flags |= IF_UPDATE;
 		
-		use_consume_item(cn, in2, 0);
+		use_consume_item(cn, in2, 1);
 		return 1;
 	}
 	// Past here we can assume there is an active enchantment
@@ -3809,7 +3783,7 @@ int use_talisman(int cn, int in, int in2)
 	}
 	
 	do_char_log(cn, 2, "You enchanted the %s with the talisman.\n", it[in2].name);
-	use_consume_item(cn, in, 1);
+	use_consume_item(cn, in, 0);
 	return 1;
 }
 
@@ -3863,7 +3837,7 @@ int use_corruptor(int cn, int in)
 		}
 		do_char_log(cn, 1, "The %s was empowered with %s.\n", it[in2].reference, sk_corrupt[it[in2].data[0]-1]);
 	}
-	use_consume_item(cn, in, 0);
+	use_consume_item(cn, in, 1);
 	
 	return 1;
 }
@@ -3886,21 +3860,21 @@ int use_soulstone(int cn, int in, int in2)
 		case 68: // Soulstone
 			if (merge_soulstone(cn, in, in2))
 			{
-				use_consume_item(cn, in2, 1);
+				use_consume_item(cn, in2, 0);
 				return 1;
 			}
 			return 0;
 		case 92: // Soul Focus
 			if (do_soulfocus(cn, in))
 			{
-				use_consume_item(cn, in2, 1);
+				use_consume_item(cn, in2, 0);
 				return 1;
 			}
 			return 0;
 		case 93: // Soul Catalyst
 			if (do_soulcatalyst(cn, in, in2))
 			{
-				use_consume_item(cn, in2, 0);
+				use_consume_item(cn, in2, 1);
 				return 1;
 			}
 			return 0;
@@ -3926,11 +3900,11 @@ int use_soulstone(int cn, int in, int in2)
 			in = soultransform(cn, in, in2, 102);
 			return 1;
 		case 101: // healing potion
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			it[in].hp[0] += 10;
 			return 1;
 		case 102: // mana potion
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			it[in].mana[0] += 10;
 			return 1;
 		default:
@@ -3963,7 +3937,7 @@ int use_soulfocus(int cn, int in) // driver 92
 		case 68: // Soulstone
 			if (do_soulfocus(cn, in2))
 			{
-				use_consume_item(cn, in, 1);
+				use_consume_item(cn, in, 0);
 				return 1;
 			}
 			return 0;
@@ -3973,7 +3947,7 @@ int use_soulfocus(int cn, int in) // driver 92
 			it[in].data[0] = 4;
 			sprintf(it[in].description, "A soul focus. It can be used on a soulstone to increase its level by 3, but only once.");
 			chlog(cn, "used focus on focus");
-			use_consume_item(cn, in2, 1);
+			use_consume_item(cn, in2, 0);
 			return 1;
 			*/
 		case 93: // Soul Catalyst
@@ -4011,7 +3985,7 @@ int use_soulcatalyst(int cn, int in) // driver 93
 		case 68: // Soulstone
 			if (do_soulcatalyst(cn, in2, in))
 			{
-				use_consume_item(cn, in, 0);
+				use_consume_item(cn, in, 1);
 				return 1;
 			}
 			return 0;
@@ -4020,7 +3994,7 @@ int use_soulcatalyst(int cn, int in) // driver 93
 			/*
 			if (do_catalyst_focus(cn, in2, in))
 			{
-				use_consume_item(cn, in2, 1);
+				use_consume_item(cn, in2, 0);
 				return 1;
 			}
 			return 0;
@@ -4712,15 +4686,8 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 	{
 		if (affix==8)
 		{
-			for (n = 0; n < 40; n++)
-			{
-				ch[co].name[n] = 0;
-			}
-			m = 6 + RANDOM(4);
-			for (n = 0; n < m; n++)
-			{
-				ch[co].name[n] = 33 + RANDOM(94);
-			}
+			for (n = 0; n < 40; n++) ch[co].name[n] = 0; m = 6 + RANDOM(4);
+			for (n = 0; n < m; n++) ch[co].name[n] = 33 + RANDOM(94);
 			sprintf(ch[co].reference, "the sanguine creature");
 			switch (RANDOM(6))
 			{
@@ -4999,7 +4966,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 			hasloot=1;
 		}
 		
-		if (!IS_LABY_MOB(co) && !ch[co].citem && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+		if (!IS_LABY_MOB(co) && !ch[co].citem && !ch[co].item[0] && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 		{
 			if (in = god_create_item(IT_CORRUPTOR))
 			{

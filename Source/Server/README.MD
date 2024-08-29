@@ -30,7 +30,7 @@ usage of data for players:
 * `0:`      away from keyboard
 * `1-9:`    group with X,Y...
 * `10:`     following X
-* `11:`     no fightback
+* `11:`     --Zarro-- Petrified Blood DoT storage
 * `12:`     follow suspension timeout
 * `13:`     money in bank
 * `14:`     number of deaths

@@ -33,8 +33,6 @@ void look_item_details(int cn, int in)
 		act = 0;
 	}
 	
-	
-	
 	if (it[in].max_age[act] || it[in].max_damage)
 	{
 		if (it[in].damage_state==0)
@@ -113,6 +111,10 @@ void look_item_details(int cn, int in)
 		if (it[in].flags & IF_IDENTIFIED)
 		{
 			item_info(cn, in, 1);
+			if (it[in].flags & IF_WHETSTONED)
+			{
+				do_char_log(cn, 2, "Has been enhanced by a whetstone.\n");
+			}
 			if (CAN_SOULSTONE(in))
 			{
 				do_char_log(cn, 3, "This item can be Soulstoned.\n");
@@ -167,6 +169,11 @@ void look_item_details(int cn, int in)
 		{
 			do_char_log(cn, 5, "Level %d. Next level in %d kills.\n", 
 				getitemrank(in, 0), rank2points(max(1, getitemrank(in, 0)))/250 - it[in].cost);
+			if (it[in].current_damage) it[in].current_damage = 0;
+			if (it[in].current_age[0]) it[in].current_age[0] = 0;
+			if (it[in].current_age[1]) it[in].current_age[1] = 0;
+			if (it[in].damage_state)   it[in].damage_state   = 0;
+			if (it[in].max_damage)     it[in].max_damage     = 0;
 		}
 		if (IS_OSIRWEAP(in) && it[in].stack)
 		{
@@ -185,18 +192,6 @@ void look_item_details(int cn, int in)
 		if (it[in].flags & IF_EASEUSE)
 		{
 			do_char_log(cn, 5, "Was made easier to use.\n");
-		}
-		if (it[in].flags & IF_DIMINISHED)
-		{
-			do_char_log(cn, 5, "Has had its complexity reduced.\n");
-		}
-		if (it[in].flags & IF_SOULSPLIT)
-		{
-			do_char_log(cn, 5, "Has been soulsplit.\n");
-		}
-		if (it[in].flags & IF_DUPLICATED)
-		{
-			do_char_log(cn, 5, "Has been duplicated.\n");
 		}
 		if (it[in].flags & IF_LEGACY)
 		{
@@ -224,10 +219,10 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 7, "When equipped, 25%% of skill costs are nullified, 25%% of mana costs from spells are taken from endurance, and 25%% of endurance costs from skills are taken from mana. You no longer lose focus.\n"); 
 		break;
 	case IT_TW_CLOAK: // Cloak of Shadows
-		do_char_log(cn, 7, "When equipped, 10%% of damage taken from hits is dealt to Endurance instead.\n");
+		do_char_log(cn, 7, "When equipped, 10%% of damage taken from hits is dealt to Endurance instead, and 10%% of damage taken from damage over time is dealt to Mana instead.\n");
 		break;
-	case IT_TW_DREAD: // The Dreadplate
-		do_char_log(cn, 7, "When equipped, your ghost companion is replaced with a spellcaster companion.\n");
+	case IT_BONEARMOR: // Bone Armor version 3
+		do_char_log(cn, 7, "When equipped, 30%% of damage taken from hits is instead taken as damage over time, over 5 seconds.\n");
 		break;
 	case IT_TW_DOUSER: // Douser Gauntlets
 		do_char_log(cn, 7, "When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n");
@@ -274,23 +269,23 @@ void look_extra(int cn, int in)
 	// -------- DW SIGNETS --------
 	
 	case IT_SIGN_SKUA:
-		do_char_log(cn, 7, "When equipped, all negative values on gear become positive.\n");
+		do_char_log(cn, 7, "When equipped, all negative values on gear double and become positive.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SHOU:
-		do_char_log(cn, 7, "When equipped, your Warcry and Rally also raise your Guard.\n");
+		do_char_log(cn, 7, "When equipped, your Warcry shocks enemies, and your Rally charges allies.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SLAY:
-		do_char_log(cn, 7, "When equipped, your Leap kills enemies left below 10%% remaining health.\n");
+		do_char_log(cn, 7, "When equipped, your Leap repeats an additional time. If Leap no longer repeats, it instead gains +1 AoE per two repeats it would have made.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_STOR:
-		do_char_log(cn, 7, "When equipped, your Blind and Douse also applies a stack of Zephyr every 5 seconds.\n");
+		do_char_log(cn, 7, "When equipped, your Blind and Douse also applies a stack of Zephyr every 3 seconds.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SICK:
-		do_char_log(cn, 7, "When equipped, your Poisons last twice as long.\n");
+		do_char_log(cn, 7, "When equipped, your Poisons last twice as long and reduce enemy cooldown rate by 10%%.\n");
 		do_char_log(cn, 4, "You may only equip one %s at a time.\n", it[in].name);
 		break;
 	case IT_SIGN_SHAD:
@@ -423,24 +418,31 @@ void look_extra(int cn, int in)
 	// -------- BOOK  ITEMS --------
 	
 	case IT_BOOK_ALCH: 
+	case IT_IMBK_ALCH: 
 		do_char_log(cn, 5, "When equipped, healing items are 50%% more effective.\n");
 		break;
 	case IT_BOOK_HOLY: 
+	case IT_IMBK_HOLY: 
 		do_char_log(cn, 5, "When equipped, maximum healing sickness you can inflict is reduced by 1 stack.\n");
 		break;
 	case IT_BOOK_ADVA: 
+	case IT_IMBK_ADVA: 
 		do_char_log(cn, 5, "When equipped, debuffs you cast are more likely to pass resistance checks.\n");
 		break;
 	case IT_BOOK_TRAV: 
+	case IT_IMBK_TRAV: 
 		do_char_log(cn, 5, "When equipped, secondary effects of Braveness and Agility are equal to the higher of the two.\n");
 		break;
 	case IT_BOOK_DAMO: 
+	case IT_IMBK_DAMO: 
 		do_char_log(cn, 5, "When equipped, increases cooldown recovery speed by 11%%.\n");
 		break;
 	case IT_BOOK_SHIV: 
+	case IT_IMBK_SHIV: 
 		do_char_log(cn, 5, "When equipped, casting Curse will immediately cast Slow as well. These are less likely to pass resistance checks.\n");
 		break;
 	case IT_BOOK_PROD: 
+	case IT_IMBK_PROD: 
 		do_char_log(cn, 5, "When equipped, improves the mana effectiveness of the Economize skill.\n");
 		break;
 	case IT_BOOK_VENO: 
@@ -450,9 +452,11 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, newly casted Ghost Companions and Shadow Copies become undead monsters.\n");
 		break;
 	case IT_BOOK_BISH: 
+	case IT_IMBK_BISH: 
 		do_char_log(cn, 5, "When equipped, casting Bless will immediately cast Protect and Enhance as well.\n");
 		break;
 	case IT_BOOK_GREA: 
+	case IT_IMBK_GREA: 
 		do_char_log(cn, 5, "When equipped, damage dealt to the duration of your Magic Shield and Magic Shell is halved.\n");
 		break;
 	case IT_BOOK_DEVI: 
@@ -465,6 +469,7 @@ void look_extra(int cn, int in)
 		do_char_log(cn, 5, "When equipped, your Dispel spell loses power less quickly and has no removal limit, but no longer immunizes or inoculates.\n");
 		break;
 	case IT_BOOK_MALT: 
+	case IT_IMBK_MALT: 
 		do_char_log(cn, 5, "When equipped, you no longer lose focus.\n");
 		break;
 	case IT_BOOK_GRAN: 
@@ -473,23 +478,72 @@ void look_extra(int cn, int in)
 	
 	// -------- UNIQUE ITEMS --------
 	
-	case IT_WP_LIFESPRIG: 
+	case IT_WB_STONEDAGG:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Sacrifice', converting 50% of your current Hitpoints into half as much Mana.\n");
+		break;
+	case IT_WP_LIFESPRIG:
+	case IT_WB_LIFESPRIG:
 		do_char_log(cn, 5, "When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
 		break;
-	case IT_WP_BLOODLET: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
+	case IT_WB_SPIDERFANG:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast Venom, with power equal to 1/5 of your uncapped mana.\n");
 		break;
-	case IT_WP_GEMCUTTER: 
+	case IT_WP_MAGEMASH:
+	case IT_WB_MAGEMASH:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast Dispel. Dispel cast in this way does not affect you or your allies, and instead removes enemy buffs.\n");
+		break;
+	case IT_WP_BLOODLET:
+	case IT_WB_BLOODLET:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints for power. Bloodletting inflicts bleeding on surrounding enemies.\n");
+		break;
+	case IT_WP_GEMCUTTER:
 		do_char_log(cn, 5, "When equipped, stats granted by your ring slots are improved by 40%%.\n");
+		break;
+	case IT_WP_QUICKSILV: 
+		do_char_log(cn, 5, "When equipped, this weapon grants full damage and shield parry while in the offhand.\n");
+		break;
+	case IT_WB_JANESOBLIT:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Obliterate', costing 1/3 of your uncapped mana for power. Obliterate has a base radius of 4, centered at your target's location.\n");
+		break;
+	case IT_WB_RATTANBO:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast a buff version of Zephyr, with power equal to your Staff skill modifier.\n");
+		break;
+	case IT_WP_PUTRIDIRE: 
+	case IT_WB_PUTRIDIRE:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Poison, with power equal to 1/3 of your uncapped mana.\n");
 		break;
 	case IT_WP_STARLIGHT: 
 		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Starlight', costing 1/3 of uncapped mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n");
 		break;
+	case IT_WP_BLOODYSCY: 
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Cleave, with power equal to 1/2 of your uncapped hitpoints.\n");
+		break;
+	case IT_WB_GOLDGLAIVE:
+		do_char_log(cn, 5, "When equipped, your Ghost Companion will use Warcry instead of Taunt, based on its Taunt skill modifier.\n");
+		break;
 	case IT_WP_KELPTRID: 
+	case IT_WB_KELPTRID:
 		do_char_log(cn, 5, "When equipped, grants +30 to action speed while underwater.\n");
 		break;
+	case IT_WP_FLAGBEAR: 
+		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Rally, with power equal to your uncapped endurance.\n");
+		break;
+	case IT_WB_FROSTGLASS:
+		do_char_log(cn, 5, "When equipped, this shield can be used to cast Slow, with power equal to your total Shield skill modifier.\n");
+		break;
 	case IT_WP_PHALANX: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 1%% damage reduction per 5 endurance spent.\n");
+	case IT_WB_PHALANX:
+		do_char_log(cn, 5, "When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 2%% damage reduction per 5 endurance spent.\n");
+		break;
+	case IT_WP_RISINGPHO: 
+	case IT_WB_RISINGPHO:
+		do_char_log(cn, 5, "When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints, ignoring spell modifier.\n");
+		break;
+	case IT_WP_THEWALL: 
+		do_char_log(cn, 5, "When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n");
+		break;
+	case IT_WB_BARBSWORD:
+		do_char_log(cn, 5, "When equipped, your Sword skill's effective attributes become (BRV + STR + STR)\n");
 		break;
 	case IT_WP_LAMEDARG: 
 		if (it[in].data[0]<REQ_LAME)
@@ -498,62 +552,71 @@ void look_extra(int cn, int in)
 			do_char_log(cn, 9, "Thou art worthy. Use me when ready.\n");
 		break;
 	case IT_WP_WHITEODA: 
+	case IT_WB_WHITEODA:
 		do_char_log(cn, 5, "When equipped, grants additional armor value based on total spell modifier.\n");
 		break;
 	case IT_WP_EXCALIBUR: 
 		do_char_log(cn, 5, "When equipped, 20%% of uncapped attack speed is granted as additional weapon value.\n");
 		break;
+	case IT_WB_BEINESTOC:
+		do_char_log(cn, 5, "When equipped, your Hit and Parry scores are the higher of the two.\n");
+		break;
 	case IT_WP_BLACKTAC: 
+	case IT_WB_BLACKTAC:
 		do_char_log(cn, 5, "When equipped, grants additional weapon value based on total spell modifier.\n");
 		break;
+	case IT_WB_LIONSPAWS:
+		do_char_log(cn, 5, "When equipped, your Hand to Hand skill's effective attributes become (BRV + BRV + BRV).\n");
+		break;
 	case IT_WP_CRIMRIP: 
+	case IT_WB_CRIMRIP:
 		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n");
 		break;
+	case IT_WP_SOVERIGNS: 
+		do_char_log(cn, 5, "When equipped, %s and %s become the average of the two, plus 10.\n", skilltab[it[in].data[1]].name, skilltab[it[in].data[2]].name);
+		break;
+	case IT_WB_GULLOXI:
+		do_char_log(cn, 5, "When equipped, your Axe skill's effective attributes become (BRV + AGL + AGL).\n");
+		break;
 	case IT_WP_CRESSUN: 
+	case IT_WB_CRESSUN:
 		do_char_log(cn, 5, "When equipped, endurance spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n");
 		break;
+	case IT_WP_MJOLNIR: 
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast Blast, with power based on your WV and top damage, ignoring spell modifier. Blasts cast this way will inflict a stack of Shock, and grant you a stack of Charge.\n");
+		break;
+	case IT_WB_LAVA2HND:
+		do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Weaken, reducing enemy weapon value.\n");
+		break;
 	case IT_WP_GILDSHINE: 
+	case IT_WB_GILDSHINE:
 		do_char_log(cn, 5, "When equipped, grants additional critical hit multiplier based off total Economize score.\n");
 		break;
+	case IT_WB_BURN2HND:
+		do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Scorch, causing enemies to take additional damage.\n");
+		break;
+	case IT_WB_ICE2HND:
+		do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Slow, reducing enemy action speed.\n");
+		break;
+	case IT_WP_CROSSBLAD: 
+		do_char_log(cn, 5, "When equipped, Surround Hit has a base radius of 4.\n");
+		break;
 	case IT_WP_BRONCHIT: 
+	case IT_WB_BRONCHIT:
 		do_char_log(cn, 5, "When equipped, 20%% of Cleave's damage is also dealt to the target's mana.\n");
 		break;
 	case IT_WP_VOLCANF: 
 		do_char_log(cn, 5, "When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n");
 		break;
-	case IT_WP_QUICKSILV: 
-		do_char_log(cn, 5, "When equipped, this weapon grants full damage and shield parry while in the offhand.\n");
-		break;
-	case IT_WP_PUTRIDIRE: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Poison, with power equal to 1/3 of your uncapped mana.\n");
-		break;
-	case IT_WP_BLOODYSCY: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Cleave, with power equal to 1/3 of your uncapped hitpoints.\n");
-		break;
-	case IT_WP_FLAGBEAR: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to freely cast Rally, with power equal to your uncapped endurance.\n");
-		break;
-	case IT_WP_RISINGPHO: 
-		do_char_log(cn, 5, "When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints, ignoring spell modifier.\n");
-		break;
-	case IT_WP_THEWALL: 
-		do_char_log(cn, 5, "When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n");
-		break;
-	case IT_WP_SOVERIGNS: 
-		do_char_log(cn, 5, "When equipped, %s and %s become the average of the two, plus 10.\n", skilltab[it[in].data[1]].name, skilltab[it[in].data[2]].name);
-		break;
-	case IT_WP_MJOLNIR: 
-		do_char_log(cn, 5, "When equipped, this weapon can be used to cast Blast, with power based on your WV and top damage, ignoring spell modifier. Blasts cast this way will inflict a stack of Shock, and grant you a stack of Charge.\n");
-		break;
-	case IT_WP_CROSSBLAD: 
-		do_char_log(cn, 5, "When equipped, Surround Hit has a base radius of 4.\n");
+	case IT_WB_VIKINGMALT:
+		do_char_log(cn, 5, "When equipped, this weapon can be used to cast 'Slam', dealing damage based on Strength around you and stunning enemies with a base radius of 2 around your target. Stun duration with Slam is determined by your crit multiplier.\n");
 		break;
 	case IT_WP_GUNGNIR: 
 		do_char_log(cn, 5, "When equipped, bleeding you inflict deals twice as much damage.\n");
 		break;
 	
-	case IT_BONEARMOR: 
-		do_char_log(cn, 5, "When equipped, all armor value is converted to rapid health regeneration.\n");
+	case IT_TW_DREAD: // The Dreadplate
+		do_char_log(cn, 5, "When equipped, your ghost companion is replaced with a spellcaster companion.\n");
 		break;
 	
 	case IT_SIGNET_TE:
@@ -715,23 +778,23 @@ void look_extra(int cn, int in)
 		// Skua
 		case 57: do_char_log(cn, 7, "25%% of Armor Value granted by Magic Shield is granted as additional Weapon Value.\n"); break;
 		case 58: do_char_log(cn, 7, "4%% of total Glow score is granted as additional spell modifier.\n"); break;
-		case 59: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict slow, reducing enemy action speed.\n"); break;
-		case 60: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict scorch, causing enemies to take additional damage.\n"); break;
+		case 59: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Slow, reducing enemy action speed.\n"); break;
+		case 60: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Scorch, causing enemies to take additional damage.\n"); break;
 		// Kwai
 		case 61: do_char_log(cn, 5, "3%% of total hit score is granted as extra parry score.\n"); break;
 		case 62: do_char_log(cn, 5, "3%% of total parry score is granted as extra hit score.\n"); break;
-		case 63: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict curse, reducing enemy attributes.\n"); break;
-		case 64: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict weaken, reducing enemy weapon value.\n"); break;
+		case 63: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Curse, reducing enemy attributes.\n"); break;
+		case 64: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Weaken, reducing enemy weapon value.\n"); break;
 		// Gorn
 		case 65: do_char_log(cn, 6, "20%% of damage dealt with hits is also dealt to enemy mana.\n"); break;
 		case 66: do_char_log(cn, 6, "Damage dealt with damage over time is restored as hitpoints at a rate equal to experience gain.\n"); break;
-		case 67: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict poison, dealing damage over time.\n"); break;
-		case 68: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n"); break;
+		case 67: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Poison, dealing damage over time.\n"); break;
+		case 68: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Douse, reducing enemy spell modifier.\n"); break;
 		// Purple
-		case 69: do_char_log(cn, 8, "5%% of damage dealt with hits is restored as hitpoints, endurance, and mana.\n"); break;
+		case 69: do_char_log(cn, 8, "4%% of damage dealt with hits is restored as hitpoints.\n"); break;
 		case 70: do_char_log(cn, 8, "Sacrifice 10%% of current endurance on hit to deal that much additional damage.\n"); break;
-		case 71: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict blind, reducing enemy perception, hit and parry.\n"); break;
-		case 72: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict frostburn, draining enemy endurance and mana.\n"); break;
+		case 71: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Blind, reducing enemy perception, hit and parry.\n"); break;
+		case 72: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Frostburn, draining enemy endurance and mana.\n"); break;
 		// Offhand
 		case 73: do_char_log(cn, 9, "Restore 2 Hitpoints upon being hit by an enemy.\n"); break;
 		case 74: do_char_log(cn, 9, "10%% of weapon value is granted as additional rapid mana regeneration.\n"); break;
@@ -741,7 +804,7 @@ void look_extra(int cn, int in)
 		default:break;
 		}
 	}
-	if (it[in].driver == 133)
+	if (IS_CORRUPTOR(in))
 	{
 		if (it[in].data[0])
 		{

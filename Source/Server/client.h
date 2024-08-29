@@ -68,6 +68,7 @@ struct cplayer
 {
 	// informative stuff
 	char name[40];
+	char location[20];
 
 	int mode;               // 0 = slow, 1 = medium, 2 = fast
 
@@ -117,6 +118,9 @@ struct cplayer
 	int    worn[20];
 	int  worn_p[20];
 	char worn_s[20];   // Stack size
+	
+	// blacksmith slots
+	int    sitem[4];
 	
 	// spells ready
 	short spell[MAXBUFFS];
@@ -174,7 +178,7 @@ struct cplayer
 #define CL_CMD_EXIT      31
 #define CL_CMD_UNIQUE    32
 #define CL_PASSWD        33
-
+#define CL_CMD_SMITH     34
 #define CL_CMD_WPS       35
 #define CL_CMD_MOTD      36
 #define CL_CMD_BSSHOP    37
@@ -200,6 +204,9 @@ struct cplayer
 #define SV_SETCHAR_ENDUR    13
 #define SV_SETCHAR_MANA     14
 
+#define SV_SETCHAR_LOCA1    16
+#define SV_SETCHAR_LOCA2    17
+
 #define SV_SETCHAR_AHP      20
 #define SV_SETCHAR_PTS      21
 #define SV_SETCHAR_GOLD     22
@@ -207,7 +214,7 @@ struct cplayer
 #define SV_SETCHAR_WORN     24
 #define SV_SETCHAR_OBJ      25
 
-#define SV_TICK 27
+#define SV_TICK             27
 
 #define SV_LOOK1            29
 #define SV_SCROLL_RIGHT     30
@@ -233,10 +240,11 @@ struct cplayer
 #define SV_LOOK5            50
 #define SV_LOOK6            51
 #define SV_LOOK7            52
+#define SV_LOOK8            53
 
+#define SV_CLOSESHOP        55
 #define SV_LOAD             56
 #define SV_CAP              57
-
 #define SV_MOD1             58
 #define SV_MOD2             59
 #define SV_MOD3             60

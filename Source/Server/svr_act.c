@@ -113,8 +113,8 @@ void step_oppressed(int cn, int fl)
 		if (bu[in].power != fl)
 		{
 			bu[in].power = fl;
-			for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl));
-			for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl));
+			for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl/2));
+			for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, (fl+1)/2));
 			do_char_log(cn, 0, "You feel the pressure on you shift.\n");
 			do_update_char(cn);
 		}
@@ -128,8 +128,8 @@ void step_oppressed(int cn, int fl)
 		strcpy(bu[in].description, "oppressed.");
 		
 		bu[in].power = fl;
-		for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl));
-		for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, fl));
+		for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl/2));
+		for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, (fl+1)/2));
 		
 		bu[in].active = bu[in].duration = 1;
 		bu[in].flags  = IF_SPELL | IF_PERMSPELL;
@@ -361,7 +361,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		{
 			if (IS_IN_SUN(ch[cn].x, ch[cn].y)) 				step_desertfloor(cn); // Heatstroke for lab 6 & Volcano
 			else if (IS_IN_VANTA(ch[cn].x, ch[cn].y)) 		step_vantablack(cn);
-			else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y)) 	step_oppressed(cn, n);
+			//else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y)) 	step_oppressed(cn, n);
 			else if (IS_IN_DW(ch[cn].x, ch[cn].y))			step_dw(cn);
 		}
 
@@ -941,7 +941,7 @@ void plr_drop(int cn)
 		return;
 	}
 
-	if (map[m].ch || map[m].to_ch || map[m].it || (map[m].flags & (MF_MOVEBLOCK | MF_NOPLAYER)))
+	if (!can_drop(m))
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;
@@ -2705,9 +2705,17 @@ static inline int speedoMisc(int n)
 
 void plr_act(int cn)
 {
+	unsigned long long prof;
+	
 	if (ch[cn].stunned==1)
 	{
 		act_idle(cn);
+		if (ch[cn].temp==CT_PANDIUM && (!(ch[cn].flags & (CF_PLAYER | CF_USURP))))
+		{
+			prof = prof_start();
+			npc_driver_low(cn);
+			prof_stop(27, prof);
+		}
 		return;
 	}
 	if (ch[cn].flags & CF_STONED)

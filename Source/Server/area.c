@@ -531,6 +531,15 @@ struct area area[] = {
 	{ 726,  109,  760,  122, "Mausoleum X",                    1},
 	{ 726,  123,  753,  136, "Mausoleum XI",                   1},
 	{ 726,  137,  746,  143, "Mausoleum XI",                   1},
+	{ 228, 1156,  248, 1176, "Mausoleum Sub-Basement",         1},
+	{ 249, 1170,  269, 1176, "Mausoleum XII",                  1},
+	{ 235, 1177,  269, 1197, "Mausoleum XII",                  1},
+	{ 242, 1135,  248, 1155, "Mausoleum XIII",                 1},
+	{ 249, 1135,  269, 1169, "Mausoleum XIII",                 1},
+	{ 207, 1135,  241, 1155, "Mausoleum XIV",                  1},
+	{ 207, 1156,  227, 1162, "Mausoleum XIV",                  1},
+	{ 207, 1163,  227, 1197, "Mausoleum XV",                   1},
+	{ 228, 1177,  234, 1197, "Mausoleum XV",                   1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 132,  112,  152,  132, "Arena",     					   0},
 	{  21,   21,   78,   71, "Lab I, Grolm Gorge",             0},
@@ -724,4 +733,13 @@ char *get_area_m(int x, int y, int verbose)
 	}
 
 	return(buf);
+}
+
+char *get_area_truncated(int cn)
+{
+	static char buf[40];
+	
+	sprintf(buf, "%.20s", get_area(cn, 0));
+	
+	return buf;
 }

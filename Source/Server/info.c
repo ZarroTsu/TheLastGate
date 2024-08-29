@@ -706,7 +706,7 @@ static void info(int cn)
 	       (globs->mdday==2 ? "nd" : ""),
 	       (globs->mdday==3 ? "rd" : ""),
 	       (globs->mdday>3 ? "th" : ""),
-	       globs->mdyear, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
+	       globs->mdyear+GAMEYEAR, globs->mdtime / MD_HOUR, (globs->mdtime / 60) % 60);
 
 	if (globs->mdday % 28 + 1==1)
 	{

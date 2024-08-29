@@ -173,7 +173,7 @@ void global_tick(void)
 	{
 		globs->mdday++;
 		globs->mdtime = 0;
-		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear);
+		xlog("day %d of the year %d begins", globs->mdday, globs->mdyear+GAMEYEAR);
 		reset_daily_shops();
 		//sanguine_spawners(0);
 		do_misc();

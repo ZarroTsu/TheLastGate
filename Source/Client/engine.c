@@ -545,8 +545,8 @@ struct skilltab _skilltab[55] = {
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning them if they are at full health. Cooldown can be bypassed at an additional cost.", 
-				"Leap (Random)", 		"Use (Skill): Strike your foe and leap through three random targets, dealing critical damage if they are at full health. Cooldown can be bypassed at an additional cost.",
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life. Higher cooldown rate lets this skill repeat additional times.",
+				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
@@ -638,8 +638,8 @@ struct sk_tree sk_tree[10][12]={
 		  6632,						"+10 to Agility Limit." },
 		{ "Acumen", 				"All melee skills use the attributes", 	// NE
 		  6633,						"(STR+BRV/2) + Agility + Agility." },
-		{ "Impact", 				"Weaken and Crush also reduce enemy", 	// EN
-		  6634,						"critical hit chance." },
+		{ "Impact", 				"Weaken and Crush also reduce enemy damage", 	// EN
+		  6634,						"multiplier and damage reduction." },
 		{ "Perseverance", 			"20%% more total Endurance.", 	// EE
 		  6635,						"" },
 		{ "Tenacity", 				"20%% of damage taken is dealt to your", 	// ES
@@ -668,8 +668,8 @@ struct sk_tree sk_tree[10][12]={
 		  6646,						"gain a bonus to hitting you." },
 		{ "Zealotry", 				"20%% more total Spell Aptitude.", 	// EE
 		  6647,						"" },
-		{ "Fervor", 				"2%% less damage taken per 10 Spell", 	// ES
-		  6648,						"Aptitude." }
+		{ "Fervor", 				"20%% of Spell Aptitude is used to reduce", 	// ES
+		  6648,						"the strength of incoming enemy spells." }
 	}, // "         '         '  ", "         '         '         '         "
 	{	// Sorcerer
 		{ "Expansiveness", 			"+1 to Area of Effect.", 	// W
@@ -790,9 +790,9 @@ struct sk_tree sk_tree[10][12]={
 		  6702,						"time, using the higher result." },
 		{ "Wrath", 					"0.5%% more effect of Rage & Calm per 50", 	// NW
 		  6703,						"missing Hitpoints, Endurance, and Mana." },
-		{ "Gluttony", 				"10%% more Hitpoints, Endurance, and Mana.", 	// NN
+		{ "Sloth", 					"10%% more Hitpoints, Endurance, and Mana.", 	// NN
 		  6704,						"" },
-		{ "Sloth", 					"10%% of damage dealt is restored as", 	// NE
+		{ "Gluttony", 				"8%% of damage dealt is restored as", 	// NE
 		  6705,						"Hitpoints, Endurance, and Mana." },
 		{ "Pride", 					"Your debuffs ignore 20%% of enemy", 	// EN
 		  6706,						"Immunity." },
@@ -1045,10 +1045,10 @@ struct sk_tree sk_corrupt[108]={
 	  6702,							"2%% remaining health." },
 	{ "* Wrath *", 					"0.2%% more effect of Rage & Calm per 50",
 	  6703,							"missing Hitpoints, Endurance, and Mana." },
-	{ "* Gluttony *", 				"3%% more Hitpoints, Endurance, and Mana.",
+	{ "* Sloth *", 					"3%% more Hitpoints, Endurance, and Mana.",
 	  6704,							"" },
-	{ "* Sloth *", 					"2%% of damage dealt is restored as",
-	  6705,							"Hitpoints, Endurance, and Mana." },
+	{ "* Hunger *", 				"2%% of damage dealt is restored as",
+	  6705,							"Hitpoints, Endurance, or Mana." },
 	{ "* Pride *", 					"Your debuffs ignore 5%% of enemy",
 	  6706,							"Immunity." },
 	{ "* Madness *", 				"+1 to Spell Modifier.",
@@ -1401,6 +1401,9 @@ int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,
 #define GUI_WV_X		1112
 #define GUI_WV_Y		 261
 
+#define GUI_LOCA_X		   9
+#define GUI_LOCA_Y		 570
+
 #define GUI_XPBAR_X		1109
 #define GUI_XPBAR_Y		 300
 #define GUI_XPBAR_W		 165
@@ -1471,7 +1474,7 @@ int sk_proxi=0, sk_immun=0, sk_resis=0, sk_conce=0, sk_ghost=0, sk_poiso=0, sk_s
 int sk_blast=0, sk_scorc=0, sk_pulse=0, sk_pucnt=0, sk_razor=0, sk_leapv=0, sk_blind=0;
 int sk_water=0, sk_cleav=0, sk_weake=0, sk_warcr=0, sk_regen=0, sk_restv=0, sk_medit=0;
 int sk_shado=0, sk_rally=0, sk_immol=0, sk_shadd=0, sk_metab=0;
-int pl_ehp=0,   cri_leap=0, sk_bleed=0, sk_rage=0,  sk_calm=0,  sk_letha=0;
+int pl_ehp=0,   sk_leapr=0, sk_bleed=0, sk_rage=0,  sk_calm=0,  sk_letha=0;
 int sk_hem=0,   sk_rage2=0, sk_calm2=0;
 int sk_bless=0, sk_enhan=0, sk_prote=0, sk_mshie=0, sk_mdura=0, sk_haste=0, sk_healr=0;
 int coo_clea=0, coo_leap=0, coo_blas=0, coo_pois=0, coo_puls=0, coo_ghos=0, coo_shad=0;
@@ -1602,7 +1605,7 @@ void init_meta_stats(void)
 	sk_calm2 = 10000 * (1000 - (IS_SEYAN_DU?(sk_calm*2/3):(sk_calm))) / 1000;
 	sk_calm  = min(127, IS_SEYAN_DU?(sk_calm/6 + 5):(sk_calm/4 + 5)) * -1;
 	
-	sk_letha = (sk_score(15)+(sk_score(15)*(T_SORC_SK(7)?at_score(AT_WIL)/1000:0)))*pl_spmod/100/(IS_SEYAN_DU?4:3);
+	sk_letha = (sk_score(15)+(sk_score(15)*(T_SORC_SK(7)?at_score(AT_WIL)/2000:0)))*pl_spmod/100/(IS_SEYAN_DU?4:3);
 	sk_bless = min(127, (sk_score(21)*pl_spmod/100*2/3) / 5 + 3);
 	sk_enhan = min(127, (IS_SEYAN_DU?(sk_score(18)*pl_spmod/100/6+3):(sk_score(18)*pl_spmod/100/4+4)));
 	sk_prote = min(127, (IS_SEYAN_DU?(sk_score(17)*pl_spmod/100/6+3):(sk_score(17)*pl_spmod/100/4+4)));
@@ -1612,13 +1615,14 @@ void init_meta_stats(void)
 	sk_haste = min(300, 10 + (sk_score(47)*pl_spmod/100)/ 6) + min(127, 5 + (sk_score(47)+6)/12);
 	sk_healr = ((pl_flags&(1<<14))?sk_score(26)*pl_spmod/100*1875/20:sk_score(26)*pl_spmod/100*2500)/1000;
 	
-	if (pl_flagb & (1<<7))	// Tarot - Rev.Justice (Leap dmg reduced)
+	if (pl_flagb & (1<<7))	// Tarot - Rev.Justice (Leap dmg crits)
 	{
-		sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_HIT/1000;
+		sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000 * pl_critm/100;
 	}
 	else
 	{
-		sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000;
+		sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_RLEAP/1000;
+		sk_leapr = max(0, min(10, (100 - pl_cdrate)/10));
 	}
 	
 	
@@ -1642,6 +1646,10 @@ void init_meta_stats(void)
 		sk_immun = sk_score(32);
 		sk_resis = sk_score(23);
 	}
+	if (T_WARR_SK(12))
+	{
+		sk_immun += pl_spapt/5;
+	}
 	
 	// Book - Great Prodigy (concentrate bonus)
 	if (pl_flags & (1 <<  3))
@@ -1663,7 +1671,7 @@ void init_meta_stats(void)
 	if (pl_flagb & (1 << 14))
 		sk_poiso = sk_poiso / 2;
 	
-	sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/3) * 2 * DAM_MULT_ZEPHYR/1000;
+	sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/2) * 2 * DAM_MULT_ZEPHYR/1000;
 	
 	if (IS_SEYAN_DU || IS_BRAVER)
 	{
@@ -1772,12 +1780,6 @@ void init_meta_stats(void)
 	
 	pl_armor = pl.armor;
 	
-	if (pl_flagb&(1<<4)) // Bone Armor
-	{
-		sk_regen += pl_armor * 25 / 2;
-		pl_armor = 0;
-	}
-	
 	// Amulet - Standard Ankh			1 0 0
 	if ((pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
 	{
@@ -1827,8 +1829,6 @@ void init_meta_stats(void)
 	sk_razor = sk_razor*pl_dmgbn/10000*pl_dmgml/100;
 	sk_immol = sk_immol*pl_dmgbn/10000*pl_dmgml/100;
 	pl_reflc = pl_reflc*pl_dmgbn/10000*pl_dmgml/100;
-	
-	cri_leap = sk_leapv*pl_critm/100;
 	
 	// Acedia - Sprite 5556
 	if (pl.worn[WN_RHAND] == 5556) len = len * 3/4; // less
@@ -1936,15 +1936,15 @@ void show_meta_stats(int n)
 			case 19: if (pl.skill[40][0])
 					 meta_stat(2,n,5,"Cleave Cooldown",      coo_clea/100, coo_clea%100, "Seconds"); break;
 			case 20: if (pl.skill[49][0])
-					 meta_stat(2,n,1,"Leap Crit Damage",     cri_leap,     -1,           ""       ); break;
-			case 21: if (pl.skill[49][0])
 					 meta_stat(2,n,1,"Leap Hit Damage",      sk_leapv,     -1,           ""       ); break;
+			case 21: if (pl.skill[49][0] && sk_leapr)
+					 meta_stat(2,n,1,"Leap # of Repeats",    sk_leapr,   -1, (sk_leapr>1?"Repeats":"Repeat")); break;
 			case 22: if (pl.skill[49][0])
 					 meta_stat(2,n,1,"Leap Cooldown",        coo_leap/100, coo_leap%100, "Seconds"); break;
-			case 23: if (pl.skill[22][0]) {
-					 meta_stat(2,n,5,"Rage TD Bonus",  sk_rage, -1,          "Top Dmg"); } break;
-			case 24: if (pl.skill[22][0]) {
-					 meta_stat(2,n,5,"Rage DoT Bonus", sk_rage2/100, sk_rage2%100, "%"); } break;
+			case 23: if (pl.skill[22][0])
+					 meta_stat(2,n,5,"Rage TD Bonus",        sk_rage,      -1,           "Top Dmg"); break;
+			case 24: if (pl.skill[22][0])
+					 meta_stat(2,n,5,"Rage DoT Bonus",       sk_rage2/100, sk_rage2%100, "%"      ); break;
 			case 25: if (pl.skill[24][0]) 
 					 meta_stat(2,n,4,"Blast Hit Damage",     sk_blast,     -1,           ""       ); break;
 			case 26: if (pl.skill[24][0])
@@ -2019,10 +2019,10 @@ void show_meta_stats(int n)
 					 meta_stat(2,n,4,(pl_flagb&(1<<10))?"M.Shell Duration":"M.Shield Duration", sk_mdura, -1, "Seconds"); break;
 			case 22: if (pl.skill[47][0])
 					 meta_stat(2,n,6,"Haste Effect",         sk_haste,     -1,           "Speed"  ); break;
-			case 23: if (pl.skill[22][0]) {
-					 meta_stat(2,n,5,"Calm TD Taken", sk_calm,    -1,         "Top Dmg"); } break;
-			case 24: if (pl.skill[22][0]) {
-					 meta_stat(2,n,5,"Calm DoT Taken", sk_calm2/100, sk_calm2%100, "%" ); } break;
+			case 23: if (pl.skill[22][0])
+					 meta_stat(2,n,5,"Calm TD Taken",        sk_calm,      -1,           "Top Dmg"); break;
+			case 24: if (pl.skill[22][0])
+					 meta_stat(2,n,5,"Calm DoT Taken",       sk_calm2/100, sk_calm2%100, "%"      ); break;
 			case 25: if (pl.skill[26][0])
 					 meta_stat(2,n,1,(pl_flags&(1<<14))?"Regen Effect":"Heal Effect",sk_healr,-1,(pl_flags&(1<<14))?"/s":""); break;
 			case 26: if (pl.skill[37][0])  {
@@ -2238,13 +2238,14 @@ void eng_display_win(int plr_sprite,int init)
 			copyspritex(do_darkmode?18004:18002, 339, 179,  0);
 		}
 
-		// WV, AV, EXP
+		// WV, AV, EXP, Location
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y,1,   "%11d",pl.weapon);
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y+14,1,"Armor Value");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl_armor);
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
+		dd_xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
 
 		// display spell shortcut buttons
 		for (n=0; n<20; n++) {
@@ -2512,7 +2513,7 @@ void eng_display_win(int plr_sprite,int init)
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
 			
-			if (!show_shop) {
+			if (!show_shop || (show_shop==110 || show_shop==111)) {
 				copyspritex(rank_sprite[points2rank(pl.points_tot)],935,42,0);
 				copyspritex(plr_sprite,935-61,36,0);
 				dd_xputtext(846+(125-strlen(pl.name)*6)/2,157,1,pl.name);
@@ -2580,7 +2581,7 @@ void eng_display_win(int plr_sprite,int init)
 				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, 15-min(15,debuffs[n][1]));
 		}
 		
-		if (show_shop==111) // New Depot
+		if (show_shop==112) // New Depot
 		{
 			copyspritex(do_darkmode?18094:18093,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (n=0; n<64; n++)
@@ -2610,6 +2611,63 @@ void eng_display_win(int plr_sprite,int init)
 			xx = GUI_SHOP_X+7 + (dept_page%4)*68;
 			yy = GUI_SHOP_Y+281 + (dept_page/4)*17;
 			dd_showbox(xx,yy,63,12,(unsigned short)(GREEN));
+		}
+		else if (show_shop==110 || show_shop==111) // Blacksmith Window
+		{
+			if (pl.sitem[1]==17357) // Show two-material gui - sprite number for claystone
+			{
+				copyspritex(do_darkmode?18120:18119,GUI_SHOP_X,GUI_SHOP_Y,0);
+				m = 1;
+			}
+			else // Show one-material gui
+			{
+				copyspritex(do_darkmode?18118:18117,GUI_SHOP_X,GUI_SHOP_Y,0);
+				m = 0;
+			}
+			
+			if (pl.sitem[1]==17356) // Show three-button overlay - sprite number for whetstone
+			{
+				if (show_shop==110)
+					copyspritex(do_darkmode?18122:18121,GUI_SHOP_X,GUI_SHOP_Y,0);
+				else
+					copyspritex(do_darkmode?18124:18123,GUI_SHOP_X,GUI_SHOP_Y,0);
+			}
+			
+			for (n=0;n<4;n++)
+			{
+				hh = 0;
+				xx = GUI_SHOP_X;
+				yy = GUI_SHOP_Y;
+				switch (n)
+				{
+					case  0:	// Left Item
+						xx +=  46;
+						yy += 125;
+						break;
+					case  1:	// Top Middle
+						xx += 125;
+						if (m)	yy +=  99;
+						else	yy += 125;
+						break;
+					case  2:	// Bottom Middle
+						if (!m) continue;
+						xx += 125;
+						yy += 151;
+						break;
+					default:	// Right Item
+						xx += 204;
+						yy += 125;
+						break;
+				}
+				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) hh = 16;
+				
+				copyspritex(pl.sitem[n],xx,yy,hh);									// Draw Item
+				if (pl.sitem_f[n] & 1) copyspritex(4496,xx,yy,hh); 					// Draw SS
+				if (pl.sitem_f[n] & 2) copyspritex(4497,xx,yy,hh); 					// Draw EN
+				if (pl.sitem_f[n] & 4) copyspritex(6881,xx,yy,hh); 					// Draw CR
+				if (pl.sitem_s[n]>0&&pl.sitem_s[n]<=10)								// Draw Stack
+					copyspritex(4000+pl.sitem_s[n],xx,yy,hh);
+			}
 		}
 		else if (show_shop) 
 		{

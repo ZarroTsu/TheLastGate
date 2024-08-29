@@ -1,14 +1,14 @@
 // Just comment/uncomment this to alter home copy version
-#define HOMECOPY
+//#define HOMECOPY
 
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
-	#define MHOST		"tlg.abyss.codes" //"10.0.0.66"
 #else
 	#define MNAME		"The Last Gate"
-	#define MHOST		"thelastgate.ddns.net"
 #endif
 
+#define MHOST			"tlg.abyss.codes"
+#define MPROXY			"thelastgate.ddns.net"
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"
 #define MNEWS			"https://discord.gg/jJbPv2R"
 
@@ -31,7 +31,8 @@
 #define DAM_MULT_CLEAVE		 500
 #define DAM_MULT_PULSE		 100
 #define DAM_MULT_ZEPHYR		  50
-#define DAM_MULT_LEAP		 500
+#define DAM_MULT_LEAP		 375
+#define DAM_MULT_RLEAP		 150
 #define DAM_MULT_POISON		4500
 #define DAM_MULT_BLEED		 750
 
@@ -197,6 +198,7 @@ struct cmap {
 struct cplayer {
 	// informative stuff
 	char name[40];
+	char location[20];
 
 	int mode;	// 0 = slow, 1 = medium, 2 = fast
 
@@ -250,6 +252,11 @@ struct cplayer {
 
 	int citem, citem_p;
 	char citem_s;  // Stack size of given item (0 - 10)
+	
+	// Smith item slots
+	int sitem[4];		// Sprite
+	char sitem_s[4];	// Stack
+	char sitem_f[4];	// Flags
 
 	int attack_cn;
 	int goto_x,goto_y;
@@ -294,7 +301,7 @@ struct cplayer {
 #define CL_CMD_EXIT			31
 #define CL_CMD_UNIQUE		32
 #define CL_PASSWD			33
-
+#define CL_CMD_SMITH		34
 #define CL_CMD_WPS			35
 #define CL_CMD_MOTD			36
 #define CL_CMD_BSSHOP		37
@@ -319,6 +326,9 @@ struct cplayer {
 #define SV_SETCHAR_HP				12
 #define SV_SETCHAR_ENDUR			13
 #define SV_SETCHAR_MANA				14
+
+#define SV_SETCHAR_LOCA1			16
+#define SV_SETCHAR_LOCA2			17
 
 #define SV_SETCHAR_AHP				20
 #define SV_SETCHAR_PTS				21
@@ -353,7 +363,9 @@ struct cplayer {
 #define SV_LOOK5					50
 #define SV_LOOK6					51
 #define SV_LOOK7					52
+#define SV_LOOK8					53
 
+#define SV_CLOSESHOP				55
 #define SV_LOAD                 	56
 #define SV_CAP						57
 #define SV_MOD1						58

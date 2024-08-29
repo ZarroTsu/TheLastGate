@@ -209,8 +209,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
 				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning them if they are at full health. Cooldown can be bypassed at an additional cost.", 
-				"Leap (Random)", 		"Use (Skill): Strike your foe and leap through three random targets, dealing critical damage if they are at full health. Cooldown can be bypassed at an additional cost.",
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life. Higher cooldown rate lets this skill repeat additional times.",
+				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
@@ -267,7 +267,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Slaying", 				"+3% Critical Multiplier for every 10 total Agility."},
 		{ "Overwhelming Agility", 	"3% increased total Agility. +10 to Agility Limit."},
 		{ "Acumen", 				"All melee skills use the attributes (STR+BRV/2) + Agility + Agility."},
-		{ "Impact", 				"Weaken and Crush also reduce enemy critical hit chance."},
+		{ "Impact", 				"Weaken and Crush also reduce enemy damage multiplier and damage reduction."},
 		{ "Perseverance", 			"20% more total Endurance."},
 		{ "Tenacity", 				"20% of damage taken is dealt to your Endurance instead."}
 	},{	// Warrior
@@ -282,7 +282,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Butchery", 				"0.5% more effect of Cleave for every 10 total Strength."},
 		{ "Champion", 				"Enemies beside and behind you no longer gain a bonus to hitting you."},
 		{ "Zealotry", 				"20% more total Spell Aptitude."},
-		{ "Fervor", 				"2% less damage taken per 10 Spell Aptitude."}
+		{ "Fervor", 				"20% of Spell Aptitude is used to reduce the strength of incoming enemy spells."}
 	},{	// Sorcerer
 		{ "Expansiveness", 			"+1 to Area of Effect."},
 		{ "Potency", 				"+3 to Willpower & +3 to Intuition."},
@@ -343,8 +343,8 @@ struct sk_tree sk_tree[10][12]={
 		{ "Ravager", 				"20% more total Top Damage"},
 		{ "Greed", 					"Your Top Damage is rolled an additional time, using the higher result."},
 		{ "Wrath", 					"0.5% more effect of Rage & Calm per 50 missing Hitpoints, Endurance, and Mana."},
-		{ "Gluttony", 				"10% more Hitpoints, Endurance, and Mana."},
-		{ "Sloth", 					"10% of damage dealt is restored as Hitpoints, Endurance, and Mana."},
+		{ "Sloth", 					"10% more Hitpoints, Endurance, and Mana."},
+		{ "Gluttony", 				"8% of damage dealt is restored as Hitpoints, Endurance, and Mana."},
 		{ "Pride", 					"Your debuffs ignore 20% of enemy Immunity."},
 		{ "Madness", 				"+3 to Spell Modifier."},
 		{ "Envy", 					"Ferocity grants +1 Spell Modifier per empty gear slot."}
@@ -468,8 +468,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Ravager", 				"(5%) more total Top Damage"},
 	{ "Culling", 				"Critical Hits kill enemies left below (2%) remaining health."}, // *
 	{ "Wrath", 					"(0.2%) more effect of Rage & Calm per 50 missing Hitpoints, Endurance, and Mana."},
-	{ "Gluttony", 				"(3%) more Hitpoints, Endurance, and Mana."},
-	{ "Sloth", 					"(2%) of damage dealt is restored as Hitpoints, Endurance, and Mana."},
+	{ "Sloth", 					"(3%) more Hitpoints, Endurance, and Mana."},
+	{ "Hunger", 				"(2%) of damage dealt is restored as Hitpoints, Endurance, or Mana."},
 	{ "Pride", 					"Your debuffs ignore (5%) of enemy Immunity."},
 	{ "Madness", 				"(+1) to Spell Modifier"},
 	{ "Envious", 				"(+1) Spell Modifier per empty ring slot."}

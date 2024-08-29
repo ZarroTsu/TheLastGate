@@ -968,7 +968,7 @@ int npc_give(int cn, int co, int in, int money)
 		{	// hack for black candle
 			ar = it[in].data[0];
 			do_give_bspoints(co, ar, 1);
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			do_sayx(cn, "Ah, a black candle! Great work, %s! Now we may see peace for a while...", ch[co].name);
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The Tactician was impressed by %s's deed.\n", ch[co].name);
 			ch[co].misc_action = DR_IDLE;
@@ -1106,7 +1106,7 @@ int npc_give(int cn, int co, int in, int money)
 			else
 				do_sayx(cn, "Here's your payment, and a bit of knowledge.");
 			
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			do_give_exp(co, nr, 0, -1, money);
 			// <group rewards>
 			for (n = 1; n<MAXCHARS; n++)
@@ -1124,7 +1124,7 @@ int npc_give(int cn, int co, int in, int money)
 		else if (ch[cn].temp==CT_ISHTAR || ch[cn].temp==CT_ANKH || ch[cn].temp==CT_KWAI || ch[cn].temp==CT_GORN)
 		{
 			do_sayx(cn, "Thank you %s. That's the %s I wanted.", ch[co].name, it[in].reference);
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			// Check for player Chalice item to upgrade, or otherwise award the worst one.
 			if (n = has_item(co, IT_CHALICE3)) nr = IT_CHALICE4;
 			else if (n = has_item(co, IT_CHALICE2)) nr = IT_CHALICE3;
@@ -1140,7 +1140,7 @@ int npc_give(int cn, int co, int in, int money)
 				else 
 				{
 					do_sayx(cn, "I shall improve your %s in exchange.", it[n].reference);
-					use_consume_item(co, n, 1);
+					use_consume_item(co, n, 0);
 				}
 				in = god_create_item(nr);
 				god_give_char(in, co);
@@ -1197,12 +1197,12 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, (nr/4), 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				else
 				{
 					do_sayx(cn, "You will need a lockpick, and I happen to have a spare. Take it, please.");
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 					in = god_create_item(93);
 					god_give_char(in, co);
 					do_sayx(cn, "You can LOOK at a door and you will be able to tell you how hard it is to pick it.");
@@ -1279,7 +1279,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
 						do_give_exp(co, nr, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 					
 					// <group rewards>
 					for (n = 1; n<MAXCHARS; n++)
@@ -1334,12 +1334,12 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				else
 				{
 					do_sayx(cn, "Simply look at any item in your possession, and you will now know its true value.");
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 					ch[co].flags |= CF_APPRAISE;
 					do_char_log(co, 0, "You learned how to appraise items!\n");
 					do_update_char(co);
@@ -1382,7 +1382,7 @@ int npc_give(int cn, int co, int in, int money)
 				else
 				{
 					do_sayx(cn, "You will now notice a magic item when it's dropped if you can see it. Additionally, you may now notice when enemies try to cast spells on you.");
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 					ch[co].flags |= CF_SENSE;
 					do_char_log(co, 0, "You learned how to sense magic!\n");
 					do_update_char(co);
@@ -1422,11 +1422,11 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				else
 				{
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 					ch[co].kindred |= KIN_IDENTIFY;
 					do_char_log(co, 0, "You learned Identify!\n");
 					do_update_char(co);
@@ -1466,12 +1466,12 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				else
 				{
 					do_sayx(cn, "Simply cast identify or use the #buffs command, and you will now know what each spell is doing to you!");
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 					ch[co].flags |= CF_KNOWSPELL;
 					do_char_log(co, 0, "You learned how to understand spell effects!\n");
 					do_update_char(co);
@@ -1531,7 +1531,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				else
 				{
@@ -1545,7 +1545,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
 						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				// <group rewards>
 				for (n = 1; n<MAXCHARS; n++)
@@ -1593,7 +1593,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
 						do_give_exp(co, nr/4 + (nr*(stsz-1))/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				else
 				{
@@ -1609,7 +1609,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
 						do_give_exp(co, nr + (nr*(stsz-1))/4, 0, -1, 0);
 					}
-					use_consume_item(cn, in, 1);
+					use_consume_item(cn, in, 0);
 				}
 				// <group rewards>
 				for (n = 1; n<MAXCHARS; n++)
@@ -1640,7 +1640,7 @@ int npc_give(int cn, int co, int in, int money)
 		/* items with a return gift - SK_HASTE is special since we don't want Regal giving a book with the skill */
 		if (nr2 != SK_HASTE && (nr = ch[cn].data[66])!=0)
 		{
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			if (nr == 1354) nr = 1354 + RANDOM(6); // Medium Gems
 			if (nr == 1360) // Big Gems
 			{
@@ -1721,7 +1721,7 @@ int npc_give(int cn, int co, int in, int money)
 				do_sayx(cn, "Here is a small token of gratitude, %s.", ch[co].name);
 			else
 				do_sayx(cn, "Here is your reward in exchange, %s!", ch[co].name);
-			use_consume_item(cn, in, 1);
+			use_consume_item(cn, in, 0);
 			ch[co].gold += money;
 			do_char_log(co, 2, "You received %dG %dS.\n", money / 100, money % 100);
 			if ((nr = ch[cn].data[51])!=0)
@@ -1759,7 +1759,7 @@ int npc_give(int cn, int co, int in, int money)
 			}
 
 			/* ok to destroy the gift now */
-			use_consume_item(co, in, 1);
+			use_consume_item(co, in, 0);
 			/* Select and ask a riddle */
 			lab9_pose_riddle(cn, co);
 		}
@@ -1927,7 +1927,7 @@ int count_uniques(int cn)
 	for (n = 0; n<20; n++)					if ((in = ch[cn].worn[n]) && IS_UNIQUE(in))							cnt++;
 	for (n = 0; n<12; n++)					if ((in = ch[cn].alt_worn[n]) && IS_UNIQUE(in))						cnt++;
 //	for (n = 0; n<62; n++)					if ((in = ch[cn].depot[n]) && IS_UNIQUE(in))						cnt++;
-	for (n = 0; n<ST_PAGES*ST_SLOTS; n++) 	if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]) && IS_UNIQUE(in)) 	cnt++;
+//	for (n = 0; n<ST_PAGES*ST_SLOTS; n++) 	if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]) && IS_UNIQUE(in)) 	cnt++;
 	
 	return(cnt);
 }
@@ -2987,17 +2987,11 @@ int npc_see(int cn, int co)
 				cnt = count_uniques(co);
 
 				if (cnt==1)
-				{
 					do_sayx(cn, "I see you have a weapon dedicated to the gods. Make good use of it, %s.\n", ch[co].name);
-				}
 				else if (cnt==2)
-				{
 					do_sayx(cn, "I see you have a few weapons dedicated to the gods. Make good use of them, %s.\n", ch[co].name);
-				}
-				else if (cnt>2)
-				{
-					do_sayx(cn, "I see you have several weapons dedicated to the gods. They will get angry if you keep more than two, %s.\n", ch[co].name);
-				}
+				//else if (cnt>2)
+				//	do_sayx(cn, "I see you have several weapons dedicated to the gods. They will get angry if you keep more than two, %s.\n", ch[co].name);
 			}
 		}
 	}
@@ -3135,7 +3129,10 @@ int get_spellcost(int cn, int spell)
 		case SK_SHIELD:		return 20;
 		case SK_LEAP:		return 20;
 		case SK_RAGE:		return SP_COST_RAGE;
-		case SK_TAUNT:		return SP_COST_TAUNT;
+		case SK_TAUNT:	if (IS_PLAYER_GC(cn) && IS_SANEPLAYER(CN_OWNER(cn)) && get_gear(CN_OWNER(cn), IT_WB_GOLDGLAIVE))
+							return SP_COST_WARCRY;
+						else
+							return SP_COST_TAUNT;
 		case SK_WEAKEN:		return SP_COST_WEAKEN;
 		case SK_WARCRY:		return SP_COST_WARCRY;
 		
@@ -3238,6 +3235,10 @@ int npc_try_spell(int cn, int co, int spell)
 	
 	truespell = spell;
 	
+	// override for improved golden glaive
+	if (spell==SK_TAUNT && IS_PLAYER_GC(cn) && IS_SANEPLAYER(CN_OWNER(cn)) && get_gear(CN_OWNER(cn), IT_WB_GOLDGLAIVE))
+		spell = SK_WARCRY;
+	
 	// ** Translate spell to truespell based on caster tarot card     
 	
 	if (spell==SK_CURSE  && get_tarot(cn, IT_CH_TOWER))   	truespell = SK_CURSE2;
@@ -3295,6 +3296,21 @@ int npc_try_spell(int cn, int co, int spell)
 	if (truespell==SK_DISPEL  && SP_MULT_DISPEL2 * offn / max(1, defn)< 9) return 0;
 	if (truespell==SK_TAUNT   && SP_MULT_TAUNT   * offn / max(1, defn)<10) return 0;
 	if (truespell==SK_WARCRY  && SP_MULT_WARCRY  * offn / max(1, defn)<10) return 0;
+	
+	// calculate target immunity and avoid casting mod 1 debuffs
+	timm = spell_immunity(offn, get_target_immunity(cn, co));
+	
+	if (T_SEYA_SK(co, 10))				timm = timm*4/5;
+	if (n=st_skillcount(co, 10))		timm = timm*(20-n)/20;
+	if (get_tarot(cn, IT_CH_CHARIO_R)) 	timm = timm*4/5;
+	if (get_enchantment(co, 4)) 		timm = timm*4/5;
+	
+	if ((spell==SK_CURSE  && get_enchantment(co, 21)) ||
+		(spell==SK_BLIND  && get_enchantment(co, 33)) ||
+		(spell==SK_WEAKEN && get_enchantment(co,  8)) ||
+		(spell==SK_SLOW   && get_enchantment(co, 14)) ) timm = timm/5;
+	
+	if (timm<=1) return 0;
 	
 	// prevent thralling multiple ghosts
 	if (spell==SK_GHOST)
@@ -6244,7 +6260,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			// Spawn shadows
 			for (n=0;n<try;n++)
 			{
-				co = 1432;
+				co = CT_SHADOW;
 				     if (try==1) { x = to_xy[1  ][0]; y = to_xy[1  ][1]; dir = to_xy[1  ][2]; }
 				else if (try==2) { x = to_xy[2+n][0]; y = to_xy[2+n][1]; dir = to_xy[2+n][2]; }
 				else 			 { x = to_xy[1+n][0]; y = to_xy[1+n][1]; dir = to_xy[1+n][2]; }
@@ -6741,12 +6757,12 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			if (ch[cn].a_hp>ch[cn].hp[5]*200) return; // Wait until 20%
 			clean_and_go(cn, go_xy[6][0], go_xy[6][1], go_xy[6][2], 200);
 			//
-			co = pop_create_char(1432, 0); x = go_xy[6][0]-4; y = go_xy[6][1];
+			co = pop_create_char(CT_SHADOW, 0); x = go_xy[6][0]-4; y = go_xy[6][1];
 			if (co) { ch[cn].data[6] = co; ch[co].kindred |= KIN_SHADOW; ch[co].flags |= CF_NOSLEEP; ch[co].a_hp = 525; ch[co].sprite = ch[cn].sprite; }
 			if (!god_drop_char_fuzzy(co, x, y)) { god_destroy_items(co); ch[co].used = USE_EMPTY; }
 			fx_add_effect(12, 0, x, y, 0); ch[co].dir = go_xy[6][2];
 			//
-			co = pop_create_char(1432, 0); x = go_xy[6][0]+4; y = go_xy[6][1];
+			co = pop_create_char(CT_SHADOW, 0); x = go_xy[6][0]+4; y = go_xy[6][1];
 			if (co) { ch[cn].data[7] = co; ch[co].kindred |= KIN_SHADOW; ch[co].flags |= CF_NOSLEEP; ch[co].a_hp = 525; ch[co].sprite = ch[cn].sprite; }
 			if (!god_drop_char_fuzzy(co, x, y)) { god_destroy_items(co); ch[co].used = USE_EMPTY; }
 			fx_add_effect(12, 0, x, y, 0); ch[co].dir = go_xy[6][2];
@@ -7339,7 +7355,7 @@ int npc_driver_high(int cn)
 	}
 	
 	// Dispel - for self
-	if (B_SK(cn, SK_DISPEL) && !get_tarot(cn, IT_CH_HEIROPH) && !has_buff(cn, SK_DISPEL))
+	if (B_SK(cn, SK_DISPEL) && !has_buff(cn, SK_DISPEL))
 	{
 		for (n = 0, m = 0; n<MAXBUFFS; n++)
 		{
@@ -7497,7 +7513,7 @@ int npc_driver_high(int cn)
 		}
 		
 		// Dispel - for friend
-		if (B_SK(cn, SK_DISPEL) && !get_tarot(cn, IT_CH_HEIROPH) && !has_buff(co, SK_DISPEL))
+		if (B_SK(cn, SK_DISPEL) && !has_buff(co, SK_DISPEL))
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
 			{
@@ -7537,7 +7553,7 @@ int npc_driver_high(int cn)
 		}
 		
 		// Dispel - for friend
-		if (B_SK(cn, SK_DISPEL) && !get_tarot(cn, IT_CH_HEIROPH) && !has_buff(co, SK_DISPEL))
+		if (B_SK(cn, SK_DISPEL) && !has_buff(co, SK_DISPEL))
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
 			{
@@ -7691,10 +7707,6 @@ int npc_driver_high(int cn)
 		{
 			return 1;
 		}
-		//if (co && ch[cn].a_end>ch[cn].end[5]*600 && !has_buff(cn, SK_RAGE) && npc_try_spell(cn, cn, SK_RAGE))
-		//{
-		//	return 1;
-		//}
 		if (co && ch[cn].a_hp>ch[cn].hp[5]*800 && !has_buff(cn, SK_IMMOLATE) && get_tarot(cn, IT_CH_JUDGE_R) && npc_try_spell(cn, cn, SK_PULSE))
 		{
 			return 1;
@@ -7703,24 +7715,6 @@ int npc_driver_high(int cn)
 		{
 			return 1;
 		}
-		
-		// Dispel - for enemy
-		if (co && B_SK(cn, SK_DISPEL) && get_tarot(cn, IT_CH_HEIROPH) && !has_buff(co, SK_DISPEL2))
-		{
-			for (n = 0, m = 0; n<MAXBUFFS; n++)
-			{
-				if ((in = ch[co].spell[n])==0) continue;
-				if (IS_DISPELABLE2(bu[in].temp)) m++;
-			}
-			if (m>1)
-			{
-				if (npc_try_spell(cn, co, SK_DISPEL))
-				{
-					return 1;
-				}
-			}
-		}
-		//
 		if (co && npc_try_spell(cn, co, SK_SLOW))
 		{
 			return 1;
@@ -7739,16 +7733,8 @@ int npc_driver_high(int cn)
 			ch[cn].data[74] = globs->ticker + TICKS * 10;
 			return 1;
 		}
-		if ((IS_COMPANION(cn) && ch[cn].data[9] == 1))
-		{
-			if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
-			{
-				ch[cn].data[9] = 2;
-				ch[cn].data[74] = globs->ticker + TICKS * 10;
-				return 1;
-			}
-		}
-		else
+		if ( (IS_COMPANION(cn) && ch[cn].data[9] == 1 && !IS_LIVINGCHAR(ch[cn].data[PCD_SHADOWCOPY])) || 
+			!(IS_COMPANION(cn) && ch[cn].data[9] == 1 &&  IS_LIVINGCHAR(ch[cn].data[PCD_SHADOWCOPY])) )
 		{
 			if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
 			{
@@ -8499,9 +8485,9 @@ void npc_driver_low(int cn)
 	}
 	
 	// are we supposed to loot graves?
-	if (ch[cn].alignment<0 && (globs->flags & GF_LOOTING) &&
-	    ((cn & 15)==(globs->ticker & 15) || (ch[cn].flags & CF_ISLOOTING)) &&
-	    !IS_COMP_TEMP(cn) && !(ch[cn].temp>=176 && ch[cn].temp<=179) && !(ch[cn].citem))
+	if (ch[cn].alignment<0 && (globs->flags & GF_LOOTING) && ((cn & 15)==(globs->ticker & 15) || (ch[cn].flags & CF_ISLOOTING)) &&
+		!IS_COMP_TEMP(cn) && !(ch[cn].temp>=176 && ch[cn].temp<=179) && !(ch[cn].citem) &&
+		ch[cn].data[CHD_GROUP]!=1001 && ch[cn].data[CHD_GROUP]!=1002 && ch[cn].data[CHD_GROUP]!=1003)
 	{
 		if (npc_grave_logic(cn))
 		{

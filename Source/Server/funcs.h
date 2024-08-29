@@ -248,6 +248,9 @@ void do_notify_char(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_area_notify(int cn, int co, int xs, int ys, int type, int dat1, int dat2, int dat3, int dat4);
 void do_npc_shout(int cn, int type, int dat1, int dat2, int dat3, int dat4);
 void do_shop_char(int cn, int co, int nr);
+int smith_cost(int in, int flag);
+int is_valid_smith_item(int in);
+void do_blacksmith(int cn, int co, int nr);
 void do_waypoint(int cn, int n);
 void do_treeupdate(int cn, int n);
 void do_give_exp(int cn, int p, int gflag, int rank, int money);
@@ -288,7 +291,7 @@ int try_boost(int v);
 void boost_char(int cn, int type);
 void item_tick(void);
 void map_tick(void);
-void use_consume_item(int cn, int in, int flag);
+void use_consume_item(int cn, int in, int v);
 void use_stack_items(int cn, int in, int in2);
 void item_damage_armor(int cn, int dam);
 void item_damage_weapon(int cn, int dam);
@@ -307,6 +310,7 @@ int explorer_point(int cn, int in, int msg);
 int get_rebirth_bits(int cn);
 int get_seyan_bits(int cn);
 int use_seyan_shrine(int cn, int in, int flag);
+int spawner_driver(int dr);
 
 //-- effect --
 int can_drop(int m);
@@ -409,6 +413,7 @@ void add_map_goal(int loc, int v);
 int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int affix, int tarot);
 
 //-- skill_driver --
+int check_gloves(int cn, int co, int orig_co, int dr1, int dr2);
 int spellcost(int cn, int cost, int in, int usemana);
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext);
 int has_buff(int cn, int bu_temp);
@@ -427,8 +432,10 @@ int add_spell(int cn, int in);
 void remove_shadow(int cn);
 void remove_spells(int cn);
 void remove_all_spells(int cn, int flag);
+void remove_all_debuffs(int cn);
 int is_facing(int cn, int co);
 int is_back(int cn, int co);
+int is_next_to(int cn, int co);
 int is_near(int cn, int co, int v);
 int spell_light(int cn, int co, int power);
 int spell_protect(int cn, int co, int power, int fromscroll);
@@ -440,6 +447,7 @@ int spell_identify(int cn, int co, int in);
 int spell_heal(int cn, int co, int power);
 int skill_plague(int cn, int co, int flag);
 int chance_compare(int co, int offense, int defense, int usemana);
+int face_target(int cn, int co);
 int get_target_resistance(int cn, int co);
 int get_target_immunity(int cn, int co);
 int get_target_metabolism(int co);
@@ -452,6 +460,9 @@ int spell_blind(int cn, int co, int power, int flag);
 int spell_frostburn(int cn, int co, int power);
 int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2);
 int spell_blast(int cn, int co, int power, int co_orig, int aoe);
+int spell_obliterate(int cn, int co, int power, int aoe);
+int skill_obliterate(int cn, int co, int power);
+
 int spell_shock(int cn, int co, int power);
 int spell_charge(int cn, int co, int power);
 int skill_lookup(char *skill);
@@ -480,7 +491,7 @@ int npc_remove_enemy(int npc, int enemy);
 void npc_remove_all_enemies(int npc);
 void die_companion(int cn);
 int is_unique_able(int in);
-int is_osiris_weap(int in);
+int is_osiris_weap(int temp);
 
 // --- talk ---
 void npc_hear(int cn, int co, char *text);
@@ -491,6 +502,7 @@ void answer_transfer(int cn, int co, int msg);
 // --- area ---
 char *get_area(int cn, int verbose);
 char *get_area_m(int x, int y, int verbose);
+char *get_area_truncated(int cn);
 
 // --- path.c ---
 int init_node(void);

@@ -183,7 +183,7 @@ int pop_create_item(int temp, int cn)
 			}
 		}
 	}
-	if ((m = is_osiris_weap(temp)) && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
+	if ((m = is_osiris_weap(temp)) && it_temp[temp].data[0]==0 && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
 	{
 		in = god_create_item(temp);		// create the item
 		if (in)							// assure the item is created
@@ -654,7 +654,7 @@ int pop_create_char(int n, int drop)
 	{
 		if ((tmp = ch[cn].worn[m])!=0)
 		{
-			if (m == WN_RHAND && n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE && !RANDOM(2)) // Vampire equipment adjustment
+			if (m == WN_RHAND && ((n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE) || (n >= CT_ANTEDUL && n <= CT_LASTANTEDUL)) && !RANDOM(2)) // Vampire equipment adjustment
 			{
 				int randm = RANDOM(9);
 				if (tmp==IT_CLAW_STEL) tmp = IT_DAGG_STEL + randm;
@@ -823,7 +823,7 @@ int pop_create_char(int n, int drop)
 		hasloot = 1;
 	}
 	
-	if (!IS_LABY_MOB(cn) && !ch[cn].citem && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+	if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 	{
 		if (tmp = god_create_item(IT_CORRUPTOR))
 		{
@@ -1021,7 +1021,7 @@ void reset_item(int n)
 		{
 			continue;
 		}
-		if (it[in].flags & (IF_SPELL|IF_STACKABLE|IF_SOULSPLIT|IF_SOULSTONE))
+		if (it[in].flags & (IF_SPELL|IF_STACKABLE|IF_SOULSTONE))
 		{
 			continue;
 		}
@@ -1030,19 +1030,11 @@ void reset_item(int n)
 			xlog(" --> %s (%d) (%d, %d,%d).", it[in].name, in, it[in].carried, it[in].x, it[in].y);
 			// make light calculations and update characters!!!
 			
-			if (it[in].flags & (IF_DIMINISHED|IF_EASEUSE|IF_ENCHANTED))
+			if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN))
 			{
-				if (it[in].flags & (IF_DIMINISHED|IF_EASEUSE))
-				{
-					it[in].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
-					it[in].max_damage = 100000;
-				}
-				if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN))
-				{
-					it[in].flags |= IF_UPDATE;
-					it[in].flags &= ~IF_ENCHANTED;
-					it[in].enchantment = 0;
-				}
+				it[in].flags |= IF_UPDATE;
+				it[in].flags &= ~IF_ENCHANTED;
+				it[in].enchantment = 0;
 				continue;
 			}
 			

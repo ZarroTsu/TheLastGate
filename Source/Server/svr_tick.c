@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.12.2\n"};
-static char intro_msg4_font = 0;
-static char intro_msg4[] = {" \n"};
+static char intro_msg3[] = {"Current client/server version is 0.13.1\n"};
+static char intro_msg4_font = 3;
+static char intro_msg4[] = {"Blacksmithing has been added! There's a smith in Aston's South End and in Neiseer on Titan Street!\n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -564,7 +564,8 @@ void plr_cmd_inv(int nr)
 		// In this instance we just subtract 1 from held item and add 1 to slot item
 		if (in && tmp && (it[in].flags & IF_STACKABLE) && it[in].temp == it[tmp].temp) 
 		{
-			// Sanity check
+			// Sanity checks
+			if (it[in].stack==10)  return;
 			if (it[tmp].stack < 1) it[tmp].stack = 1;
 			if (it[in].stack < 1)  it[in].stack  = 1;
 			
@@ -614,12 +615,7 @@ void plr_cmd_inv(int nr)
 				it[in].stack--;
 				it[in].value = tmpv * it[in].stack;
 				
-				if (it[in].driver==110)
-				{
-					it[tmp].data[0] = it[in].data[0];
-					it[tmp].data[1] = it[in].data[1];
-				}
-				if (it[in].driver== 93)
+				if (IS_SOULCAT(in))
 				{
 					it[tmp].data[0] = it[in].data[0];
 					it[tmp].data[1] = it[in].data[1];
@@ -630,6 +626,16 @@ void plr_cmd_inv(int nr)
 						it[tmp].skill[m][0] = it[in].skill[m][0];
 						it[tmp].skill[m][1] = it[in].skill[m][1];
 					}
+				}
+				if (IS_GSCROLL(in))
+				{
+					it[tmp].data[0] = it[in].data[0];
+					it[tmp].data[1] = it[in].data[1];
+				}
+				if (IS_CORRUPTOR(in))
+				{
+					it[tmp].data[0] = it[in].data[0];
+					it[tmp].flags   = it[in].flags;
 				}
 				
 				//it[tmp].x = 0;
@@ -993,9 +999,7 @@ void plr_cmd_shop(int nr)
 	int cn, co, n;
 
 	co = *(unsigned short*)(player[nr].inbuf + 1);
-
 	n = *(unsigned short*)(player[nr].inbuf + 3);
-
 	cn = player[nr].usnr;
 
 	if (co & 0x8000)
@@ -1006,6 +1010,19 @@ void plr_cmd_shop(int nr)
 	{
 		do_shop_char(cn, co, n);
 	}
+}
+
+void plr_cmd_smith(int nr)
+{
+	int cn, co, n;
+
+	co = *(unsigned short*)(player[nr].inbuf + 1);
+	n  = *(unsigned short*)(player[nr].inbuf + 3);
+	cn = player[nr].usnr;
+	
+	do_update_char(cn);
+
+	do_blacksmith(cn, co, n);
 }
 
 void plr_cmd_qshop(int nr)
@@ -1569,6 +1586,8 @@ void plr_cmd(int nr)
 	case CL_PASSWD:
 		plr_passwd(nr);
 		break;
+	default:
+		break;
 	}
 	if (player[nr].state!=ST_NORMAL)
 	{
@@ -1626,6 +1645,8 @@ void plr_cmd(int nr)
 	case CL_CMD_CTICK:
 		plr_cmd_ctick(nr);
 		return;
+	default:
+		break;
 	}
 
 	cn = player[nr].usnr;
@@ -1678,6 +1699,8 @@ void plr_cmd(int nr)
 	case CL_CMD_EXIT:
 		plr_cmd_exit(nr);
 		return;
+	default:
+		break;
 	}
 
 	if (ch[cn].stunned==1)
@@ -1690,6 +1713,9 @@ void plr_cmd(int nr)
 
 	case CL_CMD_SHOP:
 		plr_cmd_shop(nr);
+		break;
+	case CL_CMD_SMITH:
+		plr_cmd_smith(nr);
 		break;
 	case CL_CMD_QSHOP:
 		plr_cmd_qshop(nr);
@@ -2711,8 +2737,10 @@ void plr_change(int nr)
 	struct cplayer *cpl;
 	struct cmap *cmap;
 	struct cmap *smap;
-	unsigned char   buf[256];
+	unsigned char buf[256];
 	int chFlags=0;
+	int spr, ss, en, cr, stack;
+	char areaname[40];
 
 	cn   = player[nr].usnr;
 	cpl  = &player[nr].cpl;
@@ -2772,7 +2800,8 @@ void plr_change(int nr)
 			if (get_enchantment(cn, 37)) 		chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
 			if (T_SKAL_SK(cn, 12) ||
 				T_ARHR_SK(cn, 12)) 				chFlags += (1 << 12); // 20% damage shifted to end/mana (20% more eHP)
-			if (get_gear(cn, IT_WP_RISINGPHO)) 	chFlags += (1 << 13); // Immolate skill, based off HP
+			if (get_gear(cn, IT_WP_RISINGPHO) || 
+				get_gear(cn, IT_WB_RISINGPHO)) 	chFlags += (1 << 13); // Immolate skill, based off HP
 			if (get_gear(cn, IT_TW_CLOAK)) 		chFlags += (1 << 14); // 10% damage shifted to end (10% more eHP)
 			
 			buf[0] = SV_SETCHAR_ENDUR;
@@ -2918,10 +2947,12 @@ void plr_change(int nr)
 				if (n == WN_FLAGS)
 				{
 					chFlags = 0;
-					if (get_book(cn, IT_BOOK_DAMO)) 	chFlags += (1 <<  0);
+					if (get_book(cn, IT_BOOK_DAMO) 
+					 || get_book(cn, IT_IMBK_DAMO)) 	chFlags += (1 <<  0);
 					if (get_tarot(cn, IT_CH_STRENGTH)) 	chFlags += (1 <<  1);
 					if (get_tarot(cn, IT_CH_HANGED)) 	chFlags += (1 <<  2);
-					if (get_book(cn, IT_BOOK_PROD)) 	chFlags += (1 <<  3);
+					if (get_book(cn, IT_BOOK_PROD)
+					 || get_book(cn, IT_IMBK_PROD)) 	chFlags += (1 <<  3);
 					if (get_book(cn, IT_BOOK_VENO)) 	chFlags += (1 <<  4);
 					if (get_tarot(cn, IT_CH_EMPEROR)) 	chFlags += (1 <<  5); // Slow -> Slow 2
 					if (get_tarot(cn, IT_CH_TOWER)) 	chFlags += (1 <<  6); // Curse -> Curse 2
@@ -2944,7 +2975,7 @@ void plr_change(int nr)
 					if (get_neck(cn, IT_BREATHAMMY))  { chFlags += (1 <<  2); chFlags += (1 <<  1); }
 					//
 					if (get_tarot(cn, DESC_PREIST_R)) 	chFlags += (1 <<  3); // 
-					if (get_gear(cn, IT_BONEARMOR)) 	chFlags += (1 <<  4); // Bone Armor
+				//	if () 								chFlags += (1 <<  4); // ...
 					if (get_gear(cn, IT_WP_THEWALL)) 	chFlags += (1 <<  5); // The Wall
 					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
 					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
@@ -3109,6 +3140,20 @@ void plr_change(int nr)
 				cpl->citem_s = it[in].stack;
 			}
 		}
+		
+		if (strcmp(cpl->location, get_area_truncated(cn)))
+		{
+			strcpy(areaname, get_area_truncated(cn));
+			
+			buf[0] = SV_SETCHAR_LOCA1;
+			mcpy(buf + 1, areaname, 10);
+			xsend(nr, buf, 11);
+			buf[0] = SV_SETCHAR_LOCA2;
+			mcpy(buf + 1, areaname + 10, 10);
+			xsend(nr, buf, 11);
+			
+			mcpy(cpl->location, areaname, 20);
+		}
 	}
 
 	if (cpl->a_hp!=(ch[cn].a_hp + 500) / 1000)
@@ -3205,26 +3250,57 @@ void plr_change(int nr)
 			cpl->tree_node[n] = ch[cn].tree_node[n];
 		}
 	}
-
-	if (cpl->gold!=ch[cn].gold || ((get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].gigaregen[0]) 
-		|| (!get_gear(cn, IT_BONEARMOR) && cpl->armor!=ch[cn].armor)) || cpl->weapon!=ch[cn].weapon)
+	
+	// Blacksmith slots
+	for (n = 0; n<4; n++)
 	{
-		buf[0] = SV_SETCHAR_GOLD;
-		*(unsigned long*)(buf + 1) = (unsigned long)(ch[cn].gold);
-		if (get_gear(cn, IT_BONEARMOR))
+		if (cpl->sitem[n] == (in = ch[cn].blacksmith[n])) continue;
+		if (in)
 		{
-			*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].gigaregen[0]);
-			cpl->armor  = ch[cn].gigaregen[0];
+			spr = it[in].sprite[0];
+			if (it[in].flags & IF_SOULSTONE) ss = 1; else ss = 0;
+			if (it[in].flags & IF_ENCHANTED) en = 2; else en = 0;
+			if (it[in].flags & IF_CORRUPTED) cr = 4; else cr = 0;
+			if (it[in].stack) stack = it[in].stack;  else stack = 0;
 		}
 		else
 		{
-			*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].armor);
-			cpl->armor  = ch[cn].armor;
+			spr = ss = en = cr = stack = 0;
 		}
+		buf[0] = SV_LOOK8;
+		*(unsigned char *)(buf + 1) = n;
+		*(unsigned short*)(buf + 2) = (unsigned short)(ch[cn].smithnum);
+		*(unsigned short*)(buf + 4) = spr;
+		*(unsigned char *)(buf + 6) = stack;
+		*(unsigned char *)(buf + 7) = ss + en + cr;
+		xsend(nr, buf, 8);
+		
+		if (n==0 && IS_SANEITEM(ch[cn].blacksmith[0]))
+		{
+			buf[0] = SV_LOOK8;
+			if (it[ch[cn].blacksmith[0]].flags & IF_ARMORS)
+				*(unsigned char *)(buf + 1) = 5;
+			else
+				*(unsigned char *)(buf + 1) = 4;
+			*(unsigned short*)(buf + 2) = (unsigned short)(ch[cn].smithnum);
+			*(unsigned short*)(buf + 4) = 0;
+			*(unsigned char *)(buf + 6) = 0;
+			*(unsigned char *)(buf + 7) = 0;
+			xsend(nr, buf, 8);
+		}
+		cpl->sitem[n] = ch[cn].blacksmith[n];
+	}
+
+	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)
+	{
+		buf[0] = SV_SETCHAR_GOLD;
+		*(unsigned long*)(buf + 1) = (unsigned long)(ch[cn].gold);
+		*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].armor);
 		*(unsigned long*)(buf + 9) = (unsigned long)(ch[cn].weapon);
 		xsend(nr, buf, 13);
 
 		cpl->gold = ch[cn].gold;
+		cpl->armor  = ch[cn].armor;
 		cpl->weapon = ch[cn].weapon;
 	}
 
@@ -4496,6 +4572,19 @@ int check_valid(int cn)
 				xlog("Reset alt_worn item %d (%s,%d) from char %d (%s)",
 				     in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].alt_worn[n] = 0;
+			}
+		}
+	}
+	
+	for (n = 0; n<4; n++)
+	{
+		if ((in = ch[cn].blacksmith[n])!=0)
+		{
+			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
+			{
+				xlog("Reset blacksmith item %d (%s,%d) from char %d (%s)",
+				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				ch[cn].blacksmith[n] = 0;
 			}
 		}
 	}

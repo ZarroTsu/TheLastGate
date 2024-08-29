@@ -290,7 +290,7 @@ void effect_tick(void)
 				        (globs->mdday==2 ? "nd" : ""),
 				        (globs->mdday==3 ? "rd" : ""),
 				        (globs->mdday>3 ? "th" : ""),
-				        globs->mdyear);
+				        globs->mdyear+GAMEYEAR);
 				god_drop_item(in, fx[n].data[0], fx[n].data[1]);
 				ch[co].x = it[in].x;
 				ch[co].y = it[in].y;
