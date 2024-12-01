@@ -7211,7 +7211,7 @@ int get_kill_streak_exp(int k, int p)
 
 void show_pent_count(int cn)
 {
-	do_char_log(cn, 2, "Next solve is at %d pentagrammas.\n", penta_needed);
+	do_char_log(cn, 2, "Next solve is at %d pentagrams.\n", penta_needed);
 }
 
 void solved_pentagram(int cn, int in)
@@ -7266,7 +7266,7 @@ void solved_pentagram(int cn, int in)
 			/*
 			else
 			{
-				do_char_log(n, 1, "Next solve will be at %d pentagrammas.\n", penta_needed);
+				do_char_log(n, 1, "Next solve will be at %d pentagrams.\n", penta_needed);
 			}
 			*/
 		}
@@ -7275,7 +7275,7 @@ void solved_pentagram(int cn, int in)
 		{
 			do_give_exp(n, ch[n].data[18]+min(ch[n].data[18], get_kill_streak_exp(ch[n].data[77],ch[n].data[78])), 0, -1, 0);
 			ch[n].data[18] = 0;	ch[n].data[77] = 0;	ch[n].data[78] = 0;
-			do_char_log(n, 1, "Next solve will be at %d pentagrammas.\n", penta_needed);
+			do_char_log(n, 1, "Next solve will be at %d pentagrams.\n", penta_needed);
 		}
 		else if (ch[n].data[77])
 		{
@@ -7457,10 +7457,10 @@ int use_pentagram(int cn, int in)
 	ch[cn].data[78] = bv[0];
 	ch[cn].data[18] = exp;
 	//                 "!        .         .   |     .         .        !"
-	do_char_log(cn, 2, "Your pentagrammas have a total of %d exp.\n", exp);
+	do_char_log(cn, 2, "Your pentagrams have a total of %d exp.\n", exp);
 	if (r1<9) 
-		do_char_log(cn, 1, "Note that only the highest 5 pentagrammas count towards your experience bonus.\n");
-	do_char_log(cn, 1, "%d of the %d pentagrammas are now active.\n", act, tot);
+		do_char_log(cn, 1, "Note that only the highest 5 pentagrams count towards your experience bonus.\n");
+	do_char_log(cn, 1, "%d of the %d pentagrams are now active.\n", act, tot);
 	if (ch[cn].data[77]) 
 		do_char_log(cn, 0, "Your kill streak is %d, worth %d exp.\n", 
 			ch[cn].data[77], min(exp, get_kill_streak_exp(ch[cn].data[77],ch[cn].data[78])));
@@ -7487,7 +7487,7 @@ int use_pentagram(int cn, int in)
 			}
 			else
 			{
-				do_char_log(cn, 7, "Solve has been changed to %d pentagrammas.\n", penta_needed);
+				do_char_log(cn, 7, "Solve has been changed to %d pentagrams.\n", penta_needed);
 			}
 		}
 	}

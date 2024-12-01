@@ -5858,7 +5858,7 @@ void do_command(int cn, char *ptr)
 		}
 		;
 	case 'p':
-		if (prefix(cmd, "pentagrammas"))
+		if (prefix(cmd, "pentagrams"))
 		{
 			show_pent_count(cn);
 			return;
