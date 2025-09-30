@@ -233,6 +233,7 @@ struct know
 //}
 //{ Neiseer
 #define AR_NEISEE		300		// locations in Neiseer
+#define AR_UNTAINTED	350
 //}
 //{ Labyrinth
 #define AR_LABYRINTH	1000	// locations in the Labyrinth
@@ -772,6 +773,8 @@ struct know
 #define SP_BJACK_H		61		// Hit
 #define SP_BJACK_S		62		// Stand
 #define SP_BJACK_D		63		// Double Down
+//
+#define SP_TRAVEL		64
 //
 #define SP_COLOS_1		70
 #define SP_COLOS_2		71
@@ -1444,6 +1447,7 @@ struct know know[] = {
 	{{"!assist", "?me",                    "?", NULL},  0, AR_LABYRINTH, 0, AN_LAB_HELP     , 0},
 	{{"!who", "!are", "!you",              "?", NULL},  0, AR_LABYRINTH, 0, AN_LAB_WHO      , 0},
 	//}
+	{{"!set", "!sail",                     "?", NULL},  0, AR_UNTAINTED, 0, NULL, SP_TRAVEL},
 	//{ Generic Answers
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
 	{{"?what", "!hand",       "!skill",    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HAND, 0},
@@ -2052,8 +2056,8 @@ void answer_tarot(int cn, int co, int m)
 			ch[co].worn[m] = 0;
 			do_char_log(co, 1, "%s returned the %s to your inventory.\n", ch[cn].reference, it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(co, n, 0);
-			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(co, n, 0);
+			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(n, co, 0);
+			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
 		}
 		else
@@ -2202,6 +2206,24 @@ void answer_claim(int cn, int co, int nr)
 	do_char_log(co, 0, "You handed over %dG %dS.\n", v / 100, v % 100);
 	
 	do_update_char(co);
+}
+
+void answer_travel(int cn, int co)
+{
+	int v = ch[cn].data[3];
+	
+	if (ch[co].gold < v)
+	{
+		do_sayx(cn, "You don't have enough money for that, %s! (Need %d gold)", ch[co].name, v/100);
+		return;
+	}
+	ch[co].gold -= v;
+	do_char_log(co, 0, "You handed over %dG %dS.\n", v / 100, v % 100);
+	
+	do_sayx(cn, "Very well, %s. Take care!", ch[co].name);
+	
+	quick_teleport(co, ch[cn].data[0], ch[cn].data[1]);
+	ch[co].dir = ch[cn].data[2];
 }
 
 void answer_tokens(int cn, int co, int nr)
@@ -3170,6 +3192,7 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_TAROT2:		answer_tarot(cn, co, WN_CHARM2); break;
 		case SP_TAROT3:		answer_tarot(cn, co, WN_RRING); break;
 		case SP_UNLEARN:	answer_unlearn(cn, co); break;
+		case SP_TRAVEL:     answer_travel(cn, co); break;
 		//
 		case SP_TOKENS:		answer_tokens(cn, co, 0); break;
 		case SP_TOKEN_A:	answer_tokens(cn, co, 10); break;

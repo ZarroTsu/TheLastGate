@@ -51,6 +51,8 @@
 #define CT_HERBCOLL2	1205
 #define CT_SCORPCOLL    1016
 #define CT_ANTIQUECL    1429
+#define CT_COCOCOLL     1609
+#define CT_FLOWERCOL    1606
 #define CT_SHIVA_I		 664
 
 #define CT_RD_SKELE		  31
@@ -326,6 +328,8 @@
 #define IT_SCORQ		2613
 
 #define IT_ANTIQ		2889
+#define IT_COCO 		3560
+#define IT_FROFLO		3562
 
 #define IT_SM_WHET		3442
 #define IT_SM_CLAY		3443
@@ -346,6 +350,8 @@
 #define IT_AM_VERDANT	21060
 #define IT_AM_SEABREZ	21070
 #define IT_AM_OBSIDI	2108
+#define IT_AM_SUN		 466
+#define IT_AM_BLSUN		 481
 #define IT_AM_TRUESUN	2295
 #define IT_AM_FALMOON	2296
 #define IT_AM_ECLIPSE	2297
@@ -468,7 +474,7 @@
 #define IT_WP_KELPTRID		2520	//
 #define IT_WP_WAHUSHIYA		2521
 #define IT_WP_COBALTLANC	2522
-#define IT_WP_FLAGBEAR		9994	// TBD
+#define IT_WP_FLAGBEAR		3577	//
 
 #define IT_WP_OAKBUCKLER	 280
 #define IT_WP_RUBYKITE		 362
@@ -479,7 +485,7 @@
 #define IT_WP_FROSTGLASS	2525
 #define IT_WP_PHALANX		2526	//
 #define IT_WP_RISINGPHO		2791	//
-#define IT_WP_THEWALL		9996	// TBD
+#define IT_WP_THEWALL		3578	//
 
 #define IT_WP_BARBSWORD		 129
 #define IT_WP_SWRDSTLTH		 136
@@ -497,6 +503,7 @@
 #define IT_WP_BEINESTOC		2533
 #define IT_WP_FELLNIGHT		2534
 #define IT_WP_BLACKTAC		2535	//
+#define IT_WP_EVERGREEN		3580	//
 
 #define IT_WP_RUSTSPIKES	2115
 #define IT_WP_ANCIENTORN	2116
@@ -526,6 +533,7 @@
 #define IT_WP_GILDSHINE		2545	//
 #define IT_WP_VERDTRUNK		2546
 #define IT_WP_PHANTASM		2547
+#define IT_WP_COLDSTEEL		2548
 #define IT_WP_CROSSBLAD		2760	//
 #define IT_WP_SUNSWORD		3201
 
@@ -538,7 +546,7 @@
 #define IT_WP_BRONCHIT		2551	//
 #define IT_WP_VOLCANF		2552	//
 #define IT_WP_VIKINGMALT	3336
-#define IT_WP_GUNGNIR		9999	//
+#define IT_WP_GUNGNIR		3581	//
 
 #define REQ_LAME		    8000
 
@@ -640,6 +648,7 @@
 #define IT_GAMBLERFAL		2484
 #define IT_WHITEBELT		2486
 #define IT_BONEARMOR		2481
+#define IT_LIZCROWN			3583
 
 #define IT_SIGNET_TE		3343
 #define IT_SIGNET_MR		3344
@@ -666,6 +675,7 @@
 #define IT_SIGN_SCRE		3433
 
 #define IT_ICELOTUS			2796
+#define IT_RINGWARMTH		3582
 
 #define IT_COMMAND1			3126
 #define IT_COMMAND2			3127
@@ -1590,3 +1600,301 @@
 
 // 522 fire torch
 // 812	ice torch
+
+// Player Housing
+#define PLH_SIZE		   21
+#define PLH_WIDTH		   12 // 144 total for a perfect square
+#define PLH_MAX			  144
+
+#define PLH_X			  286
+#define PLH_Y			 1776
+
+#define PLH_BLANK		    0
+#define PLH_TREE		    1
+#define PLH_BUSH		    2
+#define PLH_WALL		    3
+#define PLH_WINDOW		    4
+#define PLH_FLOOR		    5
+#define PLH_DOOR_NS		    6
+#define PLH_DOOR_EW		    7
+#define PLH_BED1		    8
+#define PLH_BED2		    9
+#define PLH_CHEST		   10
+#define PLH_TABLE		   11
+#define PLH_TCANDLE		   12
+#define PLH_CANDLE		   13
+#define PLH_PATHWAY		   14
+#define PLH_SPAWN		   15
+#define PLH_PFLOOR		   16
+#define PLH_PPILLAR		   17
+#define PLH_PORTAL		   18
+#define PLH_CARPET1		   19
+#define PLH_CARPET2		   20
+#define PLH_CARPET3		   21
+#define PLH_CARPET4		   22
+#define PLH_CARPET5		   23
+#define PLH_CARPET6		   24
+#define PLH_CARPET7		   25
+#define PLH_CARPET8		   26
+#define PLH_CARPET9		   27
+#define PLH_BANNER_S	   28
+#define PLH_BANNER_W	   29
+#define PLH_BOOKSHELF_S	   30
+#define PLH_SHIELD_W	   31
+#define PLH_STOOL		   32
+
+#define NUM_PLH_LAYOUTS	    8
+#define NUM_PLH_GRASS	    7
+#define NUM_PLH_SHRUB_V	    5
+#define NUM_PLH_TREES	    6
+#define NUM_PLH_TREE_V	    5
+#define NUM_PLH_BUSHES	    5
+#define NUM_PLH_WALLS	    6
+#define NUM_PLH_FLOORS	    7
+#define NUM_PLH_DOORS	    8
+#define NUM_PLH_CHESTS	    3
+#define NUM_PLH_CARPETS	    3
+#define NUM_PLH_TABLES	    3
+#define NUM_PLH_CANDLES	    8
+#define NUM_PLH_PATHS	    5
+#define NUM_PLH_BANNERS	    4
+#define NUM_PLH_DECOR	    7
+#define NUM_PLH_SHELVES	    4
+#define NUM_PLH_CHAIRS	    5
+#define NUM_PLH_EXITS	    8
+
+#define PLH_UPD_GRASS	    0
+#define PLH_UPD_TREES	    1
+#define PLH_UPD_BUSHES	    2
+#define PLH_UPD_WALLS	    3
+#define PLH_UPD_FLOORS	    4
+#define PLH_UPD_DOORS	    5
+#define PLH_UPD_CHESTS	    6
+#define PLH_UPD_CARPETS	    7
+#define PLH_UPD_BANNERS	    8
+#define PLH_UPD_DECOR	    9
+#define PLH_UPD_SHELVES	   10
+#define PLH_UPD_TABLES	   11
+#define PLH_UPD_CANDLES	   12
+#define PLH_UPD_PATHS	   13
+#define PLH_UPD_EXITS	   14
+#define PLH_UPD_CHAIRS	   15
+
+// Default Floor Tile Sprites
+#define PHD_GRASS		  551
+#define PHD_FLOOR		  133
+#define PHD_PFLOOR		  142 // use for waypoint flag (143)
+#define PHD_PATHWAY		  542
+#define PHD_CARPET		  520 // middle tile +2, 523 is top corner
+
+// Default build object IDs
+#define PHD_TREE		 1467
+#define PHD_SHRUB		 1558 // Tall grass
+#define PHD_BUSH		 1440
+#define PHD_WALL		 1662
+#define PHD_WINDOW		 1663
+#define PHD_DOOR_NS		   22
+#define PHD_DOOR_EW		   84
+#define PHD_BED1		 3283
+#define PHD_BED2		 3284
+#define PHD_CHEST		 3598
+#define PHD_TABLE		   83
+#define PHD_TABLELEG	   82
+#define PHD_TCANDLE		   81
+#define PHD_CANDLE		  764 // Blue Candle, always on
+#define PHD_PPILLAR		 1554
+#define PHD_PORTAL		 3599
+#define PHD_BANNER_S	 2831
+#define PHD_BANNER_W	 2832
+#define PHD_BOOKSHELF_S	 1701
+#define PHD_SHIELD_W	  746
+#define PHD_STOOL		 3287
+
+
+#define TS_GRASS_SAND	  130
+#define TS_GRASS_LIGHT	  551
+#define TS_GRASS_DARK	 1118
+#define TS_GRASS_JUNG	 1003
+#define TS_GRASS_AUTUMN	 2828
+#define TS_GRASS_SNOW	 3020
+#define TS_GRASS_VIOLET	 5860
+
+#define TS_FLOOR_WOOD	  133
+#define TS_FLOOR_MARBLE	  142
+#define TS_FLOOR_DARK	  402
+#define TS_FLOOR_STRONG	  959
+#define TS_FLOOR_DIRT	 1014
+#define TS_FLOOR_GRAY	 1052
+#define TS_FLOOR_BRICK	  558
+
+#define TS_SHRUB_CONS1	  328
+#define TS_SHRUB_CONS2	 1236
+#define TS_SHRUB_ROCKS	 2778
+#define TS_SHRUB_GGRAS	 2788
+#define TS_SHRUB_GGRAM	 2790
+#define TS_SHRUB_GGRAT	 2792
+#define TS_SHRUB_DGRAS	 2794
+#define TS_SHRUB_DGRAM	 2796
+#define TS_SHRUB_DGRAT	 2798
+#define TS_SHRUB_AGRAS	17050
+#define TS_SHRUB_AGRAM	17052
+#define TS_SHRUB_AGRAT	17054
+#define TS_SHRUB_JUNG1	  352
+#define TS_SHRUB_JUNG2	  350
+#define TS_SHRUB_EART1	 1280
+#define TS_SHRUB_EART2	 1282
+#define TS_SHRUB_EART3	 5760
+#define TS_SHRUB_EART4	 5762
+#define TS_SHRUB_VIOL1	 5836
+#define TS_SHRUB_VIOL2	 5840
+#define TS_SHRUB_VIOL3	 5842
+#define TS_SHRUB_VIOL4	 5844
+#define TS_SHRUB_SHELL1	 6554
+#define TS_SHRUB_SHELL2	 6556
+#define TS_SHRUB_SHELL3	 6558
+
+#define TS_CHEST_BROWN	  220
+#define TS_CHEST_GREEN	 2739
+#define TS_CHEST_BLUE	 5588
+
+#define TS_TREE_JUNG1	  356 // +1 for fade ...
+#define TS_TREE_JUNG2	  358
+#define TS_TREE_JUNG3	  360
+#define TS_TREE_JUNG4	  362
+#define TS_TREE_SCUFF	  880
+#define TS_TREE_TALL	  882
+#define TS_TREE_BIG		  884
+#define TS_TREE_ROUND1	 1112
+#define TS_TREE_TRI1	 1114
+#define TS_TREE_DEAD	 1116
+#define TS_TREE_ROUND2	 1238
+#define TS_TREE_TRI2	 1240
+#define TS_TREE_WEB		 1138
+#define TS_TREE_AUTROU1	 2864
+#define TS_TREE_AUTROU2	 2868
+#define TS_TREE_AUTTRI1	 2866
+#define TS_TREE_AUTTRI2	 2870
+#define TS_TREE_AUTDEAD	 2872
+#define TS_TREE_AUTSCUF	 2874
+#define TS_TREE_AUTTALL	 2876
+#define TS_TREE_AUTBIG	 2878
+#define TS_TREE_SNOW	 2880
+#define TS_TREE_CACTI1	 5622
+#define TS_TREE_CACTI2	 5624
+#define TS_TREE_CACTI3	 5628
+#define TS_TREE_VIOLET1	 5828
+#define TS_TREE_VIOLET2	 5830
+#define TS_TREE_VIOLET3	 5832
+#define TS_TREE_VIOLET4	 5834
+
+#define TS_WALL_GREY	 2882 // +1 for low, +2 for window
+#define TS_WALL_GREY2	 2886
+#define TS_WALL_BEIGE	 2890
+#define TS_WALL_BEIGE2	 2894
+#define TS_WALL_RED		 2898
+#define TS_WALL_MIXED	 2902
+
+#define TS_TABLE_OPEN1	 1244 // Rough
+#define TS_TABLE_LEG1	 1242 // Rough
+#define TS_TABLE_OPEN2	  562 // Smooth
+#define TS_TABLE_LEG2	  560 // Smooth
+#define TS_TABLE_MARB	16888
+#define TS_TABLE_MLEG	16886
+
+#define TS_DOOR_MARBLE_E  502 // +2 for open
+#define TS_DOOR_MARBLE_N  514 // +2 for open
+#define TS_DOOR_RED_E	  564 // +2 for open
+#define TS_DOOR_RED_N	  568 // +2 for open
+#define TS_DOOR_GROLM_E	 1288
+#define TS_DOOR_GROLM_N	 1284
+#define TS_DOOR_WOOD_E	 1212
+#define TS_DOOR_WOOD_N	 1216
+#define TS_DOOR_SAND_E	 2784
+#define TS_DOOR_SAND_N	 2782
+#define TS_DOOR_GREEN_E	 5048
+#define TS_DOOR_GREEN_N	 5050
+#define TS_DOOR_SNOW_E	 5054
+#define TS_DOOR_SNOW_N	 5052
+#define TS_DOOR_BLUE_E	 5766
+#define TS_DOOR_BLUE_N	 5764
+
+#define TS_CARPET_RED	  520
+#define TS_CARPET_PURPLE  531
+#define TS_CARPET_GREEN	 5034
+
+#define TS_PATH_COBBLE	  542
+#define TS_PATH_MARBLE	  170
+#define TS_PATH_GREY	  808
+#define TS_PATH_STRONG	  950
+#define TS_PATH_DIRT	  989
+
+#define TS_EXIT_LADDERE	  366
+#define TS_EXIT_LADDERN	  368
+#define TS_EXIT_CISTERN1  476
+#define TS_EXIT_CISTERN2  478
+#define TS_EXIT_WELL	  480
+#define TS_EXIT_GREY	  598
+#define TS_EXIT_BLUE	  599
+#define TS_EXIT_YELLOW	  655
+#define TS_EXIT_GREEN	  667
+#define TS_EXIT_CRYSTAL	  800 // animate: 8
+#define TS_EXIT_LADDERD	  823
+#define TS_EXIT_LADDERU	  824
+#define TS_EXIT_PORTAL	  906 // animate: 8
+#define TS_EXIT_CYAN	 5621
+#define TS_EXIT_VPORTAL	 6834 // animate: 8
+#define TS_EXIT_CRYSRED	 6872 // animate: 8
+
+#define TS_DECOR_PAINT1	  572
+#define TS_DECOR_PAINT2	  578
+#define TS_DECOR_PAINT3	  580
+#define TS_DECOR_SKELE	  620
+#define TS_DECOR_MIRROR	16553
+#define TS_DECOR_SHIELD	16554
+#define TS_DECOR_GSHIEL	16556
+
+#define TS_BUSH_SHORT	 1093
+#define TS_BUSH_TALL	 1096
+#define TS_BUSH_ROCK	 1274
+#define TS_BUSH_CACTI	 5626
+#define TS_BUSH_BLUE	 5754
+
+#define TS_TORCH_GROLM	  200 // animate: 8 // 8
+#define TS_TORCH_WHITE	  460 // animate: 6 // 16
+#define TS_TORCH_GARG	  690 // animate: 8 // 8
+#define TS_TORCH_BLUE	 1026 // animate: 4 // 2
+#define TS_TORCH_GREY	  404 // animate: 4 // 2
+#define TS_TORCH_GOLD	 1102 // animate: 4 // 2
+#define TS_TORCH_LIZ	 5020 // animate: 8 // 8
+#define TS_TORCH_BROCK	 5768 // animate: 8 // 8
+#define TS_TORCH_BLACK	16422 // animate: 5 // 16
+#define TS_TORCH_BOWL	16510 // animate: 5 // 16
+#define TS_TORCH_MARBLE	16900 // animate: 5 // 16
+#define TS_TORCH_ICE	16700 // animate: 8 // 8
+
+#define TS_TTORC_BLUE1	 1027 // animate: 4 // Rpugh
+#define TS_TTORC_BLUE2	 1045 // animate: 4 // Smooth
+#define TS_TTORC_GOLD1	 1061 // animate: 4 // Rough
+#define TS_TTORC_GOLD2	  403 // animate: 4 // Smooth
+
+#define TS_BANN_SKELW	  620
+#define TS_BANN_SKELS	  622
+#define TS_BANN_REDS	 6046
+#define TS_BANN_REDW	 6048
+#define TS_BANN_PURPS	 6050
+#define TS_BANN_PURPW	 6052
+#define TS_BANN_GREENS	 6054
+#define TS_BANN_GREENW	 6056
+
+#define TS_SHELF_BROWN	 1134 // +1 for variance
+#define TS_SHELF_BARREL	 1130 // no variance
+#define TS_SHELF_SHORT	 1153 // no variance
+#define TS_SHELF_MARBLE	16897 // +1 for variance
+
+#define TS_STOOL_STOOL	 6882
+#define TS_STOOL_CHAIRW	 6884
+#define TS_STOOL_CHAIRS	 6886
+#define TS_STOOL_CHAIRE	 6888
+#define TS_STOOL_CHAIRN	 6890
+
+

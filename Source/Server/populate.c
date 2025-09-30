@@ -46,17 +46,17 @@ void init_lights(void)
 			}
 			if (it[in].active)
 			{
-				if (it[in].light[1])
+				if (it[in].light[I_A])
 				{
-					do_add_light(x, y, it[in].light[1]);
+					do_add_light(x, y, it[in].light[I_A]);
 					cnt1++;
 				}
 			}
 			else
 			{
-				if (it[in].light[0])
+				if (it[in].light[I_I])
 				{
-					do_add_light(x, y, it[in].light[0]);
+					do_add_light(x, y, it[in].light[I_I]);
 					cnt1++;
 				}
 			}
@@ -64,10 +64,128 @@ void init_lights(void)
 	}
 }
 
+int pop_count_item(int temp)
+{
+	int n, m, in, t = 200;
+	for (n=1;n<MAXCHARS;n++)
+	{
+		if (IS_PLAYER(n)) continue;
+		for (m=0;m<12;m++) if (IS_SANEITEM(in = ch[n].worn[m]) && it[in].temp==temp) t++;
+	}
+	return t*5;
+}
+
+int pop_create_godly_weapon(int cn, int temp, int godroll)
+{
+	int in, m, bonus = 1;
+	char *gend, *godn, name[60], refer[60], descr[220];
+	
+	if (!(in = god_create_item(temp))) return 0;
+	
+	if (godroll == 5 && (m = is_osiris_weap(temp)))
+	{
+		remove_item_age(in);
+		it[in].stack = 2 + m/2 + RANDOM((m*3+1)/2);
+		switch (m)
+		{
+			case  4: it[in].data[1] = 1; // 4!9 = 5005 x 1 = 5005k
+			case  3: it[in].data[1] = 2; // 3!7 = 1716 x 2 = 3432k
+			case  2: it[in].data[1] = 4; // 2!5 =  462 x 4 = 1848k
+			default: it[in].data[1] = 8; // 1!3 =   84 x 8 =  672k
+		}
+		it[in].data[2] = it[in].data[3] = it[in].data[4] = it[in].data[5] = 0;
+		it[in].flags |= IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE;
+		it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_PURP_UNI | IF_GORN_UNI;
+		strcpy(descr, it[in].description);
+		sprintf(it[in].description, "%s It has been blessed by the god Osiris.", descr);
+		
+		return in;
+	}
+	else if (!godroll)
+	{
+		godroll = RANDOM(4)+1;
+	}
+	else if (godroll == 5) return 0; // bad osiris weapon
+	
+	if (IS_TWOHAND(in)) bonus = 2;
+	
+	switch (godroll)
+	{
+		case 1:
+			gend = " god ";     godn = "Skua";
+			it[in].flags            |= IF_KWAI_UNI | IF_GORN_UNI;
+			it[in].speed[I_P]       +=  4 * bonus;
+			break;
+		case 2:
+			gend = " goddess "; godn = "Kwai";
+			it[in].flags            |= IF_KWAI_UNI;
+			it[in].to_hit[I_P]      +=  2 * bonus;
+			it[in].to_parry[I_P]    +=  2 * bonus;
+			break;
+		case 3:
+			gend = " god ";     godn = "Gorn";
+			it[in].flags            |= IF_GORN_UNI;
+			it[in].spell_mod[I_P]   +=  2 * bonus;
+			break;
+		default:
+			gend = " ";			godn = "Purple One";
+			it[in].flags            |= IF_PURP_UNI;
+			it[in].speed[I_P]       +=  2 * bonus;
+			it[in].to_hit[I_P]      +=  1 * bonus;
+			it[in].to_parry[I_P]    +=  1 * bonus;
+			it[in].spell_mod[I_P]   +=  1 * bonus;
+			break;
+	}
+	if (it_temp[temp].armor[I_I] && it_temp[temp].weapon[I_I])
+	{
+		it[in].armor[I_P]  += 1 * bonus;
+		it[in].weapon[I_P] += 1 * bonus;
+	}
+	else if (it_temp[temp].armor[I_I])  it[in].armor[I_P]  += 2 * bonus;
+	else if (it_temp[temp].weapon[I_I]) it[in].weapon[I_P] += 2 * bonus;
+	
+	remove_item_age(in);
+	
+	it[in].orig_temp = it[in].temp;
+	it[in].flags |= IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE;
+	it[in].flags &= ~IF_CAN_EN;
+	
+	strcpy(name, it[in].name);
+	strcpy(refer, it[in].reference);
+	strcpy(descr, it[in].description);
+	
+	sprintf(it[in].name, "%s's %s", godn, name);
+	sprintf(it[in].reference, "%s's %s", godn, refer);
+	sprintf(it[in].description, "%s It has been blessed by the%s%s.", descr, gend, godn);
+	
+	if (is_unique_able(temp) > 54) // Claws
+	{
+		if (godroll==1)      it[in].sprite[I_I] = 3715 + is_unique_able(temp)-55;
+		else if (godroll==2) it[in].sprite[I_I] = 3721 + is_unique_able(temp)-55;
+		else if (godroll==3) it[in].sprite[I_I] = 3727 + is_unique_able(temp)-55;
+		else                 it[in].sprite[I_I] = 4944 + is_unique_able(temp)-55;
+	}
+	else if (is_unique_able(temp) > 45)
+	{
+		if (godroll==1)      it[in].sprite[I_I] = 2602 + is_unique_able(temp)-46;
+		else if (godroll==2) it[in].sprite[I_I] = 2611 + is_unique_able(temp)-46;
+		else if (godroll==3) it[in].sprite[I_I] = 2620 + is_unique_able(temp)-46;
+		else                 it[in].sprite[I_I] = 4935 + is_unique_able(temp)-46;
+	}
+	else
+	{
+		if (godroll==1)      it[in].sprite[I_I] =  730 + is_unique_able(temp)-1;
+		else if (godroll==2) it[in].sprite[I_I] = 2512 + is_unique_able(temp)-1;
+		else if (godroll==3) it[in].sprite[I_I] = 2557 + is_unique_able(temp)-1;
+		else                 it[in].sprite[I_I] = 4890 + is_unique_able(temp)-1;
+	}
+	
+	return in;
+}
+
 int pop_create_item(int temp, int cn)
 {
-	int n = 0, m, in = 0, enbl = 0, godroll = 0, bonus = 1;
-	char *gend, *godn, name[60], refer[60], descr[220];
+	int in = 0;
 	
 	if (!(it_temp[temp].flags & IF_TAKE))
 	{
@@ -76,135 +194,14 @@ int pop_create_item(int temp, int cn)
 	}
 	if (is_unique_able(temp))
 	{
-		if (!in && ch[cn].alignment<0 && !RANDOM(1000)) // Reward a unique weapon
-		{	godroll = RANDOM(4)+1; 						// Decide which god blessed the weapon.
-			/*
-			for (m = 1, n = 0; m<MAXITEM; m++)			// Check for up to three copies
-			{
-				if (it[m].used==USE_EMPTY || it[m].orig_temp!=temp) continue;
-				if ((godroll == 1 && IS_SKUAWEAP(m)) ||
-					(godroll == 2 && IS_KWAIWEAP(m)) ||
-					(godroll == 3 && IS_GORNWEAP(m)) ||
-					(godroll == 4 && IS_PURPWEAP(m)) ) n++;
-				if (n>=3) break;
-			}
-			if (n<3)*/
-			in = god_create_item(temp); 			// create the item
-			if (in)										// assure the item is created
-			{
-				if (IS_TWOHAND(in))
-				{
-					bonus = 2;
-				}
-				
-				switch (godroll)
-				{
-					case 1:
-						gend = " god ";
-						godn = "Skua";
-						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]      +=  9 * bonus/2;
-						break;
-					case 2:
-						gend = " goddess ";
-						godn = "Kwai";
-						it[in].flags |= IF_KWAI_UNI;
-						it[in].to_hit[0]     +=  2 * bonus;
-						it[in].to_parry[0]   +=  2 * bonus;
-						break;
-					case 3:
-						gend = " god ";
-						godn = "Gorn";
-						it[in].flags |= IF_GORN_UNI;
-						it[in].spell_mod[0]  +=  3 * bonus/2;
-						break;
-					default:
-						gend = " ";
-						godn = "Purple One";
-						it[in].flags |= IF_PURP_UNI;
-						it[in].top_damage[0] += 15 * bonus;
-						break;
-				}
-				if (it_temp[temp].armor[0] && it_temp[temp].weapon[0])
-				{
-					it[in].armor[0]  += 1 + 1 * bonus;
-					it[in].weapon[0] += 1 + 1 * bonus;
-				}
-				else if (it_temp[temp].armor[0])
-					it[in].armor[0]  += 2 + 2 * bonus;
-				else if (it_temp[temp].weapon[0])
-					it[in].weapon[0] += 2 + 2 * bonus;
-				
-				it[in].orig_temp = it[in].temp;
-				it[in].temp = 0;
-				it[in].max_damage = 0;
-				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
-				it[in].flags &= ~(IF_CAN_SS | IF_CAN_EN);
-				strcpy(name, it[in].name);
-				strcpy(refer, it[in].reference);
-				strcpy(descr, it[in].description);
-				sprintf(it[in].name, "%s's %s", godn, name);
-				sprintf(it[in].reference, "%s's %s", godn, refer);
-				sprintf(it[in].description, "%s It has been blessed by the%s%s.", descr, gend, godn);
-				
-				if (is_unique_able(temp) > 54) // Claws
-				{
-					if (godroll==1)
-						it[in].sprite[0] = 3715 + is_unique_able(temp)-55;
-					else if (godroll==2)
-						it[in].sprite[0] = 3721 + is_unique_able(temp)-55;
-					else if (godroll==3)
-						it[in].sprite[0] = 3727 + is_unique_able(temp)-55;
-					else
-						it[in].sprite[0] = 4944 + is_unique_able(temp)-55;
-				}
-				else if (is_unique_able(temp) > 45)
-				{
-					if (godroll==1)
-						it[in].sprite[0] = 2602 + is_unique_able(temp)-46;
-					else if (godroll==2)
-						it[in].sprite[0] = 2611 + is_unique_able(temp)-46;
-					else if (godroll==3)
-						it[in].sprite[0] = 2620 + is_unique_able(temp)-46;
-					else
-						it[in].sprite[0] = 4935 + is_unique_able(temp)-46;
-				}
-				else
-				{
-					if (godroll==1)
-						it[in].sprite[0] =  730 + is_unique_able(temp)-1;
-					else if (godroll==2)
-						it[in].sprite[0] = 2512 + is_unique_able(temp)-1;
-					else if (godroll==3)
-						it[in].sprite[0] = 2557 + is_unique_able(temp)-1;
-					else
-						it[in].sprite[0] = 4890 + is_unique_able(temp)-1;
-				}
-			}
+		if (!in && ch[cn].alignment<0 && !RANDOM(pop_count_item(temp))) // Reward a unique weapon
+		{	
+			in = pop_create_godly_weapon(cn, temp, 0);
 		}
 	}
-	if ((m = is_osiris_weap(temp)) && it_temp[temp].data[0]==0 && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
+	if ((is_osiris_weap(temp)) && it_temp[temp].data[1]==0 && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
 	{
-		in = god_create_item(temp);		// create the item
-		if (in)							// assure the item is created
-		{
-			it[in].orig_temp = it[in].temp;
-			it[in].temp = 0;
-			it[in].max_damage = 0;
-			it[in].stack = 2 + m/2 + RANDOM((m*3+1)/2);
-			switch (m)
-			{
-				case  4: it[in].data[0] = 1; // 4!9 = 5005 x 1 = 5005k
-				case  3: it[in].data[0] = 2; // 3!7 = 1716 x 2 = 3432k
-				case  2: it[in].data[0] = 4; // 2!5 =  462 x 4 = 1848k
-				default: it[in].data[0] = 8; // 1!3 =   84 x 8 =  672k
-			}
-			it[in].data[1] = it[in].data[2] = it[in].data[3] = it[in].data[4] = 0;
-			it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_NOREPAIR | IF_PURP_UNI | IF_GORN_UNI;
-			it[in].flags &= ~IF_CAN_SS;
-			strcpy(descr, it[in].description);
-			sprintf(it[in].description, "%s It has been blessed by the god Osiris.", descr);
-		}
+		in = pop_create_godly_weapon(cn, temp, 5);
 	}
 	if (!in)
 	{
@@ -223,7 +220,7 @@ int pop_create_item(int temp, int cn)
 	{
 		xlog("%s got blessed %s.", ch[cn].name, it[in].name);
 	}
-
+	
 	return in;
 }
 
@@ -415,7 +412,7 @@ int pop_create_bonus_belt(int cn)
 		// but seems there is some checks by template so we reset it
 		// and people wont notice belt :)
 		it[n].temp = 0; // clearing template
-		it[n].sprite[0] = 16964;
+		it[n].sprite[I_I] = 16964;
 		strcpy(it[n].name, "Rainbow Belt");
 		strcpy(it[n].reference, "rainbow belt");
 		strcpy(it[n].description, "An ancient belt. It seems to be highly magical, and highly volatile.");
@@ -431,12 +428,12 @@ int pop_create_bonus_belt(int cn)
 	for(i = 0; i < j; i++)
 	{
 		skill_number = RANDOM(5);
-		//if (!it[n].attrib[skill_number][0]) it[n].attrib[skill_number][0] += 1;
-		it[n].attrib[skill_number][0] += 1;
+		//if (!it[n].attrib[skill_number][I_I]) it[n].attrib[skill_number][I_I] += 1;
+		it[n].attrib[skill_number][I_I] += 1;
 	}
 	for (i = 0; i < 5; i++)
 	{
-		if (it[n].attrib[i][0]) it[n].attrib[i][2] = max(0,(j-6)/3 * 5) + max(0, (it[n].attrib[i][0]/2) * 5);
+		if (it[n].attrib[i][I_I]) it[n].attrib[i][I_R] = max(0,(j-6)/3 * 5) + max(0, (it[n].attrib[i][I_I]/2) * 5);
 	}
 	
 	// Random skills
@@ -447,16 +444,16 @@ int pop_create_bonus_belt(int cn)
 		switch(skill_number)
 		{
 			case 50:
-				if (!it[n].hp[0]) it[n].hp[0] += 10;
-				it[n].hp[0] += 10;
+				if (!it[n].hp[I_I]) it[n].hp[I_I] += 10;
+				it[n].hp[I_I] += 10;
 				break;
 			case 51:
-				if (!it[n].end[0]) it[n].end[0] += 15;
-				it[n].end[0] += 5;
+				if (!it[n].end[I_I]) it[n].end[I_I] += 15;
+				it[n].end[I_I] += 5;
 				break;
 			case 52:
-				if (!it[n].mana[0]) it[n].mana[0] += 10;
-				it[n].mana[0] += 10;
+				if (!it[n].mana[I_I]) it[n].mana[I_I] += 10;
+				it[n].mana[I_I] += 10;
 				break;
 			case 53:
 				if (!armor) armor += 1;
@@ -473,16 +470,16 @@ int pop_create_bonus_belt(int cn)
 				if (!spmod%4) tryspm=0;
 				break;
 			case 56:
-				if (!it[n].speed[0]) it[n].speed[0] += 1;
-				it[n].speed[0] += 1;
+				if (!it[n].speed[I_I]) it[n].speed[I_I] += 1;
+				it[n].speed[I_I] += 1;
 				break;
 			case 57:
 				if (!thorn) thorn += 1;
 				thorn += 1;
 				break;
 			case 58:
-				if (!it[n].crit_chance[0]) it[n].crit_chance[0] += 5;
-				it[n].crit_chance[0] += 5;
+				if (!it[n].crit_chance[I_I]) it[n].crit_chance[I_I] += 5;
+				it[n].crit_chance[I_I] += 5;
 				break;
 			case 59:
 				if (!aoe) aoe += 1;
@@ -495,8 +492,8 @@ int pop_create_bonus_belt(int cn)
 				if (skill_number == 0 || skill_number == 2 || skill_number == 3 || 
 					skill_number == 4 || skill_number == 5 || skill_number == 6 || 
 					skill_number ==16 || skill_number ==36) skm = 1;
-				if (!it[n].skill[skill_number][0] && skm==2) it[n].skill[skill_number][0] += skm;
-				it[n].skill[skill_number][0] += 1;
+				if (!it[n].skill[skill_number][I_I] && skm==2) it[n].skill[skill_number][I_I] += skm;
+				it[n].skill[skill_number][I_I] += 1;
 				break;
 		}
 	}
@@ -507,14 +504,14 @@ int pop_create_bonus_belt(int cn)
 	if (spmod%4)	j+=tryspm;
 	if (aoe%4)		j+=tryaoe;
 	
-	if (it[n].hp[0])   it[n].hp[2]   = 50 + it[n].hp[0]/2;
-	if (it[n].mana[0]) it[n].mana[2] = 50 + it[n].mana[0]/2;
+	if (it[n].hp[I_I])   it[n].hp[I_R]   = 50 + it[n].hp[I_I]/2;
+	if (it[n].mana[I_I]) it[n].mana[I_R] = 50 + it[n].mana[I_I]/2;
 	
-	it[n].armor[0]      += armor/2;
-	it[n].weapon[0]     += weapon/2;
-	it[n].gethit_dam[0] += thorn/2;
-	it[n].spell_mod[0]  += spmod/3;
-	it[n].aoe_bonus[0]  += aoe/3;
+	it[n].armor[I_I]      += armor/2;
+	it[n].weapon[I_I]     += weapon/2;
+	it[n].gethit_dam[I_I] += thorn/2;
+	it[n].spell_mod[I_I]  += spmod/3;
+	it[n].aoe_bonus[I_I]  += aoe/3;
 	
 	// cleanup remaining numbers
 	if (j) for(i = 0; i < j; i++)
@@ -524,8 +521,8 @@ int pop_create_bonus_belt(int cn)
 		if (skill_number == 0 || skill_number == 2 || skill_number == 3 || 
 			skill_number == 4 || skill_number == 5 || skill_number == 6 || 
 			skill_number ==16 || skill_number ==36) skm = 1;
-		if (!it[n].skill[skill_number][0] && skm==2) it[n].skill[skill_number][0] += skm;
-		it[n].skill[skill_number][0] += 1;
+		if (!it[n].skill[skill_number][I_I] && skm==2) it[n].skill[skill_number][I_I] += skm;
+		it[n].skill[skill_number][I_I] += 1;
 	}
 	
 	it[n].flags |= IF_CAN_EN;
@@ -550,57 +547,57 @@ int pop_create_bonus_belt(int cn)
 		switch(skill_number)
 		{
 			case  0:
-				it[n].attrib[AT_BRV][0] += skill_value; 								// this line is how much it will raise attribute
-				if (it[n].attrib[AT_BRV][0] > 12) it[n].attrib[AT_BRV][0] = 12; 			// this will check for max level = 12 and will down it back to 12
-				it[n].attrib[AT_BRV][2] = 10 + (it[n].attrib[AT_BRV][0] * RANDOM(7)); 	// this line will set requirements
+				it[n].attrib[AT_BRV][I_I] += skill_value; 								// this line is how much it will raise attribute
+				if (it[n].attrib[AT_BRV][I_I] > 12) it[n].attrib[AT_BRV][I_I] = 12; 			// this will check for max level = 12 and will down it back to 12
+				it[n].attrib[AT_BRV][I_R] = 10 + (it[n].attrib[AT_BRV][I_I] * RANDOM(7)); 	// this line will set requirements
 				break;
 			case  1:
-				it[n].attrib[AT_WIL][0] += skill_value;
-				if (it[n].attrib[AT_WIL][0] > 12) it[n].attrib[AT_WIL][0] = 12;
-				it[n].attrib[AT_WIL][2] = 10 + (it[n].attrib[AT_WIL][0] * RANDOM(7));
+				it[n].attrib[AT_WIL][I_I] += skill_value;
+				if (it[n].attrib[AT_WIL][I_I] > 12) it[n].attrib[AT_WIL][I_I] = 12;
+				it[n].attrib[AT_WIL][I_R] = 10 + (it[n].attrib[AT_WIL][I_I] * RANDOM(7));
 				break;
 			case  2:
-				it[n].attrib[AT_INT][0] += skill_value;
-				if (it[n].attrib[AT_INT][0] > 12) it[n].attrib[AT_INT][0] = 12;
-				it[n].attrib[AT_INT][2] = 10 + (it[n].attrib[AT_INT][0] * RANDOM(7));
+				it[n].attrib[AT_INT][I_I] += skill_value;
+				if (it[n].attrib[AT_INT][I_I] > 12) it[n].attrib[AT_INT][I_I] = 12;
+				it[n].attrib[AT_INT][I_R] = 10 + (it[n].attrib[AT_INT][I_I] * RANDOM(7));
 				break;
 			case  3:
-				it[n].attrib[AT_AGL][0] += skill_value;
-				if (it[n].attrib[AT_AGL][0] > 12) it[n].attrib[AT_AGL][0] = 12;
-				it[n].attrib[AT_AGL][2] = 10 + (it[n].attrib[AT_AGL][0] * RANDOM(7));
+				it[n].attrib[AT_AGL][I_I] += skill_value;
+				if (it[n].attrib[AT_AGL][I_I] > 12) it[n].attrib[AT_AGL][I_I] = 12;
+				it[n].attrib[AT_AGL][I_R] = 10 + (it[n].attrib[AT_AGL][I_I] * RANDOM(7));
 				break;
 			case  4:
-				it[n].attrib[AT_STR][0] += skill_value;
-				if (it[n].attrib[AT_STR][0] > 12) it[n].attrib[AT_STR][0] = 12;
-				it[n].attrib[AT_STR][2] = 10 + (it[n].attrib[AT_STR][0] * RANDOM(7));
+				it[n].attrib[AT_STR][I_I] += skill_value;
+				if (it[n].attrib[AT_STR][I_I] > 12) it[n].attrib[AT_STR][I_I] = 12;
+				it[n].attrib[AT_STR][I_R] = 10 + (it[n].attrib[AT_STR][I_I] * RANDOM(7));
 				break;
 			case  5:
-				it[n].hp[0] += (skill_value * 10);
-				if (it[n].hp[0] > 120) it[n].hp[0] = 120;
-				it[n].hp[2] = 50 + (it[n].hp[0] * RANDOM(9));
+				it[n].hp[I_I] += (skill_value * 10);
+				if (it[n].hp[I_I] > 120) it[n].hp[I_I] = 120;
+				it[n].hp[I_R] = 50 + (it[n].hp[I_I] * RANDOM(9));
 				break;
 			case  6:
-				it[n].end[0] += (skill_value * 10)/2;
-				if (it[n].end[0] > 60) it[n].end[0] = 60;
+				it[n].end[I_I] += (skill_value * 10)/2;
+				if (it[n].end[I_I] > 60) it[n].end[I_I] = 60;
 				break;
 			case  7:
-				it[n].mana[0] += (skill_value * 10);
-				if (it[n].mana[0] > 120) it[n].mana[0] = 120;
-				it[n].mana[2] = 50 + (it[n].mana[0] * RANDOM(9));
+				it[n].mana[I_I] += (skill_value * 10);
+				if (it[n].mana[I_I] > 120) it[n].mana[I_I] = 120;
+				it[n].mana[I_R] = 50 + (it[n].mana[I_I] * RANDOM(9));
 				break;
 			case  8:
-				it[n].armor[0] += (skill_value+1)/2;
-				if (it[n].armor[0] > 6) it[n].armor[0] = 6;
+				it[n].armor[I_I] += (skill_value+1)/2;
+				if (it[n].armor[I_I] > 6) it[n].armor[I_I] = 6;
 				break;
 			case  9:
-				it[n].weapon[0] += (skill_value+1)/2;
-				if (it[n].weapon[0] > 6) it[n].armor[0] = 6;
+				it[n].weapon[I_I] += (skill_value+1)/2;
+				if (it[n].weapon[I_I] > 6) it[n].armor[I_I] = 6;
 				break;
 			default:
 				skm = skill_number-10;
-				it[n].skill[skm][0] += skill_value;
-				if (it[n].skill[skm][0] > 12) it[n].skill[skm][0] = 12;
-				it[n].skill[skm][2] = (it[n].skill[skm][0] * RANDOM(5));
+				it[n].skill[skm][I_I] += skill_value;
+				if (it[n].skill[skm][I_I] > 12) it[n].skill[skm][I_I] = 12;
+				it[n].skill[skm][I_R] = (it[n].skill[skm][I_I] * RANDOM(5));
 				break;
 		}
 	}
@@ -829,7 +826,7 @@ int pop_create_char(int n, int drop)
 		{
 			ch[cn].citem = tmp;
 			it[tmp].carried = cn;
-			it[tmp].cost = 555;
+			it[tmp].corruption = 555;
 		}
 	}
 
@@ -1008,35 +1005,16 @@ void reset_item(int n)
 	int in;
 	struct item tmp;
 
-	if (n<2 || n>=MAXTITEM)
-	{
-		return;                 // never reset blank template (1) stuff
-
-	}
+	if (n<2 || n>=MAXTITEM) return; // never reset blank template (1) stuff
 	xlog("Resetting item %d (%s)", n, it_temp[n].name);
 
 	for (in = 1; in<MAXITEM; in++)
 	{
-		if (it[in].used!=USE_ACTIVE)
-		{
-			continue;
-		}
-		if (it[in].flags & (IF_SPELL|IF_STACKABLE|IF_SOULSTONE))
-		{
-			continue;
-		}
+		if (it[in].used!=USE_ACTIVE) continue;
+		if (it[in].flags & IF_LEGACY) continue;
 		if (it[in].temp==n)
 		{
 			xlog(" --> %s (%d) (%d, %d,%d).", it[in].name, in, it[in].carried, it[in].x, it[in].y);
-			// make light calculations and update characters!!!
-			
-			if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN))
-			{
-				it[in].flags |= IF_UPDATE;
-				it[in].flags &= ~IF_ENCHANTED;
-				it[in].enchantment = 0;
-				continue;
-			}
 			
 			if ((it_temp[n].flags & (IF_TAKE | IF_LOOK | IF_LOOKSPECIAL | IF_USE | IF_USESPECIAL)) || it[in].carried)
 			{
@@ -1045,14 +1023,27 @@ void reset_item(int n)
 				tmp.y = it[in].y;
 				tmp.carried = it[in].carried;
 				tmp.temp = n;
-				// do we need to copy more ? !!!
+				
+				if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN))
+				{
+					it[in].enchantment = 0;
+				}
+				if (it[in].carried && item_has_player_mods(in))
+				{
+					item_copy_player_mods(it[in], tmp);
+				}
+				if (it[in].stack && (it_temp[n].flags & IF_STACKABLE))
+				{
+					tmp.stack = it[in].stack;
+				}
+				
 				it[in] = tmp;
 			}
 			else
 			{
 				map[it[in].x + it[in].y * MAPX].it = 0;
 				it[in].used = USE_EMPTY;
-				map[it[in].x + it[in].y * MAPX].fsprite = it_temp[n].sprite[0];
+				map[it[in].x + it[in].y * MAPX].fsprite = it_temp[n].sprite[I_I];
 				if (it_temp[n].flags & IF_MOVEBLOCK)
 				{
 					map[it[in].x + it[in].y * MAPX].flags |= MF_MOVEBLOCK;
@@ -1230,16 +1221,9 @@ void pop_remove(void)
 		}
 		for (m = 0; m<MAXBUFFS; m++) if ((in = ch[n].spell[m])!=0)
 		{
-			write(h2, &bu[in], sizeof(struct item));
+			write(h2, &bu[in], sizeof(struct buff));
 			itc++;
 		}
-		/*
-//	//	for (m = 0; m<62; m++) if ((in = ch[n].depot[m])!=0)
-		{
-			write(h2, &it[in], sizeof(struct item));
-			itc++;
-		}
-		*/
 		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if ((in = st[n].depot[m/ST_SLOTS][m%ST_SLOTS])!=0)
 		{
 			write(h2, &it[in], sizeof(struct item));
@@ -1249,23 +1233,13 @@ void pop_remove(void)
 		write(h1, &ch[n], sizeof(struct character));
 		chc++;
 	}
-
+	
 	write(h3, globs, sizeof(struct global));
-
-/*	for (m=0; m<MAPX*MAPY; m++) {
-                if ((in=map[m].it)!=0) {
-                        if (reason to keep a takeable object) {
-
-                                write(h2,&it[in],sizeof(struct item));
-                                itc++;
-                        ]
-                }
-        }*/
-
+	
 	close(h3);
 	close(h2);
 	close(h1);
-
+	
 	xlog("Saved %d chars, %d items.", chc, itc);
 }
 
@@ -1294,11 +1268,11 @@ void pop_load(void)
 		if (ch[n].used!=USE_EMPTY)
 		{
 			xlog("Character slot %d to be loaded to not empty!", n);
-			for (m = 0; m<MAXITEMS; m++)	if ((in = ch[n].item[m])!=0)		it[in].used = USE_EMPTY;
-			for (m = 0; m<MAXBUFFS; m++)	if ((in = ch[n].spell[m])!=0)		bu[in].used = USE_EMPTY;
-			for (m = 0; m<20; m++)			if ((in = ch[n].worn[m])!=0)		it[in].used = USE_EMPTY;
-			for (m = 0; m<12; m++)			if ((in = ch[n].alt_worn[m])!=0)	it[in].used = USE_EMPTY;
-											if ((in = ch[n].citem)!=0)			it[in].used = USE_EMPTY;
+			for (m = 0; m<MAXITEMS; m++)	if (in = ch[n].item[m])     it[in].used = USE_EMPTY;
+			for (m = 0; m<MAXBUFFS; m++)	if (in = ch[n].spell[m])    bu[in].used = USE_EMPTY;
+			for (m = 0; m<20; m++)			if (in = ch[n].worn[m])     it[in].used = USE_EMPTY;
+			for (m = 0; m<12; m++)			if (in = ch[n].alt_worn[m]) it[in].used = USE_EMPTY;
+											if (in = ch[n].citem)       it[in].used = USE_EMPTY;
 		}
 		ch[n] = ctmp;
 		chc++;
@@ -1348,24 +1322,10 @@ void pop_load(void)
 				xlog("MAXBUFF reached.");
 				break;
 			}
-			read(h2, &bu[in], sizeof(struct item));
+			read(h2, &bu[in], sizeof(struct buff));
 			itc++;
 			ch[n].spell[m] = in;
 		}
-		/*
-//	//	for (m = 0; m<62; m++) if (ch[n].depot[m])
-		{
-			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
-			if (in==MAXITEM)
-			{
-				xlog("MAXITEM reached.");
-				break;
-			}
-			read(h2, &it[in], sizeof(struct item));
-			itc++;
-//	//		ch[n].depot[m] = in;
-		}
-		*/
 		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if (st[n].depot[m/ST_SLOTS][m%ST_SLOTS])
 		{
 			for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
@@ -1513,14 +1473,6 @@ void pop_save_char(int nr)
 		write(h1, &it[in], sizeof(struct item));
 		itc++;
 	}
-	/*
-	// save depot contents
-//	for (m = 0; m<62; m++) if ((in = ch[nr].depot[m])!=0)
-	{
-		write(h1, &it[in], sizeof(struct item));
-		itc++;
-	}
-	*/
 	// save new depot contents
 	for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if ((in = st[nr].depot[m/ST_SLOTS][m%ST_SLOTS])!=0)
 	{
@@ -1558,13 +1510,12 @@ void pop_load_char(int nr)
 	if (ch[nr].used!=USE_EMPTY)
 	{
 		xlog("Character slot %d to be loaded to not empty!", nr);
-		for (m = 0; m<MAXITEMS; m++) 			if ((in = ch[nr].item[m])!=0) 						it[in].used = USE_EMPTY;
-		for (m = 0; m<MAXBUFFS; m++) 			if ((in = ch[nr].spell[m])!=0) 						bu[in].used = USE_EMPTY;
-		for (m = 0; m<20; m++) 					if ((in = ch[nr].worn[m])!=0) 						it[in].used = USE_EMPTY;
-		for (m = 0; m<12; m++) 					if ((in = ch[nr].alt_worn[m])!=0) 					it[in].used = USE_EMPTY;
-//	//	for (m = 0; m<62; m++) 					if ((in = ch[nr].depot[m])!=0) 						it[in].used = USE_EMPTY;
-		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) 	if ((in = st[nr].depot[m/ST_SLOTS][m%ST_SLOTS])!=0) it[in].used = USE_EMPTY;
-												if ((in = ch[nr].citem)!=0) 						it[in].used = USE_EMPTY;
+		for (m = 0; m<MAXITEMS; m++) 			if (in = ch[nr].item[m])                       it[in].used = USE_EMPTY;
+		for (m = 0; m<MAXBUFFS; m++) 			if (in = ch[nr].spell[m])                      bu[in].used = USE_EMPTY;
+		for (m = 0; m<20; m++) 					if (in = ch[nr].worn[m])                       it[in].used = USE_EMPTY;
+		for (m = 0; m<12; m++) 					if (in = ch[nr].alt_worn[m])                   it[in].used = USE_EMPTY;
+		for (m = 0; m<ST_PAGES*ST_SLOTS; m++) 	if (in = st[nr].depot[m/ST_SLOTS][m%ST_SLOTS]) it[in].used = USE_EMPTY;
+												if (in = ch[nr].citem)                         it[in].used = USE_EMPTY;
 	}
 	ch[nr] = ctmp;
 	chc++;
@@ -1609,20 +1560,6 @@ void pop_load_char(int nr)
 		itc++;
 		ch[nr].alt_worn[m] = in;
 	}
-	/*
-//	for (m = 0; m<62; m++) if (ch[nr].depot[m])
-	{
-		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
-		if (in==MAXITEM)
-		{
-			xlog("MAXITEM reached.");
-			break;
-		}
-		read(h1, &it[in], sizeof(struct item));
-		itc++;
-//	//	ch[nr].depot[m] = in;
-	}
-	*/
 	for (m = 0; m<ST_PAGES*ST_SLOTS; m++) if (st[nr].depot[m/ST_SLOTS][m%ST_SLOTS])
 	{
 		for (in = 1; in<MAXITEM; in++) if (it[in].used==USE_EMPTY) break;
@@ -1660,6 +1597,228 @@ void pop_save_all_chars(void)
 		ch[n].flags |= CF_SAVEME;
 		pop_save_char(n);
 	}
+}
+
+// Copies from the old item struct to the new one.
+void pop_copy_to_new_items(void)
+{
+	int a, b, c;
+	
+	xlog("pop_copy template items... ");
+	for (a = 1; a<MAXTITEM; a++)
+	{
+		if (a==1) xlog("s");
+		it_temp[a].used = (unsigned char)old_it_temp[a].used;
+		it_temp[a].temp = (unsigned short)old_it_temp[a].temp;
+		it_temp[a].orig_temp = (unsigned short)old_it_temp[a].orig_temp;
+		if (a==1) xlog("1");
+		for (b=0;b<40;b++)
+		{
+			it_temp[a].name[b] = (char)old_it_temp[a].name[b];
+			it_temp[a].reference[b] = (char)old_it_temp[a].reference[b];
+		}
+		if (a==1) xlog("2");
+		for (b=0;b<200;b++)
+		{
+			it_temp[a].description[b] = (char)old_it_temp[a].description[b];
+		}
+		if (a==1) xlog("3");
+		it_temp[a].flags = (unsigned long long)old_it_temp[a].flags;
+		if (a==1) xlog("4");
+		for (b=0;b<2;b++)
+		{
+			it_temp[a].sprite[b] = (short)old_it_temp[a].sprite[b];
+			it_temp[a].status[b] = (unsigned char)old_it_temp[a].status[b];
+			it_temp[a].max_age[b] = (unsigned int)old_it_temp[a].max_age[b];
+			it_temp[a].current_age[b] = (unsigned int)old_it_temp[a].current_age[b];
+			
+			it_temp[a].hp[b] = (short)old_it_temp[a].hp[b];
+			it_temp[a].end[b] = (short)old_it_temp[a].end[b];
+			it_temp[a].mana[b] = (short)old_it_temp[a].mana[b];
+			
+			it_temp[a].weapon[b] = (char)old_it_temp[a].weapon[b];
+			it_temp[a].armor[b] = (char)old_it_temp[a].armor[b];
+			it_temp[a].spell_pow[b] = 0;
+			
+			it_temp[a].top_damage[b] = (char)old_it_temp[a].top_damage[b];
+			it_temp[a].to_hit[b] = (char)old_it_temp[a].to_hit[b];
+			it_temp[a].to_parry[b] = (char)old_it_temp[a].to_parry[b];
+			it_temp[a].gethit_dam[b] = (char)old_it_temp[a].gethit_dam[b];
+			
+			it_temp[a].speed[b] = (short)old_it_temp[a].speed[b];
+			it_temp[a].move_speed[b] = (char)old_it_temp[a].move_speed[b];
+			it_temp[a].atk_speed[b] = (char)old_it_temp[a].atk_speed[b];
+			it_temp[a].cast_speed[b] = (char)old_it_temp[a].cast_speed[b];
+			
+			it_temp[a].spell_mod[b] = (char)old_it_temp[a].spell_mod[b];
+			it_temp[a].spell_apt[b] = (char)old_it_temp[a].spell_apt[b];
+			it_temp[a].cool_bonus[b] = (char)old_it_temp[a].cool_bonus[b];
+			it_temp[a].aoe_bonus[b] = (char)old_it_temp[a].aoe_bonus[b];
+			
+			it_temp[a].base_crit[b] = (char)old_it_temp[a].base_crit;
+			it_temp[a].crit_chance[b] = (char)old_it_temp[a].crit_chance[b];
+			it_temp[a].crit_multi[b] = (char)old_it_temp[a].crit_multi[b];
+			
+			it_temp[a].dmg_bonus[b] = (char)old_it_temp[a].dmg_bonus[b];
+			it_temp[a].dmg_reduction[b] = (char)old_it_temp[a].dmg_reduction[b];
+			it_temp[a].light[b] = (unsigned char)old_it_temp[a].light[b];
+			for (c=0;c<5;c++)
+			{
+				it_temp[a].attrib[c][b] = (char)old_it_temp[a].attrib[c][b];
+			}
+			for (c=0;c<50;c++)
+			{
+				it_temp[a].skill[c][b] = (char)old_it_temp[a].skill[c][b];
+			}
+		}
+		if (a==1) xlog("5");
+		it_temp[a].sprite_override = (unsigned short)old_it_temp[a].sprite_override;
+		it_temp[a].damage_state = (unsigned char)old_it_temp[a].damage_state;
+		it_temp[a].max_damage = (unsigned int)old_it_temp[a].max_damage;
+		it_temp[a].current_damage = (unsigned int)old_it_temp[a].current_damage;
+		it_temp[a].x = (unsigned short)old_it_temp[a].x;
+		it_temp[a].y = (unsigned short)old_it_temp[a].y;
+		it_temp[a].carried = (unsigned short)old_it_temp[a].carried;
+		it_temp[a].placement = (unsigned short)old_it_temp[a].placement;
+		it_temp[a].stack = (unsigned char)old_it_temp[a].stack;
+		it_temp[a].duration = (unsigned int)old_it_temp[a].duration;
+		it_temp[a].active = (unsigned int)old_it_temp[a].active;
+		it_temp[a].value = (unsigned int)old_it_temp[a].value;
+		it_temp[a].power = (unsigned int)old_it_temp[a].power;
+		it_temp[a].cost = (unsigned int)old_it_temp[a].cost;
+		it_temp[a].min_rank = (unsigned char)old_it_temp[a].min_rank;
+		it_temp[a].driver = (unsigned char)old_it_temp[a].driver;
+		if (a==1) xlog("6");
+		for (b=0;b<10;b++)
+		{
+			it_temp[a].data[b] = (unsigned int)old_it_temp[a].data[b];
+		}
+		if (a==1) xlog("7");
+		for (c=0;c<5;c++)
+		{
+			it_temp[a].attrib[c][3] = (char)old_it_temp[a].attrib[c][2];
+		}
+		if (a==1) xlog("8");
+		it_temp[a].hp[3] = (short)old_it_temp[a].hp[2];
+		it_temp[a].end[3] = (short)old_it_temp[a].end[2];
+		it_temp[a].mana[3] = (short)old_it_temp[a].mana[2];
+		if (a==1) xlog("9");
+		for (c=0;c<50;c++)
+		{
+			it_temp[a].skill[c][3] = (char)old_it_temp[a].skill[c][2];
+		}
+		if (a==1) xlog("0");
+	}
+	//
+	xlog("pop_copy items... ");
+	for (a = 1; a<MAXITEM; a++)
+	{
+		if (a==1) xlog("s");
+		it[a].used = (unsigned char)old_it[a].used;
+		it[a].temp = (unsigned short)old_it[a].temp;
+		it[a].orig_temp = (unsigned short)old_it[a].orig_temp;
+		if (a==1) xlog("1");
+		for (b=0;b<40;b++)
+		{
+			it[a].name[b] = (char)old_it[a].name[b];
+			it[a].reference[b] = (char)old_it[a].reference[b];
+		}
+		if (a==1) xlog("2");
+		for (b=0;b<200;b++)
+		{
+			it[a].description[b] = (char)old_it[a].description[b];
+		}
+		if (a==1) xlog("3");
+		it[a].flags = (unsigned long long)old_it[a].flags;
+		if (a==1) xlog("4");
+		for (b=0;b<2;b++)
+		{
+			it[a].sprite[b] = (short)old_it[a].sprite[b];
+			it[a].status[b] = (unsigned char)old_it[a].status[b];
+			it[a].max_age[b] = (unsigned int)old_it[a].max_age[b];
+			it[a].current_age[b] = (unsigned int)old_it[a].current_age[b];
+			
+			it[a].hp[b] = (short)old_it[a].hp[b];
+			it[a].end[b] = (short)old_it[a].end[b];
+			it[a].mana[b] = (short)old_it[a].mana[b];
+			
+			it[a].weapon[b] = (char)old_it[a].weapon[b];
+			it[a].armor[b] = (char)old_it[a].armor[b];
+			it[a].spell_pow[b] = 0;
+			
+			it[a].top_damage[b] = (char)old_it[a].top_damage[b];
+			it[a].to_hit[b] = (char)old_it[a].to_hit[b];
+			it[a].to_parry[b] = (char)old_it[a].to_parry[b];
+			it[a].gethit_dam[b] = (char)old_it[a].gethit_dam[b];
+			
+			it[a].speed[b] = (short)old_it[a].speed[b];
+			it[a].move_speed[b] = (char)old_it[a].move_speed[b];
+			it[a].atk_speed[b] = (char)old_it[a].atk_speed[b];
+			it[a].cast_speed[b] = (char)old_it[a].cast_speed[b];
+			
+			it[a].spell_mod[b] = (char)old_it[a].spell_mod[b];
+			it[a].spell_apt[b] = (char)old_it[a].spell_apt[b];
+			it[a].cool_bonus[b] = (char)old_it[a].cool_bonus[b];
+			it[a].aoe_bonus[b] = (char)old_it[a].aoe_bonus[b];
+			
+			it[a].base_crit[b] = (char)old_it[a].base_crit;
+			it[a].crit_chance[b] = (char)old_it[a].crit_chance[b];
+			it[a].crit_multi[b] = (char)old_it[a].crit_multi[b];
+			
+			it[a].dmg_bonus[b] = (char)old_it[a].dmg_bonus[b];
+			it[a].dmg_reduction[b] = (char)old_it[a].dmg_reduction[b];
+			it[a].light[b] = (unsigned char)old_it[a].light[b];
+			for (c=0;c<5;c++)
+			{
+				it[a].attrib[c][b] = (char)old_it[a].attrib[c][b];
+			}
+			for (c=0;c<50;c++)
+			{
+				it[a].skill[c][b] = (char)old_it[a].skill[c][b];
+			}
+		}
+		if (a==1) xlog("5");
+		it[a].sprite_override = (unsigned short)old_it[a].sprite_override;
+		it[a].damage_state = (unsigned char)old_it[a].damage_state;
+		it[a].max_damage = (unsigned int)old_it[a].max_damage;
+		it[a].current_damage = (unsigned int)old_it[a].current_damage;
+		it[a].x = (unsigned short)old_it[a].x;
+		it[a].y = (unsigned short)old_it[a].y;
+		it[a].carried = (unsigned short)old_it[a].carried;
+		it[a].placement = (unsigned short)old_it[a].placement;
+		it[a].stack = (unsigned char)old_it[a].stack;
+		it[a].duration = (unsigned int)old_it[a].duration;
+		it[a].active = (unsigned int)old_it[a].active;
+		it[a].value = (unsigned int)old_it[a].value;
+		it[a].power = (unsigned int)old_it[a].power;
+		if (!(old_it[a].flags & IF_CORRUPTED)) it[a].cost = (unsigned int)old_it[a].cost;
+		it[a].min_rank = (unsigned char)old_it[a].min_rank;
+		it[a].enchantment = (short)old_it[a].enchantment;
+		if (old_it[a].flags & IF_CORRUPTED) it[a].corruption = (short)old_it[a].cost;
+		it[a].driver = (unsigned char)old_it[a].driver;
+		if (a==1) xlog("6");
+		for (b=0;b<10;b++)
+		{
+			it[a].data[b] = (unsigned int)old_it[a].data[b];
+		}
+		if (a==1) xlog("7");
+		for (c=0;c<5;c++)
+		{
+			it[a].attrib[c][3] = (char)old_it[a].attrib[c][2];
+		}
+		if (a==1) xlog("8");
+		it[a].hp[3] = (short)old_it[a].hp[2];
+		it[a].end[3] = (short)old_it[a].end[2];
+		it[a].mana[3] = (short)old_it[a].mana[2];
+		if (a==1) xlog("9");
+		for (c=0;c<50;c++)
+		{
+			it[a].skill[c][3] = (char)old_it[a].skill[c][2];
+		}
+		if (a==1) xlog("0");
+		if (it[a].flags & IF_DIRTY) it[a].flags |= IF_LEGACY;
+	}
+	xlog("pop_copy complete.\n");
 }
 
 /* // This needs to be updated if this does eventually happen... But it's not necessary right now.
@@ -1813,10 +1972,6 @@ void pop_copy_to_new_chars(void)
 		}
 		ch_new[a].waypoints = ch[a].waypoints;
 		ch_new[a].tokens = ch[a].tokens;
-//	//	for (b=0;b<62;b++)
-//	//	{
-//	//	//	ch_new[a].depot[b] = ch[a].depot[b];
-//	//	}
 		ch_new[a].luck = ch[a].luck;
 		ch_new[a].unreach = ch[a].unreach;
 		ch_new[a].unreachx = ch[a].unreachx;
@@ -1979,10 +2134,6 @@ void pop_copy_to_new_chars(void)
 		}
 		ch_temp_new[a].waypoints = ch_temp[a].waypoints;
 		ch_temp_new[a].tokens = ch_temp[a].tokens;
-//	//	for (b=0;b<62;b++)
-//	//	{
-//	//	//	ch_temp_new[a].depot[b] = ch_temp[a].depot[b];
-//	//	}
 		ch_temp_new[a].luck = ch_temp[a].luck;
 		ch_temp_new[a].unreach = ch_temp[a].unreach;
 		ch_temp_new[a].unreachx = ch_temp[a].unreachx;

@@ -148,7 +148,7 @@ void effect_tick(void)
 						co = fx[n].data[2];
 						flag = 0;
 						
-						if (ch[co].citem && (it[ch[co].citem].temp==IT_CORRUPTOR) && (it[ch[co].citem].cost==555))
+						if (ch[co].citem && (it[ch[co].citem].temp==IT_CORRUPTOR) && (it[ch[co].citem].corruption==555))
 						{
 							reset_go(M2X(m), M2Y(m));
 							remove_lights(M2X(m), M2Y(m));
@@ -275,11 +275,11 @@ void effect_tick(void)
 				
 				if (ch[co].data[99])
 				{
-					it[in].max_age[0] *= 8;
+					it[in].max_age[I_I] *= 8;
 				}
 				if (ch[co].flags & CF_EXTRACRIT)
 				{
-					it[in].max_age[0] *= 2;
+					it[in].max_age[I_I] *= 2;
 				}
 
 				sprintf(it[in].description, "Here rests %s, killed by %s on the %d%s%s%s%s day of the Year %d.",
@@ -377,7 +377,7 @@ void effect_tick(void)
 						fx[n].duration = TICKS * 60 * 5;      // try again every 5 minutes
 						map[m].flags &= ~MF_GFX_DEATH;
 					}
-					if (cn && try_boost(20)) boost_char(cn, 0);
+					if (cn && try_boost(25)) boost_char(cn, 0);
 					if (cn && (ch[cn].flags & CF_MERCHANT) && !(ch[cn].flags & CF_BSPOINTS) && ch[cn].temp!=CT_NULLAN && ch[cn].temp!=CT_DVOID)
 					{
 						update_shop(cn);
@@ -391,7 +391,7 @@ void effect_tick(void)
 			in = fx[n].data[0];
 			if (!(fx[n].duration & 1))
 			{
-				it[in].status[1]++;
+				it[in].status[I_A]++;
 			}
 
 			if (fx[n].duration==0)
@@ -400,7 +400,7 @@ void effect_tick(void)
 				if (fx[n].data[1])
 				{
 					cn = pop_create_char(fx[n].data[1], 0);
-					if (cn && try_boost(20)) boost_char(cn, 0);
+					if (cn && try_boost(25)) boost_char(cn, 0);
 					god_drop_char(cn, it[in].x, it[in].y);
 					ch[cn].dir = DX_RIGHTUP;
 					plr_reset_status(cn);

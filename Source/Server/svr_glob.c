@@ -164,6 +164,45 @@ void reset_daily_shops(void)
 	}
 }
 
+int can_place_boom(int x, int y)
+{
+	if (map[x + y * MAPX].it) return 0;
+	if (map[x + y * MAPX].flags & MF_MOVEBLOCK) return 0;
+	
+	return 1;
+}
+
+void glob_aemonapproachboom(int cn, int x, int y)
+{
+	int dmg = 500;
+	
+	if (!IS_SANEPLAYER(cn)) return;
+	if (ch[cn].flags & CF_INVISIBLE) return;
+	
+	if (can_place_boom(x-1, y-1)) make_explode(x-1, y-1, dmg);
+	if (can_place_boom(x  , y-1)) make_explode(x  , y-1, dmg);
+	if (can_place_boom(x+1, y-1)) make_explode(x+1, y-1, dmg);
+	if (can_place_boom(x-1, y  )) make_explode(x-1, y  , dmg);
+	if (can_place_boom(x  , y  )) make_explode(x  , y  , dmg);
+	if (can_place_boom(x+1, y  )) make_explode(x+1, y  , dmg);
+	if (can_place_boom(x-1, y+1)) make_explode(x-1, y+1, dmg);
+	if (can_place_boom(x  , y+1)) make_explode(x  , y+1, dmg);
+	if (can_place_boom(x+1, y+1)) make_explode(x+1, y+1, dmg);
+}
+
+void glob_aemonapproach(void)
+{
+	int x, y, cn;
+	
+	for (x = 422; x<=464; x++)
+	{
+		for (y = 794; y<=831; y++)
+		{
+			if ((cn = map[x + y * MAPX].ch) && IS_SANEPLAYER(cn) && IS_IN_AEMAPP(x, y)) glob_aemonapproachboom(cn, x, y);
+		}
+	}
+}
+
 void global_tick(void)
 {
 	int tmp;
@@ -207,6 +246,8 @@ void global_tick(void)
 			if (globs->flags & GF_DISCORD) discord_ranked(message);
 		}
 	}
+	
+	if (globs->ticker%100==0) glob_aemonapproach();
 	
 	if (IS_GLOB_MAYHEM)
 	{

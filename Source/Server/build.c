@@ -6352,7 +6352,303 @@ struct dw_tile dw_tile[] = {
 	}
 };
 
-//
+struct plh_layout
+{
+	unsigned char tile[PLH_SIZE*PLH_SIZE];
+};
+
+struct plh_layout plh_layout[] = {
+	{
+		0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 0,
+		1, 1, 0, 2, 3,12,11,11,11,30,30,13, 3,10, 5, 8, 3, 2, 0, 1, 1,
+		1, 0, 0, 0, 4,11,11,11,11, 5, 5, 5, 3, 5, 5, 9, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 4, 5, 5,32, 5, 5, 5,31, 3, 5, 5, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 5,19,20,20,20,21, 5, 3, 5, 5, 5, 3, 0, 0, 1, 1,
+		1, 0, 0, 0, 3, 5,26,27,27,27,22, 5, 7, 5, 5, 5, 4, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 5,25,24,24,24,23, 5, 3, 5, 5, 5, 4, 0, 0, 0, 1,
+		1, 0, 0, 1, 3,13, 5, 5, 5, 5, 5,13, 3,13, 5, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 3, 3, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 1,28, 0,14, 0,28, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 2, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0,14, 0, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0,14,14,14, 0, 0, 0,16,16,16,16,16, 0, 1, 0, 1,
+		1, 0, 0, 0, 0, 0,14,15,14,14,14, 0,16,16,18,16,16, 0, 0, 0, 1,
+		1, 0, 0, 1, 0, 0,14,14,14, 0, 0, 0,16,16,16,16,16, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1,
+		0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0
+	},{
+		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+		0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0,
+		0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 4, 4, 3, 3,
+		1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,29, 3,13,30,30, 5, 5, 5,13, 3,
+		1, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 3, 5,19,20,21, 5, 5, 5, 3,
+		1, 0, 0, 0, 0,14,15,14,14,14,14,14, 7, 5,26,27,22, 5, 5,31, 3,
+		1, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 3, 5,26,27,22, 5,11,11, 3,
+		1, 0, 1, 0, 0, 0,14, 0, 0, 0, 0,29, 3, 5,26,27,22,32,11,11, 3,
+		1, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 3, 5,25,24,23, 5,11,11, 3,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,13, 5, 5, 5, 5,11,12, 3,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 2, 3, 3, 3, 6, 3, 3, 3, 3, 3,
+		1, 0, 0, 0,16,16,16,16,16, 0, 0, 1, 3,13, 5, 5, 5,10, 5, 8, 3,
+		1, 0, 0, 0,16,16,18,16,16, 0, 0, 1, 3, 5, 5, 5, 5, 5, 5, 9, 3,
+		1, 0, 0, 0,16,16,16,16,16, 0, 0, 0, 3, 5, 5, 5, 5, 5, 5, 5, 3,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 3, 3, 4, 4, 3, 3, 3, 3, 3,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+	},{
+		0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 0,
+		1, 1, 0, 2, 3, 8, 5,10, 3,12,11,11,11,30,30,13, 3, 2, 0, 1, 1,
+		1, 0, 0, 0, 3, 9, 5, 5, 3,11,11,11,11, 5, 5, 5, 4, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 5, 5, 5, 3, 5, 5,32, 5, 5, 5, 5, 4, 0, 0, 0, 1,
+		1, 1, 0, 0, 3, 5, 5, 5, 3, 5,19,20,20,20,21, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 4, 5, 5, 5, 7, 5,26,27,27,27,22,31, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 4, 5, 5, 5, 3, 5,25,24,24,24,23, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 5, 5,13, 3,13, 5, 5, 5, 5, 5,13, 3, 1, 0, 0, 1,
+		1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 3, 3, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0,28, 0,14, 0,28, 1, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 2, 1,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 1, 1,
+		1, 0, 1, 0,16,16,16,16,16, 0, 0, 0,14,14,14, 0, 0, 0, 0, 1, 1,
+		1, 0, 0, 0,16,16,18,16,16, 0,14,14,14,15,14, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0,16,16,16,16,16, 0, 0, 0,14,14,14, 0, 0, 1, 0, 0, 1,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
+		1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0,
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0
+	},{
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 3, 3, 4, 4, 3, 3, 3, 3, 3,
+		1, 0, 0, 0,16,16,16,16,16, 0, 0, 0, 3, 5, 5, 5, 5,10, 5, 8, 3,
+		1, 0, 0, 0,16,16,18,16,16, 0, 0, 1, 3, 5, 5, 5, 5, 5, 5, 9, 3,
+		1, 0, 0, 0,16,16,16,16,16, 0, 0, 1, 3,13, 5, 5, 5, 5, 5, 5, 3,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 2, 3, 3, 3, 6, 3, 3, 3, 3, 3,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,13, 5, 5, 5,30,30,13, 3,
+		1, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 3, 5,19,20,21, 5, 5, 5, 3,
+		1, 0, 1, 0, 0, 0,14, 0, 0, 0, 0,29, 3, 5,26,27,22, 5, 5,31, 3,
+		1, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 3, 5,26,27,22, 5,11,11, 3,
+		1, 0, 0, 0, 0,14,15,14,14,14,14,14, 7, 5,26,27,22,32,11,11, 3,
+		1, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 3, 5,25,24,23, 5,11,11, 3,
+		1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,29, 3,13, 5, 5, 5, 5,11,12, 3,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 4, 4, 3, 3,
+		0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+		0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0,
+		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
+	},{
+		0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+		0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1,
+		1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		1, 0, 0, 1, 0, 0,14,14,14, 0, 0, 0,16,16,16,16,16, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0,14,15,14,14,14, 0,16,16,18,16,16, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0,14,14,14, 0, 0, 0,16,16,16,16,16, 0, 1, 0, 1,
+		1, 1, 0, 0, 0, 0, 0,14, 0, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		1, 2, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 1, 0, 0,14, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 3, 3, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 1,
+		1, 0, 0,29, 3,13, 5, 5, 5,30,30,13, 3, 8, 5,10, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 4, 5,19,20,20,20,21, 5, 3, 9, 5, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 4, 5,26,27,27,27,22,31, 3, 5, 5, 5, 3, 0, 0, 0, 1,
+		1, 0, 0,29, 3, 5,25,24,24,24,23, 5, 3, 5, 5, 5, 3, 0, 0, 1, 1,
+		1, 0, 0, 0, 3, 5, 5,32, 5, 5, 5, 5, 7, 5, 5, 5, 4, 0, 0, 0, 1,
+		1, 0, 0, 0, 3,11,11,11,11, 5, 5, 5, 3, 5, 5, 5, 4, 0, 0, 0, 1,
+		1, 1, 0, 2, 3,12,11,11,11, 5, 5,13, 3,13, 5, 5, 3, 2, 0, 1, 1,
+		0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 0
+	},{
+		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+		0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 0, 0,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+		1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0,
+		3, 3, 3, 3, 3, 4, 4, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		3,13,30,30, 5, 5, 5,13, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+		3, 5, 5, 5,19,20,21, 5, 3, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 1,
+		3, 5, 5, 5,26,27,22, 5, 7,14,14,14,14,14,15,14, 0, 0, 0, 0, 1,
+		3,11,11, 5,26,27,22, 5, 3, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 1,
+		3,11,11,32,26,27,22,31, 3, 0, 0, 0, 0, 0,14, 0, 0, 0, 1, 0, 1,
+		3,11,11, 5,25,24,23, 5, 3, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 1,
+		3,12,11, 5, 5, 5, 5,13, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		3, 3, 3, 3, 3, 6, 3, 3, 3, 2, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		3, 8, 5,10, 5, 5, 5,13, 3, 1, 0, 0,16,16,16,16,16, 0, 0, 0, 1,
+		3, 9, 5, 5, 5, 5, 5, 5, 3, 1, 0, 0,16,16,18,16,16, 0, 0, 0, 1,
+		3, 5, 5, 5, 5, 5, 5, 5, 3, 0, 0, 0,16,16,16,16,16, 0, 0, 0, 1,
+		3, 3, 4, 4, 3, 3, 3, 3, 3, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		1,28, 0, 0,28, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0
+	},{
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0,
+		1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0,16,16,16,16,16, 0, 0, 0,14,14,14, 0, 0, 1, 0, 0, 1,
+		1, 0, 0, 0,16,16,18,16,16, 0,14,14,14,15,14, 0, 0, 0, 0, 0, 1,
+		1, 0, 1, 0,16,16,16,16,16, 0, 0, 0,14,14,14, 0, 0, 0, 0, 1, 1,
+		1, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 1, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 2, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0,14, 0, 0, 1, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 3, 3, 3, 0, 0, 0, 1,
+		1, 0, 0,29, 3,10, 5, 8, 3,13,30,30, 5, 5, 5,13, 3, 1, 0, 0, 1,
+		1, 0, 0, 0, 4, 5, 5, 9, 3, 5,19,20,20,20,21, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 4, 5, 5, 5, 3, 5,26,27,27,27,22,31, 3, 0, 0, 0, 1,
+		1, 1, 0,29, 3, 5, 5, 5, 3, 5,25,24,24,24,23, 5, 3, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 5, 5, 5, 7, 5, 5, 5, 5,32, 5, 5, 4, 0, 0, 0, 1,
+		1, 0, 0, 0, 3, 5, 5, 5, 3, 5, 5, 5,11,11,11,11, 4, 0, 0, 0, 1,
+		1, 1, 0, 2, 3, 5, 5,13, 3,13, 5, 5,11,11,11,12, 3, 2, 0, 1, 1,
+		0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 0
+	},{
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+		1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		3, 3, 4, 4, 3, 3, 3, 3, 3, 0, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		3, 8, 5,10, 5, 5, 5, 5, 3, 0, 0, 0,16,16,16,16,16, 0, 0, 0, 1,
+		3, 9, 5, 5, 5, 5, 5, 5, 3, 1, 0, 0,16,16,18,16,16, 0, 0, 0, 1,
+		3, 5, 5, 5, 5, 5, 5,13, 3, 1, 0, 0,16,16,16,16,16, 0, 0, 0, 1,
+		3, 3, 3, 3, 3, 6, 3, 3, 3, 2, 0, 0,17,16,16,16,17, 0, 0, 0, 1,
+		3,13,30,30, 5, 5, 5,13, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		3, 5, 5, 5,19,20,21, 5, 3, 0, 0, 0, 0, 0,14, 0, 0, 0, 0, 0, 1,
+		3, 5, 5, 5,26,27,22,31, 3, 0, 0, 0, 0, 0,14, 0, 0, 0, 1, 0, 1,
+		3,11,11, 5,26,27,22, 5, 3, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 1,
+		3,11,11,32,26,27,22, 5, 7,14,14,14,14,14,15,14, 0, 0, 0, 0, 1,
+		3,11,11, 5,25,24,23, 5, 3, 0, 0, 0, 0,14,14,14, 0, 0, 0, 0, 1,
+		3,12,11, 5, 5, 5, 5,13, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1,
+		3, 3, 3, 3, 3, 4, 4, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		1, 0, 0, 0,28, 0, 0,28, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0,
+		1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+		0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 0, 0,
+		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
+	}
+};
+
+struct plh_style
+{
+	unsigned short grass[NUM_PLH_GRASS];
+	unsigned short shrubs[NUM_PLH_GRASS][NUM_PLH_SHRUB_V];
+	unsigned short trees[NUM_PLH_TREES][NUM_PLH_TREE_V];
+	unsigned short bushes[NUM_PLH_BUSHES];
+	unsigned short walls[NUM_PLH_WALLS][2];
+	unsigned short floors[NUM_PLH_FLOORS];
+	unsigned short doors[NUM_PLH_DOORS][4];
+	unsigned short chests[NUM_PLH_CHESTS];
+	unsigned short carpets[NUM_PLH_CARPETS];
+	unsigned short tables[NUM_PLH_TABLES][2];
+	unsigned short tcandles[NUM_PLH_TABLES];
+	unsigned short candles[NUM_PLH_CANDLES];
+	unsigned short pathways[NUM_PLH_PATHS];
+	unsigned short banners[NUM_PLH_BANNERS][2];
+	unsigned short decor[NUM_PLH_DECOR];
+	unsigned short shelves[NUM_PLH_SHELVES];
+	unsigned short chairs[NUM_PLH_CHAIRS];
+	unsigned short exits[NUM_PLH_EXITS];
+};
+
+struct plh_style plh_styles = {
+	{ 
+	  TS_GRASS_LIGHT,  TS_GRASS_DARK,   TS_GRASS_AUTUMN, TS_GRASS_JUNG,   TS_GRASS_SNOW,
+	  TS_GRASS_SAND,   TS_GRASS_VIOLET
+	}, // Grasses
+	{
+	{ TS_SHRUB_CONS1,  TS_SHRUB_GGRAS,  TS_SHRUB_GGRAM,  TS_SHRUB_GGRAT,  TS_SHRUB_ROCKS }, // TS_GRASS_LIGHT
+	{ TS_SHRUB_CONS2,  TS_SHRUB_DGRAS,  TS_SHRUB_DGRAM,  TS_SHRUB_DGRAT,  TS_SHRUB_ROCKS }, // TS_GRASS_DARK
+	{ TS_SHRUB_ROCKS,  TS_SHRUB_AGRAS,  TS_SHRUB_AGRAM,  TS_SHRUB_AGRAT,  TS_SHRUB_ROCKS }, // TS_GRASS_AUTUMN
+	{ TS_SHRUB_JUNG1,  TS_SHRUB_JUNG2,  TS_SHRUB_EART1,  TS_SHRUB_EART2,  TS_SHRUB_ROCKS }, // TS_GRASS_JUNG
+	{ TS_SHRUB_GGRAS,  TS_SHRUB_DGRAS,  TS_SHRUB_AGRAS,  TS_SHRUB_EART4,  TS_SHRUB_ROCKS }, // TS_GRASS_SNOW
+	{ TS_SHRUB_SHELL1, TS_SHRUB_SHELL2, TS_SHRUB_SHELL3, TS_SHRUB_AGRAS,  TS_SHRUB_ROCKS }, // TS_GRASS_SAND
+	{ TS_SHRUB_VIOL1,  TS_SHRUB_VIOL2,  TS_SHRUB_VIOL3,  TS_SHRUB_VIOL4,  TS_SHRUB_EART3 }  // TS_GRASS_VIOLET
+	}, // Shrubs, based on grasses
+	{
+	{ TS_TREE_ROUND1,  TS_TREE_TRI1,    TS_TREE_ROUND2,  TS_TREE_TRI2,    TS_TREE_SCUFF   }, // Green Trees
+	{ TS_TREE_AUTROU1, TS_TREE_AUTROU2, TS_TREE_AUTTRI1, TS_TREE_AUTTRI2, TS_TREE_AUTDEAD }, // Autumn Trees
+	{ TS_TREE_JUNG1,   TS_TREE_JUNG2,   TS_TREE_JUNG3,   TS_TREE_JUNG4,   TS_TREE_JUNG1   }, // Jungle Trees
+	{ TS_TREE_SNOW,    TS_TREE_DEAD,    TS_TREE_SNOW,    TS_TREE_AUTDEAD, TS_TREE_SNOW    }, // Snow Trees
+	{ TS_TREE_CACTI1,  TS_TREE_CACTI1,  TS_TREE_CACTI2,  TS_TREE_CACTI2,  TS_TREE_CACTI3  }, // Cacti
+	{ TS_TREE_VIOLET1, TS_TREE_VIOLET2, TS_TREE_VIOLET3, TS_TREE_VIOLET4, TS_TREE_VIOLET1 }  // Violet Trees
+	}, // Trees [ Variance , 2 , 3 , 4, 5 ]
+	{
+	  TS_BUSH_SHORT,   TS_BUSH_TALL,    TS_BUSH_ROCK,    TS_BUSH_CACTI,   TS_BUSH_BLUE
+	}, // Bushes
+	{
+	{ TS_WALL_GREY,    TS_WALL_GREY+2   }, // 
+	{ TS_WALL_GREY2,   TS_WALL_GREY2+2  }, // 
+	{ TS_WALL_BEIGE,   TS_WALL_BEIGE+2  }, // 
+	{ TS_WALL_BEIGE2,  TS_WALL_BEIGE2+2 }, // 
+	{ TS_WALL_RED,     TS_WALL_RED+2    }, // 
+	{ TS_WALL_MIXED,   TS_WALL_MIXED+2  }  // 
+	}, // Walls [ Wall , Short , Window ]
+	{
+	  TS_FLOOR_WOOD,   TS_FLOOR_GRAY,   TS_FLOOR_DARK,   TS_FLOOR_MARBLE, TS_FLOOR_DIRT,
+	  TS_FLOOR_BRICK,  TS_FLOOR_STRONG
+	}, // Floors
+	{
+	{ TS_DOOR_WOOD_N,   TS_DOOR_WOOD_N+1,   TS_DOOR_WOOD_E,   TS_DOOR_WOOD_E+1   }, // Wood
+	{ TS_DOOR_RED_N,    TS_DOOR_RED_N+2,    TS_DOOR_RED_E,    TS_DOOR_RED_E+2    }, // Redwood
+	{ TS_DOOR_MARBLE_N, TS_DOOR_MARBLE_N+2, TS_DOOR_MARBLE_E, TS_DOOR_MARBLE_E+2 }, // Marble
+	{ TS_DOOR_GROLM_N,  TS_DOOR_GROLM_N+2,  TS_DOOR_GROLM_E,  TS_DOOR_GROLM_E+2  }, // Earth
+	{ TS_DOOR_BLUE_N,   TS_DOOR_BLUE_N+1,   TS_DOOR_BLUE_E,   TS_DOOR_BLUE_E+1   }, // Cold Earth
+	{ TS_DOOR_GREEN_N,  TS_DOOR_GREEN_N+1,  TS_DOOR_GREEN_E,  TS_DOOR_GREEN_E+1  }, // Emerald
+	{ TS_DOOR_SNOW_N,   TS_DOOR_SNOW_N+1,   TS_DOOR_SNOW_E,   TS_DOOR_SNOW_E+1   }, // Snowy
+	{ TS_DOOR_SAND_N,   TS_DOOR_SAND_N+1,   TS_DOOR_SAND_E,   TS_DOOR_SAND_E+1   }  // Sandy
+	}, // Doors [ NS , open , EW, open ]
+	{ 
+	  TS_CHEST_BROWN,   TS_CHEST_GREEN,   TS_CHEST_BLUE
+	}, // Chests
+	{
+	  TS_CARPET_RED,    TS_CARPET_PURPLE, TS_CARPET_GREEN
+	}, // Carpets
+	{
+	{ TS_TABLE_OPEN1,   TS_TABLE_LEG1 }, // Rough wood
+	{ TS_TABLE_OPEN2,   TS_TABLE_LEG2 }, // Smooth wood
+	{ TS_TABLE_MARB,    TS_TABLE_MLEG }  // Marble
+	}, // Tables [ No Leg, Leg ]
+	{
+	  TS_TTORC_BLUE1,   TS_TTORC_GOLD2,   TS_TABLE_MLEG
+	}, // Table Candles
+	{
+	  TS_TORCH_BLUE,    TS_TORCH_GOLD,  TS_TORCH_MARBLE, TS_TORCH_WHITE,  TS_TORCH_BLACK, 
+	  TS_TORCH_GARG,    TS_TORCH_ICE,   TS_TORCH_BOWL
+	}, // Candles
+	{
+	  TS_PATH_COBBLE, TS_PATH_MARBLE, TS_PATH_DIRT, TS_PATH_GREY, TS_PATH_STRONG
+	}, // Pathways
+	{
+	{ TS_BANN_REDS,   TS_BANN_REDW   }, // Red Banners
+	{ TS_BANN_PURPS,  TS_BANN_PURPW  }, // Purple Banners
+	{ TS_BANN_GREENS, TS_BANN_GREENW }, // Green Banners
+	{ TS_BANN_SKELS,  TS_BANN_SKELW  }  // Hanging Skeletons
+	}, // Banners [ South , West ]
+	{ 
+	  TS_DECOR_PAINT1, TS_DECOR_PAINT2, TS_DECOR_PAINT3, TS_DECOR_MIRROR, TS_DECOR_SHIELD, 
+	  TS_DECOR_GSHIEL, TS_DECOR_SKELE
+	}, // Decor
+	{ 
+	  TS_SHELF_BROWN, TS_SHELF_MARBLE, TS_SHELF_SHORT, TS_SHELF_BARREL
+	}, // Shelves
+	{ 
+	  TS_STOOL_STOOL, TS_STOOL_CHAIRN, TS_STOOL_CHAIRE, TS_STOOL_CHAIRS, TS_STOOL_CHAIRW
+	}, // Chairs
+	{
+	  TS_EXIT_PORTAL, TS_EXIT_VPORTAL, TS_EXIT_BLUE, TS_EXIT_YELLOW, TS_EXIT_GREEN, 
+	  TS_EXIT_CYAN, TS_EXIT_CRYSTAL, TS_EXIT_CRYSRED
+	}  // Exits
+};
+
 
 int diffi = 21;
 
@@ -6417,7 +6713,7 @@ int build_item(int nr, int x, int y)
 	}
 	else
 	{
-		map[x + y * MAPX].fsprite = it_temp[nr].sprite[0];
+		map[x + y * MAPX].fsprite = it_temp[nr].sprite[I_I];
 		if (it_temp[nr].flags & IF_MOVEBLOCK)
 		{
 			map[x + y * MAPX].flags |= MF_MOVEBLOCK;
@@ -6589,7 +6885,7 @@ void build_drop(int x, int y, int in)
 		case 9995: exfloor = 0x20000000 |  546; 	break;
 		case 9996: exfloor = 0x20000000 |  547; 	break;
 		case 9997: exfloor = 0x20000000 |  548; 	break;
-		case 9998: exfloor = 0x20000000 |  549; 	break;
+		case 3599: exfloor = 0x20000000 |  143; 	break; // 32
 		//
 		case 91551:	// map building hack for random sand wall
 			in = 1551 + RANDOM(3);
@@ -6706,16 +7002,16 @@ void build_drop(int x, int y, int in)
 
 	if (it[nr].active)
 	{
-		if (it[nr].light[1])
+		if (it[nr].light[I_A])
 		{
-			do_add_light(x, y, it[nr].light[1]);
+			do_add_light(x, y, it[nr].light[I_A]);
 		}
 	}
 	else
 	{
-		if (it[nr].light[0])
+		if (it[nr].light[I_I])
 		{
-			do_add_light(x, y, it[nr].light[0]);
+			do_add_light(x, y, it[nr].light[I_I]);
 		}
 	}
 }
@@ -6740,16 +7036,16 @@ void build_remove(int x, int y)
 
 	if (it[nr].active)
 	{
-		if (it[nr].light[1])
+		if (it[nr].light[I_A])
 		{
-			do_add_light(x, y, -it[nr].light[1]);
+			do_add_light(x, y, -it[nr].light[I_A]);
 		}
 	}
 	else
 	{
-		if (it[nr].light[0])
+		if (it[nr].light[I_I])
 		{
-			do_add_light(x, y, -it[nr].light[0]);
+			do_add_light(x, y, -it[nr].light[I_I]);
 		}
 	}
 
@@ -6793,16 +7089,16 @@ int build_copy(int fx, int fy, int tx, int ty)
 		it[nr].active = act;
 		if (it[nr].active)
 		{
-			if (it[nr].light[1])
+			if (it[nr].light[I_A])
 			{
-				do_add_light(tx, ty, it[nr].light[1]);
+				do_add_light(tx, ty, it[nr].light[I_A]);
 			}
 		}
 		else
 		{
-			if (it[nr].light[0])
+			if (it[nr].light[I_I])
 			{
-				do_add_light(tx, ty, it[nr].light[0]);
+				do_add_light(tx, ty, it[nr].light[I_I]);
 			}
 		}
 	}
@@ -6872,17 +7168,17 @@ void build_clean_lights(int fx, int fy, int tx, int ty)
 			}
 			if (it[in].active)
 			{
-				if (it[in].light[1])
+				if (it[in].light[I_A])
 				{
-					do_add_light(x, y, it[in].light[1]);
+					do_add_light(x, y, it[in].light[I_A]);
 					cnt1++;
 				}
 			}
 			else
 			{
-				if (it[in].light[0])
+				if (it[in].light[I_I])
 				{
-					do_add_light(x, y, it[in].light[0]);
+					do_add_light(x, y, it[in].light[I_I]);
 					cnt1++;
 				}
 			}
@@ -6922,47 +7218,47 @@ void build_money_pile(int v, int x, int y)
 	if (v>999999)
 	{
 		strcpy(it[in].description, "A huge pile of gold coins");
-		it[in].sprite[0] = 121;
+		it[in].sprite[I_I] = 121;
 	}
 	else if (v>99999)
 	{
 		strcpy(it[in].description, "A very large pile of gold coins");
-		it[in].sprite[0] = 120;
+		it[in].sprite[I_I] = 120;
 	}
 	else if (v>9999)
 	{
 		strcpy(it[in].description, "A large pile of gold coins");
-		it[in].sprite[0] = 41;
+		it[in].sprite[I_I] = 41;
 	}
 	else if (v>999)
 	{
 		strcpy(it[in].description, "A small pile of gold coins");
-		it[in].sprite[0] = 40;
+		it[in].sprite[I_I] = 40;
 	}
 	else if (v>99)
 	{
 		strcpy(it[in].description, "Some gold coins");
-		it[in].sprite[0] = 39;
+		it[in].sprite[I_I] = 39;
 	}
 	else if (v>9)
 	{
 		strcpy(it[in].description, "A pile of silver coins");
-		it[in].sprite[0] = 38;
+		it[in].sprite[I_I] = 38;
 	}
 	else if (v>2)
 	{
 		strcpy(it[in].description, "A few silver coins");
-		it[in].sprite[0] = 37;
+		it[in].sprite[I_I] = 37;
 	}
 	else if (v==2)
 	{
 		strcpy(it[in].description, "A couple of silver coins");
-		it[in].sprite[0] = 37;
+		it[in].sprite[I_I] = 37;
 	}
 	else if (v==1)
 	{
 		strcpy(it[in].description, "A lonely silver coin");
-		it[in].sprite[0] = 37;
+		it[in].sprite[I_I] = 37;
 	}
 
 	map[m].it = in;
@@ -7023,7 +7319,7 @@ void build_item_drop(int x, int y, int v, int cn, int rank)
 			else if (rank>12) { in = RANDOM(sizeof(item_eq3) / sizeof(int)); in = god_create_item(item_eq3[in]); }
 			else if (rank> 8) { in = RANDOM(sizeof(item_eq2) / sizeof(int)); in = god_create_item(item_eq2[in]); }
 			else              { in = RANDOM(sizeof(item_eq1) / sizeof(int)); in = god_create_item(item_eq1[in]); }
-			create_soultrans_equipment(cn, in, rank/2+RANDOM(rank/2)+1);
+			create_new_ss_equipment(cn, in, rank, -1);
 			break;
 		case MM_P_ARPT: // Potion
 			in = RANDOM(sizeof(item_pt) / sizeof(int));
@@ -7084,7 +7380,7 @@ void add_monster_flags(int cc, int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG])
 	if (flags[MM_N_ENWI] && (bf = make_new_buff(cn, 104, BUF_SPR_STARL, 300, SP_DUR_MAPMOD, 0)))
 	{
 		strcpy(bu[bf].name, "* Wisdom");
-		bu[bf].spell_mod[1] = ch[cn].spell_mod*flags[MM_N_ENWI]/10; bu[bf].data[4] = 1; add_spell(cn, bf);
+		bu[bf].spell_mod = ch[cn].spell_mod*flags[MM_N_ENWI]/10; bu[bf].data[4] = 1; add_spell(cn, bf);
 	}
 	// Extra kill exp
 	if (flags[MM_P_PLXP] && (bf = make_new_buff(cn, 105, BUF_SPR_POME, flags[MM_P_PLXP], SP_DUR_MAPMOD, 0)))
@@ -7124,26 +7420,26 @@ void add_player_flags(int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG])
 	if (flags[MM_N_PLDB] && (bf = make_new_buff(cn, 106, BUF_SPR_DEBIL, 300, SP_DUR_MAPMOD, 0)))
 	{
 		strcpy(bu[bf].name, "* Debilitation");
-		for (m = 0; m<5; m++) bu[bf].attrib[m][1] = -(M_AT(cn, m)*flags[MM_N_PLDB]/10);
+		for (m = 0; m<5; m++) bu[bf].attrib[m] = -(M_AT(cn, m)*flags[MM_N_PLDB]/10);
 		bu[bf].data[4] = 1; add_spell(cn, bf);
 	}
 	if (flags[MM_N_PLFR] && (bf = make_new_buff(cn, 107, BUF_SPR_FRAGI, 300, SP_DUR_MAPMOD, 0)))
 	{
 		strcpy(bu[bf].name, "* Fragility");
-		bu[bf].weapon[1] = -(ch[cn].weapon*flags[MM_N_PLFR]/20);
-		bu[bf].armor[1] = -(ch[cn].armor*flags[MM_N_PLFR]/20);
+		bu[bf].weapon = -(ch[cn].weapon*flags[MM_N_PLFR]/20);
+		bu[bf].armor = -(ch[cn].armor*flags[MM_N_PLFR]/20);
 		bu[bf].data[4] = 1; add_spell(cn, bf);
 	}
 	if (flags[MM_N_PLST] && (bf = make_new_buff(cn, 108, BUF_SPR_STIGM, 300, SP_DUR_MAPMOD, 0)))
 	{
 		strcpy(bu[bf].name, "* Stigmatism");
-		bu[bf].skill[SK_PERCEPT][1] = -(M_SK(cn, SK_PERCEPT)*flags[MM_N_PLST]/5);
+		bu[bf].skill[SK_PERCEPT] = -(M_SK(cn, SK_PERCEPT)*flags[MM_N_PLST]/5);
 		bu[bf].data[4] = 1; add_spell(cn, bf);
 	}
 	if (flags[MM_N_PLHY] && (bf = make_new_buff(cn, 109, BUF_SPR_HYPRT, 300, SP_DUR_MAPMOD, 0)))
 	{
 		strcpy(bu[bf].name, "* Hyperthermia");
-		bu[bf].end[0] = bu[bf].mana[0] = -100*flags[MM_N_PLHY]/2;
+		bu[bf].r_end = bu[bf].r_mana = -100*flags[MM_N_PLHY]/2;
 		bu[bf].data[4] = 1; add_spell(cn, bf);
 	}
 }
@@ -7157,9 +7453,9 @@ int add_map_chest(int x, int y, int mission, int goal, int rank, int tier, int n
 		if (mission==MM_M_FACH) goal++;
 		switch (RANDOM(4))
 		{
-			case  1: it[co].sprite[0] =  222; it[co].sprite[1] =  223; break;
-			case  2: it[co].sprite[0] = 2737; it[co].sprite[1] = 2738; break;
-			case  3: it[co].sprite[0] = 2739; it[co].sprite[1] = 2740; break;
+			case  1: it[co].sprite[I_I] =  222; it[co].sprite[I_A] =  223; break;
+			case  2: it[co].sprite[I_I] = 2737; it[co].sprite[I_A] = 2738; break;
+			case  3: it[co].sprite[I_I] = 2739; it[co].sprite[I_A] = 2740; break;
 			default: break;
 		}
 		it[co].data[0] = rank;
@@ -7181,9 +7477,9 @@ int add_map_shrine(int x, int y, int mission, int goal, int rank, int tier, int 
 		i = RANDOM(3);
 		switch (i)
 		{
-			case  1:	it[co].sprite[0] = 16812; it[co].data[0] = 1; break;
-			case  2:	it[co].sprite[0] = 16813; it[co].data[0] = 2; break;
-			default:	it[co].sprite[0] = 16814; it[co].data[0] = 3; break;
+			case  1:	it[co].sprite[I_I] = 16812; it[co].data[0] = 1; break;
+			case  2:	it[co].sprite[I_I] = 16813; it[co].data[0] = 2; break;
+			default:	it[co].sprite[I_I] = 16814; it[co].data[0] = 3; break;
 		}
 		it[co].data[1] = RANDOM(6);
 		it[co].data[2] = rank;
@@ -7853,7 +8149,7 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 						if (in = get_dw_obj(m, 5))
 						{
 							if (in = build_item(in, x, y))
-								it[in].light[0] = 60;
+								it[in].light[I_I] = 60;
 						}
 						if (in = get_dw_obj(m, 2)) build_drop(x, y, 0x20000000 | in);
 						map[m].flags |= MF_INDOORS;
@@ -7864,8 +8160,8 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 							it[in].driver = 136;
 							if (fl)
 							{
-								it[in].sprite[0] =  222; 
-								it[in].sprite[1] =  223;
+								it[in].sprite[I_I] =  222; 
+								it[in].sprite[I_A] =  223;
 							}
 						}
 						if (in = get_dw_obj(m, 2)) build_drop(x, y, 0x20000000 | in);
@@ -7873,14 +8169,14 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 						break;
 					case  7:	// Spike Trap
 						build_drop(x, y, 3435);
-						it[map[m].it].sprite[0] = 16653;
+						it[map[m].it].sprite[I_I] = 16653;
 						map[m].flags |= MF_DEATHTRAP;
 						break;
 					case  8:	// Water pt1
 						build_drop(x, y, 3434);
 						in = 16933;
 						if (DW_GETFLOOR(map[m].sprite, DW_FL_SEA)) in = 725;
-						it[map[m].it].sprite[0] = in;
+						it[map[m].it].sprite[I_I] = in;
 						map[m].flags |= MF_MOVEBLOCK;
 						break;
 					case  9:	// Spawner
@@ -7905,45 +8201,45 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 						if (DW_GETFLOOR(map[m].sprite, DW_FL_SEA) && map[m].it)
 						{
 							m1 = m+1; m2 = m-MAPX;
-							if (it[map[m2+1].it].sprite[0]!=725 && it[map[m2+1].it].sprite[0]!=721 && it[map[m2+1].it].sprite[0]!=720 && it[map[m2+1].it].sprite[0]!=717 && it[map[m2+1].it].sprite[0]!=719 &&
-							   (it[map[m1].it].sprite[0]==725 || it[map[m1].it].sprite[0]==721 || it[map[m1].it].sprite[0]==720 || it[map[m1].it].sprite[0]==717 || it[map[m1].it].sprite[0]==719) && 
-							   (it[map[m2].it].sprite[0]==725 || it[map[m2].it].sprite[0]==721 || it[map[m2].it].sprite[0]==720 || it[map[m2].it].sprite[0]==717 || it[map[m2].it].sprite[0]==719))
-								it[map[m].it].sprite[0] = 719;
-							else if (it[map[m1].it].sprite[0]!=725 && it[map[m1].it].sprite[0]!=721 && it[map[m1].it].sprite[0]!=720 && it[map[m1].it].sprite[0]!=717 && it[map[m1].it].sprite[0]!=719 && 
-									 it[map[m2].it].sprite[0]!=725 && it[map[m2].it].sprite[0]!=721 && it[map[m2].it].sprite[0]!=720 && it[map[m2].it].sprite[0]!=717 && it[map[m2].it].sprite[0]!=719)
-								it[map[m].it].sprite[0] = 720;
-							else if (it[map[m1].it].sprite[0]!=725 && it[map[m1].it].sprite[0]!=721 && it[map[m1].it].sprite[0]!=720 && it[map[m1].it].sprite[0]!=717 && it[map[m1].it].sprite[0]!=719 && 
-									(it[map[m2].it].sprite[0]==725 || it[map[m2].it].sprite[0]==721 || it[map[m2].it].sprite[0]==720 || it[map[m2].it].sprite[0]==717 || it[map[m2].it].sprite[0]==719))
-								it[map[m].it].sprite[0] = 721;
-							else if ((it[map[m1].it].sprite[0]==725 || it[map[m1].it].sprite[0]==721 || it[map[m1].it].sprite[0]==720 || it[map[m1].it].sprite[0]==717 || it[map[m1].it].sprite[0]==719) && 
-									  it[map[m2].it].sprite[0]!=725 && it[map[m2].it].sprite[0]!=721 && it[map[m2].it].sprite[0]!=720 && it[map[m2].it].sprite[0]!=717 && it[map[m2].it].sprite[0]!=719)
-								it[map[m].it].sprite[0] = 717;
+							if (it[map[m2+1].it].sprite[I_I]!=725 && it[map[m2+1].it].sprite[I_I]!=721 && it[map[m2+1].it].sprite[I_I]!=720 && it[map[m2+1].it].sprite[I_I]!=717 && it[map[m2+1].it].sprite[I_I]!=719 &&
+							   (it[map[m1].it].sprite[I_I]==725 || it[map[m1].it].sprite[I_I]==721 || it[map[m1].it].sprite[I_I]==720 || it[map[m1].it].sprite[I_I]==717 || it[map[m1].it].sprite[I_I]==719) && 
+							   (it[map[m2].it].sprite[I_I]==725 || it[map[m2].it].sprite[I_I]==721 || it[map[m2].it].sprite[I_I]==720 || it[map[m2].it].sprite[I_I]==717 || it[map[m2].it].sprite[I_I]==719))
+								it[map[m].it].sprite[I_I] = 719;
+							else if (it[map[m1].it].sprite[I_I]!=725 && it[map[m1].it].sprite[I_I]!=721 && it[map[m1].it].sprite[I_I]!=720 && it[map[m1].it].sprite[I_I]!=717 && it[map[m1].it].sprite[I_I]!=719 && 
+									 it[map[m2].it].sprite[I_I]!=725 && it[map[m2].it].sprite[I_I]!=721 && it[map[m2].it].sprite[I_I]!=720 && it[map[m2].it].sprite[I_I]!=717 && it[map[m2].it].sprite[I_I]!=719)
+								it[map[m].it].sprite[I_I] = 720;
+							else if (it[map[m1].it].sprite[I_I]!=725 && it[map[m1].it].sprite[I_I]!=721 && it[map[m1].it].sprite[I_I]!=720 && it[map[m1].it].sprite[I_I]!=717 && it[map[m1].it].sprite[I_I]!=719 && 
+									(it[map[m2].it].sprite[I_I]==725 || it[map[m2].it].sprite[I_I]==721 || it[map[m2].it].sprite[I_I]==720 || it[map[m2].it].sprite[I_I]==717 || it[map[m2].it].sprite[I_I]==719))
+								it[map[m].it].sprite[I_I] = 721;
+							else if ((it[map[m1].it].sprite[I_I]==725 || it[map[m1].it].sprite[I_I]==721 || it[map[m1].it].sprite[I_I]==720 || it[map[m1].it].sprite[I_I]==717 || it[map[m1].it].sprite[I_I]==719) && 
+									  it[map[m2].it].sprite[I_I]!=725 && it[map[m2].it].sprite[I_I]!=721 && it[map[m2].it].sprite[I_I]!=720 && it[map[m2].it].sprite[I_I]!=717 && it[map[m2].it].sprite[I_I]!=719)
+								it[map[m].it].sprite[I_I] = 717;
 							else
 							{
 								m1 = m-1; m2 = m+MAPX;
-								if ((it[map[m1].it].sprite[0]==725 || it[map[m1].it].sprite[0]==721 || it[map[m1].it].sprite[0]==720 || it[map[m1].it].sprite[0]==717 || it[map[m1].it].sprite[0]==719) && 
-									(it[map[m2].it].sprite[0]==725 || it[map[m2].it].sprite[0]==721 || it[map[m2].it].sprite[0]==720 || it[map[m2].it].sprite[0]==717 || it[map[m2].it].sprite[0]==719))
+								if ((it[map[m1].it].sprite[I_I]==725 || it[map[m1].it].sprite[I_I]==721 || it[map[m1].it].sprite[I_I]==720 || it[map[m1].it].sprite[I_I]==717 || it[map[m1].it].sprite[I_I]==719) && 
+									(it[map[m2].it].sprite[I_I]==725 || it[map[m2].it].sprite[I_I]==721 || it[map[m2].it].sprite[I_I]==720 || it[map[m2].it].sprite[I_I]==717 || it[map[m2].it].sprite[I_I]==719))
 									build_item(1775, x, y);
 								it[map[m].it].flags &= ~(IF_HIDDEN);
-								it[map[m].it].sprite[0] = 725;
+								it[map[m].it].sprite[I_I] = 725;
 							}
 						}
 						else
 						{
 							m1 = m-1; m2 = m+MAPX;
-							if (it[map[m2-1].it].sprite[0]!=16933 && it[map[m2-1].it].sprite[0]!=3585 && it[map[m2-1].it].sprite[0]!=3586 && it[map[m2-1].it].sprite[0]!=3587 && it[map[m2-1].it].sprite[0]!=3588 &&
-							   (it[map[m1].it].sprite[0]==16933 || it[map[m1].it].sprite[0]==3585 || it[map[m1].it].sprite[0]==3586 || it[map[m1].it].sprite[0]==3587 || it[map[m1].it].sprite[0]==3588) && 
-							   (it[map[m2].it].sprite[0]==16933 || it[map[m2].it].sprite[0]==3585 || it[map[m2].it].sprite[0]==3586 || it[map[m2].it].sprite[0]==3587 || it[map[m2].it].sprite[0]==3588))
-								it[map[m].it].sprite[0] = 3588;
-							else if (it[map[m1].it].sprite[0]!=16933 && it[map[m1].it].sprite[0]!=3585 && it[map[m1].it].sprite[0]!=3586 && it[map[m1].it].sprite[0]!=3587 && it[map[m1].it].sprite[0]!=3588 && 
-									 it[map[m2].it].sprite[0]!=16933 && it[map[m2].it].sprite[0]!=3585 && it[map[m2].it].sprite[0]!=3586 && it[map[m2].it].sprite[0]!=3587 && it[map[m2].it].sprite[0]!=3588)
-								it[map[m].it].sprite[0] = 3586;
-							else if (it[map[m1].it].sprite[0]!=16933 && it[map[m1].it].sprite[0]!=3585 && it[map[m1].it].sprite[0]!=3586 && it[map[m1].it].sprite[0]!=3587 && it[map[m1].it].sprite[0]!=3588 && 
-									(it[map[m2].it].sprite[0]==16933 || it[map[m2].it].sprite[0]==3585 || it[map[m2].it].sprite[0]==3586 || it[map[m2].it].sprite[0]==3587 || it[map[m2].it].sprite[0]==3588))
-								it[map[m].it].sprite[0] = 3585;
-							else if ((it[map[m1].it].sprite[0]==16933 || it[map[m1].it].sprite[0]==3585 || it[map[m1].it].sprite[0]==3586 || it[map[m1].it].sprite[0]==3587 || it[map[m1].it].sprite[0]==3588) && 
-									  it[map[m2].it].sprite[0]!=16933 && it[map[m2].it].sprite[0]!=3585 && it[map[m2].it].sprite[0]!=3586 && it[map[m2].it].sprite[0]!=3587 && it[map[m2].it].sprite[0]!=3588)
-								it[map[m].it].sprite[0] = 3587;
+							if (it[map[m2-1].it].sprite[I_I]!=16933 && it[map[m2-1].it].sprite[I_I]!=3585 && it[map[m2-1].it].sprite[I_I]!=3586 && it[map[m2-1].it].sprite[I_I]!=3587 && it[map[m2-1].it].sprite[I_I]!=3588 &&
+							   (it[map[m1].it].sprite[I_I]==16933 || it[map[m1].it].sprite[I_I]==3585 || it[map[m1].it].sprite[I_I]==3586 || it[map[m1].it].sprite[I_I]==3587 || it[map[m1].it].sprite[I_I]==3588) && 
+							   (it[map[m2].it].sprite[I_I]==16933 || it[map[m2].it].sprite[I_I]==3585 || it[map[m2].it].sprite[I_I]==3586 || it[map[m2].it].sprite[I_I]==3587 || it[map[m2].it].sprite[I_I]==3588))
+								it[map[m].it].sprite[I_I] = 3588;
+							else if (it[map[m1].it].sprite[I_I]!=16933 && it[map[m1].it].sprite[I_I]!=3585 && it[map[m1].it].sprite[I_I]!=3586 && it[map[m1].it].sprite[I_I]!=3587 && it[map[m1].it].sprite[I_I]!=3588 && 
+									 it[map[m2].it].sprite[I_I]!=16933 && it[map[m2].it].sprite[I_I]!=3585 && it[map[m2].it].sprite[I_I]!=3586 && it[map[m2].it].sprite[I_I]!=3587 && it[map[m2].it].sprite[I_I]!=3588)
+								it[map[m].it].sprite[I_I] = 3586;
+							else if (it[map[m1].it].sprite[I_I]!=16933 && it[map[m1].it].sprite[I_I]!=3585 && it[map[m1].it].sprite[I_I]!=3586 && it[map[m1].it].sprite[I_I]!=3587 && it[map[m1].it].sprite[I_I]!=3588 && 
+									(it[map[m2].it].sprite[I_I]==16933 || it[map[m2].it].sprite[I_I]==3585 || it[map[m2].it].sprite[I_I]==3586 || it[map[m2].it].sprite[I_I]==3587 || it[map[m2].it].sprite[I_I]==3588))
+								it[map[m].it].sprite[I_I] = 3585;
+							else if ((it[map[m1].it].sprite[I_I]==16933 || it[map[m1].it].sprite[I_I]==3585 || it[map[m1].it].sprite[I_I]==3586 || it[map[m1].it].sprite[I_I]==3587 || it[map[m1].it].sprite[I_I]==3588) && 
+									  it[map[m2].it].sprite[I_I]!=16933 && it[map[m2].it].sprite[I_I]!=3585 && it[map[m2].it].sprite[I_I]!=3586 && it[map[m2].it].sprite[I_I]!=3587 && it[map[m2].it].sprite[I_I]!=3588)
+								it[map[m].it].sprite[I_I] = 3587;
 						}
 						break;
 					default: 
@@ -8022,4 +8318,500 @@ void check_build_dw(int cn)
 	xx=x-1; yy=y-3; if (DW_INBOUND(xx,yy)) build_dw_cell(cn, xx, yy, 0);
 	xx=x-2; yy=y-2; if (DW_INBOUND(xx,yy)) build_dw_cell(cn, xx, yy, 0);
 	//
+}
+
+void build_plh_plants(int x, int y, int v)
+{
+	int in;
+	
+	build_remove(x, y);
+	
+	if (RANDOM(31)) return;
+	
+	map[x + y * MAPX].fsprite = plh_styles.shrubs[v][RANDOM(NUM_PLH_SHRUB_V)];
+}
+
+int update_house(int cn, int type, int v)
+{
+	int n, m, in, hn, r, layout, tmp;
+	int x, xx, xt, y, yy, yt;
+	
+	if (!ch[cn].house_id)
+	{
+		do_char_log(cn, 0, "But you don't own a house!\n");
+		return 0;
+	}
+	if (!IS_IN_PLH(cn))
+	{
+		do_char_log(cn, 0, "You can only do this while in your house lot.\n");
+		return 0;
+	}
+	
+	chlog(cn, "updating house (%d, %d)", type, v);
+	
+	hn = ch[cn].house_id-1;
+	layout = ch[cn].house_layout;
+	
+	xx = PLH_X + (hn/PLH_WIDTH)*PLH_SIZE;
+	yy = PLH_Y + (hn%PLH_WIDTH)*PLH_SIZE;
+	
+	for (xt=0; xt<PLH_SIZE; xt++) for (yt=0; yt<PLH_SIZE; yt++)
+	{
+		x = xx+xt; y = yy+yt; m = XY2M(x, y);
+		
+		n = plh_layout[layout].tile[yt + xt * PLH_SIZE];
+		
+		switch (type)
+		{
+			case PLH_UPD_GRASS:
+				switch (n)
+				{
+					case PLH_BLANK:
+						build_plh_plants(x, y, v);
+					case PLH_TREE:
+					case PLH_BUSH:
+					case PLH_BANNER_S:
+					case PLH_BANNER_W:
+						build_drop(x, y, 0x20000000 | plh_styles.grass[v]);
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_TREES:
+				switch (n)
+				{
+					case PLH_TREE:
+						r = RANDOM(NUM_PLH_TREE_V);
+						in = map[m].it;
+						map[m].fsprite = it[in].sprite[I_I] = plh_styles.trees[v][r];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_BUSHES:
+				switch (n)
+				{
+					case PLH_BUSH:
+						in = map[m].it;
+						map[m].fsprite = it[in].sprite[I_I] = plh_styles.bushes[v];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_WALLS:
+				switch (n)
+				{
+					case PLH_WALL:
+						in = map[m].it;
+						map[m].fsprite = it[in].sprite[I_I] = plh_styles.walls[v][0];
+						break;
+					case PLH_WINDOW:
+						in = map[m].it;
+						map[m].fsprite = it[in].sprite[I_I] = plh_styles.walls[v][1];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_FLOORS:
+				switch (n)
+				{
+					case PLH_FLOOR:
+					case PLH_DOOR_NS:
+					case PLH_DOOR_EW:
+					case PLH_BED1:
+					case PLH_BED2:
+					case PLH_CHEST:
+					case PLH_TABLE:
+					case PLH_TCANDLE:
+					case PLH_CANDLE:
+					case PLH_BOOKSHELF_S:
+					case PLH_SHIELD_W:
+					case PLH_STOOL:
+						build_drop(x, y, 0x20000000 | plh_styles.floors[v]);
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_DOORS:
+				switch (n)
+				{
+					case PLH_DOOR_NS:
+						in = map[m].it;
+						it[in].sprite[I_I] = plh_styles.doors[v][0];
+						it[in].sprite[I_A] = plh_styles.doors[v][1];
+						break;
+					case PLH_DOOR_EW:
+						in = map[m].it;
+						it[in].sprite[I_I] = plh_styles.doors[v][2];
+						it[in].sprite[I_A] = plh_styles.doors[v][3];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_CHESTS:
+				switch (n)
+				{
+					case PLH_CHEST:
+						in = map[m].it;
+						it[in].sprite[I_I] = plh_styles.chests[v];
+						it[in].sprite[I_A] = plh_styles.chests[v]+1;
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_CARPETS:
+				switch (n)
+				{
+					case PLH_CARPET1: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+3);  break;
+					case PLH_CARPET2: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+4);  break;
+					case PLH_CARPET3: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+5);  break;
+					case PLH_CARPET4: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+6);  break;
+					case PLH_CARPET5: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+7);  break;
+					case PLH_CARPET6: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+8);  break;
+					case PLH_CARPET7: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+9);  break;
+					case PLH_CARPET8: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]+10); break;
+					case PLH_CARPET9: build_drop(x, y, 0x20000000 | plh_styles.carpets[v]);    break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_TABLES:
+				switch (n)
+				{
+					case PLH_TABLE:
+						in = map[m].it;
+						if ((plh_layout[layout].tile[(yt-1) + xt * PLH_SIZE] != PLH_TABLE || plh_layout[layout].tile[(yt+1) + xt * PLH_SIZE] != PLH_TABLE) &&
+							(plh_layout[layout].tile[yt + (xt-1) * PLH_SIZE] != PLH_TABLE || plh_layout[layout].tile[yt + (xt+1) * PLH_SIZE] != PLH_TABLE) )
+							map[m].fsprite = it[in].sprite[I_I] = plh_styles.tables[v][1];
+						else
+							map[m].fsprite = it[in].sprite[I_I] = plh_styles.tables[v][0];
+						break;
+					case PLH_TCANDLE: // only vary with table type
+						in = map[m].it;
+						it[in].sprite[I_I] = tmp = plh_styles.tcandles[v];
+						if (tmp == TS_TTORC_BLUE1 || tmp == TS_TTORC_GOLD2)
+							it[in].status[I_I] = 2; // animate, 4 frames
+						else
+							it[in].status[I_I] = 0; // not animated
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_CANDLES:
+				switch (n)
+				{
+					case PLH_CANDLE:
+						in = map[m].it;
+						it[in].sprite[I_I] = tmp = plh_styles.candles[v];
+						if (tmp == TS_TORCH_GARG || tmp == TS_TORCH_ICE)
+							it[in].status[I_I] =  8; // animate, 8 frames
+						else if (tmp == TS_TORCH_WHITE || tmp == TS_TORCH_MARBLE || tmp == TS_TORCH_BOWL || tmp == TS_TORCH_BLACK)
+							it[in].status[I_I] = 16; // animate, 5 frames
+						else
+							it[in].status[I_I] =  2; // animate, 4 frames
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_PATHS:
+				switch (n)
+				{
+					case PLH_PATHWAY:
+					case PLH_SPAWN:
+						build_drop(x, y, 0x20000000 | plh_styles.pathways[v]);
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_BANNERS:
+				switch (n)
+				{
+					case PLH_BANNER_S:
+						in = map[m].it;
+						it[in].sprite[I_I] = plh_styles.banners[v][0];
+						break;
+					case PLH_BANNER_W:
+						in = map[m].it;
+						it[in].sprite[I_I] = plh_styles.banners[v][1];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_DECOR:
+				switch (n)
+				{
+					case PLH_SHIELD_W:
+						in = map[m].it;
+						it[in].sprite[I_I] = plh_styles.decor[v];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_SHELVES:
+				switch (n)
+				{
+					case PLH_BOOKSHELF_S:
+						in = map[m].it;
+						tmp = plh_styles.shelves[v];
+						if (tmp == TS_SHELF_BROWN || tmp == TS_SHELF_MARBLE)
+							tmp += RANDOM(2);
+						it[in].sprite[I_I] = tmp;
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_CHAIRS:
+				switch (n)
+				{
+					case PLH_STOOL:
+						in = map[m].it;
+						map[m].fsprite = it[in].sprite[I_I] = plh_styles.chairs[v];
+						break;
+					default: break;
+				}
+				break;
+			case PLH_UPD_EXITS:
+				switch (n)
+				{
+					case PLH_PORTAL:
+						in = map[m].it;
+						it[in].sprite[I_I] = tmp = plh_styles.exits[v];
+						if (tmp == TS_EXIT_CRYSTAL || tmp == TS_EXIT_PORTAL || tmp == TS_EXIT_VPORTAL || tmp == TS_EXIT_CRYSRED)
+							it[in].status[I_I] = 8; // animate, 8 frames
+						else
+							it[in].status[I_I] = 0; // not animated
+						break;
+					default: break;
+				}
+				break;
+			default:
+				do_char_log(cn, 0, "Unknown type!\n");
+				return 0;
+				break;
+		}
+	}
+	return 1;
+}
+
+int build_new_house(int cn, int layout)
+{
+	int n, m, in, i, j, hn=0, cc, v;
+	int x, xx, xt, y, yy, yt;
+	
+	// Error checking
+	if (ch[cn].house_id>0) hn = ch[cn].house_id;
+	else 
+	{
+		// Check for other chars if they match our CNET
+		for (n=1; n<MAXCHARS; n++) for (i = 80; i<89; i++)
+		{
+			if (ch[cn].data[i]==0) continue;
+			for (j = 80; j<89; j++)
+			{
+				if (ch[n].data[j]==0) continue;
+				if (ch[cn].data[i]==ch[n].data[j] && ch[n].house_id)
+				{
+					ch[cn].house_id     = ch[n].house_id;
+					ch[cn].house_m      = ch[n].house_m;
+					ch[cn].house_layout = ch[n].house_layout;
+					do_char_log(cn, 1, "Your house was set to your character %s's lot.\n", ch[n].name);
+					do_char_log(cn, 2, "You can now use #home from a temple to head home.\n", ch[n].name);
+					return -1;
+				}
+			}
+		}
+		// Otherwise, look for the highest house ID and grab that
+		for (hn=0, n=1; n<MAXCHARS; n++)
+		{
+			if (ch[n].house_id > hn) hn = ch[n].house_id;
+		}
+		hn++;
+		if (hn >= PLH_MAX)
+		{
+			do_char_log(cn, 0, "Well, it seems like we've somehow reached the limit on housing. Please yell at Zarro to add more.\n");
+			return 0;
+		}
+	}
+	if (hn==0)
+	{
+		do_char_log(cn, 0, "Error in build_new_house: no house number!\n");
+		return 0;
+	}
+	
+	ch[cn].house_id = hn;
+	ch[cn].house_layout = layout;
+	
+	for (n=1; n<MAXCHARS; n++) for (i = 80; i<89; i++)
+	{
+		if (ch[cn].data[i]==0) continue;
+		for (j = 80; j<89; j++)
+		{
+			if (ch[n].data[j]==0) continue;
+			if (ch[cn].data[i]==ch[n].data[j] && ch[cn].house_id == ch[n].house_id)
+				ch[n].house_layout = layout;
+		}
+	}
+	
+	hn--;
+	
+	xx = PLH_X + (hn/PLH_WIDTH)*PLH_SIZE;
+	yy = PLH_Y + (hn%PLH_WIDTH)*PLH_SIZE;
+	
+	// Clean & set the target lot
+	for (xt=0; xt<PLH_SIZE; xt++) for (yt=0; yt<PLH_SIZE; yt++)
+	{
+		build_remove(xx+xt, yy+yt);
+		build_drop(xx+xt, yy+yt, 1);
+		
+		x = xx+xt; y = yy+yt; m = XY2M(x, y);
+		
+		n = plh_layout[layout].tile[yt + xt * PLH_SIZE];
+		
+		map[m].flags &= ~(MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+		map[m].flags |= (MF_NOLAG | MF_NOFIGHT);
+		
+		switch (n)
+		{
+			case PLH_BLANK:
+				build_plh_plants(x, y, PHD_GRASS);
+				build_drop(x, y, 0x20000000 | PHD_GRASS);
+				break;
+			case PLH_TREE:
+				build_drop(x, y, 0x20000000 | PHD_GRASS); build_drop(x, y, PHD_TREE);
+				break;
+			case PLH_BUSH:
+				build_drop(x, y, 0x20000000 | PHD_GRASS); build_drop(x, y, PHD_BUSH);
+				break;
+			case PLH_WALL:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_WALL);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_WINDOW:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_WINDOW);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_FLOOR:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR);
+				map[m].flags |= (MF_INDOORS | MF_BANK);
+				break;
+			case PLH_DOOR_NS:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_DOOR_NS);
+				map[m].flags |= (MF_INDOORS | MF_BANK);
+				break;
+			case PLH_DOOR_EW:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_DOOR_EW);
+				map[m].flags |= (MF_INDOORS | MF_BANK);
+				break;
+			case PLH_BED1:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_BED1);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_BED2:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_BED2);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_CHEST:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_CHEST);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_TABLE:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR);
+				if ((plh_layout[layout].tile[(xt-1) + yt * PLH_SIZE] != PLH_TABLE || plh_layout[layout].tile[(xt+1) + yt * PLH_SIZE] != PLH_TABLE) &&
+					(plh_layout[layout].tile[xt + (yt-1) * PLH_SIZE] != PLH_TABLE || plh_layout[layout].tile[xt + (yt+1) * PLH_SIZE] != PLH_TABLE) )
+					build_drop(x, y, PHD_TABLELEG);
+				else
+					build_drop(x, y, PHD_TABLE);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_TCANDLE:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_TCANDLE);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_CANDLE:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_CANDLE);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_PATHWAY:
+				build_drop(x, y, 0x20000000 | PHD_PATHWAY);
+				break;
+			case PLH_SPAWN:
+				build_drop(x, y, 0x20000000 | PHD_PATHWAY);
+				ch[cn].house_m = XY2M(x, y);
+				break;
+			case PLH_PFLOOR:
+				build_drop(x, y, 0x20000000 | PHD_PFLOOR);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_PPILLAR:
+				build_drop(x, y, 0x20000000 | PHD_PFLOOR); build_drop(x, y, PHD_PPILLAR);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_PORTAL: // Floor is used by waypoint
+				build_drop(x, y, 0x20000000 | PHD_PFLOOR+1); build_drop(x, y, PHD_PORTAL);
+				break;
+			case PLH_CARPET1:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+3);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET2:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+4);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET3:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+5);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET4:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+6);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET5:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+7);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET6:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+8);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET7:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+9);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET8:
+				build_drop(x, y, 0x20000000 | PHD_CARPET+10);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_CARPET9:
+				build_drop(x, y, 0x20000000 | PHD_CARPET);
+				map[m].flags |= (MF_INDOORS | MF_BANK | MF_NOEXPIRE);
+				break;
+			case PLH_BANNER_S:
+				build_drop(x, y, 0x20000000 | PHD_GRASS); build_drop(x, y, PHD_BANNER_S);
+				break;
+			case PLH_BANNER_W:
+				build_drop(x, y, 0x20000000 | PHD_GRASS); build_drop(x, y, PHD_BANNER_W);
+				break;
+			case PLH_BOOKSHELF_S:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_BOOKSHELF_S);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_SHIELD_W:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_SHIELD_W);
+				map[m].flags |= MF_INDOORS;
+				break;
+			case PLH_STOOL:
+				build_drop(x, y, 0x20000000 | PHD_FLOOR); build_drop(x, y, PHD_STOOL);
+				map[m].flags |= MF_INDOORS;
+				break;
+			default: break;
+		}
+	}
+	for (xt=0; xt<PLH_SIZE; xt++) for (yt=0; yt<PLH_SIZE; yt++)
+	{
+		reset_go(xx+xt, yy+yt);
+		remove_lights(xx+xt, yy+yt);
+		reset_go(xx+xt, yy+yt);
+		add_lights(xx+xt, yy+yt);
+	}
+	
+	return hn+1;
 }

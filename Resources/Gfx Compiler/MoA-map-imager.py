@@ -441,7 +441,7 @@ if len(sys.argv) == 1:
         if command == "exit" or command == "quit" or command == "e" or command == "x" or command == "q":
             sys.exit()
         
-        commandRegex = re.search("^([?\/(\-]?\??[a-zA-Z0-9-]*)?( *(,|\.| ) *([a-zA-Z0-9.\"-]*\+?\)?))?( *(,|\.| ) *([a-zA-Z0-9-]*))?( *(,|\.| ) *([a-zA-Z0-9]*))?( *(,|\.| ) *([a-zA-Z0-9]*))?", command, re.IGNORECASE)
+        commandRegex = re.search(r"^([?\/(\-]?\??[a-zA-Z0-9-]*)?( *(,|\.| ) *([a-zA-Z0-9.\"-]*\+?\)?))?( *(,|\.| ) *([a-zA-Z0-9-]*))?( *(,|\.| ) *([a-zA-Z0-9]*))?( *(,|\.| ) *([a-zA-Z0-9]*))?", command, re.IGNORECASE)
         
         try:
             for i in range(14):
@@ -508,7 +508,7 @@ if len(sys.argv) == 1:
                     threadSurface=Thread(target=displayImage,args=(surface,))
                     threadSurface.start()
                 else:
-                    imageNumberString = re.search("^\d{1,5}$", commandRegex[4].lstrip('0'))
+                    imageNumberString = re.search(r"^\d{1,5}$", commandRegex[4].lstrip('0'))
                     if imageNumberString:
                         imageNumber = int(imageNumberString[0]) 
                         if imageNumber > 0 and imageNumber < 65536:
@@ -712,7 +712,7 @@ if len(sys.argv) == 1:
             # Ignore image number
             
             if commandRegex[4]:
-                imageNumberString = re.search("^\d{1,5}$", commandRegex[4].lstrip('0'))
+                imageNumberString = re.search(r"^\d{1,5}$", commandRegex[4].lstrip('0'))
                 if imageNumberString:   
                     imageNumber = int(imageNumberString[0]) 
                     if imageNumber > 0 and imageNumber < 65536:
@@ -744,7 +744,7 @@ if len(sys.argv) == 1:
             # Override image number's colour
             
             if commandRegex[4]:
-                imageNumberString = re.search("^\d{1,5}$", commandRegex[4].lstrip('0'))
+                imageNumberString = re.search(r"^\d{1,5}$", commandRegex[4].lstrip('0'))
                 if imageNumberString:   
                     imageNumber = int(imageNumberString[0]) 
                     if imageNumber > 0 and imageNumber < 65536: 
@@ -752,7 +752,7 @@ if len(sys.argv) == 1:
                             RGBoffset = 7
                             RGB = {}
                             for index in range(3):
-                                RGBNumberString = re.search("^\d{1,3}$", commandRegex[RGBoffset])[0]
+                                RGBNumberString = re.search(r"^\d{1,3}$", commandRegex[RGBoffset])[0]
                                 if RGBNumberString:
                                     if RGBNumberString != "0":
                                         RGBNumberString = RGBNumberString.lstrip('0')
@@ -870,11 +870,11 @@ if len(sys.argv) == 1:
             # List location info     
             
             if commandRegex[1] and commandRegex[4]:
-                commandCoordinateX = re.search("^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[1])
-                commandCoordinateY = re.search("^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[4])
+                commandCoordinateX = re.search(r"^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[1])
+                commandCoordinateY = re.search(r"^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[4])
             if commandRegex[4] and commandRegex[7]:
-                commandCoordinateXAlt = re.search("^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[4])
-                commandCoordinateYAlt = re.search("^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[7])
+                commandCoordinateXAlt = re.search(r"^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[4])
+                commandCoordinateYAlt = re.search(r"^(\d{1,4})? *-? *(\d{1,4})?-?$", commandRegex[7])
             
             if (commandRegex[1] and commandCoordinateX and commandCoordinateY) or ((commandRegex[1] == "location" or commandRegex[1] == "loc" or commandRegex[1] == "locate" or commandRegex[1] == "tile") and commandRegex[7] and commandCoordinateXAlt and commandCoordinateYAlt):
                 if commandRegex[1] == "location" or commandRegex[1] == "loc" or commandRegex[1] == "locate" or commandRegex[1] == "l" or commandRegex[1] == "tile":
@@ -886,8 +886,8 @@ if len(sys.argv) == 1:
                 x2 = mapWidth
                 y1 = 0
                 y2 = mapHeight
-                commandCoordinateXRange = re.search("^(\d{1,4})? *- *(\d{1,4})?$", commandRegex[1 + commandOffset])
-                commandCoordinateYRange = re.search("^(\d{1,4})? *- *(\d{1,4})?$", commandRegex[4 + commandOffset])            
+                commandCoordinateXRange = re.search(r"^(\d{1,4})? *- *(\d{1,4})?$", commandRegex[1 + commandOffset])
+                commandCoordinateYRange = re.search(r"^(\d{1,4})? *- *(\d{1,4})?$", commandRegex[4 + commandOffset])            
                 
                 if commandCoordinateXRange:
                     if commandCoordinateXRange[1]:
@@ -971,7 +971,7 @@ elif len(sys.argv) > 1:
                     raise
             elif sys.argv[index] == "-l" or sys.argv[index] == "-location" or sys.argv[index] == "-loc":
                 gettingLocation = True
-                coords = re.search("(-?\d{1,4})(,|.)(-?\d{1,4})", sys.argv[index + 1])   
+                coords = re.search(r"(-?\d{1,4})(,|.)(-?\d{1,4})", sys.argv[index + 1])   
         
         loadMap()
         calibrateLengths()

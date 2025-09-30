@@ -53,7 +53,7 @@ int use_door(int cn, int in)
 		return 0;
 	}
 	
-	if (it[in].data[5]>0)
+	if (it[in].data[5]>0 && IS_LIVINGCHAR(cc = it[in].data[6]) && do_char_can_see(cc, ch[cc].attack_cn, 0))
 	{
 		do_char_log(cn, 0, "It's been jammed shut! Try again later?\n");
 		return 0;
@@ -242,7 +242,7 @@ int use_create_item(int cn, int in)
 	
 	if (it[in2].temp==2921)
 	{
-		it[in2].hp[0] = it[in2].end[0] = it[in2].mana[0] = min(255, max(ch[cn].pandium_floor[0], ch[cn].pandium_floor[1]));
+		it[in2].hp[I_I] = it[in2].end[I_I] = it[in2].mana[I_I] = min(255, max(ch[cn].pandium_floor[0], ch[cn].pandium_floor[1]));
 		it[in2].flags |= IF_UPDATE;
 	}
 
@@ -516,12 +516,12 @@ int use_create_item3(int cn, int in)
 	return 1;
 }
 
-// Consume item - flag is 'always'
+// Consume item - if v is 0, consume the entire item regardless of stack
 void use_consume_item(int cn, int in, int v)
 {
 	int stk, val;
 	
-	// Stackable item check - if the current item is stackable and has a stack, we consume one. Otherwise, destroy the remaining item.
+	// Stackable item check - if the current item has a stack greater than 1, we consume one. Otherwise, destroy the item.
 	if (v && it[in].stack > v)
 	{
 		stk = it[in].stack;
@@ -563,14 +563,14 @@ void use_stack_items(int cn, int in, int in2)
 	// Special case for Soul catalysts, Greater Skill Scrolls, Corruptors
 	if (IS_MATCH_CAT(in, in2) || IS_MATCH_GSC(in, in2) || IS_MATCH_COR(in, in2))
 	{
-		if (IS_SOULCAT(in))   in3 = make_catalyst(cn, 1, 0);
+		if (IS_SOULCAT(in))   in3 = make_new_catalyst(cn, 1, 0);
 		if (IS_GSCROLL(in))   in3 = make_gskill(cn);
 		if (IS_CORRUPTOR(in)) in3 = make_corruptor(cn, 1);
 		
 		if (in3)
 		{
 			if (IS_CORRUPTOR(in))
-				do_char_log(cn, 1, "You merged the two and got fresh corruptor.\n");
+				do_char_log(cn, 1, "You merged the two and got a fresh corruptor.\n");
 			else
 				do_char_log(cn, 1, "You merged the two and got %s.\n", itemvowel(in3, 1));
 			use_consume_item(cn, in, 1);
@@ -2046,7 +2046,7 @@ int teleport2(int cn, int in2)
 		return 1;
 	}
 
-	in = god_create_buff();
+	in = god_create_buff(SK_RECALL);
 	if (!in)
 	{
 		xlog("god_create_buff failed in teleport2");
@@ -2054,10 +2054,8 @@ int teleport2(int cn, int in2)
 	}
 
 	strcpy(bu[in].name, "Teleport");
-	bu[in].flags |= IF_SPELL;
-	bu[in].sprite[1] = BUF_SPR_RECALL;
+	bu[in].sprite = BUF_SPR_RECALL;
 	bu[in].duration  = bu[in].active = 180;
-	bu[in].temp  = SK_RECALL;
 	bu[in].power = it[in2].power;
 	bu[in].data[1] = it[in2].data[0];
 	bu[in].data[2] = it[in2].data[1];
@@ -2076,16 +2074,13 @@ void debuff_vantablack(int cn)
 {
 	int in;
 	
-	in = god_create_buff();
+	in = god_create_buff(215);
 	
 	strcpy(bu[in].name, "darkness");
-	strcpy(bu[in].reference, "darkness");
-	strcpy(bu[in].description, "darkness.");
 	
 	bu[in].active = bu[in].duration = 1;
-	bu[in].flags  = IF_SPELL | IF_PERMSPELL;
-	bu[in].temp = 215;
-	bu[in].sprite[1] = BUF_SPR_VANTA;
+	bu[in].flags  = BF_PERMASPELL;
+	bu[in].sprite = BUF_SPR_VANTA;
 	
 	add_spell(cn, in);
 }
@@ -2245,9 +2240,9 @@ int use_item_pedestal(int cn, int in)
 		do_area_sound(0, 0, it[in].x, it[in].y, 10);
 		use_driver(0, in3, 0);
 		it[in3].active = it[in3].duration;
-		if (it[in3].light[0]!=it[in3].light[1])
+		if (it[in3].light[I_I]!=it[in3].light[I_A])
 		{
-			do_add_light(it[in3].x, it[in3].y, it[in3].light[1] - it[in3].light[0]);
+			do_add_light(it[in3].x, it[in3].y, it[in3].light[I_A] - it[in3].light[I_I]);
 		}
 		do_area_log(0, 0, ch[cn].x, ch[cn].y, 1, "The door opens.\n");
 	}
@@ -2351,7 +2346,7 @@ int use_bag(int cn, int in)
 {
 	int co, owner;
 	int in2, nr;
-	int emptyinv = 0;
+	int emptyinv = 2;
 
 	co = it[in].data[0];
 	owner = ch[co].data[CHD_CORPSEOWNER];
@@ -2374,37 +2369,19 @@ int use_bag(int cn, int in)
 
 	if (!(ch[cn].flags & CF_SYS_OFF))
 		do_char_log(cn, 1, "You search the remains of %s.\n", ch[co].reference);
-	if ((ch[co].flags & CF_BODY) && ch[co].gold)
+	if (ch[co].flags & CF_BODY)
 	{
-		ch[cn].gold += ch[co].gold;
-		chlog(cn, "Took %dG %dS", ch[co].gold / 100, ch[co].gold % 100);
-		do_char_log(cn, 1, "You took %dG %dS.\n", ch[co].gold / 100, ch[co].gold % 100);
-		ch[co].gold = 0;
-		emptyinv = 1;
-		for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
-		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
-	}
-	if ((ch[co].flags & CF_BODY) && (ch[cn].flags & CF_AUTOLOOT))
-	{
-		if (IS_SANEITEM(in2 = ch[co].citem))
+		if (ch[co].gold)
 		{
-			god_take_from_char(in2, co);
-			if (god_give_char(in2, cn))
-			{
-				chlog(cn, "Autoloot %s", it[in2].name);
-				do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
-				emptyinv = 1;
-			}
-			else
-			{
-				god_give_char(in2, co);
-				do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
-				emptyinv = 0;
-			}
+			ch[cn].gold += ch[co].gold;
+			chlog(cn, "Took %dG %dS", ch[co].gold / 100, ch[co].gold % 100);
+			do_char_log(cn, 1, "You took %dG %dS.\n", ch[co].gold / 100, ch[co].gold % 100);
+			ch[co].gold = 0;
+			emptyinv = 1;
 		}
-		for (nr=0; nr<MAXITEMS; nr++)
+		if (ch[cn].flags & CF_AUTOLOOT)
 		{
-			if (IS_SANEITEM(in2 = ch[co].item[nr]))
+			if (IS_SANEITEM(in2 = ch[co].citem))
 			{
 				god_take_from_char(in2, co);
 				if (god_give_char(in2, cn))
@@ -2418,34 +2395,61 @@ int use_bag(int cn, int in)
 					god_give_char(in2, co);
 					do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
 					emptyinv = 0;
-					break;
 				}
 			}
-		}
-		for (nr=0; nr<12; nr++)
-		{
-			if (IS_SANEITEM(in2 = ch[co].worn[nr]) && (it[in2].flags&IF_SHOPDESTROY))
+			for (nr=0; nr<MAXITEMS; nr++)
 			{
-				god_take_from_char(in2, co);
-				if (god_give_char(in2, cn))
+				if (IS_SANEITEM(in2 = ch[co].item[nr]))
 				{
-					chlog(cn, "Autoloot %s", it[in2].name);
-					do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
-					emptyinv = 1;
+					god_take_from_char(in2, co);
+					if (god_give_char(in2, cn))
+					{
+						chlog(cn, "Autoloot %s", it[in2].name);
+						do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
+						emptyinv = 1;
+					}
+					else
+					{
+						god_give_char(in2, co);
+						do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+						emptyinv = 0;
+						break;
+					}
 				}
-				else
+			}
+			for (nr=0; nr<12; nr++)
+			{
+				if (IS_SANEITEM(in2 = ch[co].worn[nr]) && (it[in2].flags&IF_SHOPDESTROY))
 				{
-					god_give_char(in2, co);
-					do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
-					emptyinv = 0;
-					break;
+					god_take_from_char(in2, co);
+					if (god_give_char(in2, cn))
+					{
+						chlog(cn, "Autoloot %s", it[in2].name);
+						do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
+						emptyinv = 1;
+					}
+					else
+					{
+						god_give_char(in2, co);
+						do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+						emptyinv = 0;
+						break;
+					}
 				}
 			}
 		}
-		for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]!=0) emptyinv = 0;
-		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]!=0) emptyinv = 0;
+		for (nr=0; nr<MAXITEMS; nr++) if (ch[co].item[nr]) emptyinv = 0;
+		for (nr=0; nr<12; nr++) if (ch[co].worn[nr]) emptyinv = 0;
 	}
-	if (!emptyinv) do_look_char(cn, co, 0, 0, 1);
+	else
+	{
+		do_char_log(cn, 5, "This grave is corrupt...\n");
+		return 1;
+	}
+	if (!emptyinv) 
+		do_look_char(cn, co, 0, 0, 1);
+	else if (emptyinv == 2)
+		do_char_log(cn, 5, "This grave is empty.\n");
 	return 1;
 }
 
@@ -2839,6 +2843,30 @@ int use_scroll_C(int cn, int in)
 	return 1;
 }
 
+// House Deed
+int use_scroll_H(int cn, int in)
+{
+	int n;
+	
+	if (ch[cn].house_id)
+	{
+		do_char_log(cn, 0, "But you already own a house!\n");
+		return 0;
+	}
+	
+	if ((n = build_new_house(cn, it[in].data[0])) > 0)
+	{
+		do_char_log(cn, 1, "Your house lot was created, using layout %d as a base.\n", it[in].data[0]+1);
+		do_char_log(cn, 2, "You can now use #home from a temple to head home.\n");
+	}
+	else if (n == 0) return 0;
+	
+	use_consume_item(cn, in, 1);
+	do_update_char(cn);
+	
+	return 1;
+}
+
 // Scroll of Binding
 int use_scroll_O(int cn, int in)
 {
@@ -2955,14 +2983,12 @@ int use_whetstone(int cn, int in)
 	if (n>0)	// Weapon
 	{
 		do_char_log(cn, 2, "You improved this item's Weapon Value by 1.\n");
-		it[in2].weapon[0]++;
-		it[in2].weapon[1]++;
+		it[in2].weapon[I_P]++;
 	}
 	else		// Armor
 	{
 		do_char_log(cn, 2, "You improved this item's Armor Value by 1.\n");
-		it[in2].armor[0]++;
-		it[in2].armor[1]++;
+		it[in2].armor[I_P]++;
 	}
 	
 	it[in2].flags |= IF_WHETSTONED;
@@ -3045,7 +3071,7 @@ int use_map_contract(int cn, int in)
 	it[in].data[6] = fl2[1];
 	it[in].data[7] = fl1[2];
 	it[in].data[8] = fl2[2];
-	it[in].sprite[0] = spr;
+	it[in].sprite[I_I] = spr;
 	it[in].flags |= IF_UPDATE;
 	
 	sprintf(buf, "Signed, %s.", ch[cn].name);
@@ -3139,14 +3165,14 @@ int use_map_pentigram(int cn, int in)
 		if (!co) continue;
 		ch[co].data[29] = m;
 		ch[co].data[60] = TICKS * 23;
-		if (try_boost(20)) boost_char(co, 0);
+		if (try_boost(25)) boost_char(co, 0);
 		else if (!IS_LABY_MOB(co) && !ch[co].citem && !ch[co].item[0] && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 		{
 			if (in2 = god_create_item(IT_CORRUPTOR))
 			{
 				ch[co].citem = in2;
 				it[in2].carried = co;
-				it[in2].cost = 555;
+				it[in2].corruption = 555;
 			}
 		}
 	}
@@ -3181,7 +3207,7 @@ int use_map_chest(int cn, int in)
 	}
 	for (n = 0; n < 10; n++)
 	{
-		if (it[in].skill[n][0]*100+it[in].skill[n][1] == cn)
+		if (it[in].skill[n][I_I]*100+it[in].skill[n][I_A] == cn)
 		{
 			do_char_log(cn, 0, "You already opened this chest!\n");
 			return 0;
@@ -3350,8 +3376,8 @@ int use_map_chest(int cn, int in)
 		do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 	}
 	
-	it[in].skill[it[in].data[3]][0] = cn/100;
-	it[in].skill[it[in].data[3]][1] = cn%100;
+	it[in].skill[it[in].data[3]][I_I] = cn/100;
+	it[in].skill[it[in].data[3]][I_A] = cn%100;
 	it[in].data[3]++;
 	
 	if (it[in].data[3] >= it[in].data[2]) 
@@ -3408,7 +3434,7 @@ int use_map_shrine(int cn, int in)
 	}
 	for (n = 0; n < 10; n++)
 	{
-		if (it[in].skill[n][0]*100+it[in].skill[n][1]==cn)
+		if (it[in].skill[n][I_I]*100+it[in].skill[n][I_A]==cn)
 		{
 			do_char_log(cn, 0, "You already used this shrine!\n");
 			return 0;
@@ -3543,7 +3569,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_ACCEL, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Acceleration");
-						bu[buff].speed[1] = 10 + boosted; 
+						bu[buff].speed = 10 + boosted; 
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be accelerated.\n");
 					}
@@ -3552,7 +3578,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_SHARP, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Sharpness");
-						bu[buff].weapon[1] = 10 + boosted; 
+						bu[buff].weapon = 10 + boosted; 
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be sharpened.\n");
 					}
@@ -3561,7 +3587,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_FORTI, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Fortify");
-						bu[buff].armor[1] = 10 + boosted; 
+						bu[buff].armor = 10 + boosted; 
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be fortified.\n");
 					}
@@ -3570,7 +3596,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_BLSSN, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Blessing");
-						for (n = 0; n<5; n++) bu[buff].attrib[n][1] = (10 + boosted)/2;
+						for (n = 0; n<5; n++) bu[buff].attrib[n] = (10 + boosted)/2;
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be blessed.\n");
 					}
@@ -3579,7 +3605,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_WISDM, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Cooling");
-						bu[buff].cool_bonus[1] = (10 + boosted) * 2; 
+						bu[buff].cool_bonus = (10 + boosted) * 2; 
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be calm.\n");
 					}
@@ -3588,7 +3614,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_WISDM, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Wisdom");
-						bu[buff].spell_mod[1] = (10 + boosted)/2;
+						bu[buff].spell_mod = (10 + boosted)/2;
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be wisened.\n");
 					}
@@ -3659,8 +3685,8 @@ int use_map_shrine(int cn, int in)
 		do_char_log(cn, 1, "%d down, %d to go.\n", CONT_PROG(cn), (CONT_GOAL(cn)-CONT_PROG(cn)));
 	}
 	
-	it[in].skill[it[in].data[7]][0] = cn/100;
-	it[in].skill[it[in].data[7]][1] = cn%100;
+	it[in].skill[it[in].data[7]][I_I] = cn/100;
+	it[in].skill[it[in].data[7]][I_A] = cn%100;
 	it[in].data[7]++;
 	
 	if (it[in].data[7] >= it[in].data[6]) 
@@ -3756,9 +3782,16 @@ int use_map_portal(int cn, int in)
 	return 1;
 }
 
+/*
+Tier 1. Random equipped gear gets +2 to a random attribute.
+Tier 2. Chosen gear donated to the shrine gets +2 to a random attribute.
+Tier 3. Random equipped gear gets +2 to your highest character attribute.
+Tier 4. Chosen gear donated to the shrine gets +2 to your highest character attribute.
+*/
 int use_augment_item(int cn, int in)
 {
-	int n, in2, bonus = 1;
+	int n, m, emp, aug, in2, bonus = 1;
+	int c[13] = {0};
 	char *at_name[5] = {
 		"Braveness",
 		"Willpower",
@@ -3767,10 +3800,7 @@ int use_augment_item(int cn, int in)
 		"Strength"
 	};
 	
-	if (cn==0)
-	{
-		return 0;
-	}
+	if (cn==0) return 0;
 	
 	// Abort if already consumed
 	if (it[in].active)
@@ -3778,30 +3808,86 @@ int use_augment_item(int cn, int in)
 		do_char_log(cn, 0, "The magic of this shrine has already been used.\n");
 		return 0;
 	}
-	// Abort if no held item
-	if ((in2 = ch[cn].citem)==0)
+	if (!it[in].data[0])
 	{
-		do_char_log(cn, 0, "To use this shrine, hold an equipable item under your mouse cursor.\n");
+		do_char_log(cn, 0, "Oops, something's wrong with this one. Let Zarro know.\n");
 		return 0;
 	}
-	// Abort if already augmented
-	if (it[in2].flags & IF_AUGMENTED)
+	if (it[in].data[0] == 2 || it[in].data[0] == 4) // held item gets modified
 	{
-		do_char_log(cn, 0, "This item has already been augmented!\n");
-		return 0;
+		// Abort if no held item
+		if ((in2 = ch[cn].citem)==0 && (it[in].data == 2 || it[in].data == 4))
+		{
+			do_char_log(cn, 0, "To use this shrine, hold an equipable item under your mouse cursor.\n");
+			return 0;
+		}
+		// Abort if already augmented
+		if (it[in2].flags & IF_AUGMENTED)
+		{
+			do_char_log(cn, 0, "This item has already been augmented!\n");
+			return 0;
+		}
+		// Abort if unequipable
+		if (!it[in2].placement)
+		{
+			do_char_log(cn, 0, "This item cannot be equipped!\n");
+			return 0;
+		}
 	}
-	// Abort if unequipable
-	if (!it[in2].placement)
+	else // random item gets modified
 	{
-		do_char_log(cn, 0, "This item cannot be equipped!\n");
-		return 0;
+		m = 0;
+		for (n=0;n<13;n++)
+		{
+			if (!ch[cn].worn[n])
+			{
+				emp++;
+				continue;
+			}
+			if (it[ch[cn].worn[n]].flags & IF_AUGMENTED)
+			{
+				aug++;
+				continue;
+			}
+			c[m] = ch[cn].worn[n];
+			m++;
+		}
+		if (m == 0)
+		{
+			if (emp && aug)
+			{
+				do_char_log(cn, 0, "To use this shrine, you must have something equipped and not yet augmented.\n");
+				return 0;
+			}
+			if (aug)
+			{
+				do_char_log(cn, 0, "To use this shrine, you must have something equipped which hasn't been augmented.\n");
+				return 0;
+			}
+			do_char_log(cn, 0, "To use this shrine, you must have something equipped.\n");
+			return 0;
+		}
+		m = RANDOM(m);
+		in2 = c[m];
 	}
 	
 	if (IS_TWOHAND(in2)) bonus = 2;
 	
-	n = RANDOM(5);
-	it[in2].attrib[n][0] += it[in].data[0] * bonus;
-	it[in2].attrib[n][1] += it[in].data[0] * bonus;
+	if (it[in].data[0] < 3)
+	{
+		n = RANDOM(5);
+	}
+	else
+	{
+		n = 0;
+		for (m=0;m<5;m++)
+		{
+			if (get_attrib_score(cn, m) >  get_attrib_score(cn, n)) n = m;
+			if (get_attrib_score(cn, m) == get_attrib_score(cn, n)) n = (RANDOM(2)?n:m);
+		}
+	}
+	
+	it[in2].attrib[n][I_P] += 2 * bonus;
 	
 	do_char_log(cn, 7, "Your %s has been augmented with %s.\n", it[in2].name, at_name[n]);
 	it[in2].flags |= IF_AUGMENTED;
@@ -3993,7 +4079,7 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_mana -= power*1000;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_starlight(cn, co, power, 1);
 			if (ret) add_exhaust(cn, TICKS);
 			break;
@@ -4017,7 +4103,7 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_end -= power*1000;
 			item_damage_worn(cn, WN_LHAND, 500);
-			if ((get_gear(cn, IT_WP_CRESSUN) || get_gear(cn, IT_WB_CRESSUN)) && power) spell_pomesol(cn, cn, power, 0);
+			if (do_get_iflag(cn, SF_EN_HEAL) && power) spell_pomesol(cn, cn, power, 0);
 			ret = spell_phalanx(cn, co, power, 1);
 			if (ret) add_exhaust(cn, TICKS);
 			break;
@@ -4042,7 +4128,7 @@ int use_special_spell(int cn, int in)
 			}
 			if (spellcost(cn, SP_COST_POISON, SK_POISON, 1)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_poison(cn, co, power, 1);
 			if (ret) 
 			{
@@ -4109,7 +4195,7 @@ int use_special_spell(int cn, int in)
 				do_update_char(cn);
 				return;
 			}
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_immolate(cn, cn, power);
 			if (ret) add_exhaust(cn, TICKS / 2);
 			break;
@@ -4133,7 +4219,7 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_blast(cn, co, power, 0, 0);
 			if (ret) 
 			{
@@ -4141,7 +4227,7 @@ int use_special_spell(int cn, int in)
 				spell_shock(cn, co, power);
 				surround_cast(cn, co, 0, SK_MJOLNIR, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
 				m = add_exhaust(cn, SK_EXH_BLAST/2);
-				if (m && get_gear(cn, IT_SIGN_SPAR))
+				if (m && do_get_iflag(cn, SF_SIGN_SPAR))
 				{
 					bu[m].data[0] = SK_BLAST;
 					bu[m].data[1] = power;
@@ -4149,7 +4235,7 @@ int use_special_spell(int cn, int in)
 			}
 			break;
 		case SK_SHADOW: 
-			if (!get_gear(cn, IT_BOOK_DEVI)) 
+			if (!do_get_iflag(cn, SF_BOOK_DEVI))
 			{
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
@@ -4158,7 +4244,7 @@ int use_special_spell(int cn, int in)
 			power = M_SK(cn, SK_SHADOW);
 			if (spellcost(cn, SP_COST_SHADOW, SK_SHADOW, 1)) return 0;
 			item_damage_worn(cn, WN_LHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			if (IS_PLAYER(cn) && (cc = ch[cn].data[PCD_SHADOWCOPY]))
 			{
 				if (!IS_SANECHAR(cc) || ch[cc].data[CHD_MASTER]!=cn || 
@@ -4181,7 +4267,7 @@ int use_special_spell(int cn, int in)
 				}
 			}
 			if (cn==co) co = 0;
-			ret = spell_shadow(cn, co, co?co:cn, 0, (co && !may_attack_msg(cn, co, 0)), 1);
+			ret = spell_ghost(cn, co, co?co:cn, (co && !may_attack_msg(cn, co, 0)), 2);
 			if (ret) add_exhaust(cn, SK_EXH_SHADOW/2);
 			break;
 		case SK_SACRIFICE:
@@ -4224,7 +4310,7 @@ int use_special_spell(int cn, int in)
 			}
 			if (spellcost(cn, SP_COST_POISON, SK_POISON, 1)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_poison(cn, co, power, 2);
 			if (ret) 
 			{
@@ -4260,7 +4346,7 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_mana -= power*1000;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = skill_obliterate(cn, co, power);
 			if (ret) add_exhaust(cn, SK_EXH_BLAST);
 			break;
@@ -4274,7 +4360,7 @@ int use_special_spell(int cn, int in)
 			power = M_SK(cn, SK_SHIELD);
 			if (spellcost(cn, SP_COST_ZEPHYR, SK_ZEPHYR, 1)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_zephyr(cn, cn, power, 0);
 			if (ret) add_exhaust(cn, SK_EXH_ZEPHYR);
 			break;
@@ -4298,7 +4384,7 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			item_damage_worn(cn, WN_RHAND, 500);
-			if ((get_gear(cn, IT_WP_LIFESPRIG) || get_gear(cn, IT_WB_LIFESPRIG)) && power) spell_pomesol(cn, cn, power, 1);
+			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
 			ret = spell_slow(cn, co, power, 1);
 			if (ret) 
 			{
@@ -4310,7 +4396,7 @@ int use_special_spell(int cn, int in)
 			}
 			break;
 		case SK_SLAM:
-			if (!get_gear(cn, IT_WB_VIKINGMALT)) 
+			if (!do_get_iflag(cn, SF_VIKINGMALT)) 
 			{
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
@@ -4468,7 +4554,7 @@ int crystal_gear_up(int cc, int slot, int temp, int sss, int ss_item, int en_ite
 	
 	if ((sss&&!RANDOM(4)) || ss_item == slot)
 	{
-		create_soultrans_equipment(cc, in, ss_rank); m++;
+		create_new_ss_equipment(cc, in, 0, -1); m++;
 	}
 	if ((sss&&!RANDOM(4)) || en_item == slot)
 	{
@@ -4575,8 +4661,12 @@ int use_crystal_sub(int cn, int in)
 		warsorc=0;
 	
 	if (try_boost(50)) sss = 10+tier*10;
-
-	cc = god_create_char(tmp, 0);
+	
+	if (!(cc = god_create_char(tmp, 0)))
+	{
+		do_char_log(cn, 0, "use_crystal (%d,%d): god_create_char() failed.\n", it[in].x, it[in].y);
+		return 0;
+	}
 	if (!god_drop_char_fuzzy(cc, it[in].x, it[in].y))
 	{
 		xlog("use_crystal (%d,%d): drop_char failed", it[in].x, it[in].y);
@@ -5200,12 +5290,6 @@ int use_crystal_sub(int cn, int in)
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
 			}	xlog("  got %s", it[tmp].name); hasloot++;
 		}
-		else if (RANDOM(80/(sss?4:1))==0 && base>(40+18))
-		{	switch(RANDOM(2))
-			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_BL_SOLAR, cc); it[tmp].carried = cc; break;
-				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_BL_LUNAR, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
-		}
 		if (RANDOM(100/(sss?4:1))==0 && base>(40+24))
 		{	switch(RANDOM(2))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
@@ -5289,7 +5373,7 @@ int use_crystal_sub(int cn, int in)
 			{
 				ch[cc].citem = tmp;
 				it[tmp].carried = cc;
-				it[tmp].cost = 555;
+				it[tmp].corruption = 555;
 				ch[cc].gcm = 99;
 			}
 		}
@@ -5406,7 +5490,7 @@ int rat_eye(int cn, int in)
 	chlog(cn, "Added %s to %s", it[in2].name, it[in].name);
 
 	it[in].data[n] = 0;
-	it[in].sprite[0]++;
+	it[in].sprite[I_I]++;
 	it[in].flags |= IF_UPDATE;
 	it[in].temp   = 0;
 	
@@ -5519,9 +5603,9 @@ int use_lever(int cn, int in)
 	do_area_sound(0, 0, it[in].x, it[in].y, 10);
 	use_driver(0, in2, 0);
 	it[in2].active = it[in2].duration;
-	if (it[in2].light[0]!=it[in2].light[1])
+	if (it[in2].light[I_I]!=it[in2].light[I_A])
 	{
-		do_add_light(it[in2].x, it[in2].y, it[in2].light[1] - it[in2].light[0]);
+		do_add_light(it[in2].x, it[in2].y, it[in2].light[I_A] - it[in2].light[I_I]);
 	}
 	
 	for (n=2;n<=9;n++)
@@ -5531,9 +5615,9 @@ int use_lever(int cn, int in)
 		in2 = map[m].it;
 		use_driver(0, in2, 0);
 		it[in2].active = it[in2].duration;
-		if (it[in2].light[0]!=it[in2].light[1])
+		if (it[in2].light[I_I]!=it[in2].light[I_A])
 		{
-			do_add_light(it[in2].x, it[in2].y, it[in2].light[1] - it[in2].light[0]);
+			do_add_light(it[in2].x, it[in2].y, it[in2].light[I_A] - it[in2].light[I_I]);
 		}
 	}
 
@@ -5917,18 +6001,15 @@ void debuff_dwlight(int cn)
 {
 	int in;
 	
-	in = god_create_buff();
+	in = god_create_buff(SK_DWLIGHT);
 
 	strcpy(bu[in].name, "Darklight");
-	strcpy(bu[in].reference, "darklight");
-	strcpy(bu[in].description, "Darklight.");
 	
-	bu[in].power     = 240;
+	bu[in].power  = 240;
 	bu[in].active = bu[in].duration = 1;
-	bu[in].flags     = IF_SPELL | IF_PERMSPELL;
-	bu[in].temp      = SK_DWLIGHT;
-	bu[in].sprite[1] = BUF_SPR_VANTA;
-	bu[in].light[1]  = 120;
+	bu[in].flags  = BF_PERMASPELL;
+	bu[in].sprite = BUF_SPR_VANTA;
+	bu[in].light  = 120;
 
 	add_spell(cn, in);
 }
@@ -5978,31 +6059,28 @@ int inflict_sanguine(int cn, int in)
 	if (in2)
 	{
 		bu[in2].power    = power;
-		bu[in2].hp[0]    = -(power/3);
-		bu[in2].end[0]   = -(power/9);
-		bu[in2].mana[0]  = -(power/6);
-		bu[in2].dmg_reduction[1] = -min(127, power/9);	// x% more damage taken
-		bu[in2].dmg_bonus[1]     = -min(127, power/9);	// x% less damage dealt
+		bu[in2].r_hp    = -(power/3);
+		bu[in2].r_end   = -(power/9);
+		bu[in2].r_mana  = -(power/6);
+		bu[in2].dmg_reduction = -min(127, power/9);	// x% more damage taken
+		bu[in2].dmg_bonus     = -min(127, power/9);	// x% less damage dealt
 		bu[in2].active = bu[in2].duration = TICKS * 60 * 2;
 		return 0;
 	}
 
-	in2 = god_create_buff();
+	in2 = god_create_buff(SK_SANGUINE);
 
 	strcpy(bu[in2].name, "Sanguine Scourge");
-	strcpy(bu[in2].reference, "sanguine scourge");
-	strcpy(bu[in2].description, "Sanguine scourge.");
 	
 	bu[in2].power    = power;
-	bu[in2].hp[0]    = -(power/3);
-	bu[in2].end[0]   = -(power/9);
-	bu[in2].mana[0]  = -(power/6);
-	bu[in2].dmg_reduction[1] = -min(127, power/9);		// x% more damage taken
-	bu[in2].dmg_bonus[1]     = -min(127, power/9);	// x% less damage dealt
+	bu[in2].r_hp    = -(power/3);
+	bu[in2].r_end   = -(power/9);
+	bu[in2].r_mana  = -(power/6);
+	bu[in2].dmg_reduction = -min(127, power/9);		// x% more damage taken
+	bu[in2].dmg_bonus     = -min(127, power/9);	// x% less damage dealt
 	bu[in2].active = bu[in2].duration = TICKS * 60 * 2;
-	bu[in2].flags  = IF_SPELL | IF_PERMSPELL;
-	bu[in2].temp = SK_SANGUINE;
-	bu[in2].sprite[1] = BUF_SPR_SANGUINE;
+	bu[in2].flags  = BF_PERMASPELL;
+	bu[in2].sprite = BUF_SPR_SANGUINE;
 
 	add_spell(cn, in2);
 
@@ -6043,7 +6121,7 @@ int use_sanguine_crystal(int cn, int in)
 	
 	wil = M_AT(cn, AT_WIL)/2 + 31;
 	
-	if (get_tarot(cn, IT_CH_WORLD_R))
+	if (do_get_iflag(cn, SF_WORLD_R))
 	{	// substract mana
 		if (ch[cn].a_mana<1000)
 		{
@@ -6248,7 +6326,7 @@ int use_mine(int cn, int in)
 
 	str = M_AT(cn, AT_STR);
 
-	if (get_tarot(cn, IT_CH_WORLD_R))
+	if (do_get_iflag(cn, SF_WORLD_R))
 	{	// substract mana
 		if (ch[cn].a_mana<1000)
 		{
@@ -6704,32 +6782,32 @@ int build_sinbinder(int cn, int in)
 	
 	if (t2==IT_CH_FOOL)
 	{
-		for (n=0; n<5; n++) { it[in].attrib[n][0] += it[in2].attrib[n][0]; it[in].attrib[n][2] = max(it[in].attrib[n][2], it[in2].attrib[n][2]); }
-		for (n=0; n<50; n++) { it[in].skill[n][0] += it[in2].skill[n][0]; it[in].skill[n][2] = max(it[in].skill[n][2], it[in2].skill[n][2]); }
+		for (n=0; n<5; n++) { it[in].attrib[n][I_P] += it[in2].attrib[n][I_P]; }
+		for (n=0; n<50; n++) { it[in].skill[n][I_P] += it[in2].skill[n][I_P]; }
 		
-		it[in].hp[0]          += it[in2].hp[0];
-		it[in].end[0]         += it[in2].end[0];
-		it[in].mana[0]        += it[in2].mana[0];
+		it[in].hp[I_P]          += it[in2].hp[I_P];
+		it[in].end[I_P]         += it[in2].end[I_P];
+		it[in].mana[I_P]        += it[in2].mana[I_P];
 		
-		it[in].to_hit[0]      += it[in2].to_hit[0];
-		it[in].to_parry[0]    += it[in2].to_parry[0];
-		it[in].top_damage[0]  += it[in2].top_damage[0];
-		it[in].speed[0]       += it[in2].speed[0];
-		it[in].move_speed[0]  += it[in2].move_speed[0];
-		it[in].atk_speed[0]   += it[in2].atk_speed[0];
-		it[in].cast_speed[0]  += it[in2].cast_speed[0];
-		it[in].aoe_bonus[0]   += it[in2].aoe_bonus[0];
-		it[in].spell_mod[0]   += it[in2].spell_mod[0];
-		it[in].spell_apt[0]   += it[in2].spell_apt[0];
-		it[in].cool_bonus[0]  += it[in2].cool_bonus[0];
-		it[in].light[0]       += it[in2].light[0];
-		it[in].crit_multi[0]  += it[in2].crit_multi[0];
-		it[in].crit_chance[0] += it[in2].crit_chance[0];
-		it[in].gethit_dam[0]  += it[in2].gethit_dam[0];
+		it[in].to_hit[I_P]      += it[in2].to_hit[I_P];
+		it[in].to_parry[I_P]    += it[in2].to_parry[I_P];
+		it[in].top_damage[I_P]  += it[in2].top_damage[I_P];
+		it[in].speed[I_P]       += it[in2].speed[I_P];
+		it[in].move_speed[I_P]  += it[in2].move_speed[I_P];
+		it[in].atk_speed[I_P]   += it[in2].atk_speed[I_P];
+		it[in].cast_speed[I_P]  += it[in2].cast_speed[I_P];
+		it[in].aoe_bonus[I_P]   += it[in2].aoe_bonus[I_P];
+		it[in].spell_mod[I_P]   += it[in2].spell_mod[I_P];
+		it[in].spell_apt[I_P]   += it[in2].spell_apt[I_P];
+		it[in].cool_bonus[I_P]  += it[in2].cool_bonus[I_P];
+		it[in].light[I_P]       += it[in2].light[I_P];
+		it[in].crit_multi[I_P]  += it[in2].crit_multi[I_P];
+		it[in].crit_chance[I_P] += it[in2].crit_chance[I_P];
+		it[in].gethit_dam[I_P]  += it[in2].gethit_dam[I_P];
 		
-		it[in].base_crit      += it[in2].base_crit;
-		it[in].ss_weapon      += it[in2].ss_weapon;
-		it[in].ss_armor       += it[in2].ss_armor;
+		it[in].base_crit[I_P]   += it[in2].base_crit[I_P];
+		it[in].weapon[I_P]      += it[in2].weapon[I_P];
+		it[in].armor[I_P]       += it[in2].armor[I_P];
 		
 		it[in].flags |= IF_IDENTIFIED;
 		if (it[in2].enchantment) 
@@ -6746,9 +6824,9 @@ int build_sinbinder(int cn, int in)
 		return 0;
 	}
 	
-	if ((it[in2].flags & IF_CORRUPTED) && it[in2].cost)
+	if ((it[in2].flags & IF_CORRUPTED) && it[in2].corruption)
 	{
-		it[in].cost = it[in2].cost;
+		it[in].corruption = it[in2].corruption;
 		it[in].flags |= IF_CORRUPTED | IF_LOOKSPECIAL;
 	}
 	
@@ -6765,7 +6843,7 @@ int build_sinbinder(int cn, int in)
 	
 	it[in].data[1] = 1;
 	it[in].data[2] = t2;
-	it[in].sprite[0] = IT_TW_SINSPR;
+	it[in].sprite[I_I] = IT_TW_SINSPR;
 	it[in].flags &= ~IF_USESPECIAL;
 	it[in].flags |= IF_UPDATE;
 }
@@ -6952,10 +7030,8 @@ int try_boost(int v)
 
 void boost_char(int cn, int type)
 {
-	int n, in, divi = 1, exp, v, m;
+	int n, in, divi = 1, v, m;
 	char buf[80];
-	
-	exp  = ch[cn].points_tot / 5 + RANDOM(ch[cn].points_tot / 20 + 1);
 	
 	if (ch[cn].alignment < 0 && ch[cn].data[CHD_GROUP] != 13 && ch[cn].data[CHD_GROUP] != 18 &&
 		!(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && (getrank(cn) > 4 || type==6)) // Stronger than Sergeant
@@ -6969,36 +7045,36 @@ void boost_char(int cn, int type)
 			case  1:
 			case 11:
 				sprintf(buf, "Strong %s", ch[cn].name); divi = 5;
-				make_soulstone(cn, exp);
+				give_new_ss(cn, 0);
 				if (type==11)
 				{
 					divi -= 2;
-					make_soulstone(cn, exp);
+					give_new_ss(cn, 0);
 				}
 				break;
 			case  2:
 				sprintf(buf, "Mighty %s", ch[cn].name); divi = 5;
-				make_catalyst(cn, 1, 0);
+				make_new_catalyst(cn, 1, 0);
 				break;
 			case  3:
 			case 13:
 				sprintf(buf, "Lethal %s", ch[cn].name); divi = 4;
 				if (!(ch[cn].flags & CF_EXTRACRIT)) ch[cn].flags |= CF_EXTRACRIT;
-				make_focus(cn, exp);
+				make_new_focus(cn);
 				if (type==13)
 				{
 					divi -= 2;
-					make_focus(cn, exp);
+					make_new_focus(cn);
 				}
 				break;
 			case  4:
 			case 14:
 				sprintf(buf, "Deadly %s", ch[cn].name); divi = 4;
-				make_catalyst(cn, 2, 0);
+				make_new_catalyst(cn, 2, 0);
 				if (type==14)
 				{
 					divi -= 2;
-					make_catalyst(cn, 2, 0);
+					make_new_catalyst(cn, 2, 0);
 				}
 				break;
 			case  5:
@@ -7026,8 +7102,6 @@ void boost_char(int cn, int type)
 			case  6:
 				sprintf(buf, "Potent %s", ch[cn].name); divi = 4;
 				if (!(ch[cn].flags & CF_EXTRACRIT)) ch[cn].flags |= CF_EXTRACRIT;
-				//make_soulstone(cn, exp);
-				//make_catalyst(cn, 1, 0);
 				break;
 			case  8:
 			case 18:
@@ -7157,14 +7231,14 @@ int spawn_penta_enemy(int in)
 	ch[cn].data[73] = 8;
 	ch[cn].dir = 1;
 	
-	if (try_boost(20)) boost_char(cn, 0);
+	if (try_boost(25)) boost_char(cn, 0);
 	else if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 	{
 		if (tmp = god_create_item(IT_CORRUPTOR))
 		{
 			ch[cn].citem = tmp;
 			it[tmp].carried = cn;
-			it[tmp].cost = 555;
+			it[tmp].corruption = 555;
 		}
 	}
 
@@ -7295,9 +7369,9 @@ void solved_pentagram(int cn, int in)
 		}
 		if (it[n].active==0)
 		{
-			if (it[n].light[0]!=it[n].light[1] && it[n].x>0)
+			if (it[n].light[I_I]!=it[n].light[I_A] && it[n].x>0)
 			{
-				do_add_light(it[n].x, it[n].y, it[n].light[1] - it[n].light[0]);
+				do_add_light(it[n].x, it[n].y, it[n].light[I_A] - it[n].light[I_I]);
 			}
 		}
 		if (IS_GLOB_MAYHEM)
@@ -7329,7 +7403,7 @@ void solved_pentagram(int cn, int in)
 
 int use_pentagram(int cn, int in)
 {
-	int n, v, tot = 0, act = 0, b[5] = {0, 0, 0, 0, 0}, bv[5] = {0, 0, 0, 0, 0}, exp = 0, co, m, targ=4;
+	int n, v, tot = 0, act = 0, b[5] = {0, 0, 0, 0, 0}, bv[5] = {0, 0, 0, 0, 0}, exp = 0, co, m, targ=4, count=0;
 	int r1, r2, inpents = 0;
 	
 	if (it[in].data[9] < LOWPENTS) targ = 2; else if (it[in].data[9] < MIDPENTS) targ = 3;
@@ -7451,14 +7525,18 @@ int use_pentagram(int cn, int in)
 				do_char_log(cn, 1, "Pentagram %3d, worth %5d point%s.\n",
 									bv[n], get_pent_value(bv[n]), bv[n]==1 ? "" : "s");
 			exp += get_pent_value(bv[n]); //(bv[n] * bv[n]) / 9 + 1;
+			count++;
 		}
 	}
 	
 	ch[cn].data[78] = bv[0];
 	ch[cn].data[18] = exp;
 	//                 "!        .         .   |     .         .        !"
-	do_char_log(cn, 2, "Your pentagrammas have a total of %d exp.\n", exp);
-	if (r1<9) 
+	if (count && (ch[cn].flags & CF_SYS_OFF))
+		do_char_log(cn, 2, "Your %d pents have a total of %d exp.\n", count, exp);
+	else
+		do_char_log(cn, 2, "Your pentagrammas have a total of %d exp.\n", exp);
+	if (r1<9 && !(ch[cn].flags & CF_SYS_OFF))
 		do_char_log(cn, 1, "Note that only the highest 5 pentagrammas count towards your experience bonus.\n");
 	do_char_log(cn, 1, "%d of the %d pentagrammas are now active.\n", act, tot);
 	if (ch[cn].data[77]) 
@@ -7503,41 +7581,119 @@ int use_pentagram(int cn, int in)
 	return 1;
 }
 
+int get_god_by_sprite(int in, int godroll)
+{
+	int sprite = it[in].sprite[I_I];
+	
+	switch (godroll)
+	{
+	case 1:
+		if (sprite >= 3715 && sprite <= 3720) return 1;
+		if (sprite >= 2602 && sprite <= 2610) return 1;
+		if (sprite >=  730 && sprite <=  774) return 1;
+		return 0;
+	case 2:
+		if (sprite >= 3721 && sprite <= 3726) return 1;
+		if (sprite >= 2611 && sprite <= 2619) return 1;
+		if (sprite >= 2512 && sprite <= 2556) return 1;
+		return 0;
+	case 3:
+		if (sprite >= 3727 && sprite <= 3732) return 1;
+		if (sprite >= 2620 && sprite <= 2628) return 1;
+		if (sprite >= 2557 && sprite <= 2601) return 1;
+		return 0;
+	case 4:
+		if (sprite >= 4944 && sprite <= 4949) return 1;
+		if (sprite >= 4935 && sprite <= 4943) return 1;
+		if (sprite >= 4890 && sprite <= 4934) return 1;
+		return 0;
+	default: break;
+	}
+	
+	return 0;
+}
+
+int use_shrine_return_legacy(int cn, int in)
+{
+	int in2, temp = 0, godroll = 0;
+	
+	// Check if there's a valid template to work with.
+	if (!(temp = it[in].orig_temp))
+	{
+		if (!(temp = it[in].temp))
+		{
+			do_char_log(cn, 0, "Unfortunately, this item cannot be replaced.\n");
+			return 0;
+		}
+	}
+	
+	// Attempt to return a new godly weapon of the same type
+	if (IS_GODWEAPON(in) || get_god_by_sprite(in, 1) || get_god_by_sprite(in, 2) || get_god_by_sprite(in, 3) || get_god_by_sprite(in, 4))
+	{
+		if (IS_SKUAWEAP(in) || get_god_by_sprite(in, 1)) godroll = 1;
+		if (IS_KWAIWEAP(in) || get_god_by_sprite(in, 2)) godroll = 2;
+		if (IS_GORNWEAP(in) || get_god_by_sprite(in, 3)) godroll = 3;
+		if (IS_PURPWEAP(in) || get_god_by_sprite(in, 4)) godroll = 4;
+		if (IS_OSIRWEAP(in)) godroll = 5;
+		
+		if (!(in2 = pop_create_godly_weapon(cn, temp, godroll)))
+		{
+			do_char_log(cn, 0, "Unfortunately, this item could not be created (temp = %d).\n", temp);
+			return 0;
+		}
+	}
+	else
+	{
+		if (!(in2 = god_create_item(temp)))
+		{
+			do_char_log(cn, 0, "Unfortunately, this item could not be created (temp = %d).\n", temp);
+			return 0;
+		}
+		if ((it[in2].flags & IF_STACKABLE) && it[in].stack)
+		{
+			it[in2].stack = it[in].stack;
+		}
+	}
+	
+	if (!god_give_char(in2, cn))
+	{
+		do_char_log(cn, 0, "Your backpack is full.\n");
+		it[in2].used = USE_EMPTY;
+		return 0;
+	}
+	
+	do_char_log(cn, 1, "You got a new %s.\n", it[in2].name);
+	
+	it[in].used = USE_EMPTY;
+	ch[cn].citem = 0;
+	
+	return 1;
+}
 int use_shrine(int cn, int in)
 {
 	int in2, val, rank, m;
-
-	if (!cn)
-	{
-		return 0;
-	}
-
-	if ((in2 = ch[cn].citem)==0)
+	
+	if (!cn) return 0;
+	
+	if (!(in2 = ch[cn].citem))
 	{
 		do_char_log(cn, 1, "You get the feeling that it would be appropriate to give the gods a present.\n");
 		return 0;
 	}
 	
-	if (in2 & 0x80000000)
-	{
-		val = in2 & 0x7fffffff;
-		ch[cn].citem = 0;
-	}
+	if (in2 & 0x80000000) val = in2 & 0x7fffffff;
 	else
 	{
 		val = it[in2].value;
-		if (it[in2].flags & IF_UNIQUE)
-		{
-			val *= 4;
-		}
+		if (it[in2].flags & IF_LEGACY) return use_shrine_return_legacy(cn, in2);
+		if (it[in2].flags & IF_UNIQUE) val *= 4;
 		it[in2].used = USE_EMPTY;
-		ch[cn].citem = 0;
 	}
-
-	rank = getrank(cn) + 1;
-	rank = rank * rank * rank * 7;
+	ch[cn].citem = 0;
+	
+	rank = getrank(cn) + 1; rank = rank * rank * rank * 7;
 	val += RANDOM(val + 1);
-
+	
 	if (val>=rank)
 	{
 		if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
@@ -7546,87 +7702,36 @@ int use_shrine(int cn, int in)
 			do_char_log(cn, 0, "The Goddess of Magic touches your mind.\n");
 			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 		}
-
-		if (val>=rank * 64)
-		{
-			do_char_log(cn, 1, "The gods are madly in love with your offer.\n");
-		}
-		else if (val>=rank * 32)
-		{
-			do_char_log(cn, 1, "The gods love your offer very much.\n");
-		}
-		else if (val>=rank * 16)
-		{
-			do_char_log(cn, 1, "The gods love your offer.\n");
-		}
-		else if (val>=rank * 8)
-		{
-			do_char_log(cn, 1, "The gods are very pleased with your offer.\n");
-		}
-		else if (val>=rank * 4)
-		{
-			do_char_log(cn, 1, "The gods are pleased with your offer.\n");
-		}
-		else if (val>=rank * 2)
-		{
-			do_char_log(cn, 1, "The gods deemed your offer appropriate.\n");
-		}
-		else
-		{
-			do_char_log(cn, 1, "The gods accepted your offer.\n");
-		}
-		if (val && rank)
-		{
-			m = val / max(1, sqrt(rank)*2);
-			ch[cn].luck += m;
-			if (in2 & 0x80000000)
-			{
-				chlog(cn, "Increased luck by %d to %d for %dG %dS", m, ch[cn].luck, val / 100, val % 100);
-			}
-			else
-			{
-				chlog(cn, "Increased luck by %d to %d for %dG %dS (%s)", m, ch[cn].luck, val / 100, val % 100, it[in2].name);
-			}
-		}
+			 if (val >= rank * 64) do_char_log(cn, 1, "The gods are madly in love with your offer.\n");
+		else if (val >= rank * 32) do_char_log(cn, 1, "The gods love your offer very much.\n");
+		else if (val >= rank * 16) do_char_log(cn, 1, "The gods love your offer.\n");
+		else if (val >= rank *  8) do_char_log(cn, 1, "The gods are very pleased with your offer.\n");
+		else if (val >= rank *  4) do_char_log(cn, 1, "The gods are pleased with your offer.\n");
+		else if (val >= rank *  2) do_char_log(cn, 1, "The gods deemed your offer appropriate.\n");
+		else                       do_char_log(cn, 1, "The gods accepted your offer.\n");
 	}
 	else
 	{
-		m = 0;
-		
-		if (val<rank / 8)
-		{
-			do_char_log(cn, 1, "You have angered the gods with your unworthy gift.\n");
-			m -= 2+ch[cn].luck/100;
-			ch[cn].luck += m;
-		}
-		else if (val<rank / 4)
-		{
-			do_char_log(cn, 1, "The gods sneer at your gift.\n");
-			m -= 1+ch[cn].luck/1000;
-			ch[cn].luck += m;
-		}
-		else if (val<rank / 2)
-		{
-			do_char_log(cn, 1, "The gods think you're cheap.\n");
-			m -= 1;
-			ch[cn].luck--;
-		}
-		else
-		{
-			do_char_log(cn, 1, "You feel that it takes more than this to please the gods.\n");
-		}
+		do_char_log(cn, 1, "You feel that it takes more than this to please the gods.\n");
 	}
-
+	
+	if (val)
+	{
+		ch[cn].luck += (m = val / max(1, sqrt(rank)*2));
+		if (in2 & 0x80000000) chlog(cn, "Increased luck by %d to %d for %dG %dS", m, ch[cn].luck, val / 100, val % 100);
+		else                  chlog(cn, "Increased luck by %d to %d for %dG %dS (%s)", m, ch[cn].luck, val / 100, val % 100, it[in2].name);
+	}
+	
 	do_char_log(cn, 1, " \n");
 	
-	//                                             "!        .         .         .         .        !"
-	if (ch[cn].luck<-5000)		do_char_log(cn, 1, "You feel the gods simply hate you.\n");
-	else if (ch[cn].luck<-2000)	do_char_log(cn, 1, "You feel the gods are mad at you.\n");
-	else if (ch[cn].luck<0)		do_char_log(cn, 1, "You feel the gods are angry at you.\n");
-	else if (ch[cn].luck<100)	do_char_log(cn, 1, "You feel the gods stance towards you is neutral.\n");
-	else if (ch[cn].luck<2000)	do_char_log(cn, 1, "You feel the gods are pleased with you.\n");
-	else if (ch[cn].luck<5000)	do_char_log(cn, 1, "You feel the gods are very fond of you.\n");
-	else						do_char_log(cn, 1, "You feel the gods will save your life one day.\n");
+		 if (ch[cn].luck <-5000) do_char_log(cn, 1, "You feel as if the gods simply hate you.\n");
+	else if (ch[cn].luck <-2000) do_char_log(cn, 1, "You feel as if the gods are mad at you.\n");
+	else if (ch[cn].luck <    0) do_char_log(cn, 1, "You feel as if the gods are disappointed in you.\n");
+	else if (ch[cn].luck <  100) do_char_log(cn, 1, "You feel as if the gods' stance towards you is neutral.\n");
+	else if (ch[cn].luck < 2000) do_char_log(cn, 1, "You feel as if the gods are pleased with you.\n");
+	else if (ch[cn].luck < 5000) do_char_log(cn, 1, "You feel as if the gods are very fond of you.\n");
+	else                         do_char_log(cn, 1, "You feel as if the gods will save your life one day.\n");
+	
 	do_char_log(cn, 2, "You have %d luck (%+d).\n", ch[cn].luck, m);
 	
 	return 1;
@@ -7803,18 +7908,17 @@ void make_seyan_sword(int cn, int in, int bits)
 {
 	int n;
 	
-	it[in].weapon[0]        = 15 + bits * 3;
-	it[in].ss_weapon        =      bits * 3;
+	it[in].weapon[I_I]        = 15 + bits * 3;
 	
-	it[in].to_hit[0]        = max(0,min( 10, (bits- 2)/3));
-	it[in].to_parry[0]      = max(0,min( 10, (bits- 2)/3));
+	it[in].to_hit[I_I]        = max(0,min( 10, (bits- 2)/3));
+	it[in].to_parry[I_I]      = max(0,min( 10, (bits- 2)/3));
 	
 	for (n = 0; n<5; n++) 
-		it[in].attrib[n][0] = max(0,min( 15, (bits-17)));
+		it[in].attrib[n][I_I] = max(0,min( 15, (bits-17)));
 	
-	it[in].crit_chance[0]   = max(0,min(100, (bits- 2)*10/3));
-	it[in].crit_multi[0]    = max(0,min( 20, (bits- 2)*2/3));
-	it[in].spell_mod[0]     = max(0,min( 10, (bits- 2)/3));
+	it[in].crit_chance[I_I]   = max(0,min(100, (bits- 2)*10/3));
+	it[in].crit_multi[I_I]    = max(0,min( 20, (bits- 2)*2/3));
+	it[in].spell_mod[I_I]     = max(0,min( 10, (bits- 2)/3));
 	
 	it[in].flags |= IF_UPDATE;
 	it[in].orig_temp = IT_SEYANSWORD;
@@ -7828,11 +7932,11 @@ int use_seyan_shrine(int cn, int in, int flag)
 {
 	struct item tmp;
 	int in2=0, in3=0, n, bits=0, ret = 0;
-
+	
 	if (!cn) return 0;
 	if (!IS_SANEITEM(in)) return 0;
 	if (it[in].driver!=34) return 0;
-
+	
 	if (!IS_SEYAN_DU(cn))
 	{
 		do_char_log(cn, 0, "You have the feeling you're in the wrong place here.\n");
@@ -7846,18 +7950,9 @@ int use_seyan_shrine(int cn, int in, int flag)
 	{
 		if (!in3 || it[in3].driver!=40 || it[in3].data[0]!=cn) for (n = 1; n<MAXITEM; n++)
 		{
-			if (it[n].used!=USE_ACTIVE)
-			{
-				continue;
-			}
-			if (it[n].driver!=40)
-			{
-				continue;
-			}
-			if (it[n].data[0]!=cn)
-			{
-				continue;
-			}
+			if (it[n].used!=USE_ACTIVE) continue;
+			if (it[n].driver!=40)       continue;
+			if (it[n].data[0]!=cn)      continue;
 
 			tmp = it_temp[IT_DEADSEYSWORD];
 			tmp.x = it[n].x;
@@ -7867,7 +7962,7 @@ int use_seyan_shrine(int cn, int in, int flag)
 			it[n] = tmp;
 			it[n].flags |= IF_UPDATE;
 		}
-
+		
 		if (ch[cn].luck<50)
 		{
 			do_char_log(cn, 0, "Kwai, the great goddess of war, deemed you unworthy to receive a new blade.\n");
@@ -7881,7 +7976,7 @@ int use_seyan_shrine(int cn, int in, int flag)
 			ch[cn].luck -= 50;
 		}
 	}
-
+	
 	if (!(ch[cn].data[21] & it[in].data[0]))
 	{
 		ch[cn].data[21] |= it[in].data[0];
@@ -7890,7 +7985,7 @@ int use_seyan_shrine(int cn, int in, int flag)
 		ch[cn].luck += 10;
 		ret++;
 	}
-
+	
 	bits = get_seyan_bits(cn);
 	
 	if (bits<32 && (!flag || ret)) 
@@ -7909,9 +8004,9 @@ int use_seyan_shrine(int cn, int in, int flag)
 	{
 		make_seyan_sword(cn, in3, bits);
 	}
-
+	
 	do_update_char(cn);
-
+	
 	return ret;
 }
 
@@ -7929,7 +8024,7 @@ int use_seyan_door(int cn, int in)
 
 int use_seyan_portal(int cn, int in)
 {
-	int in2, n, temp;
+	int in2, n, co, temp;
 
 	if (!cn)
 	{
@@ -7962,6 +8057,8 @@ int use_seyan_portal(int cn, int in)
 		}
 		else
 		{
+			if (co = ch[cn].data[PCD_COMPANION])  answer_transfer(co, cn, 0);
+			if (co = ch[cn].data[PCD_SHADOWCOPY]) answer_transfer(co, cn, 0);
 			do_char_log(cn, 0, "The Lycanthropes welcome you among their ranks, %s!\n", ch[cn].name);
 			if (!IS_FEMALE(cn))	
 			{
@@ -7994,6 +8091,8 @@ int use_seyan_portal(int cn, int in)
 		}
 		else
 		{
+			if (co = ch[cn].data[PCD_COMPANION])  answer_transfer(co, cn, 0);
+			if (co = ch[cn].data[PCD_SHADOWCOPY]) answer_transfer(co, cn, 0);
 			do_char_log(cn, 0, "The Bravers welcome you among their ranks, %s!\n", ch[cn].name);
 			if (!IS_FEMALE(cn))	god_racechange(cn, CT_BRAVER_M, 0);
 			else				god_racechange(cn, CT_BRAVER_F, 0);
@@ -8022,6 +8121,8 @@ int use_seyan_portal(int cn, int in)
 		}
 		else
 		{
+			if (co = ch[cn].data[PCD_COMPANION])  answer_transfer(co, cn, 0);
+			if (co = ch[cn].data[PCD_SHADOWCOPY]) answer_transfer(co, cn, 0);
 			do_char_log(cn, 0, "The Seyan'Du welcome you among their ranks, %s!\n", ch[cn].name);
 			if (!IS_FEMALE(cn))	god_racechange(cn, CT_SEYANDU_M, 0);
 			else				god_racechange(cn, CT_SEYANDU_F, 0);
@@ -8174,7 +8275,7 @@ int spell_scroll(int cn, int in)
 		do_char_log(cn, 0, "Changed target of spell from %s to %s.\n", ch[co].name, ch[cn].name);
 		co = cn;
 	}
-	else if (spell==SK_MSHIELD && get_tarot(co, IT_CH_PREIST_R))
+	else if (spell==SK_MSHIELD && do_get_iflag(co, SF_PREIST_R))
 	{
 		do_char_log(cn, 0, "Your target rejected the spell.\n");
 		return 0;
@@ -8261,7 +8362,7 @@ int use_blook_penta(int cn, int in)
 
 	do_char_log(cn, 1, "You try to wipe off the blood, but it seems to be coming back slowly.\n");
 	it[in].data[0] = 1;
-	it[in].sprite[0] = it[in].data[1] + it[in].data[0];
+	it[in].sprite[I_I] = it[in].data[1] + it[in].data[0];
 
 	return 1;
 }
@@ -8309,7 +8410,7 @@ int use_rotate(int cn, int in)
 	{
 		it[in].data[1] = 0;
 	}
-	it[in].sprite[0] = it[in].data[0] + it[in].data[1];
+	it[in].sprite[I_I] = it[in].data[0] + it[in].data[1];
 	it[in].flags |= IF_UPDATE;
 
 	return 1;
@@ -8652,8 +8753,8 @@ int shrine_of_change(int cn, int in)
 		it[in2].carried = cn;
 		ch[cn].citem = in3;
 		ch[cn].worn[WN_CHARM2] = in2;
-		if (n = ch[cn].data[PCD_COMPANION])  answer_transfer(cn, n, 0);
-		if (n = ch[cn].data[PCD_SHADOWCOPY]) answer_transfer(cn, n, 0);
+		if (co = ch[cn].data[PCD_COMPANION])  answer_transfer(co, cn, 0);
+		if (co = ch[cn].data[PCD_SHADOWCOPY]) answer_transfer(co, cn, 0);
 		remove_all_spells(cn, 0);
 		ch[cn].misc_action = DR_IDLE;
 		return 0;
@@ -8906,7 +9007,7 @@ int way_point(int cn, int in)
 	unsigned char buf[2];
 	int nr;
 
-	if (!(ch[cn].waypoints & it[in].data[0]))
+	if (!(ch[cn].waypoints & it[in].data[0]) && it[in].data[0] != -2147483648) // temporary magic number.
 	{
 		ch[cn].waypoints |= it[in].data[0];
 
@@ -8954,6 +9055,44 @@ int use_garbage(int cn, int in)
 	}
 
 	return 1;
+}
+
+void use_activate(int cn, int in, int flag, int carried)
+{
+	if (!flag)
+	{
+		it[in].active = 0;
+		if (it[in].light[I_I]!=it[in].light[I_A] && it[in].x>0)
+		{
+			do_add_light(it[in].x, it[in].y, it[in].light[I_I] - it[in].light[I_A]);
+		}
+		if (carried)
+		{
+			it[in].flags |= IF_UPDATE;
+			do_update_char(cn);
+		}
+		if (cn && !carried)
+		{
+			ch[cn].cerrno = ERR_SUCCESS;
+		}
+	}
+	else
+	{
+		it[in].active = it[in].duration;
+		if (it[in].light[I_I]!=it[in].light[I_A] && it[in].x>0)
+		{
+			do_add_light(it[in].x, it[in].y, it[in].light[I_A] - it[in].light[I_I]);
+		}
+		if (carried)
+		{
+			it[in].flags |= IF_UPDATE;
+			do_update_char(cn);
+		}
+		if (cn && !carried)
+		{
+			ch[cn].cerrno = ERR_SUCCESS;
+		}
+	}
 }
 
 void use_driver(int cn, int in, int carried)
@@ -9393,6 +9532,9 @@ void use_driver(int cn, int in, int carried)
 			case 137:
 				ret = use_whetstone(cn, in);
 				break;
+			case 138:
+				ret = use_scroll_H(cn, in);
+				break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
@@ -9423,40 +9565,14 @@ void use_driver(int cn, int in, int carried)
 		{
 			if ((it[in].flags & IF_USEDEACTIVATE) || it[in].temp==1705 || it[in].temp==1706)
 			{
-				it[in].active = 0;
-				if (it[in].light[0]!=it[in].light[1] && it[in].x>0)
-				{
-					do_add_light(it[in].x, it[in].y, it[in].light[0] - it[in].light[1]);
-				}
-				if (carried)
-				{
-					it[in].flags |= IF_UPDATE;
-					do_update_char(cn);
-				}
-				if (cn && !carried)
-				{
-					ch[cn].cerrno = ERR_SUCCESS;
-				}
+				use_activate(cn, in, 0, carried);
 			}
 		}
 		else
 		{
 			if ((it[in].flags & IF_USEACTIVATE) || it[in].temp==1705 || it[in].temp==1706)
 			{
-				it[in].active = it[in].duration;
-				if (it[in].light[0]!=it[in].light[1] && it[in].x>0)
-				{
-					do_add_light(it[in].x, it[in].y, it[in].light[1] - it[in].light[0]);
-				}
-				if (carried)
-				{
-					it[in].flags |= IF_UPDATE;
-					do_update_char(cn);
-				}
-				if (cn && !carried)
-				{
-					ch[cn].cerrno = ERR_SUCCESS;
-				}
+				use_activate(cn, in, 1, carried);
 			}
 			if (carried && (it[in].flags & IF_USEDESTROY))
 			{
@@ -9477,12 +9593,12 @@ void use_driver(int cn, int in, int carried)
 					do_update_char(cn);
 				}
 				
-				if (get_book(cn, IT_BOOK_ALCH) || get_book(cn, IT_IMBK_ALCH)) // Book: Alchemy 101
+				if (do_get_iflag(cn, SF_BOOK_ALCH)) // Book: Alchemy 101
 				{
 					thousand = thousand * 3/2;
 				}
 				
-				if (get_enchantment(cn, 2))
+				if (do_get_iflag(cn, SF_EN_HEALIT))
 				{
 					thousand = thousand * 3/2;
 				}
@@ -9497,11 +9613,11 @@ void use_driver(int cn, int in, int carried)
 				}
 				
 				// Immediate healing from item
-				ch[cn].a_hp += it[in].hp[0] * thousand;
+				ch[cn].a_hp += it[in].hp[I_I] * thousand;
 				if (ch[cn].a_hp<0)	 ch[cn].a_hp = 0;
-				ch[cn].a_end += it[in].end[0] * thousand;
+				ch[cn].a_end += it[in].end[I_I] * thousand;
 				if (ch[cn].a_end<0)	 ch[cn].a_end = 0;
-				ch[cn].a_mana += it[in].mana[0] * thousand;
+				ch[cn].a_mana += it[in].mana[I_I] * thousand;
 				if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
 				
 				// Reduce stack or destroy item
@@ -9544,8 +9660,8 @@ int item_age(int in)
 
 		it[in].current_damage = 0;
 
-		it[in].current_age[0] = 0;
-		it[in].current_age[1] = 0;
+		it[in].current_age[I_I] = 0;
+		it[in].current_age[I_A] = 0;
 
 		it[in].damage_state++;
 
@@ -9555,42 +9671,42 @@ int item_age(int in)
 		{
 			st = max(0, 4 - it[in].damage_state);
 
-			if (it[in].armor[0]>st)
+			if (it[in].armor[I_I]>st)
 			{
-				it[in].armor[0]--;
+				it[in].armor[I_I]--;
 			}
-			if (it[in].armor[1]>st)
+			if (it[in].armor[I_A]>st)
 			{
-				it[in].armor[1]--;
+				it[in].armor[I_A]--;
 			}
 
-			if (it[in].weapon[0]>st * 2)
+			if (it[in].weapon[I_I]>st * 2)
 			{
-				it[in].weapon[0]--;
-				if (it[in].weapon[0]>0)
+				it[in].weapon[I_I]--;
+				if (it[in].weapon[I_I]>0)
 				{
-					it[in].weapon[0]--;
+					it[in].weapon[I_I]--;
 				}
 			}
-			if (it[in].weapon[1]>st * 2)
+			if (it[in].weapon[I_A]>st * 2)
 			{
-				it[in].weapon[1]--;
-				if (it[in].weapon[1]>0)
+				it[in].weapon[I_A]--;
+				if (it[in].weapon[I_A]>0)
 				{
-					it[in].weapon[1]--;
+					it[in].weapon[I_A]--;
 				}
 			}
 		}
 
 		if (!(it[in].flags & IF_SINGLEAGE))
 		{
-			if (it[in].max_age[0])
+			if (it[in].max_age[I_I])
 			{
-				it[in].sprite[0]++;
+				it[in].sprite[I_I]++;
 			}
-			if (it[in].max_age[1])
+			if (it[in].max_age[I_A])
 			{
-				it[in].sprite[1]++;
+				it[in].sprite[I_A]++;
 			}
 		}
 
@@ -9780,7 +9896,7 @@ void item_damage_armor(int cn, int dam)
 	{
 		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_MSHIELD)
 		{
-			dam -= bu[in].armor[1]*2;
+			dam -= bu[in].armor*2;
 		}
 	}
 	
@@ -9911,46 +10027,31 @@ void age_message(int cn, int in, char *where)
 void char_item_expire(int cn)
 {
 	int n, in, act;
-	/* CS, 991114: Age ice cloak more slowly if not worn */
-	static int clock4 = 0;
+	static int clock4 = 0; /* CS, 991114: Age ice cloak more slowly if not worn */
 	int must_update = 0;
-
-	if (IS_BUILDING(cn))
-	{
-		return;
-	}
-
+	
+	if (IS_BUILDING(cn)) return;
+	
 	clock4++;
 	/* age items in backpack */
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		in = ch[cn].item[n];
-		if (in)
+		if (in = ch[cn].item[n])
 		{
-			if (it[in].active)
-			{
-				act = 1;
-			}
-			else
-			{
-				act = 0;
-			}
-
+			if (it[in].active) act = 1;
+			else               act = 0;
+			
 			if ((act==0 && (it[in].flags & IF_ALWAYSEXP1)) || (act==1 && (it[in].flags & IF_ALWAYSEXP2)))
 			{
 				it[in].current_age[act]++;
 				if (it[in].flags & IF_LIGHTAGE)
-				{
 					lightage(in, 1);
-				}
 				if (item_age(in))
 				{
 					must_update = 1;
 					age_message(cn, in, "in your backpack");
 					if (it[in].damage_state==5)
-					{
 						use_consume_item(cn, in, 0);
-					}
 				}
 			}
 		}
@@ -9959,25 +10060,16 @@ void char_item_expire(int cn)
 	/* age items in gear slots */
 	for (n = 0; n<20; n++)
 	{
-		in = ch[cn].worn[n];
-		if (in)
+		if (in = ch[cn].worn[n])
 		{
-			if (it[in].active)
-			{
-				act = 1;
-			}
-			else
-			{
-				act = 0;
-			}
-
+			if (it[in].active) act = 1;
+			else               act = 0;
+			
 			if ((act==0 && (it[in].flags & IF_ALWAYSEXP1)) || (act==1 && (it[in].flags & IF_ALWAYSEXP2)))
 			{
 				it[in].current_age[act]++;
 				if (it[in].flags & IF_LIGHTAGE)
-				{
 					lightage(in, 1);
-				}
 				if (item_age(in))
 				{
 					must_update = 1;
@@ -9988,9 +10080,7 @@ void char_item_expire(int cn)
 						it[in].used = USE_EMPTY;
 					}
 					else
-					{
 						age_message(cn, in, "you are using");
-					}
 				}
 			}
 		}
@@ -9999,63 +10089,43 @@ void char_item_expire(int cn)
 	/* age items in alt_set */
 	for (n = 0; n<12; n++)
 	{
-		in = ch[cn].alt_worn[n];
-		if (in)
+		if (in = ch[cn].alt_worn[n])
 		{
-			if (it[in].active)
-			{
-				act = 1;
-			}
-			else
-			{
-				act = 0;
-			}
-
+			if (it[in].active) act = 1;
+			else               act = 0;
+			
 			if ((act==0 && (it[in].flags & IF_ALWAYSEXP1)) || (act==1 && (it[in].flags & IF_ALWAYSEXP2)))
 			{
 				it[in].current_age[act]++;
 				if (it[in].flags & IF_LIGHTAGE)
-				{
 					lightage(in, 1);
-				}
 				if (item_age(in))
 				{
 					must_update = 1;
 					if (it[in].damage_state==5)
 					{
 						age_message(cn, in, "you had in your alt gear");
-						ch[cn].worn[n] = 0;
+						ch[cn].alt_worn[n] = 0;
 						it[in].used = USE_EMPTY;
 					}
 					else
-					{
 						age_message(cn, in, "in your alt gear");
-					}
 				}
 			}
 		}
 	}
 
 	/* age item under mouse cursor (held) */
-	in = ch[cn].citem;
-	if (in && !(in & 0x80000000))
+	if ((in = ch[cn].citem) && !(in & 0x80000000))
 	{
-		if (it[in].active)
-		{
-			act = 1;
-		}
-		else
-		{
-			act = 0;
-		}
-
+		if (it[in].active) act = 1;
+		else               act = 0;
+		
 		if ((act==0 && (it[in].flags & IF_ALWAYSEXP1)) || (act==1 && (it[in].flags & IF_ALWAYSEXP2)))
 		{
 			it[in].current_age[act]++;
 			if (it[in].flags & IF_LIGHTAGE)
-			{
 				lightage(in, 1);
-			}
 			if (item_age(in))
 			{
 				must_update = 1;
@@ -10066,16 +10136,12 @@ void char_item_expire(int cn)
 					it[in].used  = USE_EMPTY;
 				}
 				else
-				{
 					age_message(cn, in, "you are using");
-				}
 			}
 		}
 	}
 	if (must_update)
-	{
 		do_update_char(cn);
-	}
 }
 
 int may_deactivate(int in)
@@ -10294,7 +10360,7 @@ void enemyspawner(int in, int type, int flag)
 			t_temp = CT_GARGNEST + it[in].data[0];
 			t_ran = expire*4;	count = 7;	t_dist =12; wait = 0;
 			break;
-		case 16:		// Gargoyle Nest Basement
+		case 16:		// Gargoyle Nest Basement					- 87
 			t_temp = CT_GARGNEST + it[in].data[0];
 			t_ran = expire*4;	count = 2;	t_dist = 8; wait = 0;
 			break;
@@ -10383,14 +10449,14 @@ void enemyspawner(int in, int type, int flag)
 				ch[cn].dir = 1;
 				ch[cn].data[60] = TICKS * 60 * 2;
 			}
-			if (try_boost(20)) boost_char(cn, 0);
+			if (try_boost(25)) boost_char(cn, 0);
 			else if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE*(type<4?2:1)))
 			{
 				if (in2 = god_create_item(IT_CORRUPTOR))
 				{
 					ch[cn].citem = in2;
 					it[in2].carried = cn;
-					it[in2].cost = 555;
+					it[in2].corruption = 555;
 				}
 			}
 			
@@ -10433,7 +10499,7 @@ void expire_blood_penta(int in)
 		{
 			it[in].data[0] = 0;
 		}
-		it[in].sprite[0] = it[in].data[1] + it[in].data[0];
+		it[in].sprite[I_I] = it[in].data[1] + it[in].data[0];
 	}
 }
 
@@ -10449,9 +10515,9 @@ void expire_explosion(int in)
 	if (it[in].active < it[in].duration)
 	{
 		it[in].active++;
-		if (it[in].active < it[in].duration/2) 			it[in].sprite[1] = 2448 + ((it[in].active%9)?0:1);
-		else if (it[in].active < it[in].duration/4*3) 	it[in].sprite[1] = 2450 + ((it[in].active%6)?0:1);
-		else 											it[in].sprite[1] = 2452 + ((it[in].active%3)?0:1);
+		if (it[in].active < it[in].duration/2) 			it[in].sprite[I_A] = 2448 + ((it[in].active%9)?0:1);
+		else if (it[in].active < it[in].duration/4*3) 	it[in].sprite[I_A] = 2450 + ((it[in].active%6)?0:1);
+		else 											it[in].sprite[I_A] = 2452 + ((it[in].active%3)?0:1);
 		if (it[in].active == it[in].duration-TICKS && (cn = map[m].ch) && IS_PLAYER(cn)) do_area_sound(0, 0, x, y, 25);
 		
 		return;
@@ -10468,7 +10534,7 @@ void expire_explosion(int in)
 	}
 	do_area_sound(0, 0, x, y, 6);
 	
-	do_add_light(x, y, -it[in].light[1]);
+	do_add_light(x, y, -it[in].light[I_A]);
 	it[in].used = 0;
 	map[m].it = 0;
 }
@@ -10531,7 +10597,7 @@ void item_tick_expire(void)
 			{
 				if (m < 524800)
 				{
-					do_add_light(x, y, -it[in].light[1]);
+					do_add_light(x, y, -it[in].light[I_A]);
 					it[in].used = 0;
 					map[m].it = 0;
 				}
@@ -10543,9 +10609,9 @@ void item_tick_expire(void)
 				if (!map[m].ch && !map[m].to_ch)
 				{
 					it[in].active = it[in].duration;
-					if (it[in].light[0]!=it[in].light[1])
+					if (it[in].light[I_I]!=it[in].light[I_A])
 					{
-						do_add_light(x, y, it[in].light[1] - it[in].light[0]);
+						do_add_light(x, y, it[in].light[I_A] - it[in].light[I_I]);
 					}
 				}
 			}
@@ -10558,9 +10624,9 @@ void item_tick_expire(void)
 					{
 						use_driver(0, in, 0);
 						it[in].active = 0;
-						if (it[in].light[0]!=it[in].light[1])
+						if (it[in].light[I_I]!=it[in].light[I_A])
 						{
-							do_add_light(x, y, it[in].light[0] - it[in].light[1]);
+							do_add_light(x, y, it[in].light[I_I] - it[in].light[I_A]);
 						}
 					}
 				}
@@ -10646,7 +10712,7 @@ void item_tick_expire(void)
 					if (IS_UNIQUE(in2))           slowdecay = 4;
 				}
 				if (emptyinv && emptygear)
-					it[in].current_age[act] += EXP_TIME*EXP_RATE/max(1,slowdecay);
+					it[in].current_age[act] += EXP_TIME*EXP_RATE*2/max(1,slowdecay);
 				else if (emptyinv)
 					it[in].current_age[act] += EXP_TIME*2/max(1,slowdecay);
 				else
@@ -10765,6 +10831,16 @@ void item_tick_explosions(void)
 			expire_explosion(in);
 		}
 	}
+	// Aemon Approach
+	frx = AAPPROACH_X1; fry = AAPPROACH_Y1; tox = AAPPROACH_X2; toy = AAPPROACH_Y2;
+	for (x = frx; x <= tox; x++) for (y = fry; y <= toy; y++)
+	{
+		m = x + y * MAPX;
+		if (IS_SANEITEM(in = map[m].it) && it[in].driver==124)
+		{
+			expire_explosion(in);
+		}
+	}
 }
 
 void item_tick_gc(void)
@@ -10776,17 +10852,15 @@ void item_tick_gc(void)
 
 	for (n = off; n<m; n++)
 	{
-		if (it[n].used==USE_EMPTY)
-		{
-			continue;
-		}
+		if (it[n].used==USE_EMPTY) continue;
+		
 		cnt++;
-
+		
 		// hack: make reset seyan swords unuable
 		if (it[n].driver==40 && !it[n].data[0])
 		{
 			struct item tmp;
-
+			
 			tmp = it_temp[IT_DEADSEYSWORD];
 			tmp.x = it[n].x;
 			tmp.y = it[n].y;
@@ -10794,18 +10868,18 @@ void item_tick_gc(void)
 			tmp.temp = IT_DEADSEYSWORD;
 			it[n] = tmp;
 			it[n].flags |= IF_UPDATE;
-
+			
 			cn = it[n].carried;
-
+			
 			if (cn)
 			{
 				do_update_char(cn);
 			}
-
+			
 			xlog("reset sword from %s (%d)", ch[cn].name, cn);
 		}
-
-		if ((cn = it[n].carried)!=0)
+		
+		if (cn = it[n].carried)
 		{
 			if (IS_SANECHAR(cn) && ch[cn].used)
 			{
@@ -10813,7 +10887,7 @@ void item_tick_gc(void)
 				for (z = 0; z<      20; z++) if (ch[cn].worn[z]==n)       break; if (z<      20) continue;
 				for (z = 0; z<      12; z++) if (ch[cn].alt_worn[z]==n)   break; if (z<      12) continue;
 				for (z = 0; z<       4; z++) if (ch[cn].blacksmith[z]==n) break; if (z<       4) continue;
-				for (z = 0; z<MAXBUFFS; z++) if (ch[cn].spell[z]==n)      break; if (z<MAXBUFFS) continue;
+			//	for (z = 0; z<MAXBUFFS; z++) if (ch[cn].spell[z]==n)      break; if (z<MAXBUFFS) continue;
 				if (ch[cn].citem==n) continue;
 				if (ch[cn].flags & CF_PLAYER)
 				{
@@ -10911,26 +10985,6 @@ void trap1(int cn, int in)
 	{
 		do_update_char(cn);
 	}
-	/*
-	n  = RANDOM(11);
-	if (n==WN_CHARM) n=WN_RRING; // Can't go disintigrating tarot cards, that's just mean
-	in = ch[cn].worn[n];
-
-	if (in)
-	{
-		do_char_log(cn, 0, "You triggered an acid attack. Your %s desintegrated.\n", it[in].name);
-		chlog(cn, "Stepped on Acid Trap, %s (t=%d) vanished", it[in].name, it[in].temp);
-		it[in].used = USE_EMPTY;
-		ch[cn].worn[n] = 0;
-		do_update_char(cn);
-	}
-	else
-	{
-		do_char_log(cn, 0, "You triggered an acid attack, but it hit only your skin.\n");
-		chlog(cn, "Stepped on Acid Trap");
-		do_hurt(0, cn, 350, 0);
-	}
-	*/
 }
 
 void trap2(int cn, int tmp)
@@ -10957,9 +11011,9 @@ void start_trap(int cn, int in)
 	if (it[in].duration)
 	{
 		it[in].active = it[in].duration;
-		if (it[in].light[0]!=it[in].light[1] && it[in].x>0)
+		if (it[in].light[I_I]!=it[in].light[I_A] && it[in].x>0)
 		{
-			do_add_light(it[in].x, it[in].y, it[in].light[1] - it[in].light[0]);
+			do_add_light(it[in].x, it[in].y, it[in].light[I_A] - it[in].light[I_I]);
 		}
 	}
 
@@ -10999,7 +11053,7 @@ void start_trap(int cn, int in)
 
 int step_trap(int cn, int in)
 {
-	if (get_enchantment(cn, 3))
+	if (do_get_iflag(cn, SF_EN_NOTRAPS))
 	{
 		return 0;
 	}
@@ -11021,9 +11075,9 @@ void step_trap_remove(int cn, int in)
 	if (it[in].active)
 	{
 		it[in].active = 0;
-		if (it[in].light[0]!=it[in].light[1] && it[in].x>0)
+		if (it[in].light[I_I]!=it[in].light[I_A] && it[in].x>0)
 		{
-			do_add_light(it[in].x, it[in].y, it[in].light[0] - it[in].light[1]);
+			do_add_light(it[in].x, it[in].y, it[in].light[I_I] - it[in].light[I_A]);
 		}
 	}
 }
@@ -11540,19 +11594,16 @@ int use_toxic(int cn, int in)
 	
 	do_char_log(cn, 0, "As you touch the object, you suddenly feel dizzy and overwhelmed with nausia.\n");
 
-	in2 = god_create_buff();
+	in2 = god_create_buff(2375);
 
 	strcpy(bu[in2].name, "Toxicosis");
-	strcpy(bu[in2].reference, "Toxicosis");
-	strcpy(bu[in2].description, "Toxicosis.");
 	
-	bu[in2].temp      =  2375;
-	bu[in2].hp[0]     = -2500;
-	bu[in2].end[0]    = -25;
-	bu[in2].mana[0]   = -250;
-	bu[in2].active    = bu[in2].duration = 1;
-	bu[in2].flags     = IF_SPELL | IF_PERMSPELL;
-	bu[in2].sprite[1] =  1015;
+	bu[in2].r_hp   = -2500;
+	bu[in2].r_end  = -25;
+	bu[in2].r_mana = -250;
+	bu[in2].active = bu[in2].duration = 1;
+	bu[in2].flags  = BF_PERMASPELL;
+	bu[in2].sprite =  1015;
 	
 	add_spell(cn, in2);
 	
@@ -11565,17 +11616,14 @@ int step_firefloor(int cn, int in)
 
 	do_char_log(cn, 0, "Ouch!!\n");
 
-	in2 = god_create_buff();
+	in2 = god_create_buff(it[in].temp);
 
 	strcpy(bu[in2].name, "Fire");
-	strcpy(bu[in2].reference, "fire");
-	strcpy(bu[in2].description, "Fire.");
 
-	bu[in2].hp[0]  = -5000;
+	bu[in2].r_hp  = -5000;
 	bu[in2].active = bu[in2].duration = 1;
-	bu[in2].flags  = IF_SPELL | IF_PERMSPELL;
-	bu[in2].temp = it[in].temp;
-	bu[in2].sprite[1] = BUF_SPR_FIRE;
+	bu[in2].flags  = BF_PERMASPELL;
+	bu[in2].sprite = BUF_SPR_FIRE;
 
 	add_spell(cn, in2);
 

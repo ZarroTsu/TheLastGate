@@ -23,7 +23,6 @@
 struct map *map;
 struct character *ch;
 struct storage *st;
-struct item *bu;
 struct item *it;
 struct effect *fx;
 struct global *globs;
@@ -61,23 +60,6 @@ static int load(void)
 		return -1;
 	}
 	close(handle);
-
-	//
-	handle = open(DATDIR "/buff.dat", O_RDONLY);
-	if (handle==-1)
-	{
-		fprintf(stderr, "buff.dat does not exist.\n");
-		return -1;
-	}
-
-	bu = mmap(NULL, BUFFSIZE, PROT_READ, MAP_SHARED, handle, 0);
-	if (bu==(void*)-1)
-	{
-		fprintf(stderr, "cannot mmap buff.dat.\n");
-		return -1;
-	}
-	close(handle);
-	//
 
 	handle = open(DATDIR "/item.dat", O_RDONLY);
 	if (handle==-1)

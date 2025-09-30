@@ -39,6 +39,7 @@
 // Use flag check on a STRUCTURE ELEMENT (works for characters too)
 // DB: i dont know how it might fail... but i've added some parents anyway. here and in other places.
 // DB: looked fairly safe before, so no need to worry
+#define IS_EMPTY(x)				((x).used == USE_EMPTY)
 #define IS_USED(x) 				((x).used != USE_EMPTY)
 
 // Sanity checks on item numbers
@@ -65,6 +66,13 @@
 #define IS_TAROT(in)			((it[(in)].temp>=IT_CH_FOOL && it[(in)].temp<=IT_CH_WORLD) || (it[(in)].temp>=IT_CH_FOOL_R && it[(in)].temp<=IT_CH_WORLD_R))
 #define IS_CONTRACT(in)			(it[(in)].temp==MCT_CONTRACT)
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
+
+#define WAS_SOULSTONED(in)		(it[(in)].flags & IF_SOULSTONE)
+#define WAS_ENCHANTED(in)		(it[(in)].flags & IF_ENCHANTED)
+#define WAS_WHETSTONED(in)		(it[(in)].flags & IF_WHETSTONED)
+#define WAS_AUGMENTED(in)		(it[(in)].flags & IF_AUGMENTED)
+#define WAS_CORRUPTED(in)		(it[(in)].flags & IF_CORRUPTED)
+#define WAS_MADEEASEUSE(in)		(it[(in)].flags & IF_EASEUSE)
 
 #define IS_MATCH_CAT(in, in2)	(IS_SOULCAT(in)   && it[(in)].data[4] != it[(in2)].data[4])
 #define IS_MATCH_GSC(in, in2)	(IS_GSCROLL(in)   && it[(in)].data[1] != it[(in2)].data[1] && it[(in)].data[0] == 5 && it[(in2)].data[0] == 5)
@@ -99,7 +107,6 @@ int is_ascroll(int in);
 #define IS_EQSHIELD(in)			((it[(in)].placement & PL_SHIELD) && (it[(in)].flags & IF_OF_SHIELD))
 #define IS_EQCLOAK(in)			(it[(in)].placement & PL_CLOAK)
 #define IS_EQRING(in)			(it[(in)].placement & PL_RING)
-
 
 #define IS_TWOHAND(in)			(it[(in)].placement & PL_TWOHAND)
 #define IS_OFFHAND(in)			(it[(in)].placement & PL_SHIELD)
@@ -138,6 +145,7 @@ int is_ascroll(int in);
 #define IS_SANECHAR(cn)     	((cn) > 0 && (cn) < MAXCHARS)
 #define IS_LIVINGCHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used != USE_EMPTY)
 #define IS_ACTIVECHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used == USE_ACTIVE)
+#define IS_EMPTYCHAR(cn)		(IS_EMPTY(ch[(cn)]))
 #define IS_USEDCHAR(cn)     	(IS_USED(ch[(cn)]))
 #define IS_SANEUSEDCHAR(cn) 	(IS_SANECHAR(cn) && IS_USEDCHAR(cn))
 #define IS_ALIVEMASTER(cn, co)	(ch[(cn)].data[CHD_MASTER]==(co) && !(ch[(cn)].flags & CF_BODY) && ch[(cn)].used!=USE_EMPTY)
@@ -176,6 +184,9 @@ int is_ascroll(int in);
 #define HIM_HER(cn)				(IS_FEMALE(cn) ? "her" : "him")
 
 #define IS_OPP_CLAN(cn, co)		((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)))
+#define IS_MY_ALLY(cn, co)		((((!IS_PLAYER(cn) && !IS_PLAYER(co) && ch[(cn)].data[CHD_GROUP] == ch[(co)].data[CHD_GROUP]) || (IS_PLAYER(cn) && IS_PLAYER(co) && !IS_OPP_CLAN(cn, co))) && !(map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA)) || (IS_PLAYER(cn) && IS_PLAYER(co) && isgroup((cn), (co))) || (IS_PLAYER(cn) && IS_COMPANION(co) && CN_OWNER(co)==cn) || (IS_PLAYER(co) && IS_COMPANION(cn) && CN_OWNER(cn)==co))
+
+#define IS_NOMAGIC(cn)			((ch[cn].flags & CF_NOMAGIC) != 0)
 
 // Ditto, with sanity check
 #define IS_SANEPLAYER(cn)		(IS_SANECHAR(cn) && IS_PLAYER(cn))
@@ -229,6 +240,13 @@ int is_ascroll(int in);
 
 #define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]==13)
 
+#define CAN_ALWAYS_SEE(cn)		(!IS_PLAYER(cn) && (ch[(cn)].temp==1598||ch[(cn)].temp==1599||ch[(cn)].temp==1600||ch[(cn)].temp==1601))
+
+#define HAS_SYSOFF(cn)			(ch[(cn)].flags & CF_SYS_OFF)
+
+#define IS_BAD_SHADOWTEMP(t)	(((t) >= 1 && (t) <= 23) || ((t) >= 31 && (t) <= 35) || (t) == 1554 || (t) == 347 || (t) == 350)
+#define IS_BAD_SHADOW(cn)		()
+
 /* *** SKILLS *** */
 
 // Sanity check on skill number
@@ -253,7 +271,12 @@ int is_ascroll(int in);
 #define T_LYCA_SK(cn, a)		(IS_LYCANTH(cn)     && T_SKT((cn), (a)))
 #define T_OS_TREE(cn, a)		(IS_SANEPLAYER(cn)  && st_learned_skill(ch[(cn)].os_tree, (a)))
 
-#define IS_P_SKILL(a)			(a==8||a==9||a==23||a==32)
+#define IS_HI_SK(a)			(a==8||a==9||a==23||a==32)
+
+// Passive and Active skill split for special effects
+#define IS_PA_SK(a)			((a>=0&&a<=10)||a==12||a==14||a==16||a==23||(a>=28||a<=34)||a==36||a==38||a==39||a==44||a==45)
+#define IS_AS_SK(a)			(a==11||a==15||(a>=17&&a<=21)||(a>=24&&a<=27)||a==42||a==43||a==46||a==47)
+#define IS_AM_SK(a)			(a==13||a==22||a==31||a==35||a==37||a==40||a==41||a==48||a==49)
 
 #define CAN_SENSE(cn)			((ch[(cn)].flags & CF_SENSE) || !IS_PLAYER(cn))
 
@@ -284,53 +307,6 @@ int is_ascroll(int in);
 #define IS_DISPELABLE1(tmp)		((tmp)==SK_BLIND || (tmp)==SK_WARCRY2 || (tmp)==SK_CURSE2 || (tmp)==SK_CURSE || (tmp)==SK_WARCRY || (tmp)==SK_WEAKEN2 || (tmp)==SK_WEAKEN || (tmp)==SK_SLOW2 || (tmp)==SK_SLOW || (tmp)==SK_DOUSE || (tmp)==SK_AGGRAVATE || (tmp)==SK_SCORCH || (tmp)==SK_DISPEL2)
 #define IS_DISPELABLE2(tmp)		((tmp)==SK_HASTE || (tmp)==SK_BLESS || (tmp)==SK_MSHIELD || (tmp)==SK_MSHELL || (tmp)==SK_PULSE || (tmp)==SK_ZEPHYR || (tmp)==SK_GUARD || (tmp)==SK_DISPEL || (tmp)==SK_REGEN || (tmp)==SK_PROTECT || (tmp)==SK_ENHANCE || (tmp)==SK_LIGHT)
 
-/* Tarot Card Descriptiors (for both r-click and /tarot command) */
-
-#define DESC_FOOL		"You can apply a soulstone to this card. Once applied, it will contribute its bonuses while equipped.\n"
-#define DESC_MAGI		"When equipped, secondary effects of Intuition and Strength are equal to the higher of the two.\n"
-#define DESC_PREIST		"When equipped, 20%% of damage taken from hits is dealt to Mana instead.\n"
-#define DESC_EMPRESS	"When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n"
-#define DESC_EMPEROR	"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
-#define DESC_HEIROPH	"When equipped, Immunize and Inoculate from your Dispel spell lasts four times as long, but your Dispel spell can only remove a single buff or debuff at a time.\n"
-#define DESC_LOVERS		"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
-#define DESC_CHARIOT	"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n"
-#define DESC_STRENGTH	"When equipped, reduces your attack speed, cast speed, and cooldown recovery speed by 15%%, but grants 20%% more damage with hits.\n"
-#define DESC_HERMIT		"When equipped, you have 15%% more Armor Value, but 20%% less Resistance and Immunity.\n"
-#define DESC_WHEEL		"When equipped, your critical hit chance is reduced by 33%%, but you have 33%% more critical hit multiplier.\n"
-#define DESC_JUSTICE	"When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
-#define DESC_HANGED		"When equipped, 33%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
-#define DESC_DEATH		"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
-#define DESC_TEMPER		"When equipped, your Taunt skill grants 100%% more Guard power, but Guard duration is halved.\n"
-#define DESC_DEVIL		"When equipped, 33%% of all skill and spell costs are instead taken from your Hitpoints.\n"
-#define DESC_TOWER		"When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays over time and has a reduced duration.\n"
-#define DESC_STAR		"When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n"
-#define DESC_MOON		"When equipped, life regeneration is instead applied as mana regeneration while not at full mana.\n"
-#define DESC_SUN		"When equipped, endurance regeneration is instead applied as life regeneration while not at full life.\n"
-#define DESC_JUDGE		"When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n"
-#define DESC_WORLD		"When equipped, mana regeneration is instead applied as endurance regeneration while not at full endurance.\n"
-
-#define DESC_FOOL_R		"When equipped, your attributes become the average of all attributes, plus 8%%.\n"
-#define DESC_MAGI_R		"When equipped, your Economize skill no longer reduces the Mana cost of skills, and instead increases your Cooldown rate.\n"
-#define DESC_PREIST_R	"When equipped, your Magic Shield and Magic Shell are now passive and regenerate quickly, but are more fragile. You cannot gain Magic Shield or Magic Shell from other sources.\n"
-#define DESC_EMPRES_R	"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"
-#define DESC_EMPERO_R	"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
-#define DESC_HEIROP_R	"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
-#define DESC_LOVERS_R	"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
-#define DESC_CHARIO_R	"When equipped, your debuffs ignore 25%% of target resistance and immunity, but are 20%% weaker once applied.\n"
-#define DESC_STRENG_R	"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
-#define DESC_HERMIT_R	"When equipped, your Rage and Calm skills instead cost endurance over time.\n"
-#define DESC_WHEEL_R	"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
-#define DESC_JUSTIC_R	"When equipped, your Leap skill no longer repeats. Leap now always deals a critical hit and stuns everything it hits.\n"
-#define DESC_HANGED_R	"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"
-#define DESC_DEATH_R	"When equipped, your Zephyr skill no longer triggers on hit, and instead triggers when an enemy attacks you.\n"
-#define DESC_TEMPER_R	"When equipped, you gain 6.25%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
-#define DESC_DEVIL_R	"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
-#define DESC_TOWER_R	"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
-#define DESC_STAR_R		"When equipped, your base Spell Modifier is 0.90. Your Spell Modifier no longer effects spell power and instead effects skill power.\n"
-#define DESC_MOON_R		"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but no longer grants its bonus at full mana and instead grants it at low mana. You lose 0.2%% of current mana per second per 50 uncapped mana.\n"
-#define DESC_SUN_R		"When equipped, the effectiveness of your Regenerate, Rest, and Meditate skills behave as if stationary while fighting, but as if fighting while stationary.\n"
-#define DESC_JUDGE_R	"When equipped, your Pulse spell no longer deals damage to enemies and instead heals allies with each pulse. It inflicts Charge instead of Shock to allies, granting them additional damage and damage reduction.\n"
-#define DESC_WORLD_R	"When equipped, 50%% of damage taken is dealt to Endurance instead. All Endurance costs instead use Mana, and all skills grant Endurance on use. You lose 40%% of current endurance per second, mitigated by your Rest skill.\n"
 
 /* *** CASINO *** */
 
@@ -349,6 +325,7 @@ int is_ascroll(int in);
 
 #define BJ_NUM_CARDS		26
 
+
 /* *** CONTRACTS *** */
 
 #define MSN_COUNT			10
@@ -366,64 +343,8 @@ int is_ascroll(int in);
 #define IS_CON_COW(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]==5)
 #define IS_CON_UNI(a)		(ch[(a)].data[42]==1100 && ch[(a)].data[72]==6)
 
-#define MSN_CN			"CONTRACT: "
-#define MSN_00			"Find the exit!"
-#define MSN_01			"Defeat all enemies!"
-#define MSN_02			"Defeat all divine enemies!"
-#define MSN_03			"Defeat all cruel enemies!"
-#define MSN_04			"Find the artifact!"
-#define MSN_05			"Find all the shrines!"
-#define MSN_06			"Find all the chests!"
-#define MSN_07			"Touch all the pentagrams!"
-#define MSN_08			"Defeat the timid enemy!"
-#define MSN_09			"Defeat the unique enemy!"
 
-// 						"!        .         .   |     .         .        !"
-#define CFL_P_CHST		"  Area has %d additional chests\n"
-#define CFL_P_SHRN		"  Area has %d additional shrines\n"
-#define CFL_P_XEXP		"  Exit grants %d%% more exp\n"
-#define RATE_P_XEXP		25
-#define CFL_P_XLUK		"  Exit grants %d%% of exp as luck\n"
-#define RATE_P_XLUK		5
-#define CFL_P_XBSP		"  Exit grants %d%% of exp as stronghold pts\n"
-#define RATE_P_XBSP		10
-#define CFL_P_XOSP		"  Exit grants %d%% of exp as Osiris pts\n"
-#define RATE_P_XOSP		10
-#define CFL_P_PLXP		"  Players earn %d%% more exp from enemies\n"
-#define RATE_P_PLXP		20
-#define CFL_P_ENBS		"  Enemies grant %d%% of exp as stronghold pts\n"
-#define RATE_P_ENBS		10
-#define CFL_P_ENOS		"  Enemies grant %d%% of exp as Osiris pts\n"
-#define RATE_P_ENOS		10
-#define CFL_P_ENGL		"  Enemies drop %d%% of exp as gold\n"
-#define RATE_P_ENGL		5
-#define CFL_P_ARGL		"  Area contains %s piles of gold\n"
-#define CFL_P_AREQ		"  Area contains %s discarded equipment\n"
-#define CFL_P_ARPT		"  Area contains %s discarded potions\n"
-#define CFL_P_DRGM		"  %d enemies drop an additional huge gem\n"
-#define CFL_P_RANK		"  Contract rank is increased by %d\n"
-// 						"!        .         .   |     .         .        !"
-#define CFL_N_EXTY		"  Area has %d additional enemy spawns\n"
-#define CFL_N_EXDV		"  Area has %d additional divine enemy spawns\n"
-#define CFL_N_ARUW		"  %d%% of area is underwater\n"
-#define CFL_N_ENUN		"  Enemies are %d%% undead\n"
-#define CFL_N_EXEN		"  Exit is guarded by %d cruel enemies\n"
-#define CFL_N_ENRO		"  Enemies roam %d%% farther\n"
-#define CFL_N_ENRS		"  Enemies are %d%% more resistant\n"
-#define CFL_N_ENSK		"  Enemies are %d%% more skillful\n"
-#define CFL_N_ENSH		"  Enemies have %d%% more weapon value\n"
-#define CFL_N_ENFO		"  Enemies have %d%% more armor value\n"
-#define CFL_N_ENFS		"  Enemies are %d%% faster\n"
-#define CFL_N_ENWI		"  Enemies have %d%% more spellmod\n"
-#define CFL_N_PLDB		"  Players are %d%% debilitated\n"
-#define CFL_N_PLFR		"  Players are %d%% more fragile\n"
-#define CFL_N_PLST		"  Players are %d%% stigmatic\n"
-#define CFL_N_PLHY		"  Players are %d%% hyperthermic\n"
-#define CFL_N_ENTR		"  Enemies use %s tarot cards.\n"
-#define CFL_N_ARSP		"  Area contains %s spike traps\n"
-#define CFL_N_ARDT		"  Area contains %s hidden dart traps\n"
-#define CFL_N_ARFL		"  Area contains %s open flames\n"
-// 						"!        .         .   |     .         .        !"
+/* *** LOCATIONS *** */
 
 #define IS_IN_SKUA(x, y)	((x>= 499&&x<= 531&&y>= 504&&y<= 520)||(x>= 505&&x<= 519&&y>= 492&&y<= 535))
 #define IS_IN_GORN(x, y)	((x>= 773&&x<= 817&&y>= 780&&y<= 796)||(x>= 787&&x<= 803&&y>= 775&&y<= 812))
@@ -447,3 +368,8 @@ int is_ascroll(int in);
 #define IS_IN_SANG(x, y)	((x>= 888&&y>=1027&&x<= 989&&y<=2013))
 #define IS_IN_DW(x, y)		((x>=  21&&y>=1776&&x<= 273&&y<=2028))
 #define IS_IN_INDW(x, y)	((x>=  24&&y>=1779&&x<= 270&&y<=2025))
+#define IS_IN_AQUE(x, y)	((x>=189&&y>=1378&&x<=321&&y<=1396)?1:((x>=189&&y>=1397&&x<=321&&y<=1415)?2:((x>=189&&y>=1416&&x<=321&&y<=1434)?3:((x>=189&&y>=1435&&x<=321&&y<=1453)?4:((x>=235&&y>=1454&&x<=321&&y<=1472)?5:((x>=235&&y>=1473&&x<=321&&y<=1491)?6:((x>=235&&y>=1492&&x<=321&&y<=1510)?7:((x>=235&&y>=1511&&x<=321&&y<=1529)?8:((x>=235&&y>=1530&&x<=321&&y<=1548)?9:((x>=235&&y>=1459&&x<=321&&y<=1567)?10:0))))))))))
+#define IS_IN_AEMAPP(x, y)	((x>= 422&&y>= 800&&x<= 423&&y<= 825)||(x>= 424&&y>= 797&&x<= 426&&y<= 828)||(x>= 427&&y>= 794&&x<= 464&&y<= 831))
+
+#define IS_IN_PLH(cn)		(ch[(cn)].x>=(PLH_X+((ch[(cn)].house_id-1)/PLH_WIDTH)*PLH_SIZE)&&ch[(cn)].y>=(PLH_Y+((ch[(cn)].house_id-1)%PLH_WIDTH)*PLH_SIZE)&&ch[(cn)].x<=(PLH_X+((ch[(cn)].house_id-1)/PLH_WIDTH)*PLH_SIZE+(PLH_SIZE-1))&&ch[(cn)].y<=(PLH_Y+((ch[(cn)].house_id-1)%PLH_WIDTH)*PLH_SIZE+(PLH_SIZE-1)))
+#define IS_IN_PLHZONE(cn)	(ch[(cn)].x>=PLH_X&&ch[(cn)].y>=PLH_Y&&ch[(cn)].x<=(PLH_X+PLH_WIDTH*PLH_SIZE)&&ch[(cn)].y<=(PLH_Y+PLH_WIDTH*PLH_SIZE))

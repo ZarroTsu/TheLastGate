@@ -433,7 +433,7 @@ int pathfinder(int cn, int x1, int y1, int flag, int x2, int y2)
 	{
 		mapblock = MF_MOVEBLOCK;
 	}
-	if (!(ch[cn].flags & (CF_PLAYER | CF_USURP)) || get_enchantment(cn, 10))
+	if (!(ch[cn].flags & (CF_PLAYER | CF_USURP)) || do_get_iflag(cn, SF_EN_NODEATHT))
 	{
 		mapblock |= MF_DEATHTRAP;
 	}

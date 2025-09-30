@@ -21,27 +21,24 @@ static char *mkp(void)
 {
 	static char buf[40];
 	static char *syl1[] = {
-		"thi", "ar",  "an",   "un",  "iss", "ish", "urs",  "ur",
-		"ent", "esh", "ash",  "jey", "jay", "joh", "jan",  "jess",
-		"dur", "lon", "lan",  "len", "lun", "leg", "less", "lar",
-		"so",  "lur", "gar",  "cry", "au",  "dau", "dei",  "das", 
-		"zir", "zil", "sol",  "luc", "nis", "bus", "bat",  "bul", 
-		"mid", "err", "doo",  "do",  "al",  "ea",  "jac",  "ta",
-		"bi",  "vae", "rif",  "tol", "nim", "ru",  "li",   "rid", 
-		"fro", "sam", "beut", "bil", "ga",  "gu",  "gi",  "guy", 
-		"nee", "ara", "rho",  "dan", "va",  "lan", "lay", "larn",
-		"cec", "cic", "cac",  "cuc", "ix",  "vea", "cya", "nya", 
-		"hie", "bo",  "ni",   "do",  "sar", "phe", "ho",  "pho", 
-		"cos", "sin", "tan",  "mul", "har", "gur", "tar", "mar",
-		"a",   "e",   "i",    "o",   "u",   "je",  "ho",  "if",
-		"jai", "coy", "ya",   "pa",  "pul", "pil", "poh", "ruf",
-		"rez", "rel", "rar",  "dom", "rom", "tom", "mom", "dad",
-		"ar",  "ur",  "ir",   "er",  "yr",  "li",  "la",  "lu", "lo"
+		"thi",  "ar",  "an",  "un", "iss", "ish", "urs",  "ur", "ent", "esh", 
+		"ash", "jey", "jay", "joh", "jan","jess", "dur", "lon", "lan", "len", 
+		"lun", "leg","less", "lar",  "so", "lur", "gar", "cry",  "au", "dau", 
+		"dei", "das", "zir", "zil", "sol", "luc", "nis", "bus", "bat", "bul", 
+		"mid", "err", "doo",  "do",  "al",  "ea", "jac",  "ta",  "bi", "vae", 
+		"rif", "tol", "nim",  "ru",  "li", "rid", "fro", "sam","beut", "bil", 
+		 "ga",  "gu",  "gi", "guy", "nee", "ara", "rho", "dan",  "va", "lan", 
+		"lay","larn", "cec", "cic", "cac", "cuc",  "ix", "vea", "cya", "nya", 
+		"hie",  "bo",  "ni",  "do", "sar", "phe",  "ho", "pho", "cos", "sin", 
+		"tan", "mul", "har", "gur", "tar", "mar",	"a",   "e",   "i",   "o", 
+		  "u",  "je",  "ho",  "if",	"jai", "coy",  "ya",  "pa", "pul", "pil", 
+		"poh", "ruf", "rez", "rel", "rar", "dom", "rom", "tom", "mom", "dad",
+		 "za",  "ka",  "ir",  "er",  "yr",  "ui",  "la",  "lu",  "lo",  "yi"
 	};
 	static char *syl2[] = {
-		"tar", "tur", "kar", "kur", "kan", "tan", "gar", "gur", 
-		"run", "sun", "bun", "pun", "won", "gur", "bar", "bas",
-		"ruu", "tsu", "sue", "blu", "sno", "th",  "sh",  "ck"
+		"tar", "tur", "kar", "kur", "kan", "tan", "gar", "gur", "run", "sun", 
+		"bun", "pun", "won", "gur", "bar", "bas", "ruu", "tsu", "sue", "blu", 
+		"sno",  "th",  "sh",  "ck"
 	};
 	static char *syl3[] = {
 		"a", "e", "i", "o", "u"
@@ -60,50 +57,38 @@ static char *mkp(void)
 
 	if (random() % 2)
 	{
-		return( buf);
+		return buf;
 	}
 
 	n = random() % max(1,(sizeof(syl3) / sizeof(char *)));
 	strcat(buf, syl3[n]);
 
-	return(buf);
+	return buf;
 }
 
 #define MAXFREEBUFF 32
-#define MAXFREEITEM 32
+#define MAXFREEITEM 64
 static int free_buff_list[MAXFREEBUFF];
 static int free_item_list[MAXFREEITEM];
 
 void god_init_freelist(void)
 {
 	int n, m;
-
+	
 	bzero(free_buff_list, sizeof(free_buff_list));
-
-	for (m = 0, n = 1; n<MAXBUFF; n++)
+	
+	for (m = 0, n = 1; n<MAXBUFF; n++) if (bu[n].used == USE_EMPTY)
 	{
-		if (it[n].used==USE_EMPTY)
-		{
-			free_buff_list[m++] = n;
-			if (m>=MAXFREEBUFF)
-			{
-				break;
-			}
-		}
+		free_buff_list[m++] = n;
+		if (m >= MAXFREEBUFF) break;
 	}
 	
 	bzero(free_item_list, sizeof(free_item_list));
-
-	for (m = 0, n = 1; n<MAXITEM; n++)
+	
+	for (m = 0, n = 1; n<MAXITEM; n++) if (it[n].used == USE_EMPTY)
 	{
-		if (it[n].used==USE_EMPTY)
-		{
-			free_item_list[m++] = n;
-			if (m>=MAXFREEITEM)
-			{
-				break;
-			}
-		}
+		free_item_list[m++] = n;
+		if (m >= MAXFREEITEM) break;
 	}
 }
 
@@ -111,110 +96,91 @@ void god_init_freelist(void)
 int get_free_buff(void)
 {
 	int n, in, m;
-
-	for (n = 0; n<MAXFREEBUFF; n++)
-	{
-		if ((in = free_buff_list[n]) && bu[in].used==USE_EMPTY)
-		{
-			break;
-		}
-	}
+	
+	for (n = 0; n<MAXFREEBUFF; n++) if ((in = free_buff_list[n]) && bu[in].used==USE_EMPTY) break;
+	
 	if (n<MAXFREEBUFF)
 	{
 		free_buff_list[n] = 0;
-		return(in);
+		return in;
 	}
-
-	for (m = in = 0, n = 1; n<MAXBUFF; n++)
+	
+	for (m = in = 0, n = 1; n<MAXBUFF; n++) if (bu[n].used == USE_EMPTY)
 	{
-		if (bu[n].used==USE_EMPTY)
-		{
-			in = free_buff_list[m++] = n;
-			if (m>=MAXFREEBUFF)
-			{
-				break;
-			}
-		}
+		in = free_buff_list[m++] = n;
+		if (m >= MAXFREEBUFF) break;
 	}
-
-	return(in);
+	
+	return in;
 }
 
 int god_copy_buff(int in)
 {
 	int n, m;
 	unsigned long long prof;
-
+	
 	prof = prof_start();
-
+	
 	n = get_free_buff();
+	
 	if (!n)
 	{
 		xlog("god_copy_buff (svr_god.c): MAXBUFF reached");
 		prof_stop(46, prof);
 		return 0;
 	}
-
+	
 	bu[n] = bu[in];
-
+	
 	prof_stop(46, prof);
-
+	
 	return(n);
 }
 
-int god_create_buff(void)
+int god_create_buff(int temp)
 {
 	int n, m;
 	unsigned long long prof;
-
+	
 	prof = prof_start();
-
+	
 	n = get_free_buff();
+	
 	if (!n)
 	{
 		xlog("god_create_buff (svr_god.c): MAXBUFF reached");
 		prof_stop(46, prof);
 		return 0;
 	}
-
-	bu[n] = it_temp[1];
-	bu[n].temp = 1;
-
+	
+	bu[n] = bu[MAXBUFF-1];
+	bu[n].temp = temp;
+	bu[n].used = USE_ACTIVE;
+	
 	prof_stop(46, prof);
-
+	
 	return(n);
 }
 
 int get_free_item(void)
 {
 	int n, in, m;
-
-	for (n = 0; n<MAXFREEITEM; n++)
-	{
-		if ((in = free_item_list[n]) && it[in].used==USE_EMPTY)
-		{
-			break;
-		}
-	}
+	
+	for (n = 0; n<MAXFREEITEM; n++) if ((in = free_item_list[n]) && it[in].used==USE_EMPTY) break;
+	
 	if (n<MAXFREEITEM)
 	{
 		free_item_list[n] = 0;
-		return( in);
+		return in;
 	}
-
-	for (m = in = 0, n = 1; n<MAXITEM; n++)
+	
+	for (m = in = 0, n = 1; n<MAXITEM; n++) if (it[n].used == USE_EMPTY)
 	{
-		if (it[n].used==USE_EMPTY)
-		{
-			in = free_item_list[m++] = n;
-			if (m>=MAXFREEITEM)
-			{
-				break;
-			}
-		}
+		in = free_item_list[m++] = n;
+		if (m>=MAXFREEITEM) break;
 	}
-
-	return(in);
+	
+	return in;
 }
 
 int god_create_item(int temp)
@@ -222,45 +188,35 @@ int god_create_item(int temp)
 	int n, m;
 	unsigned long long prof;
 
-	if (!IS_SANEITEMPLATE(temp))
-	{
-		return 0;
-	}
-
+	if (!IS_SANEITEMPLATE(temp)) return 0;
+	
 	prof = prof_start();
-
+	
 	if (it_temp[temp].used == USE_EMPTY)
 	{
 		xlog("god_create_item(): unused template.");
 		prof_stop(23, prof);
 		return 0;
 	}
-
-	n = get_free_item();
-	if (!n)
+	
+	if (!(n = get_free_item()))
 	{
 		xlog("god_create_item (svr_god.c): MAXITEM reached");
 		prof_stop(23, prof);
 		return 0;
 	}
-
+	
 	it[n] = it_temp[temp];
 	it[n].temp = temp;
 	
 	// Special case to set fresh stackable items to at least 1 stack
-	if (it[n].flags & IF_STACKABLE)
-	{
-		it[n].stack = 1;
-	}
+	if (it[n].flags & IF_STACKABLE) it[n].stack = 1;
 	
 	// Special case to set stacks for spell scrolls
-	if (it[n].driver==48)
-	{
-		it[n].stack = it[n].data[2];
-	}
-
+	if (it[n].driver==48) it[n].stack = it[n].data[2];
+	
 	prof_stop(23, prof);
-
+	
 	return(n);
 }
 
@@ -286,7 +242,7 @@ int god_create_char(int temp, int withitems)
 	ch[n].pass1 = RANDOM(0x3fffffff);
 	ch[n].pass2 = RANDOM(0x3fffffff);
 	ch[n].temp  = temp;
-
+	
 	while (1)
 	{
 		strcpy(ch[n].name, mkp());
@@ -318,7 +274,7 @@ int god_create_char(int temp, int withitems)
 		!IS_FEMALE(n) ? "He" : "",
 		IS_FEMALE(n) ? "She" : "",
 		IS_MONSTER(n) ? "It" : "");
-
+	
 	for (m = 0; m<100; m++)
 	{
 		ch[n].data[m] = 0;
@@ -332,7 +288,7 @@ int god_create_char(int temp, int withitems)
 	ch[n].taunted = 0;
 	ch[n].retry = 0;
 	ch[n].dir = DX_DOWN;
-
+	
 	for (m = 0; m<MAXITEMS; m++)
 	{
 		if ((tmp = ch[n].item[m])!=0)
@@ -353,7 +309,7 @@ int god_create_char(int temp, int withitems)
 			ch[n].item[m] = tmp;
 		}
 	}
-
+	
 	for (m = 0; m<20; m++)
 	{
 		if ((tmp = ch[n].worn[m])!=0)
@@ -395,7 +351,7 @@ int god_create_char(int temp, int withitems)
 			ch[n].alt_worn[m] = tmp;
 		}
 	}
-
+	
 	for (m = 0; m<MAXBUFFS; m++)
 	{
 		if (ch[n].spell[m]!=0)
@@ -403,7 +359,7 @@ int god_create_char(int temp, int withitems)
 			ch[n].spell[m] = 0;
 		}
 	}
-
+	
 	if ((tmp = ch[n].citem)!=0)
 	{
 		if (withitems)
@@ -421,7 +377,7 @@ int god_create_char(int temp, int withitems)
 		}
 		ch[n].citem = tmp;
 	}
-
+	
 	if (flag)
 	{
 		god_destroy_items(n);
@@ -432,10 +388,10 @@ int god_create_char(int temp, int withitems)
 	ch[n].a_end  = 1000000;
 	ch[n].a_hp   = 1000000;
 	ch[n].a_mana = 1000000;
-
+	
 	do_update_char(n);
-
-	return(n);
+	
+	return n;
 }
 
 int god_change_pass(int cn, int co, char *pass)
@@ -508,16 +464,16 @@ int god_drop_item(int nr, int x, int y)
 
 	if (it[nr].active)
 	{
-		if (it[nr].light[1])
+		if (it[nr].light[I_A])
 		{
-			do_add_light(x, y, it[nr].light[1]);
+			do_add_light(x, y, it[nr].light[I_A]);
 		}
 	}
 	else
 	{
-		if (it[nr].light[0])
+		if (it[nr].light[I_I])
 		{
-			do_add_light(x, y, it[nr].light[0]);
+			do_add_light(x, y, it[nr].light[I_I]);
 		}
 	}
 
@@ -898,9 +854,50 @@ int god_drop_char_fuzzy_large(int nr, int x, int y, int xs, int ys)
 	return 0;
 }
 
+int god_stack_items(int in, int in2)
+{
+	int flag = 1, tmp, stacksize;
+	
+	if (IS_MATCH_CAT(in, in2)) flag = 0;
+	if (IS_MATCH_GSC(in, in2)) flag = 0;
+	if (it[in].driver == 133 && it[in].data[0] != it[in2].data[0]) flag = 0;
+	// Find a stackable item of the same template
+	if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[in2].temp && it[in].driver == it[in2].driver && it[in2].stack<10 && flag)
+	{
+		if (it[in2].stack<1) it[in2].stack=1;
+		if (it[in].stack>1)
+		{
+			tmp 		= it[in2].value / it[in2].stack;
+			stacksize 	= it[in2].stack + it[in].stack;
+			
+			if (stacksize > 10)
+			{
+				it[in2].stack = 10;
+				it[in2].value = tmp * it[in2].stack;
+				it[in].stack  = stacksize-10;
+				it[in].value  = tmp * it[in].stack;
+				return 0;
+			}
+			else
+			{
+				it[in2].stack += it[in].stack;
+				it[in2].value = tmp * it[in2].stack;
+			}
+		}
+		else
+		{
+			tmp = it[in2].value / it[in2].stack;
+			it[in2].stack++;
+			it[in2].value = tmp * it[in2].stack;
+		}
+		return 1;
+	}
+	return -1;
+}
+
 int god_give_char(int in, int cn)
 {
-	int n, in2, tmp, stacksize, flag=0;
+	int n, in2, tmp;
 
 	if (!IS_SANEITEM(in) || !IS_LIVINGCHAR(cn))
 	{
@@ -909,39 +906,12 @@ int god_give_char(int in, int cn)
 	if (IS_PLAYER(cn)) for (n = 0; n<MAXITEMS; n++)
 	{
 		in2 = ch[cn].item[n];
-		flag = 1;
-		if (IS_MATCH_CAT(in, in2)) flag = 0;
-		if (IS_MATCH_GSC(in, in2)) flag = 0;
-		if (it[in].driver == 133 && it[in].data[0] != it[in2].data[0]) flag = 0;
-		// Find a stackable item of the same template
-		if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[in2].temp && it[in2].stack<10 && flag)
+		
+		tmp = god_stack_items(in, in2);
+		
+		if (tmp==0) break;
+		if (tmp==1)
 		{
-			if (it[in2].stack<1)	it[in2].stack=1;
-			if (it[in].stack>1)
-			{
-				tmp 		= it[in2].value / it[in2].stack;
-				stacksize 	= it[in2].stack + it[in].stack;
-				
-				if (stacksize > 10)
-				{
-					it[in2].stack = 10;
-					it[in2].value = tmp * it[in2].stack;
-					it[in].stack 	= stacksize-10;
-					it[in].value 	= tmp * it[in].stack;
-					break;
-				}
-				else
-				{
-					it[in2].stack += it[in].stack;
-					it[in2].value = tmp * it[in2].stack;
-				}
-			}
-			else
-			{
-				tmp = it[in2].value / it[in2].stack;
-				it[in2].stack++;
-				it[in2].value = tmp * it[in2].stack;
-			}
 			do_update_char(cn);
 			return 1;
 		}
@@ -1059,8 +1029,16 @@ int god_transfer_char(int cn, int x, int y)
 	{
 		if (ch[cn].flags & CF_GCTOME)
 		{
-			if (IS_SANECHAR(gc) && ch[gc].data[CHD_MASTER]==cn) god_transfer_char(gc, x, y);
-			if (IS_SANECHAR(sc) && ch[sc].data[CHD_MASTER]==cn) god_transfer_char(sc, x, y);
+			if (IS_SANECHAR(gc) && ch[gc].data[CHD_MASTER]==cn)
+			{
+				if (IS_IN_INDW(x, y) && has_buff(gc, SK_LIGHT)) remove_buff(gc, SK_LIGHT);
+				god_transfer_char(gc, x, y);
+			}
+			if (IS_SANECHAR(sc) && ch[sc].data[CHD_MASTER]==cn)
+			{
+				if (IS_IN_INDW(x, y) && has_buff(sc, SK_LIGHT)) remove_buff(sc, SK_LIGHT);
+				god_transfer_char(sc, x, y);
+			}
 		}
 		return 1;
 	}
@@ -1680,37 +1658,37 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[0]      +=  9 * bonus/2;
+						it[in].speed[I_I]      +=  9 * bonus/2;
 						break;
 					case 2:
 						gend = " goddess ";
 						godn = "Kwai";
 						it[in].flags |= IF_KWAI_UNI;
-						it[in].to_hit[0]     +=  2 * bonus;
-						it[in].to_parry[0]   +=  2 * bonus;
+						it[in].to_hit[I_I]     +=  2 * bonus;
+						it[in].to_parry[I_I]   +=  2 * bonus;
 						break;
 					case 3:
 						gend = " god ";
 						godn = "Gorn";
 						it[in].flags |= IF_GORN_UNI;
-						it[in].spell_mod[0]  +=  3 * bonus/2;
+						it[in].spell_mod[I_I]  +=  3 * bonus/2;
 						break;
 					default:
 						gend = " ";
 						godn = "Purple One";
 						it[in].flags |= IF_PURP_UNI;
-						it[in].top_damage[0] += 15 * bonus;
+						it[in].top_damage[I_I] += 15 * bonus;
 						break;
 				}
-				if (it_temp[x].armor[0] && it_temp[x].weapon[0])
+				if (it_temp[x].armor[I_I] && it_temp[x].weapon[I_I])
 				{
-					it[in].armor[0]  += 1 + 1 * bonus;
-					it[in].weapon[0] += 1 + 1 * bonus;
+					it[in].armor[I_I]  += 1 + 1 * bonus;
+					it[in].weapon[I_I] += 1 + 1 * bonus;
 				}
-				else if (it_temp[x].armor[0])
-					it[in].armor[0]  += 2 + 2 * bonus;
-				else if (it_temp[x].weapon[0])
-					it[in].weapon[0] += 2 + 2 * bonus;
+				else if (it_temp[x].armor[I_I])
+					it[in].armor[I_I]  += 2 + 2 * bonus;
+				else if (it_temp[x].weapon[I_I])
+					it[in].weapon[I_I] += 2 + 2 * bonus;
 				
 				it[in].orig_temp = it[in].temp;
 				it[in].temp = 0;
@@ -1727,35 +1705,35 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 				if (is_unique_able(x) > 54) // Claws
 				{
 					if (gen_a==1)
-						it[in].sprite[0] = 3715 + is_unique_able(x)-55;
+						it[in].sprite[I_I] = 3715 + is_unique_able(x)-55;
 					else if (gen_a==2)
-						it[in].sprite[0] = 3721 + is_unique_able(x)-55;
+						it[in].sprite[I_I] = 3721 + is_unique_able(x)-55;
 					else if (gen_a==3)
-						it[in].sprite[0] = 3727 + is_unique_able(x)-55;
+						it[in].sprite[I_I] = 3727 + is_unique_able(x)-55;
 					else
-						it[in].sprite[0] = 4944 + is_unique_able(x)-55;
+						it[in].sprite[I_I] = 4944 + is_unique_able(x)-55;
 				}
 				else if (is_unique_able(x) > 45)
 				{
 					if (gen_a==1)
-						it[in].sprite[0] = 2602 + is_unique_able(x)-46;
+						it[in].sprite[I_I] = 2602 + is_unique_able(x)-46;
 					else if (gen_a==2)
-						it[in].sprite[0] = 2611 + is_unique_able(x)-46;
+						it[in].sprite[I_I] = 2611 + is_unique_able(x)-46;
 					else if (gen_a==3)
-						it[in].sprite[0] = 2620 + is_unique_able(x)-46;
+						it[in].sprite[I_I] = 2620 + is_unique_able(x)-46;
 					else
-						it[in].sprite[0] = 4935 + is_unique_able(x)-46;
+						it[in].sprite[I_I] = 4935 + is_unique_able(x)-46;
 				}
 				else
 				{
 					if (gen_a==1)
-						it[in].sprite[0] =  730 + is_unique_able(x)-1;
+						it[in].sprite[I_I] =  730 + is_unique_able(x)-1;
 					else if (gen_a==2)
-						it[in].sprite[0] = 2512 + is_unique_able(x)-1;
+						it[in].sprite[I_I] = 2512 + is_unique_able(x)-1;
 					else if (gen_a==3)
-						it[in].sprite[0] = 2557 + is_unique_able(x)-1;
+						it[in].sprite[I_I] = 2557 + is_unique_able(x)-1;
 					else
-						it[in].sprite[0] = 4890 + is_unique_able(x)-1;
+						it[in].sprite[I_I] = 4890 + is_unique_able(x)-1;
 				}
 			}
 		}
@@ -4240,19 +4218,6 @@ void god_destroy_items(int cn)
 	}
 	if (ch[cn].flags & CF_PLAYER)
 	{
-		/*
-		for (n = 0; n<62; n++)
-		{
-//	//	//	if ((in = ch[cn].depot[n])!=0)
-			{
-//	//	//	//	ch[cn].depot[n] = 0;
-				if (in>0 && in<MAXITEM)
-				{
-					it[in].used = USE_EMPTY;
-				}
-			}
-		}
-		*/
 		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 		{
 			if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)

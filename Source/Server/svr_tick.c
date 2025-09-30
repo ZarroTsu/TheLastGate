@@ -606,6 +606,27 @@ void plr_cmd_inv(int nr)
 					it[tmp].orig_temp = tmp;
 					it[tmp].temp = 0;
 				}
+				else if (IS_SOULCAT(in))
+				{
+					m = it[in].data[4]-1;
+					tmp = god_create_item(IT_SOULCATAL);
+					
+					sprintf(it[tmp].name, "Soul Catalyst (%s)", skilltab[m].name);
+					sprintf(it[tmp].reference, "soul catalyst (%s)", skilltab[m].name);
+					sprintf(it[tmp].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
+					
+					it[tmp].temp          = 0;
+					it[tmp].driver        = 93;
+					it[tmp].data[4]       = m+1;
+					it[tmp].flags        |= IF_IDENTIFIED | IF_STACKABLE;
+					it[tmp].stack         = 1;
+					
+					for (m=0; m<50; m++)
+					{
+						it[tmp].skill[m][I_I] = it[in].skill[m][I_I];
+						it[tmp].skill[m][I_A] = it[in].skill[m][I_A];
+					}
+				}
 				else
 				{
 					return;
@@ -615,18 +636,6 @@ void plr_cmd_inv(int nr)
 				it[in].stack--;
 				it[in].value = tmpv * it[in].stack;
 				
-				if (IS_SOULCAT(in))
-				{
-					it[tmp].data[0] = it[in].data[0];
-					it[tmp].data[1] = it[in].data[1];
-					it[tmp].data[3] = it[in].data[3];
-					it[tmp].data[4] = it[in].data[4];
-					for (m=0; m<50; m++)
-					{
-						it[tmp].skill[m][0] = it[in].skill[m][0];
-						it[tmp].skill[m][1] = it[in].skill[m][1];
-					}
-				}
 				if (IS_GSCROLL(in))
 				{
 					it[tmp].data[0] = it[in].data[0];
@@ -2785,24 +2794,24 @@ void plr_change(int nr)
 			cpl->end[5] != ch[cn].end[5])
 		{
 			chFlags = 0;
-			if (get_enchantment(cn, 36)) 		chFlags += (1 <<  0); // Half med to HP
-			if (get_enchantment(cn, 45)) 		chFlags += (1 <<  1); // Half end to MP
-			if (get_enchantment(cn,  7)) 		chFlags += (1 <<  2); // 20% more weaken effect
-			if (get_enchantment(cn, 13)) 		chFlags += (1 <<  3); // 20% more slow effect
-			if (get_enchantment(cn, 20)) 		chFlags += (1 <<  4); // 20% more curse effect
-			if (get_enchantment(cn, 27)) 		chFlags += (1 <<  5); // 20% more poison effect
-			if (get_enchantment(cn, 30)) 		chFlags += (1 <<  6); // 20% more bleed effect
-			if (get_enchantment(cn, 31)) 		chFlags += (1 <<  7); // 20% more blind effect
-			if (get_enchantment(cn, 56)) 		chFlags += (1 <<  8); // 20% more heal effect
-			if (get_enchantment(cn, 16) || 
-				get_enchantment(cn, 23)) 		chFlags += (1 <<  9); // 20% damage shifted to end/mana (20% more eHP)
-			if (get_tarot(cn, IT_CH_STAR_R)) 	chFlags += (1 << 10); // Reverse Star changes spellmod behavior
-			if (get_enchantment(cn, 37)) 		chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
+			if (do_get_iflag(cn, SF_EN_MEDIREGN))    chFlags += (1 <<  0); // Half med to HP
+			if (do_get_iflag(cn, SF_EN_RESTMEDI))    chFlags += (1 <<  1); // Half end to MP
+			if (do_get_iflag(cn, SF_EN_MOREWEAK))    chFlags += (1 <<  2); // 20% more weaken effect
+			if (do_get_iflag(cn, SF_EN_MORESLOW))    chFlags += (1 <<  3); // 20% more slow effect
+			if (do_get_iflag(cn, SF_EN_MORECURS))    chFlags += (1 <<  4); // 20% more curse effect
+			if (do_get_iflag(cn, SF_EN_MOREPOIS))    chFlags += (1 <<  5); // 20% more poison effect
+			if (do_get_iflag(cn, SF_EN_MOREBLEE))    chFlags += (1 <<  6); // 20% more bleed effect
+			if (do_get_iflag(cn, SF_EN_MOREBLIN))    chFlags += (1 <<  7); // 20% more blind effect
+			if (do_get_iflag(cn, SF_EN_MOREHEAL))    chFlags += (1 <<  8); // 20% more heal effect
+			if (do_get_iflag(cn, SF_EN_TAKEASEN) || 
+				do_get_iflag(cn, SF_EN_TAKEASMA))    chFlags += (1 <<  9); // 20% damage shifted to end/mana (20% more eHP)
+			if (do_get_iflag(cn, SF_STAR_R))         chFlags += (1 << 10); // Reverse Star changes spellmod behavior
+			if (do_get_ieffect(cn, VF_EN_EXTRAVOCH)) chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
 			if (T_SKAL_SK(cn, 12) ||
 				T_ARHR_SK(cn, 12)) 				chFlags += (1 << 12); // 20% damage shifted to end/mana (20% more eHP)
 			if (get_gear(cn, IT_WP_RISINGPHO) || 
-				get_gear(cn, IT_WB_RISINGPHO)) 	chFlags += (1 << 13); // Immolate skill, based off HP
-			if (get_gear(cn, IT_TW_CLOAK)) 		chFlags += (1 << 14); // 10% damage shifted to end (10% more eHP)
+				get_gear(cn, IT_WB_RISINGPHO))  chFlags += (1 << 13); // Immolate skill, based off HP
+			if (do_get_iflag(cn, SF_TW_CLOAK))  chFlags += (1 << 14); // 10% damage shifted to end (10% more eHP)
 			
 			buf[0] = SV_SETCHAR_ENDUR;
 			*(unsigned short*)(buf + 1)  = (unsigned short)(ch[cn].move_speed);		// char
@@ -2866,7 +2875,7 @@ void plr_change(int nr)
 						}
 						else
 						{
-							*(short int*)(buf + 5) = it_temp[in].sprite[0];
+							*(short int*)(buf + 5) = it_temp[in].sprite[I_I];
 							*(short int*)(buf + 7) = 0;
 						}
 						*(unsigned char*)(buf + 9) = 0;
@@ -2876,11 +2885,11 @@ void plr_change(int nr)
 					{
 						if (it[in].active)
 						{
-							*(short int*)(buf + 5) = it[in].sprite[1];
+							*(short int*)(buf + 5) = it[in].sprite[I_A];
 						}
 						else
 						{
-							*(short int*)(buf + 5) = it[in].sprite[0];
+							*(short int*)(buf + 5) = it[in].sprite[I_I];
 						}
 						*(short int*)(buf + 7) = 0;
 						if (IS_SOULCAT(in)) *(short int*)(buf + 7) = it[in].data[4];
@@ -2947,45 +2956,43 @@ void plr_change(int nr)
 				if (n == WN_FLAGS)
 				{
 					chFlags = 0;
-					if (get_book(cn, IT_BOOK_DAMO) 
-					 || get_book(cn, IT_IMBK_DAMO)) 	chFlags += (1 <<  0);
-					if (get_tarot(cn, IT_CH_STRENGTH)) 	chFlags += (1 <<  1);
-					if (get_tarot(cn, IT_CH_HANGED)) 	chFlags += (1 <<  2);
-					if (get_book(cn, IT_BOOK_PROD)
-					 || get_book(cn, IT_IMBK_PROD)) 	chFlags += (1 <<  3);
-					if (get_book(cn, IT_BOOK_VENO)) 	chFlags += (1 <<  4);
-					if (get_tarot(cn, IT_CH_EMPEROR)) 	chFlags += (1 <<  5); // Slow -> Slow 2
-					if (get_tarot(cn, IT_CH_TOWER)) 	chFlags += (1 <<  6); // Curse -> Curse 2
-					if (get_tarot(cn, IT_CH_JUDGE)) 	chFlags += (1 <<  7);
-					if (get_tarot(cn, IT_CH_JUSTICE)) 	chFlags += (1 <<  8);
-					if (get_tarot(cn, IT_CH_PREIST)) 	chFlags += (1 <<  9); // 20% eHP
-					if (get_tarot(cn, IT_CH_DEATH)) 	chFlags += (1 << 10); // Weaken -> Weaken 2
-					if (get_tarot(cn, IT_CH_MOON)) 		chFlags += (1 << 11);
-					if (get_tarot(cn, IT_CH_SUN)) 		chFlags += (1 << 12);
-					if (get_tarot(cn, IT_CH_WORLD)) 	chFlags += (1 << 13);
-					if (get_tarot(cn, IT_CH_STAR)) 		chFlags += (1 << 14); // Heal -> Regen
+					if (do_get_iflag(cn, SF_BOOK_DAMO)) chFlags += (1 <<  0);
+					if (do_get_iflag(cn, SF_STRENGTH))  chFlags += (1 <<  1);
+					if (do_get_iflag(cn, SF_HANGED))    chFlags += (1 <<  2);
+					if (do_get_iflag(cn, SF_BOOK_PROD)) chFlags += (1 <<  3);
+					if (do_get_iflag(cn, SF_BOOK_VENO)) chFlags += (1 <<  4);
+					if (do_get_iflag(cn, SF_EMPEROR))   chFlags += (1 <<  5); // Slow -> Slow 2
+					if (do_get_iflag(cn, SF_TOWER))     chFlags += (1 <<  6); // Curse -> Curse 2
+					if (do_get_iflag(cn, SF_JUDGE))     chFlags += (1 <<  7);
+					if (do_get_iflag(cn, SF_JUSTICE))   chFlags += (1 <<  8);
+					if (do_get_iflag(cn, SF_PREIST))    chFlags += (1 <<  9); // 20% eHP
+					if (do_get_iflag(cn, SF_DEATH))     chFlags += (1 << 10); // Weaken -> Weaken 2
+					if (do_get_iflag(cn, SF_MOON))      chFlags += (1 << 11);
+					if (do_get_iflag(cn, SF_SUN))       chFlags += (1 << 12);
+					if (do_get_iflag(cn, SF_WORLD))     chFlags += (1 << 13);
+					if (do_get_iflag(cn, SF_STAR))      chFlags += (1 << 14); // Heal -> Regen
 					*(short int*)(buf + 5) = min(32767,chFlags); // max << 14
 					chFlags = 0;
 					// Amulets can't all can't be true at the same time - compressing bits saves two flags
-					if (get_neck(cn, IT_ANKHAMULET))  { chFlags += (1 <<  0); }
-					if (get_neck(cn, IT_AMBERANKH))   { chFlags += (1 <<  1); }
-					if (get_neck(cn, IT_TURQUANKH))   { chFlags += (1 <<  1); chFlags += (1 <<  0); }
-					if (get_neck(cn, IT_GARNEANKH))   { chFlags += (1 <<  2); }
-					if (get_neck(cn, IT_TRUEANKH))    { chFlags += (1 <<  2); chFlags += (1 <<  0); }
-					if (get_neck(cn, IT_BREATHAMMY))  { chFlags += (1 <<  2); chFlags += (1 <<  1); }
+					if (do_get_iflag(cn, SF_ANKHAMULET)) { chFlags += (1 <<  0); }
+					if (do_get_iflag(cn, SF_AMBERANKH))  { chFlags += (1 <<  1); }
+					if (do_get_iflag(cn, SF_TURQUANKH))  { chFlags += (1 <<  1); chFlags += (1 <<  0); }
+					if (do_get_iflag(cn, SF_GARNEANKH))  { chFlags += (1 <<  2); }
+					if (do_get_iflag(cn, SF_TRUEANKH))   { chFlags += (1 <<  2); chFlags += (1 <<  0); }
+					if (do_get_iflag(cn, SF_WBREATH))    { chFlags += (1 <<  2); chFlags += (1 <<  1); }
 					//
-					if (get_tarot(cn, DESC_PREIST_R)) 	chFlags += (1 <<  3); // 
-				//	if () 								chFlags += (1 <<  4); // ...
-					if (get_gear(cn, IT_WP_THEWALL)) 	chFlags += (1 <<  5); // The Wall
-					if (get_tarot(cn, IT_CH_JUDGE_R)) 	chFlags += (1 <<  6); // Pulse
-					if (get_tarot(cn, IT_CH_JUSTIC_R)) 	chFlags += (1 <<  7); // Leap
-					if (globs->fullmoon)				chFlags += (1 <<  8);
-					if (globs->newmoon)					chFlags += (1 <<  9);
-					if (get_tarot(cn, IT_CH_EMPRESS)) 	chFlags += (1 << 10); // Shield -> Shell
-					if (get_tarot(cn, IT_CH_CHARIOT)) 	chFlags += (1 << 11); // Blind -> Douse
-					if (get_tarot(cn, IT_CH_EMPERO_R)) 	chFlags += (1 << 12); // Warcry -> Rally
-					if (get_book(cn, IT_BOOK_BURN)) 	chFlags += (1 << 13); // Burning Book
-					if (get_tarot(cn, IT_CH_TOWER_R)) 	chFlags += (1 << 14); // Poison -> Venom
+					if (do_get_iflag(cn, SF_PREIST_R))   chFlags += (1 <<  3); // 
+				//	if ()                                chFlags += (1 <<  4); // ...
+					if (do_get_iflag(cn, SF_SHIELDBASH)) chFlags += (1 <<  5); // The Wall
+					if (do_get_iflag(cn, SF_JUDGE_R))    chFlags += (1 <<  6); // Pulse
+					if (do_get_iflag(cn, SF_JUSTIC_R))   chFlags += (1 <<  7); // Leap
+					if (globs->fullmoon)                 chFlags += (1 <<  8);
+					if (globs->newmoon)                  chFlags += (1 <<  9);
+					if (do_get_iflag(cn, SF_EMPRESS))    chFlags += (1 << 10); // Shield -> Shell
+					if (do_get_iflag(cn, SF_CHARIOT))    chFlags += (1 << 11); // Blind -> Douse
+					if (do_get_iflag(cn, SF_EMPERO_R))   chFlags += (1 << 12); // Warcry -> Rally
+					if (do_get_iflag(cn, SF_BOOK_BURN))  chFlags += (1 << 13); // Burning Book
+					if (do_get_iflag(cn, SF_TOWER_R))    chFlags += (1 << 14); // Poison -> Venom
 					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
 				}
 				
@@ -2999,11 +3006,11 @@ void plr_change(int nr)
 				{
 					if (it[in].active)
 					{
-						*(short int*)(buf + 5) = it[in].sprite[1];
+						*(short int*)(buf + 5) = it[in].sprite[I_A];
 					}
 					else
 					{
-						*(short int*)(buf + 5) = it[in].sprite[0];
+						*(short int*)(buf + 5) = it[in].sprite[I_I];
 					}
 					*(short int*)(buf + 7) = it[in].placement;
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
@@ -3032,17 +3039,17 @@ void plr_change(int nr)
 		for (n = 0; n<MAXBUFFS; n++)
 		{
 			if (cpl->spell[n]!=(in = ch[cn].spell[n]) ||
-			    (cpl->active[n]!=bu[in].active * 16 / max(1, bu[in].duration)) || (bu[in].flags & IF_UPDATE))
+			    (cpl->active[n]!=bu[in].active * 16 / max(1, bu[in].duration)) || (bu[in].flags & BF_UPDATE))
 			{
 				buf[0] = SV_SETCHAR_SPELL;
 				*(unsigned long*)(buf + 1) = n;
 				if (in)
 				{
-					*(short int*)(buf + 5) = bu[in].sprite[1];
+					*(short int*)(buf + 5) = bu[in].sprite;
 					*(short int*)(buf + 7) = bu[in].active * 16 / max(1, bu[in].duration);
 					cpl->spell[n]  = in;
 					cpl->active[n] = (bu[in].active * 16 / max(1, bu[in].duration));
-					bu[in].flags &= ~IF_UPDATE;
+					bu[in].flags &= ~BF_UPDATE;
 				}
 				else
 				{
@@ -3106,11 +3113,11 @@ void plr_change(int nr)
 				{
 					if (it[in].active)
 					{
-						*(short int*)(buf + 1) = it[in].sprite[1];
+						*(short int*)(buf + 1) = it[in].sprite[I_A];
 					}
 					else
 					{
-						*(short int*)(buf + 1) = it[in].sprite[0];
+						*(short int*)(buf + 1) = it[in].sprite[I_I];
 					}
 					*(short int*)(buf + 3) = it[in].placement;
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
@@ -3257,7 +3264,7 @@ void plr_change(int nr)
 		if (cpl->sitem[n] == (in = ch[cn].blacksmith[n])) continue;
 		if (in)
 		{
-			spr = it[in].sprite[0];
+			spr = it[in].sprite[I_I];
 			if (it[in].flags & IF_SOULSTONE) ss = 1; else ss = 0;
 			if (it[in].flags & IF_ENCHANTED) en = 2; else en = 0;
 			if (it[in].flags & IF_CORRUPTED) cr = 4; else cr = 0;
@@ -4053,13 +4060,13 @@ void plr_getmap_complete(int nr)
 			{
 				if (it[co].active)
 				{
-					smap[n].it_sprite = it[co].sprite[1];
-					smap[n].it_status = it[co].status[1];
+					smap[n].it_sprite = it[co].sprite[I_A];
+					smap[n].it_status = it[co].status[I_A];
 				}
 				else
 				{
-					smap[n].it_sprite = it[co].sprite[0];
-					smap[n].it_status = it[co].status[0];
+					smap[n].it_sprite = it[co].sprite[I_I];
+					smap[n].it_status = it[co].status[I_I];
 				}
 				if ((it[co].flags & IF_LOOK) || (it[co].flags & IF_LOOKSPECIAL))
 				{
@@ -4357,13 +4364,13 @@ void plr_getmap_fast(int nr)
 			{
 				if (it[co].active)
 				{
-					smap[n].it_sprite = it[co].sprite[1];
-					smap[n].it_status = it[co].status[1];
+					smap[n].it_sprite = it[co].sprite[I_A];
+					smap[n].it_status = it[co].status[I_A];
 				}
 				else
 				{
-					smap[n].it_sprite = it[co].sprite[0];
-					smap[n].it_status = it[co].status[0];
+					smap[n].it_sprite = it[co].sprite[I_I];
+					smap[n].it_status = it[co].status[I_I];
 				}
 				if ((it[co].flags & IF_LOOK) || (it[co].flags & IF_LOOKSPECIAL))
 				{
@@ -4512,39 +4519,23 @@ int check_valid(int cn)
 
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		if ((in = ch[cn].item[n])!=0)
+		if (in = ch[cn].item[n])
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset item %d (%s,%d) from char %d (%s)",
-				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				xlog("Reset item %d (%s,%d) from char %d (%s)", in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].item[n] = 0;
 			//	ch[cn].item_lock[n] = 0;
 			}
 		}
 	}
-	/*
-	for (n = 0; n<62; n++)
-	{
-//	//	if ((in = ch[cn].depot[n])!=0)
-		{
-			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
-			{
-				xlog("Reset depot item %d (%s,%d) from char %d (%s)",
-				     in, it[in].name, it[in].used, cn, ch[cn].name);
-//	//	//	//	ch[cn].depot[n] = 0;
-			}
-		}
-	}
-	*/
 	for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 	{
-		if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)
+		if (in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset depot item %d (%s,%d) from char %d (%s)",
-				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				xlog("Reset depot item %d (%s,%d) from char %d (%s)", in, it[in].name, it[in].used, cn, ch[cn].name);
 				st[cn].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
 			}
 		}
@@ -4552,12 +4543,11 @@ int check_valid(int cn)
 
 	for (n = 0; n<20; n++)
 	{
-		if ((in = ch[cn].worn[n])!=0)
+		if (in = ch[cn].worn[n])
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset worn item %d (%s,%d) from char %d (%s)",
-				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				xlog("Reset worn item %d (%s,%d) from char %d (%s)", in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].worn[n] = 0;
 			}
 		}
@@ -4565,12 +4555,11 @@ int check_valid(int cn)
 	
 	for (n = 0; n<12; n++)
 	{
-		if ((in = ch[cn].alt_worn[n])!=0)
+		if (in = ch[cn].alt_worn[n])
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset alt_worn item %d (%s,%d) from char %d (%s)",
-				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				xlog("Reset alt_worn item %d (%s,%d) from char %d (%s)", in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].alt_worn[n] = 0;
 			}
 		}
@@ -4578,12 +4567,11 @@ int check_valid(int cn)
 	
 	for (n = 0; n<4; n++)
 	{
-		if ((in = ch[cn].blacksmith[n])!=0)
+		if (in = ch[cn].blacksmith[n])
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset blacksmith item %d (%s,%d) from char %d (%s)",
-				     in, it[in].name, it[in].used, cn, ch[cn].name);
+				xlog("Reset blacksmith item %d (%s,%d) from char %d (%s)", in, it[in].name, it[in].used, cn, ch[cn].name);
 				ch[cn].blacksmith[n] = 0;
 			}
 		}
@@ -4591,25 +4579,13 @@ int check_valid(int cn)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0)
+		if (in = ch[cn].spell[n])
 		{
 			if (bu[in].carried!=cn || bu[in].used!=USE_ACTIVE)
 			{
-				xlog("Reset spell buff %d (%s,%d,%d) from char %d (%s)",
-				     in, bu[in].name, bu[in].carried, bu[in].used, cn, ch[cn].name);
+				xlog("Reset spell buff %d (%s,%d,%d) from char %d (%s)", in, bu[in].name, bu[in].carried, bu[in].used, cn, ch[cn].name);
 				ch[cn].spell[n] = 0;
 			}
-		}
-	}
-	
-	for (n = 0; n<MAXBUFFS; n++)	// Remove old item buffs
-	{
-		if ((in = ch[cn].spell[n])!=0 && it[in].flags & IF_SPELL && it[in].carried==cn)
-		{
-			xlog("Removed (old) spell item %d (%s,%d,%d) from char %d (%s)",
-				 in, it[in].name, it[in].carried, it[in].used, cn, ch[cn].name);
-			ch[cn].spell[n] = 0;
-			it[in].used = USE_EMPTY;
 		}
 	}
 
@@ -4716,7 +4692,7 @@ void tick(void)
 	globs->uptime++;
 
 	globs->uptime_per_hour[hour]++;
-
+	
 	if ((globs->ticker & 31)==0)
 	{
 		pop_save_char(globs->ticker % MAXCHARS);
@@ -4809,7 +4785,7 @@ void tick(void)
 		}
 		plr_state(n);
 	}
-
+	
 	// send changes to players
 	for (n = 1; n<MAXPLAYER; n++)
 	{
@@ -4845,7 +4821,6 @@ void tick(void)
 		prof_stop(11, prof);
 #endif
 	}
-
 
 	// let characters act
 	cnt = awake = body = plon = 0;

@@ -322,48 +322,48 @@ extern unsigned int mapmarker;
 #define SK_PERCEPT		 9
 //////////////////////////
 #define SK_METABOLISM	10
-#define SK_MSHIELD		11
-#define SK_TACTICS		12 // was SK_BARTER
-#define SK_REPAIR		13
-#define SK_FINESSE		14 // was SK_RAGE
-#define SK_LETHARGY		15
+#define SK_MSHIELD		11 // Active Spell
+#define SK_TACTICS		12
+#define SK_REPAIR		13 // Active Melee
+#define SK_FINESSE		14
+#define SK_LETHARGY		15 // Active Spell
 #define SK_SHIELD		16
-#define SK_PROTECT		17
-#define SK_ENHANCE		18
-#define SK_SLOW			19
+#define SK_PROTECT		17 // Active Spell
+#define SK_ENHANCE		18 // Active Spell
+#define SK_SLOW			19 // Active Spell
 //////////////////////////
-#define SK_CURSE		20
-#define SK_BLESS		21
-#define SK_RAGE			22 // was SK_IDENT
+#define SK_CURSE		20 // Active Spell
+#define SK_BLESS		21 // Active Spell
+#define SK_RAGE			22 // Active Melee
 #define SK_RESIST		23
-#define SK_BLAST		24
-#define SK_DISPEL		25
-#define SK_HEAL			26
-#define SK_GHOST		27
+#define SK_BLAST		24 // Active Spell
+#define SK_DISPEL		25 // Active Spell
+#define SK_HEAL			26 // Active Spell
+#define SK_GHOST		27 // Active Spell
 #define SK_REGEN		28
 #define SK_REST			29
 //////////////////////////
 #define SK_MEDIT		30
-#define SK_ARIA			31
+#define SK_ARIA			31 // Active Melee
 #define SK_IMMUN		32
 #define SK_SURROUND		33
-#define SK_ECONOM		34 // was SK_CONCEN
-#define SK_WARCRY		35
+#define SK_ECONOM		34
+#define SK_WARCRY		35 // Active Melee
 #define SK_DUAL			36
-#define SK_BLIND		37
+#define SK_BLIND		37 // Active Melee
 #define SK_GEARMAST		38
 #define SK_SAFEGRD		39
 //////////////////////////
-#define SK_CLEAVE		40
-#define SK_WEAKEN		41
-#define SK_POISON		42
-#define SK_PULSE		43
+#define SK_CLEAVE		40 // Active Melee
+#define SK_WEAKEN		41 // Active Melee
+#define SK_POISON		42 // Active Spell
+#define SK_PULSE		43 // Active Spell
 #define SK_PROX			44
 #define SK_GCMASTERY	45
-#define SK_SHADOW		46
-#define SK_HASTE		47
-#define SK_TAUNT		48
-#define SK_LEAP			49
+#define SK_SHADOW		46 // Active Spell
+#define SK_HASTE		47 // Active Spell
+#define SK_TAUNT		48 // Active Melee
+#define SK_LEAP			49 // Active Melee
 //////////////////////////
 #define SK_SHIFT		54
 #define SK_IDENT		52
@@ -455,6 +455,125 @@ extern unsigned int mapmarker;
 #define CHARSIZE  (sizeof(struct character)*MAXCHARS)
 #define TCHARSIZE (sizeof(struct character)*MAXTCHARS)
 
+// Special Character Item Flags - equipped items affecting the character
+enum _ch_iflags {
+	SF_SEYASWORD,   SF_MAGI,        SF_PREIST,      SF_EMPRESS,
+	SF_EMPEROR,     SF_HEIROPH,     SF_LOVERS,      SF_CHARIOT,
+	SF_STRENGTH,    SF_HERMIT,      SF_WHEEL,       SF_JUSTICE,
+	SF_HANGED,      SF_DEATH,       SF_TEMPER,      SF_DEVIL,
+	SF_TOWER,       SF_STAR,        SF_MOON,        SF_SUN,
+	SF_JUDGE,       SF_WORLD,       SF_FOOL_R,      SF_MAGI_R,
+	SF_PREIST_R,    SF_EMPRES_R,    SF_EMPERO_R,    SF_HEIROP_R,
+	SF_LOVERS_R,    SF_CHARIO_R,    SF_STRENG_R,    SF_HERMIT_R,
+	SF_WHEEL_R,     SF_JUSTIC_R,    SF_HANGED_R,    SF_DEATH_R,
+	SF_TEMPER_R,    SF_DEVIL_R,     SF_TOWER_R,     SF_STAR_R,
+	SF_MOON_R,      SF_SUN_R,       SF_JUDGE_R,     SF_WORLD_R,
+	SF_BOOK_ALCH,   SF_BOOK_HOLY,   SF_BOOK_ADVA,   SF_BOOK_TRAV,
+	SF_BOOK_DAMO,   SF_BOOK_SHIV,   SF_BOOK_PROD,   SF_BOOK_VENO,
+	SF_BOOK_NECR,   SF_BOOK_BISH,   SF_BOOK_GREA,   SF_BOOK_DEVI,
+	SF_BOOK_BURN,   SF_BOOK_VERD,   SF_NOFOCUS,     SF_BOOK_GRAN,
+	SF_TW_CROWN,    SF_TW_CLOAK,    SF_TW_DREAD,    SF_HIT_DOUSE,
+	
+	SF_TW_MARCH,    SF_TW_OUTSIDE,  SF_TW_HEAVENS,  SF_TW_IRA,      
+	SF_TW_INVIDIA,  SF_TW_GULA,     SF_TW_LUXURIA,  SF_TW_AVARITIA, 
+	SF_TW_SUPERBIA, SF_SIGN_SKUA,   SF_SIGN_SHOU,   SF_SIGN_SLAY,   
+	SF_SIGN_STOR,   SF_SIGN_SICK,   SF_SIGN_SHAD,   SF_SIGN_SPAR,
+	SF_SIGN_SONG,   SF_SIGN_SCRE,   SF_BT_NATURES,  SF_LIZCROWN,    
+	SF_ANKHAMULET,  SF_AMBERANKH,   SF_TURQUANKH,   SF_GARNEANKH,   
+	SF_TRUEANKH,    SF_AM_SUN,      SF_AM_MOON,     SF_AM_ECLIPSE,  
+	SF_GHOSTCRY,    SF_KELPTRID,    SF_SHIELDBASH,  SF_HIGHHITPAR,  
+	SF_SPELLPWV,    SF_SPELLPAV,    SF_EXCALIBUR,   SF_EVERGREEN,   
+	SF_EN_HEAL,     SF_MA_HEAL,     SF_GILDSHINE,   SF_CROSSBLAD,   
+	SF_BRONCHIT,    SF_VOLCANF,     SF_VIKINGMALT,  SF_GUNGNIR,     
+	SF_BONEARMOR,   SF_HIT_POISON,  SF_HIT_SCORCH,  SF_HIT_BLIND,   
+	SF_HIT_SLOW,    SF_HIT_CURSE,   SF_HIT_WEAKEN,  SF_HIT_FROST,   
+	SF_HIT_FEAR,    SF_WBREATH, 
+	
+	SF_EN_MOREAV, // Enchant #  1
+	SF_EN_HEALIT, // Enchant #  2
+	SF_EN_NOTRAPS, // Enchant #  3
+	SF_EN_LESSDEBU, // Enchant #  4
+	SF_EN_MOREWEAK, // Enchant #  7
+	SF_EN_LESSWEAK, // Enchant #  8
+	SF_EN_LESSSICK, // Enchant #  9
+	SF_EN_NODEATHT, // Enchant # 10
+	SF_EN_AVASRES, // Enchant # 11
+	SF_EN_MORESLOW, // Enchant # 13
+	SF_EN_LESSSLOW, // Enchant # 14
+	, // Enchant # 15
+	SF_EN_TAKEASEN, // Enchant # 16
+	SF_EN_MORECURS, // Enchant # 20
+	SF_EN_LESSCURS, // Enchant # 21
+	SF_EN_MOVESTEA, // Enchant #  6
+	SF_EN_LESSCOST, // Enchant # 22
+	SF_EN_TAKEASMA, // Enchant # 23
+	SF_EN_AVASIMM, // Enchant # 24
+	SF_EN_NOSLOW, // Enchant # 26
+	SF_EN_MOREPOIS, // Enchant # 27
+	SF_EN_IDLESTEA, // Enchant # 28
+	SF_EN_MOREBLEE, // Enchant # 30
+	SF_EN_MOREBLIN, // Enchant # 31
+	SF_EN_LESSBLIN, // Enchant # 33
+	SF_EN_WALKREGN, // Enchant # 32
+	SF_EN_MEDIREGN, // Enchant # 36
+	SF_EN_MOREMOVE, // Enchant # 40
+	SF_EN_MOVEUW, // Enchant # 44
+	SF_EN_RESTMEDI, // Enchant # 45
+	SF_EN_ESCAPE, // Enchant # 46
+	SF_EN_MORETHOR, // Enchant # 48
+	SF_EN_MOREPERC, // Enchant # 52
+	SF_EN_MOREHEAL, // Enchant # 56
+	SF_EN_NOGLOW, // Enchant # 55
+	
+	SF_PIGSBLOOD,   SF_ASTONALE,    SF_DRAGON,      SF_MANALITE,
+	
+	SF_MAX
+};
+
+// Variable flags with additive values, such as enchants
+enum _ch_ieffects {
+	VF_EXTRA_BRV,
+	VF_EXTRA_WIL,
+	VF_EXTRA_INT,
+	VF_EXTRA_AGL,
+	VF_EXTRA_STR,
+	VF_GEMMULTI,
+	
+	VF_EN_MOREBRV,  // Enchant #  5 (+3) | 54 (+2)
+	VF_EN_MOREWIL,  // Enchant # 12 (+3) | 54 (+2)
+	VF_EN_MOREINT,  // Enchant # 19 (+3) | 54 (+2)
+	VF_EN_MOREAGL,  // Enchant # 25 (+3) | 54 (+2)
+	VF_EN_MORESTR,  // Enchant # 29 (+3) | 54 (+2)
+	VF_EN_MOREHP,
+	VF_EN_MOREEN,   // Enchant # 18 (+20)
+	VF_EN_MOREMP,
+	VF_EN_HPONHIT,  // Enchant # 49 (+1/h)
+	VF_EN_ENONHIT,  // Enchant # 42 (+1/h)
+	VF_EN_MPONHIT,  // Enchant # 38 (+1/h)
+	VF_EN_HPWHENHIT,  // Enchant # 73 (+2)
+	VF_EN_ENWHENHIT,  // Enchant # 43 (+2)
+	VF_EN_MPWHENHIT,  // Enchant # 39 (+2)
+	VF_EN_EXTRHITCH,  // Enchant # 41 (+1)
+	VF_EN_EXTRAVOCH,  // Enchant # 37 (+1)
+	VF_EN_LESSDOT,  // Enchant # 53 (+15)
+	VF_EN_MOREDAMAGE,  // Enchant # 50 (+2)
+	VF_EN_LESSDAMAGE,  // Enchant # 51 (+2)
+	VF_EN_HALFDMG, // Enchant # 35 (+8)
+	VF_EN_SKUAMS,  // Enchant # 57 (+25)
+	VF_EN_SKUAGLOW,  // Enchant # 58 (+4)
+	VF_EN_KWAIHIT,  // Enchant # 61 (+3)
+	VF_EN_KWAIPARRY,  // Enchant # 62 (+3)
+	VF_EN_GORNMANA,  // Enchant # 65 (+20)
+	VF_EN_GORNDOT,  // Enchant # 66 (+1)
+	VF_EN_PURPLEECH,  // Enchant # 69 (+4)
+	VF_EN_PURPDAMG,  // Enchant # 70 (+10)
+	VF_EN_OFFHMANA,  // Enchant # 74 (+10)
+	VF_EN_OFFHATTRIB,  // Enchant # 75 (+20)
+	VF_EN_LESSCRIT,  // Enchant # 47 (+50) | 76 (+50)
+	
+	VF_MAX
+};
+
 struct character
 {
 	unsigned char used;             // 1
@@ -534,7 +653,11 @@ struct character
 	
 	unsigned short smithnum;
 	
-	unsigned char olditem[142]; // free slots
+	unsigned long long iflags[8];	// 8x8x8 = 512 bits // Static on/off flag effects
+	
+	unsigned char ieffects[64];		// 64 bytes // stacking item effects
+	
+	unsigned char olditem[14]; 		// free slots
 
 	// items worn
 	unsigned int worn[20];
@@ -643,11 +766,16 @@ struct character
 	char tree_node[12];
 
 	unsigned int item[60]; 			// MAXITEMS = 60
-	unsigned int olddepot[2];
+	
+	unsigned short lastkilltemp;	// Used by book of shadows
+	
+	unsigned char house_id;			// Player house / assigned ID. Hopefully no more than 255...
+	unsigned int house_m;			// Player house X/Y for recall
+	unsigned char house_layout;		// Stored house layout
 	
 	unsigned short os_tree;			// Points allocated (upper 12 bits) and available (lower 4 bits)
 	
-	char future[2];
+	short int spell_pow;			// Flat added spell power bonus.
 
 	int luck;
 
@@ -855,16 +983,16 @@ __attribute__ ((packed));
 /* Items */
 /*********/
 
-#define IF_MOVEBLOCK     (1ull<<0)
-#define IF_SIGHTBLOCK    (1ull<<1)
-#define IF_TAKE          (1ull<<2)
-#define IF_MONEY         (1ull<<3)
-#define IF_LOOK          (1ull<<4)
-#define IF_LOOKSPECIAL   (1ull<<5)
-#define IF_SPELL         (1ull<<6)
-#define IF_NOREPAIR      (1ull<<7)
-#define IF_ARMOR         (1ull<<8)      // is a piece of armor
-#define IF_USE           (1ull<<9)
+#define IF_MOVEBLOCK     (1ull<< 0)
+#define IF_SIGHTBLOCK    (1ull<< 1)
+#define IF_TAKE          (1ull<< 2)
+#define IF_MONEY         (1ull<< 3)
+#define IF_LOOK          (1ull<< 4)
+#define IF_LOOKSPECIAL   (1ull<< 5)
+//#define IF_SPELL         (1ull<< 6)      // 
+#define IF_NOREPAIR      (1ull<< 7)
+#define IF_ARMOR         (1ull<< 8)      // is a piece of armor
+#define IF_USE           (1ull<< 9)
 #define IF_USESPECIAL    (1ull<<10)
 #define IF_SINGLEAGE     (1ull<<11)     // don't use age[1] even if it is active
 #define IF_SHOPDESTROY   (1ull<<12)
@@ -882,7 +1010,7 @@ __attribute__ ((packed));
 #define IF_MAGIC         (1ull<<24)     // is magical
 #define IF_MISC          (1ull<<25)     // is neither weapon nor armor nor magical
 #define IF_REACTIVATE    (1ull<<26)     // reactive item whenever it expires
-#define IF_PERMSPELL     (1ull<<27)     // permanent spell (may take mana to keep up)
+//#define IF_PERMSPELL     (1ull<<27)     // 
 #define IF_UNIQUE        (1ull<<28)     // unique item
 #define IF_DONATE        (1ull<<29)     // auto-donate this item
 #define IF_LABYDESTROY   (1ull<<30)     // destroy when leaving labyrinth
@@ -911,7 +1039,7 @@ __attribute__ ((packed));
 #define IF_WHETSTONED    (1ull<<53)     // item was enhanced by a shrine	- Unused, repurpose.
 #define IF_EASEUSE       (1ull<<54)     // item was enhanced by a shrine
 #define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine	- Unused, repurpose.
-#define IF_LEGACY        (1ull<<56)     // item was enhanced by a shrine
+#define IF_LEGACY        (1ull<<56)     // item is old
 #define IF_DUPLICATED    (1ull<<57)     // item was enhanced by a shrine	- Unused, repurpose.
 #define IF_CAN_SS		 (1ull<<58)		// item CAN be soulstoned
 #define IF_CAN_EN		 (1ull<<59)		// item CAN be enchanted (talisman)
@@ -923,7 +1051,9 @@ __attribute__ ((packed));
 #define IF_SELLABLE      (IF_WEAPON|IF_MISC|IF_MAGIC|IF_ARMORS|IF_BOOK|IF_JEWELERY|IF_GEMSTONE)
 #define IF_DIRTY         (IF_SOULSTONE|IF_AUGMENTED|IF_WHETSTONED|IF_EASEUSE|IF_LEGACY|IF_ENCHANTED|IF_CORRUPTED|IF_KWAI_UNI|IF_GORN_UNI|IF_PURP_UNI|IF_UNIQUE)
 
-#define BUFFSIZE         (sizeof(struct item)*MAXBUFF)
+#define BUFFSIZE         (sizeof(struct buff)*MAXBUFF)
+#define OLDITEMSIZE         (sizeof(struct olditem)*MAXITEM)
+#define OLDTITEMSIZE        (sizeof(struct olditem)*MAXTITEM)
 #define ITEMSIZE         (sizeof(struct item)*MAXITEM)
 #define TITEMSIZE        (sizeof(struct item)*MAXTITEM)
 
@@ -932,7 +1062,7 @@ __attribute__ ((packed));
 
 #define NUM_CORR 108
 
-struct item
+struct olditem
 {
 	unsigned char used;             // 1
 	char name[40];                  // 41
@@ -1037,6 +1167,165 @@ struct item
 
 }
 __attribute__ ((packed));
+
+/*************/
+/* New Items */
+/*************/
+
+#define I_I 0	// Inactive item stat
+#define I_A 1	// Active item stat
+#define I_P 2	// Player added stat
+#define I_R 3	// Item Requirement
+
+struct item
+{
+	unsigned char used;				//   1x 1b =    1b // Determines item active state, for data management.
+	unsigned short temp;			//   1x 2b =    3b // Template ID, used for universal item updates.
+	unsigned short orig_temp;		//   1x 2b =    5b // Original template value, if template number is fsr changed.
+	
+	char name[40];					//  40x 1b =   45b // Name of the item
+	char reference[40];				//  40x 1b =   85b // Reference for pickup, ie. "You got <reference>." (a pair of boots)
+	char description[200];			// 200x 1b =  285b // Item description when looked at. "A pair of studded leather boots"
+	
+	unsigned long long flags;		//   1x 8b =  293b // Item "IF_" flag array (64 bits)
+	
+	short sprite[2];				//   2x 4b =  301b // Item sprite value.
+	unsigned char status[2];		//   2x 1b =  303b // Item animation status. Used in svr_effect, but its purpose is unknown.
+	unsigned short sprite_override; //   1x 2b =  305b // used for potions/spells which change the character sprite
+	
+	unsigned char damage_state;		//   1x 1b =  306b // Item age damage state. 0=OK, 4=almost destroyed, 5=destroyed
+	unsigned int max_age[2];		//   2x 4b =  314b // Maximum 'age' score per damage state (from template) [0]=inactive [1]=active
+	unsigned int current_age[2];	//   2x 4b =  322b // Current 'age' score (for item) [0]=inactive [1]=active
+	unsigned int max_damage;		//   1x 4b =  326b // Maximum combat damage per damage state (from template)
+	unsigned int current_damage;	//   1x 4b =  330b // Current combat damage
+	
+	unsigned short x, y;			//   2x 2b =  334b // Current map position		NOTE: x=0, y=0 = void
+	unsigned short carried;			//   1x 2b =  336b // Carried by this character ID
+	
+	unsigned short placement;		//   1x 2b =  338b // Placement bit array for equipment.
+	unsigned char stack;			//   1x 1b =  339b // Item stacking
+	
+	unsigned int duration;			//   1x 4b =  343b // Item duration value, used for buffs
+	unsigned int active;			//   1x 4b =  347b // Currently eclipsed duration, counting up to the value of 'duration'
+	
+	unsigned int value;				//   1x 4b =  351b // Sell value. 1 = 1 silver, 100 = 1 gold.
+	unsigned int power;				//   1x 4b =  355b // Item complexity
+	unsigned int cost;				//   1x 4b =  359b // Residual slot, used for item kill counters
+	unsigned char min_rank;			//   1x 1b =  360b // minimum rank to wear the item
+	
+	char      attrib[5][4];			//  20x 1b =  380b // Mod[0] is the base stat given by an item while equipped.
+	short            hp[4];			//   4x 2b =  388b // Mod[1] is the stat given by an item if the item is active ie. rings
+	short           end[4];			//   4x 2b =  396b // Mod[2] is the stat added to an item by the player. 
+	short          mana[4];			//   4x 2b =  404b //        takes effect for both active and inactive states.
+	char      skill[50][4];			// 200x 1b =  604b // Mod[3] is the minimum value required to equip the item.
+	
+	char         weapon[3];			//   3x 1b =  607b // Weapon Value
+	char          armor[3];			//   3x 1b =  610b // Armor Value
+	char      spell_pow[3];			//   3x 1b =  613b // Added Spell Power Value [new]
+	
+	char     top_damage[3];			//   3x 1b =  616b // Maximum damage bonus for hits
+	char         to_hit[3];			//   3x 1b =  619b // Hit bonus
+	char       to_parry[3];			//   3x 1b =  622b // Parry bonus
+	char     gethit_dam[3];			//   3x 1b =  625b // Damage taken by the attacker
+	
+	short         speed[3];			//   3x 2b =  631b // Base action speed modifier (for haste and slow)
+	char     move_speed[3];			//   3x 1b =  634b // Movement speed bonus
+	char      atk_speed[3];			//   3x 1b =  637b // Attack speed bonus
+	char     cast_speed[3];			//   3x 1b =  640b // Cast speed bonus
+	
+	char      spell_mod[3];			//   3x 1b =  643b // Spell modifier bonus
+	char      spell_apt[3];			//   3x 1b =  646b // Spell aptitude bonus
+	char     cool_bonus[3];			//   3x 1b =  649b // Skill/Spell cooldown bonus
+	char      aoe_bonus[3];			//   3x 1b =  652b // Flat area of Effect bonus
+	
+	char      base_crit[3];			//   3x 1b =  655b // Base crit chance for weapons
+	char    crit_chance[3];			//   3x 1b =  658b // Crit chance bonus
+	char     crit_multi[3];			//   3x 1b =  661b // Crit multiplier bonus
+	
+	char      dmg_bonus[3];			//   3x 1b =  664b // Damage multiplier bonus - Each 1 point is 0.5% bonus.     At 100 points it is a 50% bonus.
+	char  dmg_reduction[3];			//   3x 1b =  667b // Damage reduction bonus  - Each 1 point is 0.5% reduction. At 100 points it is a 50% reduction.
+	
+	unsigned char light[3];			//   3x 1b =  670b // Glow value of the item; produces light
+	
+	short enchantment;				//   1x 2b =  672b // Special effect via talismans
+	short corruption;				//   1x 2b =  674b // Special effect via corruption
+	
+	char freespace[53];				//  53x 1b =  727b // Free slots for future additions
+	
+	unsigned char driver;			//   1x 1b =  728b // Special routines for LOOKSPECIAL and USESPECIAL
+	unsigned int data[10];			//  10x 4b =  768b // Driver data
+}
+__attribute__ ((packed));
+
+
+/*********/
+/* Buffs */
+/*********/
+
+#define BF_UPDATE       (1<<0)
+#define BF_PERMASPELL   (1<<1)
+
+struct buff
+{
+	unsigned char used;				//   1x 1b =    1b // Determines active state, for data management.
+	unsigned short temp;			//   1x 2b =    3b // Buff/debuff source; ie. SK_BLESS
+	
+	char name[40];					//  40x 1b =   43b // Name of the buff/debuff
+	
+	unsigned char flags;			//   1x 1b =   44b // buff/debuff flag array (8 bits)
+	
+	short sprite;					//   1x 4b =   48b // Item sprite value.
+	unsigned short sprite_override; //   1x 2b =   50b // used for potions/spells which change the character sprite
+	
+	unsigned short carried;			//   1x 2b =   52b // Carried by this character ID
+	
+	unsigned char stack;			//   1x 1b =   53b // Buff stacks
+	
+	unsigned int duration;			//   1x 4b =   57b // Item duration value, used for buffs
+	unsigned int active;			//   1x 4b =   61b // Currently eclipsed duration, counting up to the value of 'duration'
+	
+	unsigned int power;				//   1x 4b =   65b // Buff/debuff power
+	
+	char      attrib[5];			//   5x 1b =   70b // For buffs/debuffs, we don't need extra mods. Just one.
+	short      hp, r_hp;			//   2x 2b =   74b // 
+	short    end, r_end;			//   2x 2b =   78b // 
+	short  mana, r_mana;			//   2x 2b =   82b // 
+	char      skill[50];			//  50x 1b =  132b // 
+	
+	char         weapon;			//   1x 1b =  133b // Weapon Value
+	char          armor;			//   1x 1b =  134b // Armor Value
+	char      spell_pow;			//   1x 1b =  135b // Added Spell Power Value [new]
+	
+	char     top_damage;			//   1x 1b =  136b // Maximum damage bonus for hits
+	char         to_hit;			//   1x 1b =  137b // Hit bonus
+	char       to_parry;			//   1x 1b =  138b // Parry bonus
+	char     gethit_dam;			//   1x 1b =  139b // Damage taken by the attacker
+	
+	short         speed;			//   1x 2b =  141b // Base action speed modifier (for haste and slow)
+	char     move_speed;			//   1x 1b =  142b // Movement speed bonus
+	char      atk_speed;			//   1x 1b =  143b // Attack speed bonus
+	char     cast_speed;			//   1x 1b =  144b // Cast speed bonus
+	
+	char      spell_mod;			//   1x 1b =  145b // Spell modifier bonus
+	char      spell_apt;			//   1x 1b =  146b // Spell aptitude bonus
+	char     cool_bonus;			//   1x 1b =  147b // Skill/Spell cooldown bonus
+	char      aoe_bonus;			//   1x 1b =  148b // Flat area of Effect bonus
+	
+	char      base_crit;			//   1x 1b =  149b // Base crit chance for weapons
+	char    crit_chance;			//   1x 1b =  150b // Crit chance bonus
+	char     crit_multi;			//   1x 1b =  151b // Crit multiplier bonus
+	
+	char      dmg_bonus;			//   1x 1b =  152b // Damage multiplier bonus - Each 1 point is 0.5% bonus.     At 100 points it is a 50% bonus.
+	char  dmg_reduction;			//   1x 1b =  153b // Damage reduction bonus  - Each 1 point is 0.5% reduction. At 100 points it is a 50% reduction.
+	
+	unsigned char light;			//   1x 1b =  154b // Glow value of the item; produces light
+	
+	char freespace[6];				//   6x 1b =  160b // Free slots for future additions
+	
+	unsigned int data[10];			//  10x 4b =  200b // Driver data
+}
+__attribute__ ((packed));
+
 
 /***********/
 /* Effects */
@@ -1188,10 +1477,10 @@ extern struct s_splog splog[66];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
-extern struct storage *st;
-extern struct item *bu;
-extern struct item *it;
 extern struct character *ch_temp;
+extern struct storage *st;
+extern struct buff *bu;
+extern struct item *it;
 extern struct item *it_temp;
 extern struct effect *fx;
 extern struct see_map *  see;
@@ -1202,3 +1491,6 @@ extern struct sk_tree sk_corrupt[NUM_CORR];
 
 extern struct newcharacter *ch_new;
 extern struct newcharacter *ch_temp_new;
+
+extern struct olditem *old_it;
+extern struct olditem *old_it_temp;

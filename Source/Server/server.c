@@ -1445,14 +1445,12 @@ int main(int argc, char *args[])
 			unload();
 			exit(0);
 		}
-		/*
 		else if (strcasecmp("copy", args[1])==0)
 		{
-			pop_copy_to_new_chars();
+			pop_copy_to_new_items();
 			unload();
 			exit(0);
 		}
-		*/
 	}
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -1506,11 +1504,42 @@ int main(int argc, char *args[])
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;
-		if (it[n].orig_temp && !it[n].orig_temp)
+		
+		if (it[n].driver==68) // Soulstones
 		{
-			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
-			it[n].max_damage = 100000;
+			it[n].flags &= ~IF_ENCHANTED;
+			it[n].flags &= ~IF_SOULSTONE;
+			//it[n].stack = max(1, min(4, it[n].data[0]/4));
+			randomize_ss_stats(0, n, it[n].stack, -1);
+			it[n].data[0] = -1;
+			it[n].data[1] = 0;
+			it[n].data[2] = 0;
+			it[n].data[3] = 0;
 		}
+		
+		if (it[n].driver==93) // Catalysts
+		{
+			sprintf(it[n].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
+			for (m=0;m<50;m++)
+			{
+				if (it[n].skill[m][I_I])
+				{
+					it[n].skill[m][I_I] = 2;
+					it[n].skill[m][I_R] = 0;
+				}
+			}
+		}
+		
+		if (it[n].driver==92) // Focuses
+		{
+			sprintf(it[n].description, "A soul focus. Can be used on a soulstone to increase its level by 2, but may cause volatile side effects.");
+		}
+		
+//		if (it[n].orig_temp && !it[n].orig_temp)
+//		{
+//			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
+//			it[n].max_damage = 100000;
+//		}
 	}
 	// */ // (^^^ REMOVE AFTER UPDATE!!!)
 
@@ -1535,15 +1564,11 @@ int main(int argc, char *args[])
 	reset_changed_items();
 	
 	/*
-	for (n = 1; n<MAXITEM; n++)
+	for (n = 1; n<MAXTITEM; n++)
 	{
-		if (!it[n].used) continue;
-		if ((it[n].flags & IF_CAN_SS) || (it[n].flags & IF_CAN_EN)) 
-		{
-			it[n].flags &= ~(IF_CAN_SS | IF_CAN_EN);
-			it[n].max_damage = 0;
-			it[n].flags |= IF_NOREPAIR;
-		}
+		if (it_temp[n].used == USE_EMPTY) continue;
+		// (vvv REMOVE AFTER UPDATE!!!)
+		// (^^^ REMOVE AFTER UPDATE!!!)
 	}
 	*/
 	
@@ -1551,21 +1576,10 @@ int main(int argc, char *args[])
 	{
 		int x, y;
 
-		if (!ch_temp[n].used)
-		{
-			continue;
-		}
+		if (!ch_temp[n].used) continue;
 		
-		/* // (vvv REMOVE AFTER UPDATE!!!)
-		for (m=0;m<40;m++)
-		{
-			if (ch_temp[n].olditem[m])
-			{
-				ch_temp[n].item[m] = ch_temp[n].olditem[m];
-				ch_temp[n].olditem[m] = 0;
-			}
-		}
-		*/ // (^^^ REMOVE AFTER UPDATE!!!)
+		// (vvv REMOVE AFTER UPDATE!!!)
+		// (^^^ REMOVE AFTER UPDATE!!!)
 
 		x = ch_temp[n].data[29] % MAPX;
 		y = ch_temp[n].data[29] / MAPX;

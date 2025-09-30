@@ -63,18 +63,12 @@ void step_desertfloor(int cn)
 	}
 	if (n==MAXBUFFS)
 	{
-		in2 = god_create_buff();
-		
+		in2 = god_create_buff(206);
 		strcpy(bu[in2].name, "Heatstroke");
-		strcpy(bu[in2].reference, "heatstroke");
-		strcpy(bu[in2].description, "Heatstroke.");
-		
-		bu[in2].temp = 206;
-		bu[in2].flags = IF_SPELL;
-		bu[in2].sprite[1] = BUF_SPR_HEATSTR;
-		bu[in2].hp[0]   = -50;
-		bu[in2].end[0]  = -50;
-		bu[in2].mana[0] = -25;
+		bu[in2].sprite = BUF_SPR_HEATSTR;
+		bu[in2].r_hp   = -50;
+		bu[in2].r_end  = -50;
+		bu[in2].r_mana = -25;
 		bu[in2].active = bu[in2].duration = TICKS*15;
 		
 		if (add_spell(cn, in2) && !alreadyhave) 
@@ -91,7 +85,7 @@ void step_desertfloor_remove(int cn)
 	if (n==MAXBUFFS) return;
 
 	bu[in2].active = bu[in2].duration = TICKS*15;
-	bu[in2].flags &= ~(IF_PERMSPELL);
+	bu[in2].flags &= ~(BF_PERMASPELL);
 }
 
 void step_vantablack(int cn)
@@ -113,28 +107,25 @@ void step_oppressed(int cn, int fl)
 		if (bu[in].power != fl)
 		{
 			bu[in].power = fl;
-			for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl/2));
-			for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, (fl+1)/2));
+			for (m = 0; m<5; m++) bu[in].attrib[m] = -(min(127, fl/2));
+			for (m = 0; m<50; m++) bu[in].skill[m] = -(min(127, (fl+1)/2));
 			do_char_log(cn, 0, "You feel the pressure on you shift.\n");
 			do_update_char(cn);
 		}
 	}
 	else
 	{
-		in = god_create_buff();
+		in = god_create_buff(SK_OPPRESSED2);
 		
 		strcpy(bu[in].name, "Oppressed");
-		strcpy(bu[in].reference, "oppressed");
-		strcpy(bu[in].description, "oppressed.");
 		
 		bu[in].power = fl;
-		for (m = 0; m<5; m++) bu[in].attrib[m][1] = -(min(127, fl/2));
-		for (m = 0; m<50; m++) bu[in].skill[m][1] = -(min(127, (fl+1)/2));
+		for (m = 0; m<5; m++) bu[in].attrib[m] = -(min(127, fl/2));
+		for (m = 0; m<50; m++) bu[in].skill[m] = -(min(127, (fl+1)/2));
 		
 		bu[in].active = bu[in].duration = 1;
-		bu[in].flags  = IF_SPELL | IF_PERMSPELL;
-		bu[in].temp = SK_OPPRESSED2;
-		bu[in].sprite[1] = min(6780, 6761+fl-1);
+		bu[in].flags  = BF_PERMASPELL;
+		bu[in].sprite = min(6780, 6761+fl-1);
 		
 		add_spell(cn, in);
 		
@@ -170,7 +161,7 @@ void step_dw(int cn)
 			/*
 			if (!(bu[in].power%2))
 			{
-				bu[in].light[1]--;
+				bu[in].light--;
 				do_update_char(cn);
 			}
 			*/
@@ -206,7 +197,7 @@ void step_dw(int cn)
 		else if (in && bu[in].power==1)
 		{
 			bu[in].power = 0;
-			bu[in].light[1] = 0;
+			bu[in].light = 0;
 			do_update_char(cn);
 			
 			reset_go(ch[cn].x, ch[cn].y);
@@ -240,7 +231,7 @@ void step_dw(int cn)
 			
 			fx_add_effect(12, 0, M2X(m), M2Y(m), 0);
 			in2 = build_item(190, M2X(m), M2Y(m));
-			it[in2].light[0] = 60;
+			it[in2].light[I_I] = 60;
 			
 			reset_go(ch[cn].x, ch[cn].y);
 			add_lights(ch[cn].x, ch[cn].y);
@@ -361,8 +352,9 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		{
 			if (IS_IN_SUN(ch[cn].x, ch[cn].y)) 				step_desertfloor(cn); // Heatstroke for lab 6 & Volcano
 			else if (IS_IN_VANTA(ch[cn].x, ch[cn].y)) 		step_vantablack(cn);
-			//else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y)) 	step_oppressed(cn, n);
+			//else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y))	step_oppressed(cn, n);
 			else if (IS_IN_DW(ch[cn].x, ch[cn].y))			step_dw(cn);
+			else if (n = IS_IN_AQUE(ch[cn].x, ch[cn].y))	step_oppressed(cn, n);
 		}
 
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))
@@ -378,11 +370,10 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			return;
 		}
 
-		if (((map[m].flags & MF_NOMAGIC) && !char_wears_item(cn, 466) && !char_wears_item(cn, 481) && 
-			!char_wears_item(cn, IT_AM_TRUESUN)) || (IS_MONSTER(cn) && IS_IN_XIX(ch[cn].x, ch[cn].y)) || 
-			char_wears_item(cn, IT_AM_FALMOON)) // Sun amulet or Dark Sun amulet
+		if (((map[m].flags & MF_NOMAGIC) && !do_get_iflag(cn, SF_AM_SUN)) || do_get_iflag(cn, SF_AM_MOON) ||
+			(IS_MONSTER(cn) && IS_IN_XIX(ch[cn].x, ch[cn].y)))
 		{
-			if (!(ch[cn].flags & CF_NOMAGIC))
+			if (!IS_NOMAGIC(cn))
 			{
 				ch[cn].flags |= CF_NOMAGIC;
 				remove_spells(cn);
@@ -391,7 +382,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		}
 		else
 		{
-			if (ch[cn].flags & CF_NOMAGIC)
+			if (IS_NOMAGIC(cn))
 			{
 				ch[cn].flags &= ~CF_NOMAGIC;
 				do_update_char(cn);
@@ -753,16 +744,16 @@ void plr_pickup(int cn)
 
 		if (it[in].active)
 		{
-			if (it[in].light[1])
+			if (it[in].light[I_A])
 			{
-				do_add_light(x, y, -it[in].light[1]);
+				do_add_light(x, y, -it[in].light[I_A]);
 			}
 		}
 		else
 		{
-			if (it[in].light[0])
+			if (it[in].light[I_I])
 			{
-				do_add_light(x, y, -it[in].light[0]);
+				do_add_light(x, y, -it[in].light[I_I]);
 			}
 		}
 		return;
@@ -800,16 +791,16 @@ void plr_pickup(int cn)
 
 	if (it[in].active)
 	{
-		if (it[in].light[1])
+		if (it[in].light[I_A])
 		{
-			do_add_light(x, y, -it[in].light[1]);
+			do_add_light(x, y, -it[in].light[I_A]);
 		}
 	}
 	else
 	{
-		if (it[in].light[0])
+		if (it[in].light[I_I])
 		{
-			do_add_light(x, y, -it[in].light[0]);
+			do_add_light(x, y, -it[in].light[I_I]);
 		}
 	}
 }
@@ -973,47 +964,47 @@ void plr_drop(int cn)
 		if (tmp>999999)
 		{
 			strcpy(it[in].description, "A huge pile of gold coins");
-			it[in].sprite[0] = 121;
+			it[in].sprite[I_I] = 121;
 		}
 		else if (tmp>99999)
 		{
 			strcpy(it[in].description, "A very large pile of gold coins");
-			it[in].sprite[0] = 120;
+			it[in].sprite[I_I] = 120;
 		}
 		else if (tmp>9999)
 		{
 			strcpy(it[in].description, "A large pile of gold coins");
-			it[in].sprite[0] = 41;
+			it[in].sprite[I_I] = 41;
 		}
 		else if (tmp>999)
 		{
 			strcpy(it[in].description, "A small pile of gold coins");
-			it[in].sprite[0] = 40;
+			it[in].sprite[I_I] = 40;
 		}
 		else if (tmp>99)
 		{
 			strcpy(it[in].description, "Some gold coins");
-			it[in].sprite[0] = 39;
+			it[in].sprite[I_I] = 39;
 		}
 		else if (tmp>9)
 		{
 			strcpy(it[in].description, "A pile of silver coins");
-			it[in].sprite[0] = 38;
+			it[in].sprite[I_I] = 38;
 		}
 		else if (tmp>2)
 		{
 			strcpy(it[in].description, "A few silver coins");
-			it[in].sprite[0] = 37;
+			it[in].sprite[I_I] = 37;
 		}
 		else if (tmp==2)
 		{
 			strcpy(it[in].description, "A couple of silver coins");
-			it[in].sprite[0] = 37;
+			it[in].sprite[I_I] = 37;
 		}
 		else if (tmp==1)
 		{
 			strcpy(it[in].description, "A lonely silver coin");
-			it[in].sprite[0] = 37;
+			it[in].sprite[I_I] = 37;
 		}
 		money = 1;
 
@@ -1039,56 +1030,58 @@ void plr_drop(int cn)
 
 	if (it[in].active)
 	{
-		if (it[in].light[1])
+		if (it[in].light[I_A])
 		{
-			do_add_light(x, y, it[in].light[1]);
+			do_add_light(x, y, it[in].light[I_A]);
 		}
 	}
 	else
 	{
-		if (it[in].light[0])
+		if (it[in].light[I_I])
 		{
-			do_add_light(x, y, it[in].light[0]);
+			do_add_light(x, y, it[in].light[I_I]);
 		}
 	}
 }
 
 void plr_misc(int cn)
 {
+	int surround = 0;
+	
 	switch(ch[cn].status2)
 	{
-		case    0:
-			// Feb 2020 - regular slash does extra surround check if you have surround-speed
-			if (IS_SEYA_OR_WARR(cn))
-				plr_attack(cn, 2);
-			else
-				plr_attack(cn, 0);
+		case  0:
+			if (IS_SEYA_OR_WARR(cn)) surround = 3;
+			plr_attack(cn, surround);
 			break;
-		case    1:
+		case  1:
 			plr_pickup(cn);
 			break;
-		case    2:
+		case  2:
 			plr_drop(cn);
 			break;
-		case    3:
+		case  3:
 			plr_give(cn);
 			break;
-		case    4:
+		case  4:
 			plr_use(cn);
 			break;
-		case    5:
-			plr_attack(cn, 1);
+		case  5:
+			surround = 1;
+			plr_attack(cn, surround);
 			break;
-		case    6:
-			plr_attack(cn, 0);
+		case  6:
+			if (IS_WARRIOR(cn)) surround = 2;
+			if (IS_LYCANTH(cn)) surround = 3;
+			plr_attack(cn, surround);
 			break;
-		case    7:
+		case  7:
 			plr_bow(cn);
 			break;
-		case    8:
+		case  8:
 			plr_wave(cn);
 			break;
-		case    9:
+		case  9:
 			plr_skill(cn);
 			break;
 		default:

@@ -103,7 +103,7 @@ void scriptLoadTemplates()
             it_type = "item";
             it_color = "yellow";
         }
-        printf("item_templates[\"it_temp\" + %d] = new ItemTemp(%d, %d, \"%s\", \"%s\", `%s`);\n", i, i, it_temp[i].sprite[0], it_type, it_color, it_temp[i].name);
+        printf("item_templates[\"it_temp\" + %d] = new ItemTemp(%d, %d, \"%s\", \"%s\", `%s`);\n", i, i, it_temp[i].sprite[I_I], it_type, it_color, it_temp[i].name);
         if (it_temp[i].flags&(IF_MOVEBLOCK)) printf("item_templates[\"it_temp\" + %d].flags.moveblock = true;\n", i);
         if (it_temp[i].flags&(IF_SIGHTBLOCK)) printf("item_templates[\"it_temp\" + %d].flags.sightblock = true;\n", i);
     }
@@ -324,7 +324,7 @@ int main(int argc, char *args[])
                             if (it_temp[in].used == USE_EMPTY) continue;
                             if (it_temp[in].flags&(IF_TAKE|IF_LOOK|IF_LOOKSPECIAL|IF_USE|IF_USESPECIAL)) continue;
 
-                            if (it_temp[in].sprite[0] == map[map_tileid].fsprite) {
+                            if (it_temp[in].sprite[I_I] == map[map_tileid].fsprite) {
                                 printf("tile.item = %d;\n", in);
                                 break;
                             }

@@ -217,7 +217,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) if ((co = map[x + y * MAPX].ch)) if (cn!=co) 
 		if (ch[cn].data[CHD_GROUP]!=ch[co].data[CHD_GROUP])
 	{
-		in = god_create_buff();
+		in = god_create_buff(SK_SLOW3);
 		if (!in)
 		{
 			xlog("god_create_buff failed in npc_shiva_warp_away");
@@ -227,12 +227,10 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 		power = 200;
 
 		strcpy(bu[in].name, "Greater Slow");
-		bu[in].flags |= IF_SPELL;
-		bu[in].temp  = SK_SLOW3;
-		bu[in].sprite[1] = BUF_SPR_SLOW2;
+		bu[in].sprite = BUF_SPR_SLOW2;
 		bu[in].duration  = bu[in].active = TICKS * 4;
 		bu[in].power = power;
-		bu[in].speed[1] 		= -(min(300, 20 + SLOW2FORM(power)));
+		bu[in].speed 		= -(min(300, 20 + SLOW2FORM(power)));
 		
 		do_char_log(co, 0, "You have been badly slowed.\n");
 		
@@ -448,7 +446,7 @@ int npc_shiva_phasing(int cn)
 				//do_hurt(0, co, 999, 0);
 			}
 			
-			in = god_create_buff();
+			in = god_create_buff(666);
 			if (!in)
 			{
 				xlog("god_create_buff failed in npc_shiva_high");
@@ -456,10 +454,8 @@ int npc_shiva_phasing(int cn)
 			}
 
 			strcpy(bu[in].name, "Stun");
-			bu[in].flags |= IF_SPELL;
-			bu[in].sprite[1] = BUF_SPR_WARCRY2;
+			bu[in].sprite = BUF_SPR_WARCRY2;
 			bu[in].duration  = bu[in].active = TICKS*32;
-			bu[in].temp  = 666;
 			bu[in].power = 666;
 			
 			do_char_log(co, 0, "Suddenly, you can't move...!\n");
@@ -484,7 +480,7 @@ int npc_shiva_phasing(int cn)
 		if (in2 = map[606+233*MAPX].it) // Let's lock that door real quick
 		{
 			ch[cn].data[4] = it[in2].data[0];
-			it[in2].active = 0; it[in2].data[5] = TICKS * 60 * 15;
+			it[in2].active = 0; it[in2].data[5] = TICKS * 60 * 15; it[in2].data[6] = cn;
 			reset_go(it[in2].x, it[in2].y); it[in2].flags |= IF_MOVEBLOCK | IF_SIGHTBLOCK; reset_go(it[in2].x, it[in2].y);
 		}
 		

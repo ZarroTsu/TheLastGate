@@ -1355,11 +1355,12 @@ void mouse_mapbox(int x,int y,int state)
 	x+=176-16;
 	y+=8;
 	
-	/*
+	
 	if (screen_windowed == 1) {
 		y+=4;
+		x+=4;
 	}
-	*/
+	
 
 	dist_diff=(screen_renderdist-screen_viewsize)/2;
 

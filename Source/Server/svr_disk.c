@@ -22,15 +22,19 @@
 struct map *map;
 struct mapedit_queue *maped_queue;
 struct character *ch;
-struct newcharacter *ch_new;
-struct storage *st;
-struct item *bu;
-struct item *it;
 struct character *ch_temp;
-struct newcharacter *ch_temp_new;
+struct storage *st;
+struct buff *bu;
+struct item *it;
 struct item *it_temp;
 struct effect *fx;
 struct global *globs;
+
+struct newcharacter *ch_new;
+struct newcharacter *ch_temp_new;
+
+struct olditem *old_it;
+struct olditem *old_it_temp;
 
 /* Extend a file opened with <handle> to <sizereq> by writing blocks of size <sizeone>, optionally from <templ> */
 int extend(int handle, long sizereq, size_t sizeone, void*templ)
@@ -71,270 +75,115 @@ int load(void)
 	struct map tmap;
 
 	/** MAP **/
-	xlog("Loading MAP: Item size=%d, file size=%dK",
-	     sizeof(struct map), MAPSIZE >> 10);
-
+	xlog("Loading MAP: Obj size=%d, file size=%dK", sizeof(struct map), MAPSIZE >> 10);
 	handle = open(DATDIR "/map.dat", O_RDWR);
-	if (handle==-1)
-	{
-		flag = 1;
-		xlog("Building map");
-		handle = open(DATDIR "/map.dat", O_RDWR | O_CREAT, 0600);
-	}
+	if (handle==-1) { flag = 1; xlog("Building map"); handle = open(DATDIR "/map.dat", O_RDWR | O_CREAT, 0600); }
 	bzero(&tmap, sizeof(struct map));
 	tmap.sprite = SPR_GROUND1;
-	if (!extend(handle, MAPSIZE, sizeof(struct map), &tmap))
-	{
-		return -1;
-	}
-
+	if (!extend(handle, MAPSIZE, sizeof(struct map), &tmap)) return -1;
 	map = mmap(NULL, MAPSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (map==(void*)-1)
-	{
-		return -1;
-	}
+	if (map==(void*)-1) return -1;
 	close(handle);
 	
 	/** MAP EDITOR QUEUE **/
-	xlog("Loading MAPED_QUEUE: Item size=%d, file size %dK",
-			sizeof(struct mapedit_queue), MAPED_QUEUE_SIZE>>10);
-
+	xlog("Loading MAPEDQ: Obj size=%d, file size %dK", sizeof(struct mapedit_queue), MAPED_QUEUE_SIZE>>10);
 	handle=open(DATDIR"/mapedQ.dat",O_RDWR);
-	if (handle==-1) {
-			xlog("Building map editor queue");
-			handle=open(DATDIR"/mapedQ.dat",O_RDWR|O_CREAT,0655);
-	}
+	if (handle==-1) { xlog("Building map editor queue"); handle=open(DATDIR"/mapedQ.dat",O_RDWR|O_CREAT,0655); }
 	if (!extend(handle, MAPED_QUEUE_SIZE, sizeof(struct mapedit_queue), &maped_queue)) return -1;
-
 	maped_queue=mmap(NULL,MAPED_QUEUE_SIZE,PROT_READ|PROT_WRITE,MAP_SHARED,handle,0);
 	if (maped_queue==(void*)-1) return -1;
 	close(handle);
 	
 	/** CHAR **/
-	xlog("Loading CHAR: Item size=%d, file size=%dK",
-	     sizeof(struct character), CHARSIZE >> 10);
-
+	xlog("Loading CHAR: Obj size=%d, file size=%dK", sizeof(struct character), CHARSIZE >> 10);
 	handle = open(DATDIR "/char.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building characters");
-		handle = open(DATDIR "/char.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, CHARSIZE, sizeof(struct character), NULL))
-	{
-		return -1;
-	}
-
+	if (handle==-1) { xlog("Building characters"); handle = open(DATDIR "/char.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, CHARSIZE, sizeof(struct character), NULL)) return -1;
 	ch = mmap(NULL, CHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (ch==(void*)-1)
-	{
-		return -1;
-	}
+	if (ch==(void*)-1) return -1;
 	close(handle);
 
 	/** TCHAR **/
-	xlog("Loading TCHAR: Item size=%d, file size=%dK",
-	     sizeof(struct character), TCHARSIZE >> 10);
-
+	xlog("Loading TCHAR: Obj size=%d, file size=%dK", sizeof(struct character), TCHARSIZE >> 10);
 	handle = open(DATDIR "/tchar.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building tcharacters");
-		handle = open(DATDIR "/tchar.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, TCHARSIZE, sizeof(struct character), NULL))
-	{
-		return -1;
-	}
-
+	if (handle==-1) { xlog("Building tcharacters"); handle = open(DATDIR "/tchar.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, TCHARSIZE, sizeof(struct character), NULL)) return -1;
 	ch_temp = mmap(NULL, TCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (ch_temp==(void*)-1)
-	{
-		return -1;
-	}
+	if (ch_temp==(void*)-1) return -1;
 	close(handle);
 	
 	/** STORAGE **/
-	xlog("Loading STORAGE: Item size=%d, file size=%dK",
-	     sizeof(struct storage), STORESIZE >> 10);
-
+	xlog("Loading STORAGE: Obj size=%d, file size=%dK", sizeof(struct storage), STORESIZE >> 10);
 	handle = open(DATDIR "/storage.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building tcharacters");
-		handle = open(DATDIR "/storage.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, STORESIZE, sizeof(struct storage), NULL))
-	{
-		return -1;
-	}
-
+	if (handle==-1)	{ xlog("Building tcharacters"); handle = open(DATDIR "/storage.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, STORESIZE, sizeof(struct storage), NULL)) return -1;
 	st = mmap(NULL, STORESIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (st==(void*)-1)
-	{
-		return -1;
-	}
-	close(handle);
-	
-	// v DELETE LATER v
-	/** NEWCHAR **/
-	/*
-	xlog("Loading NEWCHAR: Item size=%d, file size=%dK",
-	     sizeof(struct newcharacter), NEWCHARSIZE >> 10);
-
-	handle = open(DATDIR "/newchar.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building newcharacters");
-		handle = open(DATDIR "/newchar.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, NEWCHARSIZE, sizeof(struct newcharacter), NULL))
-	{
-		return -1;
-	}
-
-	ch_new = mmap(NULL, NEWCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (ch_new==(void*)-1)
-	{
-		return -1;
-	}
+	if (st==(void*)-1) return -1;
 	close(handle);
 
-	/** NEWTCHAR **/
-	/*
-	xlog("Loading NEWTCHAR: Item size=%d, file size=%dK",
-	     sizeof(struct newcharacter), NEWTCHARSIZE >> 10);
-
-	handle = open(DATDIR "/newtchar.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building newtcharacters");
-		handle = open(DATDIR "/newtchar.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, NEWTCHARSIZE, sizeof(struct newcharacter), NULL))
-	{
-		return -1;
-	}
-
-	ch_temp_new = mmap(NULL, NEWTCHARSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (ch_temp_new==(void*)-1)
-	{
-		return -1;
-	}
-	close(handle); 
-	*/
-	// ^ DELETE LATER ^
-
-	/** BUFF - 3/11/2021 **/
-	xlog("Loading BUFF: Item size=%d, file size=%dK",
-	     sizeof(struct item), BUFFSIZE >> 10);
-
+	/** BUFF **/
+	xlog("Loading BUFF: Obj size=%d, file size=%dK", sizeof(struct buff), BUFFSIZE >> 10);
 	handle = open(DATDIR "/buff.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building buffs");
-		handle = open(DATDIR "/buff.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, BUFFSIZE, sizeof(struct item), NULL))
-	{
-		return -1;
-	}
-
-
+	if (handle==-1) { xlog("Building buffs"); handle = open(DATDIR "/buff.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, BUFFSIZE, sizeof(struct buff), NULL)) return -1;
 	bu = mmap(NULL, BUFFSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (bu==(void*)-1)
-	{
-		return -1;
-	}
+	if (bu==(void*)-1) return -1;
 	close(handle);
+
+	// temp
+	/** OLDITEM **/
+	xlog("Loading OLDITEM: Obj size=%d, file size=%dK", sizeof(struct olditem), OLDITEMSIZE >> 10);
+	handle = open(DATDIR "/olditem.dat", O_RDWR);
+	if (handle==-1) { xlog("Building old items"); handle = open(DATDIR "/olditem.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, OLDITEMSIZE, sizeof(struct olditem), NULL)) return -1;
+	old_it = mmap(NULL, OLDITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (old_it==(void*)-1) return -1;
+	close(handle);
+
+	/** OLDTITEM **/
+	xlog("Loading OLDTITEM: Obj size=%d, file size=%dK", sizeof(struct olditem), OLDTITEMSIZE >> 10);
+	handle = open(DATDIR "/oldtitem.dat", O_RDWR);
+	if (handle==-1) { xlog("Building old titems"); handle = open(DATDIR "/oldtitem.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, OLDTITEMSIZE, sizeof(struct olditem), NULL)) return -1;
+	old_it_temp = mmap(NULL, OLDTITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+	if (old_it_temp==(void*)-1) return -1;
+	close(handle);
+	// temp
 
 	/** ITEM **/
-	xlog("Loading ITEM: Item size=%d, file size=%dK",
-	     sizeof(struct item), ITEMSIZE >> 10);
-
+	xlog("Loading ITEM: Obj size=%d, file size=%dK", sizeof(struct item), ITEMSIZE >> 10);
 	handle = open(DATDIR "/item.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building items");
-		handle = open(DATDIR "/item.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, ITEMSIZE, sizeof(struct item), NULL))
-	{
-		return -1;
-	}
-
-
+	if (handle==-1) { xlog("Building items"); handle = open(DATDIR "/item.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, ITEMSIZE, sizeof(struct item), NULL)) return -1;
 	it = mmap(NULL, ITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (it==(void*)-1)
-	{
-		return -1;
-	}
+	if (it==(void*)-1) return -1;
 	close(handle);
 
 	/** TITEM **/
-	xlog("Loading TITEM: Item size=%d, file size=%dK",
-	     sizeof(struct item), TITEMSIZE >> 10);
-
+	xlog("Loading TITEM: Obj size=%d, file size=%dK", sizeof(struct item), TITEMSIZE >> 10);
 	handle = open(DATDIR "/titem.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building titems");
-		handle = open(DATDIR "/titem.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, TITEMSIZE, sizeof(struct item), NULL))
-	{
-		return -1;
-	}
-
+	if (handle==-1) { xlog("Building titems"); handle = open(DATDIR "/titem.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, TITEMSIZE, sizeof(struct item), NULL)) return -1;
 	it_temp = mmap(NULL, TITEMSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (it==(void*)-1)
-	{
-		return -1;
-	}
+	if (it_temp==(void*)-1) return -1;
 	close(handle);
 
 	/** EFFECT **/
-	xlog("Loading EFFECT: Item size=%d, file size=%dK",
-	     sizeof(struct effect), EFFECTSIZE >> 10);
-
+	xlog("Loading EFFECT: Obj size=%d, file size=%dK", sizeof(struct effect), EFFECTSIZE >> 10);
 	handle = open(DATDIR "/effect.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building effects");
-		handle = open(DATDIR "/effect.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, EFFECTSIZE, sizeof(struct effect), NULL))
-	{
-		return -1;
-	}
-
+	if (handle==-1) { xlog("Building effects"); handle = open(DATDIR "/effect.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, EFFECTSIZE, sizeof(struct effect), NULL)) return -1;
 	fx = mmap(NULL, EFFECTSIZE, PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (fx==(void*)-1)
-	{
-		return -1;
-	}
+	if (fx==(void*)-1) return -1;
 	close(handle);
 
 	/** GLOBS **/
-	xlog("Loading GLOBS: Item size=%d, file size=%db",
-	     sizeof(struct global), sizeof(struct global));
-
+	xlog("Loading GLOBS: Obj size=%d, file size=%db", sizeof(struct global), sizeof(struct global));
 	handle = open(DATDIR "/global.dat", O_RDWR);
-	if (handle==-1)
-	{
-		xlog("Building globals");
-		handle = open(DATDIR "/global.dat", O_RDWR | O_CREAT, 0600);
-	}
-	if (!extend(handle, GLOBSIZE, sizeof(struct global), NULL))
-	{
-		return -1;
-	}
-
+	if (handle==-1) { xlog("Building globals"); handle = open(DATDIR "/global.dat", O_RDWR | O_CREAT, 0600); }
+	if (!extend(handle, GLOBSIZE, sizeof(struct global), NULL)) return -1;
 	globs = mmap(NULL, sizeof(struct global), PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
-	if (globs==(void*)-1)
-	{
-		return -1;
-	}
+	if (globs==(void*)-1) return -1;
 	close(handle);
 
 	return 0;
@@ -431,40 +280,15 @@ void flush(void)
 void unload(void)
 {
 	xlog("Unloading data files");
-	if (munmap(map, MAPSIZE))
-	{
-		xlog("ERROR: munmap(map) %s", strerror(errno));
-	}
-	if (munmap(ch, CHARSIZE))
-	{
-		xlog("ERROR: munmap(ch) %s", strerror(errno));
-	}
-	if (munmap(bu, BUFFSIZE))
-	{
-		xlog("ERROR: munmap(bu) %s", strerror(errno));
-	}
-	if (munmap(it, ITEMSIZE))
-	{
-		xlog("ERROR: munmap(it) %s", strerror(errno));
-	}
-	if (munmap(ch_temp, TCHARSIZE))
-	{
-		xlog("ERROR: munmap(ch_temp) %s", strerror(errno));
-	}
-	if (munmap(it_temp, TITEMSIZE))
-	{
-		xlog("ERROR: munmap(it_temp) %s", strerror(errno));
-	}
-	if (munmap(fx, EFFECTSIZE))
-	{
-		xlog("ERROR munmap(fx) %s", strerror(errno));
-	}
-	if (munmap(globs, sizeof(struct global)))
-	{
-		xlog("ERROR: munmap(globs) %s", strerror(errno));
-	}
-	if (munmap(maped_queue,MAPED_QUEUE_SIZE)) 
-	{
-		xlog("ERROR: munmap(maped_queue) %s",strerror(errno));
-	}
+	if (munmap(map, MAPSIZE))					{ xlog("ERROR: munmap(map) %s", strerror(errno)); }
+	if (munmap(ch, CHARSIZE))					{ xlog("ERROR: munmap(ch) %s", strerror(errno)); }
+	if (munmap(ch_temp, TCHARSIZE))				{ xlog("ERROR: munmap(ch_temp) %s", strerror(errno)); }
+	if (munmap(bu, BUFFSIZE))					{ xlog("ERROR: munmap(bu) %s", strerror(errno)); }
+	if (munmap(it, ITEMSIZE))					{ xlog("ERROR: munmap(it) %s", strerror(errno)); }
+	if (munmap(it_temp, TITEMSIZE))				{ xlog("ERROR: munmap(it_temp) %s", strerror(errno)); }
+	if (munmap(old_it, OLDITEMSIZE))			{ xlog("ERROR: munmap(old_it) %s", strerror(errno)); }
+	if (munmap(old_it_temp, OLDTITEMSIZE))		{ xlog("ERROR: munmap(old_it_temp) %s", strerror(errno)); }
+	if (munmap(fx, EFFECTSIZE))					{ xlog("ERROR: munmap(fx) %s", strerror(errno)); }
+	if (munmap(globs, sizeof(struct global)))	{ xlog("ERROR: munmap(globs) %s", strerror(errno)); }
+	if (munmap(maped_queue,MAPED_QUEUE_SIZE)) 	{ xlog("ERROR: munmap(maped_queue) %s",strerror(errno)); }
 }

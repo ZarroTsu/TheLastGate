@@ -320,16 +320,22 @@ struct area area[] = {
 	{ 968,  460,  976,  470, "Platinum Mines II",              1},
 	{ 977,  460, 1004,  534, "Platinum Mines II",              1},
 	{ 296,  587,  324,  597, "Jungle Pents, Approach",         1},
-	{  97,  489,  134,  625, "The Emerald Cavern",             0},
-	{ 135,  489,  144,  513, "The Emerald Cavern",             0},
-	{ 145,  489,  155,  503, "The Emerald Cavern",             0},
-	{ 135,  551,  177,  701, "The Emerald Cavern",             0},
+	{ 141,  551,  177,  576, "The Emerald Cavern",             0},
+	{ 119,  577,  134,  617, "The Emerald Cavern",             0},
+	{ 135,  577,  177,  701, "The Emerald Cavern",             0},
 	{ 186,  534,  200,  542, "The Emerald Cavern",             0},
 	{ 178,  543,  200,  550, "The Emerald Cavern",             0},
 	{ 178,  551,  200,  684, "The Emerald Cavern",             0},
 	{ 178,  685,  187,  690, "The Emerald Cavern",             0},
 	{ 201,  599,  301,  684, "The Emerald Cavern",             0},
 	{ 302,  599,  309,  679, "The Emerald Cavern",             0},
+	{  97,  489,  134,  576, "The Emerald Catacomb",           0},
+	{ 135,  489,  144,  511, "The Emerald Catacomb",           0},
+	{ 145,  489,  155,  503, "The Emerald Catacomb",           0},
+	{ 135,  512,  141,  515, "The Emerald Catacomb",           0},
+	{ 135,  551,  140,  576, "The Emerald Catacomb",           0},
+	{  97,  577,  118,  617, "The Emerald Catacomb",           0},
+	{  97,  618,  134,  639, "The Emerald Catacomb",           0},
 	{ 151,  419,  200,  488, "The Emerald Valley",             3},
 	{ 156,  489,  200,  503, "The Emerald Valley",             3},
 	{ 145,  504,  200,  513, "The Emerald Valley",             3},
@@ -417,28 +423,28 @@ struct area area[] = {
 	{ 660,  828,  670,  839, "Soyala's House",                 0},
 	{ 661,  844,  670,  856, "Runa's House",                   0},
 	{ 660,  860,  670,  871, "Zephan's House",                 0},
-//	{ 681,  803,  689,  816, "A's House",                      0},
+	{ 681,  803,  689,  816, "Ichi's House",                   0},
 	{ 692,  772,  701,  784, "Vincent's House",                0},
-//	{ 690,  789,  701,  799, "C's House",                   0},
-//	{ 693,  803,  701,  816, "D's House",                   0},
-	{ 713,  772,  723,  783, "Blanche's House",                   0},
-//	{ 713,  789,  722,  801, "F's House",                   0},
-//	{ 720,  828,  730,  839, "G's House",                   0},
+	{ 690,  789,  701,  799, "Marle's House",                  0},
+	{ 693,  803,  701,  816, "Belle's House",                  0},
+	{ 713,  772,  723,  783, "Blanche's House",                0},
+	{ 713,  789,  722,  801, "Calliope's House",               0},
+	{ 720,  828,  732,  837, "Ralphy Realty",                  0},
 //	{ 757,  841,  767,  852, "H's House",                   0},
 	{ 769,  807,  781,  816, "Hamako's House",                 0},
-//	{ 773,  828,  785,  837, "'s House",                    0},
-//	{ 811,  828,  823,  837, "K's House",                   0},
+	{ 773,  828,  785,  837, "Blacksmith",                     0},
+	{ 811,  828,  823,  837, "Gilligan's House",               0},
 	{ 814,  844,  823,  856, "Jabilo's House",                 0},
 	{ 813,  860,  823,  871, "Brye's House",                   0},
 	{ 835,  860,  845,  871, "Caine's House",                  0},
-//	{ 835,  846,  846,  856, "O's House",                   0},
-//	{ 835,  828,  844,  840, "P's House",                   0},
+	{ 835,  846,  846,  856, "Solaire's House",                0},
+	{ 835,  828,  844,  840, "Luna's House",                   0},
 	{ 835,  804,  844,  816, "Charlotte's House",              0},
 	{ 835,  789,  845,  800, "Marco's House",                  0},
-//	{ 835,  773,  845,  784, "S's House",                   0},
-//	{ 835,  758,  846,  768, "T's House",                   0},
-//	{ 835,  742,  846,  752, "U's House",                   0},
-//	{ 835,  724,  845,  735, "V's House",                   0},
+	{ 835,  773,  845,  784, "Marshall's House",               0},
+	{ 835,  758,  846,  768, "Trafalgar's House",              0},
+	{ 835,  742,  846,  752, "Kid's House",                    0},
+	{ 835,  724,  845,  735, "Danica's House",                 0},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 814,  885,  876,  942, "The Violet Bog",                 0},
 	{ 821,  943,  876,  950, "The Violet Bog",                 0},
@@ -477,6 +483,39 @@ struct area area[] = {
 	{ 630,  889,  676,  972, "Hidden Village",                 1},
 	{ 677,  889,  686, 1003, "Hidden Village",                 1},
 	{ 630,  973,  676, 1003, "Seppuku House",                  1},
+	{ 439,  843,  443,  877, "Northern Tundra",                1},
+	{ 444,  837,  463,  877, "Northern Tundra",                1},
+	{ 464,  839,  472,  877, "Northern Tundra",                1},
+	{ 470,  795,  472,  829, "Northern Tundra",                1},
+	{ 473,  785,  535,  877, "Northern Tundra",                1},
+	{ 536,  785,  540,  817, "Northern Tundra",                1},
+	{ 536,  827,  540,  877, "Northern Tundra",                1},
+	{ 467,  825,  469,  829, "Broken Battlement",              1},
+	{ 464,  830,  472,  838, "Broken Battlement",              1},
+	{ 427,  832,  463,  836, "Broken Battlement",              1},
+	{ 427,  837,  443,  842, "Broken Battlement",              1},
+	{ 431,  878,  476,  886, "The Edge of the World",          3},
+	{ 421,  887,  476,  928, "The Edge of the World",          3},
+	{ 409,  929,  476,  933, "The Edge of the World",          3},
+	{ 364,  934,  476, 1003, "The Edge of the World",          3},
+	{ 355,  943,  363, 1003, "The Edge of the World",          3},
+	{ 311,  948,  354, 1003, "The Edge of the World",          3},
+	{ 422,  800,  423,  825, "Aemon's Castle, Approach",       3},
+	{ 424,  797,  426,  828, "Aemon's Castle, Approach",       3},
+	{ 427,  794,  463,  831, "Aemon's Castle, Approach",       3},
+	{ 464,  794,  469,  825, "Aemon's Castle, Approach",       3},
+	{ 424,  784,  426,  796, "Aemon's Castle, Courtyard",      3},
+	{ 418,  784,  423,  799, "Aemon's Castle, Courtyard",      3},
+	{ 413,  789,  417,  793, "Aemon's Castle, Courtyard",      3},
+	{ 408,  794,  417,  799, "Aemon's Castle, Courtyard",      3},
+	{ 408,  800,  421,  825, "Aemon's Castle, Courtyard",      3},
+	{ 408,  826,  423,  844, "Aemon's Castle, Courtyard",      3},
+	{ 424,  829,  426,  842, "Aemon's Castle, Courtyard",      3},
+	{ 411,  845,  423,  857, "Aemon's Castle, Courtyard",      3},
+	{ 408,  858,  423,  876, "Aemon's Castle, Courtyard",      3},
+	{ 424,  843,  438,  876, "Aemon's Castle, Courtyard",      3},
+	{ 413,  877,  417,  881, "Aemon's Castle, Courtyard",      3},
+	{ 418,  877,  430,  886, "Aemon's Castle, Courtyard",      3},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 852,  720,  924,  836, "The Raging Rivers",              3},
 	{ 871,  837,  924,  840, "The Raging Rivers",              3},
@@ -487,6 +526,46 @@ struct area area[] = {
 	{ 852,  848,  894,  855, "The Widow's Nest",               0},
 	{ 852,  856,  924,  877, "The Widow's Nest",               0},
 	{ 864,  630,  924,  719, "Wellspring Chasm",               1},
+	{ 925,  711,  943,  720, "Southern Shore",                 1},
+	{ 925,  721,  951,  727, "Southern Shore",                 1},
+	{ 925,  728,  967,  730, "Southern Shore",                 1},
+	{ 991,  721,  995,  727, "Southern Shore",                 1},
+	{ 985,  728,  995,  730, "Southern Shore",                 1},
+	{ 925,  731,  995,  808, "Southern Shore",                 1},
+	{ 925,  809,  980,  879, "Southern Shore",                 1},
+	{ 925,  880,  933,  946, "Southern Shore",                 1},
+	{ 934,  880,  947,  973, "Southern Shore",                 1},
+	{ 948,  880,  951,  982, "Southern Shore",                 1},
+	{ 952,  880, 1004, 1002, "Southern Shore",                 1},
+	{ 971,  912,  993,  935, "Pier",                           1},
+	{ 925,  630,  943,  710, "Coastal Cave",                   1},
+	{ 944,  630,  995,  720, "Coastal Cave",                   1},
+	{ 952,  721,  990,  727, "Coastal Cave",                   1},
+	{ 965,  728,  984,  730, "Coastal Cave",                   1},
+	{ 981,  809, 1005,  865, "Pirate's Galleon",               1},
+	{ 290, 1135,  312, 1217, "Pirate's Galleon",               1},
+//   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
+	{ 189, 1359,  321, 1377, "The Aqueduct, Depth 0",          0},
+	{ 189, 1378,  321, 1396, "The Aqueduct, Depth I",          0},
+	{ 189, 1397,  321, 1415, "The Aqueduct, Depth II",         0},
+	{ 189, 1416,  321, 1434, "The Aqueduct, Depth III",        0},
+	{ 189, 1435,  321, 1453, "The Aqueduct, Depth IV",         0},
+	{ 235, 1454,  321, 1472, "The Aqueduct, Depth V",          0},
+	{ 235, 1473,  321, 1491, "The Aqueduct, Depth VI",         0},
+	{ 235, 1492,  321, 1510, "The Aqueduct, Depth VII",        0},
+	{ 235, 1511,  321, 1529, "The Aqueduct, Depth VIII",       0},
+	{ 235, 1530,  321, 1548, "The Aqueduct, Depth IX",         0},
+	{ 235, 1549,  321, 1567, "The Aqueduct, Depth X",          0},
+	{ 268, 1587,  434, 1753, "Untainted Island",               1},
+	{ 286, 1075,  312, 1110, "Untainted Island",               1},
+	{ 300, 1654,  320, 1669, "Pier",                           1},
+	{ 296, 1724,  303, 1750, "Cavern",                         1},
+	{ 304, 1719,  320, 1753, "Cavern",                         1},
+	{ 321, 1712,  338, 1753, "Cavern",                         1},
+	{ 339, 1713,  351, 1734, "Cavern",                         1},
+	{ 286, 1075,  312, 1110, "Underground",                    1},
+	{ 339, 1735,  375, 1753, "Sun Temple",                     1},
+	{ 416, 1658,  434, 1694, "Moon Temple",                    1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 658,  344,  730,  461, "Novice Pentagram Quest",         1},
 	{ 307,  445,  441,  586, "Earth Pentagram Quest",          1},
@@ -617,66 +696,53 @@ char *get_area(int cn, int verbose)
 {
 	int n, flag = 0;
 	static char buf[512];
+	char con[49];
 
 	buf[0] = 0;
 
-	if (cn<1 || cn>=MAXCHARS)
-	{
-		return( buf);
-	}
+	if (cn<1 || cn>=MAXCHARS) return buf;
 
-	for (n = 0; n<sizeof(area) / sizeof(area[0]); n++)
+	if (IS_IN_PLHZONE(cn))
+	{
+		for (n = 1; n<MAXCHARS; n++)
+		{
+			if (!ch[n].house_id) continue;
+			if (ch[n].house_id-1 == (ch[cn].x-PLH_X)/PLH_SIZE * PLH_WIDTH + (ch[cn].y-PLH_Y)/PLH_SIZE)
+			{
+				sprintf(con, "%s's House", ch[n].name);
+				strcat(buf, con);
+				break;
+			}
+		}
+	}
+	else for (n = 0; n<sizeof(area) / sizeof(area[0]); n++)
 	{
 		if (ch[cn].x>=area[n].x1 && ch[cn].y>=area[n].y1 &&
 		    ch[cn].x<=area[n].x2 && ch[cn].y<=area[n].y2)
 		{
 			if (verbose)
 			{
-				if (!flag)
-				{
-					strcat(buf, "In ");
-					flag = 1;
-				}
-				else
-				{
-					strcat(buf, ", in ");
-				}
-				if (area[n].flag==1)
-				{
-					strcat(buf, "the ");
-				}
-				else if (area[n].flag==2)
-				{
-					strcat(buf, "on ");
-				}
-				else if (area[n].flag==3)
-				{
-					strcat(buf, "at ");
-				}
+				if (!flag) {              strcat(buf, "In "); flag = 1; }
+				else                      strcat(buf, ", in ");
+				if (area[n].flag==1)      strcat(buf, "the ");
+				else if (area[n].flag==2) strcat(buf, "on ");
+				else if (area[n].flag==3) strcat(buf, "at ");
 				strcat(buf, area[n].name);
 			}
 			else
 			{
-				if (!flag)
-				{
-					flag = 1;
-				}
-				else
-				{
-					strcat(buf, ", ");
-				}
+				if (!flag) flag = 1;
+				else strcat(buf, ", ");
 				strcat(buf, area[n].name);
 			}
 			if (area[n].y1==1025 && area[n].y2==1590)
 			{
-				char con[8];
 				sprintf(con, "%d", CONT_NUM(cn));
 				strcat(buf, con);
 			}
 		}
 	}
-
-	return(buf);
+	return buf;
 }
 
 //return the area description for x,y
@@ -694,44 +760,21 @@ char *get_area_m(int x, int y, int verbose)
 		{
 			if (verbose)
 			{
-				if (!flag)
-				{
-					strcat(buf, "in ");
-					flag = 1;
-				}
-				else
-				{
-					strcat(buf, ", in ");
-				}
-				if (area[n].flag==1)
-				{
-					strcat(buf, "the ");
-				}
-				else if (area[n].flag==2)
-				{
-					strcat(buf, "on ");
-				}
-				else if (area[n].flag==3)
-				{
-					strcat(buf, "at ");
-				}
+				if (!flag) {              strcat(buf, "in "); flag = 1; }
+				else                      strcat(buf, ", in ");
+				if (area[n].flag==1)      strcat(buf, "the ");
+				else if (area[n].flag==2) strcat(buf, "on ");
+				else if (area[n].flag==3) strcat(buf, "at ");
 				strcat(buf, area[n].name);
 			}
 			else
 			{
-				if (!flag)
-				{
-					flag = 1;
-				}
-				else
-				{
-					strcat(buf, ", ");
-				}
+				if (!flag) flag = 1;
+				else strcat(buf, ", ");
 				strcat(buf, area[n].name);
 			}
 		}
 	}
-
 	return(buf);
 }
 
@@ -743,3 +786,4 @@ char *get_area_truncated(int cn)
 	
 	return buf;
 }
+
