@@ -720,3 +720,4 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Envious *",                   "+1 Spell Modifier per empty ring slot.",		// *
 	  6708,                            "" }
 };
+

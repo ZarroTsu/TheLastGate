@@ -2832,6 +2832,8 @@ int use_scroll_C(int cn, int in)
 		ch[cn].tree_node[n] = 0;
 	}
 	
+	plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
+	
 	if (m)	do_char_log(cn, 1, "You used the scroll of cleansing. The corruption leaves your body.\n");
 	else	do_char_log(cn, 1, "You used the scroll of cleansing. You feel refreshed.\n");
 	
@@ -2878,7 +2880,7 @@ int use_scroll_O(int cn, int in)
 	}
 	else
 	{
-		if (ch[cn].os_tree==0) plr_update_tree_terminology(nr, SV_TERM_CTREE);
+		if (ch[cn].os_tree==0) plr_update_tree_terminology(ch[cn].player, SV_TERM_CTREE);
 		do_char_log(cn, 1, "You used the scroll of binding. You gained 1 Contract Skill Point.\n");
 		ch[cn].os_tree++;
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);

@@ -17151,6 +17151,7 @@ void do_treeupdate(int cn, int nr)
 		if (n)
 		{
 			ch[cn].tree_node[nr] = n;
+			plr_update_treenode_terminology(ch[cn].player, 0, nr);
 			do_char_log(cn, 4, "You feel changed.\n");
 			char_play_sound(cn, ch[cn].sound + 25, -100, 0);
 			do_update_char(cn);
