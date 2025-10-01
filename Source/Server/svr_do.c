@@ -17045,7 +17045,7 @@ void do_treeupdate(int cn, int nr)
 	{
 		nr -= 48;
 		do_char_log(cn, 5, "%s\n", sk_tree[m][nr].name);
-		do_char_log(cn, 1, "%s\n", sk_tree[m][nr].desc);
+		do_char_log(cn, 1, "%s%s\n", sk_tree[m][nr].dsc1, sk_tree[m][nr].dsc2);
 		if (T_OS_TREE(cn, nr+1))
 			do_char_log(cn, 4, "SHIFT + Left click to de-allocate for 1000G.\n");
 		else
@@ -17134,12 +17134,12 @@ void do_treeupdate(int cn, int nr)
 		if (n = ch[cn].tree_node[nr])
 		{
 			do_char_log(cn, 5, "%s\n", sk_corrupt[n-1].name);
-			do_char_log(cn, 1, "%s\n", sk_corrupt[n-1].desc);
+			do_char_log(cn, 1, "%s%s\n", sk_corrupt[n-1].dsc1, sk_corrupt[n-1].dsc2);
 		}
 		else
 		{
 			do_char_log(cn, 5, "%s\n", sk_tree[m][nr].name);
-			do_char_log(cn, 1, "%s\n", sk_tree[m][nr].desc);
+			do_char_log(cn, 1, "%s%s\n", sk_tree[m][nr].dsc1, sk_tree[m][nr].dsc2);
 		}
 		if (T_SK(cn, nr+1))
 			do_char_log(cn, 4, "SHIFT + Left click to de-allocate for 1000G.\n");

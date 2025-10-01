@@ -566,267 +566,34 @@ struct skilltab _skilltab[55] = {
 				{ 0, 0, 0 }}
 };
 
-struct sk_tree sk_tree[10][12]={
-	{	// Seyan'du
-		{ "Sharpness", 				"+2 to Weapon Value.", 	// W
-		  6601,						"" },
-		{ "Expertise", 				"+2 to All Attributes.", 	// N
-		  6602,						"" },
-		{ "Toughness", 				"+2 to Armor Value.", 	// E
-		  6603,						"" },
-		{ "Absolution", 			"0.5%% more damage dealt for each buff", 	// WS
-		  6604,						"or debuff on you." },
-		{ "Vanquisher", 			"6%% more total Weapon Value.", 	// WW
-		  6605,						"" },
-		{ "Scorn", 					"Your debuffs ignore 20%% of enemy", 	// WN
-		  6606,						"Resistance." },
-		{ "Determination", 			"Gain 1 additional Hit and Parry for", 	// NW
-		  6607,						"every 100 total Attributes." },
-		{ "Jack of All Trades", 	"4%% increased total Attributes.", 	// NN
-		  6608,						"" },
-		{ "Redemption", 			"Companions have Hit and Parry scores", 	// NE
-		  6609,						"equal to yours, and learn Regen." },
-		{ "Enigmatic", 				"20%% reduced effect of debuffs on you.", 	// EN
-		  6610,						"" },
-		{ "Steelskin", 				"6%% more total Armor Value.", 	// EE
-		  6611,						"" },
-		{ "Penance", 				"0.5%% less damage taken for each buff", 	// ES
-		  6612,						"or debuff on you." }
-	}, // "         '         '  ",	"         '         '         '         "
-	{	// Arch Templar
-		{ "Spiked", 				"+5 to Thorns.", 	// W
-		  6613,						"" },
-		{ "Might", 					"+4 to Strength.", 	// N
-		  6614,						"" },
-		{ "Bulwark", 				"+3 to Armor Value.", 	// E
-		  6615,						"" },
-		{ "Serrated Blades", 		"Cleave deals additional damage based on", 	// WS
-		  6616,						"your total Thorns." },
-		{ "Sharkskin", 				"20%% more total Thorns.", 	// WW
-		  6617,						"" },
-		{ "Retaliation", 			"Your Thorns can now trigger on a", 	// WN
-		  6618,						"parried hit with 10%% power." },
-		{ "Overlord", 				"0.5%% more effect of Warcry and Rally", 	// NW
-		  6619,						"for every 10 total Strength." },
-		{ "Overwhelming Strength", 	"3%% increased total Strength.", 	// NN
-		  6620,						"+10 to Strength Limit." },
-		{ "Censure", 				"Taunt reduces enemy Hit score by 5%%", 	// NE
-		  6621,						"for its duration." },
-		{ "Bastion", 				"20%% of total Resistance is granted as", 	// EN
-		  6622,						"extra Immunity." },
-		{ "Unbreakable", 			"9%% more total Armor Value.", 	// EE
-		  6623,						"" },
-		{ "Rampart", 				"50%% more Parry granted by your Shield", 	// ES
-		  6624,						"skill." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Skald
-		{ "Muscle", 				"+3 to Weapon Value.", 	// W
-		  6625,						"" },
-		{ "Dexterity", 				"+4 to Agility.", 	// N
-		  6626,						"" },
-		{ "Persistance", 			"+20 Endurance.", 	// E
-		  6627,						"" },
-		{ "Nocturne", 				"20%% increased effect of Aria.", 	// WS
-		  6628,						"" },
-		{ "Valor", 					"9%% more total Weapon Value.", 	// WW
-		  6629,						"" },
-		{ "Enthusiasm", 			"Your Aria additionally grants nearby", 	// WN
-		  6630,						"allies 10%% of your Weapon Value." },
-		{ "Slaying", 				"+3%% Critical Multiplier for every 10", 	// NW
-		  6631,						"total Agility." },
-		{ "Overwhelming Agility", 	"3%% increased total Agility.", 	// NN
-		  6632,						"+10 to Agility Limit." },
-		{ "Acumen", 				"All melee skills use the attributes", 	// NE
-		  6633,						"(STR+BRV/2) + Agility + Agility." },
-		{ "Impact", 				"Weaken and Crush also reduce enemy damage", 	// EN
-		  6634,						"multiplier and damage reduction." },
-		{ "Perseverance", 			"20%% more total Endurance.", 	// EE
-		  6635,						"" },
-		{ "Tenacity", 				"20%% of damage taken is dealt to your", 	// ES
-		  6636,						"Endurance instead." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Warrior
-		{ "Rapidity", 				"+5 to Attack Speed.", 	// W
-		  6637,						"" },
-		{ "Ruffian", 				"+3 to Strength & +3 to Agility.", 	// N
-		  6638,						"" },
-		{ "Passion", 				"+5 to Spell Aptitude.", 	// E
-		  6639,						"" },
-		{ "Alacrity", 				"Zephyr deals 20%% more damage.", 	// WS
-		  6640,						"" },
-		{ "Swiftness", 				"10%% more total Attack Speed.", 	// WW
-		  6641,						"" },
-		{ "Intensity", 				"+2 to Spell Modifier.", 	// WN
-		  6642,						"" },
-		{ "Antagonizer", 			"0.5%% more effect of Blind and Douse", 	// NW
-		  6643,						"for every 10 total Agility." },
-		{ "Harrier", 				"3%% increased total Agility and", 	// NN
-		  6644,						"Strength." },
-		{ "Butchery", 				"0.5%% more effect of Cleave for every", 	// NE
-		  6645,						"10 total Strength." },
-		{ "Champion", 				"Enemies beside and behind you no longer", 	// EN
-		  6646,						"gain a bonus to hitting you." },
-		{ "Zealotry", 				"20%% more total Spell Aptitude.", 	// EE
-		  6647,						"" },
-		{ "Fervor", 				"20%% of Spell Aptitude is used to reduce", 	// ES
-		  6648,						"the strength of incoming enemy spells." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Sorcerer
-		{ "Expansiveness", 			"+1 to Area of Effect.", 	// W
-		  6649,						"" },
-		{ "Potency", 				"+3 to Willpower & +3 to Intuition.", 	// N
-		  6650,						"" },
-		{ "Quickstep", 				"+5 to Movement Speed.", 	// E
-		  6651,						"" },
-		{ "Tormenter", 				"Poison deals damage 20%% faster.", 	// WS
-		  6652,						"" },
-		{ "Grandiosity", 			"20%% more total Area of Effect.", 	// WW
-		  6653,						"" },
-		{ "Brilliance", 			"+1 to Spell Modifier.", 	// WN
-		  6654,						"" },
-		{ "Coordination", 			"0.5%% more effect of Lethargy for every", 	// NW
-		  6655,						"10 total Willpower." },
-		{ "Pragmatic", 				"3%% increased total Willpower and", 	// NN
-		  6656,						"Intuition." },
-		{ "Hex Master", 			"0.5%% more effect of Curse and Slow", 	// NE
-		  6657,						"for every 10 total Intuition." },
-		{ "Nimble", 				"You no longer have a parry penalty if", 	// EN
-		  6658,						"hit while not fighting." },
-		{ "Fleet-footed", 			"20%% more total Movement Speed.", 	// EE
-		  6659,						"" },
-		{ "Acceleration", 			"Haste grants 20%% more move speed to", 	// ES
-		  6660,						"you, and it can now be cast on allies." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Summoner
-		{ "Nimbleness", 			"+5 to Cast Speed.", 	// W
-		  6661,						"" },
-		{ "Wisdom", 				"+4 to Willpower.", 	// N
-		  6662,						"" },
-		{ "Vitality", 				"+20 Hitpoints.", 	// E
-		  6663,						"" },
-		{ "Tactician", 				"Increases and multipliers to Cast Speed", 	// WS
-		  6664,						"also affect Attack Speed." },
-		{ "Spellslinger", 			"10%% more total Cast Speed.", 	// WW
-		  6665,						"" },
-		{ "Harpooner", 				"20%% more Hit and Parry score while", 	// WN
-		  6666,						"using a Spear." },
-		{ "Mysticism", 				"All spell skills use the attributes", 	// NW
-		  6667,						"(BRV+INT)/2 + Willpower + Willpower." },
-		{ "Overwhelming Willpower", "3%% increased total Willpower.", 	// NN
-		  6668,						"+10 to Willpower Limit." },
-		{ "Shaper", 				"0.5%% more effect of Shadow Copy for", 	// NE
-		  6669,						"every 10 total Willpower." },
-		{ "Diviner", 				"Ghost Companions inherit your Dispel", 	// EN
-		  6670,						"and the effects of your tarot cards." },
-		{ "Constitution", 			"20%% more total Hitpoints.", 	// EE
-		  6671,						"" },
-		{ "Protector", 				"Magic Shield and Magic Shell are also", 	// ES
-		  6672,						"cast on your active companions." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Arch Harakim
-		{ "Composure", 				"+5 to Cooldown Rate.", 	// W
-		  6673,						"" },
-		{ "Intellect", 				"+4 to Intuition.", 	// N
-		  6674,						"" },
-		{ "Wellspring", 			"+20 Mana.", 	// E
-		  6675,						"" },
-		{ "Destroyer", 				"Blast has its base cooldown reduced", 	// WS
-		  6676,						"for each enemy hit by it." },
-		{ "Serenity", 				"5%% more total Cooldown Rate.", 	// WW
-		  6677,						"" },
-		{ "Strategist", 			"You suffer no cooldown if a spell is", 	// WN
-		  6678,						"suppressed." },
-		{ "Psychosis", 				"0.5%% more effect of Pulse for every 10", 	// NW
-		  6679,						"total Intuition." },
-		{ "Overwhelming Intuition", "3%% increased total Intuition.", 	// NN
-		  6680,						"+10 to Intuition Limit." },
-		{ "Wizardry", 				"All spell skills use the attributes", 	// NE
-		  6681,						"(BRV+WIL)/2 + Intuition + Intuition." },
-		{ "Flow", 					"25%% of overcapped Mana is granted as", 	// EN
-		  6682,						"additional Hitpoints." },
-		{ "Perpetuity", 			"20%% more total Mana.", 	// EE
-		  6683,						"" },
-		{ "Resourcefulness", 		"20%% of damage taken is dealt to your", 	// ES
-		  6684,						"Mana instead." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Braver
-		{ "Accuracy", 				"+3 to Hit Score.", 	// W
-		  6685,						"" },
-		{ "Boldness", 				"+4 to Braveness.", 	// N
-		  6686,						"" },
-		{ "Avoidance", 				"+3 to Parry Score.", 	// E
-		  6687,						"" },
-		{ "Assassination", 			"20%% increased effect of Precision.", 	// WS
-		  6688,						"" },
-		{ "Rigor", 					"4%% more total Hit Score.", 	// WW
-		  6689,						"" },
-		{ "Deftness", 				"50%% reduced damage taken from", 	// WN
-		  6690,						"triggering enemy Thorns." },
-		{ "Perfectionism", 			"0.5%% more effect of Finesse for every 10", 	// NW
-		  6691,						"total Braveness." },
-		{ "Overwhelming Braveness", "3%% increased total Braveness.", 	// NN
-		  6692,						"+10 to Braveness Limit." },
-		{ "Virtuosity", 			"All weapon skills use the attributes", 	// NE
-		  6693,						"(AGL+STR)/2 + Braveness + Braveness." },
-		{ "Resilience", 			"40%% less effect of Healing Sickness", 	// EN
-		  6694,						"on you." },
-		{ "Flexibility", 			"4%% more total Parry Score.", 	// EE
-		  6695,						"" },
-		{ "Litheness", 				"50%% reduced extra damage taken from", 	// ES
-		  6696,						"enemy Critical Hits." }
-	}, // "         '         '  ", "         '         '         '         "
-	{	// Lycanthrope
-		{ "Maiming", 				"+5 to Top Damage.", 	// W
-		  6697,						"" },
-		{ "Feast", 					"+10 Hitpoints, Endurance, and Mana.", 	// N
-		  6698,						"" },
-		{ "Insight", 				"+2 to Spell Modifier.", 	// E
-		  6699,						"" },
-		{ "Lust", 					"Ferocity grants +1%% base crit chance", 	// WS
-		  6700,						"per empty gear slot." },
-		{ "Ravager", 				"20%% more total Top Damage.", 	// WW
-		  6701,						"" },
-		{ "Greed", 					"Your Top Damage is rolled an additional", 	// WN
-		  6702,						"time, using the higher result." },
-		{ "Wrath", 					"0.5%% more effect of Rage & Calm per 50", 	// NW
-		  6703,						"missing Hitpoints, Endurance, and Mana." },
-		{ "Sloth", 					"10%% more Hitpoints, Endurance, and Mana.", 	// NN
-		  6704,						"" },
-		{ "Gluttony", 				"8%% of damage dealt is restored as", 	// NE
-		  6705,						"Hitpoints, Endurance, and Mana." },
-		{ "Pride", 					"Your debuffs ignore 20%% of enemy", 	// EN
-		  6706,						"Immunity." },
-		{ "Madness", 				"+3 to Spell Modifier.", 	// EE
-		  6707,						"" },
-		{ "Envy", 					"Ferocity grants +1 Spell Modifier per", 	// ES
-		  6708,						"empty gear slot." }
-	}, // "         '         '  ", "         '         '         '         ' "
-	{	// Contract
-		{ "Reward", 				"200%% increased chance of finding Rainbow", 	// W
-		  6709,						"Belts in contracts signed by you." },
-		{ "Challenge", 				"+1 to rank of contracts signed by you.", 	// N
-		  6710,						"" },
-		{ "Army", 					"+1 enemy per spawn in contracts signed by", 	// E
-		  6711,						"you." },
-		{ "Hope", 					"20%% increased effect of rewards from", 	// WS
-		  6712,						"green shrines in contracts signed by you." },
-		{ "Opalescence", 			"200%% increased chance of finding Rainbow", 	// WW
-		  6713,						"Belts in contracts signed by you." },
-		{ "Scholar", 				"20%% more clear experience from", 	// WN
-		  6714,						"contracts signed by you." },
-		{ "Fate", 					"20%% more effect of blue shrines in", 	// NW
-		  6715,						"contracts signed by you." },
-		{ "Hubris", 				"+1 to rank of contracts signed by you.", 	// NN
-		  6716,						"" },
-		{ "Binding", 				"Contracts signed by you always grant", 	// NE
-		  6717,						"tier 3 effects from quills." },
-		{ "Destiny", 				"Red shrines produce harder enemies with", 	// EN
-		  6718,						"more rewards in contracts signed by you." },
-		{ "Swarm", 					"+1 enemy per spawn in contracts signed by", 	// EE
-		  6719,						"you." },
-		{ "Incentive", 				"Enemies grant an additional 5%% of exp as", 	// ES
-		  6720,						"Contract Pts in contracts signed by you." }
-	}  // "         '         '  ", "         '         '         '         ' "
+struct sk_tree sk_tree[2][12]={
+	{     // Character Class Tree
+		{ 6601, "p01", "", "" }, // W
+		{ 6602, "p02", "", "" }, // N
+		{ 6603, "p03", "", "" }, // E
+		{ 6604, "p04", "", "" }, // WS
+		{ 6605, "p05", "", "" }, // WW
+		{ 6606, "p06", "", "" }, // WN
+		{ 6607, "p07", "", "" }, // NW
+		{ 6608, "p08", "", "" }, // NN
+		{ 6609, "p09", "", "" }, // NE
+		{ 6610, "p10", "", "" }, // EN
+		{ 6611, "p11", "", "" }, // EE
+		{ 6612, "p12", "", "" }  // ES
+	},{   // Contract Tree
+		{ 6709, "c01", "", "" }, // W
+		{ 6710, "c02", "", "" }, // N
+		{ 6711, "c03", "", "" }, // E
+		{ 6712, "c04", "", "" }, // WS
+		{ 6713, "c05", "", "" }, // WW
+		{ 6714, "c06", "", "" }, // WN
+		{ 6715, "c07", "", "" }, // NW
+		{ 6716, "c08", "", "" }, // NN
+		{ 6717, "c09", "", "" }, // NE
+		{ 6718, "c10", "", "" }, // EN
+		{ 6719, "c11", "", "" }, // EE
+		{ 6720, "c12", "", "" }  // ES
+	}
 };
 
 struct sk_tree sk_corrupt[108]={
@@ -2774,18 +2541,10 @@ void eng_display_win(int plr_sprite,int init)
 		if (show_tree)
 		{
 			copyspritex(do_darkmode?18007:18006,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element HL_SKTREE
-			if      (show_tree==2)   m = 9;
-			else if (IS_SEYAN_DU)    m = 0;
-			else if (IS_ARCHTEMPLAR) m = 1;
-			else if (IS_SKALD)       m = 2;
-			else if (IS_WARRIOR)     m = 3;
-			else if (IS_SORCERER)    m = 4;
-			else if (IS_SUMMONER)    m = 5;
-			else if (IS_ARCHHARAKIM) m = 6;
-			else if (IS_BRAVER)      m = 7;
-			else                     m = 8;
+			if      (show_tree==2)   m = 1;
+			else                     m = 0;
 			for (n=0; n<12; n++) {
-				if ((m<9 && st_learned_skill(pl.tree_points, n+1)) || (m==9 && st_learned_skill(pl.os_tree, n+1)))
+				if ((m<1 && st_learned_skill(pl.tree_points, n+1)) || (m==1 && st_learned_skill(pl.os_tree, n+1)))
 				{
 					switch (n)
 					{
@@ -2803,7 +2562,7 @@ void eng_display_win(int plr_sprite,int init)
 							copyspritex(18116,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
 					}
 				}
-				if (m<9 && (v = pl.tree_node[n]))
+				if (m<1 && (v = pl.tree_node[n]))
 				{
 					if (hightlight==HL_SKTREE && hightlight_sub==n)
 					{
@@ -2824,7 +2583,7 @@ void eng_display_win(int plr_sprite,int init)
 						copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
 				}
 			}
-			if (m<9)
+			if (m<1)
 			{
 				copyspritex(6600,GUI_SHOP_X+140+ST_OFFSET_IC,GUI_SHOP_Y+140+ST_OFFSET_IC, 0);
 				dd_xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.tree_points),st_skill_pts_all(pl.tree_points));
@@ -2836,7 +2595,7 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			if (hightlight==HL_SKTREE)
 			{
-				if (m<9 && (v = pl.tree_node[hightlight_sub]))
+				if (m<1 && (v = pl.tree_node[hightlight_sub]))
 				{
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_corrupt[v-1].name);
 					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_corrupt[v-1].dsc1);

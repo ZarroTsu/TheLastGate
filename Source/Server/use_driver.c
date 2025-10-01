@@ -2878,6 +2878,7 @@ int use_scroll_O(int cn, int in)
 	}
 	else
 	{
+		if (ch[cn].os_tree==0) plr_update_tree_terminology(nr, SV_TERM_CTREE);
 		do_char_log(cn, 1, "You used the scroll of binding. You gained 1 Contract Skill Point.\n");
 		ch[cn].os_tree++;
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
@@ -8073,6 +8074,8 @@ int use_seyan_portal(int cn, int in)
 			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 			
+			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
+			
 			/* Announce the player's new race */
 			if (n<MAXCHARS)
 			{
@@ -8099,6 +8102,8 @@ int use_seyan_portal(int cn, int in)
 			
 			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+			
+			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
 			
 			in2 = god_create_item(35); god_give_char(in2, cn);
 			in2 = god_create_item(36); god_give_char(in2, cn);
@@ -8129,6 +8134,8 @@ int use_seyan_portal(int cn, int in)
 			
 			ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+			
+			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
 			
 			in2 = god_create_item(IT_SEYANSWORD);
 			god_give_char(in2, cn);

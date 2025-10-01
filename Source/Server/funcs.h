@@ -50,6 +50,8 @@ void pop_copy_to_new_items(void);
 // -- tick --
 void tick(void);
 void player_exit(int nr);
+void plr_update_treenode_terminology(int nr, int tn, int n);
+void plr_update_tree_terminology(int nr, int val);
 void plr_logout(int cn, int nr, int reason);
 void cl_list(void);
 void char_remove_net(int cn, int co);

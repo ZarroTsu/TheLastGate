@@ -522,7 +522,7 @@ void look_extra(int cn, int in)
 		if (it[in].data[0])
 		{
 			do_char_log(cn, 1, "%s:\n", sk_corrupt[it[in].data[0]-1].name);
-			do_char_log(cn, 4, "%s\n", sk_corrupt[it[in].data[0]-1].desc);
+			do_char_log(cn, 4, "%s%s\n", sk_corrupt[it[in].data[0]-1].dsc1, sk_corrupt[it[in].data[0]-1].dsc2);
 		}
 		do_char_log(cn, 1, "Maybe you could use it on something?\n");
 		return;
@@ -530,7 +530,7 @@ void look_extra(int cn, int in)
 	
 	if ((it[in].flags & IF_CORRUPTED) && it[in].corruption)
 	{
-		do_char_log(cn, 4, "%s\n", sk_corrupt[it[in].corruption-1].desc);
+		do_char_log(cn, 4, "%s%s\n", sk_corrupt[it[in].corruption-1].dsc1, sk_corrupt[it[in].corruption-1].dsc2);
 	}
 	
 	look_identify(cn, in);

@@ -287,7 +287,20 @@ struct cplayer
 #define SV_LOG8 98
 #define SV_LOG9 99
 
+#define SV_TERM_STREE				100
+#define SV_TERM_CTREE				101
+
 #define SV_SETMAP 128                   // 128-255 are used !!!
+
+#define ST_TREE_ICON				0
+#define ST_TREE_NAME1				1
+#define ST_TREE_NAME2				2
+#define ST_TREE_DESC1A				3
+#define ST_TREE_DESC1B				4
+#define ST_TREE_DESC1C				5
+#define ST_TREE_DESC2A				6
+#define ST_TREE_DESC2B				7
+#define ST_TREE_DESC2C				8
 
 #define LO_CHALLENGE 1
 #define LO_IDLE      2

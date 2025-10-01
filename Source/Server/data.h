@@ -1413,8 +1413,10 @@ struct waypoint
 
 struct sk_tree
 {
-	char *name;
-	char *desc;
+	char name[30];
+	char dsc1[50];
+	unsigned short icon;
+	char dsc2[50];
 };
 
 #define N_SOULBONUS		 50

@@ -410,7 +410,27 @@ struct cplayer {
 #define SV_LOG8 98
 #define SV_LOG9 99
 
+#define SV_TERM_STREE				100
+#define SV_TERM_CTREE				101
+
 #define SV_SETMAP					128
+
+#define ST_TREE_ICON				  0
+#define ST_TREE_NAME1				  1
+#define ST_TREE_NAME2				  2
+#define ST_TREE_NAME3				  3
+
+#define ST_TREE_DESC1A				  4
+#define ST_TREE_DESC1B				  5
+#define ST_TREE_DESC1C				  6
+#define ST_TREE_DESC1D				  7
+#define ST_TREE_DESC1E				  8
+
+#define ST_TREE_DESC2A				  9
+#define ST_TREE_DESC2B				 10
+#define ST_TREE_DESC2C				 11
+#define ST_TREE_DESC2D				 12
+#define ST_TREE_DESC2E				 13
 
 #define SPR_INVISIBLE				0
 #define SPR_E1						1

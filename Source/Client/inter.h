@@ -105,7 +105,6 @@ struct xbutton
 	int skill_nr;
 };
 
-
 struct pdata
 {
 	char cname[80];
@@ -252,10 +251,10 @@ struct wpslist
 
 struct sk_tree
 {
+	unsigned short icon;
 	char name[30];
-	char dsc1[42];
-	int icon;
-	char dsc2[42];
+	char dsc1[50];
+	char dsc2[50];
 };
 
 struct sk_icon
@@ -265,7 +264,7 @@ struct sk_icon
 };
 
 extern struct wpslist wpslist[MAXWPS];
-extern struct sk_tree sk_tree[10][12];
+extern struct sk_tree sk_tree[2][12];
 extern struct sk_icon sk_icon[12];
 
 void dd_puttext(int x,int y,int font,char *text);

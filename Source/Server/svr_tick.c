@@ -1816,6 +1816,114 @@ void char_remove_same_nets(int cn, int co)
 	do_char_log(cn, 1, "Done.\n");
 }
 
+void plr_update_treenode_terminology(int nr, int tn, int n)
+{
+	unsigned char buf[256];
+	int val;
+	
+	if (tn < 0) return;
+	if (tn > 9) return;
+	
+	if (tn == 9) val = SV_TERM_CTREE;
+	else         val = SV_TERM_STREE;
+	
+	buf[1] = ST_TREE_ICON;
+	buf[2] = n;
+	*(unsigned short*)(buf + 3) = (unsigned short)(sk_tree[tn][n].icon);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_NAME1;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].name,    10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_NAME2;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].name+10, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_NAME3;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].name+20, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC1A;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC1B;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC1C;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC1D;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC1E;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC2A;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC2B;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC2C;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC2D;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
+	xsend(nr, buf, 16);
+	
+	buf[1] = ST_TREE_DESC2E;
+	buf[2] = n;
+	mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
+	xsend(nr, buf, 16);
+}
+
+void plr_update_tree_terminology(int nr, int val)
+{
+	int tn = -1, n = 0;
+	int cn = player[nr].usnr;
+	
+	if (val==SV_TERM_STREE)
+	{
+		     if (IS_SEYAN_DU(cn))    tn = 0;
+		else if (IS_ARCHTEMPLAR(cn)) tn = 1;
+		else if (IS_SKALD(cn))       tn = 2;
+		else if (IS_WARRIOR(cn))     tn = 3;
+		else if (IS_SORCERER(cn))    tn = 4;
+		else if (IS_SUMMONER(cn))    tn = 5;
+		else if (IS_ARCHHARAKIM(cn)) tn = 6;
+		else if (IS_BRAVER(cn))      tn = 7;
+		else if (IS_LYCANTH(cn))     tn = 8;
+	}
+	if (val==SV_TERM_CTREE) tn = 9;
+	
+	if (tn >= 0)
+	{
+		for (n = 0; n < 12; n++)
+			plr_update_treenode_terminology(nr, tn, n);
+	}
+}
+
 void plr_newlogin(int nr)
 {
 	int cn, temp, tmp, in, n;
@@ -2125,6 +2233,9 @@ void plr_login(int nr)
 	ch[cn].tavern_y = ch[cn].temple_y;
 
 	plog(nr, "Login successful");
+	
+	plr_update_tree_terminology(nr, SV_TERM_STREE);
+	plr_update_tree_terminology(nr, SV_TERM_CTREE);
 	
 	if (ch[cn].data[79] != VERSION)
 	{
