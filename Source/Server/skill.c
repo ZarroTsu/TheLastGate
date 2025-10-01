@@ -493,7 +493,7 @@ struct sk_tree sk_tree[10][12]={
 	}  // "         '         '         ", "         '         '         '         '         "
 };
 
-struct sk_tree sk_corrupt[NUM_CORR]={ // TODO: adjust this struct to match the above
+struct sk_tree sk_corrupt[NUM_CORR]={
    // "         '         '         ", "         '         '         '         '         "
 	{ "* Sharpness *",                 "+1 to Weapon Value.",
 	  6601,                            "" },

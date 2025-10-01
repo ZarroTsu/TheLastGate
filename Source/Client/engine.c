@@ -596,234 +596,6 @@ struct sk_tree sk_tree[2][12]={
 	}
 };
 
-struct sk_tree sk_corrupt[108]={
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Sharpness *", 				"+1 to Weapon Value.",
-	  6601,							"" },
-	{ "* Expertise *", 				"+1 to All Attributes.",
-	  6602,							"" },
-	{ "* Toughness *", 				"+1 to Armor Value.",
-	  6603,							"" },
-	{ "* Absolution *", 			"0.2%% more damage dealt for each buff",
-	  6604,							"or debuff on you." },
-	{ "* Vindication *", 			"2%% of Total Armor Value granted as",			// *
-	  6605,							"extra Weapon Value." },
-	{ "* Scorn *", 					"Your debuffs ignore 5%% of enemy",
-	  6606,							"Resistance." },
-	{ "* Courage *", 				"Gain 1 additional Hit and Parry for",			// *
-	  6607,							"every 100 missing hitpoints." },
-	{ "* Master of None *", 		"+2 to all skill limits.",
-	  6608,							"" },
-	{ "* Necromancy *", 			"2%% more Companion Hit and Parry scores.",		// *
-	  6609,							"" },
-	{ "* Enigmatic *", 				"5%% reduced effect of debuffs on you.",
-	  6610,							"" },
-	{ "* Barkskin *", 				"2%% of Total Weapon Value granted as",			// *
-	  6611,							"extra Armor Value." },
-	{ "* Penance *", 				"0.2%% less damage taken for each buff",
-	  6612,							"or debuff on you." },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Spiked *", 				"+2 to Thorns.",
-	  6613,							"" },
-	{ "* Might *", 					"+2 to Strength.",
-	  6614,							"" },
-	{ "* Ironskin *", 				"Gain 1 additional Armor Value for",			// *
-	  6615,							"every 200 total Attributes." },
-	{ "* Decapitation *", 			"Cleave kills enemies left below",				// *
-	  6616,							"2%% remaining health." },
-	{ "* Sharkskin *", 				"5%% more total Thorns.",
-	  6617,							"" },
-	{ "* Razor Shell *", 			"10%% of Shield Armor Value is granted",		// *
-	  6618,							"as extra Thorns." },
-	{ "* Overlord *", 				"0.2%% more effect of Warcry and Rally",
-	  6619,							"for every 10 total Strength." },
-	{ "* Overwhelming Strength *", 	"2%% increased total Strength.",
-	  6620,							"+1 to Strength Limit." },
-	{ "* Towering *", 				"8%% more Armor Value from Shields.",			// *
-	  6621,							"" },
-	{ "* Bastion *", 				"4%% of total Resistance is granted as",
-	  6622,							"extra Immunity." },
-	{ "* Unbreakable *", 			"3%% more total Armor Value.",
-	  6623,							"" },
-	{ "* Deflecting *", 			"5%% of Shield Armor Value is granted as",		// *
-	  6624,							"extra Parry Score." },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Force *", 					"Gain 1 additional Weapon Value for",			// *
-	  6625,							"every 200 total Attributes." },
-	{ "* Dexterity *", 				"+2 to Agility.",
-	  6626,							"" },
-	{ "* Persistance *", 			"+10 Endurance.",
-	  6627,							"" },
-	{ "* Nocturne *", 				"5%% increased effect of Aria.",
-	  6628,							"" },
-	{ "* Valor *", 					"3%% more total Weapon Value.",
-	  6629,							"" },
-	{ "* Blade Dancer *", 			"8%% more Weapon Value from Dual Swords.",		// *
-	  6630,							"" },
-	{ "* Slaying *", 				"+1%% Critical Multiplier for every 10",
-	  6631,							"total Agility." },
-	{ "* Overwhelming Agility *", 	"2%% increased total Agility.",
-	  6632,							"+1 to Agility Limit." },
-	{ "* Axeman *", 				"2%% more damage dealt while using an",			// *
-	  6633,							"Axe or Greataxe." },
-	{ "* Overwhelm *", 				"5%% increased effect of Weaken and Crush.",	// *
-	  6634,							"" },
-	{ "* Perseverance *", 			"5%% more total Endurance.",
-	  6635,							"" },
-	{ "* Recycle *", 				"10%% of Endurance spent is granted as",		// *
-	  6636,							"additional Mana." },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Rapidity *", 				"+2 to Attack Speed.",
-	  6637,							"" },
-	{ "* Ruffian *", 				"+1 to Strength & +1 to Agility.",
-	  6638,							"" },
-	{ "* Passion *", 				"+2 to Spell Aptitude.",
-	  6639,							"" },
-	{ "* Alacrity *", 				"Zephyr deals 5%% more damage.",
-	  6640,							"" },
-	{ "* Swiftness *", 				"3%% more total Attack Speed.",
-	  6641,							"" },
-	{ "* Full Moon *", 				"10%% increased effect of bonuses granted",		// *
-	  6642,							"during Full Moons." },
-	{ "* Antagonizer *", 			"0.2%% more effect of Blind and Douse",
-	  6643,							"for every 10 total Agility." },
-	{ "* Harrier *", 				"1%% increased total Agility and",
-	  6644,							"Strength." },
-	{ "* Butchery *", 				"0.2%% more effect of Cleave for every",
-	  6645,							"10 total Strength." },
-	{ "* Conqueror *", 				"5%% more damage dealt to enemies beside",		// *
-	  6646,							"or behind you." },
-	{ "* Zealotry *", 				"5%% more total Spell Aptitude.",
-	  6647,							"" },
-	{ "* Crusade *", 				"+1 Skill Modifier per 50 Spell Aptitude.",
-	  6648,							"" },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Expansiveness *", 			"+1 to Area of Effect.",
-	  6649,							"" },
-	{ "* Potency *", 				"+1 to Willpower & +1 to Intuition.",
-	  6650,							"" },
-	{ "* Quickstep *", 				"+2 to Movement Speed.",
-	  6651,							"" },
-	{ "* Tormenter *", 				"Poison deals damage 5%% faster.",
-	  6652,							"" },
-	{ "* Grandiosity *", 			"10%% more total Area of Effect.",
-	  6653,							"" },
-	{ "* New Moon *", 				"10%% increased effect of bonuses granted",		// *
-	  6654,							"during New Moons." },
-	{ "* Coordination *", 			"0.2%% more effect of Lethargy for every",
-	  6655,							"10 total Willpower." },
-	{ "* Pragmatic *", 				"1%% increased total Willpower and",
-	  6656,							"Intuition." },
-	{ "* Hex Master *", 			"0.2%% more effect of Curse and Slow",
-	  6657,							"for every 10 total Intuition." },
-	{ "* Adroitness *", 			"5%% less damage taken from enemies beside",	// *
-	  6658,							"or behind you." },
-	{ "* Fleet-footed *", 			"3%% more total Movement Speed.",
-	  6659,							"" },
-	{ "* Acceleration *", 			"Haste grants 10%% more move speed to you.",
-	  6660,							"" },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Nimbleness *", 			"+2 to Cast Speed.",
-	  6661,							"" },
-	{ "* Wisdom *", 				"+2 to Willpower.",
-	  6662,							"" },
-	{ "* Vitality *", 				"+10 Hitpoints.",
-	  6663,							"" },
-	{ "* Denial *", 				"5%% chance to not be hit when you should",		// *
-	  6664,							"have been." },
-	{ "* Spellslinger *", 			"3%% more total Cast Speed.",
-	  6665,							"" },
-	{ "* Training *", 				"5%% more effective surround hit modifier",
-	  6666,							"while using a Spear." },
-	{ "* Waning *", 				"Spells gain an additional 10%% of",			// *
-	  6667,							"Willpower towards attribute bonuses." },
-	{ "* Overwhelming Willpower *",	"2%% increased total Willpower.",
-	  6668,							"+1 to Willpower Limit." },
-	{ "* Shaper *", 				"0.2%% more effect of Shadow Copy for",
-	  6669,							"every 10 total Willpower." },
-	{ "* Wraithlord *", 			"2%% of damage dealt by you is granted",		// *
-	  6670,							"to your Companions as Hitpoints." },
-	{ "* Constitution *", 			"5%% more total Hitpoints.",
-	  6671,							"" },
-	{ "* Barrier *", 				"Magic Shields and Shells affecting you",		// *
-	  6672,							"take 10%% reduced damage from enemies." },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Composure *", 				"+2 to Cooldown Rate.",
-	  6673,							"" },
-	{ "* Intellect *", 				"+2 to Intuition.",
-	  6674,							"" },
-	{ "* Wellspring *", 			"+10 Mana.",
-	  6675,							"" },
-	{ "* Detonation *", 			"Blast kills enemies left below",				// *
-	  6676,							"2%% remaining health." },
-	{ "* Serenity *", 				"2%% more total Cooldown Rate.",
-	  6677,							"" },
-	{ "* Refrigerate *", 			"3%% chance for skills to have no",				// *
-	  6678,							"cooldown." },
-	{ "* Psychosis *", 				"0.2%% more effect of Pulse for every 10",
-	  6679,							"total Intuition." },
-	{ "* Overwhelming Intuition *",	"2%% increased total Intuition.",
-	  6680,							"+1 to Intuition Limit." },
-	{ "* Waxing *", 				"Spells gain an additional 10%% of",			// *
-	  6681,							"Intuition towards attribute bonuses." },
-	{ "* Flow *", 					"10%% of overcapped Mana is granted as",
-	  6682,							"additional Hitpoints." },
-	{ "* Perpetuity *", 			"5%% more total Mana.",
-	  6683,							"" },
-	{ "* Repurpose *", 				"10%% of Mana spent is granted as",				// *
-	  6684,							"additional Endurance." },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Accuracy *", 				"+1 to Hit Score.",
-	  6685,							"" },
-	{ "* Boldness *", 				"+2 to Braveness.",
-	  6686,							"" },
-	{ "* Avoidance *", 				"+1 to Parry Score.",
-	  6687,							"" },
-	{ "* Assassination *", 			"5%% increased effect of Precision.",
-	  6688,							"" },
-	{ "* Rigor *", 					"1%% more total Hit Score.",
-	  6689,							"" },
-	{ "* Rebuke *", 				"5%% of damage taken from enemy thorns",		// *
-	  6690,							"is reflected." },
-	{ "* Perfectionism *", 			"0.2%% more effect of Finesse for every 10",
-	  6691,							"total Braveness." },
-	{ "* Overwhelming Braveness *",	"2%% increased total Braveness.",
-	  6692,							"+1 to Braveness Limit." },
-	{ "* Swordsman *", 				"2%% less damage taken while using a",			// *
-	  6693,							"Sword or Twohander." },
-	{ "* Mending *", 				"10%% increased effect of Heal and Regen.",		// *
-	  6694,							"" },
-	{ "* Flexibility *", 			"1%% more total Parry Score.",
-	  6695,							"" },
-	{ "* Revoke *", 				"5%% of damage taken from enemy critical",		// *
-	  6696,							"hits is reflected." },
-//    "         '         '      ", "         '         '         '         ' "
-	{ "* Maiming *", 				"+2 to Top Damage.",
-	  6697,							"" },
-	{ "* Feast *", 					"+5 Hitpoints, Endurance, and Mana.",
-	  6698,							"" },
-	{ "* Half Moon *", 				"5%% increased effect of bonuses granted",		// *
-	  6699,							"during Moons." },
-	{ "* Lustful *", 				"+1%% base crit chance per empty ring",			// *
-	  6700,							"slot." },
-	{ "* Ravager *", 				"5%% more total Top Damage.",
-	  6701,							"" },
-	{ "* Culling *", 				"Critical Hits kill enemies left below",		// *
-	  6702,							"2%% remaining health." },
-	{ "* Wrath *", 					"0.2%% more effect of Rage & Calm per 50",
-	  6703,							"missing Hitpoints, Endurance, and Mana." },
-	{ "* Sloth *", 					"3%% more Hitpoints, Endurance, and Mana.",
-	  6704,							"" },
-	{ "* Hunger *", 				"2%% of damage dealt is restored as",
-	  6705,							"Hitpoints, Endurance, or Mana." },
-	{ "* Pride *", 					"Your debuffs ignore 5%% of enemy",
-	  6706,							"Immunity." },
-	{ "* Madness *", 				"+1 to Spell Modifier.",
-	  6707,							"" },
-	{ "* Envious *", 				"+1 Spell Modifier per empty ring slot.",		// *
-	  6708,							"" }
-};
-
 #define ST_OFFSET_IC		-12
 #define ST_OFFSET_HL		-31
 
@@ -2562,25 +2334,17 @@ void eng_display_win(int plr_sprite,int init)
 							copyspritex(18116,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
 					}
 				}
-				if (m<1 && (v = pl.tree_node[n]))
+				if (hightlight==HL_SKTREE && hightlight_sub==n)
 				{
-					if (hightlight==HL_SKTREE && hightlight_sub==n)
-					{
-						copyspritex(sk_corrupt[v-1].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC,16);
+					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC,16);
+					if (m<1 && pl.tree_node[n])
 						copyspritex(7067,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 16);
-					}
-					else
-					{
-						copyspritex(sk_corrupt[v-1].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
-						copyspritex(7067,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
-					}
 				}
 				else
 				{
-					if (hightlight==HL_SKTREE && hightlight_sub==n)
-						copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC,16);
-					else
-						copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
+					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
+					if (m<1 && pl.tree_node[n])
+						copyspritex(7067,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_IC,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_IC, 0);
 				}
 			}
 			if (m<1)
@@ -2595,18 +2359,9 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			if (hightlight==HL_SKTREE)
 			{
-				if (m<1 && (v = pl.tree_node[hightlight_sub]))
-				{
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_corrupt[v-1].name);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_corrupt[v-1].dsc1);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_corrupt[v-1].dsc2);
-				}
-				else
-				{
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_tree[m][hightlight_sub].name);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_tree[m][hightlight_sub].dsc1);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_tree[m][hightlight_sub].dsc2);
-				}
+				dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_tree[m][hightlight_sub].name);
+				dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_tree[m][hightlight_sub].dsc1);
+				dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_tree[m][hightlight_sub].dsc2);
 			}
 		}
 		

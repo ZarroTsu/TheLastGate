@@ -1819,6 +1819,8 @@ void char_remove_same_nets(int cn, int co)
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
 	unsigned char buf[256];
+	int cn = player[nr].usnr;
+	int m = ch[cn].tree_node[n];
 	
 	if (tn < 0) return;
 	if (tn > 9) return;
@@ -1828,72 +1830,114 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 	
 	buf[1] = ST_TREE_ICON;
 	buf[2] = n;
-	*(unsigned short*)(buf + 3) = (unsigned short)(sk_tree[tn][n].icon);
+	if (m)
+		*(unsigned short*)(buf + 3) = (unsigned short)(sk_corrupt[m-1].icon);
+	else
+		*(unsigned short*)(buf + 3) = (unsigned short)(sk_tree[tn][n].icon);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_NAME1;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].name,    10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].name,    10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].name,    10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_NAME2;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].name+10, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].name+10, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].name+10, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_NAME3;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].name+20, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].name+20, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].name+20, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC1A;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc1,    10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC1B;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc1+10, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC1C;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc1+20, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC1D;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc1+30, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC1E;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc1+40, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC2A;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc2,    10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc2,    10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC2B;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc2+10, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc2+10, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC2C;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc2+20, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc2+20, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC2D;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc2+30, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc2+30, 10);
 	xsend(nr, buf, 16);
 	
 	buf[1] = ST_TREE_DESC2E;
 	buf[2] = n;
-	mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
+	if (m)
+		mcpy(buf+3, sk_corrupt[m-1].dsc2+40, 10);
+	else
+		mcpy(buf+3, sk_tree[tn][n].dsc2+40, 10);
 	xsend(nr, buf, 16);
 }
 
