@@ -1819,13 +1819,12 @@ void char_remove_same_nets(int cn, int co)
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
 	unsigned char buf[256];
-	int val;
 	
 	if (tn < 0) return;
 	if (tn > 9) return;
 	
-	if (tn == 9) val = SV_TERM_CTREE;
-	else         val = SV_TERM_STREE;
+	if (tn == 9) buf[0] = SV_TERM_CTREE;
+	else         buf[0] = SV_TERM_STREE;
 	
 	buf[1] = ST_TREE_ICON;
 	buf[2] = n;
