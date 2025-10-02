@@ -412,25 +412,51 @@ struct cplayer {
 
 #define SV_TERM_STREE				100
 #define SV_TERM_CTREE				101
+#define SV_TERM_SKILLS				102
 
 #define SV_SETMAP					128
+
 
 #define ST_TREE_ICON				  0
 #define ST_TREE_NAME1				  1
 #define ST_TREE_NAME2				  2
 #define ST_TREE_NAME3				  3
-
 #define ST_TREE_DESC1A				  4
 #define ST_TREE_DESC1B				  5
 #define ST_TREE_DESC1C				  6
 #define ST_TREE_DESC1D				  7
 #define ST_TREE_DESC1E				  8
-
 #define ST_TREE_DESC2A				  9
 #define ST_TREE_DESC2B				 10
 #define ST_TREE_DESC2C				 11
 #define ST_TREE_DESC2D				 12
 #define ST_TREE_DESC2E				 13
+
+#define ST_SKILLS_SORT				 14
+#define ST_SKILLS_NAME1				 15
+#define ST_SKILLS_NAME2				 16
+#define ST_SKILLS_NAME3				 17
+#define ST_SKILLS_DESC01			 18
+#define ST_SKILLS_DESC02			 19
+#define ST_SKILLS_DESC03			 20
+#define ST_SKILLS_DESC04			 21
+#define ST_SKILLS_DESC05			 22
+#define ST_SKILLS_DESC06			 23
+#define ST_SKILLS_DESC07			 24
+#define ST_SKILLS_DESC08			 25
+#define ST_SKILLS_DESC09			 26
+#define ST_SKILLS_DESC10			 27
+#define ST_SKILLS_DESC11			 28
+#define ST_SKILLS_DESC12			 29
+#define ST_SKILLS_DESC13			 30
+#define ST_SKILLS_DESC14			 31
+#define ST_SKILLS_DESC15			 32
+#define ST_SKILLS_DESC16			 33
+#define ST_SKILLS_DESC17			 34
+#define ST_SKILLS_DESC18			 35
+#define ST_SKILLS_DESC19			 36
+#define ST_SKILLS_DESC20			 37
+
 
 #define SPR_INVISIBLE				0
 #define SPR_E1						1

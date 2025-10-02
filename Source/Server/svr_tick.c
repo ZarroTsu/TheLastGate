@@ -1828,117 +1828,105 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 	if (tn == 9) buf[0] = SV_TERM_CTREE;
 	else         buf[0] = SV_TERM_STREE;
 	
-	buf[1] = ST_TREE_ICON;
 	buf[2] = n;
+	
+	buf[1] = ST_TREE_ICON;
 	if (m)
 		*(unsigned short*)(buf + 3) = (unsigned short)(sk_corrupt[m-1].icon);
 	else
 		*(unsigned short*)(buf + 3) = (unsigned short)(sk_tree[tn][n].icon);
-	xsend(nr, buf, 16);
+	xsend(nr, buf,  5);
 	
 	buf[1] = ST_TREE_NAME1;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].name,    10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].name,    10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_NAME2;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].name+10, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].name+10, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_NAME3;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].name+20, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].name+20, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC1A;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc1,    10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC1B;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc1+10, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC1C;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc1+20, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC1D;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc1+30, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC1E;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc1+40, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC2A;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc2,    10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc2,    10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC2B;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc2+10, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc2+10, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC2C;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc2+20, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc2+20, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC2D;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc2+30, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc2+30, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 	
 	buf[1] = ST_TREE_DESC2E;
-	buf[2] = n;
 	if (m)
 		mcpy(buf+3, sk_corrupt[m-1].dsc2+40, 10);
 	else
 		mcpy(buf+3, sk_tree[tn][n].dsc2+40, 10);
-	xsend(nr, buf, 16);
+	xsend(nr, buf, 13);
 }
 
 void plr_update_tree_terminology(int nr, int val)
@@ -1964,6 +1952,120 @@ void plr_update_tree_terminology(int nr, int val)
 	{
 		for (n = 0; n < 12; n++)
 			plr_update_treenode_terminology(nr, tn, n);
+	}
+}
+
+void plr_update_skill_terminology(int nr)
+{
+	int n;
+	
+	buf[0] = SV_TERM_SKILLS;
+	
+	for (n=0; n<(MAXSKILL+5); n++)
+	{
+		buf[2] = n;
+		
+		// TODO: send a 'show' value based on known skill criteria.
+		
+		buf[1] = ST_SKILLS_SORT;
+		mcpy(buf+3, skilltab[n].sortkey,   1);
+		xsend(nr, buf,  4);
+		
+		// TODO: send alternate name if necessary
+		
+		buf[1] = ST_SKILLS_NAME1;
+		mcpy(buf+3, skilltab[n].name,     10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_NAME2;
+		mcpy(buf+3, skilltab[n].name+ 10, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_NAME3;
+		mcpy(buf+3, skilltab[n].name+ 20, 10);
+		xsend(nr, buf, 13);
+		
+		// TODO: send alternate description if necessary
+		
+		buf[1] = ST_SKILLS_DESC01;
+		mcpy(buf+3, skilltab[n].desc,     10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC02;
+		mcpy(buf+3, skilltab[n].desc+ 10, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC03;
+		mcpy(buf+3, skilltab[n].desc+ 20, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC04;
+		mcpy(buf+3, skilltab[n].desc+ 30, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC05;
+		mcpy(buf+3, skilltab[n].desc+ 40, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC06;
+		mcpy(buf+3, skilltab[n].desc+ 50, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC07;
+		mcpy(buf+3, skilltab[n].desc+ 60, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC08;
+		mcpy(buf+3, skilltab[n].desc+ 70, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC09;
+		mcpy(buf+3, skilltab[n].desc+ 80, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC10;
+		mcpy(buf+3, skilltab[n].desc+ 90, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC11;
+		mcpy(buf+3, skilltab[n].desc+100, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC12;
+		mcpy(buf+3, skilltab[n].desc+110, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC13;
+		mcpy(buf+3, skilltab[n].desc+120, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC14;
+		mcpy(buf+3, skilltab[n].desc+130, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC15;
+		mcpy(buf+3, skilltab[n].desc+140, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC16;
+		mcpy(buf+3, skilltab[n].desc+150, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC17;
+		mcpy(buf+3, skilltab[n].desc+160, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC18;
+		mcpy(buf+3, skilltab[n].desc+170, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC19;
+		mcpy(buf+3, skilltab[n].desc+180, 10);
+		xsend(nr, buf, 13);
+		
+		buf[1] = ST_SKILLS_DESC20;
+		mcpy(buf+3, skilltab[n].desc+190, 10);
+		xsend(nr, buf, 13);
 	}
 }
 

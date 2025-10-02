@@ -51,6 +51,9 @@ extern int host_port;
 extern struct key okey;
 extern int do_exit;
 
+extern struct sk_tree sk_tree[2][12];
+extern struct skilltab _skilltab[55];
+
 int sv_cmd(unsigned char *buf);
 void sv_newplayer(unsigned char *buf);
 unsigned int xcrypt(unsigned int val);
@@ -453,7 +456,7 @@ unsigned int xcrypt(unsigned int val)
 // so_terminology - 10/1/2025
 // Gets terminology strings for various text-to-display that might differ per login.
 // Intended to give the server power over minor text that the client displays.
-void sv_terminology(unsigned char *buf)
+int sv_terminology(unsigned char *buf)
 {
 	int tn = -1, n = 0;
 	
@@ -466,23 +469,53 @@ void sv_terminology(unsigned char *buf)
 	{
 		n = buf[2];
 		
-		if (buf[1]==ST_TREE_ICON)   { sk_tree[tn][n].icon = *(unsigned short*)(buf+3) }
-		if (buf[1]==ST_TREE_NAME1)  { memcpy(sk_tree[tn][n].name,    buf+3, 10); }
-		if (buf[1]==ST_TREE_NAME2)  { memcpy(sk_tree[tn][n].name+10, buf+3, 10); }
-		if (buf[1]==ST_TREE_NAME3)  { memcpy(sk_tree[tn][n].name+20, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC1A) { memcpy(sk_tree[tn][n].dsc1,    buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC1B) { memcpy(sk_tree[tn][n].dsc1+10, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC1C) { memcpy(sk_tree[tn][n].dsc1+20, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC1D) { memcpy(sk_tree[tn][n].dsc1+30, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC1E) { memcpy(sk_tree[tn][n].dsc1+40, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC2A) { memcpy(sk_tree[tn][n].dsc2,    buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC2B) { memcpy(sk_tree[tn][n].dsc2+10, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC2C) { memcpy(sk_tree[tn][n].dsc2+20, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC2D) { memcpy(sk_tree[tn][n].dsc2+30, buf+3, 10); }
-		if (buf[1]==ST_TREE_DESC2E) { memcpy(sk_tree[tn][n].dsc2+40, buf+3, 10); }
-		
-		return;
+		if (buf[1]==ST_TREE_ICON)   { sk_tree[tn][n].icon = *(unsigned short*)(buf+3); return  5; }
+		if (buf[1]==ST_TREE_NAME1)  { memcpy(sk_tree[tn][n].name,    buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_NAME2)  { memcpy(sk_tree[tn][n].name+10, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_NAME3)  { memcpy(sk_tree[tn][n].name+20, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC1A) { memcpy(sk_tree[tn][n].dsc1,    buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC1B) { memcpy(sk_tree[tn][n].dsc1+10, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC1C) { memcpy(sk_tree[tn][n].dsc1+20, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC1D) { memcpy(sk_tree[tn][n].dsc1+30, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC1E) { memcpy(sk_tree[tn][n].dsc1+40, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC2A) { memcpy(sk_tree[tn][n].dsc2,    buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC2B) { memcpy(sk_tree[tn][n].dsc2+10, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC2C) { memcpy(sk_tree[tn][n].dsc2+20, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC2D) { memcpy(sk_tree[tn][n].dsc2+30, buf+3, 10);       return 13; }
+		if (buf[1]==ST_TREE_DESC2E) { memcpy(sk_tree[tn][n].dsc2+40, buf+3, 10);       return 13; }
 	}
+	
+	if (buf[0]==SV_TERM_SKILLS)
+	{
+		n = buf[2];
+		
+		if (buf[1]==ST_SKILLS_SORT)   { memcpy(_skilltab[n].sortkey,  buf+3,  1); return  4; }
+		if (buf[1]==ST_SKILLS_NAME1)  { memcpy(_skilltab[n].name,     buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_NAME2)  { memcpy(_skilltab[n].name+ 10, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_NAME3)  { memcpy(_skilltab[n].name+ 20, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC01) { memcpy(_skilltab[n].desc,     buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC02) { memcpy(_skilltab[n].desc+ 10, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC03) { memcpy(_skilltab[n].desc+ 20, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC04) { memcpy(_skilltab[n].desc+ 30, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC05) { memcpy(_skilltab[n].desc+ 40, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC06) { memcpy(_skilltab[n].desc+ 50, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC07) { memcpy(_skilltab[n].desc+ 60, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC08) { memcpy(_skilltab[n].desc+ 70, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC09) { memcpy(_skilltab[n].desc+ 80, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC10) { memcpy(_skilltab[n].desc+ 90, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC11) { memcpy(_skilltab[n].desc+100, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC12) { memcpy(_skilltab[n].desc+110, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC13) { memcpy(_skilltab[n].desc+120, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC14) { memcpy(_skilltab[n].desc+130, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC15) { memcpy(_skilltab[n].desc+140, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC16) { memcpy(_skilltab[n].desc+150, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC17) { memcpy(_skilltab[n].desc+160, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC18) { memcpy(_skilltab[n].desc+170, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC19) { memcpy(_skilltab[n].desc+180, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC20) { memcpy(_skilltab[n].desc+190, buf+3, 10); return 13; }
+	}
+	
+	return 16; // Should not be reached
 }
 
 void sv_newplayer(unsigned char *buf)
@@ -1296,96 +1329,99 @@ int sv_cmd(unsigned char *buf)
 
 	if (buf[0]&SV_SETMAP) return sv_setmap(buf,buf[0]&~SV_SETMAP);
 
-	switch(buf[0]) {
-		case	SV_SETCHAR_NAME1:	sv_setchar_name1(buf); break;
-		case	SV_SETCHAR_NAME2:	sv_setchar_name2(buf); break;
-		case	SV_SETCHAR_NAME3:	sv_setchar_name3(buf); break;
-		case	SV_SETCHAR_MODE:	sv_setchar_mode(buf); return 2;
-		case	SV_SETCHAR_ATTRIB:	sv_setchar_attrib(buf); return 8;
-		case	SV_SETCHAR_SKILL:	sv_setchar_skill(buf); return 8;
-		case	SV_SETCHAR_HP:		sv_setchar_hp(buf); return 13;
-		case	SV_SETCHAR_ENDUR:	sv_setchar_endur(buf); return 13;
-		case	SV_SETCHAR_MANA:	sv_setchar_mana(buf); return 13;
-		case	SV_SETCHAR_AHP:		sv_setchar_ahp(buf); return 3;
-		case	SV_SETCHAR_AEND:    sv_setchar_aend(buf); return 3;
-		case	SV_SETCHAR_AMANA:	sv_setchar_amana(buf); return 3;
-		case	SV_SETCHAR_DIR:		sv_setchar_dir(buf); return 2;
+	switch(buf[0])
+	{
+		case SV_SETCHAR_NAME1:	sv_setchar_name1(buf); break;
+		case SV_SETCHAR_NAME2:	sv_setchar_name2(buf); break;
+		case SV_SETCHAR_NAME3:	sv_setchar_name3(buf); break;
+		case SV_SETCHAR_MODE:	sv_setchar_mode(buf); return 2;
+		case SV_SETCHAR_ATTRIB:	sv_setchar_attrib(buf); return 8;
+		case SV_SETCHAR_SKILL:	sv_setchar_skill(buf); return 8;
+		case SV_SETCHAR_HP:		sv_setchar_hp(buf); return 13;
+		case SV_SETCHAR_ENDUR:	sv_setchar_endur(buf); return 13;
+		case SV_SETCHAR_MANA:	sv_setchar_mana(buf); return 13;
+		case SV_SETCHAR_AHP:		sv_setchar_ahp(buf); return 3;
+		case SV_SETCHAR_AEND:    sv_setchar_aend(buf); return 3;
+		case SV_SETCHAR_AMANA:	sv_setchar_amana(buf); return 3;
+		case SV_SETCHAR_DIR:		sv_setchar_dir(buf); return 2;
 
-		case	SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
-		case	SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 13;
-		case	SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 9;
-		case	SV_SETCHAR_TRE:		sv_setchar_tre(buf); return 3;
-		case	SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
-		case	SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
-		case	SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 10;
-		case	SV_SETCHAR_SPELL:	sv_setchar_spell(buf); return 9;
-		case	SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 6;
-		case	SV_SETCHAR_LOCA1:	sv_setchar_location1(buf); return 11;
-		case	SV_SETCHAR_LOCA2:	sv_setchar_location2(buf); return 11;
+		case SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
+		case SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 13;
+		case SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 9;
+		case SV_SETCHAR_TRE:		sv_setchar_tre(buf); return 3;
+		case SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
+		case SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
+		case SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 10;
+		case SV_SETCHAR_SPELL:	sv_setchar_spell(buf); return 9;
+		case SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 6;
+		case SV_SETCHAR_LOCA1:	sv_setchar_location1(buf); return 11;
+		case SV_SETCHAR_LOCA2:	sv_setchar_location2(buf); return 11;
 
-		case	SV_SETMAP3:		return sv_setmap3(buf,20);
-		case	SV_SETMAP4:		return sv_setmap3(buf,0);
-		case	SV_SETMAP5:		return sv_setmap3(buf,2);
-		case	SV_SETMAP6:		return sv_setmap3(buf,6);
-		case	SV_SETORIGIN:		sv_setorigin(buf); return 5;
+		case SV_SETMAP3:		return sv_setmap3(buf,20);
+		case SV_SETMAP4:		return sv_setmap3(buf,0);
+		case SV_SETMAP5:		return sv_setmap3(buf,2);
+		case SV_SETMAP6:		return sv_setmap3(buf,6);
+		case SV_SETORIGIN:		sv_setorigin(buf); return 5;
 
-		case	SV_TICK:		sv_tick(buf); return 2;
+		case SV_TICK:		sv_tick(buf); return 2;
 
-		case	SV_LOG0:		sv_log(buf,0); break;
-		case	SV_LOG1:		sv_log(buf,1); break;
-		case	SV_LOG2:		sv_log(buf,2); break;
-		case	SV_LOG3:		sv_log(buf,3); break;
-		case	SV_LOG4:		sv_log(buf,4); break;
-		case	SV_LOG5:		sv_log(buf,5); break;
-		case	SV_LOG6:		sv_log(buf,6); break;
-		case	SV_LOG7:		sv_log(buf,7); break;
-		case	SV_LOG8:		sv_log(buf,8); break;
-		case	SV_LOG9:		sv_log(buf,9); break;
+		case SV_LOG0:		sv_log(buf,0); break;
+		case SV_LOG1:		sv_log(buf,1); break;
+		case SV_LOG2:		sv_log(buf,2); break;
+		case SV_LOG3:		sv_log(buf,3); break;
+		case SV_LOG4:		sv_log(buf,4); break;
+		case SV_LOG5:		sv_log(buf,5); break;
+		case SV_LOG6:		sv_log(buf,6); break;
+		case SV_LOG7:		sv_log(buf,7); break;
+		case SV_LOG8:		sv_log(buf,8); break;
+		case SV_LOG9:		sv_log(buf,9); break;
 		
-		case	SV_TERM_STREE:
-		case	SV_TERM_CTREE:	sv_terminology(buf); break;
+		case SV_TERM_STREE:
+		case SV_TERM_CTREE:
+		case SV_TERM_SKILLS:
+			return sv_terminology(buf);
 		
-		case	SV_MOTD0:		sv_motd(buf,0); break;
-		case	SV_MOTD1:		sv_motd(buf,1); break;
-		case	SV_MOTD2:		sv_motd(buf,2); break;
-		case	SV_MOTD3:		sv_motd(buf,3); break;
+		case SV_MOTD0:		sv_motd(buf,0); break;
+		case SV_MOTD1:		sv_motd(buf,1); break;
+		case SV_MOTD2:		sv_motd(buf,2); break;
+		case SV_MOTD3:		sv_motd(buf,3); break;
 
-		case	SV_SCROLL_RIGHT:	sv_scroll_right(buf); return 1;
-		case	SV_SCROLL_LEFT:		sv_scroll_left(buf); return 1;
-		case	SV_SCROLL_DOWN:		sv_scroll_down(buf); return 1;
-		case	SV_SCROLL_UP:		sv_scroll_up(buf); return 1;
+		case SV_SCROLL_RIGHT:	sv_scroll_right(buf); return 1;
+		case SV_SCROLL_LEFT:		sv_scroll_left(buf); return 1;
+		case SV_SCROLL_DOWN:		sv_scroll_down(buf); return 1;
+		case SV_SCROLL_UP:		sv_scroll_up(buf); return 1;
 
-		case	SV_SCROLL_RIGHTDOWN:	sv_scroll_rightdown(buf); return 1;
-		case	SV_SCROLL_RIGHTUP:		sv_scroll_rightup(buf); return 1;
-		case	SV_SCROLL_LEFTDOWN:		sv_scroll_leftdown(buf); return 1;
-		case	SV_SCROLL_LEFTUP:		sv_scroll_leftup(buf); return 1;
+		case SV_SCROLL_RIGHTDOWN:	sv_scroll_rightdown(buf); return 1;
+		case SV_SCROLL_RIGHTUP:		sv_scroll_rightup(buf); return 1;
+		case SV_SCROLL_LEFTDOWN:		sv_scroll_leftdown(buf); return 1;
+		case SV_SCROLL_LEFTUP:		sv_scroll_leftup(buf); return 1;
 
-		case	SV_LOOK1:				sv_look1(buf); break;
-		case	SV_LOOK2:				sv_look2(buf); break;
-		case	SV_LOOK3:				sv_look3(buf); break;
-		case	SV_LOOK4:				sv_look4(buf); break;
-		case	SV_LOOK5:				sv_look5(buf); break;
-		case	SV_LOOK6:				sv_look6(buf); break;
-		case	SV_LOOK7:				sv_look7(buf); return 8;
-		case	SV_LOOK8:				sv_look8(buf); return 8;
+		case SV_LOOK1:				sv_look1(buf); break;
+		case SV_LOOK2:				sv_look2(buf); break;
+		case SV_LOOK3:				sv_look3(buf); break;
+		case SV_LOOK4:				sv_look4(buf); break;
+		case SV_LOOK5:				sv_look5(buf); break;
+		case SV_LOOK6:				sv_look6(buf); break;
+		case SV_LOOK7:				sv_look7(buf); return 8;
+		case SV_LOOK8:				sv_look8(buf); return 8;
 		
-		case	SV_CLOSESHOP:			sv_closeshop(buf); return 1;
+		case SV_CLOSESHOP:			sv_closeshop(buf); return 1;
 
-		case	SV_SETTARGET:			sv_settarget(buf); return 13;
+		case SV_SETTARGET:			sv_settarget(buf); return 13;
 
-		case	SV_PLAYSOUND:			sv_playsound(buf); return 13;
+		case SV_PLAYSOUND:			sv_playsound(buf); return 13;
 
-		case	SV_EXIT:				sv_exit(buf); break;
+		case SV_EXIT:				sv_exit(buf); break;
 
-		case  	SV_LOAD:             	sv_load(buf); return 5;
+		case SV_LOAD:             	sv_load(buf); return 5;
 
-		case  	SV_UNIQUE:             	sv_unique(buf); return 9;
-		case 	SV_IGNORE:		return sv_ignore(buf);
+		case SV_UNIQUE:             	sv_unique(buf); return 9;
+		case SV_IGNORE:		return sv_ignore(buf);
 		
-		case	SV_WAYPOINTS:			sv_waypoints(buf); return 1;
-		case	SV_SHOWMOTD:			sv_showmotd(buf); return 2;
+		case SV_WAYPOINTS:			sv_waypoints(buf); return 1;
+		case SV_SHOWMOTD:			sv_showmotd(buf); return 2;
 		
-		case	SV_CLEARBOX:			sv_clearbox(buf); return 9;
+		case SV_CLEARBOX:			sv_clearbox(buf); return 9;
 
 		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;
 	}

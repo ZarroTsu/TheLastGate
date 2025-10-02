@@ -228,14 +228,10 @@ struct skilltab
 {
 	int nr;
 	char sortkey;
+	char show;
 	
-	char name[40];
+	char name[30];
 	char desc[200];
-	
-	char alt_a[200]; // If something changes the name
-	char alt_b[200]; // If something changes the desc
-	
-	int attrib[3];
 };
 
 extern struct skilltab *skilltab;

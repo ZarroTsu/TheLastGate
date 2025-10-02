@@ -1357,7 +1357,7 @@ struct s_skilltab
 	int nr;
 	char sortkey;
 	
-	char name[40];
+	char name[30];
 	char desc[200];
 	
 	char alt_a[200]; // If something changes the name

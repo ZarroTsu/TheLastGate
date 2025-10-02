@@ -347,6 +347,9 @@ char *at_name[5]={
 
 struct skilltab *skilltab;
 struct skilltab _skilltab[55] = {
+	
+	// TODO: wipe this and leave placeholder slots.
+	
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
 	{  0, 'C', 	"Hand to Hand", 		"Passive ability to hit and parry while unarmed.", 
 				"", "",
@@ -1849,6 +1852,9 @@ void eng_display_win(int plr_sprite,int init)
 			if (hudmode==0||hudmode==3)
 			{
 				m=skilltab[n+skill_pos].nr;
+				
+				// TODO: incorporate the "show" value for displaying skills, handled by the server instead of here.
+				
 				if (m>=55)
 				{
 					dd_xputtext(9,(8+8*14)+n*14,1,"-");
