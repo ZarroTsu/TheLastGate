@@ -188,7 +188,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"Pulse (Charge)", 		"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to heal nearby allies and inflict charge, reducing their damage taken and increasing their damage dealt. Has a base radius of 3 tiles.",
 				{ AT_BRV, AT_INT, AT_INT }},
 				
-	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of your Aria and Weaken skills.", // Braver
+	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of skills which already have an area-of-effect.",
 				"Proximity",			"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
@@ -197,7 +197,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
-				"", "",
+				"Proximity",			"Passively improves the area-of-effect of your Aria and Weaken skills.", // Braver
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 47, 'F', 	"Haste", 				"Use (Spell): Applies a buff to yourself, increasing your action speed.", 

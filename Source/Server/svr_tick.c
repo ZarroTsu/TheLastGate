@@ -1955,41 +1955,6 @@ void plr_update_tree_terminology(int nr, int val)
 	}
 }
 
-/*
-{
-	if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-			(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-			(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-			(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
-			(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-			(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-			(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
-			(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-			(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
-			(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
-			(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
-			(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-			(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-			(m==12&&(pl_flagb & (1 <<  3))) ||  // Tactics invert
-			(m==22&&IS_SHIFTED) // Rage -> Calm
-		)
-		dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
-	else
-		dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
-	
-	
-	if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
-	
-	dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
-	
-	if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) dd_putc(163,(8+8*14)+n*14,1,'+');
-	
-	if (stat_raised[n+8+skill_pos]>0) dd_putc(177,(8+8*14)+n*14,1,'-');
-	
-	if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL) dd_xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
-}
-*/
-
 char get_known_player_skill(int cn, int n)
 {
 	if (n<0 || n>=55) return 0; // 0 = not known
@@ -2016,7 +1981,9 @@ char get_known_player_skill(int cn, int n)
 void plr_update_skill_terminology(int nr, int n)
 {
 	unsigned char buf[256];
-	char known = get_known_player_skill(player[nr].usnr, n);
+	int cn = player[nr].usnr;
+	char known = get_known_player_skill(cn, n);
+	int alt = 0;
 	
 	buf[0] = SV_TERM_SKILLS;
 	buf[2] = n;
@@ -2025,100 +1992,143 @@ void plr_update_skill_terminology(int nr, int n)
 	mcpy(buf+3, skilltab[n].sortkey,   1); *(unsigned char*)(buf + 4) = (unsigned char)known;
 	xsend(nr, buf,  5);
 	
-	// TODO: send alternate name if necessary
+	if (n==11 && do_get_iflag(cn, SF_EMPRESS))    alt = 1; // Magic Shield -> Magic Shell
+	if (n==12 && do_get_iflag(cn, SF_PREIST_R))   alt = 1; // Tactics invert
+	if (n==16 && do_get_iflag(cn, SF_SHIELDBASH)) alt = 1; // Shield -> Shield Bash
+	if (n==19 && do_get_iflag(cn, SF_EMPEROR))    alt = 1; // Slow -> Greater Slow
+	if (n==20 && do_get_iflag(cn, SF_TOWER))      alt = 1; // Curse -> Greater Curse
+	if (n==24 && do_get_iflag(cn, SF_JUDGE))      alt = 1; // Blast -> +Scorch
+	if (n==26 && do_get_iflag(cn, SF_STAR))       alt = 1; // Heal -> Regen
+	if (n==35 && do_get_iflag(cn, SF_EMPERO_R))   alt = 1; // Warcry -> Rally
+	if (n==37 && do_get_iflag(cn, SF_CHARIOT))    alt = 1; // Blind -> Douse
+	if (n==40 && do_get_iflag(cn, SF_JUSTICE))    alt = 1; // Cleave -> +Aggravate
+	if (n==41 && do_get_iflag(cn, SF_DEATH))      alt = 1; // Weaken -> Greater Weaken
+	if (n==42 && do_get_iflag(cn, SF_TOWER_R))    alt = 1; // Poison -> Venom
+	if (n==43 && do_get_iflag(cn, SF_JUDGE_R))    alt = 1; // Pulse -> Healing Pulses
+	if (n==49 && do_get_iflag(cn, SF_JUSTIC_R))   alt = 1; // Leap
+	if (n==22 && IS_SHIFTED(cn))                  alt = 1; // Rage -> Calm
+	if (n==44)
+	{
+		alt = 1;
+		if (IS_SORCERER(cn)) ;
+		else if (IS_ARCHHARAKIM(cn)) n++;
+		else if (IS_BRAVER(cn)) n+=2;
+		else alt = 0;
+	}
 	
 	buf[1] = ST_SKILLS_NAME1;
-	mcpy(buf+3, skilltab[n].name,     10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_name,     10);
+	else     mcpy(buf+3, skilltab[n].name,         10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_NAME2;
-	mcpy(buf+3, skilltab[n].name+ 10, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_name+ 10, 10);
+	else     mcpy(buf+3, skilltab[n].name    + 10, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_NAME3;
-	mcpy(buf+3, skilltab[n].name+ 20, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_name+ 20, 10);
+	else     mcpy(buf+3, skilltab[n].name    + 20, 10);
 	xsend(nr, buf, 13);
 	
-	// TODO: send alternate description if necessary
-	
 	buf[1] = ST_SKILLS_DESC01;
-	mcpy(buf+3, skilltab[n].desc,     10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc,     10);
+	else     mcpy(buf+3, skilltab[n].desc,         10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC02;
-	mcpy(buf+3, skilltab[n].desc+ 10, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 10, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 10, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC03;
-	mcpy(buf+3, skilltab[n].desc+ 20, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 20, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 20, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC04;
-	mcpy(buf+3, skilltab[n].desc+ 30, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 30, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 30, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC05;
-	mcpy(buf+3, skilltab[n].desc+ 40, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 40, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 40, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC06;
-	mcpy(buf+3, skilltab[n].desc+ 50, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 50, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 50, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC07;
-	mcpy(buf+3, skilltab[n].desc+ 60, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 60, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 60, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC08;
-	mcpy(buf+3, skilltab[n].desc+ 70, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 70, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 70, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC09;
-	mcpy(buf+3, skilltab[n].desc+ 80, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 80, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 80, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC10;
-	mcpy(buf+3, skilltab[n].desc+ 90, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 90, 10);
+	else     mcpy(buf+3, skilltab[n].desc    + 90, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC11;
-	mcpy(buf+3, skilltab[n].desc+100, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+100, 10);
+	else      mcpy(buf+3, skilltab[n].desc   +100, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC12;
-	mcpy(buf+3, skilltab[n].desc+110, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+110, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +110, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC13;
-	mcpy(buf+3, skilltab[n].desc+120, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+120, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +120, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC14;
-	mcpy(buf+3, skilltab[n].desc+130, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+130, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +130, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC15;
-	mcpy(buf+3, skilltab[n].desc+140, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+140, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +140, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC16;
-	mcpy(buf+3, skilltab[n].desc+150, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+150, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +150, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC17;
-	mcpy(buf+3, skilltab[n].desc+160, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+160, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +160, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC18;
-	mcpy(buf+3, skilltab[n].desc+170, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+170, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +170, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC19;
-	mcpy(buf+3, skilltab[n].desc+180, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+180, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +180, 10);
 	xsend(nr, buf, 13);
 	
 	buf[1] = ST_SKILLS_DESC20;
-	mcpy(buf+3, skilltab[n].desc+190, 10);
+	if (alt) mcpy(buf+3, skilltab[n].alt_desc+190, 10);
+	else     mcpy(buf+3, skilltab[n].desc    +190, 10);
 	xsend(nr, buf, 13);
 }
 
