@@ -52,7 +52,7 @@ extern struct key okey;
 extern int do_exit;
 
 extern struct sk_tree sk_tree[2][12];
-extern struct skilltab _skilltab[55];
+extern struct skilltab *skilltab;
 
 int sv_cmd(unsigned char *buf);
 void sv_newplayer(unsigned char *buf);
@@ -489,30 +489,31 @@ int sv_terminology(unsigned char *buf)
 	{
 		n = buf[2];
 		
-		if (buf[1]==ST_SKILLS_SORT)   { memcpy(_skilltab[n].sortkey,  buf+3,  1); return  4; }
-		if (buf[1]==ST_SKILLS_NAME1)  { memcpy(_skilltab[n].name,     buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_NAME2)  { memcpy(_skilltab[n].name+ 10, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_NAME3)  { memcpy(_skilltab[n].name+ 20, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC01) { memcpy(_skilltab[n].desc,     buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC02) { memcpy(_skilltab[n].desc+ 10, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC03) { memcpy(_skilltab[n].desc+ 20, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC04) { memcpy(_skilltab[n].desc+ 30, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC05) { memcpy(_skilltab[n].desc+ 40, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC06) { memcpy(_skilltab[n].desc+ 50, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC07) { memcpy(_skilltab[n].desc+ 60, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC08) { memcpy(_skilltab[n].desc+ 70, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC09) { memcpy(_skilltab[n].desc+ 80, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC10) { memcpy(_skilltab[n].desc+ 90, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC11) { memcpy(_skilltab[n].desc+100, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC12) { memcpy(_skilltab[n].desc+110, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC13) { memcpy(_skilltab[n].desc+120, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC14) { memcpy(_skilltab[n].desc+130, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC15) { memcpy(_skilltab[n].desc+140, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC16) { memcpy(_skilltab[n].desc+150, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC17) { memcpy(_skilltab[n].desc+160, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC18) { memcpy(_skilltab[n].desc+170, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC19) { memcpy(_skilltab[n].desc+180, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC20) { memcpy(_skilltab[n].desc+190, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_SORT)   { memcpy(skilltab[n].sortkey,  buf+3,  1);
+		                            skilltab[n].show = *(unsigned char*)(buf+4); return  5; }
+		if (buf[1]==ST_SKILLS_NAME1)  { memcpy(skilltab[n].name,     buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_NAME2)  { memcpy(skilltab[n].name+ 10, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_NAME3)  { memcpy(skilltab[n].name+ 20, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC01) { memcpy(skilltab[n].desc,     buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC02) { memcpy(skilltab[n].desc+ 10, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC03) { memcpy(skilltab[n].desc+ 20, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC04) { memcpy(skilltab[n].desc+ 30, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC05) { memcpy(skilltab[n].desc+ 40, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC06) { memcpy(skilltab[n].desc+ 50, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC07) { memcpy(skilltab[n].desc+ 60, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC08) { memcpy(skilltab[n].desc+ 70, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC09) { memcpy(skilltab[n].desc+ 80, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC10) { memcpy(skilltab[n].desc+ 90, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC11) { memcpy(skilltab[n].desc+100, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC12) { memcpy(skilltab[n].desc+110, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC13) { memcpy(skilltab[n].desc+120, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC14) { memcpy(skilltab[n].desc+130, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC15) { memcpy(skilltab[n].desc+140, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC16) { memcpy(skilltab[n].desc+150, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC17) { memcpy(skilltab[n].desc+160, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC18) { memcpy(skilltab[n].desc+170, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC19) { memcpy(skilltab[n].desc+180, buf+3, 10); return 13; }
+		if (buf[1]==ST_SKILLS_DESC20) { memcpy(skilltab[n].desc+190, buf+3, 10); return 13; }
 	}
 	
 	return 16; // Should not be reached

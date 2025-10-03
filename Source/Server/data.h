@@ -1360,8 +1360,8 @@ struct s_skilltab
 	char name[30];
 	char desc[200];
 	
-	char alt_a[200]; // If something changes the name
-	char alt_b[200]; // If something changes the desc
+	char alt_name[30];  // If something changes the name
+	char alt_desc[200]; // If something changes the desc
 	
 	int attrib[3];
 };

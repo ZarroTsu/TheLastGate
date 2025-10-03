@@ -51,7 +51,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{  9, 'G', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
 				"", "",
 				{ AT_INT, AT_INT, AT_AGL }},
-//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+				
 	{ 10, 'G', 	"Metabolism", 			"Passive ability to prevent the loss of hitpoints while you are underwater and against damage-over-time.", 
 				"", "",
 				{ AT_BRV, AT_WIL, AT_INT }},
@@ -91,7 +91,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 19, 'F', 	"Slow", 				"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their action speed.", 
 				"Slow (Greater)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their action speed.",
 				{ AT_BRV, AT_INT, AT_INT }},
-//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+				
 	{ 20, 'F', 	"Curse", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their attributes.", 
 				"Curse (Greater)", 		"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their attributes.",
 				{ AT_BRV, AT_INT, AT_INT }},
@@ -131,7 +131,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 29, 'A', 	"Rest", 				"Passive ability to recover endurance over time.", 
 				"", "",
 				{ AT_AGL, AT_AGL, AT_AGL }},
-//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+				
 	{ 30, 'B', 	"Meditate", 			"Passive ability to recover mana over time.", 
 				"", "",
 				{ AT_INT, AT_INT, AT_INT }},
@@ -171,7 +171,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 39, 'G', 	"Safeguard", 			"Passive ability to reduce damage taken.", 
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
-//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+				
 	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", 
 				"Cleave (Aggravate)",	"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take additional damage.",
 				{ AT_AGL, AT_STR, AT_STR }},
@@ -189,12 +189,11 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of your Aria and Weaken skills.", // Braver
-										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
-										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
+				"Proximity",			"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
 	{ 45, 'G', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
-				"", "",
+				"Proximity",			"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
@@ -212,7 +211,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life. Higher cooldown rate lets this skill repeat additional times.",
 				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
-//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+				
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
 				"", "",
 				{ 0, 0, 0 }},

@@ -1109,7 +1109,6 @@ void meta_stat_descs(int n)
 int mouse_statbox2(int x,int y,int state)
 {
 	int n, m;
-    extern struct skilltab _skilltab[];
 	int pl_flags, pl_flagb;
 	char tmp[200];
 	static int firstclick=0;

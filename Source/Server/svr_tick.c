@@ -1955,117 +1955,180 @@ void plr_update_tree_terminology(int nr, int val)
 	}
 }
 
-void plr_update_skill_terminology(int nr)
+/*
+{
+	if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+			(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+			(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+			(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
+			(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+			(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
+			(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
+			(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
+			(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
+			(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
+			(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
+			(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
+			(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
+			(m==12&&(pl_flagb & (1 <<  3))) ||  // Tactics invert
+			(m==22&&IS_SHIFTED) // Rage -> Calm
+		)
+		dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
+	else
+		dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
+	
+	
+	if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
+	
+	dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
+	
+	if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) dd_putc(163,(8+8*14)+n*14,1,'+');
+	
+	if (stat_raised[n+8+skill_pos]>0) dd_putc(177,(8+8*14)+n*14,1,'-');
+	
+	if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL) dd_xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
+}
+*/
+
+char get_known_player_skill(int cn, int n)
+{
+	if (n<0 || n>=55) return 0; // 0 = not known
+	
+	if (n>=50) // Orange meta skill
+	{
+		if ((n==52) && !(ch[cn].kindred & KIN_IDENTIFY)) return 0; // 0 = not known
+		if ((n==53||n==54) && !IS_LYCANTH(cn)) return 0; // 0 = not known
+		
+		return 2; //  2 = show in orange
+	}
+	
+	if (!B_SK(cn, n)) // We don't know this skill
+	{	// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
+		if (n==8||n==23||n==28||n==29||n==30||n==32) return 4; //  4 = show in red
+		if (n==44 && IS_SEYAN_DU(cn)) return 4; //  4 = show in red
+		
+		return 0; // 0 = not known
+	}
+	
+	return 1; //  1 = show in yellow
+}
+
+void plr_update_skill_terminology(int nr, int n)
+{
+	unsigned char buf[256];
+	char known = get_known_player_skill(player[nr].usnr, n);
+	
+	buf[0] = SV_TERM_SKILLS;
+	buf[2] = n;
+	
+	buf[1] = ST_SKILLS_SORT;
+	mcpy(buf+3, skilltab[n].sortkey,   1); *(unsigned char*)(buf + 4) = (unsigned char)known;
+	xsend(nr, buf,  5);
+	
+	// TODO: send alternate name if necessary
+	
+	buf[1] = ST_SKILLS_NAME1;
+	mcpy(buf+3, skilltab[n].name,     10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_NAME2;
+	mcpy(buf+3, skilltab[n].name+ 10, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_NAME3;
+	mcpy(buf+3, skilltab[n].name+ 20, 10);
+	xsend(nr, buf, 13);
+	
+	// TODO: send alternate description if necessary
+	
+	buf[1] = ST_SKILLS_DESC01;
+	mcpy(buf+3, skilltab[n].desc,     10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC02;
+	mcpy(buf+3, skilltab[n].desc+ 10, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC03;
+	mcpy(buf+3, skilltab[n].desc+ 20, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC04;
+	mcpy(buf+3, skilltab[n].desc+ 30, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC05;
+	mcpy(buf+3, skilltab[n].desc+ 40, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC06;
+	mcpy(buf+3, skilltab[n].desc+ 50, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC07;
+	mcpy(buf+3, skilltab[n].desc+ 60, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC08;
+	mcpy(buf+3, skilltab[n].desc+ 70, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC09;
+	mcpy(buf+3, skilltab[n].desc+ 80, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC10;
+	mcpy(buf+3, skilltab[n].desc+ 90, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC11;
+	mcpy(buf+3, skilltab[n].desc+100, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC12;
+	mcpy(buf+3, skilltab[n].desc+110, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC13;
+	mcpy(buf+3, skilltab[n].desc+120, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC14;
+	mcpy(buf+3, skilltab[n].desc+130, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC15;
+	mcpy(buf+3, skilltab[n].desc+140, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC16;
+	mcpy(buf+3, skilltab[n].desc+150, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC17;
+	mcpy(buf+3, skilltab[n].desc+160, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC18;
+	mcpy(buf+3, skilltab[n].desc+170, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC19;
+	mcpy(buf+3, skilltab[n].desc+180, 10);
+	xsend(nr, buf, 13);
+	
+	buf[1] = ST_SKILLS_DESC20;
+	mcpy(buf+3, skilltab[n].desc+190, 10);
+	xsend(nr, buf, 13);
+}
+
+void plr_update_all_skill_terminology(int nr)
 {
 	int n;
 	
-	buf[0] = SV_TERM_SKILLS;
-	
 	for (n=0; n<(MAXSKILL+5); n++)
 	{
-		buf[2] = n;
-		
-		// TODO: send a 'show' value based on known skill criteria.
-		
-		buf[1] = ST_SKILLS_SORT;
-		mcpy(buf+3, skilltab[n].sortkey,   1);
-		xsend(nr, buf,  4);
-		
-		// TODO: send alternate name if necessary
-		
-		buf[1] = ST_SKILLS_NAME1;
-		mcpy(buf+3, skilltab[n].name,     10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_NAME2;
-		mcpy(buf+3, skilltab[n].name+ 10, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_NAME3;
-		mcpy(buf+3, skilltab[n].name+ 20, 10);
-		xsend(nr, buf, 13);
-		
-		// TODO: send alternate description if necessary
-		
-		buf[1] = ST_SKILLS_DESC01;
-		mcpy(buf+3, skilltab[n].desc,     10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC02;
-		mcpy(buf+3, skilltab[n].desc+ 10, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC03;
-		mcpy(buf+3, skilltab[n].desc+ 20, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC04;
-		mcpy(buf+3, skilltab[n].desc+ 30, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC05;
-		mcpy(buf+3, skilltab[n].desc+ 40, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC06;
-		mcpy(buf+3, skilltab[n].desc+ 50, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC07;
-		mcpy(buf+3, skilltab[n].desc+ 60, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC08;
-		mcpy(buf+3, skilltab[n].desc+ 70, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC09;
-		mcpy(buf+3, skilltab[n].desc+ 80, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC10;
-		mcpy(buf+3, skilltab[n].desc+ 90, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC11;
-		mcpy(buf+3, skilltab[n].desc+100, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC12;
-		mcpy(buf+3, skilltab[n].desc+110, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC13;
-		mcpy(buf+3, skilltab[n].desc+120, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC14;
-		mcpy(buf+3, skilltab[n].desc+130, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC15;
-		mcpy(buf+3, skilltab[n].desc+140, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC16;
-		mcpy(buf+3, skilltab[n].desc+150, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC17;
-		mcpy(buf+3, skilltab[n].desc+160, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC18;
-		mcpy(buf+3, skilltab[n].desc+170, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC19;
-		mcpy(buf+3, skilltab[n].desc+180, 10);
-		xsend(nr, buf, 13);
-		
-		buf[1] = ST_SKILLS_DESC20;
-		mcpy(buf+3, skilltab[n].desc+190, 10);
-		xsend(nr, buf, 13);
+		plr_update_skill_terminology(nr, n);
 	}
 }
 
