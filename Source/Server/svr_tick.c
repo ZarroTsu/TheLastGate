@@ -1821,6 +1821,7 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 	unsigned char buf[256];
 	int cn = player[nr].usnr;
 	int m = ch[cn].tree_node[n];
+	int j;
 	
 	if (tn < 0) return;
 	if (tn > 9) return;
@@ -1837,96 +1838,29 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 		*(unsigned short*)(buf + 3) = (unsigned short)(sk_tree[tn][n].icon);
 	xsend(nr, buf,  5);
 	
-	buf[1] = ST_TREE_NAME1;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].name,    10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].name,    10);
-	xsend(nr, buf, 13);
+	for (j=0; j<3; j++)
+	{
+		buf[1] = ST_TREE_NAME+j;
+		if (m) mcpy(buf+3, sk_corrupt[m-1].name+j*10, 10);
+		else   mcpy(buf+3,  sk_tree[tn][n].name+j*10, 10);
+		xsend(nr, buf, 13);
+	}
 	
-	buf[1] = ST_TREE_NAME2;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].name+10, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].name+10, 10);
-	xsend(nr, buf, 13);
+	for (j=0; j<5; j++)
+	{
+		buf[1] = ST_TREE_DESC1+j;
+		if (m) mcpy(buf+3, sk_corrupt[m-1].dsc1+j*10, 10);
+		else   mcpy(buf+3,  sk_tree[tn][n].dsc1+j*10, 10);
+		xsend(nr, buf, 13);
+	}
 	
-	buf[1] = ST_TREE_NAME3;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].name+20, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].name+20, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC1A;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc1,    10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc1,    10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC1B;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc1+10, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc1+10, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC1C;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc1+20, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc1+20, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC1D;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc1+30, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc1+30, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC1E;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc1+40, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc1+40, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC2A;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc2,    10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc2,    10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC2B;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc2+10, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc2+10, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC2C;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc2+20, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc2+20, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC2D;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc2+30, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc2+30, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_TREE_DESC2E;
-	if (m)
-		mcpy(buf+3, sk_corrupt[m-1].dsc2+40, 10);
-	else
-		mcpy(buf+3, sk_tree[tn][n].dsc2+40, 10);
-	xsend(nr, buf, 13);
+	for (j=0; j<5; j++)
+	{
+		buf[1] = ST_TREE_DESC2+j;
+		if (m) mcpy(buf+3, sk_corrupt[m-1].dsc2+j*10, 10);
+		else   mcpy(buf+3,  sk_tree[tn][n].dsc2+j*10, 10);
+		xsend(nr, buf, 13);
+	}
 }
 
 void plr_update_tree_terminology(int nr, int val)
@@ -1983,7 +1917,7 @@ void plr_update_skill_terminology(int nr, int n)
 	unsigned char buf[256];
 	int cn = player[nr].usnr;
 	char known = get_known_player_skill(cn, n);
-	int alt = 0;
+	int alt = 0, m;
 	
 	buf[0] = SV_TERM_SKILLS;
 	buf[2] = n;
@@ -2016,130 +1950,82 @@ void plr_update_skill_terminology(int nr, int n)
 		else alt = 0;
 	}
 	
-	buf[1] = ST_SKILLS_NAME1;
-	if (alt) mcpy(buf+3, skilltab[n].alt_name,     10);
-	else     mcpy(buf+3, skilltab[n].name,         10);
-	xsend(nr, buf, 13);
+	for (m=0; m<3; m++)
+	{
+		buf[1] = ST_SKILLS_NAME+m;
+		if (alt) mcpy(buf+3, skilltab[n].alt_name+m*10, 10);
+		else     mcpy(buf+3, skilltab[n].name+m*10,     10);
+		xsend(nr, buf, 13);
+	}
 	
-	buf[1] = ST_SKILLS_NAME2;
-	if (alt) mcpy(buf+3, skilltab[n].alt_name+ 10, 10);
-	else     mcpy(buf+3, skilltab[n].name    + 10, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_NAME3;
-	if (alt) mcpy(buf+3, skilltab[n].alt_name+ 20, 10);
-	else     mcpy(buf+3, skilltab[n].name    + 20, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC01;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc,     10);
-	else     mcpy(buf+3, skilltab[n].desc,         10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC02;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 10, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 10, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC03;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 20, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 20, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC04;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 30, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 30, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC05;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 40, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 40, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC06;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 50, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 50, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC07;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 60, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 60, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC08;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 70, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 70, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC09;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 80, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 80, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC10;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+ 90, 10);
-	else     mcpy(buf+3, skilltab[n].desc    + 90, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC11;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+100, 10);
-	else      mcpy(buf+3, skilltab[n].desc   +100, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC12;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+110, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +110, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC13;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+120, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +120, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC14;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+130, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +130, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC15;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+140, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +140, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC16;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+150, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +150, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC17;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+160, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +160, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC18;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+170, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +170, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC19;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+180, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +180, 10);
-	xsend(nr, buf, 13);
-	
-	buf[1] = ST_SKILLS_DESC20;
-	if (alt) mcpy(buf+3, skilltab[n].alt_desc+190, 10);
-	else     mcpy(buf+3, skilltab[n].desc    +190, 10);
-	xsend(nr, buf, 13);
+	for (m=0; m<20; m++)
+	{
+		buf[1] = ST_SKILLS_DESC+m;
+		if (alt) mcpy(buf+3, skilltab[n].alt_desc+m*10, 10);
+		else     mcpy(buf+3, skilltab[n].desc+m*10,     10);
+		xsend(nr, buf, 13);
+	}
 }
 
 void plr_update_all_skill_terminology(int nr)
 {
-	int n;
+	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);
+}
+
+int get_meta_stat_value(int cn)
+{
+	// TODO: The big one.
 	
-	for (n=0; n<(MAXSKILL+5); n++)
+	return -1;
+}
+
+void plr_update_meta_stat_values(int nr, int n)
+{
+	unsigned char buf[256];
+	int cn = player[nr].usnr;
+	short int v;
+	
+	buf[0] = SV_TERM_META;
+	buf[2] = n;
+	
+	v = get_meta_stat_value(cn);
+	
+	buf[1] = ST_META_VALUES;
+	if (metaStats[n].flag) *(short int*)(buf + 3)     =     (short int)(v/100);
+	else                   *(short int*)(buf + 3)     =     (short int)(v);
+	if (metaStats[n].flag) *(unsigned char*)(buf + 5) = (unsigned char)(v%100);
+	else                   *(unsigned char*)(buf + 5) = (unsigned char)(0);
+	mcpy(buf+6, metaStats[n].affix, 10);
+	*(unsigned char*)(buf +14) = (unsigned char)metaStats[n].font;
+	xsend(nr, buf, 15);
+}
+
+void plr_update_meta_terminology(int nr, int n)
+{
+	unsigned char buf[256];
+	int m;
+	
+	buf[0] = SV_TERM_META;
+	buf[2] = n;
+	
+	for (m=0; m<3; m++)
 	{
-		plr_update_skill_terminology(nr, n);
+		buf[1] = ST_META_NAME+m;
+		mcpy(buf+3, metaStats[n].name+m*10, 10);
+		xsend(nr, buf, 13);
 	}
+	
+	for (m=0; m<20; m++)
+	{
+		buf[1] = ST_META_DESC+m;
+		mcpy(buf+3, metaStats[n].desc+m*10, 10);
+		xsend(nr, buf, 13);
+	}
+}
+
+void plr_update_all_meta_terminology(int nr)
+{
+	for (int n=0; n<90; n++) plr_update_meta_terminology(nr, n);
 }
 
 void plr_newlogin(int nr)

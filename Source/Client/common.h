@@ -413,6 +413,7 @@ struct cplayer {
 #define SV_TERM_STREE				100
 #define SV_TERM_CTREE				101
 #define SV_TERM_SKILLS				102
+#define SV_TERM_META				103
 
 #define SV_SETMAP					128
 
@@ -456,6 +457,31 @@ struct cplayer {
 #define ST_SKILLS_DESC18			 35
 #define ST_SKILLS_DESC19			 36
 #define ST_SKILLS_DESC20			 37
+
+#define ST_META_NAME1				 38
+#define ST_META_NAME2				 39
+#define ST_META_NAME3				 40
+#define ST_META_DESC01				 41
+#define ST_META_DESC02				 42
+#define ST_META_DESC03				 43
+#define ST_META_DESC04				 44
+#define ST_META_DESC05				 45
+#define ST_META_DESC06				 46
+#define ST_META_DESC07				 47
+#define ST_META_DESC08				 48
+#define ST_META_DESC09				 49
+#define ST_META_DESC10				 50
+#define ST_META_DESC11				 51
+#define ST_META_DESC12				 52
+#define ST_META_DESC13				 53
+#define ST_META_DESC14				 54
+#define ST_META_DESC15				 55
+#define ST_META_DESC16				 56
+#define ST_META_DESC17				 57
+#define ST_META_DESC18				 58
+#define ST_META_DESC19				 59
+#define ST_META_DESC20				 60
+#define ST_META_VALUES				 61 // includes font
 
 
 #define SPR_INVISIBLE				0

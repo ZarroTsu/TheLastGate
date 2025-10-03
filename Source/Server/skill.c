@@ -720,3 +720,19 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6708,                            "" }
 };
 
+/*
+char flag;		// flag is 1 if the expected value is a decimal
+char font;
+char name[30];
+char desc[200];
+char affix[8];
+*/
+
+// TODO: migrate client terminology to here
+
+struct metaStat metaStats[90] = {
+	
+	{ 0, 0, "", "", "" },
+};
+
+

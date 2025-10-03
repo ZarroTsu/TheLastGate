@@ -469,51 +469,97 @@ int sv_terminology(unsigned char *buf)
 	{
 		n = buf[2];
 		
-		if (buf[1]==ST_TREE_ICON)   { sk_tree[tn][n].icon = *(unsigned short*)(buf+3); return  5; }
-		if (buf[1]==ST_TREE_NAME1)  { memcpy(sk_tree[tn][n].name,    buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_NAME2)  { memcpy(sk_tree[tn][n].name+10, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_NAME3)  { memcpy(sk_tree[tn][n].name+20, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC1A) { memcpy(sk_tree[tn][n].dsc1,    buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC1B) { memcpy(sk_tree[tn][n].dsc1+10, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC1C) { memcpy(sk_tree[tn][n].dsc1+20, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC1D) { memcpy(sk_tree[tn][n].dsc1+30, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC1E) { memcpy(sk_tree[tn][n].dsc1+40, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC2A) { memcpy(sk_tree[tn][n].dsc2,    buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC2B) { memcpy(sk_tree[tn][n].dsc2+10, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC2C) { memcpy(sk_tree[tn][n].dsc2+20, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC2D) { memcpy(sk_tree[tn][n].dsc2+30, buf+3, 10);       return 13; }
-		if (buf[1]==ST_TREE_DESC2E) { memcpy(sk_tree[tn][n].dsc2+40, buf+3, 10);       return 13; }
+		switch (buf[1])
+		{
+			case ST_TREE_ICON:   sk_tree[tn][n].icon = *(unsigned short*)(buf+3); return  5;
+			case ST_TREE_NAME1:  memcpy(sk_tree[tn][n].name,    buf+3, 10);       return 13;
+			case ST_TREE_NAME2:  memcpy(sk_tree[tn][n].name+10, buf+3, 10);       return 13;
+			case ST_TREE_NAME3:  memcpy(sk_tree[tn][n].name+20, buf+3, 10);       return 13;
+			case ST_TREE_DESC1A: memcpy(sk_tree[tn][n].dsc1,    buf+3, 10);       return 13;
+			case ST_TREE_DESC1B: memcpy(sk_tree[tn][n].dsc1+10, buf+3, 10);       return 13;
+			case ST_TREE_DESC1C: memcpy(sk_tree[tn][n].dsc1+20, buf+3, 10);       return 13;
+			case ST_TREE_DESC1D: memcpy(sk_tree[tn][n].dsc1+30, buf+3, 10);       return 13;
+			case ST_TREE_DESC1E: memcpy(sk_tree[tn][n].dsc1+40, buf+3, 10);       return 13;
+			case ST_TREE_DESC2A: memcpy(sk_tree[tn][n].dsc2,    buf+3, 10);       return 13;
+			case ST_TREE_DESC2B: memcpy(sk_tree[tn][n].dsc2+10, buf+3, 10);       return 13;
+			case ST_TREE_DESC2C: memcpy(sk_tree[tn][n].dsc2+20, buf+3, 10);       return 13;
+			case ST_TREE_DESC2D: memcpy(sk_tree[tn][n].dsc2+30, buf+3, 10);       return 13;
+			case ST_TREE_DESC2E: memcpy(sk_tree[tn][n].dsc2+40, buf+3, 10);       return 13;
+			default: break;
+		}
 	}
 	
 	if (buf[0]==SV_TERM_SKILLS)
 	{
 		n = buf[2];
 		
-		if (buf[1]==ST_SKILLS_SORT)   { memcpy(skilltab[n].sortkey,  buf+3,  1);
-		                            skilltab[n].show = *(unsigned char*)(buf+4); return  5; }
-		if (buf[1]==ST_SKILLS_NAME1)  { memcpy(skilltab[n].name,     buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_NAME2)  { memcpy(skilltab[n].name+ 10, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_NAME3)  { memcpy(skilltab[n].name+ 20, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC01) { memcpy(skilltab[n].desc,     buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC02) { memcpy(skilltab[n].desc+ 10, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC03) { memcpy(skilltab[n].desc+ 20, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC04) { memcpy(skilltab[n].desc+ 30, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC05) { memcpy(skilltab[n].desc+ 40, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC06) { memcpy(skilltab[n].desc+ 50, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC07) { memcpy(skilltab[n].desc+ 60, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC08) { memcpy(skilltab[n].desc+ 70, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC09) { memcpy(skilltab[n].desc+ 80, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC10) { memcpy(skilltab[n].desc+ 90, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC11) { memcpy(skilltab[n].desc+100, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC12) { memcpy(skilltab[n].desc+110, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC13) { memcpy(skilltab[n].desc+120, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC14) { memcpy(skilltab[n].desc+130, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC15) { memcpy(skilltab[n].desc+140, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC16) { memcpy(skilltab[n].desc+150, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC17) { memcpy(skilltab[n].desc+160, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC18) { memcpy(skilltab[n].desc+170, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC19) { memcpy(skilltab[n].desc+180, buf+3, 10); return 13; }
-		if (buf[1]==ST_SKILLS_DESC20) { memcpy(skilltab[n].desc+190, buf+3, 10); return 13; }
+		switch (buf[1])
+		{
+			case ST_SKILLS_SORT: memcpy(skilltab[n].sortkey,  buf+3,  1);
+			                   skilltab[n].show = *(unsigned char*)(buf+4); return  5;
+			case ST_SKILLS_NAME1:  memcpy(skilltab[n].name,     buf+3, 10); return 13;
+			case ST_SKILLS_NAME2:  memcpy(skilltab[n].name+ 10, buf+3, 10); return 13;
+			case ST_SKILLS_NAME3:  memcpy(skilltab[n].name+ 20, buf+3, 10); return 13;
+			case ST_SKILLS_DESC01: memcpy(skilltab[n].desc,     buf+3, 10); return 13;
+			case ST_SKILLS_DESC02: memcpy(skilltab[n].desc+ 10, buf+3, 10); return 13;
+			case ST_SKILLS_DESC03: memcpy(skilltab[n].desc+ 20, buf+3, 10); return 13;
+			case ST_SKILLS_DESC04: memcpy(skilltab[n].desc+ 30, buf+3, 10); return 13;
+			case ST_SKILLS_DESC05: memcpy(skilltab[n].desc+ 40, buf+3, 10); return 13;
+			case ST_SKILLS_DESC06: memcpy(skilltab[n].desc+ 50, buf+3, 10); return 13;
+			case ST_SKILLS_DESC07: memcpy(skilltab[n].desc+ 60, buf+3, 10); return 13;
+			case ST_SKILLS_DESC08: memcpy(skilltab[n].desc+ 70, buf+3, 10); return 13;
+			case ST_SKILLS_DESC09: memcpy(skilltab[n].desc+ 80, buf+3, 10); return 13;
+			case ST_SKILLS_DESC10: memcpy(skilltab[n].desc+ 90, buf+3, 10); return 13;
+			case ST_SKILLS_DESC11: memcpy(skilltab[n].desc+100, buf+3, 10); return 13;
+			case ST_SKILLS_DESC12: memcpy(skilltab[n].desc+110, buf+3, 10); return 13;
+			case ST_SKILLS_DESC13: memcpy(skilltab[n].desc+120, buf+3, 10); return 13;
+			case ST_SKILLS_DESC14: memcpy(skilltab[n].desc+130, buf+3, 10); return 13;
+			case ST_SKILLS_DESC15: memcpy(skilltab[n].desc+140, buf+3, 10); return 13;
+			case ST_SKILLS_DESC16: memcpy(skilltab[n].desc+150, buf+3, 10); return 13;
+			case ST_SKILLS_DESC17: memcpy(skilltab[n].desc+160, buf+3, 10); return 13;
+			case ST_SKILLS_DESC18: memcpy(skilltab[n].desc+170, buf+3, 10); return 13;
+			case ST_SKILLS_DESC19: memcpy(skilltab[n].desc+180, buf+3, 10); return 13;
+			case ST_SKILLS_DESC20: memcpy(skilltab[n].desc+190, buf+3, 10); return 13;
+			default: break;
+		}
+	}
+	
+	if (buf[0]==SV_TERM_META)
+	{
+		n = buf[2];
+		
+		switch (buf[1])
+		{
+			case ST_META_NAME1:  memcpy(metaStats[n].name,     buf+3, 10); return 13;
+			case ST_META_NAME2:  memcpy(metaStats[n].name+ 10, buf+3, 10); return 13;
+			case ST_META_NAME3:  memcpy(metaStats[n].name+ 20, buf+3, 10); return 13;
+			case ST_META_DESC01: memcpy(metaStats[n].desc,     buf+3, 10); return 13;
+			case ST_META_DESC02: memcpy(metaStats[n].desc+ 10, buf+3, 10); return 13;
+			case ST_META_DESC03: memcpy(metaStats[n].desc+ 20, buf+3, 10); return 13;
+			case ST_META_DESC04: memcpy(metaStats[n].desc+ 30, buf+3, 10); return 13;
+			case ST_META_DESC05: memcpy(metaStats[n].desc+ 40, buf+3, 10); return 13;
+			case ST_META_DESC06: memcpy(metaStats[n].desc+ 50, buf+3, 10); return 13;
+			case ST_META_DESC07: memcpy(metaStats[n].desc+ 60, buf+3, 10); return 13;
+			case ST_META_DESC08: memcpy(metaStats[n].desc+ 70, buf+3, 10); return 13;
+			case ST_META_DESC09: memcpy(metaStats[n].desc+ 80, buf+3, 10); return 13;
+			case ST_META_DESC10: memcpy(metaStats[n].desc+ 90, buf+3, 10); return 13;
+			case ST_META_DESC11: memcpy(metaStats[n].desc+100, buf+3, 10); return 13;
+			case ST_META_DESC12: memcpy(metaStats[n].desc+110, buf+3, 10); return 13;
+			case ST_META_DESC13: memcpy(metaStats[n].desc+120, buf+3, 10); return 13;
+			case ST_META_DESC14: memcpy(metaStats[n].desc+130, buf+3, 10); return 13;
+			case ST_META_DESC15: memcpy(metaStats[n].desc+140, buf+3, 10); return 13;
+			case ST_META_DESC16: memcpy(metaStats[n].desc+150, buf+3, 10); return 13;
+			case ST_META_DESC17: memcpy(metaStats[n].desc+160, buf+3, 10); return 13;
+			case ST_META_DESC18: memcpy(metaStats[n].desc+170, buf+3, 10); return 13;
+			case ST_META_DESC19: memcpy(metaStats[n].desc+180, buf+3, 10); return 13;
+			case ST_META_DESC20: memcpy(metaStats[n].desc+190, buf+3, 10); return 13;
+			case ST_META_VALUES: 
+			               skilltab[n].value   =     *(short int*)(buf+3);
+			               skilltab[n].decimal = *(unsigned char*)(buf+5);
+			                        memcpy(metaStats[n].affix, buf+6,  8);
+			               skilltab[n].font   = *(unsigned char*)(buf+14); return 15;
+			default: break;
+		}
 	}
 	
 	return 16; // Should not be reached
