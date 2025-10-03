@@ -1650,34 +1650,19 @@ void eng_display_win(int plr_sprite,int init)
 					continue;
 				}
 				
+				dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
 				
+				if (pdata.show_stats)
+					dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
 				
-				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-						(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-						(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-						(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
-						(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-						(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
-						(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-						(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
-						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
-						(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
-						(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-						(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-						(m==12&&(pl_flagb & (1 <<  3))) ||  // Tactics invert
-						(m==22&&IS_SHIFTED) // Rage -> Calm
-					)
-					dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
-				else
-					dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
-				
-				if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
 				dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
+				
 				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
 					dd_putc(163,(8+8*14)+n*14,1,'+');
+				
 				if (stat_raised[n+8+skill_pos]>0) 
 					dd_putc(177,(8+8*14)+n*14,1,'-');
+				
 				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL)
 					dd_xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
 			}
