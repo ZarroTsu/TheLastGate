@@ -11795,9 +11795,9 @@ void really_update_char(int cn)
 		dmg_bns     = dmg_bns * (100 + bu[m].dmg_bonus/2)/100;
 		dmg_rdc     = dmg_rdc * (100 - bu[m].dmg_reduction/2)/100;
 		//
-		// resrv[0]   += bu[m].reserve[0];
-		// resrv[1]   += bu[m].reserve[1];
-		// resrv[2]   += bu[m].reserve[2];
+		resrv[0]   += bu[m].reserve[0]; // HP
+		resrv[1]   += bu[m].reserve[1]; // End
+		resrv[2]   += bu[m].reserve[2]; // Mana
 		//
 		if (bu[m].temp==SK_HEAL)
 		{
@@ -12160,7 +12160,7 @@ void really_update_char(int cn)
 		end = 999;
 	}
 	ch[cn].end[5] = end;
-	if (ch[cn].a_end < ch[cn].end[5]*1000) ch[cn].a_end += heal_end;
+	if (ch[cn].a_end < EN_SOFTCAP(cn)) ch[cn].a_end += heal_end;
 	
 	// Mana
 	mana = (int)ch[cn].mana[0] + (int)ch[cn].mana[1] + mana;
@@ -12217,8 +12217,8 @@ void really_update_char(int cn)
 		dmg_rdc = dmg_rdc * reduc_bonus/1000;
 	}
 	
-	if (ch[cn].a_mana < ch[cn].mana[5]*1000) ch[cn].a_mana += heal_mana;
-	if (ch[cn].a_hp < ch[cn].hp[5]*1000) ch[cn].a_hp += heal_hp;
+	if (ch[cn].a_mana < MP_SOFTCAP(cn)) ch[cn].a_mana += heal_mana;
+	if (ch[cn].a_hp   < HP_SOFTCAP(cn)) ch[cn].a_hp   += heal_hp;
 	
 	if (ch[cn].flags & (CF_PLAYER))
 	{
@@ -12374,7 +12374,7 @@ void really_update_char(int cn)
 	
 	// Tactics
 	if (B_SK(cn, SK_TACTICS))
-	{ // resrv[2]
+	{
 		z = M_SK(cn, SK_TACTICS);
 		
 		// Tarot - Moon.R :: 1% increased effect of tactics per 50 uncapped mana
@@ -12390,20 +12390,19 @@ void really_update_char(int cn)
 	}
 	
 	// Finesse
-	if (B_SK(cn, SK_FINESSE) && ch[cn].a_hp >= ch[cn].hp[5]*600)
-	{ // resrv[0]
-		if (IS_PLAYER(cn) && IS_BRAVER(cn))
-			z = M_SK(cn, SK_FINESSE)*3;
-		else
-			z = M_SK(cn, SK_FINESSE)*2;
+	if (B_SK(cn, SK_FINESSE))
+	{
+		z = M_SK(cn, SK_FINESSE);
 		
 		if (T_BRAV_SK(cn, 7))        z = z + (z * M_AT(cn, AT_BRV)/2000);
 		if (n=st_skillcount(cn, 91)) z = z + (z * M_AT(cn, AT_BRV)*n/5000);
 		
-		n = max(1, ch[cn].hp[5]*1000 - ch[cn].hp[5]*600);
-		hp = ch[cn].a_hp - ch[cn].hp[5]*600;
+		//n = max(1, ch[cn].hp[5]*1000 - ch[cn].hp[5]*600);
+		//hp = ch[cn].a_hp - ch[cn].hp[5]*600;
 		
-		dmg_bns = dmg_bns * (5000 + min(z, z * hp / n))/5000;
+		z = z*2 - max(0, min(z, z * (HP_SOFTCAP(cn) - ch[cn].a_hp) / HP_SOFTCAP(cn)));
+		
+		dmg_bns = dmg_bns * (3000 + z)/3000;
 	}
 	
 	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4) { cz=cn; cn=co; }
@@ -13212,24 +13211,15 @@ void really_update_char(int cn)
 	
 	for (z=0;z<3;z++)
 	{
-		if (resrv[z] > 90) resrv[z] = 90;
+		if (resrv[z] > 95) resrv[z] = 95;
 		if (resrv[z] <  0) resrv[z] =  0;
 		ch[cn].reserve[z] = resrv[z];
 	}
 	
 	// Force hp/end/mana to sane values
-	if (ch[cn].a_hp   > (  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * resrv[0]/100)))
-	{
-		ch[cn].a_hp   = (  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * resrv[0]/100));
-	}
-	if (ch[cn].a_end  > ( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * resrv[1]/100)))
-	{
-		ch[cn].a_end  = ( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * resrv[1]/100));
-	}
-	if (ch[cn].a_mana > (ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * resrv[2]/100)))
-	{
-		ch[cn].a_mana = (ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * resrv[2]/100));
-	}
+	if (ch[cn].a_hp   > HP_SOFTCAP(cn)) ch[cn].a_hp   = HP_SOFTCAP(cn);
+	if (ch[cn].a_end  > EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
+	if (ch[cn].a_mana > MP_SOFTCAP(cn)) ch[cn].a_mana = MP_SOFTCAP(cn);
 	
 	// Adjust local light score
 	if (oldlight!=ch[cn].light && ch[cn].used==USE_ACTIVE &&
@@ -13672,19 +13662,19 @@ void do_regenerate(int cn)
 	hpmult = endmult = manamult = moonmult;
 	
 	// Tarot - Moon :: While not full mana, life regen is mana regen
-	if (do_get_iflag(cn, SF_MOON) && (ch[cn].a_mana<ch[cn].mana[5] * 1000))
+	if (do_get_iflag(cn, SF_MOON) && (ch[cn].a_mana < MP_SOFTCAP(cn)))
 	{
 		race_med += race_reg;	race_reg -= race_reg;
 		manamult += hpmult;		hpmult   -= hpmult;
 	}
 	// Tarot - Sun :: While not full life, end regen is life regen
-	if (do_get_iflag(cn, SF_SUN) && (ch[cn].a_hp<ch[cn].hp[5] * 1000))
+	if (do_get_iflag(cn, SF_SUN) && (ch[cn].a_hp < HP_SOFTCAP(cn)))
 	{
 		race_reg += race_res;	race_res -= race_res;
 		hpmult   += endmult;	endmult  -= endmult;
 	}
 	// Tarot - World :: While not full end, mana regen is end regen
-	if (do_get_iflag(cn, SF_WORLD) && (ch[cn].a_end<ch[cn].end[5] * 1000))
+	if (do_get_iflag(cn, SF_WORLD) && (ch[cn].a_end < EN_SOFTCAP(cn)))
 	{
 		race_res += race_med;	race_med -= race_med;
 		endmult  += manamult;	manamult -= manamult;
@@ -13973,18 +13963,9 @@ void do_regenerate(int cn)
 	}
 	
 	// Force hp/end/mana to sane values
-	if (ch[cn].a_hp   > (  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * resrv[0]/100)))
-	{
-		ch[cn].a_hp   = (  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * resrv[0]/100));
-	}
-	if (ch[cn].a_end  > ( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * resrv[1]/100)))
-	{
-		ch[cn].a_end  = ( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * resrv[1]/100));
-	}
-	if (ch[cn].a_mana > (ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * resrv[2]/100)))
-	{
-		ch[cn].a_mana = (ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * resrv[2]/100));
-	}
+	if (ch[cn].a_hp   > HP_SOFTCAP(cn)) ch[cn].a_hp   = HP_SOFTCAP(cn);
+	if (ch[cn].a_end  > EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
+	if (ch[cn].a_mana > MP_SOFTCAP(cn)) ch[cn].a_mana = MP_SOFTCAP(cn);
 	
 	if ((hp && ch[cn].a_hp<ch[cn].hp[5] * 900) || (mana && ch[cn].a_mana<ch[cn].mana[5] * 900))
 	{
@@ -14077,10 +14058,12 @@ void do_regenerate(int cn)
 					continue;
 				}
 				
+				/*
 				if (bu[in].temp==SK_RAGE || bu[in].temp==SK_CALM)
 				{
 					p = min(20, getrank(cn));
 					//if (bu[in].active>(bu[in].duration-TICKS*5)) bu[in].active--;
+					
 					if (bu[in].data[2]==1) bu[in].r_hp   = -(ch[cn].a_hp  /(500+75*p));
 					if (bu[in].data[2]==2) bu[in].r_end  = -(ch[cn].a_end /(500+75*p));
 					if (bu[in].data[2]==3) bu[in].r_mana = -(ch[cn].a_mana/(500+75*p));
@@ -14096,6 +14079,7 @@ void do_regenerate(int cn)
 						chlog(cn, "%s ran out due to lack of mana.", it[in].name);
 					}
 				}
+				*/
 				
 				if (bu[in].r_hp!=-1)
 				{
@@ -14115,8 +14099,7 @@ void do_regenerate(int cn)
 				{
 					ch[cn].a_mana += bu[in].r_mana;
 				}
-				if (ch[cn].a_hp<1000 && bu[in].r_hp && (bu[in].temp==SK_LETHARGY || bu[in].temp==SK_IMMOLATE || 
-					(bu[in].temp==SK_RAGE && bu[in].data[2]==1) || (bu[in].temp==SK_CALM && bu[in].data[2]==1)))
+				if (ch[cn].a_hp<1000 && bu[in].r_hp && bu[in].temp==SK_IMMOLATE)
 				{
 					ch[cn].a_hp = 1000;
 					bu[in].active = 0;
@@ -14167,6 +14150,7 @@ void do_regenerate(int cn)
 					}
 				}
 				
+				/*
 				if (bu[in].temp==SK_RAGE || bu[in].temp==SK_CALM)
 				{
 					tmp   = 0;
@@ -14191,6 +14175,7 @@ void do_regenerate(int cn)
 					}
 					do_update_char(cn);
 				}
+				*/
 			}
 			else
 			{
@@ -14869,32 +14854,16 @@ void do_regenerate(int cn)
 		}
 	}
 	
-	if (ch[cn].player && do_get_iflag(cn, SF_TW_GULA))
-	{
-		if (ch[cn].a_hp>1500) ch[cn].a_hp -= 200 + gothp;
-	}
-	if (ch[cn].player && do_get_iflag(cn, SF_TW_AVARITIA))
-	{
-		if (ch[cn].a_end>1500) ch[cn].a_end -= 200;	
-	}
-	if (ch[cn].player && do_get_iflag(cn, SF_TW_IRA))
-	{
-		if (ch[cn].a_mana>1500) ch[cn].a_mana -= 200;
-	}
+	/*
+	if (ch[cn].player && do_get_iflag(cn, SF_TW_GULA))     if (ch[cn].a_hp>1500) ch[cn].a_hp -= 200 + gothp;
+	if (ch[cn].player && do_get_iflag(cn, SF_TW_AVARITIA)) if (ch[cn].a_end>1500) ch[cn].a_end -= 200;
+	if (ch[cn].player && do_get_iflag(cn, SF_TW_IRA))      if (ch[cn].a_mana>1500) ch[cn].a_mana -= 200;
+	*/
 	
 	// Force hp/end/mana to sane values
-	if (ch[cn].a_hp   > (  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * resrv[0]/100)))
-	{
-		ch[cn].a_hp   = (  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * resrv[0]/100));
-	}
-	if (ch[cn].a_end  > ( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * resrv[1]/100)))
-	{
-		ch[cn].a_end  = ( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * resrv[1]/100));
-	}
-	if (ch[cn].a_mana > (ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * resrv[2]/100)))
-	{
-		ch[cn].a_mana = (ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * resrv[2]/100));
-	}
+	if (ch[cn].a_hp   > HP_SOFTCAP(cn)) ch[cn].a_hp   = HP_SOFTCAP(cn);
+	if (ch[cn].a_end  > EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
+	if (ch[cn].a_mana > MP_SOFTCAP(cn)) ch[cn].a_mana = MP_SOFTCAP(cn);
 	
 	if (ch[cn].a_end<0) 	ch[cn].a_end = 0;
 	if (ch[cn].a_mana<0) 	ch[cn].a_mana = 0;

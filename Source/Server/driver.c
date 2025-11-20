@@ -7951,7 +7951,7 @@ int npc_driver_high(int cn)
 			return 1;
 		}
 		
-		if ((ch[cn].a_end>=ch[cn].end[5]*950) && co && !is_facing(cn,co) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_TAUNT))
+		if ((ch[cn].a_end>=(EN_SOFTCAP(cn)-ch[cn].end[5]*50)) && co && !is_facing(cn,co) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_TAUNT))
 		{
 			ch[cn].data[74] = globs->ticker + TICKS * 30;
 			return 1;

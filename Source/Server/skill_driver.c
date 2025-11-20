@@ -1641,9 +1641,9 @@ int spellcost(int cn, int cost, int in, int usemana)
 		
 		if (do_get_iflag(cn, SF_MA_HEAL) && mana_cost)  spell_pomesol(cn, cn, base_mana_cost, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 0);
-		if (worldr)                          ch[cn].a_end += base_mana_cost*1000;
-		if (n=st_skillcount(cn, 84))         ch[cn].a_end += mana_cost*n*100;
-		if (ch[cn].a_end>ch[cn].end[5]*1000) ch[cn].a_end  = ch[cn].end[5]*1000;
+		if (worldr)                      ch[cn].a_end += base_mana_cost*1000;
+		if (n=st_skillcount(cn, 84))     ch[cn].a_end += mana_cost*n*100;
+		if (ch[cn].a_end>EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
 	}
 	if (usemana==0 || usemana==2)
 	{
@@ -1653,8 +1653,8 @@ int spellcost(int cn, int cost, int in, int usemana)
 		
 		if (do_get_iflag(cn, SF_MA_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && end_cost)   spell_pomesol(cn, cn, end_cost, 0);
-		if (n=st_skillcount(cn, 36))           ch[cn].a_mana += end_cost*n*100;
-		if (ch[cn].a_mana>ch[cn].mana[5]*1000) ch[cn].a_mana  = ch[cn].mana[5]*1000;
+		if (n=st_skillcount(cn, 36))      ch[cn].a_mana += end_cost*n*100;
+		if (ch[cn].a_mana>MP_SOFTCAP(cn)) ch[cn].a_mana  = MP_SOFTCAP(cn);
 	}
 	return 0;
 }
@@ -6610,9 +6610,9 @@ int spell_lethargy(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_LETHARGY, BUF_SPR_LETHARGY, power, SP_DUR_LETHARGY, 1))) 
 		return 0;
 	
-	// Tarot - Empress.R : Lethargy does life over time instead
-	if (do_get_iflag(co, SF_EMPRES_R)) bu[in].r_hp   = -((75+1125*p/100)/2);
-	else                               bu[in].r_mana = -((75+1125*p/100)/2);
+	// Tarot - Empress.R : Lethargy uses life instead of mana
+	if (do_get_iflag(co, SF_EMPRES_R)) bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // bu[in].r_hp   = -((75+1125*p/100)/2);
+	else                               bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // bu[in].r_mana = -((75+1125*p/100)/2);
 	
 	// Monsters get a weaker variant
 	if (!IS_PLAYER(co)) bu[in].data[2] = 1;
@@ -6764,29 +6764,27 @@ void skill_shift(int cn, int force)
 int spell_calm(int cn, int co, int power)
 {
 	int in, n, tmp = 0, p = min(20, getrank(cn));
+	int hpbonus = (ch[co].hp[5]*1000   - ch[co].a_hp)  /1000;
+	int enbonus = (ch[co].end[5]*1000  - ch[co].a_end) /1000;
+	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
 	
 	// Need custom sprite
 	if (!(in = make_new_buff(cn, SK_CALM, BUF_SPR_CALM, power, SP_DUR_RAGE, 1))) 
 		return 0;
 	
-	// Tarot - Hermit R
-	if (do_get_iflag(co, SF_HERMIT_R))
-	{
-		bu[in].data[2] = 2;
-		bu[in].r_end  = -(ch[co].a_end /(500+75*p));
-	}
-	else
-	{
-		bu[in].data[2] = 3;
-		bu[in].r_mana = -(ch[co].a_mana/(500+75*p));
-	}
+	/*	// Tarot - Hermit R
+	if (do_get_iflag(co, SF_HERMIT_R)) { bu[in].data[2] = 2; bu[in].r_end  = -(ch[co].a_end /(500+75*p)); }
+	else                               { bu[in].data[2] = 3; bu[in].r_mana = -(ch[co].a_mana/(500+75*p)); }
+	*/
 	
-	if (T_LYCA_SK(co, 7))
-		tmp  = (((ch[co].hp[5]*1000 - ch[co].a_hp)/1000) + ((ch[co].end[5]*1000 - ch[co].a_end)/1000) + ((ch[co].mana[5]*1000 - ch[co].a_mana)/1000))/2;
-	if (n=st_skillcount(co, 103))
-		tmp += (((ch[co].hp[5]*1000 - ch[co].a_hp)/1000) + ((ch[co].end[5]*1000 - ch[co].a_end)/1000) + ((ch[co].mana[5]*1000 - ch[co].a_mana)/1000))*n/5;
+	if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
+	if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
 	
 	power = power + (power * tmp / 5000);
+	
+	// Tarot - Hermit R
+	if (do_get_iflag(co, SF_HERMIT_R)) bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
+	else                               bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
 	
 	bu[in].data[3] = min(127, power/ 4 + 5);
 	bu[in].data[4] = power;
@@ -6798,29 +6796,27 @@ int spell_calm(int cn, int co, int power)
 int spell_rage(int cn, int co, int power)
 {
 	int in, n, tmp = 0, p = min(20, getrank(cn));
+	int hpbonus = (ch[co].hp[5]*1000   - ch[co].a_hp)  /1000;
+	int enbonus = (ch[co].end[5]*1000  - ch[co].a_end) /1000;
+	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
 	
 	// Need custom sprite?
 	if (!(in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, SP_DUR_RAGE, 1))) 
 		return 0;
 	
-	// Tarot - Hermit R
-	if (do_get_iflag(co, SF_HERMIT_R))
-	{
-		bu[in].data[2] = 2;
-		bu[in].r_end  = -(ch[co].a_end /(500+75*p));
-	}
-	else
-	{
-		bu[in].data[2] = 1;
-		bu[in].r_hp   = -(ch[co].a_hp  /(500+75*p));
-	}
+	/*	// Tarot - Hermit R
+	if (do_get_iflag(co, SF_HERMIT_R)) { bu[in].data[2] = 2; bu[in].r_end  = -(ch[co].a_end /(500+75*p)); }
+	else                               { bu[in].data[2] = 1; bu[in].r_hp   = -(ch[co].a_hp  /(500+75*p)); }
+	*/
 	
-	if (T_LYCA_SK(co, 7))
-		tmp  = (((ch[co].hp[5]*1000 - ch[co].a_hp)/1000) + ((ch[co].end[5]*1000 - ch[co].a_end)/1000) + ((ch[co].mana[5]*1000 - ch[co].a_mana)/1000))/2;
-	if (n=st_skillcount(co, 103))
-		tmp += (((ch[co].hp[5]*1000 - ch[co].a_hp)/1000) + ((ch[co].end[5]*1000 - ch[co].a_end)/1000) + ((ch[co].mana[5]*1000 - ch[co].a_mana)/1000))*n/5;
+	if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
+	if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
 	
 	power = power + (power * tmp / 5000);
+	
+	// Tarot - Hermit R
+	if (do_get_iflag(co, SF_HERMIT_R)) bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
+	else                               bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
 	
 	bu[in].top_damage = min(127, power/ 4 + 5);
 	bu[in].data[4]    = power;

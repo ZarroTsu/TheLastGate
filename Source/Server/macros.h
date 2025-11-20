@@ -273,6 +273,10 @@ int is_ascroll(int in);
 
 #define IS_HI_SK(a)			(a==8||a==9||a==23||a==32)
 
+#define HP_SOFTCAP(cn)			(  ch[cn].hp[5]*1000 - (  ch[cn].hp[5]*1000 * ch[cn].reserve[0]/100))
+#define EN_SOFTCAP(cn)			( ch[cn].end[5]*1000 - ( ch[cn].end[5]*1000 * ch[cn].reserve[1]/100))
+#define MP_SOFTCAP(cn)			(ch[cn].mana[5]*1000 - (ch[cn].mana[5]*1000 * ch[cn].reserve[2]/100))
+
 // Passive and Active skill split for special effects
 #define IS_PA_SK(a)			((a>=0&&a<=10)||a==12||a==14||a==16||a==23||(a>=28||a<=34)||a==36||a==38||a==39||a==44||a==45)
 #define IS_AS_SK(a)			(a==11||a==15||(a>=17&&a<=21)||(a>=24&&a<=27)||a==42||a==43||a==46||a==47)

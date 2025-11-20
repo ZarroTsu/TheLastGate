@@ -4288,7 +4288,8 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_hp -= power;
 			item_damage_worn(cn, WN_RHAND, 500);
-			ch[cn].a_mana += power;	if (ch[cn].a_mana>ch[cn].mana[5]*1000) ch[cn].a_mana=ch[cn].mana[5]*1000;
+			ch[cn].a_mana += power;	
+			if (ch[cn].a_mana>MP_SOFTCAP(cn)) ch[cn].a_mana=MP_SOFTCAP(cn);
 			char_play_sound(cn, ch[cn].sound + 6, -100, 0);
 			fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
 			add_exhaust(cn, TICKS*5);
