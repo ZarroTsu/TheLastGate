@@ -1,14 +1,39 @@
+/*
+ * SOUND.C - Audio System using DirectSound
+ *
+ * TODO: MODERN GCC/MINGW COMPATIBILITY
+ * ====================================
+ * HEADERS:
+ * - <alloc.h> -> <malloc.h> or <stdlib.h>
+ * - <io.h> -> <unistd.h> for POSIX
+ * - <windows.h> -> Remove for cross-platform audio
+ * - <windowsx.h> -> Remove
+ * - <process.h> -> <pthread.h> or SDL_thread
+ * - "dsound.h" -> Remove (DirectSound is deprecated)
+ * - #pragma hdrstop -> Remove (Borland C++ specific)
+ *
+ * AUDIO SYSTEM:
+ * DirectSound is deprecated since Windows Vista.
+ * For modern compatibility, replace with:
+ * - SDL2_mixer (recommended for cross-platform)
+ * - OpenAL (3D audio support)
+ * - XAudio2 (Windows only, modern alternative)
+ *
+ * This will require rewriting most of the audio initialization
+ * and playback code.
+ */
+
 #include <stdio.h>
-#include <alloc.h>
+#include <alloc.h>       // TODO: Replace with <malloc.h> or <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
+#include <io.h>          // TODO: Replace with <unistd.h> for POSIX
 #include <stdlib.h>
-#include <windows.h>
-#include <windowsx.h>
-#include <process.h>
+#include <windows.h>     // TODO: Remove for cross-platform audio
+#include <windowsx.h>    // TODO: Remove
+#include <process.h>     // TODO: Use <pthread.h> or SDL_thread
 #include <errno.h>
-#pragma hdrstop
-#include "dsound.h"
+#pragma hdrstop  // TODO: Remove - Borland C++ specific
+#include "dsound.h"      // TODO: Remove - DirectSound is deprecated, use SDL2_mixer
 
 #include "common.h"
 #include "inter.h"

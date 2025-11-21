@@ -1,16 +1,34 @@
+/*
+ * OPTIONS.C - Game Options and Settings Dialog
+ *
+ * TODO: MODERN GCC/MINGW COMPATIBILITY
+ * ====================================
+ * HEADERS:
+ * - <alloc.h> -> <malloc.h> or <stdlib.h>
+ * - <io.h> -> <unistd.h> for POSIX
+ * - <windows.h> -> SDL2 headers for dialogs
+ * - <windowsx.h> -> Remove or replace with SDL2
+ * - "ddraw.h" -> Remove (deprecated)
+ * - <process.h> -> <pthread.h> or SDL_thread
+ * - <dir.h> -> <dirent.h> on POSIX
+ * - #pragma hdrstop -> Remove (Borland C++ specific)
+ *
+ * This file uses Windows dialogs extensively (OPENFILENAME, etc.)
+ * For cross-platform, replace with SDL2 file dialogs or custom UI
+ */
 
 #include <stdio.h>
-#include <alloc.h>
+#include <alloc.h>       // TODO: Replace with <malloc.h> or <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
+#include <io.h>          // TODO: Replace with <unistd.h> for POSIX
 #include <stdlib.h>
-#include <windows.h>
-#include <windowsx.h>
-#include "ddraw.h"
-#include <process.h>
+#include <windows.h>     // TODO: Replace with SDL2 headers
+#include <windowsx.h>    // TODO: Remove or replace with SDL2
+#include "ddraw.h"       // TODO: Remove - DirectDraw is deprecated
+#include <process.h>     // TODO: Use <pthread.h> or SDL_thread
 #include <time.h>
-#include <dir.h>
-#pragma hdrstop
+#include <dir.h>         // TODO: Replace with <dirent.h> on POSIX
+#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "dd.h"
 #include "common.h"
 #include "inter.h"

@@ -1,10 +1,31 @@
-#include <alloc.h>
-#include <windows.h>
+/*
+ * ENGINE.C - Main Game Rendering and Logic Loop
+ *
+ * TODO: MODERN GCC/MINGW COMPATIBILITY
+ * ====================================
+ * This file requires updates for modern compiler compatibility:
+ *
+ * HEADERS:
+ * - <alloc.h> -> <malloc.h> or <stdlib.h>
+ * - <windows.h> -> SDL2 headers for cross-platform
+ * - #pragma hdrstop -> Remove (Borland C++ specific)
+ *
+ * WINDOWS API:
+ * - SetCursor() -> SDL_SetCursor()
+ * - GetTickCount() -> SDL_GetTicks()
+ * - Sleep() -> SDL_Delay()
+ * - HCURSOR -> SDL_Cursor*
+ *
+ * See individual TODO comments below for specific locations.
+ */
+
+#include <alloc.h>     // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <windows.h>   // TODO: Replace with SDL2 headers for cross-platform
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#pragma hdrstop
+#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "dd.h"
 #include "common.h"
 #include "inter.h"
@@ -19,6 +40,8 @@ int pskip=0,pidle=0;
 extern int t_size;
 
 extern int cursor_type;
+// TODO: Modern GCC/MinGW - HCURSOR is Windows-specific
+// SDL2: Use SDL_Cursor* array
 extern HCURSOR cursor[10];
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
@@ -2231,6 +2254,8 @@ void eng_display_win(int plr_sprite,int init)
 		// Display Skill Tree button if applicable - a similar check is required in inter.c
 		if (st_skill_pts_all(pl.tree_points)>0)
 		{
+			// TODO: Modern GCC/MinGW - GetTickCount() for animation timing
+			// SDL2: Use SDL_GetTicks() instead
 			if (st_skill_pts_have(pl.tree_points)>0 && show_tree!=1)
 				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(GetTickCount()%16))*2)));
 			else if (st_skill_pts_have(pl.os_tree)>0 && show_tree!=2)
@@ -3056,6 +3081,9 @@ void eng_display(int init)	// optimize me!!!!!
 	if (!dd_isvisible()) return;
 
 	mouse(mx,my,0);
+	// TODO: Modern GCC/MinGW - SetCursor is Windows-specific
+	// SDL2: Use SDL_SetCursor() with SDL_Cursor* array
+	// Example: SDL_SetCursor(cursor[cursor_type]);
 	SetCursor(cursor[cursor_type]);
 
 	// *******
@@ -3479,28 +3507,47 @@ void init_engine(void)
 	eng_init_player();
 }
 
+// TODO: Modern GCC/MinGW - do_msg processes Windows messages
+// SDL2: Replace with SDL_PollEvent() in main loop
+// This function should be removed and message handling moved to main()
 void do_msg(void)
 {
+	// TODO: Modern GCC/MinGW - MSG is Windows-specific message structure
+	// SDL2: Use SDL_Event instead
 	MSG msg;
 
+	// TODO: Modern GCC/MinGW - Windows message processing
+	// SDL2: Replace with SDL_PollEvent(&event) loop
 	if (PeekMessage(&msg,NULL,0,0,PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 }
 
+// TODO: Modern GCC/MinGW - eng_flip uses Windows message loop
+// SDL2: Replace with SDL event handling in main loop
+// The Windows message processing should be moved to main() with SDL_PollEvent()
 void eng_flip(unsigned int t)
 {
 	int diff;
+	// TODO: Modern GCC/MinGW - MSG is Windows-specific message structure
+	// SDL2: Use SDL_Event instead
 	MSG msg;
 
+	// TODO: Modern GCC/MinGW - GetTickCount is Windows-specific (returns milliseconds)
+	// SDL2: Use SDL_GetTicks() which also returns milliseconds since SDL_Init()
 	diff=t-GetTickCount();
 	if (diff>0)	idle+=diff;
 
+	// TODO: Modern GCC/MinGW - Windows message loop with PeekMessage/TranslateMessage/DispatchMessage
+	// SDL2: Replace entire loop with SDL_PollEvent() in main event loop
+	// This message processing should be done in main() not here
 	do {
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+		// TODO: Modern GCC/MinGW - Sleep is Windows-specific (milliseconds)
+		// SDL2: Use SDL_Delay(1) for 1 millisecond delay
 		} else Sleep(1);
 	} while (t>GetTickCount());
 
@@ -4777,6 +4824,8 @@ void engine(void)
 
 	init_done=1;
 
+	// TODO: Modern GCC/MinGW - GetTickCount is Windows-specific
+	// SDL2: Use SDL_GetTicks() for milliseconds since SDL_Init()
 	t=GetTickCount();
 
 	while (!quit) 
@@ -4869,6 +4918,8 @@ void engine(void)
 			show_newp=0;
 			show_tuto=0;
 		}
+		// TODO: Modern GCC/MinGW - GetTickCount is Windows-specific
+		// SDL2: Use SDL_GetTicks() instead
 		if (t>GetTickCount() || skipinrow>100)	// display frame only if we've got enough time
 		{
 			eng_display(init);

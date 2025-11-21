@@ -1,17 +1,25 @@
+// TODO: Modern GCC/MinGW compatibility - Update includes for modern compilers
+// - Replace <alloc.h> with <malloc.h> or use stdlib.h functions
+// - <io.h> may need to be <unistd.h> or use standard C file functions
+// - <windowsx.h> may not be needed with modern Windows SDK
 #include <stdio.h>
-#include <alloc.h>
+#include <alloc.h>  // TODO: Replace with <malloc.h> or <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
+#include <io.h>     // TODO: Replace with <unistd.h> or standard C file I/O
 #include <stdlib.h>
 #include <windows.h>
-#include <windowsx.h>
+#include <windowsx.h>  // TODO: Verify if needed with modern Windows SDK
 #include <process.h>
 #include <time.h>
 #include <math.h>
-#pragma hdrstop
+#pragma hdrstop  // TODO: Borland C++ specific - remove for GCC
 #define INITGUID
-#include <ddraw.h>
-#include <dsound.h>
+// TODO: DirectDraw is deprecated - consider migrating to:
+// - SDL2 for cross-platform compatibility
+// - DirectX 9+ (D3D9) for Windows-only
+// - OpenGL/Vulkan for modern graphics
+#include <ddraw.h>  // TODO: Deprecated API - replace with modern graphics library
+#include <dsound.h> // TODO: Deprecated API - replace with modern audio library (SDL_mixer, OpenAL)
 #include "dd.h"
 #include "common.h"
 #include "inter.h"
@@ -39,31 +47,71 @@ unsigned short *dd_load_png(FILE *fp,int *xs,int *ys,unsigned char **alpha_ptr,i
 void display_alpha(unsigned char *alpha,int alphacnt,int xf,int yf,int effect);
 FILE *load_pnglib(int nr);
 
+/**
+ * init_xalloc - Initialize custom memory allocator heap
+ *
+ * Creates a Windows heap for managing memory allocations. This custom allocator
+ * tracks memory usage and provides optimized allocation for the game engine.
+ * The heap is created with HEAP_GENERATE_EXCEPTIONS to ensure allocation failures
+ * raise exceptions rather than returning NULL.
+ */
 void init_xalloc(void)
 {
+	// TODO: Modern GCC/MinGW - HeapCreate is Windows-specific
+	// Consider using standard malloc/free for cross-platform compatibility
+	// or implement platform-specific abstractions
 	heap=HeapCreate(HEAP_GENERATE_EXCEPTIONS,maxmem+4096*1024,0);
 }
 
+/**
+ * xmalloc - Allocate memory from the custom heap
+ * @size: Number of bytes to allocate
+ *
+ * Allocates memory from the custom heap and tracks allocation statistics.
+ * Updates global memory usage counters (usedmem) and block count (blockcnt).
+ *
+ * Returns: Pointer to allocated memory
+ */
 void *xmalloc(int size)
 {
 	char *ptr;
 
 	blockcnt++; blocktot++;
 
+	// TODO: Modern GCC/MinGW - Replace HeapAlloc with malloc for portability
+	// HeapSize may not be available - track allocations manually
 	ptr=HeapAlloc(heap,0,size);
 	usedmem+=HeapSize(heap,0,ptr)+16;
 
 	return ptr;
 }
 
+/**
+ * xfree - Free memory allocated with xmalloc/xcalloc
+ * @ptr: Pointer to memory block to free
+ *
+ * Releases memory back to the custom heap and updates memory tracking counters.
+ * Decrements block count and reduces used memory total.
+ */
 void xfree(void *ptr)
 {
 	blockcnt--;
+	// TODO: Modern GCC/MinGW - Replace HeapFree with free for portability
 	usedmem-=HeapSize(heap,0,ptr)+16;
 
 	HeapFree(heap,0,ptr);
 }
 
+/**
+ * xcalloc - Allocate zero-initialized memory from custom heap
+ * @size1: Number of elements
+ * @size2: Size of each element in bytes
+ *
+ * Allocates memory for an array of elements and initializes all bytes to zero.
+ * Equivalent to calloc() but uses the custom heap. Updates memory usage counters.
+ *
+ * Returns: Pointer to zero-initialized memory block
+ */
 void *xcalloc(int size1,int size2)
 {
 	int size;
@@ -73,6 +121,7 @@ void *xcalloc(int size1,int size2)
 
 	blockcnt++; blocktot++;
 
+	// TODO: Modern GCC/MinGW - Replace HeapAlloc with calloc for portability
 	ptr=HeapAlloc(heap,HEAP_ZERO_MEMORY,size);
 	usedmem+=HeapSize(heap,0,ptr)+16;
 
@@ -96,10 +145,13 @@ int MAXX1,MAXY1;
 int RED,GREEN,BLUE;
 int RGBM=-1;
 
-LPDIRECTDRAW dd=NULL;
+// TODO: Modern GCC/MinGW - Replace DirectDraw interfaces with modern equivalents
+// SDL2: SDL_Window*, SDL_Renderer*, SDL_Texture*
+// D3D9: IDirect3D9*, IDirect3DDevice9*, IDirect3DSurface9*
+LPDIRECTDRAW dd=NULL;  // TODO: Replace with SDL_Renderer* or IDirect3D9*
 
-LPDIRECTDRAWSURFACE sur1=NULL,sur2=NULL,suro=NULL;
-LPDIRECTDRAWCLIPPER clip=NULL;
+LPDIRECTDRAWSURFACE sur1=NULL,sur2=NULL,suro=NULL;  // TODO: Replace with SDL_Texture* or IDirect3DSurface9*
+LPDIRECTDRAWCLIPPER clip=NULL;  // TODO: Not needed in SDL2 (automatic clipping)
 
 void *load_file(char *file);
 void dd_invalidate_cache(void);
@@ -117,6 +169,15 @@ DWORD total,left;
 
 void dd_error(HWND hwnd,char *msg,long err);
 
+/**
+ * get_dderr - Convert DirectDraw error code to human-readable string
+ * @err: DirectDraw error code (HRESULT)
+ *
+ * Translates DirectDraw API error codes into descriptive string names
+ * for debugging and error reporting purposes.
+ *
+ * Returns: String representation of the error code
+ */
 char *get_dderr(long err)
 {
 	char *ptr;
@@ -153,6 +214,13 @@ char *get_dderr(long err)
 	return ptr;
 }
 
+/**
+ * dd_clear - Clear all DirectDraw surfaces to black
+ *
+ * Zeroes out all pixels in the primary surface (sur1), back buffer (sur2),
+ * and sprite cache surface (suro). This effectively clears the screen and
+ * cache to a black background. Used during initialization and mode changes.
+ */
 void dd_clear(void)
 {
 	unsigned short *ptr;
@@ -217,14 +285,54 @@ struct vtab vtab[]= {
 
 int usedvidmem=0;
 
+/**
+ * dd_init - Initialize DirectDraw in fullscreen exclusive mode
+ * @hwnd: Window handle to attach DirectDraw to
+ * @x: Desired screen width in pixels
+ * @y: Desired screen height in pixels
+ *
+ * Initializes DirectDraw for fullscreen rendering with double-buffering.
+ * Steps performed:
+ * 1. Create DirectDraw object
+ * 2. Set exclusive fullscreen cooperative level
+ * 3. Set display mode to requested resolution (16-bit color)
+ * 4. Detect RGB bit masks for pixel format (565 or 555)
+ * 5. Create primary surface with one back buffer for flipping
+ * 6. Create offscreen surface (suro) for sprite caching
+ * 7. Clear all surfaces and calculate cache dimensions
+ *
+ * The function tries to allocate sprite cache in video memory first, falling
+ * back to system memory if necessary. Cache size is calculated based on the
+ * largest available surface dimensions from the vtab array.
+ *
+ * Returns: 0 on success, negative error code on failure:
+ *          -1: DirectDrawCreate failed
+ *          -2: SetCooperativeLevel failed
+ *          -3: SetDisplayMode failed
+ *          -4: GetDisplayMode failed
+ *          -5: Not RGB mode
+ *          -6: Create primary surface failed
+ *          -7: Get back buffer failed
+ *          -8: GetSurfaceDesc failed
+ *          -9: Create sprite cache surface failed
+ *          -10: Get cache surface desc failed
+ */
+// TODO: Modern GCC/MinGW - Entire DirectDraw implementation needs replacement
+// DirectDraw is deprecated since Windows Vista. Options:
+// 1. Use SDL2 (recommended for cross-platform)
+// 2. Use Direct3D 9+ (Windows-only, still supported)
+// 3. Use OpenGL/GLFW (cross-platform, modern)
+// This function would become SDL_CreateWindow + SDL_CreateRenderer
 int dd_init(HWND hwnd,int x,int y)
 {
+	// TODO: Replace DDSURFACEDESC with SDL_Window/SDL_Renderer or D3D9 device
 	DDSURFACEDESC surface;
 	long ret;
 	int ysize,n;
 
 	MAXX=x; MAXY=y;
 
+	// TODO: Replace DirectDrawCreate with modern graphics API initialization
 	if ((ret=DirectDrawCreate(NULL,&dd,NULL))!=DD_OK) {
 		DDERR=get_dderr(ret);
 		return -1;
@@ -396,6 +504,13 @@ int dd_init(HWND hwnd,int x,int y)
 	return 0;
 }
 
+/**
+ * dd_deinit - Clean up DirectDraw resources in fullscreen mode
+ *
+ * Releases the primary surface (which also releases the back buffer)
+ * and restores the original display mode before releasing the DirectDraw
+ * object. Should be called before exiting fullscreen mode.
+ */
 void dd_deinit(void)
 {
 	if (sur1) {
@@ -408,13 +523,46 @@ void dd_deinit(void)
 	}
 }
 
+/**
+ * dd_init_windowed - Initialize DirectDraw in windowed mode
+ * @hwnd: Window handle to attach DirectDraw to
+ * @x: Window client area width in pixels
+ * @y: Window client area height in pixels
+ *
+ * Initializes DirectDraw for windowed rendering. Creates a primary surface
+ * representing the entire screen, an offscreen back buffer (sur2) for rendering,
+ * and a clipper to handle window boundaries. The sprite cache surface (suro)
+ * is created in video memory if possible.
+ *
+ * Unlike fullscreen mode, windowed mode:
+ * - Uses DDSCL_NORMAL cooperative level
+ * - Requires a clipper attached to the primary surface
+ * - Uses manual blitting instead of page flipping
+ * - Forces 565 RGB format (0xF800, 0x07E0, 0x001F)
+ *
+ * Returns: 0 on success, negative error code on failure:
+ *          -1: DirectDrawCreate failed
+ *          -2: SetCooperativeLevel failed
+ *          -3: Create primary surface failed
+ *          -4: Create back buffer failed
+ *          -5: CreateClipper failed
+ *          -6: Attach clipper to window failed
+ *          -7: Attach clipper to primary failed
+ *          -8: GetSurfaceDesc failed
+ *          -9: Create sprite cache failed
+ *          -10: Get cache surface desc failed
+ */
+// TODO: Modern GCC/MinGW - Replace windowed DirectDraw with modern API
+// SDL2 example: SDL_CreateWindow(title, x, y, w, h, SDL_WINDOW_SHOWN)
 int dd_init_windowed(HWND hwnd,int x,int y)
 {
+	// TODO: Replace DirectDraw structures with SDL/D3D equivalents
 	DDSURFACEDESC surface;
 	long ret;
 	int ysize,n;
 
 	printf("DirectDrawCreate\n");
+	// TODO: Replace DirectDrawCreate with SDL_CreateWindow or D3D9 CreateDevice
 	if ((ret=DirectDrawCreate(NULL,&dd,NULL))!=DD_OK) {
 		DDERR=get_dderr(ret); return -1;
 	}
@@ -545,6 +693,12 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 	return 0;
 }
 
+/**
+ * dd_deinit_windowed - Clean up DirectDraw resources in windowed mode
+ *
+ * Releases the primary surface, back buffer, and DirectDraw object.
+ * Unlike fullscreen deinit, no display mode restoration is needed.
+ */
 void dd_deinit_windowed(void)
 {
 	if (sur1) {
@@ -556,14 +710,31 @@ void dd_deinit_windowed(void)
 	}
 }
 
+// Lock counter for debugging surface access
 static int locks=0;
 
+/**
+ * dd_get_ptr - Lock a DirectDraw surface and get pointer to video memory
+ * @sur: DirectDraw surface to lock
+ *
+ * Locks the specified surface for direct memory access and returns a pointer
+ * to the surface memory. The lock counter is incremented for debugging.
+ * Always pair with dd_release_ptr() when done accessing the surface.
+ *
+ * Uses DDLOCK_WAIT to wait until the surface can be locked.
+ *
+ * Returns: Pointer to surface memory, or NULL on failure
+ */
 void *dd_get_ptr(LPDIRECTDRAWSURFACE sur)
 {
+	// TODO: Modern GCC/MinGW - Replace surface locking with modern API
+	// SDL2: SDL_LockSurface() or SDL_LockTexture()
+	// D3D9: Lock texture/surface
 	DDSURFACEDESC surface;
 	long ret;
 
 	surface.dwSize=sizeof(surface);
+	// TODO: Replace DirectDraw Lock with SDL_LockSurface/SDL_LockTexture
 	ret=sur->lpVtbl->Lock(sur,NULL,&surface,DDLOCK_SURFACEMEMORYPTR|DDLOCK_WAIT,NULL);
 	if (ret!=DD_OK) {
 		dd_error(0,"dd_get_ptr",ret);
@@ -575,11 +746,21 @@ void *dd_get_ptr(LPDIRECTDRAWSURFACE sur)
 	return surface.lpSurface;
 }
 
+/**
+ * dd_release_ptr - Unlock a DirectDraw surface
+ * @sur: DirectDraw surface to unlock
+ *
+ * Releases a lock obtained with dd_get_ptr(). Must be called after finishing
+ * all direct memory access to the surface. Decrements the lock counter.
+ *
+ * Returns: 0 on success, -1 on failure
+ */
 int dd_release_ptr(LPDIRECTDRAWSURFACE sur)
 {
 	long ret;
 
 	locks--;
+	// TODO: Modern GCC/MinGW - Replace with SDL_UnlockSurface/SDL_UnlockTexture
 	ret=sur->lpVtbl->Unlock(sur,NULL);
 	if (ret!=DD_OK) {
 		dd_error(0,"dd_release_ptr",ret); return -1;
@@ -588,6 +769,15 @@ int dd_release_ptr(LPDIRECTDRAWSURFACE sur)
 	return 0;
 }
 
+/**
+ * _dd_get_ptr - Lock surface without incrementing lock counter
+ * @sur: DirectDraw surface to lock
+ *
+ * Internal version of dd_get_ptr() that doesn't track locks. Used by
+ * debugging functions like islocked() to avoid affecting lock count.
+ *
+ * Returns: Pointer to surface memory, or NULL on failure
+ */
 void *_dd_get_ptr(LPDIRECTDRAWSURFACE sur)
 {
 	DDSURFACEDESC surface;
@@ -603,6 +793,15 @@ void *_dd_get_ptr(LPDIRECTDRAWSURFACE sur)
 	return surface.lpSurface;
 }
 
+/**
+ * _dd_release_ptr - Unlock surface without affecting lock counter
+ * @sur: DirectDraw surface to unlock
+ *
+ * Internal version of dd_release_ptr() that doesn't decrement the lock counter.
+ * Used in conjunction with _dd_get_ptr() for internal operations.
+ *
+ * Returns: 0 on success, -1 on failure
+ */
 int _dd_release_ptr(LPDIRECTDRAWSURFACE sur)
 {
 	long ret;
@@ -616,6 +815,13 @@ int _dd_release_ptr(LPDIRECTDRAWSURFACE sur)
 	return 0;
 }
 
+/**
+ * islocked - Debug indicator for locked surfaces
+ *
+ * Draws red pixels in the top-left corner if any surfaces are currently locked.
+ * This is a debugging aid to detect surfaces that haven't been properly unlocked,
+ * which can cause rendering issues. The red indicator appears as a 10x3 pixel bar.
+ */
 void islocked(void)
 {
 	unsigned short *ptr;
@@ -634,6 +840,19 @@ void islocked(void)
 	_dd_release_ptr(sur1);
 }
 
+/**
+ * dd_showbar - Draw a filled rectangle with blending
+ * @xf: X position (left edge)
+ * @yf: Y position (top edge)
+ * @xs: Width in pixels
+ * @ys: Height in pixels
+ * @col: Color in RGB565 or RGB555 format
+ *
+ * Renders a filled bar to the back buffer (sur2) with color blending.
+ * In 565 mode, the color is drawn directly. In 555 mode, colors are averaged
+ * with the background for a blending effect. Clipping is performed to keep
+ * the bar within screen bounds. Adds 4-pixel offset in windowed mode.
+ */
 void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
 {
 	unsigned short *ptr;
@@ -697,6 +916,18 @@ void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
 	dd_release_ptr(sur2);
 }
 
+/**
+ * dd_showbox - Draw a hollow rectangle outline
+ * @xf: X position (left edge)
+ * @yf: Y position (top edge)
+ * @xs: Width in pixels
+ * @ys: Height in pixels
+ * @col: Color in RGB format
+ *
+ * Draws only the border of a rectangle to the back buffer (sur2).
+ * Only pixels on the edges are drawn - interior is left unchanged.
+ * Adds 4-pixel offset in windowed mode.
+ */
 void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col)
 {
 	unsigned short *ptr;
@@ -724,8 +955,21 @@ void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col)
 	dd_release_ptr(sur2);
 }
 
+/**
+ * dd_set_background - Set transparent color key for sprite blitting
+ * @color: Color value to treat as transparent
+ *
+ * Configures the color key for the sprite cache surface (suro). Any pixels
+ * matching this color will be transparent when blitting sprites. This is
+ * essential for sprite rendering with transparency.
+ *
+ * Returns: 0 on success, -1 on failure
+ */
 int dd_set_background(int color)
 {
+	// TODO: Modern GCC/MinGW - Color key transparency
+	// SDL2: SDL_SetColorKey(surface, SDL_TRUE, color)
+	// For textures, use SDL_SetTextureBlendMode
 	DDCOLORKEY key;
 	long ret;
 
@@ -733,6 +977,7 @@ int dd_set_background(int color)
 	key.dwColorSpaceLowValue=color;
 	key.dwColorSpaceHighValue=color;
 
+	// TODO: Replace SetColorKey with SDL_SetColorKey or alpha channel
 	ret=suro->lpVtbl->SetColorKey(suro,DDCKEY_SRCBLT,&key);
 
 	if (ret!=DD_OK) {
@@ -742,7 +987,21 @@ int dd_set_background(int color)
 	return 0;
 }
 
-// BLTFast compatible (fairly)
+/**
+ * DBBltFast - Manual blit with transparency (BltFast compatible)
+ * @sur1: Destination surface
+ * @xt: X position on destination
+ * @yt: Y position on destination
+ * @sur2: Source surface
+ * @rect: Source rectangle to copy
+ *
+ * Software implementation of BltFast with color key transparency.
+ * Copies pixels from sur2 to sur1, skipping pixels that match the
+ * transparent color (RED+BLUE = magenta). This is a fallback when
+ * hardware blitting is unavailable or for special cases.
+ *
+ * Returns: DD_OK on success, DirectDraw error code on failure
+ */
 int DBBltFast(LPDIRECTDRAWSURFACE sur1,int xt,int yt,LPDIRECTDRAWSURFACE sur2,RECT *rect)
 {
 	unsigned short *from,*to;
@@ -782,7 +1041,27 @@ int DBBltFast(LPDIRECTDRAWSURFACE sur1,int xt,int yt,LPDIRECTDRAWSURFACE sur2,RE
 	return DD_OK;
 }
 
-// copy tile nr from offscreen to x,y at surface sur
+/**
+ * dd_copytile - Copy a cached tile sprite to screen
+ * @nr: Tile number in sprite cache
+ * @x: X position on destination surface
+ * @y: Y position on destination surface
+ * @sur: Destination surface (usually sur2)
+ * @mapcheck: If non-zero, performs additional bounds checking
+ *
+ * Blits a 32x32 tile from the sprite cache (suro) to the destination surface
+ * using hardware acceleration (BltFast). Handles clipping for tiles partially
+ * off-screen by adjusting the source rectangle. Uses color key transparency
+ * so background pixels are not drawn.
+ *
+ * The tile cache is organized in a grid, with tile number converted to
+ * X,Y coordinates: x = (nr % cachex) * TILE, y = (nr / cachex) * TILE
+ *
+ * Returns: 0 on success, -1 on failure, 0 if tile is completely off-screen
+ */
+// TODO: Modern GCC/MinGW - Replace BltFast with modern blitting
+// SDL2: SDL_RenderCopy with texture
+// D3D9: StretchRect or texture rendering
 int dd_copytile(int nr,int x,int y,LPDIRECTDRAWSURFACE sur,int mapcheck)
 {
 	RECT rect;
@@ -819,8 +1098,9 @@ int dd_copytile(int nr,int x,int y,LPDIRECTDRAWSURFACE sur,int mapcheck)
 	rect.top=(nr/cachex)*TILE+ys;   rect.bottom=(nr/cachex)*TILE+TILE-ye;
 
 
-	//ret=DBBltFast(sur,x,y,suro,&rect);	
-	ret=sur->lpVtbl->BltFast(sur,x,y,suro,&rect,DDBLTFAST_WAIT|DDBLTFAST_SRCCOLORKEY);	
+	//ret=DBBltFast(sur,x,y,suro,&rect);
+	// TODO: Modern GCC/MinGW - Replace BltFast with SDL_RenderCopy or D3D DrawPrimitive
+	ret=sur->lpVtbl->BltFast(sur,x,y,suro,&rect,DDBLTFAST_WAIT|DDBLTFAST_SRCCOLORKEY);
 
 	if (ret!=DD_OK) {
 		dd_error(0,"dd_copytile",ret); return -1;
@@ -828,6 +1108,19 @@ int dd_copytile(int nr,int x,int y,LPDIRECTDRAWSURFACE sur,int mapcheck)
 	return 0;
 }
 
+/**
+ * dd_alphaeffect_magic_1 - Apply magic effect with RGB555 format
+ * @nr: Effect color flags (bit 0=red, bit 1=green, bit 2=blue)
+ * @str: Effect strength (higher = weaker effect)
+ * @xpos: World X position
+ * @ypos: World Y position
+ * @xoff: Screen X offset
+ * @yoff: Screen Y offset
+ *
+ * Renders a colored glow effect in RGB555 mode. Creates a 64x64 pixel elliptical
+ * glow that's brighter in the center and fades toward edges. The glow color is
+ * determined by nr flags. Used for spell effects and magic animations.
+ */
 void dd_alphaeffect_magic_1(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 {
 	int rx,ry;
@@ -898,6 +1191,19 @@ void dd_alphaeffect_magic_1(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 
 }
 
+/**
+ * dd_alphaeffect_magic_0 - Apply magic effect with RGB565 format
+ * @nr: Effect color flags (bit 0=red, bit 1=green, bit 2=blue)
+ * @str: Effect strength (higher = weaker effect)
+ * @xpos: World X position
+ * @ypos: World Y position
+ * @xoff: Screen X offset
+ * @yoff: Screen Y offset
+ *
+ * Renders a colored glow effect in RGB565 mode. Same as magic_1 but uses
+ * 565 color format with 6 bits for green channel. Creates elliptical glow
+ * for magic spell visual effects.
+ */
 void dd_alphaeffect_magic_0(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 {
 	int rx,ry;
@@ -967,41 +1273,98 @@ void dd_alphaeffect_magic_0(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 	dd_release_ptr(sur2);
 }
 
+/**
+ * dd_alphaeffect_magic - Apply magic glow effect (dispatch function)
+ * @nr: Effect color flags (bit 0=red, bit 1=green, bit 2=blue)
+ * @str: Effect strength (higher = weaker effect)
+ * @xpos: World X position
+ * @ypos: World Y position
+ * @xoff: Screen X offset
+ * @yoff: Screen Y offset
+ *
+ * Renders a colored glow effect for magic spells. Automatically selects
+ * the appropriate implementation based on the current RGB mode (555 or 565).
+ * This is the public interface for magic effect rendering.
+ */
 void dd_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 {
 	if (RGBM==1) dd_alphaeffect_magic_1(nr,str,xpos,ypos,xoff,yoff);
-	else dd_alphaeffect_magic_0(nr,str,xpos,ypos,xoff,yoff);	
+	else dd_alphaeffect_magic_0(nr,str,xpos,ypos,xoff,yoff);
 }
 
+/**
+ * dd_getDC - Get device context for a surface
+ * @sur: DirectDraw surface
+ *
+ * Obtains a GDI device context for drawing on a DirectDraw surface.
+ * This allows using GDI drawing functions on the surface. Must be
+ * released with dd_releaseDC() when done.
+ *
+ * Returns: Device context handle
+ */
+// TODO: Modern GCC/MinGW - GDI device contexts not available in SDL/modern APIs
+// If GDI drawing is needed, consider rendering to SDL_Surface/SDL_Texture
+// or using GPU-accelerated rendering instead
 HDC dd_getDC(LPDIRECTDRAWSURFACE sur)
 {
 	HDC hdc;
 
+	// TODO: Replace GetDC with SDL surface access or remove GDI dependency
 	suro->lpVtbl->GetDC(sur,&hdc);
 
 	return hdc;
 }
 
+/**
+ * dd_releaseDC - Release a device context obtained from surface
+ * @hdc: Device context to release
+ * @sur: DirectDraw surface the DC belongs to
+ *
+ * Releases a device context obtained via dd_getDC(). Must be called
+ * after finishing GDI operations on the surface.
+ */
 void dd_releaseDC(HDC hdc,LPDIRECTDRAWSURFACE sur)
 {
+	// TODO: Replace ReleaseDC with SDL equivalent or remove
 	suro->lpVtbl->ReleaseDC(sur,hdc);
 }
 
 
+/**
+ * dd_flip - Flip primary surface and back buffer (fullscreen)
+ *
+ * Swaps the front and back buffers to display the newly rendered frame.
+ * Uses hardware page flipping for smooth, tear-free rendering. This is
+ * only used in fullscreen mode where the back buffer is attached to the
+ * primary surface. Waits for vertical sync if supported.
+ */
 void dd_flip(void)
 {
 	long ret;
 
+	// TODO: Modern GCC/MinGW - Replace Flip with SDL_RenderPresent or D3D Present
+	// SDL2: SDL_RenderPresent(renderer)
+	// D3D9: device->Present(...)
 	ret=sur1->lpVtbl->Flip(sur1,NULL,DDFLIP_WAIT);
 	if (ret!=DD_OK) {
 		dd_error(0,"dd_flip",ret);
 	}
 }
 
+/**
+ * dd_flip_windowed - Update screen in windowed mode
+ *
+ * Copies the back buffer (sur2) to the primary surface (sur1) in windowed mode.
+ * Since page flipping isn't available in windowed mode, this uses blitting.
+ * Adjusts for window borders and title bar (+20 pixels top, +1 pixel edges).
+ * This is slower than flipping but allows the game to run in a window.
+ */
 void dd_flip_windowed(void)
 {
 	RECT rect;
 
+	// TODO: Modern GCC/MinGW - GetWindowRect is Win32 API
+	// SDL2: SDL_GetWindowSize() or SDL_GetWindowPosition()
 	GetWindowRect(desk_hwnd,&rect);
 
 	// determine bounds of window in a more sensible way !!!
@@ -1010,10 +1373,21 @@ void dd_flip_windowed(void)
 	rect.right-=1;
 	rect.top+=20;
 
+	// TODO: Modern GCC/MinGW - Replace Blt with SDL_RenderPresent or D3D Present
+	// In SDL2, windowed mode uses same SDL_RenderPresent as fullscreen
 	sur1->lpVtbl->Blt(sur1,&rect,sur2,NULL,DDBLT_WAIT,NULL);
 }
 
-/* Translate direct draw error code to human readable form. */
+/**
+ * dd_error - Display DirectDraw error message
+ * @hwnd: Window handle (may be NULL)
+ * @msg: Context message describing where error occurred
+ * @err: DirectDraw error code
+ *
+ * Shows an error message on screen by drawing directly to the window's DC.
+ * Displays both the context message and the translated error code string.
+ * Suppresses SURFACELOST errors as these are expected during mode changes.
+ */
 void dd_error(HWND hwnd,char *msg,long err)
 {
 	char *ptr;
@@ -1022,6 +1396,8 @@ void dd_error(HWND hwnd,char *msg,long err)
 	ptr=get_dderr(err);
 
 	if (err!=DDERR_SURFACELOST) {
+		// TODO: Modern GCC/MinGW - GetWindowDC/TextOut are GDI functions
+		// Replace with SDL_ShowSimpleMessageBox or fprintf to stderr
 		hdc=GetWindowDC(hwnd);
 		TextOut(hdc,10,10,msg,strlen(msg));
 		TextOut(hdc,10,30,ptr,strlen(ptr));
@@ -1034,9 +1410,20 @@ void dd_error(HWND hwnd,char *msg,long err)
    Helper routines for dd_load_bitmap
    ------------- */
 
+// Static buffer for file loading to avoid repeated allocations
 static void*__mem=NULL;
 static int __msize=0;
 
+/**
+ * load_file - Load entire file into memory
+ * @file: Path to file to load
+ *
+ * Reads a complete file into a static memory buffer. The buffer grows
+ * as needed and is reused across calls to minimize allocations. This is
+ * used primarily for loading bitmap and sprite files.
+ *
+ * Returns: Pointer to file data, or NULL on failure
+ */
 void *load_file(char *file)
 {
 	int handle;
@@ -1045,12 +1432,15 @@ void *load_file(char *file)
 
 	if (locks) xlog(0,"trying to read while locked");
 
-	handle=open(file,O_RDONLY|O_BINARY);
+	// TODO: Modern GCC/MinGW - Replace low-level file I/O with standard C
+	// Use fopen/fread/fclose instead of open/read/close for portability
+	// O_BINARY flag may not be needed on Unix systems
+	handle=open(file,O_RDONLY|O_BINARY);  // TODO: Replace with fopen(file, "rb")
 	if (handle==-1) {
 		return NULL;
 	} // xlog(0,"File not found: %s",strerror(errno));
-	size=lseek(handle,0L,SEEK_END);
-	lseek(handle,0L,SEEK_SET);
+	size=lseek(handle,0L,SEEK_END);  // TODO: Replace with fseek/ftell
+	lseek(handle,0L,SEEK_SET);       // TODO: Replace with fseek
 	if (size>__msize) {
 		if (__mem) xfree(__mem);
 		__msize=max(2*1024*2024,size);
@@ -1060,23 +1450,48 @@ void *load_file(char *file)
 	if (!ptr) {
 		xlog(0,"memory low"); return NULL;
 	}
-	read(handle,ptr,size);
-	close(handle);
+	read(handle,ptr,size);  // TODO: Replace with fread
+	close(handle);          // TODO: Replace with fclose
 
 	return ptr;
 }
 
-#pragma argsused
+/**
+ * unload_file - Free file data loaded by load_file
+ * @ptr: Pointer returned by load_file (currently ignored)
+ *
+ * Placeholder for file cleanup. Currently does nothing since load_file
+ * uses a static buffer that persists across calls.
+ */
+// TODO: Modern GCC/MinGW - #pragma argsused is Borland C++ specific
+// Use GCC attribute instead: __attribute__((unused))
+// Or simply remove if parameter is truly unused
+#pragma argsused  // TODO: Replace with __attribute__((unused)) or remove
 static void unload_file(void *ptr)
 {
 	//xfree(ptr);
 	;
 }
 
-/* Load a bitmap and return it's contents */
-
+/**
+ * dd_load_bitmap - Load a Windows bitmap file into memory
+ * @name: Path to .BMP file
+ * @xs: Output parameter for image width
+ * @ys: Output parameter for image height
+ * @sur: DirectDraw surface (for getting DC)
+ *
+ * Loads a bitmap file and converts it to 16-bit RGB format in memory.
+ * Uses GDI functions to decode the bitmap, then extracts the raw pixel
+ * data. The returned buffer must be freed with xfree().
+ *
+ * Returns: Pointer to 16-bit pixel data, or NULL on failure
+ */
+// TODO: Modern GCC/MinGW - Replace GDI bitmap loading with modern image library
+// Consider using SDL_image, stb_image.h, or libpng directly
+// This function uses Windows GDI which is not portable
 void *dd_load_bitmap(char *name,int *xs,int *ys,LPDIRECTDRAWSURFACE sur)
 {
+	// TODO: Replace Windows bitmap structures with SDL_Surface or generic format
 	BITMAPINFO *info;
 	BITMAPFILEHEADER *file_hdr;
 	HDC hdc,hdcMem;
@@ -1087,6 +1502,8 @@ void *dd_load_bitmap(char *name,int *xs,int *ys,LPDIRECTDRAWSURFACE sur)
 	ptr=load_file(name);
 	if (ptr==NULL) return NULL;
 
+	// TODO: Modern GCC/MinGW - Replace GDI DC access with SDL_Surface loading
+	// SDL_image: IMG_Load(name) returns SDL_Surface directly
 	if (sur->lpVtbl->GetDC(sur,&hdc)!=DD_OK) {
 		unload_file(ptr); sur->lpVtbl->ReleaseDC(sur,hdc); xlog(0,"cannot get dc"); return NULL;
 	}
@@ -1098,6 +1515,7 @@ void *dd_load_bitmap(char *name,int *xs,int *ys,LPDIRECTDRAWSURFACE sur)
 	*xs=info->bmiHeader.biWidth;
 	*ys=info->bmiHeader.biHeight;
 
+	// TODO: Replace GDI bitmap functions with SDL_LoadBMP or SDL_image
 	hdcMem=CreateCompatibleDC(hdc);
 	if (hdcMem==0) {
 		unload_file(ptr); sur->lpVtbl->ReleaseDC(sur,hdc); xlog(0,"cannot create hdcmem"); return NULL;
@@ -1133,9 +1551,17 @@ void *dd_load_bitmap(char *name,int *xs,int *ys,LPDIRECTDRAWSURFACE sur)
 
 #define MAXEFFECT	1024
 
-#define current_tick GetTickCount()
+// TODO: Modern GCC/MinGW - GetTickCount() is Windows-specific
+// Cross-platform alternatives:
+// - SDL_GetTicks() in SDL2
+// - clock_gettime() on POSIX systems
+// - std::chrono in C++11+
+#define current_tick GetTickCount()  // TODO: Replace with SDL_GetTicks() or cross-platform timer
 
-static MEMORYSTATUS memstat;
+// TODO: Modern GCC/MinGW - MEMORYSTATUS is deprecated
+// Use MEMORYSTATUSEX instead for 64-bit support
+// Or use cross-platform alternatives (sysconf, sysctl, /proc/meminfo)
+static MEMORYSTATUS memstat;  // TODO: Replace with MEMORYSTATUSEX
 
 struct sprtab {
 	unsigned short *image;			// null means not loaded	
@@ -1310,6 +1736,13 @@ void dd_load_sprite(int nr)
 	sprtab[nr].cache=xcalloc(MAXEFFECT*sizeof(short),sprtab[nr].xs*sprtab[nr].ys);
 }
 
+/**
+ * dd_invalidate_cache - Clear the entire sprite tile cache
+ *
+ * Resets all cached sprite tiles, forcing them to be reloaded from disk
+ * on next use. Clears sprite numbers, effects, visibility, and usage tracking.
+ * This is called when switching display modes or when memory needs to be freed.
+ */
 void dd_invalidate_cache(void)
 {
 	int n;
@@ -1323,8 +1756,19 @@ void dd_invalidate_cache(void)
 	usedvid=0;
 }
 
+/**
+ * dd_init_sprites - Initialize the sprite management system
+ *
+ * Sets up the sprite and cache tables for managing game sprites. Allocates
+ * memory for sprite metadata (sprtab) and tile cache tracking (cachetab).
+ * Determines max memory usage based on available physical RAM. Sets the
+ * transparent color key to magenta (RED+BLUE).
+ */
 void dd_init_sprites(void)
 {
+	// TODO: Modern GCC/MinGW - GlobalMemoryStatus is deprecated
+	// Use GlobalMemoryStatusEx for 64-bit memory sizes
+	// Or use cross-platform alternatives (sysconf on Linux)
 	GlobalMemoryStatus(&memstat);
 	maxmem=max(8192*1024,memstat.dwTotalPhys-8192*1024);
 	maxvid=MAXCACHE;
@@ -1339,7 +1783,29 @@ void dd_init_sprites(void)
 
 int gamma=5000;
 
-#pragma argsused
+/**
+ * do_effect - Apply visual effects to a pixel color
+ * @val: Original 16-bit RGB pixel value
+ * @effect: Bit flags controlling effects and brightness
+ * @seed1: Random seed 1 (unused)
+ * @seed2: Random seed 2 (unused)
+ * @sprite: Sprite number (unused)
+ *
+ * Applies various visual effects to a single pixel:
+ * - Bits 0-15: Brightness adjustment (gamma correction)
+ * - Bit 16 (16): Red border highlight
+ * - Bit 32 (32): Green border highlight
+ * - Bit 64 (64): Invisibility (darken heavily)
+ * - Bit 128 (128): Greyscale conversion
+ * - Bit 256 (256): Infrared vision (red tint)
+ * - Bit 512 (512): Underwater tint (blue)
+ *
+ * Handles both RGB565 and RGB555 formats based on RGBM setting.
+ *
+ * Returns: Modified pixel color value
+ */
+// TODO: Modern GCC/MinGW - Replace #pragma argsused with GCC __attribute__
+#pragma argsused  // TODO: Use __attribute__((unused)) for seed1, seed2, sprite
 unsigned short do_effect(unsigned short val,int effect,int seed1,int seed2,int sprite)
 {
 	int r,g,b,invis=0,tmp,grey=0,infra=0,water=0,bloody=0,red=0,green=0;
@@ -1726,6 +2192,18 @@ void dd_savescreen(void)
 	xlog(2,"Placed screenshot in clipboard.");
 }
 
+/**
+ * dd_gputc - Draw a single character in game world coordinates
+ * @xpos: World X position
+ * @ypos: World Y position
+ * @font: Font index (0-9)
+ * @c: Character to draw (ASCII)
+ *
+ * Renders a single 6x9 pixel character from a font sprite to the screen.
+ * Converts world coordinates to screen coordinates using isometric projection.
+ * Performs clipping against screen bounds. Uses transparency for anti-aliased
+ * text. Font sprites are at sprite indices 18100-18109.
+ */
 void dd_gputc(int xpos,int ypos,int font,int c)
 {
 	unsigned short *fptr,*tptr;
@@ -1771,6 +2249,19 @@ void dd_gputc(int xpos,int ypos,int font,int c)
 	return;
 }
 
+/**
+ * dd_gputtext - Draw text string in game world coordinates
+ * @xpos: World X position
+ * @ypos: World Y position
+ * @font: Font index (0-9)
+ * @text: Null-terminated string to draw
+ * @xoff: Additional X screen offset
+ * @yoff: Additional Y screen offset
+ *
+ * Renders a text string by converting world coordinates to screen coordinates
+ * and drawing each character. Centers the text horizontally around the world
+ * position. Stops drawing if text goes off-screen.
+ */
 void dd_gputtext(int xpos,int ypos,int font,char *text,int xoff,int yoff)
 {
 	int rx,ry,len;
@@ -1794,6 +2285,17 @@ void dd_gputtext(int xpos,int ypos,int font,char *text,int xoff,int yoff)
 	}
 }
 
+/**
+ * dd_putc - Draw a single character at screen coordinates
+ * @xpos: Screen X position
+ * @ypos: Screen Y position
+ * @font: Font index (0-9)
+ * @c: Character to draw (ASCII)
+ *
+ * Draws a 6x9 pixel character directly at screen coordinates without
+ * coordinate conversion. No clipping is performed. Used for UI elements
+ * and HUD text.
+ */
 void dd_putc(int xpos,int ypos,char font,int c)
 {
 	unsigned short *fptr,*tptr;
@@ -1836,6 +2338,16 @@ void dd_putc(int xpos,int ypos,char font,int c)
 	return;
 }
 
+/**
+ * dd_puttext - Draw text string at screen coordinates
+ * @x: Screen X position
+ * @y: Screen Y position
+ * @font: Font index (0-9)
+ * @text: Null-terminated string to draw
+ *
+ * Renders text horizontally at the specified screen position. Each character
+ * is 6 pixels wide. No clipping or coordinate conversion.
+ */
 void dd_puttext(int x,int y,int font,char *text)
 {
 	while (*text) {
@@ -1844,12 +2356,25 @@ void dd_puttext(int x,int y,int font,char *text)
 	}
 }
 
+/**
+ * dd_xputtext - Draw formatted text at screen coordinates
+ * @x: Screen X position
+ * @y: Screen Y position
+ * @font: Font index (0-9)
+ * @format: Printf-style format string
+ * @...: Variable arguments for format string
+ *
+ * Renders formatted text using printf-style formatting. Useful for
+ * displaying numbers and dynamic text in the UI.
+ */
 void dd_xputtext(int x,int y,int font,char *format,...)
 {
 	va_list args;
 	char buf[1024];
 
 	va_start(args,format);
+	// TODO: Modern GCC/MinGW - vsprintf is unsafe, replace with vsnprintf
+	// vsnprintf(buf, sizeof(buf), format, args) to prevent buffer overflow
 	vsprintf(buf,format,args);
 	dd_puttext(x,y,font,buf);
 	va_end(args);
@@ -2079,11 +2604,17 @@ void display_png(unsigned char *png,int xf,int yf,int xs,int ys)
 // pixel with alpha!=255 (i.e. partially or fully transparent pixels) are marked as the transparent
 // color in the 16 bit RGB data to allow blitting them with FastBLT.
 // the alpha information may be used, but doesnt need to - it just looks better...
+// TODO: Modern GCC/MinGW - Ensure libpng is properly linked
+// MinGW: link with -lpng -lz
+// May need to install libpng-dev or libpng16-dev package
+// Consider using SDL_image (IMG_LoadPNG_RW) for easier cross-platform integration
+// Verify libpng version compatibility
 unsigned short *dd_load_png(FILE *fp,int *xs,int *ys,unsigned char **alpha_ptr,int *alphacnt_ptr)
 {
     int x,y,n,m,alphacnt=0,alphamax=0,noalpha=0,mul=4,tmp,r,g,b,a;
     unsigned char **row,*alpha=NULL;
     unsigned short *bmp;
+    // TODO: Modern GCC/MinGW - Check libpng API compatibility with version being used
     png_structp png_ptr;
     png_infop info_ptr;
     png_infop end_info;
@@ -2215,12 +2746,35 @@ void dd_invalidate_alpha(void)
 
 static unsigned char *shadowmap;
 
+/**
+ * dd_shadow_clear - Reset the shadow rendering map
+ *
+ * Clears the shadow bitmap used to track which pixels already have shadows.
+ * This prevents overlapping shadows from being rendered twice on the same
+ * pixel. Should be called once per frame before rendering shadows.
+ */
 void dd_shadow_clear(void)
 {
-	if (!shadowmap) shadowmap=calloc(MAXX,MAXY);
+	// TODO: Modern GCC/MinGW - calloc parameters are (count, size)
+	// Current usage: calloc(MAXX, MAXY) should be calloc(MAXX*MAXY, 1)
+	// or calloc(MAXX, MAXY) if MAXY is the element size
+	if (!shadowmap) shadowmap=calloc(MAXX,MAXY);  // TODO: Verify parameter order
 	else memset(shadowmap,0,MAXX*MAXY);
 }
 
+/**
+ * dd_shadow - Render a sprite's shadow
+ * @nr: Sprite number to cast shadow from
+ * @xpos: World X position
+ * @ypos: World Y position
+ * @xoff: Screen X offset
+ * @yoff: Screen Y offset
+ *
+ * Draws a darkened version of a sprite to create a shadow effect. The shadow
+ * is offset downward from the sprite position. Uses the shadowmap to avoid
+ * drawing the same pixel twice. Only works for certain sprite ranges (game
+ * characters and objects). Shadows are rendered by halving pixel brightness.
+ */
 void dd_shadow(int nr,int xpos,int ypos,int xoff,int yoff)
 {
 	unsigned int x,y,xs,ys,rx,ry,m,p,v,ok=0,disp,swap=0,n;

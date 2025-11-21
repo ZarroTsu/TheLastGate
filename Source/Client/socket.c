@@ -1,15 +1,43 @@
+/*
+ * SOCKET.C - Network Communication Layer
+ *
+ * TODO: MODERN GCC/MINGW COMPATIBILITY
+ * ====================================
+ * This file requires updates for modern compiler compatibility:
+ *
+ * HEADERS:
+ * - <alloc.h> -> <malloc.h> or <stdlib.h>
+ * - <io.h> -> <unistd.h> for POSIX or remove if not needed
+ * - <windows.h> -> Remove, not needed for networking
+ * - <winsock.h> -> <winsock2.h> for modern Windows, or use cross-platform sockets
+ * - #pragma hdrstop -> Remove (Borland C++ specific)
+ *
+ * WINDOWS API:
+ * - WSAStartup/WSACleanup -> Not needed on POSIX systems
+ * - ioctlsocket -> ioctl() on POSIX, or fcntl() for non-blocking
+ * - closesocket -> close() on POSIX
+ * - MessageBox -> SDL_ShowSimpleMessageBox() for cross-platform
+ * - HWND -> SDL_Window* for cross-platform
+ *
+ * CROSS-PLATFORM NETWORKING:
+ * For true cross-platform support, use SDL_net or standard POSIX sockets
+ * with conditional compilation for Windows-specific initialization.
+ *
+ * See individual TODO comments below for specific locations.
+ */
+
 #include <stdio.h>
-#include <alloc.h>
+#include <alloc.h>     // TODO: Replace with <malloc.h> or <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
+#include <io.h>        // TODO: Replace with <unistd.h> for POSIX or remove
 #include <stdlib.h>
-#include <windows.h>
-#include <winsock.h>
+#include <windows.h>   // TODO: Remove - not needed for networking
+#include <winsock.h>   // TODO: Replace with <winsock2.h> or POSIX <sys/socket.h>, <netinet/in.h>, <arpa/inet.h>
 #include <zlib.h>
 
 struct z_stream_s zs;
 
-#pragma hdrstop
+#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "common.h"
 #include "inter.h"
 #include "merc.rh"
@@ -75,6 +103,8 @@ char *logout_reason[]={
 "You have been banned for an hour. Enhance your social behavior before you come back."                 //14
 };
 
+// TODO: Modern GCC/MinGW - HWND is Windows-specific
+// SDL2: Use SDL_Window* instead
 extern HWND desk_hwnd;
 
 int xrecv(int sock,char *buf,int len,int flags)
@@ -99,13 +129,20 @@ void so_error(char *err)
 	save_options();
 
 	if (!do_exit) {
+		// TODO: Modern GCC/MinGW - WSAGetLastError is Winsock-specific
+		// POSIX: Use errno and strerror() instead
+		// Example: sprintf(buf, "Error: %s (%s)", err, strerror(errno));
 		sprintf(buf,"Error: %s (%d)",err,WSAGetLastError());
+		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
+		// SDL2: Use SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Irregular Exit", buf, NULL);
 		MessageBox(desk_hwnd,buf,"Irregular Exit",MB_ICONSTOP|MB_OK);
 	}
 
 	exit(0);
 }
 
+// TODO: Modern GCC/MinGW - Function takes HWND parameter (Windows-specific)
+// SDL2: Change signature to use SDL_Window* or remove if dialog updates are replaced
 int so_login(unsigned char *buf,HWND hwnd)
 {
 	unsigned int tmp,prio;
@@ -213,10 +250,15 @@ int so_login(unsigned char *buf,HWND hwnd)
 	return 0;
 }
 
+// TODO: Modern GCC/MinGW - Function takes HWND parameter (Windows-specific)
 void convert(HWND hwnd);
 
+// TODO: Modern GCC/MinGW - Function takes HWND parameter (Windows-specific)
+// SDL2: Change signature to use SDL_Window* or remove if dialog updates are replaced
 void so_connect(HWND hwnd)
 {
+	// TODO: Modern GCC/MinGW - WSADATA is Winsock-specific structure
+	// POSIX: Not needed
 	WSADATA dummy;
 	struct sockaddr_in addr;
 	struct hostent *he;
@@ -232,7 +274,13 @@ void so_connect(HWND hwnd)
 	//convert(hwnd); return;
 
 	if (!flag) {
+		// TODO: Modern GCC/MinGW - SetDlgItemText is Windows dialog API
+		// SDL2/Cross-platform: Replace with custom UI update function or logging
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Windows Sockets");
+		// TODO: Modern GCC/MinGW - WSAStartup is Winsock-specific, initializes Winsock library
+		// POSIX: Not needed, sockets work without initialization
+		// For cross-platform: Use #ifdef _WIN32 to conditionally call WSAStartup on Windows
+		// Example: #ifdef _WIN32 WSAStartup(MAKEWORD(2,2), &wsaData); #endif
 		if (WSAStartup((1<<8)+1,&dummy)) {
 			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not init Windows Sockets");
 			so_status=0;
@@ -409,8 +457,13 @@ void so_connect(HWND hwnd)
 		if (tmp==-1) { so_status=0; close(sock); return; }
 	} while (!tmp);
 
+	// TODO: Modern GCC/MinGW - Sleep is Windows-specific (milliseconds)
+	// Cross-platform: Use SDL_Delay(500) or usleep(500000) on POSIX
 	Sleep(500);
 
+	// TODO: Modern GCC/MinGW - ioctlsocket is Winsock-specific for non-blocking mode
+	// POSIX: Use fcntl() to set O_NONBLOCK flag
+	// Example: int flags = fcntl(sock, F_GETFL, 0); fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 	ioctlsocket(sock,FIONBIO,(u_long*)&one);
 
 	zs.zalloc=Z_NULL;

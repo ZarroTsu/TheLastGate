@@ -1,10 +1,22 @@
-#include <windows.h>
+/*
+ * CONV.C - Conversion and Data Processing Utilities
+ *
+ * TODO: MODERN GCC/MINGW COMPATIBILITY
+ * ====================================
+ * HEADERS:
+ * - <windows.h> -> Remove if not using Windows-specific APIs
+ * - <io.h> -> <unistd.h> for POSIX
+ * - <dir.h> -> <dirent.h> on POSIX
+ * - #pragma hdrstop -> Remove (Borland C++ specific)
+ */
+
+#include <windows.h>  // TODO: Remove if not using Windows-specific APIs
 #include <stdio.h>
 #include <stdlib.h>
-#include <io.h>
+#include <io.h>       // TODO: Replace with <unistd.h> for POSIX
 #include <fcntl.h>
-#include <dir.h>
-#pragma hdrstop
+#include <dir.h>      // TODO: Replace with <dirent.h> on POSIX
+#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "dd.h"
 #include "common.h"
 #include "inter.h"

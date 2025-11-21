@@ -1,14 +1,38 @@
+/*
+ * MAIN.C - Client Entry Point and Main Loop
+ *
+ * TODO: MODERN GCC/MINGW COMPATIBILITY
+ * ====================================
+ * This file requires updates for modern compiler compatibility:
+ *
+ * HEADERS:
+ * - <alloc.h> -> <malloc.h> or <stdlib.h>
+ * - <io.h> -> <unistd.h> or standard C file I/O
+ * - <windowsx.h> -> May not be needed
+ * - "ddraw.h" -> Replace with SDL2 headers
+ * - #pragma hdrstop -> Remove (Borland C++ specific)
+ *
+ * WINDOWS API:
+ * - HWND, HINSTANCE -> SDL_Window* in SDL2
+ * - HCURSOR -> SDL_Cursor* in SDL2
+ * - Window message loop -> SDL event loop
+ * - WinMain() -> main() with SDL_main wrapper
+ *
+ * See individual TODO comments below for specific locations.
+ */
+
+// TODO: Modern GCC/MinGW - Replace deprecated headers
 #include <stdio.h>
-#include <alloc.h>
+#include <alloc.h>  // TODO: Replace with <malloc.h> or <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
+#include <io.h>     // TODO: Replace with <unistd.h> or standard C file I/O
 #include <stdlib.h>
-#include <windows.h>
-#include <windowsx.h>
-#include "ddraw.h"
-#include <process.h>
+#include <windows.h>  // TODO: Replace with SDL2 headers for cross-platform
+#include <windowsx.h> // TODO: May not be needed with SDL2
+#include "ddraw.h"    // TODO: Remove - DirectDraw is deprecated
+#include <process.h>  // TODO: Use pthread or SDL_thread for cross-platform threading
 #include <signal.h>
-#pragma hdrstop
+#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "dd.h"
 #include "common.h"
 #include "inter.h"
@@ -39,7 +63,9 @@ void conv_init(void);
 int init_pnglib(void);
 
 extern int cursor_type;
-HCURSOR cursor[10];
+// TODO: Modern GCC/MinGW - HCURSOR is Windows-specific
+// SDL2: Use SDL_Cursor* created with SDL_CreateCursor() or SDL_CreateSystemCursor()
+HCURSOR cursor[10];  // TODO: Replace with SDL_Cursor* array
 
 void cmd(int cmd,int x,int y);
 
@@ -51,9 +77,14 @@ int host_port=5555;
 extern char path[];
 extern int tricky_flag;
 
-HWND desk_hwnd;
-HINSTANCE hinst;
+// TODO: Modern GCC/MinGW - Windows-specific window handles
+// SDL2: Use SDL_Window* instead of HWND
+// HINSTANCE not needed in SDL2
+HWND desk_hwnd;      // TODO: Replace with SDL_Window*
+HINSTANCE hinst;     // TODO: Remove - not needed in SDL2
 
+// TODO: Modern GCC/MinGW - init_sound takes HWND parameter (Windows-specific)
+// SDL2: Change signature to init_sound(SDL_Window* window) or init_sound(void)
 int init_sound(HWND hwnd);
 void engine(void);
 
@@ -140,12 +171,19 @@ void add_words(void)
 }
 
 // CTL3D
+// TODO: Modern GCC/MinGW - CTL3D (3D control library) is obsolete Windows 95/98 era
+// TODO: Remove entire CTL3D section, modern UI frameworks don't need this
+// HANDLE is Windows-specific, HBRUSH is GDI-specific
 void pascal (*ctl3don)(HANDLE,short int)=NULL;
+// TODO: Modern GCC/MinGW - HBRUSH is GDI-specific (Graphics Device Interface)
+// SDL2: Not applicable, use SDL_SetRenderDrawColor for colors
 HBRUSH dlg_back;
 int dlg_col,dlg_fcol;
 
 extern int blockcnt,blocktot,blockgc;
 int mx=0,my=0;
+// TODO: Modern GCC/MinGW - POINT is Windows-specific struct (x, y coordinates)
+// SDL2: Use SDL_Point struct or just separate int x, y variables
 POINT pt;
 
 void say(char *input)
@@ -199,22 +237,43 @@ extern int usedvidmem;
 
 extern int alphapix,fullpix;
 
+// TODO: Modern GCC/MinGW - MainWndProc is Windows-specific message handler
+// SDL2: Replace entire function with SDL event loop in main()
+// Example:
+//   SDL_Event event;
+//   while (SDL_PollEvent(&event)) {
+//     switch (event.type) {
+//       case SDL_KEYDOWN: // replaces WM_KEYDOWN
+//       case SDL_MOUSEBUTTONDOWN: // replaces WM_LBUTTONDOWN
+//       case SDL_MOUSEWHEEL: // replaces WM_MOUSEWHEEL
+//       ...
+//     }
+//   }
+// TODO: Modern GCC/MinGW - Windows-specific types and calling conventions:
+// LRESULT, FAR, PASCAL, _export, HWND, UINT, WPARAM, LPARAM are all Windows-specific
+// Replace with standard C function signature for SDL event handling
 LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam)
 {
+	// TODO: Modern GCC/MinGW - PAINTSTRUCT is Windows-specific for WM_PAINT handling
 	PAINTSTRUCT ps;
 	int keys;
 	extern int ser_ver,xmove,xxtimer;
 	static int delta=0; // scrollwheel direction/speed
 
 	keys=0;
+	// TODO: Modern GCC/MinGW - GetAsyncKeyState is Windows-specific
+	// SDL2: Use SDL_GetKeyboardState() or check event.key.keysym.mod for modifiers
+	// Example: if (SDL_GetModState() & KMOD_SHIFT)
 	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
 	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
 
+	// TODO: Modern GCC/MinGW - Windows message handling
+	// SDL2: Replace switch(message) with switch(event.type)
 	switch (message) {
-		case WM_MENUCHAR:
+		case WM_MENUCHAR:  // TODO: SDL2: Not directly applicable, handle in menu system
             return MNC_CLOSE<<16;
-		case WM_SYSKEYDOWN:
-		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:  // TODO: SDL2: Use SDL_KEYDOWN with KMOD_ALT check
+		case WM_KEYDOWN:  // TODO: SDL2: Use SDL_KEYDOWN, check event.key.keysym.sym
 			switch ((int)wParam) 
 			{
 				// **************** Ctrl cases for number keys **************** //
@@ -453,7 +512,7 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 			}
 			break;
 
-		case WM_CHAR:
+		case WM_CHAR:  // TODO: SDL2: Use SDL_TEXTINPUT for character input (Unicode support)
 			switch ((int)wParam) 
 			{
 				/*
@@ -535,44 +594,52 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 			}
 			break;
 
-		case WM_PAINT:
+		case WM_PAINT:  // TODO: SDL2: Not needed, rendering happens in main loop
+			// TODO: Modern GCC/MinGW - BeginPaint/EndPaint are Windows-specific
 			BeginPaint(hWnd,&ps);
 			EndPaint(hWnd,&ps);
 			break;
 
-		case WM_DESTROY:
+		case WM_DESTROY:  // TODO: SDL2: Handle SDL_QUIT event instead
+			// TODO: Modern GCC/MinGW - PostQuitMessage is Windows-specific
 			PostQuitMessage(0);
 			break;
 
-		case WM_MOUSEMOVE:
+		case WM_MOUSEMOVE:  // TODO: SDL2: Use SDL_MOUSEMOTION event
+			// TODO: Modern GCC/MinGW - LOWORD/HIWORD are Windows-specific macros
+			// SDL2: Use event.motion.x and event.motion.y
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_MOVE);
 			mx=LOWORD(lParam);
 			my=HIWORD(lParam);
 			break;
 
-		case WM_LBUTTONDOWN:
+		case WM_LBUTTONDOWN:  // TODO: SDL2: Use SDL_MOUSEBUTTONDOWN with event.button.button == SDL_BUTTON_LEFT
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_LB_DOWN);
 			break;
 
-		case WM_LBUTTONUP:
+		case WM_LBUTTONUP:  // TODO: SDL2: Use SDL_MOUSEBUTTONUP with event.button.button == SDL_BUTTON_LEFT
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_LB_UP);
 			break;
 
-		case WM_RBUTTONDOWN:
+		case WM_RBUTTONDOWN:  // TODO: SDL2: Use SDL_MOUSEBUTTONDOWN with event.button.button == SDL_BUTTON_RIGHT
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_RB_DOWN);
 			break;
 
-		case WM_RBUTTONUP:
+		case WM_RBUTTONUP:  // TODO: SDL2: Use SDL_MOUSEBUTTONUP with event.button.button == SDL_BUTTON_RIGHT
 			mouse(LOWORD(lParam),HIWORD(lParam),MS_RB_UP);
 			break;
-		
+
 		//  Adding support for Scroll Wheel
-		case WM_MOUSEWHEEL:
+		case WM_MOUSEWHEEL:  // TODO: SDL2: Use SDL_MOUSEWHEEL event with event.wheel.y
             if (!(short)(HIWORD(wParam))) return 0;
-			
+
 			// Fix to grab X/Y for window mode / multi screen
+			// TODO: Modern GCC/MinGW - GET_X_LPARAM/GET_Y_LPARAM are Windows-specific
+			// SDL2: event.wheel.mouseX and event.wheel.mouseY provide mouse position
 			pt.x = GET_X_LPARAM(lParam);
 			pt.y = GET_Y_LPARAM(lParam);
+			// TODO: Modern GCC/MinGW - ScreenToClient is Windows-specific
+			// SDL2: Not needed, coordinates are already window-relative
 			ScreenToClient(hWnd, &pt);
 
 			mx = pt.x;
@@ -675,67 +742,93 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				delta-=120;
 			}			
 			break;
-		
+
 		default:
+			// TODO: Modern GCC/MinGW - DefWindowProc is Windows-specific
+			// SDL2: No equivalent needed, unhandled events are simply ignored
 			return(DefWindowProc(hWnd, message, wParam, lParam));
 	}
 	return 0;
 }
 
-
+// TODO: Modern GCC/MinGW - InitWindow is Windows-specific window creation
+// SDL2: Replace entire function with SDL_CreateWindow()
+// Example:
+//   SDL_Window* window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+//     SDL_WINDOWPOS_CENTERED, width, height, flags);
+//   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 HWND InitWindow(HINSTANCE hInstance,int nCmdShow)
 {
-	WNDCLASS wc;
+	WNDCLASS wc;  // TODO: SDL2: Not needed, SDL_CreateWindow handles this
 	HWND hWnd;
+	// TODO: Modern GCC/MinGW - GetSystemMetrics is Windows-specific
+	// SDL2: Use SDL_GetDisplayBounds() to get screen dimensions
 	DWORD dwWidth = GetSystemMetrics(SM_CXSCREEN);
 	DWORD dwHeight = GetSystemMetrics(SM_CYSCREEN);
 	char buf[256];
 	int n;
 	int xx, yy;
-    HMENU hmenu;
-    LONG style;
+    HMENU hmenu;  // TODO: SDL2: Not applicable
+    LONG style;  // TODO: SDL2: Use SDL window flags instead
 
 	xx = yy = 10;
 
 	hinst=hInstance;
 
+	// TODO: Modern GCC/MinGW - LoadCursor is Windows-specific
+	// SDL2: Use SDL_CreateSystemCursor() or SDL_CreateCursor()
+	// Example: SDL_Cursor* cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 	for (n=1; n<10; n++)
 		cursor[n]=LoadCursor(hInstance,MAKEINTRESOURCE(n));
 
+	// TODO: Modern GCC/MinGW - WNDCLASS is Windows-specific window class registration
+	// SDL2: Not needed, SDL handles window class internally
 	wc.style=CS_HREDRAW|CS_VREDRAW;
 	wc.lpfnWndProc=(long (FAR PASCAL*)())MainWndProc;
 	wc.cbClsExtra=0;
 	wc.cbWndExtra=0;
 	wc.hInstance=hInstance;
+	// TODO: Modern GCC/MinGW - LoadIcon is Windows-specific
+	// SDL2: Use SDL_SetWindowIcon() with SDL_Surface* loaded from image
 	wc.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(1));
 	wc.hCursor=NULL;
 	wc.hbrBackground=NULL;
 	wc.lpszMenuName=NULL;
 	wc.lpszClassName="DDCWin";
 
+	// TODO: Modern GCC/MinGW - RegisterClass is Windows-specific
+	// SDL2: Not needed
 	RegisterClass(&wc);
 
 	sprintf(buf,MNAME" v%d.%02d.%02d",
 			VERSION>>16,(VERSION>>8)&255,VERSION&255);
-	
-	if (screen_windowed == 0) 
+
+	// TODO: Modern GCC/MinGW - CreateWindowEx is Windows-specific
+	// SDL2: Use SDL_CreateWindow() with appropriate flags
+	if (screen_windowed == 0)
 	{
-		desk_hwnd=hWnd=CreateWindowEx(WS_EX_TOPMOST, "DDCWin", buf, WS_VISIBLE|WS_BORDER|WS_POPUP|WS_SYSMENU, 
+		// TODO: SDL2: Use SDL_WINDOW_FULLSCREEN or SDL_WINDOW_FULLSCREEN_DESKTOP
+		desk_hwnd=hWnd=CreateWindowEx(WS_EX_TOPMOST, "DDCWin", buf, WS_VISIBLE|WS_BORDER|WS_POPUP|WS_SYSMENU,
 			xx, yy, 0, 0, NULL, NULL, hInstance, NULL);
-	} 
-	else 
+	}
+	else
 	{
+		// TODO: SDL2: Use SDL_WINDOW_SHOWN flag for windowed mode
 		xx = dwWidth/2 - (screen_width+2)/2;
 		yy = dwHeight/2 - (screen_height+21)/2;
-		desk_hwnd=hWnd=CreateWindowEx(0, "DDCWin", buf, WS_VISIBLE|WS_BORDER|WS_SYSMENU|WS_MINIMIZEBOX, 
+		desk_hwnd=hWnd=CreateWindowEx(0, "DDCWin", buf, WS_VISIBLE|WS_BORDER|WS_SYSMENU|WS_MINIMIZEBOX,
 			xx, yy, screen_width+2, screen_height+21, NULL, NULL, hInstance, NULL);
-			
+
+		// TODO: Modern GCC/MinGW - GetSystemMenu/DeleteMenu are Windows-specific
+		// SDL2: To disable close button, handle SDL_QUIT event and ignore it
 		hmenu = GetSystemMenu(hWnd,FALSE);
 		DeleteMenu(hmenu,SC_CLOSE,MF_BYCOMMAND);
+		// TODO: Modern GCC/MinGW - GetWindowLong/SetWindowLong are Windows-specific
+		// SDL2: Not directly applicable, use SDL window flags
 		style = GetWindowLong(hWnd,GWL_STYLE);
 		style ^= WS_SYSMENU;
 		SetWindowLong(hWnd,GWL_STYLE,style);
-		
+
 		hmenu = GetSystemMenu(desk_hwnd,FALSE);
 		DeleteMenu(hmenu,SC_CLOSE,MF_BYCOMMAND);
 		style = GetWindowLong(desk_hwnd,GWL_STYLE);
@@ -743,8 +836,14 @@ HWND InitWindow(HINSTANCE hInstance,int nCmdShow)
 		SetWindowLong(desk_hwnd,GWL_STYLE,style);
 	}
 
+    // TODO: Modern GCC/MinGW - SetFocus is Windows-specific
+	// SDL2: Use SDL_RaiseWindow() to bring window to front
     SetFocus(hWnd);
+	// TODO: Modern GCC/MinGW - ShowWindow is Windows-specific
+	// SDL2: Use SDL_ShowWindow() or SDL_WINDOW_SHOWN flag in SDL_CreateWindow()
 	ShowWindow(hWnd,nCmdShow);
+	// TODO: Modern GCC/MinGW - UpdateWindow is Windows-specific
+	// SDL2: Not needed, SDL_RenderPresent() handles updates
 	UpdateWindow(hWnd);
 
 	return hWnd;
@@ -779,18 +878,28 @@ int parse_cmd(char *s)
 	return 1;
 }
 
+// TODO: Modern GCC/MinGW - log_system_data uses Windows-specific system info APIs
+// Cross-platform: Use standard C/POSIX functions or SDL_GetPlatform() for basic info
 void log_system_data(void)
 {
 	char buf[256];
 	unsigned int langid,lcid,size=80;
 	char systemdir[256],windir[256],cdir[256],user[256],computer[256];
 
+	// TODO: Modern GCC/MinGW - GetSystemDefaultLangID/GetSystemDefaultLCID are Windows-specific
+	// Cross-platform: Use setlocale(LC_ALL, NULL) to get locale, or SDL doesn't provide this
 	langid=GetSystemDefaultLangID();
 	lcid=GetSystemDefaultLCID();
 
+	// TODO: Modern GCC/MinGW - GetSystemDirectory/GetWindowsDirectory are Windows-specific
+	// Cross-platform: Not directly applicable, use getcwd() for current directory
 	GetSystemDirectory(systemdir,80);
         GetWindowsDirectory(windir,80);
+	// TODO: Modern GCC/MinGW - GetCurrentDirectory is Windows-specific
+	// Cross-platform: Use getcwd() from <unistd.h>
 	GetCurrentDirectory(80,cdir);
+	// TODO: Modern GCC/MinGW - GetUserName/GetComputerName are Windows-specific
+	// Cross-platform: Use getenv("USER") or getenv("USERNAME") for user, gethostname() for computer
 	GetUserName((void*)user,&size); size=80;
 	GetComputerName((void*)computer,&size);
 
@@ -802,17 +911,25 @@ void log_system_data(void)
 	sprintf(buf,"|computername=\"%s\"",computer); say(buf);
 }
 
-#pragma argsused
+#pragma argsused  // TODO: Remove - Borland C++ specific pragma
+// TODO: Modern GCC/MinGW - WinMain is Windows-specific entry point
+// SDL2: Replace with standard main() using SDL_main wrapper
+// Example:
+//   #define SDL_MAIN_HANDLED  // or use SDL_main.h
+//   int main(int argc, char* argv[]) {
+//     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+//     // ... rest of initialization
+//   }
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nCmdShow)
 {
-	HWND hwnd;
+	HWND hwnd;  // TODO: SDL2: Replace with SDL_Window*
 	char buf[2048];
 	int tmp;
-	HANDLE lib;
-	void pascal (*regxx)(HANDLE);
-	void pascal (*regxy)(HANDLE);
-	HANDLE mutex;
+	HANDLE lib;  // TODO: Modern GCC/MinGW - HANDLE is Windows-specific
+	void pascal (*regxx)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
+	void pascal (*regxy)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
+	HANDLE mutex;  // TODO: Modern GCC/MinGW - Replace with SDL_mutex or file locking
 	char *mutmoa;
 	int tmpi,tmpj = 0;
 	
@@ -821,8 +938,16 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	parse_cmd(lpCmdLine);
 
+	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
+	// Cross-platform: Use file locking (flock/lockf) or SDL_CreateMutex for thread safety
+	// Example: int lock_fd = open("game.lock", O_CREAT | O_RDWR, 0666); flock(lock_fd, LOCK_EX | LOCK_NB);
 	mutex=CreateMutex(NULL,0,mutmoa="MOATLG");
+	// TODO: Modern GCC/MinGW - GetLastError is Windows-specific
+	// Cross-platform: Use errno for POSIX functions
 	if (mutex==NULL || GetLastError()==ERROR_ALREADY_EXISTS && strcmp(host_addr,"127.0.0.1")) {
+		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
+		// SDL2: Use SDL_ShowSimpleMessageBox()
+		// Example: SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "message", NULL);
 		MessageBox(0,"Another instance of "MNAME" is already running.","Error",MB_OK|MB_ICONSTOP);
 		return 0;
 	}
@@ -834,8 +959,12 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0;
 	}
 
+	// TODO: Modern GCC/MinGW - LoadLibrary/GetProcAddress are Windows-specific dynamic loading
+	// TODO: CTL3D32.DLL is obsolete (Win95/98 era 3D controls), remove this entire section
+	// Cross-platform: Use dlopen/dlsym on POSIX systems if dynamic loading is needed
 	lib=LoadLibrary("CTL3D32.DLL");
 	if (lib) {
+		// TODO: Modern GCC/MinGW - GetCurrentProcess is Windows-specific
 		regxx=(void pascal *)GetProcAddress(lib,"Ctl3dRegister");
 		if (regxx) regxx(GetCurrentProcess());
 		ctl3don=(void pascal *)GetProcAddress(lib,"Ctl3dSubclassDlg");
@@ -845,7 +974,11 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		ctl3don=NULL;
 	}
 
+	// TODO: Modern GCC/MinGW - GetSysColor is Windows-specific
+	// SDL2: Not directly applicable, use custom color scheme or theme
 	dlg_col=GetSysColor(COLOR_BTNFACE);
+	// TODO: Modern GCC/MinGW - CreateSolidBrush is GDI-specific
+	// SDL2: Not needed, use SDL_SetRenderDrawColor for solid colors
 	dlg_back=CreateSolidBrush(dlg_col);
 	dlg_fcol=GetSysColor(COLOR_WINDOWTEXT);
 
@@ -886,6 +1019,9 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 		sprintf(buf,"|DDERROR=%d",-tmp);
 		say(buf);
+		// TODO: Modern GCC/MinGW - Sleep is Windows-specific (milliseconds)
+		// Cross-platform: Use SDL_Delay() or usleep() (microseconds) / nanosleep()
+		// Example: SDL_Delay(1000); // milliseconds
 		Sleep(1000);
 
 		sprintf(buf,
@@ -897,6 +1033,8 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				"RGBM=%d\n"
 				"MAXCACHE=%d\n",
 				-tmp,DDERR,VERSION>>16,(VERSION>>8)&255,VERSION&255,MAXX,MAXY,RED,GREEN,BLUE,RGBM,MAXCACHE);
+		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
+		// SDL2: Use SDL_ShowSimpleMessageBox()
 		MessageBox(hwnd,buf,"DirectX init failed.",MB_ICONSTOP|MB_OK);
 		exit(1);
 	}
