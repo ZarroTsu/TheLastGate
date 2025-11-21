@@ -1797,7 +1797,7 @@ void damage_mshell(int co, int dam)
 				tmp = (dam + tmp - get_target_resistance(0, co)) * 5;
 				
 				// Book - Great Divide :: half duration damage dealt to shield/shell
-				if (do_get_iflag(cn, SF_BOOK_GREA)) tmp /= 2;
+				if (do_get_iflag(co, SF_BOOK_GREA)) tmp /= 2;
 				if (m=st_skillcount(co, 72)) tmp = min(tmp, max(0, tmp*(100-m*10)/100));
 				
 				if (tmp>0)

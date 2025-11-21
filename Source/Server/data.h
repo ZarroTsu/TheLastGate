@@ -500,7 +500,7 @@ enum _ch_iflags {
 	SF_EN_AVASRES, // Enchant # 11
 	SF_EN_MORESLOW, // Enchant # 13
 	SF_EN_LESSSLOW, // Enchant # 14
-	, // Enchant # 15
+	SF_FREESLOT15, // Enchant # 15
 	SF_EN_TAKEASEN, // Enchant # 16
 	SF_EN_MORECURS, // Enchant # 20
 	SF_EN_LESSCURS, // Enchant # 21

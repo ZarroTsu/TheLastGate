@@ -2568,7 +2568,7 @@ void do_refundgskill(int cn, int n)
 	if (!(m = m/2)) // Nothing left to give back.
 	{
 		ch[cn].skill[n][1] = 0;
-		do_char_log(cn, 5, "Your greater %s skill points have been reset to 0.\n", at_names[n]);
+		do_char_log(cn, 5, "Your greater %s skill points have been reset to 0.\n", skilltab[n].name);
 		return;
 	}
 	
@@ -9488,7 +9488,7 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
-	if ((n = do_get_ieffect(co, SF_EN_HALFDMG)) && RANDOM(100)<n)
+	if ((n = do_get_ieffect(co, VF_EN_HALFDMG)) && RANDOM(100)<n)
 		dam /= 2;
 	
 	if (ch[co].flags & CF_IMMORTAL)
@@ -11358,7 +11358,6 @@ void really_update_char(int cn)
 			if (do_check_items(in, IT_GL_BLVIPER)) do_set_iflag(cn, SF_HIT_FROST);
 			
 			if (do_check_items(in, IT_BONEARMOR))  do_set_iflag(cn, SF_BONEARMOR);
-			if (do_check_items(in, IT_WHITEBELT))  do_set_iflag(cn, SF_WHITEBELT);
 			if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
 			if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
 			
@@ -11633,9 +11632,9 @@ void really_update_char(int cn)
 		weapon += tempWeapon;
 		armor  += tempArmor;
 		
-		resrv[0] += reserve_hp[act];
-		resrv[1] += reserve_en[act];
-		resrv[2] += reserve_mp[act];
+		resrv[0] += it[m].reserve_hp[act];
+		resrv[1] += it[m].reserve_en[act];
+		resrv[2] += it[m].reserve_mp[act];
 	}
 	
 	// GC may inherit tarots from owner
