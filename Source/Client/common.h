@@ -7,8 +7,8 @@
 	#define MNAME		"The Last Gate"
 #endif
 
-#define MHOST			"tlg.abyss.codes"
-#define MPROXY			"thelastgate.ddns.net"
+#define MHOST			"127.0.0.1"
+#define MPROXY			"127.0.0.1"
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"
 #define MNEWS			"https://discord.gg/jJbPv2R"
 

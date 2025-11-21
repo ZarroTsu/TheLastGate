@@ -23,7 +23,7 @@
  */
 
 // Display dimensions (width and height in pixels)
-extern MAXX,MAXY;
+extern int MAXX,MAXY;
 
 // Global tick counter for animation timing
 extern unsigned int volatile dd_tick;

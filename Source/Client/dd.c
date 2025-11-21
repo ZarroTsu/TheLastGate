@@ -3,7 +3,7 @@
 // - <io.h> may need to be <unistd.h> or use standard C file functions
 // - <windowsx.h> may not be needed with modern Windows SDK
 #include <stdio.h>
-#include <alloc.h>  // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <malloc.h>
 #include <fcntl.h>
 #include <io.h>     // TODO: Replace with <unistd.h> or standard C file I/O
 #include <stdlib.h>
@@ -23,7 +23,8 @@
 #include "dd.h"
 #include "common.h"
 #include "inter.h"
-#include "lpng/png.h"
+// #include "lpng/png.h"
+#include <png.h>
 
 int tricky_flag=0;
 
@@ -369,9 +370,10 @@ int dd_init(HWND hwnd,int x,int y)
 		return -5;
 	}
 
-	RED=surface.ddpfPixelFormat.u2.dwRBitMask;
-	GREEN=surface.ddpfPixelFormat.u3.dwGBitMask;
-	BLUE=surface.ddpfPixelFormat.u4.dwBBitMask;
+	// TODO: Modern GCC/MinGW - DirectDraw unions: Borland uses u2/u3/u4, MinGW uses direct access
+	RED=surface.ddpfPixelFormat.dwRBitMask;
+	GREEN=surface.ddpfPixelFormat.dwGBitMask;
+	BLUE=surface.ddpfPixelFormat.dwBBitMask;
 
 	if (RED==0xF800 && GREEN==0x07E0 && BLUE==0x001F) RGBM=0;
 	else if (RED==0x7C00 && GREEN==0x03E0 && BLUE==0x001F) RGBM=1;
@@ -427,7 +429,8 @@ int dd_init(HWND hwnd,int x,int y)
 		DDERR=get_dderr(ret);
 		return -8;
 	}
-	MAXX1=surface.u1.lPitch/2;
+	// TODO: Modern GCC/MinGW - DirectDraw unions: Borland uses u1.lPitch, MinGW uses lPitch directly
+	MAXX1=surface.lPitch/2;
 	MAXY1=surface.dwHeight;
 	MAXX=MAXX1;
 	MAXY=MAXY1;
@@ -486,7 +489,8 @@ int dd_init(HWND hwnd,int x,int y)
 		DDERR=get_dderr(ret);
 		return -10;
 	}
-	MAXXOVER=surface.u1.lPitch/2;		// God, I hate DirectDraw!! It sucks!!
+	// TODO: Modern GCC/MinGW - DirectDraw unions: Borland uses u1.lPitch, MinGW uses lPitch directly
+	MAXXOVER=surface.lPitch/2;		// God, I hate DirectDraw!! It sucks!!
 	ysize=surface.dwHeight;			// Absolutely everying seems to be variable.
 
 	if (!(surface.ddsCaps.dwCaps&DDSCAPS_VIDEOMEMORY)) {
@@ -594,11 +598,12 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 
 	surface.ddpfPixelFormat.dwSize=sizeof(surface.ddpfPixelFormat);
 	surface.ddpfPixelFormat.dwFlags=DDPF_RGB;
-	surface.ddpfPixelFormat.u1.dwRGBBitCount=16;
-	surface.ddpfPixelFormat.u2.dwRBitMask=0xf800;
-	surface.ddpfPixelFormat.u3.dwGBitMask=0x07e0;
-	surface.ddpfPixelFormat.u4.dwBBitMask=0x001f;
-	surface.ddpfPixelFormat.u5.dwRGBAlphaBitMask=0;
+	// TODO: Modern GCC/MinGW - DirectDraw unions: Borland uses u1/u2/u3/u4/u5, MinGW uses direct access
+	surface.ddpfPixelFormat.dwRGBBitCount=16;
+	surface.ddpfPixelFormat.dwRBitMask=0xf800;
+	surface.ddpfPixelFormat.dwGBitMask=0x07e0;
+	surface.ddpfPixelFormat.dwBBitMask=0x001f;
+	surface.ddpfPixelFormat.dwRGBAlphaBitMask=0;
 
 	ret=dd->lpVtbl->CreateSurface(dd,&surface,&sur2,NULL);
 	if (ret!=DD_OK) {
@@ -632,7 +637,8 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 		DDERR=get_dderr(ret);
 		return -8;
 	}
-	MAXX1=surface.u1.lPitch/2;
+	// TODO: Modern GCC/MinGW - DirectDraw unions: Borland uses u1.lPitch, MinGW uses lPitch directly
+	MAXX1=surface.lPitch/2;
 	MAXY1=surface.dwHeight;
 	MAXX=MAXX1;
 	MAXY=MAXY1;
@@ -650,11 +656,12 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 		surface.dwHeight=vtab[n].y;
 		surface.ddpfPixelFormat.dwSize=sizeof(surface.ddpfPixelFormat);
 		surface.ddpfPixelFormat.dwFlags=DDPF_RGB;
-		//surface.ddpfPixelFormat.u1.dwRGBBitCount=16;
-		//surface.ddpfPixelFormat.u2.dwRBitMask=0x7c00;
-		//surface.ddpfPixelFormat.u3.dwGBitMask=0x03e0;
-		//surface.ddpfPixelFormat.u4.dwBBitMask=0x001f;
-		//surface.ddpfPixelFormat.u5.dwRGBAlphaBitMask=0;
+		// TODO: Modern GCC/MinGW - Commented code updated for union compatibility
+		//surface.ddpfPixelFormat.dwRGBBitCount=16;
+		//surface.ddpfPixelFormat.dwRBitMask=0x7c00;
+		//surface.ddpfPixelFormat.dwGBitMask=0x03e0;
+		//surface.ddpfPixelFormat.dwBBitMask=0x001f;
+		//surface.ddpfPixelFormat.dwRGBAlphaBitMask=0;
 
 		ret=dd->lpVtbl->CreateSurface(dd,&surface,&suro,NULL);
 		if (ret==DD_OK)	break;
@@ -677,7 +684,8 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 		DDERR=get_dderr(ret);
 		return -10;
 	}
-	MAXXOVER=surface.u1.lPitch/2;	// God, I hate DirectDraw!! It sucks!!
+	// TODO: Modern GCC/MinGW - DirectDraw unions: Borland uses u1.lPitch, MinGW uses lPitch directly
+	MAXXOVER=surface.lPitch/2;	// God, I hate DirectDraw!! It sucks!!
 	ysize=surface.dwHeight;		// Absolutely everying seems to be variable.
 
 	if (!(surface.ddsCaps.dwCaps&DDSCAPS_VIDEOMEMORY)) {
@@ -1564,7 +1572,7 @@ void *dd_load_bitmap(char *name,int *xs,int *ys,LPDIRECTDRAWSURFACE sur)
 static MEMORYSTATUS memstat;  // TODO: Replace with MEMORYSTATUSEX
 
 struct sprtab {
-	unsigned short *image;			// null means not loaded	
+	unsigned short *image;			// null means not loaded
 	unsigned char *alpha;			// null means no alpha information present
 	unsigned short *cache;
 	unsigned char xs;			// in tiles
@@ -1589,10 +1597,20 @@ int dd_cache_hit=0,dd_cache_miss=0;
 void free_2nd_cache(void)
 {
 	int n,m,old=0,tmp,t;
+	int freed_something;  // TODO: MinGW - Track if we freed anything to prevent infinite loop
+	int safety_counter = 0;  // TODO: MinGW - Safety counter to prevent infinite loop
 
 	t=GetTickCount();
 
 	while (usedmem+256*1024>maxmem) {
+		// TODO: MinGW - Safety check: if we've looped too many times, break to prevent hang
+		if (++safety_counter > 100) {
+			// Failed to free enough memory after 100 iterations - give up to prevent infinite loop
+			break;
+		}
+
+		freed_something = 0;  // TODO: MinGW - Reset flag each iteration
+
 		for (n=0; n<MAXSPRITE; n++) {
 			if (!sprtab[n].image) continue;
 			if (!sprtab[n].ticker) continue;
@@ -1626,8 +1644,16 @@ void free_2nd_cache(void)
 				sprtab[n].alphacnt=0;
 				sprtab[n].ticker=0;
 				sprtab[n].avgcol=0;
+
+				freed_something = 1;  // TODO: MinGW - Mark that we freed something
 			}
 
+		}
+
+		// TODO: MinGW - If nothing was freed, break to prevent infinite loop
+		if (!freed_something) {
+			// No sprites old enough to free - exit to prevent infinite loop
+			break;
 		}
 	}
 }
@@ -2070,7 +2096,9 @@ int gettile(unsigned int sprite,unsigned int effect,int x,int y,int xs)
 
 	cachetab[old].visible=tile2cache(old,sprite,x,y,xs,effect);
 	cachetab[old].sprite=nr;
-	cachetab[old].ticker=random(1024)+24;
+	// TODO: Modern GCC/MinGW - random() is POSIX-only, doesn't take parameters
+	// Windows: Use rand() % 1024 to get random value from 0-1023
+	cachetab[old].ticker=rand() % 1024+24;
 	cachetab[old].effect=effect;
 	sprtab[sprite].cache[(x+y*xs)*MAXEFFECT+effect]=(short)old;
 
@@ -2619,6 +2647,9 @@ unsigned short *dd_load_png(FILE *fp,int *xs,int *ys,unsigned char **alpha_ptr,i
     png_infop info_ptr;
     png_infop end_info;
 
+	printf("Compile-time libpng: %s\n", PNG_LIBPNG_VER_STRING);
+	printf("Header version: %s\n", png_get_header_version(NULL));
+	printf("Runtime version: %s\n", png_get_libpng_ver(NULL));
     png_ptr=png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
     if (!png_ptr) {
 	xlog(0,"create read"); return 0;

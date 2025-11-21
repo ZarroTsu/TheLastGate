@@ -19,7 +19,7 @@
  * See individual TODO comments below for specific locations.
  */
 
-#include <alloc.h>     // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <malloc.h>
 #include <windows.h>   // TODO: Replace with SDL2 headers for cross-platform
 #include <stdarg.h>
 #include <stdlib.h>
@@ -1405,8 +1405,8 @@ static char motdfont[MLL];
 #define GUI_UPOINTS_Y	260
 
 //					   HEAD,NECK,BODY,ARMS,BELT,CHRM,FEET,LHND,RHND,CLOK,LRNG,RRNG,CHRM2
-int gui_equ_x[]		= { 738, 700, 738, 704, 738, 777, 738, 806, 670, 772, 776, 700, 801 };
-int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,  17 };
+extern int gui_equ_x[];
+extern int gui_equ_y[];
 
 #define GUI_BAR_X		845
 #define GUI_BAR_HP		131
@@ -3069,7 +3069,7 @@ void eng_display(int init)	// optimize me!!!!!
 {
 	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
 	extern int dd_cache_hit,dd_cache_miss,swap,MAXCACHE;
-	static xm_flag=1;
+	static int xm_flag=1;
 	int inj;
 
 	if (xm_flag) {

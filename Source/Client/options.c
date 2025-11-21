@@ -18,7 +18,7 @@
  */
 
 #include <stdio.h>
-#include <alloc.h>       // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <malloc.h>
 #include <fcntl.h>
 #include <io.h>          // TODO: Replace with <unistd.h> for POSIX
 #include <stdlib.h>
@@ -28,6 +28,7 @@
 #include <process.h>     // TODO: Use <pthread.h> or SDL_thread
 #include <time.h>
 #include <dir.h>         // TODO: Replace with <dirent.h> on POSIX
+#include <direct.h>      // MinGW: Provides _getdrive(), _chdrive(), _getcwd()
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "dd.h"
 #include "common.h"
@@ -405,8 +406,10 @@ int load_dialog(HWND hwnd,char *name)
 	int disk,err;
 	char dir[256],dir2[300];
 
-	disk=getdisk();
-	getcurdir(0,dir);
+	// TODO: Modern GCC/MinGW - getdisk()/getcurdir() are Borland C specific
+	// MinGW: _getdrive() returns 1-based (A:=1), getdisk() was 0-based (A:=0)
+	disk=_getdrive() - 1;  // Convert to 0-based for compatibility
+	_getcwd(dir, sizeof(dir));  // Get full current working directory
 
 	memset(&ofn,0,sizeof(ofn));
 	ofn.lStructSize=sizeof(ofn);
@@ -427,16 +430,18 @@ int load_dialog(HWND hwnd,char *name)
 	ofn.lpfnHook=NULL;
 
 	if (!GetOpenFileName((OPENFILENAME *) &ofn)) {
-		setdisk(disk);
+		// TODO: Modern GCC/MinGW - setdisk() is Borland C specific
+		// MinGW: _chdrive() takes 1-based drive number
+		_chdrive(disk + 1);  // Convert back to 1-based
 		chdir(dir);
 		return 0;
 	}
 
 	strcpy(name,buf);
 
-	setdisk(disk);
-	sprintf(dir2,"\\%s",dir);
-	chdir(dir2);
+	// TODO: Modern GCC/MinGW - Restore drive and directory
+	_chdrive(disk + 1);  // Convert back to 1-based
+	chdir(dir);  // _getcwd gave us full path, so just chdir to it
 
 	return 1;
 }
@@ -449,8 +454,9 @@ int save_dialog(HWND hwnd,char *name)
 	int disk;
 	char dir[256],dir2[300];
 
-	disk=getdisk();
-	getcurdir(0,dir);
+	// TODO: Modern GCC/MinGW - getdisk()/getcurdir() are Borland C specific
+	disk=_getdrive() - 1;  // Convert to 0-based
+	_getcwd(dir, sizeof(dir));
 
 	strcpy(buf,okey.name);
 	strcat(buf,".moa");
@@ -474,16 +480,17 @@ int save_dialog(HWND hwnd,char *name)
 	ofn.lpfnHook=NULL;
 
 	if (!GetSaveFileName((OPENFILENAME *) &ofn)) {
-		setdisk(disk);
+		// TODO: Modern GCC/MinGW - setdisk() is Borland C specific
+		_chdrive(disk + 1);  // Convert back to 1-based
 		chdir(dir);
 		return 0;
 	}
 
 	strcpy(name,buf);
 
-	setdisk(disk);
-	sprintf(dir2,"\\%s",dir);
-	chdir(dir2);
+	// TODO: Modern GCC/MinGW - Restore drive and directory
+	_chdrive(disk + 1);  // Convert back to 1-based
+	chdir(dir);
 
 	return 1;
 }
@@ -550,7 +557,7 @@ void update_buttons(HWND hwnd)
 }
 
 #pragma argsused
-APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
+APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	int n, newp=0;
 	char buf[256];
@@ -685,9 +692,13 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					SetDlgItemText(hwnd,IDC_PASS,"");
 					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: OK");
 					//
-					randomize();
-					race=random(2)+1;
-					sex=random(3)+1;
+					// TODO: Modern GCC/MinGW - randomize() is Borland C specific
+					// Windows: Use srand(time(NULL)) to seed random number generator
+					srand(time(NULL));
+					// TODO: Modern GCC/MinGW - random() is POSIX-only, doesn't take parameters
+					// Windows: Use rand() % N to get random value from 0 to N-1
+					race=rand() % 2+1;  // 1-2
+					sex=rand() % 3+1;   // 1-3
 					update_buttons(hwnd);
 					//
 					return 1;

@@ -14,6 +14,8 @@
 #include "common.h"
 #include "inter.h"
 
+#include <stdio.h>
+
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)
 int gui_inv_up[] 	= { 600,   5, 612,  35 };
 int gui_inv_down[]	= { 600,  76, 612, 106 };

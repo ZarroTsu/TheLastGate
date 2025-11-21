@@ -211,7 +211,8 @@ int create_pnglib(HWND hwnd)
 	int n,nr,hidx,hpng,hin,off;
 	char *buf;
 	int *idx;
-	struct ffblk ff;
+	struct _finddata_t ff;
+	intptr_t find_handle;
 
 	hidx=open("pnglib.idx",O_WRONLY|O_TRUNC|O_CREAT|O_BINARY,0666);
 	hpng=open("pnglib.dat",O_WRONLY|O_TRUNC|O_CREAT|O_BINARY,0666);
@@ -227,25 +228,29 @@ int create_pnglib(HWND hwnd)
 	write(hpng,"SCAR",4); off=4;
 
 	chdir("gfx");
-	if (!findfirst("*.png",&ff,FA_ARCH)) do {
-		nr=atoi(ff.ff_name);
-		if (nr<0 || nr>=MAXSPRITE) continue;
-		sprintf(buf,"STATUS: Preparing pnglib.dat: %d",nr);
-		SetDlgItemText(hwnd,IDC_STATUS,buf);
+	find_handle = _findfirst("*.png", &ff);
+	if (find_handle != -1) {
+		do {
+			nr=atoi(ff.name);  // Changed: ff.ff_name → ff.name
+			if (nr<0 || nr>=MAXSPRITE) continue;
+			sprintf(buf,"STATUS: Preparing pnglib.dat: %d",nr);
+			SetDlgItemText(hwnd,IDC_STATUS,buf);
 
-		hin=open(ff.ff_name,O_RDONLY|O_BINARY);
-		if (hin==-1) continue;
+			hin=open(ff.name,O_RDONLY|O_BINARY);  // Changed: ff.ff_name → ff.name
+			if (hin==-1) continue;
 
-		n=read(hin,buf,1024*256);
-		close(hin);
-		if (n<1) continue;
-		write(hpng,buf,n);
+			n=read(hin,buf,1024*256);
+			close(hin);
+			if (n<1) continue;
+			write(hpng,buf,n);
 
-		idx[nr]=off;
-		off+=n;
+			idx[nr]=off;
+			off+=n;
 
-		//printf("off=%d, nr=%d (%d)\n",off,nr,idx[nr]);
-	} while (!findnext(&ff));
+			//printf("off=%d, nr=%d (%d)\n",off,nr,idx[nr]);
+		} while (_findnext(find_handle, &ff) == 0);
+		_findclose(find_handle);  // Cleanup handle
+	}
 	chdir("..");
 
 	for (n=0; n<MAXSPRITE; n++) {

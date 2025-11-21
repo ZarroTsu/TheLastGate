@@ -23,7 +23,7 @@
 
 // TODO: Modern GCC/MinGW - Replace deprecated headers
 #include <stdio.h>
-#include <alloc.h>  // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <malloc.h>
 #include <fcntl.h>
 #include <io.h>     // TODO: Replace with <unistd.h> or standard C file I/O
 #include <stdlib.h>
@@ -37,6 +37,8 @@
 #include "common.h"
 #include "inter.h"
 //#include "minilzo.h"
+
+extern void cmd3(int cmd,int x,int y,int z);
 
 extern int RED,GREEN,BLUE,RGBM,MAXXOVER;
 extern char *DDERR;
@@ -250,9 +252,8 @@ extern int alphapix,fullpix;
 //     }
 //   }
 // TODO: Modern GCC/MinGW - Windows-specific types and calling conventions:
-// LRESULT, FAR, PASCAL, _export, HWND, UINT, WPARAM, LPARAM are all Windows-specific
-// Replace with standard C function signature for SDL event handling
-LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam)
+// SDL2: Would replace entire function with SDL event loop
+LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam)
 {
 	// TODO: Modern GCC/MinGW - PAINTSTRUCT is Windows-specific for WM_PAINT handling
 	PAINTSTRUCT ps;
@@ -784,7 +785,9 @@ HWND InitWindow(HINSTANCE hInstance,int nCmdShow)
 	// TODO: Modern GCC/MinGW - WNDCLASS is Windows-specific window class registration
 	// SDL2: Not needed, SDL handles window class internally
 	wc.style=CS_HREDRAW|CS_VREDRAW;
-	wc.lpfnWndProc=(long (FAR PASCAL*)())MainWndProc;
+	// TODO: Modern GCC/MinGW - FAR PASCAL are obsolete keywords
+	// MinGW: Use WNDPROC type cast instead
+	wc.lpfnWndProc=(WNDPROC)MainWndProc;
 	wc.cbClsExtra=0;
 	wc.cbWndExtra=0;
 	wc.hInstance=hInstance;
@@ -920,7 +923,9 @@ void log_system_data(void)
 //     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 //     // ... rest of initialization
 //   }
-int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+// TODO: Modern GCC/MinGW - PASCAL is obsolete keyword
+// MinGW: Use WINAPI instead (defined as __stdcall in windows.h)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nCmdShow)
 {
 	HWND hwnd;  // TODO: SDL2: Replace with SDL_Window*
@@ -989,8 +994,11 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	setres_default();
 
+	// TODO: MinGW - Set hinst early so options() can use it before InitWindow()
+	hinst = hInstance;
+
 	load_options();
-	options();
+	options();  // Show options dialog BEFORE creating the game window
 	hwnd=InitWindow(hInstance,nCmdShow);
 
 	init_engine();
@@ -1044,7 +1052,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     init_xalloc();
 	conv_init();
 	init_pnglib();
-	dd_init_sprites();	
+	dd_init_sprites();
 
 	if (RGBM==-1) {
 		sprintf(buf,"|unknown card: R=%04X G=%04X B=%04X",RED,GREEN,BLUE);

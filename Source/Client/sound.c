@@ -24,7 +24,7 @@
  */
 
 #include <stdio.h>
-#include <alloc.h>       // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <malloc.h>
 #include <fcntl.h>
 #include <io.h>          // TODO: Replace with <unistd.h> for POSIX
 #include <stdlib.h>
@@ -33,6 +33,8 @@
 #include <process.h>     // TODO: Use <pthread.h> or SDL_thread
 #include <errno.h>
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
+#include <ddraw.h>
+
 #include "dsound.h"      // TODO: Remove - DirectSound is deprecated, use SDL2_mixer
 
 #include "common.h"
@@ -190,7 +192,7 @@ void sounder(void *dummy)
 			}
 
 			if (start[n]) {
-					shandle[n]=open(sname[n],O_RDONLY|O_BINARY|O_DENYNONE);
+					shandle[n]=open(sname[n],O_RDONLY|O_BINARY);
 					lseek(shandle[n],0x2e,SEEK_SET); // skip wave header
 					if (shandle[n]==-1) {
 						xlog(0,"%s: %s",sname[n],strerror(errno),sname[n]);

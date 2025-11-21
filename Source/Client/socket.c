@@ -27,10 +27,11 @@
  */
 
 #include <stdio.h>
-#include <alloc.h>     // TODO: Replace with <malloc.h> or <stdlib.h>
+#include <malloc.h>
 #include <fcntl.h>
 #include <io.h>        // TODO: Replace with <unistd.h> for POSIX or remove
 #include <stdlib.h>
+#include <time.h>
 #include <windows.h>   // TODO: Remove - not needed for networking
 #include <winsock.h>   // TODO: Replace with <winsock2.h> or POSIX <sys/socket.h>, <netinet/in.h>, <arpa/inet.h>
 #include <zlib.h>
@@ -290,6 +291,7 @@ void so_connect(HWND hwnd)
 
 	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Initializing socket");
 	sock=socket(PF_INET,SOCK_STREAM,0);
+	ioctlsocket(sock, FIONBIO, 0);
 	if (sock==-1) {
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not init socket");
 		so_status=0;
