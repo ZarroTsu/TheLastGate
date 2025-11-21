@@ -3729,6 +3729,7 @@ void skill_warcry(cn)
 #define ITEM_INFO_MSG6	"%-16.16s   %4d seconds\n"
 #define ITEM_INFO_MSG7	"%-16.16s   %4d\n"
 #define ITEM_INFO_MSG8	"%-16.16s   %4d (%s)\n"
+#define ITEM_INFO_MSG9	"%-16.16s   %4d%%    %4d%%\n"
 
 void item_info(int cn, int in, int look)
 {
@@ -3917,6 +3918,22 @@ void item_info(int cn, int in, int look)
 	{
 		do_char_log(cn, 1, ITEM_INFO_MSG5,
 		"Mana Regen", it[in].data[4], it[in].data[4]/max(1, it[in].duration/TICKS));
+	}
+	
+	if (it[in].reserve_hp[I_I] || it[in].reserve_hp[I_A])
+	{
+		do_char_log(cn, 1, ITEM_INFO_MSG9,
+		"HP Reserve", it[in].reserve_hp[I_I], it[in].reserve_hp[I_A]);
+	}
+	if (it[in].reserve_en[I_I] || it[in].reserve_en[I_A])
+	{
+		do_char_log(cn, 1, ITEM_INFO_MSG9,
+		"End Reserve", it[in].reserve_en[I_I], it[in].reserve_en[I_A]);
+	}
+	if (it[in].reserve_mp[I_I] || it[in].reserve_mp[I_A])
+	{
+		do_char_log(cn, 1, ITEM_INFO_MSG9,
+		"Mana Reserve", it[in].reserve_mp[I_I], it[in].reserve_mp[I_A]);
 	}
 	
 	if (it[in].duration>0 && it[in].duration<3888000 && !soulstone && !it[in].placement)
