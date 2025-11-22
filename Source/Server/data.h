@@ -659,7 +659,7 @@ struct character
 	
 	unsigned char reserve[3];		// Reservation of HP/EN/MP (0 - 100)
 	
-	unsigned char olditem[14]; 		// free slots
+	unsigned char olditem[11]; 		// free slots
 
 	// items worn
 	unsigned int worn[20];
