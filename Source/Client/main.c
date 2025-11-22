@@ -40,11 +40,7 @@
 
 extern void cmd3(int cmd,int x,int y,int z);
 
-extern int RED,GREEN,BLUE,RGBM,MAXXOVER;
-extern char *DDERR;
-extern int dd_cache_hit,dd_cache_miss,MAXCACHE,invisible,cachex,cachey,MAXXOVER;
 extern int pskip,pidle;
-extern int maxmem,usedmem,maxvid,usedvid;
 extern int noshop;
 extern int selected_char;
 
@@ -77,7 +73,6 @@ char host_proxy[84]={MPROXY};
 int host_port=5555;
 
 extern char path[];
-extern int tricky_flag;
 
 // TODO: Modern GCC/MinGW - Windows-specific window handles
 // SDL2: Use SDL_Window* instead of HWND
@@ -104,8 +99,6 @@ int logtimer=0;
 int do_alpha=0;
 int do_shadow=1;
 int do_darkmode=0;
-
-void dd_invalidate_alpha(void);
 
 char history[20][128];
 int hist_len[20]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -182,7 +175,6 @@ void pascal (*ctl3don)(HANDLE,short int)=NULL;
 HBRUSH dlg_back;
 int dlg_col,dlg_fcol;
 
-extern int blockcnt,blocktot,blockgc;
 int mx=0,my=0;
 // TODO: Modern GCC/MinGW - POINT is Windows-specific struct (x, y coordinates)
 // SDL2: Use SDL_Point struct or just separate int x, y variables
@@ -234,10 +226,6 @@ void say(char *input)
 }
 
 int do_ticker=1;
-extern int gamma;
-extern int usedvidmem;
-
-extern int alphapix,fullpix;
 
 // TODO: Modern GCC/MinGW - MainWndProc is Windows-specific message handler
 // SDL2: Replace entire function with SDL event loop in main()

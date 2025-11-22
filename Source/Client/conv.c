@@ -24,11 +24,7 @@
 
 char path[256]="";
 
-void *xmalloc(int size);
-
 extern HWND desk_hwnd;
-
-extern int RED,GREEN,BLUE,RGBM,MAXXOVER;
 
 struct gfx {
 	int xs,ys;

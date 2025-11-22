@@ -49,15 +49,6 @@ extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 extern short screen_windowed;
 extern short screen_renderdist;
 
-// from dd.c
-int copysprite(int nr,int effect,int x,int y,int xoff,int yoff);
-void dd_flip(void);
-void dd_flip_windowed(void);
-void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col);
-void copyspritex(int nr,int xpos,int ypos,int effect);
-void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col);
-void dd_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff);
-int get_avgcol(int nr);
 
 char *lookup(int nr,unsigned short id);
 
@@ -3024,8 +3015,6 @@ void set_look_proz(unsigned short nr,unsigned short id,int proz)
 }
 
 int tile_x=-1,tile_y=-1,tile_type=-1;
-
-void dd_show_map(unsigned short *src,int xo,int yo,int magnify);
 
 int autohide(int x,int y)
 {

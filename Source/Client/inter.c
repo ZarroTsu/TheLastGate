@@ -60,7 +60,6 @@ extern int stat_points_used;
 extern int noshop;
 extern int do_alpha;
 
-void dd_invalidate_alpha(void);
 int st_skill_pts_all(int st_val);
 
 int hightlight=0;

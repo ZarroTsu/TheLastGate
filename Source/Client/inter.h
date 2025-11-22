@@ -268,14 +268,8 @@ extern struct wpslist wpslist[MAXWPS];
 extern struct sk_tree sk_tree[10][12];
 extern struct sk_icon sk_icon[12];
 
-void dd_puttext(int x,int y,int font,char *text);
-void dd_gputc(int xpos,int ypos,int font,int c);
-void dd_gputtext(int xpos,int ypos,int font,char *text,int xoff,int yoff);
-void dd_putc(int xpos,int ypos,char font,int c);
-void dd_xputtext(int x,int y,int font,char *format,...);
 void say(char *input);
 void cmd1(int cmd,int x);
-void init_xalloc(void);
 void tlog(char *text,char font);
 void motdlog(char *text,char font);
 void do_msg(void);

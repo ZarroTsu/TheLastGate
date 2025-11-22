@@ -25,8 +25,57 @@
 // Display dimensions (width and height in pixels)
 extern int MAXX,MAXY;
 
+extern int tricky_flag;
+extern int maxmem,usedmem,maxvid,usedvid;
+extern char *DDERR;
+extern int blockcnt,blocktot,blockgc;
+extern int alphapix,fullpix;
+extern int dd_cache_hit,dd_cache_miss,MAXCACHE,invisible,cachex,cachey,MAXXOVER;
+extern int RED,GREEN,BLUE,RGBM,MAXXOVER;
+extern int gamma;
+extern int usedvidmem;
+
+void copysprite(int nr,int effect,int x,int y,int xoff,int yoff);
+void dd_flip(void);
+void dd_flip_windowed(void);
+void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col);
+void copyspritex(int nr,int xpos,int ypos,int effect);
+void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col);
+void dd_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff);
+int get_avgcol(int nr);
+
+void dd_puttext(int x,int y,int font,char *text);
+void dd_gputc(int xpos,int ypos,int font,int c);
+void dd_gputtext(int xpos,int ypos,int font,char *text,int xoff,int yoff);
+void dd_putc(int xpos,int ypos,char font,int c);
+void dd_xputtext(int x,int y,int font,char *format,...);
+
+void dd_show_map(unsigned short *src,int xo,int yo,int magnify);
+void dd_invalidate_alpha(void);
+
 // Global tick counter for animation timing
 extern unsigned int volatile dd_tick;
+
+/**
+ * init_xalloc - Initialize custom memory allocator heap
+ *
+ * Creates a Windows heap for managing memory allocations. This custom allocator
+ * tracks memory usage and provides optimized allocation for the game engine.
+ * The heap is created with HEAP_GENERATE_EXCEPTIONS to ensure allocation failures
+ * raise exceptions rather than returning NULL.
+ */
+void init_xalloc(void);
+
+/**
+ * xmalloc - Allocate memory from the custom heap
+ * @size: Number of bytes to allocate
+ *
+ * Allocates memory from the custom heap and tracks allocation statistics.
+ * Updates global memory usage counters (usedmem) and block count (blockcnt).
+ *
+ * Returns: Pointer to allocated memory
+ */
+void *xmalloc(int size);
 
 /**
  * dd_init - Initialize DirectDraw in fullscreen mode
