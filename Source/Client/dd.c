@@ -2647,9 +2647,6 @@ unsigned short *dd_load_png(FILE *fp,int *xs,int *ys,unsigned char **alpha_ptr,i
     png_infop info_ptr;
     png_infop end_info;
 
-	printf("Compile-time libpng: %s\n", PNG_LIBPNG_VER_STRING);
-	printf("Header version: %s\n", png_get_header_version(NULL));
-	printf("Runtime version: %s\n", png_get_libpng_ver(NULL));
     png_ptr=png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
     if (!png_ptr) {
 	xlog(0,"create read"); return 0;

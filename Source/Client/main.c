@@ -36,6 +36,7 @@
 #include "dd.h"
 #include "common.h"
 #include "inter.h"
+#include "render.h"
 //#include "minilzo.h"
 
 extern void cmd3(int cmd,int x,int y,int z);
@@ -929,6 +930,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         /* create_pnglib();
 	exit(1); */
 
+	AllocConsole();
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+	freopen("CONIN$",  "r", stdin);
+
+
 	parse_cmd(lpCmdLine);
 
 	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
@@ -996,9 +1003,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	init_sound(hwnd);
 
 	if (screen_windowed == 1) {
-		tmp=dd_init_windowed(hwnd,screen_width,screen_height);
+		tmp=init_windowed(hwnd,screen_width,screen_height);
 	} else {
-		tmp=dd_init(hwnd,screen_width,screen_height);
+		tmp=init(hwnd,screen_width,screen_height);
 	}
 	/*
 	if (tmp!=0) { // A hacky fix for fullscreen support
