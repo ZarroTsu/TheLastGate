@@ -2,7 +2,6 @@
 #define THELASTGATE_RENDER_H
 
 #include <ddraw.h>
-#include <SDL2/SDL_video.h>
 
 #define DD_ENABLED 0
 #define SDL_ENABLED 1

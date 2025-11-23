@@ -43,6 +43,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL2/SDL_image.h>
+
+
+#include "inter.h"
+#include "main.h"
 
 App app;
 

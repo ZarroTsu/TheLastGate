@@ -3,6 +3,10 @@
 #include <SDL2/SDL_events.h>
 
 #include "dd.h"
+#include "inter.h"
+#include "main.h"
+#include "socket.h"
+#include "engine.h"
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])

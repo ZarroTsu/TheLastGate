@@ -2,9 +2,6 @@
 #define THELASTGATE_SDL_H
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include "inter.h"
-#include "main.h"
 #include "render.h"
 
 #define SCREEN_WIDTH 1280

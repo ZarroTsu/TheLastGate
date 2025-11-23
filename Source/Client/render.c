@@ -4,6 +4,8 @@
 #include "SDL.h"
 #include "render.h"
 
+#include <SDL2/SDL_image.h>
+
 int init_windowed(HWND hwnd, int x, int y) {
     if (SDL_ENABLED && sdl_init())
         return -1;

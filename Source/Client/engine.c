@@ -33,6 +33,7 @@
 #include "common.h"
 #include "input.h"
 #include "inter.h"
+#include "main.h"
 #include "render.h"
 #include "sdl.h"
 
@@ -4821,7 +4822,6 @@ void engine(void)
 	}
 
 	init_done=1;
-
 	t=SDL_GetTicks();
 
 

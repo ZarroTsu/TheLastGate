@@ -1,9 +1,6 @@
 ﻿#ifndef THELASTGATE_SOUND_H
 #define THELASTGATE_SOUND_H
 
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_audio.h>
-
 extern int domusic;
 extern int dosound;
 

@@ -1,10 +1,7 @@
 #include "sound.h"
 
-#include <fcntl.h>
-#include <io.h>          // TODO: Replace with <unistd.h> for POSIX
-#include <stdlib.h>
-#include <windows.h>     // TODO: Remove for cross-platform audio
-#include <process.h>     // TODO: Use <pthread.h> or SDL_thread
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_audio.h>
 
 
 int domusic = 0;
