@@ -26,7 +26,7 @@
 // #include "lpng/png.h"
 #include <png.h>
 
-int tricky_flag=0;
+int tricky_flag=1;
 
 int maxmem=16*1024*1024,maxvid=2*1024*1024;
 int usedmem=0,usedvid=0;
@@ -382,7 +382,7 @@ int dd_init(HWND hwnd,int x,int y)
 	if (tricky_flag) {
 		surface.dwSize=sizeof(surface);
 		surface.dwFlags=DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH;
-		surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_VIDEOMEMORY;
+		surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_SYSTEMMEMORY;
 		surface.dwWidth=x;  // 1280
 		surface.dwHeight=y; //  720
 
@@ -452,7 +452,7 @@ int dd_init(HWND hwnd,int x,int y)
 		for (n=0; n<sizeof(vtab)/sizeof(struct vtab); n++) {
 			surface.dwSize=sizeof(surface);
 			surface.dwFlags=DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH;
-			surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_VIDEOMEMORY;
+			surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_SYSTEMMEMORY;
 			surface.dwWidth=vtab[n].x;
 			surface.dwHeight=vtab[n].y;
 
@@ -592,7 +592,7 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 	memset(&surface,0,sizeof(surface));
 	surface.dwSize=sizeof(surface);
 	surface.dwFlags=DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;
-	surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_VIDEOMEMORY;
+	surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_SYSTEMMEMORY;
 	surface.dwWidth=x;
 	surface.dwHeight=y;
 
@@ -651,7 +651,7 @@ int dd_init_windowed(HWND hwnd,int x,int y)
 	for (n=0; n<sizeof(vtab)/sizeof(struct vtab); n++) {
 		surface.dwSize=sizeof(surface);
 		surface.dwFlags=DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH|DDSD_PIXELFORMAT;
-		surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_VIDEOMEMORY;
+		surface.ddsCaps.dwCaps=DDSCAPS_OFFSCREENPLAIN|DDSCAPS_SYSTEMMEMORY;
 		surface.dwWidth=vtab[n].x;
 		surface.dwHeight=vtab[n].y;
 		surface.ddpfPixelFormat.dwSize=sizeof(surface.ddpfPixelFormat);
@@ -861,6 +861,199 @@ void islocked(void)
  * with the background for a blending effect. Clipping is performed to keep
  * the bar within screen bounds. Adds 4-pixel offset in windowed mode.
  */
+/**
+ * dd_showbar - Draw a filled rectangle (solid bar) on screen
+ * @xf: Top-left X coordinate
+ * @yf: Top-left Y coordinate
+ * @xs: Width of rectangle (in pixels)
+ * @ys: Height of rectangle (in pixels)
+ * @col: Color value in RGB565 or RGB555 format
+ *
+ * Draws a FILLED (solid) rectangular bar at the specified screen coordinates.
+ * Unlike dd_showbox (which draws only an outline), this fills the entire interior.
+ * Includes automatic clipping to screen boundaries. Used for health bars, progress
+ * bars, backgrounds, overlays, and UI panels.
+ *
+ * BEHAVIOR DIFFERENCES BY COLOR MODE:
+ * ====================================
+ * RGB565 mode (RGBM=0): Direct color write (opaque)
+ * RGB555 modes (RGBM=1,2): Blended color (1/3 original + 2/3 background)
+ *
+ * The RGB555 blending creates a semi-transparent effect by averaging the
+ * new color with the existing pixel color.
+ *
+ * CLIPPING:
+ * =========
+ * Automatically clips to screen bounds:
+ * - Left edge: max(0, xf)
+ * - Top edge: max(0, yf)
+ * - Right edge: min(screen_width, xf+xs)
+ * - Bottom edge: min(screen_height, yf+ys)
+ *
+ * This prevents drawing outside the visible screen area.
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * APPROACH 1: SDL_RenderFillRect (Simplest - Opaque)
+ * ---------------------------------------------------
+ * For opaque filled rectangles (RGB565 mode behavior):
+ *
+ * void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
+ *     // Convert RGB565 color to RGBA8888
+ *     Uint8 r, g, b;
+ *     if (RGBM == 0) {  // RGB565
+ *         r = ((col & 0xF800) >> 11) << 3;
+ *         g = ((col & 0x07E0) >> 5) << 2;
+ *         b = ((col & 0x001F)) << 3;
+ *     } else {  // RGB555
+ *         r = ((col & 0x7C00) >> 10) << 3;
+ *         g = ((col & 0x03E0) >> 5) << 3;
+ *         b = ((col & 0x001F)) << 3;
+ *     }
+ *
+ *     SDL_SetRenderDrawColor(app.renderer, r, g, b, 255);
+ *
+ *     // Clamp to screen bounds
+ *     int x_start = (xf < 0) ? 0 : xf;
+ *     int y_start = (yf < 0) ? 0 : yf;
+ *     int x_end = (xf + xs > SCREEN_WIDTH) ? SCREEN_WIDTH : xf + xs;
+ *     int y_end = (yf + ys > SCREEN_HEIGHT) ? SCREEN_HEIGHT : yf + ys;
+ *
+ *     SDL_Rect rect = {
+ *         .x = x_start,
+ *         .y = y_start,
+ *         .w = x_end - x_start,
+ *         .h = y_end - y_start
+ *     };
+ *
+ *     SDL_RenderFillRect(app.renderer, &rect);
+ * }
+ *
+ * APPROACH 2: Semi-Transparent Blending (RGB555 mode behavior)
+ * -------------------------------------------------------------
+ * For semi-transparent bars that blend with background:
+ *
+ * void sdl_showbar_blended(int xf, int yf, int xs, int ys, unsigned short col) {
+ *     Uint8 r, g, b;
+ *     // ... color conversion ...
+ *
+ *     // For RGB555 blending: 1/3 opacity (approximately 85 alpha)
+ *     Uint8 alpha = (RGBM == 0) ? 255 : 85;  // 85 ≈ 255/3
+ *
+ *     SDL_SetRenderDrawColor(app.renderer, r, g, b, alpha);
+ *     SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+ *
+ *     // Clamp to screen bounds
+ *     int x_start = (xf < 0) ? 0 : xf;
+ *     int y_start = (yf < 0) ? 0 : yf;
+ *     int x_end = (xf + xs > SCREEN_WIDTH) ? SCREEN_WIDTH : xf + xs;
+ *     int y_end = (yf + ys > SCREEN_HEIGHT) ? SCREEN_HEIGHT : yf + ys;
+ *
+ *     SDL_Rect rect = {
+ *         .x = x_start,
+ *         .y = y_start,
+ *         .w = x_end - x_start,
+ *         .h = y_end - y_start
+ *     };
+ *
+ *     SDL_RenderFillRect(app.renderer, &rect);
+ * }
+ *
+ * APPROACH 3: Unified Function (Handles Both Modes)
+ * --------------------------------------------------
+ * Single function that respects RGBM mode:
+ *
+ * void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
+ *     Uint8 r, g, b, alpha;
+ *
+ *     // Convert color based on mode
+ *     if (RGBM == 0) {  // RGB565 - opaque
+ *         r = ((col & 0xF800) >> 11) << 3;
+ *         g = ((col & 0x07E0) >> 5) << 2;
+ *         b = ((col & 0x001F)) << 3;
+ *         alpha = 255;  // Opaque
+ *     } else {  // RGB555 - blended
+ *         r = ((col & 0x7C00) >> 10) << 3;
+ *         g = ((col & 0x03E0) >> 5) << 3;
+ *         b = ((col & 0x001F)) << 3;
+ *         alpha = 85;  // ~33% opacity (255/3)
+ *     }
+ *
+ *     // Expand to full 8-bit range (optional, improves color accuracy)
+ *     r |= r >> 5;
+ *     g |= g >> (RGBM == 0 ? 6 : 5);
+ *     b |= b >> 5;
+ *
+ *     SDL_SetRenderDrawColor(app.renderer, r, g, b, alpha);
+ *     if (RGBM != 0) {
+ *         SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_BLEND);
+ *     }
+ *
+ *     // Clamp to screen bounds
+ *     int x_start = (xf < 0) ? 0 : xf;
+ *     int y_start = (yf < 0) ? 0 : yf;
+ *     int x_end = (xf + xs > SCREEN_WIDTH) ? SCREEN_WIDTH : xf + xs;
+ *     int y_end = (yf + ys > SCREEN_HEIGHT) ? SCREEN_HEIGHT : yf + ys;
+ *
+ *     // Skip if completely off-screen
+ *     if (x_start >= x_end || y_start >= y_end) return;
+ *
+ *     SDL_Rect rect = {
+ *         .x = x_start,
+ *         .y = y_start,
+ *         .w = x_end - x_start,
+ *         .h = y_end - y_start
+ *     };
+ *
+ *     SDL_RenderFillRect(app.renderer, &rect);
+ * }
+ *
+ * BLENDING FORMULA (RGB555 modes):
+ * =================================
+ * Original DirectDraw formula:
+ *   new_r = (existing_r + new_r) / 3
+ *   new_g = (existing_g + new_g) / 3
+ *   new_b = (existing_b + new_b) / 3
+ *
+ * This creates a 1/3 blend of the new color with the background.
+ * In SDL2, use alpha = 85 (255/3) with SDL_BLENDMODE_BLEND.
+ *
+ * SDL2 blend formula with alpha=85:
+ *   result = (new_color * 85 + old_color * 170) / 255
+ *          ≈ (new_color + old_color * 2) / 3
+ *
+ * This closely approximates the original blending behavior.
+ *
+ * COMMON USE CASES:
+ * =================
+ * - Health bars: Red/green filled rectangles showing HP
+ * - Mana bars: Blue filled rectangles showing MP
+ * - Progress bars: Loading screens, skill cooldowns
+ * - UI backgrounds: Panel backgrounds, tooltip backgrounds
+ * - Overlays: Semi-transparent screen tints (damage flash, etc.)
+ * - Selection highlights: Filled box behind selected items
+ *
+ * PERFORMANCE NOTES:
+ * ==================
+ * - SDL_RenderFillRect is hardware accelerated on most platforms
+ * - For many bars, use SDL_RenderFillRects() to batch draws
+ * - Avoid changing blend mode repeatedly (expensive)
+ * - Consider pre-calculating alpha values for common colors
+ *
+ * COORDINATE SYSTEM:
+ * ==================
+ * - (xf, yf): Top-left corner
+ * - (xf+xs, yf+ys): Bottom-right corner (exclusive)
+ * - Box size: xs × ys pixels
+ * - Example: dd_showbar(10, 10, 50, 30) fills from (10,10) to (59,39)
+ *
+ * DIFFERENCES FROM dd_showbox:
+ * =============================
+ * - dd_showbox: Draws hollow outline (border only)
+ * - dd_showbar: Draws filled rectangle (solid interior)
+ * - dd_showbar includes automatic clipping
+ * - dd_showbar supports blending in RGB555 modes
+ */
 void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
 {
 	unsigned short *ptr;
@@ -875,15 +1068,17 @@ void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
 		yf += 4;
 	}
 
+	// Clamp to screen bounds to prevent drawing outside visible area
 	xt=min(screen_width, xf+xs);
 	yt=min(screen_height, yf+ys);
 	xf=max(0, xf);
 	yf=max(0, yf);
 
+	// Fill entire rectangle with color
 	for (y=yf; y<yt; y++) {
 		for (x=xf,off=y*MAXX+xf; x<xt; x++,off++) {
 			switch (RGBM) {
-				case 0:	  // 565
+				case 0:	  // RGB565 - Direct write (opaque)
 					//r=((ptr[off]&0xF800)>>11)+((col&0xF800)>>11);
 					//g=((ptr[off]&0x07E0)>>5)+((col&0x07E0)>>5);
 					//b=((ptr[off]&0x001F))+((col&0x001F));
@@ -893,20 +1088,20 @@ void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
 					//b/=3;
 
 					//ptr[off]=(unsigned short)((r<<11)+(g<<5)+b);
-					ptr[off]=col; // livelier colors?
+					ptr[off]=col; // livelier colors? (opaque write)
 					break;
-				case 1:	 // 555
+				case 1:	 // RGB555 - Blended (1/3 new + 2/3 background)
 					r=((ptr[off]&0x7C00)>>10)+((col&0x7C00)>>10);
 					g=((ptr[off]&0x03E0)>>5)+((col&0x03E0)>>5);
 					b=((ptr[off]&0x001F))+((col&0x001F));
 
-					r/=3;
+					r/=3;  // Average: (existing + new) / 3
 					g/=3;
 					b/=3;
 
 					ptr[off]=(unsigned short)((r<<10)+(g<<5)+b);
 					break;
-				case 2:	 // 555
+				case 2:	 // RGB555 BGR variant - Blended
 					b=((ptr[off]&0x7C00)>>10)+((col&0x7C00)>>10);
 					g=((ptr[off]&0x03E0)>>5)+((col&0x03E0)>>5);
 					r=((ptr[off]&0x001F))+((col&0x001F));
@@ -936,6 +1131,172 @@ void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col)
  * Only pixels on the edges are drawn - interior is left unchanged.
  * Adds 4-pixel offset in windowed mode.
  */
+/**
+ * dd_showbox - Draw a hollow box outline on screen
+ * @xf: Top-left X coordinate
+ * @yf: Top-left Y coordinate
+ * @xs: Width of box (in pixels)
+ * @ys: Height of box (in pixels)
+ * @col: Color value in RGB565 or RGB555 format
+ *
+ * Draws a 1-pixel thick rectangular outline at the specified screen coordinates.
+ * Only the border is drawn - the interior is transparent/hollow. Used for UI
+ * elements like selection boxes, window frames, and focus indicators.
+ *
+ * ALGORITHM:
+ * ==========
+ * The function draws only edge pixels by checking if the current position is on
+ * the border (x==xf || x==xt || y==yf || y==yt). Interior pixels are skipped
+ * with `continue`, making this a hollow box.
+ *
+ * Coordinates:
+ *   (xf, yf) = top-left corner
+ *   (xf+xs, yf+ys) = bottom-right corner
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * APPROACH 1: SDL_RenderDrawRect (Simplest)
+ * ------------------------------------------
+ * Use SDL's built-in rectangle drawing function:
+ *
+ * void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
+ *     // Convert RGB565/RGB555 color to RGBA8888
+ *     Uint8 r, g, b;
+ *     if (RGBM == 0) {  // RGB565 mode
+ *         r = ((col & 0xF800) >> 11) << 3;  // 5 bits -> 8 bits
+ *         g = ((col & 0x07E0) >> 5) << 2;   // 6 bits -> 8 bits
+ *         b = ((col & 0x001F)) << 3;        // 5 bits -> 8 bits
+ *     } else {  // RGB555 mode
+ *         r = ((col & 0x7C00) >> 10) << 3;  // 5 bits -> 8 bits
+ *         g = ((col & 0x03E0) >> 5) << 3;   // 5 bits -> 8 bits
+ *         b = ((col & 0x001F)) << 3;        // 5 bits -> 8 bits
+ *     }
+ *
+ *     SDL_SetRenderDrawColor(app.renderer, r, g, b, 255);
+ *
+ *     SDL_Rect rect = {
+ *         .x = xf,
+ *         .y = yf,
+ *         .w = xs,
+ *         .h = ys
+ *     };
+ *
+ *     SDL_RenderDrawRect(app.renderer, &rect);
+ * }
+ *
+ * APPROACH 2: Four Separate Lines (More Control)
+ * -----------------------------------------------
+ * Draw each edge as a separate line for more flexibility:
+ *
+ * void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
+ *     Uint8 r, g, b;
+ *     // ... same color conversion as Approach 1 ...
+ *
+ *     SDL_SetRenderDrawColor(app.renderer, r, g, b, 255);
+ *
+ *     int xt = xf + xs;  // Right edge
+ *     int yt = yf + ys;  // Bottom edge
+ *
+ *     // Top edge
+ *     SDL_RenderDrawLine(app.renderer, xf, yf, xt, yf);
+ *
+ *     // Bottom edge
+ *     SDL_RenderDrawLine(app.renderer, xf, yt, xt, yt);
+ *
+ *     // Left edge
+ *     SDL_RenderDrawLine(app.renderer, xf, yf, xf, yt);
+ *
+ *     // Right edge
+ *     SDL_RenderDrawLine(app.renderer, xt, yf, xt, yt);
+ * }
+ *
+ * APPROACH 3: Pixel-Perfect Manual Drawing (Most Compatible)
+ * -----------------------------------------------------------
+ * For exact pixel-by-pixel compatibility with original DirectDraw behavior:
+ *
+ * void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
+ *     Uint8 r, g, b;
+ *     // ... color conversion ...
+ *
+ *     SDL_SetRenderDrawColor(app.renderer, r, g, b, 255);
+ *
+ *     int xt = xf + xs;
+ *     int yt = yf + ys;
+ *
+ *     // Draw individual pixels for exact match
+ *     for (int y = yf; y <= yt; y++) {
+ *         for (int x = xf; x <= xt; x++) {
+ *             // Only draw edge pixels (same logic as original)
+ *             if (x == xf || x == xt || y == yf || y == yt) {
+ *                 SDL_RenderDrawPoint(app.renderer, x, y);
+ *             }
+ *         }
+ *     }
+ * }
+ *
+ * COLOR CONVERSION REFERENCE:
+ * ===========================
+ * RGB565 format (most common, RGBM=0):
+ *   RRRRRGGGGGGBBBBB (16 bits)
+ *   R: bits 15-11 (5 bits, scale to 0-255: val << 3)
+ *   G: bits 10-5  (6 bits, scale to 0-255: val << 2)
+ *   B: bits 4-0   (5 bits, scale to 0-255: val << 3)
+ *
+ * RGB555 format (alternative, RGBM=1):
+ *   0RRRRRGGGGGGBBBBB (15 bits + 1 unused)
+ *   R: bits 14-10 (5 bits, scale to 0-255: val << 3)
+ *   G: bits 9-5   (5 bits, scale to 0-255: val << 3)
+ *   B: bits 4-0   (5 bits, scale to 0-255: val << 3)
+ *
+ * HELPER FUNCTION (Recommended):
+ * ===============================
+ * Create a reusable color conversion helper:
+ *
+ * void rgb565_to_rgba(unsigned short col, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
+ *     if (RGBM == 0) {  // RGB565
+ *         *r = ((col & 0xF800) >> 11) << 3;
+ *         *g = ((col & 0x07E0) >> 5) << 2;
+ *         *b = ((col & 0x001F)) << 3;
+ *     } else {  // RGB555
+ *         *r = ((col & 0x7C00) >> 10) << 3;
+ *         *g = ((col & 0x03E0) >> 5) << 3;
+ *         *b = ((col & 0x001F)) << 3;
+ *     }
+ *     *a = 255;
+ *
+ *     // Optional: Expand to full 8-bit range (improves accuracy)
+ *     *r |= *r >> 5;  // Copy upper bits to lower bits
+ *     *g |= *g >> (RGBM == 0 ? 6 : 5);
+ *     *b |= *b >> 5;
+ * }
+ *
+ * PERFORMANCE NOTES:
+ * ==================
+ * - Approach 1 (SDL_RenderDrawRect): Fastest, hardware accelerated
+ * - Approach 2 (4 lines): Fast, more flexible for custom effects
+ * - Approach 3 (pixel-by-pixel): Slowest, but exact pixel match
+ * - For most UI boxes, Approach 1 is recommended
+ * - Use SDL_RenderDrawRects() to batch multiple boxes in one call
+ *
+ * ANTI-ALIASING:
+ * ==============
+ * SDL2 may apply anti-aliasing to lines/rects by default. To disable:
+ *   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");  // Nearest neighbor
+ *
+ * COMMON USE CASES:
+ * =================
+ * - Selection boxes: Draw around selected UI elements
+ * - Window frames: Outline dialog boxes and menus
+ * - Focus indicators: Highlight active controls
+ * - Debug visualization: Show hitboxes and boundaries
+ *
+ * COORDINATE SYSTEM:
+ * ==================
+ * - (xf, yf): Top-left corner (inclusive)
+ * - (xf+xs, yf+ys): Bottom-right corner (inclusive)
+ * - Box size: (xs+1) × (ys+1) pixels total
+ * - Example: dd_showbox(10, 10, 50, 30) draws from (10,10) to (60,40)
+ */
 void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col)
 {
 	unsigned short *ptr;
@@ -953,9 +1314,10 @@ void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col)
 	xt=xf+xs;
 	yt=yf+ys;
 
+	// Draw hollow box outline - only edge pixels
 	for (y=yf; y<=yt; y++) {
 		for (x=xf,off=y*MAXX+xf; x<=xt; x++,off++) {
-			if (x!=xf && x!=xt && y!=yf && y!=yt) continue;
+			if (x!=xf && x!=xt && y!=yf && y!=yt) continue;  // Skip interior
 			ptr[off]=col;
 		}
 	}
@@ -1129,6 +1491,306 @@ int dd_copytile(int nr,int x,int y,LPDIRECTDRAWSURFACE sur,int mapcheck)
  * glow that's brighter in the center and fades toward edges. The glow color is
  * determined by nr flags. Used for spell effects and magic animations.
  */
+/**
+ * dd_alphaeffect_magic_1 - Apply magic glow effect in RGB555 format
+ * @nr: Effect color flags (bit 0=red, bit 1=green, bit 2=blue)
+ * @str: Effect strength divisor (higher value = weaker effect)
+ * @xpos: World X position (center of effect)
+ * @ypos: World Y position (center of effect)
+ * @xoff: Screen X offset
+ * @yoff: Screen Y offset
+ *
+ * Renders a 64x64 pixel elliptical colored glow effect for magic spells and
+ * special effects. The effect creates a gradient that's strongest at the center
+ * and fades toward the edges. The background is darkened and a colored glow is
+ * added based on the color flags.
+ *
+ * EFFECT ALGORITHM:
+ * =================
+ * 1. Convert world coordinates to screen coordinates (isometric projection)
+ * 2. For each pixel in a 64x64 area:
+ *    a. Read existing screen pixel color (RGB555 format)
+ *    b. Calculate elliptical gradient strength 'e' (0-32):
+ *       - Start with e=32 (maximum intensity)
+ *       - Fade horizontally: e -= distance_from_center_x (x=32 is center)
+ *       - Fade vertically (asymmetric):
+ *         * Top fade: e -= (16-y) when y<16
+ *         * Bottom fade: e -= (y-55)*2 when y>55 (faster fade)
+ *       - Divide by strength parameter: e /= str (higher str = weaker effect)
+ *    c. Darken background: subtract e2/2 from each enabled channel
+ *    d. Add colored glow: add e to each enabled channel (based on nr flags)
+ *    e. Clamp all channels to 0-31 range (RGB555)
+ *    f. Write modified pixel back to screen
+ *
+ * ELLIPTICAL GRADIENT SHAPE:
+ * ==========================
+ * The gradient creates an ellipse that's wider than it is tall:
+ * - Width: 64 pixels (fades linearly from center at x=32)
+ * - Height: 64 pixels, but asymmetric:
+ *   * Top portion (y=0-16): Gentle fade over 16 pixels
+ *   * Middle (y=16-55): Full intensity (no vertical fade)
+ *   * Bottom (y=55-64): Fast fade over 9 pixels (2x speed)
+ *
+ * This creates a vertically compressed ellipse suitable for isometric view,
+ * where vertical distances appear shorter due to projection.
+ *
+ * Example gradient values at different positions (str=1):
+ *   (32,32) center:     e = 32 (full intensity)
+ *   (16,32) left edge:  e = 32 - (32-16) = 16 (50% intensity)
+ *   (32,8) top:         e = 32 - (16-8) = 24 (75% intensity)
+ *   (32,60) bottom:     e = 32 - (60-55)*2 = 22 (69% intensity)
+ *   (0,0) corner:       e = 32 - 32 - 16 = 0 (no effect)
+ *
+ * COLOR PARAMETERS:
+ * =================
+ * @nr flags control which color channels are affected:
+ *   nr & 1 (bit 0): Enable red channel
+ *   nr & 2 (bit 1): Enable green channel
+ *   nr & 4 (bit 2): Enable blue channel
+ *
+ * Common color combinations:
+ *   nr=1: Red glow (fire, damage effects)
+ *   nr=2: Green glow (poison, nature magic)
+ *   nr=4: Blue glow (ice, mana effects)
+ *   nr=3: Yellow glow (red+green, holy magic)
+ *   nr=5: Magenta glow (red+blue, arcane magic)
+ *   nr=6: Cyan glow (green+blue, water magic)
+ *   nr=7: White glow (all channels, pure light)
+ *
+ * STRENGTH PARAMETER:
+ * ===================
+ * @str controls effect intensity by dividing the gradient:
+ *   str=1: Full intensity (e ranges 0-32)
+ *   str=2: Half intensity (e ranges 0-16)
+ *   str=4: Quarter intensity (e ranges 0-8)
+ *
+ * The darkening effect (e2) is cumulative based on enabled channels:
+ *   e2 = e * (number of bits set in nr)
+ * So multi-color glows darken the background more than single-color glows.
+ *
+ * COLOR MATH DETAILS:
+ * ===================
+ * For RGB555 format (5 bits per channel, 0-31 range):
+ *
+ * 1. Extract existing pixel color:
+ *    r1 = (pixel & 0x7C00) >> 10  // Bits 14-10
+ *    g1 = (pixel & 0x03E0) >> 5   // Bits 9-5
+ *    b1 = (pixel & 0x001F)        // Bits 4-0
+ *
+ * 2. Calculate darkening amount (e2):
+ *    e2 = e * (count of set bits in nr)
+ *
+ * 3. Darken background (all channels):
+ *    r = r1 - e2/2  (clamped to 0)
+ *    g = g1 - e2/2  (clamped to 0)
+ *    b = b1 - e2/2  (clamped to 0)
+ *
+ * 4. Add glow (selected channels only):
+ *    if (nr & 1): r += e  (clamped to 31)
+ *    if (nr & 2): g += e  (clamped to 31)
+ *    if (nr & 4): b += e  (clamped to 31)
+ *
+ * 5. Pack back to RGB555:
+ *    pixel = (r << 10) | (g << 5) | b
+ *
+ * COORDINATE SYSTEM:
+ * ==================
+ * Uses same isometric projection as copysprite():
+ *   rx = (xpos/2) + (ypos/2) - 32 + X_OFFSET - ...
+ *   ry = (xpos/4) - (ypos/4) + Y_OFFSET - 64
+ *
+ * The effect is centered at (xpos, ypos) in world coordinates.
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * APPROACH 1: RENDER TO TEXTURE WITH PIXEL MANIPULATION (Most Accurate)
+ * -----------------------------------------------------------------------
+ * Create a reusable gradient texture and blend it with the screen:
+ *
+ * // One-time setup: Create gradient textures for each color combination
+ * typedef struct {
+ *     SDL_Texture *gradients[8];  // One for each nr value (0-7)
+ * } MagicEffectCache;
+ *
+ * void sdl_create_magic_gradient(MagicEffectCache *cache, int nr, int str) {
+ *     // Create 64x64 texture
+ *     SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormat(
+ *         0, 64, 64, 32, SDL_PIXELFORMAT_ARGB8888
+ *     );
+ *     SDL_LockSurface(surf);
+ *     Uint32 *pixels = surf->pixels;
+ *
+ *     for (int y = 0; y < 64; y++) {
+ *         for (int x = 0; x < 64; x++) {
+ *             // Calculate elliptical gradient strength
+ *             int e = 32;
+ *             if (x < 32) e -= (32 - x);
+ *             if (x > 31) e -= (x - 31);
+ *             if (y < 16) e -= (16 - y);
+ *             if (y > 55) e -= (y - 55) * 2;
+ *             if (e < 0) e = 0;
+ *             e /= max(1, str);
+ *
+ *             // Calculate color intensity based on nr flags
+ *             int e2 = 0;
+ *             if (nr & 1) e2 += e;
+ *             if (nr & 2) e2 += e;
+ *             if (nr & 4) e2 += e;
+ *
+ *             // Start with darkening (background subtraction)
+ *             // We'll use alpha to control blending
+ *             int r = 0, g = 0, b = 0;
+ *
+ *             // Add glow color
+ *             if (nr & 1) r = e * 8;  // Scale 0-31 to 0-248
+ *             if (nr & 2) g = e * 8;
+ *             if (nr & 4) b = e * 8;
+ *
+ *             // Alpha controls blend strength (e2 controls darkening)
+ *             int alpha = e * 8;  // 0-255 range
+ *
+ *             pixels[y * 64 + x] = SDL_MapRGBA(surf->format, r, g, b, alpha);
+ *         }
+ *     }
+ *
+ *     SDL_UnlockSurface(surf);
+ *     cache->gradients[nr] = SDL_CreateTextureFromSurface(app.renderer, surf);
+ *     SDL_SetTextureBlendMode(cache->gradients[nr], SDL_BLENDMODE_ADD);
+ *     SDL_FreeSurface(surf);
+ * }
+ *
+ * void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos,
+ *                            int xoff, int yoff) {
+ *     // Convert world coords to screen coords (same isometric math)
+ *     int rx = (xpos/2) + (ypos/2) - 32 + X_OFFSET - ((RENDER_DISTANCE-34)/2*32);
+ *     if (xpos < 0 && (xpos & 1)) rx--;
+ *     if (ypos < 0 && (ypos & 1)) rx--;
+ *     int ry = (xpos/4) - (ypos/4) + Y_OFFSET - 64;
+ *     if (xpos < 0 && (xpos & 3)) ry--;
+ *     if (ypos < 0 && (ypos & 3)) ry++;
+ *     rx += xoff;
+ *     ry += yoff;
+ *
+ *     // Render the pre-created gradient texture
+ *     SDL_Rect dst = { .x = rx, .y = ry, .w = 64, .h = 64 };
+ *     SDL_RenderCopy(app.renderer, magic_cache.gradients[nr], NULL, &dst);
+ * }
+ *
+ * APPROACH 2: CUSTOM BLEND MODE (Simpler, Less Accurate)
+ * --------------------------------------------------------
+ * Use SDL's built-in blend modes to approximate the effect:
+ *
+ * void sdl_alphaeffect_magic_simple(int nr, int str, int xpos, int ypos,
+ *                                   int xoff, int yoff) {
+ *     // ... same coordinate conversion ...
+ *
+ *     // Create a simple radial gradient texture
+ *     static SDL_Texture *gradient = NULL;
+ *     if (!gradient) {
+ *         // Create 64x64 radial gradient (simplified)
+ *         SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormat(
+ *             0, 64, 64, 32, SDL_PIXELFORMAT_ARGB8888
+ *         );
+ *         // ... fill with radial gradient ...
+ *         gradient = SDL_CreateTextureFromSurface(app.renderer, surf);
+ *         SDL_FreeSurface(surf);
+ *     }
+ *
+ *     // Set color based on nr flags
+ *     Uint8 r = (nr & 1) ? 255 : 0;
+ *     Uint8 g = (nr & 2) ? 255 : 0;
+ *     Uint8 b = (nr & 4) ? 255 : 0;
+ *     SDL_SetTextureColorMod(gradient, r, g, b);
+ *
+ *     // Adjust alpha based on strength
+ *     Uint8 alpha = 255 / str;
+ *     SDL_SetTextureAlphaMod(gradient, alpha);
+ *
+ *     // Render with additive blending
+ *     SDL_SetTextureBlendMode(gradient, SDL_BLENDMODE_ADD);
+ *     SDL_Rect dst = { .x = rx, .y = ry, .w = 64, .h = 64 };
+ *     SDL_RenderCopy(app.renderer, gradient, NULL, &dst);
+ * }
+ *
+ * APPROACH 3: SHADER-BASED (Best Quality, Most Complex)
+ * -------------------------------------------------------
+ * Use a custom fragment shader for pixel-perfect recreation:
+ *
+ * Fragment shader (GLSL):
+ *   uniform vec2 center;      // Effect center in screen coords
+ *   uniform int colorFlags;   // nr parameter
+ *   uniform float strength;   // str parameter
+ *   uniform sampler2D screen; // Current screen contents
+ *
+ *   void main() {
+ *       vec2 pos = gl_FragCoord.xy - center;
+ *
+ *       // Calculate elliptical gradient (matches original algorithm)
+ *       float e = 32.0;
+ *       float ax = abs(pos.x);
+ *       float ay = pos.y;
+ *
+ *       e -= ax;
+ *       if (ay < 16.0) e -= (16.0 - ay);
+ *       if (ay > 55.0) e -= (ay - 55.0) * 2.0;
+ *       e = max(0.0, e) / strength;
+ *
+ *       // Sample existing screen color
+ *       vec4 screenColor = texture2D(screen, gl_TexCoord[0].xy);
+ *
+ *       // Calculate darkening
+ *       float e2 = 0.0;
+ *       if ((colorFlags & 1) != 0) e2 += e;
+ *       if ((colorFlags & 2) != 0) e2 += e;
+ *       if ((colorFlags & 4) != 0) e2 += e;
+ *
+ *       vec3 darkened = screenColor.rgb - vec3(e2 / 64.0);  // Darken
+ *
+ *       // Add glow
+ *       vec3 glow = vec3(0.0);
+ *       if ((colorFlags & 1) != 0) glow.r = e / 32.0;
+ *       if ((colorFlags & 2) != 0) glow.g = e / 32.0;
+ *       if ((colorFlags & 4) != 0) glow.b = e / 32.0;
+ *
+ *       vec3 final = clamp(darkened + glow, 0.0, 1.0);
+ *       gl_FragColor = vec4(final, screenColor.a);
+ *   }
+ *
+ * PERFORMANCE CONSIDERATIONS:
+ * ===========================
+ * - Approach 1: Fast (pre-rendered gradients), ~16KB per gradient (64×64×4 bytes)
+ * - Approach 2: Fastest, but less accurate (uses simplified radial gradient)
+ * - Approach 3: Best quality, requires OpenGL/shader support
+ *
+ * The original code manipulates pixels directly in RGB555 format, which is very
+ * efficient but not possible with modern GPU-accelerated rendering. Pre-rendered
+ * gradient textures (Approach 1) provide the best balance of performance and
+ * accuracy for SDL2.
+ *
+ * RENDERING ORDER:
+ * ================
+ * Magic effects should be rendered AFTER sprites but BEFORE UI elements:
+ *   1. Draw background tiles
+ *   2. Draw shadows
+ *   3. Draw sprites (back to front)
+ *   4. Draw magic effects (glows, particles)
+ *   5. Draw UI overlay
+ *
+ * BLENDING BEHAVIOR:
+ * ==================
+ * The original code reads the destination pixel, modifies it, and writes back.
+ * This means multiple overlapping magic effects will compound:
+ * - Darkening is cumulative (each effect darkens further)
+ * - Glow colors add together (red + blue = magenta)
+ *
+ * To replicate this in SDL2, you may need to:
+ * 1. Render scene to texture
+ * 2. Apply magic effect with custom blending
+ * 3. Render final result to screen
+ *
+ * Or accept that SDL's additive blending won't darken backgrounds and adjust
+ * the visual style accordingly.
+ */
 void dd_alphaeffect_magic_1(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 {
 	int rx,ry;
@@ -1200,17 +1862,49 @@ void dd_alphaeffect_magic_1(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 }
 
 /**
- * dd_alphaeffect_magic_0 - Apply magic effect with RGB565 format
+ * dd_alphaeffect_magic_0 - Apply magic glow effect in RGB565 format
  * @nr: Effect color flags (bit 0=red, bit 1=green, bit 2=blue)
- * @str: Effect strength (higher = weaker effect)
- * @xpos: World X position
- * @ypos: World Y position
+ * @str: Effect strength divisor (higher value = weaker effect)
+ * @xpos: World X position (center of effect)
+ * @ypos: World Y position (center of effect)
  * @xoff: Screen X offset
  * @yoff: Screen Y offset
  *
- * Renders a colored glow effect in RGB565 mode. Same as magic_1 but uses
- * 565 color format with 6 bits for green channel. Creates elliptical glow
- * for magic spell visual effects.
+ * Identical to dd_alphaeffect_magic_1() but adapted for RGB565 color format.
+ * RGB565 has 6 bits for green channel (0-63 range) instead of 5 bits like
+ * red and blue. This provides better color accuracy for human perception
+ * since our eyes are more sensitive to green.
+ *
+ * DIFFERENCES FROM RGB555 VERSION (_magic_1):
+ * ===========================================
+ * 1. Color extraction:
+ *    RGB565: r=(d&0xF800)>>11, g=(d&0x07E0)>>5, b=(d&0x001F)
+ *    RGB555: r=(d&0x7C00)>>10, g=(d&0x03E0)>>5, b=(d&0x001F)
+ *
+ * 2. Green channel darkening:
+ *    RGB565: g = g1 - e2     (full subtraction, double sensitivity)
+ *    RGB555: g = g1 - e2/2   (half subtraction)
+ *
+ * 3. Green channel glow:
+ *    RGB565: g += e*2  (double boost, max 63)
+ *    RGB555: g += e    (single boost, max 31)
+ *
+ * 4. Color packing:
+ *    RGB565: pixel = (r<<11) | (g<<5) | b
+ *    RGB555: pixel = (r<<10) | (g<<5) | b
+ *
+ * The green channel adjustments compensate for the extra bit of precision,
+ * maintaining similar visual appearance between RGB555 and RGB565 modes.
+ *
+ * SDL2 EQUIVALENT:
+ * ================
+ * The SDL2 implementation is identical to dd_alphaeffect_magic_1().
+ * Modern rendering uses RGBA8888 format with 8 bits per channel, which
+ * has even more precision than RGB565. You don't need separate RGB555/RGB565
+ * implementations in SDL2 - use a single implementation with 8-bit channels.
+ *
+ * See dd_alphaeffect_magic_1() documentation above for complete SDL2
+ * conversion details and code examples.
  */
 void dd_alphaeffect_magic_0(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 {
@@ -1284,15 +1978,48 @@ void dd_alphaeffect_magic_0(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 /**
  * dd_alphaeffect_magic - Apply magic glow effect (dispatch function)
  * @nr: Effect color flags (bit 0=red, bit 1=green, bit 2=blue)
- * @str: Effect strength (higher = weaker effect)
- * @xpos: World X position
- * @ypos: World Y position
+ * @str: Effect strength divisor (higher value = weaker effect)
+ * @xpos: World X position (center of effect)
+ * @ypos: World Y position (center of effect)
  * @xoff: Screen X offset
  * @yoff: Screen Y offset
  *
- * Renders a colored glow effect for magic spells. Automatically selects
- * the appropriate implementation based on the current RGB mode (555 or 565).
- * This is the public interface for magic effect rendering.
+ * Public interface for rendering magic glow effects. Automatically selects
+ * the appropriate implementation based on the current RGB mode:
+ * - RGBM=0: RGB565 format (5-6-5 bits, used on most hardware)
+ * - RGBM=1: RGB555 format (5-5-5 bits, used on some older cards)
+ *
+ * This abstraction allows the same code to work on different hardware
+ * configurations. The visual result is identical between the two modes.
+ *
+ * USAGE EXAMPLES:
+ * ===============
+ * // Red fire effect at player position
+ * dd_alphaeffect_magic(1, 1, player.x, player.y, 0, 0);
+ *
+ * // Blue ice effect (weak, str=4)
+ * dd_alphaeffect_magic(4, 4, spell.x, spell.y, 0, 0);
+ *
+ * // White healing glow (all channels)
+ * dd_alphaeffect_magic(7, 2, target.x, target.y, 0, 0);
+ *
+ * // Yellow holy magic (red + green)
+ * dd_alphaeffect_magic(3, 1, caster.x, caster.y, 0, 0);
+ *
+ * SDL2 EQUIVALENT:
+ * ================
+ * In SDL2, you don't need separate RGB555/RGB565 implementations since
+ * modern rendering uses RGBA8888 format universally. Simply implement
+ * one version:
+ *
+ * void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos,
+ *                            int xoff, int yoff) {
+ *     // See dd_alphaeffect_magic_1() documentation for complete
+ *     // SDL2 implementation examples (Approaches 1-3)
+ * }
+ *
+ * The SDL2 version will automatically work on all hardware and operating
+ * systems without needing runtime format detection.
  */
 void dd_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff)
 {
@@ -1353,7 +2080,7 @@ void dd_flip(void)
 	// TODO: Modern GCC/MinGW - Replace Flip with SDL_RenderPresent or D3D Present
 	// SDL2: SDL_RenderPresent(renderer)
 	// D3D9: device->Present(...)
-	ret=sur1->lpVtbl->Flip(sur1,NULL,DDFLIP_WAIT);
+	ret=sur1->lpVtbl->BltFast(sur1, 0,0, sur2, NULL, DDBLTFAST_NOCOLORKEY);
 	if (ret!=DD_OK) {
 		dd_error(0,"dd_flip",ret);
 	}
@@ -1705,7 +2432,7 @@ unsigned short avgcolor(unsigned short *ptr,int xs,int ys)
 	}
 }
 
-int get_avgcol(int nr)
+int dd_get_avgcol(int nr)
 {
 	return sprtab[nr].avgcol;
 }
@@ -1714,36 +2441,194 @@ void *conv_load(int nr,int *xs,int *ys);
 
 extern char path[];
 
+/**
+ * dd_load_sprite - Load a sprite from disk into memory
+ * @nr: Sprite index number (0-MAXSPRITE)
+ *
+ * Loads sprite graphics from various sources with fallback chain:
+ * 1. Individual PNG file (gfx/XXXXX.png)
+ * 2. PNG library archive (pnglib.dat)
+ * 3. Individual BMP file (gfx/XXXXX.bmp)
+ * 4. BMP library archive (bmplib)
+ * 5. Fallback to sprite #35 if not found
+ *
+ * The loaded image is converted to 16-bit RGB565/RGB555 format and stored
+ * in sprtab[nr].image. Alpha channel data is separated and stored in
+ * sprtab[nr].alpha for later blending. Memory management ensures total
+ * sprite memory stays under maxmem limit.
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * STRUCTURE CHANGES:
+ * ------------------
+ * struct sprtab {
+ *     SDL_Texture *texture;        // Replace: unsigned short *image
+ *     unsigned char *alpha;         // Keep for pixel-level alpha (or use texture alpha)
+ *     SDL_Texture **cache_tiles;    // Replace: unsigned short *cache
+ *     unsigned char xs, ys;         // Keep: dimensions in tiles
+ *     unsigned short alphacnt;      // Keep or remove if using texture alpha
+ *     unsigned int ticker;          // Keep: for LRU cache management
+ *     unsigned short avgcol;        // Keep: average color for effects
+ *     int pixel_width, pixel_height; // Add: actual pixel dimensions
+ * };
+ *
+ * LOADING PROCESS:
+ * ----------------
+ * 1. LOAD IMAGE FILE:
+ *    SDL_Surface *surface = NULL;
+ *
+ *    // Try PNG file (requires SDL_image)
+ *    sprintf(buf, "%sgfx\\%05d.png", path, nr);
+ *    surface = IMG_Load(buf);
+ *
+ *    // Try PNG from archive (need custom archive reader)
+ *    if (!surface) {
+ *        SDL_RWops *rw = load_pnglib_as_rwops(nr);
+ *        if (rw) surface = IMG_Load_RW(rw, 1);
+ *    }
+ *
+ *    // Try BMP file (native SDL)
+ *    if (!surface) {
+ *        sprintf(buf, "%sgfx\\%05d.bmp", path, nr);
+ *        surface = SDL_LoadBMP(buf);
+ *    }
+ *
+ *    // Fallback to sprite #35
+ *    if (!surface) {
+ *        surface = load_fallback_sprite();
+ *    }
+ *
+ * 2. SETUP COLOR KEY (for transparency):
+ *    Uint32 colorkey = SDL_MapRGB(surface->format, 255, 0, 255); // Magenta
+ *    SDL_SetColorKey(surface, SDL_TRUE, colorkey);
+ *
+ * 3. CREATE TEXTURE:
+ *    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+ *    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+ *
+ *    // Get dimensions
+ *    int width, height;
+ *    SDL_QueryTexture(texture, NULL, NULL, &width, &height);
+ *
+ * 4. EXTRACT ALPHA CHANNEL (if needed for pixel-level blending):
+ *    // Lock surface to read pixel data
+ *    SDL_LockSurface(surface);
+ *    unsigned char *pixels = (unsigned char*)surface->pixels;
+ *
+ *    // For each pixel with partial alpha (if surface has alpha):
+ *    for (int y = 0; y < height; y++) {
+ *        for (int x = 0; x < width; x++) {
+ *            Uint32 pixel = get_pixel(surface, x, y);
+ *            Uint8 r, g, b, a;
+ *            SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
+ *
+ *            if (a > 0 && a < 255) {  // Partial transparency
+ *                // Store in alpha array: x, y, r, g, b, a
+ *                alpha_data[alphacnt++] = x;
+ *                alpha_data[alphacnt++] = y;
+ *                alpha_data[alphacnt++] = r;
+ *                alpha_data[alphacnt++] = g;
+ *                alpha_data[alphacnt++] = b;
+ *                alpha_data[alphacnt++] = a;
+ *            }
+ *        }
+ *    }
+ *    SDL_UnlockSurface(surface);
+ *
+ *    // OR: Just use texture alpha channel directly
+ *    // SDL_SetTextureAlphaMod(texture, alpha_value);
+ *
+ * 5. CALCULATE AVERAGE COLOR (for lighting effects):
+ *    // Sample texture pixels to get average RGB
+ *    // OR: Calculate from surface before creating texture
+ *    Uint32 total_r = 0, total_g = 0, total_b = 0;
+ *    int pixel_count = width * height;
+ *
+ *    SDL_LockSurface(surface);
+ *    for (int y = 0; y < height; y++) {
+ *        for (int x = 0; x < width; x++) {
+ *            Uint8 r, g, b;
+ *            Uint32 pixel = get_pixel(surface, x, y);
+ *            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+ *            total_r += r; total_g += g; total_b += b;
+ *        }
+ *    }
+ *    SDL_UnlockSurface(surface);
+ *
+ *    avgcol = SDL_MapRGB(surface->format,
+ *                        total_r / pixel_count,
+ *                        total_g / pixel_count,
+ *                        total_b / pixel_count);
+ *
+ * 6. ALLOCATE TILE CACHE:
+ *    int tile_cols = width / TILE;
+ *    int tile_rows = height / TILE;
+ *
+ *    // Allocate array to track which effect variants are cached
+ *    sprtab[nr].cache_tiles = calloc(tile_cols * tile_rows * MAXEFFECT,
+ *                                     sizeof(SDL_Texture*));
+ *
+ * 7. STORE SPRITE DATA:
+ *    sprtab[nr].texture = texture;
+ *    sprtab[nr].pixel_width = width;
+ *    sprtab[nr].pixel_height = height;
+ *    sprtab[nr].xs = width / TILE;
+ *    sprtab[nr].ys = height / TILE;
+ *    sprtab[nr].alpha = alpha_data;
+ *    sprtab[nr].alphacnt = alphacnt;
+ *    sprtab[nr].avgcol = avgcol;
+ *    sprtab[nr].ticker = SDL_GetTicks();
+ *
+ *    SDL_FreeSurface(surface);  // Done with surface, texture has the data
+ *
+ * MEMORY MANAGEMENT:
+ * ------------------
+ * - Track texture memory usage (SDL_QueryTexture for size)
+ * - Call free_2nd_cache() when memory limit exceeded
+ * - Free textures: SDL_DestroyTexture(sprtab[i].texture)
+ * - Free tile cache: for each cached tile, SDL_DestroyTexture()
+ *
+ * ARCHIVE LOADING (pnglib.dat, bmplib):
+ * --------------------------------------
+ * - Use SDL_RWops for custom file reading
+ * - SDL_RWFromMem() to wrap archive data in memory
+ * - IMG_Load_RW() or SDL_LoadBMP_RW() to load from RWops
+ * - See load_pnglib() in conv.c for archive offset logic
+ *
+ * ALTERNATIVE: SDL_image can handle many formats directly:
+ * - IMG_LoadPNG_RW(), IMG_LoadBMP_RW() for specific formats
+ * - IMG_Load() auto-detects format
+ */
 void dd_load_sprite(int nr)
 {
 	int xs,ys,alphacnt=0;
-	unsigned short *optr=NULL;
+	unsigned short *optr=NULL;  // SDL2: Replace with SDL_Texture *texture
 	unsigned char *alpha=NULL;
 	char buf[80];
 	FILE *fp;
 
-	if (usedmem>maxmem) free_2nd_cache();
+	if (usedmem>maxmem) free_2nd_cache();  // SDL2: Check texture memory usage
 
 	if (!optr) {	// try to load from single png file
 		sprintf(buf,"%sgfx\\%05d.png",path,nr);
 		fp=fopen(buf,"rb");
 		if (fp) {
-			optr=dd_load_png(fp,&xs,&ys,&alpha,&alphacnt);
+			optr=dd_load_png(fp,&xs,&ys,&alpha,&alphacnt);  // SDL2: IMG_Load(buf)
 			fclose(fp);
 		}
-	}	
-        if (!optr) {	// try to load from pnglib
+	}
+        if (!optr) {	// try to load from pnglib (archive)
 		fp=load_pnglib(nr);
-		if (fp) optr=dd_load_png(fp,&xs,&ys,&alpha,&alphacnt);
-	} 
+		if (fp) optr=dd_load_png(fp,&xs,&ys,&alpha,&alphacnt);  // SDL2: IMG_Load_RW()
+	}
         if (!optr) {	// try to load from single bmp file
 	    sprintf(buf,"%sgfx\\%05d.bmp",path,nr);
-	    optr=dd_load_bitmap(buf,&xs,&ys,suro);
+	    optr=dd_load_bitmap(buf,&xs,&ys,suro);  // SDL2: SDL_LoadBMP(buf)
 	}
-	if (!optr) {	// try to load from bmplib
-		optr=conv_load(nr,&xs,&ys);
+	if (!optr) {	// try to load from bmplib (archive)
+		optr=conv_load(nr,&xs,&ys);  // SDL2: Custom archive + IMG_Load_RW()
 	}
-	if (!optr) {	// not found!
+	if (!optr) {	// not found! Load fallback sprite #35
 		//sprintf(buf,"Sprite %d is missing",nr);
 		//xlog(0,buf);
 		fp=load_pnglib(35);
@@ -1752,13 +2637,17 @@ void dd_load_sprite(int nr)
 		//return;
 	}
 
-	sprtab[nr].image=optr;
-	sprtab[nr].alpha=alpha;
+	// Store sprite data
+	// SDL2: Store SDL_Texture* instead of pixel buffer
+	sprtab[nr].image=optr;  // SDL2: sprtab[nr].texture = texture;
+	sprtab[nr].alpha=alpha;  // SDL2: Keep or use texture alpha channel
 	sprtab[nr].alphacnt=(unsigned short)alphacnt;
-	sprtab[nr].xs=(unsigned char)(xs/TILE);
-	sprtab[nr].ys=(unsigned char)(ys/TILE);
-	sprtab[nr].avgcol=avgcolor(optr,xs,ys);
+	sprtab[nr].xs=(unsigned char)(xs/TILE);  // Width in 32x32 tiles
+	sprtab[nr].ys=(unsigned char)(ys/TILE);  // Height in 32x32 tiles
+	sprtab[nr].avgcol=avgcolor(optr,xs,ys);  // SDL2: Calculate from surface
 
+	// Allocate cache for effect-modified tile variants
+	// SDL2: Allocate array of SDL_Texture* pointers
 	sprtab[nr].cache=xcalloc(MAXEFFECT*sizeof(short),sprtab[nr].xs*sprtab[nr].ys);
 }
 
@@ -2109,13 +2998,73 @@ int gettile(unsigned int sprite,unsigned int effect,int x,int y,int xs)
 	return old;
 }
 
-void copysprite(int nr,int effect,int xpos,int ypos,int xoff,int yoff)
+/**
+ * copysprite - Render a sprite to the screen using isometric coordinate transformation
+ * @nr: Sprite index number
+ * @effect: Visual effect flags (lighting, colors, etc.)
+ * @xpos: World X coordinate (isometric)
+ * @ypos: World Y coordinate (isometric)
+ * @xoff: Screen X offset adjustment
+ * @yoff: Screen Y offset adjustment
+ *
+ * Converts isometric world coordinates to screen coordinates and renders a sprite
+ * tile-by-tile from the tile cache. Sprites are stored as grids of 32x32 tiles.
+ * Handles transparency via color key and optional alpha blending.
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * 1. SPRITE LOADING (dd_load_sprite):
+ *    - Create SDL_Texture from loaded image data using SDL_CreateTexture()
+ *    - Set texture blend mode: SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND)
+ *    - Set color key for transparency: SDL_SetColorKey() or use alpha channel
+ *
+ * 2. TILE CACHE (gettile + dd_copytile):
+ *    - Replace DirectDraw surface (suro) with SDL_Texture
+ *    - Cache needs to be SDL_Texture with TILE (32x32) grid layout
+ *    - Use SDL_SetRenderTarget() to render tiles to cache texture
+ *    - Apply effects with SDL_SetTextureColorMod() for lighting/tinting
+ *
+ * 3. COORDINATE TRANSFORM (rx/ry calculation):
+ *    - Keep the same isometric->screen math (lines 2131-2139)
+ *    - Adjust for SDL's top-left origin (same as DirectDraw)
+ *
+ * 4. TILE RENDERING (dd_copytile replacement):
+ *    SDL_Rect src_rect = {
+ *        .x = (tile_nr % cachex) * TILE + clip_xs,
+ *        .y = (tile_nr / cachex) * TILE + clip_ys,
+ *        .w = TILE - clip_xe - clip_xs,
+ *        .h = TILE - clip_ye - clip_ys
+ *    };
+ *    SDL_Rect dst_rect = {
+ *        .x = screen_x,
+ *        .y = screen_y,
+ *        .w = TILE - clip_xe - clip_xs,
+ *        .h = TILE - clip_ye - clip_ys
+ *    };
+ *    SDL_RenderCopy(renderer, cache_texture, &src_rect, &dst_rect);
+ *
+ * 5. ALPHA BLENDING (display_alpha):
+ *    - For partial transparency pixels, use SDL_SetTextureAlphaMod()
+ *    - Or render with custom shader/blend mode
+ *    - Alpha data format: array of (x, y, r, g, b, a) tuples
+ *
+ * 6. EFFECT SYSTEM:
+ *    - Lighting: SDL_SetTextureColorMod(texture, r, g, b)
+ *    - Transparency: SDL_SetTextureAlphaMod(texture, alpha)
+ *    - Combine with SDL_SetTextureBlendMode() for different effects
+ *
+ * 7. PERFORMANCE:
+ *    - Use hardware textures (SDL_TEXTUREACCESS_STATIC for sprites)
+ *    - Cache texture for tile atlas (SDL_TEXTUREACCESS_TARGET)
+ *    - Batch draws where possible (minimize texture switches)
+ */
+void dd_copysprite(int nr,int effect,int xpos,int ypos,int xoff,int yoff)
 {
 	unsigned int x,y,xs,ys,n,rx,ry;
 
 	if (nr==0) return;
 
-        // image loaded?
+        // image loaded? (SDL2: check if texture exists)
 	if (!sprtab[nr].image) dd_load_sprite(nr);
 	if (!sprtab[nr].image) return;
 
@@ -2124,10 +3073,12 @@ void copysprite(int nr,int effect,int xpos,int ypos,int xoff,int yoff)
 		ypos += 4;
 	}
 
-	xs=sprtab[nr].xs;
-	ys=sprtab[nr].ys;
+	xs=sprtab[nr].xs;  // sprite width in tiles
+	ys=sprtab[nr].ys;  // sprite height in tiles
 	sprtab[nr].ticker=current_tick;
 
+	// Isometric to screen coordinate conversion
+	// SDL2: Keep this math unchanged - works with any rendering API
 	rx=(xpos/2)+(ypos/2)-(xs*16)+32+screen_tilexoff-((screen_renderdist-34)/2*32);
 	if (xpos<0 && (xpos&1))	rx--;
 	if (ypos<0 && (ypos&1))	rx--;
@@ -2138,23 +3089,46 @@ void copysprite(int nr,int effect,int xpos,int ypos,int xoff,int yoff)
 	rx+=xoff;
 	ry+=yoff;
 
+	// Render each tile in the sprite
+	// SDL2: Replace loop contents with SDL_RenderCopy calls
 	for (y=0; y<ys; y++) {
 		for (x=0; x<xs; x++) {
-			n=gettile(nr,effect,x,y,xs);
-			if (n==-1) continue;
-			dd_copytile(n,rx+x*32,ry+y*32,sur2,1);
+			n=gettile(nr,effect,x,y,xs);  // Get tile from cache, apply effects
+			if (n==-1) continue;  // Skip if tile not in cache
+			dd_copytile(n,rx+x*32,ry+y*32,sur2,1);  // Blit 32x32 tile
 		}
 	}
+	// Render semi-transparent pixels separately for better quality
+	// SDL2: Could use texture alpha channel instead, or custom shader
 	if (sprtab[nr].alpha) display_alpha(sprtab[nr].alpha,sprtab[nr].alphacnt,rx,ry,effect);
 }
 
-void copyspritex(int nr,int xpos,int ypos,int effect)
+/**
+ * copyspritex - Render a sprite to the screen using direct screen coordinates
+ * @nr: Sprite index number
+ * @xpos: Screen X coordinate (direct, not isometric)
+ * @ypos: Screen Y coordinate (direct, not isometric)
+ * @effect: Visual effect flags (lighting, colors, etc.)
+ *
+ * Similar to copysprite() but uses direct screen coordinates instead of
+ * isometric world coordinates. Used for UI elements, HUD, and other
+ * non-isometric graphics. Renders sprite tile-by-tile from the tile cache.
+ *
+ * SDL2 EQUIVALENT:
+ * ================
+ * Same as copysprite() but without coordinate transformation:
+ * - xpos/ypos are already screen coordinates, use directly
+ * - No rx/ry calculation needed (lines 2193-2201 in copysprite)
+ * - Otherwise identical: tile iteration + SDL_RenderCopy
+ * - See copysprite() documentation above for full SDL2 conversion details
+ */
+void dd_copyspritex(int nr,int xpos,int ypos,int effect)
 {
 	unsigned int x,y,xs,ys,n;
 
 	if (nr==0) return;
 
-	// image loaded?
+	// image loaded? (SDL2: check if texture exists)
 	if (!sprtab[nr].image) dd_load_sprite(nr);
 	if (!sprtab[nr].image) return;
 
@@ -2163,17 +3137,21 @@ void copyspritex(int nr,int xpos,int ypos,int effect)
 		ypos += 4;
 	}
 
-	xs=sprtab[nr].xs;
-	ys=sprtab[nr].ys;
+	xs=sprtab[nr].xs;  // sprite width in tiles
+	ys=sprtab[nr].ys;  // sprite height in tiles
 	sprtab[nr].ticker=current_tick;
 
+	// Render each tile in the sprite
+	// SDL2: Replace loop contents with SDL_RenderCopy calls (see copysprite)
 	for (y=0; y<ys; y++) {
 		for (x=0; x<xs; x++) {
-			n=gettile(nr,effect,x,y,xs);
-			if (n==-1) continue;
-			dd_copytile(n,xpos+x*32,ypos+y*32,sur2,0);
+			n=gettile(nr,effect,x,y,xs);  // Get tile from cache, apply effects
+			if (n==-1) continue;  // Skip if tile not in cache
+			dd_copytile(n,xpos+x*32,ypos+y*32,sur2,0);  // Blit 32x32 tile
 		}
 	}
+	// Render semi-transparent pixels separately for better quality
+	// SDL2: Could use texture alpha channel instead, or custom shader
 	if (sprtab[nr].alpha) display_alpha(sprtab[nr].alpha,sprtab[nr].alphacnt,xpos,ypos,effect);
 }
 
@@ -2322,7 +3300,132 @@ void dd_gputtext(int xpos,int ypos,int font,char *text,int xoff,int yoff)
  *
  * Draws a 6x9 pixel character directly at screen coordinates without
  * coordinate conversion. No clipping is performed. Used for UI elements
- * and HUD text.
+ * and HUD text. Font sprites are at indices 18100-18109.
+ *
+ * FONT SPRITE LAYOUT:
+ * ===================
+ * Font sprites are 576x11 pixel images (576 wide, 11 tall):
+ * - Row 0 (top row): Unused/border
+ * - Rows 1-9: Character pixel data (9 rows of 6x6 pixel characters)
+ * - Row 10: Unused/border
+ *
+ * Each sprite contains 96 characters (ASCII 32-127) arranged horizontally:
+ * [SPACE][!]["][#][$][%][&]['][...][~]
+ * Each character is 6 pixels wide (576 / 96 = 6 pixels per char)
+ *
+ * PIXEL ACCESS FORMULA:
+ * ---------------------
+ * For character 'c' at position (x,y) within the character (0-5, 0-8):
+ *   pixel_offset = (c * 6) + x + (y + 1) * 576
+ *                  ^^^^^^^   ^   ^^^^^^^^^^^^^^
+ *                  char_col  +   row (skip first row)
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * APPROACH 1: DIRECT TEXTURE RENDERING (Simpler, Less Flexible)
+ * -------------------------------------------------------------
+ * Load font sprite as SDL_Texture and render character-sized rectangles:
+ *
+ * void sdl_putc(int xpos, int ypos, int font, int c) {
+ *     if (c > 127 || c < 32) return;
+ *     c -= 32;  // Convert ASCII to character index (0-95)
+ *
+ *     int nr = 18100 + font;  // Font sprite index
+ *     sdl_load_sprite(nr);    // Load if not already loaded
+ *
+ *     if (!sprite_data[nr].texture) return;
+ *
+ *     // Source rectangle: extract 6x9 character from 576x11 font sprite
+ *     SDL_Rect src = {
+ *         .x = c * 6,         // Character column (0-95) * 6 pixels wide
+ *         .y = 1,             // Skip first row (row 0 is unused border)
+ *         .w = 6,             // Character width
+ *         .h = 9              // Character height
+ *     };
+ *
+ *     // Destination rectangle: where to draw on screen
+ *     SDL_Rect dst = {
+ *         .x = xpos,
+ *         .y = ypos,
+ *         .w = 6,
+ *         .h = 9
+ *     };
+ *
+ *     // Render the character
+ *     SDL_RenderCopy(app.renderer, sprite_data[nr].texture, &src, &dst);
+ * }
+ *
+ * APPROACH 2: PRE-RENDERED CHARACTER ATLAS (Better Performance)
+ * ------------------------------------------------------------
+ * Create individual textures for each character on first use:
+ *
+ * struct FontCache {
+ *     SDL_Texture *char_textures[96];  // One texture per character
+ * } font_cache[10];  // 10 fonts (0-9)
+ *
+ * void sdl_putc(int xpos, int ypos, int font, int c) {
+ *     if (c > 127 || c < 32) return;
+ *     c -= 32;
+ *
+ *     // Check if character texture is cached
+ *     if (!font_cache[font].char_textures[c]) {
+ *         // Load font sprite surface
+ *         int nr = 18100 + font;
+ *         sdl_load_sprite(nr);
+ *
+ *         // Extract character pixels to new surface
+ *         SDL_Surface *char_surf = SDL_CreateRGBSurfaceWithFormat(
+ *             0, 6, 9, 32, SDL_PIXELFORMAT_ARGB8888
+ *         );
+ *
+ *         SDL_LockSurface(sprite_data[nr].surface);
+ *         SDL_LockSurface(char_surf);
+ *
+ *         // Copy 6x9 character pixels from font sprite
+ *         for (int y = 0; y < 9; y++) {
+ *             Uint32 *src_row = (Uint32*)sprite_data[nr].surface->pixels +
+ *                              (y + 1) * sprite_data[nr].surface->pitch / 4 +
+ *                              c * 6;
+ *             Uint32 *dst_row = (Uint32*)char_surf->pixels +
+ *                              y * char_surf->pitch / 4;
+ *             memcpy(dst_row, src_row, 6 * sizeof(Uint32));
+ *         }
+ *
+ *         SDL_UnlockSurface(char_surf);
+ *         SDL_UnlockSurface(sprite_data[nr].surface);
+ *
+ *         // Create texture from character surface
+ *         font_cache[font].char_textures[c] =
+ *             SDL_CreateTextureFromSurface(app.renderer, char_surf);
+ *         SDL_SetTextureBlendMode(font_cache[font].char_textures[c],
+ *                                SDL_BLENDMODE_BLEND);
+ *         SDL_FreeSurface(char_surf);
+ *     }
+ *
+ *     // Render cached character texture
+ *     SDL_Rect dst = { .x = xpos, .y = ypos, .w = 6, .h = 9 };
+ *     SDL_RenderCopy(app.renderer, font_cache[font].char_textures[c],
+ *                   NULL, &dst);
+ * }
+ *
+ * TRANSPARENCY HANDLING:
+ * ----------------------
+ * - Background color (magenta RGB 255,0,255) should be transparent
+ * - Use SDL_SetColorKey() on font sprite surface before texture creation
+ * - Or use SDL_BLENDMODE_BLEND with alpha channel
+ *
+ * PERFORMANCE NOTES:
+ * ------------------
+ * - Approach 1: Simple, but copies 6x9 pixels per character per frame
+ * - Approach 2: Faster, pre-renders each character once, uses more VRAM
+ * - For HUD text that changes frequently, Approach 1 is adequate
+ * - For static UI elements, Approach 2 is more efficient
+ *
+ * COORDINATE SYSTEM:
+ * ------------------
+ * - xpos, ypos are direct screen pixel coordinates
+ * - No clipping performed - ensure coordinates are within screen bounds
+ * - Characters are rendered left-to-right, 6 pixels wide
  */
 void dd_putc(int xpos,int ypos,char font,int c)
 {
@@ -2368,13 +3471,105 @@ void dd_putc(int xpos,int ypos,char font,int c)
 
 /**
  * dd_puttext - Draw text string at screen coordinates
- * @x: Screen X position
- * @y: Screen Y position
+ * @x: Screen X position (left edge of text)
+ * @y: Screen Y position (top edge of text)
  * @font: Font index (0-9)
  * @text: Null-terminated string to draw
  *
  * Renders text horizontally at the specified screen position. Each character
- * is 6 pixels wide. No clipping or coordinate conversion.
+ * is 6 pixels wide, so the string advances 6 pixels per character. No clipping
+ * or coordinate conversion is performed. Used for UI labels, HUD text, and
+ * menu items.
+ *
+ * SDL2 EQUIVALENT:
+ * ================
+ * Simple wrapper that calls sdl_putc() for each character:
+ *
+ * void sdl_puttext(int x, int y, int font, char *text) {
+ *     int xpos = x;
+ *
+ *     while (*text) {
+ *         sdl_putc(xpos, y, font, *text);
+ *         text++;
+ *         xpos += 6;  // Advance 6 pixels per character
+ *     }
+ * }
+ *
+ * OPTIMIZATION FOR LONG STRINGS:
+ * -------------------------------
+ * For better performance with frequently-updated text (FPS counter, timers):
+ *
+ * void sdl_puttext_optimized(int x, int y, int font, const char *text) {
+ *     int nr = 18100 + font;
+ *     sdl_load_sprite(nr);
+ *     if (!sprite_data[nr].texture) return;
+ *
+ *     int xpos = x;
+ *     SDL_Rect src, dst;
+ *
+ *     src.y = 1;   // Skip top border row
+ *     src.w = 6;   // Character width
+ *     src.h = 9;   // Character height
+ *
+ *     dst.y = y;
+ *     dst.w = 6;
+ *     dst.h = 9;
+ *
+ *     while (*text) {
+ *         if (*text >= 32 && *text <= 127) {
+ *             src.x = (*text - 32) * 6;  // Character offset in font sprite
+ *             dst.x = xpos;
+ *             SDL_RenderCopy(app.renderer, sprite_data[nr].texture, &src, &dst);
+ *         }
+ *         text++;
+ *         xpos += 6;
+ *     }
+ * }
+ *
+ * ALTERNATIVE: SDL_ttf FOR HIGH QUALITY TEXT
+ * -------------------------------------------
+ * For anti-aliased, scalable text, consider SDL_ttf:
+ *
+ * #include <SDL2/SDL_ttf.h>
+ *
+ * TTF_Font *fonts[10];  // Cache of loaded fonts
+ *
+ * void sdl_puttext_ttf(int x, int y, int font_size, const char *text,
+ *                      SDL_Color color) {
+ *     if (!fonts[font_size]) {
+ *         fonts[font_size] = TTF_OpenFont("font.ttf", font_size);
+ *     }
+ *
+ *     SDL_Surface *text_surface = TTF_RenderText_Blended(
+ *         fonts[font_size], text, color
+ *     );
+ *
+ *     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(
+ *         app.renderer, text_surface
+ *     );
+ *
+ *     SDL_Rect dst = { .x = x, .y = y,
+ *                      .w = text_surface->w, .h = text_surface->h };
+ *
+ *     SDL_RenderCopy(app.renderer, text_texture, NULL, &dst);
+ *
+ *     SDL_DestroyTexture(text_texture);
+ *     SDL_FreeSurface(text_surface);
+ * }
+ *
+ * NOTES:
+ * ------
+ * - Bitmap font (current): Pixel-perfect, retro look, fixed 6x9 size
+ * - SDL_ttf: Smooth, scalable, modern look, but slower for dynamic text
+ * - For this game's aesthetic, bitmap fonts are recommended
+ * - Batch all text rendering together to minimize state changes
+ *
+ * CHARACTER SPACING:
+ * ------------------
+ * - Each character is exactly 6 pixels wide
+ * - No kerning or proportional spacing
+ * - String length in pixels = strlen(text) * 6
+ * - To center text: x = center_x - (strlen(text) * 6) / 2
  */
 void dd_puttext(int x,int y,int font,char *text)
 {
@@ -2395,19 +3590,69 @@ void dd_puttext(int x,int y,int font,char *text)
  * Renders formatted text using printf-style formatting. Useful for
  * displaying numbers and dynamic text in the UI.
  */
-void dd_xputtext(int x,int y,int font,char *format,...)
+void dd_xputtext(int x,int y,int font,char *format, va_list args)
 {
-	va_list args;
 	char buf[1024];
-
-	va_start(args,format);
 	// TODO: Modern GCC/MinGW - vsprintf is unsafe, replace with vsnprintf
 	// vsnprintf(buf, sizeof(buf), format, args) to prevent buffer overflow
 	vsprintf(buf,format,args);
 	dd_puttext(x,y,font,buf);
-	va_end(args);
 }
 
+/**
+ * dd_isvisible - Check if display surfaces are valid and restore if lost
+ *
+ * DirectDraw surfaces can become "lost" when:
+ * - The application loses focus in fullscreen mode
+ * - The user Alt+Tabs to another application
+ * - The window is minimized
+ * - The display mode changes
+ * - Another exclusive fullscreen application takes over
+ *
+ * When surfaces are lost, their video memory contents are destroyed and
+ * rendering operations will fail. This function:
+ * 1. Checks if each surface (sur1, sur2, suro) is lost via IsLost()
+ * 2. Attempts to restore lost surfaces via Restore()
+ * 3. Invalidates sprite cache if overlay surface (suro) was restored
+ * 4. Verifies all surfaces are valid after restoration attempt
+ *
+ * SURFACE DETAILS:
+ * - sur1: Primary rendering surface (back buffer)
+ * - sur2: Secondary rendering surface (UI overlay)
+ * - suro: Overlay surface (cached sprites)
+ *
+ * SPRITE CACHE INVALIDATION:
+ * When the overlay surface (suro) is restored, its contents are lost.
+ * This surface contains cached sprite tiles with lighting/effects applied.
+ * dd_invalidate_cache() marks all cached tiles as invalid, forcing them
+ * to be re-rendered on next use.
+ *
+ * USAGE:
+ * Called at the start of each frame (in engine.c:show_screen()) before
+ * rendering. If surfaces cannot be restored, rendering is skipped for
+ * that frame to avoid crashes.
+ *
+ * Returns: 1 if all surfaces are valid and ready for rendering
+ *          0 if any surface is lost and could not be restored
+ *
+ * SDL2 EQUIVALENT:
+ * SDL2 handles surface restoration automatically - video memory is managed
+ * by the driver and surfaces don't "lose" their contents. The equivalent
+ * function only needs to check if the window is minimized or hidden:
+ *
+ *   int sdl_isvisible(void) {
+ *       if (!app.window) return 0;
+ *       Uint32 flags = SDL_GetWindowFlags(app.window);
+ *       // Skip rendering if minimized or hidden
+ *       if (flags & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_HIDDEN)) {
+ *           return 0;
+ *       }
+ *       return 1;
+ *   }
+ *
+ * Note: SDL_WINDOW_SHOWN is not checked because it's the default state.
+ * We only check for the negative conditions (minimized/hidden).
+ */
 int dd_isvisible(void)
 {
 	long ret;
@@ -2435,6 +3680,286 @@ int dd_isvisible(void)
 	return 1;
 }
 
+/**
+ * dd_show_map - Render minimap to screen
+ * @src: Source map data array (MAPX_MAX × MAPY_MAX pixels, RGB565/RGB555 format)
+ * @xo: X offset into map data (left edge of visible area)
+ * @yo: Y offset into map data (top edge of visible area)
+ * @magnify: Zoom level (1=1:1, 2=half size, 4=quarter size, etc.)
+ *
+ * Renders a 128×128 pixel minimap in the top-right corner of the screen.
+ * The minimap shows a portion of the world map with configurable zoom level.
+ * Uses nearest-neighbor sampling for crisp pixel-art appearance.
+ *
+ * MAP DATA FORMAT:
+ * ================
+ * @src points to a 2048×2048 array of unsigned short (RGB565 or RGB555 pixels).
+ * Each pixel represents one tile or area in the game world. The array is stored
+ * in row-major order:
+ *   pixel[y][x] = src[x * MAPX_MAX + y]
+ *
+ * Note: The indexing is transposed! X iterates through rows, Y through columns.
+ * This is unusual but matches the original implementation.
+ *
+ * SCREEN POSITION:
+ * ================
+ * The minimap is drawn in the top-right corner of the screen:
+ * - X position: 582 pixels from left edge (582-710 for 128 pixels wide)
+ * - Y position: 6 pixels from top edge (6-134 for 128 pixels tall)
+ * - Windowed mode: Y position adjusted by +4 pixels (10-138)
+ *
+ * For 1280×720 screen:
+ *   Right edge: 1280 - 582 = 698 pixels from right
+ *   Top edge: 6 pixels from top
+ *
+ * MAGNIFICATION:
+ * ==============
+ * Controls zoom level by sampling every Nth pixel from source:
+ *   magnify=1: Sample every pixel (1:1, shows 128×128 world area)
+ *   magnify=2: Sample every 2nd pixel (2:1, shows 256×256 world area)
+ *   magnify=4: Sample every 4th pixel (4:1, shows 512×512 world area)
+ *   magnify=8: Sample every 8th pixel (8:1, shows 1024×1024 world area)
+ *
+ * Higher magnify = zoomed out (shows more of world in same 128×128 display).
+ *
+ * SAMPLING ALGORITHM:
+ * ===================
+ * For each pixel in the 128×128 minimap display:
+ * 1. Calculate source X coordinate: src_x = (display_x / magnify) + xo
+ * 2. Calculate source Y coordinate: src_y = (display_y / magnify) + yo
+ * 3. Read pixel from source: src[src_x * MAPX_MAX + src_y]
+ * 4. Write to screen at: dst[(display_x + 582) * MAXX + (display_y + 6)]
+ *
+ * The division by magnify implements nearest-neighbor downsampling.
+ *
+ * COORDINATE SYSTEM:
+ * ==================
+ * Source map coordinates:
+ *   0,0 = top-left of world map
+ *   2047,2047 = bottom-right of world map
+ *   Total size: 2048×2048 pixels
+ *
+ * Display coordinates:
+ *   0,0 = top-left of 128×128 minimap display
+ *   127,127 = bottom-right of minimap display
+ *
+ * Screen coordinates:
+ *   582,6 = top-left of minimap on screen (fullscreen)
+ *   582,10 = top-left of minimap on screen (windowed)
+ *   710,134 = bottom-right of minimap on screen
+ *
+ * VISIBLE AREA CALCULATION:
+ * ==========================
+ * The area of the world map visible in the minimap:
+ *   World X range: [xo, xo + 128 * magnify)
+ *   World Y range: [yo, yo + 128 * magnify)
+ *
+ * Example with magnify=4:
+ *   Displays: 128×128 pixels
+ *   Shows: 512×512 area of world (128 * 4)
+ *   If xo=1000, yo=500: Shows world area (1000-1512, 500-1012)
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * APPROACH 1: DIRECT PIXEL COPY TO TEXTURE (Most Efficient)
+ * -----------------------------------------------------------
+ * Create a streaming texture and update it each frame:
+ *
+ * static SDL_Texture *minimap_texture = NULL;
+ *
+ * void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
+ *     // Create texture if needed (once)
+ *     if (!minimap_texture) {
+ *         minimap_texture = SDL_CreateTexture(
+ *             app.renderer,
+ *             SDL_PIXELFORMAT_RGB565,  // Or RGB555 depending on RGBM
+ *             SDL_TEXTUREACCESS_STREAMING,
+ *             128, 128
+ *         );
+ *     }
+ *
+ *     // Lock texture for pixel access
+ *     void *pixels;
+ *     int pitch;
+ *     SDL_LockTexture(minimap_texture, NULL, &pixels, &pitch);
+ *     unsigned short *dst = (unsigned short *)pixels;
+ *     int dst_pitch = pitch / 2;  // Convert bytes to shorts
+ *
+ *     // Sample and copy pixels from source map
+ *     for (int x = 0; x < 128; x++) {
+ *         int src_x = (x / magnify) + xo;
+ *         for (int y = 0; y < 128; y++) {
+ *             int src_y = (y / magnify) + yo;
+ *
+ *             // Clamp to map bounds
+ *             if (src_x < 0 || src_x >= MAPX_MAX ||
+ *                 src_y < 0 || src_y >= MAPY_MAX) {
+ *                 dst[y * dst_pitch + x] = 0;  // Black for out-of-bounds
+ *                 continue;
+ *             }
+ *
+ *             // Read from source (note transposed indexing!)
+ *             unsigned short pixel = src[src_x * MAPX_MAX + src_y];
+ *             dst[y * dst_pitch + x] = pixel;
+ *         }
+ *     }
+ *
+ *     SDL_UnlockTexture(minimap_texture);
+ *
+ *     // Render to screen (top-right corner)
+ *     SDL_Rect dst_rect = {
+ *         .x = 582,
+ *         .y = 6,  // Add +4 if windowed mode
+ *         .w = 128,
+ *         .h = 128
+ *     };
+ *     SDL_RenderCopy(app.renderer, minimap_texture, NULL, &dst_rect);
+ * }
+ *
+ * APPROACH 2: SURFACE TO TEXTURE (More Compatible)
+ * -------------------------------------------------
+ * Use SDL_Surface for easier pixel format conversion:
+ *
+ * void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
+ *     // Create 128×128 surface
+ *     SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormat(
+ *         0, 128, 128, 32, SDL_PIXELFORMAT_ARGB8888
+ *     );
+ *
+ *     SDL_LockSurface(surf);
+ *     Uint32 *pixels = (Uint32 *)surf->pixels;
+ *     int pitch = surf->pitch / 4;
+ *
+ *     // Sample and convert pixels
+ *     for (int x = 0; x < 128; x++) {
+ *         int src_x = (x / magnify) + xo;
+ *         for (int y = 0; y < 128; y++) {
+ *             int src_y = (y / magnify) + yo;
+ *
+ *             if (src_x < 0 || src_x >= MAPX_MAX ||
+ *                 src_y < 0 || src_y >= MAPY_MAX) {
+ *                 pixels[y * pitch + x] = SDL_MapRGB(surf->format, 0, 0, 0);
+ *                 continue;
+ *             }
+ *
+ *             unsigned short pixel565 = src[src_x * MAPX_MAX + src_y];
+ *
+ *             // Convert RGB565 to RGB888
+ *             Uint8 r = ((pixel565 & 0xF800) >> 11) << 3;  // 5 bits -> 8 bits
+ *             Uint8 g = ((pixel565 & 0x07E0) >> 5) << 2;   // 6 bits -> 8 bits
+ *             Uint8 b = ((pixel565 & 0x001F)) << 3;        // 5 bits -> 8 bits
+ *
+ *             // Expand to full 8-bit range (more accurate)
+ *             r |= r >> 5;
+ *             g |= g >> 6;
+ *             b |= b >> 5;
+ *
+ *             pixels[y * pitch + x] = SDL_MapRGB(surf->format, r, g, b);
+ *         }
+ *     }
+ *
+ *     SDL_UnlockSurface(surf);
+ *
+ *     // Create texture from surface
+ *     SDL_Texture *texture = SDL_CreateTextureFromSurface(app.renderer, surf);
+ *     SDL_FreeSurface(surf);
+ *
+ *     // Render to screen
+ *     SDL_Rect dst_rect = { .x = 582, .y = 6, .w = 128, .h = 128 };
+ *     SDL_RenderCopy(app.renderer, texture, NULL, &dst_rect);
+ *
+ *     SDL_DestroyTexture(texture);
+ * }
+ *
+ * APPROACH 3: CACHED TEXTURE WITH DIRTY REGIONS (Most Optimized)
+ * ----------------------------------------------------------------
+ * Only update the texture when the map changes:
+ *
+ * typedef struct {
+ *     SDL_Texture *texture;
+ *     int last_xo, last_yo, last_magnify;
+ *     int dirty;
+ * } MinimapCache;
+ *
+ * static MinimapCache minimap_cache = {0};
+ *
+ * void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
+ *     // Check if map view has changed
+ *     if (!minimap_cache.texture ||
+ *         minimap_cache.last_xo != xo ||
+ *         minimap_cache.last_yo != yo ||
+ *         minimap_cache.last_magnify != magnify ||
+ *         minimap_cache.dirty) {
+ *
+ *         // Rebuild texture (use Approach 1 or 2 here)
+ *         // ... texture update code ...
+ *
+ *         minimap_cache.last_xo = xo;
+ *         minimap_cache.last_yo = yo;
+ *         minimap_cache.last_magnify = magnify;
+ *         minimap_cache.dirty = 0;
+ *     }
+ *
+ *     // Just render the cached texture
+ *     SDL_Rect dst_rect = { .x = 582, .y = 6, .w = 128, .h = 128 };
+ *     SDL_RenderCopy(app.renderer, minimap_cache.texture, NULL, &dst_rect);
+ * }
+ *
+ * // Call this when map data changes (fog of war, discovered areas, etc.)
+ * void sdl_mark_minimap_dirty(void) {
+ *     minimap_cache.dirty = 1;
+ * }
+ *
+ * PERFORMANCE CONSIDERATIONS:
+ * ===========================
+ * - Approach 1: Fast, ~50 µs to update (128×128 = 16,384 pixels)
+ * - Approach 2: Slower due to format conversion, ~200 µs
+ * - Approach 3: Fastest when view doesn't change (just 1 texture blit)
+ *
+ * For typical gameplay:
+ * - Minimap view changes when player moves (scrolling)
+ * - Map data changes rarely (fog of war updates)
+ * - Approach 1 or 3 recommended
+ *
+ * ADVANCED FEATURES:
+ * ==================
+ * 1. Smooth Scrolling: Interpolate xo/yo between frames
+ * 2. Bilinear Filtering: Use SDL_SetTextureScaleMode for smoother zoom
+ * 3. Player Marker: Draw sprite/circle at player position after minimap
+ * 4. Fog of War: Blend semi-transparent overlay over unexplored areas
+ * 5. Zoom Animation: Smoothly transition between magnify levels
+ *
+ * RENDERING ORDER:
+ * ================
+ * The minimap should be rendered AFTER the main game view but BEFORE
+ * other UI elements that might overlap:
+ *   1. Draw main game view (tiles, sprites, effects)
+ *   2. Draw minimap
+ *   3. Draw minimap frame/border (if any)
+ *   4. Draw player/party markers on minimap
+ *   5. Draw remaining UI (inventory, chat, etc.)
+ *
+ * BORDER/FRAME:
+ * =============
+ * The original code doesn't draw a border, but you might want to add one:
+ *
+ * // Draw border around minimap
+ * SDL_SetRenderDrawColor(app.renderer, 200, 200, 200, 255);
+ * SDL_Rect border = { .x = 581, .y = 5, .w = 130, .h = 130 };
+ * SDL_RenderDrawRect(app.renderer, &border);
+ *
+ * TRANSPOSED INDEXING NOTE:
+ * ==========================
+ * The source array indexing is TRANSPOSED (x and y swapped):
+ *   src[src_x * MAPX_MAX + src_y]  // X iterates rows, Y iterates columns
+ *
+ * This is unusual but intentional. When converting to SDL2, maintain this
+ * indexing to ensure the minimap displays correctly. If you rebuild the
+ * map data structure, you can normalize it to:
+ *   src[src_y * MAPX_MAX + src_x]  // Normal row-major order
+ *
+ * But this would require changing how the map data is generated/stored.
+ */
 void dd_show_map(unsigned short *src,int xo,int yo,int magnify)
 {
 	unsigned short *dst;
@@ -2799,9 +4324,289 @@ void dd_shadow_clear(void)
  * @yoff: Screen Y offset
  *
  * Draws a darkened version of a sprite to create a shadow effect. The shadow
- * is offset downward from the sprite position. Uses the shadowmap to avoid
- * drawing the same pixel twice. Only works for certain sprite ranges (game
- * characters and objects). Shadows are rendered by halving pixel brightness.
+ * is offset downward from the sprite position by 14 pixels (bottom of sprite
+ * minus disp value). Uses a global shadowmap to prevent darkening the same
+ * pixel twice when shadows overlap. Only works for certain sprite ranges
+ * (characters: 2000-16335, and objects: 17361+). Shadows are created by
+ * halving the brightness of each pixel.
+ *
+ * SHADOW ALGORITHM:
+ * =================
+ * 1. Check if sprite is in valid range (characters/objects only)
+ * 2. Convert world coordinates to screen coordinates (isometric projection)
+ * 3. Offset shadow downward by (sprite_height - 14) pixels
+ * 4. For each non-transparent pixel in sprite:
+ *    a. Check shadowmap - skip if already shadowed
+ *    b. Read existing screen pixel color
+ *    c. Halve brightness: color >>= 1
+ *    d. Mask to prevent bit bleed: RGB565 = 0x7BEF, RGB555 = 0x3DEF
+ *    e. Write darkened pixel to screen
+ *    f. Mark position in shadowmap
+ * 5. Process alpha channel pixels separately (same darkening)
+ *
+ * SHADOWMAP:
+ * ==========
+ * A MAXX×MAXY byte array (1280×720 = 921,600 bytes) that tracks which pixels
+ * have already been shadowed. This prevents double-darkening when multiple
+ * shadows overlap. The shadowmap is cleared at the start of each frame via
+ * dd_shadow_clear().
+ *
+ * SPRITE RANGE FILTERING:
+ * =======================
+ * Only these sprite ranges cast shadows:
+ * - 2000-16335: Game characters (players, NPCs, monsters)
+ * - 17361+: Dynamic objects (items, effects, etc.)
+ *
+ * Static environment sprites (tiles, walls) don't cast shadows.
+ *
+ * SHADOW OFFSET AND COMPRESSION:
+ * ================================
+ * Shadow is drawn at:
+ *   shadow_y = sprite_bottom - 14 pixels
+ *
+ * **CRITICAL**: Shadow is vertically compressed to 25% height!
+ * - Full sprite: ys * 32 pixels tall
+ * - Shadow: ys * 8 pixels tall (only 25% of sprite height)
+ *
+ * The shadow samples every 4th row of the sprite (m+=xs*96 skips 3 rows).
+ * This creates a small, squashed shadow that appears projected onto the ground.
+ *
+ * For a 2-tile tall sprite (64 pixels):
+ *   sprite_height = 2 * 32 = 64 pixels
+ *   shadow_height = 2 * 8 = 16 pixels (4x smaller!)
+ *   shadow_y = sprite_y + 64 - 14 = sprite_y + 50
+ *
+ * DARKENING FORMULA:
+ * ==================
+ * Each color channel is halved:
+ *   new_value = (old_value >> 1) & mask
+ *
+ * RGB565 mask: 0x7BEF (01111011 11101111)
+ *   R: 0x7800 (keeps bits 14-11, clears bit 15)
+ *   G: 0x03E0 (keeps bits 9-5)
+ *   B: 0x000F (keeps bits 3-0, clears bit 4)
+ *
+ * RGB555 mask: 0x3DEF (00111101 11101111)
+ *   R: 0x3C00 (keeps bits 13-10, clears bits 15-14)
+ *   G: 0x01E0 (keeps bits 8-5)
+ *   B: 0x000F (keeps bits 3-0, clears bit 4)
+ *
+ * The masking prevents bit bleed when right-shifting.
+ *
+ * SDL2 EQUIVALENT REQUIREMENTS:
+ * ==============================
+ * APPROACH 1: RENDER TO TEXTURE WITH DARKENING + COMPRESSION (Most Accurate)
+ * ---------------------------------------------------------------------------
+ * Pre-render a vertically compressed (25% height), darkened shadow texture:
+ *
+ * void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
+ *     // Check sprite range
+ *     int ok = 0, disp = 14;
+ *     if ((nr >= 2000 && nr < 16336) || nr > 17360) ok = 1;
+ *     if (!ok) return;
+ *
+ *     sdl_load_sprite(nr);
+ *     if (!sprite_data[nr].texture) return;
+ *
+ *     // Convert world coords to screen coords (same isometric math)
+ *     int xs = sprite_data[nr].xs;
+ *     int ys = sprite_data[nr].ys;
+ *     int rx = (xpos/2) + (ypos/2) - (xs*16) + 32 + X_OFFSET -
+ *              ((RENDER_DISTANCE-34)/2*32);
+ *     // ... same coordinate conversion as copysprite ...
+ *     rx += xoff;
+ *     int ry = (xpos/4) - (ypos/4) + Y_OFFSET - ys*32 + yoff;
+ *     ry += ys*32 - disp;  // Offset shadow downward
+ *
+ *     // Create compressed shadow texture (25% height, darkened)
+ *     if (!sprite_data[nr].shadow_texture) {
+ *         SDL_LockSurface(sprite_data[nr].surface);
+ *
+ *         int shadow_width = sprite_data[nr].pixel_width;
+ *         int shadow_height = ys * 8;  // Only 8 pixels per tile (25% of 32)
+ *
+ *         // Create shadow surface (compressed height)
+ *         SDL_Surface *shadow_surf = SDL_CreateRGBSurfaceWithFormat(
+ *             0, shadow_width, shadow_height, 32, SDL_PIXELFORMAT_ARGB8888
+ *         );
+ *         SDL_LockSurface(shadow_surf);
+ *
+ *         Uint32 *src_pixels = sprite_data[nr].surface->pixels;
+ *         Uint32 *dst_pixels = shadow_surf->pixels;
+ *         int src_pitch = sprite_data[nr].surface->pitch / 4;
+ *         int dst_pitch = shadow_surf->pitch / 4;
+ *
+ *         // Sample every 4th row of sprite to create compressed shadow
+ *         for (int shadow_y = 0; shadow_y < shadow_height; shadow_y++) {
+ *             int sprite_y = shadow_y * 4;  // Sample every 4th row
+ *
+ *             for (int x = 0; x < shadow_width; x++) {
+ *                 Uint8 r, g, b, a;
+ *                 Uint32 src_pixel = src_pixels[sprite_y * src_pitch + x];
+ *                 SDL_GetRGBA(src_pixel, sprite_data[nr].surface->format,
+ *                            &r, &g, &b, &a);
+ *
+ *                 // Skip transparent pixels
+ *                 if (a == 0) {
+ *                     dst_pixels[shadow_y * dst_pitch + x] = 0;
+ *                     continue;
+ *                 }
+ *
+ *                 // Halve brightness (same as original)
+ *                 r >>= 1;
+ *                 g >>= 1;
+ *                 b >>= 1;
+ *
+ *                 dst_pixels[shadow_y * dst_pitch + x] =
+ *                     SDL_MapRGBA(shadow_surf->format, r, g, b, a);
+ *             }
+ *         }
+ *
+ *         SDL_UnlockSurface(shadow_surf);
+ *         SDL_UnlockSurface(sprite_data[nr].surface);
+ *
+ *         // Create texture from compressed, darkened shadow
+ *         sprite_data[nr].shadow_texture =
+ *             SDL_CreateTextureFromSurface(app.renderer, shadow_surf);
+ *         SDL_SetTextureBlendMode(sprite_data[nr].shadow_texture,
+ *                                SDL_BLENDMODE_BLEND);
+ *         SDL_FreeSurface(shadow_surf);
+ *     }
+ *
+ *     // Render the compressed shadow texture
+ *     SDL_Rect dst = {
+ *         .x = rx,
+ *         .y = ry,
+ *         .w = sprite_data[nr].pixel_width,
+ *         .h = ys * 8  // Shadow is only 8 pixels per tile (compressed!)
+ *     };
+ *
+ *     SDL_RenderCopy(app.renderer, sprite_data[nr].shadow_texture, NULL, &dst);
+ * }
+ *
+ * APPROACH 2: TEXTURE COLOR MODULATION + SCALING (Simpler)
+ * ----------------------------------------------------------
+ * Use SDL's scaling and color modulation to compress and darken:
+ *
+ * void sdl_shadow_simple(int nr, int xpos, int ypos, int xoff, int yoff) {
+ *     // ... same setup and coordinate conversion ...
+ *
+ *     int xs = sprite_data[nr].xs;
+ *     int ys = sprite_data[nr].ys;
+ *
+ *     // Set color mod to 50% brightness (128/255 ≈ 50%)
+ *     SDL_SetTextureColorMod(sprite_data[nr].texture, 128, 128, 128);
+ *
+ *     // Render the sprite compressed to 25% height (darkened automatically)
+ *     SDL_Rect dst = {
+ *         .x = rx,
+ *         .y = ry,
+ *         .w = sprite_data[nr].pixel_width,
+ *         .h = ys * 8  // Compress to 25% height (8 pixels/tile instead of 32)
+ *     };
+ *     SDL_RenderCopy(app.renderer, sprite_data[nr].texture, NULL, &dst);
+ *
+ *     // Restore original color mod
+ *     SDL_SetTextureColorMod(sprite_data[nr].texture, 255, 255, 255);
+ * }
+ *
+ * NOTE: This is simpler but less accurate:
+ * - SDL will interpolate/filter when scaling down (may blur shadow)
+ * - Original code samples every 4th row (nearest-neighbor style)
+ * - For crisp shadows, use Approach 1
+ *
+ * APPROACH 3: SHADER-BASED DARKENING (Best Quality, Most Complex)
+ * ----------------------------------------------------------------
+ * Use a custom shader for per-pixel darkening:
+ *
+ * Fragment shader (GLSL):
+ *   uniform sampler2D texture;
+ *   void main() {
+ *       vec4 color = texture2D(texture, gl_TexCoord[0].xy);
+ *       color.rgb *= 0.5;  // Halve brightness
+ *       gl_FragColor = color;
+ *   }
+ *
+ * This provides the most accurate shadow rendering but requires OpenGL/D3D.
+ *
+ * SHADOWMAP EQUIVALENT:
+ * =====================
+ * SDL2 doesn't have a built-in shadowmap, but you can implement one:
+ *
+ * static unsigned char *shadowmap = NULL;  // SCREEN_WIDTH × SCREEN_HEIGHT
+ *
+ * void sdl_shadow_clear(void) {
+ *     if (!shadowmap) {
+ *         shadowmap = calloc(SCREEN_WIDTH * SCREEN_HEIGHT, 1);
+ *     } else {
+ *         memset(shadowmap, 0, SCREEN_WIDTH * SCREEN_HEIGHT);
+ *     }
+ * }
+ *
+ * During shadow rendering, check shadowmap before drawing each pixel:
+ *   int pixel_index = y * SCREEN_WIDTH + x;
+ *   if (shadowmap[pixel_index]) continue;  // Already shadowed
+ *   // ... darken pixel ...
+ *   shadowmap[pixel_index] = 1;
+ *
+ * However, with SDL2's texture-based rendering, the shadowmap is less critical
+ * since overlapping shadows will naturally blend (not double-darken) if you
+ * use SDL_BLENDMODE_BLEND.
+ *
+ * ALTERNATIVE: MULTIPLY BLEND MODE
+ * =================================
+ * SDL2's multiply blend mode automatically darkens:
+ *
+ * void sdl_shadow_multiply(int nr, int xpos, int ypos, int xoff, int yoff) {
+ *     // ... setup ...
+ *
+ *     SDL_SetTextureBlendMode(sprite_data[nr].texture, SDL_BLENDMODE_MOD);
+ *     SDL_SetTextureColorMod(sprite_data[nr].texture, 128, 128, 128);
+ *
+ *     // Render
+ *     SDL_RenderCopy(app.renderer, sprite_data[nr].texture, NULL, &dst);
+ *
+ *     // Restore
+ *     SDL_SetTextureBlendMode(sprite_data[nr].texture, SDL_BLENDMODE_BLEND);
+ *     SDL_SetTextureColorMod(sprite_data[nr].texture, 255, 255, 255);
+ * }
+ *
+ * SDL_BLENDMODE_MOD multiplies the source color with the destination,
+ * creating a darkening effect.
+ *
+ * SPRITE DATA STRUCTURE UPDATE:
+ * ==============================
+ * Add shadow texture to SpriteData:
+ *
+ * typedef struct {
+ *     SDL_Texture *texture;
+ *     SDL_Texture *shadow_texture;  // Pre-rendered darkened version
+ *     // ... other fields ...
+ * } SpriteData;
+ *
+ * PERFORMANCE NOTES:
+ * ==================
+ * - Approach 1: Best accuracy, cache shadow textures, ~300KB per sprite
+ * - Approach 2: Fast, simple, but less accurate darkening
+ * - Approach 3: Best quality, requires shader support
+ * - Multiply blend: Fast, automatic, but different visual result
+ *
+ * RENDERING ORDER:
+ * ================
+ * Shadows must be drawn BEFORE the sprites they belong to:
+ *   1. Clear shadowmap
+ *   2. Draw all shadows (back to front)
+ *   3. Draw all sprites (back to front)
+ *
+ * This ensures shadows appear behind their objects.
+ *
+ * COORDINATE SYSTEM:
+ * ==================
+ * Shadow uses same isometric projection as copysprite(), then adds:
+ *   shadow_y_offset = sprite_height_in_pixels - 14
+ *
+ * The 14-pixel gap prevents the shadow from touching the sprite's feet,
+ * simulating a light source above the scene.
  */
 void dd_shadow(int nr,int xpos,int ypos,int xoff,int yoff)
 {

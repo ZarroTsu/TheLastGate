@@ -26,9 +26,15 @@
 #include <stdio.h>
 #include <math.h>
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_render.h>
+
 #include "dd.h"
 #include "common.h"
+#include "input.h"
 #include "inter.h"
+#include "render.h"
+#include "sdl.h"
 
 int init_done=0;
 int frame=0;
@@ -1881,11 +1887,11 @@ void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
 	
 	if (flag)		m += 8*14;
 	
-					  dd_xputtext(9,  m+n*14,font,"%-20.20s", va    );
-	if (vc>=0)		  dd_xputtext(140,m+n*14,font,"%4d.%02d", vb, vc);
-	else if (vb>=0)	  dd_xputtext(140,m+n*14,font,"%7d",      vb    );
-	else if (flag==2) dd_xputtext(140,m+n*14,font,"%7d",      vb    );
-					  dd_xputtext(189,m+n*14,font,"%-7.7s",   ve    );
+					  xputtext(9,  m+n*14,font,"%-20.20s", va    );
+	if (vc>=0)		  xputtext(140,m+n*14,font,"%4d.%02d", vb, vc);
+	else if (vb>=0)	  xputtext(140,m+n*14,font,"%7d",      vb    );
+	else if (flag==2) xputtext(140,m+n*14,font,"%7d",      vb    );
+					  xputtext(189,m+n*14,font,"%-7.7s",   ve    );
 }
 
 void show_meta_stats(int n)
@@ -2083,27 +2089,27 @@ void eng_display_win(int plr_sprite,int init)
 	char *tmp,buf[50];
 	int pl_flags, pl_flagb;
 	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
-
-	//if (load) dd_xputtext(670,300+MAXTS,1,"%3d%%",load);
+	
+	//if (load) xputtext(670,300+MAXTS,1,"%3d%%",load);
 
 	if (init) {
 		reset_block();
 
 		// Draw red rectangles around lower right gui component toggles
-		if (pl.mode==2)			dd_showbox(GUI_F_COL1,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		else if (pl.mode==1)	dd_showbox(GUI_F_COL2,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		else if (pl.mode==0)	dd_showbox(GUI_F_COL3,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		if (pdata.show_proz)	dd_showbox(GUI_F_COL4,GUI_F_ROW1,45,12,(unsigned short)(RED));
+		if (pl.mode==2)			showbox(GUI_F_COL1,GUI_F_ROW1,45,12,(unsigned short)(RED));
+		else if (pl.mode==1)	showbox(GUI_F_COL2,GUI_F_ROW1,45,12,(unsigned short)(RED));
+		else if (pl.mode==0)	showbox(GUI_F_COL3,GUI_F_ROW1,45,12,(unsigned short)(RED));
+		if (pdata.show_proz)	showbox(GUI_F_COL4,GUI_F_ROW1,45,12,(unsigned short)(RED));
 		//
-		if (pdata.show_stats)	dd_showbox(GUI_F_COL1,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		if (pdata.hide)			dd_showbox(GUI_F_COL2,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		if (pdata.show_names)	dd_showbox(GUI_F_COL3,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		if (pdata.show_bars)	dd_showbox(GUI_F_COL4,GUI_F_ROW2,45,12,(unsigned short)(RED));
+		if (pdata.show_stats)	showbox(GUI_F_COL1,GUI_F_ROW2,45,12,(unsigned short)(RED));
+		if (pdata.hide)			showbox(GUI_F_COL2,GUI_F_ROW2,45,12,(unsigned short)(RED));
+		if (pdata.show_names)	showbox(GUI_F_COL3,GUI_F_ROW2,45,12,(unsigned short)(RED));
+		if (pdata.show_bars)	showbox(GUI_F_COL4,GUI_F_ROW2,45,12,(unsigned short)(RED));
 		//
-		if (hudmode==0)			dd_showbox(261,182,64,12,(unsigned short)(RED));
-		else if (hudmode==1)	dd_showbox(261,197,64,12,(unsigned short)(RED));
-		else if (hudmode==2)	dd_showbox(261,212,64,12,(unsigned short)(RED));
-		else if (hudmode==3)	dd_showbox(261,182,64,12,(unsigned short)(GREEN));
+		if (hudmode==0)			showbox(261,182,64,12,(unsigned short)(RED));
+		else if (hudmode==1)	showbox(261,197,64,12,(unsigned short)(RED));
+		else if (hudmode==2)	showbox(261,212,64,12,(unsigned short)(RED));
+		else if (hudmode==3)	showbox(261,182,64,12,(unsigned short)(GREEN));
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
@@ -2202,40 +2208,40 @@ void eng_display_win(int plr_sprite,int init)
 		}
 		
 		// Scroll Bars for Skills and Inventory
-		dd_showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
-		dd_showbar(601, 36+(inv_pos *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
+		showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+		showbar(601, 36+(inv_pos *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
 
 		// display info-texts
 		// HP, EN, MA below the skill list
-		dd_xputtext(GUI_HP_COUNT_X,	GUI_HP_COUNT_Y,	1,"Hitpoints         %3d %3d",pl.a_hp,pl.hp[5]);
-		dd_xputtext(GUI_EN_COUNT_X,	GUI_EN_COUNT_Y,	1,"Endurance         %3d %3d",pl.a_end,pl.end[5]);
-		dd_xputtext(GUI_MP_COUNT_X,	GUI_MP_COUNT_Y,	1,"Mana              %3d %3d",pl.a_mana,pl.mana[5]);
+		xputtext(GUI_HP_COUNT_X,	GUI_HP_COUNT_Y,	1,"Hitpoints         %3d %3d",pl.a_hp,pl.hp[5]);
+		xputtext(GUI_EN_COUNT_X,	GUI_EN_COUNT_Y,	1,"Endurance         %3d %3d",pl.a_end,pl.end[5]);
+		xputtext(GUI_MP_COUNT_X,	GUI_MP_COUNT_Y,	1,"Mana              %3d %3d",pl.a_mana,pl.mana[5]);
 		
 		// Money, BSP, CST, OSP
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"      Money");
-		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y,	1,"%9dG %2dS",pl.gold/100,pl.gold%100);
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"      Money");
+		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y,	1,"%9dG %2dS",pl.gold/100,pl.gold%100);
 		if (pl.bs_points==0)
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1,"        ???");
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1,"        ???");
 		else
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1," Stronghold");
-		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+14,	1,"  %12d",pl.bs_points);
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1," Stronghold");
+		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+14,	1,"  %12d",pl.bs_points);
 		if (pl.tokens==0)
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"        ???");
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"        ???");
 		else
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"     Casino");
-		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+28,	1,"  %12d",pl.tokens);
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"     Casino");
+		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+28,	1,"  %12d",pl.tokens);
 		if (pl.os_points==0)
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"        ???");
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"        ???");
 		else
-			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"   Contract");
-		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+42,	1,"  %12d",pl.os_points);
+			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"   Contract");
+		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+42,	1,"  %12d",pl.os_points);
 		
 		// Update and Update exp
 		if (hudmode==0||hudmode==3)
 		{
 			copyspritex(do_darkmode?18099:99, 134, 3,  0);
-			dd_xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
-			dd_xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
+			xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
+			xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
 		}
 		if (hudmode==3)
 			copyspritex(do_darkmode?18098:18097, 134, 3,  0);
@@ -2255,58 +2261,58 @@ void eng_display_win(int plr_sprite,int init)
 		}
 
 		// WV, AV, EXP, Location
-		dd_xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
-		dd_xputtext(GUI_WV_X+92,GUI_WV_Y,1,   "%11d",pl.weapon);
-		dd_xputtext(GUI_WV_X,   GUI_WV_Y+14,1,"Armor Value");
-		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl_armor);
-		dd_xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
-		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
-		dd_xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
+		xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
+		xputtext(GUI_WV_X+92,GUI_WV_Y,1,   "%11d",pl.weapon);
+		xputtext(GUI_WV_X,   GUI_WV_Y+14,1,"Armor Value");
+		xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl_armor);
+		xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
+		xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
+		xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
 
 		// display spell shortcut buttons
 		for (n=0; n<20; n++) {
-			dd_xputtext(1038+(n%5)*48,600+(n/5)*15,1,pdata.xbutton[n].name);
+			xputtext(1038+(n%5)*48,600+(n/5)*15,1,pdata.xbutton[n].name);
 		}
 		
 		if (hudmode==0)
 		{
 			for (n=0; n<5; n++) {
-				dd_xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
+				xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
 				//
-				if (pdata.show_stats) dd_xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
-				dd_xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
+				if (pdata.show_stats) xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
+				xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
 				//
 				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used) 
-					dd_putc(163,8+n*14,1,'+');
+					render_putc(163,8+n*14,1,'+');
 				if (stat_raised[n]>0) 
-					dd_putc(177,8+n*14,1,'-');
+					render_putc(177,8+n*14,1,'-');
 				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])!=HIGH_VAL) 
-					dd_xputtext(189,8+n*14,1,"%7d",attrib_needed(n,pl.attrib[n][0]+stat_raised[n]));
+					xputtext(189,8+n*14,1,"%7d",attrib_needed(n,pl.attrib[n][0]+stat_raised[n]));
 			}
 			
-			dd_xputtext(9,8+5*14,1,"Hitpoints");
+			xputtext(9,8+5*14,1,"Hitpoints");
 			//
-			if (pdata.show_stats) dd_xputtext(117,(8+5*14),3,"%3d",pl.hp[0]+stat_raised[5]);
-			dd_xputtext(140,(8+5*14),1,"%3d",pl.hp[5]+stat_raised[5]);
+			if (pdata.show_stats) xputtext(117,(8+5*14),3,"%3d",pl.hp[0]+stat_raised[5]);
+			xputtext(140,(8+5*14),1,"%3d",pl.hp[5]+stat_raised[5]);
 			//
 			if (hp_needed(pl.hp[0]+stat_raised[5])<=pl.points-stat_points_used)	
-				dd_putc(163,8+5*14,1,'+');
+				render_putc(163,8+5*14,1,'+');
 			if (stat_raised[5]>0) 
-				dd_putc(177,8+5*14,1,'-');
+				render_putc(177,8+5*14,1,'-');
 			if (hp_needed(pl.hp[0]+stat_raised[5])!=HIGH_VAL) 
-				dd_xputtext(189,8+5*14,1,"%7d",hp_needed(pl.hp[0]+stat_raised[5]));
+				xputtext(189,8+5*14,1,"%7d",hp_needed(pl.hp[0]+stat_raised[5]));
 			
-			dd_xputtext(9,8+6*14,1,"Mana");
+			xputtext(9,8+6*14,1,"Mana");
 			//
-			if (pdata.show_stats) dd_xputtext(117,(8+6*14),3,"%3d",pl.mana[0]+stat_raised[7]);
-			dd_xputtext(140,(8+6*14),1,"%3d",pl.mana[5]+stat_raised[7]);
+			if (pdata.show_stats) xputtext(117,(8+6*14),3,"%3d",pl.mana[0]+stat_raised[7]);
+			xputtext(140,(8+6*14),1,"%3d",pl.mana[5]+stat_raised[7]);
 			//
 			if (mana_needed(pl.mana[0]+stat_raised[7])<=pl.points-stat_points_used)	
-				dd_putc(163,8+6*14,1,'+');
+				render_putc(163,8+6*14,1,'+');
 			if (stat_raised[7]>0) 
-				dd_putc(177,8+6*14,1,'-');
+				render_putc(177,8+6*14,1,'-');
 			if (mana_needed(pl.mana[0]+stat_raised[7])!=HIGH_VAL) 
-				dd_xputtext(189,8+6*14,1,"%7d",mana_needed(pl.mana[0]+stat_raised[7]));
+				xputtext(189,8+6*14,1,"%7d",mana_needed(pl.mana[0]+stat_raised[7]));
 		}
 		else
 		{
@@ -2328,18 +2334,18 @@ void eng_display_win(int plr_sprite,int init)
 				m=skilltab[n+skill_pos].nr;
 				if (m>=55)
 				{
-					dd_xputtext(9,(8+8*14)+n*14,1,"-");
+					xputtext(9,(8+8*14)+n*14,1,"-");
 				}
 				else if (m>=50)
 				{
 					if ((m==52 && !KNOW_IDENTIFY) || ((m==53||m==54) && !IS_LYCANTH)) 
 					{
-						dd_xputtext(9,(8+8*14)+n*14,1,"-");
+						xputtext(9,(8+8*14)+n*14,1,"-");
 					}
 					else
 					{
-						dd_xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+skill_pos].name);
-						dd_xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
+						xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+skill_pos].name);
+						xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
 					}
 					continue;
 				}
@@ -2348,11 +2354,11 @@ void eng_display_win(int plr_sprite,int init)
 					// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
 					if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&IS_SEYAN_DU)) 
 					{
-						dd_xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
-						dd_xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
+						xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
+						xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
 					}
 					else
-						dd_xputtext(9,(8+8*14)+n*14,1,"-");
+						xputtext(9,(8+8*14)+n*14,1,"-");
 					continue;
 				}
 				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
@@ -2371,18 +2377,18 @@ void eng_display_win(int plr_sprite,int init)
 						(m==12&&(pl_flagb & (1 <<  3))) ||  // Tactics invert
 						(m==22&&IS_SHIFTED) // Rage -> Calm
 					)
-					dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
+					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
 				else
-					dd_xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
+					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
 				
-				if (pdata.show_stats) dd_xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
-				dd_xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
+				if (pdata.show_stats) xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
+				xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
 				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
-					dd_putc(163,(8+8*14)+n*14,1,'+');
+					render_putc(163,(8+8*14)+n*14,1,'+');
 				if (stat_raised[n+8+skill_pos]>0) 
-					dd_putc(177,(8+8*14)+n*14,1,'-');
+					render_putc(177,(8+8*14)+n*14,1,'-');
 				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL)
-					dd_xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
+					xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
 			}
 			else
 			{
@@ -2403,11 +2409,11 @@ void eng_display_win(int plr_sprite,int init)
 		n=0;
 	}
 	if (points2rank(pl.points_tot)==24)
-		dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_EXP);
+		showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_EXP);
 	else
 	{
-		dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_BLU);
-		dd_showbar(GUI_XPBAR_X,GUI_XPBAR_Y,n,          6,(unsigned short)GUI_BAR_EXP);
+		showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_BLU);
+		showbar(GUI_XPBAR_X,GUI_XPBAR_Y,n,          6,(unsigned short)GUI_BAR_EXP);
 	}
 	//
 
@@ -2416,7 +2422,7 @@ void eng_display_win(int plr_sprite,int init)
 	else logstart=0;
 
 	for (y=0; y<LL; y++) {
-		dd_puttext(GUI_LOG_X,8+y*10,logfont[LL-y-1+logstart],logtext[LL-y-1+logstart]);
+		puttext(GUI_LOG_X,8+y*10,logfont[LL-y-1+logstart],logtext[LL-y-1+logstart]);
 	}
 
 	input[in_len]=0;
@@ -2425,8 +2431,8 @@ void eng_display_win(int plr_sprite,int init)
 	memcpy(buf,input+view_pos,48);
 	buf[48]=0;
 
-	dd_puttext(GUI_LOG_X,13+10*LL,1,buf);
-	dd_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
+	puttext(GUI_LOG_X,13+10*LL,1,buf);
+	render_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
 
 	if (init) {
 		if (show_shop || show_wps || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
@@ -2502,38 +2508,38 @@ void eng_display_win(int plr_sprite,int init)
 
 			if (selected_char) tmp=lookup(selected_char,0);
 			else tmp=pl.name;
-			dd_xputtext(846+(125-strlen(tmp)*6)/2,32,1,tmp);
+			xputtext(846+(125-strlen(tmp)*6)/2,32,1,tmp);
 
 
 			// Bar for HP
 			if (pl.hp[5]>0)	n=min(124,pl.hp[5]*62/pl.hp[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
+			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
 			if (pl.hp[5]>0)	n=min(124,pl.a_hp*62/pl.hp[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_GRE);
+			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_GRE);
 
 			// Bar for EN
 			if (pl.end[5]>0) n=min(124,pl.end[5]*62/pl.end[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
+			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
 			if (pl.end[5]>0) n=min(124,pl.a_end*62/pl.end[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_GRE);
+			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_GRE);
 
 			// Bar for MP
 			if (pl.mana[5]>0) n=min(124,pl.mana[5]*62/pl.mana[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
+			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
 			if (pl.mana[5]>0) n=min(124,pl.a_mana*62/pl.mana[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
+			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
 			
 			if (!show_shop || (show_shop==110 || show_shop==111)) {
 				copyspritex(rank_sprite[points2rank(pl.points_tot)],935,42,0);
 				copyspritex(plr_sprite,935-61,36,0);
-				dd_xputtext(846+(125-strlen(pl.name)*6)/2,157,1,pl.name);
-				dd_xputtext(846+(125-strlen(rank[points2rank(pl.points_tot)])*6)/2,176,1,rank[points2rank(pl.points_tot)]);
+				xputtext(846+(125-strlen(pl.name)*6)/2,157,1,pl.name);
+				xputtext(846+(125-strlen(rank[points2rank(pl.points_tot)])*6)/2,176,1,rank[points2rank(pl.points_tot)]);
 			}
 
 		} else {
@@ -2558,32 +2564,32 @@ void eng_display_win(int plr_sprite,int init)
 				copyspritex(look.sprite,935-61,36,n);
 			}
 
-			dd_xputtext(846+(125-strlen(rank[points2rank(look.points)])*6)/2,176,1,rank[points2rank(look.points)]);
-			dd_xputtext(846+(125-strlen(look.name)*6)/2,157,1,look.name);
+			xputtext(846+(125-strlen(rank[points2rank(look.points)])*6)/2,176,1,rank[points2rank(look.points)]);
+			xputtext(846+(125-strlen(look.name)*6)/2,157,1,look.name);
 			
 			// Bar for HP
 			if (pl.hp[5]) n=min(124,look.hp*62/pl.hp[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
+			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
 			if (pl.hp[5]) n=min(124,look.a_hp*62/pl.hp[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_RED);
+			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_RED);
 			
 			// Bar for EN
 			if (pl.end[5]) n=min(124,look.end*62/pl.end[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
+			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
 			if (pl.end[5]) n=min(124,look.a_end*62/pl.end[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_RED);
+			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_RED);
 
 			// Bar for MP
 			if (pl.mana[5])	n=min(124,look.mana*62/pl.mana[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
+			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
 			if (pl.mana[5])	n=min(124,look.a_mana*62/pl.mana[5]);
 			else n=0;
-			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RED);
+			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RED);
 
 			copyspritex(rank_sprite[points2rank(look.points)],935,42,0);
 		}
@@ -2620,13 +2626,13 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
 			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
-			dd_xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
-			dd_xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
+			xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
+			xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
 			
 			// Depot Page Buttons
 			xx = GUI_SHOP_X+7 + (dept_page%4)*68;
 			yy = GUI_SHOP_Y+281 + (dept_page/4)*17;
-			dd_showbox(xx,yy,63,12,(unsigned short)(GREEN));
+			showbox(xx,yy,63,12,(unsigned short)(GREEN));
 		}
 		else if (show_shop==110 || show_shop==111) // Blacksmith Window
 		{
@@ -2712,53 +2718,53 @@ void eng_display_win(int plr_sprite,int init)
 						if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) 
 						{
 							pr*=10;
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
+							xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
 						}
 						else
 						{
-							dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
+							xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
 						}
 					}
 					if (show_shop==102) // Black Stronghold
-						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
+						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
 					if (show_shop==103) // Casino
-						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
+						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
 					if (show_shop==104) // Contract
-						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
+						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
 					if (show_shop==105) // Exp
-						dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
+						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
 				}
 			}
 			if (pl.citem && shop.pl_price)
 			{
 				if (show_shop>=1 && show_shop<=101)
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			/*  Sadly this is harder to do than it looks
 			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos) && shop.pl_price)
 			{
 				if (show_shop>=1 && show_shop<=101)
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			*/
 			if (y)
 			{
 				if (show_shop>=1 && show_shop<=101)
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
 				if (show_shop==102) // Black Stronghold
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
 				if (show_shop==103) // Casino
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
 				if (show_shop==104) // Contract
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
 				if (show_shop==105) // Exp
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Unspent Exp: %9d",pl.points);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Unspent Exp: %9d",pl.points);
 			}
 
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
 			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
-			dd_xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
-			dd_xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
+			xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
+			xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
 		}
 		
 		if (show_wps)
@@ -2774,17 +2780,17 @@ void eng_display_win(int plr_sprite,int init)
 					copyspritex((pl.waypoints&(1<<pr))?4500+pr:4533+pr,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
 				if (pl.waypoints&(1<<pr))
 				{
-					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,wpslist[m].name);
-					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,wpslist[m].desc);
+					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,wpslist[m].name);
+					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,wpslist[m].desc);
 				}
 				else
 				{
-					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,"Unknown Location");
-					dd_xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,"\"???\"");
+					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,"Unknown Location");
+					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,"\"???\"");
 				}
 			}
 			// Scroll bar
-			dd_showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(wps_pos*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
+			showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(wps_pos*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
 		}
 		
 		if (show_tree)
@@ -2843,26 +2849,26 @@ void eng_display_win(int plr_sprite,int init)
 			if (m<9)
 			{
 				copyspritex(6600,GUI_SHOP_X+140+ST_OFFSET_IC,GUI_SHOP_Y+140+ST_OFFSET_IC, 0);
-				dd_xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.tree_points),st_skill_pts_all(pl.tree_points));
+				xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.tree_points),st_skill_pts_all(pl.tree_points));
 			}
 			else
 			{
 				copyspritex(7066,GUI_SHOP_X+140+ST_OFFSET_IC,GUI_SHOP_Y+140+ST_OFFSET_IC, 0);
-				dd_xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.os_tree),st_skill_pts_all(pl.os_tree));
+				xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.os_tree),st_skill_pts_all(pl.os_tree));
 			}
 			if (hightlight==HL_SKTREE)
 			{
 				if (m<9 && (v = pl.tree_node[hightlight_sub]))
 				{
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_corrupt[v-1].name);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_corrupt[v-1].dsc1);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_corrupt[v-1].dsc2);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_corrupt[v-1].name);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_corrupt[v-1].dsc1);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_corrupt[v-1].dsc2);
 				}
 				else
 				{
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_tree[m][hightlight_sub].name);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_tree[m][hightlight_sub].dsc1);
-					dd_xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_tree[m][hightlight_sub].dsc2);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+272,1,sk_tree[m][hightlight_sub].name);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,sk_tree[m][hightlight_sub].dsc1);
+					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,sk_tree[m][hightlight_sub].dsc2);
 				}
 			}
 		}
@@ -2871,7 +2877,7 @@ void eng_display_win(int plr_sprite,int init)
 		{
 			copyspritex(do_darkmode?18046:18045,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (y=0+MLL/3*(tuto_page-1); y<MLL/3*tuto_page; y++) {
-				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*15,
+				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*15,
 					motdfont[y],motdtext[y]);
 			}
 		}
@@ -2880,7 +2886,7 @@ void eng_display_win(int plr_sprite,int init)
 		{
 			copyspritex(do_darkmode?18042:42,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (y=0; y<MLL; y++) {
-				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
 					motdfont[y],motdtext[y]);
 			}
 		}
@@ -2889,7 +2895,7 @@ void eng_display_win(int plr_sprite,int init)
 		{
 			copyspritex(do_darkmode?18043:43,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (y=0; y<MLL; y++) {
-				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
 					motdfont[y],motdtext[y]);
 			}
 		}
@@ -2900,7 +2906,7 @@ void eng_display_win(int plr_sprite,int init)
 			copyspritex(tutorial_image[show_tuto-1][tuto_page-1],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
 			for (y=0;y<12;y++)
 			{
-				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
+				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
 					1,tutorial_text[show_tuto-1][tuto_page-1][y]);
 			}
 		}
@@ -3067,20 +3073,21 @@ void eng_display(int init)	// optimize me!!!!!
 	}
 
 	// check if we're visible. If not, just leave.
-	if (!dd_isvisible()) return;
+	if (!isvisible()) return;
 
 	mouse(mx,my,0);
 	// TODO: Modern GCC/MinGW - SetCursor is Windows-specific
 	// SDL2: Use SDL_SetCursor() with SDL_Cursor* array
 	// Example: SDL_SetCursor(cursor[cursor_type]);
-	SetCursor(cursor[cursor_type]);
+	if (DD_ENABLED) SetCursor(cursor[cursor_type]);
+	if (SDL_ENABLED) SDL_SetCursor(cursors[cursor_type]);
 
 	// *******
 	// * map *
 	// *******
 
 	if (init) {
-		if (do_shadow) dd_shadow_clear();
+		if (do_shadow) shadow_clear();
 		xoff=-map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].obj_xoff-176; //-176;
 		yoff=-map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].obj_yoff; //-176;
 		plr_sprite=map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].obj2;
@@ -3195,7 +3202,7 @@ void eng_display(int init)	// optimize me!!!!!
 					}					
 
 				} else if (map[m].obj1) {					
-					copysprite(map[m].obj1+1,map[m].light|tmp,x*32,y*32,xoff,yoff);					
+					copysprite(map[m].obj1+1,map[m].light|tmp,x*32,y*32,xoff,yoff);
 				}
 
 				if (map[m].obj1 && map[m].x<MAPX_MAX && map[m].y<MAPY_MAX) {
@@ -3214,8 +3221,8 @@ void eng_display(int init)	// optimize me!!!!!
 				if (map[m].flags&UWATER) tmp|=512;
 				if (map[m].flags&BLOODY) tmp|=256;
 
-				if (do_shadow) dd_shadow(map[m].obj2,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff+4);
-				copysprite(map[m].obj2,map[m].light|tmp,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);				
+				if (do_shadow) shadow(map[m].obj2,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff+4);
+				copysprite(map[m].obj2,map[m].light|tmp,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
 
 				if (pl.attack_cn && pl.attack_cn==map[m].ch_nr)
 					copysprite(34,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
@@ -3233,7 +3240,7 @@ void eng_display(int init)	// optimize me!!!!!
 						txtclr = 0;
 					else
 						txtclr = map[m].ch_fontcolor;
-					dd_gputtext(x*32,y*32,txtclr,lookup(map[m].ch_nr,map[m].ch_id),xoff+map[m].obj_xoff,yoff+map[m].obj_yoff-8);
+					gputtext(x*32,y*32,txtclr,lookup(map[m].ch_nr,map[m].ch_id),xoff+map[m].obj_xoff,yoff+map[m].obj_yoff-8);
 				}
 				
 				// Healthbar over characters
@@ -3245,10 +3252,10 @@ void eng_display(int init)	// optimize me!!!!!
 					
 					if (looks[map[m].ch_nr].proz) 
 					{
-						dd_showbar(rx-1,ry-1,HPBAR_WIDTH+2,4,(unsigned short)CHAR_BAR_BL);
-						dd_showbar(rx,ry,HPBAR_WIDTH,2,(unsigned short)CHAR_BAR_RD);
+						showbar(rx-1,ry-1,HPBAR_WIDTH+2,4,(unsigned short)CHAR_BAR_BL);
+						showbar(rx,ry,HPBAR_WIDTH,2,(unsigned short)CHAR_BAR_RD);
 					}
-					dd_showbar(rx,ry,(int)(HPBAR_WIDTH*((float)looks[map[m].ch_nr].proz/100.0)),2,(unsigned short)CHAR_BAR_HP);
+					showbar(rx,ry,(int)(HPBAR_WIDTH*((float)looks[map[m].ch_nr].proz/100.0)),2,(unsigned short)CHAR_BAR_HP);
 				}
 				
 				if (pl.misc_action==DR_DROP && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
@@ -3312,7 +3319,7 @@ void eng_display(int init)	// optimize me!!!!!
 					alpha|=4;
 					alphastr=max((unsigned)alphastr,((map[m].flags&CMAGIC)>>28));
 				}
-				if (alpha) dd_alphaeffect_magic(alpha,alphastr,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+				if (alpha) alphaeffect_magic(alpha,alphastr,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
 			}
 		}
 	} else {
@@ -3344,7 +3351,7 @@ void eng_display(int init)	// optimize me!!!!!
 		if (mapy<0)	mapy=0;
 		if (mapy>MAPY_MAX-((128/max(1,mm_magnify))+1)) mapy=MAPY_MAX-((128/max(1,mm_magnify))+1);
 
-		dd_show_map(xmap,mapx,mapy,max(1,mm_magnify));
+		show_map(xmap,mapx,mapy,max(1,mm_magnify));
 	}
 
 	eng_display_win(plr_sprite,init);
@@ -3540,10 +3547,12 @@ void eng_flip(unsigned int t)
 		} else Sleep(1);
 	} while (t>GetTickCount());
 
-	if (screen_windowed == 1) {
-		dd_flip_windowed();
-	} else {
-		dd_flip();
+	if (DD_ENABLED) {
+		if (screen_windowed == 1) {
+			dd_flip_windowed();
+		} else {
+			dd_flip();
+		}
 	}
 
 	frame++;
@@ -4817,9 +4826,16 @@ void engine(void)
 	// SDL2: Use SDL_GetTicks() for milliseconds since SDL_Init()
 	t=GetTickCount();
 
+
 	while (!quit) 
 	{
 		do_msg();
+		if (SDL_ENABLED) {
+			handle_input();
+			SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
+			SDL_RenderClear(app.renderer);
+		}
+
 		if (wantquit && maynotquit)	maynotquit--;
 
 		if (do_ticker && (ticker&15)==0) cmd1s(CL_CMD_CTICK,ticker);
@@ -4913,9 +4929,11 @@ void engine(void)
 		{
 			eng_display(init);
 			eng_flip(t);
+			//SDL Stuff
+			if (SDL_ENABLED) SDL_RenderPresent(app.renderer);
 			skipinrow=0;
-		} 
-		else 
+		}
+		else
 		{
 			skip++; skipinrow++;
 		}

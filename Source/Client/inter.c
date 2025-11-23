@@ -1365,12 +1365,15 @@ void mouse_mapbox(int x,int y,int state)
 
 	x+=176-16;
 	y+=8;
-	
-	
+
+	// DirectDraw windowed mode needs offset for window chrome
+	// SDL doesn't need this - render area is always the same
+	#if DD_ENABLED
 	if (screen_windowed == 1) {
 		y+=4;
 		x+=4;
 	}
+	#endif
 	
 
 	dist_diff=(screen_renderdist-screen_viewsize)/2;

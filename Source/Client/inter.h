@@ -2,6 +2,8 @@
 #define VERSION 0x000D02
 //
 
+#include "common.h"
+
 #define MAXSPRITE 2000+(128*1024)
 
 //#define MAPX			TILEX
@@ -123,6 +125,7 @@ struct pdata
 };
 
 extern int last_skill;
+extern int selected_char;
 
 extern struct pdata pdata;
 
@@ -229,13 +232,13 @@ struct skilltab
 {
 	int nr;
 	char sortkey;
-	
+
 	char name[40];
 	char desc[200];
-	
+
 	char alt_a[200]; // If something changes the name
 	char alt_b[200]; // If something changes the desc
-	
+
 	int attrib[3];
 };
 
@@ -245,7 +248,7 @@ extern char *at_name[];
 struct wpslist
 {
 	int nr;
-	
+
 	char name[30];
 	char desc[30];
 };
@@ -269,7 +272,33 @@ extern struct sk_tree sk_tree[10][12];
 extern struct sk_icon sk_icon[12];
 
 void say(char *input);
+void cmd(int cmd,int x,int y);
 void cmd1(int cmd,int x);
+void cmd3(int cmd,int x,int y,int z);
 void tlog(char *text,char font);
 void motdlog(char *text,char font);
 void do_msg(void);
+
+extern int gui_inv_up[];
+extern int gui_inv_down[];
+
+extern int gui_skl_up[];
+extern int gui_skl_down[];
+extern int gui_update[];
+extern int gui_skl_pm[];
+extern int gui_skl_names[];
+
+extern int gui_f_col[];
+extern int gui_f_row[];
+
+extern int gui_trash[];
+extern int gui_coin[];
+
+extern int gui_inv_x[];
+extern int gui_inv_y[];
+
+extern int gui_equ_x[];
+extern int gui_equ_y[];
+
+extern int gui_equ_s[];
+extern int gui_hud_b[];

@@ -22,6 +22,8 @@
  * See dd.c for detailed TODO comments on each function.
  */
 
+#include <windows.h>
+
 // Display dimensions (width and height in pixels)
 extern int MAXX,MAXY;
 
@@ -35,20 +37,20 @@ extern int RED,GREEN,BLUE,RGBM,MAXXOVER;
 extern int gamma;
 extern int usedvidmem;
 
-void copysprite(int nr,int effect,int x,int y,int xoff,int yoff);
+void dd_copysprite(int nr,int effect,int x,int y,int xoff,int yoff);
 void dd_flip(void);
 void dd_flip_windowed(void);
 void dd_showbar(int xf,int yf,int xs,int ys,unsigned short col);
-void copyspritex(int nr,int xpos,int ypos,int effect);
+void dd_copyspritex(int nr,int xpos,int ypos,int effect);
 void dd_showbox(int xf,int yf,int xs,int ys,unsigned short col);
 void dd_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff);
-int get_avgcol(int nr);
+int dd_get_avgcol(int nr);
 
 void dd_puttext(int x,int y,int font,char *text);
 void dd_gputc(int xpos,int ypos,int font,int c);
 void dd_gputtext(int xpos,int ypos,int font,char *text,int xoff,int yoff);
 void dd_putc(int xpos,int ypos,char font,int c);
-void dd_xputtext(int x,int y,int font,char *format,...);
+void dd_xputtext(int x,int y,int font,char *format,va_list args);
 
 void dd_show_map(unsigned short *src,int xo,int yo,int magnify);
 void dd_invalidate_alpha(void);
@@ -148,11 +150,21 @@ void dd_ticker(void);
 void restore_palette(void);
 
 /**
- * dd_isvisible - Check if the display window is visible
+ * dd_isvisible - Check if display surfaces are valid and restore if lost
  *
- * Determines whether the game window is currently visible to the user.
+ * DirectDraw surfaces can become "lost" (video memory contents destroyed)
+ * when the application loses focus, minimizes, or display mode changes.
+ * This function checks all three rendering surfaces (sur1, sur2, suro),
+ * attempts to restore lost surfaces, and invalidates sprite cache if needed.
  *
- * Returns: Non-zero if visible, 0 if not visible
+ * Called at the start of each frame (engine.c:show_screen()) to ensure
+ * surfaces are valid before rendering. If restoration fails, rendering is
+ * skipped for that frame to avoid crashes.
+ *
+ * Returns: 1 if all surfaces are valid and ready for rendering
+ *          0 if any surface is lost and could not be restored
+ *
+ * SDL2 equivalent: sdl_isvisible() - checks if window is minimized/hidden
  */
 int dd_isvisible(void);
 

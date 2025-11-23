@@ -33,8 +33,11 @@
 #include <process.h>  // TODO: Use pthread or SDL_thread for cross-platform threading
 #include <signal.h>
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
+#include <SDL2/SDL_mouse.h>
+
 #include "dd.h"
 #include "common.h"
+#include "input.h"
 #include "inter.h"
 #include "render.h"
 //#include "minilzo.h"
@@ -65,6 +68,7 @@ extern int cursor_type;
 // TODO: Modern GCC/MinGW - HCURSOR is Windows-specific
 // SDL2: Use SDL_Cursor* created with SDL_CreateCursor() or SDL_CreateSystemCursor()
 HCURSOR cursor[10];  // TODO: Replace with SDL_Cursor* array
+SDL_Cursor* cursors[10];
 
 void cmd(int cmd,int x,int y);
 
@@ -264,10 +268,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
             return MNC_CLOSE<<16;
 		case WM_SYSKEYDOWN:  // TODO: SDL2: Use SDL_KEYDOWN with KMOD_ALT check
 		case WM_KEYDOWN:  // TODO: SDL2: Use SDL_KEYDOWN, check event.key.keysym.sym
-			switch ((int)wParam) 
+			switch ((int)wParam)
 			{
 				// **************** Ctrl cases for number keys **************** //
-				// -------- CTRL + 1 
+				// -------- CTRL + 1
 				case  49: if (keys>=2) button_command(16); break;
 				// -------- CTRL + 2
 				case  50: if (keys>=2) button_command(17); break;
@@ -277,7 +281,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				case  52: if (keys>=2) button_command(19); break;
 				// -------- CTRL + 5
 				case  53: if (keys>=2) button_command(20); break;
-				
+
 				// **************** Ctrl cases for letter keys **************** //
 				// -------- CTRL + Q
 				case  81: if (keys>=2) button_command(21);break;
@@ -289,7 +293,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				case  82: if (keys>=2) button_command(24);break;
 				// -------- CTRL + T
 				case  84: if (keys>=2) button_command(25);break;
-				
+
 				// -------- CTRL + A
 				case  65: if (keys>=2) button_command(26);break;
 				// -------- CTRL + S
@@ -300,7 +304,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				case  70: if (keys>=2) button_command(29);break;
 				// -------- CTRL + G
 				case  71: if (keys>=2) button_command(30);break;
-				
+
 				// -------- CTRL + Z
 				case  90: if (keys>=2) button_command(31);break;
 				// -------- CTRL + X
@@ -311,72 +315,72 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				case  86: if (keys>=2) button_command(34);break;
 				// -------- CTRL + B
 				case  66: if (keys>=2) button_command(35);break;
-				
-				// -------- ESC
-				case  27: 
-					cmd(CL_CMD_RESET,0,0); 
-					show_shop=0; 
-					show_wps=0; 
+
+				// -------- ESC (SDL: SDLK_ESCAPE)
+				case  27:
+					cmd(CL_CMD_RESET,0,0);
+					show_shop=0;
+					show_wps=0;
 					show_tree=0;
 					show_book=0;
 					show_motd=0;
 					show_newp=0;
 					show_tuto=0;
-					noshop=QSIZE*3; 
-					xmove=xxtimer=0; 
+					noshop=QSIZE*3;
+					xmove=xxtimer=0;
 					break;
 				// **************** F-Key Row 1 **************** //
-				// -------- F1
-				case 112: 
-					cmd(CL_CMD_MODE,2,0); 
+				// -------- F1 (SDL: SDLK_F1)
+				case 112:
+					cmd(CL_CMD_MODE,2,0);
 					break;
-				// -------- F2
-				case 113: 
-					cmd(CL_CMD_MODE,1,0); 
+				// -------- F2 (SDL: SDLK_F2)
+				case 113:
+					cmd(CL_CMD_MODE,1,0);
 					break;
-				// -------- F3
-				case 114: 
-					cmd(CL_CMD_MODE,0,0); 
+				// -------- F3 (SDL: SDLK_F3)
+				case 114:
+					cmd(CL_CMD_MODE,0,0);
 					break;
-				// -------- F4
-				case 115: 
-					pdata.show_proz=1-pdata.show_proz; 
+				// -------- F4 (SDL: SDLK_F4)
+				case 115:
+					pdata.show_proz=1-pdata.show_proz;
 					break;
 				// **************** F-Key Row 2 **************** //
-				// -------- F5
-				case 116: 
-					pdata.show_stats=1-pdata.show_stats; 
-					//else do_alpha++; 
-					//if (do_alpha==3) do_alpha=0; 
-					//dd_invalidate_alpha(); 
+				// -------- F5 (SDL: SDLK_F5)
+				case 116:
+					pdata.show_stats=1-pdata.show_stats;
+					//else do_alpha++;
+					//if (do_alpha==3) do_alpha=0;
+					//dd_invalidate_alpha();
 					break;
-				// -------- F6
-				case 117: 
-					pdata.hide=1-pdata.hide; 
+				// -------- F6 (SDL: SDLK_F6)
+				case 117:
+					pdata.hide=1-pdata.hide;
 					break;
-				// -------- F7
-				case 118: 
-					pdata.show_names=1-pdata.show_names; 
+				// -------- F7 (SDL: SDLK_F7)
+				case 118:
+					pdata.show_names=1-pdata.show_names;
 					break;
-				// -------- F8
-				case 119: 
-					pdata.show_bars=1-pdata.show_bars; 
+				// -------- F8 (SDL: SDLK_F8)
+				case 119:
+					pdata.show_bars=1-pdata.show_bars;
 					break;
 				// **************** F-Key Row 3 **************** //
-				// -------- F9
-				case 120: 
-					dd_savescreen(); 
+				// -------- F9 (SDL: SDLK_F9)
+				case 120:
+					dd_savescreen();
 					break;
-				// -------- F10
-				case 121: 
+				// -------- F10 (SDL: SDLK_F10)
+				case 121:
 					button_command(25);
 					gamma+=250;
 					if (gamma>6000)	gamma=5000;
 					xlog(2,"Set gamma correction to %1.2f",gamma/5000.0);
 					dd_invalidate_cache();
 					break;
-				// -------- F11
-				case 122: 
+				// -------- F11 (SDL: SDLK_F11)
+				case 122:
 					xlog(2," ");
 					xlog(2,"Client Version %d.%02d.%02d",VERSION>>16,(VERSION>>8)&255,VERSION&255);
 					xlog(2,"Server Version %d.%02d.%02d",ser_ver>>16,(ser_ver>>8)&255,ser_ver&255);
@@ -396,23 +400,23 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 
 //                                do_ticker=1-do_ticker;
 					break;
-				// -------- F12
-				case 123: 
+				// -------- F12 (SDL: SDLK_F12)
+				case 123:
 					cmd_exit();
 					break;
-				
-				// -------- Insert
+
+				// -------- Insert (SDL: SDLK_INSERT)
 				case 45:
 					cmd3(CL_CMD_INV,9,1,selected_char);
 					break;
 
 				// **************** Text Editor **************** //
-				// -------- Tab
-				case   9: 
+				// -------- Tab (SDL: SDLK_TAB)
+				case   9:
 					complete_word();
 					break;
-				// -------- Backspace
-				case   8: 
+				// -------- Backspace (SDL: SDLK_BACKSPACE)
+				case   8:
 					if (cur_pos && in_len) {
 						if (tabmode) {
 							in_len=cur_pos; tabmode=0; tabstart=0;
@@ -423,8 +427,8 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 						cur_pos--;
 					}
 					break;
-				// -------- Del
-				case  46: 
+				// -------- Del (SDL: SDLK_DELETE)
+				case  46:
 					if (in_len) {
 						if (tabmode) {
 							in_len=cur_pos; tabmode=0; tabstart=0;
@@ -434,46 +438,51 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 						}
 					}
 					break;
+				// -------- Page Up (SDL: SDLK_PAGEUP)
 				case  33:
-					if (logstart<22*8) 
+					if (logstart<22*8)
 					{
-						logstart+=11; 
+						logstart+=11;
 						if (logstart > 22*8) logstart = 22*8;
 						logtimer=TICKS*30/TICKMULTI;
 					}
 					break;
+				// -------- Page Down (SDL: SDLK_PAGEDOWN)
 				case  34:
-					if (logstart>0) 
+					if (logstart>0)
 					{
-						logstart-=11; 
+						logstart-=11;
 						if (logstart < 0) logstart = 0;
 						logtimer=TICKS*30/TICKMULTI;
 					}
 					break;
-				// -------- Home
+				// -------- Home (SDL: SDLK_HOME)
 				case  36:
-					cur_pos=0; 
-					tabmode=0; 
-					tabstart=0; 
+					cur_pos=0;
+					tabmode=0;
+					tabstart=0;
 					break;
-				// -------- End
+				// -------- End (SDL: SDLK_END)
 				case  35:
-					cur_pos=in_len; 
-					tabmode=0; 
-					tabstart=0; 
+					cur_pos=in_len;
+					tabmode=0;
+					tabstart=0;
 					break;
+				// -------- Left Arrow (SDL: SDLK_LEFT)
 				case  37:
 					if (cur_pos) cur_pos--;
-					tabmode=0; 
+					tabmode=0;
 					tabstart=0;
 					break;
+				// -------- Right Arrow (SDL: SDLK_RIGHT)
 				case  39:
 					if (cur_pos<115) cur_pos++;
-					tabmode=0; 
+					tabmode=0;
 					tabstart=0;
 					break;
+				// -------- Up Arrow (SDL: SDLK_UP)
 				case  38:
-					if (hist_nr<19) 
+					if (hist_nr<19)
 					{
 						memcpy(history[hist_nr],input,128);
 						hist_len[hist_nr]=in_len;
@@ -485,8 +494,9 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 						tabmode=0; tabstart=0;
 					}
 					break;
+				// -------- Down Arrow (SDL: SDLK_DOWN)
 				case  40:
-					if (hist_nr>0) 
+					if (hist_nr>0)
 					{
 						memcpy(history[hist_nr],input,128);
 						hist_len[hist_nr]=in_len;
@@ -503,7 +513,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 			break;
 
 		case WM_CHAR:  // TODO: SDL2: Use SDL_TEXTINPUT for character input (Unicode support)
-			switch ((int)wParam) 
+			switch ((int)wParam)
 			{
 				/*
 				// **************** Ctrl cases for letter keys **************** //
@@ -515,7 +525,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				case   5: if (keys>=2) button_command(22);break;
 				// -------- CTRL + R
 				case  18: if (keys>=2) button_command(23);break;
-				
+
 				// -------- CTRL + A
 				case   1: if (keys>=2) button_command(24);break;
 				// -------- CTRL + S
@@ -524,7 +534,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				case   4: if (keys>=2) button_command(26);break;
 				// -------- CTRL + F
 				case   6: if (keys>=2) button_command(27);break;
-				
+
 				// -------- CTRL + Z
 				case  26: if (keys>=2) button_command(28);break;
 				// -------- CTRL + X
@@ -534,12 +544,12 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 				// -------- CTRL + V
 				case  22: if (keys>=2) button_command(31);break;
 				*/
-				
-				// -------- Return Key
-				case 13: 
+
+				// -------- Return Key (SDL: SDLK_RETURN)
+				case 13:
 					if (in_len==0) break;
 
-					if (tabmode) 
+					if (tabmode)
 					{
 						tabmode=0; tabstart=0;
 						in_len--;
@@ -565,9 +575,9 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 
 				default:
 					// Keys between 32 and 127 are valid typing keys
-					if ((int)wParam>31 && (int)wParam<128 && in_len<115 && keys<2) 
+					if ((int)wParam>31 && (int)wParam<128 && in_len<115 && keys<2)
 					{
-						if (tabmode) 
+						if (tabmode)
 						{
 							if (!isalnum((char)wParam))	in_len--;
 							cur_pos=in_len;
@@ -636,22 +646,22 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 			my = pt.y;
 
 			delta+=(short)(HIWORD(wParam));
-			
+
 			// Scrolling Down
-			while (delta<=-120) {  	
+			while (delta<=-120) {
 
 				//  INVENTORY
-				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1]) 
-				{ 
+				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1])
+				{
 					if (inv_pos<MAXITEMS-30)
-						inv_pos+=10; 
+						inv_pos+=10;
 				}
-				
+
 				//  SKILL LIST
-				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
-				{ 
+				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2])
+				{
 					if (skill_pos<MAXSKILL-10)
-						skill_pos++; 
+						skill_pos++;
 				}
 
 				//  WAYPOINT PAGE - this was defined in multiple places so one more cant hurt!
@@ -662,7 +672,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 							wps_pos++;
 					}
 				}
-				
+
 				// DEPOT PAGE
 				if (show_shop==112) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
@@ -671,34 +681,34 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 							dept_page++;
 					}
 				}
-				
+
 				//	CHAT HISTORY - no good position placement so hardcoding
-				if (mx>973 && mx<1275 && my>6 && my<230) 
-				{ 
-					if (logstart>0) 
+				if (mx>973 && mx<1275 && my>6 && my<230)
+				{
+					if (logstart>0)
 					{
 						logstart-=3; logtimer=TICKS*30/TICKMULTI;
 					}
 				}
-				
+
 				delta+=120;
 			}
-			
+
 			// SCROLLING UP
-			while (delta>=120) { 
+			while (delta>=120) {
 
 				//  INVENTORY
-				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1]) 
-				{ 
-					if (inv_pos> 1)	
-						inv_pos-=10; 
+				if (mx>gui_inv_x[0] && mx<gui_inv_x[1] && my>gui_inv_y[0] && my<gui_inv_y[1])
+				{
+					if (inv_pos> 1)
+						inv_pos-=10;
 				}
-				
+
 				//  SKILL LIST
-				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
-				{ 
+				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2])
+				{
 					if (skill_pos>0)
-						skill_pos--; 
+						skill_pos--;
 				}
 
 				//  WAYPOINT PAGE
@@ -706,10 +716,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
 					{
 						if (wps_pos>0 )
-							wps_pos--; 
+							wps_pos--;
 					}
 				}
-				
+
 				// DEPOT PAGE
 				if (show_shop==112) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
@@ -718,19 +728,19 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LPARAM lPara
 							dept_page--;
 					}
 				}
-				
+
 				//  CHAT HISTORY
-				if (mx>973 && mx<1275 && my>6 && my<230) 
-				{ 
-					if (logstart<22*8) 
+				if (mx>973 && mx<1275 && my>6 && my<230)
+				{
+					if (logstart<22*8)
 					{
-						logstart+=3; 
+						logstart+=3;
 						logtimer=TICKS*30/TICKMULTI;
 					}
 				}
 
 				delta-=120;
-			}			
+			}
 			break;
 
 		default:
@@ -768,8 +778,9 @@ HWND InitWindow(HINSTANCE hInstance,int nCmdShow)
 	// TODO: Modern GCC/MinGW - LoadCursor is Windows-specific
 	// SDL2: Use SDL_CreateSystemCursor() or SDL_CreateCursor()
 	// Example: SDL_Cursor* cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-	for (n=1; n<10; n++)
+	for (n=1; n<10; n++) {
 		cursor[n]=LoadCursor(hInstance,MAKEINTRESOURCE(n));
+	}
 
 	// TODO: Modern GCC/MinGW - WNDCLASS is Windows-specific window class registration
 	// SDL2: Not needed, SDL handles window class internally
@@ -926,15 +937,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HANDLE mutex;  // TODO: Modern GCC/MinGW - Replace with SDL_mutex or file locking
 	char *mutmoa;
 	int tmpi,tmpj = 0;
-	
+
         /* create_pnglib();
 	exit(1); */
 
-	AllocConsole();
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
-	freopen("CONIN$",  "r", stdin);
+	// AllocConsole();
+	// freopen("CONOUT$", "w", stdout);
+	// freopen("CONOUT$", "w", stderr);
+	// freopen("CONIN$",  "r", stdin);
 
+	// This is required for now, when DD isn't loaded we dont set colors...
+	if (!DD_ENABLED && SDL_ENABLED) {
+		RED=0xF800;
+		GREEN=0x07E0;
+		BLUE=0x001F;
+	}
 
 	parse_cmd(lpCmdLine);
 
@@ -994,10 +1011,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	load_options();
 	options();  // Show options dialog BEFORE creating the game window
-	hwnd=InitWindow(hInstance,nCmdShow);
+	if (DD_ENABLED) hwnd=InitWindow(hInstance,nCmdShow);
 
 	init_engine();
-	
+
 	if (quit) exit(0);
 
 	init_sound(hwnd);
@@ -1017,7 +1034,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		}
 	}
 	*/
-	
+
 	if (tmp!=0) {
 
 		sprintf(buf,"|DDERROR=%d",-tmp);
@@ -1047,7 +1064,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     init_xalloc();
 	conv_init();
 	init_pnglib();
-	dd_init_sprites();
+	if (DD_ENABLED) dd_init_sprites();
+	if (SDL_ENABLED) init_input();
 
 	if (RGBM==-1) {
 		sprintf(buf,"|unknown card: R=%04X G=%04X B=%04X",RED,GREEN,BLUE);
@@ -1059,9 +1077,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	engine();
 
 	if (screen_windowed == 1) {
-		dd_deinit_windowed();
+		deinit_windowed();
 	} else {
-		dd_deinit();
+		deinit();
 	}
 
 	if (regxy) regxy(GetCurrentProcess());
