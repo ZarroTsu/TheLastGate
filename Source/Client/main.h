@@ -1,6 +1,10 @@
 ﻿#ifndef THELASTGATE_MAIN_H
 #define THELASTGATE_MAIN_H
 
+#ifdef NDEBUG
+#define printf(...) ((void)0)
+#endif
+
 #include <SDL2/SDL.h>
 
 extern int quit;
@@ -11,7 +15,7 @@ extern int tabmode;
 extern int tabstart;
 extern int logstart;
 extern int logtimer;
-extern int mx,my;
+extern int mx, my;
 
 extern char input[128];
 
@@ -20,9 +24,10 @@ extern char history[20][128];
 extern int hist_nr;
 extern int hist_len[20];
 
-extern SDL_Cursor* cursors[10];
+extern SDL_Cursor *cursors[10];
 
 void complete_word(void);
+
 void add_words(void);
 
 #endif //THELASTGATE_MAIN_H

@@ -22,6 +22,7 @@
  */
 
 // TODO: Modern GCC/MinGW - Replace deprecated headers
+#include "main.h"
 #include <stdio.h>
 #include <malloc.h>
 #include <fcntl.h>
@@ -1000,7 +1001,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	screen_renderdist=RENDERDIST;
 
 	// Default windowed
-	screen_windowed=1;
+	screen_windowed=DD_ENABLED;
 
 	setres_default();
 

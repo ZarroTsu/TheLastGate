@@ -2251,12 +2251,10 @@ void eng_display_win(int plr_sprite,int init)
 		// Display Skill Tree button if applicable - a similar check is required in inter.c
 		if (st_skill_pts_all(pl.tree_points)>0)
 		{
-			// TODO: Modern GCC/MinGW - GetTickCount() for animation timing
-			// SDL2: Use SDL_GetTicks() instead
 			if (st_skill_pts_have(pl.tree_points)>0 && show_tree!=1)
-				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(GetTickCount()%16))*2)));
+				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(SDL_GetTicks()%16))*2)));
 			else if (st_skill_pts_have(pl.os_tree)>0 && show_tree!=2)
-				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(GetTickCount()%16))*2)));
+				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(SDL_GetTicks()%16))*2)));
 			copyspritex(do_darkmode?18004:18002, 339, 179,  0);
 		}
 
@@ -3247,8 +3245,8 @@ void eng_display(int init)	// optimize me!!!!!
 				if (pdata.show_bars && map[m].ch_nr) 
 				{
 					set_look_proz(map[m].ch_nr,map[m].ch_id,map[m].ch_proz);
-					rx=((x*32)/2)+((y*32)/2)+32-HPBAR_WIDTH/2+screen_tilexoff-((screen_renderdist-34)/2*32)+xoff+map[m].obj_xoff;
-					ry=((x*32)/4)-((y*32)/4)+screen_tileyoff-60+yoff+map[m].obj_yoff;
+					rx=((x*32)/2)+((y*32)/2)+32-HPBAR_WIDTH/2+X_OFFSET-((RENDER_DISTANCE-34)/2*32)+xoff+map[m].obj_xoff;
+					ry=((x*32)/4)-((y*32)/4)+Y_OFFSET-60+yoff+map[m].obj_yoff;
 					
 					if (looks[map[m].ch_nr].proz) 
 					{
@@ -3508,6 +3506,7 @@ void init_engine(void)
 // This function should be removed and message handling moved to main()
 void do_msg(void)
 {
+	#if DD_ENABLED
 	// TODO: Modern GCC/MinGW - MSG is Windows-specific message structure
 	// SDL2: Use SDL_Event instead
 	MSG msg;
@@ -3518,6 +3517,7 @@ void do_msg(void)
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	#endif
 }
 
 // TODO: Modern GCC/MinGW - eng_flip uses Windows message loop
@@ -3526,18 +3526,16 @@ void do_msg(void)
 void eng_flip(unsigned int t)
 {
 	int diff;
-	// TODO: Modern GCC/MinGW - MSG is Windows-specific message structure
-	// SDL2: Use SDL_Event instead
-	MSG msg;
 
-	// TODO: Modern GCC/MinGW - GetTickCount is Windows-specific (returns milliseconds)
-	// SDL2: Use SDL_GetTicks() which also returns milliseconds since SDL_Init()
-	diff=t-GetTickCount();
+
+	diff=t-SDL_GetTicks();
 	if (diff>0)	idle+=diff;
 
 	// TODO: Modern GCC/MinGW - Windows message loop with PeekMessage/TranslateMessage/DispatchMessage
 	// SDL2: Replace entire loop with SDL_PollEvent() in main event loop
 	// This message processing should be done in main() not here
+#if DD_ENABLED
+	MSG msg;
 	do {
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE)) {
 			TranslateMessage(&msg);
@@ -3547,13 +3545,15 @@ void eng_flip(unsigned int t)
 		} else Sleep(1);
 	} while (t>GetTickCount());
 
-	if (DD_ENABLED) {
-		if (screen_windowed == 1) {
-			dd_flip_windowed();
-		} else {
-			dd_flip();
-		}
+
+
+	if (screen_windowed == 1) {
+		dd_flip_windowed();
+	} else {
+		dd_flip();
 	}
+
+#endif
 
 	frame++;
 }
@@ -4822,9 +4822,7 @@ void engine(void)
 
 	init_done=1;
 
-	// TODO: Modern GCC/MinGW - GetTickCount is Windows-specific
-	// SDL2: Use SDL_GetTicks() for milliseconds since SDL_Init()
-	t=GetTickCount();
+	t=SDL_GetTicks();
 
 
 	while (!quit) 
@@ -4923,9 +4921,8 @@ void engine(void)
 			show_newp=0;
 			show_tuto=0;
 		}
-		// TODO: Modern GCC/MinGW - GetTickCount is Windows-specific
-		// SDL2: Use SDL_GetTicks() instead
-		if (t>GetTickCount() || skipinrow>100)	// display frame only if we've got enough time
+
+		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
 		{
 			eng_display(init);
 			eng_flip(t);
