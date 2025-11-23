@@ -40,6 +40,7 @@
 #include "input.h"
 #include "inter.h"
 #include "render.h"
+#include "sound.h"
 //#include "minilzo.h"
 
 extern void cmd3(int cmd,int x,int y,int z);
@@ -85,9 +86,6 @@ extern char path[];
 HWND desk_hwnd;      // TODO: Replace with SDL_Window*
 HINSTANCE hinst;     // TODO: Remove - not needed in SDL2
 
-// TODO: Modern GCC/MinGW - init_sound takes HWND parameter (Windows-specific)
-// SDL2: Change signature to init_sound(SDL_Window* window) or init_sound(void)
-int init_sound(HWND hwnd);
 void engine(void);
 
 #define MWORD 2048
@@ -1017,7 +1015,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if (quit) exit(0);
 
-	init_sound(hwnd);
+	init_sound();
 
 	if (screen_windowed == 1) {
 		tmp=init_windowed(hwnd,screen_width,screen_height);
@@ -1085,6 +1083,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (regxy) regxy(GetCurrentProcess());
 
 	save_options();
+
+	cleanup_sound();
 
 	return 0;
 }
