@@ -35,6 +35,7 @@
 #include <windows.h>   // TODO: Remove - not needed for networking
 #include <winsock.h>   // TODO: Replace with <winsock2.h> or POSIX <sys/socket.h>, <netinet/in.h>, <arpa/inet.h>
 #include <zlib.h>
+#include <SDL2/SDL_timer.h>
 
 struct z_stream_s zs;
 
@@ -459,9 +460,7 @@ void so_connect(HWND hwnd)
 		if (tmp==-1) { so_status=0; close(sock); return; }
 	} while (!tmp);
 
-	// TODO: Modern GCC/MinGW - Sleep is Windows-specific (milliseconds)
-	// Cross-platform: Use SDL_Delay(500) or usleep(500000) on POSIX
-	Sleep(500);
+	SDL_Delay(500);
 
 	// TODO: Modern GCC/MinGW - ioctlsocket is Winsock-specific for non-blocking mode
 	// POSIX: Use fcntl() to set O_NONBLOCK flag

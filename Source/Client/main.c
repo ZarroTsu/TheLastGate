@@ -1038,10 +1038,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 		sprintf(buf,"|DDERROR=%d",-tmp);
 		say(buf);
-		// TODO: Modern GCC/MinGW - Sleep is Windows-specific (milliseconds)
-		// Cross-platform: Use SDL_Delay() or usleep() (microseconds) / nanosleep()
-		// Example: SDL_Delay(1000); // milliseconds
-		Sleep(1000);
+		SDL_Delay(1000);
 
 		sprintf(buf,
 				"DirectX init failed with code %d.\n"
