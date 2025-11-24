@@ -22,7 +22,6 @@
  */
 
 // TODO: Modern GCC/MinGW - Replace deprecated headers
-#include "main.h"
 #include <stdio.h>
 #include <malloc.h>
 #include <fcntl.h>
@@ -30,6 +29,7 @@
 #include <stdlib.h>
 #include <windows.h>  // TODO: Replace with SDL2 headers for cross-platform
 #include <windowsx.h> // TODO: May not be needed with SDL2
+#include "main.h"
 #include "ddraw.h"    // TODO: Remove - DirectDraw is deprecated
 #include <process.h>  // TODO: Use pthread or SDL_thread for cross-platform threading
 #include <signal.h>
