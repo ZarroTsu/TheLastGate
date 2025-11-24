@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL_events.h>
 
-#include "dd.h"
+#include "DD.H"
 #include "inter.h"
 #include "main.h"
 #include "socket.h"

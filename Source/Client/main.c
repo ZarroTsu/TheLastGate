@@ -946,7 +946,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// freopen("CONIN$",  "r", stdin);
 
 	// This is required for now, when DD isn't loaded we dont set colors...
-	if (!DD_ENABLED && SDL_ENABLED) {
+	if (SDL_ENABLED) {
 		RED=0xF800;
 		GREEN=0x07E0;
 		BLUE=0x001F;
@@ -1001,7 +1001,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	screen_renderdist=RENDERDIST;
 
 	// Default windowed
-	screen_windowed=DD_ENABLED;
+	screen_windowed=0;
 
 	setres_default();
 
@@ -1010,8 +1010,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	load_options();
 	options();  // Show options dialog BEFORE creating the game window
-	if (DD_ENABLED) hwnd=InitWindow(hInstance,nCmdShow);
-
 	init_engine();
 
 	if (quit) exit(0);
@@ -1060,7 +1058,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     init_xalloc();
 	conv_init();
 	init_pnglib();
-	if (DD_ENABLED) dd_init_sprites();
 	if (SDL_ENABLED) init_input();
 
 	if (RGBM==-1) {

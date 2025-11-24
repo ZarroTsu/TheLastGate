@@ -1461,10 +1461,8 @@ void xsend(unsigned char *buf)
 		ret=send(sock,buf+len,16-len,0);
         if (ret<0) {
 			 if (!non_critical_socket_error()) so_error("transmit buffer overflow");
-			 do_msg();
 			 continue;
 		}
-		if (ret!=16) do_msg();
 		len+=ret;
 	}
 }
@@ -1514,8 +1512,7 @@ int game_loop(void)
 			if (tmp<2) so_error("transmission corrupt");
 			tickstart+=tmp;
 			t_size++;
-		} else break;	        
-		do_msg();
+		} else break;
 	}	
 
 	return 0;	// no more work

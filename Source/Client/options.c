@@ -30,7 +30,6 @@
 #include <dir.h>         // TODO: Replace with <dirent.h> on POSIX
 #include <direct.h>      // MinGW: Provides _getdrive(), _chdrive(), _getcwd()
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
-#include "dd.h"
 #include "common.h"
 #include "inter.h"
 #include "merc.rh"

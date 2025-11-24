@@ -3,7 +3,6 @@
 
 #include <ddraw.h>
 
-#define DD_ENABLED 0
 #define SDL_ENABLED 1
 
 

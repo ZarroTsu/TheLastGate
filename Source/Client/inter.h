@@ -279,7 +279,6 @@ void cmd1(int cmd,int x);
 void cmd3(int cmd,int x,int y,int z);
 void tlog(char *text,char font);
 void motdlog(char *text,char font);
-void do_msg(void);
 
 extern int gui_inv_up[];
 extern int gui_inv_down[];

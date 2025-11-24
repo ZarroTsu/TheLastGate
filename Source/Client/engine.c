@@ -29,7 +29,6 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 
-#include "dd.h"
 #include "common.h"
 #include "input.h"
 #include "inter.h"
@@ -70,8 +69,6 @@ int tput=0;
 
 extern int do_shadow;
 extern int do_darkmode;
-
-void do_msg(void);
 
 // Going to write up the tutorial right here. Unfortunately it takes up a lot of space.
 
@@ -3075,10 +3072,6 @@ void eng_display(int init)	// optimize me!!!!!
 	if (!isvisible()) return;
 
 	mouse(mx,my,0);
-	// TODO: Modern GCC/MinGW - SetCursor is Windows-specific
-	// SDL2: Use SDL_SetCursor() with SDL_Cursor* array
-	// Example: SDL_SetCursor(cursor[cursor_type]);
-	if (DD_ENABLED) SetCursor(cursor[cursor_type]);
 	if (SDL_ENABLED) SDL_SetCursor(cursors[cursor_type]);
 
 	// *******
@@ -3417,7 +3410,6 @@ void tlog(char *text,char font)
 	// This loop moves previous line of text into the next line of text
 	// with line breaks in mind, this arranges the text lines backwards.
 	while (panic++<XLL) {
-		do_msg();
 		memmove(logtext[1],logtext[0],XLL*60-60);
 		memmove(&logfont[1],&logfont[0],XLL-1);
 		memcpy(logtext[0],text,min(60-1,strlen(text)+1));
@@ -3452,8 +3444,6 @@ void motdlog(char *text,char font)
 	// Tracking the text array with currline, this should pass to the next line
 	// this will go until currline exceeds 60. As a failsafe, it then resets to 0.
 	while (panic++<MLL) {
-		do_msg();
-		
 		if (currline>=59) currline=0;
 		
 		memcpy(motdtext[currline],text,min(60-1,strlen(text)+1));
@@ -3502,25 +3492,6 @@ void init_engine(void)
 	eng_init_player();
 }
 
-// TODO: Modern GCC/MinGW - do_msg processes Windows messages
-// SDL2: Replace with SDL_PollEvent() in main loop
-// This function should be removed and message handling moved to main()
-void do_msg(void)
-{
-	#if DD_ENABLED
-	// TODO: Modern GCC/MinGW - MSG is Windows-specific message structure
-	// SDL2: Use SDL_Event instead
-	MSG msg;
-
-	// TODO: Modern GCC/MinGW - Windows message processing
-	// SDL2: Replace with SDL_PollEvent(&event) loop
-	if (PeekMessage(&msg,NULL,0,0,PM_REMOVE)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	#endif
-}
-
 // TODO: Modern GCC/MinGW - eng_flip uses Windows message loop
 // SDL2: Replace with SDL event handling in main loop
 // The Windows message processing should be moved to main() with SDL_PollEvent()
@@ -3531,30 +3502,6 @@ void eng_flip(unsigned int t)
 
 	diff=t-SDL_GetTicks();
 	if (diff>0)	idle+=diff;
-
-	// TODO: Modern GCC/MinGW - Windows message loop with PeekMessage/TranslateMessage/DispatchMessage
-	// SDL2: Replace entire loop with SDL_PollEvent() in main event loop
-	// This message processing should be done in main() not here
-#if DD_ENABLED
-	MSG msg;
-	do {
-		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		// TODO: Modern GCC/MinGW - Sleep is Windows-specific (milliseconds)
-		// SDL2: Use SDL_Delay(1) for 1 millisecond delay
-		} else Sleep(1);
-	} while (t>GetTickCount());
-
-
-
-	if (screen_windowed == 1) {
-		dd_flip_windowed();
-	} else {
-		dd_flip();
-	}
-
-#endif
 
 	frame++;
 }
@@ -4827,7 +4774,6 @@ void engine(void)
 
 	while (!quit) 
 	{
-		do_msg();
 		if (SDL_ENABLED) {
 			handle_input();
 			SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
@@ -4899,7 +4845,6 @@ void engine(void)
 
 		panic=0;
 		do {
-			do_msg();
 			tmp=game_loop();
 			panic++;
 		} while (tmp && panic<8192);
@@ -4907,8 +4852,6 @@ void engine(void)
 		tmp=tick_do();
         if (tmp) init=1;
 		if (do_exit) init=0;
-
-		do_msg();
 
 		if (noshop>0) 
 		{
@@ -4934,8 +4877,6 @@ void engine(void)
 		{
 			skip++; skipinrow++;
 		}
-
-		do_msg();
 
 		if (t_size) tick=TICK*QSIZE/t_size;
 		else tick=TICK;
