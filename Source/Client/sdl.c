@@ -85,7 +85,7 @@ extern void *conv_load(int nr, int *xs, int *ys);
 extern FILE *load_pnglib(int nr);
 
 int sdl_init(void) {
-    const int rendererFlags = SDL_RENDERER_ACCELERATED;
+    const int rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     const int windowFlags = 0;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {

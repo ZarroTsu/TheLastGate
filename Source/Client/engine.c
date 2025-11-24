@@ -4940,6 +4940,13 @@ void engine(void)
 		if (t_size) tick=TICK*QSIZE/t_size;
 		else tick=TICK;
 
+		if (SDL_ENABLED) {
+			int delay = t - SDL_GetTicks();
+			if (delay > 0 && delay < 100) {  // Sanity check: only delay up to 100ms
+				SDL_Delay(delay);
+			}
+		}
+
 		t+=tick; ttime+=tick; xtime+=tick;
 	}
 }
