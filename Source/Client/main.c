@@ -946,11 +946,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// freopen("CONIN$",  "r", stdin);
 
 	// This is required for now, when DD isn't loaded we dont set colors...
-	if (SDL_ENABLED) {
-		RED=0xF800;
-		GREEN=0x07E0;
-		BLUE=0x001F;
-	}
+	RED=0xF800;
+	GREEN=0x07E0;
+	BLUE=0x001F;
+
 
 	parse_cmd(lpCmdLine);
 
@@ -1001,7 +1000,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	screen_renderdist=RENDERDIST;
 
 	// Default windowed
-	screen_windowed=0;
+	screen_windowed=1;
 
 	setres_default();
 
@@ -1016,11 +1015,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	init_sound();
 
-	if (screen_windowed == 1) {
-		tmp=init_windowed(hwnd,screen_width,screen_height);
-	} else {
-		tmp=init(hwnd,screen_width,screen_height);
-	}
+	tmp=init(screen_windowed);
 	/*
 	if (tmp!=0) { // A hacky fix for fullscreen support
 		screen_height=800;
@@ -1058,7 +1053,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     init_xalloc();
 	conv_init();
 	init_pnglib();
-	if (SDL_ENABLED) init_input();
+	init_input();
 
 	if (RGBM==-1) {
 		sprintf(buf,"|unknown card: R=%04X G=%04X B=%04X",RED,GREEN,BLUE);
@@ -1069,11 +1064,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	engine();
 
-	if (screen_windowed == 1) {
-		deinit_windowed();
-	} else {
-		deinit();
-	}
+	deinit();
 
 	if (regxy) regxy(GetCurrentProcess());
 

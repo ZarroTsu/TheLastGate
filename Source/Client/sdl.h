@@ -24,7 +24,7 @@ struct FontCache {
 
 extern App app;
 
-int sdl_init(void);
+int sdl_init(int windowed);
 void sdl_deinit(void);
 void sdl_init_sprites(void);
 void sdl_load_sprite(int nr);

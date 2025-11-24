@@ -84,9 +84,9 @@ extern void *conv_load(int nr, int *xs, int *ys);
 
 extern FILE *load_pnglib(int nr);
 
-int sdl_init(void) {
+int sdl_init(const int windowed) {
     const int rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-    const int windowFlags = 0;
+    const int windowFlags = windowed ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());

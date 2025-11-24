@@ -3072,7 +3072,7 @@ void eng_display(int init)	// optimize me!!!!!
 	if (!isvisible()) return;
 
 	mouse(mx,my,0);
-	if (SDL_ENABLED) SDL_SetCursor(cursors[cursor_type]);
+	SDL_SetCursor(cursors[cursor_type]);
 
 	// *******
 	// * map *
@@ -4774,11 +4774,10 @@ void engine(void)
 
 	while (!quit) 
 	{
-		if (SDL_ENABLED) {
-			handle_input();
-			SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
-			SDL_RenderClear(app.renderer);
-		}
+
+		handle_input();
+		SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
+		SDL_RenderClear(app.renderer);
 
 		if (wantquit && maynotquit)	maynotquit--;
 
@@ -4870,7 +4869,7 @@ void engine(void)
 			eng_display(init);
 			eng_flip(t);
 			//SDL Stuff
-			if (SDL_ENABLED) SDL_RenderPresent(app.renderer);
+			SDL_RenderPresent(app.renderer);
 			skipinrow=0;
 		}
 		else
@@ -4881,12 +4880,12 @@ void engine(void)
 		if (t_size) tick=TICK*QSIZE/t_size;
 		else tick=TICK;
 
-		if (SDL_ENABLED) {
-			int delay = t - SDL_GetTicks();
-			if (delay > 0 && delay < 100) {  // Sanity check: only delay up to 100ms
-				SDL_Delay(delay);
-			}
+
+		int delay = t - SDL_GetTicks();
+		if (delay > 0 && delay < 100) {  // Sanity check: only delay up to 100ms
+			SDL_Delay(delay);
 		}
+
 
 		t+=tick; ttime+=tick; xtime+=tick;
 	}

@@ -3,12 +3,8 @@
 
 #include <ddraw.h>
 
-#define SDL_ENABLED 1
 
-
-int init_windowed(HWND hwnd, int x, int y);
-int init(HWND hwnd, int x, int y);
-void deinit_windowed(void);
+int init(int windowed);
 void deinit(void);
 
 void copysprite(int nr, int effect, int x, int y, int xoff, int yoff);
