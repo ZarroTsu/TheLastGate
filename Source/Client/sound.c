@@ -40,7 +40,12 @@ int play_sound(char *file, int vol, int p) {
     if (!chunk) return -1;
     int channel = Mix_PlayChannel(-1, chunk, 0);
 
-    int sdl_volume = (vol + 10000) * MIX_MAX_VOLUME / 10000;
+    float att = powf(10.0f, vol / 2000.0f);
+    int sdl_volume = (int)(att * MIX_MAX_VOLUME);
+
+    if (sdl_volume < 0) sdl_volume = 0;
+    if (sdl_volume > MIX_MAX_VOLUME) sdl_volume = MIX_MAX_VOLUME;
+
     Mix_Volume(channel, sdl_volume);
 
     Uint8 left, right;
