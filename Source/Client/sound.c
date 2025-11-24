@@ -2,18 +2,29 @@
 
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_audio.h>
+#include <string.h>
 
 
 int domusic = 0;
 int dosound = 1;
 
+// This should be a big enough cache for now.
+#define MAX_CACHED_SOUNDS 64
+typedef struct {
+    char filename[256];
+    Mix_Chunk *chunk;
+} CachedSound;
+
+static CachedSound sound_cache[MAX_CACHED_SOUNDS];
+static int cache_count = 0;
+
 // Track which chunks are playing on which channels for cleanup
 static Mix_Chunk *channel_chunks[10] = {NULL};
 
-// Callback to free sound chunks when they finish playing
+// Callback to clear channel tracking when playback finishes
+// Note: We don't free chunks here because they're cached
 static void channel_finished(int channel) {
-    if (channel >= 0 && channel < 10 && channel_chunks[channel]) {
-        Mix_FreeChunk(channel_chunks[channel]);
+    if (channel >= 0 && channel < 10) {
         channel_chunks[channel] = NULL;
     }
 }
@@ -28,7 +39,35 @@ int init_sound() {
         channel_chunks[i] = NULL;
     }
 
+    cache_count = 0;
+
     return 0;
+}
+
+// Get a sound from cache or load it if not cached
+static Mix_Chunk *get_cached_sound(const char *file) {
+    // Search cache for existing entry
+    for (int i = 0; i < cache_count; i++) {
+        if (strcmp(sound_cache[i].filename, file) == 0) {
+            return sound_cache[i].chunk;
+        }
+    }
+
+    // Not in cache, load it
+    Mix_Chunk *chunk = Mix_LoadWAV(file);
+    if (!chunk) return NULL;
+
+    // Add to cache if there's room
+    if (cache_count < MAX_CACHED_SOUNDS) {
+        strncpy(sound_cache[cache_count].filename, file, sizeof(sound_cache[cache_count].filename) - 1);
+        sound_cache[cache_count].filename[sizeof(sound_cache[cache_count].filename) - 1] = '\0';
+        sound_cache[cache_count].chunk = chunk;
+        cache_count++;
+    }
+    // If cache is full, we still return the chunk but don't cache it
+    // This is a fallback - ideally MAX_CACHED_SOUNDS should be large enough
+
+    return chunk;
 }
 
 void ds_pan_to_sdl_mixer(int pan, Uint8 *l_out, Uint8 *r_out) {
@@ -53,22 +92,17 @@ void ds_pan_to_sdl_mixer(int pan, Uint8 *l_out, Uint8 *r_out) {
 int play_sound(char *file, int vol, int p) {
     if (!dosound) return 0;
 
-    Mix_Chunk *chunk = Mix_LoadWAV(file);
+    // Get sound from cache (or load and cache it)
+    Mix_Chunk *chunk = get_cached_sound(file);
     if (!chunk) return -1;
 
     int channel = Mix_PlayChannel(-1, chunk, 0);
     if (channel < 0) {
-        // Failed to play - free the chunk immediately
-        Mix_FreeChunk(chunk);
         return -1;
     }
 
-    // Track this chunk so it can be freed when playback finishes
+    // Track this chunk for reference (not for freeing, since it's cached)
     if (channel >= 0 && channel < 10) {
-        // Free any previous chunk on this channel (shouldn't happen, but safety first)
-        if (channel_chunks[channel]) {
-            Mix_FreeChunk(channel_chunks[channel]);
-        }
         channel_chunks[channel] = chunk;
     }
 
@@ -90,13 +124,23 @@ int play_sound(char *file, int vol, int p) {
 }
 
 void cleanup_sound(void) {
-    // Stop all channels and free any remaining chunks
+    // Stop all channels
     Mix_HaltChannel(-1);
+
+    // Clear channel tracking
     for (int i = 0; i < 10; i++) {
-        if (channel_chunks[i]) {
-            Mix_FreeChunk(channel_chunks[i]);
-            channel_chunks[i] = NULL;
-        }
+        channel_chunks[i] = NULL;
     }
+
+    // Free all cached sound chunks
+    for (int i = 0; i < cache_count; i++) {
+        if (sound_cache[i].chunk) {
+            Mix_FreeChunk(sound_cache[i].chunk);
+            sound_cache[i].chunk = NULL;
+        }
+        sound_cache[i].filename[0] = '\0';
+    }
+    cache_count = 0;
+
     Mix_CloseAudio();
 }
