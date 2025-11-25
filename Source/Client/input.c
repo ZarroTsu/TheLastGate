@@ -353,6 +353,7 @@ void handle_input(void) {
                             dept_page++;
                         else if (delta > 0 && dept_page > 0)
                             dept_page--;
+                        break;
                     case CHAT_HISTORY:
                         if (delta < 0 && logstart > 0) {
                             logstart -= 3;
@@ -361,6 +362,7 @@ void handle_input(void) {
                             logstart += 3;
                             logtimer = TICKS * 30 / TICKMULTI;
                         }
+                        break;
                     default: break;
                 }
         }
