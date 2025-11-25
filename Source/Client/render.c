@@ -8,7 +8,7 @@
 #include "graphics/loader.h"
 
 int init(const int windowed) {
-    if (!init_image_loader()) return -1;
+    if (init_image_loader() == -1) return -1;
     return sdl_init(windowed);
 }
 
