@@ -28,7 +28,7 @@
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
-#include "glad/include/glad/glad.h"
+#include "external/glad/include/glad/glad.h"
 
 #include "common.h"
 #include "input.h"

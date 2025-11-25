@@ -114,8 +114,8 @@ target_include_directories(TheLastGate PRIVATE
 find_package(OpenGL REQUIRED)
 
 # GLAD
-add_library(glad glad/src/glad.c)
-target_include_directories(glad PUBLIC glad/include)
+add_library(glad external/glad/src/glad.c)
+target_include_directories(glad PUBLIC external/glad/include)
 
 #target_link_libraries(TheLastGate PRIVATE Dbghelp)
 
