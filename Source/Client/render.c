@@ -82,7 +82,7 @@ SDL_Cursor *load_cursor_from_png(const char *filename, int hot_x, int hot_y) {
         return SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
     }
 
-    SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hot_x + 5, hot_y + 5);
+    SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hot_x, hot_y);
     SDL_FreeSurface(surface);
     return cursor;
 }
