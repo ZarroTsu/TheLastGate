@@ -3728,6 +3728,172 @@ int use_corruptor(int cn, int in)
 	return 1;
 }
 
+int use_soulstone_replace_item(int in, int temp)
+{
+	int in2;
+	
+	in2 = god_create_item(temp);
+	
+	if (!god_give_char(in2, cn))
+	{
+		do_char_log(cn, 0, "Your backpack is full.\n");
+		it[in2].used = USE_EMPTY;
+		return 0;
+	}
+	do_char_log(cn, 3, "Your %s was replaced with a %s.\n", it[in].reference, it[in2].reference);
+	
+	use_consume_item(cn, in, 1);
+	
+	return 1;
+}
+
+int use_soulstone_mod_reservation(int in)
+{
+	int in2, n, m;
+	
+	if (it[in].reserve_mp[I_A]) return 0; // This transformation has already been done?
+	
+	in2 = god_create_item(it[in].temp);
+	
+	for (n=0;n<5;n++)
+		if (m=(it[in2].attrib[n][I_I]+  it[in2].attrib[n][I_A])) it[in2].attrib[n][I_A]   = m/2;
+	for (n=0;n<50;n++)
+		if (m=( it[in2].skill[n][I_I]+   it[in2].skill[n][I_A])) it[in2].skill[n][I_A]    = m/2;
+	
+	if (m = (      it[in2].speed[I_I]+      it[in2].speed[I_A])) it[in2].speed[I_A]       = m/2; // Opal
+	if (m = (  it[in2].spell_mod[I_I]+  it[in2].spell_mod[I_A])) it[in2].spell_mod[I_A]   = m/2; // RoPs
+	if (m = (  it[in2].spell_apt[I_I]+  it[in2].spell_apt[I_A])) it[in2].spell_apt[I_A]   = m/2; // Spinel
+	if (m = ( it[in2].cool_bonus[I_I]+ it[in2].cool_bonus[I_A])) it[in2].cool_bonus[I_A]  = m/2; // Sphalerite
+	if (m = (it[in2].crit_chance[I_I]+it[in2].crit_chance[I_A])) it[in2].crit_chance[I_A] = m/2; // Beryl
+	if (m = ( it[in2].crit_multi[I_I]+ it[in2].crit_multi[I_A])) it[in2].crit_multi[I_A]  = m/2; // Citrine
+	if (m = (     it[in2].to_hit[I_I]+     it[in2].to_hit[I_A])) it[in2].to_hit[I_A]      = m/2; // Deceiver
+	if (m = (   it[in2].to_parry[I_I]+   it[in2].to_parry[I_A])) it[in2].to_parry[I_A]    = m/2; // Deceiver
+	if (m = ( it[in2].top_damage[I_I]+ it[in2].top_damage[I_A])) it[in2].top_damage[I_A]  = m/2; // Aquamarine
+	if (m = ( it[in2].gethit_dam[I_I]+ it[in2].gethit_dam[I_A])) it[in2].gethit_dam[I_A]  = m/2; // Zircon
+	if (m = (  it[in2].aoe_bonus[I_I]+  it[in2].aoe_bonus[I_A])) it[in2].aoe_bonus[I_A]   = m/2; // Reach
+	
+	it[in2].flags &= ~(IF_ALWAYSEXP2);
+	it[in2].max_age[I_A] = 0;
+	
+	switch (it[in2].temp)
+	{
+		case IT_RI_SSSA: case IT_RI_SSRU: case IT_RI_SSAM: case IT_RI_SSTO: case IT_RI_SSEM: case IT_RI_SSDI:
+			it[in2].reserve_mp[I_A] = 4; break;
+		
+		case IT_RI_MSSA: case IT_RI_MSRU: case IT_RI_MSAM: case IT_RI_MSTO: case IT_RI_MSEM: case IT_RI_MSDI:
+		case IT_RI_MGSA: case IT_RI_MGRU: case IT_RI_MGAM: case IT_RI_MGTO: case IT_RI_MGEM: case IT_RI_MGDI:
+			it[in2].reserve_mp[I_A] = 8; break;
+		
+		case IT_RI_BSSA: case IT_RI_BSRU: case IT_RI_BSAM: case IT_RI_BSTO: case IT_RI_BSEM:
+		case IT_RI_BSDI: case IT_RI_BSSP: case IT_RI_BSCI: case IT_RI_BSOP: case IT_RI_BSAQ:
+		case IT_RI_BGSA: case IT_RI_BGRU: case IT_RI_BGAM: case IT_RI_BGTO: case IT_RI_BGEM:
+		case IT_RI_BGDI: case IT_RI_BGSP: case IT_RI_BGCI: case IT_RI_BGOP: case IT_RI_BGAQ:
+		case IT_RI_BPSA: case IT_RI_BPRU: case IT_RI_BPAM: case IT_RI_BPTO: case IT_RI_BPEM:
+		case IT_RI_BPDI: case IT_RI_BPSP: case IT_RI_BPCI: case IT_RI_BPOP: case IT_RI_BPAQ:
+			it[in2].reserve_mp[I_A] = 12; break;
+		
+		case IT_RI_HGSA: case IT_RI_HGRU: case IT_RI_HGAM: case IT_RI_HGTO: case IT_RI_HGEM:
+		case IT_RI_HGDI: case IT_RI_HGSP: case IT_RI_HGCI: case IT_RI_HGOP: case IT_RI_HGAQ:
+		case IT_RI_HGBE: case IT_RI_HGZI: case IT_RI_HGPH:
+		case IT_RI_HPSA: case IT_RI_HPRU: case IT_RI_HPAM: case IT_RI_HPTO: case IT_RI_HPEM:
+		case IT_RI_HPDI: case IT_RI_HPSP: case IT_RI_HPCI: case IT_RI_HPOP: case IT_RI_HPAQ:
+		case IT_RI_HPBE: case IT_RI_HPZI: case IT_RI_HPPH:
+			it[in2].reserve_mp[I_A] = 16; break;
+		
+		case IT_RI_FPSA: case IT_RI_FPRU: case IT_RI_FPAM: case IT_RI_FPTO: case IT_RI_FPEM:
+		case IT_RI_FPDI: case IT_RI_FPSP: case IT_RI_FPCI: case IT_RI_FPOP: case IT_RI_FPAQ:
+		case IT_RI_FPBE: case IT_RI_FPZI: case IT_RI_FPPH:
+		case IT_RI_REVO: case IT_RI_REAC: case IT_RI_ROTD:
+			it[in2].reserve_mp[I_A] = 20; break;
+		
+		case IT_RI_ROPS:
+			it[in2].reserve_mp[I_A] = 25; break;
+		
+		default: 
+			it[in2].reserve_mp[I_A] = 10; break;
+	}
+	
+	if (!god_give_char(in2, cn))
+	{
+		do_char_log(cn, 0, "Your backpack is full.\n");
+		it[in2].used = USE_EMPTY;
+		return 0;
+	}
+	do_char_log(cn, 3, "Your %s was changed.\n", it[in].reference);
+	
+	use_consume_item(cn, in, 0);
+	
+	return 1;
+}
+
+int use_soulstone_special(int in)
+{
+	int in2;
+	
+	switch (it[in].temp)
+	{
+		// Gemstone downgrades
+		case IT_M_SA: if (use_soulstone_replace_item(in, IT_S_SA)) return 1; break;
+		case IT_M_RU: if (use_soulstone_replace_item(in, IT_S_RU)) return 1; break;
+		case IT_M_AM: if (use_soulstone_replace_item(in, IT_S_AM)) return 1; break;
+		case IT_M_TO: if (use_soulstone_replace_item(in, IT_S_TO)) return 1; break;
+		case IT_M_EM: if (use_soulstone_replace_item(in, IT_S_EM)) return 1; break;
+		case IT_M_DI: if (use_soulstone_replace_item(in, IT_S_DI)) return 1; break;
+		case IT_B_SA: if (use_soulstone_replace_item(in, IT_M_SA)) return 1; break;
+		case IT_B_RU: if (use_soulstone_replace_item(in, IT_M_RU)) return 1; break;
+		case IT_B_AM: if (use_soulstone_replace_item(in, IT_M_AM)) return 1; break;
+		case IT_B_TO: if (use_soulstone_replace_item(in, IT_M_TO)) return 1; break;
+		case IT_B_EM: if (use_soulstone_replace_item(in, IT_M_EM)) return 1; break;
+		case IT_B_DI: if (use_soulstone_replace_item(in, IT_M_DI)) return 1; break;
+		case IT_H_SA: if (use_soulstone_replace_item(in, IT_B_SA)) return 1; break;
+		case IT_H_RU: if (use_soulstone_replace_item(in, IT_B_RU)) return 1; break;
+		case IT_H_AM: if (use_soulstone_replace_item(in, IT_B_AM)) return 1; break;
+		case IT_H_TO: if (use_soulstone_replace_item(in, IT_B_TO)) return 1; break;
+		case IT_H_EM: if (use_soulstone_replace_item(in, IT_B_EM)) return 1; break;
+		case IT_H_DI: if (use_soulstone_replace_item(in, IT_B_DI)) return 1; break;
+		case IT_H_SP: if (use_soulstone_replace_item(in, IT_B_SP)) return 1; break;
+		case IT_H_CI: if (use_soulstone_replace_item(in, IT_B_CI)) return 1; break;
+		case IT_H_OP: if (use_soulstone_replace_item(in, IT_B_OP)) return 1; break;
+		case IT_H_AQ: if (use_soulstone_replace_item(in, IT_B_AQ)) return 1; break;
+		case IT_F_SA: if (use_soulstone_replace_item(in, IT_H_SA)) return 1; break;
+		case IT_F_RU: if (use_soulstone_replace_item(in, IT_H_RU)) return 1; break;
+		case IT_F_AM: if (use_soulstone_replace_item(in, IT_H_AM)) return 1; break;
+		case IT_F_TO: if (use_soulstone_replace_item(in, IT_H_TO)) return 1; break;
+		case IT_F_EM: if (use_soulstone_replace_item(in, IT_H_EM)) return 1; break;
+		case IT_F_DI: if (use_soulstone_replace_item(in, IT_H_DI)) return 1; break;
+		case IT_F_SP: if (use_soulstone_replace_item(in, IT_H_SP)) return 1; break;
+		case IT_F_CI: if (use_soulstone_replace_item(in, IT_H_CI)) return 1; break;
+		case IT_F_OP: if (use_soulstone_replace_item(in, IT_H_OP)) return 1; break;
+		case IT_F_AQ: if (use_soulstone_replace_item(in, IT_H_AQ)) return 1; break;
+		case IT_F_BE: if (use_soulstone_replace_item(in, IT_H_BE)) return 1; break;
+		case IT_F_ZI: if (use_soulstone_replace_item(in, IT_H_ZI)) return 1; break;
+		case IT_F_PH: if (use_soulstone_replace_item(in, IT_H_PH)) return 1; break;
+		
+		// Convert rings into reservation
+		case IT_RI_SSSA: case IT_RI_SSRU: case IT_RI_SSAM: case IT_RI_SSTO: case IT_RI_SSEM: case IT_RI_SSDI:
+		case IT_RI_MSSA: case IT_RI_MSRU: case IT_RI_MSAM: case IT_RI_MSTO: case IT_RI_MSEM: case IT_RI_MSDI:
+		case IT_RI_BSSA: case IT_RI_BSRU: case IT_RI_BSAM: case IT_RI_BSTO: case IT_RI_BSEM: case IT_RI_BSDI: 
+		case IT_RI_BSSP: case IT_RI_BSCI: case IT_RI_BSOP: case IT_RI_BSAQ: case IT_RI_MGSA: case IT_RI_MGRU: 
+		case IT_RI_MGAM: case IT_RI_MGTO: case IT_RI_MGEM: case IT_RI_MGDI: case IT_RI_BGSA: case IT_RI_BGRU: 
+		case IT_RI_BGAM: case IT_RI_BGTO: case IT_RI_BGEM: case IT_RI_BGDI: case IT_RI_BGSP: case IT_RI_BGCI: 
+		case IT_RI_BGOP: case IT_RI_BGAQ: case IT_RI_HGSA: case IT_RI_HGRU: case IT_RI_HGAM: case IT_RI_HGTO: 
+		case IT_RI_HGEM: case IT_RI_HGDI: case IT_RI_HGSP: case IT_RI_HGCI: case IT_RI_HGOP: case IT_RI_HGAQ: 
+		case IT_RI_HGBE: case IT_RI_HGZI: case IT_RI_HGPH: case IT_RI_BPSA: case IT_RI_BPRU: case IT_RI_BPAM: 
+		case IT_RI_BPTO: case IT_RI_BPEM: case IT_RI_BPDI: case IT_RI_BPSP: case IT_RI_BPCI: case IT_RI_BPOP: 
+		case IT_RI_BPAQ: case IT_RI_HPSA: case IT_RI_HPRU: case IT_RI_HPAM: case IT_RI_HPTO: case IT_RI_HPEM: 
+		case IT_RI_HPDI: case IT_RI_HPSP: case IT_RI_HPCI: case IT_RI_HPOP: case IT_RI_HPAQ: case IT_RI_HPBE: 
+		case IT_RI_HPZI: case IT_RI_HPPH: case IT_RI_FPSA: case IT_RI_FPRU: case IT_RI_FPAM: case IT_RI_FPTO: 
+		case IT_RI_FPEM: case IT_RI_FPDI: case IT_RI_FPSP: case IT_RI_FPCI: case IT_RI_FPOP: case IT_RI_FPAQ: 
+		case IT_RI_FPBE: case IT_RI_FPZI: case IT_RI_FPPH: case IT_RI_GLOW: case IT_RI_REVO: case IT_RI_REAC: 
+		case IT_RI_ROPS: case IT_RI_ROTD: case IT_TORCH:
+			if (use_soulstone_mod_reservation(in)) return 1;
+			break;
+		//
+		default: break;
+	}
+	return 0;
+}
+
 int use_soulstone(int cn, int in, int in2)
 {
 	int rank, c, t, n, m;
@@ -3755,6 +3921,12 @@ int use_soulstone(int cn, int in, int in2)
 	
 	if (CAN_SOULSTONE(in2))
 		return apply_new_ss(cn, in2, in, 1);
+	
+	if (use_soulstone_special(in2))
+	{
+		use_consume_item(cn, in, 0);
+		return 1;
+	}
 	
 	do_char_log(cn, 1, "Nothing happened.\n");
 	return 0;

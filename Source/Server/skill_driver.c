@@ -5112,7 +5112,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	else if (shadowcopy)	// Grant extra skills based on sprite
 	{
 		ch[cc].skill[SK_MEDIT][2]   = 90; ch[cc].skill[SK_MEDIT][3]   = 6;
-		ch[cc].skill[SK_SAFEGRD][2] = 75; ch[cc].skill[SK_SAFEGRD][3] = 7;
+		ch[cc].skill[SK_FINESSE][2] = 75; ch[cc].skill[SK_FINESSE][3] = 7;
 		ch[cc].mana[2] = ch[cc].hp[2];
 		if (necronomicon)
 		{

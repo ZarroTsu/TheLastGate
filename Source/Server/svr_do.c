@@ -7662,17 +7662,12 @@ int get_combat_skill(int cn, int skill[50], int flag)
 	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4)
 		cn = co;
 	
-	if (flag)	power = min(C_AT_CAP(cn, 5), skill[SK_DUAL]);
-	else		power = min(C_AT_CAP(cn, 5), skill[SK_SHIELD]);
+	if (flag) power = min(C_AT_CAP(cn, 5), skill[SK_DUAL]);
+	else      power = min(C_AT_CAP(cn, 5), skill[SK_SHIELD]);
 	
-	if (IS_PLAYER(cn))
-	{
-		if (IS_SEYAN_DU(cn) || IS_ANY_MERC(cn) || IS_BRAVER(cn))	bonus = power / 6;
-		else if (!flag && T_ARTM_SK(cn, 12))						bonus = power / 8 + power /16;
-		else														bonus = power / 8;
-	}
-	else															bonus = power /10;
-
+	if (!flag && T_ARTM_SK(cn, 12)) bonus = power / 4 + power / 8;
+	else                            bonus = power / 4;
+	
 	return bonus;
 }
 int get_offhand_skill(int cn, int skill[50], int flag)
@@ -7699,8 +7694,8 @@ int get_offhand_skill(int cn, int skill[50], int flag)
 	}
 	
 	// No Gear? No bonus
-	if (!in  || (flag 	&& !(it[in].flags & IF_OF_DUALSW ) && !(it[in].flags & IF_WP_DAGGER )) || 
-				(!flag 	&& !(it[in].flags & IF_OF_SHIELD ) && !(it[in].temp==IT_WP_QUICKSILV))  )
+	if (!in || (flag  && !(it[in].flags & IF_OF_DUALSW ) && !(it[in].flags & IF_WP_DAGGER )) || 
+		       (!flag && !(it[in].flags & IF_OF_SHIELD ) && !(it[in].temp==IT_WP_QUICKSILV))  )
 	{
 		return n;
 	}
@@ -12378,15 +12373,21 @@ void really_update_char(int cn)
 		z = M_SK(cn, SK_TACTICS);
 		
 		// Tarot - Moon.R :: 1% increased effect of tactics per 50 uncapped mana
-		if (do_get_iflag(cn, SF_MOON_R))
-			z = z + z * ch[cn].mana[4] / 5000;
+		if (do_get_iflag(cn, SF_MOON_R)) z = z + z * ch[cn].mana[4] / 5000;
 		
-		// (ch[cn].mana[5]+1) = 1000 at 999/999
+		hit_rate   += max(0, z/6);
+		parry_rate += max(0, z/6);
+	}
+	// Tactics for GCs
+	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && B_SK(co, SK_TACTICS))
+	{
+		z = M_SK(co, SK_TACTICS);
 		
-		z = z * (ch[cn].mana[5]+1) / 10000;
+		// Tarot - Moon.R :: 1% increased effect of tactics per 50 uncapped mana
+		if (do_get_iflag(co, SF_MOON_R)) z = z + z * ch[co].mana[4] / 5000;
 		
-		hit_rate   += max(0, z);
-		parry_rate += max(0, z);
+		hit_rate   += max(0, z/6);
+		parry_rate += max(0, z/6);
 	}
 	
 	// Finesse
@@ -13543,7 +13544,7 @@ void do_update_permaspells(int cn)
 					else
 						bu[in].dmg_bonus  = min(127, power/15);
 					
-					bu[in].power 	         = power;
+					bu[in].power          = power;
 					bu[in].weapon         = weapon;
 					bu[in].armor          = armor;
 					bu[in].cool_bonus     = min(127, power/4 + 1);
@@ -13552,31 +13553,27 @@ void do_update_permaspells(int cn)
 					power = M_SK(cn, SK_RAGE);
 					power = skill_multiplier(power, cn);
 					bu[in].power = power; power = power + (power * tmp / 5000);
-					if (IS_SEYAN_DU(cn))
-					{
-						bu[in].top_damage 	= min(127, power/ 6 + 5);
-						bu[in].data[4]			= power/3;
-					}
+					
+					bu[in].top_damage = min(127, power/ 4 + 5);
+					bu[in].data[4]    = power/2;
+					
+					if (do_get_iflag(cn, SF_HERMIT_R))
+						bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
 					else
-					{
-						bu[in].top_damage 	= min(127, power/ 4 + 5);
-						bu[in].data[4]			= power/2;
-					}
+						bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
 					break;
 				case SK_CALM:
 					power = M_SK(cn, SK_RAGE);
 					power = skill_multiplier(power, cn);
-					bu[in].power = power; power = power + (power * tmp / 4000);
-					if (IS_SEYAN_DU(cn))
-					{
-						bu[in].data[3] 			= min(127, power/ 6 + 5);
-						bu[in].data[4]			= power/3;
-					}
+					bu[in].power   = power; power = power + (power * tmp / 4000);
+					
+					bu[in].data[3] = min(127, power/ 4 + 5);
+					bu[in].data[4] = power/2;
+					
+					if (do_get_iflag(cn, SF_HERMIT_R))
+						bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
 					else
-					{
-						bu[in].data[3] 			= min(127, power/ 4 + 5);
-						bu[in].data[4]			= power/2;
-					}
+						bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
 					break;
 				case SK_LETHARGY:
 					power = M_SK(cn, SK_LETHARGY);
@@ -13584,6 +13581,11 @@ void do_update_permaspells(int cn)
 					if (tmp=st_skillcount(cn, 55)) power = power + (power * M_AT(cn, AT_WIL)*tmp/5000);
 					power = spell_multiplier(power, cn);
 					bu[in].power = power;
+					
+					if (do_get_iflag(cn, SF_EMPRES_R))
+						bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
+					else
+						bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
 					break;
 				case SK_IMMOLATE:
 					power = ch[cn].hp[4] * 30 / 100;

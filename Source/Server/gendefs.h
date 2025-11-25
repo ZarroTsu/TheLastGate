@@ -652,7 +652,7 @@ extern char *at_name[];
 #define DESC_FOOL_R			"When equipped, your attributes become the average of all attributes, plus 8%%.\n"
 #define DESC_MAGI_R			"When equipped, your Economize skill no longer reduces the Mana cost of skills, and instead increases your Cooldown rate.\n"
 #define DESC_PREIST_R		"When equipped, your Magic Shield and Magic Shell are now passive and regenerate quickly, but are more fragile. You cannot gain Magic Shield or Magic Shell from other sources.\n"
-#define DESC_EMPRES_R		"When equipped, your Lethargy skill costs life over time instead of mana over time.\n"
+#define DESC_EMPRES_R		"When equipped, your Lethargy skill reserves life instead of mana.\n"
 #define DESC_EMPERO_R		"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
 #define DESC_HEIROP_R		"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R		"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"

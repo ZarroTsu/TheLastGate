@@ -905,6 +905,112 @@
 #define IT_E_MA			1466
 #define IT_E_AN			2695
 
+// ---- Items for Soulstone Interactions ----
+
+#define IT_TORCH		  91
+
+#define IT_RI_SSSA		1378
+#define IT_RI_SSRU		1379
+#define IT_RI_SSAM		1380
+#define IT_RI_SSTO		1381
+#define IT_RI_SSEM		1382
+#define IT_RI_SSDI		1383
+
+#define IT_RI_MSSA		1384
+#define IT_RI_MSRU		1385
+#define IT_RI_MSAM		1386
+#define IT_RI_MSTO		1387
+#define IT_RI_MSEM		1388
+#define IT_RI_MSDI		1389
+
+#define IT_RI_BSSA		1390
+#define IT_RI_BSRU		1391
+#define IT_RI_BSAM		1392
+#define IT_RI_BSTO		1393
+#define IT_RI_BSEM		1394
+#define IT_RI_BSDI		1395
+#define IT_RI_BSSP		2073
+#define IT_RI_BSCI		2074
+#define IT_RI_BSOP		2075
+#define IT_RI_BSAQ		2076
+
+#define IT_RI_MGSA		1396
+#define IT_RI_MGRU		1397
+#define IT_RI_MGAM		1398
+#define IT_RI_MGTO		1399
+#define IT_RI_MGEM		1400
+#define IT_RI_MGDI		1401
+
+#define IT_RI_BGSA		1402
+#define IT_RI_BGRU		1403
+#define IT_RI_BGAM		1404
+#define IT_RI_BGTO		1405
+#define IT_RI_BGEM		1406
+#define IT_RI_BGDI		1407
+#define IT_RI_BGSP		2077
+#define IT_RI_BGCI		2078
+#define IT_RI_BGOP		2079
+#define IT_RI_BGAQ		2080
+
+#define IT_RI_HGSA		1408
+#define IT_RI_HGRU		1409
+#define IT_RI_HGAM		1410
+#define IT_RI_HGTO		1411
+#define IT_RI_HGEM		1412
+#define IT_RI_HGDI		1413
+#define IT_RI_HGSP		2081
+#define IT_RI_HGCI		2082
+#define IT_RI_HGOP		2083
+#define IT_RI_HGAQ		2084
+#define IT_RI_HGBE		2085
+#define IT_RI_HGZI		2086
+#define IT_RI_HGPH		2689
+
+#define IT_RI_BPSA		1414
+#define IT_RI_BPRU		1415
+#define IT_RI_BPAM		1416
+#define IT_RI_BPTO		1417
+#define IT_RI_BPEM		1418
+#define IT_RI_BPDI		1419
+#define IT_RI_BPSP		2087
+#define IT_RI_BPCI		2088
+#define IT_RI_BPOP		2089
+#define IT_RI_BPAQ		2090
+
+#define IT_RI_HPSA		1420
+#define IT_RI_HPRU		1421
+#define IT_RI_HPAM		1422
+#define IT_RI_HPTO		1423
+#define IT_RI_HPEM		1424
+#define IT_RI_HPDI		1425
+#define IT_RI_HPSP		2091
+#define IT_RI_HPCI		2092
+#define IT_RI_HPOP		2093
+#define IT_RI_HPAQ		2094
+#define IT_RI_HPBE		2095
+#define IT_RI_HPZI		2096
+#define IT_RI_HPPH		2690
+
+#define IT_RI_FPSA		1426
+#define IT_RI_FPRU		1427
+#define IT_RI_FPAM		1428
+#define IT_RI_FPTO		1429
+#define IT_RI_FPEM		1430
+#define IT_RI_FPDI		1431
+#define IT_RI_FPSP		2097
+#define IT_RI_FPCI		2098
+#define IT_RI_FPOP		2099
+#define IT_RI_FPAQ		2100
+#define IT_RI_FPBE		2101
+#define IT_RI_FPZI		2102
+#define IT_RI_FPPH		2691
+
+#define IT_RI_GLOW		1272
+#define IT_RI_REVO		2381
+#define IT_RI_REAC		2399
+#define IT_RI_ROPS		1201
+#define IT_RI_ROTD		2103
+
 // -----
 
 #define IT_GAXE_STEL	 292
