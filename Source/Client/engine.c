@@ -55,6 +55,7 @@ extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 //extern int screen_overlay_sprite;
 extern short screen_windowed;
 extern short screen_renderdist;
+extern int screen_target_fps;
 
 char *lookup(int nr,unsigned short id);
 
@@ -4762,7 +4763,7 @@ const double target_frame_time = 1.0 / target_fps;
 
 void engine(void)
 {
-	int tmp,tick,init=0;
+	int tmp,tick=TICK,init=0;
 	int step=0,skip=0,lookstep=0,optstep=0,skipinrow=0,n,panic,xtimer=0,autosort=0;
 	extern int cmd_count,tick_count;
 	unsigned int t;
@@ -4907,6 +4908,8 @@ void engine(void)
 		uint64_t frame_end = SDL_GetPerformanceCounter();
 		double elapsed = (double)(frame_end - frame_start) / frequency;
 
+		// Use configurable FPS target
+		double target_frame_time = 1.0 / (double)screen_target_fps;
 		if (elapsed < target_frame_time) {
 			double remaining = target_frame_time - elapsed;
 			SDL_Delay((Uint32)(remaining * 1000.0));

@@ -61,6 +61,7 @@ int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsi
 int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
 short screen_windowed;
 short screen_renderdist;
+int screen_target_fps = 48;  // Configurable FPS target (default 120)
 
 void dd_invalidate_cache(void);
 void conv_init(void);

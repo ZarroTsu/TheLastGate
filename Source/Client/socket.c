@@ -1555,10 +1555,10 @@ int tick_do(void)
 
 	td=time(NULL)-t;
 	if (!td) td=1;
-        
+
 	lastn=-1;	// reset sv_setmap
 	ctick++; if (ctick>199) ctick=0;		// Feb 2020 - extended ctick array from 20 to 24 to 200
-	
+
         while (idx<csize) {
 		ret=sv_cmd(buf+idx);
 		if (ret==-1) { xlog(1,"Warning: syntax error in server data"); DEBUG("Warning: syntax error in server data"); exit(1); }
