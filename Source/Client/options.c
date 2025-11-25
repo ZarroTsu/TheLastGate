@@ -156,6 +156,8 @@ void translate_okey2race(int *race_ptr,int *sex_ptr)
 		
 		case  2: race=11; sex=1; break;	// braver M
 		case  3: race=11; sex=2; break;	// braver F
+
+		case 1554: race=12; sex=1; break;
 		
 		default: race=0; sex=0; break;
 	}
@@ -525,6 +527,7 @@ void update_race(HWND hwnd)
 		if (race==9)  SetDlgItemText(hwnd,IDC_ARCH,"Summoner");
 		if (race==10) SetDlgItemText(hwnd,IDC_ARCH,"Arch-Harakim");
 		if (race==11) SetDlgItemText(hwnd,IDC_ARCH,"Braver");
+		if (race==12) SetDlgItemText(hwnd, IDC_ARCH, "Lycanthrope");
 	}
 
 	if (sex==1)   CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_MALE);
