@@ -3832,6 +3832,14 @@ int use_soulstone_special(int in)
 	
 	switch (it[in].temp)
 	{
+		// Impromptu Ring Creation
+		case IT_S_SA: if (use_soulstone_replace_item(in, IT_RI_SSSA)) return 1; break;
+		case IT_S_RU: if (use_soulstone_replace_item(in, IT_RI_SSRU)) return 1; break;
+		case IT_S_AM: if (use_soulstone_replace_item(in, IT_RI_SSAM)) return 1; break;
+		case IT_S_TO: if (use_soulstone_replace_item(in, IT_RI_SSTO)) return 1; break;
+		case IT_S_EM: if (use_soulstone_replace_item(in, IT_RI_SSEM)) return 1; break;
+		case IT_S_DI: if (use_soulstone_replace_item(in, IT_RI_SSDI)) return 1; break;
+		
 		// Gemstone downgrades
 		case IT_M_SA: if (use_soulstone_replace_item(in, IT_S_SA)) return 1; break;
 		case IT_M_RU: if (use_soulstone_replace_item(in, IT_S_RU)) return 1; break;
