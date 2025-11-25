@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "../dd.h"
+#include "../log.h"
 
 unsigned int tile_atlas;
 
@@ -10,7 +11,7 @@ AtlasCursor atlas_cursor = {0, 0, 0};
 
 void init_atlas(void) {
     if (tile_atlas) {
-        printf("Tile atlas already initialized\n");
+        LOG("Tile atlas already initialized\n");
         return;
     }
 
@@ -27,11 +28,11 @@ void init_atlas(void) {
 
 unsigned int add_to_atlas(SpriteData *sprite_data) {
     if (sprite_data->loaded_in_atlas) {
-        printf("Sprite already loaded into atlas.\n");
+        LOG("Sprite already loaded into atlas.\n");
         return tile_atlas;
     }
 
-    printf("Surface format: %s\n",
+    LOG("Surface format: %s\n",
     SDL_GetPixelFormatName(sprite_data->surface->format->format));
 
     int w = sprite_data->surface->w;
@@ -46,9 +47,9 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
 
     // Check for vertical overflow
     if (atlas_cursor.y + h > ATLAS_SIZE_Y) {
-        printf("ERROR: Atlas overflow! Sprite %dx%d won't fit at position (%d, %d)\n",
+        LOG("ERROR: Atlas overflow! Sprite %dx%d won't fit at position (%d, %d)\n",
                w, h, atlas_cursor.x, atlas_cursor.y);
-        printf("Atlas cursor: x=%d, y=%d, row_height=%d\n",
+        LOG("Atlas cursor: x=%d, y=%d, row_height=%d\n",
                atlas_cursor.x, atlas_cursor.y, atlas_cursor.row_height);
         exit(1); // TODO: Gracefully die, but for now if this happens there is a big problem.
         return 0;
@@ -67,7 +68,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
     // Check for OpenGL errors
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        printf("ERROR: OpenGL error during glTexSubImage2D: 0x%x\n", err);
+        LOG("ERROR: OpenGL error during glTexSubImage2D: 0x%x\n", err);
         return 0;
     }
 
@@ -77,7 +78,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
         (ay + h) / (float) ATLAS_SIZE_Y
     };
 
-    printf("Added sprite to atlas at (%d, %d), size %dx%d, UV: (%.4f, %.4f) to (%.4f, %.4f)\n",
+    LOG("Added sprite to atlas at (%d, %d), size %dx%d, UV: (%.4f, %.4f) to (%.4f, %.4f)\n",
            ax, ay, w, h, sprite_data->uv0.u, sprite_data->uv0.v,
            sprite_data->uv1.u, sprite_data->uv1.v);
 

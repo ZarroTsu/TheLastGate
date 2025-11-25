@@ -37,6 +37,7 @@
 #include <zlib.h>
 #include <SDL2/SDL_timer.h>
 
+#include "input.h"
 #include "render.h"
 
 struct z_stream_s zs;
@@ -1514,7 +1515,8 @@ int game_loop(void)
 			tickstart+=tmp;
 			t_size++;
 		} else break;
-	}	
+		handle_input();
+	}
 
 	return 0;	// no more work
 }

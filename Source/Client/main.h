@@ -1,10 +1,6 @@
 ﻿#ifndef THELASTGATE_MAIN_H
 #define THELASTGATE_MAIN_H
 
-#ifdef NDEBUG
-#define printf(...) ((void)0)
-#endif
-
 #include <SDL2/SDL.h>
 
 extern int quit;

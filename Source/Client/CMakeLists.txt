@@ -30,6 +30,7 @@ add_executable(TheLastGate WIN32
         socket.h
         sound.c
         sound.h
+        log.h
 )
 
 # Set Windows subsystem to GUI (uses WinMain instead of main)

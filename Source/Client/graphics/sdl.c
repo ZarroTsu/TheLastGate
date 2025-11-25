@@ -16,6 +16,7 @@
 #include "sprite_data.h"
 #include "glad/glad.h"
 #include "shaders.h"
+#include "../log.h"
 
 App app;
 
@@ -93,7 +94,7 @@ int sdl_init(const int windowed) {
     const int windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | (!windowed ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+        LOG("Couldn't initialize SDL: %s\n", SDL_GetError());
         return -1;
     }
 
@@ -107,14 +108,14 @@ int sdl_init(const int windowed) {
                                   SCREEN_HEIGHT, windowFlags);
 
     if (!app.window) {
-        printf("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
+        LOG("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
         return -1;
     }
 
     // Create OpenGL context
     app.gl_context = SDL_GL_CreateContext(app.window);
     if (!app.gl_context) {
-        printf("Failed to create OpenGL context: %s\n", SDL_GetError());
+        LOG("Failed to create OpenGL context: %s\n", SDL_GetError());
         return -1;
     }
 
@@ -122,11 +123,11 @@ int sdl_init(const int windowed) {
 
     // Load OpenGL functions with GLAD
     if (!gladLoadGL()) {
-        printf("Failed to load OpenGL functions with GLAD\n");
+        LOG("Failed to load OpenGL functions with GLAD\n");
         return -1;
     }
 
-    printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
+    LOG("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // Disable vsync - let game's internal frame limiter handle timing
     // VSync at 60 FPS conflicts with game's target FPS, causing frame skip issues
@@ -141,7 +142,7 @@ int sdl_init(const int windowed) {
     // Load gamma correction shader
     gamma_shader = load_program("shaders/gamma.vert", "shaders/gamma.frag");
     if (!gamma_shader) {
-        printf("Failed to load gamma shader\n");
+        LOG("Failed to load gamma shader\n");
         return -1;
     }
 
@@ -165,13 +166,13 @@ int sdl_init(const int windowed) {
     gamma_uUseInstancing = glGetUniformLocation(gamma_shader, "uUseInstancing");
     gamma_uModel = glGetUniformLocation(gamma_shader, "uModel");
 
-    printf("Cached gamma shader uniform locations: proj=%d, model=%d, tex=%d, gamma=%d, instancing=%d\n",
+    LOG("Cached gamma shader uniform locations: proj=%d, model=%d, tex=%d, gamma=%d, instancing=%d\n",
            gamma_uProjection, gamma_uModel, gamma_uTexture, gamma_uGammaScale, gamma_uUseInstancing);
 
     // Load solid color shader for UI primitives (boxes, bars)
     solid_shader = load_program("shaders/solid.vert", "shaders/solid.frag");
     if (!solid_shader) {
-        printf("Failed to load solid color shader\n");
+        LOG("Failed to load solid color shader\n");
         return -1;
     }
 
@@ -179,7 +180,7 @@ int sdl_init(const int windowed) {
     solid_uProjection = glGetUniformLocation(solid_shader, "uProjection");
     solid_uModel = glGetUniformLocation(solid_shader, "uModel");
     solid_uColor = glGetUniformLocation(solid_shader, "uColor");
-    printf("Cached solid shader uniform locations: proj=%d, model=%d, color=%d\n",
+    LOG("Cached solid shader uniform locations: proj=%d, model=%d, color=%d\n",
            solid_uProjection, solid_uModel, solid_uColor);
 
     // Create VAO/VBO for sprite quad rendering
@@ -214,12 +215,12 @@ int sdl_init(const int windowed) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    printf("OpenGL quad VAO/VBO created\n");
+    LOG("OpenGL quad VAO/VBO created\n");
 
     // Allocate CPU-side batch buffer
     app.batch_buffer = malloc(MAX_BATCH_SIZE * sizeof(SpriteInstance));
     if (!app.batch_buffer) {
-        printf("Failed to allocate batch buffer\n");
+        LOG("Failed to allocate batch buffer\n");
         return -1;
     }
     app.batch_count = 0;
@@ -280,7 +281,7 @@ int sdl_init(const int windowed) {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    printf("Sprite batch system initialized (max %d sprites per batch)\n", MAX_BATCH_SIZE);
+    LOG("Sprite batch system initialized (max %d sprites per batch)\n", MAX_BATCH_SIZE);
 
     init_atlas();
 
@@ -352,7 +353,7 @@ void sdl_init_sprites(void) {
     if (!sprite_data) {
         sprite_data = calloc(MAX_SPRITES, sizeof(SpriteData));
         if (!sprite_data) {
-            printf("Failed to allocate sprite table\n");
+            LOG("Failed to allocate sprite table\n");
             return;
         }
     }
@@ -559,14 +560,14 @@ void sdl_load_sprite(const int nr) {
 
     // Fallback to sprite #35 if not found
     if (!surface && nr != 35) {
-        printf("Sprite %d not found, using fallback sprite #35\n", nr);
+        LOG("Sprite %d not found, using fallback sprite #35\n", nr);
         surface = load_from_file(nr);
         if (!surface) surface = load_from_png_lib(nr);
         if (!surface) surface = load_from_gfx_lib(nr);
     }
 
     if (!surface) {
-        printf("Failed to load sprite %d\n", nr);
+        LOG("Failed to load sprite %d\n", nr);
         return;
     }
 
@@ -650,7 +651,7 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
     sdl_load_sprite(nr);
     if (!sprite_data[nr].gl_texture) {
         if (first_render) {
-            printf("ERROR: No GL texture for sprite %d\n", nr);
+            LOG("ERROR: No GL texture for sprite %d\n", nr);
         }
         return;
     }
@@ -659,7 +660,7 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
     if (!sprite_data[nr].loaded_in_atlas) {
         // Fall back to immediate rendering for non-atlas sprites
         // TODO: Implement separate batch for non-atlas sprites
-        printf("Warning: sprite %d not in atlas, skipping batching\n", nr);
+        LOG("Warning: sprite %d not in atlas, skipping batching\n", nr);
         return;
     }
 
@@ -667,13 +668,13 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
     if (!projection_initialized) {
         create_ortho_matrix(projection_matrix, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
         projection_initialized = 1;
-        printf("Initialized projection matrix\n");
+        LOG("Initialized projection matrix\n");
     }
 
     if (first_render) {
-        printf("First render: sprite=%d, effect=%d, pos=(%d,%d), offset=(%d,%d)\n",
+        LOG("First render: sprite=%d, effect=%d, pos=(%d,%d), offset=(%d,%d)\n",
                nr, effect, x, y, xoff, yoff);
-        printf("Sprite dimensions: %dx%d pixels\n", sprite_data[nr].pixel_width, sprite_data[nr].pixel_height);
+        LOG("Sprite dimensions: %dx%d pixels\n", sprite_data[nr].pixel_width, sprite_data[nr].pixel_height);
         first_render = 0;
     }
 

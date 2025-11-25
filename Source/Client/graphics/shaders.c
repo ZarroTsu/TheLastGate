@@ -2,11 +2,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "../log.h"
 
 GLuint load_shader(const char *path, GLenum type) {
     FILE *f = fopen(path, "rb");
     if (!f) {
-        printf("ERROR: Shader file not found: %s\n", path);
+        LOG("ERROR: Shader file not found: %s\n", path);
         return 0;
     }
     fseek(f, 0, SEEK_END);
@@ -28,7 +29,7 @@ GLuint load_shader(const char *path, GLenum type) {
     if (!success) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        printf("ERROR: Shader compilation failed (%s):\n%s\n", path, infoLog);
+        LOG("ERROR: Shader compilation failed (%s):\n%s\n", path, infoLog);
         free(src);
         glDeleteShader(shader);
         return 0;
@@ -43,7 +44,7 @@ GLuint load_program(const char *vpath, const char *fpath) {
     GLuint fs = load_shader(fpath, GL_FRAGMENT_SHADER);
 
     if (!vs || !fs) {
-        printf("ERROR: Failed to load shaders for program\n");
+        LOG("ERROR: Failed to load shaders for program\n");
         if (vs) glDeleteShader(vs);
         if (fs) glDeleteShader(fs);
         return 0;
@@ -60,7 +61,7 @@ GLuint load_program(const char *vpath, const char *fpath) {
     if (!success) {
         char infoLog[512];
         glGetProgramInfoLog(program, 512, NULL, infoLog);
-        printf("ERROR: Shader program linking failed:\n%s\n", infoLog);
+        LOG("ERROR: Shader program linking failed:\n%s\n", infoLog);
         glDeleteProgram(program);
         glDeleteShader(vs);
         glDeleteShader(fs);
@@ -70,6 +71,6 @@ GLuint load_program(const char *vpath, const char *fpath) {
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    printf("Shader program loaded successfully\n");
+    LOG("Shader program loaded successfully\n");
     return program;
 }

@@ -3503,9 +3503,11 @@ void eng_flip(unsigned int t)
 {
 	int diff;
 
-
 	diff=t-SDL_GetTicks();
 	if (diff>0)	idle+=diff;
+	do {
+		handle_input();
+	} while (t>SDL_GetTicks());
 
 	frame++;
 }
@@ -4763,7 +4765,7 @@ const double target_frame_time = 1.0 / target_fps;
 
 void engine(void)
 {
-	int tmp,tick=TICK,init=0;
+	int tmp,tick,init=0;
 	int step=0,skip=0,lookstep=0,optstep=0,skipinrow=0,n,panic,xtimer=0,autosort=0;
 	extern int cmd_count,tick_count;
 	unsigned int t;
@@ -4781,10 +4783,7 @@ void engine(void)
 
 	while (!quit) 
 	{
-		uint64_t frequency = SDL_GetPerformanceFrequency();
-		uint64_t frame_start = SDL_GetPerformanceCounter();
 		handle_input();
-
 		if (wantquit && maynotquit)	maynotquit--;
 
 		if (do_ticker && (ticker&15)==0) cmd1s(CL_CMD_CTICK,ticker);
@@ -4793,7 +4792,7 @@ void engine(void)
 		{
 			pskip=100.0*(float)skip/(float)frame;
 			pidle=100.0*(float)idle/(float)xtime;
-            skip=frame=0;
+			skip=frame=0;
 			idle=xtime=0;
 			step=0;
 		}
@@ -4801,7 +4800,7 @@ void engine(void)
 		frame++;
 
 		lookstep++;
-		if (lookat && lookstep>QSIZE*3) 
+		if (lookat && lookstep>QSIZE*3)
 		{
 			if (lookat>=lookmax || looks[lookat].known==0)
 				cmd1s(CL_CMD_AUTOLOOK,lookat);
@@ -4812,21 +4811,21 @@ void engine(void)
 		if (look_timer)	look_timer--;
 		else show_look=0;
 
-		if ((show_shop) && lookstep>QSIZE) 
+		if ((show_shop) && lookstep>QSIZE)
 		{
 			cmd1s(CL_CMD_LOOK,shop.nr);
 			lookstep=0;
 		}
 
 		optstep++;
-		if (optstep>4 && pdata.changed) 
+		if (optstep>4 && pdata.changed)
 		{
 			send_opt();
 			optstep=0;
 		}
-		
+
 		if (autosort<5) autosort++;
-		if (autosort==5) 
+		if (autosort==5)
 		{
 			qsort(skilltab,55,sizeof(struct skilltab),skill_cmp);
 			autosort++;
@@ -4850,6 +4849,7 @@ void engine(void)
 
 		panic=0;
 		do {
+			handle_input();
 			tmp=game_loop();
 			panic++;
 		} while (tmp && panic<8192);
@@ -4870,50 +4870,22 @@ void engine(void)
 			show_tuto=0;
 		}
 
-		// if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
-		// {
-		// 	printf("Tick time: %d, getTicks: %d\n", t, SDL_GetTicks());
-			// Clear framebuffer for OpenGL
-
-
+		handle_input();
+		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
+		{
 			glClear(GL_COLOR_BUFFER_BIT);
-
-
-
 			eng_display(init);
 			eng_flip(t);
-
-			// Present frame
-
 			sdl_batch_flush();
 			SDL_GL_SwapWindow(app.window);
-		// 	skipinrow=0;
-		// }
-		// else
-		// {
-		// 	skip++; skipinrow++;
-		// }
-
-
-		// if (t_size) tick=TICK*QSIZE/t_size;
-		// else tick=TICK;
-
-		// if (SDL_ENABLED) {
-		// 	int delay = t - SDL_GetTicks();
-		// 	if (delay > 0 && delay < 100) {  // Sanity check: only delay up to 100ms
-		// 		SDL_Delay(delay);
-		// 	}
-		// }
-
-		uint64_t frame_end = SDL_GetPerformanceCounter();
-		double elapsed = (double)(frame_end - frame_start) / frequency;
-
-		// Use configurable FPS target
-		double target_frame_time = 1.0 / (double)screen_target_fps;
-		if (elapsed < target_frame_time) {
-			double remaining = target_frame_time - elapsed;
-			SDL_Delay((Uint32)(remaining * 1000.0));
+			skipinrow=0;
+		} else {
+			skip++; skipinrow++;
 		}
+
+		handle_input();
+		if (t_size) tick=TICK*QSIZE/t_size;
+		else tick=TICK;
 
 		t+=tick; ttime+=tick; xtime+=tick;
 	}
