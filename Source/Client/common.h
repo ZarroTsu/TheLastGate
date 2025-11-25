@@ -1,14 +1,17 @@
 // Just comment/uncomment this to alter home copy version
 //#define HOMECOPY
 
+#ifndef THELASTGATE_COMMON_H
+#define THELASTGATE_COMMON_H
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
 #else
 	#define MNAME		"The Last Gate"
 #endif
 
-#define MHOST			"tlg.abyss.codes"
-#define MPROXY			"thelastgate.ddns.net"
+#define MHOST			"127.0.0.1"
+// #define MHOST			"tlg.abyss.codes"
+#define MPROXY			"127.0.0.1"
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"
 #define MNEWS			"https://discord.gg/jJbPv2R"
 
@@ -591,3 +594,5 @@ struct cplayer {
 #define DR_AREABUILD2				10
 
 extern int ctick;
+
+#endif //THELASTGATE_COMMON_H
