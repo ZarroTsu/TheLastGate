@@ -3869,6 +3869,41 @@ int use_soulstone_special(int in)
 		case IT_F_ZI: if (use_soulstone_replace_item(in, IT_H_ZI)) return 1; break;
 		case IT_F_PH: if (use_soulstone_replace_item(in, IT_H_PH)) return 1; break;
 		
+		// Stone cycle
+		case IT_SM_WHET: if (use_soulstone_replace_item(in, IT_SM_CLAY)) return 1; break;
+		case IT_SM_CLAY: if (use_soulstone_replace_item(in, IT_SM_MAGE)) return 1; break;
+		case IT_SM_MAGE: if (use_soulstone_replace_item(in, IT_SM_GRAD)) return 1; break;
+		case IT_SM_GRAD: if (use_soulstone_replace_item(in, IT_SM_WHET)) return 1; break;
+		
+		// Potion cycle
+		case IT_POT_M_HP: if (use_soulstone_replace_item(in, IT_POT_M_EN)) return 1; break;
+		case IT_POT_M_EN: if (use_soulstone_replace_item(in, IT_POT_M_MP)) return 1; break;
+		case IT_POT_M_MP: if (use_soulstone_replace_item(in, IT_POT_M_HP)) return 1; break;
+		case IT_POT_N_HP: if (use_soulstone_replace_item(in, IT_POT_N_EN)) return 1; break;
+		case IT_POT_N_EN: if (use_soulstone_replace_item(in, IT_POT_N_MP)) return 1; break;
+		case IT_POT_N_MP: if (use_soulstone_replace_item(in, IT_POT_N_HP)) return 1; break;
+		case IT_POT_G_HP: if (use_soulstone_replace_item(in, IT_POT_G_EN)) return 1; break;
+		case IT_POT_G_EN: if (use_soulstone_replace_item(in, IT_POT_G_MP)) return 1; break;
+		case IT_POT_G_MP: if (use_soulstone_replace_item(in, IT_POT_G_HP)) return 1; break;
+		case IT_POT_H_HP: if (use_soulstone_replace_item(in, IT_POT_H_EN)) return 1; break;
+		case IT_POT_H_EN: if (use_soulstone_replace_item(in, IT_POT_H_MP)) return 1; break;
+		case IT_POT_H_MP: if (use_soulstone_replace_item(in, IT_POT_H_HP)) return 1; break;
+		case IT_POT_S_HP: if (use_soulstone_replace_item(in, IT_POT_S_EN)) return 1; break;
+		case IT_POT_S_EN: if (use_soulstone_replace_item(in, IT_POT_S_MP)) return 1; break;
+		case IT_POT_S_MP: if (use_soulstone_replace_item(in, IT_POT_S_HP)) return 1; break;
+		case IT_POT_C_HP: if (use_soulstone_replace_item(in, IT_POT_C_EN)) return 1; break;
+		case IT_POT_C_EN: if (use_soulstone_replace_item(in, IT_POT_C_MP)) return 1; break;
+		case IT_POT_C_MP: if (use_soulstone_replace_item(in, IT_POT_C_HP)) return 1; break;
+		case IT_POT_L_HP: if (use_soulstone_replace_item(in, IT_POT_L_EN)) return 1; break;
+		case IT_POT_L_EN: if (use_soulstone_replace_item(in, IT_POT_L_MP)) return 1; break;
+		case IT_POT_L_MP: if (use_soulstone_replace_item(in, IT_POT_L_HP)) return 1; break;
+		case IT_POT_D_HP: if (use_soulstone_replace_item(in, IT_POT_D_EN)) return 1; break;
+		case IT_POT_D_EN: if (use_soulstone_replace_item(in, IT_POT_D_MP)) return 1; break;
+		case IT_POT_D_MP: if (use_soulstone_replace_item(in, IT_POT_D_HP)) return 1; break;
+		case IT_POT_VITA: if (use_soulstone_replace_item(in, IT_POT_CLAR)) return 1; break;
+		case IT_POT_CLAR: if (use_soulstone_replace_item(in, IT_POT_SAGE)) return 1; break;
+		case IT_POT_SAGE: if (use_soulstone_replace_item(in, IT_POT_VITA)) return 1; break;
+		
 		// Convert rings into reservation
 		case IT_RI_SSSA: case IT_RI_SSRU: case IT_RI_SSAM: case IT_RI_SSTO: case IT_RI_SSEM: case IT_RI_SSDI:
 		case IT_RI_MSSA: case IT_RI_MSRU: case IT_RI_MSAM: case IT_RI_MSTO: case IT_RI_MSEM: case IT_RI_MSDI:
