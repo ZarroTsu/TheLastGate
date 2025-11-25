@@ -178,12 +178,9 @@ static int init_gfx_lib() {
 
 static SDL_Surface *make_standard_format(SDL_Surface *loaded) {
     if (!loaded) return nullptr;
-    const bool has_alpha = (loaded->format->Amask != 0);
-    if (!has_alpha) {
-        unsigned int magenta = SDL_MapRGB(loaded->format, 255, 0, 255);
-        SDL_SetColorKey(loaded, SDL_TRUE, magenta);
-    }
 
+    unsigned int magenta = SDL_MapRGB(loaded->format, 255, 0, 255);
+    SDL_SetColorKey(loaded, SDL_TRUE, magenta);
     SDL_Surface *converted_surface = SDL_ConvertSurfaceFormat(loaded, LOADED_SPRITE_PIXEL_FORMAT, 0);
     SDL_FreeSurface(loaded);
     if (!converted_surface) {
