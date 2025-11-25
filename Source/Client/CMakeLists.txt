@@ -49,6 +49,12 @@ target_compile_options(TheLastGate PRIVATE
         -Wno-int-conversion              # Disable int/pointer conversion warnings (often related)
 )
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(TheLastGate PRIVATE
+        -DHOMECOPY
+    )
+endif()
+
 # Release build optimizations
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_options(TheLastGate PRIVATE

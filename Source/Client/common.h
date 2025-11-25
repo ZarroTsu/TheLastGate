@@ -5,13 +5,13 @@
 #define THELASTGATE_COMMON_H
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
+	#define MHOST			"127.0.0.1"
+	#define MPROXY			"127.0.0.1"
 #else
 	#define MNAME		"The Last Gate"
+	#define MHOST			"tlg.abyss.codes"
+	#define MPROXY			"thelastgate.ddns.net"
 #endif
-
-
-#define MHOST			"tlg.abyss.codes"
-#define MPROXY			"127.0.0.1"
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"
 #define MNEWS			"https://discord.gg/jJbPv2R"
 
