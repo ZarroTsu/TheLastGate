@@ -2,7 +2,6 @@
 
 #include <SDL2/SDL_events.h>
 
-#include "DD.H"
 #include "inter.h"
 #include "main.h"
 #include "socket.h"
@@ -165,20 +164,8 @@ void handle_input(void) {
                         xlog(2, " ");
                         xlog(2, "Client Version %d.%02d.%02d",VERSION >> 16, (VERSION >> 8) & 255,VERSION & 255);
                         xlog(2, "Server Version %d.%02d.%02d", ser_ver >> 16, (ser_ver >> 8) & 255, ser_ver & 255);
-                        xlog(2, "MAXX=%d, MAXY=%d, MAXXO=%d", MAXX, MAXY, MAXXOVER);
                         xlog(2, "R=%04X, G=%04X, B=%04X", RED, GREEN, BLUE);
-                        xlog(2, "RGBM=%d", RGBM);
-                        xlog(2, "MAXCACHE=%d", MAXCACHE);
-                        xlog(2, "Hit=%d, Miss=%d, Invis=%d", dd_cache_hit, dd_cache_miss, invisible);
-                        xlog(2, "Ratio=%.2f%%", 100.0 / (dd_cache_hit + dd_cache_miss) * dd_cache_hit);
                         xlog(2, "Skip=%d%% Idle=%d%%", pskip, pidle);
-                        xlog(2, "MaxMem=%dK, UsedMem=%dK", maxmem >> 10, usedmem >> 10);
-                        xlog(2, "MemBlocks=%d (T=%d,GC=%d)", blockcnt, blocktot, blockgc);
-                        xlog(2, "MaxVid=%dK, UsedVid=%dK", (maxvid * 32 * 32 * 2) >> 10, (usedvid * 32 * 32 * 2) >> 10);
-                        xlog(2, "cachex=%d, cachey=%d, MAXXOVER=%d", cachex, cachey, MAXXOVER);
-                        xlog(2, "usedvidmemflag=%d", usedvidmem);
-                        xlog(2, "alphapix=%d, fullpix=%d, ratio=%.2f", alphapix, fullpix,
-                             100.0 / (alphapix + fullpix + 1) * alphapix);
                         break;
                     case SDLK_F12:
                         cmd_exit();

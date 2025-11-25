@@ -8,15 +8,38 @@
  * effects using modern SDL2 rendering.
  */
 
-#include "sdl.h"
+#include "graphics/sdl.h"
+#include "glad/glad.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
+// External declarations from sdl.c
+extern GLuint gamma_shader;
+extern GLint gamma_uProjection;
+extern GLint gamma_uUV0;
+extern GLint gamma_uUV1;
+extern GLint gamma_uModel;
+extern GLint gamma_uTexture;
+extern GLint gamma_uGammaScale;
+extern GLint gamma_uGammaEffect;
+extern GLint gamma_uShadeEffect;
+extern GLint gamma_uRed;
+extern GLint gamma_uGreen;
+extern GLint gamma_uInvis;
+extern GLint gamma_uGrey;
+extern GLint gamma_uInfra;
+extern GLint gamma_uWater;
+extern float projection_matrix[16];
+extern int projection_initialized;
+
+// Forward declare helper from sdl.c
+extern void create_model_matrix(float *matrix, float x, float y, float width, float height);
+
 // Magic effect gradient cache
 typedef struct {
-    SDL_Texture *gradients[8];  // One for each color combination (nr 0-7)
+    unsigned int gradients[8];  // OpenGL texture IDs for each color combination (nr 0-7)
     int initialized;
 } MagicEffectCache;
 
@@ -28,22 +51,22 @@ static inline int imax(int a, int b) {
 }
 
 /*
- * sdl_create_magic_gradient - Create a pre-rendered gradient texture
+ * sdl_create_magic_gradient - Create a pre-rendered gradient texture (OpenGL)
  * @nr: Color flags (bit 0=red, bit 1=green, bit 2=blue)
  * @str: Strength divisor
  *
  * Creates a 64x64 gradient texture with the elliptical falloff pattern
  * from the original dd_alphaeffect_magic implementation.
  */
-static SDL_Texture *sdl_create_magic_gradient(int nr, int str) {
+static unsigned int sdl_create_magic_gradient(int nr, int str) {
     // Create 64x64 surface for gradient
     SDL_Surface *surf = SDL_CreateRGBSurfaceWithFormat(
-        0, 64, 64, 32, SDL_PIXELFORMAT_ARGB8888
+        0, 64, 64, 32, SPRITE_PIXEL_FORMAT
     );
 
     if (!surf) {
         printf("Failed to create magic gradient surface: %s\n", SDL_GetError());
-        return NULL;
+        return 0;
     }
 
     SDL_LockSurface(surf);
@@ -94,19 +117,25 @@ static SDL_Texture *sdl_create_magic_gradient(int nr, int str) {
 
     SDL_UnlockSurface(surf);
 
-    // Create texture from surface
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(app.renderer, surf);
+    // Create OpenGL texture from surface
+    unsigned int gl_texture;
+    glGenTextures(1, &gl_texture);
+    glBindTexture(GL_TEXTURE_2D, gl_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64,
+                 0, GL_BGRA, GL_UNSIGNED_BYTE, surf->pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     SDL_FreeSurface(surf);
 
-    if (!texture) {
-        printf("Failed to create magic gradient texture: %s\n", SDL_GetError());
-        return NULL;
+    if (!gl_texture) {
+        printf("Failed to create magic gradient OpenGL texture\n");
+        return 0;
     }
 
-    // Use additive blending for glow effect
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-
-    return texture;
+    return gl_texture;
 }
 
 /*
@@ -141,8 +170,8 @@ void sdl_deinit_magic_effects(void) {
 
     for (int nr = 0; nr < 8; nr++) {
         if (magic_cache.gradients[nr]) {
-            SDL_DestroyTexture(magic_cache.gradients[nr]);
-            magic_cache.gradients[nr] = NULL;
+            glDeleteTextures(1, &magic_cache.gradients[nr]);
+            magic_cache.gradients[nr] = 0;
         }
     }
 
@@ -196,25 +225,43 @@ void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos, int xoff, int yo
     rx += xoff;
     ry += yoff;
 
+    // Render using OpenGL with additive blending for glow effect
+    // Set additive blending: result = src + dst
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    glUseProgram(gamma_shader);
+    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
+
+    float model_matrix[16];
+    create_model_matrix(model_matrix, rx, ry, 64, 64);
+    glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
+    glUniform1i(gamma_uTexture, 0);
+
     // Adjust alpha based on strength parameter
-    // str=1: full intensity (255)
-    // str=2: half intensity (128)
-    // str=4: quarter intensity (64)
-    Uint8 alpha_mod = 255 / imax(1, str);
-    SDL_SetTextureAlphaMod(magic_cache.gradients[nr], alpha_mod);
+    // str=1: full intensity, str=2: half intensity, etc.
+    float alpha_scale = 1.0f / (float)imax(1, str);
+    glUniform2f(gamma_uUV0, 0.0f, 0.0f);
+    glUniform2f(gamma_uUV1, 1.0f, 1.0f);
+    glUniform1f(gamma_uGammaScale, alpha_scale);
+    glUniform1f(gamma_uGammaEffect, 0.0f);
+    glUniform1f(gamma_uShadeEffect, 0.0f);
 
-    // Render the gradient texture
-    SDL_Rect dst = {
-        .x = rx,
-        .y = ry,
-        .w = 64,
-        .h = 64
-    };
+    // Reset all effect bools to prevent bleeding from previous sprites
+    glUniform1i(gamma_uRed, 0);
+    glUniform1i(gamma_uGreen, 0);
+    glUniform1i(gamma_uInvis, 0);
+    glUniform1i(gamma_uGrey, 0);
+    glUniform1i(gamma_uInfra, 0);
+    glUniform1i(gamma_uWater, 0);
 
-    SDL_RenderCopy(app.renderer, magic_cache.gradients[nr], NULL, &dst);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, magic_cache.gradients[nr]);
+    glBindVertexArray(app.quad_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
 
-    // Restore full alpha for next render
-    SDL_SetTextureAlphaMod(magic_cache.gradients[nr], 255);
+    // Restore standard alpha blending (set in sdl_init)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 /*
@@ -258,16 +305,36 @@ void sdl_alphaeffect_magic_scaled(int nr, int str, int xpos, int ypos,
     rx -= (scaled_size - 64) / 2;
     ry -= (scaled_size - 64) / 2;
 
-    Uint8 alpha_mod = 255 / imax(1, str);
-    SDL_SetTextureAlphaMod(magic_cache.gradients[nr], alpha_mod);
+    // Render using OpenGL with additive blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-    SDL_Rect dst = {
-        .x = rx,
-        .y = ry,
-        .w = scaled_size,
-        .h = scaled_size
-    };
+    glUseProgram(gamma_shader);
+    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
 
-    SDL_RenderCopy(app.renderer, magic_cache.gradients[nr], NULL, &dst);
-    SDL_SetTextureAlphaMod(magic_cache.gradients[nr], 255);
+    float model_matrix[16];
+    create_model_matrix(model_matrix, rx, ry, scaled_size, scaled_size);
+    glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
+    glUniform1i(gamma_uTexture, 0);
+
+    float alpha_scale = 1.0f / (float)imax(1, str);
+    glUniform1f(gamma_uGammaScale, alpha_scale);
+    glUniform1f(gamma_uGammaEffect, 0.0f);
+    glUniform1f(gamma_uShadeEffect, 0.0f);
+
+    // Reset all effect bools to prevent bleeding from previous sprites
+    glUniform1i(gamma_uRed, 0);
+    glUniform1i(gamma_uGreen, 0);
+    glUniform1i(gamma_uInvis, 0);
+    glUniform1i(gamma_uGrey, 0);
+    glUniform1i(gamma_uInfra, 0);
+    glUniform1i(gamma_uWater, 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, magic_cache.gradients[nr]);
+    glBindVertexArray(app.quad_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+
+    // Restore standard alpha blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

@@ -10,6 +10,11 @@ The codebase is split into two main components:
 - **Server**: Linux-based C server (32-bit) that handles game logic, player data, and world state
 - **Client**: Windows-based C client using DirectDraw for rendering
 
+## Build Instructions
+- DO NOT automatically run cmake or build commands
+- Only suggest build commands for the user to run manually
+
+
 ## Build System
 
 ### Server (Linux - Ubuntu 16.04.1 LTS 32-bit recommended)

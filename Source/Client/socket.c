@@ -37,13 +37,14 @@
 #include <zlib.h>
 #include <SDL2/SDL_timer.h>
 
+#include "render.h"
+
 struct z_stream_s zs;
 
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "common.h"
 #include "inter.h"
 #include "merc.rh"
-#include "dd.h"
 //#include "minilzo.h"
 
 char passwd[15]={0};
@@ -126,7 +127,7 @@ void so_error(char *err)
 {
 	char buf[250];
 
-	dd_deinit();
+	deinit();
 
 	save_options();
 

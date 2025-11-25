@@ -28,13 +28,14 @@
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
+#include "glad/include/glad/glad.h"
 
 #include "common.h"
 #include "input.h"
 #include "inter.h"
 #include "main.h"
 #include "render.h"
-#include "sdl.h"
+#include "graphics/sdl.h"
 
 int init_done=0;
 int frame=0;
@@ -54,7 +55,6 @@ extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 //extern int screen_overlay_sprite;
 extern short screen_windowed;
 extern short screen_renderdist;
-
 
 char *lookup(int nr,unsigned short id);
 
@@ -3071,6 +3071,9 @@ void eng_display(int init)	// optimize me!!!!!
 	// check if we're visible. If not, just leave.
 	if (!isvisible()) return;
 
+	// Start sprite batching for this frame
+	sdl_batch_begin();
+
 	mouse(mx,my,0);
 	SDL_SetCursor(cursors[cursor_type]);
 
@@ -4754,6 +4757,9 @@ int noshop=0;
 extern int xmove,xxtimer;
 extern int do_ticker;
 
+const double target_fps = 120.0;
+const double target_frame_time = 1.0 / target_fps;
+
 void engine(void)
 {
 	int tmp,tick,init=0;
@@ -4774,10 +4780,9 @@ void engine(void)
 
 	while (!quit) 
 	{
-
+		uint64_t frequency = SDL_GetPerformanceFrequency();
+		uint64_t frame_start = SDL_GetPerformanceCounter();
 		handle_input();
-		SDL_SetRenderDrawColor(app.renderer, 0, 0, 0, 255);
-		SDL_RenderClear(app.renderer);
 
 		if (wantquit && maynotquit)	maynotquit--;
 
@@ -4828,7 +4833,7 @@ void engine(void)
 
 		if (xtime>0) xtimer--;
 
-		if (xmove && xtimer<1) 
+		if (xmove && xtimer<1)
 		{
 			switch (xmove) 
 			{
@@ -4864,28 +4869,48 @@ void engine(void)
 			show_tuto=0;
 		}
 
-		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
-		{
+		// if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
+		// {
+		// 	printf("Tick time: %d, getTicks: %d\n", t, SDL_GetTicks());
+			// Clear framebuffer for OpenGL
+
+
+			glClear(GL_COLOR_BUFFER_BIT);
+
+
+
 			eng_display(init);
 			eng_flip(t);
-			//SDL Stuff
-			SDL_RenderPresent(app.renderer);
-			skipinrow=0;
+
+			// Present frame
+
+			sdl_batch_flush();
+			SDL_GL_SwapWindow(app.window);
+		// 	skipinrow=0;
+		// }
+		// else
+		// {
+		// 	skip++; skipinrow++;
+		// }
+
+
+		// if (t_size) tick=TICK*QSIZE/t_size;
+		// else tick=TICK;
+
+		// if (SDL_ENABLED) {
+		// 	int delay = t - SDL_GetTicks();
+		// 	if (delay > 0 && delay < 100) {  // Sanity check: only delay up to 100ms
+		// 		SDL_Delay(delay);
+		// 	}
+		// }
+
+		uint64_t frame_end = SDL_GetPerformanceCounter();
+		double elapsed = (double)(frame_end - frame_start) / frequency;
+
+		if (elapsed < target_frame_time) {
+			double remaining = target_frame_time - elapsed;
+			SDL_Delay((Uint32)(remaining * 1000.0));
 		}
-		else
-		{
-			skip++; skipinrow++;
-		}
-
-		if (t_size) tick=TICK*QSIZE/t_size;
-		else tick=TICK;
-
-
-		int delay = t - SDL_GetTicks();
-		if (delay > 0 && delay < 100) {  // Sanity check: only delay up to 100ms
-			SDL_Delay(delay);
-		}
-
 
 		t+=tick; ttime+=tick; xtime+=tick;
 	}

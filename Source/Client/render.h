@@ -1,8 +1,9 @@
 ﻿#ifndef THELASTGATE_RENDER_H
 #define THELASTGATE_RENDER_H
 
-#include <ddraw.h>
+#include <SDL2/SDL.h>
 
+extern int gamma;
 
 int init(int windowed);
 void deinit(void);

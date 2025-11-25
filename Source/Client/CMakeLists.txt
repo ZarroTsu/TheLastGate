@@ -5,23 +5,30 @@ add_executable(TheLastGate WIN32
         conv.c
         dd.c
         engine.c
-        inter.c
-        main.c
-        options.c
-        socket.c
-        sound.c
-        MERC.rc
-        render.h
-        render.c
-        sdl.c
-        sdl.h
-        sdl_magic.c
+        engine.h
+        graphics/atlas.c
+        graphics/atlas.h
+        graphics/loader.c
+        graphics/loader.h
+        graphics/sdl.c
+        graphics/sdl.h
+        graphics/shaders.c
+        graphics/shaders.h
+        graphics/sprite_data.h
         input.c
         input.h
-        engine.h
+        inter.c
+        main.c
         main.h
+        main.h
+        MERC.rc
+        options.c
+        render.c
+        render.h
+        sdl_magic.c
+        socket.c
         socket.h
-        main.h
+        sound.c
         sound.h
 )
 
@@ -96,6 +103,15 @@ target_include_directories(TheLastGate PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/zlib
 )
 
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# GLAD
+add_library(glad glad/src/glad.c)
+target_include_directories(glad PUBLIC glad/include)
+
+#target_link_libraries(TheLastGate PRIVATE Dbghelp)
+
 target_link_libraries(TheLastGate PUBLIC
         # Core libraries
         sdl2        # SDL2 core (will link statically if available)
@@ -111,6 +127,11 @@ target_link_libraries(TheLastGate PUBLIC
 
         # Windows system libraries (for static SDL2 core)
         ws2_32
+)
+
+target_link_libraries(TheLastGate PRIVATE
+        glad
+        OpenGL::GL
 )
 
 # Hybrid linking: Copy only SDL2_image, SDL2_mixer, and their format library DLLs
@@ -154,3 +175,23 @@ add_custom_command(TARGET TheLastGate POST_BUILD
         $<TARGET_FILE_DIR:TheLastGate>
         COMMENT "Recursively copying DLLs to output directory"
 )
+
+file(GLOB SHADER_FILES
+        "${CMAKE_SOURCE_DIR}/graphics/*.frag"
+        "${CMAKE_SOURCE_DIR}/graphics/*.vert"
+)
+
+add_custom_command(TARGET TheLastGate POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:TheLastGate>/shaders"
+)
+
+foreach(SHADER ${SHADER_FILES})
+    get_filename_component(SHADER_NAME "${SHADER}" NAME)
+    add_custom_command(TARGET TheLastGate POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${SHADER}"
+            "$<TARGET_FILE_DIR:TheLastGate>/shaders/${SHADER_NAME}"
+            COMMENT "Copying shader ${SHADER_NAME}"
+    )
+endforeach()

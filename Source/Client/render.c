@@ -1,11 +1,14 @@
 ﻿#include <ddraw.h>
 
-#include "SDL.h"
+#include "graphics/sdl.h"
 #include "render.h"
 
 #include <SDL2/SDL_image.h>
 
+#include "graphics/loader.h"
+
 int init(const int windowed) {
+    if (!init_image_loader()) return -1;
     return sdl_init(windowed);
 }
 
