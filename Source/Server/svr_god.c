@@ -1813,10 +1813,20 @@ void god_reset_items(int cn)
 {
 	int n;
 	
+	/*
 	do_char_log(cn, 1, "Now resetting all items...\n");
 	for (n = 1; n<MAXTITEM; n++)
 	{
 		if (it_temp[n].used==USE_EMPTY) continue;
+		reset_item(n);
+	}
+	*/
+	do_char_log(cn, 1, "Now resetting expiring ring items...\n");
+	for (n = 1; n<MAXTITEM; n++)
+	{
+		if (it_temp[n].used==USE_EMPTY) continue;
+		if (!(it_temp[n].placement & PL_RING)) continue;
+		if (!(it_temp[n].flags & IF_ALWAYSEXP2)) continue;
 		reset_item(n);
 	}
 	do_char_log(cn, 0, "Done.\n");

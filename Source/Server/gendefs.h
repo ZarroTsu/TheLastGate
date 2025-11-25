@@ -500,11 +500,11 @@ extern char *at_name[];
 
 #define FN_ABYSS		4
 #define DESC_TW_ACEDIA		"When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n"
-#define DESC_TW_IRA			"When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you lose mana over time and cannot deal melee critical hits.\n"
+#define DESC_TW_IRA			"When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you reserve 30%% of your mana and cannot deal melee critical hits.\n"
 #define DESC_TW_INVIDIA		"When equipped, your ghost companion has surround hit AoE, and your shadow copy teleports to new targets, but each cannot regenerate health.\n"
-#define DESC_TW_GULA		"When equipped, you restore health upon hitting, cleaving or blasting an enemy, but you lose hitpoints over time.\n"
+#define DESC_TW_GULA		"When equipped, you restore health upon hitting, cleaving or blasting an enemy, but you reserve 30%% of your hitpoints.\n"
 #define DESC_TW_LUXURIA		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict stun.\n"
-#define DESC_TW_AVARITIA	"When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you lose endurance over time.\n"
+#define DESC_TW_AVARITIA	"When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you reserve 30%% of your endurance.\n"
 #define DESC_TW_SUPERBIA	"When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n"
 #define DESC_TW_SINBIND		"You may only equip one Sinbinder at a time.\n"
 
@@ -621,7 +621,7 @@ extern char *at_name[];
 #define DESC_VIKINGMALT		"When equipped, this weapon can be used to cast 'Slam', dealing damage based on Strength around you and stunning enemies with a base radius of 2 around your target. Stun duration with Slam is determined by your crit multiplier.\n"
 #define DESC_GUNGNIR		"When equipped, bleeding you inflict deals its damage three times faster.\n"
 
-#define DESC_BONEARMOR		"When equipped, 30%% of damage taken from hits is instead taken as damage over time, over 5 seconds.\n"
+#define DESC_BONEARMOR		"When equipped, 30%% of damage taken from hits is instead taken as damage over time over 5 seconds.\n"
 
 // -------- Tarot Cards -------- //
 

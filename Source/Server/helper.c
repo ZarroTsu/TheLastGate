@@ -3700,13 +3700,13 @@ int use_corruptor(int cn, int in)
 			return 0;
 		}
 		
-		if (it[in2].corruption = it[in].data[0]) {}
+		if (it[in2].corruption = it[in].data[0]) ;
 		else it[in2].corruption = RANDOM(NUM_CORR)+1;
 		
 		it[in2].flags |= IF_UPDATE | IF_CORRUPTED | IF_SHOPDESTROY;
 		it[in2].power += 60;
 		
-		do_char_log(cn, 2, "You corrupted the card with %s.\n", sk_corrupt[it[in].data[0]-1]);
+		do_char_log(cn, 2, "You corrupted the card with %s.\n", sk_corrupt[it[in].data[0]-1].name);
 	}
 	else
 	{
@@ -3721,7 +3721,7 @@ int use_corruptor(int cn, int in)
 			it[in2].used = USE_EMPTY;
 			return 0;
 		}
-		do_char_log(cn, 1, "The %s was empowered with %s.\n", it[in2].reference, sk_corrupt[it[in2].data[0]-1]);
+		do_char_log(cn, 1, "The %s was empowered with %s.\n", it[in2].reference, sk_corrupt[it[in2].data[0]-1].name);
 	}
 	use_consume_item(cn, in, 1);
 	

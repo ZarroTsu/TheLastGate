@@ -1983,13 +1983,14 @@ int get_meta_stat_value(int cn, int n)
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int dmg_wpn, dmg_low, dmg_hgh, dmg_top, dmg_hit, dmg_dps, dmg_bns, dmg_str;
 	int regen = 0, restn = 0, medit = 0;
+	int n1, n2, n3, hpbonus, enbonus, mpbonus;
 	
 	switch (n) // Regen set
 	{
 		case 51: case 52: case 53:
-			int n1 = st_skillcount(cn, 42)*10; // Full
-			int n2 = st_skillcount(cn, 54)*10; // New
-			int n3 = st_skillcount(cn, 99)* 5; // Half
+			n1 = st_skillcount(cn, 42)*10; // Full
+			n2 = st_skillcount(cn, 54)*10; // New
+			n3 = st_skillcount(cn, 99)* 5; // Half
 			
 			if (IS_GLOB_MAYHEM)				moonmult = 10;
 			if (globs->fullmoon)			moonmult = (30*(100+n1+n3))/100;
@@ -2042,8 +2043,8 @@ int get_meta_stat_value(int cn, int n)
 			//
 			dmg_low = ( dmg_wpn*dmg_str/5)/4*dmg_bns/10000;
 			dmg_hgh =   dmg_wpn+dmg_top;
-			dmg_top = ((dmg_top+dmg_top*pl_critc*pl_critm/1000000)*dmg_str/5)/4*dmg_bns/10000;
-			dmg_hgh = ((dmg_hgh+dmg_hgh*pl_critc*pl_critm/1000000)*dmg_str/5)/4*dmg_bns/10000;
+			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
+			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
 			dmg_hit = ( dmg_low+dmg_hgh+(T_LYCA_SK(cn,6)?dmg_top/2:0))/2;
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed) + ch[cn].atk_speed));
 			break;
@@ -2074,13 +2075,13 @@ int get_meta_stat_value(int cn, int n)
 	switch (n) // Rage/Calm power from hp/en/mp
 	{
 		case 30: case 31: case 71: case 72:
-			int hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
-			int enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
-			int mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
+			hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
+			enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
+			mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
 			power = skill_multiplier(M_SK(cn, SK_RAGE), cn);
 			if (T_LYCA_SK(cn, 7))         in  = (hpbonus + enbonus + mpbonus)/2;
 			if (m=st_skillcount(cn, 103)) in += (hpbonus + enbonus + mpbonus)*m/5;
-			power = power + (power * tmp / 5000);
+			power = power + (power * in / 5000);
 			break;
 		default: break;
 	}
@@ -2302,17 +2303,17 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 66: // Enhance Effect
 			power = spell_multiplier(M_SK(cn, SK_ENHANCE), cn);
-			if (IS_SEYA_OR_BRAV(co)) value = min(127, power / 6 + 3);
+			if (IS_SEYA_OR_BRAV(cn)) value = min(127, power / 6 + 3);
 			else                     value = min(127, power / 4 + 4);
 			break;
 		case 67: // Protect Effect
 			power = spell_multiplier(M_SK(cn, SK_PROTECT), cn);
-			if (IS_SEYA_OR_BRAV(co)) value = min(127, power / 6 + 3);
+			if (IS_SEYA_OR_BRAV(cn)) value = min(127, power / 6 + 3);
 			else                     value = min(127, power / 4 + 4);
 			break;
 		case 68: case 93: // M.Shield/Shell Effect
-			if (do_get_iflag(cn, SF_EMPRESS)) value = min(127, durat / (IS_SEYA_OR_BRAV(co)? 768: 512) + 1);
-			else                              value = min(127, durat / (IS_SEYA_OR_BRAV(co)?1536:1024) + 1);
+			if (do_get_iflag(cn, SF_EMPRESS)) value = min(127, durat / (IS_SEYA_OR_BRAV(cn)? 768: 512) + 1);
+			else                              value = min(127, durat / (IS_SEYA_OR_BRAV(cn)?1536:1024) + 1);
 			break;
 		case 69: case 94: // M.Shield/Shell Dur		Decimal, 0.00 Seconds
 			value = durat * 100 / 20;
