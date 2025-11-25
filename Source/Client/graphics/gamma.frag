@@ -1,4 +1,4 @@
-﻿#version 330 core
+#version 330 core
 
 in vec2 TexCoord;
 in float vGammaScale;
@@ -22,6 +22,7 @@ uniform bool uGrey;
 uniform bool uInfra;
 uniform bool uWater;
 uniform bool uShadow;
+uniform bool uUseInstancing;
 
 // Flag bit positions
 #define FLAG_RED    (1 << 0)
@@ -35,7 +36,7 @@ uniform bool uShadow;
 void main() {
     // Use instance data if available (vGammaScale will be > 0 for instanced rendering)
     // Otherwise fall back to uniforms for backward compatibility
-    bool useInstanceData = (vGammaScale > 0.0);
+    bool useInstanceData = uUseInstancing;
 
     vec2 uv;
     if (useInstanceData) {
