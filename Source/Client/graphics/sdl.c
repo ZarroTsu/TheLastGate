@@ -112,6 +112,8 @@ int sdl_init(const int windowed) {
         return -1;
     }
 
+    SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+
     // Create OpenGL context
     app.gl_context = SDL_GL_CreateContext(app.window);
     if (!app.gl_context) {
