@@ -142,7 +142,7 @@ int sdl_init(const int windowed) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Load gamma correction shader
-    gamma_shader = load_program("shaders/gamma.vert", "shaders/gamma.frag");
+    gamma_shader = load_program(TLG_Shader_Effect);
     if (!gamma_shader) {
         LOG("Failed to load gamma shader\n");
         return -1;
@@ -172,7 +172,7 @@ int sdl_init(const int windowed) {
            gamma_uProjection, gamma_uModel, gamma_uTexture, gamma_uGammaScale, gamma_uUseInstancing);
 
     // Load solid color shader for UI primitives (boxes, bars)
-    solid_shader = load_program("shaders/solid.vert", "shaders/solid.frag");
+    solid_shader = load_program(TLG_Shader_Solid);
     if (!solid_shader) {
         LOG("Failed to load solid color shader\n");
         return -1;

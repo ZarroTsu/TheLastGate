@@ -3,24 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../log.h"
+#include "shaders/effect_shader.h"
+#include "shaders/solid_shader.h"
 
-GLuint load_shader(const char *path, GLenum type) {
-    FILE *f = fopen(path, "rb");
-    if (!f) {
-        LOG("ERROR: Shader file not found: %s\n", path);
-        return 0;
-    }
-    fseek(f, 0, SEEK_END);
-    long size = ftell(f);
-    rewind(f);
-
-    char *src = malloc(size + 1);
-    fread(src, 1, size, f);
-    src[size] = '\0';
-    fclose(f);
-
+static GLuint load_shader(const char *source, GLenum type) {
     GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, (const GLchar* const*)&src, NULL);
+    glShaderSource(shader, 1, (const GLchar* const*)&source, NULL);
     glCompileShader(shader);
 
     // Check compilation status
@@ -30,18 +18,16 @@ GLuint load_shader(const char *path, GLenum type) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
         LOG("ERROR: Shader compilation failed (%s):\n%s\n", path, infoLog);
-        free(src);
         glDeleteShader(shader);
         return 0;
     }
 
-    free(src);
     return shader;
 }
 
-GLuint load_program(const char *vpath, const char *fpath) {
-    GLuint vs = load_shader(vpath, GL_VERTEX_SHADER);
-    GLuint fs = load_shader(fpath, GL_FRAGMENT_SHADER);
+static GLuint load_shader_program(const char *vertex_source, const char *fragment_source) {
+    GLuint vs = load_shader(vertex_source, GL_VERTEX_SHADER);
+    GLuint fs = load_shader(fragment_source, GL_FRAGMENT_SHADER);
 
     if (!vs || !fs) {
         LOG("ERROR: Failed to load shaders for program\n");
@@ -73,4 +59,16 @@ GLuint load_program(const char *vpath, const char *fpath) {
 
     LOG("Shader program loaded successfully\n");
     return program;
+}
+
+GLuint load_program(TLG_ShaderTypes shader_type) {
+    switch (shader_type) {
+        case TLG_Shader_Effect:
+            return load_shader_program(effect_vertex, effect_fragment);
+        case TLG_Shader_Solid:
+            return load_shader_program(solid_vertex, solid_fragment);
+        default:
+            LOG("Unknown shader type\n");
+            return 0;
+    }
 }

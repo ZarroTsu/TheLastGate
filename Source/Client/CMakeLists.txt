@@ -108,6 +108,7 @@ endif ()
 target_include_directories(TheLastGate PRIVATE
         ../../Resources/lpng
         ${CMAKE_CURRENT_SOURCE_DIR}/zlib
+        ${CMAKE_CURRENT_SOURCE_DIR}/_generated
 )
 
 # OpenGL
@@ -183,22 +184,18 @@ add_custom_command(TARGET TheLastGate POST_BUILD
         COMMENT "Recursively copying DLLs to output directory"
 )
 
-file(GLOB SHADER_FILES
-        "${CMAKE_SOURCE_DIR}/graphics/*.frag"
-        "${CMAKE_SOURCE_DIR}/graphics/*.vert"
-)
+function(generate_shader_embed_header SHADER_NAME)
+    file (READ ${CMAKE_SOURCE_DIR}/resources/${SHADER_NAME}.frag FRAGMENT_SHADER_CONTENT)
+    file (READ ${CMAKE_SOURCE_DIR}/resources/${SHADER_NAME}.vert VERTEX_SHADER_CONTENT)
+    set(FRAGMENT_SHADER_NAME "${SHADER_NAME}_fragment")
+    set(VERTEX_SHADER_NAME "${SHADER_NAME}_vertex")
 
-add_custom_command(TARGET TheLastGate POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-        "$<TARGET_FILE_DIR:TheLastGate>/shaders"
-)
-
-foreach(SHADER ${SHADER_FILES})
-    get_filename_component(SHADER_NAME "${SHADER}" NAME)
-    add_custom_command(TARGET TheLastGate POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SHADER}"
-            "$<TARGET_FILE_DIR:TheLastGate>/shaders/${SHADER_NAME}"
-            COMMENT "Copying shader ${SHADER_NAME}"
+    configure_file(
+            ${PROJECT_SOURCE_DIR}/graphics/embedded_shader.h.in
+            ${PROJECT_SOURCE_DIR}/_generated/shaders/${SHADER_NAME}_shader.h
+            @ONLY
     )
-endforeach()
+endfunction()
+
+generate_shader_embed_header(effect)
+generate_shader_embed_header(solid)

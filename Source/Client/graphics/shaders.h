@@ -2,7 +2,12 @@
 #define THELASTGATE_SHADERS_H
 #include "glad/glad.h"
 
-GLuint load_shader(const char *path, GLenum type);
-GLuint load_program(const char *vpath, const char *fpath);
+typedef enum TLG_ShaderTypes {
+    TLG_Shader_Effect,
+    TLG_Shader_Solid
+} TLG_ShaderTypes;
+
+GLuint load_program(TLG_ShaderTypes shader_type);
+
 
 #endif //THELASTGATE_SHADERS_H
