@@ -30,7 +30,7 @@ static void channel_finished(int channel) {
 }
 
 int init_sound() {
-    if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 1024) < 0) return -1;
+    if (Mix_OpenAudio(44100, AUDIO_F32SYS, 2, 2048) < 0) return -1;
     Mix_AllocateChannels(10);
     Mix_ChannelFinished(channel_finished);
 
