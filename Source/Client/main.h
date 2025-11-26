@@ -7,6 +7,7 @@ typedef struct {
     int tricky_flag;
     int gamma;
     char path[256];
+    int windowed;
 } AppState;
 
 extern AppState app_state;

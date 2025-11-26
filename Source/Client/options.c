@@ -82,7 +82,6 @@ extern int do_darkmode;
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 //extern int screen_overlay_sprite;
 extern int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
-extern short screen_windowed;
 extern short screen_renderdist;
 
 extern HINSTANCE hinst;
@@ -205,7 +204,7 @@ void setres_1280()
 	xwalk_wx=XWALK_WX_1280;
 	xwalk_wy=XWALK_WY_1280;
 	
-	if (screen_windowed == 0)
+	if (app_state.windowed == 0)
 	{
 		screen_tilexoff+=2;
 		screen_tileyoff-=5;
@@ -253,7 +252,7 @@ void load_options(void)
 		if (read(handle,&okey,sizeof(okey))!=sizeof(okey)) flag=1;
 		if (read(handle,&app_state.gamma,sizeof(app_state.gamma))!=sizeof(app_state.gamma)) app_state.gamma=5000;
 		if (read(handle,&do_shadow,sizeof(do_shadow))!=sizeof(do_shadow)) do_shadow=1;
-		if (read(handle,&screen_windowed,sizeof(screen_windowed))!=sizeof(screen_windowed)) screen_windowed=1;
+		if (read(handle,&app_state.windowed,sizeof(app_state.windowed))!=sizeof(app_state.windowed)) app_state.windowed=1;
 		if (read(handle,&do_darkmode,sizeof(do_darkmode))!=sizeof(do_darkmode)) do_darkmode=0;
 		close(handle);
 	} else flag=1;
@@ -265,7 +264,7 @@ void load_options(void)
 		memset(history,0,sizeof(history));
 		memset(hist_len,0,sizeof(hist_len));
 		memset(words,0,sizeof(words));
-		domusic=0; dosound=1; do_alpha=0; do_shadow=1; screen_windowed=1; do_darkmode=0; app_state.gamma=5000;
+		domusic=0; dosound=1; do_alpha=0; do_shadow=1; app_state.windowed=1; do_darkmode=0; app_state.gamma=5000;
 		memset(&pdata,0,sizeof(pdata));
 		pdata.show_names=1;
 		pdata.hide=1;
@@ -297,7 +296,7 @@ void save_options(void)
 		write(handle,&okey,sizeof(okey));
 		write(handle,&app_state.gamma,sizeof(app_state.gamma));
 		write(handle,&do_shadow,sizeof(do_shadow));
-		write(handle,&screen_windowed,sizeof(screen_windowed));
+		write(handle,&app_state.windowed,sizeof(app_state.windowed));
 		write(handle,&do_darkmode,sizeof(do_darkmode));
 		close(handle);
 	}
@@ -543,8 +542,8 @@ void update_alpha(HWND hwnd)
 
 void update_screenmode(HWND hwnd)
 {
-	if (screen_windowed == 0) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_FULLSCREEN);
-	if (screen_windowed == 1) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_WINDOWED);
+	if (app_state.windowed == 0) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_FULLSCREEN);
+	if (app_state.windowed == 1) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_WINDOWED);
 
 	//if (screen_width == 800) CheckRadioButton(hwnd,IDC_RES800,IDC_RES1600,IDC_RES800);
 	//if (screen_width == 1280) CheckRadioButton(hwnd,IDC_RES800,IDC_RES1600,IDC_RES1280);
@@ -850,13 +849,13 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					return 1;
 				
 				case IDC_WINDOWED:
-					screen_windowed=1;
+					app_state.windowed=1;
 					setres_1280();
 					update_buttons(hwnd);
 					return 1;
 				
 				case IDC_FULLSCREEN:
-					screen_windowed=0;
+					app_state.windowed=0;
 					setres_1280();
 					update_buttons(hwnd);
 					return 1;

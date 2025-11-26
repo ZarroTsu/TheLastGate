@@ -46,7 +46,8 @@
 AppState app_state = {
 	.tricky_flag = 0,
 	.gamma = 5000,
-	.path = ""
+	.path = "",
+	.windowed = 1
 };
 
 extern void cmd3(int cmd,int x,int y,int z);
@@ -64,7 +65,6 @@ extern unsigned int dept_page;
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 //int screen_overlay_sprite;
 int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
-short screen_windowed;
 short screen_renderdist;
 int screen_target_fps = 48;  // Configurable FPS target (default 120)
 
@@ -376,9 +376,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	screen_renderdist=RENDERDIST;
 
-	// Default windowed
-	screen_windowed=1;
-
 	setres_default();
 
 	// TODO: MinGW - Set hinst early so options() can use it before InitWindow()
@@ -391,8 +388,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (quit) exit(0);
 
 	init_sound();
-
-	tmp=init(screen_windowed);
+	tmp=init(app_state.windowed);
 	/*
 	if (tmp!=0) { // A hacky fix for fullscreen support
 		screen_height=800;
