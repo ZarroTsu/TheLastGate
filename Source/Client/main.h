@@ -3,6 +3,13 @@
 
 #include <SDL2/SDL.h>
 
+typedef struct {
+    int tricky_flag;
+    int gamma;
+    char path[256];
+} AppState;
+
+extern AppState app_state;
 extern int quit;
 extern int cur_pos;
 extern int in_len;
