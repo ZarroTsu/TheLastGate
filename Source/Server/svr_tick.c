@@ -1818,7 +1818,9 @@ void char_remove_same_nets(int cn, int co)
 
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
+	#if VERSION < 0x000E00
 	return; // Remove me when client is good to go
+	#endif
 	 
 	unsigned char buf[256];
 	int cn = player[nr].usnr;
@@ -1865,7 +1867,9 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 
 void plr_update_tree_terminology(int nr, int val)
 {
+	#if VERSION < 0x000E00
 	return; // Remove me when client is good to go
+	#endif
 	
 	int tn = -1, n = 0;
 	int cn = player[nr].usnr;
@@ -1971,7 +1975,9 @@ void plr_update_skill_terminology(int nr, int n)
 
 void plr_update_all_skill_terminology(int nr)
 {
+	#if VERSION < 0x000E00
 	return; // Remove me when client is good to go
+	#endif
 	
 	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);
 }
@@ -2476,7 +2482,9 @@ void plr_update_meta_stat_values(int nr, int n)
 
 void plr_update_all_meta_stat_values(int nr)
 {
+	#if VERSION < 0x000E00
 	return; // Remove me when client is good to go
+	#endif
 	
 	for (int n=0; n<89; n++) plr_update_meta_stat_values(nr, n);
 }
@@ -2508,7 +2516,9 @@ void plr_update_meta_terminology(int nr, int n)
 
 void plr_update_all_meta_terminology(int nr)
 {
+	#if VERSION < 0x000E00
 	return; // Remove me when client is good to go
+	#endif
 	
 	for (int n=0; n<89; n++) plr_update_meta_terminology(nr, n);
 }
