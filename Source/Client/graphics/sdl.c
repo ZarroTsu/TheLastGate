@@ -111,8 +111,8 @@ int sdl_init(const int windowed) {
     if (!windowed) {
         SDL_DisplayMode mode;
         SDL_GetDesktopDisplayMode(0, &mode);
-        width = mode.w - 2; // You have to do it by 2, or it creates a tearing effect when you walk.
-        height = mode.h - 2; // This obnoxious hack makes OpenGL not try to force it into fullscreen esque behaviour.
+        width = mode.w;
+        height = mode.h;
     }
 
     app.window = SDL_CreateWindow("Last Gate SDL", windowed ? SDL_WINDOWPOS_UNDEFINED : 0, windowed ? SDL_WINDOWPOS_UNDEFINED : 0, width,
