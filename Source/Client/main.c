@@ -36,7 +36,6 @@
 #pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include <SDL2/SDL_mouse.h>
 
-#include "dd.h"
 #include "common.h"
 #include "input.h"
 #include "inter.h"
@@ -329,13 +328,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// freopen("CONOUT$", "w", stdout);
 	// freopen("CONOUT$", "w", stderr);
 	// freopen("CONIN$",  "r", stdin);
-
-	// This is required for now, when DD isn't loaded we dont set colors...
-	RED=0xF800;
-	GREEN=0x07E0;
-	BLUE=0x001F;
-
-
 	parse_cmd(lpCmdLine);
 
 	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
@@ -418,32 +410,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		say(buf);
 		SDL_Delay(1000);
 
+		// TODO: Revisit this, it needs way better logging...
 		sprintf(buf,
-				"DirectX init failed with code %d.\n"
-				"DDError=%s\n"
+				"SDL init failed with code %d.\n"
 				"Client Version %d.%02d.%02d\n"
-				"MAXX=%d, MAXY=%d\n"
 				"R=%04X, G=%04X, B=%04X\n"
-				"RGBM=%d\n"
-				"MAXCACHE=%d\n",
-				-tmp,DDERR,VERSION>>16,(VERSION>>8)&255,VERSION&255,MAXX,MAXY,RED,GREEN,BLUE,RGBM,MAXCACHE);
+				-tmp,VERSION>>16,(VERSION>>8)&255,VERSION&255,RED,GREEN,BLUE);
 		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
 		// SDL2: Use SDL_ShowSimpleMessageBox()
 		MessageBox(hwnd,buf,"DirectX init failed.",MB_ICONSTOP|MB_OK);
 		exit(1);
 	}
-    sprintf(buf,"|R=%04X, G=%04X, B=%04X, RGBM=%d",RED,GREEN,BLUE,RGBM);
+    sprintf(buf,"|R=%04X, G=%04X, B=%04X, RGBM=%d",RED,GREEN,BLUE);
 	say(buf);
 
-    init_xalloc();
-	conv_init();
-	init_pnglib();
 	init_input();
-
-	if (RGBM==-1) {
-		sprintf(buf,"|unknown card: R=%04X G=%04X B=%04X",RED,GREEN,BLUE);
-		say(buf);
-	}
 
 	log_system_data();
 

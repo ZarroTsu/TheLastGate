@@ -2,8 +2,6 @@
 project(TheLastGate C)
 
 add_executable(TheLastGate WIN32
-        conv.c
-        dd.c
         engine.c
         engine.h
         graphics/atlas.c

@@ -6,7 +6,6 @@
 #include "main.h"
 #include "socket.h"
 #include "engine.h"
-#include "dd.h"
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])

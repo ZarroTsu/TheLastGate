@@ -595,4 +595,8 @@ struct cplayer {
 
 extern int ctick;
 
+#define RED (0xF800)
+#define GREEN (0x07E0)
+#define BLUE (0x001F)
+
 #endif //THELASTGATE_COMMON_H

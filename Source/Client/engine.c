@@ -65,7 +65,7 @@ extern int cur_pos;
 extern int view_pos;
 extern int logstart;
 extern int logtimer;
-extern int RED,GREEN,BLUE;
+
 int tput=0;
 
 extern int do_shadow;
