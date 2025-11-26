@@ -154,10 +154,9 @@ void handle_input(void) {
                         // dd_savescreen(); TODO: Implement this
                         break;
                     case SDLK_F10:
-                        button_command(25);
                         app_state.gamma += 250;
                         if (app_state.gamma > 6000) app_state.gamma = 5000;
-                        xlog(2, "Set gamma correction to %1.2f", app_state.gamma / 5000.0)
+                        xlog(2, "Set gamma correction to %1.2f", app_state.gamma / 5000.0);
                         break;
                     case SDLK_F11:
                         xlog(2, " ");
