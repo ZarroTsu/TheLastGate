@@ -225,6 +225,7 @@ void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos, int xoff, int yo
     rx += xoff;
     ry += yoff;
 
+    sdl_start_scaling();
     // Render using OpenGL with additive blending for glow effect
     // Set additive blending: result = src + dst
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -262,6 +263,7 @@ void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos, int xoff, int yo
 
     // Restore standard alpha blending (set in sdl_init)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    sdl_stop_scaling();
 }
 
 /*
@@ -305,6 +307,7 @@ void sdl_alphaeffect_magic_scaled(int nr, int str, int xpos, int ypos,
     rx -= (scaled_size - 64) / 2;
     ry -= (scaled_size - 64) / 2;
 
+    sdl_start_scaling();
     // Render using OpenGL with additive blending
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
@@ -337,4 +340,5 @@ void sdl_alphaeffect_magic_scaled(int nr, int str, int xpos, int ypos,
 
     // Restore standard alpha blending
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    sdl_stop_scaling();
 }

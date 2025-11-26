@@ -47,7 +47,8 @@ AppState app_state = {
 	.tricky_flag = 0,
 	.gamma = 5000,
 	.path = "",
-	.windowed = 1
+	.windowed = 1,
+	.window_size = {1280, 720}
 };
 
 extern void cmd3(int cmd,int x,int y,int z);

@@ -107,6 +107,7 @@ int sdl_init(const int windowed) {
 
     app.window = SDL_CreateWindow("Last Gate SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
                                   SCREEN_HEIGHT, windowFlags);
+    SDL_GetWindowSize(app.window, &app_state.window_size[0], &app_state.window_size[1]);
 
     if (!app.window) {
         LOG("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
@@ -170,7 +171,7 @@ int sdl_init(const int windowed) {
     gamma_uModel = glGetUniformLocation(gamma_shader, "uModel");
 
     LOG("Cached gamma shader uniform locations: proj=%d, model=%d, tex=%d, gamma=%d, instancing=%d\n",
-           gamma_uProjection, gamma_uModel, gamma_uTexture, gamma_uGammaScale, gamma_uUseInstancing);
+        gamma_uProjection, gamma_uModel, gamma_uTexture, gamma_uGammaScale, gamma_uUseInstancing);
 
     // Load solid color shader for UI primitives (boxes, bars)
     solid_shader = load_program(TLG_Shader_Solid);
@@ -184,7 +185,7 @@ int sdl_init(const int windowed) {
     solid_uModel = glGetUniformLocation(solid_shader, "uModel");
     solid_uColor = glGetUniformLocation(solid_shader, "uColor");
     LOG("Cached solid shader uniform locations: proj=%d, model=%d, color=%d\n",
-           solid_uProjection, solid_uModel, solid_uColor);
+        solid_uProjection, solid_uModel, solid_uColor);
 
     // Create VAO/VBO for sprite quad rendering
     // Quad vertices: position (x, y, z) + texcoord (u, v)
@@ -381,6 +382,7 @@ void sdl_batch_begin(void) {
 void sdl_batch_flush(void) {
     if (app.batch_count == 0) return;
 
+    sdl_start_scaling();
     // Upload instance data to GPU
     glBindBuffer(GL_ARRAY_BUFFER, app.instance_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, app.batch_count * sizeof(SpriteInstance), app.batch_buffer);
@@ -400,7 +402,7 @@ void sdl_batch_flush(void) {
     glBindVertexArray(app.quad_vao);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, app.batch_count);
     glBindVertexArray(0);
-
+    sdl_stop_scaling();
     // Reset batch for next frame
     app.batch_count = 0;
 
@@ -676,7 +678,7 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
 
     if (first_render) {
         LOG("First render: sprite=%d, effect=%d, pos=(%d,%d), offset=(%d,%d)\n",
-               nr, effect, x, y, xoff, yoff);
+            nr, effect, x, y, xoff, yoff);
         LOG("Sprite dimensions: %dx%d pixels\n", sprite_data[nr].pixel_width, sprite_data[nr].pixel_height);
         first_render = 0;
     }
@@ -818,6 +820,7 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
         SDL_FreeSurface(char_surf);
     }
 
+    sdl_start_scaling();
     // Render character using OpenGL (legacy uniform path)
     glUseProgram(gamma_shader);
     glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode
@@ -848,6 +851,7 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+    sdl_stop_scaling();
 }
 
 void sdl_gputc(int xpos, int ypos, int font, int c) {
@@ -894,6 +898,7 @@ void sdl_gputc(int xpos, int ypos, int font, int c) {
         SDL_FreeSurface(char_surf);
     }
 
+    sdl_start_scaling();
     // Render character using OpenGL (legacy uniform path)
     glUseProgram(gamma_shader);
     glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode
@@ -925,6 +930,7 @@ void sdl_gputc(int xpos, int ypos, int font, int c) {
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+    sdl_stop_scaling();
 }
 
 void sdl_puttext(int x, int y, int font, char *text) {
@@ -971,6 +977,7 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
     float g = ((col & 0x07E0) >> 5) / 63.0f;
     float b = (col & 0x001F) / 31.0f;
 
+    sdl_start_scaling();
     glUseProgram(solid_shader);
     glUniformMatrix4fv(solid_uProjection, 1, GL_FALSE, projection_matrix);
     glUniform4f(solid_uColor, r, g, b, 1.0f);
@@ -1000,6 +1007,7 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
+    sdl_stop_scaling();
 }
 
 void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
@@ -1011,6 +1019,7 @@ void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
     float g = ((col & 0x07E0) >> 5) / 63.0f;
     float b = (col & 0x001F) / 31.0f;
 
+    sdl_start_scaling();
     glUseProgram(solid_shader);
     glUniformMatrix4fv(solid_uProjection, 1, GL_FALSE, projection_matrix);
     glUniform4f(solid_uColor, r, g, b, 1.0f);
@@ -1023,6 +1032,7 @@ void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+    sdl_stop_scaling();
 }
 
 void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
@@ -1052,6 +1062,7 @@ void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
     ry += yoff;
     ry += ys * 32 - disp; // Offset shadow downward
 
+    sdl_start_scaling();
     // Render shadow using shader (no texture creation needed!)
     glUseProgram(gamma_shader);
     glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode (legacy path)
@@ -1099,6 +1110,7 @@ void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
 
     // Disable shadow mode for subsequent renders
     glUniform1i(gamma_uShadow, 0);
+    sdl_stop_scaling();
 }
 
 static unsigned char *shadow_map = NULL;
@@ -1211,6 +1223,7 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
         }
     }
 
+    sdl_start_scaling();
     // Upload to GPU
     glBindTexture(GL_TEXTURE_2D, minimap_gl_texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 128, 128, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -1250,8 +1263,24 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+    sdl_stop_scaling();
 }
 
 int sdl_get_avgcol(int nr) {
     return sprite_data[nr].avgcol;
+}
+
+void sdl_start_scaling(void) {
+    if (!app_state.windowed) {
+        int w, h;
+        SDL_GetWindowSize(app.window, &w, &h);
+        glViewport(0, 0, w, h);
+    }
+}
+
+void sdl_stop_scaling(void) {
+    if (!app_state.windowed) {
+        glViewport(0, 0, SCREEN_WIDTH,
+                   SCREEN_HEIGHT);
+    }
 }

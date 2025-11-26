@@ -63,6 +63,8 @@ void sdl_shadow_clear(void);
 int sdl_isvisible(void);
 void sdl_show_map(unsigned short *src,int xo,int yo,int magnify);
 int sdl_get_avgcol(int nr);
+void sdl_start_scaling(void);
+void sdl_stop_scaling(void);
 
 // Magic glow effects (sdl_magic.c)
 void sdl_init_magic_effects(void);

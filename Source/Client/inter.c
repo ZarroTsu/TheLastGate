@@ -16,6 +16,8 @@
 
 #include <stdio.h>
 
+#include "main.h"
+
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)
 int gui_inv_up[] 	= { 600,   5, 612,  35 };
 int gui_inv_down[]	= { 600,  76, 612, 106 };
@@ -1374,7 +1376,6 @@ void mouse_mapbox(int x,int y,int state)
 		x+=4;
 	}
 	#endif
-	
 
 	dist_diff=(screen_renderdist-screen_viewsize)/2;
 

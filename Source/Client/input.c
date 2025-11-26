@@ -34,6 +34,15 @@ void init_input(void) {
     SDL_StartTextInput();
 }
 
+void scale_mouse_position(int *x, int *y) {
+    if (!app_state.windowed) {
+        float scaleX = 1280 / (float)app_state.window_size[0];
+        float scaleY = 720 / (float)app_state.window_size[1];
+        *x *= scaleX;
+        *y *= scaleY;
+    }
+}
+
 void handle_input(void) {
     SDL_Event e;
 
@@ -317,12 +326,15 @@ void handle_input(void) {
                 my = e.motion.y;
                 break;
             case SDL_MOUSEBUTTONDOWN:
+                if (!app_state.windowed) scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_DOWN : MS_RB_DOWN);
                 break;
             case SDL_MOUSEBUTTONUP:
+                if (!app_state.windowed) scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_UP : MS_RB_UP);
                 break;
             case SDL_MOUSEWHEEL:
+                if (!app_state.windowed) scale_mouse_position(&e.wheel.mouseX, &e.wheel.mouseY);
                 const int delta = e.wheel.y;
                 const int x = e.wheel.mouseX;
                 const int y = e.wheel.mouseY;

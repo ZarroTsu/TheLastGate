@@ -8,6 +8,7 @@ typedef struct {
     int gamma;
     char path[256];
     int windowed;
+    int window_size[2];
 } AppState;
 
 extern AppState app_state;
