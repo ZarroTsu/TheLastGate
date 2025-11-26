@@ -3,8 +3,6 @@
 
 #include <SDL2/SDL.h>
 
-extern int gamma;
-
 int init(int windowed);
 void deinit(void);
 

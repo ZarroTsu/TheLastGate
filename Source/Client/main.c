@@ -246,7 +246,7 @@ int parse_cmd(char *s)
 			s++;
 			if (tolower(*s)=='t') {
 				s++;
-				tricky_flag=1;
+				app_state.tricky_flag=1;
 			} else if (tolower(*s)=='d') {
 				s++;
 				while (isspace(*s)) s++;

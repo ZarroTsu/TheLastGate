@@ -10,6 +10,7 @@
 
 
 #include "atlas.h"
+#include "../render.h"
 #include "loader.h"
 #include "../inter.h"
 #include "../main.h"
@@ -700,8 +701,7 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
     }
 
     // Pack effect flags into integer
-    extern int gamma;
-    float gamma_scale = gamma / 5000.0f;
+    float gamma_scale = app_state.gamma / 5000.0f;
     float shade_effect, gamma_effect;
     bool grey, infra, water, red, green, invis;
     calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis);
@@ -751,8 +751,7 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     }
 
     // Pack effect flags into integer
-    extern int gamma;
-    float gamma_scale = gamma / 5000.0f;
+    float gamma_scale = app_state.gamma / 5000.0f;
     float shade_effect, gamma_effect;
     bool grey, infra, water, red, green, invis;
     calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis);
@@ -829,8 +828,7 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
     glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
     glUniform1i(gamma_uTexture, 0);
 
-    extern int gamma;
-    float gamma_scale = gamma / 5000.0f;
+    float gamma_scale = app_state.gamma / 5000.0f;
     glUniform1f(gamma_uGammaScale, gamma_scale);
     glUniform2f(gamma_uUV0, 0.0f, 0.0f);
     glUniform2f(gamma_uUV1, 1.0f, 1.0f);
@@ -906,8 +904,7 @@ void sdl_gputc(int xpos, int ypos, int font, int c) {
     glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
     glUniform1i(gamma_uTexture, 0);
 
-    extern int gamma;
-    float gamma_scale = gamma / 5000.0f;
+    float gamma_scale = app_state.gamma / 5000.0f;
     glUniform1f(gamma_uGammaScale, gamma_scale);
     glUniform2f(gamma_uUV0, 0.0f, 0.0f);
     glUniform2f(gamma_uUV1, 1.0f, 1.0f);
@@ -1235,8 +1232,7 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
     glUniform2f(gamma_uUV1, 1.0f, 1.0f);
 
     // Disable all shader effects
-    extern int gamma;
-    float gamma_scale = gamma / 5000.0f;
+    float gamma_scale = app_state.gamma / 5000.0f;
     glUniform1f(gamma_uGammaScale, gamma_scale);
     glUniform1f(gamma_uShadeEffect, 0.0f);
     glUniform1f(gamma_uGammaEffect, 0.0f);
