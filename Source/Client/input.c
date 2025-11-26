@@ -94,7 +94,26 @@ void handle_input(void) {
 #endif
                 if (app_state.windowed) {
                     if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
-                        SDL_GetWindowSize(app.window, &app_state.window_size[0], &app_state.window_size[1]);
+                        if ((SDL_GetWindowFlags(app.window) & SDL_WINDOW_MAXIMIZED) != 0) {
+                            app_state.window_size[0] = e.window.data1;
+                            app_state.window_size[1] = e.window.data2;
+                            continue; // If they are maximizing the window just set the new size for scaling
+                        }
+
+                        // Otherwise attempt to maintain aspect ratio.
+                        int difference_width = abs(app_state.window_size[0] - e.window.data1);
+                        int difference_height = abs(app_state.window_size[1] - e.window.data2);
+                        bool widthStretch = difference_width > difference_height;
+                        if (widthStretch) {
+                            int differenceFromNatural = e.window.data1 - SCREEN_WIDTH;
+                            app_state.window_size[0] = e.window.data1;
+                            app_state.window_size[1] = SCREEN_HEIGHT + (9.0f / 16.0f * (float)differenceFromNatural);
+                        } else {
+                            int differenceFromNatural = e.window.data2 - SCREEN_HEIGHT;
+                            app_state.window_size[0] = SCREEN_WIDTH + ( 16.0f / 9.0f * (float)differenceFromNatural);
+                            app_state.window_size[1] = e.window.data2;
+                        }
+                        SDL_SetWindowSize(app.window, app_state.window_size[0], app_state.window_size[1]);
                     }
                 }
                 break;
