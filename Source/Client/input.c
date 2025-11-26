@@ -84,10 +84,12 @@ void handle_input(void) {
         switch (e.type) {
             case SDL_WINDOWEVENT:
 #ifdef _WIN32
-                if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
-                    MakeWindowTopMost(app.window);
-                } else if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
-                    MakeWindowNormal(app.window);
+                if (!app_state.windowed) {
+                    if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
+                        MakeWindowTopMost(app.window);
+                    } else if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+                        MakeWindowNormal(app.window);
+                    }
                 }
 #endif
                 break;
