@@ -36,9 +36,9 @@ void init_input(void) {
 }
 
 void scale_mouse_position(int *x, int *y) {
-    if (!app_state.windowed) {
-        float scaleX = 1280 / (float)app_state.window_size[0];
-        float scaleY = 720 / (float)app_state.window_size[1];
+    if (app_state.window_size[0] != SCREEN_WIDTH || app_state.window_size[1] != SCREEN_HEIGHT) {
+        float scaleX = 1280 / (float) app_state.window_size[0];
+        float scaleY = 720 / (float) app_state.window_size[1];
         *x *= scaleX;
         *y *= scaleY;
     }
@@ -92,6 +92,11 @@ void handle_input(void) {
                     }
                 }
 #endif
+                if (app_state.windowed) {
+                    if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
+                        SDL_GetWindowSize(app.window, &app_state.window_size[0], &app_state.window_size[1]);
+                    }
+                }
                 break;
             case SDL_QUIT: quit = 1;
                 break;
@@ -365,21 +370,21 @@ void handle_input(void) {
                 }
                 break;
             case SDL_MOUSEMOTION:
-                if (!app_state.windowed) scale_mouse_position(&e.motion.x, &e.motion.y);
+                scale_mouse_position(&e.motion.x, &e.motion.y);
                 mouse(e.motion.x, e.motion.y, MS_MOVE);
                 mx = e.motion.x;
                 my = e.motion.y;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (!app_state.windowed) scale_mouse_position(&e.button.x, &e.button.y);
+                scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_DOWN : MS_RB_DOWN);
                 break;
             case SDL_MOUSEBUTTONUP:
-                if (!app_state.windowed) scale_mouse_position(&e.button.x, &e.button.y);
+                scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_UP : MS_RB_UP);
                 break;
             case SDL_MOUSEWHEEL:
-                if (!app_state.windowed) scale_mouse_position(&e.wheel.mouseX, &e.wheel.mouseY);
+                scale_mouse_position(&e.wheel.mouseX, &e.wheel.mouseY);
                 const int delta = e.wheel.y;
                 const int x = e.wheel.mouseX;
                 const int y = e.wheel.mouseY;

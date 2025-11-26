@@ -92,7 +92,8 @@ extern void *conv_load(int nr, int *xs, int *ys);
 extern FILE *load_pnglib(int nr);
 
 int sdl_init(const int windowed) {
-    const int windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | (!windowed ? SDL_WINDOW_BORDERLESS : 0);
+    const int windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | (
+                                windowed ? SDL_WINDOW_RESIZABLE : 0) | (!windowed ? SDL_WINDOW_BORDERLESS : 0);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         LOG("Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -115,7 +116,8 @@ int sdl_init(const int windowed) {
         height = mode.h;
     }
 
-    app.window = SDL_CreateWindow("Last Gate SDL", windowed ? SDL_WINDOWPOS_UNDEFINED : 0, windowed ? SDL_WINDOWPOS_UNDEFINED : 0, width,
+    app.window = SDL_CreateWindow("Last Gate SDL", windowed ? SDL_WINDOWPOS_UNDEFINED : 0,
+                                  windowed ? SDL_WINDOWPOS_UNDEFINED : 0, width,
                                   height, windowFlags);
 
     SDL_GetWindowSize(app.window, &app_state.window_size[0], &app_state.window_size[1]);
@@ -718,7 +720,8 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     float gamma_scale = app_state.gamma / 5000.0f;
     float shade_effect, gamma_effect;
     bool grey, infra, water, red, green, invis, buff;
-    calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis, &buff);
+    calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis,
+                                  &buff);
 
     int flags = 0;
     if (red) flags |= (1 << 0); // FLAG_RED
@@ -1234,16 +1237,10 @@ int sdl_get_avgcol(int nr) {
 }
 
 void sdl_start_scaling(void) {
-    if (!app_state.windowed) {
-        int w, h;
-        SDL_GetWindowSize(app.window, &w, &h);
-        glViewport(0, 0, w, h);
-    }
+    glViewport(0, 0, app_state.window_size[0], app_state.window_size[1]);
 }
 
 void sdl_stop_scaling(void) {
-    if (!app_state.windowed) {
-        glViewport(0, 0, SCREEN_WIDTH,
-                   SCREEN_HEIGHT);
-    }
+    glViewport(0, 0, SCREEN_WIDTH,
+               SCREEN_HEIGHT);
 }
