@@ -4356,37 +4356,38 @@ int item_has_player_mods(int in)
 	return 0;
 }
 
-void item_copy_player_mods(struct item in, struct item in2) // Copy from in to in2
+void item_copy_player_mods(int in, int in2) // Copy from in to in2
 {
 	int n;
-	for (n=0;n<5;n++) in2.attrib[n][I_P] = in.attrib[n][I_P];
-	for (n=0;n<50;n++) in2.skill[n][I_P] = in.skill[n][I_P];
-	in2.hp[I_P]            = in.hp[I_P];
-	in2.end[I_P]           = in.end[I_P];
-	in2.mana[I_P]          = in.mana[I_P];
-	in2.weapon[I_P]        = in.weapon[I_P];
-	in2.armor[I_P]         = in.armor[I_P];
-	in2.spell_pow[I_P]     = in.spell_pow[I_P];
-	in2.top_damage[I_P]    = in.top_damage[I_P];
-	in2.to_hit[I_P]        = in.to_hit[I_P];
-	in2.to_parry[I_P]      = in.to_parry[I_P];
-	in2.gethit_dam[I_P]    = in.gethit_dam[I_P];
-	in2.speed[I_P]         = in.speed[I_P];
-	in2.move_speed[I_P]    = in.move_speed[I_P];
-	in2.atk_speed[I_P]     = in.atk_speed[I_P];
-	in2.cast_speed[I_P]    = in.cast_speed[I_P];
-	in2.spell_mod[I_P]     = in.spell_mod[I_P];
-	in2.spell_apt[I_P]     = in.spell_apt[I_P];
-	in2.cool_bonus[I_P]    = in.cool_bonus[I_P];
-	in2.aoe_bonus[I_P]     = in.aoe_bonus[I_P];
-	in2.base_crit[I_P]     = in.base_crit[I_P];
-	in2.crit_chance[I_P]   = in.crit_chance[I_P];
-	in2.crit_multi[I_P]    = in.crit_multi[I_P];
-	in2.dmg_bonus[I_P]     = in.dmg_bonus[I_P];
-	in2.dmg_reduction[I_P] = in.dmg_reduction[I_P];
-	in2.light[I_P]         = in.light[I_P];
-	in2.enchantment        = in.enchantment;
-	in2.corruption         = in.corruption;
+	
+	for (n=0;n<5;n++) it[in2].attrib[n][I_P] = it[in].attrib[n][I_P];
+	for (n=0;n<50;n++) it[in2].skill[n][I_P] = it[in].skill[n][I_P];
+	it[in2].hp[I_P]            = it[in].hp[I_P];
+	it[in2].end[I_P]           = it[in].end[I_P];
+	it[in2].mana[I_P]          = it[in].mana[I_P];
+	it[in2].weapon[I_P]        = it[in].weapon[I_P];
+	it[in2].armor[I_P]         = it[in].armor[I_P];
+	it[in2].spell_pow[I_P]     = it[in].spell_pow[I_P];
+	it[in2].top_damage[I_P]    = it[in].top_damage[I_P];
+	it[in2].to_hit[I_P]        = it[in].to_hit[I_P];
+	it[in2].to_parry[I_P]      = it[in].to_parry[I_P];
+	it[in2].gethit_dam[I_P]    = it[in].gethit_dam[I_P];
+	it[in2].speed[I_P]         = it[in].speed[I_P];
+	it[in2].move_speed[I_P]    = it[in].move_speed[I_P];
+	it[in2].atk_speed[I_P]     = it[in].atk_speed[I_P];
+	it[in2].cast_speed[I_P]    = it[in].cast_speed[I_P];
+	it[in2].spell_mod[I_P]     = it[in].spell_mod[I_P];
+	it[in2].spell_apt[I_P]     = it[in].spell_apt[I_P];
+	it[in2].cool_bonus[I_P]    = it[in].cool_bonus[I_P];
+	it[in2].aoe_bonus[I_P]     = it[in].aoe_bonus[I_P];
+	it[in2].base_crit[I_P]     = it[in].base_crit[I_P];
+	it[in2].crit_chance[I_P]   = it[in].crit_chance[I_P];
+	it[in2].crit_multi[I_P]    = it[in].crit_multi[I_P];
+	it[in2].dmg_bonus[I_P]     = it[in].dmg_bonus[I_P];
+	it[in2].dmg_reduction[I_P] = it[in].dmg_reduction[I_P];
+	it[in2].light[I_P]         = it[in].light[I_P];
+	it[in2].enchantment        = it[in].enchantment;
+	it[in2].corruption         = it[in].corruption;
 }
 
 int item_repair(int cn, int in, int power, int n, int flag)
@@ -4465,9 +4466,13 @@ int item_repair(int cn, int in, int power, int n, int flag)
 				if (!flag) do_char_log(cn, 0, "You failed.\n");
 				return 0;
 			}
-			if (it[in].flags & IF_IDENTIFIED) it[in2].flags |= IF_IDENTIFIED;
-			if (item_has_player_mods(in)) item_copy_player_mods(it[in], it[in2]);
-			it[in].used  = USE_EMPTY;
+			if (item_has_player_mods(in))
+				item_copy_player_mods(in, in2);
+			
+			it[in2].flags  = it[in].flags;
+			it[in2].flags |= IF_UPDATE;
+			it[in].used    = USE_EMPTY;
+			
 			if (n<0) 			ch[cn].citem 		= in2;
 			else if (flag==3)	ch[cn].alt_worn[n] 	= in2;
 			else if (flag==2)	ch[cn].worn[n] 		= in2;
