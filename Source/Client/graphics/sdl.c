@@ -615,7 +615,7 @@ void sdl_load_sprite(const int nr) {
 static int first_render = 1;
 
 void calculate_gamma_shader_params(int effect, float *shade_effect, float *gamma_effect, bool *grey, bool *infra,
-                                   bool *water, bool *red, bool *green, bool *invis) {
+                                   bool *water, bool *red, bool *green, bool *invis, bool *buff) {
     // Default: no lighting effect (0 means shader won't apply darkening)
     *shade_effect = 0.0f;
     *gamma_effect = 0.0f;
@@ -627,31 +627,36 @@ void calculate_gamma_shader_params(int effect, float *shade_effect, float *gamma
     *grey = false;
     *infra = false;
     *water = false;
+    *buff = false;
 
-    if (effect & 16) {
-        effect -= 16;
+    if (effect & EFFECT_RED) {
+        effect -= EFFECT_RED;
         *red = true;
     } //red border
-    if (effect & 32) {
-        effect -= 32;
+    if (effect & EFFECT_GREEN) {
+        effect -= EFFECT_GREEN;
         *green = true;
     } //green border
-    if (effect & 64) {
-        effect -= 64;
+    if (effect & EFFECT_INVIS) {
+        effect -= EFFECT_INVIS;
         *invis = true;
     } //blackened out
-    if (effect & 128) {
-        effect -= 128;
+    if (effect & EFFECT_GREY) {
+        effect -= EFFECT_GREY;
         *grey = true;
     } //grey scale
-    if (effect & 256) {
-        effect -= 256;
+    if (effect & EFFECT_INFRA) {
+        effect -= EFFECT_INFRA;
         *infra = true;
     } //grey scale
-    if (effect & 512) {
-        effect -= 512;
+    if (effect & EFFECT_WATER) {
+        effect -= EFFECT_WATER;
         *water = true;
     } //grey scale
+    if (effect & EFFECT_BUFF) {
+        effect -= EFFECT_BUFF;
+        *buff = true;
+    }
 
     // Only apply lighting darkening if effect is non-zero
     if (effect > 0) {
@@ -666,32 +671,8 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
 
     sdl_load_sprite(nr);
     if (!sprite_data[nr].gl_texture) {
-        if (first_render) {
-            LOG("ERROR: No GL texture for sprite %d\n", nr);
-        }
+        xlog(0, "No sprite found for sprite %s", nr);
         return;
-    }
-
-    // Only batch sprites that are in the atlas
-    if (!sprite_data[nr].loaded_in_atlas) {
-        // Fall back to immediate rendering for non-atlas sprites
-        // TODO: Implement separate batch for non-atlas sprites
-        LOG("Warning: sprite %d not in atlas, skipping batching\n", nr);
-        return;
-    }
-
-    // Initialize projection matrix once
-    if (!projection_initialized) {
-        create_ortho_matrix(projection_matrix, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
-        projection_initialized = 1;
-        LOG("Initialized projection matrix\n");
-    }
-
-    if (first_render) {
-        LOG("First render: sprite=%d, effect=%d, pos=(%d,%d), offset=(%d,%d)\n",
-            nr, effect, x, y, xoff, yoff);
-        LOG("Sprite dimensions: %dx%d pixels\n", sprite_data[nr].pixel_width, sprite_data[nr].pixel_height);
-        first_render = 0;
     }
 
     unsigned int xs = sprite_data[nr].xs;
@@ -707,37 +688,7 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
 
     rx += xoff;
     ry += yoff;
-
-    // Flush batch if full
-    if (app.batch_count >= MAX_BATCH_SIZE) {
-        sdl_batch_flush();
-    }
-
-    // Pack effect flags into integer
-    float gamma_scale = app_state.gamma / 5000.0f;
-    float shade_effect, gamma_effect;
-    bool grey, infra, water, red, green, invis;
-    calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis);
-
-    int flags = 0;
-    if (red) flags |= (1 << 0); // FLAG_RED
-    if (green) flags |= (1 << 1); // FLAG_GREEN
-    if (invis) flags |= (1 << 2); // FLAG_INVIS
-    if (grey) flags |= (1 << 3); // FLAG_GREY
-    if (infra) flags |= (1 << 4); // FLAG_INFRA
-    if (water) flags |= (1 << 5); // FLAG_WATER
-
-    // Add sprite to batch
-    SpriteInstance *inst = &app.batch_buffer[app.batch_count++];
-    create_model_matrix(inst->model, rx, ry, sprite_data[nr].pixel_width, sprite_data[nr].pixel_height);
-    inst->uv0[0] = sprite_data[nr].uv0.u;
-    inst->uv0[1] = sprite_data[nr].uv0.v;
-    inst->uv1[0] = sprite_data[nr].uv1.u;
-    inst->uv1[1] = sprite_data[nr].uv1.v;
-    inst->gamma_scale = gamma_scale;
-    inst->shade_effect = shade_effect;
-    inst->gamma_effect = gamma_effect;
-    inst->flags = flags;
+    sdl_copyspritex(nr, rx, ry, effect);
 }
 
 void sdl_copyspritex(int nr, int x, int y, int effect) {
@@ -766,8 +717,8 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     // Pack effect flags into integer
     float gamma_scale = app_state.gamma / 5000.0f;
     float shade_effect, gamma_effect;
-    bool grey, infra, water, red, green, invis;
-    calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis);
+    bool grey, infra, water, red, green, invis, buff;
+    calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis, &buff);
 
     int flags = 0;
     if (red) flags |= (1 << 0); // FLAG_RED
@@ -776,6 +727,7 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     if (grey) flags |= (1 << 3); // FLAG_GREY
     if (infra) flags |= (1 << 4); // FLAG_INFRA
     if (water) flags |= (1 << 5); // FLAG_WATER
+    if (buff) flags |= (1 << 7); // FLAG_BUFF
 
     // Add sprite to batch (x, y are already screen coordinates)
     SpriteInstance *inst = &app.batch_buffer[app.batch_count++];

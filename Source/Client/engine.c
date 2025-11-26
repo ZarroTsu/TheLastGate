@@ -2594,10 +2594,14 @@ void eng_display_win(int plr_sprite,int init)
 		// Draw buffs and debuffs
 		for (n=0; n<MAXBUFFS; n++)
 		{
-			if (buffs[n][0])
-				copyspritex(  buffs[n][0], 848+(n/5)*20,      8+(n%5)*23, 15-min(15,  buffs[n][1]));
-			if (debuffs[n][0])
-				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, 15-min(15,debuffs[n][1]));
+			if (buffs[n][0]) {
+				int effect = (15-min(15, buffs[n][1])) | EFFECT_BUFF;
+				copyspritex(  buffs[n][0], 848+(n/5)*20,      8+(n%5)*23, effect);
+			}
+			if (debuffs[n][0]) {
+				int effect = (15-min(15,debuffs[n][1])) | EFFECT_BUFF;
+				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, effect);
+			}
 		}
 		
 		if (show_shop==112) // New Depot

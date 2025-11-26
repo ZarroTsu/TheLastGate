@@ -50,7 +50,8 @@ SDL_Surface *load_from_png_lib(const int nr) {
     long size = end - start;
 
     if (size > MAX_PNG_SIZE) {
-        LOG("Attempt to load a too big sprite: nr=%d", nr);
+        // TODO: this is a lie, that i don't want to fix right now.
+        LOG("Attempt to load a too big sprite: nr=%d; size=%d", nr, size);
         size = MAX_PNG_SIZE;
     }
 

@@ -15,6 +15,15 @@
 // Maximum sprites that can be batched in a single draw call
 #define MAX_BATCH_SIZE 10000
 
+// Effect Bitmasks
+#define EFFECT_RED 16
+#define EFFECT_GREEN 32
+#define EFFECT_INVIS 64
+#define EFFECT_GREY 128
+#define EFFECT_INFRA 256
+#define EFFECT_WATER 512
+#define EFFECT_BUFF 1024
+
 // Per-sprite instance data for batched rendering
 typedef struct {
     float model[16];      // Model matrix (position + size)

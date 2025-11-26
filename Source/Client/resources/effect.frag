@@ -22,6 +22,7 @@ uniform bool uGrey;
 uniform bool uInfra;
 uniform bool uWater;
 uniform bool uShadow;
+uniform bool uBuff;
 uniform bool uUseInstancing;
 
 // Flag bit positions
@@ -32,6 +33,7 @@ uniform bool uUseInstancing;
 #define FLAG_INFRA  (1 << 4)
 #define FLAG_WATER  (1 << 5)
 #define FLAG_SHADOW (1 << 6)
+#define FLAG_BUFF   (1 << 7)
 
 void main() {
     // Use instance data if available (vGammaScale will be > 0 for instanced rendering)
@@ -52,7 +54,7 @@ void main() {
     float shadeEffect = useInstanceData ? vShadeEffect : uShadeEffect;
     float gammaEffect = useInstanceData ? vGammaEffect : uGammaEffect;
 
-    bool isRed, isGreen, isInvis, isGrey, isInfra, isWater, isShadow;
+    bool isRed, isGreen, isInvis, isGrey, isInfra, isWater, isShadow, isBuff;
     if (useInstanceData) {
         isRed = (vFlags & FLAG_RED) != 0;
         isGreen = (vFlags & FLAG_GREEN) != 0;
@@ -61,6 +63,7 @@ void main() {
         isInfra = (vFlags & FLAG_INFRA) != 0;
         isWater = (vFlags & FLAG_WATER) != 0;
         isShadow = (vFlags & FLAG_SHADOW) != 0;
+        isBuff = (vFlags & FLAG_BUFF) != 0;
     } else {
         isRed = uRed;
         isGreen = uGreen;
@@ -69,6 +72,7 @@ void main() {
         isInfra = uInfra;
         isWater = uWater;
         isShadow = uShadow;
+        isBuff = uBuff;
     }
 
     if (isShadow) {
@@ -77,6 +81,8 @@ void main() {
         FragColor = color;
         return;
     }
+
+    if (isBuff) gammaEffect = 1;
 
     if (gammaEffect > 0.0 && shadeEffect > 0.0) {
         color.rgb *= gammaEffect / (shadeEffect * shadeEffect + gammaEffect);
