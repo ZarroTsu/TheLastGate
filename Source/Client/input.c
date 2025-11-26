@@ -365,6 +365,7 @@ void handle_input(void) {
                 }
                 break;
             case SDL_MOUSEMOTION:
+                if (!app_state.windowed) scale_mouse_position(&e.motion.x, &e.motion.y);
                 mouse(e.motion.x, e.motion.y, MS_MOVE);
                 mx = e.motion.x;
                 my = e.motion.y;
