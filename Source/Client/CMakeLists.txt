@@ -50,9 +50,9 @@ target_compile_options(TheLastGate PRIVATE
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(TheLastGate PRIVATE
-        -DHOMECOPY
+            -DHOMECOPY
     )
-endif()
+endif ()
 
 # Release build optimizations
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -140,6 +140,10 @@ target_link_libraries(TheLastGate PRIVATE
         OpenGL::GL
 )
 
+if (WIN32)
+    target_link_libraries(TheLastGate PRIVATE user32)
+endif ()
+
 # Hybrid linking: Copy only SDL2_image, SDL2_mixer, and their format library DLLs
 if (MINGW)
     get_filename_component(MINGW_BIN_DIR ${CMAKE_C_COMPILER} DIRECTORY)
@@ -183,8 +187,8 @@ add_custom_command(TARGET TheLastGate POST_BUILD
 )
 
 function(generate_shader_embed_header SHADER_NAME)
-    file (READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag FRAGMENT_SHADER_CONTENT)
-    file (READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert VERTEX_SHADER_CONTENT)
+    file(READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag FRAGMENT_SHADER_CONTENT)
+    file(READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert VERTEX_SHADER_CONTENT)
     set(FRAGMENT_SHADER_NAME "${SHADER_NAME}_fragment")
     set(VERTEX_SHADER_NAME "${SHADER_NAME}_vertex")
 

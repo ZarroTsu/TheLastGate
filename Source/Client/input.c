@@ -6,6 +6,7 @@
 #include "main.h"
 #include "socket.h"
 #include "engine.h"
+#include "graphics/sdl.h"
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])
@@ -43,12 +44,53 @@ void scale_mouse_position(int *x, int *y) {
     }
 }
 
+#ifdef _WIN32
+
+#include <SDL2/SDL_syswm.h>
+
+static void MakeWindowTopMost(SDL_Window *win) {
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+
+    if (SDL_GetWindowWMInfo(win, &info)) {
+        HWND hwnd = info.info.win.window;
+
+        SetWindowPos(hwnd, HWND_TOPMOST,
+                     0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+}
+
+static void MakeWindowNormal(SDL_Window *win) {
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+
+    if (SDL_GetWindowWMInfo(win, &info)) {
+        HWND hwnd = info.info.win.window;
+
+        SetWindowPos(hwnd, HWND_NOTOPMOST,
+                     0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+}
+
+#endif
+
 void handle_input(void) {
     SDL_Event e;
 
     while (SDL_PollEvent(&e)) {
         bool spellKey = (SDL_GetModState() & (KMOD_CTRL | KMOD_ALT)) != 0;
         switch (e.type) {
+            case SDL_WINDOWEVENT:
+#ifdef _WIN32
+                if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
+                    MakeWindowTopMost(app.window);
+                } else if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+                    MakeWindowNormal(app.window);
+                }
+#endif
+                break;
             case SDL_QUIT: quit = 1;
                 break;
             case SDL_KEYDOWN:

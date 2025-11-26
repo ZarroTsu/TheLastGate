@@ -92,7 +92,7 @@ extern void *conv_load(int nr, int *xs, int *ys);
 extern FILE *load_pnglib(int nr);
 
 int sdl_init(const int windowed) {
-    const int windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | (!windowed ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+    const int windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | (!windowed ? SDL_WINDOW_BORDERLESS : 0);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         LOG("Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -105,8 +105,19 @@ int sdl_init(const int windowed) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    app.window = SDL_CreateWindow("Last Gate SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                                  SCREEN_HEIGHT, windowFlags);
+    int width = SCREEN_WIDTH;
+    int height = SCREEN_HEIGHT;
+
+    if (!windowed) {
+        SDL_DisplayMode mode;
+        SDL_GetDesktopDisplayMode(0, &mode);
+        width = mode.w;
+        height = mode.h - 1; // This obnoxious hack makes OpenGL not try to force it into fullscreen esque behaviour.
+    }
+
+    app.window = SDL_CreateWindow("Last Gate SDL", windowed ? SDL_WINDOWPOS_UNDEFINED : 0, windowed ? SDL_WINDOWPOS_UNDEFINED : 0, width,
+                                  height, windowFlags);
+
     SDL_GetWindowSize(app.window, &app_state.window_size[0], &app_state.window_size[1]);
 
     if (!app.window) {
