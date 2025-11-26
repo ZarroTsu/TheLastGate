@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../log.h"
+#include "../main.h"
 #include "shaders/effect_shader.h"
 #include "shaders/solid_shader.h"
 
@@ -17,7 +18,7 @@ static GLuint load_shader(const char *source, GLenum type) {
     if (!success) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        LOG("ERROR: Shader compilation failed (%s):\n%s\n", path, infoLog);
+        LOG("ERROR: Shader compilation failed (%s):\n%s\n", app_state.path, infoLog);
         glDeleteShader(shader);
         return 0;
     }

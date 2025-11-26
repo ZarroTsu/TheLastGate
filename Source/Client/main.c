@@ -86,8 +86,6 @@ char host_addr[84]={MHOST};
 char host_proxy[84]={MPROXY};
 int host_port=5555;
 
-extern char path[];
-
 // TODO: Modern GCC/MinGW - Windows-specific window handles
 // SDL2: Use SDL_Window* instead of HWND
 // HINSTANCE not needed in SDL2
@@ -252,9 +250,9 @@ int parse_cmd(char *s)
 			} else if (tolower(*s)=='d') {
 				s++;
 				while (isspace(*s)) s++;
-				n=0; while (n<150 && *s && !isspace(*s)) path[n++]=*s++;
-				if (path[n]!='\\') path[n++]='\\';
-				path[n]=0;
+				n=0; while (n<150 && *s && !isspace(*s)) app_state.path[n++]=*s++;
+				if (app_state.path[n]!='\\') app_state.path[n++]='\\';
+				app_state.path[n]=0;
 			} else if (tolower(*s)=='p') {
 				s++;
 				while (isspace(*s)) s++;

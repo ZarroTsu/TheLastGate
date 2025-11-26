@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include "../dd.h"
 #include "../log.h"
 
 unsigned int tile_atlas;
