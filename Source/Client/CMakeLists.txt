@@ -183,8 +183,8 @@ add_custom_command(TARGET TheLastGate POST_BUILD
 )
 
 function(generate_shader_embed_header SHADER_NAME)
-    file (READ ${CMAKE_SOURCE_DIR}/resources/${SHADER_NAME}.frag FRAGMENT_SHADER_CONTENT)
-    file (READ ${CMAKE_SOURCE_DIR}/resources/${SHADER_NAME}.vert VERTEX_SHADER_CONTENT)
+    file (READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag FRAGMENT_SHADER_CONTENT)
+    file (READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert VERTEX_SHADER_CONTENT)
     set(FRAGMENT_SHADER_NAME "${SHADER_NAME}_fragment")
     set(VERTEX_SHADER_NAME "${SHADER_NAME}_vertex")
 
