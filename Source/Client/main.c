@@ -44,6 +44,12 @@
 #include "sound.h"
 //#include "minilzo.h"
 
+AppState app_state = {
+	.tricky_flag = 0,
+	.gamma = 5000,
+	.path = ""
+};
+
 extern void cmd3(int cmd,int x,int y,int z);
 
 extern int pskip,pidle;
