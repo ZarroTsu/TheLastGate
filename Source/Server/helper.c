@@ -3728,7 +3728,7 @@ int use_corruptor(int cn, int in)
 	return 1;
 }
 
-int use_soulstone_replace_item(int in, int temp)
+int use_soulstone_replace_item(int cn, int in, int temp)
 {
 	int in2;
 	
@@ -3747,7 +3747,7 @@ int use_soulstone_replace_item(int in, int temp)
 	return 1;
 }
 
-int use_soulstone_mod_reservation(int in)
+int use_soulstone_mod_reservation(int cn, int in)
 {
 	int in2, n, m;
 	
@@ -3826,91 +3826,91 @@ int use_soulstone_mod_reservation(int in)
 	return 1;
 }
 
-int use_soulstone_special(int in)
+int use_soulstone_special(int cn, int in)
 {
 	int in2;
 	
 	switch (it[in].temp)
 	{
 		// Impromptu Ring Creation
-		case IT_S_SA: if (use_soulstone_replace_item(in, IT_RI_SSSA)) return 1; break;
-		case IT_S_RU: if (use_soulstone_replace_item(in, IT_RI_SSRU)) return 1; break;
-		case IT_S_AM: if (use_soulstone_replace_item(in, IT_RI_SSAM)) return 1; break;
-		case IT_S_TO: if (use_soulstone_replace_item(in, IT_RI_SSTO)) return 1; break;
-		case IT_S_EM: if (use_soulstone_replace_item(in, IT_RI_SSEM)) return 1; break;
-		case IT_S_DI: if (use_soulstone_replace_item(in, IT_RI_SSDI)) return 1; break;
+		case IT_S_SA: if (use_soulstone_replace_item(cn, in, IT_RI_SSSA)) return 1; break;
+		case IT_S_RU: if (use_soulstone_replace_item(cn, in, IT_RI_SSRU)) return 1; break;
+		case IT_S_AM: if (use_soulstone_replace_item(cn, in, IT_RI_SSAM)) return 1; break;
+		case IT_S_TO: if (use_soulstone_replace_item(cn, in, IT_RI_SSTO)) return 1; break;
+		case IT_S_EM: if (use_soulstone_replace_item(cn, in, IT_RI_SSEM)) return 1; break;
+		case IT_S_DI: if (use_soulstone_replace_item(cn, in, IT_RI_SSDI)) return 1; break;
 		
 		// Gemstone downgrades
-		case IT_M_SA: if (use_soulstone_replace_item(in, IT_S_SA)) return 1; break;
-		case IT_M_RU: if (use_soulstone_replace_item(in, IT_S_RU)) return 1; break;
-		case IT_M_AM: if (use_soulstone_replace_item(in, IT_S_AM)) return 1; break;
-		case IT_M_TO: if (use_soulstone_replace_item(in, IT_S_TO)) return 1; break;
-		case IT_M_EM: if (use_soulstone_replace_item(in, IT_S_EM)) return 1; break;
-		case IT_M_DI: if (use_soulstone_replace_item(in, IT_S_DI)) return 1; break;
-		case IT_B_SA: if (use_soulstone_replace_item(in, IT_M_SA)) return 1; break;
-		case IT_B_RU: if (use_soulstone_replace_item(in, IT_M_RU)) return 1; break;
-		case IT_B_AM: if (use_soulstone_replace_item(in, IT_M_AM)) return 1; break;
-		case IT_B_TO: if (use_soulstone_replace_item(in, IT_M_TO)) return 1; break;
-		case IT_B_EM: if (use_soulstone_replace_item(in, IT_M_EM)) return 1; break;
-		case IT_B_DI: if (use_soulstone_replace_item(in, IT_M_DI)) return 1; break;
-		case IT_H_SA: if (use_soulstone_replace_item(in, IT_B_SA)) return 1; break;
-		case IT_H_RU: if (use_soulstone_replace_item(in, IT_B_RU)) return 1; break;
-		case IT_H_AM: if (use_soulstone_replace_item(in, IT_B_AM)) return 1; break;
-		case IT_H_TO: if (use_soulstone_replace_item(in, IT_B_TO)) return 1; break;
-		case IT_H_EM: if (use_soulstone_replace_item(in, IT_B_EM)) return 1; break;
-		case IT_H_DI: if (use_soulstone_replace_item(in, IT_B_DI)) return 1; break;
-		case IT_H_SP: if (use_soulstone_replace_item(in, IT_B_SP)) return 1; break;
-		case IT_H_CI: if (use_soulstone_replace_item(in, IT_B_CI)) return 1; break;
-		case IT_H_OP: if (use_soulstone_replace_item(in, IT_B_OP)) return 1; break;
-		case IT_H_AQ: if (use_soulstone_replace_item(in, IT_B_AQ)) return 1; break;
-		case IT_F_SA: if (use_soulstone_replace_item(in, IT_H_SA)) return 1; break;
-		case IT_F_RU: if (use_soulstone_replace_item(in, IT_H_RU)) return 1; break;
-		case IT_F_AM: if (use_soulstone_replace_item(in, IT_H_AM)) return 1; break;
-		case IT_F_TO: if (use_soulstone_replace_item(in, IT_H_TO)) return 1; break;
-		case IT_F_EM: if (use_soulstone_replace_item(in, IT_H_EM)) return 1; break;
-		case IT_F_DI: if (use_soulstone_replace_item(in, IT_H_DI)) return 1; break;
-		case IT_F_SP: if (use_soulstone_replace_item(in, IT_H_SP)) return 1; break;
-		case IT_F_CI: if (use_soulstone_replace_item(in, IT_H_CI)) return 1; break;
-		case IT_F_OP: if (use_soulstone_replace_item(in, IT_H_OP)) return 1; break;
-		case IT_F_AQ: if (use_soulstone_replace_item(in, IT_H_AQ)) return 1; break;
-		case IT_F_BE: if (use_soulstone_replace_item(in, IT_H_BE)) return 1; break;
-		case IT_F_ZI: if (use_soulstone_replace_item(in, IT_H_ZI)) return 1; break;
-		case IT_F_PH: if (use_soulstone_replace_item(in, IT_H_PH)) return 1; break;
+		case IT_M_SA: if (use_soulstone_replace_item(cn, in, IT_S_SA)) return 1; break;
+		case IT_M_RU: if (use_soulstone_replace_item(cn, in, IT_S_RU)) return 1; break;
+		case IT_M_AM: if (use_soulstone_replace_item(cn, in, IT_S_AM)) return 1; break;
+		case IT_M_TO: if (use_soulstone_replace_item(cn, in, IT_S_TO)) return 1; break;
+		case IT_M_EM: if (use_soulstone_replace_item(cn, in, IT_S_EM)) return 1; break;
+		case IT_M_DI: if (use_soulstone_replace_item(cn, in, IT_S_DI)) return 1; break;
+		case IT_B_SA: if (use_soulstone_replace_item(cn, in, IT_M_SA)) return 1; break;
+		case IT_B_RU: if (use_soulstone_replace_item(cn, in, IT_M_RU)) return 1; break;
+		case IT_B_AM: if (use_soulstone_replace_item(cn, in, IT_M_AM)) return 1; break;
+		case IT_B_TO: if (use_soulstone_replace_item(cn, in, IT_M_TO)) return 1; break;
+		case IT_B_EM: if (use_soulstone_replace_item(cn, in, IT_M_EM)) return 1; break;
+		case IT_B_DI: if (use_soulstone_replace_item(cn, in, IT_M_DI)) return 1; break;
+		case IT_H_SA: if (use_soulstone_replace_item(cn, in, IT_B_SA)) return 1; break;
+		case IT_H_RU: if (use_soulstone_replace_item(cn, in, IT_B_RU)) return 1; break;
+		case IT_H_AM: if (use_soulstone_replace_item(cn, in, IT_B_AM)) return 1; break;
+		case IT_H_TO: if (use_soulstone_replace_item(cn, in, IT_B_TO)) return 1; break;
+		case IT_H_EM: if (use_soulstone_replace_item(cn, in, IT_B_EM)) return 1; break;
+		case IT_H_DI: if (use_soulstone_replace_item(cn, in, IT_B_DI)) return 1; break;
+		case IT_H_SP: if (use_soulstone_replace_item(cn, in, IT_B_SP)) return 1; break;
+		case IT_H_CI: if (use_soulstone_replace_item(cn, in, IT_B_CI)) return 1; break;
+		case IT_H_OP: if (use_soulstone_replace_item(cn, in, IT_B_OP)) return 1; break;
+		case IT_H_AQ: if (use_soulstone_replace_item(cn, in, IT_B_AQ)) return 1; break;
+		case IT_F_SA: if (use_soulstone_replace_item(cn, in, IT_H_SA)) return 1; break;
+		case IT_F_RU: if (use_soulstone_replace_item(cn, in, IT_H_RU)) return 1; break;
+		case IT_F_AM: if (use_soulstone_replace_item(cn, in, IT_H_AM)) return 1; break;
+		case IT_F_TO: if (use_soulstone_replace_item(cn, in, IT_H_TO)) return 1; break;
+		case IT_F_EM: if (use_soulstone_replace_item(cn, in, IT_H_EM)) return 1; break;
+		case IT_F_DI: if (use_soulstone_replace_item(cn, in, IT_H_DI)) return 1; break;
+		case IT_F_SP: if (use_soulstone_replace_item(cn, in, IT_H_SP)) return 1; break;
+		case IT_F_CI: if (use_soulstone_replace_item(cn, in, IT_H_CI)) return 1; break;
+		case IT_F_OP: if (use_soulstone_replace_item(cn, in, IT_H_OP)) return 1; break;
+		case IT_F_AQ: if (use_soulstone_replace_item(cn, in, IT_H_AQ)) return 1; break;
+		case IT_F_BE: if (use_soulstone_replace_item(cn, in, IT_H_BE)) return 1; break;
+		case IT_F_ZI: if (use_soulstone_replace_item(cn, in, IT_H_ZI)) return 1; break;
+		case IT_F_PH: if (use_soulstone_replace_item(cn, in, IT_H_PH)) return 1; break;
 		
 		// Stone cycle
-		case IT_SM_WHET: if (use_soulstone_replace_item(in, IT_SM_CLAY)) return 1; break;
-		case IT_SM_CLAY: if (use_soulstone_replace_item(in, IT_SM_MAGE)) return 1; break;
-		case IT_SM_MAGE: if (use_soulstone_replace_item(in, IT_SM_GRAD)) return 1; break;
-		case IT_SM_GRAD: if (use_soulstone_replace_item(in, IT_SM_WHET)) return 1; break;
+		case IT_SM_WHET: if (use_soulstone_replace_item(cn, in, IT_SM_CLAY)) return 1; break;
+		case IT_SM_CLAY: if (use_soulstone_replace_item(cn, in, IT_SM_MAGE)) return 1; break;
+		case IT_SM_MAGE: if (use_soulstone_replace_item(cn, in, IT_SM_GRAD)) return 1; break;
+		case IT_SM_GRAD: if (use_soulstone_replace_item(cn, in, IT_SM_WHET)) return 1; break;
 		
 		// Potion cycle
-		case IT_POT_M_HP: if (use_soulstone_replace_item(in, IT_POT_M_EN)) return 1; break;
-		case IT_POT_M_EN: if (use_soulstone_replace_item(in, IT_POT_M_MP)) return 1; break;
-		case IT_POT_M_MP: if (use_soulstone_replace_item(in, IT_POT_M_HP)) return 1; break;
-		case IT_POT_N_HP: if (use_soulstone_replace_item(in, IT_POT_N_EN)) return 1; break;
-		case IT_POT_N_EN: if (use_soulstone_replace_item(in, IT_POT_N_MP)) return 1; break;
-		case IT_POT_N_MP: if (use_soulstone_replace_item(in, IT_POT_N_HP)) return 1; break;
-		case IT_POT_G_HP: if (use_soulstone_replace_item(in, IT_POT_G_EN)) return 1; break;
-		case IT_POT_G_EN: if (use_soulstone_replace_item(in, IT_POT_G_MP)) return 1; break;
-		case IT_POT_G_MP: if (use_soulstone_replace_item(in, IT_POT_G_HP)) return 1; break;
-		case IT_POT_H_HP: if (use_soulstone_replace_item(in, IT_POT_H_EN)) return 1; break;
-		case IT_POT_H_EN: if (use_soulstone_replace_item(in, IT_POT_H_MP)) return 1; break;
-		case IT_POT_H_MP: if (use_soulstone_replace_item(in, IT_POT_H_HP)) return 1; break;
-		case IT_POT_S_HP: if (use_soulstone_replace_item(in, IT_POT_S_EN)) return 1; break;
-		case IT_POT_S_EN: if (use_soulstone_replace_item(in, IT_POT_S_MP)) return 1; break;
-		case IT_POT_S_MP: if (use_soulstone_replace_item(in, IT_POT_S_HP)) return 1; break;
-		case IT_POT_C_HP: if (use_soulstone_replace_item(in, IT_POT_C_EN)) return 1; break;
-		case IT_POT_C_EN: if (use_soulstone_replace_item(in, IT_POT_C_MP)) return 1; break;
-		case IT_POT_C_MP: if (use_soulstone_replace_item(in, IT_POT_C_HP)) return 1; break;
-		case IT_POT_L_HP: if (use_soulstone_replace_item(in, IT_POT_L_EN)) return 1; break;
-		case IT_POT_L_EN: if (use_soulstone_replace_item(in, IT_POT_L_MP)) return 1; break;
-		case IT_POT_L_MP: if (use_soulstone_replace_item(in, IT_POT_L_HP)) return 1; break;
-		case IT_POT_D_HP: if (use_soulstone_replace_item(in, IT_POT_D_EN)) return 1; break;
-		case IT_POT_D_EN: if (use_soulstone_replace_item(in, IT_POT_D_MP)) return 1; break;
-		case IT_POT_D_MP: if (use_soulstone_replace_item(in, IT_POT_D_HP)) return 1; break;
-		case IT_POT_VITA: if (use_soulstone_replace_item(in, IT_POT_CLAR)) return 1; break;
-		case IT_POT_CLAR: if (use_soulstone_replace_item(in, IT_POT_SAGE)) return 1; break;
-		case IT_POT_SAGE: if (use_soulstone_replace_item(in, IT_POT_VITA)) return 1; break;
+		case IT_POT_M_HP: if (use_soulstone_replace_item(cn, in, IT_POT_M_EN)) return 1; break;
+		case IT_POT_M_EN: if (use_soulstone_replace_item(cn, in, IT_POT_M_MP)) return 1; break;
+		case IT_POT_M_MP: if (use_soulstone_replace_item(cn, in, IT_POT_M_HP)) return 1; break;
+		case IT_POT_N_HP: if (use_soulstone_replace_item(cn, in, IT_POT_N_EN)) return 1; break;
+		case IT_POT_N_EN: if (use_soulstone_replace_item(cn, in, IT_POT_N_MP)) return 1; break;
+		case IT_POT_N_MP: if (use_soulstone_replace_item(cn, in, IT_POT_N_HP)) return 1; break;
+		case IT_POT_G_HP: if (use_soulstone_replace_item(cn, in, IT_POT_G_EN)) return 1; break;
+		case IT_POT_G_EN: if (use_soulstone_replace_item(cn, in, IT_POT_G_MP)) return 1; break;
+		case IT_POT_G_MP: if (use_soulstone_replace_item(cn, in, IT_POT_G_HP)) return 1; break;
+		case IT_POT_H_HP: if (use_soulstone_replace_item(cn, in, IT_POT_H_EN)) return 1; break;
+		case IT_POT_H_EN: if (use_soulstone_replace_item(cn, in, IT_POT_H_MP)) return 1; break;
+		case IT_POT_H_MP: if (use_soulstone_replace_item(cn, in, IT_POT_H_HP)) return 1; break;
+		case IT_POT_S_HP: if (use_soulstone_replace_item(cn, in, IT_POT_S_EN)) return 1; break;
+		case IT_POT_S_EN: if (use_soulstone_replace_item(cn, in, IT_POT_S_MP)) return 1; break;
+		case IT_POT_S_MP: if (use_soulstone_replace_item(cn, in, IT_POT_S_HP)) return 1; break;
+		case IT_POT_C_HP: if (use_soulstone_replace_item(cn, in, IT_POT_C_EN)) return 1; break;
+		case IT_POT_C_EN: if (use_soulstone_replace_item(cn, in, IT_POT_C_MP)) return 1; break;
+		case IT_POT_C_MP: if (use_soulstone_replace_item(cn, in, IT_POT_C_HP)) return 1; break;
+		case IT_POT_L_HP: if (use_soulstone_replace_item(cn, in, IT_POT_L_EN)) return 1; break;
+		case IT_POT_L_EN: if (use_soulstone_replace_item(cn, in, IT_POT_L_MP)) return 1; break;
+		case IT_POT_L_MP: if (use_soulstone_replace_item(cn, in, IT_POT_L_HP)) return 1; break;
+		case IT_POT_D_HP: if (use_soulstone_replace_item(cn, in, IT_POT_D_EN)) return 1; break;
+		case IT_POT_D_EN: if (use_soulstone_replace_item(cn, in, IT_POT_D_MP)) return 1; break;
+		case IT_POT_D_MP: if (use_soulstone_replace_item(cn, in, IT_POT_D_HP)) return 1; break;
+		case IT_POT_VITA: if (use_soulstone_replace_item(cn, in, IT_POT_CLAR)) return 1; break;
+		case IT_POT_CLAR: if (use_soulstone_replace_item(cn, in, IT_POT_SAGE)) return 1; break;
+		case IT_POT_SAGE: if (use_soulstone_replace_item(cn, in, IT_POT_VITA)) return 1; break;
 		
 		// Convert rings into reservation
 		case IT_RI_SSSA: case IT_RI_SSRU: case IT_RI_SSAM: case IT_RI_SSTO: case IT_RI_SSEM: case IT_RI_SSDI:
@@ -3929,7 +3929,7 @@ int use_soulstone_special(int in)
 		case IT_RI_FPEM: case IT_RI_FPDI: case IT_RI_FPSP: case IT_RI_FPCI: case IT_RI_FPOP: case IT_RI_FPAQ: 
 		case IT_RI_FPBE: case IT_RI_FPZI: case IT_RI_FPPH: case IT_RI_GLOW: case IT_RI_REVO: case IT_RI_REAC: 
 		case IT_RI_ROPS: case IT_RI_ROTD: case IT_TORCH:
-			if (use_soulstone_mod_reservation(in)) return 1;
+			if (use_soulstone_mod_reservation(cn, in)) return 1;
 			break;
 		//
 		default: break;
@@ -3965,7 +3965,7 @@ int use_soulstone(int cn, int in, int in2)
 	if (CAN_SOULSTONE(in2))
 		return apply_new_ss(cn, in2, in, 1);
 	
-	if (use_soulstone_special(in2))
+	if (use_soulstone_special(cn, in2))
 	{
 		use_consume_item(cn, in, 0);
 		return 1;
