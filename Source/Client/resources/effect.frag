@@ -82,7 +82,7 @@ void main() {
         return;
     }
 
-    if (isBuff) gammaEffect = 1;
+    if (isBuff) gammaEffect = 120; // Unsure why 120 is a magical number, but that's so fine.
 
     if (gammaEffect > 0.0 && shadeEffect > 0.0) {
         color.rgb *= gammaEffect / (shadeEffect * shadeEffect + gammaEffect);
