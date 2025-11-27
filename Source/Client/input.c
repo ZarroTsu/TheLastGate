@@ -195,17 +195,38 @@ void handle_input(void) {
                         break;
 
                     case SDLK_ESCAPE:
-                        cmd(CL_CMD_RESET, 0, 0);
-                        show_shop = 0;
-                        show_wps = 0;
-                        show_tree = 0;
-                        show_book = 0;
-                        show_motd = 0;
-                        show_newp = 0;
-                        show_tuto = 0;
-                        noshop = QSIZE * 3;
+                        bool closed_window = false;
+                        if (show_shop != 0) {
+                            show_shop = 0;
+                            noshop = QSIZE * 3;
+                            closed_window = true;
+                        }
+                        if (show_wps != 0) {
+                            show_wps = 0;
+                            closed_window = true;
+                        }
+                        if (show_tree != 0) {
+                            show_tree = 0;
+                            closed_window = true;
+                        }
+                        if (show_book != 0) {
+                            show_book = 0;
+                            closed_window = true;
+                        }
+                        if (show_motd != 0) {
+                            show_motd = 0;
+                            closed_window = true;
+                        }
+                        if (show_newp != 0) {
+                            show_newp = 0;
+                            closed_window = true;
+                        }
+                        if (show_tuto != 0) {
+                            show_tuto = 0;
+                            closed_window = true;
+                        }
+                        if (!closed_window) cmd(CL_CMD_RESET, 0, 0);
                         break;
-
                     case SDLK_F1:
                         cmd(CL_CMD_MODE, 2, 0);
                         break;
