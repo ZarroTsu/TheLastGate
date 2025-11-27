@@ -3248,7 +3248,7 @@ void eng_display(int init)	// optimize me!!!!!
 				{
 					set_look_proz(map[m].ch_nr,map[m].ch_id,map[m].ch_proz);
 					rx=((x*32)/2)+((y*32)/2)+32-HPBAR_WIDTH/2+X_OFFSET-((RENDER_DISTANCE-34)/2*32)+xoff+map[m].obj_xoff;
-					ry=((x*32)/4)-((y*32)/4)+Y_OFFSET-60+yoff+map[m].obj_yoff;
+					ry=((x*32)/4)-((y*32)/4)+Y_OFFSET-55+yoff+map[m].obj_yoff;
 					
 					if (looks[map[m].ch_nr].proz) 
 					{

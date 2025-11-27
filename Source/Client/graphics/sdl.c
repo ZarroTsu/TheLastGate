@@ -958,7 +958,7 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Bottom edge
-    create_model_matrix(model_matrix, xf, yf + ys - 1, xs, 1);
+    create_model_matrix(model_matrix, xf, yf + ys, xs, 1);
     glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -968,7 +968,7 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Right edge
-    create_model_matrix(model_matrix, xf + xs - 1, yf, 1, ys);
+    create_model_matrix(model_matrix, xf + xs, yf, 1, ys);
     glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

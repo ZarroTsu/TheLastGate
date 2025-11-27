@@ -209,6 +209,7 @@ add_custom_target(Package ALL
         "$<TARGET_FILE:TheLastGate>"
         "${OUTPUT_DIR}/gfx"
         "${OUTPUT_DIR}/sfx"
+        "${OUTPUT_DIR}/resources"
         "${OUTPUT_DIR}/gx00.dat"
         "${OUTPUT_DIR}/gx00.idx"
         "${OUTPUT_DIR}/libpng16-16.dll"
