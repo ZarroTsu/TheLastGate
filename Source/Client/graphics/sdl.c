@@ -568,7 +568,7 @@ void sdl_load_sprite(const int nr) {
         return;
     }
 
-    SDL_Surface *surface = nullptr;
+    SDL_Surface *surface = NULL;
     int width = 0, height = 0;
 
     // Try to load from various sources

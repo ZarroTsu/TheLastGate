@@ -1,5 +1,7 @@
 ﻿#include "input.h"
 
+#include <stdbool.h>
+#include <stdio.h>
 #include <SDL2/SDL_events.h>
 
 #include "inter.h"

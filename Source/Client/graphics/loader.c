@@ -15,7 +15,7 @@
 #include "../main.h"
 
 
-static FILE *png_lib = nullptr;
+static FILE *png_lib = NULL;
 static int png_index[MAXSPRITE];
 static Gfx *gfx_lib;
 static int gfx_handle;
@@ -38,9 +38,9 @@ int init_image_loader() {
 }
 
 SDL_Surface *load_from_png_lib(const int nr) {
-    if (nr < 0 || nr >= MAXSPRITE) return nullptr;
+    if (nr < 0 || nr >= MAXSPRITE) return NULL;
     const int offset = png_index[nr];
-    if (!offset) return nullptr;
+    if (!offset) return NULL;
     fseek(png_lib, offset, SEEK_SET);
 
     const long start = ftell(png_lib);
@@ -56,18 +56,18 @@ SDL_Surface *load_from_png_lib(const int nr) {
     }
 
     unsigned char *buffer = malloc(size);
-    if (!buffer) return nullptr;
+    if (!buffer) return NULL;
 
     size_t r = fread(buffer, 1, size, png_lib);
     if (r == 0) {
         free(buffer);
-        return nullptr;
+        return NULL;
     }
 
     SDL_RWops *rw = SDL_RWFromMem(buffer, (int) r);
     if (!rw) {
         free(buffer);
-        return nullptr;
+        return NULL;
     }
 
     SDL_Surface *surface = IMG_Load_RW(rw, 1);
@@ -76,17 +76,17 @@ SDL_Surface *load_from_png_lib(const int nr) {
 }
 
 SDL_Surface *load_from_gfx_lib(const int nr) {
-    if (nr >= 40000 || gfx_lib[nr].xs == 0) return nullptr;
+    if (nr >= 40000 || gfx_lib[nr].xs == 0) return NULL;
     if (gfx_lib[nr].xs < 0 || gfx_lib[nr].xs > 1000 || gfx_lib[nr].ys < 0 || gfx_lib[nr].ys > 1000) {
         LOG("Graphics file gx00.idx corrupt!");
-        return nullptr;
+        return NULL;
     }
     const ssize_t length = gfx_lib[nr].xs * gfx_lib[nr].ys * 2;
     unsigned short *buffer = malloc(length);
     if (!buffer) {
         LOG("Error allocating memory: length=%lld", length);
         free(buffer);
-        return nullptr;
+        return NULL;
     }
 
     lseek(gfx_handle, gfx_lib[nr].off, SEEK_SET);
@@ -96,7 +96,7 @@ SDL_Surface *load_from_gfx_lib(const int nr) {
 
     if (!surface) {
         free(buffer);
-        return nullptr;
+        return NULL;
     }
 
     SDL_LockSurface(surface);
@@ -136,7 +136,7 @@ static int init_png_lib() {
 
     snprintf(file, sizeof(file), "%spnglib.dat", app_state.path);
     png_lib = fopen(file, "rb");
-    if (png_lib == nullptr) {
+    if (png_lib == NULL) {
         LOG("Could not open pnglib.dat: path=%s", file);
         return -1;
     }
@@ -178,7 +178,7 @@ static int init_gfx_lib() {
 }
 
 static SDL_Surface *make_standard_format(SDL_Surface *loaded) {
-    if (!loaded) return nullptr;
+    if (!loaded) return NULL;
 
     unsigned int magenta = SDL_MapRGB(loaded->format, 255, 0, 255);
     SDL_SetColorKey(loaded, SDL_TRUE, magenta);
@@ -186,7 +186,7 @@ static SDL_Surface *make_standard_format(SDL_Surface *loaded) {
     SDL_FreeSurface(loaded);
     if (!converted_surface) {
         LOG("make_standard_format failed: %s", SDL_GetError());
-        return nullptr;;
+        return NULL;;
     }
 
     return converted_surface;

@@ -1,5 +1,6 @@
 #include "sound.h"
 
+#include <math.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_audio.h>
 #include <string.h>

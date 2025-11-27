@@ -1,6 +1,17 @@
 ﻿cmake_minimum_required(VERSION 3.22)
 project(TheLastGate C)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)
+
+file(GLOB_RECURSE C_SOURCES "*.c")
+file(GLOB_RECURSE C_HEADERS "*.h")
+set_source_files_properties(${C_SOURCES} PROPERTIES LANGUAGE C)
+set_source_files_properties(${C_HEADERS} PROPERTIES LANGUAGE C)
+
 add_executable(TheLastGate WIN32
         engine.c
         engine.h

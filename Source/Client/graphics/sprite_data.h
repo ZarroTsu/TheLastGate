@@ -2,6 +2,7 @@
 #define THELASTGATE_SPRITE_DATA_H
 
 #include "SDL2/SDL.h"
+#include <stdbool.h>
 
 typedef struct {
     float u;
