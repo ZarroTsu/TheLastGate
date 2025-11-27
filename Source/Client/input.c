@@ -75,9 +75,10 @@ static void MakeWindowNormal(SDL_Window *win) {
 }
 
 #endif
-
+static bool window_resetting = false;
 void handle_input(void) {
     SDL_Event e;
+
 
     while (SDL_PollEvent(&e)) {
         bool spellKey = (SDL_GetModState() & (KMOD_CTRL | KMOD_ALT)) != 0;
@@ -94,6 +95,9 @@ void handle_input(void) {
 #endif
                 if (app_state.windowed) {
                     if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
+                        if (!window_resetting) {
+                            xlog(2, "Game window resized, press shift+f10 to reset it.");
+                        }
                         if ((SDL_GetWindowFlags(app.window) & SDL_WINDOW_MAXIMIZED) != 0) {
                             app_state.window_size[0] = e.window.data1;
                             app_state.window_size[1] = e.window.data2;
@@ -114,6 +118,7 @@ void handle_input(void) {
                             app_state.window_size[1] = e.window.data2;
                         }
                         SDL_SetWindowSize(app.window, app_state.window_size[0], app_state.window_size[1]);
+                        window_resetting = false;
                     }
                 }
                 break;
@@ -231,9 +236,18 @@ void handle_input(void) {
                         // dd_savescreen(); TODO: Implement this
                         break;
                     case SDLK_F10:
-                        app_state.gamma += 250;
-                        if (app_state.gamma > 6000) app_state.gamma = 5000;
-                        xlog(2, "Set gamma correction to %1.2f", app_state.gamma / 5000.0);
+                        if ((SDL_GetModState() & KMOD_SHIFT) != 0) {
+                            app_state.window_size[0] = SCREEN_WIDTH;
+                            app_state.window_size[1] = SCREEN_HEIGHT;
+                            SDL_RestoreWindow(app.window);
+                            window_resetting = true;
+                            SDL_SetWindowSize(app.window, app_state.window_size[0], app_state.window_size[1]);
+                            xlog(2, "Game window reset to default resolution.");
+                        } else {
+                            app_state.gamma += 250;
+                            if (app_state.gamma > 6000) app_state.gamma = 5000;
+                            xlog(2, "Set gamma correction to %1.2f", app_state.gamma / 5000.0);
+                        }
                         break;
                     case SDLK_F11:
                         xlog(2, " ");
