@@ -2105,15 +2105,15 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  |  *BWIAS*  \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Small    |  Sgt  |   1 |   3 \n");
-		do_char_log(cn, 1, "  Silver, Medium   |  SSg  |   2 |   4 \n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   3 |   5 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  MSg  |   3 |   7 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  SgM  |   4 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   5 |   9 \n");
-		do_char_log(cn, 1, "Platinum, Big      | 2Lieu |   5 |  11 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Captn |   6 |  12 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | LtCol |   7 |  13 \n");
+		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   1 |   3 \n");
+		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   2 |   4 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   3 |   5 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   3 |   7 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   4 |   8 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   5 |   9 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   5 |  11 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   7 |  13 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |   9 |  15 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "1")==0 || strcmp(topic, "SAPPHIRE")==0 || strcmp(topic, "sapphire")==0)
@@ -2125,14 +2125,14 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
-		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
-		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   5 |   8 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   7 |  14 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   9 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  11 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  11 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  13 |  23 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  25 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "2")==0 || strcmp(topic, "RUBY")==0 || strcmp(topic, "ruby")==0)
@@ -2144,14 +2144,14 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
-		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
-		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   5 |   8 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   7 |  14 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   9 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  11 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  11 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  13 |  23 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  25 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "3")==0 || strcmp(topic, "AMETHYST")==0 || strcmp(topic, "amethyst")==0)
@@ -2163,14 +2163,14 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
-		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
-		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   5 |   8 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   7 |  14 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   9 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  11 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  11 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  13 |  23 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  25 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "4")==0 || strcmp(topic, "TOPAZ")==0 || strcmp(topic, "topaz")==0)
@@ -2182,14 +2182,14 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
-		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
-		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   5 |   8 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   7 |  14 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   9 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  11 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  11 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  13 |  23 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  25 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "5")==0 || strcmp(topic, "EMERALD")==0 || strcmp(topic, "emerald")==0)
@@ -2201,14 +2201,14 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
 		do_char_log(cn, 1, "  Silver, Small    |  LCp  |   3 |   6 \n");
-		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   4 |   7 \n");
-		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   5 |  11 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Medium   |  Sgt  |   5 |   8 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Medium   |  SSg  |   7 |  14 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   9 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  11 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  11 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  13 |  23 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  25 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "6")==0 || strcmp(topic, "SPINEL")==0 || strcmp(topic, "spinel")==0)
@@ -2219,12 +2219,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Spell Apt \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  SgM  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      | 2Lieu |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Captn |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | LtCol |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   3 |   5 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   4 |   8 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   5 |   9 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |   5 |  11 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   6 |  12 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |   7 |  13 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "7")==0 || strcmp(topic, "CITRINE")==0 || strcmp(topic, "citrine")==0)
@@ -2235,12 +2235,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Crit Mult \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  SgM  |  10 |  16 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |  15 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Big      | 2Lieu |  15 |  24 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Captn |  20 |  29 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | LtCol |  25 |  34 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   9 |  12 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |  13 |  20 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  17 |  24 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  17 |  27 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  21 |  31 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  25 |  35 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 || strcmp(topic, "OPAL")==0 || strcmp(topic, "opal")==0)
@@ -2251,12 +2251,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | All Speed \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  SgM  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      | 2Lieu |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Captn |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | LtCol |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   8 |  11 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |  11 |  18 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  14 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  14 |  24 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  17 |  27 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  20 |  30 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "9")==0 || strcmp(topic, "AQUAMARINE")==0 || strcmp(topic, "aquamarine")==0)
@@ -2267,12 +2267,12 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  |  Top Dmg  \n");
 		do_char_log(cn, 1, "   Metal, Gem Size | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "  Silver, Big      |  1Sg  |   5 |   8 \n");
-		do_char_log(cn, 1, "    Gold, Big      |  SgM  |   7 |  13 \n");
-		do_char_log(cn, 1, "    Gold, Huge     | 1Lieu |   9 |  15 \n");
-		do_char_log(cn, 1, "Platinum, Big      | 2Lieu |   9 |  18 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Captn |  12 |  21 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | LtCol |  15 |  24 \n");
+		do_char_log(cn, 1, "  Silver, Big      |  MSg  |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Big      |  1Sg  |   9 |  16 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  11 |  18 \n");
+		do_char_log(cn, 1, "Platinum, Big      |  SgM  |  11 |  21 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  13 |  23 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  15 |  25 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "10")==0 || strcmp(topic, "BERYL")==0 || strcmp(topic, "beryl")==0)
@@ -2283,9 +2283,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Crit Bonus\n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |  24 |  30 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Major |  32 |  41 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Colnl |  40 |  49 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |  24 |  37 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |  32 |  52 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  40 |  60 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "11")==0 || strcmp(topic, "ZIRCON")==0 || strcmp(topic, "zircon")==0)
@@ -2296,9 +2296,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  |  Thorns   \n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |   4 |   6 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Major |   5 |   8 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Colnl |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   5 |   9 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   6 |  12 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |   7 |  13 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "12")==0 || strcmp(topic, "SPHALERITE")==0 || strcmp(topic, "sphalerite")==0)
@@ -2309,9 +2309,9 @@ void do_listrings(int cn, char *topic)
 		do_char_log(cn, 1, "     Ring Tier     | Need  | Cooldown  \n");
 		do_char_log(cn, 1, "  Metal, Gem Size  | Rank  | OFF |  ON \n");
 		do_char_log(cn, 1, "-------------------+-------+-----+-----\n");
-		do_char_log(cn, 1, "    Gold, Huge     | Captn |   4 |   6 \n");
-		do_char_log(cn, 1, "Platinum, Huge     | Major |   5 |   8 \n");
-		do_char_log(cn, 1, "Platinum, Flawless | Colnl |   7 |  10 \n");
+		do_char_log(cn, 1, "    Gold, Huge     | 2Lieu |   6 |  10 \n");
+		do_char_log(cn, 1, "Platinum, Huge     | 1Lieu |   8 |  14 \n");
+		do_char_log(cn, 1, "Platinum, Flawless | Major |  10 |  16 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else
