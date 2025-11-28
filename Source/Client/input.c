@@ -8,6 +8,7 @@
 #include "main.h"
 #include "socket.h"
 #include "engine.h"
+#include "graphics/scaling.h"
 #include "graphics/sdl.h"
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
@@ -103,6 +104,7 @@ void handle_input(void) {
                         if ((SDL_GetWindowFlags(app.window) & SDL_WINDOW_MAXIMIZED) != 0) {
                             app_state.window_size[0] = e.window.data1;
                             app_state.window_size[1] = e.window.data2;
+                            resize_fbo_scaling(app_state.window_size[0], app_state.window_size[1]);
                             continue; // If they are maximizing the window just set the new size for scaling
                         }
 
@@ -120,6 +122,7 @@ void handle_input(void) {
                             app_state.window_size[1] = e.window.data2;
                         }
                         SDL_SetWindowSize(app.window, app_state.window_size[0], app_state.window_size[1]);
+                        resize_fbo_scaling(app_state.window_size[0], app_state.window_size[1]);
                         window_resetting = false;
                     }
                 }
@@ -259,7 +262,7 @@ void handle_input(void) {
                         // dd_savescreen(); TODO: Implement this
                         break;
                     case SDLK_F10:
-                        if ((SDL_GetModState() & KMOD_SHIFT) != 0) {
+                        if (app_state.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
                             app_state.window_size[0] = SCREEN_WIDTH;
                             app_state.window_size[1] = SCREEN_HEIGHT;
                             SDL_RestoreWindow(app.window);

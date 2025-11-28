@@ -10,14 +10,18 @@
 
 
 #include "atlas.h"
+#include "scaling.h"
 #include "../render.h"
 #include "loader.h"
 #include "../inter.h"
 #include "../main.h"
 #include "sprite_data.h"
 #include "glad/glad.h"
-#include "shaders.h"
+#include "shaders/shaders.h"
 #include "../log.h"
+#include "shaders/effect_shader.h"
+#include "shaders/magic_shader.h"
+#include "shaders/solid_shader.h"
 
 App app;
 
@@ -59,31 +63,6 @@ int projection_initialized = 0;
 static struct FontCache font_cache[10];
 static SpriteData *sprite_data = NULL;
 static GLuint minimap_gl_texture = 0; // OpenGL texture for minimap (128x128)
-
-GLuint gamma_shader;
-// Cached uniform locations (set once at initialization)
-GLint gamma_uProjection = -1;
-GLint gamma_uUV0 = -1;
-GLint gamma_uUV1 = -1;
-GLint gamma_uModel = -1;
-GLint gamma_uTexture = -1;
-GLint gamma_uGammaScale = -1;
-GLint gamma_uGammaEffect = -1;
-GLint gamma_uShadeEffect = -1;
-GLint gamma_uRed = -1;
-GLint gamma_uGreen = -1;
-GLint gamma_uInvis = -1;
-GLint gamma_uGrey = -1;
-GLint gamma_uInfra = -1;
-GLint gamma_uWater = -1;
-GLint gamma_uShadow = -1;
-GLint gamma_uUseInstancing = -1;
-
-static GLuint solid_shader;
-// Cached uniform locations for solid color shader
-static GLint solid_uProjection = -1;
-static GLint solid_uModel = -1;
-static GLint solid_uColor = -1;
 
 extern char path[];
 
@@ -156,49 +135,16 @@ int sdl_init(const int windowed) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Load gamma correction shader
-    gamma_shader = load_program(TLG_Shader_Effect);
-    if (!gamma_shader) {
-        LOG("Failed to load gamma shader\n");
-        return -1;
+    // Initialize projection matrix once
+    if (!projection_initialized) {
+        create_ortho_matrix(projection_matrix, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+        projection_initialized = 1;
     }
 
-    // Cache uniform locations (query once, not every frame!)
-    gamma_uProjection = glGetUniformLocation(gamma_shader, "uProjection");
-    gamma_uUV0 = glGetUniformLocation(gamma_shader, "uUV0");
-    gamma_uUV1 = glGetUniformLocation(gamma_shader, "uUV1");
-    gamma_uModel = glGetUniformLocation(gamma_shader, "uModel");
-    gamma_uTexture = glGetUniformLocation(gamma_shader, "uTexture");
-    gamma_uGammaScale = glGetUniformLocation(gamma_shader, "uGammaScale");
-    gamma_uGammaEffect = glGetUniformLocation(gamma_shader, "uGammaEffect");
-    gamma_uShadeEffect = glGetUniformLocation(gamma_shader, "uShadeEffect");
-
-    gamma_uRed = glGetUniformLocation(gamma_shader, "uRed");
-    gamma_uGreen = glGetUniformLocation(gamma_shader, "uGreen");
-    gamma_uInvis = glGetUniformLocation(gamma_shader, "uInvis");
-    gamma_uGrey = glGetUniformLocation(gamma_shader, "uGrey");
-    gamma_uInfra = glGetUniformLocation(gamma_shader, "uInfra");
-    gamma_uWater = glGetUniformLocation(gamma_shader, "uWater");
-    gamma_uShadow = glGetUniformLocation(gamma_shader, "uShadow");
-    gamma_uUseInstancing = glGetUniformLocation(gamma_shader, "uUseInstancing");
-    gamma_uModel = glGetUniformLocation(gamma_shader, "uModel");
-
-    LOG("Cached gamma shader uniform locations: proj=%d, model=%d, tex=%d, gamma=%d, instancing=%d\n",
-        gamma_uProjection, gamma_uModel, gamma_uTexture, gamma_uGammaScale, gamma_uUseInstancing);
-
-    // Load solid color shader for UI primitives (boxes, bars)
-    solid_shader = load_program(TLG_Shader_Solid);
-    if (!solid_shader) {
-        LOG("Failed to load solid color shader\n");
-        return -1;
-    }
-
-    // Cache solid shader uniform locations
-    solid_uProjection = glGetUniformLocation(solid_shader, "uProjection");
-    solid_uModel = glGetUniformLocation(solid_shader, "uModel");
-    solid_uColor = glGetUniformLocation(solid_shader, "uColor");
-    LOG("Cached solid shader uniform locations: proj=%d, model=%d, color=%d\n",
-        solid_uProjection, solid_uModel, solid_uColor);
+    load_effect_shader(projection_matrix);
+    load_solid_shader(projection_matrix);
+    load_magic_shader(projection_matrix);
+    init_fbo_scaling(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Create VAO/VBO for sprite quad rendering
     // Quad vertices: position (x, y, z) + texcoord (u, v)
@@ -231,6 +177,9 @@ int sdl_init(const int windowed) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    create_ortho_matrix(projection_matrix, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+    projection_initialized = 1;
 
     LOG("OpenGL quad VAO/VBO created\n");
 
@@ -337,15 +286,9 @@ void sdl_deinit(void) {
         minimap_gl_texture = 0;
     }
 
-    if (gamma_shader) {
-        glDeleteProgram(gamma_shader);
-        gamma_shader = 0;
-    }
-
-    if (solid_shader) {
-        glDeleteProgram(solid_shader);
-        solid_shader = 0;
-    }
+    drop_effect_shader();
+    drop_solid_shader();
+    drop_magic_shader();
 
     if (app.gl_context) {
         SDL_GL_DeleteContext(app.gl_context);
@@ -395,17 +338,13 @@ void sdl_batch_begin(void) {
 void sdl_batch_flush(void) {
     if (app.batch_count == 0) return;
 
-    sdl_start_scaling();
+    // sdl_start_scaling();
     // Upload instance data to GPU
     glBindBuffer(GL_ARRAY_BUFFER, app.instance_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, app.batch_count * sizeof(SpriteInstance), app.batch_buffer);
 
     // Set projection matrix once for all sprites
-    glUseProgram(gamma_shader);
-    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
-    glUniform1i(gamma_uTexture, 0); // Texture unit 0
-    glUniform1i(gamma_uShadow, 0); // Ensure shadow uniform is off for batch
-    glUniform1i(gamma_uUseInstancing, 1); // Enable instanced rendering mode
+    use_effect_shader_instanced();
 
     // Bind atlas texture (all batched sprites use atlas)
     glActiveTexture(GL_TEXTURE0);
@@ -415,7 +354,7 @@ void sdl_batch_flush(void) {
     glBindVertexArray(app.quad_vao);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, app.batch_count);
     glBindVertexArray(0);
-    sdl_stop_scaling();
+    // sdl_stop_scaling();
     // Reset batch for next frame
     app.batch_count = 0;
 
@@ -786,117 +725,18 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
         SDL_FreeSurface(char_surf);
     }
 
-    sdl_start_scaling();
-    // Render character using OpenGL (legacy uniform path)
-    glUseProgram(gamma_shader);
-    glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode
-    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
+    GLint model = use_effect_shader((EffectShaderSettings){
+        .gamma_scale = app_state.gamma / 5000.0f
+    });
 
     float model_matrix[16];
     create_model_matrix(model_matrix, xpos, ypos, 6, 9);
-    glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
-    glUniform1i(gamma_uTexture, 0);
-
-    float gamma_scale = app_state.gamma / 5000.0f;
-    glUniform1f(gamma_uGammaScale, gamma_scale);
-    glUniform2f(gamma_uUV0, 0.0f, 0.0f);
-    glUniform2f(gamma_uUV1, 1.0f, 1.0f);
-    // Reset all effect uniforms to prevent bleeding from previous sprites
-    glUniform1f(gamma_uShadeEffect, 0.0f);
-    glUniform1f(gamma_uGammaEffect, 0.0f);
-    glUniform1i(gamma_uRed, 0);
-    glUniform1i(gamma_uGreen, 0);
-    glUniform1i(gamma_uInvis, 0);
-    glUniform1i(gamma_uGrey, 0);
-    glUniform1i(gamma_uInfra, 0);
-    glUniform1i(gamma_uWater, 0);
-    glUniform1i(gamma_uShadow, 0);
-
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, font_cache[font].char_textures[c]);
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
-    sdl_stop_scaling();
-}
-
-void sdl_gputc(int xpos, int ypos, int font, int c) {
-    if (c > 127 || c < 32) return;
-    c -= 32;
-
-    // Flush batch before rendering text (text uses legacy uniform path)
-    sdl_batch_flush();
-
-    // Windowed mode?
-    ypos += 4;
-
-    // Create OpenGL texture for this character if needed
-    if (!font_cache[font].char_textures[c]) {
-        int nr = 18100 + font;
-        sdl_load_sprite(nr);
-
-        // Extract character from font sprite
-        SDL_Surface *char_surf = SDL_CreateRGBSurfaceWithFormat(0, 6, 9, 32, SPRITE_PIXEL_FORMAT);
-        SDL_LockSurface(sprite_data[nr].surface);
-        SDL_LockSurface(char_surf);
-
-        for (int y = 0; y < 9; y++) {
-            Uint32 *src_row = (Uint32 *) sprite_data[nr].surface->pixels + (y + 1) * sprite_data[nr].surface->pitch / 4
-                              + c * 6;
-            Uint32 *dst_row = (Uint32 *) char_surf->pixels + y * char_surf->pitch / 4;
-            memcpy(dst_row, src_row, 6 * sizeof(Uint32));
-        }
-
-        SDL_UnlockSurface(char_surf);
-        SDL_UnlockSurface(sprite_data[nr].surface);
-
-        // Create OpenGL texture from surface
-        GLuint gl_texture;
-        glGenTextures(1, &gl_texture);
-        glBindTexture(GL_TEXTURE_2D, gl_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 6, 9, 0, GL_BGRA, GL_UNSIGNED_BYTE, char_surf->pixels);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        font_cache[font].char_textures[c] = gl_texture;
-        SDL_FreeSurface(char_surf);
-    }
-
-    sdl_start_scaling();
-    // Render character using OpenGL (legacy uniform path)
-    glUseProgram(gamma_shader);
-    glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode
-    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
-
-    float model_matrix[16];
-    create_model_matrix(model_matrix, xpos, ypos, 6, 9);
-    glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
-    glUniform1i(gamma_uTexture, 0);
-
-    float gamma_scale = app_state.gamma / 5000.0f;
-    glUniform1f(gamma_uGammaScale, gamma_scale);
-    glUniform2f(gamma_uUV0, 0.0f, 0.0f);
-    glUniform2f(gamma_uUV1, 1.0f, 1.0f);
-
-    // Reset all effect uniforms to prevent bleeding from previous sprites
-    glUniform1f(gamma_uShadeEffect, 0.0f);
-    glUniform1f(gamma_uGammaEffect, 0.0f);
-    glUniform1i(gamma_uRed, 0);
-    glUniform1i(gamma_uGreen, 0);
-    glUniform1i(gamma_uInvis, 0);
-    glUniform1i(gamma_uGrey, 0);
-    glUniform1i(gamma_uInfra, 0);
-    glUniform1i(gamma_uWater, 0);
-    glUniform1i(gamma_uShadow, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, font_cache[font].char_textures[c]);
-    glBindVertexArray(app.quad_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-    sdl_stop_scaling();
 }
 
 void sdl_puttext(int x, int y, int font, char *text) {
@@ -920,9 +760,12 @@ void sdl_gputtext(int x, int y, int font, char *text, int xoff, int yoff) {
     rx += xoff;
     ry += yoff;
 
+    // Legacy math from old windowed
+    ry += 4;
     while (*text) {
         if (rx < 0 || rx > SCREEN_WIDTH - 7 || ry < 0 || ry > SCREEN_HEIGHT - 10) return;
-        sdl_gputc(rx, ry, font, *text);
+
+        sdl_putc(rx, ry, font, *text);
         text++;
         rx += 6;
     }
@@ -943,37 +786,35 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
     float g = ((col & 0x07E0) >> 5) / 63.0f;
     float b = (col & 0x001F) / 31.0f;
 
-    sdl_start_scaling();
-    glUseProgram(solid_shader);
-    glUniformMatrix4fv(solid_uProjection, 1, GL_FALSE, projection_matrix);
-    glUniform4f(solid_uColor, r, g, b, 1.0f);
+    GLint model = use_solid_shader((RGBAColor){
+        r, g, b, 1.0f
+    });
 
     // Draw 4 rectangles to form the outline (1 pixel thick)
     float model_matrix[16];
 
     // Top edge
     create_model_matrix(model_matrix, xf, yf, xs, 1);
-    glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Bottom edge
     create_model_matrix(model_matrix, xf, yf + ys, xs, 1);
-    glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Left edge
     create_model_matrix(model_matrix, xf, yf, 1, ys);
-    glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Right edge
     create_model_matrix(model_matrix, xf + xs, yf, 1, ys);
-    glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
-    sdl_stop_scaling();
 }
 
 void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
@@ -985,20 +826,18 @@ void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
     float g = ((col & 0x07E0) >> 5) / 63.0f;
     float b = (col & 0x001F) / 31.0f;
 
-    sdl_start_scaling();
-    glUseProgram(solid_shader);
-    glUniformMatrix4fv(solid_uProjection, 1, GL_FALSE, projection_matrix);
-    glUniform4f(solid_uColor, r, g, b, 1.0f);
+    GLint model = use_solid_shader((RGBAColor){
+        r, g, b, 1.0f
+    });
 
     // Draw filled rectangle
     float model_matrix[16];
     create_model_matrix(model_matrix, xf, yf, xs, ys);
-    glUniformMatrix4fv(solid_uModel, 1, GL_FALSE, model_matrix);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
 
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
-    sdl_stop_scaling();
 }
 
 void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
@@ -1028,55 +867,40 @@ void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
     ry += yoff;
     ry += ys * 32 - disp; // Offset shadow downward
 
-    sdl_start_scaling();
-    // Render shadow using shader (no texture creation needed!)
-    glUseProgram(gamma_shader);
-    glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode (legacy path)
-    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
+    EffectShaderSettings settings = {
+        .gamma_scale = 1,
+        .shadow = true
+    };
 
-    // Enable shadow mode in shader
-    glUniform1i(gamma_uShadow, 1);
+    if (sprite_data[nr].loaded_in_atlas) {
+        glBindTexture(GL_TEXTURE_2D, tile_atlas);
+        // Flip V coordinates: swap uv0.v and uv1.v
+        settings.uv0[0] = sprite_data[nr].uv0.u;
+        settings.uv0[1] = sprite_data[nr].uv1.v;
+        settings.uv1[0] = sprite_data[nr].uv1.u;
+        settings.uv1[1] = sprite_data[nr].uv0.v;
+    } else {
+        glBindTexture(GL_TEXTURE_2D, sprite_data[nr].gl_texture);
+        // Flip V coordinates: 0 and 1 swapped
+        settings.uv0[0] = 0.0f;
+        settings.uv0[1] = 1.0f;
+        settings.uv1[0] = 1.0f;
+        settings.uv1[1] = 0.0f;
+    }
+    GLint model = use_effect_shader(settings);
 
     // Compress vertically to 25% height (8 pixels per 32-pixel tile)
     float model_matrix[16];
     create_model_matrix(model_matrix, rx, ry, sprite_data[nr].pixel_width, ys * 8);
-    glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
-    glUniform1i(gamma_uTexture, 0);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
 
     // Use sprite's UV coordinates from atlas (flipped vertically for shadow)
     glActiveTexture(GL_TEXTURE0);
-    if (sprite_data[nr].loaded_in_atlas) {
-        glBindTexture(GL_TEXTURE_2D, tile_atlas);
-        // Flip V coordinates: swap uv0.v and uv1.v
-        glUniform2f(gamma_uUV0, sprite_data[nr].uv0.u, sprite_data[nr].uv1.v);
-        glUniform2f(gamma_uUV1, sprite_data[nr].uv1.u, sprite_data[nr].uv0.v);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, sprite_data[nr].gl_texture);
-        // Flip V coordinates: 0 and 1 swapped
-        glUniform2f(gamma_uUV0, 0.0f, 1.0f);
-        glUniform2f(gamma_uUV1, 1.0f, 0.0f);
-    }
-
-    // No gamma adjustment for shadows
-    glUniform1f(gamma_uGammaScale, 1.0f);
-
-    // Reset all effect uniforms
-    glUniform1f(gamma_uShadeEffect, 0.0f);
-    glUniform1f(gamma_uGammaEffect, 0.0f);
-    glUniform1i(gamma_uRed, 0);
-    glUniform1i(gamma_uGreen, 0);
-    glUniform1i(gamma_uInvis, 0);
-    glUniform1i(gamma_uGrey, 0);
-    glUniform1i(gamma_uInfra, 0);
-    glUniform1i(gamma_uWater, 0);
 
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
-    // Disable shadow mode for subsequent renders
-    glUniform1i(gamma_uShadow, 0);
-    sdl_stop_scaling();
 }
 
 static unsigned char *shadow_map = NULL;
@@ -1189,39 +1013,20 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
         }
     }
 
-    sdl_start_scaling();
     // Upload to GPU
     glBindTexture(GL_TEXTURE_2D, minimap_gl_texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 128, 128, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     free(pixels);
 
-    // Render minimap using gamma shader (with all effects disabled)
-    glUseProgram(gamma_shader);
-    glUniform1i(gamma_uUseInstancing, 0); // Disable instanced rendering mode
-    glUniformMatrix4fv(gamma_uProjection, 1, GL_FALSE, projection_matrix);
+
+    GLint model = use_effect_shader((EffectShaderSettings){
+        .gamma_scale = app_state.gamma / 5000.0f
+    });
 
     // Create model matrix for position and size
     float model_matrix[16];
     create_model_matrix(model_matrix, 6, 582, 128, 128);
-    glUniformMatrix4fv(gamma_uModel, 1, GL_FALSE, model_matrix);
-
-    // Set texture and UV coordinates
-    glUniform1i(gamma_uTexture, 0);
-    glUniform2f(gamma_uUV0, 0.0f, 0.0f);
-    glUniform2f(gamma_uUV1, 1.0f, 1.0f);
-
-    // Disable all shader effects
-    float gamma_scale = app_state.gamma / 5000.0f;
-    glUniform1f(gamma_uGammaScale, gamma_scale);
-    glUniform1f(gamma_uShadeEffect, 0.0f);
-    glUniform1f(gamma_uGammaEffect, 0.0f);
-    glUniform1i(gamma_uRed, 0);
-    glUniform1i(gamma_uGreen, 0);
-    glUniform1i(gamma_uInvis, 0);
-    glUniform1i(gamma_uGrey, 0);
-    glUniform1i(gamma_uInfra, 0);
-    glUniform1i(gamma_uWater, 0);
-    glUniform1i(gamma_uShadow, 0);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
 
     // Bind minimap texture and render
     glActiveTexture(GL_TEXTURE0);
@@ -1229,18 +1034,8 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
     glBindVertexArray(app.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
-    sdl_stop_scaling();
 }
 
 int sdl_get_avgcol(int nr) {
     return sprite_data[nr].avgcol;
-}
-
-void sdl_start_scaling(void) {
-    glViewport(0, 0, app_state.window_size[0], app_state.window_size[1]);
-}
-
-void sdl_stop_scaling(void) {
-    glViewport(0, 0, SCREEN_WIDTH,
-               SCREEN_HEIGHT);
 }

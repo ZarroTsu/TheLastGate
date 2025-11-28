@@ -35,6 +35,7 @@
 #include "inter.h"
 #include "main.h"
 #include "render.h"
+#include "graphics/scaling.h"
 #include "graphics/sdl.h"
 
 int init_done=0;
@@ -4878,9 +4879,11 @@ void engine(void)
 		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
+			sdl_start_scaling();
 			eng_display(init);
 			eng_flip(t);
 			sdl_batch_flush();
+			sdl_stop_scaling();
 			SDL_GL_SwapWindow(app.window);
 			skipinrow=0;
 		} else {

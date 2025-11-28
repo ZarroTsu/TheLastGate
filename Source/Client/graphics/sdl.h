@@ -1,7 +1,8 @@
-﻿#ifndef THELASTGATE_SDL_H
-#define THELASTGATE_SDL_H
+﻿#pragma once
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
+
+#include "glad/glad.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
@@ -72,12 +73,9 @@ void sdl_shadow_clear(void);
 int sdl_isvisible(void);
 void sdl_show_map(unsigned short *src,int xo,int yo,int magnify);
 int sdl_get_avgcol(int nr);
-void sdl_start_scaling(void);
-void sdl_stop_scaling(void);
 
 // Magic glow effects (sdl_magic.c)
-void sdl_init_magic_effects(void);
-void sdl_deinit_magic_effects(void);
 void sdl_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff);
-void sdl_alphaeffect_magic_scaled(int nr, int str, int xpos, int ypos, int xoff, int yoff, float scale);
-#endif //THELASTGATE_SDL_H
+
+extern float projection_matrix[16];
+void create_model_matrix(float *matrix, float x, float y, float width, float height);

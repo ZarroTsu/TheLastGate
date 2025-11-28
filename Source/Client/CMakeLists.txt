@@ -10,16 +10,21 @@ add_executable(TheLastGate WIN32
         graphics/atlas.h
         graphics/loader.c
         graphics/loader.h
+        graphics/scaling.c
         graphics/sdl.c
         graphics/sdl.h
-        graphics/shaders.c
-        graphics/shaders.h
+        graphics/shaders/effect_shader.c
+        graphics/shaders/effect_shader.h
+        graphics/shaders/magic_shader.c
+        graphics/shaders/shaders.c
+        graphics/shaders/shaders.h
+        graphics/shaders/solid_shader.c
+        graphics/shaders/solid_shader.h
         graphics/sprite_data.h
-        graphics/magic_shader.c
-        graphics/fbo_scale.c
         input.c
         input.h
         inter.c
+        log.h
         main.c
         main.h
         main.h
@@ -28,12 +33,11 @@ add_executable(TheLastGate WIN32
         render.c
         render.h
         sdl_magic.c
+        shader_test.c
         socket.c
         socket.h
         sound.c
         sound.h
-        log.h
-        shader_test.c
 )
 
 # Disable warnings for old code compatibility

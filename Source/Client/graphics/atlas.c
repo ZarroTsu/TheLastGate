@@ -38,14 +38,14 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
     int h = sprite_data->surface->h;
 
     // Move to next row if sprite doesn't fit horizontally
-    if (atlas_cursor.x + w > ATLAS_SIZE_X) {
+    if (atlas_cursor.x + w + 2 > ATLAS_SIZE_X) {
         atlas_cursor.x = 0;
-        atlas_cursor.y += atlas_cursor.row_height;
+        atlas_cursor.y += atlas_cursor.row_height + 2;
         atlas_cursor.row_height = 0;
     }
 
     // Check for vertical overflow
-    if (atlas_cursor.y + h > ATLAS_SIZE_Y) {
+    if (atlas_cursor.y + h + 2 > ATLAS_SIZE_Y) {
         LOG("ERROR: Atlas overflow! Sprite %dx%d won't fit at position (%d, %d)\n",
                w, h, atlas_cursor.x, atlas_cursor.y);
         LOG("Atlas cursor: x=%d, y=%d, row_height=%d\n",
@@ -54,12 +54,12 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
         return 0;
     }
 
-    int ax = atlas_cursor.x;
-    int ay = atlas_cursor.y;
+    int ax = atlas_cursor.x + 1;
+    int ay = atlas_cursor.y + 1;
 
-    atlas_cursor.x += w;
+    atlas_cursor.x += w + 1;
 
-    if (h > atlas_cursor.row_height) atlas_cursor.row_height = h;
+    if (h > atlas_cursor.row_height) atlas_cursor.row_height = h + 1;
 
     glBindTexture(GL_TEXTURE_2D, tile_atlas);
     glTexSubImage2D(GL_TEXTURE_2D, 0, ax, ay, w, h, GL_BGRA, GL_UNSIGNED_BYTE, sprite_data->surface->pixels);

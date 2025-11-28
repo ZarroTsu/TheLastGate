@@ -2,10 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../log.h"
-#include "../main.h"
-#include "shaders/effect_shader.h"
-#include "shaders/solid_shader.h"
+#include "../../log.h"
+#include "../../main.h"
+#include "shaders/effect_shader_files.h"
+#include "shaders/solid_shader_files.h"
+#include "shaders/magic_shader_files.h"
+
+static GLuint magic_shader;
 
 static GLuint load_shader(const char *source, GLenum type) {
     GLuint shader = glCreateShader(type);
@@ -26,7 +29,7 @@ static GLuint load_shader(const char *source, GLenum type) {
     return shader;
 }
 
-static GLuint load_shader_program(const char *vertex_source, const char *fragment_source) {
+GLuint load_shader_program(const char *vertex_source, const char *fragment_source) {
     GLuint vs = load_shader(vertex_source, GL_VERTEX_SHADER);
     GLuint fs = load_shader(fragment_source, GL_FRAGMENT_SHADER);
 
