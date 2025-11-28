@@ -1026,7 +1026,7 @@ void reset_item(int n)
 				
 				if (item_has_player_mods(in))
 				{
-					item_copy_player_mods(it[in], tmp);
+					item_copy_player_mods(&it[in], &tmp);
 				}
 				if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN)) // template dropped the enchant flag, remove enchantment
 				{

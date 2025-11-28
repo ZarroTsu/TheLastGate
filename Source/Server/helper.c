@@ -3781,6 +3781,8 @@ int use_soulstone_mod_reservation(int cn, int in)
 	it[in2].flags &= ~(IF_ALWAYSEXP2);
 	it[in2].max_age[I_A] = 0;
 	
+	if (it[in].flags & IF_IDENTIFIED) it[in2].flags |= IF_IDENTIFIED;
+	
 	switch (it[in2].temp)
 	{
 		case IT_RI_SSSA: case IT_RI_SSRU: case IT_RI_SSAM: case IT_RI_SSTO: case IT_RI_SSEM: case IT_RI_SSDI:

@@ -4357,53 +4357,71 @@ int item_has_player_mods(int in)
 	return 0;
 }
 
-void item_copy_player_mods(struct item in, struct item in2) // Copy from in to in2
+void item_copy_player_mods(struct item *in, struct item *in2) // Copy from in to in2
 {
-	int n;
+	int n, m;
 	
 	xlog("  Copying player mods from old item...");
 	
-	for (n=0;n<5;n++) in2.attrib[n][I_P] = in.attrib[n][I_P];
-	for (n=0;n<50;n++) in2.skill[n][I_P] = in.skill[n][I_P];
-	in2.hp[I_P]            = in.hp[I_P];
-	in2.end[I_P]           = in.end[I_P];
-	in2.mana[I_P]          = in.mana[I_P];
-	in2.weapon[I_P]        = in.weapon[I_P];
-	in2.armor[I_P]         = in.armor[I_P];
-	in2.spell_pow[I_P]     = in.spell_pow[I_P];
-	in2.top_damage[I_P]    = in.top_damage[I_P];
-	in2.to_hit[I_P]        = in.to_hit[I_P];
-	in2.to_parry[I_P]      = in.to_parry[I_P];
-	in2.gethit_dam[I_P]    = in.gethit_dam[I_P];
-	in2.speed[I_P]         = in.speed[I_P];
-	in2.move_speed[I_P]    = in.move_speed[I_P];
-	in2.atk_speed[I_P]     = in.atk_speed[I_P];
-	in2.cast_speed[I_P]    = in.cast_speed[I_P];
-	in2.spell_mod[I_P]     = in.spell_mod[I_P];
-	in2.spell_apt[I_P]     = in.spell_apt[I_P];
-	in2.cool_bonus[I_P]    = in.cool_bonus[I_P];
-	in2.aoe_bonus[I_P]     = in.aoe_bonus[I_P];
-	in2.base_crit[I_P]     = in.base_crit[I_P];
-	in2.crit_chance[I_P]   = in.crit_chance[I_P];
-	in2.crit_multi[I_P]    = in.crit_multi[I_P];
-	in2.dmg_bonus[I_P]     = in.dmg_bonus[I_P];
-	in2.dmg_reduction[I_P] = in.dmg_reduction[I_P];
-	in2.light[I_P]         = in.light[I_P];
-	in2.enchantment        = in.enchantment;
-	in2.corruption         = in.corruption;
+	for (n=0;n<5;n++) in2->attrib[n][I_P] = in->attrib[n][I_P];
+	for (n=0;n<50;n++) in2->skill[n][I_P] = in->skill[n][I_P];
+	in2->hp[I_P]            = in->hp[I_P];
+	in2->end[I_P]           = in->end[I_P];
+	in2->mana[I_P]          = in->mana[I_P];
+	in2->weapon[I_P]        = in->weapon[I_P];
+	in2->armor[I_P]         = in->armor[I_P];
+	in2->spell_pow[I_P]     = in->spell_pow[I_P];
+	in2->top_damage[I_P]    = in->top_damage[I_P];
+	in2->to_hit[I_P]        = in->to_hit[I_P];
+	in2->to_parry[I_P]      = in->to_parry[I_P];
+	in2->gethit_dam[I_P]    = in->gethit_dam[I_P];
+	in2->speed[I_P]         = in->speed[I_P];
+	in2->move_speed[I_P]    = in->move_speed[I_P];
+	in2->atk_speed[I_P]     = in->atk_speed[I_P];
+	in2->cast_speed[I_P]    = in->cast_speed[I_P];
+	in2->spell_mod[I_P]     = in->spell_mod[I_P];
+	in2->spell_apt[I_P]     = in->spell_apt[I_P];
+	in2->cool_bonus[I_P]    = in->cool_bonus[I_P];
+	in2->aoe_bonus[I_P]     = in->aoe_bonus[I_P];
+	in2->base_crit[I_P]     = in->base_crit[I_P];
+	in2->crit_chance[I_P]   = in->crit_chance[I_P];
+	in2->crit_multi[I_P]    = in->crit_multi[I_P];
+	in2->dmg_bonus[I_P]     = in->dmg_bonus[I_P];
+	in2->dmg_reduction[I_P] = in->dmg_reduction[I_P];
+	in2->light[I_P]         = in->light[I_P];
+	in2->enchantment        = in->enchantment;
+	in2->corruption         = in->corruption;
 	
-	if (in.flags & IF_SOULSTONE) { in2.flags &= ~(IF_CAN_SS); in2.flags |= IF_SOULSTONE; }
-	if (in.flags & IF_ENCHANTED) { in2.flags &= ~(IF_CAN_EN); in2.flags |= IF_ENCHANTED; }
-	if (in.flags & IF_CORRUPTED)   in2.flags |= IF_CORRUPTED;
-	if (in.flags & IF_WHETSTONED)  in2.flags |= IF_WHETSTONED;
-	if (in.flags & IF_AUGMENTED)   in2.flags |= IF_AUGMENTED;
-	if (in.flags & IF_IDENTIFIED)  in2.flags |= IF_IDENTIFIED;
+	if (in->flags & IF_SOULSTONE) { in2->flags &= ~(IF_CAN_SS); in2->flags |= IF_SOULSTONE; }
+	if (in->flags & IF_ENCHANTED) { in2->flags &= ~(IF_CAN_EN); in2->flags |= IF_ENCHANTED; }
+	if (in->flags & IF_CORRUPTED)   in2->flags |= IF_CORRUPTED;
+	if (in->flags & IF_WHETSTONED)  in2->flags |= IF_WHETSTONED;
+	if (in->flags & IF_AUGMENTED)   in2->flags |= IF_AUGMENTED;
+	if (in->flags & IF_IDENTIFIED)  in2->flags |= IF_IDENTIFIED;
 	
-	if ((in.placement & PL_RING) && in.reserve_mp[I_A] && !(in.flags & IF_ALWAYSEXP2))
+	if ((in->placement & PL_RING) && in->reserve_mp[I_A] && (in2->flags & IF_ALWAYSEXP2) && !(in->flags & IF_ALWAYSEXP2))
 	{
-		in2.flags          &= ~(IF_ALWAYSEXP2);
-		in2.max_age[I_A]    = 0;
-		in2.reserve_mp[I_A] = in.reserve_mp[I_A];
+		xlog("    Copying ring reserve state...");
+		in2->flags          &= ~(IF_ALWAYSEXP2);
+		in2->max_age[I_A]    = 0;
+		in2->reserve_mp[I_A] = in->reserve_mp[I_A];
+		
+		for (n=0;n<5;n++)
+			if (m=(in2->attrib[n][I_I]+  in2->attrib[n][I_A])) in2->attrib[n][I_A]   = m/2;
+		for (n=0;n<50;n++)
+			if (m=( in2->skill[n][I_I]+   in2->skill[n][I_A])) in2->skill[n][I_A]    = m/2;
+		
+		if (m = (      in2->speed[I_I]+      in2->speed[I_A])) in2->speed[I_A]       = m/2; // Opal
+		if (m = (  in2->spell_mod[I_I]+  in2->spell_mod[I_A])) in2->spell_mod[I_A]   = m/2; // RoPs
+		if (m = (  in2->spell_apt[I_I]+  in2->spell_apt[I_A])) in2->spell_apt[I_A]   = m/2; // Spinel
+		if (m = ( in2->cool_bonus[I_I]+ in2->cool_bonus[I_A])) in2->cool_bonus[I_A]  = m/2; // Sphalerite
+		if (m = (in2->crit_chance[I_I]+in2->crit_chance[I_A])) in2->crit_chance[I_A] = m/2; // Beryl
+		if (m = ( in2->crit_multi[I_I]+ in2->crit_multi[I_A])) in2->crit_multi[I_A]  = m/2; // Citrine
+		if (m = (     in2->to_hit[I_I]+     in2->to_hit[I_A])) in2->to_hit[I_A]      = m/2; // Deceiver
+		if (m = (   in2->to_parry[I_I]+   in2->to_parry[I_A])) in2->to_parry[I_A]    = m/2; // Deceiver
+		if (m = ( in2->top_damage[I_I]+ in2->top_damage[I_A])) in2->top_damage[I_A]  = m/2; // Aquamarine
+		if (m = ( in2->gethit_dam[I_I]+ in2->gethit_dam[I_A])) in2->gethit_dam[I_A]  = m/2; // Zircon
+		if (m = (  in2->aoe_bonus[I_I]+  in2->aoe_bonus[I_A])) in2->aoe_bonus[I_A]   = m/2; // Reach
 	}
 }
 
@@ -4454,7 +4472,7 @@ int item_repair(int cn, int in, int power, int n, int flag)
 	{
 		// Repair - option 1: reset values of the item to their originals.
 		// This option is for soulstone items, to allow repairing them without a template.
-		if (!IS_SANEITEMPLATE(it[in].temp) && IS_SANEITEMPLATE(it[in].orig_temp))
+		if (IS_SANEITEMPLATE(it[in].orig_temp))
 		{
 			orgt = it[in].orig_temp;
 			
@@ -4484,7 +4502,7 @@ int item_repair(int cn, int in, int power, int n, int flag)
 				return 0;
 			}
 			if (item_has_player_mods(in))
-				item_copy_player_mods(it[in], it[in2]);
+				item_copy_player_mods(&it[in], &it[in2]);
 			
 			it[in2].flags  = it[in].flags;
 			it[in2].flags |= IF_UPDATE;

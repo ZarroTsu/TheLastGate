@@ -442,7 +442,7 @@ int has_spell(int cn, int temp);
 int has_spell_from_item(int cn, int temp);
 int add_spell(int cn, int in);
 int item_has_player_mods(int in);
-void item_copy_player_mods(struct item in, struct item in2);
+void item_copy_player_mods(struct item *in, struct item *in2);
 void remove_shadow(int cn);
 void remove_spells(int cn);
 void remove_all_spells(int cn, int flag);
