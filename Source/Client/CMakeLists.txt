@@ -198,20 +198,31 @@ add_custom_command(TARGET TheLastGate POST_BUILD
 )
 
 function(generate_shader_embed_header SHADER_NAME)
-    file(READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag FRAGMENT_SHADER_CONTENT)
-    file(READ ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert VERTEX_SHADER_CONTENT)
-    set(FRAGMENT_SHADER_NAME "${SHADER_NAME}_fragment")
-    set(VERTEX_SHADER_NAME "${SHADER_NAME}_vertex")
+    set(FRAG ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag)
+    set(VERT ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert)
+    set(OUT ${PROJECT_SOURCE_DIR}/_generated/shaders/${SHADER_NAME}_shader_files.h)
+    set(TEMPLATE ${PROJECT_SOURCE_DIR}/graphics/embedded_shader.h.in)
 
-    configure_file(
-            ${PROJECT_SOURCE_DIR}/graphics/embedded_shader.h.in
-            ${PROJECT_SOURCE_DIR}/_generated/shaders/${SHADER_NAME}_shader.h
-            @ONLY
+    add_custom_command(
+            OUTPUT ${OUT}
+            COMMAND ${CMAKE_COMMAND}
+                -DSHADER_NAME=${SHADER_NAME}
+                -DFRAG=${FRAG}
+                -DVERT=${VERT}
+                -DTEMPLATE=${TEMPLATE}
+                -DOUT=${OUT}
+                -P ${PROJECT_SOURCE_DIR}/cmake/generate_shader.cmake
+            DEPENDS ${FRAG} ${VERT} ${TEMPLATE}
+            COMMENT "Embedding shader ${SHADER_NAME}"
     )
+
+    set(GENERATED_SHADERS ${GENERATED_SHADERS} ${OUT} PARENT_SCOPE)
 endfunction()
 
 generate_shader_embed_header(effect)
 generate_shader_embed_header(solid)
+
+add_custom_target(shader_embeds ALL DEPENDS ${GENERATED_SHADERS})
 
 set(OUTPUT_DIR "$<TARGET_FILE_DIR:TheLastGate>")
 add_custom_target(Package ALL
