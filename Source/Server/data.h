@@ -1038,8 +1038,8 @@ __attribute__ ((packed));
 #define IF_GEMSTONE      (1ull<<50)     // is a gem
 #define IF_IS_KEY        (1ull<<51)     // is a key and decays on rugs
 #define IF_AUGMENTED     (1ull<<52)     // item was enhanced by a shrine
-#define IF_WHETSTONED    (1ull<<53)     // item was enhanced by a shrine	- Unused, repurpose.
-#define IF_EASEUSE       (1ull<<54)     // item was enhanced by a shrine
+#define IF_WHETSTONED    (1ull<<53)     // item was enhanced by a whetstone
+#define IF_EASEUSE       (1ull<<54)     // item was made easier to use
 #define IF_SOULSPLIT     (1ull<<55)     // item was enhanced by a shrine	- Unused, repurpose.
 #define IF_LEGACY        (1ull<<56)     // item is old
 #define IF_DUPLICATED    (1ull<<57)     // item was enhanced by a shrine	- Unused, repurpose.

@@ -1024,13 +1024,14 @@ void reset_item(int n)
 				tmp.carried = it[in].carried;
 				tmp.temp = n;
 				
-				if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN))
-				{
-					it[in].enchantment = 0;
-				}
-				if (it[in].carried && item_has_player_mods(in))
+				if (item_has_player_mods(in))
 				{
 					item_copy_player_mods(it[in], tmp);
+				}
+				if ((it[in].flags & IF_ENCHANTED) && !(it_temp[n].flags & IF_CAN_EN)) // template dropped the enchant flag, remove enchantment
+				{
+					tmp.enchantment = 0;
+					tmp.flags &= ~(IF_ENCHANTED);
 				}
 				if (it[in].stack && (it_temp[n].flags & IF_STACKABLE))
 				{

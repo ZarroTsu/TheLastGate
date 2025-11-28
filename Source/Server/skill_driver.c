@@ -4353,41 +4353,58 @@ int item_has_player_mods(int in)
 	if (it[in].light[I_P]) return 1;
 	if (it[in].enchantment) return 1;
 	if (it[in].corruption) return 1;
+	if ((it[in].placement & PL_RING) && it[in].reserve_mp[I_A] && !(it[in].flags & IF_ALWAYSEXP2)) return 1;
 	return 0;
 }
 
-void item_copy_player_mods(int in, int in2) // Copy from in to in2
+void item_copy_player_mods(struct item in, struct item in2) // Copy from in to in2
 {
 	int n;
 	
-	for (n=0;n<5;n++) it[in2].attrib[n][I_P] = it[in].attrib[n][I_P];
-	for (n=0;n<50;n++) it[in2].skill[n][I_P] = it[in].skill[n][I_P];
-	it[in2].hp[I_P]            = it[in].hp[I_P];
-	it[in2].end[I_P]           = it[in].end[I_P];
-	it[in2].mana[I_P]          = it[in].mana[I_P];
-	it[in2].weapon[I_P]        = it[in].weapon[I_P];
-	it[in2].armor[I_P]         = it[in].armor[I_P];
-	it[in2].spell_pow[I_P]     = it[in].spell_pow[I_P];
-	it[in2].top_damage[I_P]    = it[in].top_damage[I_P];
-	it[in2].to_hit[I_P]        = it[in].to_hit[I_P];
-	it[in2].to_parry[I_P]      = it[in].to_parry[I_P];
-	it[in2].gethit_dam[I_P]    = it[in].gethit_dam[I_P];
-	it[in2].speed[I_P]         = it[in].speed[I_P];
-	it[in2].move_speed[I_P]    = it[in].move_speed[I_P];
-	it[in2].atk_speed[I_P]     = it[in].atk_speed[I_P];
-	it[in2].cast_speed[I_P]    = it[in].cast_speed[I_P];
-	it[in2].spell_mod[I_P]     = it[in].spell_mod[I_P];
-	it[in2].spell_apt[I_P]     = it[in].spell_apt[I_P];
-	it[in2].cool_bonus[I_P]    = it[in].cool_bonus[I_P];
-	it[in2].aoe_bonus[I_P]     = it[in].aoe_bonus[I_P];
-	it[in2].base_crit[I_P]     = it[in].base_crit[I_P];
-	it[in2].crit_chance[I_P]   = it[in].crit_chance[I_P];
-	it[in2].crit_multi[I_P]    = it[in].crit_multi[I_P];
-	it[in2].dmg_bonus[I_P]     = it[in].dmg_bonus[I_P];
-	it[in2].dmg_reduction[I_P] = it[in].dmg_reduction[I_P];
-	it[in2].light[I_P]         = it[in].light[I_P];
-	it[in2].enchantment        = it[in].enchantment;
-	it[in2].corruption         = it[in].corruption;
+	xlog("  Copying player mods from old item...");
+	
+	for (n=0;n<5;n++) in2.attrib[n][I_P] = in.attrib[n][I_P];
+	for (n=0;n<50;n++) in2.skill[n][I_P] = in.skill[n][I_P];
+	in2.hp[I_P]            = in.hp[I_P];
+	in2.end[I_P]           = in.end[I_P];
+	in2.mana[I_P]          = in.mana[I_P];
+	in2.weapon[I_P]        = in.weapon[I_P];
+	in2.armor[I_P]         = in.armor[I_P];
+	in2.spell_pow[I_P]     = in.spell_pow[I_P];
+	in2.top_damage[I_P]    = in.top_damage[I_P];
+	in2.to_hit[I_P]        = in.to_hit[I_P];
+	in2.to_parry[I_P]      = in.to_parry[I_P];
+	in2.gethit_dam[I_P]    = in.gethit_dam[I_P];
+	in2.speed[I_P]         = in.speed[I_P];
+	in2.move_speed[I_P]    = in.move_speed[I_P];
+	in2.atk_speed[I_P]     = in.atk_speed[I_P];
+	in2.cast_speed[I_P]    = in.cast_speed[I_P];
+	in2.spell_mod[I_P]     = in.spell_mod[I_P];
+	in2.spell_apt[I_P]     = in.spell_apt[I_P];
+	in2.cool_bonus[I_P]    = in.cool_bonus[I_P];
+	in2.aoe_bonus[I_P]     = in.aoe_bonus[I_P];
+	in2.base_crit[I_P]     = in.base_crit[I_P];
+	in2.crit_chance[I_P]   = in.crit_chance[I_P];
+	in2.crit_multi[I_P]    = in.crit_multi[I_P];
+	in2.dmg_bonus[I_P]     = in.dmg_bonus[I_P];
+	in2.dmg_reduction[I_P] = in.dmg_reduction[I_P];
+	in2.light[I_P]         = in.light[I_P];
+	in2.enchantment        = in.enchantment;
+	in2.corruption         = in.corruption;
+	
+	if (in.flags & IF_SOULSTONE) { in2.flags &= ~(IF_CAN_SS); in2.flags |= IF_SOULSTONE; }
+	if (in.flags & IF_ENCHANTED) { in2.flags &= ~(IF_CAN_EN); in2.flags |= IF_ENCHANTED; }
+	if (in.flags & IF_CORRUPTED)   in2.flags |= IF_CORRUPTED;
+	if (in.flags & IF_WHETSTONED)  in2.flags |= IF_WHETSTONED;
+	if (in.flags & IF_AUGMENTED)   in2.flags |= IF_AUGMENTED;
+	if (in.flags & IF_IDENTIFIED)  in2.flags |= IF_IDENTIFIED;
+	
+	if ((in.placement & PL_RING) && in.reserve_mp[I_A] && !(in.flags & IF_ALWAYSEXP2))
+	{
+		in2.flags          &= ~(IF_ALWAYSEXP2);
+		in2.max_age[I_A]    = 0;
+		in2.reserve_mp[I_A] = in.reserve_mp[I_A];
+	}
 }
 
 int item_repair(int cn, int in, int power, int n, int flag)
@@ -4437,7 +4454,7 @@ int item_repair(int cn, int in, int power, int n, int flag)
 	{
 		// Repair - option 1: reset values of the item to their originals.
 		// This option is for soulstone items, to allow repairing them without a template.
-		if (IS_SANEITEMPLATE(it[in].orig_temp))
+		if (!IS_SANEITEMPLATE(it[in].temp) && IS_SANEITEMPLATE(it[in].orig_temp))
 		{
 			orgt = it[in].orig_temp;
 			
@@ -4458,7 +4475,7 @@ int item_repair(int cn, int in, int power, int n, int flag)
 			it[in].sprite[I_A] = it_temp[orgt].sprite[I_A];
 		}
 		// Repair - option 2: just make a new item
-		else
+		else if (IS_SANEITEMPLATE(it[in].temp))
 		{
 			in2 = god_create_item(it[in].temp);
 			if (!in2)
@@ -4467,7 +4484,7 @@ int item_repair(int cn, int in, int power, int n, int flag)
 				return 0;
 			}
 			if (item_has_player_mods(in))
-				item_copy_player_mods(in, in2);
+				item_copy_player_mods(it[in], it[in2]);
 			
 			it[in2].flags  = it[in].flags;
 			it[in2].flags |= IF_UPDATE;
@@ -4478,6 +4495,12 @@ int item_repair(int cn, int in, int power, int n, int flag)
 			else if (flag==2)	ch[cn].worn[n] 		= in2;
 			else				ch[cn].item[n] 		= in2;
 			it[in2].carried = cn;
+		}
+		// Uh oh, we have no reference.
+		else
+		{
+			if (!flag) do_char_log(cn, 0, "This item cannot be repaired.\n");
+			return 0;
 		}
 		if (!flag) do_char_log(cn, 1, "Success!\n");
 		return 1;
