@@ -1,5 +1,4 @@
-﻿#ifndef THELASTGATE_SPRITE_DATA_H
-#define THELASTGATE_SPRITE_DATA_H
+﻿#pragma once
 
 #include "SDL2/SDL.h"
 #include <stdbool.h>
@@ -23,5 +22,3 @@ typedef struct {
     UV uv0;
     UV uv1;
 } SpriteData;
-
-#endif //THELASTGATE_SPRITE_DATA_H

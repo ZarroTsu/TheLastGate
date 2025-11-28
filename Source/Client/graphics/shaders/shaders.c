@@ -4,11 +4,7 @@
 #include <stdlib.h>
 #include "../../log.h"
 #include "../../main.h"
-#include "shaders/effect_shader_files.h"
-#include "shaders/solid_shader_files.h"
-#include "shaders/magic_shader_files.h"
 
-static GLuint magic_shader;
 
 static GLuint load_shader(const char *source, GLenum type) {
     GLuint shader = glCreateShader(type);
@@ -63,16 +59,4 @@ GLuint load_shader_program(const char *vertex_source, const char *fragment_sourc
 
     LOG("Shader program loaded successfully\n");
     return program;
-}
-
-GLuint load_program(TLG_ShaderTypes shader_type) {
-    switch (shader_type) {
-        case TLG_Shader_Effect:
-            return load_shader_program(effect_vertex, effect_fragment);
-        case TLG_Shader_Solid:
-            return load_shader_program(solid_vertex, solid_fragment);
-        default:
-            LOG("Unknown shader type\n");
-            return 0;
-    }
 }

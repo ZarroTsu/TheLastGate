@@ -1,6 +1,3 @@
-﻿#ifndef THELASTGATE_SOCKET_H
-#define THELASTGATE_SOCKET_H
+﻿#pragma once
 
 extern int ser_ver;
-
-#endif //THELASTGATE_SOCKET_H

@@ -1,5 +1,4 @@
-﻿#ifndef THELASTGATE_MAIN_H
-#define THELASTGATE_MAIN_H
+﻿#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -35,4 +34,3 @@ void complete_word(void);
 
 void add_words(void);
 
-#endif //THELASTGATE_MAIN_H

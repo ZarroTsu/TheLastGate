@@ -1,8 +1,7 @@
 // Just comment/uncomment this to alter home copy version
 //#define HOMECOPY
 
-#ifndef THELASTGATE_COMMON_H
-#define THELASTGATE_COMMON_H
+#pragma once
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
 	#define MHOST			"127.0.0.1"
@@ -598,5 +597,3 @@ extern int ctick;
 #define RED (0xF800)
 #define GREEN (0x07E0)
 #define BLUE (0x001F)
-
-#endif //THELASTGATE_COMMON_H

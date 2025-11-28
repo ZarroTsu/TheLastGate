@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include "../sdl.h"
 #include "shaders.h"
 #include "glad/glad.h"
 #include "shaders/magic_shader_files.h"
@@ -15,7 +14,7 @@ static GLint uColor = -1;
 static GLint uStrength = -1;
 static GLint uRadius = -1;
 
-void load_magic_shader(float project_matrix[16]) {
+void load_magic_shader(float projection_matrix[16]) {
     shader = load_shader_program(magic_vertex, magic_fragment);
     if (!shader) {
         printf("Unable to load magic shader\n");
@@ -30,7 +29,7 @@ void load_magic_shader(float project_matrix[16]) {
     uStrength = glGetUniformLocation(shader, "uStrength");
     uRadius = glGetUniformLocation(shader, "uRadius");
 
-    glUniformMatrix4fv(uProjection, 1, GL_FALSE, project_matrix);
+    glUniformMatrix4fv(uProjection, 1, GL_FALSE, projection_matrix);
 
     glUseProgram(0);
 }

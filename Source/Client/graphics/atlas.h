@@ -1,5 +1,4 @@
-﻿#ifndef THELASTGATE_ATLAS_H
-#define THELASTGATE_ATLAS_H
+﻿#pragma once
 
 #define ATLAS_SIZE_X 6400
 #define ATLAS_SIZE_Y 6400
@@ -16,6 +15,5 @@ typedef struct {
 extern AtlasCursor atlas_cursor;
 
 void init_atlas(void);
-unsigned int add_to_atlas(SpriteData *sprite_data);
 
-#endif //THELASTGATE_ATLAS_H
+unsigned int add_to_atlas(SpriteData *sprite_data);
