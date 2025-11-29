@@ -33,7 +33,6 @@ add_executable(TheLastGate WIN32
         render.c
         render.h
         sdl_magic.c
-        shader_test.c
         socket.c
         socket.h
         sound.c
