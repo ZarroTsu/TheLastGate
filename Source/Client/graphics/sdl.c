@@ -178,9 +178,6 @@ int sdl_init(const int windowed) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    create_ortho_matrix(projection_matrix, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
-    projection_initialized = 1;
-
     LOG("OpenGL quad VAO/VBO created\n");
 
     // Allocate CPU-side batch buffer
@@ -642,12 +639,6 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     if (!sprite_data[nr].loaded_in_atlas) {
         // Fall back to immediate rendering for non-atlas sprites
         return;
-    }
-
-    // Initialize projection matrix once
-    if (!projection_initialized) {
-        create_ortho_matrix(projection_matrix, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
-        projection_initialized = 1;
     }
 
     // Flush batch if full
