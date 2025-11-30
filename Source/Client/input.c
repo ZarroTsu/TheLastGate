@@ -382,7 +382,6 @@ void handle_input(void) {
                         break;
                     case SDLK_RETURN:
                     case SDLK_KP_ENTER:
-                        printf("Enter pressed\n");
                         if (in_len == 0) break;
 
                         if (tabmode) {
