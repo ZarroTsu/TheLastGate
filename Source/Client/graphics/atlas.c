@@ -31,9 +31,6 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
         return tile_atlas;
     }
 
-    LOG("Surface format: %s\n",
-    SDL_GetPixelFormatName(sprite_data->surface->format->format));
-
     int w = sprite_data->surface->w;
     int h = sprite_data->surface->h;
 
