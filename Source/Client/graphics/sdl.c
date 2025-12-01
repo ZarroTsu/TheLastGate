@@ -397,12 +397,12 @@ static unsigned short calculate_average_color(SDL_Surface *surface) {
 
     for (int y = 0; y < surface->h; y++) {
         for (int x = 0; x < surface->w; x++) {
-            Uint8 r, g, b;
+            Uint8 r, g, b, a;
             Uint32 pixel = get_pixel(surface, x, y);
-            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+            SDL_GetRGBA(pixel, surface->format, &r, &g, &b, &a);
 
-            // Skip magenta transparency pixels (255, 0, 255)
-            if (r == 255 && g == 0 && b == 255) {
+            // Skip magenta transparency pixels (255, 0, 255), or alpha
+            if ((r == 255 && g == 0 && b == 255) || a == 0) {
                 continue;
             }
 
