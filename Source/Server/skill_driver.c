@@ -669,6 +669,24 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 	return r;
 }
 
+// Entry :: if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
+void aoe_surroundhit(int cn, int co, int origco, int surround)
+{
+	int n, surrmod;
+	
+	if (B_SK(cn, SK_SURROUND))
+	{
+		surrmod = M_SK(cn, SK_SURROUND);
+	}
+	else
+	{
+		surrmod = (M_SK(cn, SK_DAGGER) < M_SK(cn, SK_STAFF) ? M_SK(cn, SK_DAGGER) : M_SK(cn, SK_STAFF));
+		
+		if (n=st_skillcount(cn, 66)) 
+			surrmod = surrmod + surrmod * n/20;
+	}
+}
+
 
 
 
@@ -680,7 +698,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 // cz         = origin of the aoe (usually also the attacker)
 // origco     = original target of the attack, to avoid double-dipping (ie. targeted spell)
 // intemp     = type of attack (skill or surround hit)
-// power      = original power of the spell (ie. targeted spell)
+// power      = original power of the spell (ie. targeted spell) - used for the surround mod on surround hits
 // prox_power = typically SK_PROX but might be the skill power value itself (ie. warcry)
 // count      = number of targets already hit (ie. targeted spell)
 // avgdmg     = damage already dealt before now (ie. targeted spell)
@@ -703,6 +721,21 @@ int aoe_driver(int cn, int cz, int origco, int intemp, int power, int prox_power
 	//  extra roundness      5% per corruptor         20% more for tree skill
 	r = r * 110 * (100+st_skillcount(cn,53)*5)/100 * (T_SORC_SK(cn, 5) ? 120:100)/100;
 	
+	// Loop through and count the targets
+	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)
+	{
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
+		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
+		{ 
+			if (!do_surround_check(cn, co, 0)) continue;
+			damage_mshell(co, power);
+			count++;
+		}
+	}
+	
+	// ...
+	
+	// Then loop through and hit the targets 
 	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)
 	{
 		// This makes the radius circular instead of square
@@ -714,10 +747,7 @@ int aoe_driver(int cn, int cz, int origco, int intemp, int power, int prox_power
 			{
 				// no_target func
 			}
-			else if (!do_surround_check(cn, co, 1))
-			{
-				continue;
-			}
+			else if (!do_surround_check(cn, co, 1)) continue;
 			else
 			{
 				// other func
