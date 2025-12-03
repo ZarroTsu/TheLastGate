@@ -627,284 +627,108 @@ int get_use_mana(int spell)
 	}
 }
 
-// AoE rework - hit everything around the origin (cz) at a given radius (radius)
-// Intended to replace both aoe archetypes as one unified type
+
 /*
-int aoe_driver(int cn, int cz, int origco, int temp, int power, int cost, int count, int hit, int avgdmg)
+// AoE rework - hit everything around the origin (cz) at a given radius (radius)
+// Old vectors like cost should be handled by the origin.
+
+
+// Returns the radius value for the given skill for the given character.
+// Some skills may have additional implicit range.
+
+int get_aoe_radius(int cn, int intemp, int prox_power)
 {
-	int hitpower = power, prox = B_SK(cn, SK_PROX), proxmult = 100, radius = 1 + ch[cn].aoe_bonus, area;
-	int notarget = 0, isspell = 0, isaura = 0, usemana = 1, sorcbonus = 10;
-	int co, n, x, y, xf, yf, xt, yt, xc, yc, tmp;
-	char buf[50];
+	int r = ch[cn].aoe_bonus;
+	int n = 0, baselen = 100;
 	
-	if (!IS_SANECHAR(cz)) cz = cn;
+	switch (intemp)
+	{
+		case SK_SURROUND:    n = 1; break;
+		case SK_SLAM:        n = 4; break;
+		case SK_OBLITERATE:  n = 4; break;
+		case SK_TAUNT:       n = 4; break;
+		case SK_BLIND:       n = 4; break;
+		case SK_DOUSE:       n = 4; break;
+		case SK_ZEPHYR2:     n = 4; break;
+		case SK_PLAGUE:      n = 6; break;
+		case SK_WARCRY:      n = 6; break;
+		case SK_LEAP:
+			n = 2;
+			if (do_get_iflag(cn, SF_BOOK_DAMO)) baselen = 90;
+			if (do_get_iflag(cn, SF_SIGN_SLAY) && do_get_iflag(cn, SF_JUSTIC_R))
+				n += (max(0, min(10, (100 - (100 * baselen / max(25, ch[cn].cool_bonus)))/10)) + 1)/2;
+			break;
+		default:             n = 1; break;
+	}
+	
+	r += n;
+	
+	if (B_SK(cn, SK_PROX))
+		r = r + r * prox_power/200;
+	
+	return r;
+}
+
+
+
+
+
+
+
+// aoe_driver -- core call for handling area effects
+// cn         = attacker
+// cz         = origin of the aoe (usually also the attacker)
+// origco     = original target of the attack, to avoid double-dipping (ie. targeted spell)
+// intemp     = type of attack (skill or surround hit)
+// power      = original power of the spell (ie. targeted spell)
+// prox_power = typically SK_PROX but might be the skill power value itself (ie. warcry)
+// count      = number of targets already hit (ie. targeted spell)
+// avgdmg     = damage already dealt before now (ie. targeted spell)
+int aoe_driver(int cn, int cz, int origco, int intemp, int power, int prox_power, int cost, int count, int hit, int avgdmg)
+{
+	int co;
+	int x, xc, xf, xt, y, yc, yf, yt;
+	int r = get_aoe_radius(cn, intemp, prox_power);
+	
+	
 	
 	xc = ch[cz].x;
 	yc = ch[cz].y;
 	
-	// Proximity is an added multiplier to the final radius
-	if (prox) proxmult = 100 + M_SK(cn, SK_PROX)/2;
+	xf = max(       1, xc     - r);
+	yf = max(       1, yc     - r);
+	xt = min(MAPX - 1, xc + 1 + r);
+	yt = min(MAPY - 1, yc + 1 + r);
 	
-	// Which AoE source?
-	switch (temp)
+	//  extra roundness      5% per corruptor         20% more for tree skill
+	r = r * 110 * (100+st_skillcount(cn,53)*5)/100 * (T_SORC_SK(cn, 5) ? 120:100)/100;
+	
+	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)
 	{
-		case SK_SLOW: case SK_SLOW2:
-			if (IS_SORCERER(cn)) radius += 3;
-			isspell = 1;
-			break;
-		case SK_CURSE: case SK_CURSE2:
-			if (IS_SORCERER(cn)) radius += 3;
-			isspell = 1;
-			break;
-		case SK_BLAST:
-			if (IS_ARCHHARAKIM(cn)) radius += 3;
-			isspell = 1;
-			break;
-		case SK_ARIA: case SK_ARIA2:
-			break;
-		case SK_SURROUND:
-			break;
-		case SK_WARCRY: case SK_WARCRY2: case SK_WARCRY3:
-			break;
-		case SK_BLIND: case SK_DOUSE:
-			radius += 2;
-			break;
-		case SK_CLEAVE:
-			break;
-		case SK_WEAKEN:
-			break;
-		case SK_POISON: case SK_VENOM:
-			if (IS_SORCERER(cn)) radius += 3;
-			isspell = 1;
-			break;
-		case SK_PULSE: case SK_PULSE2:
-			radius += 3;
-			isspell = 1;
-			break;
-		case SK_HASTE:
-			isspell = 1;
-			break;
-		case SK_TAUNT:
-			break;
-		case SK_LEAP:
-			break;
-		case SK_PLAGUE:
-			radius += 3;
-			break;
-		case SK_IMMOLATE: case SK_IMMOLATE2:
-			radius += 3;
-			isspell = 1;
-			break;
-		case SK_SLAM:
-			break;
-	}
-	
-	n = 100 + st_skillcount(cn, 53)*5;
-	sorcbonus = (T_SORC_SK(cn, 5)?12:10);
-	
-	area = radius * proxmult/100 * sorcbonus/10 * n/100;
-	
-	xf = max(       1,     xc - area);
-	yf = max(       1,     yc - area);
-	xt = min(MAPX - 1, 1 + xc + area);
-	yt = min(MAPY - 1, 1 + yc + area);
-	
-	// Loop through and count the number of targets first, if applicable
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++)
-	{
-		if (sqr(xc - x) + sqr(yc - y) > (sqr(area) + 1)) continue;
-		if ((co = map[x + y * MAPX].ch) && co!=cn && co!=origco)
-		{
-			if (!do_surround_check(cn, co, 0)) continue;
-			if (isspell) damage_mshell(co, power);
-			count++;
-		}
-	}
-	if (!count && !no_target)
-	{ 
-		if (origco == ch[cn].data[PCD_SHADOWCOPY] || origco == ch[cn].data[PCD_COMPANION])
-		{ 
-			do_char_log(cn, 0, "You stop yourself from %s your companion. That would be silly.\n", splog[temp].act);
-			return -1;
-		}
-		else
-		{ 
-			do_char_log(cn, 0, "You cannot %s yourself!\n", splog[temp].ref); 
-			return -1;
-		}
-	}
-	
-	//
-	
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++)
-	{
-		if (sqr(xc - x) + sqr(yc - y) > (sqr(area) + 1)) continue;
-		if ((co = map[x + y * MAPX].ch) && co != cn && co != origco)
+		// This makes the radius circular instead of square
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
+		//
+		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 		{
 			if (no_target)
 			{
-				strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
-				switch (intemp)
-				{
-					case SK_PLAGUE:
-						if (do_surround_check(cn, co, 0) && do_char_can_see(origco, co, 1) && spell_plague(cn, co, tmppl))
-						{
-							for (n = 0; n<MAXBUFFS; n++)
-							{
-								if ((in = ch[origco].spell[n])==0)	continue;
-								if (bu[in].data[5]==1 && bu[in].temp!=SK_SHADOW && !has_buff(co, bu[in].temp))
-								{
-									in2 = copy_buff(in);
-									if (bu[in2].temp == SK_PLAGUE && bu[in2].data[7] > -1) // 20% more damage per spread
-									{
-										if (bu[in2].data[7] < 5) bu[in2].data[7]++;
-										tmp = 100 + bu[in2].data[7]*20;
-										bu[in2].data[1] = bu[in2].data[6] * tmp / 100;
-									}
-									add_spell(co, in2);
-								}
-							}
-							hit++;
-						}
-						else continue;
-						break;
-					case SK_WARCRY:
-						if (spell_warcry(cn, co, power, 0))
-						{
-							do_char_log(co, 0, "You hear %s's warcry. You feel frightened and immobilized.\n", ch[cn].reference);
-							hit++;
-						}
-						else
-						{
-							if (!HAS_SYSOFF(co)) do_char_log(co, 0, "You hear %s's warcry.\n", ch[cn].reference);
-							continue;
-						}
-						break;
-					case SK_BLIND:
-						if (spell_blind(cn, co, power, 0))
-						{
-							do_char_log(co, 0, "%s kicks up a cloud of dust. You feel your eyes fail you.\n", buf);
-							hit++;
-						}
-						else
-						{
-							if (!HAS_SYSOFF(co)) do_char_log(co, 0, "%s kicks up a cloud of dust.\n", buf);
-							continue;
-						}
-						break;
-					case SK_DOUSE:
-						if (spell_blind(cn, co, power, 1))
-						{
-							do_char_log(co, 0, "%s kicks up a splash of mud. You're sopping wet.\n", buf);
-							hit++;
-						}
-						else
-						{
-							if (!HAS_SYSOFF(co)) do_char_log(co, 0, "%s kicks up a splash of mud.\n", buf);
-							continue;
-						}
-						break;
-					case SK_ZEPHYR2:
-						spell_zephyr(cn, co, zephyr, 1);
-						break;
-					default:
-						break;
-				}
+				// no_target func
 			}
-			else if (!do_surround_check(cn, co, 1)) continue;
-			else if (temp==SK_BLAST || temp==SK_SLAM || temp==SK_OBLITERATE)
+			else if (!do_surround_check(cn, co, 1))
 			{
-				if ((temp==SK_BLAST || temp==SK_OBLITERATE) && IS_NOMAGIC(co)) continue;
-				
-				if (temp==SK_BLAST)			tmp = spell_blast(cn, co, power, 0, 1);
-				if (temp==SK_SLAM)			tmp = spell_slam(cn, co, power, 1);
-				if (temp==SK_OBLITERATE)	tmp = spell_obliterate(cn, co, power, 1);
-				
-				avgdmg += max(0, tmp-1);
-				hit++;
-				
-				check_gloves(cn, co, co_orig, dr1, dr2);
-			}
-			else if (temp==SK_LEAP)
-			{
-				tmp = do_get_iflag(cn, SF_JUSTIC_R);
-				spell_leap(cn, co, co_orig, power, ch[cn].crit_multi, !tmp, (tmp && IS_PLAYER(cn)), dr1, dr2, 1);
-			}
-			else if (chance_compare(co, power+RANDOM(20), get_target_resistance(cn, co)+RANDOM(20), usemana))
-			{
-				if ((temp==SK_CURSE || temp==SK_SLOW || temp==SK_POISON || temp==SK_VENOM) && IS_NOMAGIC(co)) continue;
-				
-				if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, power, 0);
-				switch (temp)
-				{
-					case SK_CURSE:
-						spell_curse(cn, co, hitpower, 1);
-						break;
-					case SK_SLOW:
-						spell_slow(cn, co, hitpower, 1);
-						break;
-					case SK_POISON:
-						spell_poison(cn, co, hitpower, 1);
-						break;
-					case SK_VENOM:
-						spell_poison(cn, co, hitpower, 3);
-						break;
-					case SK_WEAKEN:
-						spell_weaken(cn, co, hitpower, 1);
-						break;
-					case SK_TAUNT:
-						spell_taunt(cn, co, hitpower, 1);
-						break;
-					default:
-						break;
-				}
-				hit++;
+				continue;
 			}
 			else
 			{
-				if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEMISS, cn, co, power, 0);
-				if (cn!=co && CAN_SENSE(co) && M_SK(co, SK_PERCEPT) > power + 5)
-				{
-					if (!(ch[co].flags & CF_SENSEOFF))
-					{
-						do_char_log(co, 0, "%s%s\n", ch[cn].reference, splog[temp].senseaoe);
-					}
-					if (!IS_IGNORING_SPELLS(co))
-					{
-						do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
-					}
-				}
-				else
-				{
-					if (!(ch[co].flags & CF_SYS_OFF)) do_char_log(co, 0, "%s\n", splog[temp].otheraoe);
-				}
+				// other func
 			}
 			remember_pvp(cn, co);
 		}
 	}
-	
-	do_char_log(cn, 1, "%s\n", splog[temp].selfaoe);
-	
-	if (radius > 1 && temp==SK_BLAST || temp==SK_SLAM || temp==SK_OBLITERATE)
-	{
-		if (!HAS_SYSOFF(cn))
-		{
-			do_char_log(cn, 1, "You hit %d of %d creatures in range.\n", hit, count);
-			do_char_log(cn, 1, "You dealt an average of %d damage.\n", max(0, (avgdmg-1)/max(1,hit)) );
-		}
-	}
-	else if (radius > 1 && temp!=SK_PLAGUE && temp!=SK_LEAP && temp!=SK_ZEPHYR2)
-	{
-		if (!HAS_SYSOFF(cn))
-		{
-			do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
-		}
-	}
-	
-	return hit;
 }
 */
 
+// aoe_power = M_SK(cn, SK_PROX);
 int cast_aoe_spell(int cn, int co, int intemp, int power, int aoe_power, int cost, int count, int hit, int avgdmg, int dr1, int dr2)
 {
 	int co_orig, spellaoe, spellrad, hitpower, aoeimm = 0, tmp = 0, crit_dam=0, baselen = 100, zephyr = 0;
