@@ -672,18 +672,58 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 // Entry :: if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 void aoe_surroundhit(int cn, int co, int origco, int surround)
 {
-	int n, surrmod;
+	int n, in, enPar, surrMod, surrDam, glv, glv_base = 60, surrBonus = 0, surrTotal = 0, power = 0;
 	
 	if (B_SK(cn, SK_SURROUND))
 	{
-		surrmod = M_SK(cn, SK_SURROUND);
+		surrMod = M_SK(cn, SK_SURROUND);
 	}
 	else
 	{
-		surrmod = (M_SK(cn, SK_DAGGER) < M_SK(cn, SK_STAFF) ? M_SK(cn, SK_DAGGER) : M_SK(cn, SK_STAFF));
+		surrMod = (M_SK(cn, SK_DAGGER) < M_SK(cn, SK_STAFF) ? M_SK(cn, SK_DAGGER) : M_SK(cn, SK_STAFF));
 		
 		if (n=st_skillcount(cn, 66)) 
-			surrmod = surrmod + surrmod * n/20;
+			surrMod = surrMod + surrMod * n/20;
+	}
+	
+	surrDam = odam*3/4 + crit_dam*3/4;
+	glv     = (glv_base + getrank(cn)*10)*3/4;
+	coPar   = ch[co].to_parry;
+	
+	if (in = has_spell(cn, SK_ZEPHYR))
+		power = bu[in].power;
+	else if (B_SK(cn, SK_ZEPHYR))
+		power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
+	
+	if ((surround==1 && (surrMod + RANDOM(40)) >= coPar) ||
+		(surround==2 && (surrMod + RANDOM(30)) >= coPar) ||
+		(surround==3 && (surrMod + RANDOM(20)) >= coPar) )
+	{
+		if (surround==1 && (surrMod-coPar)> 0) surrBonus = odam/4 * min(max(1,surrMod-coPar   ), 20)/20;
+		if (surround==2 && (surrMod-coPar)>10) surrBonus = odam/4 * min(max(1,surrMod-coPar-10), 20)/20;
+		if (surround==3 && (surrMod-coPar)>20) surrBonus = odam/4 * min(max(1,surrMod-coPar-20), 20)/20;
+		surrTotal = surrDam + max(0, surrBonus);
+		
+		if (co==co_orig) surrTotal = surrTotal*3/4;
+		if (co!=co_orig && (mb=st_skillcount(cn, 46))) surrTotal = surrTotal*(100+mb*5)/100;
+		
+		do_hurt(cn, co, surrTotal, 4);
+		
+		if (chance_compare(co, glv*3/4 + RANDOM(20), get_target_resistance(cn, co) + RANDOM(20), 0) && co!=co_orig)
+		{
+			if (do_get_iflag(cn, SF_HIT_POISON)) spell_poison(cn, co, glv, 1);
+			if (do_get_iflag(cn, SF_HIT_SCORCH)) spell_scorch(cn, co, glv, 1);
+			if (do_get_iflag(cn, SF_HIT_BLIND))  spell_blind(cn, co, glv, 0);
+			if (do_get_iflag(cn, SF_HIT_SLOW))   spell_slow(cn, co, glv, 1);
+			if (do_get_iflag(cn, SF_HIT_CURSE))  spell_curse(cn, co, glv, 1);
+			if (do_get_iflag(cn, SF_HIT_WEAKEN)) spell_weaken(cn, co, glv, 1);
+			if (do_get_iflag(cn, SF_HIT_FROST))  spell_frostburn(cn, co, glv);
+			if (do_get_iflag(cn, SF_HIT_DOUSE))  spell_blind(cn, co, glv, 1);
+			if (do_get_iflag(cn, SF_TW_LUXURIA)) spell_warcry(cn, co, glv, 1);
+			if (ch[co].spellfail==1) ch[co].spellfail = 0;
+		}
+		if (!IS_NOMAGIC(co) && power && co!=co_orig && !do_get_iflag(cn, SF_DEATH_R))
+			spell_zephyr(cn, co, power, 1);
 	}
 }
 
@@ -698,7 +738,7 @@ void aoe_surroundhit(int cn, int co, int origco, int surround)
 // cz         = origin of the aoe (usually also the attacker)
 // origco     = original target of the attack, to avoid double-dipping (ie. targeted spell)
 // intemp     = type of attack (skill or surround hit)
-// power      = original power of the spell (ie. targeted spell) - used for the surround mod on surround hits
+// power      = original power of the spell (ie. targeted spell)
 // prox_power = typically SK_PROX but might be the skill power value itself (ie. warcry)
 // count      = number of targets already hit (ie. targeted spell)
 // avgdmg     = damage already dealt before now (ie. targeted spell)
