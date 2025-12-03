@@ -29,6 +29,8 @@ add_executable(TheLastGate WIN32
         main.h
         main.h
         MERC.rc
+        mods/base_cost_warning.c
+        mods/base_cost_warning.h
         options.c
         render.c
         render.h
@@ -37,6 +39,8 @@ add_executable(TheLastGate WIN32
         socket.h
         sound.c
         sound.h
+        ui/option_window.c
+        ui/option_window.h
 )
 
 # Disable warnings for old code compatibility

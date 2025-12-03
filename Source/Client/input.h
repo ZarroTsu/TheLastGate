@@ -12,5 +12,6 @@ typedef enum {
     SKILL_LIST,
     WAYPOINT_PAGE,
     DEPOT_PAGE,
+    OPTIONS_WINDOW,
     CHAT_HISTORY
 } ScrollableRegion;

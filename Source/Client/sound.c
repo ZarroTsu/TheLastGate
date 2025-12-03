@@ -5,6 +5,8 @@
 #include <SDL2/SDL_audio.h>
 #include <string.h>
 
+#include "main.h"
+
 
 int domusic = 0;
 int dosound = 1;
@@ -113,6 +115,7 @@ int play_sound(char *file, int vol, int p) {
 
     if (sdl_volume < 0) sdl_volume = 0;
     if (sdl_volume > MIX_MAX_VOLUME) sdl_volume = MIX_MAX_VOLUME;
+    sdl_volume *= app_state.volume_level / 10.0f;
 
     Mix_Volume(channel, sdl_volume);
 

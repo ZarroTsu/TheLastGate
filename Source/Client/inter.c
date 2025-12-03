@@ -16,7 +16,9 @@
 
 #include <stdio.h>
 
+#include "engine.h"
 #include "main.h"
+#include "ui/option_window.h"
 
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)
 int gui_inv_up[] 	= { 600,   5, 612,  35 };
@@ -234,7 +236,7 @@ void button_command(int nr)
 		case  6: pdata.show_names=1-pdata.show_names; break;
 		case  7: pdata.show_bars=1-pdata.show_bars; break;
 		// Row 3 of F buttons
-		case  8: break;
+		case  8: cmd_options(); break;
 		case  9: break;
 		case 10: break;
 		case 11: xmove=xxtimer=0; cmd_exit(); break; // exit
@@ -2018,5 +2020,6 @@ void mouse(int x,int y,int state)
 	else if (mouse_buttonbox(x,y,state)) ;
 	else if (mouse_statbox(x,y,state)) ;
 	else if (mouse_statbox2(x,y,state)) ;
+	else if (options_window_input(x,y, state)) ;
 	else mouse_mapbox(x,y,state);
 }

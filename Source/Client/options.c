@@ -279,6 +279,21 @@ void load_options(void)
 	}
 	
 	if (app_state.gamma>6000 || app_state.gamma<5000) app_state.gamma=5000;
+
+	flag = 0;
+	handle=open("TLGExtended.dat",O_RDONLY|O_BINARY);
+	if (handle!=-1) {
+		if (read(handle,&app_state.escape_closes_menus_first,sizeof(app_state.escape_closes_menus_first))!=sizeof(app_state.escape_closes_menus_first)) flag=1;
+		if (read(handle,&app_state.cost_helper,sizeof(app_state.cost_helper))!=sizeof(app_state.cost_helper)) flag=1;
+		if (read(handle,&app_state.volume_level,sizeof(app_state.volume_level))!=sizeof(app_state.volume_level)) flag=1;
+		close(handle);
+	} else flag=1;
+
+	if (flag) {
+		app_state.escape_closes_menus_first = 1;
+		app_state.cost_helper = 0;
+		app_state.volume_level = 10;
+	}
 }
 
 void save_options(void)
@@ -298,6 +313,14 @@ void save_options(void)
 		write(handle,&do_shadow,sizeof(do_shadow));
 		write(handle,&app_state.windowed,sizeof(app_state.windowed));
 		write(handle,&do_darkmode,sizeof(do_darkmode));
+		close(handle);
+	}
+
+	handle=open("TLGExtended.dat",O_WRONLY|O_BINARY|O_CREAT|O_TRUNC,0666);
+	if (handle!=-1) {
+		write(handle,&app_state.escape_closes_menus_first,sizeof(app_state.escape_closes_menus_first));
+		write(handle,&app_state.cost_helper,sizeof(app_state.cost_helper));
+		write(handle,&app_state.volume_level,sizeof(app_state.volume_level));
 		close(handle);
 	}
 }

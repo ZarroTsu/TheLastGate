@@ -48,7 +48,10 @@ AppState app_state = {
 	.gamma = 5000,
 	.path = "",
 	.windowed = 1,
-	.window_size = {1280, 720}
+	.window_size = {1280, 720},
+	.volume_level = 10, // 100%
+	.cost_helper = false,
+	.escape_closes_menus_first = true
 };
 
 extern void cmd3(int cmd,int x,int y,int z);

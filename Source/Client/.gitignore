@@ -13,3 +13,7 @@ merc.ilc
 merc.ild
 merc.ilf
 merc.ils
+/cmake-build-pgo-use/
+/cmake-build-debug/
+/cmake-build-pgo-generate/
+/cmake-build-release/

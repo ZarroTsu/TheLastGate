@@ -37,6 +37,8 @@
 #include "render.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
+#include "mods/base_cost_warning.h"
+#include "ui/option_window.h"
 
 int init_done=0;
 int frame=0;
@@ -396,192 +398,192 @@ struct skilltab _skilltab[55] = {
 				"", "",
 				{ AT_AGL, AT_AGL, AT_STR }},
 				
-	{  7, 'G', 	"Zephyr", 				"Passive ability granting an additional hit after a brief delay.", 
-				"", "",
+	{  7, 'G', 	"Zephyr", 				"Passive ability granting your hits an additional hit after a brief delay.",
+				"Zephyr (Thorns)", 		"Passive ability granting retaliation hits after parrying.",
 				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{  8, 'G', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
+
+	{  8, 'G', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.",
 				"", "",
 				{ AT_INT, AT_AGL, AT_AGL }},
-				
-	{  9, 'G', 	"Perception", 			"Passive ability to see and hear your surroundings.", 
+
+	{  9, 'G', 	"Perception", 			"Passive ability to see and hear your surroundings.",
 				"", "",
 				{ AT_INT, AT_INT, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 10, 'G', 	"Metabolism", 			"Passive ability to prevent the loss of hitpoints while you are underwater and against damage-over-time.", 
+	{ 10, 'G', 	"Metabolism", 			"Passive ability to prevent the loss of hitpoints while you are underwater and against damage-over-time.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_INT }},
-				
-	{ 11, 'F', 	"Magic Shield", 		"Use (Spell): Applies a buff to yourself, granting temporary armor.", 
+
+	{ 11, 'F', 	"Magic Shield", 		"Use (Spell): Applies a buff to yourself, granting temporary armor.",
 				"Magic Shell", 			"Use (Spell): Applies a buff to yourself, granting temporary resistance and immunity.",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 12, 'C', 	"Tactics", 				"Passive ability to hit and parry with any weapon. Loses effectiveness while not at full mana.", 
+
+	{ 12, 'C', 	"Tactics", 				"Passive ability to hit and parry with any weapon. Loses effectiveness while not at full mana.",
 				"Tactics (Inverse)", 	"Passive ability to hit and parry with any weapon. Only effective while low on mana.",
 				{ AT_BRV, AT_WIL, AT_INT }},
-				
-	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.", 
+
+	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.",
 				"", "",
 				{ AT_INT, AT_AGL, AT_STR }},
-				
-	{ 14, 'G', 	"Finesse", 				"Passive ability which grants more global damage the healthier you are.", 
+
+	{ 14, 'G', 	"Finesse", 				"Passive ability which grants more global damage the healthier you are.",
 				"Finesse (Inverse)", 	"Passive ability which grants more global damage while near death.",
 				{ AT_BRV, AT_BRV, AT_AGL }},
-				
-	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.", 
+
+	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_INT }},
-				
-	{ 16, 'D', 	"Shield", 				"Passive ability to parry while using a shield.", 
+
+	{ 16, 'D', 	"Shield", 				"Passive ability to parry while using a shield.",
 				"Shield Bash",          "Use (Skill): Strike your foe with your shield, stunning them and dealing damage proportional to your Armor Value.",
 				{ AT_BRV, AT_WIL, AT_STR }},
-				
-	{ 17, 'F', 	"Protect", 				"Use (Spell): Applies a buff to you or your target, raising their armor value.", 
+
+	{ 17, 'F', 	"Protect", 				"Use (Spell): Applies a buff to you or your target, raising their armor value.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 18, 'F', 	"Enhance", 				"Use (Spell): Applies a buff to you or your target, raising their weapon value.", 
+
+	{ 18, 'F', 	"Enhance", 				"Use (Spell): Applies a buff to you or your target, raising their weapon value.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 19, 'F', 	"Slow", 				"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their action speed.", 
+
+	{ 19, 'F', 	"Slow", 				"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their action speed.",
 				"Slow (Greater)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their action speed.",
 				{ AT_BRV, AT_INT, AT_INT }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 20, 'F', 	"Curse", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their attributes.", 
+	{ 20, 'F', 	"Curse", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their attributes.",
 				"Curse (Greater)", 		"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their attributes.",
 				{ AT_BRV, AT_INT, AT_INT }},
-				
-	{ 21, 'F', 	"Bless", 				"Use (Spell): Applies a buff to you or your target, raising their attributes.", 
+
+	{ 21, 'F', 	"Bless", 				"Use (Spell): Applies a buff to you or your target, raising their attributes.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 22, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, granting additional Top Damage and damage-over-time at the cost of health per second.", 
+
+	{ 22, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, granting additional Top Damage and damage-over-time at the cost of health per second.",
 				"Calm", 				"Use (Skill): Applies a buff to yourself, granting resistance to enemy Top Damage and damage-over-time at the cost of mana per second.",
 				{ AT_BRV, AT_INT, AT_STR }},
-				
-	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
+
+	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_STR }},
-				
-	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies.", 
-				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", 
+
+	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies.",
+				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.",
 				{ AT_BRV, AT_INT, AT_INT }},
-				
-	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.", 
+
+	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.",
 				"Dispel (Enemy)", 		"Use (Spell): Removes buffs from your target.",
 				{ AT_BRV, AT_WIL, AT_INT }},
-				
-	{ 26, 'F', 	"Heal", 				"Use (Spell): Heals you or your target. This also applies Healing Sickness, reducing the power of consecutive heals.", 
+
+	{ 26, 'F', 	"Heal", 				"Use (Spell): Heals you or your target. This also applies Healing Sickness, reducing the power of consecutive heals.",
 				"Heal (Regen)", 		"Use (Spell): Applies a buff to you or your target, granting them health regeneration.",
 				{ AT_BRV, AT_WIL, AT_STR }},
-				
-	{ 27, 'F', 	"Ghost Companion", 		"Use (Spell): Summons a companion to follow you and your commands. Say COMMAND to it for a list of commands.", 
+
+	{ 27, 'F', 	"Ghost Companion", 		"Use (Spell): Summons a companion to follow you and your commands. Say COMMAND to it for a list of commands.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 28, 'A', 	"Regenerate", 			"Passive ability to recover hitpoints over time.", 
+
+	{ 28, 'A', 	"Regenerate", 			"Passive ability to recover hitpoints over time.",
 				"", "",
 				{ AT_STR, AT_STR, AT_STR }},
-				
-	{ 29, 'A', 	"Rest", 				"Passive ability to recover endurance over time.", 
+
+	{ 29, 'A', 	"Rest", 				"Passive ability to recover endurance over time.",
 				"", "",
 				{ AT_AGL, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 30, 'B', 	"Meditate", 			"Passive ability to recover mana over time.", 
+	{ 30, 'B', 	"Meditate", 			"Passive ability to recover mana over time.",
 				"", "",
 				{ AT_INT, AT_INT, AT_INT }},
-				
-	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff to cooldown rate, and debuffs nearby enemy cooldown rate. Has a base radius of 5 tiles.", 
+
+	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff to cooldown rate, and debuffs nearby enemy cooldown rate. Has a base radius of 5 tiles.",
 				"", "",
 				{ AT_BRV, AT_AGL, AT_AGL }},
-				
-	{ 32, 'G', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.", 
+
+	{ 32, 'G', 	"Immunity", 			"Passive ability to reduce the strength of enemy negative spells.",
 				"", "",
 				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{ 33, 'G', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
+
+	{ 33, 'G', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.",
 				"", "",
 				{ AT_AGL, AT_STR, AT_STR }},
-				
-	{ 34, 'G', 	"Economize", 			"Passive ability to reduce the mana cost of spells and abilities. Additionally grants better prices while buying or selling.", 
+
+	{ 34, 'G', 	"Economize", 			"Passive ability to reduce the mana cost of spells and abilities. Additionally grants better prices while buying or selling.",
 				"", "",
 				{ AT_WIL, AT_WIL, AT_WIL }},
-				
-	{ 35, 'E', 	"Warcry", 				"Use (Skill): Shout to stun and strike fear into all nearby enemies. Has a base radius of 6 tiles.", 
+
+	{ 35, 'E', 	"Warcry", 				"Use (Skill): Shout to stun and strike fear into all nearby enemies. Has a base radius of 6 tiles.",
 				"Warcry (Rally)", 		"Use (Skill): Shout to rally your allies and improve hit and parry score. Has a base radius of 6 tiles.",
 				{ AT_BRV, AT_STR, AT_STR }},
-				
-	{ 36, 'D', 	"Dual Wield", 			"Passive ability to hit while using a dual-sword.", 
+
+	{ 36, 'D', 	"Dual Wield", 			"Passive ability to hit while using a dual-sword.",
 				"", "",
 				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 4 tiles.", 
+
+	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 4 tiles.",
 				"Blind (Douse)", 		"Use (Skill): Applies a debuff to nearby enemies, reducing their stealth and spell modifier. Has a base radius of 4 tiles.",
 				{ AT_BRV, AT_INT, AT_AGL }},
-				
-	{ 38, 'G', 	"Gear Mastery", 		"Passive ability to improve weapon and armor values granted by your equipment.", 
+
+	{ 38, 'G', 	"Gear Mastery", 		"Passive ability to improve weapon and armor values granted by your equipment.",
 				"", "",
 				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{ 39, 'G', 	"Safeguard", 			"Passive ability to reduce damage taken.", 
+
+	{ 39, 'G', 	"Safeguard", 			"Passive ability to reduce damage taken.",
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", 
+	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.",
 				"Cleave (Aggravate)",	"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take additional damage.",
 				{ AT_AGL, AT_STR, AT_STR }},
-				
-	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon value.", 
+
+	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon value.",
 				"Weaken (Crush)", 		"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their armor value.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
-				
-	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, causing them to take damage over time.", 
+
+	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, causing them to take damage over time.",
 				"Poison (Venom)", 		"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, reducing immunity and causing damage over time. Stacks up to 3 times.",
 				{ AT_BRV, AT_INT, AT_INT }},
-				
-	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes and inflict shock. Has a base radius of 3 tiles.", 
-				"Pulse (Charge)", 		"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to heal nearby allies and inflict charge. Has a base radius of 3 tiles.",
+
+	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes and inflict shock, reducing their damage dealt and increasing their damage taken. Has a base radius of 3 tiles.",
+				"Pulse (Charge)", 		"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to heal nearby allies and inflict charge, reducing their damage taken and increasing their damage dealt. Has a base radius of 3 tiles.",
 				{ AT_BRV, AT_INT, AT_INT }},
-				
+
 	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of your Aria and Weaken skills.", // Braver
 										"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
 										"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
 				{ AT_BRV, AT_WIL, AT_INT }},
-				
-	{ 45, 'G', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
+
+	{ 45, 'G', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
+
+	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 47, 'F', 	"Haste", 				"Use (Spell): Applies a buff to yourself, increasing your action speed.", 
+
+	{ 47, 'F', 	"Haste", 				"Use (Spell): Applies a buff to yourself, increasing your action speed.",
 				"", "",
 				{ AT_BRV, AT_WIL, AT_AGL }},
-				
-	{ 48, 'E', 	"Taunt",				"Use (Skill): Applies a debuff to your target and surrounding enemies, forcing them to attack you. This also applies a buff to yourself, granting damage resistance.", 
+
+	{ 48, 'E', 	"Taunt",				"Use (Skill): Applies a debuff to your target and surrounding enemies, forcing them to attack you. This also applies a buff to yourself, granting damage resistance.",
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
-				
+
 	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life. Higher cooldown rate lets this skill repeat additional times.",
 				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
-	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
+	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.",
 				"", "",
 				{ 0, 0, 0 }},
-	{ 51, 'H', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location after a brief delay.", 
+	{ 51, 'H', 	"Recall", 				"Use (Spell): Teleport yourself to a safe location after a brief delay.",
 				"", "",
 				{ 0, 0, 0 }},
-	{ 52, 'H', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.", 
+	{ 52, 'H', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.",
 				"", "",
 				{ 0, 0, 0 }},
-	{ 53, 'I', 	"Ferocity", 			"Passively grants a bonus to WV and AV. The bonus increases for each empty gear slot.", 
+	{ 53, 'H', 	"Ferocity", 			"Passively grants a bonus to WV and AV. The bonus increases for each empty gear slot.",
 				"", "",
 				{ 0, 0, 0 }},
-	{ 54, 'I', 	"Shift", 				"Use (Skill): Change form from that of a Ratling to that of a Greenling, and vice versa. Has its own unique cooldown timer.", 
+	{ 54, 'H', 	"Shift", 				"Use (Skill): Change form from that of a Ratling to that of a Greenling, and vice versa. Has its own unique cooldown timer.",
 				"", "",
 				{ 0, 0, 0 }}
 };
@@ -1355,7 +1357,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	show_shop=0,show_wps=0,show_tree=0,dept_page=0;
+unsigned int	show_shop=0,show_wps=0,show_tree=0,dept_page=0,show_opts=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -2280,7 +2282,7 @@ void eng_display_win(int plr_sprite,int init)
 				if (pdata.show_stats) xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
 				xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
 				//
-				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used) 
+				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used)
 					render_putc(163,8+n*14,1,'+');
 				if (stat_raised[n]>0) 
 					render_putc(177,8+n*14,1,'-');
@@ -2381,8 +2383,13 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if (pdata.show_stats) xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
 				xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
-				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used) 
-					render_putc(163,(8+8*14)+n*14,1,'+');
+				if (app_state.cost_helper) {
+					char raise_icon = get_raise_icon(m, n + skill_pos);
+					render_putc(163, (8 + 8 * 14) + n * 14, raise_icon == '+' ? 1 : 2, raise_icon);
+				} else {
+					if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used)
+						render_putc(163,(8+8*14)+n* 14, 1, '+');
+				}
 				if (stat_raised[n+8+skill_pos]>0) 
 					render_putc(177,(8+8*14)+n*14,1,'-');
 				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL)
@@ -2911,6 +2918,10 @@ void eng_display_win(int plr_sprite,int init)
 				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
 					1,tutorial_text[show_tuto-1][tuto_page-1][y]);
 			}
+		}
+
+		if (show_opts) {
+			options_window_render();
 		}
 	}
 }
@@ -4736,6 +4747,10 @@ int firstquit=0;
 int wantquit=0;
 int maynotquit=TICKS*5/TICKMULTI;
 
+void cmd_options() {
+	show_opts = show_opts ? 0 : 1;
+}
+
 void cmd_exit(void)
 {
 	if (do_exit || !maynotquit) 
@@ -4779,7 +4794,7 @@ void engine(void)
 	for (n=0; n<MAXSKILL; n++) 
 	{
 		skilltab[n]=_skilltab[n];
-		skilltab[n].attrib[0]=1;
+		// skilltab[n].attrib[0]=1;
 	}
 
 	init_done=1;

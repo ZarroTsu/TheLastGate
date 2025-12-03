@@ -10,6 +10,7 @@
 #include "engine.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
+#include "ui/option_window.h"
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])
@@ -26,6 +27,11 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
     if (show_shop == 112 && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
             ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280))
         return DEPOT_PAGE;
+
+    if (show_opts && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
+            ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280)) {
+        return OPTIONS_WINDOW;
+    }
 
     if (x > 973 && x < 1275 && y > 6 && y < 230)
         return CHAT_HISTORY;
@@ -230,7 +236,11 @@ void handle_input(void) {
                             show_tuto = 0;
                             closed_window = true;
                         }
-                        if (!closed_window) cmd(CL_CMD_RESET, 0, 0);
+                        if (show_opts != 0) {
+                            show_opts = 0;
+                            closed_window = true;
+                        }
+                        if (!app_state.escape_closes_menus_first || !closed_window) cmd(CL_CMD_RESET, 0, 0);
                         break;
                     case SDLK_F1:
                         cmd(CL_CMD_MODE, 2, 0);
@@ -479,6 +489,9 @@ void handle_input(void) {
                             logstart += 3;
                             logtimer = TICKS * 30 / TICKMULTI;
                         }
+                        break;
+                    case OPTIONS_WINDOW:
+                        options_window_scroll(x, y, delta);
                         break;
                     default: break;
                 }

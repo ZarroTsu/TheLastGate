@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 
 typedef struct {
@@ -8,6 +9,9 @@ typedef struct {
     char path[256];
     int windowed;
     int window_size[2];
+    int volume_level;
+    bool cost_helper;
+    bool escape_closes_menus_first;
 } AppState;
 
 extern AppState app_state;
