@@ -78,6 +78,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
            ax, ay, w, h, sprite_data->uv0.u, sprite_data->uv0.v,
            sprite_data->uv1.u, sprite_data->uv1.v);
 
+    sprite_data->atlas_texture = tile_atlas;
     sprite_data->loaded_in_atlas = true;
     return tile_atlas;
 }
