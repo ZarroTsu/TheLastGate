@@ -44,6 +44,7 @@ typedef struct {
     unsigned int instance_vbo; // Instance buffer for batched rendering
     SpriteInstance *batch_buffer; // CPU-side batch buffer
     int batch_count;              // Number of sprites in current batch
+    unsigned int current_atlas_texture; // The atlas currently in use
 } App;
 
 struct FontCache {

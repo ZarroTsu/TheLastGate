@@ -187,6 +187,7 @@ int sdl_init(const int windowed) {
         return -1;
     }
     app.batch_count = 0;
+    app.current_atlas_texture = 0;
 
     // Create instance VBO for batched rendering
     glGenBuffers(1, &app.instance_vbo);
@@ -324,6 +325,7 @@ void sdl_init_sprites(void) {
  */
 void sdl_batch_begin(void) {
     app.batch_count = 0;
+    app.current_atlas_texture = 0;
 }
 
 /**
@@ -354,6 +356,7 @@ void sdl_batch_flush(void) {
     // sdl_stop_scaling();
     // Reset batch for next frame
     app.batch_count = 0;
+    app.current_atlas_texture = 0;
 
     // printf("Flushed batch: %d sprites\n", app.batch_count);
 }
