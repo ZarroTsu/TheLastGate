@@ -100,10 +100,14 @@ void main() {
         color.b = 0.0;
     }
     if (isWater) {
-        float tmp = (color.r + color.g + color.b) / 2.0;
-        color.r = (color.r + tmp) / 3.0;
-        color.g = ((color.g + tmp) / 3.0);
-        color.b = color.b + tmp;
+        float tmp = (color.r + color.g + color.b) / 3;
+        color.r = (color.r + tmp)/3;
+        color.g = (color.g + tmp)/2;
+        color.b = color.b + tmp * 1.2;
+
+        color.r = clamp(color.r, 0, 1);
+        color.g = clamp(color.g, 0, 1);
+        color.b = clamp(color.b, 0, 1);
     }
     color.rgb *= gammaScale;
     if (isRed) {
