@@ -247,7 +247,7 @@ int sdl_init(const int windowed) {
 
     LOG("Sprite batch system initialized (max %d sprites per batch)\n", MAX_BATCH_SIZE);
 
-    init_atlases();
+    init_atlas_groups();
 
     for (int n = 1; n < 10; n++) {
         char path[256];
