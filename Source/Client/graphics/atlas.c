@@ -4,18 +4,16 @@
 
 #include "../log.h"
 
-unsigned int tile_atlas;
-
-AtlasCursor atlas_cursor = {0, 0, 0};
+static Atlas tile_atlas;
 
 void init_atlas(void) {
-    if (tile_atlas) {
+    if (tile_atlas.texture_id) {
         LOG("Tile atlas already initialized\n");
         return;
     }
 
-    glGenTextures(1, &tile_atlas);
-    glBindTexture(GL_TEXTURE_2D, tile_atlas);
+    glGenTextures(1, &tile_atlas.texture_id);
+    glBindTexture(GL_TEXTURE_2D, tile_atlas.texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ATLAS_SIZE_X, ATLAS_SIZE_Y, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -28,37 +26,37 @@ void init_atlas(void) {
 unsigned int add_to_atlas(SpriteData *sprite_data) {
     if (sprite_data->loaded_in_atlas) {
         LOG("Sprite already loaded into atlas.\n");
-        return tile_atlas;
+        return tile_atlas.texture_id;
     }
 
     int w = sprite_data->surface->w;
     int h = sprite_data->surface->h;
 
     // Move to next row if sprite doesn't fit horizontally
-    if (atlas_cursor.x + w + 2 > ATLAS_SIZE_X) {
-        atlas_cursor.x = 0;
-        atlas_cursor.y += atlas_cursor.row_height + 2;
-        atlas_cursor.row_height = 0;
+    if (tile_atlas.cursor.x + w + 2 > ATLAS_SIZE_X) {
+        tile_atlas.cursor.x = 0;
+        tile_atlas.cursor.y += tile_atlas.cursor.row_height + 2;
+        tile_atlas.cursor.row_height = 0;
     }
 
     // Check for vertical overflow
-    if (atlas_cursor.y + h + 2 > ATLAS_SIZE_Y) {
+    if (tile_atlas.cursor.y + h + 2 > ATLAS_SIZE_Y) {
         LOG("ERROR: Atlas overflow! Sprite %dx%d won't fit at position (%d, %d)\n",
-               w, h, atlas_cursor.x, atlas_cursor.y);
+               w, h, tile_atlas.cursor.x, tile_atlas.cursor.y);
         LOG("Atlas cursor: x=%d, y=%d, row_height=%d\n",
-               atlas_cursor.x, atlas_cursor.y, atlas_cursor.row_height);
+               tile_atlas.cursor.x, tile_atlas.cursor.y, tile_atlas.cursor.row_height);
         exit(1); // TODO: Gracefully die, but for now if this happens there is a big problem.
         return 0;
     }
 
-    int ax = atlas_cursor.x + 1;
-    int ay = atlas_cursor.y + 1;
+    int ax = tile_atlas.cursor.x + 1;
+    int ay = tile_atlas.cursor.y + 1;
 
-    atlas_cursor.x += w + 1;
+    tile_atlas.cursor.x += w + 1;
 
-    if (h > atlas_cursor.row_height) atlas_cursor.row_height = h + 1;
+    if (h > tile_atlas.cursor.row_height) tile_atlas.cursor.row_height = h + 1;
 
-    glBindTexture(GL_TEXTURE_2D, tile_atlas);
+    glBindTexture(GL_TEXTURE_2D, tile_atlas.texture_id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, ax, ay, w, h, GL_BGRA, GL_UNSIGNED_BYTE, sprite_data->surface->pixels);
 
     // Check for OpenGL errors
@@ -78,7 +76,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
            ax, ay, w, h, sprite_data->uv0.u, sprite_data->uv0.v,
            sprite_data->uv1.u, sprite_data->uv1.v);
 
-    sprite_data->atlas_texture = tile_atlas;
+    sprite_data->atlas_texture = tile_atlas.texture_id;
     sprite_data->loaded_in_atlas = true;
-    return tile_atlas;
+    return tile_atlas.texture_id;
 }

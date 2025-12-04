@@ -5,14 +5,15 @@
 #include "sprite_data.h"
 #include "glad/glad.h"
 
-extern GLuint tile_atlas;
-
 typedef struct {
     int x, y;
     int row_height;
 } AtlasCursor;
 
-extern AtlasCursor atlas_cursor;
+typedef struct {
+    unsigned int texture_id;
+    AtlasCursor cursor;
+} Atlas;
 
 void init_atlas(void);
 
