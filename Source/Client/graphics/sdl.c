@@ -880,8 +880,8 @@ void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
         .shadow = true
     };
 
-    if (sprite_data[nr].loaded_in_atlas) {
-        glBindTexture(GL_TEXTURE_2D, tile_atlas);
+    if (sprite_data[nr].loaded_in_atlas && sprite_data[nr].atlas_texture) {
+        glBindTexture(GL_TEXTURE_2D, sprite_data[nr].atlas_texture);
         // Flip V coordinates: swap uv0.v and uv1.v
         settings.uv0[0] = sprite_data[nr].uv0.u;
         settings.uv0[1] = sprite_data[nr].uv1.v;
