@@ -333,6 +333,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// freopen("CONOUT$", "w", stderr);
 	// freopen("CONIN$",  "r", stdin);
 	parse_cmd(lpCmdLine);
+	freopen("client.log", "w", stdout);
+	setvbuf(stdout, NULL, _IONBF, 0); // unbuffered (optional but recommended)
 
 	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
 	// Cross-platform: Use file locking (flock/lockf) or SDL_CreateMutex for thread safety

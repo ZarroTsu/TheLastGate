@@ -1,4 +1,4 @@
-﻿static const char *effect_fragment =
+static const char *effect_fragment =
     R"SHADER(#version 330 core
 
 in vec2 TexCoord;

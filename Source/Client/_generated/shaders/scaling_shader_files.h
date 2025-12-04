@@ -1,5 +1,5 @@
-﻿static const char *scaling_fragment =
-    R"SHADER(﻿#version 330 core
+static const char *scaling_fragment =
+    R"SHADER(#version 330 core
 
 in vec2 vUV;
 out vec4 FragColor;
@@ -11,7 +11,7 @@ void main() {
 })SHADER";
 
 static const char *scaling_vertex =
-    R"SHADER(﻿#version 330 core
+    R"SHADER(#version 330 core
 
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aUV;

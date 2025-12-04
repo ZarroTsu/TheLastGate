@@ -1,4 +1,4 @@
-﻿static const char *solid_fragment =
+static const char *solid_fragment =
     R"SHADER(#version 330 core
 
 out vec4 FragColor;

@@ -1,4 +1,4 @@
-﻿static const char *@FRAGMENT_SHADER_NAME@ =
+static const char *@FRAGMENT_SHADER_NAME@ =
     R"SHADER(@FRAGMENT_SHADER_CONTENT@)SHADER";
 
 static const char *@VERTEX_SHADER_NAME@ =
