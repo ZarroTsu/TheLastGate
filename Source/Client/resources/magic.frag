@@ -16,10 +16,11 @@ void main() {
     float nx = dx / 32.0;
     float ny = dy / 64.0;
 
-    float r = length(vec2(nx, ny));
+    float r = length(vec2(nx, ny)) * 1.5;
 
     float t = clamp(1.0 - r, 0.0, 1.0);
-    float glow = pow(t, 2);;
+    float glow = pow(t, 2);
+    glow *= 1.5;
     float fade = 1.0 - (max(uStrength, 1) / 7.0);
 
     FragColor = vec4(uColor * glow * fade, glow * fade * 3);
