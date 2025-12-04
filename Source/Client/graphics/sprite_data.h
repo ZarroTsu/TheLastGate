@@ -10,6 +10,7 @@ typedef struct {
 
 typedef struct {
     unsigned int gl_texture; // OpenGL texture ID
+    GLuint atlas_texture; // This is specifically the atlas texture this image is stored in. Technically the same as above for now.
     SDL_Surface *surface;
     unsigned int gl_shadow_texture; // OpenGL shadow texture ID
     unsigned char xs; // Width in 32x32 tiles
