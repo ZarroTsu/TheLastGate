@@ -336,6 +336,7 @@ void sdl_batch_begin(void) {
  */
 void sdl_batch_flush(void) {
     if (app.batch_count == 0) return;
+    if (app.current_atlas_texture == 0) return;
 
     // sdl_start_scaling();
     // Upload instance data to GPU
@@ -347,7 +348,7 @@ void sdl_batch_flush(void) {
 
     // Bind atlas texture (all batched sprites use atlas)
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tile_atlas);
+    glBindTexture(GL_TEXTURE_2D, app.current_atlas_texture);
 
     // Render all sprites with single instanced draw call
     glBindVertexArray(app.quad_vao);
@@ -639,9 +640,22 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     if (!sprite_data[nr].gl_texture) return;
 
     // Only batch sprites that are in the atlas
-    if (!sprite_data[nr].loaded_in_atlas) {
+    if (!sprite_data[nr].loaded_in_atlas || sprite_data[nr].atlas_texture == 0) {
         // Fall back to immediate rendering for non-atlas sprites
         return;
+    }
+
+    GLuint sprite_atlas = sprite_data[nr].atlas_texture;
+
+    // First render should set the atlas
+    if (app.batch_count == 0) {
+        app.current_atlas_texture = sprite_atlas;
+    }
+
+    // When we swap atlas we need to flush the previous atlas
+    if (sprite_atlas != app.current_atlas_texture) {
+        sdl_batch_flush();
+        app.current_atlas_texture = sprite_atlas;
     }
 
     // Flush batch if full
