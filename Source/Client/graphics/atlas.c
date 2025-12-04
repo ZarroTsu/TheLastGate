@@ -3,11 +3,20 @@
 #include <stdio.h>
 
 #include "../log.h"
+#include "../engine.h"
 
 static Atlas tile_atlas; // 32x32
 static Atlas character_atlas; // 64x64
 static Atlas object_atlas; // 32x64
 static Atlas mixed_atlas; // everything else
+
+static int get_atlas_utilization(const Atlas atlas) {
+    const int total_space = ATLAS_SIZE_X * ATLAS_SIZE_Y;
+    const int used_space = atlas.cursor.y * ATLAS_SIZE_X + atlas.cursor.x;
+
+    const int percentage = (int)((float)used_space * 100.0f / (float)total_space);
+    return percentage;
+}
 
 static void init_atlas(Atlas *atlas, const char *name) {
     if (atlas->texture_id) {
@@ -36,6 +45,13 @@ void init_atlases(void) {
     init_atlas(&character_atlas, "CharacterAtlas");
     init_atlas(&object_atlas, "ObjectAtlas");
     init_atlas(&mixed_atlas, "MixedAtlas");
+}
+
+void log_atlas_debug_info(void) {
+    xlog(2, "TileAtlas(Count=%d,Utilization=%d%)", tile_atlas.cursor.count, get_atlas_utilization(tile_atlas));
+    xlog(2, "CharacterAtlas(Count=%d,Utilization=%d%)", character_atlas.cursor.count, get_atlas_utilization(character_atlas));
+    xlog(2, "ObjectAtlas(Count=%d,Utilization=%d%)", object_atlas.cursor.count, get_atlas_utilization(object_atlas));
+    xlog(2, "MixedAtlas(Count=%d,Utilization=%d%)", mixed_atlas.cursor.count, get_atlas_utilization(mixed_atlas));
 }
 
 static Atlas *get_atlas_by_size(const int width, const int height) {
@@ -99,6 +115,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
            atlas->name, ax, ay, w, h, sprite_data->uv0.u, sprite_data->uv0.v,
            sprite_data->uv1.u, sprite_data->uv1.v);
 
+    atlas->cursor.count++;
     sprite_data->atlas_texture = atlas->texture_id;
     sprite_data->loaded_in_atlas = true;
     return atlas->texture_id;

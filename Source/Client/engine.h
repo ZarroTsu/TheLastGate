@@ -15,6 +15,7 @@ extern int skill_needed(int n,int v);
 extern int attrib_needed(int n,int v);
 extern int stat_raised[108];
 extern void cmd_options(void);
+void xlog(char font,char *format,...);
 
 #define AT_BRV		0
 #define AT_WIL		1

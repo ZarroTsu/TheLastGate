@@ -8,6 +8,7 @@
 #include "main.h"
 #include "socket.h"
 #include "engine.h"
+#include "graphics/atlas.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "ui/option_window.h"
@@ -291,6 +292,7 @@ void handle_input(void) {
                         xlog(2, "Server Version %d.%02d.%02d", ser_ver >> 16, (ser_ver >> 8) & 255, ser_ver & 255);
                         xlog(2, "R=%04X, G=%04X, B=%04X", RED, GREEN, BLUE);
                         xlog(2, "Skip=%d%% Idle=%d%%", pskip, pidle);
+                        log_atlas_debug_info();
                         break;
                     case SDLK_F12:
                         cmd_exit();

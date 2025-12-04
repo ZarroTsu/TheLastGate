@@ -8,6 +8,7 @@
 typedef struct {
     int x, y;
     int row_height;
+    int count;
 } AtlasCursor;
 
 typedef struct {
@@ -17,5 +18,6 @@ typedef struct {
 } Atlas;
 
 void init_atlases(void);
+void log_atlas_debug_info(void);
 
 unsigned int add_to_atlas(SpriteData *sprite_data);
