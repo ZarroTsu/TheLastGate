@@ -89,21 +89,21 @@ void main() {
         color.rgb *= gammaEffect / (shadeEffect * shadeEffect + gammaEffect);
     }
     if (isGrey) {
-        float tmp = (color.r + (color.g / 2.0) + color.b) / 6.0;
+        float tmp = (color.r + color.g + color.b) / 3.0 * 0.5;
         color.r = tmp;
-        color.g = tmp * 2.0;
+        color.g = tmp;
         color.b = tmp;
     }
     if (isInfra) {
-        float tmp = (color.r + (color.g / 2.0) + color.b) / 3.0;
+        float tmp = (color.r + color.g + color.b) / 3.0;
         color.r = tmp;
         color.g = 0.0;
         color.b = 0.0;
     }
     if (isWater) {
-        float tmp = (color.r + (color.g / 2.0) + color.b) / 2.0;
+        float tmp = (color.r + color.g + color.b) / 2.0;
         color.r = (color.r + tmp) / 3.0;
-        color.g = ((color.g + tmp) / 3.0) * 2.0;
+        color.g = ((color.g + tmp) / 3.0);
         color.b = color.b + tmp;
     }
     color.rgb *= gammaScale;
