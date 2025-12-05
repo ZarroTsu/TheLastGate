@@ -10,6 +10,7 @@
 #include "../engine.h"
 #include "../main.h"
 #include "../render.h"
+#include "../sound.h"
 
 extern int do_darkmode;
 
@@ -32,7 +33,8 @@ static UiPosition AUDIO_VOLUME_LABEL = {GUI_SHOP_X + 15, GUI_SHOP_Y + 235};
 static UiPosition AUDIO_VOLUME_LOWER_BUTTON = {GUI_SHOP_X + 15, GUI_SHOP_Y + 250};
 static UiPosition AUDIO_VOLUME_BAR = {GUI_SHOP_X + 35, GUI_SHOP_Y + 251};
 static UiPosition AUDIO_VOLUME_RAISE_BUTTON = {GUI_SHOP_X + 143, GUI_SHOP_Y + 250};
-static UiPosition AUDIO_VOLUME_LEVEL_LABEL = {GUI_SHOP_X + 150, GUI_SHOP_Y + 250};
+static UiPosition AUDIO_VOLUME_ENABLED_LABEL = {GUI_SHOP_X + 163, GUI_SHOP_Y + 252};
+static UiPosition AUDIO_VOLUME_ENABLED_BUTTON = {GUI_SHOP_X + 217, GUI_SHOP_Y + 250};
 
 bool in_button(int mouse_x, int mouse_y, int start_x, int start_y, int width, int height) {
     return mouse_x >= start_x && mouse_x <= start_x + width && mouse_y >= start_y && mouse_y <= start_y + height;
@@ -74,9 +76,13 @@ void options_window_render() {
     showbar(AUDIO_VOLUME_BAR.x, AUDIO_VOLUME_BAR.y + 5, 99, 1, 0x7348);
     showbar(AUDIO_VOLUME_BAR.x + 99, AUDIO_VOLUME_BAR.y, 1, 11, 0x7348);
     copyspritex(18126, AUDIO_VOLUME_RAISE_BUTTON.x, AUDIO_VOLUME_RAISE_BUTTON.y, 0);
-
-
     showbar(AUDIO_VOLUME_BAR.x + 1 + 9 * app_state.volume_level, AUDIO_VOLUME_BAR.y + 1, 9, 9, GREEN);
+
+    puttext(AUDIO_VOLUME_ENABLED_LABEL.x, AUDIO_VOLUME_ENABLED_LABEL.y, 1, "Enable?");
+    copyspritex(18127, AUDIO_VOLUME_ENABLED_BUTTON.x, AUDIO_VOLUME_ENABLED_BUTTON.y, 0);
+    if (dosound) {
+        showbar(AUDIO_VOLUME_ENABLED_BUTTON.x + 1, AUDIO_VOLUME_ENABLED_BUTTON.y + 1, 11, 11, GREEN);
+    }
 }
 
 int options_window_input(int x, int y, int state) {
@@ -112,6 +118,11 @@ int options_window_input(int x, int y, int state) {
     // Raise Volume Button
     if (in_button(x, y, AUDIO_VOLUME_RAISE_BUTTON.x, AUDIO_VOLUME_RAISE_BUTTON.y, 13, 13) && state == MS_LB_UP) {
         if (app_state.volume_level < 10) app_state.volume_level++;
+    }
+
+    // Enable Audio Button
+    if (in_button(x, y, AUDIO_VOLUME_ENABLED_BUTTON.x, AUDIO_VOLUME_ENABLED_BUTTON.y, 13, 13) && state == MS_LB_UP) {
+        dosound = !dosound;
     }
 
     return 1;
