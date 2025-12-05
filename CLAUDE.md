@@ -8,12 +8,11 @@ The Last Gate is a modified version of Mercenaries of Astonia v2, an MMORPG game
 
 The codebase is split into two main components:
 - **Server**: Linux-based C server (32-bit) that handles game logic, player data, and world state
-- **Client**: Windows-based C client using DirectDraw for rendering
+- **Client**: Windows-based C client using SDL2 for rendering
 
 ## Build Instructions
 - DO NOT automatically run cmake or build commands
 - Only suggest build commands for the user to run manually
-
 
 ## Build System
 
@@ -52,18 +51,47 @@ Navigate to `localhost/cgi-imp/acct.cgi` to edit items, NPCs, and templates. Thi
 
 ### Client (Windows)
 
-The client uses CMake or can be built with the provided `make.bat`:
+The client uses CMake (recommended) or the legacy `make.bat`:
 ```bash
 cd Source/Client
-# Using CMake:
+
+# Using CMake (recommended):
 cmake -B cmake-build-debug -S .
 cmake --build cmake-build-debug
 
-# Or using make.bat (legacy)
+# Release build with optimizations:
+cmake -B cmake-build-release -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build cmake-build-release
+
+# Profile-Guided Optimization (advanced):
+# Stage 1: Generate profiling data
+cmake -B cmake-build-pgo-gen -S . -DCMAKE_BUILD_TYPE=PGO-Generate
+cmake --build cmake-build-pgo-gen
+# Run the game to collect profile data, then:
+# Stage 2: Build with profile data
+cmake -B cmake-build-pgo-use -S . -DCMAKE_BUILD_TYPE=PGO-Use
+cmake --build cmake-build-pgo-use
+
+# Or using make.bat (legacy):
 make.bat
 ```
 
-The client requires graphic files from http://www.brockhaus.org/merc2.html and overlay images moved from `gfx/overlays/` to `gfx/`.
+**Client Build System:**
+- CMake 3.22+ required
+- Modular CMake scripts in `cmake/` directory:
+  - `compiler_options.cmake` - Compiler flags and warnings
+  - `embed_shaders.cmake` - Embeds GLSL shaders at build time
+  - `opengl.cmake` - OpenGL/GLAD setup
+  - `windows_setup.cmake` - Windows-specific configuration
+  - `link_libraries.cmake` - Library dependencies
+  - `copy_runtime_dlls.cmake` - DLL deployment
+  - `package_target.cmake` - Packaging configuration
+- Shaders are automatically embedded during CMake generation (not at compile time)
+- Debug builds define `HOMECOPY` flag
+
+**Client Requirements:**
+- Graphic files from http://www.brockhaus.org/merc2.html
+- SDL2, OpenGL, GLAD (OpenGL loader)
 
 ## Architecture
 
@@ -91,14 +119,37 @@ The server is structured around a tick-based game loop (20 ticks per second, def
 
 ### Client Architecture
 
-DirectDraw-based Windows client:
+The client has transitioned from DirectDraw to SDL2 with OpenGL rendering:
+
+**Core Systems:**
 - `main.c` - Entry point and window management
-- `dd.c` - DirectDraw initialization and rendering
 - `engine.c` - Core game engine and rendering loop
 - `socket.c` - Network communication with server
 - `inter.c` - User interface and input handling
-- `options.c` - Configuration and settings
+- `options.c` - Configuration and settings (Windows dialog, migrating to SDL)
 - `sound.c` - Audio playback
+- `input.c` / `input.h` - Input handling
+
+**Graphics Pipeline (SDL2 + OpenGL):**
+- `graphics/sdl.c` - SDL2 initialization and window management
+- `graphics/atlas.c` - Texture atlas system (4096x4096 atlases, dynamic packing)
+- `graphics/loader.c` - Sprite and texture loading
+- `graphics/scaling.c` - Resolution scaling support
+- `render.c` - Main rendering coordinator
+
+**Shader System:**
+The client uses OpenGL shaders (GLSL) embedded at compile-time:
+- `graphics/shaders/solid_shader.c` - Solid color rendering
+- `graphics/shaders/effect_shader.c` - Visual effects (underwater, poison, etc.)
+- `graphics/shaders/magic_shader.c` - Magic effect rendering
+- `resources/*.vert` / `resources/*.frag` - GLSL shader source files
+- `cmake/embed_shaders.cmake` - Embeds shaders into C headers during build
+
+**Key Client Architecture Notes:**
+- Sprites loaded into texture atlases (4096x4096) for efficient rendering
+- Shaders are embedded into the binary via CMake code generation
+- `DD_ENABLED` preprocessor flag controls legacy DirectDraw vs SDL2 paths
+- Client uses C89/C90 standard with some modern OpenGL (via GLAD)
 
 ### NPC Driver System
 
@@ -128,6 +179,15 @@ Players have 100 data slots (indices 0-99) for storing state. See `Source/Server
 - `data[42]`: Group
 - `data[90]`: Database number
 
+### Client-Server Protocol
+
+The client and server communicate via a binary protocol over TCP sockets:
+- `socket.c` (client) handles network communication
+- Client sends player actions, receives world state updates
+- Server sends map data, character updates, item information
+- Both client and server must use matching `VERSION` (current: 0x000D01)
+- Minimum compatible version: `MINVERSION` (0x000D00)
+
 ## Important Notes
 
 ### Server Development
@@ -149,6 +209,22 @@ Players have 100 data slots (indices 0-99) for storing state. See `Source/Server
 - Packed structs with `__attribute__ ((packed))`
 - Extensive use of bitflags for character/item/map properties
 - Global state stored in `struct global` (see `data.h`)
+
+### Client Development
+
+**Shader Development:**
+- Shaders are in `Source/Client/resources/` as `.vert` and `.frag` files
+- When modifying shaders, CMake will regenerate embedded headers automatically
+- Shader types: `solid` (basic), `effect` (underwater/poison effects), `magic` (spell effects), `scaling` (resolution scaling)
+- Use `#version 330 core` for GLSL shader version
+- After shader changes, run CMake configure/generate before building
+
+**DirectDraw to SDL2 Migration:**
+- The client is transitioning from Windows DirectDraw to cross-platform SDL2
+- `DD_ENABLED` macro controls which rendering path is active
+- Legacy DirectDraw code exists in `dd.c`, modern SDL2 code in `graphics/sdl.c`
+- See `SDL_OPTIONS_MIGRATION.md` for detailed migration guide (particularly for options dialog)
+- Options dialog is still Windows-native; migration to SDL/ImGui is planned
 
 ### Version
 
