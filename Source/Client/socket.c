@@ -39,6 +39,7 @@
 
 #include "input.h"
 #include "render.h"
+#include "mods/give_more.h"
 
 struct z_stream_s zs;
 
@@ -753,6 +754,10 @@ void sv_setchar_obj(unsigned char *buf)
 	pl.citem=*(short int*)(buf+1);
 	pl.citem_p=*(short int*)(buf+3);
 	pl.citem_s=*(unsigned char*)(buf+5); // stack size
+
+	if (pl.citem == 0) {
+		cursor_emptied();
+	}
 
 //	xlog("SV SETCHAR OBJ (%d,%d)",*(short int*)(buf+1),*(short int*)(buf+3));
 }

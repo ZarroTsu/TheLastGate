@@ -51,7 +51,8 @@ AppState app_state = {
 	.window_size = {1280, 720},
 	.volume_level = 10, // 100%
 	.cost_helper = false,
-	.escape_closes_menus_first = true
+	.escape_closes_menus_first = true,
+	.give_more = false,
 };
 
 extern void cmd3(int cmd,int x,int y,int z);

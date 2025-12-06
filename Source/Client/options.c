@@ -286,6 +286,7 @@ void load_options(void)
 		if (read(handle,&app_state.escape_closes_menus_first,sizeof(app_state.escape_closes_menus_first))!=sizeof(app_state.escape_closes_menus_first)) flag=1;
 		if (read(handle,&app_state.cost_helper,sizeof(app_state.cost_helper))!=sizeof(app_state.cost_helper)) flag=1;
 		if (read(handle,&app_state.volume_level,sizeof(app_state.volume_level))!=sizeof(app_state.volume_level)) flag=1;
+		if (read(handle,&app_state.give_more, sizeof(app_state.give_more))!=sizeof(app_state.give_more)) app_state.give_more=0;
 		close(handle);
 	} else flag=1;
 
@@ -321,6 +322,7 @@ void save_options(void)
 		write(handle,&app_state.escape_closes_menus_first,sizeof(app_state.escape_closes_menus_first));
 		write(handle,&app_state.cost_helper,sizeof(app_state.cost_helper));
 		write(handle,&app_state.volume_level,sizeof(app_state.volume_level));
+		write(handle,&app_state.give_more, sizeof(app_state.give_more));
 		close(handle);
 	}
 }

@@ -12,6 +12,7 @@ typedef struct {
     int volume_level;
     bool cost_helper;
     bool escape_closes_menus_first;
+    bool give_more;
 } AppState;
 
 extern AppState app_state;

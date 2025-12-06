@@ -29,6 +29,10 @@ static UiPosition COST_HELPER_CHECKBOX = {GUI_SHOP_X + 15, GUI_SHOP_Y + 67};
 static UiPosition COST_HELPER_LABEL1 = { GUI_SHOP_X + 40, GUI_SHOP_Y + 60 };
 static UiPosition COST_HELPER_LABEL2 = { GUI_SHOP_X + 40, GUI_SHOP_Y + 75 };
 
+static UiPosition GIVE_MORE_CHECKBOX = { GUI_SHOP_X + 15, GUI_SHOP_Y + 97 };
+static UiPosition GIVE_MORE_LABEL_1 = { GUI_SHOP_X + 40, GUI_SHOP_Y + 90};
+static UiPosition GIVE_MORE_LABEL_2 = { GUI_SHOP_X + 40, GUI_SHOP_Y + 105};
+
 static UiPosition AUDIO_VOLUME_LABEL = {GUI_SHOP_X + 15, GUI_SHOP_Y + 235};
 static UiPosition AUDIO_VOLUME_LOWER_BUTTON = {GUI_SHOP_X + 15, GUI_SHOP_Y + 250};
 static UiPosition AUDIO_VOLUME_BAR = {GUI_SHOP_X + 35, GUI_SHOP_Y + 251};
@@ -66,6 +70,13 @@ void options_window_render() {
     }
     puttext(COST_HELPER_LABEL1.x, COST_HELPER_LABEL1.y, 1, "Show attribute (B,W,I,A,S) when cheaper");
     puttext(COST_HELPER_LABEL2.x, COST_HELPER_LABEL2.y, 1, "    than skill.");
+
+    copyspritex(18127, GIVE_MORE_CHECKBOX.x, GIVE_MORE_CHECKBOX.y, 0);
+    if (app_state.give_more) {
+        showbar(GIVE_MORE_CHECKBOX.x + 1, GIVE_MORE_CHECKBOX.y + 1, 11, 11, GREEN);
+    }
+    puttext(GIVE_MORE_LABEL_1.x, GIVE_MORE_LABEL_1.y, 1, "Holding shift when giving an item");
+    puttext(GIVE_MORE_LABEL_2.x, GIVE_MORE_LABEL_2.y, 1, "  will attempt to reload that item.");
 
 
     puttext(AUDIO_VOLUME_LABEL.x, AUDIO_VOLUME_LABEL.y, 3, "Audio Volume");
@@ -106,8 +117,14 @@ int options_window_input(int x, int y, int state) {
         app_state.escape_closes_menus_first = !app_state.escape_closes_menus_first;
     }
 
+    // Cost Helper Button
     if (in_button(x, y, COST_HELPER_CHECKBOX.x, COST_HELPER_CHECKBOX.y, 13, 13) && state == MS_LB_UP) {
         app_state.cost_helper = !app_state.cost_helper;
+    }
+
+    // Give More Button
+    if (in_button(x, y, GIVE_MORE_CHECKBOX.x, GIVE_MORE_CHECKBOX.y, 13, 13) && state == MS_LB_UP) {
+        app_state.give_more = !app_state.give_more;
     }
 
     // Lower Volume Button

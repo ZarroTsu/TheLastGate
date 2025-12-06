@@ -18,6 +18,7 @@
 
 #include "engine.h"
 #include "main.h"
+#include "mods/give_more.h"
 #include "ui/option_window.h"
 
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)
@@ -1521,6 +1522,51 @@ void mouse_mapbox(int x,int y,int state)
 			else if (state==MS_LB_UP) { xmove=xxtimer=0; cmd1(CL_CMD_ATTACK,map[m].ch_nr); }
 			else if (state==MS_RB_UP) { xmove=xxtimer=0; cmd1(CL_CMD_LOOK,map[m].ch_nr); noshop=0; }
 			tile_type=2;
+		}
+	}
+
+	if (app_state.give_more && keys == 3) {
+		if (pl.citem) {
+			if (map[m].flags&ISCHAR) hightlight=HL_MAP;
+			else if (map[m+1-screen_renderdist].flags&ISCHAR) { mx++; my--; hightlight=HL_MAP; }
+			else if (map[m+2-2*screen_renderdist].flags&ISCHAR) { mx+=2; my-=2; hightlight=HL_MAP; }
+			else if (map[m+1].flags&ISCHAR) { mx++; hightlight=HL_MAP; }
+			else if (map[m+screen_renderdist].flags&ISCHAR) { my++; hightlight=HL_MAP; }
+			else if (map[m-1].flags&ISCHAR) { mx--; hightlight=HL_MAP; }
+			else if (map[m-screen_renderdist].flags&ISCHAR) { my--; hightlight=HL_MAP; }
+			else if (map[m+1+screen_renderdist].flags&ISCHAR) { mx++; my++; hightlight=HL_MAP; }
+			else if (map[m-1+screen_renderdist].flags&ISCHAR) { mx--; my++; hightlight=HL_MAP; }
+			else if (map[m-1-screen_renderdist].flags&ISCHAR) { mx--; my--; hightlight=HL_MAP; }
+			else if (map[m+2].flags&ISCHAR) { mx+=2; hightlight=HL_MAP; }
+			else if (map[m+2*screen_renderdist].flags&ISCHAR) { my+=2; hightlight=HL_MAP; }
+			else if (map[m-2].flags&ISCHAR) { mx-=2; hightlight=HL_MAP; }
+			else if (map[m-2*screen_renderdist].flags&ISCHAR) { my-=2; hightlight=HL_MAP; }
+			else if (map[m+1+2*screen_renderdist].flags&ISCHAR) { mx++; my+=2; hightlight=HL_MAP; }
+			else if (map[m-1+2*screen_renderdist].flags&ISCHAR) { mx--; my+=2; hightlight=HL_MAP; }
+			else if (map[m+1-2*screen_renderdist].flags&ISCHAR) { mx++; my-=2; hightlight=HL_MAP; }
+			else if (map[m-1-2*screen_renderdist].flags&ISCHAR) { mx--; my-=2; hightlight=HL_MAP; }
+			else if (map[m+2+1*screen_renderdist].flags&ISCHAR) { mx+=2; my++; hightlight=HL_MAP; }
+			else if (map[m-2+1*screen_renderdist].flags&ISCHAR) { mx-=2; my++; hightlight=HL_MAP; }
+			else if (map[m+2-1*screen_renderdist].flags&ISCHAR) { mx+=2; my--; hightlight=HL_MAP; }
+			else if (map[m-2-1*screen_renderdist].flags&ISCHAR) { mx-=2; my--; hightlight=HL_MAP; }
+			else if (map[m+2+2*screen_renderdist].flags&ISCHAR) { mx+=2; my+=2; hightlight=HL_MAP; }
+			else if (map[m-2+2*screen_renderdist].flags&ISCHAR) { mx-=2; my+=2; hightlight=HL_MAP; }
+			else if (map[m-2-2*screen_renderdist].flags&ISCHAR) { mx-=2; my-=2; hightlight=HL_MAP; }
+
+			m=mx+my*screen_renderdist;
+			tile_x=mx; tile_y=my;
+			if (map[m].flags&ISCHAR) {
+				if (map[m].flags&ISCHAR) {
+					if (pl.citem) cursor_type=CT_GIVE;
+				}
+
+				if (pl.citem && state==MS_LB_UP) {
+					xmove=xxtimer=0;
+					set_last_given(pl.citem, pl.citem_p, pl.citem_s);
+					cmd1(CL_CMD_GIVE,map[m].ch_nr);
+				}
+				tile_type=2;
+			}
 		}
 	}
 
