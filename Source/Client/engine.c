@@ -38,6 +38,7 @@
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "mods/base_cost_warning.h"
+#include "mods/use_queue.h"
 #include "ui/option_window.h"
 
 int init_done=0;
@@ -3276,6 +3277,14 @@ void eng_display(int init)	// optimize me!!!!!
 					copysprite(33,0,x*32,y*32,xoff,yoff);
 				if (pl.misc_action==DR_USE && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
 					copysprite(45,0,x*32,y*32,xoff,yoff);
+				if (app_state.use_queue) {
+					int position = has_cmd_been_queued(CL_CMD_USE, map[m].x, map[m].y);
+					if (position) {
+						copysprite(45, EFFECT_GREEN, x * 32, y * 32, xoff, yoff);
+						copysprite(4000 + position, 0, x * 32, y * 32, xoff, yoff);
+					}
+				}
+
 
 				// effects
 				if (map[m].flags2&MF_MOVEBLOCK)	copysprite(55,0,x*32,y*32,xoff,yoff);

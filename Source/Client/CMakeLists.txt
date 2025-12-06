@@ -31,6 +31,10 @@ add_executable(TheLastGate WIN32
         MERC.rc
         mods/base_cost_warning.c
         mods/base_cost_warning.h
+        mods/give_more.c
+        mods/give_more.h
+        mods/use_queue.c
+        mods/use_queue.h
         options.c
         render.c
         render.h

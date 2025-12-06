@@ -275,6 +275,7 @@ extern struct sk_icon sk_icon[12];
 
 void say(char *input);
 void cmd(int cmd,int x,int y);
+void cmdq(int cmd, int x, int y);
 void cmd1(int cmd,int x);
 void cmd3(int cmd,int x,int y,int z);
 void tlog(char *text,char font);

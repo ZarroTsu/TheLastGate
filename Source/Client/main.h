@@ -13,6 +13,7 @@ typedef struct {
     bool cost_helper;
     bool escape_closes_menus_first;
     bool give_more;
+    bool use_queue;
 } AppState;
 
 extern AppState app_state;

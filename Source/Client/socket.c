@@ -30,6 +30,7 @@
 #include <malloc.h>
 #include <fcntl.h>
 #include <io.h>        // TODO: Replace with <unistd.h> for POSIX or remove
+#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>   // TODO: Remove - not needed for networking
@@ -40,6 +41,7 @@
 #include "input.h"
 #include "render.h"
 #include "mods/give_more.h"
+#include "mods/use_queue.h"
 
 struct z_stream_s zs;
 
@@ -1235,6 +1237,8 @@ void sv_clearbox(unsigned char *buf)
 void sv_settarget(unsigned char *buf)
 {
 	DEBUG("SV SETTARGET");
+	bool was_using = false;
+	if (pl.misc_action == 4) was_using = true;
 
 	pl.attack_cn    =*(unsigned short*)(buf+1);
 	pl.goto_x       =*(unsigned short*)(buf+3);
@@ -1242,6 +1246,12 @@ void sv_settarget(unsigned char *buf)
 	pl.misc_action  =*(unsigned short*)(buf+7);
 	pl.misc_target1 =*(unsigned short*)(buf+9);
 	pl.misc_target2 =*(unsigned short*)(buf+11);
+
+	if (was_using && pl.misc_action != 4) {
+		pop_cmd_from_queue();
+	} else if (!was_using && pl.misc_action == 4) {
+		cmd_queue_on_target(pl.misc_target1, pl.misc_target2);
+	}
 }
 
 void sv_playsound(unsigned char *buf)

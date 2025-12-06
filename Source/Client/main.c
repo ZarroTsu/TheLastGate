@@ -53,6 +53,7 @@ AppState app_state = {
 	.cost_helper = false,
 	.escape_closes_menus_first = true,
 	.give_more = false,
+	.use_queue = false,
 };
 
 extern void cmd3(int cmd,int x,int y,int z);
