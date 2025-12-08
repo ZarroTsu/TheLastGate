@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.22)
-project(TheLastGate LANGUAGES C)
+project(TheLastGate LANGUAGES C CXX)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/compiler_options.cmake)
 
@@ -115,6 +115,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "PGO-Use")
 endif ()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/link_libraries.cmake)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_runtime_dlls.cmake)
 
