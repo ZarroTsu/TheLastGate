@@ -134,8 +134,9 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
         LOG("ERROR: OpenGL error during glTexSubImage2D: 0x%x\n", err);
         return 0;
     }
+    float inset = 0.5f;
 
-    sprite_data->uv0 = (UV){ax / (float) ATLAS_SIZE_X, ay / (float) ATLAS_SIZE_Y};
+    sprite_data->uv0 = (UV){(ax + inset) / (float) ATLAS_SIZE_X, (ay + inset) / (float) ATLAS_SIZE_Y};
     sprite_data->uv1 = (UV){
         (ax + w) / (float) ATLAS_SIZE_X,
         (ay + h) / (float) ATLAS_SIZE_Y

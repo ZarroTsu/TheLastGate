@@ -261,6 +261,7 @@ int sdl_init(const int windowed) {
 
     /* Configure ImGui to use the same virtual resolution as the game (1280x720) */
     imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+    imgui_set_display_framebuffer_scale(1.0f, 1.0f);
 
     void *pixel_font_10 = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
 
