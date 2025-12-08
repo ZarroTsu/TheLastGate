@@ -150,7 +150,10 @@ static void audio_settings_tab() {
 }
 
 static void keybind_settings_tab() {
+    float text_width;
+    imgui_calc_text_size_simple(&text_width, NULL, "Spell Hotkeys");
     imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_center_next_item(text_width);
     imgui_text("Spell Hotkeys");
     imgui_pop_style_color(1);
 
@@ -176,23 +179,18 @@ static void keybind_settings_tab() {
     keybind("Spell 18", 17);
     keybind("Spell 19", 18);
     keybind("Spell 20", 19);
-
 }
 
 static void render_imgui_version() {
     static int active_tab = 0;  /* Track which tab is active: 0 = General, 1 = Audio */
 
-    /* Scale positions from 1280x720 to actual window size */
-    float scale_x = (float) app_state.window_size[0] / SCREEN_WIDTH;
-    float scale_y = (float) app_state.window_size[1] / SCREEN_HEIGHT;
 
-    imgui_set_next_window_pos(GUI_SHOP_X * scale_x, GUI_SHOP_Y * scale_y);
-    imgui_set_next_windows_size(320.0f * scale_x, 320.0f * scale_y);
-    imgui_set_font_global_scale(scale_y);
+    imgui_set_next_window_pos(GUI_SHOP_X, GUI_SHOP_Y);
+    imgui_set_next_windows_size(320.0f, 320.0f);
 
     if (imgui_begin("My Window", NULL,
                     IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_RESIZE |
-                    IMGUI_WINDOW_FLAG_NO_TITLE_BAR)) {
+                    IMGUI_WINDOW_FLAG_NO_TITLE_BAR | IMGUI_WINDOW_FLAG_NO_SCROLLBAR | IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE)) {
 
         /* Custom tab buttons - fixed at top */
         if (tab_button("General", active_tab == 0, 90.0f)) {

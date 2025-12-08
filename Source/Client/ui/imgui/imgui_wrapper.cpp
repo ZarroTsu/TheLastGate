@@ -38,6 +38,8 @@ void imgui_shutdown(void) {
 void imgui_new_frame(void) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
+    imgui_set_display_size(1280.0f, 720.0f);
+    imgui_set_display_framebuffer_scale(1.0f, 1.0f);
     ImGui::NewFrame();
 }
 

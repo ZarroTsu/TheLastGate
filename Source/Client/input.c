@@ -52,7 +52,7 @@ static int is_mouse_over_imgui(void) {
     return imgui_want_capture_mouse();
 }
 
-void scale_event_for_imgui(SDL_Event *event) {
+void scale_mouse_event(SDL_Event *event) {
     /* Scale mouse coordinates from window space to virtual 1280x720 space for ImGui */
     if (app_state.window_size[0] == SCREEN_WIDTH && app_state.window_size[1] == SCREEN_HEIGHT) {
         return; /* No scaling needed */
@@ -75,15 +75,6 @@ void scale_event_for_imgui(SDL_Event *event) {
             event->wheel.mouseX = (int)(event->wheel.mouseX * scaleX);
             event->wheel.mouseY = (int)(event->wheel.mouseY * scaleY);
             break;
-    }
-}
-
-void scale_mouse_position(int *x, int *y) {
-    if (app_state.window_size[0] != SCREEN_WIDTH || app_state.window_size[1] != SCREEN_HEIGHT) {
-        float scaleX = 1280 / (float) app_state.window_size[0];
-        float scaleY = 720 / (float) app_state.window_size[1];
-        *x *= scaleX;
-        *y *= scaleY;
     }
 }
 
@@ -127,6 +118,9 @@ void handle_input(void) {
 
 
     while (SDL_PollEvent(&e)) {
+        if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP || e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEWHEEL) {
+            scale_mouse_event(&e);
+        }
         if (input_event_count < 128) {
             input_events[input_event_count] = e;
             input_event_count++;
@@ -483,24 +477,20 @@ void handle_input(void) {
                 }
                 break;
             case SDL_MOUSEMOTION:
-                scale_mouse_position(&e.motion.x, &e.motion.y);
                 mouse(e.motion.x, e.motion.y, MS_MOVE);
                 mx = e.motion.x;
                 my = e.motion.y;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (is_mouse_over_imgui()) break;
-                scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_DOWN : MS_RB_DOWN);
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (is_mouse_over_imgui()) break;
-                scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_UP : MS_RB_UP);
                 break;
             case SDL_MOUSEWHEEL:
                 if (is_mouse_over_imgui()) break;
-                scale_mouse_position(&e.wheel.mouseX, &e.wheel.mouseY);
                 const int delta = e.wheel.y;
                 const int x = e.wheel.mouseX;
                 const int y = e.wheel.mouseY;

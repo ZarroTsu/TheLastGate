@@ -4904,7 +4904,6 @@ void engine(void)
 			eng_display(init);
 			eng_flip(t);
 			sdl_batch_flush();
-			sdl_stop_scaling();
 
 			/* Now render ImGui on top at native window resolution */
 			for (int i = 0; i < input_event_count; i++) {
@@ -4919,6 +4918,7 @@ void engine(void)
 			}
 
 			imgui_render();
+			sdl_stop_scaling();
 
 			SDL_GL_SwapWindow(app.window);
 			skipinrow=0;
