@@ -2,6 +2,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
+#include "sprite_data.h"
 #include "glad/glad.h"
 
 #define SCREEN_WIDTH 1280
@@ -54,6 +55,7 @@ struct FontCache {
 #define SPRITE_PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
 extern App app;
+extern SpriteData *sprite_data;
 
 int sdl_init(int windowed);
 void sdl_deinit(void);

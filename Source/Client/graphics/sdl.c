@@ -62,7 +62,7 @@ int projection_initialized = 0;
 #define MAXEFFECT 1024
 
 static struct FontCache font_cache[10];
-static SpriteData *sprite_data = NULL;
+SpriteData *sprite_data = NULL;
 static GLuint minimap_gl_texture = 0; // OpenGL texture for minimap (128x128)
 
 extern char path[];
