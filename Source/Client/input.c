@@ -12,6 +12,7 @@
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "ui/option_window.h"
+#include "ui/imgui/imgui_wrapper.h"
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])
@@ -43,6 +44,36 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
 
 void init_input(void) {
     SDL_StartTextInput();
+}
+
+static int is_mouse_over_imgui(void) {
+    return imgui_want_capture_mouse();
+}
+
+void scale_event_for_imgui(SDL_Event *event) {
+    /* Scale mouse coordinates from window space to virtual 1280x720 space for ImGui */
+    if (app_state.window_size[0] == SCREEN_WIDTH && app_state.window_size[1] == SCREEN_HEIGHT) {
+        return; /* No scaling needed */
+    }
+
+    float scaleX = (float)SCREEN_WIDTH / (float)app_state.window_size[0];
+    float scaleY = (float)SCREEN_HEIGHT / (float)app_state.window_size[1];
+
+    switch (event->type) {
+        case SDL_MOUSEMOTION:
+            event->motion.x = (int)(event->motion.x * scaleX);
+            event->motion.y = (int)(event->motion.y * scaleY);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            event->button.x = (int)(event->button.x * scaleX);
+            event->button.y = (int)(event->button.y * scaleY);
+            break;
+        case SDL_MOUSEWHEEL:
+            event->wheel.mouseX = (int)(event->wheel.mouseX * scaleX);
+            event->wheel.mouseY = (int)(event->wheel.mouseY * scaleY);
+            break;
+    }
 }
 
 void scale_mouse_position(int *x, int *y) {
@@ -84,6 +115,9 @@ static void MakeWindowNormal(SDL_Window *win) {
     }
 }
 
+SDL_Event input_events[128];
+int input_event_count = 0;
+
 #endif
 static bool window_resetting = false;
 void handle_input(void) {
@@ -91,6 +125,11 @@ void handle_input(void) {
 
 
     while (SDL_PollEvent(&e)) {
+        if (input_event_count < 128) {
+            input_events[input_event_count] = e;
+            input_event_count++;
+        }
+
         bool spellKey = (SDL_GetModState() & (KMOD_CTRL | KMOD_ALT)) != 0;
         switch (e.type) {
             case SDL_WINDOWEVENT:
@@ -446,14 +485,17 @@ void handle_input(void) {
                 my = e.motion.y;
                 break;
             case SDL_MOUSEBUTTONDOWN:
+                if (is_mouse_over_imgui()) break;
                 scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_DOWN : MS_RB_DOWN);
                 break;
             case SDL_MOUSEBUTTONUP:
+                if (is_mouse_over_imgui()) break;
                 scale_mouse_position(&e.button.x, &e.button.y);
                 mouse(e.button.x, e.button.y, e.button.button == SDL_BUTTON_LEFT ? MS_LB_UP : MS_RB_UP);
                 break;
             case SDL_MOUSEWHEEL:
+                if (is_mouse_over_imgui()) break;
                 scale_mouse_position(&e.wheel.mouseX, &e.wheel.mouseY);
                 const int delta = e.wheel.y;
                 const int x = e.wheel.mouseX;

@@ -31,6 +31,7 @@
 #include "external/glad/include/glad/glad.h"
 
 #include "common.h"
+#include "imgui_wrapper.h"
 #include "input.h"
 #include "inter.h"
 #include "main.h"
@@ -4908,13 +4909,27 @@ void engine(void)
 			eng_flip(t);
 			sdl_batch_flush();
 			sdl_stop_scaling();
+
+			/* Now render ImGui on top at native window resolution */
+			for (int i = 0; i < input_event_count; i++) {
+				imgui_process_event(&input_events[i]);
+			}
+			input_event_count = 0;
+
+			imgui_new_frame();
+
+			if (show_opts) {
+				options_window_render();
+			}
+
+			imgui_render();
+
 			SDL_GL_SwapWindow(app.window);
 			skipinrow=0;
 		} else {
 			skip++; skipinrow++;
 		}
 
-		handle_input();
 		if (t_size) tick=TICK*QSIZE/t_size;
 		else tick=TICK;
 
