@@ -310,6 +310,7 @@ void handle_input(void) {
 
                     case SDLK_F9:
                         // dd_savescreen(); TODO: Implement this
+                        show_opts = !show_opts;
                         break;
                     case SDLK_F10:
                         if (app_state.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
