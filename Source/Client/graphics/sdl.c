@@ -22,6 +22,7 @@
 #include "shaders/effect_shader.h"
 #include "shaders/magic_shader.h"
 #include "shaders/solid_shader.h"
+#include "ui/imgui/imgui_wrapper.h"
 
 App app;
 
@@ -254,6 +255,16 @@ int sdl_init(const int windowed) {
         sprintf(path, "resources/cursor%d.png", n);
         cursors[n] = load_cursor_from_png(path, 0, 0);
     }
+
+
+    imgui_init(app.window, app.gl_context);
+
+    /* Configure ImGui to use the same virtual resolution as the game (1280x720) */
+    imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    void *pixel_font_10 = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+
+    imgui_set_default_font(pixel_font_10);
 
     return 0;
 }
