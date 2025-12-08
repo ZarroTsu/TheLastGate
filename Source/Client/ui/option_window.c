@@ -352,7 +352,7 @@ int options_window_input(int x, int y, int state) {
     //     dosound = !dosound;
     // }
 
-    return 1;
+    return 0;
 }
 
 void options_window_scroll(int x, int y, int delta) {
