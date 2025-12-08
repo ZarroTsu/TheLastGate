@@ -4136,7 +4136,8 @@ int use_special_spell(int cn, int in)
 			if (ret) 
 			{
 				if (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn))
-					cast_aoe_spell(cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
+					//cast_aoe_spell(cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
+					aoe_driver(cn, cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 0, 1, 1, 0);
 				else
 					surround_cast(cn, co, 0, SK_POISON, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
 				add_exhaust(cn, SK_EXH_POISON/2);
@@ -4319,7 +4320,8 @@ int use_special_spell(int cn, int in)
 			if (ret) 
 			{
 				if (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn))
-					cast_aoe_spell(cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
+					//cast_aoe_spell(cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
+					aoe_driver(cn, cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 0, 1, 1, 0);
 				else
 					surround_cast(cn, co, 0, SK_VENOM, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
 				add_exhaust(cn, SK_EXH_POISON/2);
@@ -4393,7 +4395,8 @@ int use_special_spell(int cn, int in)
 			if (ret) 
 			{
 				if (CAN_SORC_PROX(cn))
-					cast_aoe_spell(cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
+					//cast_aoe_spell(cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
+					aoe_driver(cn, cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 0, 1, 1, 0);
 				else
 					surround_cast(cn, co, 0, SK_SLOW, power, -1, -1);
 				add_exhaust(cn, SK_EXH_SLOW/2);

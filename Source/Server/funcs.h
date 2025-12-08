@@ -460,7 +460,7 @@ int spell_mshield(int cn, int co, int power, int fromscroll);
 int spell_haste(int cn, int co, int power, int fromscroll);
 int spell_identify(int cn, int co, int in);
 int spell_heal(int cn, int co, int power);
-int skill_plague(int cn, int co, int flag);
+int skill_plague(int cn, int co, int power);
 int chance_compare(int co, int offense, int defense, int usemana);
 int face_target(int cn, int co);
 int get_target_resistance(int cn, int co);

@@ -10299,6 +10299,11 @@ void do_attack(int cn, int co, int surround)
 		
 		if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 		{
+			aoe_driver(cn, cn, co_orig, SK_SURROUND, dam, (B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0), 0, 1, surround, crit_dam);
+		}
+		/*
+		if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
+		{
 			if (B_SK(cn, SK_SURROUND))
 			{
 				surrmod = M_SK(cn, SK_SURROUND);
@@ -10465,6 +10470,7 @@ void do_attack(int cn, int co, int surround)
 				}
 			}
 		}
+		*/
 		if (in2 && !do_get_iflag(cn, SF_DEATH_R))
 		{
 			if (!IS_NOMAGIC(co_orig))
