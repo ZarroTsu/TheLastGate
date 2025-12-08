@@ -45,6 +45,7 @@ add_executable(TheLastGate WIN32
         sound.h
         ui/option_window.c
         ui/option_window.h
+        ui/widgets.c
 )
 
 # Disable warnings for old code compatibility

@@ -2921,10 +2921,6 @@ void eng_display_win(int plr_sprite,int init)
 					1,tutorial_text[show_tuto-1][tuto_page-1][y]);
 			}
 		}
-
-		if (show_opts) {
-			options_window_render();
-		}
 	}
 }
 
