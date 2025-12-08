@@ -1,9 +1,11 @@
 ﻿#pragma once
+#include <stdbool.h>
 #include <SDL2/SDL_events.h>
 
 extern int quit;
 extern SDL_Event input_events[128];
 extern int input_event_count;
+extern bool waiting_for_keybind;
 
 void init_input(void);
 

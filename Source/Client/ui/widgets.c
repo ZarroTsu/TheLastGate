@@ -3,6 +3,10 @@
 #include "imgui_wrapper.h"
 #include "ui_common.h"
 #include "graphics/sdl.h"
+#include "keybindings.h"
+#include <stdio.h>
+
+#include "input.h"
 
 bool ui_button(const char *label, float width, float height) {
     if (width < 52) width = 52;
@@ -132,34 +136,106 @@ bool tab_button(const char* label, bool is_active, float width) {
     return clicked;
 }
 
-bool keybind(const char *keybind_label) {
-    /* Calculate total width of text + button to center them together */
+bool keybind(const char *keybind_label, int spell_index) {
+    /* Static state to track which keybind is being set */
+    static int active_keybind_index = -1; /* -1 = none active */
+
+    /* Get current keybinding for this spell */
+    Keybinding current_kb = keybind_config.spell_hotkeys[spell_index];
+
+    /* Calculate layout */
     float text_width, text_height;
     imgui_calc_text_size_simple(&text_width, &text_height, keybind_label);
     float spacing_x, spacing_y;
     imgui_get_style_item_spacing(&spacing_x, &spacing_y);
 
-    float button_width = 50.0f;
+    float button_width = 80.0f;
     float button_height = 20.0f;
     float total_width = text_width + spacing_x + button_width;
 
-    /* Center the text+button pair horizontally */
+    /* Center the text+button pair */
     imgui_center_next_item(total_width);
 
-    /* Save the starting Y position */
     float start_y = imgui_get_cursor_pos_y();
-
-    /* Calculate vertical offset to center text with button */
     float text_offset = (button_height - text_height) / 2.0f;
 
-    /* Render text vertically centered with button */
+    /* Render label */
     imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);
     imgui_set_cursor_pos_y(start_y + text_offset);
     imgui_text(keybind_label);
 
-    /* Position button at the starting Y (buttons are typically taller) */
+    /* Position button */
     imgui_same_line_gap();
     imgui_set_cursor_pos_y(start_y);
-    ui_button("Ctrl+1", button_width, button_height);
+
+    /* Determine button text */
+    char button_text[32];
+    bool is_active = (active_keybind_index == spell_index);
+
+    if (is_active) {
+        snprintf(button_text, sizeof(button_text), "Press key...");
+    } else {
+        keybinding_to_string(current_kb, button_text, sizeof(button_text));
+    }
+
+    /* Draw the button */
+    bool clicked = ui_button(button_text, button_width, button_height);
+
+    /* Handle button click - enter "set mode" */
+    if (clicked && !is_active) {
+        active_keybind_index = spell_index;
+        waiting_for_keybind = true;
+    }
+
+    /* If in set mode for this keybind, capture input */
+    if (is_active) {
+        /* Check for ESC to cancel */
+        if (imgui_is_key_pressed(SDLK_ESCAPE)) {
+            active_keybind_index = -1; /* Cancel */
+            waiting_for_keybind = false;
+        } else {
+            /* Check for Ctrl or Alt modifier */
+            int mods = imgui_get_key_mods();
+            bool has_ctrl = (mods & KMOD_CTRL) != 0;
+            bool has_alt = (mods & KMOD_ALT) != 0;
+
+            /* Must have EXACTLY one modifier (not both, not neither) */
+            if ((has_ctrl && !has_alt) || (!has_ctrl && has_alt)) {
+                /* Check for valid key press (letters and numbers) */
+                int i;
+                SDL_Keycode pressed_key = SDLK_UNKNOWN;
+
+                /* Check letters A-Z */
+                for (i = SDLK_a; i <= SDLK_z; i++) {
+                    if (imgui_is_key_pressed(i)) {
+                        pressed_key = i;
+                        break;
+                    }
+                }
+
+                /* Check numbers 0-9 */
+                if (pressed_key == SDLK_UNKNOWN) {
+                    for (i = SDLK_0; i <= SDLK_9; i++) {
+                        if (imgui_is_key_pressed(i)) {
+                            pressed_key = i;
+                            break;
+                        }
+                    }
+                }
+
+                /* If valid key pressed, update the keybinding */
+                if (pressed_key != SDLK_UNKNOWN) {
+                    keybind_config.spell_hotkeys[spell_index].key = pressed_key;
+                    keybind_config.spell_hotkeys[spell_index].modifier =
+                        has_ctrl ? KEYBIND_MOD_CTRL : KEYBIND_MOD_ALT;
+                    active_keybind_index = -1; /* Exit set mode */
+                    waiting_for_keybind = false;
+                }
+            }
+        }
+    }
+
     imgui_pop_style_color(1);
+
+    return clicked;
 }

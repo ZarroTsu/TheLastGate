@@ -14,6 +14,8 @@
 #include "ui/option_window.h"
 #include "ui/imgui/imgui_wrapper.h"
 
+bool waiting_for_keybind = false;
+
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])
         return INVENTORY;
@@ -176,6 +178,7 @@ void handle_input(void) {
             case SDL_QUIT: quit = 1;
                 break;
             case SDL_KEYDOWN:
+                if (waiting_for_keybind) break;
                 switch (e.key.keysym.sym) {
                     // Spells 1-5
                     case SDLK_1:

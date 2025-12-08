@@ -41,7 +41,7 @@
 #include "inter.h"
 #include "render.h"
 #include "sound.h"
-//#include "minilzo.h"
+#include "ui/keybindings.h"
 
 AppState app_state = {
 	.tricky_flag = 0,
@@ -395,6 +395,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if (quit) exit(0);
 
+	keybindings_init();  // Initialize default keybindings
 	init_sound();
 	tmp=init(app_state.windowed);
 	/*

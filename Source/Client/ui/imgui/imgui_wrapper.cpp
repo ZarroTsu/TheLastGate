@@ -675,6 +675,41 @@ bool imgui_want_capture_keyboard(void) {
     return ImGui::GetIO().WantCaptureKeyboard;
 }
 
+/* Keyboard input - for keybinding capture */
+bool imgui_is_key_pressed(int sdl_keycode) {
+    /* Map SDL keycode to ImGui key */
+    /* SDL keycodes for a-z are sequential starting at SDLK_a (97) */
+    /* SDL keycodes for 0-9 are sequential with 0=48, 1-9=49-57 */
+
+    /* Letters a-z */
+    if (sdl_keycode >= SDLK_a && sdl_keycode <= SDLK_z) {
+        int key_index = sdl_keycode - SDLK_a;
+        return ImGui::IsKeyPressed((ImGuiKey)(ImGuiKey_A + key_index), false);
+    }
+
+    /* Numbers 0-9 */
+    if (sdl_keycode >= SDLK_0 && sdl_keycode <= SDLK_9) {
+        int key_index = sdl_keycode - SDLK_0;
+        return ImGui::IsKeyPressed((ImGuiKey)(ImGuiKey_0 + key_index), false);
+    }
+
+    /* Escape key */
+    if (sdl_keycode == SDLK_ESCAPE) {
+        return ImGui::IsKeyPressed(ImGuiKey_Escape, false);
+    }
+
+    return false;
+}
+
+int imgui_get_key_mods(void) {
+    ImGuiIO& io = ImGui::GetIO();
+    int mods = 0;
+    if (io.KeyCtrl) mods |= KMOD_CTRL;
+    if (io.KeyAlt) mods |= KMOD_ALT;
+    if (io.KeyShift) mods |= KMOD_SHIFT;
+    return mods;
+}
+
 /* Draw list API */
 
 void* imgui_get_window_draw_list(void) {

@@ -46,6 +46,8 @@ add_executable(TheLastGate WIN32
         ui/option_window.c
         ui/option_window.h
         ui/widgets.c
+        ui/keybindings.c
+        ui/keybindings.h
 )
 
 # Disable warnings for old code compatibility

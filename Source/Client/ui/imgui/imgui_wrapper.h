@@ -365,6 +365,10 @@ void imgui_show_demo_window(bool* p_open);
 bool imgui_want_capture_mouse(void);
 bool imgui_want_capture_keyboard(void);
 
+/* Keyboard input - for keybinding capture */
+bool imgui_is_key_pressed(int sdl_keycode);
+int imgui_get_key_mods(void);
+
 /* Draw list API - for custom drawing */
 void* imgui_get_window_draw_list(void);
 void* imgui_get_background_draw_list(void);

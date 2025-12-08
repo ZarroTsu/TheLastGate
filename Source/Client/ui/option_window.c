@@ -156,22 +156,26 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Spell 1");
-    keybind("Spell 2");
-    keybind("Spell 3");
-    keybind("Spell 4");
-    keybind("Spell 5");
-    keybind("Spell 6");
-    keybind("Spell 7");
-    keybind("Spell 8");
-    keybind("Spell 9");
-    keybind("Spell 10");
-    keybind("Spell 11");
-    keybind("Spell 12");
-    keybind("Spell 13");
-    keybind("Spell 14");
-    keybind("Spell 15");
-    keybind("Spell 16");
+    keybind("Spell 1", 0);
+    keybind("Spell 2", 1);
+    keybind("Spell 3", 2);
+    keybind("Spell 4", 3);
+    keybind("Spell 5", 4);
+    keybind("Spell 6", 5);
+    keybind("Spell 7", 6);
+    keybind("Spell 8", 7);
+    keybind("Spell 9", 8);
+    keybind("Spell 10", 9);
+    keybind("Spell 11", 10);
+    keybind("Spell 12", 11);
+    keybind("Spell 13", 12);
+    keybind("Spell 14", 13);
+    keybind("Spell 15", 14);
+    keybind("Spell 16", 15);
+    keybind("Spell 17", 16);
+    keybind("Spell 18", 17);
+    keybind("Spell 19", 18);
+    keybind("Spell 20", 19);
 
 }
 
