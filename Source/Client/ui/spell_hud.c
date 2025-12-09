@@ -118,7 +118,7 @@ void spell_hud() {
             imgui_draw_list_add_rect_filled(
                 draw_list,
                 x, y, x + 46, y + 13,
-                0xFF120505,
+                0xFF050512,
                 0.0f,
                 0);
             char binding_text[4];
