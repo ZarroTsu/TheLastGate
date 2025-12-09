@@ -136,12 +136,9 @@ bool tab_button(const char* label, bool is_active, float width) {
     return clicked;
 }
 
-bool keybind(const char *keybind_label, int spell_index) {
+bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
     /* Static state to track which keybind is being set */
     static int active_keybind_index = -1; /* -1 = none active */
-
-    /* Get current keybinding for this spell */
-    Keybinding current_kb = keybind_config.spell_hotkeys[spell_index];
 
     /* Calculate layout */
     float text_width, text_height;
@@ -170,12 +167,12 @@ bool keybind(const char *keybind_label, int spell_index) {
 
     /* Determine button text */
     char button_text[32];
-    bool is_active = (active_keybind_index == spell_index);
+    bool is_active = (active_keybind_index == index);
 
     if (is_active) {
         snprintf(button_text, sizeof(button_text), "Press key...");
     } else {
-        keybinding_to_string(current_kb, button_text, sizeof(button_text));
+        keybinding_to_string(*keybind, button_text, sizeof(button_text));
     }
 
     /* Draw the button */
@@ -183,7 +180,7 @@ bool keybind(const char *keybind_label, int spell_index) {
 
     /* Handle button click - enter "set mode" */
     if (clicked && !is_active) {
-        active_keybind_index = spell_index;
+        active_keybind_index = index;
         waiting_for_keybind = true;
     }
 
@@ -198,6 +195,14 @@ bool keybind(const char *keybind_label, int spell_index) {
             int mods = imgui_get_key_mods();
             bool has_ctrl = (mods & KMOD_CTRL) != 0;
             bool has_alt = (mods & KMOD_ALT) != 0;
+
+            // Unbind on delete
+            if (imgui_is_key_pressed(SDLK_DELETE)) {
+                keybind->key = SDLK_UNKNOWN;
+                active_keybind_index = -1;
+                waiting_for_keybind = false;
+            }
+
 
             /* Must have EXACTLY one modifier (not both, not neither) */
             if ((has_ctrl && !has_alt) || (!has_ctrl && has_alt)) {
@@ -225,9 +230,8 @@ bool keybind(const char *keybind_label, int spell_index) {
 
                 /* If valid key pressed, update the keybinding */
                 if (pressed_key != SDLK_UNKNOWN) {
-                    keybind_config.spell_hotkeys[spell_index].key = pressed_key;
-                    keybind_config.spell_hotkeys[spell_index].modifier =
-                        has_ctrl ? KEYBIND_MOD_CTRL : KEYBIND_MOD_ALT;
+                    keybind->key = pressed_key;
+                    keybind->modifier = has_ctrl ? KEYBIND_MOD_CTRL : KEYBIND_MOD_ALT;
                     active_keybind_index = -1; /* Exit set mode */
                     waiting_for_keybind = false;
                 }

@@ -111,6 +111,11 @@ const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size) {
     const char* mod_str = "";
     char key_char[2];
 
+    if (kb.key == SDLK_UNKNOWN) {
+        snprintf(buffer, buffer_size, "Not Set");
+        return buffer;
+    }
+
     /* Get modifier string */
     if (kb.modifier == KEYBIND_MOD_CTRL) {
         mod_str = "Ctrl+";

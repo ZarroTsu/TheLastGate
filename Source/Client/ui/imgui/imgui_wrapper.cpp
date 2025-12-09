@@ -712,6 +712,10 @@ bool imgui_is_key_pressed(int sdl_keycode) {
         return ImGui::IsKeyPressed(ImGuiKey_Escape, false);
     }
 
+    if (sdl_keycode == SDLK_DELETE) {
+        return ImGui::IsKeyPressed(ImGuiKey_Delete, false);
+    }
+
     return false;
 }
 
