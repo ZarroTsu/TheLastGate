@@ -1,6 +1,7 @@
 #include "keybindings.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 /* Global keybinding configuration */
 KeybindConfig keybind_config;
@@ -137,4 +138,28 @@ const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size) {
     }
 
     return buffer;
+}
+
+/* Find spell slot (0-19) matching key+modifier, returns -1 if no match */
+int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate) {
+    int i;
+    bool has_ctrl = (sdl_modstate & KMOD_CTRL) != 0;
+    bool has_alt = (sdl_modstate & KMOD_ALT) != 0;
+
+    for (i = 0; i < NUM_SPELL_HOTKEYS; i++) {
+        Keybinding kb = keybind_config.spell_hotkeys[i];
+
+        /* Check key match */
+        if (kb.key != key) continue;
+
+        /* Check modifier match (lenient - ignore Shift, Caps, etc.) */
+        if (kb.modifier == KEYBIND_MOD_CTRL) {
+            if (has_ctrl && !has_alt) return i;  /* Require Ctrl, forbid Alt */
+        } else if (kb.modifier == KEYBIND_MOD_ALT) {
+            if (has_alt && !has_ctrl) return i;  /* Require Alt, forbid Ctrl */
+        }
+        /* KEYBIND_MOD_NONE: Skip unbound entries */
+    }
+
+    return -1;  /* No match found */
 }

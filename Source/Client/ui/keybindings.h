@@ -31,3 +31,6 @@ void keybindings_init(void);
 /* Utility function to convert keybinding to display string like "Ctrl+A" */
 const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size);
 const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size);
+
+/* Find spell slot (0-19) matching key+modifier, returns -1 if no match */
+int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate);

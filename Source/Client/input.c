@@ -12,6 +12,7 @@
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "ui/option_window.h"
+#include "ui/keybindings.h"
 #include "ui/imgui/imgui_wrapper.h"
 
 bool waiting_for_keybind = false;
@@ -126,7 +127,6 @@ void handle_input(void) {
             input_event_count++;
         }
 
-        bool spellKey = (SDL_GetModState() & (KMOD_CTRL | KMOD_ALT)) != 0;
         switch (e.type) {
             case SDL_WINDOWEVENT:
 #ifdef _WIN32
@@ -173,75 +173,17 @@ void handle_input(void) {
                 break;
             case SDL_KEYDOWN:
                 if (waiting_for_keybind) break;
+
+                /* Check for spell hotkey binding */
+                {
+                    int spell_slot = keybinding_find_spell_slot(e.key.keysym.sym, SDL_GetModState());
+                    if (spell_slot >= 0) {
+                        button_command(16 + spell_slot);
+                        break;
+                    }
+                }
+
                 switch (e.key.keysym.sym) {
-                    // Spells 1-5
-                    case SDLK_1:
-                        if (spellKey) button_command(16);
-                        break;
-                    case SDLK_2:
-                        if (spellKey) (button_command(17));
-                        break;
-                    case SDLK_3:
-                        if (spellKey) button_command(18);
-                        break;
-                    case SDLK_4:
-                        if (spellKey) button_command(19);
-                        break;
-                    case SDLK_5:
-                        if (spellKey) button_command(20);
-                        break;
-
-                    // Spells Q-T
-                    case SDLK_q:
-                        if (spellKey) button_command(21);
-                        break;
-                    case SDLK_w:
-                        if (spellKey) button_command(22);
-                        break;
-                    case SDLK_e:
-                        if (spellKey) button_command(23);
-                        break;
-                    case SDLK_r:
-                        if (spellKey) button_command(24);
-                        break;
-                    case SDLK_t:
-                        if (spellKey) button_command(25);
-                        break;
-
-                    // Spells A-G
-                    case SDLK_a:
-                        if (spellKey) button_command(26);
-                        break;
-                    case SDLK_s:
-                        if (spellKey) button_command(27);
-                        break;
-                    case SDLK_d:
-                        if (spellKey) button_command(28);
-                        break;
-                    case SDLK_f:
-                        if (spellKey) button_command(29);
-                        break;
-                    case SDLK_g:
-                        if (spellKey) button_command(30);
-                        break;
-
-                    // Spells Z-V
-                    case SDLK_z:
-                        if (spellKey) button_command(31);
-                        break;
-                    case SDLK_x:
-                        if (spellKey) button_command(32);
-                        break;
-                    case SDLK_c:
-                        if (spellKey) button_command(33);
-                        break;
-                    case SDLK_v:
-                        if (spellKey) button_command(34);
-                        break;
-                    case SDLK_b:
-                        if (spellKey) button_command(35);
-                        break;
-
                     case SDLK_ESCAPE:
                         bool closed_window = false;
                         if (show_shop != 0) {
@@ -462,7 +404,9 @@ void handle_input(void) {
                 break; // End of SDL_KEYDOWN
 
             case SDL_TEXTINPUT:
-                if (in_len < 115 && !spellKey) {
+                int mods = SDL_GetModState();
+                bool has_spell_modifier = ((mods & KMOD_CTRL) != 0) || ((mods & KMOD_ALT) != 0);
+                if (in_len < 115 && !has_spell_modifier) {
                     if (tabmode) {
                         if (!isalnum(e.text.text[0])) in_len--;
                         cur_pos = in_len;
