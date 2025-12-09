@@ -3,6 +3,20 @@
 #include <SDL2/SDL.h>
 
 #define NUM_SPELL_HOTKEYS 20
+#define NUM_GENERAL_HOTKEYS 1
+
+// GENERAL HOTKEYS
+#define FIGHTBACK_HOTKEY 0
+//SWAP
+
+// GC Geronimo
+// GC Offense
+// GC Defense
+// GC Passive
+// GC wait
+// gc follow
+// gc move
+// Recall GC
 
 /* Modifier flags - match SDL but use simpler names */
 typedef enum {
@@ -20,6 +34,7 @@ typedef struct {
 /* Global keybinding configuration */
 typedef struct {
     Keybinding spell_hotkeys[NUM_SPELL_HOTKEYS];
+    Keybinding general_hotkeys[NUM_GENERAL_HOTKEYS];
 } KeybindConfig;
 
 /* Global instance - defined in keybindings.c */
@@ -34,3 +49,6 @@ const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size);
 
 /* Find spell slot (0-19) matching key+modifier, returns -1 if no match */
 int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate);
+
+/* Check other non-spell keybinds, returns the toggle id or -1 if no match */
+int keybinding_find_general(SDL_KeyCode key, int sdl_modstate);

@@ -71,6 +71,10 @@ void keybindings_init(void) {
 
     keybind_config.spell_hotkeys[19].key = SDLK_b;
     keybind_config.spell_hotkeys[19].modifier = KEYBIND_MOD_CTRL;
+
+    /* Toggle Hotkeys */
+    keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].modifier = KEYBIND_MOD_CTRL;
 }
 
 const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size) {
@@ -167,4 +171,23 @@ int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate) {
     }
 
     return -1;  /* No match found */
+}
+
+int keybinding_find_general(SDL_KeyCode key, int sdl_modstate) {
+    int i;
+    bool has_ctrl = (sdl_modstate & KMOD_CTRL) != 0;
+    bool has_alt = (sdl_modstate & KMOD_ALT) != 0;
+
+    for (i = 0; i < NUM_GENERAL_HOTKEYS; i++) {
+        Keybinding kb = keybind_config.general_hotkeys[i];
+        if (kb.key != key) continue;
+
+        if (kb.modifier == KEYBIND_MOD_CTRL) {
+            if (has_ctrl && !has_alt) return i;
+        } else if (kb.modifier == KEYBIND_MOD_ALT) {
+            if (has_alt && !has_ctrl) return i;
+        }
+    }
+
+    return -1;
 }

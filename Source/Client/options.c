@@ -291,55 +291,72 @@ void load_extended_options(void)
 	int handle, i;
 	unsigned int version = 0, count = 0;
 
+	// Set all defaults, keybinds are handled in init
+	app_state.escape_closes_menus_first = 1;
+	app_state.cost_helper = 0;
+	app_state.volume_level = 10;
+	app_state.give_more = 0;
+	app_state.use_queue = 0;
+
 	handle = open("TLGExtended.dat", O_RDONLY|O_BINARY);
 	if (handle != -1) {
 		/* Read and validate version */
-		if (read(handle, &version, sizeof(version)) != sizeof(version) || version != SAVE_VERSION) {
+		if (read(handle, &version, sizeof(version)) != sizeof(version)) {
 			/* Wrong version or corrupted - use defaults, delete old file */
 			close(handle);
 			unlink("TLGExtended.dat");
-			goto use_defaults;
+		}
+		if (version >= 1) {
+			/* Read app_state fields */
+			if (read(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first)) != sizeof(app_state.escape_closes_menus_first)) return;
+			if (read(handle, &app_state.cost_helper, sizeof(app_state.cost_helper)) != sizeof(app_state.cost_helper)) return;
+			if (read(handle, &app_state.volume_level, sizeof(app_state.volume_level)) != sizeof(app_state.volume_level)) return;
+			if (read(handle, &app_state.give_more, sizeof(app_state.give_more)) != sizeof(app_state.give_more)) return;
+			if (read(handle, &app_state.use_queue, sizeof(app_state.use_queue)) != sizeof(app_state.use_queue)) return;
+
+			/* Read keybinding section */
+			if (read(handle, &count, sizeof(count)) == sizeof(count)) {
+				/* Bounds check */
+				if (count > NUM_SPELL_HOTKEYS) count = NUM_SPELL_HOTKEYS;
+
+				for (i = 0; i < (int)count; i++) {
+					SDL_Keycode key;
+					KeybindModifier mod;
+
+					if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
+					if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
+
+					/* Validate before applying */
+					if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
+
+					keybind_config.spell_hotkeys[i].key = key;
+					keybind_config.spell_hotkeys[i].modifier = mod;
+				}
+			}
 		}
 
-		/* Read app_state fields */
-		if (read(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first)) != sizeof(app_state.escape_closes_menus_first)) goto use_defaults;
-		if (read(handle, &app_state.cost_helper, sizeof(app_state.cost_helper)) != sizeof(app_state.cost_helper)) goto use_defaults;
-		if (read(handle, &app_state.volume_level, sizeof(app_state.volume_level)) != sizeof(app_state.volume_level)) goto use_defaults;
-		if (read(handle, &app_state.give_more, sizeof(app_state.give_more)) != sizeof(app_state.give_more)) goto use_defaults;
-		if (read(handle, &app_state.use_queue, sizeof(app_state.use_queue)) != sizeof(app_state.use_queue)) goto use_defaults;
+		if (version >= 2) {
+			if (read(handle, &count, sizeof(count)) == sizeof(count)) {
+				if (count > NUM_GENERAL_HOTKEYS) count = NUM_GENERAL_HOTKEYS;
 
-		/* Read keybinding section */
-		if (read(handle, &count, sizeof(count)) == sizeof(count)) {
-			/* Bounds check */
-			if (count > NUM_SPELL_HOTKEYS) count = NUM_SPELL_HOTKEYS;
+				for (i = 0; i < (int)count; i++) {
+					SDL_Keycode key;
+					KeybindModifier mod;
 
-			for (i = 0; i < (int)count; i++) {
-				SDL_Keycode key;
-				KeybindModifier mod;
+					if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
+					if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
 
-				if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
-				if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
+					if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
 
-				/* Validate before applying */
-				if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
-
-				keybind_config.spell_hotkeys[i].key = key;
-				keybind_config.spell_hotkeys[i].modifier = mod;
+					keybind_config.general_hotkeys[i].key = key;
+					keybind_config.general_hotkeys[i].modifier = mod;
+				}
 			}
 		}
 
 		close(handle);
 		return;
 	}
-
-use_defaults:
-	/* Set defaults for app_state fields */
-	app_state.escape_closes_menus_first = 1;
-	app_state.cost_helper = 0;
-	app_state.volume_level = 10;
-	app_state.give_more = 0;
-	app_state.use_queue = 0;
-	/* Keybindings already initialized by keybindings_init() */
 }
 
 void save_options(void)
@@ -392,6 +409,14 @@ void save_extended_options(void)
 		for (i = 0; i < NUM_SPELL_HOTKEYS; i++) {
 			write(handle, &keybind_config.spell_hotkeys[i].key, sizeof(SDL_Keycode));
 			write(handle, &keybind_config.spell_hotkeys[i].modifier, sizeof(KeybindModifier));
+		}
+
+		count = NUM_GENERAL_HOTKEYS;
+		write(handle, &count, sizeof(count));
+
+		for (i = 0; i < NUM_GENERAL_HOTKEYS; i++) {
+			write(handle, &keybind_config.general_hotkeys[i].key, sizeof(SDL_Keycode));
+			write(handle, &keybind_config.general_hotkeys[i].modifier, sizeof(KeybindModifier));
 		}
 
 		close(handle);

@@ -175,12 +175,16 @@ void handle_input(void) {
                 if (waiting_for_keybind) break;
 
                 /* Check for spell hotkey binding */
-                {
-                    int spell_slot = keybinding_find_spell_slot(e.key.keysym.sym, SDL_GetModState());
-                    if (spell_slot >= 0) {
-                        button_command(16 + spell_slot);
-                        break;
-                    }
+                int spell_slot = keybinding_find_spell_slot(e.key.keysym.sym, SDL_GetModState());
+                if (spell_slot >= 0) {
+                    button_command(16 + spell_slot);
+                    break;
+                }
+
+                int hotkey = keybinding_find_general(e.key.keysym.sym, SDL_GetModState());
+                if (hotkey == FIGHTBACK_HOTKEY) {
+                    say("/fightback");
+                    break;
                 }
 
                 switch (e.key.keysym.sym) {

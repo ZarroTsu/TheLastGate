@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "imgui_wrapper.h"
+#include "keybindings.h"
 #include "ui_common.h"
 #include "../engine.h"
 #include "../main.h"
@@ -159,26 +160,39 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Spell 1", 0);
-    keybind("Spell 2", 1);
-    keybind("Spell 3", 2);
-    keybind("Spell 4", 3);
-    keybind("Spell 5", 4);
-    keybind("Spell 6", 5);
-    keybind("Spell 7", 6);
-    keybind("Spell 8", 7);
-    keybind("Spell 9", 8);
-    keybind("Spell 10", 9);
-    keybind("Spell 11", 10);
-    keybind("Spell 12", 11);
-    keybind("Spell 13", 12);
-    keybind("Spell 14", 13);
-    keybind("Spell 15", 14);
-    keybind("Spell 16", 15);
-    keybind("Spell 17", 16);
-    keybind("Spell 18", 17);
-    keybind("Spell 19", 18);
-    keybind("Spell 20", 19);
+    keybind("Spell 1", &keybind_config.spell_hotkeys[0], 0);
+    keybind("Spell 2", &keybind_config.spell_hotkeys[1], 1);
+    keybind("Spell 3", &keybind_config.spell_hotkeys[2], 2);
+    keybind("Spell 4", &keybind_config.spell_hotkeys[3], 3);
+    keybind("Spell 5", &keybind_config.spell_hotkeys[4], 4);
+    keybind("Spell 6", &keybind_config.spell_hotkeys[5], 5);
+    keybind("Spell 7", &keybind_config.spell_hotkeys[6], 6);
+    keybind("Spell 8", &keybind_config.spell_hotkeys[7], 7);
+    keybind("Spell 9", &keybind_config.spell_hotkeys[8], 8);
+    keybind("Spell 10", &keybind_config.spell_hotkeys[9], 9);
+    keybind("Spell 11", &keybind_config.spell_hotkeys[10], 10);
+    keybind("Spell 12", &keybind_config.spell_hotkeys[11], 11);
+    keybind("Spell 13", &keybind_config.spell_hotkeys[12], 12);
+    keybind("Spell 14", &keybind_config.spell_hotkeys[13], 13);
+    keybind("Spell 15", &keybind_config.spell_hotkeys[14], 14);
+    keybind("Spell 16", &keybind_config.spell_hotkeys[15], 15);
+    keybind("Spell 17", &keybind_config.spell_hotkeys[16], 16);
+    keybind("Spell 18", &keybind_config.spell_hotkeys[17], 17);
+    keybind("Spell 19", &keybind_config.spell_hotkeys[18], 18);
+    keybind("Spell 20", &keybind_config.spell_hotkeys[19], 19);
+
+    imgui_spacing();
+    imgui_separator();
+
+    imgui_calc_text_size_simple(&text_width, NULL, "General Hotkeys");
+    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_center_next_item(text_width);
+    imgui_text("General Hotkeys");
+    imgui_pop_style_color(1);
+
+    imgui_spacing();
+
+    keybind("Toggle Fightback", &keybind_config.general_hotkeys[FIGHTBACK_HOTKEY], 20);
 }
 
 static void render_imgui_version() {
