@@ -34,6 +34,8 @@
 #include "inter.h"
 #include "merc.rh"
 #include "main.h"
+#include "options.h"
+#include "ui/keybindings.h"
 
 /*
  * Borland and Microsoft disagree on the size of the OPENFILENAME structure.
@@ -280,28 +282,71 @@ void load_options(void)
 	
 	if (app_state.gamma>6000 || app_state.gamma<5000) app_state.gamma=5000;
 
-	flag = 0;
-	handle=open("TLGExtended.dat",O_RDONLY|O_BINARY);
-	if (handle!=-1) {
-		if (read(handle,&app_state.escape_closes_menus_first,sizeof(app_state.escape_closes_menus_first))!=sizeof(app_state.escape_closes_menus_first)) flag=1;
-		if (read(handle,&app_state.cost_helper,sizeof(app_state.cost_helper))!=sizeof(app_state.cost_helper)) flag=1;
-		if (read(handle,&app_state.volume_level,sizeof(app_state.volume_level))!=sizeof(app_state.volume_level)) flag=1;
-		if (read(handle,&app_state.give_more, sizeof(app_state.give_more))!=sizeof(app_state.give_more)) app_state.give_more=0;
-		if (read(handle,&app_state.use_queue, sizeof(app_state.use_queue))!=sizeof(app_state.use_queue)) app_state.use_queue=0;
-		close(handle);
-	} else flag=1;
+	/* Load TLGExtended.dat separately */
+	load_extended_options();
+}
 
-	if (flag) {
-		app_state.escape_closes_menus_first = 1;
-		app_state.cost_helper = 0;
-		app_state.volume_level = 10;
+void load_extended_options(void)
+{
+	int handle, i;
+	unsigned int version = 0, count = 0;
+
+	handle = open("TLGExtended.dat", O_RDONLY|O_BINARY);
+	if (handle != -1) {
+		/* Read and validate version */
+		if (read(handle, &version, sizeof(version)) != sizeof(version) || version != SAVE_VERSION) {
+			/* Wrong version or corrupted - use defaults, delete old file */
+			close(handle);
+			unlink("TLGExtended.dat");
+			goto use_defaults;
+		}
+
+		/* Read app_state fields */
+		if (read(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first)) != sizeof(app_state.escape_closes_menus_first)) goto use_defaults;
+		if (read(handle, &app_state.cost_helper, sizeof(app_state.cost_helper)) != sizeof(app_state.cost_helper)) goto use_defaults;
+		if (read(handle, &app_state.volume_level, sizeof(app_state.volume_level)) != sizeof(app_state.volume_level)) goto use_defaults;
+		if (read(handle, &app_state.give_more, sizeof(app_state.give_more)) != sizeof(app_state.give_more)) goto use_defaults;
+		if (read(handle, &app_state.use_queue, sizeof(app_state.use_queue)) != sizeof(app_state.use_queue)) goto use_defaults;
+
+		/* Read keybinding section */
+		if (read(handle, &count, sizeof(count)) == sizeof(count)) {
+			/* Bounds check */
+			if (count > NUM_SPELL_HOTKEYS) count = NUM_SPELL_HOTKEYS;
+
+			for (i = 0; i < (int)count; i++) {
+				SDL_Keycode key;
+				KeybindModifier mod;
+
+				if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
+				if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
+
+				/* Validate before applying */
+				if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
+
+				keybind_config.spell_hotkeys[i].key = key;
+				keybind_config.spell_hotkeys[i].modifier = mod;
+			}
+		}
+
+		close(handle);
+		return;
 	}
+
+use_defaults:
+	/* Set defaults for app_state fields */
+	app_state.escape_closes_menus_first = 1;
+	app_state.cost_helper = 0;
+	app_state.volume_level = 10;
+	app_state.give_more = 0;
+	app_state.use_queue = 0;
+	/* Keybindings already initialized by keybindings_init() */
 }
 
 void save_options(void)
 {
 	int handle;
 
+	/* Save TLG.dat */
 	handle=open("TLG.dat",O_WRONLY|O_BINARY|O_CREAT|O_TRUNC,0666);
 	if (handle!=-1) {
 		write(handle,history,sizeof(history));
@@ -318,13 +363,37 @@ void save_options(void)
 		close(handle);
 	}
 
-	handle=open("TLGExtended.dat",O_WRONLY|O_BINARY|O_CREAT|O_TRUNC,0666);
-	if (handle!=-1) {
-		write(handle,&app_state.escape_closes_menus_first,sizeof(app_state.escape_closes_menus_first));
-		write(handle,&app_state.cost_helper,sizeof(app_state.cost_helper));
-		write(handle,&app_state.volume_level,sizeof(app_state.volume_level));
-		write(handle,&app_state.give_more, sizeof(app_state.give_more));
-		write(handle,&app_state.use_queue, sizeof(app_state.give_more));
+	/* Save TLGExtended.dat separately */
+	save_extended_options();
+}
+
+void save_extended_options(void)
+{
+	int handle, i;
+	unsigned int version, count;
+
+	handle = open("TLGExtended.dat", O_WRONLY|O_BINARY|O_CREAT|O_TRUNC, 0666);
+	if (handle != -1) {
+		/* Write version header first */
+		version = SAVE_VERSION;
+		write(handle, &version, sizeof(version));
+
+		/* Write existing app_state fields */
+		write(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first));
+		write(handle, &app_state.cost_helper, sizeof(app_state.cost_helper));
+		write(handle, &app_state.volume_level, sizeof(app_state.volume_level));
+		write(handle, &app_state.give_more, sizeof(app_state.give_more));
+		write(handle, &app_state.use_queue, sizeof(app_state.use_queue));  /* FIXED */
+
+		/* Write keybinding section */
+		count = NUM_SPELL_HOTKEYS;
+		write(handle, &count, sizeof(count));
+
+		for (i = 0; i < NUM_SPELL_HOTKEYS; i++) {
+			write(handle, &keybind_config.spell_hotkeys[i].key, sizeof(SDL_Keycode));
+			write(handle, &keybind_config.spell_hotkeys[i].modifier, sizeof(KeybindModifier));
+		}
+
 		close(handle);
 	}
 }

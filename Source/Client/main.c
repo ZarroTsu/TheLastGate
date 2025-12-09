@@ -389,13 +389,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// TODO: MinGW - Set hinst early so options() can use it before InitWindow()
 	hinst = hInstance;
 
+	keybindings_init();  // Initialize default keybindings BEFORE loading options
 	load_options();
 	options();  // Show options dialog BEFORE creating the game window
 	init_engine();
 
 	if (quit) exit(0);
 
-	keybindings_init();  // Initialize default keybindings
 	init_sound();
 	tmp=init(app_state.windowed);
 	/*
