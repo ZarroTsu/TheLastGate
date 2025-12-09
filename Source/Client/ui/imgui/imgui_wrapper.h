@@ -119,6 +119,8 @@ void imgui_set_cursor_pos_x(float x);
 void imgui_set_cursor_pos_y(float y);
 float imgui_get_cursor_pos_x(void);
 float imgui_get_cursor_pos_y(void);
+float imgui_get_window_pos_x(void);
+float imgui_get_window_pos_y(void);
 void imgui_align_text_to_frame_padding(void);
 
 /* Centering helper - call before the item you want to center */
@@ -280,6 +282,7 @@ void imgui_close_current_popup(void);
 bool imgui_is_item_hovered(void);
 bool imgui_is_item_active(void);
 bool imgui_is_item_clicked(int mouse_button);
+bool imgui_is_mouse_clicked(int mouse_button);
 void imgui_push_item_width(float item_width);
 void imgui_pop_item_width(void);
 
@@ -294,6 +297,33 @@ void imgui_pop_style_color(int count);
 void imgui_push_style_var_float(int idx, float val);
 void imgui_push_style_var_vec2(int idx, float x, float y);
 void imgui_pop_style_var(int count);
+
+/* Style variable indices (ImGuiStyleVar_) */
+#define IMGUI_STYLE_VAR_ALPHA                   0   /* float */
+#define IMGUI_STYLE_VAR_DISABLED_ALPHA          1   /* float */
+#define IMGUI_STYLE_VAR_WINDOW_PADDING          2   /* ImVec2 */
+#define IMGUI_STYLE_VAR_WINDOW_ROUNDING         3   /* float */
+#define IMGUI_STYLE_VAR_WINDOW_BORDER_SIZE      4   /* float */
+#define IMGUI_STYLE_VAR_WINDOW_MIN_SIZE         5   /* ImVec2 */
+#define IMGUI_STYLE_VAR_WINDOW_TITLE_ALIGN      6   /* ImVec2 */
+#define IMGUI_STYLE_VAR_CHILD_ROUNDING          7   /* float */
+#define IMGUI_STYLE_VAR_CHILD_BORDER_SIZE       8   /* float */
+#define IMGUI_STYLE_VAR_POPUP_ROUNDING          9   /* float */
+#define IMGUI_STYLE_VAR_POPUP_BORDER_SIZE       10  /* float */
+#define IMGUI_STYLE_VAR_FRAME_PADDING           11  /* ImVec2 */
+#define IMGUI_STYLE_VAR_FRAME_ROUNDING          12  /* float */
+#define IMGUI_STYLE_VAR_FRAME_BORDER_SIZE       13  /* float */
+#define IMGUI_STYLE_VAR_ITEM_SPACING            14  /* ImVec2 */
+#define IMGUI_STYLE_VAR_ITEM_INNER_SPACING      15  /* ImVec2 */
+#define IMGUI_STYLE_VAR_INDENT_SPACING          16  /* float */
+#define IMGUI_STYLE_VAR_CELL_PADDING            17  /* ImVec2 */
+#define IMGUI_STYLE_VAR_SCROLLBAR_SIZE          18  /* float */
+#define IMGUI_STYLE_VAR_SCROLLBAR_ROUNDING      19  /* float */
+#define IMGUI_STYLE_VAR_GRAB_MIN_SIZE           20  /* float */
+#define IMGUI_STYLE_VAR_GRAB_ROUNDING           21  /* float */
+#define IMGUI_STYLE_VAR_TAB_ROUNDING            22  /* float */
+#define IMGUI_STYLE_VAR_BUTTON_TEXT_ALIGN       23  /* ImVec2 */
+#define IMGUI_STYLE_VAR_SELECTABLE_TEXT_ALIGN   24  /* ImVec2 */
 
 /* Style getters - get current style values */
 void imgui_get_style_item_spacing(float* out_x, float* out_y);

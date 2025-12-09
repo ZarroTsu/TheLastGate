@@ -40,6 +40,7 @@
 #include "graphics/sdl.h"
 #include "mods/base_cost_warning.h"
 #include "mods/use_queue.h"
+#include "ui/spell_hud.h"
 #include "ui/option_window.h"
 
 int init_done=0;
@@ -4913,6 +4914,7 @@ void engine(void)
 
 			imgui_new_frame();
 
+			spell_hud();
 			if (show_opts) {
 				options_window_render();
 			}

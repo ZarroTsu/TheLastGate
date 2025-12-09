@@ -29,4 +29,5 @@ extern KeybindConfig keybind_config;
 void keybindings_init(void);
 
 /* Utility function to convert keybinding to display string like "Ctrl+A" */
+const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size);
 const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size);

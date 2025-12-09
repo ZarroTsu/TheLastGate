@@ -72,6 +72,39 @@ void keybindings_init(void) {
     keybind_config.spell_hotkeys[19].modifier = KEYBIND_MOD_CTRL;
 }
 
+const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size) {
+    const char* mod_str = "";
+    char key_char[2];
+
+    /* Get modifier string */
+    if (kb.modifier == KEYBIND_MOD_CTRL) {
+        mod_str = "C-";
+    } else if (kb.modifier == KEYBIND_MOD_ALT) {
+        mod_str = "A-";
+    }
+
+    /* Get key string - handle common keys */
+    if (kb.key >= SDLK_a && kb.key <= SDLK_z) {
+        /* Letter keys - display as uppercase */
+        key_char[0] = (char)(kb.key - SDLK_a + 'A');
+        key_char[1] = '\0';
+        snprintf(buffer, buffer_size, "%s%s", mod_str, key_char);
+    } else if (kb.key >= SDLK_1 && kb.key <= SDLK_9) {
+        /* Number keys 1-9 */
+        key_char[0] = (char)(kb.key - SDLK_1 + '1');
+        key_char[1] = '\0';
+        snprintf(buffer, buffer_size, "%s%s", mod_str, key_char);
+    } else if (kb.key == SDLK_0) {
+        /* Number key 0 */
+        snprintf(buffer, buffer_size, "%s0", mod_str);
+    } else {
+        /* Unknown key */
+        snprintf(buffer, buffer_size, "%s?", mod_str);
+    }
+
+    return buffer;
+}
+
 /* Convert keybinding to display string like "Ctrl+A" */
 const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size) {
     const char* mod_str = "";

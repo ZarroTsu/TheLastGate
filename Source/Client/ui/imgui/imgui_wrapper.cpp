@@ -18,8 +18,8 @@ void imgui_init(void* sdl_window, void* gl_context) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 
-    /* Enable keyboard and gamepad navigation if desired */
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 
     /* Setup Dear ImGui style */
     ImGui::StyleColorsDark();
@@ -345,6 +345,14 @@ float imgui_get_cursor_pos_y(void) {
     return ImGui::GetCursorPosY();
 }
 
+float imgui_get_window_pos_x(void) {
+    return ImGui::GetWindowPos().x;
+}
+
+float imgui_get_window_pos_y(void) {
+    return ImGui::GetWindowPos().y;
+}
+
 void imgui_align_text_to_frame_padding(void) {
     ImGui::AlignTextToFramePadding();
 }
@@ -575,6 +583,10 @@ bool imgui_is_item_active(void) {
 
 bool imgui_is_item_clicked(int mouse_button) {
     return ImGui::IsItemClicked(mouse_button);
+}
+
+bool imgui_is_mouse_clicked(int mouse_button) {
+    return ImGui::IsMouseClicked(mouse_button);
 }
 
 void imgui_push_item_width(float item_width) {
