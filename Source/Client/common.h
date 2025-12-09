@@ -597,3 +597,108 @@ extern int ctick;
 #define RED (0xF800)
 #define GREEN (0x07E0)
 #define BLUE (0x001F)
+
+// Skill Definitions    //
+#define SK_HAND			 0
+#define SK_PRECISION	 1
+#define SK_DAGGER		 2
+#define SK_SWORD		 3
+#define SK_AXE			 4
+#define SK_STAFF		 5
+#define SK_TWOHAND		 6
+#define SK_ZEPHYR		 7
+#define SK_STEALTH		 8
+#define SK_PERCEPT		 9
+//////////////////////////
+#define SK_METABOLISM	10
+#define SK_MSHIELD		11 // Active Spell
+#define SK_TACTICS		12
+#define SK_REPAIR		13 // Active Melee
+#define SK_FINESSE		14
+#define SK_LETHARGY		15 // Active Spell
+#define SK_SHIELD		16
+#define SK_PROTECT		17 // Active Spell
+#define SK_ENHANCE		18 // Active Spell
+#define SK_SLOW			19 // Active Spell
+//////////////////////////
+#define SK_CURSE		20 // Active Spell
+#define SK_BLESS		21 // Active Spell
+#define SK_RAGE			22 // Active Melee
+#define SK_RESIST		23
+#define SK_BLAST		24 // Active Spell
+#define SK_DISPEL		25 // Active Spell
+#define SK_HEAL			26 // Active Spell
+#define SK_GHOST		27 // Active Spell
+#define SK_REGEN		28
+#define SK_REST			29
+//////////////////////////
+#define SK_MEDIT		30
+#define SK_ARIA			31 // Active Melee
+#define SK_IMMUN		32
+#define SK_SURROUND		33
+#define SK_ECONOM		34
+#define SK_WARCRY		35 // Active Melee
+#define SK_DUAL			36
+#define SK_BLIND		37 // Active Melee
+#define SK_GEARMAST		38
+#define SK_SAFEGRD		39
+//////////////////////////
+#define SK_CLEAVE		40 // Active Melee
+#define SK_WEAKEN		41 // Active Melee
+#define SK_POISON		42 // Active Spell
+#define SK_PULSE		43 // Active Spell
+#define SK_PROX			44
+#define SK_GCMASTERY	45
+#define SK_SHADOW		46 // Active Spell
+#define SK_HASTE		47 // Active Spell
+#define SK_TAUNT		48 // Active Melee
+#define SK_LEAP			49 // Active Melee
+//////////////////////////
+#define SK_SHIFT		54
+#define SK_IDENT		52
+#define SK_LIGHT		50
+#define SK_RECALL		51
+#define SK_FEROC		53
+#define SK_CALM			55
+//////////////////////////
+// Defines for Ailments // - These are OK to match existing skill numbers; see splog[] in skill_driver.c
+#define SK_EXHAUST  	 1
+#define SK_BLEED		 2
+#define SK_WEAKEN2		 3
+#define SK_SCORCH		 4
+#define SK_CURSE2		 5
+#define SK_SLOW2		 6
+#define SK_ZEPHYR2		 8
+#define SK_DOUSE		10
+#define SK_MSHELL		12
+#define SK_PLAGUE		14
+#define SK_GUARD		16
+#define SK_VENOM		29
+#define SK_WARCRY3  	30
+#define SK_DISPEL2		32
+#define SK_WARCRY2  	36
+#define SK_AGGRAVATE	38
+#define SK_ARIA2		39
+//////////////////////////
+#define SK_BLOODLET		 9
+#define SK_POME			 9
+#define SK_STARLIGHT	23
+#define SK_PHALANX		34
+#define SK_SOL			33
+#define SK_IMMOLATE		44
+#define SK_IMMOLATE2	45
+#define SK_FROSTB		56
+#define SK_SHOCK		57
+#define SK_CHARGE		58
+#define SK_SLOW3		59
+#define SK_DIVINITY		60
+#define SK_OPPRESSION	61
+#define SK_OPPRESSED	62
+#define SK_OPPRESSED2	63
+#define SK_PULSE2		64
+#define SK_MJOLNIR		65
+#define SK_SACRIFICE	66
+#define SK_OBLITERATE	67
+#define SK_SLAM			68
+#define SK_SANGUINE	   219
+#define SK_DWLIGHT     220
