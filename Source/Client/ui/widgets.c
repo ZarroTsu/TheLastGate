@@ -176,7 +176,9 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
     }
 
     /* Draw the button */
+    imgui_push_id_int(index);
     bool clicked = ui_button(button_text, button_width, button_height);
+    imgui_pop_id();
 
     /* Handle button click - enter "set mode" */
     if (clicked && !is_active) {

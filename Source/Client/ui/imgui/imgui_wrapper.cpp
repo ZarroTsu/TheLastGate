@@ -571,6 +571,24 @@ void imgui_close_current_popup(void) {
     ImGui::CloseCurrentPopup();
 }
 
+/* ID stack */
+
+void imgui_push_id_str(const char* str_id) {
+    ImGui::PushID(str_id);
+}
+
+void imgui_push_id_int(int int_id) {
+    ImGui::PushID(int_id);
+}
+
+void imgui_push_id_ptr(const void* ptr_id) {
+    ImGui::PushID(ptr_id);
+}
+
+void imgui_pop_id(void) {
+    ImGui::PopID();
+}
+
 /* Utilities */
 
 bool imgui_is_item_hovered(void) {

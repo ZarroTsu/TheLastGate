@@ -278,6 +278,12 @@ bool imgui_begin_popup_modal(const char* name, bool* p_open, int flags);
 void imgui_end_popup(void);
 void imgui_close_current_popup(void);
 
+/* ID stack - for distinguishing widgets with same label */
+void imgui_push_id_str(const char* str_id);
+void imgui_push_id_int(int int_id);
+void imgui_push_id_ptr(const void* ptr_id);
+void imgui_pop_id(void);
+
 /* Utilities */
 bool imgui_is_item_hovered(void);
 bool imgui_is_item_active(void);
