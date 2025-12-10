@@ -186,6 +186,7 @@ int is_ascroll(int in);
 #define IS_OPP_CLAN(cn, co)		((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)))
 #define IS_MY_ALLY(cn, co)		((((!IS_PLAYER(cn) && !IS_PLAYER(co) && ch[(cn)].data[CHD_GROUP] == ch[(co)].data[CHD_GROUP]) || (IS_PLAYER(cn) && IS_PLAYER(co) && !IS_OPP_CLAN(cn, co))) && !(map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA)) || (IS_PLAYER(cn) && IS_PLAYER(co) && isgroup((cn), (co))) || (IS_PLAYER(cn) && IS_COMPANION(co) && CN_OWNER(co)==cn) || (IS_PLAYER(co) && IS_COMPANION(cn) && CN_OWNER(cn)==co))
 
+#define IS_SPELL(a)				((a==5||a==6||a==8||a==11||a==12||a==15||a==17||a==18||a==19||a==20||a==21||a==23||a==24||a==25||a==26||a==27||a==29||a==32||a==42||a==43||a==46||a==47||a==50||a==51||a==52||a==59||a==64||a==65||a==67)?1:0)
 #define IS_NOMAGIC(cn)			((ch[cn].flags & CF_NOMAGIC) != 0)
 
 // Ditto, with sanity check
@@ -237,6 +238,9 @@ int is_ascroll(int in);
 #define CAN_SORC_PROX(cn)		(IS_SEYA_OR_SORC(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
 #define CAN_ARHR_PROX(cn)		(IS_SEYA_OR_ARHR(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
 #define CAN_BRAV_PROX(cn)		(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
+
+#define GET_PROX(cn)			(B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0)
+#define GET_SFAIL(cn, co)		(((ch[co].escape_timer > TICKS*3) || (ch[co].flags & CF_BODY) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[co].flags & CF_IMMORTAL))?1:0)
 
 #define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]==13)
 

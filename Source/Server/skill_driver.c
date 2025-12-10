@@ -671,7 +671,8 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 	
 	r += n;
 	
-	r = r + r * prox_power/200;
+	if (!(ch[(cn)].flags & CF_AREA_OFF))
+		r = r + r * prox_power/200;
 	
 	return (r * 11/10); // 10% more oomph to make the circles more circular
 }
@@ -814,13 +815,19 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 {
 	int tmp, dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
 	
-	if (intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
+	if (intemp==SK_BLAST || intemp==SK_MJOLNIR || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 	{
-		if ((intemp==SK_BLAST || intemp==SK_OBLITERATE) && IS_NOMAGIC(co)) continue;
+		if (intemp==SK_BLAST || intemp==SK_MJOLNIR)
+		{
+			tmp = spell_blast(cn, co, power, 0, 1);
+			if (intemp==SK_MJOLNIR)
+				spell_shock(cn, co, power);
+		}
+		if (intemp==SK_SLAM)
+			tmp = spell_slam(cn, co, power, 1);
 		
-		if (intemp==SK_BLAST)		tmp = spell_blast(cn, co, power, 0, 1);
-		if (intemp==SK_SLAM)		tmp = spell_slam(cn, co, power, 1);
-		if (intemp==SK_OBLITERATE)	tmp = spell_obliterate(cn, co, power, 1);
+		if (intemp==SK_OBLITERATE)
+			tmp = spell_obliterate(cn, co, power, 1);
 		
 		*avgdmg += max(0, tmp-1);
 		
@@ -835,9 +842,6 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 	}
 	else if (chance_compare(co, power+RANDOM(20), get_target_resistance(cn, co)+RANDOM(20), get_use_mana(intemp)))
 	{
-		if ((intemp==SK_CURSE || intemp==SK_SLOW || intemp==SK_POISON || intemp==SK_VENOM) && IS_NOMAGIC(co))
-			continue;
-		
 		if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, power, 0);
 		switch (intemp)
 		{
@@ -879,13 +883,12 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 // intemp     = type of attack (skill or surround hit)
 // power      = original power of the spell (ie. targeted spell)
 // prox_power = typically SK_PROX but might be the skill power value itself (ie. warcry)
-// cost       = cost of the skill; relevant for targeted skills cast without a target.
 // count      = number of targets already attempted (ie. targeted spell)
 // hit        = number of targets already hit (ie. targeted spell)      - surround value for SH
 // avgdmg     = damage already dealt before now (ie. targeted spell)    - critDam for SH
-int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_power, int cost, int count, int hit, int avgdmg)
+int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_power, int count, int hit, int avgdmg)
 {
-	int co, notarget = 0, sc = 0, aoeImm = 0;
+	int co, r, notarget = 0, sc = 0, aoeImm = 0;
 	int x, xc, xf, xt, y, yc, yf, yt;
 	int r = get_aoe_radius(cn, intemp, prox_power);
 	
@@ -920,7 +923,6 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 			{
 				if (!do_surround_check(cn, co, 0)) continue;
 				damage_mshell(co, power);
-				aoeImm += get_target_immunity(cn, co);
 				count++;
 			}
 		}
@@ -939,26 +941,6 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 				return -1;
 			}
 		}
-		
-		aoeImm /= max(1,count);
-		
-		if (intemp==SK_BLAST)
-		{
-			cost = ((power * 2) / 8 + 5) * (PROX_MULTI + r) / PROX_MULTI;
-			power = other_immunity(power, aoeImm) * 2;
-			power = power*3/4;
-			
-			// Harakim costs less, monster cost more mana
-			if (IS_PLAYER(cn) && IS_ANY_HARA(cn))
-				cost = cost/3;
-			else if (IS_PLAYER_GC(cn))
-				cost = 20;
-			else if (!IS_PLAYER(cn))
-				cost = cost*2;
-		}
-		
-		if (!hit && !no_target && cost && spellcost(cn, cost, intemp, get_use_mana(intemp)))
-			return -1;
 	}
 	
 	// Loop through and hit the targets 
@@ -967,6 +949,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 		{
+			if (IS_SPELL(intemp) && IS_NOMAGIC(co)) continue;
 			if (sc = do_surround_check(cn, co, 1))
 				remember_pvp(cn, co);
 			if (no_target)
@@ -3195,17 +3178,14 @@ int spell_plague(int cn, int co, int flag)
 int skill_plague(int cn, int co, int power)
 {
 	//cast_aoe_spell(cn, co, SK_PLAGUE, power, 0, 0, 0, 0, 0, -1, -1);
-	aoe_driver(cn, co, co, SK_PLAGUE, power, 0, 0, 0, 0, 0);
+	aoe_driver(cn, co, co, SK_PLAGUE, power, GET_PROX(cn), 0, 0, 0);
 }
 
 int spell_curse(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) { return 0; }
-	if (ch[co].flags & CF_BODY) { return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_multiplier(power, cn);
 	
@@ -3229,10 +3209,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	if (power <= 0) 
 	{
 		if (!IS_PLAYER(cn))
-		{
-			// 4 second exhaust for NPCS to keep them from spam-failing
-			add_exhaust(cn, TICKS * 4);
-		}
+			add_exhaust(cn, TICKS * 4); // 4 second exhaust for NPCS to keep them from spam-failing
 		return -1;
 	}
 	
@@ -3266,17 +3243,13 @@ int spell_curse(int cn, int co, int power, int flag)
 }
 void skill_curse(int cn)
 {
-	int d20 = SP_MULT_CURSE;
-	int power, aoe_power, cost, cost2, flag = 0;
-	int count = 0, hit = 0;
+	int power = M_SK(cn, SK_CURSE), cost = SP_COST_CURSE, cost2 = SP_COST_SLOW, flag = 0;
+	int count = 0, hit = 0, d20 = SP_MULT_CURSE;
 	int co, co_orig = -1;
-	int can_aoe = CAN_SORC_PROX(cn);
+	//int can_aoe = CAN_SORC_PROX(cn);
+	//int aoe_power = GET_PROX(cn);
 	
 	if (do_get_iflag(cn, SF_BOOK_SHIV)) flag = 1;
-	
-	power = M_SK(cn, SK_CURSE);
-	aoe_power = M_SK(cn, SK_PROX);
-	cost = SP_COST_CURSE;
 	
 	// Tarot Card - Tower :: Change Curse into Greater Curse
 	if (do_get_iflag(cn, SF_TOWER)) 
@@ -3286,65 +3259,46 @@ void skill_curse(int cn)
 	}
 	
 	if (flag)
-	{
-		cost2 = SP_COST_SLOW;
+		cost += do_get_iflag(cn, SF_EMPEROR)?(cost2*3/4):cost2; // Shiva book adds Slow's mana cost
 	
-		// Tarot Card - Emperor :: Change Slow into Greater Slow
-		if (do_get_iflag(cn, SF_EMPEROR)) 
-		{ 
-			cost2 = cost2 * 3 / 4;
-		}
-		
-		cost += cost2;
-	}
-	
-	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20)))
-		return;
+	// Get spell target - return on failure or not enough mana
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20))) return;
 	
 	// If we have a valid target, cast Curse on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		spell_curse(cn, co, power, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
+		spell_curse(cn, (co_orig = co), power, 0);
+		count = hit = 1;
 	}
 	
+	// Spell AoE
+	if (aoe_driver(cn, cn, co, SK_CURSE, power, B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0, count, hit, 0) < 0) return;
+	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	
 	// Cast AoE or general surround-hit
+	/*
 	if (can_aoe)
 	{
-		//if (cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, co, SK_CURSE, power, aoe_power, cost, count, hit, 0) < 0)
-			return;
-		
+		if (cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit, 0, -1, -1) < 0) return;
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
 		surround_cast(cn, co_orig, 0, SK_CURSE, power, -1, -1);
 	}
+	*/
 	
 	// Book - Shiva's Malice :: Cast Slow after casting Curse on success
-	if (flag)
-	{
-		skill_slow(cn, 1);
-	}
-	else
-	{
-		add_exhaust(cn, SK_EXH_CURSE);
-	}
+	if (flag)  skill_slow(cn, 1);
+	else      add_exhaust(cn, SK_EXH_CURSE);
 }
+
 // Feb 2020 - Slow
 int spell_slow(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) { return 0; }
-	if (ch[co].flags & CF_BODY) { return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_multiplier(power, cn);
 	
@@ -3368,10 +3322,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	if (power <= 0) 
 	{
 		if (!IS_PLAYER(cn))
-		{
-			// 4 second exhaust for NPCS to keep them from spam-failing
-			add_exhaust(cn, TICKS * 4);
-		}
+			add_exhaust(cn, TICKS * 4); // 4 second exhaust for NPCS to keep them from spam-failing
 		return -1;
 	}
 	
@@ -3398,15 +3349,11 @@ int spell_slow(int cn, int co, int power, int flag)
 }
 void skill_slow(int cn, int flag)
 {
-	int d20 = SP_MULT_SLOW;
-	int power, aoe_power, cost;
-	int count = 0, hit = 0;
+	int power = M_SK(cn, SK_SLOW), cost = SP_COST_SLOW;
+	int count = 0, hit = 0, d20 = SP_MULT_SLOW;
 	int co, co_orig = -1;
-	int can_aoe = CAN_SORC_PROX(cn);
-	
-	power = M_SK(cn, SK_SLOW);
-	aoe_power = M_SK(cn, SK_PROX);
-	cost = SP_COST_SLOW;
+	//int can_aoe = CAN_SORC_PROX(cn);
+	//int aoe_power = GET_PROX(cn);
 	
 	// Tarot Card - Emperor :: Change Slow into Greater Slow
 	if (do_get_iflag(cn, SF_EMPEROR)) 
@@ -3416,52 +3363,42 @@ void skill_slow(int cn, int flag)
 	}
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, flag?0:cost, SK_SLOW, 1, power, flag?-1:d20)))
-		return;
+	if (!(co = get_target(cn, 0, 0, 0, flag?0:cost, SK_SLOW, 1, power, flag?-1:d20))) return;
 	
 	// If we have a valid target, cast Slow on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		spell_slow(cn, co, power, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
+		spell_slow(cn, (co_orig = co), power, 0);
+		count = hit = 1;
 	}
 	
+	// Spell AoE
+	if (aoe_driver(cn, cn, co, SK_SLOW, power, GET_PROX(cn), count, hit, 0) < 0) return;
+	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	
+	/*
 	// Cast AoE or general surround-hit
 	if (can_aoe)
 	{
-		//if (cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, co, SK_SLOW, power, aoe_power, cost, count, hit, 0) < 0)
-			return;
-		
+		if (cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit, 0, -1, -1) < 0) return;
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
 		surround_cast(cn, co_orig, 0, SK_SLOW, power, -1, -1);
 	}
+	*/
 	
 	// Book - Shiva's Malice :: Extend exhaust after casting both Curse and Slow
-	if (flag)
-	{
-		add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
-	}
-	else
-	{
-		add_exhaust(cn, SK_EXH_SLOW);
-	}
+	if (flag) add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
+	else      add_exhaust(cn, SK_EXH_SLOW);
 }
 
 int spell_frostburn(int cn, int co, int power)
 {
 	int in, n, dur, ppow;
 	
-	if (ch[co].escape_timer > TICKS*3) { return 0; }
-	if (ch[co].flags & CF_BODY) { return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_multiplier(power, cn);
 	power = spell_immunity(cn, co, power);
@@ -3488,10 +3425,7 @@ int spell_poison(int cn, int co, int power, int flag)
 {
 	int in, n, dur, ppow, venommod, signet=0;
 	
-	if (ch[co].escape_timer > TICKS*3) { return 0; }
-	if (ch[co].flags & CF_BODY) { return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_multiplier(power, cn);
 	
@@ -3570,21 +3504,15 @@ int spell_poison(int cn, int co, int power, int flag)
 void skill_poison(int cn)
 {
 	int d20 = SP_MULT_POISON;
-	int power, aoe_power, cost;
+	int power = M_SK(cn, SK_POISON), cost = SP_COST_POISON;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
 	int can_aoe = (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn));
-	
-	power = M_SK(cn, SK_POISON);
-	aoe_power = M_SK(cn, SK_PROX);
-	cost = SP_COST_POISON;
+	//int aoe_power = GET_PROX(cn);
 	
 	if (do_get_iflag(cn, SF_TOWER_R)) d20 = SP_MULT_POISON2;
 	
-	if (IS_PLAYER(cn) && IS_ANY_MERC(cn)) 
-	{
-		cost /= 2;
-	}
+	if (IS_PLAYER(cn) && IS_ANY_MERC(cn)) cost /= 2;
 	
 	// Get spell target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_POISON, 1, power, d20)))
@@ -3593,26 +3521,26 @@ void skill_poison(int cn)
 	// If we have a valid target, cast Poison on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		spell_poison(cn, co, power, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
+		spell_poison(cn, (co_orig = co), power, 0);
+		count = hit = 1;
 	}
 	
+	// Spell AoE
+	if (aoe_driver(cn, cn, co, SK_POISON, power, GET_PROX(cn), count, hit, 0) < 0) return;
+	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	
+	/*
 	// Cast AoE or general surround-hit
 	if (can_aoe)
 	{
-		//if (cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, co, SK_POISON, power, aoe_power, cost, count, hit, 0) < 0)
-			return;
-		
+		if (cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit, 0, -1, -1) < 0) return;
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
 		surround_cast(cn, co_orig, 0, SK_POISON, power, -1, -1);
 	}
+	*/
 	
 	add_exhaust(cn, SK_EXH_POISON);
 }
@@ -3621,8 +3549,8 @@ int spell_stun(int cn, int co, int power)
 {
 	int n, in, dur;
 	
-	if (ch[co].escape_timer > TICKS*3) { return 0; }
-	if (ch[co].flags & CF_BODY) { return 0; }
+	if (ch[co].escape_timer > TICKS*3)     { return 0; }
+	if (ch[co].flags & CF_BODY)            { return 0; }
 	if (!do_surround_check(cn, co, 1) || 
 		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0)) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
@@ -3800,12 +3728,9 @@ int spell_warcry(int cn, int co, int power, int flag)
 }
 void skill_warcry(cn)
 {
-	int power, aoepower, cost;
-	
-	power = M_SK(cn, SK_WARCRY);
-	power = skill_multiplier(power, cn);
-	aoepower = M_SK(cn, SK_WARCRY) + (B_SK(cn, SK_PROX)?(M_SK(cn, SK_PROX)/2):0);
-	cost = SP_COST_WARCRY;
+	int power = skill_multiplier(M_SK(cn, SK_WARCRY), cn), ;
+	int cost = SP_COST_WARCRY;
+	int aoepower = M_SK(cn, SK_WARCRY) + GET_PROX(cn)/2;
 	
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, cost, SK_WARCRY, 0)) { return; }
@@ -3817,8 +3742,7 @@ void skill_warcry(cn)
 	else
 	{
 		//if (cast_aoe_spell(cn, 0, SK_WARCRY, power, aoepower, 0, 0, 0, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, 0, SK_WARCRY, power, aoepower, 0, 0, 0, 0) < 0)
-			return;
+		if (aoe_driver(cn, cn, 0, SK_WARCRY, power, aoepower, 0, 0, 0) < 0) return;
 	}
 	
 	add_exhaust(cn, SK_EXH_WARCRY + TICKS * power/80);
@@ -4192,10 +4116,7 @@ int spell_scorch(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) 						{ return 0; }
-	if (ch[co].flags & CF_BODY) 							{ return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) 	{ return 0; }
-	if (ch[co].flags & CF_IMMORTAL) 						{ return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_multiplier(power, cn);
 	power = spell_immunity(cn, co, power);
@@ -4268,17 +4189,13 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 }
 void skill_blast(int cn)
 {
-	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int power, aoe_power, cost, exhst = SK_EXH_BLAST;
-	int count = 0, hit = 0, in = 0;
+	int power = spell_multiplier(M_SK(cn, SK_BLAST), cn);
+	int cost = (power * 2) / 8 + 5;
+	int count = 0, hit = 0, in = 0, exhst = SK_EXH_BLAST;
 	int co = 0, co_orig = 0;
 	int avgdmg = 0;
-	int can_aoe = CAN_ARHR_PROX(cn);
-	
-	power = M_SK(cn, SK_BLAST);
-	power = spell_multiplier(power, cn);
-	aoe_power = M_SK(cn, SK_PROX);
-	cost = (power * 2) / 8 + 5;
+	//int can_aoe = CAN_ARHR_PROX(cn);
+	//int aoe_power = GET_PROX(cn);
 	
 	// Harakim & Sorc costs less, monster cost more mana
 	if (IS_PLAYER(cn) && (IS_ANY_HARA(cn) || IS_SORCERER(cn) || IS_BRAVER(cn) || IS_LYCANTH(cn)))
@@ -4287,34 +4204,32 @@ void skill_blast(int cn)
 		cost = 20;
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLAST, 1, power, 0)))
-		return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLAST, 1, power, 0))) return;
 	
 	// If we have a valid target, cast Blast on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		avgdmg = spell_blast(cn, co, power, 0, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
-		
-		check_gloves(cn, co, 0, dr1, dr2);
+		avgdmg = spell_blast(cn, (co_orig = co), power, 0, 0);
+		count = hit = 1;
+		check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
 	}
 	
+	// Spell AoE
+	if ((hit = aoe_driver(cn, cn, co, SK_BLAST, power, GET_PROX(cn), count, hit, avgdmg)) < 0) return;
+	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	
+	/*
 	// Cast AoE or general surround-hit
 	if (can_aoe)
 	{
-		//if ((hit = cast_aoe_spell(cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg, dr1, dr2)) < 0)
-		if ((hit = aoe_driver(cn, cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg)) < 0)
-			return;
-		
+		if ((hit = cast_aoe_spell(cn, co, SK_BLAST, power, aoe_power, cost, count, hit, avgdmg, dr1, dr2)) < 0) return;
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
 	else
 	{
 		hit += surround_cast(cn, co_orig, 0, SK_BLAST, power, dr1, dr2);
 	}
+	*/
 	
 	// Tree - cooldown reduced by # hit
 	if (T_ARHR_SK(cn, 4))
@@ -4362,14 +4277,11 @@ int spell_obliterate(int cn, int co, int power, int aoe)
 }
 int skill_obliterate(int cn, int co, int power)
 {
-	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int aoe_power = M_SK(cn, SK_PROX);
-	int count = 1, hit = 1, avgdmg = 0;
+	int avgdmg = spell_obliterate(cn, co, power, 0);
 	
-	avgdmg = spell_obliterate(cn, co, power, 0);
-	check_gloves(cn, co, 0, dr1, dr2);
-	//cast_aoe_spell(cn, co, SK_OBLITERATE, power, aoe_power, 0, count, hit, avgdmg, dr1, dr2);
-	aoe_driver(cn, co, co, SK_OBLITERATE, power, aoe_power, 0, count, hit, avgdmg);
+	check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
+	//cast_aoe_spell(cn, co, SK_OBLITERATE, power, GET_PROX(cn), 0, 1, 1, avgdmg, dr1, dr2);
+	aoe_driver(cn, co, co, SK_OBLITERATE, power, GET_PROX(cn), 1, 1, avgdmg);
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	return 1;
@@ -4416,14 +4328,11 @@ int spell_slam(int cn, int co, int power, int aoe)
 }
 int skill_slam(int cn, int co, int power)
 {
-	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int aoe_power = M_SK(cn, SK_PROX);
-	int count = 1, hit = 1, avgdmg = 0;
+	int avgdmg = spell_slam(cn, co, power, 0);
 	
-	avgdmg = spell_slam(cn, co, power, 0);
-	check_gloves(cn, co, 0, dr1, dr2);
-	//cast_aoe_spell(cn, co, SK_SLAM, power, aoe_power, 0, count, hit, avgdmg, dr1, dr2);
-	aoe_driver(cn, co, co, SK_SLAM, power, aoe_power, 0, count, hit, avgdmg);
+	check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
+	//cast_aoe_spell(cn, co, SK_SLAM, power, GET_PROX(cn), 0, count, hit, avgdmg, dr1, dr2);
+	aoe_driver(cn, co, co, SK_SLAM, power, GET_PROX(cn), 0, 1, 1, avgdmg);
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	return 1;
@@ -5766,10 +5675,7 @@ int spell_aggravate(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) 						{ return 0; }
-	if (ch[co].flags & CF_BODY) 							{ return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) 	{ return 0; }
-	if (ch[co].flags & CF_IMMORTAL) 						{ return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -5794,10 +5700,7 @@ int spell_bleed(int cn, int co, int power)
 {
 	int in, n, dur, bpow;
 	
-	if (ch[co].escape_timer > TICKS*3) 						{ return 0; }
-	if (ch[co].flags & CF_BODY) 							{ return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) 	{ return 0; }
-	if (ch[co].flags & CF_IMMORTAL) 						{ return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = power*6/5;
 	
@@ -5992,10 +5895,7 @@ int spell_weaken(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) 						{ return 0; }
-	if (ch[co].flags & CF_BODY) 							{ return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) 	{ return 0; }
-	if (ch[co].flags & CF_IMMORTAL) 						{ return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
 	if (n=st_skillcount(cn, 34))          power = power*(20+n)/20;
@@ -6213,10 +6113,7 @@ int spell_shock(int cn, int co, int power)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) 						{ return 0; }
-	if (ch[co].flags & CF_BODY) 							{ return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) 	{ return 0; }
-	if (ch[co].flags & CF_IMMORTAL) 						{ return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -6324,10 +6221,7 @@ int spell_taunt(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (ch[co].escape_timer > TICKS*3) { return 0; }
-	if (ch[co].flags & CF_BODY) { return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-	if (ch[co].flags & CF_IMMORTAL) { return 0; }
+	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
