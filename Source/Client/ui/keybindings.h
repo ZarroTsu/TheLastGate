@@ -3,20 +3,19 @@
 #include <SDL2/SDL.h>
 
 #define NUM_SPELL_HOTKEYS 20
-#define NUM_GENERAL_HOTKEYS 1
+#define NUM_GENERAL_HOTKEYS 9
 
 // GENERAL HOTKEYS
 #define FIGHTBACK_HOTKEY 0
-//SWAP
+#define SWAP_HOTKEY 1
+#define GC_OFFENSE_HOTKEY 2
+#define GC_DEFENSE_HOTKEY 3
+#define GC_PASSIVE_HOTKEY 4
+#define GC_WAIT_HOTKEY 5
+#define GC_FOLLOW_HOTKEY 6
+#define GC_MOVE_HOTKEY 7
+#define GC_BUFFS_HOTKEY 8
 
-// GC Geronimo
-// GC Offense
-// GC Defense
-// GC Passive
-// GC wait
-// gc follow
-// gc move
-// Recall GC
 
 /* Modifier flags - match SDL but use simpler names */
 typedef enum {

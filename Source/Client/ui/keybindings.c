@@ -72,9 +72,34 @@ void keybindings_init(void) {
     keybind_config.spell_hotkeys[19].key = SDLK_b;
     keybind_config.spell_hotkeys[19].modifier = KEYBIND_MOD_CTRL;
 
-    /* Toggle Hotkeys */
+    /* General Hotkeys */
     keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].key = SDLK_UNKNOWN;
     keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[SWAP_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[SWAP_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_DEFENSE_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_DEFENSE_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_PASSIVE_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_PASSIVE_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_WAIT_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_WAIT_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_FOLLOW_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_FOLLOW_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_MOVE_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_MOVE_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[GC_BUFFS_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[GC_BUFFS_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
 }
 
 const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size) {

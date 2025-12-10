@@ -181,9 +181,41 @@ void handle_input(void) {
                     break;
                 }
 
-                int hotkey = keybinding_find_general(e.key.keysym.sym, SDL_GetModState());
+                const int hotkey = keybinding_find_general(e.key.keysym.sym, SDL_GetModState());
                 if (hotkey == FIGHTBACK_HOTKEY) {
                     say("/fightback");
+                    break;
+                }
+                if (hotkey == SWAP_HOTKEY) {
+                    say("/swap");
+                    break;
+                }
+                if (hotkey == GC_OFFENSE_HOTKEY) {
+                    say("Offense");
+                    break;
+                }
+                if (hotkey == GC_DEFENSE_HOTKEY) {
+                    say("Defense");
+                    break;
+                }
+                if (hotkey == GC_PASSIVE_HOTKEY) {
+                    say("Passive");
+                    break;
+                }
+                if (hotkey == GC_WAIT_HOTKEY) {
+                    say("Wait");
+                    break;
+                }
+                if (hotkey == GC_FOLLOW_HOTKEY) {
+                    say("Follow");
+                    break;
+                }
+                if (hotkey == GC_MOVE_HOTKEY) {
+                    say("Move");
+                    break;
+                }
+                if (hotkey == GC_BUFFS_HOTKEY) {
+                    say("/gcb");
                     break;
                 }
 

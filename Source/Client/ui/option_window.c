@@ -193,6 +193,27 @@ static void keybind_settings_tab() {
     imgui_spacing();
 
     keybind("Toggle Fightback", &keybind_config.general_hotkeys[FIGHTBACK_HOTKEY], 20);
+    keybind("Swap", &keybind_config.general_hotkeys[SWAP_HOTKEY], 21);
+
+    imgui_spacing();
+    imgui_separator();
+
+    imgui_calc_text_size_simple(&text_width, NULL, "GC Commands");
+    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_center_next_item(text_width);
+    imgui_text("GC Commands");
+    imgui_pop_style_color(1);
+
+    imgui_spacing();
+
+    keybind("Offense Mode", &keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY], 22);
+    keybind("Defense Mode", &keybind_config.general_hotkeys[GC_DEFENSE_HOTKEY], 23);
+    keybind("Passive Mode", &keybind_config.general_hotkeys[GC_PASSIVE_HOTKEY], 24);
+    keybind("Wait", &keybind_config.general_hotkeys[GC_WAIT_HOTKEY], 25);
+    keybind("Follow", &keybind_config.general_hotkeys[GC_FOLLOW_HOTKEY], 26);
+    keybind("Move", &keybind_config.general_hotkeys[GC_MOVE_HOTKEY], 27);
+    keybind("Buffs", &keybind_config.general_hotkeys[GC_BUFFS_HOTKEY], 28);
+
 }
 
 static void render_imgui_version() {
