@@ -4912,7 +4912,7 @@ void engine(void)
 			}
 			input_event_count = 0;
 
-			imgui_new_frame();
+			imgui_new_frame(1.0f, 1.0f);
 
 			spell_hud();
 			if (show_opts) {

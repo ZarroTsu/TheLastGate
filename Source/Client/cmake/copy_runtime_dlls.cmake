@@ -6,6 +6,9 @@ if (MINGW)
             # Common
             libpng16-16.dll
             zlib1.dll
+            libgcc_s_seh-1.dll
+            libstdc++-6.dll
+            libwinpthread-1.dll
     )
 
     # Copy DLLs to lib/ subdirectory

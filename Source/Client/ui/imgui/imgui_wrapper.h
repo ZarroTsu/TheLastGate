@@ -17,7 +17,7 @@ extern "C" {
 /* Initialization and lifecycle */
 void imgui_init(void* sdl_window, void* gl_context);
 void imgui_shutdown(void);
-void imgui_new_frame(void);
+void imgui_new_frame(float scale_x, float scale_y);
 void imgui_render(void);
 
 /* Font management - call after imgui_init() but before first frame */
