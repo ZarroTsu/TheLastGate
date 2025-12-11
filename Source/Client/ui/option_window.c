@@ -13,7 +13,7 @@
 #include "../engine.h"
 #include "../main.h"
 #include "../render.h"
-#include "../sound.h"
+#include "../audio/sound.h"
 #include "../graphics/sdl.h"
 #include "widgets.h"
 
@@ -133,7 +133,7 @@ static void audio_settings_tab() {
     imgui_push_style_color(IMGUI_COL_FRAME_BG_ACTIVE, 0.4f, 0.4f, 0.4f, 1.0f);   /* Active */
     imgui_push_style_color(IMGUI_COL_CHECK_MARK, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);  /* Checkmark */
 
-    imgui_checkbox("Audio Enabled?", &dosound);
+    imgui_checkbox("Audio Enabled?", &do_sound);
 
     imgui_pop_style_color(4);  /* Pop the 4 checkbox colors */
 

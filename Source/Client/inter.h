@@ -144,7 +144,7 @@ void xlog(char font,char *format,...);
 void mxlog(char font,char *format,...);
 // TODO: SDL2_MIXER - This function signature stays the same, but implementation changes
 // See sound.c for migration details. When SDL is enabled, this will call SDL2_mixer functions.
-int play_sound(char *file,int vol,int pan);
+int play_sound(const char *file,int vol,int pan);
 void reset_block(void);
 
 void setres_800(void);

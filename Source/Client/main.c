@@ -40,7 +40,7 @@
 #include "input.h"
 #include "inter.h"
 #include "render.h"
-#include "sound.h"
+#include "audio/sound.h"
 #include "ui/keybindings.h"
 
 AppState app_state = {

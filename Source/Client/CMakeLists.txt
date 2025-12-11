@@ -41,8 +41,8 @@ add_executable(TheLastGate WIN32
         sdl_magic.c
         socket.c
         socket.h
-        sound.c
-        sound.h
+        audio/sound.c
+        audio/sound.h
         ui/option_window.c
         ui/option_window.h
         ui/widgets.c

@@ -5,14 +5,15 @@
 #include <SDL2/SDL_audio.h>
 #include <string.h>
 
-#include "main.h"
+#include "../main.h"
 
 
-int domusic = 0;
-int dosound = 1;
+int do_music = 0;
+int do_sound = 1;
 
 // This should be a big enough cache for now.
 #define MAX_CACHED_SOUNDS 64
+
 typedef struct {
     char filename[256];
     Mix_Chunk *chunk;
@@ -79,11 +80,11 @@ void ds_pan_to_sdl_mixer(int pan, Uint8 *l_out, Uint8 *r_out) {
 
     if (pan < 0) {
         // shift left → attenuate right
-        float att = powf(10.0f, (pan / 100.0f) / 20.0f); // DS uses 0.01 dB units
+        float att = powf(10.0f, ((float)pan / 100.0f) / 20.0f); // DS uses 0.01 dB units
         right = att;
     } else if (pan > 0) {
         // shift right → attenuate left
-        float att = powf(10.0f, (-pan / 100.0f) / 20.0f);
+        float att = powf(10.0f, ((float)-pan / 100.0f) / 20.0f);
         left = att;
     }
 
@@ -92,8 +93,8 @@ void ds_pan_to_sdl_mixer(int pan, Uint8 *l_out, Uint8 *r_out) {
     *r_out = (Uint8) (right * 255.0f);
 }
 
-int play_sound(char *file, int vol, int p) {
-    if (!dosound) return 0;
+int play_sound(const char *file, const int vol, const int p) {
+    if (!do_sound) return 0;
 
     // Get sound from cache (or load and cache it)
     Mix_Chunk *chunk = get_cached_sound(file);
@@ -105,17 +106,17 @@ int play_sound(char *file, int vol, int p) {
     }
 
     // Track this chunk for reference (not for freeing, since it's cached)
-    if (channel >= 0 && channel < 10) {
+    if (channel < 10) {
         channel_chunks[channel] = chunk;
     }
 
     // Set volume (convert from DirectSound decibels to SDL_mixer 0-128 range)
-    float att = powf(10.0f, vol / 2000.0f);
-    int sdl_volume = (int)(att * MIX_MAX_VOLUME);
+    float att = powf(10.0f, (float)vol / 2000.0f);
+    int sdl_volume = (int) (att * MIX_MAX_VOLUME);
 
     if (sdl_volume < 0) sdl_volume = 0;
     if (sdl_volume > MIX_MAX_VOLUME) sdl_volume = MIX_MAX_VOLUME;
-    sdl_volume *= app_state.volume_level / 10.0f;
+    sdl_volume *= (int)((float)app_state.volume_level / 10.0f);
 
     Mix_Volume(channel, sdl_volume);
 

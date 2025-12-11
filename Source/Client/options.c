@@ -97,7 +97,7 @@ struct pdata pdata={"","","",0};
 // option flags
 //--------------
 
-extern int domusic,dosound,smode;
+extern int do_music,do_sound,smode;
 static int opmusic,opsound,opshadow,opdarkmode;
 int race=0,sex=0;
 
@@ -248,8 +248,8 @@ void load_options(void)
 		if (read(handle,history,sizeof(history))!=sizeof(history)) flag=1;
 		if (read(handle,hist_len,sizeof(hist_len))!=sizeof(hist_len)) flag=1;
 		if (read(handle,words,sizeof(words))!=sizeof(words)) flag=1;
-		if (read(handle,&domusic,sizeof(domusic))!=sizeof(domusic)) flag=1;
-		if (read(handle,&dosound,sizeof(dosound))!=sizeof(dosound)) flag=1;
+		if (read(handle,&do_music,sizeof(do_music))!=sizeof(do_music)) flag=1;
+		if (read(handle,&do_sound,sizeof(do_sound))!=sizeof(do_sound)) flag=1;
 		if (read(handle,&pdata,sizeof(pdata))!=sizeof(pdata)) flag=1;
 		if (read(handle,&okey,sizeof(okey))!=sizeof(okey)) flag=1;
 		if (read(handle,&app_state.gamma,sizeof(app_state.gamma))!=sizeof(app_state.gamma)) app_state.gamma=5000;
@@ -266,7 +266,7 @@ void load_options(void)
 		memset(history,0,sizeof(history));
 		memset(hist_len,0,sizeof(hist_len));
 		memset(words,0,sizeof(words));
-		domusic=0; dosound=1; do_alpha=0; do_shadow=1; app_state.windowed=1; do_darkmode=0; app_state.gamma=5000;
+		do_music=0; do_sound=1; do_alpha=0; do_shadow=1; app_state.windowed=1; do_darkmode=0; app_state.gamma=5000;
 		memset(&pdata,0,sizeof(pdata));
 		pdata.show_names=1;
 		pdata.hide=1;
@@ -369,8 +369,8 @@ void save_options(void)
 		write(handle,history,sizeof(history));
 		write(handle,hist_len,sizeof(hist_len));
 		write(handle,words,sizeof(words));
-		write(handle,&domusic,sizeof(domusic));
-		write(handle,&dosound,sizeof(dosound));
+		write(handle,&do_music,sizeof(do_music));
+		write(handle,&do_sound,sizeof(do_sound));
 		write(handle,&pdata,sizeof(pdata));
 		write(handle,&okey,sizeof(okey));
 		write(handle,&app_state.gamma,sizeof(app_state.gamma));
@@ -699,8 +699,8 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case WM_CLOSE:			
 			//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 			//else domusic=0;
-			if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) dosound=1;
-			else dosound=0;
+			if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) do_sound=1;
+			else do_sound=0;
 
 			if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 			else do_shadow=0;
@@ -731,8 +731,8 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					}
 					//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 					//else domusic=0;
-					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) dosound=1;
-					else dosound=0;
+					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) do_sound=1;
+					else do_sound=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 					else do_shadow=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
@@ -775,8 +775,8 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				case    IDCANCEL:
 					//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 					//else domusic=0;
-					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) dosound=1;
-					else dosound=0;
+					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) do_sound=1;
+					else do_sound=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 					else do_shadow=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
@@ -1032,7 +1032,7 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 void options(void)
 {
-	opmusic=domusic; opsound=dosound; opshadow=do_shadow; opdarkmode=do_darkmode;
+	opmusic=do_music; opsound=do_sound; opshadow=do_shadow; opdarkmode=do_darkmode;
 
 	if (DialogBox(hinst,MAKEINTRESOURCE(OPTIONS),desk_hwnd,OptionsProc)==-1) {
 		MessageBeep(MB_ICONEXCLAMATION);
