@@ -1,6 +1,6 @@
 #include "spell_hud.h"
 
-#include "imgui_wrapper.h"
+#include "ui/imgui/imgui_wrapper.h"
 #include "inter.h"
 #include "keybindings.h"
 #include "main.h"

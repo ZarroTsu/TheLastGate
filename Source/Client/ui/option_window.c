@@ -7,7 +7,7 @@
 
 #include <stdbool.h>
 
-#include "imgui_wrapper.h"
+#include "ui/imgui/imgui_wrapper.h"
 #include "keybindings.h"
 #include "ui_common.h"
 #include "../engine.h"

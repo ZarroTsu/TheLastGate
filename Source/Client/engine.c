@@ -31,7 +31,7 @@
 #include "external/glad/include/glad/glad.h"
 
 #include "common.h"
-#include "imgui_wrapper.h"
+#include "ui/imgui/imgui_wrapper.h"
 #include "input.h"
 #include "inter.h"
 #include "main.h"

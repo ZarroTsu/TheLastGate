@@ -1,7 +1,6 @@
 #pragma once
 #include <stdbool.h>
 
-#include "imgui_wrapper.h"
 #include "keybindings.h"
 
 #define BUTTON_TEXT_COLOR imgui_color_convert_float4_to_u32(0.95f, 0.85f, 0.41f, 1.0f)

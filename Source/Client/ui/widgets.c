@@ -1,6 +1,6 @@
 #include "widgets.h"
 
-#include "imgui_wrapper.h"
+#include "ui/imgui/imgui_wrapper.h"
 #include "ui_common.h"
 #include "graphics/sdl.h"
 #include "keybindings.h"

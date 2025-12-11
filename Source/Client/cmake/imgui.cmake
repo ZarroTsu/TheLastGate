@@ -3,7 +3,7 @@
 # Build configuration for Dear ImGui and its C wrapper
 # This is the ONLY place where C++ compilation happens in the project
 
-set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ui/imgui/imgui)
+set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
 
 # Dear ImGui core source files
 set(IMGUI_SOURCES
@@ -37,7 +37,7 @@ set_target_properties(imgui_wrapper PROPERTIES
 
 # Include directories for ImGui
 target_include_directories(imgui_wrapper PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui/imgui  # For imgui_wrapper.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui  # For imgui_wrapper.h
     ${IMGUI_DIR}                          # For imgui.h
     ${IMGUI_DIR}/backends                 # For backends
 )
