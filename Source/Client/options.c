@@ -35,7 +35,7 @@
 #include "merc.rh"
 #include "main.h"
 #include "options.h"
-#include "ui/keybindings.h"
+#include "config/keybindings.h"
 
 /*
  * Borland and Microsoft disagree on the size of the OPENFILENAME structure.

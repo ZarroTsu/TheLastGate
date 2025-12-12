@@ -2,7 +2,7 @@
 
 #include "ui/imgui/imgui_wrapper.h"
 #include "inter.h"
-#include "keybindings.h"
+#include "../config/keybindings.h"
 #include "main.h"
 #include "ui_common.h"
 #include "common.h"

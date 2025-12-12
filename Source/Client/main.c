@@ -41,7 +41,7 @@
 #include "inter.h"
 #include "render.h"
 #include "audio/sound.h"
-#include "ui/keybindings.h"
+#include "config/keybindings.h"
 
 AppState app_state = {
 	.tricky_flag = 0,

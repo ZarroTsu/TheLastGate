@@ -12,7 +12,7 @@
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "ui/option_window.h"
-#include "ui/keybindings.h"
+#include "config/keybindings.h"
 #include "ui/imgui/imgui_wrapper.h"
 
 bool waiting_for_keybind = false;
