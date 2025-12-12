@@ -1020,7 +1020,7 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
             update_buttons(hwnd);
 
-			sprintf(buf,MNAME" v%d.%02d.%02d  --  Game Options",VERSION>>16,(VERSION>>8)&255,VERSION&255);
+			sprintf(buf,MNAME" v%d.%02d.%02d  --  Game Options",NETWORKING_VERSION>>16,(NETWORKING_VERSION>>8)&255,NETWORKING_VERSION&255);
 			SetWindowText(hwnd,buf);
 			done=1;
 			return 1;

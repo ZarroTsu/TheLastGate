@@ -168,7 +168,7 @@ int so_login(unsigned char *buf,HWND hwnd)
 
 		obuf[0]=CL_CHALLENGE;
 		*(unsigned long*)(obuf+1)=tmp;
-		*(unsigned long*)(obuf+5)=VERSION;
+		*(unsigned long*)(obuf+5)=NETWORKING_VERSION;
 		*(unsigned long*)(obuf+9)=race;
 		send(sock,(char*)obuf,16,0);
 

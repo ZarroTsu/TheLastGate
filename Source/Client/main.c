@@ -56,6 +56,8 @@ AppState app_state = {
 	.use_queue = false,
 };
 
+const SdlClientVersion CLIENT_VERSION = {2,1};
+
 extern void cmd3(int cmd,int x,int y,int z);
 
 extern int pskip,pidle;
@@ -335,7 +337,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// freopen("CONOUT$", "w", stderr);
 	// freopen("CONIN$",  "r", stdin);
 	parse_cmd(lpCmdLine);
-	// freopen("client.log", "w", stdout);
+	freopen("client.log", "w", stdout);
 	setvbuf(stdout, NULL, _IONBF, 0); // unbuffered (optional but recommended)
 
 	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
@@ -420,7 +422,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				"SDL init failed with code %d.\n"
 				"Client Version %d.%02d.%02d\n"
 				"R=%04X, G=%04X, B=%04X\n"
-				-tmp,VERSION>>16,(VERSION>>8)&255,VERSION&255,RED,GREEN,BLUE);
+				-tmp,NETWORKING_VERSION>>16,(NETWORKING_VERSION>>8)&255,NETWORKING_VERSION&255,RED,GREEN,BLUE);
 		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
 		// SDL2: Use SDL_ShowSimpleMessageBox()
 		MessageBox(hwnd,buf,"DirectX init failed.",MB_ICONSTOP|MB_OK);

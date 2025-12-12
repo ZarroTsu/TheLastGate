@@ -302,9 +302,22 @@ void handle_input(void) {
                         }
                         break;
                     case SDLK_F11:
+                        SDL_SysWMinfo info;
+                        SDL_VERSION(&info.version);
+                        const GLubyte *version = glGetString(GL_VERSION);
+                        const GLubyte *vendor  = glGetString(GL_VENDOR);
+                        const GLubyte *renderer = glGetString(GL_RENDERER);
+                        const GLubyte *glsl    = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
                         xlog(2, " ");
-                        xlog(2, "Client Version %d.%02d.%02d",VERSION >> 16, (VERSION >> 8) & 255,VERSION & 255);
+                        xlog(2, "Client Version RC%d.%02d", CLIENT_VERSION.major, CLIENT_VERSION.minor);
+                        xlog(2, "Networking Version %d.%02d.%02d",NETWORKING_VERSION >> 16, (NETWORKING_VERSION >> 8) & 255,NETWORKING_VERSION & 255);
                         xlog(2, "Server Version %d.%02d.%02d", ser_ver >> 16, (ser_ver >> 8) & 255, ser_ver & 255);
+                        xlog(2, "SDL Version %d.%02d.%02d", info.version.major, info.version.minor, info.version.patch);
+                        xlog(2, "OpenGL Version: %s", version);
+                        xlog(2, "OpenGL Vendor: %s", vendor);
+                        xlog(2, "OpenGL Renderer: %s", renderer);
+                        xlog(2, "GLSL Version: %s", glsl);
                         xlog(2, "R=%04X, G=%04X, B=%04X", RED, GREEN, BLUE);
                         xlog(2, "Skip=%d%% Idle=%d%%", pskip, pidle);
                         log_atlas_debug_info();
