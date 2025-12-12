@@ -5,6 +5,7 @@
 #include "scaling.h"
 #include <stdio.h>
 
+#include "sdl.h"
 #include "shaders/shaders.h"
 #include "../main.h"
 #include "glad/glad.h"
@@ -28,16 +29,7 @@ void init_fbo_scaling(int baseWidth, int baseHeight) {
     BASE_H = baseHeight;
 
     // 1) Create FBO texture
-    glGenTextures(1, &fboTexture);
-    glBindTexture(GL_TEXTURE_2D, fboTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, BASE_W, BASE_H, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-    // Pixel-perfect NEAREST scaling
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    create_gl_texture(BASE_W, BASE_H, &fboTexture, NULL);
 
     // 2) Renderbuffer for depth/stencil
     glGenRenderbuffers(1, &fboRBO);

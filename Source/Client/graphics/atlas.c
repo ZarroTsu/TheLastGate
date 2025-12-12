@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "sdl.h"
 #include "../log.h"
 #include "../engine.h"
 
@@ -36,15 +37,7 @@ static void init_atlas(Atlas *atlas) {
     atlas->cursor.y = 0;
     atlas->cursor.row_height = 0;
 
-    glGenTextures(1, &atlas->texture_id);
-    glBindTexture(GL_TEXTURE_2D, atlas->texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ATLAS_SIZE_X, ATLAS_SIZE_Y, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    create_gl_texture(ATLAS_SIZE_X, ATLAS_SIZE_Y, &atlas->texture_id, NULL);
 }
 
 static void init_atlas_group(AtlasGroup *atlas_group, const char *name) {

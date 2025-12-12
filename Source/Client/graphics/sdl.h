@@ -82,3 +82,5 @@ void sdl_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff);
 
 extern float projection_matrix[16];
 void create_model_matrix(float *matrix, float x, float y, float width, float height);
+
+void create_gl_texture(int width, int height, GLuint *out, const void *pixels);

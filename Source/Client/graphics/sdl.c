@@ -54,6 +54,19 @@ void create_model_matrix(float *matrix, float x, float y, float width, float hei
     matrix[15] = 1.0f; // Homogeneous coordinate
 }
 
+void create_gl_texture(const int width, const int height, GLuint *out, const void *pixels) {
+    glGenTextures(1, out);
+    glBindTexture(GL_TEXTURE_2D, *out);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+
+    // Pixel-perfect NEAREST scaling
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
 // Cached projection matrix (created once)
 float projection_matrix[16];
 int projection_initialized = 0;
@@ -733,14 +746,7 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
 
         // Create OpenGL texture from surface
         GLuint gl_texture;
-        glGenTextures(1, &gl_texture);
-        glBindTexture(GL_TEXTURE_2D, gl_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 6, 9, 0, GL_BGRA, GL_UNSIGNED_BYTE, char_surf->pixels);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
+        create_gl_texture(6, 9, &gl_texture, char_surf->pixels);
         font_cache[font].char_textures[c] = gl_texture;
         SDL_FreeSurface(char_surf);
     }
@@ -988,13 +994,7 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
 
     // Create OpenGL texture on first call
     if (!minimap_gl_texture) {
-        glGenTextures(1, &minimap_gl_texture);
-        glBindTexture(GL_TEXTURE_2D, minimap_gl_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        create_gl_texture(128, 128, &minimap_gl_texture, NULL);
     }
 
     // Allocate CPU buffer for RGBA conversion (128x128x4 bytes)
