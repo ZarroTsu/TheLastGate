@@ -821,8 +821,8 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
 
     // Top edge
     create_model_matrix(model_matrix, xf, yf, xs, 1);
-    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glBindVertexArray(renderer.quad_vao);
+    glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Bottom edge
