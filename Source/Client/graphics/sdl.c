@@ -11,7 +11,7 @@
 
 #include "atlas.h"
 #include "scaling.h"
-#include "../render.h"
+#include "render.h"
 #include "loader.h"
 #include "../inter.h"
 #include "../main.h"
@@ -24,7 +24,7 @@
 #include "shaders/solid_shader.h"
 #include "ui/imgui/imgui_wrapper.h"
 
-App app;
+Renderer renderer;
 
 // Simple orthographic projection matrix helper
 // Creates a 2D orthographic projection from pixel coordinates to NDC
@@ -96,13 +96,13 @@ int sdl_init(const int windowed) {
         height = mode.h;
     }
 
-    app.window = SDL_CreateWindow("Last Gate SDL", windowed ? SDL_WINDOWPOS_UNDEFINED : 0,
+    renderer.window = SDL_CreateWindow("Last Gate SDL", windowed ? SDL_WINDOWPOS_UNDEFINED : 0,
                                   windowed ? SDL_WINDOWPOS_UNDEFINED : 0, width,
                                   height, windowFlags);
 
-    SDL_GetWindowSize(app.window, &app_state.window_size[0], &app_state.window_size[1]);
+    SDL_GetWindowSize(renderer.window, &app_state.window_size[0], &app_state.window_size[1]);
 
-    if (!app.window) {
+    if (!renderer.window) {
         LOG("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
         return -1;
     }
@@ -110,13 +110,13 @@ int sdl_init(const int windowed) {
     SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
 
     // Create OpenGL context
-    app.gl_context = SDL_GL_CreateContext(app.window);
-    if (!app.gl_context) {
+    renderer.gl_context = SDL_GL_CreateContext(renderer.window);
+    if (!renderer.gl_context) {
         LOG("Failed to create OpenGL context: %s\n", SDL_GetError());
         return -1;
     }
 
-    SDL_GL_MakeCurrent(app.window, app.gl_context);
+    SDL_GL_MakeCurrent(renderer.window, renderer.gl_context);
 
     // Load OpenGL functions with GLAD
     if (!gladLoadGL()) {
@@ -161,11 +161,11 @@ int sdl_init(const int windowed) {
         1.0f, 0.0f, 0.0f, 1.0f, 0.0f // bottom right
     };
 
-    glGenVertexArrays(1, &app.quad_vao);
-    glGenBuffers(1, &app.quad_vbo);
+    glGenVertexArrays(1, &renderer.quad_vao);
+    glGenBuffers(1, &renderer.quad_vbo);
 
-    glBindVertexArray(app.quad_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, app.quad_vbo);
+    glBindVertexArray(renderer.quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer.quad_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
 
     // Position attribute (location = 0)
@@ -182,22 +182,22 @@ int sdl_init(const int windowed) {
     LOG("OpenGL quad VAO/VBO created\n");
 
     // Allocate CPU-side batch buffer
-    app.batch_buffer = malloc(MAX_BATCH_SIZE * sizeof(SpriteInstance));
-    if (!app.batch_buffer) {
+    renderer.batch_buffer = malloc(MAX_BATCH_SIZE * sizeof(SpriteInstance));
+    if (!renderer.batch_buffer) {
         LOG("Failed to allocate batch buffer\n");
         return -1;
     }
-    app.batch_count = 0;
-    app.current_atlas_texture = 0;
+    renderer.batch_count = 0;
+    renderer.current_atlas_texture = 0;
 
     // Create instance VBO for batched rendering
-    glGenBuffers(1, &app.instance_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, app.instance_vbo);
+    glGenBuffers(1, &renderer.instance_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer.instance_vbo);
     glBufferData(GL_ARRAY_BUFFER, MAX_BATCH_SIZE * sizeof(SpriteInstance), NULL, GL_DYNAMIC_DRAW);
 
     // Configure instance attributes in VAO
-    glBindVertexArray(app.quad_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, app.instance_vbo);
+    glBindVertexArray(renderer.quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer.instance_vbo);
 
     // Model matrix (4 vec4s = mat4, locations 2-5)
     for (int i = 0; i < 4; i++) {
@@ -257,7 +257,7 @@ int sdl_init(const int windowed) {
     }
 
 
-    imgui_init(app.window, app.gl_context);
+    imgui_init(renderer.window, renderer.gl_context);
 
     /* Configure ImGui to use the same virtual resolution as the game (1280x720) */
     imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -271,24 +271,24 @@ int sdl_init(const int windowed) {
 }
 
 void sdl_deinit(void) {
-    if (app.batch_buffer) {
-        free(app.batch_buffer);
-        app.batch_buffer = NULL;
+    if (renderer.batch_buffer) {
+        free(renderer.batch_buffer);
+        renderer.batch_buffer = NULL;
     }
 
-    if (app.instance_vbo) {
-        glDeleteBuffers(1, &app.instance_vbo);
-        app.instance_vbo = 0;
+    if (renderer.instance_vbo) {
+        glDeleteBuffers(1, &renderer.instance_vbo);
+        renderer.instance_vbo = 0;
     }
 
-    if (app.quad_vao) {
-        glDeleteVertexArrays(1, &app.quad_vao);
-        app.quad_vao = 0;
+    if (renderer.quad_vao) {
+        glDeleteVertexArrays(1, &renderer.quad_vao);
+        renderer.quad_vao = 0;
     }
 
-    if (app.quad_vbo) {
-        glDeleteBuffers(1, &app.quad_vbo);
-        app.quad_vbo = 0;
+    if (renderer.quad_vbo) {
+        glDeleteBuffers(1, &renderer.quad_vbo);
+        renderer.quad_vbo = 0;
     }
 
     if (minimap_gl_texture) {
@@ -300,14 +300,14 @@ void sdl_deinit(void) {
     drop_solid_shader();
     drop_magic_shader();
 
-    if (app.gl_context) {
-        SDL_GL_DeleteContext(app.gl_context);
-        app.gl_context = NULL;
+    if (renderer.gl_context) {
+        SDL_GL_DeleteContext(renderer.gl_context);
+        renderer.gl_context = NULL;
     }
 
-    if (app.window) {
-        SDL_DestroyWindow(app.window);
-        app.window = NULL;
+    if (renderer.window) {
+        SDL_DestroyWindow(renderer.window);
+        renderer.window = NULL;
     }
 
     SDL_Quit();
@@ -336,8 +336,8 @@ void sdl_init_sprites(void) {
  * Call this at the start of each frame.
  */
 void sdl_batch_begin(void) {
-    app.batch_count = 0;
-    app.current_atlas_texture = 0;
+    renderer.batch_count = 0;
+    renderer.current_atlas_texture = 0;
 }
 
 /**
@@ -347,29 +347,29 @@ void sdl_batch_begin(void) {
  * Call this at the end of each frame or when switching textures/render states.
  */
 void sdl_batch_flush(void) {
-    if (app.batch_count == 0) return;
-    if (app.current_atlas_texture == 0) return;
+    if (renderer.batch_count == 0) return;
+    if (renderer.current_atlas_texture == 0) return;
 
     // sdl_start_scaling();
     // Upload instance data to GPU
-    glBindBuffer(GL_ARRAY_BUFFER, app.instance_vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, app.batch_count * sizeof(SpriteInstance), app.batch_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, renderer.instance_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, renderer.batch_count * sizeof(SpriteInstance), renderer.batch_buffer);
 
     // Set projection matrix once for all sprites
     use_effect_shader_instanced();
 
     // Bind atlas texture (all batched sprites use atlas)
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, app.current_atlas_texture);
+    glBindTexture(GL_TEXTURE_2D, renderer.current_atlas_texture);
 
     // Render all sprites with single instanced draw call
-    glBindVertexArray(app.quad_vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, app.batch_count);
+    glBindVertexArray(renderer.quad_vao);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderer.batch_count);
     glBindVertexArray(0);
     // sdl_stop_scaling();
     // Reset batch for next frame
-    app.batch_count = 0;
-    app.current_atlas_texture = 0;
+    renderer.batch_count = 0;
+    renderer.current_atlas_texture = 0;
 
     // printf("Flushed batch: %d sprites\n", app.batch_count);
 }
@@ -660,18 +660,18 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     GLuint sprite_atlas = sprite_data[nr].atlas_texture;
 
     // First render should set the atlas
-    if (app.batch_count == 0) {
-        app.current_atlas_texture = sprite_atlas;
+    if (renderer.batch_count == 0) {
+        renderer.current_atlas_texture = sprite_atlas;
     }
 
     // When we swap atlas we need to flush the previous atlas
-    if (sprite_atlas != app.current_atlas_texture) {
+    if (sprite_atlas != renderer.current_atlas_texture) {
         sdl_batch_flush();
-        app.current_atlas_texture = sprite_atlas;
+        renderer.current_atlas_texture = sprite_atlas;
     }
 
     // Flush batch if full
-    if (app.batch_count >= MAX_BATCH_SIZE) {
+    if (renderer.batch_count >= MAX_BATCH_SIZE) {
         sdl_batch_flush();
     }
 
@@ -692,7 +692,7 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     if (buff) flags |= (1 << 7); // FLAG_BUFF
 
     // Add sprite to batch (x, y are already screen coordinates)
-    SpriteInstance *inst = &app.batch_buffer[app.batch_count++];
+    SpriteInstance *inst = &renderer.batch_buffer[renderer.batch_count++];
     create_model_matrix(inst->model, x, y, sprite_data[nr].pixel_width, sprite_data[nr].pixel_height);
     inst->uv0[0] = sprite_data[nr].uv0.u;
     inst->uv0[1] = sprite_data[nr].uv0.v;
@@ -754,7 +754,7 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
     glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, font_cache[font].char_textures[c]);
-    glBindVertexArray(app.quad_vao);
+    glBindVertexArray(renderer.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
@@ -816,7 +816,7 @@ void sdl_showbox(int xf, int yf, int xs, int ys, unsigned short col) {
     // Top edge
     create_model_matrix(model_matrix, xf, yf, xs, 1);
     glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
-    glBindVertexArray(app.quad_vao);
+    glBindVertexArray(renderer.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Bottom edge
@@ -855,7 +855,7 @@ void sdl_showbar(int xf, int yf, int xs, int ys, unsigned short col) {
     create_model_matrix(model_matrix, xf, yf, xs, ys);
     glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
 
-    glBindVertexArray(app.quad_vao);
+    glBindVertexArray(renderer.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
@@ -917,7 +917,7 @@ void sdl_shadow(int nr, int xpos, int ypos, int xoff, int yoff) {
     // Use sprite's UV coordinates from atlas (flipped vertically for shadow)
     glActiveTexture(GL_TEXTURE0);
 
-    glBindVertexArray(app.quad_vao);
+    glBindVertexArray(renderer.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
@@ -970,9 +970,9 @@ void sdl_shadow_clear(void) {
  *          0 if window is minimized/hidden (skip rendering)
  */
 int sdl_isvisible(void) {
-    if (!app.window) return 0;
+    if (!renderer.window) return 0;
 
-    Uint32 flags = SDL_GetWindowFlags(app.window);
+    Uint32 flags = SDL_GetWindowFlags(renderer.window);
 
     // Skip rendering if minimized or hidden
     if (flags & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_HIDDEN)) {
@@ -1051,7 +1051,7 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
     // Bind minimap texture and render
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, minimap_gl_texture);
-    glBindVertexArray(app.quad_vao);
+    glBindVertexArray(renderer.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }

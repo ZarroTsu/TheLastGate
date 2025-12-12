@@ -36,9 +36,9 @@ add_executable(TheLastGate WIN32
         mods/use_queue.c
         mods/use_queue.h
         options.c
-        render.c
-        render.h
-        sdl_magic.c
+        graphics/render.c
+        graphics/render.h
+        graphics/sdl_magic.c
         socket.c
         socket.h
         audio/sound.c

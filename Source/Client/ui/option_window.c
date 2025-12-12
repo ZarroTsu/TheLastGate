@@ -12,7 +12,7 @@
 #include "ui_common.h"
 #include "../engine.h"
 #include "../main.h"
-#include "../render.h"
+#include "../graphics/render.h"
 #include "../audio/sound.h"
 #include "../graphics/sdl.h"
 #include "widgets.h"

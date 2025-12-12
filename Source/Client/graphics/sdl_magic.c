@@ -1,9 +1,9 @@
-#include "graphics/sdl.h"
+#include "sdl.h"
 #include "glad/glad.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "graphics/shaders/magic_shader.h"
+#include "shaders/magic_shader.h"
 
 
 void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos, int xoff, int yoff) {
@@ -37,7 +37,7 @@ void sdl_alphaeffect_magic(int nr, int str, int xpos, int ypos, int xoff, int yo
     glUniformMatrix4fv(model, 1, GL_FALSE, model_matrix);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glBindVertexArray(app.quad_vao);
+    glBindVertexArray(renderer.quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

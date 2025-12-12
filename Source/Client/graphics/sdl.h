@@ -46,7 +46,7 @@ typedef struct {
     SpriteInstance *batch_buffer; // CPU-side batch buffer
     int batch_count;              // Number of sprites in current batch
     unsigned int current_atlas_texture; // The atlas currently in use
-} App;
+} Renderer;
 
 struct FontCache {
     unsigned int char_textures[96];  // OpenGL texture IDs (GLuint)
@@ -54,7 +54,7 @@ struct FontCache {
 
 #define SPRITE_PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
 
-extern App app;
+extern Renderer renderer;
 extern SpriteData *sprite_data;
 
 int sdl_init(int windowed);

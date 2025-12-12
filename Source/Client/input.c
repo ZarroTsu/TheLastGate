@@ -132,9 +132,9 @@ void handle_input(void) {
 #ifdef _WIN32
                 if (!app_state.windowed) {
                     if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
-                        MakeWindowTopMost(app.window);
+                        MakeWindowTopMost(renderer.window);
                     } else if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
-                        MakeWindowNormal(app.window);
+                        MakeWindowNormal(renderer.window);
                     }
                 }
 #endif
@@ -143,7 +143,7 @@ void handle_input(void) {
                         if (!window_resetting) {
                             xlog(2, "Game window resized, press shift+f10 to reset it.");
                         }
-                        if ((SDL_GetWindowFlags(app.window) & SDL_WINDOW_MAXIMIZED) != 0) {
+                        if ((SDL_GetWindowFlags(renderer.window) & SDL_WINDOW_MAXIMIZED) != 0) {
                             app_state.window_size[0] = e.window.data1;
                             app_state.window_size[1] = e.window.data2;
                             resize_fbo_scaling(app_state.window_size[0], app_state.window_size[1]);
@@ -163,7 +163,7 @@ void handle_input(void) {
                             app_state.window_size[0] = SCREEN_WIDTH + ( 16.0f / 9.0f * (float)differenceFromNatural);
                             app_state.window_size[1] = e.window.data2;
                         }
-                        SDL_SetWindowSize(app.window, app_state.window_size[0], app_state.window_size[1]);
+                        SDL_SetWindowSize(renderer.window, app_state.window_size[0], app_state.window_size[1]);
                         resize_fbo_scaling(app_state.window_size[0], app_state.window_size[1]);
                         window_resetting = false;
                     }
@@ -291,9 +291,9 @@ void handle_input(void) {
                         if (app_state.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
                             app_state.window_size[0] = SCREEN_WIDTH;
                             app_state.window_size[1] = SCREEN_HEIGHT;
-                            SDL_RestoreWindow(app.window);
+                            SDL_RestoreWindow(renderer.window);
                             window_resetting = true;
-                            SDL_SetWindowSize(app.window, app_state.window_size[0], app_state.window_size[1]);
+                            SDL_SetWindowSize(renderer.window, app_state.window_size[0], app_state.window_size[1]);
                             xlog(2, "Game window reset to default resolution.");
                         } else {
                             app_state.gamma += 250;

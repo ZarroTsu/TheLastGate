@@ -35,7 +35,7 @@
 #include "input.h"
 #include "inter.h"
 #include "main.h"
-#include "render.h"
+#include "graphics/render.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "mods/base_cost_warning.h"
@@ -4922,7 +4922,7 @@ void engine(void)
 			imgui_render();
 			sdl_stop_scaling();
 
-			SDL_GL_SwapWindow(app.window);
+			SDL_GL_SwapWindow(renderer.window);
 			skipinrow=0;
 		} else {
 			skip++; skipinrow++;

@@ -39,7 +39,7 @@
 #include "common.h"
 #include "input.h"
 #include "inter.h"
-#include "render.h"
+#include "graphics/render.h"
 #include "audio/sound.h"
 #include "config/keybindings.h"
 

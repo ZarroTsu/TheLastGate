@@ -39,7 +39,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include "input.h"
-#include "render.h"
+#include "graphics/render.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 
