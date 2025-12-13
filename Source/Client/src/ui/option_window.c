@@ -114,12 +114,12 @@ static void general_settings_tab() {
     imgui_push_style_color(IMGUI_COL_FRAME_BG_ACTIVE, 0.4f, 0.4f, 0.4f, 1.0f);   /* Active */
     imgui_push_style_color(IMGUI_COL_CHECK_MARK, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);  /* Checkmark */
 
-    togglable_option("##1", &app_state.escape_closes_menus_first,
+    togglable_option("##1", &g_config.ui.escape_closes_menu_first,
                          "Escape closes windows before canceling movement.");
-    togglable_option("##2", &app_state.cost_helper, "Show attribute (B,W,I,A,S) when cheaper than the skill.");
-    togglable_option("##3", &app_state.give_more,
+    togglable_option("##2", &g_config.ui.cost_helper, "Show attribute (B,W,I,A,S) when cheaper than the skill.");
+    togglable_option("##3", &g_config.gameplay.give_more,
                      "Holding shift when giving an item will attempt to reload that item.");
-    togglable_option("##4", &app_state.use_queue, "Holding ctrl when issuing using will queue that use. Limit 5");
+    togglable_option("##4", &g_config.gameplay.use_queue, "Holding ctrl when issuing using will queue that use. Limit 5");
 
     imgui_pop_style_color(4);  /* Pop the 4 checkbox colors */
 }

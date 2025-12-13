@@ -294,11 +294,11 @@ void load_extended_options(void)
 	unsigned int version = 0, count = 0;
 
 	// Set all defaults, keybinds are handled in init
-	app_state.escape_closes_menus_first = 1;
-	app_state.cost_helper = 0;
+	g_config.ui.escape_closes_menu_first = 1;
+	g_config.ui.cost_helper = 0;
 	g_config.audio.sound_volume = 10;
-	app_state.give_more = 0;
-	app_state.use_queue = 0;
+	g_config.gameplay.give_more = 0;
+	g_config.gameplay.use_queue = 0;
 
 	handle = open("TLGExtended.dat", O_RDONLY|O_BINARY);
 	if (handle != -1) {
@@ -310,11 +310,11 @@ void load_extended_options(void)
 		}
 		if (version >= 1) {
 			/* Read app_state fields */
-			if (read(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first)) != sizeof(app_state.escape_closes_menus_first)) return;
-			if (read(handle, &app_state.cost_helper, sizeof(app_state.cost_helper)) != sizeof(app_state.cost_helper)) return;
+			if (read(handle, &g_config.ui.escape_closes_menu_first, sizeof(g_config.ui.escape_closes_menu_first)) != sizeof(g_config.ui.escape_closes_menu_first)) return;
+			if (read(handle, &g_config.ui.cost_helper, sizeof(g_config.ui.cost_helper)) != sizeof(g_config.ui.cost_helper)) return;
 			if (read(handle, &g_config.audio.sound_volume, sizeof(g_config.audio.sound_volume)) != sizeof(g_config.audio.sound_volume)) return;
-			if (read(handle, &app_state.give_more, sizeof(app_state.give_more)) != sizeof(app_state.give_more)) return;
-			if (read(handle, &app_state.use_queue, sizeof(app_state.use_queue)) != sizeof(app_state.use_queue)) return;
+			if (read(handle, &g_config.gameplay.give_more, sizeof(g_config.gameplay.give_more)) != sizeof(g_config.gameplay.give_more)) return;
+			if (read(handle, &g_config.gameplay.use_queue, sizeof(g_config.gameplay.use_queue)) != sizeof(g_config.gameplay.use_queue)) return;
 
 			/* Read keybinding section */
 			if (read(handle, &count, sizeof(count)) == sizeof(count)) {
@@ -398,11 +398,11 @@ void save_extended_options(void)
 		write(handle, &version, sizeof(version));
 
 		/* Write existing app_state fields */
-		write(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first));
-		write(handle, &app_state.cost_helper, sizeof(app_state.cost_helper));
+		write(handle, &g_config.ui.escape_closes_menu_first, sizeof(g_config.ui.escape_closes_menu_first));
+		write(handle, &g_config.ui.cost_helper, sizeof(g_config.ui.cost_helper));
 		write(handle, &g_config.audio.sound_volume, sizeof(g_config.audio.sound_volume));
-		write(handle, &app_state.give_more, sizeof(app_state.give_more));
-		write(handle, &app_state.use_queue, sizeof(app_state.use_queue));  /* FIXED */
+		write(handle, &g_config.gameplay.give_more, sizeof(g_config.gameplay.give_more));
+		write(handle, &g_config.gameplay.use_queue, sizeof(g_config.gameplay.use_queue));  /* FIXED */
 
 		/* Write keybinding section */
 		count = NUM_SPELL_HOTKEYS;

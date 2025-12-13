@@ -48,11 +48,7 @@ AppState app_state = {
 	.tricky_flag = 0,
 	.gamma = 5000,
 	.windowed = 1,
-	.window_size = {1280, 720},
-	.cost_helper = false,
-	.escape_closes_menus_first = true,
-	.give_more = false,
-	.use_queue = false,
+	.window_size = {1280, 720}
 };
 
 const SdlClientVersion CLIENT_VERSION = {2,1};

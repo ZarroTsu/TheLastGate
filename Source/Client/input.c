@@ -8,6 +8,7 @@
 #include "main.h"
 #include "socket.h"
 #include "engine.h"
+#include "config/config.h"
 #include "graphics/atlas.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
@@ -255,7 +256,7 @@ void handle_input(void) {
                             show_opts = 0;
                             closed_window = true;
                         }
-                        if (!app_state.escape_closes_menus_first || !closed_window) cmd(CL_CMD_RESET, 0, 0);
+                        if (!g_config.ui.escape_closes_menu_first || !closed_window) cmd(CL_CMD_RESET, 0, 0);
                         break;
                     case SDLK_F1:
                         cmd(CL_CMD_MODE, 2, 0);

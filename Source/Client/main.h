@@ -8,10 +8,6 @@ typedef struct {
     int gamma;
     int windowed;
     int window_size[2];
-    bool cost_helper;
-    bool escape_closes_menus_first;
-    bool give_more;
-    bool use_queue;
 } AppState;
 
 typedef struct {

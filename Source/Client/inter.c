@@ -18,6 +18,7 @@
 
 #include "engine.h"
 #include "main.h"
+#include "config/config.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 #include "ui/option_window.h"
@@ -1538,7 +1539,7 @@ void mouse_mapbox(int x,int y,int state)
 	}
 
 	if (keys == 3) {
-		if (app_state.give_more && pl.citem) {
+		if (g_config.gameplay.give_more && pl.citem) {
 			if (map[m].flags&ISCHAR) hightlight=HL_MAP;
 			else if (map[m+1-screen_renderdist].flags&ISCHAR) { mx++; my--; hightlight=HL_MAP; }
 			else if (map[m+2-2*screen_renderdist].flags&ISCHAR) { mx+=2; my-=2; hightlight=HL_MAP; }
@@ -1579,7 +1580,7 @@ void mouse_mapbox(int x,int y,int state)
 				}
 				tile_type=2;
 			}
-		} else if (app_state.use_queue) {
+		} else if (g_config.gameplay.use_queue) {
 			if (pl.citem) { hightlight=HL_MAP; cursor_type=CT_DROP; }
 			else if (map[m].flags&ISITEM) ;
 			else if (map[m+1-screen_renderdist].flags&ISITEM) { mx++; my--; }

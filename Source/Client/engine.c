@@ -35,6 +35,7 @@
 #include "input.h"
 #include "inter.h"
 #include "main.h"
+#include "config/config.h"
 #include "graphics/render.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
@@ -2386,7 +2387,7 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if (pdata.show_stats) xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
 				xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
-				if (app_state.cost_helper) {
+				if (g_config.ui.cost_helper) {
 					char raise_icon = get_raise_icon(m, n + skill_pos);
 					render_putc(163, (8 + 8 * 14) + n * 14, raise_icon == '+' ? 1 : 2, raise_icon);
 				} else {
@@ -3275,7 +3276,7 @@ void eng_display(int init)	// optimize me!!!!!
 					copysprite(33,0,x*32,y*32,xoff,yoff);
 				if (pl.misc_action==DR_USE && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
 					copysprite(45,0,x*32,y*32,xoff,yoff);
-				if (app_state.use_queue) {
+				if (g_config.gameplay.use_queue) {
 					int position = has_cmd_been_queued(CL_CMD_USE, map[m].x, map[m].y);
 					if (position) {
 						copysprite(45, EFFECT_GREEN, x * 32, y * 32, xoff, yoff);
