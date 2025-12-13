@@ -6,7 +6,6 @@
 typedef struct {
     int tricky_flag;
     int gamma;
-    char path[256];
     int windowed;
     int window_size[2];
     int volume_level;

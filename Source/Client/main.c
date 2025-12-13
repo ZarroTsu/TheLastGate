@@ -41,12 +41,12 @@
 #include "inter.h"
 #include "graphics/render.h"
 #include "audio/sound.h"
+#include "config/config.h"
 #include "config/keybindings.h"
 
 AppState app_state = {
 	.tricky_flag = 0,
 	.gamma = 5000,
-	.path = "",
 	.windowed = 1,
 	.window_size = {1280, 720},
 	.volume_level = 10, // 100%
@@ -257,9 +257,9 @@ int parse_cmd(char *s)
 			} else if (tolower(*s)=='d') {
 				s++;
 				while (isspace(*s)) s++;
-				n=0; while (n<150 && *s && !isspace(*s)) app_state.path[n++]=*s++;
-				if (app_state.path[n]!='\\') app_state.path[n++]='\\';
-				app_state.path[n]=0;
+				n=0; while (n<150 && *s && !isspace(*s)) g_config.runtime.path[n++]=*s++;
+				if (g_config.runtime.path[n]!='\\') g_config.runtime.path[n++]='\\';
+				g_config.runtime.path[n]=0;
 			} else if (tolower(*s)=='p') {
 				s++;
 				while (isspace(*s)) s++;
