@@ -2269,11 +2269,6 @@ void eng_display_win(int plr_sprite,int init)
 		xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
 		xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 		xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
-
-		// display spell shortcut buttons
-		for (n=0; n<20; n++) {
-			xputtext(1038+(n%5)*48,600+(n/5)*15,1,pdata.xbutton[n].name);
-		}
 		
 		if (hudmode==0)
 		{
