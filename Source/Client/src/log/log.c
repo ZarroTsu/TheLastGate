@@ -15,10 +15,10 @@ static const char *sdl_log_category_name(const int category) {
 
 static void log_callback(
     void *userdata,
-    const int category,
-    const SDL_LogPriority priority,
-    const char *message) {
-    const LogFiles *logs = userdata;
+    int category,
+    SDL_LogPriority priority,
+    char *message) {
+    LogFiles *logs = userdata;
     FILE *out = NULL;
 
     switch (priority) {
