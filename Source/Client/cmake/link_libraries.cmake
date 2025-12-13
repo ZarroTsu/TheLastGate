@@ -1,7 +1,6 @@
 ﻿# Add include directories for libpng and zlib
 target_include_directories(TheLastGate PRIVATE
         ../../Resources/lpng
-        ${CMAKE_CURRENT_SOURCE_DIR}/zlib
         ${CMAKE_CURRENT_SOURCE_DIR}/_generated
         ${CMAKE_CURRENT_SOURCE_DIR}/src/
         ${CMAKE_CURRENT_SOURCE_DIR}/
