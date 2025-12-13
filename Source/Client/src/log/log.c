@@ -50,6 +50,9 @@ static void log_callback(
 static LogFiles logs = {0};
 
 void log_init() {
+    setbuf(stderr, NULL);
+    setbuf(stdout, NULL);
+
     logs.info = fopen("info.log", "w");
     logs.warn = fopen("warn.log", "w");
     logs.error = fopen("error.log", "w");
