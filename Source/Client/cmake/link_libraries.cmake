@@ -11,6 +11,7 @@ target_link_libraries(TheLastGate PUBLIC
         sdl2        # SDL2 core (will link statically if available)
         sdl2_image  # SDL2_image (dynamic - too many format dependencies)
         sdl2_mixer  # SDL2_mixer (dynamic - audio format dependencies)
+        sdl2_net    # SDL2_net (cross-platform networking)
         png         # libpng
         z           # zlib
 

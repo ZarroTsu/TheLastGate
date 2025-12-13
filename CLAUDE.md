@@ -91,7 +91,8 @@ make.bat
 
 **Client Requirements:**
 - Graphic files from http://www.brockhaus.org/merc2.html
-- SDL2, OpenGL, GLAD (OpenGL loader)
+- SDL2, SDL2_image, SDL2_mixer, SDL2_net
+- OpenGL, GLAD (OpenGL loader)
 
 ## Architecture
 
