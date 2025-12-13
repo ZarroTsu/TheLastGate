@@ -1,0 +1,28 @@
+#include "config.h"
+
+#include "graphics/sdl.h"
+
+GlobalConfig g_config = {
+    .video = {
+        .gamma = 5000.0f,
+        .windowed = true,
+        .window_size = {SCREEN_WIDTH, SCREEN_HEIGHT}
+    },
+    .audio = {
+        .music_enabled = true,
+        .music_volume = 10,
+        .sound_enabled = true,
+        .sound_volume = 1
+    },
+    .ui = {
+        .cost_helper = false,
+        .escape_closes_menu_first = true
+    },
+    .gameplay = {
+        .give_more = false,
+        .use_queue = false
+    },
+    .runtime = {
+        .path = ""
+    }
+};

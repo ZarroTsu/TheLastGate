@@ -49,6 +49,7 @@ add_executable(TheLastGate WIN32
         src/config/keybindings.c
         src/config/keybindings.h
         src/ui/spell_hud.c
+        src/config/config.c
 )
 
 # Disable warnings for old code compatibility
