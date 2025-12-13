@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 #include "external/glad/include/glad/glad.h"
@@ -3512,9 +3511,6 @@ void init_engine(void)
 	eng_init_player();
 }
 
-// TODO: Modern GCC/MinGW - eng_flip uses Windows message loop
-// SDL2: Replace with SDL event handling in main loop
-// The Windows message processing should be moved to main() with SDL_PollEvent()
 void eng_flip(unsigned int t)
 {
 	int diff;

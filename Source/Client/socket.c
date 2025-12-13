@@ -29,34 +29,32 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <fcntl.h>
-#include <io.h>        // TODO: Replace with <unistd.h> for POSIX or remove
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>   // TODO: Remove - not needed for networking
-#include <winsock.h>   // TODO: Replace with <winsock2.h> or POSIX <sys/socket.h>, <netinet/in.h>, <arpa/inet.h>
 #include <zlib.h>
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_net.h>
 
 #include "input.h"
 #include "graphics/render.h"
+#include "log/log.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 
 struct z_stream_s zs;
 
-#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include "common.h"
 #include "inter.h"
 #include "merc.rh"
-//#include "minilzo.h"
 
 char passwd[15]={0};
 
-#define DEBUG(a) 
+#define DEBUG(a)
 //printf("%d: %s\n",__cnt++,a); fflush(stdout)
 //static int __cnt=0;
-#define DEBUG2(a) 
+#define DEBUG2(a)
 //xlog(1,a)
 
 static void load_unique(void);
@@ -69,7 +67,8 @@ struct look shop;
 
 extern int show_look,look_timer;
 
-static int sock=-1;
+static TCPsocket sock = NULL;
+static SDLNet_SocketSet socket_set = NULL;
 
 int t_size=0;	// ticks in queue
 
@@ -114,17 +113,16 @@ char *logout_reason[]={
 // SDL2: Use SDL_Window* instead
 extern HWND desk_hwnd;
 
-int xrecv(int sock,char *buf,int len,int flags)
-{
-	int ret,size=0;
+int xrecv(TCPsocket sock, char *buf, int len, int flags) {
+	int ret, size = 0;
 
-	while (size<len) {
-		ret=recv(sock,buf+size,len-size,flags);
-                if (ret<1) return size;
-		size+=ret;
+	while (size < len) {
+		ret = SDLNet_TCP_Recv(sock, buf, len);
+		if (ret < 1) return size;
+		size += ret;
 	}
 
-        return size;
+	return size;
 }
 
 void so_error(char *err)
@@ -170,14 +168,14 @@ int so_login(unsigned char *buf,HWND hwnd)
 		*(unsigned long*)(obuf+1)=tmp;
 		*(unsigned long*)(obuf+5)=NETWORKING_VERSION;
 		*(unsigned long*)(obuf+9)=race;
-		send(sock,(char*)obuf,16,0);
+		SDLNet_TCP_Send(sock,(char*)obuf,16);
 
 		load_unique();
 
 		obuf[0]=CL_CMD_UNIQUE;
 		*(unsigned long*)(obuf+1)=unique1;
 		*(unsigned long*)(obuf+5)=unique2;
-		send(sock,(char*)obuf,16,0);
+		SDLNet_TCP_Send(sock,(char*)obuf,16);
 
 		capcnt=0;
 
@@ -248,10 +246,10 @@ int so_login(unsigned char *buf,HWND hwnd)
 	if (buf[0]==SV_MOD5) { memcpy(mod+60,buf+1,15); return 0; }
 	if (buf[0]==SV_MOD6) { memcpy(mod+75,buf+1,15); return 0; }
 	if (buf[0]==SV_MOD7) { memcpy(mod+90,buf+1,15); return 0; }
-	if (buf[0]==SV_MOD8) { 
-		memcpy(mod+105,buf+1,15); 
+	if (buf[0]==SV_MOD8) {
+		memcpy(mod+105,buf+1,15);
 		SetDlgItemText(hwnd,IDC_MOD,mod);
-		return 0; 
+		return 0;
 	}
 
 	return 0;
@@ -264,174 +262,68 @@ void convert(HWND hwnd);
 // SDL2: Change signature to use SDL_Window* or remove if dialog updates are replaced
 void so_connect(HWND hwnd)
 {
-	// TODO: Modern GCC/MinGW - WSADATA is Winsock-specific structure
-	// POSIX: Not needed
-	WSADATA dummy;
-	struct sockaddr_in addr;
-	struct hostent *he;
 	unsigned char buf[16];
-	static int flag=0;
-	unsigned long haddr;
-	int one=1,tmp;
-	int useproxy=0;
+	int tmp;
 
 	if (so_status) return;
 	so_status=1;
 
-	//convert(hwnd); return;
-
-	if (!flag) {
-		// TODO: Modern GCC/MinGW - SetDlgItemText is Windows dialog API
-		// SDL2/Cross-platform: Replace with custom UI update function or logging
-		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Windows Sockets");
-		// TODO: Modern GCC/MinGW - WSAStartup is Winsock-specific, initializes Winsock library
-		// POSIX: Not needed, sockets work without initialization
-		// For cross-platform: Use #ifdef _WIN32 to conditionally call WSAStartup on Windows
-		// Example: #ifdef _WIN32 WSAStartup(MAKEWORD(2,2), &wsaData); #endif
-		if (WSAStartup((1<<8)+1,&dummy)) {
-			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not init Windows Sockets");
-			so_status=0;
-		}
-		flag=1;
-	}
+	IPaddress ip;
+	IPaddress proxy_ip;
 
 	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Initializing socket");
-	sock=socket(PF_INET,SOCK_STREAM,0);
-	ioctlsocket(sock, FIONBIO, 0);
-	if (sock==-1) {
-		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not init socket");
+
+	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server address");
+	if (SDLNet_ResolveHost(&ip, host_addr, host_port) < 0) {
+		log_warning("Unable to resolve host address: %s", SDLNet_GetError());
+	}
+
+
+	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address");
+	if (SDLNet_ResolveHost(&proxy_ip, host_proxy, host_port) < 0) {
+		log_warning("Unable to resolve proxy host address: %s", SDLNet_GetError());
+	}
+
+
+	if (ip.host == INADDR_NONE && proxy_ip.host == INADDR_NONE) {
+		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown");
+		log_error("Unable to resolve any host: %s", SDLNet_GetError());
+		so_status = 0;
+		return;
+	}
+
+	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Connecting to server");
+	if (ip.host != INADDR_NONE) {
+		sock = SDLNet_TCP_Open(&ip);
+	} else {
+		sock = SDLNet_TCP_Open(&proxy_ip);
+	}
+
+	if (!sock) {
+		log_error("Unable to connect to host: %s", SDLNet_GetError());
+		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not establish connection");
 		so_status=0;
 		return;
 	}
 
-	if (isdigit(host_addr[0])) 
-	{
-		haddr=inet_addr(host_addr);
-		if (haddr==INADDR_NONE) 
-		{
-			useproxy=1;
-			if (isdigit(host_proxy[0])) 
-			{
-				haddr=inet_addr(host_proxy);
-				if (haddr==INADDR_NONE) 
-				{
-					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Illegal IP Address");
-					so_status=0;
-					return;
-				}
-			}
-			else
-			{
-				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address (bad target IP)");
-				he=gethostbyname(host_proxy);
-				if (!he)
-				{
-					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown (bad target IP)");
-					so_status=0;
-					return;
-				}
-				else
-				{
-					haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-				}
-			}
-		}
-	} 
-	else 
-	{
-		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server address");
-		he=gethostbyname(host_addr);
-		if (!he)
-		{
-			useproxy=1;
-			if (isdigit(host_proxy[0])) 
-			{
-				haddr=inet_addr(host_proxy);
-				if (haddr==INADDR_NONE) 
-				{
-					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Illegal IP Address");
-					so_status=0;
-					return;
-				}
-			}
-			else
-			{
-				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address");
-				he=gethostbyname(host_proxy);
-				if (!he)
-				{
-					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown");
-					so_status=0;
-					return;
-				}
-				else
-				{
-					haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-				}
-			}
-		}
-		else
-		{
-			haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-		}
+	socket_set = SDLNet_AllocSocketSet(1);
+	if (!socket_set) {
+		log_error("Unable to create socket set: %s", SDLNet_GetError());
+		so_status=0;
+		return;
 	}
-	
-	addr.sin_family=AF_INET;
-	addr.sin_port=htons(host_port);
-	addr.sin_addr.s_addr=haddr;
 
-	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Connecting to server");
-	if (connect(sock,(struct sockaddr *)&addr,sizeof(addr)))
-	{
-		if (!useproxy)
-		{
-			if (isdigit(host_proxy[0])) 
-			{
-				haddr=inet_addr(host_proxy);
-				if (haddr==INADDR_NONE) 
-				{
-					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR on retry: Illegal IP Address");
-					so_status=0;
-					return;
-				}
-			}
-			else
-			{
-				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Getting server proxy address on retry");
-				he=gethostbyname(host_proxy);
-				if (!he)
-				{
-					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server unknown on retry");
-					so_status=0;
-					return;
-				}
-				haddr=*(unsigned long *)(&he->h_addr_list[0][0]);
-			}
-			addr.sin_family=AF_INET;
-			addr.sin_port=htons(host_port);
-			addr.sin_addr.s_addr=haddr;
-
-			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Connecting to server by proxy");
-			if (connect(sock,(struct sockaddr *)&addr,sizeof(addr)))
-			{
-				SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not establish connection");
-				so_status=0;
-				return;
-			}
-		}
-		else
-		{
-			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Could not establish connection");
-			so_status=0;
-			return;
-		}
+	if (SDLNet_TCP_AddSocket(socket_set, sock) < 0) {
+		log_error("Unable to add socket to set: %s", SDLNet_GetError());
+		so_status=0;
+		return;
 	}
 
 	if (passwd[0]) {
 		buf[0]=CL_PASSWD;
 		memcpy(buf+1,passwd,15);
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Sending Password");
-		if (send(sock,(char*)buf,16,0)<16) {
+		if (SDLNet_TCP_Send(sock,(char*)buf,16)<16) {
 			SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server closed connection (1).");
 			so_status=0;
 			return;
@@ -448,7 +340,7 @@ void so_connect(HWND hwnd)
 	}
 
 	SetDlgItemText(hwnd,IDC_STATUS,"STATUS: Sending Login Info");
-	if (send(sock,(char*)buf,16,0)<16) {
+	if (SDLNet_TCP_Send(sock,(char*)buf,16)<16) {
 		SetDlgItemText(hwnd,IDC_STATUS,"STATUS: ERROR: Server closed connection (1).");
 		so_status=0;
 		return;
@@ -462,15 +354,10 @@ void so_connect(HWND hwnd)
 			return;
 		}
 		tmp=so_login(buf,hwnd);
-		if (tmp==-1) { so_status=0; close(sock); return; }
+		if (tmp==-1) { so_status=0; SDLNet_TCP_Close(sock); sock = NULL; return; }
 	} while (!tmp);
 
 	SDL_Delay(500);
-
-	// TODO: Modern GCC/MinGW - ioctlsocket is Winsock-specific for non-blocking mode
-	// POSIX: Use fcntl() to set O_NONBLOCK flag
-	// Example: int flags = fcntl(sock, F_GETFL, 0); fcntl(sock, F_SETFL, flags | O_NONBLOCK);
-	ioctlsocket(sock,FIONBIO,(u_long*)&one);
 
 	zs.zalloc=Z_NULL;
 	zs.zfree=Z_NULL;
@@ -482,7 +369,7 @@ void so_connect(HWND hwnd)
 	}
 
 
-        EndDialog(hwnd,0);	
+        EndDialog(hwnd,0);
 
 	return;
 }
@@ -646,20 +533,20 @@ extern int stat_points_used;
 void sv_setchar_pts(unsigned char *buf)
 {
 	int n;
-	
+
 	DEBUG("SV SETCHAR PTS");
 	pl.points=*(unsigned long*)(buf+1);
 	pl.points_tot=*(unsigned long*)(buf+5);
-	
+
 	if (pl.kindred != *(unsigned long*)(buf+9))
 	{
 		stat_points_used=0;
-		for (n=0; n<108; n++) 
+		for (n=0; n<108; n++)
 		{
 			stat_raised[n]=0;
 		}
 	}
-	
+
 	pl.kindred=*(unsigned long*)(buf+9);
 }
 
@@ -683,10 +570,10 @@ void sv_setchar_tre(unsigned char *buf)
 {
 	int n;
 	DEBUG("SV SETCHAR TRE");
-	
+
 	n = *(unsigned char*)(buf+1);
 	if (n<0 || n>11) xlog(0,"Invalid setchar tre");
-	
+
 	pl.tree_node[n]=*(unsigned char*)(buf+2);
 }
 
@@ -705,7 +592,7 @@ void sv_setchar_item(unsigned char *buf)
 
 	n=*(unsigned long*)(buf+1);
 	if (n<0 || n>(MAXITEMS-1)) xlog(0,"Invalid setchar item");
-	
+
 	pl.item[n]=*(short int*)(buf+5);
 	pl.item_p[n]=*(short int*)(buf+7);
 	pl.item_s[n]=*(unsigned char*)(buf+9); // stack size
@@ -780,7 +667,7 @@ int sv_setmap(unsigned char *buf,int off)
 		n=*(unsigned short*)(buf+2);
 		p=4;
 	}
-	
+
 	if (n<0 || n>=screen_renderdist*screen_renderdist) { xlog(0,"corrupt setmap!"); return -1; }
 
 	lastn=n;
@@ -820,14 +707,14 @@ int sv_setmap(unsigned char *buf,int off)
 	}
 	if (buf[1]&128) {
 		map[n].ch_proz=*(unsigned char*)(buf+p); p+=1;
-		// Additional data received - cast speed, attack speed, move speed, 
+		// Additional data received - cast speed, attack speed, move speed,
 		//   and special font colorization of a given npc
 		map[n].ch_castspd=*(short int*)(buf+p); p+=2;
 		map[n].ch_atkspd=*(short int*)(buf+p); p+=2;
 		map[n].ch_movespd=*(short int*)(buf+p); p+=2;
 		map[n].ch_fontcolor=*(unsigned char*)(buf+p); p+=1;
 		cnt[7]++;
-	}	
+	}
 	return p;
 }
 
@@ -836,13 +723,13 @@ int sv_setmap3(unsigned char *buf,int cnt)
 	int n,m,p;
 	unsigned char tmp;
 
-	//printf("cnt=%d, ",cnt); 
-	DEBUG("SV SETMAP3"); 
-       
+	//printf("cnt=%d, ",cnt);
+	DEBUG("SV SETMAP3");
+
 	// Old system
 	//n=(*(unsigned short*)(buf+1))&4095;
 	//tmp=(*(unsigned short*)(buf+1))>>12;
-	
+
 	n=*(unsigned int*)(buf+1);
 	tmp=*(unsigned char*)(buf+5);
 	p=6;
@@ -854,10 +741,10 @@ int sv_setmap3(unsigned char *buf,int cnt)
 		for (m=n+2; m<n+cnt+2; m+=2,p++) {
 			if (m<screen_renderdist*screen_renderdist) {
 				tmp=*(unsigned char*)(buf+p);
-			
+
 				map[m].light=(unsigned char)(tmp&15);
 				map[m-1].light=(unsigned char)(tmp>>4);
-			}		
+			}
 		}
 	}
 
@@ -878,7 +765,7 @@ void sv_setorigin(unsigned char *buf)
 			map[n].x=(unsigned short)(x+xp);
 			map[n].y=(unsigned short)(y+yp);
 		}
-	}	
+	}
 }
 
 void sv_tick(unsigned char *buf)
@@ -924,7 +811,7 @@ void sv_motd(unsigned char *buf,int font)
 	DEBUG("SV MOTD");
 
 	memcpy(text+cnt,buf+1,15);
-	
+
 	for (n=cnt; n<cnt+15; n++)
 		if (text[n]==10) {
 			text[n]=0;
@@ -1118,7 +1005,7 @@ void sv_look7(unsigned char *buf)
 	tmplook.depot_s[n][s] =*(unsigned char *)(buf+5);
 	tmplook.depot_f[n][s] =*(unsigned char *)(buf+6);
 	tmplook.depot_c[n][s] =*(unsigned char *)(buf+7);
-	
+
 	if (n==7 && s==63)
 	{
 		show_shop=112;
@@ -1138,12 +1025,12 @@ void sv_look7(unsigned char *buf)
 void sv_look8(unsigned char *buf)	// Blacksmith
 {
 	int n;
-	
+
 	DEBUG("SV LOOK8");
-	
+
 	n =*(unsigned char*)(buf+1);
 	shop.nr=*(unsigned short*)(buf+2);
-	
+
 	if (n>5||n<0)	return;
 	else if (n==5)	show_shop=111;	// Is armour
 	else if (n==4)	show_shop=110;	// Is weapon
@@ -1153,7 +1040,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 		pl.sitem_s[n]=*(unsigned char *)(buf+6); // Item stack
 		pl.sitem_f[n]=*(unsigned char *)(buf+7); // Item flags
 	}
-	
+
 	if (show_shop)
 	{
 		show_wps =0;
@@ -1176,11 +1063,11 @@ void sv_closeshop(unsigned char *buf)
 void sv_showmotd(unsigned char *buf)
 {
 	int n;
-	
+
 	DEBUG("SV SHOWMOTD");
-	
+
 	n =*(unsigned char *)(buf+1);
-	
+
 	if (n>=100)
 	{	// Display tutorial
 		tuto_page=1;
@@ -1206,7 +1093,7 @@ void sv_showmotd(unsigned char *buf)
 void sv_waypoints(unsigned char *buf)
 {
 	DEBUG("SV WAYPOINTS");
-	
+
 	show_wps=1;
 }
 
@@ -1216,14 +1103,14 @@ extern unsigned short xmap[MAPX_MAX*MAPY_MAX];
 void sv_clearbox(unsigned char *buf)
 {
 	int xx, yy, x, y, w, h;
-	
+
 	DEBUG("SV CLEARBOX");
-	
+
 	x =*(unsigned short*)(buf+1);
 	y =*(unsigned short*)(buf+3);
 	w =*(unsigned short*)(buf+5);
 	h =*(unsigned short*)(buf+7);
-	
+
 	for (xx=x; xx<x+w; xx++)
 	{
 		for (yy=y; yy<y+h; yy++)
@@ -1314,16 +1201,16 @@ int sv_ignore(unsigned char *buf)
 	size=*(unsigned int*)(buf+1);
 	got+=size;
 
-	if (!start) start=time(NULL);	
+	if (!start) start=time(NULL);
 
 	if (cnt++>16) {
 		cnt=0;
 		d=time(NULL)-start;
 		if (d==0) d=1;
-		
+
                 xlog(3,"ignore=%d, got=%d, tps=%.2fK/s",size,got,(double)got/d/1024.0);
 	}
-	
+
 	return size;
 }
 
@@ -1377,7 +1264,7 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOG7:		sv_log(buf,7); break;
 		case	SV_LOG8:		sv_log(buf,8); break;
 		case	SV_LOG9:		sv_log(buf,9); break;
-		
+
 		case	SV_MOTD0:		sv_motd(buf,0); break;
 		case	SV_MOTD1:		sv_motd(buf,1); break;
 		case	SV_MOTD2:		sv_motd(buf,2); break;
@@ -1401,7 +1288,7 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOOK6:				sv_look6(buf); break;
 		case	SV_LOOK7:				sv_look7(buf); return 8;
 		case	SV_LOOK8:				sv_look8(buf); return 8;
-		
+
 		case	SV_CLOSESHOP:			sv_closeshop(buf); return 1;
 
 		case	SV_SETTARGET:			sv_settarget(buf); return 13;
@@ -1414,10 +1301,10 @@ int sv_cmd(unsigned char *buf)
 
 		case  	SV_UNIQUE:             	sv_unique(buf); return 9;
 		case 	SV_IGNORE:		return sv_ignore(buf);
-		
+
 		case	SV_WAYPOINTS:			sv_waypoints(buf); return 1;
 		case	SV_SHOWMOTD:			sv_showmotd(buf); return 2;
-		
+
 		case	SV_CLEARBOX:			sv_clearbox(buf); return 9;
 
 		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;
@@ -1470,17 +1357,16 @@ int non_critical_socket_error(void)
     return 0;
 }
 
-void xsend(unsigned char *buf)
-{
-	int len=0,ret;
+void xsend(unsigned char *buf) {
+	int len = 0, ret;
 
-	while (len<16) {
-		ret=send(sock,buf+len,16-len,0);
-        if (ret<0) {
-			 if (!non_critical_socket_error()) so_error("transmit buffer overflow");
-			 continue;
+	while (len < 16) {
+		ret = SDLNet_TCP_Send(sock, buf + len, 16 - len);
+		if (ret < 0) {
+			if (!non_critical_socket_error()) so_error("transmit buffer overflow");
+			continue;
 		}
-		len+=ret;
+		len += ret;
 	}
 }
 
@@ -1490,50 +1376,33 @@ unsigned char tickbuf[TSIZE];
 int ticksize=0;		// amount of data in tickbuf
 int tickstart=0;	// start index to scan buffer for next tick
 
-//#define TRANS 1024
+int game_loop(void) {
+	int ret, tmp;
 
-#ifdef TRANS
-int tmptime=0,tmpsize=0;
-#endif
 
-int game_loop(void)
-{
-	int ret,tmp;
-
-#ifdef TRANS
-	if (tmptime!=(tmp=time(NULL))) {
-		xlog(2,"tmpsize=%d",tmpsize);
-		tmptime=tmp;
-		tmpsize=0;
-	}
-#endif
-        
 	while (1) {
-#ifdef TRANS
-		ret=recv(sock,tickbuf+ticksize,min(TRANS-tmpsize,TSIZE-ticksize),0);
-#else
-		ret=recv(sock,tickbuf+ticksize,TSIZE-ticksize,0);
-#endif
-		if (ret<0) {
-			 if (!non_critical_socket_error()) so_error("receive error");
-			 ret=0;
+		if (SDLNet_CheckSockets(socket_set, 0) > 0 && SDLNet_SocketReady(sock)) {
+			ret = SDLNet_TCP_Recv(sock, tickbuf+ticksize, TSIZE-ticksize);
+			if (ret <= 0) {
+				so_error("receive error");
+			}
+		} else {
+			ret = 0;  // No data available
 		}
-#ifdef TRANS
-		tmpsize+=ret;
-#endif
-                ticksize+=ret;
 
-                if (ticksize>=tickstart+2) {
-			tmp=*(unsigned short*)(tickbuf+tickstart);
-			tmp&=0x7fff;
-			if (tmp<2) so_error("transmission corrupt");
-			tickstart+=tmp;
+		ticksize += ret;
+
+		if (ticksize >= tickstart + 2) {
+			tmp = *(unsigned short *) (tickbuf + tickstart);
+			tmp &= 0x7fff;
+			if (tmp < 2) so_error("transmission corrupt");
+			tickstart += tmp;
 			t_size++;
 		} else break;
 		handle_input();
 	}
 
-	return 0;	// no more work
+	return 0; // no more work
 }
 
 int tick_do(void)
@@ -1543,29 +1412,29 @@ int tick_do(void)
 	static int ctot=1,utot=1,t=0,td;
 
 	if (!t) t=time(NULL);
-        
+
         len=*(unsigned short*)(tickbuf);
 	comp=len&0x8000;
 	len&=0x7fff;
 	ctot+=len;
         if (len>ticksize) return 0;
 
-        if (comp) {		
+        if (comp) {
 		zs.next_in=tickbuf+2;
 		zs.avail_in=len-2;
-	
+
 		zs.next_out=buf;
 		zs.avail_out=65536;
 
                 ret=inflate(&zs,Z_SYNC_FLUSH);
 		if (ret!=Z_OK) { xlog(0,"uncompress error %d!",ret); }
-		
+
 		if (zs.avail_in) { xlog(0,"uncompress: avail is %d!!\n",zs.avail_in); }
 
-                csize=65536-zs.avail_out;				
+                csize=65536-zs.avail_out;
 	} else {
 		csize=len-2;
-		if (csize) memcpy(buf,tickbuf+2,csize);                                
+		if (csize) memcpy(buf,tickbuf+2,csize);
 	}
 
 	utot+=csize;
@@ -1588,7 +1457,7 @@ int tick_do(void)
         if (ticksize) memmove(tickbuf,tickbuf+len,ticksize);
 
         engine_tick();
-        
+
 	return 1;
 }
 

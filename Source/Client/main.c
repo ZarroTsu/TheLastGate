@@ -5,6 +5,7 @@
 #include <windows.h>  // TODO: Replace with SDL2 headers for cross-platform
 #include "main.h"
 #include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_net.h>
 
 #include "common.h"
 #include "input.h"
@@ -283,6 +284,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	void pascal (*regxy)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
 	parse_cmd(lpCmdLine);
 	log_init();
+	SDLNet_Init();
 
 	char *pref_path = SDL_GetPrefPath("TheLastGate", "TheLastGate");
 	char lock_path[512];
@@ -365,6 +367,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	cleanup_sound();
 	security_release_lock();
+	SDLNet_Quit();
 
 	return 0;
 }
