@@ -6,10 +6,7 @@
 #include <string.h>
 
 #include "../main.h"
-
-
-int do_music = 0;
-int do_sound = 1;
+#include "config/config.h"
 
 // This should be a big enough cache for now.
 #define MAX_CACHED_SOUNDS 64
@@ -94,7 +91,7 @@ void ds_pan_to_sdl_mixer(int pan, Uint8 *l_out, Uint8 *r_out) {
 }
 
 int play_sound(const char *file, const int vol, const int p) {
-    if (!do_sound) return 0;
+    if (!g_config.audio.sound_enabled) return 0;
 
     // Get sound from cache (or load and cache it)
     Mix_Chunk *chunk = get_cached_sound(file);
@@ -116,7 +113,7 @@ int play_sound(const char *file, const int vol, const int p) {
 
     if (sdl_volume < 0) sdl_volume = 0;
     if (sdl_volume > MIX_MAX_VOLUME) sdl_volume = MIX_MAX_VOLUME;
-    sdl_volume *= (int)((float)app_state.volume_level / 10.0f);
+    sdl_volume = (MIX_MAX_VOLUME * g_config.audio.sound_volume) / 10;
 
     Mix_Volume(channel, sdl_volume);
 

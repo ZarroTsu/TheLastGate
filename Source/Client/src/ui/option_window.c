@@ -16,6 +16,7 @@
 #include "../audio/sound.h"
 #include "../graphics/sdl.h"
 #include "widgets.h"
+#include "config/config.h"
 
 extern int do_darkmode;
 
@@ -133,7 +134,7 @@ static void audio_settings_tab() {
     imgui_push_style_color(IMGUI_COL_FRAME_BG_ACTIVE, 0.4f, 0.4f, 0.4f, 1.0f);   /* Active */
     imgui_push_style_color(IMGUI_COL_CHECK_MARK, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);  /* Checkmark */
 
-    imgui_checkbox("Audio Enabled?", &do_sound);
+    imgui_checkbox("Audio Enabled?", &g_config.audio.sound_enabled);
 
     imgui_pop_style_color(4);  /* Pop the 4 checkbox colors */
 
@@ -144,7 +145,7 @@ static void audio_settings_tab() {
     imgui_push_style_color(IMGUI_COL_SLIDER_GRAB, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);  /* Slider knob */
     imgui_push_style_color(IMGUI_COL_SLIDER_GRAB_ACTIVE, GOLD_FONT_COLOR[0] * 0.8f, GOLD_FONT_COLOR[1] * 0.8f, GOLD_FONT_COLOR[2] * 0.8f, 1.0f);  /* Knob when dragging */
 
-    imgui_slider_int("Audio Volume", &app_state.volume_level, 0, 10);
+    imgui_slider_int("Audio Volume", &g_config.audio.sound_volume, 0, 10);
 
     imgui_pop_style_color(5);  /* Pop the 5 slider colors */
     imgui_pop_style_color(1);  /* Pop the text color */

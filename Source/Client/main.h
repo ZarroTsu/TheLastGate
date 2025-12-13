@@ -8,7 +8,6 @@ typedef struct {
     int gamma;
     int windowed;
     int window_size[2];
-    int volume_level;
     bool cost_helper;
     bool escape_closes_menus_first;
     bool give_more;

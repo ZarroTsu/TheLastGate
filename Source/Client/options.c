@@ -35,6 +35,8 @@
 #include "merc.rh"
 #include "main.h"
 #include "options.h"
+
+#include "config/config.h"
 #include "config/keybindings.h"
 
 /*
@@ -97,7 +99,7 @@ struct pdata pdata={"","","",0};
 // option flags
 //--------------
 
-extern int do_music,do_sound,smode;
+extern int smode;
 static int opmusic,opsound,opshadow,opdarkmode;
 int race=0,sex=0;
 
@@ -248,8 +250,8 @@ void load_options(void)
 		if (read(handle,history,sizeof(history))!=sizeof(history)) flag=1;
 		if (read(handle,hist_len,sizeof(hist_len))!=sizeof(hist_len)) flag=1;
 		if (read(handle,words,sizeof(words))!=sizeof(words)) flag=1;
-		if (read(handle,&do_music,sizeof(do_music))!=sizeof(do_music)) flag=1;
-		if (read(handle,&do_sound,sizeof(do_sound))!=sizeof(do_sound)) flag=1;
+		if (read(handle,&g_config.audio.music_enabled,sizeof(int))!=sizeof(int)) flag=1; // sizeof(int) for backwards compatibility
+		if (read(handle,&g_config.audio.sound_enabled,sizeof(int))!=sizeof(int)) flag=1; // sizeof(int) for backwards compatibility
 		if (read(handle,&pdata,sizeof(pdata))!=sizeof(pdata)) flag=1;
 		if (read(handle,&okey,sizeof(okey))!=sizeof(okey)) flag=1;
 		if (read(handle,&app_state.gamma,sizeof(app_state.gamma))!=sizeof(app_state.gamma)) app_state.gamma=5000;
@@ -266,7 +268,7 @@ void load_options(void)
 		memset(history,0,sizeof(history));
 		memset(hist_len,0,sizeof(hist_len));
 		memset(words,0,sizeof(words));
-		do_music=0; do_sound=1; do_alpha=0; do_shadow=1; app_state.windowed=1; do_darkmode=0; app_state.gamma=5000;
+		g_config.audio.music_enabled=0; g_config.audio.sound_enabled=1; do_alpha=0; do_shadow=1; app_state.windowed=1; do_darkmode=0; app_state.gamma=5000;
 		memset(&pdata,0,sizeof(pdata));
 		pdata.show_names=1;
 		pdata.hide=1;
@@ -294,7 +296,7 @@ void load_extended_options(void)
 	// Set all defaults, keybinds are handled in init
 	app_state.escape_closes_menus_first = 1;
 	app_state.cost_helper = 0;
-	app_state.volume_level = 10;
+	g_config.audio.sound_volume = 10;
 	app_state.give_more = 0;
 	app_state.use_queue = 0;
 
@@ -310,7 +312,7 @@ void load_extended_options(void)
 			/* Read app_state fields */
 			if (read(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first)) != sizeof(app_state.escape_closes_menus_first)) return;
 			if (read(handle, &app_state.cost_helper, sizeof(app_state.cost_helper)) != sizeof(app_state.cost_helper)) return;
-			if (read(handle, &app_state.volume_level, sizeof(app_state.volume_level)) != sizeof(app_state.volume_level)) return;
+			if (read(handle, &g_config.audio.sound_volume, sizeof(g_config.audio.sound_volume)) != sizeof(g_config.audio.sound_volume)) return;
 			if (read(handle, &app_state.give_more, sizeof(app_state.give_more)) != sizeof(app_state.give_more)) return;
 			if (read(handle, &app_state.use_queue, sizeof(app_state.use_queue)) != sizeof(app_state.use_queue)) return;
 
@@ -369,8 +371,8 @@ void save_options(void)
 		write(handle,history,sizeof(history));
 		write(handle,hist_len,sizeof(hist_len));
 		write(handle,words,sizeof(words));
-		write(handle,&do_music,sizeof(do_music));
-		write(handle,&do_sound,sizeof(do_sound));
+		write(handle,&g_config.audio.music_enabled,sizeof(int)); // sizeof(int) for backwards compatibility
+		write(handle,&g_config.audio.sound_enabled,sizeof(int)); // sizeof(int) for backwards compatibility
 		write(handle,&pdata,sizeof(pdata));
 		write(handle,&okey,sizeof(okey));
 		write(handle,&app_state.gamma,sizeof(app_state.gamma));
@@ -398,7 +400,7 @@ void save_extended_options(void)
 		/* Write existing app_state fields */
 		write(handle, &app_state.escape_closes_menus_first, sizeof(app_state.escape_closes_menus_first));
 		write(handle, &app_state.cost_helper, sizeof(app_state.cost_helper));
-		write(handle, &app_state.volume_level, sizeof(app_state.volume_level));
+		write(handle, &g_config.audio.sound_volume, sizeof(g_config.audio.sound_volume));
 		write(handle, &app_state.give_more, sizeof(app_state.give_more));
 		write(handle, &app_state.use_queue, sizeof(app_state.use_queue));  /* FIXED */
 
@@ -699,8 +701,8 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case WM_CLOSE:			
 			//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 			//else domusic=0;
-			if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) do_sound=1;
-			else do_sound=0;
+			if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) g_config.audio.sound_enabled=1;
+			else g_config.audio.sound_enabled=0;
 
 			if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 			else do_shadow=0;
@@ -731,8 +733,8 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					}
 					//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 					//else domusic=0;
-					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) do_sound=1;
-					else do_sound=0;
+					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) g_config.audio.sound_enabled=1;
+					else g_config.audio.sound_enabled=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 					else do_shadow=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
@@ -775,8 +777,8 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				case    IDCANCEL:
 					//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 					//else domusic=0;
-					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) do_sound=1;
-					else do_sound=0;
+					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) g_config.audio.sound_enabled=1;
+					else g_config.audio.sound_enabled=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 					else do_shadow=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
@@ -1032,7 +1034,7 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 void options(void)
 {
-	opmusic=do_music; opsound=do_sound; opshadow=do_shadow; opdarkmode=do_darkmode;
+	opmusic=g_config.audio.music_enabled; opsound=g_config.audio.sound_enabled; opshadow=do_shadow; opdarkmode=do_darkmode;
 
 	if (DialogBox(hinst,MAKEINTRESOURCE(OPTIONS),desk_hwnd,OptionsProc)==-1) {
 		MessageBeep(MB_ICONEXCLAMATION);

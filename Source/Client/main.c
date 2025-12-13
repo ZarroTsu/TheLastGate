@@ -49,7 +49,6 @@ AppState app_state = {
 	.gamma = 5000,
 	.windowed = 1,
 	.window_size = {1280, 720},
-	.volume_level = 10, // 100%
 	.cost_helper = false,
 	.escape_closes_menus_first = true,
 	.give_more = false,

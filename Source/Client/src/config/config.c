@@ -12,7 +12,7 @@ GlobalConfig g_config = {
         .music_enabled = true,
         .music_volume = 10,
         .sound_enabled = true,
-        .sound_volume = 1
+        .sound_volume = 10
     },
     .ui = {
         .cost_helper = false,
