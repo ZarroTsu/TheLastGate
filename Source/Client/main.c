@@ -45,10 +45,7 @@
 #include "config/keybindings.h"
 
 AppState app_state = {
-	.tricky_flag = 0,
-	.gamma = 5000,
-	.windowed = 1,
-	.window_size = {1280, 720}
+	.tricky_flag = 0
 };
 
 const SdlClientVersion CLIENT_VERSION = {2,1};
@@ -394,7 +391,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (quit) exit(0);
 
 	init_sound();
-	tmp=init(app_state.windowed);
+	tmp=init(g_config.video.windowed);
 	/*
 	if (tmp!=0) { // A hacky fix for fullscreen support
 		screen_height=800;

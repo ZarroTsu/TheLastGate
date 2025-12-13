@@ -18,6 +18,7 @@
 #include "glad/glad.h"
 #include "shaders/shaders.h"
 #include "../log.h"
+#include "config/config.h"
 #include "shaders/effect_shader.h"
 #include "shaders/magic_shader.h"
 #include "shaders/solid_shader.h"
@@ -112,7 +113,7 @@ int sdl_init(const int windowed) {
                                   windowed ? SDL_WINDOWPOS_UNDEFINED : 0, width,
                                   height, windowFlags);
 
-    SDL_GetWindowSize(renderer.window, &app_state.window_size[0], &app_state.window_size[1]);
+    SDL_GetWindowSize(renderer.window, &g_config.video.window_size[0], &g_config.video.window_size[1]);
 
     if (!renderer.window) {
         LOG("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
@@ -688,7 +689,7 @@ void sdl_copyspritex(int nr, int x, int y, int effect) {
     }
 
     // Pack effect flags into integer
-    float gamma_scale = app_state.gamma / 5000.0f;
+    float gamma_scale = g_config.video.gamma / 5000.0f;
     float shade_effect, gamma_effect;
     bool grey, infra, water, red, green, invis, buff;
     calculate_gamma_shader_params(effect, &shade_effect, &gamma_effect, &grey, &infra, &water, &red, &green, &invis,
@@ -751,7 +752,7 @@ void sdl_putc(int xpos, int ypos, int font, int c) {
     }
 
     GLint model = use_effect_shader((EffectShaderSettings){
-        .gamma_scale = app_state.gamma / 5000.0f
+        .gamma_scale = g_config.video.gamma / 5000.0f
     });
 
     float model_matrix[16];
@@ -1039,7 +1040,7 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
 
 
     GLint model = use_effect_shader((EffectShaderSettings){
-        .gamma_scale = app_state.gamma / 5000.0f
+        .gamma_scale = g_config.video.gamma / 5000.0f
     });
 
     // Create model matrix for position and size

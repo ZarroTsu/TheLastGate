@@ -12,7 +12,7 @@
 #define Y_OFFSET 460
 #define RENDER_DISTANCE 54 // Mush match server-side
 #define CLAMP8(v) ((v) < 0 ? 0 : ((v) > 255 ? 255 : (v)))
-#define GAMMA_EFFECT	(app_state.gamma-4880)   //120
+#define GAMMA_EFFECT	(g_config.video.gamma-4880)   //120
 
 // Maximum sprites that can be batched in a single draw call
 #define MAX_BATCH_SIZE 10000

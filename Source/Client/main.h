@@ -5,9 +5,6 @@
 
 typedef struct {
     int tricky_flag;
-    int gamma;
-    int windowed;
-    int window_size[2];
 } AppState;
 
 typedef struct {

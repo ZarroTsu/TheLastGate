@@ -56,12 +56,12 @@ static int is_mouse_over_imgui(void) {
 
 void scale_mouse_event(SDL_Event *event) {
     /* Scale mouse coordinates from window space to virtual 1280x720 space for ImGui */
-    if (app_state.window_size[0] == SCREEN_WIDTH && app_state.window_size[1] == SCREEN_HEIGHT) {
+    if (g_config.video.window_size[0] == SCREEN_WIDTH && g_config.video.window_size[1] == SCREEN_HEIGHT) {
         return; /* No scaling needed */
     }
 
-    float scaleX = (float)SCREEN_WIDTH / (float)app_state.window_size[0];
-    float scaleY = (float)SCREEN_HEIGHT / (float)app_state.window_size[1];
+    float scaleX = (float)SCREEN_WIDTH / (float)g_config.video.window_size[0];
+    float scaleY = (float)SCREEN_HEIGHT / (float)g_config.video.window_size[1];
 
     switch (event->type) {
         case SDL_MOUSEMOTION:
@@ -131,7 +131,7 @@ void handle_input(void) {
         switch (e.type) {
             case SDL_WINDOWEVENT:
 #ifdef _WIN32
-                if (!app_state.windowed) {
+                if (!g_config.video.windowed) {
                     if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
                         MakeWindowTopMost(renderer.window);
                     } else if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
@@ -139,33 +139,33 @@ void handle_input(void) {
                     }
                 }
 #endif
-                if (app_state.windowed) {
+                if (g_config.video.windowed) {
                     if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
                         if (!window_resetting) {
                             xlog(2, "Game window resized, press shift+f10 to reset it.");
                         }
                         if ((SDL_GetWindowFlags(renderer.window) & SDL_WINDOW_MAXIMIZED) != 0) {
-                            app_state.window_size[0] = e.window.data1;
-                            app_state.window_size[1] = e.window.data2;
-                            resize_fbo_scaling(app_state.window_size[0], app_state.window_size[1]);
+                            g_config.video.window_size[0] = e.window.data1;
+                            g_config.video.window_size[1] = e.window.data2;
+                            resize_fbo_scaling(g_config.video.window_size[0], g_config.video.window_size[1]);
                             continue; // If they are maximizing the window just set the new size for scaling
                         }
 
                         // Otherwise attempt to maintain aspect ratio.
-                        int difference_width = abs(app_state.window_size[0] - e.window.data1);
-                        int difference_height = abs(app_state.window_size[1] - e.window.data2);
+                        int difference_width = abs(g_config.video.window_size[0] - e.window.data1);
+                        int difference_height = abs(g_config.video.window_size[1] - e.window.data2);
                         bool widthStretch = difference_width > difference_height;
                         if (widthStretch) {
                             int differenceFromNatural = e.window.data1 - SCREEN_WIDTH;
-                            app_state.window_size[0] = e.window.data1;
-                            app_state.window_size[1] = SCREEN_HEIGHT + (9.0f / 16.0f * (float)differenceFromNatural);
+                            g_config.video.window_size[0] = e.window.data1;
+                            g_config.video.window_size[1] = SCREEN_HEIGHT + (9.0f / 16.0f * (float)differenceFromNatural);
                         } else {
                             int differenceFromNatural = e.window.data2 - SCREEN_HEIGHT;
-                            app_state.window_size[0] = SCREEN_WIDTH + ( 16.0f / 9.0f * (float)differenceFromNatural);
-                            app_state.window_size[1] = e.window.data2;
+                            g_config.video.window_size[0] = SCREEN_WIDTH + ( 16.0f / 9.0f * (float)differenceFromNatural);
+                            g_config.video.window_size[1] = e.window.data2;
                         }
-                        SDL_SetWindowSize(renderer.window, app_state.window_size[0], app_state.window_size[1]);
-                        resize_fbo_scaling(app_state.window_size[0], app_state.window_size[1]);
+                        SDL_SetWindowSize(renderer.window, g_config.video.window_size[0], g_config.video.window_size[1]);
+                        resize_fbo_scaling(g_config.video.window_size[0], g_config.video.window_size[1]);
                         window_resetting = false;
                     }
                 }
@@ -289,17 +289,17 @@ void handle_input(void) {
                         show_opts = !show_opts;
                         break;
                     case SDLK_F10:
-                        if (app_state.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
-                            app_state.window_size[0] = SCREEN_WIDTH;
-                            app_state.window_size[1] = SCREEN_HEIGHT;
+                        if (g_config.video.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
+                            g_config.video.window_size[0] = SCREEN_WIDTH;
+                            g_config.video.window_size[1] = SCREEN_HEIGHT;
                             SDL_RestoreWindow(renderer.window);
                             window_resetting = true;
-                            SDL_SetWindowSize(renderer.window, app_state.window_size[0], app_state.window_size[1]);
+                            SDL_SetWindowSize(renderer.window, g_config.video.window_size[0], g_config.video.window_size[1]);
                             xlog(2, "Game window reset to default resolution.");
                         } else {
-                            app_state.gamma += 250;
-                            if (app_state.gamma > 6000) app_state.gamma = 5000;
-                            xlog(2, "Set gamma correction to %1.2f", app_state.gamma / 5000.0);
+                            g_config.video.gamma += 250;
+                            if (g_config.video.gamma > 6000) g_config.video.gamma = 5000;
+                            xlog(2, "Set gamma correction to %1.2f", g_config.video.gamma / 5000.0);
                         }
                         break;
                     case SDLK_F11:

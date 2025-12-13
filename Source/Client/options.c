@@ -208,7 +208,7 @@ void setres_1280()
 	xwalk_wx=XWALK_WX_1280;
 	xwalk_wy=XWALK_WY_1280;
 	
-	if (app_state.windowed == 0)
+	if (g_config.video.windowed == 0)
 	{
 		screen_tilexoff+=2;
 		screen_tileyoff-=5;
@@ -254,9 +254,9 @@ void load_options(void)
 		if (read(handle,&g_config.audio.sound_enabled,sizeof(int))!=sizeof(int)) flag=1; // sizeof(int) for backwards compatibility
 		if (read(handle,&pdata,sizeof(pdata))!=sizeof(pdata)) flag=1;
 		if (read(handle,&okey,sizeof(okey))!=sizeof(okey)) flag=1;
-		if (read(handle,&app_state.gamma,sizeof(app_state.gamma))!=sizeof(app_state.gamma)) app_state.gamma=5000;
+		if (read(handle,&g_config.video.gamma,sizeof(g_config.video.gamma))!=sizeof(g_config.video.gamma)) g_config.video.gamma=5000;
 		if (read(handle,&do_shadow,sizeof(do_shadow))!=sizeof(do_shadow)) do_shadow=1;
-		if (read(handle,&app_state.windowed,sizeof(app_state.windowed))!=sizeof(app_state.windowed)) app_state.windowed=1;
+		if (read(handle,&g_config.video.windowed,sizeof(g_config.video.windowed))!=sizeof(g_config.video.windowed)) g_config.video.windowed=1;
 		if (read(handle,&do_darkmode,sizeof(do_darkmode))!=sizeof(do_darkmode)) do_darkmode=0;
 		close(handle);
 	} else flag=1;
@@ -268,7 +268,7 @@ void load_options(void)
 		memset(history,0,sizeof(history));
 		memset(hist_len,0,sizeof(hist_len));
 		memset(words,0,sizeof(words));
-		g_config.audio.music_enabled=0; g_config.audio.sound_enabled=1; do_alpha=0; do_shadow=1; app_state.windowed=1; do_darkmode=0; app_state.gamma=5000;
+		g_config.audio.music_enabled=0; g_config.audio.sound_enabled=1; do_alpha=0; do_shadow=1; g_config.video.windowed=1; do_darkmode=0; g_config.video.gamma=5000;
 		memset(&pdata,0,sizeof(pdata));
 		pdata.show_names=1;
 		pdata.hide=1;
@@ -282,7 +282,7 @@ void load_options(void)
 		strcpy(okey.name,"New Account");
 	}
 	
-	if (app_state.gamma>6000 || app_state.gamma<5000) app_state.gamma=5000;
+	if (g_config.video.gamma>6000 || g_config.video.gamma<5000) g_config.video.gamma=5000;
 
 	/* Load TLGExtended.dat separately */
 	load_extended_options();
@@ -309,7 +309,7 @@ void load_extended_options(void)
 			unlink("TLGExtended.dat");
 		}
 		if (version >= 1) {
-			/* Read app_state fields */
+			/* Read g_config.video fields */
 			if (read(handle, &g_config.ui.escape_closes_menu_first, sizeof(g_config.ui.escape_closes_menu_first)) != sizeof(g_config.ui.escape_closes_menu_first)) return;
 			if (read(handle, &g_config.ui.cost_helper, sizeof(g_config.ui.cost_helper)) != sizeof(g_config.ui.cost_helper)) return;
 			if (read(handle, &g_config.audio.sound_volume, sizeof(g_config.audio.sound_volume)) != sizeof(g_config.audio.sound_volume)) return;
@@ -375,9 +375,9 @@ void save_options(void)
 		write(handle,&g_config.audio.sound_enabled,sizeof(int)); // sizeof(int) for backwards compatibility
 		write(handle,&pdata,sizeof(pdata));
 		write(handle,&okey,sizeof(okey));
-		write(handle,&app_state.gamma,sizeof(app_state.gamma));
+		write(handle,&g_config.video.gamma,sizeof(g_config.video.gamma));
 		write(handle,&do_shadow,sizeof(do_shadow));
-		write(handle,&app_state.windowed,sizeof(app_state.windowed));
+		write(handle,&g_config.video.windowed,sizeof(g_config.video.windowed));
 		write(handle,&do_darkmode,sizeof(do_darkmode));
 		close(handle);
 	}
@@ -397,7 +397,7 @@ void save_extended_options(void)
 		version = SAVE_VERSION;
 		write(handle, &version, sizeof(version));
 
-		/* Write existing app_state fields */
+		/* Write existing g_config.video fields */
 		write(handle, &g_config.ui.escape_closes_menu_first, sizeof(g_config.ui.escape_closes_menu_first));
 		write(handle, &g_config.ui.cost_helper, sizeof(g_config.ui.cost_helper));
 		write(handle, &g_config.audio.sound_volume, sizeof(g_config.audio.sound_volume));
@@ -665,8 +665,8 @@ void update_alpha(HWND hwnd)
 
 void update_screenmode(HWND hwnd)
 {
-	if (app_state.windowed == 0) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_FULLSCREEN);
-	if (app_state.windowed == 1) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_WINDOWED);
+	if (g_config.video.windowed == 0) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_FULLSCREEN);
+	if (g_config.video.windowed == 1) CheckRadioButton(hwnd,IDC_WINDOWED,IDC_FULLSCREEN,IDC_WINDOWED);
 
 	//if (screen_width == 800) CheckRadioButton(hwnd,IDC_RES800,IDC_RES1600,IDC_RES800);
 	//if (screen_width == 1280) CheckRadioButton(hwnd,IDC_RES800,IDC_RES1600,IDC_RES1280);
@@ -972,13 +972,13 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					return 1;
 				
 				case IDC_WINDOWED:
-					app_state.windowed=1;
+					g_config.video.windowed=1;
 					setres_1280();
 					update_buttons(hwnd);
 					return 1;
 				
 				case IDC_FULLSCREEN:
-					app_state.windowed=0;
+					g_config.video.windowed=0;
 					setres_1280();
 					update_buttons(hwnd);
 					return 1;

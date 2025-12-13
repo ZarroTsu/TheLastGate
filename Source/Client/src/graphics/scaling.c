@@ -8,6 +8,7 @@
 #include "sdl.h"
 #include "shaders/shaders.h"
 #include "../main.h"
+#include "config/config.h"
 #include "glad/glad.h"
 #include "shaders/scaling_shader_files.h"
 
@@ -107,7 +108,7 @@ void sdl_stop_scaling(void) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Set viewport to actual window size
-    glViewport(0, 0, app_state.window_size[0], app_state.window_size[1]);
+    glViewport(0, 0, g_config.video.window_size[0], g_config.video.window_size[1]);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
