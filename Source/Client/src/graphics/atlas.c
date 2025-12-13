@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "sdl.h"
-#include "../log.h"
+#include "log/log.h"
 #include "../engine.h"
 
 static AtlasGroup tile_atlas_group; // 32x32
@@ -29,7 +29,7 @@ static int get_sprite_count(const AtlasGroup group) {
 
 static void init_atlas(Atlas *atlas) {
     if (atlas->texture_id) {
-        LOG("Atlas already initialized\n");
+        log_debug("Atlas already initialized\n");
         return;
     }
 
@@ -85,7 +85,7 @@ static AtlasGroup *get_atlas_group_by_size(const int width, const int height) {
 
 unsigned int add_to_atlas(SpriteData *sprite_data) {
     if (sprite_data->loaded_in_atlas) {
-        LOG("Sprite already loaded into atlas.\n");
+        log_debug("Sprite already loaded into atlas.\n");
         return sprite_data->atlas_texture;
     }
 
@@ -124,7 +124,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
     // Check for OpenGL errors
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        LOG("ERROR: OpenGL error during glTexSubImage2D: 0x%x\n", err);
+        log_error("ERROR: OpenGL error during glTexSubImage2D: 0x%x\n", err);
         return 0;
     }
     float inset = 0.5f;
@@ -135,7 +135,7 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
         (ay + h) / (float) ATLAS_SIZE_Y
     };
 
-    LOG("Added sprite to atlasGroup (%s:%d) at (%d, %d), size %dx%d, UV: (%.4f, %.4f) to (%.4f, %.4f)\n",
+    log_debug("Added sprite to atlasGroup (%s:%d) at (%d, %d), size %dx%d, UV: (%.4f, %.4f) to (%.4f, %.4f)\n",
         atlasGroup->name, atlasGroup->current, ax, ay, w, h, sprite_data->uv0.u, sprite_data->uv0.v,
         sprite_data->uv1.u, sprite_data->uv1.v);
 

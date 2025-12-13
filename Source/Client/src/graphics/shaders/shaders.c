@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../log.h"
+#include "log/log.h"
 #include "../../main.h"
 #include "config/config.h"
 
@@ -18,7 +18,7 @@ static GLuint load_shader(const char *source, GLenum type) {
     if (!success) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        LOG("ERROR: Shader compilation failed (%s):\n%s\n", g_config.runtime.path, infoLog);
+        log_critical("ERROR: Shader compilation failed (%s):\n%s\n", g_config.runtime.path, infoLog);
         glDeleteShader(shader);
         return 0;
     }
@@ -31,7 +31,7 @@ GLuint load_shader_program(const char *vertex_source, const char *fragment_sourc
     GLuint fs = load_shader(fragment_source, GL_FRAGMENT_SHADER);
 
     if (!vs || !fs) {
-        LOG("ERROR: Failed to load shaders for program\n");
+        log_critical("ERROR: Failed to load shaders for program\n");
         if (vs) glDeleteShader(vs);
         if (fs) glDeleteShader(fs);
         return 0;
@@ -48,7 +48,7 @@ GLuint load_shader_program(const char *vertex_source, const char *fragment_sourc
     if (!success) {
         char infoLog[512];
         glGetProgramInfoLog(program, 512, NULL, infoLog);
-        LOG("ERROR: Shader program linking failed:\n%s\n", infoLog);
+        log_critical("ERROR: Shader program linking failed:\n%s\n", infoLog);
         glDeleteProgram(program);
         glDeleteShader(vs);
         glDeleteShader(fs);
@@ -58,6 +58,6 @@ GLuint load_shader_program(const char *vertex_source, const char *fragment_sourc
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    LOG("Shader program loaded successfully\n");
+    log_info("Shader program loaded successfully\n");
     return program;
 }

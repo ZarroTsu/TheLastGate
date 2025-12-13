@@ -24,7 +24,6 @@ add_executable(TheLastGate WIN32
         input.c
         input.h
         inter.c
-        log.h
         main.c
         main.h
         main.h
@@ -50,6 +49,7 @@ add_executable(TheLastGate WIN32
         src/config/keybindings.h
         src/ui/spell_hud.c
         src/config/config.c
+        src/log/log.c
 )
 
 # Disable warnings for old code compatibility

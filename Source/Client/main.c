@@ -43,6 +43,7 @@
 #include "audio/sound.h"
 #include "config/config.h"
 #include "config/keybindings.h"
+#include "log/log.h"
 
 AppState app_state = {
 	.tricky_flag = 0
@@ -329,8 +330,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// freopen("CONOUT$", "w", stderr);
 	// freopen("CONIN$",  "r", stdin);
 	parse_cmd(lpCmdLine);
-	freopen("client.log", "w", stdout);
-	setvbuf(stdout, NULL, _IONBF, 0); // unbuffered (optional but recommended)
+	log_init();
 
 	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
 	// Cross-platform: Use file locking (flock/lockf) or SDL_CreateMutex for thread safety

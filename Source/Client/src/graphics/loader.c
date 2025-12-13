@@ -11,7 +11,7 @@
 
 #include "sdl.h"
 #include "../inter.h"
-#include "../log.h"
+#include "log/log.h"
 #include "../main.h"
 #include "config/config.h"
 
@@ -52,7 +52,7 @@ SDL_Surface *load_from_png_lib(const int nr) {
 
     if (size > MAX_PNG_SIZE) {
         // TODO: this is a lie, that i don't want to fix right now.
-        LOG("Attempt to load a too big sprite: nr=%d; size=%d", nr, size);
+        log_debug("Attempt to load a too big sprite: nr=%d; size=%d", nr, size);
         size = MAX_PNG_SIZE;
     }
 
@@ -79,13 +79,13 @@ SDL_Surface *load_from_png_lib(const int nr) {
 SDL_Surface *load_from_gfx_lib(const int nr) {
     if (nr >= 40000 || gfx_lib[nr].xs == 0) return NULL;
     if (gfx_lib[nr].xs < 0 || gfx_lib[nr].xs > 1000 || gfx_lib[nr].ys < 0 || gfx_lib[nr].ys > 1000) {
-        LOG("Graphics file gx00.idx corrupt!");
+        log_error("Graphics file gx00.idx corrupt!");
         return NULL;
     }
     const ssize_t length = gfx_lib[nr].xs * gfx_lib[nr].ys * 2;
     unsigned short *buffer = malloc(length);
     if (!buffer) {
-        LOG("Error allocating memory: length=%lld", length);
+        log_error("Error allocating memory: length=%lld", length);
         free(buffer);
         return NULL;
     }
@@ -126,7 +126,7 @@ static int init_png_lib() {
     snprintf(file, sizeof(file), "%spnglib.idx", g_config.runtime.path);
     const int handle = open(file, O_RDONLY | O_BINARY);
     if (handle == -1) {
-        LOG("Could not open pnglib.idx: path=%s", file);
+        log_error("Could not open pnglib.idx: path=%s", file);
         return -1;
     }
 
@@ -138,7 +138,7 @@ static int init_png_lib() {
     snprintf(file, sizeof(file), "%spnglib.dat", g_config.runtime.path);
     png_lib = fopen(file, "rb");
     if (png_lib == NULL) {
-        LOG("Could not open pnglib.dat: path=%s", file);
+        log_error("Could not open pnglib.dat: path=%s", file);
         return -1;
     }
 
@@ -150,19 +150,19 @@ static int init_gfx_lib() {
     snprintf(file, sizeof(file), "%sgx00.idx", g_config.runtime.path);
     const int handle = open(file, O_RDONLY | O_BINARY);
     if (handle == -1) {
-        LOG("Could not open gx00.idx: path=%s", file);
+        log_error("Could not open gx00.idx: path=%s", file);
         return -1;
     }
 
     const int length = filelength(handle);
     gfx_lib = malloc(length);
     if (!gfx_lib) {
-        LOG("Error allocating gfx_lib: lenth=%d", length);
+        log_error("Error allocating gfx_lib: lenth=%d", length);
         return -1;
     }
 
     if (length < sizeof(*gfx_lib) * 40000) {
-        LOG("Graphics file gx00.idx corrupt!");
+        log_error("Graphics file gx00.idx corrupt!");
         return -1;
     }
 
@@ -172,7 +172,7 @@ static int init_gfx_lib() {
     sprintf(file, "%sgx00.dat", g_config.runtime.path);
     gfx_handle = open(file, O_RDONLY | O_BINARY);
     if (gfx_handle == -1) {
-        LOG("Could not open gx00.dat: path=%s", file);
+        log_error("Could not open gx00.dat: path=%s", file);
         return -1;
     }
     return 0;
@@ -186,7 +186,7 @@ static SDL_Surface *make_standard_format(SDL_Surface *loaded) {
     SDL_Surface *converted_surface = SDL_ConvertSurfaceFormat(loaded, LOADED_SPRITE_PIXEL_FORMAT, 0);
     SDL_FreeSurface(loaded);
     if (!converted_surface) {
-        LOG("make_standard_format failed: %s", SDL_GetError());
+        log_error("make_standard_format failed: %s", SDL_GetError());
         return NULL;;
     }
 

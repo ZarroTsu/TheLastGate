@@ -17,7 +17,7 @@
 #include "sprite_data.h"
 #include "glad/glad.h"
 #include "shaders/shaders.h"
-#include "../log.h"
+#include "log/log.h"
 #include "config/config.h"
 #include "shaders/effect_shader.h"
 #include "shaders/magic_shader.h"
@@ -89,7 +89,7 @@ int sdl_init(const int windowed) {
                                 windowed ? SDL_WINDOW_RESIZABLE : 0) | (!windowed ? SDL_WINDOW_BORDERLESS : 0);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        LOG("Couldn't initialize SDL: %s\n", SDL_GetError());
+        log_critical("Couldn't initialize SDL: %s\n", SDL_GetError());
         return -1;
     }
 
@@ -116,7 +116,7 @@ int sdl_init(const int windowed) {
     SDL_GetWindowSize(renderer.window, &g_config.video.window_size[0], &g_config.video.window_size[1]);
 
     if (!renderer.window) {
-        LOG("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
+        log_critical("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
         return -1;
     }
 
@@ -125,7 +125,7 @@ int sdl_init(const int windowed) {
     // Create OpenGL context
     renderer.gl_context = SDL_GL_CreateContext(renderer.window);
     if (!renderer.gl_context) {
-        LOG("Failed to create OpenGL context: %s\n", SDL_GetError());
+        log_critical("Failed to create OpenGL context: %s\n", SDL_GetError());
         return -1;
     }
 
@@ -133,11 +133,11 @@ int sdl_init(const int windowed) {
 
     // Load OpenGL functions with GLAD
     if (!gladLoadGL()) {
-        LOG("Failed to load OpenGL functions with GLAD\n");
+        log_critical("Failed to load OpenGL functions with GLAD\n");
         return -1;
     }
 
-    LOG("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
+    log_debug("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // Disable vsync - let game's internal frame limiter handle timing
     // VSync at 60 FPS conflicts with game's target FPS, causing frame skip issues
@@ -192,12 +192,12 @@ int sdl_init(const int windowed) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    LOG("OpenGL quad VAO/VBO created\n");
+    log_debug("OpenGL quad VAO/VBO created\n");
 
     // Allocate CPU-side batch buffer
     renderer.batch_buffer = malloc(MAX_BATCH_SIZE * sizeof(SpriteInstance));
     if (!renderer.batch_buffer) {
-        LOG("Failed to allocate batch buffer\n");
+        log_critical("Failed to allocate batch buffer\n");
         return -1;
     }
     renderer.batch_count = 0;
@@ -259,7 +259,7 @@ int sdl_init(const int windowed) {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    LOG("Sprite batch system initialized (max %d sprites per batch)\n", MAX_BATCH_SIZE);
+    log_info("Sprite batch system initialized (max %d sprites per batch)\n", MAX_BATCH_SIZE);
 
     init_atlas_groups();
 
@@ -336,7 +336,7 @@ void sdl_init_sprites(void) {
     if (!sprite_data) {
         sprite_data = calloc(MAX_SPRITES, sizeof(SpriteData));
         if (!sprite_data) {
-            LOG("Failed to allocate sprite table\n");
+            log_critical("Failed to allocate sprite table\n");
             return;
         }
     }
@@ -543,14 +543,14 @@ void sdl_load_sprite(const int nr) {
 
     // Fallback to sprite #35 if not found
     if (!surface && nr != 35) {
-        LOG("Sprite %d not found, using fallback sprite #35\n", nr);
+        log_warning("Sprite %d not found, using fallback sprite #35\n", nr);
         surface = load_from_file(nr);
         if (!surface) surface = load_from_png_lib(nr);
         if (!surface) surface = load_from_gfx_lib(nr);
     }
 
     if (!surface) {
-        LOG("Failed to load sprite %d\n", nr);
+        log_error("Failed to load sprite %d\n", nr);
         return;
     }
 
