@@ -6,21 +6,21 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/compiler_options.cmake)
 add_executable(TheLastGate WIN32
         engine.c
         engine.h
-        graphics/atlas.c
-        graphics/atlas.h
-        graphics/loader.c
-        graphics/loader.h
-        graphics/scaling.c
-        graphics/sdl.c
-        graphics/sdl.h
-        graphics/shaders/effect_shader.c
-        graphics/shaders/effect_shader.h
-        graphics/shaders/magic_shader.c
-        graphics/shaders/shaders.c
-        graphics/shaders/shaders.h
-        graphics/shaders/solid_shader.c
-        graphics/shaders/solid_shader.h
-        graphics/sprite_data.h
+        src/graphics/atlas.c
+        src/graphics/atlas.h
+        src/graphics/loader.c
+        src/graphics/loader.h
+        src/graphics/scaling.c
+        src/graphics/sdl.c
+        src/graphics/sdl.h
+        src/graphics/shaders/effect_shader.c
+        src/graphics/shaders/effect_shader.h
+        src/graphics/shaders/magic_shader.c
+        src/graphics/shaders/shaders.c
+        src/graphics/shaders/shaders.h
+        src/graphics/shaders/solid_shader.c
+        src/graphics/shaders/solid_shader.h
+        src/graphics/sprite_data.h
         input.c
         input.h
         inter.c
@@ -29,26 +29,26 @@ add_executable(TheLastGate WIN32
         main.h
         main.h
         MERC.rc
-        mods/base_cost_warning.c
-        mods/base_cost_warning.h
-        mods/give_more.c
-        mods/give_more.h
-        mods/use_queue.c
-        mods/use_queue.h
+        src/mods/base_cost_warning.c
+        src/mods/base_cost_warning.h
+        src/mods/give_more.c
+        src/mods/give_more.h
+        src/mods/use_queue.c
+        src/mods/use_queue.h
         options.c
-        graphics/render.c
-        graphics/render.h
-        graphics/sdl_magic.c
+        src/graphics/render.c
+        src/graphics/render.h
+        src/graphics/sdl_magic.c
         socket.c
         socket.h
-        audio/sound.c
-        audio/sound.h
-        ui/option_window.c
-        ui/option_window.h
-        ui/widgets.c
-        config/keybindings.c
-        config/keybindings.h
-        ui/spell_hud.c
+        src/audio/sound.c
+        src/audio/sound.h
+        src/ui/option_window.c
+        src/ui/option_window.h
+        src/ui/widgets.c
+        src/config/keybindings.c
+        src/config/keybindings.h
+        src/ui/spell_hud.c
 )
 
 # Disable warnings for old code compatibility

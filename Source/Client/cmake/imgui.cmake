@@ -18,7 +18,7 @@ set(IMGUI_SOURCES
 
 # C++ wrapper source
 set(IMGUI_WRAPPER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui/imgui/imgui_wrapper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/imgui/imgui_wrapper.cpp
 )
 
 # Create a static library for ImGui

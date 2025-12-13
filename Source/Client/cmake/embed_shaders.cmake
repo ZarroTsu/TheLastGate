@@ -2,7 +2,7 @@
     set(FRAG ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag)
     set(VERT ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert)
     set(OUT ${PROJECT_SOURCE_DIR}/_generated/shaders/${SHADER_NAME}_shader_files.h)
-    set(TEMPLATE ${PROJECT_SOURCE_DIR}/graphics/embedded_shader.h.in)
+    set(TEMPLATE ../src/graphics/embedded_shader.h.in)
 
     message(STATUS "Checking shader ${SHADER_NAME}")
     message(STATUS "  FRAG = ${FRAG}")
