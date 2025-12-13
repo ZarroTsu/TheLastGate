@@ -5,7 +5,7 @@
 #include <SDL2/SDL_audio.h>
 #include <string.h>
 
-#include "../main.h"
+#include "main.h"
 #include "config/config.h"
 
 // This should be a big enough cache for now.

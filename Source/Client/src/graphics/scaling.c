@@ -7,7 +7,7 @@
 
 #include "sdl.h"
 #include "shaders/shaders.h"
-#include "../main.h"
+#include "main.h"
 #include "config/config.h"
 #include "glad/glad.h"
 #include "shaders/scaling_shader_files.h"

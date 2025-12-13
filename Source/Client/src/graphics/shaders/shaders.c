@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "log/log.h"
-#include "../../main.h"
+#include "main.h"
 #include "config/config.h"
 
 

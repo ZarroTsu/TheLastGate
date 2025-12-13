@@ -3,18 +3,18 @@
 //
 
 #include "option_window.h"
-#include "../inter.h"
+#include "inter.h"
 
 #include <stdbool.h>
 
 #include "imgui/imgui_wrapper.h"
 #include "config/keybindings.h"
 #include "ui_common.h"
-#include "../engine.h"
-#include "../main.h"
-#include "../graphics/render.h"
-#include "../audio/sound.h"
-#include "../graphics/sdl.h"
+#include "engine.h"
+#include "main.h"
+#include "graphics/render.h"
+#include "audio/sound.h"
+#include "graphics/sdl.h"
 #include "widgets.h"
 #include "config/config.h"
 

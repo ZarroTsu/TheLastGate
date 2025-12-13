@@ -4,7 +4,7 @@
 
 #include "sdl.h"
 #include "log/log.h"
-#include "../engine.h"
+#include "engine.h"
 
 static AtlasGroup tile_atlas_group; // 32x32
 static AtlasGroup character_atlas_group; // 64x64

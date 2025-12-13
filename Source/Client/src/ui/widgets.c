@@ -3,7 +3,7 @@
 #include "imgui/imgui_wrapper.h"
 #include "ui_common.h"
 #include "graphics/sdl.h"
-#include "../config/keybindings.h"
+#include "config/keybindings.h"
 #include <stdio.h>
 
 #include "input.h"

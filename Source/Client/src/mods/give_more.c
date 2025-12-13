@@ -3,9 +3,9 @@
 //
 
 #include "give_more.h"
-#include "../engine.h"
-#include "../common.h"
-#include "../inter.h"
+#include "engine.h"
+#include "common.h"
+#include "inter.h"
 
 static LastGiven last_given = {
     .sprite_id = 0,

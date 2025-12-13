@@ -2,8 +2,8 @@
 
 #include <stdbool.h>
 
-#include "../engine.h"
-#include "../inter.h"
+#include "engine.h"
+#include "inter.h"
 
 static QueuedCommands queued_commands = {0};
 

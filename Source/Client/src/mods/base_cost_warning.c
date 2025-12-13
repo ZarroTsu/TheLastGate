@@ -1,8 +1,8 @@
 ﻿#include "base_cost_warning.h"
 
-#include "../common.h"
-#include "../engine.h"
-#include "../inter.h"
+#include "common.h"
+#include "engine.h"
+#include "inter.h"
 
 typedef struct {
     int cost;

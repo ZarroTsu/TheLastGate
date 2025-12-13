@@ -10,9 +10,9 @@
 #include <SDL2/SDL_image.h>
 
 #include "sdl.h"
-#include "../inter.h"
+#include "inter.h"
 #include "log/log.h"
-#include "../main.h"
+#include "main.h"
 #include "config/config.h"
 
 
