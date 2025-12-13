@@ -1,39 +1,9 @@
-/*
- * MAIN.C - Client Entry Point and Main Loop
- *
- * TODO: MODERN GCC/MINGW COMPATIBILITY
- * ====================================
- * This file requires updates for modern compiler compatibility:
- *
- * HEADERS:
- * - <alloc.h> -> <malloc.h> or <stdlib.h>
- * - <io.h> -> <unistd.h> or standard C file I/O
- * - <windowsx.h> -> May not be needed
- * - "ddraw.h" -> Replace with SDL2 headers
- * - #pragma hdrstop -> Remove (Borland C++ specific)
- *
- * WINDOWS API:
- * - HWND, HINSTANCE -> SDL_Window* in SDL2
- * - HCURSOR -> SDL_Cursor* in SDL2
- * - Window message loop -> SDL event loop
- * - WinMain() -> main() with SDL_main wrapper
- *
- * See individual TODO comments below for specific locations.
- */
-
-// TODO: Modern GCC/MinGW - Replace deprecated headers
 #include <stdio.h>
 #include <malloc.h>
 #include <fcntl.h>
-#include <io.h>     // TODO: Replace with <unistd.h> or standard C file I/O
 #include <stdlib.h>
 #include <windows.h>  // TODO: Replace with SDL2 headers for cross-platform
-#include <windowsx.h> // TODO: May not be needed with SDL2
 #include "main.h"
-#include "ddraw.h"    // TODO: Remove - DirectDraw is deprecated
-#include <process.h>  // TODO: Use pthread or SDL_thread for cross-platform threading
-#include <signal.h>
-#pragma hdrstop  // TODO: Remove - Borland C++ specific
 #include <SDL2/SDL_mouse.h>
 
 #include "common.h"
@@ -44,6 +14,7 @@
 #include "config/config.h"
 #include "config/keybindings.h"
 #include "log/log.h"
+#include "security/single_instance.h"
 
 AppState app_state = {
 	.tricky_flag = 0
@@ -74,9 +45,6 @@ void conv_init(void);
 int init_pnglib(void);
 
 extern int cursor_type;
-// TODO: Modern GCC/MinGW - HCURSOR is Windows-specific
-// SDL2: Use SDL_Cursor* created with SDL_CreateCursor() or SDL_CreateSystemCursor()
-HCURSOR cursor[10];  // TODO: Replace with SDL_Cursor* array
 SDL_Cursor* cursors[10];
 
 void cmd(int cmd,int x,int y);
@@ -185,9 +153,6 @@ HBRUSH dlg_back;
 int dlg_col,dlg_fcol;
 
 int mx=0,my=0;
-// TODO: Modern GCC/MinGW - POINT is Windows-specific struct (x, y coordinates)
-// SDL2: Use SDL_Point struct or just separate int x, y variables
-POINT pt;
 
 void say(char *input)
 {
@@ -298,7 +263,6 @@ void log_system_data(void)
 	sprintf(buf,"|computername=\"%s\"",computer); say(buf);
 }
 
-#pragma argsused  // TODO: Remove - Borland C++ specific pragma
 // TODO: Modern GCC/MinGW - WinMain is Windows-specific entry point
 // SDL2: Replace with standard main() using SDL_main wrapper
 // Example:
@@ -312,44 +276,20 @@ void log_system_data(void)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nCmdShow)
 {
-	HWND hwnd;  // TODO: SDL2: Replace with SDL_Window*
 	char buf[2048];
 	int tmp;
 	HANDLE lib;  // TODO: Modern GCC/MinGW - HANDLE is Windows-specific
 	void pascal (*regxx)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
 	void pascal (*regxy)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
-	HANDLE mutex;  // TODO: Modern GCC/MinGW - Replace with SDL_mutex or file locking
-	char *mutmoa;
-	int tmpi,tmpj = 0;
-
-        /* create_pnglib();
-	exit(1); */
-
-	// AllocConsole();
-	// freopen("CONOUT$", "w", stdout);
-	// freopen("CONOUT$", "w", stderr);
-	// freopen("CONIN$",  "r", stdin);
 	parse_cmd(lpCmdLine);
 	log_init();
 
-	// TODO: Modern GCC/MinGW - CreateMutex is Windows-specific for single instance check
-	// Cross-platform: Use file locking (flock/lockf) or SDL_CreateMutex for thread safety
-	// Example: int lock_fd = open("game.lock", O_CREAT | O_RDWR, 0666); flock(lock_fd, LOCK_EX | LOCK_NB);
-	mutex=CreateMutex(NULL,0,mutmoa="MOATLG");
-	// TODO: Modern GCC/MinGW - GetLastError is Windows-specific
-	// Cross-platform: Use errno for POSIX functions
-	if (mutex==NULL || GetLastError()==ERROR_ALREADY_EXISTS && strcmp(host_addr,"127.0.0.1")) {
-		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
-		// SDL2: Use SDL_ShowSimpleMessageBox()
-		// Example: SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "message", NULL);
-		MessageBox(0,"Another instance of "MNAME" is already running.","Error",MB_OK|MB_ICONSTOP);
-		return 0;
-	}
-	// Amateur anti-cheat
-	for (tmpi = 0; tmpi<6; tmpi++) tmpj+=mutmoa[tmpi];
-	if (tmpj!=452)
-	{
-		MessageBox(0,"There is a problem with "MNAME". You aren't trying to cheat, are you?","Error",MB_OK|MB_ICONSTOP);
+	char *pref_path = SDL_GetPrefPath("TheLastGate", "TheLastGate");
+	char lock_path[512];
+	snprintf(lock_path, sizeof(lock_path), "%sgame.lock", pref_path);
+	SDL_free(pref_path);
+	if (!security_acquire_lock(lock_path)) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance of the game is already running.", NULL);
 		return 0;
 	}
 
@@ -392,16 +332,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	init_sound();
 	tmp=init(g_config.video.windowed);
-	/*
-	if (tmp!=0) { // A hacky fix for fullscreen support
-		screen_height=800;
-		if (screen_windowed == 1) {
-			tmp=dd_init_windowed(hwnd,screen_width,screen_height);
-		} else {
-			tmp=dd_init(hwnd,screen_width,screen_height);
-		}
-	}
-	*/
 
 	if (tmp!=0) {
 
@@ -415,9 +345,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				"Client Version %d.%02d.%02d\n"
 				"R=%04X, G=%04X, B=%04X\n"
 				-tmp,NETWORKING_VERSION>>16,(NETWORKING_VERSION>>8)&255,NETWORKING_VERSION&255,RED,GREEN,BLUE);
-		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
-		// SDL2: Use SDL_ShowSimpleMessageBox()
-		MessageBox(hwnd,buf,"DirectX init failed.",MB_ICONSTOP|MB_OK);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Init failed", "Check error.log for logs", NULL);
 		exit(1);
 	}
     sprintf(buf,"|R=%04X, G=%04X, B=%04X, RGBM=%d",RED,GREEN,BLUE);
@@ -436,6 +364,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	save_options();
 
 	cleanup_sound();
+	security_release_lock();
 
 	return 0;
 }

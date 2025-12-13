@@ -54,9 +54,6 @@ int pskip=0,pidle=0;
 extern int t_size;
 
 extern int cursor_type;
-// TODO: Modern GCC/MinGW - HCURSOR is Windows-specific
-// SDL2: Use SDL_Cursor* array
-extern HCURSOR cursor[10];
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 //extern int screen_overlay_sprite;

@@ -50,6 +50,7 @@ add_executable(TheLastGate WIN32
         src/ui/spell_hud.c
         src/config/config.c
         src/log/log.c
+        src/security/single_instance.c
 )
 
 # Disable warnings for old code compatibility
