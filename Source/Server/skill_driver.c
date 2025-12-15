@@ -3507,7 +3507,7 @@ void skill_poison(int cn)
 	int power = M_SK(cn, SK_POISON), cost = SP_COST_POISON;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
-	int can_aoe = (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn));
+	//int can_aoe = (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn));
 	//int aoe_power = GET_PROX(cn);
 	
 	if (do_get_iflag(cn, SF_TOWER_R)) d20 = SP_MULT_POISON2;
@@ -5798,39 +5798,36 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	if (!co_orig)
 		surround_cast(cn, co, 0, SK_CLEAVE, power, dr1, dr2);
 	
-	return 1;
+	return 1+tmp;
 }
 void skill_cleave(int cn)
 {
-	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int power, aoepower, cost, co;
-	int can_aoe = CAN_WARR_PROX(cn);
-	
-	chlog(cn, "Uses CLEAVE on %s", ch[co].name);
-	
-	power = M_SK(cn, SK_CLEAVE) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
-	aoepower = M_SK(cn, SK_SURROUND);
-	power = skill_multiplier(power, cn);
-	cost = power/12 + 5;
+	int power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon / 4 + ch[cn].top_damage / 4, cn);
+	int cost = power/12 + 5;
+	int count = 0, hit = 0, in = 0, co = 0, co_orig = 0;
 	
 	if (IS_PLAYER(cn) && (IS_ANY_TEMP(cn) || IS_WARRIOR(cn) || IS_LYCANTH(cn)))
 		cost = cost/3*2;
-	else if (IS_PLAYER_GC(cn))
+	else if (IS_PLAYER_COMP(cn))
 		cost = 5;
 	else if (!IS_PLAYER(cn))
 		cost = 20;
 	
 	// Get hit target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0)))
-		return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0))) return;
 	
-	spell_cleave(cn, co, power, 0, dr1, dr2);
+	spell_cleave(cn, co, power, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
 	
-	// Zephyr for Warrs
-	if (IS_WARRIOR(cn) && B_SK(cn, SK_ZEPHYR) && (power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn)))
+	// Zephyr proc
+	if (in = has_spell(cn, SK_ZEPHYR))
 	{
-		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, aoepower, 0, 0, 0, 0, -1, -1);
-		aoe_driver(cn, cn, 0, SK_ZEPHYR2, power, aoepower, 0, 0, 0, 0);
+		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0, -1, -1);
+		aoe_driver(cn, cn, 0, SK_ZEPHYR2, bu[in].power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0);
+	}
+	else if (B_SK(cn, SK_ZEPHYR) && (power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn)))
+	{
+		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0, -1, -1);
+		aoe_driver(cn, cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0);
 	}
 	
 	add_exhaust(cn, SK_EXH_CLEAVE);
@@ -5883,8 +5880,7 @@ void skill_bash(int cn)
 	if (!IS_PLAYER(cn)) cost = 20;
 	
 	// Get hit target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SHIELD, 0, power, 0)))
-		return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SHIELD, 0, power, 0))) return;
 	
 	spell_bash(cn, co, power, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
 	
@@ -5942,15 +5938,10 @@ int spell_weaken(int cn, int co, int power, int flag)
 void skill_weaken(int cn)
 {
 	int d20 = SP_MULT_WEAKEN;
-	int power, aoe_power, cost;
+	int power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn), cost = SP_COST_WEAKEN;
 	int count = 0, hit = 0;
 	int co = 0, co_orig = 0;
-	int can_aoe = CAN_BRAV_PROX(cn);
-	
-	power = M_SK(cn, SK_WEAKEN);
-	power = skill_multiplier(power, cn);
-	aoe_power = M_SK(cn, SK_PROX);
-	cost = SP_COST_WEAKEN;
+	//int can_aoe = CAN_BRAV_PROX(cn);
 	
 	// Tarot Card - Death :: Change Weaken into Crush
 	if (do_get_iflag(cn, SF_DEATH)) 
@@ -5960,24 +5951,25 @@ void skill_weaken(int cn)
 	}
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_WEAKEN, 0, power, d20)))
-		return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_WEAKEN, 0, power, d20))) return;
 	
-	// If we have a valid target, cast Slow on them
+	// If we have a valid target, cast Weaken on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		spell_weaken(cn, co, power, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
+		spell_weaken(cn, (co_orig = co), power, 0);
+		count = hit = 1;
 	}
 	
+	// Skill AoE
+	if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), count, hit, 0) < 0) return;
+	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	
+	/*
 	// Cast AoE or general surround-hit
 	if (can_aoe)
 	{
-		//if (cast_aoe_spell(cn, co, SK_WEAKEN, power, aoe_power, cost, count, hit, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, co, SK_WEAKEN, power, aoe_power, cost, count, hit, 0) < 0)
+		//if (cast_aoe_spell(cn, co, SK_WEAKEN, power, GET_PROX(cn), cost, count, hit, 0, -1, -1) < 0)
+		if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), cost, count, hit, 0) < 0)
 			return;
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
@@ -5986,6 +5978,7 @@ void skill_weaken(int cn)
 	{
 		surround_cast(cn, co_orig, 0, SK_WEAKEN, power, -1, -1);
 	}
+	*/
 	
 	add_exhaust(cn, SK_EXH_WEAKEN);
 }
