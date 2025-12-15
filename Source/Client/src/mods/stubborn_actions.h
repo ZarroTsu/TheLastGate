@@ -12,10 +12,13 @@ typedef struct {
     int number_of_attempts;
     int target_item_sprite; // Used for DROP/PICKUP
     int target_character_id; // Used for GIVE
+    bool indicator;
 } StubbornActionState;
 
 void mod_stubborn_actions_on_cmd(int action, int tile_id);
+void mod_stubborn_actions_set_use_cmd(int x, int y);
 void mod_stubborn_actions_on_misc_action(int action);
 bool mod_stubborn_actions_pending_use();
 void mod_stubborn_actions_clear();
 void mod_stubborn_actions_on_tick(Uint32 delta_time);
+bool mod_stubborn_actions_is_cmd_pending(int cmd, int x, int y);

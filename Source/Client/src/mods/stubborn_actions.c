@@ -52,26 +52,42 @@ static Uint32 get_next_attempt_time() {
     return max(1000, min(5000, 1000 * state.number_of_attempts));
 }
 
-void mod_stubborn_actions_on_cmd(const int action, const int tile_id) {
+static bool is_stubborn_action_enabled(int action) {
     switch (action) {
         case CL_CMD_USE:
-            if (!g_config.gameplay.stubborn_use) return;
+            if (g_config.gameplay.stubborn_use) return true;
             break;
         case CL_CMD_DROP:
-            if (!g_config.gameplay.stubborn_drop) return;
+            if (g_config.gameplay.stubborn_drop) return true;
             break;
         case CL_CMD_PICKUP:
-            if (!g_config.gameplay.stubborn_pickup) return;
+            if (g_config.gameplay.stubborn_pickup) return true;
             break;
         case CL_CMD_MOVE:
-            if (!g_config.gameplay.stubborn_move) return;
+            if (g_config.gameplay.stubborn_move) return true;
             break;
         case CL_CMD_GIVE:
-            if (!g_config.gameplay.stubborn_give) return;
+            if (g_config.gameplay.stubborn_give) return true;
             break;
         default:
-            break;
+            return false;
     }
+}
+
+void mod_stubborn_actions_set_use_cmd(int x, int y) {
+    if (!g_config.gameplay.stubborn_use) return;
+    state.pending_action = CL_CMD_USE;
+    state.target_x = x;
+    state.target_y = y;
+    state.last_x = map[center()].x;
+    state.last_y = map[center()].y;
+    state.number_of_attempts = 0;
+    state.next_attempt = get_next_attempt_time();
+    state.indicator = false;
+}
+
+void mod_stubborn_actions_on_cmd(const int action, const int tile_id) {
+    if (!is_stubborn_action_enabled(action)) return;
     state.pending_action = action;
     state.target_x = map[tile_id].x;
     state.target_y = map[tile_id].y;
@@ -79,14 +95,16 @@ void mod_stubborn_actions_on_cmd(const int action, const int tile_id) {
     state.last_y = map[center()].y;
     state.target_item_sprite = map[tile_id].it_sprite;
     state.target_character_id = map[tile_id].ch_nr;
-    state.next_attempt = 1000;
     state.number_of_attempts = 0;
+    state.next_attempt = get_next_attempt_time();
+    state.indicator = false;
 }
 
 void mod_stubborn_actions_on_misc_action(int action) {
     if (state.pending_action == 0) return;
     if (action == DR_USE && state.pending_action == CL_CMD_USE) {
         state.pending_action = 0;
+        state.indicator = false;
         pop_cmd_from_queue();
     } else if (
         (action == DR_GIVE && state.pending_action == CL_CMD_GIVE) ||
@@ -94,6 +112,7 @@ void mod_stubborn_actions_on_misc_action(int action) {
         (action == DR_DROP && state.pending_action == CL_CMD_PICKUP)
     ) {
         state.pending_action = 0;
+        state.indicator = false;
     }
 }
 
@@ -102,6 +121,7 @@ bool mod_stubborn_actions_pending_use() {
 }
 
 void mod_stubborn_actions_clear() {
+    state.indicator = false;
     state.pending_action = 0;
 }
 
@@ -142,8 +162,13 @@ void mod_stubborn_actions_on_tick(const Uint32 delta_time) {
                 state.number_of_attempts++;
             }
             state.next_attempt = get_next_attempt_time();
+            state.indicator = true;
         } else {
             state.next_attempt -= delta_time;
         }
     }
+}
+
+bool mod_stubborn_actions_is_cmd_pending(int cmd, int x, int y) {
+    return is_stubborn_action_enabled(cmd) && state.indicator && cmd == state.pending_action && x == state.target_x && y == state.target_y;
 }

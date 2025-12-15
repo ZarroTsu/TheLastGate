@@ -3129,6 +3129,8 @@ void eng_display(int init)	// optimize me!!!!!
 
 				if (pl.goto_x==map[m].x && pl.goto_y==map[m].y)
 					copysprite(31,0,x*32,y*32,xoff,yoff);
+				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_MOVE, map[m].x, map[m].y))
+					copysprite(31, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
 			}
 		}
 
@@ -3268,11 +3270,17 @@ void eng_display(int init)	// optimize me!!!!!
 				
 				if (pl.misc_action==DR_DROP && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
 					copysprite(32,0,x*32,y*32,xoff,yoff);
-				if (pl.misc_action==DR_PICKUP && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
+				else if (pl.misc_action==DR_PICKUP && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
 					copysprite(33,0,x*32,y*32,xoff,yoff);
-				if (pl.misc_action==DR_USE && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
+				else if (pl.misc_action==DR_USE && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
 					copysprite(45,0,x*32,y*32,xoff,yoff);
-				if (g_config.gameplay.use_queue) {
+				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_DROP, map[m].x, map[m].y))
+					copysprite(32, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_PICKUP, map[m].x, map[m].y))
+					copysprite(33, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_USE, map[m].x, map[m].y))
+					copysprite(45, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+				else if (g_config.gameplay.use_queue) {
 					int position = has_cmd_been_queued(CL_CMD_USE, map[m].x, map[m].y);
 					if (position) {
 						copysprite(45, EFFECT_GREEN, x * 32, y * 32, xoff, yoff);
