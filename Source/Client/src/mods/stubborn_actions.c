@@ -107,7 +107,9 @@ void mod_stubborn_actions_on_misc_action(int action) {
     if (action == DR_USE && state.pending_action == CL_CMD_USE) {
         state.pending_action = 0;
         state.indicator = false;
-        pop_cmd_from_queue();
+        if (pl.misc_action == 0) {
+            pop_cmd_from_queue();
+        }
     } else if (
         (action == DR_GIVE && state.pending_action == CL_CMD_GIVE) ||
         (action == DR_PICKUP && state.pending_action == CL_CMD_DROP) || // No idea why the action is inverted for pickup/drop
