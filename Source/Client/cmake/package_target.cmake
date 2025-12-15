@@ -14,6 +14,7 @@ add_custom_target(Package ALL
         "${OUTPUT_DIR}/SDL2.dll"
         "${OUTPUT_DIR}/SDL2_image.dll"
         "${OUTPUT_DIR}/SDL2_mixer.dll"
+        "${OUTPUT_DIR}/SDL2_net.dll"
         "${OUTPUT_DIR}/zlib1.dll"
         "${OUTPUT_DIR}/libgcc_s_seh-1.dll"
         "${OUTPUT_DIR}/libstdc++-6.dll"
