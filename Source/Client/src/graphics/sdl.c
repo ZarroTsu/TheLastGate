@@ -22,6 +22,7 @@
 #include "shaders/effect_shader.h"
 #include "shaders/magic_shader.h"
 #include "shaders/solid_shader.h"
+#include "ui/ui.h"
 #include "ui/imgui/imgui_wrapper.h"
 
 Renderer renderer;
@@ -276,9 +277,13 @@ int sdl_init(const int windowed) {
     imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
     imgui_set_display_framebuffer_scale(1.0f, 1.0f);
 
-    void *pixel_font_10 = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+    font_sizes.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+    font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 12);
+    font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 16);
+    font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 20);
 
-    imgui_set_default_font(pixel_font_10);
+
+    imgui_set_default_font(font_sizes.normal);
 
     return 0;
 }
