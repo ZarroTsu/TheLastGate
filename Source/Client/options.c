@@ -356,6 +356,14 @@ void load_extended_options(void)
 			}
 		}
 
+		if (version >= 3) {
+			if (read(handle, &g_config.gameplay.stubborn_use, sizeof(g_config.gameplay.stubborn_use)) != sizeof(g_config.gameplay.stubborn_use)) return;
+			if (read(handle, &g_config.gameplay.stubborn_drop, sizeof(g_config.gameplay.stubborn_drop)) != sizeof(g_config.gameplay.stubborn_drop)) return;
+			if (read(handle, &g_config.gameplay.stubborn_give, sizeof(g_config.gameplay.stubborn_give)) != sizeof(g_config.gameplay.stubborn_give)) return;
+			if (read(handle, &g_config.gameplay.stubborn_move, sizeof(g_config.gameplay.stubborn_move)) != sizeof(g_config.gameplay.stubborn_move)) return;
+			if (read(handle, &g_config.gameplay.stubborn_pickup, sizeof(g_config.gameplay.stubborn_pickup)) != sizeof(g_config.gameplay.stubborn_pickup)) return;
+		}
+
 		close(handle);
 		return;
 	}
@@ -420,6 +428,12 @@ void save_extended_options(void)
 			write(handle, &keybind_config.general_hotkeys[i].key, sizeof(SDL_Keycode));
 			write(handle, &keybind_config.general_hotkeys[i].modifier, sizeof(KeybindModifier));
 		}
+
+		write(handle, &g_config.gameplay.stubborn_use, sizeof(g_config.gameplay.stubborn_use));
+		write(handle, &g_config.gameplay.stubborn_drop, sizeof(g_config.gameplay.stubborn_drop));
+		write(handle, &g_config.gameplay.stubborn_give, sizeof(g_config.gameplay.stubborn_give));
+		write(handle, &g_config.gameplay.stubborn_move, sizeof(g_config.gameplay.stubborn_move));
+		write(handle, &g_config.gameplay.stubborn_pickup, sizeof(g_config.gameplay.stubborn_pickup));
 
 		close(handle);
 	}

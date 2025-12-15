@@ -26,6 +26,11 @@ typedef struct {
 typedef struct {
     bool give_more;
     bool use_queue;
+    bool stubborn_use;
+    bool stubborn_move;
+    bool stubborn_give;
+    bool stubborn_pickup;
+    bool stubborn_drop;
 } GameConfig;
 
 
