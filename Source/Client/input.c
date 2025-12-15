@@ -522,9 +522,6 @@ void handle_input(void) {
                             logtimer = TICKS * 30 / TICKMULTI;
                         }
                         break;
-                    case OPTIONS_WINDOW:
-                        options_window_scroll(x, y, delta);
-                        break;
                     default: break;
                 }
         }

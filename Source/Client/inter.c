@@ -18,6 +18,7 @@
 #include "engine.h"
 #include "main.h"
 #include "config/config.h"
+#include "mods/stubborn_actions.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 #include "ui/option_window.h"
@@ -1310,6 +1311,7 @@ void cmd(int cmd,int x,int y)
 	unsigned char buf[16];
 
 	clear_cmd_queue();
+	mod_stubborn_actions_clear();
 
 	play_sound("sfx\\click.wav",CLICKVOL,0);
 
@@ -1430,7 +1432,11 @@ void mouse_mapbox(int x,int y,int state)
 		tile_type=0;
 
 		if (state==MS_RB_UP) { xmove=xxtimer=0; cmd(CL_CMD_TURN,map[m].x,map[m].y); }
-		if (state==MS_LB_UP) { xmove=xxtimer=0; cmd(CL_CMD_MOVE,map[m].x,map[m].y); }
+		if (state==MS_LB_UP) {
+			xmove=xxtimer=0;
+			cmd(CL_CMD_MOVE,map[m].x,map[m].y);
+			mod_stubborn_actions_on_cmd(CL_CMD_MOVE, m);
+		}
 		hightlight=HL_MAP;
 		cursor_type=CT_WALK;
 		return;
@@ -1471,13 +1477,25 @@ void mouse_mapbox(int x,int y,int state)
 		else if (map[m].flags&ISITEM) { hightlight=HL_MAP; if (map[m].flags&ISUSABLE) cursor_type=CT_USE; else cursor_type=CT_TAKE; }
 
 		if (pl.citem && !(map[m].flags&ISITEM)) {
-			if (state==MS_LB_UP) { xmove=xxtimer=0; cmd(CL_CMD_DROP,map[m].x,map[m].y); }
+			if (state==MS_LB_UP) {
+				xmove=xxtimer=0;
+				cmd(CL_CMD_DROP,map[m].x,map[m].y);
+				mod_stubborn_actions_on_cmd(CL_CMD_DROP, m);
+			}
 			tile_type=0;
 		}
 		if ((map[m].flags&ISITEM)) {
 			if (state==MS_LB_UP) {
-				if (map[m].flags&ISUSABLE) { xmove=xxtimer=0; cmd(CL_CMD_USE,map[m].x,map[m].y); noshop=0; }
-				else { xmove=xxtimer=0; cmd(CL_CMD_PICKUP,map[m].x,map[m].y); }
+				if (map[m].flags&ISUSABLE) {
+					xmove=xxtimer=0;
+					cmd(CL_CMD_USE,map[m].x,map[m].y); noshop=0;
+					mod_stubborn_actions_on_cmd(CL_CMD_USE, m);
+				}
+				else {
+					xmove=xxtimer=0;
+					cmd(CL_CMD_PICKUP,map[m].x,map[m].y);
+					mod_stubborn_actions_on_cmd(CL_CMD_PICKUP, m);
+				}
 			}
 			if (state==MS_RB_UP) { xmove=xxtimer=0; cmd(CL_CMD_LOOK_ITEM,map[m].x,map[m].y); }
 			tile_type=1;
@@ -1567,6 +1585,7 @@ void mouse_mapbox(int x,int y,int state)
 					xmove=xxtimer=0;
 					set_last_given(pl.citem, pl.citem_p, pl.citem_s);
 					cmd1(CL_CMD_GIVE,map[m].ch_nr);
+					mod_stubborn_actions_on_cmd(CL_CMD_GIVE, m);
 				}
 				tile_type=2;
 			}
@@ -1609,6 +1628,9 @@ void mouse_mapbox(int x,int y,int state)
 					if (map[m].flags&ISUSABLE && (map[m].flags&INVIS) == 0) {
 						xmove=xxtimer=0;
 						add_cmd_to_queue(CL_CMD_USE, map[m].x, map[m].y);
+						if (pl.misc_action != DR_USE) {
+							mod_stubborn_actions_on_cmd(CL_CMD_USE, m);
+						}
 						noshop=0;
 					}
 				}
@@ -2113,6 +2135,5 @@ void mouse(int x,int y,int state)
 	else if (mouse_buttonbox(x,y,state)) ;
 	else if (mouse_statbox(x,y,state)) ;
 	else if (mouse_statbox2(x,y,state)) ;
-	else if (options_window_input(x,y, state)) ;
 	else mouse_mapbox(x,y,state);
 }

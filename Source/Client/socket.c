@@ -40,6 +40,7 @@
 #include "input.h"
 #include "graphics/render.h"
 #include "log/log.h"
+#include "mods/stubborn_actions.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 
@@ -1135,9 +1136,13 @@ void sv_settarget(unsigned char *buf)
 	pl.misc_target2 =*(unsigned short*)(buf+11);
 
 	if (was_using && pl.misc_action != 4) {
-		pop_cmd_from_queue();
-	} else if (!was_using && pl.misc_action == 4) {
-		cmd_queue_on_target(pl.misc_target1, pl.misc_target2);
+		if (!mod_stubborn_actions_pending_use()) {
+			pop_cmd_from_queue();
+		}
+	} else if (!was_using) {
+		if (pl.misc_action == DR_USE) {
+			cmd_queue_on_target(pl.misc_target1, pl.misc_target2);
+		}
 	}
 }
 

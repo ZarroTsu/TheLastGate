@@ -45,7 +45,7 @@ bool ui_button(const char *label, float width, float height) {
     /* Draw the 9-slice button background */
     imgui_draw_list_add_image_9_slice(
         draw_list,
-        (void*)(intptr_t)button_texture,
+        (void *) (intptr_t) button_texture,
         min_x, min_y, max_x, max_y,
         BUTTON_SPRITE_BORDER_WIDTH,
         BUTTON_SPRITE_BORDER_WIDTH,
@@ -61,7 +61,7 @@ bool ui_button(const char *label, float width, float height) {
     );
 
     /* Draw centered text */
-    const char* button_text = label;
+    const char *button_text = label;
     float text_width, text_height;
     imgui_calc_text_size_simple(&text_width, &text_height, button_text);
 
@@ -73,8 +73,8 @@ bool ui_button(const char *label, float width, float height) {
     return clicked;
 }
 
-bool tab_button(const char* label, bool is_active, float width) {
-    void* draw_list = imgui_get_window_draw_list();
+bool tab_button(const char *label, bool is_active, float width) {
+    void *draw_list = imgui_get_window_draw_list();
 
     /* Create invisible button for interaction */
     bool clicked = imgui_invisible_button(label, width, 30.0f);
@@ -104,7 +104,7 @@ bool tab_button(const char* label, bool is_active, float width) {
     /* Draw the 9-slice button background */
     imgui_draw_list_add_image_9_slice(
         draw_list,
-        (void*)(intptr_t)button_texture,
+        (void *) (intptr_t) button_texture,
         min_x, min_y, max_x, max_y,
         BUTTON_SPRITE_BORDER_WIDTH,
         BUTTON_SPRITE_BORDER_WIDTH,
@@ -127,9 +127,11 @@ bool tab_button(const char* label, bool is_active, float width) {
     float text_y = min_y + ((max_y - min_y) - text_height) / 2.0f;
 
     /* Text color: blue if active, gold if inactive */
-    unsigned int text_color = is_active ?
-        imgui_color_convert_float4_to_u32(BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f) :
-        imgui_color_convert_float4_to_u32(GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);
+    unsigned int text_color = is_active
+                                  ? imgui_color_convert_float4_to_u32(BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1],
+                                                                      BLUE_FONT_COLOR[2], 1.0f)
+                                  : imgui_color_convert_float4_to_u32(GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1],
+                                                                      GOLD_FONT_COLOR[2], 1.0f);
 
     imgui_draw_list_add_text(draw_list, text_x, text_y, text_color, label);
 
@@ -244,4 +246,65 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
     imgui_pop_style_color(1);
 
     return clicked;
+}
+
+void ui_tooltip(const char *tooltip_text) {
+    /* Custom styled tooltip with 9-slice background */
+    float padding = 8.0f;
+    float max_width = 200.0f;
+
+    /* Calculate text size with padding */
+    float text_width, text_height;
+    imgui_calc_text_size(&text_width, &text_height, tooltip_text, NULL, false, max_width - padding * 2);
+
+    /* Set padding for tooltip window */
+    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_WINDOW_PADDING, padding, padding);
+    imgui_push_style_color(IMGUI_COL_POPUP_BG, 0.0f, 0.0f, 0.0f, 0.0f); /* Transparent background */
+
+    imgui_begin_tooltip();
+
+    /* Get window position and size for background */
+    float win_x = imgui_get_window_pos_x();
+    float win_y = imgui_get_window_pos_y();
+    float win_width, win_height;
+    imgui_get_content_region_avail(&win_width, &win_height);
+
+    /* Calculate actual window bounds including padding */
+    float min_x = win_x;
+    float min_y = win_y;
+    float max_x = win_x + text_width + padding * 2;
+    float max_y = win_y + text_height + padding * 2;
+
+    /* Load and draw 9-slice background behind everything */
+    sdl_load_sprite(BUTTON_SPRITE_ID);
+    GLuint button_texture = sprite_data[BUTTON_SPRITE_ID].gl_texture;
+    void *draw_list = imgui_get_window_draw_list();
+
+    imgui_draw_list_add_image_9_slice(
+        draw_list,
+        (void *) (intptr_t) button_texture,
+        min_x, min_y, max_x, max_y,
+        BUTTON_SPRITE_BORDER_WIDTH,
+        BUTTON_SPRITE_BORDER_WIDTH,
+        BUTTON_SPRITE_BORDER_WIDTH,
+        BUTTON_SPRITE_BORDER_WIDTH,
+        sprite_data[BUTTON_SPRITE_ID].pixel_width,
+        sprite_data[BUTTON_SPRITE_ID].pixel_height,
+        sprite_data[BUTTON_SPRITE_ID].uv0.u,
+        sprite_data[BUTTON_SPRITE_ID].uv0.v,
+        sprite_data[BUTTON_SPRITE_ID].uv1.u,
+        sprite_data[BUTTON_SPRITE_ID].uv1.v,
+        BUTTON_TINT
+    );
+
+    /* Draw text with natural ImGui layout */
+    imgui_push_text_wrap_pos(imgui_get_cursor_pos_x() + max_width - padding * 2);
+    imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);
+    imgui_text_wrapped(tooltip_text);
+    imgui_pop_style_color(1);
+    imgui_pop_text_wrap_pos();
+
+    imgui_end_tooltip();
+    imgui_pop_style_color(1);
+    imgui_pop_style_var(1);
 }

@@ -4,6 +4,7 @@
 
 #include "engine.h"
 #include "inter.h"
+#include "stubborn_actions.h"
 
 static QueuedCommands queued_commands = {0};
 
@@ -33,6 +34,7 @@ void add_cmd_to_queue(const int cmd, const int x, const int y) {
 void pop_cmd_from_queue() {
     if (queued_commands.count == 0) return;
     const QueuedCommand command = queued_commands.commands[queued_commands.head];
+    mod_stubborn_actions_on_cmd(command.cmd, command.x);
     cmdq(command.cmd, command.x, command.y);
 }
 

@@ -39,6 +39,7 @@
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "mods/base_cost_warning.h"
+#include "mods/stubborn_actions.h"
 #include "mods/use_queue.h"
 #include "ui/spell_hud.h"
 #include "ui/option_window.h"
@@ -1340,6 +1341,10 @@ int skill_needed(int n,int v)
 // ************* MAP **********************
 
 struct cmap *map=NULL;
+
+bool is_player(unsigned int character_id) {
+	return character_id == map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].ch_id;
+}
 
 void eng_init_map(void)
 {
@@ -4501,18 +4506,21 @@ int eng_char(int n)
 		case 162:
 		case 163:
 		case 164:
-		case 165:   
+		case 165:
+			if (is_player(map[n].ch_id)) {
+				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+			}
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
 			break;
-		case 166:   
+		case 166:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=160;
 			break;
-		case 167:   
+		case 167:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=160+((speedoMisc(n)>1)?1:0);
@@ -4523,18 +4531,21 @@ int eng_char(int n)
 		case 170:
 		case 171:
 		case 172:
-		case 173:   
+		case 173:
+			if (is_player(map[n].ch_id)) {
+				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+			}
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
 			break;
-		case 174:   
+		case 174:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=168;
 			break;
-		case 175:   
+		case 175:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=168+((speedoMisc(n)>1)?1:0);
@@ -4545,18 +4556,21 @@ int eng_char(int n)
 		case 178:
 		case 179:
 		case 180:
-		case 181:   
+		case 181:
+			if (is_player(map[n].ch_id)) {
+				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+			}
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
 			break;
-		case 182:   
+		case 182:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=176;
 			break;
-		case 183:   
+		case 183:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=176+((speedoMisc(n)>1)?1:0);
@@ -4567,18 +4581,21 @@ int eng_char(int n)
 		case 186:
 		case 187:
 		case 188:
-		case 189:   
+		case 189:
+			if (is_player(map[n].ch_id)) {
+				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+			}
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
 			break;
-		case 190:   
+		case 190:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n)==1 && update) map[n].ch_status++;
 			else if (speedoMisc(n)>1 && update) map[n].ch_status=184;
 			break;
-		case 191:   
+		case 191:
 			map[n].obj_xoff=0; map[n].obj_yoff=0;
 			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
 			if (speedoMisc(n) && update) map[n].ch_status=184+((speedoMisc(n)>1)?1:0);
@@ -4785,6 +4802,8 @@ void engine(void)
 	int step=0,skip=0,lookstep=0,optstep=0,skipinrow=0,n,panic,xtimer=0,autosort=0;
 	extern int cmd_count,tick_count;
 	unsigned int t;
+	Uint32 last_time = 0;
+	Uint32 delta_time = 0;
 
 	skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
 	for (n=0; n<MAXSKILL; n++) 
@@ -4889,6 +4908,8 @@ void engine(void)
 		handle_input();
 		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
 		{
+			delta_time = SDL_GetTicks() - last_time;
+			last_time = SDL_GetTicks();
 			glClear(GL_COLOR_BUFFER_BIT);
 			sdl_start_scaling();
 			eng_display(init);
@@ -4912,6 +4933,8 @@ void engine(void)
 			sdl_stop_scaling();
 
 			SDL_GL_SwapWindow(renderer.window);
+
+			mod_stubborn_actions_on_tick(delta_time);
 			skipinrow=0;
 		} else {
 			skip++; skipinrow++;

@@ -24,11 +24,13 @@ extern int logtimer;
 extern int mx, my;
 
 extern char input[128];
+extern short screen_renderdist;
 
 // Chat History
 extern char history[20][128];
 extern int hist_nr;
 extern int hist_len[20];
+
 
 extern SDL_Cursor *cursors[10];
 

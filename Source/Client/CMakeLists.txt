@@ -51,6 +51,8 @@ add_executable(TheLastGate WIN32
         src/config/config.c
         src/log/log.c
         src/security/single_instance.c
+        src/mods/stubborn_actions.c
+        src/ui/ui.c
 )
 
 # Disable warnings for old code compatibility

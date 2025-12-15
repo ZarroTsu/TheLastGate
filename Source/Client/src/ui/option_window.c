@@ -10,8 +10,10 @@
 #include "config/keybindings.h"
 #include "ui_common.h"
 #include "engine.h"
+#include "ui.h"
 #include "widgets.h"
 #include "config/config.h"
+#include "graphics/sdl.h"
 
 extern int do_darkmode;
 
@@ -80,6 +82,27 @@ static void general_settings_tab() {
                      "Holding shift when giving an item will attempt to reload that item.");
     togglable_option("##4", &g_config.gameplay.use_queue,
                      "Holding ctrl when issuing using will queue that use. Limit 5");
+
+
+    imgui_spacing();
+    imgui_push_font(font_sizes.large);
+    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_text("Stubborn Actions"); imgui_same_line_gap();
+    imgui_pop_font();
+    imgui_pop_style_color(1);
+    imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);
+    imgui_text("?");
+    imgui_pop_style_color(1);
+    if (imgui_is_item_hovered()) {
+        ui_tooltip("Actions that are interrupted will be retried, up to 10 times, until they succeed. Progress will reset attempts.");
+    }
+    imgui_spacing();
+    togglable_option("##5", &g_config.gameplay.stubborn_use, "Stubborn Use");
+    togglable_option("##6", &g_config.gameplay.stubborn_drop, "Stubborn Drop");
+    togglable_option("##7", &g_config.gameplay.stubborn_pickup, "Stubborn Pickup");
+    togglable_option("##8", &g_config.gameplay.stubborn_give, "Stubborn Give");
+    togglable_option("##9", &g_config.gameplay.stubborn_move, "Stubborn Move");
+
 
     imgui_pop_style_color(4); /* Pop the 4 checkbox colors */
 }
