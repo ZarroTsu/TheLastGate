@@ -190,6 +190,9 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
 
     /* If in set mode for this keybind, capture input */
     if (is_active) {
+        if (imgui_is_item_hovered()) {
+            ui_tooltip("ESC to cancel. DEL to un-bind.");
+        }
         /* Check for ESC to cancel */
         if (imgui_is_key_pressed(SDLK_ESCAPE)) {
             active_keybind_index = -1; /* Cancel */
