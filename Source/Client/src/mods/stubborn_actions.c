@@ -84,6 +84,7 @@ void mod_stubborn_actions_set_use_cmd(int x, int y) {
     state.number_of_attempts = 0;
     state.next_attempt = get_next_attempt_time();
     state.indicator = false;
+    state.last_combat_target = 0;
 }
 
 void mod_stubborn_actions_on_cmd(const int action, const int tile_id) {
@@ -98,6 +99,7 @@ void mod_stubborn_actions_on_cmd(const int action, const int tile_id) {
     state.number_of_attempts = 0;
     state.next_attempt = get_next_attempt_time();
     state.indicator = false;
+    state.last_combat_target = 0;
 }
 
 void mod_stubborn_actions_on_misc_action(int action) {
@@ -129,6 +131,10 @@ void mod_stubborn_actions_on_tick(const Uint32 delta_time) {
     if (state.pending_action) {
         if (state.next_attempt <= delta_time) {
             if (pl.attack_cn > 0) {
+                if (pl.attack_cn != state.last_combat_target) {
+                    state.last_combat_target = pl.attack_cn;
+                    state.number_of_attempts = 0;
+                }
                 state.next_attempt = get_next_attempt_time();
                 return;
             }

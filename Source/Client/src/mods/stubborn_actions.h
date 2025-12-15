@@ -8,6 +8,7 @@ typedef struct {
     int target_y;
     int last_x;
     int last_y;
+    int last_combat_target;
     Uint32 next_attempt;
     int number_of_attempts;
     int target_item_sprite; // Used for DROP/PICKUP
