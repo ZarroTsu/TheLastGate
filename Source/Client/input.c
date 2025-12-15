@@ -187,7 +187,11 @@ void handle_input(void) {
                     say("/fightback");
                     break;
                 }
-                if (hotkey == SWAP_HOTKEY) {
+                if (hotkey == SWAP_GEAR_HOTKEY) {
+                    cmd3(CL_CMD_INV, 9, 1, selected_char);
+                    break;
+                }
+                if (hotkey == SWAP_POSITION_HOTKEY) {
                     say("/swap");
                     break;
                 }
@@ -327,6 +331,7 @@ void handle_input(void) {
                         cmd_exit();
                         break;
                     case SDLK_INSERT:
+                        if (SDL_GetModState()) return;
                         cmd3(CL_CMD_INV, 9, 1, selected_char);
                         break;
 

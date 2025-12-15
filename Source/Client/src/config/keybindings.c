@@ -76,8 +76,11 @@ void keybindings_init(void) {
     keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].key = SDLK_UNKNOWN;
     keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].modifier = KEYBIND_MOD_CTRL;
 
-    keybind_config.general_hotkeys[SWAP_HOTKEY].key = SDLK_UNKNOWN;
-    keybind_config.general_hotkeys[SWAP_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+    keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY].key = SDLK_INSERT;
+    keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+
+    keybind_config.general_hotkeys[SWAP_POSITION_HOTKEY].key = SDLK_UNKNOWN;
+    keybind_config.general_hotkeys[SWAP_POSITION_HOTKEY].modifier = KEYBIND_MOD_CTRL;
 
     keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY].key = SDLK_UNKNOWN;
     keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY].modifier = KEYBIND_MOD_CTRL;
