@@ -804,8 +804,11 @@ int aoe_skill_notarget(int cn, int co, int co_orig, int intemp, int power)
 			}
 			break;
 		case SK_ZEPHYR2:
-			spell_zephyr(cn, co, zephyr, 1);
-			break;
+			spell_zephyr(cn, co, power, 1);
+			return 1;
+		case SK_BLOODLET:
+			spell_bleed(cn, co, power);
+			return 1;
 		default: break;
 	}
 	return 0;
@@ -891,6 +894,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	int co, r, notarget = 0, sc = 0, aoeImm = 0;
 	int x, xc, xf, xt, y, yc, yf, yt;
 	int r = get_aoe_radius(cn, intemp, prox_power);
+	int countskip = 0;
 	
 	switch (intemp)
 	{
@@ -898,7 +902,19 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		case SK_DOUSE:
 		case SK_PLAGUE:
 		case SK_WARCRY:
-		case SK_ZEPHYR2: no_target = 1; break;
+		case SK_ZEPHYR2:
+		case SK_BLOODLET: no_target = 1; break;
+		default: break;
+	}
+	
+	switch (intemp)
+	{
+		
+		case SK_LEAP:
+		case SK_PLAGUE:
+		case SK_ZEPHYR2:
+		case SK_SURROUND:
+		case SK_BLOODLET: countskip = 1; break;
 		default: break;
 	}
 	
@@ -913,7 +929,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	//           5% per corruptor                  20% more for tree skill
 	r = r * (100+st_skillcount(cn,53)*5)/100 * (T_SORC_SK(cn, 5) ? 120:100)/100;
 	
-	if (intemp != SK_SURROUND)
+	if (!countskip)
 	{
 		// Loop through and count the targets
 		for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)
@@ -962,22 +978,24 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 				hit += aoe_target(cn, co, co_orig, intemp, power, &avgdmg);
 		}
 	}
-	if (intemp == SK_SURROUND) return 0;
 	
-	do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
-	
-	if (intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
+	if (!countskip)
 	{
-		if (!(ch[cn].flags & CF_SYS_OFF))
+		do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
+		
+		if (intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 		{
-			do_char_log(cn, 1, "You hit %d of %d creatures in range.\n", hit, count);
-			do_char_log(cn, 1, "You dealt an average of %d damage.\n", max(0, (avgdmg-1)/max(1,hit)) );
+			if (!(ch[cn].flags & CF_SYS_OFF))
+			{
+				do_char_log(cn, 1, "You hit %d of %d creatures in range.\n", hit, count);
+				do_char_log(cn, 1, "You dealt an average of %d damage.\n", max(0, (avgdmg-1)/max(1,hit)) );
+			}
 		}
-	}
-	else if (intemp!=SK_PLAGUE && intemp!=SK_LEAP && intemp!=SK_ZEPHYR2)
-	{
-		if (!(ch[cn].flags & CF_SYS_OFF))
-			do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+		else
+		{
+			if (!(ch[cn].flags & CF_SYS_OFF))
+				do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
+		}
 	}
 	
 	return hit;
@@ -4332,7 +4350,7 @@ int skill_slam(int cn, int co, int power)
 	
 	check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
 	//cast_aoe_spell(cn, co, SK_SLAM, power, GET_PROX(cn), 0, count, hit, avgdmg, dr1, dr2);
-	aoe_driver(cn, co, co, SK_SLAM, power, GET_PROX(cn), 0, 1, 1, avgdmg);
+	aoe_driver(cn, co, co, SK_SLAM, power, GET_PROX(cn), 1, 1, avgdmg);
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	return 1;
@@ -5822,12 +5840,12 @@ void skill_cleave(int cn)
 	if (in = has_spell(cn, SK_ZEPHYR))
 	{
 		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0, -1, -1);
-		aoe_driver(cn, cn, 0, SK_ZEPHYR2, bu[in].power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0);
+		aoe_driver(cn, cn, 0, SK_ZEPHYR2, bu[in].power, M_SK(cn, SK_SURROUND), 0, 0, 0);
 	}
 	else if (B_SK(cn, SK_ZEPHYR) && (power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn)))
 	{
 		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0, -1, -1);
-		aoe_driver(cn, cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0);
+		aoe_driver(cn, cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0);
 	}
 	
 	add_exhaust(cn, SK_EXH_CLEAVE);
@@ -5969,7 +5987,7 @@ void skill_weaken(int cn)
 	if (can_aoe)
 	{
 		//if (cast_aoe_spell(cn, co, SK_WEAKEN, power, GET_PROX(cn), cost, count, hit, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), cost, count, hit, 0) < 0)
+		if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), count, hit, 0) < 0)
 			return;
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
@@ -6069,13 +6087,8 @@ int spell_blind(int cn, int co, int power, int flag)
 }
 void skill_blind(cn)
 {
-	int power, aoe_power, cost;
-	int can_aoe = CAN_WARR_PROX(cn);
-	
-	power = M_SK(cn, SK_BLIND);
-	power = skill_multiplier(power, cn);
-	aoe_power = M_SK(cn, SK_BLIND) + (B_SK(cn, SK_PROX)?(M_SK(cn, SK_PROX)/2):0);
-	cost = SP_COST_BLIND;
+	int power = skill_multiplier(M_SK(cn, SK_BLIND), cn), cost = SP_COST_BLIND;
+	int aoe_power = (M_SK(cn, SK_BLIND) + GET_PROX(cn))/2;
 	
 	if (IS_ANY_MERC(cn))
 		cost /= 2;
@@ -6087,13 +6100,13 @@ void skill_blind(cn)
 	if (do_get_iflag(cn, SF_CHARIOT)) 
 	{
 		//if (cast_aoe_spell(cn, 0, SK_DOUSE, power, can_aoe?aoe_power:0, 0, 0, 0, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, 0, SK_DOUSE, power, can_aoe?aoe_power:0, 0, 0, 0, 0) < 0)
+		if (aoe_driver(cn, cn, 0, SK_DOUSE, power, aoe_power, 0, 0, 0) < 0)
 			return;
 	}
 	else
 	{
 		//if (cast_aoe_spell(cn, 0, SK_BLIND, power, can_aoe?aoe_power:0, 0, 0, 0, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, 0, SK_BLIND, power, can_aoe?aoe_power:0, 0, 0, 0, 0) < 0)
+		if (aoe_driver(cn, cn, 0, SK_BLIND, power, aoe_power, 0, 0, 0) < 0)
 			return;
 	}
 	
@@ -6251,40 +6264,34 @@ int spell_guard(int cn, int co, int power)
 void skill_taunt(int cn)
 {
 	int d20 = SP_MULT_TAUNT;
-	int power, aoe_power, cost;
+	int power = skill_multiplier(M_SK(cn, SK_TAUNT), cn), cost = SP_COST_TAUNT;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
 	int can_aoe = CAN_ARTM_PROX(cn);
+	int aoe_power = (M_SK(cn, SK_TAUNT) + GET_PROX(cn))
 	
-	power = M_SK(cn, SK_TAUNT);
-	power = skill_multiplier(power, cn);
-	aoe_power = M_SK(cn, SK_TAUNT)*2;
-	cost = SP_COST_TAUNT;
-	
-	if (IS_SANEPLAYER(ch[cn].data[CHD_MASTER])) // Ghost Comp
-	{
+	if (IS_PLAYER_COMP(cn))
 		cost = 5;
-	}
 	
 	// Get skill target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20)))
-		return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20))) return;
 	
 	// If we have a valid target, cast Slow on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
-		spell_taunt(cn, co, power, 0);
-		
-		co_orig = co;
-		count++;
-		hit++;
+		spell_taunt(cn, (co_orig = co), power, 0);
+		count = hit = 1;
 	}
 	
+	// AoE
+	if (aoe_driver(cn, cn, co, SK_TAUNT, power, aoe_power, count, hit, 0) < 0) return;
+	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	
+	/*
 	// Cast AoE or general surround-hit
 	if (can_aoe)
 	{
-		//hit = cast_aoe_spell(cn, co, SK_TAUNT, power, aoe_power, cost, count, hit, 0, -1, -1);
-		hit = aoe_driver(cn, cn, co, SK_TAUNT, power, aoe_power, cost, count, hit, 0);
+		hit = cast_aoe_spell(cn, co, SK_TAUNT, power, aoe_power, cost, count, hit, 0, -1, -1);
 		
 		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
@@ -6292,8 +6299,10 @@ void skill_taunt(int cn)
 	{
 		hit += surround_cast(cn, co_orig, 0, SK_TAUNT, power, -1, -1);
 	}
+	*/
 	
-	if (hit) spell_guard(cn, cn, power);
+	//if (hit) 
+	spell_guard(cn, cn, power);
 	
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
@@ -6553,8 +6562,8 @@ void skill_leap(int cn, int flag)
 		ch[cn].dir = newdir;
 		ch[cn].attack_cn = co;
 		//if (!randomtarg) surround_cast(cn, co, cc, SK_LEAP, power, dr1, dr2);
-		//cast_aoe_spell(cn, co, SK_LEAP, power, (B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0), 0, 1, 1, 0, dr1, dr2);
-		aoe_driver(cn, cn, co, SK_LEAP, power, (B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0), 0, 1, 1, 0);
+		//cast_aoe_spell(cn, co, SK_LEAP, power, GET_PROX(cn), 0, 1, 1, 0, dr1, dr2);
+		aoe_driver(cn, cn, co, SK_LEAP, power, GET_PROX(cn), 1, 1, 0);
 	}
 	
 	if (!same_target && !obstructed && !flag)
@@ -6955,9 +6964,11 @@ int spell_pomesol(int cn, int co, int power, int flag)
 
 int spell_bloodletting(int cn, int co, int power)
 {
-	if (surround_cast(cn, 0, 0, SK_BLOODLET, power, -1, -1))
+	int hit = 0;
+	//if (surround_cast(cn, 0, 0, SK_BLOODLET, power, -1, -1))
+	if (hit = aoe_driver(cn, cn, 0, SK_BLOODLET, power, GET_PROX(cn), 0, 0, 0))
 	{
-		do_char_log(cn, 1, "Your foes began bleeding!\n");
+		do_char_log(cn, 1, "%d of your foes began bleeding!\n", hit);
 		return 1;
 	}
 	else

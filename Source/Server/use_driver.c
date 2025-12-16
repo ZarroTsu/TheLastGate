@@ -4135,11 +4135,13 @@ int use_special_spell(int cn, int in)
 			ret = spell_poison(cn, co, power, 1);
 			if (ret) 
 			{
+				aoe_driver(cn, cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 1, 1, 0);
+				/*
 				if (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn))
-					//cast_aoe_spell(cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
-					aoe_driver(cn, cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 0, 1, 1, 0);
+					cast_aoe_spell(cn, co, SK_POISON, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
 				else
 					surround_cast(cn, co, 0, SK_POISON, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
+				*/
 				add_exhaust(cn, SK_EXH_POISON/2);
 			}
 			break;
@@ -4229,7 +4231,8 @@ int use_special_spell(int cn, int in)
 			{
 				spell_charge(cn, cn, power);
 				spell_shock(cn, co, power);
-				surround_cast(cn, co, 0, SK_MJOLNIR, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
+				aoe_driver(cn, cn, co, SK_MJOLNIR, power, GET_PROX(cn), 1, 1, ret);
+				//surround_cast(cn, co, 0, SK_MJOLNIR, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
 				m = add_exhaust(cn, SK_EXH_BLAST/2);
 				if (m && do_get_iflag(cn, SF_SIGN_SPAR))
 				{
@@ -4319,11 +4322,13 @@ int use_special_spell(int cn, int in)
 			ret = spell_poison(cn, co, power, 2);
 			if (ret) 
 			{
+				aoe_driver(cn, cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 1, 1, 0);
+				/*
 				if (CAN_SORC_PROX(cn)||CAN_ARHR_PROX(cn))
-					//cast_aoe_spell(cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
-					aoe_driver(cn, cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 0, 1, 1, 0);
+					cast_aoe_spell(cn, co, SK_VENOM, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
 				else
 					surround_cast(cn, co, 0, SK_VENOM, power, RANDOM(GLVDICE), RANDOM(GLVDICE));
+				*/
 				add_exhaust(cn, SK_EXH_POISON/2);
 			}
 			break;
@@ -4394,11 +4399,13 @@ int use_special_spell(int cn, int in)
 			ret = spell_slow(cn, co, power, 1);
 			if (ret) 
 			{
+				aoe_driver(cn, cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 1, 1, 0);
+				/*
 				if (CAN_SORC_PROX(cn))
-					//cast_aoe_spell(cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
-					aoe_driver(cn, cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 0, 1, 1, 0);
+					cast_aoe_spell(cn, co, SK_SLOW, power, M_SK(cn, SK_PROX), 0, 1, 1, 0, -1, -1);
 				else
 					surround_cast(cn, co, 0, SK_SLOW, power, -1, -1);
+				*/
 				add_exhaust(cn, SK_EXH_SLOW/2);
 			}
 			break;
