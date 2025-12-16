@@ -72,6 +72,7 @@ static bool is_stubborn_action_enabled(int action) {
         default:
             return false;
     }
+    return false;
 }
 
 void mod_stubborn_actions_set_use_cmd(int x, int y) {
