@@ -2437,7 +2437,10 @@ void eng_display_win(int plr_sprite,int init)
 	buf[48]=0;
 
 	puttext(GUI_LOG_X,13+10*LL,1,buf);
-	render_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
+	/* Only show cursor when option disabled OR in chat mode */
+	if (!g_config.ui.enter_to_talk || chat_mode_active) {
+		render_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
+	}
 
 	if (init) {
 		if (show_shop || show_wps || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
