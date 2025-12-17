@@ -47,7 +47,9 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
 }
 
 void init_input(void) {
-    SDL_StartTextInput();
+    if (!g_config.ui.enter_to_talk) {
+        SDL_StartTextInput();
+    }
 }
 
 static int is_mouse_over_imgui(void) {
@@ -226,6 +228,22 @@ void handle_input(void) {
 
                 switch (e.key.keysym.sym) {
                     case SDLK_ESCAPE:
+                        if (g_config.ui.enter_to_talk && chat_mode_active) {
+                            /* Clear input buffer */
+                            input[0] = 0;
+                            in_len = 0;
+                            cur_pos = 0;
+                            view_pos = 0;
+                            hist_nr = 0;
+                            /* Reset tab completion state */
+                            tabmode = 0;
+                            tabstart = 0;
+
+                            chat_mode_active = 0;
+                            SDL_StopTextInput();
+                            break;
+                        }
+
                         bool closed_window = false;
                         if (show_shop != 0) {
                             show_shop = 0;
@@ -336,10 +354,16 @@ void handle_input(void) {
                         break;
 
                     case SDLK_TAB:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         complete_word();
                         break;
 
                     case SDLK_BACKSPACE:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         if (cur_pos && in_len) {
                             if (tabmode) {
                                 in_len = cur_pos;
@@ -354,6 +378,9 @@ void handle_input(void) {
                         break;
 
                     case SDLK_DELETE:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         if (in_len) {
                             if (tabmode) {
                                 in_len = cur_pos;
@@ -380,26 +407,41 @@ void handle_input(void) {
                         }
                         break;
                     case SDLK_HOME:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         cur_pos = 0;
                         tabmode = 0;
                         tabstart = 0;
                         break;
                     case SDLK_END:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         cur_pos = in_len;
                         tabmode = 0;
                         tabstart = 0;
                         break;
                     case SDLK_LEFT:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         if (cur_pos) cur_pos--;
                         tabmode = 0;
                         tabstart = 0;
                         break;
                     case SDLK_RIGHT:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         if (cur_pos < 115) cur_pos++;
                         tabmode = 0;
                         tabstart = 0;
                         break;
                     case SDLK_UP:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         if (hist_nr < 19) {
                             memcpy(history[hist_nr], input, 128);
                             hist_len[hist_nr] = in_len;
@@ -413,6 +455,9 @@ void handle_input(void) {
                         }
                         break;
                     case SDLK_DOWN:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            break;
+                        }
                         if (hist_nr > 0) {
                             memcpy(history[hist_nr], input, 128);
                             hist_len[hist_nr] = in_len;
@@ -428,30 +473,66 @@ void handle_input(void) {
                         break;
                     case SDLK_RETURN:
                     case SDLK_KP_ENTER:
-                        if (in_len == 0) break;
+                        if (g_config.ui.enter_to_talk) {
+                            if (!chat_mode_active) {
+                                chat_mode_active = 1;
+                                SDL_StartTextInput();
+                                break;
+                            }
 
-                        if (tabmode) {
+                            if (in_len > 0) {
+                                if (tabmode) {
+                                    tabmode = 0;
+                                    tabstart = 0;
+                                    in_len--;
+                                }
+
+                                memmove(history[2], history[1], 18 * 128);
+                                memmove(&hist_len[2], &hist_len[1], sizeof(int) * 18);
+
+                                memcpy(history[1], input, 128);
+                                hist_len[1] = in_len;
+
+                                input[in_len] = 0;
+                                in_len = 0;
+                                cur_pos = 0;
+                                view_pos = 0;
+                                hist_nr = 0;
+
+                                add_words();
+
+                                say(input);
+                            }
+
+                            chat_mode_active = 0;
+                            SDL_StopTextInput();
                             tabmode = 0;
                             tabstart = 0;
-                            in_len--;
+                        } else {
+                            if (in_len == 0) break;
+
+                            if (tabmode) {
+                                tabmode = 0;
+                                tabstart = 0;
+                                in_len--;
+                            }
+
+                            memmove(history[2], history[1], 18 * 128);
+                            memmove(&hist_len[2], &hist_len[1], sizeof(int) * 18);
+
+                            memcpy(history[1], input, 128);
+                            hist_len[1] = in_len;
+
+                            input[in_len] = 0;
+                            in_len = 0;
+                            cur_pos = 0;
+                            view_pos = 0;
+                            hist_nr = 0;
+
+                            add_words();
+
+                            say(input);
                         }
-
-                        memmove(history[2], history[1], 18 * 128);
-                        memmove(&hist_len[2], &hist_len[1], sizeof(int) * 18);
-
-                        memcpy(history[1], input, 128);
-                        hist_len[1] = in_len;
-
-                        input[in_len] = 0;
-                        in_len = 0;
-                        cur_pos = 0;
-                        view_pos = 0;
-                        hist_nr = 0;
-
-                        add_words();
-
-                        say(input);
-
                         break;
                     default:
                         break;
@@ -459,6 +540,10 @@ void handle_input(void) {
                 break; // End of SDL_KEYDOWN
 
             case SDL_TEXTINPUT:
+                if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                    break;
+                }
+
                 int mods = SDL_GetModState();
                 bool has_spell_modifier = ((mods & KMOD_CTRL) != 0) || ((mods & KMOD_ALT) != 0);
                 if (in_len < 115 && !has_spell_modifier) {
