@@ -50,12 +50,12 @@ static void get_skill_tab_info_from_id(const int skill_id, char *out_name, int *
     *out_skill_tab_id = skill_tab_id;
 }
 
-static void get_keybind_text_for_current_slot(char *out, int size) {
+static void get_keybind_text_for_current_slot(int slot, char *out, int size) {
     char binding_id[32];
-    sprintf(binding_id, "spell_%d", current_slot);
+    sprintf(binding_id, "spell_%d", slot + 1);
     BindingDescriptor *binding = binding_find_by_id(binding_id);
     if (binding) {
-        keybinding_to_string(binding->keybinding, out, size);
+        keybinding_to_short_string(binding->keybinding, out, size);
     } else {
         sprintf(out, "UNK");
     }
@@ -63,7 +63,7 @@ static void get_keybind_text_for_current_slot(char *out, int size) {
 
 static void handle_spell_selection(int skill_tab_id) {
     char keybind_text[32];
-    get_keybind_text_for_current_slot(keybind_text, sizeof(keybind_text));
+    get_keybind_text_for_current_slot(current_slot, keybind_text, sizeof(keybind_text));
     if (pdata.xbutton[current_slot].skill_nr != skilltab[skill_tab_id].nr) {
         pdata.xbutton[current_slot].skill_nr = skilltab[skill_tab_id].nr;
         snprintf(pdata.xbutton[current_slot].name, 7, "%s", skilltab[skill_tab_id].name);
@@ -138,7 +138,7 @@ void spell_hud() {
             char spell_key_id[32];
 
             sprintf(spell_key_id, "##SpellKey%d", i);
-            get_keybind_text_for_current_slot(binding_text, sizeof(binding_text));
+            get_keybind_text_for_current_slot(i, binding_text, sizeof(binding_text));
             if (pdata.xbutton[i].skill_nr != -1) {
                 sprintf(spell_text, "%s", pdata.xbutton[i].name);
             } else {
