@@ -63,9 +63,6 @@ typedef struct {
     Keybinding general_hotkeys[NUM_GENERAL_HOTKEYS];
 } KeybindConfig;
 
-/* Global instance - defined in keybindings.c */
-extern KeybindConfig keybind_config;
-
 /* Initialization - call once at startup */
 void keybindings_init(void);
 

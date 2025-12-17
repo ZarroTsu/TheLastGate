@@ -149,26 +149,26 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Spell 1", &keybind_config.spell_hotkeys[0], keybind_id++);
-    keybind("Spell 2", &keybind_config.spell_hotkeys[1], keybind_id++);
-    keybind("Spell 3", &keybind_config.spell_hotkeys[2], keybind_id++);
-    keybind("Spell 4", &keybind_config.spell_hotkeys[3], keybind_id++);
-    keybind("Spell 5", &keybind_config.spell_hotkeys[4], keybind_id++);
-    keybind("Spell 6", &keybind_config.spell_hotkeys[5], keybind_id++);
-    keybind("Spell 7", &keybind_config.spell_hotkeys[6], keybind_id++);
-    keybind("Spell 8", &keybind_config.spell_hotkeys[7], keybind_id++);
-    keybind("Spell 9", &keybind_config.spell_hotkeys[8], keybind_id++);
-    keybind("Spell 10", &keybind_config.spell_hotkeys[9], keybind_id++);
-    keybind("Spell 11", &keybind_config.spell_hotkeys[10], keybind_id++);
-    keybind("Spell 12", &keybind_config.spell_hotkeys[11], keybind_id++);
-    keybind("Spell 13", &keybind_config.spell_hotkeys[12], keybind_id++);
-    keybind("Spell 14", &keybind_config.spell_hotkeys[13], keybind_id++);
-    keybind("Spell 15", &keybind_config.spell_hotkeys[14], keybind_id++);
-    keybind("Spell 16", &keybind_config.spell_hotkeys[15], keybind_id++);
-    keybind("Spell 17", &keybind_config.spell_hotkeys[16], keybind_id++);
-    keybind("Spell 18", &keybind_config.spell_hotkeys[17], keybind_id++);
-    keybind("Spell 19", &keybind_config.spell_hotkeys[18], keybind_id++);
-    keybind("Spell 20", &keybind_config.spell_hotkeys[19], keybind_id++);
+    keybind("Spell 1", &g_config.keybind.spell_hotkeys[0], keybind_id++);
+    keybind("Spell 2", &g_config.keybind.spell_hotkeys[1], keybind_id++);
+    keybind("Spell 3", &g_config.keybind.spell_hotkeys[2], keybind_id++);
+    keybind("Spell 4", &g_config.keybind.spell_hotkeys[3], keybind_id++);
+    keybind("Spell 5", &g_config.keybind.spell_hotkeys[4], keybind_id++);
+    keybind("Spell 6", &g_config.keybind.spell_hotkeys[5], keybind_id++);
+    keybind("Spell 7", &g_config.keybind.spell_hotkeys[6], keybind_id++);
+    keybind("Spell 8", &g_config.keybind.spell_hotkeys[7], keybind_id++);
+    keybind("Spell 9", &g_config.keybind.spell_hotkeys[8], keybind_id++);
+    keybind("Spell 10", &g_config.keybind.spell_hotkeys[9], keybind_id++);
+    keybind("Spell 11", &g_config.keybind.spell_hotkeys[10], keybind_id++);
+    keybind("Spell 12", &g_config.keybind.spell_hotkeys[11], keybind_id++);
+    keybind("Spell 13", &g_config.keybind.spell_hotkeys[12], keybind_id++);
+    keybind("Spell 14", &g_config.keybind.spell_hotkeys[13], keybind_id++);
+    keybind("Spell 15", &g_config.keybind.spell_hotkeys[14], keybind_id++);
+    keybind("Spell 16", &g_config.keybind.spell_hotkeys[15], keybind_id++);
+    keybind("Spell 17", &g_config.keybind.spell_hotkeys[16], keybind_id++);
+    keybind("Spell 18", &g_config.keybind.spell_hotkeys[17], keybind_id++);
+    keybind("Spell 19", &g_config.keybind.spell_hotkeys[18], keybind_id++);
+    keybind("Spell 20", &g_config.keybind.spell_hotkeys[19], keybind_id++);
 
     imgui_spacing();
     imgui_separator();
@@ -181,9 +181,9 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Fast Mode", &keybind_config.general_hotkeys[SPEED_FAST_HOTKEY], keybind_id++);
-    keybind("Normal Mode", &keybind_config.general_hotkeys[SPEED_NORMAL_HOTKEY], keybind_id++);
-    keybind("Slow Mode", &keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY], keybind_id++);
+    keybind("Fast Mode", &g_config.keybind.general_hotkeys[SPEED_FAST_HOTKEY], keybind_id++);
+    keybind("Normal Mode", &g_config.keybind.general_hotkeys[SPEED_NORMAL_HOTKEY], keybind_id++);
+    keybind("Slow Mode", &g_config.keybind.general_hotkeys[SPEED_SLOW_HOTKEY], keybind_id++);
 
     imgui_spacing();
     imgui_separator();
@@ -196,11 +196,11 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Toggle Health Percent", &keybind_config.general_hotkeys[TOGGLE_PERCENT_HOTKEY], keybind_id++);
-    keybind("Toggle Stat Bases", &keybind_config.general_hotkeys[TOGGLE_STAT_BASE_HOTKEY], keybind_id++);
-    keybind("Toggle Hide Sprites", &keybind_config.general_hotkeys[TOGGLE_HIDE_SPRITE_HOTKEY], keybind_id++);
-    keybind("Toggle Names", &keybind_config.general_hotkeys[TOGGLE_NAMES_HOTKEY], keybind_id++);
-    keybind("Toggle Health Bars", &keybind_config.general_hotkeys[TOGGLE_HEALTH_BARS_HOTKEY], keybind_id++);
+    keybind("Toggle Health Percent", &g_config.keybind.general_hotkeys[TOGGLE_PERCENT_HOTKEY], keybind_id++);
+    keybind("Toggle Stat Bases", &g_config.keybind.general_hotkeys[TOGGLE_STAT_BASE_HOTKEY], keybind_id++);
+    keybind("Toggle Hide Sprites", &g_config.keybind.general_hotkeys[TOGGLE_HIDE_SPRITE_HOTKEY], keybind_id++);
+    keybind("Toggle Names", &g_config.keybind.general_hotkeys[TOGGLE_NAMES_HOTKEY], keybind_id++);
+    keybind("Toggle Health Bars", &g_config.keybind.general_hotkeys[TOGGLE_HEALTH_BARS_HOTKEY], keybind_id++);
 
     imgui_spacing();
     imgui_separator();
@@ -213,9 +213,9 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Options Window", &keybind_config.general_hotkeys[TOGGLE_OPTIONS_HOTKEY], keybind_id++);
-    keybind("Toggle Gamma", &keybind_config.general_hotkeys[TOGGLE_GAMMA_HOTKEY], keybind_id++);
-    keybind("Reset Window Size", &keybind_config.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY], keybind_id++);
+    keybind("Options Window", &g_config.keybind.general_hotkeys[TOGGLE_OPTIONS_HOTKEY], keybind_id++);
+    keybind("Toggle Gamma", &g_config.keybind.general_hotkeys[TOGGLE_GAMMA_HOTKEY], keybind_id++);
+    keybind("Reset Window Size", &g_config.keybind.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY], keybind_id++);
 
     imgui_spacing();
     imgui_separator();
@@ -228,11 +228,11 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Toggle Fightback", &keybind_config.general_hotkeys[FIGHTBACK_HOTKEY], keybind_id++);
-    keybind("Swap Gearset", &keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY], keybind_id++);
-    keybind("Swap Position", &keybind_config.general_hotkeys[SWAP_POSITION_HOTKEY], keybind_id++);
-    keybind("Display Debug Info", &keybind_config.general_hotkeys[DISPLAY_DEBUG_INFORMATION_HOTKEY], keybind_id++);
-    keybind("Exit", &keybind_config.general_hotkeys[EXIT_HOTKEY], keybind_id++);
+    keybind("Toggle Fightback", &g_config.keybind.general_hotkeys[FIGHTBACK_HOTKEY], keybind_id++);
+    keybind("Swap Gearset", &g_config.keybind.general_hotkeys[SWAP_GEAR_HOTKEY], keybind_id++);
+    keybind("Swap Position", &g_config.keybind.general_hotkeys[SWAP_POSITION_HOTKEY], keybind_id++);
+    keybind("Display Debug Info", &g_config.keybind.general_hotkeys[DISPLAY_DEBUG_INFORMATION_HOTKEY], keybind_id++);
+    keybind("Exit", &g_config.keybind.general_hotkeys[EXIT_HOTKEY], keybind_id++);
 
     imgui_spacing();
     imgui_separator();
@@ -245,13 +245,13 @@ static void keybind_settings_tab() {
 
     imgui_spacing();
 
-    keybind("Offense Mode", &keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY], keybind_id++);
-    keybind("Defense Mode", &keybind_config.general_hotkeys[GC_DEFENSE_HOTKEY], keybind_id++);
-    keybind("Passive Mode", &keybind_config.general_hotkeys[GC_PASSIVE_HOTKEY], keybind_id++);
-    keybind("Wait", &keybind_config.general_hotkeys[GC_WAIT_HOTKEY], keybind_id++);
-    keybind("Follow", &keybind_config.general_hotkeys[GC_FOLLOW_HOTKEY], keybind_id++);
-    keybind("Move", &keybind_config.general_hotkeys[GC_MOVE_HOTKEY], keybind_id++);
-    keybind("Buffs", &keybind_config.general_hotkeys[GC_BUFFS_HOTKEY], keybind_id++);
+    keybind("Offense Mode", &g_config.keybind.general_hotkeys[GC_OFFENSE_HOTKEY], keybind_id++);
+    keybind("Defense Mode", &g_config.keybind.general_hotkeys[GC_DEFENSE_HOTKEY], keybind_id++);
+    keybind("Passive Mode", &g_config.keybind.general_hotkeys[GC_PASSIVE_HOTKEY], keybind_id++);
+    keybind("Wait", &g_config.keybind.general_hotkeys[GC_WAIT_HOTKEY], keybind_id++);
+    keybind("Follow", &g_config.keybind.general_hotkeys[GC_FOLLOW_HOTKEY], keybind_id++);
+    keybind("Move", &g_config.keybind.general_hotkeys[GC_MOVE_HOTKEY], keybind_id++);
+    keybind("Buffs", &g_config.keybind.general_hotkeys[GC_BUFFS_HOTKEY], keybind_id++);
 }
 
 void options_window_render() {

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>
+#include "config/keybindings.h"
 
 
 typedef struct {
@@ -45,6 +46,7 @@ typedef struct {
     UiConfig ui;
     GameConfig gameplay;
     RuntimeConfig runtime;
+    KeybindConfig keybind;
 } GlobalConfig;
 
 extern GlobalConfig g_config;

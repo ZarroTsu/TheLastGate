@@ -275,7 +275,7 @@ void handle_input(void) {
                         if (!window_resetting) {
                             char keybind_string[32];
                             xlog(2, "Game window resized, %s to reset it.",
-                                 keybinding_to_string(keybind_config.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY],
+                                 keybinding_to_string(g_config.keybind.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY],
                                                       keybind_string, 32));
                         }
                         if ((SDL_GetWindowFlags(renderer.window) & SDL_WINDOW_MAXIMIZED) != 0) {

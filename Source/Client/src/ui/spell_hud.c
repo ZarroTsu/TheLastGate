@@ -6,6 +6,7 @@
 #include "main.h"
 #include "ui_common.h"
 #include "common.h"
+#include "config/config.h"
 
 static int current_slot = 0;
 
@@ -51,7 +52,7 @@ static void get_skill_tab_info_from_id(const int skill_id, char *out_name, int *
 
 static void handle_spell_selection(int skill_tab_id) {
     char keybind_text[32];
-    keybinding_to_string(keybind_config.spell_hotkeys[current_slot], keybind_text, sizeof(keybind_text));
+    keybinding_to_string(g_config.keybind.spell_hotkeys[current_slot], keybind_text, sizeof(keybind_text));
     if (pdata.xbutton[current_slot].skill_nr != skilltab[skill_tab_id].nr) {
         pdata.xbutton[current_slot].skill_nr = skilltab[skill_tab_id].nr;
         snprintf(pdata.xbutton[current_slot].name, 7, "%s", skilltab[skill_tab_id].name);
@@ -126,7 +127,7 @@ void spell_hud() {
             char spell_key_id[32];
 
             sprintf(spell_key_id, "##SpellKey%d", i);
-            keybinding_to_short_string(keybind_config.spell_hotkeys[i], binding_text, sizeof(binding_text));
+            keybinding_to_short_string(g_config.keybind.spell_hotkeys[i], binding_text, sizeof(binding_text));
             if (pdata.xbutton[i].skill_nr != -1) {
                 sprintf(spell_text, "%s", pdata.xbutton[i].name);
             } else {

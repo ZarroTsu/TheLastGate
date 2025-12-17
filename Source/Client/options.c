@@ -332,8 +332,8 @@ void load_extended_options(void)
 					/* Validate before applying */
 					if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
 
-					keybind_config.spell_hotkeys[i].key = key;
-					keybind_config.spell_hotkeys[i].modifier = mod;
+					g_config.keybind.spell_hotkeys[i].key = key;
+					g_config.keybind.spell_hotkeys[i].modifier = mod;
 				}
 			}
 		}
@@ -351,8 +351,8 @@ void load_extended_options(void)
 
 					if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
 
-					keybind_config.general_hotkeys[i].key = key;
-					keybind_config.general_hotkeys[i].modifier = mod;
+					g_config.keybind.general_hotkeys[i].key = key;
+					g_config.keybind.general_hotkeys[i].modifier = mod;
 				}
 			}
 		}
@@ -422,16 +422,16 @@ void save_extended_options(void)
 		write(handle, &count, sizeof(count));
 
 		for (i = 0; i < NUM_SPELL_HOTKEYS; i++) {
-			write(handle, &keybind_config.spell_hotkeys[i].key, sizeof(SDL_Keycode));
-			write(handle, &keybind_config.spell_hotkeys[i].modifier, sizeof(KeybindModifier));
+			write(handle, &g_config.keybind.spell_hotkeys[i].key, sizeof(SDL_Keycode));
+			write(handle, &g_config.keybind.spell_hotkeys[i].modifier, sizeof(KeybindModifier));
 		}
 
 		count = NUM_GENERAL_HOTKEYS;
 		write(handle, &count, sizeof(count));
 
 		for (i = 0; i < NUM_GENERAL_HOTKEYS; i++) {
-			write(handle, &keybind_config.general_hotkeys[i].key, sizeof(SDL_Keycode));
-			write(handle, &keybind_config.general_hotkeys[i].modifier, sizeof(KeybindModifier));
+			write(handle, &g_config.keybind.general_hotkeys[i].key, sizeof(SDL_Keycode));
+			write(handle, &g_config.keybind.general_hotkeys[i].modifier, sizeof(KeybindModifier));
 		}
 
 		write(handle, &g_config.gameplay.stubborn_use, sizeof(g_config.gameplay.stubborn_use));
