@@ -51,6 +51,9 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
 void init_input(void) {
     if (!g_config.ui.enter_to_talk) {
         SDL_StartTextInput();
+    } else {
+        chat_mode_active = false;
+        SDL_StopTextInput();
     }
 }
 
