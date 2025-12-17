@@ -19,6 +19,7 @@ extern int in_len;
 extern int view_pos;
 extern int tabmode;
 extern int tabstart;
+extern int chat_mode_active;
 extern int logstart;
 extern int logtimer;
 extern int mx, my;

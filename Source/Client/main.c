@@ -72,6 +72,7 @@ int hist_nr=0;
 int view_pos=0;
 int tabmode=0;
 int tabstart=0;
+int chat_mode_active=0;
 int logstart=0;
 int logtimer=0;
 int do_alpha=0;
