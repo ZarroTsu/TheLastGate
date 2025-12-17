@@ -522,6 +522,16 @@ void handle_input(void) {
                             tabstart = 0;
                         }
                         break;
+                    case SDLK_SLASH:
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            SDL_StartTextInput();
+                            chat_mode_active = 1;
+                            memmove(input + cur_pos + 1, input + cur_pos, 120 - cur_pos);
+                            input[cur_pos] = '/';
+                            in_len++;
+                            cur_pos++;
+                        }
+                        break;
                     case SDLK_RETURN:
                     case SDLK_KP_ENTER:
                         if (g_config.ui.enter_to_talk) {
