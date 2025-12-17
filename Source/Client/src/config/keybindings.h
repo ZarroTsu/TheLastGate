@@ -38,6 +38,15 @@
 #define GC_MOVE_HOTKEY 7
 #define GC_BUFFS_HOTKEY 8
 
+/* Used for organization in UI */
+typedef enum {
+    BINDING_CATEGORY_SPELL,
+    BINDING_CATEGORY_SPEED,
+    BINDING_CATEGORY_WORLD,
+    BINDING_CATEGORY_WINDOW,
+    BINDING_CATEGORY_GENERAL,
+    BINDING_CATEGORY_GC
+} BindingCategory;
 
 /* Modifier flags - support any combination of modifiers */
 typedef enum {
@@ -56,6 +65,15 @@ typedef struct {
     SDL_Keycode key;           /* SDL_Keycode (e.g., SDLK_1, SDLK_a) */
     KeybindModifier modifier;  /* CTRL or ALT only */
 } Keybinding;
+
+/* Describes a single bindable action */
+typedef struct {
+    const char* name;
+    const char* id;
+    BindingCategory category;
+    Keybinding default_keybinding;
+    Keybinding keybinding;
+} BindingDescriptor;
 
 /* Global keybinding configuration */
 typedef struct {
