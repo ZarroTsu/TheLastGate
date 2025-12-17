@@ -726,13 +726,71 @@ bool imgui_is_key_pressed(int sdl_keycode) {
         return ImGui::IsKeyPressed((ImGuiKey)(ImGuiKey_0 + key_index), false);
     }
 
-    /* Escape key */
-    if (sdl_keycode == SDLK_ESCAPE) {
-        return ImGui::IsKeyPressed(ImGuiKey_Escape, false);
-    }
+    /* Special keys - map SDL to ImGui key codes */
+    switch (sdl_keycode) {
+        case SDLK_ESCAPE: return ImGui::IsKeyPressed(ImGuiKey_Escape, false);
+        case SDLK_DELETE: return ImGui::IsKeyPressed(ImGuiKey_Delete, false);
+        case SDLK_RETURN: return ImGui::IsKeyPressed(ImGuiKey_Enter, false);
+        case SDLK_TAB: return ImGui::IsKeyPressed(ImGuiKey_Tab, false);
+        case SDLK_BACKSPACE: return ImGui::IsKeyPressed(ImGuiKey_Backspace, false);
+        case SDLK_SPACE: return ImGui::IsKeyPressed(ImGuiKey_Space, false);
+        case SDLK_INSERT: return ImGui::IsKeyPressed(ImGuiKey_Insert, false);
+        case SDLK_HOME: return ImGui::IsKeyPressed(ImGuiKey_Home, false);
+        case SDLK_END: return ImGui::IsKeyPressed(ImGuiKey_End, false);
+        case SDLK_PAGEUP: return ImGui::IsKeyPressed(ImGuiKey_PageUp, false);
+        case SDLK_PAGEDOWN: return ImGui::IsKeyPressed(ImGuiKey_PageDown, false);
 
-    if (sdl_keycode == SDLK_DELETE) {
-        return ImGui::IsKeyPressed(ImGuiKey_Delete, false);
+        /* Arrow keys */
+        case SDLK_UP: return ImGui::IsKeyPressed(ImGuiKey_UpArrow, false);
+        case SDLK_DOWN: return ImGui::IsKeyPressed(ImGuiKey_DownArrow, false);
+        case SDLK_LEFT: return ImGui::IsKeyPressed(ImGuiKey_LeftArrow, false);
+        case SDLK_RIGHT: return ImGui::IsKeyPressed(ImGuiKey_RightArrow, false);
+
+        /* Function keys */
+        case SDLK_F1: return ImGui::IsKeyPressed(ImGuiKey_F1, false);
+        case SDLK_F2: return ImGui::IsKeyPressed(ImGuiKey_F2, false);
+        case SDLK_F3: return ImGui::IsKeyPressed(ImGuiKey_F3, false);
+        case SDLK_F4: return ImGui::IsKeyPressed(ImGuiKey_F4, false);
+        case SDLK_F5: return ImGui::IsKeyPressed(ImGuiKey_F5, false);
+        case SDLK_F6: return ImGui::IsKeyPressed(ImGuiKey_F6, false);
+        case SDLK_F7: return ImGui::IsKeyPressed(ImGuiKey_F7, false);
+        case SDLK_F8: return ImGui::IsKeyPressed(ImGuiKey_F8, false);
+        case SDLK_F9: return ImGui::IsKeyPressed(ImGuiKey_F9, false);
+        case SDLK_F10: return ImGui::IsKeyPressed(ImGuiKey_F10, false);
+        case SDLK_F11: return ImGui::IsKeyPressed(ImGuiKey_F11, false);
+        case SDLK_F12: return ImGui::IsKeyPressed(ImGuiKey_F12, false);
+
+        /* Punctuation and symbols */
+        case SDLK_MINUS: return ImGui::IsKeyPressed(ImGuiKey_Minus, false);
+        case SDLK_EQUALS: return ImGui::IsKeyPressed(ImGuiKey_Equal, false);
+        case SDLK_LEFTBRACKET: return ImGui::IsKeyPressed(ImGuiKey_LeftBracket, false);
+        case SDLK_RIGHTBRACKET: return ImGui::IsKeyPressed(ImGuiKey_RightBracket, false);
+        case SDLK_BACKSLASH: return ImGui::IsKeyPressed(ImGuiKey_Backslash, false);
+        case SDLK_SEMICOLON: return ImGui::IsKeyPressed(ImGuiKey_Semicolon, false);
+        case SDLK_QUOTE: return ImGui::IsKeyPressed(ImGuiKey_Apostrophe, false);
+        case SDLK_COMMA: return ImGui::IsKeyPressed(ImGuiKey_Comma, false);
+        case SDLK_PERIOD: return ImGui::IsKeyPressed(ImGuiKey_Period, false);
+        case SDLK_SLASH: return ImGui::IsKeyPressed(ImGuiKey_Slash, false);
+        case SDLK_BACKQUOTE: return ImGui::IsKeyPressed(ImGuiKey_GraveAccent, false);
+
+        /* Keypad keys */
+        case SDLK_KP_0: return ImGui::IsKeyPressed(ImGuiKey_Keypad0, false);
+        case SDLK_KP_1: return ImGui::IsKeyPressed(ImGuiKey_Keypad1, false);
+        case SDLK_KP_2: return ImGui::IsKeyPressed(ImGuiKey_Keypad2, false);
+        case SDLK_KP_3: return ImGui::IsKeyPressed(ImGuiKey_Keypad3, false);
+        case SDLK_KP_4: return ImGui::IsKeyPressed(ImGuiKey_Keypad4, false);
+        case SDLK_KP_5: return ImGui::IsKeyPressed(ImGuiKey_Keypad5, false);
+        case SDLK_KP_6: return ImGui::IsKeyPressed(ImGuiKey_Keypad6, false);
+        case SDLK_KP_7: return ImGui::IsKeyPressed(ImGuiKey_Keypad7, false);
+        case SDLK_KP_8: return ImGui::IsKeyPressed(ImGuiKey_Keypad8, false);
+        case SDLK_KP_9: return ImGui::IsKeyPressed(ImGuiKey_Keypad9, false);
+        case SDLK_KP_PERIOD: return ImGui::IsKeyPressed(ImGuiKey_KeypadDecimal, false);
+        case SDLK_KP_DIVIDE: return ImGui::IsKeyPressed(ImGuiKey_KeypadDivide, false);
+        case SDLK_KP_MULTIPLY: return ImGui::IsKeyPressed(ImGuiKey_KeypadMultiply, false);
+        case SDLK_KP_MINUS: return ImGui::IsKeyPressed(ImGuiKey_KeypadSubtract, false);
+        case SDLK_KP_PLUS: return ImGui::IsKeyPressed(ImGuiKey_KeypadAdd, false);
+        case SDLK_KP_ENTER: return ImGui::IsKeyPressed(ImGuiKey_KeypadEnter, false);
+        case SDLK_KP_EQUALS: return ImGui::IsKeyPressed(ImGuiKey_KeypadEqual, false);
     }
 
     return false;
