@@ -6,37 +6,37 @@
 #define NUM_GENERAL_HOTKEYS 23
 
 // SPEED HOTKEYS
-#define SPEED_SLOW_HOTKEY 10
-#define SPEED_NORMAL_HOTKEY 11
-#define SPEED_FAST_HOTKEY 12
+#define SPEED_SLOW_HOTKEY "speed_slow_hotkey"
+#define SPEED_NORMAL_HOTKEY "speed_normal_hotkey"
+#define SPEED_FAST_HOTKEY "speed_fast_hotkey"
 
 // WORLD HOTKEYS
-#define TOGGLE_PERCENT_HOTKEY 13
-#define TOGGLE_STAT_BASE_HOTKEY 14
-#define TOGGLE_HIDE_SPRITE_HOTKEY 15
-#define TOGGLE_NAMES_HOTKEY 16
-#define TOGGLE_HEALTH_BARS_HOTKEY 17
+#define TOGGLE_PERCENT_HOTKEY "toggle_percent_hotkey"
+#define TOGGLE_STAT_BASE_HOTKEY "toggle_stat_base_hotkey"
+#define TOGGLE_HIDE_SPRITE_HOTKEY "toggle_hide_sprite_hotkey"
+#define TOGGLE_NAMES_HOTKEY "toggle_names_hotkey"
+#define TOGGLE_HEALTH_BARS_HOTKEY "toggle_health_bars_hotkey"
 
 // WINDOW HOTKEYS
-#define TOGGLE_OPTIONS_HOTKEY 18
-#define TOGGLE_GAMMA_HOTKEY 19
-#define RESET_WINDOW_SIZE_HOTKEY 20
+#define TOGGLE_OPTIONS_HOTKEY "toggle_options_hotkey"
+#define TOGGLE_GAMMA_HOTKEY "toggle_gamma_hotkey"
+#define RESET_WINDOW_SIZE_HOTKEY "reset_window_size_hotkey"
 
 // GENERAL HOTKEYS
-#define FIGHTBACK_HOTKEY 0
-#define SWAP_POSITION_HOTKEY 1
-#define SWAP_GEAR_HOTKEY 9
-#define DISPLAY_DEBUG_INFORMATION_HOTKEY 21
-#define EXIT_HOTKEY 22
+#define FIGHTBACK_HOTKEY "fightback_hotkey"
+#define SWAP_POSITION_HOTKEY "swap_position_hotkey"
+#define SWAP_GEAR_HOTKEY "swap_gear_hotkey"
+#define DISPLAY_DEBUG_INFORMATION_HOTKEY "display_debug_information_hotkey"
+#define EXIT_HOTKEY "exit_hotkey"
 
 // GC HOTKEYS
-#define GC_OFFENSE_HOTKEY 2
-#define GC_DEFENSE_HOTKEY 3
-#define GC_PASSIVE_HOTKEY 4
-#define GC_WAIT_HOTKEY 5
-#define GC_FOLLOW_HOTKEY 6
-#define GC_MOVE_HOTKEY 7
-#define GC_BUFFS_HOTKEY 8
+#define GC_OFFENSE_HOTKEY "gc_offense_hotkey"
+#define GC_DEFENSE_HOTKEY "gc_defense_hotkey"
+#define GC_PASSIVE_HOTKEY "gc_passive_hotkey"
+#define GC_WAIT_HOTKEY "gc_wait_hotkey"
+#define GC_FOLLOW_HOTKEY "gc_follow_hotkey"
+#define GC_MOVE_HOTKEY "gc_move_hotkey"
+#define GC_BUFFS_HOTKEY "gc_buffs_hotkey"
 
 /* Used for organization in UI */
 typedef enum {

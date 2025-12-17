@@ -36,94 +36,94 @@ static BindingDescriptor binding_registry[] = {
 
     /* Speed Hotkeys */
     {
-        "Fast Mode", "speed_fast_hotkey", BINDING_CATEGORY_SPEED, {SDLK_F1, KEYBIND_MOD_NONE},
+        "Fast Mode", SPEED_FAST_HOTKEY, BINDING_CATEGORY_SPEED, {SDLK_F1, KEYBIND_MOD_NONE},
         {SDLK_F1, KEYBIND_MOD_NONE}
     },
     {
-        "Normal Mode", "speed_normal_hotkey", BINDING_CATEGORY_SPEED, {SDLK_F2, KEYBIND_MOD_NONE},
+        "Normal Mode", SPEED_NORMAL_HOTKEY, BINDING_CATEGORY_SPEED, {SDLK_F2, KEYBIND_MOD_NONE},
         {SDLK_F2, KEYBIND_MOD_NONE}
     },
     {
-        "Slow Mode", "speed_slow_hotkey", BINDING_CATEGORY_SPEED, {SDLK_F3, KEYBIND_MOD_NONE},
+        "Slow Mode", SPEED_SLOW_HOTKEY, BINDING_CATEGORY_SPEED, {SDLK_F3, KEYBIND_MOD_NONE},
         {SDLK_F3, KEYBIND_MOD_NONE}
     },
 
     /* World Hotkeys */
     {
-        "Toggle Health Percent", "toggle_percent_hotkey", BINDING_CATEGORY_WORLD, {SDLK_F4, KEYBIND_MOD_NONE},
+        "Toggle Health Percent", TOGGLE_PERCENT_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F4, KEYBIND_MOD_NONE},
         {SDLK_F4, KEYBIND_MOD_NONE}
     },
     {
-        "Toggle Stat Bases", "toggle_stat_base_hotkey", BINDING_CATEGORY_WORLD, {SDLK_F5, KEYBIND_MOD_NONE},
+        "Toggle Stat Bases", TOGGLE_STAT_BASE_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F5, KEYBIND_MOD_NONE},
         {SDLK_F5, KEYBIND_MOD_NONE}
     },
     {
-        "Toggle Hide Sprites", "toggle_hide_sprite_hotkey", BINDING_CATEGORY_WORLD, {SDLK_F6, KEYBIND_MOD_NONE},
+        "Toggle Hide Sprites", TOGGLE_HIDE_SPRITE_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F6, KEYBIND_MOD_NONE},
         {SDLK_F6, KEYBIND_MOD_NONE}
     },
     {
-        "Toggle Names", "toggle_names_hotkey", BINDING_CATEGORY_WORLD, {SDLK_F7, KEYBIND_MOD_NONE},
+        "Toggle Names", TOGGLE_NAMES_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F7, KEYBIND_MOD_NONE},
         {SDLK_F7, KEYBIND_MOD_NONE}
     },
     {
-        "Toggle Health Bars", "toggle_health_bars_hotkey", BINDING_CATEGORY_WORLD, {SDLK_F8, KEYBIND_MOD_NONE},
+        "Toggle Health Bars", TOGGLE_HEALTH_BARS_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F8, KEYBIND_MOD_NONE},
         {SDLK_F8, KEYBIND_MOD_NONE}
     },
 
     /* Window Hotkeys */
     {
-        "Options Window", "toggle_options_hotkey", BINDING_CATEGORY_WINDOW, {SDLK_F9, KEYBIND_MOD_NONE},
+        "Options Window", TOGGLE_OPTIONS_HOTKEY, BINDING_CATEGORY_WINDOW, {SDLK_F9, KEYBIND_MOD_NONE},
         {SDLK_F9, KEYBIND_MOD_NONE}
     },
     {
-        "Toggle Gamma", "toggle_gamma_hotkey", BINDING_CATEGORY_WINDOW, {SDLK_F10, KEYBIND_MOD_NONE},
+        "Toggle Gamma", TOGGLE_GAMMA_HOTKEY, BINDING_CATEGORY_WINDOW, {SDLK_F10, KEYBIND_MOD_NONE},
         {SDLK_F10, KEYBIND_MOD_NONE}
     },
     {
-        "Reset Window Size", "reset_window_size_hotkey", BINDING_CATEGORY_WINDOW, {SDLK_F10, KEYBIND_MOD_SHIFT},
+        "Reset Window Size", RESET_WINDOW_SIZE_HOTKEY, BINDING_CATEGORY_WINDOW, {SDLK_F10, KEYBIND_MOD_SHIFT},
         {SDLK_F10, KEYBIND_MOD_SHIFT}
     },
 
     /* General Hotkeys */
     {
-        "Toggle Fightback", "fightback_hotkey", BINDING_CATEGORY_GENERAL, {SDLK_UNKNOWN, KEYBIND_MOD_CTRL},
+        "Toggle Fightback", FIGHTBACK_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_UNKNOWN, KEYBIND_MOD_CTRL},
         {SDLK_UNKNOWN, KEYBIND_MOD_CTRL}
     },
     {
-        "Swap Gearset", "swap_gear_hotkey", BINDING_CATEGORY_GENERAL, {SDLK_INSERT, KEYBIND_MOD_NONE},
+        "Swap Gearset", SWAP_GEAR_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_INSERT, KEYBIND_MOD_NONE},
         {SDLK_INSERT, KEYBIND_MOD_NONE}
     },
     {
-        "Swap Position", "swap_position_hotkey", BINDING_CATEGORY_GENERAL, {SDLK_UNKNOWN, KEYBIND_MOD_CTRL},
+        "Swap Position", SWAP_POSITION_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_UNKNOWN, KEYBIND_MOD_CTRL},
         {SDLK_UNKNOWN, KEYBIND_MOD_CTRL}
     },
     {
-        "Display Debug Info", "display_debug_information_hotkey", BINDING_CATEGORY_GENERAL,
+        "Display Debug Info", DISPLAY_DEBUG_INFORMATION_HOTKEY, BINDING_CATEGORY_GENERAL,
         {SDLK_F11, KEYBIND_MOD_NONE}, {SDLK_F11, KEYBIND_MOD_NONE}
     },
-    {"Exit", "exit_hotkey", BINDING_CATEGORY_GENERAL, {SDLK_F12, KEYBIND_MOD_NONE}, {SDLK_F12, KEYBIND_MOD_NONE}},
+    {"Exit", EXIT_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_F12, KEYBIND_MOD_NONE}, {SDLK_F12, KEYBIND_MOD_NONE}},
 
     /* GC Hotkeys */
     {
-        "Offense Mode", "gc_offense_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        "Offense Mode", GC_OFFENSE_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
         {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
     },
     {
-        "Defense Mode", "gc_defense_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        "Defense Mode", GC_DEFENSE_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
         {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
     },
     {
-        "Passive Mode", "gc_passive_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        "Passive Mode", GC_PASSIVE_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
         {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
     },
-    {"Wait", "gc_wait_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}},
+    {"Wait", GC_WAIT_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}},
     {
-        "Follow", "gc_follow_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        "Follow", GC_FOLLOW_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
         {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
     },
-    {"Move", "gc_move_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}},
+    {"Move", GC_MOVE_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}, {SDLK_UNKNOWN, KEYBIND_MOD_NONE}},
     {
-        "Buffs", "gc_buffs_hotkey", BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        "Buffs", GC_BUFFS_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
         {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
     },
 };
