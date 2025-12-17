@@ -197,51 +197,86 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
         if (imgui_is_key_pressed(SDLK_ESCAPE)) {
             active_keybind_index = -1; /* Cancel */
             waiting_for_keybind = false;
-        } else {
-            /* Check for Ctrl or Alt modifier */
+        }
+        /* Check for DELETE to unbind */
+        else if (imgui_is_key_pressed(SDLK_DELETE)) {
+            keybind->key = SDLK_UNKNOWN;
+            active_keybind_index = -1;
+            waiting_for_keybind = false;
+        }
+        /* Capture any other key press */
+        else {
+            /* Get modifier state */
             int mods = imgui_get_key_mods();
+            bool has_shift = (mods & KMOD_SHIFT) != 0;
             bool has_ctrl = (mods & KMOD_CTRL) != 0;
             bool has_alt = (mods & KMOD_ALT) != 0;
 
-            // Unbind on delete
-            if (imgui_is_key_pressed(SDLK_DELETE)) {
-                keybind->key = SDLK_UNKNOWN;
-                active_keybind_index = -1;
-                waiting_for_keybind = false;
+            /* Build modifier flags */
+            KeybindModifier mod_flags = KEYBIND_MOD_NONE;
+            if (has_shift) mod_flags |= KEYBIND_MOD_SHIFT;
+            if (has_ctrl) mod_flags |= KEYBIND_MOD_CTRL;
+            if (has_alt) mod_flags |= KEYBIND_MOD_ALT;
+
+            /* Check for any key press (except ESC, DELETE, and ENTER) */
+            int i;
+            SDL_Keycode pressed_key = SDLK_UNKNOWN;
+
+            /* Check printable keys: letters, numbers, symbols */
+            for (i = SDLK_SPACE; i <= SDLK_z; i++) {
+                if (i == SDLK_ESCAPE || i == SDLK_DELETE) continue; /* Skip reserved keys */
+                if (imgui_is_key_pressed(i)) {
+                    pressed_key = i;
+                    break;
+                }
             }
 
-
-            /* Must have EXACTLY one modifier (not both, not neither) */
-            if ((has_ctrl && !has_alt) || (!has_ctrl && has_alt)) {
-                /* Check for valid key press (letters and numbers) */
-                int i;
-                SDL_Keycode pressed_key = SDLK_UNKNOWN;
-
-                /* Check letters A-Z */
-                for (i = SDLK_a; i <= SDLK_z; i++) {
+            /* Check function keys */
+            if (pressed_key == SDLK_UNKNOWN) {
+                for (i = SDLK_F1; i <= SDLK_F12; i++) {
                     if (imgui_is_key_pressed(i)) {
                         pressed_key = i;
                         break;
                     }
                 }
+            }
 
-                /* Check numbers 0-9 */
-                if (pressed_key == SDLK_UNKNOWN) {
-                    for (i = SDLK_0; i <= SDLK_9; i++) {
-                        if (imgui_is_key_pressed(i)) {
-                            pressed_key = i;
-                            break;
-                        }
+            /* Check arrow keys and other special keys */
+            if (pressed_key == SDLK_UNKNOWN) {
+                SDL_Keycode special_keys[] = {
+                    SDLK_TAB, SDLK_BACKSPACE, SDLK_INSERT,
+                    SDLK_HOME, SDLK_END, SDLK_PAGEUP, SDLK_PAGEDOWN,
+                    SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT
+                };
+                int num_special_keys = sizeof(special_keys) / sizeof(special_keys[0]);
+                for (i = 0; i < num_special_keys; i++) {
+                    if (imgui_is_key_pressed(special_keys[i])) {
+                        pressed_key = special_keys[i];
+                        break;
                     }
                 }
+            }
 
-                /* If valid key pressed, update the keybinding */
-                if (pressed_key != SDLK_UNKNOWN) {
-                    keybind->key = pressed_key;
-                    keybind->modifier = has_ctrl ? KEYBIND_MOD_CTRL : KEYBIND_MOD_ALT;
-                    active_keybind_index = -1; /* Exit set mode */
-                    waiting_for_keybind = false;
+            /* Check keypad keys */
+            if (pressed_key == SDLK_UNKNOWN) {
+                for (i = SDLK_KP_0; i <= SDLK_KP_EQUALS; i++) {
+                    if (imgui_is_key_pressed(i)) {
+                        pressed_key = i;
+                        break;
+                    }
                 }
+            }
+
+            /* If valid key pressed (not ENTER), update the keybinding */
+            if (pressed_key != SDLK_UNKNOWN && pressed_key != SDLK_RETURN) {
+                keybind->key = pressed_key;
+                keybind->modifier = mod_flags;
+                active_keybind_index = -1; /* Exit set mode */
+                waiting_for_keybind = false;
+            }
+            /* If ENTER was pressed, ignore it (reserved for chat) */
+            else if (imgui_is_key_pressed(SDLK_RETURN)) {
+                /* Do nothing - ENTER is reserved */
             }
         }
     }
