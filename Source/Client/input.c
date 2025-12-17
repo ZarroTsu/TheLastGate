@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_syswm.h>
 
 #include "inter.h"
 #include "main.h"
@@ -17,6 +18,7 @@
 #include "ui/imgui/imgui_wrapper.h"
 
 bool waiting_for_keybind = false;
+static bool window_resetting = false;
 
 static ScrollableRegion get_scrollable_region(int x, int y) {
     if (x > gui_inv_x[0] && x < gui_inv_x[1] && y > gui_inv_y[0] && y < gui_inv_y[1])
@@ -94,9 +96,123 @@ void scale_mouse_event(SDL_Event *event) {
     }
 }
 
-#ifdef _WIN32
+static void handle_hotkey(int hotkey) {
+    switch (hotkey) {
+        /* Speed Hotkeys */
+        case SPEED_FAST_HOTKEY:
+            cmd(CL_CMD_MODE, 0, 0);
+            break;
+        case SPEED_NORMAL_HOTKEY:
+            cmd(CL_CMD_MODE, 1, 0);
+            break;
+        case SPEED_SLOW_HOTKEY:
+            cmd(CL_CMD_MODE, 2, 0);
+            break;
 
-#include <SDL2/SDL_syswm.h>
+        /* World Hotkeys */
+        case TOGGLE_PERCENT_HOTKEY:
+            pdata.show_proz = 1 - pdata.show_proz;
+            break;
+        case TOGGLE_STAT_BASE_HOTKEY:
+            pdata.show_stats = 1 - pdata.show_stats;
+            break;
+        case TOGGLE_HIDE_SPRITE_HOTKEY:
+            pdata.hide = 1 - pdata.hide;
+            break;
+        case TOGGLE_NAMES_HOTKEY:
+            pdata.show_names = 1 - pdata.show_names;
+            break;
+        case TOGGLE_HEALTH_BARS_HOTKEY:
+            pdata.show_bars = 1 - pdata.show_bars;
+            break;
+
+        /* Window Hotkeys */
+        case TOGGLE_OPTIONS_HOTKEY:
+            // dd_savescreen(); TODO: Implement this
+            show_opts = !show_opts;
+            apply_config_changes();
+            break;
+        case TOGGLE_GAMMA_HOTKEY:
+            g_config.video.gamma += 250;
+            if (g_config.video.gamma > 6000) g_config.video.gamma = 5000;
+            xlog(2, "Set gamma correction to %1.2f", g_config.video.gamma / 5000.0);
+            break;
+        case RESET_WINDOW_SIZE_HOTKEY:
+            if (g_config.video.windowed) {
+                g_config.video.window_size[0] = SCREEN_WIDTH;
+                g_config.video.window_size[1] = SCREEN_HEIGHT;
+                SDL_RestoreWindow(renderer.window);
+                window_resetting = true;
+                SDL_SetWindowSize(renderer.window, g_config.video.window_size[0], g_config.video.window_size[1]);
+                xlog(2, "Game window reset to default resolution.");
+            }
+            break;
+
+        /* General Hotkeys */
+        case FIGHTBACK_HOTKEY:
+            say("/fightback");
+            break;
+        case SWAP_POSITION_HOTKEY:
+            say("/swap");
+            break;
+        case SWAP_GEAR_HOTKEY:
+            cmd3(CL_CMD_INV, 9, 1, selected_char);
+            break;
+        case DISPLAY_DEBUG_INFORMATION_HOTKEY: {
+            SDL_SysWMinfo info;
+            SDL_VERSION(&info.version);
+            const GLubyte *version = glGetString(GL_VERSION);
+            const GLubyte *vendor  = glGetString(GL_VENDOR);
+            const GLubyte *gl_renderer = glGetString(GL_RENDERER);
+            const GLubyte *glsl    = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+            xlog(2, " ");
+            xlog(2, "Client Version RC%d.%02d", CLIENT_VERSION.major, CLIENT_VERSION.minor);
+            xlog(2, "Networking Version %d.%02d.%02d",NETWORKING_VERSION >> 16, (NETWORKING_VERSION >> 8) & 255,NETWORKING_VERSION & 255);
+            xlog(2, "Server Version %d.%02d.%02d", ser_ver >> 16, (ser_ver >> 8) & 255, ser_ver & 255);
+            xlog(2, "SDL Version %d.%02d.%02d", info.version.major, info.version.minor, info.version.patch);
+            xlog(2, "OpenGL Version: %s", version);
+            xlog(2, "OpenGL Vendor: %s", vendor);
+            xlog(2, "OpenGL Renderer: %s", gl_renderer);
+            xlog(2, "GLSL Version: %s", glsl);
+            xlog(2, "R=%04X, G=%04X, B=%04X", RED, GREEN, BLUE);
+            xlog(2, "Skip=%d%% Idle=%d%%", pskip, pidle);
+            log_atlas_debug_info();
+            break;
+        }
+        case EXIT_HOTKEY:
+            cmd_exit();
+            break;
+
+        /* GC Hotkeys */
+        case GC_OFFENSE_HOTKEY:
+            say("Offense");
+            break;
+
+        case GC_DEFENSE_HOTKEY:
+            say("Defense");
+            break;
+        case GC_PASSIVE_HOTKEY:
+            say("Passive");
+            break;
+        case GC_WAIT_HOTKEY:
+            say("Wait");
+            break;
+        case GC_FOLLOW_HOTKEY:
+            say("Follow");
+            break;
+        case GC_MOVE_HOTKEY:
+            say("Move");
+            break;
+        case GC_BUFFS_HOTKEY:
+            say("/gcb");
+            break;
+        default:
+            break;
+    }
+}
+
+#ifdef _WIN32
 
 static void MakeWindowTopMost(SDL_Window *win) {
     SDL_SysWMinfo info;
@@ -124,11 +240,12 @@ static void MakeWindowNormal(SDL_Window *win) {
     }
 }
 
+
 SDL_Event input_events[128];
 int input_event_count = 0;
 
 #endif
-static bool window_resetting = false;
+
 void handle_input(void) {
     SDL_Event e;
 
@@ -197,47 +314,9 @@ void handle_input(void) {
                 }
 
                 const int hotkey = keybinding_find_general(e.key.keysym.sym, SDL_GetModState());
-                if (hotkey == FIGHTBACK_HOTKEY) {
-                    say("/fightback");
-                    break;
+                if (hotkey != -1) {
+                    handle_hotkey(hotkey);
                 }
-                if (hotkey == SWAP_GEAR_HOTKEY) {
-                    cmd3(CL_CMD_INV, 9, 1, selected_char);
-                    break;
-                }
-                if (hotkey == SWAP_POSITION_HOTKEY) {
-                    say("/swap");
-                    break;
-                }
-                if (hotkey == GC_OFFENSE_HOTKEY) {
-                    say("Offense");
-                    break;
-                }
-                if (hotkey == GC_DEFENSE_HOTKEY) {
-                    say("Defense");
-                    break;
-                }
-                if (hotkey == GC_PASSIVE_HOTKEY) {
-                    say("Passive");
-                    break;
-                }
-                if (hotkey == GC_WAIT_HOTKEY) {
-                    say("Wait");
-                    break;
-                }
-                if (hotkey == GC_FOLLOW_HOTKEY) {
-                    say("Follow");
-                    break;
-                }
-                if (hotkey == GC_MOVE_HOTKEY) {
-                    say("Move");
-                    break;
-                }
-                if (hotkey == GC_BUFFS_HOTKEY) {
-                    say("/gcb");
-                    break;
-                }
-
                 switch (e.key.keysym.sym) {
                     case SDLK_ESCAPE:
                         if (g_config.ui.enter_to_talk && chat_mode_active) {
@@ -293,80 +372,6 @@ void handle_input(void) {
                         }
                         if (!g_config.ui.escape_closes_menu_first || !closed_window) cmd(CL_CMD_RESET, 0, 0);
                         break;
-                    case SDLK_F1:
-                        cmd(CL_CMD_MODE, 2, 0);
-                        break;
-                    case SDLK_F2:
-                        cmd(CL_CMD_MODE, 1, 0);
-                        break;
-                    case SDLK_F3:
-                        cmd(CL_CMD_MODE, 0, 0);
-                        break;
-                    case SDLK_F4:
-                        pdata.show_proz = 1 - pdata.show_proz;
-                        break;
-
-                    case SDLK_F5:
-                        pdata.show_stats = 1 - pdata.show_stats;
-                        break;
-                    case SDLK_F6:
-                        pdata.hide = 1 - pdata.hide;
-                        break;
-                    case SDLK_F7:
-                        pdata.show_names = 1 - pdata.show_names;
-                        break;
-                    case SDLK_F8:
-                        pdata.show_bars = 1 - pdata.show_bars;
-                        break;
-
-                    case SDLK_F9:
-                        // dd_savescreen(); TODO: Implement this
-                        show_opts = !show_opts;
-                        apply_config_changes();
-                        break;
-                    case SDLK_F10:
-                        if (g_config.video.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
-                            g_config.video.window_size[0] = SCREEN_WIDTH;
-                            g_config.video.window_size[1] = SCREEN_HEIGHT;
-                            SDL_RestoreWindow(renderer.window);
-                            window_resetting = true;
-                            SDL_SetWindowSize(renderer.window, g_config.video.window_size[0], g_config.video.window_size[1]);
-                            xlog(2, "Game window reset to default resolution.");
-                        } else {
-                            g_config.video.gamma += 250;
-                            if (g_config.video.gamma > 6000) g_config.video.gamma = 5000;
-                            xlog(2, "Set gamma correction to %1.2f", g_config.video.gamma / 5000.0);
-                        }
-                        break;
-                    case SDLK_F11:
-                        SDL_SysWMinfo info;
-                        SDL_VERSION(&info.version);
-                        const GLubyte *version = glGetString(GL_VERSION);
-                        const GLubyte *vendor  = glGetString(GL_VENDOR);
-                        const GLubyte *renderer = glGetString(GL_RENDERER);
-                        const GLubyte *glsl    = glGetString(GL_SHADING_LANGUAGE_VERSION);
-
-                        xlog(2, " ");
-                        xlog(2, "Client Version RC%d.%02d", CLIENT_VERSION.major, CLIENT_VERSION.minor);
-                        xlog(2, "Networking Version %d.%02d.%02d",NETWORKING_VERSION >> 16, (NETWORKING_VERSION >> 8) & 255,NETWORKING_VERSION & 255);
-                        xlog(2, "Server Version %d.%02d.%02d", ser_ver >> 16, (ser_ver >> 8) & 255, ser_ver & 255);
-                        xlog(2, "SDL Version %d.%02d.%02d", info.version.major, info.version.minor, info.version.patch);
-                        xlog(2, "OpenGL Version: %s", version);
-                        xlog(2, "OpenGL Vendor: %s", vendor);
-                        xlog(2, "OpenGL Renderer: %s", renderer);
-                        xlog(2, "GLSL Version: %s", glsl);
-                        xlog(2, "R=%04X, G=%04X, B=%04X", RED, GREEN, BLUE);
-                        xlog(2, "Skip=%d%% Idle=%d%%", pskip, pidle);
-                        log_atlas_debug_info();
-                        break;
-                    case SDLK_F12:
-                        cmd_exit();
-                        break;
-                    case SDLK_INSERT:
-                        if (SDL_GetModState()) return;
-                        cmd3(CL_CMD_INV, 9, 1, selected_char);
-                        break;
-
                     case SDLK_TAB:
                         if (g_config.ui.enter_to_talk && !chat_mode_active) {
                             break;

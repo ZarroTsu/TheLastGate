@@ -72,16 +72,59 @@ void keybindings_init(void) {
     keybind_config.spell_hotkeys[19].key = SDLK_b;
     keybind_config.spell_hotkeys[19].modifier = KEYBIND_MOD_CTRL;
 
+    /* Speed Hotkeys */
+    keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY].key = SDLK_F1;
+    keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[SPEED_NORMAL_HOTKEY].key = SDLK_F2;
+    keybind_config.general_hotkeys[SPEED_NORMAL_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[SPEED_FAST_HOTKEY].key = SDLK_F3;
+    keybind_config.general_hotkeys[SPEED_FAST_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    /* World Hotkeys */
+    keybind_config.general_hotkeys[TOGGLE_PERCENT_HOTKEY].key = SDLK_F4;
+    keybind_config.general_hotkeys[TOGGLE_PERCENT_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[TOGGLE_STAT_BASE_HOTKEY].key = SDLK_F5;
+    keybind_config.general_hotkeys[TOGGLE_STAT_BASE_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[TOGGLE_HIDE_SPRITE_HOTKEY].key = SDLK_F6;
+    keybind_config.general_hotkeys[TOGGLE_HIDE_SPRITE_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[TOGGLE_NAMES_HOTKEY].key = SDLK_F7;
+    keybind_config.general_hotkeys[TOGGLE_NAMES_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[TOGGLE_HEALTH_BARS_HOTKEY].key = SDLK_F8;
+    keybind_config.general_hotkeys[TOGGLE_HEALTH_BARS_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    /* Window Hotkeys */
+    keybind_config.general_hotkeys[TOGGLE_OPTIONS_HOTKEY].key = SDLK_F9;
+    keybind_config.general_hotkeys[TOGGLE_OPTIONS_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[TOGGLE_GAMMA_HOTKEY].key = SDLK_F10;
+    keybind_config.general_hotkeys[TOGGLE_GAMMA_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY].key = SDLK_F10;
+    keybind_config.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY].modifier = KEYBIND_MOD_SHIFT;
+
     /* General Hotkeys */
     keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].key = SDLK_UNKNOWN;
     keybind_config.general_hotkeys[FIGHTBACK_HOTKEY].modifier = KEYBIND_MOD_CTRL;
 
     keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY].key = SDLK_INSERT;
-    keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY].modifier = KEYBIND_MOD_CTRL;
+    keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY].modifier = KEYBIND_MOD_NONE;
 
     keybind_config.general_hotkeys[SWAP_POSITION_HOTKEY].key = SDLK_UNKNOWN;
     keybind_config.general_hotkeys[SWAP_POSITION_HOTKEY].modifier = KEYBIND_MOD_CTRL;
 
+    keybind_config.general_hotkeys[DISPLAY_DEBUG_INFORMATION_HOTKEY].key = SDLK_F11;
+    keybind_config.general_hotkeys[DISPLAY_DEBUG_INFORMATION_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    keybind_config.general_hotkeys[EXIT_HOTKEY].key = SDLK_F12;
+    keybind_config.general_hotkeys[EXIT_HOTKEY].modifier = KEYBIND_MOD_NONE;
+
+    /* GC Hotkeys */
     keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY].key = SDLK_UNKNOWN;
     keybind_config.general_hotkeys[GC_OFFENSE_HOTKEY].modifier = KEYBIND_MOD_CTRL;
 
