@@ -21,7 +21,7 @@ AppState app_state = {
 	.tricky_flag = 0
 };
 
-const SdlClientVersion CLIENT_VERSION = {2,2};
+const SdlClientVersion CLIENT_VERSION = {2,3};
 
 extern void cmd3(int cmd,int x,int y,int z);
 
