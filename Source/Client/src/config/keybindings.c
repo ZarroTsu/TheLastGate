@@ -73,14 +73,14 @@ void keybindings_init(void) {
     keybind_config.spell_hotkeys[19].modifier = KEYBIND_MOD_CTRL;
 
     /* Speed Hotkeys */
-    keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY].key = SDLK_F1;
-    keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY].modifier = KEYBIND_MOD_NONE;
+    keybind_config.general_hotkeys[SPEED_FAST_HOTKEY].key = SDLK_F1;
+    keybind_config.general_hotkeys[SPEED_FAST_HOTKEY].modifier = KEYBIND_MOD_NONE;
 
     keybind_config.general_hotkeys[SPEED_NORMAL_HOTKEY].key = SDLK_F2;
     keybind_config.general_hotkeys[SPEED_NORMAL_HOTKEY].modifier = KEYBIND_MOD_NONE;
 
-    keybind_config.general_hotkeys[SPEED_FAST_HOTKEY].key = SDLK_F3;
-    keybind_config.general_hotkeys[SPEED_FAST_HOTKEY].modifier = KEYBIND_MOD_NONE;
+    keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY].key = SDLK_F3;
+    keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY].modifier = KEYBIND_MOD_NONE;
 
     /* World Hotkeys */
     keybind_config.general_hotkeys[TOGGLE_PERCENT_HOTKEY].key = SDLK_F4;

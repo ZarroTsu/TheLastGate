@@ -173,6 +173,53 @@ static void keybind_settings_tab() {
     imgui_spacing();
     imgui_separator();
 
+    imgui_calc_text_size_simple(&text_width, NULL, "Speed Hotkeys");
+    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_center_next_item(text_width);
+    imgui_text("Speed Hotkeys");
+    imgui_pop_style_color(1);
+
+    imgui_spacing();
+
+    keybind("Fast Mode", &keybind_config.general_hotkeys[SPEED_FAST_HOTKEY], keybind_id++);
+    keybind("Normal Mode", &keybind_config.general_hotkeys[SPEED_NORMAL_HOTKEY], keybind_id++);
+    keybind("Slow Mode", &keybind_config.general_hotkeys[SPEED_SLOW_HOTKEY], keybind_id++);
+
+    imgui_spacing();
+    imgui_separator();
+
+    imgui_calc_text_size_simple(&text_width, NULL, "World Hotkeys");
+    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_center_next_item(text_width);
+    imgui_text("World Hotkeys");
+    imgui_pop_style_color(1);
+
+    imgui_spacing();
+
+    keybind("Toggle Health Percent", &keybind_config.general_hotkeys[TOGGLE_PERCENT_HOTKEY], keybind_id++);
+    keybind("Toggle Stat Bases", &keybind_config.general_hotkeys[TOGGLE_STAT_BASE_HOTKEY], keybind_id++);
+    keybind("Toggle Hide Sprites", &keybind_config.general_hotkeys[TOGGLE_HIDE_SPRITE_HOTKEY], keybind_id++);
+    keybind("Toggle Names", &keybind_config.general_hotkeys[TOGGLE_NAMES_HOTKEY], keybind_id++);
+    keybind("Toggle Health Bars", &keybind_config.general_hotkeys[TOGGLE_HEALTH_BARS_HOTKEY], keybind_id++);
+
+    imgui_spacing();
+    imgui_separator();
+
+    imgui_calc_text_size_simple(&text_width, NULL, "Window Hotkeys");
+    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+    imgui_center_next_item(text_width);
+    imgui_text("Window Hotkeys");
+    imgui_pop_style_color(1);
+
+    imgui_spacing();
+
+    keybind("Options Window", &keybind_config.general_hotkeys[TOGGLE_OPTIONS_HOTKEY], keybind_id++);
+    keybind("Toggle Gamma", &keybind_config.general_hotkeys[TOGGLE_GAMMA_HOTKEY], keybind_id++);
+    keybind("Reset Window Size", &keybind_config.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY], keybind_id++);
+
+    imgui_spacing();
+    imgui_separator();
+
     imgui_calc_text_size_simple(&text_width, NULL, "General Hotkeys");
     imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
     imgui_center_next_item(text_width);
@@ -184,6 +231,8 @@ static void keybind_settings_tab() {
     keybind("Toggle Fightback", &keybind_config.general_hotkeys[FIGHTBACK_HOTKEY], keybind_id++);
     keybind("Swap Gearset", &keybind_config.general_hotkeys[SWAP_GEAR_HOTKEY], keybind_id++);
     keybind("Swap Position", &keybind_config.general_hotkeys[SWAP_POSITION_HOTKEY], keybind_id++);
+    keybind("Display Debug Info", &keybind_config.general_hotkeys[DISPLAY_DEBUG_INFORMATION_HOTKEY], keybind_id++);
+    keybind("Exit", &keybind_config.general_hotkeys[EXIT_HOTKEY], keybind_id++);
 
     imgui_spacing();
     imgui_separator();

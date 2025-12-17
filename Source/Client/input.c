@@ -100,13 +100,13 @@ static void handle_hotkey(int hotkey) {
     switch (hotkey) {
         /* Speed Hotkeys */
         case SPEED_FAST_HOTKEY:
-            cmd(CL_CMD_MODE, 0, 0);
+            cmd(CL_CMD_MODE, 2, 0);
             break;
         case SPEED_NORMAL_HOTKEY:
             cmd(CL_CMD_MODE, 1, 0);
             break;
         case SPEED_SLOW_HOTKEY:
-            cmd(CL_CMD_MODE, 2, 0);
+            cmd(CL_CMD_MODE, 0, 0);
             break;
 
         /* World Hotkeys */
@@ -273,7 +273,10 @@ void handle_input(void) {
                 if (g_config.video.windowed) {
                     if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
                         if (!window_resetting) {
-                            xlog(2, "Game window resized, press shift+f10 to reset it.");
+                            char keybind_string[32];
+                            xlog(2, "Game window resized, %s to reset it.",
+                                 keybinding_to_string(keybind_config.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY],
+                                                      keybind_string, 32));
                         }
                         if ((SDL_GetWindowFlags(renderer.window) & SDL_WINDOW_MAXIMIZED) != 0) {
                             g_config.video.window_size[0] = e.window.data1;
