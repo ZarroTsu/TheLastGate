@@ -6,7 +6,9 @@
 #include "config/keybindings.h"
 #include <stdio.h>
 
+#include "engine.h"
 #include "input.h"
+#include "config/config.h"
 
 bool ui_button(const char *label, float width, float height) {
     if (width < 52) width = 52;
@@ -136,6 +138,23 @@ bool tab_button(const char *label, bool is_active, float width) {
     imgui_draw_list_add_text(draw_list, text_x, text_y, text_color, label);
 
     return clicked;
+}
+
+static void check_and_unbind_duplicate(Keybinding new_binding, BindingDescriptor *skip_hotkey) {
+    char old_binding_str[64];
+    for (int i = 0; i < g_config.keybind.num_bindings; i++) {
+        BindingDescriptor *hk = &g_config.keybind.bindings[i];
+
+        if (hk == skip_hotkey) continue;
+
+        if (hk->keybinding.key == new_binding.key && hk->keybinding.modifier == new_binding.modifier) {
+            keybinding_to_string(hk->keybinding, old_binding_str, sizeof(old_binding_str));
+            hk->keybinding.key = SDLK_UNKNOWN;
+            hk->keybinding.modifier = KEYBIND_MOD_NONE;
+            xlog(0, "Unbound %s (%s) - key reassigned.", hk->name, old_binding_str);
+            return;
+        }
+    }
 }
 
 bool keybind(BindingDescriptor *binding, int index) {
@@ -269,6 +288,10 @@ bool keybind(BindingDescriptor *binding, int index) {
 
             /* If valid key pressed (not ENTER), update the keybinding */
             if (pressed_key != SDLK_UNKNOWN && pressed_key != SDLK_RETURN) {
+                Keybinding new_binding;
+                new_binding.key = pressed_key;
+                new_binding.modifier = mod_flags;
+                check_and_unbind_duplicate(new_binding, binding);
                 binding->keybinding.key = pressed_key;
                 binding->keybinding.modifier = mod_flags;
                 active_keybind_index = -1; /* Exit set mode */
