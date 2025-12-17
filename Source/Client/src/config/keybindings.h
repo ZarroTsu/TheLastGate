@@ -77,8 +77,8 @@ typedef struct {
 
 /* Global keybinding configuration */
 typedef struct {
-    Keybinding spell_hotkeys[NUM_SPELL_HOTKEYS];
-    Keybinding general_hotkeys[NUM_GENERAL_HOTKEYS];
+    BindingDescriptor *bindings;
+    int num_bindings;
 } KeybindConfig;
 
 /* Initialization - call once at startup */
@@ -88,8 +88,8 @@ void keybindings_init(void);
 const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size);
 const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size);
 
-/* Find spell slot (0-19) matching key+modifier, returns -1 if no match */
-int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate);
+/* Find binding by current binding, returns NULL otherwise */
+BindingDescriptor *binding_find(SDL_Keycode key, int sdl_modstate);
 
-/* Check other non-spell keybinds, returns the toggle id or -1 if no match */
-int keybinding_find_general(SDL_KeyCode key, int sdl_modstate);
+/* Find binding by ID, returns NULL otherwise */
+BindingDescriptor *binding_find_by_id(const char* id);
