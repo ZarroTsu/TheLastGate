@@ -20,6 +20,7 @@ typedef struct {
 typedef struct {
     bool escape_closes_menu_first;
     bool cost_helper;
+    bool enter_to_talk;
 } UiConfig;
 
 

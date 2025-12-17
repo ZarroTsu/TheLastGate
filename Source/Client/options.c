@@ -296,6 +296,7 @@ void load_extended_options(void)
 	// Set all defaults, keybinds are handled in init
 	g_config.ui.escape_closes_menu_first = 1;
 	g_config.ui.cost_helper = 0;
+	g_config.ui.enter_to_talk = 0;
 	g_config.audio.sound_volume = 10;
 	g_config.gameplay.give_more = 0;
 	g_config.gameplay.use_queue = 0;
@@ -362,6 +363,10 @@ void load_extended_options(void)
 			if (read(handle, &g_config.gameplay.stubborn_give, sizeof(g_config.gameplay.stubborn_give)) != sizeof(g_config.gameplay.stubborn_give)) return;
 			if (read(handle, &g_config.gameplay.stubborn_move, sizeof(g_config.gameplay.stubborn_move)) != sizeof(g_config.gameplay.stubborn_move)) return;
 			if (read(handle, &g_config.gameplay.stubborn_pickup, sizeof(g_config.gameplay.stubborn_pickup)) != sizeof(g_config.gameplay.stubborn_pickup)) return;
+		}
+
+		if (version >= 4) {
+			if (read(handle, &g_config.ui.enter_to_talk, sizeof(g_config.ui.enter_to_talk)) != sizeof(g_config.ui.enter_to_talk)) return;
 		}
 
 		close(handle);
@@ -434,6 +439,8 @@ void save_extended_options(void)
 		write(handle, &g_config.gameplay.stubborn_give, sizeof(g_config.gameplay.stubborn_give));
 		write(handle, &g_config.gameplay.stubborn_move, sizeof(g_config.gameplay.stubborn_move));
 		write(handle, &g_config.gameplay.stubborn_pickup, sizeof(g_config.gameplay.stubborn_pickup));
+
+		write(handle, &g_config.ui.enter_to_talk, sizeof(g_config.ui.enter_to_talk));
 
 		close(handle);
 	}

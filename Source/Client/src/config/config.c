@@ -16,7 +16,8 @@ GlobalConfig g_config = {
     },
     .ui = {
         .cost_helper = false,
-        .escape_closes_menu_first = true
+        .escape_closes_menu_first = true,
+        .enter_to_talk = false
     },
     .gameplay = {
         .give_more = false,
