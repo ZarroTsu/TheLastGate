@@ -18,11 +18,16 @@
 #define GC_BUFFS_HOTKEY 8
 
 
-/* Modifier flags - match SDL but use simpler names */
+/* Modifier flags - support any combination of modifiers */
 typedef enum {
     KEYBIND_MOD_NONE = 0,
-    KEYBIND_MOD_CTRL = 1,
-    KEYBIND_MOD_ALT = 2
+    KEYBIND_MOD_SHIFT = 1,
+    KEYBIND_MOD_CTRL = 2,
+    KEYBIND_MOD_ALT = 4,
+    KEYBIND_MOD_SHIFT_CTRL = 3,    /* SHIFT + CTRL */
+    KEYBIND_MOD_SHIFT_ALT = 5,     /* SHIFT + ALT */
+    KEYBIND_MOD_CTRL_ALT = 6,      /* CTRL + ALT */
+    KEYBIND_MOD_SHIFT_CTRL_ALT = 7 /* SHIFT + CTRL + ALT */
 } KeybindModifier;
 
 /* Represents a single keybinding */

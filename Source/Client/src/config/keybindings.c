@@ -105,34 +105,83 @@ void keybindings_init(void) {
 
 }
 
-const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size) {
-    const char* mod_str = "";
-    char key_char[2];
+/* Helper function to get key name */
+static const char* get_key_name(SDL_Keycode key) {
+    /* Handle common special keys */
+    switch (key) {
+        case SDLK_SPACE: return "Space";
+        case SDLK_TAB: return "Tab";
+        case SDLK_BACKSPACE: return "Backspace";
+        case SDLK_INSERT: return "Insert";
+        case SDLK_HOME: return "Home";
+        case SDLK_END: return "End";
+        case SDLK_PAGEUP: return "PgUp";
+        case SDLK_PAGEDOWN: return "PgDn";
+        case SDLK_UP: return "Up";
+        case SDLK_DOWN: return "Down";
+        case SDLK_LEFT: return "Left";
+        case SDLK_RIGHT: return "Right";
+        case SDLK_F1: return "F1";
+        case SDLK_F2: return "F2";
+        case SDLK_F3: return "F3";
+        case SDLK_F4: return "F4";
+        case SDLK_F5: return "F5";
+        case SDLK_F6: return "F6";
+        case SDLK_F7: return "F7";
+        case SDLK_F8: return "F8";
+        case SDLK_F9: return "F9";
+        case SDLK_F10: return "F10";
+        case SDLK_F11: return "F11";
+        case SDLK_F12: return "F12";
+        case SDLK_MINUS: return "-";
+        case SDLK_EQUALS: return "=";
+        case SDLK_LEFTBRACKET: return "[";
+        case SDLK_RIGHTBRACKET: return "]";
+        case SDLK_BACKSLASH: return "\\";
+        case SDLK_SEMICOLON: return ";";
+        case SDLK_QUOTE: return "'";
+        case SDLK_COMMA: return ",";
+        case SDLK_PERIOD: return ".";
+        case SDLK_SLASH: return "/";
+        case SDLK_BACKQUOTE: return "`";
+        default:
+            return SDL_GetKeyName(key);
+    }
+}
 
-    /* Get modifier string */
-    if (kb.modifier == KEYBIND_MOD_CTRL) {
-        mod_str = "C-";
-    } else if (kb.modifier == KEYBIND_MOD_ALT) {
-        mod_str = "A-";
+const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_size) {
+    char mod_str[16] = "";
+
+    /* Build modifier string */
+    if (kb.modifier & KEYBIND_MOD_SHIFT) {
+        strcat(mod_str, "S-");
+    }
+    if (kb.modifier & KEYBIND_MOD_CTRL) {
+        strcat(mod_str, "C-");
+    }
+    if (kb.modifier & KEYBIND_MOD_ALT) {
+        strcat(mod_str, "A-");
     }
 
-    /* Get key string - handle common keys */
+    /* Get key name */
+    const char* key_name = get_key_name(kb.key);
+
+    /* For single letter keys, show uppercase */
     if (kb.key >= SDLK_a && kb.key <= SDLK_z) {
-        /* Letter keys - display as uppercase */
+        char key_char[2];
         key_char[0] = (char)(kb.key - SDLK_a + 'A');
         key_char[1] = '\0';
         snprintf(buffer, buffer_size, "%s%s", mod_str, key_char);
     } else if (kb.key >= SDLK_1 && kb.key <= SDLK_9) {
         /* Number keys 1-9 */
+        char key_char[2];
         key_char[0] = (char)(kb.key - SDLK_1 + '1');
         key_char[1] = '\0';
         snprintf(buffer, buffer_size, "%s%s", mod_str, key_char);
     } else if (kb.key == SDLK_0) {
-        /* Number key 0 */
         snprintf(buffer, buffer_size, "%s0", mod_str);
     } else {
-        /* Unknown key */
-        snprintf(buffer, buffer_size, "%s?", mod_str);
+        snprintf(buffer, buffer_size, "%s%s", mod_str, key_name);
     }
 
     return buffer;
@@ -140,38 +189,43 @@ const char* keybinding_to_short_string(Keybinding kb, char* buffer, int buffer_s
 
 /* Convert keybinding to display string like "Ctrl+A" */
 const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size) {
-    const char* mod_str = "";
-    char key_char[2];
+    char mod_str[32] = "";
 
     if (kb.key == SDLK_UNKNOWN) {
         snprintf(buffer, buffer_size, "Not Set");
         return buffer;
     }
 
-    /* Get modifier string */
-    if (kb.modifier == KEYBIND_MOD_CTRL) {
-        mod_str = "Ctrl+";
-    } else if (kb.modifier == KEYBIND_MOD_ALT) {
-        mod_str = "Alt+";
+    /* Build modifier string */
+    if (kb.modifier & KEYBIND_MOD_SHIFT) {
+        strcat(mod_str, "Shift+");
+    }
+    if (kb.modifier & KEYBIND_MOD_CTRL) {
+        strcat(mod_str, "Ctrl+");
+    }
+    if (kb.modifier & KEYBIND_MOD_ALT) {
+        strcat(mod_str, "Alt+");
     }
 
-    /* Get key string - handle common keys */
+    /* Get key name */
+    const char* key_name = get_key_name(kb.key);
+
+    /* For single letter keys, show uppercase */
     if (kb.key >= SDLK_a && kb.key <= SDLK_z) {
-        /* Letter keys - display as uppercase */
+        char key_char[2];
         key_char[0] = (char)(kb.key - SDLK_a + 'A');
         key_char[1] = '\0';
         snprintf(buffer, buffer_size, "%s%s", mod_str, key_char);
     } else if (kb.key >= SDLK_1 && kb.key <= SDLK_9) {
         /* Number keys 1-9 */
+        char key_char[2];
         key_char[0] = (char)(kb.key - SDLK_1 + '1');
         key_char[1] = '\0';
         snprintf(buffer, buffer_size, "%s%s", mod_str, key_char);
     } else if (kb.key == SDLK_0) {
-        /* Number key 0 */
         snprintf(buffer, buffer_size, "%s0", mod_str);
     } else {
-        /* Unknown key */
-        snprintf(buffer, buffer_size, "%s?", mod_str);
+        snprintf(buffer, buffer_size, "%s%s", mod_str, key_name);
     }
 
     return buffer;
@@ -180,8 +234,15 @@ const char* keybinding_to_string(Keybinding kb, char* buffer, int buffer_size) {
 /* Find spell slot (0-19) matching key+modifier, returns -1 if no match */
 int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate) {
     int i;
+    bool has_shift = (sdl_modstate & KMOD_SHIFT) != 0;
     bool has_ctrl = (sdl_modstate & KMOD_CTRL) != 0;
     bool has_alt = (sdl_modstate & KMOD_ALT) != 0;
+
+    /* Build current modifier state */
+    KeybindModifier current_mod = KEYBIND_MOD_NONE;
+    if (has_shift) current_mod |= KEYBIND_MOD_SHIFT;
+    if (has_ctrl) current_mod |= KEYBIND_MOD_CTRL;
+    if (has_alt) current_mod |= KEYBIND_MOD_ALT;
 
     for (i = 0; i < NUM_SPELL_HOTKEYS; i++) {
         Keybinding kb = keybind_config.spell_hotkeys[i];
@@ -189,13 +250,8 @@ int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate) {
         /* Check key match */
         if (kb.key != key) continue;
 
-        /* Check modifier match (lenient - ignore Shift, Caps, etc.) */
-        if (kb.modifier == KEYBIND_MOD_CTRL) {
-            if (has_ctrl && !has_alt) return i;  /* Require Ctrl, forbid Alt */
-        } else if (kb.modifier == KEYBIND_MOD_ALT) {
-            if (has_alt && !has_ctrl) return i;  /* Require Alt, forbid Ctrl */
-        }
-        /* KEYBIND_MOD_NONE: Skip unbound entries */
+        /* Check exact modifier match */
+        if (kb.modifier == current_mod) return i;
     }
 
     return -1;  /* No match found */
@@ -203,18 +259,22 @@ int keybinding_find_spell_slot(SDL_Keycode key, int sdl_modstate) {
 
 int keybinding_find_general(SDL_KeyCode key, int sdl_modstate) {
     int i;
+    bool has_shift = (sdl_modstate & KMOD_SHIFT) != 0;
     bool has_ctrl = (sdl_modstate & KMOD_CTRL) != 0;
     bool has_alt = (sdl_modstate & KMOD_ALT) != 0;
+
+    /* Build current modifier state */
+    KeybindModifier current_mod = KEYBIND_MOD_NONE;
+    if (has_shift) current_mod |= KEYBIND_MOD_SHIFT;
+    if (has_ctrl) current_mod |= KEYBIND_MOD_CTRL;
+    if (has_alt) current_mod |= KEYBIND_MOD_ALT;
 
     for (i = 0; i < NUM_GENERAL_HOTKEYS; i++) {
         Keybinding kb = keybind_config.general_hotkeys[i];
         if (kb.key != key) continue;
 
-        if (kb.modifier == KEYBIND_MOD_CTRL) {
-            if (has_ctrl && !has_alt) return i;
-        } else if (kb.modifier == KEYBIND_MOD_ALT) {
-            if (has_alt && !has_ctrl) return i;
-        }
+        /* Check exact modifier match */
+        if (kb.modifier == current_mod) return i;
     }
 
     return -1;
