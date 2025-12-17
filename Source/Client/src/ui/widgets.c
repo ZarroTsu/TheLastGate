@@ -294,8 +294,8 @@ bool keybind(BindingDescriptor *binding, int index) {
                 }
             }
 
-            /* If valid key pressed (not ENTER), update the keybinding */
-            if (pressed_key != SDLK_UNKNOWN && pressed_key != SDLK_RETURN) {
+            /* If valid key pressed (not ENTER, or /), update the keybinding */
+            if (pressed_key != SDLK_UNKNOWN && pressed_key != SDLK_RETURN && pressed_key != SDLK_SLASH) {
                 Keybinding new_binding;
                 new_binding.key = pressed_key;
                 new_binding.modifier = mod_flags;
@@ -306,7 +306,7 @@ bool keybind(BindingDescriptor *binding, int index) {
                 waiting_for_keybind = false;
             }
             /* If ENTER was pressed, ignore it (reserved for chat) */
-            else if (imgui_is_key_pressed(SDLK_RETURN)) {
+            else if (imgui_is_key_pressed(SDLK_RETURN) || imgui_is_key_pressed(SDLK_SLASH)) {
                 /* Do nothing - ENTER is reserved */
             }
         }
