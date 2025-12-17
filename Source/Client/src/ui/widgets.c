@@ -138,13 +138,13 @@ bool tab_button(const char *label, bool is_active, float width) {
     return clicked;
 }
 
-bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
+bool keybind(BindingDescriptor *binding, int index) {
     /* Static state to track which keybind is being set */
     static int active_keybind_index = -1; /* -1 = none active */
 
     /* Calculate layout */
     float text_width, text_height;
-    imgui_calc_text_size_simple(&text_width, &text_height, keybind_label);
+    imgui_calc_text_size_simple(&text_width, &text_height, binding->name);
     float spacing_x, spacing_y;
     imgui_get_style_item_spacing(&spacing_x, &spacing_y);
 
@@ -161,7 +161,7 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
     /* Render label */
     imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);
     imgui_set_cursor_pos_y(start_y + text_offset);
-    imgui_text(keybind_label);
+    imgui_text(binding->name);
 
     /* Position button */
     imgui_same_line_gap();
@@ -174,7 +174,7 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
     if (is_active) {
         snprintf(button_text, sizeof(button_text), "Press key...");
     } else {
-        keybinding_to_string(*keybind, button_text, sizeof(button_text));
+        keybinding_to_string(binding->keybinding, button_text, sizeof(button_text));
     }
 
     /* Draw the button */
@@ -200,7 +200,7 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
         }
         /* Check for DELETE to unbind */
         else if (imgui_is_key_pressed(SDLK_DELETE)) {
-            keybind->key = SDLK_UNKNOWN;
+            binding->keybinding.key = SDLK_UNKNOWN;
             active_keybind_index = -1;
             waiting_for_keybind = false;
         }
@@ -269,8 +269,8 @@ bool keybind(const char *keybind_label, Keybinding *keybind, int index) {
 
             /* If valid key pressed (not ENTER), update the keybinding */
             if (pressed_key != SDLK_UNKNOWN && pressed_key != SDLK_RETURN) {
-                keybind->key = pressed_key;
-                keybind->modifier = mod_flags;
+                binding->keybinding.key = pressed_key;
+                binding->keybinding.modifier = mod_flags;
                 active_keybind_index = -1; /* Exit set mode */
                 waiting_for_keybind = false;
             }

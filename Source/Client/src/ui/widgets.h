@@ -13,5 +13,5 @@
 
 bool ui_button(const char *label, float width, float height);
 bool tab_button(const char* label, bool is_active, float width);
-bool keybind(const char *keybind_label, Keybinding *spell_index, int index);
+bool keybind(BindingDescriptor *binding, int index);
 void ui_tooltip(const char *tooltip_text);

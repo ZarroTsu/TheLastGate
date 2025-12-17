@@ -141,117 +141,48 @@ static void audio_settings_tab() {
 static void keybind_settings_tab() {
     int keybind_id = 0;
     float text_width;
-    imgui_calc_text_size_simple(&text_width, NULL, "Spell Hotkeys");
-    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
-    imgui_center_next_item(text_width);
-    imgui_text("Spell Hotkeys");
-    imgui_pop_style_color(1);
+    BindingCategory categories[] = {
+        BINDING_CATEGORY_SPELL,
+        BINDING_CATEGORY_SPEED,
+        BINDING_CATEGORY_WORLD,
+        BINDING_CATEGORY_WINDOW,
+        BINDING_CATEGORY_GENERAL,
+        BINDING_CATEGORY_GC
+    };
 
-    imgui_spacing();
+    const char *category_names[] = {
+        "Spell Hotkeys",
+        "Speed Hotkeys",
+        "World Hotkeys",
+        "Window Hotkeys",
+        "General Hotkeys",
+        "GC Commands"
+    };
 
-    keybind("Spell 1", &g_config.keybind.spell_hotkeys[0], keybind_id++);
-    keybind("Spell 2", &g_config.keybind.spell_hotkeys[1], keybind_id++);
-    keybind("Spell 3", &g_config.keybind.spell_hotkeys[2], keybind_id++);
-    keybind("Spell 4", &g_config.keybind.spell_hotkeys[3], keybind_id++);
-    keybind("Spell 5", &g_config.keybind.spell_hotkeys[4], keybind_id++);
-    keybind("Spell 6", &g_config.keybind.spell_hotkeys[5], keybind_id++);
-    keybind("Spell 7", &g_config.keybind.spell_hotkeys[6], keybind_id++);
-    keybind("Spell 8", &g_config.keybind.spell_hotkeys[7], keybind_id++);
-    keybind("Spell 9", &g_config.keybind.spell_hotkeys[8], keybind_id++);
-    keybind("Spell 10", &g_config.keybind.spell_hotkeys[9], keybind_id++);
-    keybind("Spell 11", &g_config.keybind.spell_hotkeys[10], keybind_id++);
-    keybind("Spell 12", &g_config.keybind.spell_hotkeys[11], keybind_id++);
-    keybind("Spell 13", &g_config.keybind.spell_hotkeys[12], keybind_id++);
-    keybind("Spell 14", &g_config.keybind.spell_hotkeys[13], keybind_id++);
-    keybind("Spell 15", &g_config.keybind.spell_hotkeys[14], keybind_id++);
-    keybind("Spell 16", &g_config.keybind.spell_hotkeys[15], keybind_id++);
-    keybind("Spell 17", &g_config.keybind.spell_hotkeys[16], keybind_id++);
-    keybind("Spell 18", &g_config.keybind.spell_hotkeys[17], keybind_id++);
-    keybind("Spell 19", &g_config.keybind.spell_hotkeys[18], keybind_id++);
-    keybind("Spell 20", &g_config.keybind.spell_hotkeys[19], keybind_id++);
+    int num_categories = sizeof(categories) / sizeof(categories[0]);
+    for (int i = 0; i < num_categories; i++) {
+        BindingCategory category = categories[i];
 
-    imgui_spacing();
-    imgui_separator();
+        // Padding above header for everything after the first category
+        if (i > 0) {
+            imgui_spacing();
+            imgui_separator();
+        }
 
-    imgui_calc_text_size_simple(&text_width, NULL, "Speed Hotkeys");
-    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
-    imgui_center_next_item(text_width);
-    imgui_text("Speed Hotkeys");
-    imgui_pop_style_color(1);
+        imgui_calc_text_size_simple(&text_width, NULL, category_names[i]);
+        imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
+        imgui_center_next_item(text_width);
+        imgui_text(category_names[i]);
+        imgui_pop_style_color(1);
 
-    imgui_spacing();
+        imgui_spacing();
 
-    keybind("Fast Mode", &g_config.keybind.general_hotkeys[SPEED_FAST_HOTKEY], keybind_id++);
-    keybind("Normal Mode", &g_config.keybind.general_hotkeys[SPEED_NORMAL_HOTKEY], keybind_id++);
-    keybind("Slow Mode", &g_config.keybind.general_hotkeys[SPEED_SLOW_HOTKEY], keybind_id++);
-
-    imgui_spacing();
-    imgui_separator();
-
-    imgui_calc_text_size_simple(&text_width, NULL, "World Hotkeys");
-    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
-    imgui_center_next_item(text_width);
-    imgui_text("World Hotkeys");
-    imgui_pop_style_color(1);
-
-    imgui_spacing();
-
-    keybind("Toggle Health Percent", &g_config.keybind.general_hotkeys[TOGGLE_PERCENT_HOTKEY], keybind_id++);
-    keybind("Toggle Stat Bases", &g_config.keybind.general_hotkeys[TOGGLE_STAT_BASE_HOTKEY], keybind_id++);
-    keybind("Toggle Hide Sprites", &g_config.keybind.general_hotkeys[TOGGLE_HIDE_SPRITE_HOTKEY], keybind_id++);
-    keybind("Toggle Names", &g_config.keybind.general_hotkeys[TOGGLE_NAMES_HOTKEY], keybind_id++);
-    keybind("Toggle Health Bars", &g_config.keybind.general_hotkeys[TOGGLE_HEALTH_BARS_HOTKEY], keybind_id++);
-
-    imgui_spacing();
-    imgui_separator();
-
-    imgui_calc_text_size_simple(&text_width, NULL, "Window Hotkeys");
-    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
-    imgui_center_next_item(text_width);
-    imgui_text("Window Hotkeys");
-    imgui_pop_style_color(1);
-
-    imgui_spacing();
-
-    keybind("Options Window", &g_config.keybind.general_hotkeys[TOGGLE_OPTIONS_HOTKEY], keybind_id++);
-    keybind("Toggle Gamma", &g_config.keybind.general_hotkeys[TOGGLE_GAMMA_HOTKEY], keybind_id++);
-    keybind("Reset Window Size", &g_config.keybind.general_hotkeys[RESET_WINDOW_SIZE_HOTKEY], keybind_id++);
-
-    imgui_spacing();
-    imgui_separator();
-
-    imgui_calc_text_size_simple(&text_width, NULL, "General Hotkeys");
-    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
-    imgui_center_next_item(text_width);
-    imgui_text("General Hotkeys");
-    imgui_pop_style_color(1);
-
-    imgui_spacing();
-
-    keybind("Toggle Fightback", &g_config.keybind.general_hotkeys[FIGHTBACK_HOTKEY], keybind_id++);
-    keybind("Swap Gearset", &g_config.keybind.general_hotkeys[SWAP_GEAR_HOTKEY], keybind_id++);
-    keybind("Swap Position", &g_config.keybind.general_hotkeys[SWAP_POSITION_HOTKEY], keybind_id++);
-    keybind("Display Debug Info", &g_config.keybind.general_hotkeys[DISPLAY_DEBUG_INFORMATION_HOTKEY], keybind_id++);
-    keybind("Exit", &g_config.keybind.general_hotkeys[EXIT_HOTKEY], keybind_id++);
-
-    imgui_spacing();
-    imgui_separator();
-
-    imgui_calc_text_size_simple(&text_width, NULL, "GC Commands");
-    imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
-    imgui_center_next_item(text_width);
-    imgui_text("GC Commands");
-    imgui_pop_style_color(1);
-
-    imgui_spacing();
-
-    keybind("Offense Mode", &g_config.keybind.general_hotkeys[GC_OFFENSE_HOTKEY], keybind_id++);
-    keybind("Defense Mode", &g_config.keybind.general_hotkeys[GC_DEFENSE_HOTKEY], keybind_id++);
-    keybind("Passive Mode", &g_config.keybind.general_hotkeys[GC_PASSIVE_HOTKEY], keybind_id++);
-    keybind("Wait", &g_config.keybind.general_hotkeys[GC_WAIT_HOTKEY], keybind_id++);
-    keybind("Follow", &g_config.keybind.general_hotkeys[GC_FOLLOW_HOTKEY], keybind_id++);
-    keybind("Move", &g_config.keybind.general_hotkeys[GC_MOVE_HOTKEY], keybind_id++);
-    keybind("Buffs", &g_config.keybind.general_hotkeys[GC_BUFFS_HOTKEY], keybind_id++);
+        for (int j = 0; j < g_config.keybind.num_bindings; j++) {
+            if (g_config.keybind.bindings[j].category == category) {
+                keybind(&g_config.keybind.bindings[j], keybind_id++);
+            }
+        }
+    }
 }
 
 void options_window_render() {
