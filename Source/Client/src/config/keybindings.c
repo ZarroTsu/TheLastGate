@@ -98,6 +98,10 @@ static BindingDescriptor binding_registry[] = {
         {SDLK_UNKNOWN, KEYBIND_MOD_CTRL}
     },
     {
+        "Who's Online", WHO_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+            {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
+    },
+    {
         "Display Debug Info", DISPLAY_DEBUG_INFORMATION_HOTKEY, BINDING_CATEGORY_GENERAL,
         {SDLK_F11, KEYBIND_MOD_NONE}, {SDLK_F11, KEYBIND_MOD_NONE}
     },

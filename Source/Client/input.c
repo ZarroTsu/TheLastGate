@@ -182,6 +182,10 @@ static void handle_hotkey(const BindingDescriptor *binding) {
         cmd3(CL_CMD_INV, 9, 1, selected_char);
         return;
     }
+    if (strcmp(id, WHO_HOTKEY) == 0) {
+        say("/who");
+        return;
+    }
     if (strcmp(id, DISPLAY_DEBUG_INFORMATION_HOTKEY) == 0) {
         SDL_SysWMinfo info;
         SDL_VERSION(&info.version);

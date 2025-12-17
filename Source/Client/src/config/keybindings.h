@@ -26,6 +26,7 @@
 #define FIGHTBACK_HOTKEY "fightback_hotkey"
 #define SWAP_POSITION_HOTKEY "swap_position_hotkey"
 #define SWAP_GEAR_HOTKEY "swap_gear_hotkey"
+#define WHO_HOTKEY "who_hotkey"
 #define DISPLAY_DEBUG_INFORMATION_HOTKEY "display_debug_information_hotkey"
 #define EXIT_HOTKEY "exit_hotkey"
 
