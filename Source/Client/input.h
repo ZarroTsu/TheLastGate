@@ -9,6 +9,8 @@ extern bool waiting_for_keybind;
 
 void init_input(void);
 
+void sync_chat_input_state(void);
+
 void handle_input(void);
 
 void scale_event_for_imgui(SDL_Event *event);

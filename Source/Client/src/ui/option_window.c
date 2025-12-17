@@ -259,6 +259,7 @@ void options_window_render() {
 
         if (ui_button("Close", button_width, 15.0f)) {
             show_opts = false;
+            apply_config_changes();
         }
     }
     imgui_end();

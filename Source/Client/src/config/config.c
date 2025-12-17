@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include "graphics/sdl.h"
+#include "input.h"
 
 GlobalConfig g_config = {
     .video = {
@@ -27,3 +28,7 @@ GlobalConfig g_config = {
         .path = ""
     }
 };
+
+void apply_config_changes(void) {
+    sync_chat_input_state();
+}

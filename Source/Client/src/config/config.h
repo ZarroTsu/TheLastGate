@@ -48,3 +48,6 @@ typedef struct {
 } GlobalConfig;
 
 extern GlobalConfig g_config;
+
+/* Apply config changes that require runtime state synchronization */
+void apply_config_changes(void);

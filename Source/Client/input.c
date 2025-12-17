@@ -52,6 +52,18 @@ void init_input(void) {
     }
 }
 
+void sync_chat_input_state(void) {
+    if (g_config.ui.enter_to_talk) {
+        if (chat_mode_active) {
+            chat_mode_active = 0;
+        }
+        SDL_StopTextInput();
+    } else {
+        chat_mode_active = 0;
+        SDL_StartTextInput();
+    }
+}
+
 static int is_mouse_over_imgui(void) {
     return imgui_want_capture_mouse();
 }
@@ -276,6 +288,7 @@ void handle_input(void) {
                         }
                         if (show_opts != 0) {
                             show_opts = 0;
+                            apply_config_changes();
                             closed_window = true;
                         }
                         if (!g_config.ui.escape_closes_menu_first || !closed_window) cmd(CL_CMD_RESET, 0, 0);
@@ -309,6 +322,7 @@ void handle_input(void) {
                     case SDLK_F9:
                         // dd_savescreen(); TODO: Implement this
                         show_opts = !show_opts;
+                        apply_config_changes();
                         break;
                     case SDLK_F10:
                         if (g_config.video.windowed && (SDL_GetModState() & KMOD_SHIFT) != 0) {
