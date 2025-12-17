@@ -318,27 +318,26 @@ void load_extended_options(void)
 			if (read(handle, &g_config.gameplay.use_queue, sizeof(g_config.gameplay.use_queue)) != sizeof(g_config.gameplay.use_queue)) return;
 
 			/* Read keybinding section */
-			if (read(handle, &count, sizeof(count)) == sizeof(count)) {
-				/* Bounds check */
-				if (count > NUM_SPELL_HOTKEYS) count = NUM_SPELL_HOTKEYS;
+			if (version < 5) { // new versions wont have this
+				if (read(handle, &count, sizeof(count)) == sizeof(count)) {
+					/* Bounds check */
+					if (count > NUM_SPELL_HOTKEYS) count = NUM_SPELL_HOTKEYS;
 
-				for (i = 0; i < (int)count; i++) {
-					SDL_Keycode key;
-					KeybindModifier mod;
+					for (i = 0; i < (int)count; i++) {
+						SDL_Keycode key;
+						KeybindModifier mod;
 
-					if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
-					if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
+						if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
+						if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
 
-					/* Validate before applying */
-					if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
-
-					g_config.keybind.spell_hotkeys[i].key = key;
-					g_config.keybind.spell_hotkeys[i].modifier = mod;
+						/* Validate before applying */
+						if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
+					}
 				}
 			}
 		}
 
-		if (version >= 2) {
+		if (version >= 2 && version < 5) {
 			if (read(handle, &count, sizeof(count)) == sizeof(count)) {
 				if (count > NUM_GENERAL_HOTKEYS) count = NUM_GENERAL_HOTKEYS;
 
@@ -350,9 +349,6 @@ void load_extended_options(void)
 					if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
 
 					if (key == SDLK_UNKNOWN || mod > KEYBIND_MOD_ALT) continue;
-
-					g_config.keybind.general_hotkeys[i].key = key;
-					g_config.keybind.general_hotkeys[i].modifier = mod;
 				}
 			}
 		}
@@ -367,6 +363,29 @@ void load_extended_options(void)
 
 		if (version >= 4) {
 			if (read(handle, &g_config.ui.enter_to_talk, sizeof(g_config.ui.enter_to_talk)) != sizeof(g_config.ui.enter_to_talk)) return;
+		}
+
+		if (version >= 5) {
+			if (read(handle, &count, sizeof(count)) == sizeof(count)) {
+				char id[64];
+				for (i = 0; i < (int)count; i++) {
+					uint32_t id_length;
+					SDL_Keycode key;
+					KeybindModifier mod;
+					if (read(handle, &id_length, sizeof(id_length)) != sizeof(id_length)) break;
+					if (id_length >= sizeof(id)) break;
+					if (read(handle, &id, id_length) != ((ssize_t)id_length)) break;
+					id[id_length] = '\0';
+					if (read(handle, &key, sizeof(SDL_Keycode)) != sizeof(SDL_Keycode)) break;
+					if (read(handle, &mod, sizeof(KeybindModifier)) != sizeof(KeybindModifier)) break;
+					BindingDescriptor *binding = binding_find_by_id(id);
+					if (binding) {
+						binding->keybinding.key = key;
+						binding->keybinding.modifier = mod;
+					}
+
+				}
+			}
 		}
 
 		close(handle);
@@ -417,23 +436,6 @@ void save_extended_options(void)
 		write(handle, &g_config.gameplay.give_more, sizeof(g_config.gameplay.give_more));
 		write(handle, &g_config.gameplay.use_queue, sizeof(g_config.gameplay.use_queue));  /* FIXED */
 
-		/* Write keybinding section */
-		count = NUM_SPELL_HOTKEYS;
-		write(handle, &count, sizeof(count));
-
-		for (i = 0; i < NUM_SPELL_HOTKEYS; i++) {
-			write(handle, &g_config.keybind.spell_hotkeys[i].key, sizeof(SDL_Keycode));
-			write(handle, &g_config.keybind.spell_hotkeys[i].modifier, sizeof(KeybindModifier));
-		}
-
-		count = NUM_GENERAL_HOTKEYS;
-		write(handle, &count, sizeof(count));
-
-		for (i = 0; i < NUM_GENERAL_HOTKEYS; i++) {
-			write(handle, &g_config.keybind.general_hotkeys[i].key, sizeof(SDL_Keycode));
-			write(handle, &g_config.keybind.general_hotkeys[i].modifier, sizeof(KeybindModifier));
-		}
-
 		write(handle, &g_config.gameplay.stubborn_use, sizeof(g_config.gameplay.stubborn_use));
 		write(handle, &g_config.gameplay.stubborn_drop, sizeof(g_config.gameplay.stubborn_drop));
 		write(handle, &g_config.gameplay.stubborn_give, sizeof(g_config.gameplay.stubborn_give));
@@ -441,6 +443,18 @@ void save_extended_options(void)
 		write(handle, &g_config.gameplay.stubborn_pickup, sizeof(g_config.gameplay.stubborn_pickup));
 
 		write(handle, &g_config.ui.enter_to_talk, sizeof(g_config.ui.enter_to_talk));
+
+		write(handle, &g_config.keybind.num_bindings, sizeof(g_config.keybind.num_bindings));
+
+		for (i = 0; i < g_config.keybind.num_bindings; i++) {
+			BindingDescriptor binding = g_config.keybind.bindings[i];
+
+			uint32_t id_length = (uint32_t) strlen(binding.id);
+			write(handle, &id_length, sizeof(id_length));
+			write(handle, binding.id, id_length);
+			write(handle, &binding.keybinding.key, sizeof(binding.keybinding.key));
+			write(handle, &binding.keybinding.modifier, sizeof(binding.keybinding.modifier));
+		}
 
 		close(handle);
 	}

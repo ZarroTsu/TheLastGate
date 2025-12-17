@@ -1,6 +1,6 @@
 #pragma once
 
-#define SAVE_VERSION 4  /* TLGExtended.dat format version */
+#define SAVE_VERSION 5  /* TLGExtended.dat format version */
 
 void load_options(void);
 void save_options(void);
