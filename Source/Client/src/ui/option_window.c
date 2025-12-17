@@ -17,6 +17,8 @@
 
 extern int do_darkmode;
 
+bool is_resetting_keybinds = false;
+
 bool in_button(int mouse_x, int mouse_y, int start_x, int start_y, int width, int height) {
     return mouse_x >= start_x && mouse_x <= start_x + width && mouse_y >= start_y && mouse_y <= start_y + height;
 }
@@ -167,6 +169,7 @@ static void keybind_settings_tab() {
         if (i > 0) {
             imgui_spacing();
             imgui_separator();
+            imgui_spacing();
         }
 
         imgui_calc_text_size_simple(&text_width, NULL, category_names[i]);
@@ -181,6 +184,20 @@ static void keybind_settings_tab() {
             if (g_config.keybind.bindings[j].category == category) {
                 keybind(&g_config.keybind.bindings[j], keybind_id++);
             }
+        }
+    }
+
+    imgui_spacing();
+    imgui_separator();
+    imgui_spacing();
+    imgui_center_next_item(200);
+    if (ui_button(is_resetting_keybinds ? "Confirm?" : "Reset Keybinds to Defaults", 200, 20)) {
+        if (is_resetting_keybinds) {
+            xlog(2, "Keybinds have been set to their defaults.");
+            keybindings_init();
+            is_resetting_keybinds = false;
+        } else {
+            is_resetting_keybinds = true;
         }
     }
 }
@@ -206,6 +223,7 @@ void options_window_render() {
         }
         imgui_same_line_gap();
         if (tab_button("Keybinds", active_tab == 2, 90.0f)) {
+            is_resetting_keybinds = false;
             active_tab = 2;
         }
 

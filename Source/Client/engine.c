@@ -4772,6 +4772,7 @@ int wantquit=0;
 int maynotquit=TICKS*5/TICKMULTI;
 
 void cmd_options() {
+	is_resetting_keybinds = false;
 	show_opts = show_opts ? 0 : 1;
 }
 
