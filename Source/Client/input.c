@@ -345,9 +345,10 @@ void handle_input(void) {
 
                 BindingDescriptor *binding = binding_find(e.key.keysym.sym, SDL_GetModState());
 
-                if (binding) {
+                if (binding && !(g_config.ui.enter_to_talk && chat_mode_active)) {
                     handle_hotkey(binding);
                 }
+
                 switch (e.key.keysym.sym) {
                     case SDLK_ESCAPE:
                         if (g_config.ui.enter_to_talk && chat_mode_active) {
