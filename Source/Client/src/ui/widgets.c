@@ -169,7 +169,7 @@ bool keybind(BindingDescriptor *binding, int index) {
 
     float button_width = 80.0f;
     float button_height = 20.0f;
-    float total_width = text_width + spacing_x + button_width;
+    float total_width = text_width + spacing_x + button_width + spacing_x + 40.0f;
 
     /* Center the text+button pair */
     imgui_center_next_item(total_width);
@@ -199,6 +199,17 @@ bool keybind(BindingDescriptor *binding, int index) {
     /* Draw the button */
     imgui_push_id_int(index);
     bool clicked = ui_button(button_text, button_width, button_height);
+    if (is_active && imgui_is_item_hovered()) {
+        ui_tooltip("ESC to cancel. DEL to un-bind.");
+    }
+    imgui_pop_id();
+    imgui_same_line_gap();
+    imgui_set_cursor_pos_y(start_y);
+    imgui_push_id_int(index + 1000); // Lazy :)
+    if (ui_button("Reset", 40.0f, button_height)) {
+        binding->keybinding.key = binding->default_keybinding.key;
+        binding->keybinding.modifier = binding->default_keybinding.modifier;
+    }
     imgui_pop_id();
 
     /* Handle button click - enter "set mode" */
@@ -209,9 +220,6 @@ bool keybind(BindingDescriptor *binding, int index) {
 
     /* If in set mode for this keybind, capture input */
     if (is_active) {
-        if (imgui_is_item_hovered()) {
-            ui_tooltip("ESC to cancel. DEL to un-bind.");
-        }
         /* Check for ESC to cancel */
         if (imgui_is_key_pressed(SDLK_ESCAPE)) {
             active_keybind_index = -1; /* Cancel */
