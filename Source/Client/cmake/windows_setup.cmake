@@ -9,5 +9,8 @@
             -mwindows           # MinGW: Use WinMain entry point, no console window
     )
 
-    target_link_libraries(TheLastGate PRIVATE user32)
+    target_link_libraries(TheLastGate PRIVATE
+            user32
+            bcrypt
+    )
 endif ()
