@@ -38,8 +38,8 @@ add_executable(TheLastGate WIN32
         src/graphics/render.c
         src/graphics/render.h
         src/graphics/sdl_magic.c
-        socket.c
-        socket.h
+        src/net/connection.c
+        src/net/socket.c
         src/audio/sound.c
         src/audio/sound.h
         src/ui/option_window.c

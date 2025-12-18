@@ -7,7 +7,7 @@
 
 #include "inter.h"
 #include "main.h"
-#include "socket.h"
+#include "src/net/socket.h"
 #include "engine.h"
 #include "config/config.h"
 #include "graphics/atlas.h"

@@ -37,7 +37,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_net.h>
 
-#include "input.h"
+#include "../../input.h"
 #include "graphics/render.h"
 #include "log/log.h"
 #include "mods/stubborn_actions.h"
@@ -46,9 +46,9 @@
 
 struct z_stream_s zs;
 
-#include "common.h"
-#include "inter.h"
-#include "merc.rh"
+#include "../../common.h"
+#include "../../inter.h"
+#include "../../merc.rh"
 
 char passwd[15]={0};
 
@@ -68,8 +68,8 @@ struct look shop;
 
 extern int show_look,look_timer;
 
-static TCPsocket sock = NULL;
-static SDLNet_SocketSet socket_set = NULL;
+TCPsocket sock = NULL;
+SDLNet_SocketSet socket_set = NULL;
 
 int t_size=0;	// ticks in queue
 

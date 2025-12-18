@@ -10,6 +10,7 @@
 #include "common.h"
 #include "input.h"
 #include "inter.h"
+#include "net/connection.h"
 #include "graphics/render.h"
 #include "audio/sound.h"
 #include "config/config.h"
@@ -31,9 +32,7 @@ SDL_Cursor* cursors[10];
 void cmd(int cmd,int x,int y);
 
 int quit=0;
-char host_addr[84]={MHOST};
-char host_proxy[84]={MPROXY};
-int host_port=5555;
+
 
 // TODO: Modern GCC/MinGW - Windows-specific window handles
 // SDL2: Use SDL_Window* instead of HWND
