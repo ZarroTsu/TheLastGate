@@ -50,7 +50,9 @@ add_executable(TheLastGate WIN32
         src/ui/spell_hud.c
         src/config/config.c
         src/log/log.c
+        src/security/security.c
         src/security/single_instance.c
+        src/security/unique_id.c
         src/mods/stubborn_actions.c
         src/ui/ui.c
 )

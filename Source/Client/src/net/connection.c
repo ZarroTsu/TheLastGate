@@ -15,6 +15,7 @@
 #include <zlib.h>
 
 #include "connection.h"
+#include "security/security.h"
 #include "../log/log.h"
 #include "../../common.h"
 #include "../../inter.h"
@@ -30,9 +31,6 @@ static int handle_login_packet(unsigned char *buf);
 char host_addr[84]={MHOST};
 char host_proxy[84]={MPROXY};
 int host_port=5555;
-
-/* Static unique ID globals (from socket.c) */
-static int unique1 = 0, unique2 = 0;
 
 /* Connection state */
 static ConnectionState current_state = CONNECTION_STATE_IDLE;

@@ -1,4 +1,4 @@
-#include "single_instance.h"
+#include "security.h"
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN

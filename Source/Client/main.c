@@ -16,7 +16,7 @@
 #include "config/config.h"
 #include "config/keybindings.h"
 #include "log/log.h"
-#include "security/single_instance.h"
+#include "security/security.h"
 
 const SdlClientVersion CLIENT_VERSION = {2,3};
 
