@@ -3023,11 +3023,16 @@ void plr_logout(int cn, int nr, int reason)
 		{
 			if (ch[n].used==USE_EMPTY)
 				continue;
-			if (!IS_SANEPLAYER(n) || !IS_ACTIVECHAR(n))
+			if (!IS_SANEPLAYER(n) || !IS_ACTIVECHAR(n) || !IS_PLAYER_COMP(n))
 				continue;
 			if (player[ch[n].player].spectating == cn)
-			{
 				player[ch[n].player].spectating = 0;
+			if (IS_PLAYER_COMP(n) && CN_OWNER(n) == cn && !(reason==LO_IDLE || reason==LO_SHUTDOWN || reason==0))
+			{
+				do_sayx(n, "Goodbye, %s.", ch[cn].name);
+				do_give_exp(cn, ch[n].data[28], 1, -1, 0);
+				fx_add_effect(7, 0, ch[n].x, ch[n].y, 0);
+				die_companion(n);
 			}
 		}
 	}
