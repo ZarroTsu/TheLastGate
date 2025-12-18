@@ -23,16 +23,6 @@ AppState app_state = {
 
 const SdlClientVersion CLIENT_VERSION = {2,3};
 
-extern void cmd3(int cmd,int x,int y,int z);
-
-extern int pskip,pidle;
-extern int noshop;
-extern int selected_char;
-
-// Scroll Wheel - using position from other files
-extern int inv_pos,skill_pos,wps_pos,hudmode;
-extern int gui_inv_x[],gui_inv_y[],gui_skl_names[];
-extern unsigned int dept_page;
 
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
@@ -41,11 +31,6 @@ int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_
 short screen_renderdist;
 int screen_target_fps = 48;  // Configurable FPS target (default 120)
 
-void dd_invalidate_cache(void);
-void conv_init(void);
-int init_pnglib(void);
-
-extern int cursor_type;
 SDL_Cursor* cursors[10];
 
 void cmd(int cmd,int x,int y);
