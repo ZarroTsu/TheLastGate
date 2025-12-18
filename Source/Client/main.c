@@ -144,16 +144,6 @@ void add_words(void)
 	}
 }
 
-// CTL3D
-// TODO: Modern GCC/MinGW - CTL3D (3D control library) is obsolete Windows 95/98 era
-// TODO: Remove entire CTL3D section, modern UI frameworks don't need this
-// HANDLE is Windows-specific, HBRUSH is GDI-specific
-void pascal (*ctl3don)(HANDLE,short int)=NULL;
-// TODO: Modern GCC/MinGW - HBRUSH is GDI-specific (Graphics Device Interface)
-// SDL2: Not applicable, use SDL_SetRenderDrawColor for colors
-HBRUSH dlg_back;
-int dlg_col,dlg_fcol;
-
 int mx=0,my=0;
 
 void say(char *input)
@@ -280,9 +270,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
 	char buf[2048];
 	int tmp;
-	HANDLE lib;  // TODO: Modern GCC/MinGW - HANDLE is Windows-specific
-	void pascal (*regxx)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
-	void pascal (*regxy)(HANDLE);  // TODO: Remove - CTL3D32.DLL is obsolete
 	parse_cmd(lpCmdLine);
 	log_init();
 	SDLNet_Init();
@@ -295,29 +282,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance of the game is already running.", NULL);
 		return 0;
 	}
-
-	// TODO: Modern GCC/MinGW - LoadLibrary/GetProcAddress are Windows-specific dynamic loading
-	// TODO: CTL3D32.DLL is obsolete (Win95/98 era 3D controls), remove this entire section
-	// Cross-platform: Use dlopen/dlsym on POSIX systems if dynamic loading is needed
-	lib=LoadLibrary("CTL3D32.DLL");
-	if (lib) {
-		// TODO: Modern GCC/MinGW - GetCurrentProcess is Windows-specific
-		regxx=(void pascal *)GetProcAddress(lib,"Ctl3dRegister");
-		if (regxx) regxx(GetCurrentProcess());
-		ctl3don=(void pascal *)GetProcAddress(lib,"Ctl3dSubclassDlg");
-		regxy=(void pascal *)GetProcAddress(lib,"Ctl3dUnregister");
-	} else {
-		regxy=NULL;
-		ctl3don=NULL;
-	}
-
-	// TODO: Modern GCC/MinGW - GetSysColor is Windows-specific
-	// SDL2: Not directly applicable, use custom color scheme or theme
-	dlg_col=GetSysColor(COLOR_BTNFACE);
-	// TODO: Modern GCC/MinGW - CreateSolidBrush is GDI-specific
-	// SDL2: Not needed, use SDL_SetRenderDrawColor for solid colors
-	dlg_back=CreateSolidBrush(dlg_col);
-	dlg_fcol=GetSysColor(COLOR_WINDOWTEXT);
 
 	screen_renderdist=RENDERDIST;
 
@@ -361,8 +325,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	engine();
 
 	deinit();
-
-	if (regxy) regxy(GetCurrentProcess());
 
 	save_options();
 

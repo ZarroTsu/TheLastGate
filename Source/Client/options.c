@@ -73,10 +73,6 @@ extern int hist_len[20];
 extern char words[2048][40];
 extern char passwd[15];
 
-extern void pascal (*ctl3don)(HANDLE,short int);
-extern HBRUSH dlg_back;
-extern int dlg_col,dlg_fcol;
-
 extern int quit;
 
 extern int do_alpha;
@@ -724,15 +720,6 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	CREATESTRUCT *cs;
 
 	switch (message) {
-		case WM_CTLCOLOR:
-		case WM_CTLCOLORDLG:
-		case WM_CTLCOLORSTATIC:
-		case WM_CTLCOLORBTN:
-		case WM_CTLCOLORSCROLLBAR:
-			SetTextColor((HDC) wParam,dlg_fcol);
-			SetBkColor((HDC) wParam,dlg_col);
-			return(int) dlg_back;
-
 		case WM_CLOSE:			
 			//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 			//else domusic=0;
@@ -1039,8 +1026,6 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					return 1;
 			}
 		case WM_INITDIALOG:
-			if (ctl3don) ctl3don(hwnd,0xfffe);
-
 			//CheckDlgButton(hwnd,IDC_DOMUSIC,opmusic);
 			CheckDlgButton(hwnd,IDC_DOSOUND,opsound);
 			CheckDlgButton(hwnd,IDC_DOSHADOW,opshadow);
