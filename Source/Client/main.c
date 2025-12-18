@@ -207,39 +207,6 @@ int parse_cmd(char *s)
 	return 1;
 }
 
-// TODO: Modern GCC/MinGW - log_system_data uses Windows-specific system info APIs
-// Cross-platform: Use standard C/POSIX functions or SDL_GetPlatform() for basic info
-void log_system_data(void)
-{
-	char buf[256];
-	unsigned int langid,lcid,size=80;
-	char systemdir[256],windir[256],cdir[256],user[256],computer[256];
-
-	// TODO: Modern GCC/MinGW - GetSystemDefaultLangID/GetSystemDefaultLCID are Windows-specific
-	// Cross-platform: Use setlocale(LC_ALL, NULL) to get locale, or SDL doesn't provide this
-	langid=GetSystemDefaultLangID();
-	lcid=GetSystemDefaultLCID();
-
-	// TODO: Modern GCC/MinGW - GetSystemDirectory/GetWindowsDirectory are Windows-specific
-	// Cross-platform: Not directly applicable, use getcwd() for current directory
-	GetSystemDirectory(systemdir,80);
-        GetWindowsDirectory(windir,80);
-	// TODO: Modern GCC/MinGW - GetCurrentDirectory is Windows-specific
-	// Cross-platform: Use getcwd() from <unistd.h>
-	GetCurrentDirectory(80,cdir);
-	// TODO: Modern GCC/MinGW - GetUserName/GetComputerName are Windows-specific
-	// Cross-platform: Use getenv("USER") or getenv("USERNAME") for user, gethostname() for computer
-	GetUserName((void*)user,&size); size=80;
-	GetComputerName((void*)computer,&size);
-
-	sprintf(buf,"|langid=%u, lcid=%u",langid,lcid); say(buf);
-	sprintf(buf,"|systemdir=\"%s\"",systemdir); say(buf);
-	sprintf(buf,"|windowsdir=\"%s\"",windir); say(buf);
-	sprintf(buf,"|currentdir=\"%s\"",cdir); say(buf);
-	sprintf(buf,"|username=\"%s\"",user); say(buf);
-	sprintf(buf,"|computername=\"%s\"",computer); say(buf);
-}
-
 // TODO: Modern GCC/MinGW - WinMain is Windows-specific entry point
 // SDL2: Replace with standard main() using SDL_main wrapper
 // Example:
@@ -304,8 +271,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	say(buf);
 
 	init_input();
-
-	log_system_data();
 
 	engine();
 
