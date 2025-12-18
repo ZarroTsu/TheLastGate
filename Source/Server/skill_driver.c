@@ -6966,7 +6966,7 @@ int spell_bloodletting(int cn, int co, int power)
 {
 	int hit = 0;
 	//if (surround_cast(cn, 0, 0, SK_BLOODLET, power, -1, -1))
-	if (hit = aoe_driver(cn, cn, 0, SK_BLOODLET, power, GET_PROX(cn), 0, 0, 0))
+	if ((hit = aoe_driver(cn, cn, 0, SK_BLOODLET, power, GET_PROX(cn), 0, 0, 0)) > 0)
 	{
 		do_char_log(cn, 1, "%d of your foes began bleeding!\n", hit);
 		return 1;
