@@ -4,15 +4,10 @@
 #include <SDL2/SDL.h>
 
 typedef struct {
-    int tricky_flag;
-} AppState;
-
-typedef struct {
     int major, minor;
 } SdlClientVersion;
 
 const extern SdlClientVersion CLIENT_VERSION;
-extern AppState app_state;
 extern int quit;
 extern int cur_pos;
 extern int in_len;

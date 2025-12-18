@@ -17,12 +17,7 @@
 #include "log/log.h"
 #include "security/single_instance.h"
 
-AppState app_state = {
-	.tricky_flag = 0
-};
-
 const SdlClientVersion CLIENT_VERSION = {2,3};
-
 
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
@@ -186,10 +181,7 @@ int parse_cmd(char *s)
 	while (*s) {
 		if (*s=='-') {
 			s++;
-			if (tolower(*s)=='t') {
-				s++;
-				app_state.tricky_flag=1;
-			} else if (tolower(*s)=='d') {
+			if (tolower(*s)=='d') {
 				s++;
 				while (isspace(*s)) s++;
 				n=0; while (n<150 && *s && !isspace(*s)) g_config.runtime.path[n++]=*s++;
@@ -221,7 +213,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nCmdShow)
 {
 	char buf[2048];
-	int tmp;
 	parse_cmd(lpCmdLine);
 	log_init();
 	SDLNet_Init();
@@ -250,7 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (quit) exit(0);
 
 	init_sound();
-	tmp=init(g_config.video.windowed);
+	int tmp = init(g_config.video.windowed);
 
 	if (tmp!=0) {
 
