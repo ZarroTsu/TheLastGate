@@ -15,8 +15,12 @@
 #include "audio/sound.h"
 #include "config/config.h"
 #include "config/keybindings.h"
+#include "graphics/scaling.h"
+#include "graphics/sdl.h"
+#include "launcher/launcher.h"
 #include "log/log.h"
 #include "security/security.h"
+#include "ui/imgui/imgui_wrapper.h"
 
 const SdlClientVersion CLIENT_VERSION = {2,3};
 
@@ -198,6 +202,38 @@ int parse_cmd(char *s)
 	return 1;
 }
 
+static void new_main() {
+	log_init();
+	init_security();
+	SDLNet_Init();
+	keybindings_init();
+	init_input();
+	screen_renderdist=RENDERDIST;
+	setres_default();
+	load_options();
+	init_sound();
+	init(g_config.video.windowed);
+
+	while (!quit) {
+		handle_input();
+
+		glClear(GL_COLOR_BUFFER_BIT);
+		sdl_start_scaling();
+		sdl_batch_flush();
+		for (int i = 0; i < input_event_count; i++) {
+			imgui_process_event(&input_events[i]);
+		}
+		input_event_count = 0;
+
+		imgui_new_frame(1.0f, 1.0f);
+		launcher_render();
+		imgui_render();
+		sdl_stop_scaling();
+		SDL_GL_SwapWindow(renderer.window);
+		SDL_Delay(1);
+	}
+}
+
 // TODO: Modern GCC/MinGW - WinMain is Windows-specific entry point
 // SDL2: Replace with standard main() using SDL_main wrapper
 // Example:
@@ -212,10 +248,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nCmdShow)
 {
 	char buf[2048];
+	new_main();
+	SDL_Quit();
+	exit(1);
 	parse_cmd(lpCmdLine);
 	init_security();
 	log_init();
 	SDLNet_Init();
+
 
 	if (!security_try_lock()) return 0;
 

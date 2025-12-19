@@ -54,6 +54,7 @@ add_executable(TheLastGate WIN32
         src/security/single_instance.c
         src/security/unique_id.c
         src/mods/stubborn_actions.c
+        src/launcher/launcher.c
         src/ui/ui.c
 )
 
