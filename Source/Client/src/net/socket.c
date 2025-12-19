@@ -43,6 +43,7 @@
 #include "mods/stubborn_actions.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
+#include "security/security.h"
 
 struct z_stream_s zs;
 
@@ -57,11 +58,6 @@ char passwd[15]={0};
 //static int __cnt=0;
 #define DEBUG2(a)
 //xlog(1,a)
-
-static void load_unique(void);
-static void save_unique(void);
-
-static int unique1=0,unique2=0;
 
 static struct look tmplook;
 struct look shop;
@@ -964,13 +960,11 @@ void sv_load(unsigned char *buf)
 
 void sv_unique(unsigned char *buf)
 {
-	extern int load;
-
 	DEBUG("SV UNIQUE");
 
 	unique1=*(unsigned int*)(buf+1);
 	unique2=*(unsigned int*)(buf+5);
-	save_unique();
+	security_id_save();
 }
 
 int sv_ignore(unsigned char *buf)
@@ -1239,25 +1233,4 @@ int tick_do(void)
         engine_tick();
 
 	return 1;
-}
-
-static void save_unique(void)
-{
-	HKEY hk;
-
-	if (RegCreateKey(HKEY_CURRENT_USER,"Software\\Microsoft\\Notepad",&hk)!=ERROR_SUCCESS) return;
-
-	RegSetValueEx(hk,"fStyle1",0,REG_DWORD,(void*)&unique1,4);
-	RegSetValueEx(hk,"fStyle2",0,REG_DWORD,(void*)&unique2,4);
-}
-
-static void load_unique(void)
-{
-	HKEY hk;
-	int size=4,type;
-
-	if (RegCreateKey(HKEY_CURRENT_USER,"Software\\Microsoft\\Notepad",&hk)!=ERROR_SUCCESS) return;
-
-	RegQueryValueEx(hk,"fStyle1",0,(void*)&type,(void*)&unique1,(void*)&size);
-	RegQueryValueEx(hk,"fStyle2",0,(void*)&type,(void*)&unique2,(void*)&size);
 }
