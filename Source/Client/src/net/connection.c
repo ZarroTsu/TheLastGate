@@ -24,7 +24,7 @@
 
 /* Forward declarations for helper functions */
 static void load_unique(void);
-static unsigned long xcrypt(unsigned long val);
+static unsigned int xcrypt(unsigned int val);
 static int handle_login_packet(unsigned char *buf);
 
 /* Connection info */
@@ -50,7 +50,7 @@ static char secret[256] = "\
 Ifhjf64hH8sa,-#39ddj843tvxcv0434dvsdc40G#34Trefc349534Y5#34trecerr943\
 5#erZt#eA534#5erFtw#Trwec,9345mwrxm gerte-534lMIZDN(/dn8sfn8&DBDB/D&s\
 8efnsd897)DDzD'D'D''Dofs,t0943-rg-gdfg-gdf.t,e95.34u.5retfrh.wretv.56\
-u35ti#ertger454z,utizerwt,gerh54zju6iko68ik7k8k9k0k1k2k3k4k5k5k7k";
+9v4#asf.59m(D)/ND/DDLD;gd+dsa,fw9r,x  OD(98snfsfa";
 
 /* Initialize connection system */
 void connection_init(void) {
@@ -299,7 +299,7 @@ static int handle_login_packet(unsigned char *buf) {
 		*(unsigned long*)(obuf + 9) = race_param;
 		SDLNet_TCP_Send(sock, (char*)obuf, 16);
 
-		load_unique();
+		security_id_load();
 
 		obuf[0] = CL_CMD_UNIQUE;
 		*(unsigned long*)(obuf + 1) = unique1;
@@ -420,19 +420,16 @@ static void load_unique(void) {
 }
 
 /* Encryption function for challenge response (from socket.c) */
-static unsigned long xcrypt(unsigned long val) {
-	unsigned char *cval = (unsigned char*)&val;
-	unsigned long ret;
-	unsigned char *cret = (unsigned char*)&ret;
+static unsigned int xcrypt(unsigned int val)
+{
+	unsigned int res=0;
 
-	for (int n = 0; n < 4; n++) {
-		int m = 0;
-		m += secret[cval[n]];
-		m += secret[cval[n] + 64];
-		m += secret[cval[n] + 128];
-		m += secret[cval[n] + 192];
-		cret[n] = m;
-	}
+	res+=(unsigned int)(secret[ val     &255]);
+	res+=(unsigned int)(secret[(val>>8 )&255])<<8;
+	res+=(unsigned int)(secret[(val>>16)&255])<<16;
+	res+=(unsigned int)(secret[(val>>24)&255])<<24;
 
-	return ret;
+	res^=0x5a7ce52e;
+
+	return res;
 }

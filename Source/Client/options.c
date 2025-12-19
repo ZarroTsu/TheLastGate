@@ -38,6 +38,7 @@
 
 #include "config/config.h"
 #include "config/keybindings.h"
+#include "net/connection.h"
 
 /*
  * Borland and Microsoft disagree on the size of the OPENFILENAME structure.
@@ -720,7 +721,13 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 	CREATESTRUCT *cs;
 
 	switch (message) {
-		case WM_CLOSE:			
+		case WM_CLOSE:
+			/* Cancel any ongoing connection */
+			if (so_status) {
+				KillTimer(hwnd, 1);
+				connection_cancel();
+			}
+
 			//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 			//else domusic=0;
 			if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) g_config.audio.sound_enabled=1;
@@ -728,7 +735,7 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 
 			if (IsDlgButtonChecked(hwnd,IDC_DOSHADOW)) do_shadow=1;
 			else do_shadow=0;
-			
+
 			if (IsDlgButtonChecked(hwnd,IDC_DODARKMODE)) do_darkmode=1;
 			else do_darkmode=0;
 
@@ -789,14 +796,24 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					}
 
 					save_options();
-					{
-						void so_connect(void*);
-						_beginthread(so_connect,16384,(void*)hwnd);
-					}
+
+					/* Start async connection */
+					connection_init();
+					connection_start(race, sex);
+					SetDlgItemText(hwnd, IDC_STATUS, "STATUS: Connecting...");
+
+					/* Start timer to poll connection status (100ms intervals) */
+					SetTimer(hwnd, 1, 100, NULL);
 
 					return 1;
 
 				case    IDCANCEL:
+					/* Cancel any ongoing connection */
+					if (so_status) {
+						KillTimer(hwnd, 1);
+						connection_cancel();
+					}
+
 					//if (IsDlgButtonChecked(hwnd,IDC_DOMUSIC)) domusic=1;
 					//else domusic=0;
 					if (IsDlgButtonChecked(hwnd,IDC_DOSOUND)) g_config.audio.sound_enabled=1;
@@ -1025,6 +1042,35 @@ APIENTRY int OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 				default:
 					return 1;
 			}
+
+		case WM_TIMER:
+			if (wParam == 1) {
+				/* Poll connection status */
+				ConnectionStatus status = connection_update();
+
+				/* Update status text */
+				char status_buf[300];
+				sprintf(status_buf, "STATUS: %s", status.status_message);
+				SetDlgItemText(hwnd, IDC_STATUS, status_buf);
+
+				/* Check if completed */
+				if (status.state == CONNECTION_STATE_CONNECTED) {
+					/* Connection successful */
+					KillTimer(hwnd, 1);
+					save_options();
+					EndDialog(hwnd, 0);
+					return 1;
+				} else if (status.state == CONNECTION_STATE_ERROR) {
+					/* Connection failed */
+					KillTimer(hwnd, 1);
+					sprintf(status_buf, "STATUS: ERROR: %s", status.error_message);
+					SetDlgItemText(hwnd, IDC_STATUS, status_buf);
+					return 1;
+				}
+				return 1;
+			}
+			return 0;
+
 		case WM_INITDIALOG:
 			//CheckDlgButton(hwnd,IDC_DOMUSIC,opmusic);
 			CheckDlgButton(hwnd,IDC_DOSOUND,opsound);

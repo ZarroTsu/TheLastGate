@@ -213,6 +213,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
 	char buf[2048];
 	parse_cmd(lpCmdLine);
+	init_security();
 	log_init();
 	SDLNet_Init();
 
