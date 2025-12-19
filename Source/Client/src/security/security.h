@@ -12,6 +12,7 @@ void init_security(void);
 void shutdown_security(void);
 
 /* Methods for ensuring a single instance is running */
+bool security_try_lock();
 bool security_acquire_lock(const char *path);
 void security_release_lock(void);
 

@@ -1,4 +1,21 @@
+#include <stdio.h>
+#include <SDL2/SDL_messagebox.h>
+#include <SDL2/SDL_stdinc.h>
+
 #include "security.h"
+#include "net/connection.h"
+
+bool security_try_lock() {
+    char lock_path[512];
+    snprintf(lock_path, sizeof(lock_path), "%sgame.lock", pref_path);
+    if (strncmp(host_addr, "127.0.0.1", sizeof(host_addr)) != 0 && !security_acquire_lock(lock_path)) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance of the game is already running.",
+                                 NULL);
+        return false;
+    }
+    return true;
+}
+
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -48,4 +65,3 @@ void security_release_lock() {
 }
 
 #endif
-
