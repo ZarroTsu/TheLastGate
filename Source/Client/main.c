@@ -221,7 +221,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	char lock_path[512];
 	snprintf(lock_path, sizeof(lock_path), "%sgame.lock", pref_path);
 	SDL_free(pref_path);
-	if (!security_acquire_lock(lock_path)) {
+	if (strncmp(host_addr, "127.0.0.1", sizeof(host_addr)) != 0 && !security_acquire_lock(lock_path)) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance of the game is already running.", NULL);
 		return 0;
 	}
