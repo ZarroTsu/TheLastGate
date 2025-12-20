@@ -37,7 +37,8 @@ typedef struct {
 
 
 typedef struct {
-    char path[256];
+    char base_path[256];      // Game directory
+    char pref_path[256];      // SDL preference path for saves/config
 } RuntimeConfig;
 
 typedef struct {
@@ -50,6 +51,12 @@ typedef struct {
 } GlobalConfig;
 
 extern GlobalConfig g_config;
+
+/* Initialize runtime paths (pref_path, base_path) */
+void config_init_paths(void);
+
+/* Clean up runtime paths */
+void config_cleanup_paths(void);
 
 /* Apply config changes that require runtime state synchronization */
 void apply_config_changes(void);

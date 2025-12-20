@@ -1,7 +1,11 @@
 #include "config.h"
 
+#include <SDL2/SDL_filesystem.h>
+#include <string.h>
+
 #include "graphics/sdl.h"
 #include "input.h"
+#include "log/log.h"
 
 GlobalConfig g_config = {
     .video = {
@@ -25,10 +29,42 @@ GlobalConfig g_config = {
         .use_queue = false
     },
     .runtime = {
-        .path = ""
+        .base_path = "",
+        .pref_path = ""
     }
 };
 
 void apply_config_changes(void) {
     sync_chat_input_state();
+}
+
+void config_init_paths(void) {
+    /* Initialize preference path (SDL manages this memory) */
+    char *sdl_pref_path = SDL_GetPrefPath("TheLastGate", "TheLastGate");
+    if (sdl_pref_path) {
+        strncpy(g_config.runtime.pref_path, sdl_pref_path, sizeof(g_config.runtime.pref_path) - 1);
+        g_config.runtime.pref_path[sizeof(g_config.runtime.pref_path) - 1] = '\0';
+        SDL_free(sdl_pref_path);
+        log_info("Preferences directory: %s", g_config.runtime.pref_path);
+    } else {
+        log_error("Failed to get preferences path: %s", SDL_GetError());
+        g_config.runtime.pref_path[0] = '\0';
+    }
+
+    /* Initialize base path (game directory) */
+    char *sdl_base_path = SDL_GetBasePath();
+    if (sdl_base_path) {
+        strncpy(g_config.runtime.base_path, sdl_base_path, sizeof(g_config.runtime.base_path) - 1);
+        g_config.runtime.base_path[sizeof(g_config.runtime.base_path) - 1] = '\0';
+        SDL_free(sdl_base_path);
+        log_info("Base directory: %s", g_config.runtime.base_path);
+    } else {
+        log_error("Failed to get base path: %s", SDL_GetError());
+        g_config.runtime.base_path[0] = '\0';
+    }
+}
+
+void config_cleanup_paths(void) {
+    /* Paths are stored in our own buffers, so no cleanup needed */
+    /* This function exists for API consistency and future extensibility */
 }
