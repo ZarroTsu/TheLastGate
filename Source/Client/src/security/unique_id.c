@@ -1,6 +1,7 @@
 #include <time.h>
 
 #include "security.h"
+#include "config/config.h"
 #include "log/log.h"
 
 #ifndef _WIN32
@@ -10,13 +11,8 @@
 #include <stdlib.h>
 
 void security_id_load(void) {
-    if (!pref_path) {
-        log_warning("Preferences path not initialized.");
-        return;
-    }
-
     char filepath[512];
-    snprintf(filepath, sizeof(filepath), "%sunique.dat", pref_path);
+    snprintf(filepath, sizeof(filepath), "%sunique.dat", g_config.runtime.pref_path);
 
     FILE *fp = fopen(filepath, "rb");
     if (!fp) {
@@ -46,12 +42,8 @@ void security_id_load(void) {
 }
 
 void security_id_save(void) {
-    if (!pref_path) {
-        log_warning("Preferences path not initialized.");
-        return;
-    }
     char filepath[512];
-    snprintf(filepath, sizeof(filepath), "%sunique.dat", pref_path);
+    snprintf(filepath, sizeof(filepath), "%sunique.dat", g_config.runtime.pref_path);
 
     FILE *fp = fopen(filepath, "wb");
     if (!fp) {

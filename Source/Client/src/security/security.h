@@ -1,8 +1,6 @@
 #pragma once
 #include <stdbool.h>
 
-extern char *pref_path;
-
 /* Client uniqueness values */
 extern int unique1;
 extern int unique2;

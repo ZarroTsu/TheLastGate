@@ -3,11 +3,12 @@
 #include <SDL2/SDL_stdinc.h>
 
 #include "security.h"
+#include "config/config.h"
 #include "net/connection.h"
 
 bool security_try_lock() {
     char lock_path[512];
-    snprintf(lock_path, sizeof(lock_path), "%sgame.lock", pref_path);
+    snprintf(lock_path, sizeof(lock_path), "%sgame.lock", g_config.runtime.pref_path);
     if (strncmp(host_addr, "127.0.0.1", sizeof(host_addr)) != 0 && !security_acquire_lock(lock_path)) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Another instance of the game is already running.",
                                  NULL);
