@@ -392,10 +392,11 @@ static void left_column() {
     imgui_center_next_text("Character Selection");
     imgui_text("Character Selection");
     pop_header_styles();
+    imgui_dummy(0, 30);
 
     imgui_center_next_item(150 + 240);
     if (imgui_begin_table("CurrentAccount", 2,
-                          IMGUI_TABLE_FLAG_BORDERS | IMGUI_TABLE_FLAG_SIZING_FIXED_FIT |
+                          IMGUI_TABLE_FLAG_SIZING_FIXED_FIT |
                           IMGUI_TABLE_FLAG_NO_HOST_EXTEND_X)) {
         imgui_table_setup_column("label", IMGUI_TABLE_COLUMN_FLAG_WIDTH_FIXED, 150, 0);
         imgui_table_setup_column("input", IMGUI_TABLE_COLUMN_FLAG_WIDTH_FIXED, 240, 1);
@@ -414,7 +415,7 @@ static void left_column() {
 
     imgui_center_next_item(150 + 240);
     if (imgui_begin_table("character_fields", 2,
-                          IMGUI_TABLE_FLAG_BORDERS | IMGUI_TABLE_FLAG_SIZING_FIXED_FIT |
+                          IMGUI_TABLE_FLAG_SIZING_FIXED_FIT |
                           IMGUI_TABLE_FLAG_NO_HOST_EXTEND_X)) {
         imgui_table_setup_column("label", IMGUI_TABLE_COLUMN_FLAG_WIDTH_FIXED, 150, 0);
         imgui_table_setup_column("input", IMGUI_TABLE_COLUMN_FLAG_WIDTH_FIXED, 240, 1);
@@ -465,6 +466,7 @@ static void left_column() {
     }
 
 
+    imgui_dummy(0, 25);
     push_previous_characters_styles();
     if (imgui_begin_child("previous_characters", -1, 200, true,
                           IMGUI_WINDOW_FLAG_NO_SCROLLBAR | IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE)) {
@@ -472,6 +474,7 @@ static void left_column() {
         imgui_center_next_text("Previous Characters");
         imgui_text("Previous Characters");
         pop_sub_header_styles();
+        imgui_dummy(0, 15);
         if (imgui_begin_child("previous_character_list", -1, -1, false, IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR)) {
             for (int i = 0; i < 6; i++) {
                 push_button_styles();
@@ -491,10 +494,11 @@ static void right_column() {
     imgui_center_next_text("Options");
     imgui_text("Options");
     pop_header_styles();
+    imgui_dummy(0, 30);
 
     imgui_center_next_item(150 + 240);
     if (imgui_begin_table("Options", 2,
-                          IMGUI_TABLE_FLAG_BORDERS | IMGUI_TABLE_FLAG_SIZING_FIXED_FIT |
+                          IMGUI_TABLE_FLAG_SIZING_FIXED_FIT |
                           IMGUI_TABLE_FLAG_NO_HOST_EXTEND_X)) {
         imgui_table_setup_column("label", IMGUI_TABLE_COLUMN_FLAG_WIDTH_FIXED, 150, 0);
         imgui_table_setup_column("input", IMGUI_TABLE_COLUMN_FLAG_WIDTH_FIXED, 240, 1);
@@ -811,7 +815,7 @@ void launcher_render() {
             }
         }
 
-        if (imgui_begin_table("LauncherLayout", 2, IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME | IMGUI_TABLE_FLAG_BORDERS)) {
+        if (imgui_begin_table("LauncherLayout", 2, IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME)) {
             imgui_table_next_row(0, 40);
             imgui_table_next_column();
             left_column();
