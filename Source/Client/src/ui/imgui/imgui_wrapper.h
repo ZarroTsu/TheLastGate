@@ -88,8 +88,10 @@ bool imgui_radio_button(const char* label, bool active);
 
 /* Widgets: Input */
 bool imgui_input_text(const char* label, char* buf, int buf_size);
+bool imgui_input_text_area(const char* label, char* buf, int buf_size, float width, float height);
 bool imgui_input_int(const char* label, int* v);
 bool imgui_input_float(const char* label, float* v);
+bool imgui_input_password(const char* label, char* buf, int buf_size);
 
 /* Widgets: Sliders */
 bool imgui_slider_int(const char* label, int* v, int v_min, int v_max);
@@ -125,6 +127,7 @@ void imgui_align_text_to_frame_padding(void);
 
 /* Centering helper - call before the item you want to center */
 void imgui_center_next_item(float item_width);
+void imgui_center_next_text(const char* text);
 
 /* Layout metrics */
 float imgui_get_frame_height(void);
@@ -183,6 +186,11 @@ void imgui_table_header(const char* label);
 #define IMGUI_TABLE_FLAG_SCROLL_Y                   (1 << 25)
 #define IMGUI_TABLE_FLAG_SORT_MULTI                 (1 << 26)
 #define IMGUI_TABLE_FLAG_SORT_TRISTATE              (1 << 27)
+#define IMGUI_TABLE_FLAG_SIZING_MASK                (IMGUI_TABLE_FLAG_SIZING_FIXED_FIT | IMGUI_TABLE_FLAG_SIZING_FIXED_SAME | IMGUI_TABLE_FLAG_SIZING_STRETCH_PROP | IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME)
+
+/* Table row flags */
+#define IMGUI_TABLE_ROW_FLAG_NONE                   0
+#define IMGUI_TABLE_ROW_FLAG_HEADERS                (1 << 0)
 
 /* Table column flags */
 #define IMGUI_TABLE_COLUMN_FLAG_NONE                0
@@ -250,8 +258,20 @@ void imgui_set_tab_item_closed(const char* tab_or_docked_window_label);
 bool imgui_selectable(const char* label, bool selected);
 
 /* Combo box */
-bool imgui_begin_combo(const char* label, const char* preview_value);
+bool imgui_begin_combo(const char* label, const char* preview_value, int flags);
 void imgui_end_combo(void);
+
+/* Combo flags */
+#define IMGUI_COMBO_FLAG_NONE                   0
+#define IMGUI_COMBO_FLAG_POPUP_ALIGN_LEFT       (1 << 0)
+#define IMGUI_COMBO_FLAG_HEIGHT_SMALL           (1 << 1)
+#define IMGUI_COMBO_FLAG_HEIGHT_REGULAR         (1 << 2)
+#define IMGUI_COMBO_FLAG_HEIGHT_LARGE           (1 << 3)
+#define IMGUI_COMBO_FLAG_HEIGHT_LARGEST         (1 << 4)
+#define IMGUI_COMBO_FLAG_NO_ARROW_BUTTON        (1 << 5)
+#define IMGUI_COMBO_FLAG_NO_PREVIEW             (1 << 6)
+#define IMGUI_COMBO_FLAG_WIDTH_FIT_PREVIEW      (1 << 7)
+#define IMGUI_COMBO_FLAG_HEIGHT_MASK            (IMGUI_COMBO_FLAG_HEIGHT_SMALL | IMGUI_COMBO_FLAG_HEIGHT_REGULAR | IMGUI_COMBO_FLAG_HEIGHT_LARGE | IMGUI_COMBO_FLAG_HEIGHT_LARGEST)
 
 /* List box */
 bool imgui_begin_list_box(const char* label);
@@ -291,6 +311,7 @@ bool imgui_is_item_clicked(int mouse_button);
 bool imgui_is_mouse_clicked(int mouse_button);
 void imgui_push_item_width(float item_width);
 void imgui_pop_item_width(void);
+void imgui_set_item_default_focus(void);
 
 /* Item rectangle queries - get bounding box of last item */
 void imgui_get_item_rect_min(float* out_x, float* out_y);
@@ -298,6 +319,7 @@ void imgui_get_item_rect_max(float* out_x, float* out_y);
 void imgui_get_item_rect_size(float* out_x, float* out_y);
 
 /* Style */
+void imgui_push_style_color_32(int idx, unsigned int col);
 void imgui_push_style_color(int idx, float r, float g, float b, float a);
 void imgui_pop_style_color(int count);
 void imgui_push_style_var_float(int idx, float val);
@@ -373,26 +395,38 @@ float imgui_get_style_scrollbar_size(void);
 #define IMGUI_COL_RESIZE_GRIP               30
 #define IMGUI_COL_RESIZE_GRIP_HOVERED       31
 #define IMGUI_COL_RESIZE_GRIP_ACTIVE        32
-#define IMGUI_COL_TAB                       33
+#define IMGUI_COL_INPUT_TEXT_CURSOR         33
 #define IMGUI_COL_TAB_HOVERED               34
-#define IMGUI_COL_TAB_ACTIVE                35
-#define IMGUI_COL_TAB_UNFOCUSED             36
-#define IMGUI_COL_TAB_UNFOCUSED_ACTIVE      37
-#define IMGUI_COL_PLOT_LINES                40
-#define IMGUI_COL_PLOT_LINES_HOVERED        41
-#define IMGUI_COL_PLOT_HISTOGRAM            42
-#define IMGUI_COL_PLOT_HISTOGRAM_HOVERED    43
-#define IMGUI_COL_TABLE_HEADER_BG           44
-#define IMGUI_COL_TABLE_BORDER_STRONG       45
-#define IMGUI_COL_TABLE_BORDER_LIGHT        46
-#define IMGUI_COL_TABLE_ROW_BG              47
-#define IMGUI_COL_TABLE_ROW_BG_ALT          48
-#define IMGUI_COL_TEXT_SELECTED_BG          49
-#define IMGUI_COL_DRAG_DROP_TARGET          50
-#define IMGUI_COL_NAV_HIGHLIGHT             51
-#define IMGUI_COL_NAV_WINDOWING_HIGHLIGHT   52
-#define IMGUI_COL_NAV_WINDOWING_DIM_BG      53
-#define IMGUI_COL_MODAL_WINDOW_DIM_BG       54
+#define IMGUI_COL_TAB                       35
+#define IMGUI_COL_TAB_SELECTED              36
+#define IMGUI_COL_TAB_SELECTED_OVERLINE     37
+#define IMGUI_COL_TAB_DIMMED                38
+#define IMGUI_COL_TAB_DIMMED_SELECTED       39
+#define IMGUI_COL_TAB_DIMMED_SELECTED_OVERLINE 40
+#define IMGUI_COL_PLOT_LINES                41
+#define IMGUI_COL_PLOT_LINES_HOVERED        42
+#define IMGUI_COL_PLOT_HISTOGRAM            43
+#define IMGUI_COL_PLOT_HISTOGRAM_HOVERED    44
+#define IMGUI_COL_TABLE_HEADER_BG           45
+#define IMGUI_COL_TABLE_BORDER_STRONG       46
+#define IMGUI_COL_TABLE_BORDER_LIGHT        47
+#define IMGUI_COL_TABLE_ROW_BG              48
+#define IMGUI_COL_TABLE_ROW_BG_ALT          49
+#define IMGUI_COL_TEXT_LINK                 50
+#define IMGUI_COL_TEXT_SELECTED_BG          51
+#define IMGUI_COL_TREE_LINES                52
+#define IMGUI_COL_DRAG_DROP_TARGET          53
+#define IMGUI_COL_DRAG_DROP_TARGET_BG       54
+#define IMGUI_COL_UNSAVED_MARKER            55
+#define IMGUI_COL_NAV_CURSOR                56
+#define IMGUI_COL_NAV_WINDOWING_HIGHLIGHT   57
+#define IMGUI_COL_NAV_WINDOWING_DIM_BG      58
+#define IMGUI_COL_MODAL_WINDOW_DIM_BG       59
+/* Backwards compatibility aliases (renamed in newer ImGui versions) */
+#define IMGUI_COL_TAB_ACTIVE                IMGUI_COL_TAB_SELECTED
+#define IMGUI_COL_TAB_UNFOCUSED             IMGUI_COL_TAB_DIMMED
+#define IMGUI_COL_TAB_UNFOCUSED_ACTIVE      IMGUI_COL_TAB_DIMMED_SELECTED
+#define IMGUI_COL_NAV_HIGHLIGHT             IMGUI_COL_NAV_CURSOR
 
 /* Demo/Debug */
 void imgui_show_demo_window(bool* p_open);

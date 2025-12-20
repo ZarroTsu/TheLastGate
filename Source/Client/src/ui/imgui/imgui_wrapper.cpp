@@ -252,12 +252,20 @@ bool imgui_input_text(const char* label, char* buf, int buf_size) {
     return ImGui::InputText(label, buf, buf_size);
 }
 
+bool imgui_input_text_area(const char* label, char* buf, int buf_size, float width, float height) {
+    return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
+}
+
 bool imgui_input_int(const char* label, int* v) {
     return ImGui::InputInt(label, v);
 }
 
 bool imgui_input_float(const char* label, float* v) {
     return ImGui::InputFloat(label, v);
+}
+
+bool imgui_input_password(const char* label, char* buf, int buf_size) {
+    return ImGui::InputText(label, buf, buf_size, ImGuiInputTextFlags_Password);
 }
 
 /* Widgets: Sliders */
@@ -364,6 +372,11 @@ void imgui_center_next_item(float item_width) {
     if (offset > 0.0f) {
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
     }
+}
+
+void imgui_center_next_text(const char* text) {
+    float text_width = ImGui::CalcTextSize(text).x;
+    imgui_center_next_item(text_width);
 }
 
 /* Layout metrics */
@@ -482,8 +495,8 @@ bool imgui_selectable(const char* label, bool selected) {
 
 /* Combo box */
 
-bool imgui_begin_combo(const char* label, const char* preview_value) {
-    return ImGui::BeginCombo(label, preview_value);
+bool imgui_begin_combo(const char* label, const char* preview_value, int flags) {
+    return ImGui::BeginCombo(label, preview_value, flags);
 }
 
 void imgui_end_combo(void) {
@@ -616,6 +629,10 @@ void imgui_pop_item_width(void) {
     ImGui::PopItemWidth();
 }
 
+void imgui_set_item_default_focus(void) {
+    ImGui::SetItemDefaultFocus();
+}
+
 /* Item rectangle queries */
 
 void imgui_get_item_rect_min(float* out_x, float* out_y) {
@@ -637,6 +654,10 @@ void imgui_get_item_rect_size(float* out_x, float* out_y) {
 }
 
 /* Style */
+
+void imgui_push_style_color_32(int idx, unsigned int col) {
+    ImGui::PushStyleColor(idx, col);
+}
 
 void imgui_push_style_color(int idx, float r, float g, float b, float a) {
     ImGui::PushStyleColor(idx, ImVec4(r, g, b, a));
