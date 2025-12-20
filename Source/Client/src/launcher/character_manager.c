@@ -10,6 +10,7 @@
 #include "launcher.h"
 #include "options.h"
 #include "log/log.h"
+#include "config/config.h"
 
 void load_character_from_file(const char *file_path) {
     char buf[250];
@@ -339,23 +340,31 @@ void save_previous_characters(void) {
     int handle;
     unsigned int version = 1;
     int i;
+    char filepath[512];
 
-    handle = open("TLGCharacters.dat", O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, 0666);
+    if (!g_config.runtime.pref_path[0]) {
+        log_error("Preferences path not initialized");
+        return;
+    }
+
+    snprintf(filepath, sizeof(filepath), "%sTLGCharacters.dat", g_config.runtime.pref_path);
+
+    handle = open(filepath, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, 0666);
     if (handle == -1) {
-        log_error("Could not save TLGCharacters.dat");
+        log_error("Could not save %s", filepath);
         return;
     }
 
     /* Write version */
     if (write(handle, &version, sizeof(version)) != sizeof(version)) {
-        log_error("Failed to write version to TLGCharacters.dat");
+        log_error("Failed to write version to %s", filepath);
         close(handle);
         return;
     }
 
     /* Write count */
     if (write(handle, &g_previous_characters.count, sizeof(g_previous_characters.count)) != sizeof(g_previous_characters.count)) {
-        log_error("Failed to write count to TLGCharacters.dat");
+        log_error("Failed to write count to %s", filepath);
         close(handle);
         return;
     }
@@ -363,14 +372,14 @@ void save_previous_characters(void) {
     /* Write entries */
     for (i = 0; i < g_previous_characters.count; i++) {
         if (write(handle, &g_previous_characters.entries[i], sizeof(PreviousCharacterEntry)) != sizeof(PreviousCharacterEntry)) {
-            log_error("Failed to write entry %d to TLGCharacters.dat", i);
+            log_error("Failed to write entry %d to %s", i, filepath);
             close(handle);
             return;
         }
     }
 
     close(handle);
-    log_info("Saved %d previous characters to TLGCharacters.dat", g_previous_characters.count);
+    log_info("Saved %d previous characters to %s", g_previous_characters.count, filepath);
 }
 
 void load_previous_characters(void) {
@@ -378,42 +387,50 @@ void load_previous_characters(void) {
     unsigned int version;
     unsigned int count;
     int i;
+    char filepath[512];
 
     /* Initialize to empty state */
     g_previous_characters.count = 0;
     memset(g_previous_characters.entries, 0, sizeof(g_previous_characters.entries));
 
-    handle = open("TLGCharacters.dat", O_RDONLY | O_BINARY);
+    if (!g_config.runtime.pref_path[0]) {
+        log_error("Preferences path not initialized");
+        return;
+    }
+
+    snprintf(filepath, sizeof(filepath), "%sTLGCharacters.dat", g_config.runtime.pref_path);
+
+    handle = open(filepath, O_RDONLY | O_BINARY);
     if (handle == -1) {
         /* File doesn't exist yet - not an error for first run */
-        log_info("TLGCharacters.dat not found, starting with empty list");
+        log_info("%s not found, starting with empty list", filepath);
         return;
     }
 
     /* Read version */
     if (read(handle, &version, sizeof(version)) != sizeof(version)) {
-        log_error("Failed to read version from TLGCharacters.dat");
+        log_error("Failed to read version from %s", filepath);
         close(handle);
         return;
     }
 
     /* Validate version */
     if (version < 1) {
-        log_error("Invalid version in TLGCharacters.dat: %u", version);
+        log_error("Invalid version in %s: %u", filepath, version);
         close(handle);
         return;
     }
 
     /* Read count */
     if (read(handle, &count, sizeof(count)) != sizeof(count)) {
-        log_error("Failed to read count from TLGCharacters.dat");
+        log_error("Failed to read count from %s", filepath);
         close(handle);
         return;
     }
 
     /* Validate count */
     if (count > MAX_PREVIOUS_CHARACTERS) {
-        log_error("Invalid count in TLGCharacters.dat: %u (max %d)", count, MAX_PREVIOUS_CHARACTERS);
+        log_error("Invalid count in %s: %u (max %d)", filepath, count, MAX_PREVIOUS_CHARACTERS);
         close(handle);
         return;
     }
@@ -421,7 +438,7 @@ void load_previous_characters(void) {
     /* Read entries */
     for (i = 0; i < (int)count; i++) {
         if (read(handle, &g_previous_characters.entries[i], sizeof(PreviousCharacterEntry)) != sizeof(PreviousCharacterEntry)) {
-            log_error("Failed to read entry %d from TLGCharacters.dat", i);
+            log_error("Failed to read entry %d from %s", i, filepath);
             close(handle);
             return;
         }
@@ -429,7 +446,7 @@ void load_previous_characters(void) {
 
     g_previous_characters.count = count;
     close(handle);
-    log_info("Loaded %d previous characters from TLGCharacters.dat", g_previous_characters.count);
+    log_info("Loaded %d previous characters from %s", g_previous_characters.count, filepath);
 }
 
 void init_previous_characters(void) {
