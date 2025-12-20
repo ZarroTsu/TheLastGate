@@ -1,5 +1,7 @@
 #include "launcher.h"
 
+#include <fcntl.h>
+#include <io.h>
 #include <stddef.h>
 
 #include "inter.h"
@@ -55,6 +57,120 @@ static int current_gender = 0;
 static char password[15] = "";
 
 static const char *filterPatterns[1] = {"*.moa"};
+
+static void set_race_gender() {
+    switch (okey.race) {
+        case 4: // templar M
+            current_class = 0;
+            current_gender = 0;
+            break;
+        case 5: // templar F
+            current_class = 0;
+            current_gender = 1;
+            break;
+
+        case 6: // mercenary M
+            current_class = 1;
+            current_gender = 0;
+            break;
+        case 7: // mercenary F
+            current_class = 1;
+            current_gender = 1;
+            break;
+
+        case 8: // harakim M
+            current_class = 2;
+            current_gender = 0;
+            break;
+        case 9: // harakim F
+            current_class = 2;
+            current_gender = 1;
+            break;
+
+        case 10: // seyan M
+            current_class = 6;
+            current_gender = 0;
+            break;
+        case 11: // seyan F
+            current_class = 6;
+            current_gender = 1;
+            break;
+
+
+        case 12: // arch templar M
+            current_class = 3;
+            current_gender = 0;
+            break;
+        case 13: // arch templar F
+            current_class = 3;
+            current_gender = 1;
+            break;
+
+        case 14: // pugilist M
+            current_class = 4;
+            current_gender = 0;
+            break;
+        case 15: // pugilist F
+            current_class = 4;
+            current_gender = 1;
+            break;
+
+        case 16: // warrior M
+            current_class = 5;
+            current_gender = 0;
+            break;
+        case 17: // warrior F
+            current_class = 5;
+            current_gender = 1;
+            break;
+
+        case 18: // sorcerer M
+            current_class = 7;
+            current_gender = 0;
+            break;
+        case 19: // sorcerer F
+            current_class = 7;
+            current_gender = 1;
+            break;
+
+        case 20: // summoner M
+            current_class = 8;
+            current_gender = 0;
+            break;
+        case 21: // summoner F
+            current_class = 8;
+            current_gender = 1;
+            break;
+
+        case 22: // arch harakim M
+            current_class = 9;
+            current_gender = 0;
+            break;
+        case 23: // arch harakim F
+            current_class = 9;
+            current_gender = 1;
+            break;
+
+        //
+
+        case 2:
+            current_class = 10;
+            current_gender = 0;
+            break; // braver M
+        case 3:
+            current_class = 10;
+            current_gender = 1;
+            break; // braver F
+
+        case 1554: current_class = 11;
+            current_gender = 0;
+            break;
+
+        default: current_class = 0;
+            current_gender = 0;
+            break;
+    }
+}
 
 static void start_load_switch_character_confirmation(const char *file_path) {
     strncpy(switch_confirm.file_path, file_path, sizeof(switch_confirm.file_path) - 1);
@@ -403,117 +519,57 @@ static void right_column() {
 }
 
 void launcher_init() {
-    switch (okey.race) {
-        case 4: // templar M
-            current_class = 0;
-            current_gender = 0;
-            break;
-        case 5: // templar F
-            current_class = 0;
-            current_gender = 1;
-            break;
+    set_race_gender();
+}
 
-        case 6: // mercenary M
-            current_class = 1;
-            current_gender = 0;
-            break;
-        case 7: // mercenary F
-            current_class = 1;
-            current_gender = 1;
-            break;
-
-        case 8: // harakim M
-            current_class = 2;
-            current_gender = 0;
-            break;
-        case 9: // harakim F
-            current_class = 2;
-            current_gender = 1;
-            break;
-
-        case 10: // seyan M
-            current_class = 6;
-            current_gender = 0;
-            break;
-        case 11: // seyan F
-            current_class = 6;
-            current_gender = 1;
-            break;
-
-
-        case 12: // arch templar M
-            current_class = 3;
-            current_gender = 0;
-            break;
-        case 13: // arch templar F
-            current_class = 3;
-            current_gender = 1;
-            break;
-
-        case 14: // pugilist M
-            current_class = 4;
-            current_gender = 0;
-            break;
-        case 15: // pugilist F
-            current_class = 4;
-            current_gender = 1;
-            break;
-
-        case 16: // warrior M
-            current_class = 5;
-            current_gender = 0;
-            break;
-        case 17: // warrior F
-            current_class = 5;
-            current_gender = 1;
-            break;
-
-        case 18: // sorcerer M
-            current_class = 7;
-            current_gender = 0;
-            break;
-        case 19: // sorcerer F
-            current_class = 7;
-            current_gender = 1;
-            break;
-
-        case 20: // summoner M
-            current_class = 8;
-            current_gender = 0;
-            break;
-        case 21: // summoner F
-            current_class = 8;
-            current_gender = 1;
-            break;
-
-        case 22: // arch harakim M
-            current_class = 9;
-            current_gender = 0;
-            break;
-        case 23: // arch harakim F
-            current_class = 9;
-            current_gender = 1;
-            break;
-
-        //
-
-        case 2:
-            current_class = 10;
-            current_gender = 0;
-            break; // braver M
-        case 3:
-            current_class = 10;
-            current_gender = 1;
-            break; // braver F
-
-        case 1554: current_class = 11;
-            current_gender = 0;
-            break;
-
-        default: current_class = 0;
-            current_gender = 0;
-            break;
+static void load_file() {
+    int file = open(switch_confirm.file_path, O_RDONLY | O_BINARY);
+    int flag = 0;
+    if (file == -1) {
+        log_error("Could not open file %s", switch_confirm.file_path);
+        // TODO: Display the error somehow
+        return;
     }
+
+    if (lseek(file, 0, SEEK_END) > (long)(sizeof(struct pdata)+sizeof(struct key))) flag = 1;
+    lseek(file, 0, SEEK_SET);
+    read(file, &okey, sizeof(struct key));
+    if (read(file, &pdata, sizeof(struct pdata)) != sizeof(struct pdata) || flag) {
+        pdata.hide = 1;
+        pdata.show_names = 1;
+        pdata.show_proz = 1;
+        pdata.show_stats = 0;
+        pdata.show_bars = 0;
+        pdata.cname[0] = 0;
+        pdata.ref[0] = 0;
+        pdata.desc[0] = 0;
+        pdata.changed = 0;
+
+        for (int i = 0; i < 20; i++) {
+            pdata.xbutton[i].skill_nr=-1;
+            strcpy(pdata.xbutton[i].name, "-");
+        }
+    }
+
+    close(file);
+    pdata.changed = 1;
+    set_race_gender();
+}
+
+static void save_file(const char *file_path) {
+    int file = open(file_path, O_WRONLY|O_BINARY|O_CREAT|O_TRUNC, 0600);
+    if (file == -1) {
+        log_error("Could not save file %s", file_path);
+        // TODO: Show error
+        return;
+    }
+
+    write(file, &okey, sizeof(struct key));
+    write(file, &pdata, sizeof(struct pdata));
+    close(file);
+
+    log_info("Saved file as %s", file_path);
+    // TODO: Show Message
 }
 
 static void load() {
@@ -527,6 +583,30 @@ static void load() {
         log_info("Loading MOA from %s", file_path);
         start_load_switch_character_confirmation(file_path);
     }
+}
+
+static void save() {
+    char const *file_path = tinyfd_saveFileDialog(
+        "Save your character",
+        "",
+        1,
+        filterPatterns, "Astonia Save File (.MOA)");
+
+    if (file_path != NULL) {
+        log_info("Saving MOA to %s", file_path);
+        save_file(file_path);
+    }
+}
+
+static void new_character() {
+    okey.usnr = 0;
+    okey.race = 0;
+    okey.pass1 = 0;
+    okey.pass2 = 0;
+    pdata.changed = 1;
+    strcpy(okey.name, "New Account");
+    pdata.cname[0] = 0;
+    set_race_gender();
 }
 
 static void switch_character_confirmation() {
@@ -549,8 +629,13 @@ static void switch_character_confirmation() {
         // imgui_set_cursor_pos_y(imgui_get_cursor_pos_y() + 25);
         imgui_center_next_item(350);
         if (imgui_begin_child("text_container", 350, 100, false, IMGUI_WINDOW_FLAG_NO_SCROLLBAR)) {
-            imgui_center_next_text("Do you really want to create a new account?");
-            imgui_text("Do you really want to create a new account?");
+            if (switch_confirm.new_character) {
+                imgui_center_next_text("Do you really want to create a new account?");
+                imgui_text("Do you really want to create a new account?");
+            } else {
+                imgui_center_next_text("Do you really want to switch accounts?");
+                imgui_text("Do you really want to switch accounts?");
+            }
             imgui_spacing();
             imgui_text_wrapped_colored_32(BEIGE_COLOR_32,
                                           "Your old account will no longer be accessible, unless you remembered to save it.");
@@ -576,6 +661,7 @@ static void switch_character_confirmation() {
         if (imgui_button_sized("Cancel", 120, 0)) {
             imgui_close_current_popup();
             switch_confirm.file_path[0] = '\0';
+            switch_confirm.new_character = false;
         }
         pop_button_styles();
 
@@ -611,8 +697,13 @@ static void switch_character_confirmation() {
         if (imgui_button_sized("Yes", 120, 0)) {
             imgui_close_current_popup();
             switch_confirm.show_second_confirmation = false;
-            // load_file();
+            if (switch_confirm.new_character) {
+                new_character();
+            } else {
+                load_file();
+            }
             switch_confirm.file_path[0] = '\0';
+            switch_confirm.new_character = false;
         }
 
         imgui_same_line(0, 10);
@@ -620,6 +711,7 @@ static void switch_character_confirmation() {
         if (imgui_button_sized("Cancel", 120, 0)) {
             imgui_close_current_popup();
             switch_confirm.file_path[0] = '\0';
+            switch_confirm.new_character = false;
         }
         pop_button_styles();
 
@@ -666,11 +758,17 @@ void launcher_render() {
             load();
         }
         imgui_same_line(0, 10);
-        imgui_button_sized("Save", 120, 30);
+        if (imgui_button_sized("Save", 120, 30)) {
+            save();
+        }
         imgui_same_line(0, 10);
-        imgui_button_sized("Discord", 120, 30);
+        if (imgui_button_sized("Discord", 120, 30)) {
+            SDL_OpenURL(MNEWS);
+        }
         imgui_same_line(0, 10);
-        imgui_button_sized("Exit", 120, 30);
+        if (imgui_button_sized("Exit", 120, 30)) {
+            quit = 1;
+        }
         pop_button_styles();
     }
     pop_launcher_styles();
