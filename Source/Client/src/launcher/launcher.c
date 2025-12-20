@@ -9,6 +9,7 @@
 #include "inter.h"
 #include "main.h"
 #include "options.h"
+#include "save_manager.h"
 #include "tinyfiledialogs.h"
 #include "config/config.h"
 #include "graphics/sdl.h"
@@ -64,142 +65,6 @@ static int current_gender = 0;
 static char password[15] = "";
 
 static const char *filterPatterns[1] = {"*.moa"};
-
-static void set_race_gender() {
-    switch (okey.race) {
-        case 4: // templar M
-            current_class = 0;
-            current_gender = 0;
-            break;
-        case 5: // templar F
-            current_class = 0;
-            current_gender = 1;
-            break;
-
-        case 6: // mercenary M
-            current_class = 1;
-            current_gender = 0;
-            break;
-        case 7: // mercenary F
-            current_class = 1;
-            current_gender = 1;
-            break;
-
-        case 8: // harakim M
-            current_class = 2;
-            current_gender = 0;
-            break;
-        case 9: // harakim F
-            current_class = 2;
-            current_gender = 1;
-            break;
-
-        case 10: // seyan M
-            current_class = 6;
-            current_gender = 0;
-            break;
-        case 11: // seyan F
-            current_class = 6;
-            current_gender = 1;
-            break;
-
-
-        case 12: // arch templar M
-            current_class = 3;
-            current_gender = 0;
-            break;
-        case 13: // arch templar F
-            current_class = 3;
-            current_gender = 1;
-            break;
-
-        case 14: // pugilist M
-            current_class = 4;
-            current_gender = 0;
-            break;
-        case 15: // pugilist F
-            current_class = 4;
-            current_gender = 1;
-            break;
-
-        case 16: // warrior M
-            current_class = 5;
-            current_gender = 0;
-            break;
-        case 17: // warrior F
-            current_class = 5;
-            current_gender = 1;
-            break;
-
-        case 18: // sorcerer M
-            current_class = 7;
-            current_gender = 0;
-            break;
-        case 19: // sorcerer F
-            current_class = 7;
-            current_gender = 1;
-            break;
-
-        case 20: // summoner M
-            current_class = 8;
-            current_gender = 0;
-            break;
-        case 21: // summoner F
-            current_class = 8;
-            current_gender = 1;
-            break;
-
-        case 22: // arch harakim M
-            current_class = 9;
-            current_gender = 0;
-            break;
-        case 23: // arch harakim F
-            current_class = 9;
-            current_gender = 1;
-            break;
-
-        //
-
-        case 2:
-            current_class = 10;
-            current_gender = 0;
-            break; // braver M
-        case 3:
-            current_class = 10;
-            current_gender = 1;
-            break; // braver F
-
-        case 1554: current_class = 11;
-            current_gender = 0;
-            break;
-
-        default: current_class = 0;
-            current_gender = 0;
-            break;
-    }
-}
-
-static int get_race_from_class_gender() {
-    static const int race_map[12][2] = {
-        {4, 5},     /* 0: Templar M/F */
-        {6, 7},     /* 1: Mercenary M/F */
-        {8, 9},     /* 2: Harakim M/F */
-        {12, 13},   /* 3: Arch-Templar M/F */
-        {14, 15},   /* 4: Skald/Pugilist M/F */
-        {16, 17},   /* 5: Warrior M/F */
-        {10, 11},   /* 6: Seyan M/F */
-        {18, 19},   /* 7: Sorcerer M/F */
-        {20, 21},   /* 8: Summoner M/F */
-        {22, 23},   /* 9: Arch-Harakim M/F */
-        {2, 3},     /* 10: Braver M/F */
-        {1554, 1554} /* 11: Lycanthrope (M only) */
-    };
-
-    if (current_class < 0 || current_class >= 12) return 4; /* Default to Templar M */
-    if (current_gender < 0 || current_gender > 1) current_gender = 0;
-
-    return race_map[current_class][current_gender];
-}
 
 static void start_load_switch_character_confirmation(const char *file_path) {
     strncpy(switch_confirm.file_path, file_path, sizeof(switch_confirm.file_path) - 1);
@@ -556,60 +421,7 @@ static void right_column() {
 }
 
 void launcher_init() {
-    set_race_gender();
-}
-
-static void load_file() {
-    int file = open(switch_confirm.file_path, O_RDONLY | O_BINARY);
-    int flag = 0;
-    if (file == -1) {
-        log_error("Could not open file %s", switch_confirm.file_path);
-        snprintf(simple_popover_text, sizeof(simple_popover_text), "Could not open file %s", switch_confirm.file_path);
-        imgui_open_popup("FYI");
-        return;
-    }
-
-    if (lseek(file, 0, SEEK_END) > (long) (sizeof(struct pdata) + sizeof(struct key))) flag = 1;
-    lseek(file, 0, SEEK_SET);
-    read(file, &okey, sizeof(struct key));
-    if (read(file, &pdata, sizeof(struct pdata)) != sizeof(struct pdata) || flag) {
-        pdata.hide = 1;
-        pdata.show_names = 1;
-        pdata.show_proz = 1;
-        pdata.show_stats = 0;
-        pdata.show_bars = 0;
-        pdata.cname[0] = 0;
-        pdata.ref[0] = 0;
-        pdata.desc[0] = 0;
-        pdata.changed = 0;
-
-        for (int i = 0; i < 20; i++) {
-            pdata.xbutton[i].skill_nr = -1;
-            strcpy(pdata.xbutton[i].name, "-");
-        }
-    }
-
-    close(file);
-    pdata.changed = 1;
-    set_race_gender();
-}
-
-static void save_file(const char *file_path) {
-    int file = open(file_path, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, 0600);
-    if (file == -1) {
-        log_error("Could not save file %s", file_path);
-        snprintf(simple_popover_text, sizeof(simple_popover_text), "Could not save file %s", file_path);
-        imgui_open_popup("FYI");
-        return;
-    }
-
-    write(file, &okey, sizeof(struct key));
-    write(file, &pdata, sizeof(struct pdata));
-    close(file);
-
-    log_info("Saved file as %s", file_path);
-    snprintf(simple_popover_text, sizeof(simple_popover_text), "Saved file as %s", file_path);
-    imgui_open_popup("FYI");
+    okey_to_class_gender(&current_class, &current_gender);
 }
 
 static void load() {
@@ -634,19 +446,8 @@ static void save() {
 
     if (file_path != NULL) {
         log_info("Saving MOA to %s", file_path);
-        save_file(file_path);
+        save_to_file(file_path);
     }
-}
-
-static void new_character() {
-    okey.usnr = 0;
-    okey.race = 0;
-    okey.pass1 = 0;
-    okey.pass2 = 0;
-    pdata.changed = 1;
-    strcpy(okey.name, "New Account");
-    pdata.cname[0] = 0;
-    set_race_gender();
 }
 
 static void render_popovers() {
@@ -738,9 +539,11 @@ static void render_popovers() {
             imgui_close_current_popup();
             switch_confirm.show_second_confirmation = false;
             if (switch_confirm.new_character) {
-                new_character();
+                create_new_character();
+                okey_to_class_gender(&current_class, &current_gender);
             } else {
-                load_file();
+                load_save_from_file(switch_confirm.file_path);
+                okey_to_class_gender(&current_class, &current_gender);
             }
             switch_confirm.file_path[0] = '\0';
             switch_confirm.new_character = false;
@@ -833,7 +636,7 @@ void launcher_render() {
         imgui_center_next_item(640);
         push_button_styles();
         if (imgui_button_sized("Start", 120, 30)) {
-            int race = get_race_from_class_gender();
+            int race = class_gender_to_okey(current_class, current_class);
             int sex = current_gender + 1; /* Convert 0/1 to 1/2 */
 
             strncpy(passwd, password, sizeof(passwd) - 1);
@@ -866,4 +669,9 @@ void launcher_render() {
     pop_launcher_styles();
     imgui_pop_style_var(1);
     imgui_end();
+}
+
+void launcher_set_fyi(const char *text) {
+    snprintf(simple_popover_text, sizeof(simple_popover_text), "Could not open file %s", switch_confirm.file_path);
+    imgui_open_popup("FYI");
 }

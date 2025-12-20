@@ -30,3 +30,5 @@ typedef struct {
 
 void launcher_init(void);
 void launcher_render(void);
+
+void launcher_set_fyi(const char* text);
