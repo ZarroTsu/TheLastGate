@@ -19,6 +19,7 @@ static const int window_flags =
         IMGUI_WINDOW_FLAG_NO_TITLE_BAR | IMGUI_WINDOW_FLAG_NO_SCROLLBAR | IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE;
 
 static SwitchCharacterConfirmState switch_confirm = {0};
+static char simple_popover_text[250];
 
 static const char *classes[] = {
     "Templar",
@@ -527,11 +528,12 @@ static void load_file() {
     int flag = 0;
     if (file == -1) {
         log_error("Could not open file %s", switch_confirm.file_path);
-        // TODO: Display the error somehow
+        snprintf(simple_popover_text, sizeof(simple_popover_text), "Could not open file %s", switch_confirm.file_path);
+        imgui_open_popup("FYI");
         return;
     }
 
-    if (lseek(file, 0, SEEK_END) > (long)(sizeof(struct pdata)+sizeof(struct key))) flag = 1;
+    if (lseek(file, 0, SEEK_END) > (long) (sizeof(struct pdata) + sizeof(struct key))) flag = 1;
     lseek(file, 0, SEEK_SET);
     read(file, &okey, sizeof(struct key));
     if (read(file, &pdata, sizeof(struct pdata)) != sizeof(struct pdata) || flag) {
@@ -546,7 +548,7 @@ static void load_file() {
         pdata.changed = 0;
 
         for (int i = 0; i < 20; i++) {
-            pdata.xbutton[i].skill_nr=-1;
+            pdata.xbutton[i].skill_nr = -1;
             strcpy(pdata.xbutton[i].name, "-");
         }
     }
@@ -557,10 +559,11 @@ static void load_file() {
 }
 
 static void save_file(const char *file_path) {
-    int file = open(file_path, O_WRONLY|O_BINARY|O_CREAT|O_TRUNC, 0600);
+    int file = open(file_path, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, 0600);
     if (file == -1) {
         log_error("Could not save file %s", file_path);
-        // TODO: Show error
+        snprintf(simple_popover_text, sizeof(simple_popover_text), "Could not save file %s", file_path);
+        imgui_open_popup("FYI");
         return;
     }
 
@@ -569,7 +572,8 @@ static void save_file(const char *file_path) {
     close(file);
 
     log_info("Saved file as %s", file_path);
-    // TODO: Show Message
+    snprintf(simple_popover_text, sizeof(simple_popover_text), "Saved file as %s", file_path);
+    imgui_open_popup("FYI");
 }
 
 static void load() {
@@ -609,7 +613,7 @@ static void new_character() {
     set_race_gender();
 }
 
-static void switch_character_confirmation() {
+static void render_popovers() {
     if (switch_confirm.show_first_confirmation) {
         imgui_open_popup("Are you sure?");
         switch_confirm.show_first_confirmation = false;
@@ -717,6 +721,29 @@ static void switch_character_confirmation() {
 
         imgui_end_popup();
     }
+
+    imgui_set_next_window_pos(UI_CENTER_X - 200, UI_CENTER_Y - 100);
+    imgui_set_next_windows_size(400, 200);
+    if (imgui_begin_popup_modal("FYI", NULL, IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_RESIZE |
+                                             IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS)) {
+        imgui_center_next_item(350);
+        if (imgui_begin_child("text_container", 350, 100, false, IMGUI_WINDOW_FLAG_NO_SCROLLBAR)) {
+            imgui_text_wrapped(simple_popover_text);
+            imgui_end_child();
+        }
+        imgui_spacing();
+        imgui_separator();
+        imgui_spacing();
+
+        imgui_center_next_item(120);
+        push_button_styles();
+        if (imgui_button_sized("Ok", 120, 0)) {
+            imgui_close_current_popup();
+        }
+        pop_button_styles();
+
+        imgui_end_popup();
+    }
     imgui_pop_style_color(3);
     imgui_pop_style_var(3);
 }
@@ -737,7 +764,7 @@ void launcher_render() {
                                   imgui_color_convert_float4_to_u32(1, 1, 1, 1));
 
 
-        switch_character_confirmation();
+        render_popovers();
 
         if (imgui_begin_table("LauncherLayout", 2, IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME | IMGUI_TABLE_FLAG_BORDERS)) {
             imgui_table_next_row(0, 40);
