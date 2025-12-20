@@ -58,6 +58,9 @@ add_executable(TheLastGate
         src/ui/ui.c
 )
 
+# Force C linker for the main executable (even though project includes C++ for ImGui)
+set_target_properties(TheLastGate PROPERTIES LINKER_LANGUAGE C)
+
 # Disable warnings for old code compatibility
 # TODO: These warnings indicate real issues that should be fixed during modernization
 target_compile_options(TheLastGate PRIVATE

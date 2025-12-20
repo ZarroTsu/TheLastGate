@@ -8,7 +8,7 @@ pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
 pkg_check_modules(SDL2_MIXER REQUIRED SDL2_mixer)
 pkg_check_modules(SDL2_NET REQUIRED SDL2_net)
 
-# Combine all SDL2 libraries
+message(STATUS "Using dynamic SDL2 libraries")
 set(SDL2_LIBRARIES
     ${SDL2_LIBRARIES}
     ${SDL2_IMAGE_LIBRARIES}
