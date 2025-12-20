@@ -345,6 +345,7 @@ void handle_input(void) {
             case SDL_QUIT: quit = 1;
                 break;
             case SDL_KEYDOWN:
+                if (launching) break;
                 if (waiting_for_keybind) break;
 
                 BindingDescriptor *binding = binding_find(e.key.keysym.sym, SDL_GetModState());
