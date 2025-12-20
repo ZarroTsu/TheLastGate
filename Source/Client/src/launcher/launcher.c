@@ -346,6 +346,7 @@ static void left_column() {
                 imgui_center_next_item(240);
                 if (imgui_button_sized(entry.name, 240, 24)) {
                     load_character_from_file(entry.file_path);
+                    okey_to_class_gender(&current_class, &current_gender);
                 }
                 pop_button_styles();
             }
