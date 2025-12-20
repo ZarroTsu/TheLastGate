@@ -1,4 +1,4 @@
-#include "save_manager.h"
+#include "character_manager.h"
 
 #include <fcntl.h>
 #include <io.h>
@@ -10,7 +10,7 @@
 #include "options.h"
 #include "log/log.h"
 
-void load_save_from_file(const char *file_path) {
+void load_character_from_file(const char *file_path) {
     char buf[250];
     int file = open(file_path, O_RDONLY | O_BINARY);
     int flag = 0;
@@ -45,7 +45,7 @@ void load_save_from_file(const char *file_path) {
     pdata.changed = 1;
 }
 
-void save_to_file(const char *file_path) {
+void save_character_to_file(const char *file_path) {
     char buf[250];
 
     int file = open(file_path, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, 0600);

@@ -9,7 +9,7 @@
 #include "inter.h"
 #include "main.h"
 #include "options.h"
-#include "save_manager.h"
+#include "character_manager.h"
 #include "tinyfiledialogs.h"
 #include "config/config.h"
 #include "graphics/sdl.h"
@@ -446,7 +446,7 @@ static void save() {
 
     if (file_path != NULL) {
         log_info("Saving MOA to %s", file_path);
-        save_to_file(file_path);
+        save_character_to_file(file_path);
     }
 }
 
@@ -542,7 +542,7 @@ static void render_popovers() {
                 create_new_character();
                 okey_to_class_gender(&current_class, &current_gender);
             } else {
-                load_save_from_file(switch_confirm.file_path);
+                load_character_from_file(switch_confirm.file_path);
                 okey_to_class_gender(&current_class, &current_gender);
             }
             switch_confirm.file_path[0] = '\0';
