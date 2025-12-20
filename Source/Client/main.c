@@ -205,6 +205,7 @@ int parse_cmd(char *s)
 
 int main(int argc, char *argv[]) {
 	log_init();
+	config_init_paths();
 	security_init();
 	SDLNet_Init();
 	load_options();
@@ -249,6 +250,7 @@ int main(int argc, char *argv[]) {
 
 	sound_shutdown();
 	security_release_lock();
+	config_cleanup_paths();
 	SDLNet_Quit();
 	return 0;
 }
