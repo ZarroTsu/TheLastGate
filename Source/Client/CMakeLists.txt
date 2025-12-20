@@ -129,6 +129,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/link_libraries.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tinyfiledialogs.cmake)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_runtime_dlls.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/include_packaged_files.cmake)
