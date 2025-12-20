@@ -27,7 +27,6 @@ add_executable(TheLastGate
         main.c
         main.h
         main.h
-        MERC.rc
         src/mods/base_cost_warning.c
         src/mods/base_cost_warning.h
         src/mods/give_more.c
@@ -137,5 +136,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tinyfiledialogs.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_runtime_dlls.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/include_packaged_files.cmake)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/appimage.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/package_target.cmake)
