@@ -281,6 +281,7 @@ int sdl_init(const int windowed) {
     font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 12);
     font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 16);
     font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 20);
+    font_sizes.big_header = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 24);
 
 
     imgui_set_default_font(font_sizes.normal);
