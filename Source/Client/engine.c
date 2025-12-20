@@ -20,7 +20,6 @@
  */
 
 #include <malloc.h>
-#include <windows.h>   // TODO: Replace with SDL2 headers for cross-platform
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,6 +42,7 @@
 #include "mods/use_queue.h"
 #include "ui/spell_hud.h"
 #include "ui/option_window.h"
+#include "util/math_util.h"
 
 int init_done=0;
 int frame=0;
@@ -2727,7 +2727,8 @@ void eng_display_win(int plr_sprite,int init)
 				{
 					if (show_shop>=1 && show_shop<=101) // Normal shop
 					{
-						if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) 
+						SDL_Keymod mods = SDL_GetModState();
+						if ((mods & KMOD_CTRL) || (mods & KMOD_ALT))
 						{
 							pr*=10;
 							xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
