@@ -603,6 +603,16 @@ void imgui_pop_id(void) {
     ImGui::PopID();
 }
 
+/* Disabling widgets */
+
+void imgui_begin_disabled(bool disabled) {
+    ImGui::BeginDisabled(disabled);
+}
+
+void imgui_end_disabled(void) {
+    ImGui::EndDisabled();
+}
+
 /* Utilities */
 
 bool imgui_is_item_hovered(void) {

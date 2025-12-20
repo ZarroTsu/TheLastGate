@@ -19,6 +19,10 @@ extern int logstart;
 extern int logtimer;
 extern int mx, my;
 
+extern int do_alpha;
+extern int do_shadow;
+extern int do_darkmode;
+
 extern char input[128];
 extern short screen_renderdist;
 

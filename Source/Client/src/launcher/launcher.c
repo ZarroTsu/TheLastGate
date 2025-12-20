@@ -2,6 +2,10 @@
 
 #include <stddef.h>
 
+#include "inter.h"
+#include "main.h"
+#include "options.h"
+#include "config/config.h"
 #include "graphics/sdl.h"
 #include "ui/ui.h"
 #include "ui/imgui/imgui_wrapper.h"
@@ -13,7 +17,16 @@ static const int window_flags =
 static const char *classes[] = {
     "Templar",
     "Mercenary",
-    "Harakim"
+    "Harakim",
+    "Arch-Templar",
+    "Skald",
+    "Warrior",
+    "Seyan",
+    "Sorcerer",
+    "Summoner",
+    "Arch-Harakim",
+    "Braver",
+    "Lycanthrope"
 };
 
 static const char *genders[] = {
@@ -28,19 +41,14 @@ static const char *alphas[] = {
 };
 
 static const char *window_modes[] = {
-    "Windowed",
-    "Fullscreen"
+    "Fullscreen",
+    "Windowed"
 };
 
 static int current_class = 0;
 static int current_gender = 0;
-static int current_alpha = 0;
-static int current_window_mode = 0;
 
-static bool shadows = 0;
-static bool do_sound = 0;
-static int volume_level = 0;
-static bool dark_ui = 0;
+static char password[15] = "";
 
 static void push_launcher_styles() {
     imgui_push_style_color_32(IMGUI_COL_TEXT, GOLD_COLOR_32);
@@ -193,7 +201,6 @@ static void pop_slider_styles() {
 }
 
 static void shared_dropdown(const char *id, const char **options, int option_count, int *current_option) {
-
     push_dropdown_styles();
 
     push_dropdown_input_styles();
@@ -220,7 +227,6 @@ static void shared_dropdown(const char *id, const char **options, int option_cou
 }
 
 static void left_column() {
-    static char name_buffer[32];
     push_header_styles();
     imgui_center_next_text("Character Selection");
     imgui_text("Character Selection");
@@ -235,7 +241,7 @@ static void left_column() {
 
         imgui_table_next_row(0, 20);
         imgui_table_next_column();
-        imgui_text("WorldOfSlaying");
+        imgui_text(okey.name);
         imgui_table_next_column();
         push_button_styles();
         imgui_button("Create New Account");
@@ -256,7 +262,7 @@ static void left_column() {
         imgui_table_next_column();
         imgui_push_item_width(-1);
         push_input_styles();
-        imgui_input_text("##name", name_buffer, sizeof(name_buffer));
+        imgui_input_text("##name", pdata.cname, sizeof(pdata.cname));
         pop_input_styles();
         imgui_pop_item_width();
 
@@ -266,7 +272,7 @@ static void left_column() {
         imgui_table_next_column();
         imgui_push_item_width(-1);
         push_input_styles();
-        imgui_input_password("##password", name_buffer, sizeof(name_buffer));
+        imgui_input_password("##password", password, sizeof(password));
         pop_input_styles();
         imgui_pop_item_width();
 
@@ -275,9 +281,10 @@ static void left_column() {
         imgui_text("Description");
         imgui_table_next_column();
         push_input_styles();
-        imgui_input_text_area("##description", name_buffer, sizeof(name_buffer), -1, 80);
+        imgui_input_text_area("##description", pdata.desc, sizeof(pdata.desc), -1, 80);
         pop_input_styles();
 
+        imgui_begin_disabled(okey.usnr > 0);
         imgui_table_next_row(0, 20);
         imgui_table_next_column();
         imgui_text("Class");
@@ -289,6 +296,7 @@ static void left_column() {
         imgui_text("Gender");
         imgui_table_next_column();
         shared_dropdown("##gender", genders, 2, &current_gender);
+        imgui_end_disabled();
 
         imgui_end_table();
     }
@@ -332,20 +340,20 @@ static void right_column() {
         imgui_table_next_column();
         imgui_text("Alpha");
         imgui_table_next_column();
-        shared_dropdown("##alphas", alphas, 3, &current_alpha);
+        shared_dropdown("##alphas", alphas, 3, &do_alpha);
 
         imgui_table_next_row(0, 20);
         imgui_table_next_column();
         imgui_text("Window Type");
         imgui_table_next_column();
-        shared_dropdown("##window_modes", window_modes, 2, &current_window_mode);
+        shared_dropdown("##window_modes", window_modes, 2, &g_config.video.windowed);
 
         imgui_table_next_row(0, 20);
         imgui_table_next_column();
         imgui_text("Shadows");
         imgui_table_next_column();
         push_checkbox_styles();
-        imgui_checkbox("##shadow", &shadows);
+        imgui_checkbox("##shadow", &do_shadow);
         pop_checkbox_styles();
 
         imgui_table_next_row(0, 20);
@@ -353,7 +361,7 @@ static void right_column() {
         imgui_text("Sounds Enabled?");
         imgui_table_next_column();
         push_checkbox_styles();
-        imgui_checkbox("##do_sound", &do_sound);
+        imgui_checkbox("##do_sound", &g_config.audio.sound_enabled);
         pop_checkbox_styles();
 
         imgui_table_next_row(0, 20);
@@ -361,7 +369,7 @@ static void right_column() {
         imgui_text("Volume Level");
         imgui_table_next_column();
         push_slider_styles();
-        imgui_slider_int("##volume_level", &volume_level, 0, 10);
+        imgui_slider_int("##volume_level", &g_config.audio.sound_volume, 0, 10);
         pop_slider_styles();
 
         imgui_table_next_row(0, 20);
@@ -369,14 +377,128 @@ static void right_column() {
         imgui_text("Dark GUI");
         imgui_table_next_column();
         push_checkbox_styles();
-        imgui_checkbox("##dark_ui", &dark_ui);
+        imgui_checkbox("##dark_ui", &do_darkmode);
         pop_checkbox_styles();
 
         imgui_end_table();
     }
 }
 
-void launcher_render(void) {
+void launcher_init() {
+    switch (okey.race) {
+        case 4: // templar M
+            current_class = 0;
+            current_gender = 0;
+            break;
+        case 5: // templar F
+            current_class = 0;
+            current_gender = 1;
+            break;
+
+        case 6: // mercenary M
+            current_class = 1;
+            current_gender = 0;
+            break;
+        case 7: // mercenary F
+            current_class = 1;
+            current_gender = 1;
+            break;
+
+        case 8: // harakim M
+            current_class = 2;
+            current_gender = 0;
+            break;
+        case 9: // harakim F
+            current_class = 2;
+            current_gender = 1;
+            break;
+
+        case 10: // seyan M
+            current_class = 6;
+            current_gender = 0;
+            break;
+        case 11: // seyan F
+            current_class = 6;
+            current_gender = 1;
+            break;
+
+
+        case 12: // arch templar M
+            current_class = 3;
+            current_gender = 0;
+            break;
+        case 13: // arch templar F
+            current_class = 3;
+            current_gender = 1;
+            break;
+
+        case 14: // pugilist M
+            current_class = 4;
+            current_gender = 0;
+            break;
+        case 15: // pugilist F
+            current_class = 4;
+            current_gender = 1;
+            break;
+
+        case 16: // warrior M
+            current_class = 5;
+            current_gender = 0;
+            break;
+        case 17: // warrior F
+            current_class = 5;
+            current_gender = 1;
+            break;
+
+        case 18: // sorcerer M
+            current_class = 7;
+            current_gender = 0;
+            break;
+        case 19: // sorcerer F
+            current_class = 7;
+            current_gender = 1;
+            break;
+
+        case 20: // summoner M
+            current_class = 8;
+            current_gender = 0;
+            break;
+        case 21: // summoner F
+            current_class = 8;
+            current_gender = 1;
+            break;
+
+        case 22: // arch harakim M
+            current_class = 9;
+            current_gender = 0;
+            break;
+        case 23: // arch harakim F
+            current_class = 9;
+            current_gender = 1;
+            break;
+
+        //
+
+        case 2:
+            current_class = 10;
+            current_gender = 0;
+            break; // braver M
+        case 3:
+            current_class = 10;
+            current_gender = 1;
+            break; // braver F
+
+        case 1554: current_class = 11;
+            current_gender = 0;
+            break;
+
+        default: current_class = 0;
+            current_gender = 0;
+            break;
+    }
+}
+
+void launcher_render() {
     imgui_set_next_window_pos(0, 0);
     imgui_set_next_windows_size(SCREEN_WIDTH, SCREEN_HEIGHT);
     sdl_load_sprite(LAUNCHER_BACKGROUND_SPRITE);

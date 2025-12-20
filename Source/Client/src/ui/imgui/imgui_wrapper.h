@@ -304,6 +304,10 @@ void imgui_push_id_int(int int_id);
 void imgui_push_id_ptr(const void* ptr_id);
 void imgui_pop_id(void);
 
+/* Disabling widgets */
+void imgui_begin_disabled(bool disabled);
+void imgui_end_disabled(void);
+
 /* Utilities */
 bool imgui_is_item_hovered(void);
 bool imgui_is_item_active(void);

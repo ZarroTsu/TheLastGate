@@ -213,6 +213,7 @@ static void new_main() {
 	load_options();
 	init_sound();
 	init(g_config.video.windowed);
+	launcher_init();
 
 	while (!quit) {
 		handle_input();

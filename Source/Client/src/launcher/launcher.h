@@ -20,4 +20,5 @@ static const unsigned int INNER_WINDOW_32 = 0xFF210004;
 static const unsigned int POPOVER_BACKGROUND_32 = 0XE1210003;
 static const unsigned int CURRENT_CHARACTER_COLOR_32 = 0xFF6342D6;
 
+void launcher_init(void);
 void launcher_render(void);
