@@ -22,12 +22,12 @@ if (MINGW)
                 COMMENT "Copying ${DLL}"
         )
     endforeach ()
-endif ()
 
-# We use the MVSC SDL dependencies whe we ship so we don't need to ship a million other dlls with them.
-add_custom_command(TARGET TheLastGate POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/../../Resources/DLLs/SDL"
-        $<TARGET_FILE_DIR:TheLastGate>
-        COMMENT "Recursively copying DLLs to output directory"
-)
+    # We use the MVSC SDL dependencies when we ship so we don't need to ship a million other dlls with them.
+    add_custom_command(TARGET TheLastGate POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/../../Resources/DLLs/SDL"
+            $<TARGET_FILE_DIR:TheLastGate>
+            COMMENT "Recursively copying DLLs to output directory"
+    )
+endif ()
