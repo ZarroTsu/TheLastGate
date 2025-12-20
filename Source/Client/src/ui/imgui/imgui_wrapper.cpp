@@ -11,13 +11,14 @@
 #include "backends/imgui_impl_opengl3.h"
 #include <SDL2/SDL.h>
 
-
+/* All wrapper functions must have C linkage to be callable from C code */
+extern "C" {
 /* Initialization and lifecycle */
 
-void imgui_init(void* sdl_window, void* gl_context) {
+void imgui_init(void *sdl_window, void *gl_context) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
 
 
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
@@ -26,7 +27,7 @@ void imgui_init(void* sdl_window, void* gl_context) {
     ImGui::StyleColorsDark();
 
     /* Setup platform/renderer backends */
-    ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(sdl_window), gl_context);
+    ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window *>(sdl_window), gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 }
 
@@ -51,32 +52,32 @@ void imgui_render(void) {
 
 /* Font management */
 
-void* imgui_add_font_from_file_ttf(const char* filename, float size_pixels) {
-    ImGuiIO& io = ImGui::GetIO();
-    ImFont* font = io.Fonts->AddFontFromFileTTF(filename, size_pixels);
-    return static_cast<void*>(font);
+void *imgui_add_font_from_file_ttf(const char *filename, float size_pixels) {
+    ImGuiIO &io = ImGui::GetIO();
+    ImFont *font = io.Fonts->AddFontFromFileTTF(filename, size_pixels);
+    return static_cast<void *>(font);
 }
 
-void* imgui_add_font_from_file_ttf_pixel_perfect(const char* filename, float size_pixels) {
-    ImGuiIO& io = ImGui::GetIO();
+void *imgui_add_font_from_file_ttf_pixel_perfect(const char *filename, float size_pixels) {
+    ImGuiIO &io = ImGui::GetIO();
 
     /* Configure for pixel-perfect rendering */
     ImFontConfig config;
-    config.OversampleH = 1;  /* No horizontal oversampling */
-    config.OversampleV = 1;  /* No vertical oversampling */
-    config.PixelSnapH = true;  /* Align to pixel grid */
+    config.OversampleH = 1; /* No horizontal oversampling */
+    config.OversampleV = 1; /* No vertical oversampling */
+    config.PixelSnapH = true; /* Align to pixel grid */
 
-    ImFont* font = io.Fonts->AddFontFromFileTTF(filename, size_pixels, &config);
-    return static_cast<void*>(font);
+    ImFont *font = io.Fonts->AddFontFromFileTTF(filename, size_pixels, &config);
+    return static_cast<void *>(font);
 }
 
-void imgui_set_default_font(void* font) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.FontDefault = static_cast<ImFont*>(font);
+void imgui_set_default_font(void *font) {
+    ImGuiIO &io = ImGui::GetIO();
+    io.FontDefault = static_cast<ImFont *>(font);
 }
 
-void imgui_push_font(void* font) {
-    ImGui::PushFont(static_cast<ImFont*>(font));
+void imgui_push_font(void *font) {
+    ImGui::PushFont(static_cast<ImFont *>(font));
 }
 
 void imgui_pop_font(void) {
@@ -86,23 +87,23 @@ void imgui_pop_font(void) {
 /* Display scaling */
 
 void imgui_set_display_size(float width, float height) {
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize = ImVec2(width, height);
 }
 
 void imgui_set_display_framebuffer_scale(float scale_x, float scale_y) {
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     io.DisplayFramebufferScale = ImVec2(scale_x, scale_y);
 }
 
 /* Process SDL events */
 
-bool imgui_process_event(void* sdl_event) {
-    SDL_Event* event = static_cast<SDL_Event*>(sdl_event);
+bool imgui_process_event(void *sdl_event) {
+    SDL_Event *event = static_cast<SDL_Event *>(sdl_event);
     ImGui_ImplSDL2_ProcessEvent(event);
 
     /* Return true if ImGui wants to capture this event */
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     if (event->type == SDL_MOUSEMOTION ||
         event->type == SDL_MOUSEBUTTONDOWN ||
         event->type == SDL_MOUSEBUTTONUP ||
@@ -125,18 +126,18 @@ void imgui_set_next_windows_size(float width, float height) {
     ImGui::SetNextWindowSize(ImVec2(width, height));
 }
 
-bool imgui_begin(const char* name, bool* p_open, int flags) {
+bool imgui_begin(const char *name, bool *p_open, int flags) {
     /* Map our C flags to ImGui flags */
     ImGuiWindowFlags imgui_flags = 0;
-    if (flags & IMGUI_WINDOW_FLAG_NO_TITLE_BAR)         imgui_flags |= ImGuiWindowFlags_NoTitleBar;
-    if (flags & IMGUI_WINDOW_FLAG_NO_RESIZE)            imgui_flags |= ImGuiWindowFlags_NoResize;
-    if (flags & IMGUI_WINDOW_FLAG_NO_MOVE)              imgui_flags |= ImGuiWindowFlags_NoMove;
-    if (flags & IMGUI_WINDOW_FLAG_NO_SCROLLBAR)         imgui_flags |= ImGuiWindowFlags_NoScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_TITLE_BAR) imgui_flags |= ImGuiWindowFlags_NoTitleBar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_RESIZE) imgui_flags |= ImGuiWindowFlags_NoResize;
+    if (flags & IMGUI_WINDOW_FLAG_NO_MOVE) imgui_flags |= ImGuiWindowFlags_NoMove;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_NoScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE) imgui_flags |= ImGuiWindowFlags_NoScrollWithMouse;
-    if (flags & IMGUI_WINDOW_FLAG_NO_COLLAPSE)          imgui_flags |= ImGuiWindowFlags_NoCollapse;
-    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_AUTO_RESIZE)   imgui_flags |= ImGuiWindowFlags_AlwaysAutoResize;
-    if (flags & IMGUI_WINDOW_FLAG_NO_BACKGROUND)        imgui_flags |= ImGuiWindowFlags_NoBackground;
-    if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS)    imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
+    if (flags & IMGUI_WINDOW_FLAG_NO_COLLAPSE) imgui_flags |= ImGuiWindowFlags_NoCollapse;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_AUTO_RESIZE) imgui_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    if (flags & IMGUI_WINDOW_FLAG_NO_BACKGROUND) imgui_flags |= ImGuiWindowFlags_NoBackground;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS) imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
 
     return ImGui::Begin(name, p_open, imgui_flags);
 }
@@ -147,14 +148,15 @@ void imgui_end(void) {
 
 /* Child windows */
 
-bool imgui_begin_child(const char* str_id, float width, float height, bool border, int flags) {
+bool imgui_begin_child(const char *str_id, float width, float height, bool border, int flags) {
     /* Map our C flags to ImGui flags */
     ImGuiWindowFlags imgui_flags = 0;
-    if (flags & IMGUI_WINDOW_FLAG_NO_SCROLLBAR)         imgui_flags |= ImGuiWindowFlags_NoScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_NoScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE) imgui_flags |= ImGuiWindowFlags_NoScrollWithMouse;
     if (flags & IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_HorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
-    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR)
+        imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
 
     return ImGui::BeginChild(str_id, ImVec2(width, height), border, imgui_flags);
 }
@@ -165,55 +167,56 @@ void imgui_end_child(void) {
 
 /* Text and labels */
 
-void imgui_text(const char* text) {
+void imgui_text(const char *text) {
     ImGui::TextUnformatted(text);
 }
 
-void imgui_text_colored_rgb(float r, float g, float b, float a, const char* text) {
-    ImGui::TextColored(ImVec4(r/255.0f, g/255.0f, b/255.0f, a), "%s", text);
+void imgui_text_colored_rgb(float r, float g, float b, float a, const char *text) {
+    ImGui::TextColored(ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, a), "%s", text);
 }
 
-void imgui_text_colored(float r, float g, float b, float a, const char* text) {
+void imgui_text_colored(float r, float g, float b, float a, const char *text) {
     ImGui::TextColored(ImVec4(r, g, b, a), "%s", text);
 }
 
-void imgui_text_colored_32(unsigned int col, const char* text) {
+void imgui_text_colored_32(unsigned int col, const char *text) {
     ImGui::PushStyleColor(ImGuiCol_Text, col);
     ImGui::TextUnformatted(text);
     ImGui::PopStyleColor();
 }
 
-void imgui_text_disabled(const char* text) {
+void imgui_text_disabled(const char *text) {
     ImGui::TextDisabled("%s", text);
 }
 
-void imgui_text_wrapped(const char* text) {
+void imgui_text_wrapped(const char *text) {
     ImGui::TextWrapped("%s", text);
 }
 
-void imgui_text_wrapped_colored_32(unsigned int col, const char* text) {
+void imgui_text_wrapped_colored_32(unsigned int col, const char *text) {
     ImGui::PushStyleColor(ImGuiCol_Text, col);
     ImGui::TextWrapped("%s", text);
     ImGui::PopStyleColor();
 }
 
-void imgui_label_text(const char* label, const char* text) {
+void imgui_label_text(const char *label, const char *text) {
     ImGui::LabelText(label, "%s", text);
 }
 
-void imgui_bullet_text(const char* text) {
+void imgui_bullet_text(const char *text) {
     ImGui::BulletText("%s", text);
 }
 
 /* Text utilities */
 
-void imgui_calc_text_size(float* out_width, float* out_height, const char* text, const char* text_end, bool hide_text_after_double_hash, float wrap_width) {
+void imgui_calc_text_size(float *out_width, float *out_height, const char *text, const char *text_end,
+                          bool hide_text_after_double_hash, float wrap_width) {
     ImVec2 size = ImGui::CalcTextSize(text, text_end, hide_text_after_double_hash, wrap_width);
     if (out_width) *out_width = size.x;
     if (out_height) *out_height = size.y;
 }
 
-void imgui_calc_text_size_simple(float* out_width, float* out_height, const char* text) {
+void imgui_calc_text_size_simple(float *out_width, float *out_height, const char *text) {
     ImVec2 size = ImGui::CalcTextSize(text);
     if (out_width) *out_width = size.x;
     if (out_height) *out_height = size.y;
@@ -228,75 +231,75 @@ void imgui_pop_text_wrap_pos(void) {
 }
 
 void imgui_set_font_global_scale(float scale) {
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     io.FontGlobalScale = scale;
 }
 
 /* Widgets: Main */
 
-bool imgui_button(const char* label) {
+bool imgui_button(const char *label) {
     return ImGui::Button(label);
 }
 
-bool imgui_button_sized(const char* label, float width, float height) {
+bool imgui_button_sized(const char *label, float width, float height) {
     return ImGui::Button(label, ImVec2(width, height));
 }
 
-bool imgui_small_button(const char* label) {
+bool imgui_small_button(const char *label) {
     return ImGui::SmallButton(label);
 }
 
-bool imgui_invisible_button(const char* str_id, float width, float height) {
+bool imgui_invisible_button(const char *str_id, float width, float height) {
     return ImGui::InvisibleButton(str_id, ImVec2(width, height));
 }
 
-bool imgui_checkbox(const char* label, bool* v) {
+bool imgui_checkbox(const char *label, bool *v) {
     return ImGui::Checkbox(label, v);
 }
 
-bool imgui_radio_button(const char* label, bool active) {
+bool imgui_radio_button(const char *label, bool active) {
     return ImGui::RadioButton(label, active);
 }
 
 /* Widgets: Input */
 
-bool imgui_input_text(const char* label, char* buf, int buf_size) {
+bool imgui_input_text(const char *label, char *buf, int buf_size) {
     return ImGui::InputText(label, buf, buf_size);
 }
 
-bool imgui_input_text_area(const char* label, char* buf, int buf_size, float width, float height) {
+bool imgui_input_text_area(const char *label, char *buf, int buf_size, float width, float height) {
     return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
 }
 
-bool imgui_input_int(const char* label, int* v) {
+bool imgui_input_int(const char *label, int *v) {
     return ImGui::InputInt(label, v);
 }
 
-bool imgui_input_float(const char* label, float* v) {
+bool imgui_input_float(const char *label, float *v) {
     return ImGui::InputFloat(label, v);
 }
 
-bool imgui_input_password(const char* label, char* buf, int buf_size) {
+bool imgui_input_password(const char *label, char *buf, int buf_size) {
     return ImGui::InputText(label, buf, buf_size, ImGuiInputTextFlags_Password);
 }
 
 /* Widgets: Sliders */
 
-bool imgui_slider_int(const char* label, int* v, int v_min, int v_max) {
+bool imgui_slider_int(const char *label, int *v, int v_min, int v_max) {
     return ImGui::SliderInt(label, v, v_min, v_max);
 }
 
-bool imgui_slider_float(const char* label, float* v, float v_min, float v_max) {
+bool imgui_slider_float(const char *label, float *v, float v_min, float v_max) {
     return ImGui::SliderFloat(label, v, v_min, v_max);
 }
 
 /* Widgets: Color */
 
-bool imgui_color_edit3(const char* label, float col[3]) {
+bool imgui_color_edit3(const char *label, float col[3]) {
     return ImGui::ColorEdit3(label, col);
 }
 
-bool imgui_color_edit4(const char* label, float col[4]) {
+bool imgui_color_edit4(const char *label, float col[4]) {
     return ImGui::ColorEdit4(label, col);
 }
 
@@ -386,7 +389,7 @@ void imgui_center_next_item(float item_width) {
     }
 }
 
-void imgui_center_next_text(const char* text) {
+void imgui_center_next_text(const char *text) {
     float text_width = ImGui::CalcTextSize(text).x;
     imgui_center_next_item(text_width);
 }
@@ -401,7 +404,7 @@ float imgui_get_frame_height_with_spacing(void) {
     return ImGui::GetFrameHeightWithSpacing();
 }
 
-void imgui_get_content_region_avail(float* out_width, float* out_height) {
+void imgui_get_content_region_avail(float *out_width, float *out_height) {
     ImVec2 avail = ImGui::GetContentRegionAvail();
     if (out_width) *out_width = avail.x;
     if (out_height) *out_height = avail.y;
@@ -409,7 +412,7 @@ void imgui_get_content_region_avail(float* out_width, float* out_height) {
 
 /* Columns */
 
-void imgui_columns(int count, const char* id, int border) {
+void imgui_columns(int count, const char *id, int border) {
     ImGui::Columns(count, id, border != 0);
 }
 
@@ -427,7 +430,7 @@ int imgui_get_column_index(void) {
 
 /* Tables (modern, preferred) */
 
-bool imgui_begin_table(const char* str_id, int column_count, int flags) {
+bool imgui_begin_table(const char *str_id, int column_count, int flags) {
     return ImGui::BeginTable(str_id, column_count, flags);
 }
 
@@ -447,7 +450,7 @@ bool imgui_table_set_column_index(int column_n) {
     return ImGui::TableSetColumnIndex(column_n);
 }
 
-void imgui_table_setup_column(const char* label, int flags, float init_width_or_weight, unsigned int user_id) {
+void imgui_table_setup_column(const char *label, int flags, float init_width_or_weight, unsigned int user_id) {
     ImGui::TableSetupColumn(label, flags, init_width_or_weight, user_id);
 }
 
@@ -455,13 +458,13 @@ void imgui_table_headers_row(void) {
     ImGui::TableHeadersRow();
 }
 
-void imgui_table_header(const char* label) {
+void imgui_table_header(const char *label) {
     ImGui::TableHeader(label);
 }
 
 /* Tree/Collapsing */
 
-bool imgui_tree_node(const char* label) {
+bool imgui_tree_node(const char *label) {
     return ImGui::TreeNode(label);
 }
 
@@ -469,13 +472,13 @@ void imgui_tree_pop(void) {
     ImGui::TreePop();
 }
 
-bool imgui_collapsing_header(const char* label, int flags) {
+bool imgui_collapsing_header(const char *label, int flags) {
     return ImGui::CollapsingHeader(label, flags);
 }
 
 /* Tab bars */
 
-bool imgui_begin_tab_bar(const char* str_id, int flags) {
+bool imgui_begin_tab_bar(const char *str_id, int flags) {
     return ImGui::BeginTabBar(str_id, flags);
 }
 
@@ -483,7 +486,7 @@ void imgui_end_tab_bar(void) {
     ImGui::EndTabBar();
 }
 
-bool imgui_begin_tab_item(const char* label, bool* p_open, int flags) {
+bool imgui_begin_tab_item(const char *label, bool *p_open, int flags) {
     return ImGui::BeginTabItem(label, p_open, flags);
 }
 
@@ -491,23 +494,23 @@ void imgui_end_tab_item(void) {
     ImGui::EndTabItem();
 }
 
-bool imgui_tab_item_button(const char* label, int flags) {
+bool imgui_tab_item_button(const char *label, int flags) {
     return ImGui::TabItemButton(label, flags);
 }
 
-void imgui_set_tab_item_closed(const char* tab_or_docked_window_label) {
+void imgui_set_tab_item_closed(const char *tab_or_docked_window_label) {
     ImGui::SetTabItemClosed(tab_or_docked_window_label);
 }
 
 /* Selectables */
 
-bool imgui_selectable(const char* label, bool selected) {
+bool imgui_selectable(const char *label, bool selected) {
     return ImGui::Selectable(label, selected);
 }
 
 /* Combo box */
 
-bool imgui_begin_combo(const char* label, const char* preview_value, int flags) {
+bool imgui_begin_combo(const char *label, const char *preview_value, int flags) {
     return ImGui::BeginCombo(label, preview_value, flags);
 }
 
@@ -517,7 +520,7 @@ void imgui_end_combo(void) {
 
 /* List box */
 
-bool imgui_begin_list_box(const char* label) {
+bool imgui_begin_list_box(const char *label) {
     return ImGui::BeginListBox(label);
 }
 
@@ -543,7 +546,7 @@ void imgui_end_menu_bar(void) {
     ImGui::EndMenuBar();
 }
 
-bool imgui_begin_menu(const char* label, bool enabled) {
+bool imgui_begin_menu(const char *label, bool enabled) {
     return ImGui::BeginMenu(label, enabled);
 }
 
@@ -551,13 +554,13 @@ void imgui_end_menu(void) {
     ImGui::EndMenu();
 }
 
-bool imgui_menu_item(const char* label, const char* shortcut, bool selected, bool enabled) {
+bool imgui_menu_item(const char *label, const char *shortcut, bool selected, bool enabled) {
     return ImGui::MenuItem(label, shortcut, selected, enabled);
 }
 
 /* Tooltips */
 
-void imgui_set_tooltip(const char* text) {
+void imgui_set_tooltip(const char *text) {
     ImGui::SetTooltip("%s", text);
 }
 
@@ -572,19 +575,19 @@ void imgui_end_tooltip(void) {
 
 /* Popups */
 
-void imgui_open_popup(const char* str_id) {
+void imgui_open_popup(const char *str_id) {
     ImGui::OpenPopup(str_id);
 }
 
-bool imgui_begin_popup(const char* str_id) {
+bool imgui_begin_popup(const char *str_id) {
     return ImGui::BeginPopup(str_id);
 }
 
-bool imgui_begin_popup_modal(const char* name, bool* p_open, int flags) {
+bool imgui_begin_popup_modal(const char *name, bool *p_open, int flags) {
     ImGuiWindowFlags imgui_flags = 0;
-    if (flags & IMGUI_WINDOW_FLAG_NO_TITLE_BAR)         imgui_flags |= ImGuiWindowFlags_NoTitleBar;
-    if (flags & IMGUI_WINDOW_FLAG_NO_RESIZE)            imgui_flags |= ImGuiWindowFlags_NoResize;
-    if (flags & IMGUI_WINDOW_FLAG_NO_MOVE)              imgui_flags |= ImGuiWindowFlags_NoMove;
+    if (flags & IMGUI_WINDOW_FLAG_NO_TITLE_BAR) imgui_flags |= ImGuiWindowFlags_NoTitleBar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_RESIZE) imgui_flags |= ImGuiWindowFlags_NoResize;
+    if (flags & IMGUI_WINDOW_FLAG_NO_MOVE) imgui_flags |= ImGuiWindowFlags_NoMove;
 
     return ImGui::BeginPopupModal(name, p_open, imgui_flags);
 }
@@ -599,7 +602,7 @@ void imgui_close_current_popup(void) {
 
 /* ID stack */
 
-void imgui_push_id_str(const char* str_id) {
+void imgui_push_id_str(const char *str_id) {
     ImGui::PushID(str_id);
 }
 
@@ -607,7 +610,7 @@ void imgui_push_id_int(int int_id) {
     ImGui::PushID(int_id);
 }
 
-void imgui_push_id_ptr(const void* ptr_id) {
+void imgui_push_id_ptr(const void *ptr_id) {
     ImGui::PushID(ptr_id);
 }
 
@@ -657,19 +660,19 @@ void imgui_set_item_default_focus(void) {
 
 /* Item rectangle queries */
 
-void imgui_get_item_rect_min(float* out_x, float* out_y) {
+void imgui_get_item_rect_min(float *out_x, float *out_y) {
     ImVec2 min = ImGui::GetItemRectMin();
     if (out_x) *out_x = min.x;
     if (out_y) *out_y = min.y;
 }
 
-void imgui_get_item_rect_max(float* out_x, float* out_y) {
+void imgui_get_item_rect_max(float *out_x, float *out_y) {
     ImVec2 max = ImGui::GetItemRectMax();
     if (out_x) *out_x = max.x;
     if (out_y) *out_y = max.y;
 }
 
-void imgui_get_item_rect_size(float* out_x, float* out_y) {
+void imgui_get_item_rect_size(float *out_x, float *out_y) {
     ImVec2 size = ImGui::GetItemRectSize();
     if (out_x) *out_x = size.x;
     if (out_y) *out_y = size.y;
@@ -703,26 +706,26 @@ void imgui_pop_style_var(int count) {
 
 /* Style getters */
 
-void imgui_get_style_item_spacing(float* out_x, float* out_y) {
-    ImGuiStyle& style = ImGui::GetStyle();
+void imgui_get_style_item_spacing(float *out_x, float *out_y) {
+    ImGuiStyle &style = ImGui::GetStyle();
     if (out_x) *out_x = style.ItemSpacing.x;
     if (out_y) *out_y = style.ItemSpacing.y;
 }
 
-void imgui_get_style_item_inner_spacing(float* out_x, float* out_y) {
-    ImGuiStyle& style = ImGui::GetStyle();
+void imgui_get_style_item_inner_spacing(float *out_x, float *out_y) {
+    ImGuiStyle &style = ImGui::GetStyle();
     if (out_x) *out_x = style.ItemInnerSpacing.x;
     if (out_y) *out_y = style.ItemInnerSpacing.y;
 }
 
-void imgui_get_style_frame_padding(float* out_x, float* out_y) {
-    ImGuiStyle& style = ImGui::GetStyle();
+void imgui_get_style_frame_padding(float *out_x, float *out_y) {
+    ImGuiStyle &style = ImGui::GetStyle();
     if (out_x) *out_x = style.FramePadding.x;
     if (out_y) *out_y = style.FramePadding.y;
 }
 
-void imgui_get_style_window_padding(float* out_x, float* out_y) {
-    ImGuiStyle& style = ImGui::GetStyle();
+void imgui_get_style_window_padding(float *out_x, float *out_y) {
+    ImGuiStyle &style = ImGui::GetStyle();
     if (out_x) *out_x = style.WindowPadding.x;
     if (out_y) *out_y = style.WindowPadding.y;
 }
@@ -737,7 +740,7 @@ float imgui_get_style_scrollbar_size(void) {
 
 /* Demo/Debug */
 
-void imgui_show_demo_window(bool* p_open) {
+void imgui_show_demo_window(bool *p_open) {
     ImGui::ShowDemoWindow(p_open);
 }
 
@@ -760,13 +763,13 @@ bool imgui_is_key_pressed(int sdl_keycode) {
     /* Letters a-z */
     if (sdl_keycode >= SDLK_a && sdl_keycode <= SDLK_z) {
         int key_index = sdl_keycode - SDLK_a;
-        return ImGui::IsKeyPressed((ImGuiKey)(ImGuiKey_A + key_index), false);
+        return ImGui::IsKeyPressed((ImGuiKey) (ImGuiKey_A + key_index), false);
     }
 
     /* Numbers 0-9 */
     if (sdl_keycode >= SDLK_0 && sdl_keycode <= SDLK_9) {
         int key_index = sdl_keycode - SDLK_0;
-        return ImGui::IsKeyPressed((ImGuiKey)(ImGuiKey_0 + key_index), false);
+        return ImGui::IsKeyPressed((ImGuiKey) (ImGuiKey_0 + key_index), false);
     }
 
     /* Special keys - map SDL to ImGui key codes */
@@ -840,7 +843,7 @@ bool imgui_is_key_pressed(int sdl_keycode) {
 }
 
 int imgui_get_key_mods(void) {
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     int mods = 0;
     if (io.KeyCtrl) mods |= KMOD_CTRL;
     if (io.KeyAlt) mods |= KMOD_ALT;
@@ -850,54 +853,58 @@ int imgui_get_key_mods(void) {
 
 /* Draw list API */
 
-void* imgui_get_window_draw_list(void) {
-    return static_cast<void*>(ImGui::GetWindowDrawList());
+void *imgui_get_window_draw_list(void) {
+    return static_cast<void *>(ImGui::GetWindowDrawList());
 }
 
-void* imgui_get_background_draw_list(void) {
-    return static_cast<void*>(ImGui::GetBackgroundDrawList());
+void *imgui_get_background_draw_list(void) {
+    return static_cast<void *>(ImGui::GetBackgroundDrawList());
 }
 
-void* imgui_get_foreground_draw_list(void) {
-    return static_cast<void*>(ImGui::GetForegroundDrawList());
+void *imgui_get_foreground_draw_list(void) {
+    return static_cast<void *>(ImGui::GetForegroundDrawList());
 }
 
 /* Draw list commands */
 
-void imgui_draw_list_add_line(void* draw_list, float x1, float y1, float x2, float y2, unsigned int col, float thickness) {
-    ImDrawList* dl = static_cast<ImDrawList*>(draw_list);
+void imgui_draw_list_add_line(void *draw_list, float x1, float y1, float x2, float y2, unsigned int col,
+                              float thickness) {
+    ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     dl->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), col, thickness);
 }
 
-void imgui_draw_list_add_rect(void* draw_list, float min_x, float min_y, float max_x, float max_y, unsigned int col, float rounding, int flags, float thickness) {
-    ImDrawList* dl = static_cast<ImDrawList*>(draw_list);
+void imgui_draw_list_add_rect(void *draw_list, float min_x, float min_y, float max_x, float max_y, unsigned int col,
+                              float rounding, int flags, float thickness) {
+    ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     dl->AddRect(ImVec2(min_x, min_y), ImVec2(max_x, max_y), col, rounding, flags, thickness);
 }
 
-void imgui_draw_list_add_rect_filled(void* draw_list, float min_x, float min_y, float max_x, float max_y, unsigned int col, float rounding, int flags) {
-    ImDrawList* dl = static_cast<ImDrawList*>(draw_list);
+void imgui_draw_list_add_rect_filled(void *draw_list, float min_x, float min_y, float max_x, float max_y,
+                                     unsigned int col, float rounding, int flags) {
+    ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     dl->AddRectFilled(ImVec2(min_x, min_y), ImVec2(max_x, max_y), col, rounding, flags);
 }
 
-void imgui_draw_list_add_image(void* draw_list, void* texture_id, float min_x, float min_y, float max_x, float max_y, float uv0_x, float uv0_y, float uv1_x, float uv1_y, unsigned int tint_col) {
-    ImDrawList* dl = static_cast<ImDrawList*>(draw_list);
+void imgui_draw_list_add_image(void *draw_list, void *texture_id, float min_x, float min_y, float max_x, float max_y,
+                               float uv0_x, float uv0_y, float uv1_x, float uv1_y, unsigned int tint_col) {
+    ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     ImTextureID tex = reinterpret_cast<ImTextureID>(texture_id);
     dl->AddImage(tex, ImVec2(min_x, min_y), ImVec2(max_x, max_y), ImVec2(uv0_x, uv0_y), ImVec2(uv1_x, uv1_y), tint_col);
 }
 
-void imgui_draw_list_add_text(void* draw_list, float x, float y, unsigned int col, const char* text) {
-    ImDrawList* dl = static_cast<ImDrawList*>(draw_list);
+void imgui_draw_list_add_text(void *draw_list, float x, float y, unsigned int col, const char *text) {
+    ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     dl->AddText(ImVec2(x, y), col, text);
 }
 
-void imgui_draw_list_add_image_9_slice(void* draw_list, void* texture_id,
+void imgui_draw_list_add_image_9_slice(void *draw_list, void *texture_id,
                                        float min_x, float min_y, float max_x, float max_y,
                                        float border_left, float border_right,
                                        float border_top, float border_bottom,
                                        float texture_width, float texture_height,
                                        float uv0_x, float uv0_y, float uv1_x, float uv1_y,
                                        unsigned int tint_col) {
-    ImDrawList* dl = static_cast<ImDrawList*>(draw_list);
+    ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     ImTextureID tex = reinterpret_cast<ImTextureID>(texture_id);
 
     /* Calculate the UV range for this sprite in the atlas */
@@ -982,3 +989,4 @@ void imgui_text_formatted(const char *format, ...) {
     va_end(args);
     ImGui::Text(buffer);
 }
+} /* extern "C" */
