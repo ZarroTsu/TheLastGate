@@ -274,11 +274,10 @@ static void MakeWindowNormal(SDL_Window *win) {
     }
 }
 
+#endif
 
 SDL_Event input_events[128];
 int input_event_count = 0;
-
-#endif
 
 void handle_input(void) {
     SDL_Event e;
