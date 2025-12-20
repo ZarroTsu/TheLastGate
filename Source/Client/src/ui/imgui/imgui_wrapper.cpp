@@ -177,12 +177,24 @@ void imgui_text_colored(float r, float g, float b, float a, const char* text) {
     ImGui::TextColored(ImVec4(r, g, b, a), "%s", text);
 }
 
+void imgui_text_colored_32(unsigned int col, const char* text) {
+    ImGui::PushStyleColor(ImGuiCol_Text, col);
+    ImGui::TextUnformatted(text);
+    ImGui::PopStyleColor();
+}
+
 void imgui_text_disabled(const char* text) {
     ImGui::TextDisabled("%s", text);
 }
 
 void imgui_text_wrapped(const char* text) {
     ImGui::TextWrapped("%s", text);
+}
+
+void imgui_text_wrapped_colored_32(unsigned int col, const char* text) {
+    ImGui::PushStyleColor(ImGuiCol_Text, col);
+    ImGui::TextWrapped("%s", text);
+    ImGui::PopStyleColor();
 }
 
 void imgui_label_text(const char* label, const char* text) {

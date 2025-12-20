@@ -66,8 +66,10 @@ void imgui_text(const char* text);
 void imgui_text_formatted(const char* format, ...);
 void imgui_text_colored(float r, float g, float b, float a, const char* text);
 void imgui_text_colored_rgb(float r, float g, float b, float a, const char* text);
+void imgui_text_colored_32(unsigned int col, const char* text);
 void imgui_text_disabled(const char* text);
 void imgui_text_wrapped(const char* text);
+void imgui_text_wrapped_colored_32(unsigned int col, const char* text);
 void imgui_label_text(const char* label, const char* text);
 void imgui_bullet_text(const char* text);
 

@@ -1,5 +1,8 @@
 #pragma once
 
+#define UI_CENTER_X (SCREEN_WIDTH / 2)
+#define UI_CENTER_Y (SCREEN_HEIGHT / 2)
+
 typedef struct {
     void *normal;
     void *large;

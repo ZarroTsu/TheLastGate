@@ -1,6 +1,7 @@
 #pragma once
 
 #define LAUNCHER_BACKGROUND_SPRITE 18130
+#include <stdbool.h>
 
 static const unsigned int BACKGROUND_COLOR_32 = 0xFF050017;
 static const unsigned int GOLD_COLOR_32 = 0xFF4AABCE;
@@ -19,6 +20,13 @@ static const unsigned int DROPDOWN_ACTIVE_32 = 0x7F412529;
 static const unsigned int INNER_WINDOW_32 = 0xFF210004;
 static const unsigned int POPOVER_BACKGROUND_32 = 0XE1210003;
 static const unsigned int CURRENT_CHARACTER_COLOR_32 = 0xFF6342D6;
+
+typedef struct {
+    bool show_first_confirmation;
+    bool show_second_confirmation;
+    char file_path[512];
+    bool new_character;
+} SwitchCharacterConfirmState;
 
 void launcher_init(void);
 void launcher_render(void);

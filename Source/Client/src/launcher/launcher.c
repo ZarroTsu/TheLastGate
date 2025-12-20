@@ -5,14 +5,18 @@
 #include "inter.h"
 #include "main.h"
 #include "options.h"
+#include "tinyfiledialogs.h"
 #include "config/config.h"
 #include "graphics/sdl.h"
+#include "log/log.h"
 #include "ui/ui.h"
 #include "ui/imgui/imgui_wrapper.h"
 
 static const int window_flags =
         IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE | IMGUI_WINDOW_FLAG_NO_MOVE |
         IMGUI_WINDOW_FLAG_NO_TITLE_BAR | IMGUI_WINDOW_FLAG_NO_SCROLLBAR | IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE;
+
+static SwitchCharacterConfirmState switch_confirm = {0};
 
 static const char *classes[] = {
     "Templar",
@@ -49,6 +53,18 @@ static int current_class = 0;
 static int current_gender = 0;
 
 static char password[15] = "";
+
+static const char *filterPatterns[1] = {"*.moa"};
+
+static void start_load_switch_character_confirmation(const char *file_path) {
+    strncpy(switch_confirm.file_path, file_path, sizeof(switch_confirm.file_path) - 1);
+    switch_confirm.show_first_confirmation = true;
+}
+
+static void start_new_switch_character_confirmation() {
+    switch_confirm.new_character = true;
+    switch_confirm.show_first_confirmation = true;
+}
 
 static void push_launcher_styles() {
     imgui_push_style_color_32(IMGUI_COL_TEXT, GOLD_COLOR_32);
@@ -244,7 +260,9 @@ static void left_column() {
         imgui_text(okey.name);
         imgui_table_next_column();
         push_button_styles();
-        imgui_button("Create New Account");
+        if (imgui_button("Create New Account")) {
+            start_new_switch_character_confirmation();
+        }
         pop_button_styles();
         imgui_end_table();
     }
@@ -498,6 +516,119 @@ void launcher_init() {
     }
 }
 
+static void load() {
+    char const *file_path = tinyfd_openFileDialog(
+        "Select your MOA",
+        "",
+        1,
+        filterPatterns, "Astonia Save File (.MOA)", 0);
+
+    if (file_path != NULL) {
+        log_info("Loading MOA from %s", file_path);
+        start_load_switch_character_confirmation(file_path);
+    }
+}
+
+static void switch_character_confirmation() {
+    if (switch_confirm.show_first_confirmation) {
+        imgui_open_popup("Are you sure?");
+        switch_confirm.show_first_confirmation = false;
+    }
+
+    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_WINDOW_PADDING, 4, 4);
+    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_FRAME_PADDING, 4, 4);
+    imgui_push_style_var_float(IMGUI_STYLE_VAR_WINDOW_BORDER_SIZE, 2);
+    imgui_push_style_color_32(IMGUI_COL_POPUP_BG, INNER_WINDOW_32);
+    imgui_push_style_color_32(IMGUI_COL_TITLE_BG_ACTIVE, BORDERS_32);
+    imgui_push_style_color_32(IMGUI_COL_BORDER, BORDERS_32);
+    imgui_set_next_window_pos(UI_CENTER_X - 200, UI_CENTER_Y - 100);
+    imgui_set_next_windows_size(400, 200);
+    if (imgui_begin_popup_modal("Are you sure?", NULL,
+                                IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_RESIZE |
+                                IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS)) {
+        // imgui_set_cursor_pos_y(imgui_get_cursor_pos_y() + 25);
+        imgui_center_next_item(350);
+        if (imgui_begin_child("text_container", 350, 100, false, IMGUI_WINDOW_FLAG_NO_SCROLLBAR)) {
+            imgui_center_next_text("Do you really want to create a new account?");
+            imgui_text("Do you really want to create a new account?");
+            imgui_spacing();
+            imgui_text_wrapped_colored_32(BEIGE_COLOR_32,
+                                          "Your old account will no longer be accessible, unless you remembered to save it.");
+            imgui_spacing();
+            imgui_center_next_text("You did save it, didn't you");
+            imgui_text_colored_32(HEADER_TEXT_COLOR_32, "You did save it, didn't you");
+            imgui_end_child();
+        }
+
+        imgui_spacing();
+        imgui_separator();
+        imgui_spacing();
+
+        imgui_center_next_item(250);
+        push_button_styles();
+        if (imgui_button_sized("Yes", 120, 0)) {
+            imgui_close_current_popup();
+            switch_confirm.show_second_confirmation = true;
+        }
+
+        imgui_same_line(0, 10);
+
+        if (imgui_button_sized("Cancel", 120, 0)) {
+            imgui_close_current_popup();
+            switch_confirm.file_path[0] = '\0';
+        }
+        pop_button_styles();
+
+        imgui_end_popup();
+    }
+
+    if (switch_confirm.show_second_confirmation) {
+        imgui_open_popup("Are you really sure?");
+        switch_confirm.show_second_confirmation = false;
+    }
+
+    imgui_set_next_window_pos(UI_CENTER_X - 200, UI_CENTER_Y - 100);
+    imgui_set_next_windows_size(400, 200);
+    if (imgui_begin_popup_modal("Are you really sure?", NULL,
+                                IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_RESIZE |
+                                IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS)) {
+        imgui_center_next_item(350);
+        if (imgui_begin_child("text_container", 350, 100, false, IMGUI_WINDOW_FLAG_NO_SCROLLBAR)) {
+            imgui_center_next_text("No Really!");
+            imgui_text_colored(1.0f, 0.5f, 0.0f, 1.0f, "No Really!");
+            imgui_spacing();
+
+            imgui_text_wrapped("This will replace your current character.");
+            imgui_center_next_text("This action cannot be undone.");
+            imgui_text("This action cannot be undone.");
+            imgui_end_child();
+        }
+        imgui_spacing();
+        imgui_separator();
+        imgui_spacing();
+        imgui_center_next_item(250);
+        push_button_styles();
+        if (imgui_button_sized("Yes", 120, 0)) {
+            imgui_close_current_popup();
+            switch_confirm.show_second_confirmation = false;
+            // load_file();
+            switch_confirm.file_path[0] = '\0';
+        }
+
+        imgui_same_line(0, 10);
+
+        if (imgui_button_sized("Cancel", 120, 0)) {
+            imgui_close_current_popup();
+            switch_confirm.file_path[0] = '\0';
+        }
+        pop_button_styles();
+
+        imgui_end_popup();
+    }
+    imgui_pop_style_color(3);
+    imgui_pop_style_var(3);
+}
+
 void launcher_render() {
     imgui_set_next_window_pos(0, 0);
     imgui_set_next_windows_size(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -514,6 +645,8 @@ void launcher_render() {
                                   imgui_color_convert_float4_to_u32(1, 1, 1, 1));
 
 
+        switch_character_confirmation();
+
         if (imgui_begin_table("LauncherLayout", 2, IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME | IMGUI_TABLE_FLAG_BORDERS)) {
             imgui_table_next_row(0, 40);
             imgui_table_next_column();
@@ -529,7 +662,9 @@ void launcher_render() {
         push_button_styles();
         imgui_button_sized("Start", 120, 30);
         imgui_same_line(0, 10);
-        imgui_button_sized("Load", 120, 30);
+        if (imgui_button_sized("Load", 120, 30)) {
+            load();
+        }
         imgui_same_line(0, 10);
         imgui_button_sized("Save", 120, 30);
         imgui_same_line(0, 10);
