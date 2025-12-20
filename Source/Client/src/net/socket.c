@@ -32,7 +32,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>   // TODO: Remove - not needed for networking
 #include <zlib.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_net.h>
@@ -44,6 +43,7 @@
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 #include "security/security.h"
+#include "util/math_util.h"
 
 struct z_stream_s zs;
 
