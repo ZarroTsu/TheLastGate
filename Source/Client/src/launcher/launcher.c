@@ -173,6 +173,28 @@ static void set_race_gender() {
     }
 }
 
+static int get_race_from_class_gender() {
+    static const int race_map[12][2] = {
+        {4, 5},     /* 0: Templar M/F */
+        {6, 7},     /* 1: Mercenary M/F */
+        {8, 9},     /* 2: Harakim M/F */
+        {12, 13},   /* 3: Arch-Templar M/F */
+        {14, 15},   /* 4: Skald/Pugilist M/F */
+        {16, 17},   /* 5: Warrior M/F */
+        {10, 11},   /* 6: Seyan M/F */
+        {18, 19},   /* 7: Sorcerer M/F */
+        {20, 21},   /* 8: Summoner M/F */
+        {22, 23},   /* 9: Arch-Harakim M/F */
+        {2, 3},     /* 10: Braver M/F */
+        {1554, 1554} /* 11: Lycanthrope (M only) */
+    };
+
+    if (current_class < 0 || current_class >= 12) return 4; /* Default to Templar M */
+    if (current_gender < 0 || current_gender > 1) current_gender = 0;
+
+    return race_map[current_class][current_gender];
+}
+
 static void start_load_switch_character_confirmation(const char *file_path) {
     strncpy(switch_confirm.file_path, file_path, sizeof(switch_confirm.file_path) - 1);
     switch_confirm.show_first_confirmation = true;
