@@ -39,7 +39,7 @@ static int current_window_mode = 0;
 
 static bool shadows = 0;
 static bool do_sound = 0;
-static float volume_level = 0;
+static int volume_level = 0;
 static bool dark_ui = 0;
 
 static void push_launcher_styles() {
@@ -55,9 +55,11 @@ static void pop_launcher_styles() {
 static void push_header_styles() {
     imgui_push_font(font_sizes.big_header);
     imgui_push_style_color_32(IMGUI_COL_TEXT, HEADER_TEXT_COLOR_32);
+    imgui_push_font(font_sizes_bold.big_header);
 }
 
 static void pop_header_styles() {
+    imgui_pop_font();
     imgui_pop_style_color(1);
     imgui_pop_font();
 }
@@ -91,9 +93,11 @@ static void push_button_styles() {
     imgui_push_style_color_32(IMGUI_COL_BUTTON_HOVERED, BUTTON_COLOR_HOVERED_32);
     imgui_push_style_color_32(IMGUI_COL_BUTTON_ACTIVE, BUTTON_COLOR_ACTIVE_32);
     imgui_push_style_color_32(IMGUI_COL_TEXT, 0xFF000000);
+    imgui_push_font(font_sizes_bold.subheader);
 }
 
 static void pop_button_styles() {
+    imgui_pop_font();
     imgui_pop_style_color(5);
     imgui_pop_style_var(1);
 }
@@ -121,7 +125,7 @@ static void push_checkbox_styles() {
     imgui_push_style_color_32(IMGUI_COL_FRAME_BG_HOVERED, BEIGE_COLOR_HOVERED_32);
     imgui_push_style_color_32(IMGUI_COL_FRAME_BG_ACTIVE, BEIGE_COLOR_ACTIVE_32);
 
-    imgui_push_style_color_32(IMGUI_COL_CHECK_MARK, INNER_WINDOW_32);
+    imgui_push_style_color_32(IMGUI_COL_CHECK_MARK, DROPDOWN_HIGHLIGHT_32);
 }
 
 static void pop_checkbox_styles() {
@@ -130,11 +134,13 @@ static void pop_checkbox_styles() {
 }
 
 static void push_dropdown_styles() {
+    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_WINDOW_PADDING, 4, 4);
     imgui_push_style_color_32(IMGUI_COL_POPUP_BG, POPOVER_BACKGROUND_32);
 }
 
 static void pop_dropdown_styles() {
     imgui_pop_style_color(1);
+    imgui_pop_style_var(1);
 }
 
 static void push_dropdown_input_styles() {
@@ -165,6 +171,24 @@ static void push_dropdown_popover_styles() {
 
 static void pop_dropdown_popover_styles() {
     imgui_pop_style_color(4);
+    imgui_pop_style_var(1);
+}
+
+static void push_slider_styles() {
+    imgui_push_style_var_float(IMGUI_STYLE_VAR_FRAME_BORDER_SIZE, 2);
+    imgui_push_style_color_32(IMGUI_COL_BORDER, BORDERS_32);
+
+    imgui_push_style_color_32(IMGUI_COL_TEXT, INNER_WINDOW_32);
+
+    imgui_push_style_color_32(IMGUI_COL_FRAME_BG, BEIGE_COLOR_32);
+    imgui_push_style_color_32(IMGUI_COL_FRAME_BG_HOVERED, BEIGE_COLOR_HOVERED_32);
+    imgui_push_style_color_32(IMGUI_COL_FRAME_BG_ACTIVE, BEIGE_COLOR_HOVERED_32);
+    imgui_push_style_color_32(IMGUI_COL_SLIDER_GRAB, DROPDOWN_HIGHLIGHT_32);
+    imgui_push_style_color_32(IMGUI_COL_SLIDER_GRAB_ACTIVE, DROPDOWN_HIGHLIGHT_32);
+}
+
+static void pop_slider_styles() {
+    imgui_pop_style_color(7);
     imgui_pop_style_var(1);
 }
 
@@ -289,15 +313,6 @@ static void left_column() {
     }
     imgui_end_child();
     pop_previous_characters_styles();
-
-    imgui_center_next_item(380);
-    push_button_styles();
-    imgui_button_sized("Start", 120, 30);
-    imgui_same_line(0, 10);
-    imgui_button_sized("Load", 120, 30);
-    imgui_same_line(0, 10);
-    imgui_button_sized("Save", 120, 30);
-    pop_button_styles();
 }
 
 static void right_column() {
@@ -345,7 +360,9 @@ static void right_column() {
         imgui_table_next_column();
         imgui_text("Volume Level");
         imgui_table_next_column();
-        imgui_input_float("##volume_level", &volume_level);
+        push_slider_styles();
+        imgui_slider_int("##volume_level", &volume_level, 0, 10);
+        pop_slider_styles();
 
         imgui_table_next_row(0, 20);
         imgui_table_next_column();
@@ -357,13 +374,6 @@ static void right_column() {
 
         imgui_end_table();
     }
-
-    imgui_center_next_item(250);
-    push_button_styles();
-    imgui_button_sized("Discord", 120, 30);
-    imgui_same_line(0, 10);
-    imgui_button_sized("Exit", 120, 30);
-    pop_button_styles();
 }
 
 void launcher_render(void) {
@@ -392,6 +402,19 @@ void launcher_render(void) {
             imgui_end_child();
             imgui_end_table();
         }
+
+        imgui_center_next_item(640);
+        push_button_styles();
+        imgui_button_sized("Start", 120, 30);
+        imgui_same_line(0, 10);
+        imgui_button_sized("Load", 120, 30);
+        imgui_same_line(0, 10);
+        imgui_button_sized("Save", 120, 30);
+        imgui_same_line(0, 10);
+        imgui_button_sized("Discord", 120, 30);
+        imgui_same_line(0, 10);
+        imgui_button_sized("Exit", 120, 30);
+        pop_button_styles();
     }
     pop_launcher_styles();
     imgui_pop_style_var(1);

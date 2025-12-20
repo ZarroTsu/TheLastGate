@@ -5,8 +5,8 @@
 static const unsigned int BACKGROUND_COLOR_32 = 0xFF050017;
 static const unsigned int GOLD_COLOR_32 = 0xFF4AABCE;
 static const unsigned int BEIGE_COLOR_32 = 0xFFAFD8E9;
-static const unsigned int BEIGE_COLOR_HOVERED_32 = 0xFF3A9BBE;
-static const unsigned int BEIGE_COLOR_ACTIVE_32 = 0xFF2189AE;
+static const unsigned int BEIGE_COLOR_HOVERED_32 = 0xFF71B6D8;
+static const unsigned int BEIGE_COLOR_ACTIVE_32 = 0xFF509FCF;
 static const unsigned int BUTTON_COLOR_32 = 0xFF4BABCE;
 static const unsigned int BUTTON_COLOR_HOVERED_32 = 0xFF3693BC;
 static const unsigned int BUTTON_COLOR_ACTIVE_32 = 0xFF2C74A2;
