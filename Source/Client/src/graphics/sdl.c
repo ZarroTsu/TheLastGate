@@ -277,14 +277,22 @@ int sdl_init(const int windowed) {
     imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
     imgui_set_display_framebuffer_scale(1.0f, 1.0f);
 
-    font_sizes.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
-    font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 12);
-    font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 16);
-    font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 20);
-    font_sizes.big_header = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 24);
+    font_pixel_times = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+
+    font_sizes.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 10);
+    font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 12);
+    font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 16);
+    font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 24);
+    font_sizes.big_header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 28);
+
+    font_sizes_bold.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 10);
+    font_sizes_bold.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 12);
+    font_sizes_bold.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 16);
+    font_sizes_bold.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 24);
+    font_sizes_bold.big_header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 28);
 
 
-    imgui_set_default_font(font_sizes.normal);
+    imgui_set_default_font(font_pixel_times);
 
     return 0;
 }
