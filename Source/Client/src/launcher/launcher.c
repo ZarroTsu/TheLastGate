@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <io.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "inter.h"
 #include "main.h"
@@ -13,6 +15,8 @@
 #include "log/log.h"
 #include "ui/ui.h"
 #include "ui/imgui/imgui_wrapper.h"
+#include "net/connection.h"
+#include "net/socket.h"
 
 static const int window_flags =
         IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE | IMGUI_WINDOW_FLAG_NO_MOVE |
@@ -20,6 +24,8 @@ static const int window_flags =
 
 static SwitchCharacterConfirmState switch_confirm = {0};
 static char simple_popover_text[250];
+static int is_connecting = 0;
+static char status_buf[300];
 
 static const char *classes[] = {
     "Templar",
@@ -788,6 +794,22 @@ void launcher_render() {
 
         render_popovers();
 
+        if (is_connecting) {
+            ConnectionStatus status = connection_update();
+
+            sprintf(status_buf, "STATUS: %s", status.status_message);
+
+            if (status.state == CONNECTION_STATE_CONNECTED) {
+                is_connecting = 0;
+                save_options();
+                launching = false;
+            } else if (status.state == CONNECTION_STATE_ERROR) {
+                is_connecting = 0;
+                log_error("Connection failed: %s", status.error_message);
+                snprintf(simple_popover_text, sizeof(simple_popover_text), "Connection failed: %s", status.error_message);
+            }
+        }
+
         if (imgui_begin_table("LauncherLayout", 2, IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME | IMGUI_TABLE_FLAG_BORDERS)) {
             imgui_table_next_row(0, 40);
             imgui_table_next_column();
@@ -801,7 +823,19 @@ void launcher_render() {
 
         imgui_center_next_item(640);
         push_button_styles();
-        imgui_button_sized("Start", 120, 30);
+        if (imgui_button_sized("Start", 120, 30)) {
+            int race = get_race_from_class_gender();
+            int sex = current_gender + 1; /* Convert 0/1 to 1/2 */
+
+            strncpy(passwd, password, sizeof(passwd) - 1);
+            passwd[sizeof(passwd) - 1] = '\0';
+
+            save_options();
+
+            connection_init();
+            connection_start(race, sex);
+            is_connecting = 1;
+        }
         imgui_same_line(0, 10);
         if (imgui_button_sized("Load", 120, 30)) {
             load();
