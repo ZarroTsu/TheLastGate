@@ -1,13 +1,3 @@
-/*
- * INTER.C - User Interface and Input Handling
- *
- * TODO: MODERN GCC/MINGW COMPATIBILITY
- * ====================================
- * HEADERS:
- * - <windows.h> -> Remove or replace with SDL2 headers
- * - #pragma hdrstop -> Remove (Borland C++ specific)
- */
-
 #include <math.h>
 #include "common.h"
 #include "inter.h"

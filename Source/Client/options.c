@@ -1,20 +1,6 @@
 /*
  * OPTIONS.C - Game Options and Settings Dialog
  *
- * TODO: MODERN GCC/MINGW COMPATIBILITY
- * ====================================
- * HEADERS:
- * - <alloc.h> -> <malloc.h> or <stdlib.h>
- * - <io.h> -> <unistd.h> for POSIX
- * - <windows.h> -> SDL2 headers for dialogs
- * - <windowsx.h> -> Remove or replace with SDL2
- * - "ddraw.h" -> Remove (deprecated)
- * - <process.h> -> <pthread.h> or SDL_thread
- * - <dir.h> -> <dirent.h> on POSIX
- * - #pragma hdrstop -> Remove (Borland C++ specific)
- *
- * This file uses Windows dialogs extensively (OPENFILENAME, etc.)
- * For cross-platform, replace with SDL2 file dialogs or custom UI
  */
 
 #include <stdio.h>

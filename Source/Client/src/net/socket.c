@@ -1,31 +1,3 @@
-/*
- * SOCKET.C - Network Communication Layer
- *
- * TODO: MODERN GCC/MINGW COMPATIBILITY
- * ====================================
- * This file requires updates for modern compiler compatibility:
- *
- * HEADERS:
- * - <alloc.h> -> <malloc.h> or <stdlib.h>
- * - <io.h> -> <unistd.h> for POSIX or remove if not needed
- * - <windows.h> -> Remove, not needed for networking
- * - <winsock.h> -> <winsock2.h> for modern Windows, or use cross-platform sockets
- * - #pragma hdrstop -> Remove (Borland C++ specific)
- *
- * WINDOWS API:
- * - WSAStartup/WSACleanup -> Not needed on POSIX systems
- * - ioctlsocket -> ioctl() on POSIX, or fcntl() for non-blocking
- * - closesocket -> close() on POSIX
- * - MessageBox -> SDL_ShowSimpleMessageBox() for cross-platform
- * - HWND -> SDL_Window* for cross-platform
- *
- * CROSS-PLATFORM NETWORKING:
- * For true cross-platform support, use SDL_net or standard POSIX sockets
- * with conditional compilation for Windows-specific initialization.
- *
- * See individual TODO comments below for specific locations.
- */
-
 #include <stdio.h>
 #include <malloc.h>
 #include <fcntl.h>
