@@ -8,6 +8,7 @@ target_include_directories(TheLastGate PRIVATE
 
 target_link_libraries(TheLastGate PUBLIC
         # Core libraries
+        sdl2main    # SDL2main - provides WinMain entry point for SDL apps
         sdl2        # SDL2 core (will link statically if available)
         sdl2_image  # SDL2_image (dynamic - too many format dependencies)
         sdl2_mixer  # SDL2_mixer (dynamic - audio format dependencies)

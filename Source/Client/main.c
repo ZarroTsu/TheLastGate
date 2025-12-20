@@ -203,7 +203,7 @@ int parse_cmd(char *s)
 	return 1;
 }
 
-static void new_main() {
+int main(int argc, char *argv[]) {
 	log_init();
 	security_init();
 	SDLNet_Init();
@@ -215,8 +215,7 @@ static void new_main() {
 	launcher_init();
 	init_engine();
 
-	keybindings_init();
-	input_init();
+	if (!security_try_lock()) return 0;
 
 	launching = true;
 	while (!quit && launching) {
@@ -238,77 +237,16 @@ static void new_main() {
 		SDL_Delay(1);
 	}
 
-	engine();
-}
-
-// TODO: Modern GCC/MinGW - WinMain is Windows-specific entry point
-// SDL2: Replace with standard main() using SDL_main wrapper
-// Example:
-//   #define SDL_MAIN_HANDLED  // or use SDL_main.h
-//   int main(int argc, char* argv[]) {
-//     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-//     // ... rest of initialization
-//   }
-// TODO: Modern GCC/MinGW - PASCAL is obsolete keyword
-// MinGW: Use WINAPI instead (defined as __stdcall in windows.h)
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-				   LPSTR lpCmdLine, int nCmdShow)
-{
-	char buf[2048];
-	parse_cmd(lpCmdLine);
-	security_init();
-	log_init();
-	SDLNet_Init();
-
-
-	if (!security_try_lock()) return 0;
-
-	screen_renderdist=RENDERDIST;
-
-	setres_default();
-
-	// TODO: MinGW - Set hinst early so options() can use it before InitWindow()
-	hinst = hInstance;
-
-	keybindings_init();  // Initialize default keybindings BEFORE loading options
-	load_options();
-	options();  // Show options dialog BEFORE creating the game window
-	init_engine();
-
-	if (quit) exit(0);
-
-	sound_init();
-	int tmp = init(g_config.video.windowed);
-
-	if (tmp!=0) {
-
-		sprintf(buf,"|DDERROR=%d",-tmp);
-		say(buf);
-		SDL_Delay(1000);
-
-		// TODO: Revisit this, it needs way better logging...
-		sprintf(buf,
-				"SDL init failed with code %d.\n"
-				"Client Version %d.%02d.%02d\n"
-				"R=%04X, G=%04X, B=%04X\n"
-				-tmp,NETWORKING_VERSION>>16,(NETWORKING_VERSION>>8)&255,NETWORKING_VERSION&255,RED,GREEN,BLUE);
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Init failed", "Check error.log for logs", NULL);
-		exit(1);
-	}
-    sprintf(buf,"|R=%04X, G=%04X, B=%04X, RGBM=%d",RED,GREEN,BLUE);
-	say(buf);
-
+	keybindings_init();
 	input_init();
 
 	engine();
 
 	deinit();
-
 	save_options();
 
 	sound_shutdown();
 	security_release_lock();
 	SDLNet_Quit();
-
 	return 0;
 }
