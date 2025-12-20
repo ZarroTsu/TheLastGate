@@ -153,7 +153,15 @@ static int init_gfx_lib() {
         return -1;
     }
 
-    const int length = filelength(handle);
+    const off_t file_size = lseek(handle, 0, SEEK_END);
+    if (file_size == -1) {
+        log_error("Could not get file size: path=%s", file);
+        close(handle);
+        return -1;
+    }
+    lseek(handle, 0, SEEK_SET);
+
+    const int length = (int)file_size;
     gfx_lib = malloc(length);
     if (!gfx_lib) {
         log_error("Error allocating gfx_lib: lenth=%d", length);
