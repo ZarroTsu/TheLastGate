@@ -18,7 +18,7 @@ static GLuint load_shader(const char *source, GLenum type) {
     if (!success) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        log_critical("ERROR: Shader compilation failed (%s):\n%s\n", g_config.runtime.path, infoLog);
+        log_critical("ERROR: Shader compilation failed (%s):\n%s\n", g_config.runtime.base_path, infoLog);
         glDeleteShader(shader);
         return 0;
     }

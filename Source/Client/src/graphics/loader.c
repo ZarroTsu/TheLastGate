@@ -110,10 +110,10 @@ SDL_Surface *load_from_gfx_lib(const int nr) {
 
 SDL_Surface *load_from_file(int nr) {
     char name[256];
-    sprintf(name, "%sgfx\\%05d.png", g_config.runtime.path, nr);
+    sprintf(name, "%sgfx\\%05d.png", g_config.runtime.base_path, nr);
     SDL_Surface *surface = IMG_Load(name);
     if (!surface) {
-        sprintf(name, "%sgfx\\%05d.bmp", g_config.runtime.path, nr);
+        sprintf(name, "%sgfx\\%05d.bmp", g_config.runtime.base_path, nr);
         surface = SDL_LoadBMP(name);
     }
 
@@ -123,7 +123,7 @@ SDL_Surface *load_from_file(int nr) {
 static int init_png_lib() {
     char file[80];
 
-    snprintf(file, sizeof(file), "%spnglib.idx", g_config.runtime.path);
+    snprintf(file, sizeof(file), "%spnglib.idx", g_config.runtime.base_path);
     const int handle = open(file, O_RDONLY | O_BINARY);
     if (handle == -1) {
         log_error("Could not open pnglib.idx: path=%s", file);
@@ -135,7 +135,7 @@ static int init_png_lib() {
         if (r != sizeof(png_index[i])) { break; } // Nothing left to read
     }
 
-    snprintf(file, sizeof(file), "%spnglib.dat", g_config.runtime.path);
+    snprintf(file, sizeof(file), "%spnglib.dat", g_config.runtime.base_path);
     png_lib = fopen(file, "rb");
     if (png_lib == NULL) {
         log_error("Could not open pnglib.dat: path=%s", file);
@@ -147,7 +147,7 @@ static int init_png_lib() {
 
 static int init_gfx_lib() {
     char file[256];
-    snprintf(file, sizeof(file), "%sgx00.idx", g_config.runtime.path);
+    snprintf(file, sizeof(file), "%sgx00.idx", g_config.runtime.base_path);
     const int handle = open(file, O_RDONLY | O_BINARY);
     if (handle == -1) {
         log_error("Could not open gx00.idx: path=%s", file);
@@ -169,7 +169,7 @@ static int init_gfx_lib() {
     read(handle, gfx_lib, length);
     close(handle);
 
-    sprintf(file, "%sgx00.dat", g_config.runtime.path);
+    sprintf(file, "%sgx00.dat", g_config.runtime.base_path);
     gfx_handle = open(file, O_RDONLY | O_BINARY);
     if (gfx_handle == -1) {
         log_error("Could not open gx00.dat: path=%s", file);

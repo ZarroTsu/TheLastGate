@@ -188,9 +188,9 @@ int parse_cmd(char *s)
 			if (tolower(*s)=='d') {
 				s++;
 				while (isspace(*s)) s++;
-				n=0; while (n<150 && *s && !isspace(*s)) g_config.runtime.path[n++]=*s++;
-				if (g_config.runtime.path[n]!='\\') g_config.runtime.path[n++]='\\';
-				g_config.runtime.path[n]=0;
+				n=0; while (n<150 && *s && !isspace(*s)) g_config.runtime.base_path[n++]=*s++;
+				if (g_config.runtime.base_path[n]!='\\') g_config.runtime.base_path[n++]='\\';
+				g_config.runtime.base_path[n]=0;
 			} else if (tolower(*s)=='p') {
 				s++;
 				while (isspace(*s)) s++;
