@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <malloc.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include "main.h"

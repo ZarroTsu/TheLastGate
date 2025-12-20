@@ -4,7 +4,7 @@
  */
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include "common.h"
 #include "inter.h"

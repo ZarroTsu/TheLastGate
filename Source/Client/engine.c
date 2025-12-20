@@ -19,7 +19,6 @@
  * See individual TODO comments below for specific locations.
  */
 
-#include <malloc.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
