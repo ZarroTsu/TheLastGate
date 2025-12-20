@@ -578,9 +578,9 @@ void sdl_load_sprite(const int nr) {
     // Fallback to sprite #35 if not found
     if (!surface && nr != 35) {
         log_warning("Sprite %d not found, using fallback sprite #35\n", nr);
-        surface = load_from_file(nr);
-        if (!surface) surface = load_from_png_lib(nr);
-        if (!surface) surface = load_from_gfx_lib(nr);
+        surface = load_from_file(35);
+        if (!surface) surface = load_from_png_lib(35);
+        if (!surface) surface = load_from_gfx_lib(35);
     }
 
     if (!surface) {
@@ -672,7 +672,7 @@ void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff) {
 
     sdl_load_sprite(nr);
     if (!sprite_data[nr].gl_texture) {
-        xlog(0, "No sprite found for sprite %s", nr);
+        xlog(0, "No sprite found for sprite %d", nr);
         return;
     }
 
