@@ -29,6 +29,7 @@ typedef struct {
 } SwitchCharacterConfirmState;
 
 void launcher_init(void);
+void launcher_shutdown(void);
 void launcher_render(void);
 
 void launcher_set_fyi(const char* text);

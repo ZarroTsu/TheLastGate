@@ -341,10 +341,13 @@ static void left_column() {
         pop_sub_header_styles();
         imgui_dummy(0, 15);
         if (imgui_begin_child("previous_character_list", -1, -1, false, IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR)) {
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < get_previous_characters()->count; i++) {
+                PreviousCharacterEntry entry = get_previous_characters()->entries[i];
                 push_button_styles();
                 imgui_center_next_item(240);
-                imgui_button_sized("WorldofBiting", 240, 24);
+                if (imgui_button_sized(entry.name, 240, 24)) {
+                    load_character_from_file(entry.file_path);
+                }
                 pop_button_styles();
             }
         }
@@ -422,6 +425,11 @@ static void right_column() {
 
 void launcher_init() {
     okey_to_class_gender(&current_class, &current_gender);
+    init_previous_characters();
+}
+
+void launcher_shutdown() {
+    save_previous_characters();
 }
 
 static void load() {
