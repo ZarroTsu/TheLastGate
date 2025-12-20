@@ -129,8 +129,55 @@ static void pop_checkbox_styles() {
     imgui_pop_style_var(1);
 }
 
+static void push_dropdown_styles() {
+    imgui_push_style_color_32(IMGUI_COL_POPUP_BG, POPOVER_BACKGROUND_32);
+}
+
+static void pop_dropdown_styles() {
+    imgui_pop_style_color(1);
+}
+
+static void push_dropdown_input_styles() {
+    imgui_push_style_var_float(IMGUI_STYLE_VAR_FRAME_BORDER_SIZE, 2);
+    imgui_push_style_color_32(IMGUI_COL_BORDER, BORDERS_32);
+
+    imgui_push_style_color_32(IMGUI_COL_FRAME_BG, BEIGE_COLOR_32);
+    imgui_push_style_color_32(IMGUI_COL_FRAME_BG_HOVERED, BEIGE_COLOR_HOVERED_32);
+    imgui_push_style_color_32(IMGUI_COL_FRAME_BG_ACTIVE, BEIGE_COLOR_ACTIVE_32);
+    imgui_push_style_color_32(IMGUI_COL_TEXT, 0xFF000000);
+
+    imgui_push_style_color_32(IMGUI_COL_INPUT_TEXT_CURSOR, 0xFF000000);
+}
+
+static void pop_dropdown_input_styles() {
+    imgui_pop_style_color(6);
+    imgui_pop_style_var(1);
+}
+
+static void push_dropdown_popover_styles() {
+    imgui_push_style_var_float(IMGUI_STYLE_VAR_POPUP_BORDER_SIZE, 2);
+    imgui_push_style_color_32(IMGUI_COL_HEADER, DROPDOWN_SELECTED_32);
+    imgui_push_style_color_32(IMGUI_COL_HEADER_HOVERED, DROPDOWN_HIGHLIGHT_32);
+    imgui_push_style_color_32(IMGUI_COL_HEADER_ACTIVE, DROPDOWN_ACTIVE_32);
+
+    imgui_push_style_color_32(IMGUI_COL_BORDER, BORDERS_32);
+}
+
+static void pop_dropdown_popover_styles() {
+    imgui_pop_style_color(4);
+    imgui_pop_style_var(1);
+}
+
 static void shared_dropdown(const char *id, const char **options, int option_count, int *current_option) {
-    if (imgui_begin_combo(id, options[*current_option], 0)) {
+
+    push_dropdown_styles();
+
+    push_dropdown_input_styles();
+    bool opened = imgui_begin_combo(id, options[*current_option], IMGUI_COMBO_FLAG_NO_ARROW_BUTTON);
+    pop_dropdown_input_styles();
+
+    push_dropdown_popover_styles();
+    if (opened) {
         for (int i = 0; i < option_count; i++) {
             bool selected = (*current_option == i);
 
@@ -144,6 +191,8 @@ static void shared_dropdown(const char *id, const char **options, int option_cou
         }
         imgui_end_combo();
     }
+    pop_dropdown_popover_styles();
+    pop_dropdown_styles();
 }
 
 static void left_column() {
