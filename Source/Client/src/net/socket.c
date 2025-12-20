@@ -106,10 +106,6 @@ char *logout_reason[]={
 "You have been banned for an hour. Enhance your social behavior before you come back."                 //14
 };
 
-// TODO: Modern GCC/MinGW - HWND is Windows-specific
-// SDL2: Use SDL_Window* instead
-extern HWND desk_hwnd;
-
 int xrecv(TCPsocket sock, char *buf, int len, int flags) {
 	int ret, size = 0;
 
@@ -122,29 +118,19 @@ int xrecv(TCPsocket sock, char *buf, int len, int flags) {
 	return size;
 }
 
-void so_error(char *err)
+void so_error(const char *err)
 {
-	char buf[250];
-
 	deinit();
 
 	save_options();
 
 	if (!do_exit) {
-		// TODO: Modern GCC/MinGW - WSAGetLastError is Winsock-specific
-		// POSIX: Use errno and strerror() instead
-		// Example: sprintf(buf, "Error: %s (%s)", err, strerror(errno));
-		sprintf(buf,"Error: %s (%d)",err,WSAGetLastError());
-		// TODO: Modern GCC/MinGW - MessageBox is Windows-specific
-		// SDL2: Use SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Irregular Exit", buf, NULL);
-		MessageBox(desk_hwnd,buf,"Irregular Exit",MB_ICONSTOP|MB_OK);
+		log_error("Networking Error: %s", err);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"Irregular Exit",err, NULL);
 	}
 
 	exit(0);
 }
-
-// TODO: Modern GCC/MinGW - Function takes HWND parameter (Windows-specific)
-void convert(HWND hwnd);
 
 // ---------------------------------
 
@@ -1100,45 +1086,13 @@ void so_perf_report(int ticksize,int skip,int idle)
 	xsend(buf);
 }
 
-int non_critical_socket_error(void)
-{
-    int err;
-
-    err=WSAGetLastError();
-    WSASetLastError(0);
-
-    switch(err) {
-        case 0:
-        case WSAEWOULDBLOCK:
-        case WSAEINTR:
-        case WSAEINPROGRESS:        return 1;
-
-        case WSAEFAULT:
-        case WSAENETDOWN:
-        case WSAENOTCONN:
-        case WSAENETRESET:
-        case WSAENOTSOCK:
-        case WSAEOPNOTSUPP:
-        case WSAESHUTDOWN:
-        case WSAEMSGSIZE:
-        case WSAEINVAL:
-        case WSAECONNABORTED:
-        case WSAETIMEDOUT:
-        case WSAECONNRESET:
-        case WSANOTINITIALISED:    return 0;
-    }
-
-    return 0;
-}
-
 void xsend(unsigned char *buf) {
 	int len = 0, ret;
 
 	while (len < 16) {
 		ret = SDLNet_TCP_Send(sock, buf + len, 16 - len);
 		if (ret < 0) {
-			if (!non_critical_socket_error()) so_error("transmit buffer overflow");
-			continue;
+			so_error(SDLNet_GetError());
 		}
 		len += ret;
 	}
