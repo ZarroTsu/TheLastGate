@@ -8,8 +8,8 @@ extern int unique1;
 extern int unique2;
 
 /* Initializes common security based functionality */
-void init_security(void);
-void shutdown_security(void);
+void security_init(void);
+void security_shutdown(void);
 
 /* Methods for ensuring a single instance is running */
 bool security_try_lock();

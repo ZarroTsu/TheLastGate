@@ -48,7 +48,7 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
     return NONE;
 }
 
-void init_input(void) {
+void input_init(void) {
     if (!g_config.ui.enter_to_talk) {
         SDL_StartTextInput();
     } else {

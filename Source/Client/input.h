@@ -7,7 +7,7 @@ extern SDL_Event input_events[128];
 extern int input_event_count;
 extern bool waiting_for_keybind;
 
-void init_input(void);
+void input_init(void);
 
 void sync_chat_input_state(void);
 

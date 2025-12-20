@@ -28,7 +28,7 @@ int unique1 = 0, unique2 = 0;
 
 char *pref_path = NULL;
 
-void init_security(void) {
+void security_init(void) {
     pref_path = SDL_GetPrefPath("TheLastGate", "TheLastGate");
     if (!pref_path) {
         log_error("Failed to get preferences path: %s", SDL_GetError());
@@ -38,7 +38,7 @@ void init_security(void) {
     log_info("Preferences directory: %s", pref_path);
 }
 
-void shutdown_security(void) {
+void security_shutdown(void) {
     if (pref_path) {
         SDL_free(pref_path);
         pref_path = NULL;

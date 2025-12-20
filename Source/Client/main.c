@@ -205,18 +205,18 @@ int parse_cmd(char *s)
 
 static void new_main() {
 	log_init();
-	init_security();
+	security_init();
 	SDLNet_Init();
 	load_options();
 	screen_renderdist=RENDERDIST;
 	setres_default();
-	init_sound();
+	sound_init();
 	init(g_config.video.windowed);
 	launcher_init();
 	init_engine();
 
 	keybindings_init();
-	init_input();
+	input_init();
 
 	launching = true;
 	while (!quit && launching) {
@@ -255,11 +255,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				   LPSTR lpCmdLine, int nCmdShow)
 {
 	char buf[2048];
-	new_main();
-	SDL_Quit();
-	exit(1);
 	parse_cmd(lpCmdLine);
-	init_security();
+	security_init();
 	log_init();
 	SDLNet_Init();
 
@@ -280,7 +277,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if (quit) exit(0);
 
-	init_sound();
+	sound_init();
 	int tmp = init(g_config.video.windowed);
 
 	if (tmp!=0) {
@@ -301,7 +298,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     sprintf(buf,"|R=%04X, G=%04X, B=%04X, RGBM=%d",RED,GREEN,BLUE);
 	say(buf);
 
-	init_input();
+	input_init();
 
 	engine();
 
@@ -309,7 +306,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	save_options();
 
-	cleanup_sound();
+	sound_shutdown();
 	security_release_lock();
 	SDLNet_Quit();
 

@@ -30,7 +30,7 @@ static void channel_finished(int channel) {
     }
 }
 
-int init_sound() {
+int sound_init() {
     if (Mix_OpenAudio(44100, AUDIO_F32SYS, 2, 2048) < 0) return -1;
     Mix_AllocateChannels(10);
     Mix_ChannelFinished(channel_finished);
@@ -125,7 +125,7 @@ int play_sound(const char *file, const int vol, const int p) {
     return channel;
 }
 
-void cleanup_sound(void) {
+void sound_shutdown(void) {
     // Stop all channels
     Mix_HaltChannel(-1);
 
