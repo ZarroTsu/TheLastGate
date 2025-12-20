@@ -196,17 +196,17 @@ void okey_to_class_gender(int *out_class, int *out_gender) {
 
 int class_gender_to_okey(const int class, int gender) {
     static const int race_map[12][2] = {
-        {4, 5},     /* 0: Templar M/F */
-        {6, 7},     /* 1: Mercenary M/F */
-        {8, 9},     /* 2: Harakim M/F */
-        {12, 13},   /* 3: Arch-Templar M/F */
-        {14, 15},   /* 4: Skald/Pugilist M/F */
-        {16, 17},   /* 5: Warrior M/F */
-        {10, 11},   /* 6: Seyan M/F */
-        {18, 19},   /* 7: Sorcerer M/F */
-        {20, 21},   /* 8: Summoner M/F */
-        {22, 23},   /* 9: Arch-Harakim M/F */
-        {2, 3},     /* 10: Braver M/F */
+        {4, 5}, /* 0: Templar M/F */
+        {6, 7}, /* 1: Mercenary M/F */
+        {8, 9}, /* 2: Harakim M/F */
+        {12, 13}, /* 3: Arch-Templar M/F */
+        {14, 15}, /* 4: Skald/Pugilist M/F */
+        {16, 17}, /* 5: Warrior M/F */
+        {10, 11}, /* 6: Seyan M/F */
+        {18, 19}, /* 7: Sorcerer M/F */
+        {20, 21}, /* 8: Summoner M/F */
+        {22, 23}, /* 9: Arch-Harakim M/F */
+        {2, 3}, /* 10: Braver M/F */
         {1554, 1554} /* 11: Lycanthrope (M only) */
     };
 

@@ -617,7 +617,8 @@ void launcher_render() {
             } else if (status.state == CONNECTION_STATE_ERROR) {
                 is_connecting = 0;
                 log_error("Connection failed: %s", status.error_message);
-                snprintf(simple_popover_text, sizeof(simple_popover_text), "Connection failed: %s", status.error_message);
+                snprintf(simple_popover_text, sizeof(simple_popover_text), "Connection failed: %s",
+                         status.error_message);
                 imgui_open_popup("FYI");
             }
         }
