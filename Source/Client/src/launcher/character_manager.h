@@ -1,5 +1,10 @@
 #pragma once
 
+typedef struct {
+    char name[40];
+    char file_path[512];
+} PreviousCharacterEntry;
+
 void load_character_from_file(const char *file_path);
 void save_character_to_file(const char *file_path);
 void create_new_character();
