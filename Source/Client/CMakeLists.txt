@@ -126,6 +126,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "PGO-Use")
     )
 endif ()
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2_setup.cmake)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/link_libraries.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake)

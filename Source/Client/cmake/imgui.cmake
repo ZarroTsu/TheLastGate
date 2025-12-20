@@ -42,9 +42,11 @@ target_include_directories(imgui_wrapper PUBLIC
     ${IMGUI_DIR}/backends                 # For backends
 )
 
-# Find SDL2 (should already be found by main project, but ensure it's available)
-find_package(SDL2 REQUIRED)
-target_include_directories(imgui_wrapper PRIVATE ${SDL2_INCLUDE_DIRS})
+# SDL2 include directories are set by cmake/sdl2_setup.cmake (already included)
+# Both Linux and Windows need this
+if(SDL2_INCLUDE_DIRS)
+    target_include_directories(imgui_wrapper PRIVATE ${SDL2_INCLUDE_DIRS})
+endif()
 
 # Link OpenGL (GLAD is already included in main project)
 # ImGui needs to know about OpenGL but doesn't link directly
