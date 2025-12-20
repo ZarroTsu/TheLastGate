@@ -8,7 +8,6 @@
  * - #pragma hdrstop -> Remove (Borland C++ specific)
  */
 
-#include <windows.h>  // TODO: Remove or replace with SDL2 headers
 #include <math.h>
 #include "common.h"
 #include "inter.h"
@@ -22,6 +21,7 @@
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
 #include "ui/option_window.h"
+#include "util/math_util.h"
 
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)
 int gui_inv_up[] 	= { 600,   5, 612,  35 };
@@ -221,10 +221,15 @@ int trans_button(int x,int y)
 void button_command(int nr)
 {
 	int sk, keys;
+	SDL_Keymod mods = SDL_GetModState();
 	
 	keys=0;
-	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
+
+	if (mods & KMOD_SHIFT)
+		keys |= 1;
+
+	if ((mods & KMOD_CTRL) || (mods & KMOD_ALT))
+		keys |= 2;
 
 	switch (nr) 
 	{
@@ -587,9 +592,11 @@ int mouse_inventory(int x,int y,int mode)
 	static int firstrclick = 0;
 
 	keys=0;
-	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
-	if (GetAsyncKeyState(VK_MENU)&0x8000) keys|=4;
+	SDL_Keymod mods = SDL_GetModState();
+
+	if (mods & KMOD_SHIFT) keys |= 1;
+	if (mods & KMOD_CTRL)  keys |= 2;
+	if (mods & KMOD_ALT)   keys |= 4;
 	
 	// money - 10,000.00
 	if (x>gui_coin[0] && x<gui_coin[0]+34 && y>gui_coin[3] && y<gui_coin[3]+34) 
@@ -929,8 +936,13 @@ int mouse_statbox(int x,int y,int state)
 	int n,m,keys,ret=0;
 
 	keys=0;
-	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if ((GetAsyncKeyState(VK_CONTROL)&0x8000) || (GetAsyncKeyState(VK_MENU)&0x8000)) keys|=2;
+	SDL_Keymod mods = SDL_GetModState();
+
+	if (mods & KMOD_SHIFT)
+		keys |= 1;
+
+	if ((mods & KMOD_CTRL) || (mods & KMOD_ALT))
+		keys |= 2;
 
 	if (state==MS_LB_UP) 
 	{
@@ -1423,9 +1435,11 @@ void mouse_mapbox(int x,int y,int state)
 	}
 
 	keys=0;
-	if (GetAsyncKeyState(VK_SHIFT)&0x8000) keys|=1;
-	if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
-	if (GetAsyncKeyState(VK_MENU)&0x8000) keys|=4;
+	SDL_Keymod mods = SDL_GetModState();
+
+	if (mods & KMOD_SHIFT) keys |= 1;
+	if (mods & KMOD_CTRL)  keys |= 2;
+	if (mods & KMOD_ALT)   keys |= 4;
 
 	if (keys==0) {
 		tile_x=mx; tile_y=my;
@@ -1694,9 +1708,11 @@ int mouse_shop(int x,int y,int mode)
 	
 	if (show_shop==110 || show_shop==111) // Blacksmith
 	{
-		if (GetAsyncKeyState(VK_SHIFT)&0x8000)   keys|=1;
-		if (GetAsyncKeyState(VK_CONTROL)&0x8000) keys|=2;
-		if (GetAsyncKeyState(VK_MENU)&0x8000)    keys|=4;
+		SDL_Keymod mods = SDL_GetModState();
+
+		if (mods & KMOD_SHIFT) keys |= 1;
+		if (mods & KMOD_CTRL)  keys |= 2;
+		if (mods & KMOD_ALT)   keys |= 4;
 	
 		// [X]
 		if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y+80) && y<(GUI_SHOP_Y+94)) 
@@ -1746,7 +1762,10 @@ int mouse_shop(int x,int y,int mode)
 		
 		return 0;
 	}
-	if ((GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
+	SDL_Keymod mods = SDL_GetModState();
+
+	if ((mods & KMOD_CTRL) || (mods & KMOD_ALT))
+		keys = 1;
 	
 	// [X]
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
@@ -1836,7 +1855,12 @@ int mouse_wps(int x,int y,int mode)
 	if (!show_wps) return 0;
 	
 	keys=0;
-	if ((GetAsyncKeyState(VK_SHIFT)&0x8000)||(GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
+	SDL_Keymod mods = SDL_GetModState();
+
+	if ((mods & KMOD_SHIFT) ||
+		(mods & KMOD_CTRL)  ||
+		(mods & KMOD_ALT))
+		keys = 1;
 	
 	// Close Window
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
@@ -1910,7 +1934,12 @@ int mouse_tree(int x, int y, int mode)
 	if (!show_tree) return 0;
 	
 	keys=0;
-	if ((GetAsyncKeyState(VK_SHIFT)&0x8000)||(GetAsyncKeyState(VK_CONTROL)&0x8000)||(GetAsyncKeyState(VK_MENU)&0x8000)) keys=1;
+	SDL_Keymod mods = SDL_GetModState();
+
+	if ((mods & KMOD_SHIFT) ||
+		(mods & KMOD_CTRL)  ||
+		(mods & KMOD_ALT))
+		keys = 1;
 	
 	// Close Window
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
