@@ -4,6 +4,7 @@
 #include <io.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "inter.h"
 #include "launcher.h"
@@ -41,6 +42,8 @@ void load_character_from_file(const char *file_path) {
         }
     }
 
+    add_to_previous_characters(okey.name, file_path);
+
     close(file);
     pdata.changed = 1;
 }
@@ -59,6 +62,8 @@ void save_character_to_file(const char *file_path) {
     write(file, &okey, sizeof(struct key));
     write(file, &pdata, sizeof(struct pdata));
     close(file);
+
+    add_to_previous_characters(okey.name, file_path);
 
     log_info("Saved file as %s", file_path);
     snprintf(buf, sizeof(buf), "Saved file as %s", file_path);
@@ -214,4 +219,220 @@ int class_gender_to_okey(const int class, int gender) {
     if (gender < 0 || gender > 1) gender = 0;
 
     return race_map[class][gender];
+}
+
+static PreviousCharactersList g_previous_characters = {0};
+
+const PreviousCharactersList* get_previous_characters(void) {
+    return &g_previous_characters;
+}
+
+void add_to_previous_characters(const char *name, const char *file_path) {
+    int i;
+    int found_index = -1;
+
+    if (name == NULL || file_path == NULL) {
+        return;
+    }
+
+    /* Search for existing entry with matching file_path */
+    for (i = 0; i < g_previous_characters.count; i++) {
+        if (strcmp(g_previous_characters.entries[i].file_path, file_path) == 0) {
+            found_index = i;
+            break;
+        }
+    }
+
+    if (found_index != -1) {
+        /* Entry exists - update name if different and move to front */
+        PreviousCharacterEntry temp = g_previous_characters.entries[found_index];
+
+        /* Update name */
+        strncpy(temp.name, name, sizeof(temp.name) - 1);
+        temp.name[sizeof(temp.name) - 1] = '\0';
+
+        /* Shift entries down to make room at index 0 */
+        for (i = found_index; i > 0; i--) {
+            g_previous_characters.entries[i] = g_previous_characters.entries[i - 1];
+        }
+
+        /* Place at front */
+        g_previous_characters.entries[0] = temp;
+    } else {
+        /* Entry doesn't exist - add new entry */
+        PreviousCharacterEntry new_entry;
+
+        /* Copy name and file_path */
+        strncpy(new_entry.name, name, sizeof(new_entry.name) - 1);
+        new_entry.name[sizeof(new_entry.name) - 1] = '\0';
+
+        strncpy(new_entry.file_path, file_path, sizeof(new_entry.file_path) - 1);
+        new_entry.file_path[sizeof(new_entry.file_path) - 1] = '\0';
+
+        /* If list is full, we'll overwrite the last entry */
+        if (g_previous_characters.count >= MAX_PREVIOUS_CHARACTERS) {
+            /* Shift all entries down (oldest one at end will be lost) */
+            for (i = MAX_PREVIOUS_CHARACTERS - 1; i > 0; i--) {
+                g_previous_characters.entries[i] = g_previous_characters.entries[i - 1];
+            }
+            g_previous_characters.entries[0] = new_entry;
+            /* count stays at MAX_PREVIOUS_CHARACTERS */
+        } else {
+            /* List not full - shift entries down and increment count */
+            for (i = g_previous_characters.count; i > 0; i--) {
+                g_previous_characters.entries[i] = g_previous_characters.entries[i - 1];
+            }
+            g_previous_characters.entries[0] = new_entry;
+            g_previous_characters.count++;
+        }
+    }
+}
+
+void remove_from_previous_characters(const char *file_path) {
+    int i;
+    int found_index = -1;
+
+    if (file_path == NULL) {
+        return;
+    }
+
+    /* Search for entry with matching file_path */
+    for (i = 0; i < g_previous_characters.count; i++) {
+        if (strcmp(g_previous_characters.entries[i].file_path, file_path) == 0) {
+            found_index = i;
+            break;
+        }
+    }
+
+    if (found_index != -1) {
+        /* Shift all entries after it up one position */
+        for (i = found_index; i < g_previous_characters.count - 1; i++) {
+            g_previous_characters.entries[i] = g_previous_characters.entries[i + 1];
+        }
+        g_previous_characters.count--;
+    }
+}
+
+static void cleanup_invalid_paths(void) {
+    int i;
+    int removed_any = 0;
+    struct stat st;
+
+    /* Iterate backwards so removal doesn't affect iteration */
+    for (i = g_previous_characters.count - 1; i >= 0; i--) {
+        /* Check if file exists using stat (cross-platform) */
+        if (stat(g_previous_characters.entries[i].file_path, &st) != 0) {
+            /* File doesn't exist - remove this entry */
+            log_info("Removing invalid character path: %s", g_previous_characters.entries[i].file_path);
+            remove_from_previous_characters(g_previous_characters.entries[i].file_path);
+            removed_any = 1;
+        }
+    }
+
+    /* If we removed any entries, save the cleaned list */
+    if (removed_any) {
+        save_previous_characters();
+    }
+}
+
+void save_previous_characters(void) {
+    int handle;
+    unsigned int version = 1;
+    int i;
+
+    handle = open("TLGCharacters.dat", O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, 0666);
+    if (handle == -1) {
+        log_error("Could not save TLGCharacters.dat");
+        return;
+    }
+
+    /* Write version */
+    if (write(handle, &version, sizeof(version)) != sizeof(version)) {
+        log_error("Failed to write version to TLGCharacters.dat");
+        close(handle);
+        return;
+    }
+
+    /* Write count */
+    if (write(handle, &g_previous_characters.count, sizeof(g_previous_characters.count)) != sizeof(g_previous_characters.count)) {
+        log_error("Failed to write count to TLGCharacters.dat");
+        close(handle);
+        return;
+    }
+
+    /* Write entries */
+    for (i = 0; i < g_previous_characters.count; i++) {
+        if (write(handle, &g_previous_characters.entries[i], sizeof(PreviousCharacterEntry)) != sizeof(PreviousCharacterEntry)) {
+            log_error("Failed to write entry %d to TLGCharacters.dat", i);
+            close(handle);
+            return;
+        }
+    }
+
+    close(handle);
+    log_info("Saved %d previous characters to TLGCharacters.dat", g_previous_characters.count);
+}
+
+void load_previous_characters(void) {
+    int handle;
+    unsigned int version;
+    unsigned int count;
+    int i;
+
+    /* Initialize to empty state */
+    g_previous_characters.count = 0;
+    memset(g_previous_characters.entries, 0, sizeof(g_previous_characters.entries));
+
+    handle = open("TLGCharacters.dat", O_RDONLY | O_BINARY);
+    if (handle == -1) {
+        /* File doesn't exist yet - not an error for first run */
+        log_info("TLGCharacters.dat not found, starting with empty list");
+        return;
+    }
+
+    /* Read version */
+    if (read(handle, &version, sizeof(version)) != sizeof(version)) {
+        log_error("Failed to read version from TLGCharacters.dat");
+        close(handle);
+        return;
+    }
+
+    /* Validate version */
+    if (version < 1) {
+        log_error("Invalid version in TLGCharacters.dat: %u", version);
+        close(handle);
+        return;
+    }
+
+    /* Read count */
+    if (read(handle, &count, sizeof(count)) != sizeof(count)) {
+        log_error("Failed to read count from TLGCharacters.dat");
+        close(handle);
+        return;
+    }
+
+    /* Validate count */
+    if (count > MAX_PREVIOUS_CHARACTERS) {
+        log_error("Invalid count in TLGCharacters.dat: %u (max %d)", count, MAX_PREVIOUS_CHARACTERS);
+        close(handle);
+        return;
+    }
+
+    /* Read entries */
+    for (i = 0; i < (int)count; i++) {
+        if (read(handle, &g_previous_characters.entries[i], sizeof(PreviousCharacterEntry)) != sizeof(PreviousCharacterEntry)) {
+            log_error("Failed to read entry %d from TLGCharacters.dat", i);
+            close(handle);
+            return;
+        }
+    }
+
+    g_previous_characters.count = count;
+    close(handle);
+    log_info("Loaded %d previous characters from TLGCharacters.dat", g_previous_characters.count);
+}
+
+void init_previous_characters(void) {
+    load_previous_characters();
+    cleanup_invalid_paths();
 }
