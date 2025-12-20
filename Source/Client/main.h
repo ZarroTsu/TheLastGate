@@ -18,6 +18,7 @@ extern int chat_mode_active;
 extern int logstart;
 extern int logtimer;
 extern int mx, my;
+extern bool launching;
 
 extern int do_alpha;
 extern int do_shadow;

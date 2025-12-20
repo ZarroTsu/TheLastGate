@@ -36,6 +36,7 @@ SDL_Cursor* cursors[10];
 void cmd(int cmd,int x,int y);
 
 int quit=0;
+bool launching = 0;
 
 
 // TODO: Modern GCC/MinGW - Windows-specific window handles
@@ -206,16 +207,19 @@ static void new_main() {
 	log_init();
 	init_security();
 	SDLNet_Init();
-	keybindings_init();
-	init_input();
+	load_options();
 	screen_renderdist=RENDERDIST;
 	setres_default();
-	load_options();
 	init_sound();
 	init(g_config.video.windowed);
 	launcher_init();
+	init_engine();
 
-	while (!quit) {
+	keybindings_init();
+	init_input();
+
+	launching = true;
+	while (!quit && launching) {
 		handle_input();
 
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -233,6 +237,8 @@ static void new_main() {
 		SDL_GL_SwapWindow(renderer.window);
 		SDL_Delay(1);
 	}
+
+	engine();
 }
 
 // TODO: Modern GCC/MinGW - WinMain is Windows-specific entry point
