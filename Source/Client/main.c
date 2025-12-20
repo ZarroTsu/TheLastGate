@@ -237,6 +237,8 @@ int main(int argc, char *argv[]) {
 		SDL_Delay(1);
 	}
 
+	launcher_shutdown();
+
 	keybindings_init();
 	input_init();
 
