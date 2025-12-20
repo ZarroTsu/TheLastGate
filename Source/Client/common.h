@@ -14,6 +14,17 @@
 #define MHELP			"https://github.com/ZarroTsu/TheLastGate"
 #define MNEWS			"https://discord.gg/jJbPv2R"
 
+/* Platform-specific file I/O compatibility */
+#ifdef _WIN32
+	#include <io.h>
+	#ifndef O_BINARY
+		#define O_BINARY 0
+	#endif
+#else
+	#include <unistd.h>
+	#define O_BINARY 0     /* Not needed on POSIX systems */
+#endif
+
 //#define DOCONVERT	// enable sprite packer
 
 #define TICKMULTI		2

@@ -5,7 +5,6 @@
 #include "loader.h"
 
 #include <fcntl.h>
-#include <io.h>
 #include <stdio.h>
 #include <SDL2/SDL_image.h>
 

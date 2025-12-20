@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include "common.h"
 #include "inter.h"
 #include "main.h"
