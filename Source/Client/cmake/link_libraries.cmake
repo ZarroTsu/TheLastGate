@@ -7,20 +7,19 @@ target_include_directories(TheLastGate PRIVATE
 )
 
 target_link_libraries(TheLastGate PUBLIC
-        # Core libraries
-        sdl2main    # SDL2main - provides WinMain entry point for SDL apps
+        # Core cross-platform libraries
         sdl2        # SDL2 core (will link statically if available)
         sdl2_image  # SDL2_image (dynamic - too many format dependencies)
         sdl2_mixer  # SDL2_mixer (dynamic - audio format dependencies)
         sdl2_net    # SDL2_net (cross-platform networking)
         png         # libpng
         z           # zlib
-
-
-        # Legacy DirectDraw/DirectSound
-        ddraw
-        dsound
-
-        # Windows system libraries (for static SDL2 core)
-        ws2_32
 )
+
+# Platform-specific libraries
+if(WIN32)
+    target_link_libraries(TheLastGate PUBLIC
+            sdl2main    # SDL2main - provides WinMain entry point
+            ws2_32      # Windows socket library
+    )
+endif()
