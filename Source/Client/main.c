@@ -38,13 +38,6 @@ void cmd(int cmd,int x,int y);
 int quit=0;
 bool launching = 0;
 
-
-// TODO: Modern GCC/MinGW - Windows-specific window handles
-// SDL2: Use SDL_Window* instead of HWND
-// HINSTANCE not needed in SDL2
-HWND desk_hwnd;      // TODO: Replace with SDL_Window*
-HINSTANCE hinst;     // TODO: Remove - not needed in SDL2
-
 void engine(void);
 
 #define MWORD 2048
