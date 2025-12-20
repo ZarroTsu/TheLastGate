@@ -1,6 +1,4 @@
-﻿#include <ddraw.h>
-
-#include "sdl.h"
+﻿#include "sdl.h"
 #include "render.h"
 
 #include <stdio.h>
