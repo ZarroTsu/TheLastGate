@@ -297,6 +297,26 @@ int sdl_init(const int windowed) {
     return 0;
 }
 
+void sdl_set_fullscreen(int windowed) {
+    if (!renderer.window) return;
+
+    if (windowed) {
+        SDL_SetWindowFullscreen(renderer.window, 0);
+        SDL_SetWindowSize(renderer.window, SCREEN_WIDTH, SCREEN_HEIGHT);
+        SDL_SetWindowPosition(renderer.window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        SDL_SetWindowBordered(renderer.window, SDL_TRUE);
+    } else {
+        SDL_DisplayMode mode;
+        SDL_GetDesktopDisplayMode(0, &mode);
+        SDL_SetWindowBordered(renderer.window, SDL_FALSE);
+        SDL_SetWindowSize(renderer.window, mode.w, mode.h);
+        SDL_SetWindowPosition(renderer.window, 0, 0);
+        SDL_SetWindowFullscreen(renderer.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+
+    SDL_GetWindowSize(renderer.window, &g_config.video.window_size[0], &g_config.video.window_size[1]);
+}
+
 void sdl_deinit(void) {
     if (renderer.batch_buffer) {
         free(renderer.batch_buffer);

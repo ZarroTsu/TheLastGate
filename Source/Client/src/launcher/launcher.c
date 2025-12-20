@@ -513,7 +513,11 @@ static void right_column() {
         imgui_table_next_column();
         imgui_text("Window Type");
         imgui_table_next_column();
+        int prev_windowed = g_config.video.windowed;
         shared_dropdown("##window_modes", window_modes, 2, &g_config.video.windowed);
+        if (prev_windowed != g_config.video.windowed) {
+            sdl_set_fullscreen(g_config.video.windowed);
+        }
 
         imgui_table_next_row(0, 20);
         imgui_table_next_column();
