@@ -18,7 +18,7 @@ void add_cmd_to_queue(const int cmd, const int x, const int y) {
 
     if (has_cmd_been_queued(cmd, x, y)) return;
 
-    play_sound("sfx\\click.wav",CLICKVOL, 0);
+    play_sound("sfx/click.wav",CLICKVOL, 0);
 
     queued_commands.commands[queued_commands.tail] = (QueuedCommand){
         .cmd = cmd,

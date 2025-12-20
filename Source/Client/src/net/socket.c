@@ -887,7 +887,7 @@ void sv_playsound(unsigned char *buf)
 
 //  xlog(1,"sample=%d, pan=%d, vol=%d",nr,pan,vol);
 
-	sprintf(name,"sfx\\%d.wav",nr);
+	sprintf(name,"sfx/%d.wav",nr);
 	play_sound(name,vol,-pan);		// add flag to reverse channels!!
 }
 

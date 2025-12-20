@@ -109,10 +109,10 @@ SDL_Surface *load_from_gfx_lib(const int nr) {
 
 SDL_Surface *load_from_file(int nr) {
     char name[256];
-    sprintf(name, "%sgfx\\%05d.png", g_config.runtime.base_path, nr);
+    sprintf(name, "%sgfx/%05d.png", g_config.runtime.base_path, nr);
     SDL_Surface *surface = IMG_Load(name);
     if (!surface) {
-        sprintf(name, "%sgfx\\%05d.bmp", g_config.runtime.base_path, nr);
+        sprintf(name, "%sgfx/%05d.bmp", g_config.runtime.base_path, nr);
         surface = SDL_LoadBMP(name);
     }
 

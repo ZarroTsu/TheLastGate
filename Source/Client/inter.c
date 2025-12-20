@@ -1315,7 +1315,7 @@ void cmd(int cmd,int x,int y)
 	clear_cmd_queue();
 	mod_stubborn_actions_clear();
 
-	play_sound("sfx\\click.wav",CLICKVOL,0);
+	play_sound("sfx/click.wav",CLICKVOL,0);
 
 	buf[0]=(char)cmd;
 	*(unsigned short*)(buf+1)=(short)x;
@@ -1346,7 +1346,7 @@ void cmd3(int cmd,int x,int y,int z)
 {
 	unsigned char buf[16];
 
-	play_sound("sfx\\click.wav",CLICKVOL,0);
+	play_sound("sfx/click.wav",CLICKVOL,0);
 
 	buf[0]=(char)cmd;
 	*(unsigned long*)(buf+1)=x;
@@ -1359,7 +1359,7 @@ void cmd1(int cmd,int x)
 {
 	unsigned char buf[16];
 
-	play_sound("sfx\\click.wav",CLICKVOL,0);
+	play_sound("sfx/click.wav",CLICKVOL,0);
 
 	buf[0]=(char)cmd;
 	*(unsigned int*)(buf+1)=x;
@@ -1824,7 +1824,7 @@ int mouse_depot(int x,int y,int mode)
 		if (mode==MS_LB_UP)
 		{
 			dept_page = n+m*4;
-			play_sound("sfx\\click.wav",CLICKVOL,0);
+			play_sound("sfx/click.wav",CLICKVOL,0);
 		}
 		return 1;
 	}
@@ -2009,7 +2009,7 @@ int mouse_book(int x,int y,int mode)
 		{ 
 			tuto_page--; 
 			if (tuto_page<=1) tuto_page=1;
-			else play_sound("sfx\\click.wav",CLICKVOL,0);
+			else play_sound("sfx/click.wav",CLICKVOL,0);
 		}
 		return 1;
 	}
@@ -2021,7 +2021,7 @@ int mouse_book(int x,int y,int mode)
 		{
 			tuto_page++; 
 			if (tuto_page>=tuto_max) tuto_page=tuto_max;
-			else play_sound("sfx\\click.wav",CLICKVOL,0);
+			else play_sound("sfx/click.wav",CLICKVOL,0);
 		}
 		return 1;
 	}
@@ -2077,14 +2077,14 @@ int mouse_motd(int x,int y,int mode)
 			{
 				show_newp=0;
 				show_tuto=1; tuto_page=1; tuto_max=3;
-				play_sound("sfx\\click.wav",CLICKVOL,0);
+				play_sound("sfx/click.wav",CLICKVOL,0);
 			}
 			// Tutorial window PREV
 			else if (show_tuto)
 			{
 				tuto_page--; 
 				if (tuto_page<=1) tuto_page=1;
-				else play_sound("sfx\\click.wav",CLICKVOL,0);
+				else play_sound("sfx/click.wav",CLICKVOL,0);
 				
 			}
 		}
@@ -2108,7 +2108,7 @@ int mouse_motd(int x,int y,int mode)
 			{
 				tuto_page++; 
 				if (tuto_page>=tuto_max) tuto_page=tuto_max;
-				else play_sound("sfx\\click.wav",CLICKVOL,0);
+				else play_sound("sfx/click.wav",CLICKVOL,0);
 			}
 		}
 		return 1;
