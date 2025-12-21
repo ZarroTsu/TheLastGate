@@ -25,7 +25,7 @@
 #include <math.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
-#include "external/glad/include/glad/glad.h"
+#include "glad/glad.h"
 
 #include "common.h"
 #include "ui/imgui/imgui_wrapper.h"
