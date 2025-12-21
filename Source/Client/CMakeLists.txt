@@ -58,8 +58,10 @@ add_executable(TheLastGate
         src/ui/ui.c
 )
 
-# Force C linker for the main executable (even though project includes C++ for ImGui)
-set_target_properties(TheLastGate PROPERTIES LINKER_LANGUAGE C)
+# Use C++ linker for mixed C/C++ project (C++ linker handles C code correctly)
+# This is REQUIRED because we link against imgui_wrapper (C++ library)
+# The C++ linker can link both C and C++ object files without issues
+set_target_properties(TheLastGate PROPERTIES LINKER_LANGUAGE CXX)
 
 # Disable warnings for old code compatibility
 # TODO: These warnings indicate real issues that should be fixed during modernization
@@ -76,7 +78,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/windows_setup.cmake)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(TheLastGate PRIVATE
-            -DHOMECOPY
+#            -DHOMECOPY
     )
 endif ()
 
@@ -84,13 +86,18 @@ endif ()
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_options(TheLastGate PRIVATE
             -O3                    # Maximum optimization
-            -march=x86-64          # Optimize for current CPU (or use -march=x86-64 for compatibility)
+            -march=x86-64          # Optimize for x86-64 compatibility
             -ffast-math            # Fast floating-point math (safe for game logic)
-            -flto                  # Link-time optimization
             -DNDEBUG               # Disable assertions (enables the printf macro suppression)
     )
+
+    # LTO on Windows only - Linux LLVM linker has issues with mixed C/C++ LTO
+    if(WIN32)
+        target_compile_options(TheLastGate PRIVATE -flto)
+        target_link_options(TheLastGate PRIVATE -flto)
+    endif()
+
     target_link_options(TheLastGate PRIVATE
-            -flto                  # Link-time optimization
             -s                     # Strip debug symbols
     )
 endif ()
@@ -116,13 +123,18 @@ if (CMAKE_BUILD_TYPE STREQUAL "PGO-Use")
             -O3
             -march=x86-64
             -ffast-math
-            -flto
             -fprofile-use          # Use profiling data for optimization
             -fprofile-correction   # Handle profile inconsistencies gracefully
             -DNDEBUG
     )
+
+    # LTO on Windows only
+    if(WIN32)
+        target_compile_options(TheLastGate PRIVATE -flto)
+        target_link_options(TheLastGate PRIVATE -flto)
+    endif()
+
     target_link_options(TheLastGate PRIVATE
-            -flto
             -fprofile-use
             -s
     )
