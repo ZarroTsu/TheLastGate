@@ -21,3 +21,4 @@ merc.ils
 # vcpkg
 /vcpkg_installed/
 /.vs/
+/build/
