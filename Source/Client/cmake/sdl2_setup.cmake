@@ -16,9 +16,9 @@ find_package(SDL2_net CONFIG REQUIRED)
 target_link_libraries(TheLastGate PRIVATE
     SDL2::SDL2main  # Provides WinMain wrapper for Windows
     SDL2::SDL2
-    SDL2_image::SDL2_image
-    SDL2_mixer::SDL2_mixer
-    SDL2_net::SDL2_net
+    SDL2_image
+    SDL2_mixer
+    SDL2_net
 )
 
 message(STATUS "SDL2 libraries linked via vcpkg")
