@@ -1,4 +1,24 @@
 ﻿cmake_minimum_required(VERSION 3.22)
+
+# vcpkg integration - must be set before project()
+# Set CMAKE_TOOLCHAIN_FILE if not already set (allows command-line override)
+if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if (DEFINED ENV{VCPKG_ROOT})
+        set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+                CACHE STRING "vcpkg toolchain file")
+    else ()
+        message(WARNING "VCPKG_ROOT environment variable not set. "
+                "Please set it or specify CMAKE_TOOLCHAIN_FILE manually. "
+                "Example: cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake ..")
+    endif ()
+endif ()
+
+# Set default triplet to x64-windows (dynamic linking)
+# This can be overridden via command line: -DVCPKG_TARGET_TRIPLET=x64-windows-static
+if (NOT DEFINED VCPKG_TARGET_TRIPLET)
+    set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "vcpkg target triplet")
+endif ()
+
 project(TheLastGate LANGUAGES C CXX)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/compiler_options.cmake)
