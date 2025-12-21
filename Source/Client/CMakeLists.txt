@@ -42,57 +42,39 @@ endif ()
 add_executable(TheLastGate
         ${PLATFORM_SOURCES}
         engine.c
-        engine.h
-        src/graphics/atlas.c
-        src/graphics/atlas.h
-        src/graphics/loader.c
-        src/graphics/loader.h
-        src/graphics/scaling.c
-        src/graphics/sdl.c
-        src/graphics/sdl.h
-        src/graphics/shaders/effect_shader.c
-        src/graphics/shaders/effect_shader.h
-        src/graphics/shaders/magic_shader.c
-        src/graphics/shaders/shaders.c
-        src/graphics/shaders/shaders.h
-        src/graphics/shaders/solid_shader.c
-        src/graphics/shaders/solid_shader.h
-        src/graphics/sprite_data.h
         input.c
-        input.h
         inter.c
         main.c
-        main.h
-        main.h
-        src/mods/base_cost_warning.c
-        src/mods/base_cost_warning.h
-        src/mods/give_more.c
-        src/mods/give_more.h
-        src/mods/use_queue.c
-        src/mods/use_queue.h
         options.c
+        src/audio/sound.c
+        src/config/config.c
+        src/config/keybindings.c
+        src/graphics/atlas.c
+        src/graphics/loader.c
         src/graphics/render.c
-        src/graphics/render.h
+        src/graphics/scaling.c
+        src/graphics/sdl.c
         src/graphics/sdl_magic.c
+        src/graphics/shaders/effect_shader.c
+        src/graphics/shaders/magic_shader.c
+        src/graphics/shaders/shaders.c
+        src/graphics/shaders/solid_shader.c
+        src/launcher/character_manager.c
+        src/launcher/launcher.c
+        src/log/log.c
+        src/mods/base_cost_warning.c
+        src/mods/give_more.c
+        src/mods/stubborn_actions.c
+        src/mods/use_queue.c
         src/net/connection.c
         src/net/socket.c
-        src/audio/sound.c
-        src/audio/sound.h
-        src/ui/option_window.c
-        src/ui/option_window.h
-        src/ui/widgets.c
-        src/config/keybindings.c
-        src/config/keybindings.h
-        src/ui/spell_hud.c
-        src/config/config.c
-        src/log/log.c
         src/security/security.c
         src/security/single_instance.c
         src/security/unique_id.c
-        src/mods/stubborn_actions.c
-        src/launcher/launcher.c
-        src/launcher/character_manager.c
+        src/ui/option_window.c
+        src/ui/spell_hud.c
         src/ui/ui.c
+        src/ui/widgets.c
 )
 
 # Use C++ linker for mixed C/C++ project (C++ linker handles C code correctly)
