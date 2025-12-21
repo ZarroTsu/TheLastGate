@@ -322,7 +322,7 @@ bool imgui_input_text(const char *label, char *buf, int buf_size) {
 }
 
 bool imgui_input_text_area(const char *label, char *buf, int buf_size, float width, float height) {
-    return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(width, height));
+    return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
 }
 
 bool imgui_input_int(const char *label, int *v) {
