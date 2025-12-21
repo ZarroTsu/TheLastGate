@@ -19,16 +19,7 @@
     "libpng",
     "zlib",
     "glad",
-    {
-      "name": "imgui",
-      "features": ["sdl2-binding", "opengl3-binding"]
-    }
-  ],
-  "overrides": [
-    {
-      "name": "imgui",
-      "version": "1.91.8#2"
-    }
+    "imgui"
   ],
   "builtin-baseline": "1fddddc280dfed63956e15ef74f4321bc6a219c9"
 }
