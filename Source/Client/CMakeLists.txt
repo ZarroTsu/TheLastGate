@@ -30,6 +30,7 @@ project(TheLastGate LANGUAGES C CXX)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/compiler_options.cmake)
 
 add_executable(TheLastGate
+        TheLastGate.rc
         engine.c
         engine.h
         src/graphics/atlas.c
