@@ -34,6 +34,13 @@ if (WIN32)
             "${OUTPUT_DIR}/libstdc++-6.dll"
             "${OUTPUT_DIR}/libwinpthread-1.dll"
 
+            # Imgui runtime dependencies
+            "${OUTPUT_DIR}/libfreetype.dll"
+            "${OUTPUT_DIR}/libbz2.dll"
+            "${OUTPUT_DIR}/libbrotlicommon.dll"
+            "${OUTPUT_DIR}/libbrotlidec.dll"
+            "${OUTPUT_DIR}/libbrotlienc.dll"
+
             COMMENT "Creating release ZIP package..."
     )
 
