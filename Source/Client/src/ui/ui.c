@@ -6,6 +6,5 @@
 
 #include <stddef.h>
 
-void *font_pixel_times = NULL;
 FontSizes font_sizes = {0};
 FontSizes font_sizes_bold = {0};

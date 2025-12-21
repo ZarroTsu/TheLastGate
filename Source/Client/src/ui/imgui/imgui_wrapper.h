@@ -26,6 +26,19 @@ void* imgui_add_font_from_file_ttf_pixel_perfect(const char* filename, float siz
 void imgui_set_default_font(void* font);
 void imgui_push_font(void* font);
 void imgui_pop_font(void);
+bool imgui_is_freetype_enabled(void);  /* Returns true if FreeType is compiled in */
+
+/* FreeType rasterizer flags (only used if IMGUI_ENABLE_FREETYPE is defined) */
+#define IMGUI_FREETYPE_NO_HINTING           (1 << 0)  /* Disable hinting (smoother but less sharp) */
+#define IMGUI_FREETYPE_NO_AUTO_HINT         (1 << 1)  /* Disable auto-hinter */
+#define IMGUI_FREETYPE_FORCE_AUTO_HINT      (1 << 2)  /* Force auto-hinter over font's native hinter */
+#define IMGUI_FREETYPE_LIGHT_HINTING        (1 << 3)  /* Lighter hinting for non-monochrome modes */
+#define IMGUI_FREETYPE_MONO_HINTING         (1 << 4)  /* Hinting for monochrome output */
+#define IMGUI_FREETYPE_BOLD                 (1 << 5)  /* Make glyphs bold (embolden) */
+#define IMGUI_FREETYPE_OBLIQUE              (1 << 6)  /* Make glyphs italic/oblique */
+#define IMGUI_FREETYPE_MONOCHROME           (1 << 7)  /* Disable anti-aliasing (1-bit per pixel) */
+#define IMGUI_FREETYPE_LOAD_COLOR           (1 << 8)  /* Load color glyphs/emojis */
+#define IMGUI_FREETYPE_BITMAP               (1 << 9)  /* Use embedded bitmap strikes if available */
 
 /* Display scaling - call this to set virtual resolution for ImGui */
 void imgui_set_display_size(float width, float height);
@@ -38,14 +51,23 @@ bool imgui_process_event(void* sdl_event);
 /* Window management */
 void imgui_set_next_windows_size(float width, float height);
 void imgui_set_next_window_pos(float x, float y);
+void imgui_set_next_window_pos_ex(float x, float y, int cond);
+void imgui_set_next_window_size_ex(float width, float height, int cond);
 bool imgui_begin(const char* name, bool* p_open, int flags);
 void imgui_end(void);
+
+/* Condition flags for SetNextWindow* functions */
+#define IMGUI_COND_NONE             0
+#define IMGUI_COND_ALWAYS           (1 << 0)
+#define IMGUI_COND_ONCE             (1 << 1)
+#define IMGUI_COND_FIRST_USE_EVER   (1 << 2)
+#define IMGUI_COND_APPEARING        (1 << 3)
 
 /* Child windows - scrollable regions */
 bool imgui_begin_child(const char* str_id, float width, float height, bool border, int flags);
 void imgui_end_child(void);
 
-/* Window flags (bitfield) */
+/* Window flags (bitfield) - mapped to ImGuiWindowFlags */
 #define IMGUI_WINDOW_FLAG_NONE                  0
 #define IMGUI_WINDOW_FLAG_NO_TITLE_BAR          (1 << 0)
 #define IMGUI_WINDOW_FLAG_NO_RESIZE             (1 << 1)
@@ -56,9 +78,21 @@ void imgui_end_child(void);
 #define IMGUI_WINDOW_FLAG_ALWAYS_AUTO_RESIZE    (1 << 6)
 #define IMGUI_WINDOW_FLAG_NO_BACKGROUND         (1 << 7)
 #define IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS     (1 << 8)
-#define IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR  (1 << 9)
-#define IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR (1 << 10)
-#define IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR (1 << 11)
+#define IMGUI_WINDOW_FLAG_NO_MOUSE_INPUTS       (1 << 9)
+#define IMGUI_WINDOW_FLAG_MENU_BAR              (1 << 10)
+#define IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR  (1 << 11)
+#define IMGUI_WINDOW_FLAG_NO_FOCUS_ON_APPEARING (1 << 12)
+#define IMGUI_WINDOW_FLAG_NO_BRING_TO_FRONT_ON_FOCUS (1 << 13)
+#define IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR (1 << 14)
+#define IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR (1 << 15)
+#define IMGUI_WINDOW_FLAG_NO_NAV_INPUTS         (1 << 18)
+#define IMGUI_WINDOW_FLAG_NO_NAV_FOCUS          (1 << 19)
+#define IMGUI_WINDOW_FLAG_UNSAVED_DOCUMENT      (1 << 20)
+#define IMGUI_WINDOW_FLAG_NO_DOCKING            (1 << 21)
+/* Combination flags */
+#define IMGUI_WINDOW_FLAG_NO_NAV                (IMGUI_WINDOW_FLAG_NO_NAV_INPUTS | IMGUI_WINDOW_FLAG_NO_NAV_FOCUS)
+#define IMGUI_WINDOW_FLAG_NO_DECORATION         (IMGUI_WINDOW_FLAG_NO_TITLE_BAR | IMGUI_WINDOW_FLAG_NO_RESIZE | IMGUI_WINDOW_FLAG_NO_SCROLLBAR | IMGUI_WINDOW_FLAG_NO_COLLAPSE)
+#define IMGUI_WINDOW_FLAG_NO_INPUTS             (IMGUI_WINDOW_FLAG_NO_MOUSE_INPUTS | IMGUI_WINDOW_FLAG_NO_NAV_INPUTS | IMGUI_WINDOW_FLAG_NO_NAV_FOCUS)
 
 
 /* Text and labels */

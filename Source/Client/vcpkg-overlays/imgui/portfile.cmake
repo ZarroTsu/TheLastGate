@@ -43,15 +43,26 @@ set(BACKEND_HEADERS
     backends/imgui_impl_opengl3.h
 )
 
-find_package(SDL2 CONFIG REQUIRED)
+# FreeType support
+set(FREETYPE_SOURCES
+    misc/freetype/imgui_freetype.cpp
+)
 
-add_library(imgui STATIC ${IMGUI_SOURCES} ${BACKEND_SOURCES})
+set(FREETYPE_HEADERS
+    misc/freetype/imgui_freetype.h
+)
+
+find_package(SDL2 CONFIG REQUIRED)
+find_package(Freetype REQUIRED)
+
+add_library(imgui STATIC ${IMGUI_SOURCES} ${BACKEND_SOURCES} ${FREETYPE_SOURCES})
 target_include_directories(imgui PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/backends>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(imgui PUBLIC SDL2::SDL2)
+target_link_libraries(imgui PUBLIC SDL2::SDL2 Freetype::Freetype)
+target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE)
 
 # Installation
 install(TARGETS imgui EXPORT imguiConfig
@@ -62,6 +73,7 @@ install(TARGETS imgui EXPORT imguiConfig
 
 install(FILES ${IMGUI_HEADERS} DESTINATION include)
 install(FILES ${BACKEND_HEADERS} DESTINATION include)
+install(FILES ${FREETYPE_HEADERS} DESTINATION include)
 
 install(EXPORT imguiConfig
     FILE imguiConfig.cmake

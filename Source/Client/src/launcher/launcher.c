@@ -77,7 +77,7 @@ static void start_new_switch_character_confirmation() {
 
 static void push_launcher_styles() {
     imgui_push_style_color_32(IMGUI_COL_TEXT, GOLD_COLOR_32);
-    imgui_push_font(font_sizes.subheader);
+    imgui_push_font(font_sizes.normal);
 }
 
 static void pop_launcher_styles() {
@@ -86,19 +86,17 @@ static void pop_launcher_styles() {
 }
 
 static void push_header_styles() {
-    imgui_push_font(font_sizes.big_header);
     imgui_push_style_color_32(IMGUI_COL_TEXT, HEADER_TEXT_COLOR_32);
-    imgui_push_font(font_sizes_bold.big_header);
+    imgui_push_font(font_sizes_bold.header);
 }
 
 static void pop_header_styles() {
-    imgui_pop_font();
     imgui_pop_style_color(1);
     imgui_pop_font();
 }
 
 static void push_sub_header_styles() {
-    imgui_push_font(font_sizes.header);
+    imgui_push_font(font_sizes.subheader);
     imgui_push_style_color_32(IMGUI_COL_TEXT, GOLD_COLOR_32);
 }
 
@@ -126,7 +124,7 @@ static void push_button_styles() {
     imgui_push_style_color_32(IMGUI_COL_BUTTON_HOVERED, BUTTON_COLOR_HOVERED_32);
     imgui_push_style_color_32(IMGUI_COL_BUTTON_ACTIVE, BUTTON_COLOR_ACTIVE_32);
     imgui_push_style_color_32(IMGUI_COL_TEXT, 0xFF000000);
-    imgui_push_font(font_sizes_bold.subheader);
+    imgui_push_font(font_sizes_bold.normal);
 }
 
 static void pop_button_styles() {

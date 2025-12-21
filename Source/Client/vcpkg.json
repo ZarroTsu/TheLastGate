@@ -19,7 +19,8 @@
     "libpng",
     "zlib",
     "glad",
-    "imgui"
+    "imgui",
+    "freetype"
   ],
   "builtin-baseline": "1fddddc280dfed63956e15ef74f4321bc6a219c9"
 }

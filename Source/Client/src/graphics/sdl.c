@@ -122,6 +122,8 @@ int sdl_init(const int windowed) {
     }
 
     SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+    SDL_SetHint(SDL_HINT_WINDOWS_DPI_SCALING, "1");
+    SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1");
 
     // Create OpenGL context
     renderer.gl_context = SDL_GL_CreateContext(renderer.window);
@@ -277,22 +279,19 @@ int sdl_init(const int windowed) {
     imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
     imgui_set_display_framebuffer_scale(1.0f, 1.0f);
 
-    font_pixel_times = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+    font_sizes.ui = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+    font_sizes.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 16);
+    font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 24);
+    font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 28);
+    font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 32);
 
-    font_sizes.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 10);
-    font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 12);
-    font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 16);
-    font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 24);
-    font_sizes.big_header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono.ttf", 28);
+    font_sizes_bold.ui = imgui_add_font_from_file_ttf_pixel_perfect("resources/pixel-times.ttf", 10);
+    font_sizes_bold.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 16);
+    font_sizes_bold.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 24);
+    font_sizes_bold.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 28);
+    font_sizes_bold.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 32);
 
-    font_sizes_bold.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 10);
-    font_sizes_bold.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 12);
-    font_sizes_bold.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 16);
-    font_sizes_bold.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 24);
-    font_sizes_bold.big_header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperatorMono-Bold.ttf", 28);
-
-
-    imgui_set_default_font(font_pixel_times);
+    imgui_set_default_font(font_sizes.ui);
 
     return 0;
 }

@@ -3,6 +3,9 @@
 # ImGui configuration using vcpkg package
 # This replaces the vendored ImGui build with vcpkg's pre-built package
 
+# Find FreeType (required by ImGui for font rasterization)
+find_package(Freetype REQUIRED)
+
 # Find ImGui package with SDL2 and OpenGL3 backends
 find_package(imgui CONFIG REQUIRED)
 
@@ -34,8 +37,10 @@ set_target_properties(imgui_wrapper_c PROPERTIES
 target_link_libraries(imgui_wrapper_c PRIVATE imgui::imgui)
 
 # The wrapper also needs OpenGL definitions (for IMGUI_IMPL_OPENGL_LOADER_GLAD)
+# and FreeType support
 target_compile_definitions(imgui_wrapper_c PUBLIC
     IMGUI_IMPL_OPENGL_LOADER_GLAD
+    IMGUI_ENABLE_FREETYPE
 )
 
 # Disable warnings for wrapper (it interfaces with third-party code)

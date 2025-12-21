@@ -89,7 +89,7 @@ static void general_settings_tab() {
 
 
     imgui_spacing();
-    imgui_push_font(font_sizes.large);
+    imgui_push_font(font_sizes.normal);
     imgui_push_style_color(IMGUI_COL_TEXT, BLUE_FONT_COLOR[0], BLUE_FONT_COLOR[1], BLUE_FONT_COLOR[2], 1.0f);
     imgui_text("Stubborn Actions"); imgui_same_line_gap();
     imgui_pop_font();

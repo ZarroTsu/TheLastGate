@@ -11,6 +11,10 @@
 #include "imgui_impl_opengl3.h"
 #include <SDL2/SDL.h>
 
+#ifdef IMGUI_ENABLE_FREETYPE
+#include "imgui_freetype.h"
+#endif
+
 /* All wrapper functions must have C linkage to be callable from C code */
 extern "C" {
 /* Initialization and lifecycle */
@@ -22,6 +26,7 @@ void imgui_init(void *sdl_window, void *gl_context) {
 
 
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
+    io.FontGlobalScale = 1.0f;
 
     /* Setup Dear ImGui style */
     ImGui::StyleColorsDark();
@@ -61,11 +66,16 @@ void *imgui_add_font_from_file_ttf(const char *filename, float size_pixels) {
 void *imgui_add_font_from_file_ttf_pixel_perfect(const char *filename, float size_pixels) {
     ImGuiIO &io = ImGui::GetIO();
 
+    io.Fonts->Flags = ImFontAtlasFlags_NoBakedLines;
     /* Configure for pixel-perfect rendering */
     ImFontConfig config;
-    config.OversampleH = 1; /* No horizontal oversampling */
+    config.OversampleH = 2; /* No horizontal oversampling */
     config.OversampleV = 1; /* No vertical oversampling */
     config.PixelSnapH = true; /* Align to pixel grid */
+    config.PixelSnapV = true;
+    config.RasterizerMultiply = 1.0f;
+    config.RasterizerDensity  = 1.0f;
+    config.FontLoaderFlags = ImGuiFreeTypeBuilderFlags_Monochrome;
 
     ImFont *font = io.Fonts->AddFontFromFileTTF(filename, size_pixels, &config);
     return static_cast<void *>(font);
@@ -82,6 +92,14 @@ void imgui_push_font(void *font) {
 
 void imgui_pop_font(void) {
     ImGui::PopFont();
+}
+
+bool imgui_is_freetype_enabled(void) {
+#ifdef IMGUI_ENABLE_FREETYPE
+    return true;
+#else
+    return false;
+#endif
 }
 
 /* Display scaling */
@@ -122,8 +140,28 @@ void imgui_set_next_window_pos(float x, float y) {
     ImGui::SetNextWindowPos(ImVec2(x, y));
 }
 
+void imgui_set_next_window_pos_ex(float x, float y, int cond) {
+    ImGuiCond imgui_cond = ImGuiCond_None;
+    if (cond & IMGUI_COND_ALWAYS) imgui_cond = ImGuiCond_Always;
+    else if (cond & IMGUI_COND_ONCE) imgui_cond = ImGuiCond_Once;
+    else if (cond & IMGUI_COND_FIRST_USE_EVER) imgui_cond = ImGuiCond_FirstUseEver;
+    else if (cond & IMGUI_COND_APPEARING) imgui_cond = ImGuiCond_Appearing;
+
+    ImGui::SetNextWindowPos(ImVec2(x, y), imgui_cond);
+}
+
 void imgui_set_next_windows_size(float width, float height) {
     ImGui::SetNextWindowSize(ImVec2(width, height));
+}
+
+void imgui_set_next_window_size_ex(float width, float height, int cond) {
+    ImGuiCond imgui_cond = ImGuiCond_None;
+    if (cond & IMGUI_COND_ALWAYS) imgui_cond = ImGuiCond_Always;
+    else if (cond & IMGUI_COND_ONCE) imgui_cond = ImGuiCond_Once;
+    else if (cond & IMGUI_COND_FIRST_USE_EVER) imgui_cond = ImGuiCond_FirstUseEver;
+    else if (cond & IMGUI_COND_APPEARING) imgui_cond = ImGuiCond_Appearing;
+
+    ImGui::SetNextWindowSize(ImVec2(width, height), imgui_cond);
 }
 
 bool imgui_begin(const char *name, bool *p_open, int flags) {
@@ -138,6 +176,16 @@ bool imgui_begin(const char *name, bool *p_open, int flags) {
     if (flags & IMGUI_WINDOW_FLAG_ALWAYS_AUTO_RESIZE) imgui_flags |= ImGuiWindowFlags_AlwaysAutoResize;
     if (flags & IMGUI_WINDOW_FLAG_NO_BACKGROUND) imgui_flags |= ImGuiWindowFlags_NoBackground;
     if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS) imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
+    if (flags & IMGUI_WINDOW_FLAG_NO_MOUSE_INPUTS) imgui_flags |= ImGuiWindowFlags_NoMouseInputs;
+    if (flags & IMGUI_WINDOW_FLAG_MENU_BAR) imgui_flags |= ImGuiWindowFlags_MenuBar;
+    if (flags & IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_HorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_FOCUS_ON_APPEARING) imgui_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+    if (flags & IMGUI_WINDOW_FLAG_NO_BRING_TO_FRONT_ON_FOCUS) imgui_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_NAV_INPUTS) imgui_flags |= ImGuiWindowFlags_NoNavInputs;
+    if (flags & IMGUI_WINDOW_FLAG_NO_NAV_FOCUS) imgui_flags |= ImGuiWindowFlags_NoNavFocus;
+    if (flags & IMGUI_WINDOW_FLAG_UNSAVED_DOCUMENT) imgui_flags |= ImGuiWindowFlags_UnsavedDocument;
 
     return ImGui::Begin(name, p_open, imgui_flags);
 }
@@ -155,8 +203,14 @@ bool imgui_begin_child(const char *str_id, float width, float height, bool borde
     if (flags & IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE) imgui_flags |= ImGuiWindowFlags_NoScrollWithMouse;
     if (flags & IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_HorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
-    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR)
-        imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_BACKGROUND) imgui_flags |= ImGuiWindowFlags_NoBackground;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS) imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
+    if (flags & IMGUI_WINDOW_FLAG_MENU_BAR) imgui_flags |= ImGuiWindowFlags_MenuBar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_MOUSE_INPUTS) imgui_flags |= ImGuiWindowFlags_NoMouseInputs;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_AUTO_RESIZE) imgui_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    if (flags & IMGUI_WINDOW_FLAG_NO_NAV_INPUTS) imgui_flags |= ImGuiWindowFlags_NoNavInputs;
+    if (flags & IMGUI_WINDOW_FLAG_NO_NAV_FOCUS) imgui_flags |= ImGuiWindowFlags_NoNavFocus;
 
     return ImGui::BeginChild(str_id, ImVec2(width, height), border, imgui_flags);
 }
@@ -588,6 +642,17 @@ bool imgui_begin_popup_modal(const char *name, bool *p_open, int flags) {
     if (flags & IMGUI_WINDOW_FLAG_NO_TITLE_BAR) imgui_flags |= ImGuiWindowFlags_NoTitleBar;
     if (flags & IMGUI_WINDOW_FLAG_NO_RESIZE) imgui_flags |= ImGuiWindowFlags_NoResize;
     if (flags & IMGUI_WINDOW_FLAG_NO_MOVE) imgui_flags |= ImGuiWindowFlags_NoMove;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_NoScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE) imgui_flags |= ImGuiWindowFlags_NoScrollWithMouse;
+    if (flags & IMGUI_WINDOW_FLAG_NO_COLLAPSE) imgui_flags |= ImGuiWindowFlags_NoCollapse;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_AUTO_RESIZE) imgui_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    if (flags & IMGUI_WINDOW_FLAG_NO_BACKGROUND) imgui_flags |= ImGuiWindowFlags_NoBackground;
+    if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS) imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
+    if (flags & IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_HorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_NO_NAV_INPUTS) imgui_flags |= ImGuiWindowFlags_NoNavInputs;
+    if (flags & IMGUI_WINDOW_FLAG_NO_NAV_FOCUS) imgui_flags |= ImGuiWindowFlags_NoNavFocus;
 
     return ImGui::BeginPopupModal(name, p_open, imgui_flags);
 }
@@ -990,3 +1055,4 @@ void imgui_text_formatted(const char *format, ...) {
     ImGui::Text(buffer);
 }
 } /* extern "C" */
+

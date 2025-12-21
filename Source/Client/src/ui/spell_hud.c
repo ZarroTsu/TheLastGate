@@ -6,6 +6,7 @@
 #include "main.h"
 #include "ui_common.h"
 #include "common.h"
+#include "ui.h"
 #include "config/config.h"
 
 static int current_slot = 0;
@@ -108,6 +109,7 @@ void spell_hud() {
     imgui_push_style_var_vec2(IMGUI_STYLE_VAR_ITEM_SPACING, 0.0f, 0.0f);
     imgui_push_style_var_vec2(IMGUI_STYLE_VAR_FRAME_PADDING, 0.0f, 2.0f);
     imgui_push_style_var_float(IMGUI_STYLE_VAR_WINDOW_BORDER_SIZE, 0.0f);
+    imgui_push_font(font_sizes.ui);
     if (imgui_begin("##SPELLHUD", NULL, IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE | IMGUI_WINDOW_FLAG_NO_BACKGROUND | IMGUI_WINDOW_FLAG_NO_TITLE_BAR)) {
         void *draw_list = imgui_get_window_draw_list();
         float window_x = imgui_get_window_pos_x();
@@ -171,6 +173,7 @@ void spell_hud() {
         render_spell_popover();
         imgui_pop_style_color(4);
     }
+    imgui_pop_font();
     imgui_end();
     imgui_pop_style_var(4);
 }
