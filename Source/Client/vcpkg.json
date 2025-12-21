@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "thelastgate",
+  "version": "0.13.1",
+  "description": "The Last Gate - Mercenaries of Astonia v2 Client",
+  "dependencies": [
+    "sdl2",
+    {
+      "name": "sdl2-image",
+      "default-features": true,
+      "features": ["libjpeg-turbo", "libwebp", "tiff"]
+    },
+    {
+      "name": "sdl2-mixer",
+      "default-features": true,
+      "features": ["libflac", "mpg123", "opusfile"]
+    },
+    "sdl2-net",
+    "libpng",
+    "zlib",
+    "glad",
+    {
+      "name": "imgui",
+      "features": ["sdl2-binding", "opengl3-binding"]
+    }
+  ],
+  "overrides": [
+    {
+      "name": "imgui",
+      "version": "1.91.8#2"
+    }
+  ],
+  "builtin-baseline": "1fddddc280dfed63956e15ef74f4321bc6a219c9"
+}
