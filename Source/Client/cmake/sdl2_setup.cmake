@@ -1,41 +1,24 @@
-# SDL2 Setup - Cross-platform SDL2 detection and linking
-# Uses pkg-config on all platforms (available in MSYS2/MinGW on Windows)
+# SDL2 Setup - vcpkg-based SDL2 detection and linking
+# Uses modern CMake imported targets from vcpkg packages
 
-find_package(PkgConfig REQUIRED)
+# SDL2 core
+find_package(SDL2 CONFIG REQUIRED)
 
-pkg_check_modules(SDL2 REQUIRED sdl2)
-pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
-pkg_check_modules(SDL2_MIXER REQUIRED SDL2_mixer)
-pkg_check_modules(SDL2_NET REQUIRED SDL2_net)
+# SDL2 extensions
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(SDL2_mixer CONFIG REQUIRED)
+find_package(SDL2_net CONFIG REQUIRED)
 
-message(STATUS "Using dynamic SDL2 libraries")
-set(SDL2_LIBRARIES
-    ${SDL2_LIBRARIES}
-    ${SDL2_IMAGE_LIBRARIES}
-    ${SDL2_MIXER_LIBRARIES}
-    ${SDL2_NET_LIBRARIES}
+# Link SDL2 libraries using modern imported targets
+# vcpkg provides these targets:
+#   SDL2::SDL2main - SDL2 main entry point wrapper (WinMain on Windows)
+#   SDL2::SDL2      - SDL2 core library
+target_link_libraries(TheLastGate PRIVATE
+    SDL2::SDL2main  # Provides WinMain wrapper for Windows
+    SDL2::SDL2
+    SDL2_image::SDL2_image
+    SDL2_mixer::SDL2_mixer
+    SDL2_net::SDL2_net
 )
 
-# Add include directories
-target_include_directories(TheLastGate PRIVATE
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2_IMAGE_INCLUDE_DIRS}
-    ${SDL2_MIXER_INCLUDE_DIRS}
-    ${SDL2_NET_INCLUDE_DIRS}
-)
-
-# Add library directories
-target_link_directories(TheLastGate PRIVATE
-    ${SDL2_LIBRARY_DIRS}
-    ${SDL2_IMAGE_LIBRARY_DIRS}
-    ${SDL2_MIXER_LIBRARY_DIRS}
-    ${SDL2_NET_LIBRARY_DIRS}
-)
-
-# Link SDL2 libraries
-target_link_libraries(TheLastGate PUBLIC ${SDL2_LIBRARIES})
-
-# Windows-specific: Add sdl2main for WinMain entry point
-if(WIN32)
-    target_link_libraries(TheLastGate PUBLIC sdl2main)
-endif()
+message(STATUS "SDL2 libraries linked via vcpkg")

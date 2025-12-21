@@ -1,12 +1,15 @@
-﻿# OpenGL
+# OpenGL and GLAD setup - vcpkg-based OpenGL loader
+
+# OpenGL - system-provided, use standard CMake find module
 find_package(OpenGL REQUIRED)
 
-# GLAD
-add_library(glad ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c)
+# GLAD - use vcpkg package instead of vendored version
+find_package(glad CONFIG REQUIRED)
 
-target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
-
+# Link OpenGL and GLAD using imported targets
 target_link_libraries(TheLastGate PRIVATE
-        glad
-        OpenGL::GL
+    OpenGL::GL
+    glad::glad
 )
+
+message(STATUS "OpenGL and GLAD linked via vcpkg")

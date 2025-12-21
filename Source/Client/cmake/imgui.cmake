@@ -1,65 +1,51 @@
 # imgui.cmake
 #
-# Build configuration for Dear ImGui and its C wrapper
-# This is the ONLY place where C++ compilation happens in the project
+# ImGui configuration using vcpkg package
+# This replaces the vendored ImGui build with vcpkg's pre-built package
 
-set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui)
+# Find ImGui package with SDL2 and OpenGL3 backends
+find_package(imgui CONFIG REQUIRED)
 
-# Dear ImGui core source files
-set(IMGUI_SOURCES
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_demo.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_sdl2.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
-)
+# vcpkg's imgui package provides these targets:
+#   imgui::imgui - core ImGui library (imgui.cpp, imgui_draw.cpp, etc.)
+#
+# Backends are included in the core library when features are enabled:
+#   - sdl2-binding: includes imgui_impl_sdl2.cpp
+#   - opengl3-binding: includes imgui_impl_opengl3.cpp
 
-# C++ wrapper source
-set(IMGUI_WRAPPER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/imgui/imgui_wrapper.cpp
-)
+# Link ImGui to main target
+target_link_libraries(TheLastGate PRIVATE imgui::imgui)
 
-# Create a static library for ImGui
-# This library is compiled as C++ but exposes a C interface
-add_library(imgui_wrapper STATIC
-    ${IMGUI_SOURCES}
-    ${IMGUI_WRAPPER_SOURCES}
-)
+# We still need our C wrapper (imgui_wrapper.cpp)
+# Build it separately and link it
+set(IMGUI_WRAPPER_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/imgui/imgui_wrapper.cpp)
 
-# Set C++ standard for ImGui compilation
-set_target_properties(imgui_wrapper PROPERTIES
+# Create a small library for just the C wrapper
+add_library(imgui_wrapper_c STATIC ${IMGUI_WRAPPER_SOURCE})
+
+# Set C++ standard for wrapper compilation
+set_target_properties(imgui_wrapper_c PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
 
-# Include directories for ImGui
-target_include_directories(imgui_wrapper PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui  # For imgui_wrapper.h
-    ${IMGUI_DIR}                          # For imgui.h
-    ${IMGUI_DIR}/backends                 # For backends
-)
+# The wrapper needs to include imgui headers (provided by imgui::imgui target)
+target_link_libraries(imgui_wrapper_c PRIVATE imgui::imgui)
 
-# SDL2 include directories are set by cmake/sdl2_setup.cmake (already included)
-# Both Linux and Windows need this
-if(SDL2_INCLUDE_DIRS)
-    target_include_directories(imgui_wrapper PRIVATE ${SDL2_INCLUDE_DIRS})
-endif()
-
-# Link OpenGL (GLAD is already included in main project)
-# ImGui needs to know about OpenGL but doesn't link directly
-target_compile_definitions(imgui_wrapper PUBLIC
+# The wrapper also needs OpenGL definitions (for IMGUI_IMPL_OPENGL_LOADER_GLAD)
+target_compile_definitions(imgui_wrapper_c PUBLIC
     IMGUI_IMPL_OPENGL_LOADER_GLAD
 )
 
-# Disable warnings for ImGui (it's third-party code)
+# Disable warnings for wrapper (it interfaces with third-party code)
 if(MSVC)
-    target_compile_options(imgui_wrapper PRIVATE /W0)
+    target_compile_options(imgui_wrapper_c PRIVATE /W0)
 else()
-    target_compile_options(imgui_wrapper PRIVATE -w)
+    target_compile_options(imgui_wrapper_c PRIVATE -w)
 endif()
 
-# Link the ImGui wrapper library to the main target
-target_link_libraries(TheLastGate PRIVATE imgui_wrapper)
+# Link the C wrapper to the main target
+target_link_libraries(TheLastGate PRIVATE imgui_wrapper_c)
+
+message(STATUS "ImGui linked via vcpkg (with custom C wrapper)")

@@ -13,10 +13,16 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     endif ()
 endif ()
 
-# Set default triplet to x64-windows (dynamic linking)
-# This can be overridden via command line: -DVCPKG_TARGET_TRIPLET=x64-windows-static
+# Set default triplet based on compiler
+# MinGW needs x64-mingw-dynamic, MSVC needs x64-windows
 if (NOT DEFINED VCPKG_TARGET_TRIPLET)
-    set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "vcpkg target triplet")
+    if (MINGW)
+        set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "vcpkg target triplet")
+        message(STATUS "Detected MinGW compiler, using vcpkg triplet: x64-mingw-dynamic")
+    else ()
+        set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "vcpkg target triplet")
+        message(STATUS "Using vcpkg triplet: x64-windows")
+    endif ()
 endif ()
 
 project(TheLastGate LANGUAGES C CXX)
@@ -111,52 +117,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
             -DNDEBUG               # Disable assertions (enables the printf macro suppression)
     )
 
-    # LTO on Windows only - Linux LLVM linker has issues with mixed C/C++ LTO
-    if(WIN32)
-        target_compile_options(TheLastGate PRIVATE -flto)
-        target_link_options(TheLastGate PRIVATE -flto)
-    endif()
-
     target_link_options(TheLastGate PRIVATE
             -s                     # Strip debug symbols
-    )
-endif ()
-
-# Profile-Guided Optimization (PGO) builds
-# Stage 1: Build with profiling instrumentation
-if (CMAKE_BUILD_TYPE STREQUAL "PGO-Generate")
-    target_compile_options(TheLastGate PRIVATE
-            -O3
-            -march=x86-64
-            -ffast-math
-            -fprofile-generate     # Generate profiling data
-            -DNDEBUG
-    )
-    target_link_options(TheLastGate PRIVATE
-            -fprofile-generate
-    )
-endif ()
-
-# Stage 2: Build using collected profile data
-if (CMAKE_BUILD_TYPE STREQUAL "PGO-Use")
-    target_compile_options(TheLastGate PRIVATE
-            -O3
-            -march=x86-64
-            -ffast-math
-            -fprofile-use          # Use profiling data for optimization
-            -fprofile-correction   # Handle profile inconsistencies gracefully
-            -DNDEBUG
-    )
-
-    # LTO on Windows only
-    if(WIN32)
-        target_compile_options(TheLastGate PRIVATE -flto)
-        target_link_options(TheLastGate PRIVATE -flto)
-    endif()
-
-    target_link_options(TheLastGate PRIVATE
-            -fprofile-use
-            -s
     )
 endif ()
 

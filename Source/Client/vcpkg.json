@@ -7,13 +7,13 @@
     "sdl2",
     {
       "name": "sdl2-image",
-      "default-features": true,
-      "features": ["libjpeg-turbo", "libwebp", "tiff"]
+      "default-features": false,
+      "features": []
     },
     {
       "name": "sdl2-mixer",
-      "default-features": true,
-      "features": ["libflac", "mpg123", "opusfile"]
+      "default-features": false,
+      "features": []
     },
     "sdl2-net",
     "libpng",

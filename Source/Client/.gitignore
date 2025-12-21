@@ -17,3 +17,7 @@ merc.ils
 /cmake-build-debug/
 /cmake-build-pgo-generate/
 /cmake-build-release/
+
+# vcpkg
+/vcpkg_installed/
+/.vs/

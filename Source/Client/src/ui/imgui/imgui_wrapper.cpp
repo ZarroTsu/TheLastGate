@@ -7,8 +7,8 @@
 
 #include "imgui_wrapper.h"
 #include "imgui.h"
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 #include <SDL2/SDL.h>
 
 /* All wrapper functions must have C linkage to be callable from C code */
@@ -268,7 +268,7 @@ bool imgui_input_text(const char *label, char *buf, int buf_size) {
 }
 
 bool imgui_input_text_area(const char *label, char *buf, int buf_size, float width, float height) {
-    return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
+    return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(width, height));
 }
 
 bool imgui_input_int(const char *label, int *v) {
