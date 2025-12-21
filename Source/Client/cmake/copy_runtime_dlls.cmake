@@ -17,15 +17,17 @@ if(WIN32)
     # vcpkg sets the IMPORTED_LOCATION property for DLLs
 
     # Helper: Copy DLLs for a target's dependencies
+    # Use debug DLLs for Debug builds, release DLLs for Release builds
     add_custom_command(TARGET TheLastGate POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "Copying vcpkg DLLs to output directory..."
 
-        # vcpkg installs DLLs to vcpkg_installed/<triplet>/bin/
+        # vcpkg installs debug DLLs to vcpkg_installed/<triplet>/debug/bin/
+        # and release DLLs to vcpkg_installed/<triplet>/bin/
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/bin"
+            "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/debug/bin,${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/bin>"
             "$<TARGET_FILE_DIR:TheLastGate>"
 
-        COMMENT "Copying runtime DLLs from vcpkg"
+        COMMENT "Copying runtime DLLs from vcpkg ($<CONFIG> build)"
     )
 
     # Also copy MinGW runtime DLLs if using MinGW compiler
