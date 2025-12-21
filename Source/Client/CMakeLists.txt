@@ -13,12 +13,15 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     endif ()
 endif ()
 
-# Set default triplet based on compiler
-# MinGW needs x64-mingw-dynamic, MSVC needs x64-windows
+# Set default triplet based on platform and compiler
+# MinGW needs x64-mingw-dynamic, MSVC needs x64-windows, Linux needs x64-linux
 if (NOT DEFINED VCPKG_TARGET_TRIPLET)
     if (MINGW)
         set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "vcpkg target triplet")
         message(STATUS "Detected MinGW compiler, using vcpkg triplet: x64-mingw-dynamic")
+    elseif (UNIX AND NOT APPLE)
+        set(VCPKG_TARGET_TRIPLET "x64-linux" CACHE STRING "vcpkg target triplet")
+        message(STATUS "Detected Linux, using vcpkg triplet: x64-linux")
     else ()
         set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "vcpkg target triplet")
         message(STATUS "Using vcpkg triplet: x64-windows")
@@ -29,8 +32,15 @@ project(TheLastGate LANGUAGES C CXX)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/compiler_options.cmake)
 
+# Platform-specific source files
+if (WIN32)
+    set(PLATFORM_SOURCES TheLastGate.rc)
+else ()
+    set(PLATFORM_SOURCES)
+endif ()
+
 add_executable(TheLastGate
-        TheLastGate.rc
+        ${PLATFORM_SOURCES}
         engine.c
         engine.h
         src/graphics/atlas.c
