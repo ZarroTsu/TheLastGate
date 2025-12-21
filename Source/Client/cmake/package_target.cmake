@@ -10,14 +10,26 @@ if (WIN32)
             "${OUTPUT_DIR}/resources"
             "${OUTPUT_DIR}/gx00.dat"
             "${OUTPUT_DIR}/gx00.idx"
-            "${OUTPUT_DIR}/libpng16-16.dll"
             "${OUTPUT_DIR}/pnglib.dat"
             "${OUTPUT_DIR}/pnglib.idx"
+
+            # SDL2 libraries
             "${OUTPUT_DIR}/SDL2.dll"
             "${OUTPUT_DIR}/SDL2_image.dll"
             "${OUTPUT_DIR}/SDL2_mixer.dll"
             "${OUTPUT_DIR}/SDL2_net.dll"
-            "${OUTPUT_DIR}/zlib1.dll"
+
+            # Image support (PNG only)
+            "${OUTPUT_DIR}/libpng16.dll"
+            "${OUTPUT_DIR}/libzlib1.dll"
+
+            # Audio codecs (Vorbis is hard dependency of SDL2_mixer in vcpkg)
+            "${OUTPUT_DIR}/libogg.dll"
+            "${OUTPUT_DIR}/libvorbis.dll"
+            "${OUTPUT_DIR}/libvorbisenc.dll"
+            "${OUTPUT_DIR}/libvorbisfile.dll"
+
+            # MinGW runtime libraries
             "${OUTPUT_DIR}/libgcc_s_seh-1.dll"
             "${OUTPUT_DIR}/libstdc++-6.dll"
             "${OUTPUT_DIR}/libwinpthread-1.dll"
