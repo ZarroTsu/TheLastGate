@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "engine.h"
-#include "input.h"
+#include "game/game_input.h"
 #include "config/config.h"
 
 bool ui_button(const char *label, float width, float height) {

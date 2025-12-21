@@ -7,7 +7,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_net.h>
 
-#include "../../input.h"
+#include "game/game_input.h"
 #include "graphics/render.h"
 #include "log/log.h"
 #include "mods/stubborn_actions.h"

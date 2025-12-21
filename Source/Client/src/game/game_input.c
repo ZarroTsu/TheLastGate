@@ -1,14 +1,14 @@
-﻿#include "input.h"
+﻿#include "game_input.h"
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_syswm.h>
 
-#include "inter.h"
-#include "main.h"
-#include "src/net/socket.h"
-#include "engine.h"
+#include "../../inter.h"
+#include "../../main.h"
+#include "../net/socket.h"
+#include "../../engine.h"
 #include "config/config.h"
 #include "graphics/atlas.h"
 #include "graphics/scaling.h"

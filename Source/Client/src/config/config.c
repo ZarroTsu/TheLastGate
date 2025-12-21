@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "graphics/sdl.h"
-#include "input.h"
+#include "game/game_input.h"
 #include "log/log.h"
 
 GlobalConfig g_config = {

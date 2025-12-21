@@ -29,7 +29,7 @@
 
 #include "common.h"
 #include "ui/imgui/imgui_wrapper.h"
-#include "input.h"
+#include "game/game_input.h"
 #include "inter.h"
 #include "main.h"
 #include "config/config.h"

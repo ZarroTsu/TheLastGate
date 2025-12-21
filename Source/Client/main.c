@@ -6,7 +6,7 @@
 #include <SDL2/SDL_net.h>
 
 #include "common.h"
-#include "input.h"
+#include "game/game_input.h"
 #include "inter.h"
 #include "net/connection.h"
 #include "graphics/render.h"

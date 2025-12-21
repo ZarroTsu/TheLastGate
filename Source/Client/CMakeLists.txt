@@ -42,13 +42,13 @@ endif ()
 add_executable(TheLastGate
         ${PLATFORM_SOURCES}
         engine.c
-        input.c
         inter.c
         main.c
         options.c
         src/audio/sound.c
         src/config/config.c
         src/config/keybindings.c
+        src/game/game_input.c
         src/graphics/atlas.c
         src/graphics/loader.c
         src/graphics/render.c
