@@ -41,7 +41,7 @@
 #include "mods/base_cost_warning.h"
 #include "mods/stubborn_actions.h"
 #include "mods/use_queue.h"
-#include "ui/spell_hud.h"
+#include "ui/hotbar.h"
 #include "ui/option_window.h"
 #include "util/math_util.h"
 
