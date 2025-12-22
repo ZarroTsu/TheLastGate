@@ -20,5 +20,6 @@ typedef struct {
     /* Window Visibility */
     unsigned int open_shop;
     bool show_waypoints;
+    unsigned int open_skill_tree;
 
 } GameUiState;

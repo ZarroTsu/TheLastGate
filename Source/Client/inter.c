@@ -345,17 +345,17 @@ void button_command(int nr)
 			show_tuto=0;
 			if (keys)
 			{
-				if (st_skill_pts_all(pl.os_tree)>0 && show_tree!=2)
-					show_tree = 2;
+				if (st_skill_pts_all(pl.os_tree)>0 && game_ui_state.open_skill_tree != 2)
+					game_ui_state.open_skill_tree = 2;
 				else
-					show_tree = 0;
+					game_ui_state.open_skill_tree = 0;
 			}
 			else
 			{
-				if (st_skill_pts_all(pl.tree_points)>0 && show_tree!=1)
-					show_tree = 1;
+				if (st_skill_pts_all(pl.tree_points)>0 && game_ui_state.open_skill_tree != 1)
+					game_ui_state.open_skill_tree = 1;
 				else
-					show_tree = 0;
+					game_ui_state.open_skill_tree = 0;
 			}
 			break;
 
@@ -1922,7 +1922,7 @@ int mouse_tree(int x, int y, int mode)
 {
 	int nr, n, keys;
 	
-	if (!show_tree) return 0;
+	if (!game_ui_state.open_skill_tree) return 0;
 	
 	keys=0;
 	SDL_Keymod mods = SDL_GetModState();
@@ -1937,7 +1937,7 @@ int mouse_tree(int x, int y, int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{ 
-			show_tree=0;
+			game_ui_state.open_skill_tree = 0;
 		}
 		return 1;
 	}
@@ -1951,7 +1951,7 @@ int mouse_tree(int x, int y, int mode)
 	// Selecting a skill icon
 	if (nr<12) 
 	{
-		if (show_tree==2)
+		if (game_ui_state.open_skill_tree == 2)
 		{
 			if (mode==MS_LB_UP) 
 			{

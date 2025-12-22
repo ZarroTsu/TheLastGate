@@ -1363,7 +1363,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	show_tree=0,dept_page=0,show_opts=0;
+unsigned int	dept_page=0,show_opts=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -2259,9 +2259,9 @@ void eng_display_win(int plr_sprite,int init)
 		// Display Skill Tree button if applicable - a similar check is required in inter.c
 		if (st_skill_pts_all(pl.tree_points)>0)
 		{
-			if (st_skill_pts_have(pl.tree_points)>0 && show_tree!=1)
+			if (st_skill_pts_have(pl.tree_points)>0 && game_ui_state.open_skill_tree != 1)
 				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(SDL_GetTicks()%16))*2)));
-			else if (st_skill_pts_have(pl.os_tree)>0 && show_tree!=2)
+			else if (st_skill_pts_have(pl.os_tree)>0 && game_ui_state.open_skill_tree != 2)
 				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(SDL_GetTicks()%16))*2)));
 			copyspritex(do_darkmode?18004:18002, 339, 179,  0);
 		}
@@ -2444,7 +2444,7 @@ void eng_display_win(int plr_sprite,int init)
 	}
 
 	if (init) {
-		if (game_ui_state.open_shop || game_ui_state.show_waypoints || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
+		if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -2807,10 +2807,10 @@ void eng_display_win(int plr_sprite,int init)
 			showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(game_ui_state.waypoint_scroll*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
 		}
 		
-		if (show_tree)
+		if (game_ui_state.open_skill_tree)
 		{
 			copyspritex(do_darkmode?18007:18006,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element HL_SKTREE
-			if      (show_tree==2)   m = 9;
+			if      (game_ui_state.open_skill_tree == 2)   m = 9;
 			else if (IS_SEYAN_DU)    m = 0;
 			else if (IS_ARCHTEMPLAR) m = 1;
 			else if (IS_SKALD)       m = 2;
@@ -4912,7 +4912,7 @@ void engine(void)
 			noshop--;
 			game_ui_state.open_shop=0;
 			game_ui_state.show_waypoints = false;
-			show_tree=0;
+			game_ui_state.open_skill_tree = 0;
 			show_book=0;
 			show_motd=0;
 			show_newp=0;

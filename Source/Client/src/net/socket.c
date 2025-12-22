@@ -719,7 +719,7 @@ void sv_look6(unsigned char *buf)
 		show_motd=0;
 		show_newp=0;
 		show_tuto=0;
-		show_tree=0;
+		game_ui_state.open_skill_tree = 0;
 	}
 }
 
@@ -749,7 +749,7 @@ void sv_look7(unsigned char *buf)
 		show_motd=0;
 		show_newp=0;
 		show_tuto=0;
-		show_tree=0;
+		game_ui_state.open_skill_tree = 0;
 	}
 }
 
@@ -779,7 +779,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 		show_motd=0;
 		show_newp=0;
 		show_tuto=0;
-		show_tree=0;
+		game_ui_state.open_skill_tree = 0;
 	}
 }
 

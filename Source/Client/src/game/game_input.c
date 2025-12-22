@@ -259,8 +259,8 @@ void game_handle_input(const SDL_Event *e) {
                         game_ui_state.show_waypoints = false;
                         closed_window = true;
                     }
-                    if (show_tree != 0) {
-                        show_tree = 0;
+                    if (game_ui_state.open_skill_tree != 0) {
+                        game_ui_state.open_skill_tree = 0;
                         closed_window = true;
                     }
                     if (show_book != 0) {
