@@ -59,8 +59,10 @@ add_executable(TheLastGate
         src/graphics/shaders/magic_shader.c
         src/graphics/shaders/shaders.c
         src/graphics/shaders/solid_shader.c
+        src/input/input.c
         src/launcher/character_manager.c
         src/launcher/launcher.c
+        src/launcher/launcher_input.c
         src/log/log.c
         src/mods/base_cost_warning.c
         src/mods/give_more.c

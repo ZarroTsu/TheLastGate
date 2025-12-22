@@ -646,7 +646,7 @@ void launcher_render() {
             if (connection_status.state == CONNECTION_STATE_CONNECTED) {
                 is_connecting = 0;
                 save_options();
-                launching = false;
+                g_game_state = GAME_STATE_GAME;
             } else if (connection_status.state == CONNECTION_STATE_ERROR) {
                 is_connecting = 0;
                 log_error("Connection failed: %s", connection_status.error_message);

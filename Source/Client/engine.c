@@ -36,6 +36,7 @@
 #include "graphics/render.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
+#include "input/input.h"
 #include "mods/base_cost_warning.h"
 #include "mods/stubborn_actions.h"
 #include "mods/use_queue.h"

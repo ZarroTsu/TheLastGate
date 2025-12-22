@@ -15,6 +15,7 @@
 #include "config/keybindings.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
+#include "input/input.h"
 #include "launcher/launcher.h"
 #include "log/log.h"
 #include "security/security.h"
@@ -34,7 +35,7 @@ SDL_Cursor* cursors[10];
 void cmd(int cmd,int x,int y);
 
 int quit=0;
-bool launching = 0;
+GameState g_game_state = GAME_STATE_LAUNCHER;
 
 void engine(void);
 
@@ -209,8 +210,8 @@ int main(int argc, char *argv[]) {
 
 	if (!security_try_lock()) return 0;
 
-	launching = true;
-	while (!quit && launching) {
+	g_game_state = GAME_STATE_LAUNCHER;
+	while (!quit && g_game_state == GAME_STATE_LAUNCHER) {
 		handle_input();
 
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -232,7 +233,7 @@ int main(int argc, char *argv[]) {
 	launcher_shutdown();
 
 	keybindings_init();
-	input_init();
+	game_input_init();
 
 	engine();
 

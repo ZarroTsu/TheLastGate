@@ -7,6 +7,11 @@ typedef struct {
     int major, minor;
 } SdlClientVersion;
 
+typedef enum {
+    GAME_STATE_LAUNCHER,
+    GAME_STATE_GAME,
+} GameState;
+
 const extern SdlClientVersion CLIENT_VERSION;
 extern int quit;
 extern int cur_pos;
@@ -18,7 +23,7 @@ extern int chat_mode_active;
 extern int logstart;
 extern int logtimer;
 extern int mx, my;
-extern bool launching;
+extern GameState g_game_state;
 
 extern int do_alpha;
 extern int do_shadow;

@@ -3,6 +3,7 @@
 #include <SDL2/SDL_filesystem.h>
 #include <string.h>
 
+#include "main.h"
 #include "graphics/sdl.h"
 #include "game/game_input.h"
 #include "log/log.h"
@@ -35,7 +36,9 @@ GlobalConfig g_config = {
 };
 
 void apply_config_changes(void) {
-    sync_chat_input_state();
+    if (g_game_state == GAME_STATE_GAME) {
+        sync_chat_input_state();
+    }
 }
 
 void config_init_paths(void) {

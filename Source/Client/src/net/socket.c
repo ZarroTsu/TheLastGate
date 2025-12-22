@@ -9,6 +9,7 @@
 
 #include "game/game_input.h"
 #include "graphics/render.h"
+#include "input/input.h"
 #include "log/log.h"
 #include "mods/stubborn_actions.h"
 #include "mods/give_more.h"

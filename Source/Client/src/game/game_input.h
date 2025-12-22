@@ -2,18 +2,14 @@
 #include <stdbool.h>
 #include <SDL2/SDL_events.h>
 
-extern int quit;
-extern SDL_Event input_events[128];
-extern int input_event_count;
 extern bool waiting_for_keybind;
 
-void input_init(void);
+void game_input_init(void);
+void game_input_shutdown(void);
 
 void sync_chat_input_state(void);
 
-void handle_input(void);
-
-void scale_event_for_imgui(SDL_Event *event);
+void game_handle_input(const SDL_Event *e);
 
 typedef enum {
     NONE,
