@@ -1363,7 +1363,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	dept_page=0,show_opts=0;
+unsigned int	dept_page=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -4775,7 +4775,7 @@ int maynotquit=TICKS*5/TICKMULTI;
 
 void cmd_options() {
 	is_resetting_keybinds = false;
-	show_opts = show_opts ? 0 : 1;
+	game_ui_state.show_options = game_ui_state.show_options ? false : true;
 }
 
 void cmd_exit(void)
@@ -4939,7 +4939,7 @@ void engine(void)
 			imgui_new_frame(1.0f, 1.0f);
 
 			spell_hud();
-			if (show_opts) {
+			if (game_ui_state.show_options) {
 				options_window_render();
 			}
 

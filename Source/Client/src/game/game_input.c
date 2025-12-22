@@ -34,7 +34,7 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
             ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280))
         return DEPOT_PAGE;
 
-    if (show_opts && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
+    if (game_ui_state.show_options && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
             ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280)) {
         return OPTIONS_WINDOW;
     }
@@ -120,7 +120,7 @@ static void handle_hotkey(const BindingDescriptor *binding) {
     /* Window Hotkeys */
     if (strcmp(id, TOGGLE_OPTIONS_HOTKEY) == 0) {
         // dd_savescreen(); TODO: Implement this
-        show_opts = !show_opts;
+        game_ui_state.show_options = !game_ui_state.show_options;
         apply_config_changes();
         return;
     }
@@ -279,8 +279,8 @@ void game_handle_input(const SDL_Event *e) {
                         show_tuto = 0;
                         closed_window = true;
                     }
-                    if (show_opts != 0) {
-                        show_opts = 0;
+                    if (game_ui_state.show_options) {
+                        game_ui_state.show_options = false;
                         apply_config_changes();
                         closed_window = true;
                     }

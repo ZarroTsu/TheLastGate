@@ -13,6 +13,7 @@
 #include "ui.h"
 #include "widgets.h"
 #include "config/config.h"
+#include "game/game_ui.h"
 #include "graphics/sdl.h"
 
 extern int do_darkmode;
@@ -256,7 +257,7 @@ void options_window_render() {
         imgui_center_next_item(button_width);
 
         if (ui_button("Close", button_width, 15.0f)) {
-            show_opts = false;
+            game_ui_state.show_options = false;
             apply_config_changes();
         }
     }

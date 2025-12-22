@@ -2,7 +2,6 @@
 
 extern int noshop;
 extern int pskip, pidle;
-extern int show_opts;
 
 extern int st_learned_skill(int st_val, int v);
 
