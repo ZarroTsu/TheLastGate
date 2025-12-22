@@ -23,14 +23,16 @@ typedef struct {
     /* Hud Mode */
     GameHudMode hud_mode;
 
-    /* Window Visibility */
-    unsigned int open_shop;
+    /* Window Settings */
+    TutorialState tutorial;
+
     bool show_waypoints;
-    unsigned int open_skill_tree;
     bool show_options;
-    unsigned int open_book;
     bool show_motd;
     bool show_new_player;
-    TutorialState tutorial;
+
+    unsigned int open_shop;
+    unsigned int open_skill_tree;
+    unsigned int open_book;
 
 } GameUiState;
