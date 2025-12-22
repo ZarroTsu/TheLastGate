@@ -15,4 +15,8 @@ typedef struct {
 
     /* Hud Mode */
     GameHudMode hud_mode;
+
+    /* Window Visibility */
+    unsigned int open_shop;
+
 } GameUiState;

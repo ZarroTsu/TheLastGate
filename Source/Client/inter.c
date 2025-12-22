@@ -337,7 +337,7 @@ void button_command(int nr)
 			break;
 		
 		case 47:
-			show_shop=0;
+			game_ui_state.open_shop=0;
 			show_wps =0;
 			show_book=0;
 			show_motd=0;
@@ -632,7 +632,7 @@ int mouse_inventory(int x,int y,int mode)
 		{
 			if (mode==MS_LB_UP)
 			{
-				if (show_shop && show_shop != 110 && show_shop != 111)
+				if (game_ui_state.open_shop && game_ui_state.open_shop != 110 && game_ui_state.open_shop != 111)
 				{	// Sell item from inventory
 					cmd3(CL_CMD_QSHOP,shop.nr,nr+game_ui_state.inventory_scroll,dept_page);
 				}
@@ -1692,12 +1692,12 @@ int mouse_shop(int x,int y,int mode)
 {
 	int nr,tx,ty,keys;
 
-	if (!show_shop)     return 0;
-	if (show_shop>=112) return 0;
+	if (!game_ui_state.open_shop)     return 0;
+	if (game_ui_state.open_shop>=112) return 0;
 	
 	keys=0;
 	
-	if (show_shop==110 || show_shop==111) // Blacksmith
+	if (game_ui_state.open_shop==110 || game_ui_state.open_shop==111) // Blacksmith
 	{
 		SDL_Keymod mods = SDL_GetModState();
 
@@ -1707,7 +1707,7 @@ int mouse_shop(int x,int y,int mode)
 	
 		// [X]
 		if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y+80) && y<(GUI_SHOP_Y+94)) 
-		{	if (mode==MS_LB_UP) { show_shop=0; noshop=QSIZE*3; } return 1;	}
+		{	if (mode==MS_LB_UP) { game_ui_state.open_shop=0; noshop=QSIZE*3; } return 1;	}
 		
 		nr = -1;
 		
@@ -1760,7 +1760,7 @@ int mouse_shop(int x,int y,int mode)
 	
 	// [X]
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
-	{	if (mode==MS_LB_UP) { show_shop=0; noshop=QSIZE*3; } return 1;	}
+	{	if (mode==MS_LB_UP) { game_ui_state.open_shop=0; noshop=QSIZE*3; } return 1;	}
 	
 	// Shop Contents
 	if (x>(GUI_SHOP_X) && x<(GUI_SHOP_X+280) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+280))
@@ -1796,11 +1796,11 @@ int mouse_depot(int x,int y,int mode)
 {
 	int n,m,nr,tx,ty;
 
-	if (show_shop!=112) return 0;
+	if (game_ui_state.open_shop!=112) return 0;
 	
 	// [X]
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
-	{	if (mode==MS_LB_UP) { show_shop=0; noshop=QSIZE*3; } return 1;	}
+	{	if (mode==MS_LB_UP) { game_ui_state.open_shop=0; noshop=QSIZE*3; } return 1;	}
 	
 	// Depot Contents
 	if (x>(GUI_SHOP_X+4) && x<(GUI_SHOP_X+276) && y>(GUI_SHOP_Y+4) && y<(GUI_SHOP_Y+276))

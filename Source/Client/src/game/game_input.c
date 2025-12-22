@@ -30,7 +30,7 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
             ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280))
         return WAYPOINT_PAGE;
 
-    if (show_shop == 112 && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
+    if (game_ui_state.open_shop == 112 && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
             ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280))
         return DEPOT_PAGE;
 
@@ -250,8 +250,8 @@ void game_handle_input(const SDL_Event *e) {
                     }
 
                     bool closed_window = false;
-                    if (show_shop != 0) {
-                        show_shop = 0;
+                    if (game_ui_state.open_shop != 0) {
+                        game_ui_state.open_shop = 0;
                         noshop = QSIZE * 3;
                         closed_window = true;
                     }

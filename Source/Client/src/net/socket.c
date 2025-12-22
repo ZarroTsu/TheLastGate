@@ -8,6 +8,7 @@
 #include <SDL2/SDL_net.h>
 
 #include "game/game_input.h"
+#include "game/game_ui.h"
 #include "graphics/render.h"
 #include "input/input.h"
 #include "log/log.h"
@@ -708,10 +709,10 @@ void sv_look6(unsigned char *buf)
 		tmplook.item_p[n] =*(unsigned char *)(buf+14+(n-s));
 	}
 	if (n==62) {
-		show_shop=1+*(unsigned char*)(buf+14); // gold slot bit
+		game_ui_state.open_shop=1+*(unsigned char*)(buf+14); // gold slot bit
 		shop=tmplook;
 	}
-	if (show_shop)
+	if (game_ui_state.open_shop)
 	{
 		show_wps =0;
 		show_book=0;
@@ -738,10 +739,10 @@ void sv_look7(unsigned char *buf)
 
 	if (n==7 && s==63)
 	{
-		show_shop=112;
+		game_ui_state.open_shop=112;
 		shop=tmplook;
 	}
-	if (show_shop)
+	if (game_ui_state.open_shop)
 	{
 		show_wps =0;
 		show_book=0;
@@ -762,8 +763,8 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 	shop.nr=*(unsigned short*)(buf+2);
 
 	if (n>5||n<0)	return;
-	else if (n==5)	show_shop=111;	// Is armour
-	else if (n==4)	show_shop=110;	// Is weapon
+	else if (n==5)	game_ui_state.open_shop=111;	// Is armour
+	else if (n==4)	game_ui_state.open_shop=110;	// Is weapon
 	else
 	{
 		  pl.sitem[n]=*(unsigned short*)(buf+4); // Item sprite
@@ -771,7 +772,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 		pl.sitem_f[n]=*(unsigned char *)(buf+7); // Item flags
 	}
 
-	if (show_shop)
+	if (game_ui_state.open_shop)
 	{
 		show_wps =0;
 		show_book=0;
@@ -787,7 +788,7 @@ extern int noshop;
 void sv_closeshop(unsigned char *buf)
 {
 	DEBUG("SV CLOSESHOP");
-	show_shop=0; noshop=QSIZE*3;
+	game_ui_state.open_shop=0; noshop=QSIZE*3;
 }
 
 void sv_showmotd(unsigned char *buf)

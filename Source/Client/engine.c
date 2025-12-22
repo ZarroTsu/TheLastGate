@@ -1363,7 +1363,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	show_shop=0,show_wps=0,show_tree=0,dept_page=0,show_opts=0;
+unsigned int	show_wps=0,show_tree=0,dept_page=0,show_opts=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -2444,7 +2444,7 @@ void eng_display_win(int plr_sprite,int init)
 	}
 
 	if (init) {
-		if (show_shop || show_wps || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
+		if (game_ui_state.open_shop || show_wps || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -2544,7 +2544,7 @@ void eng_display_win(int plr_sprite,int init)
 			else n=0;
 			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
 			
-			if (!show_shop || (show_shop==110 || show_shop==111)) {
+			if (!game_ui_state.open_shop || (game_ui_state.open_shop==110 || game_ui_state.open_shop==111)) {
 				copyspritex(rank_sprite[points2rank(pl.points_tot)],935,42,0);
 				copyspritex(plr_sprite,935-61,36,0);
 				xputtext(846+(125-strlen(pl.name)*6)/2,157,1,pl.name);
@@ -2616,7 +2616,7 @@ void eng_display_win(int plr_sprite,int init)
 			}
 		}
 		
-		if (show_shop==112) // New Depot
+		if (game_ui_state.open_shop==112) // New Depot
 		{
 			copyspritex(do_darkmode?18094:18093,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (n=0; n<64; n++)
@@ -2647,7 +2647,7 @@ void eng_display_win(int plr_sprite,int init)
 			yy = GUI_SHOP_Y+281 + (dept_page/4)*17;
 			showbox(xx,yy,63,12,(unsigned short)(GREEN));
 		}
-		else if (show_shop==110 || show_shop==111) // Blacksmith Window
+		else if (game_ui_state.open_shop==110 || game_ui_state.open_shop==111) // Blacksmith Window
 		{
 			if (pl.sitem[1]==17357) // Show two-material gui - sprite number for claystone
 			{
@@ -2662,7 +2662,7 @@ void eng_display_win(int plr_sprite,int init)
 			
 			if (pl.sitem[1]==17356) // Show three-button overlay - sprite number for whetstone
 			{
-				if (show_shop==110)
+				if (game_ui_state.open_shop==110)
 					copyspritex(do_darkmode?18122:18121,GUI_SHOP_X,GUI_SHOP_Y,0);
 				else
 					copyspritex(do_darkmode?18124:18123,GUI_SHOP_X,GUI_SHOP_Y,0);
@@ -2704,7 +2704,7 @@ void eng_display_win(int plr_sprite,int init)
 					copyspritex(4000+pl.sitem_s[n],xx,yy,hh);
 			}
 		}
-		else if (show_shop) 
+		else if (game_ui_state.open_shop)
 		{
 			copyspritex(do_darkmode?18092:92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			y=0;
@@ -2726,7 +2726,7 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if (hh && (pr = (shop.price[n] - (shop.price[n]&(1<<30)) - (shop.price[n]&(1<<31)))))
 				{
-					if (show_shop>=1 && show_shop<=101) // Normal shop
+					if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101) // Normal shop
 					{
 						SDL_Keymod mods = SDL_GetModState();
 						if ((mods & KMOD_CTRL) || (mods & KMOD_ALT))
@@ -2739,39 +2739,39 @@ void eng_display_win(int plr_sprite,int init)
 							xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
 						}
 					}
-					if (show_shop==102) // Black Stronghold
+					if (game_ui_state.open_shop==102) // Black Stronghold
 						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
-					if (show_shop==103) // Casino
+					if (game_ui_state.open_shop==103) // Casino
 						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
-					if (show_shop==104) // Contract
+					if (game_ui_state.open_shop==104) // Contract
 						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
-					if (show_shop==105) // Exp
+					if (game_ui_state.open_shop==105) // Exp
 						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
 				}
 			}
 			if (pl.citem && shop.pl_price)
 			{
-				if (show_shop>=1 && show_shop<=101)
+				if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			/*  Sadly this is harder to do than it looks
 			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)game_ui_state.inventory_scroll) && shop.pl_price)
 			{
-				if (show_shop>=1 && show_shop<=101)
+				if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			*/
 			if (y)
 			{
-				if (show_shop>=1 && show_shop<=101)
+				if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
-				if (show_shop==102) // Black Stronghold
+				if (game_ui_state.open_shop==102) // Black Stronghold
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
-				if (show_shop==103) // Casino
+				if (game_ui_state.open_shop==103) // Casino
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
-				if (show_shop==104) // Contract
+				if (game_ui_state.open_shop==104) // Contract
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
-				if (show_shop==105) // Exp
+				if (game_ui_state.open_shop==105) // Exp
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Unspent Exp: %9d",pl.points);
 			}
 
@@ -4860,7 +4860,7 @@ void engine(void)
 		if (look_timer)	look_timer--;
 		else show_look=0;
 
-		if ((show_shop) && lookstep>QSIZE)
+		if ((game_ui_state.open_shop) && lookstep>QSIZE)
 		{
 			cmd1s(CL_CMD_LOOK,shop.nr);
 			lookstep=0;
@@ -4910,7 +4910,7 @@ void engine(void)
 		if (noshop>0) 
 		{
 			noshop--;
-			show_shop=0;
+			game_ui_state.open_shop=0;
 			show_wps=0;
 			show_tree=0;
 			show_book=0;
