@@ -9,6 +9,12 @@ typedef enum {
 } GameHudMode;
 
 typedef struct {
+    unsigned int open;
+    unsigned int page;
+    unsigned int count;
+} TutorialState;
+
+typedef struct {
     /* Scroll Positions */
     int inventory_scroll;
     int skill_scroll;
@@ -25,5 +31,6 @@ typedef struct {
     unsigned int open_book;
     bool show_motd;
     bool show_new_player;
+    TutorialState tutorial;
 
 } GameUiState;

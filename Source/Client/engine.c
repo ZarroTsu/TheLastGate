@@ -1365,8 +1365,6 @@ void eng_init_player(void)
 
 unsigned int	dept_page=0;
 
-unsigned int	show_tuto=0,tuto_page=0,tuto_max=0;
-
 int				mm_magnify=2;
 
 unsigned int   show_look=0,
@@ -2444,7 +2442,7 @@ void eng_display_win(int plr_sprite,int init)
 	}
 
 	if (init) {
-		if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || game_ui_state.open_book || game_ui_state.show_motd || game_ui_state.show_new_player || show_tuto) show_look=0;
+		if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || game_ui_state.open_book || game_ui_state.show_motd || game_ui_state.show_new_player || game_ui_state.tutorial.open) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -2890,7 +2888,7 @@ void eng_display_win(int plr_sprite,int init)
 		if (game_ui_state.open_book)
 		{
 			copyspritex(do_darkmode?18046:18045,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			for (y=0+MLL/3*(tuto_page-1); y<MLL/3*tuto_page; y++) {
+			for (y=0+MLL/3*(game_ui_state.tutorial.page-1); y<MLL/3*game_ui_state.tutorial.page; y++) {
 				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*15,
 					motdfont[y],motdtext[y]);
 			}
@@ -2914,14 +2912,14 @@ void eng_display_win(int plr_sprite,int init)
 			}
 		}
 		
-		if (show_tuto)
+		if (game_ui_state.tutorial.open)
 		{
 			copyspritex(do_darkmode?18044:44,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			copyspritex(tutorial_image[show_tuto-1][tuto_page-1],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
+			copyspritex(tutorial_image[game_ui_state.tutorial.open-1][game_ui_state.tutorial.page-1],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
 			for (y=0;y<12;y++)
 			{
 				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
-					1,tutorial_text[show_tuto-1][tuto_page-1][y]);
+					1,tutorial_text[game_ui_state.tutorial.open-1][game_ui_state.tutorial.page-1][y]);
 			}
 		}
 	}
@@ -4916,7 +4914,7 @@ void engine(void)
 			game_ui_state.open_book=0;
 			game_ui_state.show_motd=false;
 			game_ui_state.show_new_player = false;
-			show_tuto=0;
+			game_ui_state.tutorial.open=0;
 		}
 
 		handle_input();

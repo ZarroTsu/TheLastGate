@@ -717,7 +717,7 @@ void sv_look6(unsigned char *buf)
 		game_ui_state.open_book=0;
 		game_ui_state.show_motd = false;
 		game_ui_state.show_new_player = false;
-		show_tuto=0;
+		game_ui_state.tutorial.open=0;
 		game_ui_state.open_skill_tree = 0;
 	}
 }
@@ -747,7 +747,7 @@ void sv_look7(unsigned char *buf)
 		game_ui_state.open_book=0;
 		game_ui_state.show_motd = false;
 		game_ui_state.show_new_player = false;
-		show_tuto=0;
+		game_ui_state.tutorial.open=0;
 		game_ui_state.open_skill_tree = 0;
 	}
 }
@@ -777,7 +777,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 		game_ui_state.open_book=0;
 		game_ui_state.show_motd = false;
 		game_ui_state.show_new_player = false;
-		show_tuto=0;
+		game_ui_state.tutorial.open=0;
 		game_ui_state.open_skill_tree = 0;
 	}
 }
@@ -800,9 +800,9 @@ void sv_showmotd(unsigned char *buf)
 
 	if (n>=100)
 	{	// Display tutorial
-		tuto_page=1;
-		show_tuto=(n%100);
-		tuto_max=3;
+		game_ui_state.tutorial.page=1;
+		game_ui_state.tutorial.open=(n%100);
+		game_ui_state.tutorial.count=3;
 	}
 	else if (n==99)
 	{	// Display NEW PLAYER MotD from server and offer tutorial
@@ -811,8 +811,8 @@ void sv_showmotd(unsigned char *buf)
 	else if (n)
 	{
 		game_ui_state.open_book=n;
-		tuto_page=1;
-		tuto_max=3;
+		game_ui_state.tutorial.page=1;
+		game_ui_state.tutorial.count=3;
 	}
 	else
 	{	// Display normal MotD from server

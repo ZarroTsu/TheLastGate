@@ -342,7 +342,7 @@ void button_command(int nr)
 			game_ui_state.open_book=0;
 			game_ui_state.show_motd = false;
 			game_ui_state.show_new_player = false;
-			show_tuto=0;
+			game_ui_state.tutorial.open=0;
 			if (keys)
 			{
 				if (st_skill_pts_all(pl.os_tree)>0 && game_ui_state.open_skill_tree != 2)
@@ -1996,7 +1996,7 @@ int mouse_book(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			if (game_ui_state.show_new_player) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
-			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
+			if (game_ui_state.tutorial.open) cmd1(CL_CMD_MOTD,game_ui_state.tutorial.open); // Tell server we did this tutorial
 			game_ui_state.open_book=0;
 			noshop=QSIZE*3;
 		}
@@ -2008,8 +2008,8 @@ int mouse_book(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{ 
-			tuto_page--; 
-			if (tuto_page<=1) tuto_page=1;
+			game_ui_state.tutorial.page--;
+			if (game_ui_state.tutorial.page<=1) game_ui_state.tutorial.page=1;
 			else play_sound("sfx/click.wav",CLICKVOL,0);
 		}
 		return 1;
@@ -2020,8 +2020,8 @@ int mouse_book(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{
-			tuto_page++; 
-			if (tuto_page>=tuto_max) tuto_page=tuto_max;
+			game_ui_state.tutorial.page++;
+			if (game_ui_state.tutorial.page>=game_ui_state.tutorial.count) game_ui_state.tutorial.page=game_ui_state.tutorial.count;
 			else play_sound("sfx/click.wav",CLICKVOL,0);
 		}
 		return 1;
@@ -2040,7 +2040,7 @@ int mouse_motd(int x,int y,int mode)
 {
 	int nr, tx, ty;
 	
-	if (!game_ui_state.show_motd && !game_ui_state.show_new_player && !show_tuto) return 0;
+	if (!game_ui_state.show_motd && !game_ui_state.show_new_player && !game_ui_state.tutorial.open) return 0;
 	
 	// Close Window
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
@@ -2048,10 +2048,10 @@ int mouse_motd(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			if (game_ui_state.show_new_player) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
-			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
+			if (game_ui_state.tutorial.open) cmd1(CL_CMD_MOTD,game_ui_state.tutorial.open); // Tell server we did this tutorial
 			game_ui_state.show_motd = false;
 			game_ui_state.show_new_player = false;
-			show_tuto=0;
+			game_ui_state.tutorial.open=0;
 			noshop=QSIZE*3;
 		}
 		return 1;
@@ -2077,14 +2077,14 @@ int mouse_motd(int x,int y,int mode)
 			if (game_ui_state.show_new_player)
 			{
 				game_ui_state.show_new_player = false;
-				show_tuto=1; tuto_page=1; tuto_max=3;
+				game_ui_state.tutorial.open=1; game_ui_state.tutorial.page=1; game_ui_state.tutorial.count=3;
 				play_sound("sfx/click.wav",CLICKVOL,0);
 			}
 			// Tutorial window PREV
-			else if (show_tuto)
+			else if (game_ui_state.tutorial.open)
 			{
-				tuto_page--; 
-				if (tuto_page<=1) tuto_page=1;
+				game_ui_state.tutorial.page--;
+				if (game_ui_state.tutorial.page<=1) game_ui_state.tutorial.page=1;
 				else play_sound("sfx/click.wav",CLICKVOL,0);
 				
 			}
@@ -2105,10 +2105,10 @@ int mouse_motd(int x,int y,int mode)
 				noshop=QSIZE*3;
 			}
 			// Tutorial window NEXT
-			else if (show_tuto)
+			else if (game_ui_state.tutorial.open)
 			{
-				tuto_page++; 
-				if (tuto_page>=tuto_max) tuto_page=tuto_max;
+				game_ui_state.tutorial.page++;
+				if (game_ui_state.tutorial.page>=game_ui_state.tutorial.count) game_ui_state.tutorial.page=game_ui_state.tutorial.count;
 				else play_sound("sfx/click.wav",CLICKVOL,0);
 			}
 		}
