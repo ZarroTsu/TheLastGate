@@ -740,6 +740,10 @@ void sv_look7(unsigned char *buf)
 	tmplook.depot_f[n][s] =*(unsigned char *)(buf+6);
 	tmplook.depot_c[n][s] =*(unsigned char *)(buf+7);
 
+	tmplook.depot_info[n][s] = (ItemDisplayInfo){
+		tmplook.depot[n][s], tmplook.depot_c[n][s], tmplook.depot_s[n][s], tmplook.depot_f[n][s]
+	};
+
 	if (n==7 && s==63)
 	{
 		game_ui_state.open_shop=112;

@@ -2095,8 +2095,9 @@ typedef struct {
 } GridLayout;
 
 static const GridLayout inventory_layout = {261, 6, 10, 34, 34};
+static const GridLayout depot_layout = {GUI_SHOP_X + 6, GUI_SHOP_Y + 6, 8, 34, 34};
 
-static void inv_slot_to_xy(const GridLayout *layout, const int slot, int *out_x, int *out_y) {
+static void grid_slot_to_xy(const GridLayout *layout, const int slot, int *out_x, int *out_y) {
 	const int col = slot % layout->columns;
 	const int row = slot / layout->columns;
 
@@ -2137,7 +2138,7 @@ void eng_display_win(int plr_sprite,int init)
 		for (n=0; n<30; n++) {
 			int slot_x, slot_y;
 			int inventory_slot = n+game_ui_state.inventory_scroll; // N represents the visible slot
-			inv_slot_to_xy(&inventory_layout, n, &slot_x, &slot_y);
+			grid_slot_to_xy(&inventory_layout, n, &slot_x, &slot_y);
 			// Draw inventory items
 			if (pl.item_info[inventory_slot].sprite) {
 				bool highlighted = hightlight==HL_BACKPACK && hightlight_sub==inventory_slot;
@@ -2562,20 +2563,10 @@ void eng_display_win(int plr_sprite,int init)
 			for (n=0; n<64; n++)
 			{
 				if (!shop.depot[game_ui_state.open_depot_page][n]) continue;
-				
-				hh = 0;
-				xx = GUI_SHOP_X+6+(n%8)*34;
-				yy = GUI_SHOP_Y+6+(n/8)*34;
-				
-				if (!pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n) hh = 16;
-				
-				copyspritex(shop.depot[game_ui_state.open_depot_page][n],xx,yy,hh);												// Draw Item
-				if (shop.depot_f[game_ui_state.open_depot_page][n] & 1) copyspritex(4496,xx,yy,hh); 							// Draw SS
-				if (shop.depot_f[game_ui_state.open_depot_page][n] & 2) copyspritex(4497,xx,yy,hh); 							// Draw EN
-				if (shop.depot_f[game_ui_state.open_depot_page][n] & 4) copyspritex(6881,xx,yy,hh); 							// Draw CR
-				if (shop.depot_c[game_ui_state.open_depot_page][n])		copyspritex(6999+shop.depot_c[game_ui_state.open_depot_page][n],xx,yy,hh);	// Draw CA
-				if (shop.depot_s[game_ui_state.open_depot_page][n]>0&&shop.depot_s[game_ui_state.open_depot_page][n]<=10)							// Draw Stack
-					copyspritex(4000+shop.depot_s[game_ui_state.open_depot_page][n],xx,yy,hh);
+				int slot_x, slot_y;
+				grid_slot_to_xy(&depot_layout, n, &slot_x, &slot_y);
+				bool highlighted = !pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n;
+				render_depot_item_display(&shop.depot_info[game_ui_state.open_depot_page][n], slot_x, slot_y, highlighted ? 16 : 0);
 			}
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
 			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);

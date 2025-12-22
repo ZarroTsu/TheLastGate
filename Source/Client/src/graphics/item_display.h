@@ -16,6 +16,13 @@ typedef enum {
     ITEM_FLAG_CORRUPTION = 1 << 3,
 } ItemFlags;
 
+typedef enum {
+    DEPOT_ITEM_FLAG_NONE = 0,
+    DEPOT_ITEM_FLAG_SOULSTONE = 1 << 0,
+    DEPOT_ITEM_FLAG_TALISMAN = 1 << 1,
+    DEPOT_ITEM_FLAG_CORRUPTION = 1 << 2
+} DepotItemFlags;
+
 /* Temporary struct for passing item data to rendering functions */
 typedef struct {
     int sprite; /* Base sprite ID */
@@ -39,3 +46,5 @@ static inline ItemDisplayInfo make_item_display(int sprite, int properties,
 void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 
 void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+
+void render_depot_item_display(const ItemDisplayInfo *item, int x, int y, int effect);

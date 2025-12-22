@@ -196,6 +196,7 @@ struct look
 	unsigned char depot_s[8][64];	//      Depot stacks
 	unsigned char depot_f[8][64];	//      Depot flags
 	unsigned char depot_c[8][64];	//      Depot catalyst #
+	ItemDisplayInfo depot_info[8][64];
 };
 
 extern struct look look;
