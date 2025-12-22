@@ -27,6 +27,8 @@ static char simple_popover_text[250];
 static int is_connecting = 0;
 static char status_buf[300];
 
+static ConnectionStatus connection_status;
+
 static const char *classes[] = {
     "Templar",
     "Mercenary",
@@ -589,6 +591,34 @@ static void render_popovers() {
 
         imgui_end_popup();
     }
+
+    imgui_set_next_window_pos(UI_CENTER_X - 200, UI_CENTER_Y - 100);
+    imgui_set_next_windows_size(400, 200);
+    if (imgui_begin_popup_modal("Connection", NULL,
+                                IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_RESIZE |
+                                IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS)) {
+        imgui_center_next_item(350);
+        if (imgui_begin_child("text_container", 350, 100, false, IMGUI_WINDOW_FLAG_NO_SCROLLBAR)) {
+            imgui_text_wrapped(status_buf);
+            imgui_end_child();
+        }
+
+        imgui_spacing();
+        imgui_separator();
+        imgui_spacing();
+
+        imgui_center_next_item(120);
+        imgui_begin_disabled(
+            connection_status.state != CONNECTION_STATE_CONNECTED && connection_status.state != CONNECTION_STATE_ERROR);
+        push_button_styles();
+        if (imgui_button_sized("Ok", 120, 0)) {
+            imgui_close_current_popup();
+        }
+        pop_button_styles();
+        imgui_end_disabled();
+        imgui_end_popup();
+    }
+
     imgui_pop_style_color(3);
     imgui_pop_style_var(3);
 }
@@ -608,26 +638,23 @@ void launcher_render() {
                                   background_sprite_data->uv1.u, background_sprite_data->uv1.v,
                                   imgui_color_convert_float4_to_u32(1, 1, 1, 1));
 
-
-        render_popovers();
-
         if (is_connecting) {
-            ConnectionStatus status = connection_update();
+            connection_status = connection_update();
 
-            sprintf(status_buf, "STATUS: %s", status.status_message);
+            snprintf(status_buf, sizeof(status_buf), "STATUS: %s", connection_status.status_message);
 
-            if (status.state == CONNECTION_STATE_CONNECTED) {
+            if (connection_status.state == CONNECTION_STATE_CONNECTED) {
                 is_connecting = 0;
                 save_options();
                 launching = false;
-            } else if (status.state == CONNECTION_STATE_ERROR) {
+            } else if (connection_status.state == CONNECTION_STATE_ERROR) {
                 is_connecting = 0;
-                log_error("Connection failed: %s", status.error_message);
-                snprintf(simple_popover_text, sizeof(simple_popover_text), "Connection failed: %s",
-                         status.error_message);
-                imgui_open_popup("FYI");
+                log_error("Connection failed: %s", connection_status.error_message);
+                snprintf(status_buf, sizeof(status_buf), "STATUS: %s", connection_status.error_message);
             }
         }
+
+        render_popovers();
 
         if (imgui_begin_table("LauncherLayout", 2, IMGUI_TABLE_FLAG_SIZING_STRETCH_SAME)) {
             imgui_table_next_row(0, 40);
@@ -650,6 +677,7 @@ void launcher_render() {
             passwd[sizeof(passwd) - 1] = '\0';
 
             save_options();
+            imgui_open_popup("Connection");
 
             connection_init();
             connection_start(race, sex);
