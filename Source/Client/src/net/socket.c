@@ -328,6 +328,8 @@ void sv_setchar_item(unsigned char *buf)
 	pl.item_s[n]=*(unsigned char*)(buf+9); // stack size
 	pl.item_l[n]=*(unsigned char*)(buf+10); // item lock
 
+	pl.item_info[n] = (ItemDisplayInfo){pl.item[n], pl.item_p[n], pl.item_s[n], pl.item_l[n]};
+
 //	xlog("SV SETCHAR ITEM (%d,%d,%d)",*(unsigned long*)(buf+1),*(short int*)(buf+5),*(short int*)(buf+7));
 }
 
