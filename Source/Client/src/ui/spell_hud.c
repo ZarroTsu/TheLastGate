@@ -64,14 +64,46 @@ static void get_keybind_text_for_current_slot(int slot, char *out, int size) {
 
 static void handle_spell_selection(int skill_tab_id) {
     char keybind_text[32];
+    char item[8];
     get_keybind_text_for_current_slot(current_slot, keybind_text, sizeof(keybind_text));
-    if (pdata.xbutton[current_slot].skill_nr != skilltab[skill_tab_id].nr) {
-        pdata.xbutton[current_slot].skill_nr = skilltab[skill_tab_id].nr;
-        snprintf(pdata.xbutton[current_slot].name, 7, "%s", skilltab[skill_tab_id].name);
-        xlog(1,"%s is now %s.", keybind_text, skilltab[skill_tab_id].name);
-    } else {
-        pdata.xbutton[current_slot].skill_nr = -1;
-        xlog(1,"%s is now unassigned.", keybind_text);
+    if (skill_tab_id < 60) {
+        if (pdata.xbutton[current_slot].skill_nr != skilltab[skill_tab_id].nr) {
+            pdata.xbutton[current_slot].skill_nr = skilltab[skill_tab_id].nr;
+            snprintf(pdata.xbutton[current_slot].name, 7, "%s", skilltab[skill_tab_id].name);
+            xlog(1,"%s is now %s.", keybind_text, skilltab[skill_tab_id].name);
+        } else {
+            pdata.xbutton[current_slot].skill_nr = -1;
+            xlog(1,"%s is now unassigned.", keybind_text);
+        }
+    } else if (skill_tab_id >= 200) { // Technically Equipment
+        static char gear_name[20][8] = {
+            "*Helmet",	"*Neckla",	"*Armor",	"*Gloves",	"*Belt",
+            "*Tarot1",	"*Boots",	"*Offhan",	"*Weapon",	"*Cloak",
+            "*L-Ring",	"*R-Ring",	"*Tarot2",	"?",		"?",
+            "?", 		"?",		"?",		"?",		"?"
+        };
+
+        if (pdata.xbutton[current_slot].skill_nr == skill_tab_id) {
+            pdata.xbutton[current_slot].skill_nr = -1;
+            xlog(1, "%s is now unassigned.", keybind_text);
+        } else {
+            pdata.xbutton[current_slot].skill_nr = skill_tab_id;
+            snprintf(item, 7, "%s", gear_name[skill_tab_id - 200]);;
+            xlog(1, "%s is now %s", keybind_text, item);
+            strncpy(pdata.xbutton[current_slot].name, item, 7);
+            pdata.xbutton[current_slot].name[7] = 0;
+        }
+    } else if (skill_tab_id >= 100) {
+        if (pdata.xbutton[current_slot].skill_nr == skill_tab_id) {
+            pdata.xbutton[current_slot].skill_nr = -1;
+            xlog(1, "%s is now unassigned.", keybind_text);
+        } else {
+            pdata.xbutton[current_slot].skill_nr = skill_tab_id;
+            snprintf(item, 7, "Item %d", skill_tab_id - 100);
+            xlog(1, "%s is now %s", keybind_text, item);
+            strncpy(pdata.xbutton[current_slot].name, item, 7);
+            pdata.xbutton[current_slot].name[7] = 0;
+        }
     }
 }
 
