@@ -9,19 +9,19 @@ typedef enum {
 } SpriteOverlayId;
 
 typedef enum {
-    ITEM_FLAG_NONE = 0,
-    ITEM_FLAG_LOCKED = 1 << 0,
-    ITEM_FLAG_SOULSTONE = 1 << 1,
-    ITEM_FLAG_TALISMAN = 1 << 2,
-    ITEM_FLAG_CORRUPTION = 1 << 3,
-} ItemFlags;
+    LOCKABLE_ITEM_FLAG_NONE = 0,
+    LOCKABLE_ITEM_FLAG_LOCKED = 1 << 0,
+    LOCKABLE_ITEM_FLAG_SOULSTONE = 1 << 1,
+    LOCKABLE_ITEM_FLAG_TALISMAN = 1 << 2,
+    LOCKABLE_ITEM_FLAG_CORRUPTION = 1 << 3,
+} LockableItemFlags;
 
 typedef enum {
-    DEPOT_ITEM_FLAG_NONE = 0,
-    DEPOT_ITEM_FLAG_SOULSTONE = 1 << 0,
-    DEPOT_ITEM_FLAG_TALISMAN = 1 << 1,
-    DEPOT_ITEM_FLAG_CORRUPTION = 1 << 2
-} DepotItemFlags;
+    ITEM_FLAG_NONE = 0,
+    ITEM_FLAG_SOULSTONE = 1 << 0,
+    ITEM_FLAG_TALISMAN = 1 << 1,
+    ITEM_FLAG_CORRUPTION = 1 << 2
+} ItemFlags;
 
 /* Temporary struct for passing item data to rendering functions */
 typedef struct {
@@ -43,8 +43,8 @@ static inline ItemDisplayInfo make_item_display(int sprite, int properties,
 }
 
 /* Render an item sprite with all overlays */
-void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 
 void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 
-void render_depot_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect);

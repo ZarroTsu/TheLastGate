@@ -2142,7 +2142,7 @@ void eng_display_win(int plr_sprite,int init)
 			// Draw inventory items
 			if (pl.item_info[inventory_slot].sprite) {
 				bool highlighted = hightlight==HL_BACKPACK && hightlight_sub==inventory_slot;
-				render_item_display(&pl.item_info[inventory_slot], slot_x, slot_y, highlighted ? 16 : 0);
+				render_lockable_item_display(&pl.item_info[inventory_slot], slot_x, slot_y, highlighted ? 16 : 0);
 			}
 			// Draw shortcut key IDs
 			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)game_ui_state.inventory_scroll)
@@ -2566,7 +2566,7 @@ void eng_display_win(int plr_sprite,int init)
 				int slot_x, slot_y;
 				grid_slot_to_xy(&depot_layout, n, &slot_x, &slot_y);
 				bool highlighted = !pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n;
-				render_depot_item_display(&shop.depot_info[game_ui_state.open_depot_page][n], slot_x, slot_y, highlighted ? 16 : 0);
+				render_item_display(&shop.depot_info[game_ui_state.open_depot_page][n], slot_x, slot_y, highlighted ? 16 : 0);
 			}
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
 			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
@@ -2626,13 +2626,8 @@ void eng_display_win(int plr_sprite,int init)
 						break;
 				}
 				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) hh = 16;
-				
-				copyspritex(pl.sitem[n],xx,yy,hh);									// Draw Item
-				if (pl.sitem_f[n] & 1) copyspritex(4496,xx,yy,hh); 					// Draw SS
-				if (pl.sitem_f[n] & 2) copyspritex(4497,xx,yy,hh); 					// Draw EN
-				if (pl.sitem_f[n] & 4) copyspritex(6881,xx,yy,hh); 					// Draw CR
-				if (pl.sitem_s[n]>0&&pl.sitem_s[n]<=10)								// Draw Stack
-					copyspritex(4000+pl.sitem_s[n],xx,yy,hh);
+
+				render_item_display(&pl.smith_info[n], xx, yy, hh);
 			}
 		}
 		else if (game_ui_state.open_shop)

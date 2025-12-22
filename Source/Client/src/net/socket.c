@@ -777,6 +777,8 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 		  pl.sitem[n]=*(unsigned short*)(buf+4); // Item sprite
 		pl.sitem_s[n]=*(unsigned char *)(buf+6); // Item stack
 		pl.sitem_f[n]=*(unsigned char *)(buf+7); // Item flags
+
+		  pl.smith_info[n] = (ItemDisplayInfo){pl.sitem[n], 0, pl.sitem_s[n], pl.sitem_f[n]};
 	}
 
 	if (game_ui_state.open_shop)

@@ -276,6 +276,8 @@ struct cplayer {
 	char sitem_s[4];	// Stack
 	char sitem_f[4];	// Flags
 
+	ItemDisplayInfo smith_info[4];
+
 	int attack_cn;
 	int goto_x,goto_y;
 	int misc_action,misc_target1,misc_target2;

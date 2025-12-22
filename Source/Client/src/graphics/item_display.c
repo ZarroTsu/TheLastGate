@@ -3,20 +3,20 @@
 #include "render.h"
 #include "../../common.h"  /* For copyspritex and PL_* flags */
 
-void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
+void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
     if (!item || !item->sprite) return;
 
     /* Draw base sprite */
     copyspritex(item->sprite, x, y, effect);
 
     /* Draw overlays in order */
-    if (item->flags & ITEM_FLAG_SOULSTONE)
+    if (item->flags & LOCKABLE_ITEM_FLAG_SOULSTONE)
         copyspritex(SPRITE_OVERLAY_SOULSTONE, x, y, effect);
 
-    if (item->flags & ITEM_FLAG_TALISMAN)
+    if (item->flags & LOCKABLE_ITEM_FLAG_TALISMAN)
         copyspritex(SPRITE_OVERLAY_TALISMAN, x, y, effect);
 
-    if (item->flags & ITEM_FLAG_CORRUPTION)
+    if (item->flags & LOCKABLE_ITEM_FLAG_CORRUPTION)
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
@@ -46,20 +46,20 @@ void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int eff
         copyspritex(SPRITE_OVERLAY_STACK_BASE + item->stack, x, y, effect);
 }
 
-void render_depot_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
+void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
     if (!item || !item->sprite) return;
 
     /* Draw base sprite */
     copyspritex(item->sprite, x, y, effect);
 
     /* Draw overlays in order */
-    if (item->flags & DEPOT_ITEM_FLAG_SOULSTONE)
+    if (item->flags & ITEM_FLAG_SOULSTONE)
         copyspritex(SPRITE_OVERLAY_SOULSTONE, x, y, effect);
 
-    if (item->flags & DEPOT_ITEM_FLAG_TALISMAN)
+    if (item->flags & ITEM_FLAG_TALISMAN)
         copyspritex(SPRITE_OVERLAY_TALISMAN, x, y, effect);
 
-    if (item->flags & DEPOT_ITEM_FLAG_CORRUPTION)
+    if (item->flags & ITEM_FLAG_CORRUPTION)
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
