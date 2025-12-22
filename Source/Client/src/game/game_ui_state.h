@@ -22,5 +22,6 @@ typedef struct {
     bool show_waypoints;
     unsigned int open_skill_tree;
     bool show_options;
+    unsigned int open_book;
 
 } GameUiState;

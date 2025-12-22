@@ -263,8 +263,8 @@ void game_handle_input(const SDL_Event *e) {
                         game_ui_state.open_skill_tree = 0;
                         closed_window = true;
                     }
-                    if (show_book != 0) {
-                        show_book = 0;
+                    if (game_ui_state.open_book != 0) {
+                        game_ui_state.open_book = 0;
                         closed_window = true;
                     }
                     if (show_motd != 0) {

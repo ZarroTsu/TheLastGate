@@ -714,7 +714,7 @@ void sv_look6(unsigned char *buf)
 	if (game_ui_state.open_shop)
 	{
 		game_ui_state.show_waypoints = false;
-		show_book=0;
+		game_ui_state.open_book=0;
 		show_motd=0;
 		show_newp=0;
 		show_tuto=0;
@@ -744,7 +744,7 @@ void sv_look7(unsigned char *buf)
 	if (game_ui_state.open_shop)
 	{
 		game_ui_state.show_waypoints = false;
-		show_book=0;
+		game_ui_state.open_book=0;
 		show_motd=0;
 		show_newp=0;
 		show_tuto=0;
@@ -774,7 +774,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 	if (game_ui_state.open_shop)
 	{
 		game_ui_state.show_waypoints = false;
-		show_book=0;
+		game_ui_state.open_book=0;
 		show_motd=0;
 		show_newp=0;
 		show_tuto=0;
@@ -810,7 +810,7 @@ void sv_showmotd(unsigned char *buf)
 	}
 	else if (n)
 	{
-		show_book=n;
+		game_ui_state.open_book=n;
 		tuto_page=1;
 		tuto_max=3;
 	}

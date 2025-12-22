@@ -339,7 +339,7 @@ void button_command(int nr)
 		case 47:
 			game_ui_state.open_shop=0;
 			game_ui_state.show_waypoints = false;
-			show_book=0;
+			game_ui_state.open_book=0;
 			show_motd=0;
 			show_newp=0;
 			show_tuto=0;
@@ -1988,7 +1988,7 @@ int mouse_book(int x,int y,int mode)
 {
 	int nr, tx, ty;
 	
-	if (!show_book) return 0;
+	if (!game_ui_state.open_book) return 0;
 	
 	// Close Window
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
@@ -1997,7 +1997,7 @@ int mouse_book(int x,int y,int mode)
 		{ 
 			if (show_newp) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
 			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
-			show_book=0;
+			game_ui_state.open_book=0;
 			noshop=QSIZE*3;
 		}
 		return 1;
