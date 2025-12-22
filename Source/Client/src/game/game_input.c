@@ -267,8 +267,8 @@ void game_handle_input(const SDL_Event *e) {
                         game_ui_state.open_book = 0;
                         closed_window = true;
                     }
-                    if (show_motd != 0) {
-                        show_motd = 0;
+                    if (game_ui_state.show_motd) {
+                        game_ui_state.show_motd = false;
                         closed_window = true;
                     }
                     if (show_newp != 0) {

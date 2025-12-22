@@ -340,7 +340,7 @@ void button_command(int nr)
 			game_ui_state.open_shop=0;
 			game_ui_state.show_waypoints = false;
 			game_ui_state.open_book=0;
-			show_motd=0;
+			game_ui_state.show_motd = false;
 			show_newp=0;
 			show_tuto=0;
 			if (keys)
@@ -2040,7 +2040,7 @@ int mouse_motd(int x,int y,int mode)
 {
 	int nr, tx, ty;
 	
-	if (!show_motd && !show_newp && !show_tuto) return 0;
+	if (!game_ui_state.show_motd && !show_newp && !show_tuto) return 0;
 	
 	// Close Window
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
@@ -2049,7 +2049,7 @@ int mouse_motd(int x,int y,int mode)
 		{ 
 			if (show_newp) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
 			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
-			show_motd=0;
+			game_ui_state.show_motd = false;
 			show_newp=0;
 			show_tuto=0;
 			noshop=QSIZE*3;
@@ -2058,11 +2058,11 @@ int mouse_motd(int x,int y,int mode)
 	}
 	
 	// Normal MOTD 'OK' button (closes window)
-	if (show_motd && x>(GUI_SHOP_X+117) && x<(GUI_SHOP_X+164) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
+	if (game_ui_state.show_motd && x>(GUI_SHOP_X+117) && x<(GUI_SHOP_X+164) && y>(GUI_SHOP_Y+291) && y<(GUI_SHOP_Y+305))
 	{
 		if (mode==MS_LB_UP) 
 		{ 
-			show_motd=0;
+			game_ui_state.show_motd = false;
 			noshop=QSIZE*3;
 		}
 		return 1;

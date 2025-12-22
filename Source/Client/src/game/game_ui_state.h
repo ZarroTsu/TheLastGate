@@ -23,5 +23,6 @@ typedef struct {
     unsigned int open_skill_tree;
     bool show_options;
     unsigned int open_book;
+    bool show_motd;
 
 } GameUiState;
