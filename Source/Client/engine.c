@@ -2085,6 +2085,26 @@ void show_meta_stats(int n)
 	}
 }
 
+/* This is the home for the inventory grid definition until I find a better home */
+typedef struct {
+	int start_x;
+	int start_y;
+	int columns;
+	int cell_width;
+	int cell_height;
+} GridLayout;
+
+static const GridLayout inventory_layout = {261, 6, 10, 34, 34};
+
+static void inv_slot_to_xy(const GridLayout *layout, const int slot, int *out_x, int *out_y) {
+	const int col = slot % layout->columns;
+	const int row = slot / layout->columns;
+
+	if (out_x != NULL) *out_x = layout->start_x + col * layout->cell_width;
+	if (out_y != NULL) *out_y = layout->start_y + row * layout->cell_height;
+}
+
+
 void eng_display_win(int plr_sprite,int init)
 {
 	int y,n,m,v,pr,hh,xx,yy;
@@ -2115,58 +2135,13 @@ void eng_display_win(int plr_sprite,int init)
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
+			int slot_x, slot_y;
+			int inventory_slot = n+game_ui_state.inventory_scroll; // N represents the visible slot
+			inv_slot_to_xy(&inventory_layout, n, &slot_x, &slot_y);
 			// Draw inventory items
-			if (pl.item[n+game_ui_state.inventory_scroll]) {
-				if (hightlight==HL_BACKPACK && hightlight_sub==n+(signed)game_ui_state.inventory_scroll)
-				{
-					// Draw item sprite
-					copyspritex(pl.item[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,16);
-					// Draw lock icon for locked items
-					/*
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&1)
-						copyspritex(4000,261+(n%10)*34,6+(n/10)*34,16);
-					*/
-					// Draw soulstone icon 
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&2)
-						copyspritex(4496,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw talisman icon 
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&4)
-						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw corruption icon 
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&8)
-						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw catalyst name
-					if (pl.item_p[n+game_ui_state.inventory_scroll])
-						copyspritex(6999+pl.item_p[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,16);
-					// Draw stack count 
-					if (pl.item_s[n+game_ui_state.inventory_scroll]>0&&pl.item_s[n+game_ui_state.inventory_scroll]<=10)
-						copyspritex(4000+pl.item_s[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,16);
-				}
-				else
-				{
-					// Draw item sprite
-					copyspritex(pl.item[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,0);
-					// Draw lock icon for locked items
-					/*
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&1)
-						copyspritex(4000,261+(n%10)*34,6+(n/10)*34,0);
-					*/
-					// Draw soulstone icon 
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&2)
-						copyspritex(4496,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw talisman icon 
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&4)
-						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw corruption icon 
-					if (pl.item_l[n+game_ui_state.inventory_scroll]&8)
-						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw catalyst name
-					if (pl.item_p[n+game_ui_state.inventory_scroll])
-						copyspritex(6999+pl.item_p[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,0);
-					// Draw stack count 
-					if (pl.item_s[n+game_ui_state.inventory_scroll]>0&&pl.item_s[n+game_ui_state.inventory_scroll]<=10)
-						copyspritex(4000+pl.item_s[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,0);
-				}
+			if (pl.item_info[inventory_slot].sprite) {
+				bool highlighted = hightlight==HL_BACKPACK && hightlight_sub==inventory_slot;
+				render_item_display(&pl.item_info[inventory_slot], slot_x, slot_y, highlighted ? 16 : 0);
 			}
 			// Draw shortcut key IDs
 			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)game_ui_state.inventory_scroll)
