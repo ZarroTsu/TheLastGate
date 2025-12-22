@@ -1363,7 +1363,7 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	show_wps=0,show_tree=0,dept_page=0,show_opts=0;
+unsigned int	show_tree=0,dept_page=0,show_opts=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
@@ -2444,7 +2444,7 @@ void eng_display_win(int plr_sprite,int init)
 	}
 
 	if (init) {
-		if (game_ui_state.open_shop || show_wps || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
+		if (game_ui_state.open_shop || game_ui_state.show_waypoints || show_tree || show_book || show_motd || show_newp || show_tuto) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -2781,7 +2781,7 @@ void eng_display_win(int plr_sprite,int init)
 			xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
 		}
 		
-		if (show_wps)
+		if (game_ui_state.show_waypoints)
 		{
 			copyspritex(do_darkmode?18005:5,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			//game_ui_state.waypoint_scroll
@@ -4911,7 +4911,7 @@ void engine(void)
 		{
 			noshop--;
 			game_ui_state.open_shop=0;
-			show_wps=0;
+			game_ui_state.show_waypoints = false;
 			show_tree=0;
 			show_book=0;
 			show_motd=0;

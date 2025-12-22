@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 typedef enum {
     HUD_MODE_LIST_SKILLS,
@@ -18,5 +19,6 @@ typedef struct {
 
     /* Window Visibility */
     unsigned int open_shop;
+    bool show_waypoints;
 
 } GameUiState;

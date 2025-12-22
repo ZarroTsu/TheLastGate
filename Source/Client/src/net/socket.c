@@ -714,7 +714,7 @@ void sv_look6(unsigned char *buf)
 	}
 	if (game_ui_state.open_shop)
 	{
-		show_wps =0;
+		game_ui_state.show_waypoints = false;
 		show_book=0;
 		show_motd=0;
 		show_newp=0;
@@ -744,7 +744,7 @@ void sv_look7(unsigned char *buf)
 	}
 	if (game_ui_state.open_shop)
 	{
-		show_wps =0;
+		game_ui_state.show_waypoints = false;
 		show_book=0;
 		show_motd=0;
 		show_newp=0;
@@ -774,7 +774,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 
 	if (game_ui_state.open_shop)
 	{
-		show_wps =0;
+		game_ui_state.show_waypoints = false;
 		show_book=0;
 		show_motd=0;
 		show_newp=0;
@@ -825,7 +825,7 @@ void sv_waypoints(unsigned char *buf)
 {
 	DEBUG("SV WAYPOINTS");
 
-	show_wps=1;
+	game_ui_state.show_waypoints = true;
 }
 
 extern unsigned short ymap[MAPX_MAX*MAPY_MAX];

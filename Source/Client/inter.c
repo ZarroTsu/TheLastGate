@@ -338,7 +338,7 @@ void button_command(int nr)
 		
 		case 47:
 			game_ui_state.open_shop=0;
-			show_wps =0;
+			game_ui_state.show_waypoints = false;
 			show_book=0;
 			show_motd=0;
 			show_newp=0;
@@ -1843,7 +1843,7 @@ int mouse_wps(int x,int y,int mode)
 {
 	int nr, ty, keys;
 	
-	if (!show_wps) return 0;
+	if (!game_ui_state.show_waypoints) return 0;
 	
 	keys=0;
 	SDL_Keymod mods = SDL_GetModState();
@@ -1858,7 +1858,7 @@ int mouse_wps(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{ 
-			show_wps=0;
+			game_ui_state.show_waypoints = false;
 		}
 		return 1;
 	}
@@ -1874,7 +1874,7 @@ int mouse_wps(int x,int y,int mode)
 			cmd1(CL_CMD_WPS,nr);
 			if (pl.waypoints&(1<<nr))
 			{
-				show_wps=0;
+				game_ui_state.show_waypoints = false;
 				noshop=QSIZE*3; 
 			}
 		}

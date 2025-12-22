@@ -26,7 +26,7 @@ static ScrollableRegion get_scrollable_region(int x, int y) {
         gui_skl_names[RECT_Y2])
         return SKILL_LIST;
 
-    if (show_wps && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
+    if (game_ui_state.show_waypoints && x > (((1280 / 2) - (320 / 2))) && x < (((1280 / 2) - (320 / 2)) + 280 - 13) && y > (
             ((736 / 2) - (320 / 2) + 72) + 1) && y < (((736 / 2) - (320 / 2) + 72) + 1 + 280))
         return WAYPOINT_PAGE;
 
@@ -255,8 +255,8 @@ void game_handle_input(const SDL_Event *e) {
                         noshop = QSIZE * 3;
                         closed_window = true;
                     }
-                    if (show_wps != 0) {
-                        show_wps = 0;
+                    if (game_ui_state.show_waypoints ) {
+                        game_ui_state.show_waypoints = false;
                         closed_window = true;
                     }
                     if (show_tree != 0) {
