@@ -37,3 +37,5 @@ static inline ItemDisplayInfo make_item_display(int sprite, int properties,
 
 /* Render an item sprite with all overlays */
 void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+
+void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect);

@@ -2439,38 +2439,9 @@ void eng_display_win(int plr_sprite,int init)
 			{
 				if (pl.worn[n])
 				{
-					if (hightlight==HL_EQUIPMENT && hightlight_sub==n)
-					{
-						copyspritex(pl.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
-						// Draw soulstone icon 
-						if (pl.worn_p[n]&PL_SOULSTONED)
-							copyspritex(4496, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
-						// Draw talisman icon 
-						if (pl.worn_p[n]&PL_ENCHANTED)
-							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
-						// Draw corrupt icon 
-						if (pl.worn_p[n]&PL_CORRUPTED)
-							copyspritex(6881, gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
-						// Draw stack count
-						if (pl.worn_s[n]>0&&pl.worn_s[n]<=10)
-							copyspritex(4000+pl.worn_s[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 16);
-					}
-					else
-					{
-						copyspritex(pl.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
-						// Draw soulstone icon 
-						if (pl.worn_p[n]&PL_SOULSTONED)
-							copyspritex(4496, gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
-						// Draw talisman icon 
-						if (pl.worn_p[n]&PL_ENCHANTED)
-							copyspritex(4497, gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
-						// Draw corrupt icon 
-						if (pl.worn_p[n]&PL_CORRUPTED)
-							copyspritex(6881, gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
-						// Draw stack count
-						if (pl.worn_s[n]>0&&pl.worn_s[n]<=10)
-							copyspritex(4000+pl.worn_s[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
-					}
+					bool highlighted = hightlight==HL_EQUIPMENT && hightlight_sub==n;
+					render_worn_item_display(&pl.worn_info[n], gui_equ_x[n]+1, gui_equ_y[n]+1, highlighted ? 16 : 0);
+
 					// Draw shortcut key IDs
 					for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==200+n)
 						copyspritex(4011+m,gui_equ_x[n]+1,gui_equ_y[n]+1, 0);

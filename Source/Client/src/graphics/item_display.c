@@ -27,3 +27,21 @@ void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect) 
     if (item->stack > 0 && item->stack <= 10)
         copyspritex(SPRITE_OVERLAY_STACK_BASE + item->stack, x, y, effect);
 }
+
+void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
+    if (!item || !item->sprite) return;
+
+    /* Draw base sprite */
+    copyspritex(item->sprite, x, y, effect);
+
+    /* Draw overlays in order */
+    if (item->properties & PL_SOULSTONED)
+        copyspritex(SPRITE_OVERLAY_SOULSTONE, x, y, effect);
+    if (item->properties & PL_ENCHANTED)
+        copyspritex(SPRITE_OVERLAY_TALISMAN, x, y, effect);
+    if (item->properties & PL_CORRUPTED)
+        copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
+
+    if (item->stack > 0 && item->stack <= 10)
+        copyspritex(SPRITE_OVERLAY_STACK_BASE + item->stack, x, y, effect);
+}

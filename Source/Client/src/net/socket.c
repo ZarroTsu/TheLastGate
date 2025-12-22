@@ -343,6 +343,8 @@ void sv_setchar_worn(unsigned char *buf)
 	pl.worn[n]=*(short int*)(buf+5);
 	pl.worn_p[n]=*(short int*)(buf+7);
 	pl.worn_s[n]=*(unsigned char*)(buf+9);
+
+	pl.worn_info[n] = (ItemDisplayInfo){pl.worn[n], pl.worn_p[n], pl.worn_s[n], 0};
 }
 
 void sv_setchar_spell(unsigned char *buf)

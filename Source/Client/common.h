@@ -259,6 +259,8 @@ struct cplayer {
 	int  worn_p[20];
 	char worn_s[20];   // Stack size
 
+	ItemDisplayInfo worn_info[20];
+
 	// spells ready
 	short spell[MAXBUFFS];
 	char active[MAXBUFFS];
