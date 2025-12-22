@@ -1365,7 +1365,7 @@ void eng_init_player(void)
 
 unsigned int	dept_page=0;
 
-unsigned int	show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
+unsigned int	show_tuto=0,tuto_page=0,tuto_max=0;
 
 int				mm_magnify=2;
 
@@ -2444,7 +2444,7 @@ void eng_display_win(int plr_sprite,int init)
 	}
 
 	if (init) {
-		if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || game_ui_state.open_book || game_ui_state.show_motd || show_newp || show_tuto) show_look=0;
+		if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || game_ui_state.open_book || game_ui_state.show_motd || game_ui_state.show_new_player || show_tuto) show_look=0;
 		if (!show_look) {
 			/*
 			for (n=0; n<12; n++) 
@@ -2905,7 +2905,7 @@ void eng_display_win(int plr_sprite,int init)
 			}
 		}
 		
-		if (show_newp)
+		if (game_ui_state.show_new_player)
 		{
 			copyspritex(do_darkmode?18043:43,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (y=0; y<MLL; y++) {
@@ -4915,7 +4915,7 @@ void engine(void)
 			game_ui_state.open_skill_tree = 0;
 			game_ui_state.open_book=0;
 			game_ui_state.show_motd=false;
-			show_newp=0;
+			game_ui_state.show_new_player = false;
 			show_tuto=0;
 		}
 

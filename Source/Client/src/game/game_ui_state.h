@@ -24,5 +24,6 @@ typedef struct {
     bool show_options;
     unsigned int open_book;
     bool show_motd;
+    bool show_new_player;
 
 } GameUiState;

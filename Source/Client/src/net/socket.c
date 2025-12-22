@@ -716,7 +716,7 @@ void sv_look6(unsigned char *buf)
 		game_ui_state.show_waypoints = false;
 		game_ui_state.open_book=0;
 		game_ui_state.show_motd = false;
-		show_newp=0;
+		game_ui_state.show_new_player = false;
 		show_tuto=0;
 		game_ui_state.open_skill_tree = 0;
 	}
@@ -746,7 +746,7 @@ void sv_look7(unsigned char *buf)
 		game_ui_state.show_waypoints = false;
 		game_ui_state.open_book=0;
 		game_ui_state.show_motd = false;
-		show_newp=0;
+		game_ui_state.show_new_player = false;
 		show_tuto=0;
 		game_ui_state.open_skill_tree = 0;
 	}
@@ -776,7 +776,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 		game_ui_state.show_waypoints = false;
 		game_ui_state.open_book=0;
 		game_ui_state.show_motd = false;
-		show_newp=0;
+		game_ui_state.show_new_player = false;
 		show_tuto=0;
 		game_ui_state.open_skill_tree = 0;
 	}
@@ -806,7 +806,7 @@ void sv_showmotd(unsigned char *buf)
 	}
 	else if (n==99)
 	{	// Display NEW PLAYER MotD from server and offer tutorial
-		show_newp=1;
+		game_ui_state.show_new_player = true;
 	}
 	else if (n)
 	{

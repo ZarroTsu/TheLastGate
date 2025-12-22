@@ -341,7 +341,7 @@ void button_command(int nr)
 			game_ui_state.show_waypoints = false;
 			game_ui_state.open_book=0;
 			game_ui_state.show_motd = false;
-			show_newp=0;
+			game_ui_state.show_new_player = false;
 			show_tuto=0;
 			if (keys)
 			{
@@ -1995,7 +1995,7 @@ int mouse_book(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{ 
-			if (show_newp) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
+			if (game_ui_state.show_new_player) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
 			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
 			game_ui_state.open_book=0;
 			noshop=QSIZE*3;
@@ -2040,17 +2040,17 @@ int mouse_motd(int x,int y,int mode)
 {
 	int nr, tx, ty;
 	
-	if (!game_ui_state.show_motd && !show_newp && !show_tuto) return 0;
+	if (!game_ui_state.show_motd && !game_ui_state.show_new_player && !show_tuto) return 0;
 	
 	// Close Window
 	if (x>(GUI_SHOP_X+279) && x<(GUI_SHOP_X+296) && y>(GUI_SHOP_Y) && y<(GUI_SHOP_Y+14)) 
 	{
 		if (mode==MS_LB_UP) 
 		{ 
-			if (show_newp) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
+			if (game_ui_state.show_new_player) cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
 			if (show_tuto) cmd1(CL_CMD_MOTD,show_tuto); // Tell server we did this tutorial
 			game_ui_state.show_motd = false;
-			show_newp=0;
+			game_ui_state.show_new_player = false;
 			show_tuto=0;
 			noshop=QSIZE*3;
 		}
@@ -2074,9 +2074,9 @@ int mouse_motd(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{ 
 			// New Player MOTD 'Tutorial' button
-			if (show_newp)
+			if (game_ui_state.show_new_player)
 			{
-				show_newp=0;
+				game_ui_state.show_new_player = false;
 				show_tuto=1; tuto_page=1; tuto_max=3;
 				play_sound("sfx/click.wav",CLICKVOL,0);
 			}
@@ -2098,10 +2098,10 @@ int mouse_motd(int x,int y,int mode)
 		if (mode==MS_LB_UP) 
 		{
 			// New Player MOTD 'OK' button (closes window)
-			if (show_newp)
+			if (game_ui_state.show_new_player)
 			{
 				cmd1(CL_CMD_MOTD,16); // Tell server we've skipped the tutorial
-				show_newp=0;
+				game_ui_state.show_new_player = false;
 				noshop=QSIZE*3;
 			}
 			// Tutorial window NEXT

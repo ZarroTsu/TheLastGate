@@ -271,8 +271,8 @@ void game_handle_input(const SDL_Event *e) {
                         game_ui_state.show_motd = false;
                         closed_window = true;
                     }
-                    if (show_newp != 0) {
-                        show_newp = 0;
+                    if (game_ui_state.show_new_player) {
+                        game_ui_state.show_new_player = false;
                         closed_window = true;
                     }
                     if (show_tuto != 0) {
