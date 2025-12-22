@@ -26,6 +26,13 @@
 static void load_unique(void);
 static unsigned int xcrypt(unsigned int val);
 static int handle_login_packet(unsigned char *buf);
+static int connect_socket(void *data);
+static void cleanup_connect_thread(void);
+
+
+/* Connecting State */
+static SDL_Thread *connect_thread = NULL;
+static SDL_atomic_t connect_status;
 
 /* Connection info */
 char host_addr[84]={MHOST};
@@ -61,16 +68,19 @@ void connection_init(void) {
 	race_param = 0;
 	sex_param = 0;
 	so_status = 0;
+	cleanup_connect_thread();
 }
 
 /* Start connection attempt */
 void connection_start(int race_id, int sex_id) {
 	race_param = race_id;
 	sex_param = sex_id;
-	current_state = CONNECTION_STATE_RESOLVING;
-	status.state = CONNECTION_STATE_RESOLVING;
+	current_state = CONNECTION_STATE_CONNECTING;
+	status.state = CONNECTION_STATE_CONNECTING;
 	status.retry_count = 0;
-	strcpy(status.status_message, "Resolving hostname...");
+	cleanup_connect_thread();
+	SDL_AtomicSet(&connect_status, CONNECTING_IDLE);
+	connect_thread = SDL_CreateThread(connect_socket, "connect_socket", NULL);
 	status.error_message[0] = '\0';
 	capcnt = 0;
 	so_status = 1;  /* Mark as attempting connection */
@@ -85,77 +95,67 @@ ConnectionStatus connection_update(void) {
 			strcpy(status.status_message, "Ready");
 			break;
 
-		case CONNECTION_STATE_RESOLVING:
-			/* Resolve primary host */
-			if (SDLNet_ResolveHost(&ip, host_addr, host_port) < 0) {
-				log_warning("Unable to resolve host address: %s", SDLNet_GetError());
-				ip.host = INADDR_NONE;
-			}
-
-			/* Resolve proxy host */
-			if (SDLNet_ResolveHost(&proxy_ip, host_proxy, host_port) < 0) {
-				log_warning("Unable to resolve proxy host address: %s", SDLNet_GetError());
-				proxy_ip.host = INADDR_NONE;
-			}
-
-			/* Check if at least one resolved */
-			if (ip.host == INADDR_NONE && proxy_ip.host == INADDR_NONE) {
-				log_error("Unable to resolve any host");
-				current_state = CONNECTION_STATE_ERROR;
-				strcpy(status.error_message, "Could not resolve hostname");
-				so_status = 0;
-				break;
-			}
-
-			/* Success, move to connecting */
-			current_state = CONNECTION_STATE_CONNECTING;
-			strcpy(status.status_message, "Connecting to server...");
-			break;
-
 		case CONNECTION_STATE_CONNECTING:
-			/* Try primary host first, then proxy */
-			if (ip.host != INADDR_NONE) {
-				sock = SDLNet_TCP_Open(&ip);
-			} else {
-				sock = SDLNet_TCP_Open(&proxy_ip);
-			}
+			switch (SDL_AtomicGet(&connect_status)) {
+				case CONNECTING_RESOLVE_HOST:
+					strcpy(status.status_message, "Resolving host...");
+					break;
+				case CONNECTING_RESOLVE_PROXY:
+					strcpy(status.status_message, "Resolving proxy...");
+					break;
+				case CONNECTING_CONNECT_HOST:
+					strcpy(status.status_message, "Connecting to host...");
+					break;
+				case CONNECTING_CONNECT_PROXY:
+					strcpy(status.status_message, "Failed to connect to host. Connecting to proxy...");
+					break;
+				case CONNECTING_DONE:
+					SDL_WaitThread(connect_thread, NULL);
+					connect_thread = NULL;
 
-			if (!sock) {
-				log_error("Unable to connect to host: %s", SDLNet_GetError());
-				current_state = CONNECTION_STATE_ERROR;
-				strcpy(status.error_message, "Connection refused");
-				so_status = 0;
-				break;
-			}
+					socket_set = SDLNet_AllocSocketSet(1);
+					if (!socket_set) {
+						log_error("Unable to create socket set: %s", SDLNet_GetError());
+						current_state = CONNECTION_STATE_ERROR;
+						strcpy(status.error_message, "Socket initialization failed");
+						so_status = 0;
+						break;
+					}
 
-			/* Create socket set for non-blocking operations */
-			socket_set = SDLNet_AllocSocketSet(1);
-			if (!socket_set) {
-				log_error("Unable to create socket set: %s", SDLNet_GetError());
-				current_state = CONNECTION_STATE_ERROR;
-				strcpy(status.error_message, "Socket initialization failed");
-				so_status = 0;
-				break;
-			}
+					if (SDLNet_TCP_AddSocket(socket_set, sock) < 0) {
+						log_error("Unable to add socket to set: %s", SDLNet_GetError());
+						current_state = CONNECTION_STATE_ERROR;
+						strcpy(status.error_message, "Socket initialization failed");
+						so_status = 0;
+						break;
+					}
 
-			if (SDLNet_TCP_AddSocket(socket_set, sock) < 0) {
-				log_error("Unable to add socket to set: %s", SDLNet_GetError());
-				current_state = CONNECTION_STATE_ERROR;
-				strcpy(status.error_message, "Socket initialization failed");
-				so_status = 0;
-				break;
-			}
-
-			/* Connected, check if we need to send password */
-			if (passwd[0]) {
-				current_state = CONNECTION_STATE_SENDING_PASSWORD;
-				strcpy(status.status_message, "Sending password...");
-			} else {
-				current_state = CONNECTION_STATE_SENDING_LOGIN;
-				strcpy(status.status_message, "Sending login...");
+					/* Connected, check if we need to send password */
+					if (passwd[0]) {
+						current_state = CONNECTION_STATE_SENDING_PASSWORD;
+						strcpy(status.status_message, "Sending password...");
+					} else {
+						current_state = CONNECTION_STATE_SENDING_LOGIN;
+						strcpy(status.status_message, "Sending login...");
+					}
+					break;
+				case CONNECTING_ERROR:
+				default:
+					SDL_WaitThread(connect_thread, NULL);
+					connect_thread = NULL;
+					if (ip.host == INADDR_NONE && proxy_ip.host == INADDR_NONE) {
+						strcpy(status.error_message, "Unable to resolve host or proxy...");
+						current_state = CONNECTION_STATE_ERROR;
+					} else if (!sock) {
+						strcpy(status.error_message, "Unable to connect to host or proxy...");
+						current_state = CONNECTION_STATE_ERROR;
+					} else {
+						strcpy(status.error_message, "Unknown Socket Error...");
+						current_state = CONNECTION_STATE_ERROR;
+					}
+					break;
 			}
 			break;
-
 		case CONNECTION_STATE_SENDING_PASSWORD: {
 			unsigned char obuf[16];
 			obuf[0] = CL_PASSWD;
@@ -242,7 +242,9 @@ ConnectionStatus connection_update(void) {
 		}
 
 		case CONNECTION_STATE_CONNECTED:
+			cleanup_connect_thread();
 			strcpy(status.status_message, "Connected");
+
 			break;
 
 		case CONNECTION_STATE_ERROR:
@@ -266,6 +268,7 @@ void connection_cancel(void) {
 	current_state = CONNECTION_STATE_IDLE;
 	status.state = CONNECTION_STATE_IDLE;
 	strcpy(status.status_message, "Cancelled");
+	cleanup_connect_thread();
 	so_status = 0;
 }
 
@@ -282,6 +285,48 @@ const char* connection_get_status(void) {
 /* ========================================================================
  * HELPER FUNCTIONS (from socket.c)
  * ======================================================================== */
+
+static int connect_socket(void *data) {
+	SDL_AtomicSet(&connect_status, CONNECTING_RESOLVE_HOST);
+	if (SDLNet_ResolveHost(&ip, host_addr, host_port) < 0) {
+		ip.host = INADDR_NONE;
+	}
+
+	SDL_AtomicSet(&connect_status, CONNECTING_RESOLVE_PROXY);
+	if (SDLNet_ResolveHost(&proxy_ip, host_proxy, host_port) < 0) {
+		proxy_ip.host = INADDR_NONE;
+	}
+
+	if (ip.host == INADDR_NONE && proxy_ip.host == INADDR_NONE) {
+		SDL_AtomicSet(&connect_status, CONNECTING_ERROR);
+		return -1;
+	}
+
+	SDL_AtomicSet(&connect_status, CONNECTING_CONNECT_HOST);
+	if (ip.host != INADDR_NONE) {
+		sock = SDLNet_TCP_Open(&ip);
+	}
+
+	if (!sock && proxy_ip.host != INADDR_NONE) {
+		SDL_AtomicSet(&connect_status, CONNECTING_CONNECT_PROXY);
+		sock = SDLNet_TCP_Open(&proxy_ip);
+	}
+
+	if (!sock) {
+		SDL_AtomicSet(&connect_status, CONNECTING_ERROR);
+		return -1;
+	}
+
+	SDL_AtomicSet(&connect_status, CONNECTING_DONE);
+	return 0;
+}
+
+static void cleanup_connect_thread() {
+	if (connect_thread != NULL) {
+		SDL_WaitThread(connect_thread, NULL);
+		connect_thread = NULL;
+	}
+}
 
 /* Handle login packet (extracted from so_login in socket.c:152-257) */
 static int handle_login_packet(unsigned char *buf) {
@@ -382,7 +427,7 @@ static int handle_login_packet(unsigned char *buf) {
 		unsigned int tmp = *(unsigned int*)(buf + 1);
 		unsigned int prio = *(unsigned int*)(buf + 5);
 		capcnt++;
-		sprintf(status.status_message,
+		snprintf(status.status_message, sizeof(status.status_message),
 		        "Player limit reached. Queue position: %d, Priority: %d, Try: %d",
 		        tmp, prio, capcnt);
 		return 0;

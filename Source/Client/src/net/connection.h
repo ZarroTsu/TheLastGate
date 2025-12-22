@@ -14,8 +14,7 @@
 /* Connection states for async state machine */
 typedef enum {
 	CONNECTION_STATE_IDLE,                    /* No connection attempt */
-	CONNECTION_STATE_RESOLVING,               /* Resolving hostname via SDLNet_ResolveHost */
-	CONNECTION_STATE_CONNECTING,              /* Opening TCP socket */
+	CONNECTION_STATE_CONNECTING,
 	CONNECTION_STATE_SENDING_PASSWORD,        /* Sending password packet (if passwd[0] != 0) */
 	CONNECTION_STATE_SENDING_LOGIN,           /* Sending login/newlogin packet */
 	CONNECTION_STATE_WAITING_CHALLENGE,       /* Waiting for SV_CHALLENGE from server */
@@ -31,6 +30,17 @@ typedef struct {
 	char error_message[256];     /* Error message if state == CONN_STATE_ERROR */
 	int retry_count;             /* Number of retries attempted */
 } ConnectionStatus;
+
+/* Connecting Thread */
+typedef enum {
+	CONNECTING_IDLE,
+	CONNECTING_RESOLVE_HOST,
+	CONNECTING_RESOLVE_PROXY,
+	CONNECTING_CONNECT_HOST,
+	CONNECTING_CONNECT_PROXY,
+	CONNECTING_DONE,
+	CONNECTING_ERROR
+} ConnectingStatus;
 
 /* Connection info */
 extern char host_addr[84];
