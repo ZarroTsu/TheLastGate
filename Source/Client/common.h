@@ -2,6 +2,7 @@
 //#define HOMECOPY
 
 #pragma once
+#include "graphics/item_display.h"
 #ifdef HOMECOPY
 	#define MNAME		"The Last Gate Dev"
 	#define MHOST			"127.0.0.1"
@@ -250,6 +251,8 @@ struct cplayer {
 	int  item_p[MAXITEMS];
 	char item_s[MAXITEMS];  // Stack size of given item (0 - 10)
 	char item_l[MAXITEMS];  // Whether or not the given item is locked or stoned
+
+	ItemDisplayInfo item_info[MAXITEMS];
 
 	// items worn
 	int    worn[20];
