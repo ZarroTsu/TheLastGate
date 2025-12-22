@@ -22,7 +22,6 @@ struct z_stream_s zs;
 
 #include "../../common.h"
 #include "../../inter.h"
-#include "../../merc.rh"
 
 char passwd[15]={0};
 
