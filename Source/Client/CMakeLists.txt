@@ -49,6 +49,7 @@ add_executable(TheLastGate
         src/config/config.c
         src/config/keybindings.c
         src/game/game_input.c
+        src/game/game_ui.c
         src/graphics/atlas.c
         src/graphics/loader.c
         src/graphics/render.c
@@ -99,7 +100,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/windows_setup.cmake)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(TheLastGate PRIVATE
-            -DHOMECOPY
+#            -DHOMECOPY
     )
 endif ()
 

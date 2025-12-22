@@ -4,8 +4,6 @@ extern int noshop;
 extern int pskip, pidle;
 extern int show_opts;
 
-extern int inv_pos, skill_pos, wps_pos;
-
 extern int st_learned_skill(int st_val, int v);
 
 extern int stat_points_used;

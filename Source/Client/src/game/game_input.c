@@ -4,6 +4,7 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_syswm.h>
 
+#include "game_ui.h"
 #include "../../inter.h"
 #include "../../main.h"
 #include "../net/socket.h"
@@ -522,22 +523,22 @@ void game_handle_input(const SDL_Event *e) {
             const int y = e->wheel.mouseY;
             switch (get_scrollable_region(x, y)) {
                 case INVENTORY:
-                    if (delta < 0 && inv_pos < MAXITEMS - 30)
-                        inv_pos += 10;
-                    else if (delta > 0 && inv_pos > 1)
-                        inv_pos -= 10;
+                    if (delta < 0 && game_ui_state.inventory_scroll < MAXITEMS - 30)
+                        game_ui_state.inventory_scroll += 10;
+                    else if (delta > 0 && game_ui_state.inventory_scroll > 1)
+                        game_ui_state.inventory_scroll -= 10;
                     break;
                 case SKILL_LIST:
-                    if (delta < 0 && skill_pos < MAXSKILL - 10)
-                        skill_pos++;
-                    else if (delta > 0 && skill_pos > 0)
-                        skill_pos--;
+                    if (delta < 0 && game_ui_state.skill_scroll < MAXSKILL - 10)
+                        game_ui_state.skill_scroll++;
+                    else if (delta > 0 && game_ui_state.skill_scroll > 0)
+                        game_ui_state.skill_scroll--;
                     break;
                 case WAYPOINT_PAGE:
-                    if (delta < 0 && wps_pos < MAXWPS - 8)
-                        wps_pos++;
-                    else if (delta > 0 && wps_pos > 0)
-                        wps_pos--;
+                    if (delta < 0 && game_ui_state.waypoint_scroll < MAXWPS - 8)
+                        game_ui_state.waypoint_scroll++;
+                    else if (delta > 0 && game_ui_state.waypoint_scroll > 0)
+                        game_ui_state.waypoint_scroll--;
                     break;
                 case DEPOT_PAGE:
                     if (delta < 0 && dept_page < 7)

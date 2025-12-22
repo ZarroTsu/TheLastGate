@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
 	launcher_init();
 	init_engine();
 
-	if (!security_try_lock()) return 0;
+	// if (!security_try_lock()) return 0;
 
 	g_game_state = GAME_STATE_LAUNCHER;
 	while (!quit && g_game_state == GAME_STATE_LAUNCHER) {

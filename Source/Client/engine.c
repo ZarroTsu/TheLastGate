@@ -33,6 +33,7 @@
 #include "inter.h"
 #include "main.h"
 #include "config/config.h"
+#include "game/game_ui.h"
 #include "graphics/render.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
@@ -1366,7 +1367,7 @@ unsigned int	show_shop=0,show_wps=0,show_tree=0,dept_page=0,show_opts=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
-int				inv_pos=0,skill_pos=0,wps_pos=0,hudmode=0,mm_magnify=2;
+int				mm_magnify=2;
 
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
@@ -1932,10 +1933,10 @@ void show_meta_stats(int n)
 			default: break;
 		}
 	}
-	else if (hudmode==1)		// Offense Stats
+	else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES)		// Offense Stats
 	{
 		n-=7;
-		switch (n+skill_pos)
+		switch (n+game_ui_state.skill_scroll)
 		{
 			case  0: meta_stat(1,n,9,"  Passive Stats:",     -1,           -1,           ""       ); break;
 			case  1: if (pl_dmgbn!=10000)
@@ -2010,7 +2011,7 @@ void show_meta_stats(int n)
 	else						// Defense Stats
 	{
 		n-=7;
-		switch (n+skill_pos)
+		switch (n+game_ui_state.skill_scroll)
 		{
 			case  0: meta_stat(1,n,9,"  Passive Stats:",     -1,           -1,           ""       ); break;
 			case  1: if (pl_dmgrd!=10000)
@@ -2113,68 +2114,68 @@ void eng_display_win(int plr_sprite,int init)
 		if (pdata.show_names)	showbox(GUI_F_COL3,GUI_F_ROW2,45,12,(unsigned short)(RED));
 		if (pdata.show_bars)	showbox(GUI_F_COL4,GUI_F_ROW2,45,12,(unsigned short)(RED));
 		//
-		if (hudmode==0)			showbox(261,182,64,12,(unsigned short)(RED));
-		else if (hudmode==1)	showbox(261,197,64,12,(unsigned short)(RED));
-		else if (hudmode==2)	showbox(261,212,64,12,(unsigned short)(RED));
-		else if (hudmode==3)	showbox(261,182,64,12,(unsigned short)(GREEN));
+		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)			showbox(261,182,64,12,(unsigned short)(RED));
+		else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES)	showbox(261,197,64,12,(unsigned short)(RED));
+		else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES)	showbox(261,212,64,12,(unsigned short)(RED));
+		else if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)	showbox(261,182,64,12,(unsigned short)(GREEN));
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
 			// Draw inventory items
-			if (pl.item[n+inv_pos]) {
-				if (hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos)
+			if (pl.item[n+game_ui_state.inventory_scroll]) {
+				if (hightlight==HL_BACKPACK && hightlight_sub==n+(signed)game_ui_state.inventory_scroll)
 				{
 					// Draw item sprite
-					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
+					copyspritex(pl.item[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,16);
 					// Draw lock icon for locked items
 					/*
-					if (pl.item_l[n+inv_pos]&1)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&1)
 						copyspritex(4000,261+(n%10)*34,6+(n/10)*34,16);
 					*/
 					// Draw soulstone icon 
-					if (pl.item_l[n+inv_pos]&2)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&2)
 						copyspritex(4496,261+(n%10)*34,6+(n/10)*34,16);
 					// Draw talisman icon 
-					if (pl.item_l[n+inv_pos]&4)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&4)
 						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,16);
 					// Draw corruption icon 
-					if (pl.item_l[n+inv_pos]&8)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&8)
 						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,16);
 					// Draw catalyst name
-					if (pl.item_p[n+inv_pos])
-						copyspritex(6999+pl.item_p[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
+					if (pl.item_p[n+game_ui_state.inventory_scroll])
+						copyspritex(6999+pl.item_p[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,16);
 					// Draw stack count 
-					if (pl.item_s[n+inv_pos]>0&&pl.item_s[n+inv_pos]<=10)
-						copyspritex(4000+pl.item_s[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
+					if (pl.item_s[n+game_ui_state.inventory_scroll]>0&&pl.item_s[n+game_ui_state.inventory_scroll]<=10)
+						copyspritex(4000+pl.item_s[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,16);
 				}
 				else
 				{
 					// Draw item sprite
-					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
+					copyspritex(pl.item[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,0);
 					// Draw lock icon for locked items
 					/*
-					if (pl.item_l[n+inv_pos]&1)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&1)
 						copyspritex(4000,261+(n%10)*34,6+(n/10)*34,0);
 					*/
 					// Draw soulstone icon 
-					if (pl.item_l[n+inv_pos]&2)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&2)
 						copyspritex(4496,261+(n%10)*34,6+(n/10)*34,0);
 					// Draw talisman icon 
-					if (pl.item_l[n+inv_pos]&4)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&4)
 						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
 					// Draw corruption icon 
-					if (pl.item_l[n+inv_pos]&8)
+					if (pl.item_l[n+game_ui_state.inventory_scroll]&8)
 						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,0);
 					// Draw catalyst name
-					if (pl.item_p[n+inv_pos])
-						copyspritex(6999+pl.item_p[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
+					if (pl.item_p[n+game_ui_state.inventory_scroll])
+						copyspritex(6999+pl.item_p[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,0);
 					// Draw stack count 
-					if (pl.item_s[n+inv_pos]>0&&pl.item_s[n+inv_pos]<=10)
-						copyspritex(4000+pl.item_s[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
+					if (pl.item_s[n+game_ui_state.inventory_scroll]>0&&pl.item_s[n+game_ui_state.inventory_scroll]<=10)
+						copyspritex(4000+pl.item_s[n+game_ui_state.inventory_scroll],261+(n%10)*34,6+(n/10)*34,0);
 				}
 			}
 			// Draw shortcut key IDs
-			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)inv_pos)
+			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)game_ui_state.inventory_scroll)
 				copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
 		}
 
@@ -2215,8 +2216,8 @@ void eng_display_win(int plr_sprite,int init)
 		}
 		
 		// Scroll Bars for Skills and Inventory
-		showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
-		showbar(601, 36+(inv_pos *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
+		showbar(234,152+(game_ui_state.skill_scroll*58)/(MAXSKILL-10)+(game_ui_state.skill_scroll>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+		showbar(601, 36+(game_ui_state.inventory_scroll *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
 
 		// display info-texts
 		// HP, EN, MA below the skill list
@@ -2244,13 +2245,13 @@ void eng_display_win(int plr_sprite,int init)
 		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+42,	1,"  %12d",pl.os_points);
 		
 		// Update and Update exp
-		if (hudmode==0||hudmode==3)
+		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS||game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
 		{
 			copyspritex(do_darkmode?18099:99, 134, 3,  0);
 			xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
 			xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
 		}
-		if (hudmode==3)
+		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
 			copyspritex(do_darkmode?18098:18097, 134, 3,  0);
 		
 		init_meta_stats();
@@ -2274,7 +2275,7 @@ void eng_display_win(int plr_sprite,int init)
 		xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 		xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
 		
-		if (hudmode==0)
+		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 		{
 			for (n=0; n<5; n++) {
 				xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
@@ -2329,9 +2330,9 @@ void eng_display_win(int plr_sprite,int init)
 		for (n=0; n<10; n++) 
 		{
 			// regular skill tab functionality
-			if (hudmode==0||hudmode==3)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS||game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
 			{
-				m=skilltab[n+skill_pos].nr;
+				m=skilltab[n+game_ui_state.skill_scroll].nr;
 				if (m>=55)
 				{
 					xputtext(9,(8+8*14)+n*14,1,"-");
@@ -2344,7 +2345,7 @@ void eng_display_win(int plr_sprite,int init)
 					}
 					else
 					{
-						xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+skill_pos].name);
+						xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].name);
 						xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
 					}
 					continue;
@@ -2354,7 +2355,7 @@ void eng_display_win(int plr_sprite,int init)
 					// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
 					if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&IS_SEYAN_DU)) 
 					{
-						xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+skill_pos].name);
+						xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].name);
 						xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
 					}
 					else
@@ -2377,23 +2378,23 @@ void eng_display_win(int plr_sprite,int init)
 						(m==12&&(pl_flagb & (1 <<  3))) ||  // Tactics invert
 						(m==22&&IS_SHIFTED) // Rage -> Calm
 					)
-					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].alt_a);
+					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].alt_a);
 				else
-					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+skill_pos].name);
+					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].name);
 				
-				if (pdata.show_stats) xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+skill_pos]);
-				xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+skill_pos]);
+				if (pdata.show_stats) xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll]);
+				xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+game_ui_state.skill_scroll]);
 				if (g_config.ui.cost_helper) {
-					char raise_icon = get_raise_icon(m, n + skill_pos);
+					char raise_icon = get_raise_icon(m, n + game_ui_state.skill_scroll);
 					render_putc(163, (8 + 8 * 14) + n * 14, raise_icon == '+' ? 1 : 2, raise_icon);
 				} else {
-					if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])<=pl.points-stat_points_used)
+					if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll])<=pl.points-stat_points_used)
 						render_putc(163,(8+8*14)+n* 14, 1, '+');
 				}
-				if (stat_raised[n+8+skill_pos]>0) 
+				if (stat_raised[n+8+game_ui_state.skill_scroll]>0)
 					render_putc(177,(8+8*14)+n*14,1,'-');
-				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos])!=HIGH_VAL)
-					xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+skill_pos]));
+				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll])!=HIGH_VAL)
+					xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll]));
 			}
 			else
 			{
@@ -2754,7 +2755,7 @@ void eng_display_win(int plr_sprite,int init)
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
 			}
 			/*  Sadly this is harder to do than it looks
-			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos) && shop.pl_price)
+			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)game_ui_state.inventory_scroll) && shop.pl_price)
 			{
 				if (show_shop>=1 && show_shop<=101)
 					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
@@ -2783,9 +2784,9 @@ void eng_display_win(int plr_sprite,int init)
 		if (show_wps)
 		{
 			copyspritex(do_darkmode?18005:5,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			//wps_pos
+			//game_ui_state.waypoint_scroll
 			for (n=0; n<8; n++) {
-				m=n+wps_pos;
+				m=n+game_ui_state.waypoint_scroll;
 				pr = wpslist[m].nr;
 				if (hightlight==HL_WAYPOINT && hightlight_sub==n)
 					copyspritex((pl.waypoints&(1<<pr))?4500+pr:4533+pr,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
@@ -2803,7 +2804,7 @@ void eng_display_win(int plr_sprite,int init)
 				}
 			}
 			// Scroll bar
-			showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(wps_pos*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
+			showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(game_ui_state.waypoint_scroll*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
 		}
 		
 		if (show_tree)

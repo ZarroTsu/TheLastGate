@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "main.h"
 #include "config/config.h"
+#include "game/game_ui.h"
 #include "mods/stubborn_actions.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
@@ -41,7 +42,7 @@ int gui_hud_b[]		= { 260, 181, 196, 211 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern int inv_pos,skill_pos,wps_pos,hudmode,mm_magnify;
+extern int mm_magnify;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -243,23 +244,23 @@ void button_command(int nr)
 		case 12: 
 			if (keys)
 			{
-				inv_pos = 0; 
+				game_ui_state.inventory_scroll = 0;
 			}
 			else
 			{
-				if (inv_pos> 1)
-					inv_pos -= 10; 
+				if (game_ui_state.inventory_scroll> 1)
+					game_ui_state.inventory_scroll -= 10;
 			}
 			break;
 		case 13: 
 			if (keys)
 			{
-				inv_pos = MAXITEMS-30; 
+				game_ui_state.inventory_scroll = MAXITEMS-30;
 			}
 			else
 			{
-				if (inv_pos<MAXITEMS-30)
-					inv_pos += 10; 
+				if (game_ui_state.inventory_scroll<MAXITEMS-30)
+					game_ui_state.inventory_scroll += 10;
 			}
 			break;
 
@@ -267,25 +268,25 @@ void button_command(int nr)
 		case 14: 
 			if (keys)
 			{
-				if (skill_pos>11)	skill_pos -= 10; 
-				else 				skill_pos  = 0;
+				if (game_ui_state.skill_scroll>11)	game_ui_state.skill_scroll -= 10;
+				else 				game_ui_state.skill_scroll  = 0;
 			}
 			else
 			{
-				if (skill_pos> 1)	skill_pos -= 2; 
-				else				skill_pos  = 0;
+				if (game_ui_state.skill_scroll> 1)	game_ui_state.skill_scroll -= 2;
+				else				game_ui_state.skill_scroll  = 0;
 			}
 			break;
 		case 15: 
 			if (keys)
 			{
-				if (skill_pos<MAXSKILL-20)	skill_pos += 10; 
-				else						skill_pos  = MAXSKILL-10;
+				if (game_ui_state.skill_scroll<MAXSKILL-20)	game_ui_state.skill_scroll += 10;
+				else						game_ui_state.skill_scroll  = MAXSKILL-10;
 			}
 			else
 			{
-				if (skill_pos<MAXSKILL-10)	skill_pos += 2; 
-				else						skill_pos  = MAXSKILL-10;
+				if (game_ui_state.skill_scroll<MAXSKILL-10)	game_ui_state.skill_scroll += 2;
+				else						game_ui_state.skill_scroll  = MAXSKILL-10;
 			}
 			break;
 		
@@ -325,14 +326,14 @@ void button_command(int nr)
 			
 		// New GUI swap buttons
 		case 44:
-			if (hudmode == 0) hudmode = 3;
-			else hudmode = 0;
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) game_ui_state.hud_mode = HUD_MODE_LIST_SKILLS_AND_META;
+			else game_ui_state.hud_mode = HUD_MODE_LIST_SKILLS;
 			break;
 		case 45:
-			hudmode = 1;
+			game_ui_state.hud_mode = HUD_MODE_LIST_OFFENSES;
 			break;
 		case 46:
-			hudmode = 2;
+			game_ui_state.hud_mode = HUD_MODE_LIST_DEFENSES;
 			break;
 		
 		case 47:
@@ -360,8 +361,8 @@ void button_command(int nr)
 
 		default: break;
 	}
-	if (skill_pos>MAXSKILL-10) skill_pos = MAXSKILL-10;
-	if (skill_pos<0) skill_pos = 0;
+	if (game_ui_state.skill_scroll>MAXSKILL-10) game_ui_state.skill_scroll = MAXSKILL-10;
+	if (game_ui_state.skill_scroll<0) game_ui_state.skill_scroll = 0;
 }
 
 void button_help(int nr)
@@ -633,11 +634,11 @@ int mouse_inventory(int x,int y,int mode)
 			{
 				if (show_shop && show_shop != 110 && show_shop != 111)
 				{	// Sell item from inventory
-					cmd3(CL_CMD_QSHOP,shop.nr,nr+inv_pos,dept_page);
+					cmd3(CL_CMD_QSHOP,shop.nr,nr+game_ui_state.inventory_scroll,dept_page);
 				}
 				else
 				{	// Push or pull item stacks
-					cmd3(CL_CMD_INV,3,nr+inv_pos,selected_char); 
+					cmd3(CL_CMD_INV,3,nr+game_ui_state.inventory_scroll,selected_char);
 				}
 			}
 			else if (mode==MS_RB_UP)
@@ -647,28 +648,28 @@ int mouse_inventory(int x,int y,int mode)
 					xlog(6,"Details panel now showing default.");
 				}
 				// Lock item where it is ;  TODO: fix /sort server-side before uncommenting
-				//cmd3(CL_CMD_INV,4,nr+inv_pos,selected_char);
-				//pl.item_l[nr+inv_pos] = 1-pl.item_l[nr+inv_pos];
-				if (last_skill == 100+nr+inv_pos)
+				//cmd3(CL_CMD_INV,4,nr+game_ui_state.inventory_scroll,selected_char);
+				//pl.item_l[nr+game_ui_state.inventory_scroll] = 1-pl.item_l[nr+game_ui_state.inventory_scroll];
+				if (last_skill == 100+nr+game_ui_state.inventory_scroll)
 				{
 					last_skill = -1;
-					xlog(6,"Inventory slot %d no longer selected for shortcut.",nr+inv_pos);
+					xlog(6,"Inventory slot %d no longer selected for shortcut.",nr+game_ui_state.inventory_scroll);
 				}
 				else
 				{
-					last_skill = 100+nr+inv_pos;
+					last_skill = 100+nr+game_ui_state.inventory_scroll;
 					if (firstrclick)
 					{
-						xlog(6,"Inventory slot %d selected for shortcut.",nr+inv_pos);
+						xlog(6,"Inventory slot %d selected for shortcut.",nr+game_ui_state.inventory_scroll);
 					}
 					else
 					{
 						firstrclick++;
-						xlog(6,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+inv_pos);
+						xlog(6,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+game_ui_state.inventory_scroll);
 					}
 				}
 			}
-			if (pl.item[nr+inv_pos]) 
+			if (pl.item[nr+game_ui_state.inventory_scroll])
 			{
 				if (pl.citem) cursor_type=CT_NONE;
 				else cursor_type=CT_TAKE;
@@ -680,9 +681,9 @@ int mouse_inventory(int x,int y,int mode)
 		}
 		else if (keys==1) 
 		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,0,nr+inv_pos,selected_char);
-			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+inv_pos,0,selected_char);
-			if (pl.item[nr+inv_pos]) 
+			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,0,nr+game_ui_state.inventory_scroll,selected_char);
+			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+game_ui_state.inventory_scroll,0,selected_char);
+			if (pl.item[nr+game_ui_state.inventory_scroll])
 			{
 				if (pl.citem) cursor_type=CT_SWAP;
 				else cursor_type=CT_TAKE;
@@ -694,15 +695,15 @@ int mouse_inventory(int x,int y,int mode)
 		}
 		else if (keys==0) 
 		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,6,nr+inv_pos,selected_char);
-			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+inv_pos,0,selected_char);
-			if (pl.item[nr+inv_pos]) cursor_type=CT_USE;
+			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,6,nr+game_ui_state.inventory_scroll,selected_char);
+			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+game_ui_state.inventory_scroll,0,selected_char);
+			if (pl.item[nr+game_ui_state.inventory_scroll]) cursor_type=CT_USE;
 			else cursor_type=CT_NONE;
 		} 
 		else 
 			cursor_type=CT_NONE;
 		hightlight=HL_BACKPACK;
-		hightlight_sub=nr+inv_pos;
+		hightlight_sub=nr+game_ui_state.inventory_scroll;
 		return 1;
 	}
 	
@@ -806,7 +807,7 @@ int _mouse_statbox(int x,int y,int state)
 
 	// Update Button
 	if (	x>gui_update[RECT_X1] 	&& y>gui_update[RECT_Y1] 
-		&&  x<gui_update[RECT_X2] 	&& y<gui_update[RECT_Y2] && hudmode!=1 && hudmode!=2)
+		&&  x<gui_update[RECT_X2] 	&& y<gui_update[RECT_Y2] && game_ui_state.hud_mode != HUD_MODE_LIST_OFFENSES && game_ui_state.hud_mode != HUD_MODE_LIST_DEFENSES)
 	{
 		hightlight=HL_STATBOX;
 		hightlight_sub=0;
@@ -844,27 +845,27 @@ int _mouse_statbox(int x,int y,int state)
 
 	if (x<172) { // raise
 		if (state==MS_RB_UP) {
-			if (n<5 && hudmode==0) xlog(1,"Raise %s.",at_name[n]);
-			else if (n==5 && hudmode==0) xlog(1,"Raise Hitpoints.");
-			else if (n==6 && hudmode==0) xlog(1,"Raise Mana."); 	// xlog(1,"Raise Endurance.");
+			if (n<5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) xlog(1,"Raise %s.",at_name[n]);
+			else if (n==5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) xlog(1,"Raise Hitpoints.");
+			else if (n==6 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) xlog(1,"Raise Mana."); 	// xlog(1,"Raise Endurance.");
 			else if (n==7) return 1; 				// xlog(1,"Raise Mana.");
-			else if (n>=8 && hudmode!=1 && hudmode!=2) xlog(1,"Raise %s.",skilltab[n-8+skill_pos].name);
+			else if (n>=8 && game_ui_state.hud_mode != HUD_MODE_LIST_OFFENSES && game_ui_state.hud_mode != HUD_MODE_LIST_DEFENSES) xlog(1,"Raise %s.",skilltab[n-8+game_ui_state.skill_scroll].name);
 			return 1;
 		}
 		if (state!=MS_LB_UP) return 1;
 
-		if (n<5 && hudmode==0) {
+		if (n<5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) {
 			if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])>pl.points-stat_points_used) return 1;
 			stat_points_used+=attrib_needed(n,pl.attrib[n][0]+stat_raised[n]);
 			stat_raised[n]++;
 			return 1;
-		} else if (n==5 && hudmode==0) {
+		} else if (n==5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) {
 			if (hp_needed(pl.hp[0]+stat_raised[n])>pl.points-stat_points_used) return 1;
 			stat_points_used+=hp_needed(pl.hp[0]+stat_raised[n]);
 			stat_raised[n]++;
 			return 1;
 		} 
-		else if (n==6 && hudmode==0) 
+		else if (n==6 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 		{
 			if (mana_needed(pl.mana[0]+stat_raised[n+1])>pl.points-stat_points_used) return 1;
 			stat_points_used+=mana_needed(pl.mana[0]+stat_raised[n+1]);
@@ -872,38 +873,38 @@ int _mouse_statbox(int x,int y,int state)
 			return 1;
 		} 
 		else if (n==7) return 1;
-		else if (n>=8 && hudmode!=1 && hudmode!=2) {
-			m=skilltab[n-8+skill_pos].nr;
-			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+skill_pos])>pl.points-stat_points_used) return 1;
-			stat_points_used+=skill_needed(m,pl.skill[m][0]+stat_raised[n+skill_pos]);
-			stat_raised[n+skill_pos]++;
+		else if (n>=8 && game_ui_state.hud_mode != HUD_MODE_LIST_OFFENSES && game_ui_state.hud_mode != HUD_MODE_LIST_DEFENSES) {
+			m=skilltab[n-8+game_ui_state.skill_scroll].nr;
+			if (skill_needed(m,pl.skill[m][0]+stat_raised[n+game_ui_state.skill_scroll])>pl.points-stat_points_used) return 1;
+			stat_points_used+=skill_needed(m,pl.skill[m][0]+stat_raised[n+game_ui_state.skill_scroll]);
+			stat_raised[n+game_ui_state.skill_scroll]++;
 			return 1;
 		}
 	} 
 	else 
 	{ // lower
 		if (state==MS_RB_UP) {
-			if (n<5 && hudmode==0) xlog(1,"Lower %s.",at_name[n]);
-			else if (n==5 && hudmode==0) xlog(1,"Lower Hitpoints.");
-			else if (n==6 && hudmode==0) xlog(1,"Lower Mana."); 	// xlog(1,"Lower Endurance.");
+			if (n<5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) xlog(1,"Lower %s.",at_name[n]);
+			else if (n==5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) xlog(1,"Lower Hitpoints.");
+			else if (n==6 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) xlog(1,"Lower Mana."); 	// xlog(1,"Lower Endurance.");
 			else if (n==7) return 1; 				// xlog(1,"Lower Mana.");
-			else if (n>=8 && hudmode!=1 && hudmode!=2) xlog(1,"Lower %s.",skilltab[n-8+skill_pos].name);
+			else if (n>=8 && game_ui_state.hud_mode != HUD_MODE_LIST_OFFENSES && game_ui_state.hud_mode != HUD_MODE_LIST_DEFENSES) xlog(1,"Lower %s.",skilltab[n-8+game_ui_state.skill_scroll].name);
 			return 1;
 		}
 		if (state!=MS_LB_UP) return 1;
 
-		if (n<5 && hudmode==0) {
+		if (n<5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) {
 			if (!stat_raised[n]) return 1;
 			stat_raised[n]--;
 			stat_points_used-=attrib_needed(n,pl.attrib[n][0]+stat_raised[n]);
 			return 1;
-		} else if (n==5 && hudmode==0) {
+		} else if (n==5 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) {
 			if (!stat_raised[n]) return 1;
 			stat_raised[n]--;
 			stat_points_used-=hp_needed(pl.hp[0]+stat_raised[n]);
 			return 1;
 		} 
-		else if (n==6 && hudmode==0) 
+		else if (n==6 && game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 		{
 			if (!stat_raised[n+1]) return 1;
 			stat_raised[n+1]--;
@@ -911,11 +912,11 @@ int _mouse_statbox(int x,int y,int state)
 			return 1;
 		} 
 		else if (n==7) return 1;
-		else if (n>=8 && hudmode!=1 && hudmode!=2) {
-			if (!stat_raised[n+skill_pos]) return 1;
-			m=skilltab[n-8+skill_pos].nr;
-			stat_raised[n+skill_pos]--;
-			stat_points_used-=skill_needed(m,pl.skill[m][0]+stat_raised[n+skill_pos]);
+		else if (n>=8 && game_ui_state.hud_mode != HUD_MODE_LIST_OFFENSES && game_ui_state.hud_mode != HUD_MODE_LIST_DEFENSES) {
+			if (!stat_raised[n+game_ui_state.skill_scroll]) return 1;
+			m=skilltab[n-8+game_ui_state.skill_scroll].nr;
+			stat_raised[n+game_ui_state.skill_scroll]--;
+			stat_points_used-=skill_needed(m,pl.skill[m][0]+stat_raised[n+game_ui_state.skill_scroll]);
 			return 1;
 		}
 	}
@@ -943,7 +944,7 @@ int mouse_statbox(int x,int y,int state)
 	else 
 		m=1;
 	
-	if (hudmode==0 || hudmode==3)
+	if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
 	{
 		for (n=0; n<m; n++) ret=_mouse_statbox(x,y,state);
 	}
@@ -970,10 +971,10 @@ void meta_stat_descs(int n)
 			default: break;
 		}
 	}
-	else if (hudmode==1)		// Offense Stats
+	else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES)		// Offense Stats
 	{
 		n-=7;
-		switch (n+skill_pos)
+		switch (n+game_ui_state.skill_scroll)
 		{
 			case  1: if (pl_dmgbn!=10000)
 					 xlog(1,"Damage Multiplier is the final multiplier for all damage you deal."); break;
@@ -1047,7 +1048,7 @@ void meta_stat_descs(int n)
 	else						// Defense Stats
 	{
 		n-=7;
-		switch (n+skill_pos)
+		switch (n+game_ui_state.skill_scroll)
 		{
 			case  1: if (pl_dmgrd!=10000)
 					 xlog(1,"Damage Reduction is the final multiplier for all damage you take."); break;
@@ -1155,7 +1156,7 @@ int mouse_statbox2(int x,int y,int state)
 		
 		n=0; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Braveness
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"%s improves most skills and spells. It also improves your critical hit rate.",at_name[n]);
 			else
 				meta_stat_descs(n);
@@ -1163,7 +1164,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		n=1; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Willpower
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"%s improves most support spells. It also improves the speed of casting spells and using skills, and helps overwhelm spell suppression.",at_name[n]);
 			else
 				meta_stat_descs(n);
@@ -1171,7 +1172,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		n=2; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Intuition
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"%s improves most offensive spells. It also reduces the duration of skill exhaustion.",at_name[n]);
 			else
 				meta_stat_descs(n);
@@ -1179,7 +1180,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		n=3; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Agility
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"%s improves most combat skills. It also improves your movement speed and your attack speed.",at_name[n]);
 			else
 				meta_stat_descs(n);
@@ -1187,7 +1188,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		n=4; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Strength
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"%s improves most combat skills. It also improves your movement speed and the damage dealt by your attacks.",at_name[n]);
 			else
 				meta_stat_descs(n);
@@ -1195,7 +1196,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		n=5; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Hitpoints
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"Your Hitpoints.");
 			else
 				meta_stat_descs(n);
@@ -1203,7 +1204,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		n=6; if ( x>xt && y>yt+shf*n && x<xb && y<yb+shf*n ) // Mana
 		{
-			if (hudmode==0)
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 				xlog(1,"Your Mana.");
 			else
 				meta_stat_descs(n);
@@ -1228,9 +1229,9 @@ int mouse_statbox2(int x,int y,int state)
 	// Skills
 	if (state==MS_RB_UP) 
 	{
-		if (hudmode==0 || hudmode==3)
+		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
 		{
-			m = skilltab[n+skill_pos].nr;
+			m = skilltab[n+game_ui_state.skill_scroll].nr;
 			if (pl.skill[m][0] || m==50 || m==51 || (m==52 && KNOW_IDENTIFY) || ((m==53 || m==54) && IS_LYCANTH))
 			{
 				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
@@ -1250,35 +1251,35 @@ int mouse_statbox2(int x,int y,int state)
 						(m==22&&IS_SHIFTED)
 					)
 				{
-					strcpy(tmp, skilltab[n+skill_pos].alt_a);
-					xlog(1,skilltab[n+skill_pos].alt_b);
+					strcpy(tmp, skilltab[n+game_ui_state.skill_scroll].alt_a);
+					xlog(1,skilltab[n+game_ui_state.skill_scroll].alt_b);
 				}
 				else if (m==44)	// Proximity has special descriptions
 				{
-					strcpy(tmp, skilltab[n+skill_pos].name);
+					strcpy(tmp, skilltab[n+game_ui_state.skill_scroll].name);
 					if (IS_BRAVER)
-						xlog(1,skilltab[n+skill_pos].desc); // Braver
+						xlog(1,skilltab[n+game_ui_state.skill_scroll].desc); // Braver
 					else if (IS_SORCERER)
-						xlog(1,skilltab[n+skill_pos].alt_a); // Sorcerer
+						xlog(1,skilltab[n+game_ui_state.skill_scroll].alt_a); // Sorcerer
 					else if (IS_ARCHHARAKIM)
-						xlog(1,skilltab[n+skill_pos].alt_b); // Arch-Harakim
+						xlog(1,skilltab[n+game_ui_state.skill_scroll].alt_b); // Arch-Harakim
 					else
 						xlog(1,"Passively improves the area-of-effect of various skills and spells.");
 				}
 				else
 				{
-					strcpy(tmp, skilltab[n+skill_pos].name);
-					xlog(1,skilltab[n+skill_pos].desc);
+					strcpy(tmp, skilltab[n+game_ui_state.skill_scroll].name);
+					xlog(1,skilltab[n+game_ui_state.skill_scroll].desc);
 				}
 				
-				if (last_skill == n+skill_pos)
+				if (last_skill == n+game_ui_state.skill_scroll)
 				{
 					last_skill = -1;
 					xlog(6,"%s no longer selected for shortcut.",tmp);
 				}
 				else
 				{
-					last_skill = n+skill_pos;
+					last_skill = n+game_ui_state.skill_scroll;
 					if (!firstclick)
 					{
 						xlog(6,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
@@ -1292,18 +1293,18 @@ int mouse_statbox2(int x,int y,int state)
 				}
 			}
 		}
-		else if (hudmode==1)
+		else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES)
 		{
 			meta_stat_descs(n+7);
 		}
-		else if (hudmode==2)
+		else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES)
 		{
 			meta_stat_descs(n+7);
 		}
 	} 
-	else if (state==MS_LB_UP && (hudmode==0 || hudmode==3))
+	else if (state==MS_LB_UP && (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META))
 	{
-		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,skilltab[n+skill_pos].attrib[0]);
+		cmd3(CL_CMD_SKILL,skilltab[n+game_ui_state.skill_scroll].nr,selected_char,skilltab[n+game_ui_state.skill_scroll].attrib[0]);
 	}
 	return 1;
 }
@@ -1867,7 +1868,7 @@ int mouse_wps(int x,int y,int mode)
 	{
 		ty=(y-(GUI_SHOP_Y))/35;
 
-		nr=wpslist[ty+wps_pos].nr;
+		nr=wpslist[ty+game_ui_state.waypoint_scroll].nr;
 		if (mode==MS_LB_UP) 
 		{
 			cmd1(CL_CMD_WPS,nr);
@@ -1889,9 +1890,9 @@ int mouse_wps(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{
-			if (keys) 			wps_pos -= 8; 
-			else				wps_pos -= 2; 
-			if (wps_pos < 0) 	wps_pos  = 0;
+			if (keys) 			game_ui_state.waypoint_scroll -= 8;
+			else				game_ui_state.waypoint_scroll -= 2;
+			if (game_ui_state.waypoint_scroll < 0) 	game_ui_state.waypoint_scroll  = 0;
 		}
 		return 1;
 	}
@@ -1901,9 +1902,9 @@ int mouse_wps(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP) 
 		{
-			if (keys)					wps_pos += 8;
-			else						wps_pos += 2;
-			if (wps_pos > (MAXWPS-8))	wps_pos  = (MAXWPS-8);
+			if (keys)					game_ui_state.waypoint_scroll += 8;
+			else						game_ui_state.waypoint_scroll += 2;
+			if (game_ui_state.waypoint_scroll > (MAXWPS-8))	game_ui_state.waypoint_scroll  = (MAXWPS-8);
 		}
 		return 1;
 	}
