@@ -200,7 +200,6 @@ struct look
 
 extern struct look look;
 extern struct look shop;
-extern unsigned int dept_page;
 
 #define HL_BUTTONBOX	1
 #define HL_STATBOX		2

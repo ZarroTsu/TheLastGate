@@ -1363,10 +1363,6 @@ void eng_init_player(void)
 
 // ************* DISPLAY ******************
 
-unsigned int	dept_page=0;
-
-int				mm_magnify=2;
-
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
 look_type=0,		// 1=char, 2=item
@@ -2619,7 +2615,7 @@ void eng_display_win(int plr_sprite,int init)
 			copyspritex(do_darkmode?18094:18093,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
 			for (n=0; n<64; n++)
 			{
-				if (!shop.depot[dept_page][n]) continue;
+				if (!shop.depot[game_ui_state.open_depot_page][n]) continue;
 				
 				hh = 0;
 				xx = GUI_SHOP_X+6+(n%8)*34;
@@ -2627,13 +2623,13 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if (!pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n) hh = 16;
 				
-				copyspritex(shop.depot[dept_page][n],xx,yy,hh);												// Draw Item
-				if (shop.depot_f[dept_page][n] & 1) copyspritex(4496,xx,yy,hh); 							// Draw SS
-				if (shop.depot_f[dept_page][n] & 2) copyspritex(4497,xx,yy,hh); 							// Draw EN
-				if (shop.depot_f[dept_page][n] & 4) copyspritex(6881,xx,yy,hh); 							// Draw CR
-				if (shop.depot_c[dept_page][n])		copyspritex(6999+shop.depot_c[dept_page][n],xx,yy,hh);	// Draw CA
-				if (shop.depot_s[dept_page][n]>0&&shop.depot_s[dept_page][n]<=10)							// Draw Stack
-					copyspritex(4000+shop.depot_s[dept_page][n],xx,yy,hh);
+				copyspritex(shop.depot[game_ui_state.open_depot_page][n],xx,yy,hh);												// Draw Item
+				if (shop.depot_f[game_ui_state.open_depot_page][n] & 1) copyspritex(4496,xx,yy,hh); 							// Draw SS
+				if (shop.depot_f[game_ui_state.open_depot_page][n] & 2) copyspritex(4497,xx,yy,hh); 							// Draw EN
+				if (shop.depot_f[game_ui_state.open_depot_page][n] & 4) copyspritex(6881,xx,yy,hh); 							// Draw CR
+				if (shop.depot_c[game_ui_state.open_depot_page][n])		copyspritex(6999+shop.depot_c[game_ui_state.open_depot_page][n],xx,yy,hh);	// Draw CA
+				if (shop.depot_s[game_ui_state.open_depot_page][n]>0&&shop.depot_s[game_ui_state.open_depot_page][n]<=10)							// Draw Stack
+					copyspritex(4000+shop.depot_s[game_ui_state.open_depot_page][n],xx,yy,hh);
 			}
 			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
 			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
@@ -2641,8 +2637,8 @@ void eng_display_win(int plr_sprite,int init)
 			xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
 			
 			// Depot Page Buttons
-			xx = GUI_SHOP_X+7 + (dept_page%4)*68;
-			yy = GUI_SHOP_Y+281 + (dept_page/4)*17;
+			xx = GUI_SHOP_X+7 + (game_ui_state.open_depot_page%4)*68;
+			yy = GUI_SHOP_Y+281 + (game_ui_state.open_depot_page/4)*17;
 			showbox(xx,yy,63,12,(unsigned short)(GREEN));
 		}
 		else if (game_ui_state.open_shop==110 || game_ui_state.open_shop==111) // Blacksmith Window
@@ -3368,17 +3364,17 @@ void eng_display(int init)	// optimize me!!!!!
 		
 		// offsets the minimap draw, so that it begins drawing from 64 tiles to the upper-left of your position,
 		//   drawing 128 x 128 tiles as pixels in dd_show_map.
-		// Added to this, mm_magnify carries a magnification value, which shrinks the tile offsets
+		// Added to this, game_ui_state.minimap_magnification carries a magnification value, which shrinks the tile offsets
 		//   and increases the size of the drawn 'pixels' to fill the 128x128 space.
-		mapx=mapx-(64/max(1,mm_magnify));
+		mapx=mapx-(64/max(1,game_ui_state.minimap_magnification));
 		if (mapx<0)	mapx=0;
-		if (mapx>1024-((128/max(1,mm_magnify))+1)) mapx=1024-((128/max(1,mm_magnify))+1);
+		if (mapx>1024-((128/max(1,game_ui_state.minimap_magnification))+1)) mapx=1024-((128/max(1,game_ui_state.minimap_magnification))+1);
 
-		mapy=mapy-(64/max(1,mm_magnify));
+		mapy=mapy-(64/max(1,game_ui_state.minimap_magnification));
 		if (mapy<0)	mapy=0;
-		if (mapy>MAPY_MAX-((128/max(1,mm_magnify))+1)) mapy=MAPY_MAX-((128/max(1,mm_magnify))+1);
+		if (mapy>MAPY_MAX-((128/max(1,game_ui_state.minimap_magnification))+1)) mapy=MAPY_MAX-((128/max(1,game_ui_state.minimap_magnification))+1);
 
-		show_map(xmap,mapx,mapy,max(1,mm_magnify));
+		show_map(xmap,mapx,mapy,max(1,game_ui_state.minimap_magnification));
 	}
 
 	eng_display_win(plr_sprite,init);

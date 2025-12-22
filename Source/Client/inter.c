@@ -42,7 +42,6 @@ int gui_hud_b[]		= { 260, 181, 196, 211 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern int mm_magnify;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -316,12 +315,12 @@ void button_command(int nr)
 		
 		// Magnification buttons for the mini-map
 		case 42:
-			if (keys) mm_magnify = 4;
-			else if (mm_magnify<4) mm_magnify++; 
+			if (keys) game_ui_state.minimap_magnification = 4;
+			else if (game_ui_state.minimap_magnification<4) game_ui_state.minimap_magnification++;
 			break;
 		case 43:
-			if (keys) mm_magnify = 1;
-			else if (mm_magnify>1) mm_magnify--; 
+			if (keys) game_ui_state.minimap_magnification = 1;
+			else if (game_ui_state.minimap_magnification>1) game_ui_state.minimap_magnification--;
 			break;
 			
 		// New GUI swap buttons
@@ -634,7 +633,7 @@ int mouse_inventory(int x,int y,int mode)
 			{
 				if (game_ui_state.open_shop && game_ui_state.open_shop != 110 && game_ui_state.open_shop != 111)
 				{	// Sell item from inventory
-					cmd3(CL_CMD_QSHOP,shop.nr,nr+game_ui_state.inventory_scroll,dept_page);
+					cmd3(CL_CMD_QSHOP,shop.nr,nr+game_ui_state.inventory_scroll,game_ui_state.open_depot_page);
 				}
 				else
 				{	// Push or pull item stacks
@@ -1808,7 +1807,7 @@ int mouse_depot(int x,int y,int mode)
 		tx=(x-(GUI_SHOP_X+4))/34;
 		ty=(y-(GUI_SHOP_Y+4))/34;
 
-		nr=min(512,dept_page*64+tx+ty*8);
+		nr=min(512,game_ui_state.open_depot_page*64+tx+ty*8);
 		if (mode==MS_LB_UP) cmd(CL_CMD_SHOP,shop.nr,nr);
 		if (mode==MS_RB_UP) cmd(CL_CMD_SHOP,shop.nr,nr+8*64);
 
@@ -1824,7 +1823,7 @@ int mouse_depot(int x,int y,int mode)
 	{
 		if (mode==MS_LB_UP)
 		{
-			dept_page = n+m*4;
+			game_ui_state.open_depot_page = n+m*4;
 			play_sound("sfx/click.wav",CLICKVOL,0);
 		}
 		return 1;

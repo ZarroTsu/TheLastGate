@@ -34,5 +34,9 @@ typedef struct {
     unsigned int open_shop;
     unsigned int open_skill_tree;
     unsigned int open_book;
+    unsigned int open_depot_page;
+
+    /* Minimap */
+    int minimap_magnification;
 
 } GameUiState;

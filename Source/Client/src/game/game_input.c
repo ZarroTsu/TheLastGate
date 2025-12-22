@@ -541,10 +541,10 @@ void game_handle_input(const SDL_Event *e) {
                         game_ui_state.waypoint_scroll--;
                     break;
                 case DEPOT_PAGE:
-                    if (delta < 0 && dept_page < 7)
-                        dept_page++;
-                    else if (delta > 0 && dept_page > 0)
-                        dept_page--;
+                    if (delta < 0 && game_ui_state.open_depot_page < 7)
+                        game_ui_state.open_depot_page++;
+                    else if (delta > 0 && game_ui_state.open_depot_page > 0)
+                        game_ui_state.open_depot_page--;
                     break;
                 case CHAT_HISTORY:
                     if (delta < 0 && logstart > 0) {
