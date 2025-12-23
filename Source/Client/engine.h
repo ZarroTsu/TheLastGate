@@ -15,6 +15,8 @@ extern int stat_raised[108];
 extern void cmd_options(void);
 void xlog(char font,char *format,...);
 int at_score(int n);
+int sk_score(int n);
+int points2rank(int v);
 
 #define AT_BRV		0
 #define AT_WIL		1

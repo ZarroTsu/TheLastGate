@@ -2280,69 +2280,9 @@ void eng_display_win(int plr_sprite,int init)
 			// regular skill tab functionality
 			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS||game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
 			{
-				m=skilltab[n+game_ui_state.skill_scroll].nr;
-				if (m>=55)
-				{
-					xputtext(9,(8+8*14)+n*14,1,"-");
-				}
-				else if (m>=50)
-				{
-					if ((m==52 && !KNOW_IDENTIFY) || ((m==53||m==54) && !IS_LYCANTH)) 
-					{
-						xputtext(9,(8+8*14)+n*14,1,"-");
-					}
-					else
-					{
-						xputtext(9,(8+8*14)+n*14,5,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].name);
-						xputtext(140,(8+8*14)+n*14,5,"%3d",min(300, max(1,(points2rank(pl.points_tot)+1)*8)));
-					}
-					continue;
-				}
-				else if (!pl.skill[m][0]) 
-				{
-					// Stealth, Resist, Regen, Rest, Medit, Immun -- these are active even if you don't know them.
-					if (m==8||m==23||m==28||m==29||m==30||m==32||(m==44&&IS_SEYAN_DU)) 
-					{
-						xputtext(9,(8+8*14)+n*14,0,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].name);
-						xputtext(140,(8+8*14)+n*14,0,"%3d",sk_score(m));
-					}
-					else
-						xputtext(9,(8+8*14)+n*14,1,"-");
-					continue;
-				}
-				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-						(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-						(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-						(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
-						(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-						(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
-						(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-						(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
-						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
-						(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
-						(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-						(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-						(m==12&&(pl_flagb & (1 <<  3))) ||  // Tactics invert
-						(m==22&&IS_SHIFTED) // Rage -> Calm
-					)
-					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].alt_a);
-				else
-					xputtext(9,(8+8*14)+n*14,1,"%-20.20s",skilltab[n+game_ui_state.skill_scroll].name);
-				
-				if (pdata.show_stats) xputtext(117,(8+8*14)+n*14,3,"%3d",pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll]);
-				xputtext(140,(8+8*14)+n*14,1,"%3d",sk_score(m)+stat_raised[n+8+game_ui_state.skill_scroll]);
-				if (g_config.ui.cost_helper) {
-					char raise_icon = get_raise_icon(m, n + game_ui_state.skill_scroll);
-					render_putc(163, (8 + 8 * 14) + n * 14, raise_icon == '+' ? 1 : 2, raise_icon);
-				} else {
-					if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll])<=pl.points-stat_points_used)
-						render_putc(163,(8+8*14)+n* 14, 1, '+');
-				}
-				if (stat_raised[n+8+game_ui_state.skill_scroll]>0)
-					render_putc(177,(8+8*14)+n*14,1,'-');
-				if (skill_needed(m,pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll])!=HIGH_VAL)
-					xputtext(189,(8+8*14)+n*14,1,"%7d",skill_needed(m,pl.skill[m][0]+stat_raised[n+8+game_ui_state.skill_scroll]));
+				StatDisplayInfo skill_info = {0};
+				get_skill_display_info(n, &skill_info);
+				render_stat_line(&skill_info, 0, (8 + 8 * 14) + n * 14, pdata.show_stats);
 			}
 			else
 			{

@@ -18,5 +18,7 @@ void get_attribute_display_info(int attrib_id, StatDisplayInfo *out);
 
 void get_hp_mana_display_info(int vital_id, StatDisplayInfo *out);
 
+void get_skill_display_info(int skill_slot, StatDisplayInfo *out);
+
 /* Render Helpers */
 void render_stat_line(const StatDisplayInfo *stat, int x, int y, bool show_base_stats);
