@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/jamesblack/TheLastGate/compare/v3.1.0...v3.2.0) (2025-12-23)
+
+
+### Features
+
+* IMGUI Inventory Window ([#4](https://github.com/jamesblack/TheLastGate/issues/4)) ([0c82e91](https://github.com/jamesblack/TheLastGate/commit/0c82e9164a261430f870048f6e9cbfbce1591d5d))
+
 ## [3.1.0](https://github.com/jamesblack/TheLastGate/compare/v1.0.0...v3.1.0) (2025-12-23)
 
 
