@@ -34,6 +34,7 @@
 #include "main.h"
 #include "config/config.h"
 #include "game/game_ui.h"
+#include "game/stat_display.h"
 #include "graphics/render.h"
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
@@ -2244,46 +2245,23 @@ void eng_display_win(int plr_sprite,int init)
 		xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
 		xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 		xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
-		
+
 		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
 		{
 			for (n=0; n<5; n++) {
-				xputtext(9,8+n*14,1,"%-20.20s",at_name[n]);
-				//
-				if (pdata.show_stats) xputtext(117,(8+n*14),3,"%3d",pl.attrib[n][0]+stat_raised[n]);
-				xputtext(140,(8+n*14),1,"%3d",at_score(n)+stat_raised[n]);
-				//
-				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])<=pl.points-stat_points_used)
-					render_putc(163,8+n*14,1,'+');
-				if (stat_raised[n]>0) 
-					render_putc(177,8+n*14,1,'-');
-				if (attrib_needed(n,pl.attrib[n][0]+stat_raised[n])!=HIGH_VAL) 
-					xputtext(189,8+n*14,1,"%7d",attrib_needed(n,pl.attrib[n][0]+stat_raised[n]));
+				StatDisplayInfo stat_info;
+				get_attribute_display_info(n, &stat_info);
+				render_stat_line(&stat_info, 0, 8 + n * 14, pdata.show_stats);
 			}
-			
-			xputtext(9,8+5*14,1,"Hitpoints");
-			//
-			if (pdata.show_stats) xputtext(117,(8+5*14),3,"%3d",pl.hp[0]+stat_raised[5]);
-			xputtext(140,(8+5*14),1,"%3d",pl.hp[5]+stat_raised[5]);
-			//
-			if (hp_needed(pl.hp[0]+stat_raised[5])<=pl.points-stat_points_used)	
-				render_putc(163,8+5*14,1,'+');
-			if (stat_raised[5]>0) 
-				render_putc(177,8+5*14,1,'-');
-			if (hp_needed(pl.hp[0]+stat_raised[5])!=HIGH_VAL) 
-				xputtext(189,8+5*14,1,"%7d",hp_needed(pl.hp[0]+stat_raised[5]));
-			
-			xputtext(9,8+6*14,1,"Mana");
-			//
-			if (pdata.show_stats) xputtext(117,(8+6*14),3,"%3d",pl.mana[0]+stat_raised[7]);
-			xputtext(140,(8+6*14),1,"%3d",pl.mana[5]+stat_raised[7]);
-			//
-			if (mana_needed(pl.mana[0]+stat_raised[7])<=pl.points-stat_points_used)	
-				render_putc(163,8+6*14,1,'+');
-			if (stat_raised[7]>0) 
-				render_putc(177,8+6*14,1,'-');
-			if (mana_needed(pl.mana[0]+stat_raised[7])!=HIGH_VAL) 
-				xputtext(189,8+6*14,1,"%7d",mana_needed(pl.mana[0]+stat_raised[7]));
+
+			StatDisplayInfo health_info;
+			StatDisplayInfo mana_info;
+
+			get_hp_mana_display_info(5, &health_info);
+			get_hp_mana_display_info(7, &mana_info);
+
+			render_stat_line(&health_info, 0, 8 + 5 * 14, pdata.show_stats);
+			render_stat_line(&mana_info, 0, 8 + 6 * 14, pdata.show_stats);
 		}
 		else
 		{

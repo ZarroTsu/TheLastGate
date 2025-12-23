@@ -7,12 +7,14 @@ extern int st_learned_skill(int st_val, int v);
 
 extern int stat_points_used;
 extern struct cplayer pl;
+extern char *at_name[5];
 extern struct skilltab *skilltab;
 extern int skill_needed(int n,int v);
 extern int attrib_needed(int n,int v);
 extern int stat_raised[108];
 extern void cmd_options(void);
 void xlog(char font,char *format,...);
+int at_score(int n);
 
 #define AT_BRV		0
 #define AT_WIL		1

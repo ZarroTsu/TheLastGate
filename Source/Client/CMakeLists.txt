@@ -50,6 +50,7 @@ add_executable(TheLastGate
         src/config/keybindings.c
         src/game/game_input.c
         src/game/game_ui.c
+        src/game/stat_display.c
         src/graphics/atlas.c
         src/graphics/item_display.c
         src/graphics/loader.c
