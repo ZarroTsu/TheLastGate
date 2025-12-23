@@ -4613,6 +4613,7 @@ void cmd_exit(void)
 	}
 	if (!firstquit) 
 	{
+		say("/tavern");
 		xlog(0," ");
 		xlog(0,"(F12) Leaving the game without entering a tavern will cause you to take damage, and possibly lose your life. Click again if you need to leave immediately.");
 		xlog(0,"A tavern will be located near where you entered the game.");
