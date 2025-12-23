@@ -132,6 +132,8 @@ bool imgui_input_password(const char* label, char* buf, int buf_size);
 /* Widgets: Sliders */
 bool imgui_slider_int(const char* label, int* v, int v_min, int v_max);
 bool imgui_slider_float(const char* label, float* v, float v_min, float v_max);
+bool imgui_vslider_int(const char* label, float width, float height, int* v, int v_min, int v_max);
+bool imgui_vslider_float(const char* label, float width, float height, float* v, float v_min, float v_max);
 
 /* Widgets: Color */
 bool imgui_color_edit3(const char* label, float col[3]);
@@ -169,6 +171,16 @@ void imgui_center_next_text(const char* text);
 float imgui_get_frame_height(void);
 float imgui_get_frame_height_with_spacing(void);
 void imgui_get_content_region_avail(float* out_width, float* out_height);
+
+/* Scrolling */
+float imgui_get_scroll_x(void);
+float imgui_get_scroll_y(void);
+float imgui_get_scroll_max_x(void);
+float imgui_get_scroll_max_y(void);
+void imgui_set_scroll_x(float scroll_x);
+void imgui_set_scroll_y(float scroll_y);
+void imgui_set_scroll_here_x(float center_x_ratio);
+void imgui_set_scroll_here_y(float center_y_ratio);
 
 /* Columns (legacy) */
 void imgui_columns(int count, const char* id, int border);
@@ -349,6 +361,7 @@ bool imgui_is_item_hovered(void);
 bool imgui_is_item_active(void);
 bool imgui_is_item_clicked(int mouse_button);
 bool imgui_is_mouse_clicked(int mouse_button);
+bool imgui_is_window_hovered(void);
 void imgui_push_item_width(float item_width);
 void imgui_pop_item_width(void);
 void imgui_set_item_default_focus(void);
@@ -387,11 +400,12 @@ void imgui_pop_style_var(int count);
 #define IMGUI_STYLE_VAR_CELL_PADDING            17  /* ImVec2 */
 #define IMGUI_STYLE_VAR_SCROLLBAR_SIZE          18  /* float */
 #define IMGUI_STYLE_VAR_SCROLLBAR_ROUNDING      19  /* float */
-#define IMGUI_STYLE_VAR_GRAB_MIN_SIZE           20  /* float */
-#define IMGUI_STYLE_VAR_GRAB_ROUNDING           21  /* float */
-#define IMGUI_STYLE_VAR_TAB_ROUNDING            22  /* float */
-#define IMGUI_STYLE_VAR_BUTTON_TEXT_ALIGN       23  /* ImVec2 */
-#define IMGUI_STYLE_VAR_SELECTABLE_TEXT_ALIGN   24  /* ImVec2 */
+#define IMGUI_STYLE_VAR_SCROLLBAR_PADDING       20  /* ImVec2 */
+#define IMGUI_STYLE_VAR_GRAB_MIN_SIZE           21  /* float */
+#define IMGUI_STYLE_VAR_GRAB_ROUNDING           22  /* float */
+#define IMGUI_STYLE_VAR_TAB_ROUNDING            23  /* float */
+#define IMGUI_STYLE_VAR_BUTTON_TEXT_ALIGN       24  /* ImVec2 */
+#define IMGUI_STYLE_VAR_SELECTABLE_TEXT_ALIGN   25  /* ImVec2 */
 
 /* Style getters - get current style values */
 void imgui_get_style_item_spacing(float* out_x, float* out_y);
@@ -475,6 +489,10 @@ void imgui_show_demo_window(bool* p_open);
 bool imgui_want_capture_mouse(void);
 bool imgui_want_capture_keyboard(void);
 
+/* Mouse input */
+float imgui_get_mouse_wheel(void);
+float imgui_get_mouse_wheel_h(void);
+
 /* Keyboard input - for keybinding capture */
 bool imgui_is_key_pressed(int sdl_keycode);
 int imgui_get_key_mods(void);
@@ -485,11 +503,17 @@ void* imgui_get_background_draw_list(void);
 void* imgui_get_foreground_draw_list(void);
 
 /* Draw list commands - use the draw list returned from above functions */
+void imgui_draw_list_reset_render_state(void *draw_list);
 void imgui_draw_list_add_line(void* draw_list, float x1, float y1, float x2, float y2, unsigned int col, float thickness);
 void imgui_draw_list_add_rect(void* draw_list, float min_x, float min_y, float max_x, float max_y, unsigned int col, float rounding, int flags, float thickness);
 void imgui_draw_list_add_rect_filled(void* draw_list, float min_x, float min_y, float max_x, float max_y, unsigned int col, float rounding, int flags);
 void imgui_draw_list_add_image(void* draw_list, void* texture_id, float min_x, float min_y, float max_x, float max_y, float uv0_x, float uv0_y, float uv1_x, float uv1_y, unsigned int tint_col);
 void imgui_draw_list_add_text(void* draw_list, float x, float y, unsigned int col, const char* text);
+void imgui_draw_list_add_text_outline(void* draw_list, float x, float y, unsigned int col, unsigned int outline_col, const char* text);
+
+/* Draw list callback - for custom rendering within ImGui */
+typedef void (*imgui_draw_callback_fn)(void* user_data);
+void imgui_draw_list_add_callback(void* draw_list, imgui_draw_callback_fn callback, void* user_data);
 
 /* 9-slice/9-patch image drawing - for scalable UI elements like buttons */
 /* border_* are the pixel sizes of the borders in the source texture */

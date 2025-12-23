@@ -78,6 +78,9 @@ int sdl_isvisible(void);
 void sdl_show_map(unsigned short *src,int xo,int yo,int magnify);
 int sdl_get_avgcol(int nr);
 
+void calculate_gamma_shader_params(int effect, float *shade_effect, float *gamma_effect, bool *grey, bool *infra,
+                                   bool *water, bool *red, bool *green, bool *invis, bool *buff);
+
 // Magic glow effects (sdl_magic.c)
 void sdl_alphaeffect_magic(int nr,int str,int xpos,int ypos,int xoff,int yoff);
 

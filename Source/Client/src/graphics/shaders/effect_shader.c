@@ -8,6 +8,7 @@
 
 #include "shaders.h"
 #include "shaders/effect_shader_files.h"
+#include "shaders/effect_imgui_shader_files.h"
 
 static GLuint shader;
 
@@ -106,4 +107,104 @@ void use_effect_shader_instanced(void) {
     glUniform1i(uTexture, 0); // Texture unit 0
     glUniform1i(uShadow, 0); // Ensure shadow uniform is off for batch
     glUniform1i(uUseInstancing, 1); // Enable instanced rendering mode
+}
+
+/* ===== ImGui-Compatible Effect Shader ===== */
+/* This version uses vec2 position to match ImGui's vertex format */
+
+static GLuint imgui_shader = 0;
+
+static GLint imgui_uProjection = -1;
+static GLint imgui_uModel = -1;
+static GLint imgui_uTexture = -1;
+static GLint imgui_uUV0 = -1;
+static GLint imgui_uUV1 = -1;
+static GLint imgui_uGammaScale = -1;
+static GLint imgui_uGammaEffect = -1;
+static GLint imgui_uShadeEffect = -1;
+static GLint imgui_uRed = -1;
+static GLint imgui_uGreen = -1;
+static GLint imgui_uInvis = -1;
+static GLint imgui_uGrey = -1;
+static GLint imgui_uInfra = -1;
+static GLint imgui_uWater = -1;
+static GLint imgui_uShadow = -1;
+static GLint imgui_uBuff = -1;
+
+void load_effect_shader_imgui(float projection_matrix[16]) {
+    imgui_shader = load_shader_program(effect_imgui_vertex, effect_imgui_fragment);
+    if (!imgui_shader) {
+        printf("Failed to load ImGui effect shader\n");
+        return;
+    }
+
+    glUseProgram(imgui_shader);
+
+    /* Cache uniform locations */
+    imgui_uProjection = glGetUniformLocation(imgui_shader, "uProjection");
+    imgui_uModel = glGetUniformLocation(imgui_shader, "uModel");
+    imgui_uTexture = glGetUniformLocation(imgui_shader, "uTexture");
+    imgui_uUV0 = glGetUniformLocation(imgui_shader, "uUV0");
+    imgui_uUV1 = glGetUniformLocation(imgui_shader, "uUV1");
+    imgui_uGammaScale = glGetUniformLocation(imgui_shader, "uGammaScale");
+    imgui_uGammaEffect = glGetUniformLocation(imgui_shader, "uGammaEffect");
+    imgui_uShadeEffect = glGetUniformLocation(imgui_shader, "uShadeEffect");
+    imgui_uRed = glGetUniformLocation(imgui_shader, "uRed");
+    imgui_uGreen = glGetUniformLocation(imgui_shader, "uGreen");
+    imgui_uInvis = glGetUniformLocation(imgui_shader, "uInvis");
+    imgui_uGrey = glGetUniformLocation(imgui_shader, "uGrey");
+    imgui_uInfra = glGetUniformLocation(imgui_shader, "uInfra");
+    imgui_uWater = glGetUniformLocation(imgui_shader, "uWater");
+    imgui_uShadow = glGetUniformLocation(imgui_shader, "uShadow");
+    imgui_uBuff = glGetUniformLocation(imgui_shader, "uBuff");
+
+    glUniformMatrix4fv(uProjection, 1, GL_FALSE, projection_matrix);
+
+    glUseProgram(0);
+}
+
+void drop_effect_shader_imgui(void) {
+    if (imgui_shader) {
+        glDeleteProgram(imgui_shader);
+        imgui_shader = 0;
+    }
+}
+
+void use_effect_shader_imgui(EffectShaderSettings settings) {
+    glUseProgram(imgui_shader);
+
+    /* Set identity model matrix (ImGui already handles positioning) */
+    static const float identity[16] = {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+    glUniformMatrix4fv(imgui_uModel, 1, GL_FALSE, identity);
+
+    /* Set texture sampler */
+    glUniform1i(imgui_uTexture, 0);
+
+    /* Set UV coordinates */
+    if (settings.uv0[0] == 0 && settings.uv1[0] == 0 &&
+        settings.uv1[0] == 0 && settings.uv1[1] == 0) {
+        glUniform2f(imgui_uUV0, 0.0f, 0.0f);
+        glUniform2f(imgui_uUV1, 1.0f, 1.0f);
+    } else {
+        glUniform2f(imgui_uUV0, settings.uv0[0], settings.uv0[1]);
+        glUniform2f(imgui_uUV1, settings.uv1[0], settings.uv1[1]);
+    }
+
+    /* Set effect uniforms - same as non-instanced path */
+    glUniform1f(imgui_uGammaScale, settings.gamma_scale);
+    glUniform1f(imgui_uShadeEffect, settings.shade_effect);
+    glUniform1f(imgui_uGammaEffect, settings.gamma_effect);
+    glUniform1i(imgui_uRed, settings.red);
+    glUniform1i(imgui_uGreen, settings.green);
+    glUniform1i(imgui_uInvis, settings.invis);
+    glUniform1i(imgui_uGrey, settings.grey);
+    glUniform1i(imgui_uInfra, settings.infra);
+    glUniform1i(imgui_uWater, settings.water);
+    glUniform1i(imgui_uShadow, settings.shadow);
+    glUniform1i(imgui_uBuff, 0);
 }

@@ -22,7 +22,7 @@
 #include "ui/imgui/imgui_wrapper.h"
 #include "util/perf.h"
 
-const SdlClientVersion CLIENT_VERSION = {3,1};
+const SdlClientVersion CLIENT_VERSION = {3,2};
 
 // Screen data, can be shared with other files via extern
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;

@@ -126,6 +126,7 @@ struct pdata
 
 extern int last_skill;
 extern int selected_char;
+extern int cursor_type;
 
 extern struct pdata pdata;
 

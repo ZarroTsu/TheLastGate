@@ -33,6 +33,7 @@
 endfunction()
 
 generate_shader_embed_header(effect)
+generate_shader_embed_header(effect_imgui)
 generate_shader_embed_header(scaling)
 generate_shader_embed_header(solid)
 generate_shader_embed_header(magic)

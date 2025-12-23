@@ -159,6 +159,7 @@ int sdl_init(const int windowed) {
     }
 
     load_effect_shader(projection_matrix);
+    load_effect_shader_imgui(projection_matrix);
     load_solid_shader(projection_matrix);
     load_magic_shader(projection_matrix);
     init_fbo_scaling(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -343,6 +344,7 @@ void sdl_deinit(void) {
     }
 
     drop_effect_shader();
+    drop_effect_shader_imgui();
     drop_solid_shader();
     drop_magic_shader();
 

@@ -43,6 +43,7 @@
 #include "mods/stubborn_actions.h"
 #include "mods/use_queue.h"
 #include "ui/hotbar.h"
+#include "ui/inventory.h"
 #include "ui/option_window.h"
 #include "ui/perf_window.h"
 #include "util/math_util.h"
@@ -2137,21 +2138,6 @@ void eng_display_win(int plr_sprite,int init)
 		else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES)	showbox(261,212,64,12,(unsigned short)(RED));
 		else if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)	showbox(261,182,64,12,(unsigned short)(GREEN));
 
-		// inventory    251  6
-		for (n=0; n<30; n++) {
-			int slot_x, slot_y;
-			int inventory_slot = n+game_ui_state.inventory_scroll; // N represents the visible slot
-			grid_slot_to_xy(&inventory_layout, n, &slot_x, &slot_y);
-			// Draw inventory items
-			if (pl.item_info[inventory_slot].sprite) {
-				bool highlighted = hightlight==HL_BACKPACK && hightlight_sub==inventory_slot;
-				render_lockable_item_display(&pl.item_info[inventory_slot], slot_x, slot_y, highlighted ? 16 : 0);
-			}
-			// Draw shortcut key IDs
-			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)game_ui_state.inventory_scroll)
-				copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
-		}
-
 		// Prepare spell icons // pl.spell[n] is the SPRITE of the debuff being received.
 		// This can be used to cheat and split buffs and debuffs into two groups.
 		// buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2];
@@ -2936,7 +2922,6 @@ void eng_display(int init)	// optimize me!!!!!
 	sdl_batch_begin();
 
 	mouse(mx,my,0);
-	SDL_SetCursor(cursors[cursor_type]);
 
 	// *******
 	// * map *
@@ -4786,11 +4771,13 @@ void engine(void)
 			if (game_ui_state.show_options) {
 				options_window_render();
 			}
+			inventory_render();
 			if (g_config.runtime.show_performance) {
 				render_perf_window();
 			}
 
 			imgui_render();
+			SDL_SetCursor(cursors[cursor_type]);
 
 			if (init) {
 				eng_display_cursor_items();

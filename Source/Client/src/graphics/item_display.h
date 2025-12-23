@@ -54,10 +54,15 @@ static inline ItemDisplayInfo make_item_display(int sprite, ItemDisplayPropertie
     return info;
 }
 
+void render_item_keybind_imgui(void *draw_list, int inventory_slot, float x, float y, float cell_width, float cell_height);
+
 /* Render an item sprite with all overlays */
 void render_shop_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 
 void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+
+void render_lockable_item_display_imgui(void *draw_list, const ItemDisplayInfo *item,
+                                        float x, float y, int effect);
 
 void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 

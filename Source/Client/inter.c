@@ -76,12 +76,6 @@ int trans_button(int x,int y)
 {
 	int n;
 	int tx,ty;
-
-	// Scroll for Inventory
-	if (	x>gui_inv_up[RECT_X1] 	&& y>gui_inv_up[RECT_Y1] 
-		&&  x<gui_inv_up[RECT_X2] 	&& y<gui_inv_up[RECT_Y2]) return 12;
-	if (	x>gui_inv_down[RECT_X1] && y>gui_inv_down[RECT_Y1] 
-		&&  x<gui_inv_down[RECT_X2] && y<gui_inv_down[RECT_Y2]) return 13;
 	
 	// Scroll for Skill List
 	if (	x>gui_skl_up[RECT_X1] 	&& y>gui_skl_up[RECT_Y1] 
@@ -240,27 +234,8 @@ void button_command(int nr)
 		case 11: xmove=xxtimer=0; cmd_exit(); break; // exit
 
 		// Scroll bar for inventory
-		case 12: 
-			if (keys)
-			{
-				game_ui_state.inventory_scroll = 0;
-			}
-			else
-			{
-				if (game_ui_state.inventory_scroll> 1)
-					game_ui_state.inventory_scroll -= 10;
-			}
-			break;
-		case 13: 
-			if (keys)
-			{
-				game_ui_state.inventory_scroll = MAXITEMS-30;
-			}
-			else
-			{
-				if (game_ui_state.inventory_scroll<MAXITEMS-30)
-					game_ui_state.inventory_scroll += 10;
-			}
+		case 12:
+		case 13:
 			break;
 
 		// Scroll bar for skill list
@@ -408,8 +383,9 @@ void button_help(int nr)
 			break;
 		
 		// Scroll bar for inventory
-		case 12: xlog(1,"Scroll inventory contents up."); break;
-		case 13: xlog(1,"Scroll inventory contents down."); break;
+		case 12:
+		case 13:
+			break;
 		
 		// Scroll bar for skill list
 		case 14: xlog(1,"Scroll skill list up."); break;
@@ -619,91 +595,11 @@ int mouse_inventory(int x,int y,int mode)
 		if (mode==MS_RB_UP) xlog(1,"Dispose of items under your cursor here.");
 		return 1;
 	}
-	
-	// backpack
-	if (x>gui_inv_x[0] && x<gui_inv_x[1] && y>gui_inv_y[0] && y<gui_inv_y[1]) 
-	{
-		tx=(x-gui_inv_x[0])/34;
-		ty=(y-gui_inv_y[0])/34;
 
-		nr=tx+ty*10;
-		if (keys>=2)
-		{
-			if (mode==MS_LB_UP)
-			{
-				if (game_ui_state.open_shop && game_ui_state.open_shop != 110 && game_ui_state.open_shop != 111)
-				{	// Sell item from inventory
-					cmd3(CL_CMD_QSHOP,shop.nr,nr+game_ui_state.inventory_scroll,game_ui_state.open_depot_page);
-				}
-				else
-				{	// Push or pull item stacks
-					cmd3(CL_CMD_INV,3,nr+game_ui_state.inventory_scroll,selected_char);
-				}
-			}
-			else if (mode==MS_RB_UP)
-			{
-				if (last_skill >= 60 && last_skill <= 64)
-				{
-					xlog(6,"Details panel now showing default.");
-				}
-				// Lock item where it is ;  TODO: fix /sort server-side before uncommenting
-				//cmd3(CL_CMD_INV,4,nr+game_ui_state.inventory_scroll,selected_char);
-				//pl.item_l[nr+game_ui_state.inventory_scroll] = 1-pl.item_l[nr+game_ui_state.inventory_scroll];
-				if (last_skill == 100+nr+game_ui_state.inventory_scroll)
-				{
-					last_skill = -1;
-					xlog(6,"Inventory slot %d no longer selected for shortcut.",nr+game_ui_state.inventory_scroll);
-				}
-				else
-				{
-					last_skill = 100+nr+game_ui_state.inventory_scroll;
-					if (firstrclick)
-					{
-						xlog(6,"Inventory slot %d selected for shortcut.",nr+game_ui_state.inventory_scroll);
-					}
-					else
-					{
-						firstrclick++;
-						xlog(6,"Inventory slot %d selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",nr+game_ui_state.inventory_scroll);
-					}
-				}
-			}
-			if (pl.item[nr+game_ui_state.inventory_scroll])
-			{
-				if (pl.citem) cursor_type=CT_NONE;
-				else cursor_type=CT_TAKE;
-			} else 
-			{
-				if (pl.citem) cursor_type=CT_DROP;
-				else cursor_type=CT_NONE;
-			}
-		}
-		else if (keys==1) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,0,nr+game_ui_state.inventory_scroll,selected_char);
-			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+game_ui_state.inventory_scroll,0,selected_char);
-			if (pl.item[nr+game_ui_state.inventory_scroll])
-			{
-				if (pl.citem) cursor_type=CT_SWAP;
-				else cursor_type=CT_TAKE;
-			} else 
-			{
-				if (pl.citem) cursor_type=CT_DROP;
-				else cursor_type=CT_NONE;
-			}
-		}
-		else if (keys==0) 
-		{
-			if (mode==MS_LB_UP) cmd3(CL_CMD_INV,6,nr+game_ui_state.inventory_scroll,selected_char);
-			else if (mode==MS_RB_UP) cmd3(CL_CMD_INV_LOOK,nr+game_ui_state.inventory_scroll,0,selected_char);
-			if (pl.item[nr+game_ui_state.inventory_scroll]) cursor_type=CT_USE;
-			else cursor_type=CT_NONE;
-		} 
-		else 
-			cursor_type=CT_NONE;
-		hightlight=HL_BACKPACK;
-		hightlight_sub=nr+game_ui_state.inventory_scroll;
-		return 1;
+	// backpack
+	if (x>gui_inv_x[0] && x<gui_inv_x[1] && y>gui_inv_y[0] && y<gui_inv_y[1])
+	{
+		return 1; // Legacy to make sure the mouse doesn't behave weirdly
 	}
 	
 	// worn
