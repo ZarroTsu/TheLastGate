@@ -191,6 +191,7 @@ struct look
 	unsigned short item[62];
 	unsigned char item_p[62];
 	unsigned int price[62];
+	ItemDisplayInfo item_info[62];
 	unsigned int pl_price;
 	unsigned short  depot[8][64];	// New! Depot list
 	unsigned char depot_s[8][64];	//      Depot stacks

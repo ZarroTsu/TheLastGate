@@ -3,6 +3,24 @@
 #include "render.h"
 #include "../../common.h"  /* For copyspritex and PL_* flags */
 
+void render_shop_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
+    if (!item || !item->sprite) return;
+
+    /* Draw base sprite */
+    copyspritex(item->sprite, x, y, effect);
+
+    /* Draw overlays in order */
+    if (item->properties.shop_info.soulstone)
+        copyspritex(SPRITE_OVERLAY_SOULSTONE, x, y, effect);
+
+    if (item->properties.shop_info.talisman)
+        copyspritex(SPRITE_OVERLAY_TALISMAN, x, y, effect);
+
+    /* Draw catalyst overlay (properties = catalyst ID) */
+    if (item->flags > 0)
+        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int)item->flags, x, y, effect);
+}
+
 void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
     if (!item || !item->sprite) return;
 

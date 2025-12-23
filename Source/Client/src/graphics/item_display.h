@@ -28,6 +28,11 @@ typedef union {
     uint32_t raw;
     uint32_t worn_flags;
     uint32_t catalyst_id;
+    struct {
+        uint32_t price : 30;
+        uint32_t soulstone : 1;
+        uint32_t talisman : 1;
+    } shop_info;
 } ItemDisplayProperties;
 
 /* Temporary struct for passing item data to rendering functions */
@@ -50,6 +55,8 @@ static inline ItemDisplayInfo make_item_display(int sprite, ItemDisplayPropertie
 }
 
 /* Render an item sprite with all overlays */
+void render_shop_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+
 void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 
 void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect);

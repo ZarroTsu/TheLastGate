@@ -710,6 +710,7 @@ void sv_look6(unsigned char *buf)
 		tmplook.item[n]   =*(unsigned short*)(buf+2+(n-s)*6);
 		tmplook.price[n]  =*(unsigned int  *)(buf+4+(n-s)*6);
 		tmplook.item_p[n] =*(unsigned char *)(buf+14+(n-s));
+		tmplook.item_info[n] = (ItemDisplayInfo){tmplook.item[n], tmplook.price[n], 0, tmplook.item_p[n]};
 	}
 	if (n==62) {
 		game_ui_state.open_shop=1+*(unsigned char*)(buf+14); // gold slot bit

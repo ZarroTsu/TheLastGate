@@ -2642,15 +2642,12 @@ void eng_display_win(int plr_sprite,int init)
 				xx = GUI_SHOP_X+2+(n%8)*35;
 				yy = GUI_SHOP_Y+2+(n/8)*35;
 				
-				if ((shop.price[n] - (shop.price[n] & (1<<30)) - (shop.price[n] & (1<<31))) > 0) y=1;
+				if (shop.item_info[n].properties.shop_info.price > 0) y=1;
 				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) hh = 16;
+
+				render_shop_item_display(&shop.item_info[n], xx, yy, hh);
 				
-				copyspritex(shop.item[n],xx,yy,hh);
-				if (shop.price[n] & (1<<30))       copyspritex(4496,xx,yy,hh); 
-				if (shop.price[n] & (1<<31))       copyspritex(4497,xx,yy,hh);
-				if (shop.item_p[n]) copyspritex(6999+shop.item_p[n],xx,yy,hh);
-				
-				if (hh && (pr = (shop.price[n] - (shop.price[n]&(1<<30)) - (shop.price[n]&(1<<31)))))
+				if (hh && (pr = shop.item_info[n].properties.shop_info.price))
 				{
 					if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101) // Normal shop
 					{
