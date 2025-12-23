@@ -20,8 +20,8 @@ void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
-    if (item->properties > 0)
-        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + item->properties, x, y, effect);
+    if (item->properties.catalyst_id > 0)
+        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int)item->properties.catalyst_id, x, y, effect);
 
     /* Draw stack count overlay */
     if (item->stack > 0 && item->stack <= 10)
@@ -35,11 +35,11 @@ void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int eff
     copyspritex(item->sprite, x, y, effect);
 
     /* Draw overlays in order */
-    if (item->properties & PL_SOULSTONED)
+    if (item->properties.worn_flags & PL_SOULSTONED)
         copyspritex(SPRITE_OVERLAY_SOULSTONE, x, y, effect);
-    if (item->properties & PL_ENCHANTED)
+    if (item->properties.worn_flags & PL_ENCHANTED)
         copyspritex(SPRITE_OVERLAY_TALISMAN, x, y, effect);
-    if (item->properties & PL_CORRUPTED)
+    if (item->properties.worn_flags & PL_CORRUPTED)
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     if (item->stack > 0 && item->stack <= 10)
@@ -63,8 +63,8 @@ void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect) 
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
-    if (item->properties > 0)
-        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + item->properties, x, y, effect);
+    if (item->properties.catalyst_id > 0)
+        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int)item->properties.catalyst_id, x, y, effect);
 
     /* Draw stack count overlay */
     if (item->stack > 0 && item->stack <= 10)
