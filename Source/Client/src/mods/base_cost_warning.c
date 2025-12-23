@@ -125,8 +125,8 @@ static AttributeCostResult cost_to_raise_attributes_by_5_uber(const int attribut
 }
 
 char get_raise_icon(int skill_id, int skill_tab_position) {
-    // Not Enough XP to raise or Maxed
-    if (skill_needed(skill_id,pl.skill[skill_id][0]+stat_raised[skill_tab_position + 8])>pl.points-stat_points_used) return ' ';
+    // Maxed
+    if (skill_needed(skill_id, pl.skill[skill_id][0] + stat_raised[skill_tab_position + 8]) == HIGH_VAL) return ' ';
 
     int cost_to_raise_skill = skill_needed(skill_id, pl.skill[skill_id][0] + stat_raised[skill_tab_position + 8]);
 
@@ -147,5 +147,7 @@ char get_raise_icon(int skill_id, int skill_tab_position) {
         if (pl.attrib[4][0] + stat_raised[4] < result.attribute_targets[4]) return 'S';
         return '*';
     }
+    // Cannot Raise
+    if (skill_needed(skill_id,pl.skill[skill_id][0]+stat_raised[skill_tab_position + 8])>pl.points-stat_points_used) return ' ';
     return '+';
 }
