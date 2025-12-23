@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/jamesblack/TheLastGate/compare/v1.0.0...v3.1.0) (2025-12-23)
+
+
+### Miscellaneous Chores
+
+* release 3.1.0 ([1ab3cd4](https://github.com/jamesblack/TheLastGate/commit/1ab3cd40e8ec152f3fbf4358c70405181adbda17))
+
 ## 1.0.0 (2025-12-23)
 
 
