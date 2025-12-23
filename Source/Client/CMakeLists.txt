@@ -78,8 +78,10 @@ add_executable(TheLastGate
         src/security/unique_id.c
         src/ui/hotbar.c
         src/ui/option_window.c
+        src/ui/perf_window.c
         src/ui/ui.c
         src/ui/widgets.c
+        src/util/perf.c
 )
 
 # Use C++ linker for mixed C/C++ project (C++ linker handles C code correctly)

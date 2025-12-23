@@ -31,7 +31,8 @@ GlobalConfig g_config = {
     },
     .runtime = {
         .base_path = "",
-        .pref_path = ""
+        .pref_path = "",
+        .show_performance = false
     }
 };
 

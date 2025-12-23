@@ -44,7 +44,9 @@
 #include "mods/use_queue.h"
 #include "ui/hotbar.h"
 #include "ui/option_window.h"
+#include "ui/perf_window.h"
 #include "util/math_util.h"
+#include "util/perf.h"
 
 int init_done=0;
 int frame=0;
@@ -4761,12 +4763,15 @@ void engine(void)
 		handle_input();
 		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
 		{
+			perf_begin();
 			delta_time = SDL_GetTicks() - last_time;
 			last_time = SDL_GetTicks();
 			glClear(GL_COLOR_BUFFER_BIT);
 			sdl_start_scaling();
 			eng_display(init);
+			perf_end();
 			eng_flip(t);
+			perf_begin();
 			sdl_batch_flush();
 
 			/* Now render ImGui on top at native window resolution */
@@ -4781,6 +4786,9 @@ void engine(void)
 			if (game_ui_state.show_options) {
 				options_window_render();
 			}
+			if (g_config.runtime.show_performance) {
+				render_perf_window();
+			}
 
 			imgui_render();
 
@@ -4793,6 +4801,8 @@ void engine(void)
 			SDL_GL_SwapWindow(renderer.window);
 
 			mod_stubborn_actions_on_tick(delta_time);
+			perf_end();
+			perf_commit();
 			skipinrow=0;
 		} else {
 			skip++; skipinrow++;

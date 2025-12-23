@@ -39,6 +39,7 @@ typedef struct {
 typedef struct {
     char base_path[256];      // Game directory
     char pref_path[256];      // SDL preference path for saves/config
+    bool show_performance;
 } RuntimeConfig;
 
 typedef struct {

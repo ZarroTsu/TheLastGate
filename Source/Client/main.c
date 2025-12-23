@@ -20,6 +20,7 @@
 #include "log/log.h"
 #include "security/security.h"
 #include "ui/imgui/imgui_wrapper.h"
+#include "util/perf.h"
 
 const SdlClientVersion CLIENT_VERSION = {3,1};
 
@@ -205,9 +206,9 @@ int main(int argc, char *argv[]) {
 	setres_default();
 	sound_init();
 	init(g_config.video.windowed);
+	perf_init();
 	launcher_init();
 	init_engine();
-
 	// if (!security_try_lock()) return 0;
 
 	g_game_state = GAME_STATE_LAUNCHER;

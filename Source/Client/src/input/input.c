@@ -70,6 +70,10 @@ static void MakeWindowNormal(SDL_Window *win) {
 
 #endif
 
+static int has_ctrl(SDL_Keymod m) { return (m & KMOD_CTRL) != 0; }
+static int has_alt(SDL_Keymod m) { return (m & KMOD_ALT) != 0; }
+static int has_shift(SDL_Keymod m) { return (m & KMOD_SHIFT) != 0; }
+
 void handle_input() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
@@ -143,6 +147,13 @@ void handle_input() {
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEWHEEL:
             default:
+                if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_F12) {
+                    SDL_Keymod mods = e.key.keysym.mod;
+                    if (has_ctrl(mods) && has_alt(mods) && has_shift(mods)) {
+                        g_config.runtime.show_performance = !g_config.runtime.show_performance;
+                        break;
+                    }
+                }
                 if (g_game_state == GAME_STATE_LAUNCHER) {
                     launcher_handle_input(&e);
                 } else if (g_game_state == GAME_STATE_GAME) {
