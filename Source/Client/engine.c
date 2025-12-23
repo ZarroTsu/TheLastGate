@@ -3225,45 +3225,6 @@ void eng_display(int init)	// optimize me!!!!!
 	}
 
 	eng_display_win(plr_sprite,init);
-
-	// ********************
-	// display cursors etc.
-	// ********************
-
-	if (init && pl.citem) {
-		if (cursor_type==CT_DROP || cursor_type==CT_SWAP || cursor_type==CT_USE)
-		{
-			copyspritex(pl.citem,mouse_x-16,mouse_y-16,16);
-			// Draw soulstone icon 
-			if (pl.citem_p&PL_SOULSTONED)
-				copyspritex(4496,mouse_x-16,mouse_y-16,16);
-			// Draw talisman icon 
-			if (pl.citem_p&PL_ENCHANTED)
-				copyspritex(4497,mouse_x-16,mouse_y-16,16);
-			// Draw corrupt icon 
-			if (pl.citem_p&PL_CORRUPTED)
-				copyspritex(6881,mouse_x-16,mouse_y-16,16);
-			
-			if (pl.citem_s>0&&pl.citem_s<=10)
-				copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,16);
-		}
-		else
-		{
-			copyspritex(pl.citem,mouse_x-16,mouse_y-16,0);
-			// Draw soulstone icon 
-			if (pl.citem_p&PL_SOULSTONED)
-				copyspritex(4496,mouse_x-16,mouse_y-16,0);
-			// Draw talisman icon 
-			if (pl.citem_p&PL_ENCHANTED)
-				copyspritex(4497,mouse_x-16,mouse_y-16,0);
-			// Draw corrupt icon 
-			if (pl.citem_p&PL_CORRUPTED)
-				copyspritex(6881,mouse_x-16,mouse_y-16,0);
-			
-			if (pl.citem_s>0&&pl.citem_s<=10)
-				copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,0);
-		}
-	}
 }
 
 // DISPLAY: TEXT OUTPUT
@@ -4539,6 +4500,43 @@ int eng_item(int n)
 	}
 }
 
+static void eng_display_cursor_items(void) {
+	if (!pl.citem) return;
+
+	if (cursor_type==CT_DROP || cursor_type==CT_SWAP || cursor_type==CT_USE)
+	{
+		copyspritex(pl.citem,mouse_x-16,mouse_y-16,16);
+		// Draw soulstone icon
+		if (pl.citem_p&PL_SOULSTONED)
+			copyspritex(4496,mouse_x-16,mouse_y-16,16);
+		// Draw talisman icon
+		if (pl.citem_p&PL_ENCHANTED)
+			copyspritex(4497,mouse_x-16,mouse_y-16,16);
+		// Draw corrupt icon
+		if (pl.citem_p&PL_CORRUPTED)
+			copyspritex(6881,mouse_x-16,mouse_y-16,16);
+
+		if (pl.citem_s>0&&pl.citem_s<=10)
+			copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,16);
+	}
+	else
+	{
+		copyspritex(pl.citem,mouse_x-16,mouse_y-16,0);
+		// Draw soulstone icon
+		if (pl.citem_p&PL_SOULSTONED)
+			copyspritex(4496,mouse_x-16,mouse_y-16,0);
+		// Draw talisman icon
+		if (pl.citem_p&PL_ENCHANTED)
+			copyspritex(4497,mouse_x-16,mouse_y-16,0);
+		// Draw corrupt icon
+		if (pl.citem_p&PL_CORRUPTED)
+			copyspritex(6881,mouse_x-16,mouse_y-16,0);
+
+		if (pl.citem_s>0&&pl.citem_s<=10)
+			copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,0);
+	}
+}
+
 void engine_tick(void)
 {
 	int n,tmp;
@@ -4785,6 +4783,11 @@ void engine(void)
 			}
 
 			imgui_render();
+
+			if (init) {
+				eng_display_cursor_items();
+				sdl_batch_flush();
+			}
 			sdl_stop_scaling();
 
 			SDL_GL_SwapWindow(renderer.window);
