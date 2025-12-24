@@ -11,6 +11,7 @@
     {
       "name": "vcpkg-cmake-config",
       "host": true
-    }
+    },
+    "sdl2"
   ]
 }

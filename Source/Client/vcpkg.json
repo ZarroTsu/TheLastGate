@@ -3,24 +3,22 @@
   "name": "thelastgate",
   "version": "0.13.1",
   "description": "The Last Gate - Mercenaries of Astonia v2 Client",
+  "builtin-baseline": "1fddddc280dfed63956e15ef74f4321bc6a219c9",
   "dependencies": [
+    "freetype",
+    "glad",
+    "imgui",
+    "libpng",
     "sdl2",
     {
       "name": "sdl2-image",
-      "default-features": false,
-      "features": []
+      "default-features": false
     },
     {
       "name": "sdl2-mixer",
-      "default-features": false,
-      "features": []
+      "default-features": false
     },
     "sdl2-net",
-    "libpng",
-    "zlib",
-    "glad",
-    "imgui",
-    "freetype"
-  ],
-  "builtin-baseline": "1fddddc280dfed63956e15ef74f4321bc6a219c9"
+    "zlib"
+  ]
 }

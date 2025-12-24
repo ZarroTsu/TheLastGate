@@ -1,0 +1,74 @@
+name: build.yml
+on:
+  workflow_call:
+    inputs:
+      upload_artifacts:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      CLIENT_DIR: ${{ github.workspace }}/Source/Client
+      VCPKG_ROOT: ${{ github.workspace}}/vcpkg
+      VCPKG_DEFAULT_TRIPLET: x64-linux
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            python3 \
+            python3-jinja2 \
+            ninja-build \
+            pkg-config \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libgl1-mesa-dev \
+            autoconf \
+            autoconf-archive \
+            automake \
+            libtool
+
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: '84bab45d415d22042bd0b9081aea57f362da3f35'
+          runVcpkgInstall: false
+          vcpkgJsonGlob: ${{ env.CLIENT_DIR }}/vcpkg.json
+          vcpkgConfigurationJsonGlob: ${{ env.CLIENT_DIR}}/vcpkg-configuration.json
+
+
+      - name: Configure CMake
+        uses: lukka/run-cmake@v10
+
+        with:
+
+            cmakeListsTxtPath: ${{ env.CLIENT_DIR }}/CMakeLists.txt
+            configurePreset: linux
+
+      - name: Build
+        uses: lukka/run-cmake@v10
+        with:
+          cmakeListsTxtPath: ${{ env.CLIENT_DIR }}/CMakeLists.txt
+          buildPreset: linux
+
+      - name: Upload build artifacts
+        if: inputs.upload_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-linux
+          path: |
+            ${{ env.CLIENT_DIR }}/build/TheLastGateSDLRelease.tar.gz

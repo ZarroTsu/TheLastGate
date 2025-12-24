@@ -1,6 +1,6 @@
 #pragma once
 
-static const int PERFORMANCE_HISTORY = 60;
+#define PERFORMANCE_HISTORY 60
 
 typedef struct {
     float sample_ms_last;

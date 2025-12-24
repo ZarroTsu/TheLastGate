@@ -1,0 +1,24 @@
+{
+  "version": 5,
+  "configurePresets": [
+    {
+      "name": "linux",
+      "displayName": "Client | Linux x64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "VCPKG_MANIFEST_DIR": "$env{CLIENT_DIR}",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux",
+      "configurePreset": "linux",
+      "targets": "TarPackage"
+    }
+  ]
+}
