@@ -93,7 +93,8 @@ jobs:
         run: |
           export VCPKG_ROOT=$(cygpath -u "$VCPKG_ROOT")
           export CLIENT_DIR=$(cygpath -u "$CLIENT_DIR")
-
+          
+          cd "$CLIENT_DIR"
           cmake --preset windows
 
 
@@ -111,6 +112,7 @@ jobs:
           export VCPKG_ROOT=$(cygpath -u "$VCPKG_ROOT")
           export CLIENT_DIR=$(cygpath -u "$CLIENT_DIR")
 
+          cd "$CLIENT_DIR"
           cmake --build --preset windows
 
       - name: Rename Linux Release Artifact
