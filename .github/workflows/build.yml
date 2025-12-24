@@ -9,20 +9,35 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            preset: linux
+            shell: bash
+            mingw: false
+          - os: windows-latest
+            preset: windows
+            shell: msys2
+            mingw: true
 
     env:
       CLIENT_DIR: ${{ github.workspace }}/Source/Client
       VCPKG_ROOT: ${{ github.workspace}}/vcpkg
-      VCPKG_DEFAULT_TRIPLET: x64-linux
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Get CMake
+        if: matrix.os == 'ubuntu-latest'
         uses: lukka/get-cmake@latest
 
-      - name: Install system dependencies
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -43,6 +58,19 @@ jobs:
             automake \
             libtool
 
+      - name: Setup MSYS2 (MinGW64)
+        if: matrix.mingw
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-pkg-config
+            zip
+            tar
+
       - name: Setup anew (or from cache) vcpkg (and does not build any package)
         uses: lukka/run-vcpkg@v11
         with:
@@ -52,24 +80,57 @@ jobs:
           vcpkgConfigurationJsonGlob: ${{ env.CLIENT_DIR}}/vcpkg-configuration.json
 
 
-      - name: Configure CMake
+      - name: Configure (Linux)
+        if: matrix.shell == 'bash'
         uses: lukka/run-cmake@v10
-
         with:
-
             cmakeListsTxtPath: ${{ env.CLIENT_DIR }}/CMakeLists.txt
             configurePreset: linux
 
+      - name: Configure (Windows MinGW)
+        if: matrix.shell == 'msys2'
+        shell: msys2 {0}
+        run: |
+          export VCPKG_ROOT=$(cygpath -u "$VCPKG_ROOT")
+          export CLIENT_DIR=$(cygpath -u "$CLIENT_DIR")
+
+          cmake --preset windows
+
+
       - name: Build
+        if: matrix.shell == 'bash'
         uses: lukka/run-cmake@v10
         with:
           cmakeListsTxtPath: ${{ env.CLIENT_DIR }}/CMakeLists.txt
           buildPreset: linux
 
+      - name: Build (Windows MinGW)
+        if: matrix.shell == 'msys2'
+        shell: msys2 {0}
+        run: |
+          export VCPKG_ROOT=$(cygpath -u "$VCPKG_ROOT")
+          export CLIENT_DIR=$(cygpath -u "$CLIENT_DIR")
+
+          cmake --build --preset windows
+
+      - name: Rename Linux Release Artifact
+        if: matrix.shell == 'bash'
+        run: |
+          mv "$CLIENT_DIR/build/linux/TheLastGateSDLRelease.tar.gz" \
+             "$CLIENT_DIR/build/linux/TheLastGateSDLRelease-Linux64.tar.gz"
+
+      - name: Rename Linux Release Artifact
+        if: matrix.shell == 'msys2'
+        shell: msys2 {0}
+        run: |
+          CLIENT_DIR_POSIX=$(cygpath -u "$CLIENT_DIR")
+          mv "$CLIENT_DIR_POSIX/build/windows/TheLastGateSDLRelease.zip" \
+             "$CLIENT_DIR_POSIX/build/windows/TheLastGateSDLRelease-Win64.zip"
+
       - name: Upload build artifacts
         if: inputs.upload_artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: client-linux
+          name: client-${{ matrix.preset }}
           path: |
-            ${{ env.CLIENT_DIR }}/build/TheLastGateSDLRelease.tar.gz
+            ${{ env.CLIENT_DIR }}/build/*/TheLastGateSDLRelease-*.*

@@ -5,10 +5,22 @@
       "name": "linux",
       "displayName": "Client | Linux x64",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
+      "binaryDir": "${sourceDir}/build/linux",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "VCPKG_MANIFEST_DIR": "$env{CLIENT_DIR}",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows",
+      "displayName": "Client | Windows x64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
         "VCPKG_MANIFEST_DIR": "$env{CLIENT_DIR}",
         "CMAKE_BUILD_TYPE": "Release"
       }
@@ -19,6 +31,11 @@
       "name": "linux",
       "configurePreset": "linux",
       "targets": "TarPackage"
+    },
+    {
+      "name": "windows",
+      "configurePreset": "windows",
+      "targets": "Package"
     }
   ]
 }
