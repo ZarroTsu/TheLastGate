@@ -32,6 +32,7 @@ jobs:
             ninja-build \
             pkg-config \
             libx11-dev \
+            libltdl-dev \
             libxrandr-dev \
             libxinerama-dev \
             libxcursor-dev \
