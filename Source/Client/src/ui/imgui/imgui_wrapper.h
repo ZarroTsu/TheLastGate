@@ -361,6 +361,7 @@ bool imgui_is_item_hovered(void);
 bool imgui_is_item_active(void);
 bool imgui_is_item_clicked(int mouse_button);
 bool imgui_is_mouse_clicked(int mouse_button);
+bool imgui_is_mouse_released(int mouse_button);
 bool imgui_is_window_hovered(void);
 void imgui_push_item_width(float item_width);
 void imgui_pop_item_width(void);

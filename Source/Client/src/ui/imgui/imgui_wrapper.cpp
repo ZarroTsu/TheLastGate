@@ -753,6 +753,10 @@ bool imgui_is_mouse_clicked(int mouse_button) {
     return ImGui::IsMouseClicked(mouse_button);
 }
 
+bool imgui_is_mouse_released(int mouse_button) {
+    return ImGui::IsMouseReleased(mouse_button);
+}
+
 bool imgui_is_window_hovered(void) {
     return ImGui::IsWindowHovered();
 }
