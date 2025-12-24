@@ -12,7 +12,7 @@ target_link_libraries(TheLastGate PRIVATE
 
 # Add include directories for project structure
 target_include_directories(TheLastGate PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/_generated
+    ${CMAKE_BINARY_DIR}/_generated
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
     ${CMAKE_CURRENT_SOURCE_DIR}/
 )

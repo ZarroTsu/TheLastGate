@@ -1,8 +1,8 @@
 ﻿function(generate_shader_embed_header SHADER_NAME)
     set(FRAG ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.frag)
     set(VERT ${PROJECT_SOURCE_DIR}/resources/${SHADER_NAME}.vert)
-    set(OUT ${PROJECT_SOURCE_DIR}/_generated/shaders/${SHADER_NAME}_shader_files.h)
-    set(TEMPLATE ../src/graphics/embedded_shader.h.in)
+    set(OUT ${CMAKE_BINARY_DIR}/_generated/shaders/${SHADER_NAME}_shader_files.h)
+    set(TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/embedded_shader.h.in)
 
     message(STATUS "Checking shader ${SHADER_NAME}")
     message(STATUS "  FRAG = ${FRAG}")
@@ -30,6 +30,7 @@
     )
 
     set(GENERATED_SHADERS ${GENERATED_SHADERS} ${OUT} PARENT_SCOPE)
+    set_source_files_properties(${OUT} PROPERTIES GENERATED TRUE)
 endfunction()
 
 generate_shader_embed_header(effect)
