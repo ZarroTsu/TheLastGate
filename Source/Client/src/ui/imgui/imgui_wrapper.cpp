@@ -74,7 +74,7 @@ void *imgui_add_font_from_file_ttf_pixel_perfect(const char *filename, float siz
     config.PixelSnapH = true; /* Align to pixel grid */
     config.PixelSnapV = true;
     config.RasterizerMultiply = 1.0f;
-    config.RasterizerDensity  = 1.0f;
+    config.RasterizerDensity = 1.0f;
     config.FontLoaderFlags = ImGuiFreeTypeBuilderFlags_Monochrome;
 
     ImFont *font = io.Fonts->AddFontFromFileTTF(filename, size_pixels, &config);
@@ -182,7 +182,8 @@ bool imgui_begin(const char *name, bool *p_open, int flags) {
     if (flags & IMGUI_WINDOW_FLAG_NO_FOCUS_ON_APPEARING) imgui_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
     if (flags & IMGUI_WINDOW_FLAG_NO_BRING_TO_FRONT_ON_FOCUS) imgui_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
     if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
-    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR)
+        imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_NO_NAV_INPUTS) imgui_flags |= ImGuiWindowFlags_NoNavInputs;
     if (flags & IMGUI_WINDOW_FLAG_NO_NAV_FOCUS) imgui_flags |= ImGuiWindowFlags_NoNavFocus;
     if (flags & IMGUI_WINDOW_FLAG_UNSAVED_DOCUMENT) imgui_flags |= ImGuiWindowFlags_UnsavedDocument;
@@ -203,7 +204,8 @@ bool imgui_begin_child(const char *str_id, float width, float height, bool borde
     if (flags & IMGUI_WINDOW_FLAG_NO_SCROLL_WITH_MOUSE) imgui_flags |= ImGuiWindowFlags_NoScrollWithMouse;
     if (flags & IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_HorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
-    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR)
+        imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_NO_BACKGROUND) imgui_flags |= ImGuiWindowFlags_NoBackground;
     if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS) imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
     if (flags & IMGUI_WINDOW_FLAG_MENU_BAR) imgui_flags |= ImGuiWindowFlags_MenuBar;
@@ -692,7 +694,8 @@ bool imgui_begin_popup_modal(const char *name, bool *p_open, int flags) {
     if (flags & IMGUI_WINDOW_FLAG_NO_SAVED_SETTINGS) imgui_flags |= ImGuiWindowFlags_NoSavedSettings;
     if (flags & IMGUI_WINDOW_FLAG_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_HorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_ALWAYS_VERTICAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
-    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR) imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (flags & IMGUI_WINDOW_FLAG_ALWAYS_HORIZONTAL_SCROLLBAR)
+        imgui_flags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
     if (flags & IMGUI_WINDOW_FLAG_NO_NAV_INPUTS) imgui_flags |= ImGuiWindowFlags_NoNavInputs;
     if (flags & IMGUI_WINDOW_FLAG_NO_NAV_FOCUS) imgui_flags |= ImGuiWindowFlags_NoNavFocus;
 
@@ -1026,7 +1029,8 @@ void imgui_draw_list_add_text(void *draw_list, float x, float y, unsigned int co
     dl->AddText(ImVec2(x, y), col, text);
 }
 
-void imgui_draw_list_add_text_outline(void *draw_list, float x, float y, unsigned int col, unsigned int outline_col, const char *text) {
+void imgui_draw_list_add_text_outline(void *draw_list, float x, float y, unsigned int col, unsigned int outline_col,
+                                      const char *text) {
     ImDrawList *dl = static_cast<ImDrawList *>(draw_list);
     dl->AddText(ImVec2(x - 1, y - 1), outline_col, text);
     dl->AddText(ImVec2(x - 1, y + 1), outline_col, text);
@@ -1040,9 +1044,9 @@ struct CCallbackPayload {
     void *user_data;
 };
 
-static void imgui_c_trampoline(const ImDrawList*, const ImDrawCmd* cmd) {
+static void imgui_c_trampoline(const ImDrawList *, const ImDrawCmd *cmd) {
     CCallbackPayload *payload =
-        (CCallbackPayload *)cmd->UserCallbackData;
+            (CCallbackPayload *) cmd->UserCallbackData;
 
     payload->callback(payload->user_data);
 
@@ -1150,4 +1154,3 @@ void imgui_text_formatted(const char *format, ...) {
     ImGui::Text(buffer);
 }
 } /* extern "C" */
-
