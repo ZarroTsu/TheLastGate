@@ -174,12 +174,13 @@ void inventory_render() {
                 int inventory_slot = i + (scroll * inventory_layout.columns);
                 grid_slot_to_xy(&inventory_layout, i, &slot_x, &slot_y);
                 imgui_set_cursor_pos(slot_x, slot_y);
-                if (imgui_invisible_button("##1", INVENTORY_BUTTON_SIZE[0], INVENTORY_BUTTON_SIZE[1])) {
-                    on_inventory_left_click(inventory_slot);
-                }
+                imgui_dummy(INVENTORY_BUTTON_SIZE[0], INVENTORY_BUTTON_SIZE[1]);
+
                 if (imgui_is_item_hovered()) {
                     on_inventory_hovered(inventory_slot);
-                    if (imgui_is_mouse_clicked(1)) {
+                    if (imgui_is_mouse_released(0)) {
+                        on_inventory_left_click(inventory_slot);
+                    } else if (imgui_is_mouse_released(1)) {
                         on_inventory_right_click(inventory_slot);
                     }
                 }
