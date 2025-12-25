@@ -157,13 +157,13 @@ static void check_and_unbind_duplicate(Keybinding new_binding, BindingDescriptor
     }
 }
 
-bool keybind(BindingDescriptor *binding, int index) {
-    /* Static state to track which keybind is being set */
+bool keybind_label(const char *label, BindingDescriptor *binding, int index) {
+/* Static state to track which keybind is being set */
     static int active_keybind_index = -1; /* -1 = none active */
 
     /* Calculate layout */
     float text_width, text_height;
-    imgui_calc_text_size_simple(&text_width, &text_height, binding->name);
+    imgui_calc_text_size_simple(&text_width, &text_height, label);
     float spacing_x, spacing_y;
     imgui_get_style_item_spacing(&spacing_x, &spacing_y);
 
@@ -180,7 +180,7 @@ bool keybind(BindingDescriptor *binding, int index) {
     /* Render label */
     imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1.0f);
     imgui_set_cursor_pos_y(start_y + text_offset);
-    imgui_text(binding->name);
+    imgui_text(label);
 
     /* Position button */
     imgui_same_line_gap();
@@ -315,6 +315,10 @@ bool keybind(BindingDescriptor *binding, int index) {
     imgui_pop_style_color(1);
 
     return clicked;
+}
+
+bool keybind(BindingDescriptor *binding, const int index) {
+    return keybind_label(binding->name, binding, index);
 }
 
 void ui_tooltip(const char *tooltip_text) {
