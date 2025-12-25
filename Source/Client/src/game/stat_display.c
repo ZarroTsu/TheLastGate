@@ -138,6 +138,6 @@ void render_stat_line(const StatDisplayInfo *stat, int x, int y, bool show_base_
     render_putc(x + 163, y, g_config.ui.cost_helper && stat->raise_icon != '+' ? 2 : 1, stat->raise_icon);
     if (stat->can_lower)
         render_putc(x + 177, y, 1, '-');
-    if (stat->cost_to_raise != HIGH_VAL)
+    if (stat->cost_to_raise != HIGH_VAL && stat->base_value > 0)
         xputtext(x + 189, y, 1, "%7d", stat->cost_to_raise);
 }
