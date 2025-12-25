@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.3.0](https://github.com/jamesblack/TheLastGate/compare/v3.2.0...v3.3.0) (2025-12-25)
+
+
+### Features
+
+* Pressing "Exit" will attempt to use /tavern ([739fbac](https://github.com/jamesblack/TheLastGate/commit/739fbacc97be85a8845e3350f5037ad74723e3c7))
+
+
+### Bug Fixes
+
+* Do not render a cost of 0, silly me. ([0cda3e1](https://github.com/jamesblack/TheLastGate/commit/0cda3e10b2e369a78a996ec25d54926c42f8e52d))
+* **inventory:** Use mouse up instead of mouse down to replicate old behaviour. ([3473848](https://github.com/jamesblack/TheLastGate/commit/347384898488576bc2bf7f59c75a5cf2479188d0))
+* Launcher now correctly flags changes to description to be sent to server ([b940d2a](https://github.com/jamesblack/TheLastGate/commit/b940d2aaef48606d8c8d3b44ea9ec357710ca6e9))
+* Launcher now correctly shows the FYI message instead of hardcoded "something went wrong" ([aad3916](https://github.com/jamesblack/TheLastGate/commit/aad3916d6541a7686d7ee4fa6b294abfadcb0e16))
+
+
+### Miscellaneous Chores
+
+* bump version ([232eef1](https://github.com/jamesblack/TheLastGate/commit/232eef177f9a883177773e30e865ed42b2f11728))
+
 ## [3.2.0](https://github.com/jamesblack/TheLastGate/compare/v3.1.0...v3.2.0) (2025-12-23)
 
 
