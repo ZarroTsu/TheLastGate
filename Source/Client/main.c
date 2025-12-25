@@ -201,6 +201,7 @@ int main(int argc, char *argv[]) {
 	config_init_paths();
 	security_init();
 	SDLNet_Init();
+	keybindings_init();
 	load_options();
 	screen_renderdist=RENDERDIST;
 	setres_default();
@@ -232,8 +233,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	launcher_shutdown();
-
-	keybindings_init();
 	game_input_init();
 
 	engine();
