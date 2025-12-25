@@ -10,6 +10,7 @@
 #include "config/keybindings.h"
 #include "ui_common.h"
 #include "engine.h"
+#include "inter.h"
 #include "ui.h"
 #include "widgets.h"
 #include "config/config.h"
@@ -163,6 +164,7 @@ static void keybind_settings_tab() {
     };
 
     int num_categories = sizeof(categories) / sizeof(categories[0]);
+    int current_keybind_category_index = 0; // Used for hinting spell bindings
     for (int i = 0; i < num_categories; i++) {
         BindingCategory category = categories[i];
 
@@ -183,7 +185,14 @@ static void keybind_settings_tab() {
 
         for (int j = 0; j < g_config.keybind.num_bindings; j++) {
             if (g_config.keybind.bindings[j].category == category) {
-                keybind(&g_config.keybind.bindings[j], keybind_id++);
+                if (category == BINDING_CATEGORY_SPELL && pdata.xbutton[current_keybind_category_index].skill_nr != -1) {
+                    char spell_label[64];
+                    snprintf(spell_label, sizeof(spell_label), "%s (%s)", g_config.keybind.bindings[j].name, pdata.xbutton[current_keybind_category_index].name);
+                    keybind_label(spell_label, &g_config.keybind.bindings[j], keybind_id++);
+                } else {
+                    keybind(&g_config.keybind.bindings[j], keybind_id++);
+                }
+                current_keybind_category_index++;
             }
         }
     }
