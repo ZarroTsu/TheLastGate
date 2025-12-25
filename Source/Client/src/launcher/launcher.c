@@ -346,10 +346,12 @@ static void left_column() {
                 PreviousCharacterEntry entry = get_previous_characters()->entries[i];
                 push_button_styles();
                 imgui_center_next_item(240);
+                imgui_push_id_str(entry.file_path);
                 if (imgui_button_sized(entry.name, 240, 24)) {
                     load_character_from_file(entry.file_path);
                     okey_to_class_gender(&current_class, &current_gender);
                 }
+                imgui_pop_id();
                 pop_button_styles();
             }
         }
