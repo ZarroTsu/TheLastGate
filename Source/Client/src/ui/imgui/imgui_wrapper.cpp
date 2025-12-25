@@ -744,6 +744,10 @@ bool imgui_is_item_hovered(void) {
     return ImGui::IsItemHovered();
 }
 
+bool imgui_is_item_hovered_flag(const int flags) {
+    return ImGui::IsItemHovered(flags);
+}
+
 bool imgui_is_item_active(void) {
     return ImGui::IsItemActive();
 }

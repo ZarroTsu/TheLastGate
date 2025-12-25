@@ -459,7 +459,30 @@ void imgui_begin_disabled(bool disabled);
 void imgui_end_disabled(void);
 
 /* Utilities */
+#define IMGUI_HOVERED_FLAGS_NONE                               (0)
+#define IMGUI_HOVERED_FLAGS_CHILD_WINDOWS                      (1 << 0)
+#define IMGUI_HOVERED_FLAGS_ROOT_WINDOW                        (1 << 1)
+#define IMGUI_HOVERED_FLAGS_ANY_WINDOW                         (1 << 2)
+#define IMGUI_HOVERED_FLAGS_NO_POPUP_HIERARCHY                 (1 << 3)
+#define IMGUI_HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_POPUP        (1 << 5)
+#define IMGUI_HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM  (1 << 7)
+#define IMGUI_HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED_BY_ITEM      (1 << 8)
+#define IMGUI_HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED_BY_WINDOW    (1 << 9)
+#define IMGUI_HOVERED_FLAGS_ALLOW_WHEN_DISABLED                (1 << 10)
+#define IMGUI_HOVERED_FLAGS_NO_NAV_OVERRIDE                    (1 << 11)
+#define IMGUI_HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED              (IMGUI_HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED_BY_ITEM | IMGUI_HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED_BY_WINDOW)
+#define IMGUI_HOVERED_FLAGS_RECT_ONLY                          (IMGUI_HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_POPUP | IMGUI_HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM | IMGUI_HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED)
+#define IMGUI_HOVERED_FLAGS_ROOT_AND_CHILD_WINDOWS             (IMGUI_HOVERED_FLAGS_ROOT_WINDOW | IMGUI_HOVERED_FLAGS_CHILD_WINDOWS)
+#define IMGUI_HOVERED_FLAGS_FOR_TOOLTIP                        (1 << 12)
+#define IMGUI_HOVERED_FLAGS_STATIONARY                         (1 << 13)
+#define IMGUI_HOVERED_FLAGS_DELAY_NONE                         (1 << 14)
+#define IMGUI_HOVERED_FLAGS_DELAY_SHORT                        (1 << 15)
+#define IMGUI_HOVERED_FLAGS_DELAY_NORMAL                       (1 << 16)
+#define IMGUI_HOVERED_FLAGS_NO_SHARED_DELAY                    (1 << 17)
+
 bool imgui_is_item_hovered(void);
+
+bool imgui_is_item_hovered_flag(int flags);
 
 bool imgui_is_item_active(void);
 
