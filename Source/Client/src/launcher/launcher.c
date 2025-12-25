@@ -707,6 +707,6 @@ void launcher_render() {
 }
 
 void launcher_set_fyi(const char *text) {
-    snprintf(simple_popover_text, sizeof(simple_popover_text), "Could not open file %s", switch_confirm.file_path);
+    snprintf(simple_popover_text, sizeof(simple_popover_text), "%s", text);
     imgui_open_popup("FYI");
 }
