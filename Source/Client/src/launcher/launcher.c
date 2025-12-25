@@ -309,7 +309,9 @@ static void left_column() {
         imgui_text("Description");
         imgui_table_next_column();
         push_input_styles();
-        imgui_input_text_area("##description", pdata.desc, sizeof(pdata.desc), -1, 80);
+        if (imgui_input_text_area("##description", pdata.desc, sizeof(pdata.desc), -1, 80)) {
+            pdata.changed = true;
+        }
         pop_input_styles();
 
         imgui_begin_disabled(okey.usnr > 0);
