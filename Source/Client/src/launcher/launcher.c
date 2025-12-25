@@ -352,6 +352,11 @@ static void left_column() {
                     okey_to_class_gender(&current_class, &current_gender);
                 }
                 imgui_pop_id();
+                if (imgui_is_item_hovered_flag(IMGUI_HOVERED_FLAGS_STATIONARY | IMGUI_HOVERED_FLAGS_DELAY_NORMAL)) {
+                    imgui_push_style_color_32(IMGUI_COL_TEXT, 0xFFFFFFFF);
+                    imgui_set_tooltip(entry.file_path);
+                    imgui_pop_style_color(1);
+                }
                 pop_button_styles();
             }
         }
