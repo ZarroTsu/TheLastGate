@@ -1506,6 +1506,22 @@ int sk_bless=0, sk_enhan=0, sk_prote=0, sk_mshie=0, sk_mdura=0, sk_haste=0, sk_h
 int coo_clea=0, coo_leap=0, coo_blas=0, coo_pois=0, coo_puls=0, coo_ghos=0, coo_shad=0;
 int coo_blin=0, coo_warc=0, coo_weak=0, coo_curs=0, coo_slow=0;
 
+static void calculate_game_ui_state() {
+	game_ui_state.quick_stat_state.weapon_value = pl.weapon;
+	game_ui_state.quick_stat_state.armor_value = pl_armor;
+	game_ui_state.quick_stat_state.hit_score = pl_hitsc;
+	game_ui_state.quick_stat_state.parry_score = pl_parry;
+	game_ui_state.quick_stat_state.experience = pl.points_tot;
+	if (points2rank(pl.points_tot) == 24) {
+		game_ui_state.quick_stat_state.experience_bar_progress = 1.0f;
+	} else {
+		float starting_experience = (float) rank2points(points2rank(pl.points_tot));
+		float ending_experience = (float) pl.points_tot + (float) points_tolevel(pl.points_tot);
+		float percentage = ((float) pl.points_tot - starting_experience) / (ending_experience - starting_experience);
+		game_ui_state.quick_stat_state.experience_bar_progress = percentage;
+	}
+}
+
 void init_meta_stats(void)
 {
 	int moonmult = 20;
@@ -2225,13 +2241,6 @@ void eng_display_win(int plr_sprite,int init)
 			copyspritex(do_darkmode?18004:18002, 339, 179,  0);
 		}
 
-		// WV, AV, EXP, Location
-		xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
-		xputtext(GUI_WV_X+92,GUI_WV_Y,1,   "%11d",pl.weapon);
-		xputtext(GUI_WV_X,   GUI_WV_Y+14,1,"Armor Value");
-		xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl_armor);
-		xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
-		xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 		xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
 
 		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
@@ -2279,25 +2288,6 @@ void eng_display_win(int plr_sprite,int init)
 		}
 	}
 
-	// experience bar
-	if (pl.points_tot>0 && points2rank(pl.points_tot)<24) 
-	{
-		n=min(GUI_XPBAR_W,((unsigned int)(pl.points_tot-rank2points(points2rank(pl.points_tot)))
-			)*GUI_XPBAR_W/((unsigned int)(pl.points_tot+points_tolevel(pl.points_tot)-rank2points(points2rank(pl.points_tot)))
-			));
-	}
-	else 
-	{
-		n=0;
-	}
-	if (points2rank(pl.points_tot)==24)
-		showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_EXP);
-	else
-	{
-		showbar(GUI_XPBAR_X,GUI_XPBAR_Y,GUI_XPBAR_W,6,(unsigned short)GUI_BAR_BLU);
-		showbar(GUI_XPBAR_X,GUI_XPBAR_Y,n,          6,(unsigned short)GUI_BAR_EXP);
-	}
-	//
 
 	// logtext
 	if (logtimer) logtimer--;
@@ -4755,6 +4745,7 @@ void engine(void)
 			glClear(GL_COLOR_BUFFER_BIT);
 			sdl_start_scaling();
 			eng_display(init);
+			calculate_game_ui_state();
 			perf_end();
 			eng_flip(t);
 			perf_begin();
@@ -4773,6 +4764,7 @@ void engine(void)
 				options_window_render();
 			}
 			inventory_render();
+			quick_stats_render(&game_ui_state.quick_stat_state);
 			if (g_config.runtime.show_performance) {
 				render_perf_window();
 			}

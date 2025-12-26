@@ -80,6 +80,7 @@ add_executable(TheLastGate
         src/ui/inventory.c
         src/ui/option_window.c
         src/ui/perf_window.c
+        src/ui/quick_stats.c
         src/ui/ui.c
         src/ui/widgets.c
         src/util/perf.c

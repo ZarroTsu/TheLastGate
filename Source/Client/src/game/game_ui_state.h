@@ -1,6 +1,8 @@
 #pragma once
 #include <stdbool.h>
 
+#include "ui/quick_stats.h"
+
 typedef enum {
     HUD_MODE_LIST_SKILLS,
     HUD_MODE_LIST_OFFENSES,
@@ -39,4 +41,9 @@ typedef struct {
     /* Minimap */
     int minimap_magnification;
 
+    /* Quick State Window (WV, AV, HS, PS Exp) */
+    QuickStatState quick_stat_state;
+
 } GameUiState;
+
+void game_ui_state_calculate(void);
