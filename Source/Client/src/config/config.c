@@ -23,7 +23,8 @@ GlobalConfig g_config = {
     .ui = {
         .cost_helper = false,
         .escape_closes_menu_first = true,
-        .enter_to_talk = false
+        .enter_to_talk = false,
+        .expanded_quick_stats = true
     },
     .gameplay = {
         .give_more = false,

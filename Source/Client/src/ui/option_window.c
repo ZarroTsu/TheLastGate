@@ -88,6 +88,8 @@ static void general_settings_tab() {
                      "Holding ctrl when issuing using will queue that use. Limit 5");
     togglable_option("##5", &g_config.ui.enter_to_talk,
                      "Press Enter to activate chat mode before typing. Press Enter again to send, or ESC to cancel.");
+    togglable_option("##11", &g_config.ui.expanded_quick_stats,
+        "Show Hit/Parry Score with Weapon/Armor value.");
 
 
     imgui_spacing();
