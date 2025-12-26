@@ -20,6 +20,8 @@ SDL_Surface *load_from_gfx_lib(int nr);
 
 SDL_Surface *load_from_file(int nr);
 
+SDL_Surface *load_ui_from_file(int nr);
+
 typedef struct {
     int xs, ys;
     int off;

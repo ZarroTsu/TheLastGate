@@ -77,6 +77,7 @@ int projection_initialized = 0;
 
 static struct FontCache font_cache[10];
 SpriteData *sprite_data = NULL;
+SpriteData *ui_sprite_data = NULL;
 static GLuint minimap_gl_texture = 0; // OpenGL texture for minimap (128x128)
 
 extern char path[];
@@ -375,6 +376,13 @@ void sdl_init_sprites(void) {
             return;
         }
     }
+    if (!ui_sprite_data) {
+        ui_sprite_data = calloc(MAX_SPRITES, sizeof(SpriteData));
+        if (!ui_sprite_data) {
+            log_critical("Failed to allocate ui sprite table\n");
+            return;
+        }
+    }
 }
 
 /**
@@ -612,6 +620,59 @@ void sdl_load_sprite(const int nr) {
     sprite_data[nr].xs = (unsigned char) (width / TILE);
     sprite_data[nr].ys = (unsigned char) (height / TILE);
     sprite_data[nr].avgcol = avgcol;
+}
+
+void sdl_load_ui(const int nr) {
+    if (nr < 0 || nr >= MAX_SPRITES) return;
+    if (!ui_sprite_data) sdl_init_sprites();
+
+    if (ui_sprite_data[nr].gl_texture) {
+        return;
+    }
+
+    SDL_Surface *surface = NULL;
+    int width = 0, height = 0;
+
+    // Try to load from various sources
+    surface = load_ui_from_file(nr);
+
+    // Fallback to sprite #35 if not found
+    if (!surface && nr != 35) {
+        log_warning("UI Sprite %d not found, using fallback sprite #35\n", nr);
+        surface = load_from_file(35);
+        if (!surface) surface = load_from_png_lib(35);
+        if (!surface) surface = load_from_gfx_lib(35);
+    }
+
+    if (!surface) {
+        log_error("Failed to load ui sprite %d\n", nr);
+        return;
+    }
+
+    width = surface->w;
+    height = surface->h;
+
+    ui_sprite_data[nr].surface = surface;
+    ui_sprite_data[nr].is_ui = true;
+
+    unsigned int atlas = add_to_atlas(&ui_sprite_data[nr]);
+    ui_sprite_data[nr].gl_texture = atlas;
+
+
+    // Extract alpha channel for pixel-perfect blending
+    int alphacnt = 0;
+    unsigned char *alpha = extract_alpha_channel(surface, &alphacnt);
+
+    // Calculate average color for lighting effects
+    unsigned short avgcol = calculate_average_color(surface);
+
+    // Store sprite data
+    ui_sprite_data[nr].alphacnt = alphacnt;
+    ui_sprite_data[nr].pixel_width = width;
+    ui_sprite_data[nr].pixel_height = height;
+    ui_sprite_data[nr].xs = (unsigned char) (width / TILE);
+    ui_sprite_data[nr].ys = (unsigned char) (height / TILE);
+    ui_sprite_data[nr].avgcol = avgcol;
 }
 
 static int first_render = 1;
@@ -1093,4 +1154,10 @@ void sdl_show_map(unsigned short *src, int xo, int yo, int magnify) {
 
 int sdl_get_avgcol(int nr) {
     return sprite_data[nr].avgcol;
+}
+
+SpriteData *sdl_get_ui_sprite_data(int nr) {
+    if (do_darkmode) nr += 10000;
+    sdl_load_ui(nr);
+    return &ui_sprite_data[nr];
 }

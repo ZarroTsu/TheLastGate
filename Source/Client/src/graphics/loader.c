@@ -119,6 +119,17 @@ SDL_Surface *load_from_file(int nr) {
     return make_standard_format(surface);
 }
 
+SDL_Surface * load_ui_from_file(int nr) {
+    char name[256];
+    sprintf(name, "%sui/%05d.png", g_config.runtime.base_path, nr);
+    SDL_Surface *surface = IMG_Load(name);
+    if (!surface) {
+        sprintf(name, "%sui/%05d.png", g_config.runtime.base_path, nr);
+        surface = SDL_LoadBMP(name);
+    }
+    return make_standard_format(surface);
+}
+
 static int init_png_lib() {
     char file[80];
 

@@ -20,6 +20,7 @@ typedef struct {
     int pixel_width; // Actual pixel width
     int pixel_height; // Actual pixel height
     bool loaded_in_atlas;
+    bool is_ui;
     UV uv0;
     UV uv1;
 } SpriteData;

@@ -56,6 +56,7 @@ struct FontCache {
 
 extern Renderer renderer;
 extern SpriteData *sprite_data;
+extern SpriteData *ui_sprite_data;
 
 int sdl_init(int windowed);
 void sdl_deinit(void);
@@ -64,6 +65,7 @@ void sdl_batch_begin(void);
 void sdl_batch_flush(void);
 void sdl_init_sprites(void);
 void sdl_load_sprite(int nr);
+void sdl_load_ui(int nr);
 void sdl_copysprite(int nr, int effect, int x, int y, int xoff, int yoff);
 void sdl_copyspritex(int nr, int x, int y, int effect);
 void sdl_puttext(int x, int y, int font, char *text);
@@ -77,6 +79,8 @@ void sdl_shadow_clear(void);
 int sdl_isvisible(void);
 void sdl_show_map(unsigned short *src,int xo,int yo,int magnify);
 int sdl_get_avgcol(int nr);
+
+SpriteData *sdl_get_ui_sprite_data(int nr);
 
 void calculate_gamma_shader_params(int effect, float *shade_effect, float *gamma_effect, bool *grey, bool *infra,
                                    bool *water, bool *red, bool *green, bool *invis, bool *buff);

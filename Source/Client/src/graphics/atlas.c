@@ -10,6 +10,7 @@ static AtlasGroup tile_atlas_group; // 32x32
 static AtlasGroup character_atlas_group; // 64x64
 static AtlasGroup object_atlas_group; // 32x64
 static AtlasGroup mixed_atlas_group; // everything else
+static AtlasGroup ui_atlas_group; // everything UI related
 
 static int get_atlas_utilization(const Atlas atlas) {
     const int total_space = ATLAS_SIZE_X * ATLAS_SIZE_Y;
@@ -53,6 +54,7 @@ void init_atlas_groups(void) {
     init_atlas_group(&character_atlas_group, "CharacterAtlas");
     init_atlas_group(&object_atlas_group, "ObjectAtlas");
     init_atlas_group(&mixed_atlas_group, "MixedAtlas");
+    init_atlas_group(&ui_atlas_group, "UiAtlas");
 }
 
 void log_atlas_debug_info(void) {
@@ -92,7 +94,13 @@ unsigned int add_to_atlas(SpriteData *sprite_data) {
     int w = sprite_data->surface->w;
     int h = sprite_data->surface->h;
 
-    AtlasGroup *atlasGroup = get_atlas_group_by_size(w, h);
+
+    AtlasGroup *atlasGroup;
+    if (sprite_data->is_ui) {
+        atlasGroup = &ui_atlas_group;
+    } else {
+        atlasGroup = get_atlas_group_by_size(w, h);
+    }
 
     Atlas *atlas = &atlasGroup->atlases[atlasGroup->current];
 
