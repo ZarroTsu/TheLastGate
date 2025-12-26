@@ -143,6 +143,8 @@ void imgui_pop_text_wrap_pos(void);
 
 void imgui_set_font_global_scale(float scale);
 
+float imgui_get_text_line_height(void);
+
 /* Widgets: Main */
 bool imgui_button(const char *label);
 
@@ -175,6 +177,9 @@ bool imgui_slider_float(const char *label, float *v, float v_min, float v_max);
 bool imgui_vslider_int(const char *label, float width, float height, int *v, int v_min, int v_max);
 
 bool imgui_vslider_float(const char *label, float width, float height, float *v, float v_min, float v_max);
+
+/* Widgets: Progress Bars */
+void imgui_progress_bar(float progress, float width, float height, const char *overlay);
 
 /* Widgets: Color */
 bool imgui_color_edit3(const char *label, float col[3]);

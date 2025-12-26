@@ -291,6 +291,10 @@ void imgui_set_font_global_scale(float scale) {
     io.FontGlobalScale = scale;
 }
 
+float imgui_get_text_line_height(void) {
+    return ImGui::GetTextLineHeight();
+}
+
 /* Widgets: Main */
 
 bool imgui_button(const char *label) {
@@ -355,6 +359,12 @@ bool imgui_vslider_int(const char *label, float width, float height, int *v, int
 
 bool imgui_vslider_float(const char *label, float width, float height, float *v, float v_min, float v_max) {
     return ImGui::VSliderFloat(label, ImVec2(width, height), v, v_min, v_max);
+}
+
+/* Widgets: Progress Bars */
+
+void imgui_progress_bar(float progress, float width, float height, const char *overlay) {
+    ImGui::ProgressBar(progress, ImVec2(width, height), overlay);
 }
 
 /* Widgets: Color */

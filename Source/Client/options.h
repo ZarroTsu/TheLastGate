@@ -1,6 +1,6 @@
 #pragma once
 
-#define SAVE_VERSION 5  /* TLGExtended.dat format version */
+#define SAVE_VERSION 6  /* TLGExtended.dat format version */
 
 extern struct key okey;
 

@@ -260,6 +260,10 @@ void load_extended_options(void)
 			}
 		}
 
+		if (version >= 6) {
+			if (read(handle, &g_config.ui.expanded_quick_stats, sizeof(g_config.ui.expanded_quick_stats)) != sizeof(g_config.ui.expanded_quick_stats)) return;
+		}
+
 		close(handle);
 		return;
 	}
@@ -327,6 +331,8 @@ void save_extended_options(void)
 			write(handle, &binding.keybinding.key, sizeof(binding.keybinding.key));
 			write(handle, &binding.keybinding.modifier, sizeof(binding.keybinding.modifier));
 		}
+
+		write(handle, &g_config.ui.expanded_quick_stats, sizeof(g_config.ui.expanded_quick_stats));
 
 		close(handle);
 	}
