@@ -10,27 +10,14 @@
 #include "inter.h"
 #include "main.h"
 #include "options.h"
+#include "net/socket.h"
 
 #include "config/config.h"
 #include "config/keybindings.h"
 
-extern char history[20][128];
-extern int hist_len[20];
-extern char words[2048][40];
-extern char passwd[15];
-
-extern int quit;
-
-extern int do_alpha;
-extern int do_shadow;
-extern int do_darkmode;
-
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 //extern int screen_overlay_sprite;
 extern int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
-extern short screen_renderdist;
-
-extern int so_status;
 
 struct key okey;
 struct pdata pdata={"","","",0};

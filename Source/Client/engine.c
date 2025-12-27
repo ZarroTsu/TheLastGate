@@ -58,27 +58,14 @@ extern int ticker;
 int pskip=0,pidle=0;
 extern int t_size;
 
-extern int cursor_type;
-
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 //extern int screen_overlay_sprite;
 extern short screen_windowed;
-extern short screen_renderdist;
 extern int screen_target_fps;
 
 char *lookup(int nr,unsigned short id);
 
-extern char input[];
-extern int in_len;
-extern int cur_pos;
-extern int view_pos;
-extern int logstart;
-extern int logtimer;
-
 int tput=0;
-
-extern int do_shadow;
-extern int do_darkmode;
 
 // Going to write up the tutorial right here. Unfortunately it takes up a lot of space.
 

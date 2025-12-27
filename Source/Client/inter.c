@@ -49,13 +49,8 @@ extern int tile_x,tile_y,tile_type;
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 extern int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
 extern short screen_windowed;
-extern short screen_renderdist;
 
 extern int xoff,yoff;
-extern int stat_raised[];
-extern int stat_points_used;
-extern int noshop;
-extern int do_alpha;
 
 int st_skill_pts_all(int st_val);
 
@@ -66,9 +61,6 @@ int selected_char=0;
 int last_skill=-1;
 
 int xmove=0,xxtimer=0;
-
-void cmd(int cmd,int x,int y);
-void cmd3(int cmd,int x,int y,int z);
 
 int mouse_x=0,mouse_y=0;
 

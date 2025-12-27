@@ -33,14 +33,10 @@ int screen_target_fps = 48;  // Configurable FPS target (default 120)
 
 SDL_Cursor* cursors[10];
 
-void cmd(int cmd,int x,int y);
-
 int quit=0;
 GameState g_game_state = GAME_STATE_LAUNCHER;
 
 void engine(void);
-
-#define MWORD 2048
 
 char input[128];
 int in_len=0;

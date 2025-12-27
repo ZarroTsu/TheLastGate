@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+#define MWORD 2048
+
 typedef struct {
     int major, minor;
 } SdlClientVersion;
@@ -36,6 +38,7 @@ extern short screen_renderdist;
 extern char history[20][128];
 extern int hist_nr;
 extern int hist_len[20];
+extern char words[MWORD][40];
 
 
 extern SDL_Cursor *cursors[10];
