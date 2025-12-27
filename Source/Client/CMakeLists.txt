@@ -30,6 +30,8 @@ endif ()
 
 project(TheLastGate LANGUAGES C CXX)
 
+option(HOME_COPY "Connect to Home Server" OFF)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/compiler_options.cmake)
 
 # Platform-specific source files
@@ -104,7 +106,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/embed_shaders.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/windows_setup.cmake)
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (HOME_COPY)
     target_compile_options(TheLastGate PRIVATE
             -DHOMECOPY
     )
