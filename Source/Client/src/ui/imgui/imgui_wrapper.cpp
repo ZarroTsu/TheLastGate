@@ -75,7 +75,7 @@ void *imgui_add_font_from_file_ttf_pixel_perfect(const char *filename, float siz
     config.PixelSnapV = true;
     config.RasterizerMultiply = 1.0f;
     config.RasterizerDensity = 1.0f;
-    config.FontLoaderFlags = ImGuiFreeTypeBuilderFlags_Monochrome;
+    config.FontLoaderFlags = ImGuiFreeTypeBuilderFlags_Bitmap;
 
     ImFont *font = io.Fonts->AddFontFromFileTTF(filename, size_pixels, &config);
     return static_cast<void *>(font);
