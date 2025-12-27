@@ -9,8 +9,8 @@
 #include "inter.h"
 #include "main.h"
 #include "use_queue.h"
-#include "../../../Server/macros.h"
 #include "config/config.h"
+#include "util/math_util.h"
 
 static StubbornActionState state = {0};
 
