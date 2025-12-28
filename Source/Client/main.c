@@ -5,6 +5,10 @@
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_net.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "common.h"
 #include "game/game_input.h"
 #include "inter.h"
@@ -193,6 +197,14 @@ int parse_cmd(char *s)
 }
 
 int main(int argc, char *argv[]) {
+#if defined(_WIN32) && (!defined(NDEBUG))
+	// Allocate a console window for debug builds
+	AllocConsole();
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+	freopen("CONIN$", "r", stdin);
+#endif
+
 	log_init();
 	config_init_paths();
 	security_init();
@@ -220,6 +232,7 @@ int main(int argc, char *argv[]) {
 		}
 		input_event_count = 0;
 
+		glBindVertexArray(0);
 		imgui_new_frame(1.0f, 1.0f);
 		launcher_render();
 		imgui_render();

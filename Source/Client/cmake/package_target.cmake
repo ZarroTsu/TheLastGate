@@ -6,6 +6,7 @@ if (WIN32)
 
             "$<TARGET_FILE:TheLastGate>"
             "${OUTPUT_DIR}/gfx"
+            "${OUTPUT_DIR}/ui"
             "${OUTPUT_DIR}/sfx"
             "${OUTPUT_DIR}/resources"
             "${OUTPUT_DIR}/gx00.dat"
