@@ -158,7 +158,7 @@ void load_effect_shader_imgui(float projection_matrix[16]) {
     imgui_uShadow = glGetUniformLocation(imgui_shader, "uShadow");
     imgui_uBuff = glGetUniformLocation(imgui_shader, "uBuff");
 
-    glUniformMatrix4fv(uProjection, 1, GL_FALSE, projection_matrix);
+    glUniformMatrix4fv(imgui_uProjection, 1, GL_FALSE, projection_matrix);
 
     glUseProgram(0);
 }

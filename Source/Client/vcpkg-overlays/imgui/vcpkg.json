@@ -12,6 +12,7 @@
       "name": "vcpkg-cmake-config",
       "host": true
     },
-    "sdl2"
+    "sdl2",
+    "glad"
   ]
 }

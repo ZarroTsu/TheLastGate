@@ -52,6 +52,7 @@ set(FREETYPE_HEADERS
     misc/freetype/imgui_freetype.h
 )
 
+find_package(glad CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
 
@@ -61,8 +62,8 @@ target_include_directories(imgui PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/backends>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(imgui PUBLIC SDL2::SDL2 Freetype::Freetype)
-target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE)
+target_link_libraries(imgui PUBLIC SDL2::SDL2 Freetype::Freetype glad::glad)
+target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 # Installation
 install(TARGETS imgui EXPORT imguiConfig

@@ -33,7 +33,7 @@ void imgui_init(void *sdl_window, void *gl_context) {
 
     /* Setup platform/renderer backends */
     ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window *>(sdl_window), gl_context);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui_ImplOpenGL3_Init("#version 410 core");
 }
 
 void imgui_shutdown(void) {

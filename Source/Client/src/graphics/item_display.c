@@ -133,7 +133,9 @@ static void draw_sprite_imgui(void *draw_list, int sprite_id, float x, float y, 
     if (!sprite->loaded_in_atlas) return;
 
     /* If effect is needed, switch shaders */
-    imgui_draw_list_add_callback(draw_list, enable_effect_shader_callback, (void *) (intptr_t) effect);
+    if (effect > 0) {
+        imgui_draw_list_add_callback(draw_list, enable_effect_shader_callback, (void *) (intptr_t) effect);
+    }
 
     /* Draw sprite using ImGui */
     void *texture = (void *) (uintptr_t) sprite->atlas_texture;
@@ -145,7 +147,9 @@ static void draw_sprite_imgui(void *draw_list, int sprite_id, float x, float y, 
                               0xFFFFFFFF);
 
 
-    imgui_draw_list_reset_render_state(draw_list);
+    if (effect > 0) {
+        imgui_draw_list_reset_render_state(draw_list);
+    }
 }
 
 void render_lockable_item_display_imgui(void *draw_list, const ItemDisplayInfo *item,
