@@ -217,6 +217,10 @@ static void handle_hotkey(const BindingDescriptor *binding) {
         say("/gcb");
         return;
     }
+    if (strcmp(id, GC_TRANSFER_HOTKEY) == 0) {
+        say("transfer");
+        return;
+    }
 }
 
 

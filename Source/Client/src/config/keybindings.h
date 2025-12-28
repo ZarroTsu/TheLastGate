@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 
 #define NUM_SPELL_HOTKEYS 20
-#define NUM_GENERAL_HOTKEYS 23
+#define NUM_GENERAL_HOTKEYS 24
 
 // SPEED HOTKEYS
 #define SPEED_SLOW_HOTKEY "speed_slow_hotkey"
@@ -38,6 +38,7 @@
 #define GC_FOLLOW_HOTKEY "gc_follow_hotkey"
 #define GC_MOVE_HOTKEY "gc_move_hotkey"
 #define GC_BUFFS_HOTKEY "gc_buffs_hotkey"
+#define GC_TRANSFER_HOTKEY "gc_transfer_hotkey"
 
 /* Used for organization in UI */
 typedef enum {

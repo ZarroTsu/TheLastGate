@@ -130,6 +130,10 @@ static BindingDescriptor binding_registry[] = {
         "Buffs", GC_BUFFS_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
         {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
     },
+    {
+        "Transfer", GC_TRANSFER_HOTKEY, BINDING_CATEGORY_GC, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
+    }
 };
 
 /* Initialize Global config and ensure defaults are set */
