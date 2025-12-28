@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.4.0](https://github.com/jamesblack/TheLastGate/compare/v3.3.0...v3.4.0) (2025-12-28)
+
+
+### Features
+
+* Add /buffs as a bindable hotkey ([6d247a2](https://github.com/jamesblack/TheLastGate/commit/6d247a2c13a91e03a1484c2f1a792db761c1e609))
+* add a new font based off original font for most ui ([3199a59](https://github.com/jamesblack/TheLastGate/commit/3199a59faecc3a5733783e581f467a2dd394cf9e))
+* Add GC Transfer as a bindable hotkey ([e91e11c](https://github.com/jamesblack/TheLastGate/commit/e91e11c060854f7149760d7d43c942e51140adff))
+* Add new configuration to enable/disable the expanded quick stat window, defaults to true. ([960c297](https://github.com/jamesblack/TheLastGate/commit/960c297eb06c2fa34de4baaa7d286a668db9420b))
+* Add new ui sprites to a separate folder for easier location/loading ([ab05da4](https://github.com/jamesblack/TheLastGate/commit/ab05da46741ea5830a255514531749ef24ee13bb))
+* **launcher:** hovering over a previous character will show the location of the moa ([be6af82](https://github.com/jamesblack/TheLastGate/commit/be6af82fe03db13ca314ff606c2bebf315f0ff8b))
+* Quick Stats window (WV, AV, Experience) now uses the new ui rendering code. ([606bcf1](https://github.com/jamesblack/TheLastGate/commit/606bcf15d3c55020ef3c72f7ebfa25e50c54863c))
+* when a spell is currently bound to a keybind include the spell in it the option window ([eb08f50](https://github.com/jamesblack/TheLastGate/commit/eb08f5013e9fb264b9176e9e7fb7be3993c23587))
+
+
+### Bug Fixes
+
+* **assets:** Fix bad names for new ui sprites ([2989a3e](https://github.com/jamesblack/TheLastGate/commit/2989a3e360c388d17db5e5953401cf94e9a43774))
+* inconsistencys that cause inventory items to not render ([d8c36db](https://github.com/jamesblack/TheLastGate/commit/d8c36dbc4b8f2594d0179767e98c52092821f971))
+* **launcher:** duplicate previous character names no longer shows an error ([e2ef2ec](https://github.com/jamesblack/TheLastGate/commit/e2ef2ececd8c9be939530d35902f3e7587cb6952))
+* Move Keybinding init earlier, to make sure they are there for options loading. ([2a4a7dd](https://github.com/jamesblack/TheLastGate/commit/2a4a7dd0d0a46d4b41adb19f1475dd6a498df732))
+
 ## [3.3.0](https://github.com/jamesblack/TheLastGate/compare/v3.2.0...v3.3.0) (2025-12-25)
 
 
