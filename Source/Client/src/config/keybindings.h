@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 
 #define NUM_SPELL_HOTKEYS 20
-#define NUM_GENERAL_HOTKEYS 24
+#define NUM_GENERAL_HOTKEYS 26
 
 // SPEED HOTKEYS
 #define SPEED_SLOW_HOTKEY "speed_slow_hotkey"
@@ -29,6 +29,7 @@
 #define WHO_HOTKEY "who_hotkey"
 #define DISPLAY_DEBUG_INFORMATION_HOTKEY "display_debug_information_hotkey"
 #define EXIT_HOTKEY "exit_hotkey"
+#define MY_BUFF_HOTKEY "my_buff_hotkey"
 
 // GC HOTKEYS
 #define GC_OFFENSE_HOTKEY "gc_offense_hotkey"

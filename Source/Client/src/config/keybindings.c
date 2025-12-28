@@ -106,6 +106,10 @@ static BindingDescriptor binding_registry[] = {
         {SDLK_F11, KEYBIND_MOD_NONE}, {SDLK_F11, KEYBIND_MOD_NONE}
     },
     {"Exit", EXIT_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_F12, KEYBIND_MOD_NONE}, {SDLK_F12, KEYBIND_MOD_NONE}},
+    {
+        "Buffs", MY_BUFF_HOTKEY, BINDING_CATEGORY_GENERAL, {SDLK_UNKNOWN, KEYBIND_MOD_NONE},
+        {SDLK_UNKNOWN, KEYBIND_MOD_NONE}
+    },
 
     /* GC Hotkeys */
     {

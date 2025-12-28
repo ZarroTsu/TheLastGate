@@ -186,6 +186,10 @@ static void handle_hotkey(const BindingDescriptor *binding) {
         cmd_exit();
         return;
     }
+    if (strcmp(id, MY_BUFF_HOTKEY) == 0) {
+        say("/buffs");
+        return;
+    }
 
     /* GC Hotkeys */
     if (strcmp(id, GC_OFFENSE_HOTKEY) == 0) {
