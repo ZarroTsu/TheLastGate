@@ -1929,8 +1929,12 @@ void plr_update_skill_terminology(int nr, int n)
 	buf[2] = n;
 	
 	buf[1] = ST_SKILLS_SORT;
-	mcpy(buf+3, skilltab[n].sortkey,   1); *(unsigned char*)(buf + 4) = (unsigned char)known;
-	xsend(nr, buf,  5);
+	*(unsigned char*)(buf + 3) = (unsigned char)skilltab[n].sortkey;
+	*(unsigned char*)(buf + 4) = (unsigned char)skilltab[n].attrib[0];
+	*(unsigned char*)(buf + 5) = (unsigned char)skilltab[n].attrib[1];
+	*(unsigned char*)(buf + 6) = (unsigned char)skilltab[n].attrib[2];
+	*(unsigned char*)(buf + 7) = (unsigned char)known;
+	xsend(nr, buf,  8);
 	
 	if (n==11 && do_get_iflag(cn, SF_EMPRESS))    alt = 1; // Magic Shield -> Magic Shell
 	if (n==12 && do_get_iflag(cn, SF_PREIST_R))   alt = 1; // Tactics invert

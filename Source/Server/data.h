@@ -1371,7 +1371,7 @@ struct s_skilltab
 	char alt_name[30];  // If something changes the name
 	char alt_desc[200]; // If something changes the desc
 	
-	int attrib[3];
+	char attrib[3];
 };
 
 struct see_map

@@ -232,6 +232,8 @@ struct skilltab
 	
 	char name[30];
 	char desc[200];
+	
+	char attrib[3];
 };
 
 extern struct skilltab *skilltab;

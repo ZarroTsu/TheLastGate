@@ -497,7 +497,10 @@ int sv_terminology(unsigned char *buf)
 		switch (buf[1])
 		{
 			case ST_SKILLS_SORT: skilltab[n].sortkey = *(unsigned char*)(buf+3);
-			                   skilltab[n].show = *(unsigned char*)(buf+4); return  5;
+			                   skilltab[n].attrib[0] = *(unsigned char*)(buf+4);
+			                   skilltab[n].attrib[1] = *(unsigned char*)(buf+5);
+			                   skilltab[n].attrib[2] = *(unsigned char*)(buf+6);
+			                   skilltab[n].show = *(unsigned char*)(buf+7); return  8;
 			case ST_SKILLS_NAME1:  memcpy(skilltab[n].name,     buf+3, 10); return 13;
 			case ST_SKILLS_NAME2:  memcpy(skilltab[n].name+ 10, buf+3, 10); return 13;
 			case ST_SKILLS_NAME3:  memcpy(skilltab[n].name+ 20, buf+3, 10); return 13;
