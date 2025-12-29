@@ -53,6 +53,7 @@ extern int do_exit;
 
 extern struct sk_tree sk_tree[2][12];
 extern struct skilltab *skilltab;
+extern struct metaStat metaStats[90];
 
 int sv_cmd(unsigned char *buf);
 void sv_newplayer(unsigned char *buf);
@@ -458,7 +459,7 @@ unsigned int xcrypt(unsigned int val)
 // Intended to give the server power over minor text that the client displays.
 int sv_terminology(unsigned char *buf)
 {
-	int tn = -1, n = 0;
+	int tn = -1, n;
 	
 	DEBUG("SV TERMINOLOGY");
 	
@@ -495,7 +496,7 @@ int sv_terminology(unsigned char *buf)
 		
 		switch (buf[1])
 		{
-			case ST_SKILLS_SORT: memcpy(skilltab[n].sortkey,  buf+3,  1);
+			case ST_SKILLS_SORT: skilltab[n].sortkey = *(unsigned char*)(buf+3);
 			                   skilltab[n].show = *(unsigned char*)(buf+4); return  5;
 			case ST_SKILLS_NAME1:  memcpy(skilltab[n].name,     buf+3, 10); return 13;
 			case ST_SKILLS_NAME2:  memcpy(skilltab[n].name+ 10, buf+3, 10); return 13;
@@ -554,10 +555,10 @@ int sv_terminology(unsigned char *buf)
 			case ST_META_DESC19: memcpy(metaStats[n].desc+180, buf+3, 10); return 13;
 			case ST_META_DESC20: memcpy(metaStats[n].desc+190, buf+3, 10); return 13;
 			case ST_META_VALUES: 
-			               skilltab[n].value   =     *(short int*)(buf+3);
-			               skilltab[n].decimal = *(unsigned char*)(buf+5);
+			              metaStats[n].value   =     *(short int*)(buf+3);
+			              metaStats[n].decimal = *(unsigned char*)(buf+5);
 			                        memcpy(metaStats[n].affix, buf+6,  8);
-			               skilltab[n].font   = *(unsigned char*)(buf+14); return 15;
+			              metaStats[n].font   = *(unsigned char*)(buf+14); return 15;
 			default: break;
 		}
 	}
@@ -1219,7 +1220,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 
 extern int noshop;
 
-void sv_closeshop(unsigned char *buf)
+void sv_closeshop(void)
 {
 	DEBUG("SV CLOSESHOP");
 	show_shop=0; noshop=QSIZE*3;
@@ -1255,7 +1256,7 @@ void sv_showmotd(unsigned char *buf)
 	}
 }
 
-void sv_waypoints(unsigned char *buf)
+void sv_waypoints(void)
 {
 	DEBUG("SV WAYPOINTS");
 	
@@ -1452,7 +1453,7 @@ int sv_cmd(unsigned char *buf)
 		case SV_LOOK7:				sv_look7(buf); return 8;
 		case SV_LOOK8:				sv_look8(buf); return 8;
 		
-		case SV_CLOSESHOP:			sv_closeshop(buf); return 1;
+		case SV_CLOSESHOP:			sv_closeshop(); return 1;
 
 		case SV_SETTARGET:			sv_settarget(buf); return 13;
 
@@ -1465,7 +1466,7 @@ int sv_cmd(unsigned char *buf)
 		case SV_UNIQUE:             	sv_unique(buf); return 9;
 		case SV_IGNORE:		return sv_ignore(buf);
 		
-		case SV_WAYPOINTS:			sv_waypoints(buf); return 1;
+		case SV_WAYPOINTS:			sv_waypoints(); return 1;
 		case SV_SHOWMOTD:			sv_showmotd(buf); return 2;
 		
 		case SV_CLEARBOX:			sv_clearbox(buf); return 9;
@@ -1477,7 +1478,7 @@ int sv_cmd(unsigned char *buf)
 }
 
 #pragma argused
-void so_perf_report(int ticksize,int skip,int idle)
+void so_perf_report(void) //int ticksize,int skip,int idle)
 {
 	unsigned char buf[16];
 

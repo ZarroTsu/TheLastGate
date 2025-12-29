@@ -73,6 +73,7 @@ int do_shadow=1;
 int do_darkmode=0;
 
 void dd_invalidate_alpha(void);
+void cmd3(int cmd,int x,int y,int z);
 
 char history[20][128];
 int hist_len[20]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};

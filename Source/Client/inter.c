@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <math.h>
+#include <stdio.h>
 #pragma hdrstop
 #include "common.h"
 #include "inter.h"
@@ -429,27 +430,27 @@ void button_help(int nr)
 					} 
 					else 
 					{
-						int pl_flags, pl_flagb;
-						pl_flags = pl.worn[WN_FLAGS];
-						pl_flagb = pl.worn_p[WN_FLAGS];
-						if (	(last_skill==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-								(last_skill==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-								(last_skill==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-								(last_skill==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-								(last_skill==41&&(pl_flags & (1 << 10))) )	// Weaken -> Greater Weaken
-						{
-							pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
-							xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].alt_a);
-							strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
-							pdata.xbutton[nr-16].name[7]=0;
-						}
-						else
-						{
+						//int pl_flags, pl_flagb;
+						//pl_flags = pl.worn[WN_FLAGS];
+						//pl_flagb = pl.worn_p[WN_FLAGS];
+						//if (	(last_skill==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+						//		(last_skill==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+						//		(last_skill==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+						//		(last_skill==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+						//		(last_skill==41&&(pl_flags & (1 << 10))) )	// Weaken -> Greater Weaken
+						//{
+						//	pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
+						//	xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].alt_a);
+						//	strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
+						//	pdata.xbutton[nr-16].name[7]=0;
+						//}
+						//else
+						//{
 							pdata.xbutton[nr-16].skill_nr=skilltab[last_skill].nr;
 							xlog(1,"CTRL-%c (or ALT-%c), now %s.", tmp, tmp, skilltab[last_skill].name);
 							strncpy(pdata.xbutton[nr-16].name,skilltab[last_skill].name,7);
 							pdata.xbutton[nr-16].name[7]=0;
-						}
+						//}
 					}
 				}
 				// Equipment shortcuts
@@ -904,6 +905,7 @@ int _mouse_statbox(int x,int y,int state)
 			return 1;
 		}
 	}
+	return 0;
 }
 
 int mouse_statbox(int x,int y,int state)
@@ -1109,7 +1111,7 @@ void meta_stat_descs(int n)
 int mouse_statbox2(int x,int y,int state)
 {
 	int n, m;
-	int pl_flags, pl_flagb;
+//	int pl_flags, pl_flagb;
 	char tmp[200];
 	static int firstclick=0;
 	
@@ -1201,8 +1203,8 @@ int mouse_statbox2(int x,int y,int state)
 	hightlight_sub=n;
 	
 	// Player Flags from special items
-	pl_flags = pl.worn[WN_FLAGS];
-	pl_flagb = pl.worn_p[WN_FLAGS];
+	//pl_flags = pl.worn[WN_FLAGS];
+	//pl_flagb = pl.worn_p[WN_FLAGS];
 	
 	// Skills
 	if (state==MS_RB_UP) 
@@ -1212,43 +1214,43 @@ int mouse_statbox2(int x,int y,int state)
 			m = skilltab[n+skill_pos].nr;
 			if (pl.skill[m][0] || m==50 || m==51 || (m==52 && KNOW_IDENTIFY) || ((m==53 || m==54) && IS_LYCANTH))
 			{
-				if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
-						(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
-						(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
-						(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
-						(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
-						(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
-						(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
-						(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
-						(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
-						(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
-						(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
-						(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
-						(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
-						(m==14&&(pl_flagb & (1 <<  3))) ||  // Finesse invert
-						(m==22&&IS_SHIFTED)
-					)
-				{
-					strcpy(tmp, skilltab[n+skill_pos].alt_a);
-					xlog(1,skilltab[n+skill_pos].alt_b);
-				}
-				else if (m==44)	// Proximity has special descriptions
-				{
-					strcpy(tmp, skilltab[n+skill_pos].name);
-					if (IS_BRAVER)
-						xlog(1,skilltab[n+skill_pos].desc); // Braver
-					else if (IS_SORCERER)
-						xlog(1,skilltab[n+skill_pos].alt_a); // Sorcerer
-					else if (IS_ARCHHARAKIM)
-						xlog(1,skilltab[n+skill_pos].alt_b); // Arch-Harakim
-					else
-						xlog(1,"Passively improves the area-of-effect of various skills and spells.");
-				}
-				else
-				{
+				//if (	(m==11&&(pl_flagb & (1 << 10))) ||	// Magic Shield -> Magic Shell
+				//		(m==19&&(pl_flags & (1 <<  5))) ||	// Slow -> Greater Slow
+				//		(m==20&&(pl_flags & (1 <<  6))) ||	// Curse -> Greater Curse
+				//		(m==24&&(pl_flags & (1 <<  7))) ||	// Blast -> +Scorch
+				//		(m==26&&(pl_flags & (1 << 14))) ||	// Heal -> Regen
+				//		(m==37&&(pl_flagb & (1 << 11))) ||	// Blind -> Douse
+				//		(m==40&&(pl_flags & (1 <<  8))) ||	// Cleave -> +Aggravate
+				//		(m==41&&(pl_flags & (1 << 10))) ||  // Weaken -> Greater Weaken
+				//		(m==16&&(pl_flagb & (1 <<  5))) ||  // Shield -> Shield Bash
+				//		(m==43&&(pl_flagb & (1 <<  6))) ||  // Pulse -> Healing Pulses
+				//		(m==49&&(pl_flagb & (1 <<  7))) ||  // Leap
+				//		(m==35&&(pl_flagb & (1 << 12))) ||  // Warcry -> Rally
+				//		(m==42&&(pl_flagb & (1 << 14))) ||  // Poison -> Venom
+				//		(m==14&&(pl_flagb & (1 <<  3))) ||  // Finesse invert
+				//		(m==22&&IS_SHIFTED)
+				//	)
+				//{
+				//	strcpy(tmp, skilltab[n+skill_pos].alt_a);
+				//	xlog(1,skilltab[n+skill_pos].alt_b);
+				//}
+				//else if (m==44)	// Proximity has special descriptions
+				//{
+				//	strcpy(tmp, skilltab[n+skill_pos].name);
+				//	if (IS_BRAVER)
+				//		xlog(1,skilltab[n+skill_pos].desc); // Braver
+				//	else if (IS_SORCERER)
+				//		xlog(1,skilltab[n+skill_pos].alt_a); // Sorcerer
+				//	else if (IS_ARCHHARAKIM)
+				//		xlog(1,skilltab[n+skill_pos].alt_b); // Arch-Harakim
+				//	else
+				//		xlog(1,"Passively improves the area-of-effect of various skills and spells.");
+				//}
+				//else
+				//{
 					strcpy(tmp, skilltab[n+skill_pos].name);
 					xlog(1,skilltab[n+skill_pos].desc);
-				}
+				//}
 				
 				if (last_skill == n+skill_pos)
 				{
@@ -1282,7 +1284,7 @@ int mouse_statbox2(int x,int y,int state)
 	} 
 	else if (state==MS_LB_UP && (hudmode==0 || hudmode==3))
 	{
-		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,skilltab[n+skill_pos].attrib[0]);
+		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,0);
 	}
 	return 1;
 }

@@ -346,6 +346,7 @@ char *at_name[5]={
 #define AT_STR		4
 
 struct skilltab *skilltab;
+struct metaStat metaStats[90];
 
 struct sk_tree sk_tree[2][12]={
 	{     // Character Class Tree
@@ -701,9 +702,8 @@ static char motdfont[MLL];
 #define GUI_UPOINTS_X	189
 #define GUI_UPOINTS_Y	260
 
-//					   HEAD,NECK,BODY,ARMS,BELT,CHRM,FEET,LHND,RHND,CLOK,LRNG,RRNG,CHRM2
-int gui_equ_x[]		= { 738, 700, 738, 704, 738, 777, 738, 806, 670, 772, 776, 700, 801 };
-int gui_equ_y[]		= {   5,  18,  39,  56,  73,  17, 107,  56,  56,  56,  94,  94,  17 };
+extern int gui_equ_x[];
+extern int gui_equ_y[];
 
 #define GUI_BAR_X		845
 #define GUI_BAR_HP		131
@@ -803,8 +803,8 @@ int coo_blin=0, coo_warc=0, coo_weak=0, coo_curs=0, coo_slow=0;
 void init_meta_stats(void)
 {
 	int moonmult = 20;
-	int hpmult=0, endmult=0, manamult=0;
-	int race_reg = 0, race_res = 0, race_med = 0;
+	int hpmult, endmult, manamult;
+	int race_reg, race_res, race_med;
 	int len = 100;
 	
 	if (pl.worn[WN_SPMOD]==NULL) return;
@@ -1389,7 +1389,7 @@ void eng_display_win(int plr_sprite,int init)
 {
 	int y,n,m,v,pr,hh,xx,yy;
 	char *tmp,buf[50];
-	int pl_flags, pl_flagb;
+//	int pl_flags, pl_flagb;
 	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
 
 	//if (load) dd_xputtext(670,300+MAXTS,1,"%3d%%",load);
@@ -1486,7 +1486,7 @@ void eng_display_win(int plr_sprite,int init)
 		// Split buffs and debuffs
 		for (n=0; n<MAXBUFFS; n++)
 		{
-			if (m = pl.spell[n]) 
+			if ((m = pl.spell[n])>0) 
 			{
 				if (m==   89 || m==   91 || m==   97 || m==  119 || m==  149 ||
 					m==  178 || m==  224 || m==  225 || m==  319 || m==  325 ||
@@ -1623,8 +1623,8 @@ void eng_display_win(int plr_sprite,int init)
 		}
 		
 		// Player Flags from special items
-		pl_flags = pl.worn[WN_FLAGS];
-		pl_flagb = pl.worn_p[WN_FLAGS];
+		//pl_flags = pl.worn[WN_FLAGS];
+		//pl_flagb = pl.worn_p[WN_FLAGS];
 		
 		for (n=0; n<10; n++) 
 		{
@@ -1989,7 +1989,7 @@ void eng_display_win(int plr_sprite,int init)
 				if (shop.price[n] & (1<<31))       copyspritex(4497,xx,yy,hh);
 				if (shop.item_p[n]) copyspritex(6999+shop.item_p[n],xx,yy,hh);
 				
-				if (hh && (pr = (shop.price[n] - (shop.price[n]&(1<<30)) - (shop.price[n]&(1<<31)))))
+				if (hh && ((pr = (shop.price[n] - (shop.price[n]&(1<<30)) - (shop.price[n]&(1<<31))))>0))
 				{
 					if (show_shop>=1 && show_shop<=101) // Normal shop
 					{
@@ -2129,7 +2129,7 @@ void eng_display_win(int plr_sprite,int init)
 		if (show_book)
 		{
 			copyspritex(do_darkmode?18046:18045,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			for (y=0+MLL/3*(tuto_page-1); y<MLL/3*tuto_page; y++) {
+			for (y=0+MLL/3*((int)(tuto_page)-1); y<MLL/3*(int)(tuto_page); y++) {
 				dd_puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*15,
 					motdfont[y],motdtext[y]);
 			}

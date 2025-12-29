@@ -1816,16 +1816,17 @@ void char_remove_same_nets(int cn, int co)
 	do_char_log(cn, 1, "Done.\n");
 }
 
+#define PL_TESTER 873
+
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
-	#if VERSION < 0x000E00
-	return; // Remove me when client is good to go
-	#endif
-	 
 	unsigned char buf[256];
 	int cn = player[nr].usnr;
 	int m = ch[cn].tree_node[n];
 	int j;
+	
+	if (player[nr].usnr != PL_TESTER)
+		return; // Remove me when client is good to go
 	
 	if (tn < 0) return;
 	if (tn > 9) return;
@@ -1867,12 +1868,11 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 
 void plr_update_tree_terminology(int nr, int val)
 {
-	#if VERSION < 0x000E00
-	return; // Remove me when client is good to go
-	#endif
-	
 	int tn = -1, n = 0;
 	int cn = player[nr].usnr;
+	
+	if (player[nr].usnr != PL_TESTER)
+		return; // Remove me when client is good to go
 	
 	if (val==SV_TERM_STREE)
 	{
@@ -1975,9 +1975,8 @@ void plr_update_skill_terminology(int nr, int n)
 
 void plr_update_all_skill_terminology(int nr)
 {
-	#if VERSION < 0x000E00
-	return; // Remove me when client is good to go
-	#endif
+	if (player[nr].usnr != PL_TESTER)
+		return; // Remove me when client is good to go
 	
 	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);
 }
@@ -2482,9 +2481,8 @@ void plr_update_meta_stat_values(int nr, int n)
 
 void plr_update_all_meta_stat_values(int nr)
 {
-	#if VERSION < 0x000E00
-	return; // Remove me when client is good to go
-	#endif
+	if (player[nr].usnr != PL_TESTER)
+		return; // Remove me when client is good to go
 	
 	for (int n=0; n<89; n++) plr_update_meta_stat_values(nr, n);
 }
@@ -2516,9 +2514,8 @@ void plr_update_meta_terminology(int nr, int n)
 
 void plr_update_all_meta_terminology(int nr)
 {
-	#if VERSION < 0x000E00
-	return; // Remove me when client is good to go
-	#endif
+	if (player[nr].usnr != PL_TESTER)
+		return; // Remove me when client is good to go
 	
 	for (int n=0; n<89; n++) plr_update_meta_terminology(nr, n);
 }
@@ -2677,7 +2674,8 @@ void plr_newlogin(int nr)
 	ch[cn].goto_x = HOME_START_X;
 	ch[cn].goto_y = HOME_START_Y;
 	
-	// TODO: add terminology sends to new players for client here
+	plr_update_all_skill_terminology(nr);
+	plr_update_all_meta_stat_values(nr);
 	
 	// do_staff_log(2,"New player %s entered the game!\n",ch[cn].name);
 	do_announce(cn, 0, "A new player has entered the game.\n", ch[cn].name);
@@ -2838,7 +2836,8 @@ void plr_login(int nr)
 	plr_update_tree_terminology(nr, SV_TERM_STREE);
 	plr_update_tree_terminology(nr, SV_TERM_CTREE);
 	
-	// TODO: add other terminology sends to players for client here
+	plr_update_all_skill_terminology(nr);
+	plr_update_all_meta_stat_values(nr);
 	
 	if (ch[cn].data[79] != VERSION)
 	{

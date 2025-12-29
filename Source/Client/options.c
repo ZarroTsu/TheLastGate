@@ -146,7 +146,7 @@ void translate_okey2race(int *race_ptr,int *sex_ptr)
 	*sex_ptr=sex;
 }
 
-void setres_800()
+void setres_800(void)
 {
 	screen_width=800;
 	screen_height=600;
@@ -166,7 +166,7 @@ void setres_800()
 	xwalk_wy=XWALK_WY_800;
 }
 
-void setres_1280()
+void setres_1280(void)
 {
 	screen_width=1280;
 	screen_height=720;
@@ -192,7 +192,7 @@ void setres_1280()
 	}
 }
 
-void setres_1600()
+void setres_1600(void)
 {
 	screen_width=1600;
 	screen_height=900;
@@ -212,7 +212,7 @@ void setres_1600()
 	xwalk_wy=XWALK_WY_1600;
 }
 
-void setres_default()
+void setres_default(void)
 {
 	//setres_800();
 	setres_1280();
@@ -534,7 +534,8 @@ void update_buttons(HWND hwnd)
 #pragma argsused
 APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
-	int n, newp=0;
+	int n;
+//	int newp=0;
 	char buf[256];
 	static int done=0;
 	CREATESTRUCT *cs;

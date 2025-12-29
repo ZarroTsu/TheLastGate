@@ -151,7 +151,7 @@ void options(void);
 
 void xsend(unsigned char *buf);
 void engine_tick(void);
-void so_perf_report(int ticksize,int skip,int idle);
+void so_perf_report(void); //int ticksize,int skip,int idle);
 int game_loop(void);
 int tick_do(void);
 void init_engine(void);

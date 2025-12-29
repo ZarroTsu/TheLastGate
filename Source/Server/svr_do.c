@@ -13240,6 +13240,9 @@ void really_update_char(int cn)
 	
 	do_update_permaspells(cn);
 	
+	if (IS_SANEPLAYER(cn) && ch[cn].player)
+		plr_update_all_meta_stat_values(ch[cn].player);
+	
 	prof_stop(7, prof);
 }
 

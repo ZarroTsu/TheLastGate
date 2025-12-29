@@ -1342,7 +1342,7 @@ int gamma=5000;
 #pragma argsused
 unsigned short do_effect(unsigned short val,int effect,int seed1,int seed2,int sprite)
 {
-	int r,g,b,invis=0,tmp,grey=0,infra=0,water=0,bloody=0,red=0,green=0;
+	int r,g,b,invis=0,tmp,grey=0,infra=0,water=0,red=0,green=0;
 
 	if (effect&16)   { effect-=  16; red   =1; } //red border
 	if (effect&32)   { effect-=  32; green =1; } //green border
@@ -1914,7 +1914,7 @@ void dd_show_map(unsigned short *src,int xo,int yo,int magnify)
 
 void do_rgb8_effect(int *r1,int *g1,int *b1,int effect)
 {
-    int r,g,b,invis=0,tmp,grey=0,infra=0,water=0,bloody=0,red=0,green=0;
+    int r,g,b,invis=0,tmp,grey=0,infra=0,water=0,red=0,green=0;
 
     if (effect&16) { effect-=16; red=1; } //red border
     if (effect&32) { effect-=32; green=1; } //green border
@@ -2253,7 +2253,7 @@ void dd_shadow(int nr,int xpos,int ypos,int xoff,int yoff)
 
 	ry+=ys*32-disp;
 	
-	if (rx>screen_width || ry>screen_height || rx<0 || ry<0) return;
+//	if (rx>screen_width || ry>screen_height || rx<0 || ry<0) return;
 
 	dst=dd_get_ptr(sur2);
 	if (!dst) return;
