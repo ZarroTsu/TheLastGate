@@ -1987,7 +1987,7 @@ void plr_update_all_skill_terminology(int nr)
 
 int get_meta_stat_value(int cn, int n)
 {
-	int m, in = 0, power, durat, value = 0, cdlen = 100;
+	int m, in = 0, power, durat, value = -1, cdlen = 100;
 	int hpmult, endmult, manamult, moonmult = 20;
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int dmg_wpn, dmg_low, dmg_hgh, dmg_top, dmg_hit, dmg_dps, dmg_bns, dmg_str;
@@ -2464,7 +2464,7 @@ void plr_update_meta_stat_values(int nr, int n)
 {
 	unsigned char buf[256];
 	int cn = player[nr].usnr;
-	int v;
+	int v, m = 0;
 	
 	n = plr_get_meta_alternative_value(nr, n);
 	
@@ -2474,13 +2474,19 @@ void plr_update_meta_stat_values(int nr, int n)
 	v = get_meta_stat_value(cn, n);
 	
 	buf[1] = ST_META_VALUES;
-	if (metaStats[n].flag) *(short int*)(buf + 3)     =     (short int)(v/100);
-	else                   *(short int*)(buf + 3)     =     (short int)(v);
-	if (metaStats[n].flag) *(unsigned char*)(buf + 5) = (unsigned char)(v%100);
-	else                   *(unsigned char*)(buf + 5) = (unsigned char)(0);
-	mcpy(buf+6, metaStats[n].affix, 10);
+	    *(short int*)(buf + 3) = (short int)(v);
+	*(unsigned char*)(buf + 5) = (unsigned char)metaStats[n].flag;
+	mcpy(buf+6, metaStats[n].affix, 8);
 	*(unsigned char*)(buf +14) = (unsigned char)metaStats[n].font;
-	xsend(nr, buf, 15);
+	
+	if (metaStats[n].sknum == -2) m = 0;
+	else if (metaStats[n].sknum == -1) m = 1;
+	else if (metaStats[n].sknum == SK_IMMOLATE) { if (IS_WEARINGPHOENIX(cn)) m = 1; else m = 0; }
+	else if (metaStats[n].sknum >=0 && metaStats[n].sknum < 50 && B_SK(cn, metaStats[n].sknum)) m = 1;
+	
+	*(unsigned char*)(buf +15) = (unsigned char)m;
+	
+	xsend(nr, buf, 16);
 }
 
 void plr_update_all_meta_stat_values(int nr)
@@ -2679,6 +2685,7 @@ void plr_newlogin(int nr)
 	ch[cn].goto_y = HOME_START_Y;
 	
 	plr_update_all_skill_terminology(nr);
+	plr_update_all_meta_terminology(nr);
 	plr_update_all_meta_stat_values(nr);
 	
 	// do_staff_log(2,"New player %s entered the game!\n",ch[cn].name);
@@ -2841,6 +2848,7 @@ void plr_login(int nr)
 	plr_update_tree_terminology(nr, SV_TERM_CTREE);
 	
 	plr_update_all_skill_terminology(nr);
+	plr_update_all_meta_terminology(nr);
 	plr_update_all_meta_stat_values(nr);
 	
 	if (ch[cn].data[79] != VERSION)

@@ -95,7 +95,7 @@ struct cplayer
 
 	int points;
 	int points_tot;
-	int kindred;
+	unsigned long kindred;
 
 	// possessions
 	int gold;
@@ -298,7 +298,7 @@ struct cplayer
 #define ST_TREE_ICON				  0
 #define ST_TREE_NAME				  1
 #define ST_TREE_DESC1				  4
-#define ST_TREE_DESC2				 10
+#define ST_TREE_DESC2				  9
 
 #define ST_SKILLS_SORT				 14
 #define ST_SKILLS_NAME				 15
@@ -472,6 +472,7 @@ struct player
 
 struct metaStat
 {
+	char sknum;
 	char flag;
 	char font;
 	char name[30];

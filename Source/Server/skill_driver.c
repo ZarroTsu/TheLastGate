@@ -680,7 +680,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 // Entry :: if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int critDam)
 {
-	int n, in, enPar, glv, surrBonus = 0, surrTotal = 0, power = 0;
+	int n, in, coPar, glv, surrBonus = 0, surrTotal = 0, power = 0;
 	int surrMod = 0, surrDam = 0;
 	
 	remember_pvp(cn, co);
@@ -716,7 +716,7 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 		if (surround==3 && (surrMod-coPar)>20) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-20), 20)/20);
 		
 		if (co==co_orig)                               surrDam = surrDam*3/4;
-		if (co!=co_orig && (mb=st_skillcount(cn, 46))) surrDam = surrDam*(100+mb*5)/100;
+		if (co!=co_orig && (n=st_skillcount(cn, 46))) surrDam = surrDam*(100+n*5)/100;
 		
 		do_hurt(cn, co, surrDam+critDam, critDam>0?9:4);
 		
@@ -741,7 +741,7 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 
 int aoe_skill_notarget(int cn, int co, int co_orig, int intemp, int power)
 {
-	int n, in, in2;
+	int n, in, in2, tmp;
 	char buf[50];
 	
 	strcpy(buf, ch[cn].reference);
@@ -891,7 +891,7 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 // avgdmg     = damage already dealt before now (ie. targeted spell)    - critDam for SH
 int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_power, int count, int hit, int avgdmg)
 {
-	int co, r, notarget = 0, sc = 0, aoeImm = 0;
+	int co, no_target = 0, sc = 0, aoeImm = 0;
 	int x, xc, xf, xt, y, yc, yf, yt;
 	int r = get_aoe_radius(cn, intemp, prox_power);
 	int countskip = 0;
@@ -973,7 +973,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 			else if (!sc)
 				continue;
 			else if (intemp == SK_SURROUND)
-				aoe_surroundhit(cn, co, origco, hit, power, avgdmg);
+				aoe_surroundhit(cn, co, co_orig, hit, power, avgdmg);
 			else
 				hit += aoe_target(cn, co, co_orig, intemp, power, &avgdmg);
 		}
@@ -3746,7 +3746,7 @@ int spell_warcry(int cn, int co, int power, int flag)
 }
 void skill_warcry(cn)
 {
-	int power = skill_multiplier(M_SK(cn, SK_WARCRY), cn), ;
+	int power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 	int cost = SP_COST_WARCRY;
 	int aoepower = M_SK(cn, SK_WARCRY) + GET_PROX(cn)/2;
 	
@@ -6268,7 +6268,7 @@ void skill_taunt(int cn)
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
 	int can_aoe = CAN_ARTM_PROX(cn);
-	int aoe_power = (M_SK(cn, SK_TAUNT) + GET_PROX(cn))
+	int aoe_power = (M_SK(cn, SK_TAUNT) + GET_PROX(cn));
 	
 	if (IS_PLAYER_COMP(cn))
 		cost = 5;

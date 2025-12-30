@@ -18,6 +18,7 @@
 #define TICKS			(24*TICKMULTI)
 
 #define MAXSKILL		(50+5)	// must match server!
+#define MAXMETA			89		// must match server!
 #define MAXITEMS		60		// must match server!
 #define MAXBUFFS		40		// must match server!
 #define MAXWPS			27

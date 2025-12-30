@@ -315,6 +315,9 @@ int is_ascroll(int in);
 #define IS_DISPELABLE1(tmp)		((tmp)==SK_BLIND || (tmp)==SK_WARCRY2 || (tmp)==SK_CURSE2 || (tmp)==SK_CURSE || (tmp)==SK_WARCRY || (tmp)==SK_WEAKEN2 || (tmp)==SK_WEAKEN || (tmp)==SK_SLOW2 || (tmp)==SK_SLOW || (tmp)==SK_DOUSE || (tmp)==SK_AGGRAVATE || (tmp)==SK_SCORCH || (tmp)==SK_DISPEL2)
 #define IS_DISPELABLE2(tmp)		((tmp)==SK_HASTE || (tmp)==SK_BLESS || (tmp)==SK_MSHIELD || (tmp)==SK_MSHELL || (tmp)==SK_PULSE || (tmp)==SK_ZEPHYR || (tmp)==SK_GUARD || (tmp)==SK_DISPEL || (tmp)==SK_REGEN || (tmp)==SK_PROTECT || (tmp)==SK_ENHANCE || (tmp)==SK_LIGHT)
 
+#define IS_WEARINGHAND(cn, n, in)	(it[ch[cn].worn[n]].temp==in || it[ch[cn].worn[n]].orig_temp==in)
+#define IS_WEARINGHANDS(cn, in)		(IS_WEARINGHAND(cn, WN_RHAND, in) || IS_WEARINGHAND(cn, WN_LHAND, in))
+#define IS_WEARINGPHOENIX(cn)		(IS_WEARINGHANDS(cn, IT_WP_RISINGPHO) || IS_WEARINGHANDS(cn, WN_RHAND, IT_WB_RISINGPHO))
 
 /* *** CASINO *** */
 

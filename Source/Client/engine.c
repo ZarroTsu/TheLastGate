@@ -346,7 +346,7 @@ char *at_name[5]={
 #define AT_STR		4
 
 struct skilltab *skilltab;
-struct metaStat metaStats[90];
+struct metaStat *metaStats;
 
 struct sk_tree sk_tree[2][12]={
 	{     // Character Class Tree
@@ -785,6 +785,41 @@ int sk_score(int n)
 	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
 }
 
+struct skilltab *skilltab;
+struct metaStat *metaStats;
+
+void set_temp_skilltab(void)
+{
+	int n;
+	for (n=0; n<MAXSKILL; n++)
+	{
+		skilltab[n].nr = n;
+		skilltab[n].sortkey = n;
+		skilltab[n].show = 0;
+		sprintf(skilltab[n].name,"skill%02d", n);
+		sprintf(skilltab[n].desc,"desc%02d", n);
+		skilltab[n].attrib[0] = 0;
+		skilltab[n].attrib[1] = 1;
+		skilltab[n].attrib[2] = 2;
+	}
+}
+
+void set_temp_metaStats(void)
+{
+	int n;
+	for (n=0; n<MAXMETA; n++)
+	{
+		metaStats[n].show = 1;
+		metaStats[n].flag = 0;
+		metaStats[n].font = 1;
+		sprintf(metaStats[n].name,"stat%02d", n);
+		sprintf(metaStats[n].desc,"desc%02d", n);
+		metaStats[n].value = -1;
+		sprintf(metaStats[n].affix,"afx%02d", n);
+	}
+}
+
+/*
 int pl_speed=0, pl_atksp=0, pl_spmod=0, pl_skmod=0, pl_spapt=0, pl_movsp=0;
 int pl_critc=0, pl_critm=0, pl_topdm=0, pl_topd2=0, pl_reflc=0, pl_aoebn=0;
 int pl_hitsc=0, pl_parry=0, pl_coold=0, pl_casts=0, pl_dmgbn=0;
@@ -871,9 +906,9 @@ void init_meta_stats(void)
 	// Player cooldown rate - pl_cdrate
 	pl_cdrate = 100 * pl_basel / max(25, pl_coold);
 	
-	/*
-		Moon multiplier adjustments
-	*/
+	//
+	//	Moon multiplier adjustments
+	//
 	// FULL MOON
 	if (pl_flagb & (1 <<  8))
 	{
@@ -893,9 +928,9 @@ void init_meta_stats(void)
 		pl_spmod = 100;
 	}
 	
-	/*
-		Additional skill bonuses for GUI
-	*/
+	//
+	//	Additional skill bonuses for GUI
+	//
 	sk_proxi = sk_score(44) / (300/12);
 	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
 	sk_poiso = (sk_score(42)*pl_spmod/100 + 5) * DAM_MULT_POISON / 300;
@@ -1055,9 +1090,9 @@ void init_meta_stats(void)
 	if (pl_flagc & (1<<8)) // 20% more heal effect
 		sk_healr = sk_healr * 6/5;
 	
-	/*
-		Regeneration stats
-	*/
+	//
+	//	Regeneration stats
+	//
 	race_reg = sk_score(28) * moonmult / 20 + sk_score(28) * pl.hp[5]/2000;
 	race_res = sk_score(29) * moonmult / 20 + sk_score(29) * pl.end[5]/2000;
 	race_med = sk_score(30) * moonmult / 20 + sk_score(30) * pl.mana[5]/2000;
@@ -1180,6 +1215,7 @@ void init_meta_stats(void)
 	if (pl_flags & (1<<9)) // 20% damage null/shifted to mana
 		pl_ehp = pl_ehp * 100 /  80;
 }
+*/
 
 void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
 {
@@ -1208,10 +1244,34 @@ void show_meta_stats(int n)
 	// 8 = Violet
 	// 9 = White
 	
-	if (pl.worn[WN_SPMOD]==NULL) return;
+	int m, pos = n;
+	
+	if (!metaStats[n].show) return;
 	
 	// TODO: incorporate new method structure here.
+	if (n<7)
+	{
+		m = 0;					// Topmost standard stats
+	}
+	else if (hudmode==1)		// Offense Stats
+	{
+		m = 1 + (n+skill_pos>17?1:0);
+		n = n+skill_pos; if (n>=48) return;
+		pos -= 7;
+	}
+	else						// Defense Stats
+	{
+		m = 1 + (n+skill_pos>17?1:0);
+		n = n+41+skill_pos; if (n>=89) return;
+		pos -= 7;
+	}
 	
+	if (metaStats[n].flag)
+		meta_stat(m, pos, metaStats[n].font, metaStats[n].name, metaStats[n].value/100, metaStats[n].value%100, metaStats[n].affix);
+	else
+		meta_stat(m, pos, metaStats[n].font, metaStats[n].name, metaStats[n].value, -1, metaStats[n].affix);
+	
+	/*
 	if (n<7)					// Topmost standard stats
 	{
 		switch (n)
@@ -1383,6 +1443,7 @@ void show_meta_stats(int n)
 			default: break;
 		}
 	}
+	*/
 }
 
 void eng_display_win(int plr_sprite,int init)
@@ -1548,7 +1609,7 @@ void eng_display_win(int plr_sprite,int init)
 		if (hudmode==3)
 			copyspritex(do_darkmode?18098:18097, 134, 3,  0);
 		
-		init_meta_stats();
+		//init_meta_stats();
 		
 		// Display Skill Tree button if applicable - a similar check is required in inter.c
 		if (st_skill_pts_all(pl.tree_points)>0)
@@ -1564,7 +1625,7 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y,1,   "Weapon Value");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y,1,   "%11d",pl.weapon);
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y+14,1,"Armor Value");
-		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl_armor);
+		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+14,1,"%11d",pl.armor);
 		dd_xputtext(GUI_WV_X,   GUI_WV_Y+28,1,"Experience");
 		dd_xputtext(GUI_WV_X+92,GUI_WV_Y+28,1,"%11d",pl.points_tot);
 		dd_xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
@@ -1670,7 +1731,7 @@ void eng_display_win(int plr_sprite,int init)
 			}
 			else
 			{
-				show_meta_stats(7+n);
+				show_meta_stats(n+7);
 			}
 		}
 	}
@@ -4044,6 +4105,10 @@ void engine(void)
 	unsigned int t;
 	
 	skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
+	metaStats=malloc(sizeof(struct metaStat)*MAXMETA);
+	
+	set_temp_skilltab();
+	set_temp_metaStats();
 	
 	init_done=1;
 	

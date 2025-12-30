@@ -180,7 +180,7 @@ void sounder(void *dummy)
 			if (!start[n]) {
 				hr=sb[n]->lpVtbl->GetCurrentPosition(sb[n],&pos,NULL);
 				if (hr!=DD_OK) { sound_error(hr,desk_hwnd,"GetCurrentPosition"); continue; }
-				if ((int)(pos)<cpos[n]+BUFFCHUNK && (int)(pos)+(BUFFSIZE/2)>cpos[n]) continue;
+				if (pos<(unsigned)(cpos[n]+BUFFCHUNK) && pos+(BUFFSIZE/2)>(unsigned)(cpos[n])) continue;
 				rsize=BUFFCHUNK;
 			} else { pos=0; rsize=BUFFSIZE; start[n]=0; }
 
@@ -196,7 +196,7 @@ void sounder(void *dummy)
 			//xlog("size=%dK len=%dK",size1>>10,len>>10);
 			if (len<size1) {
 				memset((unsigned char*)ptr1+len,127,size1-len);
-				if ((int)(pos)<cpos[n]) {
+				if (pos<(unsigned)(cpos[n])) {
 					hr=sb[n]->lpVtbl->Play(sb[n],0,0,0);
 					if (hr!=DD_OK) { sound_error(hr,desk_hwnd,"Play"); close(shandle[n]); }
 					hr=sb[n]->lpVtbl->SetVolume(sb[n],volume[n]);

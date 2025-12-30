@@ -53,7 +53,7 @@ extern int do_exit;
 
 extern struct sk_tree sk_tree[2][12];
 extern struct skilltab *skilltab;
-extern struct metaStat metaStats[90];
+extern struct metaStat *metaStats;
 
 int sv_cmd(unsigned char *buf);
 void sv_newplayer(unsigned char *buf);
@@ -559,9 +559,10 @@ int sv_terminology(unsigned char *buf)
 			case ST_META_DESC20: memcpy(metaStats[n].desc+190, buf+3, 10); return 13;
 			case ST_META_VALUES: 
 			              metaStats[n].value   =     *(short int*)(buf+3);
-			              metaStats[n].decimal = *(unsigned char*)(buf+5);
+						  metaStats[n].flag    = *(unsigned char*)(buf+5);
 			                        memcpy(metaStats[n].affix, buf+6,  8);
-			              metaStats[n].font   = *(unsigned char*)(buf+14); return 15;
+			              metaStats[n].font   = *(unsigned char*)(buf+14); 
+						  metaStats[n].show   = *(unsigned char*)(buf+15); return 16;
 			default: break;
 		}
 	}
@@ -1430,6 +1431,7 @@ int sv_cmd(unsigned char *buf)
 		case SV_TERM_STREE:
 		case SV_TERM_CTREE:
 		case SV_TERM_SKILLS:
+		case SV_TERM_META:
 			return sv_terminology(buf);
 		
 		case SV_MOTD0:		sv_motd(buf,0); break;

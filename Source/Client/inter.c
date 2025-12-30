@@ -933,10 +933,13 @@ int mouse_statbox(int x,int y,int state)
 	return ret;
 }
 
-extern int pl_dmgbn, pl_reflc, pl_aoebn, pl_flags, pl_flagb, pl_flagc, pl_dmgrd;
+//extern int pl_dmgbn, pl_reflc, pl_aoebn, pl_flags, pl_flagb, pl_flagc, pl_dmgrd;
 
 void meta_stat_descs(int n)
 {
+	xlog(1,metaStats[n].desc);
+	
+	/*
 	if (n<7)					// Topmost standard stats
 	{
 		switch (n)
@@ -1106,6 +1109,7 @@ void meta_stat_descs(int n)
 			default: break;
 		}
 	}
+	*/
 }
 
 int mouse_statbox2(int x,int y,int state)
@@ -1284,7 +1288,7 @@ int mouse_statbox2(int x,int y,int state)
 	} 
 	else if (state==MS_LB_UP && (hudmode==0 || hudmode==3))
 	{
-		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,0);
+		cmd3(CL_CMD_SKILL,skilltab[n+skill_pos].nr,selected_char,skilltab[n+skill_pos].attrib[0]);
 	}
 	return 1;
 }
