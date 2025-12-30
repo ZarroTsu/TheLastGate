@@ -937,6 +937,7 @@ int mouse_statbox(int x,int y,int state)
 
 void meta_stat_descs(int n)
 {
+	xlog(5,metaStats[n].name);
 	xlog(1,metaStats[n].desc);
 	
 	/*
@@ -1253,6 +1254,7 @@ int mouse_statbox2(int x,int y,int state)
 				//else
 				//{
 					strcpy(tmp, skilltab[n+skill_pos].name);
+					xlog(5,skilltab[n+skill_pos].name);
 					xlog(1,skilltab[n+skill_pos].desc);
 				//}
 				

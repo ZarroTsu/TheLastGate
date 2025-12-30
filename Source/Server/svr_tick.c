@@ -2484,7 +2484,7 @@ void plr_update_meta_stat_values(int nr, int n)
 	else if (metaStats[n].sknum == SK_IMMOLATE) { if (IS_WEARINGPHOENIX(cn)) m = 1; else m = 0; }
 	else if (metaStats[n].sknum >=0 && metaStats[n].sknum < 50 && B_SK(cn, metaStats[n].sknum)) m = 1;
 	
-	*(unsigned char*)(buf +15) = (unsigned char)m;
+	*(unsigned char*)(buf +15) = (unsigned char)(m);
 	
 	xsend(nr, buf, 16);
 }
@@ -2514,7 +2514,7 @@ void plr_update_meta_terminology(int nr, int n)
 		xsend(nr, buf, 13);
 	}
 	
-	for (m=0; m<20; m++)
+	for (m=0; m<12; m++)
 	{
 		buf[1] = ST_META_DESC+m;
 		mcpy(buf+3, metaStats[n].desc+m*10, 10);
@@ -2686,7 +2686,6 @@ void plr_newlogin(int nr)
 	
 	plr_update_all_skill_terminology(nr);
 	plr_update_all_meta_terminology(nr);
-	plr_update_all_meta_stat_values(nr);
 	
 	// do_staff_log(2,"New player %s entered the game!\n",ch[cn].name);
 	do_announce(cn, 0, "A new player has entered the game.\n", ch[cn].name);
@@ -2849,7 +2848,6 @@ void plr_login(int nr)
 	
 	plr_update_all_skill_terminology(nr);
 	plr_update_all_meta_terminology(nr);
-	plr_update_all_meta_stat_values(nr);
 	
 	if (ch[cn].data[79] != VERSION)
 	{

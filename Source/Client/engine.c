@@ -815,7 +815,7 @@ void set_temp_metaStats(void)
 		sprintf(metaStats[n].name,"stat%02d", n);
 		sprintf(metaStats[n].desc,"desc%02d", n);
 		metaStats[n].value = -1;
-		sprintf(metaStats[n].affix,"afx%02d", n);
+		sprintf(metaStats[n].affix,"", n);
 	}
 }
 
@@ -1246,8 +1246,6 @@ void show_meta_stats(int n)
 	
 	int m, pos = n;
 	
-	if (!metaStats[n].show) return;
-	
 	// TODO: incorporate new method structure here.
 	if (n<7)
 	{
@@ -1255,16 +1253,18 @@ void show_meta_stats(int n)
 	}
 	else if (hudmode==1)		// Offense Stats
 	{
-		m = 1 + (n+skill_pos>17?1:0);
+		m = 1 + (n>17?1:0);
 		n = n+skill_pos; if (n>=48) return;
 		pos -= 7;
 	}
 	else						// Defense Stats
 	{
-		m = 1 + (n+skill_pos>17?1:0);
+		m = 1 + (n>17?1:0);
 		n = n+41+skill_pos; if (n>=89) return;
 		pos -= 7;
 	}
+	
+	if (!metaStats[n].show) return;
 	
 	if (metaStats[n].flag)
 		meta_stat(m, pos, metaStats[n].font, metaStats[n].name, metaStats[n].value/100, metaStats[n].value%100, metaStats[n].affix);
