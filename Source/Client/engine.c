@@ -660,7 +660,7 @@ unsigned int	show_shop=0,show_wps=0,show_tree=0,dept_page=0;
 
 unsigned int	show_book=0,show_motd=0,show_newp=0,show_tuto=0,tuto_page=0,tuto_max=0;
 
-int				inv_pos=0,skill_pos=0,wps_pos=0,hudmode=0,mm_magnify=2;
+int				inv_pos=0,skill_pos=0,meta_pos=0,wps_pos=0,hudmode=0,mm_magnify=2;
 
 unsigned int   show_look=0,
 look_nr=0,			// look at char/item nr
@@ -1254,13 +1254,13 @@ void show_meta_stats(int n)
 	else if (hudmode==1)		// Offense Stats
 	{
 		m = 1 + (n>17?1:0);
-		n = n+skill_pos; if (n>=48) return;
+		n = n+meta_pos; if (n>=48) return;
 		pos -= 7;
 	}
 	else						// Defense Stats
 	{
 		m = 1 + (n>17?1:0);
-		n = n+41+skill_pos; if (n>=89) return;
+		n = n+41+meta_pos; if (n>=89) return;
 		pos -= 7;
 	}
 	
@@ -1571,7 +1571,11 @@ void eng_display_win(int plr_sprite,int init)
 		}
 		
 		// Scroll Bars for Skills and Inventory
-		dd_showbar(234,152+(skill_pos*58)/(MAXSKILL-10)+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+		if (hudmode == 1 || hudmode == 2)
+			dd_showbar(234,152+(meta_pos*58)/(((MAXMETA-7)/2)-10)+(meta_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+		else
+			dd_showbar(234,152+(skill_pos*58)/MAXSK_SCR+(skill_pos>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+		
 		dd_showbar(601, 36+(inv_pos *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
 
 		// display info-texts

@@ -23,7 +23,7 @@ extern int noshop;
 extern int selected_char;
 
 // Scroll Wheel - using position from other files
-extern int inv_pos,skill_pos,wps_pos,hudmode;
+extern int inv_pos,skill_pos,meta_pos,wps_pos,hudmode;
 extern int gui_inv_x[],gui_inv_y[],gui_skl_names[];
 extern unsigned int dept_page;
 
@@ -593,11 +593,19 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				
 				//  SKILL LIST
 				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
-				{ 
-					if (skill_pos<MAXSKILL-10)
-						skill_pos++; 
+				{
+					if (hudmode == 1 || hudmode == 2)
+					{
+						if (meta_pos<MAXMT_SCR)
+							meta_pos++; 
+					}
+					else
+					{
+						if (skill_pos<MAXSK_SCR)
+							skill_pos++; 
+					}
 				}
-
+				
 				//  WAYPOINT PAGE - this was defined in multiple places so one more cant hurt!
 				if (show_wps) {
 					if (mx>(((1280/2)-(320/2))) && mx<(((1280/2)-(320/2))+280-13) && my>(((736/2)-(320/2)+72)+1) && my<(((736/2)-(320/2)+72)+1+280))
@@ -641,8 +649,17 @@ LRESULT FAR PASCAL _export MainWndProc(HWND hWnd, UINT message,WPARAM wParam, LP
 				//  SKILL LIST
 				if (mx>gui_skl_names[RECT_X1] && mx<gui_skl_names[RECT_X2]+110 && my>gui_skl_names[RECT_Y1] && my<gui_skl_names[RECT_Y2]) 
 				{ 
-					if (skill_pos>0)
-						skill_pos--; 
+					if (hudmode == 1 || hudmode == 2)
+					{
+						if (meta_pos>0)
+							meta_pos--; 
+					}
+					else
+					{
+						if (skill_pos>0)
+							skill_pos--; 
+					}
+					
 				}
 
 				//  WAYPOINT PAGE

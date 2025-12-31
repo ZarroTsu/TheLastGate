@@ -33,7 +33,7 @@ int gui_hud_b[]		= { 260, 181, 196, 211 };
 
 // Back to the regular Borland defines
 extern int init_done;
-extern int inv_pos,skill_pos,wps_pos,hudmode,mm_magnify;
+extern int inv_pos,skill_pos,meta_pos,wps_pos,hudmode,mm_magnify;
 extern unsigned int look_nr,look_type;
 extern unsigned char inv_block[];
 extern int tile_x,tile_y,tile_type;
@@ -253,27 +253,60 @@ void button_command(int nr)
 
 		// Scroll bar for skill list
 		case 14: 
-			if (keys)
+			if (hudmode == 1 || hudmode == 2)
 			{
-				if (skill_pos>11)	skill_pos -= 10; 
-				else 				skill_pos  = 0;
+				if (keys)
+				{
+					if (meta_pos>11)	meta_pos -= 10; 
+					else 				meta_pos  = 0;
+				}
+				else
+				{
+					if (meta_pos> 1)	meta_pos -= 2; 
+					else				meta_pos  = 0;
+				}
 			}
 			else
 			{
-				if (skill_pos> 1)	skill_pos -= 2; 
-				else				skill_pos  = 0;
+				if (keys)
+				{
+					if (skill_pos>11)	skill_pos -= 10; 
+					else 				skill_pos  = 0;
+				}
+				else
+				{
+					if (skill_pos> 1)	skill_pos -= 2; 
+					else				skill_pos  = 0;
+				}
 			}
 			break;
-		case 15: 
-			if (keys)
+		case 15:
+			if (hudmode == 1 || hudmode == 2)
 			{
-				if (skill_pos<MAXSKILL-20)	skill_pos += 10; 
-				else						skill_pos  = MAXSKILL-10;
+				if (keys)
+				{
+					if (meta_pos<MAXMT_SCR-10)	meta_pos += 10; 
+					else						meta_pos  = MAXMT_SCR;
+				}
+				else
+				{
+					if (meta_pos<MAXMT_SCR)		meta_pos += 2; 
+					else						meta_pos  = MAXMT_SCR;
+				}
+
 			}
 			else
 			{
-				if (skill_pos<MAXSKILL-10)	skill_pos += 2; 
-				else						skill_pos  = MAXSKILL-10;
+				if (keys)
+				{
+					if (skill_pos<MAXSK_SCR-10)	skill_pos += 10; 
+					else						skill_pos  = MAXSK_SCR;
+				}
+				else
+				{
+					if (skill_pos<MAXSK_SCR)	skill_pos += 2; 
+					else						skill_pos  = MAXSK_SCR;
+				}
 			}
 			break;
 		
@@ -348,7 +381,9 @@ void button_command(int nr)
 
 		default: break;
 	}
-	if (skill_pos>MAXSKILL-10) skill_pos = MAXSKILL-10;
+	if (meta_pos>MAXMT_SCR) meta_pos = MAXMT_SCR;
+	if (meta_pos<0) meta_pos = 0;
+	if (skill_pos>MAXSK_SCR) skill_pos = MAXSK_SCR;
 	if (skill_pos<0) skill_pos = 0;
 }
 
@@ -937,8 +972,14 @@ int mouse_statbox(int x,int y,int state)
 
 void meta_stat_descs(int n)
 {
-	xlog(5,metaStats[n].name);
-	xlog(1,metaStats[n].desc);
+	if (n<0) return;
+	if (n>MAXMETA) return;
+	if (!metaStats[n+meta_pos].show) return;
+	if (strcmp(metaStats[n+meta_pos].name, "  Passive Stats:")==0) return;
+	if (strcmp(metaStats[n+meta_pos].name, "  Active Stats:")==0) return;
+	
+	xlog(5,metaStats[n+meta_pos].name);
+	xlog(1,metaStats[n+meta_pos].desc);
 	
 	/*
 	if (n<7)					// Topmost standard stats
@@ -1256,6 +1297,10 @@ int mouse_statbox2(int x,int y,int state)
 					strcpy(tmp, skilltab[n+skill_pos].name);
 					xlog(5,skilltab[n+skill_pos].name);
 					xlog(1,skilltab[n+skill_pos].desc);
+					xlog(5,"Affected by: %s, %s, %s", 
+						at_name[skilltab[n+skill_pos].attrib[0]], 
+						at_name[skilltab[n+skill_pos].attrib[1]], 
+						at_name[skilltab[n+skill_pos].attrib[2]]);
 				//}
 				
 				if (last_skill == n+skill_pos)
@@ -1285,7 +1330,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		else if (hudmode==2)
 		{
-			meta_stat_descs(n+7);
+			meta_stat_descs(n+48);
 		}
 	} 
 	else if (state==MS_LB_UP && (hudmode==0 || hudmode==3))

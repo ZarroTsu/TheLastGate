@@ -23,6 +23,9 @@
 #define MAXBUFFS		40		// must match server!
 #define MAXWPS			27
 
+#define MAXSK_SCR		(MAXSKILL-10)
+#define MAXMT_SCR		((MAXMETA-7)/2-10)
+
 // -------- Damage Multipliers -------- //
 
 #define DAM_MULT_HIT		 250
