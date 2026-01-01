@@ -50,7 +50,7 @@ static BindingDescriptor binding_registry[] = {
 
     /* World Hotkeys */
     {
-        "Toggle Health Percent", TOGGLE_PERCENT_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F4, KEYBIND_MOD_NONE},
+        "Toggle Health %", TOGGLE_PERCENT_HOTKEY, BINDING_CATEGORY_WORLD, {SDLK_F4, KEYBIND_MOD_NONE},
         {SDLK_F4, KEYBIND_MOD_NONE}
     },
     {
