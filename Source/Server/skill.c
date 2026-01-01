@@ -262,7 +262,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Might",                         "+4 to Strength.",
 		  6614,                            "" },
 		{ "Bulwark",                       "+3 to Armor Value.",
-		  6615,                            "" },
+		  6603,                            "" },
 		{ "Serrated Blades",               "Cleave deals additional damage based on ",
 		  6616,                            "your total Thorns." },
 		{ "Sharkskin",                     "20%% more total Thorns.",
@@ -278,13 +278,13 @@ struct sk_tree sk_tree[10][12]={
 		{ "Bastion",                       "20%% of total Resistance is granted as ",
 		  6622,                            "extra Immunity." },
 		{ "Unbreakable",                   "9%% more total Armor Value.",
-		  6623,                            "" },
+		  6611,                            "" },
 		{ "Rampart",                       "50%% more Parry granted by your Shield ",
 		  6624,                            "skill." }
 	}, // "         '         '         ", "         '         '         '         '         "
 	{	// Skald
 		{ "Muscle",                        "+3 to Weapon Value.",
-		  6625,                            "" },
+		  6601,                            "" },
 		{ "Dexterity",                     "+4 to Agility.",
 		  6626,                            "" },
 		{ "Persistance",                   "+20 Endurance.",
@@ -292,7 +292,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Nocturne",                      "20%% increased effect of Aria.",
 		  6628,                            "" },
 		{ "Valor",                         "9%% more total Weapon Value.",
-		  6629,                            "" },
+		  6605,                            "" },
 		{ "Enthusiasm",                    "Your Aria additionally grants nearby ",
 		  6630,                            "allies 10%% of your Weapon Value." },
 		{ "Slaying",                       "+3%% Critical Multiplier for every 10 ",
@@ -326,7 +326,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Harrier",                       "3%% increased total Agility and ",
 		  6644,                            "Strength." },
 		{ "Butchery",                      "0.5%% more effect of Cleave for every ",
-		  6645,                            "10 total Strength." },
+		  6616,                            "10 total Strength." },
 		{ "Champion",                      "Enemies beside and behind you no longer ",
 		  6646,                            "gain a bonus to hitting you." },
 		{ "Zealotry",                      "20%% more total Spell Aptitude.",
@@ -346,7 +346,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Grandiosity",                   "20%% more total Area of Effect.",
 		  6653,                            "" },
 		{ "Brilliance",                    "+1 to Spell Modifier.",
-		  6654,                            "" },
+		  6642,                            "" },
 		{ "Coordination",                  "0.5%% more effect of Lethargy for every ",
 		  6655,                            "10 total Willpower." },
 		{ "Pragmatic",                     "3%% increased total Willpower and ",
@@ -374,7 +374,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Harpooner",                     "20%% more Hit and Parry score while ",
 		  6666,                            "using a Spear." },
 		{ "Mysticism",                     "All spell skills use the attributes ",
-		  6667,                            "(BRV+INT)/2 + Willpower + Willpower." },
+		  6699,                            "(BRV+INT)/2 + Willpower + Willpower." },
 		{ "Overwhelming Willpower",        "3%% increased total Willpower. ",
 		  6668,                            "+10 to Willpower Limit." },
 		{ "Shaper",                        "0.5%% more effect of Shadow Copy for ",
@@ -404,7 +404,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Overwhelming Intuition",        "3%% increased total Intuition.",
 		  6680,                            "+10 to Intuition Limit." },
 		{ "Wizardry",                      "All spell skills use the attributes ",
-		  6681,                            "(BRV+WIL)/2 + Intuition + Intuition." },
+		  6699,                            "(BRV+WIL)/2 + Intuition + Intuition." },
 		{ "Flow",                          "25%% of overcapped Mana is granted as ",
 		  6682,                            "additional Hitpoints." },
 		{ "Perpetuity",                    "20%% more total Mana.",
@@ -418,7 +418,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Boldness",                      "+4 to Braveness.",
 		  6686,                            "" },
 		{ "Avoidance",                     "+3 to Parry Score.",
-		  6687,                            "" },
+		  6624,                            "" },
 		{ "Assassination",                 "20%% increased effect of Precision.",
 		  6688,                            "" },
 		{ "Rigor",                         "4%% more total Hit Score.",
@@ -436,7 +436,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Flexibility",                   "4%% more total Parry Score.",
 		  6695,                            "" },
 		{ "Litheness",                     "50%% reduced extra damage taken from ",
-		  6696,                            "enemy Critical Hits." }
+		  6634,                            "enemy Critical Hits." }
 	}, // "         '         '         ", "         '         '         '         '         "
 	{	// Lycanthrope
 		{ "Maiming",                       "+5 to Top Damage.",
@@ -444,7 +444,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Feast",                         "+10 Hitpoints, Endurance, and Mana.",
 		  6698,                            "" },
 		{ "Insight",                       "+2 to Spell Modifier.",
-		  6699,                            "" },
+		  6642,                            "" },
 		{ "Lust",                          "Ferocity grants +1%% base crit chance ",
 		  6700,                            "per empty gear slot." },
 		{ "Ravager",                       "20%% more total Top Damage.",
@@ -524,7 +524,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Might *",                     "+2 to Strength.",
 	  6614,                            "" },
 	{ "* Ironskin *",                  "Gain 1 additional Armor Value for ",			// *
-	  6615,                            "every 200 total Attributes." },
+	  6603,                            "every 200 total Attributes." },
 	{ "* Decapitation *",              "Cleave kills enemies left below ",				// *
 	  6616,                            "2%% remaining health." },
 	{ "* Sharkskin *",                 "5%% more total Thorns.",
@@ -540,12 +540,12 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Bastion *",                   "4%% of total Resistance is granted as ",
 	  6622,                            "extra Immunity." },
 	{ "* Unbreakable *",               "3%% more total Armor Value.",
-	  6623,                            "" },
+	  6611,                            "" },
 	{ "* Deflecting *",                "5%% of Shield Armor Value is granted as ",		// *
 	  6624,                            "extra Parry Score." },
    // "         '         '         ", "         '         '         '         '         "
 	{ "* Force *",                     "Gain 1 additional Weapon Value for ",			// *
-	  6625,                            "every 200 total Attributes." },
+	  6601,                            "every 200 total Attributes." },
 	{ "* Dexterity *",                 "+2 to Agility.",
 	  6626,                            "" },
 	{ "* Persistance *",               "+10 Endurance.",
@@ -553,7 +553,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Nocturne *",                  "5%% increased effect of Aria.",
 	  6628,                            "" },
 	{ "* Valor *",                     "3%% more total Weapon Value.",
-	  6629,                            "" },
+	  6605,                            "" },
 	{ "* Blade Dancer *",              "8%% more Weapon Value from Dual Swords.",		// *
 	  6630,                            "" },
 	{ "* Slaying *",                   "+1%% Critical Multiplier for every 10 ",
@@ -586,7 +586,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Harrier *",                   "1%% increased total Agility and ",
 	  6644,                            "Strength." },
 	{ "* Butchery *",                  "0.2%% more effect of Cleave for every ",
-	  6645,                            "10 total Strength." },
+	  6616,                            "10 total Strength." },
 	{ "* Conqueror *",                 "5%% more damage dealt to enemies beside ",		// *
 	  6646,                            "or behind you." },
 	{ "* Zealotry *",                  "5%% more total Spell Aptitude.",
@@ -605,7 +605,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Grandiosity *",               "10%% more total Area of Effect.",
 	  6653,                            "" },
 	{ "* New Moon *",                  "10%% increased effect of bonuses granted ",		// *
-	  6654,                            "during New Moons." },
+	  6642,                            "during New Moons." },
 	{ "* Coordination *",              "0.2%% more effect of Lethargy for every ",
 	  6655,                            "10 total Willpower." },
 	{ "* Pragmatic *",                 "1%% increased total Willpower and ",
@@ -632,7 +632,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Training *",                  "5%% more effective surround hit modifier ",
 	  6666,                            "while using a Spear." },
 	{ "* Waning *",                    "Spells gain an additional 10%% of ",			// *
-	  6667,                            "Willpower towards attribute bonuses." },
+	  6699,                            "Willpower towards attribute bonuses." },
 	{ "* Overwhelming Willpower *",    "2%% increased total Willpower. ",
 	  6668,                            "+1 to Willpower Limit." },
 	{ "* Shaper *",                    "0.2%% more effect of Shadow Copy for ",
@@ -661,7 +661,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Overwhelming Intuition *",    "2%% increased total Intuition. ",
 	  6680,                            "+1 to Intuition Limit." },
 	{ "* Waxing *",                    "Spells gain an additional 10%% of ",			// *
-	  6681,                            "Intuition towards attribute bonuses." },
+	  6699,                            "Intuition towards attribute bonuses." },
 	{ "* Flow *",                      "10%% of overcapped Mana is granted as ",
 	  6682,                            "additional Hitpoints." },
 	{ "* Perpetuity *",                "5%% more total Mana.",
@@ -674,7 +674,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Boldness *",                  "+2 to Braveness.",
 	  6686,                            "" },
 	{ "* Avoidance *",                 "+1 to Parry Score.",
-	  6687,                            "" },
+	  6624,                            "" },
 	{ "* Assassination *",             "5%% increased effect of Precision.",
 	  6688,                            "" },
 	{ "* Rigor *",                     "1%% more total Hit Score.",
@@ -692,14 +692,14 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "* Flexibility *",               "1%% more total Parry Score.",
 	  6695,                            "" },
 	{ "* Revoke *",                    "5%% of damage taken from enemy critical ",		// *
-	  6696,                            "hits is reflected." },
+	  6634,                            "hits is reflected." },
    // "         '         '         ", "         '         '         '         '         "
 	{ "* Maiming *",                   "+2 to Top Damage.",
 	  6697,                            "" },
 	{ "* Feast *",                     "+5 Hitpoints, Endurance, and Mana.",
 	  6698,                            "" },
 	{ "* Half Moon *",                 "5%% increased effect of bonuses granted ",		// *
-	  6699,                            "during Moons." },
+	  6642,                            "during Moons." },
 	{ "* Lustful *",                   "+1%% base crit chance per empty ring ",			// *
 	  6700,                            "slot." },
 	{ "* Ravager *",                   "5%% more total Top Damage.",
