@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.22)
+﻿cmake_minimum_required(VERSION 4.1.0)
 
 # vcpkg integration - must be set before project()
 # Set CMAKE_TOOLCHAIN_FILE if not already set (allows command-line override)
