@@ -4753,7 +4753,7 @@ void engine(void)
 			inventory_render();
 			quick_stats_render(&game_ui_state.quick_stat_state);
 			if (g_config.runtime.show_performance) {
-				render_perf_window();
+				perf_window_render(ui_get_perf_window_state());
 			}
 
 			imgui_render();
