@@ -51,7 +51,7 @@ static bool is_spell(int skill_id) {
     }
 }
 
-static AttributeCostResult cost_to_raise_attributes_by_5(const int attributes[3]) {
+static AttributeCostResult cost_to_raise_attributes_by_5(const char attributes[3]) {
     int initial_values[5] = {pl.attrib[0][0], pl.attrib[1][0], pl.attrib[2][0], pl.attrib[3][0], pl.attrib[4][0]};
     int total_cost = 0;
     int startingValue = (initial_values[attributes[0]] + initial_values[attributes[1]] + initial_values[attributes[2]])
