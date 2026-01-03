@@ -100,7 +100,13 @@ target_compile_options(TheLastGate PRIVATE
         -Wno-int-conversion              # Disable int/pointer conversion warnings (often related)
 )
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/opengl.cmake)
+include(cmake/dependencies/sdl2.cmake)
+
+include(cmake/dependencies/pnglib.cmake)
+
+include(cmake/dependencies/imgui.cmake)
+
+include(cmake/dependencies/opengl.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/embed_shaders.cmake)
 
@@ -126,11 +132,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     )
 endif ()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2_setup.cmake)
-
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/link_libraries.cmake)
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tinyfiledialogs.cmake)
 

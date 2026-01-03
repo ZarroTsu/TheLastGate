@@ -28,9 +28,9 @@ add_library(imgui_wrapper_c STATIC ${IMGUI_WRAPPER_SOURCE})
 
 # Set C++ standard for wrapper compilation
 set_target_properties(imgui_wrapper_c PROPERTIES
-    CXX_STANDARD 11
+    CXX_STANDARD 23
     CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
+    CXX_EXTENSIONS YES
 )
 
 # The wrapper needs to include imgui headers (provided by imgui::imgui target)
