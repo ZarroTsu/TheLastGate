@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.5.0](https://github.com/jamesblack/TheLastGate/compare/v3.4.0...v3.5.0) (2026-01-03)
+
+
+### Features
+
+* Binding Options alignment ([f038d6b](https://github.com/jamesblack/TheLastGate/commit/f038d6bd11c60f90fd565ca464f2e62021604abb))
+* **upstream:** Future Skill Tree GFX ([edd39f7](https://github.com/jamesblack/TheLastGate/commit/edd39f768aa03449f20d3fadf7d93a0fe5785436))
+
+
+### Miscellaneous Chores
+
+* Bump Version ([912bd4c](https://github.com/jamesblack/TheLastGate/commit/912bd4c31cb00994c5fb26b39c0f15b8ef0d59a1))
+* Bump Version ([e62cfee](https://github.com/jamesblack/TheLastGate/commit/e62cfee60286692a0ea7a2ae288c2c8d1be2b3a4))
+
 ## [3.4.0](https://github.com/jamesblack/TheLastGate/compare/v3.3.0...v3.4.0) (2025-12-28)
 
 
