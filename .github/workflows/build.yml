@@ -58,6 +58,13 @@ jobs:
             automake \
             libtool
 
+      - name: Install Modern Clang (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: egor-tensin/setup-clang@v2
+        with:
+          version: 21
+          platform: x64
+
       - name: Setup MSYS2 (MinGW64)
         if: matrix.mingw
         uses: msys2/setup-msys2@v2
@@ -65,6 +72,7 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-clang
             mingw-w64-x86_64-ninja
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-pkg-config
