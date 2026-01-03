@@ -7,6 +7,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_net.h>
 
+#include "engine.h"
 #include "game/game_input.h"
 #include "game/game_ui.h"
 #include "graphics/render.h"
@@ -124,6 +125,115 @@ unsigned int xcrypt(unsigned int val)
 	res^=0x5a7ce52e;
 
 	return res;
+}
+
+int sv_terminology(unsigned char *buf) {
+	int tn = -1, n = 0;
+
+	DEBUG("SV TERMINOLOGY");
+
+	if (buf[0] == SV_TERM_STREE) tn = 0;
+	if (buf[0] == SV_TERM_CTREE) tn = 1;
+
+	if (tn >= 0) {
+		n = buf[2];
+
+		switch (buf[1]) {
+			case ST_TREE_ICON:   sk_tree[tn][n].icon = *(unsigned short*)(buf+3); return  5;
+			case ST_TREE_NAME1:  memcpy(sk_tree[tn][n].name,    buf+3, 10);       return 13;
+			case ST_TREE_NAME2:  memcpy(sk_tree[tn][n].name+10, buf+3, 10);       return 13;
+			case ST_TREE_NAME3:  memcpy(sk_tree[tn][n].name+20, buf+3, 10);       return 13;
+			case ST_TREE_DESC1A: memcpy(sk_tree[tn][n].dsc1,    buf+3, 10);       return 13;
+			case ST_TREE_DESC1B: memcpy(sk_tree[tn][n].dsc1+10, buf+3, 10);       return 13;
+			case ST_TREE_DESC1C: memcpy(sk_tree[tn][n].dsc1+20, buf+3, 10);       return 13;
+			case ST_TREE_DESC1D: memcpy(sk_tree[tn][n].dsc1+30, buf+3, 10);       return 13;
+			case ST_TREE_DESC1E: memcpy(sk_tree[tn][n].dsc1+40, buf+3, 10);       return 13;
+			case ST_TREE_DESC2A: memcpy(sk_tree[tn][n].dsc2,    buf+3, 10);       return 13;
+			case ST_TREE_DESC2B: memcpy(sk_tree[tn][n].dsc2+10, buf+3, 10);       return 13;
+			case ST_TREE_DESC2C: memcpy(sk_tree[tn][n].dsc2+20, buf+3, 10);       return 13;
+			case ST_TREE_DESC2D: memcpy(sk_tree[tn][n].dsc2+30, buf+3, 10);       return 13;
+			case ST_TREE_DESC2E: memcpy(sk_tree[tn][n].dsc2+40, buf+3, 10);       return 13;
+			default: break;
+		}
+
+
+	}
+
+	if (buf[0]==SV_TERM_SKILLS) {
+		n = buf[2];
+		switch (buf[1]) {
+			case ST_SKILLS_SORT: skilltab[n].sortkey = *(unsigned char *) (buf + 3);
+				skilltab[n].attrib[0] = *(unsigned char *) (buf + 4);
+				skilltab[n].attrib[1] = *(unsigned char *) (buf + 5);
+				skilltab[n].attrib[2] = *(unsigned char *) (buf + 6);
+				skilltab[n].show = *(unsigned char *) (buf + 7);
+				return 8;
+			case ST_SKILLS_NAME1: memcpy(skilltab[n].name,     buf+3, 10); return 13;
+			case ST_SKILLS_NAME2: memcpy(skilltab[n].name+ 10, buf+3, 10); return 13;
+			case ST_SKILLS_NAME3: memcpy(skilltab[n].name+ 20, buf+3, 10); return 13;
+			case ST_SKILLS_DESC01: memcpy(skilltab[n].desc,     buf+3, 10); return 13;
+			case ST_SKILLS_DESC02: memcpy(skilltab[n].desc+ 10, buf+3, 10); return 13;
+			case ST_SKILLS_DESC03: memcpy(skilltab[n].desc+ 20, buf+3, 10); return 13;
+			case ST_SKILLS_DESC04: memcpy(skilltab[n].desc+ 30, buf+3, 10); return 13;
+			case ST_SKILLS_DESC05: memcpy(skilltab[n].desc+ 40, buf+3, 10); return 13;
+			case ST_SKILLS_DESC06: memcpy(skilltab[n].desc+ 50, buf+3, 10); return 13;
+			case ST_SKILLS_DESC07: memcpy(skilltab[n].desc+ 60, buf+3, 10); return 13;
+			case ST_SKILLS_DESC08: memcpy(skilltab[n].desc+ 70, buf+3, 10); return 13;
+			case ST_SKILLS_DESC09: memcpy(skilltab[n].desc+ 80, buf+3, 10); return 13;
+			case ST_SKILLS_DESC10: memcpy(skilltab[n].desc+ 90, buf+3, 10); return 13;
+			case ST_SKILLS_DESC11: memcpy(skilltab[n].desc+100, buf+3, 10); return 13;
+			case ST_SKILLS_DESC12: memcpy(skilltab[n].desc+110, buf+3, 10); return 13;
+			case ST_SKILLS_DESC13: memcpy(skilltab[n].desc+120, buf+3, 10); return 13;
+			case ST_SKILLS_DESC14: memcpy(skilltab[n].desc+130, buf+3, 10); return 13;
+			case ST_SKILLS_DESC15: memcpy(skilltab[n].desc+140, buf+3, 10); return 13;
+			case ST_SKILLS_DESC16: memcpy(skilltab[n].desc+150, buf+3, 10); return 13;
+			case ST_SKILLS_DESC17: memcpy(skilltab[n].desc+160, buf+3, 10); return 13;
+			case ST_SKILLS_DESC18: memcpy(skilltab[n].desc+170, buf+3, 10); return 13;
+			case ST_SKILLS_DESC19: memcpy(skilltab[n].desc+180, buf+3, 10); return 13;
+			case ST_SKILLS_DESC20: memcpy(skilltab[n].desc+190, buf+3, 10); return 13;
+			default: break;
+		}
+	}
+
+	if (buf[0]==SV_TERM_META) {
+		n = buf[2];
+
+		switch (buf[1]) {
+			case ST_META_NAME1:  memcpy(meta_stats[n].name,     buf+3, 10); return 13;
+			case ST_META_NAME2:  memcpy(meta_stats[n].name+ 10, buf+3, 10); return 13;
+			case ST_META_NAME3:  memcpy(meta_stats[n].name+ 20, buf+3, 10); return 13;
+			case ST_META_DESC01: memcpy(meta_stats[n].desc,     buf+3, 10); return 13;
+			case ST_META_DESC02: memcpy(meta_stats[n].desc+ 10, buf+3, 10); return 13;
+			case ST_META_DESC03: memcpy(meta_stats[n].desc+ 20, buf+3, 10); return 13;
+			case ST_META_DESC04: memcpy(meta_stats[n].desc+ 30, buf+3, 10); return 13;
+			case ST_META_DESC05: memcpy(meta_stats[n].desc+ 40, buf+3, 10); return 13;
+			case ST_META_DESC06: memcpy(meta_stats[n].desc+ 50, buf+3, 10); return 13;
+			case ST_META_DESC07: memcpy(meta_stats[n].desc+ 60, buf+3, 10); return 13;
+			case ST_META_DESC08: memcpy(meta_stats[n].desc+ 70, buf+3, 10); return 13;
+			case ST_META_DESC09: memcpy(meta_stats[n].desc+ 80, buf+3, 10); return 13;
+			case ST_META_DESC10: memcpy(meta_stats[n].desc+ 90, buf+3, 10); return 13;
+			case ST_META_DESC11: memcpy(meta_stats[n].desc+100, buf+3, 10); return 13;
+			case ST_META_DESC12: memcpy(meta_stats[n].desc+110, buf+3, 10); return 13;
+			case ST_META_DESC13: memcpy(meta_stats[n].desc+120, buf+3, 10); return 13;
+			case ST_META_DESC14: memcpy(meta_stats[n].desc+130, buf+3, 10); return 13;
+			case ST_META_DESC15: memcpy(meta_stats[n].desc+140, buf+3, 10); return 13;
+			case ST_META_DESC16: memcpy(meta_stats[n].desc+150, buf+3, 10); return 13;
+			case ST_META_DESC17: memcpy(meta_stats[n].desc+160, buf+3, 10); return 13;
+			case ST_META_DESC18: memcpy(meta_stats[n].desc+170, buf+3, 10); return 13;
+			case ST_META_DESC19: memcpy(meta_stats[n].desc+180, buf+3, 10); return 13;
+			case ST_META_DESC20: memcpy(meta_stats[n].desc+190, buf+3, 10); return 13;
+			case ST_META_VALUES:
+				meta_stats[n].value = *(short int *) (buf + 3);
+				meta_stats[n].flag = *(unsigned char *) (buf + 5);
+				memcpy(meta_stats[n].affix, buf + 6, 8);
+				meta_stats[n].font = *(unsigned char *) (buf + 14);
+				meta_stats[n].show = *(unsigned char *) (buf + 15);
+				return 16;
+			default: break;
+		}
+	}
+
+	return 16; // Should not be reached
 }
 
 void sv_newplayer(unsigned char *buf)
@@ -795,7 +905,7 @@ void sv_look8(unsigned char *buf)	// Blacksmith
 
 extern int noshop;
 
-void sv_closeshop(unsigned char *buf)
+void sv_closeshop()
 {
 	DEBUG("SV CLOSESHOP");
 	game_ui_state.open_shop=0; noshop=QSIZE*3;
@@ -831,7 +941,7 @@ void sv_showmotd(unsigned char *buf)
 	}
 }
 
-void sv_waypoints(unsigned char *buf)
+void sv_waypoints()
 {
 	DEBUG("SV WAYPOINTS");
 
@@ -1008,6 +1118,12 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOG8:		sv_log(buf,8); break;
 		case	SV_LOG9:		sv_log(buf,9); break;
 
+		case SV_TERM_STREE:
+		case SV_TERM_CTREE:
+		case SV_TERM_SKILLS:
+		case SV_TERM_META:
+			return sv_terminology(buf);
+
 		case	SV_MOTD0:		sv_motd(buf,0); break;
 		case	SV_MOTD1:		sv_motd(buf,1); break;
 		case	SV_MOTD2:		sv_motd(buf,2); break;
@@ -1032,7 +1148,7 @@ int sv_cmd(unsigned char *buf)
 		case	SV_LOOK7:				sv_look7(buf); return 8;
 		case	SV_LOOK8:				sv_look8(buf); return 8;
 
-		case	SV_CLOSESHOP:			sv_closeshop(buf); return 1;
+		case	SV_CLOSESHOP:			sv_closeshop(); return 1;
 
 		case	SV_SETTARGET:			sv_settarget(buf); return 13;
 
@@ -1045,7 +1161,7 @@ int sv_cmd(unsigned char *buf)
 		case  	SV_UNIQUE:             	sv_unique(buf); return 9;
 		case 	SV_IGNORE:		return sv_ignore(buf);
 
-		case	SV_WAYPOINTS:			sv_waypoints(buf); return 1;
+		case	SV_WAYPOINTS:			sv_waypoints(); return 1;
 		case	SV_SHOWMOTD:			sv_showmotd(buf); return 2;
 
 		case	SV_CLEARBOX:			sv_clearbox(buf); return 9;
@@ -1057,7 +1173,7 @@ int sv_cmd(unsigned char *buf)
 }
 
 #pragma argused
-void so_perf_report(int ticksize,int skip,int idle)
+void so_perf_report()
 {
 	unsigned char buf[16];
 
@@ -1158,7 +1274,7 @@ int tick_do(void)
 
         while (idx<csize) {
 		ret=sv_cmd(buf+idx);
-		if (ret==-1) { xlog(1,"Warning: syntax error in server data"); DEBUG("Warning: syntax error in server data"); exit(1); }
+		if (ret==-1) { xlog(1,"Warning: syntax error in server data"); log_critical("Warning: syntax error in server data"); exit(1); }
 		idx+=ret;
 	}
 

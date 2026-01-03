@@ -1,5 +1,5 @@
 //
-#define NETWORKING_VERSION 0x000D02
+#define NETWORKING_VERSION 0x000E00
 //
 
 #include "common.h"
@@ -156,7 +156,7 @@ void options(void);
 
 void xsend(unsigned char *buf);
 void engine_tick(void);
-void so_perf_report(int ticksize,int skip,int idle);
+void so_perf_report(void);
 int game_loop(void);
 int tick_do(void);
 void init_engine(void);
@@ -234,14 +234,12 @@ struct skilltab
 {
 	int nr;
 	char sortkey;
+	char show;
 
-	char name[40];
+	char name[30];
 	char desc[200];
 
-	char alt_a[200]; // If something changes the name
-	char alt_b[200]; // If something changes the desc
-
-	int attrib[3];
+	char attrib[3];
 };
 
 extern struct skilltab *skilltab;
@@ -257,9 +255,9 @@ struct wpslist
 
 struct sk_tree
 {
+	unsigned short icon;
 	char name[30];
 	char dsc1[42];
-	int icon;
 	char dsc2[42];
 };
 
@@ -269,9 +267,22 @@ struct sk_icon
 	int y;
 };
 
+struct MetaStat {
+	char show;
+	char flag;
+	char font;
+	char name[30];
+	char desc[200];
+	short value;
+	char decimal;
+	char affix[8];
+};
+
+
 extern struct wpslist wpslist[MAXWPS];
-extern struct sk_tree sk_tree[10][12];
+extern struct sk_tree sk_tree[2][12];
 extern struct sk_icon sk_icon[12];
+extern struct MetaStat *meta_stats;
 
 void say(char *input);
 void cmd(int cmd,int x,int y);

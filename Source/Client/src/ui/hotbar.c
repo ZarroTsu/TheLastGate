@@ -14,8 +14,6 @@ static int current_slot = 0;
 static const int usable_skills[26] = {SK_BLIND, SK_CLEAVE, SK_SHIELD, SK_LEAP, SK_RAGE, SK_TAUNT, SK_WEAKEN, SK_WARCRY, SK_BLAST, SK_BLESS, SK_CURSE, SK_DISPEL, SK_ENHANCE, SK_GHOST, SK_HASTE, SK_HEAL, SK_IDENT, SK_LETHARGY, SK_LIGHT, SK_MSHIELD, SK_POISON, SK_PROTECT, SK_PULSE, SK_RECALL, SK_SHADOW, SK_SLOW};
 
 static void get_skill_tab_info_from_id(const int skill_id, char *out_name, int *out_skill_tab_id) {
-    int pl_flags = pl.worn[WN_FLAGS];
-    int pl_flagb = pl.worn_p[WN_FLAGS];
     int skill_tab_id = -1;
     for (int i = 0; i < 55; i++) {
         if (skilltab[i].nr == skill_id) {
@@ -28,25 +26,8 @@ static void get_skill_tab_info_from_id(const int skill_id, char *out_name, int *
         snprintf(out_name, sizeof(out_name), "Invalid");
         return;
     }
-    if ((skill_id == 11 && (pl_flagb & (1 << 10))) || // Magic Shield -> Magic Shell
-        (skill_id == 19 && (pl_flags & (1 << 5))) || // Slow -> Greater Slow
-        (skill_id == 20 && (pl_flags & (1 << 6))) || // Curse -> Greater Curse
-        (skill_id == 24 && (pl_flags & (1 << 7))) || // Blast -> +Scorch
-        (skill_id == 26 && (pl_flags & (1 << 14))) || // Heal -> Regen
-        (skill_id == 37 && (pl_flagb & (1 << 11))) || // Blind -> Douse
-        (skill_id == 40 && (pl_flags & (1 << 8))) || // Cleave -> +Aggravate
-        (skill_id == 41 && (pl_flags & (1 << 10))) || // Weaken -> Greater Weaken
-        (skill_id == 16 && (pl_flagb & (1 << 5))) || // Shield -> Shield Bash
-        (skill_id == 43 && (pl_flagb & (1 << 6))) || // Pulse -> Healing Pulses
-        (skill_id == 49 && (pl_flagb & (1 << 7))) || // Leap
-        (skill_id == 35 && (pl_flagb & (1 << 12))) || // Warcry -> Rally
-        (skill_id == 42 && (pl_flagb & (1 << 14))) || // Poison -> Venom
-        (skill_id == 12 && (pl_flagb & (1 << 3))) || // Tactics invert
-        (skill_id == 22 && IS_SHIFTED) // Rage -> Calm
-    )
-        snprintf(out_name, sizeof(out_name), "%s", skilltab[skill_tab_id].alt_a);
-    else
-        snprintf(out_name, sizeof(out_name), "%s", skilltab[skill_tab_id].name);
+
+    snprintf(out_name, sizeof(out_name), "%s", skilltab[skill_tab_id].name);
 
     *out_skill_tab_id = skill_tab_id;
 }

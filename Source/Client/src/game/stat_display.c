@@ -81,38 +81,29 @@ void get_skill_display_info(const int skill_slot, StatDisplayInfo *out) {
     int skill_id = skill_tab.nr;
     int amount_raised = stat_raised[skill_position];
 
-    if (skill_id >= 55) {
-        return;
-    }
-
-    if (skill_id >= 50) {
-        if (skill_id == 52 && !KNOW_IDENTIFY) {
-            return;
-        }
-
-        if ((skill_id == 53 || skill_id == 54) && !IS_LYCANTH) {
-            return;
-        }
-
-        out->is_visible = true;
-        out->name = skill_tab.name;
-        out->current_value = max(300, max(1, (points2rank(pl.points_tot) + 1) * 8));
-        out->text_color = 5;
-        return;
-    }
-
-    if (!pl.skill[skill_id][0]) {
-        if (is_inherit_skill(skill_id)) {
-            out->is_visible = true;
-            out->name = skill_tab.name;
-            out->current_value = sk_score(skill_id);
-            out->text_color = 0;
-        }
+    if (skill_tab.show < 1) {
         return;
     }
 
     out->is_visible = true;
-    out->name = is_alternate(skill_id) ? skill_tab.alt_a : skill_tab.name;
+    out->name = skill_tab.name;
+
+    if (skill_tab.show != 1) {
+        // Not Known
+        if (skill_tab.show == 4) {
+            // Show in red
+            out->current_value = sk_score(skill_id);
+            out->text_color = 0;
+            return;
+        }
+
+        if (skill_tab.show == 2) {
+            out->current_value = max(300, max(1, (points2rank(pl.points_tot) + 1) * 8));
+            out->text_color = 5;
+            return;
+        }
+    }
+
     out->base_value = pl.skill[skill_id][0] + amount_raised;
     out->current_value = sk_score(skill_id) + amount_raised;
     out->cost_to_raise = skill_needed(skill_id, pl.skill[skill_id][0] + amount_raised);

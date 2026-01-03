@@ -40,6 +40,7 @@
 #define TICKS			(24*TICKMULTI)
 
 #define MAXSKILL		(50+5)	// must match server!
+#define MAXMETA			89		// must match server!
 #define MAXITEMS		60		// must match server!
 #define MAXBUFFS		40		// must match server!
 #define MAXWPS			27
@@ -241,7 +242,7 @@ struct cplayer {
 
 	int points;
 	int points_tot;
-	int kindred;
+	unsigned long kindred;
 
 	// possessions
 	int gold;
@@ -438,7 +439,79 @@ struct cplayer {
 #define SV_LOG8 98
 #define SV_LOG9 99
 
+#define SV_TERM_STREE				100
+#define SV_TERM_CTREE				101
+#define SV_TERM_SKILLS				102
+#define SV_TERM_META				103
+
 #define SV_SETMAP					128
+
+#define ST_TREE_ICON				  0
+#define ST_TREE_NAME1				  1
+#define ST_TREE_NAME2				  2
+#define ST_TREE_NAME3				  3
+
+#define ST_TREE_DESC1A				  4
+#define ST_TREE_DESC1B				  5
+#define ST_TREE_DESC1C				  6
+#define ST_TREE_DESC1D				  7
+#define ST_TREE_DESC1E				  8
+
+#define ST_TREE_DESC2A				  9
+#define ST_TREE_DESC2B				 10
+#define ST_TREE_DESC2C				 11
+#define ST_TREE_DESC2D				 12
+#define ST_TREE_DESC2E				 13
+
+#define ST_SKILLS_SORT				 14
+#define ST_SKILLS_NAME1				 15
+#define ST_SKILLS_NAME2				 16
+#define ST_SKILLS_NAME3				 17
+#define ST_SKILLS_DESC01			 18
+#define ST_SKILLS_DESC02			 19
+#define ST_SKILLS_DESC03			 20
+#define ST_SKILLS_DESC04			 21
+#define ST_SKILLS_DESC05			 22
+#define ST_SKILLS_DESC06			 23
+#define ST_SKILLS_DESC07			 24
+#define ST_SKILLS_DESC08			 25
+#define ST_SKILLS_DESC09			 26
+#define ST_SKILLS_DESC10			 27
+#define ST_SKILLS_DESC11			 28
+#define ST_SKILLS_DESC12			 29
+#define ST_SKILLS_DESC13			 30
+#define ST_SKILLS_DESC14			 31
+#define ST_SKILLS_DESC15			 32
+#define ST_SKILLS_DESC16			 33
+#define ST_SKILLS_DESC17			 34
+#define ST_SKILLS_DESC18			 35
+#define ST_SKILLS_DESC19			 36
+#define ST_SKILLS_DESC20			 37
+
+#define ST_META_NAME1				 38
+#define ST_META_NAME2				 39
+#define ST_META_NAME3				 40
+#define ST_META_DESC01				 41
+#define ST_META_DESC02				 42
+#define ST_META_DESC03				 43
+#define ST_META_DESC04				 44
+#define ST_META_DESC05				 45
+#define ST_META_DESC06				 46
+#define ST_META_DESC07				 47
+#define ST_META_DESC08				 48
+#define ST_META_DESC09				 49
+#define ST_META_DESC10				 50
+#define ST_META_DESC11				 51
+#define ST_META_DESC12				 52
+#define ST_META_DESC13				 53
+#define ST_META_DESC14				 54
+#define ST_META_DESC15				 55
+#define ST_META_DESC16				 56
+#define ST_META_DESC17				 57
+#define ST_META_DESC18				 58
+#define ST_META_DESC19				 59
+#define ST_META_DESC20				 60
+#define ST_META_VALUES				 61 // includes font
 
 #define SPR_INVISIBLE				0
 #define SPR_E1						1
