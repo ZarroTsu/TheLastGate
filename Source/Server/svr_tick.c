@@ -29,7 +29,7 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.13.1\n"};
+static char intro_msg3[] = {"Current client/server version is 0.14.0\n"};
 static char intro_msg4_font = 3;
 static char intro_msg4[] = {"Blacksmithing has been added! There's a smith in Aston's South End and in Neiseer on Titan Street!\n"};
 static char intro_msg5_font = 2;
@@ -1816,7 +1816,7 @@ void char_remove_same_nets(int cn, int co)
 	do_char_log(cn, 1, "Done.\n");
 }
 
-#define PL_TESTER 873
+
 
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
@@ -1824,9 +1824,6 @@ void plr_update_treenode_terminology(int nr, int tn, int n)
 	int cn = player[nr].usnr;
 	int m = ch[cn].tree_node[n];
 	int j;
-	
-	if (player[nr].usnr != PL_TESTER)
-		return; // Remove me when client is good to go
 	
 	if (tn < 0) return;
 	if (tn > 9) return;
@@ -1870,9 +1867,6 @@ void plr_update_tree_terminology(int nr, int val)
 {
 	int tn = -1, n = 0;
 	int cn = player[nr].usnr;
-	
-	if (player[nr].usnr != PL_TESTER)
-		return; // Remove me when client is good to go
 	
 	if (val==SV_TERM_STREE)
 	{
@@ -1979,9 +1973,6 @@ void plr_update_skill_terminology(int nr, int n)
 
 void plr_update_all_skill_terminology(int nr)
 {
-	if (player[nr].usnr != PL_TESTER)
-		return; // Remove me when client is good to go
-	
 	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);
 }
 
@@ -2491,9 +2482,6 @@ void plr_update_meta_stat_values(int nr, int n)
 
 void plr_update_all_meta_stat_values(int nr)
 {
-	if (player[nr].usnr != PL_TESTER)
-		return; // Remove me when client is good to go
-	
 	for (int n=0; n<89; n++) plr_update_meta_stat_values(nr, n);
 }
 
@@ -2524,9 +2512,6 @@ void plr_update_meta_terminology(int nr, int n)
 
 void plr_update_all_meta_terminology(int nr)
 {
-	if (player[nr].usnr != PL_TESTER)
-		return; // Remove me when client is good to go
-	
 	for (int n=0; n<89; n++) plr_update_meta_terminology(nr, n);
 }
 

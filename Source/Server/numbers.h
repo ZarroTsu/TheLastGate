@@ -178,6 +178,8 @@
 
 // -----
 
+#define PL_TESTER		 873
+
 #define COMPANION_TIMEOUT (5 * 60 * TICKS)
 
 // ----- Laby poles & shrines, for recollection purposes
