@@ -88,6 +88,12 @@ add_executable(TheLastGate
         src/util/perf.c
 )
 
+target_include_directories(TheLastGate PRIVATE
+        ${CMAKE_BINARY_DIR}/_generated
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/
+        ${CMAKE_CURRENT_SOURCE_DIR}/
+)
+
 # Use C++ linker for mixed C/C++ project (C++ linker handles C code correctly)
 # This is REQUIRED because we link against imgui_wrapper (C++ library)
 # The C++ linker can link both C and C++ object files without issues
@@ -131,8 +137,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
             -s                     # Strip debug symbols
     )
 endif ()
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/link_libraries.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tinyfiledialogs.cmake)
 
