@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.2](https://github.com/jamesblack/TheLastGate/compare/v3.5.1...v3.5.2) (2026-01-03)
+
+
+### Bug Fixes
+
+* crash when using base cost warning mod ([55cd240](https://github.com/jamesblack/TheLastGate/commit/55cd240f002c59f93c3085a47bf47f3fd0021565))
+
 ## [3.5.1](https://github.com/jamesblack/TheLastGate/compare/v3.5.0...v3.5.1) (2026-01-03)
 
 
