@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.1](https://github.com/jamesblack/TheLastGate/compare/v3.5.0...v3.5.1) (2026-01-03)
+
+
+### Bug Fixes
+
+* Forgot to pack the new sprites with update ([d8e5b77](https://github.com/jamesblack/TheLastGate/commit/d8e5b7799cd1b211a1a5b5d757822b928f45c779))
+
 ## [3.5.0](https://github.com/jamesblack/TheLastGate/compare/v3.4.0...v3.5.0) (2026-01-03)
 
 
