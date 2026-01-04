@@ -59,6 +59,7 @@ int hightlight_sub=0;
 int cursor_type=CT_NONE;
 int selected_char=0;
 int last_skill=-1;
+int got_meta=0;
 
 int xmove=0,xxtimer=0;
 
@@ -183,11 +184,26 @@ int trans_button(int x,int y)
 	// New Magnify buttons for mini-map
 	if ( x>135 && y>581 && x<152 && y<598 ) return 42;
 	if ( x>135 && y>599 && x<152 && y<616 ) return 43;
-	
+
+    int hovered_gui_mode = 0;
 	// New GUI mode buttons
-	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[1] && y<=gui_hud_b[1]+14 ) return 44;
-	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[2] && y<=gui_hud_b[2]+14 ) return 45;
-	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[3] && y<=gui_hud_b[3]+14 ) return 46;
+	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[1] && y<=gui_hud_b[1]+14 ) {
+	    hovered_gui_mode = 44;
+	}
+	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[2] && y<=gui_hud_b[2]+14 ) {
+	    hovered_gui_mode = 45;
+	}
+	if ( x>=gui_hud_b[0] && x<=gui_hud_b[0]+66 && y>=gui_hud_b[3] && y<=gui_hud_b[3]+14 ) {
+	    hovered_gui_mode = 46;
+	}
+
+    if (hovered_gui_mode > 0) {
+        if (!got_meta) {
+            got_meta = 1;
+            cmd1s(CL_CMD_META, 0);
+        }
+        return hovered_gui_mode;
+    }
 	
 	if ( x>=339+2 && x<=339+30 && y>=179 && y<=179+30 ) return 47;
 
@@ -855,6 +871,7 @@ void meta_stat_descs(int n)
 {
 	if (n < 0) return;
     if (n > MAXMETA) return;
+
     if (!meta_stats[n+game_ui_state.meta_scroll].show) return;
     if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Passive Stats:")==0) return;
     if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Active Stats:")==0) return;

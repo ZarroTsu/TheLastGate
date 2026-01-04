@@ -1,5 +1,5 @@
 //
-#define NETWORKING_VERSION 0x000E00
+#define NETWORKING_VERSION 0x000E01
 //
 
 #include "common.h"
