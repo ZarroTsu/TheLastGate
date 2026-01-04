@@ -400,7 +400,7 @@ struct sk_tree sk_tree[2][12] = {
 #define ST_OFFSET_IC		-12
 #define ST_OFFSET_HL		-31
 
-struct sk_icon sk_icon[12]={
+struct sk_icon sk_icons[12]={
 	{  96, 165 }, // W
 	{ 140,  89 }, // N
 	{ 184, 165 }, // E
@@ -1829,31 +1829,31 @@ void eng_display_win(int plr_sprite,int init)
 					switch (n)
 					{
 						case  3: case 11: 
-							copyspritex(18111,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+							copyspritex(18111,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
 						case  0: case  4: 
-							copyspritex(18112,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+							copyspritex(18112,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
 						case  5: case  6: 
-							copyspritex(18113,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+							copyspritex(18113,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
 						case  1: case  7: 
-							copyspritex(18114,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+							copyspritex(18114,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
 						case  8: case  9: 
-							copyspritex(18115,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+							copyspritex(18115,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
 						default: 
-							copyspritex(18116,GUI_SHOP_X+sk_icon[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icon[n].y+ST_OFFSET_HL, 0); break;
+							copyspritex(18116,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
 					}
 				}
 				if (hightlight == HL_SKTREE && hightlight_sub == n) {
-					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icon[n].x + ST_OFFSET_IC,
-					            GUI_SHOP_Y + sk_icon[n].y + ST_OFFSET_IC, 16);
+					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+					            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 16);
 					if (m < 1 && pl.tree_node[n])
-						copyspritex(7067,GUI_SHOP_X + sk_icon[n].x + ST_OFFSET_IC,
-						            GUI_SHOP_Y + sk_icon[n].y + ST_OFFSET_IC, 16);
+						copyspritex(7067,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+						            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 16);
 				} else {
-					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icon[n].x + ST_OFFSET_IC,
-					            GUI_SHOP_Y + sk_icon[n].y + ST_OFFSET_IC, 0);
+					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+					            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 0);
 					if (m < 1 && pl.tree_node[n])
-						copyspritex(7067,GUI_SHOP_X + sk_icon[n].x + ST_OFFSET_IC,
-						            GUI_SHOP_Y + sk_icon[n].y + ST_OFFSET_IC, 0);
+						copyspritex(7067,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+						            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 0);
 				}
 			}
 			if (m<1)

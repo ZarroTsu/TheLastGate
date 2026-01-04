@@ -1646,7 +1646,7 @@ int mouse_tree(int x, int y, int mode)
 	// Figure out which skill icon we may be moused over
 	for (nr=0;nr<12;nr++)
 	{
-		if ((int)sqrt(pow(x-(GUI_SHOP_X+sk_icon[nr].x),2)+pow(y-(GUI_SHOP_Y+sk_icon[nr].y),2)) < 14) break;
+		if ((int)sqrt(pow(x-(GUI_SHOP_X+sk_icons[nr].x),2)+pow(y-(GUI_SHOP_Y+sk_icons[nr].y),2)) < 14) break;
 	}
 	
 	// Selecting a skill icon
