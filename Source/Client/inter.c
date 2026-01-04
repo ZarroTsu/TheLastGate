@@ -948,7 +948,7 @@ int mouse_statbox2(int x,int y,int state)
 				else
 				{
 					last_skill = n+game_ui_state.skill_scroll;
-					if (!firstclick)
+					if (!firstclick && (IS_TEMPLAR || IS_MERCENARY || IS_HARAKIM))
 					{
 						xlog(6,"%s selected for shortcut. Right-click on one of the shortcut keys in the bottom right to set a shortcut.",tmp);
 						firstclick=1;
