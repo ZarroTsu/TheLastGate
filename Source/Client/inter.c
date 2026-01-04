@@ -57,6 +57,7 @@ int hightlight_sub=0;
 int cursor_type=CT_NONE;
 int selected_char=0;
 int last_skill=-1;
+int got_meta=0;
 
 int xmove=0,xxtimer=0;
 
@@ -974,12 +975,16 @@ void meta_stat_descs(int n)
 {
 	if (n<0) return;
 	if (n>MAXMETA) return;
-	if (!metaStats[n+meta_pos].show) return;
-	if (strcmp(metaStats[n+meta_pos].name, "  Passive Stats:")==0) return;
-	if (strcmp(metaStats[n+meta_pos].name, "  Active Stats:")==0) return;
 	
-	xlog(5,metaStats[n+meta_pos].name);
-	xlog(1,metaStats[n+meta_pos].desc);
+	if (n<7) ;
+	else n += meta_pos;
+	
+	if (!metaStats[n].show) return;
+	if (strcmp(metaStats[n].name, "  Passive Stats:")==0) return;
+	if (strcmp(metaStats[n].name, "  Active Stats:")==0) return;
+	
+	xlog(5,metaStats[n].name);
+	xlog(1,metaStats[n].desc);
 	
 	/*
 	if (n<7)					// Topmost standard stats

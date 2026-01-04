@@ -1816,8 +1816,6 @@ void char_remove_same_nets(int cn, int co)
 	do_char_log(cn, 1, "Done.\n");
 }
 
-
-
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
 	unsigned char buf[256];
@@ -1962,7 +1960,7 @@ void plr_update_skill_terminology(int nr, int n)
 		xsend(nr, buf, 13);
 	}
 	
-	for (m=0; m<20; m++)
+	for (m=0; m<12; m++)
 	{
 		buf[1] = ST_SKILLS_DESC+m;
 		if (alt) mcpy(buf+3, skilltab[n].alt_desc+m*10, 10);
