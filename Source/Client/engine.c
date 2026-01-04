@@ -39,13 +39,10 @@
 #include "graphics/scaling.h"
 #include "graphics/sdl.h"
 #include "input/input.h"
-#include "mods/base_cost_warning.h"
 #include "mods/stubborn_actions.h"
 #include "mods/use_queue.h"
-#include "ui/hotbar.h"
-#include "ui/inventory.h"
 #include "ui/option_window.h"
-#include "ui/perf_window.h"
+#include "ui/ui.h"
 #include "util/math_util.h"
 #include "util/perf.h"
 
@@ -3912,19 +3909,18 @@ void engine(void)
 			}
 			input_event_count = 0;
 
-			imgui_new_frame(1.0f, 1.0f);
+		    ui_render();
+			// spell_hud();
+			// if (game_ui_state.show_options) {
+			// 	options_window_render();
+			// }
+			// inventory_render();
+			// quick_stats_render(&game_ui_state.quick_stat_state);
+			// if (g_config.runtime.show_performance) {
+			// 	perf_window_render(&game_ui_state.perf_window_state);
+			// }
 
-			spell_hud();
-			if (game_ui_state.show_options) {
-				options_window_render();
-			}
-			inventory_render();
-			quick_stats_render(&game_ui_state.quick_stat_state);
-			if (g_config.runtime.show_performance) {
-				perf_window_render(&game_ui_state.perf_window_state);
-			}
-
-			imgui_render();
+			// imgui_render();
 			SDL_SetCursor(cursors[cursor_type]);
 
 			if (init) {

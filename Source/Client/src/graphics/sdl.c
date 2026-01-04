@@ -275,7 +275,7 @@ int sdl_init(const int windowed) {
     }
 
 
-    imgui_init(renderer.window, renderer.gl_context);
+    ui_init(renderer.window, renderer.gl_context);
 
     /* Configure ImGui to use the same virtual resolution as the game (1280x720) */
     imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -348,6 +348,8 @@ void sdl_deinit(void) {
     drop_effect_shader_imgui();
     drop_solid_shader();
     drop_magic_shader();
+
+    ui_shutdown();
 
     if (renderer.gl_context) {
         SDL_GL_DeleteContext(renderer.gl_context);
