@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.6.0](https://github.com/jamesblack/TheLastGate/compare/v3.5.2...v3.6.0) (2026-01-04)
+
+
+### Features
+
+* Catch up with new server version ([d2cef44](https://github.com/jamesblack/TheLastGate/commit/d2cef44716091aa9e8aeab6a2a87b7b81b093f0e))
+* Don't show binding help when arched ([09bfc6d](https://github.com/jamesblack/TheLastGate/commit/09bfc6dad04bb850d2cf18996c5f49ed3390d90d))
+
+
+### Bug Fixes
+
+* Meta Stats in the Quick Stat Window now correctly update ([ddc36e5](https://github.com/jamesblack/TheLastGate/commit/ddc36e525d1629fe5579725df6ee6113f6ae044d))
+* Skill tree Icon now shows in the correct place ([e94d616](https://github.com/jamesblack/TheLastGate/commit/e94d61658a8798c4877d7b302e258535d0260e61))
+* Skill/Meta Lists now work the same(?) as original client ([452b23f](https://github.com/jamesblack/TheLastGate/commit/452b23fbdb8dee1bee6ee34b446d708240f5cdb9))
+
+
+### Miscellaneous Chores
+
+* bump version ([6f8a660](https://github.com/jamesblack/TheLastGate/commit/6f8a660a4ec2d5424c296e146b907ce504aca6fa))
+
 ## [3.5.2](https://github.com/jamesblack/TheLastGate/compare/v3.5.1...v3.5.2) (2026-01-03)
 
 
