@@ -5,3 +5,6 @@ Checks: >
   performance-*,
   readability-*,
   -llvm-header-guard
+
+CheckOptions:
+  - { key: readability-identifier-length.IgnoredVariableNames, value: '^(i|j|k|io)$' }
