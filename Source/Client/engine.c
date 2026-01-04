@@ -851,9 +851,9 @@ int coo_blin=0, coo_warc=0, coo_weak=0, coo_curs=0, coo_slow=0;
 
 static void calculate_game_ui_state() {
 	game_ui_state.quick_stat_state.weapon_value = pl.weapon;
-	game_ui_state.quick_stat_state.armor_value = pl_armor;
-	game_ui_state.quick_stat_state.hit_score = pl_hitsc;
-	game_ui_state.quick_stat_state.parry_score = pl_parry;
+	game_ui_state.quick_stat_state.armor_value = pl.armor;
+	game_ui_state.quick_stat_state.hit_score = meta_stats[5].value;
+	game_ui_state.quick_stat_state.parry_score = meta_stats[6].value;
 	game_ui_state.quick_stat_state.experience = pl.points_tot;
 	if (points2rank(pl.points_tot) == 24) {
 		game_ui_state.quick_stat_state.experience_bar_progress = 1.0f;
