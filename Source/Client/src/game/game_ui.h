@@ -5,4 +5,6 @@
 
 extern GameUiState game_ui_state;
 
-const PerfWindowState *ui_get_perf_window_state(void);
+void ui_calculate_perf_window_state(void);
+
+void ui_calculate_quick_stats_window_state(void);

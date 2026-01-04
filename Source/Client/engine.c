@@ -850,19 +850,8 @@ int coo_clea=0, coo_leap=0, coo_blas=0, coo_pois=0, coo_puls=0, coo_ghos=0, coo_
 int coo_blin=0, coo_warc=0, coo_weak=0, coo_curs=0, coo_slow=0;
 
 static void calculate_game_ui_state() {
-	game_ui_state.quick_stat_state.weapon_value = pl.weapon;
-	game_ui_state.quick_stat_state.armor_value = pl.armor;
-	game_ui_state.quick_stat_state.hit_score = meta_stats[5].value;
-	game_ui_state.quick_stat_state.parry_score = meta_stats[6].value;
-	game_ui_state.quick_stat_state.experience = pl.points_tot;
-	if (points2rank(pl.points_tot) == 24) {
-		game_ui_state.quick_stat_state.experience_bar_progress = 1.0f;
-	} else {
-		float starting_experience = (float) rank2points(points2rank(pl.points_tot));
-		float ending_experience = (float) pl.points_tot + (float) points_tolevel(pl.points_tot);
-		float percentage = ((float) pl.points_tot - starting_experience) / (ending_experience - starting_experience);
-		game_ui_state.quick_stat_state.experience_bar_progress = percentage;
-	}
+    ui_calculate_perf_window_state();
+    ui_calculate_quick_stats_window_state();
 }
 
 void init_meta_stats(void)
@@ -3932,7 +3921,7 @@ void engine(void)
 			inventory_render();
 			quick_stats_render(&game_ui_state.quick_stat_state);
 			if (g_config.runtime.show_performance) {
-				perf_window_render(ui_get_perf_window_state());
+				perf_window_render(&game_ui_state.perf_window_state);
 			}
 
 			imgui_render();

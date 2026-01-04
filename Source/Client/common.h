@@ -44,6 +44,7 @@
 #define MAXITEMS		60		// must match server!
 #define MAXBUFFS		40		// must match server!
 #define MAXWPS			27
+#define MAX_RANK        24
 
 #define MAX_SKILL_SCROLL (MAXSKILL-10)
 #define MAX_META_SCROLL ((MAXMETA-7)/2-10)

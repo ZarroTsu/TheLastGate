@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 #include "ui/quick_stats.h"
+#include "ui/states/perf_window_state.h"
 
 typedef enum {
     HUD_MODE_LIST_SKILLS,
@@ -44,7 +45,7 @@ typedef struct {
 
     /* Quick State Window (WV, AV, HS, PS Exp) */
     QuickStatState quick_stat_state;
-
+    PerfWindowState perf_window_state;
 } GameUiState;
 
 void game_ui_state_calculate(void);
