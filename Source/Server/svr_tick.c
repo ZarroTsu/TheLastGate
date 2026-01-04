@@ -1705,6 +1705,9 @@ void plr_cmd(int nr)
 	case CL_CMD_INV:
 		plr_cmd_inv(nr);
 		return;
+	case CL_CMD_META:
+		plr_update_all_meta_terminology(nr);
+		break;
 	case CL_CMD_EXIT:
 		plr_cmd_exit(nr);
 		return;
@@ -2668,7 +2671,6 @@ void plr_newlogin(int nr)
 	ch[cn].goto_y = HOME_START_Y;
 	
 	plr_update_all_skill_terminology(nr);
-	plr_update_all_meta_terminology(nr);
 	
 	// do_staff_log(2,"New player %s entered the game!\n",ch[cn].name);
 	do_announce(cn, 0, "A new player has entered the game.\n", ch[cn].name);
@@ -2830,7 +2832,6 @@ void plr_login(int nr)
 	plr_update_tree_terminology(nr, SV_TERM_CTREE);
 	
 	plr_update_all_skill_terminology(nr);
-	plr_update_all_meta_terminology(nr);
 	
 	if (ch[cn].data[79] != VERSION)
 	{

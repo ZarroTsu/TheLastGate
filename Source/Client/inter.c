@@ -349,12 +349,27 @@ void button_command(int nr)
 		case 44:
 			if (hudmode == 0) hudmode = 3;
 			else hudmode = 0;
+			if (!got_meta)
+			{
+				got_meta = 1;
+				cmd1s(CL_CMD_META,0);
+			}
 			break;
 		case 45:
 			hudmode = 1;
+			if (!got_meta)
+			{
+				got_meta = 1;
+				cmd1s(CL_CMD_META,0);
+			}
 			break;
 		case 46:
 			hudmode = 2;
+			if (!got_meta)
+			{
+				got_meta = 1;
+				cmd1s(CL_CMD_META,0);
+			}
 			break;
 		
 		case 47:

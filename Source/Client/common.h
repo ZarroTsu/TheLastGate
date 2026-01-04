@@ -311,6 +311,7 @@ struct cplayer {
 #define CL_CMD_BSSHOP		37
 #define CL_CMD_QSHOP		38
 #define CL_CMD_TREE			39
+#define CL_CMD_META			40
 #define CL_CMD_CTICK		255
 
 
