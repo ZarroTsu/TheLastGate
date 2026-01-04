@@ -380,10 +380,11 @@ void game_handle_input(const SDL_Event *e) {
                     tabstart = 0;
                     break;
                 case SDLK_UP:
-                    if (g_config.ui.enter_to_talk && !chat_mode_active) {
-                        break;
-                    }
                     if (hist_nr < 19) {
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            chat_mode_active = true;
+                            SDL_StartTextInput();
+                        }
                         memcpy(history[hist_nr], input, 128);
                         hist_len[hist_nr] = in_len;
                         hist_nr++;
@@ -396,10 +397,11 @@ void game_handle_input(const SDL_Event *e) {
                     }
                     break;
                 case SDLK_DOWN:
-                    if (g_config.ui.enter_to_talk && !chat_mode_active) {
-                        break;
-                    }
                     if (hist_nr > 0) {
+                        if (g_config.ui.enter_to_talk && !chat_mode_active) {
+                            chat_mode_active = true;
+                            SDL_StartTextInput();
+                        }
                         memcpy(history[hist_nr], input, 128);
                         hist_len[hist_nr] = in_len;
 
