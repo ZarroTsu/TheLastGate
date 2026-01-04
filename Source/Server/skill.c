@@ -11,7 +11,7 @@
 //		AT_BRV	AT_WIL	AT_INT	AT_AGL	AT_STR
 
 struct s_skilltab skilltab[MAXSKILL+5] = {
-//	{ //, '/', 	"////////////////",		"////////////////////////////////////////////////////////////////////////////////",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
 	{  0, 'C', 	"Hand to Hand", 		"Passive ability to hit and parry while unarmed.", 
 				"", "",
 				{ AT_BRV, AT_AGL, AT_STR }},
@@ -60,8 +60,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"Magic Shell", 			"Use (Spell): Applies a buff to yourself, granting temporary resistance and immunity.",
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
-	{ 12, 'C', 	"Tactics", 				"Passive ability to hit and parry with any weapon. Loses effectiveness while not at full mana.", 
-				"Tactics (Inverse)", 	"Passive ability to hit and parry with any weapon. Only effective while low on mana.",
+	{ 12, 'C', 	"Tactics", 				"Passive ability to hit and parry with any weapon. Grants summoned companions a similar bonus.", 
+				"Tactics (Inverse)", 	"Passive ability to hit and parry with any weapon. Grants summoned companions a similar bonus.",
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
 	{ 13, 'E', 	"Repair", 				"Use (Skill): You will try to repair the item under your cursor.", 
@@ -71,8 +71,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 14, 'G', 	"Finesse", 				"Passive ability which grants more global damage the healthier you are.", 
 				"Finesse (Inverse)", 	"Passive ability which grants more global damage while near death.",
 				{ AT_BRV, AT_BRV, AT_AGL }},
-				
-	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself, letting you pierce enemy Resistance and Immunity at the cost of mana over time.", 
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself which reserves mana to let you pierce enemy Resistance and Immunity.", 
 				"", "",
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
@@ -99,17 +99,17 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 21, 'F', 	"Bless", 				"Use (Spell): Applies a buff to you or your target, raising their attributes.", 
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
-				
-	{ 22, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself, granting additional Top Damage and damage-over-time at the cost of health per second.", 
-				"Calm", 				"Use (Skill): Applies a buff to yourself, granting resistance to enemy Top Damage and damage-over-time at the cost of mana per second.",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 22, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself which reserves health to grant additional Top Damage and damage-over-time.", 
+				"Calm", 				"Use (Skill): Applies a buff to yourself which reserves mana to reduce Top Damage and damage-over-time received.",
 				{ AT_BRV, AT_INT, AT_STR }},
 				
 	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
 				"", "",
 				{ AT_BRV, AT_WIL, AT_STR }},
-				
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
 	{ 24, 'F', 	"Blast", 				"Use (Spell): Damages your target and surrounding enemies.", 
-				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff, increasing the damage dealt to the target.", 
+				"Blast (Scorch)", 		"Use (Spell): Damages your target and surrounding enemies. This also applies a debuff which increases damage taken.", 
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 25, 'F', 	"Dispel", 				"Use (Spell): Removes debuffs from your target.", 
@@ -135,8 +135,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 30, 'B', 	"Meditate", 			"Passive ability to recover mana over time.", 
 				"", "",
 				{ AT_INT, AT_INT, AT_INT }},
-				
-	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff to cooldown rate, and debuffs nearby enemy cooldown rate. Has a base radius of 5 tiles.", 
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 31, 'G', 	"Aria", 				"Passively grants you and allies a buff to cooldown rate, and debuff enemy cooldown rate. Has a base radius of 5 tiles.", 
 				"", "",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
@@ -147,21 +147,21 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 33, 'G', 	"Surround Hit", 		"Passive ability to deal a portion of melee hit damage to all foes around you.", 
 				"", "",
 				{ AT_AGL, AT_STR, AT_STR }},
-				
-	{ 34, 'G', 	"Economize", 			"Passive ability to reduce the mana cost of spells and abilities. Additionally grants better prices while buying or selling.", 
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 34, 'G', 	"Economize", 			"Passive ability to reduce the mana cost of spells and abilities. Grants better prices while buying or selling.", 
 				"", "",
 				{ AT_WIL, AT_WIL, AT_WIL }},
 				
 	{ 35, 'E', 	"Warcry", 				"Use (Skill): Shout to stun and strike fear into all nearby enemies. Has a base radius of 6 tiles.", 
-				"Warcry (Rally)", 		"Use (Skill): Shout to rally your allies and improve hit and parry score. Has a base radius of 6 tiles.",
+				"Warcry (Rally)", 		"Use (Skill): Shout to rally yourself and your allies. Has a base radius of 6 tiles.",
 				{ AT_BRV, AT_STR, AT_STR }},
 				
 	{ 36, 'D', 	"Dual Wield", 			"Passive ability to hit while using a dual-sword.", 
 				"", "",
 				{ AT_BRV, AT_AGL, AT_STR }},
-				
-	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff to nearby enemies, reducing their hit and parry rates. Has a base radius of 4 tiles.", 
-				"Blind (Douse)", 		"Use (Skill): Applies a debuff to nearby enemies, reducing their stealth and spell modifier. Has a base radius of 4 tiles.",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 37, 'E', 	"Blind", 				"Use (Skill): Applies a debuff which reduces hit and parry scores. Has a base radius of 4 tiles.", 
+				"Blind (Douse)", 		"Use (Skill): Applies a debuff which reduces stealth and spell modifier. Has a base radius of 4 tiles.",
 				{ AT_BRV, AT_INT, AT_AGL }},
 				
 	{ 38, 'G', 	"Gear Mastery", 		"Passive ability to improve weapon and armor values granted by your equipment.", 
@@ -171,21 +171,21 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 39, 'G', 	"Safeguard", 			"Passive ability to reduce damage taken.", 
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
-				
-	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take damage over time.", 
-				"Cleave (Aggravate)",	"Use (Skill): Strike your foe and deal damage to surrounding enemies. This also applies a debuff, causing them to take additional damage.",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 40, 'E', 	"Cleave", 				"Use (Skill): Strike your foe and surrounding enemies. This also applies a debuff which deals damage over time.", 
+				"Cleave (Aggravate)",	"Use (Skill): Strike your foe and surrounding enemies. This also applies a debuff which causes additional damage.",
 				{ AT_AGL, AT_STR, AT_STR }},
 				
-	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their weapon value.", 
-				"Weaken (Crush)", 		"Use (Skill): Applies a debuff to your foe and surrounding enemies, reducing their armor value.",
+	{ 41, 'E', 	"Weaken", 				"Use (Skill): Applies a debuff which reduces weapon value.", 
+				"Weaken (Crush)", 		"Use (Skill): Applies a debuff which reduces armor value.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
-				
-	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, causing them to take damage over time.", 
-				"Poison (Venom)", 		"Use (Spell): Applies a stacking debuff to your target and surrounding enemies, reducing immunity and causing damage over time. Stacks up to 3 times.",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 42, 'F', 	"Poison", 				"Use (Spell): Applies a debuff which causes them to take damage over time.", 
+				"Poison (Venom)", 		"Use (Spell): Applies a stacking debuff which reduces immunity and causes damage over time. Stacks up to 3 times.",
 				{ AT_BRV, AT_INT, AT_INT }},
-				
-	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to damage nearby foes and inflict shock, reducing their damage dealt and increasing their damage taken. Has a base radius of 3 tiles.", 
-				"Pulse (Charge)", 		"Use (Spell): Applies a buff to yourself, causing a repeating burst of energy to heal nearby allies and inflict charge, reducing their damage taken and increasing their damage dealt. Has a base radius of 3 tiles.",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 43, 'F', 	"Pulse", 				"Use (Spell): Applies a buff to yourself, bursting with energy to shock nearby foes. Has a base radius of 3 tiles.", 
+				"Pulse (Charge)", 		"Use (Spell): Applies a buff to yourself, bursting with energy to charge nearby allies. Has a base radius of 3 tiles.",
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of skills which already have an area-of-effect.",
@@ -203,12 +203,12 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 47, 'F', 	"Haste", 				"Use (Spell): Applies a buff to yourself, increasing your action speed.", 
 				"", "",
 				{ AT_BRV, AT_WIL, AT_AGL }},
-				
-	{ 48, 'E', 	"Taunt",				"Use (Skill): Applies a debuff to your target and surrounding enemies, forcing them to attack you. This also applies a buff to yourself, granting damage resistance.", 
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 48, 'E', 	"Taunt",				"Use (Skill): Forces the target and surrounding enemies to attack you. Grants you damage resistance when it hits.", 
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
-				
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life. Higher cooldown rate lets this skill repeat additional times.",
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life.",
 				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
@@ -224,7 +224,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 53, 'H', 	"Ferocity", 			"Passively grants a bonus to WV and AV. The bonus increases for each empty gear slot.", 
 				"", "",
 				{ 0, 0, 0 }},
-	{ 54, 'H', 	"Shift", 				"Use (Skill): Change form from that of a Ratling to that of a Greenling, and vice versa. Has its own unique cooldown timer.", 
+//	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
+	{ 54, 'H', 	"Shift", 				"Use (Skill): Change form from that of a Ratling to that of a Greenling, and vice versa. Has a unique cooldown timer.", 
 				"", "",
 				{ 0, 0, 0 }}
 };
@@ -743,7 +744,7 @@ struct metaStat metaStats[102] = {
 	{ -1, 0, 5, "Melee Ceiling Damage", "",        "The highest possible damage a melee hit may deal. Affected by increases to Top Damage and your critical hit scores." },
 	{ -1, 0, 5, "Melee  Floor  Damage", "",        "Melee Floor Damage is the lowest possible damage a melee hit may deal. Determined by 1/4 of your Weapon Value." },
 	{ -1, 1, 6, "Attack Speed",         "",        "The speed at which melee attacks are performed. Increased by Agility." },
-	{ -1, 1, 6, "  Cast Speed",         "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
+	{ -1, 1, 6, "Cast Speed",           "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
 	{ -1, 0, 1, "Thorns Score",         "",        "Damage dealt to attackers when you are hit (even if you take no damage). Does not damage attackers if they miss." },
 	{ -1, 1, 4, "Mana Cost Multiplier", "%",       "The multiplier of mana for spells, determined by your Concentrate skill." },
 	{ -1, 0, 1, "Total AoE Bonus",      "Tiles",   "Flat increase to area-of-effect skills." },
