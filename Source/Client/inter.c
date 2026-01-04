@@ -231,28 +231,54 @@ void button_command(int nr)
 			break;
 
 		// Scroll bar for skill list
-		case 14: 
-			if (keys)
-			{
-				if (game_ui_state.skill_scroll>11)	game_ui_state.skill_scroll -= 10;
-				else 				game_ui_state.skill_scroll  = 0;
-			}
-			else
-			{
-				if (game_ui_state.skill_scroll> 1)	game_ui_state.skill_scroll -= 2;
-				else				game_ui_state.skill_scroll  = 0;
-			}
+		case 14:
+	        if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES || game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) {
+	            if (keys)
+	            {
+	                if (game_ui_state.meta_scroll>11)	game_ui_state.meta_scroll -= 10;
+	                else 				game_ui_state.meta_scroll  = 0;
+	            }
+	            else
+	            {
+	                if (game_ui_state.meta_scroll> 1)	game_ui_state.meta_scroll -= 2;
+	                else				game_ui_state.meta_scroll  = 0;
+	            }
+	        } else {
+	            if (keys)
+	            {
+	                if (game_ui_state.skill_scroll>11)	game_ui_state.skill_scroll -= 10;
+	                else 				game_ui_state.skill_scroll  = 0;
+	            }
+	            else
+	            {
+	                if (game_ui_state.skill_scroll> 1)	game_ui_state.skill_scroll -= 2;
+	                else				game_ui_state.skill_scroll  = 0;
+	            }
+	        }
 			break;
 		case 15: 
-			if (keys)
-			{
-				if (game_ui_state.skill_scroll<MAXSKILL-20)	game_ui_state.skill_scroll += 10;
-				else						game_ui_state.skill_scroll  = MAXSKILL-10;
-			}
-			else
-			{
-				if (game_ui_state.skill_scroll<MAXSKILL-10)	game_ui_state.skill_scroll += 2;
-				else						game_ui_state.skill_scroll  = MAXSKILL-10;
+			if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES || game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) {
+			    if (keys)
+			    {
+			        if (game_ui_state.meta_scroll<MAX_META_SCROLL-10)	game_ui_state.meta_scroll += 10;
+			        else						game_ui_state.meta_scroll  = MAX_META_SCROLL;
+			    }
+			    else
+			    {
+			        if (game_ui_state.meta_scroll<MAX_META_SCROLL)	game_ui_state.meta_scroll += 2;
+			        else						game_ui_state.meta_scroll  = MAX_META_SCROLL;
+			    }
+			} else {
+			    if (keys)
+			    {
+			        if (game_ui_state.skill_scroll<MAX_SKILL_SCROLL-10)	game_ui_state.skill_scroll += 10;
+			        else						game_ui_state.skill_scroll  = MAX_SKILL_SCROLL;
+			    }
+			    else
+			    {
+			        if (game_ui_state.skill_scroll<MAX_SKILL_SCROLL)	game_ui_state.skill_scroll += 2;
+			        else						game_ui_state.skill_scroll  = MAX_SKILL_SCROLL;
+			    }
 			}
 			break;
 		
@@ -327,8 +353,10 @@ void button_command(int nr)
 
 		default: break;
 	}
-	if (game_ui_state.skill_scroll>MAXSKILL-10) game_ui_state.skill_scroll = MAXSKILL-10;
-	if (game_ui_state.skill_scroll<0) game_ui_state.skill_scroll = 0;
+    if (game_ui_state.meta_scroll > MAX_META_SCROLL) game_ui_state.meta_scroll = MAX_META_SCROLL;
+    if (game_ui_state.meta_scroll < 0) game_ui_state.meta_scroll = 0;
+    if (game_ui_state.skill_scroll > MAX_SKILL_SCROLL) game_ui_state.skill_scroll = MAX_SKILL_SCROLL;
+    if (game_ui_state.skill_scroll < 0) game_ui_state.skill_scroll = 0;
 }
 
 void button_help(int nr)
@@ -825,7 +853,12 @@ int mouse_statbox(int x,int y,int state)
 
 void meta_stat_descs(int n)
 {
-	if (!meta_stats[n].show) return;
+	if (n < 0) return;
+    if (n > MAXMETA) return;
+    if (!meta_stats[n+game_ui_state.meta_scroll].show) return;
+    if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Passive Stats:")==0) return;
+    if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Active Stats:")==0) return;
+
 	xlog(5, meta_stats[n].name);
 	xlog(1, meta_stats[n].desc);
 }
@@ -967,7 +1000,7 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES)
 		{
-			meta_stat_descs(n + game_ui_state.skill_scroll +7);
+			meta_stat_descs(n + game_ui_state.skill_scroll +48);
 		}
 	} 
 	else if (state==MS_LB_UP && (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META))

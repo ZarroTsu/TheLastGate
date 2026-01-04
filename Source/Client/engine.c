@@ -1281,12 +1281,12 @@ void show_meta_stats(int n)
 		m = 0;
 	} else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES) {
 		m = 1 + (n > 17 ? 1: 0);
-		n = n + game_ui_state.skill_scroll;
+		n = n + game_ui_state.meta_scroll;
 		if (n >= 48) return;
 		pos -= 7;
 	} else {
 		m = 1 + (n > 17 ? 1 : 0);
-		n = n + 41 + game_ui_state.skill_scroll;
+		n = n + 41 + game_ui_state.meta_scroll;
 		if (n >= 89) return;
 		pos -= 7;
 	}
@@ -1385,7 +1385,11 @@ void eng_display_win(int plr_sprite,int init)
 		}
 		
 		// Scroll Bars for Skills and Inventory
-		showbar(234,152+(game_ui_state.skill_scroll*58)/(MAXSKILL-10)+(game_ui_state.skill_scroll>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+	    if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES || game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) {
+	        showbar(234,152+(game_ui_state.meta_scroll*58)/(MAX_META_SCROLL)+(game_ui_state.skill_scroll>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+	    } else {
+    		showbar(234,152+(game_ui_state.skill_scroll*58)/(MAX_SKILL_SCROLL)+(game_ui_state.skill_scroll>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
+	    }
 		showbar(601, 36+(game_ui_state.inventory_scroll *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
 
 		// display info-texts

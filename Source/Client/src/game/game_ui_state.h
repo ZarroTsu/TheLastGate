@@ -20,6 +20,7 @@ typedef struct {
     /* Scroll Positions */
     int inventory_scroll;
     int skill_scroll;
+    int meta_scroll;
     int waypoint_scroll;
 
     /* Hud Mode */

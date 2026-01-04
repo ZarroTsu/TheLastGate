@@ -537,10 +537,17 @@ void game_handle_input(const SDL_Event *e) {
                         game_ui_state.inventory_scroll -= 10;
                     break;
                 case SKILL_LIST:
-                    if (delta < 0 && game_ui_state.skill_scroll < MAXSKILL - 10)
-                        game_ui_state.skill_scroll++;
-                    else if (delta > 0 && game_ui_state.skill_scroll > 0)
-                        game_ui_state.skill_scroll--;
+                    if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES || game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) {
+                        if (delta < 0 && game_ui_state.meta_scroll < MAX_META_SCROLL)
+                            game_ui_state.meta_scroll++;
+                        else if (delta > 0 && game_ui_state.meta_scroll > 0)
+                            game_ui_state.meta_scroll--;
+                    } else {
+                        if (delta < 0 && game_ui_state.skill_scroll < MAX_SKILL_SCROLL)
+                            game_ui_state.skill_scroll++;
+                        else if (delta > 0 && game_ui_state.skill_scroll > 0)
+                            game_ui_state.skill_scroll--;
+                    }
                     break;
                 case WAYPOINT_PAGE:
                     if (delta < 0 && game_ui_state.waypoint_scroll < MAXWPS - 8)

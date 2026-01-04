@@ -45,6 +45,9 @@
 #define MAXBUFFS		40		// must match server!
 #define MAXWPS			27
 
+#define MAX_SKILL_SCROLL (MAXSKILL-10)
+#define MAX_META_SCROLL ((MAXMETA-7)/2-10)
+
 // -------- Damage Multipliers -------- //
 
 #define DAM_MULT_HIT		 250
