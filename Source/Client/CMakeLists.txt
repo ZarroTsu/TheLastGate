@@ -88,6 +88,10 @@ add_executable(TheLastGate
         src/util/perf.c
 )
 
+target_precompile_headers(TheLastGate PRIVATE
+        src/ui/ui_ffi.h
+)
+
 target_include_directories(TheLastGate PRIVATE
         ${CMAKE_BINARY_DIR}/_generated
         ${CMAKE_CURRENT_SOURCE_DIR}/src/
