@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
+#include "inventory.hpp"
 #include "option_window.hpp"
 #include "game/game_ui.h"
 
@@ -63,6 +64,8 @@ void ui_render(void) {
     if (game_ui_state.show_options) {
     	options_window_render();
     }
+
+    inventory_render();
 
     render();
 }

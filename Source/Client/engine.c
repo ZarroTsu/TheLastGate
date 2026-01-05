@@ -3910,8 +3910,6 @@ void engine(void)
 			input_event_count = 0;
 
 		    ui_render();
-
-			// inventory_render();
 			// quick_stats_render(&game_ui_state.quick_stat_state);
 			// if (g_config.runtime.show_performance) {
 			// 	perf_window_render(&game_ui_state.perf_window_state);

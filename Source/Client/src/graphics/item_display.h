@@ -1,5 +1,7 @@
 #pragma once
+EXTERN_C_BEGIN
 #include <stdint.h>
+
 
 typedef enum {
     SPRITE_OVERLAY_SOULSTONE = 4496,
@@ -67,3 +69,5 @@ void render_lockable_item_display_imgui(void *draw_list, const ItemDisplayInfo *
 void render_worn_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
 
 void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect);
+
+EXTERN_C_END
