@@ -1,6 +1,9 @@
 #pragma once
+#include "common.h"
 #include <stdbool.h>
 #include "config/keybindings.h"
+
+EXTERN_C_BEGIN
 
 
 typedef struct {
@@ -62,3 +65,5 @@ void config_cleanup_paths(void);
 
 /* Apply config changes that require runtime state synchronization */
 void apply_config_changes(void);
+
+EXTERN_C_END

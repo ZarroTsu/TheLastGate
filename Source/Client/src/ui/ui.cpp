@@ -8,6 +8,8 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
+#include "option_window.hpp"
+#include "game/game_ui.h"
 
 static void start_frame() {
     ImGui_ImplOpenGL3_NewFrame();
@@ -57,6 +59,11 @@ void ui_render(void) {
     start_frame();
 
     spell_hud();
+
+    if (game_ui_state.show_options) {
+    	options_window_render();
+    }
+
     render();
 }
 

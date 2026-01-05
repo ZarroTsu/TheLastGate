@@ -2,7 +2,7 @@
 // Created by james on 12/2/2025.
 //
 
-#include "option_window.h"
+#include "option_window.hpp"
 
 #include <stdbool.h>
 
@@ -12,7 +12,7 @@
 #include "engine.h"
 #include "inter.h"
 #include "ui.h"
-#include "widgets.h"
+#include "widgets.hpp"
 #include "config/config.h"
 #include "game/game_input.h"
 #include "game/game_ui.h"
@@ -158,9 +158,9 @@ static bool keybind_label(const OptionWindowLayout *layout, const char *label, B
 
             /* Build modifier flags */
             KeybindModifier mod_flags = KEYBIND_MOD_NONE;
-            if (has_shift) mod_flags |= KEYBIND_MOD_SHIFT;
-            if (has_ctrl) mod_flags |= KEYBIND_MOD_CTRL;
-            if (has_alt) mod_flags |= KEYBIND_MOD_ALT;
+            if (has_shift) mod_flags = (KeybindModifier)(mod_flags | KEYBIND_MOD_SHIFT);
+            if (has_ctrl) mod_flags = (KeybindModifier)(mod_flags | KEYBIND_MOD_CTRL);
+            if (has_alt) mod_flags = (KeybindModifier)(mod_flags | KEYBIND_MOD_ALT);
 
             /* Check for any key press (except ESC, DELETE, and ENTER) */
             int i;

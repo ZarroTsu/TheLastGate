@@ -11,7 +11,7 @@
 #include "mods/stubborn_actions.h"
 #include "mods/give_more.h"
 #include "mods/use_queue.h"
-#include "ui/option_window.h"
+#include "ui/option_window.hpp"
 #include "util/math_util.h"
 
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include "common.h"
+EXTERN_C_BEGIN
+
 extern int noshop;
 extern int pskip, pidle;
 
@@ -31,3 +34,5 @@ int points2rank(int v);
     #define GUI_SHOP_X		((1280/2)-(320/2))
     #define GUI_SHOP_Y		((736/2)-(320/2)+72)
 #endif
+
+EXTERN_C_END

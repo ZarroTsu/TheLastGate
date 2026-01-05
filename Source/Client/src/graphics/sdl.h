@@ -2,8 +2,11 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
+#include "common.h"
 #include "sprite_data.h"
 #include "glad/glad.h"
+
+EXTERN_C_BEGIN
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
@@ -92,3 +95,5 @@ extern float projection_matrix[16];
 void create_model_matrix(float *matrix, float x, float y, float width, float height);
 
 void create_gl_texture(int width, int height, GLuint *out, const void *pixels);
+
+EXTERN_C_END

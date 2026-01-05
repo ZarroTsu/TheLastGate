@@ -80,11 +80,11 @@ add_executable(TheLastGate
         src/security/unique_id.c
         src/ui/hotbar.cpp
         src/ui/inventory.c
-        src/ui/option_window.c
+        src/ui/option_window.cpp
         src/ui/perf_window.cpp
         src/ui/quick_stats.c
         src/ui/ui.cpp
-        src/ui/widgets.c
+        src/ui/widgets.cpp
         src/util/perf.c
 )
 

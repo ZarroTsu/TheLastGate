@@ -41,7 +41,7 @@
 #include "input/input.h"
 #include "mods/stubborn_actions.h"
 #include "mods/use_queue.h"
-#include "ui/option_window.h"
+#include "ui/option_window.hpp"
 #include "ui/ui.h"
 #include "util/math_util.h"
 #include "util/perf.h"
@@ -3910,9 +3910,7 @@ void engine(void)
 			input_event_count = 0;
 
 		    ui_render();
-			// if (game_ui_state.show_options) {
-			// 	options_window_render();
-			// }
+
 			// inventory_render();
 			// quick_stats_render(&game_ui_state.quick_stat_state);
 			// if (g_config.runtime.show_performance) {
