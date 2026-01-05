@@ -2493,7 +2493,8 @@ int use_scroll(int cn, int in)
 	}
 	
 	use_consume_item(cn, in, 1);
-
+	
+	ch_update_skill_terminology(cn, nr);
 	do_update_char(cn);
 
 	return 1;
@@ -3965,6 +3966,7 @@ int use_pandium_shrine(int cn, int in)
 			ch[cn].skill[tmp][2] = 75 + (bits?min(5,max(0,bits/6)):0);
 			ch[cn].skill[tmp][3] =  8;
 			do_char_log(cn, 9, "You have been blessed by The Archon's shrine. You learned %s.\n", skilltab[tmp].name);
+			ch_update_skill_terminology(cn, tmp);
 			break;
 		case  4:	// Floor 20 Reward
 			ch[cn].end[0]  += 50;

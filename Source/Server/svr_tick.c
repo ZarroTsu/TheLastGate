@@ -1972,6 +1972,11 @@ void plr_update_skill_terminology(int nr, int n)
 	}
 }
 
+void ch_update_skill_terminology(int cn, int n)
+{
+	plr_update_skill_terminology(ch[cn].player, n);
+}
+
 void plr_update_all_skill_terminology(int nr)
 {
 	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);

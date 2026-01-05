@@ -50,6 +50,7 @@ void pop_copy_to_new_items(void);
 // -- tick --
 void tick(void);
 void player_exit(int nr);
+void ch_update_skill_terminology(int cn, int n);
 void plr_update_treenode_terminology(int nr, int tn, int n);
 void plr_update_tree_terminology(int nr, int val);
 void plr_logout(int cn, int nr, int reason);
@@ -237,6 +238,7 @@ char *itemvowel(int in, int flag);
 void do_add_light(int x, int y, int stren);
 int do_store_item(int cn);
 int do_check_fool(int cn, int in);
+void do_swap_send_info(int cn, int n, int tmp);
 int do_swap_item(int cn, int n);
 void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag);
 void do_look_item(int cn, int in);

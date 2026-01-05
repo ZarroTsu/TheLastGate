@@ -1021,6 +1021,7 @@ int npc_give(int cn, int co, int in, int money)
 			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(n, co, 0);
 			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
+			do_swap_send_info(co, in, in2);
 			ch[co].misc_action = DR_IDLE;
 			return 0;
 		}
@@ -1453,6 +1454,7 @@ int npc_give(int cn, int co, int in, int money)
 					use_consume_item(cn, in, 0);
 					ch[co].kindred |= KIN_IDENTIFY;
 					do_char_log(co, 0, "You learned Identify!\n");
+					ch_update_skill_terminology(co, SK_IDENT);
 					do_update_char(co);
 					if ((nr = ch[cn].data[51])!=0)
 					{
@@ -1471,6 +1473,7 @@ int npc_give(int cn, int co, int in, int money)
 						{
 							ch[n].kindred |= KIN_IDENTIFY;
 							do_char_log(n, 0, "You learned Identify!\n");
+							ch_update_skill_terminology(n, SK_IDENT);
 							do_update_char(n);
 							div = 1;
 						}
@@ -1562,6 +1565,8 @@ int npc_give(int cn, int co, int in, int money)
 					B_SK(co, nr)  = 1;
 					B_SK(co, nr3) = 1;
 					do_char_log(co, 0, "You learned %s and %s!\n", skilltab[nr].name, skilltab[nr3].name);
+					ch_update_skill_terminology(co, nr);
+					ch_update_skill_terminology(co, nr3);
 					do_update_char(co);
 					
 					if ((nr = ch[cn].data[51])!=0)
@@ -1582,6 +1587,7 @@ int npc_give(int cn, int co, int in, int money)
 						{
 							B_SK(n, nr2) = 1;
 							do_char_log(n, 0, "You learned %s!\n", skilltab[nr2].name);
+							ch_update_skill_terminology(n, nr2);
 							do_update_char(n);
 							div = 1;
 						}
@@ -1626,6 +1632,7 @@ int npc_give(int cn, int co, int in, int money)
 						do_char_log(co, 0, "You learned Calm!\n");
 					else
 						do_char_log(co, 0, "You learned %s!\n", skilltab[nr].name);
+					ch_update_skill_terminology(co, nr);
 					do_update_char(co);
 					
 					if ((nr = ch[cn].data[51])!=0)
@@ -1649,6 +1656,7 @@ int npc_give(int cn, int co, int in, int money)
 								do_char_log(n, 0, "You learned Calm!\n");
 							else
 								do_char_log(n, 0, "You learned %s!\n", skilltab[nr2].name);
+							ch_update_skill_terminology(n, nr2);
 							do_update_char(n);
 							div = 1;
 						}

@@ -18503,9 +18503,39 @@ int do_check_fool(int cn, int in)
 	return 1;
 }
 
+void do_swap_send_info(int cn, int n, int tmp)
+{
+	int m, z;
+	
+	for (m = 0; m < 2; m++)
+	{
+		if (m == 0) z = tmp;
+		else        z = ch[cn].worn[n];
+		
+		if (z) switch (it[z].temp)
+		{
+			case IT_CH_EMPRESS:  ch_update_skill_terminology(cn, 11); break;
+			case IT_CH_PREIST_R: ch_update_skill_terminology(cn, 12); break;
+			case IT_WP_THEWALL:  ch_update_skill_terminology(cn, 16); break;
+			case IT_CH_EMPEROR:  ch_update_skill_terminology(cn, 19); break;
+			case IT_CH_TOWER:    ch_update_skill_terminology(cn, 20); break;
+			case IT_CH_JUDGE:    ch_update_skill_terminology(cn, 24); break;
+			case IT_CH_STAR:     ch_update_skill_terminology(cn, 26); break;
+			case IT_CH_EMPERO_R: ch_update_skill_terminology(cn, 35); break;
+			case IT_CH_CHARIOT:  ch_update_skill_terminology(cn, 37); break;
+			case IT_CH_JUSTICE:  ch_update_skill_terminology(cn, 40); break;
+			case IT_CH_DEATH:    ch_update_skill_terminology(cn, 41); break;
+			case IT_CH_TOWER_R:  ch_update_skill_terminology(cn, 42); break;
+			case IT_CH_JUDGE_R:  ch_update_skill_terminology(cn, 43); break;
+			case IT_CH_JUSTIC_R: ch_update_skill_terminology(cn, 49); break;
+			default: break;
+		}
+	}
+}
+
 int do_swap_item(int cn, int n)
 {
-	int tmp, in, m;
+	int tmp, in, m, z=0;
 	static char *at_text[5] = {
 		"not brave enough", 
 		"not determined enough", 
@@ -18801,9 +18831,11 @@ int do_swap_item(int cn, int n)
 		}
 	}
 	
+	do_swap_send_info(cn, n, tmp);
+	
 	ch[cn].citem = ch[cn].worn[n];
 	ch[cn].worn[n] = tmp;
-
+	
 	do_update_char(cn);
 
 	return(n);
