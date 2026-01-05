@@ -23,15 +23,6 @@ void PerfWindow::RenderStats(const PerfWindowState *state) {
     ImGui::Text("Slowest: %fms", state->sample_ms_max);
 }
 
-EXTERN_C_BEGIN
-void perf_window_render(const PerfWindowState *state) noexcept {
-    try {
-        PerfWindow::Render(state);
-    } catch (const std::exception &e) {
-        log_error("C++ Error Caught in perf_window_render: %s", e.what());
-    } catch (...) {
-        log_error("Unknown C++ Error Caught in perf_window_render");
-    }
+void perf_window_render(const PerfWindowState *state) {
+    PerfWindow::Render(state);
 }
-
-EXTERN_C_END

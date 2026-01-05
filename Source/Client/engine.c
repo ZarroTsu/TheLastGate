@@ -3910,11 +3910,6 @@ void engine(void)
 			input_event_count = 0;
 
 		    ui_render();
-			// if (g_config.runtime.show_performance) {
-			// 	perf_window_render(&game_ui_state.perf_window_state);
-			// }
-
-			// imgui_render();
 			SDL_SetCursor(cursors[cursor_type]);
 
 			if (init) {

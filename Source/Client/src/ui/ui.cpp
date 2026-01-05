@@ -10,6 +10,8 @@
 #include "imgui_impl_sdl2.h"
 #include "inventory.hpp"
 #include "option_window.hpp"
+#include "perf_window.hpp"
+#include "config/config.h"
 #include "game/game_ui.h"
 
 static void start_frame() {
@@ -67,6 +69,9 @@ void ui_render(void) {
 
     inventory_render();
     quick_stats_render(&game_ui_state.quick_stat_state);
+    if (g_config.runtime.show_performance) {
+    	perf_window_render(&game_ui_state.perf_window_state);
+    }
 
     render();
 }

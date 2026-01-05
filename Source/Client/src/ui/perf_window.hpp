@@ -8,3 +8,5 @@ public:
 private:
     static void RenderStats(const PerfWindowState *state);
 };
+
+void perf_window_render(const PerfWindowState *state);
