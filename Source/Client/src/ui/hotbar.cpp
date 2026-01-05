@@ -1,5 +1,6 @@
 #include "hotbar.hpp"
 
+#include <imgui.h>
 #include <stdio.h>
 
 #include "common.h"
@@ -8,6 +9,7 @@
 #include "ui_common.hpp"
 #include "config/keybindings.h"
 #include "imgui/imgui_wrapper.h"
+#include "ui_utils/imgui_style_builder.hpp"
 
 static int current_slot = 0;
 
@@ -120,13 +122,15 @@ static void render_spell_popover() {
 
 
 void spell_hud() {
-    imgui_set_next_window_pos(1036, 597);
-    imgui_set_next_windows_size(238, 58);
-    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_WINDOW_PADDING, 0.0f, 0.0f);
-    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_ITEM_SPACING, 0.0f, 0.0f);
-    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_FRAME_PADDING, 0.0f, 2.0f);
-    imgui_push_style_var_float(IMGUI_STYLE_VAR_WINDOW_BORDER_SIZE, 0.0f);
-    imgui_push_font(font_sizes.ui);
+    ImGui::SetNextWindowPos(ImVec2(1036, 597));
+    ImGui::SetNextWindowSize(ImVec2(238, 58));
+    auto pop_spell_hud_styles = ImGuiStyleBuilder()
+            .Var(ImGuiStyleVar_WindowPadding, ImVec2(0, 0))
+            .Var(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f))
+            .Var(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 2.0f))
+            .Var(ImGuiStyleVar_WindowBorderSize, 0.0f)
+            .Font(static_cast<ImFont *>(font_sizes.ui))
+            .Build();
     if (imgui_begin("##SPELLHUD", NULL,
                     IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE |
                     IMGUI_WINDOW_FLAG_NO_BACKGROUND | IMGUI_WINDOW_FLAG_NO_TITLE_BAR)) {
@@ -192,7 +196,6 @@ void spell_hud() {
         render_spell_popover();
         imgui_pop_style_color(4);
     }
-    imgui_pop_font();
     imgui_end();
-    imgui_pop_style_var(4);
+    pop_spell_hud_styles();
 }

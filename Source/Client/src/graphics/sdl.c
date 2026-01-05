@@ -23,7 +23,6 @@
 #include "shaders/magic_shader.h"
 #include "shaders/solid_shader.h"
 #include "ui/ui.h"
-#include "ui/imgui/imgui_wrapper.h"
 
 Renderer renderer;
 
@@ -276,24 +275,6 @@ int sdl_init(const int windowed) {
 
 
     ui_init(renderer.window, renderer.gl_context);
-
-    /* Configure ImGui to use the same virtual resolution as the game (1280x720) */
-    imgui_set_display_size(SCREEN_WIDTH, SCREEN_HEIGHT);
-    imgui_set_display_framebuffer_scale(1.0f, 1.0f);
-
-    font_sizes.ui = imgui_add_font_from_file_ttf_pixel_perfect("resources/astonia.ttf", 10);
-    font_sizes.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 16);
-    font_sizes.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 24);
-    font_sizes.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 28);
-    font_sizes.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator.ttf", 32);
-
-    font_sizes_bold.ui = imgui_add_font_from_file_ttf_pixel_perfect("resources/astonia.ttf", 10);
-    font_sizes_bold.normal = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 16);
-    font_sizes_bold.large = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 24);
-    font_sizes_bold.subheader = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 28);
-    font_sizes_bold.header = imgui_add_font_from_file_ttf_pixel_perfect("resources/PixelOperator-Bold.ttf", 32);
-
-    imgui_set_default_font(font_sizes.ui);
 
     return 0;
 }
