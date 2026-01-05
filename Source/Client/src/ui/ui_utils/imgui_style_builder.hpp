@@ -13,6 +13,8 @@ public:
 
     ImGuiStyleBuilder &Color(ImGuiCol idx, ImU32 val);
 
+    ImGuiStyleBuilder &Color(ImGuiCol idx, const ImVec4 &val);
+
     ImGuiStyleBuilder &Font(ImFont *font);
 
     std::function<void()> Build();

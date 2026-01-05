@@ -22,6 +22,12 @@ ImGuiStyleBuilder &ImGuiStyleBuilder::Color(ImGuiCol idx, ImU32 val) {
     return *this;
 }
 
+ImGuiStyleBuilder &ImGuiStyleBuilder::Color(ImGuiCol idx, const ImVec4 &val) {
+    ImGui::PushStyleColor(idx, val);
+    ++colors_pushed;
+    return *this;
+}
+
 ImGuiStyleBuilder &ImGuiStyleBuilder::Font(ImFont *font) {
     ImGui::PushFont(font);
     ++fonts_pushed;
