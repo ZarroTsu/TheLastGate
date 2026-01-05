@@ -876,8 +876,8 @@ void meta_stat_descs(int n)
     if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Passive Stats:")==0) return;
     if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Active Stats:")==0) return;
 
-	xlog(5, meta_stats[n].name);
-	xlog(1, meta_stats[n].desc);
+	xlog(5, meta_stats[n+game_ui_state.meta_scroll].name);
+	xlog(1, meta_stats[n+game_ui_state.meta_scroll].desc);
 }
 
 int mouse_statbox2(int x,int y,int state)
