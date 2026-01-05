@@ -8,7 +8,7 @@
 
 #include "imgui/imgui_wrapper.h"
 #include "config/keybindings.h"
-#include "ui_common.h"
+#include "ui_common.hpp"
 #include "engine.h"
 #include "inter.h"
 #include "ui.h"

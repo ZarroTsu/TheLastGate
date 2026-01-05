@@ -1,7 +1,7 @@
 #include "widgets.hpp"
 
 #include "imgui/imgui_wrapper.h"
-#include "ui_common.h"
+#include "ui_common.hpp"
 #include "graphics/sdl.h"
 #include "config/keybindings.h"
 #include <stdio.h>

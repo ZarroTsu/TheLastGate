@@ -5,7 +5,7 @@
 #include "common.h"
 #include "inter.h"
 #include "ui.h"
-#include "ui_common.h"
+#include "ui_common.hpp"
 #include "config/keybindings.h"
 #include "imgui/imgui_wrapper.h"
 

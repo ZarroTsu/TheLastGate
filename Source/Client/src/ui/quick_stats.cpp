@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "main.h"
-#include "ui_common.h"
+#include "ui_common.hpp"
 #include "config/config.h"
 #include "graphics/sdl.h"
 #include "imgui/imgui_wrapper.h"
