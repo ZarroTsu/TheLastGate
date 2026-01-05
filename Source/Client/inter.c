@@ -875,12 +875,14 @@ void meta_stat_descs(int n)
 	if (n < 0) return;
     if (n > MAXMETA) return;
 
-    if (!meta_stats[n+game_ui_state.meta_scroll].show) return;
-    if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Passive Stats:")==0) return;
-    if (strcmp(meta_stats[n+game_ui_state.meta_scroll].name, "  Active Stats:")==0) return;
+    if (n >= 7) n += game_ui_state.meta_scroll;
 
-	xlog(5, meta_stats[n+game_ui_state.meta_scroll].name);
-	xlog(1, meta_stats[n+game_ui_state.meta_scroll].desc);
+    if (!meta_stats[n].show) return;
+    if (strcmp(meta_stats[n].name, "  Passive Stats:")==0) return;
+    if (strcmp(meta_stats[n].name, "  Active Stats:")==0) return;
+
+	xlog(5, meta_stats[n].name);
+	xlog(1, meta_stats[n].desc);
 }
 
 int mouse_statbox2(int x,int y,int state)
@@ -1016,11 +1018,11 @@ int mouse_statbox2(int x,int y,int state)
 		}
 		else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES)
 		{
-			meta_stat_descs(n + game_ui_state.skill_scroll +7);
+			meta_stat_descs(n + 7);
 		}
 		else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES)
 		{
-			meta_stat_descs(n + game_ui_state.skill_scroll +48);
+			meta_stat_descs(n + 48);
 		}
 	} 
 	else if (state==MS_LB_UP && (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META))

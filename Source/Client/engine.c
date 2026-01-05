@@ -1261,8 +1261,6 @@ void show_meta_stats(int n)
 	
 	int m, pos = n;
 
-	if (!meta_stats[n].show) return;
-
 	if (n < 7) {
 		m = 0;
 	} else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES) {
