@@ -8,7 +8,6 @@
 #include "ui.h"
 #include "ui_common.hpp"
 #include "config/keybindings.h"
-#include "imgui/imgui_wrapper.h"
 #include "ui_utils/imgui_style_builder.hpp"
 
 static int current_slot = 0;
@@ -96,9 +95,9 @@ static void handle_spell_selection(int skill_tab_id) {
 }
 
 static void render_spell_popover() {
-    imgui_push_style_var_vec2(IMGUI_STYLE_VAR_WINDOW_PADDING, 8.0f, 4.0f);
-    if (imgui_begin_popup("SpellPopup1")) {
-        if (imgui_selectable("-", 0)) {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 4));
+    if (ImGui::BeginPopup("SpellPopup1")) {
+        if (ImGui::Selectable("-", false)) {
             pdata.xbutton[current_slot].skill_nr = -1;
         }
         for (int i = 0; i < 26; i++) {
@@ -111,13 +110,13 @@ static void render_spell_popover() {
             get_skill_tab_info_from_id(skill_id, skill_name, &skill_tab_id);
             if (skill_tab_id == -1) continue;
             if (pl.skill[skill_tab_id][0] == 0) continue;
-            if (imgui_selectable(skill_name, 0)) {
+            if (ImGui::Selectable(skill_name, false)) {
                 handle_spell_selection(skill_tab_id);
             }
         }
-        imgui_end_popup();
+        ImGui::EndPopup();
     }
-    imgui_pop_style_var(1);
+    ImGui::PopStyleVar(1);
 }
 
 
@@ -131,31 +130,33 @@ void spell_hud() {
             .Var(ImGuiStyleVar_WindowBorderSize, 0.0f)
             .Font(static_cast<ImFont *>(font_sizes.ui))
             .Build();
-    if (imgui_begin("##SPELLHUD", NULL,
-                    IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE |
-                    IMGUI_WINDOW_FLAG_NO_BACKGROUND | IMGUI_WINDOW_FLAG_NO_TITLE_BAR)) {
-        void *draw_list = imgui_get_window_draw_list();
-        float window_x = imgui_get_window_pos_x();
-        float window_y = imgui_get_window_pos_y();
-        imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1);
-        imgui_push_style_color(IMGUI_COL_BUTTON, 1, 1, 1, 0);
-        imgui_push_style_color(IMGUI_COL_BUTTON_HOVERED, 1, 1, 1, 0);
-        imgui_push_style_color(IMGUI_COL_BUTTON_ACTIVE, 1, 1, 1, 0);
+    if (ImGui::Begin("##SPELLHUD", nullptr,
+                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+                     ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar)) {
+        ImDrawList *draw_list = ImGui::GetWindowDrawList();
+        float window_x = ImGui::GetWindowPos().x;
+        float window_y = ImGui::GetWindowPos().y;
+        auto pop_button_styles = ImGuiStyleBuilder()
+                .Color(ImGuiCol_Text, GOLD_FONT_COLOR_32)
+                .Color(ImGuiCol_Button, TRANSPARENT_COLOR_32)
+                .Color(ImGuiCol_ButtonHovered, TRANSPARENT_COLOR_32)
+                .Color(ImGuiCol_ButtonActive, TRANSPARENT_COLOR_32)
+                .Build();
         for (int i = 0; i < 20; i++) {
             if (i > 0 && i % 5 != 0) {
-                imgui_same_line_gap();
-                imgui_set_cursor_pos_x(imgui_get_cursor_pos_x() + 2.0f);
+                ImGui::SameLine();
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 2.0f);
             }
 
             if (i > 0 && i % 5 == 0) {
-                imgui_dummy(0, 2.0f);
+                ImGui::Dummy(ImVec2(0, 2.0f));
             }
-            float x = window_x + imgui_get_cursor_pos_x();
-            float y = window_y + imgui_get_cursor_pos_y();
-            imgui_draw_list_add_rect_filled(
-                draw_list,
-                x, y, x + 46, y + 13,
-                0xFF050512,
+            float x = window_x + ImGui::GetCursorPosX();
+            float y = window_y + ImGui::GetCursorPosY();
+            draw_list->AddRectFilled(
+                ImVec2(x, y),
+                ImVec2(x + 46, y + 13),
+                BACKGROUND_COLOR_DARK_MODE,
                 0.0f,
                 0);
             char binding_text[4];
@@ -170,32 +171,31 @@ void spell_hud() {
                 sprintf(spell_text, "-");
             }
 
-            float keybind_width, keybind_height;
-            imgui_calc_text_size_simple(&keybind_width, &keybind_height, binding_text);
+            auto [keybind_width, keybind_height] = ImGui::CalcTextSize(binding_text);
 
             /* Center the keybind text within the button */
             float text_x = x + (46 - keybind_width);
             float text_y = y + (13 - keybind_height) / 2.0f;
 
-            imgui_draw_list_add_text(draw_list, text_x - 2, text_y + 1, HINT_GREY_FONT_COLOR_32, binding_text);
-            imgui_draw_list_add_text(draw_list, x + 2, text_y + 1, GOLD_FONT_COLOR_32, spell_text);
+            draw_list->AddText(ImVec2(text_x - 2, text_y + 1), HINT_GREY_FONT_COLOR_32, binding_text);
+            draw_list->AddText(ImVec2(x + 2, text_y + 1), GOLD_FONT_COLOR_32, spell_text);
 
-            if (imgui_invisible_button(spell_key_id, 46, 13)) {
+            if (ImGui::InvisibleButton(spell_key_id, ImVec2(46, 13))) {
                 button_command(16 + i);
             }
 
-            if (imgui_is_item_hovered() && imgui_is_mouse_clicked(1)) {
+            if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1)) {
                 current_slot = i;
                 if (last_skill == -1) {
-                    imgui_open_popup("SpellPopup1");
+                    ImGui::OpenPopup("SpellPopup1");
                 } else {
                     handle_spell_selection(last_skill);
                 }
             }
         }
         render_spell_popover();
-        imgui_pop_style_color(4);
+        pop_button_styles();
     }
-    imgui_end();
+    ImGui::End();
     pop_spell_hud_styles();
 }
