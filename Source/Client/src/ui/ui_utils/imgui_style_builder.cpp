@@ -17,8 +17,8 @@ ImGuiStyleBuilder &ImGuiStyleBuilder::Var(ImGuiStyleVar idx, const ImVec2 &vec) 
 }
 
 ImGuiStyleBuilder &ImGuiStyleBuilder::Color(ImGuiCol idx, ImU32 val) {
-    ImGui::PushStyleVar(idx, val);
-    ++vars_pushed;
+    ImGui::PushStyleColor(idx, val);
+    ++colors_pushed;
     return *this;
 }
 
