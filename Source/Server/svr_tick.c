@@ -2463,11 +2463,10 @@ void plr_update_meta_stat_values(int nr, int n)
 	int cn = player[nr].usnr;
 	int v, m = 0;
 	
-	n = plr_get_meta_alternative_value(nr, n);
-	
 	buf[0] = SV_TERM_META;
 	buf[2] = n;
 	
+	n = plr_get_meta_alternative_value(nr, n);
 	v = get_meta_stat_value(cn, n);
 	
 	buf[1] = ST_META_VALUES;
@@ -2496,10 +2495,10 @@ void plr_update_meta_terminology(int nr, int n)
 	unsigned char buf[256];
 	int m;
 	
-	n = plr_get_meta_alternative_value(nr, n);
-	
 	buf[0] = SV_TERM_META;
 	buf[2] = n;
+	
+	n = plr_get_meta_alternative_value(nr, n);
 	
 	for (m=0; m<3; m++)
 	{
