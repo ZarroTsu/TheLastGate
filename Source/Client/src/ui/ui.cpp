@@ -66,6 +66,7 @@ void ui_render(void) {
     }
 
     inventory_render();
+    quick_stats_render(&game_ui_state.quick_stat_state);
 
     render();
 }

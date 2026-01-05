@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
 
-#include "ui/quick_stats.h"
+#include "ui/quick_stats.hpp"
 #include "ui/states/perf_window_state.h"
 
 typedef enum {

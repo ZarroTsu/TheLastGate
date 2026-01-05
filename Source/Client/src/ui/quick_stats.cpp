@@ -1,4 +1,4 @@
-#include "quick_stats.h"
+#include "quick_stats.hpp"
 
 #include <stddef.h>
 #include <stdio.h>
