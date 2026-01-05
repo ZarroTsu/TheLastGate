@@ -35,7 +35,7 @@ int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_
 short screen_renderdist;
 int screen_target_fps = 48;  // Configurable FPS target (default 120)
 
-SDL_Cursor* cursors[10];
+SDL_Cursor* cursors[MAX_CURSORS];
 
 int quit=0;
 GameState g_game_state = GAME_STATE_LAUNCHER;

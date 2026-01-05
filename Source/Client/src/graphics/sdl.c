@@ -267,7 +267,7 @@ int sdl_init(const int windowed) {
 
     init_atlas_groups();
 
-    for (int n = 1; n < 10; n++) {
+    for (int n = 1; n < MAX_CURSORS; n++) {
         char path[256];
         sprintf(path, "resources/cursor%d.png", n);
         cursors[n] = load_cursor_from_png(path, 0, 0);

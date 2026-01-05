@@ -610,6 +610,9 @@ int mouse_inventory(int x,int y,int mode)
 	// trashbin
 	if (x>gui_trash[0] && x<gui_trash[0]+34 && y>gui_trash[1] && y<gui_trash[1]+34) 
 	{
+	    if (pl.citem) cursor_type = CT_TRASH;
+	    else cursor_type = CT_NONE;
+
 		if (mode==MS_LB_UP) cmd3(CL_CMD_INV,9,0,selected_char);
 		if (mode==MS_RB_UP) xlog(1,"Dispose of items under your cursor here.");
 		return 1;

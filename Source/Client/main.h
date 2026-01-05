@@ -41,7 +41,9 @@ extern int hist_len[20];
 extern char words[MWORD][40];
 
 
-extern SDL_Cursor *cursors[10];
+#define MAX_CURSORS     11
+
+extern SDL_Cursor *cursors[MAX_CURSORS];
 
 void complete_word(void);
 

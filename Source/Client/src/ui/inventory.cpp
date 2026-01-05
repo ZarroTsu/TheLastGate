@@ -74,7 +74,19 @@ static void pop_scroll_styles() {
 static void on_inventory_hovered(const int slot) {
     const int keys = get_modifier_keys();
 
-    if (keys >= 2) {
+    if (keys >= 7) {
+        if (pl.item_info[slot].sprite) {
+            if (pl.citem ||
+                (pl.item_info[slot].flags & LOCKABLE_ITEM_FLAG_SOULSTONE) ||
+                (pl.item_info[slot].flags & LOCKABLE_ITEM_FLAG_TALISMAN) ||
+                (pl.item_info[slot].flags & LOCKABLE_ITEM_FLAG_CORRUPTION) ||
+                (pl.item_info[slot].stack > 0)) {
+                cursor_type = CT_NONE;
+            } else {
+                cursor_type = CT_TRASH;
+            }
+        }
+    } else if (keys >= 2) {
         if (pl.item_info[slot].sprite) {
             if (pl.citem) cursor_type = CT_NONE;
             else cursor_type = CT_TAKE;
@@ -101,7 +113,17 @@ static void on_inventory_hovered(const int slot) {
 static void on_inventory_left_click(const int slot) {
     const int keys = get_modifier_keys();
 
-    if (keys >= 2) {
+    if (keys >= 7) {
+        if (pl.citem ||
+            (pl.item_info[slot].flags & LOCKABLE_ITEM_FLAG_SOULSTONE) ||
+            (pl.item_info[slot].flags & LOCKABLE_ITEM_FLAG_TALISMAN) ||
+            (pl.item_info[slot].flags & LOCKABLE_ITEM_FLAG_CORRUPTION) ||
+            (pl.item_info[slot].stack > 0)) {
+            return;
+        }
+        cmd3(CL_CMD_INV, 0, slot, selected_char);
+        cmd3(CL_CMD_INV, 9, 0, selected_char);
+    } else if (keys >= 2) {
         if (game_ui_state.open_shop && game_ui_state.open_shop != 110 && game_ui_state.open_shop != 111) {
             // Sell item from inventory
             cmd3(CL_CMD_QSHOP, shop.nr, slot, game_ui_state.open_depot_page);
@@ -188,9 +210,9 @@ void inventory_render() {
                     bool highlighted = imgui_is_item_hovered();
                     render_lockable_item_display_imgui(draw_list, &pl.item_info[inventory_slot], win_x + slot_x,
                                                        win_y + slot_y, highlighted ? 16 : 0);
-
                 }
-                render_item_keybind_imgui(draw_list, INVENTORY_HOTBAR_SKILL_OFFSET + inventory_slot, win_x + slot_x, win_y + slot_y, INVENTORY_BUTTON_SIZE[0], INVENTORY_BUTTON_SIZE[1]);
+                render_item_keybind_imgui(draw_list, INVENTORY_HOTBAR_SKILL_OFFSET + inventory_slot, win_x + slot_x,
+                                          win_y + slot_y, INVENTORY_BUTTON_SIZE[0], INVENTORY_BUTTON_SIZE[1]);
                 imgui_pop_id();
             }
             imgui_end_child();

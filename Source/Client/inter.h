@@ -230,6 +230,7 @@ extern int hightlight_sub;
 #define CT_HIT			7
 #define CT_SWAP			8
 #define CT_SEL			9
+#define CT_TRASH        10
 
 struct skilltab
 {
