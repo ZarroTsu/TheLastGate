@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.7.0](https://github.com/jamesblack/TheLastGate/compare/v3.6.0...v3.7.0) (2026-01-05)
+
+
+### Features
+
+* New Trash cursor (thanks Ratheart) also a shortcut to delete items quickly from inventory ([9e59dfb](https://github.com/jamesblack/TheLastGate/commit/9e59dfb4669bb9a1a5f203f86bceea2540b0dbbb))
+* the up/down arrow will now put you into chat mode when the option is enabled but you aren't currently chatting. ([8ff29a2](https://github.com/jamesblack/TheLastGate/commit/8ff29a2f5e4a80a056d06b166247833bab1c66cd))
+
+
+### Bug Fixes
+
+* hopefully the last of the meta skill list fixes. ([e9e8a0d](https://github.com/jamesblack/TheLastGate/commit/e9e8a0d63c201a61d68f0d2842ecdcb4965c3708))
+* Meta Name/Description not showing the correct value... ([fbdab2d](https://github.com/jamesblack/TheLastGate/commit/fbdab2db309b5ff13f83d73c86cd7a9ef11f006e))
+* repaired pushcolor in the helper ([50d9ea0](https://github.com/jamesblack/TheLastGate/commit/50d9ea0bf4eb48aa449988def1db85804fabe934))
+
+
+### Miscellaneous Chores
+
+* bump version ([4f3394b](https://github.com/jamesblack/TheLastGate/commit/4f3394b33ff3050abb042ab6ce967a667f124bc9))
+
 ## [3.6.0](https://github.com/jamesblack/TheLastGate/compare/v3.5.2...v3.6.0) (2026-01-04)
 
 
