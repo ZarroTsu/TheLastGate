@@ -1,17 +1,21 @@
-#include "hotbar.h"
+#include "hotbar.hpp"
 
-#include "imgui/imgui_wrapper.h"
-#include "inter.h"
-#include "config/keybindings.h"
-#include "main.h"
-#include "ui_common.h"
+#include <stdio.h>
+
 #include "common.h"
+#include "inter.h"
 #include "ui.h"
-#include "config/config.h"
+#include "ui_common.h"
+#include "config/keybindings.h"
+#include "imgui/imgui_wrapper.h"
 
 static int current_slot = 0;
 
-static const int usable_skills[26] = {SK_BLIND, SK_CLEAVE, SK_SHIELD, SK_LEAP, SK_RAGE, SK_TAUNT, SK_WEAKEN, SK_WARCRY, SK_BLAST, SK_BLESS, SK_CURSE, SK_DISPEL, SK_ENHANCE, SK_GHOST, SK_HASTE, SK_HEAL, SK_IDENT, SK_LETHARGY, SK_LIGHT, SK_MSHIELD, SK_POISON, SK_PROTECT, SK_PULSE, SK_RECALL, SK_SHADOW, SK_SLOW};
+static const int usable_skills[26] = {
+    SK_BLIND, SK_CLEAVE, SK_SHIELD, SK_LEAP, SK_RAGE, SK_TAUNT, SK_WEAKEN, SK_WARCRY, SK_BLAST, SK_BLESS, SK_CURSE,
+    SK_DISPEL, SK_ENHANCE, SK_GHOST, SK_HASTE, SK_HEAL, SK_IDENT, SK_LETHARGY, SK_LIGHT, SK_MSHIELD, SK_POISON,
+    SK_PROTECT, SK_PULSE, SK_RECALL, SK_SHADOW, SK_SLOW
+};
 
 static void get_skill_tab_info_from_id(const int skill_id, char *out_name, int *out_skill_tab_id) {
     int skill_tab_id = -1;
@@ -51,17 +55,18 @@ static void handle_spell_selection(int skill_tab_id) {
         if (pdata.xbutton[current_slot].skill_nr != skilltab[skill_tab_id].nr) {
             pdata.xbutton[current_slot].skill_nr = skilltab[skill_tab_id].nr;
             snprintf(pdata.xbutton[current_slot].name, 7, "%s", skilltab[skill_tab_id].name);
-            xlog(1,"%s is now %s.", keybind_text, skilltab[skill_tab_id].name);
+            xlog(1, "%s is now %s.", keybind_text, skilltab[skill_tab_id].name);
         } else {
             pdata.xbutton[current_slot].skill_nr = -1;
-            xlog(1,"%s is now unassigned.", keybind_text);
+            xlog(1, "%s is now unassigned.", keybind_text);
         }
-    } else if (skill_tab_id >= 200) { // Technically Equipment
+    } else if (skill_tab_id >= 200) {
+        // Technically Equipment
         static char gear_name[20][8] = {
-            "*Helmet",	"*Neckla",	"*Armor",	"*Gloves",	"*Belt",
-            "*Tarot1",	"*Boots",	"*Offhan",	"*Weapon",	"*Cloak",
-            "*L-Ring",	"*R-Ring",	"*Tarot2",	"?",		"?",
-            "?", 		"?",		"?",		"?",		"?"
+            "*Helmet", "*Neckla", "*Armor", "*Gloves", "*Belt",
+            "*Tarot1", "*Boots", "*Offhan", "*Weapon", "*Cloak",
+            "*L-Ring", "*R-Ring", "*Tarot2", "?", "?",
+            "?", "?", "?", "?", "?"
         };
 
         if (pdata.xbutton[current_slot].skill_nr == skill_tab_id) {
@@ -97,8 +102,8 @@ static void render_spell_popover() {
         for (int i = 0; i < 26; i++) {
             int skill_id = usable_skills[i];
             int skill_tab_id;
-            const char *skill_name[32];
-            if ((skill_id==52 && !KNOW_IDENTIFY) || ((skill_id==53||skill_id==54) && !IS_LYCANTH)) {
+            char skill_name[32];
+            if ((skill_id == 52 && !KNOW_IDENTIFY) || ((skill_id == 53 || skill_id == 54) && !IS_LYCANTH)) {
                 continue;
             }
             get_skill_tab_info_from_id(skill_id, skill_name, &skill_tab_id);
@@ -114,7 +119,6 @@ static void render_spell_popover() {
 }
 
 
-
 void spell_hud() {
     imgui_set_next_window_pos(1036, 597);
     imgui_set_next_windows_size(238, 58);
@@ -123,14 +127,16 @@ void spell_hud() {
     imgui_push_style_var_vec2(IMGUI_STYLE_VAR_FRAME_PADDING, 0.0f, 2.0f);
     imgui_push_style_var_float(IMGUI_STYLE_VAR_WINDOW_BORDER_SIZE, 0.0f);
     imgui_push_font(font_sizes.ui);
-    if (imgui_begin("##SPELLHUD", NULL, IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE | IMGUI_WINDOW_FLAG_NO_BACKGROUND | IMGUI_WINDOW_FLAG_NO_TITLE_BAR)) {
+    if (imgui_begin("##SPELLHUD", NULL,
+                    IMGUI_WINDOW_FLAG_NO_MOVE | IMGUI_WINDOW_FLAG_NO_COLLAPSE | IMGUI_WINDOW_FLAG_NO_RESIZE |
+                    IMGUI_WINDOW_FLAG_NO_BACKGROUND | IMGUI_WINDOW_FLAG_NO_TITLE_BAR)) {
         void *draw_list = imgui_get_window_draw_list();
         float window_x = imgui_get_window_pos_x();
         float window_y = imgui_get_window_pos_y();
         imgui_push_style_color(IMGUI_COL_TEXT, GOLD_FONT_COLOR[0], GOLD_FONT_COLOR[1], GOLD_FONT_COLOR[2], 1);
-        imgui_push_style_color(IMGUI_COL_BUTTON, 1,1,1,0);
-        imgui_push_style_color(IMGUI_COL_BUTTON_HOVERED, 1,1,1,0);
-        imgui_push_style_color(IMGUI_COL_BUTTON_ACTIVE, 1,1,1,0);
+        imgui_push_style_color(IMGUI_COL_BUTTON, 1, 1, 1, 0);
+        imgui_push_style_color(IMGUI_COL_BUTTON_HOVERED, 1, 1, 1, 0);
+        imgui_push_style_color(IMGUI_COL_BUTTON_ACTIVE, 1, 1, 1, 0);
         for (int i = 0; i < 20; i++) {
             if (i > 0 && i % 5 != 0) {
                 imgui_same_line_gap();

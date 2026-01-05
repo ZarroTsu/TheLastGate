@@ -78,7 +78,7 @@ add_executable(TheLastGate
         src/security/security.c
         src/security/single_instance.c
         src/security/unique_id.c
-        src/ui/hotbar.c
+        src/ui/hotbar.cpp
         src/ui/inventory.c
         src/ui/option_window.c
         src/ui/perf_window.cpp

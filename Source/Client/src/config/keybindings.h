@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+EXTERN_C_BEGIN
 #include <SDL2/SDL.h>
 
 #define NUM_SPELL_HOTKEYS 20
@@ -96,3 +98,4 @@ BindingDescriptor *binding_find(SDL_Keycode key, int sdl_modstate);
 
 /* Find binding by ID, returns NULL otherwise */
 BindingDescriptor *binding_find_by_id(const char* id);
+EXTERN_C_END

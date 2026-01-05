@@ -4,6 +4,7 @@
 
 #include "ui.h"
 
+#include "hotbar.hpp"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
@@ -55,6 +56,7 @@ void ui_shutdown(void) {
 void ui_render(void) {
     start_frame();
 
+    spell_hud();
     render();
 }
 

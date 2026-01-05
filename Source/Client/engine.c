@@ -3910,7 +3910,6 @@ void engine(void)
 			input_event_count = 0;
 
 		    ui_render();
-			// spell_hud();
 			// if (game_ui_state.show_options) {
 			// 	options_window_render();
 			// }

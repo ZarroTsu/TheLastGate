@@ -3,6 +3,7 @@
 //
 
 #include "common.h"
+EXTERN_C_BEGIN
 
 #define MAXSPRITE 2000+(128*1024)
 
@@ -315,3 +316,4 @@ extern int gui_equ_y[];
 
 extern int gui_equ_s[];
 extern int gui_hud_b[];
+EXTERN_C_END
