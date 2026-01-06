@@ -1374,7 +1374,7 @@ void plr_cmd_setuser(int nr)
 			reason = NULL;
 			
 			if (strlen(ch[cn].description)<10)
-				reason = "is too short";}
+				reason = "is too short";
 			
 			/*else if (strstr(ch[cn].description, ch[cn].name)==NULL)
 				reason = "does not contain your name";*/
@@ -2223,23 +2223,20 @@ int get_meta_stat_value(int cn, int n)
 
 int ch_get_meta_alternative_value(int cn, int n)
 {
-	switch (n)
-	{
-		case  2: if (do_get_iflag(cn, SF_STAR_R))   n =  89; break; // Spell Modifier -> Skill Modifier
-		case 35: if (do_get_iflag(cn, SF_TOWER_R))  n =  90; break; // Poison -> Venom
-		case 36: if (do_get_iflag(cn, SF_TOWER_R))  n =  91; break; // Poison -> Venom
-		case 37: if (do_get_iflag(cn, SF_JUDGE_R))  n =  92; break; // Pulse Hit Damage -> Pulse Hit Heal
-		case 68: if (do_get_iflag(cn, SF_EMPRESS))  n =  93; break; // M.Shield -> M.Shell
-		case 69: if (do_get_iflag(cn, SF_EMPRESS))  n =  94; break; // M.Shield -> M.Shell
-		case 73: if (do_get_iflag(cn, SF_STAR))     n =  95; break; // Heal -> Regen
-		case 74: if (do_get_iflag(cn, SF_CHARIOT))  n =  96; break; // Blind -> Douse
-		case 75: if (do_get_iflag(cn, SF_CHARIOT))  n =  97; break; // Blind -> Douse
-		case 76: if (do_get_iflag(cn, SF_EMPERO_R)) n =  98; break; // Warcry -> Rally
-		case 77: if (do_get_iflag(cn, SF_EMPERO_R)) n =  99; break; // Warcry -> Rally
-		case 78: if (do_get_iflag(cn, SF_DEATH))    n = 100; break; // Weaken -> Crush
-		case 79: if (do_get_iflag(cn, SF_DEATH))    n = 101; break; // Weaken -> Crush
-		default: break;
-	}
+	if (n ==  2 && do_get_iflag(cn, SF_STAR_R))   return  89; break; // Spell Modifier -> Skill Modifier
+	if (n == 35 && do_get_iflag(cn, SF_TOWER_R))  return  90; break; // Poison -> Venom
+	if (n == 36 && do_get_iflag(cn, SF_TOWER_R))  return  91; break; // Poison -> Venom
+	if (n == 37 && do_get_iflag(cn, SF_JUDGE_R))  return  92; break; // Pulse Hit Damage -> Pulse Hit Heal
+	if (n == 68 && do_get_iflag(cn, SF_EMPRESS))  return  93; break; // M.Shield -> M.Shell
+	if (n == 69 && do_get_iflag(cn, SF_EMPRESS))  return  94; break; // M.Shield -> M.Shell
+	if (n == 73 && do_get_iflag(cn, SF_STAR))     return  95; break; // Heal -> Regen
+	if (n == 74 && do_get_iflag(cn, SF_CHARIOT))  return  96; break; // Blind -> Douse
+	if (n == 75 && do_get_iflag(cn, SF_CHARIOT))  return  97; break; // Blind -> Douse
+	if (n == 76 && do_get_iflag(cn, SF_EMPERO_R)) return  98; break; // Warcry -> Rally
+	if (n == 77 && do_get_iflag(cn, SF_EMPERO_R)) return  99; break; // Warcry -> Rally
+	if (n == 78 && do_get_iflag(cn, SF_DEATH))    return 100; break; // Weaken -> Crush
+	if (n == 79 && do_get_iflag(cn, SF_DEATH))    return 101; break; // Weaken -> Crush
+	
 	return n;
 }
 
