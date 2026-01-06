@@ -256,6 +256,8 @@ int is_ascroll(int in);
 // Sanity check on skill number
 #define IS_SANESKILL(s) 		((s)>=0 && (s)<MAXSKILL)
 
+#define IS_SEYANSKILL(n)		(n==SK_WARCRY||n==SK_PULSE||n==SK_LEAP||n==SK_LETHARGY||n==SK_GCMASTERY||n==SK_ZEPHYR||n==SK_FINESSE||n==SK_RAGE)
+
 // Fancy get/setters
 #define B_AT(cn, a)				(ch[(cn)].attrib[(a)][0])
 #define M_AT(cn, a)				(get_attrib_score((cn), (a)))

@@ -878,19 +878,14 @@ int npc_give(int cn, int co, int in, int money)
 	if ((nr = ch[cn].data[50])!=0)
 	{
 		// Check each arch skill against the race that is intended to learn it.
-		if (( nr == SK_WARCRY && !IS_SEYA_OR_ARTM(co) )
-		 || ( nr == SK_PULSE  && !IS_SEYA_OR_ARHR(co) )
-		 || ( nr == SK_LEAP   && !IS_SEYA_OR_SKAL(co) )
-		 || ( nr == SK_LETHARGY && !IS_SEYA_OR_SORC(co) )
-		 || ( nr == SK_GCMASTERY && !IS_SEYA_OR_SUMM(co) )
-		 || ( nr == SK_ZEPHYR && !IS_SEYA_OR_WARR(co) )
-		 || ( nr == SK_FINESSE && !IS_SEYA_OR_BRAV(co) )
-		 || ( nr == SK_RAGE && !IS_SEYA_OR_LYCA(co) ))
+		if (( nr == SK_WARCRY    && !IS_SEYA_OR_ARTM(co) ) || ( nr == SK_PULSE     && !IS_SEYA_OR_ARHR(co) )
+		 || ( nr == SK_LEAP      && !IS_SEYA_OR_SKAL(co) ) || ( nr == SK_LETHARGY  && !IS_SEYA_OR_SORC(co) )
+		 || ( nr == SK_GCMASTERY && !IS_SEYA_OR_SUMM(co) ) || ( nr == SK_ZEPHYR    && !IS_SEYA_OR_WARR(co) )
+		 || ( nr == SK_FINESSE   && !IS_SEYA_OR_BRAV(co) ) || ( nr == SK_RAGE      && !IS_SEYA_OR_LYCA(co) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only two!
-		if ((nr == SK_WARCRY || nr == SK_PULSE || nr == SK_LEAP || nr == SK_LETHARGY || 
-			nr == SK_GCMASTERY || nr == SK_ZEPHYR || nr == SK_FINESSE || nr == SK_RAGE) && IS_SEYAN_DU(co))
+		if (IS_SEYANSKILL(nr) && IS_SEYAN_DU(co))
 		{
 			canlearn = 2;
 			if (B_SK(co, SK_WARCRY))   canlearn--;
@@ -902,10 +897,8 @@ int npc_give(int cn, int co, int in, int money)
 			if (B_SK(co, SK_FINESSE))  canlearn--;
 			if (B_SK(co, SK_RAGE))     canlearn--;
 			
-			if (canlearn>=1) 
-				canlearn = 1;
-			else 
-				canlearn = 0;
+			if (canlearn >= 1) canlearn = 1;
+			else               canlearn = 0;
 		}
 	}
 
@@ -1649,7 +1642,26 @@ int npc_give(int cn, int co, int in, int money)
 					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
 					{
 						nr2 = convert_skill_for_group(n, nr2);
-						if (!B_SK(n, nr2) && ch[n].skill[nr2][2])
+						
+						canlearn = 2;
+						
+						// Seyan'du can learn any arch skill, but only two!
+						if (IS_SEYANSKILL(nr2) && IS_SEYAN_DU(n))
+						{
+							if (B_SK(n, SK_WARCRY))    canlearn--;
+							if (B_SK(n, SK_LEAP))      canlearn--;
+							if (B_SK(n, SK_GCMASTERY)) canlearn--;
+							if (B_SK(n, SK_LETHARGY))  canlearn--;
+							if (B_SK(n, SK_PULSE))     canlearn--;
+							if (B_SK(n, SK_ZEPHYR))    canlearn--;
+							if (B_SK(n, SK_FINESSE))   canlearn--;
+							if (B_SK(n, SK_RAGE))      canlearn--;
+							
+							if (canlearn >= 1) canlearn = 1;
+							else               canlearn = 0;
+						}
+						
+						if (!B_SK(n, nr2) && (canlearn > 0) && ch[n].skill[nr2][2])
 						{
 							B_SK(n, nr2) = 1;
 							if (IS_LYCANTH(n) && IS_SHIFTED(n) && nr2==SK_RAGE)

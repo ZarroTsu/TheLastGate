@@ -6824,6 +6824,7 @@ void skill_shift(int cn, int force)
 	ch[cn].a_hp = ch[cn].a_mana;
 	ch[cn].a_mana = tmp;
 	
+	ch_update_skill_terminology(cn, 22);
 	do_update_char(cn);
 	
 	if (!force)
