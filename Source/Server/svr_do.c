@@ -9478,7 +9478,6 @@ int do_hurt(int cn, int co, int dam, int type)
 				case 18: damtype = DAM_MULT_RLEAP;  break; // Random Leaps
 				default: damtype = DAM_MULT_HIT;    break; // Hit / Surround Hit / Crit
 			}
-			if ((type==5 || type == 8 || type == 18) && !IS_PLAYER(cn) && IS_PLAYER(co)) damtype = damtype*4/5;
 			dam *= damtype;
 		}
 	}

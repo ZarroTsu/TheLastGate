@@ -188,16 +188,16 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"Pulse (Charge)", 		"Use (Spell): Applies a buff to yourself, bursting with energy to charge nearby allies. Has a base radius of 3 tiles.",
 				{ AT_BRV, AT_INT, AT_INT }},
 				
-	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of skills which already have an area-of-effect.",
-				"Proximity",			"Passively improves the area-of-effect of your Poison, Curse, and Slow spells.", // Sorcerer
+	{ 44, 'G', 	"Proximity", 			"Passively improves the area-of-effect of several skills.",
+				"", "",
 				{ AT_BRV, AT_WIL, AT_INT }},
 				
 	{ 45, 'G', 	"Companion Mastery", 	"Passively increases the limit and number of abilities known by your ghost companion.", 
-				"Proximity",			"Passively improves the area-of-effect of your Blast and Pulse spells.", // Arch-Harakim
+				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 46, 'F', 	"Shadow Copy", 			"Use (Spell): Summons a temporary doppelganger to attack your enemies.", 
-				"Proximity",			"Passively improves the area-of-effect of your Aria and Weaken skills.", // Braver
+				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
 	{ 47, 'F', 	"Haste", 				"Use (Spell): Applies a buff to yourself, increasing your action speed.", 

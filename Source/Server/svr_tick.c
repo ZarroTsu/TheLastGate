@@ -1208,18 +1208,9 @@ void plr_cmd_skill(int nr)
 	n  = *(unsigned long*)(player[nr].inbuf + 1);
 	co = *(unsigned long*)(player[nr].inbuf + 5);
 
-	if (n<0 || n>99)
-	{
-		return;                 // sanity checks
-	}
-	if (co<0 || co>=MAXCHARS)
-	{
-		return;
-	}
-	if (n!=50 && n!=51 && n!=52 && n!=53 && n!=54 && !B_SK(cn, n))
-	{
-		return;
-	}
+	if (n<0 || n>99)                                               return; // sanity checks
+	if (co<0 || co>=MAXCHARS)                                      return;
+	if (n!=50 && n!=51 && n!=52 && n!=53 && n!=54 && !B_SK(cn, n)) return;
 
 	ch[cn].skill_nr = n;
 	ch[cn].skill_target1 = co;
@@ -1228,84 +1219,52 @@ void plr_cmd_skill(int nr)
 void plr_cmd_input1(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input2(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 15] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n + 15] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input3(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 30] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n + 30] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input4(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 45] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n + 45] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input5(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 60] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n + 60] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input6(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 75] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n + 75] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input7(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 90] = player[nr].inbuf[n + 1];
-	}
+	for (n = 0; n<15; n++) player[nr].input[n + 90] = player[nr].inbuf[n + 1];
 }
 
 void plr_cmd_input8(int nr)
 {
 	int n;
-
-	for (n = 0; n<15; n++)
-	{
-		player[nr].input[n + 105] = player[nr].inbuf[n + 1];
-	}
-
+	for (n = 0; n<15; n++) player[nr].input[n + 105] = player[nr].inbuf[n + 1];
+	
 	player[nr].input[105 + 14] = 0;
-
+	
 	do_say(player[nr].usnr, player[nr].input);
 }
 
@@ -1326,186 +1285,132 @@ void plr_cmd_setuser(int nr)
 
 	switch(player[nr].inbuf[1])
 	{
-	case    0:
-		for (n = 0; n<13; n++)
-		{
-			ch[cn].text[0][n + pos] = player[nr].inbuf[n + 3];
-		}
-		break;
-	case    1:
-		for (n = 0; n<13; n++)
-		{
-			ch[cn].text[1][n + pos] = player[nr].inbuf[n + 3];
-		}
-		break;
-	case    2:
-		for (n = 0; n<13; n++)
-		{
-			ch[cn].text[2][n + pos] = player[nr].inbuf[n + 3];
-		}
-		if (pos!=65)
-		{
+		case    0:
+			for (n = 0; n<13; n++)
+				ch[cn].text[0][n + pos] = player[nr].inbuf[n + 3];
 			break;
-		}
-		if (strlen(ch[cn].text[0])>2 &&
-		    strlen(ch[cn].text[0])<38 &&
-		    (ch[cn].flags & CF_NEWUSER))
-		{
-
-			flag = 0;
-
-			for (n = 0; ch[cn].text[0][n]; n++)
+		case    1:
+			for (n = 0; n<13; n++)
+				ch[cn].text[1][n + pos] = player[nr].inbuf[n + 3];
+			break;
+		case    2:
+			for (n = 0; n<13; n++)
+				ch[cn].text[2][n + pos] = player[nr].inbuf[n + 3];
+			if (pos!=65)
+				break;
+			
+			if (strlen(ch[cn].text[0])>2 &&
+				strlen(ch[cn].text[0])<38 &&
+				(ch[cn].flags & CF_NEWUSER))
 			{
-				if (!isalpha(ch[cn].text[0][n]))
+
+				flag = 0;
+
+				for (n = 0; ch[cn].text[0][n]; n++)
 				{
-					flag = 1;
-					break;
+					if (!isalpha(ch[cn].text[0][n]))
+					{
+						flag = 1;
+						break;
+					}
+					ch[cn].text[0][n] = tolower(ch[cn].text[0][n]);
 				}
-				ch[cn].text[0][n] = tolower(ch[cn].text[0][n]);
-			}
-			if (flag==1)
-			{
-				reason = "contains non-letters. Please choose a more normal-looking name.";
-			}
+				if (flag==1)
+				{
+					reason = "contains non-letters. Please choose a more normal-looking name.";
+				}
 
-			// check for bad names here when the string is all lowercase
-			if (god_is_badname(ch[cn].text[0]))
-			{
-				flag = 3;
-			}
+				// check for bad names here when the string is all lowercase
+				if (god_is_badname(ch[cn].text[0]))
+				{
+					flag = 3;
+				}
 
-			ch[cn].text[0][0] = toupper(ch[cn].text[0][0]);
+				ch[cn].text[0][0] = toupper(ch[cn].text[0][0]);
 
-			/* CS, 991030: Reserve "Self" for self-reference. */
-			if (!strcmp(ch[cn].text[0], "Self"))
-			{
-				flag = 2;
-			}
-			for (n = 1; !flag && n<MAXCHARS; n++)
-			{
-				if (ch[n].used!=USE_EMPTY && strcmp(ch[cn].text[0], ch[n].name)==0)
+				/* CS, 991030: Reserve "Self" for self-reference. */
+				if (!strcmp(ch[cn].text[0], "Self"))
+				{
+					flag = 2;
+				}
+				for (n = 1; !flag && n<MAXCHARS; n++)
+				{
+					if (ch[n].used!=USE_EMPTY && strcmp(ch[cn].text[0], ch[n].name)==0)
+					{
+						flag = 2;
+						break;
+					}
+				}
+				/* CS, 000301: Check for names of mobs in templates */
+				for (n = 1; !flag && n<MAXTCHARS; n++) if (!strcmp(ch[cn].text[0], ch_temp[n].name))
 				{
 					flag = 2;
 					break;
 				}
-			}
-			/* CS, 000301: Check for names of mobs in templates */
-			for (n = 1; !flag && n<MAXTCHARS; n++)
-			{
-				if (!strcmp(ch[cn].text[0], ch_temp[n].name))
+				
+				if (flag==2)
+					reason = "is already in use. Please try to choose another name.";
+				
+				if (flag==3)
+					reason = "is deemed inappropriate. Please try to choose another name.";
+				
+				if (flag)
+					do_char_log(cn, 0, "The name \"%s\" you have chosen for your character %s\n",
+								ch[cn].text[0], reason);
+				
+				else
 				{
-					flag = 2;
-					break;
+					strcpy(ch[cn].name, ch[cn].text[0]);
+					strcpy(ch[cn].reference, ch[cn].text[0]);
+					ch[cn].flags &= ~CF_NEWUSER;
 				}
 			}
-			if (flag==2)
+			
+			strcpy(ch[cn].description, ch[cn].text[1]);
+			
+			if (strlen(ch[cn].description)>77)
+				strcat(ch[cn].description, ch[cn].text[2]);
+			
+			reason = NULL;
+			
+			if (strlen(ch[cn].description)<10)
+				reason = "is too short";}
+			
+			/*else if (strstr(ch[cn].description, ch[cn].name)==NULL)
+				reason = "does not contain your name";*/
+			
+			else if (strchr(ch[cn].description, '\"'))
+				reason = "contains a double quote";
+			
+			else if (ch[cn].flags & CF_NODESC)
+				reason = "was blocked because you have been known to enter inappropriate descriptions";
+			
+			if (reason != NULL)
 			{
-				reason = "is already in use. Please try to choose another name.";
+				if (IS_TEMPLAR(cn))          race_name = "a Templar";
+				else if (IS_HARAKIM(cn))     race_name = "a Harakim";
+				else if (IS_MERCENARY(cn))   race_name = "a Mercenary";
+				else if (IS_SEYAN_DU(cn))    race_name = "a Seyan'Du";
+				else if (IS_ARCHHARAKIM(cn)) race_name = "an Arch Harakim";
+				else if (IS_ARCHTEMPLAR(cn)) race_name = "an Arch Templar";
+				else if (IS_WARRIOR(cn))     race_name = "a Warrior";
+				else if (IS_SORCERER(cn))    race_name = "a Sorcerer";
+				else if (IS_SKALD(cn))       race_name = "a Skald";
+				else if (IS_SUMMONER(cn))    race_name = "a Summoner";
+				else if (IS_BRAVER(cn))      race_name = "a Braver";
+				else if (IS_LYCANTH(cn))     race_name = "a Lycanthrope";
+				else                         race_name = "a strange figure";
+				
+				do_char_log(cn, 0, "The description you entered for your character %s, so it has been rejected.\n", reason);
+				sprintf(ch[cn].description, "%s is %s. %s looks somewhat nondescript.", ch[cn].name, race_name, HE_SHE_CAPITAL(cn));
 			}
-			if (flag==3)
-			{
-				reason = "is deemed inappropriate. Please try to choose another name.";
-			}
-
-			if (flag)
-			{
-				do_char_log(cn, 0, "The name \"%s\" you have chosen for your character %s\n",
-				            ch[cn].text[0], reason);
-			}
-			else
-			{
-				strcpy(ch[cn].name, ch[cn].text[0]);
-				strcpy(ch[cn].reference, ch[cn].text[0]);
-				ch[cn].flags &= ~CF_NEWUSER;
-			}
-		}
-		strcpy(ch[cn].description, ch[cn].text[1]);
-		if (strlen(ch[cn].description)>77)
-		{
-			strcat(ch[cn].description, ch[cn].text[2]);
-		}
-		reason = NULL;
-		if (strlen(ch[cn].description)<10)
-		{
-			reason = "is too short";
-		}
-		/*else if (strstr(ch[cn].description, ch[cn].name)==NULL)
-		{
-			reason = "does not contain your name";
-		}*/
-		else if (strchr(ch[cn].description, '\"'))
-		{
-			reason = "contains a double quote";
-		}
-		else if (ch[cn].flags & CF_NODESC)
-		{
-			reason = "was blocked because you have been known to enter inappropriate descriptions";
-		}
-		if (reason != NULL)
-		{
-			if (IS_TEMPLAR(cn))
-			{
-				race_name = "a Templar";
-			}
-			else if (IS_HARAKIM(cn))
-			{
-				race_name = "a Harakim";
-			}
-			else if (IS_MERCENARY(cn))
-			{
-				race_name = "a Mercenary";
-			}
-			else if (IS_SEYAN_DU(cn))
-			{
-				race_name = "a Seyan'Du";
-			}
-			else if (IS_ARCHHARAKIM(cn))
-			{
-				race_name = "an Arch Harakim";
-			}
-			else if (IS_ARCHTEMPLAR(cn))
-			{
-				race_name = "an Arch Templar";
-			}
-			else if (IS_WARRIOR(cn))
-			{
-				race_name = "a Warrior";
-			}
-			else if (IS_SORCERER(cn))
-			{
-				race_name = "a Sorcerer";
-			}
-			else if (IS_SKALD(cn))
-			{
-				race_name = "a Skald";
-			}
-			else if (IS_SUMMONER(cn))
-			{
-				race_name = "a Summoner";
-			}
-			else if (IS_BRAVER(cn))
-			{
-				race_name = "a Braver";
-			}
-			else if (IS_LYCANTH(cn))
-			{
-				race_name = "a Lycanthrope";
-			}
-			else
-			{
-				race_name = "a strange figure";
-			}
-			do_char_log(cn, 0, "The description you entered for your character %s, so it has been rejected.\n", reason);
-			sprintf(ch[cn].description, "%s is %s. %s looks somewhat nondescript.", ch[cn].name, race_name, HE_SHE_CAPITAL(cn));
-		}
-
-		do_char_log(cn, 1, "Account data received.\n");
-		plog(nr, "Account data received");
-		do_update_char(cn);
-		break;
-	default:
-		plog(nr, "Unknown setuser subtype %d", player[nr].inbuf[1]);
-		break;
+			do_char_log(cn, 1, "Account data received.\n");
+			plog(nr, "Account data received");
+			do_update_char(cn);
+			break;
+		default:
+			plog(nr, "Unknown setuser subtype %d", player[nr].inbuf[1]);
+			break;
 	}
 }
 
@@ -1838,14 +1743,6 @@ void plr_update_skill_terminology(int nr, int n)
 	if (n==43 && do_get_iflag(cn, SF_JUDGE_R))    alt = 1; // Pulse -> Healing Pulses
 	if (n==49 && do_get_iflag(cn, SF_JUSTIC_R))   alt = 1; // Leap
 	if (n==22 && IS_SHIFTED(cn))                  alt = 1; // Rage -> Calm
-	if (n==44)
-	{
-		alt = 1;
-		if (IS_SORCERER(cn)) ;
-		else if (IS_ARCHHARAKIM(cn)) n++;
-		else if (IS_BRAVER(cn)) n+=2;
-		else alt = 0;
-	}
 	
 	for (m=0; m<3; m++)
 	{
@@ -2042,7 +1939,7 @@ int get_meta_stat_value(int cn, int n)
 			value = max(1, 100 - 100*M_SK(cn, SK_ECONOM)/(do_get_iflag(cn, SF_BOOK_PROD)?300:400));
 			break;
 		case 19: case 60: // Total AoE Bonus
-			value = ch[cn].aoe_bonus;
+			value = ch[cn].aoe_bonus + ch[cn].aoe_bonus * GET_PROX(cn)/200;
 			break;
 		//
 		case 24: // Cleave Hit Damage				Decimal, 0.00
@@ -2085,7 +1982,7 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_TW_IRA))   in = power * ch[cn].crit_multi / 100 - power;
 			if (do_get_iflag(cn, SF_JUDGE)) power = (power+max(0, in))*85/100;
 			else                            power = power+max(0, in);
-			value = power * DAM_MULT_BLAST/10;
+			value = power * DAM_MULT_BLAST/10;													// BUG: Blank??
 			break;
 		case 33: // Blast Cooldown					Decimal, 0.00 Seconds
 			value = (T_ARHR_SK(cn,4)?575:600) * cdlen / 100;
@@ -2115,8 +2012,8 @@ int get_meta_stat_value(int cn, int n)
 			if (T_ARHR_SK(cn, 7))        power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 79)) power = power + (power*M_AT(cn, AT_INT)*m/5000);
 			power = spell_multiplier(power, cn);
-			if (n==37) value = power * 2;
-			else       value = power * DAM_MULT_PULSE / 20;
+			if (n==37) value = power * 2;													// BUG: Blank??
+			else       value = power * DAM_MULT_PULSE / 20;									// BUG: Blank??
 			break;
 		case 38: // Pulse Count
 			value = 60*2*100 / 3 * cdlen;
@@ -2214,7 +2111,7 @@ int get_meta_stat_value(int cn, int n)
 			else                              value = min(127, durat / (IS_SEYA_OR_BRAV(cn)?1536:1024) + 1);
 			break;
 		case 69: case 94: // M.Shield/Shell Dur		Decimal, 0.00 Seconds
-			value = durat * 100 / 20;
+			value = durat * 100 / 20;																			// BUG: Blank??
 			break;
 		case 70: // Haste Effect
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
@@ -2270,8 +2167,8 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
 			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
-			if (do_get_iflag(cn, SF_TOWER))       value = -(5 + CURSE2FORM(power, 4));
-			else                                  value = -(3 + (power - 4) / 5);
+			if (do_get_iflag(cn, SF_TOWER))       value = -(5 + CURSE2FORM(power, 4));					// BUG: Blank??
+			else                                  value = -(3 + (power - 4) / 5);						// BUG: Blank??
 			break;
 		case 81: // Curse Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
@@ -2281,8 +2178,8 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
 			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
-			if (do_get_iflag(cn, SF_EMPEROR))     value = -(min(300, 30 + SLOW2FORM(power)));
-			else                                  value = -(min(300, 30 + SLOWFORM(power)));
+			if (do_get_iflag(cn, SF_EMPEROR))     value = -(min(300, 30 + SLOW2FORM(power)));			// BUG: Blank??
+			else                                  value = -(min(300, 30 + SLOWFORM(power)));			// BUG: Blank??
 			break;
 		case 83: // Slow Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
@@ -2324,10 +2221,8 @@ int get_meta_stat_value(int cn, int n)
 	return value;
 }
 
-int plr_get_meta_alternative_value(int nr, int n)
+int ch_get_meta_alternative_value(int cn, int n)
 {
-	int cn = player[nr].usnr;
-	
 	switch (n)
 	{
 		case  2: if (do_get_iflag(cn, SF_STAR_R))   n =  89; break; // Spell Modifier -> Skill Modifier
@@ -2345,7 +2240,6 @@ int plr_get_meta_alternative_value(int nr, int n)
 		case 79: if (do_get_iflag(cn, SF_DEATH))    n = 101; break; // Weaken -> Crush
 		default: break;
 	}
-	
 	return n;
 }
 
@@ -2358,7 +2252,7 @@ void plr_update_meta_stat_values(int nr, int n)
 	buf[0] = SV_TERM_META;
 	buf[2] = n;
 	
-	n = plr_get_meta_alternative_value(nr, n);
+	n = ch_get_meta_alternative_value(cn, n);
 	v = get_meta_stat_value(cn, n);
 	
 	buf[1] = ST_META_VALUES;
@@ -2390,7 +2284,7 @@ void plr_update_meta_terminology(int nr, int n)
 	buf[0] = SV_TERM_META;
 	buf[2] = n;
 	
-	n = plr_get_meta_alternative_value(nr, n);
+	n = ch_get_meta_alternative_value(player[nr].usnr, n);
 	
 	for (m=0; m<3; m++)
 	{

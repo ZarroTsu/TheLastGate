@@ -460,13 +460,6 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
 	else co = cn;
 	
-	/* Event logging for debug
-	if (co!=cn)
-		chlog(cn, "  Trying to cast %s on %s", splog[in].name, ch[co].name);
-	else
-		chlog(cn, "  Trying to cast %s on self", splog[in].name);
-	*/
-	
 	if (usemana && (ch[co].flags & CF_NOMAGIC) && !(IS_IN_CAROV(ch[co].x, ch[co].y)))
 	{
 		nomagic(cn, 1);
@@ -480,15 +473,8 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	if (!buff)
 	{
-		// AoE spells forgo failing since there may be targets handled by cast_aoe_spell
-		// The spell cost is set to zero and will be spent in cast_aoe_spell
-		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && ((B_SK(cn, SK_PROX) && ((IS_BRAVER(cn) && in==SK_WEAKEN) || 
-			(IS_ARCHHARAKIM(cn) && (in==SK_BLAST||in==SK_POISON)) || (IS_SORCERER(cn) && (in==SK_CURSE||in==SK_SLOW||in==SK_POISON)) )) || 
-			(IS_ARCHTEMPLAR(cn) && in==SK_TAUNT) || (IS_WARRIOR(cn) && in==SK_BLIND) ||
-			(IS_SEYAN_DU(cn) && (in==SK_CURSE||in==SK_SLOW||in==SK_POISON||in==SK_TAUNT||in==SK_BLAST||in==SK_WEAKEN)) ))
-		{
-			cost = 0;
-		}
+		// AoE spells forgo failing since there may be targets handled by aoe_driver
+		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && IS_AOESKILL(in)) ;
 		else if (cn==co)
 		{
 			if (need_combat)
@@ -527,25 +513,14 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		
 		if (need_combat && !is_facing(cn,co))
 		{
-			if (!face_target(cn, co))
-				return 0;
+			if (!face_target(cn, co)) return 0;
 		}
 		
-		if (!buff)
-		{
-			remember_pvp(cn, co);
-		}
+		if (!buff) remember_pvp(cn, co);
 	}
 	
-	if (is_exhausted(cn))
-	{ 
-		return 0; 
-	}
-	
-	if (spellcost(cn, cost, in, usemana))
-	{
-		return 0; 
-	}
+	if (is_exhausted(cn)) return 0; 
+	if (spellcost(cn, cost, in, usemana)) return 0; 
 	
 	if (cn!=co)
 	{
@@ -602,8 +577,6 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		do_char_log(cn, 0, "You lost your focus.\n");
 		return 0;
 	}
-	
-	//chlog(cn, "    End of get_target");
 	
 	if (!buff && cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, power, 0);
 	
@@ -715,7 +688,7 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 		if (surround==2 && (surrMod-coPar)>10) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-10), 20)/20);
 		if (surround==3 && (surrMod-coPar)>20) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-20), 20)/20);
 		
-		if (co==co_orig)                               surrDam = surrDam*3/4;
+		if (co==co_orig)                              surrDam = surrDam*3/4;
 		if (co!=co_orig && (n=st_skillcount(cn, 46))) surrDam = surrDam*(100+n*5)/100;
 		
 		do_hurt(cn, co, surrDam+critDam, critDam>0?9:4);
@@ -909,7 +882,6 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	
 	switch (intemp)
 	{
-		
 		case SK_LEAP:
 		case SK_PLAGUE:
 		case SK_ZEPHYR2:
@@ -951,9 +923,14 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 				do_char_log(cn, 0, "You stop yourself from %s your companion. That would be silly.\n", splog[intemp].act);
 				return -1;
 			}
-			else
+			else if (co_orig==cn)
 			{ 
 				do_char_log(cn, 0, "You cannot %s yourself!\n", splog[intemp].ref); 
+				return -1;
+			}
+			else
+			{
+				do_char_log(cn, 0, "There's nothing nearby to %s.\n", splog[intemp].ref); 
 				return -1;
 			}
 		}
@@ -3290,7 +3267,7 @@ void skill_curse(int cn)
 	}
 	
 	// Spell AoE
-	if (aoe_driver(cn, cn, co, SK_CURSE, power, B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0, count, hit, 0) < 0) return;
+	if (aoe_driver(cn, cn, co, SK_CURSE, power, GET_PROX(cn), count, hit, 0) < 0) return;
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	// Cast AoE or general surround-hit
