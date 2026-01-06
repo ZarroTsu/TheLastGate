@@ -1575,199 +1575,91 @@ void cl_list(void)
 void plr_cmd(int nr)
 {
 	int cn;
-
-	clcmd[player[nr].inbuf[0]]++;
-
-	switch(player[nr].inbuf[0])
-	{
-	case CL_NEWLOGIN:
-		plr_challenge_newlogin(nr);
-		break;
-	case CL_CHALLENGE:
-		plr_challenge(nr);
-		break;
-	case CL_LOGIN:
-		plr_challenge_login(nr);
-		break;
-	case CL_CMD_UNIQUE:
-		plr_unique(nr);
-		return;
-	case CL_PASSWD:
-		plr_passwd(nr);
-		break;
-	default:
-		break;
-	}
-	if (player[nr].state!=ST_NORMAL)
-	{
-		return;
-	}
-
-	if (player[nr].inbuf[0]!=CL_CMD_AUTOLOOK &&
-	    player[nr].inbuf[0]!=CL_PERF_REPORT &&
-	    player[nr].inbuf[0]!=CL_CMD_CTICK)
-	{
-		player[nr].lasttick2 = globs->ticker;
-	}
-
-	switch(player[nr].inbuf[0])
-	{
-	case CL_PERF_REPORT:
-		plr_perf_report(nr);
-		return;
-	case CL_CMD_LOOK:
-		plr_cmd_look(nr, 0);
-		return;
-	case CL_CMD_AUTOLOOK:
-		plr_cmd_look(nr, 1);
-		return;
-	case CL_CMD_SETUSER:
-		plr_cmd_setuser(nr);
-		return;
-	case CL_CMD_STAT:
-		plr_cmd_stat(nr);
-		return;
-	case CL_CMD_INPUT1:
-		plr_cmd_input1(nr);
-		return;
-	case CL_CMD_INPUT2:
-		plr_cmd_input2(nr);
-		return;
-	case CL_CMD_INPUT3:
-		plr_cmd_input3(nr);
-		return;
-	case CL_CMD_INPUT4:
-		plr_cmd_input4(nr);
-		return;
-	case CL_CMD_INPUT5:
-		plr_cmd_input5(nr);
-		return;
-	case CL_CMD_INPUT6:
-		plr_cmd_input6(nr);
-		return;
-	case CL_CMD_INPUT7:
-		plr_cmd_input7(nr);
-		return;
-	case CL_CMD_INPUT8:
-		plr_cmd_input8(nr);
-		return;
-	case CL_CMD_CTICK:
-		plr_cmd_ctick(nr);
-		return;
-	default:
-		break;
-	}
-
-	cn = player[nr].usnr;
-	if (ch[cn].stunned==1)
-	{
-		do_char_log(cn, 2, "You have been stunned. You cannot move.\n");
-	}
-
-	switch(player[nr].inbuf[0])
-	{
-	case CL_CMD_LOOK_ITEM:
-		plr_cmd_look_item(nr);
-		return;
-	case CL_CMD_GIVE:
-		plr_cmd_give(nr);
-		return;
-	case CL_CMD_TURN:
-		plr_cmd_turn(nr);
-		return;
-	case CL_CMD_DROP:
-		plr_cmd_drop(nr);
-		return;
-	case CL_CMD_PICKUP:
-		plr_cmd_pickup(nr);
-		return;
-	case CL_CMD_ATTACK:
-		plr_cmd_attack(nr);
-		return;
-	case CL_CMD_MODE:
-		plr_cmd_mode(nr);
-		return;
-	case CL_CMD_MOVE:
-		plr_cmd_move(nr);
-		return;
-	case CL_CMD_RESET:
-		plr_cmd_reset(nr);
-		return;
-	case CL_CMD_SKILL:
-		plr_cmd_skill(nr);
-		return;
-	case CL_CMD_INV_LOOK:
-		plr_cmd_inv_look(nr);
-		return;
-	case CL_CMD_USE:
-		plr_cmd_use(nr);
-		return;
-	case CL_CMD_INV:
-		plr_cmd_inv(nr);
-		return;
-	case CL_CMD_META:
-		plr_update_all_meta_terminology(nr);
-		break;
-	case CL_CMD_EXIT:
-		plr_cmd_exit(nr);
-		return;
-	default:
-		break;
-	}
-
-	if (ch[cn].stunned==1)
-	{
-		return;
-	}
-
-	switch(player[nr].inbuf[0])
-	{
-
-	case CL_CMD_SHOP:
-		plr_cmd_shop(nr);
-		break;
-	case CL_CMD_SMITH:
-		plr_cmd_smith(nr);
-		break;
-	case CL_CMD_QSHOP:
-		plr_cmd_qshop(nr);
-		break;
-	case CL_CMD_WPS:
-		plr_cmd_wps(nr);
-		break;
-	case CL_CMD_TREE:
-		plr_cmd_tree(nr);
-		break;
-	case CL_CMD_MOTD:
-		plr_cmd_motd(nr);
-		break;
-	case CL_CMD_BSSHOP:
-		plr_cmd_bsshop(nr);
-		break;
 	
-	default:
-		plog(nr, "Unknown CL: %d", player[nr].inbuf[0]);
-		break;
+	clcmd[player[nr].inbuf[0]]++;
+	
+	switch(player[nr].inbuf[0])
+	{
+		case CL_NEWLOGIN:   plr_challenge_newlogin(nr); break;
+		case CL_CHALLENGE:  plr_challenge(nr);          break;
+		case CL_LOGIN:      plr_challenge_login(nr);    break;
+		case CL_CMD_UNIQUE: plr_unique(nr);             return;
+		case CL_PASSWD:     plr_passwd(nr);             break;
+		default: break;
+	}
+	if (player[nr].state!=ST_NORMAL) return;
+	
+	if (player[nr].inbuf[0] != CL_CMD_AUTOLOOK &&
+		player[nr].inbuf[0] != CL_PERF_REPORT  &&
+		player[nr].inbuf[0] != CL_CMD_CTICK    )
+		player[nr].lasttick2 = globs->ticker;
+	
+	switch(player[nr].inbuf[0])
+	{
+		case CL_PERF_REPORT:  plr_perf_report(nr); return;
+		case CL_CMD_LOOK:     plr_cmd_look(nr, 0); return;
+		case CL_CMD_AUTOLOOK: plr_cmd_look(nr, 1); return;
+		case CL_CMD_SETUSER:  plr_cmd_setuser(nr); return;
+		case CL_CMD_STAT:     plr_cmd_stat(nr);    return;
+		case CL_CMD_INPUT1:   plr_cmd_input1(nr);  return;
+		case CL_CMD_INPUT2:   plr_cmd_input2(nr);  return;
+		case CL_CMD_INPUT3:   plr_cmd_input3(nr);  return;
+		case CL_CMD_INPUT4:   plr_cmd_input4(nr);  return;
+		case CL_CMD_INPUT5:   plr_cmd_input5(nr);  return;
+		case CL_CMD_INPUT6:   plr_cmd_input6(nr);  return;
+		case CL_CMD_INPUT7:   plr_cmd_input7(nr);  return;
+		case CL_CMD_INPUT8:   plr_cmd_input8(nr);  return;
+		case CL_CMD_CTICK:    plr_cmd_ctick(nr);   return;
+		default: break;
+	}
+	
+	cn = player[nr].usnr;
+	if (ch[cn].stunned==1) do_char_log(cn, 2, "You have been stunned. You cannot move.\n");
+	
+	switch(player[nr].inbuf[0])
+	{
+		case CL_CMD_LOOK_ITEM: plr_cmd_look_item(nr);               return;
+		case CL_CMD_GIVE:      plr_cmd_give(nr);                    return;
+		case CL_CMD_TURN:      plr_cmd_turn(nr);                    return;
+		case CL_CMD_DROP:      plr_cmd_drop(nr);                    return;
+		case CL_CMD_PICKUP:    plr_cmd_pickup(nr);                  return;
+		case CL_CMD_ATTACK:    plr_cmd_attack(nr);                  return;
+		case CL_CMD_MODE:      plr_cmd_mode(nr);                    return;
+		case CL_CMD_MOVE:      plr_cmd_move(nr);                    return;
+		case CL_CMD_RESET:     plr_cmd_reset(nr);                   return;
+		case CL_CMD_SKILL:     plr_cmd_skill(nr);                   return;
+		case CL_CMD_INV_LOOK:  plr_cmd_inv_look(nr);                return;
+		case CL_CMD_USE:       plr_cmd_use(nr);                     return;
+		case CL_CMD_INV:       plr_cmd_inv(nr);                     return;
+		case CL_CMD_META:      plr_update_all_meta_terminology(nr); break;
+		case CL_CMD_EXIT:      plr_cmd_exit(nr);                    return;
+		default: break;
+	}
+	
+	if (ch[cn].stunned==1) return;
+	
+	switch(player[nr].inbuf[0])
+	{
+		case CL_CMD_SHOP:   plr_cmd_shop(nr);   break;
+		case CL_CMD_SMITH:  plr_cmd_smith(nr);  break;
+		case CL_CMD_QSHOP:  plr_cmd_qshop(nr);  break;
+		case CL_CMD_WPS:    plr_cmd_wps(nr);    break;
+		case CL_CMD_TREE:   plr_cmd_tree(nr);   break;
+		case CL_CMD_MOTD:   plr_cmd_motd(nr);   break;
+		case CL_CMD_BSSHOP: plr_cmd_bsshop(nr); break;
+		default: plog(nr, "Unknown CL: %d", player[nr].inbuf[0]); break;
 	}
 }
 
 void char_add_net(int cn, unsigned int net)
 {
 	int n, m;
-
-	for (n = 80; n<89; n++)
-	{
-		if ((ch[cn].data[n] & 0x00ffffff)==(net & 0x00ffffff))
-		{
-			break;
-		}
-	}
-
-	for (m = n; m>80; m--)
-	{
-		ch[cn].data[m] = ch[cn].data[m - 1];
-	}
-
+	
+	for (n = 80; n<89; n++) if ((ch[cn].data[n] & 0x00ffffff) == (net & 0x00ffffff))
+		break;
+	
+	for (m = n; m>80; m--) ch[cn].data[m] = ch[cn].data[m - 1];
+	
 	ch[cn].data[80] = net;
 }
 
