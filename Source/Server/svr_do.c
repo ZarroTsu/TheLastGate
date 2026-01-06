@@ -10298,7 +10298,7 @@ void do_attack(int cn, int co, int surround)
 		
 		if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 		{
-			aoe_driver(cn, cn, co_orig, SK_SURROUND, dam, GET_PROX(cn), 1, surround, crit_dam);
+			aoe_driver(cn, cn, co_orig, SK_SURROUND, odam, GET_PROX(cn), 1, surround, crit_dam);
 		}
 		/*
 		if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
