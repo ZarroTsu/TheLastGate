@@ -3289,8 +3289,10 @@ void plr_change(int nr)
 		}
 
 		plr_change_power(nr, cpl->hp, ch[cn].hp, SV_SETCHAR_HP);
+		plr_change_power(nr, cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
 		plr_change_power(nr, cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
 		
+		/*
 		if (cpl->end[0] != ch[cn].move_speed || cpl->end[1] != ch[cn].aoe_bonus || 
 			cpl->end[2] != ch[cn].dmg_bonus  || cpl->end[3] != ch[cn].dmg_reduction || 
 			cpl->end[5] != ch[cn].end[5])
@@ -3331,6 +3333,7 @@ void plr_change(int nr)
 			cpl->end[4] = min(32767,chFlags); 	// max << 14
 			cpl->end[5] = ch[cn].end[5];
 		}
+		*/
 
 		for (n = 0; n<MAXSKILL; n++)
 		{
@@ -3419,8 +3422,9 @@ void plr_change(int nr)
 			}
 		}
 
-		for (n = 0; n<20; n++)
+		for (n = 0; n<13; n++)
 		{
+			/*
 			if (n >= 13)	// Sneaky hack to pass bonus player variables
 			{
 				buf[0] = SV_SETCHAR_WORN;
@@ -3500,7 +3504,8 @@ void plr_change(int nr)
 				
 				xsend(nr, buf, 10);
 			}
-			else if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
+			else */
+				if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
 			{
 				buf[0] = SV_SETCHAR_WORN;
 				*(unsigned long*)(buf + 1) = n;
