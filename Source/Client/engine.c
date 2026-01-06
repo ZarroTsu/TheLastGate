@@ -785,9 +785,6 @@ int sk_score(int n)
 	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
 }
 
-struct skilltab *skilltab;
-struct metaStat *metaStats;
-
 void set_temp_skilltab(void)
 {
 	int n;
@@ -796,8 +793,8 @@ void set_temp_skilltab(void)
 		skilltab[n].nr = n;
 		skilltab[n].sortkey = n;
 		skilltab[n].show = 0;
-		sprintf(skilltab[n].name,"skill%02d", n);
-		sprintf(skilltab[n].desc,"desc%02d", n);
+		sprintf(skilltab[n].name,"", n);
+		sprintf(skilltab[n].desc,"", n);
 		skilltab[n].attrib[0] = 0;
 		skilltab[n].attrib[1] = 1;
 		skilltab[n].attrib[2] = 2;
@@ -812,8 +809,8 @@ void set_temp_metaStats(void)
 		metaStats[n].show = 1;
 		metaStats[n].flag = 0;
 		metaStats[n].font = 1;
-		sprintf(metaStats[n].name,"stat%02d", n);
-		sprintf(metaStats[n].desc,"desc%02d", n);
+		sprintf(metaStats[n].name,"", n);
+		sprintf(metaStats[n].desc,"", n);
 		metaStats[n].value = -1;
 		sprintf(metaStats[n].affix,"", n);
 	}
@@ -1253,14 +1250,14 @@ void show_meta_stats(int n)
 	}
 	else if (hudmode==1)		// Offense Stats
 	{
-		m = 1 + (n>17?1:0);
 		n = n+meta_pos; if (n>=48) return;
+		m = 1 + (n>23?1:0);
 		pos -= 7;
 	}
 	else						// Defense Stats
 	{
-		m = 1 + (n>17?1:0);
 		n = n+41+meta_pos; if (n>=89) return;
+		m = 1 + (n>(23+41)?1:0);
 		pos -= 7;
 	}
 	
