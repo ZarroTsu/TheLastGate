@@ -256,7 +256,7 @@ int is_ascroll(int in);
 // Sanity check on skill number
 #define IS_SANESKILL(s) 		((s)>=0 && (s)<MAXSKILL)
 
-#define IS_AOESKILL(n)			(n==SK_PLAGUE||n==SK_CURSE||n==SK_SLOW||n==SK_POISON||n==SK_WARCRY||n==SK_BLAST||n==SK_WEAKEN||n==SK_DOUSE||n==SK_BLIND||n==SK_TAUNT||n==SK_LEAP)
+#define IS_AOESKILL(n)			(n==SK_PLAGUE||n==SK_CURSE||n==SK_SLOW||n==SK_POISON||n==SK_WARCRY||n==SK_BLAST||n==SK_WEAKEN||n==SK_DOUSE||n==SK_BLIND||n==SK_TAUNT)
 #define IS_SEYANSKILL(n)		(n==SK_WARCRY||n==SK_PULSE||n==SK_LEAP||n==SK_LETHARGY||n==SK_GCMASTERY||n==SK_ZEPHYR||n==SK_FINESSE||n==SK_RAGE)
 
 // Fancy get/setters
