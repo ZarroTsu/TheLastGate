@@ -1942,12 +1942,12 @@ int get_meta_stat_value(int cn, int n)
 			value = ch[cn].aoe_bonus + ch[cn].aoe_bonus * GET_PROX(cn)/200;
 			break;
 		//
-		case 24: // Cleave Hit Damage				Decimal, 0.00
+		case 24: // Cleave Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
 			if (T_ARTM_SK(cn, 4))         power = power + ch[cn].gethit_dam;
 			if (T_WARR_SK(cn, 9))         power = power + (power * M_AT(cn, AT_STR)  / 2000);
 			if (m=st_skillcount(cn, 45))  power = power + (power * M_AT(cn, AT_STR)*m/ 5000);
-			value = power * DAM_MULT_CLEAVE/10;
+			value = power * DAM_MULT_CLEAVE/1000;
 			break;
 		case 25: // Cleave Bleed Degen				Decimal, 0.00 /s
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
@@ -1960,10 +1960,10 @@ int get_meta_stat_value(int cn, int n)
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds
 			value = 5 * cdlen;
 			break;
-		case 27: // Leap Hit Damage					Decimal, 0.00
+		case 27: // Leap Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_LEAP) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn) * 2;
-			if (do_get_iflag(cn, SF_JUSTIC_R)) value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/10;
-			else                               value = power + power * (ch[cn].crit_multi-100) / 1000 * DAM_MULT_RLEAP/10;
+			if (do_get_iflag(cn, SF_JUSTIC_R)) value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/1000;
+			else                               value = power + power * (ch[cn].crit_multi-100) / 1000 * DAM_MULT_RLEAP/1000;
 			break;
 		case 28: // Leap # of Repeats
 			value = max(0, min(10, (100-cdlen)/10)) + do_get_iflag(cn, SF_SIGN_SLAY)?1:0;
@@ -1977,12 +1977,12 @@ int get_meta_stat_value(int cn, int n)
 		case 31: // Rage DoT Bonus					Decimal, 0.00 %
 			value = 10000 * (2000 + power) / 2000;
 			break;
-		case 32: // Blast Hit Damage				Decimal, 0.00
+		case 32: // Blast Hit Damage
 			power = spell_multiplier(M_SK(cn, SK_BLAST), cn) * 2;
 			if (do_get_iflag(cn, SF_TW_IRA))   in = power * ch[cn].crit_multi / 100 - power;
 			if (do_get_iflag(cn, SF_JUDGE)) power = (power+max(0, in))*85/100;
 			else                            power = power+max(0, in);
-			value = power * DAM_MULT_BLAST/10;													// BUG: Blank??
+			value = power * DAM_MULT_BLAST/1000;
 			break;
 		case 33: // Blast Cooldown					Decimal, 0.00 Seconds
 			value = (T_ARHR_SK(cn,4)?575:600) * cdlen / 100;
@@ -2012,11 +2012,11 @@ int get_meta_stat_value(int cn, int n)
 			if (T_ARHR_SK(cn, 7))        power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 79)) power = power + (power*M_AT(cn, AT_INT)*m/5000);
 			power = spell_multiplier(power, cn);
-			if (n==37) value = power * 2;													// BUG: Blank??
-			else       value = power * DAM_MULT_PULSE / 20;									// BUG: Blank??
+			if (n==37) value = power * 2;
+			else       value = power * DAM_MULT_PULSE / 20;
 			break;
 		case 38: // Pulse Count
-			value = 60*2*100 / 3 * cdlen;
+			value = 60*2*100 / (3 * cdlen);
 			break;
 		case 39: // Pulse Cooldown					Decimal, 0.00 Seconds
 			value = 6 * cdlen;
@@ -2111,7 +2111,7 @@ int get_meta_stat_value(int cn, int n)
 			else                              value = min(127, durat / (IS_SEYA_OR_BRAV(cn)?1536:1024) + 1);
 			break;
 		case 69: case 94: // M.Shield/Shell Dur		Decimal, 0.00 Seconds
-			value = durat * 100 / 20;																			// BUG: Blank??
+			value = durat / 20;
 			break;
 		case 70: // Haste Effect
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
@@ -2167,8 +2167,8 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
 			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
-			if (do_get_iflag(cn, SF_TOWER))       value = -(5 + CURSE2FORM(power, 4));					// BUG: Blank??
-			else                                  value = -(3 + (power - 4) / 5);						// BUG: Blank??
+			if (do_get_iflag(cn, SF_TOWER))       value = -(5 + CURSE2FORM(power, 4));
+			else                                  value = -(3 + (power - 4) / 5);
 			break;
 		case 81: // Curse Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
@@ -2178,8 +2178,8 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
 			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
-			if (do_get_iflag(cn, SF_EMPEROR))     value = -(min(300, 30 + SLOW2FORM(power)));			// BUG: Blank??
-			else                                  value = -(min(300, 30 + SLOWFORM(power)));			// BUG: Blank??
+			if (do_get_iflag(cn, SF_EMPEROR))     value = -(min(300, 30 + SLOW2FORM(power)));
+			else                                  value = -(min(300, 30 + SLOWFORM(power)));
 			break;
 		case 83: // Slow Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
@@ -2217,6 +2217,9 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		default: break;
 	}
+	
+	if (value >  32750) value =  32750;
+	if (value < -32750) value = -32750;
 	
 	return value;
 }

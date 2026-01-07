@@ -752,15 +752,15 @@ struct metaStat metaStats[102] = {
 	{ -2, 0, 0, "", "", "" }, // blank
 	{ -2, 0, 0, "", "", "" }, // blank
 	{ -1, 0, 9, "  Active Stats:",      "",        "" }, // 23
-	{ 40, 1, 5, "Cleave Hit Damage",    "",        "Damage dealt by your Cleave skill, before enemy defenses." },
+	{ 40, 0, 5, "Cleave Hit Damage",    "",        "Damage dealt by your Cleave skill, before enemy defenses." },
 	{ 40, 1, 5, "Cleave Bleed Degen",   "/s",      "Effective damage over time dealt by Bleeding caused by Cleave, before enemy defenses." },
 	{ 40, 1, 5, "Cleave Cooldown",      "Seconds", "Skill exhaustion duration expected upon using your Cleave skill." },
-	{ 49, 1, 1, "Leap Hit Damage",      "",        "Damage dealt by your Leap skill if your target is at or near maximum hitpoints." },
+	{ 49, 0, 1, "Leap Hit Damage",      "",        "Damage dealt by your Leap skill if your target is at or near maximum hitpoints." },
 	{ 49, 0, 1, "Leap # of Repeats",    "Repeats", "Damage dealt by your Leap skill, before enemy defenses." },
 	{ 49, 1, 1, "Leap Cooldown",        "Seconds", "Skill exhaustion duration expected upon using your Leap skill." },
 	{ 22, 0, 5, "Rage TD Bonus",        "Top Dmg", "Effective increase to top damage granted while under the effect of your Rage skill." },
 	{ 22, 1, 5, "Rage DoT Bonus",       "%",       "Effective multiplier to damage over time granted while under the effect of your Rage skill." },
-	{ 24, 1, 4, "Blast Hit Damage",     "",        "Damage dealt by your Blast spell, before enemy defenses." },
+	{ 24, 0, 4, "Blast Hit Damage",     "",        "Damage dealt by your Blast spell, before enemy defenses." },
 	{ 24, 1, 4, "Blast Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Blast spell." },
 	{ 15, 0, 1, "Lethargy Effect",      "I/R Pen", "Effective penetration of target Immunity and Resistance when casting debuffs." },
 	{ 42, 1, 4, "Poison Degen",         "/s",      "Effective damage over time dealt by your Poison spell, before reduction from target Immunity." },
