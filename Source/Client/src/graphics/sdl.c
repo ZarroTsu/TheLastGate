@@ -279,7 +279,7 @@ int sdl_init(const int windowed) {
     return 0;
 }
 
-void sdl_set_fullscreen(int windowed) {
+void sdl_set_fullscreen(bool windowed) {
     if (!renderer.window) return;
 
     if (windowed) {

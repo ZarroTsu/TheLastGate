@@ -63,7 +63,7 @@ extern SpriteData *ui_sprite_data;
 
 int sdl_init(int windowed);
 void sdl_deinit(void);
-void sdl_set_fullscreen(int windowed);
+void sdl_set_fullscreen(bool windowed);
 void sdl_batch_begin(void);
 void sdl_batch_flush(void);
 void sdl_init_sprites(void);

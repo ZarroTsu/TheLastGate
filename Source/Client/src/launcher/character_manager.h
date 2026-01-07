@@ -1,5 +1,6 @@
 #pragma once
 
+EXTERN_C_BEGIN
 #define MAX_PREVIOUS_CHARACTERS 20
 
 typedef struct {
@@ -18,7 +19,7 @@ void create_new_character();
 
 void okey_to_class_gender(int *out_class, int *out_gender);
 
-int class_gender_to_okey(int class, int gender);
+int class_gender_to_okey(int race, int gender);
 
 /* Previous Characters List Management */
 void init_previous_characters(void);
@@ -27,3 +28,4 @@ void remove_from_previous_characters(const char *file_path);
 void save_previous_characters(void);
 void load_previous_characters(void);
 const PreviousCharactersList* get_previous_characters(void);
+EXTERN_C_END

@@ -114,7 +114,7 @@ static void bar_row_render(const QuickStatsLayout *layout, const float progress)
     imgui_draw_list_add_rect_filled(draw_list, x, y, x + progress_width, y + height, 0xFF0061BD, 0, 0);
 }
 
-static void draw_sprite_imgui(void *draw_list, const SpriteData *data, float x, float y) {
+static void imgui_draw_sprite(void *draw_list, const SpriteData *data, float x, float y) {
     if (!data->loaded_in_atlas) return;
 
     /* Draw sprite_data using ImGui */
@@ -132,7 +132,7 @@ static void draw_quick_stat_background(const QuickStatsLayout *layout) {
     SpriteData *data = sdl_get_ui_sprite_data(g_config.ui.expanded_quick_stats
                                                   ? layout->window_background_sprite_expanded
                                                   : layout->window_background_sprite);
-    draw_sprite_imgui(draw_list, data, layout->window_position.x, layout->window_position.y);
+    imgui_draw_sprite(draw_list, data, layout->window_position.x, layout->window_position.y);
 }
 
 typedef struct {

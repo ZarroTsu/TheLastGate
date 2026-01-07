@@ -11,6 +11,7 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "inventory.hpp"
+#include "launcher_ui.hpp"
 #include "option_window.hpp"
 #include "perf_window.hpp"
 #include "config/config.h"
@@ -100,19 +101,23 @@ void ui_shutdown(void) {
     ImGui::DestroyContext();
 }
 
-void ui_render(void) {
+void ui_render(const UIState ui_state) {
     start_frame();
 
-    spell_hud();
+    if (ui_state == UI_STATE_LAUNCHER) {
+        launcher_ui_render();
+    } else {
+        spell_hud();
 
-    if (game_ui_state.show_options) {
-    	options_window_render();
-    }
+        if (game_ui_state.show_options) {
+            options_window_render();
+        }
 
-    inventory_render();
-    quick_stats_render(&game_ui_state.quick_stat_state);
-    if (g_config.runtime.show_performance) {
-    	perf_window_render(&game_ui_state.perf_window_state);
+        inventory_render();
+        quick_stats_render(&game_ui_state.quick_stat_state);
+        if (g_config.runtime.show_performance) {
+            perf_window_render(&game_ui_state.perf_window_state);
+        }
     }
 
     render();

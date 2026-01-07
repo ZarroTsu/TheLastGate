@@ -28,8 +28,8 @@ extern int mx, my;
 extern GameState g_game_state;
 
 extern int do_alpha;
-extern int do_shadow;
-extern int do_darkmode;
+extern bool do_shadow;
+extern bool do_darkmode;
 
 extern char input[128];
 extern short screen_renderdist;

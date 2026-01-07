@@ -125,7 +125,7 @@ static void enable_effect_shader_callback(void *user_data) {
 }
 
 /* Helper to draw a single sprite with ImGui draw_list */
-static void draw_sprite_imgui(void *draw_list, int sprite_id, float x, float y, int effect) {
+static void imgui_draw_sprite(void *draw_list, int sprite_id, float x, float y, int effect) {
     if (sprite_id <= 0 || !sprite_data) return;
 
     sdl_load_sprite(sprite_id);
@@ -157,23 +157,23 @@ void render_lockable_item_display_imgui(void *draw_list, const ItemDisplayInfo *
     if (!item || !item->sprite || !draw_list) return;
 
     /* Draw base sprite with effect */
-    draw_sprite_imgui(draw_list, item->sprite, x, y, effect);
+    imgui_draw_sprite(draw_list, item->sprite, x, y, effect);
 
     /* Draw overlays without effect */
     if (item->flags & LOCKABLE_ITEM_FLAG_SOULSTONE)
-        draw_sprite_imgui(draw_list, SPRITE_OVERLAY_SOULSTONE, x, y, effect);
+        imgui_draw_sprite(draw_list, SPRITE_OVERLAY_SOULSTONE, x, y, effect);
 
     if (item->flags & LOCKABLE_ITEM_FLAG_TALISMAN)
-        draw_sprite_imgui(draw_list, SPRITE_OVERLAY_TALISMAN, x, y, effect);
+        imgui_draw_sprite(draw_list, SPRITE_OVERLAY_TALISMAN, x, y, effect);
 
     if (item->flags & LOCKABLE_ITEM_FLAG_CORRUPTION)
-        draw_sprite_imgui(draw_list, SPRITE_OVERLAY_CORRUPTION, x, y, effect);
+        imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     if (item->properties.catalyst_id > 0)
-        draw_sprite_imgui(draw_list, SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+        imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
 
     if (item->stack > 0 && item->stack <= 10)
-        draw_sprite_imgui(draw_list, SPRITE_OVERLAY_STACK_BASE + item->stack, x, y, effect);
+        imgui_draw_sprite(draw_list, SPRITE_OVERLAY_STACK_BASE + item->stack, x, y, effect);
 }
 
 void render_item_keybind_imgui(void *draw_list, int action_inventory_slot, float x, float y, float cell_width, float cell_height) {

@@ -3907,7 +3907,7 @@ void engine(void)
 			}
 			input_event_count = 0;
 
-		    ui_render();
+		    ui_render(UI_STATE_GAME);
 			SDL_SetCursor(cursors[cursor_type]);
 
 			if (init) {

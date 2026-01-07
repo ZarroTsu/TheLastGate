@@ -23,6 +23,7 @@
 #include "launcher/launcher.h"
 #include "log/log.h"
 #include "security/security.h"
+#include "ui/ui.h"
 #include "ui/imgui/imgui_wrapper.h"
 #include "util/perf.h"
 
@@ -53,8 +54,8 @@ int chat_mode_active=0;
 int logstart=0;
 int logtimer=0;
 int do_alpha=0;
-int do_shadow=1;
-int do_darkmode=0;
+bool do_shadow=true;
+bool do_darkmode=false;
 
 char history[20][128];
 int hist_len[20]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -225,6 +226,7 @@ int main(int argc, char *argv[]) {
 		handle_input();
 
 		glClear(GL_COLOR_BUFFER_BIT);
+	    launcher_tick();
 		sdl_start_scaling();
 		sdl_batch_flush();
 		for (int i = 0; i < input_event_count; i++) {
@@ -233,9 +235,7 @@ int main(int argc, char *argv[]) {
 		input_event_count = 0;
 
 		glBindVertexArray(0);
-		imgui_new_frame(1.0f, 1.0f);
-		launcher_render();
-		imgui_render();
+		ui_render(UI_STATE_LAUNCHER);
 		sdl_stop_scaling();
 		SDL_GL_SwapWindow(renderer.window);
 		SDL_Delay(1);

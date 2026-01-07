@@ -199,7 +199,7 @@ void okey_to_class_gender(int *out_class, int *out_gender) {
     if (out_gender != NULL) *out_gender = gender;
 }
 
-int class_gender_to_okey(const int class, int gender) {
+int class_gender_to_okey(const int race, int gender) {
     static const int race_map[12][2] = {
         {4, 5}, /* 0: Templar M/F */
         {6, 7}, /* 1: Mercenary M/F */
@@ -215,10 +215,10 @@ int class_gender_to_okey(const int class, int gender) {
         {1554, 1554} /* 11: Lycanthrope (M only) */
     };
 
-    if (class < 0 || class >= 12) return 4; /* Default to Templar M */
+    if (race < 0 || race >= 12) return 4; /* Default to Templar M */
     if (gender < 0 || gender > 1) gender = 0;
 
-    return race_map[class][gender];
+    return race_map[race][gender];
 }
 
 static PreviousCharactersList g_previous_characters = {0};

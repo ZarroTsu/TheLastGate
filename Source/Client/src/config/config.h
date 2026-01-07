@@ -4,6 +4,7 @@
 
 EXTERN_C_BEGIN
 
+static const int MAX_VOLUME_LEVEL = 10;
 
 typedef struct {
     float gamma;
