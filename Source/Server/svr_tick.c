@@ -2804,12 +2804,11 @@ void plr_logout(int cn, int nr, int reason)
 		
 		for (n=1;n<MAXCHARS;n++)
 		{
-			if (ch[n].used==USE_EMPTY)
-				continue;
-			if (!IS_SANEPLAYER(n) || !IS_ACTIVECHAR(n) || !IS_PLAYER_COMP(n))
-				continue;
-			if (player[ch[n].player].spectating == cn)
+			if (ch[n].used==USE_EMPTY) continue;
+			
+			if (IS_SANEPLAYER(n) && ch[n].player && player[ch[n].player].spectating == cn)
 				player[ch[n].player].spectating = 0;
+			
 			if (IS_PLAYER_COMP(n) && CN_OWNER(n) == cn && !(reason==LO_IDLE || reason==LO_SHUTDOWN || reason==0))
 			{
 				do_sayx(n, "Goodbye, %s.", ch[cn].name);
