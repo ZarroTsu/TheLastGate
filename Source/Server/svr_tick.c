@@ -1987,12 +1987,12 @@ int get_meta_stat_value(int cn, int n)
 		case 33: // Blast Cooldown					Decimal, 0.00 Seconds
 			value = (T_ARHR_SK(cn,4)?575:600) * cdlen / 100;
 			break;
-		case 34: // Lethargy Effect
+		case 34: // Lethargy Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_LETHARGY), cn);
 			if (T_SORC_SK(cn, 7))        power = power + (power * M_AT(cn, AT_WIL)/2000);
 			if (m=st_skillcount(cn, 55)) power = power + (power*M_AT(cn, AT_WIL)*m/5000);
-			if (IS_SEYAN_DU(cn))         value = -((bu[in].power+3)/6);
-			else                         value = -(bu[in].power/4);
+			if (IS_SEYAN_DU(cn))         value = (bu[in].power/6);
+			else                         value = (bu[in].power/4);
 			break;
 		case 35: case 90: // Poison/Venom Degen		Decimal, 0.00 /s
 			power = spell_multiplier(M_SK(cn, SK_POISON), cn);
