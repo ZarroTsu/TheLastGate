@@ -1706,6 +1706,9 @@
 #define DW_WL_SWA		 3305	//+4	-- Random evil jungle tree
 #define DW_WL_SWB		 1668	//		Mixed Tan Brick
 
+#define DW_TRAP			 3435
+#define DW_WATER		 3434
+#define DW_SPAWNER		 3307
 #define DW_EXPPOLE		 3624
 
 // 522 fire torch

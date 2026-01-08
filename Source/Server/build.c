@@ -8263,22 +8263,22 @@ int build_dw_cell(int cn, int xs, int ys, int flag)
 						map[m].flags |= MF_INDOORS;
 						break;
 					case  7:	// Spike Trap
-						build_drop(x, y, 3435);
+						build_drop(x, y, DW_TRAP);
 						it[map[m].it].sprite[I_I] = 16653;
 						map[m].flags |= MF_DEATHTRAP;
 						break;
 					case  8:	// Water pt1
-						build_drop(x, y, 3434);
+						build_drop(x, y, DW_WATER);
 						in = 16933;
 						if (DW_GETFLOOR(map[m].sprite, DW_FL_SEA)) in = 725;
 						it[map[m].it].sprite[I_I] = in;
 						map[m].flags |= MF_MOVEBLOCK;
 						break;
 					case  9:	// Spawner
-						build_drop(x, y, 3307);
+						build_drop(x, y, DW_SPAWNER);
 						break;
 					case 10:	// Exp Pole
-						build_drop(x, y, );
+						build_drop(x, y, DW_EXPPOLE);
 						map[m].flags |= MF_INDOORS;
 						break;
 					default: 
