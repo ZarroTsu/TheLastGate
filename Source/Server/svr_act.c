@@ -673,16 +673,16 @@ void plr_give(int cn)
 
 void plr_pickup(int cn)
 {
-	int m, in, x, y, n;
-
+	int m, in, in2, x, y, n;
+	
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
-
+	
 	if (ch[cn].citem)
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
-
+	
 	if (ch[cn].dir==DX_UP && ch[cn].y>0)
 	{
 		m = ch[cn].x + ch[cn].y * MAPX - MAPX;
@@ -712,7 +712,7 @@ void plr_pickup(int cn)
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
-
+	
 	in = map[m].it;
 	if (!in)
 	{
@@ -724,85 +724,65 @@ void plr_pickup(int cn)
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
-
+	
 	ch[cn].cerrno = ERR_SUCCESS;
 	do_update_char(cn);
-
+	
 	// support for money:
 	if (it[in].flags & IF_MONEY)
 	{
 		ch[cn].gold += it[in].value;
-
+		
 		do_char_log(cn, 2, "You got %dG %dS\n", it[in].value / 100, it[in].value % 100);
 		chlog(cn, "Took %dG %dS", it[in].value / 100, it[in].value % 100);
-
+		
 		map[m].it = 0;
-
+		
 		it[in].used = USE_EMPTY;
 		it[in].x = 0;
 		it[in].y = 0;
-
-		if (it[in].active)
-		{
-			if (it[in].light[I_A])
-			{
-				do_add_light(x, y, -it[in].light[I_A]);
-			}
-		}
-		else
-		{
-			if (it[in].light[I_I])
-			{
-				do_add_light(x, y, -it[in].light[I_I]);
-			}
-		}
+		
+		if (it[in].active && it[in].light[I_A]) do_add_light(x, y, -it[in].light[I_A]);
+		else if (it[in].light[I_I])             do_add_light(x, y, -it[in].light[I_I]);
+		
 		return;
 	}
-
+	
 	map[m].it = 0;
-
+	
 	if (ch[cn].flags & (CF_PLAYER))
 	{
-		for (n = 0; n<MAXITEMS; n++)
+		// Loop through and check if the item can be stacked with any existing item on the current page
+		for (n = 0; n<MAXITEMS; n++) 
 		{
-			if (!ch[cn].item[n])
+			if (in2 = ch[cn].item[n])
 			{
-				break;
+				if (god_stack_items(in, in2)==1) // All the picked-up items got stacked to an existing slot
+				{
+					chlog(cn, "Took %s", it[in].name);
+					if (it[in].active && it[in].light[I_A]) do_add_light(x, y, -it[in].light[I_A]);
+					else if (it[in].light[I_I])             do_add_light(x, y, -it[in].light[I_I]);
+					return;
+				}
 			}
 		}
-		if (n<MAXITEMS)
-		{
-			ch[cn].item[n] = in;
-		}
-		else
-		{
-			ch[cn].citem = in;
-		}
+		// Find an empty inventory slot for any remaining item
+		for (n = 0; n<MAXITEMS; n++) if (!ch[cn].item[n]) break;
+		if (n<MAXITEMS) ch[cn].item[n] = in;
+		else            ch[cn].citem = in;
 		chlog(cn, "Took %s", it[in].name);
 	}
 	else
 	{
 		ch[cn].citem = in;
 	}
-
+	
 	it[in].x = 0;
 	it[in].y = 0;
 	it[in].carried = cn;
-
-	if (it[in].active)
-	{
-		if (it[in].light[I_A])
-		{
-			do_add_light(x, y, -it[in].light[I_A]);
-		}
-	}
-	else
-	{
-		if (it[in].light[I_I])
-		{
-			do_add_light(x, y, -it[in].light[I_I]);
-		}
-	}
+	
+	if (it[in].active && it[in].light[I_A]) do_add_light(x, y, -it[in].light[I_A]);
+	else if (it[in].light[I_I])             do_add_light(x, y, -it[in].light[I_I]);
 }
 
 void plr_bow(int cn)
