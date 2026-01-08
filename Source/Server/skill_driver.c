@@ -2669,7 +2669,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 			if (li<0)
 			{
 				if (temp==SK_LIGHT) do_char_log(cn, 1, "You stop emitting light.\n");
-				if (temp==SK_PACT)  do_char_log(cn, 1, "Rage no longer active.\n");
+				if (temp==SK_PACT)  do_char_log(cn, 1, "Pact no longer active.\n");
 			}
 			else
 				do_char_log(cn, 1, "%s\n", splog[temp].self);
@@ -6814,21 +6814,26 @@ int spell_pact(int cn, int co, int power)
 	int enbonus = (ch[co].end[5]*1000  - ch[co].a_end) /1000;
 	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
 	
-	// Need custom sprite?
 	if (!(in = make_new_buff(cn, SK_PACT, BUF_SPR_PACT, power, SP_DUR_PACT, 1))) 
 		return 0;
 	
 	if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
 	if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
 	
-	power = power + (power * tmp / 5000);
-	
-	// Tarot - Hermit R
-	if (do_get_iflag(co, SF_HERMIT_R)) bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
-	else                               bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
-	
-	bu[in].top_damage = min(127, power/ 4 + 5);
-	bu[in].data[4]    = power;
+	if (do_get_iflag(cn, SF_HERMIT_R))
+	{
+		power = bu[in].reserve[2] = min(80, 15+power/5); // Mana
+		power = power + (power * tmp / 5000);
+		bu[in].dmg_reduction = power*4/6;
+		bu[in].dmg_bonus     = power*2/6;
+	}
+	else
+	{
+		power = bu[in].reserve[0] = min(80, 15+power/5); // Hitpoints
+		power = power + (power * tmp / 5000);
+		bu[in].dmg_reduction = power*4/3;
+		bu[in].dmg_bonus     = power*2/3;
+	}
 	
 	bu[in].flags = BF_PERMASPELL;
 	

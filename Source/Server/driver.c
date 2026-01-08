@@ -1593,10 +1593,7 @@ int npc_give(int cn, int co, int in, int money)
 			{
 				int div = 4;
 				nr2 = nr;
-				if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_PACT)
-					do_sayx(cn, "Now I'll teach you Calm.");
-				else
-					do_sayx(cn, "Now I'll teach you %s.", skilltab[nr].name);
+				do_sayx(cn, "Now I'll teach you %s.", skilltab[nr].name);
 				if (!ch[co].skill[nr2][2])
 				{
 					do_sayx(cn, "But you can't learn %s, %s!", skilltab[nr].name, ch[co].name);
@@ -1607,10 +1604,7 @@ int npc_give(int cn, int co, int in, int money)
 				}
 				else if (B_SK(co, nr))
 				{
-					if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_PACT)
-						do_sayx(cn, "But you already know Calm, %s!", ch[co].name);
-					else
-						do_sayx(cn, "But you already know %s, %s!", skilltab[nr].name, ch[co].name);
+					do_sayx(cn, "But you already know %s, %s!", skilltab[nr].name, ch[co].name);
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Well, let me teach you a couple of small life lessons instead...");
@@ -1621,10 +1615,7 @@ int npc_give(int cn, int co, int in, int money)
 				else
 				{
 					B_SK(co, nr) = 1;
-					if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_PACT)
-						do_char_log(co, 0, "You learned Calm!\n");
-					else
-						do_char_log(co, 0, "You learned %s!\n", skilltab[nr].name);
+					do_char_log(co, 0, "You learned %s!\n", skilltab[nr].name);
 					ch_update_skill_terminology(co, nr);
 					do_update_char(co);
 					
@@ -1664,10 +1655,7 @@ int npc_give(int cn, int co, int in, int money)
 						if (!B_SK(n, nr2) && (canlearn > 0) && ch[n].skill[nr2][2])
 						{
 							B_SK(n, nr2) = 1;
-							if (IS_LYCANTH(n) && IS_SHIFTED(n) && nr2==SK_PACT)
-								do_char_log(n, 0, "You learned Calm!\n");
-							else
-								do_char_log(n, 0, "You learned %s!\n", skilltab[nr2].name);
+							do_char_log(n, 0, "You learned %s!\n", skilltab[nr2].name);
 							ch_update_skill_terminology(n, nr2);
 							do_update_char(n);
 							div = 1;
@@ -3147,10 +3135,10 @@ int npc_see(int cn, int co)
 						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
-							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you RAGE and CALM.", ch[co].name);
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you PACT.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Lycanthropes can force themselves into a furious rage, or hypnotizing calm?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Lycanthropes can force themselves into a dangerous pact of power?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#gatekeeper13")==0)
 				{

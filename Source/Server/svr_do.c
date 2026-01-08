@@ -1767,7 +1767,7 @@ if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Cleave               (BRV+STR)/2 + AG
 else						do_char_log(cn, 5, "Cleave                 AGL + STR + STR\n");
 if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Leap                 (BRV+STR)/2 + AGL + AGL\n");
 else						do_char_log(cn, 1, "Leap                   BRV + AGL + AGL\n");
-							do_char_log(cn, 5, "Rage / Calm            BRV + INT + STR\n");
+							do_char_log(cn, 5, "Pact                   BRV + INT + STR\n");
 							do_char_log(cn, 1, "Repair                 INT + AGL + STR\n");
 if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Taunt                (BRV+STR)/2 + AGL + AGL\n");
 else						do_char_log(cn, 5, "Taunt                  BRV + STR + STR\n");
@@ -2639,7 +2639,7 @@ void do_refundgskills(int cn, char *topic)
 		do_refundgskill(cn, 20);
 	else if (strcmp(topic, "21")==0 || strcmp(topic, "Bless")==0 || strcmp(topic, "bless")==0)
 		do_refundgskill(cn, 21);
-	else if (strcmp(topic, "22")==0 || strcmp(topic, "Rage")==0 || strcmp(topic, "rage")==0)
+	else if (strcmp(topic, "22")==0 || strcmp(topic, "Pact")==0 || strcmp(topic, "pact")==0)
 		do_refundgskill(cn, 22);
 	else if (strcmp(topic, "23")==0 || strcmp(topic, "Resistance")==0 || strcmp(topic, "resistance")==0)
 		do_refundgskill(cn, 23);
@@ -4188,6 +4188,7 @@ int do_showbuffs(int cn, int co)
 					case SK_SCORCH:
 					case SK_SHOCK:
 					case SK_CHARGE:
+					case SK_PACT:
 						if (bu[in].dmg_reduction>0)
 						{
 							if (bu[in].dmg_reduction%2==0)
@@ -4222,12 +4223,6 @@ int do_showbuffs(int cn, int co)
 							do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/4);
 						else
 							do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/3);
-						break;
-					case SK_PACT: // TODO
-					
-						do_char_log(cn, 6, " : %+d Top Damage\n", bu[in].top_damage);
-						do_char_log(cn, 6, " : +%d.%02d%% DoT Dealt\n", 100*(2000+bu[in].data[4])/2000, abs(10000*(2000+bu[in].data[4])/2000)%100);
-						
 						break;
 					case 254: // R/G/S Essence
 						do_char_log(cn, 6, " : %+d to each attribute\n",  bu[in].attrib[0]);
@@ -13519,11 +13514,12 @@ void do_random_blast(int cn, int power)
 void do_update_permaspells(int cn)
 {
 	int n, in, power, tmp = 0, tmpa=0, weapon=0, armor=0;
+	int hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
+	int enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
+	int mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
 	
-	if (T_LYCA_SK(cn, 7))
-		tmp  = (((ch[cn].hp[5]*1000 - ch[cn].a_hp)/1000) + ((ch[cn].end[5]*1000 - ch[cn].a_end)/1000) + ((ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000))/2;
-	if (n=st_skillcount(cn, 103))
-		tmp += (((ch[cn].hp[5]*1000 - ch[cn].a_hp)/1000) + ((ch[cn].end[5]*1000 - ch[cn].a_end)/1000) + ((ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000))*n/5;
+	if (T_LYCA_SK(cn, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
+	if (n=st_skillcount(cn, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -13553,15 +13549,24 @@ void do_update_permaspells(int cn)
 				case SK_PACT:
 					power = M_SK(cn, SK_PACT);
 					power = skill_multiplier(power, cn);
-					bu[in].power = power; power = power + (power * tmp / 5000);
-					
-					bu[in].top_damage = min(127, power/ 4 + 5);
-					bu[in].data[4]    = power/2;
+					bu[in].power = power;
 					
 					if (do_get_iflag(cn, SF_HERMIT_R))
-						bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
+					{
+						bu[in].reserve[2] = min(80, 15+power/5); // Mana
+						power = ch[cn].reserve[2];
+						power = power + (power * tmp / 5000);
+						bu[in].dmg_reduction = power*4/6;
+						bu[in].dmg_bonus     = power*2/6;
+					}
 					else
-						bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
+					{
+						bu[in].reserve[0] = min(80, 15+power/5); // Hitpoints
+						power = ch[cn].reserve[0];
+						power = power + (power * tmp / 5000);
+						bu[in].dmg_reduction = power*4/3;
+						bu[in].dmg_bonus     = power*2/3;
+					}
 					break;
 				case SK_LETHARGY:
 					power = M_SK(cn, SK_LETHARGY);
@@ -14264,8 +14269,6 @@ void do_regenerate(int cn)
 					degendam = degenpower;
 					
 					degendam = spell_metabolism(degendam, get_target_metabolism(cn));
-					
-					if (co && (in2 = has_buff(co, SK_PACT))) degendam = degendam * (2000 + bu[in2].data[4]) / 2000;
 					
 					// Easy new method!
 					if (co) degendam = degendam * ch[co].dmg_bonus / 10000;

@@ -658,7 +658,7 @@ extern char *at_name[];
 #define DESC_LOVERS_R		"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
 #define DESC_CHARIO_R		"When equipped, your debuffs ignore 25%% of target resistance and immunity, but are 20%% weaker once applied.\n"
 #define DESC_STRENG_R		"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
-#define DESC_HERMIT_R		"When equipped, your Rage and Calm skills reserve endurance instead of hitpoints or mana.\n"
+#define DESC_HERMIT_R		"When equipped, your Pact skill reserves and functions based off of reserved mana instead of hitpoints, but provides less of a benefit while active.\n"
 #define DESC_WHEEL_R		"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
 #define DESC_JUSTIC_R		"When equipped, your Leap skill no longer repeats. Leap now always deals a critical hit and stuns everything it hits.\n"
 #define DESC_HANGED_R		"When equipped, you have 24%% more Top Damage, but 12%% less Weapon Value.\n"

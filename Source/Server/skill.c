@@ -101,7 +101,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				{ AT_BRV, AT_WIL, AT_WIL }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
 	{ 22, 'E', 	"Pact", 				"Use (Skill): Applies a buff to yourself which reserves health to grant additional Damage and Damage Reduction.",
-				"", "",
+				"Pact (Mana)",          "Use (Skill): Applies a buff to yourself which reserves mana to grant additional Damage and Damage Reduction.",
 				{ AT_BRV, AT_INT, AT_STR }},
 				
 	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 
@@ -452,8 +452,8 @@ struct sk_tree sk_tree[10][12]={
 		  6701,                            "" },
 		{ "Greed",                         "Your Top Damage is rolled an additional ",
 		  6702,                            "time, using the higher result." },
-		{ "Wrath",                         "0.5%% more effect of Rage & Calm per 50 ",
-		  6703,                            "missing Hitpoints, Endurance, and Mana." },
+		{ "Wrath",                         "0.5%% more effect of bonus from Pact per ",
+		  6703,                            "50 missing Hitpoints, Endurance, and Mana." },
 		{ "Sloth",                         "10%% more Hitpoints, Endurance, and Mana.",
 		  6704,                            "" },
 		{ "Gluttony",                      "8%% of damage dealt is restored as ",
@@ -707,8 +707,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6701,                            "" },
 	{ "* Culling *",                   "Critical Hits kill enemies left below ",		// *
 	  6702,                            "2%% remaining health." },
-	{ "* Wrath *",                     "0.2%% more effect of Rage & Calm per 50 ",
-	  6703,                            "missing Hitpoints, Endurance, and Mana." },
+	{ "* Wrath *",                     "0.2%% more effect of bonus from Pact per ",
+	  6703,                            "50 missing Hitpoints, Endurance, and Mana." },
 	{ "* Sloth *",                     "3%% more Hitpoints, Endurance, and Mana.",
 	  6704,                            "" },
 	{ "* Hunger *",                    "2%% of damage dealt is restored as ",
@@ -721,7 +721,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6708,                            "" }
 };
 
-struct metaStat metaStats[102] = {
+struct metaStat metaStats[103] = {
 	//
 	//   Topmost standard stats
 	//                                             "         '         '         '         '         '         '         '         '         '         '         '         "
@@ -758,8 +758,8 @@ struct metaStat metaStats[102] = {
 	{ 49, 0, 1, "Leap Hit Damage",      "",        "Damage dealt by your Leap skill if your target is at or near maximum hitpoints." },
 	{ 49, 0, 1, "Leap # of Repeats",    "Repeats", "Damage dealt by your Leap skill, before enemy defenses." },
 	{ 49, 1, 1, "Leap Cooldown",        "Seconds", "Skill exhaustion duration expected upon using your Leap skill." },
-	{ 22, 0, 5, "Rage TD Bonus",        "Top Dmg", "Effective increase to top damage granted while under the effect of your Rage skill." },
-	{ 22, 1, 5, "Rage DoT Bonus",       "%",       "Effective multiplier to damage over time granted while under the effect of your Rage skill." },
+	{ 22, 1, 5, "Pact Dmg Bonus",       "%",       "Effective multiplier to damage granted while under the effect of your Pact skill." },
+	{ 22, 0, 5, "Pact Health Reserve",  "%",       "The amount of health, as a percent, reserved while Pact is active." },
 	{ 24, 0, 4, "Blast Hit Damage",     "",        "Damage dealt by your Blast spell, before enemy defenses." },
 	{ 24, 1, 4, "Blast Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Blast spell." },
 	{ 15, 0, 1, "Lethargy Effect",      "I/R Pen", "Effective penetration of target Immunity and Resistance when casting debuffs." },
@@ -802,8 +802,8 @@ struct metaStat metaStats[102] = {
 	{ 11, 0, 4, "M.Shield Effect",      "AV",      "Effective increase to Armor Value granted by your Magic Shield spell. Decreases as you take damage." },
 	{ 11, 1, 4, "M.Shield Duration",    "Seconds", "Estimated duration of your Magic Shell, not including reductions from taking damage." },
 	{ 47, 0, 6, "Haste Effect",         "Speed",   "Estimated increase to Speed granted by your Haste spell." },
-	{ 22, 0, 5, "Calm Less TD Taken",   "Top Dmg", "Effective reduction to incoming top damage granted while under the effect of your Calm skill." },
-	{ 22, 1, 5, "Calm DoT Taken",       "%",       "Effective multiplier to incoming damage over time granted while under the effect of your Calm skill." },
+	{ 22, 1, 5, "Pact Dmg Taken",       "%",       "Effective multiplier to incoming damage granted while under the effect of your Pact skill." },
+	{ 22, 0, 5, "Pact Health Reserve",  "%",       "The amount of health, as a percent, reserved while Pact is active." },
 	{ 26, 0, 1, "Heal Effect",          "",        "Effective flat healing expected when casting your heal spell." },
 	{ 37, 0, 5, "Blind Effect",         "",        "Effective reduction of target Hit and Parry Scores when using your Blind skill, before enemy defenses." },
 	{ 37, 1, 5, "Blind Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Blind skill." },
@@ -836,5 +836,6 @@ struct metaStat metaStats[102] = {
 	{ 35, 1, 1, "Rally Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Rally skill." },
 	{ 41, 0, 5, "Crush Effect",         "AV",      "Effective reduction of target Armor Value when using your Crush skill, before enemy defenses." },
 	{ 41, 1, 5, "Crush Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Crush skill." },
+	{ 22, 0, 5, "Pact Mana Reserve",    "%",       "The amount of mana, as a percent, reserved while Pact is active." }
 };
 

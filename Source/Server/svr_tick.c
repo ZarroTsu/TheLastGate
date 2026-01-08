@@ -1733,6 +1733,7 @@ void plr_update_skill_terminology(int nr, int n)
 	if (n==16 && do_get_iflag(cn, SF_SHIELDBASH)) alt = 1; // Shield -> Shield Bash
 	if (n==19 && do_get_iflag(cn, SF_EMPEROR))    alt = 1; // Slow -> Greater Slow
 	if (n==20 && do_get_iflag(cn, SF_TOWER))      alt = 1; // Curse -> Greater Curse
+	if (n==22 && do_get_iflag(cn, SF_HERMIT_R))   alt = 1; // Pact HP -> Mana
 	if (n==24 && do_get_iflag(cn, SF_JUDGE))      alt = 1; // Blast -> +Scorch
 	if (n==26 && do_get_iflag(cn, SF_STAR))       alt = 1; // Heal -> Regen
 	if (n==35 && do_get_iflag(cn, SF_EMPERO_R))   alt = 1; // Warcry -> Rally
@@ -1742,7 +1743,6 @@ void plr_update_skill_terminology(int nr, int n)
 	if (n==42 && do_get_iflag(cn, SF_TOWER_R))    alt = 1; // Poison -> Venom
 	if (n==43 && do_get_iflag(cn, SF_JUDGE_R))    alt = 1; // Pulse -> Healing Pulses
 	if (n==49 && do_get_iflag(cn, SF_JUSTIC_R))   alt = 1; // Leap
-	if (n==22 && IS_SHIFTED(cn))                  alt = 1; // Rage -> Calm
 	
 	for (m=0; m<3; m++)
 	{
@@ -1867,13 +1867,20 @@ int get_meta_stat_value(int cn, int n)
 		default: break;
 	}
 	
-	switch (n) // Rage/Calm power from hp/en/mp
+	switch (n) // Pact power from hp/en/mp
 	{
-		case 30: case 31: case 71: case 72:
+		case 30: case 71:
 			hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
 			enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
 			mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
+			
 			power = skill_multiplier(M_SK(cn, SK_PACT), cn);
+			
+			if (do_get_iflag(cn, SF_HERMIT_R))
+				power = has_buff(cn, SK_PACT)?ch[cn].reserve[2]:min(95, min(80, 15+power/5)+ch[cn].reserve[2]);
+			else
+				power = has_buff(cn, SK_PACT)?ch[cn].reserve[0]:min(95, min(80, 15+power/5)+ch[cn].reserve[0]);
+			
 			if (T_LYCA_SK(cn, 7))         in  = (hpbonus + enbonus + mpbonus)/2;
 			if (m=st_skillcount(cn, 103)) in += (hpbonus + enbonus + mpbonus)*m/5;
 			power = power + (power * in / 5000);
@@ -1971,11 +1978,13 @@ int get_meta_stat_value(int cn, int n)
 		case 29: // Leap Cooldown					Decimal, 0.00 Seconds
 			value = 5 * cdlen;
 			break;
-		case 30: // Rage TD Bonus
-			value = min(127, power/4 + 5);
+		case 30: // Pact Dmg Bonus								Decimal, 0.00 %
+			if (do_get_iflag(cn, SF_HERMIT_R)) value = 10000+(power*2/6)*50;
+			else                               value = 10000+(power*2/3)*50;
 			break;
-		case 31: // Rage DoT Bonus					Decimal, 0.00 %
-			value = 10000 * (2000 + power) / 2000;
+		case 31: case 72: // Pact HP Reserve
+			power = skill_multiplier(M_SK(cn, SK_PACT), cn);
+			value = min(80, 15+power/5);
 			break;
 		case 32: // Blast Hit Damage
 			power = spell_multiplier(M_SK(cn, SK_BLAST), cn) * 2;
@@ -2116,11 +2125,9 @@ int get_meta_stat_value(int cn, int n)
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
 			value = min(300,10+(power)/6)+min(127,5+(power+6)/12);
 			break;
-		case 71: // Calm TD Taken											// Flipped to Positive
-			value = min(127, power/4 + 5);
-			break;
-		case 72: // Calm DoT Taken					Decimal, 0.00 %
-			value = 10000 * (2000 - power) / 2000;
+		case 71: // Pact Dmg Taken								Decimal, 0.00 %
+			if (do_get_iflag(cn, SF_HERMIT_R)) value = 10000-(power*4/6)*50;
+			else                               value = 10000-(power*4/3)*50;
 			break;
 		case 73: case 95: // Heal/Regen Effect
 			power = M_SK(cn, SK_HEAL);
@@ -2211,7 +2218,6 @@ int get_meta_stat_value(int cn, int n)
 			value = value * ((do_get_iflag(cn, SF_STRENGTH)?6:5)/5)*(ch[cn].dmg_bonus/10000);
 			break;
 		case 25: case 35: case 41: case 90:
-			if (in = has_buff(cn, SK_PACT)) value = value * (2000 + bu[in].data[4]) / 2000;
 			value = value * ((do_get_iflag(cn, SF_STRENGTH)?6:5)/5)*(ch[cn].dmg_bonus/10000) / 20;
 			break;
 		default: break;
@@ -2238,6 +2244,8 @@ int ch_get_meta_alternative_value(int cn, int n)
 	if (n == 77 && do_get_iflag(cn, SF_EMPERO_R)) return  99; break; // Warcry -> Rally
 	if (n == 78 && do_get_iflag(cn, SF_DEATH))    return 100; break; // Weaken -> Crush
 	if (n == 79 && do_get_iflag(cn, SF_DEATH))    return 101; break; // Weaken -> Crush
+	if (n == 31 && do_get_iflag(cn, SF_HERMIT_R)) return 102; break; // Pact HP -> Mana
+	if (n == 72 && do_get_iflag(cn, SF_HERMIT_R)) return 102; break; // Pact HP -> Mana
 	
 	return n;
 }
