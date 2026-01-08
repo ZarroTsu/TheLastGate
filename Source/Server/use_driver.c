@@ -1938,7 +1938,7 @@ int teleport(int cn, int in)
 			case  1: do_char_log(cn, 1, "Everything spins. Where...?\n"); break;
 			case  2: do_char_log(cn, 1, "Your fingertips laugh at you.\n"); break;
 			case  3: do_char_log(cn, 1, "The sky is gone. It left you here.\n"); break;
-			case  4: do_char_log(cn, 1, "yOu aRe nOt sAfe.\n"); break;
+			case  4: do_char_log(cn, 1, "You are no longer safe.\n"); break;
 			case  5: do_char_log(cn, 1, "This may have been a mistake.\n"); break;
 			case  6: do_char_log(cn, 1, "Your vision clouds. And then...\n"); break;
 			case  7: do_char_log(cn, 1, "I don't know where you are.\n"); break;
@@ -1950,13 +1950,15 @@ int teleport(int cn, int in)
 		build_dw_square(cn, x, y);
 		quick_teleport(cn, x, y);
 		
+		for (n=0;n<3;n++) use_spawn_dw_mobs(cn, in); // Spawn mobs to give chase
+		
 		x = it[in].x;
 		y = it[in].y;
 		
-		if (!(map[XY2M(x, y)].flags & MF_NOLAG))
-			ch[cn].data[25] = XY2M(x, y);
-		else
+		if ((map[XY2M(x, y)].flags & MF_NOLAG) && !CONT_NUM(cn))
 			ch[cn].data[25] = 0;
+		else
+			ch[cn].data[25] = XY2M(x, y);
 		
 		fx_add_effect(12, 0, x, y, 0);
 		do_area_sound(cn, 0, x, y, 21);
@@ -6131,6 +6133,35 @@ int shatter_sanguine_crystal(int cn, int in, int x, int y)
 	return 1;
 }
 
+int use_spawn_dw_mobs(int cn, int in)
+{
+	int x, y, base, co, rank = getrank(cn) + (IS_RB(cn)?1:0);
+	
+	if (!RANDOM(2))
+	{
+		x = it[in].x - 11 + RANDOM(23);
+		y = it[in].y - 11 + (RANDOM(2)?23:0);
+	}
+	else
+	{
+		x = it[in].x - 11 + (RANDOM(2)?23:0);
+		y = it[in].y - 11 + RANDOM(23);
+	}
+	if (IS_IN_INDW(x, y))
+	{
+		base = max(9, (rank-5) * 6 + 7);
+		co = generate_map_enemy(cn, 350, RANDOM(NUM_MAP_ENEM)+11, x, y, base, 7, 1+RANDOM(2));
+		ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 5;
+		ch[co].sprite = ch[cn].sprite;
+		ch[co].light_bonus = 0;
+		ch[co].flags |= CF_INFRARED;
+		x = it[in].x - 1 + RANDOM(3);
+		y = it[in].y - 1 + RANDOM(3);
+		if (npc_add_enemy(co, cn, 1) && !(ch[cn].flags & CF_SILENCE)) npc_saytext_n(co, 1, ch[cn].name);
+		npc_moveto(co, x, y);
+	}
+}
+
 int use_sanguine_crystal(int cn, int in)
 {
 	int tmp, wil, x, y, base, rank, co;
@@ -6179,30 +6210,7 @@ int use_sanguine_crystal(int cn, int in)
 		if (it[in].data[2]>=160)
 		{
 			it[in].data[2] -= 160;
-			// Spawn a mob to give chase
-			if (!RANDOM(2))
-			{
-				x = it[in].x - 11 + RANDOM(23);
-				y = it[in].y - 11 + (RANDOM(2)?23:0);
-			}
-			else
-			{
-				x = it[in].x - 11 + (RANDOM(2)?23:0);
-				y = it[in].y - 11 + RANDOM(23);
-			}
-			if (IS_IN_INDW(x, y))
-			{
-				base = max(9, (rank-5) * 6 + 9 + (IS_RB(cn)?1:0));
-				co = generate_map_enemy(cn, 350, RANDOM(NUM_MAP_ENEM)+11, x, y, base, 7, 1+RANDOM(2));
-				ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 5;
-				ch[co].sprite = ch[cn].sprite;
-				ch[co].light_bonus = 0;
-				ch[co].flags |= CF_INFRARED;
-				x = it[in].x - 1 + RANDOM(3);
-				y = it[in].y - 1 + RANDOM(3);
-				if (npc_add_enemy(co, cn, 1) && !(ch[cn].flags & CF_SILENCE)) npc_saytext_n(co, 1, ch[cn].name);
-				npc_moveto(co, x, y);
-			}
+			use_spawn_dw_mobs(cn, in); // Spawn a mob to give chase
 		}
 	}
 	
@@ -6218,7 +6226,7 @@ int use_sanguine_crystal(int cn, int in)
 
 int use_dw_chest(int cn, int in)
 {
-	int co, rank, x, y, n, in2, base;
+	int co, rank, x, y, n = 0, stk = 0; in2, base;
 	
 	if (cn==0)
 	{
@@ -6233,41 +6241,50 @@ int use_dw_chest(int cn, int in)
 	
 	if (rank <= 14) 	// Officers
 	{
-		switch (RANDOM(8))
+		switch (RANDOM(10))
 		{
-			case  0:	
-			case  1:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
-			case  2:	n = RANDOM(2)?(RANDOM(2)?(IT_RD_GEND):IT_RD_GMANA):IT_RD_GHEAL;			break;
-			case  3:	
-			case  4:	n = RANDOM(4)?(IT_POP_ASPEL+RANDOM(7)):(IT_RD_HP+RANDOM(2)*2); 			break;
-			case  5: 	n = RANDOM(4)?(RANDOM(6)?IT_RPOT:IT_GPOT):(IT_SIGN_SHOU+RANDOM(9));		break;
-			case  6:	n = RANDOM(8)?(RANDOM(6)?IT_CORRUPTOR:IT_POT_RAIN):(IT_TALISMAN);		break;
-			default:	n = RANDOM(2)?IT_SM_WHET:IT_SM_MAGE;									break;
+			case  0: n = IT_EXPS; break;
+			case  1: n = IT_POT_G_HP; stk = 2 + RANDOM(3); break;
+			case  2: n = IT_POP_ASPEL; break;
+			case  3: n = IT_POP_ISPEL; break;
+			case  4: n = IT_RD_HP; break;
+			case  5: n = IT_RD_HP; break;
+			case  6: n = IT_RPOT; stk = RANDOM(3); break;
+			case  7: n = IT_SIGN_SHOU; break;
+			case  8: n = (RANDOM(2)?IT_CORRUPTOR:IT_TALISMAN); break;
+			default: n = IT_SM_WHET; stk = 2 + RANDOM(3); break;
 		}
 	}
 	else if (rank <= 19) 	// Generals
 	{
-		switch (RANDOM(7))
+		switch (RANDOM(10))
 		{
-			case  0:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
-			case  1:	n = RANDOM(2)?(RANDOM(2)?(IT_RD_GEND):IT_RD_GMANA):IT_RD_GHEAL;			break;
-			case  2: 	n = RANDOM(4)?(IT_POP_ASPEL+RANDOM(7)):(IT_RD_HP+RANDOM(2)*2); 			break;
-			case  3: 	n = RANDOM(5)?(IT_POP_ISPEL+RANDOM(7)):(IT_RD_BRV+RANDOM(5)); 			break;
-			case  4:	n = RANDOM(3)?(RANDOM(4)?IT_RPOT:IT_GPOT):(IT_SIGN_SHOU+RANDOM(9));		break;
-			case  5:	n = RANDOM(7)?(RANDOM(6)?IT_CORRUPTOR:IT_POT_RAIN):(IT_TALISMAN);		break;
-			default:	n = RANDOM(2)?IT_SM_WHET:IT_SM_MAGE;									break;
+			case  0: n = IT_EXPS; break;
+			case  1: n = IT_POT_VITA; stk = 2 + RANDOM(2); break;
+			case  2: n = IT_POP_ISPEL; break;
+			case  3: n = IT_POP_ISPEL; break;
+			case  4: n = IT_RD_HP; break;
+			case  5: n = IT_RD_BRV; break;
+			case  6: n = IT_GPOT; stk = RANDOM(3); break;
+			case  7: n = IT_SIGN_SHOU; break;
+			case  8: n = (RANDOM(2)?IT_CORRUPTOR:IT_TALISMAN); break;
+			default: n = IT_SM_WHET; stk = 3 + RANDOM(5); break;
 		}
 	}
 	else					// Nobles
 	{
-		switch (RANDOM(6))
+		switch (RANDOM(10))
 		{
-			case  0:	n = RANDOM(2)?(IT_EXPS+RANDOM(2)):IT_EXPS;								break;
-			case  1: 	n = RANDOM(2)?(RANDOM(2)?(IT_RD_GEND):IT_RD_GMANA):IT_RD_GHEAL;			break;
-			case  2: 	n = RANDOM(5)?(IT_POP_ISPEL+RANDOM(7)):(IT_RD_BRV+RANDOM(5)); 			break;
-			case  3: 	n = RANDOM(6)?(IT_POT_D_HP+RANDOM(3)*6):(IT_OS_BRV+RANDOM(5)); 			break;
-			case  4:	n = RANDOM(2)?(RANDOM(2)?IT_RPOT:IT_GPOT):(IT_SIGN_SHOU+RANDOM(9));		break;
-			default:	n = RANDOM(6)?(RANDOM(8)?IT_CORRUPTOR:IT_OS_SK):(IT_SIGN_SKUA);			break;
+			case  0: n = IT_EXPS; break;
+			case  1: n = IT_POT_VITA; stk = 2 + RANDOM(2); break;
+			case  2: n = IT_POP_ISPEL; break;
+			case  3: n = IT_POP_SSPEL; break;
+			case  4: n = IT_RD_BRV; break;
+			case  5: n = (RANDOM(2)?IT_RD_BRV:IT_OS_BRV); break;
+			case  6: n = IT_SPOT; stk = RANDOM(3); break;
+			case  7: n = (RANDOM(6)?IT_SIGN_SHOU:IT_SIGN_SKUA); break;
+			case  8: n = (RANDOM(2)?IT_CORRUPTOR:IT_TALISMAN); break;
+			default: n = IT_SM_WHET; stk = 4 + RANDOM(7); break;
 		}
 	}
 	
@@ -6280,9 +6297,67 @@ int use_dw_chest(int cn, int in)
 	}
 	else
 	{
-		if (n<=0 || n>=MAXTITEM)
+		if (n<=0 || n>=MAXTITEM) n = IT_POT_RAIN;
+		else
 		{
-			n = IT_POT_RAIN;
+			switch (n)
+			{
+				case IT_EXPS: if (!RANDOM(4)) n++;   break;
+				case IT_POT_G_HP:
+					switch (RANDOM(3))
+					{
+						case  0: n = IT_POT_G_HP;    break;
+						case  1: n = IT_POT_G_EN;    break;
+						default: n = IT_POT_G_MP;    break;
+					}
+					break;
+				case IT_POT_VITA:
+					switch (RANDOM(3))
+					{
+						case  0: n = IT_POT_VITA;    break;
+						case  1: n = IT_POT_CLAR;    break;
+						default: n = IT_POT_SAGE;    break;
+					}
+					break;
+				case IT_POT_D_HP:
+					switch (RANDOM(3))
+					{
+						case  0: n = IT_POT_D_HP;    break;
+						case  1: n = IT_POT_D_EN;    break;
+						default: n = IT_POT_D_MP;    break;
+					}
+					break;
+				case IT_POP_ASPEL: n += RANDOM(7);   break;
+				case IT_POP_ISPEL: n += RANDOM(7);   break;
+				case IT_POP_SSPEL: n += RANDOM(7);   break;
+				case IT_RD_HP:     n += RANDOM(2)*2; break;
+				case IT_RD_BRV:    n += RANDOM(5);   break;
+				case IT_OS_BRV:    n += RANDOM(5);   break;
+				case IT_SM_WHET:
+					switch (RANDOM(3))
+					{
+						case  0: n = IT_SM_WHET;     break;
+						case  1: n = IT_SM_MAGE;     break;
+						default: n = IT_SM_GRAD;     break;
+					}
+					break;
+				case IT_GPOT:
+					switch (RANDOM(4))
+					{
+						case  0:                     break;
+						default: n = IT_RPOT;        break;
+					}
+					break;
+				case IT_SPOT:
+					switch (RANDOM(4))
+					{
+						case  0:                     break;
+						default: n = IT_GPOT;        break;
+					}
+					break;
+				case IT_SIGN_SHOU: n += RANDOM(9);   break;
+				default: break;
+			}
 		}
 		
 		in2 = get_special_item(cn, n, 0, 0, 0);
@@ -6293,6 +6368,7 @@ int use_dw_chest(int cn, int in)
 		}
 		else
 		{
+			if (stk) it[in2].stack = stk;
 			if (n==IT_OS_SK) it[in2].data[1] = RANDOM(50);
 			if (!god_give_char(in2, cn))
 			{
@@ -6305,33 +6381,7 @@ int use_dw_chest(int cn, int in)
 		}
 	}
 	
-	for (n=0;n<3;n++)
-	{
-		// Spawn a mob to give chase
-		if (!RANDOM(2))
-		{
-			x = it[in].x - 11 + RANDOM(23);
-			y = it[in].y - 11 + (RANDOM(2)?23:0);
-		}
-		else
-		{
-			x = it[in].x - 11 + (RANDOM(2)?23:0);
-			y = it[in].y - 11 + RANDOM(23);
-		}
-		if (IS_IN_INDW(x, y))
-		{
-			base = max(9, (rank-5) * 6 + 9 + (IS_RB(cn)?1:0));
-			co = generate_map_enemy(cn, 350, RANDOM(NUM_MAP_ENEM)+11, x, y, base, 7, 1+RANDOM(2));
-			ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 5;
-			ch[co].sprite = ch[cn].sprite;
-			ch[co].light_bonus = 0;
-			ch[co].flags |= CF_INFRARED;
-			x = it[in].x - 1 + RANDOM(3);
-			y = it[in].y - 1 + RANDOM(3);
-			if (npc_add_enemy(co, cn, 1) && !(ch[cn].flags & CF_SILENCE)) npc_saytext_n(co, 1, ch[cn].name);
-			npc_moveto(co, x, y);
-		}
-	}
+	for (n=0;n<3;n++) use_spawn_dw_mobs(cn, in); // Spawn mobs to give chase
 	
 	return 1;
 }
@@ -8982,7 +9032,7 @@ int rebirth_explorer_point(int cn, int in, int msg)
 
 int explorer_point(int cn, int in, int msg)
 {
-	int exp;
+	int exp, x, y, n;
 	
 	if (!cn) return 0;
 	if (!IS_SANEITEM(in)) return 0;
@@ -8990,6 +9040,31 @@ int explorer_point(int cn, int in, int msg)
 	
 	if (it[in].data[8]) 
 		return rebirth_explorer_point(cn, in, msg);
+	
+	if (it[in].temp == DW_EXPPOLE)
+	{
+		if (it[in].active)
+		{
+			if (msg) do_char_log(cn, 1, "Hmm. Seems to have been used.\n");
+			return 0;
+		}
+		
+		do_char_log(cn, 0, "You found a new exploration point!\n");
+		ch[cn].luck += 10;
+
+		exp  = rank2points(getrank(cn)-1)/(getrank(cn)*getrank(cn)+1);
+		exp -= RANDOM(exp/20+1);
+		exp  = min(ch[cn].points_tot / 10, exp);        // not more than 10% of total experience
+		exp += RANDOM(exp/20+1);
+		
+		chlog(cn, "Found special exp point, granting %d exp", exp);
+		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
+		do_give_exp(cn, exp, 0, -1, 0);
+		
+		for (n=0;n<3;n++) use_spawn_dw_mobs(cn, in); // Spawn mobs to give chase
+		
+		return 1;
+	}
 	
 	if (!(ch[cn].data[46] & it[in].data[0]) && !(ch[cn].data[47] & it[in].data[1]) &&
 	    !(ch[cn].data[48] & it[in].data[2]) && !(ch[cn].data[49] & it[in].data[3]) && 

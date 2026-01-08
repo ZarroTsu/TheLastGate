@@ -320,6 +320,7 @@ int get_rebirth_bits(int cn);
 int get_seyan_bits(int cn);
 int use_seyan_shrine(int cn, int in, int flag);
 int spawner_driver(int dr);
+int use_spawn_dw_mobs(int cn, int in);
 
 //-- effect --
 int can_drop(int m);

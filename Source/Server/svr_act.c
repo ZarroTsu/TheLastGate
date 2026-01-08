@@ -158,41 +158,8 @@ void step_dw(int cn)
 		if (in && bu[in].power>1)
 		{
 			bu[in].power--;
-			/*
-			if (!(bu[in].power%2))
-			{
-				bu[in].light--;
-				do_update_char(cn);
-			}
-			*/
 			
-			if (!(bu[in].power%21))
-			{
-				rank = getrank(cn) + (IS_RB(cn)?1:0);
-				
-				// Spawn a mob to give chase
-				if (!RANDOM(2))
-				{
-					x = ch[cn].x - 11 + RANDOM(23);
-					y = ch[cn].y - 11 + (RANDOM(2)?23:0);
-				}
-				else
-				{
-					x = ch[cn].x - 11 + (RANDOM(2)?23:0);
-					y = ch[cn].y - 11 + RANDOM(23);
-				}
-				if (IS_IN_INDW(x, y))
-				{
-					base = max(9, (rank-5) * 6 + 9 + (IS_RB(cn)?1:0));
-					co = generate_map_enemy(cn, 350, RANDOM(NUM_MAP_ENEM)+11, x, y, base, 7, 1+RANDOM(2));
-					ch[co].data[PCD_COMPANION] = globs->ticker + TICKS * 60 * 5;
-					ch[co].sprite = ch[cn].sprite;
-					x = (ch[cn].goto_x)?(ch[cn].goto_x):(ch[cn].x);
-					y = (ch[cn].goto_y)?(ch[cn].goto_y):(ch[cn].y);
-					if (npc_add_enemy(co, cn, 1) && !(ch[cn].flags & CF_SILENCE)) npc_saytext_n(co, 1, ch[cn].name);
-					npc_moveto(co, x, y);
-				}
-			}
+			if (!(bu[in].power%21)) use_spawn_dw_mobs(cn, in);	// Spawn a mob to give chase
 		}
 		else if (in && bu[in].power==1)
 		{
