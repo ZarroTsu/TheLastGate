@@ -4223,12 +4223,12 @@ int do_showbuffs(int cn, int co)
 						else
 							do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/3);
 						break;
-					case SK_PACT:
+					case SK_PACT: // TODO
+					
 						do_char_log(cn, 6, " : %+d Top Damage\n", bu[in].top_damage);
-						do_char_log(cn, 6, " : +%d.%02d%% DoT Dealt\n", 100*(2000+bu[in].data[4])/2000, abs(10000*(2000+bu[in].data[4])/2000)%100); break;
-					case SK_CALM:
-						do_char_log(cn, 6, " : %+d Top Damage Taken\n", bu[in].data[3]*-1);
-						do_char_log(cn, 6, " : %d.%02d%% DoT Taken\n", 100*(2000-bu[in].data[4])/2000, abs(10000*(2000-bu[in].data[4])/2000)%100); break;
+						do_char_log(cn, 6, " : +%d.%02d%% DoT Dealt\n", 100*(2000+bu[in].data[4])/2000, abs(10000*(2000+bu[in].data[4])/2000)%100);
+						
+						break;
 					case 254: // R/G/S Essence
 						do_char_log(cn, 6, " : %+d to each attribute\n",  bu[in].attrib[0]);
 						if (bu[in].skill[SK_GEARMAST])
@@ -10173,10 +10173,6 @@ void do_attack(int cn, int co, int surround)
 		dam = ch[cn].weapon + RANDOM(9);
 		topdam = max(0, ch[cn].top_damage);
 		
-		if (in = has_buff(co, SK_CALM))
-		{
-			topdam = topdam - bu[in].data[3];
-		}
 		if (topdam>1)
 		{
 			// Tree
@@ -13567,19 +13563,6 @@ void do_update_permaspells(int cn)
 					else
 						bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
 					break;
-				case SK_CALM:
-					power = M_SK(cn, SK_PACT);
-					power = skill_multiplier(power, cn);
-					bu[in].power   = power; power = power + (power * tmp / 4000);
-					
-					bu[in].data[3] = min(127, power/ 4 + 5);
-					bu[in].data[4] = power/2;
-					
-					if (do_get_iflag(cn, SF_HERMIT_R))
-						bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
-					else
-						bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
-					break;
 				case SK_LETHARGY:
 					power = M_SK(cn, SK_LETHARGY);
 					if (T_SORC_SK(cn, 7))          power = power + (power * M_AT(cn, AT_WIL)/2000);
@@ -14065,29 +14048,6 @@ void do_regenerate(int cn)
 					continue;
 				}
 				
-				/*
-				if (bu[in].temp==SK_PACT || bu[in].temp==SK_CALM)
-				{
-					p = min(20, getrank(cn));
-					//if (bu[in].active>(bu[in].duration-TICKS*5)) bu[in].active--;
-					
-					if (bu[in].data[2]==1) bu[in].r_hp   = -(ch[cn].a_hp  /(500+75*p));
-					if (bu[in].data[2]==2) bu[in].r_end  = -(ch[cn].a_end /(500+75*p));
-					if (bu[in].data[2]==3) bu[in].r_mana = -(ch[cn].a_mana/(500+75*p));
-					
-					if (ch[cn].a_end<500)
-					{
-						ch[cn].a_end  = 500;	bu[in].active = 0;
-						chlog(cn, "%s ran out due to lack of endurance.", it[in].name);
-					}
-					if (ch[cn].a_mana<500)
-					{
-						ch[cn].a_mana  = 500;	bu[in].active = 0;
-						chlog(cn, "%s ran out due to lack of mana.", it[in].name);
-					}
-				}
-				*/
-				
 				if (bu[in].r_hp!=-1)
 				{
 					degendam = bu[in].r_hp;
@@ -14156,33 +14116,6 @@ void do_regenerate(int cn)
 						}
 					}
 				}
-				
-				/*
-				if (bu[in].temp==SK_PACT || bu[in].temp==SK_CALM)
-				{
-					tmp   = 0;
-					power = bu[in].power;
-					
-					if (T_LYCA_SK(cn, 7))
-						tmp  = (((ch[cn].hp[5]*1000 - ch[cn].a_hp)/1000) + ((ch[cn].end[5]*1000 - ch[cn].a_end)/1000) + ((ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000))/2;
-					if (m=st_skillcount(cn, 103))
-						tmp += (((ch[cn].hp[5]*1000 - ch[cn].a_hp)/1000) + ((ch[cn].end[5]*1000 - ch[cn].a_end)/1000) + ((ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000))*m/5;
-					
-					power = power + (power * tmp / 5000);
-					
-					if (bu[in].temp==SK_PACT)
-					{
-						bu[in].top_damage = min(127, power/ 4 + 5);
-						bu[in].data[4]    = power/2;
-					}
-					if (bu[in].temp==SK_CALM)
-					{
-						bu[in].data[3]    = min(127, power/ 4 + 5);
-						bu[in].data[4]    = power/2;
-					}
-					do_update_char(cn);
-				}
-				*/
 			}
 			else
 			{
@@ -14337,8 +14270,6 @@ void do_regenerate(int cn)
 					// Easy new method!
 					if (co) degendam = degendam * ch[co].dmg_bonus / 10000;
 							degendam = degendam * ch[cn].dmg_reduction / 10000;
-					
-					if (in2 = has_buff(cn, SK_CALM)) degendam = degendam * (2000 - bu[in2].data[4]) / 2000;
 					
 					if (tmp = do_get_ieffect(cn, VF_EN_LESSDOT))
 						degendam = degendam * max(25, 100-tmp)/100;
@@ -14810,9 +14741,6 @@ void do_regenerate(int cn)
 		if (uwater)
 		{
 			int waterlifeloss = spell_metabolism(250, get_target_metabolism(cn));
-			
-			if (in = has_buff(cn, SK_CALM)) 
-				waterlifeloss = waterlifeloss * (1000 - bu[in].data[4]) / 1000;
 			
 			// Amulet of Waterbreathing quarters the result
 			if (do_get_iflag(cn, SF_WBREATH))

@@ -100,8 +100,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
-	{ 22, 'E', 	"Rage", 				"Use (Skill): Applies a buff to yourself which reserves health to grant additional Top Damage and damage-over-time.", 
-				"Calm", 				"Use (Skill): Applies a buff to yourself which reserves mana to reduce Top Damage and damage-over-time received.",
+	{ 22, 'E', 	"Pact", 				"Use (Skill): Applies a buff to yourself which reserves health to grant additional Damage and Damage Reduction.",
+				"", "",
 				{ AT_BRV, AT_INT, AT_STR }},
 				
 	{ 23, 'G', 	"Resistance", 			"Passive ability to avoid enemy negative spells.", 

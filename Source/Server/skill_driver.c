@@ -117,9 +117,9 @@ struct s_splog splog[66] = {
 		" was blessed.",
 		" cast bless on you."
 	},{ 
-		SK_PACT, 		"Rage",			"rage",			"raging",
-		"You enter a bloodthirsty rage!",
-		" starts to rage.", ""
+		SK_PACT, 		"Pact",			"pact",			"pacting",
+		"You enter a pact of power.",
+		" starts a pact.", ""
 	},{
 		SK_STARLIGHT,	"Starlight",	"starlight",	"starlighting",
 		"You feel wisened.",
@@ -247,7 +247,7 @@ struct s_splog splog[66] = {
 	},{
 		SK_SHIFT, 		"Shift Exhaust",		"shift",		"shifting"
 	},{
-		SK_CALM, 		"Calm",			"calm",			"calming"
+		0, 				"",		"",		""
 	},{
 		SK_FROSTB, 		"Frostburn",	"frostburn",	"frostburning"
 	},{
@@ -1612,10 +1612,8 @@ int spellcost(int cn, int cost, int in, int usemana)
 	int cotfk_cost = 0, devil_cost = 0, hp_cost = 0;
 	int base_mana_cost, mana_cost, end_cost, t, n, in2, worldr = 0;
 	
-	if (IS_PLAYER(cn) && in != SK_BLAST && 
-		in != SK_CLEAVE && in != SK_SHIELD && in != SK_WEAKEN && in != SK_WARCRY && 
-		in != SK_BLIND && in != SK_DOUSE && in != SK_TAUNT && 
-		in != SK_LEAP && in != SK_PACT)
+	if (IS_PLAYER(cn)  && in != SK_BLAST && in != SK_CLEAVE && in != SK_SHIELD && in != SK_WEAKEN && in != SK_WARCRY && 
+		in != SK_BLIND && in != SK_DOUSE && in != SK_TAUNT  && in != SK_LEAP   && in != SK_PACT)
 	{
 		cost = max(SP_COST_BASE, min(cost, cost*M_SK(cn, in)/100));
 	}
@@ -2672,7 +2670,6 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 			{
 				if (temp==SK_LIGHT) do_char_log(cn, 1, "You stop emitting light.\n");
 				if (temp==SK_PACT)  do_char_log(cn, 1, "Rage no longer active.\n");
-				if (temp==SK_CALM)  do_char_log(cn, 1, "Calm no longer active.\n");
 			}
 			else
 				do_char_log(cn, 1, "%s\n", splog[temp].self);
@@ -4701,7 +4698,6 @@ void remove_all_spells(int cn, int flag) // Card turn-ins & Lycan Shifting
 			if (bu[in].temp == SK_WARCRY3)  continue;
 			if (bu[in].temp == SK_DIVINITY) continue;
 			if (bu[in].temp == SK_PACT) 	continue;
-			if (bu[in].temp == SK_CALM) 	continue;
 			if (bu[in].temp == 635) continue; // Infrared 1
 			if (bu[in].temp == 637) continue; // Infrared 2
 			if (bu[in].temp == 639) continue; // Infrared 3
@@ -6811,38 +6807,6 @@ void skill_shift(int cn, int force)
 	}
 }
 
-int spell_calm(int cn, int co, int power)
-{
-	int in, n, tmp = 0, p = min(20, getrank(cn));
-	int hpbonus = (ch[co].hp[5]*1000   - ch[co].a_hp)  /1000;
-	int enbonus = (ch[co].end[5]*1000  - ch[co].a_end) /1000;
-	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
-	
-	// Need custom sprite
-	if (!(in = make_new_buff(cn, SK_CALM, BUF_SPR_CALM, power, SP_DUR_RAGE, 1))) 
-		return 0;
-	
-	/*	// Tarot - Hermit R
-	if (do_get_iflag(co, SF_HERMIT_R)) { bu[in].data[2] = 2; bu[in].r_end  = -(ch[co].a_end /(500+75*p)); }
-	else                               { bu[in].data[2] = 3; bu[in].r_mana = -(ch[co].a_mana/(500+75*p)); }
-	*/
-	
-	if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
-	if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
-	
-	power = power + (power * tmp / 5000);
-	
-	// Tarot - Hermit R
-	if (do_get_iflag(co, SF_HERMIT_R)) bu[in].reserve[1] = min(35, max(15, (300+power)/20)); // Endurance
-	else                               bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
-	
-	bu[in].data[3] = min(127, power/ 4 + 5);
-	bu[in].data[4] = power;
-	
-	bu[in].flags = BF_PERMASPELL;
-	
-	return cast_a_spell(cn, co, in, 0, 1); // SK_CALM
-}
 int spell_pact(int cn, int co, int power)
 {
 	int in, n, tmp = 0, p = min(20, getrank(cn));
@@ -6851,13 +6815,8 @@ int spell_pact(int cn, int co, int power)
 	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
 	
 	// Need custom sprite?
-	if (!(in = make_new_buff(cn, SK_PACT, BUF_SPR_PACT, power, SP_DUR_RAGE, 1))) 
+	if (!(in = make_new_buff(cn, SK_PACT, BUF_SPR_PACT, power, SP_DUR_PACT, 1))) 
 		return 0;
-	
-	/*	// Tarot - Hermit R
-	if (do_get_iflag(co, SF_HERMIT_R)) { bu[in].data[2] = 2; bu[in].r_end  = -(ch[co].a_end /(500+75*p)); }
-	else                               { bu[in].data[2] = 1; bu[in].r_hp   = -(ch[co].a_hp  /(500+75*p)); }
-	*/
 	
 	if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
 	if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
@@ -6883,36 +6842,16 @@ void skill_pact(int cn)
 	power = skill_multiplier(power, cn);
 	
 	if (is_exhausted(cn)) 							{ return; }
-	if (!IS_SHIFTED(cn) && has_buff(cn, SK_PACT))
+	if (has_buff(cn, SK_PACT))
 	{
-		do_char_log(cn, 1, "Rage no longer active.\n");
+		do_char_log(cn, 1, "Pact no longer active.\n");
 		remove_buff(cn, SK_PACT);
-		if ((in = has_buff(cn, SK_CALM)) && (bu[in].active>(bu[in].duration-TICKS*5)))
-		{
-			do_char_log(cn, 1, "Calm no longer active.\n");
-			remove_buff(cn, SK_CALM);
-		}
-		do_update_char(cn);
-		return;
-	}
-	if (IS_SHIFTED(cn) && has_buff(cn, SK_CALM))
-	{
-		do_char_log(cn, 1, "Calm no longer active.\n");
-		remove_buff(cn, SK_CALM);
-		if ((in = has_buff(cn, SK_PACT)) && (bu[in].active>(bu[in].duration-TICKS*5)))
-		{
-			do_char_log(cn, 1, "Rage no longer active.\n");
-			remove_buff(cn, SK_PACT);
-		}
 		do_update_char(cn);
 		return;
 	}
 	if (spellcost(cn, SP_COST_PACT, SK_PACT, 0))	{ return; }
 	
-	if (IS_SHIFTED(cn))
-		spell_calm(cn, cn, power);
-	else
-		spell_pact(cn, cn, power);
+	spell_pact(cn, cn, power);
 
 	add_exhaust(cn, SK_EXH_PACT);
 }

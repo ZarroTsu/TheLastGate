@@ -2089,7 +2089,6 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 62: // Underwater Degen				Decimal, 0.00 /s
 			value = spell_metabolism(250, get_target_metabolism(cn)) * 20/10;
-			if (in = has_buff(cn, SK_CALM))   value = value * (1000 - bu[in].data[4]) / 1000;
 			if (do_get_iflag(cn, SF_WBREATH)) value /= 4;
 			break;
 		case 65: // Bless Effect

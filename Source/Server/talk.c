@@ -309,8 +309,7 @@ struct know
 #define AN_SK_HASTE		"Haste is an advanced spell. It allows the caster to dramatically speed up their actions."
 #define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
 #define AN_SK_LEAP		"Leap is an advanced skill learned by Skalds. It leaps from enemy to enemy, damaging them in the process."
-#define AN_SK_PACT		"Rage is an advanced skill learned by Lycanthrope. It allows them to deal more damage, for a cost."
-#define AN_SK_CALM		"Calm is an advanced skill learned by Lycanthrope. It allows them to take less damage, for a cost."
+#define AN_SK_PACT		"Pact is an advanced skill learned by Lycanthrope. It allows them to deal more and take less damage, for a cost."
 //}
 //{ "What is ...?" for each race
 #define AN_RA_TEMP		"Templars are powerful fighters. They are not very good with spells, but they have learned to adapt without them."
@@ -1500,8 +1499,7 @@ struct know know[] = {
 	{{"?what", "!haste",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HASTE, 0},
 	{{"?what", "!taunt",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_TAUNT, 0},
 	{{"?what", "!leap",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_LEAP, 0},
-	{{"?what", "!rage",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PACT, 0},
-	{{"?what", "!calm",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CALM, 0},
+	{{"?what", "!pact",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PACT, 0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
 	{{"?what", "!templar",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_TEMP, 0},
 	{{"?what", "!mercenary",               "?", NULL}, 0, AR_GENERAL, 0, AN_RA_MERC, 0},
@@ -2080,10 +2078,8 @@ void answer_unlearn(int cn, int co)
 	int v = 250000, n;
 	char unl[7][40];
 	
-	if (IS_SEYAN_DU(co) && 
-		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_GCMASTERY) ||
-		 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
-		 B_SK(co, SK_FINESSE) || B_SK(co, SK_PACT)))
+	if (IS_SEYAN_DU(co)   && (B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP)    || B_SK(co, SK_GCMASTERY) || B_SK(co, SK_LETHARGY) || 
+		B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || B_SK(co, SK_FINESSE) || B_SK(co, SK_PACT)))
 	{
 		n = 0;
 		if (B_SK(co, SK_WARCRY))   { B_SK(co, SK_WARCRY)   = 0; strcpy(unl[n], skilltab[SK_WARCRY].name);   n++; }

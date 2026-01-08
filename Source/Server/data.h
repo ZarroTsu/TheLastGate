@@ -370,7 +370,6 @@ extern unsigned int mapmarker;
 #define SK_LIGHT		50
 #define SK_RECALL		51
 #define SK_FEROC		53
-#define SK_CALM			55
 //////////////////////////
 // Defines for Ailments // - These are OK to match existing skill numbers; see splog[] in skill_driver.c
 #define SK_EXHAUST  	 1

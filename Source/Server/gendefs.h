@@ -379,7 +379,7 @@
 #define SP_DUR_POME			( TICKS *  5                      )
 #define SP_DUR_SOL			( TICKS *  5                      )
 #define SP_DUR_ARIA			( TICKS *  5                      )
-#define SP_DUR_RAGE			( TICKS *  5                      )
+#define SP_DUR_PACT			( TICKS *  5                      )
 #define SP_DUR_LETHARGY		( TICKS *  5                      )
 
 #define SP_DUR_MSHELL(a)	( a * 128                         )

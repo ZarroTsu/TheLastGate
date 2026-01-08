@@ -3423,7 +3423,7 @@ int npc_try_spell(int cn, int co, int spell)
 	int offn, defn, tpow, tdef, timm;
 
 	if (spell!=SK_CLEAVE && spell!=SK_SHIELD && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && 
-		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_PACT && spell!=SK_CALM)
+		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_PACT)
 	{
 		usemana = 1;
 		if ((ch[cn].flags & CF_NOMAGIC) || (ch[co].flags & CF_NOMAGIC))
@@ -3634,7 +3634,7 @@ int npc_can_spell(int cn, int co, int spell)
 {
 	if (!do_get_iflag(cn, SF_WORLD_R) && 
        (spell==SK_CLEAVE || spell==SK_SHIELD || spell==SK_WEAKEN || spell==SK_WARCRY || spell==SK_BLIND || 
-		spell==SK_TAUNT || spell==SK_LEAP || spell==SK_PACT || spell==SK_CALM))
+		spell==SK_TAUNT || spell==SK_LEAP || spell==SK_PACT))
 	{
 		if ((ch[cn].a_end-500) / 1000 < get_spellcost(cn, spell)) return 0;
 	}
