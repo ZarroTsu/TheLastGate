@@ -117,7 +117,7 @@ struct s_splog splog[66] = {
 		" was blessed.",
 		" cast bless on you."
 	},{ 
-		SK_RAGE, 		"Rage",			"rage",			"raging",
+		SK_PACT, 		"Rage",			"rage",			"raging",
 		"You enter a bloodthirsty rage!",
 		" starts to rage.", ""
 	},{
@@ -1615,7 +1615,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 	if (IS_PLAYER(cn) && in != SK_BLAST && 
 		in != SK_CLEAVE && in != SK_SHIELD && in != SK_WEAKEN && in != SK_WARCRY && 
 		in != SK_BLIND && in != SK_DOUSE && in != SK_TAUNT && 
-		in != SK_LEAP && in != SK_RAGE)
+		in != SK_LEAP && in != SK_PACT)
 	{
 		cost = max(SP_COST_BASE, min(cost, cost*M_SK(cn, in)/100));
 	}
@@ -2671,7 +2671,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 			if (li<0)
 			{
 				if (temp==SK_LIGHT) do_char_log(cn, 1, "You stop emitting light.\n");
-				if (temp==SK_RAGE)  do_char_log(cn, 1, "Rage no longer active.\n");
+				if (temp==SK_PACT)  do_char_log(cn, 1, "Rage no longer active.\n");
 				if (temp==SK_CALM)  do_char_log(cn, 1, "Calm no longer active.\n");
 			}
 			else
@@ -4700,7 +4700,7 @@ void remove_all_spells(int cn, int flag) // Card turn-ins & Lycan Shifting
 			if (bu[in].temp == SK_CHARGE)   continue;
 			if (bu[in].temp == SK_WARCRY3)  continue;
 			if (bu[in].temp == SK_DIVINITY) continue;
-			if (bu[in].temp == SK_RAGE) 	continue;
+			if (bu[in].temp == SK_PACT) 	continue;
 			if (bu[in].temp == SK_CALM) 	continue;
 			if (bu[in].temp == 635) continue; // Infrared 1
 			if (bu[in].temp == 637) continue; // Infrared 2
@@ -6843,7 +6843,7 @@ int spell_calm(int cn, int co, int power)
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_CALM
 }
-int spell_rage(int cn, int co, int power)
+int spell_pact(int cn, int co, int power)
 {
 	int in, n, tmp = 0, p = min(20, getrank(cn));
 	int hpbonus = (ch[co].hp[5]*1000   - ch[co].a_hp)  /1000;
@@ -6851,7 +6851,7 @@ int spell_rage(int cn, int co, int power)
 	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
 	
 	// Need custom sprite?
-	if (!(in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, SP_DUR_RAGE, 1))) 
+	if (!(in = make_new_buff(cn, SK_PACT, BUF_SPR_PACT, power, SP_DUR_RAGE, 1))) 
 		return 0;
 	
 	/*	// Tarot - Hermit R
@@ -6873,20 +6873,20 @@ int spell_rage(int cn, int co, int power)
 	
 	bu[in].flags = BF_PERMASPELL;
 	
-	return cast_a_spell(cn, co, in, 0, 1); // SK_RAGE
+	return cast_a_spell(cn, co, in, 0, 1); // SK_PACT
 }
-void skill_rage(int cn)
+void skill_pact(int cn)
 {
 	int in, power;
 	
-	power = M_SK(cn, SK_RAGE);
+	power = M_SK(cn, SK_PACT);
 	power = skill_multiplier(power, cn);
 	
 	if (is_exhausted(cn)) 							{ return; }
-	if (!IS_SHIFTED(cn) && has_buff(cn, SK_RAGE))
+	if (!IS_SHIFTED(cn) && has_buff(cn, SK_PACT))
 	{
 		do_char_log(cn, 1, "Rage no longer active.\n");
-		remove_buff(cn, SK_RAGE);
+		remove_buff(cn, SK_PACT);
 		if ((in = has_buff(cn, SK_CALM)) && (bu[in].active>(bu[in].duration-TICKS*5)))
 		{
 			do_char_log(cn, 1, "Calm no longer active.\n");
@@ -6899,22 +6899,22 @@ void skill_rage(int cn)
 	{
 		do_char_log(cn, 1, "Calm no longer active.\n");
 		remove_buff(cn, SK_CALM);
-		if ((in = has_buff(cn, SK_RAGE)) && (bu[in].active>(bu[in].duration-TICKS*5)))
+		if ((in = has_buff(cn, SK_PACT)) && (bu[in].active>(bu[in].duration-TICKS*5)))
 		{
 			do_char_log(cn, 1, "Rage no longer active.\n");
-			remove_buff(cn, SK_RAGE);
+			remove_buff(cn, SK_PACT);
 		}
 		do_update_char(cn);
 		return;
 	}
-	if (spellcost(cn, SP_COST_RAGE, SK_RAGE, 0))	{ return; }
+	if (spellcost(cn, SP_COST_PACT, SK_PACT, 0))	{ return; }
 	
 	if (IS_SHIFTED(cn))
 		spell_calm(cn, cn, power);
 	else
-		spell_rage(cn, cn, power);
+		spell_pact(cn, cn, power);
 
-	add_exhaust(cn, SK_EXH_RAGE);
+	add_exhaust(cn, SK_EXH_PACT);
 }
 
 int spell_pomesol(int cn, int co, int power, int flag)
@@ -7082,7 +7082,7 @@ void skill_driver(int cn, int nr)
 		case SK_BLIND:		skill_blind(cn);	break;
 		case SK_CLEAVE:		skill_cleave(cn);	break;
 		case SK_LEAP:		skill_leap(cn,0);	break;
-		case SK_RAGE:		skill_rage(cn);		break;
+		case SK_PACT:		skill_pact(cn);		break;
 		case SK_REPAIR:		skill_repair(cn);	break;
 		case SK_SHIFT:		skill_shift(cn,0);	break;
 		case SK_TAUNT:		skill_taunt(cn);	break;

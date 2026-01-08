@@ -1357,7 +1357,7 @@
 #define BUF_SPR_WARCRY2		91
 #define BUF_SPR_WARCRY3		822
 //
-#define BUF_SPR_RAGE		700
+#define BUF_SPR_PACT		700
 #define BUF_SPR_CALM		1011
 #define BUF_SPR_ARIA		701
 #define BUF_SPR_ARIA2		702

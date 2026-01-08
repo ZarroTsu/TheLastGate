@@ -3826,7 +3826,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if ((B_SK(cn, SK_GCMASTERY) && IS_SUMMONER(cn)))		quest1[16] = 1;
 	if ((B_SK(cn, SK_PULSE) 	&& IS_ARCHHARAKIM(cn)))		quest1[16] = 1;
 	if ((B_SK(cn, SK_FINESSE) 	&& IS_BRAVER(cn)))			quest1[16] = 1;
-	if ((B_SK(cn, SK_RAGE) 		&& IS_LYCANTH(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_PACT) 		&& IS_LYCANTH(cn)))			quest1[16] = 1;
 	//
 	if (IS_SEYAN_DU(cn))
 	{
@@ -3834,7 +3834,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 		if (B_SK(cn, SK_WARCRY))    n++;	if (B_SK(cn, SK_LEAP))     n++;
 		if (B_SK(cn, SK_GCMASTERY)) n++;	if (B_SK(cn, SK_LETHARGY)) n++;
 		if (B_SK(cn, SK_PULSE))     n++;	if (B_SK(cn, SK_ZEPHYR))   n++;
-		if (B_SK(cn, SK_FINESSE))   n++;	if (B_SK(cn, SK_RAGE))     n++;		
+		if (B_SK(cn, SK_FINESSE))   n++;	if (B_SK(cn, SK_PACT))     n++;		
 		if (n>=2)  		quest1[16] = 1;
 	}
 	//
@@ -3982,7 +3982,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Terri",    "Bulwark Aven", "*Zephyr",   73000);
 	ars = (ast && (IS_BRAVER(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_FINESSE))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Sierra",   "Bulwark Aven", "*Finesse",  73000);
-	ars = (ast && (IS_LYCANTH(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_RAGE))));
+	ars = (ast && (IS_LYCANTH(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_PACT))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Mystery",  "Bulwark Aven", "*Rage",     73000);
 	m = display_quest(cn, flag, page, m, ast, quest1[27], 14, "Iggy",     "Bulwark Aven", "*Spellkn",  74000);
 	m = display_quest(cn, flag, page, m,!nei, quest3[16], 14, "???",      "Neiseer",      "???",       75000); // #149 Neiseer Park / Dimling Den
@@ -4223,7 +4223,7 @@ int do_showbuffs(int cn, int co)
 						else
 							do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/3);
 						break;
-					case SK_RAGE:
+					case SK_PACT:
 						do_char_log(cn, 6, " : %+d Top Damage\n", bu[in].top_damage);
 						do_char_log(cn, 6, " : +%d.%02d%% DoT Dealt\n", 100*(2000+bu[in].data[4])/2000, abs(10000*(2000+bu[in].data[4])/2000)%100); break;
 					case SK_CALM:
@@ -13554,8 +13554,8 @@ void do_update_permaspells(int cn)
 					bu[in].armor          = armor;
 					bu[in].cool_bonus     = min(127, power/4 + 1);
 					break;
-				case SK_RAGE:
-					power = M_SK(cn, SK_RAGE);
+				case SK_PACT:
+					power = M_SK(cn, SK_PACT);
 					power = skill_multiplier(power, cn);
 					bu[in].power = power; power = power + (power * tmp / 5000);
 					
@@ -13568,7 +13568,7 @@ void do_update_permaspells(int cn)
 						bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
 					break;
 				case SK_CALM:
-					power = M_SK(cn, SK_RAGE);
+					power = M_SK(cn, SK_PACT);
 					power = skill_multiplier(power, cn);
 					bu[in].power   = power; power = power + (power * tmp / 4000);
 					
@@ -14066,7 +14066,7 @@ void do_regenerate(int cn)
 				}
 				
 				/*
-				if (bu[in].temp==SK_RAGE || bu[in].temp==SK_CALM)
+				if (bu[in].temp==SK_PACT || bu[in].temp==SK_CALM)
 				{
 					p = min(20, getrank(cn));
 					//if (bu[in].active>(bu[in].duration-TICKS*5)) bu[in].active--;
@@ -14158,7 +14158,7 @@ void do_regenerate(int cn)
 				}
 				
 				/*
-				if (bu[in].temp==SK_RAGE || bu[in].temp==SK_CALM)
+				if (bu[in].temp==SK_PACT || bu[in].temp==SK_CALM)
 				{
 					tmp   = 0;
 					power = bu[in].power;
@@ -14170,7 +14170,7 @@ void do_regenerate(int cn)
 					
 					power = power + (power * tmp / 5000);
 					
-					if (bu[in].temp==SK_RAGE)
+					if (bu[in].temp==SK_PACT)
 					{
 						bu[in].top_damage = min(127, power/ 4 + 5);
 						bu[in].data[4]    = power/2;
@@ -14332,7 +14332,7 @@ void do_regenerate(int cn)
 					
 					degendam = spell_metabolism(degendam, get_target_metabolism(cn));
 					
-					if (co && (in2 = has_buff(co, SK_RAGE))) degendam = degendam * (2000 + bu[in2].data[4]) / 2000;
+					if (co && (in2 = has_buff(co, SK_PACT))) degendam = degendam * (2000 + bu[in2].data[4]) / 2000;
 					
 					// Easy new method!
 					if (co) degendam = degendam * ch[co].dmg_bonus / 10000;

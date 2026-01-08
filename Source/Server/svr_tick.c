@@ -1873,7 +1873,7 @@ int get_meta_stat_value(int cn, int n)
 			hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
 			enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
 			mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
-			power = skill_multiplier(M_SK(cn, SK_RAGE), cn);
+			power = skill_multiplier(M_SK(cn, SK_PACT), cn);
 			if (T_LYCA_SK(cn, 7))         in  = (hpbonus + enbonus + mpbonus)/2;
 			if (m=st_skillcount(cn, 103)) in += (hpbonus + enbonus + mpbonus)*m/5;
 			power = power + (power * in / 5000);
@@ -2212,7 +2212,7 @@ int get_meta_stat_value(int cn, int n)
 			value = value * ((do_get_iflag(cn, SF_STRENGTH)?6:5)/5)*(ch[cn].dmg_bonus/10000);
 			break;
 		case 25: case 35: case 41: case 90:
-			if (in = has_buff(cn, SK_RAGE)) value = value * (2000 + bu[in].data[4]) / 2000;
+			if (in = has_buff(cn, SK_PACT)) value = value * (2000 + bu[in].data[4]) / 2000;
 			value = value * ((do_get_iflag(cn, SF_STRENGTH)?6:5)/5)*(ch[cn].dmg_bonus/10000) / 20;
 			break;
 		default: break;

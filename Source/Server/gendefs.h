@@ -271,7 +271,7 @@
 #define SP_TAUNT	(1u<<14)
 #define SP_ZEPHYR	(1u<<15)
 #define SP_MSHIELD	(1u<<16)
-#define SP_RAGE		(1u<<17)
+#define SP_PACT		(1u<<17)
 #define SP_LETHARGY	(1u<<18)
 #define SP_WEAKEN2	(1u<<19)
 #define SP_CURSE2	(1u<<20)
@@ -310,7 +310,7 @@
 #define SP_COST_BLIND		20
 #define SP_COST_TAUNT		15
 #define SP_COST_WARCRY		25
-#define SP_COST_RAGE		20
+#define SP_COST_PACT		20
 
 #define FIVE_PERC_FAIL		18
 #define TEN_PERC_FAIL		17
@@ -400,7 +400,7 @@
 #define SK_EXH_HASTE		(TICKS / 2)
 #define SK_EXH_RECALL		(TICKS / 2)
 #define SK_EXH_ZEPHYR		(TICKS / 2)
-#define SK_EXH_RAGE			(TICKS / 2)
+#define SK_EXH_PACT			(TICKS / 2)
 #define SK_EXH_PULSE		(TICKS / 2)
 #define SK_EXH_IDENT		(TICKS / 2)
 #define SK_EXH_LETHARGY		(TICKS * 2)

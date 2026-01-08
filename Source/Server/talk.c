@@ -309,7 +309,7 @@ struct know
 #define AN_SK_HASTE		"Haste is an advanced spell. It allows the caster to dramatically speed up their actions."
 #define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
 #define AN_SK_LEAP		"Leap is an advanced skill learned by Skalds. It leaps from enemy to enemy, damaging them in the process."
-#define AN_SK_RAGE		"Rage is an advanced skill learned by Lycanthrope. It allows them to deal more damage, for a cost."
+#define AN_SK_PACT		"Rage is an advanced skill learned by Lycanthrope. It allows them to deal more damage, for a cost."
 #define AN_SK_CALM		"Calm is an advanced skill learned by Lycanthrope. It allows them to take less damage, for a cost."
 //}
 //{ "What is ...?" for each race
@@ -1500,7 +1500,7 @@ struct know know[] = {
 	{{"?what", "!haste",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HASTE, 0},
 	{{"?what", "!taunt",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_TAUNT, 0},
 	{{"?what", "!leap",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_LEAP, 0},
-	{{"?what", "!rage",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_RAGE, 0},
+	{{"?what", "!rage",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_PACT, 0},
 	{{"?what", "!calm",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CALM, 0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
 	{{"?what", "!templar",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_TEMP, 0},
@@ -2083,7 +2083,7 @@ void answer_unlearn(int cn, int co)
 	if (IS_SEYAN_DU(co) && 
 		(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP) || B_SK(co, SK_GCMASTERY) ||
 		 B_SK(co, SK_LETHARGY) || B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || 
-		 B_SK(co, SK_FINESSE) || B_SK(co, SK_RAGE)))
+		 B_SK(co, SK_FINESSE) || B_SK(co, SK_PACT)))
 	{
 		n = 0;
 		if (B_SK(co, SK_WARCRY))   { B_SK(co, SK_WARCRY)   = 0; strcpy(unl[n], skilltab[SK_WARCRY].name);   n++; }
@@ -2093,7 +2093,7 @@ void answer_unlearn(int cn, int co)
 		if (B_SK(co, SK_PULSE))    { B_SK(co, SK_PULSE)    = 0; strcpy(unl[n], skilltab[SK_PULSE].name);    n++; }
 		if (B_SK(co, SK_ZEPHYR))   { B_SK(co, SK_ZEPHYR)   = 0; strcpy(unl[n], skilltab[SK_ZEPHYR].name);   n++; }
 		if (B_SK(co, SK_FINESSE))  { B_SK(co, SK_FINESSE)  = 0; strcpy(unl[n], skilltab[SK_FINESSE].name);  n++; }
-		if (B_SK(co, SK_RAGE))     { B_SK(co, SK_RAGE)     = 0; strcpy(unl[n], skilltab[SK_RAGE].name);     n++; }
+		if (B_SK(co, SK_PACT))     { B_SK(co, SK_PACT)     = 0; strcpy(unl[n], skilltab[SK_PACT].name);     n++; }
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
 		if (n==2)

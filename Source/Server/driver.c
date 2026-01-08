@@ -881,7 +881,7 @@ int npc_give(int cn, int co, int in, int money)
 		if (( nr == SK_WARCRY    && !IS_SEYA_OR_ARTM(co) ) || ( nr == SK_PULSE     && !IS_SEYA_OR_ARHR(co) )
 		 || ( nr == SK_LEAP      && !IS_SEYA_OR_SKAL(co) ) || ( nr == SK_LETHARGY  && !IS_SEYA_OR_SORC(co) )
 		 || ( nr == SK_GCMASTERY && !IS_SEYA_OR_SUMM(co) ) || ( nr == SK_ZEPHYR    && !IS_SEYA_OR_WARR(co) )
-		 || ( nr == SK_FINESSE   && !IS_SEYA_OR_BRAV(co) ) || ( nr == SK_RAGE      && !IS_SEYA_OR_LYCA(co) ))
+		 || ( nr == SK_FINESSE   && !IS_SEYA_OR_BRAV(co) ) || ( nr == SK_PACT      && !IS_SEYA_OR_LYCA(co) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only two!
@@ -895,7 +895,7 @@ int npc_give(int cn, int co, int in, int money)
 			if (B_SK(co, SK_PULSE))    canlearn--;
 			if (B_SK(co, SK_ZEPHYR))   canlearn--;
 			if (B_SK(co, SK_FINESSE))  canlearn--;
-			if (B_SK(co, SK_RAGE))     canlearn--;
+			if (B_SK(co, SK_PACT))     canlearn--;
 			
 			if (canlearn >= 1) canlearn = 1;
 			else               canlearn = 0;
@@ -1593,7 +1593,7 @@ int npc_give(int cn, int co, int in, int money)
 			{
 				int div = 4;
 				nr2 = nr;
-				if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_RAGE)
+				if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_PACT)
 					do_sayx(cn, "Now I'll teach you Calm.");
 				else
 					do_sayx(cn, "Now I'll teach you %s.", skilltab[nr].name);
@@ -1607,7 +1607,7 @@ int npc_give(int cn, int co, int in, int money)
 				}
 				else if (B_SK(co, nr))
 				{
-					if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_RAGE)
+					if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_PACT)
 						do_sayx(cn, "But you already know Calm, %s!", ch[co].name);
 					else
 						do_sayx(cn, "But you already know %s, %s!", skilltab[nr].name, ch[co].name);
@@ -1621,7 +1621,7 @@ int npc_give(int cn, int co, int in, int money)
 				else
 				{
 					B_SK(co, nr) = 1;
-					if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_RAGE)
+					if (IS_LYCANTH(co) && IS_SHIFTED(co) && nr==SK_PACT)
 						do_char_log(co, 0, "You learned Calm!\n");
 					else
 						do_char_log(co, 0, "You learned %s!\n", skilltab[nr].name);
@@ -1655,7 +1655,7 @@ int npc_give(int cn, int co, int in, int money)
 							if (B_SK(n, SK_PULSE))     canlearn--;
 							if (B_SK(n, SK_ZEPHYR))    canlearn--;
 							if (B_SK(n, SK_FINESSE))   canlearn--;
-							if (B_SK(n, SK_RAGE))      canlearn--;
+							if (B_SK(n, SK_PACT))      canlearn--;
 							
 							if (canlearn >= 1) canlearn = 1;
 							else               canlearn = 0;
@@ -1664,7 +1664,7 @@ int npc_give(int cn, int co, int in, int money)
 						if (!B_SK(n, nr2) && (canlearn > 0) && ch[n].skill[nr2][2])
 						{
 							B_SK(n, nr2) = 1;
-							if (IS_LYCANTH(n) && IS_SHIFTED(n) && nr2==SK_RAGE)
+							if (IS_LYCANTH(n) && IS_SHIFTED(n) && nr2==SK_PACT)
 								do_char_log(n, 0, "You learned Calm!\n");
 							else
 								do_char_log(n, 0, "You learned %s!\n", skilltab[nr2].name);
@@ -3055,7 +3055,7 @@ int npc_see(int cn, int co)
 				if (B_SK(co, SK_PULSE))    knowarch++;
 				if (B_SK(co, SK_ZEPHYR))   knowarch++;
 				if (B_SK(co, SK_FINESSE))  knowarch++;
-				if (B_SK(co, SK_RAGE))     knowarch++;
+				if (B_SK(co, SK_PACT))     knowarch++;
 				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
 					if (IS_SEYA_OR_ARTM(co))
@@ -3347,7 +3347,7 @@ int get_spellcost(int cn, int spell)
 		case SK_CLEAVE:		return 20;
 		case SK_SHIELD:		return 20;
 		case SK_LEAP:		return 20;
-		case SK_RAGE:		return SP_COST_RAGE;
+		case SK_PACT:		return SP_COST_PACT;
 		case SK_TAUNT:	if (IS_PLAYER_GC(cn) && IS_SANEPLAYER(CN_OWNER(cn)) && do_get_iflag(CN_OWNER(cn), SF_GHOSTCRY))
 							return SP_COST_WARCRY;
 						else
@@ -3384,7 +3384,7 @@ int spellflag(int spell)
 	{
 		case SK_BLIND:		return SP_BLIND;
 		case SK_DOUSE:		return SP_DOUSE;
-		case SK_RAGE:		return SP_RAGE;
+		case SK_PACT:		return SP_PACT;
 		case SK_TAUNT:		return SP_TAUNT;
 		case SK_WARCRY:		return SP_WARCRY;
 		case SK_WARCRY3:	return SP_WARCRY3;
@@ -3423,7 +3423,7 @@ int npc_try_spell(int cn, int co, int spell)
 	int offn, defn, tpow, tdef, timm;
 
 	if (spell!=SK_CLEAVE && spell!=SK_SHIELD && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && 
-		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_RAGE && spell!=SK_CALM)
+		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_PACT && spell!=SK_CALM)
 	{
 		usemana = 1;
 		if ((ch[cn].flags & CF_NOMAGIC) || (ch[co].flags & CF_NOMAGIC))
@@ -3634,7 +3634,7 @@ int npc_can_spell(int cn, int co, int spell)
 {
 	if (!do_get_iflag(cn, SF_WORLD_R) && 
        (spell==SK_CLEAVE || spell==SK_SHIELD || spell==SK_WEAKEN || spell==SK_WARCRY || spell==SK_BLIND || 
-		spell==SK_TAUNT || spell==SK_LEAP || spell==SK_RAGE || spell==SK_CALM))
+		spell==SK_TAUNT || spell==SK_LEAP || spell==SK_PACT || spell==SK_CALM))
 	{
 		if ((ch[cn].a_end-500) / 1000 < get_spellcost(cn, spell)) return 0;
 	}

@@ -334,7 +334,7 @@ extern unsigned int mapmarker;
 //////////////////////////
 #define SK_CURSE		20 // Active Spell
 #define SK_BLESS		21 // Active Spell
-#define SK_RAGE			22 // Active Melee
+#define SK_PACT			22 // Active Melee
 #define SK_RESIST		23
 #define SK_BLAST		24 // Active Spell
 #define SK_DISPEL		25 // Active Spell
