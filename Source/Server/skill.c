@@ -802,7 +802,7 @@ struct metaStat metaStats[102] = {
 	{ 11, 0, 4, "M.Shield Effect",      "AV",      "Effective increase to Armor Value granted by your Magic Shield spell. Decreases as you take damage." },
 	{ 11, 1, 4, "M.Shield Duration",    "Seconds", "Estimated duration of your Magic Shell, not including reductions from taking damage." },
 	{ 47, 0, 6, "Haste Effect",         "Speed",   "Estimated increase to Speed granted by your Haste spell." },
-	{ 22, 0, 5, "Calm TD Taken",        "Top Dmg", "Effective reduction to incoming top damage granted while under the effect of your Calm skill." },
+	{ 22, 0, 5, "Calm Less TD Taken",   "Top Dmg", "Effective reduction to incoming top damage granted while under the effect of your Calm skill." },
 	{ 22, 1, 5, "Calm DoT Taken",       "%",       "Effective multiplier to incoming damage over time granted while under the effect of your Calm skill." },
 	{ 26, 0, 1, "Heal Effect",          "",        "Effective flat healing expected when casting your heal spell." },
 	{ 37, 0, 5, "Blind Effect",         "",        "Effective reduction of target Hit and Parry Scores when using your Blind skill, before enemy defenses." },

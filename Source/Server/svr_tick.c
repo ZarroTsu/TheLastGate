@@ -2117,8 +2117,8 @@ int get_meta_stat_value(int cn, int n)
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
 			value = min(300,10+(power)/6)+min(127,5+(power+6)/12);
 			break;
-		case 71: // Calm TD Taken
-			value = -(min(127, power/4 + 5));
+		case 71: // Calm TD Taken											// Flipped to Positive
+			value = min(127, power/4 + 5);
 			break;
 		case 72: // Calm DoT Taken					Decimal, 0.00 %
 			value = 10000 * (2000 - power) / 2000;
@@ -2132,54 +2132,54 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_STAR))        value = (power * 1875/10) * 20;
 			else                                  value = spell_multiplier(power * 4/5, cn);
 			break;
-		case 74: // Blind Effect
+		case 74: // Blind Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
 			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
 			if (T_WARR_SK(cn, 7))                 power = power + (power * M_AT(cn, AT_AGL)  /2000);
 			if (m=st_skillcount(cn, 43))          power = power + (power * M_AT(cn, AT_AGL)*m/5000);
-			if (IS_ANY_MERC(cn)) value = max(-127, -(power/6 + 2));
-			else                 value = max(-127, -(power/8 + 1));
+			if (IS_ANY_MERC(cn)) value = min(127, (power/6 + 2));
+			else                 value = min(127, (power/8 + 1));
 			break;
 		case 75: case 97: // Blind/Douse Cooldown					Decimal, 0.00 Seconds
 			value = 3 * cdlen;
 			break;
-		case 76: // Warcry Effect
+		case 76: // Warcry Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 			if (T_ARTM_SK(cn, 7))        power = power + (power * M_AT(cn, AT_STR)  /2000);
 			if (m=st_skillcount(cn, 19)) power = power + (power  *M_AT(cn, AT_STR)*m/5000);
-			if (IS_ARCHTEMPLAR(cn)) value = -(4+(power*5/8) / 5);
-			else                    value = -(3+(power  /2) / 5);
+			if (IS_ARCHTEMPLAR(cn)) value = (4+(power*5/8) / 5);
+			else                    value = (3+(power  /2) / 5);
 			break;
 		case 77: case 99: // Warcry/Rally Cooldn	Decimal, 0.00 Seconds
 			value = 3 * cdlen;
 			break;
-		case 78: case 100: // Weaken/Crush Effect
+		case 78: case 100: // Weaken/Crush Effect							// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*     6/ 5;
 			if (m=st_skillcount(cn, 34))          power = power*(20+m)/20;
-			value = max(-127, -(power / 4 + 4));
+			value = min(127, (power / 4 + 4));
 			break;
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
 			value = 3 * cdlen;
 			break;
-		case 80: // Curse Effect
+		case 80: // Curse Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
 			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
-			if (do_get_iflag(cn, SF_TOWER))       value = -(5 + CURSE2FORM(power, 4));
-			else                                  value = -(3 + (power - 4) / 5);
+			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
+			else                                  value = (3 + (power - 4) / 5);
 			break;
 		case 81: // Curse Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
 			break;
-		case 82: // Slow Effect
+		case 82: // Slow Effect												// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
 			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
 			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
-			if (do_get_iflag(cn, SF_EMPEROR))     value = -(min(300, 30 + SLOW2FORM(power)));
-			else                                  value = -(min(300, 30 + SLOWFORM(power)));
+			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
+			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;
 		case 83: // Slow Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
@@ -2188,13 +2188,13 @@ int get_meta_stat_value(int cn, int n)
 		case 89: // Skill Modifier					Decimal, 0.00 x
 			value = skill_multiplier(100, cn);
 			break;
-		case 96: // Douse Effect					Decimal, 0.00 %
+		case 96: // Douse Effect					Decimal, 0.00 %			// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
 			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
 			if (T_WARR_SK(cn, 7))                 power = power + (power * M_AT(cn, AT_AGL)  /2000);
 			if (m=st_skillcount(cn, 43))          power = power + (power * M_AT(cn, AT_AGL)*m/5000);
-			if (IS_ANY_MERC(cn)) value = max(-127, -(power/6 + 2));
-			else                 value = max(-127, -(power/8 + 1));
+			if (IS_ANY_MERC(cn)) value = min(127, (power/6 + 2));
+			else                 value = min(127, (power/8 + 1));
 			break;
 		case 98: // Rally Effect
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
