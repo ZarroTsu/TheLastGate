@@ -2124,9 +2124,9 @@ int add_spell(int cn, int in)
 	// Acedia
 	if (IS_SANECHAR(bu[in].data[0]))
 	{
-		if (it[ch[bu[in].data[0]].worn[WN_RHAND]].temp==IT_TW_ACEDIA || it[ch[bu[in].data[0]].worn[WN_RHAND]].orig_temp==IT_TW_ACEDIA) // less
+		if (IS_IT_TEMP(ch[bu[in].data[0]].worn[WN_RHAND], IT_TW_ACEDIA)) // less
 			bu[in].duration = bu[in].active = bu[in].duration * 3/4;
-		if (it[ch[bu[in].data[0]].worn[WN_LHAND]].temp==IT_TW_ACEDIA || it[ch[bu[in].data[0]].worn[WN_LHAND]].orig_temp==IT_TW_ACEDIA) // more
+		if (IS_IT_TEMP(ch[bu[in].data[0]].worn[WN_LHAND], IT_TW_ACEDIA)) // more
 			bu[in].duration = bu[in].active = bu[in].duration * 6/4;
 	}
 	
@@ -2348,8 +2348,8 @@ int add_exhaust(int cn, int len)
 	// len = (len * baselen + (len - ch[cn].cool_bonus) * baselen) / 100;
 	
 	// Acedia
-	if (it[ch[cn].worn[WN_RHAND]].temp==IT_TW_ACEDIA || it[ch[cn].worn[WN_RHAND]].orig_temp==IT_TW_ACEDIA) len = len * 3/4; // less
-	if (it[ch[cn].worn[WN_LHAND]].temp==IT_TW_ACEDIA || it[ch[cn].worn[WN_LHAND]].orig_temp==IT_TW_ACEDIA) len = len * 6/4; // more
+	if (IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_TW_ACEDIA)) len = len * 3/4; // less
+	if (IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_TW_ACEDIA)) len = len * 6/4; // more
 	
 	if (ch[cn].spellfail==2)
 	{

@@ -560,8 +560,8 @@ void use_stack_items(int cn, int in, int in2)
 		return;
 	}
 	
-	// Special case for Soul catalysts, Greater Skill Scrolls, Corruptors
-	if (IS_MATCH_CAT(in, in2) || IS_MATCH_GSC(in, in2) || IS_MATCH_COR(in, in2))
+	// Special case for Soul catalysts, Attribute Scrolls, Greater Skill Scrolls, Corruptors
+	if (IS_MATCH_CAT(in, in2) || IS_MATCH_LSC(in, in2) || IS_MATCH_GSC(in, in2) || IS_MATCH_COR(in, in2))
 	{
 		if (IS_SOULCAT(in))   in3 = make_new_catalyst(cn, 1, 0);
 		if (IS_GSCROLL(in))   in3 = make_gskill(cn);

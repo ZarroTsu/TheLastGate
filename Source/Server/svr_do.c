@@ -77,7 +77,7 @@ void do_area_log(int cn, int co, int xs, int ys, int font, char *format, ...) //
 	vsprintf(buf, format, args);
 	va_end(args);
 
-	for (y = max(0, ys - 12); y<min(MAPY, ys + 13); y++) // was 12, 13
+	for (y = max(0, ys - 12); y<min(MAPY, ys + 13); y++)
 	{
 		m = y * MAPX;
 		for (x = max(0, xs - 12); x<min(MAPX, xs + 13); x++)
@@ -86,12 +86,9 @@ void do_area_log(int cn, int co, int xs, int ys, int font, char *format, ...) //
 			{
 				for (n=1; n<MAXCHARS; n++)
 				{
-					if (ch[n].used==USE_EMPTY)
-						continue;
-					if (!IS_SANEPLAYER(n) || !IS_ACTIVECHAR(n))
-						continue;
-					if (n==cc) 
-						continue;
+					if (ch[n].used==USE_EMPTY) continue;
+					if (!IS_SANEPLAYER(n) || !IS_ACTIVECHAR(n)) continue;
+					if (n==cc) continue;
 					nr = ch[n].player;
 					if (player[nr].spectating && player[nr].spectating == cc)
 					{
@@ -100,10 +97,8 @@ void do_area_log(int cn, int co, int xs, int ys, int font, char *format, ...) //
 				}
 				if (cc!=cn && cc!=co)
 				{
-					if ((!ch[cc].player && ch[cc].temp!=15) || ((ch[cc].flags & CF_SYS_OFF) && font==0))
-					{
-						continue;
-					}
+					if ((!ch[cc].player && ch[cc].temp!=15) || ((ch[cc].flags & CF_SYS_OFF) && font==0)) continue;
+					if (IS_PLAYER_COMP(cn) && cc != CN_OWNER(cn)) continue; // Other players don't need to hear player GCs, do they?
 					do_log(cc, font, buf);
 				}
 			}
@@ -7514,7 +7509,7 @@ void do_sayx(int cn, char *format, ...)
 	}
 	else
 	{
-		do_area_log(0, 0, ch[cn].x, ch[cn].y, 1, "%.30s: \"%.300s\"\n", ch[cn].name, buf);
+		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "%.30s: \"%.300s\"\n", ch[cn].name, buf);
 	}
 }
 

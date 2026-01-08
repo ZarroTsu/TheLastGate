@@ -274,7 +274,7 @@ struct know
 #define AN_SK_SWIM		"The Metabolism skill allows one to survive underwater without drowning, and reduces damage taken from vile poisons."
 #define AN_SK_MSHIELD	"Magic Shield is a spell learned by Harakims. It provides an added layer of defense that degrades over time."
 #define AN_SK_ECONOM	"Economize will help you haggle with shopkeepers, and reduces the mana cost of spells."
-#define AN_SK_REPAIR	"Repair, when used while holding an item, allows one to try to repair it."
+#define AN_SK_REPAIR	"Repair allows one to try to repair their items."
 #define AN_SK_LIGHT		"Light is the most simple spell. It allows one, or their target, to begin glowing."
 #define AN_SK_RECALL	"Recall is a spell that allows one to return to a place they call safe, be it a tavern or temple."
 #define AN_SK_SHIELD	"The Shield skill assists with parrying blows when equipped with a shield."
@@ -295,7 +295,7 @@ struct know
 #define AN_SK_SENSE		"The Sense Magic skill allows one to be perceptive of items or effects that are magical in nature."
 #define AN_SK_IMMUNITY	"Immunity is a skill learned by Templars. It reduces the effectiveness of negative ailments on them."
 #define AN_SK_SURROUND	"Surround Hit is a skill learned by Templars. It allows them to hit everything around them at once!"
-#define AN_SK_WARCRY	"Warcry is an advanced skill learned by powerful fighters. It frightens and stuns all nearby enemies."
+#define AN_SK_WARCRY	"Warcry is an advanced skill learned by powerful Templar. It frightens and stuns all nearby enemies."
 #define AN_SK_DUALW		"The Dual Wield skill provides additional chance to hit enemies when using an off-handed weapons."
 #define AN_SK_BLIND 	"Blind is a skill used by Mercenaries. It blinds and debilitates all nearby enemies."
 #define AN_SK_GEARMAST	"Gear Mastery is a skill used by Templars. It gives them up to double the weapon and armor value of their equipment."
@@ -303,12 +303,14 @@ struct know
 #define AN_SK_WEAKEN	"Weaken is a powerful skill used by Templars. It allows them to reduce their enemy's weapon and armor values."
 #define AN_SK_POISON	"Poison is a powerful spell learned by Mercenaries. It inflicts an ailment that eats away at their target's health."
 #define AN_SK_PULSE		"Pulse is an advanced skill learned by powerful Harakim. It grants a repeating burst of area damage."
-#define AN_SK_PROX		"Proximity is an advanced skill. It grants a variety of bonuses depending on the class that knows it"
-#define AN_SK_COMPM		"Companion Mastery is an advanced skill learned by Summoners. Their Ghost Companion becomes stronger and learns the Heal spell."
-#define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners. It lets them summon a copy of themself to fight for them."
-#define AN_SK_HASTE		"Haste is an advanced spell learned by Warriors and Sorcerers. It allows them to dramatically speed up their actions."
+#define AN_SK_PROX		"Proximity is an advanced skill. It grants an increase to the area-of-effect of various other skills."
+#define AN_SK_COMPM		"Companion Mastery is an advanced skill learned by Summoners. It makes their companions much stronger than usual."
+#define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners. It lets them summon a copy of themself or their target to fight for them."
+#define AN_SK_HASTE		"Haste is an advanced spell. It allows the caster to dramatically speed up their actions."
 #define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
-#define AN_SK_LEAP		"Leap is an advanced skill learned by Skalds. It leaps through enemies, damaging them in the process."
+#define AN_SK_LEAP		"Leap is an advanced skill learned by Skalds. It leaps from enemy to enemy, damaging them in the process."
+#define AN_SK_RAGE		"Rage is an advanced skill learned by Lycanthrope. It allows them to deal more damage, for a cost."
+#define AN_SK_CALM		"Calm is an advanced skill learned by Lycanthrope. It allows them to take less damage, for a cost."
 //}
 //{ "What is ...?" for each race
 #define AN_RA_TEMP		"Templars are powerful fighters. They are not very good with spells, but they have learned to adapt without them."
@@ -1498,6 +1500,8 @@ struct know know[] = {
 	{{"?what", "!haste",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_HASTE, 0},
 	{{"?what", "!taunt",                   "?", NULL}, 0, AR_GENERAL, 0, AN_SK_TAUNT, 0},
 	{{"?what", "!leap",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_LEAP, 0},
+	{{"?what", "!rage",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_RAGE, 0},
+	{{"?what", "!calm",                    "?", NULL}, 0, AR_GENERAL, 0, AN_SK_CALM, 0},
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		
 	{{"?what", "!templar",                 "?", NULL}, 0, AR_GENERAL, 0, AN_RA_TEMP, 0},
 	{{"?what", "!mercenary",               "?", NULL}, 0, AR_GENERAL, 0, AN_RA_MERC, 0},

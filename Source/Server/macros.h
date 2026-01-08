@@ -51,8 +51,11 @@
 #define CAN_ENCHANT(in)			(it[(in)].flags & IF_CAN_EN)
 #define HAS_ENCHANT(in, n)		(it[(in)].enchantment == (n))
 
-#define IS_SINBINDER(in)		(it[(in)].temp==IT_TW_SINBIND || it[(in)].orig_temp==IT_TW_SINBIND)
-#define NOT_SINBINDER(in)		(it[(in)].temp!=IT_TW_SINBIND && it[(in)].orig_temp!=IT_TW_SINBIND)
+#define IS_IT_TEMP(in, v)		(it[(in)].temp==v || it[(in)].orig_temp==v)
+#define IS_NOT_IT_TEMP(in, v)	(it[(in)].temp!=v && it[(in)].orig_temp!=v)
+
+#define IS_SINBINDER(in)		(IS_IT_TEMP(in, IT_TW_SINBIND))
+#define NOT_SINBINDER(in)		(IS_NOT_IT_TEMP(in, IT_TW_SINBIND))
 
 #define IS_MAGICITEM(in)		(it[(in)].flags & IF_MAGIC)
 #define IS_UNIQUE(in)			(it[(in)].flags & IF_UNIQUE)
@@ -61,6 +64,7 @@
 #define IS_SOULSTONE(in)		(it[(in)].driver== 68)
 #define IS_SOULFOCUS(in)		(it[(in)].driver== 92)
 #define IS_SOULCAT(in)			(it[(in)].driver== 93)
+#define IS_LSCROLL(in)			(it[(in)].driver== 10)
 #define IS_GSCROLL(in)			(it[(in)].driver==110)
 #define IS_CORRUPTOR(in)		(it[(in)].driver==133)
 #define IS_TAROT(in)			((it[(in)].temp>=IT_CH_FOOL && it[(in)].temp<=IT_CH_WORLD) || (it[(in)].temp>=IT_CH_FOOL_R && it[(in)].temp<=IT_CH_WORLD_R))
@@ -75,7 +79,8 @@
 #define WAS_MADEEASEUSE(in)		(it[(in)].flags & IF_EASEUSE)
 
 #define IS_MATCH_CAT(in, in2)	(IS_SOULCAT(in)   && it[(in)].data[4] != it[(in2)].data[4])
-#define IS_MATCH_GSC(in, in2)	(IS_GSCROLL(in)   && it[(in)].data[1] != it[(in2)].data[1] && it[(in)].data[0] == 5 && it[(in2)].data[0] == 5)
+#define IS_MATCH_LSC(in, in2)	(IS_LSCROLL(in)   && (it[(in)].data[0] != it[(in2)].data[0]))
+#define IS_MATCH_GSC(in, in2)	(IS_GSCROLL(in)   && ( (it[(in)].data[1] != it[(in2)].data[1] && it[(in)].data[0] == 5 && it[(in2)].data[0] == 5) || (it[(in)].data[0] < 5 && it[(in2)].data[0] < 5 && it[(in)].data[0] != it[(in2)].data[0]) ))
 #define IS_MATCH_COR(in, in2)	(IS_CORRUPTOR(in) && it[(in)].data[0] != it[(in2)].data[0] && it[(in)].data[0] != 0 && it[(in2)].data[0] != 0)
 
 int is_apotion(int in);
@@ -318,7 +323,7 @@ int is_ascroll(int in);
 #define IS_DISPELABLE1(tmp)		((tmp)==SK_BLIND || (tmp)==SK_WARCRY2 || (tmp)==SK_CURSE2 || (tmp)==SK_CURSE || (tmp)==SK_WARCRY || (tmp)==SK_WEAKEN2 || (tmp)==SK_WEAKEN || (tmp)==SK_SLOW2 || (tmp)==SK_SLOW || (tmp)==SK_DOUSE || (tmp)==SK_AGGRAVATE || (tmp)==SK_SCORCH || (tmp)==SK_DISPEL2)
 #define IS_DISPELABLE2(tmp)		((tmp)==SK_HASTE || (tmp)==SK_BLESS || (tmp)==SK_MSHIELD || (tmp)==SK_MSHELL || (tmp)==SK_PULSE || (tmp)==SK_ZEPHYR || (tmp)==SK_GUARD || (tmp)==SK_DISPEL || (tmp)==SK_REGEN || (tmp)==SK_PROTECT || (tmp)==SK_ENHANCE || (tmp)==SK_LIGHT)
 
-#define IS_WEARINGPHOENIX(cn)		(it[ch[cn].worn[WN_RHAND]].temp==IT_WP_RISINGPHO || it[ch[cn].worn[WN_RHAND]].orig_temp==IT_WP_RISINGPHO || (it[ch[cn].worn[WN_LHAND]].temp==IT_WP_RISINGPHO || it[ch[cn].worn[WN_LHAND]].orig_temp==IT_WP_RISINGPHO) || it[ch[cn].worn[WN_RHAND]].temp==IT_WB_RISINGPHO || it[ch[cn].worn[WN_RHAND]].orig_temp==IT_WB_RISINGPHO || (it[ch[cn].worn[WN_LHAND]].temp==IT_WB_RISINGPHO || it[ch[cn].worn[WN_LHAND]].orig_temp==IT_WB_RISINGPHO))
+#define IS_WEARINGPHOENIX(cn)	(IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_WP_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_WP_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_WB_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_WB_RISINGPHO))
 
 /* *** CASINO *** */
 

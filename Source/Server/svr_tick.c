@@ -1852,8 +1852,8 @@ int get_meta_stat_value(int cn, int n)
 		case 39: case 44: case 47: case 75: case 77: case 79: case 81: 
 		case 83: case 85: case 88: case 91: case 97: case 99: case 101:
 			cdlen = 100 * (do_get_iflag(cn, SF_BOOK_DAMO)?90:100) / max(25, ch[cn].cool_bonus);
-			if (it[ch[cn].worn[WN_RHAND]].temp==IT_TW_ACEDIA || it[ch[cn].worn[WN_RHAND]].orig_temp==IT_TW_ACEDIA) cdlen = cdlen * 3/4; // Acedia less
-			if (it[ch[cn].worn[WN_LHAND]].temp==IT_TW_ACEDIA || it[ch[cn].worn[WN_LHAND]].orig_temp==IT_TW_ACEDIA) cdlen = cdlen * 6/4; // Acedia more
+			if (IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_TW_ACEDIA)) cdlen = cdlen * 3/4; // Acedia less
+			if (IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_TW_ACEDIA)) cdlen = cdlen * 6/4; // Acedia more
 			break;
 		default: break;
 	}
