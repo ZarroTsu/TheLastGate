@@ -2231,21 +2231,21 @@ int get_meta_stat_value(int cn, int n)
 
 int ch_get_meta_alternative_value(int cn, int n)
 {
-	if (n ==  2 && do_get_iflag(cn, SF_STAR_R))   return  89; break; // Spell Modifier -> Skill Modifier
-	if (n == 35 && do_get_iflag(cn, SF_TOWER_R))  return  90; break; // Poison -> Venom
-	if (n == 36 && do_get_iflag(cn, SF_TOWER_R))  return  91; break; // Poison -> Venom
-	if (n == 37 && do_get_iflag(cn, SF_JUDGE_R))  return  92; break; // Pulse Hit Damage -> Pulse Hit Heal
-	if (n == 68 && do_get_iflag(cn, SF_EMPRESS))  return  93; break; // M.Shield -> M.Shell
-	if (n == 69 && do_get_iflag(cn, SF_EMPRESS))  return  94; break; // M.Shield -> M.Shell
-	if (n == 73 && do_get_iflag(cn, SF_STAR))     return  95; break; // Heal -> Regen
-	if (n == 74 && do_get_iflag(cn, SF_CHARIOT))  return  96; break; // Blind -> Douse
-	if (n == 75 && do_get_iflag(cn, SF_CHARIOT))  return  97; break; // Blind -> Douse
-	if (n == 76 && do_get_iflag(cn, SF_EMPERO_R)) return  98; break; // Warcry -> Rally
-	if (n == 77 && do_get_iflag(cn, SF_EMPERO_R)) return  99; break; // Warcry -> Rally
-	if (n == 78 && do_get_iflag(cn, SF_DEATH))    return 100; break; // Weaken -> Crush
-	if (n == 79 && do_get_iflag(cn, SF_DEATH))    return 101; break; // Weaken -> Crush
-	if (n == 31 && do_get_iflag(cn, SF_HERMIT_R)) return 102; break; // Pact HP -> Mana
-	if (n == 72 && do_get_iflag(cn, SF_HERMIT_R)) return 102; break; // Pact HP -> Mana
+	if (n ==  2 && do_get_iflag(cn, SF_STAR_R))   return  89; // Spell Modifier -> Skill Modifier
+	if (n == 35 && do_get_iflag(cn, SF_TOWER_R))  return  90; // Poison -> Venom
+	if (n == 36 && do_get_iflag(cn, SF_TOWER_R))  return  91; // Poison -> Venom
+	if (n == 37 && do_get_iflag(cn, SF_JUDGE_R))  return  92; // Pulse Hit Damage -> Pulse Hit Heal
+	if (n == 68 && do_get_iflag(cn, SF_EMPRESS))  return  93; // M.Shield -> M.Shell
+	if (n == 69 && do_get_iflag(cn, SF_EMPRESS))  return  94; // M.Shield -> M.Shell
+	if (n == 73 && do_get_iflag(cn, SF_STAR))     return  95; // Heal -> Regen
+	if (n == 74 && do_get_iflag(cn, SF_CHARIOT))  return  96; // Blind -> Douse
+	if (n == 75 && do_get_iflag(cn, SF_CHARIOT))  return  97; // Blind -> Douse
+	if (n == 76 && do_get_iflag(cn, SF_EMPERO_R)) return  98; // Warcry -> Rally
+	if (n == 77 && do_get_iflag(cn, SF_EMPERO_R)) return  99; // Warcry -> Rally
+	if (n == 78 && do_get_iflag(cn, SF_DEATH))    return 100; // Weaken -> Crush
+	if (n == 79 && do_get_iflag(cn, SF_DEATH))    return 101; // Weaken -> Crush
+	if (n == 31 && do_get_iflag(cn, SF_HERMIT_R)) return 102; // Pact HP -> Mana
+	if (n == 72 && do_get_iflag(cn, SF_HERMIT_R)) return 102; // Pact HP -> Mana
 	
 	return n;
 }

@@ -6226,7 +6226,7 @@ int use_sanguine_crystal(int cn, int in)
 
 int use_dw_chest(int cn, int in)
 {
-	int co, rank, x, y, n = 0, stk = 0; in2, base;
+	int co, rank, x, y, n = 0, stk = 0, in2, base;
 	
 	if (cn==0)
 	{
