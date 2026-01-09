@@ -2069,7 +2069,7 @@ int get_meta_stat_value(int cn, int n)
 			value = ch[cn].dmg_reduction;
 			break;
 		case 50: // Effective Hitpoints
-			value = ch[cn].hp[5] * 10000 / ch[cn].dmg_reduction;
+			value = HP_SOFTCAP(cn)*10 / ch[cn].dmg_reduction;
 			if (do_get_iflag(cn, SF_EN_TAKEASEN) || do_get_iflag(cn, SF_EN_TAKEASMA)) value = value * 100 / 80;
 			if (T_SKAL_SK(cn, 12) || T_ARHR_SK(cn, 12))                               value = value * 100 / 80;
 			if (do_get_iflag(cn, SF_TW_CLOAK))                                        value = value * 100 / 90;
