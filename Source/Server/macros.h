@@ -78,10 +78,10 @@
 #define WAS_CORRUPTED(in)		(it[(in)].flags & IF_CORRUPTED)
 #define WAS_MADEEASEUSE(in)		(it[(in)].flags & IF_EASEUSE)
 
-#define IS_MATCH_CAT(in, in2)	(IS_SOULCAT(in)   && it[(in)].data[4] != it[(in2)].data[4])
-#define IS_MATCH_LSC(in, in2)	(IS_LSCROLL(in)   && (it[(in)].data[0] != it[(in2)].data[0]))
-#define IS_MATCH_GSC(in, in2)	(IS_GSCROLL(in)   && ( (it[(in)].data[1] != it[(in2)].data[1] && it[(in)].data[0] == 5 && it[(in2)].data[0] == 5) || (it[(in)].data[0] < 5 && it[(in2)].data[0] < 5 && it[(in)].data[0] != it[(in2)].data[0]) ))
-#define IS_MATCH_COR(in, in2)	(IS_CORRUPTOR(in) && it[(in)].data[0] != it[(in2)].data[0] && it[(in)].data[0] != 0 && it[(in2)].data[0] != 0)
+#define IS_MATCH_CAT(in, in2)	(IS_SOULCAT(in)   && IS_SOULCAT(in2)   && it[(in)].data[4] != it[(in2)].data[4])
+#define IS_MATCH_LSC(in, in2)	(IS_LSCROLL(in)   && IS_LSCROLL(in2)   && (it[(in)].data[0] != it[(in2)].data[0]))
+#define IS_MATCH_GSC(in, in2)	(IS_GSCROLL(in)   && IS_GSCROLL(in2)   && ( (it[(in)].data[1] != it[(in2)].data[1] && it[(in)].data[0] == 5 && it[(in2)].data[0] == 5) || (it[(in)].data[0] < 5 && it[(in2)].data[0] < 5 && it[(in)].data[0] != it[(in2)].data[0]) ))
+#define IS_MATCH_COR(in, in2)	(IS_CORRUPTOR(in) && IS_CORRUPTOR(in2) && it[(in)].data[0] != it[(in2)].data[0] && it[(in)].data[0] != 0 && it[(in2)].data[0] != 0)
 
 int is_apotion(int in);
 int is_ascroll(int in);

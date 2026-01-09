@@ -564,8 +564,10 @@ void use_stack_items(int cn, int in, int in2)
 	if (IS_MATCH_CAT(in, in2) || IS_MATCH_LSC(in, in2) || IS_MATCH_GSC(in, in2) || IS_MATCH_COR(in, in2))
 	{
 		if (IS_SOULCAT(in))   in3 = make_new_catalyst(cn, 1, 0);
-		if (IS_GSCROLL(in))   in3 = make_gskill(cn);
+		if (IS_LSCROLL(in))   in3 = make_lskill(cn, RANDOM(5));
 		if (IS_CORRUPTOR(in)) in3 = make_corruptor(cn, 1);
+		if (IS_GSCROLL(in) && it[in].data[0]  < 5 && it[in2].data[0]  < 5) in3 = make_gskill(cn, 50+RANDOM(5));
+		if (IS_GSCROLL(in) && it[in].data[0] == 5 && it[in2].data[0] == 5) in3 = make_gskill(cn, RANDOM(MAXSKILL));
 		
 		if (in3)
 		{
@@ -9247,7 +9249,8 @@ void use_driver(int cn, int in, int carried)
 		
 		// Item stacking - held items are stackable and the same template
 		if (carried && (it[in].flags & IF_STACKABLE) && ch[cn].citem && in != ch[cn].citem && 
-			it[in].temp == it[ch[cn].citem].temp && (it[in].temp != 0 || it[in].driver == it[ch[cn].citem].driver))
+			(it[in].temp == it[ch[cn].citem].temp || IS_MATCH_LSC(in, ch[cn].citem) || IS_MATCH_GSC(in, ch[cn].citem)) &&
+			(it[in].temp != 0 || it[in].driver == it[ch[cn].citem].driver))
 		{
 			use_stack_items(cn, in, ch[cn].citem);
 			return;

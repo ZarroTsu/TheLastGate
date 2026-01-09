@@ -1337,8 +1337,7 @@ struct know know[] = {
 	// Key words ................................... , Dif,      Area, Tmp,         Answer, Spc		AR_LAB_GATE
 	{{"!remove", "?",                           NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_TAROT2},
 	{{"!remove", "?tarot", "?card", "?",        NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_TAROT2},
-	{{"!unlearn", "?",                          NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
-	{{"!unlearn", "?skill",                "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
+	{{"!unlearn",                               NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_UNLEARN},
 	{{"!claim", "!one",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_1},
 	{{"!claim", "!two",                    "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_2},
 	{{"!claim", "!three",                  "?", NULL}, 13, AR_LABYRINTH, 0,    NULL, SP_CLAIM_3},
@@ -2073,13 +2072,31 @@ void answer_tarot(int cn, int co, int m)
 	}
 }
 
-void answer_unlearn(int cn, int co)
+void answer_unlearn(int cn, int co, char *text)
 {
-	int v = 250000, n;
+	int v = 125000, n;
 	char unl[7][40];
+	char word[40];
 	
-	if (IS_SEYAN_DU(co)   && (B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP)    || B_SK(co, SK_GCMASTERY) || B_SK(co, SK_LETHARGY) || 
-		B_SK(co, SK_PULSE) || B_SK(co, SK_ZEPHYR) || B_SK(co, SK_FINESSE) || B_SK(co, SK_PACT)))
+	if (!IS_SEYAN_DU(co)) return;
+	
+	if (!(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP)   || B_SK(co, SK_GCMASTERY) || B_SK(co, SK_LETHARGY) || 
+		  B_SK(co, SK_PULSE)  || B_SK(co, SK_ZEPHYR) || B_SK(co, SK_FINESSE)   || B_SK(co, SK_PACT)     ))
+	{
+		do_sayx(cn, "But you do not know any arch skills, %s!", ch[co].name);
+		return;
+	}
+	
+	while (isalpha(*text)) text++;
+	while (isspace(*text)) text++;
+	for (n = 0; n<35 && *text; word[n++] = *text++) ;
+	word[n] = 0;
+	if (n<1)
+	{
+		do_sayx(cn, "Let me know the name of the skill you want to UNLEARN, %s. If you want to unlearn all of them, say UNLEARN ALL.", ch[co].name);
+		return;
+	}
+	if (!strcasecmp(word, "all")) // word matches
 	{
 		n = 0;
 		if (B_SK(co, SK_WARCRY))   { B_SK(co, SK_WARCRY)   = 0; strcpy(unl[n], skilltab[SK_WARCRY].name);   n++; }
@@ -2090,9 +2107,19 @@ void answer_unlearn(int cn, int co)
 		if (B_SK(co, SK_ZEPHYR))   { B_SK(co, SK_ZEPHYR)   = 0; strcpy(unl[n], skilltab[SK_ZEPHYR].name);   n++; }
 		if (B_SK(co, SK_FINESSE))  { B_SK(co, SK_FINESSE)  = 0; strcpy(unl[n], skilltab[SK_FINESSE].name);  n++; }
 		if (B_SK(co, SK_PACT))     { B_SK(co, SK_PACT)     = 0; strcpy(unl[n], skilltab[SK_PACT].name);     n++; }
+		
+		v *= n;
+		
 		ch[co].points_tot -= v;
 		ch[co].points -= v;
-		if (n==2)
+		
+		if (n<2)
+		{
+			do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, unl[0]);
+			chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", unl[0], ch[co].name, v);
+			do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl[0], v);
+		}
+		else if (n == 2)
 		{
 			do_sayx(cn, "Very well %s, I will remove %s and %s. Close your eyes, and...", ch[co].name, unl[0], unl[1]);
 			chlog(cn, "Gatekeeper: Removed %s and %s from %s, and lowered by %d.", unl[0], unl[1], ch[co].name, v);
@@ -2100,15 +2127,37 @@ void answer_unlearn(int cn, int co)
 		}
 		else
 		{
-			do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, unl[0]);
-			chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", unl[0], ch[co].name, v);
-			do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl[0], v);
+			do_sayx(cn, "Very well %s, I will remove all of your arch skills. Close your eyes, and...", ch[co].name);
+			chlog(cn, "Gatekeeper: Removed all arch skills %s, and lowered by %d.", ch[co].name, v);
+			do_char_log(co, 0, "You no longer know your arch skills. You lost %d experience points.\n", v);
 		}
+		
+		return;
 	}
-	else if (IS_SEYAN_DU(co))
+	else if (!strcasecmp(word, skilltab[SK_WARCRY].name))    n = SK_WARCRY;
+	else if (!strcasecmp(word, skilltab[SK_LEAP].name))      n = SK_LEAP;
+	else if (!strcasecmp(word, skilltab[SK_GCMASTERY].name)) n = SK_GCMASTERY;
+	else if (!strcasecmp(word, skilltab[SK_LETHARGY].name))  n = SK_LETHARGY;
+	else if (!strcasecmp(word, skilltab[SK_PULSE].name))     n = SK_PULSE;
+	else if (!strcasecmp(word, skilltab[SK_ZEPHYR].name))    n = SK_ZEPHYR;
+	else if (!strcasecmp(word, skilltab[SK_FINESSE].name))   n = SK_FINESSE;
+	else if (!strcasecmp(word, skilltab[SK_PACT].name))      n = SK_PACT;
+	else
 	{
-		do_sayx(cn, "But you do not know an arch skill, %s!", ch[co].name);
+		do_sayx(cn, "Ah, I'm not sure which skill you're referring to %s. Try again?", ch[co].name);
+		return;
 	}
+	
+	if (!B_SK(co, n)) { do_sayx(cn, "But you do not know %s, %s!", skilltab[n].name, ch[co].name); return; }
+	strcpy(unl[0], skilltab[n].name);
+	
+	B_SK(co, n) = 0;
+	ch[co].points_tot -= v;
+	ch[co].points -= v;
+	
+	do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, unl[0]);
+	chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", unl[0], ch[co].name, v);
+	do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl[0], v);
 }
 
 void answer_claim(int cn, int co, int nr)
@@ -3191,7 +3240,7 @@ void special_answer(int cn, int co, int spec, char *word, int nr)
 		case SP_TAROT:		answer_tarot(cn, co, WN_CHARM); break;
 		case SP_TAROT2:		answer_tarot(cn, co, WN_CHARM2); break;
 		case SP_TAROT3:		answer_tarot(cn, co, WN_RRING); break;
-		case SP_UNLEARN:	answer_unlearn(cn, co); break;
+		case SP_UNLEARN:	answer_unlearn(cn, co, word); break;
 		case SP_TRAVEL:     answer_travel(cn, co); break;
 		//
 		case SP_TOKENS:		answer_tokens(cn, co, 0); break;

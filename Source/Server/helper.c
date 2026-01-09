@@ -3180,22 +3180,61 @@ void create_new_ss_equipment(int cn, int in, int rank, int sk)
 	apply_new_ss(cn, in, in2, 0);
 }
 
-int make_gskill(int cn)
+int make_lskill(int cn, int v)
 {
-	int in, v;
+	int in;
 	
-	if (!(in = god_create_item(IT_OS_SK)))
+	if (v >= 0 && v <= 4) // Attribute Scroll
 	{
-		chlog(cn, "ERROR in make_gskill: god_create_item failure");
+		if (!(in = god_create_item(IT_RD_BRV+v)))
+		{
+			chlog(cn, "ERROR in make_gskill: god_create_item failure");
+			return 0;
+		}
+	}
+	else // Bad value
+	{
 		return 0;
 	}
 	
-	v = RANDOM(MAXSKILL);
+	if (!god_give_char(in, cn))
+	{
+		it[in].used = USE_EMPTY;
+		return 0;
+	}
 	
-	sprintf(it[in].name, "Greater Scroll of (%s)", skilltab[v].name);
-	sprintf(it[in].reference, "greater scroll of (%s)", skilltab[v].name);
+	return in;
+}
+
+int make_gskill(int cn, int v)
+{
+	int in;
 	
-	it[in].data[1] = v;
+	if (v < 50)
+	{
+		if (!(in = god_create_item(IT_OS_SK)))
+		{
+			chlog(cn, "ERROR in make_gskill: god_create_item failure");
+			return 0;
+		}
+		
+		sprintf(it[in].name, "Greater Scroll of (%s)", skilltab[v].name);
+		sprintf(it[in].reference, "greater scroll of (%s)", skilltab[v].name);
+		
+		it[in].data[1] = v;
+	}
+	else if (v >= 50 && v <= 54) // Attribute Scroll
+	{
+		if (!(in = god_create_item(IT_OS_BRV+(v-50))))
+		{
+			chlog(cn, "ERROR in make_gskill: god_create_item failure");
+			return 0;
+		}
+	}
+	else // Bad value
+	{
+		return 0;
+	}
 	
 	if (!god_give_char(in, cn))
 	{

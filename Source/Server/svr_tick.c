@@ -1969,8 +1969,8 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 27: // Leap Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_LEAP) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn) * 2;
-			if (do_get_iflag(cn, SF_JUSTIC_R)) value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/1000;
-			else                               value = power + power * (ch[cn].crit_multi-100) / 1000 * DAM_MULT_RLEAP/1000;
+			value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/1000;
+			if (do_get_iflag(cn, SF_JUSTIC_R)) value = (power + (power * ch[cn].crit_multi / 1000)) * DAM_MULT_LEAP/1000; // only crit roughly 1/10th of the time
 			break;
 		case 28: // Leap # of Repeats
 			value = max(0, min(10, (100-cdlen)/10)) + do_get_iflag(cn, SF_SIGN_SLAY)?1:0;
@@ -1982,7 +1982,7 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_HERMIT_R)) value = 10000+(power*2/6)*50;
 			else                               value = 10000+(power*2/3)*50;
 			break;
-		case 31: case 72: // Pact HP Reserve
+		case 31: case 72: case 102: // Pact HP/MP Reserve
 			power = skill_multiplier(M_SK(cn, SK_PACT), cn);
 			value = min(80, 15+power/5);
 			break;

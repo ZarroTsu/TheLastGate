@@ -1400,7 +1400,11 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 6):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			if (ch[cn].house_id)
+				do_char_log(cn, 1, "#tavern                exit the game (@house).\n");
 			do_char_log(cn, 1, "#tell <player> <text>  tells player text.\n");
+			if (ch[cn].house_id)
+				do_char_log(cn, 1, "#temple                go to temple (@house).\n");
 			do_char_log(cn, 1, "#topaz                 list topaz rings.\n");
 			do_char_log(cn, 1, "#trash                 delete item from cursor.\n");
 			do_char_log(cn, 1, "#twohander             list twohander stats.\n");
@@ -1439,8 +1443,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
 			do_char_log(cn, 1, "#tarot                 list tarot cards.\n");
-			if (ch[cn].house_id)
-				do_char_log(cn, 1, "#tavern                exit the game (@house).\n");
 		}
 		else if (strcmp(topic, "4")==0)
 		{
@@ -3259,6 +3261,7 @@ void do_gohome(int cn)
 		//                 "!        .         .   |     .         .        !"
 		do_char_log(cn, 1, "#spawn                 set recall point.\n");
 		do_char_log(cn, 1, "#tavern                exit the game.\n");
+		do_char_log(cn, 1, "#temple                return to your temple.\n");
 		do_char_log(cn, 1, "#change <thing> <val>  adjust house appearance.\n");
 		return;
 	}
@@ -7217,9 +7220,9 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
-		if (prefix(cmd, "temple") && f_giu)
+		if (prefix(cmd, "temple") && (f_giu || IS_IN_PLH(cn)))
 		{
-			god_goto(cn, cn, "800", "800");
+			god_temple(cn);
 			return;
 		}
 		;

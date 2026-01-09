@@ -2488,6 +2488,33 @@ int god_army(int cn, int nmbr, char *spec1, char *spec2)
 	}
 }
 
+void god_temple(int cn)
+{
+	int x, y;
+	
+	if (IS_PURPLE(cn))
+	{
+		x = HOME_PURPLE_X;
+		y = HOME_PURPLE_Y;
+	}
+	else if (IS_CLANGORN(cn))
+	{
+		x = HOME_GORN_X;
+		y = HOME_GORN_Y;
+	}
+	else if (IS_CLANKWAI(cn))
+	{
+		x = HOME_KWAI_X;
+		y = HOME_KWAI_Y;
+	}
+	else
+	{
+		x = HOME_TEMPLE_X;
+		y = HOME_TEMPLE_Y;
+	}
+	
+	quick_teleport(cn, x, y);
+}
 
 void god_tavern(int cn)
 {

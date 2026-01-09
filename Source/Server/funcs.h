@@ -138,6 +138,7 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset);
 int god_army(int cn, int nmbr, char *spec1, char *spec2);
 void god_mirror(int cn, char *spec1, char *spec2); //ML 7.11. ff
 int god_remove_item(int cn, int nr);
+void god_temple(int cn);
 void god_tavern(int cn);
 void god_build(int cn, int x);
 void god_set_flag(int cn, int co, unsigned long long flag);
@@ -404,7 +405,8 @@ void give_new_ss(int cn, int rank);
 int make_new_catalyst(int cn, int n, int v);
 int make_new_focus(int cn);
 void create_new_ss_equipment(int cn, int in, int rank, int sk);
-int make_gskill(int cn);
+int make_lskill(int cn, int v);
+int make_gskill(int cn, int v);
 void make_talisfrag(int cn, int n);
 void create_random_talisman_equipment(int cn, int in2);
 int set_enchantment(int cn, int v);
