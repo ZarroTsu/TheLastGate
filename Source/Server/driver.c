@@ -2887,7 +2887,7 @@ int npc_see(int cn, int co)
 				else if (getrank(co)<17) // Leiu Gen
 					do_sayx(cn, "Hi, %s. I'm very busy right now, please leave.", ch[co].name);
 				else
-					do_sayx(cn, "Hi, %s. I don't have anything for you right now, please leave.", ch[co].name);
+					do_sayx(cn, "Hi, %s. On the southern shore is a gathering of pirates under the banner of the dreaded Cap'n Kuro. Bring me their claws and I shall reward you with a Scroll of Intuition.", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest153")==0) //   53 - Solaire - Untainted Isle - Sun
 			{

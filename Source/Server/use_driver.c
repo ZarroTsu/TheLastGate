@@ -10436,7 +10436,7 @@ void enemyspawner(int in, int type, int flag)
 			t_temp = CT_SEASONSMOB + it[in].data[0];
 			t_ran = expire*5;	count = 1;	t_dist = 8;	wait = 1;
 			break;
-		case 10:		// Ascent Gorge Mobs
+		case 10:		// Ascent Gorge Mobs						- 81
 			t_temp = CT_ASCENTMOB + it[in].data[0];
 			t_ran = expire*5;	count = 1;	t_dist = 8;	wait = 1;
 			break;
