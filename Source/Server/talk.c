@@ -1856,28 +1856,15 @@ int answer_attack(int cn, int co, char *text)
 {
 	int n, best = 9999, bestn = 0, dist, idx;
 	char name[50];
-
+	
 	if (obey(cn, co))
 	{
-		while (isalpha(*text))
-		{
-			text++;
-		}
-		while (isspace(*text))
-		{
-			text++;
-		}
-
-		for (n = 0; n<45 && *text; name[n++] = *text++)
-		{
-			;
-		}
+		while (isalpha(*text)) text++;
+		while (isspace(*text)) text++;
+		for (n = 0; n<45 && *text; name[n++] = *text++) ;
 		name[n] = 0;
-		if (n<1)
-		{
-			return 0;
-		}
-
+		if (n<1) return 0;
+		
 		for (n = 1; n<MAXCHARS; n++)
 		{
 			if (ch[n].used!=USE_ACTIVE)
@@ -1898,7 +1885,7 @@ int answer_attack(int cn, int co, char *text)
 				}
 			}
 		}
-
+		
 		if (bestn && best<40)
 		{
 			/* CS, 000209: Prevent attacks on self */
@@ -1921,7 +1908,6 @@ int answer_attack(int cn, int co, char *text)
 			idx = bestn | (char_id(bestn) << 16);
 			ch[cn].data[MCD_ENEMY1ST] = idx;
 			do_sayx(cn, "Yes %s, I will kill %s!", ch[co].name, ch[bestn].reference);
-//                      do_sayx(cn,ch[cn].text[1],ch[bestn].name);
 			do_notify_char(bestn, NT_GOTMISS, co, 0, 0, 0);
 			return 1;
 		}
@@ -2074,63 +2060,70 @@ void answer_tarot(int cn, int co, int m)
 
 void answer_unlearn(int cn, int co, char *text)
 {
-	int v = 125000, n;
-	char unl[7][40];
+	int v = 100000, n = 0, m;
+	int unl[8];
 	char word[40];
 	
 	if (!IS_SEYAN_DU(co)) return;
 	
-	if (!(B_SK(co, SK_WARCRY) || B_SK(co, SK_LEAP)   || B_SK(co, SK_GCMASTERY) || B_SK(co, SK_LETHARGY) || 
-		  B_SK(co, SK_PULSE)  || B_SK(co, SK_ZEPHYR) || B_SK(co, SK_FINESSE)   || B_SK(co, SK_PACT)     ))
+	if (B_SK(co, SK_WARCRY))   { unl[n] = SK_WARCRY;    n++; }
+	if (B_SK(co, SK_LEAP))     { unl[n] = SK_LEAP;      n++; }
+	if (B_SK(co, SK_GCMASTERY)){ unl[n] = SK_GCMASTERY; n++; }
+	if (B_SK(co, SK_LETHARGY)) { unl[n] = SK_LETHARGY;  n++; }
+	if (B_SK(co, SK_PULSE))    { unl[n] = SK_PULSE;     n++; }
+	if (B_SK(co, SK_ZEPHYR))   { unl[n] = SK_ZEPHYR;    n++; }
+	if (B_SK(co, SK_FINESSE))  { unl[n] = SK_FINESSE;   n++; }
+	if (B_SK(co, SK_PACT))     { unl[n] = SK_PACT;      n++; }
+	
+	if (n < 1)
 	{
 		do_sayx(cn, "But you do not know any arch skills, %s!", ch[co].name);
 		return;
 	}
+	else if (n == 1)
+	{
+		do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, skilltab[unl[0]].name);
+		chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", skilltab[unl[0]].name, ch[co].name, v);
+		do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", skilltab[unl[0]].name, v);
+		
+		B_SK(co, unl[0]) = 0;
+		ch[co].points_tot -= v;
+		ch[co].points -= v;
+		
+		return;
+	}
+	
+	// past here we must assume n >= 2
 	
 	while (isalpha(*text)) text++;
 	while (isspace(*text)) text++;
-	for (n = 0; n<35 && *text; word[n++] = *text++) ;
-	word[n] = 0;
-	if (n<1)
+	for (m = 0; m<35 && *text; word[m++] = *text++) ;
+	word[m] = 0;
+	if (m<1)
 	{
 		do_sayx(cn, "Let me know the name of the skill you want to UNLEARN, %s. If you want to unlearn all of them, say UNLEARN ALL.", ch[co].name);
 		return;
 	}
+	
 	if (!strcasecmp(word, "all")) // word matches
 	{
-		n = 0;
-		if (B_SK(co, SK_WARCRY))   { B_SK(co, SK_WARCRY)   = 0; strcpy(unl[n], skilltab[SK_WARCRY].name);   n++; }
-		if (B_SK(co, SK_LEAP))     { B_SK(co, SK_LEAP)     = 0; strcpy(unl[n], skilltab[SK_LEAP].name);     n++; }
-		if (B_SK(co, SK_GCMASTERY)){ B_SK(co, SK_GCMASTERY)= 0; strcpy(unl[n], skilltab[SK_GCMASTERY].name);n++; }
-		if (B_SK(co, SK_LETHARGY)) { B_SK(co, SK_LETHARGY) = 0; strcpy(unl[n], skilltab[SK_LETHARGY].name); n++; }
-		if (B_SK(co, SK_PULSE))    { B_SK(co, SK_PULSE)    = 0; strcpy(unl[n], skilltab[SK_PULSE].name);    n++; }
-		if (B_SK(co, SK_ZEPHYR))   { B_SK(co, SK_ZEPHYR)   = 0; strcpy(unl[n], skilltab[SK_ZEPHYR].name);   n++; }
-		if (B_SK(co, SK_FINESSE))  { B_SK(co, SK_FINESSE)  = 0; strcpy(unl[n], skilltab[SK_FINESSE].name);  n++; }
-		if (B_SK(co, SK_PACT))     { B_SK(co, SK_PACT)     = 0; strcpy(unl[n], skilltab[SK_PACT].name);     n++; }
-		
 		v *= n;
 		
-		ch[co].points_tot -= v;
-		ch[co].points -= v;
-		
-		if (n<2)
-		{
-			do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, unl[0]);
-			chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", unl[0], ch[co].name, v);
-			do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl[0], v);
-		}
-		else if (n == 2)
-		{
-			do_sayx(cn, "Very well %s, I will remove %s and %s. Close your eyes, and...", ch[co].name, unl[0], unl[1]);
-			chlog(cn, "Gatekeeper: Removed %s and %s from %s, and lowered by %d.", unl[0], unl[1], ch[co].name, v);
-			do_char_log(co, 0, "You no longer know %s and %s. You lost %d experience points.\n", unl[0], unl[1], v);
-		}
-		else
+		if (n > 2)
 		{
 			do_sayx(cn, "Very well %s, I will remove all of your arch skills. Close your eyes, and...", ch[co].name);
 			chlog(cn, "Gatekeeper: Removed all arch skills %s, and lowered by %d.", ch[co].name, v);
 			do_char_log(co, 0, "You no longer know your arch skills. You lost %d experience points.\n", v);
 		}
+		else
+		{
+			do_sayx(cn, "Very well %s, I will remove %s and %s. Close your eyes, and...", ch[co].name, skilltab[unl[0]].name, skilltab[unl[1]].name);
+			chlog(cn, "Gatekeeper: Removed %s and %s from %s, and lowered by %d.", skilltab[unl[0]].name, skilltab[unl[1]].name, ch[co].name, v);
+			do_char_log(co, 0, "You no longer know %s and %s. You lost %d experience points.\n", skilltab[unl[0]].name, skilltab[unl[1]].name, v);
+		}
+		
+		ch[co].points_tot -= v;
+		ch[co].points -= v;
 		
 		return;
 	}
@@ -2149,15 +2142,14 @@ void answer_unlearn(int cn, int co, char *text)
 	}
 	
 	if (!B_SK(co, n)) { do_sayx(cn, "But you do not know %s, %s!", skilltab[n].name, ch[co].name); return; }
-	strcpy(unl[0], skilltab[n].name);
 	
 	B_SK(co, n) = 0;
 	ch[co].points_tot -= v;
 	ch[co].points -= v;
 	
-	do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, unl[0]);
-	chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", unl[0], ch[co].name, v);
-	do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", unl[0], v);
+	do_sayx(cn, "Very well %s, I will remove %s. Close your eyes, and...", ch[co].name, skilltab[n].name);
+	chlog(cn, "Gatekeeper: Removed %s from %s, and lowered by %d.", skilltab[n].name, ch[co].name, v);
+	do_char_log(co, 0, "You no longer know %s. You lost %d experience points.\n", skilltab[n].name, v);
 }
 
 void answer_claim(int cn, int co, int nr)
