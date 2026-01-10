@@ -140,11 +140,20 @@ int use_door(int cn, int in)
 		else if (it[in].data[2]==999 && !lock)
 			return 0;
 	}
+	
+	if (it[in].data[4] && it[in].data[5])
+	{
+		do_area_sound(0, 0, it[in].x, it[in].y, 10);
+		quick_teleport(cn, it[in].data[4], it[in].data[5]);
+		do_area_sound(0, 0, ch[cn].x, ch[cn].y, 10);
+		do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
+		return 1;
+	}
+	
 	reset_go(it[in].x, it[in].y);
 	remove_lights(it[in].x, it[in].y);
-
 	do_area_sound(0, 0, it[in].x, it[in].y, 10);
-
+	
 	if (!it[in].active)
 	{
 		it[in].flags &= ~(IF_MOVEBLOCK | IF_SIGHTBLOCK);
