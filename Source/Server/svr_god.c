@@ -861,7 +861,7 @@ int god_stack_items(int in, int in2)
 	if (IS_MATCH_CAT(in, in2)) flag = 0;
 	if (IS_MATCH_GSC(in, in2)) flag = 0;
 	if (IS_MATCH_LSC(in, in2)) flag = 0;
-	if (IS_MATCH_COR(in, in2)) flag = 0;
+	if (IS_CORRUPTOR(in) && it[in].data[0] != it[in2].data[0]) flag = 0; // don't use IS_MATCH_COR here //
 	
 	// Find a stackable item of the same template
 	if ((it[in].flags & IF_STACKABLE) && it[in].temp == it[in2].temp && it[in].driver == it[in2].driver && it[in2].stack<10 && flag)
