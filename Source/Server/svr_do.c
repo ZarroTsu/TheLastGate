@@ -3722,7 +3722,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[29], "The Emerald Palace",      170000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[22], "The Emerald Palace");
 	m = display_pole(cn, flag, page, m, pole5[11], "Platinum Mines II",       175000);
-//	m = display_pole(cn, flag, page, m, pole5[26], "Pirate's Galleon",        177500);
+	m = display_pole(cn, flag, page, m, pole5[26], "Pirate's Galleon",        177500);
 	m = display_pole(cn, flag, page, m, pole6[12], "Lab XVIII, Commandment ", 185000);
 	m = display_pole(cn, flag, page, m, pole6[13], "Lab XVIII, Commandment ", 185000);
 	m = display_pole(cn, flag, page, m, pole6[14], "Lab XVIII, Commandment ", 185000);
@@ -4022,7 +4022,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_quest(cn, flag, page, m, liz, quest2[28], 18, "Dracus",   "Settlement",   "Helmet",   135000);
 	m = display_quest(cn, flag, page, m, nlb, questP[16], 18, "Lab XVI",  "Pirate's Gor", "+1 SP",    475000);
 	m = display_quest(cn, flag, page, m, nrb, questP[16], 18, "Lab XVI",  "Pirate's Gor", "-",        475000);
-//	m = display_quest(cn, flag, page, m, nei, quest3[19], 18, "Trafalgar", "Warlock Way", "Scroll",   142500); // #152 Pirate's Galleon
+	m = display_quest(cn, flag, page, m, nei, quest3[19], 18, "Trafalgar", "Warlock Way", "Scroll",   142500); // #152 Pirate's Galleon
 
 	m = display_quest(cn, flag, page, m, coc,          0, 19, "Gilligan", "Titan Street", "@Gold",     10000); // #### Untainted Coconuts
 	m = display_quest(cn, flag, page, m, nei, quest3[ 9], 19, "Charlotte","Warlock Way",  "Tarot",    150000); // #142
