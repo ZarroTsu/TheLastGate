@@ -141,10 +141,10 @@ int use_door(int cn, int in)
 			return 0;
 	}
 	
-	if (it[in].data[4] && it[in].data[5])
+	if (it[in].data[7] && it[in].data[8])
 	{
 		do_area_sound(0, 0, it[in].x, it[in].y, 10);
-		quick_teleport(cn, it[in].data[4], it[in].data[5]);
+		quick_teleport(cn, it[in].data[7], it[in].data[8]);
 		do_area_sound(0, 0, ch[cn].x, ch[cn].y, 10);
 		do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 		return 1;
