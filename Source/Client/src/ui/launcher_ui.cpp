@@ -562,7 +562,7 @@ static void render_character_select(const LauncherLayout *layout) {
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
         pop_input_styles = create_input_style(layout);
-        ImGui::InputText("##password", launcher_state.password, sizeof(launcher_state.password));
+        ImGui::InputText("##password", launcher_state.password, sizeof(launcher_state.password), ImGuiInputTextFlags_Password);
         pop_input_styles();
         ImGui::PopItemWidth();
 
