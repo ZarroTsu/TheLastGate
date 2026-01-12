@@ -808,8 +808,8 @@ void set_temp_skilltab(void)
 		skilltab[n].nr = n;
 		skilltab[n].sortkey = n;
 		skilltab[n].show = 0;
-		sprintf(skilltab[n].name,"skill%02d", n);
-		sprintf(skilltab[n].desc,"desc%02d", n);
+		sprintf(skilltab[n].name,"", n);
+		sprintf(skilltab[n].desc,"", n);
 		skilltab[n].attrib[0] = 0;
 		skilltab[n].attrib[1] = 1;
 		skilltab[n].attrib[2] = 2;
@@ -824,8 +824,8 @@ void set_temp_metaStats(void)
 		meta_stats[n].show = 1;
 		meta_stats[n].flag = 0;
 		meta_stats[n].font = 1;
-		sprintf(meta_stats[n].name,"stat%02d", n);
-		sprintf(meta_stats[n].desc,"desc%02d", n);
+		sprintf(meta_stats[n].name,"", n);
+		sprintf(meta_stats[n].desc,"", n);
 		meta_stats[n].value = -1;
 		sprintf(meta_stats[n].affix,"", n);
 	}
@@ -1264,13 +1264,13 @@ void show_meta_stats(int n)
 	if (n < 7) {
 		m = 0;
 	} else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES) {
-		m = 1 + (n > 17 ? 1: 0);
 		n = n + game_ui_state.meta_scroll;
+		m = 1 + (n > 23 ? 1: 0);
 		if (n >= 48) return;
 		pos -= 7;
 	} else {
-		m = 1 + (n > 17 ? 1 : 0);
 		n = n + 41 + game_ui_state.meta_scroll;
+		m = 1 + (n > (23 + 41) ? 1 : 0);
 		if (n >= 89) return;
 		pos -= 7;
 	}
