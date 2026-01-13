@@ -1675,142 +1675,99 @@ void do_listgcmax(int cn, int shadow)
 	do_char_log(cn, 1, " \n");
 }
 
+void write_listskills(int cn, int fnt, int sk)
+{
+	int n[3];
+	
+	n[0] = GET_AT(cn, sk, 0);
+	n[1] = GET_AT(cn, sk, 1);
+	n[2] = GET_AT(cn, sk, 2);
+	
+	if (n[0] != skilltab[sk].attrib[0] || n[1] != skilltab[sk].attrib[1] || n[2] != skilltab[sk].attrib[2])
+	{
+		if (fnt == 1) fnt = 7;
+		else          fnt = 3;
+	}
+	
+	do_char_log(cn, fnt, "%-22s %3s + %3s + %3s\n", skilltab[sk].name, at_short[n[0]], at_short[n[1]], at_short[n[2]]);
+}
+
 void do_listskills(int cn, char *topic)
 {
-	int pagenum = 0;
+	int pagenum;
 	if (strcmp(topic, "4")==0)
 	{
-							pagenum = 4;
-							do_char_log(cn, 1, "Now listing skill attributes (PAGE 4):\n");
-							do_char_log(cn, 1, " \n");
-							//                 "!        .         .   |     .         .        !"
-							do_char_log(cn, 1, "Aria                   BRV + AGL + AGL\n");
-							do_char_log(cn, 5, "Companion Mastery      BRV + WIL + WIL\n");
-							do_char_log(cn, 1, "Economize              WIL + WIL + WIL\n");
-							do_char_log(cn, 5, "Finesse                BRV + BRV + AGL\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Gear Mastery         (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 1, "Gear Mastery           BRV + AGL + STR\n");
-							do_char_log(cn, 5, "Immunity               WIL + AGL + STR\n");
-							do_char_log(cn, 1, "Metabolism             BRV + WIL + INT\n");
-							do_char_log(cn, 5, "Perception             INT + INT + AGL\n");
-							do_char_log(cn, 1, "Precision              BRV + AGL + AGL\n");
-							do_char_log(cn, 5, "Proximity              BRV + INT + INT\n");
-							do_char_log(cn, 1, "Resistance             BRV + WIL + STR\n");
-							do_char_log(cn, 5, "Safeguard              BRV + STR + STR\n");
-							do_char_log(cn, 1, "Stealth                INT + AGL + AGL\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Surround Hit         (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 5, "Surround Hit           AGL + STR + STR\n");
-							do_char_log(cn, 1, "Zephyr                 BRV + BRV + INT\n");
+		pagenum = 4;
+		do_char_log(cn, 1, "Now listing skill attributes (PAGE 4):\n");
+		do_char_log(cn, 1, " \n");
+		write_listskills(cn, 1, SK_ARIA);
+		write_listskills(cn, 5, SK_GCMASTERY);
+		write_listskills(cn, 1, SK_ECONOM);
+		write_listskills(cn, 5, SK_FINESSE);
+		write_listskills(cn, 1, SK_GEARMAST);
+		write_listskills(cn, 5, SK_IMMUN);
+		write_listskills(cn, 1, SK_METABOLISM);
+		write_listskills(cn, 5, SK_PERCEPT);
+		write_listskills(cn, 1, SK_PRECISION);
+		write_listskills(cn, 5, SK_PROX);
+		write_listskills(cn, 1, SK_RESIST);
+		write_listskills(cn, 5, SK_SAFEGRD);
+		write_listskills(cn, 1, SK_STEALTH);
+		write_listskills(cn, 5, SK_SURROUND);
+		write_listskills(cn, 1, SK_ZEPHYR);
 	}
 	else if (strcmp(topic, "3")==0)
 	{
-							pagenum = 3;
-							do_char_log(cn, 1, "Now listing skill attributes (PAGE 3):\n");
-							do_char_log(cn, 1, " \n");
-							//                 "!        .         .   |     .         .        !"
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Blast                (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Blast                (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 1, "Blast                  BRV + INT + INT\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Bless                (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Bless                (BRV+WIL)/2 + INT + INT\n");
-else if (IS_LYCANTH(cn))	do_char_log(cn, 3, "Bless                  BRV + WIL + AGL\n");
-else						do_char_log(cn, 5, "Bless                  BRV + WIL + WIL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Curse                (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Curse                (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 1, "Curse                  BRV + INT + INT\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Dispel               (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Dispel               (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 5, "Dispel                 BRV + WIL + INT\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Enhance              (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Enhance              (BRV+WIL)/2 + INT + INT\n");
-else if (IS_LYCANTH(cn))	do_char_log(cn, 7, "Enhance                BRV + WIL + AGL\n");
-else						do_char_log(cn, 1, "Enhance                BRV + WIL + WIL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Ghost Companion      (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Ghost Companion      (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 5, "Ghost Companion        BRV + WIL + WIL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Haste                (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Haste                (BRV+WIL)/2 + INT + INT\n");
-else if (IS_LYCANTH(cn))	do_char_log(cn, 7, "Haste                  BRV + WIL + AGL\n");
-else						do_char_log(cn, 1, "Haste                  BRV + WIL + AGL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Heal                 (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Heal                 (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 5, "Heal                   BRV + WIL + STR\n");
-							do_char_log(cn, 1, "Lethargy               BRV + WIL + INT\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Magic Shield         (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Magic Shield         (BRV+WIL)/2 + INT + INT\n");
-else if (IS_LYCANTH(cn))	do_char_log(cn, 3, "Magic Shield           BRV + WIL + AGL\n");
-else						do_char_log(cn, 5, "Magic Shield           BRV + WIL + WIL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Poison               (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Poison               (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 1, "Poison                 BRV + INT + INT\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Protect              (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Protect              (BRV+WIL)/2 + INT + INT\n");
-else if (IS_LYCANTH(cn))	do_char_log(cn, 3, "Protect                BRV + WIL + AGL\n");
-else						do_char_log(cn, 5, "Protect                BRV + WIL + WIL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Pulse                (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Pulse                (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 1, "Pulse                  BRV + INT + INT\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 3, "Shadow Copy          (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 3, "Shadow Copy          (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 5, "Shadow Copy            BRV + WIL + WIL\n");
-if (T_SUMM_SK(cn, 7))		do_char_log(cn, 7, "Slow                 (BRV+INT)/2 + WIL + WIL\n");
-else if (T_ARHR_SK(cn, 9))	do_char_log(cn, 7, "Slow                 (BRV+WIL)/2 + INT + INT\n");
-else						do_char_log(cn, 1, "Slow                   BRV + INT + INT\n");
+		pagenum = 3;
+		do_char_log(cn, 1, "Now listing skill attributes (PAGE 3):\n");
+		do_char_log(cn, 1, " \n");
+		write_listskills(cn, 1, SK_BLAST);
+		write_listskills(cn, 5, SK_BLESS);
+		write_listskills(cn, 1, SK_CURSE);
+		write_listskills(cn, 5, SK_DISPEL);
+		write_listskills(cn, 1, SK_ENHANCE);
+		write_listskills(cn, 5, SK_GHOST);
+		write_listskills(cn, 1, SK_HASTE);
+		write_listskills(cn, 5, SK_HEAL);
+		write_listskills(cn, 1, SK_LETHARGY);
+		write_listskills(cn, 5, SK_MSHIELD);
+		write_listskills(cn, 1, SK_POISON);
+		write_listskills(cn, 5, SK_PROTECT);
+		write_listskills(cn, 1, SK_PULSE);
+		write_listskills(cn, 5, SK_SHADOW);
+		write_listskills(cn, 1, SK_SLOW);
 	}
 	else if (strcmp(topic, "2")==0)
 	{
-							pagenum = 2;
-							do_char_log(cn, 1, "Now listing skill attributes (PAGE 2):\n");
-							do_char_log(cn, 1, " \n");
-							//                 "!        .         .   |     .         .        !"
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Blind                (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 1, "Blind                  BRV + INT + AGL\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Cleave               (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 5, "Cleave                 AGL + STR + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Leap                 (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 1, "Leap                   BRV + AGL + STR\n");
-							do_char_log(cn, 5, "Pact                   BRV + INT + STR\n");
-							do_char_log(cn, 1, "Repair                 INT + AGL + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Taunt                (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 5, "Taunt                  BRV + STR + STR\n");
-							do_char_log(cn, 1, "Warcry                 BRV + STR + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Weaken               (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 5, "Weaken                 BRV + AGL + AGL\n");
+		pagenum = 2;
+		do_char_log(cn, 1, "Now listing skill attributes (PAGE 2):\n");
+		do_char_log(cn, 1, " \n");
+		write_listskills(cn, 1, SK_BLIND);
+		write_listskills(cn, 5, SK_CLEAVE);
+		write_listskills(cn, 1, SK_LEAP);
+		write_listskills(cn, 5, SK_PACT);
+		write_listskills(cn, 1, SK_REPAIR);
+		write_listskills(cn, 5, SK_TAUNT);
+		write_listskills(cn, 1, SK_WARCRY);
+		write_listskills(cn, 5, SK_WEAKEN);
 	}
 	else
 	{
-							pagenum = 1;
-							do_char_log(cn, 1, "Now listing skill attributes (PAGE 1):\n");
-							do_char_log(cn, 1, " \n");
-							//                 "!        .         .   |     .         .        !"
-							do_char_log(cn, 1, "Regenerate             STR + STR + STR\n");
-							do_char_log(cn, 5, "Rest                   AGL + AGL + AGL\n");
-							do_char_log(cn, 1, "Meditate               INT + INT + INT\n");
-if (get_gear(cn, 3494))		do_char_log(cn, 3, "Hand to Hand           BRV + BRV + BRV\n"); 		// IT_WB_LIONSPAWS
-else if (T_SKAL_SK(cn, 9))	do_char_log(cn, 3, "Hand to Hand         (BRV+STR)/2 + AGL + AGL\n");
-else if (T_BRAV_SK(cn, 9))	do_char_log(cn, 3, "Hand to Hand         (AGL+STR)/2 + BRV + BRV\n");
-else						do_char_log(cn, 5, "Hand to Hand           BRV + AGL + STR\n");
-							do_char_log(cn, 1, "Tactics                BRV + WIL + INT\n");
-if (get_gear(cn, 3501))		do_char_log(cn, 3, "Axe                    BRV + AGL + AGL\n"); 		// IT_WB_GULLOXI
-else if (T_SKAL_SK(cn, 9))	do_char_log(cn, 3, "Axe                  (BRV+STR)/2 + AGL + AGL\n");
-else if (T_BRAV_SK(cn, 9))	do_char_log(cn, 3, "Axe                  (AGL+STR)/2 + BRV + BRV\n");
-else						do_char_log(cn, 5, "Axe                    AGL + STR + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Dagger               (BRV+STR)/2 + AGL + AGL\n");
-else if (T_BRAV_SK(cn, 9))	do_char_log(cn, 7, "Dagger               (AGL+STR)/2 + BRV + BRV\n");
-else						do_char_log(cn, 1, "Dagger                 WIL + WIL + AGL\n");
-							do_char_log(cn, 5, "Dual Wield             BRV + AGL + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Shield               (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 1, "Shield                 BRV + WIL + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Staff                (BRV+STR)/2 + AGL + AGL\n");
-else if (T_BRAV_SK(cn, 9))	do_char_log(cn, 3, "Staff                (AGL+STR)/2 + BRV + BRV\n");
-else						do_char_log(cn, 5, "Staff                  INT + INT + STR\n");
-if (get_gear(cn, 3477))		do_char_log(cn, 7, "Sword                  BRV + STR + STR\n"); 		// IT_WB_BARBSWORD
-else if (T_SKAL_SK(cn, 9))	do_char_log(cn, 7, "Sword                (BRV+STR)/2 + AGL + AGL\n");
-else if (T_BRAV_SK(cn, 9))	do_char_log(cn, 7, "Sword                (AGL+STR)/2 + BRV + BRV\n");
-else						do_char_log(cn, 1, "Sword                  BRV + AGL + STR\n");
-if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Two-Handed           (BRV+STR)/2 + AGL + AGL\n");
-else if (T_BRAV_SK(cn, 9))	do_char_log(cn, 3, "Two-Handed           (AGL+STR)/2 + BRV + BRV\n");
-else						do_char_log(cn, 5, "Two-Handed             AGL + AGL + STR\n");
+		pagenum = 1;
+		do_char_log(cn, 1, "Now listing skill attributes (PAGE 1):\n");
+		do_char_log(cn, 1, " \n");
+		write_listskills(cn, 1, SK_REGEN);
+		write_listskills(cn, 5, SK_REST);
+		write_listskills(cn, 1, SK_MEDIT);
+		write_listskills(cn, 5, SK_HAND);
+		write_listskills(cn, 1, SK_TACTICS);
+		write_listskills(cn, 5, SK_AXE);
+		write_listskills(cn, 1, SK_DAGGER);
+		write_listskills(cn, 5, SK_DUAL);
+		write_listskills(cn, 1, SK_SHIELD);
+		write_listskills(cn, 5, SK_STAFF);
+		write_listskills(cn, 1, SK_SWORD);
+		write_listskills(cn, 5, SK_TWOHAND);
 	}
 	do_char_log(cn, 1, " \n");
 	do_char_log(cn, 2, "Showing page %d of 4. #listskills <x> to swap.\n", pagenum);

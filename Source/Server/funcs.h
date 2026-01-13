@@ -53,6 +53,7 @@ void player_exit(int nr);
 void ch_update_skill_terminology(int cn, int n);
 void plr_update_treenode_terminology(int nr, int tn, int n);
 void plr_update_tree_terminology(int nr, int val);
+int ch_get_skill_attrib(int cn, int n, int m);
 void plr_logout(int cn, int nr, int reason);
 void cl_list(void);
 void char_remove_net(int cn, int co);

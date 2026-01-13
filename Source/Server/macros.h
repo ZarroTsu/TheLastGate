@@ -246,6 +246,8 @@ int is_ascroll(int in);
 
 #define GET_PROX(cn)			(B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0)
 #define GET_SFAIL(cn, co)		(((ch[co].escape_timer > TICKS*3) || (ch[co].flags & CF_BODY) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[co].flags & CF_IMMORTAL))?1:0)
+#define GET_AT(cn, n, m)		(ch_get_skill_attrib((cn), (n), (m)))
+
 
 #define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]==13)
 

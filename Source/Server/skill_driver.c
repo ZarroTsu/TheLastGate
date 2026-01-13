@@ -21,6 +21,14 @@ char *at_name[5] = {
 	"Strength"
 };
 
+char *at_short[5] = {
+	"BRV",
+	"WIL",
+	"INT",
+	"AGL",
+	"STR"
+};
+
 struct s_splog splog[66] = {
 	{
 		0

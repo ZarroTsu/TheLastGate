@@ -1710,6 +1710,40 @@ char get_known_player_skill(int cn, int n)
 	return 1; //  1 = show in yellow
 }
 
+int ch_get_skill_attrib(int cn, int sk, int n)
+{
+	int atr;
+	
+	atr = skilltab[sk].attrib[n];
+	
+	if ((sk == SK_BLESS || sk == SK_ENHANCE || sk == SK_HASTE || sk == SK_PROTECT || sk == SK_MSHIELD) && IS_LYCANTH(cn))
+	{
+		if (n == 0) atr = AT_BRV;
+		if (n == 1) atr = AT_WIL;
+		if (n == 2) atr = AT_AGL;
+	}
+	if (sk == SK_HAND  && get_gear(cn, IT_WB_LIONSPAWS)) // Hand to Hand
+	{
+		if (n == 0) atr = AT_BRV;
+		if (n == 1) atr = AT_BRV;
+		if (n == 2) atr = AT_BRV;
+	}
+	if (sk == SK_AXE   && get_gear(cn, IT_WB_GULLOXI))   // Axe
+	{
+		if (n == 0) atr = AT_BRV;
+		if (n == 1) atr = AT_AGL;
+		if (n == 2) atr = AT_AGL;
+	}
+	if (sk == SK_SWORD && get_gear(cn, IT_WB_BARBSWORD)) // Sword
+	{
+		if (n == 0) atr = AT_BRV;
+		if (n == 1) atr = AT_STR;
+		if (n == 2) atr = AT_STR;
+	}
+	
+	return atr;
+}
+
 void plr_update_skill_terminology(int nr, int n)
 {
 	unsigned char buf[256];
@@ -1722,9 +1756,9 @@ void plr_update_skill_terminology(int nr, int n)
 	
 	buf[1] = ST_SKILLS_SORT;
 	*(unsigned char*)(buf + 3) = (unsigned char)skilltab[n].sortkey;
-	*(unsigned char*)(buf + 4) = (unsigned char)skilltab[n].attrib[0];
-	*(unsigned char*)(buf + 5) = (unsigned char)skilltab[n].attrib[1];
-	*(unsigned char*)(buf + 6) = (unsigned char)skilltab[n].attrib[2];
+	*(unsigned char*)(buf + 4) = (unsigned char)(GET_AT(cn, n, 0));
+	*(unsigned char*)(buf + 5) = (unsigned char)(GET_AT(cn, n, 1));
+	*(unsigned char*)(buf + 6) = (unsigned char)(GET_AT(cn, n, 2));
 	*(unsigned char*)(buf + 7) = (unsigned char)known;
 	xsend(nr, buf,  8);
 	
