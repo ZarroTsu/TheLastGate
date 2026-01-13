@@ -1693,14 +1693,14 @@ else						do_char_log(cn, 1, "Gear Mastery           BRV + AGL + STR\n");
 							do_char_log(cn, 5, "Immunity               WIL + AGL + STR\n");
 							do_char_log(cn, 1, "Metabolism             BRV + WIL + INT\n");
 							do_char_log(cn, 5, "Perception             INT + INT + AGL\n");
-							do_char_log(cn, 1, "Precision              BRV + BRV + INT\n");
+							do_char_log(cn, 1, "Precision              BRV + AGL + AGL\n");
 							do_char_log(cn, 5, "Proximity              BRV + INT + INT\n");
 							do_char_log(cn, 1, "Resistance             BRV + WIL + STR\n");
 							do_char_log(cn, 5, "Safeguard              BRV + STR + STR\n");
 							do_char_log(cn, 1, "Stealth                INT + AGL + AGL\n");
 if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Surround Hit         (BRV+STR)/2 + AGL + AGL\n");
 else						do_char_log(cn, 5, "Surround Hit           AGL + STR + STR\n");
-							do_char_log(cn, 1, "Zephyr                 BRV + AGL + STR\n");
+							do_char_log(cn, 1, "Zephyr                 BRV + BRV + INT\n");
 	}
 	else if (strcmp(topic, "3")==0)
 	{
@@ -1768,7 +1768,7 @@ else						do_char_log(cn, 1, "Blind                  BRV + INT + AGL\n");
 if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Cleave               (BRV+STR)/2 + AGL + AGL\n");
 else						do_char_log(cn, 5, "Cleave                 AGL + STR + STR\n");
 if (T_SKAL_SK(cn, 9))		do_char_log(cn, 7, "Leap                 (BRV+STR)/2 + AGL + AGL\n");
-else						do_char_log(cn, 1, "Leap                   BRV + AGL + AGL\n");
+else						do_char_log(cn, 1, "Leap                   BRV + AGL + STR\n");
 							do_char_log(cn, 5, "Pact                   BRV + INT + STR\n");
 							do_char_log(cn, 1, "Repair                 INT + AGL + STR\n");
 if (T_SKAL_SK(cn, 9))		do_char_log(cn, 3, "Taunt                (BRV+STR)/2 + AGL + AGL\n");

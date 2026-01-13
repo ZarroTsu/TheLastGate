@@ -18,7 +18,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				
 	{  1, 'G', 	"Precision", 			"Passively improves your ability to inflict critical hits.", 
 				"", "",
-				{ AT_BRV, AT_BRV, AT_INT }},
+				{ AT_BRV, AT_AGL, AT_AGL }},
 				
 	{  2, 'D', 	"Dagger", 				"Passive ability to hit and parry with a dagger in your main hand.", 
 				"", "",
@@ -42,7 +42,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				
 	{  7, 'G', 	"Zephyr", 				"Passive ability granting your hits an additional hit after a brief delay.", 
 				"Zephyr (Thorns)", 		"Passive ability granting retaliation hits after parrying.",
-				{ AT_BRV, AT_AGL, AT_STR }},
+				{ AT_BRV, AT_BRV, AT_INT }},
 				
 	{  8, 'G', 	"Stealth", 				"Passive ability to stay hidden from others' sight. More effective while in SLOW mode.", 
 				"", "",
@@ -210,7 +210,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
 	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life.",
 				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
-				{ AT_BRV, AT_AGL, AT_AGL }},
+				{ AT_BRV, AT_AGL, AT_STR }},
 				
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
 				"", "",
