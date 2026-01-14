@@ -2692,32 +2692,29 @@ void plr_logout(int cn, int nr, int reason)
 {
 	int n, in, co;
 	unsigned char buf[16];
-
-	if (nr<0 || nr>=MAXPLAYER)
-	{
-		nr = 0;
-	}
-
+	
+	if (nr<0 || nr>=MAXPLAYER) nr = 0;
 	if (cn>0 && cn<MAXCHARS && (ch[cn].player==nr || nr==0) && (ch[cn].flags & CF_USURP))
 	{
 		ch[cn].flags &= ~(CF_CCP | CF_USURP | CF_STAFF | CF_IMMORTAL | CF_GOD | CF_CREATOR);
 		co = ch[cn].data[97];
 		plr_logout(co, 0, LO_SHUTDOWN);
 	}
-
+	
 	if (cn>0 && cn<MAXCHARS && (ch[cn].player==nr || nr==0) && (ch[cn].flags & (CF_PLAYER)) && !(ch[cn].flags & CF_CCP))
 	{
-
 		if (reason==LO_EXIT)
 		{
 			chlog(cn, "Punished for leaving the game with F12");
-
+			
 			do_char_log(cn, 0, " \n");
 			do_char_log(cn, 0, "You are being punished for leaving the game without entering a tavern.\n");
 			do_char_log(cn, 0, "If you are out of combat, this punishment will be minimal. Otherwise...\n");
 			do_char_log(cn, 0, " \n");
 			do_char_log(cn, 0, "You have been hit by a demon. You lost %d HP.\n", ch[cn].hp[5] * 5 / 10);
+			
 			ch[cn].a_hp -= ch[cn].hp[5] * 500;
+			
 			if (ch[cn].a_hp<500)
 			{
 				do_char_log(cn, 0, " \n");
@@ -2725,14 +2722,14 @@ void plr_logout(int cn, int nr, int reason)
 				do_char_log(cn, 0, "Your belongings dropped to the ground where you stood.\n");
 				do_char_killed(0, cn, 0);
 			}
+			
 			do_area_log(cn, 0, ch[cn].x, ch[cn].y, 2, "%s left the game without saying goodbye.\n", ch[cn].name);
 		}
 		else
 		{
 			for (n = 0; n<MAXBUFFS; n++) // clear poison to avoid dying offline
 			{
-				if ((in = ch[cn].spell[n])==0) { continue; }
-				
+				if ((in = ch[cn].spell[n])==0) continue;
 				if (bu[in].temp==SK_VENOM || bu[in].temp==SK_POISON || bu[in].temp==SK_BLEED || bu[in].temp==SK_IMMOLATE2)
 				{
 					bu[in].used = USE_EMPTY; 
@@ -2740,90 +2737,41 @@ void plr_logout(int cn, int nr, int reason)
 				}
 			}
 		}
-
+		
 		if (map[ch[cn].x + ch[cn].y * MAPX].ch==cn)
 		{
 			map[ch[cn].x + ch[cn].y * MAPX].ch = 0;
 			if (ch[cn].light)
-			{
 				do_add_light(ch[cn].x, ch[cn].y, -ch[cn].light);
-			}
 		}
+		
 		if (map[ch[cn].tox + ch[cn].toy * MAPX].to_ch==cn)
-		{
 			map[ch[cn].tox + ch[cn].toy * MAPX].to_ch = 0;
-		}
+		
 		remove_enemy(cn);
-
+		
 		if (reason==LO_IDLE || reason==LO_SHUTDOWN || reason==0)   // give lag scroll to player
 		{
 			if (abs(ch[cn].x - ch[cn].temple_x) + abs(ch[cn].y - ch[cn].temple_y)>10 && !(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_NOLAG))
 			{
 				for (n=0;n<MAXITEMS;n++)
 				{
-					if (!(in = ch[cn].item[n]))
-					{
-						continue;
-					}
+					if (!(in = ch[cn].item[n])) continue;
 					if (it[in].temp==IT_LAGSCROLL)
 					{
 						it[in].used = USE_EMPTY;
 						ch[cn].item[n] = 0;
 					}
 				}
+				
 				in = god_create_item(IT_LAGSCROLL);
 				it[in].data[0] = ch[cn].x;
 				it[in].data[1] = ch[cn].y;
 				it[in].data[2] = globs->ticker;
-				if (in)
-				{
-					god_give_char(in, cn);
-				}
+				
+				if (in) god_give_char(in, cn);
 			}
 		}
-
-		ch[cn].x = ch[cn].y = ch[cn].tox = ch[cn].toy = ch[cn].frx = ch[cn].fry = 0;
-
-		ch[cn].player  = 0;
-		ch[cn].status  = 0;
-		ch[cn].status2 = 0;
-		ch[cn].dir = 1;
-		ch[cn].escape_timer = 0;
-		for (n = 0; n<4; n++)
-		{
-			ch[cn].enemy[n] = 0;
-		}
-		ch[cn].attack_cn = 0;
-		ch[cn].skill_nr  = 0;
-		ch[cn].goto_x = 0;
-		ch[cn].use_nr = 0;
-		ch[cn].misc_action = 0;
-		ch[cn].stunned = 0;
-		ch[cn].taunted = 0;
-		ch[cn].retry = 0;
-		for (n = 0; n<13; n++) // reset afk, group and follow
-		{
-			if (n==11)
-			{
-				continue;    // leave fightback set
-			}
-			ch[cn].data[n] = 0;
-		}
-		ch[cn].data[96] = 0;	// Reset Queued spell
-		clear_map_buffs(cn, 1);
-
-		ch[cn].used = USE_NONACTIVE;
-		ch[cn].logout_date = time(NULL);
-
-		ch[cn].flags |= CF_SAVEME;
-		ch[cn].flags &= ~CF_ALW_SPECT;
-
-		if (IS_BUILDING(cn))
-		{
-			god_build(cn, 0);
-		}
-
-		do_announce(cn, 0, "%s left the game.\n", ch[cn].name);
 		
 		for (n=1;n<MAXCHARS;n++)
 		{
@@ -2840,21 +2788,53 @@ void plr_logout(int cn, int nr, int reason)
 				die_companion(n);
 			}
 		}
+		
+		ch[cn].x = ch[cn].y = ch[cn].tox = ch[cn].toy = ch[cn].frx = ch[cn].fry = 0;
+		
+		ch[cn].player       = 0;
+		ch[cn].status       = 0;
+		ch[cn].status2      = 0;
+		ch[cn].dir          = 1;
+		ch[cn].escape_timer = 0;
+		
+		for (n = 0; n<4; n++) ch[cn].enemy[n] = 0;
+		
+		ch[cn].attack_cn    = 0;
+		ch[cn].skill_nr     = 0;
+		ch[cn].goto_x       = 0;
+		ch[cn].use_nr       = 0;
+		ch[cn].misc_action  = 0;
+		ch[cn].stunned      = 0;
+		ch[cn].taunted      = 0;
+		ch[cn].retry        = 0;
+		for (n = 0; n<13; n++)      // reset afk, group and follow
+		{
+			if (n==11) continue;    // leave fightback set
+			ch[cn].data[n]  = 0;
+		}
+		ch[cn].data[96]     = 0;    // Reset Queued spell
+		
+		clear_map_buffs(cn, 1);
+		
+		ch[cn].used = USE_NONACTIVE;
+		ch[cn].logout_date = time(NULL);
+		
+		ch[cn].flags |= CF_SAVEME;
+		ch[cn].flags &= ~CF_ALW_SPECT;
+		
+		if (IS_BUILDING(cn)) god_build(cn, 0);
+		
+		do_announce(cn, 0, "%s left the game.\n", ch[cn].name);
 	}
-
+	
 	if (nr && reason && reason!=LO_USURP)
 	{
 		buf[0] = SV_EXIT;
 		*(unsigned int*)(buf + 1) = reason;
-		if (player[nr].state==ST_NORMAL)
-		{
-			xsend(nr, buf, 16);
-		}
-		else
-		{
-			csend(nr, buf, 16);
-		}
-
+		
+		if (player[nr].state==ST_NORMAL) xsend(nr, buf, 16);
+		else csend(nr, buf, 16);
+		
 		player_exit(nr);
 	}
 }

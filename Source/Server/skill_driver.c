@@ -4670,63 +4670,66 @@ void remove_shadow(int cn)
 void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 {
 	int in, n;
-
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n])==0)  continue;
 		if (bu[in].temp == 1)           continue;
 		if (bu[in].temp == SK_DIVINITY) continue;
-		if (bu[in].data[4] > 0)         continue; // Effects not removed by NMZ
+		if (bu[in].data[4] &= 1)        continue; // Effects not removed by NMZ
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
+	
 	do_update_char(cn);
 }
 
 void remove_all_spells(int cn, int flag) // Card turn-ins & Lycan Shifting
 {
 	int in, n;
-
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])==0)	continue;
-		if (bu[in].temp == SK_SHIFT)	continue;
+		if ((in = ch[cn].spell[n])==0)                    continue;
+		if (bu[in].temp == SK_SHIFT)                      continue;
 		if (flag)
 		{
-			if (bu[in].temp == SK_LIGHT)    continue;
-			if (bu[in].temp == SK_BLESS)    continue;
-			if (bu[in].temp == SK_ENHANCE)  continue;
-			if (bu[in].temp == SK_PROTECT)  continue;
-			if (bu[in].temp == SK_HASTE)    continue;
-			if (bu[in].temp == SK_HEAL)     continue;
-			if (bu[in].temp == SK_REGEN)    continue;
-			if (bu[in].temp == SK_MSHIELD)  continue;
-			if (bu[in].temp == SK_CHARGE)   continue;
-			if (bu[in].temp == SK_WARCRY3)  continue;
-			if (bu[in].temp == SK_DIVINITY) continue;
-			if (bu[in].temp == SK_PACT) 	continue;
-			if (bu[in].temp == 635) continue; // Infrared 1
-			if (bu[in].temp == 637) continue; // Infrared 2
-			if (bu[in].temp == 639) continue; // Infrared 3
-			if (bu[in].temp == 641) continue; // Infrared 4
-			if (bu[in].temp == 205) continue; // Coconut
-			if (bu[in].temp == 206) continue; // Heatstroke
-			if (bu[in].temp == 215) continue; // Vantablack
-			if (bu[in].temp == SK_SANGUINE) continue; // Sanguine
-			if (bu[in].temp == SK_DWLIGHT) continue; // Darklight
+			if (bu[in].temp == SK_LIGHT)                  continue;
+			if (bu[in].temp == SK_BLESS)                  continue;
+			if (bu[in].temp == SK_ENHANCE)                continue;
+			if (bu[in].temp == SK_PROTECT)                continue;
+			if (bu[in].temp == SK_HASTE)                  continue;
+			if (bu[in].temp == SK_HEAL)                   continue;
+			if (bu[in].temp == SK_REGEN)                  continue;
+			if (bu[in].temp == SK_MSHIELD)                continue;
+			if (bu[in].temp == SK_CHARGE)                 continue;
+			if (bu[in].temp == SK_WARCRY3)                continue;
+			if (bu[in].temp == SK_DIVINITY)               continue;
+			if (bu[in].temp == SK_PACT)                   continue;
+			if (bu[in].temp == 635)                       continue; // Infrared 1
+			if (bu[in].temp == 637)                       continue; // Infrared 2
+			if (bu[in].temp == 639)                       continue; // Infrared 3
+			if (bu[in].temp == 641)                       continue; // Infrared 4
+			if (bu[in].temp == 205)                       continue; // Coconut
+			if (bu[in].temp == 206)                       continue; // Heatstroke
+			if (bu[in].temp == 215)                       continue; // Vantablack
+			if (bu[in].temp == SK_SANGUINE)               continue; // Sanguine
+			if (bu[in].temp == SK_DWLIGHT)                continue; // Darklight
 			if (bu[in].temp >= 104 && bu[in].temp <= 109) continue; // contract buffs/debuffs
 		}
-		if (bu[in].temp == 103)			continue; // Don't remove food items
-		if (bu[in].temp == 254)			continue; // Don't remove rpot/gpot/spot
+		if (bu[in].temp == 103)                           continue; // Don't remove food items
+		if (bu[in].temp == 254)                           continue; // Don't remove rpot/gpot/spot
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
+	
 	do_update_char(cn);
 }
 
 void remove_all_debuffs(int cn)
 {
 	int in, n;
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[cn].spell[n])==0)	continue;
@@ -4734,6 +4737,7 @@ void remove_all_debuffs(int cn)
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
+	
 	do_update_char(cn);
 }
 
