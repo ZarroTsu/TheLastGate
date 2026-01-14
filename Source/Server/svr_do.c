@@ -13272,19 +13272,21 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 	
 	if (in && intemp == SK_IMMOLATE2) // Immolate
 	{
-		if (!flag) return;
+		if (!flag) return; // Only effect enemies
 		
 		power = spell_immunity(cn, co, bu[in].power*3);
 		
 		if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, power, SP_DUR_ARIA, 0))) return;
 		
 		bu[in2].data[1] = max(100, 100 + power*4);
+		bu[in2].data[4] = 1;
 	}
 	
 	switch (intemp)
 	{
 		case SK_ARIA:
-			power = M_SK(cn, SK_ARIA) * (100 + (T_SKAL_SK(cn,4)?20:0) + (st_skillcount(cn, 28)*5))/100;
+			power = M_SK(cn, SK_ARIA);
+			power = power * (100 + (T_SKAL_SK(cn,4)?20:0) + (st_skillcount(cn, 28)*5))/100;
 			
 			if (flag) // Target is an enemy
 			{
@@ -13293,6 +13295,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				if (!(in2 = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, power, SP_DUR_ARIA, 0))) return;
 				
 				bu[in2].cool_bonus = max(-127, -(power/4 + 1));
+				bu[in2].data[4] = 1;
 			}
 			else // Target is an ally
 			{
@@ -13300,18 +13303,117 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				
 				if (IS_SKALD(co)) bu[in2].dmg_bonus = min(127, power/15);
 				
-				bu[in2].weapon = get_aria_wv(cn, in, n);
-				bu[in2].armor  = get_aria_av(cn, in, n);
-				
+				bu[in2].weapon     = get_aria_wv(cn, in, n);
+				bu[in2].armor      = get_aria_av(cn, in, n);
 				bu[in2].cool_bonus = min(127, power/4 + 1);
+				bu[in2].data[4] = 1;
 			}
 			break;
+			
+		case SK_HASTE:
+			if (flag) return; // Only effect allies
+			if (ch[co].flags & CF_NOMAGIC) return;
+			
+			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
+			power = power * (100 + (T_SKAL_SK(cn,4)?20:0) + (st_skillcount(cn, 28)*5))/100;
+			
+				if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
+				bu[in].speed      = min(300, 10 + (power  )/ 6);
+				bu[in].atk_speed  = min(127,  5 + (power+6)/12);
+				bu[in].cast_speed = min(127,  5 + (power+6)/12);
+			break;
+			
+		case SK_SLOW:
+			if (!flag) return; // Only effect enemies
+			if (ch[co].flags & CF_NOMAGIC) return;
+			
+			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
+			
+			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
+			if (T_SORC_SK(cn,  9))                power = power + (power*M_AT(cn, AT_INT)  /2000);
+			if (n=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*n/5000);
+			
+			power = common_mult(cn, co, spell_immunity(cn, co, power));
+			
+			if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/5;
+			
+			if (do_get_iflag(cn, SF_EMPEROR))
+			{
+				if (!(in2 = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0))) return;
+				bu[in2].speed      = -(min(300, 30 + SLOW2FORM(power)));
+			}
+			else
+			{
+				if (!(in2 = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_SLOW(power), 0))) return;
+				bu[in2].speed      = -(min(300, 20 + SLOWFORM(power)*2/3));
+				bu[in2].atk_speed  = -(min(127, 10 + SLOWFORM(power)/3));
+				bu[in2].cast_speed = -(min(127, 10 + SLOWFORM(power)/3));
+			}
+			bu[in2].data[5] = 1;
+			break;
+			
+		case SK_CURSE:
+			if (!flag) return; // Only effect enemies
+			if (ch[co].flags & CF_NOMAGIC) return;
+			
+			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
+			
+			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
+			if (T_SORC_SK(cn,  9))                power = power + (power*M_AT(cn, AT_INT)  /2000);
+			if (n=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*n/5000);
+			
+			power = common_mult(cn, co, spell_immunity(cn, co, power));
+			
+			if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/5;
+			
+			if (do_get_iflag(cn, SF_TOWER))
+			{
+				if (!(in2 = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_CURSE2, 0))) return;
+				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
+			}
+			else
+			{
+				if (!(in2 = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_CURSE, 0))) return;
+				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(3 + (power - (4 - n)) / 5);
+			}
+			bu[in2].data[5] = 1;
+			break;
+			
+		case SK_WEAKEN:
+			if (!flag) return; // Only effect enemies
+			
+			power = spell_multiplier(M_SK(cn, SK_WEAKEN), cn);
+			
+			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
+			if (n=st_skillcount(cn, 34))          power = power*(20+n)/20;
+			
+			power = common_mult(cn, co, spell_immunity(cn, co, power));
+			
+			if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/5;
+			
+			// Tarot Card - Death :: Change Weaken into Crush
+			if (do_get_iflag(cn, SF_DEATH))
+			{
+				if (!(in2 = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_WEAKEN, 0))) return;
+				bu[in2].armor  = max(-127, -(power / 4 + 4));
+			}
+			else
+			{
+				if (!(in = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0))) return;
+				bu[in2].weapon  = max(-127, -(power / 4 + 4));
+			}
+			bu[in2].data[4] = 1;
+			bu[in2].data[5] = 1;
+			break;
+			
 		default: break;
 	}
 	
-	bu[in2].data[4] = 2; // Effects not removed by NMZ, Effects refresh dynamically
-	
-	if (in2) add_spell(co, in2);
+	if (in2)
+	{
+		bu[in2].data[4] += 2; // Effects can refresh dynamically
+		add_spell(co, in2);
+	}
 }
 void do_skill_aura(int cn, int intemp, int in)
 {
@@ -13340,7 +13442,6 @@ void do_skill_aura(int cn, int intemp, int in)
 					for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) if (ch[co].data[n]==idx) break;
 					if (n==MCD_ENEMYZZZ+1) continue;
 				}
-				
 				do_apply_aura(cn, intemp, co, in, 1);
 			}
 			else // Target is an ally
