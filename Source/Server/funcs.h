@@ -430,6 +430,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 
 //-- skill_driver --
 void check_gloves(int cn, int co, int orig_co, int dr1, int dr2);
+int get_aoe_radius(int cn, int intemp, int prox_power);
 int spellcost(int cn, int cost, int in, int usemana);
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext);
 int has_buff(int cn, int bu_temp);

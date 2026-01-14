@@ -872,10 +872,13 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 // avgdmg     = damage already dealt before now (ie. targeted spell)    - critDam for SH
 int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_power, int count, int hit, int avgdmg)
 {
-	int co, no_target = 0, sc = 0, aoeImm = 0;
+	int co, r, no_target = 0, sc = 0, aoeImm = 0;
 	int x, xc, xf, xt, y, yc, yf, yt;
-	int r = get_aoe_radius(cn, intemp, prox_power);
 	int countskip = 0;
+	
+	r = get_aoe_radius(cn, intemp, prox_power);
+	r = r * (100+st_skillcount(cn,53)*5)/100; //  5% more per corruptor
+	r = r * (T_SORC_SK(cn, 5) ? 120:100)/100; // 20% more for tree skill
 	
 	switch (intemp)
 	{
@@ -901,18 +904,15 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	xc = ch[cz].x;
 	yc = ch[cz].y;
 	
-	xf = max(       1, xc     - r);
-	yf = max(       1, yc     - r);
-	xt = min(MAPX - 1, xc + 1 + r);
-	yt = min(MAPY - 1, yc + 1 + r);
-	
-	//           5% per corruptor                  20% more for tree skill
-	r = r * (100+st_skillcount(cn,53)*5)/100 * (T_SORC_SK(cn, 5) ? 120:100)/100;
+	xf = max(       1, xc - (sqr(r)/10000));
+	yf = max(       1, yc - (sqr(r)/10000));
+	xt = min(MAPX - 1, xc + (sqr(r)/10000));
+	yt = min(MAPY - 1, yc + (sqr(r)/10000));
 	
 	if (!countskip)
 	{
 		// Loop through and count the targets
-		for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)
+		for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
 		{
 			if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 			if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
@@ -945,7 +945,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	}
 	
 	// Loop through and hit the targets 
-	for (x = xf; x<xt; x++)	for (y = yf; y<yt; y++)
+	for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
 	{
 		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
