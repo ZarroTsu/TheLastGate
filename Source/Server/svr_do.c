@@ -13243,7 +13243,7 @@ int get_aria_wv(int cn, int in, int sk)
 	{
 		weapon = ch[cn].weapon;
 		if (in && bu[in].weapon) weapon -= bu[in].weapon;
-		weapon = weapon*(100+(T_SKAL_SK(cn,4)?20:0)+sk*5)/100;
+		weapon = weapon * (100 + sk)/100;
 		weapon = weapon/10;
 	}
 	
@@ -13257,7 +13257,7 @@ int get_aria_av(int cn, int in, int sk)
 	{
 		armor = ch[cn].armor;
 		if (in && bu[in].armor) armor -= bu[in].armor;
-		armor = armor*(100+(T_SKAL_SK(cn,4)?20:0)+sk*5)/100;
+		armor = armor * (100 + sk)/100;
 		armor = armor/10;
 	}
 	
@@ -13508,15 +13508,89 @@ void do_random_blast(int cn, int power)
 	}
 }
 
-void do_update_permaspells(int cn)
+void do_update_spell_aria(int cn, int in)
 {
-	int n, in, power, tmp = 0, tmpa=0, weapon=0, armor=0;
+	int power, weapon, armor, n;
+	
+	n = (T_SKAL_SK(cn,4)?20:0) + st_skillcount(cn, 28)*5;
+	
+	power = M_SK(cn, SK_ARIA);
+	power = power * (100 + n)/100;
+	
+	weapon = get_aria_wv(cn, in, n);
+	armor  = get_aria_av(cn, in, n);
+	
+	if (!IS_SKALD(cn))
+		power /= 4;
+	else
+		bu[in].dmg_bonus  = min(127, power/15);
+	
+	bu[in].power          = power;
+	bu[in].weapon         = weapon;
+	bu[in].armor          = armor;
+	bu[in].cool_bonus     = min(127, power/4 + 1);
+}
+void do_update_spell_pact(int cn, int in)
+{
+	int power, n, tmp;
 	int hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
 	int enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
 	int mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
 	
-	if (T_LYCA_SK(cn, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
-	if (n=st_skillcount(cn, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
+	n = (hpbonus + enbonus + mpbonus)*st_skillcount(cn, 103)/5;
+	if (T_LYCA_SK(cn, 7)) n += (hpbonus + enbonus + mpbonus)/2;
+	
+	power = skill_multiplier(M_SK(cn, SK_PACT), cn);
+	bu[in].power = power;
+	
+	if (do_get_iflag(cn, SF_HERMIT_R))
+	{
+		bu[in].reserve[2] = min(80, 15 + power/5); // Mana
+		power = ch[cn].reserve[2];
+		power = power + (power * n / 5000);
+		bu[in].dmg_reduction = power*4/6;
+		bu[in].dmg_bonus     = power*2/6;
+	}
+	else
+	{
+		bu[in].reserve[0] = min(80, 15 + power/5); // Hitpoints
+		power = ch[cn].reserve[0];
+		power = power + (power * n / 5000);
+		bu[in].dmg_reduction = power*4/3;
+		bu[in].dmg_bonus     = power*2/3;
+	}
+}
+void do_update_spell_lethargy(int cn, int in)
+{
+	int power, n, tmp;
+	
+	power = M_SK(cn, SK_LETHARGY);
+	
+	if (T_SORC_SK(cn, 7))        power = power + (power * M_AT(cn, AT_WIL)  /2000);
+	if (n=st_skillcount(cn, 55)) power = power + (power * M_AT(cn, AT_WIL)*n/5000);
+	
+	power = spell_multiplier(power, cn);
+	bu[in].power = power;
+	
+	if (do_get_iflag(cn, SF_EMPRES_R))
+		bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
+	else
+		bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
+}
+void do_update_spell_immolate(int cn, int in)
+{
+	int power;
+	
+	power = ch[cn].hp[4] * 30 / 100;
+	
+	if (do_get_iflag(cn, SF_BOOK_BURN))
+		power = power + ch[cn].hp[4]/25;
+	
+	bu[in].power = power;
+}
+void do_update_permaspells(int cn)
+{
+	int n, in;
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -13524,67 +13598,11 @@ void do_update_permaspells(int cn)
 		{
 			switch (bu[in].temp)
 			{
-				case SK_ARIA:
-					tmpa = st_skillcount(cn, 28);
-					
-					power = M_SK(cn, SK_ARIA);
-					power = power*(100+(T_SKAL_SK(cn,4)?20:0)+tmpa*5)/100;
-					
-					weapon = get_aria_wv(cn, in, tmpa);
-					armor  = get_aria_av(cn, in, tmpa);
-					
-					if (!IS_SKALD(cn))
-						power /= 4;
-					else
-						bu[in].dmg_bonus  = min(127, power/15);
-					
-					bu[in].power          = power;
-					bu[in].weapon         = weapon;
-					bu[in].armor          = armor;
-					bu[in].cool_bonus     = min(127, power/4 + 1);
-					break;
-				case SK_PACT:
-					power = M_SK(cn, SK_PACT);
-					power = skill_multiplier(power, cn);
-					bu[in].power = power;
-					
-					if (do_get_iflag(cn, SF_HERMIT_R))
-					{
-						bu[in].reserve[2] = min(80, 15+power/5); // Mana
-						power = ch[cn].reserve[2];
-						power = power + (power * tmp / 5000);
-						bu[in].dmg_reduction = power*4/6;
-						bu[in].dmg_bonus     = power*2/6;
-					}
-					else
-					{
-						bu[in].reserve[0] = min(80, 15+power/5); // Hitpoints
-						power = ch[cn].reserve[0];
-						power = power + (power * tmp / 5000);
-						bu[in].dmg_reduction = power*4/3;
-						bu[in].dmg_bonus     = power*2/3;
-					}
-					break;
-				case SK_LETHARGY:
-					power = M_SK(cn, SK_LETHARGY);
-					if (T_SORC_SK(cn, 7))          power = power + (power * M_AT(cn, AT_WIL)/2000);
-					if (tmp=st_skillcount(cn, 55)) power = power + (power * M_AT(cn, AT_WIL)*tmp/5000);
-					power = spell_multiplier(power, cn);
-					bu[in].power = power;
-					
-					if (do_get_iflag(cn, SF_EMPRES_R))
-						bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // Hitpoints
-					else
-						bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // Mana
-					break;
-				case SK_IMMOLATE:
-					power = ch[cn].hp[4] * 30 / 100;
-					if (do_get_iflag(cn, SF_BOOK_BURN)) power = power + ch[cn].hp[4]/25;
-					bu[in].power = power;
-					bu[in].data[3] = PRXP_RAD + ch[cn].aoe_bonus;
-					break;
-				default:
-					break;
+				case SK_ARIA:     do_update_spell_aria(cn, in);     break;
+				case SK_PACT:     do_update_spell_pact(cn, in);     break;
+				case SK_LETHARGY: do_update_spell_lethargy(cn, in); break;
+				case SK_IMMOLATE: do_update_spell_immolate(cn, in); break;
+				default: break;
 			}
 		}
 	}
