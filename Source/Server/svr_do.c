@@ -13315,12 +13315,11 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			if (ch[co].flags & CF_NOMAGIC) return;
 			
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
-			power = power * (100 + (T_SKAL_SK(cn,4)?20:0) + (st_skillcount(cn, 28)*5))/100;
 			
-				if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
-				bu[in].speed      = min(300, 10 + (power  )/ 6);
-				bu[in].atk_speed  = min(127,  5 + (power+6)/12);
-				bu[in].cast_speed = min(127,  5 + (power+6)/12);
+			if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
+			bu[in].speed      = min(300, 10 + (power  )/ 6);
+			bu[in].atk_speed  = min(127,  5 + (power+6)/12);
+			bu[in].cast_speed = min(127,  5 + (power+6)/12);
 			break;
 			
 		case SK_SLOW:
@@ -13530,6 +13529,16 @@ void do_update_spell_aria(int cn, int in)
 	bu[in].armor          = armor;
 	bu[in].cool_bonus     = min(127, power/4 + 1);
 }
+void do_update_spell_haste(int cn, int in)
+{
+	int power;
+	
+	power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
+	
+	bu[in].speed      = min(300, 10 + (power  )/ 6);
+	bu[in].atk_speed  = min(127,  5 + (power+6)/12);
+	bu[in].cast_speed = min(127,  5 + (power+6)/12);
+}
 void do_update_spell_pact(int cn, int in)
 {
 	int power, n, tmp;
@@ -13594,11 +13603,12 @@ void do_update_permaspells(int cn)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && ((bu[in].flags & BF_PERMASPELL) || (bu[in].temp==SK_ARIA && (bu[in].data[0] == cn))))
+		if ((in = ch[cn].spell[n]) && ((bu[in].flags & BF_PERMASPELL) || ((bu[in].data[4] &= 2) && (bu[in].data[0] == cn))))
 		{
 			switch (bu[in].temp)
 			{
 				case SK_ARIA:     do_update_spell_aria(cn, in);     break;
+				case SK_HASTE:    do_update_spell_haste(cn, in);    break;
 				case SK_PACT:     do_update_spell_pact(cn, in);     break;
 				case SK_LETHARGY: do_update_spell_lethargy(cn, in); break;
 				case SK_IMMOLATE: do_update_spell_immolate(cn, in); break;

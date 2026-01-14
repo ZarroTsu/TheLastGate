@@ -6167,9 +6167,7 @@ int spell_immolate(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	
-	bu[in].r_hp   = -(75+1125*p/100);
-	bu[in].data[3] 	= PRXP_RAD + ch[cn].aoe_bonus;
-	
+	bu[in].r_hp  = -(75+1125*p/100);
 	bu[in].flags = BF_PERMASPELL;
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_IMMOLATE
