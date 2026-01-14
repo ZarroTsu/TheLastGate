@@ -653,8 +653,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 	r += n;
 	
 	r = r + r * prox_power/200;
-	r = r * (100+st_skillcount(cn,53)*5)/100; //  5% more per corruptor
-	r = r * (T_SORC_SK(cn, 5) ? 120:100)/100; // 20% more for tree skill
+	r = r * (100 + (T_SORC_SK(cn, 5)?20:0) + st_skillcount(cn,53)*5)/100; // Increases to total AoE
 	
 	return (r * 11/10); // 10% more oomph to make the circles more circular
 }
@@ -4674,10 +4673,10 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])==0)	continue;
-		if (bu[in].temp == 1)			continue;
+		if ((in = ch[cn].spell[n])==0)  continue;
+		if (bu[in].temp == 1)           continue;
 		if (bu[in].temp == SK_DIVINITY) continue;
-		if (bu[in].data[4] == 1)		continue; // Effects not removed by NMZ
+		if (bu[in].data[4] > 0)         continue; // Effects not removed by NMZ
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}

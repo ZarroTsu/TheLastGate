@@ -13249,7 +13249,6 @@ int get_aria_wv(int cn, int in, int sk)
 	
 	return weapon;
 }
-
 int get_aria_av(int cn, int in, int sk)
 {
 	int armor = 0;
@@ -13265,134 +13264,98 @@ int get_aria_av(int cn, int in, int sk)
 	return armor;
 }
 
-void do_aria(int cn)
+void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
-	int _aoe, _rad, n, j, x, y, xf, yf, xt, yt, xc, yc, aoe_power, in, power, co, weapon=0, armor=0;
-	double tmp_a;
+	int power, cz = 0, in2 = 0;
 	
-	n = st_skillcount(cn, 28);
+	if (!co) return;
 	
-	power = M_SK(cn, SK_ARIA);
-	power = power*(100+(T_SKAL_SK(cn,4)?20:0)+n*5)/100;
+	if (in && intemp == SK_IMMOLATE2) // Immolate
+	{
+		if (!flag) return;
+		
+		power = spell_immunity(cn, co, bu[in].power*3);
+		
+		if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, power, SP_DUR_ARIA, 0))) return;
+		
+		bu[in2].data[1] = max(100, 100 + power*4);
+	}
 	
-	in = has_buff(cn, SK_ARIA);
+	switch (intemp)
+	{
+		case SK_ARIA:
+			power = M_SK(cn, SK_ARIA) * (100 + (T_SKAL_SK(cn,4)?20:0) + (st_skillcount(cn, 28)*5))/100;
+			
+			if (flag) // Target is an enemy
+			{
+				power = spell_immunity(cn, co, power);
+				
+				if (!(in2 = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, power, SP_DUR_ARIA, 0))) return;
+				
+				bu[in2].cool_bonus = max(-127, -(power/4 + 1));
+			}
+			else // Target is an ally
+			{
+				if (!(in2 = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) return;
+				
+				if (IS_SKALD(co)) bu[in2].dmg_bonus = min(127, power/15);
+				
+				bu[in2].weapon = get_aria_wv(cn, in, n);
+				bu[in2].armor  = get_aria_av(cn, in, n);
+				
+				bu[in2].cool_bonus = min(127, power/4 + 1);
+			}
+			break;
+		default: break;
+	}
 	
-	weapon = get_aria_wv(cn, in, n);
-	armor  = get_aria_av(cn, in, n);
+	bu[in2].data[4] = 2; // Effects not removed by NMZ, Effects refresh dynamically
 	
-	if (!IS_SKALD(cn))    power /= 4; // Braver
-	
-	j = 100 + st_skillcount(cn, 53)*5;
-	
-	aoe_power = M_SK(cn, SK_PROX)+15;
-	_rad      = PRXA_RAD + ch[cn].aoe_bonus;
-	_aoe      = (aoe_power/(PROX_CAP*2) + _rad) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100;
-	tmp_a     = (double)((aoe_power*100/(PROX_CAP*2) + _rad*100) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100);
+	if (in2) add_spell(co, in2);
+}
+void do_skill_aura(int cn, int intemp, int in)
+{
+	int co, n, idx;
+	int x, xc, xf, xt, y, yc, yf, yt;
+	int r = get_aoe_radius(cn, intemp, GET_PROX(cn));
 	
 	xc = ch[cn].x;
 	yc = ch[cn].y;
-	xf = max(1, xc - _aoe);
-	yf = max(1, yc - _aoe);
-	xt = min(MAPX - 1, xc + 1 + _aoe);
-	yt = min(MAPY - 1, yc + 1 + _aoe);
 	
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
+	xf = max(       1, xc - (sqr(r)/10000));
+	yf = max(       1, yc - (sqr(r)/10000));
+	xt = min(MAPX - 1, xc + (sqr(r)/10000));
+	yt = min(MAPY - 1, yc + (sqr(r)/10000));
+	
+	for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
 	{
-		// This makes the radius circular instead of square
-		if (sqr(xc - x) + sqr(yc - y) > (sqr(tmp_a/100) + 1))
-		{
-			continue;
-		}
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co, 0))
 		{
-			in = 0;
-			if ((cn!=co) && do_surround_check(cn, co, 1)) 
+			if ((cn!=co) && do_surround_check(cn, co, 1)) // Target is an enemy
 			{
-				aoe_power = spell_immunity(cn, co, power);
-				// debuff version
-				if (!(in = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, aoe_power, SP_DUR_ARIA, 0))) 
-					continue;
+				if (!IS_PLAYER(co) && ch[co].data[25] != 1) // Prevent from touching npcs that don't want to hurt you atm
+				{
+					idx = cn | (char_id(cn) << 16);
+					for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) if (ch[co].data[n]==idx) break;
+					if (n==MCD_ENEMYZZZ+1) continue;
+				}
 				
-				bu[in].cool_bonus = max(-127, -(aoe_power/4 + 1));
-				bu[in].data[4] = 1; // Effects not removed by NMZ (SK_ARIA2)
+				do_apply_aura(cn, intemp, co, in, 1);
 			}
-			else
+			else // Target is an ally
 			{
-				// buff version
-				if (!(in = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) 
-					continue;
-				
-				if (IS_SKALD(co))
-					bu[in].dmg_bonus = min(127, power/15);
-				bu[in].weapon = weapon;
-				bu[in].armor  = armor;
-				
-				bu[in].cool_bonus = min(127, power/4 + 1);
-				bu[in].data[4] = 1; // Effects not removed by NMZ (SK_ARIA)
+				do_apply_aura(cn, intemp, co, in, 0);
 			}
-			if (co && in) add_spell(co, in);
 		}
 	}
 }
-
-void do_immolate(int cn, int in)
+void do_check_auras(int cn)
 {
-	int _aoe, _rad, j, x, y, xf, yf, xt, yt, xc, yc, aoe_power, in2 = 0, power, co, idx, nn;
-	double tmp_a, tmp_s, tmp_h;
+	int in;
 	
-	j = 100 + st_skillcount(cn, 53)*5;
-	
-	tmp_s     = (double)(bu[in].power*3/(IS_PLAYER(cn)?2:3));
-	aoe_power = M_SK(cn, SK_PROX)+15;
-	_rad      = bu[in].data[3];
-	_aoe      = (aoe_power/(PROX_CAP*2) + _rad) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100;
-	tmp_a     = (double)((aoe_power*100/(PROX_CAP*2) + _rad*100) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100);
-	tmp_h     = (double)((sqr(aoe_power*100/PROX_HIT-_aoe)/500+(_rad*300)) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100);
-	
-	xc = ch[cn].x;
-	yc = ch[cn].y;
-	xf = max(1, xc - _aoe);
-	yf = max(1, yc - _aoe);
-	xt = min(MAPX - 1, xc + 1 + _aoe);
-	yt = min(MAPY - 1, yc + 1 + _aoe);
-	
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
-	{
-		// This makes the radius circular instead of square
-		if (sqr(xc - x) + sqr(yc - y) > (sqr(tmp_a/100) + 1))
-		{
-			continue;
-		}
-		if (IS_LIVINGCHAR(co = map[x + y * MAPX].ch) && do_char_can_see(cn, co, 0) && cn!=co)
-		{
-			in2 = 0;
-			// Prevent from hurting enemies that don't want to hurt you atm
-			if (!IS_PLAYER(co) && ch[co].data[25] != 1)
-			{
-				idx = cn | (char_id(cn) << 16);
-				for (nn = MCD_ENEMY1ST; nn<=MCD_ENEMYZZZ; nn++)
-				{
-					if (ch[co].data[nn]==idx) break;
-				}
-				if (nn==MCD_ENEMYZZZ+1) continue;
-			}
-			//
-			if (do_surround_check(cn, co, 1)) 
-			{
-				aoe_power = (int)(double)(min(tmp_s, tmp_s / max(1, (
-							sqr(abs(xc - x)) + sqr(abs(yc - y))) / (tmp_h/100))));
-				aoe_power = spell_immunity(cn, co, aoe_power);
-				
-				// debuff version
-				if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, aoe_power, SP_DUR_ARIA, 0))) 
-					continue;
-				
-				bu[in2].data[1] = max(100, 100 + (IS_PLAYER(cn))?(aoe_power*4):(aoe_power*3));
-				bu[in2].data[4] = 1; // Effects not removed by NMZ (SK_IMMOLATE2)
-			}
-			if (co && in2) add_spell(co, in2);
-		}
-	}
+	if (B_SK(cn, SK_ARIA))              do_skill_aura(cn, SK_ARIA, has_buff(cn, SK_ARIA));
+	if (in = has_buff(cn, SK_IMMOLATE)) do_skill_aura(cn, SK_IMMOLATE2, in);
 }
 
 void do_random_blast(int cn, int power)
@@ -13918,13 +13881,13 @@ void do_regenerate(int cn)
 		if (ch[cn].a_end<0) ch[cn].a_end = 0;
 	}
 	
-	if (B_SK(cn, SK_ARIA)) do_aria(cn);
+	
 	if (do_get_iflag(cn, SF_PREIST_R) && B_SK(cn, SK_MSHIELD)) do_pmshield(cn, cn);
 	if (IS_COMP_TEMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && T_SUMM_SK(cc, 10))
 	{
 		if (do_get_iflag(cc, SF_PREIST_R) && B_SK(cc, SK_MSHIELD)) do_pmshield(cc, cn);
 	}
-	if (in = has_buff(cn, SK_IMMOLATE)) do_immolate(cn, in);
+	do_check_auras(cn);
 	
 	// Tick down escape try
 	if (ch[cn].escape_timer > 0) 
