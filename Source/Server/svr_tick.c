@@ -1722,24 +1722,6 @@ int ch_get_skill_attrib(int cn, int sk, int n)
 		if (n == 1) atr = AT_WIL;
 		if (n == 2) atr = AT_AGL;
 	}
-	if (sk == SK_HAND  && get_gear(cn, IT_WB_LIONSPAWS)) // Hand to Hand
-	{
-		if (n == 0) atr = AT_BRV;
-		if (n == 1) atr = AT_BRV;
-		if (n == 2) atr = AT_BRV;
-	}
-	if (sk == SK_AXE   && get_gear(cn, IT_WB_GULLOXI))   // Axe
-	{
-		if (n == 0) atr = AT_BRV;
-		if (n == 1) atr = AT_AGL;
-		if (n == 2) atr = AT_AGL;
-	}
-	if (sk == SK_SWORD && get_gear(cn, IT_WB_BARBSWORD)) // Sword
-	{
-		if (n == 0) atr = AT_BRV;
-		if (n == 1) atr = AT_STR;
-		if (n == 2) atr = AT_STR;
-	}
 	
 	return atr;
 }

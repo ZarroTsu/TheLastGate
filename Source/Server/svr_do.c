@@ -12216,79 +12216,52 @@ void really_update_char(int cn)
 	
 	for (z = 0; z<MAXSKILL; z++)
 	{
-		//if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4) { cz=cn; cn=co; }
+		skill[z] += B_SK(cn, z) + ch[cn].skill[z][1];  // Base + greater scrolls
 		
-		skill[z] = (int)B_SK(cn, z) + (int)ch[cn].skill[z][1] + skill[z];
-		
+		/*
 		if ((z==0||z==2||z==3||z==4||z==5||z==6||z==16||z==33||z==37||z==38||z==40||z==41||z==48||z==49) && T_SKAL_SK(cn, 9))
-			skill[z] += ((int)((M_AT(cn, AT_BRV)+M_AT(cn, AT_STR))/2)+(int)M_AT(cn, AT_AGL)+(int)M_AT(cn, AT_AGL))/5;
+			m = (M_AT(cn, AT_BRV) + M_AT(cn, AT_STR))/2 + M_AT(cn, AT_AGL) + M_AT(cn, AT_AGL);
+		
 		else if ((z==0||z==2||z==3||z==4||z==5||z==6) && T_BRAV_SK(cn, 9))
-			skill[z] += ((int)((M_AT(cn, AT_AGL)+M_AT(cn, AT_STR))/2)+(int)M_AT(cn, AT_BRV)+(int)M_AT(cn, AT_BRV))/5;
+			m = (M_AT(cn, AT_AGL) + M_AT(cn, AT_STR))/2 + M_AT(cn, AT_BRV) + M_AT(cn, AT_BRV);
+		
 		else if (z==11||z==17||z==18||z==19||z==20||z==21||z==24||z==25||z==26||z==27||z==42||z==43||z==46||z==47)
 		{
-			n = st_skillcount(cn, 67);
-			m = st_skillcount(cn, 81);
+			m = (st_skillcount(cn, 67)*M_AT(cn, AT_WIL)/10) + (st_skillcount(cn, 81)*M_AT(cn, AT_INT)/10);
+			
 			if (T_SUMM_SK(cn, 7))
-				skill[z] += ((int)((M_AT(cn, AT_BRV)+M_AT(cn, AT_INT))/2)+(int)M_AT(cn, AT_WIL)+(int)M_AT(cn, AT_WIL)
-					+(int)(n*M_AT(cn, AT_WIL)/10)+(int)(m*M_AT(cn, AT_INT)/10))/5;
+				m += ((M_AT(cn, AT_BRV) + M_AT(cn, AT_INT))/2) + M_AT(cn, AT_WIL) + M_AT(cn, AT_WIL);
 			else if (T_ARHR_SK(cn, 9))
-				skill[z] += ((int)((M_AT(cn, AT_BRV)+M_AT(cn, AT_WIL))/2)+(int)M_AT(cn, AT_INT)+(int)M_AT(cn, AT_INT)
-					+(int)(n*M_AT(cn, AT_WIL)/10)+(int)(m*M_AT(cn, AT_INT)/10))/5;
+				m += ((M_AT(cn, AT_BRV) + M_AT(cn, AT_WIL))/2) + M_AT(cn, AT_INT) + M_AT(cn, AT_INT);
 			else if ((z==11||z==17||z==18||z==21||z==47) && IS_LYCANTH(cn))
-				skill[z] += ((int)M_AT(cn, AT_BRV)+(int)M_AT(cn, AT_WIL)+(int)M_AT(cn, AT_AGL)
-					+(int)(n*M_AT(cn, AT_WIL)/10)+(int)(m*M_AT(cn, AT_INT)/10))/5;
+				m += M_AT(cn, AT_BRV) + M_AT(cn, AT_WIL) + M_AT(cn, AT_AGL);
 			else
-				skill[z] += ((int)M_AT(cn,skilltab[z].attrib[0])+(int)M_AT(cn,skilltab[z].attrib[1])+(int)M_AT(cn, skilltab[z].attrib[2])
-					+(int)(n*M_AT(cn, AT_WIL)/10)+(int)(m*M_AT(cn, AT_INT)/10))/5;
+				m += M_AT(cn,skilltab[z].attrib[0]) + M_AT(cn,skilltab[z].attrib[1]) + M_AT(cn, skilltab[z].attrib[2]);
 		}
 		else
-			skill[z] += ((int)M_AT(cn,skilltab[z].attrib[0])+(int)M_AT(cn,skilltab[z].attrib[1])+(int)M_AT(cn,skilltab[z].attrib[2]))/5;
+			m = M_AT(cn,skilltab[z].attrib[0]) + M_AT(cn,skilltab[z].attrib[1]) + M_AT(cn,skilltab[z].attrib[2]);
 		
-		// Passive skills gain an extra % of braveness
-		if (IS_PA_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_BRV)))
-			skill[z] += m * M_AT(cn, AT_BRV)/100;
-		// Active magic spells gain an extra % of willpower
-		if (IS_AS_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_WIL)))
-			skill[z] += m * M_AT(cn, AT_WIL)/100;
-		// Active magic spells gain an extra % of intuition
-		if (IS_AS_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_INT)))
-			skill[z] += m * M_AT(cn, AT_INT)/100;
-		// Active melee skills gain an extra % of agility
-		if (IS_AM_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_AGL)))
-			skill[z] += m * M_AT(cn, AT_AGL)/100;
-		// Active melee skills gain an extra % of strength
-		if (IS_AM_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_STR)))
-			skill[z] += m * M_AT(cn, AT_STR)/100;
+		skill[z] += m/5;
+		*/
 		
-		if (z==SK_IMMUN && T_ARTM_SK(cn, 10))
-		{
-			skill[z] += skill[SK_RESIST]/5;
-		}
-		if (z==SK_IMMUN && (n=st_skillcount(cn, 22)))
-		{
-			skill[z] += skill[SK_RESIST]*n/25;
-		}
+		skill[z] += ( M_AT(cn, GET_AT(cn, z, 0)) + M_AT(cn, GET_AT(cn, z, 1)) + M_AT(cn, GET_AT(cn, z, 2)) ) / 5;
 		
-		if (do_get_iflag(cn, SF_HERMIT) && (z==SK_RESIST||z==SK_IMMUN))
-		{
-			skill[z] = skill[z]*4/5;
-		}
+		if (IS_PA_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_BRV))) skill[z] += m * M_AT(cn, AT_BRV)/100;    // Passive skills      gain an extra m% of braveness
+		if (IS_AS_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_WIL))) skill[z] += m * M_AT(cn, AT_WIL)/100;    // Active magic spells gain an extra m% of willpower
+		if (IS_AS_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_INT))) skill[z] += m * M_AT(cn, AT_INT)/100;    // Active magic spells gain an extra m% of intuition
+		if (IS_AM_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_AGL))) skill[z] += m * M_AT(cn, AT_AGL)/100;    // Active melee skills gain an extra m% of agility
+		if (IS_AM_SK(z) && (m = do_get_ieffect(cn, VF_EXTRA_STR))) skill[z] += m * M_AT(cn, AT_STR)/100;    // Active melee skills gain an extra m% of strength
 		
-		if (cz) cn=cz;
+		if ( z==SK_IMMUN                && T_ARTM_SK(cn, 10)          ) skill[z] += skill[SK_RESIST]  / 5;  // ArTm -- Bastion
+		if ( z==SK_IMMUN                && (n=st_skillcount(cn, 22))  ) skill[z] += skill[SK_RESIST]*n/25;  // Corr -- Bastion
+		if ((z==SK_RESIST||z==SK_IMMUN) && do_get_iflag(cn, SF_HERMIT)) skill[z]  = skill[z]*4/5;           // Hermit tarot
+		
+		if (cz) cn = cz;
 		
 		set_skill_score(cn, z, skill[z]);
 		
-		if (z==0 && bbelt)
-		{
-			weapon     += min(AT_CAP, skill[z])/2;
-			tempWeapon += min(AT_CAP, skill[z])/2;
-		}
-		
-		if (z==0 && wbelt)
-		{
-			weapon     += min(AT_CAP, skill[z])/3;
-			tempWeapon += min(AT_CAP, skill[z])/3;
-		}
+		if (z==0 && bbelt) { weapon += min(AT_CAP, skill[z])/2; tempWeapon += min(AT_CAP, skill[z])/2; }    // Black belt
+		if (z==0 && wbelt) { weapon += min(AT_CAP, skill[z])/3; tempWeapon += min(AT_CAP, skill[z])/3; }    // White belt
 	}
 	
 	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4) { cz=cn; cn=co; }
