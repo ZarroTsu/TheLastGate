@@ -7515,7 +7515,8 @@ int get_skill_score(int cn, int n)
 	{
 		return min(300, max(1, (getrank(cn)+1)*8));
 	}
-	return ( (ch[cn].skill[n][4] << 8) | ch[cn].skill[n][5] );
+	
+	return ( (ch[cn].skill[n][4] << 8) | ch[cn].skill[n][5] ) + (IS_SPELL(n) ? ch[cn].spell_pow : 0);
 }
 void set_skill_score(int cn, int z, int n)
 {
@@ -12609,14 +12610,14 @@ void really_update_char(int cn)
 		Flat additive value to all spells. WIP -- need client-side adjustments to display it.
 	*/
 	
-	// Clamp spell_mod between 0 and 300
-	if (spell_pow > 300)
+	// Clamp spell_pow between -300 and 300
+	if (spell_pow >  300)
 	{
-		spell_pow = 300;
+		spell_pow =  300;
 	}
-	if (spell_pow < 0)
+	if (spell_pow < -300)
 	{
-		spell_pow = 0;
+		spell_pow = -300;
 	}
 	ch[cn].spell_pow = spell_pow;
 	
