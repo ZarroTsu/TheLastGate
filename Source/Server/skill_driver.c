@@ -1932,11 +1932,9 @@ int get_target_resistance(int cn, int co)
 		if (do_get_iflag(cn, SF_CHARIO_R))
 			target_resist = target_resist * 3/4;
 		
-		n = st_skillcount(cn,  6)*4;
+		n = T_SEYA_SK(cn,  6)*20 + TC_SK(cn,  6)*10;    // Scorn
 		
-		// Tree - seya
-		if (T_SEYA_SK(cn, 6)) target_resist = target_resist*( 80-n)/100;
-		else                  target_resist = target_resist*(100-n)/100;
+		target_resist = target_resist*max(10, 100-n)/100;
 		
 		// Lethargy - penetrate
 		if (in = has_buff(cn, SK_LETHARGY))
@@ -2744,8 +2742,9 @@ int common_mult(int cn, int co, int power)
 {
 	int n;
 	
-	if (T_SEYA_SK(co, 10))                power = power*4/5;
-	if (n = st_skillcount(co, 10))        power = power*(20-n)/20;
+	if (T_SEYA_SK(cn, 10))        power = power*             80 /100;   // Enigmatic
+	if (n = TC_SK(cn, 10))        power = power*max(10,100-n*10)/100;
+	
 	if (do_get_iflag(cn, SF_CHARIO_R))    power = power*4/5;
 	if (do_get_iflag(co, SF_EN_LESSDEBU)) power = power*4/5;
 	
@@ -5325,18 +5324,6 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 			cap                     = ch[cc].mana[2] + (ch[cm].mana[5] * gcm/1000);
 			ch[cc].mana[0]          = max( 50, min(cap + max(0, root - cap)/8, root));
 		} else ch[cc].mana[0]       = 0;
-		
-		// Tree - Seyan GC/SC learns Regen
-		if (T_SEYA_SK(cm,  9))
-		{
-			root                    = base * 5 / max(1, 8) + (M_SK(cm, n) * gcm/2000);
-			cap                     = 60                   + (M_SK(cm, n) * gcm/1000);
-			B_SK(cc, SK_HEAL)       = max(  0, min(cap + max(0, root - cap)/8, root));
-			
-			in                      = god_create_item(IT_CH_STAR);
-			ch[cc].worn[WN_CHARM]   = in;
-			it[in].carried          = cc;
-		}
 		
 		// Tree - Summoner GC learns Dispel
 		if (!shadowcopy && T_SUMM_SK(cm, 10))

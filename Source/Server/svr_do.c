@@ -10813,183 +10813,6 @@ int do_char_can_see_item(int cn, int in)
 	return(d);
 }
 
-// dmg_bns = do_get_tree_value(dmg_bns, cn, TSK_SEYA_ABSO, bcount);
-int do_get_tree_value(int v, int cn, int n, int a)
-{
-	int m = 2;
-	
-	// Return if we don't have the skill
-	if (n >= 12*0 && n <= 12*1-1 && !T_SEYA_SK(cn, n%12+1)) return v;
-	if (n >= 12*1 && n <= 12*2-1 && !T_ARTM_SK(cn, n%12+1)) return v;
-	if (n >= 12*2 && n <= 12*3-1 && !T_SKAL_SK(cn, n%12+1)) return v;
-	if (n >= 12*3 && n <= 12*4-1 && !T_WARR_SK(cn, n%12+1)) return v;
-	if (n >= 12*4 && n <= 12*5-1 && !T_SORC_SK(cn, n%12+1)) return v;
-	if (n >= 12*5 && n <= 12*6-1 && !T_SUMM_SK(cn, n%12+1)) return v;
-	if (n >= 12*6 && n <= 12*7-1 && !T_ARHR_SK(cn, n%12+1)) return v;
-	if (n >= 12*7 && n <= 12*8-1 && !T_BRAV_SK(cn, n%12+1)) return v;
-	if (n >= 12*8 && n <= 12*9-1 && !T_LYCA_SK(cn, n%12+1)) return v;
-	
-	// Get corruptor count as multiplier
-	if (n >= (TSK_MAX/2)) m = st_skillcount(cn, n % (TSK_MAX/2));
-	
-	switch (n % (TSK_MAX/2))
-	{
-		case TSK_SEYA_ACCU: return (v + 2*m);
-		case TSK_SEYA_EXPE: return (v + 1*m);
-		case TSK_SEYA_AVOI: return (v + 2*m);
-		
-		case TSK_SEYA_ABSO: return (v * min(120, 100 + a*m)/100);	// Multiplier - input number of buffs
-		case TSK_SEYA_RIGO: return (v + 2*m);						// Input current %, output new % ( 100 + 4 = 104% )
-		case TSK_SEYA_SCOR: return max(0, v - 10*m);				// Input current %, output new % ( 100 - 20 = 80% )
-		
-		case TSK_SEYA_DETE: return (v + a*m/50);					// +1 per 25 == +2 per 50
-		case TSK_SEYA_JACK: return (v + 5*m);
-		case TSK_SEYA_INDI: return (v + a*m/50);					// +1 per 25 == +2 per 50
-		
-		case TSK_SEYA_ENIG: return max(0, v - 10*m);				// Input current %, output new % ( 100 - 20 = 80% )
-		case TSK_SEYA_FLEX: return (v + 2*m);						// Input current %, output new % ( 100 + 4 = 104% )
-		case TSK_SEYA_PENA: return (v * max(80, 100 - a*m)/100);	// Multiplier - input number of buffs
-		
-		
-		case TSK_ARTM_RAVA: return (v + 3*m);
-		case TSK_ARTM_MIGH: return (v + 3*m);
-		case TSK_ARTM_TOUG: return (v + 2*m);
-		
-		case TSK_ARTM_BULW: return (v * max(0, 100 - 15*m)/100);	// Multiplier
-		case TSK_ARTM_VANQ: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_ARTM_IMPA: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		
-		case TSK_ARTM_BARB: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		case TSK_ARTM_STRE: return (a?(v + 5*m):(v + 3*m));			// "a" boolean for two values : +# vs +%
-		case TSK_ARTM_OVER: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		
-		case TSK_ARTM_RAMP: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		case TSK_ARTM_UNBR: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_ARTM_TEMP: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		
-		
-		case TSK_SKAL_DECI: return (v + m);
-		case TSK_SKAL_DEXT: return (v + 3*m);
-		case TSK_SKAL_WALL: return (v + 2*m);
-		
-		case TSK_SKAL_LITH: return max(0, v - 25*m);				// Input current %, output new % ( 100 - 50 = 50% )
-		case TSK_SKAL_BRUT: return (v + 5*m);
-		case TSK_SKAL_CRUS: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		
-		case TSK_SKAL_NOCT: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		case TSK_SKAL_AGIL: return (a?(v + 5*m):(v + 3*m));			// "a" boolean for two values : +# vs +%
-		case TSK_SKAL_CELE: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		
-		case TSK_SKAL_GUAR: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		case TSK_SKAL_SANC: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_SKAL_BAST: return (v + 10*m);						// Input current %, output new % (   0 + 20 =  20% )
-		
-		
-		case TSK_WARR_RAPI: return (v + 3*m);
-		case TSK_WARR_RUFF: return (v + 2*m);
-		case TSK_WARR_STAM: return (v + 15*m);
-		
-		case TSK_WARR_DISM: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		case TSK_WARR_SWIF: return (v + 10*m);						// Input current %, output new % ( 100 + 20 = 120% )
-		case TSK_WARR_FLAS: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		
-		case TSK_WARR_SLAY: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		case TSK_WARR_HARR: return (v + 2*m);						// Input current %, output new % ( 100 +  4 = 104% )
-		case TSK_WARR_ANTA: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		
-		case TSK_WARR_CHAM: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		case TSK_WARR_PERS: return (a?(v + 10*m):(v + 1*m));		// "a" boolean for two values : +% vs +%
-		case TSK_WARR_TENA: return (v + 25*m);						// Input current %, output new % (   0 + 50 =  50% )
-		
-		
-		case TSK_SORC_PASS: return (v + 2*m);
-		case TSK_SORC_POTE: return (v + 2*m);
-		case TSK_SORC_QUIC: return (v + 3*m);
-		
-		case TSK_SORC_INTR: return (v + a*m/100);					// +1 per 50 == +2 per 100
-		case TSK_SORC_ZEAL: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_SORC_REWI: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		
-		case TSK_SORC_TOXI: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		case TSK_SORC_PRAG: return (v + 2*m);						// Input current %, output new % ( 100 +  4 = 104% )
-		case TSK_SORC_HEXM: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		
-		case TSK_SORC_FAST: return (v + 15*m);						// Input current %, output new % (   0 + 15 =  15% ) -- Boolean for non-corruption
-		case TSK_SORC_FLEE: return (v + 10*m);						// Input current %, output new % ( 100 + 20 = 120% )
-		case TSK_SORC_DODG: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		
-		
-		case TSK_SUMM_NIMB: return (v + 3*m);
-		case TSK_SUMM_WISD: return (v + 3*m);
-		case TSK_SUMM_BARR: return (v + 2*m);
-		
-		case TSK_SUMM_TACT: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		case TSK_SUMM_SPEL: return (v + 10*m);						// Input current %, output new % ( 100 + 20 = 120% )
-		case TSK_SUMM_STRA: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		
-		case TSK_SUMM_MYST: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		case TSK_SUMM_WILL: return (a?(v + 5*m):(v + 3*m));			// "a" boolean for two values : +# vs +%
-		case TSK_SUMM_SHAP: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		
-		case TSK_SUMM_DIVI: return (v + 2*m);						// Input current %, output new % (   0 +  2 =   2% ) -- Boolean for non-corruption
-		case TSK_SUMM_CONS: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_SUMM_NECR: return (v + 1*m);						// Input current %, output new % (   0 +  2 =   2% )
-		
-		
-		case TSK_ARHR_COMP: return (v + 2*m);
-		case TSK_ARHR_INTE: return (v + 3*m);
-		case TSK_ARHR_WELL: return (v + 15*m);
-		
-		case TSK_ARHR_MALI: return (v + 15*m);						// Input current %, output new % (   0 + 15 =  15% ) -- Boolean for non-corruption
-		case TSK_ARHR_SERE: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_ARHR_DEST: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		
-		case TSK_ARHR_PSYC: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		case TSK_ARHR_INTU: return (a?(v + 5*m):(v + 3*m));			// "a" boolean for two values : +# vs +%
-		case TSK_ARHR_CONC: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		
-		case TSK_ARHR_FLOW: return (v + a*m/200);					// +1 per 100 == +2 per 200
-		case TSK_ARHR_PERP: return (a?(v + 10*m):(v + 1*m));		// "a" boolean for two values : +% vs +%
-		case TSK_ARHR_RESO: return (v + 25*m);						// Input current %, output new % (   0 + 50 =  50% )
-		
-		
-		case TSK_BRAV_MUSC: return (v + 2*m);
-		case TSK_BRAV_BOLD: return (v + 3*m);
-		case TSK_BRAV_MIND: return (v + 2*m);
-		
-		case TSK_BRAV_PERF: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		case TSK_BRAV_VALO: return (v + 5*m);						// Input current %, output new % ( 100 + 10 = 110% )
-		case TSK_BRAV_PRES: return (v + 1*m);						// Boolean for non-corruption
-		
-		case TSK_BRAV_VIRT: return (v + 5*m);						// Input current %, output new % (   0 + 10 =  10% )
-		case TSK_BRAV_BRAV: return (a?(v + 5*m):(v + 3*m));			// "a" boolean for two values : +# vs +%
-		case TSK_BRAV_ALAC: return (v + a*m/20);					// +1 per 10 == +2 per 20
-		
-		case TSK_BRAV_SPEL: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		case TSK_BRAV_WIZA: return (v + 10*m);						// Input current %, output new % ( 100 + 20 = 120% )
-		case TSK_BRAV_RESI: return (v + 25*m);						// Input current %, output new % (   0 + 50 =  50% )
-		
-		
-		case TSK_LYCA_EXPA: return (v + 1*m);
-		case TSK_LYCA_FEAS: return (v + 15*m);
-		case TSK_LYCA_SHAR: return (v + 3*m);
-		
-		case TSK_LYCA_SICK: return (v + 5*m);						// Boolean for non-corruption
-		case TSK_LYCA_PRID: return (v + 25*m);						// Input current %, output new % (   0 + 50 =  50% )
-		case TSK_LYCA_GREE: return (v + 1*m);						// Input current %, output new % (   0 +  2 =   2% )
-		
-		case TSK_LYCA_LUST: return (v + 25*m);						// Input current %, output new % (   0 + 50 =  50% )
-		case TSK_LYCA_GLUT: return (a?(v + 10*m):(v + 1*m));		// "a" boolean for two values : +% vs +%
-		case TSK_LYCA_WRAT: return (v + a*m/100);					// +1 per 50 == +2 per 100
-		
-		case TSK_LYCA_SLOT: return (v + 10*m);						// Input current %, output new % (   0 + 20 =  20% )
-		case TSK_LYCA_ENVY: return (v + 10*m);						// Input current %, output new % ( 100 + 20 = 120% )
-		case TSK_LYCA_SERR: return (v + 15*m);						// Input current %, output new % ( 100 + 15 = 115% ) -- Boolean for non-corruption
-		
-		default: break;
-	}
-}
-
 int do_check_tarot(int in, int temp)
 {
 	if (it[in].temp==temp || (IS_SINBINDER(in) && it[in].data[2]==temp)) return 1;
@@ -11083,7 +10906,7 @@ void really_update_char(int cn)
 {
 	int n, m, t, oldlight, z, sublight = 0, maxlight = 0, co=0, cz=0, bits=0;
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0, pigsblood = 0;
-	int heal_hp, heal_end, heal_mana, tmpa = 0, tmpw = 0, act = 0, tmphm = 0, gench = 0;
+	int heal_hp, heal_end, heal_mana, act = 0, tmphm = 0, gench = 0;
 	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0, in=0, nmz=0;
 	int isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0;
 	int divCursed = 1, divSlowed = 1, divWeaken = 1, symSpec = 0;
@@ -11832,12 +11655,16 @@ void really_update_char(int cn)
 		if (bu[m].data[3]==BUF_IT_PIGS) pigsblood = 1;
 	}
 	
-	// Tree flat passive bonuses
-	if (T_SEYA_SK(cn, 1)) weapon += 2;
-	if (T_SEYA_SK(cn, 2)) { for (z = 0; z<5; z++) attrib[z] += 2; }
-	if (T_SEYA_SK(cn, 3)) armor += 2;
-	if (T_SEYA_SK(cn, 4)) dmg_bns = dmg_bns * (1000 + bcount*5)/1000;
-	if (T_SEYA_SK(cn, 8)) 
+	// Tree passive bonuses
+	if (T_SEYA_SK(cn,  1))                   hit_rate   +=   4;   // Accuracy
+	if (n = TC_SK(cn,  1))                   hit_rate   += n*2;
+	if (T_SEYA_SK(cn,  2)) for (z=0;z<5;z++) attrib[z]  +=   2;   // Expertise
+	if (n = TC_SK(cn,  2)) for (z=0;z<5;z++) attrib[z]  += n*1;
+	if (T_SEYA_SK(cn,  3))                   parry_rate +=   4;   // Avoidance
+	if (n = TC_SK(cn,  3))                   parry_rate += n*2;
+	if (T_SEYA_SK(cn,  4)) dmg_bns = dmg_bns*(100+bcount*2)/100;  // Absolution
+	if (n = TC_SK(cn,  4)) dmg_bns = dmg_bns*(100+bcount*n)/100;
+	if (T_SEYA_SK(cn,  8))                                        // Jack of All Trades
 	{
 		do_add_ieffect(cn, VF_EN_MOREBRV, 4);
 		do_add_ieffect(cn, VF_EN_MOREWIL, 4);
@@ -11845,8 +11672,12 @@ void really_update_char(int cn)
 		do_add_ieffect(cn, VF_EN_MOREAGL, 4);
 		do_add_ieffect(cn, VF_EN_MORESTR, 4);
 	}
-	if (T_SEYA_SK(cn,12)) dmg_rdc = dmg_rdc * (1000 - bcount*5)/1000;
+	if (T_SEYA_SK(cn, 12)) dmg_rdc = dmg_rdc*(100-bcount*2)/100;  // Penance
+	if (n = TC_SK(cn, 12)) dmg_rdc = dmg_rdc*(100-bcount*n)/100;  // Penance
 	//
+	
+	
+	/*
 	if (T_ARTM_SK(cn, 1)) gethit += 5;
 	if (T_ARTM_SK(cn, 2)) attrib[AT_STR] += 4;
 	if (T_ARTM_SK(cn, 3)) armor += 3;
@@ -11898,12 +11729,6 @@ void really_update_char(int cn)
 	if (T_LYCA_SK(cn,11)) spell_mod += 3;
 	//
 	// Corruption Effects
-	n = st_skillcount(cn,  1); weapon                          += n;
-	n = st_skillcount(cn,  2); for (z = 0; z<5; z++) attrib[z] += n;
-	n = st_skillcount(cn,  3); armor                           += n;
-	n = st_skillcount(cn,  4); dmg_bns = dmg_bns * (1000 + bcount*n*2)/1000;
-	n = st_skillcount(cn, 12); dmg_rdc = dmg_rdc * (1000 - bcount*n*2)/1000;
-	//
 	n = st_skillcount(cn, 13); gethit         += n*2;
 	n = st_skillcount(cn, 14); attrib[AT_STR] += n*2;
 	n = st_skillcount(cn, 20); do_add_ieffect(cn, VF_EN_MORESTR, n*2);
@@ -11945,6 +11770,7 @@ void really_update_char(int cn)
 	n = st_skillcount(cn, 98); hp += n*5; end += n*5; mana += n*5;
 	n = st_skillcount(cn,107); spell_mod      += n;
 	//
+	*/
 	//
 	
 	// Special check for heatstroke removal
@@ -12019,9 +11845,10 @@ void really_update_char(int cn)
 	}
 	ch[cn].limit_break[5][1]  = max(-127, min(127, suppression));
 	ch[cn].limit_break[5][1] += min(5,max(0,bits/6));
-	if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[5][1] += 3;
-	if (n = st_skillcount(cn, 8)) ch[cn].limit_break[5][1] += n*2;
-	// if (IS_BLOODY(cn)) ch[cn].limit_break[5][1] += 33;
+	
+	if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[5][1] += 5;
+	
+	if (n = TC_SK(cn, 8)) ch[cn].limit_break[5][1] += n*5;  // *Master of None
 	
 	// Weapon - Fist of the Heavens :: best attribute times 1.2
 	if (do_get_iflag(cn, SF_TW_HEAVENS))
@@ -12429,9 +12256,11 @@ void really_update_char(int cn)
 		}
 	}
 	
-	// Tree - Attribute mods
-	if (T_SEYA_SK(cn, 7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } hit_rate+=m/100; parry_rate+=m/100; }
-	if (n = st_skillcount(cn,  7)) { m = (ch[cn].hp[5]*1000-ch[cn].a_hp)/1000; hit_rate+=m*n/100; parry_rate+=m*n/100; }
+	// Tree - Attribute counter mods
+	if (T_SEYA_SK(cn,  7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=  m/25; armor+=  m/25; } // Determination
+	if (n = TC_SK(cn,  7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=n*m/50; armor+=n*m/50; }
+	if (T_SEYA_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=  m/25; }             // Brilliance
+	if (n = TC_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/50; }
 	
 	/*
 		ch[].mana_cost
@@ -12890,7 +12719,13 @@ void really_update_char(int cn)
 	if (do_get_iflag(cn, SF_STRENG_R))
 		hit_rate = hit_rate * 4/5;
 	
-	// Tree - brav
+	// Skill tree passive multipliers
+	n = T_SEYA_SK(cn,  5)*4 + TC_SK(cn,  5)*2;   // Rigor
+	hit_rate = hit_rate * (100+n)/100;
+	
+	n = T_SEYA_SK(cn, 11)*4 + TC_SK(cn, 11)*2;   // Flexibility
+	hit_rate = hit_rate * (100+n)/100;
+	
 	if (T_BRAV_SK(cn,  5))         hit_rate   = hit_rate  *104/100;
 	if (T_BRAV_SK(cn, 11))         parry_rate = parry_rate*104/100;
 	if (n = st_skillcount(cn, 89)) hit_rate   = hit_rate  *(100+n)/100;
@@ -12904,30 +12739,6 @@ void really_update_char(int cn)
 			hit_rate   = hit_rate  *6/5;
 			parry_rate = parry_rate*6/5;
 		}
-	}
-	
-	// GC parent override (seya tree)
-	if (IS_PLAYER_COMP(cn) && (m = CN_OWNER(cn)))
-	{
-		if (T_SEYA_SK(m, 9))
-		{
-			hit_rate   = ch[m].to_hit;
-			parry_rate = ch[m].to_parry;
-		}
-		
-		if (n = st_skillcount(m,  9))
-		{
-			hit_rate   += hit_rate   * (n*2) / 100;
-			parry_rate += parry_rate * (n*2) / 100;
-		}
-		
-		/*
-		if (is_atpandium(cn) && is_atpandium(m))
-		{
-			hit_rate   = hit_rate  *11/10;
-			parry_rate = parry_rate*11/10;
-		}
-		*/
 	}
 	
 	if (attaunt)
@@ -13028,22 +12839,17 @@ void really_update_char(int cn)
 		weapon = weapon * 112/100;
 	}
 	// Tree - % more wv/av
-	if (T_SEYA_SK(cn,  5))       weapon = weapon * 106 / 100;
+	
 	if (T_SKAL_SK(cn,  5))       weapon = weapon * 109 / 100;
-	if (T_SEYA_SK(cn, 11))       armor  = armor  * 106 / 100;
 	if (T_ARTM_SK(cn, 11))       armor  = armor  * 109 / 100;
 	//
 	if (n=st_skillcount(cn, 23)) armor  = armor  * (100+n*3) / 100;
 	if (n=st_skillcount(cn, 29)) weapon = weapon * (100+n*3) / 100;
 	//
-	if (n=st_skillcount(cn,  5)) tmpw = armor  * (n*2) / 100;
-	if (n=st_skillcount(cn, 11)) tmpa = weapon * (n*2) / 100;
-	//
 	
 	if (ch[cn].temp == CT_PIRATELORD && IS_SANEITEM(m = map[1331331].it) && !(it[in].active))
 		armor += 100;
 	
-	armor += tmpa;
 	if (armor<0)
 	{
 		armor = 0;
@@ -13061,7 +12867,6 @@ void really_update_char(int cn)
 	if (do_get_iflag(cn, SF_EN_AVASIMM))
 		set_skill_score(cn, SK_IMMUN, skill[SK_IMMUN] + armor/10);
 	
-	weapon += tmpw;
 	if (weapon<0)
 	{
 		weapon = 0;
