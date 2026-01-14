@@ -652,8 +652,9 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 	
 	r += n;
 	
-	if (!(ch[(cn)].flags & CF_AREA_OFF))
-		r = r + r * prox_power/200;
+	r = r + r * prox_power/200;
+	r = r * (100+st_skillcount(cn,53)*5)/100; //  5% more per corruptor
+	r = r * (T_SORC_SK(cn, 5) ? 120:100)/100; // 20% more for tree skill
 	
 	return (r * 11/10); // 10% more oomph to make the circles more circular
 }
@@ -872,13 +873,12 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 // avgdmg     = damage already dealt before now (ie. targeted spell)    - critDam for SH
 int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_power, int count, int hit, int avgdmg)
 {
-	int co, r, no_target = 0, sc = 0, aoeImm = 0;
+	int co, no_target = 0, sc = 0, aoeImm = 0;
 	int x, xc, xf, xt, y, yc, yf, yt;
+	int r = get_aoe_radius(cn, intemp, prox_power);
 	int countskip = 0;
 	
-	r = get_aoe_radius(cn, intemp, prox_power);
-	r = r * (100+st_skillcount(cn,53)*5)/100; //  5% more per corruptor
-	r = r * (T_SORC_SK(cn, 5) ? 120:100)/100; // 20% more for tree skill
+	if (ch[(cn)].flags & CF_AREA_OFF) r = 100;
 	
 	switch (intemp)
 	{
