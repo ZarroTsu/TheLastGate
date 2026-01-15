@@ -2146,6 +2146,7 @@ int add_spell(int cn, int in)
 
 				if (do_get_iflag(cn, SF_BOOK_HOLY))        stack--;    // [Book] Holy Etiquette
 				if (has_spell_from_item(cn, BUF_IT_DRAG))  stack--;    // [Food] Dragon's Breath
+				if (do_get_iflag(cn, SF_TEMPER_R))         stack++;    // [Taro] Temperance.R
 				
 				if (!IS_PLAYER(cn) && !IS_PLAYER_COMP(cn)) stack = 4;  // Monsters reach 100% heal penalty
 				
