@@ -11,6 +11,9 @@
 #define RANDOM(a)				(a>1?random()%(a):0)
 #define ARRAYSIZE(a)			(sizeof(a)/sizeof(a[0]))
 #define sqr(a)					((a) * (a))
+#define clamp(a, b, c)			(((a)>(b) ? (b)) : ((a)<(c) ? (c) : (a)))		// clamp value (a) between values (b) and (c)
+#define more(a, b, c)			((a) * max(0,(c*100) + (b))/max(1,(c*100))		// increase value (a) by 1% per (c) of value (b)
+#define less(a, b, c)			((a) * max(0,(c*100) - (b))/max(1,(c*100))		//   reduce value (a) by 1% per (c) of value (b)
 
 // Sanity checks on map locations x and y
 #define SANEX(x)     			((x) >= 0 && (x) < MAPX)
@@ -157,7 +160,7 @@ int is_ascroll(int in);
 
 // flag checks
 #define IS_PLAYER(cn)			((ch[(cn)].flags & CF_PLAYER) != 0)
-#define IS_STAFF(cn)			((ch[(cn)].flags & CF_STAFF) != 0)
+#define IS_STAFFER(cn)			((ch[(cn)].flags & CF_STAFF) != 0)
 #define IS_GOD(cn)				((ch[(cn)].flags & CF_GOD) != 0)
 #define IS_USURP(cn)			((ch[(cn)].flags & CF_USURP) != 0)
 #define IS_IMP(cn)				((ch[(cn)].flags & CF_IMP) != 0)
@@ -196,7 +199,7 @@ int is_ascroll(int in);
 
 // Ditto, with sanity check
 #define IS_SANEPLAYER(cn)		(IS_SANECHAR(cn) && IS_PLAYER(cn))
-#define IS_SANESTAFF(cn)		(IS_SANECHAR(cn) && IS_STAFF(cn))
+#define IS_SANESTAFF(cn)		(IS_SANECHAR(cn) && IS_STAFFER(cn))
 #define IS_SANEGOD(cn)			(IS_SANECHAR(cn) && IS_GOD(cn))
 #define IS_SANEUSURP(cn)		(IS_SANECHAR(cn) && IS_USURP(cn))
 // IS_SANENPC is derived. No IS_NPC because of... logic.

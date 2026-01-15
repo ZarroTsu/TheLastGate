@@ -108,7 +108,7 @@ void discord_top_five(void)
 		for (m = 0; m<DISC_T; m++)
 		{
 			if (nr[j][m]==-1) continue;
-			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			font = (IS_STAFFER(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
 			
 			r1 = ch[nr[j][m]].points_tot / 1000000000;
 			r2 = ch[nr[j][m]].points_tot / 1000000 % 1000;
@@ -167,7 +167,7 @@ void discord_top_five(void)
 		for (m = 0; m<DISC_T; m++)
 		{
 			if (nr[j][m]==-1) continue;
-			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			font = (IS_STAFFER(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
 			
 			r1 = ch[nr[j][m]].points_tot / 1000000000;
 			r2 = ch[nr[j][m]].points_tot / 1000000 % 1000;
@@ -226,7 +226,7 @@ void discord_top_five(void)
 		for (m = 0; m<DISC_T; m++)
 		{
 			if (nr[j][m]==-1) continue;
-			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			font = (IS_STAFFER(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
 			
 			r1 = ch[nr[j][m]].points_tot / 1000000000;
 			r2 = ch[nr[j][m]].points_tot / 1000000 % 1000;
@@ -366,7 +366,7 @@ void discord_pandium(void)
 		for (m = 0; m<(j?DISC_P:DISC_T); m++)
 		{
 			if (nr[j][m]==-1) continue;
-			font = (IS_STAFF(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
+			font = (IS_STAFFER(nr[j][m]) || IS_GOD(nr[j][m])) ? 1 : 0;
 			
 			cl = -1;
 			if (IS_SEYAN_DU(nr[j][m]))    cl = 0;
@@ -415,7 +415,7 @@ void discord_who(void)
 		}
 		players++;
 		/* color staff and gods green */
-		font = (IS_STAFF(n) || IS_GOD(n)) ? 1 : 0;
+		font = (IS_STAFFER(n) || IS_GOD(n)) ? 1 : 0;
 
 		showarea = 1;
 		if (ch[n].flags & CF_GOD)

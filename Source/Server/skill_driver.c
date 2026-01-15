@@ -2144,14 +2144,10 @@ int add_spell(int cn, int in)
 				// Multiple heals stack 'healing sickness' (SK_HEAL), reducing heal power
 				stack=3;
 
-				if (do_get_iflag(cn, SF_BOOK_HOLY)) // Book: Holy Etiquette
-					stack--;
-				if (has_spell_from_item(cn, BUF_IT_DRAG)) // Dragon's Breath
-					stack--;
-				if (do_get_iflag(cn, SF_TEMPER_R)) // Tarot - Temperance.R : +1 stack max
-					stack++;
-					
-				if (!(IS_PLAYER(cn) || IS_PLAYER_COMP(cn))) stack = 4;
+				if (do_get_iflag(cn, SF_BOOK_HOLY))        stack--;    // [Book] Holy Etiquette
+				if (has_spell_from_item(cn, BUF_IT_DRAG))  stack--;    // [Food] Dragon's Breath
+				
+				if (!IS_PLAYER(cn) && !IS_PLAYER_COMP(cn)) stack = 4;  // Monsters reach 100% heal penalty
 				
 				bu[in].data[1] = bu[in2].data[1] + 1;
 				
@@ -2742,7 +2738,7 @@ int common_mult(int cn, int co, int power)
 {
 	int n;
 	
-	if (T_SEYA_SK(cn, 10))        power = power*             80 /100;   // Enigmatic
+	if (T_SEYA_SK(cn, 10))        power = power*             80 /100;   // (Seya) Enigmatic
 	if (n = TC_SK(cn, 10))        power = power*max(10,100-n*10)/100;
 	
 	if (do_get_iflag(cn, SF_CHARIO_R))    power = power*4/5;
@@ -3146,9 +3142,6 @@ int spell_plague(int cn, int co, int flag)
 	
 	power = M_SK(cn, SK_FEROC);
 	power = spell_multiplier(power, cn);
-	
-	if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = power*6/5;
-	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
 	
@@ -3554,8 +3547,14 @@ int spell_stun(int cn, int co, int power)
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
-	if (T_ARTM_SK(cn,  7)) 				power = power + (power * M_AT(cn, AT_STR)/2000);
-	if (n=st_skillcount(cn, 19))        power = power + (power*M_AT(cn, AT_STR)*n/5000);
+	// "Increased" effects
+	{
+		n  = 0;
+		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
+		n +=     TC_SK(cn, 21)*1;
+		
+		power = more(power, n, 20);
+	}
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -3576,8 +3575,14 @@ int spell_rally(int cn, int co, int power)
 {
 	int in, n;
 	
-	if (T_ARTM_SK(cn, 7))        power = power + (power * M_AT(cn, AT_STR)/2000);
-	if (n=st_skillcount(cn, 19)) power = power + (power*M_AT(cn, AT_STR)*n/5000);
+	// "Increased" effects
+	{
+		n  = 0;
+		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
+		n +=     TC_SK(cn, 21)*1;
+		
+		power = more(power, n, 20);
+	}
 	
 	if (!(in = make_new_buff(cn, SK_WARCRY3, BUF_SPR_WARCRY3, power, SP_DUR_RALLY, 1))) 
 		return 0;
@@ -3677,8 +3682,14 @@ int spell_warcry(int cn, int co, int power, int flag)
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
-	if (!flag && T_ARTM_SK(cn,  7)) 	  power = power + (power * M_AT(cn, AT_STR)/2000);
-	if (!flag&&(n=st_skillcount(cn, 19))) power = power + (power*M_AT(cn, AT_STR)*n/5000);
+	// "Increased" effects
+	{
+		n  = 0;
+		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
+		n +=     TC_SK(cn, 21)*1;
+		
+		power = more(power, n, 20);
+	}
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -5691,10 +5702,11 @@ int spell_bleed(int cn, int co, int power)
 	
 	if (GET_SFAIL(cn, co)) return 0;
 	
-	if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = power*6/5;
-	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
+	
+	if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                 // [Ench] More Bleed
+	if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 2);  // (Lyca) Serration
 	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	
@@ -5726,9 +5738,9 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	
 	chlog(cn, "Used Cleave on %s", ch[co].name);
 	
-	if (T_ARTM_SK(cn, 4))        hitpower = hitpower + ch[cn].gethit_dam;
 	if (T_WARR_SK(cn, 9))        hitpower = hitpower + (hitpower * M_AT(cn, AT_STR)/2000);
 	if (n=st_skillcount(cn, 45)) hitpower = hitpower + (hitpower*M_AT(cn, AT_STR)*n/5000);
+	
 	hitpower = skill_immunity(co, hitpower) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
 	

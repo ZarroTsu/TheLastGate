@@ -1417,7 +1417,7 @@ void god_who(int cn)
 			// only imps below this point
 			font = 3; // NOWHO'd chars are blue for imps
 		}
-		else if (IS_STAFF(n) || IS_GOD(n))
+		else if (IS_STAFFER(n) || IS_GOD(n))
 		{
 			// staff and gods are green for everyone
 			font = 2;
@@ -1537,7 +1537,7 @@ void user_who(int cn)
 		}
 		players++;
 		/* color staff and gods green */
-		font = (IS_STAFF(n) || IS_GOD(n)) ? 2 : 1;
+		font = (IS_STAFFER(n) || IS_GOD(n)) ? 2 : 1;
 
 		showarea = 1;
 		if ((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD))

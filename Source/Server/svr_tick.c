@@ -1967,17 +1967,21 @@ int get_meta_stat_value(int cn, int n)
 		//
 		case 24: // Cleave Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
-			if (T_ARTM_SK(cn, 4))         power = power + ch[cn].gethit_dam;
+			
 			if (T_WARR_SK(cn, 9))         power = power + (power * M_AT(cn, AT_STR)  / 2000);
 			if (m=st_skillcount(cn, 45))  power = power + (power * M_AT(cn, AT_STR)*m/ 5000);
+			
 			value = power * DAM_MULT_CLEAVE/1000;
 			break;
 		case 25: // Cleave Bleed Degen				Decimal, 0.00 /s
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
-			if (T_ARTM_SK(cn, 4))         power = power + ch[cn].gethit_dam;
-			if (T_WARR_SK(cn, 9))         power = power + (power * M_AT(cn, AT_STR)  / 2000);
-			if (m=st_skillcount(cn, 45))  power = power + (power * M_AT(cn, AT_STR)*m/ 5000);
-			if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = power*6/5;
+			
+			if (T_WARR_SK(cn,  9))         power = power + (power * M_AT(cn, AT_STR)  / 2000);
+			if (m=st_skillcount(cn, 45))   power = power + (power * M_AT(cn, AT_STR)*m/ 5000);
+
+			if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                  // [Ench] More Bleed
+			if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 2);   // (Lyca) Serration
+			
 			value = BLEEDFORM(power, (do_get_iflag(cn, SF_GUNGNIR)?SP_DUR_BLEED/3:SP_DUR_BLEED));
 			break;
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds
@@ -2167,8 +2171,14 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 76: // Warcry Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
-			if (T_ARTM_SK(cn, 7))        power = power + (power * M_AT(cn, AT_STR)  /2000);
-			if (m=st_skillcount(cn, 19)) power = power + (power  *M_AT(cn, AT_STR)*m/5000);
+			// "Increased" effects
+			{
+				m  = 0;
+				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
+				m +=     TC_SK(cn, 21)*1;
+				
+				power = more(power, m, 20);
+			}
 			if (IS_ARCHTEMPLAR(cn)) value = (4+(power*5/8) / 5);
 			else                    value = (3+(power  /2) / 5);
 			break;
@@ -2220,8 +2230,14 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 98: // Rally Effect
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
-			if (T_ARTM_SK(cn, 7))        power = power + (power * M_AT(cn, AT_STR)  /2000);
-			if (m=st_skillcount(cn, 19)) power = power + (power  *M_AT(cn, AT_STR)*m/5000);
+			// "Increased" effects
+			{
+				m  = 0;
+				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
+				m +=     TC_SK(cn, 21)*1;
+				
+				power = more(power, m, 20);
+			}
 			value = power/10;
 			break;
 		//
@@ -3277,6 +3293,7 @@ void plr_change(int nr)
 			xsend(nr, buf, 16);
 			mcpy(cpl->name, ch[cn].name, 40);
 		}
+		
 		if (cpl->mode!=ch[cn].mode)
 		{
 			buf[0] = SV_SETCHAR_MODE;
@@ -3285,6 +3302,7 @@ void plr_change(int nr)
 
 			cpl->mode = ch[cn].mode;
 		}
+		
 		for (n = 0; n<5; n++)
 		{
 			plr_change_stat(nr, cpl->attrib[n], ch[cn].attrib[n], SV_SETCHAR_ATTRIB, n);
@@ -3294,54 +3312,12 @@ void plr_change(int nr)
 		plr_change_power(nr, cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
 		plr_change_power(nr, cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
 		
-		/*
-		if (cpl->end[0] != ch[cn].move_speed || cpl->end[1] != ch[cn].aoe_bonus || 
-			cpl->end[2] != ch[cn].dmg_bonus  || cpl->end[3] != ch[cn].dmg_reduction || 
-			cpl->end[5] != ch[cn].end[5])
-		{
-			chFlags = 0;
-			if (do_get_iflag(cn, SF_EN_MEDIREGN))    chFlags += (1 <<  0); // Half med to HP
-			if (do_get_iflag(cn, SF_EN_RESTMEDI))    chFlags += (1 <<  1); // Half end to MP
-			if (do_get_iflag(cn, SF_EN_MOREWEAK))    chFlags += (1 <<  2); // 20% more weaken effect
-			if (do_get_iflag(cn, SF_EN_MORESLOW))    chFlags += (1 <<  3); // 20% more slow effect
-			if (do_get_iflag(cn, SF_EN_MORECURS))    chFlags += (1 <<  4); // 20% more curse effect
-			if (do_get_iflag(cn, SF_EN_MOREPOIS))    chFlags += (1 <<  5); // 20% more poison effect
-			if (do_get_iflag(cn, SF_EN_MOREBLEE))    chFlags += (1 <<  6); // 20% more bleed effect
-			if (do_get_iflag(cn, SF_EN_MOREBLIN))    chFlags += (1 <<  7); // 20% more blind effect
-			if (do_get_iflag(cn, SF_EN_MOREHEAL))    chFlags += (1 <<  8); // 20% more heal effect
-			if (do_get_iflag(cn, SF_EN_TAKEASEN) || 
-				do_get_iflag(cn, SF_EN_TAKEASMA))    chFlags += (1 <<  9); // 20% damage shifted to end/mana (20% more eHP)
-			if (do_get_iflag(cn, SF_STAR_R))         chFlags += (1 << 10); // Reverse Star changes spellmod behavior
-			if (do_get_ieffect(cn, VF_EN_EXTRAVOCH)) chFlags += (1 << 11); //  5% chance to avoid being hit (5% more melee eHP)
-			if (T_SKAL_SK(cn, 12) ||
-				T_ARHR_SK(cn, 12)) 				chFlags += (1 << 12); // 20% damage shifted to end/mana (20% more eHP)
-			if (get_gear(cn, IT_WP_RISINGPHO) || 
-				get_gear(cn, IT_WB_RISINGPHO))  chFlags += (1 << 13); // Immolate skill, based off HP
-			if (do_get_iflag(cn, SF_TW_CLOAK))  chFlags += (1 << 14); // 10% damage shifted to end (10% more eHP)
-			
-			buf[0] = SV_SETCHAR_ENDUR;
-			*(unsigned short*)(buf + 1)  = (unsigned short)(ch[cn].move_speed);		// char
-			*(unsigned short*)(buf + 3)  = (unsigned short)(ch[cn].aoe_bonus);		// char
-			*(unsigned short*)(buf + 5)  = (unsigned short)(ch[cn].dmg_bonus);		// unsigned short
-			*(unsigned short*)(buf + 7)  = (unsigned short)(ch[cn].dmg_reduction);	// unsigned short
-			*(unsigned short*)(buf + 9)  = min(32767,chFlags); 		// max << 14
-			*(unsigned short*)(buf + 11) = ch[cn].end[5];
-			xsend(nr, buf, 13);
-			
-			cpl->end[0] = ch[cn].move_speed;
-			cpl->end[1] = ch[cn].aoe_bonus;
-			cpl->end[2] = ch[cn].dmg_bonus;
-			cpl->end[3] = ch[cn].dmg_reduction;
-			cpl->end[4] = min(32767,chFlags); 	// max << 14
-			cpl->end[5] = ch[cn].end[5];
-		}
-		*/
-
+		
 		for (n = 0; n<MAXSKILL; n++)
 		{
 			plr_change_stat(nr, cpl->skill[n], ch[cn].skill[n], SV_SETCHAR_SKILL, n);
 		}
-
+		
 		for (n = 0; n<MAXITEMS; n++)
 		{
 			in = ch[cn].item[n];
@@ -3426,110 +3402,29 @@ void plr_change(int nr)
 
 		for (n = 0; n<13; n++)
 		{
-			/*
-			if (n >= 13)	// Sneaky hack to pass bonus player variables
-			{
-				buf[0] = SV_SETCHAR_WORN;
-				*(unsigned long*)(buf + 1) = n;
-				if (n == WN_SPEED)	
-				{
-					*(short int*)(buf + 5) = (short int)(max(0,min(300,ch[cn].speed)));     // 0 to 300, lower is better
-					*(short int*)(buf + 7) = (short int)(max(0,min(300,ch[cn].atk_speed))); // additional speed, higher is better
-				}
-				if (n == WN_SPMOD)	
-				{
-					*(short int*)(buf + 5) = (short int)(max(0,min(300,ch[cn].spell_mod))); // 100 = 1%
-					*(short int*)(buf + 7) = (short int)(max(0,min(999,ch[cn].spell_apt))); // 
-				}
-				if (n == WN_CRIT)
-				{
-					*(short int*)(buf + 5) = (short int)(max(0,min(10000,ch[cn].crit_chance))); // 100 = 1%
-					*(short int*)(buf + 7) = (short int)(max(0,min(800,ch[cn].crit_multi)));  // % increase of damage upon a crit
-				}
-				if (n == WN_TOP)
-				{
-					*(short int*)(buf + 5) = (short int)(max(0,min(999,ch[cn].top_damage))); // STR/2 + mods
-					*(short int*)(buf + 7) = (short int)(max(0,min(999,ch[cn].gethit_dam)));
-				}
-				if (n == WN_HITPAR)
-				{
-					*(short int*)(buf + 5) = (short int)(max(0,min(999,ch[cn].to_hit)));
-					*(short int*)(buf + 7) = (short int)(max(0,min(999,ch[cn].to_parry)));
-				}
-				if (n == WN_CLDWN)
-				{
-					*(short int*)(buf + 5) = (short int)(max(0,min(1000,ch[cn].cool_bonus))); // 100 + INT/4 + mods
-					*(short int*)(buf + 7) = (short int)(max(0,min(300,ch[cn].cast_speed))); // BRV/4 + mods
-				}
-				if (n == WN_FLAGS)
-				{
-					chFlags = 0;
-					if (do_get_iflag(cn, SF_BOOK_DAMO)) chFlags += (1 <<  0);
-					if (do_get_iflag(cn, SF_STRENGTH))  chFlags += (1 <<  1);
-					if (do_get_iflag(cn, SF_HANGED))    chFlags += (1 <<  2);
-					if (do_get_iflag(cn, SF_BOOK_PROD)) chFlags += (1 <<  3);
-					if (do_get_iflag(cn, SF_BOOK_VENO)) chFlags += (1 <<  4);
-					if (do_get_iflag(cn, SF_EMPEROR))   chFlags += (1 <<  5); // Slow -> Slow 2
-					if (do_get_iflag(cn, SF_TOWER))     chFlags += (1 <<  6); // Curse -> Curse 2
-					if (do_get_iflag(cn, SF_JUDGE))     chFlags += (1 <<  7);
-					if (do_get_iflag(cn, SF_JUSTICE))   chFlags += (1 <<  8);
-					if (do_get_iflag(cn, SF_PREIST))    chFlags += (1 <<  9); // 20% eHP
-					if (do_get_iflag(cn, SF_DEATH))     chFlags += (1 << 10); // Weaken -> Weaken 2
-					if (do_get_iflag(cn, SF_MOON))      chFlags += (1 << 11);
-					if (do_get_iflag(cn, SF_SUN))       chFlags += (1 << 12);
-					if (do_get_iflag(cn, SF_WORLD))     chFlags += (1 << 13);
-					if (do_get_iflag(cn, SF_STAR))      chFlags += (1 << 14); // Heal -> Regen
-					*(short int*)(buf + 5) = min(32767,chFlags); // max << 14
-					chFlags = 0;
-					// Amulets can't all can't be true at the same time - compressing bits saves two flags
-					if (do_get_iflag(cn, SF_ANKHAMULET)) { chFlags += (1 <<  0); }
-					if (do_get_iflag(cn, SF_AMBERANKH))  { chFlags += (1 <<  1); }
-					if (do_get_iflag(cn, SF_TURQUANKH))  { chFlags += (1 <<  1); chFlags += (1 <<  0); }
-					if (do_get_iflag(cn, SF_GARNEANKH))  { chFlags += (1 <<  2); }
-					if (do_get_iflag(cn, SF_TRUEANKH))   { chFlags += (1 <<  2); chFlags += (1 <<  0); }
-					if (do_get_iflag(cn, SF_WBREATH))    { chFlags += (1 <<  2); chFlags += (1 <<  1); }
-					//
-					if (do_get_iflag(cn, SF_PREIST_R))   chFlags += (1 <<  3); // 
-				//	if ()                                chFlags += (1 <<  4); // ...
-					if (do_get_iflag(cn, SF_SHIELDBASH)) chFlags += (1 <<  5); // The Wall
-					if (do_get_iflag(cn, SF_JUDGE_R))    chFlags += (1 <<  6); // Pulse
-					if (do_get_iflag(cn, SF_JUSTIC_R))   chFlags += (1 <<  7); // Leap
-					if (globs->fullmoon)                 chFlags += (1 <<  8);
-					if (globs->newmoon)                  chFlags += (1 <<  9);
-					if (do_get_iflag(cn, SF_EMPRESS))    chFlags += (1 << 10); // Shield -> Shell
-					if (do_get_iflag(cn, SF_CHARIOT))    chFlags += (1 << 11); // Blind -> Douse
-					if (do_get_iflag(cn, SF_EMPERO_R))   chFlags += (1 << 12); // Warcry -> Rally
-					if (do_get_iflag(cn, SF_BOOK_BURN))  chFlags += (1 << 13); // Burning Book
-					if (do_get_iflag(cn, SF_TOWER_R))    chFlags += (1 << 14); // Poison -> Venom
-					*(short int*)(buf + 7) = min(32767,chFlags); // max << 14
-				}
-				
-				xsend(nr, buf, 10);
-			}
-			else */
-				if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
+			if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
 			{
 				buf[0] = SV_SETCHAR_WORN;
 				*(unsigned long*)(buf + 1) = n;
 				if (in)
 				{
-					if (it[in].active)
-					{
-						*(short int*)(buf + 5) = it[in].sprite[I_A];
-					}
-					else
-					{
-						*(short int*)(buf + 5) = it[in].sprite[I_I];
-					}
+					if (it[in].active) *(short int*)(buf + 5) = it[in].sprite[I_A];
+					else               *(short int*)(buf + 5) = it[in].sprite[I_I];
+					
 					*(short int*)(buf + 7) = it[in].placement;
+					
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 						*(short int*)(buf + 7) |= PL_WEAPON;
+					
 					if (it[in].flags & IF_SOULSTONE)
 						*(short int*)(buf + 7) |= PL_SOULSTONED;
+					
 					if (it[in].flags & IF_ENCHANTED)
 						*(short int*)(buf + 7) |= PL_ENCHANTED;
+					
 					if (it[in].flags & IF_CORRUPTED)
 						*(short int*)(buf + 7) |= PL_CORRUPTED;
+					
 					*(unsigned char*)(buf + 9) = it[in].stack;
 				}
 				else
@@ -3579,34 +3474,13 @@ void plr_change(int nr)
 			buf[0] = SV_SETCHAR_OBJ;
 			if (in & 0x80000000)
 			{
-				if ((in & 0x7fffffff)>999999)
-				{
-					*(short int*)(buf + 1) = 121;
-				}
-				else if ((in & 0x7fffffff)>99999)
-				{
-					*(short int*)(buf + 1) = 120;
-				}
-				else if ((in & 0x7fffffff)>9999)
-				{
-					*(short int*)(buf + 1) = 41;
-				}
-				else if ((in & 0x7fffffff)>999)
-				{
-					*(short int*)(buf + 1) = 40;
-				}
-				else if ((in & 0x7fffffff)>99)
-				{
-					*(short int*)(buf + 1) = 39;
-				}
-				else if ((in & 0x7fffffff)>9)
-				{
-					*(short int*)(buf + 1) = 38;
-				}
-				else
-				{
-					*(short int*)(buf + 1) = 37;
-				}
+				if ((in & 0x7fffffff)>999999)     *(short int*)(buf + 1) = 121;
+				else if ((in & 0x7fffffff)>99999) *(short int*)(buf + 1) = 120;
+				else if ((in & 0x7fffffff)>9999)  *(short int*)(buf + 1) =  41;
+				else if ((in & 0x7fffffff)>999)   *(short int*)(buf + 1) =  40;
+				else if ((in & 0x7fffffff)>99)    *(short int*)(buf + 1) =  39;
+				else if ((in & 0x7fffffff)>9)     *(short int*)(buf + 1) =  38;
+				else                              *(short int*)(buf + 1) =  37;
 				*(short int*)(buf + 3) = 0;
 				*(unsigned char*)(buf + 5) = 0;
 			}
@@ -3614,47 +3488,46 @@ void plr_change(int nr)
 			{
 				if (IS_BUILDING(cn))
 				{
-					*(short int*)(buf + 1) = 46;
-					*(short int*)(buf + 3) = 0;
-					*(unsigned char*)(buf + 5) = 0;
+					*(short int*)(buf + 1)     = 46;
+					*(short int*)(buf + 3)     =  0;
+					*(unsigned char*)(buf + 5) =  0;
 				}
 				else
 				{
-					if (it[in].active)
-					{
-						*(short int*)(buf + 1) = it[in].sprite[I_A];
-					}
-					else
-					{
-						*(short int*)(buf + 1) = it[in].sprite[I_I];
-					}
+					if (it[in].active) *(short int*)(buf + 1) = it[in].sprite[I_A];
+					else               *(short int*)(buf + 1) = it[in].sprite[I_I];
+					
 					*(short int*)(buf + 3) = it[in].placement;
+					
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 						*(short int*)(buf + 3) |= PL_WEAPON;
+					
 					if (it[in].flags & IF_SOULSTONE)
 						*(short int*)(buf + 3) |= PL_SOULSTONED;
+					
 					if (it[in].flags & IF_ENCHANTED)
 						*(short int*)(buf + 3) |= PL_ENCHANTED;
+					
 					if (it[in].flags & IF_CORRUPTED)
 						*(short int*)(buf + 3) |= PL_CORRUPTED;
+					
 					*(unsigned char*)(buf + 5) = it[in].stack;
-
+					
 					it[in].flags &= ~IF_UPDATE;
 				}
 			}
 			else
 			{
-				*(short int*)(buf + 1) = 0;
-				*(short int*)(buf + 3) = 0;
+				*(short int*)(buf + 1)     = 0;
+				*(short int*)(buf + 3)     = 0;
 				*(unsigned char*)(buf + 5) = 0;
 			}
 			xsend(nr, buf, 6);
-
+			
 			cpl->citem = in;
+			
 			if (!IS_BUILDING(cn) && !(in & 0x80000000))
-			{
 				cpl->citem_s = it[in].stack;
-			}
 		}
 		
 		if (strcmp(cpl->location, get_area_truncated(cn)))
@@ -3664,6 +3537,7 @@ void plr_change(int nr)
 			buf[0] = SV_SETCHAR_LOCA1;
 			mcpy(buf + 1, areaname, 10);
 			xsend(nr, buf, 11);
+			
 			buf[0] = SV_SETCHAR_LOCA2;
 			mcpy(buf + 1, areaname + 10, 10);
 			xsend(nr, buf, 11);
