@@ -11782,8 +11782,7 @@ void really_update_char(int cn)
 	{
 		z = M_SK(cn, SK_TACTICS);
 		
-		// Tarot - Moon.R :: 1% increased effect of tactics per 50 uncapped mana
-		if (do_get_iflag(cn, SF_MOON_R)) z = z + z * ch[cn].mana[4] / 5000;
+		if (do_get_iflag(cn, SF_MOON_R)) z = more(z, ch[cn].mana[4], 50);    // [Taro] Moon.R
 		
 		hit_rate   += max(0, z/6);
 		parry_rate += max(0, z/6);
@@ -11793,8 +11792,7 @@ void really_update_char(int cn)
 	{
 		z = M_SK(co, SK_TACTICS);
 		
-		// Tarot - Moon.R :: 1% increased effect of tactics per 50 uncapped mana
-		if (do_get_iflag(co, SF_MOON_R)) z = z + z * ch[co].mana[4] / 5000;
+		if (do_get_iflag(co, SF_MOON_R)) z = more(z, ch[co].mana[4], 50);    // [Taro] Moon.R
 		
 		hit_rate   += max(0, z/6);
 		parry_rate += max(0, z/6);
