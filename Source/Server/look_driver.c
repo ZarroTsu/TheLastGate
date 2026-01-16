@@ -442,14 +442,14 @@ void look_extra(int cn, int in)
 	case 13: do_char_log(cn, 8, "20%% more effect of Slows you inflict.\n"); break;
 	case 14: do_char_log(cn, 8, "Slows inflicted on you are 80%% weaker.\n"); break;
 	case 15: do_char_log(cn, 8, "Cannot lose focus.\n"); break;
-	case 16: do_char_log(cn, 8, "20%% of damage taken from hits is dealt to your Endurance instead.\n"); break;
+	case 16: do_char_log(cn, 8, "30%% of damage taken from damage over time is dealt to your Endurance instead.\n"); break;
 	case 17: do_char_log(cn, 8, "Grants infravision.\n"); break;
 	case 18: do_char_log(cn, 8, "20%% more maximum Endurance.\n"); break;
 	case 19: do_char_log(cn, 8, "%d%% more total Intuition.\n", 3 * (IS_TWOHAND(in)?2:1)); break;
 	case 20: do_char_log(cn, 8, "20%% more effect of Curses you inflict.\n"); break;
 	case 21: do_char_log(cn, 8, "Curses inflicted on you are 80%% weaker.\n"); break;
 	case 22: do_char_log(cn, 8, "20%% less cost of skills and spells.\n"); break;
-	case 23: do_char_log(cn, 8, "20%% of damage taken from hits is dealt to your Mana instead.\n"); break;
+	case 23: do_char_log(cn, 8, "30%% of damage taken from hits is dealt to your Mana instead.\n"); break;
 	case 24: do_char_log(cn, 8, "10%% of total Armor Value is granted as additional Immunity.\n"); break;
 	case 25: do_char_log(cn, 8, "%d%% more total Agility.\n", 3 * (IS_TWOHAND(in)?2:1)); break;
 	case 26: do_char_log(cn, 8, "Movement speed cannot fall below 1.50.\n"); break;
@@ -710,7 +710,7 @@ void look_talisman(int cn, int in)
 		case 20: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Cast Speed", 3); break;
 		case 21: do_char_log(cn, 8, "[Cloak Only] Slows inflicted on you are 80%% weaker.\n"); break; // 14
 		case 22: do_char_log(cn, 8, "[Jewellery Only] Cannot lose focus.\n"); break; // 15
-		case 23: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken from hits is dealt to your Endurance instead.\n"); break; // 16
+		case 23: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken is dealt to your Endurance before Hitpoints.\n"); break; // 16
 		case 24: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Intuition", 4); break;
 		case 25: do_char_log(cn, 8, "[Helmet Only] Grants infravision.\n"); break; // 17
 		case 26: do_char_log(cn, 8, "[Armor Pieces Only] 20%% more maximum Endurance.\n"); break; // 18
@@ -720,7 +720,7 @@ void look_talisman(int cn, int in)
 		case 30: do_char_log(cn, 8, "[Boots Only] Stealth is 25%% stronger while moving.\n"); break; //  6
 		case 31: do_char_log(cn, 8, "[Cloak Only] Curses inflicted on you are 80%% weaker.\n"); break; // 21
 		case 32: do_char_log(cn, 8, "[Helmet Only] 20%% less cost of skills and spells.\n"); break; // 22
-		case 33: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken from hits is dealt to your Mana instead.\n"); break; // 23
+		case 33: do_char_log(cn, 8, "[Chest Only] 20%% of damage taken is dealt to your Mana before Hitpoints.\n"); break; // 23
 		case 34: do_char_log(cn, 1, "%-12.12s  %+4d\n", "Agility", 4); break;
 		case 35: do_char_log(cn, 8, "[Chest Only] 10%% of total Armor Value is granted as additional Immunity.\n"); break; // 24
 		case 36: do_char_log(cn, 8, "3%% more total Agility.\n"); break; // 25

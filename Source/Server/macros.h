@@ -251,6 +251,11 @@ int is_ascroll(int in);
 #define GET_SFAIL(cn, co)		(((ch[co].escape_timer > TICKS*3) || (ch[co].flags & CF_BODY) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[co].flags & CF_IMMORTAL))?1:0)
 #define GET_AT(cn, n, m)		(ch_get_skill_attrib((cn), (n), (m)))
 
+#define GET_SPD(cn)				(SPEED_CAP - ch[(cn)].speed)
+#define GET_SPD_ATK(cn)			(GET_SPD(cn) + ch[cn].atk_speed  - SPEED_BASE)
+#define GET_SPD_CAS(cn)			(GET_SPD(cn) + ch[cn].cast_speed - SPEED_BASE)
+#define GET_SPD_MOV(cn)			(GET_SPD(cn) + ch[cn].move_speed - SPEED_BASE)
+
 
 #define IS_LABY_MOB(cn)			(ch[(cn)].data[CHD_GROUP]==13)
 

@@ -2090,10 +2090,12 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 50: // Effective Hitpoints
 			value = HP_SOFTCAP(cn)*10 / ch[cn].dmg_reduction;
-			if (do_get_iflag(cn, SF_EN_TAKEASEN) || do_get_iflag(cn, SF_EN_TAKEASMA)) value = value * 100 / 80;
-			if (T_SKAL_SK(cn, 12) || T_ARHR_SK(cn, 12))                               value = value * 100 / 80;
-			if (do_get_iflag(cn, SF_TW_CLOAK))                                        value = value * 100 / 90;
-			if (do_get_iflag(cn, SF_PREIST))                                          value = value * 100 / 80;
+			if (do_get_iflag(cn, SF_EN_TAKEASEN) || do_get_iflag(cn, SF_EN_TAKEASMA)) value = value * 100 / 80; // taken as...
+			
+			if (T_WARR_SK(cn, 12) || T_ARHR_SK(cn, 12))                               value = value * 100 / 50; // taken as...
+			
+			if (do_get_iflag(cn, SF_TW_CLOAK))                                        value = value * 100 / 90; // taken as...
+			if (do_get_iflag(cn, SF_PREIST))                                          value = value * 100 / 80; // taken as...
 			break;
 		case 51: // Health Regen Rate				Decimal, 0.00 /s
 			value = regen * 20/10;

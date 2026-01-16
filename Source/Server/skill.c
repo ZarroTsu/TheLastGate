@@ -286,7 +286,7 @@ struct sk_tree sk_tree[10][12]={
 		  6624,                            "" },
 		{ "Unbreakable",                   "10%% increased total Armor Value.",
 		  6611,                            "" },
-		{ "Temperance",                    "1%% increased effect of Safeguard for every 10 ",
+		{ "Fortitude",                     "1%% increased effect of Safeguard for every 10 ",
 		  6622,                            "total Armor Value." }
 	}, // "         '         '         ", "         '         '         '         '         "
 	{	// Skald
@@ -344,7 +344,7 @@ struct sk_tree sk_tree[10][12]={
 		  6646,                            "bonus to hitting you." },
 		{ "Perseverance",                  "20%% increased Maximum Endurance. ",
 		  6635,                            "2%% of damage dealt is leeched as Endurance." },
-		{ "Tenacity",                      "50%% of damage taken is dealt to your Endurance ",
+		{ "Tenacity",                      "30%% of damage taken is dealt to your Endurance ",
 		  6636,                            "before Hitpoints." }
 	}, // "         '         '         ", "         '         '         '         '         "
 	{	// Sorcerer
@@ -431,7 +431,7 @@ struct sk_tree sk_tree[10][12]={
 		  6623,                            "Maximum Mana." },
 		{ "Perpetuity",                    "20%% increased Maximum Mana. ",
 		  6683,                            "2%% of damage dealt is leeched as Mana." },
-		{ "Resourcefulness",               "50%% of damage taken is dealt to your Mana ",
+		{ "Resourcefulness",               "30%% of damage taken is dealt to your Mana ",
 		  6684,                            "before Hitpoints." }
 	}, // "         '         '         ", "         '         '         '         '         "
 	{	// Braver
@@ -451,7 +451,7 @@ struct sk_tree sk_tree[10][12]={
 		//"         '         '         ", "         '         '         '         '         "
 		{ "Virtuosity",                    "Your passive skills gain an additional 20%% ",
 		  6645,                            "Braveness bonus." },
-		{ "Overwhelming Braveness",        "3%% increased total Braveness. ",
+		{ "Overwhelming Braveness",        "6%% increased total Braveness. ",
 		  6692,                            "+10 to Braveness Limit." },
 		{ "Alacrity",                      "1%% increased power of Zephyr for every 10 ",
 		  6640,                            "total Braveness." },
@@ -578,7 +578,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6690,                            "Shields." },
 	{ "False Unbreakable",             "(+5%%) increased total Armor Value.",
 	  6611,                            "" },
-	{ "False Temperance",              "(+1%%) increased effect of Safeguard for every ",
+	{ "False Fortitude",               "(+1%%) increased effect of Safeguard for every ",
 	  6622,                            "20 total Armor Value." },
 	//"         '         '         ", "         '         '         '         '         " ////////
 	{ "False Decisiveness",            "(+1%%) to Base Critical Hit Chance.",
@@ -634,7 +634,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6630,                            "Dual Swords." },
 	{ "False Perseverance",            "(+10%%) increased Maximum Endurance. ",
 	  6635,                            "(+1%%) of damage dealt is leeched as Endurance." },
-	{ "False Tenacity",                "(+25%%) of damage taken is dealt to your ",
+	{ "False Tenacity",                "(+15%%) of damage taken is dealt to your ",
 	  6636,                            "Endurance before Hitpoints." },
 	//"         '         '         ", "         '         '         '         '         " ////////
 	{ "False Passion",                 "(+2) to Spell Aptitude.",
@@ -718,7 +718,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6623,                            "Maximum Mana." },
 	{ "False Perpetuity",              "(+10%%) increased Maximum Mana. ",
 	  6683,                            "(+1%%) of damage dealt is leeched as Mana." },
-	{ "False Resourcefulness",         "(+25%%) of damage taken is dealt to your Mana ",
+	{ "False Resourcefulness",         "(+15%%) of damage taken is dealt to your Mana ",
 	  6684,                            "before Hitpoints." },
 	//"         '         '         ", "         '         '         '         '         " ////////
 	{ "False Muscle",                  "(+2) to Weapon Value.",
@@ -732,12 +732,12 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6691,                            "total Weapon Value." },
 	{ "False Valor",                   "(+5%%) increased total Weapon Value.",
 	  6605,                            "" },
-	{ "Madness",                       "(+1) to Spellpower Multiplier.",
+	{ "Madness",                       "(+2) to Spellpower Multiplier.",
 	  6699,                            "" },
 	//"         '         '         ", "         '         '         '         '         "
 	{ "False Virtuosity",              "Your passive skills gain an additional (+10%%) ",
 	  6645,                            "Braveness bonus." },
-	{ "False Braveness",               "(+2%%) increased total Braveness. ",
+	{ "False Braveness",               "(+3%%) increased total Braveness. ",
 	  6692,                            "(+5) to Braveness Limit." },
 	{ "False Alacrity",                "(+1%%) increased power of Zephyr for every 20 ",
 	  6640,                            "total Braveness." },

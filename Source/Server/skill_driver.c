@@ -1920,29 +1920,44 @@ int get_target_resistance(int cn, int co)
 {
 	int target_resist = 1, in, n;
 	
-	// Tarot Card - Hanged Man :: Resistance behaves as extra Immunity instead
-	if (do_get_iflag(co, SF_HANGED))
-		target_resist = (M_SK(co, SK_RESIST)*2/3);
-	else
-		target_resist = M_SK(co, SK_RESIST);
+	n = M_SK(co, SK_RESIST);
+	
+	if (do_get_iflag(co, SF_HANGED)) n = (n * 2 / 3);                 // [Taro] Hanged Man
+	
+	target_resist = n;
+	
+	// Bonuses from defender
+	{
+		n = GET_SPD_MOV(cn) * (T_SORC_SK(cn, 12)*2 + TC_SK(cn, 60));  // (Sorc) Dodging
+		target_resist = more(target_resist, n, 50);
+	}
 	
 	if (IS_SANECHAR(cn))
 	{
-		// Tarot - Chariot.R : 25% res/imm penetration
-		if (do_get_iflag(cn, SF_CHARIO_R))
-			target_resist = target_resist * 3/4;
+		// Additive bonuses from attacker
+		{
+			n  = 0;
+			n += T_SEYA_SK(cn,  6)*20;                                // (Seya) Scorn
+			n +=     TC_SK(cn,  6)*10;
+			
+			target_resist = less(target_resist, n, 1);
+		}
 		
-		n = T_SEYA_SK(cn,  6)*20 + TC_SK(cn,  6)*10;    // Scorn
+		// Multiplicative bonuses from attacker
+		{
+			n = target_resist;
+			
+			if (do_get_iflag(cn, SF_CHARIO_R)) n = less(n, 25, 1);    // [Taro] Chariot.R
+			
+			target_resist = n;
+		}
 		
-		target_resist = target_resist*max(10, 100-n)/100;
-		
-		// Lethargy - penetrate
+		// Lethargy penetration
 		if (in = has_buff(cn, SK_LETHARGY))
 		{
-			if (bu[in].data[2])
-				target_resist -= (bu[in].power+3)/6;
-			else
-				target_resist -= bu[in].power/4;
+			n = bu[in].power;
+			if (bu[in].data[2]) target_resist -= (n+3)/6;             // Seyan'du
+			else                target_resist -=  n   /4;
 		}
 	}
 	
@@ -1953,35 +1968,35 @@ int get_target_immunity(int cn, int co)
 {
 	int target_immune = 1, in, n;
 	
-	// Tarot Card - Hanged Man :: Resistance behaves as extra Immunity instead
-	if (do_get_iflag(co, SF_HANGED))
-		target_immune = M_SK(co, SK_IMMUN) + (M_SK(co, SK_RESIST)/3);
-	else
-		target_immune = M_SK(co, SK_IMMUN);
+	n = M_SK(co, SK_IMMUN);
 	
-	// Fervor
-	if (T_WARR_SK(co, 12))
-		target_immune += ch[co].spell_apt/5;
+	if (do_get_iflag(co, SF_HANGED)) n += (M_SK(co, SK_RESIST)/3);    // [Taro] Hanged Man
+	
+	target_immune = n;
+	
+	// Bonuses from defender
+	{
+		n = GET_SPD_ATK(cn) * (T_WARR_SK(cn,  4)*2 + TC_SK(cn, 40));  // (Warr) Dismissal
+		target_immune = more(target_immune, n, 50);
+	}
 	
 	if (IS_SANECHAR(cn))
 	{
-		// Tarot - Chariot.R : 25% res/imm penetration
-		if (do_get_iflag(cn, SF_CHARIO_R))
-			target_immune = target_immune * 3/4;
+		// Multiplicative bonuses from attacker
+		{
+			n = target_immune;
+			
+			if (do_get_iflag(cn, SF_CHARIO_R)) n = less(n, 25, 1);    // [Taro] Chariot.R
+			
+			target_immune = n;
+		}
 		
-		n = st_skillcount(cn,106)*4;
-		
-		// Tree - lycan
-		if (T_LYCA_SK(cn, 10)) target_immune = target_immune*( 80-n)/100;
-		else                   target_immune = target_immune*(100-n)/100;
-		
-		// Lethargy - penetrate
+		// Lethargy penetration
 		if (in = has_buff(cn, SK_LETHARGY))
 		{
-			if (bu[in].data[2])
-				target_immune -= bu[in].power/6;
-			else
-				target_immune -= (bu[in].power+2)/4;
+			n = bu[in].power;
+			if (bu[in].data[2]) target_immune -=  n   /6;             // Seyan'du
+			else                target_immune -= (n+2)/4;
 		}
 	}
 	
@@ -5909,27 +5924,16 @@ int spell_weaken(int cn, int co, int power, int flag)
 		if (!(in = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_WEAKEN, 0)))
 			return 0;
 		
-		if (!IS_PLAYER(cn))
-			bu[in].armor  = max(-127, -(power / 6 + 2));
-		else
-			bu[in].armor  = max(-127, -(power / 4 + 4));
+		if (!IS_PLAYER(cn)) bu[in].armor  = max(-127, -(power / 6 + 2));
+		else                bu[in].armor  = max(-127, -(power / 4 + 4));
 	}
 	else
 	{
 		if (!(in = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0)))
 			return 0;
 		
-		if (!IS_PLAYER(cn))
-			bu[in].weapon  = max(-127, -(power / 6 + 2));
-		else
-			bu[in].weapon  = max(-127, -(power / 4 + 4));
-	}
-	
-	// Tree
-	if (T_SKAL_SK(cn, 10))
-	{
-		bu[in].dmg_bonus 	= max(-127, -(power / 10));
-		bu[in].dmg_reduction = max(-127, -(power / 10));
+		if (!IS_PLAYER(cn)) bu[in].weapon  = max(-127, -(power / 6 + 2));
+		else                bu[in].weapon  = max(-127, -(power / 4 + 4));
 	}
 	
 	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_WEAKEN & SK_WEAKEN2)
@@ -6609,7 +6613,7 @@ int spell_zephyr(int cn, int co, int power, int flag)
 		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
 		if (ch[co].flags & CF_IMMORTAL) { return 0; }
 		
-		power = power + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 3;
+		power = power + max(0, GET_SPD_ATK(cn)) / 3;
 		
 		if (T_WARR_SK(cn,  4))				power = power*6/5;
 		if (n=st_skillcount(cn, 40))		power = power*(20+n)/20;

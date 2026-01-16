@@ -490,7 +490,7 @@ extern char *at_name[];
 
 #define FN_TOWER		7
 #define DESC_TW_CROWN		"When equipped, 25%% of skill costs are nullified, 25%% of mana costs from spells are taken from endurance, and 25%% of endurance costs from skills are taken from mana. You no longer lose focus.\n"
-#define DESC_TW_CLOAK		"When equipped, 10%% of damage taken from hits is dealt to Endurance instead, and 10%% of damage taken from damage over time is dealt to Mana instead.\n"
+#define DESC_TW_CLOAK		"When equipped, 15%% of damage taken from hits is dealt to Endurance before Hitpoints, and 15%% of damage taken from damage over time is dealt to Mana before Hitpoints.\n"
 #define DESC_TW_DREAD		"When equipped, your ghost companion is replaced with a spellcaster companion.\n"
 #define DESC_TW_DOUSER		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n"
 #define DESC_TW_MARCH		"When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by one third.\n"
@@ -616,7 +616,7 @@ extern char *at_name[];
 #define DESC_ICE2HND		"Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Slow, reducing enemy action speed.\n"
 #define DESC_COLDSTEEL		"When equipped, your active melee skills gain an additional 10%% Agility bonus.\n"
 #define DESC_CROSSBLAD		"When equipped, Surround Hit has a base radius of 4.\n"
-#define DESC_BRONCHIT		"When equipped, 20%% of Cleave's damage is also dealt to the target's mana.\n"
+#define DESC_BRONCHIT		"When equipped, 25%% of Cleave's damage is also dealt to the target's mana.\n"
 #define DESC_VOLCANF		"When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n"
 #define DESC_VIKINGMALT		"When equipped, this weapon can be used to cast 'Slam', dealing damage based on Strength around you and stunning enemies with a base radius of 2 around your target. Stun duration with Slam is determined by your crit multiplier.\n"
 #define DESC_GUNGNIR		"When equipped, bleeding you inflict deals its damage three times faster.\n"
@@ -628,7 +628,7 @@ extern char *at_name[];
 #define FN_TAROT		8
 #define DESC_FOOL			"Grants applied soulstone and enchantment while equipped. Soulstones applied to this card behave strangely.\n"
 #define DESC_MAGI			"When equipped, secondary effects of Intuition and Strength are equal to the higher of the two.\n"
-#define DESC_PREIST			"When equipped, 20%% of damage taken from hits is dealt to Mana instead.\n"
+#define DESC_PREIST			"When equipped, 30%% of damage taken is dealt to Mana before Hitpoints.\n"
 #define DESC_EMPRESS		"When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n"
 #define DESC_EMPEROR		"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
 #define DESC_HEIROPH		"When equipped, Immunize and Inoculate from your Dispel spell lasts four times as long, but your Dispel spell can only remove a single buff or debuff at a time.\n"
