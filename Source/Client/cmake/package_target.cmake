@@ -66,6 +66,7 @@ else ()
                 "$<TARGET_FILE:TheLastGate>"
                 "${OUTPUT_DIR}/gfx"
                 "${OUTPUT_DIR}/sfx"
+                "${OUTPUT_DIR}/ui"
                 "${OUTPUT_DIR}/resources"
                 "${OUTPUT_DIR}/gx00.dat"
                 "${OUTPUT_DIR}/gx00.idx"
