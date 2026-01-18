@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.8.0](https://github.com/jamesblack/TheLastGate/compare/v3.7.0...v3.8.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* Dangling Pointer was cusing issues on linux where skillnames wouldn't show up. ([baded01](https://github.com/jamesblack/TheLastGate/commit/baded01822877d6e72a9bec66426c257466eec47))
+* package the new ui graphics with the linux client as well. ([a6d32b6](https://github.com/jamesblack/TheLastGate/commit/a6d32b6a14a2c729a0e50a29a3a805d00a9309e5))
+* re-passwordify the password field. ([cc7071c](https://github.com/jamesblack/TheLastGate/commit/cc7071c3db4da6900a61896eeaaf813d719e6b48))
+
+
+### Miscellaneous Chores
+
+* bump version number ([904cb30](https://github.com/jamesblack/TheLastGate/commit/904cb302a1ae2e0a076c3cadb9c98e99cfcae123))
+
 ## [3.7.0](https://github.com/jamesblack/TheLastGate/compare/v3.6.0...v3.7.0) (2026-01-05)
 
 
