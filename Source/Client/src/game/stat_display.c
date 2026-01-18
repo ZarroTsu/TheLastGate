@@ -77,27 +77,27 @@ static bool is_alternate(int skill_id) {
 void get_skill_display_info(const int skill_slot, StatDisplayInfo *out) {
     int skill_tab_id = skill_slot + game_ui_state.skill_scroll;
     int skill_position = 8 + skill_tab_id;
-    struct skilltab skill_tab = skilltab[skill_tab_id];
-    int skill_id = skill_tab.nr;
+    struct skilltab *skill_tab = &skilltab[skill_tab_id];
+    int skill_id = skill_tab->nr;
     int amount_raised = stat_raised[skill_position];
 
-    if (skill_tab.show < 1) {
+    if (skill_tab->show < 1) {
         return;
     }
 
     out->is_visible = true;
-    out->name = skill_tab.name;
+    out->name = skill_tab->name;
 
-    if (skill_tab.show != 1) {
+    if (skill_tab->show != 1) {
         // Not Known
-        if (skill_tab.show == 4) {
+        if (skill_tab->show == 4) {
             // Show in red
             out->current_value = sk_score(skill_id);
             out->text_color = 0;
             return;
         }
 
-        if (skill_tab.show == 2) {
+        if (skill_tab->show == 2) {
             out->current_value = max(300, max(1, (points2rank(pl.points_tot) + 1) * 8));
             out->text_color = 5;
             return;
