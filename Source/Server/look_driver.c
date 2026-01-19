@@ -498,12 +498,12 @@ void look_extra(int cn, int in)
 	
 	// -------- GORN ENCHANTMENTS --------
 	case 65: do_char_log(cn, 6, "20%% of damage dealt with hits is also dealt to enemy mana.\n"); break;
-	case 66: do_char_log(cn, 6, "Damage dealt with damage over time is restored as hitpoints at a rate equal to experience gain.\n"); break;
+	case 66: do_char_log(cn, 6, "1%% of damage dealt with damage over time is leeched as hitpoints, endurance and mana.\n"); break;
 	case 67: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Poison, dealing damage over time.\n"); break;
 	case 68: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Douse, reducing enemy spell modifier.\n"); break;
 	
 	// -------- PURP ENCHANTMENTS --------
-	case 69: do_char_log(cn, 8, "4%% of damage dealt with hits is restored as hitpoints.\n"); break;
+	case 69: do_char_log(cn, 8, "1%% of damage dealt with hits is leeched as hitpoints, endurance and mana.\n"); break;
 	case 70: do_char_log(cn, 8, "10%% of current endurance value is granted as additional damage on hit.\n"); break;
 	case 71: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Blind, reducing enemy perception, hit and parry.\n"); break;
 	case 72: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Frostburn, draining enemy endurance and mana.\n"); break;

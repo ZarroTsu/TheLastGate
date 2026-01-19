@@ -653,13 +653,15 @@ struct character
 	
 	unsigned short smithnum;
 	
-	unsigned long long iflags[8];	// 8x8x8 = 512 bits // Static on/off flag effects
+	unsigned long long iflags[8];   // 8x8x8 = 512 bits // Static on/off flag effects
 	
-	unsigned char ieffects[64];		// 64 bytes // stacking item effects
+	unsigned char ieffects[64];     // 64 bytes // stacking item effects
 	
-	unsigned char reserve[3];		// Reservation of HP/EN/MP (0 - 100)
+	unsigned char reserve[3];       // Reservation of HP/EN/MP (0 - 100)
 	
-	unsigned char olditem[11]; 		// free slots
+	unsigned short leech[3];        // Leech effects for HP/EN/MP
+	
+	unsigned char olditem[5];       // free slots  11 -> 5
 
 	// items worn
 	unsigned int worn[20];
@@ -720,9 +722,9 @@ struct character
 
 	char lastattack;                // neater display: remembers the last attack animation
 	
-	char move_speed;		// Bonus to movement speed (added to speed_mod)
-	char atk_speed;		// Bonus to attacking speed (added to speed_mod)
-	char cast_speed;		// Bonus to casting speed (added to speed_mod)
+	char move_speed;                // Bonus to movement speed (added to speed_mod)
+	char atk_speed;                 // Bonus to attacking speed (added to speed_mod)
+	char cast_speed;                // Bonus to casting speed (added to speed_mod)
 	
 	unsigned short spell_mod;       // race dependent spell modifier - two digit decimal accuracy (1.00)
 	unsigned short spell_apt;       // aptitude for receiving spells

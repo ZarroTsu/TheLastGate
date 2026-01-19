@@ -9267,22 +9267,24 @@ void do_lucksave(int cn, char *deathtype)
 }
 
 #define    ALTER_MAX    90
-int alter_damage(int cn, int co, int dam, int *en_dam, int *mp_dam, int isdot)
+int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 {
 	int hp_dam, n;
+	
+	if (!IS_SANECHAR(co)) return;
 	
 	hp_dam = dam;
 	
 	*en_dam = *mp_dam = 0;
 	
 	if (T_ARHR_SK(co, 12))                           en_dam +=   30;    // (Warr) Tenacity
-	if (n = TC_SK(cn, 48))                           en_dam += n*15;
+	if (n = TC_SK(co, 48))                           en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               en_dam +=   15;    // [Gear] Cloak of Shadows
 	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
 	if (do_get_iflag(co, SF_WORLD_R))                en_dam +=   60;    // [Taro] World.R
 	
 	if (T_ARHR_SK(co, 12))                           mp_dam +=   30;    // (ArHr) Resourcefulness
-	if (n = TC_SK(cn, 84))                           mp_dam += n*15;
+	if (n = TC_SK(co, 84))                           mp_dam += n*15;
 	if (do_get_iflag(co, SF_PREIST))                 mp_dam +=   30;    // [Taro] Priestess
 	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
 	
@@ -9297,6 +9299,47 @@ int alter_damage(int cn, int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	return hp_dam;
 }
 #undef    ALTER_MAX
+
+void do_leech(int cn, int dam, int is_dot)
+{
+	int tmp, n;
+	
+	if (!IS_SANECHAR(cn)) return;
+	
+	/*
+		"Leech" Effects - adding to
+		ch[cn].leech[0] - HP    ch[cn].leech[1] - EN    ch[cn].leech[2] - MP
+	*/
+	
+	tmp = ch[cn].leech[0];
+	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (!is_dot && do_get_iflag(cn, SF_TW_GULA))                         // [Gear] Gula
+						   tmp = clamp(tmp + (dam *20/1000), 0, 65500);
+	if (T_LYCA_SK(cn,  8)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Lyca) Gluttony
+	if (n = TC_SK(cn,104)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	ch[cn].leech[0] = tmp;
+	
+	tmp = ch[cn].leech[1];
+	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (T_WARR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Warr) Perseverance
+	if (n = TC_SK(cn, 47)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	ch[cn].leech[1] = tmp;
+	
+	tmp = ch[cn].leech[2];
+	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (ArHr) Perpetuity
+	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	ch[cn].leech[2] = tmp;
+}
 
 // dmg types: 0=normal 1=blast 2=hw/soku 3=gethit 4=surround 5=cleave 6=pulse 7=zephyr 8=leap 9=crit 13=gethit/10
 // returns actual damage done
@@ -9563,48 +9606,10 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
-	if (type!=2 && type!=3 && type!=13)
-	{
-		// Gula - 20% damage dealt healed as hp
-		if (do_get_iflag(cn, SF_TW_GULA))
-		{
-			ch[cn].a_hp += dam/5;
-		}
-		
-		// Lycan Tree - 8% damage dealt healed as hp/end/mana
-		if (T_LYCA_SK(cn, 9))
-		{
-			ch[cn].a_hp   += dam*2/25;
-			ch[cn].a_end  += dam*2/25;
-			ch[cn].a_mana += dam*2/25;
-		}
-		
-		// God Enchant :: 4% of damage dealt healed as hp
-		if (n = do_get_ieffect(cn, VF_EN_PURPLEECH))
-		{
-			ch[cn].a_hp   += dam*n/100;
-		}
-		
-		if (n=st_skillcount(cn,105))
-		{
-			switch (RANDOM(3))
-			{
-				case  0: ch[cn].a_hp   += dam*n/50; break;
-				case  1: ch[cn].a_end  += dam*n/50; break;
-				default: ch[cn].a_mana += dam*n/50; break;
-			}
-		}
-		if (n=st_skillcount(cn, 70))
-		{
-			if (IS_SANECHAR(cc = ch[cn].data[PCD_COMPANION]) && IS_PLAYER_GC(cc))
-				ch[cc].a_hp   += dam*n/50;
-			if (IS_SANECHAR(cc = ch[cn].data[PCD_SHADOWCOPY]) && IS_PLAYER_SC(cc))
-				ch[cc].a_hp   += dam*n/50;
-		}
-	}
+	if (type!=2 && type!=3 && type!=13) do_leech(cn, dam, 0);
 	
 	// Damage dealt to Endurance and Mana *instead of Hitpoints*
-	hp_dam = alter_damage(cn, co, dam, &en_dam, &mp_dam, 0);
+	hp_dam = alter_damage(co, dam, &en_dam, &mp_dam, 0);
 	
 	// *Additional* damage dealt to Endurance or Mana
 	{
@@ -13207,6 +13212,9 @@ void do_regenerate(int cn)
 		}
 	}
 	
+	/*
+		Special character regeneration effects
+	*/
 	if (ch[cn].flags & CF_UNDEAD)
 	{
 		hp = 450 + getrank(cn) * 25;
@@ -13289,6 +13297,29 @@ void do_regenerate(int cn)
 		ch[cn].a_hp   += (race_reg/ 8) / (halfhp   ? 2 : 1);
 		ch[cn].a_end  += (race_res/ 8) / (halfend  ? 2 : 1);
 		ch[cn].a_mana += (race_med/ 8) / (halfmana ? 2 : 1);
+	}
+	
+	/*
+		"Leech" Effects - applied
+		ch[cn].leech[0] - HP    ch[cn].leech[1] - EN    ch[cn].leech[2] - MP
+	*/
+	if (ch[cn].leech[0])
+	{
+		if ((hp   = ch[cn].leech[0]) >= 15) hp   /= 15;
+		ch[cn].a_hp   += hp   * 10;
+		ch[cn].leech[0] = max(0, ch[cn].leech[0] - hp);
+	}
+	if (ch[cn].leech[1])
+	{
+		if ((end  = ch[cn].leech[1]) >= 15) end  /= 15;
+		ch[cn].a_end  += end  * 10;
+		ch[cn].leech[1] = max(0, ch[cn].leech[1] - end);
+	}
+	if (ch[cn].leech[2])
+	{
+		if ((mana = ch[cn].leech[2]) >= 15) mana /= 15;
+		ch[cn].a_mana += mana * 10;
+		ch[cn].leech[2] = max(0, ch[cn].leech[2] - mana);
 	}
 	
 	// Force hp/end/mana to sane values
@@ -13391,7 +13422,7 @@ void do_regenerate(int cn)
 				{
 					degendam = bu[in].r_hp;
 					if (degendam<0)
-						degendam = alter_damage(cn, co, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+						degendam = alter_damage(cn, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 					if (mp_dam)   ch[cn].a_mana += mp_dam;
 					if (en_dam)   ch[cn].a_end  += en_dam;
 					if (degendam) ch[cn].a_hp += degendam;
@@ -13497,7 +13528,7 @@ void do_regenerate(int cn)
 				{
 					degendam = bu[in].r_hp;
 					if (degendam<0)
-						degendam = alter_damage(cn, co, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+						degendam = alter_damage(cn, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 					if (mp_dam)   ch[cn].a_mana += mp_dam;
 					if (en_dam)   ch[cn].a_end  += en_dam;
 					if (degendam) ch[cn].a_hp += degendam;
@@ -13609,7 +13640,9 @@ void do_regenerate(int cn)
 					if (tmp = do_get_ieffect(cn, VF_EN_LESSDOT))
 						degendam = degendam * max(25, 100-tmp)/100;
 					
-					degendam = alter_damage(cn, co, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+					if (co) do_leech(co, degendam, 1);
+					
+					degendam = alter_damage(cn, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 					if (mp_dam)   ch[cn].a_mana -= mp_dam;
 					if (en_dam)   ch[cn].a_end  -= en_dam;
 					
@@ -13642,13 +13675,6 @@ void do_regenerate(int cn)
 							ch[co].points += 1;
 							ch[co].points_tot += 1;
 							do_check_new_level(co, 1);
-						}
-						// God Enchant :: Restore DOT dealt as HP
-						if (tmp = do_get_ieffect(co, VF_EN_GORNDOT))
-						{
-							ch[co].a_hp += 100*tmp;
-							if (ch[co].a_hp > ch[co].hp[5] * 1000)
-								ch[co].a_hp = ch[co].hp[5] * 1000;
 						}
 					}
 					
@@ -14079,7 +14105,7 @@ void do_regenerate(int cn)
 			if (do_get_iflag(cn, SF_WBREATH))
 				waterlifeloss /= 4;
 			
-			waterlifeloss = alter_damage(cn, co, waterlifeloss, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+			waterlifeloss = alter_damage(cn, waterlifeloss, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 			if (mp_dam)   ch[cn].a_mana -= mp_dam;
 			if (en_dam)   ch[cn].a_end  -= en_dam;
 			
@@ -14102,7 +14128,7 @@ void do_regenerate(int cn)
 			
 			ch[cn].data[11] -= petri;
 			
-			petri = alter_damage(cn, co, petri, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+			petri = alter_damage(cn, petri, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 			if (mp_dam)   ch[cn].a_mana -= mp_dam;
 			if (en_dam)   ch[cn].a_end  -= en_dam;
 			
