@@ -3563,13 +3563,13 @@ int spell_stun(int cn, int co, int power)
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
-	// "Increased" effects
+	// "Increased" effect
 	{
 		n  = 0;
 		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
 		n +=     TC_SK(cn, 21)*1;
 		
-		power = more(power, n, 20);
+		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
 	
 	power = spell_immunity(cn, co, power);
@@ -3591,13 +3591,13 @@ int spell_rally(int cn, int co, int power)
 {
 	int in, n;
 	
-	// "Increased" effects
+	// "Increased" effect
 	{
 		n  = 0;
 		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
 		n +=     TC_SK(cn, 21)*1;
 		
-		power = more(power, n, 20);
+		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
 	
 	if (!(in = make_new_buff(cn, SK_WARCRY3, BUF_SPR_WARCRY3, power, SP_DUR_RALLY, 1))) 
@@ -3698,13 +3698,13 @@ int spell_warcry(int cn, int co, int power, int flag)
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
-	// "Increased" effects
+	// "Increased" effect
 	{
 		n  = 0;
 		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
 		n +=     TC_SK(cn, 21)*1;
 		
-		power = more(power, n, 20);
+		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
 	
 	power = spell_immunity(cn, co, power);
@@ -5750,28 +5750,20 @@ int spell_bleed(int cn, int co, int power)
 }
 int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 {
-	int hitpower = power, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0;
+	int hitpower = power, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0, crit_dam=0;
 	
 	chlog(cn, "Used Cleave on %s", ch[co].name);
 	
-	if (T_WARR_SK(cn, 9))        hitpower = hitpower + (hitpower * M_AT(cn, AT_STR)/2000);
-	if (n=st_skillcount(cn, 45)) hitpower = hitpower + (hitpower*M_AT(cn, AT_STR)*n/5000);
+	if (T_SKAL_SK(cn, 6)) crit_dam = max(0, do_crit(cn, co, power, 1));  // (Skal) Crushing Blows
 	
-	hitpower = skill_immunity(co, hitpower) * 2;
+	hitpower = skill_immunity(co, hitpower+crit_dam) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
 	
-	// Tarot Card - Justice :: Inflict Aggravate instead of Bleed
-	if (do_get_iflag(cn, SF_JUSTICE))
-	{
-		aggravate = 1;
-	}
+	if (do_get_iflag(cn, SF_JUSTICE)) aggravate = 1;    // [Taro] Justice
 	
 	tmp = do_hurt(cn, co, hitpower, 5);
 	
-	if (do_get_iflag(cn, SF_BRONCHIT))
-	{
-		tmpmp = tmp/5;
-	}
+	if (do_get_iflag(cn, SF_BRONCHIT)) tmpmp = tmp/4;
 	
 	if (tmp<1)
 	{
@@ -5794,9 +5786,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	
 	// Plague spreading
 	if ((in = has_buff(co, SK_PLAGUE)) && IS_SANECHAR(bu[in].data[0]))
-	{
 		skill_plague(bu[in].data[0], co, bu[in].data[5]);
-	}
 	
 	if (!co_orig)
 	{
@@ -6005,9 +5995,16 @@ int spell_blind(int cn, int co, int power, int flag)
 	
 	origpow = power;
 	
+	// "Increased" effect
+	{
+		n  = 0;
+		n += T_WARR_SK(cn,  9)*2;    // (Warr) Antagonizer
+		n +=     TC_SK(cn, 45);
+		
+		power = more(power, M_AT(cn, AT_AGL) * n, 20);
+	}
+	
 	if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
-	if (T_WARR_SK(cn, 7))                 power = power + (power * M_AT(cn, AT_AGL)/2000);
-	if (n=st_skillcount(cn, 43))          power = power + (power*M_AT(cn, AT_AGL)*n/5000);
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -6297,10 +6294,19 @@ int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, 
 {
 	int dam, tmp, in;
 	
+	// "Increased" effect
+	{
+		n  = 0;
+		n += T_WARR_SK(cn,  7)*2;    // (Warr) Slayer
+		n +=     TC_SK(cn, 43);
+		
+		power = more(power, M_AT(cn, AT_STR) * n, 20);
+	}
+	
 	dam = skill_immunity(co, power) * 2;
 	if (weak) dam = dam*3/4;
 	
-	if (!randomtarg || (!weak && ch[co].a_hp >= ch[co].hp[5]*900))
+	if (!randomtarg)
 	{
 		dam = dam * critical / 100;
 		if (dostun) spell_warcry(cn, co, dam/4, 2);
@@ -6347,22 +6353,22 @@ int invalid_leap(int cn, int m, int md)
 void skill_leap(int cn, int flag)
 {	// we leap to 'co' and damage both 'cc' and 'co' in the process
 	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
-	int power, numrepeats, aoepower, cost, dist, old_dist, cost_dist, cost_pow, tmp, critical, avgdmg=0, hit=0;
-	int co, cc=0, dam, gotrand=0, tmptome=0, baselen=100;
-	int x, y, n, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0, cooldown = SK_EXH_LEAP;
-	int dist_target=0, same_target=0, dostun=1, signet=0;
+	int power, numrepeats=0, aoepower, cost, dist, old_dist, cost_dist, cost_pow, tmp, critical, avgdmg=0, hit=0;
+	int co, cc=0, dam, gotrand=0, tmptome=0;
+	int x, y, n, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0;
+	int dist_target=0, same_target=0, dostun=1;
 	int xc, yc, xf, yf, xt, yt, c = 0;
 	int catalog[64] = { 0 };
 	
 	if (!flag && is_exhausted(cn)) return;
-	if (do_get_iflag(cn, SF_BOOK_DAMO)) baselen = 90;
-	if (do_get_iflag(cn, SF_SIGN_SLAY)) signet  =  1;
+	if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats  +=  1;
+	if (T_WARR_SK(cn,  6))              numrepeats  +=  1;  // (Warr) Flash Step
 	
-	power      = M_SK(cn, SK_LEAP) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
-	power      = skill_multiplier(power, cn);
-	numrepeats = max(0, min(10, (100 - (100 * baselen / max(25, ch[cn].cool_bonus)))/10)) + signet;
-	aoepower   = (flag?6:10) + ch[cn].aoe_bonus + (B_SK(cn, SK_PROX)?(M_SK(cn, SK_PROX)/30):0);
-	critical   = ch[cn].crit_multi;
+	power       = M_SK(cn, SK_LEAP) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
+	power       = skill_multiplier(power, cn);
+	numrepeats += max(0, GET_SPD_ATK(cn)/100);
+	aoepower    = (flag?6:10) + ch[cn].aoe_bonus + (B_SK(cn, SK_PROX)?(M_SK(cn, SK_PROX)/30):0);
+	critical    = ch[cn].crit_multi;
 	
 	// Tarot Card - Justice.R :: make target random
 	if (!do_get_iflag(cn, SF_JUSTIC_R) || flag)
@@ -6598,8 +6604,6 @@ void skill_leap(int cn, int flag)
 		if (avgdmg>0 && !(ch[cn].flags & CF_SYS_OFF))
 			do_char_log(cn, 1, "You sliced your targets for about %d HP.\n", avgdmg);
 	}
-	
-	
 }
 
 // Zephyr grants a stacking debuff to hits, dealing additional damage when it expires
@@ -6830,8 +6834,8 @@ int spell_pact(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_PACT, BUF_SPR_PACT, power, SP_DUR_PACT, 1))) 
 		return 0;
 	
-	if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
-	if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
+	//if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
+	//if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
 	
 	if (do_get_iflag(cn, SF_HERMIT_R))
 	{

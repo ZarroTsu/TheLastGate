@@ -502,7 +502,7 @@ extern char *at_name[];
 #define DESC_TW_ACEDIA		"When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n"
 #define DESC_TW_IRA			"When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you reserve 30%% of your mana and cannot deal melee critical hits.\n"
 #define DESC_TW_INVIDIA		"When equipped, your ghost companion has surround hit AoE, and your shadow copy teleports to new targets, but each cannot regenerate health.\n"
-#define DESC_TW_GULA		"When equipped, you restore health upon hitting, cleaving or blasting an enemy, but you reserve 30%% of your hitpoints.\n"
+#define DESC_TW_GULA		"When equipped, you leech 20%% of damage dealt with hits as hitpoints, but you reserve 30%% of your hitpoints.\n"
 #define DESC_TW_LUXURIA		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict stun.\n"
 #define DESC_TW_AVARITIA	"When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you reserve 30%% of your endurance.\n"
 #define DESC_TW_SUPERBIA	"When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n"

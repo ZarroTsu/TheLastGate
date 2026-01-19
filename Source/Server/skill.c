@@ -384,11 +384,11 @@ struct sk_tree sk_tree[10][12]={
 		{ "Barrier",                       "+4 to Resistance.",
 		  6667,                            "" },
 		//"         '         '         ", "         '         '         '         '         "
-		{ "Tactician",                     "Increases and multipliers to Cast Speed also ",
+		{ "Strategist",                    "Increases and multipliers to Cast Speed also ",
 		  6664,                            "affect Attack Speed." },
 		{ "Spellslinger",                  "20%% increased total Cast Speed.",
 		  6665,                            "" },
-		{ "Strategist",                    "1%% increased effect of Tactics for every 25 ",
+		{ "Tactician",                     "1%% increased effect of Tactics for every 25 ",
 		  6666,                            "uncapped Cast Speed." },
 		//"         '         '         ", "         '         '         '         '         "
 		{ "Mysticism",                     "Your active magic spells gain an additional ",
@@ -428,7 +428,7 @@ struct sk_tree sk_tree[10][12]={
 		  6629,                            "20%% Intuition bonus." },
 		//"         '         '         ", "         '         '         '         '         "
 		{ "Flow",                          "Gain +1 to Spellpower bonus for every 100 ",
-		  6623,                            "Maximum Mana." },
+		  6623,                            "uncapped Maximum Mana." },
 		{ "Perpetuity",                    "20%% increased Maximum Mana. ",
 		  6683,                            "2%% of damage dealt is leeched as Mana." },
 		{ "Resourcefulness",               "30%% of damage taken is dealt to your Mana ",
@@ -676,7 +676,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6630,                            "Spears." },
 	{ "False Spellslinger",            "(+10%%) increased total Cast Speed.",
 	  6665,                            "" },
-	{ "False Strategist",              "(+1%%) increased effect of Tactics for every 50 ",
+	{ "False Tactician",               "(+1%%) increased effect of Tactics for every 50 ",
 	  6666,                            "uncapped Cast Speed." },
 	//"         '         '         ", "         '         '         '         '         "
 	{ "False Mysticism",               "Your active magic spells gain an additional ",
@@ -700,8 +700,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "False Wellspring",              "(+15) to Maximum Mana.",
 	  6675,                            "" },
 	//"         '         '         ", "         '         '         '         '         "
-	{ "Repurpose",                     "(+15%%) of Maximum Mana is converted into ",
-	  6682,                            "Maximum Hitpoints." },
+	{ "Repurpose",                     "(+15%%) of uncapped Maximum Mana is converted ",
+	  6682,                            "into Maximum Hitpoints." },
 	{ "False Serenity",                "(+5%%) increased total Cooldown Rate.",
 	  6677,                            "" },
 	{ "Warlock",                       "(+15%%) increased effect of stats granted by ",
@@ -715,7 +715,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6629,                            "(+10%%) Intuition bonus." },
 	//"         '         '         ", "         '         '         '         '         "
 	{ "False Flow",                    "Gain (+1) Spellpower bonus for every 200 ",
-	  6623,                            "Maximum Mana." },
+	  6623,                            "uncapped Maximum Mana." },
 	{ "False Perpetuity",              "(+10%%) increased Maximum Mana. ",
 	  6683,                            "(+1%%) of damage dealt is leeched as Mana." },
 	{ "False Resourcefulness",         "(+15%%) of damage taken is dealt to your Mana ",

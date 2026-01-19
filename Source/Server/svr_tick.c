@@ -1857,7 +1857,7 @@ int get_meta_stat_value(int cn, int n)
 			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
 			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
 			dmg_hit = ( dmg_low+dmg_hgh+(T_LYCA_SK(cn,6)?dmg_top/2:0))/2;
-			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed) + ch[cn].atk_speed));
+			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		default: break;
 	}
@@ -1950,10 +1950,10 @@ int get_meta_stat_value(int cn, int n)
 			value = dmg_low;
 			break;
 		case 15: case 56: // Attack Speed			Decimal, 0.00
-			value = max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed) + ch[cn].atk_speed));
+			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		case 16: case 57: //   Cast Speed			Decimal, 0.00
-			value = max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed)/2 + ch[cn].cast_speed*2));
+			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_CAS(cn)));
 			break;
 		case 17: case 58: // Thorns Score
 			value = ch[cn].gethit_dam * dmg_str/5 * dmg_bns/10000;
@@ -2052,7 +2052,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 40: // Zephyr Hit Damage				Decimal, 0.00
 			power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
-			power = power + max(0, ((SPEED_CAP - ch[cn].speed) + ch[cn].atk_speed - 120)) / 3;
+			power = power + max(0, GET_SPD_ATK(cn)) / 3;
 			if (T_WARR_SK(cn,  4))				power = power*6/5;
 			if (m=st_skillcount(cn, 40))		power = power*(20+m)/20;
 			value = power * 2 * DAM_MULT_ZEPHYR/10;
