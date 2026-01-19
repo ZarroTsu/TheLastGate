@@ -9266,6 +9266,38 @@ void do_lucksave(int cn, char *deathtype)
 	ch[cn].data[44]++;
 }
 
+#define    ALTER_MAX    90
+int alter_damage(int cn, int co, int dam, int *en_dam, int *mp_dam, int isdot)
+{
+	int hp_dam, n;
+	
+	hp_dam = dam;
+	
+	*en_dam = *mp_dam = 0;
+	
+	if (T_ARHR_SK(co, 12))                           en_dam +=   30;    // (Warr) Tenacity
+	if (n = TC_SK(cn, 48))                           en_dam += n*15;
+	if (do_get_iflag(co, SF_TW_CLOAK))               en_dam +=   15;    // [Gear] Cloak of Shadows
+	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
+	if (do_get_iflag(co, SF_WORLD_R))                en_dam +=   60;    // [Taro] World.R
+	
+	if (T_ARHR_SK(co, 12))                           mp_dam +=   30;    // (ArHr) Resourcefulness
+	if (n = TC_SK(cn, 84))                           mp_dam += n*15;
+	if (do_get_iflag(co, SF_PREIST))                 mp_dam +=   30;    // [Taro] Priestess
+	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
+	
+	n = *en_dam + *mp_dam;
+	
+	*en_dam = dam * ( (*en_dam * 100)/n * min(ALTER_MAX, n) )/10000;
+	*mp_dam = dam * ( (*mp_dam * 100)/n * min(ALTER_MAX, n) )/10000;
+	
+	hp_dam -= *en_dam;
+	hp_dam -= *mp_dam;
+	
+	return hp_dam;
+}
+#undef    ALTER_MAX
+
 // dmg types: 0=normal 1=blast 2=hw/soku 3=gethit 4=surround 5=cleave 6=pulse 7=zephyr 8=leap 9=crit 13=gethit/10
 // returns actual damage done
 int do_hurt(int cn, int co, int dam, int type)
@@ -9571,35 +9603,8 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
-	hp_dam = dam;
-	
-	// Damage dealt to Endurance and Mana *instead of Hitpoints* -- [TODO] move this to its own function
-	{
-		en_dam = 0;
-		mp_dam = 0;
-		
-		if (T_ARHR_SK(co, 12))                 en_dam +=   30;    // (Warr) Tenacity
-		if (n = TC_SK(cn, 48))                 en_dam += n*15;
-		if (do_get_iflag(co, SF_TW_CLOAK))     en_dam +=   15;    // [Gear] Cloak of Shadows
-		//if (do_get_iflag(co, SF_EN_TAKEASEN))  en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
-		if (do_get_iflag(co, SF_WORLD_R))      en_dam +=   60;    // [Taro] World.R
-		
-		if (T_ARHR_SK(co, 12))                 mp_dam +=   30;    // (ArHr) Resourcefulness
-		if (n = TC_SK(cn, 84))                 mp_dam += n*15;
-		if (do_get_iflag(co, SF_PREIST))       mp_dam +=   30;    // [Taro] Priestess
-		if (do_get_iflag(co, SF_EN_TAKEASMA))  mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
-		
-		n = en_dam + mp_dam;
-		
-		en_dam = dam * ( (en_dam * 100)/n * min(90, n) )/10000;
-		mp_dam = dam * ( (mp_dam * 100)/n * min(90, n) )/10000;
-		
-		if (ch[co].a_end  - en_dam<0) en_dam = ch[co].a_end;
-		if (ch[co].a_mana - mp_dam<0) mp_dam = ch[co].a_mana;
-		
-		hp_dam -= en_dam;
-		hp_dam -= mp_dam;
-	}
+	// Damage dealt to Endurance and Mana *instead of Hitpoints*
+	hp_dam = alter_damage(cn, co, dam, &en_dam, &mp_dam, 0);
 	
 	// *Additional* damage dealt to Endurance or Mana
 	{
@@ -12929,11 +12934,10 @@ void do_update_permaspells(int cn)
 void do_regenerate(int cn)
 {
 	unsigned long long prof;
-	long long degendam = 0;
 	unsigned long long mf1, mf2;
 	int n, m, p, in, in2, nohp = 0, noend = 0, nomana = 0, halfhp = 0, halfend = 0, halfmana = 0, old;
 	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0, sunR = 0, worldR = 0, moonR = 0, money = 0;
-	int race_reg = 0, race_res = 0, race_med = 0, cloakofshadows = 0;
+	int race_reg = 0, race_res = 0, race_med = 0, degendam=0, en_dam=0, mp_dam=0;
 	int degenpower = 0, tickcheck = 10000;
 	int moonmult = 20, n1=0, n2=0, n3=0;
 	int hpmult, endmult, manamult, rank=0;
@@ -12983,7 +12987,6 @@ void do_regenerate(int cn)
 	if (ch[cn].flags & CF_NOMANAREG)   halfmana       = 1;
 
 	if (mf1 & MF_UWATER)               uwater         = 1;
-	if (do_get_iflag(cn, SF_TW_CLOAK)) cloakofshadows = 1;
 	
 	hpmult = endmult = manamult = moonmult;
 	
@@ -13387,12 +13390,11 @@ void do_regenerate(int cn)
 				if (bu[in].r_hp!=-1)
 				{
 					degendam = bu[in].r_hp;
-					if (degendam<0 && cloakofshadows)
-					{
-						ch[cn].a_mana 	+= degendam/10;
-						degendam 		+= degendam/10;
-					}
-					ch[cn].a_hp += degendam;
+					if (degendam<0)
+						degendam = alter_damage(cn, co, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+					if (mp_dam)   ch[cn].a_mana += mp_dam;
+					if (en_dam)   ch[cn].a_end  += en_dam;
+					if (degendam) ch[cn].a_hp += degendam;
 				}
 				if (bu[in].r_end!=-1)
 				{
@@ -13494,12 +13496,11 @@ void do_regenerate(int cn)
 				if (bu[in].r_hp)
 				{
 					degendam = bu[in].r_hp;
-					if (degendam<0 && cloakofshadows)
-					{
-						ch[cn].a_mana 	+= degendam/10;
-						degendam 		+= degendam/10;
-					}
-					ch[cn].a_hp += degendam;
+					if (degendam<0)
+						degendam = alter_damage(cn, co, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+					if (mp_dam)   ch[cn].a_mana += mp_dam;
+					if (en_dam)   ch[cn].a_end  += en_dam;
+					if (degendam) ch[cn].a_hp += degendam;
 					if (ch[cn].a_hp>ch[cn].hp[5] * 1000) ch[cn].a_hp = ch[cn].hp[5] * 1000;
 				}
 				if (bu[in].r_end)
@@ -13608,11 +13609,9 @@ void do_regenerate(int cn)
 					if (tmp = do_get_ieffect(cn, VF_EN_LESSDOT))
 						degendam = degendam * max(25, 100-tmp)/100;
 					
-					if (cloakofshadows)
-					{
-						ch[cn].a_mana 	-= degendam/10;
-						degendam 		-= degendam/10;
-					}
+					degendam = alter_damage(cn, co, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+					if (mp_dam)   ch[cn].a_mana -= mp_dam;
+					if (en_dam)   ch[cn].a_end  -= en_dam;
 					
 					if (ch[cn].a_hp - (degendam + gothp)<500 && !(mf2 & MF_ARENA) && try_lucksave(cn) && !(ch[cn].flags & CF_IMMORTAL))
 					{
@@ -14080,11 +14079,9 @@ void do_regenerate(int cn)
 			if (do_get_iflag(cn, SF_WBREATH))
 				waterlifeloss /= 4;
 			
-			if (cloakofshadows)
-			{
-				ch[cn].a_mana 	-= waterlifeloss/10;
-				waterlifeloss 	-= waterlifeloss/10;
-			}
+			waterlifeloss = alter_damage(cn, co, waterlifeloss, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+			if (mp_dam)   ch[cn].a_mana -= mp_dam;
+			if (en_dam)   ch[cn].a_end  -= en_dam;
 			
 			ch[cn].a_hp -= waterlifeloss + gothp;
 			
@@ -14105,11 +14102,9 @@ void do_regenerate(int cn)
 			
 			ch[cn].data[11] -= petri;
 			
-			if (cloakofshadows)
-			{
-				ch[cn].a_mana 	-= petri/10;
-				petri 			-= petri/10;
-			}
+			petri = alter_damage(cn, co, petri, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
+			if (mp_dam)   ch[cn].a_mana -= mp_dam;
+			if (en_dam)   ch[cn].a_end  -= en_dam;
 			
 			ch[cn].a_hp -= petri;
 			
