@@ -28,6 +28,9 @@
 #define MAXSK_SCR		(MAXSKILL-10)
 #define MAXMT_SCR		((MAXMETA-7)/2-10)
 
+#define SPEEDMAX       300
+#define CTICKMAX       200
+
 // -------- Damage Multipliers -------- //
 
 #define DAM_MULT_HIT		 250
