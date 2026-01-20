@@ -2044,6 +2044,27 @@ void display_floortile(int tile,int light,int x,int y,int xoff,int yoff,int mx,i
 unsigned short ymap[MAPX_MAX*MAPY_MAX];
 unsigned short xmap[MAPX_MAX*MAPY_MAX];
 
+void draw_goto_target(const int map_x, const int map_y, const int tile_index) {
+    static const int move_to_indicator_sprite = 31;
+    if (pl.goto_x == map[tile_index].x && pl.goto_y == map[tile_index].y) {
+        copysprite(move_to_indicator_sprite, 0, map_x * 32, map_y * 32, xoff, yoff);
+    } else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_MOVE, map[tile_index].x, map[tile_index].y)) {
+        copysprite(move_to_indicator_sprite, EFFECT_INFRA, map_x * 32, map_y * 32, xoff, yoff);
+    }
+}
+
+void set_minimap_background(int m) {
+    if (map[m].x<MAPX_MAX && map[m].y<MAPY_MAX && !(map[m].flags&INVIS))
+    {
+        if (!xmap[map[m].y+map[m].x*MAPX_MAX] || xmap[map[m].y+map[m].x*MAPX_MAX]==0xffff
+            || ymap[map[m].y+map[m].x*MAPX_MAX]==1)
+        {
+            xmap[map[m].y+map[m].x*MAPX_MAX]=(unsigned short)get_avgcol(map[m].back);
+            ymap[map[m].y+map[m].x*MAPX_MAX]=0;
+        }
+    }
+}
+
 void eng_display(int init)	// optimize me!!!!!
 {
 	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
@@ -2091,20 +2112,8 @@ void eng_display(int init)	// optimize me!!!!!
 
 				display_floortile(map[m].back,map[m].light|tmp,x*32,y*32,xoff,yoff,map[x+y*screen_renderdist].x,map[x+y*screen_renderdist].y);
 
-				if (map[m].x<MAPX_MAX && map[m].y<MAPY_MAX && !(map[m].flags&INVIS)) 
-				{
-					if (!xmap[map[m].y+map[m].x*MAPX_MAX] || xmap[map[m].y+map[m].x*MAPX_MAX]==0xffff 
-						|| ymap[map[m].y+map[m].x*MAPX_MAX]==1)
-					{
-						xmap[map[m].y+map[m].x*MAPX_MAX]=(unsigned short)get_avgcol(map[m].back);
-						ymap[map[m].y+map[m].x*MAPX_MAX]=0;
-					}
-				}
-
-				if (pl.goto_x==map[m].x && pl.goto_y==map[m].y)
-					copysprite(31,0,x*32,y*32,xoff,yoff);
-				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_MOVE, map[m].x, map[m].y))
-					copysprite(31, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+				set_minimap_background(m);
+				draw_goto_target(x, y, m);
 			}
 		}
 
