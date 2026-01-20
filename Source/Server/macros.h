@@ -11,7 +11,7 @@
 #define RANDOM(a)				(a>1?random()%(a):0)
 #define ARRAYSIZE(a)			(sizeof(a)/sizeof(a[0]))
 #define sqr(a)					((a) * (a))
-#define clamp(a, b, c)			((a)>(b) ? (b) : ((a)<(c) ? (c) : (a)))		// clamp value (a) between values (b) and (c)
+#define clamp(a, b, c)			((a)<(b) ? (b) : ((a)>(c) ? (c) : (a)))			// clamp value (a) between values (b) and (c)
 #define more(a, b, c)			((a) * max(0,(c*100) + (b))/max(1,(c*100))		// increase value (a) by 1% per (c) of value (b)
 #define less(a, b, c)			((a) * max(0,(c*100) - (b))/max(1,(c*100))		//   reduce value (a) by 1% per (c) of value (b)
 

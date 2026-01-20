@@ -9313,31 +9313,31 @@ void do_leech(int cn, int dam, int is_dot)
 	
 	tmp = ch[cn].leech[0];
 	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
-						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
-						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	if (!is_dot && do_get_iflag(cn, SF_TW_GULA))                         // [Gear] Gula
-						   tmp = clamp(tmp + (dam *20/1000), 65500, 0);
-	if (T_LYCA_SK(cn,  8)) tmp = clamp(tmp + (dam * 2/1000), 65500, 0);  // (Lyca) Gluttony
-	if (n = TC_SK(cn,104)) tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam *20/1000), 0, 65500);
+	if (T_LYCA_SK(cn,  8)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Lyca) Gluttony
+	if (n = TC_SK(cn,104)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[0] = tmp;
 	
 	tmp = ch[cn].leech[1];
 	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
-						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
-						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
-	if (T_WARR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 65500, 0);  // (Warr) Perseverance
-	if (n = TC_SK(cn, 47)) tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (T_WARR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Warr) Perseverance
+	if (n = TC_SK(cn, 47)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[1] = tmp;
 	
 	tmp = ch[cn].leech[2];
 	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
-						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
-						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
-	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 65500, 0);  // (ArHr) Perpetuity
-	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (ArHr) Perpetuity
+	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[2] = tmp;
 }
 
@@ -11876,7 +11876,7 @@ void really_update_char(int cn)
 		light = 0;
 	}
 	
-	ch[cn].light = clamp(light, 250, 0);
+	ch[cn].light = clamp(light, 0, 250);
 	
 	// ******************************** Meta mods! ******************************** //
 	// In addition to gear and spells above, these mods may have extra bonuses applied by skills or race.
@@ -11952,7 +11952,7 @@ void really_update_char(int cn)
 		tempCost -= t;
 	}
 	
-	ch[cn].mana_cost = clamp(tempCost, 20000, 0);
+	ch[cn].mana_cost = clamp(tempCost, 0, 20000);
 	
 	/*
 		ch[].speed value
@@ -11971,7 +11971,7 @@ void really_update_char(int cn)
 	if (ch[cn].mode==1) base_spd += 30;	// old: 14 + 4 = 18/36
 	if (ch[cn].mode==2) base_spd += 45;	// old: 14 + 6 = 20/36
 	
-	ch[cn].speed = SPEED_CAP - clamp(base_spd, SPEED_CAP, 1);
+	ch[cn].speed = SPEED_CAP - clamp(base_spd, 1, SPEED_CAP);
 	
 	// Table array is between 0 and 299 and stored in reverse order.
 	// So we take 300, minus our bonus speed values above.
@@ -12009,7 +12009,7 @@ void really_update_char(int cn)
 	if (T_SORC_SK(cn, 11))         spd_move = ((base_spd + spd_move) * 120/100) - base_spd;
 	if (n = st_skillcount(cn, 59)) spd_move = ((base_spd + spd_move) * (100+n*3)/100) - base_spd;
 	
-	ch[cn].move_speed = clamp(spd_move, 127, -127);
+	ch[cn].move_speed = clamp(spd_move, -127, 127);
 	
 	
 	/*
@@ -12061,8 +12061,8 @@ void really_update_char(int cn)
 		spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
 	}
 	
-	ch[cn].cast_speed = clamp(spd_cast,   127, -127);
-	ch[cn].atk_speed  = clamp(spd_attack, 127, -127);
+	ch[cn].cast_speed = clamp(spd_cast,   -127, 127);
+	ch[cn].atk_speed  = clamp(spd_attack, -127, 127);
 	
 	
 	/*
@@ -12077,7 +12077,7 @@ void really_update_char(int cn)
 		if (n = TC_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/50; }
 	}
 	
-	ch[cn].spell_pow = clamp(spell_pow, 300, -300);
+	ch[cn].spell_pow = clamp(spell_pow, -300, 300);
 	
 	
 	/*
@@ -12094,7 +12094,7 @@ void really_update_char(int cn)
 	if (n = st_skillcount(cn, 47)) spell_apt = spell_apt*(100+n*5)/100;
 	//if (T_WARR_SK(cn, 12))         dmg_rdc = max(1000, dmg_rdc * (500 - spell_apt)/500);
 	
-	ch[cn].spell_apt = clamp(spell_apt, 999, 1);
+	ch[cn].spell_apt = clamp(spell_apt, 1, 999);
 	
 	
 	/*
@@ -12111,7 +12111,7 @@ void really_update_char(int cn)
 		spell_mod += light * do_get_ieffect(cn, VF_EN_SKUAGLOW)/100;  // [Ench] Skua
 	}
 	
-	ch[cn].spell_mod = clamp(spell_mod, 300, 0);
+	ch[cn].spell_mod = clamp(spell_mod, 0, 300);
 	
 	
 	/*
@@ -12149,7 +12149,7 @@ void really_update_char(int cn)
 	if ((n = has_buff(cn, SK_POISON)) && bu[n].data[8]==10) spell_cool = spell_cool*9/10;
 	if ((n = has_buff(cn, SK_VENOM))  && bu[n].data[8]==10) spell_cool = spell_cool*9/10;
 	
-	ch[cn].cool_bonus = 100 + clamp(spell_cool, 900, -75);
+	ch[cn].cool_bonus = 100 + clamp(spell_cool, -75, 900);
 	
 	
 	/*
@@ -12176,7 +12176,7 @@ void really_update_char(int cn)
 	critical_b *= 100;
 	
 	// Grant extra crit chance by crit bonus
-	critical_b += critical_b * (critical_c+ava_crit)/100;
+	critical_b += critical_b * (critical_c + ava_crit)/100;
 	
 	if (B_SK(cn, SK_PRECISION))
 	{
@@ -12192,7 +12192,7 @@ void really_update_char(int cn)
 		critical_b = critical_b * 2/3;
 	}
 	
-	ch[cn].crit_chance = clamp(critical_b, 10000, 0);
+	ch[cn].crit_chance = clamp(critical_b, 0, 10000);
 	
 	
 	/*
@@ -12216,7 +12216,7 @@ void really_update_char(int cn)
 		critical_m = (critical_m + 100) * 4/3 - 100;
 	}
 	
-	ch[cn].crit_multi = 100 + clamp(critical_m, 800, 0);
+	ch[cn].crit_multi = 100 + clamp(critical_m, 0, 800);
 	
 	
 	/*
@@ -12275,8 +12275,8 @@ void really_update_char(int cn)
 		else						hit_rate   = parry_rate;
 	}
 	
-	ch[cn].to_hit   = clamp(hit_rate,   999, 0);
-	ch[cn].to_parry = clamp(parry_rate, 999, 0);
+	ch[cn].to_hit   = clamp(hit_rate,   0, 999);
+	ch[cn].to_parry = clamp(parry_rate, 0, 999);
 	
 	
 	/*
@@ -12357,8 +12357,8 @@ void really_update_char(int cn)
 	//
 	
 	
-	ch[cn].armor = clamp(armor, 999, 0);
-	ch[cn].weapon = clamp(weapon, 999, 0);
+	ch[cn].armor  = clamp(armor,  0, 999);
+	ch[cn].weapon = clamp(weapon, 0, 999);
 	
 	
 	/*
@@ -12379,14 +12379,14 @@ void really_update_char(int cn)
 		if (do_get_iflag(cn, SF_EN_MORETHOR)) gethit = more(gethit, 30, 1);  // [Ench] 30% more Thorns
 	}
 	
-	ch[cn].gethit_dam = clamp(gethit, 255, 0);
+	ch[cn].gethit_dam = clamp(gethit, 0, 255);
 	
 	
 	/*
 		ch[].aoe_bonus value
 	*/
 	
-	ch[cn].aoe_bonus = aoe; clamp(gethit, 15, -15);
+	ch[cn].aoe_bonus = clamp(aoe, -15, 15);
 	
 	/*
 		ch[].top_damage value
@@ -12410,7 +12410,7 @@ void really_update_char(int cn)
 		if (do_get_iflag(cn, SF_HANGED_R)) damage_top = more(damage_top, 25, 1); // [Taro] Hanged.R
 	}
 	
-	ch[cn].top_damage = clamp(damage_top, 999, 0);
+	ch[cn].top_damage = clamp(damage_top, 0, 999);
 	
 	/*
 		ch[].dmg_bonus
@@ -12433,8 +12433,8 @@ void really_update_char(int cn)
 		dmg_rdc = less(dmg_rdc, do_get_ieffect(cn, VF_EN_LESSDAMAGE), 1);  // [Ench] Less damage taken
 	}
 	
-	ch[cn].dmg_bonus     = clamp(dmg_bns, 30000, 1000);
-	ch[cn].dmg_reduction = clamp(dmg_rdc, 30000, 1000);
+	ch[cn].dmg_bonus     = clamp(dmg_bns, 1000, 30000);
+	ch[cn].dmg_reduction = clamp(dmg_rdc, 1000, 30000);
 	
 	
 	/*

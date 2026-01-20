@@ -2583,7 +2583,7 @@ int speedo(int n)
 	int moveSpeedValue;
 	
 	moveSpeedValue = map[n].ch_speed - map[n].ch_movespd;
-	moveSpeedValue = clamp(moveSpeedValue, 299, 0);
+	moveSpeedValue = clamp(moveSpeedValue, 0, 299);
 	return speedtab[moveSpeedValue][ctick];
 }
 
@@ -2600,19 +2600,19 @@ int speedoMisc(int n)
 		case    5:
 		case    6:
 			miscSpeedValue -= map[n].ch_atkspd;
-			miscSpeedValue = clamp(miscSpeedValue, 299, 0);
+			miscSpeedValue = clamp(miscSpeedValue, 0, 299);
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
 		case    9:
 			miscSpeedValue  = map[n].ch_speed*5/4;
 			miscSpeedValue -= map[n].ch_castspd*3/2;
-			miscSpeedValue = clamp(miscSpeedValue, 299, 0);
+			miscSpeedValue = clamp(miscSpeedValue, 0, 299);
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
-			miscSpeedValue = clamp(miscSpeedValue, 299, 0);
+			miscSpeedValue = clamp(miscSpeedValue, 0, 299);
 			return(speedtab[miscSpeedValue][ctick]);
 	}
 }
@@ -2627,7 +2627,7 @@ int speedstep(int n,int d,int s,int update)
 	int z,m;
 
 	speed = map[n].ch_speed - map[n].ch_movespd;
-	speed = clamp(speed, 299, 0);
+	speed = clamp(speed, 0, 299);
 	
 	hard_step = map[n].ch_status - d;
 	
