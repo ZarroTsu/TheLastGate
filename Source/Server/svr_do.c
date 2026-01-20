@@ -9313,31 +9313,31 @@ void do_leech(int cn, int dam, int is_dot)
 	
 	tmp = ch[cn].leech[0];
 	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
-						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
-						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	if (!is_dot && do_get_iflag(cn, SF_TW_GULA))                         // [Gear] Gula
-						   tmp = clamp(tmp + (dam *20/1000), 0, 65500);
-	if (T_LYCA_SK(cn,  8)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Lyca) Gluttony
-	if (n = TC_SK(cn,104)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam *20/1000), 65500, 0);
+	if (T_LYCA_SK(cn,  8)) tmp = clamp(tmp + (dam * 2/1000), 65500, 0);  // (Lyca) Gluttony
+	if (n = TC_SK(cn,104)) tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	ch[cn].leech[0] = tmp;
 	
 	tmp = ch[cn].leech[1];
 	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
-						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
-						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
-	if (T_WARR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Warr) Perseverance
-	if (n = TC_SK(cn, 47)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+	if (T_WARR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 65500, 0);  // (Warr) Perseverance
+	if (n = TC_SK(cn, 47)) tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	ch[cn].leech[1] = tmp;
 	
 	tmp = ch[cn].leech[2];
 	if (is_dot && (n = do_get_ieffect(cn, VF_EN_GORNDOT)))               // [Ench] Gorn
-						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
-						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
-	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (ArHr) Perpetuity
-	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+						   tmp = clamp(tmp + (dam * n/1000), 65500, 0);
+	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 65500, 0);  // (ArHr) Perpetuity
+	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 65500, 0);
 	ch[cn].leech[2] = tmp;
 }
 

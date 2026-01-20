@@ -2582,14 +2582,7 @@ static inline int speedo(int n)
 	int moveSpeedValue;
 	
 	moveSpeedValue = ch[n].speed - ch[n].move_speed;
-	if (moveSpeedValue < 0)
-	{
-		moveSpeedValue = 0;
-	}
-	if (moveSpeedValue > 299)
-	{
-		moveSpeedValue = 299;
-	}
+	moveSpeedValue = clamp(moveSpeedValue, 299, 0);
 	return(speedtab[moveSpeedValue][ctick]);
 }
 static inline int speedoMisc(int n)
@@ -2605,40 +2598,19 @@ static inline int speedoMisc(int n)
 		case    5:
 		case    6:
 			miscSpeedValue -= ch[n].atk_speed;
-			if (miscSpeedValue < 0)
-			{
-				miscSpeedValue = 0;
-			}
-			if (miscSpeedValue > 299)
-			{
-				miscSpeedValue = 299;
-			}
+			miscSpeedValue  = clamp(miscSpeedValue, 299, 0);
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
 		case    9:
 			miscSpeedValue  = ch[n].speed*5/4;
 			miscSpeedValue -= ch[n].cast_speed*3/2;
-			if (miscSpeedValue < 0)
-			{
-				miscSpeedValue = 0;
-			}
-			if (miscSpeedValue > 299)
-			{
-				miscSpeedValue = 299;
-			}
+			miscSpeedValue  = clamp(miscSpeedValue, 299, 0);
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
-			if (miscSpeedValue < 0)
-			{
-				miscSpeedValue = 0;
-			}
-			if (miscSpeedValue > 299)
-			{
-				miscSpeedValue = 299;
-			}
+			miscSpeedValue  = clamp(miscSpeedValue, 299, 0);
 			return(speedtab[miscSpeedValue][ctick]);
 	}
 }
