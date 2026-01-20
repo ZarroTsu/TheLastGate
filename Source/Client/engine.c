@@ -357,6 +357,7 @@ char *at_name[5]={
 #define AT_AGL		3
 #define AT_STR		4
 
+struct skilltab *raw_skilltab;
 struct skilltab *skilltab;
 struct MetaStat *meta_stats;
 
@@ -443,6 +444,10 @@ struct wpslist wpslist[MAXWPS]={
 	{ 26, "The Burning Plains", 			"\"The archon waits.\"" }
 //    nr, "123456789012345678901234567890",	"123456789012345678901234567890"
 };
+
+void update_skill_tab_from_raw() {
+    memcpy(skilltab, raw_skilltab,sizeof(struct skilltab) * MAXSKILL);
+}
 
 int skill_cmp(const void *a,const void *b)
 {
@@ -805,15 +810,17 @@ void set_temp_skilltab(void)
 	int n;
 	for (n=0; n<MAXSKILL; n++)
 	{
-		skilltab[n].nr = n;
-		skilltab[n].sortkey = n;
-		skilltab[n].show = 0;
-		sprintf(skilltab[n].name,"", n);
-		sprintf(skilltab[n].desc,"", n);
-		skilltab[n].attrib[0] = 0;
-		skilltab[n].attrib[1] = 1;
-		skilltab[n].attrib[2] = 2;
+		raw_skilltab[n].nr = n;
+		raw_skilltab[n].sortkey = n;
+		raw_skilltab[n].show = 0;
+		sprintf(raw_skilltab[n].name,"", n);
+		sprintf(raw_skilltab[n].desc,"", n);
+		raw_skilltab[n].attrib[0] = 0;
+		raw_skilltab[n].attrib[1] = 1;
+		raw_skilltab[n].attrib[2] = 2;
 	}
+
+    update_skill_tab_from_raw();
 }
 
 void set_temp_metaStats(void)
@@ -3796,6 +3803,7 @@ void engine(void)
 	Uint32 last_time = 0;
 	Uint32 delta_time = 0;
 
+    raw_skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
 	skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
 	meta_stats=malloc(sizeof(struct MetaStat)*MAXMETA);
 
