@@ -1378,55 +1378,54 @@ int sv_ignore(unsigned char *buf)
 
 int sv_cmd(unsigned char *buf)
 {
-
 	if (buf[0]&SV_SETMAP) return sv_setmap(buf,buf[0]&~SV_SETMAP);
-
+	
 	switch(buf[0])
 	{
-		case SV_SETCHAR_NAME1:	sv_setchar_name1(buf); break;
-		case SV_SETCHAR_NAME2:	sv_setchar_name2(buf); break;
-		case SV_SETCHAR_NAME3:	sv_setchar_name3(buf); break;
-		case SV_SETCHAR_MODE:	sv_setchar_mode(buf); return 2;
-		case SV_SETCHAR_ATTRIB:	sv_setchar_attrib(buf); return 8;
-		case SV_SETCHAR_SKILL:	sv_setchar_skill(buf); return 8;
-		case SV_SETCHAR_HP:		sv_setchar_hp(buf); return 13;
-		case SV_SETCHAR_ENDUR:	sv_setchar_endur(buf); return 13;
-		case SV_SETCHAR_MANA:	sv_setchar_mana(buf); return 13;
-		case SV_SETCHAR_AHP:		sv_setchar_ahp(buf); return 3;
-		case SV_SETCHAR_AEND:    sv_setchar_aend(buf); return 3;
-		case SV_SETCHAR_AMANA:	sv_setchar_amana(buf); return 3;
-		case SV_SETCHAR_DIR:		sv_setchar_dir(buf); return 2;
-
-		case SV_SETCHAR_PTS:		sv_setchar_pts(buf); return 13;
-		case SV_SETCHAR_WPS:		sv_setchar_wps(buf); return 13;
-		case SV_SETCHAR_TOK:		sv_setchar_tok(buf); return 9;
-		case SV_SETCHAR_TRE:		sv_setchar_tre(buf); return 3;
-		case SV_SETCHAR_GOLD:	sv_setchar_gold(buf); return 13;
-		case SV_SETCHAR_ITEM:	sv_setchar_item(buf); return 11;
-		case SV_SETCHAR_WORN:	sv_setchar_worn(buf); return 10;
-		case SV_SETCHAR_SPELL:	sv_setchar_spell(buf); return 9;
-		case SV_SETCHAR_OBJ:		sv_setchar_obj(buf); return 6;
-		case SV_SETCHAR_LOCA1:	sv_setchar_location1(buf); return 11;
-		case SV_SETCHAR_LOCA2:	sv_setchar_location2(buf); return 11;
-
-		case SV_SETMAP3:		return sv_setmap3(buf,20);
-		case SV_SETMAP4:		return sv_setmap3(buf,0);
-		case SV_SETMAP5:		return sv_setmap3(buf,2);
-		case SV_SETMAP6:		return sv_setmap3(buf,6);
-		case SV_SETORIGIN:		sv_setorigin(buf); return 5;
-
-		case SV_TICK:		sv_tick(buf); return 2;
-
-		case SV_LOG0:		sv_log(buf,0); break;
-		case SV_LOG1:		sv_log(buf,1); break;
-		case SV_LOG2:		sv_log(buf,2); break;
-		case SV_LOG3:		sv_log(buf,3); break;
-		case SV_LOG4:		sv_log(buf,4); break;
-		case SV_LOG5:		sv_log(buf,5); break;
-		case SV_LOG6:		sv_log(buf,6); break;
-		case SV_LOG7:		sv_log(buf,7); break;
-		case SV_LOG8:		sv_log(buf,8); break;
-		case SV_LOG9:		sv_log(buf,9); break;
+		case SV_SETCHAR_NAME1:     sv_setchar_name1(buf);     break;
+		case SV_SETCHAR_NAME2:     sv_setchar_name2(buf);     break;
+		case SV_SETCHAR_NAME3:     sv_setchar_name3(buf);     break;
+		case SV_SETCHAR_MODE:      sv_setchar_mode(buf);      return  2;
+		case SV_SETCHAR_ATTRIB:    sv_setchar_attrib(buf);    return  8;
+		case SV_SETCHAR_SKILL:     sv_setchar_skill(buf);     return  8;
+		case SV_SETCHAR_HP:        sv_setchar_hp(buf);        return 13;
+		case SV_SETCHAR_ENDUR:     sv_setchar_endur(buf);     return 13;
+		case SV_SETCHAR_MANA:      sv_setchar_mana(buf);      return 13;
+		case SV_SETCHAR_AHP:       sv_setchar_ahp(buf);       return  3;
+		case SV_SETCHAR_AEND:      sv_setchar_aend(buf);      return  3;
+		case SV_SETCHAR_AMANA:     sv_setchar_amana(buf);     return  3;
+		case SV_SETCHAR_DIR:       sv_setchar_dir(buf);       return  2;
+		
+		case SV_SETCHAR_PTS:       sv_setchar_pts(buf);       return 13;
+		case SV_SETCHAR_WPS:       sv_setchar_wps(buf);       return 13;
+		case SV_SETCHAR_TOK:       sv_setchar_tok(buf);       return  9;
+		case SV_SETCHAR_TRE:       sv_setchar_tre(buf);       return  3;
+		case SV_SETCHAR_GOLD:      sv_setchar_gold(buf);      return 13;
+		case SV_SETCHAR_ITEM:      sv_setchar_item(buf);      return 11;
+		case SV_SETCHAR_WORN:      sv_setchar_worn(buf);      return 10;
+		case SV_SETCHAR_SPELL:     sv_setchar_spell(buf);     return  9;
+		case SV_SETCHAR_OBJ:       sv_setchar_obj(buf);       return  6;
+		case SV_SETCHAR_LOCA1:     sv_setchar_location1(buf); return 11;
+		case SV_SETCHAR_LOCA2:     sv_setchar_location2(buf); return 11;
+		
+		case SV_SETMAP3:           return sv_setmap3(buf,20);
+		case SV_SETMAP4:           return sv_setmap3(buf,0);
+		case SV_SETMAP5:           return sv_setmap3(buf,2);
+		case SV_SETMAP6:           return sv_setmap3(buf,6);
+		case SV_SETORIGIN:         sv_setorigin(buf);         return  5;
+		
+		case SV_TICK:              sv_tick(buf);              return  2;
+		
+		case SV_LOG0:              sv_log(buf,0);             break;
+		case SV_LOG1:              sv_log(buf,1);             break;
+		case SV_LOG2:              sv_log(buf,2);             break;
+		case SV_LOG3:              sv_log(buf,3);             break;
+		case SV_LOG4:              sv_log(buf,4);             break;
+		case SV_LOG5:              sv_log(buf,5);             break;
+		case SV_LOG6:              sv_log(buf,6);             break;
+		case SV_LOG7:              sv_log(buf,7);             break;
+		case SV_LOG8:              sv_log(buf,8);             break;
+		case SV_LOG9:              sv_log(buf,9);             break;
 		
 		case SV_TERM_STREE:
 		case SV_TERM_CTREE:
@@ -1434,51 +1433,51 @@ int sv_cmd(unsigned char *buf)
 		case SV_TERM_META:
 			return sv_terminology(buf);
 		
-		case SV_MOTD0:		sv_motd(buf,0); break;
-		case SV_MOTD1:		sv_motd(buf,1); break;
-		case SV_MOTD2:		sv_motd(buf,2); break;
-		case SV_MOTD3:		sv_motd(buf,3); break;
+		case SV_MOTD0:             sv_motd(buf,0);            break;
+		case SV_MOTD1:             sv_motd(buf,1);            break;
+		case SV_MOTD2:             sv_motd(buf,2);            break;
+		case SV_MOTD3:             sv_motd(buf,3);            break;
 
-		case SV_SCROLL_RIGHT:	sv_scroll_right(buf); return 1;
-		case SV_SCROLL_LEFT:		sv_scroll_left(buf); return 1;
-		case SV_SCROLL_DOWN:		sv_scroll_down(buf); return 1;
-		case SV_SCROLL_UP:		sv_scroll_up(buf); return 1;
-
-		case SV_SCROLL_RIGHTDOWN:	sv_scroll_rightdown(buf); return 1;
-		case SV_SCROLL_RIGHTUP:		sv_scroll_rightup(buf); return 1;
-		case SV_SCROLL_LEFTDOWN:		sv_scroll_leftdown(buf); return 1;
-		case SV_SCROLL_LEFTUP:		sv_scroll_leftup(buf); return 1;
-
-		case SV_LOOK1:				sv_look1(buf); break;
-		case SV_LOOK2:				sv_look2(buf); break;
-		case SV_LOOK3:				sv_look3(buf); break;
-		case SV_LOOK4:				sv_look4(buf); break;
-		case SV_LOOK5:				sv_look5(buf); break;
-		case SV_LOOK6:				sv_look6(buf); break;
-		case SV_LOOK7:				sv_look7(buf); return 8;
-		case SV_LOOK8:				sv_look8(buf); return 8;
+		case SV_SCROLL_RIGHT:      sv_scroll_right(buf);      return  1;
+		case SV_SCROLL_LEFT:       sv_scroll_left(buf);       return  1;
+		case SV_SCROLL_DOWN:       sv_scroll_down(buf);       return  1;
+		case SV_SCROLL_UP:         sv_scroll_up(buf);         return  1;
 		
-		case SV_CLOSESHOP:			sv_closeshop(); return 1;
-
-		case SV_SETTARGET:			sv_settarget(buf); return 13;
-
-		case SV_PLAYSOUND:			sv_playsound(buf); return 13;
-
-		case SV_EXIT:				sv_exit(buf); break;
-
-		case SV_LOAD:             	sv_load(buf); return 5;
-
-		case SV_UNIQUE:             	sv_unique(buf); return 9;
-		case SV_IGNORE:		return sv_ignore(buf);
+		case SV_SCROLL_RIGHTDOWN:  sv_scroll_rightdown(buf);  return  1;
+		case SV_SCROLL_RIGHTUP:    sv_scroll_rightup(buf);    return  1;
+		case SV_SCROLL_LEFTDOWN:   sv_scroll_leftdown(buf);   return  1;
+		case SV_SCROLL_LEFTUP:     sv_scroll_leftup(buf);     return  1;
 		
-		case SV_WAYPOINTS:			sv_waypoints(); return 1;
-		case SV_SHOWMOTD:			sv_showmotd(buf); return 2;
+		case SV_LOOK1:             sv_look1(buf);             break;
+		case SV_LOOK2:             sv_look2(buf);             break;
+		case SV_LOOK3:             sv_look3(buf);             break;
+		case SV_LOOK4:             sv_look4(buf);             break;
+		case SV_LOOK5:             sv_look5(buf);             break;
+		case SV_LOOK6:             sv_look6(buf);             break;
+		case SV_LOOK7:             sv_look7(buf);             return  8;
+		case SV_LOOK8:             sv_look8(buf);             return  8;
 		
-		case SV_CLEARBOX:			sv_clearbox(buf); return 9;
-
-		default: 			xlog(0,"Unknown SV: %d",buf[0]); return -1;
+		case SV_CLOSESHOP:         sv_closeshop();            return  1;
+		
+		case SV_SETTARGET:         sv_settarget(buf);         return 13;
+		
+		case SV_PLAYSOUND:         sv_playsound(buf);         return 13;
+		
+		case SV_EXIT:              sv_exit(buf);              break;
+		
+		case SV_LOAD:              sv_load(buf);              return  5;
+		
+		case SV_UNIQUE:            sv_unique(buf);            return  9;
+		case SV_IGNORE:            return sv_ignore(buf);
+		
+		case SV_WAYPOINTS:         sv_waypoints();            return  1;
+		case SV_SHOWMOTD:          sv_showmotd(buf);          return  2;
+		
+		case SV_CLEARBOX:          sv_clearbox(buf);          return  9;
+		
+		default: xlog(0,"Unknown SV: %d",buf[0]);             return -1;
 	}
-
+	
 	return 16;
 }
 
@@ -1596,57 +1595,66 @@ int game_loop(void)
 
 int tick_do(void)
 {
-	int len,idx=0,ret,csize,comp;
+	int len, idx=0, ret, csize, comp;
 	static char buf[65536];
-	static int ctot=1,utot=1,t=0,td;
-
+	static int ctot=1, utot=1, t=0, td;
+	
 	if (!t) t=time(NULL);
-        
-        len=*(unsigned short*)(tickbuf);
-	comp=len&0x8000;
-	len&=0x7fff;
-	ctot+=len;
-        if (len>ticksize) return 0;
-
-        if (comp) {		
-		zs.next_in=tickbuf+2;
-		zs.avail_in=len-2;
 	
-		zs.next_out=buf;
-		zs.avail_out=65536;
+	len   = *(unsigned short*)(tickbuf);
+	comp  = len & 0x8000;
+	len  &= 0x7fff;
+	ctot += len;
+	
+	if (len > ticksize) return 0;
 
-                ret=inflate(&zs,Z_SYNC_FLUSH);
-		if (ret!=Z_OK) { xlog(0,"uncompress error %d!",ret); }
+	if (comp)
+	{
+		zs.next_in   = tickbuf+2;
+		zs.avail_in  = len-2;
+		zs.next_out  = buf;
+		zs.avail_out = 65536;
 		
-		if (zs.avail_in) { xlog(0,"uncompress: avail is %d!!\n",zs.avail_in); }
-
-                csize=65536-zs.avail_out;				
-	} else {
-		csize=len-2;
-		if (csize) memcpy(buf,tickbuf+2,csize);                                
+		ret = inflate(&zs, Z_SYNC_FLUSH);
+		
+		if (ret != Z_OK)
+			xlog(0, "uncompress error %d!", ret);
+		
+		if (zs.avail_in)
+			xlog(0, "uncompress: avail is %d!!\n", zs.avail_in);
+		
+		csize = 65536 - zs.avail_out;
 	}
-
-	utot+=csize;
-
-	td=time(NULL)-t;
-	if (!td) td=1;
-        
-	lastn=-1;	// reset sv_setmap
-	ctick++; if (ctick>199) ctick=0;		// Feb 2020 - extended ctick array from 20 to 24 to 200
+	else
+	{
+		csize = len-2;
+		if (csize)
+			memcpy(buf, tickbuf+2, csize);
+	}
 	
-        while (idx<csize) {
-		ret=sv_cmd(buf+idx);
-		if (ret==-1) { xlog(1,"Warning: syntax error in server data"); DEBUG("Warning: syntax error in server data"); exit(1); }
-		idx+=ret;
+	utot += csize;
+	
+	td = time(NULL) - t;
+	if (!td) td = 1;
+	
+	lastn = -1;    // reset sv_setmap
+	ctick++;
+	if (ctick>199) ctick=0;    // Feb 2020 - extended ctick array from 20 to 24 to 200
+	
+	while (idx<csize)
+	{
+		ret = sv_cmd(buf + idx);
+		if (ret == -1) { xlog(1,"Warning: syntax error in server data"); DEBUG("Warning: syntax error in server data"); exit(1); }
+		idx += ret;
 	}
-
-	ticksize-=len;
-	tickstart-=len;
+	
+	ticksize  -= len;
+	tickstart -= len;
 	t_size--;
-        if (ticksize) memmove(tickbuf,tickbuf+len,ticksize);
-
-        engine_tick();
-        
+	if (ticksize) memmove(tickbuf, tickbuf + len, ticksize);
+	
+	engine_tick();
+	
 	return 1;
 }
 
@@ -1670,3 +1678,4 @@ static void load_unique(void)
 	RegQueryValueEx(hk,"fStyle1",0,(void*)&type,(void*)&unique1,(void*)&size);
 	RegQueryValueEx(hk,"fStyle2",0,(void*)&type,(void*)&unique2,(void*)&size);
 }
+
