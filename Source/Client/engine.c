@@ -2293,26 +2293,40 @@ int speedoMisc(int n)
 	
 	miscSpeedValue = map[n].ch_speed;
 	
+	/*
+		status2 / ch_stat_off values:
+		0 = Attack animation
+		1 = Pickup
+		2 = Drop
+		3 = Give
+		4 = Use
+		5 = Attack animation 2
+		6 = Attack animation 3
+		7 = Bow
+		8 = Wave
+		9 = Use skill (casting)
+	*/
+	
 	switch(map[n].ch_stat_off)
 	{
 		// 0, 5, 6 == Attack
-		case    0:
-		case    5:
-		case    6:
+		case  0:
+		case  5:
+		case  6:
 			miscSpeedValue -= map[n].ch_atkspd;
-			miscSpeedValue = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
+			miscSpeedValue  = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
 			return get_speedValue(miscSpeedValue, ctick);
 			
 		// 9 == Use skill, mostly casting
-		case    9:
+		case  9:
 			miscSpeedValue  = map[n].ch_speed*5/4;
 			miscSpeedValue -= map[n].ch_castspd*3/2;
-			miscSpeedValue = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
+			miscSpeedValue  = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
 			return get_speedValue(miscSpeedValue, ctick);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
-			miscSpeedValue = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
+			miscSpeedValue  = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
 			return get_speedValue(miscSpeedValue, ctick);
 	}
 }
