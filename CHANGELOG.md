@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.9.0](https://github.com/jamesblack/TheLastGate/compare/v3.8.0...v3.9.0) (2026-01-20)
+
+
+### Bug Fixes
+
+* Pact will no longer duplicate itself when shifting as Lycan. ([bef2f0f](https://github.com/jamesblack/TheLastGate/commit/bef2f0fa51731024882a7104e19e07b417dbfe66))
+
+
+### Miscellaneous Chores
+
+* bump version number ([e89b471](https://github.com/jamesblack/TheLastGate/commit/e89b471c8f4bc69bced05febee084c1f03e35099))
+
 ## [3.8.0](https://github.com/jamesblack/TheLastGate/compare/v3.7.0...v3.8.0) (2026-01-18)
 
 
