@@ -1794,7 +1794,7 @@ int get_meta_stat_value(int cn, int n)
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int dmg_wpn, dmg_low, dmg_hgh, dmg_top, dmg_hit, dmg_dps, dmg_bns, dmg_str;
 	int regen = 0, restn = 0, medit = 0;
-	int n1, n2, n3, hpbonus, enbonus, mpbonus;
+	int n1, n2, n3, hpbonus, enbonus, mpbonus, en_dam, mp_dam;
 	
 	switch (n) // Regen set
 	{
@@ -1968,17 +1968,11 @@ int get_meta_stat_value(int cn, int n)
 		case 24: // Cleave Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
 			
-			if (T_WARR_SK(cn, 9))         power = power + (power * M_AT(cn, AT_STR)  / 2000);
-			if (m=st_skillcount(cn, 45))  power = power + (power * M_AT(cn, AT_STR)*m/ 5000);
-			
 			value = power * DAM_MULT_CLEAVE/1000;
 			break;
 		case 25: // Cleave Bleed Degen				Decimal, 0.00 /s
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
 			
-			if (T_WARR_SK(cn,  9))         power = power + (power * M_AT(cn, AT_STR)  / 2000);
-			if (m=st_skillcount(cn, 45))   power = power + (power * M_AT(cn, AT_STR)*m/ 5000);
-
 			if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                  // [Ench] More Bleed
 			if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 2);   // (Lyca) Serration
 			
@@ -2014,22 +2008,34 @@ int get_meta_stat_value(int cn, int n)
 			value = power * DAM_MULT_BLAST/1000;
 			break;
 		case 33: // Blast Cooldown					Decimal, 0.00 Seconds
-			value = (T_ARHR_SK(cn,4)?575:600) * cdlen / 100;
+			value = 6 * cdlen;
 			break;
 		case 34: // Lethargy Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_LETHARGY), cn);
-			if (T_SORC_SK(cn, 7))        power = power + (power * M_AT(cn, AT_WIL)/2000);
-			if (m=st_skillcount(cn, 55)) power = power + (power*M_AT(cn, AT_WIL)*m/5000);
+			// Additive bonus
+			{
+				n  = 0;
+				n += T_SORC_SK(cn,  9)*2;    // (Sorc) Hex Master
+				n +=     TC_SK(cn, 57);
+				
+				power = more(power, M_AT(cn, AT_WIL) * n, 20);
+			}
 			if (IS_SEYAN_DU(cn))         value = (bu[in].power/6);
 			else                         value = (bu[in].power/4);
 			break;
 		case 35: case 90: // Poison/Venom Degen		Decimal, 0.00 /s
 			power = spell_multiplier(M_SK(cn, SK_POISON), cn);
 			durat = SP_DUR_POISON;
+			// Additive bonus
+			{
+				m  = 0;
+				m += T_SORC_SK(cn,  7)*2;    // (Sorc) Toxins
+				m +=     TC_SK(cn, 55);
+				
+				power = more(power, M_AT(cn, AT_INT) * m, 20);
+			}
 			if (do_get_iflag(cn, SF_EN_MOREPOIS)) power = power*6/5;
 			if (do_get_iflag(cn, SF_BOOK_VENO))   durat = durat*8/10;
-			if (T_SORC_SK(cn, 4))                 durat = durat*8/10;
-			if (m=st_skillcount(cn, 52))          durat = durat*(100-m*5)/100;
 			value = PL_POISFORM(power, durat);
 			if (do_get_iflag(cn, SF_TOWER_R))     value /= 2;
 			break;
@@ -2038,8 +2044,14 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 37: case 92: // Pulse Hit Damage/Heal	Decimal, 0.00
 			power = M_SK(cn, SK_PULSE);
-			if (T_ARHR_SK(cn, 7))        power = power + (power * M_AT(cn, AT_INT)/2000);
-			if (m=st_skillcount(cn, 79)) power = power + (power*M_AT(cn, AT_INT)*m/5000);
+			// Additive bonus
+			{
+				m  = 0;
+				m += T_ARHR_SK(cn,  7)*2;    // (ArHr) Psychosis
+				m +=     TC_SK(cn, 79);
+				
+				power = more(power, M_AT(cn, AT_INT) * m, 20);
+			}
 			power = spell_multiplier(power, cn);
 			if (n==37) value = power * 2;
 			else       value = power * DAM_MULT_PULSE / 20;
@@ -2053,8 +2065,6 @@ int get_meta_stat_value(int cn, int n)
 		case 40: // Zephyr Hit Damage				Decimal, 0.00
 			power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
 			power = power + max(0, GET_SPD_ATK(cn)) / 3;
-			if (T_WARR_SK(cn,  4))				power = power*6/5;
-			if (m=st_skillcount(cn, 40))		power = power*(20+m)/20;
 			value = power * 2 * DAM_MULT_ZEPHYR/10;
 			break;
 		case 41: // Immolate Degen					Decimal, 0.00 /s
@@ -2071,14 +2081,10 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 45: case 86: // Shadow Copy Potency
 			power = spell_multiplier(M_SK(cn, SK_SHADOW), cn);
-			if (T_SUMM_SK(cn, 9))        power = power + (power * M_AT(cn, AT_WIL)  /2000);
-			if (m=st_skillcount(cn, 69)) power = power + (power * M_AT(cn, AT_WIL)*m/5000);
 			value = power;
 			break;
 		case 46: case 87: // Shadow Copy Duration	Decimal, 0.00 Seconds
 			power = spell_multiplier(M_SK(cn, SK_SHADOW), cn);
-			if (T_SUMM_SK(cn, 9))        power = power + (power * M_AT(cn, AT_WIL)  /2000);
-			if (m=st_skillcount(cn, 69)) power = power + (power * M_AT(cn, AT_WIL)*m/5000);
 			value = SP_DUR_SHADOW(power);
 			break;
 		case 47: case 88: // Shadow Copy Cooldown	Decimal, 0.00 Seconds
@@ -2090,12 +2096,25 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 50: // Effective Hitpoints
 			value = HP_SOFTCAP(cn)*10 / ch[cn].dmg_reduction;
-			if (do_get_iflag(cn, SF_EN_TAKEASEN) || do_get_iflag(cn, SF_EN_TAKEASMA)) value = value * 100 / 80; // taken as...
+			en_dam = mp_dam = 0;
+			if (T_WARR_SK(cn, 12))                 en_dam +=   30;    // (Warr) Tenacity
+			if (m = TC_SK(cn, 48))                 en_dam += m*15;
+			if (do_get_iflag(cn, SF_TW_CLOAK))     en_dam +=   15;    // [Gear] Cloak of Shadows
+			if (do_get_iflag(cn, SF_EN_TAKEASEN))  en_dam +=   15;    // [Ench] *DoT* damage taken as endurance
+			if (do_get_iflag(cn, SF_WORLD_R))      en_dam +=   60;    // [Taro] World.R
 			
-			if (T_WARR_SK(cn, 12) || T_ARHR_SK(cn, 12))                               value = value * 100 / 50; // taken as...
+			if (T_ARHR_SK(cn, 12))                 mp_dam +=   30;    // (ArHr) Resourcefulness
+			if (m = TC_SK(cn, 84))                 mp_dam += m*15;
+			if (do_get_iflag(cn, SF_PREIST))       mp_dam +=   30;    // [Taro] Priestess
+			if (do_get_iflag(cn, SF_EN_TAKEASMA))  mp_dam +=   15;    // [Ench] *Hit* damage taken as mana
 			
-			if (do_get_iflag(cn, SF_TW_CLOAK))                                        value = value * 100 / 90; // taken as...
-			if (do_get_iflag(cn, SF_PREIST))                                          value = value * 100 / 80; // taken as...
+			m = en_dam + mp_dam;
+			
+			en_dam = ( (en_dam * 100)/m * min(90, m) )/100;
+			mp_dam = ( (mp_dam * 100)/m * min(90, m) )/100;
+			
+			value = value + en_dam*EN_SOFTCAP(cn)/(ch[cn].dmg_reduction*10);
+			value = value + mp_dam*MP_SOFTCAP(cn)/(ch[cn].dmg_reduction*10);
 			break;
 		case 51: // Health Regen Rate				Decimal, 0.00 /s
 			value = regen * 20/10;
@@ -2109,11 +2128,26 @@ int get_meta_stat_value(int cn, int n)
 		case 54: // Effective Immunity
 			value = M_SK(cn, SK_IMMUN);
 			if (do_get_iflag(cn, SF_HANGED)) value += M_SK(cn, SK_RESIST)/3;
-			if (T_WARR_SK(cn, 12))           value += ch[cn].spell_apt/5;
+			// Additive bonus
+			{
+				n  = 0;
+				n += T_WARR_SK(cn,  4)*2;  // (Warr) Dismissal
+				n +=     TC_SK(cn, 40);
+				
+				value = more(value, (SPEED_BASE + GET_SPD_ATK(cn))*n, 50);
+			}
 			break;
 		case 55: // Effective Resistance
 			value = M_SK(cn, SK_RESIST);
 			if (do_get_iflag(cn, SF_HANGED)) value -= M_SK(cn, SK_RESIST)/3;
+			// Additive bonus
+			{
+				n  = 0;
+				n += T_SORC_SK(cn, 12)*2;  // (Sorc) Dodging
+				n +=     TC_SK(cn, 60);
+				
+				value = more(value, (SPEED_BASE + GET_SPD_MOV(cn))*n, 50);
+			}
 			break;
 		case 61: // Buffing Apt Bonus
 			value = M_AT(cn, AT_WIL)/4;
@@ -2162,9 +2196,15 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 74: // Blind Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
+			// Additive bonus
+			{
+				m  = 0;
+				m += T_WARR_SK(cn,  9)*2;    // (Warr) Antagonizer
+				m +=     TC_SK(cn, 45);
+				
+				power = more(power, M_AT(cn, AT_AGL) * m, 20);
+			}
 			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
-			if (T_WARR_SK(cn, 7))                 power = power + (power * M_AT(cn, AT_AGL)  /2000);
-			if (m=st_skillcount(cn, 43))          power = power + (power * M_AT(cn, AT_AGL)*m/5000);
 			if (IS_ANY_MERC(cn)) value = min(127, (power/6 + 2));
 			else                 value = min(127, (power/8 + 1));
 			break;
@@ -2173,7 +2213,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 76: // Warcry Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
-			// "Increased" effects
+			// Additive bonus
 			{
 				m  = 0;
 				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
@@ -2199,8 +2239,6 @@ int get_meta_stat_value(int cn, int n)
 		case 80: // Curse Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
-			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
-			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
 			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
 			else                                  value = (3 + (power - 4) / 5);
 			break;
@@ -2210,8 +2248,6 @@ int get_meta_stat_value(int cn, int n)
 		case 82: // Slow Effect												// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
-			if (T_SORC_SK(cn,  9))                power = power + (power * M_AT(cn, AT_INT)/2000);
-			if (m=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*m/5000);
 			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
 			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;

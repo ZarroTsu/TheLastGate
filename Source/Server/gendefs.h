@@ -495,7 +495,7 @@ extern char *at_name[];
 #define DESC_TW_DOUSER		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n"
 #define DESC_TW_MARCH		"When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by one third.\n"
 #define DESC_TW_BBELT		"When equipped, get WV from your Hand to Hand skill and +2%% base crit if your main hand is empty, half of shield parry bonus if your off-hand is empty, and 5%% total base crit if both hands are empty.\n"
-#define DESC_TW_OUTSIDE		"When equipped, enemies beside and behind you no longer gain a bonus to hitting you.\n"
+#define DESC_TW_OUTSIDE		"When equipped, enemies no longer gain a bonus to hitting you while you are stunned or not fighting back.\n"
 #define DESC_TW_HEAVENS		"Uses your highest weapon skill for hit and parry scores. When equipped, your highest attribute score is increased by 20%%.\n"
 
 #define FN_ABYSS		4

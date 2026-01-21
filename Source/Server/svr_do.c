@@ -1616,7 +1616,7 @@ void do_listmax(int cn)
 
 void do_listgcmax(int cn, int shadow)
 {
-	int n, co=0, archbonus=0, archtmp=0, m = PCD_COMPANION;
+	int n, co=0, gcm=0, archtmp=0, m = PCD_COMPANION;
 	
 	if (shadow) m = PCD_SHADOWCOPY;
 	
@@ -1632,8 +1632,17 @@ void do_listgcmax(int cn, int shadow)
 		do_char_log(cn, 0, "You must summon a new companion first.\n");
 		return;
 	}
-	if (B_SK(cn, SK_GCMASTERY)) 
-		archbonus 	= M_SK(cn, SK_GCMASTERY);
+	
+	if (B_SK(cn, SK_GCMASTERY)) gcm = M_SK(cn, SK_GCMASTERY);
+	
+	// Additive bonus
+	{
+		n  = 0;
+		n += T_SUMM_SK(cn,  9)*2;    // (Summ) Shaper
+		n +=     TC_SK(cn, 69);
+		
+		gcm = more(gcm, M_AT(cn, AT_WIL) * n, 20);
+	}
 	
 	//                 "!        .         .   |     .         .        !"
 	do_char_log(cn, 1, "Now listing skill maximums for your ghost:\n");
@@ -1641,9 +1650,9 @@ void do_listgcmax(int cn, int shadow)
 	//
 	for (n=0;n<5;n++)
 	{
-		do_char_log(cn, (B_AT(co, n)>=ch[co].attrib[n][2]+max(0,archbonus-n)/10)?2:1,
+		do_char_log(cn, (B_AT(co, n)>=ch[co].attrib[n][2]+max(0,gcm-n)/10)?2:1,
 		"%20s  %3d  %3d\n", 
-		at_name[n], B_AT(co, n), ch[co].attrib[n][2]+max(0,archbonus-n)/10);
+		at_name[n], B_AT(co, n), ch[co].attrib[n][2]+max(0,gcm-n)/10);
 	}
 	//
 	do_char_log(cn, (ch[co].hp[0]>=ch[co].hp[2])?2:1, 
@@ -1659,15 +1668,15 @@ void do_listgcmax(int cn, int shadow)
 		{
 			if (n==0)
 			{
-				do_char_log(cn, (B_SK(co, n)>=ch[co].skill[n][2]+archbonus/5)?2:1, 
+				do_char_log(cn, (B_SK(co, n)>=ch[co].skill[n][2]+gcm/5)?2:1, 
 					"%20s  %3d  %3d\n", 
-					skilltab[n].name, B_SK(co, n), ch[co].skill[n][2]+archbonus/5);
+					skilltab[n].name, B_SK(co, n), ch[co].skill[n][2]+gcm/5);
 			}
 			else
 			{
-				do_char_log(cn, (B_SK(co, n)>=ch[co].skill[n][2]+(archbonus-archtmp)/10)?2:1, 
+				do_char_log(cn, (B_SK(co, n)>=ch[co].skill[n][2]+(gcm-archtmp)/10)?2:1, 
 					"%20s  %3d  %3d\n", 
-					skilltab[n].name, B_SK(co, n), ch[co].skill[n][2]+(archbonus-archtmp)/10);
+					skilltab[n].name, B_SK(co, n), ch[co].skill[n][2]+(gcm-archtmp)/10);
 				archtmp++;
 			}
 		}
@@ -7659,10 +7668,6 @@ int get_tarot(int cn, int in)
 {
 	int ch1=0, ch2=0, ch3=0, cc=0;
 	
-	// Let GC copy card effects (summ tree)
-	if (IS_COMP_TEMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && (T_SUMM_SK(cc, 10) || ch[cn].data[1]==4))
-		cn = cc;
-	
 	if (ch[cn].flags & CF_NOMAGIC) return 0;
 	
 	ch1 = ch[cn].worn[WN_CHARM];
@@ -9277,7 +9282,7 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	
 	*en_dam = *mp_dam = 0;
 	
-	if (T_ARHR_SK(co, 12))                           en_dam +=   30;    // (Warr) Tenacity
+	if (T_WARR_SK(co, 12))                           en_dam +=   30;    // (Warr) Tenacity
 	if (n = TC_SK(co, 48))                           en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               en_dam +=   15;    // [Gear] Cloak of Shadows
 	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
@@ -9302,7 +9307,7 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 
 void do_leech(int cn, int dam, int is_dot)
 {
-	int tmp, n;
+	int tmp, n, cc;
 	
 	if (!IS_SANECHAR(cn)) return;
 	
@@ -9339,6 +9344,23 @@ void do_leech(int cn, int dam, int is_dot)
 	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (ArHr) Perpetuity
 	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[2] = tmp;
+	
+	if (IS_PLAYER_COMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]))
+	{
+		tmp = ch[cc].leech[0];
+		if (T_SUMM_SK(cc, 12)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Summ) Necromancy
+		if (n = TC_SK(cc, 72)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+		ch[cc].leech[0] = tmp;
+	}
+	
+	if (n = TC_SK(cn, 70))  // (Corr) Wraithlord
+	{
+		if (IS_LIVINGCHAR(cc = ch[cn].data[PCD_COMPANION]) && ch[cc].data[CHD_MASTER]==cn)
+			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * (n*2)/1000), 0, 65500);
+		
+		if (IS_LIVINGCHAR(cc = ch[cn].data[PCD_SHADOWCOPY]) && ch[cc].data[CHD_MASTER]==cn)
+			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * (n*2)/1000), 0, 65500);
+	}
 }
 
 // dmg types: 0=normal 1=blast 2=hw/soku 3=gethit 4=surround 5=cleave 6=pulse 7=zephyr 8=leap 9=crit 13=gethit/10
@@ -9631,12 +9653,6 @@ int do_hurt(int cn, int co, int dam, int type)
 	
 	if (hp_dam < 0) hp_dam = 0;
 	
-	// Culling strike!
-	if ((type==5 && (n=st_skillcount(cn, 10))) || (type==1 && (n=st_skillcount(cn, 76))) || (type==9 && (n=st_skillcount(cn, 102))))
-	{
-		cullval = 500 + min(ch[co].hp[5]*200, max(0, ch[co].hp[5]*1000 - ch[co].hp[5]*1000*(100-n*2)/100));
-	}
-	
 	if ((ch[co].a_hp - hp_dam) < cullval && !(mf2 & MF_ARENA) && try_lucksave(co))
 	{
 		do_lucksave(co, "killing blow");
@@ -9775,16 +9791,6 @@ int do_hurt(int cn, int co, int dam, int type)
 				thorns = max(0, thorns - (ch[cn].to_parry - ch[co].to_hit));
 			}
 			if (thorns>0) do_hurt(co, cn, thorns, 3);
-		}
-		if ((type==3 || type==13) && st_skillcount(co, 90))
-		{
-			thorns = dam/1000;
-			if (thorns>0) do_hurt(co, cn, thorns, 90);
-		}
-		if (type==9 && st_skillcount(co, 96))
-		{
-			thorns = dam/1000;
-			if (thorns>0) do_hurt(co, cn, thorns, 96);
 		}
 	}
 
@@ -9993,11 +9999,10 @@ void do_attack(int cn, int co, int surround)
 	if (!is_facing(co, cn)) sorb = 1;
 	if (   is_back(co, cn)) sorb = 2;
 	
-	//   Outsider's Eye                  or  (Warr) Champion
-	if (!do_get_iflag(cn, SF_TW_OUTSIDE) && !T_WARR_SK(co, 10)) s2 -= 10*sorb;
+	if (!T_WARR_SK(co, 10)) s2 -= 10 * sorb; // (Warr) Champion
 	
-	//   Stunned or not fighting
-	if ((ch[co].stunned==1 || !ch[co].attack_cn)) s2 -= 10;
+	//   Stunned or not fighting                 ~~  Outsider's Eye
+	if ((ch[co].stunned==1 || !ch[co].attack_cn) && !do_get_iflag(co, SF_TW_OUTSIDE)) s2 -= 10;
 	
 	diff = s1 - s2;
 	
@@ -10613,7 +10618,7 @@ void really_update_char(int cn)
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0;
 	int heal_hp, heal_end, heal_mana, act = 0, tmphm = 0, gench = 0;
 	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0, in=0, nmz=0;
-	int isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0;
+	int isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0, isWater = 0;
 	int divCursed = 1, divSlowed = 1, divWeaken = 1, symSpec = 0;
 	int hastePower = 0, slowPower = 0, hasteSpeed = 0, slowSpeed = 0, slow2Speed = 0, sickStacks = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
@@ -10717,6 +10722,8 @@ void really_update_char(int cn)
 	dmg_bns = dmg_rdc = tempCost = 10000;
 	
 	if (IS_PLAYER_COMP(cn)) dmg_rdc = 5000;
+	
+	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER) isWater = 1;
 	
 	// Loop through gear for item effect flags - Magic checks
 	if (!(ch[cn].flags & CF_NOMAGIC)) for (n=0; n<MAXGSLOTS; n++)
@@ -11113,13 +11120,6 @@ void really_update_char(int cn)
 		resrv[0] += it[m].reserve_hp[act];
 		resrv[1] += it[m].reserve_en[act];
 		resrv[2] += it[m].reserve_mp[act];
-	}
-	
-	// GC may inherit tarots from owner
-	if (IS_COMP_TEMP(cn) && !(ch[cn].flags & CF_NOMAGIC) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && T_SUMM_SK(co, 10))
-	{
-		for (n = SF_MAGI; n<SF_WORLD_R; n++)
-			if (do_get_iflag(co, n)) do_set_iflag(cn, n);
 	}
 	
 	// Feb 2020 - Store the current armor and weapon values from your gear, before other additions.
@@ -11733,6 +11733,10 @@ void really_update_char(int cn)
 		}
 	}
 	
+	/*
+		Skill score bonuses from attributes
+	*/
+	
 	for (z = 0; z<MAXSKILL; z++)
 	{
 		skill[z] += B_SK(cn, z) + ch[cn].skill[z][1];  // Base + greater scrolls
@@ -11808,26 +11812,7 @@ void really_update_char(int cn)
 	
 	if (cz) cn = cz;
 	
-	// Tactics
-	if (B_SK(cn, SK_TACTICS))
-	{
-		z = M_SK(cn, SK_TACTICS);
-		
-		if (do_get_iflag(cn, SF_MOON_R)) z = more(z, ch[cn].mana[4], 50);    // [Taro] Moon.R
-		
-		hit_rate   += max(0, z/6);
-		parry_rate += max(0, z/6);
-	}
-	// Tactics for GCs
-	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && B_SK(co, SK_TACTICS))
-	{
-		z = M_SK(co, SK_TACTICS);
-		
-		if (do_get_iflag(co, SF_MOON_R)) z = more(z, ch[co].mana[4], 50);    // [Taro] Moon.R
-		
-		hit_rate   += max(0, z/6);
-		parry_rate += max(0, z/6);
-	}
+	
 	
 	// Finesse
 	if (B_SK(cn, SK_FINESSE))
@@ -11867,14 +11852,8 @@ void really_update_char(int cn)
 	light += maxlight/2;
 	light -= sublight;
 	
-	if (has_buff(cn, 215))
-	{
-		light = light/10;
-	}
-	if (do_get_iflag(cn, SF_EN_NOGLOW))
-	{
-		light = 0;
-	}
+	if (has_buff(cn, 215)) light = light/10;
+	if (do_get_iflag(cn, SF_EN_NOGLOW)) light = 0;
 	
 	ch[cn].light = clamp(light, 0, 250);
 	
@@ -11954,24 +11933,25 @@ void really_update_char(int cn)
 	
 	ch[cn].mana_cost = clamp(tempCost, 0, 20000);
 	
+	
 	/*
 		ch[].speed value
 	*/
 	
-	// Weapon - Kelp Trident :: +30 speed while underwater
-	if ((do_get_iflag(cn, SF_KELPTRID)) && (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER))
+	// Flat bonus
 	{
-		base_spd += 30;
+		base_spd += SPEED_BASE + ch[cn].speed_mod;
+		base_spd += (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 8;
+		
+		if (isWater && (do_get_iflag(cn, SF_KELPTRID))) base_spd += 30;  // [Gear] Kelp Trident
+		
+		if (ch[cn].mode==0) base_spd += 15;  // [Mode] "SLOW"
+		if (ch[cn].mode==1) base_spd += 30;  // [Mode] "NORMAL"
+		if (ch[cn].mode==2) base_spd += 45;  // [Mode] "FAST"
 	}
 	
-	base_spd = SPEED_BASE + base_spd + (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 8 + ch[cn].speed_mod;
-	
-	// Additional bonus via speed mode :: Slow, Normal, Fast
-	if (ch[cn].mode==0) base_spd += 15;	// old: 14 + 2 = 16/36
-	if (ch[cn].mode==1) base_spd += 30;	// old: 14 + 4 = 18/36
-	if (ch[cn].mode==2) base_spd += 45;	// old: 14 + 6 = 20/36
-	
 	ch[cn].speed = SPEED_CAP - clamp(base_spd, 1, SPEED_CAP);
+	
 	
 	// Table array is between 0 and 299 and stored in reverse order.
 	// So we take 300, minus our bonus speed values above.
@@ -11980,34 +11960,31 @@ void really_update_char(int cn)
 		ch[].move_speed value
 	*/
 	
-	spd_move += 20;
-	
-	if (IS_GLOB_MAYHEM && !IS_PLAYER(cn))
-		spd_move += 40;
-	
-	if (IS_BLOODY(cn) && ch[cn].data[42] == 1100)
-		spd_move += 100;
-	
-	// Enchant: Move speed can't go below 150
-	if (do_get_iflag(cn, SF_EN_NOSLOW))
+	// Flat bonus
 	{
-		if (base_spd + spd_move < 150)
-			spd_move = 150 - (base_spd + spd_move);
-	}
-	// Enchant: 20% more Move speed
-	if (do_get_iflag(cn, SF_EN_MOREMOVE))
-	{
-		spd_move = ((base_spd + spd_move) * 6/5) - base_spd;
-	}
-	// Enchant: 2x Move Speed underwater
-	if (do_get_iflag(cn, SF_EN_MOVEUW) && (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER))
-	{
-		spd_move = ((base_spd + spd_move) * 2) - base_spd;
+		spd_move += 20;
+		
+		if (IS_GLOB_MAYHEM && !IS_PLAYER(cn))       spd_move +=  40;
+		if (IS_BLOODY(cn) && ch[cn].data[42]==1100) spd_move += 100;
 	}
 	
-	// Tree - sorc
-	if (T_SORC_SK(cn, 11))         spd_move = ((base_spd + spd_move) * 120/100) - base_spd;
-	if (n = st_skillcount(cn, 59)) spd_move = ((base_spd + spd_move) * (100+n*3)/100) - base_spd;
+	// Additive bonus
+	{
+		n  = 0;
+		n += T_SORC_SK(cn, 11)*20;  // (Sorc) Fleet-Foot
+		n +=     TC_SK(cn, 59)*10;
+		
+		spd_move = more(base_spd + spd_move, n, 1) - base_spd;
+	}
+	
+	// Multiplicative bonus
+	{
+		if (do_get_iflag(cn, SF_EN_MOREMOVE))          spd_move = more(base_spd + spd_move,  20, 1) - base_spd;
+		if (isWater && do_get_iflag(cn, SF_EN_MOVEUW)) spd_move = more(base_spd + spd_move, 100, 1) - base_spd;
+	}
+	
+	if (do_get_iflag(cn, SF_EN_NOSLOW) && (base_spd + spd_move < 150))  // [Ench] Move speed can't go below 150
+		spd_move = 150 - (base_spd + spd_move);
 	
 	ch[cn].move_speed = clamp(spd_move, -127, 127);
 	
@@ -12017,7 +11994,7 @@ void really_update_char(int cn)
 		ch[].atk_speed value
 	*/
 	
-	// Flat bonuses
+	// Flat bonus
 	{
 		if (IS_SUMMONER(cn))
 			spd_cast   += attrib_ex[AT_WIL]/2;
@@ -12033,7 +12010,7 @@ void really_update_char(int cn)
 			spd_attack += spd_cast;
 	}
 	
-	// Additive bonuses
+	// Additive bonus
 	{
 		n  = 0;
 		n += T_WARR_SK(cn,  5)*20;  // (Warr) Swiftness
@@ -12064,6 +12041,71 @@ void really_update_char(int cn)
 	ch[cn].cast_speed = clamp(spd_cast,   -127, 127);
 	ch[cn].atk_speed  = clamp(spd_attack, -127, 127);
 	
+	// Tactics
+	if (B_SK(cn, SK_TACTICS))
+	{
+		z = M_SK(cn, SK_TACTICS);
+		
+		// Additive bonus
+		{
+			n  = 0;
+			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
+			n +=     TC_SK(cn, 66);
+			
+			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 50);
+		}
+		
+		if (do_get_iflag(cn, SF_MOON_R)) z = more(z, ch[cn].mana[4], 50);    // [Taro] Moon.R
+		
+		hit_rate   += max(0, z/6);
+		parry_rate += max(0, z/6);
+	}
+	// Tactics for GCs
+	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && B_SK(co, SK_TACTICS))
+	{
+		z = M_SK(co, SK_TACTICS);
+		
+		// Additive bonus
+		{
+			n  = 0;
+			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
+			n +=     TC_SK(cn, 66);
+			
+			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 50);
+		}
+		
+		if (do_get_iflag(co, SF_MOON_R)) z = more(z, ch[co].mana[4], 50);    // [Taro] Moon.R
+		
+		hit_rate   += max(0, z/6);
+		parry_rate += max(0, z/6);
+	}
+	
+	
+	/*
+		ch[].spell_apt -- Spell Aptitude
+	*/
+	
+	// Flat bonus
+	{
+		spell_apt += (attrib[AT_WIL] + attrib[AT_INT]) * spell_race_mod(100, cn) / 100;
+	}
+	
+	// Additive bonus
+	{
+		n  = 0;
+		n += T_SORC_SK(cn,  5)*10;          // (Sorc) Zealotry
+		n +=     TC_SK(cn, 53)* 5;
+		
+		spell_apt = more(spell_apt, n, 1);
+	}
+	
+	// Multiplicative bonus
+	{
+		if (do_get_iflag(cn, SF_TW_SUPERBIA)) spell_apt = less(spell_apt, 90, 1);  // [Gear] Superbia
+	}
+	
+	ch[cn].spell_apt = clamp(spell_apt, 1, 999);
+	
 	
 	/*
 		ch[].spell_pow -- Spellpower Bonus
@@ -12071,30 +12113,15 @@ void really_update_char(int cn)
 		Flat additive value to all spells. WIP -- need client-side adjustments to display it.
 	*/
 	
-	// Flat bonuses
+	// Flat bonus
 	{
-		if (T_SEYA_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=  m/25; }             // (Seya) Brilliance
+		if (T_SEYA_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=  m/25; }  // (Seya) Brilliance
 		if (n = TC_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/50; }
+		
+		spell_pow += (T_SORC_SK(cn, 4)*2 + TC_SK(cn, 52))*spell_apt/50;    // (Sorc) Introspection
 	}
 	
 	ch[cn].spell_pow = clamp(spell_pow, -300, 300);
-	
-	
-	/*
-		ch[].spell_apt -- Spell Aptitude
-	*/
-	
-	spell_apt += (attrib[AT_WIL] + attrib[AT_INT]) * spell_race_mod(100, cn) / 100;
-	
-	// Superbia
-	if (do_get_iflag(cn, SF_TW_SUPERBIA)) spell_apt = spell_apt/10;
-	
-	// Tree - warr
-	if (T_WARR_SK(cn, 11))         spell_apt = spell_apt*120/100;
-	if (n = st_skillcount(cn, 47)) spell_apt = spell_apt*(100+n*5)/100;
-	//if (T_WARR_SK(cn, 12))         dmg_rdc = max(1000, dmg_rdc * (500 - spell_apt)/500);
-	
-	ch[cn].spell_apt = clamp(spell_apt, 1, 999);
 	
 	
 	/*
@@ -12125,6 +12152,15 @@ void really_update_char(int cn)
 		spell_cool += attrib_ex[AT_INT]/6;                          // Implicit attribute bonus
 	}
 	
+	// Additive bonuses
+	{
+		n  = 0;
+		n += T_ARHR_SK(cn,  5)*10;             // (ArHr) Serenity
+		n +=     TC_SK(cn, 77)* 5;
+		
+		spell_cool   = more(spell_cool, n, 1);
+	}
+	
 	// Multiplicative bonuses
 	{
 		n = spell_cool;
@@ -12137,17 +12173,12 @@ void really_update_char(int cn)
 			else                                n = more(n, m, 4);
 		}
 		
-		if (do_get_iflag(cn, SF_STRENGTH)) n = less(n, 15, 1);      // [Taro] Strength
+		if (do_get_iflag(cn, SF_STRENGTH))                      n = less(n, 15, 1);      // [Taro] Strength
+		if ((m = has_buff(cn, SK_POISON)) && bu[m].data[8]==10) n = less(n, 10, 1);
+		if ((m = has_buff(cn, SK_VENOM))  && bu[m].data[8]==10) n = less(n, 10, 1);
 		
 		spell_cool = n;
 	}
-	
-	// Tree - arhr
-	if (T_ARHR_SK(cn,  5))         spell_cool = spell_cool*105/100;
-	if (n = st_skillcount(cn, 77)) spell_cool = spell_cool*(100+n*2)/100;
-	
-	if ((n = has_buff(cn, SK_POISON)) && bu[n].data[8]==10) spell_cool = spell_cool*9/10;
-	if ((n = has_buff(cn, SK_VENOM))  && bu[n].data[8]==10) spell_cool = spell_cool*9/10;
 	
 	ch[cn].cool_bonus = 100 + clamp(spell_cool, -75, 900);
 	
@@ -12663,6 +12694,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			
 			if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
+			
 			bu[in].speed      = min(300, 10 + (power  )/ 6);
 			bu[in].atk_speed  = min(127,  5 + (power+6)/12);
 			bu[in].cast_speed = min(127,  5 + (power+6)/12);
@@ -12676,8 +12708,6 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
-			if (T_SORC_SK(cn,  9))                power = power + (power*M_AT(cn, AT_INT)  /2000);
-			if (n=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*n/5000);
 			
 			power = common_mult(cn, co, spell_immunity(cn, co, power));
 			
@@ -12706,8 +12736,6 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
-			if (T_SORC_SK(cn,  9))                power = power + (power*M_AT(cn, AT_INT)  /2000);
-			if (n=st_skillcount(cn, 57))          power = power + (power*M_AT(cn, AT_INT)*n/5000);
 			
 			power = common_mult(cn, co, spell_immunity(cn, co, power));
 			
@@ -12733,7 +12761,6 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
-			if (n=st_skillcount(cn, 34))          power = power*(20+n)/20;
 			
 			power = common_mult(cn, co, spell_immunity(cn, co, power));
 			
@@ -12803,41 +12830,37 @@ void do_check_auras(int cn)
 {
 	int in;
 	
-	if (B_SK(cn, SK_ARIA))              do_skill_aura(cn, SK_ARIA, has_buff(cn, SK_ARIA));
-	if (in = has_buff(cn, SK_IMMOLATE)) do_skill_aura(cn, SK_IMMOLATE2, in);
+	if (B_SK(cn, SK_ARIA))                        do_skill_aura(cn, SK_ARIA, has_buff(cn, SK_ARIA));
+	if (in = has_buff(cn, SK_IMMOLATE))           do_skill_aura(cn, SK_IMMOLATE2, in);
+	if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   do_skill_aura(cn, SK_SLOW,   0);  // (Sorc) Rewind
+	if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  do_skill_aura(cn, SK_HASTE,  0);  // (Sorc) Fast Forward
+	if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  do_skill_aura(cn, SK_CURSE,  0);  // (Brav) Presence
+	if (T_LYCA_SK(cn,  4) && B_SK(cn, SK_WEAKEN)) do_skill_aura(cn, SK_WEAKEN, 0);  // (Lyca) Sickness
 }
 
 void do_random_blast(int cn, int power)
 {
-	int _aoe, _rad, j, x, y, xf, yf, xt, yt, xc, yc, aoe_power, c = 0, co;
-	double tmp_a;
+	int x, y, xf, yf, xt, yt, xc, yc, c = 0, co;
+	int r = get_aoe_radius(cn, SK_WARCRY, GET_PROX(cn));
 	int catalog[64] = { 0 };
 	
 	if (!cn) return;
 	
-	power = power/2 + power/4;
-	
-	j = 100 + st_skillcount(cn, 53)*5;
-	
-	aoe_power = M_SK(cn, SK_PROX)+15;
-	_rad      = PRXA_RAD + ch[cn].aoe_bonus;
-	_aoe      = (aoe_power/(PROX_CAP*2) + _rad) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100;
-	tmp_a     = (double)((aoe_power*100/(PROX_CAP*2) + _rad*100) * (T_SORC_SK(cn, 5)?12:10)/10 * j/100);
+	power = less(power, 25, 1);
 	
 	xc = ch[cn].x;
 	yc = ch[cn].y;
-	xf = max(1, xc - _aoe);
-	yf = max(1, yc - _aoe);
-	xt = min(MAPX - 1, xc + 1 + _aoe);
-	yt = min(MAPY - 1, yc + 1 + _aoe);
 	
-	for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
+	xf = max(       1, xc - (sqr(r)/10000));
+	yf = max(       1, yc - (sqr(r)/10000));
+	xt = min(MAPX - 1, xc + (sqr(r)/10000));
+	yt = min(MAPY - 1, yc + (sqr(r)/10000));
+	
+	m1 = XY2M(ch[cn].x, ch[cn].y);
+	
+	for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
 	{
-		// This makes the radius circular instead of square
-		if (sqr(xc - x) + sqr(yc - y) > (sqr(tmp_a/100) + 1))
-		{
-			continue;
-		}
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 		if (IS_SANECHAR(co = map[x + y * MAPX].ch) && cn!=co)
 		{
 			if (!do_char_can_see(cn, co, 0)) continue;
@@ -12922,8 +12945,14 @@ void do_update_spell_lethargy(int cn, int in)
 	
 	power = M_SK(cn, SK_LETHARGY);
 	
-	if (T_SORC_SK(cn, 7))        power = power + (power * M_AT(cn, AT_WIL)  /2000);
-	if (n=st_skillcount(cn, 55)) power = power + (power * M_AT(cn, AT_WIL)*n/5000);
+	// Additive bonus
+	{
+		n  = 0;
+		n += T_SORC_SK(cn,  9)*2;    // (Sorc) Hex Master
+		n +=     TC_SK(cn, 57);
+		
+		power = more(power, M_AT(cn, AT_WIL) * n, 20);
+	}
 	
 	power = spell_multiplier(power, cn);
 	bu[in].power = power;
@@ -12963,6 +12992,65 @@ void do_update_permaspells(int cn)
 			}
 		}
 	}
+}
+
+void do_pulse_tick(int cn, int co, int in)
+{
+	int xf, yf,	xt, yt, xc, yc, x, y, co, n, idx;
+	int r = get_aoe_radius(cn, SK_PULSE, GET_PROX(cn));
+	
+	xc = ch[cn].x;
+	yc = ch[cn].y;
+	
+	xf = max(       1, xc - (sqr(r)/10000));
+	yf = max(       1, yc - (sqr(r)/10000));
+	xt = min(MAPX - 1, xc + (sqr(r)/10000));
+	yt = min(MAPY - 1, yc + (sqr(r)/10000));
+	
+	for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
+	{
+		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
+		if ((co = map[x + y * MAPX].ch) && (cn!=co || bu[in].temp==SK_PULSE2))
+		{
+			if (IS_NOMAGIC(co)) continue;
+			if (bu[in].temp==SK_PULSE)
+			{
+				// Prevent pulse from hitting enemies that don't want to hurt you
+				idx = cn | (char_id(cn) << 16);
+				for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
+				{
+					if (ch[co].data[n]==idx) break;
+				}
+				if (n==MCD_ENEMYZZZ+1) continue;
+			}
+			if (bu[in].temp==SK_PULSE)
+			{
+				remember_pvp(cn, co);
+				if (do_surround_check(cn, co, 1))
+				{
+					do_hurt(cn, co, spell_immunity(cn, co, bu[in].power) * 2, 6);
+					spell_shock(cn, co, bu[in].power);
+					
+					check_gloves(cn, co, -1, RANDOM(20), RANDOM(20));
+					
+					char_play_sound(co, ch[cn].sound + 20, -150, 0);
+					do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 20);
+					fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+				}
+			}
+			else if (bu[in].temp==SK_PULSE2 && IS_MY_ALLY(cn, co))
+			{
+				ch[co].a_hp += bu[in].power * DAM_MULT_PULSE / 2;
+				if (ch[co].a_hp > ch[co].hp[5] * 1000) ch[co].a_hp = ch[co].hp[5] * 1000;
+				spell_charge(cn, co, bu[in].power);
+				
+				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			}
+		}
+	}
+	
+	// Set next tick schedule
+	bu[in].data[2] = globs->ticker + bu[in].data[1];
 }
 
 // note: this calculates ALL normal endurance/hp changes.
@@ -13383,10 +13471,7 @@ void do_regenerate(int cn)
 	
 	
 	if (do_get_iflag(cn, SF_PREIST_R) && B_SK(cn, SK_MSHIELD)) do_pmshield(cn, cn);
-	if (IS_COMP_TEMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && T_SUMM_SK(cc, 10))
-	{
-		if (do_get_iflag(cc, SF_PREIST_R) && B_SK(cc, SK_MSHIELD)) do_pmshield(cc, cn);
-	}
+
 	do_check_auras(cn);
 	
 	// Tick down escape try
@@ -13904,79 +13989,7 @@ void do_regenerate(int cn)
 			// Pulse
 			if ((bu[in].temp==SK_PULSE || bu[in].temp==SK_PULSE2) && globs->ticker>bu[in].data[2] && (co = bu[in].data[0]))
 			{
-				int pulse_dam, pulse_aoe, pulse_rad, j, x, y, xf, yf, xt, yt, xc, yc, aoe_power, cc;
-				double tmp_a, tmp_h, tmp_s;
-				int idx, nn;
-				
-				cc 		= cn;
-				tmp_s   = (double)(bu[in].power);
-				
-				j = 100 + st_skillcount(cc, 53)*5;
-				
-				aoe_power = M_SK(cc, SK_PROX)+15;
-				pulse_rad = bu[in].data[3];
-				pulse_aoe = (aoe_power/(PROX_CAP*2) + pulse_rad) * (T_SORC_SK(cc, 5)?12:10)/10 * j/100;
-				tmp_a   = (double)((aoe_power*100/(PROX_CAP*2) + pulse_rad*100) * (T_SORC_SK(cc, 5)?12:10)/10 * j/100);
-				tmp_h   = (double)((sqr(aoe_power*100/PROX_HIT-pulse_aoe)/500+(pulse_rad*300)) * (T_SORC_SK(cc, 5)?12:10)/10 * j/100);
-				
-				xc = ch[cn].x;
-				yc = ch[cn].y;
-				xf = max(1, xc - pulse_aoe);
-				yf = max(1, yc - pulse_aoe);
-				xt = min(MAPX - 1, xc + 1 + pulse_aoe);
-				yt = min(MAPY - 1, yc + 1 + pulse_aoe);
-				
-				for (x = xf; x<xt; x++) for (y = yf; y<yt; y++) 
-				{
-					// This makes the radius circular instead of square
-					if (sqr(xc - x) + sqr(yc - y) > (sqr(tmp_a/100) + 1))
-					{
-						continue;
-					}
-					if ((co = map[x + y * MAPX].ch) && ((cn!=co && cc!=co) || bu[in].temp==SK_PULSE2))
-					{
-						if (bu[in].temp==SK_PULSE)
-						{
-							// Prevent pulse from hitting enemies that don't want to hurt you atm
-							idx = cn | (char_id(cn) << 16);
-							for (nn = MCD_ENEMY1ST; nn<=MCD_ENEMYZZZ; nn++)
-							{
-								if (ch[co].data[nn]==idx) break;
-							}
-							if (nn==MCD_ENEMYZZZ+1) continue;
-						}
-						//
-						pulse_dam = (int)(double)(min(tmp_s, tmp_s / max(1, (
-							sqr(abs(xc - x)) + sqr(abs(yc - y))) / (tmp_h/100))));
-						if (bu[in].temp==SK_PULSE)
-						{
-							if (IS_NOMAGIC(co)) continue;
-							remember_pvp(cn, co);
-							if (do_surround_check(cn, co, 1))
-							{
-								do_hurt(cn, co, spell_immunity(cn, co, pulse_dam) * 2, 6);
-								spell_shock(cn, co, pulse_dam);
-								
-								check_gloves(cn, co, -1, RANDOM(20), RANDOM(20));
-								
-								char_play_sound(co, ch[cn].sound + 20, -150, 0);
-								do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 20);
-								fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
-							}
-						}
-						else if (bu[in].temp==SK_PULSE2 && IS_MY_ALLY(cn, co))
-						{
-							ch[co].a_hp += pulse_dam * DAM_MULT_PULSE / 2;
-							if (ch[co].a_hp > ch[co].hp[5] * 1000) ch[co].a_hp = ch[co].hp[5] * 1000;
-							spell_charge(cn, co, pulse_dam);
-							
-							fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-						}
-					}
-				}
-				
-				// Set next tick schedule
-				bu[in].data[2] = globs->ticker + bu[in].data[1];
+				do_pulse_tick(cn, co, in);
 			}
 			
 			// Blue pills in lab 7
@@ -14106,8 +14119,22 @@ void do_regenerate(int cn)
 				{
 					do_char_log(cn, 0, "%s ran out.\n", bu[in].name);
 				}
-				if (bu[in].temp==SK_EXHAUST && bu[in].data[0]==SK_BLAST)
-					do_random_blast(cn, bu[in].data[1]);
+				if (bu[in].temp==SK_EXHAUST)
+				{
+					if (bu[in].data[0]==SK_BLAST)  // [Gear] Signet of Sparks
+					{
+						if (bu[in].data[2] == 2)
+							do_random_blast(cn, bu[in].data[1]);
+						do_random_blast(cn, bu[in].data[1]);
+					}
+					
+					if (m = TC_SK(cn, 58) * 15)         // (Corr) Skip Ahead
+					{
+						if ((tmp = (HP_SOFTCAP(cn) - ch[cn].a_hp))   > 0) ch[cn].a_hp   += tmp*m/100;
+						if ((tmp = (EN_SOFTCAP(cn) - ch[cn].a_end))  > 0) ch[cn].a_end  += tmp*m/100;
+						if ((tmp = (MP_SOFTCAP(cn) - ch[cn].a_mana)) > 0) ch[cn].a_mana += tmp*m/100;
+					}
+				}
 				bu[in].used = USE_EMPTY;
 				ch[cn].spell[n] = 0;
 				do_update_char(cn);

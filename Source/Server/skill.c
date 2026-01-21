@@ -395,7 +395,7 @@ struct sk_tree sk_tree[10][12]={
 		  6629,                            "20%% Willpower bonus." },
 		{ "Overwhelming Willpower",        "6%% increased total Willpower. ",
 		  6668,                            "+10 to Willpower Limit." },
-		{ "Shaper",                        "1%% increased power of Companion Mastery for ",
+		{ "Shaper",                        "1%% increased effect of Companion Mastery for ",
 		  6669,                            "every 10 total Willpower." },
 		//"         '         '         ", "         '         '         '         '         "
 		{ "Diviner",                       "Casting a companion skill while holding a tarot ",
@@ -658,8 +658,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "False Hex Master",              "(+1%%) increased power of Lethargy for every 20 ",
 	  6655,                            "total Willpower." },
 	//"         '         '         ", "         '         '         '         '         "
-	{ "Skip Ahead",                    "(+15%%) of skill and spell costs is refunded ",
-	  6660,                            "when cooldown ends." },
+	{ "Skip Ahead",                    "(+15%%) of missing health, endurance and mana ",
+	  6660,                            "is restored when skill exhaustion ends." },
 	{ "False Fleet-Foot",              "(+10%%) increased total Movement Speed.",
 	  6659,                            "" },
 	{ "False Dodging",                 "(+1%%) increased effect of Resistance for every ",
@@ -683,8 +683,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6629,                            "(+10%%) Willpower bonus." },
 	{ "False Willpower",               "(+3%%) increased total Willpower. ",
 	  6668,                            "(+5) to Willpower Limit." },
-	{ "False Shaper",                  "(+1%%) increased power of Companion Mastery for ",
-	  6669,                            "every 20 total Willpower." },
+	{ "False Shaper",                  "(+1%%) increased effect of Companion Mastery ",
+	  6669,                            "for every 20 total Willpower." },
 	//"         '         '         ", "         '         '         '         '         "
 	{ "Wraithlord",                    "(+2%%) of damage dealt by you is leeched to ",
 	  6708,                            "your companions as Hitpoints." },

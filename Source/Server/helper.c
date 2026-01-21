@@ -900,9 +900,6 @@ int st_skillcount(int cn, int v)
 	
 	for (n=0; n<12; n++) count += st_skillnum(cn, v, n);
 	
-	if (IS_PLAYER_GC(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && T_SUMM_SK(co, 10))
-		cn = co;
-	
 	if ((in = ch[cn].worn[WN_CHARM])  && (it[in].flags & IF_CORRUPTED) && it[in].corruption == v) count++;
 	if ((in = ch[cn].worn[WN_CHARM2]) && (it[in].flags & IF_CORRUPTED) && it[in].corruption == v) count++;
 	if (IS_SINBINDER(in = ch[cn].worn[WN_LRING]) && (it[in].flags & IF_CORRUPTED) && it[in].corruption == v) count++;
