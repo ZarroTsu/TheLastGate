@@ -460,7 +460,7 @@ struct sk_tree sk_tree[10][12]={
 		  6654,                            "Top Damage." },
 		{ "Wizardry",                      "20%% increased total Spellpower Bonus.",
 		  6707,                            "" },
-		{ "Resilience",                    "50%% reduced effect of healing sickness on you.",
+		{ "Resilience",                    "40%% reduced effect of healing sickness on you.",
 		  6694,                            "" }
 	}, // "         '         '         ", "         '         '         '         '         "
 	{	// Lycanthrope
@@ -746,8 +746,8 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6630,                            "Swords." },
 	{ "False Wizardry",                "(10%%) increased total Spellpower Bonus.",
 	  6707,                            "" },
-	{ "False Resilience",              "(+25%%) reduced effect of healing sickness on ",
-	  6694,                            "you." },
+	{ "Guardian Angel",                "(+1%%) increased power of Bless for every 20 ",
+	  6694,                            "total Braveness." },
 	//"         '         '         ", "         '         '         '         '         " ////////
 	{ "False Expanse",                 "(+1) to Area of Effect.",
 	  6649,                            "" },

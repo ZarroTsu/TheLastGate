@@ -4307,8 +4307,7 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_hp -= power;
 			item_damage_worn(cn, WN_RHAND, 500);
-			ch[cn].a_mana += power;	
-			if (ch[cn].a_mana>MP_SOFTCAP(cn)) ch[cn].a_mana=MP_SOFTCAP(cn);
+			do_recovery(cn, 2, power);
 			char_play_sound(cn, ch[cn].sound + 6, -100, 0);
 			fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
 			add_exhaust(cn, TICKS*5);
@@ -9716,18 +9715,15 @@ void use_driver(int cn, int in, int carried)
 				// CGI Rainbow Potion heals 20, here we give a random ++(0-40)
 				if (it[in].temp==IT_POT_RAIN)
 				{
-					ch[cn].a_hp += RANDOM(41) * thousand;
-					ch[cn].a_end += RANDOM(41) * thousand;
-					ch[cn].a_mana += RANDOM(41) * thousand;
+					do_recovery(cn, 0, RANDOM(41) * thousand);
+					do_recovery(cn, 1, RANDOM(41) * thousand);
+					do_recovery(cn, 2, RANDOM(41) * thousand);
 				}
 				
 				// Immediate healing from item
-				ch[cn].a_hp += it[in].hp[I_I] * thousand;
-				if (ch[cn].a_hp<0)	 ch[cn].a_hp = 0;
-				ch[cn].a_end += it[in].end[I_I] * thousand;
-				if (ch[cn].a_end<0)	 ch[cn].a_end = 0;
-				ch[cn].a_mana += it[in].mana[I_I] * thousand;
-				if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
+				do_recovery(cn, 0, it[in].hp[I_I]   * thousand);
+				do_recovery(cn, 1, it[in].end[I_I]  * thousand);
+				do_recovery(cn, 2, it[in].mana[I_I] * thousand);
 				
 				// Reduce stack or destroy item
 				if (it[in].temp!=IT_CHALICE5) use_consume_item(cn, in, 1);

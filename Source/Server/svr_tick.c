@@ -1794,18 +1794,14 @@ int get_meta_stat_value(int cn, int n)
 	int race_reg = 0, race_res = 0, race_med = 0;
 	int dmg_wpn, dmg_low, dmg_hgh, dmg_top, dmg_hit, dmg_dps, dmg_bns, dmg_str;
 	int regen = 0, restn = 0, medit = 0;
-	int n1, n2, n3, hpbonus, enbonus, mpbonus, en_dam, mp_dam;
+	int hpbonus, enbonus, mpbonus, en_dam, mp_dam;
 	
 	switch (n) // Regen set
 	{
 		case 51: case 52: case 53:
-			n1 = st_skillcount(cn, 42)*10; // Full
-			n2 = st_skillcount(cn, 54)*10; // New
-			n3 = st_skillcount(cn, 99)* 5; // Half
-			
 			if (IS_GLOB_MAYHEM)				moonmult = 10;
-			if (globs->fullmoon)			moonmult = (30*(100+n1+n3))/100;
-			if (globs->newmoon)				moonmult = (40*(100+n2+n3))/100;
+			if (globs->fullmoon)			moonmult = 30;
+			if (globs->newmoon)				moonmult = 40;
 			
 			hpmult = endmult = manamult = moonmult;
 			
@@ -1856,7 +1852,8 @@ int get_meta_stat_value(int cn, int n)
 			dmg_hgh =   dmg_wpn+dmg_top;
 			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
 			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
-			dmg_hit = ( dmg_low+dmg_hgh+(T_LYCA_SK(cn,6)?dmg_top/2:0))/2;
+			dmg_hit = ( dmg_low+dmg_hgh)/2;
+			if (T_ARTM_SK(cn, 6)) dmg_hit = dmg_hgh;  // (ArTm) Impact
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		default: break;
@@ -1886,20 +1883,12 @@ int get_meta_stat_value(int cn, int n)
 	switch (n) // Pact power from hp/en/mp
 	{
 		case 30: case 71:
-			hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
-			enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
-			mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
-			
 			power = skill_multiplier(M_SK(cn, SK_PACT), cn);
-			
 			if (do_get_iflag(cn, SF_HERMIT_R))
 				power = has_buff(cn, SK_PACT)?ch[cn].reserve[2]:min(95, min(80, 15+power/5)+ch[cn].reserve[2]);
 			else
 				power = has_buff(cn, SK_PACT)?ch[cn].reserve[0]:min(95, min(80, 15+power/5)+ch[cn].reserve[0]);
-			
-			if (T_LYCA_SK(cn, 7))         in  = (hpbonus + enbonus + mpbonus)/2;
-			if (m=st_skillcount(cn, 103)) in += (hpbonus + enbonus + mpbonus)*m/5;
-			power = power + (power * in / 5000);
+			power = more(power, ch[cn].hp[5] * (T_LYCA_SK(cn,9)*2+TC_SK(cn,105)), 100);  // (Lyca) Wrath
 			break;
 		default: break;
 	}
@@ -1987,7 +1976,9 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_JUSTIC_R)) value = (power + (power * ch[cn].crit_multi / 1000)) * DAM_MULT_LEAP/1000; // only crit roughly 1/10th of the time
 			break;
 		case 28: // Leap # of Repeats
-			value = max(0, min(10, (100-cdlen)/10)) + do_get_iflag(cn, SF_SIGN_SLAY)?1:0;
+			value = max(0, GET_SPD_ATK(cn)/40);
+			if (do_get_iflag(cn, SF_SIGN_SLAY)) value++;
+			if (T_WARR_SK(cn,  6))              value++;  // (Warr) Flash Step
 			break;
 		case 29: // Leap Cooldown					Decimal, 0.00 Seconds
 			value = 5 * cdlen;
@@ -2118,12 +2109,15 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 51: // Health Regen Rate				Decimal, 0.00 /s
 			value = regen * 20/10;
+			value = more(value, T_LYCA_SK(cn, 7)*50+TC_SK(cn, 103)*25, 1);  // (Lyca) Lust
 			break;
 		case 52: // Endurance Regen Rate			Decimal, 0.00 /s
 			value = restn * 20/10;
+			value = more(value, T_LYCA_SK(cn, 7)*50+TC_SK(cn, 103)*25, 1);  // (Lyca) Lust
 			break;
 		case 53: // Mana Regen Rate					Decimal, 0.00 /s
 			value = medit * 20/10;
+			value = more(value, T_LYCA_SK(cn, 7)*50+TC_SK(cn, 103)*25, 1);  // (Lyca) Lust
 			break;
 		case 54: // Effective Immunity
 			value = M_SK(cn, SK_IMMUN);
@@ -2188,7 +2182,6 @@ int get_meta_stat_value(int cn, int n)
 		case 73: case 95: // Heal/Regen Effect
 			power = M_SK(cn, SK_HEAL);
 			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = power*6/5;
-			if (m=st_skillcount(cn, 94))          power = power*(100+m*10)/100;
 			if (!IS_PLAYER(cn))                   power = power*2/3;
 			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power/= 2;
 			if (do_get_iflag(cn, SF_STAR))        value = (power * 1875/10) * 20;
@@ -2217,7 +2210,7 @@ int get_meta_stat_value(int cn, int n)
 			{
 				m  = 0;
 				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-				m +=     TC_SK(cn, 21)*1;
+				m +=     TC_SK(cn, 21);
 				
 				power = more(power, m, 20);
 			}
@@ -2230,7 +2223,6 @@ int get_meta_stat_value(int cn, int n)
 		case 78: case 100: // Weaken/Crush Effect							// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*     6/ 5;
-			if (m=st_skillcount(cn, 34))          power = power*(20+m)/20;
 			value = min(127, (power / 4 + 4));
 			break;
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
@@ -2260,9 +2252,15 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 96: // Douse Effect					Decimal, 0.00 %			// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
+			// Additive bonus
+			{
+				m  = 0;
+				m += T_WARR_SK(cn,  9)*2;    // (Warr) Antagonizer
+				m +=     TC_SK(cn, 45);
+				
+				power = more(power, M_AT(cn, AT_AGL) * m, 20);
+			}
 			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
-			if (T_WARR_SK(cn, 7))                 power = power + (power * M_AT(cn, AT_AGL)  /2000);
-			if (m=st_skillcount(cn, 43))          power = power + (power * M_AT(cn, AT_AGL)*m/5000);
 			if (IS_ANY_MERC(cn)) value = min(127, (power/6 + 2));
 			else                 value = min(127, (power/8 + 1));
 			break;
@@ -2272,7 +2270,7 @@ int get_meta_stat_value(int cn, int n)
 			{
 				m  = 0;
 				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-				m +=     TC_SK(cn, 21)*1;
+				m +=     TC_SK(cn, 21);
 				
 				power = more(power, m, 20);
 			}

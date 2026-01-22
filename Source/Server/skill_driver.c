@@ -624,12 +624,12 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 	{
 		case SK_SURROUND: if (CAN_ARTM_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
 		case SK_TAUNT:    if (CAN_ARTM_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_CURSE:    if (CAN_SORC_PROX(cn)||T_BRAV_SK(cn, 6)) n = 4 * 100; else n = 1 * 100; break;
+		case SK_CURSE:    if (CAN_SORC_PROX(cn)||T_BRAV_SK(cn, 6)) n = 4 * 100; else n = 1 * 100; break;  // (Brav) Presence
 		case SK_SLOW:     if (CAN_SORC_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
 		case SK_POISON:   if (CAN_SORC_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
 		case SK_VENOM:    if (CAN_SORC_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
 		case SK_BLAST:    if (CAN_ARHR_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_WEAKEN:   if (CAN_BRAV_PROX(cn)||T_LYCA_SK(cn, 4)) n = 4 * 100; else n = 1 * 100; break;
+		case SK_WEAKEN:   if (CAN_BRAV_PROX(cn)||T_LYCA_SK(cn, 4)) n = 4 * 100; else n = 1 * 100; break;  // (Lyca) Sickness
 		//
 		case SK_HASTE:                           n = 4 * 100; break; // Aura only
 		//
@@ -681,9 +681,6 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 	else
 	{
 		surrMod = (M_SK(cn, SK_DAGGER) < M_SK(cn, SK_STAFF) ? M_SK(cn, SK_DAGGER) : M_SK(cn, SK_STAFF));
-		
-		if (n=st_skillcount(cn, 66)) 
-			surrMod = surrMod + surrMod * n/20;
 	}
 	
 	surrDam = dam*3/4;
@@ -704,8 +701,7 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 		if (surround==2 && (surrMod-coPar)>10) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-10), 20)/20);
 		if (surround==3 && (surrMod-coPar)>20) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-20), 20)/20);
 		
-		if (co==co_orig)                              surrDam = surrDam*3/4;
-		if (co!=co_orig && (n=st_skillcount(cn, 46))) surrDam = surrDam*(100+n*5)/100;
+		if (co==co_orig)                       surrDam = surrDam*3/4;
 		
 		do_hurt(cn, co, surrDam+critDam, critDam>0?9:4);
 		
@@ -1381,26 +1377,22 @@ int spellcost(int cn, int cost, int in, int usemana)
 	}
 	if (usemana>0)
 	{
-		ch[cn].a_mana -= mana_cost*1000;
-		ch[cn].a_end  -= cotfk_cost*1000;
-		ch[cn].a_hp   -= hp_cost*1000;
+		ch[cn].a_mana -= mana_cost  * 1000;
+		ch[cn].a_end  -= cotfk_cost * 1000;
+		ch[cn].a_hp   -= hp_cost    * 1000;
 		
 		if (do_get_iflag(cn, SF_MA_HEAL) && mana_cost)  spell_pomesol(cn, cn, base_mana_cost, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 0);
-		if (worldr)                      ch[cn].a_end += base_mana_cost*1000;
-		if (n=st_skillcount(cn, 84))     ch[cn].a_end += mana_cost*n*100;
-		if (ch[cn].a_end>EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
+		if (worldr) do_recovery(cn, 1, base_mana_cost*1000);
 	}
 	if (usemana==0 || usemana==2)
 	{
-		ch[cn].a_end  -= end_cost*1000;
-		ch[cn].a_mana -= cotfk_cost*1000;
-		ch[cn].a_hp   -= (hp_cost+devil_cost*2)*1000;
+		ch[cn].a_end  -= end_cost               * 1000;
+		ch[cn].a_mana -= cotfk_cost             * 1000;
+		ch[cn].a_hp   -= (hp_cost+devil_cost*2) * 1000;
 		
 		if (do_get_iflag(cn, SF_MA_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && end_cost)   spell_pomesol(cn, cn, end_cost, 0);
-		if (n=st_skillcount(cn, 36))      ch[cn].a_mana += end_cost*n*100;
-		if (ch[cn].a_mana>MP_SOFTCAP(cn)) ch[cn].a_mana  = MP_SOFTCAP(cn);
 	}
 	return 0;
 }
@@ -1546,7 +1538,6 @@ void damage_mshell(int co, int dam)
 				
 				// Book - Great Divide :: half duration damage dealt to shield/shell
 				if (do_get_iflag(co, SF_BOOK_GREA)) tmp /= 2;
-				if (m=st_skillcount(co, 72)) tmp = min(tmp, max(0, tmp*(100-m*10)/100));
 				
 				if (tmp>0)
 				{
@@ -1725,45 +1716,37 @@ int other_immunity(int power, int immun)
 
 int spell_race_mod(int power, int cn)
 {
-	int kindred, mod, n1, n2, n3;
-	
-	kindred = ch[cn].kindred;
+	int mod = 100;
 	
 	// Tarot - Star.R : Spell modifier is at least 1.00
-	     if 	(do_get_iflag(cn, SF_STAR_R))	{ mod =  90; }
-	else if 	(kindred & KIN_TEMPLAR)			{ mod =  75; }
-	else if 	(kindred & KIN_MERCENARY)		{ mod = 100; }
-	else if 	(kindred & KIN_HARAKIM)			{ mod = 105; }
-
-	else if 	(kindred & KIN_SEYAN_DU)		{ mod =  95; }
-	else if 	(kindred & KIN_ARCHTEMPLAR)		{ mod =  80; }
-	else if 	(kindred & KIN_SKALD)			{ mod =  80; }
-	else if 	(kindred & KIN_WARRIOR)			{ mod = 105; }
-	else if 	(kindred & KIN_SORCERER)		{ mod = 105; }
-	else if 	(kindred & KIN_SUMMONER)		{ mod = 110; }
-	else if 	(kindred & KIN_ARCHHARAKIM)		{ mod = 110; }
-	else if 	(kindred & KIN_BRAVER)			{ mod = 115; }
-	else if 	(kindred & KIN_LYCANTH)			{ mod = 100; }
-	else if	(ch[cn].temp == CT_CASTERCOMP 
-		|| ch[cn].temp == CT_ARCHCASTER)		{ mod = 120; }
-	else										{ mod = 100; }
+	if (do_get_iflag(cn, SF_STAR_R)) mod =  90;
 	
-	if (kindred & KIN_MONSTER)
+	else if	(IS_CASTCOMP(cn))        mod = 120;
+	
+	else if (IS_TEMPLAR(cn))         mod =  75;
+	else if (IS_MERCENARY(cn))       mod = 100;
+	else if (IS_HARAKIM(cn))         mod = 105;
+	
+	else if (IS_SEYAN_DU(cn))        mod =  95;
+	else if (IS_ARCHTEMPLAR(cn))     mod =  80;
+	else if (IS_SKALD(cn))           mod =  80;
+	else if (IS_WARRIOR(cn))         mod = 105;
+	else if (IS_SORCERER(cn))        mod = 105;
+	else if (IS_SUMMONER(cn))        mod = 110;
+	else if (IS_ARCHHARAKIM(cn))     mod = 110;
+	else if (IS_BRAVER(cn))          mod = 115;
+	else if (IS_LYCANTH(cn))         mod = 100;
+	
+	if (IS_MONSTER(cn))
 	{
-		if (IS_GLOB_MAYHEM)
-			mod += (getrank(cn)-4);
-		else
-			mod += (getrank(cn)-4)/2;
+		if (IS_GLOB_MAYHEM) mod += (getrank(cn)-4);
+		else                mod += (getrank(cn)-4)/2;
 	}
 	
-	n1 = st_skillcount(cn, 42)*10; // Full
-	n2 = st_skillcount(cn, 54)*10; // New
-	n3 = st_skillcount(cn, 99)* 5; // Half
+	if (globs->fullmoon)    mod += 15;
+	if (globs->newmoon)     mod += 10;
 	
-	if (globs->fullmoon)	{ mod += (15*(100+n1+n3))/100; }
-	if (globs->newmoon)		{ mod += (10*(100+n2+n3))/100; }
-	
-	return (power * mod) / 100;
+	return ( power * mod / 100 );
 }
 
 int spell_multiplier(int power, int cn)
@@ -1781,7 +1764,6 @@ int skill_multiplier(int power, int cn)
 	
 	// Tarot - Star.R : Spellmod now effects skills.
 	if (do_get_iflag(cn, SF_STAR_R)) mod  = (mod * ch[cn].spell_mod / 100);
-	if (n = st_skillcount(cn, 48))   mod += (ch[cn].spell_apt*n/50);
 	
 	return (power * mod) / 100;
 }
@@ -2551,6 +2533,7 @@ int spell_bless(int cn, int co, int power, int fromscroll)
 	int in, n;
 	
 	power = spellpower_check(cn, co, spell_multiplier(power, cn), fromscroll);
+	power = more(power, M_AT(cn, AT_BRV) * TC_SK(cn, 96), 20);                  // (Corr) Guardian Angel
 	
 	if (!(in = make_new_buff(cn, SK_BLESS, BUF_SPR_BLESS, power, SP_DUR_BLESS, 1))) 
 		return 0;
@@ -2729,11 +2712,14 @@ int spell_heal(int cn, int co, int power)
 			if ((in2=has_buff(co, SK_HEAL))!=0)
 			{
 				// Each stack of heal sickness reduces the spell power by 1/4th
-				tmp = bu[in2].data[1];
-				healing = healing - (healing * tmp * (T_BRAV_SK(co, 10)?6:10) / 40);
+				tmp = bu[in2].data[1] * 25;
+				tmp = less(tmp, T_BRAV_SK(co, 12)*40, 1)  // (Brav) Resilience
+				
+				healing = healing - (healing * tmp / 100);
+				
 				if (tmp) 
 				{
-					do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", (100 * tmp * (T_BRAV_SK(co, 10)?6:10) / 40));
+					do_char_log(cn, 1, "Heal's power was reduced by %d%%\n", tmp);
 				}
 			}
 		}
@@ -2741,16 +2727,11 @@ int spell_heal(int cn, int co, int power)
 	
 	if (cn!=co)
 	{
-		ch[co].a_hp += spell_multiplier(power * healing, cn);
+		do_recovery(co, 0, spell_multiplier(power * healing, cn)); 
 	}
 	else
 	{
-		ch[co].a_hp += power * healing;
-	}
-	
-	if (ch[co].a_hp > ch[co].hp[5] * 1000)
-	{
-		ch[co].a_hp = ch[co].hp[5] * 1000;
+		do_recovery(co, 0, power * healing); 
 	}
 	
 	return 1;
@@ -2762,7 +2743,6 @@ void skill_heal(int cn)
 	power = M_SK(cn, SK_HEAL);
 	
 	if (do_get_iflag(cn, SF_EN_MOREHEAL)) power  = power*6/5;
-	if (n=st_skillcount(cn, 94))          power  = power*(100+n*10)/100;
 	if (!IS_PLAYER(cn))                   power  = power*2/3;
 	if (do_get_iflag(cn, SF_TW_SUPERBIA)) power /= 2;
 	
@@ -3210,7 +3190,7 @@ int spell_stun(int cn, int co, int power)
 	{
 		n  = 0;
 		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-		n +=     TC_SK(cn, 21)*1;
+		n +=     TC_SK(cn, 21);
 		
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
@@ -3238,7 +3218,7 @@ int spell_rally(int cn, int co, int power)
 	{
 		n  = 0;
 		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-		n +=     TC_SK(cn, 21)*1;
+		n +=     TC_SK(cn, 21);
 		
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
@@ -3322,7 +3302,7 @@ int spell_warcry(int cn, int co, int power, int flag)
 	{
 		n  = 0;
 		n += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-		n +=     TC_SK(cn, 21)*1;
+		n +=     TC_SK(cn, 21);
 		
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
@@ -3863,7 +3843,7 @@ void skill_blast(int cn)
 	
 	in = add_exhaust(cn, exhst);
 	
-	if (in && (do_get_iflag(cn, SF_SIGN_SPAR) || T_ARHR_SK(cn, 6)))
+	if (in && (do_get_iflag(cn, SF_SIGN_SPAR) || T_ARHR_SK(cn, 6)))  // [Gear] Signet of Sparks  // (ArHr) Destroyer
 	{
 		bu[in].data[0] = SK_BLAST;
 		bu[in].data[1] = power;
@@ -5511,7 +5491,6 @@ int spell_weaken(int cn, int co, int power, int flag)
 	if (GET_SFAIL(cn, co)) return 0;
 	
 	if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
-	if (n=st_skillcount(cn, 34))          power = power*(20+n)/20;
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -5964,8 +5943,8 @@ void skill_leap(int cn, int flag)
 	int catalog[64] = { 0 };
 	
 	if (!flag && is_exhausted(cn)) return;
-	if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats  +=  1;
-	if (T_WARR_SK(cn,  6))              numrepeats  +=  1;  // (Warr) Flash Step
+	if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats++;
+	if (T_WARR_SK(cn,  6))              numrepeats++;  // (Warr) Flash Step
 	
 	power       = M_SK(cn, SK_LEAP) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
 	power       = skill_multiplier(power, cn);
@@ -6215,12 +6194,10 @@ int spell_zephyr(int cn, int co, int power, int flag)
 {
 	int in, n;
 	
-	if (flag)	// Debuff version
+	if (flag) // Debuff version
 	{
-		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-		if (ch[co].flags & CF_IMMORTAL) { return 0; }
-		
-		power = power + max(0, GET_SPD_ATK(cn)) / 3;
+		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) return 0;
+		if (ch[co].flags & CF_IMMORTAL)                      return 0;
 		
 		if (IS_PLAYER(co))	power = spell_immunity(cn, co, power);
 		else				power = other_immunity(power, get_target_immunity(cn, co)/2);
@@ -6240,9 +6217,18 @@ int spell_zephyr(int cn, int co, int power, int flag)
 		
 		return add_spell(co, in); // SK_ZEPHYR2
 	}
-	else		// Buff version
+	else      // Buff version
 	{
 		power = spell_multiplier(power, cn);
+		
+		// Additive bonus
+		{
+			n  = 0;
+			n += T_BRAV_SK(cn,  9)*2;    // (Brav) Alacrity
+			n +=     TC_SK(cn, 93);
+			
+			power = more(power, M_AT(cn, AT_BRV) * n, 20);
+		}
 		
 		if (!(in = make_new_buff(cn, SK_ZEPHYR, BUF_SPR_ZEPHYR, power, SP_DUR_ZEPHYR, 0))) 
 			return 0;
@@ -6263,7 +6249,7 @@ void skill_zephyr(int cn)
 
 int spell_lethargy(int cn, int co, int power)
 {
-	int in, n, p = min(20, getrank(cn));
+	int in, n;
 	
 	// Additive bonus
 	{
@@ -6280,8 +6266,8 @@ int spell_lethargy(int cn, int co, int power)
 		return 0;
 	
 	// Tarot - Empress.R : Lethargy uses life instead of mana
-	if (do_get_iflag(co, SF_EMPRES_R)) bu[in].reserve[0] = min(35, max(15, (300+power)/20)); // bu[in].r_hp   = -((75+1125*p/100)/2);
-	else                               bu[in].reserve[2] = min(35, max(15, (300+power)/20)); // bu[in].r_mana = -((75+1125*p/100)/2);
+	if (do_get_iflag(co, SF_EMPRES_R)) bu[in].reserve[0] = min(35, max(15, (300+power)/20));
+	else                               bu[in].reserve[2] = min(35, max(15, (300+power)/20));
 	
 	// Monsters get a weaker variant
 	if (!IS_PLAYER(co)) bu[in].data[2] = 1;
@@ -6433,28 +6419,29 @@ void skill_shift(int cn, int force)
 
 int spell_pact(int cn, int co, int power)
 {
-	int in, n, tmp = 0, p = min(20, getrank(cn));
-	int hpbonus = (ch[co].hp[5]*1000   - ch[co].a_hp)  /1000;
-	int enbonus = (ch[co].end[5]*1000  - ch[co].a_end) /1000;
-	int mpbonus = (ch[co].mana[5]*1000 - ch[co].a_mana)/1000;
+	int in, n;
 	
 	if (!(in = make_new_buff(cn, SK_PACT, BUF_SPR_PACT, power, SP_DUR_PACT, 1))) 
 		return 0;
 	
-	//if (T_LYCA_SK(co, 7))         tmp  = (hpbonus + enbonus + mpbonus)/2;
-	//if (n=st_skillcount(co, 103)) tmp += (hpbonus + enbonus + mpbonus)*n/5;
+	// Additive Bonus
+	{
+		n  = 0;
+		n += T_LYCA_SK(co,  9)*2;    // (Lyca) Wrath
+		n +=     TC_SK(co,105);
+	}
 	
 	if (do_get_iflag(cn, SF_HERMIT_R))
 	{
 		power = bu[in].reserve[2] = min(80, 15+power/5); // Mana
-		power = power + (power * tmp / 5000);
+		power = more(power, ch[co].hp[5] * n, 100);
 		bu[in].dmg_reduction = power*4/6;
 		bu[in].dmg_bonus     = power*2/6;
 	}
 	else
 	{
 		power = bu[in].reserve[0] = min(80, 15+power/5); // Hitpoints
-		power = power + (power * tmp / 5000);
+		power = more(power, ch[co].hp[5] * n, 100);
 		bu[in].dmg_reduction = power*4/3;
 		bu[in].dmg_bonus     = power*2/3;
 	}

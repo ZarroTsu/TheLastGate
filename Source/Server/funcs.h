@@ -267,6 +267,7 @@ void do_treeupdate(int cn, int n);
 void do_give_exp(int cn, int p, int gflag, int rank, int money);
 int try_lucksave(int cn);
 void do_lucksave(int cn, char *deathtype);
+void do_recovery(int cn, int type, int v);
 int do_hurt(int cn, int co, int dam, int type);
 void do_staff_log(int font, char *format, ...) __attribute__ ((format(printf, 2, 3)));
 int do_remove_unique(int cn);

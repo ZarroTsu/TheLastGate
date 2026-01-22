@@ -9305,6 +9305,30 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 }
 #undef    ALTER_MAX
 
+
+void do_recovery(int cn, int type, int v)
+{
+	int n;
+	
+	if (v > 0)
+	{
+		n = T_LYCA_SK(cn, 7)*50 + TC_SK(cn, 103)*25;  // (Lyca) Lust
+		v = more(v, n, 1);
+	}
+	
+	switch (type)
+	{
+		case  0: ch[cn].a_hp   += v; break;
+		case  1: ch[cn].a_end  += v; break;
+		case  2: ch[co].a_mana += v; break;
+		default: break;
+	}
+	
+	ch[cn].a_hp   = clamp(ch[cn].a_hp,   0, HP_SOFTCAP(cn));
+	ch[cn].a_end  = clamp(ch[cn].a_end,  0, EN_SOFTCAP(cn));
+	ch[cn].a_mana = clamp(ch[cn].a_mana, 0, MP_SOFTCAP(cn));
+}
+
 void do_leech(int cn, int dam, int is_dot)
 {
 	int tmp, n, cc;
@@ -9353,26 +9377,26 @@ void do_leech(int cn, int dam, int is_dot)
 		ch[cc].leech[0] = tmp;
 	}
 	
-	if (n = TC_SK(cn, 70))  // (Corr) Wraithlord
+	if (n = TC_SK(cn, 70)*2)  // (Corr) Wraithlord
 	{
 		if (IS_LIVINGCHAR(cc = ch[cn].data[PCD_COMPANION]) && ch[cc].data[CHD_MASTER]==cn)
-			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * (n*2)/1000), 0, 65500);
+			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * n/1000), 0, 65500);
 		
 		if (IS_LIVINGCHAR(cc = ch[cn].data[PCD_SHADOWCOPY]) && ch[cc].data[CHD_MASTER]==cn)
-			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * (n*2)/1000), 0, 65500);
+			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * n/1000), 0, 65500);
 	}
 }
 
-// dmg types: 0=normal 1=blast 2=hw/soku 3=gethit 4=surround 5=cleave 6=pulse 7=zephyr 8=leap 9=crit 13=gethit/10
+// types: 0=normal 1=blast 2=hw/soku 3=thorns 4=surround 5=cleave 6=pulse 7=zephyr 8=leap 9=crit 13=parried_thorns
 // returns actual damage done
 int do_hurt(int cn, int co, int dam, int type)
 {
 	int tmp = 0, cc, n, m, in, rank = 0, noexp = 0, halfexp = 0, kill_bsp = 0, kill_osp = 0, kill_bos = 0, money = 0;
 	unsigned long long mf1, mf2;
-	int hp_dam, en_dam, mp_dam;
+	int hp_dam, en_dam, mp_dam, greed=0;
 	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, phalanx = 0, aggravate = 0;
 	int offpot = 0, defpot = 0;
-	int thorns = 0, crit_dam = 0, damtype = 250;
+	int crit_dam = 0, damtype = 250;
 	int extradam = 0, priestess = 1, cullval=500;
 	
 	mf1 = mf2 = map[XY2M(ch[co].x, ch[co].y)].flags;
@@ -9394,7 +9418,7 @@ int do_hurt(int cn, int co, int dam, int type)
 		dam += extradam;
 	}
 
-	if ((ch[co].flags & (CF_PLAYER)) && type!=3 && type!=13 && type!=90 && type!=96)
+	if ((ch[co].flags & (CF_PLAYER)) && type!=3 && type!=13)
 	{
 		item_damage_armor(co, dam);
 	}
@@ -9416,11 +9440,6 @@ int do_hurt(int cn, int co, int dam, int type)
 		halfexp = 1;
 	}
 	
-	if (type==3 && (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW || (IS_PLAYER(cn) && IS_PLAYER(co))))
-	{
-		type = 13;
-	}
-	
 	// Invidia
 	if (do_get_iflag(co, SF_TW_INVIDIA) && IS_SANECHAR(ch[co].data[PCD_COMPANION]) 
 		&& ch[ch[co].data[PCD_COMPANION]].data[CHD_MASTER]==co && !(ch[ch[co].data[PCD_COMPANION]].flags & CF_BODY))
@@ -9435,6 +9454,11 @@ int do_hurt(int cn, int co, int dam, int type)
 	{
 		if ((in = ch[co].spell[n])!=0)
 		{
+			if (bu[in].temp==SK_EXHAUST) continue;
+			
+			if (((bu[in].temp==SK_PLAGUE) || bu[in].data[5]==1) && IS_SANECHAR(cc = bu[in].data[0]))
+				greed += T_LYCA_SK(cc, 6)*2 + TC_SK(cc, 102);    // (Lyca) Greed
+			
 			if (bu[in].temp==SK_MSHIELD)
 			{
 				if (IS_SEYA_OR_BRAV(co))
@@ -9445,7 +9469,6 @@ int do_hurt(int cn, int co, int dam, int type)
 				
 				// Book - Great Divide :: half duration damage dealt to shield/shell
 				if (do_get_iflag(cn, SF_BOOK_GREA)) tmp /= 2;
-				if (m=st_skillcount(co, 72)) tmp = min(tmp, max(0, tmp*(100-m*10)/100));
 				
 				if (tmp>0)
 				{
@@ -9482,25 +9505,24 @@ int do_hurt(int cn, int co, int dam, int type)
 		dam = dam*6/5;
 	}
 	
-	if (type==3 || type==13 || type==90 || type==96)
+	if ((type==3 || type==13) && (mf1 & MF_NOFIGHT) && !(IS_IN_BOJ(ch[cn].x, ch[cn].y) && get_gear(cn, IT_XIXDARKSUN)))
 	{
-		dam = dam * ch[co].dmg_reduction / 10000;
-		if (type!=23 && T_BRAV_SK(co, 6)) dam /= 2;
-		dam *= DAM_MULT_THORNS; 						// Thorns
-		if (type==13) dam = dam/10;
-		if (type==90)
-		{
-			if (n=st_skillcount(cn, 90)) dam = dam*n*5/100;
-			else dam = 0;
-		}
-		if (type==96)
-		{
-			if (n=st_skillcount(cn, 96)) dam = dam*n*5/100;
-			else dam = 0;
-		}
+		dam = 0;
+	}
+	else if (type==3 || type==13)
+	{
+		if (ch[cn].to_parry > ch[co].to_hit)
+			dam = max(0, dam - (ch[cn].to_parry - ch[co].to_hit));
 		
-		if ((mf1 & MF_NOFIGHT) && !(IS_IN_BOJ(ch[cn].x, ch[cn].y) && get_gear(cn, IT_XIXDARKSUN)))
-			dam = 0;
+		dam = dam * DAM_MULT_THORNS;                   // Thorns
+		dam = dam * ch[co].dmg_reduction / 10000;
+		dam = RANDOM(dam)+1;
+		
+		if (type==13) // Parried Thorns
+			dam = dam * (T_LYCA_SK(cn, 10)*20+TC_SK(cn, 106)*10) / 100;  // (Lyca) Sloth
+			
+		if (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW || (IS_PLAYER(cn) && IS_PLAYER(co))) // Reduced
+			dam = less(dam, 80, 1);
 	}
 	else
 	{
@@ -9543,40 +9565,26 @@ int do_hurt(int cn, int co, int dam, int type)
 			do_notify_char(co, NT_GOTHIT, cn, dam / 1000, 0, 0);
 		do_notify_char(cn, NT_DIDHIT, co, dam / 1000, 0, 0);
 	}
-
+	
 	if (dam<1)
 	{
 		if ((type==0 || type==4 || type==5 || type==8 || type==18 || type==9) && ch[co].gethit_dam>0)
-		{
-			thorns = RANDOM(ch[co].gethit_dam)+1;
-			if (ch[cn].to_parry > ch[co].to_hit) 
-			{
-				thorns = max(0, thorns - (ch[cn].to_parry - ch[co].to_hit));
-			}
-			if (thorns>0) do_hurt(co, cn, thorns, 3);
-		}
+			do_hurt(co, cn, ch[co].gethit_dam, 3);
 		
+		// Heal-on-hit sources
 		if (type!=2 && type!=3 && type!=13)
 		{
-			// Enchantments
-			if (n = do_get_ieffect(cn, VF_EN_HPONHIT))   ch[cn].a_hp   += n*1000;
-			if (n = do_get_ieffect(co, VF_EN_HPWHENHIT)) ch[co].a_hp   += n*2000;
-			if (n = do_get_ieffect(cn, VF_EN_ENONHIT))   ch[cn].a_end  += n*1000;
-			if (n = do_get_ieffect(co, VF_EN_ENWHENHIT)) ch[co].a_end  += n*2000;
-			if (n = do_get_ieffect(cn, VF_EN_MPONHIT))   ch[cn].a_mana += n*1000;
-			if (n = do_get_ieffect(co, VF_EN_MPWHENHIT)) ch[co].a_mana += n*2000;
+			if (n = do_get_ieffect(cn, VF_EN_HPONHIT))   do_recovery(cn, 0, n*1000);
+			if (n = do_get_ieffect(co, VF_EN_HPWHENHIT)) do_recovery(co, 0, n*2000);
+			if (n = do_get_ieffect(cn, VF_EN_ENONHIT))   do_recovery(cn, 1, n*1000);
+			if (n = do_get_ieffect(co, VF_EN_ENWHENHIT)) do_recovery(co, 1, n*2000);
+			if (n = do_get_ieffect(cn, VF_EN_MPONHIT))   do_recovery(cn, 2, n*1000);
+			if (n = do_get_ieffect(co, VF_EN_MPWHENHIT)) do_recovery(co, 2, n*2000);
 		}
-		
-		// force to sane values
-		if (ch[cn].a_hp>ch[cn].hp[5] * 1000)     ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
-		if (ch[cn].a_end>ch[cn].end[5] * 1000)   ch[cn].a_end  = ch[cn].end[5]  * 1000;
-		if (ch[co].a_end>ch[co].end[5] * 1000)   ch[co].a_end  = ch[co].end[5]  * 1000;
-		if (ch[cn].a_mana>ch[cn].mana[5] * 1000) ch[cn].a_mana = ch[cn].mana[5] * 1000;
-		if (ch[co].a_mana>ch[co].mana[5] * 1000) ch[co].a_mana = ch[co].mana[5] * 1000;
 		
 		return 0;
 	}
-
+	
 	// give some EXPs to the attacker for a successful blow:
 	if (type!=2 && type!=3 && type!=13 && !noexp)
 	{
@@ -9667,24 +9675,18 @@ int do_hurt(int cn, int co, int dam, int type)
 		ch[co].a_mana -= mp_dam;
 	}
 	
+	// Heal-on-hit sources
 	if (type!=2 && type!=3 && type!=13)
 	{
-		// Enchantments
-		if (n = do_get_ieffect(cn, VF_EN_HPONHIT))   ch[cn].a_hp   += n*1000;
-		if (n = do_get_ieffect(co, VF_EN_HPWHENHIT)) ch[co].a_hp   += n*2000;
-		if (n = do_get_ieffect(cn, VF_EN_ENONHIT))   ch[cn].a_end  += n*1000;
-		if (n = do_get_ieffect(co, VF_EN_ENWHENHIT)) ch[co].a_end  += n*2000;
-		if (n = do_get_ieffect(cn, VF_EN_MPONHIT))   ch[cn].a_mana += n*1000;
-		if (n = do_get_ieffect(co, VF_EN_MPWHENHIT)) ch[co].a_mana += n*2000;
+		if (greed) do_recovery(cn, 0, dam*greed/100);
+		if (n = do_get_ieffect(cn, VF_EN_HPONHIT))   do_recovery(cn, 0, n*1000);
+		if (n = do_get_ieffect(co, VF_EN_HPWHENHIT)) do_recovery(co, 0, n*2000);
+		if (n = do_get_ieffect(cn, VF_EN_ENONHIT))   do_recovery(cn, 1, n*1000);
+		if (n = do_get_ieffect(co, VF_EN_ENWHENHIT)) do_recovery(co, 1, n*2000);
+		if (n = do_get_ieffect(cn, VF_EN_MPONHIT))   do_recovery(cn, 2, n*1000);
+		if (n = do_get_ieffect(co, VF_EN_MPWHENHIT)) do_recovery(co, 2, n*2000);
 	}
 	
-	// force to sane values
-	if (ch[cn].a_hp  >ch[cn].hp[5]   * 1000) ch[cn].a_hp   = ch[cn].hp[5]   * 1000;
-	if (ch[cn].a_end >ch[cn].end[5]  * 1000) ch[cn].a_end  = ch[cn].end[5]  * 1000;
-	if (ch[co].a_end >ch[co].end[5]  * 1000) ch[co].a_end  = ch[co].end[5]  * 1000;
-	if (ch[cn].a_mana>ch[cn].mana[5] * 1000) ch[cn].a_mana = ch[cn].mana[5] * 1000;
-	if (ch[co].a_mana>ch[co].mana[5] * 1000) ch[co].a_mana = ch[co].mana[5] * 1000;
-
 	if (ch[co].a_hp<12500 && ch[co].a_hp>=500 && getrank(co)<5)
 	{
 		do_char_log(co, 0, "You're almost dead... Use a potion, quickly!\n");
@@ -9784,14 +9786,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	else
 	{
 		if ((type==0 || type==4 || type==5 || type==8 || type==18 || type==9) && ch[co].gethit_dam>0)
-		{
-			thorns = RANDOM(ch[co].gethit_dam)+1;
-			if (ch[cn].to_parry > ch[co].to_hit) 
-			{
-				thorns = max(0, thorns - (ch[cn].to_parry - ch[co].to_hit));
-			}
-			if (thorns>0) do_hurt(co, cn, thorns, 3);
-		}
+			do_hurt(co, cn, ch[co].gethit_dam, 3);
 	}
 
 	return (dam / 1000);
@@ -9956,7 +9951,7 @@ void do_attack(int cn, int co, int surround)
 {
 	int hit, dam = 0, die, m, odam = 0, cc = 0, surrmod = 0, sorb = 0;
 	int chance, s1, s2, bonus = 0, diff, crit_dam=0, in=0, co_orig=-1;
-	int surrDam, surrBonus, surrTotal, n, power=0, topdam = 0, thorns = 0;
+	int surrDam, surrBonus, surrTotal, n, power=0, topdam = 0;
 	int glv, glv_base = 60;
 	int in2 = 0;
 	
@@ -10046,16 +10041,18 @@ void do_attack(int cn, int co, int surround)
 	
 	if (hit)
 	{
-		dam    = ch[cn].weapon + RANDOM(9);
-		topdam = max(0, ch[cn].top_damage);
+		dam    = ch[cn].weapon + RANDOM(8);
 		
-		if (topdam>1)
+		if (topdam = max(0, ch[cn].top_damage))
 		{
 			if (T_ARTM_SK(co,  4)) topdam = less(topdam,   30, 1);  // (ArTm) Bulwark
 			if (n = TC_SK(co, 16)) topdam = less(topdam, n*15, 1);
 			
-			if (T_ARTM_SK(cn,  6))   dam += topdam;                 // (ArTm) Impact
-			else                     dam += RANDOM(topdam);
+			if (topdam>1)
+			{
+				if (T_ARTM_SK(cn,  6))   dam += topdam;                 // (ArTm) Impact
+				else                     dam += RANDOM(topdam);
+			}
 		}
 		
 		if (do_get_iflag(co, SF_WHEEL_R)) dam = less(dam, 20, 1);   // [Taro] Wheel.R
@@ -10096,8 +10093,6 @@ void do_attack(int cn, int co, int surround)
 		
 		// Weapon damage
 		if (ch[cn].flags & (CF_PLAYER)) item_damage_weapon(cn, dam+crit_dam);
-		
-		if (sorb && (n=st_skillcount(co, 58))) dam = dam * (100-n*5)/100;
 		
 		dam = do_hurt(cn, co, dam+crit_dam, crit_dam>0?9:0);
 		
@@ -10140,13 +10135,8 @@ void do_attack(int cn, int co, int surround)
 		do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 		do_notify_char(cn, NT_DIDMISS, co, 0, 0, 0);
 				
-		if (T_LYCA_SK(co, 10) && (thorns = RANDOM(ch[co].gethit_dam)+1)>0)        // (Lyca) Sloth
-		{
-			if (ch[cn].to_parry > ch[co].to_hit)
-				thorns = max(0, thorns - (ch[cn].to_parry - ch[co].to_hit));
-			
-			if (thorns>0) do_hurt(co, cn, thorns, 13);
-		}
+		if ((T_LYCA_SK(cn, 10)+TC_SK(cn, 106))>0 && ch[co].gethit_dam>0)    // (Lyca) Sloth
+			do_hurt(co, cn, ch[co].gethit_dam, 13);
 	}
 	
 	// Tarot - Death.R : Trigger Zephyr when attacked
@@ -11092,7 +11082,6 @@ void really_update_char(int cn)
 		
 		if (IS_WPDUALSW(m))
 		{
-			if (z=st_skillcount(cn, 30)) tempWeapon += tempWeapon*z*2/25;
 			if (IS_ANY_TEMP(cn) && it[m].temp != IT_WP_FELLNIGHT)
 			{
 				tempWeapon /= 2;
@@ -11104,14 +11093,11 @@ void really_update_char(int cn)
 		}
 		if (IS_WPSHIELD(m))
 		{
-			if (z=st_skillcount(cn, 21))  tempArmor += tempArmor *z*2/25;
 			if (n == WN_RHAND)
 			{
 				tempWeapon += tempArmor;
 				tempArmor  /= 2;
 			}
-			if (z=st_skillcount(cn, 18)) gethit     += tempArmor *z/10;
-			if (z=st_skillcount(cn, 24)) parry_rate += tempArmor *z/20;
 		}
 		
 		weapon += tempWeapon;
@@ -11365,7 +11351,7 @@ void really_update_char(int cn)
 	if (T_SEYA_SK(cn,  1))                      hit_rate   +=   4;  // (Seya) Accuracy
 	if (n = TC_SK(cn,  1))                      hit_rate   += n*2;
 	if (T_SEYA_SK(cn,  2)) for (z=0; z<5; z++)  attrib[z]  +=   2;  // (Seya) Expertise
-	if (n = TC_SK(cn,  2)) for (z=0; z<5; z++)  attrib[z]  += n*1;
+	if (n = TC_SK(cn,  2)) for (z=0; z<5; z++)  attrib[z]  +=   n;
 	if (T_SEYA_SK(cn,  3))                      parry_rate +=   4;  // (Seya) Avoidance
 	if (n = TC_SK(cn,  3))                      parry_rate += n*2;
 	if (T_SEYA_SK(cn,  4))   dmg_bns = dmg_bns*(100+bcount*2)/100;  // (Seya) Absolution
@@ -11393,7 +11379,7 @@ void really_update_char(int cn)
 	if (n = TC_SK(cn, 20)) do_add_ieffect(cn, VF_EN_MORESTR, n*3);
 	//
 	if (T_SKAL_SK(cn,  1))                      critical_b +=   2;  // (Skal) Decisiveness
-	if (n = TC_SK(cn, 25))                      critical_b += n*1;
+	if (n = TC_SK(cn, 25))                      critical_b +=   n;
 	if (T_SKAL_SK(cn,  2))                  attrib[AT_AGL] +=   6;  // (Skal) Dexterity
 	if (n = TC_SK(cn, 26))                  attrib[AT_AGL] += n*3;
 	if (T_SKAL_SK(cn,  3))                 skill[SK_IMMUN] +=   4;  // (Skal) Sanctity
@@ -11470,7 +11456,7 @@ void really_update_char(int cn)
 	if (n = TC_SK(cn, 92)) do_add_ieffect(cn, VF_EN_MOREBRV, n*3);
 	//
 	if (T_LYCA_SK(cn,  1))                             aoe +=   2;  // (Lyca) Expanse
-	if (n = TC_SK(cn, 97))                             aoe += n*1;
+	if (n = TC_SK(cn, 97))                             aoe +=   n;
 	if (T_LYCA_SK(cn,  2))                              hp +=   6;  // (Lyca) Feast
 	if (n = TC_SK(cn, 98))                              hp += n*3;
 	if (T_LYCA_SK(cn,  3))                          gethit +=   6;  // (Lyca) Sharkskin
@@ -11647,6 +11633,14 @@ void really_update_char(int cn)
 		tmphm = mana; mana = hp; hp = tmphm;
 	}
 	
+	if (n = TC_SK(cn, 76)*15)  // (Corr) Repurpose
+	{
+		m = mana * n / 100;
+		
+		mana -= min(mana, n);
+		hp   += n;
+	}
+	
 	if (mana < 10) mana = 10;
 	if (end  < 10) end  = 10;
 	if (hp   < 10) hp   = 10;
@@ -11655,8 +11649,7 @@ void really_update_char(int cn)
 	ch[cn].end[4]  = end;
 	ch[cn].hp[4]   = hp;
 	
-	if (T_ARHR_SK(cn, 10)) spell_pow += mana*1/100;  // (ArHr) Flow
-	if (n = TC_SK(cn, 82)) spell_pow += mana*n/200;
+	spell_pow += mana*(T_ARHR_SK(cn, 10)*2+TC_SK(cn, 82))/200;  // (ArHr) Flow
 	
 	if (mana > 999 && IS_PLAYER(cn))
 	{
@@ -11679,6 +11672,7 @@ void really_update_char(int cn)
 	ch[cn].end[5]  = end;
 	ch[cn].hp[5]   = hp;
 	
+	// Don't use do_recovery() here -- these values are meant to account for gear swaps
 	if (ch[cn].a_mana < MP_SOFTCAP(cn)) ch[cn].a_mana += heal_mana;
 	if (ch[cn].a_end  < EN_SOFTCAP(cn)) ch[cn].a_end  += heal_end;
 	if (ch[cn].a_hp   < HP_SOFTCAP(cn)) ch[cn].a_hp   += heal_hp;
@@ -11812,24 +11806,6 @@ void really_update_char(int cn)
 	
 	if (cz) cn = cz;
 	
-	
-	
-	// Finesse
-	if (B_SK(cn, SK_FINESSE))
-	{
-		z = M_SK(cn, SK_FINESSE);
-		
-		if (T_BRAV_SK(cn, 7))        z = z + (z * M_AT(cn, AT_BRV)/2000);
-		if (n=st_skillcount(cn, 91)) z = z + (z * M_AT(cn, AT_BRV)*n/5000);
-		
-		//n = max(1, ch[cn].hp[5]*1000 - ch[cn].hp[5]*600);
-		//hp = ch[cn].a_hp - ch[cn].hp[5]*600;
-		
-		z = z*2 - max(0, min(z, z * (HP_SOFTCAP(cn) - ch[cn].a_hp) / HP_SOFTCAP(cn)));
-		
-		dmg_bns = dmg_bns * (3000 + z)/3000;
-	}
-	
 	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4) { cz=cn; cn=co; }
 	
 	// Ferocity
@@ -11838,11 +11814,7 @@ void really_update_char(int cn)
 		z = M_SK(cn, SK_FEROC); // M_SK(cn, SK_FEROC)*(M_SK(cn, SK_FEROC)/8)*136/5000+8;
 		weapon += (z/2 + z*empty/10)/4; //  1 = (  4+  8)/4 == btwn + 1 and +  3
 		armor  += (z/2 + z*empty/10)/4; // 25 = (100+200)/4 == btwn +25 and + 75
-		if (T_LYCA_SK(cn,  4)) critical_b += empty;
-		if (T_LYCA_SK(cn, 12)) spell_mod += empty;
 	}
-	if (n = st_skillcount(cn,100)) critical_b += emptyring*n;
-	if (n = st_skillcount(cn,108)) spell_mod  += emptyring*n;
 	
 	if (cz) cn = cz;
 	
@@ -12121,6 +12093,15 @@ void really_update_char(int cn)
 		spell_pow += (T_SORC_SK(cn, 4)*2 + TC_SK(cn, 52))*spell_apt/50;    // (Sorc) Introspection
 	}
 	
+	// Additive Bonuses
+	{
+		n  = 0;
+		n += T_BRAV_SK(cn, 11)*20;    // (Brav) Wizardry
+		n +=     TC_SK(cn, 95)*10;
+		
+		spell_pow = more(spell_pow, n, 1);
+	}
+	
 	ch[cn].spell_pow = clamp(spell_pow, -300, 300);
 	
 	
@@ -12195,33 +12176,22 @@ void really_update_char(int cn)
 	
 	critical_c += attrib_ex[AT_BRV]*2;
 	
-	// Monster-related crit adjustments
-	if (!IS_PLAYER(cn))
-	{
-		if (ch[cn].flags & CF_EXTRACRIT)
-			critical_b = 4;
-		else
-			critical_b = 1;
-	}
+	if (!IS_PLAYER(cn) && (ch[cn].flags & CF_EXTRACRIT)) critical_b += 4;
+	if (unarmed) critical_b += TC_SK(cn, 100)*5;  // (Corr) Martial Artist
 	
 	critical_b *= 100;
 	
-	// Grant extra crit chance by crit bonus
 	critical_b += critical_b * (critical_c + ava_crit)/100;
 	
 	if (B_SK(cn, SK_PRECISION))
 	{
-		n = T_SKAL_SK(cn, 7)*2 + TC_SK(cn, 31)*1;    // (Skal) Nocturne
+		n = T_SKAL_SK(cn, 7)*2 + TC_SK(cn, 31);    // (Skal) Nocturne
 		n = more(skill[SK_PRECISION], n, 20);
 		
 		critical_b += critical_b * n / PREC_CAP;
 	}
 	
-	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
-	if (do_get_iflag(cn, SF_WHEEL))
-	{
-		critical_b = critical_b * 2/3;
-	}
+	if (do_get_iflag(cn, SF_WHEEL)) critical_b = critical_b * 2/3;  // [Taro] Wheel of Fortune
 	
 	ch[cn].crit_chance = clamp(critical_b, 0, 10000);
 	
@@ -12288,12 +12258,6 @@ void really_update_char(int cn)
 	
 	// Multiplicative bonuses
 	{
-		if (T_BRAV_SK(cn,  5))             hit_rate   = more(hit_rate,   4, 1);
-		if (n = st_skillcount(cn, 89))     hit_rate   = more(hit_rate,   n, 1);
-		
-		if (T_BRAV_SK(cn, 11))             parry_rate = more(parry_rate, 4, 1);
-		if (n = st_skillcount(cn, 95))     parry_rate = more(parry_rate, n, 1);
-		
 		if (do_get_iflag(cn, SF_STRENG_R)) hit_rate   = less(hit_rate,  20, 1); // [Tarot] Strength.R
 	}
 	
@@ -12302,8 +12266,8 @@ void really_update_char(int cn)
 	
 	if (do_get_iflag(cn, SF_HIGHHITPAR)) // Improved Bien Estoc
 	{
-		if (hit_rate > parry_rate)	parry_rate =   hit_rate;
-		else						hit_rate   = parry_rate;
+		if (hit_rate > parry_rate) parry_rate =   hit_rate;
+		else                       hit_rate   = parry_rate;
 	}
 	
 	ch[cn].to_hit   = clamp(hit_rate,   0, 999);
@@ -12381,12 +12345,11 @@ void really_update_char(int cn)
 		armor  = more(armor,  n, 1);
 		
 		n  = 0;
+		n += T_BRAV_SK(cn,  5)*10;        // (Brav) Valor
+		n +=     TC_SK(cn, 89)* 5;
 		
 		weapon = more(weapon, n, 1);
 	}
-	
-	//
-	
 	
 	ch[cn].armor  = clamp(armor,  0, 999);
 	ch[cn].weapon = clamp(weapon, 0, 999);
@@ -12399,7 +12362,7 @@ void really_update_char(int cn)
 	// "Increased" and "Decreased" Thorns
 	{
 		n  = 0;
-		n += T_LYCA_SK(cn, 11)*20;                                           // (Lyca) Envy
+		n += T_LYCA_SK(cn, 11)*20;    // (Lyca) Envy
 		n +=     TC_SK(cn,107)*10;
 		
 		gethit = more(gethit, n, 1);
@@ -12425,18 +12388,23 @@ void really_update_char(int cn)
 		Determined by STR/2. This is put into a RANDOM(), so "average damage" can be considered WV plus half of this number
 	*/
 	
-	damage_top = damage_top + (attrib_ex[AT_STR] * unarmed) / 2;
+	// Flat Bonuses
+	{
+		damage_top += (attrib_ex[AT_STR] * unarmed) / 2;
+		
+		if (T_BRAV_SK(cn, 10)) damage_top += spell_pow;  // (Brav) Spellblade
+	}
 	
-	// "Increased" and "Decreased" Top Damage
+	// Additive Bonuses
 	{
 		n  = 0;
-		n += T_ARTM_SK(cn,  5)*10;                                           // (ArTm) Vanquisher
+		n += T_ARTM_SK(cn,  5)*10;    // (ArTm) Vanquisher
 		n +=     TC_SK(cn, 17)* 5;
 		
 		damage_top = more(damage_top, n, 1);
 	}
 	
-	// "More" and "Less" Top Damage
+	// Multiplicative Bonuses
 	{
 		if (do_get_iflag(cn, SF_HANGED_R)) damage_top = more(damage_top, 25, 1); // [Taro] Hanged.R
 	}
@@ -12448,14 +12416,23 @@ void really_update_char(int cn)
 		ch[].dmg_reduction
 	*/
 	
-	// "More" and "Less" Damage Bonus/Reduction
+	// Multiplicative Bonuses
 	{
+		// Finesse
+		if (B_SK(cn, SK_FINESSE))
+		{
+			n = weapon * max(0, T_BRAV_SK(cn, 4)*2 + TC_SK(cn, 88));       // (Brav) Perfectionism
+			m = more(M_SK(cn, SK_FINESSE), n, 20);
+			
+			dmg_bns = dmg_bns * (3000 + z)/3000;
+		}
+		
 		dmg_bns = more(dmg_bns, do_get_ieffect(cn, VF_EN_MOREDAMAGE), 1);  // [Ench] More damage dealt
 		
 		// Safeguard
 		if (B_SK(cn, SK_SAFEGRD))
 		{
-			n = armor * max(0, T_ARTM_SK(cn, 12)*2 + TC_SK(cn, 23)*1);     // (ArTm) Fortitude
+			n = armor * max(0, T_ARTM_SK(cn, 12)*2 + TC_SK(cn, 24));       // (ArTm) Fortitude
 			m = more(M_SK(cn, SK_SAFEGRD), n, 20);
 			
 			dmg_rdc = less(dmg_rdc, m, 6);
@@ -12510,9 +12487,9 @@ void really_update_char(int cn)
 	*/
 	
 	// Force hp/end/mana to sane values
-	if (ch[cn].a_hp   > HP_SOFTCAP(cn)) ch[cn].a_hp   = HP_SOFTCAP(cn);
-	if (ch[cn].a_end  > EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
-	if (ch[cn].a_mana > MP_SOFTCAP(cn)) ch[cn].a_mana = MP_SOFTCAP(cn);
+	ch[cn].a_hp   = clamp(ch[cn].a_hp,   0, HP_SOFTCAP(cn));
+	ch[cn].a_end  = clamp(ch[cn].a_end,  0, EN_SOFTCAP(cn));
+	ch[cn].a_mana = clamp(ch[cn].a_mana, 0, MP_SOFTCAP(cn));
 	
 	// Adjust local light score
 	if (oldlight!=ch[cn].light && ch[cn].used==USE_ACTIVE &&
@@ -12911,22 +12888,22 @@ void do_update_spell_haste(int cn, int in)
 }
 void do_update_spell_pact(int cn, int in)
 {
-	int power, n, tmp;
-	int hpbonus = (ch[cn].hp[5]*1000   - ch[cn].a_hp)  /1000;
-	int enbonus = (ch[cn].end[5]*1000  - ch[cn].a_end) /1000;
-	int mpbonus = (ch[cn].mana[5]*1000 - ch[cn].a_mana)/1000;
+	int power, n;
 	
-	n = (hpbonus + enbonus + mpbonus)*st_skillcount(cn, 103)/5;
-	if (T_LYCA_SK(cn, 7)) n += (hpbonus + enbonus + mpbonus)/2;
+	bu[in].power = skill_multiplier(M_SK(cn, SK_PACT), cn);
 	
-	power = skill_multiplier(M_SK(cn, SK_PACT), cn);
-	bu[in].power = power;
+	// Additive Bonus
+	{
+		n  = 0;
+		n += T_LYCA_SK(co,  9)*2;    // (Lyca) Wrath
+		n +=     TC_SK(co,105);
+	}
 	
 	if (do_get_iflag(cn, SF_HERMIT_R))
 	{
 		bu[in].reserve[2] = min(80, 15 + power/5); // Mana
 		power = ch[cn].reserve[2];
-		power = power + (power * n / 5000);
+		power = more(power, ch[co].hp[5] * n, 100);
 		bu[in].dmg_reduction = power*4/6;
 		bu[in].dmg_bonus     = power*2/6;
 	}
@@ -12934,7 +12911,7 @@ void do_update_spell_pact(int cn, int in)
 	{
 		bu[in].reserve[0] = min(80, 15 + power/5); // Hitpoints
 		power = ch[cn].reserve[0];
-		power = power + (power * n / 5000);
+		power = more(power, ch[co].hp[5] * n, 100);
 		bu[in].dmg_reduction = power*4/3;
 		bu[in].dmg_bonus     = power*2/3;
 	}
@@ -13040,8 +13017,8 @@ void do_pulse_tick(int cn, int co, int in)
 			}
 			else if (bu[in].temp==SK_PULSE2 && IS_MY_ALLY(cn, co))
 			{
-				ch[co].a_hp += bu[in].power * DAM_MULT_PULSE / 2;
-				if (ch[co].a_hp > ch[co].hp[5] * 1000) ch[co].a_hp = ch[co].hp[5] * 1000;
+				do_recovery(co, 0, bu[in].power * DAM_MULT_PULSE / 2);
+				
 				spell_charge(cn, co, bu[in].power);
 				
 				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
@@ -13063,7 +13040,7 @@ void do_regenerate(int cn)
 	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0, sunR = 0, worldR = 0, moonR = 0, money = 0;
 	int race_reg = 0, race_res = 0, race_med = 0, degendam=0, en_dam=0, mp_dam=0;
 	int degenpower = 0, tickcheck = 10000;
-	int moonmult = 20, n1=0, n2=0, n3=0;
+	int moonmult = 20;
 	int hpmult, endmult, manamult, rank=0;
 	int co = -1, cc=0;
 	int tmp = 0, kill_bsp = 0, kill_osp = 0, kill_bos = 0;
@@ -13085,13 +13062,9 @@ void do_regenerate(int cn)
 
 	if ((ch[cn].flags & (CF_PLAYER)) || (IS_COMP_TEMP(cn) && (co = ch[cn].data[CHD_MASTER]) && IS_SANEPLAYER(co)))
 	{
-		n1 = st_skillcount(cn, 42)*10; // Full
-		n2 = st_skillcount(cn, 54)*10; // New
-		n3 = st_skillcount(cn, 99)* 5; // Half
-	
 		if (IS_GLOB_MAYHEM)				moonmult = 10;
-		if (globs->fullmoon)			moonmult = (30*(100+n1+n3))/100;
-		if (globs->newmoon)				moonmult = (40*(100+n2+n3))/100;
+		if (globs->fullmoon)			moonmult = 30;
+		if (globs->newmoon)				moonmult = 40;
 		
 		race_reg = M_SK(cn, SK_REGEN) * moonmult / 20 + (B_SK(cn, SK_REGEN)?M_SK(cn, SK_REGEN):0) * ch[cn].hp[5]   / 2000;
 		race_res = M_SK(cn, SK_REST)  * moonmult / 20 + (B_SK(cn, SK_REST) ?M_SK(cn, SK_REST) :0) * ch[cn].end[5]  / 1000;
@@ -13187,10 +13160,10 @@ void do_regenerate(int cn)
 		{
 			// STANDING STATES
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					ch[cn].a_hp 			+= (nohp   ? 0 : (hp  / 8 * (sunR?1:8) * idle/3) / (halfhp   ? 2 : 1)); 
-					gothp 					+= (nohp   ? 0 : (hp  /16 * (sunR?1:8) * idle/3) / (halfhp   ? 2 : 1));
-					ch[cn].a_end 			+= (noend  ? 0 : (end / 8 * (sunR?1:8) * idle/3) / (halfend  ? 2 : 1));
-					ch[cn].a_mana 			+= (nomana ? 0 : (mana/ 8 * (sunR?1:8) * idle/3) / (halfmana ? 2 : 1)); 
+					do_recovery(cn, 0, (nohp   ? 0 : (hp  / 8 * (sunR?1:8) * idle/3) / (halfhp   ? 2 : 1)));
+					gothp           += (nohp   ? 0 : (hp  /16 * (sunR?1:8) * idle/3) / (halfhp   ? 2 : 1));
+					do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?1:8) * idle/3) / (halfend  ? 2 : 1)));
+					do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?1:8) * idle/3) / (halfmana ? 2 : 1))); 
 				break;
 			
 			// WALKING STATES
@@ -13199,105 +13172,107 @@ void do_regenerate(int cn)
 			case 128: case 132: case 136: case 140: case 144: case 148: case 152:
 				if (do_get_iflag(cn, SF_EN_WALKREGN))
 				{
-					ch[cn].a_hp 			+= (nohp   ? 0 : (hp     ) / (halfhp   ? 2 : 1)); 
-					gothp 					+= (nohp   ? 0 : (hp  / 2) / (halfhp   ? 2 : 1));
+					do_recovery(cn, 0, (nohp   ? 0 : (hp     ) / (halfhp   ? 2 : 1))); 
+					gothp           += (nohp   ? 0 : (hp  / 2) / (halfhp   ? 2 : 1));
 					if (worldR)
 					{
 						if (ch[cn].mode==2) // Fast
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end    ) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1)) - 40; 
+							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1)) - 40); 
 						}
 						else
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end    ) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1)); 
+							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1))); 
 						}
 					}
 					else
 					{
 						if (ch[cn].mode==2) // Fast
-							ch[cn].a_end 	+= (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)) - 40;
+							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)) - 40);
 						else
-							ch[cn].a_end 	+= (noend  ? 0 : (end    ) / (halfend  ? 2 : 1));
-						ch[cn].a_mana 		+= (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1)); 
+							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)));
+						
+						do_recovery(cn, 2, (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1))); 
 					}
 				}
 				else
 				{
-					ch[cn].a_hp 			+= (nohp   ? 0 : (hp  / 4) / (halfhp   ? 2 : 1)); 
-					gothp 					+= (nohp   ? 0 : (hp  / 8) / (halfhp   ? 2 : 1));
+					do_recovery(cn, 0, (nohp   ? 0 : (hp  / 4) / (halfhp   ? 2 : 1))); 
+					gothp           += (nohp   ? 0 : (hp  / 8) / (halfhp   ? 2 : 1));
 					if (worldR)
 					{
 						if (ch[cn].mode==2) // Fast
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)) - 40;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)) - 40);
 						}
 						if (ch[cn].mode==1) // Normal
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)));
 						}
 						if (ch[cn].mode==0) // Slow
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)));
 						}
 					}
 					else
 					{
 						if (ch[cn].mode==2) // Fast
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)) - 40;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)) - 40);
 						if (ch[cn].mode==1) // Normal
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)));
 						if (ch[cn].mode==0) // Slow
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1));
-						ch[cn].a_mana 		+= (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1)));
+						
+						do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)));
 					}
 				}
 				break;
 			
 			// FIGHTING STATES
 			case 160: case 168: case 176: case 184:
-				ch[cn].a_hp 				+= (nohp   ? 0 : (hp  / 8 * (sunR?8:1)) / (halfhp   ? 2 : 1)); 
-				gothp 						+= (nohp   ? 0 : (hp  /16 * (sunR?8:1)) / (halfhp   ? 2 : 1));
+				do_recovery(cn, 0, (nohp   ? 0 : (hp  / 8 * (sunR?8:1)) / (halfhp   ? 2 : 1))); 
+				gothp           += (nohp   ? 0 : (hp  /16 * (sunR?8:1)) / (halfhp   ? 2 : 1));
 				if (worldR)
 				{
 					if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
 					{
 						if (ch[cn].mode==2) // Fast
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 75;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 75);
 						}
 						if (ch[cn].mode==1) // Normal
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 25;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 25);
 						}
 						if (ch[cn].mode==0) // Slow
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
 						}
 					}
 					else // Misc.
 					{
 						if (ch[cn].mode==2)		// Fast
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 50;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 50);
 						}
 						if (ch[cn].mode==1)		// Normal
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
 						}
 						if (ch[cn].mode==0)		// Slow
 						{
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 2 * (sunR?2:1)) / (halfend  ? 2 : 1));
-							ch[cn].a_mana 	+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 2 * (sunR?2:1)) / (halfend  ? 2 : 1)));
+							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
 						}
 					}
 				}
@@ -13306,22 +13281,22 @@ void do_regenerate(int cn)
 					if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
 					{
 						if (ch[cn].mode==2) // Fast
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)) - 75;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)) - 75);
 						if (ch[cn].mode==1) // Normal
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)) - 25;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)) - 25);
 						if (ch[cn].mode==0) // Slow
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
 					}
 					else // Misc.
 					{
 						if (ch[cn].mode==2)		// Fast
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)) - 50;
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)) - 50);
 						if (ch[cn].mode==1)		// Normal
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
 						if (ch[cn].mode==0)		// Slow
-							ch[cn].a_end 	+= (noend  ? 0 : (end / 2 * (sunR?2:1)) / (halfend  ? 2 : 1));
+							do_recovery(cn, 1, (noend  ? 0 : (end / 2 * (sunR?2:1)) / (halfend  ? 2 : 1)));
 					}
-					ch[cn].a_mana 			+= (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1));
+					do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
 				}
 				break;
 			
@@ -13345,29 +13320,29 @@ void do_regenerate(int cn)
 		}
 		if (ch[cn].temp == CT_DRACULA) hp = hp*10;
 		
-		ch[cn].a_hp	+= hp / (halfhp   ? 2 : 1);
-		gothp 		+= hp / (halfhp   ? 4 : 2);
+		do_recovery(cn, 0, hp / (halfhp   ? 2 : 1));
+		gothp           += hp / (halfhp   ? 4 : 2);
 	}
 	if (ch[cn].gigaregen[0])
 	{
 		hp = ch[cn].gigaregen[0] * 50;
-		ch[cn].a_hp		+=   hp / (halfhp   ? 2 : 1);
-		gothp 			+=   hp / (halfhp   ? 4 : 2);
+		do_recovery(cn, 0, hp / (halfhp   ? 2 : 1));
+		gothp         +=   hp / (halfhp   ? 4 : 2);
 	}
 	if (ch[cn].gigaregen[1])
 	{
 		end = ch[cn].gigaregen[1] * 50;
-		ch[cn].a_end	+=  end / (halfend  ? 2 : 1);
+		do_recovery(cn, 1, end / (halfend  ? 2 : 1));
 	}
 	if (ch[cn].gigaregen[2])
 	{
 		mana = ch[cn].gigaregen[2] * 50;
-		ch[cn].a_mana	+= mana / (halfmana ? 2 : 1);
+		do_recovery(cn, 2, mana / (halfmana ? 2 : 1));
 	}
 	if (ch[cn].temp == CT_PIRATELORD && (IS_SANEITEM(in = map[1331331].it) && !(it[in].active)))
 	{
-		ch[cn].a_hp	+= 20000;
-		gothp 		+= 1;
+		do_recovery(cn, 0, 20000);
+		gothp += 1;
 	}
 	
 	// Special case for the Amulet of Ankhs
@@ -13376,29 +13351,29 @@ void do_regenerate(int cn)
 		switch (it[in].temp)
 		{
 			case IT_ANKHAMULET: 
-				ch[cn].a_hp   += (race_reg/ 8) / (halfhp   ? 2 : 1);
-				ch[cn].a_end  += (race_res/ 8) / (halfend  ? 2 : 1);
-				ch[cn].a_mana += (race_med/ 8) / (halfmana ? 2 : 1);
+				do_recovery(cn, 0, (race_reg/ 8) / (halfhp   ? 2 : 1));
+				do_recovery(cn, 1, (race_res/ 8) / (halfend  ? 2 : 1));
+				do_recovery(cn, 2, (race_med/ 8) / (halfmana ? 2 : 1));
 				break;
 			case IT_AMBERANKH: 
-				ch[cn].a_hp   += (race_reg/ 4) / (halfhp   ? 2 : 1);
-				ch[cn].a_end  += (race_res/12) / (halfend  ? 2 : 1);
-				ch[cn].a_mana += (race_med/12) / (halfmana ? 2 : 1);
+				do_recovery(cn, 0, (race_reg/ 4) / (halfhp   ? 2 : 1));
+				do_recovery(cn, 1, (race_res/12) / (halfend  ? 2 : 1));
+				do_recovery(cn, 2, (race_med/12) / (halfmana ? 2 : 1));
 				break;
 			case IT_TURQUANKH: 
-				ch[cn].a_hp   += (race_reg/12) / (halfhp   ? 2 : 1);
-				ch[cn].a_end  += (race_res/ 4) / (halfend  ? 2 : 1);
-				ch[cn].a_mana += (race_med/12) / (halfmana ? 2 : 1);
+				do_recovery(cn, 0, (race_reg/12) / (halfhp   ? 2 : 1));
+				do_recovery(cn, 1, (race_res/ 4) / (halfend  ? 2 : 1));
+				do_recovery(cn, 2, (race_med/12) / (halfmana ? 2 : 1));
 				break;
 			case IT_GARNEANKH: 
-				ch[cn].a_hp   += (race_reg/12) / (halfhp   ? 2 : 1);
-				ch[cn].a_end  += (race_res/12) / (halfend  ? 2 : 1);
-				ch[cn].a_mana += (race_med/ 4) / (halfmana ? 2 : 1);
+				do_recovery(cn, 0, (race_reg/12) / (halfhp   ? 2 : 1));
+				do_recovery(cn, 1, (race_res/12) / (halfend  ? 2 : 1));
+				do_recovery(cn, 2, (race_med/ 4) / (halfmana ? 2 : 1));
 				break;
 			case IT_TRUEANKH: 
-				ch[cn].a_hp   += (race_reg/ 4) / (halfhp   ? 2 : 1);
-				ch[cn].a_end  += (race_res/ 4) / (halfend  ? 2 : 1);
-				ch[cn].a_mana += (race_med/ 4) / (halfmana ? 2 : 1);
+				do_recovery(cn, 0, (race_reg/ 4) / (halfhp   ? 2 : 1));
+				do_recovery(cn, 1, (race_res/ 4) / (halfend  ? 2 : 1));
+				do_recovery(cn, 2, (race_med/ 4) / (halfmana ? 2 : 1));
 				break;
 			case IT_GAMBLERFAL:
 				if (it[in].active) 
@@ -13413,9 +13388,9 @@ void do_regenerate(int cn)
 	}
 	if (in = get_gear(cn, IT_RINGWARMTH) && it[in].active)
 	{
-		ch[cn].a_hp   += (race_reg/ 8) / (halfhp   ? 2 : 1);
-		ch[cn].a_end  += (race_res/ 8) / (halfend  ? 2 : 1);
-		ch[cn].a_mana += (race_med/ 8) / (halfmana ? 2 : 1);
+		do_recovery(cn, 0, (race_reg/ 8) / (halfhp   ? 2 : 1));
+		do_recovery(cn, 1, (race_res/ 8) / (halfend  ? 2 : 1));
+		do_recovery(cn, 2, (race_med/ 8) / (halfmana ? 2 : 1));
 	}
 	
 	/*
@@ -13425,26 +13400,21 @@ void do_regenerate(int cn)
 	if (ch[cn].leech[0])
 	{
 		if ((hp   = ch[cn].leech[0]) >= 15) hp   /= 15;
-		ch[cn].a_hp   += hp   * 10;
+		do_recovery(cn, 0, hp   * 10);
 		ch[cn].leech[0] = max(0, ch[cn].leech[0] - hp);
 	}
 	if (ch[cn].leech[1])
 	{
 		if ((end  = ch[cn].leech[1]) >= 15) end  /= 15;
-		ch[cn].a_end  += end  * 10;
+		do_recovery(cn, 1, end  * 10);
 		ch[cn].leech[1] = max(0, ch[cn].leech[1] - end);
 	}
 	if (ch[cn].leech[2])
 	{
 		if ((mana = ch[cn].leech[2]) >= 15) mana /= 15;
-		ch[cn].a_mana += mana * 10;
+		do_recovery(cn, 2, mana * 10);
 		ch[cn].leech[2] = max(0, ch[cn].leech[2] - mana);
 	}
-	
-	// Force hp/end/mana to sane values
-	if (ch[cn].a_hp   > HP_SOFTCAP(cn)) ch[cn].a_hp   = HP_SOFTCAP(cn);
-	if (ch[cn].a_end  > EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
-	if (ch[cn].a_mana > MP_SOFTCAP(cn)) ch[cn].a_mana = MP_SOFTCAP(cn);
 	
 	if ((hp && ch[cn].a_hp<ch[cn].hp[5] * 900) || (mana && ch[cn].a_mana<ch[cn].mana[5] * 900))
 	{
@@ -13539,17 +13509,17 @@ void do_regenerate(int cn)
 					degendam = bu[in].r_hp;
 					if (degendam<0)
 						degendam = alter_damage(cn, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
-					if (mp_dam)   ch[cn].a_mana += mp_dam;
-					if (en_dam)   ch[cn].a_end  += en_dam;
-					if (degendam) ch[cn].a_hp += degendam;
+					if (mp_dam)   do_recovery(cn, 2, mp_dam);
+					if (en_dam)   do_recovery(cn, 1, en_dam);
+					if (degendam) do_recovery(cn, 0, degendam);
 				}
 				if (bu[in].r_end!=-1)
 				{
-					ch[cn].a_end += bu[in].r_end;
+					do_recovery(cn, 1, bu[in].r_end);
 				}
 				if (bu[in].r_mana!=-1)
 				{
-					ch[cn].a_mana += bu[in].r_mana;
+					do_recovery(cn, 2, bu[in].r_mana);
 				}
 				if (ch[cn].a_hp<1000 && bu[in].r_hp && bu[in].temp==SK_IMMOLATE)
 				{
@@ -13645,22 +13615,17 @@ void do_regenerate(int cn)
 					degendam = bu[in].r_hp;
 					if (degendam<0)
 						degendam = alter_damage(cn, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
-					if (mp_dam)   ch[cn].a_mana += mp_dam;
-					if (en_dam)   ch[cn].a_end  += en_dam;
-					if (degendam) ch[cn].a_hp += degendam;
-					if (ch[cn].a_hp>ch[cn].hp[5] * 1000) ch[cn].a_hp = ch[cn].hp[5] * 1000;
+					if (mp_dam)   do_recovery(cn, 2, mp_dam);
+					if (en_dam)   do_recovery(cn, 1, en_dam);
+					if (degendam) do_recovery(cn, 0, degendam);
 				}
 				if (bu[in].r_end)
 				{
-					ch[cn].a_end += bu[in].r_end;
-					if (ch[cn].a_end>ch[cn].end[5] * 1000) ch[cn].a_end = ch[cn].end[5] * 1000;
-					if (ch[cn].a_end<0) ch[cn].a_end = 0;
+					do_recovery(cn, 1, bu[in].r_end);
 				}
 				if (bu[in].r_mana)
 				{
-					ch[cn].a_mana += bu[in].r_mana;
-					if (ch[cn].a_mana>ch[cn].mana[5] * 1000) ch[cn].a_mana = ch[cn].mana[5] * 1000;
-					if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
+					do_recovery(cn, 2, bu[in].r_mana);
 				}
 				if (ch[cn].a_hp<500)
 				{
@@ -13697,9 +13662,7 @@ void do_regenerate(int cn)
 			// Regen
 			if (bu[in].temp==SK_REGEN)
 			{
-				ch[cn].a_hp += bu[in].r_hp;
-				if (ch[cn].a_hp>ch[cn].hp[5] * 1000)
-					ch[cn].a_hp = ch[cn].hp[5] * 1000;
+				do_recovery(cn, 0, bu[in].r_hp);
 			}
 			
 			// Slow and Curse2 Decay
@@ -13980,10 +13943,8 @@ void do_regenerate(int cn)
 			// Frostburn
 			if (bu[in].temp==SK_FROSTB)
 			{
-				ch[cn].a_end  += bu[in].r_end;
-				ch[cn].a_mana += bu[in].r_mana;
-				if (ch[cn].a_end<0)  ch[cn].a_end  = 0;
-				if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
+				do_recovery(cn, 1, bu[in].r_end);
+				do_recovery(cn, 2, bu[in].r_mana);
 			}
 			
 			// Pulse
@@ -14130,9 +14091,9 @@ void do_regenerate(int cn)
 					
 					if (m = TC_SK(cn, 58) * 15)         // (Corr) Skip Ahead
 					{
-						if ((tmp = (HP_SOFTCAP(cn) - ch[cn].a_hp))   > 0) ch[cn].a_hp   += tmp*m/100;
-						if ((tmp = (EN_SOFTCAP(cn) - ch[cn].a_end))  > 0) ch[cn].a_end  += tmp*m/100;
-						if ((tmp = (MP_SOFTCAP(cn) - ch[cn].a_mana)) > 0) ch[cn].a_mana += tmp*m/100;
+						if ((tmp = (HP_SOFTCAP(cn) - ch[cn].a_hp))   > 0) do_recovery(cn, 0, tmp*m/100);
+						if ((tmp = (EN_SOFTCAP(cn) - ch[cn].a_end))  > 0) do_recovery(cn, 1, tmp*m/100);
+						if ((tmp = (MP_SOFTCAP(cn) - ch[cn].a_mana)) > 0) do_recovery(cn, 2, tmp*m/100);
 					}
 				}
 				bu[in].used = USE_EMPTY;
@@ -14202,26 +14163,15 @@ void do_regenerate(int cn)
 		}
 	}
 	
-	/*
-	if (ch[cn].player && do_get_iflag(cn, SF_TW_GULA))     if (ch[cn].a_hp>1500) ch[cn].a_hp -= 200 + gothp;
-	if (ch[cn].player && do_get_iflag(cn, SF_TW_AVARITIA)) if (ch[cn].a_end>1500) ch[cn].a_end -= 200;
-	if (ch[cn].player && do_get_iflag(cn, SF_TW_IRA))      if (ch[cn].a_mana>1500) ch[cn].a_mana -= 200;
-	*/
-	
 	// Force hp/end/mana to sane values
-	if (ch[cn].a_hp   > HP_SOFTCAP(cn)) ch[cn].a_hp   = HP_SOFTCAP(cn);
-	if (ch[cn].a_end  > EN_SOFTCAP(cn)) ch[cn].a_end  = EN_SOFTCAP(cn);
-	if (ch[cn].a_mana > MP_SOFTCAP(cn)) ch[cn].a_mana = MP_SOFTCAP(cn);
+	ch[cn].a_hp   = clamp(ch[cn].a_hp,   0, HP_SOFTCAP(cn));
+	ch[cn].a_end  = clamp(ch[cn].a_end,  0, EN_SOFTCAP(cn));
+	ch[cn].a_mana = clamp(ch[cn].a_mana, 0, MP_SOFTCAP(cn));
 	
-	if (ch[cn].a_end<0) 	ch[cn].a_end = 0;
-	if (ch[cn].a_mana<0) 	ch[cn].a_mana = 0;
-
 	// item tear and wear
 	if (ch[cn].used==USE_ACTIVE && (ch[cn].flags & (CF_PLAYER)))
-	{
 		char_item_expire(cn);
-	}
-
+	
 	prof_stop(8, prof);
 }
 
