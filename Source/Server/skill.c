@@ -785,9 +785,9 @@ struct metaStat metaStats[103] = {
 	//                                             "         '         '         '         '         '         '         '         '         '         '         '         "
 	{ -1, 1, 1, "Cooldown Duration",    "x",       "The multiplier that cooldown from skills is applied with, the lower the better. Affected by Cooldown Rate." },
 	{ -1, 0, 4, "Spell Aptitude",       "",        "How powerful a spell you can receive from any source. Determined by Willpower, Intuition, and class Spell Modifier." },
-	{ -1, 1, 4, "Spell Modifier",       "x",       "A multiplier which effects the strength of spells you cast. Determined by your character class." },
+	{ -1, 0, 4, "Spell Bonus",          "",        "Flat added bonus to the power of spells you cast." },
+	{ -1, 1, 4, "Spell Multiplier",     "x",       "A multiplier which effects the strength of spells you cast. Determined by your character class." },
 	{ -1, 1, 6, "Base Action Speed",    "",        "The base speed at which ALL actions are performed. Determined by Agility and Strength." },
-	{ -1, 1, 6, "Movement Speed",       "",        "The speed at which your character runs around Astonia." },
 	{ -1, 0, 7, "Hit Score",            "",        "The value used to determine the rate of hitting enemies in melee combat. Granted by your weapon skill." },
 	{ -1, 0, 7, "Parry Score",          "",        "The value used to determine the rate of avoiding damage from enemies. Granted by your weapon skill." },
 	//
@@ -845,7 +845,7 @@ struct metaStat metaStats[103] = {
 	{ -1, 1, 4, "Mana Regen Rate",      "/s",      "Rate at which mana is regenerated per second. This is improved by the Meditate skill." },
 	{ -1, 0, 1, "Effective Immunity",   "",        "Estimated Immunity score. This displays your 'true' Immunity value after special effects." },
 	{ -1, 0, 1, "Effective Resistance", "",        "Estimated Resistance score. This displays your 'true' Resistance value after special effects." },
-	{ -1, 1, 6, "Attack Speed",         "",        "The speed at which melee attacks are performed. Increased by Agility." },
+	{ -1, 1, 6, "Movement Speed",       "",        "The speed at which your character runs around Astonia." },
 	{ -1, 1, 6, "  Cast Speed",         "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
 	{ -1, 0, 1, "Thorns Score",         "",        "Damage dealt to attackers when you are hit (even if you take no damage). Does not damage attackers if they miss." },
 	{ -1, 1, 4, "Mana Cost Multiplier", "%",       "The multiplier of mana for spells, determined by your Economize skill." },
@@ -881,7 +881,7 @@ struct metaStat metaStats[103] = {
 	//
 	//   Alternative values
 	//                                             "         '         '         '         '         '         '         '         '         '         '         '         "
-	{ -1, 1, 5, "Skill Modifier",       "x",       "Skill Modifier is a multiplier which effects the strength of skills you use." },
+	{ -1, 0, 5, "Skill Bonus",          "",        "Flat added bonus to the power of skills you use." },
 	{ 42, 1, 4, "Venom Degen",          "/s",      "Effective damage over time dealt by your Venom spell, before enemy defenses. This can stack up to three times." },
 	{ 42, 1, 4, "Venom Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Venom spell." },
 	{ 43, 1, 1, "Pulse Hit Heal",       "/tick",   "Healing caused by the Pulse spell to surrounding allies when pulsing." },

@@ -666,7 +666,7 @@ extern char *at_name[];
 #define DESC_TEMPER_R		"When equipped, 10%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
 #define DESC_DEVIL_R		"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
 #define DESC_TOWER_R		"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
-#define DESC_STAR_R			"When equipped, your base Spell Modifier is 0.90. Your Spell Modifier no longer effects spell power and instead effects skill power.\n"
+#define DESC_STAR_R			"When equipped, your Spellpower Bonus affects active skills instead of active spells.\n"
 #define DESC_MOON_R			"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but you lose 0.2%% of current mana per second per 50 uncapped mana.\n"
 #define DESC_SUN_R			"When equipped, the effectiveness of your Regenerate, Rest, and Meditate skills behave as if stationary while fighting, but as if fighting while stationary.\n"
 #define DESC_JUDGE_R		"When equipped, your Pulse spell no longer deals damage to enemies and instead heals allies with each pulse. It inflicts Charge instead of Shock to allies, granting them additional damage and damage reduction.\n"

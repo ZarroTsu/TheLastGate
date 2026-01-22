@@ -1718,10 +1718,7 @@ int spell_race_mod(int power, int cn)
 {
 	int mod = 100;
 	
-	// Tarot - Star.R : Spell modifier is at least 1.00
-	if (do_get_iflag(cn, SF_STAR_R)) mod =  90;
-	
-	else if	(IS_CASTCOMP(cn))        mod = 120;
+	if	    (IS_CASTCOMP(cn))        mod = 120;
 	
 	else if (IS_TEMPLAR(cn))         mod =  75;
 	else if (IS_MERCENARY(cn))       mod = 100;
@@ -1751,21 +1748,12 @@ int spell_race_mod(int power, int cn)
 
 int spell_multiplier(int power, int cn)
 {
-	// Tarot - Star.R : No spellmod effect on spells.
-	if (do_get_iflag(cn, SF_STAR_R))
-		return power;
-	
 	return (power * ch[cn].spell_mod / 100);
 }
 
 int skill_multiplier(int power, int cn)
 {
-	int n=0, mod = 100;
-	
-	// Tarot - Star.R : Spellmod now effects skills.
-	if (do_get_iflag(cn, SF_STAR_R)) mod  = (mod * ch[cn].spell_mod / 100);
-	
-	return (power * mod) / 100;
+	return power;
 }
 
 int add_spell(int cn, int in)

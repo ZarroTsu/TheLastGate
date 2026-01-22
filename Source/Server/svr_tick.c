@@ -1901,14 +1901,14 @@ int get_meta_stat_value(int cn, int n)
 		case  1: // Spell Aptitude
 			value = ch[cn].spell_apt;
 			break;
-		case  2: // Spell Modifier					Decimal, 0.00 x
+		case  2: // Spell Bonus
+			value = ch[cn].spell_pow;
+			break;
+		case  3: // Spell Multiplier				Decimal, 0.00 x
 			value = ch[cn].spell_mod;
 			break;
-		case  3: // Base Action Speed				Decimal, 0.00
+		case  4: // Base Action Speed				Decimal, 0.00
 			value = max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed)));
-			break;
-		case  4: // Movement Speed					Decimal, 0.00
-			value = max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed) + ch[cn].move_speed));
 			break;
 		case  5: // Hit Score
 			value = ch[cn].to_hit;
@@ -1938,8 +1938,11 @@ int get_meta_stat_value(int cn, int n)
 		case 14: // Melee  Floor  Damage
 			value = dmg_low;
 			break;
-		case 15: case 56: // Attack Speed			Decimal, 0.00
+		case 15: // Attack Speed					Decimal, 0.00
 			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
+			break;
+		case 56: // Movement Speed					Decimal, 0.00
+			value = max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed) + ch[cn].move_speed));
 			break;
 		case 16: case 57: //   Cast Speed			Decimal, 0.00
 			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_CAS(cn)));
@@ -2152,6 +2155,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 65: // Bless Effect
 			power = spell_multiplier(M_SK(cn, SK_BLESS), cn);
+			power = more(power, M_AT(cn, AT_BRV)*TC_SK(cn, 96), 20);  // (Corr) Guardian Angel
 			value = min(127, (power*2/3) / 5 + 3);
 			break;
 		case 66: // Enhance Effect
@@ -2181,23 +2185,15 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 73: case 95: // Heal/Regen Effect
 			power = M_SK(cn, SK_HEAL);
-			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = power*6/5;
-			if (!IS_PLAYER(cn))                   power = power*2/3;
-			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power/= 2;
-			if (do_get_iflag(cn, SF_STAR))        value = (power * 1875/10) * 20;
+			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = more(power, 20, 1);
+			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power = less(power, 50, 1);
+			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power)*1875/SP_DUR_REGEN * 20;
 			else                                  value = spell_multiplier(power * 4/5, cn);
 			break;
 		case 74: // Blind Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
-			// Additive bonus
-			{
-				m  = 0;
-				m += T_WARR_SK(cn,  9)*2;    // (Warr) Antagonizer
-				m +=     TC_SK(cn, 45);
-				
-				power = more(power, M_AT(cn, AT_AGL) * m, 20);
-			}
-			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
+			power = more(power, M_AT(cn, AT_AGL)*(T_WARR_SK(cn, 9)*2+TC_SK(cn, 45)), 20);  // (Warr) Antagonizer
+			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = more(power, 20, 1);
 			if (IS_ANY_MERC(cn)) value = min(127, (power/6 + 2));
 			else                 value = min(127, (power/8 + 1));
 			break;
@@ -2206,14 +2202,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 76: // Warcry Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
-			// Additive bonus
-			{
-				m  = 0;
-				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-				m +=     TC_SK(cn, 21);
-				
-				power = more(power, m, 20);
-			}
+			power = more(power, M_AT(cn, AT_STR)*(T_ARTM_SK(cn, 9)*2+TC_SK(cn, 21)), 20);  // (ArTm) Overlord
 			if (IS_ARCHTEMPLAR(cn)) value = (4+(power*5/8) / 5);
 			else                    value = (3+(power  /2) / 5);
 			break;
@@ -2222,7 +2211,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 78: case 100: // Weaken/Crush Effect							// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
-			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*     6/ 5;
+			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = more(power, 20, 1);
 			value = min(127, (power / 4 + 4));
 			break;
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
@@ -2230,7 +2219,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 80: // Curse Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
-			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
+			if (do_get_iflag(cn, SF_EN_MORECURS)) power = more(power, 20, 1);
 			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
 			else                                  value = (3 + (power - 4) / 5);
 			break;
@@ -2239,7 +2228,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 82: // Slow Effect												// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
-			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
+			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = more(power, 20, 1);
 			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
 			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;
@@ -2252,29 +2241,15 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 96: // Douse Effect					Decimal, 0.00 %			// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
-			// Additive bonus
-			{
-				m  = 0;
-				m += T_WARR_SK(cn,  9)*2;    // (Warr) Antagonizer
-				m +=     TC_SK(cn, 45);
-				
-				power = more(power, M_AT(cn, AT_AGL) * m, 20);
-			}
-			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
+			power = more(power, M_AT(cn, AT_AGL)*(T_WARR_SK(cn,  9)*2+TC_SK(cn, 45)), 20);  // (Warr) Antagonizer
+			if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = more(power, 20, 1);
 			if (IS_ANY_MERC(cn)) value = min(127, (power/6 + 2));
 			else                 value = min(127, (power/8 + 1));
 			break;
 		case 98: // Rally Effect
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
-			// "Increased" effects
-			{
-				m  = 0;
-				m += T_ARTM_SK(cn,  9)*2;    // (ArTm) Overlord
-				m +=     TC_SK(cn, 21);
-				
-				power = more(power, m, 20);
-			}
-			value = power/10;
+			power = more(power, M_AT(cn, AT_STR)*(T_ARTM_SK(cn, 9)*2+TC_SK(cn, 21)), 20);  // (ArTm) Overlord
+			value = min(127, power/10 + 3);
 			break;
 		//
 		default: break;
@@ -2299,7 +2274,7 @@ int get_meta_stat_value(int cn, int n)
 
 int ch_get_meta_alternative_value(int cn, int n)
 {
-	if (n ==  2 && do_get_iflag(cn, SF_STAR_R))   return  89; // Spell Modifier -> Skill Modifier
+	if (n ==  2 && do_get_iflag(cn, SF_STAR_R))   return  89; // Spell Bonus -> Skill Bonus
 	if (n == 35 && do_get_iflag(cn, SF_TOWER_R))  return  90; // Poison -> Venom
 	if (n == 36 && do_get_iflag(cn, SF_TOWER_R))  return  91; // Poison -> Venom
 	if (n == 37 && do_get_iflag(cn, SF_JUDGE_R))  return  92; // Pulse Hit Damage -> Pulse Hit Heal

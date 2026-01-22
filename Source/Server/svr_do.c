@@ -4114,6 +4114,7 @@ int do_showbuffs(int cn, int co)
 					case SK_CURSE2:
 					case SK_BLESS:
 					case SK_WARCRY:
+					case SK_WARCRY3:
 						do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
 						do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
 						do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
@@ -4137,7 +4138,6 @@ int do_showbuffs(int cn, int co)
 						if (bu[in].armor)
 							do_char_log(cn, 6, " : %+d Armor Value\n", bu[in].armor);
 						break;
-					case SK_WARCRY3:
 					case SK_BLIND:
 						do_char_log(cn, 6, " : %+d Hit Score\n",   bu[in].to_hit); 
 						do_char_log(cn, 6, " : %+d Parry Score\n", bu[in].to_parry); 
@@ -7520,12 +7520,19 @@ void set_attrib_score(int cn, int z, int n)
 }
 int get_skill_score(int cn, int n)
 {
+	int v;
+	
 	if (n > 49)
 	{
 		return min(300, max(1, (getrank(cn)+1)*8));
 	}
 	
-	return ( (ch[cn].skill[n][4] << 8) | ch[cn].skill[n][5] ) + (IS_SPELL(n) ? ch[cn].spell_pow : 0);
+	v = ( (ch[cn].skill[n][4] << 8) | ch[cn].skill[n][5] );
+	
+	if ((IS_SPELL(n) && !do_get_iflag(cn, SF_STAR_R)) || (IS_SKILL(n) && do_get_iflag(cn, SF_STAR_R))) // [Taro] Star.R
+		v += ch[cn].spell_pow
+	
+	return v;
 }
 void set_skill_score(int cn, int z, int n)
 {
@@ -12082,7 +12089,7 @@ void really_update_char(int cn)
 	/*
 		ch[].spell_pow -- Spellpower Bonus
 		
-		Flat additive value to all spells. WIP -- need client-side adjustments to display it.
+		Flat additive value to all spells.
 	*/
 	
 	// Flat bonus
