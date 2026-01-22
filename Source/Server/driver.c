@@ -881,21 +881,21 @@ int npc_give(int cn, int co, int in, int money)
 		if (( nr == SK_WARCRY    && !IS_SEYA_OR_ARTM(co) ) || ( nr == SK_PULSE     && !IS_SEYA_OR_ARHR(co) )
 		 || ( nr == SK_LEAP      && !IS_SEYA_OR_SKAL(co) ) || ( nr == SK_LETHARGY  && !IS_SEYA_OR_SORC(co) )
 		 || ( nr == SK_GCMASTERY && !IS_SEYA_OR_SUMM(co) ) || ( nr == SK_ZEPHYR    && !IS_SEYA_OR_WARR(co) )
-		 || ( nr == SK_FINESSE   && !IS_SEYA_OR_BRAV(co) ) || ( nr == SK_PACT      && !IS_SEYA_OR_LYCA(co) ))
+		 || ( nr == SK_PRECISION && !IS_SEYA_OR_BRAV(co) ) || ( nr == SK_PACT      && !IS_SEYA_OR_LYCA(co) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only two!
 		if (IS_SEYANSKILL(nr) && IS_SEYAN_DU(co))
 		{
 			canlearn = 2;
-			if (B_SK(co, SK_WARCRY))   canlearn--;
-			if (B_SK(co, SK_LEAP))     canlearn--;
-			if (B_SK(co, SK_GCMASTERY))canlearn--;
-			if (B_SK(co, SK_LETHARGY)) canlearn--;
-			if (B_SK(co, SK_PULSE))    canlearn--;
-			if (B_SK(co, SK_ZEPHYR))   canlearn--;
-			if (B_SK(co, SK_FINESSE))  canlearn--;
-			if (B_SK(co, SK_PACT))     canlearn--;
+			if (B_SK(co, SK_WARCRY))    canlearn--;
+			if (B_SK(co, SK_LEAP))      canlearn--;
+			if (B_SK(co, SK_GCMASTERY)) canlearn--;
+			if (B_SK(co, SK_LETHARGY))  canlearn--;
+			if (B_SK(co, SK_PULSE))     canlearn--;
+			if (B_SK(co, SK_ZEPHYR))    canlearn--;
+			if (B_SK(co, SK_PRECISION)) canlearn--;
+			if (B_SK(co, SK_PACT))      canlearn--;
 			
 			if (canlearn >= 1) canlearn = 1;
 			else               canlearn = 0;
@@ -1645,7 +1645,7 @@ int npc_give(int cn, int co, int in, int money)
 							if (B_SK(n, SK_LETHARGY))  canlearn--;
 							if (B_SK(n, SK_PULSE))     canlearn--;
 							if (B_SK(n, SK_ZEPHYR))    canlearn--;
-							if (B_SK(n, SK_FINESSE))   canlearn--;
+							if (B_SK(n, SK_PRECISION)) canlearn--;
 							if (B_SK(n, SK_PACT))      canlearn--;
 							
 							if (canlearn >= 1) canlearn = 1;
@@ -3036,14 +3036,14 @@ int npc_see(int cn, int co)
 			else 
 			{
 				int knowarch=0;
-				if (B_SK(co, SK_WARCRY))   knowarch++;
-				if (B_SK(co, SK_LEAP))     knowarch++;
-				if (B_SK(co, SK_GCMASTERY))knowarch++;
-				if (B_SK(co, SK_LETHARGY)) knowarch++;
-				if (B_SK(co, SK_PULSE))    knowarch++;
-				if (B_SK(co, SK_ZEPHYR))   knowarch++;
-				if (B_SK(co, SK_FINESSE))  knowarch++;
-				if (B_SK(co, SK_PACT))     knowarch++;
+				if (B_SK(co, SK_WARCRY))    knowarch++;
+				if (B_SK(co, SK_LEAP))      knowarch++;
+				if (B_SK(co, SK_GCMASTERY)) knowarch++;
+				if (B_SK(co, SK_LETHARGY))  knowarch++;
+				if (B_SK(co, SK_PULSE))     knowarch++;
+				if (B_SK(co, SK_ZEPHYR))    knowarch++;
+				if (B_SK(co, SK_PRECISION)) knowarch++;
+				if (B_SK(co, SK_PACT))      knowarch++;
 				if (strcmp(ch[cn].text[2], "#skill21")==0) // ArTm - 35 - Warcry
 				{
 					if (IS_SEYA_OR_ARTM(co))
@@ -3056,9 +3056,9 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s! Did you know Arch-Templar can strike fear into their enemies with a single shout?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill22")==0) // Warr - 7 - Zephyr
+				else if (strcmp(ch[cn].text[2], "#skill22")==0) // Brav - 7 - Zephyr
 				{
-					if (IS_SEYA_OR_WARR(co))
+					if (IS_SEYA_OR_BRAV(co))
 					{
 						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -3066,7 +3066,7 @@ int npc_see(int cn, int co)
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you ZEPHYR.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Warriors can make the very wind strike foes alongside them?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Bravers can make the very wind strike foes alongside them?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#skill23")==0) // Summ - 46 - GC Mastery
 				{
@@ -3104,9 +3104,9 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s! Did you know Arch-Harakim can cause damaging bursts without thinking?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Skal - 49 - Leap
+				else if (strcmp(ch[cn].text[2], "#skill26")==0) // Warr - 49 - Leap
 				{
-					if (IS_SEYA_OR_SKAL(co))
+					if (IS_SEYA_OR_WARR(co))
 					{
 						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
@@ -3114,19 +3114,19 @@ int npc_see(int cn, int co)
 							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you LEAP.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Skalds can leap great distances to strike distant foes?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Warriors can leap from foe to foe in an instant?", ch[co].name);
 				}
-				else if (strcmp(ch[cn].text[2], "#skill27")==0) // Brav - 14 - Finesse
+				else if (strcmp(ch[cn].text[2], "#skill27")==0) // Skal - 14 - Precision
 				{
-					if (IS_SEYA_OR_BRAV(co))
+					if (IS_SEYA_OR_SKAL(co))
 					{
 						if ((IS_SEYAN_DU(co) && knowarch==2) || (!IS_SEYAN_DU(co) && knowarch))
 							do_sayx(cn, "Greetings, %s!", ch[co].name);
 						else
-							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you FINESSE.", ch[co].name);
+							do_sayx(cn, "Greetings, %s! Bring me the Star Amulet from the Northern Mountains and I would teach you PRECISION.", ch[co].name);
 					}
 					else
-						do_sayx(cn, "Greetings, %s! Did you know Bravers can capitalize on having full health?", ch[co].name);
+						do_sayx(cn, "Greetings, %s! Did you know Skalds can deal frequent critical hits?", ch[co].name);
 				}
 				else if (strcmp(ch[cn].text[2], "#skill28")==0) // Lyca - 22 - Rage
 				{

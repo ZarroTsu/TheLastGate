@@ -63,6 +63,7 @@ char *syn[] = {
 	"17",          "seventeen",
 	"18",          "eighteen",
 	"19",          "nineteen",
+	"20",          "twenty",
 	"n",           "north",
 	"northern",    "north",
 	"e",           "east",
@@ -129,7 +130,9 @@ char *syn[] = {
 	"doors",       "door",
 	"keys",        "key",
 	"skills",      "skill",
-	"riddles",     "riddle"
+	"riddles",     "riddle",
+	"lycanth",     "lycanthrope",
+	"lycan",       "lycanthrope"
 };
 
 void replace_synonym(char *a)
@@ -262,13 +265,13 @@ struct know
 // "Answer" values
 //{ Answers for each skill question ("What is ...?")
 #define AN_SK_HAND		"The Hand to Hand skill assists with one's ability to hit and parry while unarmed."
-#define AN_SK_PRECISION	"Precision is an advanced skill learned by Bravers. It lets them score critical hits more often."
+#define AN_SK_PRECISION	"Precision is an advanced skill learned by Skalds. It lets them score critical hits more often."
 #define AN_SK_DAGGER	"The Dagger skill will help with one's ability to hit and parry while using a dagger."
 #define AN_SK_SWORD		"The Sword skill helps with one's ability to hit and parry attacks with a sword."
 #define AN_SK_AXE		"The Axe skill will help with one's ability to hit and parry when using an axe."
 #define AN_SK_STAFF		"The Staff skill will assist with hitting and parrying while using a staff."
 #define AN_SK_TWOHAND	"The Two-Handed skill helps with hitting and parrying when using a two-handed weapon."
-#define AN_SK_ZEPHYR	"Zephyr is an advanced skill learned by Warriors. It creates blades of wind, dealing extra damage with each hit."
+#define AN_SK_ZEPHYR	"Zephyr is an advanced skill learned by Bravers. It creates blades of wind, dealing extra damage with each hit."
 #define AN_SK_STEALTH	"Stealth is a skill that assists with avoiding fights. With enough stealth, one can appear invisible!"
 #define AN_SK_PERCEPT	"Perception is a skill for seeing and hearing. Some say that with enough investment, one can see in the dark!"
 #define AN_SK_SWIM		"The Metabolism skill allows one to survive underwater without drowning, and reduces damage taken from vile poisons."
@@ -308,7 +311,7 @@ struct know
 #define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners. It lets them summon a copy of themself or their target to fight for them."
 #define AN_SK_HASTE		"Haste is an advanced spell. It allows the caster to dramatically speed up their actions."
 #define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
-#define AN_SK_LEAP		"Leap is an advanced skill learned by Skalds. It leaps from enemy to enemy, damaging them in the process."
+#define AN_SK_LEAP		"Leap is an advanced skill learned by Warriors. It lets them rapidly injure enemies, leaping between them in the process."
 #define AN_SK_PACT		"Pact is an advanced skill learned by Lycanthrope. It allows them to deal more and take less damage, for a cost."
 //}
 //{ "What is ...?" for each race
@@ -317,11 +320,13 @@ struct know
 #define AN_RA_HARA		"Harakim are powerful spellcasters. They are not very good at combat, and prefer to act from long range."
 #define AN_RA_SEYANDU	"Seyan'du are very powerful and can excel in a large number of things at once."
 #define AN_RA_ARCHTEMP	"Arch-Templar are Templar who have become masters of war. They can cleave the air so hard that it can fell an entire army."
-#define AN_RA_PUGILIST	"Skalds are Templars who attack with agility and valor. They sing haunting arias and they can leap great distances."
+#define AN_RA_PUGILIST	"Skalds are Templars who attack with agility and valor. They sing haunting arias and can deal crushing critical blows."
 #define AN_RA_WARRIOR	"Warriors are Merceneries who have preferred melee over spells. They can become very agile and use multiple weapons at once."
 #define AN_RA_SORCERER	"Sorcerers are Merceneries who have preferred spells over melee. They can cast powerful ailments in a wide area instantaniously."
 #define AN_RA_SUMMONER	"Summoners are Harakims who have dedicated their arts to their companion. They can summon their shadows to assist with spellcasting."
 #define AN_RA_ARCHHARA	"Arch-Harakim are Harakim who have become masterful casters. They know powerful spells and can detonate enemy swarms in an instant."
+#define AN_RA_BRAVER	"Bravers are foreign to Astonia. They weave blades and spells together in a peculiar fashion."
+#define AN_RA_LYCANTH	"Lycanthropes are monsterous abberitions. They are shapeshifters that dabble in blasphemous pacts."
 //}
 //{ Etc Common knowledge
 // Common Labyrinth knowledge ("What gate?" "What labyrinth?")
@@ -1510,6 +1515,8 @@ struct know know[] = {
 	{{"?what", "!sorcerer",                "?", NULL}, 0, AR_GENERAL, 0, AN_RA_SORCERER, 0},
 	{{"?what", "!summoner",                "?", NULL}, 0, AR_GENERAL, 0, AN_RA_SUMMONER, 0},
 	{{"?what", "!arch", "!harakim",        "?", NULL}, 0, AR_GENERAL, 0, AN_RA_ARCHHARA, 0},
+	{{"?what", "!braver",                  "?", NULL}, 0, AR_GENERAL, 0, AN_RA_BRAVER, 0},
+	{{"?what", "!lycanthrope",             "?", NULL}, 0, AR_GENERAL, 0, AN_RA_LYCANTH, 0},
 	//}
 	
 	// Generic Special Answers
@@ -2072,7 +2079,7 @@ void answer_unlearn(int cn, int co, char *text)
 	if (B_SK(co, SK_LETHARGY)) { unl[n] = SK_LETHARGY;  n++; }
 	if (B_SK(co, SK_PULSE))    { unl[n] = SK_PULSE;     n++; }
 	if (B_SK(co, SK_ZEPHYR))   { unl[n] = SK_ZEPHYR;    n++; }
-	if (B_SK(co, SK_FINESSE))  { unl[n] = SK_FINESSE;   n++; }
+	if (B_SK(co, SK_PRECISION)){ unl[n] = SK_PRECISION; n++; }
 	if (B_SK(co, SK_PACT))     { unl[n] = SK_PACT;      n++; }
 	
 	if (n < 1)
@@ -2133,7 +2140,7 @@ void answer_unlearn(int cn, int co, char *text)
 	else if (!strcasecmp(word, skilltab[SK_LETHARGY].name))  n = SK_LETHARGY;
 	else if (!strcasecmp(word, skilltab[SK_PULSE].name))     n = SK_PULSE;
 	else if (!strcasecmp(word, skilltab[SK_ZEPHYR].name))    n = SK_ZEPHYR;
-	else if (!strcasecmp(word, skilltab[SK_FINESSE].name))   n = SK_FINESSE;
+	else if (!strcasecmp(word, skilltab[SK_PRECISION].name)) n = SK_PRECISION;
 	else if (!strcasecmp(word, skilltab[SK_PACT].name))      n = SK_PACT;
 	else
 	{

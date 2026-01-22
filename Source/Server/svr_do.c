@@ -3788,14 +3788,14 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if (ch[cn].flags & CF_KNOWSPELL)													quest1[27] = 1; // ( Iggy )
 	
 	//
-	if ((B_SK(cn, SK_WARCRY) 	&& IS_ARCHTEMPLAR(cn)))		quest1[16] = 1;
-	if ((B_SK(cn, SK_LEAP) 		&& IS_SKALD(cn)))			quest1[16] = 1;
-	if ((B_SK(cn, SK_ZEPHYR) 	&& IS_WARRIOR(cn)))			quest1[16] = 1;
-	if ((B_SK(cn, SK_LETHARGY) 	&& IS_SORCERER(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_WARCRY)    && IS_ARCHTEMPLAR(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_PRECISION) && IS_SKALD(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_LEAP)      && IS_WARRIOR(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_LETHARGY)  && IS_SORCERER(cn)))		quest1[16] = 1;
 	if ((B_SK(cn, SK_GCMASTERY) && IS_SUMMONER(cn)))		quest1[16] = 1;
-	if ((B_SK(cn, SK_PULSE) 	&& IS_ARCHHARAKIM(cn)))		quest1[16] = 1;
-	if ((B_SK(cn, SK_FINESSE) 	&& IS_BRAVER(cn)))			quest1[16] = 1;
-	if ((B_SK(cn, SK_PACT) 		&& IS_LYCANTH(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_PULSE)     && IS_ARCHHARAKIM(cn)))		quest1[16] = 1;
+	if ((B_SK(cn, SK_ZEPHYR)    && IS_BRAVER(cn)))			quest1[16] = 1;
+	if ((B_SK(cn, SK_PACT)      && IS_LYCANTH(cn)))			quest1[16] = 1;
 	//
 	if (IS_SEYAN_DU(cn))
 	{
@@ -3803,7 +3803,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 		if (B_SK(cn, SK_WARCRY))    n++;	if (B_SK(cn, SK_LEAP))     n++;
 		if (B_SK(cn, SK_GCMASTERY)) n++;	if (B_SK(cn, SK_LETHARGY)) n++;
 		if (B_SK(cn, SK_PULSE))     n++;	if (B_SK(cn, SK_ZEPHYR))   n++;
-		if (B_SK(cn, SK_FINESSE))   n++;	if (B_SK(cn, SK_PACT))     n++;		
+		if (B_SK(cn, SK_PRECISION)) n++;	if (B_SK(cn, SK_PACT))     n++;		
 		if (n>=2)  		quest1[16] = 1;
 	}
 	//
@@ -3939,18 +3939,18 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	//
 	ars = (ast && (IS_ARCHTEMPLAR(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_WARCRY))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Jamie",    "Bulwark Aven", "*Warcry",   73000);
-	ars = (ast && (IS_SKALD(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_LEAP))));
+	ars = (ast && (IS_SKALD(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_PRECISION))));
+	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Sierra",   "Bulwark Aven", "*Precisi",  73000);
+	ars = (ast && (IS_WARRIOR(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_LEAP))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Ellis",    "Bulwark Aven", "*Leap",     73000);
-	ars = (ast && (IS_SUMMONER(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_GCMASTERY))));
-	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Roger",    "Bulwark Aven", "*Compani",  73000);
 	ars = (ast && (IS_SORCERER(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_LETHARGY))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Boris",    "Bulwark Aven", "*Letharg",  73000);
+	ars = (ast && (IS_SUMMONER(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_GCMASTERY))));
+	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Roger",    "Bulwark Aven", "*Compani",  73000);
 	ars = (ast && (IS_ARCHHARAKIM(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_PULSE))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Kaleigh",  "Bulwark Aven", "*Pulse",    73000);
-	ars = (ast && (IS_WARRIOR(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_ZEPHYR))));
+	ars = (ast && (IS_BRAVER(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_ZEPHYR))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Terri",    "Bulwark Aven", "*Zephyr",   73000);
-	ars = (ast && (IS_BRAVER(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_FINESSE))));
-	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Sierra",   "Bulwark Aven", "*Finesse",  73000);
 	ars = (ast && (IS_LYCANTH(cn) || (IS_SEYAN_DU(cn) && !quest1[16] && !B_SK(cn, SK_PACT))));
 	m = display_quest(cn, flag, page, m, ars, quest1[16], 14, "Mystery",  "Bulwark Aven", "*Rage",     73000);
 	m = display_quest(cn, flag, page, m, ast, quest1[27], 14, "Iggy",     "Bulwark Aven", "*Spellkn",  74000);

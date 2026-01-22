@@ -3962,7 +3962,7 @@ int use_pandium_shrine(int cn, int in)
 		case  3:	// Floor 10 Reward
 			if 		(IS_SEYAN_DU(cn)) 	 tmp = SK_PROX;
 			else if (IS_ARCHTEMPLAR(cn)) tmp = SK_DISPEL;
-			else if (IS_SKALD(cn)) 		 tmp = SK_PRECISION;
+			else if (IS_SKALD(cn)) 		 tmp = SK_FINESSE;
 			else if (IS_WARRIOR(cn)) 	 tmp = SK_GEARMAST;
 			else if (IS_SORCERER(cn)) 	 tmp = SK_MSHIELD;
 			else if (IS_SUMMONER(cn)) 	 tmp = SK_IMMUN;
