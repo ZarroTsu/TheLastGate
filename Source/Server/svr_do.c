@@ -11899,18 +11899,19 @@ void really_update_char(int cn)
 		ch[].mana_cost
 	*/
 	
-	// Economize
-	if (B_SK(cn, SK_ECONOM) && !do_get_iflag(cn, SF_MAGI_R))
+	// Multiplicative bonuses
 	{
-		if (do_get_iflag(cn, SF_BOOK_PROD)) // Book: Great Prodigy
+		n = tempCost;
+		
+		if (B_SK(cn, SK_ECONOM) && !do_get_iflag(cn, SF_MAGI_R))
 		{
-			t = tempCost * M_SK(cn, SK_ECONOM) / 333;
+			m = M_SK(cn, SK_ECONOM);
+			
+			if (do_get_iflag(cn, SF_BOOK_PROD)) n = less(n, m, 3);  // [Book] Great Prodigy
+			else                                n = less(n, m, 4);
 		}
-		else
-		{
-			t = tempCost * M_SK(cn, SK_ECONOM) / 444;
-		}
-		tempCost -= t;
+		
+		tempCost = n;
 	}
 	
 	ch[cn].mana_cost = clamp(tempCost, 0, 20000);

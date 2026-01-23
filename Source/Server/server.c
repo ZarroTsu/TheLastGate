@@ -1502,7 +1502,7 @@ int main(int argc, char *args[])
 			if (ch[n].skill[SK_FINESSE][4]) { ch[n].skill[SK_PRECISION][4] = ch[n].skill[SK_FINESSE][4]; ch[n].skill[SK_FINESSE][4] = 0; }
 			if (ch[n].skill[SK_FINESSE][5]) { ch[n].skill[SK_PRECISION][5] = ch[n].skill[SK_FINESSE][5]; ch[n].skill[SK_FINESSE][5] = 0; }
 		}
-		god_racechange(n, ch[n].temp, 1);  // reset character template
+		god_racechange(n, ch[n].temp, 1); plr_logout(n, 0, LO_TAVERN);  // reset character template
 		ch[n].tree_points = st_skill_pts_all(ch[n].tree_points);  // reset skill tree points
 		
 		// */ // (^^^ REMOVE AFTER UPDATE!!!)

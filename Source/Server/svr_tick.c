@@ -30,8 +30,8 @@ static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
 static char intro_msg3[] = {"Current client/server version is 0.14.1\n"};
-static char intro_msg4_font = 3;
-static char intro_msg4[] = {"Blacksmithing has been added! There's a smith in Aston's South End and in Neiseer on Titan Street!\n"};
+static char intro_msg4_font = 0;
+static char intro_msg4[] = {"Skill trees have been overhauled and deallocated. Remember to reallocate before adventuring!\n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
@@ -1806,7 +1806,7 @@ int get_meta_stat_value(int cn, int n)
 			hpmult = endmult = manamult = moonmult;
 			
 			race_reg = M_SK(cn, SK_REGEN) * moonmult / 20 + M_SK(cn, SK_REGEN) * ch[cn].hp[5]  /2000;
-			race_res = M_SK(cn, SK_REST)  * moonmult / 20 + M_SK(cn, SK_REST)  * ch[cn].end[5] /2000;
+			race_res = M_SK(cn, SK_REST)  * moonmult / 20 + M_SK(cn, SK_REST)  * ch[cn].end[5] /1000;
 			race_med = M_SK(cn, SK_MEDIT) * moonmult / 20 + M_SK(cn, SK_MEDIT) * ch[cn].mana[5]/2000;
 			
 			if (do_get_iflag(cn, SF_MOON)  && (ch[cn].a_mana < ch[cn].mana[5] * 1000)) // Tarot - Moon
@@ -1845,13 +1845,13 @@ int get_meta_stat_value(int cn, int n)
 		case  9: case 10: case 13: case 14: case 17: case 58:
 			dmg_wpn = ch[cn].weapon;
 			dmg_top = ch[cn].top_damage + (6 + 8);
-			dmg_str = do_get_iflag(cn, SF_STRENGTH)?6:5;
+			dmg_str = do_get_iflag(cn, SF_STRENGTH)?120:100;
 			dmg_bns = ch[cn].dmg_bonus;
 			//
-			dmg_low = ( dmg_wpn*dmg_str/5)/4*dmg_bns/10000;
+			dmg_low = ( dmg_wpn*dmg_str/100)/4*dmg_bns/10000;
 			dmg_hgh =   dmg_wpn+dmg_top;
-			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
-			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/5)/4*dmg_bns/10000;
+			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
+			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
 			dmg_hit = ( dmg_low+dmg_hgh)/2;
 			if (T_ARTM_SK(cn, 6)) dmg_hit = dmg_hgh;  // (ArTm) Impact
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
@@ -1901,7 +1901,7 @@ int get_meta_stat_value(int cn, int n)
 		case  1: // Spell Aptitude
 			value = ch[cn].spell_apt;
 			break;
-		case  2: // Spell Bonus
+		case  2: case 89: // Spell Bonus
 			value = ch[cn].spell_pow;
 			break;
 		case  3: // Spell Multiplier				Decimal, 0.00 x
@@ -1948,10 +1948,10 @@ int get_meta_stat_value(int cn, int n)
 			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_CAS(cn)));
 			break;
 		case 17: case 58: // Thorns Score
-			value = ch[cn].gethit_dam * dmg_str/5 * dmg_bns/10000;
+			value = ch[cn].gethit_dam * dmg_str/100 * dmg_bns/10000;
 			break;
 		case 18: case 59: // Mana Cost Multiplier	Decimal, 0.00 %
-			value = max(1, 100 - 100*M_SK(cn, SK_ECONOM)/(do_get_iflag(cn, SF_BOOK_PROD)?300:400));
+			value = ch[cn].mana_cost;
 			break;
 		case 19: case 60: // Total AoE Bonus
 			value = ch[cn].aoe_bonus + ch[cn].aoe_bonus * GET_PROX(cn)/200;
@@ -1959,15 +1959,12 @@ int get_meta_stat_value(int cn, int n)
 		//
 		case 24: // Cleave Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
-			
 			value = power * DAM_MULT_CLEAVE/1000;
 			break;
 		case 25: // Cleave Bleed Degen				Decimal, 0.00 /s
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
-			
 			if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                  // [Ench] More Bleed
 			if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 2);   // (Lyca) Serration
-			
 			value = BLEEDFORM(power, (do_get_iflag(cn, SF_GUNGNIR)?SP_DUR_BLEED/3:SP_DUR_BLEED));
 			break;
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds
@@ -1975,8 +1972,9 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 27: // Leap Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_LEAP) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn) * 2;
-			value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/1000;
-			if (do_get_iflag(cn, SF_JUSTIC_R)) value = (power + (power * ch[cn].crit_multi / 1000)) * DAM_MULT_LEAP/1000; // only crit roughly 1/10th of the time
+			power = more(power, M_AT(cn, AT_STR) * (T_WARR_SK(cn, 7)*2+TC_SK(cn, 43)), 20);  // (Warr) Slayer
+			value = power * DAM_MULT_RLEAP/1000;
+			if (do_get_iflag(cn, SF_JUSTIC_R)) value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/1000;
 			break;
 		case 28: // Leap # of Repeats
 			value = max(0, GET_SPD_ATK(cn)/40);
@@ -1998,7 +1996,7 @@ int get_meta_stat_value(int cn, int n)
 			power = spell_multiplier(M_SK(cn, SK_BLAST), cn) * 2;
 			if (do_get_iflag(cn, SF_TW_IRA))   in = power * ch[cn].crit_multi / 100 - power;
 			if (do_get_iflag(cn, SF_JUDGE)) power = (power+max(0, in))*85/100;
-			else                            power = power+max(0, in);
+			else                            power =  power+max(0, in);
 			value = power * DAM_MULT_BLAST/1000;
 			break;
 		case 33: // Blast Cooldown					Decimal, 0.00 Seconds
@@ -2006,28 +2004,14 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 34: // Lethargy Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_LETHARGY), cn);
-			// Additive bonus
-			{
-				n  = 0;
-				n += T_SORC_SK(cn,  9)*2;    // (Sorc) Hex Master
-				n +=     TC_SK(cn, 57);
-				
-				power = more(power, M_AT(cn, AT_WIL) * n, 20);
-			}
-			if (IS_SEYAN_DU(cn))         value = (bu[in].power/6);
-			else                         value = (bu[in].power/4);
+			power = more(power, M_AT(cn, AT_WIL) * (T_SORC_SK(cn, 9)*2+TC_SK(cn, 57)), 20);  // (Sorc) Hex Master
+			if (IS_SEYAN_DU(cn)) value = (bu[in].power/6);
+			else                 value = (bu[in].power/4);
 			break;
 		case 35: case 90: // Poison/Venom Degen		Decimal, 0.00 /s
 			power = spell_multiplier(M_SK(cn, SK_POISON), cn);
 			durat = SP_DUR_POISON;
-			// Additive bonus
-			{
-				m  = 0;
-				m += T_SORC_SK(cn,  7)*2;    // (Sorc) Toxins
-				m +=     TC_SK(cn, 55);
-				
-				power = more(power, M_AT(cn, AT_INT) * m, 20);
-			}
+			power = more(power, M_AT(cn, AT_INT) * (T_SORC_SK(cn, 7)*2+TC_SK(cn, 55)), 20);  // (Sorc) Toxins
 			if (do_get_iflag(cn, SF_EN_MOREPOIS)) power = power*6/5;
 			if (do_get_iflag(cn, SF_BOOK_VENO))   durat = durat*8/10;
 			value = PL_POISFORM(power, durat);
@@ -2038,14 +2022,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 37: case 92: // Pulse Hit Damage/Heal	Decimal, 0.00
 			power = M_SK(cn, SK_PULSE);
-			// Additive bonus
-			{
-				m  = 0;
-				m += T_ARHR_SK(cn,  7)*2;    // (ArHr) Psychosis
-				m +=     TC_SK(cn, 79);
-				
-				power = more(power, M_AT(cn, AT_INT) * m, 20);
-			}
+			power = more(power, M_AT(cn, AT_INT) * (T_ARHR_SK(cn,  7)*2+TC_SK(cn, 79)), 20);  // (ArHr) Psychosis
 			power = spell_multiplier(power, cn);
 			if (n==37) value = power * 2;
 			else       value = power * DAM_MULT_PULSE / 20;
@@ -2058,8 +2035,8 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 40: // Zephyr Hit Damage				Decimal, 0.00
 			power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
-			power = power + max(0, GET_SPD_ATK(cn)) / 3;
-			value = power * 2 * DAM_MULT_ZEPHYR/10;
+			power = more(power, M_AT(cn, AT_BRV)*(T_BRAV_SK(cn, 9)*2+TC_SK(cn, 93)), 20);  // (Brav) Alacrity
+			value = power * DAM_MULT_ZEPHYR/10;
 			break;
 		case 41: // Immolate Degen					Decimal, 0.00 /s
 			power = ch[cn].hp[4] / 3;
@@ -2095,55 +2072,40 @@ int get_meta_stat_value(int cn, int n)
 			if (m = TC_SK(cn, 48))                 en_dam += m*15;
 			if (do_get_iflag(cn, SF_TW_CLOAK))     en_dam +=   15;    // [Gear] Cloak of Shadows
 			if (do_get_iflag(cn, SF_EN_TAKEASEN))  en_dam +=   15;    // [Ench] *DoT* damage taken as endurance
-			
 			if (T_ARHR_SK(cn, 12))                 mp_dam +=   30;    // (ArHr) Resourcefulness
 			if (m = TC_SK(cn, 84))                 mp_dam += m*15;
 			if (do_get_iflag(cn, SF_PREIST))       mp_dam +=   30;    // [Taro] Priestess
 			if (do_get_iflag(cn, SF_EN_TAKEASMA))  mp_dam +=   15;    // [Ench] *Hit* damage taken as mana
-			
 			m = en_dam + mp_dam;
-			
 			en_dam = ( (en_dam * 100)/m * min(90, m) )/100;
 			mp_dam = ( (mp_dam * 100)/m * min(90, m) )/100;
-			
 			value = value + en_dam*EN_SOFTCAP(cn)/(ch[cn].dmg_reduction*10);
 			value = value + mp_dam*MP_SOFTCAP(cn)/(ch[cn].dmg_reduction*10);
 			break;
 		case 51: // Health Regen Rate				Decimal, 0.00 /s
 			value = regen * 20/10;
 			value = more(value, T_LYCA_SK(cn, 7)*50+TC_SK(cn, 103)*25, 1);  // (Lyca) Lust
+			if (do_get_iflag(cn, SF_WORLD_R)) value = less(value, 50, 1);  // [Taro] World.R
 			break;
 		case 52: // Endurance Regen Rate			Decimal, 0.00 /s
 			value = restn * 20/10;
 			value = more(value, T_LYCA_SK(cn, 7)*50+TC_SK(cn, 103)*25, 1);  // (Lyca) Lust
+			if (do_get_iflag(cn, SF_WORLD_R)) value = less(value, 50, 1);  // [Taro] World.R
 			break;
 		case 53: // Mana Regen Rate					Decimal, 0.00 /s
 			value = medit * 20/10;
 			value = more(value, T_LYCA_SK(cn, 7)*50+TC_SK(cn, 103)*25, 1);  // (Lyca) Lust
+			if (do_get_iflag(cn, SF_WORLD_R)) value = less(value, 50, 1);  // [Taro] World.R
 			break;
 		case 54: // Effective Immunity
 			value = M_SK(cn, SK_IMMUN);
 			if (do_get_iflag(cn, SF_HANGED)) value += M_SK(cn, SK_RESIST)/3;
-			// Additive bonus
-			{
-				n  = 0;
-				n += T_WARR_SK(cn,  4)*2;  // (Warr) Dismissal
-				n +=     TC_SK(cn, 40);
-				
-				value = more(value, (SPEED_BASE + GET_SPD_ATK(cn))*n, 50);
-			}
+			value = more(value, (SPEED_BASE+GET_SPD_ATK(cn))*(T_WARR_SK(cn, 4)*2+TC_SK(cn, 40)), 50);  // (Warr) Dismissal
 			break;
 		case 55: // Effective Resistance
 			value = M_SK(cn, SK_RESIST);
 			if (do_get_iflag(cn, SF_HANGED)) value -= M_SK(cn, SK_RESIST)/3;
-			// Additive bonus
-			{
-				n  = 0;
-				n += T_SORC_SK(cn, 12)*2;  // (Sorc) Dodging
-				n +=     TC_SK(cn, 60);
-				
-				value = more(value, (SPEED_BASE + GET_SPD_MOV(cn))*n, 50);
-			}
+			value = more(value, (SPEED_BASE+GET_SPD_MOV(cn))*(T_SORC_SK(cn, 12)*2+TC_SK(cn, 60)), 50);  // (Sorc) Dodging
 			break;
 		case 61: // Buffing Apt Bonus
 			value = M_AT(cn, AT_WIL)/4;
@@ -2235,9 +2197,6 @@ int get_meta_stat_value(int cn, int n)
 			value = 4 * cdlen;
 			break;
 		//
-		case 89: // Skill Modifier					Decimal, 0.00 x
-			value = skill_multiplier(100, cn);
-			break;
 		case 96: // Douse Effect					Decimal, 0.00 %			// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_BLIND), cn);
 			power = more(power, M_AT(cn, AT_AGL)*(T_WARR_SK(cn,  9)*2+TC_SK(cn, 45)), 20);  // (Warr) Antagonizer
@@ -2257,10 +2216,10 @@ int get_meta_stat_value(int cn, int n)
 	switch (n) // Global damage multiplier
 	{
 		case 24: case 27: case 32: case 37: case 40:
-			value = value * ((do_get_iflag(cn, SF_STRENGTH)?6:5)/5)*(ch[cn].dmg_bonus/10000);
+			value = value * ((do_get_iflag(cn, SF_STRENGTH)?120:100)/100)*(ch[cn].dmg_bonus/10000);
 			break;
 		case 25: case 35: case 41: case 90:
-			value = value * ((do_get_iflag(cn, SF_STRENGTH)?6:5)/5)*(ch[cn].dmg_bonus/10000) / 20;
+			value = value * ((do_get_iflag(cn, SF_STRENGTH)?120:100)/100)*(ch[cn].dmg_bonus/10000) / 20;
 			break;
 		default: break;
 	}
