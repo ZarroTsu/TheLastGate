@@ -6365,6 +6365,11 @@ void skill_shift(int cn, int force)
 		ch[cn].skill[SK_REGEN][n] = ch[cn].skill[SK_MEDIT][n];
 		ch[cn].skill[SK_MEDIT][n] = tmp;
 		
+		// Axe <-> Dagger
+		tmp = ch[cn].skill[SK_AXE][n];
+		ch[cn].skill[SK_AXE][n] = ch[cn].skill[SK_DAGGER][n];
+		ch[cn].skill[SK_DAGGER][n] = tmp;
+		
 		// Tactics <-> Blind
 		tmp = ch[cn].skill[SK_TACTICS][n];
 		ch[cn].skill[SK_TACTICS][n] = ch[cn].skill[SK_BLIND][n];
