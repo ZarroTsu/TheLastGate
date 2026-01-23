@@ -459,7 +459,7 @@ unsigned int xcrypt(unsigned int val)
 // Intended to give the server power over minor text that the client displays.
 int sv_terminology(unsigned char *buf)
 {
-	int tn = -1, n;
+	int tn = -1, n, m;
 	
 	DEBUG("SV TERMINOLOGY");
 	
@@ -492,7 +492,10 @@ int sv_terminology(unsigned char *buf)
 	
 	if (buf[0]==SV_TERM_SKILLS)
 	{
-		n = buf[2];
+		m = buf[2];
+		
+		for (n=0; n<MAXSKILL; n++) if (skilltab[n].nr==m) break;  // get the correct skilltab value
+		if (n==MAXSKILL) n = 0;
 		
 		switch (buf[1])
 		{
