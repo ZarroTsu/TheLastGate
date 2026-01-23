@@ -6178,26 +6178,13 @@ int use_sanguine_crystal(int cn, int in)
 	
 	wil = M_AT(cn, AT_WIL)/2 + 31;
 	
-	if (do_get_iflag(cn, SF_WORLD_R))
-	{	// substract mana
-		if (ch[cn].a_mana<1000)
-		{
-			do_char_log(cn, 0, "You're too exhausted to continue attacking.\n");
-			ch[cn].misc_action = DR_IDLE;
-			return 0;
-		}
-		ch[cn].a_mana -= 1000;
+	if (ch[cn].a_end<1000)
+	{
+		do_char_log(cn, 0, "You're too exhausted to continue attacking.\n");
+		ch[cn].misc_action = DR_IDLE;
+		return 0;
 	}
-	else
-	{	// substract endurance
-		if (ch[cn].a_end<1000)
-		{
-			do_char_log(cn, 0, "You're too exhausted to continue attacking.\n");
-			ch[cn].misc_action = DR_IDLE;
-			return 0;
-		}
-		ch[cn].a_end -= 1000;
-	}
+	ch[cn].a_end -= 1000;
 	
 	if (ch[cn].worn[WN_RHAND]) item_damage_weapon(cn, wil / 10);
 	
@@ -6399,30 +6386,17 @@ int use_dw_chest(int cn, int in)
 int use_mine(int cn, int in)
 {
 	int tmp, in2, str;
-
+	
 	str = M_AT(cn, AT_STR);
-
-	if (do_get_iflag(cn, SF_WORLD_R))
-	{	// substract mana
-		if (ch[cn].a_mana<1000)
-		{
-			do_char_log(cn, 0, "You're too exhausted to continue digging.\n");
-			ch[cn].misc_action = DR_IDLE;
-			return 0;
-		}
-		ch[cn].a_mana -= 1000;
+	
+	if (ch[cn].a_end<1000)
+	{
+		do_char_log(cn, 0, "You're too exhausted to continue digging.\n");
+		ch[cn].misc_action = DR_IDLE;
+		return 0;
 	}
-	else
-	{	// substract endurance
-		if (ch[cn].a_end<1000)
-		{
-			do_char_log(cn, 0, "You're too exhausted to continue digging.\n");
-			ch[cn].misc_action = DR_IDLE;
-			return 0;
-		}
-		ch[cn].a_end -= 1000;
-	}
-
+	ch[cn].a_end -= 1000;
+	
 	// check for proper tools!
 	if ((in2 = ch[cn].worn[WN_RHAND])!=0)
 	{

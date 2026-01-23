@@ -3585,8 +3585,6 @@ int npc_try_spell(int cn, int co, int spell)
 		}
 	}
 	
-	if (do_get_iflag(cn, SF_WORLD_R)) usemana = 1;
-
 	if (n==MAXBUFFS)
 	{
 		tmp = spellflag(truespell);
@@ -3620,9 +3618,9 @@ int npc_try_spell(int cn, int co, int spell)
 
 int npc_can_spell(int cn, int co, int spell)
 {
-	if (!do_get_iflag(cn, SF_WORLD_R) && 
-       (spell==SK_CLEAVE || spell==SK_SHIELD || spell==SK_WEAKEN || spell==SK_WARCRY || spell==SK_BLIND || 
-		spell==SK_TAUNT || spell==SK_LEAP || spell==SK_PACT))
+	if ((spell==SK_CLEAVE  || spell==SK_SHIELD || spell==SK_WEAKEN || 
+		 spell==SK_WARCRY  || spell==SK_BLIND  || spell==SK_TAUNT  || 
+		 spell==SK_LEAP    || spell==SK_PACT   ))
 	{
 		if ((ch[cn].a_end-500) / 1000 < get_spellcost(cn, spell)) return 0;
 	}
@@ -8231,115 +8229,42 @@ int npc_check_placement(int cn, int in, int n)
 {
 	switch(n)
 	{
-	case    WN_HEAD:
-		if (!(it[in].placement & PL_HEAD))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_HEAD:
+			if (!(it[in].placement & PL_HEAD))                                                return 0;
 			break;
-		}
-	case    WN_NECK:
-		if (!(it[in].placement & PL_NECK))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_NECK:
+			if (!(it[in].placement & PL_NECK))                                                return 0;
 			break;
-		}
-	case    WN_BODY:
-		if (!(it[in].placement & PL_BODY))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_BODY:
+			if (!(it[in].placement & PL_BODY))                                                return 0;
 			break;
-		}
-	case    WN_ARMS:
-		if (!(it[in].placement & PL_ARMS))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_ARMS:
+			if (!(it[in].placement & PL_ARMS))                                                return 0;
 			break;
-		}
-	case    WN_BELT:
-		if (!(it[in].placement & PL_BELT))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_BELT:
+			if (!(it[in].placement & PL_BELT))                                                return 0;
 			break;
-		}
-	case    WN_FEET:
-		if (!(it[in].placement & PL_FEET))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_FEET:
+			if (!(it[in].placement & PL_FEET))                                                return 0;
 			break;
-		}
-	case    WN_LHAND:
-		if (!(it[in].placement & PL_SHIELD))
-		{
-			return 0;
-		}
-		else if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_LHAND:
+			if (!(it[in].placement & PL_SHIELD))                                              return 0;
+			else if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))                       return 0;
 			break;
-		}
-	case    WN_RHAND:
-		if (!(it[in].placement & PL_WEAPON) && !((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn)))
-		{
-			return 0;
-		}
-		else if (IS_TWOHAND(in) && ch[cn].worn[WN_LHAND])
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_RHAND:
+			if (!IS_EQWEAPON(in) && !(IS_EQSHIELD(in) && IS_ARCHTEMPLAR(cn)))                 return 0;
+			else if (IS_TWOHAND(in) && !do_get_iflag(cn,SF_WORLD_R) && ch[cn].worn[WN_LHAND]) return 0;  // [Taro] World.R
 			break;
-		}
-	case    WN_CLOAK:
-		if (!(it[in].placement & PL_CLOAK))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_CLOAK:
+			if (!(it[in].placement & PL_CLOAK))                                               return 0;
 			break;
-		}
-	case    WN_RRING:
-	case    WN_LRING:
-		if (!(it[in].placement & PL_RING))
-		{
-			return 0;
-		}
-		else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))
-		{
-			return 0;
-		}
-		else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))
-		{
-			return 0;
-		}
-		else
-		{
+		case    WN_RRING:
+		case    WN_LRING:
+			if (!(it[in].placement & PL_RING))                                                return 0;
+			else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))        return 0;
+			else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))        return 0;
 			break;
-		}
-	default:
-		return 0;
+		default: return 0;
 	}
 
 	return 1;

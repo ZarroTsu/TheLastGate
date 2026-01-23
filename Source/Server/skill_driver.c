@@ -1277,7 +1277,7 @@ int is_near(int cn, int co, int v)
 int spellcost(int cn, int cost, int in, int usemana)
 {
 	int cotfk_cost = 0, devil_cost = 0, hp_cost = 0;
-	int base_mana_cost, mana_cost, end_cost, t, n, in2, worldr = 0;
+	int base_mana_cost, mana_cost, end_cost, t, n, in2;
 	
 	if (IS_PLAYER(cn)  && in != SK_BLAST && in != SK_CLEAVE && in != SK_SHIELD && in != SK_WEAKEN && in != SK_WARCRY && 
 		in != SK_BLIND && in != SK_DOUSE && in != SK_TAUNT  && in != SK_LEAP   && in != SK_PACT)
@@ -1301,15 +1301,10 @@ int spellcost(int cn, int cost, int in, int usemana)
 		devil_cost=cost/3;
 	}
 	
-	if (do_get_iflag(cn, SF_WORLD_R))
-	{
-		usemana = worldr = 1;
-	}
-	
 	if (usemana>0)
 	{
 		// Crown of the First King
-		if (!worldr && do_get_iflag(cn, SF_TW_CROWN))
+		if (do_get_iflag(cn, SF_TW_CROWN))
 		{
 			cotfk_cost = cost*25/100;
 		}
@@ -1383,7 +1378,6 @@ int spellcost(int cn, int cost, int in, int usemana)
 		
 		if (do_get_iflag(cn, SF_MA_HEAL) && mana_cost)  spell_pomesol(cn, cn, base_mana_cost, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 0);
-		if (worldr) do_recovery(cn, 1, base_mana_cost*1000);
 	}
 	if (usemana==0 || usemana==2)
 	{
@@ -4055,25 +4049,14 @@ int item_repair(int cn, int in, int power, int n, int flag)
 		if (!flag) do_char_log(cn, 0, "That's too difficult for you (requires %d Repair).\n", power);
 		return 0;
 	}
-	if (do_get_iflag(cn, SF_WORLD_R))
+	
+	if (ch[cn].a_end<power * 200)
 	{
-		if (ch[cn].a_mana<power * 200)
-		{
-			if (!flag) do_char_log(cn, 0, "You don't have enough mana to repair that.\n");
-			return 0;
-		}
-		ch[cn].a_mana -= power * 200;
+		if (!flag) do_char_log(cn, 0, "You're too exhausted to repair that.\n");
+		return 0;
 	}
-	else
-	{
-		if (ch[cn].a_end<power * 200)
-		{
-			if (!flag) do_char_log(cn, 0, "You're too exhausted to repair that.\n");
-			return 0;
-		}
-		ch[cn].a_end -= power * 200;
-	}
-
+	ch[cn].a_end -= power * 200;
+	
 	if (power)		chance = M_SK(cn, SK_REPAIR) * 15 / power;
 	else			chance = 19;
 	if (chance< 0)	chance =  0;
@@ -5598,12 +5581,12 @@ int spell_blind(int cn, int co, int power, int flag)
 		if (IS_ANY_MERC(cn) && IS_PLAYER(cn))
 		{
 			bu[in].skill[SK_STEALTH] = max(-127, -(power/2 + 4));
-			bu[in].spell_mod         = max(-127, -(power/6 + 2));
+			bu[in].spell_pow         = max(-127, -(power/6 + 2));
 		}
 		else
 		{
 			bu[in].skill[SK_STEALTH] = max(-127, -(power/3 + 3));
-			bu[in].spell_mod         = max(-127, -(power/8 + 1));
+			bu[in].spell_pow         = max(-127, -(power/8 + 1));
 		}
 		chlog(cn, "Used Douse on %s", ch[co].name);
 	}
@@ -6511,7 +6494,7 @@ int spell_starlight(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_STARLIGHT, BUF_SPR_STARL, power, SP_DUR_STARL, 1))) 
 		return 0;
 	
-	bu[in].spell_mod = power/50+1;
+	bu[in].spell_pow = power/50+1;
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_STARLIGHT
 }

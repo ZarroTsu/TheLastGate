@@ -588,7 +588,7 @@ extern char *at_name[];
 #define DESC_JANESOBLIT		"When equipped, this weapon can be used to cast 'Obliterate', costing 1/3 of your uncapped mana for power. Obliterate has a base radius of 4, centered at your target's location.\n"
 #define DESC_RATTANBO		"When equipped, this weapon can be used to cast a buff version of Zephyr, with power equal to your Staff skill modifier.\n"
 #define DESC_PUTRIDIRE		"When equipped, this weapon can be used to freely cast Poison, with power equal to 1/3 of your uncapped mana.\n"
-#define DESC_STARLIGHT		"When equipped, this weapon can be used to cast 'Starlight', costing 1/3 of uncapped mana. Starlight grants 1 additional spell modifier per 50 mana spent.\n"
+#define DESC_STARLIGHT		"When equipped, this weapon can be used to cast 'Starlight', costing 1/3 of uncapped mana. Starlight grants 1 additional spellpower bonus per 50 mana spent.\n"
 #define DESC_BLOODYSCY		"When equipped, this weapon can be used to freely cast Cleave, with power equal to 1/2 of your uncapped hitpoints.\n"
 #define DESC_GOLDGLAIVE		"When equipped, your Ghost Companion will use Warcry instead of Taunt, based on its Taunt skill modifier.\n"
 #define DESC_KELPTRID		"When equipped, grants +30 to action speed while underwater.\n"
@@ -633,7 +633,7 @@ extern char *at_name[];
 #define DESC_EMPEROR		"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
 #define DESC_HEIROPH		"When equipped, Immunize and Inoculate from your Dispel spell lasts four times as long, but your Dispel spell can only remove a single buff or debuff at a time.\n"
 #define DESC_LOVERS			"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
-#define DESC_CHARIOT		"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spell modifier.\n"
+#define DESC_CHARIOT		"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spellpower bonus.\n"
 #define DESC_STRENGTH		"When equipped, reduces your attack speed, cast speed, and cooldown recovery speed by 15%%, but grants 20%% more damage with hits.\n"
 #define DESC_HERMIT			"When equipped, you have 15%% more Armor Value, but 20%% less Resistance and Immunity.\n"
 #define DESC_WHEEL			"When equipped, your critical hit chance is reduced by 33%%, but you have 33%% more critical hit multiplier.\n"
@@ -653,7 +653,7 @@ extern char *at_name[];
 #define DESC_MAGI_R			"When equipped, your Economize skill no longer reduces the Mana cost of skills, and instead increases your Cooldown rate.\n"
 #define DESC_PREIST_R		"When equipped, your Magic Shield and Magic Shell are now passive and regenerate quickly, but are more fragile. You cannot gain Magic Shield or Magic Shell from other sources.\n"
 #define DESC_EMPRES_R		"When equipped, your Lethargy skill reserves life instead of mana.\n"
-#define DESC_EMPERO_R		"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves Hit Score and Parry Score.\n"
+#define DESC_EMPERO_R		"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves all attributes.\n"
 #define DESC_HEIROP_R		"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R		"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
 #define DESC_CHARIO_R		"When equipped, your debuffs ignore 25%% of target resistance and immunity, but are 20%% weaker once applied.\n"
@@ -670,7 +670,7 @@ extern char *at_name[];
 #define DESC_MOON_R			"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but you lose 0.2%% of current mana per second per 50 uncapped mana.\n"
 #define DESC_SUN_R			"When equipped, the effectiveness of your Regenerate, Rest, and Meditate skills behave as if stationary while fighting, but as if fighting while stationary.\n"
 #define DESC_JUDGE_R		"When equipped, your Pulse spell no longer deals damage to enemies and instead heals allies with each pulse. It inflicts Charge instead of Shock to allies, granting them additional damage and damage reduction.\n"
-#define DESC_WORLD_R		"When equipped, 50%% of damage taken is dealt to Endurance instead. All Endurance costs instead use Mana, and all skills grant Endurance on use. You lose 40%% of current endurance per second, mitigated by your Rest skill.\n"
+#define DESC_WORLD_R		"When equipped, all two-handed weapons can be used one-handed, but you have 50% less effect of recovery from all sources.\n"
 
 enum _sk_tree_skills {
 	TSK_SEYA_ACCU,	TSK_SEYA_EXPE,	TSK_SEYA_AVOI,	TSK_SEYA_ABSO,	TSK_SEYA_RIGO,	TSK_SEYA_SCOR,

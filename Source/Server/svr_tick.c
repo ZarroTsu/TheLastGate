@@ -2095,7 +2095,6 @@ int get_meta_stat_value(int cn, int n)
 			if (m = TC_SK(cn, 48))                 en_dam += m*15;
 			if (do_get_iflag(cn, SF_TW_CLOAK))     en_dam +=   15;    // [Gear] Cloak of Shadows
 			if (do_get_iflag(cn, SF_EN_TAKEASEN))  en_dam +=   15;    // [Ench] *DoT* damage taken as endurance
-			if (do_get_iflag(cn, SF_WORLD_R))      en_dam +=   60;    // [Taro] World.R
 			
 			if (T_ARHR_SK(cn, 12))                 mp_dam +=   30;    // (ArHr) Resourcefulness
 			if (m = TC_SK(cn, 84))                 mp_dam += m*15;
@@ -3424,6 +3423,9 @@ void plr_change(int nr)
 					
 					*(short int*)(buf + 7) = it[in].placement;
 					
+					if (IS_TWOHAND(in) && do_get_iflag(cn, SF_WORLD_R))    // [Taro] World.R
+						*(short int*)(buf + 7) &= ~PL_TWOHAND;
+					
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 						*(short int*)(buf + 7) |= PL_WEAPON;
 					
@@ -3509,6 +3511,9 @@ void plr_change(int nr)
 					else               *(short int*)(buf + 1) = it[in].sprite[I_I];
 					
 					*(short int*)(buf + 3) = it[in].placement;
+					
+					if (IS_TWOHAND(in) && do_get_iflag(cn, SF_WORLD_R))    // [Taro] World.R
+						*(short int*)(buf + 3) &= ~PL_TWOHAND;
 					
 					if ((it[in].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn))
 						*(short int*)(buf + 3) |= PL_WEAPON;

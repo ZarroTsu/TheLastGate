@@ -9293,7 +9293,6 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	if (n = TC_SK(co, 48))                           en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               en_dam +=   15;    // [Gear] Cloak of Shadows
 	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
-	if (do_get_iflag(co, SF_WORLD_R))                en_dam +=   60;    // [Taro] World.R
 	
 	if (T_ARHR_SK(co, 12))                           mp_dam +=   30;    // (ArHr) Resourcefulness
 	if (n = TC_SK(co, 84))                           mp_dam += n*15;
@@ -9313,7 +9312,7 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 #undef    ALTER_MAX
 
 
-void do_recovery(int cn, int type, int v)
+int do_recovery(int cn, int type, int v)
 {
 	int n;
 	
@@ -9322,6 +9321,8 @@ void do_recovery(int cn, int type, int v)
 		n = T_LYCA_SK(cn, 7)*50 + TC_SK(cn, 103)*25;  // (Lyca) Lust
 		v = more(v, n, 1);
 	}
+	
+	if (do_get_iflag(cn, SF_WORLD_R)) v = less(v, 50, 1);  // [Taro] World.R
 	
 	switch (type)
 	{
@@ -9334,6 +9335,8 @@ void do_recovery(int cn, int type, int v)
 	ch[cn].a_hp   = clamp(ch[cn].a_hp,   0, HP_SOFTCAP(cn));
 	ch[cn].a_end  = clamp(ch[cn].a_end,  0, EN_SOFTCAP(cn));
 	ch[cn].a_mana = clamp(ch[cn].a_mana, 0, MP_SOFTCAP(cn));
+	
+	return v;
 }
 
 void do_leech(int cn, int dam, int is_dot)
@@ -13043,8 +13046,8 @@ void do_regenerate(int cn)
 {
 	unsigned long long prof;
 	unsigned long long mf1, mf2;
-	int n, m, p, in, in2, nohp = 0, noend = 0, nomana = 0, halfhp = 0, halfend = 0, halfmana = 0, old;
-	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0, sunR = 0, worldR = 0, moonR = 0, money = 0;
+	int n, m, p, in, in2, nohp = 0, noen = 0, nomp = 0, halfhp = 0, halfen = 0, halfmp = 0, old;
+	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0, sunR = 0, moonR = 0, money = 0;
 	int race_reg = 0, race_res = 0, race_med = 0, degendam=0, en_dam=0, mp_dam=0;
 	int degenpower = 0, tickcheck = 10000;
 	int moonmult = 20;
@@ -13057,8 +13060,7 @@ void do_regenerate(int cn)
 	char buf[50];
 	
 	strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
-
-	// gothp determines how much to counter degeneration effects while underwater.
+	
 	m = ch[cn].x + ch[cn].y * MAPX;
 	mf1 = mf2 = map[m].flags;
 	
@@ -13086,11 +13088,11 @@ void do_regenerate(int cn)
 		race_med = M_SK(cn, SK_MEDIT) * moonmult / 30;
 	}
 	
-	if (ch[cn].flags & CF_NOHPREG)     halfhp         = 1;
-	if (ch[cn].flags & CF_NOENDREG)    halfend        = 1;
-	if (ch[cn].flags & CF_NOMANAREG)   halfmana       = 1;
+	if (ch[cn].flags & CF_NOHPREG)     halfhp = 1;
+	if (ch[cn].flags & CF_NOENDREG)    halfen = 1;
+	if (ch[cn].flags & CF_NOMANAREG)   halfmp = 1;
 
-	if (mf1 & MF_UWATER)               uwater         = 1;
+	if (mf1 & MF_UWATER)               uwater = 1;
 	
 	hpmult = endmult = manamult = moonmult;
 	
@@ -13114,7 +13116,6 @@ void do_regenerate(int cn)
 	}
 	
 	if (do_get_iflag(cn, SF_SUN_R))   sunR   = 1;
-	if (do_get_iflag(cn, SF_WORLD_R)) { worldR = 1; noend = 1; }
 	if (do_get_iflag(cn, SF_MOON_R))  moonR  = 1;
 	
 	// Meditate added to Hitpoints
@@ -13167,10 +13168,10 @@ void do_regenerate(int cn)
 		{
 			// STANDING STATES
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					do_recovery(cn, 0, (nohp   ? 0 : (hp  / 8 * (sunR?1:8) * idle/3) / (halfhp   ? 2 : 1)));
-					gothp           += (nohp   ? 0 : (hp  /16 * (sunR?1:8) * idle/3) / (halfhp   ? 2 : 1));
-					do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?1:8) * idle/3) / (halfend  ? 2 : 1)));
-					do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?1:8) * idle/3) / (halfmana ? 2 : 1))); 
+				// gothp determines how much to counter degen effects.
+				gothp += do_recovery(cn, 0, (nohp?0: (hp  / 8 * (sunR?1:8) * idle/3) / (halfhp+1)));
+				         do_recovery(cn, 1, (noen?0: (end / 8 * (sunR?1:8) * idle/3) / (halfen+1)));
+				         do_recovery(cn, 2, (nomp?0: (mana/ 8 * (sunR?1:8) * idle/3) / (halfmp+1))); 
 				break;
 			
 			// WALKING STATES
@@ -13179,132 +13180,81 @@ void do_regenerate(int cn)
 			case 128: case 132: case 136: case 140: case 144: case 148: case 152:
 				if (do_get_iflag(cn, SF_EN_WALKREGN))
 				{
-					do_recovery(cn, 0, (nohp   ? 0 : (hp     ) / (halfhp   ? 2 : 1))); 
-					gothp           += (nohp   ? 0 : (hp  / 2) / (halfhp   ? 2 : 1));
-					if (worldR)
+					gothp += do_recovery(cn, 0, (nohp?0: (hp  ) / (halfhp+1)));
+					
+					if (ch[cn].mode==2) // Fast
 					{
-						if (ch[cn].mode==2) // Fast
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1)) - 40); 
-						}
-						else
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1))); 
-						}
+						ch[cn].a_end -= 40;
+						do_recovery(cn, 1, (noen?0: (end) / (halfen+1)));
 					}
 					else
 					{
-						if (ch[cn].mode==2) // Fast
-							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)) - 40);
-						else
-							do_recovery(cn, 1, (noend  ? 0 : (end    ) / (halfend  ? 2 : 1)));
-						
-						do_recovery(cn, 2, (nomana ? 0 : (mana   ) / (halfmana ? 2 : 1))); 
+						do_recovery(cn, 1, (noen?0: (end) / (halfen+1)));
 					}
+					
+					do_recovery(cn, 2, (nomp?0: (mana) / (halfmp+1))); 
 				}
 				else
 				{
-					do_recovery(cn, 0, (nohp   ? 0 : (hp  / 4) / (halfhp   ? 2 : 1))); 
-					gothp           += (nohp   ? 0 : (hp  / 8) / (halfhp   ? 2 : 1));
-					if (worldR)
+					gothp += do_recovery(cn, 0, (nohp?0: (hp/4) / (halfhp+1)));
+					
+					if (ch[cn].mode==2) // Fast
 					{
-						if (ch[cn].mode==2) // Fast
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)) - 40);
-						}
-						if (ch[cn].mode==1) // Normal
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)));
-						}
-						if (ch[cn].mode==0) // Slow
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)));
-						}
+						ch[cn].a_end -= 40;
+						do_recovery(cn, 1, (noen?0: (end/4) / (halfen+1)));
 					}
-					else
+					if (ch[cn].mode==1) // Normal
 					{
-						if (ch[cn].mode==2) // Fast
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)) - 40);
-						if (ch[cn].mode==1) // Normal
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4) / (halfend  ? 2 : 1)));
-						if (ch[cn].mode==0) // Slow
-							do_recovery(cn, 1, (noend  ? 0 : (end / 2) / (halfend  ? 2 : 1)));
-						
-						do_recovery(cn, 2, (nomana ? 0 : (mana/ 4) / (halfmana ? 2 : 1)));
+						do_recovery(cn, 1, (noen?0: (end/4) / (halfen+1)));
 					}
+					if (ch[cn].mode==0) // Slow
+					{
+						do_recovery(cn, 1, (noen?0: (end/2) / (halfen+1)));
+					}
+					
+					do_recovery(cn, 2, (nomp?0: (mana/4) / (halfmp+1)));
 				}
 				break;
 			
 			// FIGHTING STATES
 			case 160: case 168: case 176: case 184:
-				do_recovery(cn, 0, (nohp   ? 0 : (hp  / 8 * (sunR?8:1)) / (halfhp   ? 2 : 1))); 
-				gothp           += (nohp   ? 0 : (hp  /16 * (sunR?8:1)) / (halfhp   ? 2 : 1));
-				if (worldR)
+				gothp += do_recovery(cn, 0, (nohp?0: (hp/ 8 * (sunR?8:1)) / (halfhp+1)));
+				
+				if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
 				{
-					if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
+					if (ch[cn].mode==2) // Fast
 					{
-						if (ch[cn].mode==2) // Fast
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 75);
-						}
-						if (ch[cn].mode==1) // Normal
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 25);
-						}
-						if (ch[cn].mode==0) // Slow
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
-						}
+						ch[cn].a_end -= 75;
+						do_recovery(cn, 1, (noen?0: (end/8 * (sunR?8:1)) / (halfen+1)));
 					}
-					else // Misc.
+					if (ch[cn].mode==1) // Normal
 					{
-						if (ch[cn].mode==2)		// Fast
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)) - 50);
-						}
-						if (ch[cn].mode==1)		// Normal
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
-						}
-						if (ch[cn].mode==0)		// Slow
-						{
-							do_recovery(cn, 1, (noend  ? 0 : (end / 2 * (sunR?2:1)) / (halfend  ? 2 : 1)));
-							do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
-						}
+						ch[cn].a_end -= 25;
+						do_recovery(cn, 1, (noen?0: (end/8 * (sunR?8:1)) / (halfen+1)));
+					}
+					if (ch[cn].mode==0) // Slow
+					{
+						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1)));
 					}
 				}
-				else
+				else // Misc.
 				{
-					if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
+					if (ch[cn].mode==2)		// Fast
 					{
-						if (ch[cn].mode==2) // Fast
-							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)) - 75);
-						if (ch[cn].mode==1) // Normal
-							do_recovery(cn, 1, (noend  ? 0 : (end / 8 * (sunR?8:1)) / (halfend  ? 2 : 1)) - 25);
-						if (ch[cn].mode==0) // Slow
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
+						ch[cn].a_end -= 50;
+						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1)));
 					}
-					else // Misc.
+					if (ch[cn].mode==1)		// Normal
 					{
-						if (ch[cn].mode==2)		// Fast
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)) - 50);
-						if (ch[cn].mode==1)		// Normal
-							do_recovery(cn, 1, (noend  ? 0 : (end / 4 * (sunR?4:1)) / (halfend  ? 2 : 1)));
-						if (ch[cn].mode==0)		// Slow
-							do_recovery(cn, 1, (noend  ? 0 : (end / 2 * (sunR?2:1)) / (halfend  ? 2 : 1)));
+						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1)));
 					}
-					do_recovery(cn, 2, (nomana ? 0 : (mana/ 8 * (sunR?8:1)) / (halfmana ? 2 : 1)));
+					if (ch[cn].mode==0)		// Slow
+					{
+						do_recovery(cn, 1, (noen?0: (end/2 * (sunR?2:1)) / (halfen+1)));
+					}
 				}
+				
+				do_recovery(cn, 2, (nomp?0: (mana/8 * (sunR?8:1)) / (halfmp+1)));
 				break;
 			
 			default:
@@ -13327,29 +13277,27 @@ void do_regenerate(int cn)
 		}
 		if (ch[cn].temp == CT_DRACULA) hp = hp*10;
 		
-		do_recovery(cn, 0, hp / (halfhp   ? 2 : 1));
-		gothp           += hp / (halfhp   ? 4 : 2);
+		gothp += do_recovery(cn, 0, (hp) / (halfhp+1));
 	}
 	if (ch[cn].gigaregen[0])
 	{
 		hp = ch[cn].gigaregen[0] * 50;
-		do_recovery(cn, 0, hp / (halfhp   ? 2 : 1));
-		gothp         +=   hp / (halfhp   ? 4 : 2);
+		gothp += do_recovery(cn, 0, (hp) / (halfhp+1));
 	}
 	if (ch[cn].gigaregen[1])
 	{
 		end = ch[cn].gigaregen[1] * 50;
-		do_recovery(cn, 1, end / (halfend  ? 2 : 1));
+		do_recovery(cn, 1, (end) / (halfen+1));
 	}
 	if (ch[cn].gigaregen[2])
 	{
 		mana = ch[cn].gigaregen[2] * 50;
-		do_recovery(cn, 2, mana / (halfmana ? 2 : 1));
+		do_recovery(cn, 2, (mana) / (halfmp+1));
 	}
 	if (ch[cn].temp == CT_PIRATELORD && (IS_SANEITEM(in = map[1331331].it) && !(it[in].active)))
 	{
 		do_recovery(cn, 0, 20000);
-		gothp += 1;
+		gothp += 2;
 	}
 	
 	// Special case for the Amulet of Ankhs
@@ -13358,29 +13306,29 @@ void do_regenerate(int cn)
 		switch (it[in].temp)
 		{
 			case IT_ANKHAMULET: 
-				do_recovery(cn, 0, (race_reg/ 8) / (halfhp   ? 2 : 1));
-				do_recovery(cn, 1, (race_res/ 8) / (halfend  ? 2 : 1));
-				do_recovery(cn, 2, (race_med/ 8) / (halfmana ? 2 : 1));
+				do_recovery(cn, 0, (race_reg/ 8) / (halfhp+1));
+				do_recovery(cn, 1, (race_res/ 8) / (halfen+1));
+				do_recovery(cn, 2, (race_med/ 8) / (halfmp+1));
 				break;
 			case IT_AMBERANKH: 
-				do_recovery(cn, 0, (race_reg/ 4) / (halfhp   ? 2 : 1));
-				do_recovery(cn, 1, (race_res/12) / (halfend  ? 2 : 1));
-				do_recovery(cn, 2, (race_med/12) / (halfmana ? 2 : 1));
+				do_recovery(cn, 0, (race_reg/ 4) / (halfhp+1));
+				do_recovery(cn, 1, (race_res/12) / (halfen+1));
+				do_recovery(cn, 2, (race_med/12) / (halfmp+1));
 				break;
 			case IT_TURQUANKH: 
-				do_recovery(cn, 0, (race_reg/12) / (halfhp   ? 2 : 1));
-				do_recovery(cn, 1, (race_res/ 4) / (halfend  ? 2 : 1));
-				do_recovery(cn, 2, (race_med/12) / (halfmana ? 2 : 1));
+				do_recovery(cn, 0, (race_reg/12) / (halfhp+1));
+				do_recovery(cn, 1, (race_res/ 4) / (halfen+1));
+				do_recovery(cn, 2, (race_med/12) / (halfmp+1));
 				break;
 			case IT_GARNEANKH: 
-				do_recovery(cn, 0, (race_reg/12) / (halfhp   ? 2 : 1));
-				do_recovery(cn, 1, (race_res/12) / (halfend  ? 2 : 1));
-				do_recovery(cn, 2, (race_med/ 4) / (halfmana ? 2 : 1));
+				do_recovery(cn, 0, (race_reg/12) / (halfhp+1));
+				do_recovery(cn, 1, (race_res/12) / (halfen+1));
+				do_recovery(cn, 2, (race_med/ 4) / (halfmp+1));
 				break;
 			case IT_TRUEANKH: 
-				do_recovery(cn, 0, (race_reg/ 4) / (halfhp   ? 2 : 1));
-				do_recovery(cn, 1, (race_res/ 4) / (halfend  ? 2 : 1));
-				do_recovery(cn, 2, (race_med/ 4) / (halfmana ? 2 : 1));
+				do_recovery(cn, 0, (race_reg/ 4) / (halfhp+1));
+				do_recovery(cn, 1, (race_res/ 4) / (halfen+1));
+				do_recovery(cn, 2, (race_med/ 4) / (halfmp+1));
 				break;
 			case IT_GAMBLERFAL:
 				if (it[in].active) 
@@ -13395,9 +13343,9 @@ void do_regenerate(int cn)
 	}
 	if (in = get_gear(cn, IT_RINGWARMTH) && it[in].active)
 	{
-		do_recovery(cn, 0, (race_reg/ 8) / (halfhp   ? 2 : 1));
-		do_recovery(cn, 1, (race_res/ 8) / (halfend  ? 2 : 1));
-		do_recovery(cn, 2, (race_med/ 8) / (halfmana ? 2 : 1));
+		do_recovery(cn, 0, (race_reg/ 8) / (halfhp+1));
+		do_recovery(cn, 1, (race_res/ 8) / (halfen+1));
+		do_recovery(cn, 2, (race_med/ 8) / (halfmp+1));
 	}
 	
 	/*
@@ -13428,17 +13376,7 @@ void do_regenerate(int cn)
 		ch[cn].data[92] = TICKS * 60;
 	}
 	
-	if (worldR)
-	{
-		if (ch[cn].a_mana<500 && ch[cn].mode!=0)
-		{
-			ch[cn].mode = 0;
-			do_update_char(cn);
-			do_char_log(cn, 0, "You're exhausted.\n");
-			if (ch[cn].a_mana<0) ch[cn].a_mana = 0;
-		}
-	}
-	else if (ch[cn].a_end<500 && ch[cn].mode!=0)
+	if (ch[cn].a_end<500 && ch[cn].mode!=0)
 	{
 		ch[cn].mode = 0;
 		do_update_char(cn);
@@ -13450,6 +13388,8 @@ void do_regenerate(int cn)
 	if (do_get_iflag(cn, SF_PREIST_R) && B_SK(cn, SK_MSHIELD)) do_pmshield(cn, cn);
 
 	do_check_auras(cn);
+	
+	gothp /= 2;
 	
 	// Tick down escape try
 	if (ch[cn].escape_timer > 0) 
@@ -14110,11 +14050,6 @@ void do_regenerate(int cn)
 		}
 	}
 	
-	// World R
-	if (worldR)
-	{	// 2% per frame = 40% per 20 frames  (100.000 / 50 = 2000 * 20 = 40.000)
-		ch[cn].a_end -= (ch[cn].a_end / (50 + (end + race_res + endmult*3)/4));
-	}
 	// Moon R
 	if (moonR)
 	{	// 0.01% per frame = 0.2% per 20 frames  (100.000 / 10000 = 10 * 20 = 0.200)
@@ -17855,21 +17790,12 @@ int do_swap_item(int cn, int n)
 		"Agility", 
 		"Strength"
 	};
-
-	if (ch[cn].citem & 0x80000000)
-	{
-		return -1;
-	}
-
-	if (n<0 || n>19)
-	{
-		return -1;        // sanity check
-
-	}
-	tmp = ch[cn].citem;
-
+	
+	if (ch[cn].citem & 0x80000000) return -1;
+	if (n<0 || n>19)               return -1;  // sanity check
+	
 	// check prerequisites:
-	if (tmp)
+	if (tmp = ch[cn].citem)
 	{
 		if (it[tmp].driver==40 && it[tmp].data[0]!=cn)
 		{
@@ -17881,15 +17807,13 @@ int do_swap_item(int cn, int n)
 			if (it[tmp].data[0]==0)
 			{
 				char buf[300];
-
+				
 				it[tmp].data[0] = cn;
-
+				
 				sprintf(buf, "%s Engraved in it are the letters \"%s\".",
-				        it[tmp].description, ch[cn].name);
+					it[tmp].description, ch[cn].name);
 				if (strlen(buf)<200)
-				{
 					strcpy(it[tmp].description, buf);
-				}
 			}
 			else
 			{
@@ -17940,148 +17864,69 @@ int do_swap_item(int cn, int n)
 			do_char_log(cn, 0, "(Need %d base Mana)\n",it[tmp].mana[I_R]);
 			return -1;
 		}
-
+		
 		if ((IS_SKUAWEAP(tmp)   &&  IS_PURPLE(cn)) ||
 			(it[tmp].temp==3201 &&  IS_PURPLE(cn)) ||
-		    (IS_PURPWEAP(tmp)   && !IS_PURPLE(cn)) ||
+			(IS_PURPWEAP(tmp)   && !IS_PURPLE(cn)) ||
 			(it[tmp].temp==3202 && !IS_PURPLE(cn)) ||
-		    (it[tmp].driver==40 && !IS_SEYAN_DU(cn)))
+			(it[tmp].driver==40 && !IS_SEYAN_DU(cn)))
 		{
 			do_char_log(cn, 0, "Ouch. That hurt.\n");
 			return -1;
 		}
-
+		
 		if (it[tmp].min_rank>getrank(cn))
 		{
 			do_char_log(cn, 0, "You're not experienced enough to use that.\n");
 			do_char_log(cn, 0, "(Need a rank of %s)\n",rank_name[it[tmp].min_rank]);
 			return -1;
 		}
-
+		
 		// check for correct placement:
 		switch(n)
 		{
-		case    WN_HEAD:
-			if (!(it[tmp].placement & PL_HEAD))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_HEAD:
+				if (!(it[tmp].placement & PL_HEAD))                                           return -1;
 				break;
-			}
-		case    WN_NECK:
-			if (!(it[tmp].placement & PL_NECK))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_NECK:
+				if (!(it[tmp].placement & PL_NECK))                                           return -1;
 				break;
-			}
-		case    WN_BODY:
-			if (!(it[tmp].placement & PL_BODY))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_BODY:
+				if (!(it[tmp].placement & PL_BODY))                                           return -1;
 				break;
-			}
-		case    WN_ARMS:
-			if (!(it[tmp].placement & PL_ARMS))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_ARMS:
+				if (!(it[tmp].placement & PL_ARMS))                                           return -1;
 				break;
-			}
-		case    WN_BELT:
-			if (!(it[tmp].placement & PL_BELT))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_BELT:
+				if (!(it[tmp].placement & PL_BELT))                                           return -1;
 				break;
-			}
-		case    WN_CHARM:
-		case    WN_CHARM2:
-			if (!(it[tmp].placement & PL_CHARM))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_CHARM:
+			case WN_CHARM2:
+				if (!(it[tmp].placement & PL_CHARM))                                          return -1;
 				break;
-			}
-		case    WN_FEET:
-			if (!(it[tmp].placement & PL_FEET))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_FEET:
+				if (!(it[tmp].placement & PL_FEET))                                           return -1;
 				break;
-			}
-		case    WN_LHAND:
-			if (!(it[tmp].placement & PL_SHIELD))
-			{
-				return -1;
-			}
-			if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))
-			{
-				return -1;
-			}
-			break;
-		case    WN_RHAND:
-			if (!(it[tmp].placement & PL_WEAPON) && !((it[tmp].flags & IF_OF_SHIELD) && IS_ARCHTEMPLAR(cn)))
-			{
-				return -1;
-			}
-			if (IS_TWOHAND(tmp) && ch[cn].worn[WN_LHAND])
-			{
-				return -1;
-			}
-			break;
-		case    WN_CLOAK:
-			if (!(it[tmp].placement & PL_CLOAK))
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_LHAND:
+				if (!(it[tmp].placement & PL_SHIELD))                                         return -1;
+				if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))                        return -1;
 				break;
-			}
-		case    WN_RRING:
-		case    WN_LRING:
-			if (!(it[tmp].placement & PL_RING))
-			{
-				return -1;
-			}
-			else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))
-			{
-				return -1;
-			}
-			else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))
-			{
-				return -1;
-			}
-			else if (n==WN_RRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_LRING])
-			{
-				return -1;
-			}
-			else if (n==WN_LRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_RRING])
-			{
-				return -1;
-			}
-			else
-			{
+			case WN_RHAND:
+				if (!IS_EQWEAPON(tmp) && !(IS_EQSHIELD(tmp) && IS_ARCHTEMPLAR(cn)))           return -1;
+				if (IS_TWOHAND(tmp) && !do_get_iflag(cn,SF_WORLD_R) && ch[cn].worn[WN_LHAND]) return -1;  // [Taro] World.R
 				break;
-			}
-		default:
-			return -1;
+			case WN_CLOAK:
+				if (!(it[tmp].placement & PL_CLOAK))                                          return -1;
+				break;
+			case WN_RRING:
+			case WN_LRING:
+				if (!(it[tmp].placement & PL_RING))                                           return -1;
+				else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))    return -1;
+				else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))    return -1;
+				else if (n==WN_RRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_LRING])             return -1;
+				else if (n==WN_LRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_RRING])             return -1;
+				break;
+			default: return -1;
 		}
 	}
 	
@@ -18142,7 +17987,7 @@ int do_swap_item(int cn, int n)
 	ch[cn].worn[n] = tmp;
 	
 	do_update_char(cn);
-
+	
 	return(n);
 }
 
