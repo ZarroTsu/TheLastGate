@@ -1844,6 +1844,7 @@ void god_reset_player(int cn, int co)
 	
 	do_char_log(cn, 1, "Now resetting player %s (%d)\n", ch[co].name, co);
 	god_racechange(co, ch[co].temp, 1);
+	plr_logout(co, 0, LO_TAVERN);
 	do_char_log(cn, 0, "Done.\n");
 	return;
 }
@@ -1880,6 +1881,7 @@ void god_reset_players(int cn, int r)
 		if (r ==12 && !IS_LYCANTH(n))		continue;
 		//
 		god_racechange(n, ch[n].temp, 1);
+		plr_logout(n, 0, LO_TAVERN);
 	}
 	
 	do_char_log(cn, 0, "Done.\n");

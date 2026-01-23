@@ -1490,11 +1490,21 @@ int main(int argc, char *args[])
 
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (ch[n].used==USE_ACTIVE)
-		{
-			plr_logout(n, 0, LO_SHUTDOWN);
-		}
+		if (ch[n].used==USE_ACTIVE) plr_logout(n, 0, LO_SHUTDOWN);
 		// (vvv REMOVE AFTER UPDATE!!!)
+		
+		if (IS_SEYAN_DU(n))  // Finesse -> Precision for Seyans
+		{
+			if (ch[n].skill[SK_FINESSE][0]) { ch[n].skill[SK_PRECISION][0] = ch[n].skill[SK_FINESSE][0]; ch[n].skill[SK_FINESSE][0] = 0; }
+			if (ch[n].skill[SK_FINESSE][1]) { ch[n].skill[SK_PRECISION][1] = ch[n].skill[SK_FINESSE][1]; ch[n].skill[SK_FINESSE][1] = 0; }
+			if (ch[n].skill[SK_FINESSE][2]) { ch[n].skill[SK_PRECISION][2] = ch[n].skill[SK_FINESSE][2]; ch[n].skill[SK_FINESSE][2] = 0; }
+			if (ch[n].skill[SK_FINESSE][3]) { ch[n].skill[SK_PRECISION][3] = ch[n].skill[SK_FINESSE][3]; ch[n].skill[SK_FINESSE][3] = 0; }
+			if (ch[n].skill[SK_FINESSE][4]) { ch[n].skill[SK_PRECISION][4] = ch[n].skill[SK_FINESSE][4]; ch[n].skill[SK_FINESSE][4] = 0; }
+			if (ch[n].skill[SK_FINESSE][5]) { ch[n].skill[SK_PRECISION][5] = ch[n].skill[SK_FINESSE][5]; ch[n].skill[SK_FINESSE][5] = 0; }
+		}
+		god_racechange(n, ch[n].temp, 1);  // reset character template
+		ch[n].tree_points = st_skill_pts_all(ch[n].tree_points);  // reset skill tree points
+		
 		// */ // (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);
@@ -1504,42 +1514,6 @@ int main(int argc, char *args[])
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;
-		
-		if (it[n].driver==68) // Soulstones
-		{
-			it[n].flags &= ~IF_ENCHANTED;
-			it[n].flags &= ~IF_SOULSTONE;
-			//it[n].stack = max(1, min(4, it[n].data[0]/4));
-			randomize_ss_stats(0, n, it[n].stack, -1);
-			it[n].data[0] = -1;
-			it[n].data[1] = 0;
-			it[n].data[2] = 0;
-			it[n].data[3] = 0;
-		}
-		
-		if (it[n].driver==93) // Catalysts
-		{
-			sprintf(it[n].description, "A soul catalyst. Can be used on a soulstone to grant it static properties.");
-			for (m=0;m<50;m++)
-			{
-				if (it[n].skill[m][I_I])
-				{
-					it[n].skill[m][I_I] = 2;
-					it[n].skill[m][I_R] = 0;
-				}
-			}
-		}
-		
-		if (it[n].driver==92) // Focuses
-		{
-			sprintf(it[n].description, "A soul focus. Can be used on a soulstone to increase its level by 2, but may cause volatile side effects.");
-		}
-		
-//		if (it[n].orig_temp && !it[n].orig_temp)
-//		{
-//			it[n].flags |= IF_UPDATE | IF_NOREPAIR | IF_LEGACY;
-//			it[n].max_damage = 100000;
-//		}
 	}
 	// */ // (^^^ REMOVE AFTER UPDATE!!!)
 
