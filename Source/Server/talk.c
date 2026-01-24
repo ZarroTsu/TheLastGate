@@ -2035,7 +2035,7 @@ void answer_quest(int cn, int co)
 
 void answer_tarot(int cn, int co, int m)
 {
-	int n, in = 0;
+	int n, in = 0, in2 = 0;
 	
 	if (in = ch[co].worn[m])
 	{
@@ -2045,6 +2045,21 @@ void answer_tarot(int cn, int co, int m)
 			return;
 		}
 		do_sayx(cn, "Very well, %s, I have removed your %s for you.", ch[co].name, it[in].name);
+		if (it[in].temp==IT_CH_WORLD_R && (in2 = ch[co].worn[WN_LHAND]) && ch[co].worn[WN_RHAND] && IS_TWOHAND(ch[co].worn[WN_RHAND])) // [Taro] World.R
+		{
+			for (n = 0; n<MAXITEMS; n++) if (!ch[co].item[n]) break;  // Find an empty inventory slot
+			if (n==MAXITEMS)  // Inventory is full...
+			{
+				do_sayx(cn, "Or, erm... I would, but your inventory seems a bit full. Please come back less encumbered!");
+				return;
+			}
+			it[in2].x = 0;
+			it[in2].y = 0;
+			it[in2].carried = co;
+			ch[co].item[n] = in2;
+			ch[co].worn[WN_LHAND] = 0;
+			do_update_char(co);
+		}
 		if (god_give_char(in, co))
 		{
 			ch[co].worn[m] = 0;

@@ -866,7 +866,7 @@ int npc_give(int cn, int co, int in, int money)
 	int nr, nr2, ar, canlearn = 1, stsz = 1;
 	int tmp = 0;
 	int qnum = 0;
-	int n, in2 = 0;
+	int n, in2 = 0, in3 = 0;
 	unsigned char buf[3];
 
 	if (ch[co].flags & (CF_PLAYER | CF_USURP))
@@ -997,11 +997,30 @@ int npc_give(int cn, int co, int in, int money)
 					return 0;
 				}
 			}
+			if ((in2 = ch[co].worn[WN_CHARM]) && it[in2].temp==IT_CH_WORLD_R 
+			 && (in3 = ch[co].worn[WN_LHAND]) && ch[co].worn[WN_RHAND] && IS_TWOHAND(ch[co].worn[WN_RHAND])) // [Taro] World.R
+			{
+				for (n = 0; n<MAXITEMS; n++) if (!ch[co].item[n]) break;  // Find an empty inventory slot
+				if (n==MAXITEMS)  // Inventory is full...
+				{
+					do_sayx(cn, "I'm sorry %s, but removing this card demands a place in your backpack!", ch[co].name);
+					god_take_from_char(in, cn);
+					god_give_char(in, co);
+					do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in].name);
+					return 0;
+				}
+				it[in3].x = 0;
+				it[in3].y = 0;
+				it[in3].carried = co;
+				ch[co].item[n] = in3;
+				ch[co].worn[WN_LHAND] = 0;
+				do_update_char(co);
+			}
 			do_sayx(cn, "A tarot card, I see. Allow me to apply its magic to you, %s.", ch[co].name);
 			god_take_from_char(in, cn);
 			do_char_log(co, 1, "You now have the effects of your %s equipped.\n", it[in].name);
 			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-			if (in2 = ch[co].worn[WN_CHARM])
+			if (in2)
 			{
 				do_sayx(cn, "I have removed your %s for you as well. Please take it.", it[in2].name);
 				do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in2].name);
