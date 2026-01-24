@@ -263,6 +263,7 @@ int smith_cost(int in, int flag);
 int is_valid_smith_item(int in);
 void do_blacksmith(int cn, int co, int nr);
 void do_waypoint(int cn, int n);
+void print_tree_desc(int cn, char *text1, char *text2);
 void do_treeupdate(int cn, int n);
 void do_give_exp(int cn, int p, int gflag, int rank, int money);
 int try_lucksave(int cn);

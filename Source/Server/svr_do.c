@@ -12682,11 +12682,11 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
 			power = more(power, n, 1);
 			
-			if (!(in = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
+			if (!(in2 = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
 			
-			bu[in].speed      = min(300, 10 + (power  )/ 6);
-			bu[in].atk_speed  = min(127,  5 + (power+6)/12);
-			bu[in].cast_speed = min(127,  5 + (power+6)/12);
+			bu[in2].speed      = min(300, 10 + (power  )/ 6);
+			bu[in2].atk_speed  = min(127,  5 + (power+6)/12);
+			bu[in2].cast_speed = min(127,  5 + (power+6)/12);
 			break;
 			
 		case SK_SLOW:
@@ -12763,7 +12763,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			}
 			else
 			{
-				if (!(in = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0))) return;
 				bu[in2].weapon  = max(-127, -(power / 4 + 4));
 			}
 			bu[in2].data[4] = 1;

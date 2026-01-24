@@ -671,7 +671,7 @@ extern char *at_short[];
 #define DESC_MOON_R			"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but you lose 0.2%% of current mana per second per 50 uncapped mana.\n"
 #define DESC_SUN_R			"When equipped, the effectiveness of your Regenerate, Rest, and Meditate skills behave as if stationary while fighting, but as if fighting while stationary.\n"
 #define DESC_JUDGE_R		"When equipped, your Pulse spell no longer deals damage to enemies and instead heals allies with each pulse. It inflicts Charge instead of Shock to allies, granting them additional damage and damage reduction.\n"
-#define DESC_WORLD_R		"When equipped, all two-handed weapons can be used one-handed, but you have 50% less effect of recovery from all sources.\n"
+#define DESC_WORLD_R		"When equipped, all two-handed weapons can be used one-handed, but you have 50%% less effect of recovery from all sources.\n"
 
 enum _sk_tree_skills {
 	TSK_SEYA_ACCU,	TSK_SEYA_EXPE,	TSK_SEYA_AVOI,	TSK_SEYA_ABSO,	TSK_SEYA_RIGO,	TSK_SEYA_SCOR,
