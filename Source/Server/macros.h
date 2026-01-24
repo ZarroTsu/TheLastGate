@@ -12,8 +12,8 @@
 #define ARRAYSIZE(a)			(sizeof(a)/sizeof(a[0]))
 #define sqr(a)					((a) * (a))
 #define clamp(a, b, c)			((a)<(b) ? (b) : ((a)>(c) ? (c) : (a)))			// clamp value (a) between values (b) and (c)
-#define more(a, b, c)			((a) * max(0,(c*100) + (b))/max(1,(c*100))		// increase value (a) by 1% per (c) of value (b)
-#define less(a, b, c)			((a) * max(0,(c*100) - (b))/max(1,(c*100))		//   reduce value (a) by 1% per (c) of value (b)
+#define more(a, b, c)			((a) * max(0,(c*100) + (b))/max(1,(c*100)))		// increase value (a) by 1% per (c) of value (b)
+#define less(a, b, c)			((a) * max(0,(c*100) - (b))/max(1,(c*100)))		//   reduce value (a) by 1% per (c) of value (b)
 
 // Sanity checks on map locations x and y
 #define SANEX(x)     			((x) >= 0 && (x) < MAPX)
@@ -282,8 +282,8 @@ int is_ascroll(int in);
 #define B_SK(cn, s)				(ch[(cn)].skill[(s)][0])
 #define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
 
-#define T_SK(cn, a)				(IS_SANECHAR(cn)    && st_skillnum((cn), (a), (-1)))
-#define T_SKT(cn, a)			(IS_SANECHAR(cn)    && st_skillnum((cn), (a), (-2)))
+#define T_SK(cn, a)				(IS_SANECHAR(cn)     && st_skillnum((cn), (a), (-1)))
+#define T_SKT(cn, a)			(IS_SANECHAR(cn)     && st_skillnum((cn), (a), (-2)))
 #define T_SEYA_SK(cn, a)		((IS_SEYAN_DU(cn)    && T_SKT((cn), (a)))?1:0)
 #define T_ARTM_SK(cn, a)		((IS_ARCHTEMPLAR(cn) && T_SKT((cn), (a)))?1:0)
 #define T_SKAL_SK(cn, a)		((IS_SKALD(cn)       && T_SKT((cn), (a)))?1:0)
@@ -293,8 +293,8 @@ int is_ascroll(int in);
 #define T_ARHR_SK(cn, a)		((IS_ARCHHARAKIM(cn) && T_SKT((cn), (a)))?1:0)
 #define T_BRAV_SK(cn, a)		((IS_BRAVER(cn)      && T_SKT((cn), (a)))?1:0)
 #define T_LYCA_SK(cn, a)		((IS_LYCANTH(cn)     && T_SKT((cn), (a)))?1:0)
-#define T_OS_TREE(cn, a)		(IS_SANEPLAYER(cn)  && st_learned_skill(ch[(cn)].os_tree, (a)))
-#define TC_SK(cn, a)			(st_skillcount(cn, a))
+#define T_OS_TREE(cn, a)		(IS_SANEPLAYER(cn)   && st_learned_skill(ch[(cn)].os_tree, (a)))
+#define TC_SK(cn, a)			(st_skillcount((cn), (a)))
 
 #define IS_HI_SK(a)			(a==8||a==9||a==23||a==32)
 

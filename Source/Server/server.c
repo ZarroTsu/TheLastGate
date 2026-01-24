@@ -1491,7 +1491,7 @@ int main(int argc, char *args[])
 	for (n = 1; n<MAXCHARS; n++)
 	{
 		if (ch[n].used==USE_ACTIVE) plr_logout(n, 0, LO_SHUTDOWN);
-		// (vvv REMOVE AFTER UPDATE!!!)
+		/* // (vvv REMOVE AFTER UPDATE!!!)
 		
 		if (IS_SEYAN_DU(n))  // Finesse -> Precision for Seyans
 		{

@@ -7530,7 +7530,7 @@ int get_skill_score(int cn, int n)
 	v = ( (ch[cn].skill[n][4] << 8) | ch[cn].skill[n][5] );
 	
 	if ((IS_SPELL(n) && !do_get_iflag(cn, SF_STAR_R)) || (IS_SKILL(n) && do_get_iflag(cn, SF_STAR_R))) // [Taro] Star.R
-		v += ch[cn].spell_pow
+		v += ch[cn].spell_pow;
 	
 	return v;
 }
@@ -9328,7 +9328,7 @@ int do_recovery(int cn, int type, int v)
 	{
 		case  0: ch[cn].a_hp   += v; break;
 		case  1: ch[cn].a_end  += v; break;
-		case  2: ch[co].a_mana += v; break;
+		case  2: ch[cn].a_mana += v; break;
 		default: break;
 	}
 	
@@ -10079,14 +10079,14 @@ void do_attack(int cn, int co, int surround)
 			glv = glv_base + getrank(cn)*15/2;
 			if (chance_compare(co, glv+glv/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
 			{
-				if (do_get_iflag(cn, SF_HIT_POISON)) spell_poison(cn,    co, glv, 1))
-				if (do_get_iflag(cn, SF_HIT_SCORCH)) spell_scorch(cn,    co, glv, 1))
-				if (do_get_iflag(cn, SF_HIT_BLIND))  spell_blind(cn,     co, glv, 0))
-				if (do_get_iflag(cn, SF_HIT_SLOW))   spell_slow(cn,      co, glv, 1))
-				if (do_get_iflag(cn, SF_HIT_CURSE))  spell_curse(cn,     co, glv, 1))
-				if (do_get_iflag(cn, SF_HIT_WEAKEN)) spell_weaken(cn,    co, glv, 1))
-				if (do_get_iflag(cn, SF_HIT_FROST))  spell_frostburn(cn, co, glv))
-				if (do_get_iflag(cn, SF_HIT_DOUSE))  spell_blind(cn,     co, glv, 1))
+				if (do_get_iflag(cn, SF_HIT_POISON)) spell_poison(cn,    co, glv, 1);
+				if (do_get_iflag(cn, SF_HIT_SCORCH)) spell_scorch(cn,    co, glv, 1);
+				if (do_get_iflag(cn, SF_HIT_BLIND))  spell_blind(cn,     co, glv, 0);
+				if (do_get_iflag(cn, SF_HIT_SLOW))   spell_slow(cn,      co, glv, 1);
+				if (do_get_iflag(cn, SF_HIT_CURSE))  spell_curse(cn,     co, glv, 1);
+				if (do_get_iflag(cn, SF_HIT_WEAKEN)) spell_weaken(cn,    co, glv, 1);
+				if (do_get_iflag(cn, SF_HIT_FROST))  spell_frostburn(cn, co, glv);
+				if (do_get_iflag(cn, SF_HIT_DOUSE))  spell_blind(cn,     co, glv, 1);
 			}
 			if (ch[co].spellfail==1) ch[co].spellfail = 0;
 		}
@@ -10095,7 +10095,7 @@ void do_attack(int cn, int co, int surround)
 			glv = glv_base*2 + getrank(cn)*15/2;
 			if (chance_compare(co, glv+glv/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
 			{
-				if (do_get_iflag(cn, SF_TW_LUXURIA)) spell_warcry(cn, co, glv, 1))
+				if (do_get_iflag(cn, SF_TW_LUXURIA)) spell_warcry(cn, co, glv, 1);
 			}
 		}
 		
@@ -12844,8 +12844,6 @@ void do_random_blast(int cn, int power)
 	xt = min(MAPX - 1, xc + (sqr(r)/10000));
 	yt = min(MAPY - 1, yc + (sqr(r)/10000));
 	
-	m1 = XY2M(ch[cn].x, ch[cn].y);
-	
 	for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
 	{
 		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
@@ -12906,15 +12904,15 @@ void do_update_spell_pact(int cn, int in)
 	// Additive Bonus
 	{
 		n  = 0;
-		n += T_LYCA_SK(co,  9)*2;    // (Lyca) Wrath
-		n +=     TC_SK(co,105);
+		n += T_LYCA_SK(cn,  9)*2;    // (Lyca) Wrath
+		n +=     TC_SK(cn,105);
 	}
 	
 	if (do_get_iflag(cn, SF_HERMIT_R))
 	{
 		bu[in].reserve[2] = min(80, 15 + power/5); // Mana
 		power = ch[cn].reserve[2];
-		power = more(power, ch[co].hp[5] * n, 100);
+		power = more(power, ch[cn].hp[5] * n, 100);
 		bu[in].dmg_reduction = power*4/6;
 		bu[in].dmg_bonus     = power*2/6;
 	}
@@ -12922,7 +12920,7 @@ void do_update_spell_pact(int cn, int in)
 	{
 		bu[in].reserve[0] = min(80, 15 + power/5); // Hitpoints
 		power = ch[cn].reserve[0];
-		power = more(power, ch[co].hp[5] * n, 100);
+		power = more(power, ch[cn].hp[5] * n, 100);
 		bu[in].dmg_reduction = power*4/3;
 		bu[in].dmg_bonus     = power*2/3;
 	}
@@ -12982,7 +12980,7 @@ void do_update_permaspells(int cn)
 	}
 }
 
-void do_pulse_tick(int cn, int co, int in)
+void do_pulse_tick(int cn, int in)
 {
 	int xf, yf,	xt, yt, xc, yc, x, y, co, n, idx;
 	int r = get_aoe_radius(cn, SK_PULSE, GET_PROX(cn));
@@ -13896,9 +13894,9 @@ void do_regenerate(int cn)
 			}
 			
 			// Pulse
-			if ((bu[in].temp==SK_PULSE || bu[in].temp==SK_PULSE2) && globs->ticker>bu[in].data[2] && (co = bu[in].data[0]))
+			if ((bu[in].temp==SK_PULSE || bu[in].temp==SK_PULSE2) && globs->ticker>bu[in].data[2] && bu[in].data[0])
 			{
-				do_pulse_tick(cn, co, in);
+				do_pulse_tick(cn, in);
 			}
 			
 			// Blue pills in lab 7

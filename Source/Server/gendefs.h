@@ -424,6 +424,7 @@
 #define GLVDICE		4
 
 extern char *at_name[];
+extern char *at_short[];
 
 // -------- Contract Names and Modifiers -------- //
 

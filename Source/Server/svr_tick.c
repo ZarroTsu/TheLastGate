@@ -1888,7 +1888,9 @@ int get_meta_stat_value(int cn, int n)
 				power = has_buff(cn, SK_PACT)?ch[cn].reserve[2]:min(95, min(80, 15+power/5)+ch[cn].reserve[2]);
 			else
 				power = has_buff(cn, SK_PACT)?ch[cn].reserve[0]:min(95, min(80, 15+power/5)+ch[cn].reserve[0]);
-			power = more(power, ch[cn].hp[5] * (T_LYCA_SK(cn,9)*2+TC_SK(cn,105)), 100);  // (Lyca) Wrath
+			
+			power = more(power, ch[cn].hp[5] * (T_LYCA_SK(cn,9)*2 + TC_SK(cn,105)), 100);  // (Lyca) Wrath
+			
 			break;
 		default: break;
 	}

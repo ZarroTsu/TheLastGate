@@ -4494,12 +4494,12 @@ void god_racechange(int co, int temp, int keepstuff)
 		
 		if (ch[co].pandium_floor[2] >= 1 && ch[co].limit_break[0][0] < 5)
 		{
-			chlog(co, "Pandium Floor 1 : FIX");
+			//chlog(co, "Pandium Floor 1 : FIX");
 			for (n=0;n<5;n++) ch[co].limit_break[n][0] = 5;
 		}
 		if (ch[co].pandium_floor[2] >= 2)
 		{
-			chlog(co, "Pandium Floor 2 : OK");
+			//chlog(co, "Pandium Floor 2 : OK");
 			ch[co].hp[2]   += 50;
 			ch[co].mana[2] += 50;
 		}
@@ -4508,7 +4508,7 @@ void god_racechange(int co, int temp, int keepstuff)
 			n = 0;
 			if 		(IS_SEYAN_DU(co)) 	 n = SK_PROX;
 			else if (IS_ARCHTEMPLAR(co)) n = SK_DISPEL;
-			else if (IS_SKALD(co)) 		 n = SK_PRECISION;
+			else if (IS_SKALD(co)) 		 n = SK_FINESSE;
 			else if (IS_WARRIOR(co)) 	 n = SK_GEARMAST;
 			else if (IS_SORCERER(co)) 	 n = SK_MSHIELD;
 			else if (IS_SUMMONER(co)) 	 n = SK_IMMUN;
@@ -4525,12 +4525,12 @@ void god_racechange(int co, int temp, int keepstuff)
 		}
 		if (ch[co].pandium_floor[2] >= 4)
 		{
-			chlog(co, "Pandium Floor 4 : OK");
+			//chlog(co, "Pandium Floor 4 : OK");
 			ch[co].end[0]  += 50;
 		}
 		if (ch[co].pandium_floor[2] >= 5 && ch[co].limit_break[5][0] < 5)
 		{
-			chlog(co, "Pandium Floor 5 : FIX");
+			//chlog(co, "Pandium Floor 5 : FIX");
 			ch[co].limit_break[5][0] = 5;
 		}
 		

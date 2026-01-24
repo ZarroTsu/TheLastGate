@@ -2695,7 +2695,7 @@ int spell_heal(int cn, int co, int power)
 			{
 				// Each stack of heal sickness reduces the spell power by 1/4th
 				tmp = bu[in2].data[1] * 25;
-				tmp = less(tmp, T_BRAV_SK(co, 12)*40, 1)  // (Brav) Resilience
+				tmp = less(tmp, T_BRAV_SK(co, 12)*40, 1);  // (Brav) Resilience
 				
 				healing = healing - (healing * tmp / 100);
 				
@@ -5694,7 +5694,7 @@ int spell_charge(int cn, int co, int power)
 }
 int spell_pulse(int cn, int co, int power, int tarot)
 {
-	int in, len, baselen = 100;
+	int n, in, len, baselen = 100;
 
 	// Book: Damor's Grudge
 	if (do_get_iflag(cn, SF_BOOK_DAMO))
@@ -5845,7 +5845,7 @@ void skill_taunt(int cn)
 
 int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, int dostun, int dr1, int dr2, int weak)
 {
-	int dam, tmp, in;
+	int n, dam, tmp, in;
 	
 	// "Increased" effect
 	{
@@ -5908,7 +5908,7 @@ void skill_leap(int cn, int flag)
 	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
 	int power, numrepeats=0, aoepower, cost, dist, old_dist, cost_dist, cost_pow, tmp, critical, avgdmg=0, hit=0;
 	int co, cc=0, dam, gotrand=0, tmptome=0;
-	int x, y, n, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0;
+	int x, y, n, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0, cooldown = SK_EXH_LEAP;
 	int dist_target=0, same_target=0, dostun=1;
 	int xc, yc, xf, yf, xt, yt, c = 0;
 	int catalog[64] = { 0 };
