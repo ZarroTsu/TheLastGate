@@ -2030,7 +2030,7 @@ int get_meta_stat_value(int cn, int n)
 			else       value = power * DAM_MULT_PULSE / 20;
 			break;
 		case 38: // Pulse Count
-			value = 60*2*100 / (3 * cdlen);
+			value = 60*2*100 / max(1, 3 * cdlen);
 			break;
 		case 39: // Pulse Cooldown					Decimal, 0.00 Seconds
 			value = 6 * cdlen;
@@ -2068,7 +2068,7 @@ int get_meta_stat_value(int cn, int n)
 			value = ch[cn].dmg_reduction;
 			break;
 		case 50: // Effective Hitpoints
-			value = HP_SOFTCAP(cn)*10 / ch[cn].dmg_reduction;
+			value = HP_SOFTCAP(cn)*10 / max(1, ch[cn].dmg_reduction);
 			en_dam = mp_dam = 0;
 			if (T_WARR_SK(cn, 12))                 en_dam +=   30;    // (Warr) Tenacity
 			if (m = TC_SK(cn, 48))                 en_dam += m*15;
@@ -2078,9 +2078,11 @@ int get_meta_stat_value(int cn, int n)
 			if (m = TC_SK(cn, 84))                 mp_dam += m*15;
 			if (do_get_iflag(cn, SF_PREIST))       mp_dam +=   30;    // [Taro] Priestess
 			if (do_get_iflag(cn, SF_EN_TAKEASMA))  mp_dam +=   15;    // [Ench] *Hit* damage taken as mana
-			m = en_dam + mp_dam;
-			en_dam = ( (en_dam * 100)/m * min(90, m) )/100;
-			mp_dam = ( (mp_dam * 100)/m * min(90, m) )/100;
+			if (m = en_dam + mp_dam)
+			{
+				en_dam = ( (en_dam * 100)/m * min(90, m) )/100;
+				mp_dam = ( (mp_dam * 100)/m * min(90, m) )/100;
+			}
 			value = value + en_dam*EN_SOFTCAP(cn)/(ch[cn].dmg_reduction*10);
 			value = value + mp_dam*MP_SOFTCAP(cn)/(ch[cn].dmg_reduction*10);
 			break;
@@ -2150,7 +2152,7 @@ int get_meta_stat_value(int cn, int n)
 			power = M_SK(cn, SK_HEAL);
 			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = more(power, 20, 1);
 			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power = less(power, 50, 1);
-			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power)*1875/SP_DUR_REGEN * 20;
+			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power)*1875/max(1, SP_DUR_REGEN * 20);
 			else                                  value = spell_multiplier(power * 4/5, cn);
 			break;
 		case 74: // Blind Effect											// Flipped to Positive

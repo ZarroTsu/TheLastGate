@@ -493,7 +493,7 @@ void compute_dlight(int xc, int yc)
 				}
 				else
 				{
-					d = 256 / (v * (abs(xc - x) + abs(yc - y)));
+					d = 256 / max(1, v * (abs(xc - x) + abs(yc - y)));
 				}
 				if (d>best)
 				{

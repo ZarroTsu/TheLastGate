@@ -879,9 +879,9 @@ int npc_give(int cn, int co, int in, int money)
 	{
 		// Check each arch skill against the race that is intended to learn it.
 		if (( nr == SK_WARCRY    && !IS_SEYA_OR_ARTM(co) ) || ( nr == SK_PULSE     && !IS_SEYA_OR_ARHR(co) )
-		 || ( nr == SK_LEAP      && !IS_SEYA_OR_SKAL(co) ) || ( nr == SK_LETHARGY  && !IS_SEYA_OR_SORC(co) )
-		 || ( nr == SK_GCMASTERY && !IS_SEYA_OR_SUMM(co) ) || ( nr == SK_ZEPHYR    && !IS_SEYA_OR_WARR(co) )
-		 || ( nr == SK_PRECISION && !IS_SEYA_OR_BRAV(co) ) || ( nr == SK_PACT      && !IS_SEYA_OR_LYCA(co) ))
+		 || ( nr == SK_LEAP      && !IS_SEYA_OR_WARR(co) ) || ( nr == SK_LETHARGY  && !IS_SEYA_OR_SORC(co) )
+		 || ( nr == SK_GCMASTERY && !IS_SEYA_OR_SUMM(co) ) || ( nr == SK_ZEPHYR    && !IS_SEYA_OR_BRAV(co) )
+		 || ( nr == SK_PRECISION && !IS_SEYA_OR_SKAL(co) ) || ( nr == SK_PACT      && !IS_SEYA_OR_LYCA(co) ))
 			canlearn = 0;
 		
 		// Seyan'du can learn any arch skill, but only two!

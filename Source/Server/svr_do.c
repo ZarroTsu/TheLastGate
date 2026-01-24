@@ -9299,10 +9299,11 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	if (do_get_iflag(co, SF_PREIST))                 mp_dam +=   30;    // [Taro] Priestess
 	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
 	
-	n = *en_dam + *mp_dam;
-	
-	*en_dam = dam * ( (*en_dam * 100)/n * min(ALTER_MAX, n) )/10000;
-	*mp_dam = dam * ( (*mp_dam * 100)/n * min(ALTER_MAX, n) )/10000;
+	if (n = *en_dam + *mp_dam)
+	{
+		*en_dam = dam * ( (*en_dam * 100)/n * min(ALTER_MAX, n) )/10000;
+		*mp_dam = dam * ( (*mp_dam * 100)/n * min(ALTER_MAX, n) )/10000;
+	}
 	
 	hp_dam -= *en_dam;
 	hp_dam -= *mp_dam;
@@ -12197,7 +12198,7 @@ void really_update_char(int cn)
 	if (B_SK(cn, SK_PRECISION))
 	{
 		n = T_SKAL_SK(cn, 7)*2 + TC_SK(cn, 31);    // (Skal) Nocturne
-		n = more(skill[SK_PRECISION], n, 20);
+		n = more(skill[SK_PRECISION], M_AT(cn, AT_AGL)*n, 20);
 		
 		critical_b += critical_b * n / PREC_CAP;
 	}
@@ -12745,7 +12746,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 		case SK_WEAKEN:
 			if (!flag) return; // Only effect enemies
 			
-			power = spell_multiplier(M_SK(cn, SK_WEAKEN), cn);
+			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
 			power = more(power, n, 1);
 			
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
@@ -12802,7 +12803,10 @@ void do_skill_aura(int cn, int intemp, int in)
 				if (!IS_PLAYER(co) && ch[co].data[25] != 1) // Prevent from touching npcs that don't want to hurt you atm
 				{
 					idx = cn | (char_id(cn) << 16);
-					for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) if (ch[co].data[n]==idx) break;
+					for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
+					{
+						if (ch[co].data[n]==idx) break;
+					}
 					if (n==MCD_ENEMYZZZ+1) continue;
 				}
 				do_apply_aura(cn, intemp, co, in, 1);
@@ -17908,7 +17912,8 @@ int do_swap_item(int cn, int n)
 				break;
 			case WN_LHAND:
 				if (!(it[tmp].placement & PL_SHIELD))                                         return -1;
-				if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))                        return -1;
+				if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in) 
+					&& !do_get_iflag(cn,SF_WORLD_R))                                          return -1;
 				break;
 			case WN_RHAND:
 				if (!IS_EQWEAPON(tmp) && !(IS_EQSHIELD(tmp) && IS_ARCHTEMPLAR(cn)))           return -1;

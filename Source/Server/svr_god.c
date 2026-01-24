@@ -4323,6 +4323,10 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	ch[co].dir = old.dir;
 
+	ch[co].house_id     = old.house_id;
+	ch[co].house_m      = old.house_m;
+	ch[co].house_layout = old.house_layout;
+	
 	ch[co].temple_x = ch[co].tavern_x = HOME_TEMPLE_X;
 	ch[co].temple_y = ch[co].tavern_y = HOME_TEMPLE_Y;
 

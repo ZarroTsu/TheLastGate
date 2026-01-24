@@ -1259,6 +1259,8 @@ void view_object(LIST *head)
 	printf("<tr><td>Cast Speed:</td><td><input type=text name=cast_speed_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=cast_speed_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].cast_speed[I_I], it_temp[in].cast_speed[I_A]);
 			
+	printf("<tr><td>Spell Bonus:</td><td><input type=text name=spell_pow_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=spell_pow_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it_temp[in].spell_pow[I_I], it_temp[in].spell_pow[I_A]);
 	printf("<tr><td>Spell Mod:</td><td><input type=text name=spell_mod_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=spell_mod_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it_temp[in].spell_mod[I_I], it_temp[in].spell_mod[I_A]);
 	printf("<tr><td>Spell Aptitude:</td><td><input type=text name=spell_apt_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=spell_apt_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
@@ -1566,7 +1568,9 @@ void view_item(LIST *head)
 			it[in].atk_speed[I_I], it[in].atk_speed[I_A]);
 	printf("<tr><td>Cast Speed:</td><td><input type=text name=cast_speed_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=cast_speed_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].cast_speed[I_I], it[in].cast_speed[I_A]);
-			
+	
+	printf("<tr><td>Spell Bonus:</td><td><input type=text name=spell_pow_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=spell_pow_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
+			it[in].spell_pow[I_I], it[in].spell_pow[I_A]);
 	printf("<tr><td>Spell Mod:</td><td><input type=text name=spell_mod_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=spell_mod_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
 			it[in].spell_mod[I_I], it[in].spell_mod[I_A]);
 	printf("<tr><td>Spell Aptitude:</td><td><input type=text name=spell_apt_1 value=\"%d\" size=10 maxlength=10></td><td><input type=text name=spell_apt_2 value=\"%d\" size=10 maxlength=10></td></tr>\n",
@@ -3208,6 +3212,28 @@ void update_object(LIST *head)
 	else
 	{
 		printf("cast_speed_2 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "spell_pow_1");
+	if (tmp)
+	{
+		it_temp[in].spell_pow[I_I] = atoi(tmp);
+	}
+	else
+	{
+		printf("spell_pow_1 not specified.\n");
+		return;
+	}
+	
+	tmp = find_val(head, "spell_pow_2");
+	if (tmp)
+	{
+		it_temp[in].spell_pow[I_A] = atoi(tmp);
+	}
+	else
+	{
+		printf("spell_pow_2 not specified.\n");
 		return;
 	}
 	
