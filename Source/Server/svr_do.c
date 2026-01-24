@@ -3743,7 +3743,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	int n, m, t, page = 1, ex = 0;
 	int ast = 1, liz = 0, nei = 0, ars = 0, arc = 0, nlb = 0, nrb = 0;
 	int spi = 0, sp2 = 0, sco = 0, sc2 = 0, sc3 = 0, gre = 0, bla = 0, hou = 0, dmr = 0, coc = 0, flo = 0;
-	int quest1[28]={0};
+	int quest1[30]={0};
 	int quest2[32]={0}; // ch[cn].data[72]
 	int quest3[32]={0}; // ch[cn].data[94]
 	int questP[32]={0}; // ch[cn].data[20]
@@ -3759,13 +3759,15 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if (strcmp(topic, "9")==0) page = 9;
 	
 	if (B_SK(cn, SK_ECONOM))															quest1[ 0] = 1;	// ( Jamil )
-	if (IS_ANY_MERC(cn) || IS_ANY_HARA(cn) || B_SK(cn, SK_TAUNT))						quest1[ 1] = 1;	// ( Inga )
+	if (IS_BRAVER(cn)   || IS_ANY_MERC(cn) || IS_ANY_HARA(cn) || B_SK(cn, SK_TAUNT))	quest1[ 1] = 1;	// ( Inga )
 	if (IS_BRAVER(cn)   || IS_ANY_HARA(cn) || IS_ANY_TEMP(cn) || B_SK(cn, SK_POISON))	quest1[24] = 1;	// ( Inga )
 	if (IS_BRAVER(cn)||IS_LYCANTH(cn)||IS_ANY_TEMP(cn)||IS_ANY_MERC(cn)||B_SK(cn, SK_STAFF)) quest1[25] = 1;	// ( Inga )
+	if (!IS_BRAVER(cn)  || B_SK(cn, SK_MSHIELD)) 										quest1[28] = 1;	// ( Inga )
 	if (IS_BRAVER(cn)   || IS_ANY_TEMP(cn) || B_SK(cn, SK_ENHANCE))						quest1[ 2] = 1;	// ( Sirjan )
 	if (IS_ANY_MERC(cn)||IS_LYCANTH(cn)|| IS_ANY_HARA(cn)||B_SK(cn, SK_MSHIELD))		quest1[ 3] = 1;	// ( Sirjan )
-	if (IS_ANY_MERC(cn) || IS_ANY_HARA(cn) || B_SK(cn, SK_WEAKEN))						quest1[ 4] = 1;	// ( Amity )
+	if (IS_BRAVER(cn)   || IS_ANY_MERC(cn) || IS_ANY_HARA(cn) || B_SK(cn, SK_WEAKEN))	quest1[ 4] = 1;	// ( Amity )
 	if (IS_BRAVER(cn)   || IS_ANY_TEMP(cn) || B_SK(cn, SK_SLOW))						quest1[ 5] = 1;	// ( Amity )
+	if (!IS_BRAVER(cn)  || B_SK(cn, SK_CURSE))											quest1[29] = 1;	// ( Amity )
 	if (B_SK(cn, SK_REPAIR))															quest1[ 6] = 1;	// ( Jefferson )
 	if (ch[cn].flags & CF_LOCKPICK)														quest1[ 7] = 1;	// ( Steven )
 	if (IS_BRAVER(cn)   || IS_ANY_HARA(cn)	|| B_SK(cn, SK_IMMUN))						quest1[ 8] = 1;	// ( Ingrid )
@@ -3852,10 +3854,12 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_quest(cn, flag, page, m,   1, quest1[ 1],  1, "Inga",     "First Street", "*Taunt",      200);
 	m = display_quest(cn, flag, page, m,   1, quest1[24],  1, "Inga",     "First Street", "*Poison",     200);
 	m = display_quest(cn, flag, page, m,   1, quest1[25],  1, "Inga",     "First Street", "*Staff",      200);
+	m = display_quest(cn, flag, page, m,   1, quest1[28],  1, "Inga",     "First Street", "*Magic S",    200);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 2],  1, "Sirjan",   "First Street", "*Enhance",    300);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 3],  1, "Sirjan",   "First Street", "*Magic S",    300);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 4],  2, "Amity",    "Lynbore Libr", "*Weaken",     450);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 5],  2, "Amity",    "Lynbore Libr", "*Slow",       450);
+	m = display_quest(cn, flag, page, m,   1, quest1[29],  2, "Amity",    "Lynbore Libr", "*Curse",      450);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 6],  2, "Jefferso", "Second Stree", "*Repair",     600);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 7],  2, "Steven",   "Second Stree", "*Lockpic",    800);
 	m = display_quest(cn, flag, page, m,   1, quest1[ 8],  3, "Ingrid",   "Castle Way",   "*Immunit",   1000);

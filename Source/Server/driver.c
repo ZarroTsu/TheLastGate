@@ -839,10 +839,10 @@ int convert_skill_for_group(int co, int nr)
 	}
 	if (IS_BRAVER(co))
 	{
-		if (nr == SK_ENHANCE) nr = SK_MSHIELD;  // Enhance -> MShield
-		if (nr == SK_SLOW)    nr = SK_WEAKEN;   // Slow    -> Weaken
-		if (nr == SK_IMMUN)   nr = SK_DISPEL; 	// Immun   -> Dispel
+		if (nr == SK_TAUNT)   nr = SK_MSHIELD;  // Taunt   -> MShield
 		if (nr == SK_CURSE)   nr = SK_SURROUND; // Curse   -> Surround
+		if (nr == SK_SLOW)    nr = SK_CURSE;    // Slow    -> Curse
+		if (nr == SK_IMMUN)   nr = SK_DISPEL;   // Immun   -> Dispel
 	}
 	if (IS_SEYAN_DU(co))
 	{
@@ -2272,6 +2272,13 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Greetings, %s.", ch[co].name);
 				}
+				else if (IS_BRAVER(co))
+				{
+					if (!B_SK(co, SK_MSHIELD))
+						do_sayx(cn, "Greetings, %s. I was attacked and lost my Stone Dagger in the park across the street. If you could return it, I'd teach you MAGIC SHIELD.", ch[co].name);
+					else
+						do_sayx(cn, "Greetings, %s.", ch[co].name);
+				}
 				else if (IS_ANY_TEMP(co) || IS_BRAVER(co) || (IS_SEYAN_DU(co) && !B_SK(co, SK_TAUNT)))
 				{
 					if (!B_SK(co, SK_TAUNT))
@@ -2296,7 +2303,7 @@ int npc_see(int cn, int co)
 			}
 			else if (strcmp(ch[cn].text[2], "#skill03")==0) //    18/38	* EW or WM			( Sirjan )
 			{
-				if (IS_ANY_TEMP(co) || IS_BRAVER(co))
+				if (IS_ANY_TEMP(co))
 				{
 					if (!B_SK(co, SK_MSHIELD))
 						do_sayx(cn, "Hello, %s. There is an ancient weapon hiding in the cursed tomb past the crossroad. Bring it to me and I shall teach you MAGIC SHIELD.", ch[co].name);
@@ -2321,8 +2328,14 @@ int npc_see(int cn, int co)
 					else
 						do_sayx(cn, "Hello, %s! Thanks again!", ch[co].name);
 				}
-				else if (IS_ANY_TEMP(co) || IS_BRAVER(co) 
-					|| (IS_SEYAN_DU(co) && B_SK(co, SK_SLOW)))
+				else if (IS_BRAVER(co))
+				{
+					if (!B_SK(co, SK_CURSE))
+						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you CURSE.", ch[co].name);
+					else
+						do_sayx(cn, "Hello, %s! Thanks again!", ch[co].name);
+				}
+				else if (IS_ANY_TEMP(co) || (IS_SEYAN_DU(co) && B_SK(co, SK_SLOW)))
 				{
 					if (!B_SK(co, SK_WEAKEN))
 						do_sayx(cn, "Hello, %s. Crazed Harakim have taken over the library, and stole a precious belt from me. Return it, and I shall teach you WEAKEN.", ch[co].name);

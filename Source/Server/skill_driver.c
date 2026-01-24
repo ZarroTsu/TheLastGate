@@ -3519,6 +3519,11 @@ void item_info(int cn, int in, int look)
 		do_char_log(cn, 1, ITEM_INFO_MSG2,
 		"Cast Speed", it[in].cast_speed[I_I]+it[in].cast_speed[I_P], it[in].cast_speed[I_A]+it[in].cast_speed[I_P]);
 	}
+	if (it[in].spell_pow[I_I] || it[in].spell_pow[I_A] || it[in].spell_pow[I_P])
+	{
+		do_char_log(cn, 1, ITEM_INFO_MSG2,
+		"Spell Bonus", it[in].spell_pow[I_I]+it[in].spell_pow[I_P], it[in].spell_pow[I_A]+it[in].spell_pow[I_P]);
+	}
 	if (it[in].spell_mod[I_I] || it[in].spell_mod[I_A] || it[in].spell_mod[I_P])
 	{
 		do_char_log(cn, 1, ITEM_INFO_MSG2,
