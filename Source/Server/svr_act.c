@@ -102,7 +102,7 @@ void step_oppressed(int cn, int fl)
 {
 	int in, m;
 	
-	if (in = has_buff(cn, SK_OPPRESSED2))
+	if ((in = has_buff(cn, SK_OPPRESSED2)))
 	{
 		if (bu[in].power != fl)
 		{
@@ -135,12 +135,12 @@ void step_oppressed(int cn, int fl)
 
 void step_dw(int cn)
 {
-	int x, y, m, co, in=0, in2=0, rank, base;
+	int x, y, m, in=0, in2=0;
 	
 	if (!IS_SANEPLAYER(cn)) return;
 	if (ch[cn].flags & CF_INVISIBLE) return;
 	
-	if (in = has_buff(cn, SK_DWLIGHT)) { ; }
+	if ((in = has_buff(cn, SK_DWLIGHT))) ;
 	else
 	{
 		if (has_buff(cn, SK_LIGHT)) remove_buff(cn, SK_LIGHT);
@@ -232,8 +232,10 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 				x_offset = to_x = (ch[cn].x - ch[cn].frx);
 				y_offset = to_y = (ch[cn].y - ch[cn].fry);
 				
-				if (to_x>1) to_x=1; if (to_x<-1) to_x=-1;
-				if (to_y>1) to_y=1; if (to_y<-1) to_y=-1;
+				if (to_x> 1) to_x= 1;
+				if (to_x<-1) to_x=-1;
+				if (to_y> 1) to_y= 1;
+				if (to_y<-1) to_y=-1;
 				
 				x = ch[cn].x + to_x;
 				y = ch[cn].y + to_y;
@@ -317,13 +319,15 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 		}
 		else if (IS_SANEPLAYER(cn) || IS_PLAYER_COMP(cn))
 		{
-			if (IS_IN_SUN(ch[cn].x, ch[cn].y)) 				step_desertfloor(cn); // Heatstroke for lab 6 & Volcano
-			else if (IS_IN_VANTA(ch[cn].x, ch[cn].y)) 		step_vantablack(cn);
-			//else if (n = IS_IN_ABYSS(ch[cn].x, ch[cn].y))	step_oppressed(cn, n);
-			else if (IS_IN_DW(ch[cn].x, ch[cn].y))			step_dw(cn);
-			else if (n = IS_IN_AQUE(ch[cn].x, ch[cn].y))	step_oppressed(cn, n);
+			x = ch[cn].x;
+			y = ch[cn].y;
+			if (IS_IN_SUN(x, y))                step_desertfloor(cn); // Heatstroke for lab 6 & Volcano
+			else if (IS_IN_VANTA(x, y))         step_vantablack(cn);
+			else if (IS_IN_DW(x, y))            step_dw(cn);
+			else if ((n = IS_IN_AQUE(x, y)))    step_oppressed(cn, n);
+			//else if ((n = IS_IN_ABYSS(x, y))) step_oppressed(cn, n);
 		}
-
+		
 		if ((map[m].flags & MF_TAVERN) && (ch[cn].flags & (CF_PLAYER)))
 		{
 			if (IS_BUILDING(cn))
@@ -597,7 +601,7 @@ void plr_attack(int cn, int surround)
 
 void plr_give(int cn)
 {
-	int co, x, y, in;
+	int co, x, y;
 
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 
@@ -722,7 +726,7 @@ void plr_pickup(int cn)
 		// Loop through and check if the item can be stacked with any existing item on the current page
 		for (n = 0; n<MAXITEMS; n++) 
 		{
-			if (in2 = ch[cn].item[n])
+			if ((in2 = ch[cn].item[n]))
 			{
 				if (god_stack_items(in, in2)==1) // All the picked-up items got stacked to an existing slot
 				{
@@ -774,33 +778,33 @@ void plr_wave(int cn)
 
 void plr_use(int cn)
 {
-	int m, in, x, y;
+	int m, in; //, x, y;
 
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 
 	if (ch[cn].dir==DX_UP && ch[cn].y>0)
 	{
 		m = ch[cn].x + ch[cn].y * MAPX - MAPX;
-		x = ch[cn].x;
-		y = ch[cn].y - 1;
+//		x = ch[cn].x;
+//		y = ch[cn].y - 1;
 	}
 	else if (ch[cn].dir==DX_DOWN && ch[cn].y<MAPY - 1)
 	{
 		m = ch[cn].x + ch[cn].y * MAPX + MAPX;
-		x = ch[cn].x;
-		y = ch[cn].y + 1;
+//		x = ch[cn].x;
+//		y = ch[cn].y + 1;
 	}
 	else if (ch[cn].dir==DX_LEFT && ch[cn].x>0)
 	{
 		m = ch[cn].x + ch[cn].y * MAPX - 1;
-		x = ch[cn].x - 1;
-		y = ch[cn].y;
+//		x = ch[cn].x - 1;
+//		y = ch[cn].y;
 	}
 	else if (ch[cn].dir==DX_RIGHT && ch[cn].x<MAPX - 1)
 	{
 		m = ch[cn].x + ch[cn].y * MAPX + 1;
-		x = ch[cn].x + 1;
-		y = ch[cn].y;
+//		x = ch[cn].x + 1;
+//		y = ch[cn].y;
 	}
 	else
 	{
@@ -832,7 +836,7 @@ void plr_skill(int cn)
 
 void plr_drop(int cn)
 {
-	int m, in, x, y, tmp, money = 0, in2;
+	int m, in, x, y, tmp, /*money = 0,*/ in2;
 
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
 
@@ -953,8 +957,8 @@ void plr_drop(int cn)
 			strcpy(it[in].description, "A lonely silver coin");
 			it[in].sprite[I_I] = 37;
 		}
-		money = 1;
-
+//		money = 1;
+		
 		chlog(cn, "Dropped %dG %dS", tmp / 100, tmp % 100);
 	}
 	else
@@ -2136,10 +2140,8 @@ void act_use(int cn)            // get the object in front of the character
 	}
 }
 
-void act_drop(int cn)           // drops the current object in front of the character
+void act_drop(int cn)  // drops the current object in front of the character
 {
-	int in;
-	
 	ch[cn].cerrno = ERR_NONE;
 
 	if (!do_char_can_flee(cn) || (ch[cn].flags & CF_SIMPLE))

@@ -306,28 +306,28 @@ void plr_challenge(int nr)
 
 void plr_perf_report(int nr)
 {
-	int ticksize, _idle, skip; //,cn;
-//      float kbps;
-
-	ticksize = *(unsigned short*)(player[nr].inbuf + 1);
-	skip  = *(unsigned short*)(player[nr].inbuf + 3);
-	_idle = *(unsigned short*)(player[nr].inbuf + 5);
-//      kbps=*(float *)(player[nr].inbuf+7);
-
+//	int ticksize, _idle, skip; //,cn;
+//	float kbps;
+	
+//	ticksize = *(unsigned short*)(player[nr].inbuf + 1);
+//	skip  = *(unsigned short*)(player[nr].inbuf + 3);
+//	_idle = *(unsigned short*)(player[nr].inbuf + 5);
+//	kbps=*(float *)(player[nr].inbuf+7);
+	
 	player[nr].lasttick = globs->ticker;      // update timeout
+	
+//	plog(nr,"ticksize=%3d, %2d%% skip, %2d%% idle, %2.2fkBps",
+//		ticksize,skip,_idle,kbps);
 
-//      plog(nr,"ticksize=%3d, %2d%% skip, %2d%% idle, %2.2fkBps",
-//              ticksize,skip,_idle,kbps);
-
-/*      cn=player[nr].usnr;
-        if (cn) {
-                chlog(cn,"HP=%d/%d End=%d/%d, Mana=%d/%d, Exp=%d/%d, TS=%d, SK=%d%% ID=%d%%",
-                        ch[cn].a_hp/1000,ch[cn].hp[5],
-                        ch[cn].a_end/1000,ch[cn].end[5],
-                        ch[cn].a_mana/1000,ch[cn].mana[5],
-                        ch[cn].points,ch[cn].points_tot,
-                        ticksize,skip,_idle);
-        }*/
+/*	cn=player[nr].usnr;
+	if (cn) {
+		chlog(cn,"HP=%d/%d End=%d/%d, Mana=%d/%d, Exp=%d/%d, TS=%d, SK=%d%% ID=%d%%",
+			ch[cn].a_hp/1000,ch[cn].hp[5],
+			ch[cn].a_end/1000,ch[cn].end[5],
+			ch[cn].a_mana/1000,ch[cn].mana[5],
+			ch[cn].points,ch[cn].points_tot,
+			ticksize,skip,_idle);
+	}*/
 }
 
 void plr_unique(int nr)
@@ -1105,14 +1105,14 @@ void plr_cmd_motd(int nr)
 
 void plr_cmd_bsshop(int nr)
 {
-	int cn, co, n;
-
-	co = *(unsigned short*)(player[nr].inbuf + 1);
-	n = *(unsigned short*)(player[nr].inbuf + 3);
-
-	cn = player[nr].usnr;
-
-	/* do_shop_char(cn, co, n); */
+//	int cn, co, n;
+//	
+//	co = *(unsigned short*)(player[nr].inbuf + 1);
+//	n = *(unsigned short*)(player[nr].inbuf + 3);
+//	
+//	cn = player[nr].usnr;
+//	
+//	/* do_shop_char(cn, co, n); */
 }
 
 void plr_cmd_look_item(int nr)
@@ -1458,7 +1458,7 @@ void cl_list(void)
 {
 	int n, m = 0, tot = 0;
 
-	for (n = 0; n<256; n++)
+	for (n = 0; n<255; n++)
 	{
 		tot += clcmd[n];
 		if (clcmd[n]>m)
@@ -1467,7 +1467,7 @@ void cl_list(void)
 		}
 	}
 
-	for (n = 0; n<256; n++)
+	for (n = 0; n<255; n++)
 	{
 		if (clcmd[n]>m / 16)
 		{
@@ -1475,6 +1475,8 @@ void cl_list(void)
 		}
 	}
 }
+
+void plr_update_all_meta_terminology(int nr);
 
 // dispatch command.
 void plr_cmd(int nr)
@@ -1570,7 +1572,7 @@ void char_add_net(int cn, unsigned int net)
 
 void char_remove_net(int cn, int co)
 {
-	int n, m;
+	int n;
 	
 	if (co<=0 || co>=MAXCHARS || !IS_SANECHAR(co))
 	{
@@ -1789,12 +1791,13 @@ void plr_update_all_skill_terminology(int nr)
 
 int get_meta_stat_value(int cn, int n)
 {
-	int m, in = 0, power, durat, value = -1, cdlen = 100;
+	int m, in = 0, power=0, durat=0, value = -1, cdlen = 100;
 	int hpmult, endmult, manamult, moonmult = 20;
 	int race_reg = 0, race_res = 0, race_med = 0;
-	int dmg_wpn, dmg_low, dmg_hgh, dmg_top, dmg_hit, dmg_dps, dmg_bns, dmg_str;
+	int dmg_wpn=0, dmg_low=0, dmg_hgh=0, dmg_top=0;
+	int dmg_hit=0, dmg_dps=0, dmg_bns=0, dmg_str=0;
 	int regen = 0, restn = 0, medit = 0;
-	int hpbonus, enbonus, mpbonus, en_dam, mp_dam;
+	int en_dam, mp_dam;
 	
 	switch (n) // Regen set
 	{
@@ -1825,7 +1828,7 @@ int get_meta_stat_value(int cn, int n)
 			restn = race_res + endmult  * 3;
 			medit = race_med + manamult * 1;
 			
-			if (in = ch[cn].worn[WN_NECK]) switch (it[in].temp)
+			if ((in = ch[cn].worn[WN_NECK])) switch (it[in].temp)
 			{
 				case IT_ANKHAMULET: regen += (race_reg/ 8); restn += (race_res/ 8); medit += (race_med/ 8); break;
 				case IT_AMBERANKH:  regen += (race_reg/ 4); restn += (race_res/12); medit += (race_med/12); break;
@@ -1834,7 +1837,7 @@ int get_meta_stat_value(int cn, int n)
 				case IT_TRUEANKH:   regen += (race_reg/ 4); restn += (race_res/ 4); medit += (race_med/ 4); break;
 				default: break;
 			}
-			if (in = get_gear(cn, IT_RINGWARMTH) && it[in].active)
+			if ((in = get_gear(cn, IT_RINGWARMTH)) && it[in].active)
 			{ regen += (race_reg/ 8); restn += (race_res/ 8); medit += (race_med/ 8); }
 			break;
 		default: break;
@@ -2071,14 +2074,14 @@ int get_meta_stat_value(int cn, int n)
 			value = HP_SOFTCAP(cn)*10 / max(1, ch[cn].dmg_reduction);
 			en_dam = mp_dam = 0;
 			if (T_WARR_SK(cn, 12))                 en_dam +=   30;    // (Warr) Tenacity
-			if (m = TC_SK(cn, 48))                 en_dam += m*15;
+			if ((m=TC_SK(cn, 48)))                 en_dam += m*15;
 			if (do_get_iflag(cn, SF_TW_CLOAK))     en_dam +=   15;    // [Gear] Cloak of Shadows
 			if (do_get_iflag(cn, SF_EN_TAKEASEN))  en_dam +=   15;    // [Ench] *DoT* damage taken as endurance
 			if (T_ARHR_SK(cn, 12))                 mp_dam +=   30;    // (ArHr) Resourcefulness
-			if (m = TC_SK(cn, 84))                 mp_dam += m*15;
+			if ((m=TC_SK(cn, 84)))                 mp_dam += m*15;
 			if (do_get_iflag(cn, SF_PREIST))       mp_dam +=   30;    // [Taro] Priestess
 			if (do_get_iflag(cn, SF_EN_TAKEASMA))  mp_dam +=   15;    // [Ench] *Hit* damage taken as mana
-			if (m = en_dam + mp_dam)
+			if ((m = en_dam + mp_dam))
 			{
 				en_dam = ( (en_dam * 100)/m * min(90, m) )/100;
 				mp_dam = ( (mp_dam * 100)/m * min(90, m) )/100;
@@ -2276,7 +2279,7 @@ void plr_update_meta_stat_values(int nr, int n)
 	if (metaStats[n].sknum == -2) m = 0;
 	else if (metaStats[n].sknum == -1) m = 1;
 	else if (metaStats[n].sknum == SK_IMMOLATE) { if (IS_WEARINGPHOENIX(cn)) m = 1; else m = 0; }
-	else if (metaStats[n].sknum >=0 && metaStats[n].sknum < 50 && B_SK(cn, metaStats[n].sknum)) m = 1;
+	else if (metaStats[n].sknum >=0 && metaStats[n].sknum < 50 && B_SK(cn, (int)(metaStats[n].sknum))) m = 1;
 	
 	*(unsigned char*)(buf +15) = (unsigned char)(m);
 	
@@ -2320,7 +2323,7 @@ void plr_update_all_meta_terminology(int nr)
 
 void plr_newlogin(int nr)
 {
-	int cn, temp, tmp, in, n;
+	int cn, temp, tmp, in;
 	unsigned char buf[16];
 
 	if (player[nr].version<MINVERSION)
@@ -2500,7 +2503,7 @@ void plr_login(int nr)
 		return;
 	}
 
-	if (ch[cn].pass1!=player[nr].pass1 || ch[cn].pass2!=ch[cn].pass2)
+	if (ch[cn].pass1!=player[nr].pass1 || ch[cn].pass2!=player[nr].pass2)
 	{
 		plog(nr, "Login as %s denied (pass1/pass2)", ch[cn].name);
 		plr_logout(0, nr, LO_PASSWORD);
@@ -3235,12 +3238,11 @@ int cl_light_seven(int n, int dosend, struct cmap *cmap, struct cmap *smap)
 // check for any changed values in player data and send them to the client
 void plr_change(int nr)
 {
-	int cn, n, m, in, p, lastn = -1;
+	int cn, n, in, p, lastn = -1;
 	struct cplayer *cpl;
 	struct cmap *cmap;
 	struct cmap *smap;
 	unsigned char buf[256];
-	int chFlags=0;
 	int spr, ss, en, cr, stack;
 	char areaname[40];
 
@@ -3284,7 +3286,6 @@ void plr_change(int nr)
 		plr_change_power(nr, cpl->hp, ch[cn].hp, SV_SETCHAR_HP);
 		plr_change_power(nr, cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
 		plr_change_power(nr, cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
-		
 		
 		for (n = 0; n<MAXSKILL; n++)
 		{
@@ -3930,7 +3931,7 @@ void char_play_sound(int cn, int sound, int vol, int pan)
 	xsend(nr, buf, 13);
 }
 
-inline int do_char_calc_light(int cn, int light)
+int do_char_calc_light(int cn, int light)
 {
 	int val, infv = 5;
 	
@@ -3983,7 +3984,7 @@ inline int do_char_calc_light(int cn, int light)
 		val = infv;
 	}
 
-	return(val);
+	return (val);
 }
 
 inline int check_dlight(int x, int y)
@@ -4881,7 +4882,7 @@ int check_valid(int cn)
 
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		if (in = ch[cn].item[n])
+		if ((in = ch[cn].item[n]))
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
@@ -4893,7 +4894,7 @@ int check_valid(int cn)
 	}
 	for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 	{
-		if (in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])
+		if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]))
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
@@ -4905,7 +4906,7 @@ int check_valid(int cn)
 
 	for (n = 0; n<20; n++)
 	{
-		if (in = ch[cn].worn[n])
+		if ((in = ch[cn].worn[n]))
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
@@ -4917,7 +4918,7 @@ int check_valid(int cn)
 	
 	for (n = 0; n<12; n++)
 	{
-		if (in = ch[cn].alt_worn[n])
+		if ((in = ch[cn].alt_worn[n]))
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
@@ -4929,7 +4930,7 @@ int check_valid(int cn)
 	
 	for (n = 0; n<4; n++)
 	{
-		if (in = ch[cn].blacksmith[n])
+		if ((in = ch[cn].blacksmith[n]))
 		{
 			if (it[in].carried!=cn || it[in].used!=USE_ACTIVE)
 			{
@@ -4941,7 +4942,7 @@ int check_valid(int cn)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if (in = ch[cn].spell[n])
+		if ((in = ch[cn].spell[n]))
 		{
 			if (bu[in].carried!=cn || bu[in].used!=USE_ACTIVE)
 			{
@@ -4967,11 +4968,11 @@ int check_valid(int cn)
 
 void check_expire(int cn)
 {
-	int erase = 0, t, year, week, day;
+	int erase = 0, t, /*year,*/ week, day;
 	
 	day   = 60*60*24;
 	week  = day*7;
-	year  = day*365;
+//	year  = day*365;
 
 	t = time(NULL);
 	

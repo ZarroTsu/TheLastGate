@@ -394,7 +394,7 @@ void discord_pandium(void)
 
 void discord_who(void)
 {
-	int n, players, gc, font, showarea;
+	int n, players, font, showarea;
 	
 	// open Discord files
 	discordWho = fopen("who.txt", "w");
@@ -501,7 +501,7 @@ void discord_ranked(char *text)
 {
 	discordRanked = fopen("ranked.txt", "w");
 	fprintf(discordRanked, "```diff\n");
-	fprintf(discordRanked, text);
+	fprintf(discordRanked, "%s", text);
 	fprintf(discordRanked, "```\n");
 	fflush(discordRanked);
 	fclose(discordRanked);
@@ -1293,22 +1293,24 @@ void prof_stop(int task, unsigned long long cycle)
 void tmplabcheck(int in)
 {
 	int cn;
-
+	
+	if (!in) return;
+	
 	// carried by a player?
 	if (!(cn = it[in].carried) | !IS_SANEPLAYER(cn))
 	{
 		return;
 	}
-
+	
 	// player is inside a lab?
 	if (ch[cn].temple_x!=512 && ch[cn].temple_x!=558 && ch[cn].temple_x!=813)
 	{
 		return;
 	}
-
+	
 	god_take_from_char(in, cn);
 	it[in].used = USE_EMPTY;
-
+	
 	chlog(cn, "Removed Lab Item %s", it[in].name);
 }
 
@@ -1316,7 +1318,7 @@ int see_hit = 0, see_miss = 0;
 
 int main(int argc, char *args[])
 {
-	int sock, n, m, one = 1, doleave = 0, ltimer = 0;
+	int sock, n, one = 1, doleave = 0, ltimer = 0;
 	struct sockaddr_in addr;
 	int pidfile;
 	char pid_str[10];

@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "server.h"
 #include "driver.h"
@@ -185,9 +186,9 @@ int npc_add_enemy(int cn, int co, int always)
 	}
 	
 	// Group check for GCs
-	if (!IS_THRALL(cn) &&
+	if (!IS_THRALL(cn) && (
 		(!IS_PLAYER(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
-		(!IS_PLAYER(co) && IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]))
+		(!IS_PLAYER(co) && IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]) ))
 	{
 		return 0;
 	}
@@ -477,6 +478,8 @@ int npc_didmiss(int cn, int co)
 {
 	return 0;
 }
+
+void npc_activate_rings(int cn, int flag);
 
 int npc_killed(int cn, int cc, int co)
 {
@@ -977,7 +980,7 @@ int npc_give(int cn, int co, int in, int money)
 			(it[in].temp>=IT_CH_FOOL && it[in].temp<=IT_CH_WORLD) || 
 			(it[in].temp>=IT_CH_FOOL_R && it[in].temp<=IT_CH_WORLD_R) ))
 		{
-			if (in2 = ch[co].worn[WN_CHARM2])
+			if ((in2 = ch[co].worn[WN_CHARM2]))
 			{
 				if (it[in2].temp == it[in].temp)
 				{
@@ -1037,8 +1040,8 @@ int npc_give(int cn, int co, int in, int money)
 			it[in].carried = co;
 			ch[co].citem = in2;
 			ch[co].worn[WN_CHARM] = in;
-			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(n, co, 0);
-			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(n, co, 0);
+			if ((n = ch[co].data[PCD_COMPANION]))  answer_transfer(n, co, 0);
+			if ((n = ch[co].data[PCD_SHADOWCOPY])) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
 			do_swap_send_info(co, in, in2);
 			ch[co].misc_action = DR_IDLE;
@@ -1085,8 +1088,8 @@ int npc_give(int cn, int co, int in, int money)
 			it[in].carried = co;
 			ch[co].citem = in2;
 			ch[co].worn[WN_RRING] = in;
-			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(n, co, 0);
-			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(n, co, 0);
+			if ((n = ch[co].data[PCD_COMPANION]))  answer_transfer(n, co, 0);
+			if ((n = ch[co].data[PCD_SHADOWCOPY])) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
 			ch[co].misc_action = DR_IDLE;
 			return 0;
@@ -1170,10 +1173,10 @@ int npc_give(int cn, int co, int in, int money)
 			do_sayx(cn, "Thank you %s. That's the %s I wanted.", ch[co].name, it[in].reference);
 			use_consume_item(cn, in, 0);
 			// Check for player Chalice item to upgrade, or otherwise award the worst one.
-			if (n = has_item(co, IT_CHALICE3)) nr = IT_CHALICE4;
-			else if (n = has_item(co, IT_CHALICE2)) nr = IT_CHALICE3;
-			else if (n = has_item(co, IT_CHALICE1)) nr = IT_CHALICE2;
-			else nr = IT_CHALICE1;
+			if ((n = has_item(co, IT_CHALICE3)))      nr = IT_CHALICE4;
+			else if ((n = has_item(co, IT_CHALICE2))) nr = IT_CHALICE3;
+			else if ((n = has_item(co, IT_CHALICE1))) nr = IT_CHALICE2;
+			else                                      nr = IT_CHALICE1;
 			//
 			if (!(ch[cn].flags&(CF_BODY)))
 			{
@@ -1353,7 +1356,7 @@ int npc_give(int cn, int co, int in, int money)
 								ch[n].temple_x = ch[n].tavern_x = HOME_TEMPLE_X; 
 								ch[n].temple_y = ch[n].tavern_y = HOME_TEMPLE_Y;
 							}
-							do_char_log(n, 0, "Your #quest list has been updated and will now show quests in Aston.\n", ch[co].name);
+							do_char_log(n, 0, "Your #quest list has been updated and will now show quests in Aston.\n");
 						}
 					}
 					// </group rewards>
@@ -1747,10 +1750,10 @@ int npc_give(int cn, int co, int in, int money)
 					god_give_char(in, co);
 					if (it[in].driver==52)
 					{
-						char buf[300];
+						char buf2[300];
 						it[in].data[0] = co;
-						sprintf(buf, "%s Engraved in it are the letters \"%s\".", it[in].description, ch[co].name);
-						if (strlen(buf)<200) strcpy(it[in].description, buf);
+						sprintf(buf2, "%s Engraved in it are the letters \"%s\".", it[in].description, ch[co].name);
+						if (strlen(buf2)<200) strcpy(it[in].description, buf2);
 					}
 				}
 				if ((nr = ch[cn].data[51])!=0)
@@ -1990,7 +1993,7 @@ int count_uniques(int cn)
 
 int npc_see(int cn, int co)
 {
-	int n, n2, m, idx, indoor1, indoor2;
+	int n, m, idx, indoor1, indoor2;
 	int x1, x2, y1, y2, dist, ret, cnt, cc;
 	unsigned char buf[3];
 
@@ -2151,7 +2154,7 @@ int npc_see(int cn, int co)
 	
 	if (IS_COMP_TEMP(cn) && ch[cn].data[1]>=2 && ((ch[cn].alignment>0 && ch[co].alignment<0) || (ch[cn].alignment<0 && ch[co].alignment>0)))
 	{
-		int mdist, coma, idx2;
+		int coma, idx2;
 
 		if (ch[cn].data[1]==2 && (coma=ch[cn].data[CHD_MASTER])) // Offense Mode
 		{
@@ -2170,7 +2173,7 @@ int npc_see(int cn, int co)
 			}
 		}
 		
-		if (co && npc_add_enemy(cn, co, 1))
+		if (IS_SANECHAR(co) && npc_add_enemy(cn, co, 1))
 		{
 			if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE) && ch[cn].data[55]+TICKS*2<globs->ticker)
 			{
@@ -2629,7 +2632,7 @@ int npc_see(int cn, int co)
 				if (npc_quest_cleared(co, 116))
 					do_sayx(cn, "Ah, %s. Do come in. Stay a while.", ch[co].name);
 				else if (getrank(co)<8) // Serg Major
-					do_sayx(cn, "Please leave.", ch[co].name);
+					do_sayx(cn, "Please leave.");
 				else
 					do_sayx(cn, "Ah, %s. Do come in. I've a request - could you retrive my Sapphire Golden Helmet from the bandits in the Jagged pass? I'd reward you handsomely.", ch[co].name);
 			}
@@ -2976,18 +2979,18 @@ int npc_see(int cn, int co)
 			else if (strcmp(ch[cn].text[2], "#quest159")==0) //   59 - Commander - Aemon
 			{
 				if (npc_quest_cleared(co, 159))
-					do_sayx(cn, "", ch[co].name);
+					do_sayx(cn, "%s", ch[co].name);
 				else if (getrank(co)<20) // Noble
-					do_sayx(cn, "", ch[co].name);
+					do_sayx(cn, "%s", ch[co].name);
 				else
-					do_sayx(cn, "", ch[co].name);
+					do_sayx(cn, "%s", ch[co].name);
 			}
 			else if (strcmp(ch[cn].text[2], "#quest160")==0) //   60 - Calliope - Emerald Catacomb
 			{
 				if (npc_quest_cleared(co, 160))
 					do_sayx(cn, "'Sup, %s!", ch[co].name);
 				else if (getrank(co)<16) // Major General
-					do_sayx(cn, "'Sup, deadbeat.", ch[co].name);
+					do_sayx(cn, "'Sup, deadbeat.");
 				else
 					do_sayx(cn, "'Sup, %s. Past the Emerald Cavern to the north east, they say there's an old catacomb full of lizard remains. A magical emerald sword is said to be in there somewhere... Can you bring it here?", ch[co].name);
 			}
@@ -3021,7 +3024,7 @@ int npc_see(int cn, int co)
 			// 
 			else if (strcmp(ch[cn].text[2], "#blackherbs")==0) //   xx - Zorani - Black Plants
 			{
-				do_sayx(cn, "Greetingsss, human! Pleassse bring me rare, black herbsss from treacherousss placesss. I would pay you very well.", ch[co].name);
+				do_sayx(cn, "Greetingsss, human! Pleassse bring me rare, black herbsss from treacherousss placesss. I would pay you very well.");
 			}
 			else if (strcmp(ch[cn].text[2], "#scorpions")==0) //   xx - Faiza - Scorpions
 			{
@@ -3446,8 +3449,8 @@ int spellflag(int spell)
 
 int npc_try_spell(int cn, int co, int spell)
 {
-	int mana, end, n, in, tmp, cc, truespell, usemana = 0;
-	int offn, defn, tpow, tdef, timm;
+	int mana, end, n, in, tmp, truespell, usemana = 0;
+	int offn, defn, /*tpow,*/ tdef, timm;
 
 	if (spell!=SK_CLEAVE && spell!=SK_SHIELD && spell!=SK_LEAP && spell!=SK_WEAKEN && spell!=SK_TAUNT && 
 		spell!=SK_WARCRY && spell!=SK_BLIND && spell!=SK_PACT)
@@ -3597,7 +3600,7 @@ int npc_try_spell(int cn, int co, int spell)
 	{
 		if ((in = ch[co].spell[n])!=0)
 		{
-			tpow = bu[in].power+15;
+			//tpow = bu[in].power+15;
 			timm = spell_immunity(cn, co, offn);
 			timm = tdef ? (timm/2) : timm;
 			// Cancel if target is already buffed or debuffed (except for heal)
@@ -3708,11 +3711,11 @@ int npc_quaff_potion(int cn, int itemp, int stemp)
 	return 1;
 }
 
-void npc_wedge_this(int cn, int x, int y, int fx, int fy)
+void npc_wedge_this(int cn, int x, int y, int tx, int ty)
 {
 	int in, co = map[XY2M(x, y)].ch;
 	
-	if (co) god_transfer_char(co, fx, fy);
+	if (co) god_transfer_char(co, tx, ty);
 	
 	in = map[XY2M(x, y)].it;
 	it[in].active = 0;
@@ -3731,7 +3734,7 @@ void npc_unwedge_this(int x, int y)
 }
 void npc_wedge_doors(int cn, int flag) // flag = wedge the door!
 {
-	int co, in, x, y;
+	int x, y;
 	
 	switch (ch[cn].data[26])
 	{
@@ -3761,14 +3764,14 @@ void npc_activate_rings(int cn, int flag)
 {
 	int in;
 	
-	if (in = ch[cn].worn[WN_LRING])
+	if ((in = ch[cn].worn[WN_LRING]))
 	{
 		if (flag && !it[in].active)
 			use_driver(cn, in, 1);
 		else if (!flag && it[in].active)
 			use_driver(cn, in, 1);
 	}
-	if (in = ch[cn].worn[WN_RRING])
+	if ((in = ch[cn].worn[WN_RRING]))
 	{
 		if (flag && !it[in].active)
 			use_driver(cn, in, 1);
@@ -3862,6 +3865,8 @@ int is_atpandium(int cn)
 	return 0;
 }
 
+int shiva_activate_candle(int cn, int in, int candlenum);
+
 // special sub-proc for black stronghold mages
 // This is where monsters are spawned and candles are considered
 // Triggers if mana is above 95%, if HP is below 60% and mana is above 30%, or at the times when new candles would generate
@@ -3869,7 +3874,7 @@ void stronghold_mage_driver(int cn)
 {
 	int bscanA, bscanB, bscanC, bscanD, bscanE;
 	int bs_x, bs_y, bs_group, bs_temp, spawn_temp[60], attr_bonus[6] = {0}, wv_bonus[6] = {0}, hp_bonus[6] = {0}, ws_bonus[6] = {0};
-	int n, m, j, in, co, magenum=0, pts=0, modified=0;
+	int n, m, j, in=0, co, magenum=0, pts=0, modified=0;
 	int pinline = 0;
 	char buf[80];
 	
@@ -3914,10 +3919,10 @@ void stronghold_mage_driver(int cn)
 		{
 			if (shiva_activate_candle(cn, in, 0))
 			{
-				if (in = map[bscanB].it) it[in].active = it[in].duration;
-				if (in = map[bscanC].it) it[in].active = it[in].duration;
-				if (in = map[bscanD].it) it[in].active = it[in].duration;
-				if (in = map[bscanE].it) it[in].active = it[in].duration;
+				if ((in = map[bscanB].it)) it[in].active = it[in].duration;
+				if ((in = map[bscanC].it)) it[in].active = it[in].duration;
+				if ((in = map[bscanD].it)) it[in].active = it[in].duration;
+				if ((in = map[bscanE].it)) it[in].active = it[in].duration;
 				for (n = 1; n<MAXCHARS; n++)
 				{
 					if (ch[n].used==USE_EMPTY) continue;
@@ -3958,7 +3963,11 @@ void stronghold_mage_driver(int cn)
 		ch[cn].data[1] = j;
 		
 		// Heal if we're panic-summoning
-		if (ch[cn].a_hp<ch[cn].hp[5]*600) ch[cn].a_mana -= ch[cn].mana[5]*333;	ch[cn].a_hp += ch[cn].hp[5]*500;
+		if (ch[cn].a_hp<ch[cn].hp[5]*600)
+		{
+			ch[cn].a_mana -= ch[cn].mana[5]*333;
+			ch[cn].a_hp   += ch[cn].hp[5]*500;
+		}
 		
 		// If there are less than BS_COUNTER monsters in the given group...
 		if (m<BS_COUNTER+3)
@@ -4602,10 +4611,10 @@ void stronghold_mage_driver_ver2(int cn)
 		{
 			if (shiva_activate_candle(cn, in, 0))
 			{
-				if (in = map[candleB].it) it[in].active = it[in].duration;
-				if (in = map[candleC].it) it[in].active = it[in].duration;
-				if (in = map[candleD].it) it[in].active = it[in].duration;
-				if (in = map[candleE].it) it[in].active = it[in].duration;
+				if ((in = map[candleB].it)) it[in].active = it[in].duration;
+				if ((in = map[candleC].it)) it[in].active = it[in].duration;
+				if ((in = map[candleD].it)) it[in].active = it[in].duration;
+				if ((in = map[candleE].it)) it[in].active = it[in].duration;
 				for (n = 1; n<MAXCHARS; n++)
 				{
 					if (ch[n].used==USE_EMPTY) continue;
@@ -4701,9 +4710,9 @@ void stronghold_mage_driver_ver2(int cn)
 		if (bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m]>0 && 
 			bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m]<11)
 		{
-			if (co = generate_map_enemy(cn, 347, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
+			if ((co = generate_map_enemy(cn, 347, bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][m], 
 				spawnX, spawnY, (magenum*15+(magenum==3?15:0))+ch[cn].data[1]*magenum, 
-				(ch[cn].data[1]>10&&try_boost(20))?2:((ch[cn].data[1]>5&&try_boost(20))?1:0), 0))
+				(ch[cn].data[1]>10&&try_boost(20))?2:((ch[cn].data[1]>5&&try_boost(20))?1:0), 0)))
 			{
 				ch[co].flags |= CF_NOSLEEP;
 				ch[co].data[25] = 2;
@@ -4968,53 +4977,53 @@ void spawn_colosseum_rewards(int x, int y, int diffi, int wave)
 	switch (diffi)
 	{
 		case  1: 	// Standard
-			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] =  125; }
-			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_RPOT; }
-			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] =  250; }
-			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_GPOT; }
-			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] =  375; }
-			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_RD_BRV+RANDOM(5); }
-			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_DAGG_TITN; }
-			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 1; }
+			if (wave>0) { if ((in = build_item(CR_GOLD, x,   y+3))) it[in].data[0] =  125; }
+			if (wave>1) { if ((in = build_item(CR_ITEM, x+1, y+3))) it[in].data[0] = IT_RPOT; }
+			if (wave>2) { if ((in = build_item(CR_GOLD, x-1, y+3))) it[in].data[0] =  250; }
+			if (wave>3) { if ((in = build_item(CR_ITEM, x+2, y+3))) it[in].data[0] = IT_GPOT; }
+			if (wave>4) { if ((in = build_item(CR_GOLD, x-2, y+3))) it[in].data[0] =  375; }
+			if (wave>5) { if ((in = build_item(CR_ITEM, x+3, y+3))) it[in].data[0] = IT_RD_BRV+RANDOM(5); }
+			if (wave>6) { if ((in = build_item(CR_ITEM, x-3, y+3))) it[in].data[0] = IT_DAGG_TITN; }
+			if (wave>6) { if ((in = build_item(CR_AUGM, x-4, y+1))) it[in].data[0] = 1; }
 			break;
 		case  2: 	// Cruel
-			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] =  250; }
-			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_GPOT; }
-			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] =  500; }
-			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_GPOT; }
-			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] =  750; }
-			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_OS_SK; }
-			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_DAGG_DAMA; }
-			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 2; }
+			if (wave>0) { if ((in = build_item(CR_GOLD, x,   y+3))) it[in].data[0] =  250; }
+			if (wave>1) { if ((in = build_item(CR_ITEM, x+1, y+3))) it[in].data[0] = IT_GPOT; }
+			if (wave>2) { if ((in = build_item(CR_GOLD, x-1, y+3))) it[in].data[0] =  500; }
+			if (wave>3) { if ((in = build_item(CR_ITEM, x+2, y+3))) it[in].data[0] = IT_GPOT; }
+			if (wave>4) { if ((in = build_item(CR_GOLD, x-2, y+3))) it[in].data[0] =  750; }
+			if (wave>5) { if ((in = build_item(CR_ITEM, x+3, y+3))) it[in].data[0] = IT_OS_SK; }
+			if (wave>6) { if ((in = build_item(CR_ITEM, x-3, y+3))) it[in].data[0] = IT_DAGG_DAMA; }
+			if (wave>6) { if ((in = build_item(CR_AUGM, x-4, y+1))) it[in].data[0] = 2; }
 			break;
 		case  3: 	// Merciless
-			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] =  500; }
-			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_GPOT; }
-			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] = 1000; }
-			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_SPOT; }
-			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] = 1500; }
-			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_OS_BRV+RANDOM(5); }
-			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_DAGG_ADAM; }
-			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 3; }
+			if (wave>0) { if ((in = build_item(CR_GOLD, x,   y+3))) it[in].data[0] =  500; }
+			if (wave>1) { if ((in = build_item(CR_ITEM, x+1, y+3))) it[in].data[0] = IT_GPOT; }
+			if (wave>2) { if ((in = build_item(CR_GOLD, x-1, y+3))) it[in].data[0] = 1000; }
+			if (wave>3) { if ((in = build_item(CR_ITEM, x+2, y+3))) it[in].data[0] = IT_SPOT; }
+			if (wave>4) { if ((in = build_item(CR_GOLD, x-2, y+3))) it[in].data[0] = 1500; }
+			if (wave>5) { if ((in = build_item(CR_ITEM, x+3, y+3))) it[in].data[0] = IT_OS_BRV+RANDOM(5); }
+			if (wave>6) { if ((in = build_item(CR_ITEM, x-3, y+3))) it[in].data[0] = IT_DAGG_ADAM; }
+			if (wave>6) { if ((in = build_item(CR_AUGM, x-4, y+1))) it[in].data[0] = 3; }
 			break;
 		default: 	// Absurd
-			if (wave>0) { if (in = build_item(CR_GOLD, x,   y+3)) it[in].data[0] = 1000; }
-			if (wave>1) { if (in = build_item(CR_ITEM, x+1, y+3)) it[in].data[0] = IT_SPOT; }
-			if (wave>2) { if (in = build_item(CR_GOLD, x-1, y+3)) it[in].data[0] = 2000; }
-			if (wave>3) { if (in = build_item(CR_ITEM, x+2, y+3)) it[in].data[0] = IT_SPOT; }
-			if (wave>4) { if (in = build_item(CR_GOLD, x-2, y+3)) it[in].data[0] = 3000; }
-			if (wave>5) { if (in = build_item(CR_ITEM, x+3, y+3)) it[in].data[0] = IT_OS_SK; }
-			if (wave>6) { if (in = build_item(CR_ITEM, x-3, y+3)) it[in].data[0] = IT_OS_SK; }
-			if (wave>6) { if (in = build_item(CR_AUGM, x-4, y+1)) it[in].data[0] = 4; }
+			if (wave>0) { if ((in = build_item(CR_GOLD, x,   y+3))) it[in].data[0] = 1000; }
+			if (wave>1) { if ((in = build_item(CR_ITEM, x+1, y+3))) it[in].data[0] = IT_SPOT; }
+			if (wave>2) { if ((in = build_item(CR_GOLD, x-1, y+3))) it[in].data[0] = 2000; }
+			if (wave>3) { if ((in = build_item(CR_ITEM, x+2, y+3))) it[in].data[0] = IT_SPOT; }
+			if (wave>4) { if ((in = build_item(CR_GOLD, x-2, y+3))) it[in].data[0] = 3000; }
+			if (wave>5) { if ((in = build_item(CR_ITEM, x+3, y+3))) it[in].data[0] = IT_OS_SK; }
+			if (wave>6) { if ((in = build_item(CR_ITEM, x-3, y+3))) it[in].data[0] = IT_OS_SK; }
+			if (wave>6) { if ((in = build_item(CR_AUGM, x-4, y+1))) it[in].data[0] = 4; }
 			break;
 	}
 }
 
 void spawn_colosseum_enemy(int cn, int x, int y, int tox, int toy, int parent, int diffi, int wave, int m)
 {
-	int co, try;
+	int co;
 	
-	if (co = generate_map_enemy(cn, 347, col_waves[diffi][wave][m], x, y, col_waves[diffi][wave][4], 0, 3))
+	if ((co = generate_map_enemy(cn, 347, col_waves[diffi][wave][m], x, y, col_waves[diffi][wave][4], 0, 3)))
 	{
 		ch[co].flags |= CF_NOSLEEP;
 		ch[co].kindred |= KIN_MONSTER;
@@ -5033,7 +5042,7 @@ void spawn_colosseum_enemy(int cn, int x, int y, int tox, int toy, int parent, i
 // For the Colosseum NPC(s) to track player progress
 void colosseum_driver(int cn)
 {
-	int n, m=0, i=0, p=0, x, y, anum=0, co=0, try;
+	int n, m=0, i=0, p=0, x, y, anum=0, co=0;
 	static int from_xy[5][5][2] = {
 		{ {735,933},{751,949},{767,933},{751,917} },
 		{ {702,908},{718,924},{734,908},{718,892} },
@@ -5268,7 +5277,7 @@ void spawn_pandium_rewards(int cn, int fl, int x, int y)
 	else if (fl% 5==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_OS_BRV+RANDOM(5);     // Greater attribute scroll
 	else if (fl% 3==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = m;                       // Greater attribute potion
 	else if (fl% 2==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POT_D_HP+RANDOM(3)*6; // Divine potion
-	else if (in = build_item(CR_ITEM, x, y))               it[in].data[0] = IT_OS_SK;                // Greater skill scroll
+	else if ((in = build_item(CR_ITEM, x, y)))             it[in].data[0] = IT_OS_SK;                // Greater skill scroll
 	
 	xlog("Spawned Pandium Rewards for %s with floor value of %d", ch[cn].name, fl);
 }
@@ -5291,7 +5300,7 @@ void pandium_clean(void)
 	
 	for (x = PANDI_X1-1; x<=PANDI_X2+1; x++) for (y = PANDI_Y1-1; y<=PANDI_Y2+1; y++)
 	{
-		if (in = map[x + y * MAPX].it)
+		if ((in = map[x + y * MAPX].it))
 		{
 			do_add_light(x, y, -it[in].light[I_A]);
 			it[in].used = 0;
@@ -5400,9 +5409,9 @@ void pandium_pattern(int fl)
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
-				if ((!((m)>=3 && (n)>=3 && (m)<=13 && (n)<=13)) || (((m)>=4 && (n)>=4 && (m)<=12 && (n)<=12) &&
-					 !((m)>=6 && (n)>=6 && (m)<=10 && (n)<=10)) || (((m)>=7 && (n)>=7 && (m)<= 9 && (n)<= 9) &&
-					 !((m)>=5 && (n)>=5 && (m)<= 5 && (n)<= 5)) && !(m==8 && n==8)) continue;
+				if (((!((m)>=3 && (n)>=3 && (m)<=13 && (n)<=13))  || (((m)>=4 && (n)>=4 && (m)<=12 && (n)<=12) &&
+					  !((m)>=6 && (n)>=6 && (m)<=10 && (n)<=10))  || (((m)>=7 && (n)>=7 && (m)<= 9 && (n)<= 9) &&
+					  !((m)>=5 && (n)>=5 && (m)<= 5 && (n)<= 5))) && !(m==8 && n==8)) continue;
 				make_explode(x, y, dmg);
 			}
 			break;
@@ -6241,7 +6250,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
 			if (IS_PLAYER(n) && is_atpandium(n))
 			{
-				do_char_log(n, 0, "You feel something press down on you.\n", fl);
+				do_char_log(n, 0, "You feel something press down on you.\n");
 				if (has_buff(n, SK_OPPRESSED)) remove_buff(n, SK_OPPRESSED);
 				in = god_create_buff(SK_OPPRESSED);
 				strcpy(bu[in].name, "Oppressed");
@@ -6648,21 +6657,21 @@ void change_the_arena(int v, int frx, int fry, int tox, int toy)
 		if ((in=map[x+y*MAPX].it)!=0 && it[in].driver!=124 && (it[in].flags & IF_LOOK)) { build_remove(x, y); build_drop(x, y, b); }
 		// floor change
 		build_drop(x, y, 0x20000000 | c);
-		if (x> 199&&x<209&&y>1549&&y<1559)	build_drop(x, y, 0x20000000 | d + 0); // carpet
-		if (x==199&&y==1549) 				build_drop(x, y, 0x20000000 | d + 3); // carpet corner
-		if (x==199&&y>1549&&y<1559) 		build_drop(x, y, 0x20000000 | d + 4); // carpet edge
-		if (x==199&&y==1559) 				build_drop(x, y, 0x20000000 | d + 5); // carpet corner
-		if (x> 199&&x<209&&y==1559) 		build_drop(x, y, 0x20000000 | d + 6); // carpet edge
-		if (x==209&&y==1559) 				build_drop(x, y, 0x20000000 | d + 7); // carpet corner
-		if (x==209&&y>1549&&y<1559) 		build_drop(x, y, 0x20000000 | d + 8); // carpet edge
-		if (x==209&&y==1549) 				build_drop(x, y, 0x20000000 | d + 9); // carpet corner
-		if (x> 199&&x<209&&y==1549) 		build_drop(x, y, 0x20000000 | d +10); // carpet edge
+		if (x> 199&&x<209&&y>1549&&y<1559)	build_drop(x, y, 0x20000000 | (d + 0)); // carpet
+		if (x==199&&y==1549) 				build_drop(x, y, 0x20000000 | (d + 3)); // carpet corner
+		if (x==199&&y>1549&&y<1559) 		build_drop(x, y, 0x20000000 | (d + 4)); // carpet edge
+		if (x==199&&y==1559) 				build_drop(x, y, 0x20000000 | (d + 5)); // carpet corner
+		if (x> 199&&x<209&&y==1559) 		build_drop(x, y, 0x20000000 | (d + 6)); // carpet edge
+		if (x==209&&y==1559) 				build_drop(x, y, 0x20000000 | (d + 7)); // carpet corner
+		if (x==209&&y>1549&&y<1559) 		build_drop(x, y, 0x20000000 | (d + 8)); // carpet edge
+		if (x==209&&y==1549) 				build_drop(x, y, 0x20000000 | (d + 9)); // carpet corner
+		if (x> 199&&x<209&&y==1549) 		build_drop(x, y, 0x20000000 | (d +10)); // carpet edge
 	}
 }
 
 void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 {
-	int n, m, x, y, frx, fry, tox, toy, try, co, in, p=0;
+	int n, x, y, frx, fry, tox, toy, try, co, in, p=0;
 	static int go_xy[8][3] = { {211,1554,2},{208,1554,2},{204,1547,4},{204,1550,4},
 							   {197,1554,1},{200,1554,1},{204,1561,3},{204,1558,3} };
 	/*
@@ -6682,7 +6691,9 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 	for (n = 1; n<MAXCHARS; n++)
 	{
 		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
-		if (IS_PLAYER(n) && IS_IN_TLG(ch[n].x, ch[n].y)) { p = n; break; }
+		x = ch[n].x;
+		y = ch[n].y;
+		if (IS_PLAYER(n) && IS_IN_TLG(x, y)) { p = n; break; }
 	}
 	ch[cn].data[0] = p;
 	
@@ -6781,7 +6792,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 				case  2: x = M2X(ch[cn].data[8]); y = (TLG_Y1+1) + ch[cn].data[5]; break;
 				case  3: x = (TLG_X1+1) + ch[cn].data[5]; y = M2Y(ch[cn].data[8]); break;
 				case  4: x = M2X(ch[cn].data[8]); y = (TLG_Y2-1) - ch[cn].data[5]; break;
-				default: break;
+				default: x = 0; y = 0; break;
 			}
 			// Single line sweep
 			if (IS_IN_TLG(x, y) && map[x + y * MAPX].it==0 && (in = build_item(IT_EXPLOSION, x, y)))
@@ -7047,7 +7058,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 
 void npc_lab_lord_driver(int cn)
 {
-	int co, in;
+	int co;
 	
 	if (ch[cn].data[2]==0 && ch[cn].data[0])
 	{
@@ -7074,7 +7085,7 @@ void npc_lab_lord_driver(int cn)
 
 void npc_emperor_driver(int cn)
 {
-	int co, in, n;
+	int co, in;
 	int x = 928, y = 408;
 	
 	if (ch[cn].data[2]==0 && ch[cn].data[0])
@@ -7205,7 +7216,7 @@ void npc_emperor_driver(int cn)
 
 void npc_shivab_driver(int cn)
 {
-	int co, in, n;
+	int co, in;
 	
 	if (ch[cn].data[2]==0)
 	{
@@ -8459,7 +8470,7 @@ int npc_equip_item(int cn, int in)
 int npc_loot_grave(int cn, int in)
 {
 	int co, n;
-
+	
 	if (abs(ch[cn].x - it[in].x) + abs(ch[cn].y - it[in].y)>1 || drv_dcoor2dir(it[in].x - ch[cn].x, it[in].y - ch[cn].y)!=ch[cn].dir)
 	{
 		ch[cn].misc_action  = DR_USE;
@@ -8467,9 +8478,9 @@ int npc_loot_grave(int cn, int in)
 		ch[cn].misc_target2 = it[in].y;
 		return 1;
 	}
-
-	co = it[in].data[0];
-
+	
+	if (!IS_SANECHAR(co = it[in].data[0])) return 0;
+	
 	for (n = 0; n<20; n++)
 	{
 		if ((in = ch[co].worn[n]))
@@ -8484,7 +8495,7 @@ int npc_loot_grave(int cn, int in)
 	}
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		if (in = ch[co].item[n])
+		if ((in = ch[co].item[n]))
 		{
 			if (npc_equip_item(cn, in))
 			{
@@ -8500,7 +8511,7 @@ int npc_loot_grave(int cn, int in)
 			}
 		}
 	}
-
+	
 	if (ch[co].gold)
 	{
 		chlog(cn, "got %.2fG from %s's grave", ch[co].gold / 100.0, ch[co].name);
@@ -8508,7 +8519,7 @@ int npc_loot_grave(int cn, int in)
 		ch[co].gold  = 0;
 		return 1;
 	}
-
+	
 	return 0;
 }
 
@@ -8568,7 +8579,7 @@ int npc_grave_logic(int cn)
 
 void npc_driver_low(int cn)
 {
-	int n, x, y, j, m, in, panic, co;
+	int n, x, y, j, m, in, panic, co=0;
 	int alone = 1;
 
 	if (ch[cn].data[25])    // check for special driver routine
@@ -8871,11 +8882,11 @@ void npc_driver_low(int cn)
 		// Turn off toggles when resting
 		if (ch[cn].a_mana<ch[cn].mana[5]*400 && has_buff(cn, SK_LETHARGY) && !do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
 		{
-			return 1;
+			return;
 		}
 		if (co && ch[cn].a_hp<ch[cn].hp[5]*600 && has_buff(cn, SK_LETHARGY) && do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
 		{
-			return 1;
+			return;
 		}
 		
 		npc_activate_rings(cn, 0);

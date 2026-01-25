@@ -71,13 +71,13 @@ int extend(int handle, long sizereq, size_t sizeone, void*templ)
 /* CS, 991113: Use extend() to extend files where necessary */
 int load(void)
 {
-	int handle, flag = 0;
+	int handle; //, flag = 0;
 	struct map tmap;
 
 	/** MAP **/
 	xlog("Loading MAP: Obj size=%d, file size=%dK", sizeof(struct map), MAPSIZE >> 10);
 	handle = open(DATDIR "/map.dat", O_RDWR);
-	if (handle==-1) { flag = 1; xlog("Building map"); handle = open(DATDIR "/map.dat", O_RDWR | O_CREAT, 0600); }
+	if (handle==-1) { /*flag = 1;*/ xlog("Building map"); handle = open(DATDIR "/map.dat", O_RDWR | O_CREAT, 0600); }
 	bzero(&tmap, sizeof(struct map));
 	tmap.sprite = SPR_GROUND1;
 	if (!extend(handle, MAPSIZE, sizeof(struct map), &tmap)) return -1;

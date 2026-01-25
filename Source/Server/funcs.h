@@ -46,6 +46,7 @@ void pop_save_char(int nr);
 void pop_load_all_chars(void);
 void pop_copy_to_new_items(void);
 //void pop_copy_to_new_chars(void);
+void reset_char(int n);
 
 // -- tick --
 void tick(void);
@@ -294,6 +295,7 @@ void really_update_char(int cn);
 void do_trash(int cn);
 void do_swap_gear(int cn);
 void do_force_recall(int cn);
+void do_give_bspoints(int cn, int p, int gflag);
 
 //-- use --
 void use_activate(int cn, int in, int flag, int carried);
@@ -449,6 +451,8 @@ void item_info(int cn, int in, int look);
 int spell_from_item(int cn, int in2);
 int has_spell(int cn, int temp);
 int has_spell_from_item(int cn, int temp);
+int spell_multiplier(int power, int cn);
+int skill_multiplier(int power, int cn);
 int add_spell(int cn, int in);
 int item_has_player_mods(int in);
 void item_copy_player_mods(struct item *in, struct item *in2);
@@ -517,6 +521,8 @@ void npc_remove_all_enemies(int npc);
 void die_companion(int cn);
 int is_unique_able(int in);
 int is_osiris_weap(int temp);
+void npc_wedge_doors(int cn, int flag);
+void npc_archeologist_low(int cn);
 
 // --- talk ---
 void npc_hear(int cn, int co, char *text);
