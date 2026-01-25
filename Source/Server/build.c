@@ -42,7 +42,7 @@ struct map_tile
 	unsigned char tile[MAP_TILE_SIZE*MAP_TILE_SIZE];
 };
 
-struct map_tile map_tile_a[] = {{
+struct map_tile map_tile_a[] = {
 	{
 		0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,
@@ -1771,9 +1771,9 @@ struct map_tile map_tile_a[] = {{
 		9,9,0,0,0,9,9,
 		9,9,0,0,0,9,9	// BF
 	}
-}};
+};
 
-struct map_tile map_tile_b[] = {{
+struct map_tile map_tile_b[] = {
 	{
 		0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,
@@ -3502,9 +3502,9 @@ struct map_tile map_tile_b[] = {{
 		9,2,0,0,0,2,9,
 		9,9,0,0,0,9,9	// BF
 	}
-}};
+};
 
-struct map_tile map_tile_c[] = {{
+struct map_tile map_tile_c[] = {
 	{
 		0,0,0,0,0,0,0,
 		0,0,0,0,0,0,0,
@@ -5233,7 +5233,7 @@ struct map_tile map_tile_c[] = {{
 		9,2,0,1,0,2,9,
 		9,9,0,0,0,9,9	// BF
 	}
-}};
+};
 
 /*
 	Map layouts to automatically generate a map.
@@ -5245,7 +5245,7 @@ struct map_layout
 	unsigned int cell[MAP_CELL_SIZE*MAP_CELL_SIZE];
 };
 
-struct map_layout map_layout[] = {{
+struct map_layout map_layout[] = {
 	{		
 		0x101,0xA03,0x223,0x012,0x023,0xE03,0x104,
 		0x20C,0xE00,0xD48,0x04B,0x240,0x020,0xB06,
@@ -5651,7 +5651,7 @@ struct map_layout map_layout[] = {{
 		0x20C,0xE44,0x012,0x150,0x012,0xC41,0x206,
 		0xE2A,0x009,0x20E,0x029,0x20E,0xE09,0xB27
 	}	// 08/26/22 -- 8 Enemies					45
-}};
+};
 
 struct map_flavor
 {
@@ -5661,7 +5661,7 @@ struct map_flavor
 	int door[2];
 };
 
-struct map_flavor map_flavor[] = {{
+struct map_flavor map_flavor[] = {
 	{ MFL_LGRASS, MWL_TBRICK, MTR_LAMP, 0, 						// 00 : Park
 		{ MWL_TTREE, MWL_TTREE, MDE_SBUSH, MDE_FRUIT }, 
 		{ MSC_MOSS, MSC_FLOWER, MSC_LGRASS, MSC_PEBBLES }, 
@@ -5822,7 +5822,7 @@ struct map_flavor map_flavor[] = {{
 		{ MWL_SNTREE, MWL_SNTREE, MDE_ICE, MDE_ICE }, 
 		{ MSC_SPLANT, (0x20000000 | MFL_ICE), MDE_CSTONE, 0 }, 
 		{ MDR_COLD_N, MDR_COLD_E } }
-}};
+};
 //
 
 //
@@ -5856,7 +5856,7 @@ struct dw_tile
 	unsigned char tile[DW_TILE_SIZE*DW_TILE_SIZE];
 };
 
-struct dw_tile dw_tile[] = {{
+struct dw_tile dw_tile[] = {
 	{		
 		0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
 		1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
@@ -6438,7 +6438,7 @@ struct dw_tile dw_tile[] = {{
 		0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	}
-}};
+};
 
 #undef A
 #undef B
@@ -6452,7 +6452,7 @@ struct plh_layout
 	unsigned char tile[PLH_SIZE*PLH_SIZE];
 };
 
-struct plh_layout plh_layout[] = {{
+struct plh_layout plh_layout[] = {
 	{
 		0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 0,
 		1, 1, 0, 2, 3,12,11,11,11,30,30,13, 3,10, 5, 8, 3, 2, 0, 1, 1,
@@ -6630,7 +6630,7 @@ struct plh_layout plh_layout[] = {{
 		0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 0, 0,
 		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
 	}
-}};
+};
 
 struct plh_style
 {
@@ -6654,7 +6654,7 @@ struct plh_style
 	unsigned short exits[NUM_PLH_EXITS];
 };
 
-struct plh_style plh_styles = {{
+struct plh_style plh_styles = {
 	{ 
 	  TS_GRASS_LIGHT,  TS_GRASS_DARK,   TS_GRASS_AUTUMN, TS_GRASS_JUNG,   TS_GRASS_SNOW,
 	  TS_GRASS_SAND,   TS_GRASS_VIOLET
@@ -6742,7 +6742,7 @@ struct plh_style plh_styles = {{
 	  TS_EXIT_PORTAL, TS_EXIT_VPORTAL, TS_EXIT_BLUE, TS_EXIT_YELLOW, TS_EXIT_GREEN, 
 	  TS_EXIT_CYAN, TS_EXIT_CRYSTAL, TS_EXIT_CRYSRED
 	}  // Exits
-}};
+};
 
 
 int diffi = 21;

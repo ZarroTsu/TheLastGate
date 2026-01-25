@@ -2155,7 +2155,7 @@ int get_meta_stat_value(int cn, int n)
 			power = M_SK(cn, SK_HEAL);
 			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = more(power, 20, 1);
 			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power = less(power, 50, 1);
-			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power)*1875/max(1, SP_DUR_REGEN * 20);
+			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power, cn)*1875/max(1, SP_DUR_REGEN * 20);
 			else                                  value = spell_multiplier(power * 4/5, cn);
 			break;
 		case 74: // Blind Effect											// Flipped to Positive
