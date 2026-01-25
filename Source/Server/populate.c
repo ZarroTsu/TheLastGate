@@ -838,22 +838,13 @@ int pop_create_char(int n, int drop)
 void reset_char(int n)
 {
 	int cn, m, z, pts = 0, cnt = 0;
-
-	if (n<1 || n>=MAXTCHARS)
-	{
-		return;
-	}
-	if (!ch_temp[n].used)
-	{
-		return;
-	}
-	if (!(ch_temp[n].flags & CF_RESPAWN))
-	{
-		return;
-	}
-
+	
+	if (n<1 || n>=MAXTCHARS) return;
+	if (!ch_temp[n].used) return;
+	if (!(ch_temp[n].flags & CF_RESPAWN)) return;
+	
 	xlog("Resetting char %d (%s)", n, ch_temp[n].name);
-
+	
 	for (z = 0; z<5; z++)
 	{
 		for (m = 10; m<ch_temp[n].attrib[z][0]; m++)
@@ -861,22 +852,22 @@ void reset_char(int n)
 			pts += attrib_needed(m, 3);
 		}
 	}
-
+	
 	for (m = 50; m<ch_temp[n].hp[0]; m++)
 	{
 		pts += hp_needed(m, 3);
 	}
-
+	
 	//for (m = 50; m<ch_temp[n].end[0]; m++)
 	//{
 	//	pts += end_needed(m, 2);
 	//}
-
+	
 	for (m = 50; m<ch_temp[n].mana[0]; m++)
 	{
 		pts += mana_needed(m, 3);
 	}
-
+	
 	for (z = 0; z<MAXSKILL; z++)
 	{
 		for (m = 1; m<ch_temp[n].skill[z][0]; m++)
@@ -884,15 +875,12 @@ void reset_char(int n)
 			pts += skill_needed(m, 3);
 		}
 	}
-
+	
 	ch_temp[n].points_tot = pts;
-
+	
 	for (cn = 1; cn<MAXCHARS; cn++)
 	{
-		if (ch[cn].used!=USE_ACTIVE)
-		{
-			continue;
-		}
+		if (ch[cn].used!=USE_ACTIVE) continue;
 		if (ch[cn].temp==n)
 		{
 			xlog(" --> %s (%d) (%d,%d).", ch[cn].name, cn, ch[cn].x, ch[cn].y);
@@ -902,13 +890,10 @@ void reset_char(int n)
 			cnt++;
 		}
 	}
-
+	
 	for (m = 0; m<MAXEFFECT; m++)
 	{
-		if (fx[m].used!=USE_ACTIVE)
-		{
-			continue;
-		}
+		if (fx[m].used!=USE_ACTIVE) continue;
 		if (fx[m].type==2 && fx[m].data[2]==n)
 		{
 			xlog(" --> effect %d", m);
@@ -916,13 +901,10 @@ void reset_char(int n)
 			cnt++;
 		}
 	}
-
+	
 	for (m = 0; m<MAXITEM; m++)
 	{
-		if (it[m].used!=USE_ACTIVE)
-		{
-			continue;
-		}
+		if (it[m].used!=USE_ACTIVE) continue;
 		if (it[m].driver==7 && (cn = it[m].data[0])!=0)
 		{
 			if (ch[cn].temp==n)
@@ -935,17 +917,12 @@ void reset_char(int n)
 			}
 		}
 	}
-
+	
 	if (cnt!=1)
-	{
 		xlog("AUTO-RESPAWN: Found %d instances of %s (%d)", cnt, ch_temp[n].name, n);
-	}
-
+	
 	if (ch_temp[n].used==USE_ACTIVE)   // schedule respawn
-	{
 		fx_add_effect(2, TICKS * 10, ch_temp[n].x, ch_temp[n].y, n); // 10 seconds
-	}
-
 }
 
 int skillcost(int val, int dif, int start)
@@ -1075,22 +1052,21 @@ void pop_tick(void)
 {
 	static int last_reset = 0;
 	int nr;
-
-	if (globs->ticker - last_reset>=RESETTICKER)      // reset one character per minute
+	
+	if ((globs->ticker - last_reset)>=RESETTICKER)  // reset one character per minute
 	{
 		nr = (globs->ticker / RESETTICKER) % MAXTCHARS;
-		if (nr>0 && nr<MAXTCHARS)               // yes, we're paranoid :)
-		{
+		if (IS_SANECTEMPLATE(nr))  // yes, we're paranoid :)
 			reset_char(nr);
-		}
 		last_reset = globs->ticker;
 	}
-
+	
 	if (globs->reset_char)
 	{
 		reset_char(globs->reset_char);
 		globs->reset_char = 0;
 	}
+	
 	if (globs->reset_item)
 	{
 		reset_item(globs->reset_item);
@@ -1121,48 +1097,31 @@ void pop_reset_all(void)
 void pop_wipe(void)
 {
 	int n;
-
+	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (ch[n].used==USE_EMPTY)
-		{
-			continue;
-		}
+		if (ch[n].used==USE_EMPTY) continue;
 		god_destroy_items(n);
 		if (ch[n].used==USE_ACTIVE)
-		{
 			plr_map_remove(n);
-		}
-
 		ch[n].used = USE_EMPTY;
 	}
-
+	
 	for (n = 1; n<MAXITEM; n++)
 	{
-		if (it[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!(it[n].flags & IF_TAKE) && it[n].driver!=7)
-		{
-			continue;
-		}
+		if (it[n].used==USE_EMPTY) continue;
+		if (!(it[n].flags & IF_TAKE) && it[n].driver!=7) continue;
 		if (it[n].used==USE_ACTIVE)
-		{
 			map[it[n].x + it[n].y * MAPX].it = 0;
-		}
 		it[n].used = USE_EMPTY;
 	}
-
+	
 	for (n = 1; n<MAXEFFECT; n++)
 	{
-		if (fx[n].used==USE_EMPTY)
-		{
-			continue;
-		}
+		if (fx[n].used==USE_EMPTY) continue;
 		fx[n].used = USE_EMPTY;
 	}
-
+	
 	globs->players_created = 0;
 	globs->npcs_created = 0;
 	globs->players_died = 0;
@@ -1177,10 +1136,9 @@ void pop_wipe(void)
 	globs->reset_item = 0;
 	globs->total_online_time = 0;
 	globs->uptime = 0;
+	
 	for (n = 0; n<24; n++)
-	{
 		globs->online_per_hour[n] = 0;
-	}
 }
 
 void pop_remove(void)
@@ -1389,38 +1347,22 @@ void pop_load(void)
 void populate(void)
 {
 	int n, m;
-
+	
 	xlog("Started Populate");
-
-	/*xlog("Load");
-
-	   pop_load();*/
-
+	
 	xlog("Creating NPCs from Templates");
-
+	
 	for (n = 1; n<MAXTCHARS; n++)
 	{
 		if (ch_temp[n].used!=USE_EMPTY)
 		{
 			for (m = 1; m<MAXCHARS; m++)
 			{
-				if (ch[m].used!=USE_ACTIVE)
-				{
-					continue;
-				}
-				if (ch[m].flags & CF_BODY)
-				{
-					continue;
-				}
-				if (ch[m].temp==n)
-				{
-					break;
-				}
+				if (ch[m].used!=USE_ACTIVE) continue;
+				if (ch[m].flags & CF_BODY) continue;
+				if (ch[m].temp==n) break;
 			}
-			if (m==MAXCHARS)
-			{
-				reset_char(n);
-			}
+			if (m==MAXCHARS) reset_char(n);
 		}
 	}
 }

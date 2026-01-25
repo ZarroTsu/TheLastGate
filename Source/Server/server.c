@@ -1318,11 +1318,12 @@ int see_hit = 0, see_miss = 0;
 
 int main(int argc, char *args[])
 {
-	int sock, n, one = 1, doleave = 0, ltimer = 0;
+	int sock, n, one = 1, doleave = 0, ltimer = 0, cleanme=0;
 	struct sockaddr_in addr;
 	int pidfile;
 	char pid_str[10];
 	unsigned long long t1, t2;
+	int x, y;
 
 	nice(5);
 
@@ -1453,6 +1454,10 @@ int main(int argc, char *args[])
 			unload();
 			exit(0);
 		}
+		else if (strcasecmp("clean", args[1])==0)
+		{
+			cleanme = 1;
+		}
 	}
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -1550,21 +1555,16 @@ int main(int argc, char *args[])
 	
 	for (n = 1; n<MAXTCHARS; n++)
 	{
-		int x, y;
-
 		if (!ch_temp[n].used) continue;
 		
 		// (vvv REMOVE AFTER UPDATE!!!)
 		// (^^^ REMOVE AFTER UPDATE!!!)
-
+		
 		x = ch_temp[n].data[29] % MAPX;
 		y = ch_temp[n].data[29] / MAPX;
-
-		if (!x && !y)
-		{
-			continue;
-		}
-
+		
+		if (!x && !y) continue;
+		
 		if (abs(x - ch_temp[n].x) + abs(y - ch_temp[n].y)>200)
 		{
 			xlog("RESET %d (%s): %d %d -> %d %d", n, ch_temp[n].name, ch_temp[n].x, ch_temp[n].y, x, y);
@@ -1572,17 +1572,20 @@ int main(int argc, char *args[])
 		}
 	}
 	
-	/*
-	god_reset_npcs(0);
-	init_lights();
-	*/
-
+	if (cleanme)
+	{
+		xlog("Resetting NPCs...");
+		god_reset_npcs(0);
+		xlog("Initializing Lights...");
+		init_lights();
+	}
+	
 	globs->flags |= GF_DIRTY;
-
+	
 	load_mod();
-
+	
 	xlog("Entering game loop...");
-
+	
 	while (!doleave)
 	{
 		if ((globs->ticker & 4095)==0)
@@ -1625,22 +1628,22 @@ int main(int argc, char *args[])
 			}
 		}
 	}
-
+	
 	globs->flags &= ~GF_DIRTY;
 	unload();
-
+	
 	xlog("Server down (%d,%d)", see_hit, see_miss);
 	unlink("server.pid");
+	
 	if (logfp!=stdout)
-	{
 		fclose(logfp);
-	}
+	
 	fclose(discordWho);
 	fclose(discordShoutIn);
 	fclose(discordShoutOut);
 	fclose(discordRanked);
 	fclose(discordTopA);
 	fclose(discordPandium);
-
+	
 	return 0;
 }
