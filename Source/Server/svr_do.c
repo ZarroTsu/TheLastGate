@@ -404,7 +404,7 @@ void do_char_motd(int cn, int font, char *format, ...)
 
 void do_log(int cn, int font, char *text)
 {
-	int n = 0, len, nr, m=0;
+	int n = 0, len, nr;
 	unsigned char buf[16];
 
 	nr = ch[cn].player;
@@ -505,7 +505,7 @@ void do_admin_log(int source, char *format, ...)
 void do_announce(int source, int author, char *format, ...)
 {
 	va_list args;
-	char buf_anon[1024];
+	char buf_anon[1000];
 	char buf_named[1024];
 	int  n;
 
@@ -552,7 +552,7 @@ void do_announce(int source, int author, char *format, ...)
 void do_server_announce(int source, int author, char *format, ...)
 {
 	va_list args;
-	char buf_anon[1024];
+	char buf_anon[1000];
 	char buf_named[1024];
 	int  n;
 
@@ -594,7 +594,7 @@ void do_server_announce(int source, int author, char *format, ...)
 void do_caution(int source, int author, char *format, ...)
 {
 	va_list args;
-	char buf_anon[1024];
+	char buf_anon[1000];
 	char buf_named[1024];
 	int  n;
 
@@ -930,7 +930,6 @@ void do_toggle_spellknowledge(int cn)
 
 void do_autoloot(int cn)
 {
-	int cc;
 	ch[cn].flags ^= CF_AUTOLOOT;
 	
 	if (ch[cn].flags & CF_AUTOLOOT)
@@ -950,7 +949,6 @@ void do_autoloot(int cn)
 
 void do_sense(int cn)
 {
-	int cc;
 	ch[cn].flags ^= CF_SENSEOFF;
 	
 	if (ch[cn].flags & CF_SENSEOFF)
@@ -999,7 +997,6 @@ void do_silence(int cn)
 
 void do_override(int cn)
 {
-	int cc;
 	ch[cn].flags ^= CF_OVERRIDE;
 
 	if (ch[cn].flags & CF_OVERRIDE)
@@ -1019,7 +1016,6 @@ void do_override(int cn)
 
 void do_sysoff(int cn)
 {
-	int cc;
 	ch[cn].flags ^= CF_SYS_OFF;
 
 	if (ch[cn].flags & CF_SYS_OFF)
@@ -1620,7 +1616,7 @@ void do_listgcmax(int cn, int shadow)
 	
 	if (shadow) m = PCD_SHADOWCOPY;
 	
-	if (co = ch[cn].data[m])
+	if ((co = ch[cn].data[m]))
 	{
 		if (!IS_SANECHAR(co) || ch[co].data[CHD_MASTER]!=cn || (ch[co].flags & CF_BODY) || ch[co].used==USE_EMPTY)
 		{
@@ -3209,7 +3205,7 @@ void do_gohome(int cn)
 					ch[cn].house_m      = ch[n].house_m;
 					ch[cn].house_layout = ch[n].house_layout;
 					do_char_log(cn, 1, "Your house was set to your character %s's lot.\n", ch[n].name);
-					do_char_log(cn, 2, "You can now use #home from a temple to head home.\n", ch[n].name);
+					do_char_log(cn, 2, "You can now use #home from a temple to head home.\n");
 					return;
 				}
 			}
@@ -3740,7 +3736,7 @@ int display_quest(int cn, int flag, int page, int m, int req, int quest, int ran
 }
 void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 {
-	int n, m, t, page = 1, ex = 0;
+	int n, m, /*t,*/ page = 1;
 	int ast = 1, liz = 0, nei = 0, ars = 0, arc = 0, nlb = 0, nrb = 0;
 	int spi = 0, sp2 = 0, sco = 0, sc2 = 0, sc3 = 0, gre = 0, bla = 0, hou = 0, dmr = 0, coc = 0, flo = 0;
 	int quest1[30]={0};
@@ -3802,10 +3798,14 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if (IS_SEYAN_DU(cn))
 	{
 		n = 0;
-		if (B_SK(cn, SK_WARCRY))    n++;	if (B_SK(cn, SK_LEAP))     n++;
-		if (B_SK(cn, SK_GCMASTERY)) n++;	if (B_SK(cn, SK_LETHARGY)) n++;
-		if (B_SK(cn, SK_PULSE))     n++;	if (B_SK(cn, SK_ZEPHYR))   n++;
-		if (B_SK(cn, SK_PRECISION)) n++;	if (B_SK(cn, SK_PACT))     n++;		
+		if (B_SK(cn, SK_WARCRY))    n++;
+		if (B_SK(cn, SK_LEAP))      n++;
+		if (B_SK(cn, SK_GCMASTERY)) n++;
+		if (B_SK(cn, SK_LETHARGY))  n++;
+		if (B_SK(cn, SK_PULSE))     n++;
+		if (B_SK(cn, SK_ZEPHYR))    n++;
+		if (B_SK(cn, SK_PRECISION)) n++;
+		if (B_SK(cn, SK_PACT))      n++;
 		if (n>=2)  		quest1[16] = 1;
 	}
 	//
@@ -3847,7 +3847,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	do_char_log(cn, 1, " \n");
 	
 	n = (page-1)*16;
-	t = page*16;
+//	t = page*16;
 	m = 0;
 	//
 	m = display_quest(cn, flag, page, m,   1, quest1[ 0],  0, "Jamil",    "Bluebird Tav", "*Econimi",    100);
@@ -4250,10 +4250,10 @@ void do_listbuffs(int cn, int co)
 
 void do_listgcbuffs(int cn, int shadow)
 {
-	int co=0, n, in, flag = 0, m = PCD_COMPANION;
+	int co=0, m = PCD_COMPANION;
 	
 	if (shadow) m = PCD_SHADOWCOPY;
-	if (co = ch[cn].data[m])
+	if ((co = ch[cn].data[m]))
 	{
 		if (!IS_SANECHAR(co) || ch[co].data[CHD_MASTER]!=cn || (ch[co].flags & CF_BODY) || ch[co].used==USE_EMPTY)
 		{
@@ -4404,8 +4404,6 @@ void do_force_recall(int cn)
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	
 	add_spell(cn, in);
-	
-	return 1;
 }
 
 // -------- //
@@ -5148,8 +5146,6 @@ void do_sort_depot(int cn, char *arg, char *arg2)
 
 void do_sort(int cn, char *arg)
 {
-	int n;
-	
 	if (IS_BUILDING(cn))
 	{
 		do_char_log(cn, 1, "Not in build-mode, dude.");
@@ -5160,7 +5156,7 @@ void do_sort(int cn, char *arg)
 	
 	// Set temporary item locks before qsort, removing any invalid ones beforehand
 	/*
-	for (n=0;n<MAXITEMS;n++) 
+	for (int n=0;n<MAXITEMS;n++) 
 	{
 		it[ch[cn].item[n]].flags &= ~IF_ITEMLOCK;
 	//	if (ch[cn].item_lock[n])
@@ -5837,10 +5833,12 @@ void do_spectate(int cn, int co)
 	if (!IS_GOD(cn)) do_char_log(co, 9, "%s is watching you.\n", ch[cn].name);
 }
 
+void do_wipe_deaths(int cn, int co);
+
 void do_command(int cn, char *ptr)
 {
 	int n, m;
-	int f_c, f_g, f_i, f_s, f_p, f_m, f_u, f_sh, f_gi, f_giu, f_gius, f_poh, f_pol, f_gg;
+	int f_c, f_g, f_i, f_s, f_p, f_m, f_u, f_sh, f_gi, f_giu, f_gius, /*f_poh, f_pol,*/ f_gg;
 	char arg[10][40], *args[10];
 	char *cmd;
 
@@ -5899,8 +5897,8 @@ void do_command(int cn, char *ptr)
 	f_gi   = f_g || f_i;
 	f_giu  = f_gi || f_u;
 	f_gius = f_giu || f_s;
-	f_poh  = (ch[cn].kindred & KIN_POH) !=0;
-	f_pol  = ((ch[cn].kindred & KIN_POH_LEADER) || (ch[cn].flags & CF_GOD));
+//	f_poh  = (ch[cn].kindred & KIN_POH) !=0;
+//	f_pol  = ((ch[cn].kindred & KIN_POH_LEADER) || (ch[cn].flags & CF_GOD));
 
 	switch (cmd[0])
 	{
@@ -7677,7 +7675,7 @@ int get_offhand_skill(int cn, int skill[50], int flag)
 // put in an item, see if we're wearing it in a charm slot.
 int get_tarot(int cn, int in)
 {
-	int ch1=0, ch2=0, ch3=0, cc=0;
+	int ch1=0, ch2=0, ch3=0;
 	
 	if (ch[cn].flags & CF_NOMAGIC) return 0;
 	
@@ -7994,11 +7992,13 @@ void do_ransack_corpse(int cn, int co, char *msg)
 	}
 }
 
+void do_check_new_item_level(int cn, int in);
+
 void do_item_kills(int cn)
 {
 	int in;
 	
-	if (in = get_gear(cn, IT_WP_LAMEDARG)) it[in].data[0]++;
+	if ((in = get_gear(cn, IT_WP_LAMEDARG))) it[in].data[0]++;
 	if ((in = ch[cn].worn[WN_RHAND]) && ((IS_GODWEAPON(in) && it[in].stack < 10) || (IS_OSIRWEAP(in) && it[in].stack > 0)) && !(it[in].flags & IF_LEGACY))
 	{
 		it[in].cost++;
@@ -8014,7 +8014,7 @@ void do_item_kills(int cn)
 // note: cn may be zero!!
 void do_char_killed(int cn, int co, int pentsolve)
 {
-	int n, in, x, y, z, temp = 0, m, tmp, tmpg, wimp, cc = 0, fn, r1, r2, rank, grouped = 0;
+	int n, in, x, y, z, m, tmp, tmpg, wimp, cc = 0, fn, /*r1, r2,*/ rank, grouped = 0;
 	unsigned long long mf1, mf2;
 	unsigned char buf[3];
 	int os;
@@ -8258,8 +8258,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 		}
 
 		// update statistics
-		r1 = getrank(cn);
-		r2 = getrank(co);
+//		r1 = getrank(cn);
+//		r2 = getrank(co);
 		
 		ch[cn].data[23]++; // Kill Counter
 		
@@ -8367,8 +8367,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 		do_area_notify(cc, co, ch[cc].x, ch[cc].y, NT_SEEHIT, cc, co, 0, 0);
 		
 		// update statistics
-		r1 = getrank(cc);
-		r2 = getrank(co);
+//		r1 = getrank(cc);
+//		r2 = getrank(co);
 		
 		ch[cc].data[23]++; // Kill Counter
 		
@@ -8476,11 +8476,11 @@ void do_char_killed(int cn, int co, int pentsolve)
 		globs->npcs_died++;
 	}
 
-	// remember template if we're to respawn this char
+	/*// remember template if we're to respawn this char
 	if (ch[co].flags & CF_RESPAWN)
 	{
 		temp = ch[co].temp;
-	}
+	}*/
 
 	// really kill co:
 	x = ch[co].x;
@@ -8941,8 +8941,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 int do_char_can_flee(int cn)
 {
 	int per = 0, co, ste, m, chance;
-	int n;
-
+	
 	for (m = 0; m<4; m++)
 	{
 		if ((co = ch[cn].enemy[m])!=0 && ch[co].current_enemy!=cn)
@@ -8950,7 +8949,7 @@ int do_char_can_flee(int cn)
 			ch[cn].enemy[m] = 0;
 		}
 	}
-
+	
 	for (m = 0; m<4; m++)
 	{
 		if ((co = ch[cn].enemy[m])!=0 && ch[co].attack_cn!=cn)
@@ -8958,13 +8957,13 @@ int do_char_can_flee(int cn)
 			ch[cn].enemy[m] = 0;
 		}
 	}
-
+	
 	if (!ch[cn].enemy[0] && !ch[cn].enemy[1] &&
 	    !ch[cn].enemy[2] && !ch[cn].enemy[3])
 	{
 		return 1;
 	}
-
+	
 	// You already succeeded in escaping recently, so give it a bit
 	if (ch[cn].escape_timer > TICKS*2 || do_get_iflag(cn, SF_EN_ESCAPE) || IS_COMP_TEMP(cn)) 
 	{ 
@@ -8990,9 +8989,9 @@ int do_char_can_flee(int cn)
 		return 1; 
 	}
 	if (ch[cn].escape_timer || do_get_iflag(cn, SF_EN_ESCAPE) || IS_COMP_TEMP(cn)) return 0;
-
+	
 	per  = 0;
-
+	
 	for (m = 0; m<4; m++)
 	{
 		if ((co = ch[cn].enemy[m])!=0)
@@ -9001,7 +9000,7 @@ int do_char_can_flee(int cn)
 		}
 	}
 	ste   = M_SK(cn, SK_STEALTH);
-
+	
 	//chance = 9 + (per - ste);
 	chance=ste*15/per;
 	
@@ -9020,11 +9019,11 @@ int do_char_can_flee(int cn)
 		remove_enemy(cn);
 		return 1;
 	}
-
+	
 	ch[cn].escape_timer = TICKS;
 	if (!(ch[cn].flags & CF_SYS_OFF))
 		do_char_log(cn, 0, "You cannot escape!\n");
-
+	
 	return 0;
 }
 
@@ -9154,7 +9153,7 @@ void do_give_exp(int cn, int p, int gflag, int rank, int money)
 
 void do_give_bspoints(int cn, int p, int gflag)
 {
-	int n, c, co, s;
+	int n, c, co;
 
 	if (p<1)
 	{
@@ -9199,7 +9198,7 @@ void do_give_bspoints(int cn, int p, int gflag)
 
 void do_give_ospoints(int cn, int p, int gflag)
 {
-	int n, c, co, s;
+	int n, c, co;
 
 	if (p<1)
 	{
@@ -9287,23 +9286,23 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 {
 	int hp_dam, n;
 	
-	if (!IS_SANECHAR(co)) return;
+	if (!IS_SANECHAR(co)) return dam;
 	
 	hp_dam = dam;
 	
 	*en_dam = *mp_dam = 0;
 	
 	if (T_WARR_SK(co, 12))                           en_dam +=   30;    // (Warr) Tenacity
-	if (n = TC_SK(co, 48))                           en_dam += n*15;
+	if ((n=TC_SK(co, 48)))                           en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               en_dam +=   15;    // [Gear] Cloak of Shadows
 	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
 	
 	if (T_ARHR_SK(co, 12))                           mp_dam +=   30;    // (ArHr) Resourcefulness
-	if (n = TC_SK(co, 84))                           mp_dam += n*15;
+	if ((n=TC_SK(co, 84)))                           mp_dam += n*15;
 	if (do_get_iflag(co, SF_PREIST))                 mp_dam +=   30;    // [Taro] Priestess
 	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
 	
-	if (n = *en_dam + *mp_dam)
+	if ((n = *en_dam + *mp_dam))
 	{
 		*en_dam = dam * ( (*en_dam * 100)/n * min(ALTER_MAX, n) )/10000;
 		*mp_dam = dam * ( (*mp_dam * 100)/n * min(ALTER_MAX, n) )/10000;
@@ -9363,7 +9362,7 @@ void do_leech(int cn, int dam, int is_dot)
 	if (!is_dot && do_get_iflag(cn, SF_TW_GULA))                         // [Gear] Gula
 						   tmp = clamp(tmp + (dam *20/1000), 0, 65500);
 	if (T_LYCA_SK(cn,  8)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Lyca) Gluttony
-	if (n = TC_SK(cn,104)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if ((n=TC_SK(cn,104))) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[0] = tmp;
 	
 	tmp = ch[cn].leech[1];
@@ -9372,7 +9371,7 @@ void do_leech(int cn, int dam, int is_dot)
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
 						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	if (T_WARR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Warr) Perseverance
-	if (n = TC_SK(cn, 47)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if ((n=TC_SK(cn, 47))) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[1] = tmp;
 	
 	tmp = ch[cn].leech[2];
@@ -9381,18 +9380,18 @@ void do_leech(int cn, int dam, int is_dot)
 	if (!is_dot && (n = do_get_ieffect(cn, VF_EN_PURPLEECH)))            // [Ench] Purple
 						   tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	if (T_ARHR_SK(cn, 11)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (ArHr) Perpetuity
-	if (n = TC_SK(cn, 83)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+	if ((n=TC_SK(cn, 83))) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 	ch[cn].leech[2] = tmp;
 	
 	if (IS_PLAYER_COMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]))
 	{
 		tmp = ch[cc].leech[0];
 		if (T_SUMM_SK(cc, 12)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Summ) Necromancy
-		if (n = TC_SK(cc, 72)) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+		if ((n=TC_SK(cc, 72))) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
 		ch[cc].leech[0] = tmp;
 	}
 	
-	if (n = TC_SK(cn, 70)*2)  // (Corr) Wraithlord
+	if ((n = TC_SK(cn, 70)*2))  // (Corr) Wraithlord
 	{
 		if (IS_LIVINGCHAR(cc = ch[cn].data[PCD_COMPANION]) && ch[cc].data[CHD_MASTER]==cn)
 			ch[cc].leech[0] = clamp(ch[cc].leech[0] + (dam * n/1000), 0, 65500);
@@ -9406,12 +9405,10 @@ void do_leech(int cn, int dam, int is_dot)
 // returns actual damage done
 int do_hurt(int cn, int co, int dam, int type)
 {
-	int tmp = 0, cc, n, m, in, rank = 0, noexp = 0, halfexp = 0, kill_bsp = 0, kill_osp = 0, kill_bos = 0, money = 0;
+	int tmp = 0, cc, n, in, rank = 0, noexp = 0, halfexp = 0, kill_bsp = 0, kill_osp = 0, kill_bos = 0, money = 0;
 	unsigned long long mf1, mf2;
 	int hp_dam, en_dam, mp_dam, greed=0;
-	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, phalanx = 0, aggravate = 0;
-	int offpot = 0, defpot = 0;
-	int crit_dam = 0, damtype = 250;
+	int damtype = 250;
 	int extradam = 0, priestess = 1, cullval=500;
 	
 	mf1 = mf2 = map[XY2M(ch[co].x, ch[co].y)].flags;
@@ -9501,7 +9498,7 @@ int do_hurt(int cn, int co, int dam, int type)
 							bu[in].armor = min(127, bu[in].active / 1536 + 1);
 						else
 							bu[in].armor = min(127, bu[in].active / 1024 + 1);
-						if (tmp = do_get_ieffect(co, VF_EN_SKUAMS)) 
+						if ((tmp = do_get_ieffect(co, VF_EN_SKUAMS)))
 							bu[in].weapon = bu[in].armor*tmp/100;
 						bu[in].power = bu[in].active / 256;
 						do_update_char(co);
@@ -9589,12 +9586,12 @@ int do_hurt(int cn, int co, int dam, int type)
 		// Heal-on-hit sources
 		if (type!=2 && type!=3 && type!=13)
 		{
-			if (n = do_get_ieffect(cn, VF_EN_HPONHIT))   do_recovery(cn, 0, n*1000);
-			if (n = do_get_ieffect(co, VF_EN_HPWHENHIT)) do_recovery(co, 0, n*2000);
-			if (n = do_get_ieffect(cn, VF_EN_ENONHIT))   do_recovery(cn, 1, n*1000);
-			if (n = do_get_ieffect(co, VF_EN_ENWHENHIT)) do_recovery(co, 1, n*2000);
-			if (n = do_get_ieffect(cn, VF_EN_MPONHIT))   do_recovery(cn, 2, n*1000);
-			if (n = do_get_ieffect(co, VF_EN_MPWHENHIT)) do_recovery(co, 2, n*2000);
+			if ((n = do_get_ieffect(cn, VF_EN_HPONHIT)))   do_recovery(cn, 0, n*1000);
+			if ((n = do_get_ieffect(co, VF_EN_HPWHENHIT))) do_recovery(co, 0, n*2000);
+			if ((n = do_get_ieffect(cn, VF_EN_ENONHIT)))   do_recovery(cn, 1, n*1000);
+			if ((n = do_get_ieffect(co, VF_EN_ENWHENHIT))) do_recovery(co, 1, n*2000);
+			if ((n = do_get_ieffect(cn, VF_EN_MPONHIT)))   do_recovery(cn, 2, n*1000);
+			if ((n = do_get_ieffect(co, VF_EN_MPWHENHIT))) do_recovery(co, 2, n*2000);
 		}
 		
 		return 0;
@@ -9694,12 +9691,12 @@ int do_hurt(int cn, int co, int dam, int type)
 	if (type!=2 && type!=3 && type!=13)
 	{
 		if (greed) do_recovery(cn, 0, dam*greed/100);
-		if (n = do_get_ieffect(cn, VF_EN_HPONHIT))   do_recovery(cn, 0, n*1000);
-		if (n = do_get_ieffect(co, VF_EN_HPWHENHIT)) do_recovery(co, 0, n*2000);
-		if (n = do_get_ieffect(cn, VF_EN_ENONHIT))   do_recovery(cn, 1, n*1000);
-		if (n = do_get_ieffect(co, VF_EN_ENWHENHIT)) do_recovery(co, 1, n*2000);
-		if (n = do_get_ieffect(cn, VF_EN_MPONHIT))   do_recovery(cn, 2, n*1000);
-		if (n = do_get_ieffect(co, VF_EN_MPWHENHIT)) do_recovery(co, 2, n*2000);
+		if ((n = do_get_ieffect(cn, VF_EN_HPONHIT)))   do_recovery(cn, 0, n*1000);
+		if ((n = do_get_ieffect(co, VF_EN_HPWHENHIT))) do_recovery(co, 0, n*2000);
+		if ((n = do_get_ieffect(cn, VF_EN_ENONHIT)))   do_recovery(cn, 1, n*1000);
+		if ((n = do_get_ieffect(co, VF_EN_ENWHENHIT))) do_recovery(co, 1, n*2000);
+		if ((n = do_get_ieffect(cn, VF_EN_MPONHIT)))   do_recovery(cn, 2, n*1000);
+		if ((n = do_get_ieffect(co, VF_EN_MPWHENHIT))) do_recovery(co, 2, n*2000);
 	}
 	
 	if (ch[co].a_hp<12500 && ch[co].a_hp>=500 && getrank(co)<5)
@@ -9946,16 +9943,16 @@ int do_crit(int cn, int co, int dam, int msg)
 		
 		if (msg) do_char_log(cn, 0, "Critical hit!\n");
 		
-		if (in = get_neck(cn, IT_GAMBLERFAL))
+		if ((in = get_neck(cn, IT_GAMBLERFAL)))
 		{
 			if (!it[in].active) do_update_char(cn);
 			it[in].active = it[in].duration;
 		}
 	}
 	
-	if (n = do_get_ieffect(co, VF_EN_LESSCRIT)) crit_redc -=    n;
+	if ((n=do_get_ieffect(co, VF_EN_LESSCRIT))) crit_redc -=    n;
 	if (T_SKAL_SK(co,  4))                      crit_redc -=   50;  // (Skal) Litheness
-	if (n = TC_SK(cn, 28))                      crit_redc -= n*25;
+	if ((n=TC_SK(cn, 28)))                      crit_redc -= n*25;
 	
 	if (crit_redc < 0) crit_redc = 0;
 	
@@ -9964,9 +9961,9 @@ int do_crit(int cn, int co, int dam, int msg)
 
 void do_attack(int cn, int co, int surround)
 {
-	int hit, dam = 0, die, m, odam = 0, cc = 0, surrmod = 0, sorb = 0;
-	int chance, s1, s2, bonus = 0, diff, crit_dam=0, in=0, co_orig=-1;
-	int surrDam, surrBonus, surrTotal, n, power=0, topdam = 0;
+	int hit, dam = 0, die, odam = 0, cc = 0, sorb = 0;
+	int chance, s1, s2, bonus = 0, diff, crit_dam=0, co_orig=-1;
+	int n, power=0, topdam = 0;
 	int glv, glv_base = 60;
 	int in2 = 0;
 	
@@ -10058,10 +10055,10 @@ void do_attack(int cn, int co, int surround)
 	{
 		dam    = ch[cn].weapon + RANDOM(8);
 		
-		if (topdam = max(0, ch[cn].top_damage))
+		if ((topdam = max(0, ch[cn].top_damage)))
 		{
 			if (T_ARTM_SK(co,  4)) topdam = less(topdam,   30, 1);  // (ArTm) Bulwark
-			if (n = TC_SK(co, 16)) topdam = less(topdam, n*15, 1);
+			if ((n=TC_SK(co, 16))) topdam = less(topdam, n*15, 1);
 			
 			if (topdam>1)
 			{
@@ -10159,7 +10156,7 @@ void do_attack(int cn, int co, int surround)
 	{
 		power = spell_multiplier(M_SK(co, SK_ZEPHYR), co);
 		
-		if (in2 = has_spell(co, SK_ZEPHYR))
+		if ((in2 = has_spell(co, SK_ZEPHYR)))
 		{
 			if (!IS_NOMAGIC(cn))
 				spell_zephyr(co, cn, bu[in2].power, 1);
@@ -10358,7 +10355,8 @@ int do_char_can_see(int cn, int co, int flag)
 	}                                             // save some time...
 	
 	// x+, y-
-	if ((ch[co].y <= ch[cn].y-16 && ch[co].x >= ch[cn].x+20) || (ch[co].y <= ch[cn].y-20 && ch[co].x >= ch[cn].x+16) && !CAN_ALWAYS_SEE(cn))
+	if (((ch[co].y <= ch[cn].y-16 && ch[co].x >= ch[cn].x+20) || (ch[co].y <= ch[cn].y-20 && ch[co].x >= ch[cn].x+16))
+		&& !CAN_ALWAYS_SEE(cn))
 	{
 		prof_stop(21, prof);
 		return 0;
@@ -10552,7 +10550,7 @@ void do_set_iflag(int cn, int v)
 	if (v<0 || v>=64*8)
 	{
 		xlog("Error in do_set_iflag: Out of bounds! (SET %d)", v);
-		return 0;
+		return;
 	}
 	
 	ch[cn].iflags[m] |= (1ull<<(v%64));
@@ -10576,7 +10574,7 @@ void do_add_ieffect(int cn, int v, int n)
 	if (v<0 || v>=64)
 	{
 		xlog("Error in do_add_ieffect: Out of bounds! (ADD %d)", v);
-		return 0;
+		return;
 	}
 	
 	m = ch[cn].ieffects[v] + n;
@@ -10613,19 +10611,20 @@ int do_add_stat(int cn, int in, int v, int m)
 	return v;
 }
 
+void do_update_permaspells(int cn);
+
 void do_update_char(int cn)
 {
 	ch[cn].flags |= (CF_UPDATE | CF_SAVEME);
 }
 void really_update_char(int cn)
 {
-	int n, m, t, oldlight, z, sublight = 0, maxlight = 0, co=0, cz=0, bits=0;
+	int n, m, oldlight, z, sublight = 0, maxlight = 0, co=0, cz=0, bits=0;
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0;
 	int heal_hp, heal_end, heal_mana, act = 0, tmphm = 0, gench = 0;
-	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0, in=0, nmz=0;
+	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0, in=0; //, nmz=0;
 	int isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0, isWater = 0;
-	int divCursed = 1, divSlowed = 1, divWeaken = 1, symSpec = 0;
-	int hastePower = 0, slowPower = 0, hasteSpeed = 0, slowSpeed = 0, slow2Speed = 0, sickStacks = 0;
+	int sickStacks = 0, divCursed = 1, divSlowed = 1, divWeaken = 1, symSpec = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
 	int critical_b = 0, critical_c = 0, critical_m = 0;
@@ -10683,7 +10682,7 @@ void really_update_char(int cn)
 			do_char_log(cn, 0, "You feel your magic return.\n");
 		}
 	}
-	if (ch[cn].flags & CF_NOMAGIC) nmz = 1;
+//	if (ch[cn].flags & CF_NOMAGIC) nmz = 1;
 	
 	oldlight = ch[cn].light;
 	
@@ -11364,13 +11363,13 @@ void really_update_char(int cn)
 	
 	// Tree passive bonuses
 	if (T_SEYA_SK(cn,  1))                      hit_rate   +=   4;  // (Seya) Accuracy
-	if (n = TC_SK(cn,  1))                      hit_rate   += n*2;
+	if ((n=TC_SK(cn,  1)))                      hit_rate   += n*2;
 	if (T_SEYA_SK(cn,  2)) for (z=0; z<5; z++)  attrib[z]  +=   2;  // (Seya) Expertise
-	if (n = TC_SK(cn,  2)) for (z=0; z<5; z++)  attrib[z]  +=   n;
+	if ((n=TC_SK(cn,  2))) for (z=0; z<5; z++)  attrib[z]  +=   n;
 	if (T_SEYA_SK(cn,  3))                      parry_rate +=   4;  // (Seya) Avoidance
-	if (n = TC_SK(cn,  3))                      parry_rate += n*2;
+	if ((n=TC_SK(cn,  3)))                      parry_rate += n*2;
 	if (T_SEYA_SK(cn,  4))   dmg_bns = dmg_bns*(100+bcount*2)/100;  // (Seya) Absolution
-	if (n = TC_SK(cn,  4))   dmg_bns = dmg_bns*(100+bcount*n)/100;
+	if ((n=TC_SK(cn,  4)))   dmg_bns = dmg_bns*(100+bcount*n)/100;
 	if (T_SEYA_SK(cn,  8))                                          // (Seya) Jack of All Trades
 	{
 		do_add_ieffect(cn, VF_EN_MOREBRV, 5);
@@ -11380,106 +11379,106 @@ void really_update_char(int cn)
 		do_add_ieffect(cn, VF_EN_MORESTR, 5);
 	}
 	if (T_SEYA_SK(cn, 12))   dmg_rdc = dmg_rdc*(100-bcount*2)/100;  // (Seya) Penance
-	if (n = TC_SK(cn, 12))   dmg_rdc = dmg_rdc*(100-bcount*n)/100;
+	if ((n=TC_SK(cn, 12)))   dmg_rdc = dmg_rdc*(100-bcount*n)/100;
 	//
 	if (T_ARTM_SK(cn,  1))                      damage_top +=   6;  // (ArTm) Ravager
-	if (n = TC_SK(cn, 13))                      damage_top += n*3;
+	if ((n=TC_SK(cn, 13)))                      damage_top += n*3;
 	if (T_ARTM_SK(cn,  2))                  attrib[AT_STR] +=   6;  // (ArTm) Might
-	if (n = TC_SK(cn, 14))                  attrib[AT_STR] += n*3;
+	if ((n=TC_SK(cn, 14)))                  attrib[AT_STR] += n*3;
 	if (T_ARTM_SK(cn,  3))                           armor +=   4;  // (ArTm) Toughness
-	if (n = TC_SK(cn, 15))                           armor += n*2;
+	if ((n=TC_SK(cn, 15)))                           armor += n*2;
 	if (T_ARTM_SK(cn,  7)) do_add_ieffect(cn, VF_EXTRA_STR,   20);  // (ArTm) Barbarism
-	if (n = TC_SK(cn, 19)) do_add_ieffect(cn, VF_EXTRA_STR, n*10);
+	if ((n=TC_SK(cn, 19))) do_add_ieffect(cn, VF_EXTRA_STR, n*10);
 	if (T_ARTM_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MORESTR,   6);  // (ArTm) Overwhelming Strength
-	if (n = TC_SK(cn, 20)) do_add_ieffect(cn, VF_EN_MORESTR, n*3);
+	if ((n=TC_SK(cn, 20))) do_add_ieffect(cn, VF_EN_MORESTR, n*3);
 	//
 	if (T_SKAL_SK(cn,  1))                      critical_b +=   2;  // (Skal) Decisiveness
-	if (n = TC_SK(cn, 25))                      critical_b +=   n;
+	if ((n=TC_SK(cn, 25)))                      critical_b +=   n;
 	if (T_SKAL_SK(cn,  2))                  attrib[AT_AGL] +=   6;  // (Skal) Dexterity
-	if (n = TC_SK(cn, 26))                  attrib[AT_AGL] += n*3;
+	if ((n=TC_SK(cn, 26)))                  attrib[AT_AGL] += n*3;
 	if (T_SKAL_SK(cn,  3))                 skill[SK_IMMUN] +=   4;  // (Skal) Sanctity
-	if (n = TC_SK(cn, 27))                 skill[SK_IMMUN] += n*2;
+	if ((n=TC_SK(cn, 27)))                 skill[SK_IMMUN] += n*2;
 	if (T_SKAL_SK(cn,  5))                      critical_m +=  20;  // (Skal) Brutality
-	if (n = TC_SK(cn, 29))                      critical_m +=n*10;
+	if ((n=TC_SK(cn, 29)))                      critical_m +=n*10;
 	if (T_SKAL_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MOREAGL,   6);  // (Skal) Overwhelming Agility
-	if (n = TC_SK(cn, 32)) do_add_ieffect(cn, VF_EN_MOREAGL, n*3);
+	if ((n=TC_SK(cn, 32))) do_add_ieffect(cn, VF_EN_MOREAGL, n*3);
 	if (T_SKAL_SK(cn,  9)) do_add_ieffect(cn, VF_EXTRA_AGL,   20);  // (Skal) Celerity
-	if (n = TC_SK(cn, 33)) do_add_ieffect(cn, VF_EXTRA_AGL, n*10);
+	if ((n=TC_SK(cn, 33))) do_add_ieffect(cn, VF_EXTRA_AGL, n*10);
 	//
 	if (T_WARR_SK(cn,  1))                      spd_attack +=   6;  // (Warr) Rapidity
-	if (n = TC_SK(cn, 37))                      spd_attack += n*3;
+	if ((n=TC_SK(cn, 37)))                      spd_attack += n*3;
 	if (T_WARR_SK(cn,  2))                 {attrib[AT_AGL] +=   4;  // (Warr) Ruffian
 	                                        attrib[AT_STR] +=   4;}
-	if (n = TC_SK(cn, 38))                 {attrib[AT_AGL] += n*2;
+	if ((n=TC_SK(cn, 38)))                 {attrib[AT_AGL] += n*2;
 	                                        attrib[AT_STR] += n*2;}
 	if (T_WARR_SK(cn,  3))                             end +=  30;  // (Warr) Stamina
-	if (n = TC_SK(cn, 39))                             end +=n*15;
+	if ((n=TC_SK(cn, 39)))                             end +=n*15;
 	if (T_WARR_SK(cn,  8)){do_add_ieffect(cn, VF_EN_MOREAGL,   4);  // (Warr) Harrier
 	                       do_add_ieffect(cn, VF_EN_MORESTR,   4);}
-	if (n = TC_SK(cn, 44)){do_add_ieffect(cn, VF_EN_MOREAGL, n*2);
+	if ((n=TC_SK(cn, 44))){do_add_ieffect(cn, VF_EN_MOREAGL, n*2);
 	                       do_add_ieffect(cn, VF_EN_MORESTR, n*2);}
 	if (T_WARR_SK(cn, 11)) do_add_ieffect(cn, VF_EN_MOREEN,   20);  // (Warr) Perseverance
-	if (n = TC_SK(cn, 47)) do_add_ieffect(cn, VF_EN_MOREEN, n*10);
+	if ((n=TC_SK(cn, 47))) do_add_ieffect(cn, VF_EN_MOREEN, n*10);
 	// 
 	//
 	if (T_SORC_SK(cn,  1))                      spell_apt  +=   4;  // (Sorc) Passion
-	if (n = TC_SK(cn, 49))                      spell_apt  += n*2;
+	if ((n=TC_SK(cn, 49)))                      spell_apt  += n*2;
 	if (T_SORC_SK(cn,  2))                 {attrib[AT_WIL] +=   4;  // (Sorc) Potency
 	                                        attrib[AT_INT] +=   4;}
-	if (n = TC_SK(cn, 50))                 {attrib[AT_WIL] += n*2;
+	if ((n=TC_SK(cn, 50)))                 {attrib[AT_WIL] += n*2;
 	                                        attrib[AT_INT] += n*2;}
 	if (T_SORC_SK(cn,  3))                        spd_move +=   6;  // (Sorc) Quickstep
-	if (n = TC_SK(cn, 51))                        spd_move += n*3;
+	if ((n=TC_SK(cn, 51)))                        spd_move += n*3;
 	if (T_SORC_SK(cn,  8)){do_add_ieffect(cn, VF_EN_MOREWIL,   4);  // (Sorc) Pragmatism
 	                       do_add_ieffect(cn, VF_EN_MOREINT,   4);}
-	if (n = TC_SK(cn, 56)){do_add_ieffect(cn, VF_EN_MOREWIL, n*2);
+	if ((n=TC_SK(cn, 56))){do_add_ieffect(cn, VF_EN_MOREWIL, n*2);
 	                       do_add_ieffect(cn, VF_EN_MOREINT, n*2);}
 	//
 	if (T_SUMM_SK(cn,  1))                        spd_cast +=   6;  // (Summ) Nimbleness
-	if (n = TC_SK(cn, 61))                        spd_cast += n*3;
+	if ((n=TC_SK(cn, 61)))                        spd_cast += n*3;
 	if (T_SUMM_SK(cn,  2))                  attrib[AT_WIL] +=   6;  // (Summ) Wisdom
-	if (n = TC_SK(cn, 62))                  attrib[AT_WIL] += n*3;
+	if ((n=TC_SK(cn, 62)))                  attrib[AT_WIL] += n*3;
 	if (T_SUMM_SK(cn,  3))                skill[SK_RESIST] +=   4;  // (Summ) Barrier
-	if (n = TC_SK(cn, 63))                skill[SK_RESIST] += n*2;
+	if ((n=TC_SK(cn, 63)))                skill[SK_RESIST] += n*2;
 	if (T_SUMM_SK(cn,  7)) do_add_ieffect(cn, VF_EXTRA_WIL,   20);  // (Summ) Mysticism
-	if (n = TC_SK(cn, 67)) do_add_ieffect(cn, VF_EXTRA_WIL, n*10);
+	if ((n=TC_SK(cn, 67))) do_add_ieffect(cn, VF_EXTRA_WIL, n*10);
 	if (T_SUMM_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MOREWIL,   6);  // (Summ) Overwhelming Willpower
-	if (n = TC_SK(cn, 68)) do_add_ieffect(cn, VF_EN_MOREWIL, n*3);
+	if ((n=TC_SK(cn, 68))) do_add_ieffect(cn, VF_EN_MOREWIL, n*3);
 	//
 	if (T_ARHR_SK(cn,  1))                      spell_cool +=   6;  // (ArHr) Composure
-	if (n = TC_SK(cn, 73))                      spell_cool += n*3;
+	if ((n=TC_SK(cn, 73)))                      spell_cool += n*3;
 	if (T_ARHR_SK(cn,  2))                  attrib[AT_INT] +=   6;  // (ArHr) Intellect
-	if (n = TC_SK(cn, 74))                  attrib[AT_INT] += n*3;
+	if ((n=TC_SK(cn, 74)))                  attrib[AT_INT] += n*3;
 	if (T_ARHR_SK(cn,  3))                            mana +=  30;  // (ArHr) Wellspring
-	if (n = TC_SK(cn, 75))                            mana +=n*15;
+	if ((n=TC_SK(cn, 75)))                            mana +=n*15;
 	if (T_ARHR_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MOREINT,   6);  // (ArHr) Overwhelming Intuition
-	if (n = TC_SK(cn, 80)) do_add_ieffect(cn, VF_EN_MOREINT, n*3);
+	if ((n=TC_SK(cn, 80))) do_add_ieffect(cn, VF_EN_MOREINT, n*3);
 	if (T_ARHR_SK(cn,  9)) do_add_ieffect(cn, VF_EXTRA_INT,   20);  // (ArHr) Concentration
-	if (n = TC_SK(cn, 81)) do_add_ieffect(cn, VF_EXTRA_INT, n*10);
+	if ((n=TC_SK(cn, 81))) do_add_ieffect(cn, VF_EXTRA_INT, n*10);
 	if (T_ARHR_SK(cn, 11)) do_add_ieffect(cn, VF_EN_MOREMP,   20);  // (ArHr) Perpetuity
-	if (n = TC_SK(cn, 83)) do_add_ieffect(cn, VF_EN_MOREMP, n*10);
+	if ((n=TC_SK(cn, 83))) do_add_ieffect(cn, VF_EN_MOREMP, n*10);
 	//
 	if (T_BRAV_SK(cn,  1))                          weapon +=   4;  // (Brav) Muscle
-	if (n = TC_SK(cn, 85))                          weapon += n*2;
+	if ((n=TC_SK(cn, 85)))                          weapon += n*2;
 	if (T_BRAV_SK(cn,  2))                  attrib[AT_BRV] +=   6;  // (Brav) Boldness
-	if (n = TC_SK(cn, 86))                  attrib[AT_BRV] += n*3;
+	if ((n=TC_SK(cn, 86)))                  attrib[AT_BRV] += n*3;
 	if (T_BRAV_SK(cn,  3))                       spell_pow +=   4;  // (Brav) Mindfulness
-	if (n = TC_SK(cn, 87))                       spell_pow += n*2;
+	if ((n=TC_SK(cn, 87)))                       spell_pow += n*2;
 	if (T_BRAV_SK(cn,  7)) do_add_ieffect(cn, VF_EXTRA_BRV,   20);  // (ArHr) Virtuosity
-	if (n = TC_SK(cn, 91)) do_add_ieffect(cn, VF_EXTRA_BRV, n*10);
+	if ((n=TC_SK(cn, 91))) do_add_ieffect(cn, VF_EXTRA_BRV, n*10);
 	if (T_BRAV_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MOREBRV,   6);  // (Brav) Overwhelming Braveness
-	if (n = TC_SK(cn, 92)) do_add_ieffect(cn, VF_EN_MOREBRV, n*3);
+	if ((n=TC_SK(cn, 92))) do_add_ieffect(cn, VF_EN_MOREBRV, n*3);
 	//
 	if (T_LYCA_SK(cn,  1))                             aoe +=   2;  // (Lyca) Expanse
-	if (n = TC_SK(cn, 97))                             aoe +=   n;
+	if ((n=TC_SK(cn, 97)))                             aoe +=   n;
 	if (T_LYCA_SK(cn,  2))                              hp +=   6;  // (Lyca) Feast
-	if (n = TC_SK(cn, 98))                              hp += n*3;
+	if ((n=TC_SK(cn, 98)))                              hp += n*3;
 	if (T_LYCA_SK(cn,  3))                          gethit +=   6;  // (Lyca) Sharkskin
-	if (n = TC_SK(cn, 99))                          gethit += n*3;
+	if ((n=TC_SK(cn, 99)))                          gethit += n*3;
 	if (T_LYCA_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MOREHP,   20);  // (Lyca) Gluttony
-	if (n = TC_SK(cn,104)) do_add_ieffect(cn, VF_EN_MOREHP, n*10);
+	if ((n=TC_SK(cn,104))) do_add_ieffect(cn, VF_EN_MOREHP, n*10);
 	//
-	if (n = TC_SK(cn, 90))                       spell_mod += n*2;  // (Corr) Madness
+	if ((n=TC_SK(cn, 90)))                       spell_mod += n*2;  // (Corr) Madness
 	//
 	
 	// Special check for heatstroke removal
@@ -11559,7 +11558,7 @@ void really_update_char(int cn)
 	
 	if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[5][1] += 5;
 	
-	if (n = TC_SK(cn, 8)) ch[cn].limit_break[5][1] += n*5;  // *Master of None
+	if ((n=TC_SK(cn, 8))) ch[cn].limit_break[5][1] += n*5;  // *Master of None
 	
 	// Weapon - Fist of the Heavens :: best attribute times 1.2
 	if (do_get_iflag(cn, SF_TW_HEAVENS))
@@ -11585,7 +11584,7 @@ void really_update_char(int cn)
 	}
 	
 	// God Enchant :: worst attribute times 1.2
-	if (gench = do_get_ieffect(cn, VF_EN_OFFHATTRIB)) // 20% per
+	if ((gench = do_get_ieffect(cn, VF_EN_OFFHATTRIB))) // 20% per
 	{
 		int worstattribute[5] = {0};
 		for (n = 0; n<5; n++)
@@ -11648,7 +11647,7 @@ void really_update_char(int cn)
 		tmphm = mana; mana = hp; hp = tmphm;
 	}
 	
-	if (n = TC_SK(cn, 76)*15)  // (Corr) Repurpose
+	if ((n = TC_SK(cn, 76)*15))  // (Corr) Repurpose
 	{
 		m = mana * n / 100;
 		
@@ -12104,7 +12103,7 @@ void really_update_char(int cn)
 	// Flat bonus
 	{
 		if (T_SEYA_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=  m/25; }  // (Seya) Brilliance
-		if (n = TC_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/50; }
+		if ((n=TC_SK(cn,  9))) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/50; }
 		
 		spell_pow += (T_SORC_SK(cn, 4)*2 + TC_SK(cn, 52))*spell_apt/50;    // (Sorc) Introspection
 	}
@@ -12322,7 +12321,7 @@ void really_update_char(int cn)
 		}
 		
 		if (T_SEYA_SK(cn,  7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=  m/25; armor+=  m/25; } // (Seya) Determination
-		if (n = TC_SK(cn,  7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=n*m/50; armor+=n*m/50; }
+		if ((n=TC_SK(cn,  7))) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=n*m/50; armor+=n*m/50; }
 	}
 	
 	// Tarot - Lovers
@@ -12588,7 +12587,7 @@ void do_pmshield(int cn, int co)
 		{
 			bu[in].armor  = min(127, bu[in].active / 1024 + 1);
 		}
-		if (n = do_get_ieffect(co, VF_EN_SKUAMS)) bu[in].weapon = bu[in].armor*n/100;
+		if ((n = do_get_ieffect(co, VF_EN_SKUAMS))) bu[in].weapon = bu[in].armor*n/100;
 	}
 	
 	add_spell(co, in);
@@ -12621,7 +12620,7 @@ int get_aria_imm(int cn, int in, int n)
 	
 	if (T_SKAL_SK(cn, 10))                 // (Skal) Guardian
 	{
-		immun = ch[cn].skill[SK_IMMUN];
+		immun = M_SK(cn, SK_IMMUN);
 		
 		if (in) immun -= bu[in].skill[SK_IMMUN];
 		
@@ -12633,7 +12632,7 @@ int get_aria_imm(int cn, int in, int n)
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
-	int power, cz = 0, in2 = 0, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
+	int power, in2 = 0, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
 	
 	if (!co) return;
 	
@@ -12827,7 +12826,7 @@ void do_check_auras(int cn)
 	int in;
 	
 	if (B_SK(cn, SK_ARIA))                        do_skill_aura(cn, SK_ARIA, has_buff(cn, SK_ARIA));
-	if (in = has_buff(cn, SK_IMMOLATE))           do_skill_aura(cn, SK_IMMOLATE2, in);
+	if ((in = has_buff(cn, SK_IMMOLATE)))         do_skill_aura(cn, SK_IMMOLATE2, in);
 	if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   do_skill_aura(cn, SK_SLOW,   0);  // (Sorc) Rewind
 	if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  do_skill_aura(cn, SK_HASTE,  0);  // (Sorc) Fast Forward
 	if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  do_skill_aura(cn, SK_CURSE,  0);  // (Brav) Presence
@@ -12907,7 +12906,7 @@ void do_update_spell_pact(int cn, int in)
 {
 	int power, n;
 	
-	bu[in].power = skill_multiplier(M_SK(cn, SK_PACT), cn);
+	power = bu[in].power = skill_multiplier(M_SK(cn, SK_PACT), cn);
 	
 	// Additive Bonus
 	{
@@ -12935,7 +12934,7 @@ void do_update_spell_pact(int cn, int in)
 }
 void do_update_spell_lethargy(int cn, int in)
 {
-	int power, n, tmp;
+	int power, n;
 	
 	power = M_SK(cn, SK_LETHARGY);
 	
@@ -13059,11 +13058,10 @@ void do_regenerate(int cn)
 	int degenpower = 0, tickcheck = 10000;
 	int moonmult = 20;
 	int hpmult, endmult, manamult, rank=0;
-	int co = -1, cc=0;
+	int co = -1;
 	int tmp = 0, kill_bsp = 0, kill_osp = 0, kill_bos = 0;
-	int scorched = 0, guarded = 0, devRn = 0, devRo = 0, has_sld = 0, has_shl = 0, phalanx = 0, aggravate = 0;
-	int offpot = 0, defpot = 0;
-	int idle = 3, power = 0;
+	int has_sld = 0, has_shl = 0;
+	int idle = 3;
 	char buf[50];
 	
 	strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
@@ -13139,7 +13137,7 @@ void do_regenerate(int cn)
 	}
 	
 	// Special non-ankh amulets
-	if (in = ch[cn].worn[WN_NECK])
+	if ((in = ch[cn].worn[WN_NECK]))
 	{
 		switch (it[in].temp)
 		{
@@ -13308,7 +13306,7 @@ void do_regenerate(int cn)
 	}
 	
 	// Special case for the Amulet of Ankhs
-	if (in = ch[cn].worn[WN_NECK])
+	if ((in = ch[cn].worn[WN_NECK]))
 	{
 		switch (it[in].temp)
 		{
@@ -13348,7 +13346,7 @@ void do_regenerate(int cn)
 				break;
 		}
 	}
-	if (in = get_gear(cn, IT_RINGWARMTH) && it[in].active)
+	if ((in = get_gear(cn, IT_RINGWARMTH) && it[in].active))
 	{
 		do_recovery(cn, 0, (race_reg/ 8) / (halfhp+1));
 		do_recovery(cn, 1, (race_res/ 8) / (halfen+1));
@@ -13409,7 +13407,7 @@ void do_regenerate(int cn)
 	// spell effects
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if (in = ch[cn].spell[n])
+		if ((in = ch[cn].spell[n]))
 		{
 			if ((bu[in].flags & BF_PERMASPELL) || bu[in].temp==206)
 			{
@@ -13606,7 +13604,7 @@ void do_regenerate(int cn)
 						// death
 						do_area_log(cn, cn, ch[cn].x, ch[cn].y, 0, "%s died from a nasty poison.\n", buf);
 						do_char_log(cn, 0, "Oh dear, that poison was fatal. You died...\n");
-						chlog(cn, "Drank poison and died.", ch[cn].name);
+						chlog(cn, "Drank poison and died.");
 						do_char_killed(0, cn, 0);
 						return;
 					}
@@ -13670,7 +13668,7 @@ void do_regenerate(int cn)
 					if (co) degendam = degendam * ch[co].dmg_bonus / 10000;
 							degendam = degendam * ch[cn].dmg_reduction / 10000;
 					
-					if (tmp = do_get_ieffect(cn, VF_EN_LESSDOT))
+					if ((tmp = do_get_ieffect(cn, VF_EN_LESSDOT)))
 						degendam = degendam * max(25, 100-tmp)/100;
 					
 					if (co) do_leech(co, degendam, 1);
@@ -13882,7 +13880,7 @@ void do_regenerate(int cn)
 			{
 				if (co && do_get_iflag(co, SF_SIGN_STOR))
 				{
-					if (in2 = has_spell(co, SK_ZEPHYR))
+					if ((in2 = has_spell(co, SK_ZEPHYR)))
 					{
 						spell_zephyr(co, cn, bu[in2].power, 1);
 					}
@@ -13919,12 +13917,11 @@ void do_regenerate(int cn)
 				if (IS_SEYA_OR_BRAV(cn)) tmp += 256*2;
 				if (has_shl) tmp += 256*3;
 				bu[in].armor = min(127, bu[in].active / tmp + 1);
-				if (p=do_get_ieffect(cn, VF_EN_SKUAMS)) bu[in].weapon = bu[in].armor*p/100;
+				if ((p = do_get_ieffect(cn, VF_EN_SKUAMS)))
+					bu[in].weapon = bu[in].armor*p/100;
 				bu[in].power = bu[in].active / 256;
 				if (old!=bu[in].armor)
-				{
 					do_update_char(cn);
-				}
 			}
 			if (bu[in].temp==SK_MSHELL)
 			{
@@ -14043,7 +14040,7 @@ void do_regenerate(int cn)
 						do_random_blast(cn, bu[in].data[1]);
 					}
 					
-					if (m = TC_SK(cn, 58) * 15)         // (Corr) Skip Ahead
+					if ((m = TC_SK(cn, 58) * 15))         // (Corr) Skip Ahead
 					{
 						if ((tmp = (HP_SOFTCAP(cn) - ch[cn].a_hp))   > 0) do_recovery(cn, 0, tmp*m/100);
 						if ((tmp = (EN_SOFTCAP(cn) - ch[cn].a_end))  > 0) do_recovery(cn, 1, tmp*m/100);
@@ -14407,10 +14404,10 @@ int do_item_osvalue(int cn)
 
 void do_look_item(int cn, int in)
 {
-	int n, flag = 0, act;
+	int n, flag = 0; //, act;
 
-	if (it[in].active) act = 1;
-	else               act = 0;
+//	if (it[in].active) act = 1;
+//	else               act = 0;
 
 	for (n = 0; n<MAXITEMS; n++)    if (ch[cn].item[n]==in    ) { flag = 1; break; }
 	for (n = 0; n<20 && !flag; n++) if (ch[cn].worn[n]==in    ) { flag = 1; break; }
@@ -14423,14 +14420,14 @@ void do_look_item(int cn, int in)
 int barter(int cn, int in, int flag) // flag=1 merchant is selling, flag=0 merchant is buying
 {
 	int pr, opr, brt = 0;
-	int ctrank = 0;
+//	int ctrank = 0;
 		
 	opr = do_item_value(in);
 	
 	// Hack for contracts
 	if (flag && it[in].temp == MCT_CONTRACT)
 	{
-		ctrank = getrank(cn)-6;
+//		ctrank = getrank(cn)-6;
 		opr = opr * 10;
 		opr = opr + opr * getrank(cn) / 9;
 	}
@@ -14468,8 +14465,7 @@ int barter(int cn, int in, int flag) // flag=1 merchant is selling, flag=0 merch
 
 void do_shop_char(int cn, int co, int nr)
 {
-	int in, pr, in2, flag = 0, tmp, n, stk, orgstk=0, orgval=0;
-	unsigned char buf[256];
+	int in, pr, in2, flag = 0, /*tmp,*/ n, stk, orgstk=0, orgval=0;
 	int sk = -1, m = 0;
 	
 	if (co<=0 || co>=MAXCHARS || nr<0 || nr>=186) return;
@@ -14553,7 +14549,7 @@ void do_shop_char(int cn, int co, int nr)
 		chlog(cn, "Sold %s", it[in].name);
 		do_char_log(cn, 1, "You sold a %s for %dG %dS.\n", it[in].reference, pr / 100, pr % 100);
 
-		tmp = it[in].temp;
+//		tmp = it[in].temp;
 	}
 	else
 	{
@@ -14569,7 +14565,7 @@ void do_shop_char(int cn, int co, int nr)
 			{
 				if ((in = ch[co].item[nr])!=0)
 				{
-					int in2 = 0;
+					in2 = 0;
 					if (ch[co].flags & CF_BSPOINTS)
 					{
 						// Stronghold items reflected by player stats
@@ -14695,7 +14691,7 @@ void do_shop_char(int cn, int co, int nr)
 								if (!(ch[cn].flags & CF_SYS_OFF))
 									do_char_log(cn, 1, "You bought a %s for %d Points.\n", it[in2].reference, pr);
 
-								tmp = it[in2].temp;
+//								tmp = it[in2].temp;
 							}
 							else
 							{
@@ -14717,7 +14713,7 @@ void do_shop_char(int cn, int co, int nr)
 								if (!(ch[cn].flags & CF_SYS_OFF))
 									do_char_log(cn, 1, "You bought a %s for %d Tokens.\n", it[in2].reference, pr);
 
-								tmp = it[in2].temp;
+//								tmp = it[in2].temp;
 							}
 							else
 							{
@@ -14742,7 +14738,7 @@ void do_shop_char(int cn, int co, int nr)
 								if (!(ch[cn].flags & CF_SYS_OFF))
 									do_char_log(cn, 1, "You bought a %s for %d Points.\n", it[in2].reference, pr);
 
-								tmp = it[in2].temp;
+//								tmp = it[in2].temp;
 								// Auto-use scroll
 								if (it[in2].driver==134) use_driver(cn, in2, 1);
 							}
@@ -14766,7 +14762,7 @@ void do_shop_char(int cn, int co, int nr)
 								if (!(ch[cn].flags & CF_SYS_OFF))
 									do_char_log(cn, 1, "You bought a %s for %d Points.\n", it[in2].reference, pr);
 
-								tmp = it[in2].temp;
+//								tmp = it[in2].temp;
 								// Super hacky auto-use of scrolls
 								if (it[in2].driver==110)
 								{
@@ -14813,7 +14809,7 @@ void do_shop_char(int cn, int co, int nr)
 										do_char_log(cn, 1, "You bought a %s for %dG %dS.\n", it[in].reference, pr / 100, pr % 100);
 								}
 
-								tmp = it[in].temp;
+//								tmp = it[in].temp;
 							}
 							else
 							{
@@ -14917,7 +14913,6 @@ void do_shop_char(int cn, int co, int nr)
 				{
 					if ((ch[co].flags & CF_BSPOINTS) && !(ch[co].flags & CF_BODY))
 					{
-						int in2;
 						if (ch[co].temp == CT_TACTICIAN || ch[co].temp == get_nullandvoid(0))
 						{
 							in2 = change_bs_shop_item(cn, it[in].temp);
@@ -15650,7 +15645,7 @@ int smith_grade_in(int in)
 {
 	int n;
 	
-	if ( n = it[in].orig_temp) ;
+	if ((n = it[in].orig_temp)) ;
 	else n = it[in].temp;
 	
 	switch (n)
@@ -16103,7 +16098,7 @@ void do_bs_magestone(int cn, int in, int in2)
 	
 	if (!(spr = is_valid_mage_item(in)))
 	{
-		do_char_log(cn, 0, "This item cannot be upgraded with this stone.\n", v);
+		do_char_log(cn, 0, "This item cannot be upgraded with this stone.\n");
 		return;
 	}
 	
@@ -16133,7 +16128,7 @@ void do_bs_gradestone(int cn, int in, int in2)
 	
 	if (!(in3 = smith_grade_in(in)))
 	{
-		do_char_log(cn, 0, "This item cannot be improved with this stone.\n", v);
+		do_char_log(cn, 0, "This item cannot be improved with this stone.\n");
 		return;
 	}
 	
@@ -16417,19 +16412,18 @@ void do_waypoint(int cn, int nr)
 
 void print_tree_desc(int cn, char *text1, char *text2) // used to remove the double %% signs from descriptions
 {
-	int m;
 	char buf[200];
 	
 	strcpy(buf, text1);
 	strcat(buf, text2);
-	sprintf(buf, buf);
+	sprintf(buf, "%s", buf);
 	
 	do_char_log(cn, 1, "%s\n", buf);
 }
 
 void do_treeupdate(int cn, int nr)
 {
-	int i, j, m=0, n;
+	int m = 0, n;
 	int v = 100000;
 	
 	// Check that the ID from the client is valid
@@ -16568,7 +16562,7 @@ void do_treeupdate(int cn, int nr)
 		}
 		if (!(ch[cn].flags & CF_SYS_OFF))
 		{
-			if (n = ch[cn].tree_node[nr])
+			if ((n = ch[cn].tree_node[nr]))
 				do_char_log(cn, 5, "You de-allocated %s for 1000G.\n", sk_corrupt[n].name);
 			else
 				do_char_log(cn, 5, "You de-allocated %s for 1000G.\n", sk_tree[m][nr].name);
@@ -16584,7 +16578,7 @@ void do_treeupdate(int cn, int nr)
 	else if (nr>=12)
 	{
 		nr -= 12;
-		if (n = ch[cn].tree_node[nr])
+		if ((n = ch[cn].tree_node[nr]))
 		{
 			do_char_log(cn, 5, "%s\n", sk_corrupt[n-1].name);
 			print_tree_desc(cn, sk_corrupt[n-1].dsc1, sk_corrupt[n-1].dsc2);
@@ -16613,7 +16607,7 @@ void do_treeupdate(int cn, int nr)
 		}
 		if (T_SK(cn, nr+1))
 		{
-			if (n = ch[cn].tree_node[nr])
+			if ((n = ch[cn].tree_node[nr]))
 				do_char_log(cn, 5, "You have %s allocated already!\n", sk_corrupt[n-1].name);
 			else
 				do_char_log(cn, 5, "You have %s allocated already!\n", sk_tree[m][nr].name);
@@ -16621,7 +16615,7 @@ void do_treeupdate(int cn, int nr)
 		}
 		if (nr>=3 && nr<=5 && !T_SK(cn, 1))
 		{
-			if (n = ch[cn].tree_node[0])
+			if ((n = ch[cn].tree_node[0]))
 				do_char_log(cn, 0, "You must allocate the previous node (%s) before you can allocate this one.\n", sk_corrupt[n-1].name);
 			else
 				do_char_log(cn, 0, "You must allocate the previous node (%s) before you can allocate this one.\n", sk_tree[m][0].name);
@@ -16629,7 +16623,7 @@ void do_treeupdate(int cn, int nr)
 		}
 		if (nr>=6 && nr<=8 && !T_SK(cn, 2))
 		{
-			if (n = ch[cn].tree_node[1])
+			if ((n = ch[cn].tree_node[1]))
 				do_char_log(cn, 0, "You must allocate the previous node (%s) before you can allocate this one.\n", sk_corrupt[n-1].name);
 			else
 				do_char_log(cn, 0, "You must allocate the previous node (%s) before you can allocate this one.\n", sk_tree[m][1].name);
@@ -16637,7 +16631,7 @@ void do_treeupdate(int cn, int nr)
 		}
 		if (nr>=9 && nr<=11 && !T_SK(cn, 3))
 		{
-			if (n = ch[cn].tree_node[2])
+			if ((n = ch[cn].tree_node[2]))
 				do_char_log(cn, 0, "You must allocate the previous node (%s) before you can allocate this one.\n", sk_corrupt[n-1].name);
 			else
 				do_char_log(cn, 0, "You must allocate the previous node (%s) before you can allocate this one.\n", sk_tree[m][2].name);
@@ -16651,7 +16645,7 @@ void do_treeupdate(int cn, int nr)
 		}
 		if (!(ch[cn].flags & CF_SYS_OFF))
 		{
-			if (n = ch[cn].tree_node[nr])
+			if ((n = ch[cn].tree_node[nr]))
 				do_char_log(cn, 1, "You allocated %s.\n", sk_corrupt[n-1].name);
 			else
 				do_char_log(cn, 1, "You allocated %s.\n", sk_tree[m][nr].name);
@@ -16675,7 +16669,7 @@ int do_add_depot(int cn, int in, int nr)
 	// Loop through and check if the item can be stacked with any existing item on the current page
 	for (n = 0; n<ST_SLOTS; n++) 
 	{
-		if (in2 = st[cn].depot[nr][n])
+		if ((in2 = st[cn].depot[nr][n]))
 		{
 			if (god_stack_items(in, in2)==1)
 			{
@@ -17782,7 +17776,7 @@ void do_swap_send_info(int cn, int n, int tmp)
 
 int do_swap_item(int cn, int n)
 {
-	int tmp, in, m, z=0;
+	int tmp, in, m;
 	static char *at_text[5] = {
 		"not brave enough", 
 		"not determined enough", 
@@ -17802,7 +17796,7 @@ int do_swap_item(int cn, int n)
 	if (n<0 || n>19)               return -1;  // sanity check
 	
 	// check prerequisites:
-	if (tmp = ch[cn].citem)
+	if ((tmp = ch[cn].citem))
 	{
 		if (it[tmp].driver==40 && it[tmp].data[0]!=cn)
 		{

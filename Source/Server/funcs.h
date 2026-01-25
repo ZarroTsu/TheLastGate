@@ -47,6 +47,7 @@ void pop_load_all_chars(void);
 void pop_copy_to_new_items(void);
 //void pop_copy_to_new_chars(void);
 void reset_char(int n);
+void reset_item(int n);
 
 // -- tick --
 void tick(void);
@@ -83,6 +84,7 @@ int ch_base_status(int n);
 void char_play_sound(int cn, int nr, int vol, int pan);
 void init_group(void);
 int group_active(int cn);
+void plr_update_all_meta_stat_values(int nr);
 
 // ---- act ----
 int plr_check_target(int m);
@@ -137,7 +139,7 @@ void god_top(int cn);
 void god_create(int cn, int x, int gen_a, int gen_b, int gen_c);
 void god_summon(int cn, char *spec1, char *spec2, char *spec3);
 int god_thrall(int cn, char *spec1, char *spec2, int offset);
-int god_army(int cn, int nmbr, char *spec1, char *spec2);
+void god_army(int cn, int nmbr, char *spec1, char *spec2);
 void god_mirror(int cn, char *spec1, char *spec2); //ML 7.11. ff
 int god_remove_item(int cn, int nr);
 void god_temple(int cn);
@@ -198,7 +200,7 @@ void god_reset_player(int cn, int co);
 void god_reset_players(int cn, int r);
 void god_reset_npcs(int cn);
 void god_reset_ticker(int cn);
-void god_reset_grey(int cn);
+void god_reset_items(int cn);
 
 // ---- do ----
 void do_log(int cn, int font, char *text);
@@ -465,6 +467,7 @@ int is_back(int cn, int co);
 int is_next_to(int cn, int co);
 int is_near(int cn, int co, int v);
 int common_mult(int cn, int co, int power);
+int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_power, int count, int hit, int avgdmg);
 int spell_light(int cn, int co, int power);
 int spell_protect(int cn, int co, int power, int fromscroll);
 int spell_enhance(int cn, int co, int power, int fromscroll);
@@ -473,6 +476,8 @@ int spell_mshield(int cn, int co, int power, int fromscroll);
 int spell_haste(int cn, int co, int power, int fromscroll);
 int spell_identify(int cn, int co, int in);
 int spell_heal(int cn, int co, int power);
+int spell_warcry(int cn, int co, int power, int flag);
+int spell_zephyr(int cn, int co, int power, int flag);
 int skill_plague(int cn, int co, int power);
 int chance_compare(int co, int offense, int defense, int usemana);
 int face_target(int cn, int co);

@@ -116,7 +116,7 @@ int get_free_buff(void)
 
 int god_copy_buff(int in)
 {
-	int n, m;
+	int n;
 	unsigned long long prof;
 	
 	prof = prof_start();
@@ -139,7 +139,7 @@ int god_copy_buff(int in)
 
 int god_create_buff(int temp)
 {
-	int n, m;
+	int n;
 	unsigned long long prof;
 	
 	prof = prof_start();
@@ -185,7 +185,7 @@ int get_free_item(void)
 
 int god_create_item(int temp)
 {
-	int n, m;
+	int n;
 	unsigned long long prof;
 
 	if (!IS_SANEITEMPLATE(temp)) return 0;
@@ -1700,9 +1700,12 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 				strcpy(name, it[in].name);
 				strcpy(refer, it[in].reference);
 				strcpy(descr, it[in].description);
-				sprintf(it[in].name, "%s's %s", godn, name);
-				sprintf(it[in].reference, "%s's %s", godn, refer);
-				sprintf(it[in].description, "%s It has been blessed by the%s%s.", descr, gend, godn);
+				sprintf(name, "%s's %s", godn, name);
+				strncpy(it[in].name, name, 39);
+				sprintf(refer, "%s's %s", godn, refer);
+				strncpy(it[in].reference, refer, 39);
+				sprintf(descr, "%s It has been blessed by the%s%s.", descr, gend, godn);
+				strncpy(it[in].description, descr, 199);
 				
 				if (is_unique_able(x) > 54) // Claws
 				{
@@ -1759,7 +1762,8 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 				it[in].flags |= IF_IDENTIFIED | IF_SOULSTONE | IF_NOREPAIR | IF_PURP_UNI | IF_GORN_UNI;
 				it[in].flags &= ~IF_CAN_SS;
 				strcpy(descr, it[in].description);
-				sprintf(it[in].description, "%s It has been blessed by the god Osiris.", descr);
+				sprintf(descr, "%s It has been blessed by the god Osiris.", descr);
+				strncpy(it[in].description, descr, 199);
 			}
 		}
 		else
@@ -2457,19 +2461,19 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset)
 	return ct;
 }
 
-int god_army(int cn, int nmbr, char *spec1, char *spec2)
+void god_army(int cn, int nmbr, char *spec1, char *spec2)
 {
 	int n, gt=0, offset=0;
 	
 	if (nmbr < 1)
 	{
 		do_char_log(cn, 0, "...How many?\n");
-		return 0;
+		return;
 	}
 	if (nmbr > 25)
 	{
 		do_char_log(cn, 0, "That might be TOO many...\n");
-		return 0;
+		return;
 	}
 	
 	if (nmbr > 1) offset++;
@@ -2480,7 +2484,7 @@ int god_army(int cn, int nmbr, char *spec1, char *spec2)
 		if (god_thrall(cn, spec1, spec2, offset))
 			gt++;
 		else 
-			return 0;
+			return;
 	}
 	
 	if (gt)
@@ -2539,6 +2543,7 @@ void god_tavern(int cn)
 int god_build_start(int cn)
 {
 	int co, n, in;
+	char buf[60];
 
 	if ((co = ch[cn].data[PCD_COMPANION]))
 	{
@@ -2570,7 +2575,9 @@ int god_build_start(int cn)
 	ch[co].citem = ch[cn].citem;
 	ch[cn].citem = 0;
 
-	sprintf(ch[co].name, "%s's holder", ch[cn].name);
+	sprintf(buf, "%s's holder", ch[cn].name);
+	strncpy(ch[co].name, buf, 39);
+	
 	god_drop_char(co, 10, 10);
 
 	/* Set build mode flag */
@@ -4278,7 +4285,7 @@ void god_racechange(int co, int temp, int keepstuff)
 {
 	struct item tmp;
 	int n, rank;
-	struct character old, old_dpt;
+	struct character old; //, old_dpt;
 	struct storage dpt;
 
 	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co))
@@ -4293,7 +4300,7 @@ void god_racechange(int co, int temp, int keepstuff)
 
 	if (!keepstuff)
 	{
-		old_dpt = ch[co];
+//		old_dpt = ch[co];
 		dpt = st[co];
 		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 			st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
@@ -5047,7 +5054,7 @@ void god_gargoyle(int cn)
 
 void god_minor_racechange(int cn, int t) // note: cannot deal with values which are already higher than the new max!
 {
-	int n, tempkin, tempflags;
+	int n, tempkin; //, tempflags;
 
 	if (!IS_SANECHAR(cn) || !IS_SANECTEMPLATE(t))
 	{
@@ -5068,7 +5075,7 @@ void god_minor_racechange(int cn, int t) // note: cannot deal with values which 
 	ch[cn].sprite = ch_temp[t].sprite;
 	
 	tempkin = ch[cn].kindred;
-	tempflags = ch[cn].flags;
+//	tempflags = ch[cn].flags;
 	
 	ch[cn].kindred = ch_temp[t].kindred;
 	

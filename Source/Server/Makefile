@@ -2,7 +2,7 @@ all: server respawn password cgi/info.cgi cgi/acct.cgi cgi/mapper.cgi owner
 
 CC=gcc -m32
 DEBUG=-g
-CFLAGS=-Wall -Wshadow -Winline -Wno-pointer-sign -Wno-missing-braces -O3 $(DEBUG) -march=pentium4 -fno-strict-aliasing
+CFLAGS=-Wall -Wshadow -Winline -Wno-pointer-sign -Wno-missing-braces -Wunused-result -O3 $(DEBUG) -march=pentium4 -fno-strict-aliasing
 LDFLAGS=-O $(DEBUG)
 ENDFLAGS=-lm -lz -lcrypt
 
