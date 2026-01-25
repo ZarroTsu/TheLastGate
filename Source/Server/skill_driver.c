@@ -953,7 +953,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 		{
-			if (IS_SPELL(intemp) && IS_NOMAGIC(co)) continue;
+			if (IS_SPELLEX(intemp) && IS_NOMAGIC(co)) continue;
 			if (sc = do_surround_check(cn, co, 1))
 				remember_pvp(cn, co);
 			if (no_target)
@@ -3623,8 +3623,8 @@ void char_info(int cn, int co)
 		{
 			do_char_log(cn, 1, 
 			"%-12.12s %3d/%3d  !  %-12.12s %3d/%3d\n",
-			skilltab[n1].name, B_SK(co, n1), M_SK(co, n1),
-			skilltab[n2].name, B_SK(co, n2), M_SK(co, n2));
+			skilltab[n1].name, B_SK(co, n1), get_skill_score(co, n1, 0),
+			skilltab[n2].name, B_SK(co, n2), get_skill_score(co, n2, 0));
 			n1 = -1;
 			n2 = -1;
 		}
@@ -3634,7 +3634,7 @@ void char_info(int cn, int co)
 	{
 		do_char_log(cn, 1, 
 		"%-12.12s %3d/%3d\n",
-		skilltab[n1].name, B_SK(co, n1), M_SK(co, n1));
+		skilltab[n1].name, B_SK(co, n1), get_skill_score(co, n1, 0));
 	}
 	
 	do_char_log(cn, 1, " \n");

@@ -7522,7 +7522,7 @@ void set_attrib_score(int cn, int z, int n)
 	ch[cn].attrib[z][4] = (n >> 8) & 0xFF;
 	ch[cn].attrib[z][5] = n & 0xFF;
 }
-int get_skill_score(int cn, int n)
+int get_skill_score(int cn, int n, int sppow)
 {
 	int v;
 	
@@ -7533,7 +7533,7 @@ int get_skill_score(int cn, int n)
 	
 	v = ( (ch[cn].skill[n][4] << 8) | ch[cn].skill[n][5] );
 	
-	if ((IS_SPELL(n) && !do_get_iflag(cn, SF_STAR_R)) || (IS_SKILL(n) && do_get_iflag(cn, SF_STAR_R))) // [Taro] Star.R
+	if (sppow && ((IS_SPELL(n) && !do_get_iflag(cn, SF_STAR_R)) || (IS_SKILL(n) && do_get_iflag(cn, SF_STAR_R)))) // [Taro] Star.R
 		v += ch[cn].spell_pow;
 	
 	return v;

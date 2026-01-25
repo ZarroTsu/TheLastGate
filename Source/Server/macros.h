@@ -196,7 +196,8 @@ int is_ascroll(int in);
 #define IS_MY_ALLY(cn, co)		((((!IS_PLAYER(cn) && !IS_PLAYER(co) && ch[(cn)].data[CHD_GROUP] == ch[(co)].data[CHD_GROUP]) || (IS_PLAYER(cn) && IS_PLAYER(co) && !IS_OPP_CLAN(cn, co))) && !(map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA)) || (IS_PLAYER(cn) && IS_PLAYER(co) && isgroup((cn), (co))) || (IS_PLAYER(cn) && IS_COMPANION(co) && CN_OWNER(co)==cn) || (IS_PLAYER(co) && IS_COMPANION(cn) && CN_OWNER(cn)==co))
 
 #define IS_SKILL(a)				((a==13||a==22||a==31||a==35||a==37||a==40||a==41||a==48||a==49)?1:0)
-#define IS_SPELL(a)				((a==5||a==6||a==8||a==11||a==12||a==15||a==17||a==18||a==19||a==20||a==21||a==23||a==24||a==25||a==26||a==27||a==29||a==32||a==42||a==43||a==46||a==47||a==50||a==51||a==52||a==59||a==64||a==65||a==67)?1:0)
+#define IS_SPELL(a)				((a==11||a==15||a==17||a==18||a==19||a==20||a==21||a==24||a==25||a==26||a==27||a==42||a==43||a==46||a==47)?1:0)
+#define IS_SPELLEX(a)			((a==5||a==6||a==8||a==11||a==12||a==15||a==17||a==18||a==19||a==20||a==21||a==23||a==24||a==25||a==26||a==27||a==29||a==32||a==42||a==43||a==46||a==47||a==50||a==51||a==52||a==59||a==64||a==65||a==67)?1:0)
 #define IS_NOMAGIC(cn)			((ch[cn].flags & CF_NOMAGIC) != 0)
 
 // Ditto, with sanity check
@@ -280,7 +281,7 @@ int is_ascroll(int in);
 #define B_AT(cn, a)				(ch[(cn)].attrib[(a)][0])
 #define M_AT(cn, a)				(get_attrib_score((cn), (a)))
 #define B_SK(cn, s)				(ch[(cn)].skill[(s)][0])
-#define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s))*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s)))
+#define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s), 1)*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s), 1))
 
 #define T_SK(cn, a)				(IS_SANECHAR(cn)     && st_skillnum((cn), (a), (-1)))
 #define T_SKT(cn, a)			(IS_SANECHAR(cn)     && st_skillnum((cn), (a), (-2)))

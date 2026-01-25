@@ -238,28 +238,28 @@ struct sk_tree sk_tree[10][12]={
 		  6602,                            "" },
 		{ "Avoidance",                     "+4 to Parry Score.",
 		  6624,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Absolution",                    "2%% more damage dealt for each buff or debuff ",
 		  6604,                            "on you." },
 		{ "Rigor",                         "4%% increased total Hit Score.",
 		  6689,                            "" },
 		{ "Scorn",                         "Your skills and spells ignore 20%% of enemy ",
 		  6606,                            "immunity." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Determination",                 "Gain +1 to Weapon and Armor Value for every 25 ",
 		  6615,                            "total attributes." },
 		{ "Jack of All Trades",            "5%% increased total Attributes.",
 		  6608,                            "" },
 		{ "Brilliance",                    "Gain +1 to Spellpower Bonus for every 25 ",
 		  6623,                            "total attributes." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Enigmatic",                     "20%% less effect of debuffs on you.",
 		  6610,                            "" },
 		{ "Flexibility",                   "4%% increased total Parry Score.",
 		  6695,                            "" },
 		{ "Penance",                       "2%% less damage taken for each buff or debuff ",
 		  6612,                            "on you." }
-	}, // "         '         '         ", "         '         '         '         '         "
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Arch Templar
 		{ "Ravager",                       "+6 to Top Damage.",
 		  6697,                            "" },
@@ -267,28 +267,28 @@ struct sk_tree sk_tree[10][12]={
 		  6614,                            "" },
 		{ "Toughness",                     "+4 to Armor Value.",
 		  6603,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Bulwark",                       "30%% less Top Damage taken from enemies ",
 		  6612,                            "attacking you." },
 		{ "Vanquisher",                    "10%% increased total Top Damage.",
 		  6701,                            "" },
 		{ "Impact",                        "Your minimum hit damage is equal to your ",
 		  6702,                            "maximum hit damage." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Barbarism",                     "Your active melee skills gain an additional ",
 		  6625,                            "20%% Strength bonus." },
 		{ "Overwhelming Strength",         "6%% increased total Strength. ",
 		  6620,                            "+10 to Strength Limit." },
 		{ "Overlord",                      "1%% increased effect of Warcry for every 10 ",
 		  6619,                            "total Strength." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Rampart",                       "50%% more parry granted by your Shield skill.",
 		  6624,                            "" },
 		{ "Unbreakable",                   "10%% increased total Armor Value.",
 		  6611,                            "" },
 		{ "Fortitude",                     "1%% increased effect of Safeguard for every 10 ",
 		  6622,                            "total Armor Value." }
-	}, // "         '         '         ", "         '         '         '         '         "
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Skald
 		{ "Decisiveness",                  "+2%% to Base Critical Hit Chance.",
 		  6688,                            "" },
@@ -296,28 +296,28 @@ struct sk_tree sk_tree[10][12]={
 		  6626,                            "" },
 		{ "Sanctity",                      "+4 to Immunity.",
 		  6667,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Litheness",                     "50%% reduced extra damage taken from enemy ",
 		  6634,                            "critical strikes." },
 		{ "Brutality",                     "+20%% to Critial Hit Multiplier.",
 		  6631,                            "" },
 		{ "Crushing Blows",                "Your Cleave skill can inflict critical hits.",
 		  6616,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Nocturne",                      "1%% increased effect of Precision for every 10 ",
 		  6687,                            "total Agility." },
 		{ "Overwhelming Agility",          "6%% increased total Agility. ",
 		  6632,                            "+10 to Agility Limit." },
 		{ "Celerity",                      "Your active melee skills gain an additional ",
 		  6625,                            "20%% Agility bonus." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Guardian",                      "Your Aria grants affected allies 20%% of your ",
 		  6672,                            "total Immunity." },
 		{ "Indifference",                  "10%% increased total Immunity.",
 		  6681,                            "" },
 		{ "Bastion",                       "20%% reduced reservation of hitpoints, ",
 		  6628,                            "endurance, or mana." }
-	}, // "         '         '         ", "         '         '         '         '         "
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Warrior
 		{ "Rapidity",                      "+6 to Attack Speed.",
 		  6637,                            "" },
@@ -325,28 +325,28 @@ struct sk_tree sk_tree[10][12]={
 		  6638,                            "" },
 		{ "Stamina",                       "+30 to Maximum Endurance.",
 		  6627,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Dismissal",                     "1%% increased effect of Immunity for every 25 ",
 		  6648,                            "uncapped Attack Speed." },
 		{ "Swiftness",                     "20%% increased total Attack Speed.",
 		  6641,                            "" },
 		{ "Flash Step",                    "Your Leap skill repeats an additional time.",
 		  6640,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Slayer",                        "1%% increased power of Leap for every 10 total ",
 		  6696,                            "Strength." },
 		{ "Harrier",                       "4%% increased total Agility and Strength.",
 		  6644,                            "" },
-		{ "Antagonizer",                   "1%% increased power of Blind for every 10 total ",
-		  6643,                            "Agility." },
-		//"         '         '         ", "         '         '         '         '         "
+		{ "Antagonizer",                   "1%% increased power of Blind for every 10 ",
+		  6643,                            "total Agility." },
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Champion",                      "Enemies beside and behind you no longer gain a ",
 		  6646,                            "bonus to hitting you." },
 		{ "Perseverance",                  "20%% increased Maximum Endurance. ",
 		  6635,                            "2%% of damage dealt is leeched as Endurance." },
-		{ "Tenacity",                      "30%% of damage taken is dealt to your Endurance ",
-		  6636,                            "before Hitpoints." }
-	}, // "         '         '         ", "         '         '         '         '         "
+		{ "Tenacity",                      "30%% of damage taken is dealt to your ",
+		  6636,                            "Endurance before Hitpoints." }
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Sorcerer
 		{ "Passion",                       "+4 to Spell Aptitude.",
 		  6639,                            "" },
@@ -354,28 +354,28 @@ struct sk_tree sk_tree[10][12]={
 		  6650,                            "" },
 		{ "Quickstep",                     "+6 to Movement Speed.",
 		  6651,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Introspection",                 "Gain +1 to Spellpower Bonus for every 25 total ",
 		  6623,                            "Spell Aptitude." },
 		{ "Zealotry",                      "10%% increased total Spell Aptitude.",
 		  6647,                            "" },
 		{ "Rewind",                        "Your Slow spell is now a passive aura, with a ",
 		  6658,                            "base radius of 4." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Toxins",                        "1%% increased power of Poison for every 10 ",
 		  6652,                            "total Intuition." },
 		{ "Pragmatism",                    "4%% increased total Willpower and Intuition.",
 		  6656,                            "" },
 		{ "Hex Master",                    "1%% increased power of Lethargy for every 10 ",
 		  6655,                            "total Willpower." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Fast Forward",                  "Your Haste spell is now a passive aura, with a ",
 		  6660,                            "base radius of 4." },
 		{ "Fleet-Foot",                    "20%% increased total Movement Speed.",
 		  6659,                            "" },
-		{ "Dodging",                       "1%% increased effect of Resistance for every 25 ",
-		  6648,                            "uncapped Movement Speed." }
-	}, // "         '         '         ", "         '         '         '         '         "
+		{ "Dodging",                       "1%% increased effect of Resistance for every ",
+		  6648,                            "25 uncapped Movement Speed." }
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Summoner
 		{ "Nimbleness",                    "+6 to Cast Speed.",
 		  6661,                            "" },
@@ -383,28 +383,28 @@ struct sk_tree sk_tree[10][12]={
 		  6662,                            "" },
 		{ "Barrier",                       "+4 to Resistance.",
 		  6667,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Strategist",                    "Increases and multipliers to Cast Speed also ",
 		  6664,                            "affect Attack Speed." },
 		{ "Spellslinger",                  "20%% increased total Cast Speed.",
 		  6665,                            "" },
 		{ "Tactician",                     "1%% increased effect of Tactics for every 25 ",
 		  6666,                            "uncapped Cast Speed." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Mysticism",                     "Your active magic spells gain an additional ",
 		  6629,                            "20%% Willpower bonus." },
 		{ "Overwhelming Willpower",        "6%% increased total Willpower. ",
 		  6668,                            "+10 to Willpower Limit." },
 		{ "Shaper",                        "1%% increased effect of Companion Mastery for ",
 		  6669,                            "every 10 total Willpower." },
-		//"         '         '         ", "         '         '         '         '         "
-		{ "Diviner",                       "Casting a companion skill while holding a tarot ",
-		  6670,                            "card grants the companion its effects." },
+		//"         '         '         ", "         '         '         '         '      "
+		{ "Diviner",                       "Casting a companion skill while holding a ",
+		  6670,                            "tarot card grants the companion its effects." },
 		{ "Constitution",                  "10%% increased total Resistance.",
 		  6681,                            "" },
 		{ "Necromancy",                    "2%% of damage dealt by your companions is ",
 		  6703,                            "leeched to you as Hitpoints." }
-	}, // "         '         '         ", "         '         '         '         '         "
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Arch Harakim
 		{ "Composure",                     "+4 to Cooldown Rate.",
 		  6673,                            "" },
@@ -412,28 +412,28 @@ struct sk_tree sk_tree[10][12]={
 		  6674,                            "" },
 		{ "Wellspring",                    "+30 to Maximum Mana.",
 		  6675,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Malice",                        "Your spells cannot be suppressed.",
 		  6657,                            "" },
 		{ "Serenity",                      "10%% increased total Cooldown Rate.",
 		  6677,                            "" },
 		{ "Destroyer",                     "Your Blast spell repeats an additional time at ",
 		  6676,                            "the end of its cooldown." },
-		//"         '         '         ", "         '         '         '         '         "
-		{ "Psychosis",                     "1%% increased power of Pulse for every 10 total ",
-		  6679,                            "Intuition." },
+		//"         '         '         ", "         '         '         '         '      "
+		{ "Psychosis",                     "1%% increased power of Pulse for every 10 ",
+		  6679,                            "total Intuition." },
 		{ "Overwhelming Intuition",        "6%% increased total Intuition. ",
 		  6680,                            "+10 to Intuition Limit." },
 		{ "Concentration",                 "Your active magic spells gain an additional ",
 		  6629,                            "20%% Intuition bonus." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Flow",                          "Gain +1 to Spellpower bonus for every 100 ",
 		  6623,                            "uncapped Maximum Mana." },
 		{ "Perpetuity",                    "20%% increased Maximum Mana. ",
 		  6683,                            "2%% of damage dealt is leeched as Mana." },
 		{ "Resourcefulness",               "30%% of damage taken is dealt to your Mana ",
 		  6684,                            "before Hitpoints." }
-	}, // "         '         '         ", "         '         '         '         '         "
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Braver
 		{ "Muscle",                        "+4 to Weapon Value.",
 		  6601,                            "" },
@@ -441,28 +441,28 @@ struct sk_tree sk_tree[10][12]={
 		  6686,                            "" },
 		{ "Mindfulness",                   "+4 to Spellpower Bonus.",
 		  6642,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Perfectionism",                 "1%% increased effect of Finesse for every 10 ",
 		  6691,                            "total Weapon Value." },
 		{ "Valor",                         "10%% increased total Weapon Value.",
 		  6605,                            "" },
 		{ "Presence",                      "Your Curse spell is now a passive aura, with a ",
 		  6658,                            "base radius of 4." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Virtuosity",                    "Your passive skills gain an additional 20%% ",
 		  6645,                            "Braveness bonus." },
 		{ "Overwhelming Braveness",        "6%% increased total Braveness. ",
 		  6692,                            "+10 to Braveness Limit." },
 		{ "Alacrity",                      "1%% increased power of Zephyr for every 10 ",
 		  6640,                            "total Braveness." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Spellblade",                    "Your Spellpower Bonus is granted as additional ",
 		  6654,                            "Top Damage." },
 		{ "Wizardry",                      "20%% increased total Spellpower Bonus.",
 		  6707,                            "" },
-		{ "Resilience",                    "40%% reduced effect of healing sickness on you.",
-		  6694,                            "" }
-	}, // "         '         '         ", "         '         '         '         '         "
+		{ "Resilience",                    "40%% reduced effect of healing sickness on ",
+		  6694,                            "you." }
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Lycanthrope
 		{ "Expanse",                       "+2 to Area of Effect.",
 		  6649,                            "" },
@@ -470,313 +470,313 @@ struct sk_tree sk_tree[10][12]={
 		  6663,                            "" },
 		{ "Sharkskin",                     "+6 to Thorns.",
 		  6613,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
-		{ "Sickness",                      "Your Weaken skill is now a passive aura, with a ",
-		  6658,                            "base radius of 4." },
+		//"         '         '         ", "         '         '         '         '      "
+		{ "Sickness",                      "Your Weaken skill is now a passive aura, with ",
+		  6658,                            "a base radius of 4." },
 		{ "Pride",                         "50%% increased total Area of Effect.",
 		  6653,                            "" },
 		{ "Greed",                         "Enemies affected by your debuffs grant 2%% of ",
 		  6700,                            "damage taken as Hitpoints to the attacker." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Lust",                          "50%% increased effect of recovery from all ",
 		  6706,                            "sources." },
 		{ "Gluttony",                      "20%% increased Maximum Hitpoints. ",
 		  6671,                            "2%% of damage dealt is leeched as Hitpoints." },
 		{ "Wrath",                         "1%% increased effect of bonus from Pact for ",
 		  6705,                            "every 50 uncapped Maximum Hitpoints." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Sloth",                         "20%% of Thorns is triggered upon parrying.",
 		  6618,                            "" },
 		{ "Envy",                          "20%% increased total Thorns score.",
 		  6617,                            "" },
 		{ "Serration",                     "Bleeding inflicted by you deals 1%% increased ",
 		  6702,                            "damage per 2 points of Thorns score." }
-	}, // "         '         '         ", "         '         '         '         '         "
+	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Contract
-		{ "Reward",                        "200%% increased chance of finding Rainbow Belts ",
-		  6709,                            "in contracts signed by you." },
+		{ "Reward",                        "200%% increased chance of finding Rainbow ",
+		  6709,                            "Belts in contracts signed by you." },
 		{ "Challenge",                     "+1 to rank of contracts signed by you.",
 		  6710,                            "" },
 		{ "Army",                          "+1 enemy per spawn in contracts signed by you.",
 		  6711,                            "" },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Hope",                          "20%% increased effect of rewards from green ",
 		  6712,                            "shrines in contracts signed by you." },
-		{ "Opalescence",                   "200%% increased chance of finding Rainbow Belts ",
-		  6713,                            "in contracts signed by you." },
+		{ "Opalescence",                   "200%% increased chance of finding Rainbow ",
+		  6713,                            "Belts in contracts signed by you." },
 		{ "Scholar",                       "20%% more clear experience from contracts ",
 		  6714,                            "signed by you." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Fate",                          "20%% more effect of blue shrines in contracts ",
 		  6715,                            "signed by you." },
 		{ "Hubris",                        "+1 to rank of contracts signed by you.",
 		  6716,                            "" },
 		{ "Binding",                       "Contracts signed by you always grant tier 3 ",
 		  6717,                            "effects from quills." },
-		//"         '         '         ", "         '         '         '         '         "
+		//"         '         '         ", "         '         '         '         '      "
 		{ "Destiny",                       "Red shrines produce harder enemies with more ",
 		  6718,                            "rewards in contracts signed by you." },
 		{ "Swarm",                         "+1 enemy per spawn in contracts signed by you.",
 		  6719,                            "" },
 		{ "Incentive",                     "Enemies grant an additional 5%% of exp as ",
 		  6720,                            "Contract Pts in contracts signed by you." }
-	}  // "         '         '         ", "         '         '         '         '         "
+	}  // "         '         '         ", "         '         '         '         '      "
 };
 
 struct sk_tree sk_corrupt[NUM_CORR]={
-   // "         '         '         ", "         '         '         '         '         "
+   // "         '         '         ", "         '         '         '         '      "
 	{ "False Accuracy",                "(+2) to Hit Score.",
 	  6685,                            "" },
 	{ "False Expertise",               "(+1) to all Attributes.",
 	  6602,                            "" },
 	{ "False Avoidance",               "(+2) to Parry Score.",
 	  6624,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Absolution",              "(+1%%) more damage dealt for each buff or ",
 	  6604,                            "debuff on you." },
 	{ "False Rigor",                   "(+2%%) increased total Hit Score.",
 	  6689,                            "" },
 	{ "False Scorn",                   "Your skills and spells ignore (+10%%) of enemy ",
 	  6606,                            "immunity." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Determination",           "Gain (+1) to Weapon and Armor Value for every ",
 	  6615,                            "50 total attributes." },
 	{ "Master of None",                "(+5) to all Skill and Attribute limits.",
 	  6704,                            "" },
 	{ "False Brilliance",              "Gain (+1) to Spellpower Bonus for every 50 ",
 	  6623,                            "total attributes." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Enigmatic",               "(+10%%) less effect of debuffs on you.",
 	  6610,                            "" },
 	{ "False Flexibility",             "(+2%%) increased total Parry Score.",
 	  6695,                            "" },
 	{ "False Penance",                 "(+1%%) less damage taken for each buff or ",
 	  6612,                            "debuff on you." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Ravager",                 "(+3) to Top Damage.",
 	  6697,                            "" },
 	{ "False Might",                   "(+3) to Strength.",
 	  6614,                            "" },
 	{ "False Toughness",               "(+2) to Armor Value.",
 	  6603,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Bulwark",                 "(+15%%) less Top Damage taken from enemies ",
 	  6612,                            "attacking you." },
 	{ "False Vanquisher",              "(+5%%) increased total Top Damage.",
 	  6701,                            "" },
 	{ "Goliath",                       "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Greataxes." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Barbarism",               "Your active melee skills gain an additional ",
 	  6625,                            "(+10%%) Strength bonus." },
 	{ "False Strength",                "(+3%%) increased total Strength. ",
 	  6620,                            "(+5) to Strength Limit." },
 	{ "False Overlord",                "(+1%%) increased effect of Warcry for every 20 ",
 	  6619,                            "total Strength." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Full Cover",                    "(+15%%) incresed effect of stats granted by ",
 	  6690,                            "Shields." },
 	{ "False Unbreakable",             "(+5%%) increased total Armor Value.",
 	  6611,                            "" },
 	{ "False Fortitude",               "(+1%%) increased effect of Safeguard for every ",
 	  6622,                            "20 total Armor Value." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Decisiveness",            "(+1%%) to Base Critical Hit Chance.",
 	  6688,                            "" },
 	{ "False Dexterity",               "(+3) to Agility.",
 	  6626,                            "" },
 	{ "False Sanctity",                "(+2) to Immunity.",
 	  6667,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Litheness",               "(+25%%) reduced extra damage taken from enemy ",
 	  6634,                            "critical strikes." },
 	{ "False Brutality",               "(+10%%) to Critical Hit Multiplier.",
 	  6631,                            "" },
 	{ "Monkey Grip",                   "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Twohanders." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Nocturne",                "(+1%%) increased effect of Precision for every ",
 	  6687,                            "20 total Agility." },
-	{ "False Agility",                 "(+3%%) increased total Agility. (+5) to Agility Limit.",
-	  6632,                            "" },
+	{ "False Agility",                 "(+3%%) increased total Agility. ",
+	  6632,                            "(+5) to Agility Limit." },
 	{ "False Celerity",                "Your active melee skills gain an additional ",
 	  6625,                            "(+10%%) Agility bonus." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Towering Presence",             "(+15%%) increased effect of passive aura ",
 	  6672,                            "abilities." },
 	{ "False Indifference",            "(+5%%) increased total Immunity.",
 	  6681,                            "" },
 	{ "False Bastion",                 "(+10%%) reduced reservation of hitpoints, ",
 	  6628,                            "endurance, or mana." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Rapidity",                "(+3) to Attack speed.",
 	  6637,                            "" },
 	{ "False Ruffian",                 "(+2) to Strength & (+2) to Agility.",
 	  6638,                            "" },
 	{ "False Stamina",                 "(+15) to Maximum Endurance.",
 	  6627,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Dismissal",               "(+1%%) increased effect of Immunity for every ",
 	  6648,                            "50 uncapped Attack Speed." },
 	{ "False Swiftness",               "(+10%%) incressed total Attack Speed.",
 	  6641,                            "" },
 	{ "Axeman",                        "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Axes." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Slayer",                  "(+1%%) increased power of Leap for every 20 ",
 	  6696,                            "total Strength." },
 	{ "False Harrier",                 "(+2%%) increased total Agility and Strength.",
 	  6644,                            "" },
 	{ "False Antagonizer",             "(+1%%) increased power of Blind for every 20 ",
 	  6643,                            "total Agility." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Severance",                     "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Dual Swords." },
 	{ "False Perseverance",            "(+10%%) increased Maximum Endurance. ",
 	  6635,                            "(+1%%) of damage dealt is leeched as Endurance." },
 	{ "False Tenacity",                "(+15%%) of damage taken is dealt to your ",
 	  6636,                            "Endurance before Hitpoints." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Passion",                 "(+2) to Spell Aptitude.",
 	  6639,                            "" },
 	{ "False Potency",                 "(+2) to Willpower & (+2) to Intuition.",
 	  6650,                            "" },
 	{ "False Quickstep",               "(+3) to Movement Speed.",
 	  6651,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Introspection",           "Gain (+1) to Spellpower Bonus for every 50 ",
 	  6623,                            "total Spell Aptitude." },
 	{ "False Zealotry",                "(+5%%) increased total Spell Aptitude.",
 	  6647,                            "" },
 	{ "Assassin",                      "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Daggers." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Toxins",                  "(+1%%) increased power of Poison for every 20 ",
 	  6652,                            "total Intuition." },
 	{ "False Pragmatism",              "(+2%%) increased total Willpower and Intuition.",
 	  6656,                            "" },
 	{ "False Hex Master",              "(+1%%) increased power of Lethargy for every 20 ",
 	  6655,                            "total Willpower." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Skip Ahead",                    "(+15%%) of missing health, endurance and mana ",
 	  6660,                            "is restored when skill exhaustion ends." },
 	{ "False Fleet-Foot",              "(+10%%) increased total Movement Speed.",
 	  6659,                            "" },
 	{ "False Dodging",                 "(+1%%) increased effect of Resistance for every ",
 	  6648,                            "50 uncapped Movement Speed." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Nimbleness",              "(+3) to Cast Speed.",
 	  6661,                            "" },
 	{ "False Wisdom",                  "(+3) to Willpower.",
 	  6662,                            "" },
 	{ "False Barrier",                 "(+2) to Resistance.",
 	  6667,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Harpooner",                     "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Spears." },
 	{ "False Spellslinger",            "(+10%%) increased total Cast Speed.",
 	  6665,                            "" },
-	{ "False Tactician",               "(+1%%) increased effect of Tactics for every 50 ",
-	  6666,                            "uncapped Cast Speed." },
-	//"         '         '         ", "         '         '         '         '         "
+	{ "False Tactician",               "(+1%%) increased effect of Tactics for every ",
+	  6666,                            "50 uncapped Cast Speed." },
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Mysticism",               "Your active magic spells gain an additional ",
 	  6629,                            "(+10%%) Willpower bonus." },
 	{ "False Willpower",               "(+3%%) increased total Willpower. ",
 	  6668,                            "(+5) to Willpower Limit." },
 	{ "False Shaper",                  "(+1%%) increased effect of Companion Mastery ",
 	  6669,                            "for every 20 total Willpower." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Wraithlord",                    "(+2%%) of damage dealt by you is leeched to ",
 	  6708,                            "your companions as Hitpoints." },
 	{ "False Constitution",            "(+5%%) increased total Resistance.",
 	  6681,                            "" },
 	{ "False Necromancy",              "(+1%%) of damage dealt by your companions is ",
 	  6703,                            "leeched to you as Hitpoints." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Composure",               "(+2) to Cooldown Rate.",
 	  6673,                            "" },
 	{ "False Intellect",               "(+3) to Intuition.",
 	  6674,                            "" },
 	{ "False Wellspring",              "(+15) to Maximum Mana.",
 	  6675,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Repurpose",                     "(+15%%) of uncapped Maximum Mana is converted ",
 	  6682,                            "into Maximum Hitpoints." },
 	{ "False Serenity",                "(+5%%) increased total Cooldown Rate.",
 	  6677,                            "" },
 	{ "Warlock",                       "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Staffs." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Psychosis",               "(+1%%) increased power of Pulse for every 20 ",
 	  6679,                            "total Intuition." },
 	{ "False Intuition",               "(+3%%) increased total Intuition. ",
 	  6680,                            "(+5) to Intuition Limit." },
 	{ "False Concentration",           "Your active magic spells gain an additional ",
 	  6629,                            "(+10%%) Intuition bonus." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Flow",                    "Gain (+1) Spellpower bonus for every 200 ",
 	  6623,                            "uncapped Maximum Mana." },
 	{ "False Perpetuity",              "(+10%%) increased Maximum Mana. ",
 	  6683,                            "(+1%%) of damage dealt is leeched as Mana." },
 	{ "False Resourcefulness",         "(+15%%) of damage taken is dealt to your Mana ",
 	  6684,                            "before Hitpoints." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Muscle",                  "(+2) to Weapon Value.",
 	  6601,                            "" },
 	{ "False Boldness",                "(+3) to Braveness.",
 	  6686,                            "" },
 	{ "False Mindfulness",             "(+2) to Spellpower Bonus.",
 	  6642,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
-	{ "False Perfectionism",           "(+1%%) increased effect of Finesse for every 20 ",
-	  6691,                            "total Weapon Value." },
+	//"         '         '         ", "         '         '         '         '      "
+	{ "False Perfectionism",           "(+1%%) increased effect of Finesse for every ",
+	  6691,                            "20 total Weapon Value." },
 	{ "False Valor",                   "(+5%%) increased total Weapon Value.",
 	  6605,                            "" },
 	{ "Madness",                       "(+2) to Spellpower Multiplier.",
 	  6699,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Virtuosity",              "Your passive skills gain an additional (+10%%) ",
 	  6645,                            "Braveness bonus." },
 	{ "False Braveness",               "(+3%%) increased total Braveness. ",
 	  6692,                            "(+5) to Braveness Limit." },
 	{ "False Alacrity",                "(+1%%) increased power of Zephyr for every 20 ",
 	  6640,                            "total Braveness." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Swordsman",                     "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Swords." },
 	{ "False Wizardry",                "(10%%) increased total Spellpower Bonus.",
 	  6707,                            "" },
 	{ "Guardian Angel",                "(+1%%) increased power of Bless for every 20 ",
 	  6694,                            "total Braveness." },
-	//"         '         '         ", "         '         '         '         '         " ////////
+	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Expanse",                 "(+1) to Area of Effect.",
 	  6649,                            "" },
 	{ "False Feast",                   "(+15) to Maximum Hitpoints.",
 	  6663,                            "" },
 	{ "False Sharkskin",               "(+3) to Thorns.",
 	  6613,                            "" },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "Martial Artist",                "(+5%%) to Base Critical Hit Chance while ",
 	  6698,                            "unarmed." },
 	{ "False Pride",                   "(+25%%) increased total Area of Effect.",
 	  6653,                            "" },
 	{ "False Greed",                   "Enemies affected by your debuffs grant (+1%%) ",
 	  6700,                            "of damage taken as Hitpoints to the attacker." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Lust",                    "(+25%%) increased effect of recovery from all ",
 	  6706,                            "sources." },
 	{ "False Gluttony",                "(+10%%) increased Maximum Hitpoints. ",
 	  6671,                            "(+1%%) of damage dealt is leeched as Hitpoints." },
 	{ "False Wrath",                   "(+1%%) increased effect of bonus from Pact for ",
 	  6705,                            "every 100 uncapped Maximum Hitpoints." },
-	//"         '         '         ", "         '         '         '         '         "
+	//"         '         '         ", "         '         '         '         '      "
 	{ "False Sloth",                   "(+10%%) of Thorns is triggered upon parrying.",
 	  6618,                            "" },
 	{ "False Envy",                    "(+10%%) increased total Thorns score.",
 	  6617,                            "" },
-	{ "Wild Child",                    "(+15%%) increased effect of stats granted by Claws.",
-	  6630,                            "" }
-	//"         '         '         ", "         '         '         '         '         "
+	{ "Wild Child",                    "(+15%%) increased effect of stats granted by ",
+	  6630,                            "Claws." }
+	//"         '         '         ", "         '         '         '         '      "
 };
 
 struct metaStat metaStats[103] = {
