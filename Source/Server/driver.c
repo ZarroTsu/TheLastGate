@@ -997,24 +997,31 @@ int npc_give(int cn, int co, int in, int money)
 					return 0;
 				}
 			}
-			if ((in2 = ch[co].worn[WN_CHARM]) && it[in2].temp==IT_CH_WORLD_R 
-			 && (in3 = ch[co].worn[WN_LHAND]) && ch[co].worn[WN_RHAND] && IS_TWOHAND(ch[co].worn[WN_RHAND])) // [Taro] World.R
+			in2 = ch[co].worn[WN_CHARM];
+			if (in2 && it[in2].temp==IT_CH_WORLD_R)
 			{
-				for (n = 0; n<MAXITEMS; n++) if (!ch[co].item[n]) break;  // Find an empty inventory slot
-				if (n==MAXITEMS)  // Inventory is full...
+				in3 = ch[co].worn[WN_LHAND];
+				if (in3 && ch[co].worn[WN_RHAND] && IS_TWOHAND(ch[co].worn[WN_RHAND])) // [Taro] World.R
 				{
-					do_sayx(cn, "I'm sorry %s, but removing this card demands a place in your backpack!", ch[co].name);
-					god_take_from_char(in, cn);
-					god_give_char(in, co);
-					do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in].name);
-					return 0;
+					for (n = 0; n<MAXITEMS; n++)
+					{
+						if (!ch[co].item[n]) break;  // Find an empty inventory slot
+					}
+					if (n==MAXITEMS)  // Inventory is full...
+					{
+						do_sayx(cn, "I'm sorry %s, but removing this card demands a place in your backpack!", ch[co].name);
+						god_take_from_char(in, cn);
+						god_give_char(in, co);
+						do_char_log(co, 1, "%s returned the %s to you.\n", ch[cn].reference, it[in].name);
+						return 0;
+					}
+					it[in3].x = 0;
+					it[in3].y = 0;
+					it[in3].carried = co;
+					ch[co].item[n] = in3;
+					ch[co].worn[WN_LHAND] = 0;
+					do_update_char(co);
 				}
-				it[in3].x = 0;
-				it[in3].y = 0;
-				it[in3].carried = co;
-				ch[co].item[n] = in3;
-				ch[co].worn[WN_LHAND] = 0;
-				do_update_char(co);
 			}
 			do_sayx(cn, "A tarot card, I see. Allow me to apply its magic to you, %s.", ch[co].name);
 			god_take_from_char(in, cn);

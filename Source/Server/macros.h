@@ -151,7 +151,7 @@ int is_ascroll(int in);
 
 // Sanity checks on character numbers
 #define IS_SANECHAR(cn)     	((cn) > 0 && (cn) < MAXCHARS)
-#define IS_LIVINGCHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used != USE_EMPTY)
+#define IS_LIVINGCHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used != USE_EMPTY && !(ch[(cn)].flags & CF_BODY))
 #define IS_ACTIVECHAR(cn)   	(IS_SANECHAR(cn) && ch[(cn)].used == USE_ACTIVE)
 #define IS_EMPTYCHAR(cn)		(IS_EMPTY(ch[(cn)]))
 #define IS_USEDCHAR(cn)     	(IS_USED(ch[(cn)]))
@@ -202,6 +202,7 @@ int is_ascroll(int in);
 
 // Ditto, with sanity check
 #define IS_SANEPLAYER(cn)		(IS_SANECHAR(cn) && IS_PLAYER(cn))
+#define IS_LIVINGPLAYER(cn)   	(IS_SANECHAR(cn) && IS_PLAYER(cn) && ch[(cn)].used != USE_EMPTY && !(ch[(cn)].flags & CF_BODY))
 #define IS_SANESTAFF(cn)		(IS_SANECHAR(cn) && IS_STAFFER(cn))
 #define IS_SANEGOD(cn)			(IS_SANECHAR(cn) && IS_GOD(cn))
 #define IS_SANEUSURP(cn)		(IS_SANECHAR(cn) && IS_USURP(cn))

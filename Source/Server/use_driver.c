@@ -8797,21 +8797,28 @@ int shrine_of_change(int cn, int in)
 			if (do_check_fool(cn, in2)<1)
 				return 0;
 		}
-		if ((in3 = ch[cn].worn[WN_CHARM2]) && it[in3].temp==IT_CH_WORLD_R 
-		 && (in4 = ch[cn].worn[WN_LHAND]) && ch[cn].worn[WN_RHAND] && IS_TWOHAND(ch[cn].worn[WN_RHAND])) // [Taro] World.R
+		in3 = ch[cn].worn[WN_CHARM2];
+		if (in3 && it[in3].temp==IT_CH_WORLD_R)
 		{
-			for (n = 0; n<MAXITEMS; n++) if (!ch[cn].item[n]) break;  // Find an empty inventory slot
-			if (n==MAXITEMS)  // Inventory is full...
+			in4 = ch[cn].worn[WN_LHAND];
+			if (in4 && ch[cn].worn[WN_RHAND] && IS_TWOHAND(ch[cn].worn[WN_RHAND])) // [Taro] World.R
 			{
-				do_char_log(cn, 0, "You feel like you need more space in your backpack.\n");
-				return 0;
+				for (n = 0; n<MAXITEMS; n++)
+				{
+					if (!ch[cn].item[n]) break;  // Find an empty inventory slot
+				}
+				if (n==MAXITEMS)  // Inventory is full...
+				{
+					do_char_log(cn, 0, "You feel like you need more space in your backpack.\n");
+					return 0;
+				}
+				it[in4].x = 0;
+				it[in4].y = 0;
+				it[in4].carried = cn;
+				ch[cn].item[n] = in4;
+				ch[cn].worn[WN_LHAND] = 0;
+				do_update_char(cn);
 			}
-			it[in4].x = 0;
-			it[in4].y = 0;
-			it[in4].carried = cn;
-			ch[cn].item[n] = in4;
-			ch[cn].worn[WN_LHAND] = 0;
-			do_update_char(cn);
 		}
 		god_take_from_char(in2, cn);
 		do_char_log(cn, 1, "You now have the effects of your %s equipped.\n", it[in2].name);

@@ -10662,6 +10662,8 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_AM_FALMOON))  do_set_iflag(cn, SF_AM_MOON);
 	}
 	
+	if (map[m].flags & MF_UWATER) isWater = 1;
+	
 	// No-magic zone check -- except if you have the sun ammy or dark-sun ammy equipped
 	if (((map[m].flags & MF_NOMAGIC) && !do_get_iflag(cn, SF_AM_SUN)) || do_get_iflag(cn, SF_AM_MOON))
 	{
@@ -10727,8 +10729,6 @@ void really_update_char(int cn)
 	dmg_bns = dmg_rdc = tempCost = 10000;
 	
 	if (IS_PLAYER_COMP(cn)) dmg_rdc = 5000;
-	
-	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_UWATER) isWater = 1;
 	
 	// Loop through gear for item effect flags - Magic checks
 	if (!(ch[cn].flags & CF_NOMAGIC)) for (n=0; n<MAXGSLOTS; n++)
@@ -12517,7 +12517,7 @@ void really_update_char(int cn)
 	
 	do_update_permaspells(cn);
 	
-	if (IS_SANEPLAYER(cn) && ch[cn].player)
+	if (IS_LIVINGPLAYER(cn) && ch[cn].player)
 		plr_update_all_meta_stat_values(ch[cn].player);
 	
 	prof_stop(7, prof);
