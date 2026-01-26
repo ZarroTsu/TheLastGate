@@ -455,7 +455,7 @@ int has_spell(int cn, int temp);
 int has_spell_from_item(int cn, int temp);
 int spell_multiplier(int power, int cn);
 int skill_multiplier(int power, int cn);
-int add_spell(int cn, int in);
+int add_spell(int cn, int new_in);
 int item_has_player_mods(int in);
 void item_copy_player_mods(struct item *in, struct item *in2);
 void remove_shadow(int cn);

@@ -4076,162 +4076,179 @@ void do_showchars(int cn)
 int do_showbuffs(int cn, int co)
 {
 	int n, in, flag = 0;
-	for (n = 0; n<MAXBUFFS; n++)
+	for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n]))
 	{
-		if ((in = ch[co].spell[n])!=0)
+		flag = 1;
+		if (bu[in].temp == SK_MSHIELD || bu[in].temp == SK_MSHELL)
+			do_char_log(cn, 1, "%s power of %d / %d\n", bu[in].name, bu[in].power, bu[in].duration / 256);
+		else if (bu[in].temp == SK_HEAL)
+			do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].data[1], bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
+		else if (bu[in].temp == SK_VENOM || bu[in].temp == SK_SHOCK || bu[in].temp == SK_CHARGE || bu[in].temp == SK_ZEPHYR2)
+			do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].stack, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
+		else if (bu[in].flags & BF_PERMASPELL)
+			do_char_log(cn, 1, "%s power of %d\n", bu[in].name, bu[in].power);
+		else
+			do_char_log(cn, 1, "%s power of %d for %dm %ds\n", bu[in].name, bu[in].power, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
+		
+		if ((ch[cn].flags & CF_KNOWSPELL) && !(ch[cn].flags & CF_KNOW_OFF)) switch (bu[in].temp)
 		{
-			flag = 1;
-			if (bu[in].temp == SK_MSHIELD || bu[in].temp == SK_MSHELL)
-				do_char_log(cn, 1, "%s power of %d / %d\n", bu[in].name, bu[in].power, bu[in].duration / 256);
-			else if (bu[in].temp == SK_HEAL)
-				do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].data[1], bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
-			else if (bu[in].temp == SK_VENOM || bu[in].temp == SK_SHOCK || bu[in].temp == SK_CHARGE || bu[in].temp == SK_ZEPHYR2)
-				do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].stack, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
-			else if (bu[in].flags & BF_PERMASPELL)
-				do_char_log(cn, 1, "%s power of %d\n", bu[in].name, bu[in].power);
-			else
-				do_char_log(cn, 1, "%s power of %d for %dm %ds\n", bu[in].name, bu[in].power, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
-			if ((ch[cn].flags & CF_KNOWSPELL) && !(ch[cn].flags & CF_KNOW_OFF))
-			{
-				switch (bu[in].temp)
+			case SK_LIGHT:
+				do_char_log(cn, 6, " : %+d Glow\n", bu[in].light); 
+				break;
+			case SK_MSHIELD: 
+			case SK_PROTECT:
+			case SK_WEAKEN2:
+				do_char_log(cn, 6, " : %+d Armor Value\n", bu[in].armor);
+				break;
+			case SK_ENHANCE: 
+			case SK_WEAKEN:
+				do_char_log(cn, 6, " : %+d Weapon Value\n", bu[in].weapon);
+				break;
+			case SK_SLOW:
+			case SK_SLOW2:
+			case SK_HASTE:
+				if (bu[in].speed)      do_char_log(cn, 6, " : %+d Speed\n",        bu[in].speed);
+				if (bu[in].atk_speed)  do_char_log(cn, 6, " : %+d Attack Speed\n", bu[in].atk_speed);
+				if (bu[in].cast_speed) do_char_log(cn, 6, " : %+d Cast Speed\n",   bu[in].cast_speed);
+				break;
+			case SK_CURSE:
+			case SK_CURSE2:
+			case SK_BLESS:
+			case SK_WARCRY:
+			case SK_WARCRY3:
+				do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
+				do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
+				do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
+				do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3]); 
+				do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
+				break;
+			case SK_REGEN: // bu[in].r_hp
+				do_char_log(cn, 6, " : %+d.%02d HP/sec\n", bu[in].r_hp/50, bu[in].r_hp%50); break;
+			case SK_ARIA:
+			case SK_ARIA2:
+				if (bu[in].hp)   do_char_log(cn, 6, " : %+d Hitpoints\n",  bu[in].hp);
+				if (bu[in].end)  do_char_log(cn, 6, " : %+d Endurance\n",  bu[in].end);
+				if (bu[in].mana) do_char_log(cn, 6, " : %+d Mana\n",       bu[in].mana);
+				
+				if (bu[in].attrib[0]) do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
+				if (bu[in].attrib[1]) do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
+				if (bu[in].attrib[2]) do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
+				if (bu[in].attrib[3]) do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3]); 
+				if (bu[in].attrib[4]) do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
+				
+				if (bu[in].skill[SK_IMMUN])
+					do_char_log(cn, 6, " : %+d Immunity\n",     bu[in].skill[SK_IMMUN]);
+				
+				if (bu[in].weapon)      do_char_log(cn, 6, " : %+d Weapon Value\n",    bu[in].weapon);
+				if (bu[in].armor)       do_char_log(cn, 6, " : %+d Armor Value\n",     bu[in].armor);
+				if (bu[in].spell_pow)   do_char_log(cn, 6, " : %+d Spellpower\n",      bu[in].spell_pow);
+				if (bu[in].top_damage)  do_char_log(cn, 6, " : %+d Top Damage\n",      bu[in].top_damage);
+				if (bu[in].to_hit)      do_char_log(cn, 6, " : %+d Hit Score\n",       bu[in].to_hit); 
+				if (bu[in].to_parry)    do_char_log(cn, 6, " : %+d Parry Score\n",     bu[in].to_parry); 
+				if (bu[in].gethit_dam)  do_char_log(cn, 6, " : %+d Thorns\n",          bu[in].gethit_dam);
+				if (bu[in].speed)       do_char_log(cn, 6, " : %+d Speed\n",           bu[in].speed);
+				if (bu[in].spell_apt)   do_char_log(cn, 6, " : %+d Spell Apt\n",       bu[in].spell_apt);
+				if (bu[in].cool_bonus)  do_char_log(cn, 6, " : %+d Cooldown Rate\n",   bu[in].cool_bonus);
+				if (bu[in].crit_chance) do_char_log(cn, 6, " : %+d Crit Chance\n",     bu[in].crit_chance);
+				if (bu[in].crit_multi)  do_char_log(cn, 6, " : %+d Crit Multiplier\n", bu[in].crit_multi);
+				
+				if (bu[in].dmg_bonus>0) 
 				{
-					case SK_LIGHT:
-						do_char_log(cn, 6, " : %+d Glow\n", bu[in].light); 
-						break;
-					case SK_MSHIELD: 
-					case SK_PROTECT:
-					case SK_WEAKEN2:
-						do_char_log(cn, 6, " : %+d Armor Value\n", bu[in].armor);
-						break;
-					case SK_ENHANCE: 
-					case SK_WEAKEN:
-						do_char_log(cn, 6, " : %+d Weapon Value\n", bu[in].weapon);
-						break;
-					case SK_SLOW:
-					case SK_SLOW2:
-					case SK_HASTE:
-						if (bu[in].speed)      do_char_log(cn, 6, " : %+d Speed\n",        bu[in].speed);
-						if (bu[in].atk_speed)  do_char_log(cn, 6, " : %+d Attack Speed\n", bu[in].atk_speed);
-						if (bu[in].cast_speed) do_char_log(cn, 6, " : %+d Cast Speed\n",   bu[in].cast_speed);
-						break;
-					case SK_CURSE:
-					case SK_CURSE2:
-					case SK_BLESS:
-					case SK_WARCRY:
-					case SK_WARCRY3:
-						do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
-						do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
-						do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
-						do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3]); 
-						do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
-						break;
-					case SK_REGEN: // bu[in].r_hp
-						do_char_log(cn, 6, " : %+d.%02d HP/sec\n", bu[in].r_hp/50, bu[in].r_hp%50); break;
-					case SK_ARIA:
-					case SK_ARIA2:
-						do_char_log(cn, 6, " : %+d Cooldown Rate\n", bu[in].cool_bonus * (bu[in].temp==SK_ARIA?2:1));
-						if (bu[in].dmg_bonus)
-						{
-							if (bu[in].dmg_bonus%2==0)
-								do_char_log(cn, 6, " : %+d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2));
-							else
-								do_char_log(cn, 6, " : %+d.%1d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
-						}
-						if (bu[in].weapon)
-							do_char_log(cn, 6, " : %+d Weapon Value\n", bu[in].weapon);
-						if (bu[in].armor)
-							do_char_log(cn, 6, " : %+d Armor Value\n", bu[in].armor);
-						break;
-					case SK_BLIND:
-						do_char_log(cn, 6, " : %+d Hit Score\n",   bu[in].to_hit); 
-						do_char_log(cn, 6, " : %+d Parry Score\n", bu[in].to_parry); 
-						if (bu[in].skill[SK_PERCEPT])
-							do_char_log(cn, 6, " : %+d Perception\n",  bu[in].skill[SK_PERCEPT]);
-						break;
-					case SK_DOUSE:
-						do_char_log(cn, 6, " : %+d Spell Modifier\n", bu[in].spell_mod);
-						do_char_log(cn, 6, " : %+d Stealth\n",        bu[in].skill[SK_STEALTH]);
-						break;
-					case SK_MSHELL:
-						do_char_log(cn, 6, " : %+d Resistance\n", bu[in].skill[SK_RESIST]);
-						do_char_log(cn, 6, " : %+d Immunity\n",   bu[in].skill[SK_IMMUN]);
-						break;
-					case SK_GUARD:
-					case SK_AGGRAVATE:
-					case SK_SCORCH:
-					case SK_SHOCK:
-					case SK_CHARGE:
-					case SK_PACT:
-						if (bu[in].dmg_reduction>0)
-						{
-							if (bu[in].dmg_reduction%2==0)
-								do_char_log(cn, 6, " : %+d%% Less Damage Taken\n", abs(bu[in].dmg_reduction/2));
-							else
-								do_char_log(cn, 6, " : %+d.%1d%% Less Damage Taken\n", abs(bu[in].dmg_reduction/2), abs(bu[in].dmg_reduction*5)%10);
-						}
-						if (bu[in].dmg_reduction<0)
-						{
-							if (bu[in].dmg_reduction%2==0)
-								do_char_log(cn, 6, " : %+d%% More Damage Taken\n", abs(bu[in].dmg_reduction/2));
-							else
-								do_char_log(cn, 6, " : %+d.%1d%% More Damage Taken\n", abs(bu[in].dmg_reduction/2), abs(bu[in].dmg_reduction*5)%10);
-						}
-						if (bu[in].dmg_bonus>0) 
-						{
-							if (bu[in].dmg_bonus%2==0)
-								do_char_log(cn, 6, " : %+d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2));
-							else
-								do_char_log(cn, 6, " : %+d.%1d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
-						}
-						if (bu[in].dmg_bonus<0) 
-						{
-							if (bu[in].dmg_bonus%2==0)
-								do_char_log(cn, 6, " : %+d%% Less Damage Dealt\n", abs(bu[in].dmg_bonus/2));
-							else
-								do_char_log(cn, 6, " : %+d.%1d%% Less Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
-						}
-						break;
-					case SK_LETHARGY:
-						if (bu[in].data[2])
-							do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/4);
-						else
-							do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/3);
-						break;
-					case 254: // R/G/S Essence
-						do_char_log(cn, 6, " : %+d to each attribute\n",  bu[in].attrib[0]);
-						if (bu[in].skill[SK_GEARMAST])
-							do_char_log(cn, 6, " : %+d to some skills\n", bu[in].skill[SK_GEARMAST]);
-						break;
-					case SK_WARCRY2:
-						do_char_log(cn, 6, " : Stunned!\n");
-						break;
-					case SK_TAUNT:
-						do_char_log(cn, 6, " : Taunted!\n");
-						break;
-					case SK_POISON:
-					case SK_BLEED:
-					case SK_PLAGUE:
-					case SK_VENOM:
-						break;
-					case 104: case 105: case 106: case 107:
-						if (bu[in].speed)      do_char_log(cn, 6, " : %+d Speed\n",          bu[in].speed);
-						if (bu[in].weapon)     do_char_log(cn, 6, " : %+d Weapon Value\n",   bu[in].weapon);
-						if (bu[in].armor)      do_char_log(cn, 6, " : %+d Armor Value\n",    bu[in].armor);
-						if (bu[in].attrib[0])
-						{
-							do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
-							do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
-							do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
-							do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3]); 
-							do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
-						}
-						if (bu[in].cool_bonus) do_char_log(cn, 6, " : %+d Cooldown Rate\n",  bu[in].cool_bonus);
-						if (bu[in].spell_mod)  do_char_log(cn, 6, " : %+d Spell Modifier\n", bu[in].spell_mod);
-						break;
-					default: break;
+					if (bu[in].dmg_bonus%2==0)
+						do_char_log(cn, 6, " : %+d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
 				}
-			}
+				break;
+			case SK_BLIND:
+				do_char_log(cn, 6, " : %+d Hit Score\n",      bu[in].to_hit); 
+				do_char_log(cn, 6, " : %+d Parry Score\n",    bu[in].to_parry); 
+				if (bu[in].skill[SK_PERCEPT])
+					do_char_log(cn, 6, " : %+d Perception\n", bu[in].skill[SK_PERCEPT]);
+				break;
+			case SK_DOUSE:
+				do_char_log(cn, 6, " : %+d Spell Power\n",    bu[in].spell_pow);
+				do_char_log(cn, 6, " : %+d Stealth\n",        bu[in].skill[SK_STEALTH]);
+				break;
+			case SK_MSHELL:
+				do_char_log(cn, 6, " : %+d Resistance\n",     bu[in].skill[SK_RESIST]);
+				do_char_log(cn, 6, " : %+d Immunity\n",       bu[in].skill[SK_IMMUN]);
+				break;
+			case SK_GUARD:
+			case SK_AGGRAVATE:
+			case SK_SCORCH:
+			case SK_SHOCK:
+			case SK_CHARGE:
+			case SK_PACT:
+				if (bu[in].dmg_reduction>0)
+				{
+					if (bu[in].dmg_reduction%2==0)
+						do_char_log(cn, 6, " : %+d%% Less Damage Taken\n", abs(bu[in].dmg_reduction/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% Less Damage Taken\n", abs(bu[in].dmg_reduction/2), abs(bu[in].dmg_reduction*5)%10);
+				}
+				if (bu[in].dmg_reduction<0)
+				{
+					if (bu[in].dmg_reduction%2==0)
+						do_char_log(cn, 6, " : %+d%% More Damage Taken\n", abs(bu[in].dmg_reduction/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% More Damage Taken\n", abs(bu[in].dmg_reduction/2), abs(bu[in].dmg_reduction*5)%10);
+				}
+				if (bu[in].dmg_bonus>0) 
+				{
+					if (bu[in].dmg_bonus%2==0)
+						do_char_log(cn, 6, " : %+d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% More Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
+				}
+				if (bu[in].dmg_bonus<0) 
+				{
+					if (bu[in].dmg_bonus%2==0)
+						do_char_log(cn, 6, " : %+d%% Less Damage Dealt\n", abs(bu[in].dmg_bonus/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% Less Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
+				}
+				break;
+			case SK_LETHARGY:
+				if (bu[in].data[2])
+					do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/4);
+				else
+					do_char_log(cn, 6, " : %+d Res&Imm Piercing\n", bu[in].power/3);
+				break;
+			case 254: // R/G/S Essence
+				do_char_log(cn, 6, " : %+d to each attribute\n",  bu[in].attrib[0]);
+				if (bu[in].skill[SK_GEARMAST])
+					do_char_log(cn, 6, " : %+d to some skills\n", bu[in].skill[SK_GEARMAST]);
+				break;
+			case SK_WARCRY2:
+				do_char_log(cn, 6, " : Stunned!\n");
+				break;
+			case SK_TAUNT:
+				do_char_log(cn, 6, " : Taunted!\n");
+				break;
+			case SK_POISON:
+			case SK_BLEED:
+			case SK_PLAGUE:
+			case SK_VENOM:
+				break;
+			case 104: case 105: case 106: case 107:
+				if (bu[in].speed)      do_char_log(cn, 6, " : %+d Speed\n",          bu[in].speed);
+				if (bu[in].weapon)     do_char_log(cn, 6, " : %+d Weapon Value\n",   bu[in].weapon);
+				if (bu[in].armor)      do_char_log(cn, 6, " : %+d Armor Value\n",    bu[in].armor);
+				if (bu[in].attrib[0])
+				{
+					do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
+					do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
+					do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
+					do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3]); 
+					do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
+				}
+				if (bu[in].cool_bonus) do_char_log(cn, 6, " : %+d Cooldown Rate\n", bu[in].cool_bonus);
+				if (bu[in].spell_mod)  do_char_log(cn, 6, " : %+d Spell Bonus\n",   bu[in].spell_pow);
+				break;
+			default: break;
 		}
+		
 	}
 	return flag;
 }
@@ -11258,7 +11275,7 @@ void really_update_char(int cn)
 		spell_pow  += bu[m].spell_pow;
 		spell_mod  += bu[m].spell_mod;
 		spell_apt  += bu[m].spell_apt;
-		spell_cool += bu[m].cool_bonus * (bu[m].temp==SK_ARIA?2:1);
+		spell_cool += bu[m].cool_bonus;
 		aoe        += bu[m].aoe_bonus;
 		critical_b += bu[m].base_crit;
 		critical_c += bu[m].crit_chance;
@@ -12463,6 +12480,14 @@ void really_update_char(int cn)
 		ch[].reserve[] values
 	*/
 	
+	// Flat additions
+	{
+		if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   resrv[2] += 25;  // (Sorc) Rewind
+		if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  resrv[2] += 25;  // (Sorc) Fast Forward
+		if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  resrv[2] += 25;  // (Brav) Presence
+		if (T_LYCA_SK(cn,  4) && B_SK(cn, SK_WEAKEN)) resrv[1] += 25;  // (Lyca) Sickness
+	}
+	
 	for (z=0;z<3;z++)
 	{
 		n  = 0;
@@ -12592,17 +12617,17 @@ void do_pmshield(int cn, int co)
 	add_spell(co, in);
 }
 
-int get_aria_wv(int cn, int in, int n)
+int get_aria_wv(int cn, int in)
 {
-	int weapon = 0;
+	int weapon = 0, n = TC_SK(cn, 34)*15;
 	
 	return more(weapon, n, 1)/100;
 }
-int get_aria_av(int cn, int in, int n)
+int get_aria_av(int cn, int in)
 {
-	int armor = 0;
+	int armor = 0, n = TC_SK(cn, 34)*15;
 	
-	if (do_get_iflag(cn, SF_SIGN_SONG))     // [Ring] Signet of Song
+	if (cn && do_get_iflag(cn, SF_SIGN_SONG))    // [Ring] Signet of Song
 	{
 		armor = ch[cn].armor;
 		
@@ -12613,11 +12638,11 @@ int get_aria_av(int cn, int in, int n)
 	
 	return more(armor, n, 1)/100;
 }
-int get_aria_imm(int cn, int in, int n)
+int get_aria_im(int cn, int in)
 {
-	int immun = 0;
+	int immun = 0, n = TC_SK(cn, 34)*15;
 	
-	if (T_SKAL_SK(cn, 10))                 // (Skal) Guardian
+	if (cn && T_SKAL_SK(cn, 10))    // (Skal) Guardian
 	{
 		immun = M_SK(cn, SK_IMMUN);
 		
@@ -12627,6 +12652,92 @@ int get_aria_imm(int cn, int in, int n)
 	}
 	
 	return more(immun, n, 1)/100;
+}
+
+void do_aria_stats(int cn, int in, int power, int flag)
+{
+	int n, cc = 0, ring1=0, ring2=0, act1=0, act2=0;
+	int r_hp=0, r_en=0, r_mp=0, r_at[5]={0}, r_sk[50]={0};
+	int r_wp=0, r_ar=0, r_sp=0, r_tp=0, r_ht=0, r_pr=0, r_th=0, r_as=0, r_ap=0, r_co=0, r_cc=0, r_cm=0;
+	int r_xx=0;
+	
+	if (IS_SANECHAR(cc = bu[in].data[0]))
+	{
+		if (IS_SANEITEM(ring1 = ch[cc].worn[WN_LRING]) && it[ring1].active) act1 = 1;
+		if (IS_SANEITEM(ring2 = ch[cc].worn[WN_RRING]) && it[ring2].active) act2 = 1;
+	}
+	
+	if (cc == cn) // Caster reserves mana
+		bu[in].reserve[2] = min(30, 5 + M_SK(cn, SK_ARIA) / 15);
+	
+	if (IS_SANEITEM(ring1))
+	{
+		for (n=0;n< 5;n++) r_at[n] += it[ring1].attrib[n][act1];
+		for (n=0;n<50;n++) r_sk[n] += it[ring1].skill[n][act1];
+		r_hp += it[ring1].hp[act1];         r_en += it[ring1].end[act1];         r_mp += it[ring1].mana[act1];
+		r_wp += it[ring1].weapon[act1];     r_ar += it[ring1].armor[act1];       r_sp += it[ring1].spell_pow[act1];
+		r_tp += it[ring1].top_damage[act1]; r_ht += it[ring1].to_hit[act1];      r_pr += it[ring1].to_parry[act1];
+		r_th += it[ring1].gethit_dam[act1]; r_as += it[ring1].speed[act1];       r_ap += it[ring1].spell_apt[act1];
+		r_co += it[ring1].cool_bonus[act1]; r_cc += it[ring1].crit_chance[act1]; r_cm += it[ring1].crit_multi[act1];
+	}
+	else
+	{
+		r_xx++;
+	}
+	
+	if (IS_SANEITEM(ring2))
+	{
+		for (n=0;n< 5;n++) r_at[n] += it[ring2].attrib[n][act2];
+		for (n=0;n<50;n++) r_sk[n] += it[ring2].skill[n][act2];
+		r_hp += it[ring2].hp[act2];         r_en += it[ring2].end[act2];         r_mp += it[ring2].mana[act2];
+		r_wp += it[ring2].weapon[act2];     r_ar += it[ring2].armor[act2];       r_sp += it[ring2].spell_pow[act2];
+		r_tp += it[ring2].top_damage[act2]; r_ht += it[ring2].to_hit[act2];      r_pr += it[ring2].to_parry[act2];
+		r_th += it[ring2].gethit_dam[act2]; r_as += it[ring2].speed[act2];       r_ap += it[ring2].spell_apt[act2];
+		r_co += it[ring2].cool_bonus[act2]; r_cc += it[ring2].crit_chance[act2]; r_cm += it[ring2].crit_multi[act2];
+	}
+	else
+	{
+		r_xx++;
+	}
+	
+	if (flag)  // Enemy
+	{
+		for (n=0;n< 5;n++) r_at[n] *= -1;
+		for (n=0;n<50;n++) r_sk[n] *= -1;
+		r_hp *= -1; r_en *= -1; r_mp *= -1;
+		r_wp *= -1; r_ar *= -1; r_sp *= -1;
+		r_tp *= -1; r_ht *= -1; r_pr *= -1;
+		r_th *= -1; r_as *= -1; r_ap *= -1;
+		r_co *= -1; r_cc *= -1; r_cm *= -1;
+		
+		bu[in].reserve[0] = min(25, r_xx * power / 25);
+	}
+	else  // Ally
+	{
+		bu[in].dmg_bonus = min(25, r_xx * power / 25);
+	}
+	
+	bu[in].power = power;
+	
+	bu[in].hp    = r_hp * power / 400;
+	bu[in].end   = r_en * power / 400;
+	bu[in].mana  = r_mp * power / 400;
+	
+	for (n=0;n< 5;n++) bu[in].attrib[n] = r_at[n] * power / 400;
+	for (n=0;n<50;n++) bu[in].skill[n]  = r_sk[n] * power / 400 + (n==SK_IMMUN)?get_aria_im(cc, in):0;
+	
+	bu[in].weapon      = r_wp * power / 400 + get_aria_wv(cc, in);
+	bu[in].armor       = r_ar * power / 400 + get_aria_av(cc, in);
+	bu[in].spell_pow   = r_sp * power / 400;
+	bu[in].top_damage  = r_tp * power / 400;
+	bu[in].to_hit      = r_ht * power / 400;
+	bu[in].to_parry    = r_pr * power / 400;
+	bu[in].gethit_dam  = r_th * power / 400;
+	bu[in].speed       = r_as * power / 400;
+	bu[in].spell_apt   = r_ap * power / 400;
+	bu[in].cool_bonus  = r_co * power / 400;
+	bu[in].crit_chance = r_cc * power / 400;
+	bu[in].crit_multi  = r_cm * power / 400;
 }
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
@@ -12660,19 +12771,14 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				
 				if (!(in2 = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, power, SP_DUR_ARIA, 0))) return;
 				
-				bu[in2].cool_bonus = max(-127, -(power/4 + 1));
+				do_aria_stats(cn, in2, power, 1);
 				bu[in2].data[4] = 1;
 			}
 			else // Target is an ally
 			{
 				if (!(in2 = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) return;
 				
-				if (IS_SKALD(co)) bu[in2].dmg_bonus = min(127, power/15);
-				
-				bu[in2].weapon          = get_aria_wv(cn,  in, n);
-				bu[in2].armor           = get_aria_av(cn,  in, n);
-				bu[in2].skill[SK_IMMUN] = get_aria_imm(cn, in, n);
-				bu[in2].cool_bonus = min(127, power/4 + 1);
+				do_aria_stats(cn, in2, power, 0);
 				bu[in2].data[4] = 1;
 			}
 			break;
@@ -12684,7 +12790,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
 			power = more(power, n, 1);
 			
-			if (!(in2 = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_HASTE, 0))) return;
+			if (!(in2 = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_ARIA, 0))) return;
 			
 			bu[in2].speed      = min(300, 10 + (power  )/ 6);
 			bu[in2].atk_speed  = min(127,  5 + (power+6)/12);
@@ -12706,12 +12812,12 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(cn, SF_EMPEROR))
 			{
-				if (!(in2 = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_ARIA, 0))) return;
 				bu[in2].speed      = -(min(300, 30 + SLOW2FORM(power)));
 			}
 			else
 			{
-				if (!(in2 = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_SLOW(power), 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_SLOW, BUF_SPR_SLOW, power, SP_DUR_ARIA, 0))) return;
 				bu[in2].speed      = -(min(300, 20 + SLOWFORM(power)*2/3));
 				bu[in2].atk_speed  = -(min(127, 10 + SLOWFORM(power)/3));
 				bu[in2].cast_speed = -(min(127, 10 + SLOWFORM(power)/3));
@@ -12734,12 +12840,12 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(cn, SF_TOWER))
 			{
-				if (!(in2 = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_CURSE2, 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_ARIA, 0))) return;
 				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
 			}
 			else
 			{
-				if (!(in2 = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_CURSE, 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_ARIA, 0))) return;
 				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(3 + (power - (4 - n)) / 5);
 			}
 			bu[in2].data[5] = 1;
@@ -12760,12 +12866,12 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			// Tarot Card - Death :: Change Weaken into Crush
 			if (do_get_iflag(cn, SF_DEATH))
 			{
-				if (!(in2 = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_WEAKEN, 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_ARIA, 0))) return;
 				bu[in2].armor  = max(-127, -(power / 4 + 4));
 			}
 			else
 			{
-				if (!(in2 = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_WEAKEN, 0))) return;
+				if (!(in2 = make_new_buff(cn, SK_WEAKEN, BUF_SPR_REND, power, SP_DUR_ARIA, 0))) return;
 				bu[in2].weapon  = max(-127, -(power / 4 + 4));
 			}
 			bu[in2].data[4] = 1;
@@ -12871,6 +12977,7 @@ void do_random_blast(int cn, int power)
 	}
 }
 
+
 void do_update_spell_aria(int cn, int in)
 {
 	int power, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
@@ -12878,17 +12985,7 @@ void do_update_spell_aria(int cn, int in)
 	power = M_SK(cn, SK_ARIA);
 	power = more(power, n, 1);
 	
-	if (!IS_SKALD(cn))
-		power /= 4;
-	else
-		bu[in].dmg_bonus   = min(127, power/15);
-	
-	bu[in].power           = power;
-	bu[in].weapon          = get_aria_wv(cn,  in, n);
-	bu[in].armor           = get_aria_av(cn,  in, n);
-	bu[in].skill[SK_IMMUN] = get_aria_imm(cn, in, n);
-	
-	bu[in].cool_bonus      = min(127, power/4 + 1);
+	do_aria_stats(cn, in, power, 0);
 }
 void do_update_spell_haste(int cn, int in)
 {
@@ -12918,7 +13015,7 @@ void do_update_spell_pact(int cn, int in)
 	{
 		bu[in].reserve[2] = min(80, 15 + power/5); // Mana
 		power = ch[cn].reserve[2];
-		power = more(power, ch[cn].hp[5] * n, 100);
+		power = more(power, ch[cn].mana[5] * n, 100);
 		bu[in].dmg_reduction = power*4/6;
 		bu[in].dmg_bonus     = power*2/6;
 	}

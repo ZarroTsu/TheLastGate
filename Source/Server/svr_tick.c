@@ -1982,7 +1982,7 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_JUSTIC_R)) value = power * ch[cn].crit_multi / 100 * DAM_MULT_LEAP/1000;
 			break;
 		case 28: // Leap # of Repeats
-			value = max(0, GET_SPD_ATK(cn)/40);
+			value = max(0, GET_SPD_ATK(cn)/60);
 			if (do_get_iflag(cn, SF_SIGN_SLAY)) value++;
 			if (T_WARR_SK(cn,  6))              value++;  // (Warr) Flash Step
 			break;

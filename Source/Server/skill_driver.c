@@ -284,7 +284,6 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 int chance(int cn, int d20);
 int add_exhaust(int cn, int len);
 void skill_slow(int cn, int flag);
-int add_spell(int cn, int in);
 int spell_plague(int cn, int co, int flag);
 int spell_shock(int cn, int co, int power);
 
@@ -1750,236 +1749,269 @@ int skill_multiplier(int power, int cn)
 	return power;
 }
 
-int add_spell(int cn, int in)
+int add_spell(int cn, int new_in)
 {
-	int n, in2, weak = 999, weakest = 99, tmp;
-	int m, stack, tickminimum = TICKS*60;
-
-	m = ch[cn].x + ch[cn].y * MAPX;
-	if (map[m].flags & CF_NOMAGIC) { return 0; }
+	int n, m, old_in, weak = 999, weakest = 99;
+	int stack, tickminimum = TICKS*60;
+	int old_temp, new_temp;
 	
-	tmp = bu[in].temp;
+	if (map[XY2M(ch[cn].x, ch[cn].y)].flags & CF_NOMAGIC) return 0;
+	
+	new_temp = bu[new_in].temp;
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in2 = ch[cn].spell[n])!=0)
+		if ((old_in = ch[cn].spell[n]))
 		{
+			old_temp = bu[old_in].temp;
+			
 			// Immunize/Inoculate prevents up to three ailments
-			if ((bu[in2].temp==SK_DISPEL || bu[in2].temp==SK_DISPEL2) &&
-				(tmp==bu[in2].data[1] || tmp==bu[in2].data[2] || tmp==bu[in2].data[3]))
+			if ((old_temp==SK_DISPEL || old_temp==SK_DISPEL2) &&
+				(new_temp==bu[old_in].data[1] || new_temp==bu[old_in].data[2] || new_temp==bu[old_in].data[3]))
 			{
-				chlog(cn,"Immunize true (%d)",bu[in2].temp);
-				if (bu[in2].temp==SK_DISPEL2) do_char_log(cn, 0, "The magic didn't work!\n");
+				chlog(cn,"Immunize true (%d)", old_temp);
+				if (old_temp==SK_DISPEL2)
+					do_char_log(cn, 0, "The magic didn't work!\n");
 				return 0;
 			}
 		}
 	}
 	
 	// Acedia
-	if (IS_SANECHAR(bu[in].data[0]))
+	if (IS_SANECHAR(bu[new_in].data[0]))
 	{
-		if (IS_IT_TEMP(ch[bu[in].data[0]].worn[WN_RHAND], IT_TW_ACEDIA)) // less
-			bu[in].duration = bu[in].active = bu[in].duration * 3/4;
-		if (IS_IT_TEMP(ch[bu[in].data[0]].worn[WN_LHAND], IT_TW_ACEDIA)) // more
-			bu[in].duration = bu[in].active = bu[in].duration * 6/4;
+		if (IS_IT_TEMP(ch[bu[new_in].data[0]].worn[WN_RHAND], IT_TW_ACEDIA)) // less
+			bu[new_in].duration = bu[new_in].active = bu[new_in].duration * 3/4;
+		if (IS_IT_TEMP(ch[bu[new_in].data[0]].worn[WN_LHAND], IT_TW_ACEDIA)) // more
+			bu[new_in].duration = bu[new_in].active = bu[new_in].duration * 6/4;
 	}
 	
 	// overwrite spells if same spell is cast twice and the new spell is more powerful
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in2 = ch[cn].spell[n])!=0)
+		if ((old_in = ch[cn].spell[n]))
 		{
-			if (bu[in2].used==USE_EMPTY) continue;
-			if (bu[in].temp==SK_HEAL && bu[in2].temp==SK_HEAL)
+			if (bu[old_in].used==USE_EMPTY) continue;
+			if ((old_temp = bu[old_in].temp) != new_temp) continue;
+			
+			if (new_temp==SK_HEAL)
 			{
 				// Multiple heals stack 'healing sickness' (SK_HEAL), reducing heal power
-				stack=3;
-
+				stack = 3;
+				
 				if (do_get_iflag(cn, SF_BOOK_HOLY))        stack--;    // [Book] Holy Etiquette
 				if (has_spell_from_item(cn, BUF_IT_DRAG))  stack--;    // [Food] Dragon's Breath
 				if (do_get_iflag(cn, SF_TEMPER_R))         stack++;    // [Taro] Temperance.R
 				
 				if (!IS_PLAYER(cn) && !IS_PLAYER_COMP(cn)) stack = 4;  // Monsters reach 100% heal penalty
 				
-				bu[in].data[1] = bu[in2].data[1] + 1;
+				bu[new_in].data[1] = bu[old_in].data[1] + 1;
 				
-				if (bu[in].data[1] > stack)
-					bu[in].data[1] = max(stack, bu[in2].data[1]);
+				if (bu[new_in].data[1] > stack)
+					bu[new_in].data[1] = max(stack, bu[old_in].data[1]);
 				
-				bu[in].sprite = min(6720+stack, 6721+bu[in].data[1]);
+				bu[new_in].sprite = min(6720+stack, 6721+bu[new_in].data[1]);
 				
-				bu[in2].used = USE_EMPTY;
+				bu[old_in].used = USE_EMPTY;
 				break;
 			}
-			else if (bu[in].temp==SK_VENOM && bu[in2].temp==SK_VENOM)
+			else if (new_temp==SK_VENOM)
 			{
-				bu[in].data[2] = max(bu[in].data[2], bu[in2].data[2]);
-				bu[in].data[1] = min(bu[in].data[2], bu[in].data[1] + bu[in2].data[1]);
-				bu[in].data[7] = max(bu[in].data[7], bu[in2].data[7]);
-				bu[in].data[6] = min(bu[in].data[7], bu[in].data[6] + bu[in2].data[6]);
-				bu[in].skill[SK_IMMUN] = -(bu[in].data[6]);
-				bu[in].stack = min(3, bu[in2].stack + 1);
-				bu[in].sprite = min(6733, 6731+bu[in].stack-1);
+				bu[new_in].data[2] = max(bu[new_in].data[2], bu[old_in].data[2]);
+				bu[new_in].data[1] = min(bu[new_in].data[2], bu[new_in].data[1] + bu[old_in].data[1]);
+				bu[new_in].data[7] = max(bu[new_in].data[7], bu[old_in].data[7]);
+				bu[new_in].data[6] = min(bu[new_in].data[7], bu[new_in].data[6] + bu[old_in].data[6]);
+				bu[new_in].skill[SK_IMMUN] = -(bu[new_in].data[6]);
+				bu[new_in].stack = min(3, bu[old_in].stack + 1);
+				bu[new_in].sprite = min(6733, 6731+bu[new_in].stack-1);
 				
-				bu[in2].used = USE_EMPTY;
+				bu[old_in].used = USE_EMPTY;
 				break;
 			}
-			else if (bu[in].temp==SK_SHOCK && bu[in2].temp==SK_SHOCK)
+			else if (new_temp==SK_SHOCK)
 			{
-				bu[in].stack = min(5, bu[in2].stack + 1);
-				bu[in].dmg_reduction = -(bu[in].stack*4);
-				bu[in].dmg_bonus     = -(bu[in].stack*4);
-				bu[in].sprite = min(6745, 6741+bu[in].stack-1);
+				bu[new_in].stack = min(5, bu[old_in].stack + 1);
+				bu[new_in].dmg_reduction = -(bu[new_in].stack*4);
+				bu[new_in].dmg_bonus     = -(bu[new_in].stack*4);
+				bu[new_in].sprite = min(6745, 6741+bu[new_in].stack-1);
 				
-				bu[in2].used = USE_EMPTY;
+				bu[old_in].used = USE_EMPTY;
 				break;
 			}
-			else if (bu[in].temp==SK_CHARGE && bu[in2].temp==SK_CHARGE)
+			else if (new_temp==SK_CHARGE)
 			{
-				bu[in].stack = min(5, bu[in2].stack + 1);
-				bu[in].dmg_reduction = bu[in].stack*4;
-				bu[in].dmg_bonus     = bu[in].stack*4;
-				bu[in].sprite = min(6750, 6746+bu[in].stack-1);
+				bu[new_in].stack = min(5, bu[old_in].stack + 1);
+				bu[new_in].dmg_reduction = bu[new_in].stack*4;
+				bu[new_in].dmg_bonus     = bu[new_in].stack*4;
+				bu[new_in].sprite = min(6750, 6746+bu[new_in].stack-1);
 				
-				bu[in2].used = USE_EMPTY;
+				bu[old_in].used = USE_EMPTY;
 				break;
 			}
-			else if (bu[in].temp==SK_ZEPHYR2 && bu[in2].temp==SK_ZEPHYR2)
+			else if (new_temp==SK_ZEPHYR2)
 			{
 				// Multiple zephyrs store their expiry time so each can occur
-				bu[in].data[2] = bu[in2].data[1];
-				bu[in].data[1] = bu[in2].active;
-				bu[in].stack = min(3, bu[in2].stack + 1);
-				bu[in].sprite = max(6726, min(6728, 6726+bu[in].stack-1));
+				bu[new_in].data[2] = bu[old_in].data[1];
+				bu[new_in].data[1] = bu[old_in].active;
+				bu[new_in].stack = min(3, bu[old_in].stack + 1);
+				bu[new_in].sprite = max(6726, min(6728, 6726+bu[new_in].stack-1));
 				
-				bu[in2].used = USE_EMPTY;
+				bu[old_in].used = USE_EMPTY;
 				break;
 			}
-			else if (bu[in].temp==SK_IMMOLATE2 && bu[in2].temp==SK_IMMOLATE2)
+			else if (new_temp==SK_IMMOLATE2)
 			{
-				bu[in2].data[1] = max(bu[in].data[1], bu[in2].data[1]);
-				bu[in2].duration = bu[in2].active = bu[in].duration;
+				bu[old_in].data[1] = max(bu[new_in].data[1], bu[old_in].data[1]);
+				bu[old_in].duration = bu[old_in].active = bu[new_in].duration;
 				
-				bu[in].used = USE_EMPTY;
+				bu[new_in].used = USE_EMPTY;
 				return 0;
 			}
-			else if (bu[in].temp==SK_ARIA && bu[in2].temp==SK_ARIA)
+			else
 			{
-				bu[in2].cool_bonus = max(bu[in].cool_bonus, bu[in2].cool_bonus);
-				if (bu[in2].data[0] == cn) { ; }
-				else if (bu[in].data[0] == cn)
-				{
-					if (IS_SKALD(cn)) bu[in2].dmg_bonus = bu[in].dmg_bonus;
-					bu[in2].weapon = bu[in].weapon;
-					bu[in2].armor  = bu[in].armor;
-				}
-				else
-				{
-					if (IS_SKALD(cn)) bu[in2].dmg_bonus = max(bu[in].dmg_bonus, bu[in2].dmg_bonus);
-					bu[in2].weapon = max(bu[in].weapon, bu[in2].weapon);
-					bu[in2].armor  = max(bu[in].armor,  bu[in2].armor);
-				}
-				
-				bu[in2].duration = bu[in2].active = bu[in].duration;
-				
-				bu[in].used = USE_EMPTY;
-				return 0;
-			}
-			else if (bu[in].temp==SK_ARIA2 && bu[in2].temp==SK_ARIA2)
-			{
-				bu[in2].cool_bonus = min(bu[in].cool_bonus, bu[in2].cool_bonus);
-				bu[in2].duration = bu[in2].active = bu[in].duration;
-				
-				bu[in].used = USE_EMPTY;
-				return 0;
-			}
-			else if (bu[in2].temp==bu[in].temp)
-			{
-				if (bu[in2].temp==SK_SLOW || bu[in2].temp==SK_SLOW2 || bu[in2].temp==SK_CURSE2)
+				if (old_temp==SK_SLOW || old_temp==SK_SLOW2 || old_temp==SK_CURSE2)
 					tickminimum = TICKS*5;
 				
-				if ((ch[cn].flags & CF_OVERRIDE) && bu[in].data[0]==cn &&
-					(bu[in].temp==SK_BLESS  || bu[in].temp==SK_PROTECT || bu[in].temp==SK_ENHANCE || bu[in].temp==SK_MSHIELD || 
-					 bu[in].temp==SK_MSHELL || bu[in].temp==SK_HASTE   || bu[in].temp==SK_ZEPHYR  || bu[in].temp==SK_PULSE   || 
-					 bu[in].temp==SK_PULSE2 || bu[in].temp==SK_WARCRY3))
+				if (bu[old_in].data[4] &= 2 && bu[new_in].data[4] &= 2)  // Aura skill
 				{
-					bu[in2].used = USE_EMPTY;
+					if ((old_temp==SK_ARIA || old_temp==SK_ARIA2))
+					{
+						bu[old_in].duration    = bu[old_in].active = bu[new_in].duration;
+						bu[old_in].power       = bu[new_in].power;
+						
+						bu[old_in].hp          = max(bu[new_in].hp, bu[old_in].hp);
+						bu[old_in].end         = max(bu[new_in].end, bu[old_in].end);
+						bu[old_in].mana        = max(bu[new_in].mana, bu[old_in].mana);
+						
+						for (m=0;m< 5;m++) bu[old_in].attrib[m] = max(bu[new_in].attrib[m], bu[old_in].attrib[m]);
+						for (m=0;m<50;m++) bu[old_in].skill[m]  = max(bu[new_in].skill[m], bu[old_in].skill[m]);
+						
+						bu[old_in].weapon      = max(bu[new_in].weapon, bu[old_in].weapon);
+						bu[old_in].armor       = max(bu[new_in].armor, bu[old_in].armor);
+						bu[old_in].spell_pow   = max(bu[new_in].spell_pow, bu[old_in].spell_pow);
+						bu[old_in].top_damage  = max(bu[new_in].top_damage, bu[old_in].top_damage);
+						bu[old_in].to_hit      = max(bu[new_in].to_hit, bu[old_in].to_hit);
+						bu[old_in].to_parry    = max(bu[new_in].to_parry, bu[old_in].to_parry);
+						bu[old_in].gethit_dam  = max(bu[new_in].gethit_dam, bu[old_in].gethit_dam);
+						bu[old_in].speed       = max(bu[new_in].speed, bu[old_in].speed);
+						bu[old_in].atk_speed   = max(bu[new_in].atk_speed, bu[old_in].atk_speed);
+						bu[old_in].cast_speed  = max(bu[new_in].cast_speed, bu[old_in].cast_speed);
+						bu[old_in].spell_apt   = max(bu[new_in].spell_apt, bu[old_in].spell_apt);
+						bu[old_in].cool_bonus  = max(bu[new_in].cool_bonus, bu[old_in].cool_bonus);
+						bu[old_in].crit_chance = max(bu[new_in].crit_chance, bu[old_in].crit_chance);
+						bu[old_in].crit_multi  = max(bu[new_in].crit_multi, bu[old_in].crit_multi);
+					}
+					else if (bu[new_in].power >= bu[old_in].power)
+					{
+						bu[old_in].duration    = bu[old_in].active = bu[new_in].duration;
+						bu[old_in].power       = bu[new_in].power;
+						
+						bu[old_in].hp          = bu[new_in].hp;
+						bu[old_in].end         = bu[new_in].end;
+						bu[old_in].mana        = bu[new_in].mana;
+						
+						for (m=0;m< 5;m++) bu[old_in].attrib[m] = bu[new_in].attrib[m];
+						for (m=0;m<50;m++) bu[old_in].skill[m]  = bu[new_in].skill[m];
+						
+						bu[old_in].weapon      = bu[new_in].weapon;
+						bu[old_in].armor       = bu[new_in].armor;
+						bu[old_in].spell_pow   = bu[new_in].spell_pow;
+						bu[old_in].top_damage  = bu[new_in].top_damage;
+						bu[old_in].to_hit      = bu[new_in].to_hit;
+						bu[old_in].to_parry    = bu[new_in].to_parry;
+						bu[old_in].gethit_dam  = bu[new_in].gethit_dam;
+						bu[old_in].speed       = bu[new_in].speed;
+						bu[old_in].atk_speed   = bu[new_in].atk_speed;
+						bu[old_in].cast_speed  = bu[new_in].cast_speed;
+						bu[old_in].spell_apt   = bu[new_in].spell_apt;
+						bu[old_in].cool_bonus  = bu[new_in].cool_bonus;
+						bu[old_in].crit_chance = bu[new_in].crit_chance;
+						bu[old_in].crit_multi  = bu[new_in].crit_multi;
+					}
+					bu[new_in].used = USE_EMPTY;
+					return 0;
+				}
+				
+				if ((ch[cn].flags & CF_OVERRIDE) && bu[new_in].data[0]==cn &&
+					(new_temp==SK_BLESS  || new_temp==SK_PROTECT || new_temp==SK_ENHANCE || new_temp==SK_MSHIELD || 
+					 new_temp==SK_MSHELL || new_temp==SK_HASTE   || new_temp==SK_ZEPHYR  || new_temp==SK_PULSE   || 
+					 new_temp==SK_PULSE2 || new_temp==SK_WARCRY3))
+				{
+					bu[old_in].used = USE_EMPTY;
 					ch[cn].spell[n] = 0;
 					break;
 				}
 				
-				if (IS_PLAYER_GC(cn) && (ch[CN_OWNER(cn)].flags & CF_OVERRIDE) && bu[in].data[0]==cn &&
-					(bu[in].temp==SK_BLESS || bu[in].temp==SK_PROTECT || bu[in].temp==SK_ENHANCE || bu[in].temp==SK_MSHIELD || 
-					bu[in].temp==SK_MSHELL || bu[in].temp==SK_HASTE   || bu[in].temp==SK_ZEPHYR  || bu[in].temp==SK_PULSE   || 
-					bu[in].temp==SK_PULSE2 || bu[in].temp==SK_WARCRY3))
+				if (IS_PLAYER_GC(cn) && (ch[CN_OWNER(cn)].flags & CF_OVERRIDE) && bu[new_in].data[0]==cn &&
+					(new_temp==SK_BLESS  || new_temp==SK_PROTECT || new_temp==SK_ENHANCE || new_temp==SK_MSHIELD || 
+					 new_temp==SK_MSHELL || new_temp==SK_HASTE   || new_temp==SK_ZEPHYR  || new_temp==SK_PULSE   || 
+					 new_temp==SK_PULSE2 || new_temp==SK_WARCRY3))
 				{
-					bu[in2].used = USE_EMPTY;
+					bu[old_in].used = USE_EMPTY;
 					ch[cn].spell[n] = 0;
 					break;
 				}
 				
-				if (bu[in2].temp==SK_LIGHT && bu[in2].active>(bu[in2].duration-TICKS*5) && bu[in].data[0]==cn)
+				if (old_temp==SK_LIGHT && bu[old_in].active>(bu[old_in].duration-TICKS*5) && bu[new_in].data[0]==cn)
 				{
-					bu[in].used = USE_EMPTY;
-					bu[in2].used = USE_EMPTY;
+					bu[new_in].used = USE_EMPTY;
+					bu[old_in].used = USE_EMPTY;
 					ch[cn].spell[n] = 0;
 					return -1;
 				}
 				
-				if (bu[in].power<bu[in2].power && bu[in2].active>tickminimum && bu[in2].temp!=SK_LIGHT)
+				if (bu[new_in].power<bu[old_in].power && bu[old_in].active>tickminimum && old_temp!=SK_LIGHT)
 				{
-					bu[in].used = USE_EMPTY;
+					bu[new_in].used = USE_EMPTY;
 					return 0;
 				}
 				
-				bu[in2].used = USE_EMPTY;
+				bu[old_in].used = USE_EMPTY;
 				ch[cn].spell[n] = 0;
 				break;
 			}
 		}
 	}
-
+	
 	if (n==MAXBUFFS)
 	{
 		for (n = 0; n<MAXBUFFS; n++)
 		{
-			if (!(in2 = ch[cn].spell[n]))
+			if (!(old_in = ch[cn].spell[n])) break;
+			if (bu[old_in].power < weak)
 			{
-				break;
-			}
-			if (bu[in2].power<weak)
-			{
-				weak = bu[in2].power;
+				weak = bu[old_in].power;
 				weakest = n;
 			}
 		}
 		if (n==MAXBUFFS)      // overwrite weakest spell if it is weaker than the new spell
 		{
-			if (weak<999 && weak<bu[in].power)
+			if (weak<999 && weak<bu[new_in].power)
 			{
 				n = weakest;
-				if ((in2 = ch[cn].spell[n])!=0)
+				if ((old_in = ch[cn].spell[n])!=0)
 				{
-					bu[in2].used = USE_EMPTY;
+					bu[old_in].used = USE_EMPTY;
 					ch[cn].spell[n] = 0;
 				}
 			}
 			else
 			{
-				bu[in].used = USE_EMPTY;
+				bu[new_in].used = USE_EMPTY;
 				return 0;
 			}
 		}
 	}
-
-	ch[cn].spell[n] = in;
-	bu[in].carried  = cn;
-
+	
+	ch[cn].spell[n]    = new_in;
+	bu[new_in].carried = cn;
+	
 	do_update_char(cn);
 	
-	if (bu[in].data[5] == 1 && bu[in].temp != SK_SHADOW && bu[in].temp != SK_HEAL && !has_buff(cn, SK_PLAGUE) &&
-		IS_SANECHAR(n = bu[in].data[0]) && IS_LYCANTH(n)) spell_plague(n, cn, 2);
-
+	if (bu[new_in].data[5] == 1 && new_temp != SK_SHADOW && new_temp != SK_HEAL && !has_buff(cn, SK_PLAGUE) &&
+		IS_SANECHAR(n = bu[new_in].data[0]) && IS_LYCANTH(n))
+			spell_plague(n, cn, 2);
+	
 	return 1;
 }
 
@@ -5924,7 +5956,10 @@ void skill_leap(int cn, int flag)
 	
 	power       = M_SK(cn, SK_LEAP) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
 	power       = skill_multiplier(power, cn);
-	numrepeats += max(0, GET_SPD_ATK(cn)/40);
+	if (IS_PLAYER(cn))
+		numrepeats += max(0, GET_SPD_ATK(cn)/60);
+	else
+		numrepeats += max(0, GET_SPD_ATK(cn)/90);
 	aoepower    = (flag?6:10) + ch[cn].aoe_bonus + (B_SK(cn, SK_PROX)?(M_SK(cn, SK_PROX)/30):0);
 	critical    = ch[cn].crit_multi;
 	
@@ -6414,7 +6449,7 @@ int spell_pact(int cn, int co, int power)
 	if (do_get_iflag(cn, SF_HERMIT_R))
 	{
 		power = bu[in].reserve[2] = min(80, 15+power/5); // Mana
-		power = more(power, ch[co].hp[5] * n, 100);
+		power = more(power, ch[co].mana[5] * n, 100);
 		bu[in].dmg_reduction = power*4/6;
 		bu[in].dmg_bonus     = power*2/6;
 	}

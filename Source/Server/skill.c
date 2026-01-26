@@ -136,7 +136,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_INT, AT_INT, AT_INT }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
-	{ 31, 'G', 	"Aria", 				"Passively grants you and allies a buff to cooldown rate, and debuff enemy cooldown rate. Has a base radius of 5 tiles.", 
+	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff based off equipped rings, and a debuff to enemies.", 
 				"", "",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				
@@ -208,8 +208,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
-	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a random nearby enemy, dealing critical damage to enemies at full life.",
-				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning enemies it hits.",
+	{ 49, 'E', 	"Leap", 				"Use (Skill): Strike your foe and leap to a number of random nearby enemies.",
+				"Leap (Critical)", 		"Use (Skill): Strike your foe and leap to your target, dealing critical damage and stunning each enemy hit.",
 				{ AT_BRV, AT_AGL, AT_STR }},
 				
 	{ 50, 'H', 	"Light", 				"Use (Spell): Applies a buff to you or your target, making them glow in the dark.", 
@@ -360,7 +360,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Zealotry",                      "10%% increased total Spell Aptitude.",
 		  6647,                            "" },
 		{ "Rewind",                        "Your Slow spell is now a passive aura, with a ",
-		  6658,                            "base radius of 4." },
+		  6658,                            "base radius of 4 and a reservation of 25%%." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Toxins",                        "1%% increased power of Poison for every 10 ",
 		  6652,                            "total Intuition." },
@@ -370,7 +370,7 @@ struct sk_tree sk_tree[10][12]={
 		  6655,                            "total Willpower." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Fast Forward",                  "Your Haste spell is now a passive aura, with ",
-		  6660,                            "a base radius of 4." },
+		  6660,                            "a base radius of 4 and a reservation of 25%%." },
 		{ "Fleet-Foot",                    "20%% increased total Movement Speed.",
 		  6659,                            "" },
 		{ "Dodging",                       "1%% increased effect of Resistance for every ",
@@ -447,7 +447,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Valor",                         "10%% increased total Weapon Value.",
 		  6605,                            "" },
 		{ "Presence",                      "Your Curse spell is now a passive aura, with ",
-		  6658,                            "a base radius of 4." },
+		  6658,                            "a base radius of 4 and a reservation of 25%%." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Virtuosity",                    "Your passive skills gain an additional 20%% ",
 		  6645,                            "Braveness bonus." },
@@ -472,7 +472,7 @@ struct sk_tree sk_tree[10][12]={
 		  6613,                            "" },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Sickness",                      "Your Weaken skill is now a passive aura, with ",
-		  6658,                            "a base radius of 4." },
+		  6658,                            "a base radius of 4 and a reservation of 25%%." },
 		{ "Pride",                         "50%% increased total Area of Effect.",
 		  6653,                            "" },
 		{ "Greed",                         "Enemies affected by your debuffs grant 2%% of ",
@@ -846,7 +846,7 @@ struct metaStat metaStats[103] = {
 	{ -1, 0, 1, "Effective Immunity",   "",        "Estimated Immunity score. This displays your 'true' Immunity value after special effects." },
 	{ -1, 0, 1, "Effective Resistance", "",        "Estimated Resistance score. This displays your 'true' Resistance value after special effects." },
 	{ -1, 1, 6, "Movement Speed",       "",        "The speed at which your character runs around Astonia." },
-	{ -1, 1, 6, "  Cast Speed",         "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
+	{ -1, 1, 6, "Cast Speed",           "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
 	{ -1, 0, 1, "Thorns Score",         "",        "Damage dealt to attackers when you are hit (even if you take no damage). Does not damage attackers if they miss." },
 	{ -1, 1, 4, "Mana Cost Multiplier", "%",       "The multiplier of mana for spells, determined by your Economize skill." },
 	{ -1, 0, 4, "Total AoE Bonus",      "Tiles",   "Flat increase to area-of-effect skills." },
