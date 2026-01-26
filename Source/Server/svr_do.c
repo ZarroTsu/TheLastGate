@@ -12482,10 +12482,10 @@ void really_update_char(int cn)
 	
 	// Flat additions
 	{
-		if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   resrv[2] += 25;  // (Sorc) Rewind
-		if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  resrv[2] += 25;  // (Sorc) Fast Forward
-		if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  resrv[2] += 25;  // (Brav) Presence
-		if (T_LYCA_SK(cn,  4) && B_SK(cn, SK_WEAKEN)) resrv[1] += 25;  // (Lyca) Sickness
+		if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   resrv[2] += min(35, 10 + M_SK(cn, SK_SLOW)   / 15);  // (Sorc) Rewind
+		if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  resrv[2] += min(35, 10 + M_SK(cn, SK_HASTE)  / 15);  // (Sorc) Fast Forward
+		if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  resrv[2] += min(35, 10 + M_SK(cn, SK_CURSE)  / 15);  // (Brav) Presence
+		if (T_LYCA_SK(cn,  4) && B_SK(cn, SK_WEAKEN)) resrv[1] += min(35, 10 + M_SK(cn, SK_WEAKEN) / 15);  // (Lyca) Sickness
 	}
 	
 	for (z=0;z<3;z++)
