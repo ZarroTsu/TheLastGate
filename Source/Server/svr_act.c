@@ -610,35 +610,33 @@ void plr_give(int cn)
 
 	switch(ch[cn].dir)
 	{
-	case DX_UP:
-		y--;
-		break;
-	case DX_DOWN:
-		y++;
-		break;
-	case DX_LEFT:
-		x--;
-		break;
-	case DX_RIGHT:
-		x++;
-		break;
-	default:
-		xlog("plr_give (svr_act.c): Unknown dir %d for char %d", ch[cn].dir, cn);
-		ch[cn].cerrno = ERR_FAILED;
-		return;
+		case DX_UP:
+			y--;
+			break;
+		case DX_DOWN:
+			y++;
+			break;
+		case DX_LEFT:
+			x--;
+			break;
+		case DX_RIGHT:
+			x++;
+			break;
+		default:
+			xlog("plr_give (svr_act.c): Unknown dir %d for char %d", ch[cn].dir, cn);
+			ch[cn].cerrno = ERR_FAILED;
+			return;
 	}
-
-	co = map[x + y * MAPX].ch;
-	if (!co)
-	{
+	
+	if (!(co = map[x + y * MAPX].ch))
 		co = map[x + y * MAPX].to_ch;
-	}
+	
 	if (!co)
 	{
 		do_char_log(cn, 2, "Your target moved away!\n");
 		return;
 	}
-
+	
 	do_give(cn, co);
 }
 

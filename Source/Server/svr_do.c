@@ -10191,12 +10191,11 @@ void do_give(int cn, int co)
 {
 	int tmp, in;
 
-	if (!ch[cn].citem)
+	if (!(in = ch[cn].citem))
 	{
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
-	in = ch[cn].citem;
 
 	ch[cn].cerrno = ERR_SUCCESS;
 
@@ -11508,7 +11507,7 @@ void really_update_char(int cn)
 		for (z = 0; z<5; z++)
 		{
 			attrib[z]  = foolaverage/5;
-			attrib[z] +=  attrib[z]/25*2; // 8%
+			attrib[z] +=  attrib[z]/20; // 5%
 		}
 	}
 	else
@@ -12102,8 +12101,8 @@ void really_update_char(int cn)
 	
 	// Flat bonus
 	{
-		if (T_SEYA_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=  m/25; }  // (Seya) Brilliance
-		if ((n=TC_SK(cn,  9))) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/50; }
+		if (T_SEYA_SK(cn,  9)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=  m/ 75; }  // (Seya) Brilliance
+		if ((n=TC_SK(cn,  9))) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } spell_pow+=n*m/150; }
 		
 		spell_pow += (T_SORC_SK(cn, 4)*2 + TC_SK(cn, 52))*spell_apt/50;    // (Sorc) Introspection
 	}
@@ -12320,8 +12319,8 @@ void really_update_char(int cn)
 			armor  += (attrib_ex[AT_STR]/10);
 		}
 		
-		if (T_SEYA_SK(cn,  7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=  m/25; armor+=  m/25; } // (Seya) Determination
-		if ((n=TC_SK(cn,  7))) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=n*m/50; armor+=n*m/50; }
+		if (T_SEYA_SK(cn,  7)) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=  m/ 75; armor+=  m/ 75; } // (Seya) Determination
+		if ((n=TC_SK(cn,  7))) { m=0; for (z=0; z<5; z++) { m+=attrib_ex[z]; } weapon+=n*m/150; armor+=n*m/150; }
 	}
 	
 	// Tarot - Lovers
@@ -16416,7 +16415,7 @@ void print_tree_desc(int cn, char *text1, char *text2) // used to remove the dou
 	
 	strcpy(buf, text1);
 	strcat(buf, text2);
-	sprintf(buf, "%s", buf);
+	sprintf(buf, buf);
 	
 	do_char_log(cn, 1, "%s\n", buf);
 }
@@ -17796,7 +17795,7 @@ int do_swap_item(int cn, int n)
 	if (n<0 || n>19)               return -1;  // sanity check
 	
 	// check prerequisites:
-	if ((tmp = ch[cn].citem))
+	if (IS_SANEITEM(tmp = ch[cn].citem))
 	{
 		if (it[tmp].driver==40 && it[tmp].data[0]!=cn)
 		{
@@ -17910,8 +17909,8 @@ int do_swap_item(int cn, int n)
 				break;
 			case WN_LHAND:
 				if (!(it[tmp].placement & PL_SHIELD))                                         return -1;
-				if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in) 
-					&& !do_get_iflag(cn,SF_WORLD_R))                                          return -1;
+				if (IS_SANEITEM(in = ch[cn].worn[WN_RHAND]) && IS_TWOHAND(in) 
+					&& !do_get_iflag(cn,SF_WORLD_R))                                          return -1;  // [Taro] World.R
 				break;
 			case WN_RHAND:
 				if (!IS_EQWEAPON(tmp) && !(IS_EQSHIELD(tmp) && IS_ARCHTEMPLAR(cn)))           return -1;
@@ -17923,10 +17922,10 @@ int do_swap_item(int cn, int n)
 			case WN_RRING:
 			case WN_LRING:
 				if (!(it[tmp].placement & PL_RING))                                           return -1;
-				else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))    return -1;
-				else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))    return -1;
-				else if (n==WN_RRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_LRING])             return -1;
-				else if (n==WN_LRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_RRING])             return -1;
+				if (n==WN_RRING && IS_SANEITEM(in = ch[cn].worn[WN_LRING]) && IS_TWOHAND(in)) return -1;
+				if (n==WN_LRING && IS_SANEITEM(in = ch[cn].worn[WN_RRING]) && IS_TWOHAND(in)) return -1;
+				if (n==WN_RRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_LRING])                  return -1;
+				if (n==WN_LRING && IS_TWOHAND(tmp) && ch[cn].worn[WN_RRING])                  return -1;
 				break;
 			default: return -1;
 		}

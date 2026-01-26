@@ -650,7 +650,7 @@ extern char *at_short[];
 #define DESC_JUDGE			"When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_WORLD			"When equipped, mana regeneration is instead applied as endurance regeneration while able to recover endurance.\n"
 
-#define DESC_FOOL_R			"When equipped, your attributes become the average of all attributes, plus 8%%.\n"
+#define DESC_FOOL_R			"When equipped, your attributes become the average of all attributes, plus 5%%.\n"
 #define DESC_MAGI_R			"When equipped, your Economize skill no longer reduces the Mana cost of skills, and instead increases your Cooldown rate.\n"
 #define DESC_PREIST_R		"When equipped, your Magic Shield and Magic Shell are now passive and regenerate quickly, but are more fragile. You cannot gain Magic Shield or Magic Shell from other sources.\n"
 #define DESC_EMPRES_R		"When equipped, your Lethargy skill reserves life instead of mana.\n"

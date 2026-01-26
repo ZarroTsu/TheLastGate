@@ -247,10 +247,10 @@ struct sk_tree sk_tree[10][12]={
 		  6606,                            "immunity." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Determination",                 "Gain +1 to Weapon and Armor Value for every ",
-		  6615,                            "25 total attributes." },
+		  6615,                            "75 total attributes." },
 		{ "Jack of All Trades",            "5%% increased total Attributes.",
 		  6608,                            "" },
-		{ "Brilliance",                    "Gain +1 to Spellpower Bonus for every 25 ",
+		{ "Brilliance",                    "Gain +1 to Spellpower Bonus for every 75 ",
 		  6623,                            "total attributes." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Enigmatic",                     "20%% less effect of debuffs on you.",
@@ -540,10 +540,10 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6606,                            "immunity." },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "False Determination",           "Gain (+1) to Weapon and Armor Value for every ",
-	  6615,                            "50 total attributes." },
-	{ "Master of None",                "(+5) to all Skill and Attribute limits.",
+	  6615,                            "150 total attributes." },
+	{ "Master of None",                "(+5) to all Skill limits.",
 	  6704,                            "" },
-	{ "False Brilliance",              "Gain (+1) to Spellpower Bonus for every 50 ",
+	{ "False Brilliance",              "Gain (+1) to Spellpower Bonus for every 150 ",
 	  6623,                            "total attributes." },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "False Enigmatic",               "(+10%%) less effect of debuffs on you.",

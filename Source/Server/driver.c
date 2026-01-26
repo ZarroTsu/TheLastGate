@@ -8273,50 +8273,53 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 }
 
 // grave looting and friends
-
-// does not check correctly for two-handed weapons
 int npc_check_placement(int cn, int in, int n)
 {
+	int in2;
+	
 	switch(n)
 	{
 		case    WN_HEAD:
-			if (!(it[in].placement & PL_HEAD))                                                return 0;
+			if (!(it[in].placement & PL_HEAD)) return 0;
 			break;
 		case    WN_NECK:
-			if (!(it[in].placement & PL_NECK))                                                return 0;
+			if (!(it[in].placement & PL_NECK)) return 0;
 			break;
 		case    WN_BODY:
-			if (!(it[in].placement & PL_BODY))                                                return 0;
+			if (!(it[in].placement & PL_BODY)) return 0;
 			break;
 		case    WN_ARMS:
-			if (!(it[in].placement & PL_ARMS))                                                return 0;
+			if (!(it[in].placement & PL_ARMS)) return 0;
 			break;
 		case    WN_BELT:
-			if (!(it[in].placement & PL_BELT))                                                return 0;
+			if (!(it[in].placement & PL_BELT)) return 0;
 			break;
 		case    WN_FEET:
-			if (!(it[in].placement & PL_FEET))                                                return 0;
+			if (!(it[in].placement & PL_FEET)) return 0;
 			break;
 		case    WN_LHAND:
-			if (!(it[in].placement & PL_SHIELD))                                              return 0;
-			else if ((in = ch[cn].worn[WN_RHAND])!=0 && IS_TWOHAND(in))                       return 0;
+			if (!(it[in].placement & PL_SHIELD)) return 0;
+			if (IS_SANEITEM(in2 = ch[cn].worn[WN_RHAND]) && IS_TWOHAND(in2) 
+				&& !do_get_iflag(cn,SF_WORLD_R)) return 0;  // [Taro] World.R
 			break;
 		case    WN_RHAND:
-			if (!IS_EQWEAPON(in) && !(IS_EQSHIELD(in) && IS_ARCHTEMPLAR(cn)))                 return 0;
-			else if (IS_TWOHAND(in) && !do_get_iflag(cn,SF_WORLD_R) && ch[cn].worn[WN_LHAND]) return 0;  // [Taro] World.R
+			if (!IS_EQWEAPON(in) && !(IS_EQSHIELD(in) && IS_ARCHTEMPLAR(cn))) return 0;
+			if (IS_TWOHAND(in) && !do_get_iflag(cn,SF_WORLD_R) && ch[cn].worn[WN_LHAND]) return 0;  // [Taro] World.R
 			break;
 		case    WN_CLOAK:
-			if (!(it[in].placement & PL_CLOAK))                                               return 0;
+			if (!(it[in].placement & PL_CLOAK)) return 0;
 			break;
 		case    WN_RRING:
 		case    WN_LRING:
-			if (!(it[in].placement & PL_RING))                                                return 0;
-			else if (n==WN_RRING && (in = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in))        return 0;
-			else if (n==WN_LRING && (in = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in))        return 0;
+			if (!(it[in].placement & PL_RING)) return 0;
+			if (n==WN_RRING && IS_SANEITEM(in2 = ch[cn].worn[WN_LRING])!=0 && IS_TWOHAND(in2)) return 0;
+			if (n==WN_LRING && IS_SANEITEM(in2 = ch[cn].worn[WN_RRING])!=0 && IS_TWOHAND(in2)) return 0;
+			if (n==WN_RRING && IS_TWOHAND(in) && ch[cn].worn[WN_LRING]) return 0;
+			if (n==WN_LRING && IS_TWOHAND(in) && ch[cn].worn[WN_RRING]) return 0;
 			break;
 		default: return 0;
 	}
-
+	
 	return 1;
 }
 
