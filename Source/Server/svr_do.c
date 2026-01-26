@@ -12668,7 +12668,7 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	}
 	
 	if (cc == cn) // Caster reserves mana
-		bu[in].reserve[2] = min(30, 5 + M_SK(cn, SK_ARIA) / 15);
+		bu[in].reserve[2] = min(35, 10 + M_SK(cn, SK_ARIA) / 15);
 	
 	if (IS_SANEITEM(ring1))
 	{
