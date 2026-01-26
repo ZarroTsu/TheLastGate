@@ -1872,7 +1872,7 @@ int add_spell(int cn, int new_in)
 				if (old_temp==SK_SLOW || old_temp==SK_SLOW2 || old_temp==SK_CURSE2)
 					tickminimum = TICKS*5;
 				
-				if (bu[old_in].data[4] &= 2 && bu[new_in].data[4] &= 2)  // Aura skill
+				if ((bu[old_in].data[4] &= 2) && (bu[new_in].data[4] &= 2))  // Aura skill
 				{
 					if ((old_temp==SK_ARIA || old_temp==SK_ARIA2))
 					{
