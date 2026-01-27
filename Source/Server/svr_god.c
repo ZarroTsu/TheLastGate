@@ -1660,37 +1660,38 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[I_I]      +=  9 * bonus/2;
+						it[in].speed[I_P]      +=  4 * bonus;
 						break;
 					case 2:
 						gend = " goddess ";
 						godn = "Kwai";
 						it[in].flags |= IF_KWAI_UNI;
-						it[in].to_hit[I_I]     +=  2 * bonus;
-						it[in].to_parry[I_I]   +=  2 * bonus;
+						it[in].to_hit[I_P]     +=  2 * bonus;
+						it[in].to_parry[I_P]   +=  2 * bonus;
 						break;
 					case 3:
 						gend = " god ";
 						godn = "Gorn";
 						it[in].flags |= IF_GORN_UNI;
-						it[in].spell_mod[I_I]  +=  3 * bonus/2;
+						it[in].spell_pow[I_P]  +=  2 * bonus;
 						break;
 					default:
 						gend = " ";
 						godn = "Purple One";
 						it[in].flags |= IF_PURP_UNI;
-						it[in].top_damage[I_I] += 15 * bonus;
+						it[in].speed[I_P]       +=  2 * bonus;
+						it[in].to_hit[I_P]      +=  1 * bonus;
+						it[in].to_parry[I_P]    +=  1 * bonus;
+						it[in].spell_pow[I_P]   +=  1 * bonus;
 						break;
 				}
 				if (it_temp[x].armor[I_I] && it_temp[x].weapon[I_I])
 				{
-					it[in].armor[I_I]  += 1 + 1 * bonus;
-					it[in].weapon[I_I] += 1 + 1 * bonus;
+					it[in].armor[I_P]  += 1 * bonus;
+					it[in].weapon[I_P] += 1 * bonus;
 				}
-				else if (it_temp[x].armor[I_I])
-					it[in].armor[I_I]  += 2 + 2 * bonus;
-				else if (it_temp[x].weapon[I_I])
-					it[in].weapon[I_I] += 2 + 2 * bonus;
+				else if (it_temp[x].armor[I_I])  it[in].armor[I_P]  += 2 * bonus;
+				else if (it_temp[x].weapon[I_I]) it[in].weapon[I_P] += 2 * bonus;
 				
 				it[in].orig_temp = it[in].temp;
 				it[in].temp = 0;

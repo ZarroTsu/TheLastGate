@@ -359,8 +359,8 @@ struct sk_tree sk_tree[10][12]={
 		  6623,                            "total Spell Aptitude." },
 		{ "Zealotry",                      "10%% increased total Spell Aptitude.",
 		  6647,                            "" },
-		{ "Rewind",                        "Your Slow spell reserves mana to become a ",
-		  6658,                            "passive aura, with a base radius of 4." },
+		{ "Rewind",                        "Your Slow spell is 25%% weaker, but is now a ",
+		  6658,                            "passive aura with a base radius of 4." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Toxins",                        "1%% increased power of Poison for every 10 ",
 		  6652,                            "total Intuition." },
@@ -369,8 +369,8 @@ struct sk_tree sk_tree[10][12]={
 		{ "Hex Master",                    "1%% increased power of Lethargy for every 10 ",
 		  6655,                            "total Willpower." },
 		//"         '         '         ", "         '         '         '         '      "
-		{ "Fast Forward",                  "Your Haste spell reserves mana to become a ",
-		  6660,                            "passive aura, with a base radius of 4." },
+		{ "Fast Forward",                  "Your Haste spell is 25%% weaker, but is now a ",
+		  6660,                            "passive aura with a base radius of 4." },
 		{ "Fleet-Foot",                    "20%% increased total Movement Speed.",
 		  6659,                            "" },
 		{ "Dodging",                       "1%% increased effect of Resistance for every ",
@@ -446,8 +446,8 @@ struct sk_tree sk_tree[10][12]={
 		  6691,                            "total Weapon Value." },
 		{ "Valor",                         "10%% increased total Weapon Value.",
 		  6605,                            "" },
-		{ "Presence",                      "Your Curse spell reserves mana to become a ",
-		  6658,                            "passive aura, with a base radius of 4." },
+		{ "Presence",                      "Your Curse spell is 25%% weaker, but is now a ",
+		  6658,                            "passive aura with a base radius of 4." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Virtuosity",                    "Your passive skills gain an additional 20%% ",
 		  6645,                            "Braveness bonus." },
@@ -471,8 +471,8 @@ struct sk_tree sk_tree[10][12]={
 		{ "Sharkskin",                     "+6 to Thorns.",
 		  6613,                            "" },
 		//"         '         '         ", "         '         '         '         '      "
-		{ "Sickness",                      "Your Weaken skill reserves endurance to become ",
-		  6658,                            "a passive aura, with a radius of 4." },
+		{ "Sickness",                      "Your Weaken skill is 25%% weaker, but is now ",
+		  6658,                            "a passive aura with a radius of 2." },
 		{ "Pride",                         "50%% increased total Area of Effect.",
 		  6653,                            "" },
 		{ "Greed",                         "Enemies affected by your debuffs grant 2%% of ",

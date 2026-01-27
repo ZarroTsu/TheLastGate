@@ -12480,14 +12480,6 @@ void really_update_char(int cn)
 		ch[].reserve[] values
 	*/
 	
-	// Flat additions
-	{
-		if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   resrv[2] += min(35, 10 + M_SK(cn, SK_SLOW)   / 15);  // (Sorc) Rewind
-		if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  resrv[2] += min(35, 10 + M_SK(cn, SK_HASTE)  / 15);  // (Sorc) Fast Forward
-		if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  resrv[2] += min(35, 10 + M_SK(cn, SK_CURSE)  / 15);  // (Brav) Presence
-		if (T_LYCA_SK(cn,  4) && B_SK(cn, SK_WEAKEN)) resrv[1] += min(35, 10 + M_SK(cn, SK_WEAKEN) / 15);  // (Lyca) Sickness
-	}
-	
 	for (z=0;z<3;z++)
 	{
 		n  = 0;
@@ -12654,6 +12646,8 @@ int get_aria_im(int cn, int in)
 	return more(immun, n, 1)/100;
 }
 
+#define ARIA_MULT    power / 300
+
 void do_aria_stats(int cn, int in, int power, int flag)
 {
 	int n, cc = 0, ring1=0, ring2=0, act1=0, act2=0;
@@ -12672,13 +12666,16 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	
 	if (IS_SANEITEM(ring1))
 	{
-		for (n=0;n< 5;n++) r_at[n] += it[ring1].attrib[n][act1];
-		for (n=0;n<50;n++) r_sk[n] += it[ring1].skill[n][act1];
-		r_hp += it[ring1].hp[act1];         r_en += it[ring1].end[act1];         r_mp += it[ring1].mana[act1];
-		r_wp += it[ring1].weapon[act1];     r_ar += it[ring1].armor[act1];       r_sp += it[ring1].spell_pow[act1];
-		r_tp += it[ring1].top_damage[act1]; r_ht += it[ring1].to_hit[act1];      r_pr += it[ring1].to_parry[act1];
-		r_th += it[ring1].gethit_dam[act1]; r_as += it[ring1].speed[act1];       r_ap += it[ring1].spell_apt[act1];
-		r_co += it[ring1].cool_bonus[act1]; r_cc += it[ring1].crit_chance[act1]; r_cm += it[ring1].crit_multi[act1];
+		for (n=0;n< 5;n++) r_at[n] += max(0, it[ring1].attrib[n][act1]);
+		for (n=0;n<50;n++) r_sk[n] += max(0, it[ring1].skill[n][act1]);
+		r_hp += max(0, it[ring1].hp[act1]);         r_en += max(0, it[ring1].end[act1]);
+		r_mp += max(0, it[ring1].mana[act1]);       r_wp += max(0, it[ring1].weapon[act1]);
+		r_ar += max(0, it[ring1].armor[act1]);      r_sp += max(0, it[ring1].spell_pow[act1]);
+		r_tp += max(0, it[ring1].top_damage[act1]); r_ht += max(0, it[ring1].to_hit[act1]);
+		r_pr += max(0, it[ring1].to_parry[act1]);   r_th += max(0, it[ring1].gethit_dam[act1]);
+		r_as += max(0, it[ring1].speed[act1]);      r_ap += max(0, it[ring1].spell_apt[act1]);
+		r_co += max(0, it[ring1].cool_bonus[act1]); r_cc += max(0, it[ring1].crit_chance[act1]);
+		r_cm += max(0, it[ring1].crit_multi[act1]);
 	}
 	else
 	{
@@ -12687,13 +12684,16 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	
 	if (IS_SANEITEM(ring2))
 	{
-		for (n=0;n< 5;n++) r_at[n] += it[ring2].attrib[n][act2];
-		for (n=0;n<50;n++) r_sk[n] += it[ring2].skill[n][act2];
-		r_hp += it[ring2].hp[act2];         r_en += it[ring2].end[act2];         r_mp += it[ring2].mana[act2];
-		r_wp += it[ring2].weapon[act2];     r_ar += it[ring2].armor[act2];       r_sp += it[ring2].spell_pow[act2];
-		r_tp += it[ring2].top_damage[act2]; r_ht += it[ring2].to_hit[act2];      r_pr += it[ring2].to_parry[act2];
-		r_th += it[ring2].gethit_dam[act2]; r_as += it[ring2].speed[act2];       r_ap += it[ring2].spell_apt[act2];
-		r_co += it[ring2].cool_bonus[act2]; r_cc += it[ring2].crit_chance[act2]; r_cm += it[ring2].crit_multi[act2];
+		for (n=0;n< 5;n++) r_at[n] += max(0, it[ring2].attrib[n][act2]);
+		for (n=0;n<50;n++) r_sk[n] += max(0, it[ring2].skill[n][act2]);
+		r_hp += max(0, it[ring2].hp[act2]);         r_en += max(0, it[ring2].end[act2]);
+		r_mp += max(0, it[ring2].mana[act2]);       r_wp += max(0, it[ring2].weapon[act2]);
+		r_ar += max(0, it[ring2].armor[act2]);      r_sp += max(0, it[ring2].spell_pow[act2]);
+		r_tp += max(0, it[ring2].top_damage[act2]); r_ht += max(0, it[ring2].to_hit[act2]);
+		r_pr += max(0, it[ring2].to_parry[act2]);   r_th += max(0, it[ring2].gethit_dam[act2]);
+		r_as += max(0, it[ring2].speed[act2]);      r_ap += max(0, it[ring2].spell_apt[act2]);
+		r_co += max(0, it[ring2].cool_bonus[act2]); r_cc += max(0, it[ring2].crit_chance[act2]);
+		r_cm += max(0, it[ring2].crit_multi[act2]);
 	}
 	else
 	{
@@ -12719,26 +12719,28 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	
 	bu[in].power = power;
 	
-	bu[in].hp    = r_hp * power / 400;
-	bu[in].end   = r_en * power / 400;
-	bu[in].mana  = r_mp * power / 400;
+	bu[in].hp    = r_hp * ARIA_MULT;
+	bu[in].end   = r_en * ARIA_MULT;
+	bu[in].mana  = r_mp * ARIA_MULT;
 	
-	for (n=0;n< 5;n++) bu[in].attrib[n] = r_at[n] * power / 400;
-	for (n=0;n<50;n++) bu[in].skill[n]  = r_sk[n] * power / 400 + (n==SK_IMMUN)?get_aria_im(cc, in):0;
+	for (n=0;n< 5;n++) bu[in].attrib[n] = r_at[n] * ARIA_MULT;
+	for (n=0;n<50;n++) bu[in].skill[n]  = r_sk[n] * ARIA_MULT + (n==SK_IMMUN)?get_aria_im(cc, in):0;
 	
-	bu[in].weapon      = r_wp * power / 400 + get_aria_wv(cc, in);
-	bu[in].armor       = r_ar * power / 400 + get_aria_av(cc, in);
-	bu[in].spell_pow   = r_sp * power / 400;
-	bu[in].top_damage  = r_tp * power / 400;
-	bu[in].to_hit      = r_ht * power / 400;
-	bu[in].to_parry    = r_pr * power / 400;
-	bu[in].gethit_dam  = r_th * power / 400;
-	bu[in].speed       = r_as * power / 400;
-	bu[in].spell_apt   = r_ap * power / 400;
-	bu[in].cool_bonus  = r_co * power / 400;
-	bu[in].crit_chance = r_cc * power / 400;
-	bu[in].crit_multi  = r_cm * power / 400;
+	bu[in].weapon      = r_wp * ARIA_MULT + get_aria_wv(cc, in);
+	bu[in].armor       = r_ar * ARIA_MULT + get_aria_av(cc, in);
+	bu[in].spell_pow   = r_sp * ARIA_MULT;
+	bu[in].top_damage  = r_tp * ARIA_MULT;
+	bu[in].to_hit      = r_ht * ARIA_MULT;
+	bu[in].to_parry    = r_pr * ARIA_MULT;
+	bu[in].gethit_dam  = r_th * ARIA_MULT;
+	bu[in].speed       = r_as * ARIA_MULT;
+	bu[in].spell_apt   = r_ap * ARIA_MULT;
+	bu[in].cool_bonus  = r_co * ARIA_MULT;
+	bu[in].crit_chance = r_cc * ARIA_MULT;
+	bu[in].crit_multi  = r_cm * ARIA_MULT;
 }
+
+#undef ARIA_MULT
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
@@ -12789,6 +12791,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
 			power = more(power, n, 1);
+			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
 			if (!(in2 = make_new_buff(cn, SK_HASTE, BUF_SPR_HASTE, power, SP_DUR_ARIA, 0))) return;
 			
@@ -12803,6 +12806,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			power = more(power, n, 1);
+			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
 			
@@ -12810,7 +12814,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/5;
 			
-			if (do_get_iflag(cn, SF_EMPEROR))
+			if (do_get_iflag(cn, SF_EMPEROR))  // [Taro] Emperor
 			{
 				if (!(in2 = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_ARIA, 0))) return;
 				bu[in2].speed      = -(min(300, 30 + SLOW2FORM(power)));
@@ -12831,6 +12835,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			power = more(power, n, 1);
+			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
 			
@@ -12838,7 +12843,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/5;
 			
-			if (do_get_iflag(cn, SF_TOWER))
+			if (do_get_iflag(cn, SF_TOWER)) // [Taro] Tower
 			{
 				if (!(in2 = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_ARIA, 0))) return;
 				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
@@ -12856,6 +12861,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
 			power = more(power, n, 1);
+			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
 			
@@ -12863,8 +12869,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/5;
 			
-			// Tarot Card - Death :: Change Weaken into Crush
-			if (do_get_iflag(cn, SF_DEATH))
+			if (do_get_iflag(cn, SF_DEATH))  // [Taro] Death
 			{
 				if (!(in2 = make_new_buff(cn, SK_WEAKEN2, BUF_SPR_REND2, power, SP_DUR_ARIA, 0))) return;
 				bu[in2].armor  = max(-127, -(power / 4 + 4));
@@ -18381,7 +18386,7 @@ void do_check_new_item_level(int cn, int in)
 		}
 		else if (IS_GORNWEAP(in))
 		{
-			it[in].spell_mod[I_P]  = 2 * bonus * rank/20 + 2 * bonus;
+			it[in].spell_pow[I_P]  = 2 * bonus * rank/20 + 2 * bonus;
 			ench = 65 + RANDOM(4);
 		}
 		else if (IS_KWAIWEAP(in))
@@ -18393,7 +18398,7 @@ void do_check_new_item_level(int cn, int in)
 		else if (IS_PURPWEAP(in))
 		{
 			it[in].speed[I_P]      = 2 * bonus * rank/20 + 2 * bonus;
-			it[in].spell_mod[I_P]  = 1 * bonus * rank/20 + 1 * bonus;
+			it[in].spell_pow[I_P]  = 1 * bonus * rank/20 + 1 * bonus;
 			it[in].to_hit[I_P]     = 1 * bonus * rank/20 + 1 * bonus;
 			it[in].to_parry[I_P]   = 1 * bonus * rank/20 + 1 * bonus + parr;
 			ench = 69 + RANDOM(4);

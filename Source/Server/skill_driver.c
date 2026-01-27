@@ -108,7 +108,7 @@ struct s_splog splog[66] = {
 		"You have been slowed.",
 		" was slowed.",
 		" cast slow on you.",
-		"You unleash a powerful mass-slow.",
+		"You slow nearby foes.",
 		"You feel a chilling power emanate from somewhere.",
 		" tried to include you in a mass-slow but failed."
 	},{ 
@@ -116,7 +116,7 @@ struct s_splog splog[66] = {
 		"You have been cursed.",
 		" was cursed.",
 		" cast curse on you.",
-		"You unleash a powerful mass-curse.",
+		"You curse nearby foes.",
 		"You feel a wiked power emanate from somewhere.",
 		" tried to include you in a mass-curse but failed."
 	},{ 
@@ -161,7 +161,7 @@ struct s_splog splog[66] = {
 		"You have been envenomed!",
 		" was envenomed.",
 		" cast venom on you.",
-		"You unleash a powerful mass-venom.",
+		"You envenom nearby foes.",
 		"You feel a putrid aura emanate from somewhere.",
 		" tried to include you in a mass-venom but failed."
 	},{
@@ -212,7 +212,7 @@ struct s_splog splog[66] = {
 		"You have been poisoned!",
 		" was poisoned.",
 		" cast poison on you.",
-		"You unleash a powerful mass-poison.",
+		"You poison nearby foes.",
 		"You feel a toxic aura emanate from somewhere.",
 		" tried to include you in a mass-poison but failed."
 	},{
@@ -617,36 +617,38 @@ int get_use_mana(int spell)
 int get_aoe_radius(int cn, int intemp, int prox_power)
 {
 	int r = ch[cn].aoe_bonus * 100;
-	int n = 0, baselen = 100;
+	int n = 100, baselen = 100, numrepeats = 0;
 	
 	switch (intemp)
 	{
-		case SK_SURROUND: if (CAN_ARTM_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_TAUNT:    if (CAN_ARTM_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_CURSE:    if (CAN_SORC_PROX(cn)||T_BRAV_SK(cn, 6)) n = 4 * 100; else n = 1 * 100; break;  // (Brav) Presence
-		case SK_SLOW:     if (CAN_SORC_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_POISON:   if (CAN_SORC_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_VENOM:    if (CAN_SORC_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_BLAST:    if (CAN_ARHR_PROX(cn))                   n = 4 * 100; else n = 1 * 100; break;
-		case SK_WEAKEN:   if (CAN_BRAV_PROX(cn)||T_LYCA_SK(cn, 4)) n = 4 * 100; else n = 1 * 100; break;  // (Lyca) Sickness
+		case SK_SURROUND: if (CAN_ARTM_PROX(cn))                   n = 4 * 100; break;
+		case SK_TAUNT:    if (CAN_ARTM_PROX(cn))                   n = 4 * 100; break;
+		case SK_CURSE:    if (CAN_SORC_PROX(cn)||T_BRAV_SK(cn, 6)) n = 4 * 100; break;  // (Brav) Presence
+		case SK_SLOW:     if (CAN_SORC_PROX(cn))                   n = 4 * 100; break;
+		case SK_POISON:   if (CAN_SORC_PROX(cn))                   n = 4 * 100; break;
+		case SK_VENOM:    if (CAN_SORC_PROX(cn))                   n = 4 * 100; break;
+		case SK_BLAST:    if (CAN_ARHR_PROX(cn))                   n = 4 * 100; break;
+		case SK_WEAKEN:   if (T_LYCA_SK(cn, 4))                    n = 2 * 100; break;  // (Lyca) Sickness
 		//
-		case SK_HASTE:                           n = 4 * 100; break; // Aura only
+		case SK_HASTE:      n = 4 * 100; break; // Aura only
 		//
-		case SK_BLIND:                           n = 4 * 100; break;
-		case SK_DOUSE:                           n = 4 * 100; break;
-		case SK_SLAM:                            n = 4 * 100; break;
-		case SK_OBLITERATE:                      n = 4 * 100; break;
-		case SK_ZEPHYR2:                         n = 4 * 100; break;
-		case SK_PLAGUE:                          n = 6 * 100; break;
-		case SK_WARCRY:                          n = 6 * 100; break;
+		case SK_BLIND:      n = 4 * 100; break;
+		case SK_DOUSE:      n = 4 * 100; break;
+		case SK_SLAM:       n = 4 * 100; break;
+		case SK_OBLITERATE: n = 4 * 100; break;
+		case SK_ZEPHYR2:    n = 4 * 100; break;
+		case SK_PLAGUE:     n = 6 * 100; break;
+		case SK_WARCRY:     n = 6 * 100; break;
 		//
 		case SK_LEAP:
 			n = 2 * 100;
-			if (do_get_iflag(cn, SF_BOOK_DAMO)) baselen = 90;
-			if (do_get_iflag(cn, SF_SIGN_SLAY) && do_get_iflag(cn, SF_JUSTIC_R))
-				n += max(0, min(10, (100 - (100 * baselen / max(25, ch[cn].cool_bonus)))/10)) * 100/2;
+			if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats++;
+			if (T_WARR_SK(cn,  6))              numrepeats++;  // (Warr) Flash Step
+			if (IS_PLAYER(cn))     numrepeats += max(0, GET_SPD_ATK(cn)/60);
+			else                   numrepeats += max(0, GET_SPD_ATK(cn)/90);
+			n += numrepeats * 50;
 			break;
-		default: n = 1 * 100; break;
+		default: break;
 	}
 	
 	r += n;
@@ -704,7 +706,7 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 		
 		do_hurt(cn, co, surrDam+critDam, critDam>0?9:4);
 		
-		if (chance_compare(co, glv*3/4 + RANDOM(20), get_target_resistance(cn, co) + RANDOM(20), 0) && co!=co_orig)
+		if (!RANDOM(20) && chance_compare(co, glv*3/4 + RANDOM(20), get_target_resistance(cn, co) + RANDOM(20), 0) && co!=co_orig)
 		{
 			if (do_get_iflag(cn, SF_HIT_POISON)) spell_poison(cn, co, glv, 1);
 			if (do_get_iflag(cn, SF_HIT_SCORCH)) spell_scorch(cn, co, glv, 1);
