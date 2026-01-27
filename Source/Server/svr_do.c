@@ -7383,15 +7383,11 @@ void do_say(int cn, char *text)
 	{
 		for (n = 0; n<MAXBUFFS; n++)
 		{
-			if ((in = ch[cn].spell[n])!=0 && bu[in].temp==IT_GREENPILL) // speak underwater with a Green Pill
-			{
+			if ((in = ch[cn].spell[n]) && bu[in].temp==IT_GREENPILL) // speak underwater with a Green Pill
 				break;
-			}
 		}
 		if (n==MAXBUFFS)
-		{
 			ptr = "Blub!";
-		}
 	}
 
 	for (n = m = 0; text[n]; n++)
@@ -9309,15 +9305,15 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	
 	*en_dam = *mp_dam = 0;
 	
-	if (T_WARR_SK(co, 12))                           en_dam +=   30;    // (Warr) Tenacity
-	if ((n=TC_SK(co, 48)))                           en_dam += n*15;
-	if (do_get_iflag(co, SF_TW_CLOAK))               en_dam +=   15;    // [Gear] Cloak of Shadows
-	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
+	if (T_WARR_SK(co, 12))                           *en_dam +=   30;    // (Warr) Tenacity
+	if ((n=TC_SK(co, 48)))                           *en_dam += n*15;
+	if (do_get_iflag(co, SF_TW_CLOAK))               *en_dam +=   15;    // [Gear] Cloak of Shadows
+	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   *en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
 	
-	if (T_ARHR_SK(co, 12))                           mp_dam +=   30;    // (ArHr) Resourcefulness
-	if ((n=TC_SK(co, 84)))                           mp_dam += n*15;
-	if (do_get_iflag(co, SF_PREIST))                 mp_dam +=   30;    // [Taro] Priestess
-	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
+	if (T_ARHR_SK(co, 12))                           *mp_dam +=   30;    // (ArHr) Resourcefulness
+	if ((n=TC_SK(co, 84)))                           *mp_dam += n*15;
+	if (do_get_iflag(co, SF_PREIST))                 *mp_dam +=   30;    // [Taro] Priestess
+	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  *mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
 	
 	if ((n = *en_dam + *mp_dam))
 	{
