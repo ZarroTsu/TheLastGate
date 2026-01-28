@@ -624,7 +624,7 @@ void look_contract(int cn, int in, int desc)
 	mission = it[in].data[1];
 	tier    = it[in].data[2];
 	
-	if (T_OS_TREE(cc, 9)) r1 = r2 = r3 = 3;
+	if (T_OS_TREE(cc, 9)) r1 = r2 = r3 = 3;  // (Cont) Binding
 	
 	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r1;
 	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r2;

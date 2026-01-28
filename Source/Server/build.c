@@ -7495,7 +7495,7 @@ void add_monster_flags(int cc, int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG])
 		strcpy(bu[bf].name, "* Bonus OSP");
 		bu[bf].data[4] = 1; add_spell(cn, bf);
 	}
-	if (T_OS_TREE(cc, 12) && (bf = make_new_buff(cn, 108, BUF_SPR_POME, 1, SP_DUR_MAPMOD, 0)))
+	if (T_OS_TREE(cc, 12) && (bf = make_new_buff(cn, 108, BUF_SPR_POME, 1, SP_DUR_MAPMOD, 0)))  // (Cont) Incentive
 	{
 		strcpy(bu[bf].name, "* Bonus OSP *");
 		bu[bf].data[4] = 1; add_spell(cn, bf);
@@ -7740,9 +7740,9 @@ int build_new_map(int cn, int cc, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], 
 		}
 	}
 	
-	if (T_OS_TREE(cc, 3)) bgm++;
-	if (T_OS_TREE(cc,11)) bgm++;
-	if (T_OS_TREE(cc, 6)) bcl++;
+	if (T_OS_TREE(cc, 3)) bgm++;  // (Cont) Army
+	if (T_OS_TREE(cc,11)) bgm++;  // (Cont) Swarm
+	if (T_OS_TREE(cc, 6)) bcl++;  // (Cont) Scholar
 	
 	uw = RANDOM(4);
 	

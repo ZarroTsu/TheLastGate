@@ -4126,14 +4126,14 @@ int start_contract(int cn, int in)
 	
 	cc		= it[in].data[0];
 	
-	if (T_OS_TREE(cc, 2)) bonus++;
-	if (T_OS_TREE(cc, 8)) bonus++;
+	if (T_OS_TREE(cc, 2)) bonus++;  // (Cont) Challenge
+	if (T_OS_TREE(cc, 8)) bonus++;  // (Cont) Hubris
 	
 	mission = it[in].data[1];
 	tier    = it[in].data[2];
 	rank    = getrank(cn) + tier + bonus;
 	
-	if (T_OS_TREE(cc, 9)) r1 = r2 = r3 = 3;
+	if (T_OS_TREE(cc, 9)) r1 = r2 = r3 = 3;  // (Cont) Binding
 	
 	if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r1;
 	if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r2;
@@ -4736,7 +4736,7 @@ int get_map_eme[11+NUM_MAP_ENEM+NUM_LEG_ENEM][60] = {
 
 int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int affix, int tarot)
 {
-	int co, tmp, pts, n, m, j, in, v, rank, tbelt=1, hasloot=0;
+	int co, tmp, pts, n, m, j, in, v, rank, tbelt=0, hasloot=0;
 	char buf[40];
 	
 	co = pop_create_char(temp, 0);
@@ -4970,8 +4970,8 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 		in = 0;
 		rank = getrank(co);
 		
-		if (T_OS_TREE(cn, 1)) tbelt += 2;
-		if (T_OS_TREE(cn, 5)) tbelt += 2;
+		if (T_OS_TREE(cn, 1)) tbelt++;  // (Cont) Reward
+		if (T_OS_TREE(cn, 5)) tbelt++;  // (Cont) Opalescence
 		
 		if (rank>=18 && try_boost(40))
 		{
@@ -5032,14 +5032,15 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 			god_give_char(in, co);
 			hasloot=1;
 		}
-		if (try_boost(6000/max(1,tbelt)))
+		if (try_boost(6000) || (RANDOM(100) < tbelt))
 		{
 			in = pop_create_bonus_belt(co);
 			god_give_char(in, co);
 			hasloot=1;
 		}
 		
-		if (!IS_LABY_MOB(co) && !ch[co].citem && !ch[co].item[0] && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+		if (!ch[co].item[0] && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && 
+			(try_boost(DW_CHANCE) || (RANDOM(100) < tbelt)))
 		{
 			if (in = god_create_item(IT_CORRUPTOR))
 			{

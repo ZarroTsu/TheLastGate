@@ -3138,7 +3138,7 @@ int use_create_map_nme(int cn, int tier, int in, int base, int tarot, int x, int
 	
 	if (IS_SANEITEM(in))
 	{
-		if (T_OS_TREE(cn, 9)) r1 = r2 = r3 = 3;
+		if (T_OS_TREE(cn, 9)) r1 = r2 = r3 = 3;  // (Cont) Binding
 		if ((fl = it[in].data[3]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r1;
 		if ((fl = it[in].data[5]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r2;
 		if ((fl = it[in].data[7]) && fl > 0 && fl < NUM_MAP_POS+1) flags[fl-1] = r3;
@@ -3493,13 +3493,14 @@ int use_map_shrine(int cn, int in)
 			cont_in = it[in].data[4];
 			tarot   = it[in].data[5];
 			
-			if (T_OS_TREE(cc, 10)) boosted = 10;
+			if (T_OS_TREE(cc, 10)) boosted = 10;  // (Cont) Destiny
 			
 			switch (roll)
 			{
 				case  1:
 					for (n=0,panic=0;n<c;n++)
 					{
+						if (n % 2) continue;
 						if (!(ch[catalog[n]].flags & CF_EXTRAEXP))
 						{
 							panic++;
@@ -3579,7 +3580,7 @@ int use_map_shrine(int cn, int in)
 			if (inc = has_buff(cn, 105)) v = 106;
 			if (inc = has_buff(cn, 106)) v = 107;
 			if (inc && (inr = has_buff(cn, 107)) && (bu[inc].active < bu[inr].active)) v = 104;
-			if (T_OS_TREE(cc, 7)) boosted = 2;
+			if (T_OS_TREE(cc, 7)) boosted = 2;  // (Cont) Fate
 			switch (it[in].data[1])
 			{
 				case  1:
@@ -3643,7 +3644,7 @@ int use_map_shrine(int cn, int in)
 		default:		// Green - Character bonus
 			p = sqrt(rank2points(rank)) * 7 + 7;
 			p -= RANDOM(p/25+1); p += RANDOM(p/25*(tier+1)+1);
-			if (T_OS_TREE(cc, 4)) p += p/5;
+			if (T_OS_TREE(cc, 4)) p += p/5;  // (Cont) Hope
 			switch (it[in].data[1])
 			{
 				case  1:

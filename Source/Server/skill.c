@@ -493,8 +493,8 @@ struct sk_tree sk_tree[10][12]={
 		  6702,                            "damage per 2 points of Thorns score." }
 	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Contract
-		{ "Reward",                        "200%% increased chance of finding Rainbow ",
-		  6709,                            "Belts in contracts signed by you." },
+		{ "Reward",                        "+1%% chance of finding Rainbow Belts and ",
+		  6709,                            "Mysterious Portals in contracts signed by you." },
 		{ "Challenge",                     "+1 to rank of contracts signed by you.",
 		  6710,                            "" },
 		{ "Army",                          "+1 enemy per spawn in contracts signed by you.",
@@ -502,8 +502,8 @@ struct sk_tree sk_tree[10][12]={
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Hope",                          "20%% increased effect of rewards from green ",
 		  6712,                            "shrines in contracts signed by you." },
-		{ "Opalescence",                   "200%% increased chance of finding Rainbow ",
-		  6713,                            "Belts in contracts signed by you." },
+		{ "Opalescence",                   "+1%% chance of finding Rainbow Belts and ",
+		  6713,                            "Mysterious Portals in contracts signed by you." },
 		{ "Scholar",                       "20%% more clear experience from contracts ",
 		  6714,                            "signed by you." },
 		//"         '         '         ", "         '         '         '         '      "
