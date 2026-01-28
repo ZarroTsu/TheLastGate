@@ -9420,7 +9420,7 @@ int do_hurt(int cn, int co, int dam, int type)
 {
 	int tmp = 0, cc, n, in, rank = 0, noexp = 0, halfexp = 0, kill_bsp = 0, kill_osp = 0, kill_bos = 0, money = 0;
 	unsigned long long mf1, mf2;
-	int hp_dam, en_dam, mp_dam, greed=0;
+	int hp_dam=0, en_dam=0, mp_dam=0, greed=0;
 	int damtype = 250;
 	int extradam = 0, priestess = 1, cullval=500;
 	
@@ -9492,6 +9492,8 @@ int do_hurt(int cn, int co, int dam, int type)
 					tmp = (bu[in].active / 1024 + 1) * priestess;
 				tmp = (dam + tmp - ch[co].armor) * 5;
 				
+				tmp = less(tmp, TC_SK(co,118)*15, 1); // (Corr) Steadfast
+				
 				// Book - Great Divide :: half duration damage dealt to shield/shell
 				if (do_get_iflag(cn, SF_BOOK_GREA)) tmp /= 2;
 				
@@ -9548,6 +9550,8 @@ int do_hurt(int cn, int co, int dam, int type)
 			
 		if (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW || (IS_PLAYER(cn) && IS_PLAYER(co))) // Reduced
 			dam = less(dam, 80, 1);
+		
+		dam = less(dam, TC_SK(co,114)*25, 1); // (Corr) Courage
 	}
 	else
 	{
@@ -9663,6 +9667,16 @@ int do_hurt(int cn, int co, int dam, int type)
 	
 	if (type!=2 && type!=3 && type!=13) do_leech(cn, dam, 0);
 	
+	// Staggered damage
+	{
+		if (do_get_iflag(co, SF_BONEARMOR)) hp_dam += dam*30/100;
+		
+		if ((n=TC_SK(co,119)) hp_dam += dam*n*5/100;  // (Corr) Censure
+		
+		ch[co].data[11] += hp_dam;
+		dam             -= hp_dam;
+	}
+	
 	// Damage dealt to Endurance and Mana *instead of Hitpoints*
 	hp_dam = alter_damage(co, dam, &en_dam, &mp_dam, 0);
 	
@@ -9676,12 +9690,6 @@ int do_hurt(int cn, int co, int dam, int type)
 		mp_dam += dam * n /100;
 		
 		if (ch[co].a_mana - mp_dam<0) mp_dam = ch[co].a_mana;
-	}
-	
-	if (do_get_iflag(co, SF_BONEARMOR))
-	{
-		ch[co].data[11] += hp_dam*30/100;
-		hp_dam          -= hp_dam*30/100;
 	}
 	
 	if (hp_dam < 0) hp_dam = 0;

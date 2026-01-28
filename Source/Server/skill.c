@@ -776,36 +776,34 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6617,                            "" },
 	{ "Wild Child",                    "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Claws." }
-/*
 	//"         '         '         ", "         '         '         '         '      " ////////
-	{ "",                 "",
-	  6649,                            "" },
-	{ "",                   "",
-	  6663,                            "" },
-	{ "",               "",
-	  6613,                            "" },
+	{ "Shackle",                       "(+1%%) increased power of Slow for every 20 ",
+	  6646,                            "total Willpower." },
+	{ "Famine",                        "(+1%%) increased power of Curse for every 20 ",
+	  6657,                            "total Intuition." },
+	{ "Burden",                        "(+1%%) increased power of Weaken for every 20 ",
+	  6669,                            "total Agility." },
 	//"         '         '         ", "         '         '         '         '      "
-	{ "",                "",
-	  6698,                            "" },
-	{ "",                   "",
-	  6653,                            "" },
-	{ "",                   "",
-	  6700,                            "" },
+	{ "Conquest",                      "(+1%%) increased power of Cleave for every 20 ",
+	  6616,                            "total Strength." },
+	{ "Foresight",                     "(+25%%) reduced extra damage taken from enemy ",
+	  6634,                            "critical strikes." },
+	{ "Courage",                       "(+25%%) reduced damage taken from enemy ",
+	  6690,                            "Thorns." },
 	//"         '         '         ", "         '         '         '         '      "
-	{ "",                    "",
-	  6706,                            "" },
-	{ "",                "",
-	  6671,                            "" },
-	{ "",                   "",
-	  6705,                            "" },
+	{ "Ambidexterity",                 "(+15%%) of total Weapon Value is granted as ",
+	  6664,                            "extra Cooldown Rate." },
+	{ "Razor Shell",                   "(+15%%) of total Armor Value is granted as ",
+	  6618,                            "extra Thorns." },
+	{ "Redemption",                    "(+15%%) of total Weapon and Armor Value is ",
+	  6609,                            "granted to your Companions." },
 	//"         '         '         ", "         '         '         '         '      "
-	{ "",                   "",
-	  6618,                            "" },
-	{ "",                    "",
-	  6617,                            "" },
-	{ "",                    "",
-	  6630,                            "" }
-*/
+	{ "Steadfast",                     "Magic Shields and Shells affecting you take ",
+	  6621,                            "(+15%%) reduced damage from enemies." },
+	{ "Censure",                       "(+5%%) of damage taken from hits is staggered ",
+	  6622,                            "over 5 seconds." },
+	{ "Pestilence",                    "Your skills and spells ignore (+10%%) of enemy ",
+	  6606,                            "resistance." }
 };
 
 struct metaStat metaStats[103] = {

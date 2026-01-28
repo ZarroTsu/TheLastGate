@@ -1513,7 +1513,7 @@ int chance(int cn, int d20)
 
 void damage_mshell(int co, int dam)
 {
-	int tmp = 0, n, m, in, priestess = 1;
+	int tmp = 0, n, in, priestess = 1;
 	
 	//chlog(co,"Magic Shell damaged.");
 	
@@ -1530,6 +1530,8 @@ void damage_mshell(int co, int dam)
 				else
 					tmp = (bu[in].active / 512 + 1) * priestess;
 				tmp = (dam + tmp - get_target_resistance(0, co)) * 5;
+				
+				tmp = less(tmp, TC_SK(co,118)*15, 1); // (Corr) Steadfast
 				
 				// Book - Great Divide :: half duration damage dealt to shield/shell
 				if (do_get_iflag(co, SF_BOOK_GREA)) tmp /= 2;
@@ -1592,8 +1594,7 @@ int get_target_resistance(int cn, int co)
 		// Additive bonuses from attacker
 		{
 			n  = 0;
-			n += T_SEYA_SK(cn,  6)*20;                                // (Seya) Scorn
-			n +=     TC_SK(cn,  6)*10;
+			n += TC_SK(cn,120)*10;  // (Corr) Pestilence
 			
 			target_resist = less(target_resist, n, 1);
 		}
@@ -1640,6 +1641,15 @@ int get_target_immunity(int cn, int co)
 	
 	if (IS_SANECHAR(cn))
 	{
+		// Additive bonuses from attacker
+		{
+			n  = 0;
+			n += T_SEYA_SK(cn,  6)*20;                                // (Seya) Scorn
+			n +=     TC_SK(cn,  6)*10;
+			
+			target_immune = less(target_immune, n, 1);
+		}
+		
 		// Multiplicative bonuses from attacker
 		{
 			n = target_immune;
@@ -2835,6 +2845,12 @@ int spell_curse(int cn, int co, int power, int flag)
 	
 	if (GET_SFAIL(cn, co)) return 0;
 	
+	// Additive bonus
+	{
+		n = TC_SK(cn,110);    // (Corr) Famine
+		power = more(power, M_AT(cn, AT_INT) * n, 20);
+	}
+	
 	power = spell_multiplier(power, cn);
 	
 	if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
@@ -2945,6 +2961,12 @@ int spell_slow(int cn, int co, int power, int flag)
 	int in, n;
 	
 	if (GET_SFAIL(cn, co)) return 0;
+	
+	// Additive bonus
+	{
+		n = TC_SK(cn,109);    // (Corr) Shackle
+		power = more(power, M_AT(cn, AT_WIL) * n, 20);
+	}
 	
 	power = spell_multiplier(power, cn);
 	
@@ -5350,11 +5372,19 @@ int spell_bleed(int cn, int co, int power)
 }
 int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 {
-	int hitpower = power, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0, crit_dam=0;
+	int hitpower, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0, crit_dam=0;
 	
 	chlog(cn, "Used Cleave on %s", ch[co].name);
 	
-	if (T_SKAL_SK(cn, 6)) crit_dam = max(0, do_crit(cn, co, power, 1));  // (Skal) Crushing Blows
+	// Additive bonus
+	{
+		n = TC_SK(cn,112);    // (Corr) Conquest
+		power = more(power, M_AT(cn, AT_STR) * n, 20);
+	}
+	
+	hitpower = power;
+	
+	if (T_SKAL_SK(cn, 6)) crit_dam = max(0, do_crit(cn, co, hitpower, 1));  // (Skal) Crushing Blows
 	
 	hitpower = skill_immunity(co, hitpower+crit_dam) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
@@ -5499,6 +5529,12 @@ int spell_weaken(int cn, int co, int power, int flag)
 	int in, n;
 	
 	if (GET_SFAIL(cn, co)) return 0;
+	
+	// Additive bonus
+	{
+		n = TC_SK(cn,111);    // (Corr) Burden
+		power = more(power, M_AT(cn, AT_AGL) * n, 20);
+	}
 	
 	if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
 	

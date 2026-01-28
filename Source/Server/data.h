@@ -1064,7 +1064,7 @@ __attribute__ ((packed));
 #define EXP_RATE 16
 #define EXP_TIME (MAPY/EXP_RATE)
 
-#define NUM_CORR 108
+#define NUM_CORR 120
 
 struct olditem
 {

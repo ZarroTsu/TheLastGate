@@ -622,7 +622,7 @@ extern char *at_short[];
 #define DESC_VIKINGMALT		"When equipped, this weapon can be used to cast 'Slam', dealing damage based on Strength around you and stunning enemies with a base radius of 2 around your target. Stun duration with Slam is determined by your crit multiplier.\n"
 #define DESC_GUNGNIR		"When equipped, bleeding you inflict deals its damage three times faster.\n"
 
-#define DESC_BONEARMOR		"When equipped, 30%% of damage taken from hits is instead taken as damage over time over 5 seconds.\n"
+#define DESC_BONEARMOR		"When equipped, 30%% of damage taken from hits is staggered over 5 seconds.\n"
 
 // -------- Tarot Cards -------- //
 
