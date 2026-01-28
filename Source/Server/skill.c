@@ -489,8 +489,8 @@ struct sk_tree sk_tree[10][12]={
 		  6618,                            "" },
 		{ "Envy",                          "20%% increased total Thorns score.",
 		  6617,                            "" },
-		{ "Serration",                     "Bleeding inflicted by you deals 1%% increased ",
-		  6702,                            "damage per 2 points of Thorns score." }
+		{ "Serration",                     "Bleeding inflicted by you deals increased ",
+		  6702,                            "damage equal to your Thorns score." }
 	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Contract
 		{ "Reward",                        "+1%% chance of finding Rainbow Belts and ",
@@ -575,7 +575,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6619,                            "total Strength." },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "Full Cover",                    "(+15%%) incresed effect of stats granted by ",
-	  6690,                            "Shields." },
+	  6621,                            "Shields." },
 	{ "False Unbreakable",             "(+5%%) increased total Armor Value.",
 	  6611,                            "" },
 	{ "False Fortitude",               "(+1%%) increased effect of Safeguard for every ",
@@ -631,7 +631,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6643,                            "total Agility." },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "Severance",                     "(+15%%) increased effect of stats granted by ",
-	  6630,                            "Dual Swords." },
+	  6685,                            "Dual Swords." },
 	{ "False Perseverance",            "(+10%%) increased Maximum Endurance. (+1%%) ",
 	  6635,                            "of damage dealt is leeched as Endurance." },
 	{ "False Tenacity",                "(+15%%) of damage taken is dealt to your ",
@@ -776,7 +776,36 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6617,                            "" },
 	{ "Wild Child",                    "(+15%%) increased effect of stats granted by ",
 	  6630,                            "Claws." }
+/*
+	//"         '         '         ", "         '         '         '         '      " ////////
+	{ "",                 "",
+	  6649,                            "" },
+	{ "",                   "",
+	  6663,                            "" },
+	{ "",               "",
+	  6613,                            "" },
 	//"         '         '         ", "         '         '         '         '      "
+	{ "",                "",
+	  6698,                            "" },
+	{ "",                   "",
+	  6653,                            "" },
+	{ "",                   "",
+	  6700,                            "" },
+	//"         '         '         ", "         '         '         '         '      "
+	{ "",                    "",
+	  6706,                            "" },
+	{ "",                "",
+	  6671,                            "" },
+	{ "",                   "",
+	  6705,                            "" },
+	//"         '         '         ", "         '         '         '         '      "
+	{ "",                   "",
+	  6618,                            "" },
+	{ "",                    "",
+	  6617,                            "" },
+	{ "",                    "",
+	  6630,                            "" }
+*/
 };
 
 struct metaStat metaStats[103] = {

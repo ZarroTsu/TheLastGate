@@ -1969,7 +1969,7 @@ int get_meta_stat_value(int cn, int n)
 		case 25: // Cleave Bleed Degen				Decimal, 0.00 /s
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
 			if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                  // [Ench] More Bleed
-			if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 2);   // (Lyca) Serration
+			if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 1);   // (Lyca) Serration
 			value = BLEEDFORM(power, (do_get_iflag(cn, SF_GUNGNIR)?SP_DUR_BLEED/3:SP_DUR_BLEED));
 			break;
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds

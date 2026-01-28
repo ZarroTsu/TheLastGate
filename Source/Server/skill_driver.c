@@ -1874,7 +1874,7 @@ int add_spell(int cn, int new_in)
 				if (old_temp==SK_SLOW || old_temp==SK_SLOW2 || old_temp==SK_CURSE2)
 					tickminimum = TICKS*5;
 				
-				if ((bu[old_in].data[4] &= 2) && (bu[new_in].data[4] &= 2))  // Aura skill
+				if ((bu[old_in].data[4] & 2) && (bu[new_in].data[4] & 2))  // Aura skill
 				{
 					if ((old_temp==SK_ARIA || old_temp==SK_ARIA2))
 					{
@@ -4296,7 +4296,7 @@ void remove_spells(int cn) // Handles No-Magic-Zones, not Dispel
 		if ((in = ch[cn].spell[n])==0)  continue;
 		if (bu[in].temp == 1)           continue;
 		if (bu[in].temp == SK_DIVINITY) continue;
-		if (bu[in].data[4] &= 1)        continue; // Effects not removed by NMZ
+		if (bu[in].data[4] & 1)         continue; // Effects not removed by NMZ
 		bu[in].used = USE_EMPTY;
 		ch[cn].spell[n] = 0;
 	}
@@ -5322,7 +5322,7 @@ int spell_bleed(int cn, int co, int power)
 	power = common_mult(cn, co, power);
 	
 	if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                 // [Ench] More Bleed
-	if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 2);  // (Lyca) Serration
+	if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
 	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	

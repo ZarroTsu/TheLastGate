@@ -13069,7 +13069,7 @@ void do_update_permaspells(int cn)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && ((bu[in].flags & BF_PERMASPELL) || ((bu[in].data[4] &= 2) && (bu[in].data[0] == cn))))
+		if ((in = ch[cn].spell[n]) && ((bu[in].flags & BF_PERMASPELL) || ((bu[in].data[4] & 2) && (bu[in].data[0] == cn))))
 		{
 			switch (bu[in].temp)
 			{
