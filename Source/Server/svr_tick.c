@@ -1856,7 +1856,11 @@ int get_meta_stat_value(int cn, int n)
 			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
 			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
 			dmg_hit = ( dmg_low+dmg_hgh)/2;
-			if (T_ARTM_SK(cn, 6)) dmg_hit = dmg_hgh;  // (ArTm) Impact
+			if (T_ARTM_SK(cn, 6))  // (ArTm) Impact
+			{
+				dmg_low = dmg_hgh;
+				dmg_hit = dmg_hgh;
+			}
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		default: break;
@@ -2145,6 +2149,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 70: // Haste Effect
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
+			if (T_SORC_SK(cn, 10)) power = less(power, 25, 1);  // (Sorc) Fast Forward
 			value = min(300,10+(power)/6)+min(127,5+(power+6)/12);
 			break;
 		case 71: // Pact Dmg Taken								Decimal, 0.00 %
@@ -2180,6 +2185,7 @@ int get_meta_stat_value(int cn, int n)
 		case 78: case 100: // Weaken/Crush Effect							// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = more(power, 20, 1);
+			if (T_LYCA_SK(cn,  4)) power = less(power, 25, 1);  // (Lyca) Sickness
 			value = min(127, (power / 4 + 4));
 			break;
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
@@ -2188,6 +2194,7 @@ int get_meta_stat_value(int cn, int n)
 		case 80: // Curse Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = more(power, 20, 1);
+			if (T_BRAV_SK(cn,  6)) power = less(power, 25, 1);  // (Brav) Presence
 			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
 			else                                  value = (3 + (power - 4) / 5);
 			break;
@@ -2197,6 +2204,7 @@ int get_meta_stat_value(int cn, int n)
 		case 82: // Slow Effect												// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = more(power, 20, 1);
+			if (T_SORC_SK(cn,  6)) power = less(power, 25, 1);  // (Sorc) Rewind
 			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
 			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;

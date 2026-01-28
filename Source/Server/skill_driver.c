@@ -2813,6 +2813,8 @@ int spell_plague(int cn, int co, int flag)
 	power = common_mult(cn, co, power);
 	
 	dur = SP_DUR_PLAGUE;
+	dur = dur * 100 / (100 + TC_SK(cn,113)*15);  // (Corr) Torment
+	
 	ppow = PLAGUEFORM(power, dur);
 	
 	if (flag == 3)
@@ -3089,7 +3091,7 @@ int spell_frostburn(int cn, int co, int power)
 // Feb 2020 - Poison
 int spell_poison(int cn, int co, int power, int flag)
 {
-	int in, n, dur, ppow, venommod, signet=0;
+	int in, n, dur, ppow, venommod, signet=0, faster=0;
 	
 	if (GET_SFAIL(cn, co)) return 0;
 	
@@ -3125,7 +3127,11 @@ int spell_poison(int cn, int co, int power, int flag)
 	
 	dur = SP_DUR_POISON;    // 30 seconds
 	
-	if (do_get_iflag(cn, SF_BOOK_VENO)) dur = less(dur, 20, 1);  // [Book] Venom Compendium
+	faster += TC_SK(cn,113)*15; // (Corr) Torment
+	
+	if (do_get_iflag(cn, SF_BOOK_VENO)) faster += 25;  // [Book] Venom Compendium
+	
+	dur = dur * 100 / (100 + faster);
 	
 	if (IS_PLAYER(cn))
 	{
@@ -4975,9 +4981,11 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 			cap                     = 54           +  gcm    /20;
 			ch[cc].weapon_bonus     = max(  8, min(cap + max(0, root - cap)/8, root));
 			
+			
 			root                    = base * 5 / 6 + 6;
 			cap                     = 60           + (gcm+10)/20;
 			ch[cc].armor_bonus      = max( 12, min(cap + max(0, root - cap)/8, root));
+			
 			
 			if (necronomicon)		// caster ~ becomes ghost
 			{
@@ -5003,6 +5011,9 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 				ch[cc].data[1]      = 3; // BERSERK!!
 			}
 		}
+		
+		ch[cc].weapon_bonus += ch[cn].weapon * (TC_SK(cn,117)*15) / 100;  // (Corr) Redemption
+		ch[cc].armor_bonus  += ch[cn].armor  * (TC_SK(cn,117)*15) / 100;  // (Corr) Redemption
 	}
 	
 	// calculate experience
@@ -5347,6 +5358,8 @@ int spell_bleed(int cn, int co, int power)
 	if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
 	
 	dur = SP_DUR_BLEED; 			// 15 seconds
+	
+	dur = dur * 100 / (100 + TC_SK(cn,113)*15);  // (Corr) Torment
 	
 	if (do_get_iflag(cn, SF_GUNGNIR))
 	{

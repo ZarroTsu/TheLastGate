@@ -9671,7 +9671,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	{
 		if (do_get_iflag(co, SF_BONEARMOR)) hp_dam += dam*30/100;
 		
-		if ((n=TC_SK(co,119)) hp_dam += dam*n*5/100;  // (Corr) Censure
+		if ((n=TC_SK(co,119))) hp_dam += dam*n*5/100;  // (Corr) Censure
 		
 		ch[co].data[11] += hp_dam;
 		dam             -= hp_dam;
@@ -12156,48 +12156,6 @@ void really_update_char(int cn)
 	
 	
 	/*
-		ch[].cool_bonus -- Cooldown Bonus
-		
-		dur * 100 / var = skill exhaust
-	*/
-	
-	// Flat bonuses
-	{
-		spell_cool += attrib_ex[AT_INT]/6;                          // Implicit attribute bonus
-	}
-	
-	// Additive bonuses
-	{
-		n  = 0;
-		n += T_ARHR_SK(cn,  5)*10;             // (ArHr) Serenity
-		n +=     TC_SK(cn, 77)* 5;
-		
-		spell_cool   = more(spell_cool, n, 1);
-	}
-	
-	// Multiplicative bonuses
-	{
-		n = spell_cool;
-		
-		if (B_SK(cn, SK_ECONOM) && do_get_iflag(cn, SF_MAGI_R))     // [Taro] Magician.R
-		{
-			m = M_SK(cn, SK_ECONOM);
-			
-			if (do_get_iflag(cn, SF_BOOK_PROD)) n = more(n, m, 3);  // [Book] Great Prodigy
-			else                                n = more(n, m, 4);
-		}
-		
-		if (do_get_iflag(cn, SF_STRENGTH))                      n = less(n, 15, 1);      // [Taro] Strength
-		if ((m = has_buff(cn, SK_POISON)) && bu[m].data[8]==10) n = less(n, 10, 1);
-		if ((m = has_buff(cn, SK_VENOM))  && bu[m].data[8]==10) n = less(n, 10, 1);
-		
-		spell_cool = n;
-	}
-	
-	ch[cn].cool_bonus = 100 + clamp(spell_cool, -75, 900);
-	
-	
-	/*
 		ch[].crit_chance value
 		
 		Base crit chance is currently determined by what kind of weapon is equipped 
@@ -12389,8 +12347,56 @@ void really_update_char(int cn)
 	
 	
 	/*
+		ch[].cool_bonus -- Cooldown Bonus
+		
+		dur * 100 / var = skill exhaust
+	*/
+	
+	// Flat bonuses
+	{
+		spell_cool += attrib_ex[AT_INT]/6;                   // Implicit attribute bonus
+		spell_cool += weapon * (TC_SK(cn,115) * 10) / 100;   // (Corr) Ambidexterity
+	}
+	
+	// Additive bonuses
+	{
+		n  = 0;
+		n += T_ARHR_SK(cn,  5)*10;             // (ArHr) Serenity
+		n +=     TC_SK(cn, 77)* 5;
+		
+		spell_cool   = more(spell_cool, n, 1);
+	}
+	
+	// Multiplicative bonuses
+	{
+		n = spell_cool;
+		
+		if (B_SK(cn, SK_ECONOM) && do_get_iflag(cn, SF_MAGI_R))     // [Taro] Magician.R
+		{
+			m = M_SK(cn, SK_ECONOM);
+			
+			if (do_get_iflag(cn, SF_BOOK_PROD)) n = more(n, m, 3);  // [Book] Great Prodigy
+			else                                n = more(n, m, 4);
+		}
+		
+		if (do_get_iflag(cn, SF_STRENGTH))                      n = less(n, 15, 1);      // [Taro] Strength
+		if ((m = has_buff(cn, SK_POISON)) && bu[m].data[8]==10) n = less(n, 10, 1);
+		if ((m = has_buff(cn, SK_VENOM))  && bu[m].data[8]==10) n = less(n, 10, 1);
+		
+		spell_cool = n;
+	}
+	
+	ch[cn].cool_bonus = 100 + clamp(spell_cool, -75, 900);
+	
+	
+	/*
 		ch[].gethit_dam value
 	*/
+	
+	// Flat Bonus
+	{
+		gethit += armor * (TC_SK(cn,116) * 10) / 100;    // (Corr) Razor Shell
+	}
 	
 	// "Increased" and "Decreased" Thorns
 	{

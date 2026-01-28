@@ -775,7 +775,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "False Envy",                    "(+10%%) increased total Thorns score.",
 	  6617,                            "" },
 	{ "Wild Child",                    "(+15%%) increased effect of stats granted by ",
-	  6630,                            "Claws." }
+	  6630,                            "Claws." },
 	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "Shackle",                       "(+1%%) increased power of Slow for every 20 ",
 	  6646,                            "total Willpower." },
@@ -786,17 +786,17 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	//"         '         '         ", "         '         '         '         '      "
 	{ "Conquest",                      "(+1%%) increased power of Cleave for every 20 ",
 	  6616,                            "total Strength." },
-	{ "Foresight",                     "(+25%%) reduced extra damage taken from enemy ",
-	  6634,                            "critical strikes." },
+	{ "Torment",                       "Damage dealt by Damage Over Time is dealt ",
+	  6652,                            "(+15%%) faster." },
 	{ "Courage",                       "(+25%%) reduced damage taken from enemy ",
 	  6690,                            "Thorns." },
 	//"         '         '         ", "         '         '         '         '      "
-	{ "Ambidexterity",                 "(+15%%) of total Weapon Value is granted as ",
-	  6664,                            "extra Cooldown Rate." },
-	{ "Razor Shell",                   "(+15%%) of total Armor Value is granted as ",
-	  6618,                            "extra Thorns." },
+	{ "Ambidexterity",                 "(+10%%) of total Weapon Value is granted as ",
+	  6664,                            "additional Cooldown Rate." },
+	{ "Razor Shell",                   "(+10%%) of total Armor Value is granted as ",
+	  6618,                            "additional Thorns." },
 	{ "Redemption",                    "(+15%%) of total Weapon and Armor Value is ",
-	  6609,                            "granted to your Companions." },
+	  6609,                            "granted to your companions." },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "Steadfast",                     "Magic Shields and Shells affecting you take ",
 	  6621,                            "(+15%%) reduced damage from enemies." },
