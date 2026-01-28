@@ -9317,8 +9317,8 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	
 	if ((n = *en_dam + *mp_dam))
 	{
-		*en_dam = dam * ( (*en_dam * 100)/n * min(ALTER_MAX, n) )/10000;
-		*mp_dam = dam * ( (*mp_dam * 100)/n * min(ALTER_MAX, n) )/10000;
+		*en_dam = min(ch[co].a_end,  dam * ( (*en_dam * 100)/n * min(ALTER_MAX, n) )/10000);
+		*mp_dam = min(ch[co].a_mana, dam * ( (*mp_dam * 100)/n * min(ALTER_MAX, n) )/10000);
 	}
 	
 	hp_dam -= *en_dam;
@@ -9687,9 +9687,7 @@ int do_hurt(int cn, int co, int dam, int type)
 		if (type == 5 && do_get_iflag(cn, SF_BRONCHIT)) n += 25;  // [Weap] Bronchitis
 		n += do_get_ieffect(cn, VF_EN_GORNMANA)*25;               // [Ench] Gorn
 		
-		mp_dam += dam * n /100;
-		
-		if (ch[co].a_mana - mp_dam<0) mp_dam = ch[co].a_mana;
+		mp_dam = min(ch[co].a_mana, mp_dam + dam * n /100);
 	}
 	
 	if (hp_dam < 0) hp_dam = 0;
