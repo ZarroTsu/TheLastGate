@@ -1785,9 +1785,9 @@ void plr_update_skill_terminology(int nr, int n)
 	int alt = 0, m;
 	char known;
 	
-	n = tmpSkList[n].nr;  // Remove me after a proper fix!
-	
 	known = get_known_player_skill(cn, n);
+	
+	n = tmpSkList[n].nr;  // Remove me after a proper fix!
 	
 	buf[0] = SV_TERM_SKILLS;
 	buf[2] = n;
