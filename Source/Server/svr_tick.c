@@ -1621,15 +1621,20 @@ void char_remove_same_nets(int cn, int co)
 void plr_update_treenode_terminology(int nr, int tn, int n)
 {
 	unsigned char buf[256];
-	int cn = player[nr].usnr;
-	int m = ch[cn].tree_node[n];
-	int j;
+	int cn = player[nr].usnr, m = 0, j;
 	
 	if (tn < 0) return;
 	if (tn > 9) return;
 	
-	if (tn == 9) buf[0] = SV_TERM_CTREE;
-	else         buf[0] = SV_TERM_STREE;
+	if (tn == 9)
+	{
+		buf[0] = SV_TERM_CTREE;
+	}
+	else
+	{
+		buf[0] = SV_TERM_STREE;
+		m = ch[cn].tree_node[n];
+	}
 	
 	buf[2] = n;
 	
@@ -1728,18 +1733,67 @@ int ch_get_skill_attrib(int cn, int sk, int n)
 	return atr;
 }
 
+int tmp_sort_ch = 0;                            // Remove me after a proper fix!
+struct s_skilltab tmpSkList[MAXSKILL+5];        // Remove me after a proper fix!
+int svr_skill_cmp(const void *a,const void *b)  // Remove me after a proper fix!
+{
+	const struct s_skilltab *c,*d;
+	int m1,m2;
+
+	c=a; d=b;
+
+	m1=c->nr; m2=d->nr;
+	
+	if (m1==99 && m2!=99) return  1;
+	if (m2==99 && m1!=99) return -1;
+	
+	if (B_SK(tmp_sort_ch, m1)==0 && B_SK(tmp_sort_ch, m2)!=0) return  1;
+	if (B_SK(tmp_sort_ch, m2)==0 && B_SK(tmp_sort_ch, m1)!=0) return -1;
+	
+	if (m1==52 && m2!=52 && !(ch[tmp_sort_ch].kindred & KIN_IDENTIFY)) return  1;
+	if (m2==52 && m1!=52 && !(ch[tmp_sort_ch].kindred & KIN_IDENTIFY)) return -1;
+	
+	if ((m1==53||m1==54) && (m2!=53&&m2!=54) && !IS_LYCANTH(tmp_sort_ch)) return  1;
+	if ((m2==53||m2==54) && (m1!=53&&m1!=54) && !IS_LYCANTH(tmp_sort_ch)) return -1;
+	
+	if ((m1==50||m1==51||m1==52||m1==53||m1==54) && 
+		(m2!=50&&m2!=51&&m2!=52&&m2!=53&&m2!=54)) return -1;
+	if ((m2==50||m2==51||m2==52||m2==53||m2==54) && 
+		(m1!=50&&m1!=51&&m1!=52&&m1!=53&&m1!=54)) return  1;
+	
+	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
+	if (B_SK(tmp_sort_ch, m1)==0 && B_SK(tmp_sort_ch, m2)==0 && 
+		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==44||m1==50||m1==51||m1==52||m1==53||m1==54) && 
+		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=44&&m2!=50&&m2!=51&&m2!=52&&m2!=53&&m2!=54)) return -1;
+	if (B_SK(tmp_sort_ch, m2)==0 && B_SK(tmp_sort_ch, m1)==0 && 
+		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==44||m2==50||m2==51||m2==52||m2==53||m2==54) && 
+		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=44&&m1!=50&&m1!=51&&m1!=52&&m1!=53&&m1!=54)) return  1;
+	
+	if (m1==44 && !IS_SEYAN_DU(tmp_sort_ch)) return  1;
+	if (m2==44 && !IS_SEYAN_DU(tmp_sort_ch)) return -1;
+	
+	if (c->sortkey>d->sortkey) return  1;
+	if (c->sortkey<d->sortkey) return -1;
+
+	return strcmp(c->name,d->name);
+}
+
 void plr_update_skill_terminology(int nr, int n)
 {
 	unsigned char buf[256];
 	int cn = player[nr].usnr;
-	char known = get_known_player_skill(cn, n);
 	int alt = 0, m;
+	char known;
+	
+	n = tmpSkList[n].nr;  // Remove me after a proper fix!
+	
+	known = get_known_player_skill(cn, n);
 	
 	buf[0] = SV_TERM_SKILLS;
 	buf[2] = n;
 	
 	buf[1] = ST_SKILLS_SORT;
-	*(unsigned char*)(buf + 3) = (unsigned char)skilltab[n].sortkey;
+	*(unsigned char*)(buf + 3) = (unsigned char)tmpSkList[n].sortkey;
 	*(unsigned char*)(buf + 4) = (unsigned char)(GET_AT(cn, n, 0));
 	*(unsigned char*)(buf + 5) = (unsigned char)(GET_AT(cn, n, 1));
 	*(unsigned char*)(buf + 6) = (unsigned char)(GET_AT(cn, n, 2));
@@ -1765,27 +1819,31 @@ void plr_update_skill_terminology(int nr, int n)
 	for (m=0; m<3; m++)
 	{
 		buf[1] = ST_SKILLS_NAME+m;
-		if (alt) mcpy(buf+3, skilltab[n].alt_name+m*10, 10);
-		else     mcpy(buf+3, skilltab[n].name+m*10,     10);
+		if (alt) mcpy(buf+3, tmpSkList[n].alt_name+m*10, 10);
+		else     mcpy(buf+3, tmpSkList[n].name+m*10,     10);
 		xsend(nr, buf, 13);
 	}
 	
 	for (m=0; m<12; m++)
 	{
 		buf[1] = ST_SKILLS_DESC+m;
-		if (alt) mcpy(buf+3, skilltab[n].alt_desc+m*10, 10);
-		else     mcpy(buf+3, skilltab[n].desc+m*10,     10);
+		if (alt) mcpy(buf+3, tmpSkList[n].alt_desc+m*10, 10);
+		else     mcpy(buf+3, tmpSkList[n].desc+m*10,     10);
 		xsend(nr, buf, 13);
 	}
 }
 
 void ch_update_skill_terminology(int cn, int n)
 {
+	tmpSkList = skilltab;                                                   // Remove me after a proper fix!
+	tmp_sort_ch = cn;                                                       // Remove me after a proper fix!
+	qsort(tmpSkList,(MAXSKILL+5),sizeof(struct s_skilltab),svr_skill_cmp);  // Remove me after a proper fix!
 	plr_update_skill_terminology(ch[cn].player, n);
 }
 
 void plr_update_all_skill_terminology(int nr)
 {
+	tmpSkList = skilltab;                                                   // Remove me after a proper fix!
 	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);
 }
 
@@ -1855,12 +1913,10 @@ int get_meta_stat_value(int cn, int n)
 			dmg_hgh =   dmg_wpn+dmg_top;
 			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
 			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
-			dmg_hit = ( dmg_low+dmg_hgh)/2;
 			if (T_ARTM_SK(cn, 6))  // (ArTm) Impact
-			{
-				dmg_low = dmg_hgh;
-				dmg_hit = dmg_hgh;
-			}
+				dmg_hit = (dmg_low+dmg_hgh*2)/3;
+			else
+				dmg_hit = (dmg_low+dmg_hgh)/2;
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		default: break;
@@ -1968,13 +2024,18 @@ int get_meta_stat_value(int cn, int n)
 		//
 		case 24: // Cleave Hit Damage
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
+			power = more(power, M_AT(cn, AT_STR) * TC_SK(cn,112), 20);  // (Corr) Conquest
 			value = power * DAM_MULT_CLEAVE/1000;
 			break;
 		case 25: // Cleave Bleed Degen				Decimal, 0.00 /s
 			power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon/4 + ch[cn].top_damage/4, cn)*2;
+			power = more(power, M_AT(cn, AT_STR) * TC_SK(cn,112), 20);  // (Corr) Conquest
 			if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                  // [Ench] More Bleed
 			if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 1);   // (Lyca) Serration
-			value = BLEEDFORM(power, (do_get_iflag(cn, SF_GUNGNIR)?SP_DUR_BLEED/3:SP_DUR_BLEED));
+			durat = 0;
+			durat += TC_SK(cn,113)*15; // (Corr) Torment
+			durat = SP_DUR_BLEED * 100 / (100 + durat);
+			value = BLEEDFORM(power, (do_get_iflag(cn, SF_GUNGNIR)?durat/3:durat));
 			break;
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds
 			value = 5 * cdlen;
@@ -2019,10 +2080,12 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 35: case 90: // Poison/Venom Degen		Decimal, 0.00 /s
 			power = spell_multiplier(M_SK(cn, SK_POISON), cn);
-			durat = SP_DUR_POISON;
 			power = more(power, M_AT(cn, AT_INT) * (T_SORC_SK(cn, 7)*2+TC_SK(cn, 55)), 20);  // (Sorc) Toxins
 			if (do_get_iflag(cn, SF_EN_MOREPOIS)) power = power*6/5;
-			if (do_get_iflag(cn, SF_BOOK_VENO))   durat = durat*8/10;
+			durat = 0;
+			durat += TC_SK(cn,113)*15; // (Corr) Torment
+			if (do_get_iflag(cn, SF_BOOK_VENO)) durat += 25;  // [Book] Venom Compendium
+			durat = SP_DUR_POISON * 100 / (100 + durat);
 			value = PL_POISFORM(power, durat);
 			if (do_get_iflag(cn, SF_TOWER_R))     value /= 2;
 			break;
@@ -2184,6 +2247,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 78: case 100: // Weaken/Crush Effect							// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
+			power = more(power, M_AT(cn, AT_AGL) * TC_SK(cn,1111), 20);  // (Corr) Burden
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = more(power, 20, 1);
 			if (T_LYCA_SK(cn,  4)) power = less(power, 25, 1);  // (Lyca) Sickness
 			value = min(127, (power / 4 + 4));
@@ -2193,6 +2257,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 80: // Curse Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
+			power = more(power, M_AT(cn, AT_INT) * TC_SK(cn,110), 20);  // (Corr) Famine
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = more(power, 20, 1);
 			if (T_BRAV_SK(cn,  6)) power = less(power, 25, 1);  // (Brav) Presence
 			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
@@ -2203,6 +2268,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 82: // Slow Effect												// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
+			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = more(power, 20, 1);
 			if (T_SORC_SK(cn,  6)) power = less(power, 25, 1);  // (Sorc) Rewind
 			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));

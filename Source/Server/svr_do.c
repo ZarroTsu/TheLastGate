@@ -3759,8 +3759,8 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	if (IS_BRAVER(cn)   || IS_ANY_HARA(cn) || IS_ANY_TEMP(cn) || B_SK(cn, SK_POISON))	quest1[24] = 1;	// ( Inga )
 	if (IS_BRAVER(cn)||IS_LYCANTH(cn)||IS_ANY_TEMP(cn)||IS_ANY_MERC(cn)||B_SK(cn, SK_STAFF)) quest1[25] = 1;	// ( Inga )
 	if (!IS_BRAVER(cn)  || B_SK(cn, SK_MSHIELD)) 										quest1[28] = 1;	// ( Inga )
-	if (IS_BRAVER(cn)   || IS_ANY_TEMP(cn) || B_SK(cn, SK_ENHANCE))						quest1[ 2] = 1;	// ( Sirjan )
-	if (IS_ANY_MERC(cn)||IS_LYCANTH(cn)|| IS_ANY_HARA(cn)||B_SK(cn, SK_MSHIELD))		quest1[ 3] = 1;	// ( Sirjan )
+	if (IS_ANY_TEMP(cn) || B_SK(cn, SK_ENHANCE))										quest1[ 2] = 1;	// ( Sirjan )
+	if (IS_BRAVER(cn)||IS_ANY_MERC(cn)||IS_LYCANTH(cn)|| IS_ANY_HARA(cn)||B_SK(cn, SK_MSHIELD)) quest1[ 3] = 1;	// ( Sirjan )
 	if (IS_BRAVER(cn)   || IS_ANY_MERC(cn) || IS_ANY_HARA(cn) || B_SK(cn, SK_WEAKEN))	quest1[ 4] = 1;	// ( Amity )
 	if (IS_BRAVER(cn)   || IS_ANY_TEMP(cn) || B_SK(cn, SK_SLOW))						quest1[ 5] = 1;	// ( Amity )
 	if (!IS_BRAVER(cn)  || B_SK(cn, SK_CURSE))											quest1[29] = 1;	// ( Amity )
@@ -10072,7 +10072,7 @@ void do_attack(int cn, int co, int surround)
 	
 	if (hit)
 	{
-		dam    = ch[cn].weapon + RANDOM(8);
+		dam = ch[cn].weapon + RANDOM(8);
 		
 		if ((topdam = max(0, ch[cn].top_damage)))
 		{
@@ -10081,8 +10081,11 @@ void do_attack(int cn, int co, int surround)
 			
 			if (topdam>1)
 			{
-				if (T_ARTM_SK(cn,  6))   dam += topdam;                 // (ArTm) Impact
-				else                     dam += RANDOM(topdam);
+				die = RANDOM(topdam);
+				
+				if (T_ARTM_SK(cn,  6)) die = max(die, RANDOM(topdam));  // (ArTm) Impact
+				
+				dam += die;
 			}
 		}
 		

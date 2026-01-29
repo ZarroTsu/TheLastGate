@@ -272,8 +272,8 @@ struct sk_tree sk_tree[10][12]={
 		  6612,                            "attacking you." },
 		{ "Vanquisher",                    "10%% increased total Top Damage.",
 		  6701,                            "" },
-		{ "Impact",                        "Your minimum hit damage is equal to your ",
-		  6702,                            "maximum hit damage." },
+		{ "Impact",                        "Your Top Damage is rolled an additional time ",
+		  6702,                            "on hit, using the higher roll." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Barbarism",                     "Your active melee skills gain an additional ",
 		  6625,                            "20%% Strength bonus." },

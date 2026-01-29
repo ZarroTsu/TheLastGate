@@ -970,7 +970,8 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	
 	if (!countskip)
 	{
-		do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
+		if ((sqr(r)/10000) > 1)
+			do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
 		
 		if (intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 		{
