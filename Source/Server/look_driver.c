@@ -511,7 +511,7 @@ void look_extra(int cn, int in)
 	// -------- OFFH ENCHANTMENTS --------
 	case 73: do_char_log(cn, 9, "Restore 2 Hitpoints upon being hit by an enemy.\n"); break;
 	case 74: do_char_log(cn, 9, "10%% of weapon value is granted as additional rapid mana regeneration.\n"); break;
-	case 75: do_char_log(cn, 9, "Your lowest attribute score is increased by 20%%.\n"); break;
+	case 75: do_char_log(cn, 9, "20%% of damage taken from hits is staggered over 5 seconds.\n"); break;
 	case 76: do_char_log(cn, 9, "Reduces extra damage taken from enemy critical hits by 50%%.\n"); break;
 	
 	default:break;

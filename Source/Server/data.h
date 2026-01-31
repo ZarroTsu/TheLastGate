@@ -485,9 +485,9 @@ enum _ch_iflags {
 	SF_SPELLPWV,    SF_SPELLPAV,    SF_EXCALIBUR,   SF_EVERGREEN,   
 	SF_EN_HEAL,     SF_MA_HEAL,     SF_GILDSHINE,   SF_CROSSBLAD,   
 	SF_BRONCHIT,    SF_VOLCANF,     SF_VIKINGMALT,  SF_GUNGNIR,     
-	SF_BONEARMOR,   SF_HIT_POISON,  SF_HIT_SCORCH,  SF_HIT_BLIND,   
-	SF_HIT_SLOW,    SF_HIT_CURSE,   SF_HIT_WEAKEN,  SF_HIT_FROST,   
-	SF_HIT_FEAR,    SF_WBREATH, 
+	SF_HIT_POISON,  SF_HIT_SCORCH,  SF_HIT_BLIND,   SF_HIT_SLOW,    
+	SF_HIT_CURSE,   SF_HIT_WEAKEN,  SF_HIT_FROST,   SF_HIT_FEAR,    
+	SF_WBREATH, 
 	
 	SF_EN_MOREAV, // Enchant #  1
 	SF_EN_HEALIT, // Enchant #  2
@@ -568,7 +568,7 @@ enum _ch_ieffects {
 	VF_EN_PURPLEECH,  // Enchant # 69 (+4)
 	VF_EN_PURPDAMG,  // Enchant # 70 (+10)
 	VF_EN_OFFHMANA,  // Enchant # 74 (+10)
-	VF_EN_OFFHATTRIB,  // Enchant # 75 (+20)
+	VF_EN_STAGGER,  // Enchant # 75 (+20)
 	VF_EN_LESSCRIT,  // Enchant # 47 (+50) | 76 (+50)
 	
 	VF_MAX

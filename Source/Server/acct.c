@@ -3851,6 +3851,7 @@ void list_objects(LIST *head, int flag)
 	for (n = m; n<MAXTITEM; n++)
 	{
 		if (it_temp[n].used==USE_EMPTY) continue;
+		if (flag==6 && !(it_temp[n].spell_mod[I_I] || it_temp[n].spell_mod[I_A])) continue;
 		if (flag==5 && !(it_temp[n].flags & IF_MAGIC)) continue;
 		if (flag==1 && !(it_temp[n].flags & IF_SELLABLE)) continue;
 		if (flag==2 && !(it_temp[n].flags & IF_JEWELERY)) continue;
@@ -4108,6 +4109,9 @@ int main(int argc, char *args[])
 	case 38:
 		list_objects(head, 5);
 		break;
+	case 39:
+		list_objects(head, 6);
+		break;
 	case 41:
 		list_characters2_template(head);
 		break;
@@ -4140,6 +4144,7 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=33>Object Templates (Jewelery)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=38>Object Templates (Magic)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=34>Object Templates (Duration)</a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=39>Object Templates (Spellmod)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");

@@ -9669,7 +9669,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	
 	// Staggered damage
 	{
-		if (do_get_iflag(co, SF_BONEARMOR)) hp_dam += dam*30/100;
+		hp_dam += dam*do_get_ieffect(cn, VF_EN_STAGGER)/100;
 		
 		if ((n=TC_SK(co,119))) hp_dam += dam*n*5/100;  // (Corr) Censure
 		
@@ -10868,7 +10868,7 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_GL_TITANS))  do_set_iflag(cn, SF_HIT_WEAKEN);
 		if (do_check_items(in, IT_GL_BLVIPER)) do_set_iflag(cn, SF_HIT_FROST);
 		
-		if (do_check_items(in, IT_BONEARMOR))  do_set_iflag(cn, SF_BONEARMOR);
+		if (do_check_items(in, IT_BONEARMOR))  do_add_ieffect(cn, VF_EN_STAGGER, 30);
 		if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
 		if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
 		
@@ -10983,7 +10983,7 @@ void really_update_char(int cn)
 		if (it[in].enchantment== 70) do_add_ieffect(cn, VF_EN_PURPDAMG,   10*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 73) do_add_ieffect(cn, VF_EN_HPWHENHIT,   2*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 74) do_add_ieffect(cn, VF_EN_OFFHMANA,   10*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 75) do_add_ieffect(cn, VF_EN_OFFHATTRIB, 20*(1+IS_TWOHAND(in)));
+		if (it[in].enchantment== 75) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 76) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
 	}
 	
@@ -11600,29 +11600,6 @@ void really_update_char(int cn)
 			{
 				set_attrib_score(cn, z, attrib[z]*6/5);
 				attrib[z] = attrib[z]*6/5;
-			}
-		}
-	}
-	
-	// God Enchant :: worst attribute times 1.2
-	if ((gench = do_get_ieffect(cn, VF_EN_OFFHATTRIB))) // 20% per
-	{
-		int worstattribute[5] = {0};
-		for (n = 0; n<5; n++)
-		{
-			worstattribute[n] = attrib[n];
-			for (m = 0; m<5; m++)
-			{
-				if (worstattribute[n] > attrib[m])
-					worstattribute[n] = 0;
-			}
-		}
-		for (z = 0; z<5; z++)
-		{
-			if (worstattribute[z])
-			{
-				set_attrib_score(cn, z, attrib[z]*(100+gench)/100);
-				attrib[z] = attrib[z]*(100+gench)/100;
 			}
 		}
 	}
