@@ -3888,6 +3888,7 @@ void god_skill(int cn, int co, int n, int val)
 	}
 	B_SK(co, n) = val;
 	do_update_char(co);
+	ch_update_skill_terminology(co, n);
 
 	do_char_log(cn, 1, "Set %s of %s to %d.\n", skilltab[n].name, ch[co].name, val);
 	chlog(cn, "IMP: Set %s of %s to %d.", skilltab[n].name, ch[co].name, val);

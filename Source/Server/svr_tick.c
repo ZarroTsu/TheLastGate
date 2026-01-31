@@ -1733,51 +1733,6 @@ int ch_get_skill_attrib(int cn, int sk, int n)
 	return atr;
 }
 
-int tmp_sort_ch = 0;                            // Remove me after a proper fix!
-struct s_skilltab tmpSkList[MAXSKILL+5];        // Remove me after a proper fix!
-int svr_skill_cmp(const void *a,const void *b)  // Remove me after a proper fix!
-{
-	const struct s_skilltab *c,*d;
-	int m1,m2;
-
-	c=a; d=b;
-
-	m1=c->nr; m2=d->nr;
-	
-	if (m1==99 && m2!=99) return  1;
-	if (m2==99 && m1!=99) return -1;
-	
-	if (B_SK(tmp_sort_ch, m1)==0 && B_SK(tmp_sort_ch, m2)!=0) return  1;
-	if (B_SK(tmp_sort_ch, m2)==0 && B_SK(tmp_sort_ch, m1)!=0) return -1;
-	
-	if (m1==52 && m2!=52 && !(ch[tmp_sort_ch].kindred & KIN_IDENTIFY)) return  1;
-	if (m2==52 && m1!=52 && !(ch[tmp_sort_ch].kindred & KIN_IDENTIFY)) return -1;
-	
-	if ((m1==53||m1==54) && (m2!=53&&m2!=54) && !IS_LYCANTH(tmp_sort_ch)) return  1;
-	if ((m2==53||m2==54) && (m1!=53&&m1!=54) && !IS_LYCANTH(tmp_sort_ch)) return -1;
-	
-	if ((m1==50||m1==51||m1==52||m1==53||m1==54) && 
-		(m2!=50&&m2!=51&&m2!=52&&m2!=53&&m2!=54)) return -1;
-	if ((m2==50||m2==51||m2==52||m2==53||m2==54) && 
-		(m1!=50&&m1!=51&&m1!=52&&m1!=53&&m1!=54)) return  1;
-	
-	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
-	if (B_SK(tmp_sort_ch, m1)==0 && B_SK(tmp_sort_ch, m2)==0 && 
-		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==44||m1==50||m1==51||m1==52||m1==53||m1==54) && 
-		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=44&&m2!=50&&m2!=51&&m2!=52&&m2!=53&&m2!=54)) return -1;
-	if (B_SK(tmp_sort_ch, m2)==0 && B_SK(tmp_sort_ch, m1)==0 && 
-		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==44||m2==50||m2==51||m2==52||m2==53||m2==54) && 
-		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=44&&m1!=50&&m1!=51&&m1!=52&&m1!=53&&m1!=54)) return  1;
-	
-	if (m1==44 && !IS_SEYAN_DU(tmp_sort_ch)) return  1;
-	if (m2==44 && !IS_SEYAN_DU(tmp_sort_ch)) return -1;
-	
-	if (c->sortkey>d->sortkey) return  1;
-	if (c->sortkey<d->sortkey) return -1;
-
-	return strcmp(c->name,d->name);
-}
-
 void plr_update_skill_terminology(int nr, int n)
 {
 	unsigned char buf[256];
@@ -1787,13 +1742,11 @@ void plr_update_skill_terminology(int nr, int n)
 	
 	known = get_known_player_skill(cn, n);
 	
-	n = tmpSkList[n].nr;  // Remove me after a proper fix!
-	
 	buf[0] = SV_TERM_SKILLS;
 	buf[2] = n;
 	
 	buf[1] = ST_SKILLS_SORT;
-	*(unsigned char*)(buf + 3) = (unsigned char)tmpSkList[n].sortkey;
+	*(unsigned char*)(buf + 3) = (unsigned char)skilltab[n].sortkey;
 	*(unsigned char*)(buf + 4) = (unsigned char)(GET_AT(cn, n, 0));
 	*(unsigned char*)(buf + 5) = (unsigned char)(GET_AT(cn, n, 1));
 	*(unsigned char*)(buf + 6) = (unsigned char)(GET_AT(cn, n, 2));
@@ -1819,31 +1772,27 @@ void plr_update_skill_terminology(int nr, int n)
 	for (m=0; m<3; m++)
 	{
 		buf[1] = ST_SKILLS_NAME+m;
-		if (alt) mcpy(buf+3, tmpSkList[n].alt_name+m*10, 10);
-		else     mcpy(buf+3, tmpSkList[n].name+m*10,     10);
+		if (alt) mcpy(buf+3, skilltab[n].alt_name+m*10, 10);
+		else     mcpy(buf+3, skilltab[n].name+m*10,     10);
 		xsend(nr, buf, 13);
 	}
 	
 	for (m=0; m<12; m++)
 	{
 		buf[1] = ST_SKILLS_DESC+m;
-		if (alt) mcpy(buf+3, tmpSkList[n].alt_desc+m*10, 10);
-		else     mcpy(buf+3, tmpSkList[n].desc+m*10,     10);
+		if (alt) mcpy(buf+3, skilltab[n].alt_desc+m*10, 10);
+		else     mcpy(buf+3, skilltab[n].desc+m*10,     10);
 		xsend(nr, buf, 13);
 	}
 }
 
 void ch_update_skill_terminology(int cn, int n)
 {
-	tmpSkList = skilltab;                                                   // Remove me after a proper fix!
-	tmp_sort_ch = cn;                                                       // Remove me after a proper fix!
-	qsort(tmpSkList,(MAXSKILL+5),sizeof(struct s_skilltab),svr_skill_cmp);  // Remove me after a proper fix!
 	plr_update_skill_terminology(ch[cn].player, n);
 }
 
 void plr_update_all_skill_terminology(int nr)
 {
-	tmpSkList = skilltab;                                                   // Remove me after a proper fix!
 	for (int n=0; n<(MAXSKILL+5); n++) plr_update_skill_terminology(nr, n);
 }
 
