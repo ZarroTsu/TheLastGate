@@ -287,77 +287,143 @@ void skill_slow(int cn, int flag);
 int spell_plague(int cn, int co, int flag);
 int spell_shock(int cn, int co, int power);
 
-void check_gloves(int cn, int co, int orig_co, int dr1, int dr2)
+// Newer glove driver
+// Check for and escalate a given debuff template
+int on_hit_debuff(int cn, int co, int v, int origtmp)
 {
-	int glv, glv_base = 60;
-	int d20 = 5;
+	int n, in, spr, dur = SP_DUR_GLOVES, power = 1;
+	int nmz = 0;
 	
-	if (ch[co].escape_timer > TICKS*3) return;
-	if (ch[co].flags & CF_BODY) return;
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) return;
-	if (ch[co].flags & CF_IMMORTAL) return;
-	if (co==orig_co) return;
+	if (!origtmp)           return 0;
+	if (!IS_LIVINGCHAR(co)) return 0;
 	
-	// Special gloves
-	if (!dr1)
+	switch (origtmp)
 	{
-		glv = glv_base + getrank(cn)*15/2;
-		if (chance_compare(co, glv+glv/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
-		{
-			if (do_get_iflag(cn, SF_HIT_POISON) && spell_poison(cn, co, glv, 1)) 
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You poisoned your enemies!\n"); 
-			}
-			if (do_get_iflag(cn, SF_HIT_SCORCH) && spell_scorch(cn, co, glv, 1))
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You scorched your enemies!\n"); 
-			}
-			if (do_get_iflag(cn, SF_HIT_BLIND) && spell_blind(cn, co, glv, 0))
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You blinded your enemies!\n"); 
-			}
-			if (do_get_iflag(cn, SF_HIT_SLOW) && spell_slow(cn, co, glv, 1))
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You slowed your enemies!\n");   
-			}
-			if (do_get_iflag(cn, SF_HIT_CURSE) && spell_curse(cn, co, glv, 1))  
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You cursed your enemies!\n");   
-			}
-			if (do_get_iflag(cn, SF_HIT_WEAKEN) && spell_weaken(cn, co, glv, 1))  
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You weakened your enemies!\n"); 
-			}
-			if (do_get_iflag(cn, SF_HIT_FROST) && spell_frostburn(cn, co, glv)) 
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You glaciated your enemies!\n"); 
-			}
-			if (do_get_iflag(cn, SF_HIT_DOUSE) && spell_blind(cn, co, glv, 1))
-			{ 
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co) 
-					do_char_log(cn, 0, "You doused your enemies!\n"); 
-			}
-		}
+		case SK_POISON:
+			if (do_get_iflag(cn, SF_TOWER_R)) { tmp = SK_VENOM;   spr = BUF_SPR_VENOM;  }
+			else                              { tmp = SK_POISON;  spr = BUF_SPR_POISON; }
+			break;
+		case SK_BLIND:
+			if (do_get_iflag(cn, SF_CHARIOT)) { tmp = SK_DOUSE;   spr = BUF_SPR_DOUSE; }
+			else                              { tmp = SK_BLIND;   spr = BUF_SPR_BLIND; }
+			nmz = 1;
+			break;
+		case SK_SLOW:
+			if (do_get_iflag(cn, SF_EMPEROR)) { tmp = SK_SLOW2;   spr = BUF_SPR_SLOW2; }
+			else                              { tmp = SK_SLOW;    spr = BUF_SPR_SLOW;  }
+			break;
+		case SK_CURSE:
+			if (do_get_iflag(cn, SF_TOWER))   { tmp = SK_CURSE2;  spr = BUF_SPR_CURSE2; }
+			else                              { tmp = SK_CURSE;   spr = BUF_SPR_CURSE;  }
+			break;
+		case SK_WEAKEN:
+			if (do_get_iflag(cn, SF_DEATH))   { tmp = SK_WEAKEN2; spr = BUF_SPR_REND2; }
+			else                              { tmp = SK_WEAKEN;  spr = BUF_SPR_REND;  }
+			nmz = 1;
+			break;
+		case SK_SCORCH:
+			tmp = SK_SCORCH;    spr = BUF_SPR_SCORCH;
+			break;
+		case SK_AGGRAVATE:
+			tmp = SK_AGGRAVATE; spr = BUF_SPR_AGGRAVATE; nmz = 1;
+			break;
+		case SK_FATIGUE:
+			tmp = SK_FATIGUE;   spr = BUF_SPR_FATIGUE;   nmz = 1;
+			break;
+		case SK_FROSTB:
+			tmp = SK_FROSTB;    spr = BUF_SPR_FROSTB;
+			break;
+		default: return 0;  // Invalid skill
 	}
-	if (!dr2)
+	
+	for (n = 0; n<MAXBUFFS; n++)
 	{
-		glv = glv_base*2 + getrank(cn)*15/2;
-		if (chance_compare(co, glv+glv/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
-		{
-			if (do_get_iflag(cn, SF_TW_LUXURIA) && spell_warcry(cn, co, glv, 1))
-			{
-				if (!(ch[cn].flags & CF_SYS_OFF) && !orig_co)
-					do_char_log(cn, 0, "You stunned your enemies!\n"); 
-			}
-		}
+		if ((in = ch[co].spell[n])==0) continue;
+		if (bu[in].temp != tmp)        continue;
+		if (!bu[in].data[9])           return 0;  // Don't overwrite a normal debuff
+		power = bu[in].data[9] + v;
+		break;
 	}
+	
+	if (!(in = make_new_buff(cn, tmp, spr, power, dur, 0))) return 0;
+	
+	switch (tmp)
+	{
+		case SK_POISON:
+			n = TC_SK(cn,113)*15; // (Corr) Torment
+			if (do_get_iflag(cn, SF_BOOK_VENO)) n += 25;  // [Book] Venom Compendium
+			dur = dur * 100 / (100 + n);
+			bu[in].data[1] = PL_POISFORM(power, dur); // Decay rate
+			break;
+		case SK_VENOM:
+			bu[in].data[1] = PL_POISFORM(power, dur)/2;   // Decay rate
+			bu[in].data[2] = PL_POISFORM(power, dur)/2*3; // Decay maximum
+			bu[in].data[6] = (power/12 + 3);              // Immunity reduction
+			bu[in].data[7] = (power/12 + 3)*3;            // Immunity maximum
+			bu[in].skill[SK_IMMUN] = -(bu[in].data[6]);
+			bu[in].stack = 1;
+			break;
+		case SK_BLIND:
+			bu[in].skill[SK_PERCEPT] = max(-127, -(power/3 + 3));
+			bu[in].to_hit            = max(-127, -(power/8 + 1));
+			bu[in].to_parry          = max(-127, -(power/8 + 1));
+			break;
+		case SK_DOUSE:
+			bu[in].skill[SK_STEALTH] = max(-127, -(power/3 + 3));
+			bu[in].spell_pow         = max(-127, -(power/8 + 1));
+			break;
+		case SK_SLOW:
+			bu[in].speed      = -(min(300, 20 + SLOWFORM(power)*2/3));
+			bu[in].atk_speed  = -(min(127, 10 + SLOWFORM(power)/3));
+			bu[in].cast_speed = -(min(127, 10 + SLOWFORM(power)/3));
+			break;
+		case SK_SLOW2:
+			bu[in].speed = -(min(300, 30 + SLOW2FORM(power)));
+			break;
+		case SK_CURSE:
+			for (n=0; n<5; n++) bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
+			break;
+		case SK_CURSE2:
+			for (n=0; n<5; n++) bu[in].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
+			break;
+		case SK_WEAKEN:
+			bu[in].weapon  = max(-127, -(power / 4 + 4));
+			break;
+		case SK_WEAKEN2:
+			bu[in].armor  = max(-127, -(power / 4 + 4));
+			break;
+		case SK_SCORCH:
+		case SK_AGGRAVATE:
+			bu[in].dmg_reduction = -min(20*2, power/5);
+			break;
+		case SK_FATIGUE:
+			bu[in].dmg_bonus = -min(20*2, power/5);
+			break;
+		case SK_FROSTB:
+			bu[in].r_end  = -FROSTBFORM(power, dur);
+			bu[in].r_mana = -FROSTBFORM(power, dur);
+			break;
+		default: break;
+	}
+	
+	bu[in].data[4] = nmz;
+	bu[in].data[5] = 1;
+	bu[in].data[9] = power;
+	
+	return add_spell(co, in);
+}
+
+void try_hit_debuff(int cn, int co, int v)
+{
+	if (do_get_iflag(cn, SF_HIT_POISON)) on_hit_debuff(cn, co, v, SK_POISON);
+	if (do_get_iflag(cn, SF_HIT_BLIND))  on_hit_debuff(cn, co, v, SK_BLIND);
+	if (do_get_iflag(cn, SF_HIT_SLOW))   on_hit_debuff(cn, co, v, SK_SLOW);
+	if (do_get_iflag(cn, SF_HIT_CURSE))  on_hit_debuff(cn, co, v, SK_CURSE);
+	if (do_get_iflag(cn, SF_HIT_WEAKEN)) on_hit_debuff(cn, co, v, SK_WEAKEN);
+	if (do_get_iflag(cn, SF_HIT_SCORCH)) on_hit_debuff(cn, co, v, SK_SCORCH);
+	if (do_get_iflag(cn, SF_TW_LUXURIA)) on_hit_debuff(cn, co, v, SK_AGGRAVATE);
+	if (do_get_iflag(cn, SF_HIT_DOUSE))  on_hit_debuff(cn, co, v, SK_FATIGUE);
+	if (do_get_iflag(cn, SF_HIT_FROST))  on_hit_debuff(cn, co, v, SK_FROSTB);
 }
 
 int friend_is_enemy(int cn, int cc)
@@ -670,23 +736,18 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 // Entry :: if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int critDam)
 {
-	int n, in, coPar, glv, surrBonus = 0, surrTotal = 0, power = 0;
+	int n, in, coPar, surrBonus = 0, surrTotal = 0, power = 0;
 	int surrMod = 0, surrDam = 0;
 	
 	remember_pvp(cn, co);
 	
 	if (B_SK(cn, SK_SURROUND))
-	{
 		surrMod = M_SK(cn, SK_SURROUND);
-	}
 	else
-	{
 		surrMod = (M_SK(cn, SK_DAGGER) < M_SK(cn, SK_STAFF) ? M_SK(cn, SK_DAGGER) : M_SK(cn, SK_STAFF));
-	}
 	
 	surrDam = dam*3/4;
 	critDam = critDam*3/4;
-	glv     = (60 + getrank(cn)*10)*3/4;
 	coPar   = ch[co].to_parry;
 	
 	if (in = has_spell(cn, SK_ZEPHYR))
@@ -702,23 +763,11 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 		if (surround==2 && (surrMod-coPar)>10) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-10), 20)/20);
 		if (surround==3 && (surrMod-coPar)>20) surrDam = surrDam + max(0, dam/4 * min(max(1,surrMod-coPar-20), 20)/20);
 		
-		if (co==co_orig)                       surrDam = surrDam*3/4;
+		if (co==co_orig) surrDam = surrDam*3/4;
 		
-		do_hurt(cn, co, surrDam+critDam, critDam>0?9:4);
+		dam = do_hurt(cn, co, surrDam+critDam, critDam>0?9:4);
 		
-		if (!RANDOM(20) && chance_compare(co, glv*3/4 + RANDOM(20), get_target_resistance(cn, co) + RANDOM(20), 0) && co!=co_orig)
-		{
-			if (do_get_iflag(cn, SF_HIT_POISON)) spell_poison(cn, co, glv, 1);
-			if (do_get_iflag(cn, SF_HIT_SCORCH)) spell_scorch(cn, co, glv, 1);
-			if (do_get_iflag(cn, SF_HIT_BLIND))  spell_blind(cn, co, glv, 0);
-			if (do_get_iflag(cn, SF_HIT_SLOW))   spell_slow(cn, co, glv, 1);
-			if (do_get_iflag(cn, SF_HIT_CURSE))  spell_curse(cn, co, glv, 1);
-			if (do_get_iflag(cn, SF_HIT_WEAKEN)) spell_weaken(cn, co, glv, 1);
-			if (do_get_iflag(cn, SF_HIT_FROST))  spell_frostburn(cn, co, glv);
-			if (do_get_iflag(cn, SF_HIT_DOUSE))  spell_blind(cn, co, glv, 1);
-			if (do_get_iflag(cn, SF_TW_LUXURIA)) spell_warcry(cn, co, glv, 1);
-			if (ch[co].spellfail==1) ch[co].spellfail = 0;
-		}
+		if (dam>0) try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 		
 		if (!IS_NOMAGIC(co) && power && co!=co_orig && !do_get_iflag(cn, SF_DEATH_R))
 			spell_zephyr(cn, co, power, 1);
@@ -802,7 +851,7 @@ int aoe_skill_notarget(int cn, int co, int co_orig, int intemp, int power)
 
 int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 {
-	int tmp, dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
+	int tmp;
 	
 	if (intemp==SK_BLAST || intemp==SK_MJOLNIR || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 	{
@@ -820,13 +869,13 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 		
 		*avgdmg += max(0, tmp-1);
 		
-		check_gloves(cn, co, co_orig, dr1, dr2);
+		try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 		return 1;
 	}
 	else if (intemp==SK_LEAP)
 	{
 		tmp = do_get_iflag(cn, SF_JUSTIC_R);
-		spell_leap(cn, co, co_orig, power, ch[cn].crit_multi, !tmp, (tmp && IS_PLAYER(cn)), dr1, dr2, 1);
+		spell_leap(cn, co, co_orig, power, ch[cn].crit_multi, !tmp, (tmp && IS_PLAYER(cn)), 1);
 		return 1;
 	}
 	else if (chance_compare(co, power+RANDOM(20), get_target_resistance(cn, co)+RANDOM(20), get_use_mana(intemp)))
@@ -995,7 +1044,7 @@ int spell_scorch(int cn, int co, int power, int flag);
 int spell_aggravate(int cn, int co, int power, int flag);
 int spell_bleed(int cn, int co, int power);
 
-int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power, int dr1, int dr2)
+int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power)
 {
 	int m, n, mc, co, hitpower, tmp, tmpmp, hit=0, crit_dam=0, usemana = 1;
 	int aggravate = 0, mjolnir = 0;
@@ -1030,23 +1079,23 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power, int d
 			{
 				if (IS_NOMAGIC(co)) continue;
 				spell_blast(cn, co, power, co_orig, 0);
-				check_gloves(cn, co, co_orig, dr1, dr2);
+				try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 				if (mjolnir) spell_shock(cn, co, power);
 			}
 			else if (intemp==SK_CLEAVE)
 			{
-				spell_cleave(cn, co, power, co_orig, dr1, dr2);
+				spell_cleave(cn, co, power, co_orig);
 				continue; // skip damage_mshell
 			}
 			else if (intemp==SK_SHIELD)
 			{
-				spell_bash(cn, co, power, co_orig, dr1, dr2);
+				spell_bash(cn, co, power, co_orig);
 				continue; // skip damage_mshell
 			}
 			else if (intemp==SK_LEAP)
 			{
 				tmp = do_get_iflag(cn, SF_JUSTIC_R);
-				spell_leap(cn, co, co_orig, power, ch[cn].crit_multi, !tmp, (tmp && IS_PLAYER(cn)), dr1, dr2, 1);
+				spell_leap(cn, co, co_orig, power, ch[cn].crit_multi, !tmp, (tmp && IS_PLAYER(cn)), 1);
 				continue; // skip damage_mshell
 			}
 			else if (intemp==SK_BLOODLET)
@@ -1130,14 +1179,8 @@ int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext)
 	if (dur==-1) bu[in].flags = BF_PERMASPELL;
 	else         bu[in].flags = 0;
 	
-	if (ext && !IS_PLAYER(cn))
-	{
-		bu[in].duration = bu[in].active = SP_DUR_MONSTERS;
-	}
-	else
-	{
-		bu[in].duration = bu[in].active = dur;
-	}
+	if (ext && !IS_PLAYER(cn)) bu[in].duration = bu[in].active = SP_DUR_MONSTERS;
+	else                       bu[in].duration = bu[in].active = dur;
 	
 	return in;
 }
@@ -2844,7 +2887,6 @@ int spell_plague(int cn, int co, int flag)
 }
 int skill_plague(int cn, int co, int power)
 {
-	//cast_aoe_spell(cn, co, SK_PLAGUE, power, 0, 0, 0, 0, 0, -1, -1);
 	aoe_driver(cn, co, co, SK_PLAGUE, power, GET_PROX(cn), 0, 0, 0);
 }
 
@@ -2946,19 +2988,6 @@ void skill_curse(int cn)
 	if (aoe_driver(cn, cn, co, SK_CURSE, power, GET_PROX(cn), count, hit, 0) < 0) return;
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
-	// Cast AoE or general surround-hit
-	/*
-	if (can_aoe)
-	{
-		if (cast_aoe_spell(cn, co, SK_CURSE, power, aoe_power, cost, count, hit, 0, -1, -1) < 0) return;
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	}
-	else
-	{
-		surround_cast(cn, co_orig, 0, SK_CURSE, power, -1, -1);
-	}
-	*/
-	
 	// Book - Shiva's Malice :: Cast Slow after casting Curse on success
 	if (flag)  skill_slow(cn, 1);
 	else      add_exhaust(cn, SK_EXH_CURSE);
@@ -3050,19 +3079,6 @@ void skill_slow(int cn, int flag)
 	// Spell AoE
 	if (aoe_driver(cn, cn, co, SK_SLOW, power, GET_PROX(cn), count, hit, 0) < 0) return;
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	
-	/*
-	// Cast AoE or general surround-hit
-	if (can_aoe)
-	{
-		if (cast_aoe_spell(cn, co, SK_SLOW, power, aoe_power, cost, count, hit, 0, -1, -1) < 0) return;
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	}
-	else
-	{
-		surround_cast(cn, co_orig, 0, SK_SLOW, power, -1, -1);
-	}
-	*/
 	
 	// Book - Shiva's Malice :: Extend exhaust after casting both Curse and Slow
 	if (flag) add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
@@ -3209,19 +3225,6 @@ void skill_poison(int cn)
 	// Spell AoE
 	if (aoe_driver(cn, cn, co, SK_POISON, power, GET_PROX(cn), count, hit, 0) < 0) return;
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	
-	/*
-	// Cast AoE or general surround-hit
-	if (can_aoe)
-	{
-		if (cast_aoe_spell(cn, co, SK_POISON, power, aoe_power, cost, count, hit, 0, -1, -1) < 0) return;
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	}
-	else
-	{
-		surround_cast(cn, co_orig, 0, SK_POISON, power, -1, -1);
-	}
-	*/
 	
 	add_exhaust(cn, SK_EXH_POISON);
 }
@@ -3417,7 +3420,6 @@ void skill_warcry(cn)
 	}
 	else
 	{
-		//if (cast_aoe_spell(cn, 0, SK_WARCRY, power, aoepower, 0, 0, 0, 0, -1, -1) < 0)
 		if (aoe_driver(cn, cn, 0, SK_WARCRY, power, aoepower, 0, 0, 0) < 0) return;
 	}
 	
@@ -3890,7 +3892,7 @@ void skill_blast(int cn)
 	{
 		avgdmg = spell_blast(cn, (co_orig = co), power, 0, 0);
 		count = hit = 1;
-		check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
+		try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	}
 	
 	// Spell AoE
@@ -3944,8 +3946,7 @@ int skill_obliterate(int cn, int co, int power)
 {
 	int avgdmg = spell_obliterate(cn, co, power, 0);
 	
-	check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
-	//cast_aoe_spell(cn, co, SK_OBLITERATE, power, GET_PROX(cn), 0, 1, 1, avgdmg, dr1, dr2);
+	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	aoe_driver(cn, co, co, SK_OBLITERATE, power, GET_PROX(cn), 1, 1, avgdmg);
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
@@ -3995,8 +3996,7 @@ int skill_slam(int cn, int co, int power)
 {
 	int avgdmg = spell_slam(cn, co, power, 0);
 	
-	check_gloves(cn, co, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
-	//cast_aoe_spell(cn, co, SK_SLAM, power, GET_PROX(cn), 0, count, hit, avgdmg, dr1, dr2);
+	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	aoe_driver(cn, co, co, SK_SLAM, power, GET_PROX(cn), 1, 1, avgdmg);
 	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
@@ -5390,7 +5390,7 @@ int spell_bleed(int cn, int co, int power)
 	
 	return 1;
 }
-int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
+int spell_cleave(int cn, int co, int power, int co_orig)
 {
 	int hitpower, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0, crit_dam=0;
 	
@@ -5450,10 +5450,10 @@ int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	else if (tmp)
 		spell_bleed(cn, co, tmp);
 	
-	check_gloves(cn, co, co_orig, dr1, dr2);
+	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	
 	if (!co_orig)
-		surround_cast(cn, co, 0, SK_CLEAVE, power, dr1, dr2);
+		surround_cast(cn, co, 0, SK_CLEAVE, power);
 	
 	return 1+tmp;
 }
@@ -5473,24 +5473,22 @@ void skill_cleave(int cn)
 	// Get hit target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0))) return;
 	
-	spell_cleave(cn, co, power, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
+	spell_cleave(cn, co, power, 0);
 	
 	// Zephyr proc
 	if (in = has_spell(cn, SK_ZEPHYR))
 	{
-		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0, -1, -1);
 		aoe_driver(cn, cn, 0, SK_ZEPHYR2, bu[in].power, M_SK(cn, SK_SURROUND), 0, 0, 0);
 	}
 	else if (B_SK(cn, SK_ZEPHYR) && (power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn)))
 	{
-		//cast_aoe_spell(cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0, 0, -1, -1);
 		aoe_driver(cn, cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0);
 	}
 	
 	add_exhaust(cn, SK_EXH_CLEAVE);
 }
 
-int spell_bash(int cn, int co, int power, int co_orig, int dr1, int dr2)
+int spell_bash(int cn, int co, int power, int co_orig)
 {
 	int hitpower = power, aggravate=0, tmp;
 	
@@ -5518,9 +5516,9 @@ int spell_bash(int cn, int co, int power, int co_orig, int dr1, int dr2)
 	}
 	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	
-	check_gloves(cn, co, co_orig, dr1, dr2);
+	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	
-	if (!co_orig) surround_cast(cn, co, 0, SK_SHIELD, power, dr1, dr2);
+	if (!co_orig) surround_cast(cn, co, 0, SK_SHIELD, power);
 	
 	return 1;
 }
@@ -5539,7 +5537,7 @@ void skill_bash(int cn)
 	// Get hit target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SHIELD, 0, power, 0))) return;
 	
-	spell_bash(cn, co, power, 0, RANDOM(GLVDICE), RANDOM(GLVDICE));
+	spell_bash(cn, co, power, 0);
 	
 	add_exhaust(cn, SK_EXH_CLEAVE);
 }
@@ -5614,22 +5612,6 @@ void skill_weaken(int cn)
 	// Skill AoE
 	if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), count, hit, 0) < 0) return;
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	
-	/*
-	// Cast AoE or general surround-hit
-	if (can_aoe)
-	{
-		//if (cast_aoe_spell(cn, co, SK_WEAKEN, power, GET_PROX(cn), cost, count, hit, 0, -1, -1) < 0)
-		if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), count, hit, 0) < 0)
-			return;
-		
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-	}
-	else
-	{
-		surround_cast(cn, co_orig, 0, SK_WEAKEN, power, -1, -1);
-	}
-	*/
 	
 	add_exhaust(cn, SK_EXH_WEAKEN);
 }
@@ -5739,13 +5721,11 @@ void skill_blind(cn)
 	// Tarot Card - Chariot :: Change Blind into Douse
 	if (do_get_iflag(cn, SF_CHARIOT)) 
 	{
-		//if (cast_aoe_spell(cn, 0, SK_DOUSE, power, can_aoe?aoe_power:0, 0, 0, 0, 0, -1, -1) < 0)
 		if (aoe_driver(cn, cn, 0, SK_DOUSE, power, aoe_power, 0, 0, 0) < 0)
 			return;
 	}
 	else
 	{
-		//if (cast_aoe_spell(cn, 0, SK_BLIND, power, can_aoe?aoe_power:0, 0, 0, 0, 0, -1, -1) < 0)
 		if (aoe_driver(cn, cn, 0, SK_BLIND, power, aoe_power, 0, 0, 0) < 0)
 			return;
 	}
@@ -5938,7 +5918,7 @@ void skill_taunt(int cn)
 	add_exhaust(cn, SK_EXH_TAUNT);
 }
 
-int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, int dostun, int dr1, int dr2, int weak)
+int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, int dostun, int weak)
 {
 	int n, dam, tmp, in;
 	
@@ -5978,7 +5958,7 @@ int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, 
 		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	}
 	do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
-	check_gloves(cn, co, cc, dr1, dr2);
+	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	
 	return dam;
 }
@@ -6000,7 +5980,6 @@ int invalid_leap(int cn, int m, int md)
 // Gets bonus damage from attack speed score
 void skill_leap(int cn, int flag)
 {	// we leap to 'co' and damage both 'cc' and 'co' in the process
-	int dr1 = RANDOM(GLVDICE), dr2 = RANDOM(GLVDICE);
 	int power, numrepeats=0, aoepower, cost, dist, old_dist, cost_dist, cost_pow, tmp, critical, avgdmg=0, hit=0;
 	int co, cc=0, dam, gotrand=0, tmptome=0;
 	int x, y, n, m, md, mt, obstructed = 0, newdir = 0, randomtarg = 0, cooldown = SK_EXH_LEAP;
@@ -6186,7 +6165,7 @@ void skill_leap(int cn, int flag)
 	
 	char_play_sound(cn, ch[cn].sound + 24, -50, 0);
 	
-	if (!randomtarg) surround_cast(cn, co, cc, SK_LEAP, power, dr1, dr2);
+	if (!randomtarg) surround_cast(cn, co, cc, SK_LEAP, power);
 	
 	if (ch[cn].flags & CF_GCTOME)
 	{
@@ -6204,22 +6183,20 @@ void skill_leap(int cn, int flag)
 		remove_enemy(cn);
 		ch[cn].dir = newdir;
 		ch[cn].attack_cn = co;
-		//if (!randomtarg) surround_cast(cn, co, cc, SK_LEAP, power, dr1, dr2);
-		//cast_aoe_spell(cn, co, SK_LEAP, power, GET_PROX(cn), 0, 1, 1, 0, dr1, dr2);
 		aoe_driver(cn, cn, co, SK_LEAP, power, GET_PROX(cn), 1, 1, 0);
 	}
 	
 	if (!same_target && !obstructed && !flag)
 	{
 		chlog(cn, "Used Leap on %s and %s", ch[co].name, ch[cc].name);
-		avgdmg += spell_leap(cn, cc,  0, power, critical, randomtarg, dostun, dr1, dr2, 0); // Damage fight target (cc)
-		avgdmg += spell_leap(cn, co, cc, power, critical, randomtarg, dostun, dr1, dr2, 0); // Damage leap target  (co)
+		avgdmg += spell_leap(cn, cc,  0, power, critical, randomtarg, dostun, 0); // Damage fight target (cc)
+		avgdmg += spell_leap(cn, co, cc, power, critical, randomtarg, dostun, 0); // Damage leap target  (co)
 		hit += 2;
 	}
 	else
 	{
 		chlog(cn, "Used Leap on %s", ch[co].name);
-		avgdmg += spell_leap(cn, co,  0, power, critical, randomtarg, dostun, dr1, dr2, 0); // Damage target
+		avgdmg += spell_leap(cn, co,  0, power, critical, randomtarg, dostun, 0); // Damage target
 		hit++;
 	}
 	
@@ -6571,7 +6548,6 @@ int spell_pomesol(int cn, int co, int power, int flag)
 int spell_bloodletting(int cn, int co, int power)
 {
 	int hit = 0;
-	//if (surround_cast(cn, 0, 0, SK_BLOODLET, power, -1, -1))
 	if ((hit = aoe_driver(cn, cn, 0, SK_BLOODLET, power, GET_PROX(cn), 0, 0, 0)) > 0)
 	{
 		do_char_log(cn, 1, "%d of your foes began bleeding!\n", hit);

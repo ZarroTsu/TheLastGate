@@ -435,7 +435,7 @@ void add_map_goal(int loc, int v);
 int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int affix, int tarot);
 
 //-- skill_driver --
-void check_gloves(int cn, int co, int orig_co, int dr1, int dr2);
+void try_hit_debuff(int cn, int co, int v);
 int get_aoe_radius(int cn, int intemp, int prox_power);
 int spellcost(int cn, int cost, int in, int usemana);
 int make_new_buff(int cn, int intemp, int sptemp, int power, int dur, int ext);
@@ -491,7 +491,7 @@ int spell_scorch(int cn, int co, int power, int flag);
 int spell_weaken(int cn, int co, int power, int flag);
 int spell_blind(int cn, int co, int power, int flag);
 int spell_frostburn(int cn, int co, int power);
-int spell_cleave(int cn, int co, int power, int co_orig, int dr1, int dr2);
+int spell_cleave(int cn, int co, int power, int co_orig);
 int spell_blast(int cn, int co, int power, int co_orig, int aoe);
 int spell_obliterate(int cn, int co, int power, int aoe);
 int skill_obliterate(int cn, int co, int power);

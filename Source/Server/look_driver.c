@@ -487,26 +487,26 @@ void look_extra(int cn, int in)
 	// -------- SKUA ENCHANTMENTS --------
 	case 57: do_char_log(cn, 7, "25%% of Armor Value granted by Magic Shield is granted as additional Weapon Value.\n"); break;
 	case 58: do_char_log(cn, 7, "4%% of total Glow score is granted as additional spell modifier.\n"); break;
-	case 59: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Slow, reducing enemy action speed.\n"); break;
-	case 60: do_char_log(cn, 7, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Scorch, causing enemies to take additional damage.\n"); break;
+	case 59: do_char_log(cn, 7, "Your hits inflict a self-scaling Slow, reducing enemy action speed.\n"); break;
+	case 60: do_char_log(cn, 7, "Your hits inflict a self-scaling Scorch, causing enemies to take additional damage.\n"); break;
 	
 	// -------- KWAI ENCHANTMENTS --------
 	case 61: do_char_log(cn, 5, "3%% of total hit score is granted as extra parry score.\n"); break;
 	case 62: do_char_log(cn, 5, "3%% of total parry score is granted as extra hit score.\n"); break;
-	case 63: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Curse, reducing enemy attributes.\n"); break;
-	case 64: do_char_log(cn, 5, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Weaken, reducing enemy weapon value.\n"); break;
+	case 63: do_char_log(cn, 5, "Your hits inflict a self-scaling Curse, reducing enemy attributes.\n"); break;
+	case 64: do_char_log(cn, 5, "Your hits inflict a self-scaling Weaken, reducing enemy weapon value.\n"); break;
 	
 	// -------- GORN ENCHANTMENTS --------
 	case 65: do_char_log(cn, 6, "20%% of damage dealt with hits is also dealt to enemy mana.\n"); break;
 	case 66: do_char_log(cn, 6, "1%% of damage dealt with damage over time is leeched as hitpoints, endurance and mana.\n"); break;
-	case 67: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Poison, dealing damage over time.\n"); break;
-	case 68: do_char_log(cn, 6, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Douse, reducing enemy spell modifier.\n"); break;
+	case 67: do_char_log(cn, 6, "Your hits inflict a self-scaling Poison, dealing damage over time.\n"); break;
+	case 68: do_char_log(cn, 6, "Your hits inflict a self-scaling Fatigue, causing enemies to deal less damage.\n"); break;
 	
 	// -------- PURP ENCHANTMENTS --------
 	case 69: do_char_log(cn, 8, "1%% of damage dealt with hits is leeched as hitpoints, endurance and mana.\n"); break;
 	case 70: do_char_log(cn, 8, "10%% of current endurance value is granted as additional damage on hit.\n"); break;
-	case 71: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Blind, reducing enemy perception, hit and parry.\n"); break;
-	case 72: do_char_log(cn, 8, "Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Frostburn, draining enemy endurance and mana.\n"); break;
+	case 71: do_char_log(cn, 8, "Your hits inflict a self-scaling Blind, reducing enemy perception, hit and parry.\n"); break;
+	case 72: do_char_log(cn, 8, "Your hits inflict a self-scaling Frostburn, draining enemy endurance and mana.\n"); break;
 	
 	// -------- OFFH ENCHANTMENTS --------
 	case 73: do_char_log(cn, 9, "Restore 2 Hitpoints upon being hit by an enemy.\n"); break;

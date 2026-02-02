@@ -411,6 +411,7 @@ extern unsigned int mapmarker;
 #define SK_SACRIFICE	66
 #define SK_OBLITERATE	67
 #define SK_SLAM			68
+#define SK_FATIGUE		69
 #define SK_SANGUINE	   219
 #define SK_DWLIGHT     220
 

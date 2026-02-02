@@ -9983,7 +9983,6 @@ void do_attack(int cn, int co, int surround)
 	int hit, dam = 0, die, odam = 0, cc = 0, sorb = 0;
 	int chance, s1, s2, bonus = 0, diff, crit_dam=0, co_orig=-1;
 	int n, power=0, topdam = 0;
-	int glv, glv_base = 60;
 	int in2 = 0;
 	
 	if (!may_attack_msg(cn, co, 1))
@@ -10088,47 +10087,15 @@ void do_attack(int cn, int co, int surround)
 				dam += die;
 			}
 		}
-		
 		if (do_get_iflag(co, SF_WHEEL_R)) dam = less(dam, 20, 1);   // [Taro] Wheel.R
 		
 		odam  =   dam;
 		dam  += bonus;
 		
-		// Critical hits!! -- Surround Hit handles its own crits
-		if (!do_get_iflag(cn, SF_TW_IRA)) crit_dam = do_crit(cn, co, dam, 0);
+		if (!do_get_iflag(cn, SF_TW_IRA)) crit_dam = do_crit(cn, co, dam, 0);  // Critical hit check
+		if (ch[cn].flags & (CF_PLAYER)) item_damage_weapon(cn, dam+crit_dam);  // Player weapon damage
 		
-		// Special gloves
-		if (!RANDOM(20)) // 5% chance
-		{
-			glv = glv_base + getrank(cn)*15/2;
-			if (chance_compare(co, glv+glv/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
-			{
-				if (do_get_iflag(cn, SF_HIT_POISON)) spell_poison(cn,    co, glv, 1);
-				if (do_get_iflag(cn, SF_HIT_SCORCH)) spell_scorch(cn,    co, glv, 1);
-				if (do_get_iflag(cn, SF_HIT_BLIND))  spell_blind(cn,     co, glv, 0);
-				if (do_get_iflag(cn, SF_HIT_SLOW))   spell_slow(cn,      co, glv, 1);
-				if (do_get_iflag(cn, SF_HIT_CURSE))  spell_curse(cn,     co, glv, 1);
-				if (do_get_iflag(cn, SF_HIT_WEAKEN)) spell_weaken(cn,    co, glv, 1);
-				if (do_get_iflag(cn, SF_HIT_FROST))  spell_frostburn(cn, co, glv);
-				if (do_get_iflag(cn, SF_HIT_DOUSE))  spell_blind(cn,     co, glv, 1);
-			}
-			if (ch[co].spellfail==1) ch[co].spellfail = 0;
-		}
-		if (!RANDOM(20)) // 5% chance
-		{
-			glv = glv_base*2 + getrank(cn)*15/2;
-			if (chance_compare(co, glv+glv/2+RANDOM(20), get_target_resistance(cn, co)+RANDOM(10), 0))
-			{
-				if (do_get_iflag(cn, SF_TW_LUXURIA)) spell_warcry(cn, co, glv, 1);
-			}
-		}
-		
-		co_orig = co;
-		
-		// Weapon damage
-		if (ch[cn].flags & (CF_PLAYER)) item_damage_weapon(cn, dam+crit_dam);
-		
-		dam = do_hurt(cn, co, dam+crit_dam, crit_dam>0?9:0);
+		dam = do_hurt(cn, (co_orig = co), dam+crit_dam, crit_dam>0?9:0);
 		
 		if (dam<1)
 		{
@@ -10137,6 +10104,7 @@ void do_attack(int cn, int co, int surround)
 		}
 		else
 		{
+			try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 			do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 4);
 			char_play_sound(co, ch[cn].sound + 4, -150, 0);
 		}
@@ -10145,20 +10113,12 @@ void do_attack(int cn, int co, int surround)
 		in2 = has_spell(cn, SK_ZEPHYR);
 		
 		if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
-		{
 			aoe_driver(cn, cn, co_orig, SK_SURROUND, odam, GET_PROX(cn), 1, surround, crit_dam);
-		}
 		
-		if (in2 && !do_get_iflag(cn, SF_DEATH_R))
-		{
-			if (!IS_NOMAGIC(co_orig))
-				spell_zephyr(cn, co_orig, bu[in2].power, 1);
-		}
-		else if (power && !do_get_iflag(cn, SF_DEATH_R))
-		{
-			if (!IS_NOMAGIC(co_orig))
-				spell_zephyr(cn, co_orig, power, 1);
-		}
+		if (in2 && !do_get_iflag(cn, SF_DEATH_R) && !IS_NOMAGIC(co))
+			spell_zephyr(cn, co, bu[in2].power, 1);
+		else if (power && !do_get_iflag(cn, SF_DEATH_R) && !IS_NOMAGIC(co))
+			spell_zephyr(cn, co, power, 1);
 	}
 	else    // Attack was parried...
 	{
@@ -13113,7 +13073,7 @@ void do_pulse_tick(int cn, int in)
 					do_hurt(cn, co, spell_immunity(cn, co, bu[in].power) * 2, 6);
 					spell_shock(cn, co, bu[in].power);
 					
-					check_gloves(cn, co, -1, RANDOM(20), RANDOM(20));
+					try_hit_debuff(cn, co, 10);
 					
 					char_play_sound(co, ch[cn].sound + 20, -150, 0);
 					do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 20);
@@ -14035,6 +13995,7 @@ void do_regenerate(int cn)
 					if (!bu[in].data[2])
 					{
 						tmp = do_hurt(co, cn, bu[in].power * 2, 7);
+						if (tmp>0) try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 						p = 1;
 						chlog(co, "Zephyr hit %s for %d damage", ch[cn].name, tmp);
 					}
@@ -14048,6 +14009,7 @@ void do_regenerate(int cn)
 					if (!bu[in].data[1])
 					{
 						tmp = do_hurt(co, cn, bu[in].power * 2, 7);
+						if (tmp>0) try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 						p = 1;
 						chlog(co, "Zephyr hit %s for %d damage", ch[cn].name, tmp);
 					}
@@ -14058,6 +14020,7 @@ void do_regenerate(int cn)
 				if (!bu[in].active) // Final hit of zephyr
 				{
 					tmp = do_hurt(co, cn, bu[in].power * 2, 7);
+					if (tmp>0) try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 					p = 1;
 					chlog(co, "Zephyr hit %s for %d damage", ch[cn].name, tmp);
 				}

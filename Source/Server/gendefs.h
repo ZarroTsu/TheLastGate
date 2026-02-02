@@ -370,10 +370,12 @@
 
 #define SP_DUR_CURSE2		( TICKS * 60                      )
 #define SP_DUR_HEAL			( TICKS * 60                      )
+#define SP_DUR_GLOVES		( TICKS * 30                      )
 #define SP_DUR_POISON		( TICKS * 30                      )
 #define SP_DUR_GUARD		( TICKS * 30                      )
 #define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_AGGRAVATE	( TICKS * 20                      )
+#define SP_DUR_FATIGUE		( TICKS * 20                      )
 #define SP_DUR_REGEN		( TICKS * 20                      )
 #define SP_DUR_BLEED		( TICKS * 15                      )
 #define SP_DUR_POME			( TICKS *  5                      )
@@ -421,7 +423,9 @@
 #define SK_EXH_GHOST		(TICKS * 8)
 #define SK_EXH_SHIFT		(TICKS * 8)
 
-#define GLVDICE		4
+#define HIT_DEBUFF_LARGE      20
+#define HIT_DEBUFF_PULSE      10
+#define HIT_DEBUFF_SMALL       5
 
 extern char *at_name[];
 extern char *at_short[];
@@ -493,7 +497,7 @@ extern char *at_short[];
 #define DESC_TW_CROWN		"When equipped, 25%% of skill costs are nullified, 25%% of mana costs from spells are taken from endurance, and 25%% of endurance costs from skills are taken from mana. You no longer lose focus.\n"
 #define DESC_TW_CLOAK		"When equipped, 15%% of damage taken from hits is dealt to Endurance before Hitpoints, and 15%% of damage taken from damage over time is dealt to Mana before Hitpoints.\n"
 #define DESC_TW_DREAD		"When equipped, your ghost companion is replaced with a spellcaster companion.\n"
-#define DESC_TW_DOUSER		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict douse, reducing enemy spell modifier.\n"
+#define DESC_TW_DOUSER		"When equipped, your hits inflict a self-scaling Fatigue, causing enemies to deal less damage.\n"
 #define DESC_TW_MARCH		"When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by one third.\n"
 #define DESC_TW_BBELT		"When equipped, get WV from your Hand to Hand skill and +2%% base crit if your main hand is empty, half of shield parry bonus if your off-hand is empty, and 5%% total base crit if both hands are empty.\n"
 #define DESC_TW_OUTSIDE		"When equipped, enemies no longer gain a bonus to hitting you while you are stunned or not fighting back.\n"
@@ -504,7 +508,7 @@ extern char *at_short[];
 #define DESC_TW_IRA			"When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you reserve 30%% of your mana and cannot deal melee critical hits.\n"
 #define DESC_TW_INVIDIA		"When equipped, your ghost companion has surround hit AoE, and your shadow copy teleports to new targets, but each cannot regenerate health.\n"
 #define DESC_TW_GULA		"When equipped, you leech 20%% of damage dealt with hits as hitpoints, but you reserve 30%% of your hitpoints.\n"
-#define DESC_TW_LUXURIA		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict stun.\n"
+#define DESC_TW_LUXURIA		"When equipped, your hits inflict a self-scaling Aggravate, causing enemies to take more damage.\n"
 #define DESC_TW_AVARITIA	"When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you reserve 30%% of your endurance.\n"
 #define DESC_TW_SUPERBIA	"When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n"
 #define DESC_TW_SINBIND		"You may only equip one Sinbinder at a time.\n"
@@ -525,13 +529,13 @@ extern char *at_short[];
 #define DESC_SIGN_SCRE		"When equipped, your Curse also inflicts Aggravate.\n"
 
 #define FN_EX			5
-#define DESC_GL_SERPENT		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict poison, dealing damage over time.\n"
-#define DESC_GL_BURNING		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict scorch, causing enemies to take additional damage.\n"
-#define DESC_GL_SHADOW		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict blind, reducing enemy perception, hit and parry.\n"
-#define DESC_GL_CHILLED		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict slow, reducing enemy action speed.\n"
-#define DESC_GL_CURSED		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict curse, reducing enemy attributes.\n"
-#define DESC_GL_TITANS		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict weaken, reducing enemy weapon value.\n"
-#define DESC_GL_BLVIPER		"When equipped, grants a 25%% chance on skill hit and a 5%% chance on melee hit to inflict frostburn, draining enemy endurance and mana.\n"
+#define DESC_GL_SERPENT		"When equipped, your hits inflict a self-scaling Poison, dealing damage over time.\n"
+#define DESC_GL_BURNING		"When equipped, your hits inflict a self-scaling Scorch, causing enemies to take more damage.\n"
+#define DESC_GL_SHADOW		"When equipped, your hits inflict a self-scaling Blind, reducing enemy perception, hit and parry.\n"
+#define DESC_GL_CHILLED		"When equipped, your hits inflict a self-scaling Slow, reducing enemy action speed.\n"
+#define DESC_GL_CURSED		"When equipped, your hits inflict a self-scaling Curse, reducing enemy attributes.\n"
+#define DESC_GL_TITANS		"When equipped, your hits inflict a self-scaling Weaken, reducing enemy weapon value.\n"
+#define DESC_GL_BLVIPER		"When equipped, your hits inflict a self-scaling Frostburn, draining enemy endurance and mana.\n"
 
 #define DESC_BT_NATURES		"When equipped, grants 33%% more regeneration rates while idle.\n"
 #define DESC_RINGWARMTH		"When equipped and activated, grants additional health, endurance, and mana regeneration.\n"
