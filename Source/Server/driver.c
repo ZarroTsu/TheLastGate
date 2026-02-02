@@ -1043,7 +1043,7 @@ int npc_give(int cn, int co, int in, int money)
 			if ((n = ch[co].data[PCD_COMPANION]))  answer_transfer(n, co, 0);
 			if ((n = ch[co].data[PCD_SHADOWCOPY])) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
-			//do_swap_send_info(co, in, in2);
+			do_swap_send_info(co, in, in2);
 			ch[co].misc_action = DR_IDLE;
 			return 0;
 		}

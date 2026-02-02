@@ -17833,16 +17833,16 @@ int do_check_fool(int cn, int in)
 	return 1;
 }
 
-void do_swap_send_info(int cn, int n, int tmp)
+void do_swap_send_info(int cn, int in, int in2)
 {
-	int m, z;
+	int n, z;
 	
-	for (m = 0; m < 2; m++)
+	for (n=0; n<2; n++)
 	{
-		if (m == 0) z = tmp;
-		else        z = ch[cn].worn[n];
+		if (n) z = in;
+		else   z = in2;
 		
-		if (z) switch (it[z].temp)
+		if (IS_SANEITEM(z)) switch (it[z].temp)
 		{
 			case IT_CH_EMPRESS:  ch_update_skill_terminology(cn, 11); break;
 			case IT_CH_PREIST_R: ch_update_skill_terminology(cn, 12); break;
@@ -18072,7 +18072,7 @@ int do_swap_item(int cn, int n)
 		}
 	}
 	
-	//do_swap_send_info(cn, n, tmp);
+	do_swap_send_info(cn, ch[cn].worn[n], tmp);
 	
 	ch[cn].citem = ch[cn].worn[n];
 	ch[cn].worn[n] = tmp;

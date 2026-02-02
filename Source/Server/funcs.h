@@ -243,7 +243,7 @@ char *itemvowel(int in, int flag);
 void do_add_light(int x, int y, int stren);
 int do_store_item(int cn);
 int do_check_fool(int cn, int in);
-void do_swap_send_info(int cn, int n, int tmp);
+void do_swap_send_info(int cn, int in, int in2);
 int do_swap_item(int cn, int n);
 void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag);
 void do_look_item(int cn, int in);
