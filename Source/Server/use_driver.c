@@ -8768,7 +8768,7 @@ void change_to_sorcerer(int cn)
 
 int shrine_of_change(int cn, int in)
 {
-	int co, n, in2, in3 = 0, in4 = 0, flag=0, rebirth = it[in].data[0];
+	int co, n, m, in2, in3 = 0, in4 = 0, flag=0, rebirth = it[in].data[0];
 	char msg[120];
 
 	if (!cn)
@@ -8798,28 +8798,40 @@ int shrine_of_change(int cn, int in)
 			if (do_check_fool(cn, in2)<1)
 				return 0;
 		}
-		in3 = ch[cn].worn[WN_CHARM2];
-		if (in3 && it[in3].temp==IT_CH_WORLD_R)
+		if ((in3 = ch[cn].worn[WN_CHARM2]) && it[in3].temp==IT_CH_WORLD_R) // [Taro] World.R
 		{
-			in4 = ch[cn].worn[WN_LHAND];
-			if (in4 && ch[cn].worn[WN_RHAND] && IS_TWOHAND(ch[cn].worn[WN_RHAND])) // [Taro] World.R
+			for (n = 0, m = 0; n<MAXITEMS; n++)
 			{
-				for (n = 0; n<MAXITEMS; n++)
+				if (!ch[cn].item[n]) // Pre-emptively find two empty inventory slots
 				{
-					if (!ch[cn].item[n]) break;  // Find an empty inventory slot
+					if (m) break;
+					m = n;
 				}
-				if (n==MAXITEMS)  // Inventory is full...
-				{
-					do_char_log(cn, 0, "You feel like you need more space in your backpack.\n");
-					return 0;
-				}
+			}
+			if (n>=(MAXITEMS-1) &&  // Inventory too full...
+				((ch[cn].worn[WN_LHAND] && ch[cn].worn[WN_RHAND] && IS_TWOHAND(ch[cn].worn[WN_RHAND])) ||
+				 (ch[cn].alt_worn[WN_LHAND] && ch[cn].alt_worn[WN_RHAND] && IS_TWOHAND(ch[cn].alt_worn[WN_RHAND])) ))
+			{
+				do_char_log(cn, 0, "You feel like you need more space in your backpack.\n");
+				return 0;
+			}
+			if ((in4 = ch[cn].worn[WN_LHAND]) && ch[cn].worn[WN_RHAND] && IS_TWOHAND(ch[cn].worn[WN_RHAND]))
+			{
+				it[in4].x = 0;
+				it[in4].y = 0;
+				it[in4].carried = cn;
+				ch[cn].item[m] = in4;
+				ch[cn].worn[WN_LHAND] = 0;
+			}
+			if ((in4 = ch[cn].alt_worn[WN_LHAND]) && ch[cn].alt_worn[WN_RHAND] && IS_TWOHAND(ch[cn].alt_worn[WN_RHAND]))
+			{
 				it[in4].x = 0;
 				it[in4].y = 0;
 				it[in4].carried = cn;
 				ch[cn].item[n] = in4;
-				ch[cn].worn[WN_LHAND] = 0;
-				do_update_char(cn);
+				ch[cn].alt_worn[WN_LHAND] = 0;
 			}
+			do_update_char(cn);
 		}
 		god_take_from_char(in2, cn);
 		do_char_log(cn, 1, "You now have the effects of your %s equipped.\n", it[in2].name);
