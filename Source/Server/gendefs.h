@@ -547,7 +547,7 @@ extern char *at_short[];
 #define DESC_AM_SEABREZ		"When equipped, penalizes rest, but greatly improves the effect of meditate.\n"
 #define DESC_AM_TRUESUN		"When equipped, you are immune to areas that would disable your magic.\n"
 #define DESC_AM_FALMOON		"When equipped, you cannot cast or receive spells of any kind.\n"
-#define DESC_AM_ECLIPSE		"When equipped, your immunity has 25%% increased effectiveness.\n"
+#define DESC_AM_ECLIPSE		"When equipped, your immunity has 25%% more effectiveness.\n"
 #define DESC_GAMBLERFAL		"When equipped, critical hits award the active stats on this amulet for 5 seconds.\n"
 
 #define DESC_BL_ECLIPSE		"Grants passive bonuses during the day (6:00 to 18:00), and active bonuses during the night (18:00 to 6:00).\n"

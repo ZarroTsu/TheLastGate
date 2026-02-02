@@ -2124,6 +2124,7 @@ int get_meta_stat_value(int cn, int n)
 			value = M_SK(cn, SK_IMMUN);
 			if (do_get_iflag(cn, SF_HANGED)) value += M_SK(cn, SK_RESIST)/3;
 			value = more(value, (SPEED_BASE+GET_SPD_ATK(cn))*(T_WARR_SK(cn, 4)*2+TC_SK(cn, 40)), 50);  // (Warr) Dismissal
+			if (do_get_iflag(cn, SF_AM_ECLIPSE)) n = more(n, 25, 1);
 			break;
 		case 55: // Effective Resistance
 			value = M_SK(cn, SK_RESIST);

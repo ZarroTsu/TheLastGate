@@ -11492,8 +11492,8 @@ void really_update_char(int cn)
 	//
 	if (T_LYCA_SK(cn,  1))                             aoe +=   2;  // (Lyca) Expanse
 	if ((n=TC_SK(cn, 97)))                             aoe +=   n;
-	if (T_LYCA_SK(cn,  2))                              hp +=   6;  // (Lyca) Feast
-	if ((n=TC_SK(cn, 98)))                              hp += n*3;
+	if (T_LYCA_SK(cn,  2))                              hp +=  30;  // (Lyca) Feast
+	if ((n=TC_SK(cn, 98)))                              hp +=n*15;
 	if (T_LYCA_SK(cn,  3))                          gethit +=   6;  // (Lyca) Sharkskin
 	if ((n=TC_SK(cn, 99)))                          gethit += n*3;
 	if (T_LYCA_SK(cn,  8)) do_add_ieffect(cn, VF_EN_MOREHP,   20);  // (Lyca) Gluttony

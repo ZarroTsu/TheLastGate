@@ -1571,6 +1571,8 @@ void damage_mshell(int co, int dam)
 		item_damage_worn(co, WN_CLOAK, dam);
 }
 
+// cn is the attacker
+// co is the defender
 int get_target_resistance(int cn, int co)
 {
 	int target_resist = 1, in, n;
@@ -1584,10 +1586,10 @@ int get_target_resistance(int cn, int co)
 	// Additive bonus from defender
 	{
 		n  = 0;
-		n += T_SORC_SK(cn, 12)*2;  // (Sorc) Dodging
-		n +=     TC_SK(cn, 60);
+		n += T_SORC_SK(co, 12)*2;  // (Sorc) Dodging
+		n +=     TC_SK(co, 60);
 		
-		target_resist = more(target_resist, (SPEED_BASE + GET_SPD_MOV(cn))*n, 50);
+		target_resist = more(target_resist, (SPEED_BASE + GET_SPD_MOV(co))*n, 50);
 	}
 	
 	if (IS_SANECHAR(cn))
@@ -1621,6 +1623,8 @@ int get_target_resistance(int cn, int co)
 	return max(1, target_resist);
 }
 
+// cn is the attacker
+// co is the defender
 int get_target_immunity(int cn, int co)
 {
 	int target_immune = 1, in, n;
@@ -1634,10 +1638,15 @@ int get_target_immunity(int cn, int co)
 	// Additive bonus from defender
 	{
 		n  = 0;
-		n += T_WARR_SK(cn,  4)*2;  // (Warr) Dismissal
-		n +=     TC_SK(cn, 40);
+		n += T_WARR_SK(co,  4)*2;  // (Warr) Dismissal
+		n +=     TC_SK(co, 40);
 		
-		target_immune = more(target_immune, (SPEED_BASE + GET_SPD_ATK(cn))*n, 50);
+		target_immune = more(target_immune, (SPEED_BASE + GET_SPD_ATK(co))*n, 50);
+	}
+	
+	// Multiplicative bonuses from defender
+	{
+		if (do_get_iflag(co, SF_AM_ECLIPSE)) n = more(n, 25, 1);
 	}
 	
 	if (IS_SANECHAR(cn))
@@ -1691,12 +1700,9 @@ int spell_metabolism(int power, int metabolism)
 
 int spell_immunity(int cn, int co, int power)
 {
-	int immun, base_immun = get_target_immunity(cn, co);
+	int immun = get_target_immunity(cn, co);
 	
-	immun = base_immun/2;
-	
-	if (IS_WARRIOR(co))                  immun += base_immun/8;
-	if (do_get_iflag(co, SF_AM_ECLIPSE)) immun += base_immun/8;
+	immun = immun/2;
 	
 	if (power<=immun) 		return 1;
 	else					return (power - immun);
