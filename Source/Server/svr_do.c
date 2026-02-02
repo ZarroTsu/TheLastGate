@@ -18072,7 +18072,7 @@ int do_swap_item(int cn, int n)
 		}
 	}
 	
-	do_swap_send_info(cn, n, tmp);
+	//do_swap_send_info(cn, n, tmp);
 	
 	ch[cn].citem = ch[cn].worn[n];
 	ch[cn].worn[n] = tmp;
