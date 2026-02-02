@@ -13073,7 +13073,7 @@ void do_pulse_tick(int cn, int in)
 					do_hurt(cn, co, spell_immunity(cn, co, bu[in].power) * 2, 6);
 					spell_shock(cn, co, bu[in].power);
 					
-					try_hit_debuff(cn, co, 10);
+					try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 					
 					char_play_sound(co, ch[cn].sound + 20, -150, 0);
 					do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 20);

@@ -424,7 +424,6 @@
 #define SK_EXH_SHIFT		(TICKS * 8)
 
 #define HIT_DEBUFF_LARGE      20
-#define HIT_DEBUFF_PULSE      10
 #define HIT_DEBUFF_SMALL       5
 
 extern char *at_name[];

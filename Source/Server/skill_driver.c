@@ -291,7 +291,7 @@ int spell_shock(int cn, int co, int power);
 // Check for and escalate a given debuff template
 int on_hit_debuff(int cn, int co, int v, int origtmp)
 {
-	int n, in, spr, dur = SP_DUR_GLOVES, power = 1;
+	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 1;
 	int nmz = 0;
 	
 	if (!origtmp)           return 0;
