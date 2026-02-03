@@ -341,9 +341,14 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		if ((in = ch[co].spell[n])==0) continue;
 		if (bu[in].temp != tmp)        continue;
 		if (!bu[in].data[9])           return 0;  // Don't overwrite a normal debuff
-		power = bu[in].data[9] + v;
+		power = bu[in].data[9];
 		break;
 	}
+	
+	if (power >= 300)      power = 300;
+	else if (power >= 250) power = power + v/3;
+	else if (power >= 150) power = power + v*2/3;
+	else                   power = power + v;
 	
 	if (!(in = make_new_buff(cn, tmp, spr, power, dur, 0))) return 0;
 	

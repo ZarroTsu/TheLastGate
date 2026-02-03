@@ -423,8 +423,8 @@
 #define SK_EXH_GHOST		(TICKS * 8)
 #define SK_EXH_SHIFT		(TICKS * 8)
 
-#define HIT_DEBUFF_LARGE      20
-#define HIT_DEBUFF_SMALL       5
+#define HIT_DEBUFF_LARGE      24
+#define HIT_DEBUFF_SMALL       6
 
 extern char *at_name[];
 extern char *at_short[];
@@ -525,7 +525,7 @@ extern char *at_short[];
 #define DESC_SIGN_SPAR		"When equipped, your Blast hits an additional nearby target when its cooldown expires.\n"
 #define DESC_SIGN_SYMM		"When equipped, this ring will copy the effects of your other ring slot.\n"
 #define DESC_SIGN_SONG		"When equipped, your Aria additionally grants nearby allies 10%% of your Armor Value.\n"
-#define DESC_SIGN_SCRE		"When equipped, your Curse also inflicts Aggravate.\n"
+#define DESC_SIGN_SCRE		"When equipped, casting Curse will also inflict Aggravate.\n"
 
 #define FN_EX			5
 #define DESC_GL_SERPENT		"When equipped, your hits inflict a self-scaling Poison, dealing damage over time.\n"
