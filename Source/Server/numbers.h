@@ -1220,6 +1220,9 @@
 #define IT_TALISMAN		2608
 #define IT_TALISFRAG	2609
 
+#define IT_RAINBBELT	3340
+#define IT_SPR_RBELT	16964
+
 // -------- Magic Item Sprites  -------- //
 
 #define IT_SPR_DAGG_STEL	4950

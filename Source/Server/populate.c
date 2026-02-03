@@ -389,220 +389,66 @@ int pop_create_bonus(int cn)
 /*	Added by SoulHunter  04.04.2000	*/
 int pop_create_bonus_belt(int cn)
 {
-	int n = 3340;   // value to store id-number of created belt
-	                // at start it contains template of 'rainbow_belt'
-	int i, j;
-	int rank, skill_value, skill_number, skm, armor=0, weapon=0, thorn=0, aoe=0, spmod=0, tryspm=0, tryaoe=0;
+	int in, n, v, rank = getrank(cn);  // 0 - 24
+	int num_attrib, num_skill, num_meta;
+	int skill_value, skill_number, skm, armor=0, weapon=0, thorn=0, aoe=0, spmod=0, tryspm=0, tryaoe=0;
 	
-	rank = getrank(cn);  // private wont get this belt
-	if (!rank)
+	if (!rank) return 0;
+	if (!(in = god_create_item(IT_RAINBBELT))) return 0;
+	
+	it[in].temp = 0;
+	it[in].sprite[I_I] = IT_SPR_RBELT;
+	strcpy(it[in].name, "Rainbow Belt");
+	strcpy(it[in].reference, "rainbow belt");
+	strcpy(it[in].description, "An ancient belt. It seems to be highly magical, and highly volatile.");
+	
+	chlog(cn, ", with rank %d, got %s (t=%d)", rank, it[in].name, it[in].temp);
+	
+	num_attrib = min(5, 1 + RANDOM(rank/4)); // Between 1 and 5 attributes
+	num_skill  = min(4, 1 + RANDOM(rank/6)); // Between 1 and 4 skills
+	num_meta   = min(3, 1 + RANDOM(rank/8)); // Between 1 and 3 meta values
+	
+	it[in].power = 15    + RANDOM(rank*5);
+	it[in].value = 15000 + RANDOM(rank*5000);
+	
+	for (n=0; n<num_attrib; n++)
 	{
-		return 0;
+		v = RANDOM(5);
+		it[in].attrib[v][I_I] += (rank/(num_attrib+1) + 2)  /2 + (RANDOM(rank/(num_attrib+1) + 1)  /2);
+		it[in].attrib[v][I_R] += (rank/(num_attrib+1) + 2)*5/2 + (RANDOM(rank/(num_attrib+1) + 1)*5/2);
 	}
-	if (n)
+	for (n=0; n<num_skill; n++)
 	{
-		n = god_create_item(n);   // creating belt from template
-		if(!n)
+		v = RANDOM(50);
+		it[in].skill[v][I_I]  += (rank/(num_skill +1) + 3)  /3 + (RANDOM(rank/(num_skill +1) + 2)  /2);
+	}
+	for (n=0; n<num_meta; n++)
+	{
+		v = RANDOM(10);
+		switch (v)
 		{
-			return 0;     // return if failed
-		}
-		// problem is if we keep template for newly created and
-		// then changed item, it sometimes doesnt keep changes
-		// we need template number for is_belt() function
-		// but seems there is some checks by template so we reset it
-		// and people wont notice belt :)
-		it[n].temp = 0; // clearing template
-		it[n].sprite[I_I] = 16964;
-		strcpy(it[n].name, "Rainbow Belt");
-		strcpy(it[n].reference, "rainbow belt");
-		strcpy(it[n].description, "An ancient belt. It seems to be highly magical, and highly volatile.");
-		// putting message about created belt into log-file
-		chlog(cn, ", with rank %d, got %s (t=%d)", rank, it[n].name, it[n].temp);
-	}
-
-	j = rank/2+1 + RANDOM(rank/2+1); // how many skills will be in belt?
-	it[n].power += 5 * j;     // counting power of item, *remind* power = 10 in template
-	it[n].value += 10000 * j; // counting price value, value = 100 in template
-	
-	// Random attributes
-	for(i = 0; i < j; i++)
-	{
-		skill_number = RANDOM(5);
-		//if (!it[n].attrib[skill_number][I_I]) it[n].attrib[skill_number][I_I] += 1;
-		it[n].attrib[skill_number][I_I] += 1;
-	}
-	for (i = 0; i < 5; i++)
-	{
-		if (it[n].attrib[i][I_I]) it[n].attrib[i][I_R] = max(0,(j-6)/3 * 5) + max(0, (it[n].attrib[i][I_I]/2) * 5);
-	}
-	
-	// Random skills
-	for(i = 0; i < j; i++)
-	{
-		skill_number = RANDOM(60);
-		
-		switch(skill_number)
-		{
-			case 50:
-				if (!it[n].hp[I_I]) it[n].hp[I_I] += 10;
-				it[n].hp[I_I] += 10;
-				break;
-			case 51:
-				if (!it[n].end[I_I]) it[n].end[I_I] += 15;
-				it[n].end[I_I] += 5;
-				break;
-			case 52:
-				if (!it[n].mana[I_I]) it[n].mana[I_I] += 10;
-				it[n].mana[I_I] += 10;
-				break;
-			case 53:
-				if (!armor) armor += 1;
-				armor += 1;
-				break;
-			case 54:
-				if (!weapon) weapon += 1;
-				weapon += 1;
-				break;
-			case 55:
-				if (!spmod) spmod += 1;
-				spmod += 1;
-				tryspm++;
-				if (!spmod%4) tryspm=0;
-				break;
-			case 56:
-				if (!it[n].speed[I_I]) it[n].speed[I_I] += 1;
-				it[n].speed[I_I] += 1;
-				break;
-			case 57:
-				if (!thorn) thorn += 1;
-				thorn += 1;
-				break;
-			case 58:
-				if (!it[n].crit_chance[I_I]) it[n].crit_chance[I_I] += 5;
-				it[n].crit_chance[I_I] += 5;
-				break;
-			case 59:
-				if (!aoe) aoe += 1;
-				aoe += 1;
-				tryaoe++;
-				if (!tryaoe%4) tryaoe=0;
-				break;
-			default:
-				skm = 2;
-				if (skill_number == 0 || skill_number == 2 || skill_number == 3 || 
-					skill_number == 4 || skill_number == 5 || skill_number == 6 || 
-					skill_number ==16 || skill_number ==36) skm = 1;
-				if (!it[n].skill[skill_number][I_I] && skm==2) it[n].skill[skill_number][I_I] += skm;
-				it[n].skill[skill_number][I_I] += 1;
-				break;
+			case 1:  it[in].hp[I_I]          += 10 + RANDOM(rank/(num_meta+1)); break;
+			case 2:  it[in].end[I_I]         += 10 + RANDOM(rank/(num_meta+1)); break;
+			case 3:  it[in].mana[I_I]        += 10 + RANDOM(rank/(num_meta+1)); break;
+			case 4:  it[in].armor[I_I]       +=  1 + RANDOM(rank/(num_meta+2)); break;
+			case 5:  it[in].weapon[I_I]      +=  1 + RANDOM(rank/(num_meta+2)); break;
+			case 6:  it[in].spell_pow[I_I]   +=  1 + RANDOM(rank/(num_meta+3)); break;
+			case 7:  it[in].speed[I_I]       +=  3 + RANDOM(rank/(num_meta+2)); break;
+			case 8:  it[in].gethit_dam[I_I]  +=  2 + RANDOM(rank/(num_meta+3)); break;
+			case 9:  it[in].crit_chance[I_I] +=  5 + RANDOM(rank/(num_meta+1)); break;
+			default: it[in].crit_multi[I_I]  +=  5 + RANDOM(rank/(num_meta+1)); break;
 		}
 	}
-	j = 0;
-	if (armor%2)	j++;
-	if (weapon%2)	j++;
-	if (thorn%2)	j++;
-	if (spmod%4)	j+=tryspm;
-	if (aoe%4)		j+=tryaoe;
 	
-	if (it[n].hp[I_I])   it[n].hp[I_R]   = 50 + it[n].hp[I_I]/2;
-	if (it[n].mana[I_I]) it[n].mana[I_R] = 50 + it[n].mana[I_I]/2;
-	
-	it[n].armor[I_I]      += armor/2;
-	it[n].weapon[I_I]     += weapon/2;
-	it[n].gethit_dam[I_I] += thorn/2;
-	it[n].spell_mod[I_I]  += spmod/3;
-	it[n].aoe_bonus[I_I]  += aoe/3;
-	
-	// cleanup remaining numbers
-	if (j) for(i = 0; i < j; i++)
+	if (rank>=12)
 	{
-		skill_number = RANDOM(50);
-		skm = 2;
-		if (skill_number == 0 || skill_number == 2 || skill_number == 3 || 
-			skill_number == 4 || skill_number == 5 || skill_number == 6 || 
-			skill_number ==16 || skill_number ==36) skm = 1;
-		if (!it[n].skill[skill_number][I_I] && skm==2) it[n].skill[skill_number][I_I] += skm;
-		it[n].skill[skill_number][I_I] += 1;
+		if (!RANDOM(2))
+			it[in].flags |= IF_CAN_EN;
+		else
+			it[in].flags |= IF_CAN_SS;
 	}
 	
-	it[n].flags |= IF_CAN_EN;
-	
-	// Vanilla
-	/*
-	
-	// here we decide which skills will be in belt, not more than rank
-	for(i = 0; i < j; i++)
-	{
-		skill_number = RANDOM(60);			// which skill it will be
-		skill_value  = RANDOM(rank+2);		// with that value of skill
-		skill_value  = skill_value >> 1;	// divide it by 2, cause it cant be more than 12 (max_rank/2)
-		if(skill_value == 0)
-		{
-			skill_value = 1;              	// and cant be zero
-		}
-		// the following code put all these skills in belt
-		// sometimes requirements are zeroed, cause if we have, in example,
-		// dagger and sword skills in belt, this belt can be used only by
-		// templar/seyan, but i dont want this
-		switch(skill_number)
-		{
-			case  0:
-				it[n].attrib[AT_BRV][I_I] += skill_value; 								// this line is how much it will raise attribute
-				if (it[n].attrib[AT_BRV][I_I] > 12) it[n].attrib[AT_BRV][I_I] = 12; 			// this will check for max level = 12 and will down it back to 12
-				it[n].attrib[AT_BRV][I_R] = 10 + (it[n].attrib[AT_BRV][I_I] * RANDOM(7)); 	// this line will set requirements
-				break;
-			case  1:
-				it[n].attrib[AT_WIL][I_I] += skill_value;
-				if (it[n].attrib[AT_WIL][I_I] > 12) it[n].attrib[AT_WIL][I_I] = 12;
-				it[n].attrib[AT_WIL][I_R] = 10 + (it[n].attrib[AT_WIL][I_I] * RANDOM(7));
-				break;
-			case  2:
-				it[n].attrib[AT_INT][I_I] += skill_value;
-				if (it[n].attrib[AT_INT][I_I] > 12) it[n].attrib[AT_INT][I_I] = 12;
-				it[n].attrib[AT_INT][I_R] = 10 + (it[n].attrib[AT_INT][I_I] * RANDOM(7));
-				break;
-			case  3:
-				it[n].attrib[AT_AGL][I_I] += skill_value;
-				if (it[n].attrib[AT_AGL][I_I] > 12) it[n].attrib[AT_AGL][I_I] = 12;
-				it[n].attrib[AT_AGL][I_R] = 10 + (it[n].attrib[AT_AGL][I_I] * RANDOM(7));
-				break;
-			case  4:
-				it[n].attrib[AT_STR][I_I] += skill_value;
-				if (it[n].attrib[AT_STR][I_I] > 12) it[n].attrib[AT_STR][I_I] = 12;
-				it[n].attrib[AT_STR][I_R] = 10 + (it[n].attrib[AT_STR][I_I] * RANDOM(7));
-				break;
-			case  5:
-				it[n].hp[I_I] += (skill_value * 10);
-				if (it[n].hp[I_I] > 120) it[n].hp[I_I] = 120;
-				it[n].hp[I_R] = 50 + (it[n].hp[I_I] * RANDOM(9));
-				break;
-			case  6:
-				it[n].end[I_I] += (skill_value * 10)/2;
-				if (it[n].end[I_I] > 60) it[n].end[I_I] = 60;
-				break;
-			case  7:
-				it[n].mana[I_I] += (skill_value * 10);
-				if (it[n].mana[I_I] > 120) it[n].mana[I_I] = 120;
-				it[n].mana[I_R] = 50 + (it[n].mana[I_I] * RANDOM(9));
-				break;
-			case  8:
-				it[n].armor[I_I] += (skill_value+1)/2;
-				if (it[n].armor[I_I] > 6) it[n].armor[I_I] = 6;
-				break;
-			case  9:
-				it[n].weapon[I_I] += (skill_value+1)/2;
-				if (it[n].weapon[I_I] > 6) it[n].armor[I_I] = 6;
-				break;
-			default:
-				skm = skill_number-10;
-				it[n].skill[skm][I_I] += skill_value;
-				if (it[n].skill[skm][I_I] > 12) it[n].skill[skm][I_I] = 12;
-				it[n].skill[skm][I_R] = (it[n].skill[skm][I_I] * RANDOM(5));
-				break;
-		}
-	}
-	*/
-	return(n);
+	return(in);
 }
 /*	--end	*/
 
