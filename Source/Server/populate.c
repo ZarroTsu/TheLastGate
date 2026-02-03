@@ -390,8 +390,7 @@ int pop_create_bonus(int cn)
 int pop_create_bonus_belt(int cn)
 {
 	int in, n, v, rank = getrank(cn);  // 0 - 24
-	int num_attrib, num_skill, num_meta;
-	int skill_value, skill_number, skm, armor=0, weapon=0, thorn=0, aoe=0, spmod=0, tryspm=0, tryaoe=0;
+	int num_attrib, num_skill, num_meta, tmp;
 	
 	if (!rank) return 0;
 	if (!(in = god_create_item(IT_RAINBBELT))) return 0;
@@ -409,46 +408,53 @@ int pop_create_bonus_belt(int cn)
 	num_meta   = min(3, 1 + RANDOM(rank/8)); // Between 1 and 3 meta values
 	
 	it[in].power = 15    + RANDOM(rank*5);
-	it[in].value = 15000 + RANDOM(rank*5000);
+	it[in].value = 12500 + RANDOM(rank*2500);
 	
 	for (n=0; n<num_attrib; n++)
 	{
 		v = RANDOM(5);
-		it[in].attrib[v][I_I] += (rank/(num_attrib+1) + 2)  /2 + (RANDOM(rank/(num_attrib+1) + 1)  /2);
-		it[in].attrib[v][I_R] += (rank/(num_attrib+1) + 2)*5/2 + (RANDOM(rank/(num_attrib+1) + 1)*5/2);
+		tmp = (rank/(num_attrib+1)+2)/2 + (RANDOM(rank/(num_attrib+1)+1));
+		
+		it[in].attrib[v][I_I] += tmp;
+		it[in].attrib[v][I_R] += RANDOM(tmp*3);
 	}
+	
 	for (n=0; n<num_skill; n++)
 	{
 		v = RANDOM(50);
-		it[in].skill[v][I_I]  += (rank/(num_skill +1) + 3)  /3 + (RANDOM(rank/(num_skill +1) + 2)  /2);
+		tmp = (rank/(num_skill+2)+4)/3 + (RANDOM(rank/(num_skill+2)+1));
+		
+		if (v == 0 || v == 2 || v == 3 || v == 4 || v == 5 || v == 6)
+			it[in].skill[v][I_I] += tmp/2;
+		else
+			it[in].skill[v][I_I] += tmp;
 	}
+	
 	for (n=0; n<num_meta; n++)
 	{
 		v = RANDOM(10);
 		switch (v)
 		{
-			case 1:  it[in].hp[I_I]          += 10 + RANDOM(rank/(num_meta+1)); break;
-			case 2:  it[in].end[I_I]         += 10 + RANDOM(rank/(num_meta+1)); break;
-			case 3:  it[in].mana[I_I]        += 10 + RANDOM(rank/(num_meta+1)); break;
+			case 1:  it[in].hp[I_I]          += 13 + RANDOM(rank/(num_meta+1)); break;
+			case 2:  it[in].end[I_I]         += 13 + RANDOM(rank/(num_meta+1)); break;
+			case 3:  it[in].mana[I_I]        += 13 + RANDOM(rank/(num_meta+1)); break;
 			case 4:  it[in].armor[I_I]       +=  1 + RANDOM(rank/(num_meta+2)); break;
 			case 5:  it[in].weapon[I_I]      +=  1 + RANDOM(rank/(num_meta+2)); break;
 			case 6:  it[in].spell_pow[I_I]   +=  1 + RANDOM(rank/(num_meta+3)); break;
 			case 7:  it[in].speed[I_I]       +=  3 + RANDOM(rank/(num_meta+2)); break;
 			case 8:  it[in].gethit_dam[I_I]  +=  2 + RANDOM(rank/(num_meta+3)); break;
 			case 9:  it[in].crit_chance[I_I] +=  5 + RANDOM(rank/(num_meta+1)); break;
-			default: it[in].crit_multi[I_I]  +=  5 + RANDOM(rank/(num_meta+1)); break;
+			default: it[in].crit_multi[I_I]  +=  3 + RANDOM(rank/(num_meta+2)); break;
 		}
 	}
 	
-	if (rank>=12)
+	if (rank > 12)
 	{
-		if (!RANDOM(2))
-			it[in].flags |= IF_CAN_EN;
-		else
-			it[in].flags |= IF_CAN_SS;
+		if (!RANDOM(2)) it[in].flags |= IF_CAN_EN;
+		else            it[in].flags |= IF_CAN_SS;
 	}
 	
-	return(in);
+	return in;
 }
 /*	--end	*/
 
