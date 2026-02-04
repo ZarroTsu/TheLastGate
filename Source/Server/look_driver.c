@@ -137,7 +137,8 @@ void look_has_mod(int cn, int in)
 	if (it[in].flags & IF_LEGACY)        lega++;
 	
 	if (whet) do_char_log(cn, 5, "Has been Whetstoned.\n");
-	if (soul) do_char_log(cn, 3, "Has been Soulstoned.\n");
+	if (osiw && it[in].stack) ;
+	else if (soul) do_char_log(cn, 3, "Has been Soulstoned.\n");
 	if (cata) do_char_log(cn, 3, "Has been Catalyzed.\n");
 	if (ench) do_char_log(cn, 8, "Has been Enchanted.\n");
 	if (focu) do_char_log(cn, 8, "Has been Focused.\n");

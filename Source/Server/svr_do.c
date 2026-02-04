@@ -7972,8 +7972,8 @@ void do_ransack_corpse(int cn, int co, char *msg)
 		if (IS_RANSACKGEAR(in) && perc > RANDOM(200))
 		{
 			colr = -1; pchk = RANDOM(200);
-			if      (IS_UNIQUE(in))      { colr = 9; sprintf(dropped, "%s %s (UNQ)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
-			else if (IS_OSIRWEAP(in))    { colr = 9; sprintf(dropped, "%s %s (OSI)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
+			if (IS_OSIRWEAP(in))         { colr = 9; sprintf(dropped, "%s %s (OSI)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
+			else if      (IS_UNIQUE(in)) { colr = 9; sprintf(dropped, "%s %s (UNQ)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
 			else if (IS_SOULCHANTED(in)) { colr = 7; sprintf(dropped, "%s %s (S&E)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
 			else if (IS_SOULSTONED(in))  { colr = 7; sprintf(dropped, "%s %s (SS)",  drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
 			else if (IS_ENCHANTED(in))   { colr = 8; sprintf(dropped, "%s %s (EN)",  drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
@@ -7987,8 +7987,8 @@ void do_ransack_corpse(int cn, int co, char *msg)
 		if (perc > RANDOM(200))
 		{
 			colr = -1; pchk = RANDOM(200);
-			if      (IS_UNIQUE(in))      { colr = 9; sprintf(dropped, "%s %s (UNQ)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
-			else if (IS_OSIRWEAP(in))    { colr = 9; sprintf(dropped, "%s %s (OSI)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
+			if (IS_OSIRWEAP(in))         { colr = 9; sprintf(dropped, "%s %s (OSI)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
+			else if      (IS_UNIQUE(in)) { colr = 9; sprintf(dropped, "%s %s (UNQ)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
 			else if (IS_SOULCHANTED(in)) { colr = 7; sprintf(dropped, "%s %s (S&E)", drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
 			else if (IS_SOULSTONED(in))  { colr = 7; sprintf(dropped, "%s %s (SS)",  drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
 			else if (IS_ENCHANTED(in))   { colr = 8; sprintf(dropped, "%s %s (EN)",  drvowel(in, perc, pchk), drtype(in, perc, pchk)); }
@@ -14094,9 +14094,9 @@ void do_regenerate(int cn)
 					
 					if ((m = TC_SK(cn, 58) * 15))         // (Corr) Skip Ahead
 					{
-						if ((tmp = (HP_SOFTCAP(cn) - ch[cn].a_hp))   > 0) do_recovery(cn, 0, tmp*m/100);
-						if ((tmp = (EN_SOFTCAP(cn) - ch[cn].a_end))  > 0) do_recovery(cn, 1, tmp*m/100);
-						if ((tmp = (MP_SOFTCAP(cn) - ch[cn].a_mana)) > 0) do_recovery(cn, 2, tmp*m/100);
+						if ((tmp=(HP_SOFTCAP(cn)-ch[cn].a_hp))  >0) do_recovery(cn, 0, tmp*clamp(bu[in].duration, 0, 60)*m/6000);
+						if ((tmp=(EN_SOFTCAP(cn)-ch[cn].a_end)) >0) do_recovery(cn, 1, tmp*clamp(bu[in].duration, 0, 60)*m/6000);
+						if ((tmp=(MP_SOFTCAP(cn)-ch[cn].a_mana))>0) do_recovery(cn, 2, tmp*clamp(bu[in].duration, 0, 60)*m/6000);
 					}
 				}
 				bu[in].used = USE_EMPTY;

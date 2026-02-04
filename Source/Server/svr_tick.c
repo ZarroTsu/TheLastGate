@@ -2238,7 +2238,7 @@ int get_meta_stat_value(int cn, int n)
 		case 98: // Rally Effect
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 			power = more(power, M_AT(cn, AT_STR)*(T_ARTM_SK(cn, 9)*2+TC_SK(cn, 21)), 20);  // (ArTm) Overlord
-			value = min(127, power/10 + 3);
+			value = min(127, (power*2/3) / 5 + 3);
 			break;
 		//
 		default: break;

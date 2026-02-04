@@ -2405,10 +2405,10 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 		if (!(li = add_spell(cn, in)))
 		{
 			do_char_log(cn, 1, 
-			"Magical interference neutralized the %s's effect.\n", bu[in].name);
+				"Magical interference neutralized the %s's effect.\n", bu[in].name);
 			return 0;
 		}
-		if (temp!=SK_RECALL && temp!=SK_IDENT)
+		if (temp!=SK_RECALL && temp!=SK_IDENT && temp!=SK_WARCRY3)
 		{
 			if (li<0)
 			{
@@ -3287,7 +3287,7 @@ int spell_rally(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_WARCRY3, BUF_SPR_WARCRY3, power, SP_DUR_RALLY, 1))) 
 		return 0;
 	
-	for (n=0; n<5; n++) bu[in].attrib[n] = min(127, 3 + (power/2-(4-n))/5);
+	for (n=0; n<5; n++) bu[in].attrib[n] = min(127, 3 + ((power*2/3)-(4-n))/5);
 	
 	bu[in].data[4] = 1;  // Effects not removed by NMZ
 	
@@ -3342,7 +3342,7 @@ int skill_rally(int cn, int power)
 			}
 		}
 	}
-	do_char_log(cn, 1, "You call for your allies, rallying them to your cause!\n");
+	do_char_log(cn, 1, "You rally yourself and your allies!\n");
 	
 	return 1;
 }
