@@ -397,9 +397,14 @@ int pop_create_bonus_belt(int cn)
 	
 	it[in].temp = 0;
 	it[in].sprite[I_I] = IT_SPR_RBELT;
+	
 	strcpy(it[in].name, "Rainbow Belt");
 	strcpy(it[in].reference, "rainbow belt");
-	strcpy(it[in].description, "An ancient belt. It seems to be highly magical, and highly volatile.");
+	
+	if (rank >= 20)      strcpy(it[in].description, "An ancient, highly volatile belt. Its magic is overwhelming.");
+	else if (rank >= 15) strcpy(it[in].description, "An ancient, highly volatile belt. It seems quite magical.");
+	else if (rank >=  9) strcpy(it[in].description, "An ancient, highly volatile belt. It has something magical about it.");
+	else                 strcpy(it[in].description, "An ancient, highly volatile belt. It seems to have some residual magic left.");
 	
 	chlog(cn, ", with rank %d, got %s (t=%d)", rank, it[in].name, it[in].temp);
 	
@@ -407,16 +412,16 @@ int pop_create_bonus_belt(int cn)
 	num_skill  = min(4, 1 + RANDOM(rank/6)); // Between 1 and 4 skills
 	num_meta   = min(3, 1 + RANDOM(rank/8)); // Between 1 and 3 meta values
 	
-	it[in].power = 15    + RANDOM(rank*5);
+	it[in].power = 15    + rank*5;
 	it[in].value = 12500 + RANDOM(rank*2500);
 	
 	for (n=0; n<num_attrib; n++)
 	{
 		v = RANDOM(5);
-		tmp = (rank/(num_attrib+1)+2)/2 + (RANDOM(rank/(num_attrib+1)+1));
+		tmp = (rank/(num_attrib+1)+3)/3 + (RANDOM(rank/(num_attrib+1)+1));
 		
-		it[in].attrib[v][I_I] += tmp;
-		it[in].attrib[v][I_R] += RANDOM(tmp*3);
+		it[in].attrib[v][I_I] = clamp(it[in].attrib[v][I_I] + tmp  ,  2, 17);
+		it[in].attrib[v][I_R] = clamp(it[in].attrib[v][I_R] + tmp*5, 10, 83);
 	}
 	
 	for (n=0; n<num_skill; n++)
@@ -425,9 +430,9 @@ int pop_create_bonus_belt(int cn)
 		tmp = (rank/(num_skill+2)+4)/3 + (RANDOM(rank/(num_skill+2)+1));
 		
 		if (v == 0 || v == 2 || v == 3 || v == 4 || v == 5 || v == 6)
-			it[in].skill[v][I_I] += tmp/2;
+			it[in].skill[v][I_I] = clamp(it[in].skill[v][I_I] + tmp/2, 1,  7);
 		else
-			it[in].skill[v][I_I] += tmp;
+			it[in].skill[v][I_I] = clamp(it[in].skill[v][I_I] + tmp  , 2, 13);
 	}
 	
 	for (n=0; n<num_meta; n++)
@@ -435,23 +440,26 @@ int pop_create_bonus_belt(int cn)
 		v = RANDOM(10);
 		switch (v)
 		{
-			case 1:  it[in].hp[I_I]          += 13 + RANDOM(rank/(num_meta+1)); break;
-			case 2:  it[in].end[I_I]         += 13 + RANDOM(rank/(num_meta+1)); break;
-			case 3:  it[in].mana[I_I]        += 13 + RANDOM(rank/(num_meta+1)); break;
-			case 4:  it[in].armor[I_I]       +=  1 + RANDOM(rank/(num_meta+2)); break;
-			case 5:  it[in].weapon[I_I]      +=  1 + RANDOM(rank/(num_meta+2)); break;
-			case 6:  it[in].spell_pow[I_I]   +=  1 + RANDOM(rank/(num_meta+3)); break;
-			case 7:  it[in].speed[I_I]       +=  3 + RANDOM(rank/(num_meta+2)); break;
-			case 8:  it[in].gethit_dam[I_I]  +=  2 + RANDOM(rank/(num_meta+3)); break;
-			case 9:  it[in].crit_chance[I_I] +=  5 + RANDOM(rank/(num_meta+1)); break;
-			default: it[in].crit_multi[I_I]  +=  3 + RANDOM(rank/(num_meta+2)); break;
+			case 1:  it[in].hp[I_I]          = clamp(it[in].hp[I_I]          + RANDOM(15 + rank/(num_meta+1)+1), 10, 61); break;
+			case 2:  it[in].end[I_I]         = clamp(it[in].end[I_I]         + RANDOM(15 + rank/(num_meta+1)+1), 10, 61); break;
+			case 3:  it[in].mana[I_I]        = clamp(it[in].mana[I_I]        + RANDOM(15 + rank/(num_meta+1)+1), 10, 61); break;
+			case 4:  it[in].armor[I_I]       = clamp(it[in].armor[I_I]       + RANDOM( 1 + rank/(num_meta+3)+1),  1, 11); break;
+			case 5:  it[in].weapon[I_I]      = clamp(it[in].weapon[I_I]      + RANDOM( 1 + rank/(num_meta+3)+1),  1, 11); break;
+			case 6:  it[in].spell_pow[I_I]   = clamp(it[in].spell_pow[I_I]   + RANDOM( 1 + rank/(num_meta+3)+1),  1, 11); break;
+			case 7:  it[in].speed[I_I]       = clamp(it[in].speed[I_I]       + RANDOM( 2 + rank/(num_meta+2)+1),  2, 13); break;
+			case 8:  it[in].gethit_dam[I_I]  = clamp(it[in].gethit_dam[I_I]  + RANDOM( 2 + rank/(num_meta+3)+1),  2, 19); break;
+			case 9:  it[in].crit_chance[I_I] = clamp(it[in].crit_chance[I_I] + RANDOM( 5 + rank/(num_meta+2)+1),  5, 29); break;
+			default: it[in].crit_multi[I_I]  = clamp(it[in].crit_multi[I_I]  + RANDOM( 3 + rank/(num_meta+2)+1),  3, 23); break;
 		}
 	}
 	
+	it[in].flags &= ~IF_CAN_EN;
+	it[in].flags &= ~IF_CAN_SS;
+	
 	if (rank > 12)
 	{
-		if (!RANDOM(2)) it[in].flags |= IF_CAN_EN;
-		else            it[in].flags |= IF_CAN_SS;
+		     if (!RANDOM(2)) it[in].flags |= IF_CAN_EN;
+		else if (!RANDOM(2)) it[in].flags |= IF_CAN_SS;
 	}
 	
 	return in;
