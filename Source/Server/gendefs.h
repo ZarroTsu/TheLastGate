@@ -576,7 +576,7 @@ extern char *at_short[];
 #define DESC_BOOK_BISH		"When equipped, casting Bless will immediately cast Protect and Enhance as well.\n"
 #define DESC_BOOK_GREA		"When equipped, damage dealt to the duration of your Magic Shield and Magic Shell is halved.\n"
 #define DESC_BOOK_DEVI		"When equipped, this book can be used to freely cast Shadow Copy. Shadow copies created this way are a thrall of the last enemy you've killed.\n"
-#define DESC_BOOK_BURN		"When equipped, your Immolate spell gains 1 additional base power per 20 uncapped hitpoints.\n"
+#define DESC_BOOK_BURN		"When equipped, this book can be used to freely cast Immolate, with power equal to 30%% of your uncapped hitpoints and a base radius of 2. Sources of Leech do not provide healing for Immolate, and instead provide increased damage.\n"
 #define DESC_BOOK_VERD		"When equipped, your Dispel spell loses power less quickly and has no removal limit, but no longer immunizes or inoculates.\n"
 #define DESC_BOOK_MALT		"When equipped, you no longer lose focus.\n"
 #define DESC_BOOK_GRAN		"When equipped, your highest attribute score is increased by 10%%.\n"
@@ -599,7 +599,7 @@ extern char *at_short[];
 #define DESC_FLAGBEAR		"When equipped, this weapon can be used to freely cast Rally, with power equal to your uncapped endurance.\n"
 #define DESC_FROSTGLASS		"When equipped, this shield can be used to cast Slow, with power equal to your total Shield skill modifier.\n"
 #define DESC_PHALANX		"When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 2%% damage reduction per 5 endurance spent.\n"
-#define DESC_RISINGPHO		"When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints, ignoring spell modifier.\n"
+#define DESC_RISINGPHO		"When equipped, this shield can be used to freely cast Immolate, with power equal to 30%% of your uncapped hitpoints and a base radius of 2. Sources of Leech do not provide healing for Immolate, and instead provide increased damage.\n"
 #define DESC_THEWALL		"When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n"
 #define DESC_BARBSWORD		"When equipped, your active melee skills gain an additional 5%% Strength bonus.\n"
 #define DESC_LAMEDARG		"Thine worth shall be proven. %d remain.\n", max(0, REQ_LAME-it[in].data[0])

@@ -2060,9 +2060,10 @@ int get_meta_stat_value(int cn, int n)
 			value = power * DAM_MULT_ZEPHYR/10;
 			break;
 		case 41: // Immolate Degen					Decimal, 0.00 /s
-			power = ch[cn].hp[4] / 3;
-			if (do_get_iflag(cn, SF_BOOK_BURN)) power = power + ch[cn].hp[4]/20;
-			value = power * 3/2;
+			power = ch[cn].hp[4] * 30 / 100;  // 30% uncapped HP as power
+			power = more(power*3, (TC_SK(cn, 34)*15), 1);
+			value = max(100, 100 + power*4);
+			value = do_immol_leech_dam(cn, value) * 20 / 10;
 			break;
 		case 43: case 84: // Ghost Comp Potency
 			power = spell_multiplier(M_SK(cn, SK_GHOST), cn);
@@ -2162,7 +2163,11 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 70: // Haste Effect
 			power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
-			if (T_SORC_SK(cn, 10)) power = less(power, 25, 1);  // (Sorc) Fast Forward
+			if (T_SORC_SK(cn, 10))    // (Sorc) Fast Forward
+			{
+				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
+				power = less(power, 25, 1);
+			}
 			value = min(300,10+(power)/6)+min(127,5+(power+6)/12);
 			break;
 		case 71: // Pact Dmg Taken								Decimal, 0.00 %
@@ -2199,7 +2204,11 @@ int get_meta_stat_value(int cn, int n)
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
 			power = more(power, M_AT(cn, AT_AGL) * TC_SK(cn,1111), 20);  // (Corr) Burden
 			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = more(power, 20, 1);
-			if (T_LYCA_SK(cn,  4)) power = less(power, 25, 1);  // (Lyca) Sickness
+			if (T_LYCA_SK(cn,  4))    // (Lyca) Sickness
+			{
+				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
+				power = less(power, 25, 1);
+			}
 			value = min(127, (power / 4 + 4));
 			break;
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
@@ -2209,7 +2218,11 @@ int get_meta_stat_value(int cn, int n)
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			power = more(power, M_AT(cn, AT_INT) * TC_SK(cn,110), 20);  // (Corr) Famine
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = more(power, 20, 1);
-			if (T_BRAV_SK(cn,  6)) power = less(power, 25, 1);  // (Brav) Presence
+			if (T_BRAV_SK(cn,  6))    // (Brav) Presence
+			{
+				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
+				power = less(power, 25, 1);
+			}
 			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
 			else                                  value = (3 + (power - 4) / 5);
 			break;
@@ -2220,7 +2233,11 @@ int get_meta_stat_value(int cn, int n)
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = more(power, 20, 1);
-			if (T_SORC_SK(cn,  6)) power = less(power, 25, 1);  // (Sorc) Rewind
+			if (T_SORC_SK(cn,  6))    // (Sorc) Rewind
+			{
+				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
+				power = less(power, 25, 1);
+			}
 			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
 			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;

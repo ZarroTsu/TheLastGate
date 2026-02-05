@@ -702,6 +702,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 		case SK_WEAKEN:   if (T_LYCA_SK(cn, 4))                    n = 2 * 100; break;  // (Lyca) Sickness
 		//
 		case SK_HASTE:      n = 4 * 100; break; // Aura only
+		case SK_IMMOLATE2:  n = 2 * 100; break;
 		//
 		case SK_BLIND:      n = 4 * 100; break;
 		case SK_DOUSE:      n = 4 * 100; break;
@@ -5817,7 +5818,6 @@ int spell_immolate(int cn, int co, int power)
 {
 	int in, p = min(20, getrank(cn));
 	
-	if (do_get_iflag(cn, SF_BOOK_BURN)) power = power + ch[cn].hp[4]/20;
 	if (!(in = make_new_buff(cn, SK_IMMOLATE, BUF_SPR_IMMOLATE, power, SP_DUR_PULSE, 0))) 
 		return 0;
 	

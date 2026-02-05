@@ -4202,8 +4202,7 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Immolate power equal to 1/3 of uncapped HP
-			power = ch[cn].hp[4] / 3;
+			power = ch[cn].hp[4] * 30 / 100;  // 30% uncapped HP as power
 			if (has_buff(cn, SK_IMMOLATE))
 			{
 				do_char_log(cn, 1, "Immolate no longer active.\n");

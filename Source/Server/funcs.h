@@ -213,6 +213,7 @@ int do_get_iflag(int cn, int v);
 int do_get_ieffect(int cn, int v);
 void do_update_char(int cn);
 void do_regenerate(int cn);
+int do_immol_leech_dam(int cn, int dam);
 int do_lookup_char_self(char *name, int cn);
 void do_admin_log(int source, char *format, ...);
 void do_imp_log(int font, char *format, ...);

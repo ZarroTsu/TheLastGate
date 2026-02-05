@@ -9356,6 +9356,28 @@ int do_recovery(int cn, int type, int v)
 	return v;
 }
 
+int do_immol_leech_dam(int cn, int dam)
+{
+	int tmp, n;
+	
+	if (!IS_SANECHAR(cn)) return;
+	
+	tmp = 0;
+	if ((n = do_get_ieffect(cn, VF_EN_GORNDOT))) tmp += n;  // [Ench] Gorn
+	if (T_LYCA_SK(cn,  8))                       tmp += 2;  // (Lyca) Gluttony
+	if ((n=TC_SK(cn,104)))                       tmp += n;
+	
+	if ((n = do_get_ieffect(cn, VF_EN_GORNDOT))) tmp += n;  // [Ench] Gorn
+	if (T_WARR_SK(cn, 11))                       tmp += 2;  // (Warr) Perseverance
+	if ((n=TC_SK(cn, 47)))                       tmp += n;
+	
+	if ((n = do_get_ieffect(cn, VF_EN_GORNDOT))) tmp += n;  // [Ench] Gorn
+	if (T_ARHR_SK(cn, 11))                       tmp += 2;  // (ArHr) Perpetuity
+	if ((n=TC_SK(cn, 83)))                       tmp += n;
+	
+	return more(dam, tmp, 1);
+}
+
 void do_leech(int cn, int dam, int is_dot)
 {
 	int tmp, n, cc;
@@ -10781,7 +10803,6 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_BOOK_GREA)) do_set_iflag(cn, SF_BOOK_GREA);
 		if (do_check_items(in, IT_IMBK_GREA)) do_set_iflag(cn, SF_BOOK_GREA);
 		if (do_check_items(in, IT_BOOK_DEVI)) do_set_iflag(cn, SF_BOOK_DEVI);
-		if (do_check_items(in, IT_BOOK_BURN)) do_set_iflag(cn, SF_BOOK_BURN);
 		if (do_check_items(in, IT_BOOK_VERD)) do_set_iflag(cn, SF_BOOK_VERD);
 		if (do_check_items(in, IT_BOOK_MALT)) do_set_iflag(cn, SF_NOFOCUS);
 		if (do_check_items(in, IT_IMBK_MALT)) do_set_iflag(cn, SF_NOFOCUS);
@@ -13008,10 +13029,7 @@ void do_update_spell_immolate(int cn, int in)
 {
 	int power;
 	
-	power = ch[cn].hp[4] * 30 / 100;
-	
-	if (do_get_iflag(cn, SF_BOOK_BURN))
-		power = power + ch[cn].hp[4]/25;
+	power = ch[cn].hp[4] * 30 / 100;  // 30% uncapped HP as power
 	
 	bu[in].power = power;
 }
@@ -13720,7 +13738,13 @@ void do_regenerate(int cn)
 					if ((tmp = do_get_ieffect(cn, VF_EN_LESSDOT)))
 						degendam = degendam * max(25, 100-tmp)/100;
 					
-					if (co) do_leech(co, degendam, 1);
+					if (co)
+					{
+						if (bu[in].temp==SK_IMMOLATE2)
+							degendam = do_immol_leech_dam(co, degendam);
+						else
+							do_leech(co, degendam, 1);
+					}
 					
 					degendam = alter_damage(cn, degendam, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 					if (mp_dam)   ch[cn].a_mana -= mp_dam;
