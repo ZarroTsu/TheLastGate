@@ -2,6 +2,8 @@
 #define NETWORKING_VERSION 0x000E02
 //
 
+#pragma once
+
 #include "common.h"
 EXTERN_C_BEGIN
 

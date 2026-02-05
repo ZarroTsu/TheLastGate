@@ -13,6 +13,7 @@
 #include "mods/use_queue.h"
 #include "ui/option_window.hpp"
 #include "util/math_util.h"
+#include "util/nearest_to_mouse.h"
 
 // Zarro 2020 - Define gui rectangles as arrays - easier to find and change them here (sort of)
 int gui_inv_up[] 	= { 600,   5, 612,  35 };
@@ -69,7 +70,7 @@ int trans_button(int x,int y)
 {
 	int n;
 	int tx,ty;
-	
+
 	// Scroll for Skill List
 	if (	x>gui_skl_up[RECT_X1] 	&& y>gui_skl_up[RECT_Y1] 
 		&&  x<gui_skl_up[RECT_X2] 	&& y<gui_skl_up[RECT_Y2]) return 14;
@@ -1127,9 +1128,9 @@ void mouse_mapbox(int x,int y,int state)
 			}
 			return;
 		}
-
-	mx=mx/32;
-	my=my/32;
+    Vec2 mouse_world_pos = vec2((float)mx / 32.0F, (float)my / 32.0F);
+	mx=(int)mouse_world_pos.x;
+	my=(int)mouse_world_pos.y;
 
         tile_x=-1; tile_y=-1; tile_type=-1;
 	if (mx<dist_diff+3 || mx>screen_renderdist-dist_diff-view_subedges-3) return;
@@ -1171,32 +1172,11 @@ void mouse_mapbox(int x,int y,int state)
 	}
 
 	if (keys==1) {
+	    IVec2 target = {0};
 		if (pl.citem) { hightlight=HL_MAP; cursor_type=CT_DROP; }
-		else if (map[m].flags&ISITEM) ;
-		else if (map[m+1-screen_renderdist].flags&ISITEM) { mx++; my--; }
-		else if (map[m+2-2*screen_renderdist].flags&ISITEM) { mx+=2; my-=2; }
-		else if (map[m+1].flags&ISITEM) { mx++; }
-		else if (map[m+screen_renderdist].flags&ISITEM) { my++; }
-		else if (map[m-1].flags&ISITEM) { mx--; }
-		else if (map[m-screen_renderdist].flags&ISITEM) { my--; }
-		else if (map[m+1+screen_renderdist].flags&ISITEM) { mx++; my++; }
-		else if (map[m-1+screen_renderdist].flags&ISITEM) { mx--; my++; }
-		else if (map[m-1-screen_renderdist].flags&ISITEM) { mx--; my--; }
-		else if (map[m+2].flags&ISITEM) { mx+=2; }
-		else if (map[m+2*screen_renderdist].flags&ISITEM) { my+=2; }
-		else if (map[m-2].flags&ISITEM) { mx-=2; }
-		else if (map[m-2*screen_renderdist].flags&ISITEM) { my-=2; }
-		else if (map[m+1+2*screen_renderdist].flags&ISITEM) { mx++; my+=2; }
-		else if (map[m-1+2*screen_renderdist].flags&ISITEM) { mx--; my+=2; }
-		else if (map[m+1-2*screen_renderdist].flags&ISITEM) { mx++; my-=2; }
-		else if (map[m-1-2*screen_renderdist].flags&ISITEM) { mx--; my-=2; }
-		else if (map[m+2+1*screen_renderdist].flags&ISITEM) { mx+=2; my++; }
-		else if (map[m-2+1*screen_renderdist].flags&ISITEM) { mx-=2; my++; }
-		else if (map[m+2-1*screen_renderdist].flags&ISITEM) { mx+=2; my--; }
-		else if (map[m-2-1*screen_renderdist].flags&ISITEM) { mx-=2; my--; }
-		else if (map[m+2+2*screen_renderdist].flags&ISITEM) { mx+=2; my+=2; }
-		else if (map[m-2+2*screen_renderdist].flags&ISITEM) { mx-=2; my+=2; }
-		else if (map[m-2-2*screen_renderdist].flags&ISITEM) { mx-=2; my-=2; }
+	    else if (find_nearest_item(ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
+	        mx=target.x; my=target.y;
+	    }
 
 		m=mx+my*screen_renderdist;
 		tile_x=mx; tile_y=my;

@@ -89,6 +89,7 @@ add_executable(TheLastGate
         src/ui/ui_utils/imgui_style_builder.cpp
         src/ui/widgets.cpp
         src/util/perf.c
+        src/util/nearest_to_mouse.c
 )
 
 target_precompile_headers(TheLastGate PRIVATE
