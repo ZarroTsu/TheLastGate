@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.10.0](https://github.com/jamesblack/TheLastGate/compare/v3.9.0...v3.10.0) (2026-02-05)
+
+
+### Features
+
+* Use actual "nearest mouse" for finding interactibles. ([5417826](https://github.com/jamesblack/TheLastGate/commit/54178260c417e95975a41fc677957a7f8485975a))
+
+
+### Miscellaneous Chores
+
+* bump version ([d967d6e](https://github.com/jamesblack/TheLastGate/commit/d967d6ec942027d07e6c7486ae0da48c00ccd7ee))
+
 ## [3.9.0](https://github.com/jamesblack/TheLastGate/compare/v3.8.0...v3.9.0) (2026-01-20)
 
 
