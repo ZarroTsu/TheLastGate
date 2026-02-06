@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.11.0](https://github.com/jamesblack/TheLastGate/compare/v3.10.0...v3.11.0) (2026-02-06)
+
+
+### Bug Fixes
+
+* include all forms of targetting in new "nearest mouse" ([5c38584](https://github.com/jamesblack/TheLastGate/commit/5c38584fd30e937ec84c1417ec881216c1c5bb08))
+
+
+### Miscellaneous Chores
+
+* bump version ([465d58f](https://github.com/jamesblack/TheLastGate/commit/465d58fcac5aaa672f5766328f982088ba1d599b))
+
 ## [3.10.0](https://github.com/jamesblack/TheLastGate/compare/v3.9.0...v3.10.0) (2026-02-05)
 
 
