@@ -1171,10 +1171,10 @@ void mouse_mapbox(int x,int y,int state)
 		return;
 	}
 
+    IVec2 target = {0};
 	if (keys==1) {
-	    IVec2 target = {0};
 		if (pl.citem) { hightlight=HL_MAP; cursor_type=CT_DROP; }
-	    else if (find_nearest_item(ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
+	    else if (find_nearest(ISITEM, ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
 	        mx=target.x; my=target.y;
 	    }
 
@@ -1213,30 +1213,11 @@ void mouse_mapbox(int x,int y,int state)
 
 	if (keys==2) {
 		if (map[m].flags&ISCHAR) hightlight=HL_MAP;
-		else if (map[m+1-screen_renderdist].flags&ISCHAR) { mx++; my--; hightlight=HL_MAP; }
-		else if (map[m+2-2*screen_renderdist].flags&ISCHAR) { mx+=2; my-=2; hightlight=HL_MAP; }
-		else if (map[m+1].flags&ISCHAR) { mx++; hightlight=HL_MAP; }
-		else if (map[m+screen_renderdist].flags&ISCHAR) { my++; hightlight=HL_MAP; }
-		else if (map[m-1].flags&ISCHAR) { mx--; hightlight=HL_MAP; }
-		else if (map[m-screen_renderdist].flags&ISCHAR) { my--; hightlight=HL_MAP; }
-		else if (map[m+1+screen_renderdist].flags&ISCHAR) { mx++; my++; hightlight=HL_MAP; }
-		else if (map[m-1+screen_renderdist].flags&ISCHAR) { mx--; my++; hightlight=HL_MAP; }
-		else if (map[m-1-screen_renderdist].flags&ISCHAR) { mx--; my--; hightlight=HL_MAP; }
-		else if (map[m+2].flags&ISCHAR) { mx+=2; hightlight=HL_MAP; }
-		else if (map[m+2*screen_renderdist].flags&ISCHAR) { my+=2; hightlight=HL_MAP; }
-		else if (map[m-2].flags&ISCHAR) { mx-=2; hightlight=HL_MAP; }
-		else if (map[m-2*screen_renderdist].flags&ISCHAR) { my-=2; hightlight=HL_MAP; }
-		else if (map[m+1+2*screen_renderdist].flags&ISCHAR) { mx++; my+=2; hightlight=HL_MAP; }
-		else if (map[m-1+2*screen_renderdist].flags&ISCHAR) { mx--; my+=2; hightlight=HL_MAP; }
-		else if (map[m+1-2*screen_renderdist].flags&ISCHAR) { mx++; my-=2; hightlight=HL_MAP; }
-		else if (map[m-1-2*screen_renderdist].flags&ISCHAR) { mx--; my-=2; hightlight=HL_MAP; }
-		else if (map[m+2+1*screen_renderdist].flags&ISCHAR) { mx+=2; my++; hightlight=HL_MAP; }
-		else if (map[m-2+1*screen_renderdist].flags&ISCHAR) { mx-=2; my++; hightlight=HL_MAP; }
-		else if (map[m+2-1*screen_renderdist].flags&ISCHAR) { mx+=2; my--; hightlight=HL_MAP; }
-		else if (map[m-2-1*screen_renderdist].flags&ISCHAR) { mx-=2; my--; hightlight=HL_MAP; }
-		else if (map[m+2+2*screen_renderdist].flags&ISCHAR) { mx+=2; my+=2; hightlight=HL_MAP; }
-		else if (map[m-2+2*screen_renderdist].flags&ISCHAR) { mx-=2; my+=2; hightlight=HL_MAP; }
-		else if (map[m-2-2*screen_renderdist].flags&ISCHAR) { mx-=2; my-=2; hightlight=HL_MAP; }
+		else if (find_nearest(ISCHAR, ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
+		    mx = target.x;
+		    my = target.y;
+		    hightlight=HL_MAP;
+		}
 
 		m=mx+my*screen_renderdist;
 		tile_x=mx; tile_y=my;
@@ -1257,30 +1238,11 @@ void mouse_mapbox(int x,int y,int state)
 	if (keys == 3) {
 		if (g_config.gameplay.give_more && pl.citem) {
 			if (map[m].flags&ISCHAR) hightlight=HL_MAP;
-			else if (map[m+1-screen_renderdist].flags&ISCHAR) { mx++; my--; hightlight=HL_MAP; }
-			else if (map[m+2-2*screen_renderdist].flags&ISCHAR) { mx+=2; my-=2; hightlight=HL_MAP; }
-			else if (map[m+1].flags&ISCHAR) { mx++; hightlight=HL_MAP; }
-			else if (map[m+screen_renderdist].flags&ISCHAR) { my++; hightlight=HL_MAP; }
-			else if (map[m-1].flags&ISCHAR) { mx--; hightlight=HL_MAP; }
-			else if (map[m-screen_renderdist].flags&ISCHAR) { my--; hightlight=HL_MAP; }
-			else if (map[m+1+screen_renderdist].flags&ISCHAR) { mx++; my++; hightlight=HL_MAP; }
-			else if (map[m-1+screen_renderdist].flags&ISCHAR) { mx--; my++; hightlight=HL_MAP; }
-			else if (map[m-1-screen_renderdist].flags&ISCHAR) { mx--; my--; hightlight=HL_MAP; }
-			else if (map[m+2].flags&ISCHAR) { mx+=2; hightlight=HL_MAP; }
-			else if (map[m+2*screen_renderdist].flags&ISCHAR) { my+=2; hightlight=HL_MAP; }
-			else if (map[m-2].flags&ISCHAR) { mx-=2; hightlight=HL_MAP; }
-			else if (map[m-2*screen_renderdist].flags&ISCHAR) { my-=2; hightlight=HL_MAP; }
-			else if (map[m+1+2*screen_renderdist].flags&ISCHAR) { mx++; my+=2; hightlight=HL_MAP; }
-			else if (map[m-1+2*screen_renderdist].flags&ISCHAR) { mx--; my+=2; hightlight=HL_MAP; }
-			else if (map[m+1-2*screen_renderdist].flags&ISCHAR) { mx++; my-=2; hightlight=HL_MAP; }
-			else if (map[m-1-2*screen_renderdist].flags&ISCHAR) { mx--; my-=2; hightlight=HL_MAP; }
-			else if (map[m+2+1*screen_renderdist].flags&ISCHAR) { mx+=2; my++; hightlight=HL_MAP; }
-			else if (map[m-2+1*screen_renderdist].flags&ISCHAR) { mx-=2; my++; hightlight=HL_MAP; }
-			else if (map[m+2-1*screen_renderdist].flags&ISCHAR) { mx+=2; my--; hightlight=HL_MAP; }
-			else if (map[m-2-1*screen_renderdist].flags&ISCHAR) { mx-=2; my--; hightlight=HL_MAP; }
-			else if (map[m+2+2*screen_renderdist].flags&ISCHAR) { mx+=2; my+=2; hightlight=HL_MAP; }
-			else if (map[m-2+2*screen_renderdist].flags&ISCHAR) { mx-=2; my+=2; hightlight=HL_MAP; }
-			else if (map[m-2-2*screen_renderdist].flags&ISCHAR) { mx-=2; my-=2; hightlight=HL_MAP; }
+			else if (find_nearest(ISCHAR, ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
+			    mx = target.x;
+			    my = target.y;
+			    hightlight=HL_MAP;
+			}
 
 			m=mx+my*screen_renderdist;
 			tile_x=mx; tile_y=my;
@@ -1299,31 +1261,10 @@ void mouse_mapbox(int x,int y,int state)
 			}
 		} else if (g_config.gameplay.use_queue) {
 			if (pl.citem) { hightlight=HL_MAP; cursor_type=CT_DROP; }
-			else if (map[m].flags&ISITEM) ;
-			else if (map[m+1-screen_renderdist].flags&ISITEM) { mx++; my--; }
-			else if (map[m+2-2*screen_renderdist].flags&ISITEM) { mx+=2; my-=2; }
-			else if (map[m+1].flags&ISITEM) { mx++; }
-			else if (map[m+screen_renderdist].flags&ISITEM) { my++; }
-			else if (map[m-1].flags&ISITEM) { mx--; }
-			else if (map[m-screen_renderdist].flags&ISITEM) { my--; }
-			else if (map[m+1+screen_renderdist].flags&ISITEM) { mx++; my++; }
-			else if (map[m-1+screen_renderdist].flags&ISITEM) { mx--; my++; }
-			else if (map[m-1-screen_renderdist].flags&ISITEM) { mx--; my--; }
-			else if (map[m+2].flags&ISITEM) { mx+=2; }
-			else if (map[m+2*screen_renderdist].flags&ISITEM) { my+=2; }
-			else if (map[m-2].flags&ISITEM) { mx-=2; }
-			else if (map[m-2*screen_renderdist].flags&ISITEM) { my-=2; }
-			else if (map[m+1+2*screen_renderdist].flags&ISITEM) { mx++; my+=2; }
-			else if (map[m-1+2*screen_renderdist].flags&ISITEM) { mx--; my+=2; }
-			else if (map[m+1-2*screen_renderdist].flags&ISITEM) { mx++; my-=2; }
-			else if (map[m-1-2*screen_renderdist].flags&ISITEM) { mx--; my-=2; }
-			else if (map[m+2+1*screen_renderdist].flags&ISITEM) { mx+=2; my++; }
-			else if (map[m-2+1*screen_renderdist].flags&ISITEM) { mx-=2; my++; }
-			else if (map[m+2-1*screen_renderdist].flags&ISITEM) { mx+=2; my--; }
-			else if (map[m-2-1*screen_renderdist].flags&ISITEM) { mx-=2; my--; }
-			else if (map[m+2+2*screen_renderdist].flags&ISITEM) { mx+=2; my+=2; }
-			else if (map[m-2+2*screen_renderdist].flags&ISITEM) { mx-=2; my+=2; }
-			else if (map[m-2-2*screen_renderdist].flags&ISITEM) { mx-=2; my-=2; }
+			else if (find_nearest(ISITEM, ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
+			    mx = target.x;
+			    my = target.y;
+			}
 
 			m=mx+my*screen_renderdist;
 			tile_x=mx; tile_y=my;
@@ -1349,30 +1290,11 @@ void mouse_mapbox(int x,int y,int state)
 
 	if (keys==4) {
 		if (map[m].flags&ISCHAR) hightlight=HL_MAP;
-		else if (map[m+1-screen_renderdist].flags&ISCHAR) { mx++; my--; hightlight=HL_MAP; }
-		else if (map[m+2-2*screen_renderdist].flags&ISCHAR) { mx+=2; my-=2; hightlight=HL_MAP; }
-		else if (map[m+1].flags&ISCHAR) { mx++; hightlight=HL_MAP; }
-		else if (map[m+screen_renderdist].flags&ISCHAR) { my++; hightlight=HL_MAP; }
-		else if (map[m-1].flags&ISCHAR) { mx--; hightlight=HL_MAP; }
-		else if (map[m-screen_renderdist].flags&ISCHAR) { my--; hightlight=HL_MAP; }
-		else if (map[m+1+screen_renderdist].flags&ISCHAR) { mx++; my++; hightlight=HL_MAP; }
-		else if (map[m-1+screen_renderdist].flags&ISCHAR) { mx--; my++; hightlight=HL_MAP; }
-		else if (map[m-1-screen_renderdist].flags&ISCHAR) { mx--; my--; hightlight=HL_MAP; }
-		else if (map[m+2].flags&ISCHAR) { mx+=2; hightlight=HL_MAP; }
-		else if (map[m+2*screen_renderdist].flags&ISCHAR) { my+=2; hightlight=HL_MAP; }
-		else if (map[m-2].flags&ISCHAR) { mx-=2; hightlight=HL_MAP; }
-		else if (map[m-2*screen_renderdist].flags&ISCHAR) { my-=2; hightlight=HL_MAP; }
-		else if (map[m+1+2*screen_renderdist].flags&ISCHAR) { mx++; my+=2; hightlight=HL_MAP; }
-		else if (map[m-1+2*screen_renderdist].flags&ISCHAR) { mx--; my+=2; hightlight=HL_MAP; }
-		else if (map[m+1-2*screen_renderdist].flags&ISCHAR) { mx++; my-=2; hightlight=HL_MAP; }
-		else if (map[m-1-2*screen_renderdist].flags&ISCHAR) { mx--; my-=2; hightlight=HL_MAP; }
-		else if (map[m+2+1*screen_renderdist].flags&ISCHAR) { mx+=2; my++; hightlight=HL_MAP; }
-		else if (map[m-2+1*screen_renderdist].flags&ISCHAR) { mx-=2; my++; hightlight=HL_MAP; }
-		else if (map[m+2-1*screen_renderdist].flags&ISCHAR) { mx+=2; my--; hightlight=HL_MAP; }
-		else if (map[m-2-1*screen_renderdist].flags&ISCHAR) { mx-=2; my--; hightlight=HL_MAP; }
-		else if (map[m+2+2*screen_renderdist].flags&ISCHAR) { mx+=2; my+=2; hightlight=HL_MAP; }
-		else if (map[m-2+2*screen_renderdist].flags&ISCHAR) { mx-=2; my+=2; hightlight=HL_MAP; }
-		else if (map[m-2-2*screen_renderdist].flags&ISCHAR) { mx-=2; my-=2; hightlight=HL_MAP; }
+		else if (find_nearest(ISCHAR, ivec2(mx, my), mouse_world_pos, RENDERDIST, map, &target)) {
+		    mx = target.x;
+		    my = target.y;
+		    hightlight=HL_MAP;
+		}
 
 		m=mx+my*screen_renderdist;
 		tile_x=mx; tile_y=my;

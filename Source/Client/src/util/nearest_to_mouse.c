@@ -6,8 +6,8 @@
 
 #include <stdbool.h>
 
-int find_nearest_item(IVec2 tile_pos, Vec2 mouse_world_pos, int screen_render_distance, struct cmap *map,
-                      IVec2 *out_pos) {
+int find_nearest(unsigned int type, IVec2 tile_pos, Vec2 mouse_world_pos, int screen_render_distance,
+                 struct cmap *map, IVec2 *out_pos) {
     const Offset *rings[] = {ring0, ring1, ring2};
     const int ring_sizes[] = {
         (int) (sizeof(ring0) / sizeof(ring0[0])),
@@ -24,7 +24,7 @@ int find_nearest_item(IVec2 tile_pos, Vec2 mouse_world_pos, int screen_render_di
         for (int i = 0; i < ring_sizes[ring]; i++) {
             int tile_x = tile_pos.x + rings[ring][i].dx;
             int tile_y = tile_pos.y + rings[ring][i].dy;
-            if (!(MAP_AT(tile_x, tile_y).flags & ISITEM)) continue;
+            if (!(MAP_AT(tile_x, tile_y).flags & type)) continue;
 
             float distance_x = ((float)tile_x + 0.5F) - mouse_world_pos.x;
             float distance_y = ((float)tile_y + 0.5F) - mouse_world_pos.y;

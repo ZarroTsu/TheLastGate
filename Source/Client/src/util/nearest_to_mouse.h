@@ -28,4 +28,4 @@ static const Offset ring2[] = {
 
 #define MAP_AT(x, y) (map[((y) * screen_render_distance) + (x)])
 
-extern int find_nearest_item(IVec2 tile_pos, Vec2 mouse_world_pos, int screen_render_distance, struct cmap *map, IVec2 *out_pos);
+extern int find_nearest(unsigned int type, IVec2 tile_pos, Vec2 mouse_world_pos, int screen_render_distance, struct cmap *map, IVec2 *out_pos);
