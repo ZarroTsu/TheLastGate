@@ -26,8 +26,9 @@
 // data[22] current state
 // data[23] timer for staying at home (state 0)
 // data[24] timer for moving slowly
+// data[29] timer for fighting back
 
-// data[29] to data[41] are safe to use:
+// data[30] to data[41] are safe to use:
 
 // data[30] to data[34] contain any members of the same group who got attacked last turn
 // data[35] to data[39] timer for above
@@ -112,9 +113,13 @@ int npc_stunrun_add_seen(int cn, int co)
 int npc_stunrun_gotattack(int cn, int co)
 {
 	npc_stunrun_add_seen(cn, co);
-
+	
 	ch[cn].data[20] = co;
-
+	ch[cn].data[21] = globs->ticker;           // Begin Fightback
+	
+	if (!ch[cn].data[29])
+		ch[cn].data[29] = globs->ticker+TICKS*10;  // End Fightback
+	
 	return 1;
 }
 
@@ -165,10 +170,8 @@ int npc_stunrun_see(int cn, int co)
 {
 	int cc;
 	
-	if (!do_char_can_see(cn, co, 0))
-	{
-		return 1;                     // processed it: we cannot see him, so ignore him
-	}
+	if (!do_char_can_see(cn, co, 0)) return 1; // we cannot see, so ignore
+	
 	npc_stunrun_add_seen(cn, co);
 	
 	// if we're taunted, try to attack the taunter
@@ -187,6 +190,10 @@ int npc_stunrun_see(int cn, int co)
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
+		ch[cn].data[20] = cc;
+		ch[cn].data[21] = globs->ticker;           // Begin Fightback
+		if (!ch[cn].data[29])
+			ch[cn].data[29] = globs->ticker+TICKS*10;  // End Fightback
 		ch[cn].data[58] = 2;
 		return 1;
 	}
@@ -196,41 +203,26 @@ int npc_stunrun_see(int cn, int co)
 
 int npc_stunrun_msg(int cn, int type, int dat1, int dat2, int dat3, int dat4)
 {
-	switch(type)
+	switch (type)
 	{
-	case    NT_GOTHIT:
-		return( npc_stunrun_gotattack(cn, dat1));
-	case    NT_GOTMISS:
-		return( npc_stunrun_gotattack(cn, dat1));
-	case    NT_DIDHIT:
-		return 0;
-	case    NT_DIDMISS:
-		return 0;
-	case    NT_DIDKILL:
-		return 0;
-	case    NT_GOTEXP:
-		return 0;
-	case    NT_SEEKILL:
-		return 0;
-	case    NT_SEEHIT:
-		return( npc_stunrun_seeattack(cn, dat1, dat2));
-	case    NT_SEEMISS:
-		return( npc_stunrun_seeattack(cn, dat1, dat2));
-	case    NT_GIVE:
-		return 0;
-	case    NT_SEE:
-		return( npc_stunrun_see(cn, dat1));
-	case    NT_DIED:
-		return 0;
-	case    NT_SHOUT:
-		return 0;
-	case    NT_HITME:
-		return 0;
-
-	default:
-		xlog("Unknown NPC message for %d (%s): %d",
-		     cn, ch[cn].name, type);
-		return 0;
+		case NT_GOTHIT:  return npc_stunrun_gotattack(cn, dat1);
+		case NT_GOTMISS: return npc_stunrun_gotattack(cn, dat1);
+		case NT_DIDHIT:  return 0;
+		case NT_DIDMISS: return 0;
+		case NT_DIDKILL: return 0;
+		case NT_GOTEXP:  return 0;
+		case NT_SEEKILL: return 0;
+		case NT_SEEHIT:  return npc_stunrun_seeattack(cn, dat1, dat2);
+		case NT_SEEMISS: return npc_stunrun_seeattack(cn, dat1, dat2);
+		case NT_GIVE:    return 0;
+		case NT_SEE:     return npc_stunrun_see(cn, dat1);
+		case NT_DIED:    return 0;
+		case NT_SHOUT:   return 0;
+		case NT_HITME:   return 0;
+		
+		default:
+			xlog("Unknown NPC message for %d (%s): %d", cn, ch[cn].name, type);
+			return 0;
 	}
 }
 
@@ -309,22 +301,20 @@ struct seen
 	int help;
 };
 
-//}
 int npc_stunrun_high(int cn)
 {
+	int x, y, xt1, yt1, xt2, yt2, xt3, yt3, xt4, yt4, xt5, yt5, keyitem;
 	int n, co, maxseen = 0, m, tmp, done = 0, in, sgr = 0;
 	struct seen seen[2][30]; // ** Added [2] here with sgr above, in an attempt to distinguish between grolmy and seagrolmy. idk why this would happen though.
-	int flee = 0;                             // should we flee?
-	int help = 0;                             // should we help someone?
-	int stun = 0;                             // should we stun someone?
-	int up = 0, down = 0, left = 0, right = 0;         // directions to move in
+	int flee = 0;                              // should we flee?
+	int help = 0;                              // should we help someone?
+	int stun = 0;                              // should we stun someone?
+	int up = 0, down = 0, left = 0, right = 0; // directions to move in
 
 	ch[cn].data[92] = TICKS * 60;
 	
 	if (ch[cn].data[26]==15) sgr = 1;
 	
-	//{
-
 	for (n = 0; n<20; n++)
 	{
 		if ((co = ch[cn].data[n]) && IS_SANECHAR(co))
@@ -403,7 +393,7 @@ int npc_stunrun_high(int cn)
 		}
 	}
 
-	if ((co = ch[cn].data[20]) && IS_SANECHAR(co))
+	if ((co = ch[cn].data[20]) && IS_SANECHAR(co) && globs->ticker > ch[cn].data[29])
 	{
 		flee += 5; // we dont like infights, try to flee if attacked
 		for (m = 0; m<maxseen; m++)
@@ -448,91 +438,45 @@ int npc_stunrun_high(int cn)
 		help -= 3;
 		flee++;
 	}
-
-//	do_sayx(cn,"-- flee=%d, help=%d, stun=%d ---------",flee,help,stun);
-	/* for (n=0; n<maxseen; n++) {
-	        do_sayx(cn,"%s: dist=%d, friend=%d, stun=%d, help=%d",
-	                ch[seen[sgr][n].co].reference,
-	                seen[sgr][n].dist,
-	                seen[sgr][n].friend,
-	                seen[sgr][n].stun,
-	                seen[sgr][n].help);
-	   } */
-
+	
 	// reset former orders
-	ch[cn].use_nr = 0;
-	ch[cn].skill_nr  = 0;
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
-	ch[cn].goto_y = 0;
+	ch[cn].use_nr      = 0;
+	ch[cn].skill_nr    = 0;
+	ch[cn].goto_x      = 0;
+	ch[cn].goto_y      = 0;
 	ch[cn].misc_action = 0;
-	ch[cn].cerrno = 0;
+	ch[cn].cerrno      = 0;
+	
+	if (globs->ticker > ch[cn].data[29])
+		ch[cn].attack_cn = 0;
 
-	if (ch[cn].a_hp<ch[cn].hp[5] * 600)
-	{
-		flee += 5;
-	}
-
+	if (ch[cn].a_hp<ch[cn].hp[5] * 600) flee += 5;
+	
 	if (!done && ch[cn].a_hp<ch[cn].hp[5] * 600)
-	{
 		done = npc_try_spell(cn, cn, SK_HEAL);
-	}
-
-	if (ch[cn].a_end>15000)
-	{
-		ch[cn].mode = 1;
-	}
-	else
-	{
-		ch[cn].mode = 0;
-	}
-
+	
+	if (ch[cn].a_end>15000) ch[cn].mode = 1;
+	else                    ch[cn].mode = 0;
+	
 	if (!done && flee>1 && flee>=help && flee>=stun && !ch[cn].taunted)
 	{
-		if (ch[cn].a_end>15000)
-		{
-			ch[cn].mode = 2;
-		}
-		else
-		{
-			ch[cn].mode = 1;
-		}
-
+		if (ch[cn].a_end>15000) ch[cn].mode = 2;
+		else                    ch[cn].mode = 1;
+		
 		for (n = 0; n<maxseen; n++)
 		{
 			if (!seen[sgr][n].friend)
 			{
-				if (seen[sgr][n].dist<6)
-				{
-					tmp = -2000;
-				}
-				else
-				{
-					tmp = -1000;
-				}
-			}
-			else
-			{
-				tmp = 150;
-			}
-
+				if (seen[sgr][n].dist<6) tmp = -2000;
+				else                     tmp = -1000;
+			} else                       tmp =   150;
+			
 			co = seen[sgr][n].co;
-			if (ch[co].x>ch[cn].x)
-			{
-				right += tmp / (ch[co].x - ch[cn].x);
-			}
-			if (ch[co].x<ch[cn].x)
-			{
-				left += tmp / (ch[cn].x - ch[co].x);
-			}
-			if (ch[co].y>ch[cn].y)
-			{
-				down += tmp / (ch[co].y - ch[cn].y);
-			}
-			if (ch[co].y<ch[cn].y)
-			{
-				up += tmp / (ch[cn].y - ch[co].y);
-			}
+			
+			if (ch[co].x>ch[cn].x) right += tmp / (ch[co].x - ch[cn].x);
+			if (ch[co].x<ch[cn].x) left += tmp / (ch[cn].x - ch[co].x);
+			if (ch[co].y>ch[cn].y) down += tmp / (ch[co].y - ch[cn].y);
+			if (ch[co].y<ch[cn].y) up += tmp / (ch[cn].y - ch[co].y);
 		}
 
 		// check if up is free space
@@ -606,29 +550,14 @@ int npc_stunrun_high(int cn)
 				}
 			}
 		}
-
-		if (ch[cn].dir==DX_UP)
-		{
-			up += 20;
-		}
-		if (ch[cn].dir==DX_DOWN)
-		{
-			down += 20;
-		}
-		if (ch[cn].dir==DX_LEFT)
-		{
-			left += 20;
-		}
-		if (ch[cn].dir==DX_RIGHT)
-		{
-			right += 20;
-		}
-
-		//do_sayx(cn,"up=%d, down=%d, left=%d, right=%d",up,down,left,right);
-
+		
+		if (ch[cn].dir==DX_UP) up += 20;
+		if (ch[cn].dir==DX_DOWN) down += 20;
+		if (ch[cn].dir==DX_LEFT) left += 20;
+		if (ch[cn].dir==DX_RIGHT) right += 20;
+		
 		if (!done && up>=down && up>=left && up>=right)
 		{
-			//do_sayx(cn,"Would flee up.");
 			if (npc_check_target(ch[cn].x, ch[cn].y - 1))
 			{
 				ch[cn].goto_x = ch[cn].x;
@@ -648,10 +577,9 @@ int npc_stunrun_high(int cn)
 				done = 1;
 			}
 		}
-
+		
 		if (!done && down>=up && down>=left && down>=right)
 		{
-			//do_sayx(cn,"Would flee down.");
 			if (npc_check_target(ch[cn].x, ch[cn].y + 1))
 			{
 				ch[cn].goto_x = ch[cn].x;
@@ -671,10 +599,9 @@ int npc_stunrun_high(int cn)
 				done = 1;
 			}
 		}
-
+		
 		if (!done && left>=up && left>=down && left>=right)
 		{
-			//do_sayx(cn,"Would flee left.");
 			if (npc_check_target(ch[cn].x - 1, ch[cn].y))
 			{
 				ch[cn].goto_x = ch[cn].x - 1;
@@ -694,10 +621,9 @@ int npc_stunrun_high(int cn)
 				done = 1;
 			}
 		}
-
+		
 		if (!done && right>=up && right>=down && right>=left)
 		{
-			//do_sayx(cn,"Would flee right.");
 			if (npc_check_target(ch[cn].x + 1, ch[cn].y))
 			{
 				ch[cn].goto_x = ch[cn].x + 1;
@@ -717,10 +643,9 @@ int npc_stunrun_high(int cn)
 				done = 1;
 			}
 		}
-
+		
 		if (!done)
 		{
-			//do_sayx(cn,"Would Panic!");
 			if ((co = ch[cn].data[20]))
 			{
 				ch[cn].attack_cn = co;
@@ -729,25 +654,15 @@ int npc_stunrun_high(int cn)
 			}
 		}
 	}
-
-	if (!done)
-	{
-		done = npc_try_spell(cn, cn, SK_BLESS);
-	}
-	if (!done)
-	{
-		done = npc_try_spell(cn, cn, SK_MSHIELD);
-	}
-	if (!done)
-	{
-		done = npc_try_spell(cn, cn, SK_PROTECT);
-	}
-	if (!done)
-	{
-		done = npc_try_spell(cn, cn, SK_ENHANCE);
-	}
-
-
+	
+	if (!done) done = npc_try_spell(cn, cn, SK_BLESS);
+	if (!done) done = npc_try_spell(cn, cn, SK_MSHIELD);
+	if (!done) done = npc_try_spell(cn, cn, SK_PROTECT);
+	if (!done) done = npc_try_spell(cn, cn, SK_ENHANCE);
+	
+	if (!done && (co = ch[cn].data[20]))
+		done = npc_spell_routine_debuffs(cn, co);
+	
 	if (!done && stun>1 && stun>=help)
 	{
 		for (m = n = tmp = 0; n<maxseen; n++)
@@ -761,10 +676,8 @@ int npc_stunrun_high(int cn)
 		if (tmp>0)
 		{
 			done = npc_try_spell(cn, seen[sgr][m].co, SK_SLOW);
-			if (!done)
-			{
-				done = npc_try_spell(cn, seen[sgr][m].co, SK_CURSE);
-			}
+			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_CURSE);
+			
 			ch[cn].data[24] = globs->ticker;
 		}
 	}
@@ -784,32 +697,16 @@ int npc_stunrun_high(int cn)
 		}
 		if (tmp>0)
 		{
-			if (ch[seen[sgr][m].co].a_hp<ch[seen[sgr][m].co].hp[5] * 400)
-			{
-				done = npc_try_spell(cn, seen[sgr][m].co, SK_HEAL);
-			}
-			if (!done)
-			{
-				done = npc_try_spell(cn, seen[sgr][m].co, SK_BLESS);
-			}
-			if (!done)
-			{
-				done = npc_try_spell(cn, seen[sgr][m].co, SK_PROTECT);
-			}
-			if (!done)
-			{
-				done = npc_try_spell(cn, seen[sgr][m].co, SK_ENHANCE);
-			}
+			if (ch[seen[sgr][m].co].a_hp<ch[seen[sgr][m].co].hp[5]*400) done = npc_try_spell(cn, seen[sgr][m].co, SK_HEAL);
+			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_BLESS);
+			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_PROTECT);
+			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_ENHANCE);
 			ch[cn].data[24] = globs->ticker;
 		}
 	}
-
-//}
-
+	
 	if (!done)
 	{
-		int x, y, xt1, yt1, xt2, yt2, xt3, yt3, xt4, yt4, xt5, yt5, keyitem;
-		
 		if (ch[cn].data[26]==15) // Seagrel
 		{
 			xt1 = SEAGROLMY_X_1; yt1 = SEAGROLMY_Y_1;
@@ -829,37 +726,29 @@ int npc_stunrun_high(int cn)
 			keyitem = 718;
 		}
 		
-		if (ch[cn].data[22]==0)         // staying at home
+		if (ch[cn].data[22]==0)  // staying at home
 		{
 			if ((in = ch[cn].citem))
 			{
 				ch[cn].citem = 0;
 				it[in].used  = USE_EMPTY;
 			}
-			if (ch[cn].data[23]==0)
-			{
-				ch[cn].data[23] = globs->ticker;                // init
-			}
+			
+			if (ch[cn].data[23]==0) ch[cn].data[23] = globs->ticker;  // init
+			
 			if (ch[cn].data[23] + TICKS * 60 * 20 < globs->ticker)
 			{
-				for (y = yt1, tmp = 0; y<=yt2 && !tmp; y++)
+				for (y = yt1, tmp = 0; y<=yt2 && !tmp; y++) for (x = xt1; x<=xt2 && !tmp; x++)
 				{
-					for (x = xt1; x<=xt2 && !tmp; x++)
-					{
-						if ((co = map[x + y * MAPX].ch) && ch[co].data[CHD_GROUP]!=ch[cn].data[CHD_GROUP])
-						{
-							tmp = 1;
-						}
-					}
+					if ((co = map[x + y * MAPX].ch) && ch[co].data[CHD_GROUP]!=ch[cn].data[CHD_GROUP]) tmp = 1;
 				}
-				if (!tmp)
-				{
-					ch[cn].data[22] = 1; // set state for moving towards entry
-				}
+				
+				if (!tmp) ch[cn].data[22] = 1;  // set state for moving towards entry
+				
 				ch[cn].data[23] = globs->ticker;
 			}
 		}
-		if (ch[cn].data[22]==1 && globs->ticker>ch[cn].data[24] + TICKS * 10)       // moving towards entry
+		if (ch[cn].data[22]==1 && globs->ticker>ch[cn].data[24] + TICKS * 10)  // moving towards entry
 		{
 			if (!ch[cn].citem)
 			{
@@ -894,7 +783,7 @@ int npc_stunrun_high(int cn)
 				}
 			}
 		}
-		if (ch[cn].data[22]==2)         // moving towards home
+		if (ch[cn].data[22]==2)  // moving towards home
 		{
 			if (abs(ch[cn].x - xt5) + abs(ch[cn].y - yt5)<3)
 			{
@@ -909,27 +798,24 @@ int npc_stunrun_high(int cn)
 			}
 		}
 	}
-
-//	do_sayx(cn,"state=%d",ch[cn].data[22]);
-
+	
 	for (n = 0; n<20; n++)
 	{
-		if (ch[cn].data[n + 50] + TICKS * 2<globs->ticker)
-		{
-			ch[cn].data[n] = 0;                                     // erase all chars we saw
-		}
+		if (ch[cn].data[n+50]+TICKS*2 < globs->ticker) ch[cn].data[n] = 0;  // erase all chars we saw
 	}
+	
 	for (n = 30; n<35; n++)
 	{
-		if (ch[cn].data[n + 5] + TICKS * 2<globs->ticker)
-		{
-			ch[cn].data[n] = 0;                                     // erase all fellows that got hit
-		}
+		if (ch[cn].data[n+5]+TICKS*2 < globs->ticker) ch[cn].data[n] = 0;  // erase all fellows that got hit
 	}
-	if (ch[cn].data[21] + TICKS * 2<globs->ticker)
+	
+	if (ch[cn].data[21]+TICKS*2 < globs->ticker) ch[cn].data[20] = 0;  // forget who hit us
+	if (ch[cn].data[29]+TICKS*2 < globs->ticker)
 	{
-		ch[cn].data[20] = 0;                                            // forget who hit us
+		ch[cn].data[20] = 0;  // forget who hit us
+		ch[cn].data[29] = 0;
 	}
+	
 	return 0;
 }
 

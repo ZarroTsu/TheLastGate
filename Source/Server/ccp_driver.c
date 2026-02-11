@@ -352,26 +352,7 @@ void ccp_driver(int cn)
 
 	if (ch[cn].a_mana>1000 * 30) // always keep 15 mana for recall
 	{
-		if (ch[cn].a_hp<ch[cn].hp[5] * 750 && npc_try_spell(cn, cn, SK_HEAL))
-		{
-			return;
-		}
-		if (npc_try_spell(cn, cn, SK_PROTECT))
-		{
-			return;
-		}
-		if (npc_try_spell(cn, cn, SK_ENHANCE))
-		{
-			return;
-		}
-		if (npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return;
-		}
-		if (npc_try_spell(cn, cn, SK_MSHIELD))
-		{
-			return;
-		}
+		npc_spell_routine_buffs(cn, 0);
 	}
 
 	// dont fight enemy if no longer visible
@@ -388,40 +369,21 @@ void ccp_driver(int cn)
 		{
 			if (mem->enemy_strength>1)
 			{
-				if (npc_try_spell(cn, co, SK_CURSE))
-				{
-					return;                                 // keep him cursed
-				}
-				if (npc_try_spell(cn, co, SK_SLOW))
-				{
-					return;                                 // and stunned all the time
-				}
+				if (npc_try_spell(cn, co, SK_CURSE)) return;     // keep 'em cursed
+				if (npc_try_spell(cn, co, SK_SLOW)) return;      // and stunned all the time
 				if (mem->enemy_strength>2)
 				{
-					if (npc_try_spell(cn, co, SK_BLAST))
-					{
-						return;                                 // then blast
-					}
+					if (npc_try_spell(cn, co, SK_BLAST)) return; // then blast
 				}
 			}
 		}
 	}
-	if (ch[cn].attack_cn || ch[cn].goto_x || ch[cn].misc_action)
-	{
-		return;                                                      // we're busy
-
-	}
-	if (ch[cn].a_mana<ch[cn].mana[5] * 900)
-	{
-		return;                                                                 // wait for mana regeneration
-	}
-	if (ch[cn].a_hp<ch[cn].hp[5] * 900)
-	{
-		return;                                 // wait for hp regeneration
-
-	}
+	if (ch[cn].attack_cn || ch[cn].goto_x || ch[cn].misc_action) return; // we're busy
+	if (ch[cn].a_mana<ch[cn].mana[5] * 900) return;                      // wait for mana regeneration
+	if (ch[cn].a_hp<ch[cn].hp[5] * 900) return;                          // wait for hp regeneration
+	
 	ccp_sector_score(cn, -1);        // we get bored easily...
-
 	ccp_goto_sector(cn);
+	
 #endif
 }

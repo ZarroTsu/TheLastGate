@@ -187,63 +187,19 @@ int npc_cityattack_high(int cn)
 	// heal if hurt
 	if (ch[cn].a_hp<ch[cn].hp[5] * 600)
 	{
-		if (npc_try_spell(cn, cn, SK_HEAL))
-		{
-			return 1;
-		}
+		if (npc_try_spell(cn, cn, SK_HEAL)) return 1;
 	}
 
 	// generic spell management
 	if (ch[cn].a_mana>ch[cn].mana[5] * 850)
 	{
-		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_PROTECT))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_MSHIELD))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_HASTE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_ENHANCE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
+		npc_spell_routine_buffs(cn, 1);
 	}
 
 	// generic endurance management
-	if (ch[cn].attack_cn && ch[cn].a_end>10000)
-	{
-		if (ch[cn].mode!=2)
-		{
-			ch[cn].mode = 2;
-			do_update_char(cn);
-		}
-	}
-	else if (ch[cn].a_end>10000)
-	{
-		if (ch[cn].mode!=1)
-		{
-			ch[cn].mode = 1;
-			do_update_char(cn);
-		}
-	}
-	else if (ch[cn].mode!=0)
-	{
-		ch[cn].mode = 0;
-		do_update_char(cn);
-	}
+	if (ch[cn].attack_cn && ch[cn].a_end>10000 && ch[cn].mode!=2) { ch[cn].mode = 2; do_update_char(cn); }
+	else if (ch[cn].a_end>10000 && ch[cn].mode!=1)                { ch[cn].mode = 1; do_update_char(cn); }
+	else if (ch[cn].mode!=0)                                      { ch[cn].mode = 0; do_update_char(cn); }
 
 	// fight management
 	if ((co = ch[cn].attack_cn)) // we're fighting
@@ -256,94 +212,10 @@ int npc_cityattack_high(int cn)
 				return 1;
 			}
 		}
-
-		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_PROTECT))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_MSHIELD))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_HASTE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_ENHANCE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_SLOW))
-		{
-			return 1;
-		}
-		if (co && is_facing(cn,co) && npc_try_spell(cn, co, SK_WEAKEN))
-		{
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_CURSE))
-		{
-			return 1;
-		}
-		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
-		{
-			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_PULSE))
-		{
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, cn, SK_ZEPHYR))
-		{
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && npc_try_spell(cn, co, SK_POISON))
-		{
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
-		{
-			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return 1;
-		}
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && 
-			((!IS_PLAYER(co) && globs->ticker>ch[cn].data[74]) || (IS_PLAYER(co) && globs->ticker>ch[co].data[74])) && 
-			npc_try_spell(cn, co, SK_WARCRY))
-		{
-			if (IS_PLAYER(co)) 
-				ch[co].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
-			else
-				ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
-			return 1;
-		}
-		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
-		{
-			ch[co].data[75] = globs->ticker + TICKS;
-			return 1;
-		}
-		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
-		{
-			ch[co].data[75] = globs->ticker + TICKS;
-			return 1;
-		}
-
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
-		{
-			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
-			{
-				ch[co].data[75] = globs->ticker + TICKS;
-				return 1;
-			}
-		}
+		
+		npc_spell_routine_buffs(cn, 0);
+		
+		if (co) npc_spell_routine_debuffs(cn, co);
 	}
 
 	return 0;

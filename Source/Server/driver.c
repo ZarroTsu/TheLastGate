@@ -3694,32 +3694,136 @@ int npc_can_spell(int cn, int co, int spell)
 	return 1;
 }
 
+int npc_spell_routine_buffs(int cn, int wake)
+{
+	int my_mana = ch[cn].a_mana;
+	int my_end  = ch[cn].a_end, max_end = ch[cn].end[5];
+	int bl_ch = (my_mana>      75000)?1:0;
+	int wc_ch = (my_end >max_end*500)?1:0;
+	int shi = (M_SK(cn, SK_MSHIELD)>=(wake*84))?1:0;
+	int pri = do_get_iflag(cn, SF_PREIST_R);
+	int tow = do_get_iflag(cn, SF_TOWER);
+	int war = do_get_iflag(cn, SF_EMPERO_R);
+	
+	if (bl_ch &&        npc_try_spell(cn,cn, SK_BLESS))   return 1;
+	if (                npc_try_spell(cn,cn, SK_PROTECT)) return 1;
+	if (!pri && shi &&  npc_try_spell(cn,cn, SK_MSHIELD)) return 1;
+	if (tow &&          npc_try_spell(cn,cn, SK_CURSE))   return 1;
+	if (                npc_try_spell(cn,cn, SK_HASTE))   return 1;
+	if (                npc_try_spell(cn,cn, SK_ENHANCE)) return 1;
+	if (                npc_try_spell(cn,cn, SK_BLESS))   return 1;
+	if (war && wc_ch && npc_try_spell(cn,cn, SK_WARCRY))  return 1;
+	
+}
+
+int npc_spell_routine_debuffs(int cn, int co)
+{
+	int my_hp   = ch[cn].a_hp,   max_hp   = ch[cn].hp[5];
+	int my_end  = ch[cn].a_end,  max_end  = ch[cn].end[5];
+	int my_mana = ch[cn].a_mana, max_mana = ch[cn].mana[5];
+	int emp = do_get_iflag(cn, SF_EMPRES_R);
+	int her = do_get_iflag(cn, SF_HERMIT_R);
+	int war = do_get_iflag(cn, SF_EMPERO_R);
+	int tow = do_get_iflag(cn, SF_TOWER);
+	int cz = cn;
+	
+	if (!has_buff(cn, SK_LETHARGY) && !emp && my_mana>max_mana*600 && npc_try_spell(cn, cn, SK_LETHARGY)) return 1;
+	if (!has_buff(cn, SK_LETHARGY) &&  emp && my_hp  >max_hp  *800 && npc_try_spell(cn, cn, SK_LETHARGY)) return 1;
+	if ( has_buff(cn, SK_LETHARGY) && !emp && my_mana<max_mana*300 && npc_try_spell(cn, cn, SK_LETHARGY)) return 1;
+	if ( has_buff(cn, SK_LETHARGY) &&  emp && my_hp  <max_hp  *400 && npc_try_spell(cn, cn, SK_LETHARGY)) return 1;
+	
+	if (!has_buff(cn, SK_PACT) && !her && npc_try_spell(cn, cn, SK_PACT)) return 1;
+	if (!has_buff(cn, SK_PACT) &&  her && npc_try_spell(cn, cn, SK_PACT)) return 1;
+	if ( has_buff(cn, SK_PACT) && !her && npc_try_spell(cn, cn, SK_PACT)) return 1;
+	if ( has_buff(cn, SK_PACT) &&  her && npc_try_spell(cn, cn, SK_PACT)) return 1;
+	
+	if (npc_try_spell(cn, cn, SK_PULSE))         return 1;
+	if (npc_try_spell(cn, co, SK_SLOW))          return 1;
+	if (!tow && npc_try_spell(cn, co, SK_CURSE)) return 1;
+	
+	if (globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
+	{
+		ch[cn].data[74] = globs->ticker + TICKS*10;
+		return 1;
+	}
+	
+	if (!IS_COMPANION(cn) || (IS_COMPANION(cn) && ch[cn].data[9] == 1 && !IS_LIVINGCHAR(ch[cn].data[PCD_SHADOWCOPY]))) // Shadow Signet
+	{
+		if (globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
+		{
+			ch[cn].data[74] = globs->ticker + TICKS*10;
+			return 1;
+		}
+	}
+	
+	if (npc_try_spell(cn, co, SK_POISON)) return 1;
+	
+	if (is_near(cn, co, 4+ch[cn].aoe_bonus))
+	{
+		if (!is_facing(cn, co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
+		{
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
+		if (!is_facing(cn, co) && my_end>max_end*950 && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_TAUNT))
+		{
+			ch[cn].data[74] = globs->ticker + TICKS * 30;
+			return 1;
+		}
+		if (my_end>max_end*200 && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
+		{
+			ch[cn].data[74] = globs->ticker + TICKS * 15;
+			return 1;
+		}
+		if (IS_PLAYER(co)) cz = co;
+		if (!war && my_end>max_end*200 && globs->ticker>ch[cz].data[74] && npc_try_spell(cn, co, SK_WARCRY))
+		{
+			ch[cz].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
+			return 1;
+		}
+	}
+	
+	if (is_facing(cn, co))
+	{
+		if (npc_try_spell(cn, co, SK_WEAKEN)) return 1;
+		if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
+		{
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
+		if (globs->ticker>ch[co].data[75] && do_get_iflag(cn, SF_SHIELDBASH) && npc_try_spell(cn, co, SK_SHIELD))
+		{
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
+		if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
+		{
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
+	}
+	
+	if (ch[co].armor+5 > ch[cn].weapon) // blast if we cannot hurt them otherwise
+	{
+		if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
+		{
+			ch[co].data[75] = globs->ticker + TICKS;
+			return 1;
+		}
+	}
+}
+
 int npc_quaff_potion(int cn, int itemp, int stemp)
 {
 	int n, in;
-
-	for (n = 0; n<MAXBUFFS; n++)
-	{
-		if ((in = ch[cn].spell[n]) && bu[in].temp==stemp)
-		{
-			return 0;                                         // potion already active
-		}
-	}
-	for (n = 0; n<40; n++)
-	{
-		if ((in = ch[cn].item[n]) && it[in].temp==itemp)
-		{
-			break;                                                           // find potion
-		}
-	}
-	if (n==40)
-	{
-		return 0;                                                             // no potion :(
-	}
+	
+	for (n=0; n<MAXBUFFS; n++) if ((in=ch[cn].spell[n]) && bu[in].temp==stemp) return 0; // potion already active
+	for (n=0; n<MAXITEMS; n++) if ((in=ch[cn].item[n])  && it[in].temp==itemp) break;  // find potion
+	if (n==MAXITEMS) return 0;  // no potion :(
+	
 	do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "%s drinks deep from a magical brew.\n", ch[cn].reference);
-
 	use_driver(cn, in, 1);
-
+	
 	return 1;
 }
 
@@ -7423,10 +7527,8 @@ void npc_shivab_driver(int cn)
 int npc_driver_high(int cn)
 {
 	int x, y, in, co, indoor1, indoor2, cc, in2, n;
-	int mc, m, priestess=0;
+	int mc, m, chmode=0;
 	
-	if (do_get_iflag(cn, SF_PREIST_R)) priestess = 1;
-
 	if (ch[cn].data[25])
 	{
 		switch(ch[cn].data[25])
@@ -7552,39 +7654,21 @@ int npc_driver_high(int cn)
 	}
 	
 	// Guess I'll put this here?
-	if (ch[cn].temp==CT_PANDIUM)
-	{
-		pandium_driver(cn);
-	}
-	if (ch[cn].temp==CT_LAB20_KEEP)
-	{
-		gatekeeper_driver(cn);
-	}
+	if (ch[cn].temp==CT_PANDIUM)    pandium_driver(cn);
+	if (ch[cn].temp==CT_LAB20_KEEP) gatekeeper_driver(cn);
 	
 	// driver check if low health
 	if (ch[cn].a_hp<ch[cn].hp[5] * 400)
 	{
-		if (ch[cn].data[26]==12)
-		{
-			npc_lab_lord_driver(cn);
-		}
-		else if (ch[cn].data[26]==13)
-		{
-			npc_emperor_driver(cn);
-		}
-		else if (ch[cn].data[26]==14)
-		{
-			npc_shivab_driver(cn);
-		}
+		if (ch[cn].data[26]==12)      npc_lab_lord_driver(cn);
+		else if (ch[cn].data[26]==13) npc_emperor_driver(cn);
+		else if (ch[cn].data[26]==14) npc_shivab_driver(cn);
 	}
 	
 	// heal us if we're hurt
 	if ((ch[cn].a_hp<ch[cn].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[cn].a_hp<ch[cn].hp[5] * 400)
 	{
-		if (npc_try_spell(cn, cn, SK_HEAL))
-		{
-			return 1;
-		}
+		if (npc_try_spell(cn, cn, SK_HEAL)) return 1;
 		
 		if (ch[cn].temp==CT_BSMAGE1 || ch[cn].temp==CT_BSMAGE2 || ch[cn].temp==CT_BSMAGE3) 
 		{
@@ -7605,13 +7689,10 @@ int npc_driver_high(int cn)
 		}
 		if (m>1)
 		{
-			if (npc_try_spell(cn, cn, SK_DISPEL))
-			{
-				return 1;
-			}
+			if (npc_try_spell(cn, cn, SK_DISPEL)) return 1;
 		}
 	}
-
+	
 	// donate/destroy citem if that's our job
 	if ((in = ch[cn].citem)!=0 && ch[cn].data[47]>0 && ch[cn].data[47]<10)
 	{
@@ -7650,96 +7731,36 @@ int npc_driver_high(int cn)
 	// generic spell management
 	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && !(ch[cn].flags & CF_MERCHANT))
 	{
-		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_PROTECT))
-		{
-			return 1;
-		}
-		if (M_SK(cn, SK_MSHIELD) >= 84) // to avoid persistent awake timers
-		{
-			if (!priestess && npc_try_spell(cn, cn, SK_MSHIELD))
-			{
-				return 1;
-			}
-		}
-		if (npc_try_spell(cn, cn, SK_HASTE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_ENHANCE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
+		npc_spell_routine_buffs(cn, 1);
 	}
+	
+	chmode = -1;
 	
 	if (IS_PLAYER_COMP(cn) && ch[cn].data[1]<2 && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]))
 	{
 		// companion endurance management
 		if (ch[cn].a_end>10000)
 		{
-			if (ch[co].mode==2 && ch[cn].mode!=2)
-			{
-				ch[cn].mode = 2;
-				do_update_char(cn);
-			}
-			if (ch[co].mode==1 && ch[cn].mode!=1)
-			{
-				ch[cn].mode = 1;
-				do_update_char(cn);
-			}
-			if (ch[co].mode==0 && ch[cn].mode!=0)
-			{
-				ch[cn].mode = 0;
-				do_update_char(cn);
-			}
-		}
-		else if (ch[cn].mode!=0)
-		{
-			ch[cn].mode = 0;
-			do_update_char(cn);
-		}
+			if (ch[co].mode==2 && ch[cn].mode!=2) chmode = ch[cn].mode = 2;
+			if (ch[co].mode==1 && ch[cn].mode!=1) chmode = ch[cn].mode = 1;
+			if (ch[co].mode==0 && ch[cn].mode!=0) chmode = ch[cn].mode = 0;
+		}	else if (ch[cn].mode!=0)              chmode = ch[cn].mode = 0;
 	}
 	else
 	{
 		// generic endurance management
-		if (ch[cn].data[58]>1 && ch[cn].a_end>10000)
-		{
-			if (ch[cn].mode!=2)
-			{
-				ch[cn].mode = 2;
-				do_update_char(cn);
-			}
-		}
-		else if (ch[cn].data[58]==1 && ch[cn].a_end>10000)
-		{
-			if (ch[cn].mode!=1)
-			{
-				ch[cn].mode = 1;
-				do_update_char(cn);
-			}
-		}
-		else if (ch[cn].mode!=0)
-		{
-			ch[cn].mode = 0;
-			do_update_char(cn);
-		}
+		if (ch[cn].data[58]>1 && ch[cn].a_end>10000 && ch[cn].mode!=2)       chmode = ch[cn].mode = 2;
+		else if (ch[cn].data[58]==1 && ch[cn].a_end>10000 && ch[cn].mode!=1) chmode = ch[cn].mode = 1;
+		else if (ch[cn].mode!=0)                                             chmode = ch[cn].mode = 0;
 	}
-
+	
+	if (chmode>-1) do_update_char(cn);
+	
 	// create light
 	if ((ch[cn].data[62]<11 && ch[cn].data[62]>ch[cn].data[58] && check_dlight(ch[cn].x, ch[cn].y)<20 && map[ch[cn].x + ch[cn].y * MAPX].light<20)
 		|| ch[cn].data[62]-10>ch[cn].data[58])
 	{
-		if (npc_try_spell(cn, cn, SK_LIGHT))
-		{
-			return 1;
-		}
+		if (npc_try_spell(cn, cn, SK_LIGHT)) return 1;
 	}
 
 	// make sure protected character survives
@@ -7747,10 +7768,7 @@ int npc_driver_high(int cn)
 	{
 		if ((ch[co].a_hp<ch[co].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<ch[co].hp[5] * 400) // he's hurt
 		{
-			if (npc_try_spell(cn, co, SK_HEAL))
-			{
-				return 1;
-			}
+			if (npc_try_spell(cn, co, SK_HEAL)) return 1;
 		}
 		
 		// Dispel - for friend
@@ -7763,10 +7781,7 @@ int npc_driver_high(int cn)
 			}
 			if (m>1)
 			{
-				if (npc_try_spell(cn, co, SK_DISPEL))
-				{
-					return 1;
-				}
+				if (npc_try_spell(cn, co, SK_DISPEL)) return 1;
 			}
 		}
 	}
@@ -7775,22 +7790,16 @@ int npc_driver_high(int cn)
 	if ((co = ch[cn].data[65])!=0 && ch[cn].a_mana>ch[cn].mana[5]*250)
 	{
 		cc = ch[co].attack_cn;
-
+		
 		// bless us first if we have enough mana - makes spells more powerful
-		if (ch[cn].a_mana>get_spellcost(cn, SK_BLESS) * 2 + get_spellcost(cn, SK_PROTECT) + get_spellcost(cn, SK_ENHANCE))
+		if (ch[cn].a_mana>get_spellcost(cn, SK_BLESS)*2 + get_spellcost(cn, SK_PROTECT) + get_spellcost(cn, SK_ENHANCE))
 		{
-			if (npc_try_spell(cn, cn, SK_BLESS))
-			{
-				return 1;
-			}
+			if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
 		}
-
+		
 		if ((ch[co].a_hp<ch[co].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<ch[co].hp[5] * 400) // he's hurt
 		{
-			if (npc_try_spell(cn, co, SK_HEAL))
-			{
-				return 1;
-			}
+			if (npc_try_spell(cn, co, SK_HEAL)) return 1;
 		}
 		
 		// Dispel - for friend
@@ -7803,25 +7812,14 @@ int npc_driver_high(int cn)
 			}
 			if (m>1)
 			{
-				if (npc_try_spell(cn, co, SK_DISPEL))
-				{
-					return 1;
-				}
+				if (npc_try_spell(cn, co, SK_DISPEL)) return 1;
 			}
 		}
-
-		if (!npc_can_spell(co, cn, SK_PROTECT) && npc_try_spell(cn, co, SK_PROTECT))
-		{
-			return 1;
-		}
-		if (!npc_can_spell(co, cn, SK_ENHANCE) && npc_try_spell(cn, co, SK_ENHANCE))
-		{
-			return 1;
-		}
-		if (!npc_can_spell(co, cn, SK_BLESS) && npc_try_spell(cn, co, SK_BLESS))
-		{
-			return 1;
-		}
+		
+		if (do_get_iflag(cn, SF_TOWER) && !npc_can_spell(co, cn, SK_CURSE) && npc_try_spell(cn, co, SK_CURSE)) return 1;
+		if (!npc_can_spell(co, cn, SK_PROTECT) && npc_try_spell(cn, co, SK_PROTECT)) return 1;
+		if (!npc_can_spell(co, cn, SK_ENHANCE) && npc_try_spell(cn, co, SK_ENHANCE)) return 1;
+		if (!npc_can_spell(co, cn, SK_BLESS) && npc_try_spell(cn, co, SK_BLESS)) return 1;
 		
 		// taunt this enemy to pull them off our friend
 		if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
@@ -7906,133 +7904,10 @@ int npc_driver_high(int cn)
 				return 1;
 			}
 		}
-
-		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_PROTECT))
-		{
-			return 1;
-		}
-		if (!priestess && npc_try_spell(cn, cn, SK_MSHIELD))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_HASTE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_ENHANCE))
-		{
-			return 1;
-		}
-		if (npc_try_spell(cn, cn, SK_BLESS))
-		{
-			return 1;
-		}
-		if (do_get_iflag(cn, SF_EMPERO_R) && ch[cn].a_end>ch[cn].end[5]*500 && npc_try_spell(cn, cn, SK_WARCRY))
-		{
-			return 1;
-		}
 		
-		if (co && ch[cn].a_mana>ch[cn].mana[5]*600 && !has_buff(cn, SK_LETHARGY) && !do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
-		{
-			return 1;
-		}
-		if (co && ch[cn].a_hp>ch[cn].hp[5]*800 && !has_buff(cn, SK_LETHARGY) && do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
-		{
-			return 1;
-		}
-		if (co && ch[cn].a_hp<ch[cn].hp[5]*300 && has_buff(cn, SK_LETHARGY) && do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
-		{
-			return 1;
-		}
-		if (co && npc_try_spell(cn, co, SK_SLOW))
-		{
-			return 1;
-		}
-		if (co && is_facing(cn,co) && npc_try_spell(cn, co, SK_WEAKEN))
-		{
-			return 1;
-		}
+		npc_spell_routine_buffs(cn, 0);
 		
-		if (co && npc_try_spell(cn, co, SK_CURSE))
-		{
-			return 1;
-		}
-		if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_GHOST))
-		{
-			ch[cn].data[74] = globs->ticker + TICKS * 10;
-			return 1;
-		}
-		if ((IS_COMPANION(cn) && ch[cn].data[9] == 1 && !IS_LIVINGCHAR(ch[cn].data[PCD_SHADOWCOPY])) || !IS_COMPANION(cn) )
-		{
-			if (co && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_SHADOW))
-			{
-				ch[cn].data[74] = globs->ticker + TICKS * 10;
-				return 1;
-			}
-		}
-		if (co && npc_try_spell(cn, cn, SK_PULSE))
-		{
-			return 1;
-		}
-		if (co && npc_try_spell(cn, co, SK_POISON))
-		{
-			return 1;
-		}
-		
-		if (co && !is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
-		{
-			ch[co].data[75] = globs->ticker + TICKS;
-			return 1;
-		}
-		if (co && is_near(cn, co, PRXB_RAD-1 + ch[cn].aoe_bonus) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
-		{
-			ch[cn].data[74] = globs->ticker + TICKS * 15;
-			return 1;
-		}
-		if (co && is_near(cn, co, PRXW_RAD-1 + ch[cn].aoe_bonus) &&
-			((!IS_PLAYER(co) && globs->ticker>ch[cn].data[74]) || (IS_PLAYER(co) && globs->ticker>ch[co].data[74])) && 
-			!do_get_iflag(cn, SF_EMPERO_R) && ch[cn].a_end>ch[cn].end[5]*200 && npc_try_spell(cn, co, SK_WARCRY))
-		{
-			if (IS_PLAYER(co))
-				ch[co].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
-			else
-				ch[cn].data[74] = globs->ticker + SP_DUR_WARCRY2(M_SK(cn, SK_WARCRY))*2;
-			return 1;
-		}
-		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_CLEAVE))
-		{
-			ch[co].data[75] = globs->ticker + TICKS;
-			return 1;
-		}
-		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && do_get_iflag(cn, SF_SHIELDBASH) && npc_try_spell(cn, co, SK_SHIELD))
-		{
-			ch[co].data[75] = globs->ticker + TICKS;
-			return 1;
-		}
-		if (co && is_facing(cn,co) && globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_LEAP))
-		{
-			ch[co].data[75] = globs->ticker + TICKS;
-			return 1;
-		}
-		
-		if ((ch[cn].a_end>=(EN_SOFTCAP(cn)-ch[cn].end[5]*50)) && co && !is_facing(cn,co) && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_TAUNT))
-		{
-			ch[cn].data[74] = globs->ticker + TICKS * 30;
-			return 1;
-		}
-
-		if (co && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
-		{
-			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
-			{
-				ch[co].data[75] = globs->ticker + TICKS;
-				return 1;
-			}
-		}
+		if (co) npc_spell_routine_debuffs(cn, co);
 	}
 
 	// did we panic?

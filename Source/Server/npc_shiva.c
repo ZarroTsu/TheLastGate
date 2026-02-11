@@ -655,36 +655,13 @@ int npc_shiva_high(int cn)
 	// generic spell management
 	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && ch[cn].data[6]==0)
 	{
-		if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS)) return 1;
-		if (npc_try_spell(cn, cn, SK_PROTECT)) return 1;
-		if (npc_try_spell(cn, cn, SK_MSHIELD)) return 1;
-		if (npc_try_spell(cn, cn, SK_HASTE)) return 1;
-		if (npc_try_spell(cn, cn, SK_ENHANCE)) return 1;
-		if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
+		npc_spell_routine_buffs(cn, 1);
 	}
 
 	// generic endurance management
-	if (ch[cn].data[58]>1 && ch[cn].a_end>10000)
-	{
-		if (ch[cn].mode!=2)
-		{
-			ch[cn].mode = 2;
-			do_update_char(cn);
-		}
-	}
-	else if (ch[cn].data[58]==1 && ch[cn].a_end>10000)
-	{
-		if (ch[cn].mode!=1)
-		{
-			ch[cn].mode = 1;
-			do_update_char(cn);
-		}
-	}
-	else if (ch[cn].mode!=0)
-	{
-		ch[cn].mode = 0;
-		do_update_char(cn);
-	}
+	if (ch[cn].data[58]>1 && ch[cn].a_end>10000 && ch[cn].mode!=2)       { ch[cn].mode = 2; do_update_char(cn); }
+	else if (ch[cn].data[58]==1 && ch[cn].a_end>10000 && ch[cn].mode!=1) { ch[cn].mode = 1; do_update_char(cn); }
+	else if (ch[cn].mode!=0)                                             { ch[cn].mode = 0; do_update_char(cn); }
 
 	// create light
 	if (check_dlight(ch[cn].x, ch[cn].y)<20 && map[ch[cn].x + ch[cn].y * MAPX].light<20)
@@ -701,9 +678,9 @@ int npc_shiva_high(int cn)
 			if (npc_try_spell(cn, cn, SK_BLESS))	return 1;
 		}
 
-		if (!npc_can_spell(co, cn, SK_PROTECT) && npc_try_spell(cn, co, SK_PROTECT))	return 1;
-		if (!npc_can_spell(co, cn, SK_ENHANCE) && npc_try_spell(cn, co, SK_ENHANCE))	return 1;
-		if (!npc_can_spell(co, cn, SK_BLESS) && npc_try_spell(cn, co, SK_BLESS))		return 1;
+		if (!npc_can_spell(co, cn, SK_PROTECT) && npc_try_spell(cn, co, SK_PROTECT)) return 1;
+		if (!npc_can_spell(co, cn, SK_ENHANCE) && npc_try_spell(cn, co, SK_ENHANCE)) return 1;
+		if (!npc_can_spell(co, cn, SK_BLESS)   && npc_try_spell(cn, co, SK_BLESS))   return 1;
 
 		ch[cn].data[65] = 0;
 	}
@@ -717,21 +694,10 @@ int npc_shiva_high(int cn)
 			{
 				if (npc_try_spell(cn, co, SK_BLAST)) return 1;
 			}
-
-			if (ch[cn].a_mana>75000 && npc_try_spell(cn, cn, SK_BLESS)) return 1;
-			if (npc_try_spell(cn, cn, SK_PROTECT)) return 1;
-			if (npc_try_spell(cn, cn, SK_MSHIELD)) return 1;
-			if (npc_try_spell(cn, cn, SK_HASTE)) return 1;
-			if (npc_try_spell(cn, cn, SK_ENHANCE)) return 1;
-			if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
-			if (co && npc_try_spell(cn, co, SK_SLOW)) return 1;
-			if (co && npc_try_spell(cn, co, SK_CURSE)) return 1;
-			if (co && npc_try_spell(cn, co, SK_PULSE)) return 1;
-			if (co && npc_try_spell(cn, co, SK_POISON)) return 1;
-			if (co && ch[co].armor + 5>ch[cn].weapon) // blast always if we cannot hurt him otherwise
-			{
-				if (npc_try_spell(cn, co, SK_BLAST)) return 1;
-			}
+			
+			npc_spell_routine_buffs(cn, 0);
+			
+			if (co) npc_spell_routine_debuffs(cn, co);
 		}
 	}
 	
