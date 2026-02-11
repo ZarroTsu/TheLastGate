@@ -278,6 +278,7 @@ extern unsigned int mapmarker;
 
 #define AT_CAP				300
 #define SPEED_CAP 			300
+#define CTICK_MAX 			200
 #define SPEED_BASE			120
 #define C_AT_CAP(cn, n)		(AT_CAP + ch[(cn)].limit_break[(n)][0] + ch[(cn)].limit_break[(n)][1])
 
