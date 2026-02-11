@@ -806,7 +806,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6606,                            "resistance." }
 };
 
-struct metaStat metaStats[103] = {
+struct metaStat metaStats[107] = {
 	//
 	//   Topmost standard stats
 	//                                             "         '         '         '         '         '         '         '         '         '         '         '         "
@@ -921,6 +921,10 @@ struct metaStat metaStats[103] = {
 	{ 35, 1, 1, "Rally Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Rally skill." },
 	{ 41, 0, 5, "Crush Effect",         "AV",      "Effective reduction of target Armor Value when using your Crush skill, before enemy defenses." },
 	{ 41, 1, 5, "Crush Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Crush skill." },
-	{ 22, 0, 5, "Pact Mana Reserve",    "%",       "The amount of mana, as a percent, reserved while Pact is active." }
+	{ 22, 0, 5, "Pact Mana Reserve",    "%",       "The amount of mana, as a percent, reserved while Pact is active." },
+	{ 20, 0, 2, "Stymie Effect",        "Cooldwn", "Effective reduction of target Cooldown Rate when casting your Stymie spell, before enemy defenses." },
+	{ 20, 1, 2, "Stymie Cooldown",      "Seconds", "Skill exhaustion duration expected upon using your Stymie spell." },
+	{ 19, 0, 4, "Focus Effect",         "Cooldwn", "Effective increase to Cooldown Rate granted by your Focus spell." },
+	{ 19, 1, 4, "Focus Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Focus spell." }
 };
 

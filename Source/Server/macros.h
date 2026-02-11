@@ -316,12 +316,6 @@ int is_ascroll(int in);
 // Slow's formula (used to degrade)
 #define SLOWFORM(n)				(n/2*9/10)
 
-// Slow2's formula (used to degrade) 
-#define SLOW2FORM(n)			(n/3*9/10)
-
-// Curse2's formula (used to degrade)
-#define CURSE2FORM(p, n)		(((p*5/3)-n)/5)
-
 // Poison's formula (damage per tick)
 #define PL_POISFORM(p, d)		(((p+ 5) * 4500) / max(1, d))
 #define MN_POISFORM(p, d)		(((p   ) * 3000) / max(1, d))
@@ -335,8 +329,8 @@ int is_ascroll(int in);
 // Frostburn's formula (degen per tick)
 #define FROSTBFORM(p, d)		(((p+10) * 1000) / max(1, d))
 
-#define IS_DISPELABLE1(tmp)		((tmp)==SK_BLIND || (tmp)==SK_WARCRY2 || (tmp)==SK_CURSE2 || (tmp)==SK_CURSE || (tmp)==SK_WARCRY || (tmp)==SK_WEAKEN2 || (tmp)==SK_WEAKEN || (tmp)==SK_SLOW2 || (tmp)==SK_SLOW || (tmp)==SK_DOUSE || (tmp)==SK_AGGRAVATE || (tmp)==SK_SCORCH || (tmp)==SK_DISPEL2)
-#define IS_DISPELABLE2(tmp)		((tmp)==SK_HASTE || (tmp)==SK_BLESS || (tmp)==SK_MSHIELD || (tmp)==SK_MSHELL || (tmp)==SK_PULSE || (tmp)==SK_ZEPHYR || (tmp)==SK_GUARD || (tmp)==SK_DISPEL || (tmp)==SK_REGEN || (tmp)==SK_PROTECT || (tmp)==SK_ENHANCE || (tmp)==SK_LIGHT)
+#define IS_DISPELABLE1(tmp)		((tmp)==SK_BLIND || (tmp)==SK_WARCRY2 || (tmp)==SK_CURSE || (tmp)==SK_WARCRY || (tmp)==SK_WEAKEN2 || (tmp)==SK_WEAKEN || (tmp)==SK_SLOW || (tmp)==SK_STYMIE || (tmp)==SK_DOUSE || (tmp)==SK_AGGRAVATE || (tmp)==SK_SCORCH || (tmp)==SK_DISPEL2)
+#define IS_DISPELABLE2(tmp)		((tmp)==SK_HASTE || (tmp)==SK_FOCUS || (tmp)==SK_BLESS || (tmp)==SK_MSHIELD || (tmp)==SK_MSHELL || (tmp)==SK_PULSE || (tmp)==SK_ZEPHYR || (tmp)==SK_GUARD || (tmp)==SK_DISPEL || (tmp)==SK_REGEN || (tmp)==SK_PROTECT || (tmp)==SK_ENHANCE || (tmp)==SK_LIGHT)
 
 #define IS_WEARINGPHOENIX(cn)	(IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_WP_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_WP_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_WB_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_WB_RISINGPHO) || IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_BOOK_BURN) || IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_BOOK_BURN))
 

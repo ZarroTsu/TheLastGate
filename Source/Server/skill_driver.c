@@ -47,15 +47,15 @@ struct s_splog splog[66] = {
 		" was scorched.",
 		" scorched you."
 	},{ 
-		SK_CURSE2, 		"Greater Curse",	"curse",	"cursing",
-		"You have been badly cursed.",
-		" was badly cursed.",
-		" cast greater curse on you."
+		SK_FOCUS, 		"Focus",		"focus",		"focusing",
+		"Your focus sharpened.",
+		" had their focus improved.",
+		" cast focus on you."
 	},{ 
-		SK_SLOW2, 		"Greater Slow",		"slow",		"slowing",
-		"You have been badly slowed.",
-		" was badly slowed.",
-		" cast greater slow on you."
+		SK_STYMIE, 		"Stymie",		"stymie",		"styming",
+		"You feel your focus slip away.",
+		" had their focus reduced.",
+		" cast stymie on you."
 	},{
 		SK_ZEPHYR,		"Zephyr",		"zephyr",		"zephyring",
 		"Zephyr active!",
@@ -292,7 +292,7 @@ int spell_shock(int cn, int co, int power);
 int on_hit_debuff(int cn, int co, int v, int origtmp)
 {
 	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 1;
-	int nmz = 0;
+	int nmz = 0, debuff=1;
 	
 	if (!origtmp)           return 0;
 	if (!IS_LIVINGCHAR(co)) return 0;
@@ -309,12 +309,12 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			nmz = 1;
 			break;
 		case SK_SLOW:
-			if (do_get_iflag(cn, SF_EMPEROR)) { tmp = SK_SLOW2;   spr = BUF_SPR_SLOW2; }
-			else                              { tmp = SK_SLOW;    spr = BUF_SPR_SLOW;  }
+			if (do_get_iflag(cn, SF_EMPEROR)) { tmp = SK_STYMIE;  spr = BUF_SPR_STYMIE; }
+			else                              { tmp = SK_SLOW;    spr = BUF_SPR_SLOW;   }
 			break;
 		case SK_CURSE:
-			if (do_get_iflag(cn, SF_TOWER))   { tmp = SK_CURSE2;  spr = BUF_SPR_CURSE2; }
-			else                              { tmp = SK_CURSE;   spr = BUF_SPR_CURSE;  }
+			if (do_get_iflag(cn, SF_TOWER))   { tmp = SK_FOCUS;   spr = BUF_SPR_FOCUS; }
+			else                              { tmp = SK_CURSE;   spr = BUF_SPR_CURSE; }
 			break;
 		case SK_WEAKEN:
 			if (do_get_iflag(cn, SF_DEATH))   { tmp = SK_WEAKEN2; spr = BUF_SPR_REND2; }
@@ -382,14 +382,15 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].atk_speed  = -(min(127, 10 + SLOWFORM(power)/3));
 			bu[in].cast_speed = -(min(127, 10 + SLOWFORM(power)/3));
 			break;
-		case SK_SLOW2:
-			bu[in].speed = -(min(300, 30 + SLOW2FORM(power)));
+		case SK_STYMIE:
+			bu[in].cool_bonus = max(-127, -(aoe_power/4 + 1));
 			break;
 		case SK_CURSE:
 			for (n=0; n<5; n++) bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
 			break;
-		case SK_CURSE2:
-			for (n=0; n<5; n++) bu[in].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
+		case SK_FOCUS:
+			bu[in].cool_bonus = min(127, power/4 + 1);
+			debuff = 0;
 			break;
 		case SK_WEAKEN:
 			bu[in].weapon  = max(-127, -(power / 4 + 4));
@@ -412,8 +413,11 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	}
 	
 	bu[in].data[4] = nmz;
-	bu[in].data[5] = 1;
+	bu[in].data[5] = debuff;
 	bu[in].data[9] = power;
+	
+	if (!debuff)
+		return add_spell(cn, in);
 	
 	return add_spell(co, in);
 }
@@ -1937,7 +1941,7 @@ int add_spell(int cn, int new_in)
 			}
 			else
 			{
-				if (old_temp==SK_SLOW || old_temp==SK_SLOW2 || old_temp==SK_CURSE2)
+				if (old_temp==SK_SLOW)
 					tickminimum = TICKS*5;
 				
 				if ((bu[old_in].data[4] & 2) && (bu[new_in].data[4] & 2))  // Aura skill
@@ -2896,6 +2900,19 @@ int skill_plague(int cn, int co, int power)
 	aoe_driver(cn, co, co, SK_PLAGUE, power, GET_PROX(cn), 0, 0, 0);
 }
 
+int spell_focus(int cn, int co, int power)
+{
+	int in;
+	
+	power = spellpower_check(cn, co, spell_multiplier(power, cn), 0);
+	
+	if (!(in = make_new_buff(cn, SK_FOCUS, BUF_SPR_FOCUS, power, SP_DUR_FOCUS, 1)))
+		return 0;
+	
+	bu[in].cool_bonus = min(127, power/4 + 1);
+	
+	return cast_a_spell(cn, co, in, 0, 1); // SK_FOCUS
+}
 int spell_curse(int cn, int co, int power, int flag)
 {
 	int in, n;
@@ -2932,70 +2949,57 @@ int spell_curse(int cn, int co, int power, int flag)
 		return -1;
 	}
 	
-	// Tarot Card - Tower :: Change Curse into Greater Curse
-	if (do_get_iflag(cn, SF_TOWER))
+	if (!(in = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_CURSE, 0)))
+		return 0;
+	
+	for (n = 0; n<5; n++)
 	{
-		if (!(in = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_CURSE2, 0)))
-			return 0;
-		
-		for (n = 0; n<5; n++) 
-		{
-			bu[in].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
-		}
+		bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
 	}
-	else
-	{
-		if (!(in = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_CURSE, 0)))
-			return 0;
-		
-		for (n = 0; n<5; n++)
-		{
-			bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
-		}
-	}
+	
 	bu[in].data[5] = 1;
 	
 	if (do_get_iflag(cn, SF_SIGN_SCRE))
 		spell_aggravate(cn, co, power, 1);
 	
-	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_CURSE / SK_CURSE2
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_CURSE
 }
 void skill_curse(int cn)
 {
-	int power = M_SK(cn, SK_CURSE), cost = SP_COST_CURSE, cost2 = SP_COST_SLOW, flag = 0;
+	int power = M_SK(cn, SK_CURSE), cost = SP_COST_CURSE, cost2 = SP_COST_SLOW;
 	int count = 0, hit = 0, d20 = SP_MULT_CURSE;
-	int co, co_orig = -1;
-	//int can_aoe = CAN_SORC_PROX(cn);
-	//int aoe_power = GET_PROX(cn);
+	int co, co_orig = -1, flag;
 	
-	if (do_get_iflag(cn, SF_BOOK_SHIV)) flag = 1;
+	// Shiva's Malice adds Slow's mana cost
+	if ((flag = do_get_iflag(cn, SF_BOOK_SHIV))) cost += cost2;
 	
-	// Tarot Card - Tower :: Change Curse into Greater Curse
-	if (do_get_iflag(cn, SF_TOWER)) 
+	// Tarot Card - Tower :: Change Curse into Focus
+	if (do_get_iflag(cn, SF_TOWER))
 	{ 
-		cost = cost * 4 / 3;
-		d20 = SP_MULT_CURSE2;
+		if (!(co = get_target(cn, 0, 1, 1, cost, SK_FOCUS, 1, power, 0)))
+			return;
+		
+		spell_focus(cn, co, power);
 	}
-	
-	if (flag)
-		cost += do_get_iflag(cn, SF_EMPEROR)?(cost2*3/4):cost2; // Shiva book adds Slow's mana cost
-	
-	// Get spell target - return on failure or not enough mana
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20))) return;
-	
-	// If we have a valid target, cast Curse on them
-	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
+	else
 	{
-		spell_curse(cn, (co_orig = co), power, 0);
-		count = hit = 1;
+		// Get spell target - return on failure or not enough mana
+		if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20))) return;
+		
+		// If we have a valid target, cast Curse on them
+		if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
+		{
+			spell_curse(cn, (co_orig = co), power, 0);
+			count = hit = 1;
+		}
+		
+		// Spell AoE
+		if (aoe_driver(cn, cn, co, SK_CURSE, power, GET_PROX(cn), count, hit, 0) < 0) return;
+		if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	}
-	
-	// Spell AoE
-	if (aoe_driver(cn, cn, co, SK_CURSE, power, GET_PROX(cn), count, hit, 0) < 0) return;
-	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	// Book - Shiva's Malice :: Cast Slow after casting Curse on success
-	if (flag)  skill_slow(cn, 1);
+	if (flag) skill_slow(cn, 1);
 	else      add_exhaust(cn, SK_EXH_CURSE);
 }
 
@@ -3036,13 +3040,13 @@ int spell_slow(int cn, int co, int power, int flag)
 		return -1;
 	}
 	
-	// Tarot Card - Emperor :: Change Slow into Greater Slow
+	// Tarot Card - Emperor :: Change Slow into Stymie
 	if (do_get_iflag(cn, SF_EMPEROR))
 	{
-		if (!(in = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_SLOW2(power), 0)))
+		if (!(in = make_new_buff(cn, SK_STYMIE, BUF_SPR_STYMIE, power, SP_DUR_STYMIE, 0)))
 			return 0;
 		
-		bu[in].speed = -(min(300, 30 + SLOW2FORM(power)));
+		bu[in].cool_bonus = max(-127, -(power/4 + 1));
 	}
 	else
 	{
@@ -3055,7 +3059,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	}
 	bu[in].data[5] = 1;
 	
-	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_SLOW / SK_SLOW2
+	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_SLOW / SK_STYMIE
 }
 void skill_slow(int cn, int flag)
 {
@@ -4402,12 +4406,12 @@ void remove_all_debuffs(int cn)
 	do_update_char(cn);
 }
 
-#define DISPEL_MAX		18
+#define DISPEL_MAX		17
 #define DISPEL_STORE	 3
 
 int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag, int tarot)
 {
-	int in, n;
+	int in, n, dur;
 	
 	// spell_multiplier is already done in skill_dispel
 	
@@ -4522,15 +4526,16 @@ void skill_dispel(int cn, int flag)
 			if (bu[in].temp==SK_MSHIELD) 	ail[2] = n;
 			if (bu[in].temp==SK_MSHELL) 	ail[3] = n;
 			if (bu[in].temp==SK_PULSE) 		ail[4] = n;
-			if (bu[in].temp==SK_ZEPHYR) 	ail[5] = n;
-			if (bu[in].temp==SK_GUARD) 		ail[6] = n;
-			if (bu[in].temp==SK_WARCRY3) 	ail[7] = n;
-			if (bu[in].temp==SK_CHARGE) 	ail[8] = n;
-			if (bu[in].temp==SK_DISPEL) 	ail[9] = n;
-			if (bu[in].temp==SK_REGEN) 		ail[10] = n;
-			if (bu[in].temp==SK_PROTECT) 	ail[11] = n;
-			if (bu[in].temp==SK_ENHANCE) 	ail[12] = n;
-			if (bu[in].temp==SK_LIGHT) 		ail[13] = n;
+			if (bu[in].temp==SK_FOCUS) 		ail[5] = n;
+			if (bu[in].temp==SK_ZEPHYR) 	ail[6] = n;
+			if (bu[in].temp==SK_GUARD) 		ail[7] = n;
+			if (bu[in].temp==SK_WARCRY3) 	ail[8] = n;
+			if (bu[in].temp==SK_CHARGE) 	ail[9] = n;
+			if (bu[in].temp==SK_DISPEL) 	ail[10] = n;
+			if (bu[in].temp==SK_REGEN) 		ail[11] = n;
+			if (bu[in].temp==SK_PROTECT) 	ail[12] = n;
+			if (bu[in].temp==SK_ENHANCE) 	ail[13] = n;
+			if (bu[in].temp==SK_LIGHT) 		ail[14] = n;
 		}
 	}
 	else
@@ -4548,18 +4553,17 @@ void skill_dispel(int cn, int flag)
 			if (!ismon && bu[in].temp==SK_FROSTB) 	ail[3] = n;
 			if (bu[in].temp==SK_BLIND) 				ail[4] = n;
 			if (bu[in].temp==SK_WARCRY2) 			ail[5] = n;
-			if (bu[in].temp==SK_CURSE2) 			ail[6] = n;
+			if (bu[in].temp==SK_STYMIE) 			ail[6] = n;
 			if (bu[in].temp==SK_CURSE) 				ail[7] = n;
 			if (bu[in].temp==SK_WARCRY) 			ail[8] = n;
 			if (bu[in].temp==SK_WEAKEN2) 			ail[9] = n;
 			if (bu[in].temp==SK_WEAKEN) 			ail[10] = n;
-			if (bu[in].temp==SK_SLOW2) 				ail[11] = n;
-			if (bu[in].temp==SK_SLOW) 				ail[12] = n;
-			if (bu[in].temp==SK_DOUSE) 				ail[13] = n;
-			if (bu[in].temp==SK_AGGRAVATE) 			ail[14] = n;
-			if (bu[in].temp==SK_SCORCH) 			ail[15] = n;
-			if (bu[in].temp==SK_SHOCK) 				ail[16] = n;
-			if (bu[in].temp==SK_DISPEL2) 			ail[17] = n;
+			if (bu[in].temp==SK_SLOW) 				ail[11] = n;
+			if (bu[in].temp==SK_DOUSE) 				ail[12] = n;
+			if (bu[in].temp==SK_AGGRAVATE) 			ail[13] = n;
+			if (bu[in].temp==SK_SCORCH) 			ail[14] = n;
+			if (bu[in].temp==SK_SHOCK) 				ail[15] = n;
+			if (bu[in].temp==SK_DISPEL2) 			ail[16] = n;
 		}
 	}
 	for (m = 0; m<DISPEL_MAX; m++) if (ail[m]>-1)
@@ -5810,7 +5814,7 @@ int spell_pulse(int cn, int co, int power, int tarot)
 	
 	bu[in].data[1] = len; 								// tick rate
 	bu[in].data[2] = globs->ticker + bu[in].data[1]; 	// next tick
-	bu[in].data[3] = PRXP_RAD + ch[cn].aoe_bonus;
+	bu[in].data[3] = 3 + ch[cn].aoe_bonus;
 	
 	return cast_a_spell(cn, co, in, 0, 1); // SK_PULSE
 }

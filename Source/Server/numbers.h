@@ -1374,8 +1374,8 @@
 #define BUF_SPR_BLEED		411
 #define BUF_SPR_REND2		329
 #define BUF_SPR_SCORCH		365
-#define BUF_SPR_CURSE2		225
-#define BUF_SPR_SLOW2		319
+#define BUF_SPR_STYMIE		3494
+#define BUF_SPR_FOCUS		519
 #define BUF_SPR_MSHELL		219
 #define BUF_SPR_REGEN		98
 //

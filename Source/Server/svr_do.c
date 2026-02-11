@@ -4105,14 +4105,16 @@ int do_showbuffs(int cn, int co)
 				do_char_log(cn, 6, " : %+d Weapon Value\n", bu[in].weapon);
 				break;
 			case SK_SLOW:
-			case SK_SLOW2:
 			case SK_HASTE:
 				if (bu[in].speed)      do_char_log(cn, 6, " : %+d Speed\n",        bu[in].speed);
 				if (bu[in].atk_speed)  do_char_log(cn, 6, " : %+d Attack Speed\n", bu[in].atk_speed);
 				if (bu[in].cast_speed) do_char_log(cn, 6, " : %+d Cast Speed\n",   bu[in].cast_speed);
 				break;
+			case SK_FOCUS:
+			case SK_STYMIE:
+				do_char_log(cn, 6, " : %+d Cooldown Rate\n", bu[in].cool_bonus * (bu[in].temp==SK_FOCUS?2:1));
+				break;
 			case SK_CURSE:
-			case SK_CURSE2:
 			case SK_BLESS:
 			case SK_WARCRY:
 			case SK_WARCRY3:
@@ -10626,8 +10628,7 @@ void really_update_char(int cn)
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0;
 	int heal_hp, heal_end, heal_mana, act = 0, tmphm = 0, gench = 0;
 	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0, in=0; //, nmz=0;
-	int isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0, isWater = 0;
-	int sickStacks = 0, divCursed = 1, divSlowed = 1, divWeaken = 1, symSpec = 0;
+	int sickStacks = 0, symSpec = 0, isWater = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
 	int critical_b = 0, critical_c = 0, critical_m = 0;
@@ -11142,28 +11143,6 @@ void really_update_char(int cn)
 	
 	if (cz) cn = cz;
 	
-	// Check first for existing debuffs that conflict with other debuffs
-	for (n = 0; n<MAXBUFFS; n++)
-	{
-		if (!ch[cn].spell[n]) continue;
-		
-		m = ch[cn].spell[n];
-		
-		// isCurse1 = 0, isSlow1 = 0, isWeaken1 = 0, isCurse2 = 0, isSlow2 = 0, isWeaken2 = 0;
-		
-		// Halves other debuff
-		if (bu[m].temp==SK_CURSE  ) isCurse1  = bu[m].power;
-		if (bu[m].temp==SK_SLOW   ) isSlow1   = bu[m].power;
-		if (bu[m].temp==SK_WEAKEN ) isWeaken1 = bu[m].power;
-		if (bu[m].temp==SK_CURSE2 ) isCurse2  = bu[m].power;
-		if (bu[m].temp==SK_SLOW2  ) isSlow2   = bu[m].power;
-		if (bu[m].temp==SK_WEAKEN2) isWeaken2 = bu[m].power;
-	}
-	
-	if (isCurse1  >= isCurse2 )	isCurse1  = 0; else isCurse2  = 0;
-	if (isSlow2   >= isSlow1  )	isSlow2   = 0; else isSlow1   = 0;
-	if (isWeaken1 >= isWeaken2)	isWeaken1 = 0; else isWeaken2 = 0;
-	
 	if (IS_PLAYER_COMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]))
 	{
 		for (n = 0; n<MAXBUFFS; n++)
@@ -11212,15 +11191,10 @@ void really_update_char(int cn)
 		if ((ch[cn].flags & CF_NOMAGIC) && !bu[m].data[4]) continue;
 		
 		bcount++;
-		divCursed = divSlowed = divWeaken = 1;
-		
-		if ((bu[m].temp==SK_CURSE  && isCurse1 ) || (bu[m].temp==SK_CURSE2  && isCurse2 )) divCursed = 2;
-		if ((bu[m].temp==SK_SLOW   && isSlow1  ) || (bu[m].temp==SK_SLOW2   && isSlow2  )) divSlowed = 3;
-		if ((bu[m].temp==SK_WEAKEN && isWeaken1) || (bu[m].temp==SK_WEAKEN2 && isWeaken2)) divWeaken = 2;
 		
 		for (z = 0; z<5; z++)
 		{
-			attrib[z] += bu[m].attrib[z] / max(1, divCursed);
+			attrib[z] += bu[m].attrib[z];
 		}
 		
 		hp   += bu[m].hp;
@@ -11230,15 +11204,14 @@ void really_update_char(int cn)
 		heal_hp   += bu[m].r_hp;
 		heal_end  += bu[m].r_end;
 		heal_mana += bu[m].r_mana;
-
+		
 		for (z = 0; z<MAXSKILL; z++)
 		{
 			skill[z] += bu[m].skill[z];
 		}
-
-		armor  += bu[m].armor  / max(1, divWeaken);
-		weapon += bu[m].weapon / max(1, divWeaken);
-		//spell  += bu[m].spell  / max(1, divWeaken);
+		
+		armor  += bu[m].armor;
+		weapon += bu[m].weapon;
 		
 		if (!labcmd)
 		{
@@ -11254,14 +11227,14 @@ void really_update_char(int cn)
 		}
 		
 		// Meta values
-		base_spd   += (do_get_iflag(cn, SF_TW_MARCH) && (bu[m].speed/max(1, divSlowed))<0) ? (bu[m].speed/max(1, divSlowed))/2 : bu[m].speed/max(1, divSlowed);
+		base_spd   += (do_get_iflag(cn, SF_TW_MARCH) && bu[m].speed<0)      ? bu[m].speed/2      : bu[m].speed;
 		spd_move   += (do_get_iflag(cn, SF_TW_MARCH) && bu[m].move_speed<0) ? bu[m].move_speed/2 : bu[m].move_speed;
-		spd_attack += (do_get_iflag(cn, SF_TW_MARCH) && bu[m].atk_speed<0) ? bu[m].atk_speed/2 : bu[m].atk_speed;
+		spd_attack += (do_get_iflag(cn, SF_TW_MARCH) && bu[m].atk_speed<0)  ? bu[m].atk_speed/2  : bu[m].atk_speed;
 		spd_cast   += (do_get_iflag(cn, SF_TW_MARCH) && bu[m].cast_speed<0) ? bu[m].cast_speed/2 : bu[m].cast_speed;
 		spell_pow  += bu[m].spell_pow;
 		spell_mod  += bu[m].spell_mod;
 		spell_apt  += bu[m].spell_apt;
-		spell_cool += bu[m].cool_bonus;
+		spell_cool += bu[m].cool_bonus * (bu[m].temp==SK_FOCUS?2:1);
 		aoe        += bu[m].aoe_bonus;
 		critical_b += bu[m].base_crit;
 		critical_c += bu[m].crit_chance;
@@ -12713,7 +12686,7 @@ void do_aria_stats(int cn, int in, int power, int flag)
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
-	int power, in2 = 0, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
+	int power, tarot, in2 = 0, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
 	
 	if (!co) return;
 	
@@ -12785,8 +12758,8 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(cn, SF_EMPEROR))  // [Taro] Emperor
 			{
-				if (!(in2 = make_new_buff(cn, SK_SLOW2, BUF_SPR_SLOW2, power, SP_DUR_ARIA, 0))) return;
-				bu[in2].speed      = -(min(300, 30 + SLOW2FORM(power)));
+				if (!(in2 = make_new_buff(cn, SK_STYMIE, BUF_SPR_STYMIE, power, SP_DUR_ARIA, 0))) return;
+				bu[in2].cool_bonus = max(-127, -(aoe_power/4 + 1));
 			}
 			else
 			{
@@ -12799,7 +12772,10 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			break;
 			
 		case SK_CURSE:
-			if (!flag) return; // Only effect enemies
+			tarot = do_get_iflag(cn, SF_TOWER);
+			
+			if (!tarot && !flag) return; // Only effect enemies
+			if (tarot && flag)   return; // Only effect allies
 			if (ch[co].flags & CF_NOMAGIC) return;
 			
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
@@ -12808,21 +12784,22 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
 			
-			power = common_mult(cn, co, spell_immunity(cn, co, power));
-			
-			if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/5;
-			
-			if (do_get_iflag(cn, SF_TOWER)) // [Taro] Tower
+			if (tarot)
 			{
-				if (!(in2 = make_new_buff(cn, SK_CURSE2, BUF_SPR_CURSE2, power, SP_DUR_ARIA, 0))) return;
-				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(5 + CURSE2FORM(power, (4 - n)));
+				if (!(in2 = make_new_buff(cn, SK_FOCUS, BUF_SPR_FOCUS, power, SP_DUR_ARIA, 0))) return;
+				bu[in2].cool_bonus = min(127, power/4 + 1);
 			}
 			else
 			{
+				power = common_mult(cn, co, spell_immunity(cn, co, power));
+				
+				if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/5;
+				
 				if (!(in2 = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_ARIA, 0))) return;
 				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(3 + (power - (4 - n)) / 5);
+				
+				bu[in2].data[5] = 1;
 			}
-			bu[in2].data[5] = 1;
 			break;
 			
 		case SK_WEAKEN:
@@ -13684,8 +13661,8 @@ void do_regenerate(int cn)
 				do_recovery(cn, 0, bu[in].r_hp);
 			}
 			
-			// Slow and Curse2 Decay
-			if ((bu[in].temp==SK_SLOW || bu[in].temp==SK_CURSE2) && bu[in].active>0 && bu[in].active <= (bu[in].duration-5) && (bu[in].active % 5))
+			// Slow Decay
+			if (bu[in].temp==SK_SLOW && bu[in].active>0 && bu[in].active <= (bu[in].duration-5) && (bu[in].active % 5))
 			{
 				p = bu[in].power;
 				if (bu[in].active<=bu[in].duration*(bu[in].data[1]-(p/2))/max(1,(p-(p/2))))
@@ -13694,21 +13671,12 @@ void do_regenerate(int cn)
 					if (bu[in].data[1] > p)		bu[in].data[1] = p;
 					if (bu[in].data[1] < p / 2)	bu[in].data[1] = p / 2;
 					p = bu[in].data[1];
-					if (bu[in].temp==SK_SLOW)
-					{
-						if (do_get_iflag(cn, SF_EN_LESSSLOW)) p = p/5;
-						bu[in].speed 		= -(min(300, 10 + SLOWFORM(p)/2));
-						bu[in].atk_speed 	= -(min(127, 10 + SLOWFORM(p)/2));
-						bu[in].cast_speed 	= -(min(127, 10 + SLOWFORM(p)/2));
-					}
-					else if (bu[in].temp==SK_CURSE2)
-					{
-						if (do_get_iflag(cn, SF_EN_LESSCURS)) p = p/5;
-						for (m = 0; m<5; m++) 
-						{
-							bu[in].attrib[m] = -(5 + CURSE2FORM(p, (4 - m)));
-						}
-					}
+					
+					if (do_get_iflag(cn, SF_EN_LESSSLOW)) p = p/5;
+					bu[in].speed 		= -(min(300, 10 + SLOWFORM(p)/2));
+					bu[in].atk_speed 	= -(min(127, 10 + SLOWFORM(p)/2));
+					bu[in].cast_speed 	= -(min(127, 10 + SLOWFORM(p)/2));
+					
 					do_update_char(cn);
 				}
 			}

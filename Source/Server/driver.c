@@ -3443,9 +3443,9 @@ int spellflag(int spell)
 		case SK_HEAL:		return SP_HEAL;
 		case SK_REGEN:		return SP_REGEN;
 		case SK_CURSE:		return SP_CURSE;
-		case SK_CURSE2:		return SP_CURSE2;
+		case SK_FOCUS:		return SP_FOCUS;
 		case SK_SLOW:		return SP_SLOW;
-		case SK_SLOW2:		return SP_SLOW2;
+		case SK_STYMIE:		return SP_STYMIE;
 		case SK_POISON:		return SP_POISON;
 		case SK_VENOM:		return SP_VENOM;
 		case SK_LETHARGY:	return SP_LETHARGY;
@@ -3513,12 +3513,12 @@ int npc_try_spell(int cn, int co, int spell)
 	
 	// ** Translate spell to truespell based on caster tarot card     
 	
-	if (spell==SK_CURSE  && do_get_iflag(cn, SF_TOWER))   	truespell = SK_CURSE2;
+	if (spell==SK_CURSE  && do_get_iflag(cn, SF_TOWER))   	truespell = SK_FOCUS;
 	if (spell==SK_BLIND  && do_get_iflag(cn, SF_CHARIOT)) 	truespell = SK_DOUSE;
 	if (spell==SK_POISON && do_get_iflag(cn, SF_TOWER_R)) 	truespell = SK_VENOM;
 	if (spell==SK_PULSE  && do_get_iflag(cn, SF_JUDGE_R)) 	truespell = SK_IMMOLATE;
 	if (spell==SK_WEAKEN && do_get_iflag(cn, SF_DEATH)) 	truespell = SK_WEAKEN2;
-	if (spell==SK_SLOW   && do_get_iflag(cn, SF_EMPEROR)) 	truespell = SK_SLOW2;
+	if (spell==SK_SLOW   && do_get_iflag(cn, SF_EMPEROR)) 	truespell = SK_STYMIE;
 	if (spell==SK_WARCRY && do_get_iflag(cn, SF_EMPERO_R)) 	truespell = SK_WARCRY3;
 	if (spell==SK_HEAL   && do_get_iflag(cn, SF_STAR)) 		truespell = SK_REGEN;
 	
@@ -3556,7 +3556,6 @@ int npc_try_spell(int cn, int co, int spell)
 	
 	// dont debuff if chances of success are bad
 	if (truespell==SK_CURSE   && SP_MULT_CURSE   * offn / max(1, defn)< 7) return 0;
-	if (truespell==SK_CURSE2  && SP_MULT_CURSE2  * offn / max(1, defn)< 7) return 0;
 	if (truespell==SK_BLIND   && SP_MULT_BLIND   * offn / max(1, defn)< 7) return 0;
 	if (truespell==SK_DOUSE   && SP_MULT_BLIND   * offn / max(1, defn)< 7) return 0;
 	if (truespell==SK_POISON  && SP_MULT_POISON  * offn / max(1, defn)< 8) return 0;
@@ -3564,7 +3563,7 @@ int npc_try_spell(int cn, int co, int spell)
 	if (truespell==SK_WEAKEN  && SP_MULT_WEAKEN  * offn / max(1, defn)< 8) return 0;
 	if (truespell==SK_WEAKEN2 && SP_MULT_WEAKEN2 * offn / max(1, defn)< 8) return 0;
 	if (truespell==SK_SLOW    && SP_MULT_SLOW    * offn / max(1, defn)< 9) return 0;
-	if (truespell==SK_SLOW2   && SP_MULT_SLOW2   * offn / max(1, defn)< 9) return 0;
+	if (truespell==SK_STYMIE  && SP_MULT_STYMIE  * offn / max(1, defn)< 9) return 0;
 	if (truespell==SK_DISPEL  && SP_MULT_DISPEL2 * offn / max(1, defn)< 9) return 0;
 	if (truespell==SK_TAUNT   && SP_MULT_TAUNT   * offn / max(1, defn)<10) return 0;
 	if (truespell==SK_WARCRY  && SP_MULT_WARCRY  * offn / max(1, defn)<10) return 0;
@@ -3672,25 +3671,16 @@ int npc_try_spell(int cn, int co, int spell)
 
 int npc_can_spell(int cn, int co, int spell)
 {
-	if ((spell==SK_CLEAVE  || spell==SK_SHIELD || spell==SK_WEAKEN || 
-		 spell==SK_WARCRY  || spell==SK_BLIND  || spell==SK_TAUNT  || 
-		 spell==SK_LEAP    || spell==SK_PACT   ))
+	if ((ch[cn].a_mana-500) / 1000 < get_spellcost(cn, spell) * (do_get_iflag(cn, SF_MAGI_R)?3:2)/2) return 0;
+	
+	if (spell==SK_CURSE)
 	{
-		if ((ch[cn].a_end-500) / 1000 < get_spellcost(cn, spell)) return 0;
+		if (!do_get_iflag(co, SF_TOWER)) return 0;
 	}
-	else
-	{
-		if ((ch[cn].a_mana-500) / 1000 < get_spellcost(cn, spell) * (do_get_iflag(cn, SF_MAGI_R)?3:2)/2) return 0;
-	}
-	if (!B_SK(cn, spell))
-	{
-		return 0;
-	}
-	if (M_SK(co, spell)>M_SK(cn, spell))
-	{
-		return 0;
-	}
-
+	
+	if (!B_SK(cn, spell))                return 0;
+	if (M_SK(co, spell)>M_SK(cn, spell)) return 0;
+	
 	return 1;
 }
 

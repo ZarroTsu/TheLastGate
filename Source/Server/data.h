@@ -281,26 +281,6 @@ extern unsigned int mapmarker;
 #define SPEED_BASE			120
 #define C_AT_CAP(cn, n)		(AT_CAP + ch[(cn)].limit_break[(n)][0] + ch[(cn)].limit_break[(n)][1])
 
-#define PROX_MULTI		(AT_CAP/ 2)
-#define PROX_CAP		(AT_CAP/10) // 12
-#define PROX_HIT		(AT_CAP/25) // 30
-#define PROX_POW		(AT_CAP/30) // 36
-
-#define PRXW_RAD		6
-#define PRXW_CAP		(AT_CAP/ 4)
-#define PRXW_HIT		(AT_CAP/20)
-#define PRXW_POW		(AT_CAP/24)
-
-#define PRXB_RAD		4
-#define PRXB_CAP		(AT_CAP/ 5)
-#define PRXB_HIT		(AT_CAP/15)
-#define PRXB_POW		(AT_CAP/18)
-
-#define PRXP_RAD		3
-#define PRXL_RAD		2
-
-#define PRXA_RAD		5
-
 #define PREC_CAP		(AT_CAP)
 
 // Attribute Definitions
@@ -377,8 +357,8 @@ extern unsigned int mapmarker;
 #define SK_BLEED		 2
 #define SK_WEAKEN2		 3
 #define SK_SCORCH		 4
-#define SK_CURSE2		 5 
-#define SK_SLOW2		 6
+#define SK_FOCUS		 5 
+#define SK_STYMIE		 6
 #define SK_ZEPHYR2		 8
 #define SK_DOUSE		10
 #define SK_MSHELL		12
@@ -1065,7 +1045,7 @@ __attribute__ ((packed));
 #define EXP_RATE 16
 #define EXP_TIME (MAPY/EXP_RATE)
 
-#define NUM_CORR 120
+#define NUM_CORR 121
 
 struct olditem
 {

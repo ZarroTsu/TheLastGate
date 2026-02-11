@@ -274,8 +274,8 @@
 #define SP_PACT		(1u<<17)
 #define SP_LETHARGY	(1u<<18)
 #define SP_WEAKEN2	(1u<<19)
-#define SP_CURSE2	(1u<<20)
-#define SP_SLOW2	(1u<<21)
+#define SP_STYMIE	(1u<<20)
+#define SP_FOCUS	(1u<<21)
 #define SP_DOUSE	(1u<<22)
 #define SP_MSHELL	(1u<<23)
 #define SP_WARCRY3	(1u<<24)
@@ -318,9 +318,8 @@
 // -------- Debuff Multipliers -------- //
 
 #define SP_MULT_CURSE		100
-#define SP_MULT_CURSE2		105
+#define SP_MULT_STYMIE		115
 #define SP_MULT_SLOW		120
-#define SP_MULT_SLOW2		115
 #define SP_MULT_POISON		115
 #define SP_MULT_POISON2		110
 #define SP_MULT_IDENTIFY	180
@@ -353,6 +352,7 @@
 #define SP_DUR_ENHANCE		( TICKS * 60 * 10                 )
 #define SP_DUR_BLESS		( TICKS * 60 * 10                 )
 #define SP_DUR_HASTE		( TICKS * 60 * 10                 )
+#define SP_DUR_FOCUS		( TICKS * 60 * 10                 )
 #define SP_DUR_RALLY		( TICKS * 60 * 10                 )
 #define SP_DUR_PULSE		( TICKS * 60 * 10                 )
 #define SP_DUR_ZEPHYR		( TICKS * 60 * 10                 )
@@ -367,8 +367,8 @@
 #define SP_DUR_SHOCK		( TICKS * 60 *  2                 )
 #define SP_DUR_DOUSE		( TICKS * 60 *  2                 )
 #define SP_DUR_FROSTB		( TICKS * 60 *  2                 )
+#define SP_DUR_STYMIE		( TICKS * 60 *  2                 )
 
-#define SP_DUR_CURSE2		( TICKS * 60                      )
 #define SP_DUR_HEAL			( TICKS * 60                      )
 #define SP_DUR_GLOVES		( TICKS * 30                      )
 #define SP_DUR_POISON		( TICKS * 30                      )
@@ -386,7 +386,6 @@
 
 #define SP_DUR_MSHELL(a)	( a * 128                         )
 #define SP_DUR_MSHIELD(a)	( a * 256                         )
-#define SP_DUR_SLOW2(a)		( TICKS * 30 + TICKS * a / 2      )
 #define SP_DUR_SLOW(a)		( TICKS * 15 + TICKS * a / 4      )
 #define SP_DUR_WARCRY2(a)	( TICKS + TICKS * a / 75          )
 #define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
@@ -400,6 +399,7 @@
 #define SK_EXH_ENHANCE		(TICKS / 2)
 #define SK_EXH_BLESS		(TICKS / 2)
 #define SK_EXH_HASTE		(TICKS / 2)
+#define SK_EXH_FOCUS		(TICKS / 2)
 #define SK_EXH_RECALL		(TICKS / 2)
 #define SK_EXH_ZEPHYR		(TICKS / 2)
 #define SK_EXH_PACT			(TICKS / 2)
@@ -524,7 +524,7 @@ extern char *at_short[];
 #define DESC_SIGN_SHAD		"When equipped, your Shadow Copy can summon Shadow Copies.\n"
 #define DESC_SIGN_SPAR		"When equipped, your Blast hits an additional nearby target when its cooldown expires.\n"
 #define DESC_SIGN_SYMM		"When equipped, this ring will copy the effects of your other ring slot.\n"
-#define DESC_SIGN_SONG		"When equipped, your Aria additionally grants nearby allies 10%% of your Armor Value.\n"
+#define DESC_SIGN_SONG		"When equipped, your Aria additionally grants yourself and nearby allies 10%% of your Weapon and Armor Values.\n"
 #define DESC_SIGN_SCRE		"When equipped, casting Curse will also inflict Aggravate.\n"
 
 #define FN_EX			5
@@ -634,7 +634,7 @@ extern char *at_short[];
 #define DESC_MAGI			"When equipped, secondary effects of Intuition and Strength are equal to the higher of the two.\n"
 #define DESC_PREIST			"When equipped, 30%% of damage taken is dealt to Mana before Hitpoints.\n"
 #define DESC_EMPRESS		"When equipped, your Magic Shield spell is replaced with Magic Shell. Magic Shell grants a temporary Resistance and Immunity bonus.\n"
-#define DESC_EMPEROR		"When equipped, your Slow spell is replaced with Greater Slow. Greater Slow no longer decays and has an increased duration.\n"
+#define DESC_EMPEROR		"When equipped, your Slow spell is replaced with Stymie. Stymie reduces enemy Cooldown Rate.\n"
 #define DESC_HEIROPH		"When equipped, Immunize and Inoculate from your Dispel spell lasts four times as long, but your Dispel spell can only remove a single buff or debuff at a time.\n"
 #define DESC_LOVERS			"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
 #define DESC_CHARIOT		"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spellpower bonus.\n"
@@ -646,7 +646,7 @@ extern char *at_short[];
 #define DESC_DEATH			"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
 #define DESC_TEMPER			"When equipped, your Taunt skill grants 100%% more Guard power, but Guard duration is halved.\n"
 #define DESC_DEVIL			"When equipped, 33%% of all skill and spell costs are instead taken from your Hitpoints.\n"
-#define DESC_TOWER			"When equipped, your Curse spell is replaced with Greater Curse. Greater Curse has increased effect, but decays over time and has a reduced duration.\n"
+#define DESC_TOWER			"When equipped, your Curse spell is replaced with Focus. Focus grants additional Cooldown Rate.\n"
 #define DESC_STAR			"When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n"
 #define DESC_MOON			"When equipped, life regeneration is instead applied as mana regeneration while able to recover mana.\n"
 #define DESC_SUN			"When equipped, endurance regeneration is instead applied as life regeneration while able to recover life.\n"

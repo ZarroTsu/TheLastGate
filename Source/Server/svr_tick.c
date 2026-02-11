@@ -1873,9 +1873,10 @@ int get_meta_stat_value(int cn, int n)
 	
 	switch (n) // Cooldown set
 	{
-		case  0: case 26: case 28: case 29: case 33: case 36: case 38: 
+		case 0: case 26: case 28: case 29: case 33: case 36: case 38: 
 		case 39: case 44: case 47: case 75: case 77: case 79: case 81: 
 		case 83: case 85: case 88: case 91: case 97: case 99: case 101:
+		case 104: case 106:
 			cdlen = 100 * (do_get_iflag(cn, SF_BOOK_DAMO)?90:100) / max(25, ch[cn].cool_bonus);
 			if (IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_TW_ACEDIA)) cdlen = cdlen * 3/4; // Acedia less
 			if (IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_TW_ACEDIA)) cdlen = cdlen * 6/4; // Acedia more
@@ -2214,7 +2215,7 @@ int get_meta_stat_value(int cn, int n)
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
 			value = 3 * cdlen;
 			break;
-		case 80: // Curse Effect											// Flipped to Positive
+		case 80: case 103: // Curse/Stymie Effect									// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			power = more(power, M_AT(cn, AT_INT) * TC_SK(cn,110), 20);  // (Corr) Famine
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = more(power, 20, 1);
@@ -2223,13 +2224,13 @@ int get_meta_stat_value(int cn, int n)
 				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
 				power = less(power, 25, 1);
 			}
-			if (do_get_iflag(cn, SF_TOWER))       value = (5 + CURSE2FORM(power, 4));
+			if (do_get_iflag(cn, SF_TOWER))       value = max(-127, -(power/4 + 1));
 			else                                  value = (3 + (power - 4) / 5);
 			break;
-		case 81: // Curse Cooldown					Decimal, 0.00 Seconds
+		case 81: case 104: // Curse/Stymie Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
 			break;
-		case 82: // Slow Effect												// Flipped to Positive
+		case 82: case 105: // Slow/Focus Effect										// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = more(power, 20, 1);
@@ -2241,7 +2242,7 @@ int get_meta_stat_value(int cn, int n)
 			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
 			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;
-		case 83: // Slow Cooldown					Decimal, 0.00 Seconds
+		case 83: case 106: // Slow/Focus Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
 			break;
 		//
@@ -2295,6 +2296,10 @@ int ch_get_meta_alternative_value(int cn, int n)
 	if (n == 79 && do_get_iflag(cn, SF_DEATH))    return 101; // Weaken -> Crush
 	if (n == 31 && do_get_iflag(cn, SF_HERMIT_R)) return 102; // Pact HP -> Mana
 	if (n == 72 && do_get_iflag(cn, SF_HERMIT_R)) return 102; // Pact HP -> Mana
+	if (n == 80 && do_get_iflag(cn, SF_TOWER))    return 103; // Curse -> Stymie
+	if (n == 81 && do_get_iflag(cn, SF_TOWER))    return 104; // Curse -> Stymie
+	if (n == 82 && do_get_iflag(cn, SF_EMPEROR))  return 105; // Slow -> Focus
+	if (n == 83 && do_get_iflag(cn, SF_EMPEROR))  return 106; // Slow -> Focus
 	
 	return n;
 }
