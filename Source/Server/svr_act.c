@@ -1000,7 +1000,7 @@ void plr_misc(int cn)
 	switch(ch[cn].status2)
 	{
 		case  0:
-			if (IS_SEYA_OR_WARR(cn)) surround = 3;
+			if (IS_SEYA_OR_BRAV(cn)) surround = 3;
 			plr_attack(cn, surround);
 			break;
 		case  1:
@@ -1020,6 +1020,7 @@ void plr_misc(int cn)
 			plr_attack(cn, surround);
 			break;
 		case  6:
+			if (IS_BRAVER(cn))  surround = 3;
 			if (IS_WARRIOR(cn)) surround = 2;
 			if (IS_LYCANTH(cn)) surround = 3;
 			plr_attack(cn, surround);

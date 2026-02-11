@@ -10091,8 +10091,6 @@ void do_attack(int cn, int co, int surround)
 		do_get_iflag(cc, SF_HEIROP_R) && !RANDOM(5)) hit = 0;                              // [Taro] Heirophant.R
 	if (do_get_iflag(co, SF_WHEEL_R) && !RANDOM(4))  hit = 1;                              // [Taro] Wheel.R
 	
-	if (B_SK(cn, SK_ZEPHYR)) power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
-	
 	if (hit)
 	{
 		dam = ch[cn].weapon + RANDOM(8);
@@ -10133,22 +10131,16 @@ void do_attack(int cn, int co, int surround)
 			char_play_sound(co, ch[cn].sound + 4, -150, 0);
 		}
 		
-		// Check if the attacker has Zephyr
-		in2 = has_spell(cn, SK_ZEPHYR);
-		
 		if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 			aoe_driver(cn, cn, co_orig, SK_SURROUND, odam, GET_PROX(cn), 1, surround, crit_dam);
 		
-		if (in2 && !do_get_iflag(cn, SF_DEATH_R) && !IS_NOMAGIC(co))
-			spell_zephyr(cn, co, bu[in2].power, 1);
-		else if (power && !do_get_iflag(cn, SF_DEATH_R) && !IS_NOMAGIC(co))
-			spell_zephyr(cn, co, power, 1);
+		zephyr_check(cn, co, 0, 0);
 	}
 	else    // Attack was parried...
 	{
 		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 5);
 		char_play_sound(co, ch[cn].sound + 5, -150, 0);
-
+		
 		do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEMISS, cn, co, 0, 0);
 		do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 		do_notify_char(cn, NT_DIDMISS, co, 0, 0, 0);
@@ -10157,22 +10149,7 @@ void do_attack(int cn, int co, int surround)
 			do_hurt(co, cn, ch[co].gethit_dam, 13);
 	}
 	
-	// Tarot - Death.R : Trigger Zephyr when attacked
-	if (B_SK(co, SK_ZEPHYR) && do_get_iflag(co, SF_DEATH_R))
-	{
-		power = spell_multiplier(M_SK(co, SK_ZEPHYR), co);
-		
-		if ((in2 = has_spell(co, SK_ZEPHYR)))
-		{
-			if (!IS_NOMAGIC(cn))
-				spell_zephyr(co, cn, bu[in2].power, 1);
-		}
-		else if (power && do_get_iflag(co, SF_DEATH_R))
-		{
-			if (!IS_NOMAGIC(cn))
-				spell_zephyr(co, cn, power, 1);
-		}
-	}
+	zephyr_check(co, cn, 0, 1);
 }
 
 int do_maygive(int cn, int co, int in)
@@ -11928,58 +11905,6 @@ void really_update_char(int cn)
 	ch[cn].move_speed = clamp(spd_move, -127, 127);
 	
 	
-	/*
-		ch[].cast_speed value
-		ch[].atk_speed value
-	*/
-	
-	// Flat bonus
-	{
-		if (IS_SUMMONER(cn))
-			spd_cast   += attrib_ex[AT_WIL]/2;
-		else
-			spd_cast   += attrib_ex[AT_WIL]/4;
-		
-		if (IS_WARRIOR(cn))
-			spd_attack += attrib_ex[AT_AGL]/2;
-		else
-			spd_attack += attrib_ex[AT_AGL]/4;
-		
-		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
-			spd_attack += spd_cast;
-	}
-	
-	// Additive bonus
-	{
-		n  = 0;
-		n += T_WARR_SK(cn,  5)*20;  // (Warr) Swiftness
-		n +=     TC_SK(cn, 41)*10;
-		
-		spd_attack = more(base_spd + spd_attack, n, 1) - base_spd;
-		
-		n  = 0;
-		n += T_SUMM_SK(cn,  5)*20;  // (Summ) Spellslinger
-		n +=     TC_SK(cn, 65)*10;
-		
-		spd_cast = more(base_spd + spd_cast, n, 1) - base_spd;
-		
-		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
-			spd_attack = more(base_spd + spd_attack, n, 1) - base_spd;
-	}
-	
-	if (do_get_iflag(cn, SF_STRENGTH))    // [Taro] Strength
-	{
-		spd_cast = less(base_spd + spd_cast, 15, 1);
-		
-		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
-			spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
-		
-		spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
-	}
-	
-	ch[cn].cast_speed = clamp(spd_cast,   -127, 127);
-	ch[cn].atk_speed  = clamp(spd_attack, -127, 127);
-	
 	// Tactics
 	if (B_SK(cn, SK_TACTICS))
 	{
@@ -12070,6 +11995,59 @@ void really_update_char(int cn)
 	}
 	
 	ch[cn].spell_pow = clamp(spell_pow, -300, 300);
+	
+	
+	/*
+		ch[].cast_speed value
+		ch[].atk_speed value
+	*/
+	
+	// Flat bonus
+	{
+		if (IS_SUMMONER(cn))
+			spd_cast   += attrib_ex[AT_WIL]/2;
+		else
+			spd_cast   += attrib_ex[AT_WIL]/4;
+		
+		if (IS_WARRIOR(cn))
+			spd_attack += attrib_ex[AT_AGL]/2;
+		else
+			spd_attack += attrib_ex[AT_AGL]/4;
+		
+		if (T_SUMM_SK(cn,  4))    // (Summ) Strategist
+			spd_attack += spd_cast;
+	}
+	
+	// Additive bonus
+	{
+		n  = 0;
+		n += T_WARR_SK(cn,  5)*20;  // (Warr) Swiftness
+		n +=     TC_SK(cn, 41)*10;
+		
+		spd_attack = more(base_spd + spd_attack, n, 1) - base_spd;
+		
+		n  = 0;
+		n += T_SUMM_SK(cn,  5)*20;  // (Summ) Spellslinger
+		n +=     TC_SK(cn, 65)*10;
+		
+		spd_cast = more(base_spd + spd_cast, n, 1) - base_spd;
+		
+		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
+			spd_attack = more(base_spd + spd_attack, n, 1) - base_spd;
+	}
+	
+	if (do_get_iflag(cn, SF_STRENGTH))    // [Taro] Strength
+	{
+		spd_cast = less(base_spd + spd_cast, 15, 1);
+		
+		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
+			spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
+		
+		spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
+	}
+	
+	ch[cn].cast_speed = clamp(spd_cast,   -127, 127);
+	ch[cn].atk_speed  = clamp(spd_attack, -127, 127);
 	
 	
 	/*
@@ -12365,7 +12343,8 @@ void really_update_char(int cn)
 	{
 		damage_top += (attrib_ex[AT_STR] * unarmed) / 2;
 		
-		if (T_BRAV_SK(cn, 10)) damage_top += spell_pow;  // (Brav) Spellblade
+		if (T_BRAV_SK(cn, 10))    // (Brav) Spellblade
+			damage_top += spell_pow;
 	}
 	
 	// Additive Bonuses
@@ -12554,6 +12533,15 @@ void do_pmshield(int cn, int co)
 int get_aria_wv(int cn, int in)
 {
 	int weapon = 0, n = TC_SK(cn, 34)*15;
+	
+	if (cn && do_get_iflag(cn, SF_SIGN_SONG))    // [Ring] Signet of Song
+	{
+		weapon = ch[cn].weapon;
+		
+		if (in) weapon -= bu[in].weapon;
+		
+		weapon = weapon * 10; // 10%
+	}
 	
 	return more(weapon, n, 1)/100;
 }
@@ -13920,16 +13908,7 @@ void do_regenerate(int cn)
 			if ((bu[in].temp==SK_BLIND || bu[in].temp==SK_DOUSE) && (tmp = bu[in].data[1]) && globs->ticker>bu[in].data[2] && (co = bu[in].data[0]))
 			{
 				if (co && do_get_iflag(co, SF_SIGN_STOR))
-				{
-					if ((in2 = has_spell(co, SK_ZEPHYR)))
-					{
-						spell_zephyr(co, cn, bu[in2].power, 1);
-					}
-					else if (tmp)
-					{
-						spell_zephyr(co, cn, tmp, 1);
-					}
-				}
+					zephyr_check(co, cn, 0, -1);
 				bu[in].data[2] = globs->ticker + TICKS*5;
 			}
 			

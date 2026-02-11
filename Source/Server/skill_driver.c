@@ -746,7 +746,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 // Entry :: if (surround && (B_SK(cn, SK_SURROUND) || IS_WPSPEAR(ch[cn].worn[WN_RHAND])))
 void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int critDam)
 {
-	int n, in, coPar, surrBonus = 0, surrTotal = 0, power = 0;
+	int n, coPar, surrBonus = 0, surrTotal = 0;
 	int surrMod = 0, surrDam = 0;
 	
 	remember_pvp(cn, co);
@@ -759,11 +759,6 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 	surrDam = dam*3/4;
 	critDam = critDam*3/4;
 	coPar   = ch[co].to_parry;
-	
-	if (in = has_spell(cn, SK_ZEPHYR))
-		power = bu[in].power;
-	else if (B_SK(cn, SK_ZEPHYR))
-		power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
 	
 	if ((surround==1 && (surrMod + RANDOM(40)) >= coPar) ||
 		(surround==2 && (surrMod + RANDOM(30)) >= coPar) ||
@@ -779,8 +774,8 @@ void aoe_surroundhit(int cn, int co, int co_orig, int surround, int dam, int cri
 		
 		if (dam>0) try_hit_debuff(cn, co, HIT_DEBUFF_SMALL);
 		
-		if (!IS_NOMAGIC(co) && power && co!=co_orig && !do_get_iflag(cn, SF_DEATH_R))
-			spell_zephyr(cn, co, power, 1);
+		if (co!=co_orig)
+			zephyr_check(cn, co, 0, 0);
 	}
 }
 
@@ -849,11 +844,9 @@ int aoe_skill_notarget(int cn, int co, int co_orig, int intemp, int power)
 			}
 			break;
 		case SK_ZEPHYR2:
-			spell_zephyr(cn, co, power, 1);
-			return 1;
+			return zephyr_check(cn, co, 0, 0);
 		case SK_BLOODLET:
-			spell_bleed(cn, co, power);
-			return 1;
+			return spell_bleed(cn, co, power);
 		default: break;
 	}
 	return 0;
@@ -2799,7 +2792,7 @@ int spell_heal(int cn, int co, int power)
 			{
 				// Each stack of heal sickness reduces the spell power by 1/4th
 				tmp = bu[in2].data[1] * 25;
-				tmp = less(tmp, T_BRAV_SK(co, 12)*40, 1);  // (Brav) Resilience
+				tmp = less(tmp, TC_SK(cn,121)*20, 1);  // (Corr) Ignorance
 				
 				healing = healing - (healing * tmp / 100);
 				
@@ -3878,6 +3871,9 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 	if (do_get_iflag(cn, SF_JUDGE))
 		spell_scorch(cn, co, hitpower, 0);
 	
+	// Zephyr proc - centered on the target
+	zephyr_check(cn, co, co, 0);
+	
 	return 1+tmp;
 }
 void skill_blast(int cn)
@@ -4423,7 +4419,12 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag, int
 		power = spell_immunity(cn, co, power);
 		power = common_mult(cn, co, power);
 		
-		if (!(in = make_new_buff(cn, SK_DISPEL2, BUF_SPR_INNOCU, power, SP_DUR_DISPEL(power/4)*(tarot?4:1), 0)))
+		dur = SP_DUR_DISPEL(power/4)*(tarot?4:1);
+		
+		if (T_BRAV_SK(cn, 12))  // (Brav) Resilience
+			dur = -1;
+		
+		if (!(in = make_new_buff(cn, SK_DISPEL2, BUF_SPR_INNOCU, power, dur, 0)))
 			return 0;
 		
 		bu[in].data[5] = 1;
@@ -4431,6 +4432,11 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag, int
 	else		// Buff version
 	{
 		power = spellpower_check(cn, co, power, 0);
+		
+		dur = SP_DUR_DISPEL(power)*(tarot?4:1);
+		
+		if (T_BRAV_SK(co, 12))  // (Brav) Resilience
+			dur = -1;
 		
 		if (!(in = make_new_buff(cn, SK_DISPEL, BUF_SPR_IMMUNI, power, SP_DUR_DISPEL(power)*(tarot?4:1), 0)))
 			return 0;
@@ -5486,14 +5492,7 @@ void skill_cleave(int cn)
 	spell_cleave(cn, co, power, 0);
 	
 	// Zephyr proc
-	if (in = has_spell(cn, SK_ZEPHYR))
-	{
-		aoe_driver(cn, cn, 0, SK_ZEPHYR2, bu[in].power, M_SK(cn, SK_SURROUND), 0, 0, 0);
-	}
-	else if (B_SK(cn, SK_ZEPHYR) && (power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn)))
-	{
-		aoe_driver(cn, cn, 0, SK_ZEPHYR2, power, M_SK(cn, SK_SURROUND), 0, 0, 0);
-	}
+	zephyr_check(cn, co, cn, 0);
 	
 	add_exhaust(cn, SK_EXH_CLEAVE);
 }
@@ -6243,6 +6242,45 @@ void skill_leap(int cn, int flag)
 	}
 }
 
+int zephyr_power(int cn, int power)
+{
+	power = spell_multiplier(power, cn) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
+	
+	// Additive bonus
+	{
+		n  = 0;
+		n += T_BRAV_SK(cn,  9)*2;    // (Brav) Alacrity
+		n +=     TC_SK(cn, 93);
+		
+		power = more(power, M_AT(cn, AT_BRV) * n, 20);
+	}
+	
+	return power;
+}
+
+int zephyr_check(int cn, int co, int cz, int tarot)
+{
+	int in, power;
+	
+	if (IS_NOMAGIC(co))                            return 0;
+	if (tarot==0 &&  do_get_iflag(cn, SF_DEATH_R)) return 0;
+	if (tarot==1 && !do_get_iflag(cn, SF_DEATH_R)) return 0;
+	
+	if (in = has_spell(cn, SK_ZEPHYR))
+		power = bu[in].power;
+	else if (B_SK(cn, SK_ZEPHYR))
+		power = zephyr_power(cn, M_SK(cn, SK_ZEPHYR));
+	else
+		return 0;
+	
+	if (IS_LIVINGCHAR(cz))
+		aoe_driver(cn, cz, 0, SK_ZEPHYR2, power, power, 0, 0, 0);
+	else
+		spell_zephyr(cn, co, power, 1);
+	
+	return 1;
+}
+
 // Zephyr grants a stacking debuff to hits, dealing additional damage when it expires
 // This damage is considered melee
 int spell_zephyr(int cn, int co, int power, int flag)
@@ -6274,16 +6312,7 @@ int spell_zephyr(int cn, int co, int power, int flag)
 	}
 	else      // Buff version
 	{
-		power = spell_multiplier(power, cn);
-		
-		// Additive bonus
-		{
-			n  = 0;
-			n += T_BRAV_SK(cn,  9)*2;    // (Brav) Alacrity
-			n +=     TC_SK(cn, 93);
-			
-			power = more(power, M_AT(cn, AT_BRV) * n, 20);
-		}
+		power = zephyr_power(cn, power);
 		
 		if (!(in = make_new_buff(cn, SK_ZEPHYR, BUF_SPR_ZEPHYR, power, SP_DUR_ZEPHYR, 0))) 
 			return 0;
@@ -6293,12 +6322,12 @@ int spell_zephyr(int cn, int co, int power, int flag)
 }
 void skill_zephyr(int cn)
 {
-	if (is_exhausted(cn)) 								{ return; }
-	if (spellcost(cn, SP_COST_ZEPHYR, SK_ZEPHYR, 1))	{ return; }
-	if (chance(cn, FIVE_PERC_FAIL)) 					{ return; }
-
+	if (is_exhausted(cn))                            return;
+	if (spellcost(cn, SP_COST_ZEPHYR, SK_ZEPHYR, 1)) return;
+	if (chance(cn, FIVE_PERC_FAIL))                  return;
+	
 	spell_zephyr(cn, cn, M_SK(cn, SK_ZEPHYR), 0);
-
+	
 	add_exhaust(cn, SK_EXH_ZEPHYR);
 }
 

@@ -460,8 +460,8 @@ struct sk_tree sk_tree[10][12]={
 		  6654,                            "additional Top Damage." },
 		{ "Wizardry",                      "20%% increased total Spellpower Bonus.",
 		  6707,                            "" },
-		{ "Resilience",                    "40%% reduced effect of healing sickness on ",
-		  6694,                            "you." }
+		{ "Resilience",                    "Immunize on you no longer expires. ",
+		  6694,                            "Innoculate from you no longer expires." }
 	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Lycanthrope
 		{ "Expanse",                       "+2 to Area of Effect.",
@@ -803,7 +803,10 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "Censure",                       "(+5%%) of damage taken from hits is staggered ",
 	  6622,                            "over 5 seconds." },
 	{ "Pestilence",                    "Your skills and spells ignore (+10%%) of enemy ",
-	  6606,                            "resistance." }
+	  6606,                            "resistance." },
+	//"         '         '         ", "         '         '         '         '      " ////////
+	{ "Ignorance",                     "(+20%%) reduced effect of healing sickness on ",
+	  6694,                            "you." }
 };
 
 struct metaStat metaStats[107] = {

@@ -2056,7 +2056,7 @@ int get_meta_stat_value(int cn, int n)
 			value = 6 * cdlen;
 			break;
 		case 40: // Zephyr Hit Damage				Decimal, 0.00
-			power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn);
+			power = spell_multiplier(M_SK(cn, SK_ZEPHYR), cn) + ch[cn].weapon / 4;
 			power = more(power, M_AT(cn, AT_BRV)*(T_BRAV_SK(cn, 9)*2+TC_SK(cn, 93)), 20);  // (Brav) Alacrity
 			value = power * DAM_MULT_ZEPHYR/10;
 			break;
