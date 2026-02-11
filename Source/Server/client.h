@@ -496,5 +496,7 @@ struct metaStat
 
 #define ST_EXIT 12
 
+#define METASTATCOUNT    107
+
 extern struct player player[];
-extern struct metaStat metaStats[103];
+extern struct metaStat metaStats[METASTATCOUNT];

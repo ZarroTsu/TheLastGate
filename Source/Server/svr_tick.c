@@ -2215,7 +2215,7 @@ int get_meta_stat_value(int cn, int n)
 		case 79: case 101: // Weaken/Crush Cooldn	Decimal, 0.00 Seconds
 			value = 3 * cdlen;
 			break;
-		case 80: case 103: // Curse/Stymie Effect									// Flipped to Positive
+		case 80: case 103: // Curse/Focus Effect									// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
 			power = more(power, M_AT(cn, AT_INT) * TC_SK(cn,110), 20);  // (Corr) Famine
 			if (do_get_iflag(cn, SF_EN_MORECURS)) power = more(power, 20, 1);
@@ -2224,13 +2224,13 @@ int get_meta_stat_value(int cn, int n)
 				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
 				power = less(power, 25, 1);
 			}
-			if (do_get_iflag(cn, SF_TOWER))       value = max(-127, -(power/4 + 1));
+			if (do_get_iflag(cn, SF_TOWER))       value = min(127, power/4 + 1);
 			else                                  value = (3 + (power - 4) / 5);
 			break;
 		case 81: case 104: // Curse/Stymie Cooldown					Decimal, 0.00 Seconds
 			value = 4 * cdlen;
 			break;
-		case 82: case 105: // Slow/Focus Effect										// Flipped to Positive
+		case 82: case 105: // Slow/Stymie Effect										// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
 			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
 			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = more(power, 20, 1);
@@ -2239,7 +2239,7 @@ int get_meta_stat_value(int cn, int n)
 				power = more(power, (TC_SK(cn, 34)*15), 1);  // (Corr) Towering Presence
 				power = less(power, 25, 1);
 			}
-			if (do_get_iflag(cn, SF_EMPEROR))     value = (min(300, 30 + SLOW2FORM(power)));
+			if (do_get_iflag(cn, SF_EMPEROR))     value = max(-127, -(power/4 + 1));
 			else                                  value = (min(300, 30 + SLOWFORM(power)));
 			break;
 		case 83: case 106: // Slow/Focus Cooldown					Decimal, 0.00 Seconds

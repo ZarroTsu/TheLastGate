@@ -227,7 +227,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 		power = 200;
 
 		strcpy(bu[in].name, "Greater Slow");
-		bu[in].sprite = BUF_SPR_SLOW2;
+		bu[in].sprite = 319;
 		bu[in].duration  = bu[in].active = TICKS * 4;
 		bu[in].power = power;
 		bu[in].speed 		= -(min(300, 20 + SLOW2FORM(power)));

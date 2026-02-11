@@ -315,6 +315,7 @@ int is_ascroll(int in);
 
 // Slow's formula (used to degrade)
 #define SLOWFORM(n)				(n/2*9/10)
+#define SLOW2FORM(n)			(n/3*9/10)
 
 // Poison's formula (damage per tick)
 #define PL_POISFORM(p, d)		(((p+ 5) * 4500) / max(1, d))

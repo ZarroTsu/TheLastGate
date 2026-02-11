@@ -12747,7 +12747,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			if (do_get_iflag(cn, SF_EMPEROR))  // [Taro] Emperor
 			{
 				if (!(in2 = make_new_buff(cn, SK_STYMIE, BUF_SPR_STYMIE, power, SP_DUR_ARIA, 0))) return;
-				bu[in2].cool_bonus = max(-127, -(aoe_power/4 + 1));
+				bu[in2].cool_bonus = max(-127, -(power/4 + 1));
 			}
 			else
 			{

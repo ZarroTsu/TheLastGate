@@ -461,7 +461,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Wizardry",                      "20%% increased total Spellpower Bonus.",
 		  6707,                            "" },
 		{ "Resilience",                    "Immunize on you no longer expires. ",
-		  6694,                            "Innoculate from you no longer expires." }
+		  6694,                            "Inoculate from you no longer expires." }
 	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Lycanthrope
 		{ "Expanse",                       "+2 to Area of Effect.",
@@ -809,7 +809,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6694,                            "you." }
 };
 
-struct metaStat metaStats[107] = {
+struct metaStat metaStats[METASTATCOUNT] = {
 	//
 	//   Topmost standard stats
 	//                                             "         '         '         '         '         '         '         '         '         '         '         '         "
@@ -925,9 +925,9 @@ struct metaStat metaStats[107] = {
 	{ 41, 0, 5, "Crush Effect",         "AV",      "Effective reduction of target Armor Value when using your Crush skill, before enemy defenses." },
 	{ 41, 1, 5, "Crush Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Crush skill." },
 	{ 22, 0, 5, "Pact Mana Reserve",    "%",       "The amount of mana, as a percent, reserved while Pact is active." },
-	{ 20, 0, 2, "Stymie Effect",        "Cooldwn", "Effective reduction of target Cooldown Rate when casting your Stymie spell, before enemy defenses." },
-	{ 20, 1, 2, "Stymie Cooldown",      "Seconds", "Skill exhaustion duration expected upon using your Stymie spell." },
-	{ 19, 0, 4, "Focus Effect",         "Cooldwn", "Effective increase to Cooldown Rate granted by your Focus spell." },
-	{ 19, 1, 4, "Focus Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Focus spell." }
+	{ 20, 0, 4, "Focus Effect",         "Cooldwn", "Effective increase to Cooldown Rate granted by your Focus spell." },
+	{ 20, 1, 4, "Focus Cooldown",       "Seconds", "Skill exhaustion duration expected upon using your Focus spell." },
+	{ 19, 0, 2, "Stymie Effect",        "Cooldwn", "Effective reduction of target Cooldown Rate when casting your Stymie spell, before enemy defenses." },
+	{ 19, 1, 2, "Stymie Cooldown",      "Seconds", "Skill exhaustion duration expected upon using your Stymie spell." }
 };
 

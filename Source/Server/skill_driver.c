@@ -383,7 +383,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].cast_speed = -(min(127, 10 + SLOWFORM(power)/3));
 			break;
 		case SK_STYMIE:
-			bu[in].cool_bonus = max(-127, -(aoe_power/4 + 1));
+			bu[in].cool_bonus = max(-127, -(power/4 + 1));
 			break;
 		case SK_CURSE:
 			for (n=0; n<5; n++) bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
@@ -3066,7 +3066,7 @@ void skill_slow(int cn, int flag)
 	if (do_get_iflag(cn, SF_EMPEROR)) 
 	{ 
 		cost = cost * 3 / 4;
-		d20 = SP_MULT_SLOW2;
+		d20 = SP_MULT_STYMIE;
 	}
 	
 	// Get spell target - return on failure
@@ -6244,6 +6244,8 @@ void skill_leap(int cn, int flag)
 
 int zephyr_power(int cn, int power)
 {
+	int n;
+	
 	power = spell_multiplier(power, cn) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
 	
 	// Additive bonus
@@ -6285,7 +6287,7 @@ int zephyr_check(int cn, int co, int cz, int tarot)
 // This damage is considered melee
 int spell_zephyr(int cn, int co, int power, int flag)
 {
-	int in, n;
+	int in;
 	
 	if (flag) // Debuff version
 	{
