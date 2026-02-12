@@ -3294,7 +3294,7 @@ int spell_rally(int cn, int co, int power)
 int skill_rally(int cn, int power)
 {
 	int xf, yf,	xt, yt, xc, yc, x, y, co, m1, m2, n, skip;
-	int r = get_aoe_radius(cn, SK_WARCRY, M_SK(cn, SK_WARCRY) + GET_PROX(cn)/2);
+	int r = get_aoe_radius(cn, SK_WARCRY, (GET_PROX(cn) + power)/2);
 	
 	xc = ch[cn].x;
 	yc = ch[cn].y;
@@ -3412,7 +3412,6 @@ void skill_warcry(cn)
 {
 	int power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 	int cost = SP_COST_WARCRY;
-	int aoepower = M_SK(cn, SK_WARCRY) + GET_PROX(cn)/2;
 	
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, cost, SK_WARCRY, 0)) { return; }
@@ -3423,7 +3422,7 @@ void skill_warcry(cn)
 	}
 	else
 	{
-		if (aoe_driver(cn, cn, 0, SK_WARCRY, power, aoepower, 0, 0, 0) < 0) return;
+		if (aoe_driver(cn, cn, 0, SK_WARCRY, power, (GET_PROX(cn) + power)/2, 0, 0, 0) < 0) return;
 	}
 	
 	add_exhaust(cn, SK_EXH_WARCRY + TICKS * power/80);
@@ -4438,7 +4437,7 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag, int
 		if (T_BRAV_SK(co, 12))  // (Brav) Resilience
 			dur = -1;
 		
-		if (!(in = make_new_buff(cn, SK_DISPEL, BUF_SPR_IMMUNI, power, SP_DUR_DISPEL(power)*(tarot?4:1), 0)))
+		if (!(in = make_new_buff(cn, SK_DISPEL, BUF_SPR_IMMUNI, power, dur, 0)))
 			return 0;
 	}
 	
@@ -5719,7 +5718,6 @@ int spell_blind(int cn, int co, int power, int flag)
 void skill_blind(cn)
 {
 	int power = skill_multiplier(M_SK(cn, SK_BLIND), cn), cost = SP_COST_BLIND;
-	int aoe_power = (M_SK(cn, SK_BLIND) + GET_PROX(cn))/2;
 	
 	if (IS_ANY_MERC(cn))
 		cost /= 2;
@@ -5730,12 +5728,12 @@ void skill_blind(cn)
 	// Tarot Card - Chariot :: Change Blind into Douse
 	if (do_get_iflag(cn, SF_CHARIOT)) 
 	{
-		if (aoe_driver(cn, cn, 0, SK_DOUSE, power, aoe_power, 0, 0, 0) < 0)
+		if (aoe_driver(cn, cn, 0, SK_DOUSE, power, (GET_PROX(cn) + power)/2, 0, 0, 0) < 0)
 			return;
 	}
 	else
 	{
-		if (aoe_driver(cn, cn, 0, SK_BLIND, power, aoe_power, 0, 0, 0) < 0)
+		if (aoe_driver(cn, cn, 0, SK_BLIND, power, (GET_PROX(cn) + power)/2, 0, 0, 0) < 0)
 			return;
 	}
 	
@@ -5776,7 +5774,7 @@ int spell_charge(int cn, int co, int power)
 	
 	return add_spell(co, in); // SK_CHARGE
 }
-int spell_pulse(int cn, int co, int power, int tarot)
+int spell_pulse(int cn, int co, int power)
 {
 	int n, in, len, baselen = 100;
 
@@ -5800,7 +5798,7 @@ int spell_pulse(int cn, int co, int power, int tarot)
 	power = spell_multiplier(power, cn);
 	
 	// Tarot - Judgement.R : Pulse changed to buff form
-	if (tarot)
+	if (do_get_iflag(cn, SF_JUDGE_R))
 	{
 		if (!(in = make_new_buff(cn, SK_PULSE2, BUF_SPR_PULSE, power, SP_DUR_PULSE, 0))) 
 			return 0;
@@ -5831,24 +5829,15 @@ int spell_immolate(int cn, int co, int power)
 }
 void skill_pulse(int cn)
 {
-	int co, n, power, tarot = 0;
-	
-	tarot = do_get_iflag(cn, SF_JUDGE_R);
+	int co, n, power;
 	
 	if (is_exhausted(cn)) 								{ return; }
-	if (tarot && has_buff(cn, SK_IMMOLATE))
-	{
-		do_char_log(cn, 1, "Immolate no longer active.\n");
-		remove_buff(cn, SK_IMMOLATE);
-		do_update_char(cn);
-		return;
-	}
 	if (spellcost(cn, SP_COST_PULSE, SK_PULSE, 1))		{ return; }
 	if (chance(cn, FIVE_PERC_FAIL)) 					{ return; }
 	
 	power = M_SK(cn, SK_PULSE);
 	
-	spell_pulse(cn, cn, power, tarot);
+	spell_pulse(cn, cn, power);
 	
 	add_exhaust(cn, SK_EXH_PULSE);
 }
@@ -5900,8 +5889,7 @@ void skill_taunt(int cn)
 	int power = skill_multiplier(M_SK(cn, SK_TAUNT), cn), cost = SP_COST_TAUNT;
 	int count = 0, hit = 0;
 	int co, co_orig = -1;
-	int can_aoe = CAN_ARTM_PROX(cn);
-	int aoe_power = (M_SK(cn, SK_TAUNT) + GET_PROX(cn));
+//	int can_aoe = CAN_ARTM_PROX(cn);
 	
 	if (IS_PLAYER_COMP(cn))
 		cost = 5;
@@ -5917,7 +5905,7 @@ void skill_taunt(int cn)
 	}
 	
 	// AoE
-	if (aoe_driver(cn, cn, co, SK_TAUNT, power, aoe_power, count, hit, 0) < 0) return;
+	if (aoe_driver(cn, cn, co, SK_TAUNT, power, (GET_PROX(cn) + power)/2, count, hit, 0) < 0) return;
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	//if (hit) 
@@ -6264,6 +6252,7 @@ int zephyr_check(int cn, int co, int cz, int tarot)
 {
 	int in, power;
 	
+	if (!do_char_can_see(cn, co, 0))               return 0;
 	if (IS_NOMAGIC(co))                            return 0;
 	if (tarot==0 &&  do_get_iflag(cn, SF_DEATH_R)) return 0;
 	if (tarot==1 && !do_get_iflag(cn, SF_DEATH_R)) return 0;
@@ -6276,7 +6265,7 @@ int zephyr_check(int cn, int co, int cz, int tarot)
 		return 0;
 	
 	if (IS_LIVINGCHAR(cz))
-		aoe_driver(cn, cz, 0, SK_ZEPHYR2, power, power, 0, 0, 0);
+		aoe_driver(cn, cz, 0, SK_ZEPHYR2, power, (GET_PROX(cn) + power)/2, 0, 0, 0);
 	else
 		spell_zephyr(cn, co, power, 1);
 	

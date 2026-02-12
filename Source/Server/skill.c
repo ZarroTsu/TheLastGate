@@ -88,12 +88,12 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_BRV, AT_WIL, AT_WIL }},
 				
-	{ 19, 'F', 	"Slow", 				"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their action speed.", 
-				"Slow (Greater)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their action speed.",
+	{ 19, 'F', 	"Slow", 				"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, reducing their action speed.", 
+				"Slow (Stymie)", 		"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their cooldown rate.",
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 20, 'F', 	"Curse", 				"Use (Spell): Applies a debuff to your target and surrounding enemies, reducing their attributes.", 
-				"Curse (Greater)", 		"Use (Spell): Applies a decaying debuff to your target and surrounding enemies, greatly reducing their attributes.",
+				"Curse (Focus)", 		"Use (Spell): Applies a buff to you or your target, greatly raising their cooldown rate.",
 				{ AT_BRV, AT_INT, AT_INT }},
 				
 	{ 21, 'F', 	"Bless", 				"Use (Spell): Applies a buff to you or your target, raising their attributes.", 
@@ -403,7 +403,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Constitution",                  "10%% increased total Resistance.",
 		  6681,                            "" },
 		{ "Necromancy",                    "2%% of damage dealt by your companions is ",
-		  6703,                            "leeched to you as Hitpoints." }
+		  6703,                            "leeched by them and to you as Hitpoints." }
 	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Arch Harakim
 		{ "Composure",                     "+4 to Cooldown Rate.",
@@ -691,7 +691,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "False Constitution",            "(+5%%) increased total Resistance.",
 	  6681,                            "" },
 	{ "False Necromancy",              "(+1%%) of damage dealt by your companions is ",
-	  6703,                            "leeched to you as Hitpoints." },
+	  6703,                            "leeched by them and to you as Hitpoints." },
 	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Composure",               "(+2) to Cooldown Rate.",
 	  6673,                            "" },

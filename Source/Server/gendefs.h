@@ -423,8 +423,8 @@
 #define SK_EXH_GHOST		(TICKS * 8)
 #define SK_EXH_SHIFT		(TICKS * 8)
 
-#define HIT_DEBUFF_LARGE      24
-#define HIT_DEBUFF_SMALL       6
+#define HIT_DEBUFF_LARGE      12
+#define HIT_DEBUFF_SMALL       3
 
 extern char *at_name[];
 extern char *at_short[];

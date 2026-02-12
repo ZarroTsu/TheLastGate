@@ -4197,7 +4197,7 @@ int use_special_spell(int cn, int in)
 			if (ret) add_exhaust(cn, SK_EXH_WARCRY/2);
 			break;
 		case SK_IMMOLATE: 
-			if (!get_gear(cn, IT_WP_RISINGPHO) && !get_gear(cn, IT_WB_RISINGPHO)) 
+			if (!get_gear(cn, IT_WP_RISINGPHO) && !get_gear(cn, IT_WB_RISINGPHO) && !get_gear(cn, IT_BOOK_BURN)) 
 			{
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;

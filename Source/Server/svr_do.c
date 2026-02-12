@@ -9422,6 +9422,11 @@ void do_leech(int cn, int dam, int is_dot)
 	
 	if (IS_PLAYER_COMP(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]))
 	{
+		tmp = ch[cn].leech[0];
+		if (T_SUMM_SK(cc, 12)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Summ) Necromancy
+		if ((n=TC_SK(cc, 72))) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
+		ch[cn].leech[0] = tmp;
+		
 		tmp = ch[cc].leech[0];
 		if (T_SUMM_SK(cc, 12)) tmp = clamp(tmp + (dam * 2/1000), 0, 65500);  // (Summ) Necromancy
 		if ((n=TC_SK(cc, 72))) tmp = clamp(tmp + (dam * n/1000), 0, 65500);
@@ -9951,7 +9956,7 @@ int do_surround_check(int cn, int co, int gethit) // cn is the attacker, co is t
 	if (!do_inner_surround_checks(cn , co ))                             return 0; // Ignore if we're related or friendly.
 	if (gethit)
 	{
-		if (!do_char_can_see(cn, co, 0))                                 return 0; // Ignore things we cannot see
+		if (!(do_char_can_see(cn, co, 0) || do_char_can_see(co, cn, 0))) return 0; // Ignore things we cannot see
 		if (!may_attack_msg(cn, co, 0))                                  return 0; // Ignore things we cannot attack
 		if (ch[co].flags & CF_IMMORTAL)                                  return 0; // Ignore immortals, gods, etc.
 	}

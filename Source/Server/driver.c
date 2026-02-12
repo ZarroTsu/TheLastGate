@@ -1739,7 +1739,7 @@ int npc_give(int cn, int co, int in, int money)
 			if (nr == 3343) // Signet Rings (Tactician)
 			{
 				if (IS_ANY_MERC(co)||IS_SEYAN_DU(co)) nr = 3344;
-				if (IS_ANY_HARA(co)|| IS_LYCANTH(co)) nr = 3345;
+				if (IS_ANY_HARA(co)||  IS_BRAVER(co)) nr = 3345;
 			}
 			if (nr == 3346) // Arch Signet Rings (Damor)
 			{
@@ -3516,7 +3516,7 @@ int npc_try_spell(int cn, int co, int spell)
 	if (spell==SK_CURSE  && do_get_iflag(cn, SF_TOWER))   	truespell = SK_FOCUS;
 	if (spell==SK_BLIND  && do_get_iflag(cn, SF_CHARIOT)) 	truespell = SK_DOUSE;
 	if (spell==SK_POISON && do_get_iflag(cn, SF_TOWER_R)) 	truespell = SK_VENOM;
-	if (spell==SK_PULSE  && do_get_iflag(cn, SF_JUDGE_R)) 	truespell = SK_IMMOLATE;
+	if (spell==SK_PULSE  && do_get_iflag(cn, SF_JUDGE_R)) 	truespell = SK_PULSE2;
 	if (spell==SK_WEAKEN && do_get_iflag(cn, SF_DEATH)) 	truespell = SK_WEAKEN2;
 	if (spell==SK_SLOW   && do_get_iflag(cn, SF_EMPEROR)) 	truespell = SK_STYMIE;
 	if (spell==SK_WARCRY && do_get_iflag(cn, SF_EMPERO_R)) 	truespell = SK_WARCRY3;
