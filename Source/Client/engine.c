@@ -2886,657 +2886,557 @@ static int stattab[]={ 0, 1, 1, 6, 6, 2, 3, 4, 5, 7, 4};
 
 #define do_idle(ani,sprite)  (sprite==22480 ? ani : 0)
 
-int eng_char(int n)
-{
-	int tmp,update=1;
+int eng_char(int n) {
+    int m, tmp, update = 1;
 
-	if (map[n].flags&STUNNED) update=0;
+    if (map[n].flags & STUNNED) update = 0;
 
-	switch (map[n].ch_status) 
-	{
-		case   0:	// idle up
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0;
-			tmp=SPF_IDLE_UP+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   1:	// idle down
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_DOWN+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   2:	// idle left
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_LEFT+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   3:	// idle right
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_RIGHT+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   4:	// idle left-up
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_LEFTUP+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   5:	// idle left-down
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_LEFTDOWN+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   6:	// idle right-up
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_RIGHTUP+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		case   7:	// idle right-down
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			if (speedo(n) && update) { map[n].idle_ani++; if (map[n].idle_ani>7) map[n].idle_ani=0; }
-			tmp=SPF_IDLE_RIGHTDOWN+do_idle(map[n].idle_ani,map[n].ch_sprite);
-			break;
-		
-		case  16:	// walk up
-		case  17:
-		case  18:
-		case  19:
-		case  20:
-		case  21: 
-			map[n].obj_xoff=-speedstep(n,16,8,update)/2;
-			map[n].obj_yoff=speedstep(n,16,8,update)/4;
-			tmp=(map[n].ch_status-16)+SPF_WALK_UP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  22: 
-			map[n].obj_xoff=-speedstep(n,16,8,update)/2;
-			map[n].obj_yoff=speedstep(n,16,8,update)/4;
-			tmp=(map[n].ch_status-16)+SPF_WALK_UP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=16;
-			break;
-		case  23:   
-			map[n].obj_xoff=-speedstep(n,16,8,update)/2;
-			map[n].obj_yoff=speedstep(n,16,8,update)/4;
-			tmp=(map[n].ch_status-16)+SPF_WALK_UP;
-			if (speedo(n) && update) map[n].ch_status=16+((speedo(n)>1)?1:0);
-			break;
-		
-		case  24:	// walk down
-		case  25:
-		case  26:
-		case  27:
-		case  28:
-		case  29: 
-			map[n].obj_xoff=speedstep(n,24,8,update)/2;
-			map[n].obj_yoff=-speedstep(n,24,8,update)/4;
-			tmp=(map[n].ch_status-24)+SPF_WALK_DOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  30: 
-			map[n].obj_xoff=speedstep(n,24,8,update)/2;
-			map[n].obj_yoff=-speedstep(n,24,8,update)/4;
-			tmp=(map[n].ch_status-24)+SPF_WALK_DOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=24;
-			break;
-		case  31:   
-			map[n].obj_xoff=speedstep(n,24,8,update)/2;
-			map[n].obj_yoff=-speedstep(n,24,8,update)/4;
-			tmp=(map[n].ch_status-24)+SPF_WALK_DOWN;
-			if (speedo(n) && update) map[n].ch_status=24+((speedo(n)>1)?1:0);
-			break;
-		
-		case  32:	// walk left
-		case  33:
-		case  34:
-		case  35:
-		case  36:
-		case  37: 
-			map[n].obj_xoff=-speedstep(n,32,8,update)/2;
-			map[n].obj_yoff=-speedstep(n,32,8,update)/4;
-			tmp=(map[n].ch_status-32)+SPF_WALK_LEFT;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  38: 
-			map[n].obj_xoff=-speedstep(n,32,8,update)/2;
-			map[n].obj_yoff=-speedstep(n,32,8,update)/4;
-			tmp=(map[n].ch_status-32)+SPF_WALK_LEFT;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=32;
-			break;
-		case  39:   
-			map[n].obj_xoff=-speedstep(n,32,8,update)/2;
-			map[n].obj_yoff=-speedstep(n,32,8,update)/4;
-			tmp=(map[n].ch_status-32)+SPF_WALK_LEFT;
-			if (speedo(n) && update) map[n].ch_status=32+((speedo(n)>1)?1:0);
-			break;
-		
-		case  40:	// walk right
-		case  41:
-		case  42:
-		case  43:
-		case  44:
-		case  45: 
-			map[n].obj_xoff=speedstep(n,40,8,update)/2;
-			map[n].obj_yoff=speedstep(n,40,8,update)/4;
-			tmp=(map[n].ch_status-40)+SPF_WALK_RIGHT;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  46: 
-			map[n].obj_xoff=speedstep(n,40,8,update)/2;
-			map[n].obj_yoff=speedstep(n,40,8,update)/4;
-			tmp=(map[n].ch_status-40)+SPF_WALK_RIGHT;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=40;
-			break;
-		case  47:   
-			map[n].obj_xoff=speedstep(n,40,8,update)/2;
-			map[n].obj_yoff=speedstep(n,40,8,update)/4;
-			tmp=(map[n].ch_status-40)+SPF_WALK_RIGHT;
-			if (speedo(n) && update) map[n].ch_status=40+((speedo(n)>1)?1:0);
-			break;
-		
-		case  48:	// left+up
-		case  49:
-		case  50:
-		case  51:
-		case  52:
-		case  53:
-		case  54:
-		case  55:
-		case  56:
-		case  57:   
-			map[n].obj_xoff=-speedstep(n,48,12,update);
-			map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-48)*8/12+SPF_WALK_LEFTUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  58:  
-			map[n].obj_xoff=-speedstep(n,48,12,update);
-			map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-48)*8/12+SPF_WALK_LEFTUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=48;
-			break;
-		case  59:   
-			map[n].obj_xoff=-speedstep(n,48,12,update);
-			map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-48)*8/12+SPF_WALK_LEFTUP;
-			if (speedo(n) && update) map[n].ch_status=48+((speedo(n)>1)?1:0);
-			break;
-		
-		case  60:	// left+down
-		case  61:
-		case  62:
-		case  63:
-		case  64:
-		case  65:
-		case  66:
-		case  67:
-		case  68:
-		case  69:   
-			map[n].obj_xoff=0;
-			map[n].obj_yoff=-speedstep(n,60,12,update)/2;
-			tmp=(map[n].ch_status-60)*8/12+SPF_WALK_LEFTDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  70:   
-			map[n].obj_xoff=0;
-			map[n].obj_yoff=-speedstep(n,60,12,update)/2;
-			tmp=(map[n].ch_status-60)*8/12+SPF_WALK_LEFTDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=60;
-			break;
-		case  71:   
-			map[n].obj_xoff=0;
-			map[n].obj_yoff=-speedstep(n,60,12,update)/2;
-			tmp=(map[n].ch_status-60)*8/12+SPF_WALK_LEFTDOWN;
-			if (speedo(n) && update) map[n].ch_status=60+((speedo(n)>1)?1:0);
-			break;
-		
-		case  72:	// right+up
-		case  73:
-		case  74:
-		case  75:
-		case  76:
-		case  77:
-		case  78:
-		case  79:
-		case  80:
-		case  81:   
-			map[n].obj_xoff=0;
-			map[n].obj_yoff=speedstep(n,72,12,update)/2;
-			tmp=(map[n].ch_status-72)*8/12+SPF_WALK_RIGHTUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  82:   
-			map[n].obj_xoff=0;
-			map[n].obj_yoff=speedstep(n,72,12,update)/2;
-			tmp=(map[n].ch_status-72)*8/12+SPF_WALK_RIGHTUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=72;
-			break;
-		case  83:   
-			map[n].obj_xoff=0;
-			map[n].obj_yoff=speedstep(n,72,12,update)/2;
-			tmp=(map[n].ch_status-72)*8/12+SPF_WALK_RIGHTUP;
-			if (speedo(n) && update) map[n].ch_status=72+((speedo(n)>1)?1:0);
-			break;
-		
-		case  84:	// right+down
-		case  85:
-		case  86:
-		case  87:
-		case  88:
-		case  89:
-		case  90:
-		case  91:
-		case  92:
-		case  93:   
-			map[n].obj_xoff=speedstep(n,84,12,update);
-			map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-84)*8/12+SPF_WALK_RIGHTDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  94:   
-			map[n].obj_xoff=speedstep(n,84,12,update);
-			map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-84)*8/12+SPF_WALK_RIGHTDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=84;
-			break;
-		case  95:   
-			map[n].obj_xoff=speedstep(n,84,12,update);
-			map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-84)*8/12+SPF_WALK_RIGHTDOWN;
-			if (speedo(n) && update) map[n].ch_status=84+((speedo(n)>1)?1:0);
-			break;
-		
-		case  96:	// turn up to left-up
-		case  97: 
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-96)+SPF_TURN_UPLEFTUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case  98: 
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-96)+SPF_TURN_UPLEFTUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=96;
-			break;
-		case  99: 
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-96)+SPF_TURN_UPLEFTUP;
-			if (speedo(n) && update) map[n].ch_status=96+((speedo(n)>1)?1:0);
-			break;
-		
-		case 100:	// turn left-up to up
-		case 101:  
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-100)+SPF_TURN_LEFTUPUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 102:  
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-100)+SPF_TURN_LEFTUPUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=100;
-			break;
-		case 103:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-100)+SPF_TURN_LEFTUPUP;
-			if (speedo(n) && update) map[n].ch_status=100+((speedo(n)>1)?1:0);
-			break;
-		
-		case 104:	// turn up to right-up
-		case 105:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-104)+SPF_TURN_UPRIGHTUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 106:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-104)+SPF_TURN_UPRIGHTUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=104;
-			break;
-		case 107:   
-			tmp=(map[n].ch_status-104)+SPF_TURN_UPRIGHTUP;
-			if (speedo(n) && update) map[n].ch_status=104+((speedo(n)>1)?1:0);
-			break;
-		
-		case 108:	// turn right-up to right
-		case 109:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-108)+SPF_TURN_RIGHTUPRIGHT;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 110:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-108)+SPF_TURN_RIGHTUPRIGHT;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=108;
-			break;
-		case 111:   
-			tmp=(map[n].ch_status-108)+SPF_TURN_RIGHTUPRIGHT;
-			if (speedo(n) && update) map[n].ch_status=108+((speedo(n)>1)?1:0);
-			break;
-		
-		case 112:	// turn down to left-down
-		case 113: 
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-112)+SPF_TURN_DOWNLEFTDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 114: 
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-112)+SPF_TURN_DOWNLEFTDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=112;
-			break;
-		case 115: 
-			tmp=(map[n].ch_status-112)+SPF_TURN_DOWNLEFTDOWN;
-			if (speedo(n) && update) map[n].ch_status=112+((speedo(n)>1)?1:0);
-			break;
-		
-		case 116:	// turn left-down to left
-		case 117:  
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-116)+SPF_TURN_LEFTDOWNLEFT;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 118:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-116)+SPF_TURN_LEFTDOWNLEFT;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=116;
-			break;
-		case 119:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-116)+SPF_TURN_LEFTDOWNLEFT;
-			if (speedo(n) && update) map[n].ch_status=116+((speedo(n)>1)?1:0);
-			break;
-		
-		case 120:	// turn down to right-down
-		case 121:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-120)+SPF_TURN_DOWNRIGHTDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 122:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-120)+SPF_TURN_DOWNRIGHTDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=120;
-			break;
-		case 123:   
-			tmp=(map[n].ch_status-120)+SPF_TURN_DOWNRIGHTDOWN;
-			if (speedo(n) && update) map[n].ch_status=120+((speedo(n)>1)?1:0);
-			break;
-		
-		case 124:	// turn right-down to down
-		case 125:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-124)+SPF_TURN_RIGHTDOWNDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 126:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-124)+SPF_TURN_RIGHTDOWNDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=124;
-			break;
-		case 127:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-124)+SPF_TURN_RIGHTDOWNDOWN;
-			if (speedo(n) && update) map[n].ch_status=124+((speedo(n)>1)?1:0);
-			break;
-		
-		case 128:	// turn left to left-up
-		case 129:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-128)+SPF_TURN_LEFTLEFTUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 130:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-128)+SPF_TURN_LEFTLEFTUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=128;
-			break;
-		case 131:   
-			tmp=(map[n].ch_status-128)+SPF_TURN_LEFTLEFTUP;
-			if (speedo(n) && update) map[n].ch_status=128+((speedo(n)>1)?1:0);
-			break;
-		
-		case 132:	// turn left-up to left
-		case 133:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-132)+SPF_TURN_LEFTUPLEFT;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 134:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-132)+SPF_TURN_LEFTUPLEFT;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=132;
-			break;
-		case 135:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-132)+SPF_TURN_LEFTUPLEFT;
-			if (speedo(n) && update) map[n].ch_status=132+((speedo(n)>1)?1:0);
-			break;
-		
-		case 136:	// turn left to left-down
-		case 137:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-136)+SPF_TURN_LEFTLEFTDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 138:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-136)+SPF_TURN_LEFTLEFTDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=136;
-			break;
-		case 139:   
-			tmp=(map[n].ch_status-136)+SPF_TURN_LEFTLEFTDOWN;
-			if (speedo(n) && update) map[n].ch_status=136+((speedo(n)>1)?1:0);
-			break;
-		
-		case 140:	// turn left-down to down
-		case 141:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-140)+SPF_TURN_LEFTDOWNDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 142:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-140)+SPF_TURN_LEFTDOWNDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=140;
-			break;
-		case 143:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-140)+SPF_TURN_LEFTDOWNDOWN;
-			if (speedo(n) && update) map[n].ch_status=140+((speedo(n)>1)?1:0);
-			break;
-		
-		case 144:	// turn right to right-up
-		case 145:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-144)+SPF_TURN_RIGHTRIGHTUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 146:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-144)+SPF_TURN_RIGHTRIGHTUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=144;
-			break;
-		case 147:   
-			tmp=(map[n].ch_status-144)+SPF_TURN_RIGHTRIGHTUP;
-			if (speedo(n) && update) map[n].ch_status=144+((speedo(n)>1)?1:0);
-			break;
-		
-		case 148:	// turn right-up to up
-		case 149:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-148)+SPF_TURN_RIGHTUPUP;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 150:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-148)+SPF_TURN_RIGHTUPUP;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=148;
-			break;
-		case 151:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-148)+SPF_TURN_RIGHTUPUP;
-			if (speedo(n) && update) map[n].ch_status=148+((speedo(n)>1)?1:0);
-			break;
-		
-		case 152:	// turn right to right-down
-		case 153:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-152)+SPF_TURN_RIGHTRIGHTDOWN;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 154:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-152)+SPF_TURN_RIGHTRIGHTDOWN;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=152;
-			break;
-		case 155:   
-			tmp=(map[n].ch_status-152)+SPF_TURN_RIGHTRIGHTDOWN;
-			if (speedo(n) && update) map[n].ch_status=152+((speedo(n)>1)?1:0);
-			break;
-		
-		case 156:	// turn right-down to down
-		case 157:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-156)+SPF_TURN_RIGHTDOWNRIGHT;
-			if (speedo(n) && update) map[n].ch_status+=speedo(n);
-			break;
-		case 158:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-156)+SPF_TURN_RIGHTDOWNRIGHT;
-			if (speedo(n)==1 && update) map[n].ch_status++;
-			else if (speedo(n)>1 && update) map[n].ch_status=156;
-			break;
-		case 159:   
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-156)+SPF_TURN_RIGHTDOWNRIGHT;
-			if (speedo(n) && update) map[n].ch_status=156+((speedo(n)>1)?1:0);
-			break;
-		
-		case 160:	// misc up
-		case 161:
-		case 162:
-		case 163:
-		case 164:
-		case 165:
-			if (is_player(map[n].ch_id)) {
-				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
-			}
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			break;
-		case 166:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n)==1 && update) map[n].ch_status++;
-			else if (speedoMisc(n)>1 && update) map[n].ch_status=160;
-			break;
-		case 167:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-160)+SPF_MISC_UP+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status=160+((speedoMisc(n)>1)?1:0);
-			break;
-		
-		case 168:	// misc down
-		case 169:
-		case 170:
-		case 171:
-		case 172:
-		case 173:
-			if (is_player(map[n].ch_id)) {
-				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
-			}
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			break;
-		case 174:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n)==1 && update) map[n].ch_status++;
-			else if (speedoMisc(n)>1 && update) map[n].ch_status=168;
-			break;
-		case 175:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-168)+SPF_MISC_DOWN+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status=168+((speedoMisc(n)>1)?1:0);
-			break;
-		
-		case 176:	// misc left
-		case 177:
-		case 178:
-		case 179:
-		case 180:
-		case 181:
-			if (is_player(map[n].ch_id)) {
-				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
-			}
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			break;
-		case 182:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n)==1 && update) map[n].ch_status++;
-			else if (speedoMisc(n)>1 && update) map[n].ch_status=176;
-			break;
-		case 183:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-176)+SPF_MISC_LEFT+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status=176+((speedoMisc(n)>1)?1:0);
-			break;
-		
-		case 184:	// misc right
-		case 185:
-		case 186:
-		case 187:
-		case 188:
-		case 189:
-			if (is_player(map[n].ch_id)) {
-				mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
-			}
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status+=speedoMisc(n);
-			break;
-		case 190:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n)==1 && update) map[n].ch_status++;
-			else if (speedoMisc(n)>1 && update) map[n].ch_status=184;
-			break;
-		case 191:
-			map[n].obj_xoff=0; map[n].obj_yoff=0;
-			tmp=(map[n].ch_status-184)+SPF_MISC_RIGHT+((int)(stattab[map[n].ch_stat_off])<<5);
-			if (speedoMisc(n) && update) map[n].ch_status=184+((speedoMisc(n)>1)?1:0);
-			break;
+    switch (map[n].ch_status) {
+        case 0: // idle up
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            map[n].idle_ani++;
+            if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            tmp = SPF_IDLE_UP + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 1: // idle down
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_DOWN + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 2: // idle left
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_LEFT + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 3: // idle right
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_RIGHT + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 4: // idle left-up
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_LEFTUP + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 5: // idle left-down
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_LEFTDOWN + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 6: // idle right-up
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_RIGHTUP + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
+        case 7: // idle right-down
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            if (speedo(n) && update) {
+                map[n].idle_ani++;
+                if (map[n].idle_ani > 7) map[n].idle_ani = 0;
+            }
+            tmp = SPF_IDLE_RIGHTDOWN + do_idle(map[n].idle_ani, map[n].ch_sprite);
+            break;
 
-		default:        
-			xlog(0,"Unknown ch_status %d",map[n].ch_status);
-			return 0;
-	}
-	
-	return tmp;
+        case 16: // walk up
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+            map[n].obj_xoff = -speedstep(n, 16, 8, update) / 2;
+            map[n].obj_yoff = speedstep(n, 16, 8, update) / 4;
+            tmp = (map[n].ch_status - 16) + SPF_WALK_UP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 23) map[n].ch_status = 16 + ((map[n].ch_status + m) - 23 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 24: // walk down
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+        case 30:
+        case 31:
+            map[n].obj_xoff = speedstep(n, 24, 8, update) / 2;
+            map[n].obj_yoff = -speedstep(n, 24, 8, update) / 4;
+            tmp = (map[n].ch_status - 24) + SPF_WALK_DOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 31) map[n].ch_status = 24 + ((map[n].ch_status + m) - 31 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 32: // walk left
+        case 33:
+        case 34:
+        case 35:
+        case 36:
+        case 37:
+        case 38:
+        case 39:
+            map[n].obj_xoff = -speedstep(n, 32, 8, update) / 2;
+            map[n].obj_yoff = -speedstep(n, 32, 8, update) / 4;
+            tmp = (map[n].ch_status - 32) + SPF_WALK_LEFT;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 39) map[n].ch_status = 32 + ((map[n].ch_status + m) - 39 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 40: // walk right
+        case 41:
+        case 42:
+        case 43:
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+            map[n].obj_xoff = speedstep(n, 40, 8, update) / 2;
+            map[n].obj_yoff = speedstep(n, 40, 8, update) / 4;
+            tmp = (map[n].ch_status - 40) + SPF_WALK_RIGHT;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 47) map[n].ch_status = 40 + ((map[n].ch_status + m) - 47 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 48: // left+up
+        case 49:
+        case 50:
+        case 51:
+        case 52:
+        case 53:
+        case 54:
+        case 55:
+        case 56:
+        case 57:
+        case 58:
+        case 59:
+            map[n].obj_xoff = -speedstep(n, 48, 12, update);
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 48) * 8 / 12 + SPF_WALK_LEFTUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 59) map[n].ch_status = 48 + ((map[n].ch_status + m) - 59 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 60: // left+down
+        case 61:
+        case 62:
+        case 63:
+        case 64:
+        case 65:
+        case 66:
+        case 67:
+        case 68:
+        case 69:
+        case 70:
+        case 71:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = -speedstep(n, 60, 12, update) / 2;
+            tmp = (map[n].ch_status - 60) * 8 / 12 + SPF_WALK_LEFTDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 71) map[n].ch_status = 60 + ((map[n].ch_status + m) - 71 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 72: // right+up
+        case 73:
+        case 74:
+        case 75:
+        case 76:
+        case 77:
+        case 78:
+        case 79:
+        case 80:
+        case 81:
+        case 82:
+        case 83:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = speedstep(n, 72, 12, update) / 2;
+            tmp = (map[n].ch_status - 72) * 8 / 12 + SPF_WALK_RIGHTUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 83) map[n].ch_status = 72 + ((map[n].ch_status + m) - 83 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 84: // right+down
+        case 85:
+        case 86:
+        case 87:
+        case 88:
+        case 89:
+        case 90:
+        case 91:
+        case 92:
+        case 93:
+        case 94:
+        case 95:
+            map[n].obj_xoff = speedstep(n, 84, 12, update);
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 84) * 8 / 12 + SPF_WALK_RIGHTDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 95) map[n].ch_status = 84 + ((map[n].ch_status + m) - 95 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 96: // turn up to left-up
+        case 97:
+        case 98:
+        case 99:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 96) + SPF_TURN_UPLEFTUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 99) map[n].ch_status = 96 + ((map[n].ch_status + m) - 99 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 100: // turn left-up to up
+        case 101:
+        case 102:
+        case 103:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 100) + SPF_TURN_LEFTUPUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 103) map[n].ch_status = 100 + ((map[n].ch_status + m) - 103 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 104: // turn up to right-up
+        case 105:
+        case 106:
+        case 107:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 104) + SPF_TURN_UPRIGHTUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 107) map[n].ch_status = 104 + ((map[n].ch_status + m) - 107 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 108: // turn right-up to right
+        case 109:
+        case 110:
+        case 111:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 108) + SPF_TURN_RIGHTUPRIGHT;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 111) map[n].ch_status = 108 + ((map[n].ch_status + m) - 111 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 112: // turn down to left-down
+        case 113:
+        case 114:
+        case 115:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 112) + SPF_TURN_DOWNLEFTDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 115) map[n].ch_status = 112 + ((map[n].ch_status + m) - 115 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 116: // turn left-down to left
+        case 117:
+        case 118:
+        case 119:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 116) + SPF_TURN_LEFTDOWNLEFT;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 119) map[n].ch_status = 116 + ((map[n].ch_status + m) - 119 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 120: // turn down to right-down
+        case 121:
+        case 122:
+        case 123:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 120) + SPF_TURN_DOWNRIGHTDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 123) map[n].ch_status = 120 + ((map[n].ch_status + m) - 123 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 124: // turn right-down to down
+        case 125:
+        case 126:
+        case 127:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 124) + SPF_TURN_RIGHTDOWNDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 127) map[n].ch_status = 124 + ((map[n].ch_status + m) - 127 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 128: // turn left to left-up
+        case 129:
+        case 130:
+        case 131:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 128) + SPF_TURN_LEFTLEFTUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 131) map[n].ch_status = 128 + ((map[n].ch_status + m) - 131 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 132: // turn left-up to left
+        case 133:
+        case 134:
+        case 135:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 132) + SPF_TURN_LEFTUPLEFT;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 135) map[n].ch_status = 132 + ((map[n].ch_status + m) - 135 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 136: // turn left to left-down
+        case 137:
+        case 138:
+        case 139:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 136) + SPF_TURN_LEFTLEFTDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 139) map[n].ch_status = 136 + ((map[n].ch_status + m) - 139 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 140: // turn left-down to down
+        case 141:
+        case 142:
+        case 143:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 140) + SPF_TURN_LEFTDOWNDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 143) map[n].ch_status = 140 + ((map[n].ch_status + m) - 143 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 144: // turn right to right-up
+        case 145:
+        case 146:
+        case 147:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 144) + SPF_TURN_RIGHTRIGHTUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 147) map[n].ch_status = 144 + ((map[n].ch_status + m) - 147 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 148: // turn right-up to up
+        case 149:
+        case 150:
+        case 151:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 148) + SPF_TURN_RIGHTUPUP;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 151) map[n].ch_status = 148 + ((map[n].ch_status + m) - 151 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 152: // turn right to right-down
+        case 153:
+        case 154:
+        case 155:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 152) + SPF_TURN_RIGHTRIGHTDOWN;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 155) map[n].ch_status = 152 + ((map[n].ch_status + m) - 155 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 156: // turn right-down to down
+        case 157:
+        case 158:
+        case 159:
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 156) + SPF_TURN_RIGHTDOWNRIGHT;
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 159) map[n].ch_status = 156 + ((map[n].ch_status + m) - 159 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 160: // misc up
+        case 161:
+        case 162:
+        case 163:
+        case 164:
+        case 165:
+        case 166:
+        case 167:
+            if (is_player(map[n].ch_id) && map[n].ch_status == 165) {
+                mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+            }
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 160) + SPF_MISC_UP + ((int) (stattab[map[n].ch_stat_off]) << 5);
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 167) map[n].ch_status = 160 + ((map[n].ch_status + m) - 167 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 168: // misc down
+        case 169:
+        case 170:
+        case 171:
+        case 172:
+        case 173:
+        case 174:
+        case 175:
+            if (is_player(map[n].ch_id) && map[n].ch_status == 173) {
+                mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+            }
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 168) + SPF_MISC_DOWN + ((int) (stattab[map[n].ch_stat_off]) << 5);
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 175) map[n].ch_status = 168 + ((map[n].ch_status + m) - 175 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 176: // misc left
+        case 177:
+        case 178:
+        case 179:
+        case 180:
+        case 181:
+        case 182:
+        case 183:
+            if (is_player(map[n].ch_id) && map[n].ch_status == 181) {
+                mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+            }
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 176) + SPF_MISC_LEFT + ((int) (stattab[map[n].ch_stat_off]) << 5);
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 183) map[n].ch_status = 176 + ((map[n].ch_status + m) - 183 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        case 184: // misc right
+        case 185:
+        case 186:
+        case 187:
+        case 188:
+        case 189:
+        case 190:
+        case 191:
+            if (is_player(map[n].ch_id) && map[n].ch_status == 189) {
+                mod_stubborn_actions_on_misc_action(map[n].ch_stat_off);
+            }
+            map[n].obj_xoff = 0;
+            map[n].obj_yoff = 0;
+            tmp = (map[n].ch_status - 184) + SPF_MISC_RIGHT + ((int) (stattab[map[n].ch_stat_off]) << 5);
+            m = speedo(n);
+            if (m && update) {
+                if ((map[n].ch_status + m) > 191) map[n].ch_status = 184 + ((map[n].ch_status + m) - 191 - 1);
+                else map[n].ch_status += m;
+            }
+            break;
+
+        default:
+            xlog(0, "Unknown ch_status %d", map[n].ch_status);
+            return 0;
+    }
+
+    return tmp;
 }
 
 int eng_item(int n)
