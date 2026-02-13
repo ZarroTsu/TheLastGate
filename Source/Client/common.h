@@ -43,6 +43,9 @@
 #define MAX_SKILL_SCROLL (MAXSKILL-10)
 #define MAX_META_SCROLL ((MAXMETA-7)/2-10)
 
+#define SPEED_MAX 300
+#define CTICK_MAX 200
+
 // -------- Damage Multipliers -------- //
 
 #define DAM_MULT_HIT		 250
