@@ -1968,8 +1968,8 @@ int get_meta_stat_value(int cn, int n)
 		case 18: case 59: // Mana Cost Multiplier	Decimal, 0.00 %
 			value = ch[cn].mana_cost;
 			break;
-		case 19: case 60: // Total AoE Bonus
-			value = ch[cn].aoe_bonus + ch[cn].aoe_bonus * GET_PROX(cn)/200;
+		case 19: case 60: // Total AoE Bonus		Decimal, 0.00 %
+			value = ch[cn].aoe_bonus*50 + ch[cn].aoe_bonus*50 * GET_PROX(cn)/400;
 			break;
 		//
 		case 24: // Cleave Hit Damage

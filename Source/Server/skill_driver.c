@@ -691,33 +691,33 @@ int get_use_mana(int spell)
 // Multiplied by 100 in this case so that minor incriments by prox_power may reflect on the output
 int get_aoe_radius(int cn, int intemp, int prox_power)
 {
-	int r = ch[cn].aoe_bonus * 100;
+	int r = ch[cn].aoe_bonus * 50;
 	int n = 100, baselen = 100, numrepeats = 0;
 	
 	switch (intemp)
 	{
-		case SK_SURROUND: if (CAN_ARTM_PROX(cn))                   n = 4 * 100; break;
-		case SK_TAUNT:    if (CAN_ARTM_PROX(cn))                   n = 4 * 100; break;
-		case SK_CURSE:    if (CAN_SORC_PROX(cn)||T_BRAV_SK(cn, 6)) n = 4 * 100; break;  // (Brav) Presence
-		case SK_SLOW:     if (CAN_SORC_PROX(cn))                   n = 4 * 100; break;
-		case SK_POISON:   if (CAN_SORC_PROX(cn))                   n = 4 * 100; break;
-		case SK_VENOM:    if (CAN_SORC_PROX(cn))                   n = 4 * 100; break;
-		case SK_BLAST:    if (CAN_ARHR_PROX(cn))                   n = 4 * 100; break;
-		case SK_WEAKEN:   if (T_LYCA_SK(cn, 4))                    n = 2 * 100; break;  // (Lyca) Sickness
+		case SK_SURROUND: if (CAN_ARTM_PROX(cn))                   n = 400; break;
+		case SK_TAUNT:    if (CAN_ARTM_PROX(cn))                   n = 400; break;
+		case SK_CURSE:    if (CAN_SORC_PROX(cn)||T_BRAV_SK(cn, 6)) n = 400; break;  // (Brav) Presence
+		case SK_SLOW:     if (CAN_SORC_PROX(cn))                   n = 400; break;
+		case SK_POISON:   if (CAN_SORC_PROX(cn))                   n = 400; break;
+		case SK_VENOM:    if (CAN_SORC_PROX(cn))                   n = 400; break;
+		case SK_BLAST:    if (CAN_ARHR_PROX(cn))                   n = 400; break;
+		case SK_WEAKEN:   if (T_LYCA_SK(cn, 4))                    n = 200; break;  // (Lyca) Sickness
 		//
-		case SK_HASTE:      n = 4 * 100; break; // Aura only
-		case SK_IMMOLATE2:  n = 2 * 100; break;
+		case SK_HASTE:      n = 400; break; // Aura only
+		case SK_IMMOLATE2:  n = 200; break;
 		//
-		case SK_BLIND:      n = 4 * 100; break;
-		case SK_DOUSE:      n = 4 * 100; break;
-		case SK_SLAM:       n = 4 * 100; break;
-		case SK_OBLITERATE: n = 4 * 100; break;
-		case SK_ZEPHYR2:    n = 4 * 100; break;
-		case SK_PLAGUE:     n = 6 * 100; break;
-		case SK_WARCRY:     n = 6 * 100; break;
+		case SK_BLIND:      n = 400; break;
+		case SK_DOUSE:      n = 400; break;
+		case SK_SLAM:       n = 400; break;
+		case SK_OBLITERATE: n = 400; break;
+		case SK_ZEPHYR2:    n = 200; break;
+		case SK_PLAGUE:     n = 600; break;
+		case SK_WARCRY:     n = 600; break;
 		//
 		case SK_LEAP:
-			n = 2 * 100;
+			n = 200;
 			if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats++;
 			if (T_WARR_SK(cn,  6))              numrepeats++;  // (Warr) Flash Step
 			if (IS_PLAYER(cn))     numrepeats += max(0, GET_SPD_ATK(cn)/60);
@@ -738,7 +738,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 		r = more(r, n, 1);
 	}
 	
-	r = r + r * prox_power/200;
+	r = r + r * prox_power/400;
 	
 	return (r * 11/10); // 10% more oomph to make the circles more circular
 }

@@ -835,7 +835,7 @@ struct metaStat metaStats[METASTATCOUNT] = {
 	{ -1, 1, 6, "Cast Speed",           "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
 	{ -1, 0, 1, "Thorns Score",         "",        "Damage dealt to attackers when you are hit (even if you take no damage). Does not damage attackers if they miss." },
 	{ -1, 1, 4, "Mana Cost Multiplier", "%",       "The multiplier of mana for spells, determined by your Concentrate skill." },
-	{ -1, 0, 1, "Total AoE Bonus",      "Tiles",   "Flat increase to area-of-effect skills." },
+	{ -1, 1, 1, "Total AoE Bonus",      "Tiles",   "Flat increase to area-of-effect skills." },
 	{ -2, 0, 0, "", "", "" }, // blank
 	{ -2, 0, 0, "", "", "" }, // blank
 	{ -2, 0, 0, "", "", "" }, // blank
@@ -879,7 +879,7 @@ struct metaStat metaStats[METASTATCOUNT] = {
 	{ -1, 1, 6, "Cast Speed",           "",        "The speed at which casting and action animations occur per second. Increased by Willpower." },
 	{ -1, 0, 1, "Thorns Score",         "",        "Damage dealt to attackers when you are hit (even if you take no damage). Does not damage attackers if they miss." },
 	{ -1, 1, 4, "Mana Cost Multiplier", "%",       "The multiplier of mana for spells, determined by your Economize skill." },
-	{ -1, 0, 4, "Total AoE Bonus",      "Tiles",   "Flat increase to area-of-effect skills." },
+	{ -1, 1, 4, "Total AoE Bonus",      "Tiles",   "Flat increase to area-of-effect skills." },
 	{ -1, 0, 4, "Buffing Apt Bonus",    "",        "Bonus granted to target allies when casting friendly spells. Granted by Willpower." },
 	{ -1, 1, 1, "Underwater Degen",     "/s",      "Rate at which health is lost while underwater. This can be reduced by the Metabolism skill." },
 	{ -2, 0, 0, "", "", "" }, // blank
