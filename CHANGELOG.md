@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.0](https://github.com/jamesblack/TheLastGate/compare/v3.11.0...v3.12.0) (2026-02-13)
+
+
+### Miscellaneous Chores
+
+* bump version ([6067968](https://github.com/jamesblack/TheLastGate/commit/6067968bc37ffa7892d87d5133342b88e12b3a10))
+
 ## [3.11.0](https://github.com/jamesblack/TheLastGate/compare/v3.10.0...v3.11.0) (2026-02-06)
 
 
