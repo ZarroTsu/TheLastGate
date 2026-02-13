@@ -2799,14 +2799,7 @@ int speedo(int n)
 	int moveSpeedValue;
 	
 	moveSpeedValue = map[n].ch_speed - map[n].ch_movespd;
-	if (moveSpeedValue < 0)
-	{
-		moveSpeedValue = 0;
-	}
-	if (moveSpeedValue > 299)
-	{
-		moveSpeedValue = 299;
-	}
+    moveSpeedValue = clamp(moveSpeedValue, 299, 0);
 	return speedtab[moveSpeedValue][ctick];
 }
 
@@ -2823,40 +2816,19 @@ int speedoMisc(int n)
 		case    5:
 		case    6:
 			miscSpeedValue -= map[n].ch_atkspd;
-			if (miscSpeedValue < 0) 
-			{
-				miscSpeedValue = 0;
-			}
-			if (miscSpeedValue > 299)
-			{
-				miscSpeedValue = 299;
-			}
+			miscSpeedValue = clamp(miscSpeedValue, 299, 0);
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// 9 == Use skill, mostly casting
 		case    9:
 			miscSpeedValue  = map[n].ch_speed*5/4;
 			miscSpeedValue -= map[n].ch_castspd*3/2;
-			if (miscSpeedValue < 0) 
-			{
-				miscSpeedValue = 0;
-			}
-			if (miscSpeedValue > 299)
-			{
-				miscSpeedValue = 299;
-			}
+	        miscSpeedValue = clamp(miscSpeedValue, 299, 0);
 			return(speedtab[miscSpeedValue][ctick]);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
-			if (miscSpeedValue < 0) 
-			{
-				miscSpeedValue = 0;
-			}
-			if (miscSpeedValue > 299)
-			{
-				miscSpeedValue = 299;
-			}
+	        miscSpeedValue = clamp(miscSpeedValue, 299, 0);
 			return(speedtab[miscSpeedValue][ctick]);
 	}
 }
@@ -2871,8 +2843,7 @@ int speedstep(int n,int d,int s,int update)
 	int z,m;
 
 	speed=map[n].ch_speed - map[n].ch_movespd;
-	if (speed < 0) speed = 0;
-	if (speed > 299) speed = 299;
+    speed = clamp(speed, 299, 0);
 	
 	hard_step=map[n].ch_status-d;
 

@@ -28,6 +28,8 @@
 
 //#define DOCONVERT	// enable sprite packer
 
+#define clamp(a, b, c)			((a)<(b) ? (b) : ((a)>(c) ? (c) : (a)))		// clamp value (a) between values (b) and (c)
+
 #define TICKMULTI		2
 #define TICKS			(24*TICKMULTI)
 
