@@ -3570,72 +3570,66 @@ int eng_char(int n)
 
 int eng_item(int n)
 {
-	switch (map[n].it_status) 
+    int m;
+	switch (map[n].it_status)
 	{
 		case 0: return map[n].it_sprite;
 		case 1: return map[n].it_sprite;
 
-			// four sprite animation, 2-step
-		case 2: if (speedtab[200][ctick]) map[n].it_status++;	// adjusted these speedtab values from 10 to 24 to 200
-			return map[n].it_sprite;
+		// four sprite animation, 2-step
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+            m = (map[n].it_status - 2) * 2;
+            if ((ctick - 1) % 2) {
+                if (map[n].it_status == 5) map[n].it_status = 2;
+                else map[n].it_status++;
+            }
+            return map[n].it_sprite + m;
 
-		case 3: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+2;
+		// two sprite animation, 1-step
+		case 6:
+		case 7:
+            m = (map[n].it_status - 6);
+            if ((ctick - 1) % 2) {
+                if (map[n].it_status == 7) map[n].it_status = 6;
+                else map[n].it_status++;
+            }
+            return map[n].it_sprite + m;
 
-		case 4: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+4;
+		// eight sprite animation, 1-step
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+	        m = (map[n].it_status-8);
+	        if ((ctick-1)%2)
+	        {
+	            if (map[n].it_status == 15) map[n].it_status = 8;
+	            else                        map[n].it_status++;
+	        }
+	        return map[n].it_sprite + m;
 
-		case 5: if (speedtab[200][ctick]) map[n].it_status=2;
-			return map[n].it_sprite+6;
+		// five sprite animation, 1-step, random
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		case 20:
+	        m = (map[n].it_status-16);
+	        if ((ctick-1)%2)
+	        {
+	            if (map[n].it_status == 20) map[n].it_status = 16;
+	            else                        map[n].it_status++;
+	        }
+	        return map[n].it_sprite + m;
 
-			// two sprite animation, 1-step
-		case 6: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite;
-
-		case 7: if (speedtab[200][ctick]) map[n].it_status=6;
-			return map[n].it_sprite+1;
-
-			// eight sprite animation, 1-step
-		case 8: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite;
-
-		case 9: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+1;
-
-		case 10: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+2;
-
-		case 11: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+3;
-
-		case 12: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+4;
-
-		case 13: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+5;
-
-		case 14: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+6;
-
-		case 15: if (speedtab[200][ctick]) map[n].it_status=8;
-			return map[n].it_sprite+7;
-
-			// five sprite animation, 1-step, random
-		case 16: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite;
-
-		case 17: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+1;
-
-		case 18: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+2;
-
-		case 19: if (speedtab[200][ctick]) map[n].it_status++;
-			return map[n].it_sprite+3;
-
-		case 20: if (speedtab[200][ctick]) map[n].it_status=16;
-			return map[n].it_sprite+4;
-
+	    // 64 sprite animation?
 		case 21: 
 			return map[n].it_sprite+(ticker&63);
 
