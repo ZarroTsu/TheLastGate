@@ -1,28 +1,5 @@
-/*
- * ENGINE.C - Main Game Rendering and Logic Loop
- *
- * TODO: MODERN GCC/MINGW COMPATIBILITY
- * ====================================
- * This file requires updates for modern compiler compatibility:
- *
- * HEADERS:
- * - <alloc.h> -> <malloc.h> or <stdlib.h>
- * - <windows.h> -> SDL2 headers for cross-platform
- * - #pragma hdrstop -> Remove (Borland C++ specific)
- *
- * WINDOWS API:
- * - SetCursor() -> SDL_SetCursor()
- * - GetTickCount() -> SDL_GetTicks()
- * - Sleep() -> SDL_Delay()
- * - HCURSOR -> SDL_Cursor*
- *
- * See individual TODO comments below for specific locations.
- */
-
-#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 #include "glad/glad.h"
@@ -46,13 +23,13 @@
 #include "util/math_util.h"
 #include "util/perf.h"
 
-int init_done=0;
-int frame=0;
-extern int mx,my;
+int init_done = 0;
+int frame = 0;
+extern int mx, my;
 
 extern int ticker;
 
-int pskip=0,pidle=0;
+int pskip = 0, pidle = 0;
 extern int t_size;
 
 extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
@@ -60,295 +37,320 @@ extern int screen_width, screen_height, screen_tilexoff, screen_tileyoff;
 extern short screen_windowed;
 extern int screen_target_fps;
 
-char *lookup(int nr,unsigned short id);
+char *lookup(int nr, unsigned short id);
 
-int tput=0;
+int tput = 0;
 
 // Going to write up the tutorial right here. Unfortunately it takes up a lot of space.
 
-char tutorial_text[6][3][12][45] = { // overall
-	{ // tutorial 1
-		{ // page 1
-			{ "The diamond-shaped space in the middle of" },
-			{ "your screen is the game world." },
-			{ " " },
-			{ "As you move your mouse in this space, it" },
-			{ "will highlight tiles in the world." },
-			{ " " },
-			{ "Right-clicking a tile will rotate your" },
-			{ "character to face that direction." },
-			{ " " },
-			{ "Left-clicking a tile will tell your" },
-			{ "character to travel to that tile." },
-			{ " " }
-		},
-		{ // page 2
-			{ "In the upper right corner of the screen is" },
-			{ "the dialog window." },
-			{ " " },
-			{ "This displays chat messages, system" },
-			{ "messages, and game world events as text." },
-			{ " " },
-			{ "You can type at any time to make text, and" },
-			{ "can press the Enter/Return key to send it." },
-			{ " " },
-			{ "There are also various chat commands that" },
-			{ "can be sent starting with the # or / key," },
-			{ "such as /help or /shout." }
-		},
-		{ // page 3
-			{ "To get started, try approaching Jamil. He" },
-			{ "can be found in the room NORTH of here (to" },
-			{ "the upper left of your screen)." },
-			{ " " },
-			{ "You can click the X in the upper right of" },
-			{ "this dialog window or press the ESCAPE key" },
-			{ "to continue." },
-			{ " " },
-			{ " " },
-			{ " " },
-			{ " " },
-			{ " " }
-		}
-	},
-	{ // tutorial 2
-		{ // page 1
-			{ "Jamil has given you your first quest!" },
-			{ "The Thieves House is located farther to" },
-			{ "the NORTH, outside of this tavern." },
-			{ " " },
-			{ "To leave this tavern, you can click on the" },
-			{ "same tile as the door to open it and stand" },
-			{ "in its frame, revealing tiles beyond it." },
-			{ " " },
-			{ "You can also click inside the black void" },
-			{ "beyond the door, and your character will" },
-			{ "attempt to navigate to that tile if they" },
-			{ "are able to." }
-		},
-		{ // page 2
-			{ "While out in the game world, the CTRL, ALT," },
-			{ "and SHIFT keys change the way clicking" },
-			{ "interacts with the world." },
-			{ " " },
-			{ "The SHIFT key allows interactions with" },
-			{ "objects and items." },
-			{ " " },
-			{ "The CTRL key allows interactions with NPCS" },
-			{ "and monsters." },
-			{ " " },
-			{ "If you are a spellcaster, the ALT key lets" },
-			{ "you highlight a target for your spells." }
-		},
-		{ // page 3
-			{ "For now, feel free to explore, try out the" },
-			{ "controls, maybe test the /help command?" },
-			{ " " },
-			{ "To assist your character, try casting the" },
-			{ "LIGHT spell on the hotkey list in the lower" },
-			{ "right. These spells can also be used by" },
-			{ "holding the CTRL or ALT key, and pressing" },
-			{ "the number or letter shown next to them." },
-			{ " " },
-			{ "If you happen to stumble into combat, your" },
-			{ "character will fight back automatically." },
-			{ " " }
-		}
-	},
-	{ // tutorial 3
-		{ // page 1
-			{ "You got your first kill! You have been" },
-			{ "awarded a bunch of experience points." },
-			{ " " },
-			{ "In The Last Gate, experience points are" },
-			{ "put towards an assortment of skills and" },
-			{ "passives which effect your character." },
-			{ " " },
-			{ "The skill list in the upper left should now" },
-			{ "be filled with +'s. Clicking on these will" },
-			{ "allocate some experience toward that skill." },
-			{ " " },
-			{ " " }
-		},
-		{ // page 2
-			{ "You can RIGHT-CLICK on skills on this list" },
-			{ "to see what they do. This will be displayed" },
-			{ "in the dialog window on the right." },
-			{ " " },
-			{ "With your experience allocated, it will NOT" },
-			{ "affect your character until it is applied." },
-			{ " " },
-			{ "To apply this experience, always remember" },
-			{ "to LEFT-CLICK on the 'Update' button at the" },
-			{ "bottom of the list." },
-			{ " " },
-			{ " " }
-		},
-		{ // page 3
-			{ "Here are some helpful tips to raising your" },
-			{ "first character:" },
-			{ " " },
-			{ "Raising the weapon skill that matches your" },
-			{ "weapon, such as AXE, SWORD or DAGGER, can" },
-			{ "improve survivability by making enemies" },
-			{ "miss more often when they strike you." },
-			{ " " },
-			{ "Harakim may also benefit from raising" },
-			{ "spells such as BLAST or GHOST COMPANION," },
-			{ "which get stronger as they increase." },
-			{ " " }
-		}
-	},
-	{ // tutorial 4
-		{ // page 1
-			{ "This particular enemy has dropped a key," },
-			{ "which you'll need to get further inside." },
-			{ " " },
-			{ "To loot their grave and grab the key, you" },
-			{ "can hold down your SHIFT key and LEFT-" },
-			{ "CLICK while highlighting their gravestone." },
-			{ " " },
-			{ "This will open a new window, displaying the" },
-			{ "content of their grave such as what they" },
-			{ "were carrying, their gear, and any money" },
-			{ "they may have had." },
-			{ " " }
-		},
-		{ // page 2
-			{ "If you RIGHT-CLICK on any item in this" },
-			{ "grave window, it will display the item's" },
-			{ "name in the dialog window to the right." },
-			{ " " },
-			{ "You can LEFT-CLICK on any item in this" },
-			{ "grave window to take it, adding it to your" },
-			{ "inventory." },
-			{ " " },
-			{ "Money will be taken automatically and" },
-			{ "added to your carried money." },
-			{ " " },
-			{ " " }
-		},
-		{ // page 3
-			{ "Similarly, RIGHT-CLICKING items in your" },
-			{ "inventory will let you look at them, and" },
-			{ "LEFT-CLICKING items in your inventory will" },
-			{ "use them." },
-			{ " " },
-			{ "Some items, such as keys, will be used" },
-			{ "automatically while they are in your" },
-			{ "inventory. Keys let you walk through locked" },
-			{ "doors as if they were open." },
-			{ " " },
-			{ "Consumable items such as potions will be" },
-			{ "reduced or removed when you use them." }
-		}
-	},
-	{ // tutorial 5
-		{ // page 1
-			{ "You killed the boss of the Thieves Guild!" },
-			{ " " },
-			{ "Jamil's amulet aside, he is also carrying" },
-			{ "additional pieces of armor you can wear." },
-			{ " " },
-			{ "If you hold down the SHIFT key and LEFT-" },
-			{ "CLICK on items in your inventory, you will" },
-			{ "pick that item up and hold it under your" },
-			{ "cursor." },
-			{ " " },
-			{ "You can drop the item on your cursor by" },
-			{ "holding SHIFT and LEFT-CLICKING elsewhere." }
-		},
-		{ // page 2
-			{ "Equipping the armor the thief was carrying" },
-			{ "will grant you additional Armor Value," },
-			{ "which reduces damage taken when being hit." },
-			{ " " },
-			{ "You can also try to equip Jamil's amulet if" },
-			{ "you like, but you might not be able to..." },
-			{ " " },
-			{ "As you explore and your character improves," },
-			{ "you will find new weapons and armor that" },
-			{ "can be equipped. Some can give bonuses to" },
-			{ "your skills and attributes as well." },
-			{ " " }
-		},
-		{ // page 3
-			{ "Your final task is to return to Jamil and" },
-			{ "give back his amulet." },
-			{ " " },
-			{ "While holding an item under your cursor," },
-			{ "holding down the CTRL key and LEFT-CLICKING" },
-			{ "on a character will attempt to give the" },
-			{ "held item to that character." },
-			{ " " },
-			{ "Holding CTRL and LEFT-CLICKING without an" },
-			{ "item on your cursor will instead tell your" },
-			{ "character to begin combat with that target." },
-			{ "Be careful with your clicks!" }
-		}
-	},
-	{ // tutorial 6
-		{ // page 1
-			{ "You have completed your first quest!" },
-			{ " " },
-			{ "Jamil has given you a new skill, as well as" },
-			{ "some more experience points to play around" },
-			{ "with. Spend this however you like!" },
-			{ " " },
-			{ "Of course, Jamil is only the first quest." },
-			{ "There are many NPCs dotted around town who" },
-			{ "may ask for your help when you meet them." },
-			{ " " },
-			{ "The Innkeeper may help you find additional" },
-			{ "quests to try out if you approach him." }
-		},
-		{ // page 2
-			{ "If, on the other hand, you feel like this" },
-			{ "is a good stopping point to take a break" },
-			{ "from the game, you can do so by entering" },
-			{ "the vacant room in the lower right." },
-			{ " " },
-			{ "Although it looks dark and uninviting, this" },
-			{ "will allow your character to safely exit" },
-			{ "the game." },
-			{ " " },
-			{ "Clicking on the 'EXIT' button in the lower" },
-			{ "right will quit the game faster, but this" },
-			{ "may punish you if you try to cheat combat." }
-		},
-		{ // page 3
-			{ "The other buttons in the lower right can" },
-			{ "adjust how the game world is displayed," },
-			{ "each behaving as a toggle for the named" },
-			{ "element in the game world." },
-			{ " " },
-			{ "The 'FAST', 'NORMAL', and 'SLOW' buttons" },
-			{ "adjust movement speed, each carrying their" },
-			{ "own strengths and weaknesses." },
-			{ " " },
-			{ "So we reach the end of this tutorial. We" },
-			{ "hope you have fun in this little world of" },
-			{ "ours, and mayest thou pass The Last Gate!" }
-		}
-	},
+char tutorial_text[6][3][12][45] = {
+    // overall
+    {
+        // tutorial 1
+        {
+            // page 1
+            {"The diamond-shaped space in the middle of"},
+            {"your screen is the game world."},
+            {" "},
+            {"As you move your mouse in this space, it"},
+            {"will highlight tiles in the world."},
+            {" "},
+            {"Right-clicking a tile will rotate your"},
+            {"character to face that direction."},
+            {" "},
+            {"Left-clicking a tile will tell your"},
+            {"character to travel to that tile."},
+            {" "}
+        },
+        {
+            // page 2
+            {"In the upper right corner of the screen is"},
+            {"the dialog window."},
+            {" "},
+            {"This displays chat messages, system"},
+            {"messages, and game world events as text."},
+            {" "},
+            {"You can type at any time to make text, and"},
+            {"can press the Enter/Return key to send it."},
+            {" "},
+            {"There are also various chat commands that"},
+            {"can be sent starting with the # or / key,"},
+            {"such as /help or /shout."}
+        },
+        {
+            // page 3
+            {"To get started, try approaching Jamil. He"},
+            {"can be found in the room NORTH of here (to"},
+            {"the upper left of your screen)."},
+            {" "},
+            {"You can click the X in the upper right of"},
+            {"this dialog window or press the ESCAPE key"},
+            {"to continue."},
+            {" "},
+            {" "},
+            {" "},
+            {" "},
+            {" "}
+        }
+    },
+    {
+        // tutorial 2
+        {
+            // page 1
+            {"Jamil has given you your first quest!"},
+            {"The Thieves House is located farther to"},
+            {"the NORTH, outside of this tavern."},
+            {" "},
+            {"To leave this tavern, you can click on the"},
+            {"same tile as the door to open it and stand"},
+            {"in its frame, revealing tiles beyond it."},
+            {" "},
+            {"You can also click inside the black void"},
+            {"beyond the door, and your character will"},
+            {"attempt to navigate to that tile if they"},
+            {"are able to."}
+        },
+        {
+            // page 2
+            {"While out in the game world, the CTRL, ALT,"},
+            {"and SHIFT keys change the way clicking"},
+            {"interacts with the world."},
+            {" "},
+            {"The SHIFT key allows interactions with"},
+            {"objects and items."},
+            {" "},
+            {"The CTRL key allows interactions with NPCS"},
+            {"and monsters."},
+            {" "},
+            {"If you are a spellcaster, the ALT key lets"},
+            {"you highlight a target for your spells."}
+        },
+        {
+            // page 3
+            {"For now, feel free to explore, try out the"},
+            {"controls, maybe test the /help command?"},
+            {" "},
+            {"To assist your character, try casting the"},
+            {"LIGHT spell on the hotkey list in the lower"},
+            {"right. These spells can also be used by"},
+            {"holding the CTRL or ALT key, and pressing"},
+            {"the number or letter shown next to them."},
+            {" "},
+            {"If you happen to stumble into combat, your"},
+            {"character will fight back automatically."},
+            {" "}
+        }
+    },
+    {
+        // tutorial 3
+        {
+            // page 1
+            {"You got your first kill! You have been"},
+            {"awarded a bunch of experience points."},
+            {" "},
+            {"In The Last Gate, experience points are"},
+            {"put towards an assortment of skills and"},
+            {"passives which effect your character."},
+            {" "},
+            {"The skill list in the upper left should now"},
+            {"be filled with +'s. Clicking on these will"},
+            {"allocate some experience toward that skill."},
+            {" "},
+            {" "}
+        },
+        {
+            // page 2
+            {"You can RIGHT-CLICK on skills on this list"},
+            {"to see what they do. This will be displayed"},
+            {"in the dialog window on the right."},
+            {" "},
+            {"With your experience allocated, it will NOT"},
+            {"affect your character until it is applied."},
+            {" "},
+            {"To apply this experience, always remember"},
+            {"to LEFT-CLICK on the 'Update' button at the"},
+            {"bottom of the list."},
+            {" "},
+            {" "}
+        },
+        {
+            // page 3
+            {"Here are some helpful tips to raising your"},
+            {"first character:"},
+            {" "},
+            {"Raising the weapon skill that matches your"},
+            {"weapon, such as AXE, SWORD or DAGGER, can"},
+            {"improve survivability by making enemies"},
+            {"miss more often when they strike you."},
+            {" "},
+            {"Harakim may also benefit from raising"},
+            {"spells such as BLAST or GHOST COMPANION,"},
+            {"which get stronger as they increase."},
+            {" "}
+        }
+    },
+    {
+        // tutorial 4
+        {
+            // page 1
+            {"This particular enemy has dropped a key,"},
+            {"which you'll need to get further inside."},
+            {" "},
+            {"To loot their grave and grab the key, you"},
+            {"can hold down your SHIFT key and LEFT-"},
+            {"CLICK while highlighting their gravestone."},
+            {" "},
+            {"This will open a new window, displaying the"},
+            {"content of their grave such as what they"},
+            {"were carrying, their gear, and any money"},
+            {"they may have had."},
+            {" "}
+        },
+        {
+            // page 2
+            {"If you RIGHT-CLICK on any item in this"},
+            {"grave window, it will display the item's"},
+            {"name in the dialog window to the right."},
+            {" "},
+            {"You can LEFT-CLICK on any item in this"},
+            {"grave window to take it, adding it to your"},
+            {"inventory."},
+            {" "},
+            {"Money will be taken automatically and"},
+            {"added to your carried money."},
+            {" "},
+            {" "}
+        },
+        {
+            // page 3
+            {"Similarly, RIGHT-CLICKING items in your"},
+            {"inventory will let you look at them, and"},
+            {"LEFT-CLICKING items in your inventory will"},
+            {"use them."},
+            {" "},
+            {"Some items, such as keys, will be used"},
+            {"automatically while they are in your"},
+            {"inventory. Keys let you walk through locked"},
+            {"doors as if they were open."},
+            {" "},
+            {"Consumable items such as potions will be"},
+            {"reduced or removed when you use them."}
+        }
+    },
+    {
+        // tutorial 5
+        {
+            // page 1
+            {"You killed the boss of the Thieves Guild!"},
+            {" "},
+            {"Jamil's amulet aside, he is also carrying"},
+            {"additional pieces of armor you can wear."},
+            {" "},
+            {"If you hold down the SHIFT key and LEFT-"},
+            {"CLICK on items in your inventory, you will"},
+            {"pick that item up and hold it under your"},
+            {"cursor."},
+            {" "},
+            {"You can drop the item on your cursor by"},
+            {"holding SHIFT and LEFT-CLICKING elsewhere."}
+        },
+        {
+            // page 2
+            {"Equipping the armor the thief was carrying"},
+            {"will grant you additional Armor Value,"},
+            {"which reduces damage taken when being hit."},
+            {" "},
+            {"You can also try to equip Jamil's amulet if"},
+            {"you like, but you might not be able to..."},
+            {" "},
+            {"As you explore and your character improves,"},
+            {"you will find new weapons and armor that"},
+            {"can be equipped. Some can give bonuses to"},
+            {"your skills and attributes as well."},
+            {" "}
+        },
+        {
+            // page 3
+            {"Your final task is to return to Jamil and"},
+            {"give back his amulet."},
+            {" "},
+            {"While holding an item under your cursor,"},
+            {"holding down the CTRL key and LEFT-CLICKING"},
+            {"on a character will attempt to give the"},
+            {"held item to that character."},
+            {" "},
+            {"Holding CTRL and LEFT-CLICKING without an"},
+            {"item on your cursor will instead tell your"},
+            {"character to begin combat with that target."},
+            {"Be careful with your clicks!"}
+        }
+    },
+    {
+        // tutorial 6
+        {
+            // page 1
+            {"You have completed your first quest!"},
+            {" "},
+            {"Jamil has given you a new skill, as well as"},
+            {"some more experience points to play around"},
+            {"with. Spend this however you like!"},
+            {" "},
+            {"Of course, Jamil is only the first quest."},
+            {"There are many NPCs dotted around town who"},
+            {"may ask for your help when you meet them."},
+            {" "},
+            {"The Innkeeper may help you find additional"},
+            {"quests to try out if you approach him."}
+        },
+        {
+            // page 2
+            {"If, on the other hand, you feel like this"},
+            {"is a good stopping point to take a break"},
+            {"from the game, you can do so by entering"},
+            {"the vacant room in the lower right."},
+            {" "},
+            {"Although it looks dark and uninviting, this"},
+            {"will allow your character to safely exit"},
+            {"the game."},
+            {" "},
+            {"Clicking on the 'EXIT' button in the lower"},
+            {"right will quit the game faster, but this"},
+            {"may punish you if you try to cheat combat."}
+        },
+        {
+            // page 3
+            {"The other buttons in the lower right can"},
+            {"adjust how the game world is displayed,"},
+            {"each behaving as a toggle for the named"},
+            {"element in the game world."},
+            {" "},
+            {"The 'FAST', 'NORMAL', and 'SLOW' buttons"},
+            {"adjust movement speed, each carrying their"},
+            {"own strengths and weaknesses."},
+            {" "},
+            {"So we reach the end of this tutorial. We"},
+            {"hope you have fun in this little world of"},
+            {"ours, and mayest thou pass The Last Gate!"}
+        }
+    },
 };
 
-int tutorial_image[6][3] = { 
-	{ 18010, 18011, 18012 },
-	{ 18013, 18014, 18015 },
-	{ 18016, 18017, 18018 },
-	{ 18019, 18020, 18021 },
-	{ 18022, 18023, 18024 },
-	{ 18025, 18026, 18027 }
+int tutorial_image[6][3] = {
+    {18010, 18011, 18012},
+    {18013, 18014, 18015},
+    {18016, 18017, 18018},
+    {18019, 18020, 18021},
+    {18022, 18023, 18024},
+    {18025, 18026, 18027}
 };
 //
 
-char *at_name[5]={
-	"Braveness",
-	"Willpower",
-	"Intuition",
-	"Agility",
-	"Strength"
+char *at_name[5] = {
+    "Braveness",
+    "Willpower",
+    "Intuition",
+    "Agility",
+    "Strength"
 };
 
 #define AT_BRV		0
@@ -362,249 +364,256 @@ struct skilltab *skilltab;
 struct MetaStat *meta_stats;
 
 struct sk_tree sk_tree[2][12] = {
-	{
-		// Character Class Tree
-		{6601, "p01", "", ""}, // W
-		{6602, "p02", "", ""}, // N
-		{6603, "p03", "", ""}, // E
-		{6604, "p04", "", ""}, // WS
-		{6605, "p05", "", ""}, // WW
-		{6606, "p06", "", ""}, // WN
-		{6607, "p07", "", ""}, // NW
-		{6608, "p08", "", ""}, // NN
-		{6609, "p09", "", ""}, // NE
-		{6610, "p10", "", ""}, // EN
-		{6611, "p11", "", ""}, // EE
-		{6612, "p12", "", ""} // ES
-	},
-	{
-		// Contract Tree
-		{6709, "c01", "", ""}, // W
-		{6710, "c02", "", ""}, // N
-		{6711, "c03", "", ""}, // E
-		{6712, "c04", "", ""}, // WS
-		{6713, "c05", "", ""}, // WW
-		{6714, "c06", "", ""}, // WN
-		{6715, "c07", "", ""}, // NW
-		{6716, "c08", "", ""}, // NN
-		{6717, "c09", "", ""}, // NE
-		{6718, "c10", "", ""}, // EN
-		{6719, "c11", "", ""}, // EE
-		{6720, "c12", "", ""} // ES
-	}
+    {
+        // Character Class Tree
+        {6601, "p01", "", ""}, // W
+        {6602, "p02", "", ""}, // N
+        {6603, "p03", "", ""}, // E
+        {6604, "p04", "", ""}, // WS
+        {6605, "p05", "", ""}, // WW
+        {6606, "p06", "", ""}, // WN
+        {6607, "p07", "", ""}, // NW
+        {6608, "p08", "", ""}, // NN
+        {6609, "p09", "", ""}, // NE
+        {6610, "p10", "", ""}, // EN
+        {6611, "p11", "", ""}, // EE
+        {6612, "p12", "", ""} // ES
+    },
+    {
+        // Contract Tree
+        {6709, "c01", "", ""}, // W
+        {6710, "c02", "", ""}, // N
+        {6711, "c03", "", ""}, // E
+        {6712, "c04", "", ""}, // WS
+        {6713, "c05", "", ""}, // WW
+        {6714, "c06", "", ""}, // WN
+        {6715, "c07", "", ""}, // NW
+        {6716, "c08", "", ""}, // NN
+        {6717, "c09", "", ""}, // NE
+        {6718, "c10", "", ""}, // EN
+        {6719, "c11", "", ""}, // EE
+        {6720, "c12", "", ""} // ES
+    }
 };
 
 
 #define ST_OFFSET_IC		-12
 #define ST_OFFSET_HL		-31
 
-struct sk_icon sk_icons[12]={
-	{  96, 165 }, // W
-	{ 140,  89 }, // N
-	{ 184, 165 }, // E
-	{  96, 216 }, // WS
-	{  52, 190 }, // WW
-	{  52, 140 }, // WN
-	{  96,  64 }, // NW
-	{ 140,  38 }, // NN
-	{ 184,  64 }, // NE
-	{ 228, 140 }, // EN
-	{ 228, 190 }, // EE
-	{ 184, 216 }  // ES
+struct sk_icon sk_icons[12] = {
+    {96, 165}, // W
+    {140, 89}, // N
+    {184, 165}, // E
+    {96, 216}, // WS
+    {52, 190}, // WW
+    {52, 140}, // WN
+    {96, 64}, // NW
+    {140, 38}, // NN
+    {184, 64}, // NE
+    {228, 140}, // EN
+    {228, 190}, // EE
+    {184, 216} // ES
 };
 
-struct wpslist wpslist[MAXWPS]={
-//    nr, "123456789012345678901234567890",	"\"2345678901234567890123456789\""
-	{  0, "Lynbore, Tavern", 				"\"Humble beginnings.\"" },
-	{  1, "Lynbore, East", 					"\"Ghosts and spiders duel.\"" },
-	{  2, "Aston, South", 					"\"The Weeping Woods.\"" },
-	{  3, "Aston, Crossroads", 				"\"Between ivory and violet.\"" },
-	{  4, "Aston, West", 					"\"The Strange Forest.\"" },
-	{  5, "Aston, East", 					"\"The Autumn Meadow.\"" },
-	{  6, "Forgotten Canyon", 				"\"Old secrets echo.\"" },
-	{ 20, "Lizard Temple, South", 			"\"Where reptiles implore.\"" },
-	{  7, "Lizard Temple, North", 			"\"The Beryl Jungle.\"" },
-	{ 21, "Lizard Settlement, East", 		"\"Betwixt emerald and magma.\"" },
-	{ 22, "The Emerald Cavern, East", 		"\"A feudal audience.\"" },
-	{  8, "Temple of Osiris", 				"\"Gods toy with greed.\"" },
-	{ 23, "The Tower", 						"\"Sky-piercing obelisk.\"" },
-	{  9, "Neiseer, West", 					"\"The Basalt Desert.\"" },
-	{ 10, "Neiseer", 						"\"Twilit stars sing sweetly.\"" },
-	{ 25, "Neiseer, South", 				"\"The Raging Rivers.\"" },
-	{ 24, "Neiseer, East", 					"\"The Violet Bog.\"" },
-	{ 11, "Neiseer, North", 				"\"The Ravaged Prairie.\"" },
-	{ 12, "Mausoleum, Basement", 			"\"An accursed tomb.\"" },
-	{ 13, "Pentagram Quest, Novice", 		"\"Endless adventure begins.\"" },
-	{ 14, "Pentagram Quest, Earth", 		"\"Smells of dirt and soot.\"" },
-	{ 15, "Pentagram Quest, Fire", 			"\"Boiling and burning.\"" },
-	{ 16, "Pentagram Quest, Jungle", 		"\"A verdant expanse.\"" },
-	{ 17, "Pentagram Quest, Ice", 			"\"Frozen still for eternity.\"" },
-	{ 18, "Pentagram Quest, Underwater",	"\"Embrace foul waters.\"" },
-	{ 19, "Pentagram Quest, Onyx", 			"\"Depths known only by fear.\"" },
-	{ 26, "The Burning Plains", 			"\"The archon waits.\"" }
-//    nr, "123456789012345678901234567890",	"123456789012345678901234567890"
+struct wpslist wpslist[MAXWPS] = {
+    //    nr, "123456789012345678901234567890",	"\"2345678901234567890123456789\""
+    {0, "Lynbore, Tavern", "\"Humble beginnings.\""},
+    {1, "Lynbore, East", "\"Ghosts and spiders duel.\""},
+    {2, "Aston, South", "\"The Weeping Woods.\""},
+    {3, "Aston, Crossroads", "\"Between ivory and violet.\""},
+    {4, "Aston, West", "\"The Strange Forest.\""},
+    {5, "Aston, East", "\"The Autumn Meadow.\""},
+    {6, "Forgotten Canyon", "\"Old secrets echo.\""},
+    {20, "Lizard Temple, South", "\"Where reptiles implore.\""},
+    {7, "Lizard Temple, North", "\"The Beryl Jungle.\""},
+    {21, "Lizard Settlement, East", "\"Betwixt emerald and magma.\""},
+    {22, "The Emerald Cavern, East", "\"A feudal audience.\""},
+    {8, "Temple of Osiris", "\"Gods toy with greed.\""},
+    {23, "The Tower", "\"Sky-piercing obelisk.\""},
+    {9, "Neiseer, West", "\"The Basalt Desert.\""},
+    {10, "Neiseer", "\"Twilit stars sing sweetly.\""},
+    {25, "Neiseer, South", "\"The Raging Rivers.\""},
+    {24, "Neiseer, East", "\"The Violet Bog.\""},
+    {11, "Neiseer, North", "\"The Ravaged Prairie.\""},
+    {12, "Mausoleum, Basement", "\"An accursed tomb.\""},
+    {13, "Pentagram Quest, Novice", "\"Endless adventure begins.\""},
+    {14, "Pentagram Quest, Earth", "\"Smells of dirt and soot.\""},
+    {15, "Pentagram Quest, Fire", "\"Boiling and burning.\""},
+    {16, "Pentagram Quest, Jungle", "\"A verdant expanse.\""},
+    {17, "Pentagram Quest, Ice", "\"Frozen still for eternity.\""},
+    {18, "Pentagram Quest, Underwater", "\"Embrace foul waters.\""},
+    {19, "Pentagram Quest, Onyx", "\"Depths known only by fear.\""},
+    {26, "The Burning Plains", "\"The archon waits.\""}
+    //    nr, "123456789012345678901234567890",	"123456789012345678901234567890"
 };
 
 void update_skill_tab_from_raw() {
-    memcpy(skilltab, raw_skilltab,sizeof(struct skilltab) * MAXSKILL);
+    memcpy(skilltab, raw_skilltab, sizeof(struct skilltab) * MAXSKILL);
 }
 
-int skill_cmp(const void *a,const void *b)
-{
-	const struct skilltab *c,*d;
-	int m1,m2;
+int skill_cmp(const void *a, const void *b) {
+    const struct skilltab *c, *d;
+    int m1, m2;
 
-	c=a; d=b;
+    c = a;
+    d = b;
 
-	m1=c->nr; m2=d->nr;
-	
-	if (m1==99 && m2!=99) return  1;
-	if (m2==99 && m1!=99) return -1;
-	
-	if (pl.skill[m1][0]==0 && pl.skill[m2][0]!=0) return  1;
-	if (pl.skill[m2][0]==0 && pl.skill[m1][0]!=0) return -1;
-	
-	if (m1==52 && m2!=52 && !KNOW_IDENTIFY) return  1;
-	if (m2==52 && m1!=52 && !KNOW_IDENTIFY) return -1;
-	
-	if ((m1==53||m1==54) && (m2!=53&&m2!=54) && !IS_LYCANTH) return  1;
-	if ((m2==53||m2==54) && (m1!=53&&m1!=54) && !IS_LYCANTH) return -1;
-	
-	if ((m1==50||m1==51||m1==52||m1==53||m1==54) && 
-		(m2!=50&&m2!=51&&m2!=52&&m2!=53&&m2!=54)) return -1;
-	if ((m2==50||m2==51||m2==52||m2==53||m2==54) && 
-		(m1!=50&&m1!=51&&m1!=52&&m1!=53&&m1!=54)) return  1;
-	
-	// Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
-	if (pl.skill[m1][0]==0 && pl.skill[m2][0]==0 && 
-		(m1==8||m1==23||m1==28||m1==29||m1==30||m1==32||m1==44||m1==50||m1==51||m1==52||m1==53||m1==54) && 
-		(m2!=8&&m2!=23&&m2!=28&&m2!=29&&m2!=30&&m2!=32&&m2!=44&&m2!=50&&m2!=51&&m2!=52&&m2!=53&&m2!=54)) return -1;
-	if (pl.skill[m2][0]==0 && pl.skill[m1][0]==0 && 
-		(m2==8||m2==23||m2==28||m2==29||m2==30||m2==32||m2==44||m2==50||m2==51||m2==52||m2==53||m2==54) && 
-		(m1!=8&&m1!=23&&m1!=28&&m1!=29&&m1!=30&&m1!=32&&m1!=44&&m1!=50&&m1!=51&&m1!=52&&m1!=53&&m1!=54)) return  1;
-	
-	if (m1==44 && !IS_SEYAN_DU) return  1;
-	if (m2==44 && !IS_SEYAN_DU) return -1;
-	
-	if (c->sortkey>d->sortkey) return  1;
-	if (c->sortkey<d->sortkey) return -1;
+    m1 = c->nr;
+    m2 = d->nr;
 
-	return strcmp(c->name,d->name);
+    if (m1 == 99 && m2 != 99) return 1;
+    if (m2 == 99 && m1 != 99) return -1;
+
+    if (pl.skill[m1][0] == 0 && pl.skill[m2][0] != 0) return 1;
+    if (pl.skill[m2][0] == 0 && pl.skill[m1][0] != 0) return -1;
+
+    if (m1 == 52 && m2 != 52 && !KNOW_IDENTIFY) return 1;
+    if (m2 == 52 && m1 != 52 && !KNOW_IDENTIFY) return -1;
+
+    if ((m1 == 53 || m1 == 54) && (m2 != 53 && m2 != 54) && !IS_LYCANTH) return 1;
+    if ((m2 == 53 || m2 == 54) && (m1 != 53 && m1 != 54) && !IS_LYCANTH) return -1;
+
+    if ((m1 == 50 || m1 == 51 || m1 == 52 || m1 == 53 || m1 == 54) &&
+        (m2 != 50 && m2 != 51 && m2 != 52 && m2 != 53 && m2 != 54))
+        return -1;
+    if ((m2 == 50 || m2 == 51 || m2 == 52 || m2 == 53 || m2 == 54) &&
+        (m1 != 50 && m1 != 51 && m1 != 52 && m1 != 53 && m1 != 54))
+        return 1;
+
+    // Stealth, Resistance, Immunity -- these are active even if you don't know them. m==8||m==23||m==28||m==29||m==30||m==32
+    if (pl.skill[m1][0] == 0 && pl.skill[m2][0] == 0 &&
+        (m1 == 8 || m1 == 23 || m1 == 28 || m1 == 29 || m1 == 30 || m1 == 32 || m1 == 44 || m1 == 50 || m1 == 51 || m1
+         == 52 || m1 == 53 || m1 == 54) &&
+        (m2 != 8 && m2 != 23 && m2 != 28 && m2 != 29 && m2 != 30 && m2 != 32 && m2 != 44 && m2 != 50 && m2 != 51 && m2
+         != 52 && m2 != 53 && m2 != 54))
+        return -1;
+    if (pl.skill[m2][0] == 0 && pl.skill[m1][0] == 0 &&
+        (m2 == 8 || m2 == 23 || m2 == 28 || m2 == 29 || m2 == 30 || m2 == 32 || m2 == 44 || m2 == 50 || m2 == 51 || m2
+         == 52 || m2 == 53 || m2 == 54) &&
+        (m1 != 8 && m1 != 23 && m1 != 28 && m1 != 29 && m1 != 30 && m1 != 32 && m1 != 44 && m1 != 50 && m1 != 51 && m1
+         != 52 && m1 != 53 && m1 != 54))
+        return 1;
+
+    if (m1 == 44 && !IS_SEYAN_DU) return 1;
+    if (m2 == 44 && !IS_SEYAN_DU) return -1;
+
+    if (c->sortkey > d->sortkey) return 1;
+    if (c->sortkey < d->sortkey) return -1;
+
+    return strcmp(c->name, d->name);
 }
 
 // from main.c
 extern int quit;
 
-int idle=0;
-int ttime=0,xtime=0;
-int ctick=0;
+int idle = 0;
+int ttime = 0, xtime = 0;
+int ctick = 0;
 
-int do_exit=0;
+int do_exit = 0;
 
-int xoff=0,yoff=0;
+int xoff = 0, yoff = 0;
 
 extern int selected_char;
 
-struct look look={0,{0},0,0,"",0,0,0,0};
+struct look look = {0, {0}, 0, 0, "", 0, 0, 0, 0};
 
 // ************* CHARACTER ****************
 
 struct cplayer pl;
 
-static char *rank[25]={
-	"Private",
-	"Private First Class",
-	"Lance Corporal",
-	"Corporal",
-	"Sergeant",
-	"Staff Sergeant",
-	"Master Sergeant",
-	"First Sergeant",
-	"Sergeant Major",
-	"Second Lieutenant",
-	"First Lieutenant",
-	"Captain",
-	"Major",
-	"Lieutenant Colonel",
-	"Colonel",
-	"Brigadier General",
-	"Major General",
-	"Lieutenant General",
-	"General",
-	"Field Marshal",
-	"Knight",
-	"Baron",
-	"Earl",
-	"Marquess",
-	"Warlord"
+static char *rank[25] = {
+    "Private",
+    "Private First Class",
+    "Lance Corporal",
+    "Corporal",
+    "Sergeant",
+    "Staff Sergeant",
+    "Master Sergeant",
+    "First Sergeant",
+    "Sergeant Major",
+    "Second Lieutenant",
+    "First Lieutenant",
+    "Captain",
+    "Major",
+    "Lieutenant Colonel",
+    "Colonel",
+    "Brigadier General",
+    "Major General",
+    "Lieutenant General",
+    "General",
+    "Field Marshal",
+    "Knight",
+    "Baron",
+    "Earl",
+    "Marquess",
+    "Warlord"
 };
-static int rank_sprite[25]={
-	   10,    11,    12,    13,    14, 
-	   15,    16,    17,    18,    19, 
-	   20,    21,    22,    23,    24, 
-	   25,    26,    27,    28,    29,
-	   30,     6,     7,     8,     9
+static int rank_sprite[25] = {
+    10, 11, 12, 13, 14,
+    15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29,
+    30, 6, 7, 8, 9
 };
 
-int stat_raised[108]={0,0,0,0,0,0,0,0,0,0,0,0,0,};
-int stat_points_used=0;
+int stat_raised[108] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
+int stat_points_used = 0;
 
-int points2rank(int v)
-{
-	if (v<      250)	return( 0); // Private
-	if (v<     1750)	return( 1); // Private FIrst Class
-	if (v<     7000)	return( 2); // Lance Corporal
-	if (v<    21000)	return( 3); // Corporal
-	if (v<    52500)	return( 4); // Sergeant
-	if (v<   115500)	return( 5); // Staff Sergeant
-	if (v<   231000)	return( 6); // Master Sergeant
-	if (v<   429000)	return( 7); // First Sergeant
-	if (v<   750750)	return( 8); // Sergeant Major
-	if (v<  1251250)	return( 9); // Second Lieutenant
-	if (v<  2002000)	return(10); // First Lieutenant
-	if (v<  3094000)	return(11); // Captain
-	if (v<  4641000)	return(12); // Major
-	if (v<  6783000)	return(13); // Lieutenant Colonel
-	if (v<  9690000)	return(14); // Colonel
-	if (v< 13566000)	return(15); // Brigadier General
-	if (v< 18653250)	return(16); // Major General
-	if (v< 25236750)	return(17); // Lieutenant General
-	if (v< 33649000)	return(18); // General
-	if (v< 44275000)	return(19); // Field Marshal
-	if (v< 57557500)	return(20); // Knight
-	if (v< 74002500)	return(21); // Baron
-	if (v< 94185000)	return(22); // Earl
-	if (v<118755000)	return(23); // Marquess
-						return(24); // Warlord
+int points2rank(int v) {
+    if (v < 250) return (0); // Private
+    if (v < 1750) return (1); // Private FIrst Class
+    if (v < 7000) return (2); // Lance Corporal
+    if (v < 21000) return (3); // Corporal
+    if (v < 52500) return (4); // Sergeant
+    if (v < 115500) return (5); // Staff Sergeant
+    if (v < 231000) return (6); // Master Sergeant
+    if (v < 429000) return (7); // First Sergeant
+    if (v < 750750) return (8); // Sergeant Major
+    if (v < 1251250) return (9); // Second Lieutenant
+    if (v < 2002000) return (10); // First Lieutenant
+    if (v < 3094000) return (11); // Captain
+    if (v < 4641000) return (12); // Major
+    if (v < 6783000) return (13); // Lieutenant Colonel
+    if (v < 9690000) return (14); // Colonel
+    if (v < 13566000) return (15); // Brigadier General
+    if (v < 18653250) return (16); // Major General
+    if (v < 25236750) return (17); // Lieutenant General
+    if (v < 33649000) return (18); // General
+    if (v < 44275000) return (19); // Field Marshal
+    if (v < 57557500) return (20); // Knight
+    if (v < 74002500) return (21); // Baron
+    if (v < 94185000) return (22); // Earl
+    if (v < 118755000) return (23); // Marquess
+    return (24); // Warlord
 }
 
-int rank2points(int v)
-{
-	if (v==1)	return 250;
-	if (v==2)	return 1750;
-	if (v==3)	return 7000;
-	if (v==4)	return 21000;
-	if (v==5)	return 52500;
-	if (v==6)	return 115500;
-	if (v==7)	return 231000;
-	if (v==8)	return 429000;
-	if (v==9)	return 750750;
-	if (v==10)	return 1251250;
-	if (v==11)	return 2002000;
-	if (v==12)	return 3094000;
-	if (v==13)	return 4641000;
-	if (v==14)	return 6783000;
-	if (v==15)	return 9690000;
-	if (v==16)	return 13566000;
-	if (v==17)	return 18653250;
-	if (v==18)	return 25236750;
-	if (v==19)	return 33649000;
-	if (v==20)	return 44275000;
-	if (v==21)	return 57557500;
-	if (v==22)	return 74002500;
-	if (v==23)	return 94185000;
-	if (v>=24)	return 118755000;
-				return 0;
+int rank2points(int v) {
+    if (v == 1) return 250;
+    if (v == 2) return 1750;
+    if (v == 3) return 7000;
+    if (v == 4) return 21000;
+    if (v == 5) return 52500;
+    if (v == 6) return 115500;
+    if (v == 7) return 231000;
+    if (v == 8) return 429000;
+    if (v == 9) return 750750;
+    if (v == 10) return 1251250;
+    if (v == 11) return 2002000;
+    if (v == 12) return 3094000;
+    if (v == 13) return 4641000;
+    if (v == 14) return 6783000;
+    if (v == 15) return 9690000;
+    if (v == 16) return 13566000;
+    if (v == 17) return 18653250;
+    if (v == 18) return 25236750;
+    if (v == 19) return 33649000;
+    if (v == 20) return 44275000;
+    if (v == 21) return 57557500;
+    if (v == 22) return 74002500;
+    if (v == 23) return 94185000;
+    if (v >= 24) return 118755000;
+    return 0;
 }
 
 /* Calculates experience to next level from current experience and the
@@ -612,84 +621,76 @@ int rank2points(int v)
    binary search to determine the experience for the next level.
    If the given number of points corresponds to the highest level,
    return 0. */
-int points_tolevel(int curr_exp)
-{
-        int curr_level, next_level, r, j;  //, p0, p5, p9;
+int points_tolevel(int curr_exp) {
+    int curr_level, next_level, r, j; //, p0, p5, p9;
 
-		if (!curr_exp) return 250;	//0 exp
-        curr_level = points2rank(curr_exp);
-        if (curr_level == 24) return 118755000;
-        next_level = curr_level + 1;
+    if (!curr_exp) return 250; //0 exp
+    curr_level = points2rank(curr_exp);
+    if (curr_level == 24) return 118755000;
+    next_level = curr_level + 1;
 
-		r = rank2points(next_level);
-		j = r-curr_exp;
-		
-		return j;
+    r = rank2points(next_level);
+    j = r - curr_exp;
+
+    return j;
 }
 
-int attrib_needed(int n,int v)
-{
-	if (v>=pl.attrib[n][2])	return HIGH_VAL;
+int attrib_needed(int n, int v) {
+    if (v >= pl.attrib[n][2]) return HIGH_VAL;
 
-	return v*v*v*pl.attrib[n][3]/20;
+    return v * v * v * pl.attrib[n][3] / 20;
 }
 
-int hp_needed(int v)
-{
-	if (v>=pl.hp[2]) return HIGH_VAL;
+int hp_needed(int v) {
+    if (v >= pl.hp[2]) return HIGH_VAL;
 
-	return v*pl.hp[3];
+    return v * pl.hp[3];
 }
 
-int mana_needed(int v)
-{
-	if (v>=pl.mana[2]) return HIGH_VAL;
+int mana_needed(int v) {
+    if (v >= pl.mana[2]) return HIGH_VAL;
 
-	return v*pl.mana[3];
+    return v * pl.mana[3];
 }
 
-int skill_needed(int n,int v)
-{
-	if (v>=pl.skill[n][2]) return HIGH_VAL;
+int skill_needed(int n, int v) {
+    if (v >= pl.skill[n][2]) return HIGH_VAL;
 
-	return max(v,v*v*v*pl.skill[n][3]/40);
+    return max(v, v * v * v * pl.skill[n][3] / 40);
 }
-
 
 
 // ************* MAP **********************
 
-struct cmap *map=NULL;
+struct cmap *map = NULL;
 
 bool is_player(unsigned int character_id) {
-	return character_id == map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].ch_id;
+    return character_id == map[(screen_renderdist / 2) + (screen_renderdist / 2) * screen_renderdist].ch_id;
 }
 
-void eng_init_map(void)
-{
-	int n;
+void eng_init_map(void) {
+    int n;
 
-	map=calloc(screen_renderdist*screen_renderdist*sizeof(struct cmap),1);
+    map = calloc(screen_renderdist * screen_renderdist * sizeof(struct cmap), 1);
 
-	for (n=0; n<screen_renderdist*screen_renderdist; n++)	map[n].ba_sprite=SPR_EMPTY;
+    for (n = 0; n < screen_renderdist * screen_renderdist; n++) map[n].ba_sprite = SPR_EMPTY;
 }
 
-void eng_init_player(void)
-{
-	memset(&pl,0,sizeof(struct cplayer));
+void eng_init_player(void) {
+    memset(&pl, 0, sizeof(struct cplayer));
 }
 
 // ************* DISPLAY ******************
 
-unsigned int   show_look=0,
-look_nr=0,			// look at char/item nr
-look_type=0,		// 1=char, 2=item
-look_timer=0;		// look_timer
+unsigned int show_look = 0,
+        look_nr = 0, // look at char/item nr
+        look_type = 0, // 1=char, 2=item
+        look_timer = 0; // look_timer
 
-unsigned char   inv_block[20]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+unsigned char inv_block[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-extern int inv_object;			// object carried with the mouse cursor
-extern int mouse_x,mouse_y;	// current mouse coordinates
+extern int inv_object; // object carried with the mouse cursor
+extern int mouse_x, mouse_y; // current mouse coordinates
 
 #define XS	49
 #define LL	22
@@ -773,1283 +774,1240 @@ extern int gui_equ_y[];
 
 //
 
-int load=0;
+int load = 0;
 
-int st_learned_skill(int st_val, int v)
-{	// Returns the bitwise value of the parsed value v from the input value st_val
-	return ( (st_val>>((12-v)+4))%2 );
+int st_learned_skill(int st_val, int v) {
+    // Returns the bitwise value of the parsed value v from the input value st_val
+    return ((st_val >> ((12 - v) + 4)) % 2);
 }
 
-int st_skill_pts_have(int st_val)
-{	// Returns the available skill points
-	return ( st_val%16 );
+int st_skill_pts_have(int st_val) {
+    // Returns the available skill points
+    return (st_val % 16);
 }
 
-int st_skill_pts_all(int st_val)
-{	// Returns the available skill points plus spent skill points
-	int n, m = 0;
-	for (n=0;n<12;n++)
-	{
-		m += st_learned_skill(st_val, n+1);
-	}
-	return ( m + st_skill_pts_have(st_val) );
+int st_skill_pts_all(int st_val) {
+    // Returns the available skill points plus spent skill points
+    int n, m = 0;
+    for (n = 0; n < 12; n++) {
+        m += st_learned_skill(st_val, n + 1);
+    }
+    return (m + st_skill_pts_have(st_val));
 }
 
-int at_score(int n)
-{
-	return ( (pl.attrib[n][4] << 8) | pl.attrib[n][5] );
+int at_score(int n) {
+    return ((pl.attrib[n][4] << 8) | pl.attrib[n][5]);
 }
 
-int sk_score(int n)
-{
-	return ( (pl.skill[n][4] << 8) | pl.skill[n][5] );
+int sk_score(int n) {
+    return ((pl.skill[n][4] << 8) | pl.skill[n][5]);
 }
 
-void set_temp_skilltab(void)
-{
-	int n;
-	for (n=0; n<MAXSKILL; n++)
-	{
-		raw_skilltab[n].nr = n;
-		raw_skilltab[n].sortkey = n;
-		raw_skilltab[n].show = 0;
-		sprintf(raw_skilltab[n].name,"", n);
-		sprintf(raw_skilltab[n].desc,"", n);
-		raw_skilltab[n].attrib[0] = 0;
-		raw_skilltab[n].attrib[1] = 1;
-		raw_skilltab[n].attrib[2] = 2;
-	}
+void set_temp_skilltab(void) {
+    int n;
+    for (n = 0; n < MAXSKILL; n++) {
+        raw_skilltab[n].nr = n;
+        raw_skilltab[n].sortkey = n;
+        raw_skilltab[n].show = 0;
+        sprintf(raw_skilltab[n].name, "", n);
+        sprintf(raw_skilltab[n].desc, "", n);
+        raw_skilltab[n].attrib[0] = 0;
+        raw_skilltab[n].attrib[1] = 1;
+        raw_skilltab[n].attrib[2] = 2;
+    }
 
     update_skill_tab_from_raw();
 }
 
-void set_temp_metaStats(void)
-{
-	int n;
-	for (n=0; n<MAXMETA; n++)
-	{
-		meta_stats[n].show = 1;
-		meta_stats[n].flag = 0;
-		meta_stats[n].font = 1;
-		sprintf(meta_stats[n].name,"", n);
-		sprintf(meta_stats[n].desc,"", n);
-		meta_stats[n].value = -1;
-		sprintf(meta_stats[n].affix,"", n);
-	}
+void set_temp_metaStats(void) {
+    int n;
+    for (n = 0; n < MAXMETA; n++) {
+        meta_stats[n].show = 1;
+        meta_stats[n].flag = 0;
+        meta_stats[n].font = 1;
+        sprintf(meta_stats[n].name, "", n);
+        sprintf(meta_stats[n].desc, "", n);
+        meta_stats[n].value = -1;
+        sprintf(meta_stats[n].affix, "", n);
+    }
 }
 
-int pl_speed=0, pl_atksp=0, pl_spmod=0, pl_skmod=0, pl_spapt=0, pl_movsp=0;
-int pl_critc=0, pl_critm=0, pl_topdm=0, pl_topd2=0, pl_reflc=0, pl_aoebn=0;
-int pl_hitsc=0, pl_parry=0, pl_coold=0, pl_casts=0, pl_dmgbn=0;
-int pl_flags=0, pl_flagb=0, pl_flagc=0, pl_basel=0, pl_dmgml=0, pl_dmgrd=0;
-int pl_dlow=0,  pl_dhigh=0, pl_dps=0,   pl_hitdm=0, pl_cdrate=0, pl_armor=0;
-int sk_proxi=0, sk_immun=0, sk_resis=0, sk_conce=0, sk_ghost=0, sk_poiso=0, sk_slowv=0, sk_curse=0;
-int sk_blast=0, sk_scorc=0, sk_pulse=0, sk_pucnt=0, sk_razor=0, sk_leapv=0, sk_blind=0;
-int sk_water=0, sk_cleav=0, sk_weake=0, sk_warcr=0, sk_regen=0, sk_restv=0, sk_medit=0;
-int sk_shado=0, sk_rally=0, sk_immol=0, sk_shadd=0, sk_metab=0;
-int pl_ehp=0,   sk_leapr=0, sk_bleed=0, sk_rage=0,  sk_calm=0,  sk_letha=0;
-int sk_hem=0,   sk_rage2=0, sk_calm2=0;
-int sk_bless=0, sk_enhan=0, sk_prote=0, sk_mshie=0, sk_mdura=0, sk_haste=0, sk_healr=0;
-int coo_clea=0, coo_leap=0, coo_blas=0, coo_pois=0, coo_puls=0, coo_ghos=0, coo_shad=0;
-int coo_blin=0, coo_warc=0, coo_weak=0, coo_curs=0, coo_slow=0;
+int pl_speed = 0, pl_atksp = 0, pl_spmod = 0, pl_skmod = 0, pl_spapt = 0, pl_movsp = 0;
+int pl_critc = 0, pl_critm = 0, pl_topdm = 0, pl_topd2 = 0, pl_reflc = 0, pl_aoebn = 0;
+int pl_hitsc = 0, pl_parry = 0, pl_coold = 0, pl_casts = 0, pl_dmgbn = 0;
+int pl_flags = 0, pl_flagb = 0, pl_flagc = 0, pl_basel = 0, pl_dmgml = 0, pl_dmgrd = 0;
+int pl_dlow = 0, pl_dhigh = 0, pl_dps = 0, pl_hitdm = 0, pl_cdrate = 0, pl_armor = 0;
+int sk_proxi = 0, sk_immun = 0, sk_resis = 0, sk_conce = 0, sk_ghost = 0, sk_poiso = 0, sk_slowv = 0, sk_curse = 0;
+int sk_blast = 0, sk_scorc = 0, sk_pulse = 0, sk_pucnt = 0, sk_razor = 0, sk_leapv = 0, sk_blind = 0;
+int sk_water = 0, sk_cleav = 0, sk_weake = 0, sk_warcr = 0, sk_regen = 0, sk_restv = 0, sk_medit = 0;
+int sk_shado = 0, sk_rally = 0, sk_immol = 0, sk_shadd = 0, sk_metab = 0;
+int pl_ehp = 0, sk_leapr = 0, sk_bleed = 0, sk_rage = 0, sk_calm = 0, sk_letha = 0;
+int sk_hem = 0, sk_rage2 = 0, sk_calm2 = 0;
+int sk_bless = 0, sk_enhan = 0, sk_prote = 0, sk_mshie = 0, sk_mdura = 0, sk_haste = 0, sk_healr = 0;
+int coo_clea = 0, coo_leap = 0, coo_blas = 0, coo_pois = 0, coo_puls = 0, coo_ghos = 0, coo_shad = 0;
+int coo_blin = 0, coo_warc = 0, coo_weak = 0, coo_curs = 0, coo_slow = 0;
 
 static void calculate_game_ui_state() {
     ui_calculate_perf_window_state();
     ui_calculate_quick_stats_window_state();
 }
 
-void init_meta_stats(void)
-{
-	int moonmult = 20;
-	int hpmult, endmult, manamult;
-	int race_reg, race_res, race_med;
-	int len = 100;
-	
-	if (pl.worn[WN_SPMOD]==NULL) return;
-	
-	// Player Speed and Attack Speed - WN_SPEED
-	pl_speed = SPEED_CAP - pl.worn[WN_SPEED]; 
-	pl_atksp = pl_speed + pl.worn_p[WN_SPEED]; 
-	pl_movsp = pl_speed + pl.end[0];
-	
-	if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP; if (pl_speed < 0) pl_speed = 0;
-	if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP; if (pl_atksp < 0) pl_atksp = 0;
-	if (pl_movsp > SPEED_CAP) pl_movsp = SPEED_CAP; if (pl_movsp < 0) pl_movsp = 0;
+void init_meta_stats(void) {
+    int moonmult = 20;
+    int hpmult, endmult, manamult;
+    int race_reg, race_res, race_med;
+    int len = 100;
 
-	// Player Spell Mod and Spell Apt - WN_SPMOD
-	pl_spmod = pl.worn[WN_SPMOD];
-	pl_skmod = 100;
-	pl_spapt = pl.worn_p[WN_SPMOD];
-	
-	// Player Crit chance and Crit Multiplier - WN_CRIT
-	pl_critc = pl.worn[WN_CRIT];
-	pl_critm = pl.worn_p[WN_CRIT];
-	
-	// Player Top damage and Reflection - WN_TOP
-	pl_topdm = pl.worn[WN_TOP]+6+8;
-	pl_reflc = pl.worn_p[WN_TOP];
-	
-	// Player Hit and Parry - WN_HITPAR
-	pl_hitsc = pl.worn[WN_HITPAR];
-	pl_parry = pl.worn_p[WN_HITPAR];
-	
-	// Player Cooldown and Cast Speed - WN_CLDWN
-	pl_coold = pl.worn[WN_CLDWN];
-	pl_casts = pl_speed/2 + pl.worn_p[WN_CLDWN]*2; 
-	
-	if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP; if (pl_casts < 0) pl_casts = 0;
-	
-	pl_aoebn = pl.end[1];
-	pl_dmgbn = pl.end[2];
-	pl_dmgrd = pl.end[3];
-	pl_flagc = pl.end[4];
-	
-	// Player Flags from special items
-	pl_flags = pl.worn[WN_FLAGS];
-	pl_flagb = pl.worn_p[WN_FLAGS];
-	pl_basel = 100;
-	pl_dmgml = 100;
-	
-	// Book - Damor's Grudge (cooldown bonus)
-	if (pl_flags & (1 <<  0))
-		pl_basel =  90;
-	
-	// Tarot - Strength (damage multiplier)  // *pl_dmgbn/10000*pl_dmgml/100
-	if (pl_flags & (1 <<  1))
-		pl_dmgml = 120;
-	
-	// Player DPS - pl_dlow, pl_dhigh, pl_dps
-	pl_dlow  = (pl.weapon*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_dhigh = pl.weapon+pl_topdm;
-	pl_topd2 = ((pl_topdm+pl_topdm*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_dhigh = ((pl_dhigh+pl_dhigh*pl_critc*pl_critm/1000000)*pl_dmgml/100)/4*pl_dmgbn/10000;
-	pl_hitdm = (pl_dlow+pl_dhigh+(T_LYCA_SK(6)?pl_topd2/2:0))/2;
-	pl_dps   = pl_hitdm*pl_atksp;
-	
-	// Player cooldown rate - pl_cdrate
-	pl_cdrate = 100 * pl_basel / max(25, pl_coold);
-	
-	/*
-		Moon multiplier adjustments
-	*/
-	// FULL MOON
-	if (pl_flagb & (1 <<  8))
-	{
-		moonmult = 30;
-	}
-	// NEW MOON
-	if (pl_flagb & (1 <<  9))
-	{
-		moonmult = 40;
-	}
-	hpmult = endmult = manamult = moonmult;
-	
-	// Reverse Star
-	if (pl_flagc&(1<<10))
-	{
-		pl_skmod = pl_spmod;
-		pl_spmod = 100;
-	}
-	
-	/*
-		Additional skill bonuses for GUI
-	*/
-	sk_proxi = sk_score(44) / (300/12);
-	sk_ghost = sk_score(27)*pl_spmod/100 * 5 / 11;
-	sk_poiso = (sk_score(42)*pl_spmod/100 + 5) * DAM_MULT_POISON / 300;
-	sk_blast = sk_score(24)*pl_spmod/100 * 2 * DAM_MULT_BLAST/1000;
-	sk_scorc = 1000 + sk_score(24)*pl_spmod/100;
-	sk_pulse = (sk_score(43)+(sk_score(43)*(T_ARHR_SK(7)?at_score(AT_INT)/1000:0)))*pl_spmod/100 * 2 * DAM_MULT_PULSE/1000;
-	sk_pucnt = (60*2*100 / (3*pl_cdrate));
-	sk_water = 25 * TICKS;
-	sk_cleav = ((sk_score(40)+(sk_score(40)*(T_WARR_SK(9)?at_score(AT_STR)/1000:0)))*pl_skmod/100+pl.weapon/4+pl_topdm/4+(T_ARTM_SK(4)?pl_reflc:0)) * 2 * DAM_MULT_CLEAVE/1000;
-	sk_warcr = -(2+((sk_score(35)+(sk_score(35)*(T_ARTM_SK(7)?at_score(AT_STR)/2000:0)))*pl_skmod/100/(10/3)) / 5);
-	sk_rally = sk_score(35)*pl_skmod/100/10;
-	sk_shado = (sk_score(46)+(sk_score(46)*(T_SUMM_SK(9)?at_score(AT_WIL)/1000:0)))*pl_spmod/100 * 5 / 11;
-	sk_shadd = 15 + (sk_score(46)+(sk_score(46)*(T_SUMM_SK(9)?at_score(AT_WIL)/1000:0)))*pl_spmod/500;
-	sk_weake = -(sk_score(41)*pl_skmod/100 / 4 + 2);
-	
-	sk_bleed = (sk_cleav + 5) * DAM_MULT_BLEED / 150;
-	
-	sk_hem   = ((pl.hp[5] - pl.a_hp)/10) + ((pl.end[5] - pl.a_end)/10) + ((pl.mana[5] - pl.a_mana)/10);
-	
-	sk_rage  = sk_rage2 = sk_score(22);
-	if (T_LYCA_SK(9)) sk_rage = sk_rage + (sk_rage * sk_hem / 500);
-	sk_rage2 = 10000 * (1000 + (IS_SEYAN_DU?(sk_rage*2/3):(sk_rage))) / 1000;
-	sk_rage  = min(127, IS_SEYAN_DU?(sk_rage/6 + 5):(sk_rage/4 + 5));
-	
-	sk_calm  = sk_calm2 = sk_score(22);
-	if (T_LYCA_SK(7)) sk_calm = sk_calm + (sk_calm * sk_hem / 500);
-	sk_calm2 = 10000 * (1000 - (IS_SEYAN_DU?(sk_calm*2/3):(sk_calm))) / 1000;
-	sk_calm  = min(127, IS_SEYAN_DU?(sk_calm/6 + 5):(sk_calm/4 + 5)) * -1;
-	
-	sk_letha = (sk_score(15)+(sk_score(15)*(T_SORC_SK(7)?at_score(AT_WIL)/2000:0)))*pl_spmod/100/(IS_SEYAN_DU?4:3);
-	sk_bless = min(127, (sk_score(21)*pl_spmod/100*2/3) / 5 + 3);
-	sk_enhan = min(127, (IS_SEYAN_DU?(sk_score(18)*pl_spmod/100/6+3):(sk_score(18)*pl_spmod/100/4+4)));
-	sk_prote = min(127, (IS_SEYAN_DU?(sk_score(17)*pl_spmod/100/6+3):(sk_score(17)*pl_spmod/100/4+4)));
-	sk_mdura = sk_score(11)*pl_spmod/100 * ((pl_flagb&(1<<10))?128:256);
-	sk_mshie = min(127, (IS_SEYAN_DU?(sk_mdura/((pl_flagb&(1<<10))?768:1536)+1):(sk_mdura/((pl_flagb&(1<<10))?512:1024)+1)));
-	sk_mdura = sk_mdura/20;
-	sk_haste = min(300, 10 + (sk_score(47)*pl_spmod/100)/ 6) + min(127, 5 + (sk_score(47)+6)/12);
-	sk_healr = ((pl_flags&(1<<14))?sk_score(26)*pl_spmod/100*1875/20:sk_score(26)*pl_spmod/100*2500)/1000;
-	
-	if (pl_flagb & (1<<7))	// Tarot - Rev.Justice (Leap dmg crits)
-	{
-		sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_LEAP/1000 * pl_critm/100;
-	}
-	else
-	{
-		sk_leapv = (sk_score(49)*pl_skmod/100+pl.weapon/4) * 2 * DAM_MULT_RLEAP/1000;
-		sk_leapr = max(0, min(10, (100 - pl_cdrate)/10));
-	}
-	
-	
-	if (IS_MERCENARY || IS_WARRIOR || IS_SORCERER)
-	{
-		sk_blind = -((sk_score(37)+(sk_score(37)*(T_WARR_SK(7)?at_score(AT_AGL)/2000:0)))*pl_skmod/100 / 6 + 2);
-	}
-	else
-	{
-		sk_blind = -(sk_score(37)*pl_skmod/100 / 8 + 1);
-	}
-	
-	// Tarot - Hanged Man (immunity&resistance)
-	if (pl_flags & (1 <<  2))
-	{
-		sk_immun = sk_score(32) + sk_score(23)/3;
-		sk_resis = sk_score(23) * 2/3;
-	}
-	else
-	{
-		sk_immun = sk_score(32);
-		sk_resis = sk_score(23);
-	}
-	if (T_WARR_SK(12))
-	{
-		sk_immun += pl_spapt/5;
-	}
-	
-	// Book - Great Prodigy (concentrate bonus)
-	if (pl_flags & (1 <<  3))
-	{
-		sk_conce = max(1, 100 - 100 * sk_score(34) / 300);
-	}
-	else
-	{
-		sk_conce = max(1, 100 - 100 * sk_score(34) / 400);
-	}
-	
-	// Book - Venom Compendium (poison bonus)
-	if (pl_flags & (1 <<  4))
-		sk_poiso = sk_poiso * 5 / 4;
-	// Tree - 10% faster = 11.1% more damage
-	if (T_SORC_SK(4))
-		sk_poiso = sk_poiso * 10 / 9;
-	// Tarot - Rev.Tower (Venom)
-	if (pl_flagb & (1 << 14))
-		sk_poiso = sk_poiso / 2;
-	
-	sk_razor = (sk_score(7)*pl_spmod/100 + max(0,(pl_atksp-120))/2) * 2 * DAM_MULT_ZEPHYR/1000;
-	
-	if (IS_SEYAN_DU || IS_BRAVER)
-	{
-		sk_weake = -(sk_score(41) / 6 + 2);
-	}
-	
-	// Tarot - Emperor (slow bonus)
-	if (pl_flags & (1 <<  5))
-	{
-		sk_slowv = -(30 + ((sk_score(19)+(sk_score(19)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)/4);
-	}
-	else
-	{
-		sk_slowv = -(30 + ((sk_score(19)+(sk_score(19)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)/3);
-	}
-	
-	// Tarot - Tower (curse bonus)
-	if (pl_flags & (1 <<  6))
-	{
-		sk_curse = -(2 + ((((sk_score(20)+(sk_score(20)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)*5/4)-4)/5);
-	}
-	else
-	{
-		sk_curse = -(2 + (((sk_score(20)+(sk_score(20)*(T_SORC_SK(9)?at_score(AT_INT)/2500:0)))*pl_spmod/100)-4)/5);
-	}
-	
-	sk_metab = 0;
-	
-	// Metabolism skill
-	if (pl.skill[10][0]) sk_metab = sk_score(10)/2;
-	sk_water = max(1, (250 - sk_metab) * (200 - sk_metab) / 200) * 20/10;
-	
-	// Amulet - Water breathing (degen/2)		0 1 1
-	if (!(pl_flagb & (1 <<  0)) && (pl_flagb & (1 <<  1)) && (pl_flagb & (1 <<  2)))
-	{
-		sk_water /= 4;
-	}
-	
-	// Immolate
-	sk_immol = pl.hp[4] * 30 / 100;
-	
-	// Book - Burning
-	if (pl_flagb & (1 << 13)) sk_immol = sk_immol + pl.hp[4]/25;
-	
-	// Immolate damage calc
-	sk_immol = sk_immol*3/2;
-	sk_immol = 10 + sk_immol*4;
-	
-	if (pl_flagc & (1<<2)) // 20% more weaken effect
-		sk_weake = sk_weake * 6/5;
-	if (pl_flagc & (1<<3)) // 20% more slow effect
-		sk_slowv = sk_slowv * 6/5;
-	if (pl_flagc & (1<<4)) // 20% more curse effect
-		sk_curse = sk_curse * 6/5;
-	if (pl_flagc & (1<<5)) // 20% more poison effect
-		sk_poiso = sk_poiso * 6/5;
-	if (pl_flagc & (1<<6)) // 20% more bleed effect
-		sk_bleed = sk_bleed * 6/5;
-	if (pl_flagc & (1<<7)) // 20% more blind effect
-		sk_blind = sk_blind * 6/5;
-	if (pl_flagc & (1<<8)) // 20% more heal effect
-		sk_healr = sk_healr * 6/5;
-	
-	/*
-		Regeneration stats
-	*/
-	race_reg = sk_score(28) * moonmult / 20 + sk_score(28) * pl.hp[5]/2000;
-	race_res = sk_score(29) * moonmult / 20 + sk_score(29) * pl.end[5]/2000;
-	race_med = sk_score(30) * moonmult / 20 + sk_score(30) * pl.mana[5]/2000;
-	
-	// Tarot - Moon :: While not full mana, life regen is mana regen
-	if ((pl_flags & (1 << 11)) && (pl.a_mana<pl.mana[5]))
-	{
-		race_med += race_reg;	race_reg -= race_reg;
-		manamult += hpmult;		hpmult   -= hpmult;
-	}
-	// Tarot - Sun :: While not full life, end regen is life regen
-	if ((pl_flags & (1 << 12)) && (pl.a_hp<pl.hp[5]))
-	{
-		race_reg += race_res;	race_res -= race_res;
-		hpmult   += endmult;	endmult  -= endmult;
-	}
-	// Tarot - World :: While not full end, mana regen is end regen
-	if ((pl_flags & (1 << 13)) && (pl.a_end<pl.end[5]))
-	{
-		race_res += race_med;	race_med -= race_med;
-		endmult  += manamult;	manamult -= manamult;
-	}
-	
-	// Meditate added to Hitpoints
-	if (pl_flagc & (1<<0))
-	{
-		race_reg += race_med/2;
-		hpmult   += manamult/2;
-	}
-	// Rest added to mana
-	if (pl_flagc & (1<<1))
-	{
-		race_med += race_res/2;
-		manamult += endmult/2;
-	}
-	
-	sk_regen = (pl.skill[28][0]?race_reg:0) + hpmult   * 2;
-	sk_restv = (pl.skill[29][0]?race_res:0) + endmult  * 3;
-	sk_medit = (pl.skill[30][0]?race_med:0) + manamult * 1;
-	
-	pl_armor = pl.armor;
-	
-	// Amulet - Standard Ankh			1 0 0
-	if ((pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
-	{
-		sk_regen += pl.skill[28][0]?race_reg/12:0;
-		sk_restv += pl.skill[29][0]?race_res/12:0;
-		sk_medit += pl.skill[30][0]?race_med/12:0;
-	}
-	// Amulet - Amber Ankh (Life) 		0 1 0
-	if (!(pl_flagb & (1 <<  0)) && (pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
-	{
-		sk_regen += pl.skill[28][0]?race_reg/ 6:0;
-		sk_restv += pl.skill[29][0]?race_res/24:0;
-		sk_medit += pl.skill[30][0]?race_med/24:0;
-	}
-	// Amulet - Turquoise Ankh (End)	1 1 0
-	if ((pl_flagb & (1 <<  0)) && (pl_flagb & (1 <<  1)) && !(pl_flagb & (1 <<  2)))
-	{
-		sk_regen += pl.skill[28][0]?race_reg/24:0;
-		sk_restv += pl.skill[29][0]?race_res/ 6:0;
-		sk_medit += pl.skill[30][0]?race_med/24:0;
-	}
-	// Amulet - Garnet Ankh (Mana)		0 0 1
-	if (!(pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && (pl_flagb & (1 <<  2)))
-	{
-		sk_regen += pl.skill[28][0]?race_reg/24:0;
-		sk_restv += pl.skill[29][0]?race_res/24:0;
-		sk_medit += pl.skill[30][0]?race_med/ 6:0;
-	}
-	// Amulet - True Ankh				1 0 1
-	if ((pl_flagb & (1 <<  0)) && !(pl_flagb & (1 <<  1)) && (pl_flagb & (1 <<  2)))
-	{
-		sk_regen += pl.skill[28][0]?race_reg/ 6:0;
-		sk_restv += pl.skill[29][0]?race_res/ 6:0;
-		sk_medit += pl.skill[30][0]?race_med/ 6:0;
-	}
-	
-	sk_regen = sk_regen * 20/10;
-	sk_restv = sk_restv * 20/10;
-	sk_medit = sk_medit * 20/10;
-	
-	// add *pl_dmgbn/10000 to damage values for the HUD
-	sk_cleav = sk_cleav*pl_dmgbn/10000*pl_dmgml/100;
-	sk_leapv = sk_leapv*pl_dmgbn/10000*pl_dmgml/100;
-	sk_blast = sk_blast*pl_dmgbn/10000*pl_dmgml/100;
-	sk_poiso = sk_poiso*pl_dmgbn/10000*pl_dmgml/100;
-	if (!(pl_flagb&(1<<6))) sk_pulse = sk_pulse*pl_dmgbn/10000*pl_dmgml/100;
-	sk_razor = sk_razor*pl_dmgbn/10000*pl_dmgml/100;
-	sk_immol = sk_immol*pl_dmgbn/10000*pl_dmgml/100;
-	pl_reflc = pl_reflc*pl_dmgbn/10000*pl_dmgml/100;
-	
-	// Acedia - Sprite 5556
-	if (pl.worn[WN_RHAND] == 5556) len = len * 3/4; // less
-	if (pl.worn[WN_LHAND] == 5556) len = len * 6/4; // more
-	
-	coo_clea = 500 * pl_cdrate / 100 * len / 100;
-	coo_leap = 500 * pl_cdrate / 100 * len / 100;
-	coo_blas = (600-T_ARHR_SK(4)*25) * pl_cdrate / 100 * len / 100;
-	coo_pois = 500 * pl_cdrate / 100 * len / 100;
-	coo_puls = 600 * pl_cdrate / 100 * len / 100;
-	coo_ghos = 800 * pl_cdrate / 100 * len / 100;
-	coo_shad = 400 * pl_cdrate / 100 * len / 100;
-	coo_blin = 300 * pl_cdrate / 100 * len / 100;
-	coo_warc = 300 * pl_cdrate / 100 * len / 100;
-	coo_weak = 300 * pl_cdrate / 100 * len / 100;
-	coo_curs = 400 * pl_cdrate / 100 * len / 100;
-	coo_slow = 400 * pl_cdrate / 100 * len / 100;
-	
-	pl_ehp = pl.hp[5]*10000/pl_dmgrd;
-	
-	if (pl_flagc & (1<<9)) // 20% damage shifted to end/mana
-		pl_ehp = pl_ehp * 100 /  80;
-	if (pl_flagc & (1<<11)) // 5% chance to not be hit by melee
-		pl_ehp = pl_ehp * 100 /  95;
-	if (pl_flagc & (1<<12)) // 20% damage shifted to end/mana
-		pl_ehp = pl_ehp * 100 /  80;
-	if (pl_flagc & (1<<14)) // 10% damage null/shifted to endurance
-		pl_ehp = pl_ehp * 100 /  90;
-	if (pl_flags & (1<<9)) // 20% damage null/shifted to mana
-		pl_ehp = pl_ehp * 100 /  80;
+    if (pl.worn[WN_SPMOD] == NULL) return;
+
+    // Player Speed and Attack Speed - WN_SPEED
+    pl_speed = SPEED_CAP - pl.worn[WN_SPEED];
+    pl_atksp = pl_speed + pl.worn_p[WN_SPEED];
+    pl_movsp = pl_speed + pl.end[0];
+
+    if (pl_speed > SPEED_CAP) pl_speed = SPEED_CAP;
+    if (pl_speed < 0) pl_speed = 0;
+    if (pl_atksp > SPEED_CAP) pl_atksp = SPEED_CAP;
+    if (pl_atksp < 0) pl_atksp = 0;
+    if (pl_movsp > SPEED_CAP) pl_movsp = SPEED_CAP;
+    if (pl_movsp < 0) pl_movsp = 0;
+
+    // Player Spell Mod and Spell Apt - WN_SPMOD
+    pl_spmod = pl.worn[WN_SPMOD];
+    pl_skmod = 100;
+    pl_spapt = pl.worn_p[WN_SPMOD];
+
+    // Player Crit chance and Crit Multiplier - WN_CRIT
+    pl_critc = pl.worn[WN_CRIT];
+    pl_critm = pl.worn_p[WN_CRIT];
+
+    // Player Top damage and Reflection - WN_TOP
+    pl_topdm = pl.worn[WN_TOP] + 6 + 8;
+    pl_reflc = pl.worn_p[WN_TOP];
+
+    // Player Hit and Parry - WN_HITPAR
+    pl_hitsc = pl.worn[WN_HITPAR];
+    pl_parry = pl.worn_p[WN_HITPAR];
+
+    // Player Cooldown and Cast Speed - WN_CLDWN
+    pl_coold = pl.worn[WN_CLDWN];
+    pl_casts = pl_speed / 2 + pl.worn_p[WN_CLDWN] * 2;
+
+    if (pl_casts > SPEED_CAP) pl_casts = SPEED_CAP;
+    if (pl_casts < 0) pl_casts = 0;
+
+    pl_aoebn = pl.end[1];
+    pl_dmgbn = pl.end[2];
+    pl_dmgrd = pl.end[3];
+    pl_flagc = pl.end[4];
+
+    // Player Flags from special items
+    pl_flags = pl.worn[WN_FLAGS];
+    pl_flagb = pl.worn_p[WN_FLAGS];
+    pl_basel = 100;
+    pl_dmgml = 100;
+
+    // Book - Damor's Grudge (cooldown bonus)
+    if (pl_flags & (1 << 0))
+        pl_basel = 90;
+
+    // Tarot - Strength (damage multiplier)  // *pl_dmgbn/10000*pl_dmgml/100
+    if (pl_flags & (1 << 1))
+        pl_dmgml = 120;
+
+    // Player DPS - pl_dlow, pl_dhigh, pl_dps
+    pl_dlow = (pl.weapon * pl_dmgml / 100) / 4 * pl_dmgbn / 10000;
+    pl_dhigh = pl.weapon + pl_topdm;
+    pl_topd2 = ((pl_topdm + pl_topdm * pl_critc * pl_critm / 1000000) * pl_dmgml / 100) / 4 * pl_dmgbn / 10000;
+    pl_dhigh = ((pl_dhigh + pl_dhigh * pl_critc * pl_critm / 1000000) * pl_dmgml / 100) / 4 * pl_dmgbn / 10000;
+    pl_hitdm = (pl_dlow + pl_dhigh + (T_LYCA_SK(6) ? pl_topd2 / 2 : 0)) / 2;
+    pl_dps = pl_hitdm * pl_atksp;
+
+    // Player cooldown rate - pl_cdrate
+    pl_cdrate = 100 * pl_basel / max(25, pl_coold);
+
+    /*
+        Moon multiplier adjustments
+    */
+    // FULL MOON
+    if (pl_flagb & (1 << 8)) {
+        moonmult = 30;
+    }
+    // NEW MOON
+    if (pl_flagb & (1 << 9)) {
+        moonmult = 40;
+    }
+    hpmult = endmult = manamult = moonmult;
+
+    // Reverse Star
+    if (pl_flagc & (1 << 10)) {
+        pl_skmod = pl_spmod;
+        pl_spmod = 100;
+    }
+
+    /*
+        Additional skill bonuses for GUI
+    */
+    sk_proxi = sk_score(44) / (300 / 12);
+    sk_ghost = sk_score(27) * pl_spmod / 100 * 5 / 11;
+    sk_poiso = (sk_score(42) * pl_spmod / 100 + 5) * DAM_MULT_POISON / 300;
+    sk_blast = sk_score(24) * pl_spmod / 100 * 2 * DAM_MULT_BLAST / 1000;
+    sk_scorc = 1000 + sk_score(24) * pl_spmod / 100;
+    sk_pulse = (sk_score(43) + (sk_score(43) * (T_ARHR_SK(7) ? at_score(AT_INT) / 1000 : 0))) * pl_spmod / 100 * 2 *
+               DAM_MULT_PULSE / 1000;
+    sk_pucnt = (60 * 2 * 100 / (3 * pl_cdrate));
+    sk_water = 25 * TICKS;
+    sk_cleav = ((sk_score(40) + (sk_score(40) * (T_WARR_SK(9) ? at_score(AT_STR) / 1000 : 0))) * pl_skmod / 100 + pl.
+                weapon / 4 + pl_topdm / 4 + (T_ARTM_SK(4) ? pl_reflc : 0)) * 2 * DAM_MULT_CLEAVE / 1000;
+    sk_warcr = -(2 + ((sk_score(35) + (sk_score(35) * (T_ARTM_SK(7) ? at_score(AT_STR) / 2000 : 0))) * pl_skmod / 100 /
+                      (10 / 3)) / 5);
+    sk_rally = sk_score(35) * pl_skmod / 100 / 10;
+    sk_shado = (sk_score(46) + (sk_score(46) * (T_SUMM_SK(9) ? at_score(AT_WIL) / 1000 : 0))) * pl_spmod / 100 * 5 / 11;
+    sk_shadd = 15 + (sk_score(46) + (sk_score(46) * (T_SUMM_SK(9) ? at_score(AT_WIL) / 1000 : 0))) * pl_spmod / 500;
+    sk_weake = -(sk_score(41) * pl_skmod / 100 / 4 + 2);
+
+    sk_bleed = (sk_cleav + 5) * DAM_MULT_BLEED / 150;
+
+    sk_hem = ((pl.hp[5] - pl.a_hp) / 10) + ((pl.end[5] - pl.a_end) / 10) + ((pl.mana[5] - pl.a_mana) / 10);
+
+    sk_rage = sk_rage2 = sk_score(22);
+    if (T_LYCA_SK(9)) sk_rage = sk_rage + (sk_rage * sk_hem / 500);
+    sk_rage2 = 10000 * (1000 + (IS_SEYAN_DU ? (sk_rage * 2 / 3) : (sk_rage))) / 1000;
+    sk_rage = min(127, IS_SEYAN_DU ? (sk_rage / 6 + 5) : (sk_rage / 4 + 5));
+
+    sk_calm = sk_calm2 = sk_score(22);
+    if (T_LYCA_SK(7)) sk_calm = sk_calm + (sk_calm * sk_hem / 500);
+    sk_calm2 = 10000 * (1000 - (IS_SEYAN_DU ? (sk_calm * 2 / 3) : (sk_calm))) / 1000;
+    sk_calm = min(127, IS_SEYAN_DU ? (sk_calm / 6 + 5) : (sk_calm / 4 + 5)) * -1;
+
+    sk_letha = (sk_score(15) + (sk_score(15) * (T_SORC_SK(7) ? at_score(AT_WIL) / 2000 : 0))) * pl_spmod / 100 / (
+                   IS_SEYAN_DU ? 4 : 3);
+    sk_bless = min(127, (sk_score(21) * pl_spmod / 100 * 2 / 3) / 5 + 3);
+    sk_enhan = min(
+        127, (IS_SEYAN_DU ? (sk_score(18) * pl_spmod / 100 / 6 + 3) : (sk_score(18) * pl_spmod / 100 / 4 + 4)));
+    sk_prote = min(
+        127, (IS_SEYAN_DU ? (sk_score(17) * pl_spmod / 100 / 6 + 3) : (sk_score(17) * pl_spmod / 100 / 4 + 4)));
+    sk_mdura = sk_score(11) * pl_spmod / 100 * ((pl_flagb & (1 << 10)) ? 128 : 256);
+    sk_mshie = min(127, (IS_SEYAN_DU
+                             ? (sk_mdura / ((pl_flagb & (1 << 10)) ? 768 : 1536) + 1)
+                             : (sk_mdura / ((pl_flagb & (1 << 10)) ? 512 : 1024) + 1)));
+    sk_mdura = sk_mdura / 20;
+    sk_haste = min(300, 10 + (sk_score(47) * pl_spmod / 100) / 6) + min(127, 5 + (sk_score(47) + 6) / 12);
+    sk_healr = ((pl_flags & (1 << 14))
+                    ? sk_score(26) * pl_spmod / 100 * 1875 / 20
+                    : sk_score(26) * pl_spmod / 100 * 2500) / 1000;
+
+    if (pl_flagb & (1 << 7)) // Tarot - Rev.Justice (Leap dmg crits)
+    {
+        sk_leapv = (sk_score(49) * pl_skmod / 100 + pl.weapon / 4) * 2 * DAM_MULT_LEAP / 1000 * pl_critm / 100;
+    } else {
+        sk_leapv = (sk_score(49) * pl_skmod / 100 + pl.weapon / 4) * 2 * DAM_MULT_RLEAP / 1000;
+        sk_leapr = max(0, min(10, (100 - pl_cdrate) / 10));
+    }
+
+
+    if (IS_MERCENARY || IS_WARRIOR || IS_SORCERER) {
+        sk_blind = -((sk_score(37) + (sk_score(37) * (T_WARR_SK(7) ? at_score(AT_AGL) / 2000 : 0))) * pl_skmod / 100 / 6
+                     + 2);
+    } else {
+        sk_blind = -(sk_score(37) * pl_skmod / 100 / 8 + 1);
+    }
+
+    // Tarot - Hanged Man (immunity&resistance)
+    if (pl_flags & (1 << 2)) {
+        sk_immun = sk_score(32) + sk_score(23) / 3;
+        sk_resis = sk_score(23) * 2 / 3;
+    } else {
+        sk_immun = sk_score(32);
+        sk_resis = sk_score(23);
+    }
+    if (T_WARR_SK(12)) {
+        sk_immun += pl_spapt / 5;
+    }
+
+    // Book - Great Prodigy (concentrate bonus)
+    if (pl_flags & (1 << 3)) {
+        sk_conce = max(1, 100 - 100 * sk_score(34) / 300);
+    } else {
+        sk_conce = max(1, 100 - 100 * sk_score(34) / 400);
+    }
+
+    // Book - Venom Compendium (poison bonus)
+    if (pl_flags & (1 << 4))
+        sk_poiso = sk_poiso * 5 / 4;
+    // Tree - 10% faster = 11.1% more damage
+    if (T_SORC_SK(4))
+        sk_poiso = sk_poiso * 10 / 9;
+    // Tarot - Rev.Tower (Venom)
+    if (pl_flagb & (1 << 14))
+        sk_poiso = sk_poiso / 2;
+
+    sk_razor = (sk_score(7) * pl_spmod / 100 + max(0, (pl_atksp - 120)) / 2) * 2 * DAM_MULT_ZEPHYR / 1000;
+
+    if (IS_SEYAN_DU || IS_BRAVER) {
+        sk_weake = -(sk_score(41) / 6 + 2);
+    }
+
+    // Tarot - Emperor (slow bonus)
+    if (pl_flags & (1 << 5)) {
+        sk_slowv = -(30 + ((sk_score(19) + (sk_score(19) * (T_SORC_SK(9) ? at_score(AT_INT) / 2500 : 0))) * pl_spmod /
+                           100) / 4);
+    } else {
+        sk_slowv = -(30 + ((sk_score(19) + (sk_score(19) * (T_SORC_SK(9) ? at_score(AT_INT) / 2500 : 0))) * pl_spmod /
+                           100) / 3);
+    }
+
+    // Tarot - Tower (curse bonus)
+    if (pl_flags & (1 << 6)) {
+        sk_curse = -(2 + ((((sk_score(20) + (sk_score(20) * (T_SORC_SK(9) ? at_score(AT_INT) / 2500 : 0))) * pl_spmod /
+                            100) * 5 / 4) - 4) / 5);
+    } else {
+        sk_curse = -(2 + (((sk_score(20) + (sk_score(20) * (T_SORC_SK(9) ? at_score(AT_INT) / 2500 : 0))) * pl_spmod /
+                           100) - 4) / 5);
+    }
+
+    sk_metab = 0;
+
+    // Metabolism skill
+    if (pl.skill[10][0]) sk_metab = sk_score(10) / 2;
+    sk_water = max(1, (250 - sk_metab) * (200 - sk_metab) / 200) * 20 / 10;
+
+    // Amulet - Water breathing (degen/2)		0 1 1
+    if (!(pl_flagb & (1 << 0)) && (pl_flagb & (1 << 1)) && (pl_flagb & (1 << 2))) {
+        sk_water /= 4;
+    }
+
+    // Immolate
+    sk_immol = pl.hp[4] * 30 / 100;
+
+    // Book - Burning
+    if (pl_flagb & (1 << 13)) sk_immol = sk_immol + pl.hp[4] / 25;
+
+    // Immolate damage calc
+    sk_immol = sk_immol * 3 / 2;
+    sk_immol = 10 + sk_immol * 4;
+
+    if (pl_flagc & (1 << 2)) // 20% more weaken effect
+        sk_weake = sk_weake * 6 / 5;
+    if (pl_flagc & (1 << 3)) // 20% more slow effect
+        sk_slowv = sk_slowv * 6 / 5;
+    if (pl_flagc & (1 << 4)) // 20% more curse effect
+        sk_curse = sk_curse * 6 / 5;
+    if (pl_flagc & (1 << 5)) // 20% more poison effect
+        sk_poiso = sk_poiso * 6 / 5;
+    if (pl_flagc & (1 << 6)) // 20% more bleed effect
+        sk_bleed = sk_bleed * 6 / 5;
+    if (pl_flagc & (1 << 7)) // 20% more blind effect
+        sk_blind = sk_blind * 6 / 5;
+    if (pl_flagc & (1 << 8)) // 20% more heal effect
+        sk_healr = sk_healr * 6 / 5;
+
+    /*
+        Regeneration stats
+    */
+    race_reg = sk_score(28) * moonmult / 20 + sk_score(28) * pl.hp[5] / 2000;
+    race_res = sk_score(29) * moonmult / 20 + sk_score(29) * pl.end[5] / 2000;
+    race_med = sk_score(30) * moonmult / 20 + sk_score(30) * pl.mana[5] / 2000;
+
+    // Tarot - Moon :: While not full mana, life regen is mana regen
+    if ((pl_flags & (1 << 11)) && (pl.a_mana < pl.mana[5])) {
+        race_med += race_reg;
+        race_reg -= race_reg;
+        manamult += hpmult;
+        hpmult -= hpmult;
+    }
+    // Tarot - Sun :: While not full life, end regen is life regen
+    if ((pl_flags & (1 << 12)) && (pl.a_hp < pl.hp[5])) {
+        race_reg += race_res;
+        race_res -= race_res;
+        hpmult += endmult;
+        endmult -= endmult;
+    }
+    // Tarot - World :: While not full end, mana regen is end regen
+    if ((pl_flags & (1 << 13)) && (pl.a_end < pl.end[5])) {
+        race_res += race_med;
+        race_med -= race_med;
+        endmult += manamult;
+        manamult -= manamult;
+    }
+
+    // Meditate added to Hitpoints
+    if (pl_flagc & (1 << 0)) {
+        race_reg += race_med / 2;
+        hpmult += manamult / 2;
+    }
+    // Rest added to mana
+    if (pl_flagc & (1 << 1)) {
+        race_med += race_res / 2;
+        manamult += endmult / 2;
+    }
+
+    sk_regen = (pl.skill[28][0] ? race_reg : 0) + hpmult * 2;
+    sk_restv = (pl.skill[29][0] ? race_res : 0) + endmult * 3;
+    sk_medit = (pl.skill[30][0] ? race_med : 0) + manamult * 1;
+
+    pl_armor = pl.armor;
+
+    // Amulet - Standard Ankh			1 0 0
+    if ((pl_flagb & (1 << 0)) && !(pl_flagb & (1 << 1)) && !(pl_flagb & (1 << 2))) {
+        sk_regen += pl.skill[28][0] ? race_reg / 12 : 0;
+        sk_restv += pl.skill[29][0] ? race_res / 12 : 0;
+        sk_medit += pl.skill[30][0] ? race_med / 12 : 0;
+    }
+    // Amulet - Amber Ankh (Life) 		0 1 0
+    if (!(pl_flagb & (1 << 0)) && (pl_flagb & (1 << 1)) && !(pl_flagb & (1 << 2))) {
+        sk_regen += pl.skill[28][0] ? race_reg / 6 : 0;
+        sk_restv += pl.skill[29][0] ? race_res / 24 : 0;
+        sk_medit += pl.skill[30][0] ? race_med / 24 : 0;
+    }
+    // Amulet - Turquoise Ankh (End)	1 1 0
+    if ((pl_flagb & (1 << 0)) && (pl_flagb & (1 << 1)) && !(pl_flagb & (1 << 2))) {
+        sk_regen += pl.skill[28][0] ? race_reg / 24 : 0;
+        sk_restv += pl.skill[29][0] ? race_res / 6 : 0;
+        sk_medit += pl.skill[30][0] ? race_med / 24 : 0;
+    }
+    // Amulet - Garnet Ankh (Mana)		0 0 1
+    if (!(pl_flagb & (1 << 0)) && !(pl_flagb & (1 << 1)) && (pl_flagb & (1 << 2))) {
+        sk_regen += pl.skill[28][0] ? race_reg / 24 : 0;
+        sk_restv += pl.skill[29][0] ? race_res / 24 : 0;
+        sk_medit += pl.skill[30][0] ? race_med / 6 : 0;
+    }
+    // Amulet - True Ankh				1 0 1
+    if ((pl_flagb & (1 << 0)) && !(pl_flagb & (1 << 1)) && (pl_flagb & (1 << 2))) {
+        sk_regen += pl.skill[28][0] ? race_reg / 6 : 0;
+        sk_restv += pl.skill[29][0] ? race_res / 6 : 0;
+        sk_medit += pl.skill[30][0] ? race_med / 6 : 0;
+    }
+
+    sk_regen = sk_regen * 20 / 10;
+    sk_restv = sk_restv * 20 / 10;
+    sk_medit = sk_medit * 20 / 10;
+
+    // add *pl_dmgbn/10000 to damage values for the HUD
+    sk_cleav = sk_cleav * pl_dmgbn / 10000 * pl_dmgml / 100;
+    sk_leapv = sk_leapv * pl_dmgbn / 10000 * pl_dmgml / 100;
+    sk_blast = sk_blast * pl_dmgbn / 10000 * pl_dmgml / 100;
+    sk_poiso = sk_poiso * pl_dmgbn / 10000 * pl_dmgml / 100;
+    if (!(pl_flagb & (1 << 6))) sk_pulse = sk_pulse * pl_dmgbn / 10000 * pl_dmgml / 100;
+    sk_razor = sk_razor * pl_dmgbn / 10000 * pl_dmgml / 100;
+    sk_immol = sk_immol * pl_dmgbn / 10000 * pl_dmgml / 100;
+    pl_reflc = pl_reflc * pl_dmgbn / 10000 * pl_dmgml / 100;
+
+    // Acedia - Sprite 5556
+    if (pl.worn[WN_RHAND] == 5556) len = len * 3 / 4; // less
+    if (pl.worn[WN_LHAND] == 5556) len = len * 6 / 4; // more
+
+    coo_clea = 500 * pl_cdrate / 100 * len / 100;
+    coo_leap = 500 * pl_cdrate / 100 * len / 100;
+    coo_blas = (600 - T_ARHR_SK(4) * 25) * pl_cdrate / 100 * len / 100;
+    coo_pois = 500 * pl_cdrate / 100 * len / 100;
+    coo_puls = 600 * pl_cdrate / 100 * len / 100;
+    coo_ghos = 800 * pl_cdrate / 100 * len / 100;
+    coo_shad = 400 * pl_cdrate / 100 * len / 100;
+    coo_blin = 300 * pl_cdrate / 100 * len / 100;
+    coo_warc = 300 * pl_cdrate / 100 * len / 100;
+    coo_weak = 300 * pl_cdrate / 100 * len / 100;
+    coo_curs = 400 * pl_cdrate / 100 * len / 100;
+    coo_slow = 400 * pl_cdrate / 100 * len / 100;
+
+    pl_ehp = pl.hp[5] * 10000 / pl_dmgrd;
+
+    if (pl_flagc & (1 << 9)) // 20% damage shifted to end/mana
+        pl_ehp = pl_ehp * 100 / 80;
+    if (pl_flagc & (1 << 11)) // 5% chance to not be hit by melee
+        pl_ehp = pl_ehp * 100 / 95;
+    if (pl_flagc & (1 << 12)) // 20% damage shifted to end/mana
+        pl_ehp = pl_ehp * 100 / 80;
+    if (pl_flagc & (1 << 14)) // 10% damage null/shifted to endurance
+        pl_ehp = pl_ehp * 100 / 90;
+    if (pl_flags & (1 << 9)) // 20% damage null/shifted to mana
+        pl_ehp = pl_ehp * 100 / 80;
 }
 
-void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
-{
-	int m = 8;
-	
-	if (flag)		m += 8*14; // Move the text downard by 8 rows
-	
-					  xputtext(9,  m+n*14,font,"%-20.20s", va    ); // Left Side
-	if (vc>=0)		  xputtext(140,m+n*14,font,"%4d.%02d", vb, vc); // Numeric - Decimal
-	else if (vb>=0)	  xputtext(140,m+n*14,font,"%7d",      vb    ); // Numeric
-	else if (flag==2) xputtext(140,m+n*14,font,"%7d",      vb    ); // Numeric - show even if negative
-					  xputtext(189,m+n*14,font,"%-7.7s",   ve    ); // Affix
+void meta_stat(int flag, int n, int font, char *va, int vb, int vc, char *ve) {
+    int m = 8;
+
+    if (flag) m += 8 * 14; // Move the text downard by 8 rows
+
+    xputtext(9, m + n * 14, font, "%-20.20s", va); // Left Side
+    if (vc >= 0) xputtext(140, m + n * 14, font, "%4d.%02d", vb, vc); // Numeric - Decimal
+    else if (vb >= 0) xputtext(140, m + n * 14, font, "%7d", vb); // Numeric
+    else if (flag == 2) xputtext(140, m + n * 14, font, "%7d", vb); // Numeric - show even if negative
+    xputtext(189, m + n * 14, font, "%-7.7s", ve); // Affix
 }
 
-void show_meta_stats(int n)
-{
-	// Font Colors:
-	// 0 = Red
-	// 1 = Yellow
-	// 2 = Green
-	// 3 = Blue
-	// 4 = Pink
-	// 5 = Orange
-	// 6 = Lime
-	// 7 = Skyblue
-	// 8 = Violet
-	// 9 = White
-	
-	int m, pos = n;
+void show_meta_stats(int n) {
+    // Font Colors:
+    // 0 = Red
+    // 1 = Yellow
+    // 2 = Green
+    // 3 = Blue
+    // 4 = Pink
+    // 5 = Orange
+    // 6 = Lime
+    // 7 = Skyblue
+    // 8 = Violet
+    // 9 = White
 
-	if (n < 7) {
-		m = 0;
-	} else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES) {
-		n = n + game_ui_state.meta_scroll;
-		m = 1 + (n > 23 ? 1: 0);
-		if (n >= 48) return;
-		pos -= 7;
-	} else {
-		n = n + 41 + game_ui_state.meta_scroll;
-		m = 1 + (n > (23 + 41) ? 1 : 0);
-		if (n >= 89) return;
-		pos -= 7;
-	}
+    int m, pos = n;
 
-	if (!meta_stats[n].show) return;
+    if (n < 7) {
+        m = 0;
+    } else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES) {
+        n = n + game_ui_state.meta_scroll;
+        m = 1 + (n > 23 ? 1 : 0);
+        if (n >= 48) return;
+        pos -= 7;
+    } else {
+        n = n + 41 + game_ui_state.meta_scroll;
+        m = 1 + (n > (23 + 41) ? 1 : 0);
+        if (n >= 89) return;
+        pos -= 7;
+    }
 
-	if (meta_stats[n].flag) {
-		meta_stat(m, pos, meta_stats[n].font, meta_stats[n].name, meta_stats[n].value / 100, meta_stats[n].value % 100, meta_stats[n].affix);
-	} else {
-		meta_stat(m, pos, meta_stats[n].font, meta_stats[n].name, meta_stats[n].value, -1, meta_stats[n].affix);
-	}
+    if (!meta_stats[n].show) return;
+
+    if (meta_stats[n].flag) {
+        meta_stat(m, pos, meta_stats[n].font, meta_stats[n].name, meta_stats[n].value / 100, meta_stats[n].value % 100,
+                  meta_stats[n].affix);
+    } else {
+        meta_stat(m, pos, meta_stats[n].font, meta_stats[n].name, meta_stats[n].value, -1, meta_stats[n].affix);
+    }
 }
 
 /* This is the home for the inventory grid definition until I find a better home */
 typedef struct {
-	int start_x;
-	int start_y;
-	int columns;
-	int cell_width;
-	int cell_height;
+    int start_x;
+    int start_y;
+    int columns;
+    int cell_width;
+    int cell_height;
 } GridLayout;
 
 static const GridLayout inventory_layout = {261, 6, 10, 34, 34};
 static const GridLayout depot_layout = {GUI_SHOP_X + 6, GUI_SHOP_Y + 6, 8, 34, 34};
 
 static void grid_slot_to_xy(const GridLayout *layout, const int slot, int *out_x, int *out_y) {
-	const int col = slot % layout->columns;
-	const int row = slot / layout->columns;
+    const int col = slot % layout->columns;
+    const int row = slot / layout->columns;
 
-	if (out_x != NULL) *out_x = layout->start_x + col * layout->cell_width;
-	if (out_y != NULL) *out_y = layout->start_y + row * layout->cell_height;
+    if (out_x != NULL) *out_x = layout->start_x + col * layout->cell_width;
+    if (out_y != NULL) *out_y = layout->start_y + row * layout->cell_height;
 }
 
 
-void eng_display_win(int plr_sprite,int init)
-{
-	int y,n,m,v,pr,hh,xx,yy;
-	char *tmp,buf[50];
-	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
-	
-	//if (load) xputtext(670,300+MAXTS,1,"%3d%%",load);
+void eng_display_win(int plr_sprite, int init) {
+    int y, n, m, v, pr, hh, xx, yy;
+    char *tmp, buf[50];
+    int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
 
-	if (init) {
-		reset_block();
+    //if (load) xputtext(670,300+MAXTS,1,"%3d%%",load);
 
-		// Draw red rectangles around lower right gui component toggles
-		if (pl.mode==2)			showbox(GUI_F_COL1,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		else if (pl.mode==1)	showbox(GUI_F_COL2,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		else if (pl.mode==0)	showbox(GUI_F_COL3,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		if (pdata.show_proz)	showbox(GUI_F_COL4,GUI_F_ROW1,45,12,(unsigned short)(RED));
-		//
-		if (pdata.show_stats)	showbox(GUI_F_COL1,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		if (pdata.hide)			showbox(GUI_F_COL2,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		if (pdata.show_names)	showbox(GUI_F_COL3,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		if (pdata.show_bars)	showbox(GUI_F_COL4,GUI_F_ROW2,45,12,(unsigned short)(RED));
-		//
-		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)			showbox(261,182,64,12,(unsigned short)(RED));
-		else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES)	showbox(261,197,64,12,(unsigned short)(RED));
-		else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES)	showbox(261,212,64,12,(unsigned short)(RED));
-		else if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)	showbox(261,182,64,12,(unsigned short)(GREEN));
+    if (init) {
+        reset_block();
 
-		// Prepare spell icons // pl.spell[n] is the SPRITE of the debuff being received.
-		// This can be used to cheat and split buffs and debuffs into two groups.
-		// buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2];
-		bf = 0;
-		df = 0;
-		for (n=0; n<MAXBUFFS; n++)
-		{
-			buffs[n][0] = 0; debuffs[n][0] = 0;
-			buffs[n][1] = 0; debuffs[n][1] = 0;
-		}
-		// Split buffs and debuffs
-		for (n=0; n<MAXBUFFS; n++)
-		{
-			if ((m = pl.spell[n]) > 0)
-			{
-				if (m==   89 || m==   91 || m==   97 || m==  119 || m==  149 ||
-					m==  178 || m==  224 || m==  225 || m==  319 || m==  325 ||
-					m==  329 || m==  338 || m==  365 || m==  411 || m==  419 ||
-					m==  471 || m==  487 || m==  489 || m==  498 || m==  617 ||
-					m==  618 || m==  702 || m== 1009 || m== 1015 || m== 3493 ||
-					m== 3494 ||(m>= 6721 && m<= 6745)||(m>= 6761 && m<= 6780)||
-				   (m>=16860 && m<=16863) )
-				{
-					debuffs[df][0] = pl.spell[n];
-					debuffs[df][1] = pl.active[n];
-					df++;
-				}
-				else
-				{
-					buffs[bf][0] = pl.spell[n];
-					buffs[bf][1] = pl.active[n];
-					bf++;
-				}
-			}
-		}
-		
-		// Scroll Bars for Skills and Inventory
-	    if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES || game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) {
-	        showbar(234,152+(game_ui_state.meta_scroll*58)/(MAX_META_SCROLL)+(game_ui_state.skill_scroll>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
-	    } else {
-    		showbar(234,152+(game_ui_state.skill_scroll*58)/(MAX_SKILL_SCROLL)+(game_ui_state.skill_scroll>25?1:0), 11,11,(unsigned short)GUI_BAR_GRE);
-	    }
-		showbar(601, 36+(game_ui_state.inventory_scroll *  9)/10, 11,13,(unsigned short)GUI_BAR_GRE);
+        // Draw red rectangles around lower right gui component toggles
+        if (pl.mode == 2) showbox(GUI_F_COL1,GUI_F_ROW1, 45, 12, (unsigned short) (RED));
+        else if (pl.mode == 1) showbox(GUI_F_COL2,GUI_F_ROW1, 45, 12, (unsigned short) (RED));
+        else if (pl.mode == 0) showbox(GUI_F_COL3,GUI_F_ROW1, 45, 12, (unsigned short) (RED));
+        if (pdata.show_proz) showbox(GUI_F_COL4,GUI_F_ROW1, 45, 12, (unsigned short) (RED));
+        //
+        if (pdata.show_stats) showbox(GUI_F_COL1,GUI_F_ROW2, 45, 12, (unsigned short) (RED));
+        if (pdata.hide) showbox(GUI_F_COL2,GUI_F_ROW2, 45, 12, (unsigned short) (RED));
+        if (pdata.show_names) showbox(GUI_F_COL3,GUI_F_ROW2, 45, 12, (unsigned short) (RED));
+        if (pdata.show_bars) showbox(GUI_F_COL4,GUI_F_ROW2, 45, 12, (unsigned short) (RED));
+        //
+        if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) showbox(261, 182, 64, 12, (unsigned short) (RED));
+        else if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES) showbox(261, 197, 64, 12, (unsigned short) (RED));
+        else if (game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) showbox(261, 212, 64, 12, (unsigned short) (RED));
+        else if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
+            showbox(
+                261, 182, 64, 12, (unsigned short) (GREEN));
 
-		// display info-texts
-		// HP, EN, MA below the skill list
-		xputtext(GUI_HP_COUNT_X,	GUI_HP_COUNT_Y,	1,"Hitpoints         %3d %3d",pl.a_hp,pl.hp[5]);
-		xputtext(GUI_EN_COUNT_X,	GUI_EN_COUNT_Y,	1,"Endurance         %3d %3d",pl.a_end,pl.end[5]);
-		xputtext(GUI_MP_COUNT_X,	GUI_MP_COUNT_Y,	1,"Mana              %3d %3d",pl.a_mana,pl.mana[5]);
-		
-		// Money, BSP, CST, OSP
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"      Money");
-		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y,	1,"%9dG %2dS",pl.gold/100,pl.gold%100);
-		if (pl.bs_points==0)
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1,"        ???");
-		else
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+14,	1," Stronghold");
-		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+14,	1,"  %12d",pl.bs_points);
-		if (pl.tokens==0)
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"        ???");
-		else
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+28,	1,"     Casino");
-		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+28,	1,"  %12d",pl.tokens);
-		if (pl.os_points==0)
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"        ???");
-		else
-			xputtext(GUI_MONEY_X,	GUI_MONEY_Y+42,	1,"   Contract");
-		xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y+42,	1,"  %12d",pl.os_points);
-		
-		// Update and Update exp
-		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS||game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
-		{
-			copyspritex(do_darkmode?18099:99, 134, 3,  0);
-			xputtext(GUI_UPDATE_X,	GUI_UPDATE_Y,	1,"Update");
-			xputtext(GUI_UPOINTS_X,	GUI_UPOINTS_Y,	1,"%7d",pl.points-stat_points_used);
-		}
-		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
-			copyspritex(do_darkmode?18098:18097, 134, 3,  0);
-		
-		// Display Skill Tree button if applicable - a similar check is required in inter.c
-		if (st_skill_pts_all(pl.tree_points)>0)
-		{
-			if (st_skill_pts_have(pl.tree_points)>0 && game_ui_state.open_skill_tree != 1)
-				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(SDL_GetTicks()%16))*2)));
-			else if (st_skill_pts_have(pl.os_tree)>0 && game_ui_state.open_skill_tree != 2)
-				copyspritex(18008, 337, 177, min(15, max(0, abs(8-(SDL_GetTicks()%16))*2)));
-			copyspritex(do_darkmode?18004:18002, 339, 179,  0);
-		}
+        // Prepare spell icons // pl.spell[n] is the SPRITE of the debuff being received.
+        // This can be used to cheat and split buffs and debuffs into two groups.
+        // buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2];
+        bf = 0;
+        df = 0;
+        for (n = 0; n < MAXBUFFS; n++) {
+            buffs[n][0] = 0;
+            debuffs[n][0] = 0;
+            buffs[n][1] = 0;
+            debuffs[n][1] = 0;
+        }
+        // Split buffs and debuffs
+        for (n = 0; n < MAXBUFFS; n++) {
+            if ((m = pl.spell[n]) > 0) {
+                if (m == 89 || m == 91 || m == 97 || m == 119 || m == 149 ||
+                    m == 178 || m == 224 || m == 225 || m == 319 || m == 325 ||
+                    m == 329 || m == 338 || m == 365 || m == 411 || m == 419 ||
+                    m == 471 || m == 487 || m == 489 || m == 498 || m == 617 ||
+                    m == 618 || m == 702 || m == 1009 || m == 1015 || m == 3493 ||
+                    m == 3494 || (m >= 6721 && m <= 6745) || (m >= 6761 && m <= 6780) ||
+                    (m >= 16860 && m <= 16863)) {
+                    debuffs[df][0] = pl.spell[n];
+                    debuffs[df][1] = pl.active[n];
+                    df++;
+                } else {
+                    buffs[bf][0] = pl.spell[n];
+                    buffs[bf][1] = pl.active[n];
+                    bf++;
+                }
+            }
+        }
 
-		xputtext(GUI_LOCA_X, GUI_LOCA_Y,1, "%.20s", pl.location);
+        // Scroll Bars for Skills and Inventory
+        if (game_ui_state.hud_mode == HUD_MODE_LIST_OFFENSES || game_ui_state.hud_mode == HUD_MODE_LIST_DEFENSES) {
+            showbar(
+                234, 152 + (game_ui_state.meta_scroll * 58) / (MAX_META_SCROLL) + (
+                         game_ui_state.skill_scroll > 25 ? 1 : 0), 11, 11, (unsigned short) GUI_BAR_GRE);
+        } else {
+            showbar(
+                234, 152 + (game_ui_state.skill_scroll * 58) / (MAX_SKILL_SCROLL) + (
+                         game_ui_state.skill_scroll > 25 ? 1 : 0), 11, 11, (unsigned short) GUI_BAR_GRE);
+        }
+        showbar(601, 36 + (game_ui_state.inventory_scroll * 9) / 10, 11, 13, (unsigned short) GUI_BAR_GRE);
 
-		if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS)
-		{
-			for (n=0; n<5; n++) {
-				StatDisplayInfo stat_info;
-				get_attribute_display_info(n, &stat_info);
-				render_stat_line(&stat_info, 0, 8 + n * 14, pdata.show_stats);
-			}
+        // display info-texts
+        // HP, EN, MA below the skill list
+        xputtext(GUI_HP_COUNT_X, GUI_HP_COUNT_Y, 1, "Hitpoints         %3d %3d", pl.a_hp, pl.hp[5]);
+        xputtext(GUI_EN_COUNT_X, GUI_EN_COUNT_Y, 1, "Endurance         %3d %3d", pl.a_end, pl.end[5]);
+        xputtext(GUI_MP_COUNT_X, GUI_MP_COUNT_Y, 1, "Mana              %3d %3d", pl.a_mana, pl.mana[5]);
 
-			StatDisplayInfo health_info;
-			StatDisplayInfo mana_info;
+        // Money, BSP, CST, OSP
+        xputtext(GUI_MONEY_X, GUI_MONEY_Y, 1, "      Money");
+        xputtext(GUI_MONEY_X + 74, GUI_MONEY_Y, 1, "%9dG %2dS", pl.gold / 100, pl.gold % 100);
+        if (pl.bs_points == 0)
+            xputtext(GUI_MONEY_X, GUI_MONEY_Y + 14, 1, "        ???");
+        else
+            xputtext(GUI_MONEY_X, GUI_MONEY_Y + 14, 1, " Stronghold");
+        xputtext(GUI_MONEY_X + 74, GUI_MONEY_Y + 14, 1, "  %12d", pl.bs_points);
+        if (pl.tokens == 0)
+            xputtext(GUI_MONEY_X, GUI_MONEY_Y + 28, 1, "        ???");
+        else
+            xputtext(GUI_MONEY_X, GUI_MONEY_Y + 28, 1, "     Casino");
+        xputtext(GUI_MONEY_X + 74, GUI_MONEY_Y + 28, 1, "  %12d", pl.tokens);
+        if (pl.os_points == 0)
+            xputtext(GUI_MONEY_X, GUI_MONEY_Y + 42, 1, "        ???");
+        else
+            xputtext(GUI_MONEY_X, GUI_MONEY_Y + 42, 1, "   Contract");
+        xputtext(GUI_MONEY_X + 74, GUI_MONEY_Y + 42, 1, "  %12d", pl.os_points);
 
-			get_hp_mana_display_info(5, &health_info);
-			get_hp_mana_display_info(7, &mana_info);
+        // Update and Update exp
+        if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META) {
+            copyspritex(do_darkmode ? 18099 : 99, 134, 3, 0);
+            xputtext(GUI_UPDATE_X, GUI_UPDATE_Y, 1, "Update");
+            xputtext(GUI_UPOINTS_X, GUI_UPOINTS_Y, 1, "%7d", pl.points - stat_points_used);
+        }
+        if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
+            copyspritex(do_darkmode ? 18098 : 18097, 134, 3, 0);
 
-			render_stat_line(&health_info, 0, 8 + 5 * 14, pdata.show_stats);
-			render_stat_line(&mana_info, 0, 8 + 6 * 14, pdata.show_stats);
-		}
-		else
-		{
-			for (n=0; n<7; n++) 
-			{
-				show_meta_stats(n);
-			}
-		}
-		
-		for (n=0; n<10; n++) 
-		{
-			// regular skill tab functionality
-			if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS||game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS_AND_META)
-			{
-				StatDisplayInfo skill_info = {0};
-				get_skill_display_info(n, &skill_info);
-				render_stat_line(&skill_info, 0, (8 + 8 * 14) + n * 14, pdata.show_stats);
-			}
-			else
-			{
-				show_meta_stats(7+n);
-			}
-		}
-	}
+        // Display Skill Tree button if applicable - a similar check is required in inter.c
+        if (st_skill_pts_all(pl.tree_points) > 0) {
+            if (st_skill_pts_have(pl.tree_points) > 0 && game_ui_state.open_skill_tree != 1)
+                copyspritex(18008, 337, 177, min(15, max(0, abs(8 - (SDL_GetTicks() % 16)) * 2)));
+            else if (st_skill_pts_have(pl.os_tree) > 0 && game_ui_state.open_skill_tree != 2)
+                copyspritex(18008, 337, 177, min(15, max(0, abs(8 - (SDL_GetTicks() % 16)) * 2)));
+            copyspritex(do_darkmode ? 18004 : 18002, 339, 179, 0);
+        }
+
+        xputtext(GUI_LOCA_X, GUI_LOCA_Y, 1, "%.20s", pl.location);
+
+        if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS) {
+            for (n = 0; n < 5; n++) {
+                StatDisplayInfo stat_info;
+                get_attribute_display_info(n, &stat_info);
+                render_stat_line(&stat_info, 0, 8 + n * 14, pdata.show_stats);
+            }
+
+            StatDisplayInfo health_info;
+            StatDisplayInfo mana_info;
+
+            get_hp_mana_display_info(5, &health_info);
+            get_hp_mana_display_info(7, &mana_info);
+
+            render_stat_line(&health_info, 0, 8 + 5 * 14, pdata.show_stats);
+            render_stat_line(&mana_info, 0, 8 + 6 * 14, pdata.show_stats);
+        } else {
+            for (n = 0; n < 7; n++) {
+                show_meta_stats(n);
+            }
+        }
+
+        for (n = 0; n < 10; n++) {
+            // regular skill tab functionality
+            if (game_ui_state.hud_mode == HUD_MODE_LIST_SKILLS || game_ui_state.hud_mode ==
+                HUD_MODE_LIST_SKILLS_AND_META) {
+                StatDisplayInfo skill_info = {0};
+                get_skill_display_info(n, &skill_info);
+                render_stat_line(&skill_info, 0, (8 + 8 * 14) + n * 14, pdata.show_stats);
+            } else {
+                show_meta_stats(7 + n);
+            }
+        }
+    }
 
 
-	// logtext
-	if (logtimer) logtimer--;
-	else logstart=0;
+    // logtext
+    if (logtimer) logtimer--;
+    else logstart = 0;
 
-	for (y=0; y<LL; y++) {
-		puttext(GUI_LOG_X,8+y*10,logfont[LL-y-1+logstart],logtext[LL-y-1+logstart]);
-	}
+    for (y = 0; y < LL; y++) {
+        puttext(GUI_LOG_X, 8 + y * 10, logfont[LL - y - 1 + logstart], logtext[LL - y - 1 + logstart]);
+    }
 
-	input[in_len]=0;
-	if (cur_pos-view_pos>45) view_pos=cur_pos-45;
-	if (cur_pos-5<view_pos)	view_pos=max(0,cur_pos-5);
-	memcpy(buf,input+view_pos,48);
-	buf[48]=0;
+    input[in_len] = 0;
+    if (cur_pos - view_pos > 45) view_pos = cur_pos - 45;
+    if (cur_pos - 5 < view_pos) view_pos = max(0, cur_pos - 5);
+    memcpy(buf, input + view_pos, 48);
+    buf[48] = 0;
 
-	puttext(GUI_LOG_X,13+10*LL,1,buf);
-	/* Only show cursor when option disabled OR in chat mode */
-	if (!g_config.ui.enter_to_talk || chat_mode_active) {
-		render_putc(GUI_LOG_X+6*(cur_pos-view_pos),13+10*LL,1,127);
-	}
+    puttext(GUI_LOG_X, 13 + 10 * LL, 1, buf);
+    /* Only show cursor when option disabled OR in chat mode */
+    if (!g_config.ui.enter_to_talk || chat_mode_active) {
+        render_putc(GUI_LOG_X + 6 * (cur_pos - view_pos), 13 + 10 * LL, 1, 127);
+    }
 
-	if (init) {
-		if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || game_ui_state.open_book || game_ui_state.show_motd || game_ui_state.show_new_player || game_ui_state.tutorial.open) show_look=0;
-		if (!show_look) {
-			/*
-			for (n=0; n<12; n++) 
-			{
-				if (pl.worn[wntab[n]]) 
-				{
-					if (hightlight==HL_EQUIPMENT && hightlight_sub==wntab[n])
-						copyspritex(pl.worn[wntab[n]],303+(n%2)*35,2+(n/2)*35,16);
-					else
-						copyspritex(pl.worn[wntab[n]],303+(n%2)*35,2+(n/2)*35,0);
-				}
-				if (inv_block[wntab[n]]) copyspritex(4,303+(n%2)*35,2+(n/2)*35,0);
-			}
-			*/
-			
-			if (pl.worn[WN_CHARM2])
-			{
-				copyspritex(do_darkmode?18003:3, 775, 15,  0);
-			}
-			
-			// Show your own gear
-			for (n = 0; n < 13; n++)
-			{
-				if (pl.worn[n])
-				{
-					bool highlighted = hightlight==HL_EQUIPMENT && hightlight_sub==n;
-					render_worn_item_display(&pl.worn_info[n], gui_equ_x[n]+1, gui_equ_y[n]+1, highlighted ? 16 : 0);
+    if (init) {
+        if (game_ui_state.open_shop || game_ui_state.show_waypoints || game_ui_state.open_skill_tree || game_ui_state.
+            open_book || game_ui_state.show_motd || game_ui_state.show_new_player || game_ui_state.tutorial.open)
+            show_look = 0;
+        if (!show_look) {
+            /*
+            for (n=0; n<12; n++)
+            {
+                if (pl.worn[wntab[n]])
+                {
+                    if (hightlight==HL_EQUIPMENT && hightlight_sub==wntab[n])
+                        copyspritex(pl.worn[wntab[n]],303+(n%2)*35,2+(n/2)*35,16);
+                    else
+                        copyspritex(pl.worn[wntab[n]],303+(n%2)*35,2+(n/2)*35,0);
+                }
+                if (inv_block[wntab[n]]) copyspritex(4,303+(n%2)*35,2+(n/2)*35,0);
+            }
+            */
 
-					// Draw shortcut key IDs
-					for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==200+n)
-						copyspritex(4011+m,gui_equ_x[n]+1,gui_equ_y[n]+1, 0);
-					
-					if (inv_block[n] && n==WN_CHARM2)
-						copyspritex(4,          gui_equ_x[n]+1, gui_equ_y[n]+1,  0); 
-				}
-				// Get [X] sprite if we can't equip the slot
-				if (inv_block[n] && n!=WN_CHARM2)
-						copyspritex(4,          gui_equ_x[n]+1, gui_equ_y[n]+1,  0); 
-			}
-			//
+            if (pl.worn[WN_CHARM2]) {
+                copyspritex(do_darkmode ? 18003 : 3, 775, 15, 0);
+            }
 
-			if (selected_char) tmp=lookup(selected_char,0);
-			else tmp=pl.name;
-			xputtext(846+(125-strlen(tmp)*6)/2,32,1,tmp);
+            // Show your own gear
+            for (n = 0; n < 13; n++) {
+                if (pl.worn[n]) {
+                    bool highlighted = hightlight == HL_EQUIPMENT && hightlight_sub == n;
+                    render_worn_item_display(&pl.worn_info[n], gui_equ_x[n] + 1, gui_equ_y[n] + 1,
+                                             highlighted ? 16 : 0);
+
+                    // Draw shortcut key IDs
+                    for (m = 0; m < 20; m++)
+                        if (pdata.xbutton[m].skill_nr == 200 + n)
+                            copyspritex(4011 + m, gui_equ_x[n] + 1, gui_equ_y[n] + 1, 0);
+
+                    if (inv_block[n] && n == WN_CHARM2)
+                        copyspritex(4, gui_equ_x[n] + 1, gui_equ_y[n] + 1, 0);
+                }
+                // Get [X] sprite if we can't equip the slot
+                if (inv_block[n] && n != WN_CHARM2)
+                    copyspritex(4, gui_equ_x[n] + 1, gui_equ_y[n] + 1, 0);
+            }
+            //
+
+            if (selected_char) tmp = lookup(selected_char, 0);
+            else tmp = pl.name;
+            xputtext(846 + (125 - strlen(tmp) * 6) / 2, 32, 1, tmp);
 
 
-			// Bar for HP
-			if (pl.hp[5]>0)	n=min(124,pl.hp[5]*62/pl.hp[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
-			if (pl.hp[5]>0)	n=min(124,pl.a_hp*62/pl.hp[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_GRE);
+            // Bar for HP
+            if (pl.hp[5] > 0) n = min(124, pl.hp[5] * 62 / pl.hp[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_HP, n, 6, (unsigned short) GUI_BAR_BLU);
+            if (pl.hp[5] > 0) n = min(124, pl.a_hp * 62 / pl.hp[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_HP, n, 6, (unsigned short) GUI_BAR_GRE);
 
-			// Bar for EN
-			if (pl.end[5]>0) n=min(124,pl.end[5]*62/pl.end[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
-			if (pl.end[5]>0) n=min(124,pl.a_end*62/pl.end[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_GRE);
+            // Bar for EN
+            if (pl.end[5] > 0) n = min(124, pl.end[5] * 62 / pl.end[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_EN, n, 6, (unsigned short) GUI_BAR_BLU);
+            if (pl.end[5] > 0) n = min(124, pl.a_end * 62 / pl.end[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_EN, n, 6, (unsigned short) GUI_BAR_GRE);
 
-			// Bar for MP
-			if (pl.mana[5]>0) n=min(124,pl.mana[5]*62/pl.mana[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
-			if (pl.mana[5]>0) n=min(124,pl.a_mana*62/pl.mana[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
-			
-			if (!game_ui_state.open_shop || (game_ui_state.open_shop==110 || game_ui_state.open_shop==111)) {
-				copyspritex(rank_sprite[points2rank(pl.points_tot)],935,42,0);
-				copyspritex(plr_sprite,935-61,36,0);
-				xputtext(846+(125-strlen(pl.name)*6)/2,157,1,pl.name);
-				xputtext(846+(125-strlen(rank[points2rank(pl.points_tot)])*6)/2,176,1,rank[points2rank(pl.points_tot)]);
-			}
+            // Bar for MP
+            if (pl.mana[5] > 0) n = min(124, pl.mana[5] * 62 / pl.mana[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_MP, n, 6, (unsigned short) GUI_BAR_BLU);
+            if (pl.mana[5] > 0) n = min(124, pl.a_mana * 62 / pl.mana[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_MP, n, 6, (unsigned short) GUI_BAR_GRE);
 
-		} else {
-			if (look.worn[WN_CHARM2])
-			{
-				copyspritex(do_darkmode?18003:3, 775, 15,  0);
-			}
-			// Look at target gear
-			for (n = 0; n < 13; n++)
-			{
-				if (look.worn[n]) 
-				{
-					copyspritex(look.worn[n], gui_equ_x[n]+1, gui_equ_y[n]+1, 0);
-				}
-			}
-			
-			if (look.sprite) 
-			{
-				n = 0;
-				if (look.extended & 2) n|=128;
-				if (look.extended & 4) n|=256;
-				copyspritex(look.sprite,935-61,36,n);
-			}
+            if (!game_ui_state.open_shop || (game_ui_state.open_shop == 110 || game_ui_state.open_shop == 111)) {
+                copyspritex(rank_sprite[points2rank(pl.points_tot)], 935, 42, 0);
+                copyspritex(plr_sprite, 935 - 61, 36, 0);
+                xputtext(846 + (125 - strlen(pl.name) * 6) / 2, 157, 1, pl.name);
+                xputtext(846 + (125 - strlen(rank[points2rank(pl.points_tot)]) * 6) / 2, 176, 1,
+                         rank[points2rank(pl.points_tot)]);
+            }
+        } else {
+            if (look.worn[WN_CHARM2]) {
+                copyspritex(do_darkmode ? 18003 : 3, 775, 15, 0);
+            }
+            // Look at target gear
+            for (n = 0; n < 13; n++) {
+                if (look.worn[n]) {
+                    copyspritex(look.worn[n], gui_equ_x[n] + 1, gui_equ_y[n] + 1, 0);
+                }
+            }
 
-			xputtext(846+(125-strlen(rank[points2rank(look.points)])*6)/2,176,1,rank[points2rank(look.points)]);
-			xputtext(846+(125-strlen(look.name)*6)/2,157,1,look.name);
-			
-			// Bar for HP
-			if (pl.hp[5]) n=min(124,look.hp*62/pl.hp[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
-			if (pl.hp[5]) n=min(124,look.a_hp*62/pl.hp[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_RED);
-			
-			// Bar for EN
-			if (pl.end[5]) n=min(124,look.end*62/pl.end[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
-			if (pl.end[5]) n=min(124,look.a_end*62/pl.end[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_RED);
+            if (look.sprite) {
+                n = 0;
+                if (look.extended & 2) n |= 128;
+                if (look.extended & 4) n |= 256;
+                copyspritex(look.sprite, 935 - 61, 36, n);
+            }
 
-			// Bar for MP
-			if (pl.mana[5])	n=min(124,look.mana*62/pl.mana[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
-			if (pl.mana[5])	n=min(124,look.a_mana*62/pl.mana[5]);
-			else n=0;
-			showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RED);
+            xputtext(846 + (125 - strlen(rank[points2rank(look.points)]) * 6) / 2, 176, 1,
+                     rank[points2rank(look.points)]);
+            xputtext(846 + (125 - strlen(look.name) * 6) / 2, 157, 1, look.name);
 
-			copyspritex(rank_sprite[points2rank(look.points)],935,42,0);
-		}
-		
-		// Draw buffs and debuffs
-		for (n=0; n<MAXBUFFS; n++)
-		{
-			if (buffs[n][0]) {
-				int effect = (15-min(15, buffs[n][1])) | EFFECT_BUFF;
-				copyspritex(  buffs[n][0], 848+(n/5)*20,      8+(n%5)*23, effect);
-			}
-			if (debuffs[n][0]) {
-				int effect = (15-min(15,debuffs[n][1])) | EFFECT_BUFF;
-				copyspritex(debuffs[n][0], 848+5*20-(n/5)*20, 8+(n%5)*23, effect);
-			}
-		}
-		
-		if (game_ui_state.open_shop==112) // New Depot
-		{
-			copyspritex(do_darkmode?18094:18093,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			for (n=0; n<64; n++)
-			{
-				if (!shop.depot[game_ui_state.open_depot_page][n]) continue;
-				int slot_x, slot_y;
-				grid_slot_to_xy(&depot_layout, n, &slot_x, &slot_y);
-				bool highlighted = !pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n;
-				render_item_display(&shop.depot_info[game_ui_state.open_depot_page][n], slot_x, slot_y, highlighted ? 16 : 0);
-			}
-			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
-			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
-			xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
-			xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
-			
-			// Depot Page Buttons
-			xx = GUI_SHOP_X+7 + (game_ui_state.open_depot_page%4)*68;
-			yy = GUI_SHOP_Y+281 + (game_ui_state.open_depot_page/4)*17;
-			showbox(xx,yy,63,12,(unsigned short)(GREEN));
-		}
-		else if (game_ui_state.open_shop==110 || game_ui_state.open_shop==111) // Blacksmith Window
-		{
-			if (pl.sitem[1]==17357) // Show two-material gui - sprite number for claystone
-			{
-				copyspritex(do_darkmode?18120:18119,GUI_SHOP_X,GUI_SHOP_Y,0);
-				m = 1;
-			}
-			else // Show one-material gui
-			{
-				copyspritex(do_darkmode?18118:18117,GUI_SHOP_X,GUI_SHOP_Y,0);
-				m = 0;
-			}
-			
-			if (pl.sitem[1]==17356) // Show three-button overlay - sprite number for whetstone
-			{
-				if (game_ui_state.open_shop==110)
-					copyspritex(do_darkmode?18122:18121,GUI_SHOP_X,GUI_SHOP_Y,0);
-				else
-					copyspritex(do_darkmode?18124:18123,GUI_SHOP_X,GUI_SHOP_Y,0);
-			}
-			
-			for (n=0;n<4;n++)
-			{
-				hh = 0;
-				xx = GUI_SHOP_X;
-				yy = GUI_SHOP_Y;
-				switch (n)
-				{
-					case  0:	// Left Item
-						xx +=  46;
-						yy += 125;
-						break;
-					case  1:	// Top Middle
-						xx += 125;
-						if (m)	yy +=  99;
-						else	yy += 125;
-						break;
-					case  2:	// Bottom Middle
-						if (!m) continue;
-						xx += 125;
-						yy += 151;
-						break;
-					default:	// Right Item
-						xx += 204;
-						yy += 125;
-						break;
-				}
-				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) hh = 16;
+            // Bar for HP
+            if (pl.hp[5]) n = min(124, look.hp * 62 / pl.hp[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_HP, n, 6, (unsigned short) GUI_BAR_BLU);
+            if (pl.hp[5]) n = min(124, look.a_hp * 62 / pl.hp[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_HP, n, 6, (unsigned short) GUI_BAR_RED);
 
-				render_item_display(&pl.smith_info[n], xx, yy, hh);
-			}
-		}
-		else if (game_ui_state.open_shop)
-		{
-			copyspritex(do_darkmode?18092:92,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			y=0;
-			for (n=0; n<62; n++) 
-			{
-				if (!shop.item[n]) continue;
-				
-				hh = 0;
-				xx = GUI_SHOP_X+2+(n%8)*35;
-				yy = GUI_SHOP_Y+2+(n/8)*35;
-				
-				if (shop.item_info[n].properties.shop_info.price > 0) y=1;
-				if (!pl.citem && hightlight==HL_SHOP && hightlight_sub==n) hh = 16;
+            // Bar for EN
+            if (pl.end[5]) n = min(124, look.end * 62 / pl.end[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_EN, n, 6, (unsigned short) GUI_BAR_BLU);
+            if (pl.end[5]) n = min(124, look.a_end * 62 / pl.end[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_EN, n, 6, (unsigned short) GUI_BAR_RED);
 
-				render_shop_item_display(&shop.item_info[n], xx, yy, hh);
-				
-				if (hh && (pr = shop.item_info[n].properties.shop_info.price))
-				{
-					if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101) // Normal shop
-					{
-						SDL_Keymod mods = SDL_GetModState();
-						if ((mods & KMOD_CTRL) || (mods & KMOD_ALT))
-						{
-							pr*=10;
-							xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Buy 10 for: %9dG %2dS",pr/100,pr%100);
-						}
-						else
-						{
-							xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"   Buy for: %9dG %2dS",pr/100,pr%100);
-						}
-					}
-					if (game_ui_state.open_shop==102) // Black Stronghold
-						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"    Take reward for: %9d Stronghold Pts",pr);
-					if (game_ui_state.open_shop==103) // Casino
-						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"Take reward for: %9d Tokens",pr);
-					if (game_ui_state.open_shop==104) // Contract
-						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Take reward for: %9d Contract Pts",pr);
-					if (game_ui_state.open_shop==105) // Exp
-						xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"         Buy for: %9d Exp",pr);
-				}
-			}
-			if (pl.citem && shop.pl_price)
-			{
-				if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
-			}
-			/*  Sadly this is harder to do than it looks
-			else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)game_ui_state.inventory_scroll) && shop.pl_price)
-			{
-				if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
-			}
-			*/
-			if (y)
-			{
-				if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Money: %9dG %2dS",pl.gold/100,pl.gold%100);
-				if (game_ui_state.open_shop==102) // Black Stronghold
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Stronghold Pts: %9d",pl.bs_points);
-				if (game_ui_state.open_shop==103) // Casino
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"    Your Tokens: %9d",pl.tokens);
-				if (game_ui_state.open_shop==104) // Contract
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Contract Pts: %9d",pl.os_points);
-				if (game_ui_state.open_shop==105) // Exp
-					xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+287,1,"Your Unspent Exp: %9d",pl.points);
-			}
+            // Bar for MP
+            if (pl.mana[5]) n = min(124, look.mana * 62 / pl.mana[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_MP, n, 6, (unsigned short) GUI_BAR_BLU);
+            if (pl.mana[5]) n = min(124, look.a_mana * 62 / pl.mana[5]);
+            else n = 0;
+            showbar(GUI_BAR_X,GUI_BAR_MP, n, 6, (unsigned short) GUI_BAR_RED);
 
-			if (shop.sprite) copyspritex(shop.sprite,935-61,36,0);
-			copyspritex(rank_sprite[points2rank(shop.points)],935,42,0);
-			xputtext(846+(125-strlen(rank[points2rank(shop.points)])*6)/2,176,1,rank[points2rank(shop.points)]);
-			xputtext(846+(125-strlen(shop.name)*6)/2,157,1,shop.name);
-		}
-		
-		if (game_ui_state.show_waypoints)
-		{
-			copyspritex(do_darkmode?18005:5,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			//game_ui_state.waypoint_scroll
-			for (n=0; n<8; n++) {
-				m=n+game_ui_state.waypoint_scroll;
-				pr = wpslist[m].nr;
-				if (hightlight==HL_WAYPOINT && hightlight_sub==n)
-					copyspritex((pl.waypoints&(1<<pr))?4500+pr:4533+pr,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35,16);
-				else
-					copyspritex((pl.waypoints&(1<<pr))?4500+pr:4533+pr,GUI_SHOP_X+2,GUI_SHOP_Y+2+n*35, 0);
-				if (pl.waypoints&(1<<pr))
-				{
-					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,wpslist[m].name);
-					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,wpslist[m].desc);
-				}
-				else
-				{
-					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+ 7+n*35,1,"Unknown Location");
-					xputtext(GUI_SHOP_X+74,GUI_SHOP_Y+18+n*35,1,"\"???\"");
-				}
-			}
-			// Scroll bar
-			showbar(GUI_SHOP_X+269, GUI_SHOP_Y+36+(game_ui_state.waypoint_scroll*176)/(MAXWPS-8),11,33,(unsigned short)GUI_BAR_GRE);
-		}
-		
-		if (game_ui_state.open_skill_tree)
-		{
-			copyspritex(do_darkmode?18007:18006,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element HL_SKTREE
-			if (game_ui_state.open_skill_tree == 2) m = 1;
-			else m = 0;
-			for (n=0; n<12; n++) {
-				if ((m<1 && st_learned_skill(pl.tree_points, n+1)) || (m==1 && st_learned_skill(pl.os_tree, n+1)))
-				{
-					switch (n)
-					{
-						case  3: case 11: 
-							copyspritex(18111,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
-						case  0: case  4: 
-							copyspritex(18112,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
-						case  5: case  6: 
-							copyspritex(18113,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
-						case  1: case  7: 
-							copyspritex(18114,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
-						case  8: case  9: 
-							copyspritex(18115,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
-						default: 
-							copyspritex(18116,GUI_SHOP_X+sk_icons[n].x+ST_OFFSET_HL,GUI_SHOP_Y+sk_icons[n].y+ST_OFFSET_HL, 0); break;
-					}
-				}
-				if (hightlight == HL_SKTREE && hightlight_sub == n) {
-					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
-					            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 16);
-					if (m < 1 && pl.tree_node[n])
-						copyspritex(7067,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
-						            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 16);
-				} else {
-					copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
-					            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 0);
-					if (m < 1 && pl.tree_node[n])
-						copyspritex(7067,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
-						            GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 0);
-				}
-			}
-			if (m<1)
-			{
-				copyspritex(6600,GUI_SHOP_X+140+ST_OFFSET_IC,GUI_SHOP_Y+140+ST_OFFSET_IC, 0);
-				xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.tree_points),st_skill_pts_all(pl.tree_points));
-			}
-			else
-			{
-				copyspritex(7066,GUI_SHOP_X+140+ST_OFFSET_IC,GUI_SHOP_Y+140+ST_OFFSET_IC, 0);
-				xputtext(GUI_SHOP_X+260,GUI_SHOP_Y+270,1,"%d/%d",st_skill_pts_have(pl.os_tree),st_skill_pts_all(pl.os_tree));
-			}
-			if (hightlight == HL_SKTREE) {
-				xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 272, 1, sk_tree[m][hightlight_sub].name);
-				xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, sk_tree[m][hightlight_sub].dsc1);
-				xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, sk_tree[m][hightlight_sub].dsc2);
-			}
-		}
-		
-		if (game_ui_state.open_book)
-		{
-			copyspritex(do_darkmode?18046:18045,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			for (y=0+MLL/3*(game_ui_state.tutorial.page-1); y<MLL/3*game_ui_state.tutorial.page; y++) {
-				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*15,
-					motdfont[y],motdtext[y]);
-			}
-		}
-		
-		if (game_ui_state.show_motd)
-		{
-			copyspritex(do_darkmode?18042:42,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			for (y=0; y<MLL; y++) {
-				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
-					motdfont[y],motdtext[y]);
-			}
-		}
-		
-		if (game_ui_state.show_new_player)
-		{
-			copyspritex(do_darkmode?18043:43,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			for (y=0; y<MLL; y++) {
-				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
-					motdfont[y],motdtext[y]);
-			}
-		}
-		
-		if (game_ui_state.tutorial.open)
-		{
-			copyspritex(do_darkmode?18044:44,GUI_SHOP_X,GUI_SHOP_Y,0); // GUI element
-			copyspritex(tutorial_image[game_ui_state.tutorial.open-1][game_ui_state.tutorial.page-1],GUI_SHOP_X+6,GUI_SHOP_Y+145,0);
-			for (y=0;y<12;y++)
-			{
-				puttext(GUI_SHOP_X+10,GUI_SHOP_Y+10+y*10,
-					1,tutorial_text[game_ui_state.tutorial.open-1][game_ui_state.tutorial.page-1][y]);
-			}
-		}
-	}
+            copyspritex(rank_sprite[points2rank(look.points)], 935, 42, 0);
+        }
+
+        // Draw buffs and debuffs
+        for (n = 0; n < MAXBUFFS; n++) {
+            if (buffs[n][0]) {
+                int effect = (15 - min(15, buffs[n][1])) | EFFECT_BUFF;
+                copyspritex(buffs[n][0], 848 + (n / 5) * 20, 8 + (n % 5) * 23, effect);
+            }
+            if (debuffs[n][0]) {
+                int effect = (15 - min(15, debuffs[n][1])) | EFFECT_BUFF;
+                copyspritex(debuffs[n][0], 848 + 5 * 20 - (n / 5) * 20, 8 + (n % 5) * 23, effect);
+            }
+        }
+
+        if (game_ui_state.open_shop == 112) // New Depot
+        {
+            copyspritex(do_darkmode ? 18094 : 18093,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            for (n = 0; n < 64; n++) {
+                if (!shop.depot[game_ui_state.open_depot_page][n]) continue;
+                int slot_x, slot_y;
+                grid_slot_to_xy(&depot_layout, n, &slot_x, &slot_y);
+                bool highlighted = !pl.citem && hightlight == HL_SHOP && (hightlight_sub % 64) == n;
+                render_item_display(&shop.depot_info[game_ui_state.open_depot_page][n], slot_x, slot_y,
+                                    highlighted ? 16 : 0);
+            }
+            if (shop.sprite) copyspritex(shop.sprite, 935 - 61, 36, 0);
+            copyspritex(rank_sprite[points2rank(shop.points)], 935, 42, 0);
+            xputtext(846 + (125 - strlen(rank[points2rank(shop.points)]) * 6) / 2, 176, 1,
+                     rank[points2rank(shop.points)]);
+            xputtext(846 + (125 - strlen(shop.name) * 6) / 2, 157, 1, shop.name);
+
+            // Depot Page Buttons
+            xx = GUI_SHOP_X + 7 + (game_ui_state.open_depot_page % 4) * 68;
+            yy = GUI_SHOP_Y + 281 + (game_ui_state.open_depot_page / 4) * 17;
+            showbox(xx, yy, 63, 12, (unsigned short) (GREEN));
+        } else if (game_ui_state.open_shop == 110 || game_ui_state.open_shop == 111) // Blacksmith Window
+        {
+            if (pl.sitem[1] == 17357) // Show two-material gui - sprite number for claystone
+            {
+                copyspritex(do_darkmode ? 18120 : 18119,GUI_SHOP_X,GUI_SHOP_Y, 0);
+                m = 1;
+            } else // Show one-material gui
+            {
+                copyspritex(do_darkmode ? 18118 : 18117,GUI_SHOP_X,GUI_SHOP_Y, 0);
+                m = 0;
+            }
+
+            if (pl.sitem[1] == 17356) // Show three-button overlay - sprite number for whetstone
+            {
+                if (game_ui_state.open_shop == 110)
+                    copyspritex(do_darkmode ? 18122 : 18121,GUI_SHOP_X,GUI_SHOP_Y, 0);
+                else
+                    copyspritex(do_darkmode ? 18124 : 18123,GUI_SHOP_X,GUI_SHOP_Y, 0);
+            }
+
+            for (n = 0; n < 4; n++) {
+                hh = 0;
+                xx = GUI_SHOP_X;
+                yy = GUI_SHOP_Y;
+                switch (n) {
+                    case 0: // Left Item
+                        xx += 46;
+                        yy += 125;
+                        break;
+                    case 1: // Top Middle
+                        xx += 125;
+                        if (m) yy += 99;
+                        else yy += 125;
+                        break;
+                    case 2: // Bottom Middle
+                        if (!m) continue;
+                        xx += 125;
+                        yy += 151;
+                        break;
+                    default: // Right Item
+                        xx += 204;
+                        yy += 125;
+                        break;
+                }
+                if (!pl.citem && hightlight == HL_SHOP && hightlight_sub == n) hh = 16;
+
+                render_item_display(&pl.smith_info[n], xx, yy, hh);
+            }
+        } else if (game_ui_state.open_shop) {
+            copyspritex(do_darkmode ? 18092 : 92,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            y = 0;
+            for (n = 0; n < 62; n++) {
+                if (!shop.item[n]) continue;
+
+                hh = 0;
+                xx = GUI_SHOP_X + 2 + (n % 8) * 35;
+                yy = GUI_SHOP_Y + 2 + (n / 8) * 35;
+
+                if (shop.item_info[n].properties.shop_info.price > 0) y = 1;
+                if (!pl.citem && hightlight == HL_SHOP && hightlight_sub == n) hh = 16;
+
+                render_shop_item_display(&shop.item_info[n], xx, yy, hh);
+
+                if (hh && (pr = shop.item_info[n].properties.shop_info.price)) {
+                    if (game_ui_state.open_shop >= 1 && game_ui_state.open_shop <= 101) // Normal shop
+                    {
+                        SDL_Keymod mods = SDL_GetModState();
+                        if ((mods & KMOD_CTRL) || (mods & KMOD_ALT)) {
+                            pr *= 10;
+                            xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "Buy 10 for: %9dG %2dS", pr / 100, pr % 100);
+                        } else {
+                            xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "   Buy for: %9dG %2dS", pr / 100, pr % 100);
+                        }
+                    }
+                    if (game_ui_state.open_shop == 102) // Black Stronghold
+                        xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "    Take reward for: %9d Stronghold Pts", pr);
+                    if (game_ui_state.open_shop == 103) // Casino
+                        xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "Take reward for: %9d Tokens", pr);
+                    if (game_ui_state.open_shop == 104) // Contract
+                        xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "  Take reward for: %9d Contract Pts", pr);
+                    if (game_ui_state.open_shop == 105) // Exp
+                        xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "         Buy for: %9d Exp", pr);
+                }
+            }
+            if (pl.citem && shop.pl_price) {
+                if (game_ui_state.open_shop >= 1 && game_ui_state.open_shop <= 101)
+                    xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, "  Sell for: %9dG %2dS", shop.pl_price / 100,
+                             shop.pl_price % 100);
+            }
+            /*  Sadly this is harder to do than it looks
+            else if ((hightlight==HL_BACKPACK && hightlight_sub==n+(signed)game_ui_state.inventory_scroll) && shop.pl_price)
+            {
+                if (game_ui_state.open_shop>=1 && game_ui_state.open_shop<=101)
+                    xputtext(GUI_SHOP_X+7,GUI_SHOP_Y+300,1,"  Sell for: %9dG %2dS",shop.pl_price/100,shop.pl_price%100);
+            }
+            */
+            if (y) {
+                if (game_ui_state.open_shop >= 1 && game_ui_state.open_shop <= 101)
+                    xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, "Your Money: %9dG %2dS", pl.gold / 100, pl.gold % 100);
+                if (game_ui_state.open_shop == 102) // Black Stronghold
+                    xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, "Your Stronghold Pts: %9d", pl.bs_points);
+                if (game_ui_state.open_shop == 103) // Casino
+                    xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, "    Your Tokens: %9d", pl.tokens);
+                if (game_ui_state.open_shop == 104) // Contract
+                    xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, "Your Contract Pts: %9d", pl.os_points);
+                if (game_ui_state.open_shop == 105) // Exp
+                    xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, "Your Unspent Exp: %9d", pl.points);
+            }
+
+            if (shop.sprite) copyspritex(shop.sprite, 935 - 61, 36, 0);
+            copyspritex(rank_sprite[points2rank(shop.points)], 935, 42, 0);
+            xputtext(846 + (125 - strlen(rank[points2rank(shop.points)]) * 6) / 2, 176, 1,
+                     rank[points2rank(shop.points)]);
+            xputtext(846 + (125 - strlen(shop.name) * 6) / 2, 157, 1, shop.name);
+        }
+
+        if (game_ui_state.show_waypoints) {
+            copyspritex(do_darkmode ? 18005 : 5,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            //game_ui_state.waypoint_scroll
+            for (n = 0; n < 8; n++) {
+                m = n + game_ui_state.waypoint_scroll;
+                pr = wpslist[m].nr;
+                if (hightlight == HL_WAYPOINT && hightlight_sub == n)
+                    copyspritex((pl.waypoints & (1 << pr)) ? 4500 + pr : 4533 + pr,GUI_SHOP_X + 2,
+                                GUI_SHOP_Y + 2 + n * 35, 16);
+                else
+                    copyspritex((pl.waypoints & (1 << pr)) ? 4500 + pr : 4533 + pr,GUI_SHOP_X + 2,
+                                GUI_SHOP_Y + 2 + n * 35, 0);
+                if (pl.waypoints & (1 << pr)) {
+                    xputtext(GUI_SHOP_X + 74,GUI_SHOP_Y + 7 + n * 35, 1, wpslist[m].name);
+                    xputtext(GUI_SHOP_X + 74,GUI_SHOP_Y + 18 + n * 35, 1, wpslist[m].desc);
+                } else {
+                    xputtext(GUI_SHOP_X + 74,GUI_SHOP_Y + 7 + n * 35, 1, "Unknown Location");
+                    xputtext(GUI_SHOP_X + 74,GUI_SHOP_Y + 18 + n * 35, 1, "\"???\"");
+                }
+            }
+            // Scroll bar
+            showbar(GUI_SHOP_X + 269, GUI_SHOP_Y + 36 + (game_ui_state.waypoint_scroll * 176) / (MAXWPS - 8), 11, 33,
+                    (unsigned short) GUI_BAR_GRE);
+        }
+
+        if (game_ui_state.open_skill_tree) {
+            copyspritex(do_darkmode ? 18007 : 18006,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element HL_SKTREE
+            if (game_ui_state.open_skill_tree == 2) m = 1;
+            else m = 0;
+            for (n = 0; n < 12; n++) {
+                if ((m < 1 && st_learned_skill(pl.tree_points, n + 1)) || (
+                        m == 1 && st_learned_skill(pl.os_tree, n + 1))) {
+                    switch (n) {
+                        case 3:
+                        case 11:
+                            copyspritex(18111,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_HL,
+                                        GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_HL, 0);
+                            break;
+                        case 0:
+                        case 4:
+                            copyspritex(18112,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_HL,
+                                        GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_HL, 0);
+                            break;
+                        case 5:
+                        case 6:
+                            copyspritex(18113,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_HL,
+                                        GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_HL, 0);
+                            break;
+                        case 1:
+                        case 7:
+                            copyspritex(18114,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_HL,
+                                        GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_HL, 0);
+                            break;
+                        case 8:
+                        case 9:
+                            copyspritex(18115,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_HL,
+                                        GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_HL, 0);
+                            break;
+                        default:
+                            copyspritex(18116,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_HL,
+                                        GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_HL, 0);
+                            break;
+                    }
+                }
+                if (hightlight == HL_SKTREE && hightlight_sub == n) {
+                    copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+                                GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 16);
+                    if (m < 1 && pl.tree_node[n])
+                        copyspritex(7067,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+                                    GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 16);
+                } else {
+                    copyspritex(sk_tree[m][n].icon,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+                                GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 0);
+                    if (m < 1 && pl.tree_node[n])
+                        copyspritex(7067,GUI_SHOP_X + sk_icons[n].x + ST_OFFSET_IC,
+                                    GUI_SHOP_Y + sk_icons[n].y + ST_OFFSET_IC, 0);
+                }
+            }
+            if (m < 1) {
+                copyspritex(6600,GUI_SHOP_X + 140 + ST_OFFSET_IC,GUI_SHOP_Y + 140 + ST_OFFSET_IC, 0);
+                xputtext(GUI_SHOP_X + 260,GUI_SHOP_Y + 270, 1, "%d/%d", st_skill_pts_have(pl.tree_points),
+                         st_skill_pts_all(pl.tree_points));
+            } else {
+                copyspritex(7066,GUI_SHOP_X + 140 + ST_OFFSET_IC,GUI_SHOP_Y + 140 + ST_OFFSET_IC, 0);
+                xputtext(GUI_SHOP_X + 260,GUI_SHOP_Y + 270, 1, "%d/%d", st_skill_pts_have(pl.os_tree),
+                         st_skill_pts_all(pl.os_tree));
+            }
+            if (hightlight == HL_SKTREE) {
+                xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 272, 1, sk_tree[m][hightlight_sub].name);
+                xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 287, 1, sk_tree[m][hightlight_sub].dsc1);
+                xputtext(GUI_SHOP_X + 7,GUI_SHOP_Y + 300, 1, sk_tree[m][hightlight_sub].dsc2);
+            }
+        }
+
+        if (game_ui_state.open_book) {
+            copyspritex(do_darkmode ? 18046 : 18045,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            for (y = 0 + MLL / 3 * (game_ui_state.tutorial.page - 1); y < MLL / 3 * game_ui_state.tutorial.page; y++) {
+                puttext(GUI_SHOP_X + 10,GUI_SHOP_Y + 10 + y * 15,
+                        motdfont[y], motdtext[y]);
+            }
+        }
+
+        if (game_ui_state.show_motd) {
+            copyspritex(do_darkmode ? 18042 : 42,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            for (y = 0; y < MLL; y++) {
+                puttext(GUI_SHOP_X + 10,GUI_SHOP_Y + 10 + y * 10,
+                        motdfont[y], motdtext[y]);
+            }
+        }
+
+        if (game_ui_state.show_new_player) {
+            copyspritex(do_darkmode ? 18043 : 43,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            for (y = 0; y < MLL; y++) {
+                puttext(GUI_SHOP_X + 10,GUI_SHOP_Y + 10 + y * 10,
+                        motdfont[y], motdtext[y]);
+            }
+        }
+
+        if (game_ui_state.tutorial.open) {
+            copyspritex(do_darkmode ? 18044 : 44,GUI_SHOP_X,GUI_SHOP_Y, 0); // GUI element
+            copyspritex(tutorial_image[game_ui_state.tutorial.open - 1][game_ui_state.tutorial.page - 1],GUI_SHOP_X + 6,
+                        GUI_SHOP_Y + 145, 0);
+            for (y = 0; y < 12; y++) {
+                puttext(GUI_SHOP_X + 10,GUI_SHOP_Y + 10 + y * 10,
+                        1, tutorial_text[game_ui_state.tutorial.open - 1][game_ui_state.tutorial.page - 1][y]);
+            }
+        }
+    }
 }
 
 struct looks {
-	char known;
-	char name[21];
-	char proz;
-	unsigned short id;
+    char known;
+    char name[21];
+    char proz;
+    unsigned short id;
 };
 
-struct looks *looks=NULL;
-int lookmax=0;
-int lookat=0;
+struct looks *looks = NULL;
+int lookmax = 0;
+int lookat = 0;
 
-char *lookup(int nr,unsigned short id)
-{
-	static char buf[40];
-	int n;
+char *lookup(int nr, unsigned short id) {
+    static char buf[40];
+    int n;
 
-	if (nr>=lookmax) {
-		looks=realloc(looks,sizeof(struct looks)*(nr+10));
-		for (n=lookmax; n<nr+10; n++) {
-			strcpy(looks[n].name,"");
-			looks[n].known=0;
-			looks[n].proz=0;
-		}
-		lookmax=nr+10;
-	}
+    if (nr >= lookmax) {
+        looks = realloc(looks, sizeof(struct looks) * (nr + 10));
+        for (n = lookmax; n < nr + 10; n++) {
+            strcpy(looks[n].name, "");
+            looks[n].known = 0;
+            looks[n].proz = 0;
+        }
+        lookmax = nr + 10;
+    }
 
-	if (id && id!=looks[nr].id) {
-		looks[nr].known=0;
-		looks[nr].name[0]=0;
-		looks[nr].proz=0;
-		looks[nr].id=id;
-	}
+    if (id && id != looks[nr].id) {
+        looks[nr].known = 0;
+        looks[nr].name[0] = 0;
+        looks[nr].proz = 0;
+        looks[nr].id = id;
+    }
 
-	if (!looks[nr].known) lookat=nr;
+    if (!looks[nr].known) lookat = nr;
 
-	if (!id) return looks[nr].name;
+    if (!id) return looks[nr].name;
 
-	if (pdata.show_names && pdata.show_proz) 
-	{
-		if (looks[nr].proz) 
-		{
-			sprintf(buf,"%s %d%%",looks[nr].name,looks[nr].proz);
-			return buf;
-		} 
-		else return looks[nr].name;
-	} 
-	else if (pdata.show_names) return looks[nr].name;
-	else if (pdata.show_proz) 
-	{
-		if (looks[nr].proz) 
-		{
-			sprintf(buf,"%d%%",looks[nr].proz);
-			return buf;
-		} 
-		else return "";
-	} 
-	else return "";
+    if (pdata.show_names && pdata.show_proz) {
+        if (looks[nr].proz) {
+            sprintf(buf, "%s %d%%", looks[nr].name, looks[nr].proz);
+            return buf;
+        } else return looks[nr].name;
+    } else if (pdata.show_names) return looks[nr].name;
+    else if (pdata.show_proz) {
+        if (looks[nr].proz) {
+            sprintf(buf, "%d%%", looks[nr].proz);
+            return buf;
+        } else return "";
+    } else return "";
 }
 
-void add_look(unsigned short nr,char *name,unsigned short id)
-{
-	int n;
+void add_look(unsigned short nr, char *name, unsigned short id) {
+    int n;
 
-	if (nr>=lookmax) {
-		looks=realloc(looks,sizeof(struct looks)*(nr+10));
-		for (n=lookmax; n<nr+10; n++) {
-			strcpy(looks[n].name,"");
-			looks[n].known=0;
-			looks[n].proz=0;
-		}
-		lookmax=nr+10;
-	}
+    if (nr >= lookmax) {
+        looks = realloc(looks, sizeof(struct looks) * (nr + 10));
+        for (n = lookmax; n < nr + 10; n++) {
+            strcpy(looks[n].name, "");
+            looks[n].known = 0;
+            looks[n].proz = 0;
+        }
+        lookmax = nr + 10;
+    }
 
-	if (id!=looks[nr].id) {
-		looks[nr].known=0;
-		looks[nr].name[0]=0;
-		looks[nr].proz=0;
-	}
+    if (id != looks[nr].id) {
+        looks[nr].known = 0;
+        looks[nr].name[0] = 0;
+        looks[nr].proz = 0;
+    }
 
-	strncpy(looks[nr].name,name,16);
-	looks[nr].name[16]=0;
-	looks[nr].known=1;
-	looks[nr].proz=0;
-	looks[nr].id=id;
+    strncpy(looks[nr].name, name, 16);
+    looks[nr].name[16] = 0;
+    looks[nr].known = 1;
+    looks[nr].proz = 0;
+    looks[nr].id = id;
 }
 
-void set_look_proz(unsigned short nr,unsigned short id,int proz)
-{
-	int n;
+void set_look_proz(unsigned short nr, unsigned short id, int proz) {
+    int n;
 
-	if (nr>=lookmax) {
-		looks=realloc(looks,sizeof(struct looks)*(nr+10));
-		for (n=lookmax; n<nr+10; n++) {
-			strcpy(looks[n].name,"");
-			looks[n].known=0;
-		}
-		lookmax=nr+10;
-	}
-	if (id!=looks[nr].id) {
-		looks[nr].known=0;
-		looks[nr].name[0]=0;
-		looks[nr].proz=0;
-		looks[nr].id=id;
-	}
-	looks[nr].proz=(unsigned char)proz;
+    if (nr >= lookmax) {
+        looks = realloc(looks, sizeof(struct looks) * (nr + 10));
+        for (n = lookmax; n < nr + 10; n++) {
+            strcpy(looks[n].name, "");
+            looks[n].known = 0;
+        }
+        lookmax = nr + 10;
+    }
+    if (id != looks[nr].id) {
+        looks[nr].known = 0;
+        looks[nr].name[0] = 0;
+        looks[nr].proz = 0;
+        looks[nr].id = id;
+    }
+    looks[nr].proz = (unsigned char) proz;
 }
 
-int tile_x=-1,tile_y=-1,tile_type=-1;
+int tile_x = -1, tile_y = -1, tile_type = -1;
 
-int autohide(int x,int y)
-{
-	if (x>=(screen_renderdist/2) || (y<=screen_renderdist/2)) return 0;
-	return 1;
+int autohide(int x, int y) {
+    if (x >= (screen_renderdist / 2) || (y <= screen_renderdist / 2)) return 0;
+    return 1;
 }
 
-int facing(int x,int y,int dir)
-{
-	if (dir==1 && x==screen_renderdist/2+1 && y==screen_renderdist/2) return 1;
-	if (dir==2 && x==screen_renderdist/2-1 && y==screen_renderdist/2) return 1;
-	if (dir==4 && x==screen_renderdist/2 && y==screen_renderdist/2+1) return 1;
-	if (dir==3 && x==screen_renderdist/2 && y==screen_renderdist/2-1) return 1;
+int facing(int x, int y, int dir) {
+    if (dir == 1 && x == screen_renderdist / 2 + 1 && y == screen_renderdist / 2) return 1;
+    if (dir == 2 && x == screen_renderdist / 2 - 1 && y == screen_renderdist / 2) return 1;
+    if (dir == 4 && x == screen_renderdist / 2 && y == screen_renderdist / 2 + 1) return 1;
+    if (dir == 3 && x == screen_renderdist / 2 && y == screen_renderdist / 2 - 1) return 1;
 
-	return 0;
+    return 0;
 }
 
-int mapxy_rand(int x,int y,int dur)
-{
-    int val,tim;
+int mapxy_rand(int x, int y, int dur) {
+    int val, tim;
 
-    val=(x*43+y*77+x*y+x*24+y*39)%666;
-    tim=(ticker/dur)%666;
+    val = (x * 43 + y * 77 + x * y + x * 24 + y * 39) % 666;
+    tim = (ticker / dur) % 666;
 
-    if (tim==val) return ticker%dur;
+    if (tim == val) return ticker % dur;
     else return 0;
 }
 
-void display_floortile(int tile,int light,int x,int y,int xoff,int yoff,int mx,int my)
-{
-    switch(tile) {
-	case 16980:	tile+=mapxy_rand(mx,my,10)/2; break;
+void display_floortile(int tile, int light, int x, int y, int xoff, int yoff, int mx, int my) {
+    switch (tile) {
+        case 16980: tile += mapxy_rand(mx, my, 10) / 2;
+            break;
     }
-    copysprite(tile,light,x,y,xoff,yoff);
+    copysprite(tile, light, x, y, xoff, yoff);
 }
 
-unsigned short ymap[MAPX_MAX*MAPY_MAX];
-unsigned short xmap[MAPX_MAX*MAPY_MAX];
+unsigned short ymap[MAPX_MAX * MAPY_MAX];
+unsigned short xmap[MAPX_MAX * MAPY_MAX];
 
 void draw_goto_target(const int map_x, const int map_y, const int tile_index) {
     static const int move_to_indicator_sprite = 31;
@@ -2061,431 +2019,446 @@ void draw_goto_target(const int map_x, const int map_y, const int tile_index) {
 }
 
 void set_minimap_background(int m) {
-    if (map[m].x<MAPX_MAX && map[m].y<MAPY_MAX && !(map[m].flags&INVIS))
-    {
-        if (!xmap[map[m].y+map[m].x*MAPX_MAX] || xmap[map[m].y+map[m].x*MAPX_MAX]==0xffff
-            || ymap[map[m].y+map[m].x*MAPX_MAX]==1)
-        {
-            xmap[map[m].y+map[m].x*MAPX_MAX]=(unsigned short)get_avgcol(map[m].back);
-            ymap[map[m].y+map[m].x*MAPX_MAX]=0;
+    if (map[m].x < MAPX_MAX && map[m].y < MAPY_MAX && !(map[m].flags & INVIS)) {
+        if (!xmap[map[m].y + map[m].x * MAPX_MAX] || xmap[map[m].y + map[m].x * MAPX_MAX] == 0xffff
+            || ymap[map[m].y + map[m].x * MAPX_MAX] == 1) {
+            xmap[map[m].y + map[m].x * MAPX_MAX] = (unsigned short) get_avgcol(map[m].back);
+            ymap[map[m].y + map[m].x * MAPX_MAX] = 0;
         }
     }
 }
 
-void eng_display(int init)	// optimize me!!!!!
+void eng_display(int init) // optimize me!!!!!
 {
-	int x,y,rx,ry,m,plr_sprite,tmp,mapx,mapy,selected_visible=0,alpha,alphastr,txtclr;
-	extern int dd_cache_hit,dd_cache_miss,swap,MAXCACHE;
-	static int xm_flag=1;
-	int inj;
+    int x, y, rx, ry, m, plr_sprite, tmp, mapx, mapy, selected_visible = 0, alpha, alphastr, txtclr;
+    extern int dd_cache_hit, dd_cache_miss, swap, MAXCACHE;
+    static int xm_flag = 1;
+    int inj;
 
-	if (xm_flag) {
-		for (m=0; m<MAPX_MAX*MAPY_MAX; m++)	{ xmap[m]=0; ymap[m]=0; }
-		xm_flag=0;
-	}
+    if (xm_flag) {
+        for (m = 0; m < MAPX_MAX * MAPY_MAX; m++) {
+            xmap[m] = 0;
+            ymap[m] = 0;
+        }
+        xm_flag = 0;
+    }
 
-	// check if we're visible. If not, just leave.
-	if (!isvisible()) return;
+    // check if we're visible. If not, just leave.
+    if (!isvisible()) return;
 
-	// Start sprite batching for this frame
-	sdl_batch_begin();
+    // Start sprite batching for this frame
+    sdl_batch_begin();
 
-	mouse(mx,my,0);
+    mouse(mx, my, 0);
 
-	// *******
-	// * map *
-	// *******
+    // *******
+    // * map *
+    // *******
 
-	if (init) {
-		if (do_shadow) shadow_clear();
-		xoff=-map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].obj_xoff-176; //-176;
-		yoff=-map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].obj_yoff; //-176;
-		plr_sprite=map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].obj2;
+    if (init) {
+        if (do_shadow) shadow_clear();
+        xoff = -map[(screen_renderdist / 2) + (screen_renderdist / 2) * screen_renderdist].obj_xoff - 176; //-176;
+        yoff = -map[(screen_renderdist / 2) + (screen_renderdist / 2) * screen_renderdist].obj_yoff; //-176;
+        plr_sprite = map[(screen_renderdist / 2) + (screen_renderdist / 2) * screen_renderdist].obj2;
 
-		mapx=map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].x;
-		mapy=map[(screen_renderdist/2)+(screen_renderdist/2)*screen_renderdist].y;
+        mapx = map[(screen_renderdist / 2) + (screen_renderdist / 2) * screen_renderdist].x;
+        mapy = map[(screen_renderdist / 2) + (screen_renderdist / 2) * screen_renderdist].y;
 
-		for (y=screen_renderdist-1; y>=0; y--) {
-			for (x=0; x<screen_renderdist; x++) {
+        for (y = screen_renderdist - 1; y >= 0; y--) {
+            for (x = 0; x < screen_renderdist; x++) {
+                // background
+                m = x + y * screen_renderdist;
 
-				// background
-				m=x+y*screen_renderdist;
+                if (hightlight == HL_MAP && tile_type == 0 && tile_x == x && tile_y == y) tmp = 16;
+                else tmp = 0;
+                if (map[m].flags & INVIS) tmp |= 64;
+                if (map[m].flags & INFRARED) tmp |= 256;
+                if (map[m].flags & UWATER) tmp |= 512;
 
-				if (hightlight==HL_MAP && tile_type==0 && tile_x==x && tile_y==y) tmp=16;
-				else tmp=0;
-				if (map[m].flags&INVIS)	tmp|=64;
-				if (map[m].flags&INFRARED) tmp|=256;
-				if (map[m].flags&UWATER) tmp|=512;
+                display_floortile(map[m].back, map[m].light | tmp, x * 32, y * 32, xoff, yoff,
+                                  map[x + y * screen_renderdist].x, map[x + y * screen_renderdist].y);
 
-				display_floortile(map[m].back,map[m].light|tmp,x*32,y*32,xoff,yoff,map[x+y*screen_renderdist].x,map[x+y*screen_renderdist].y);
+                set_minimap_background(m);
+                draw_goto_target(x, y, m);
+            }
+        }
 
-				set_minimap_background(m);
-				draw_goto_target(x, y, m);
-			}
-		}
+        for (y = screen_renderdist - 1; y >= 0; y--) {
+            for (x = 0; x < screen_renderdist; x++) {
+                if ((y <= 5 && x >= screen_renderdist - 9)
+                    || (y <= 6 && x >= screen_renderdist - 8)
+                    || (y <= 7 && x >= screen_renderdist - 7)
+                    || (y <= 8 && x >= screen_renderdist - 6)
+                    || (y <= 9 && x >= screen_renderdist - 5))
+                    continue; // x+, y-
 
-		for (y=screen_renderdist-1; y>=0; y--) {
-			for (x=0; x<screen_renderdist; x++) {
+                m = x + y * screen_renderdist;
 
-				if (	(y <= 5 && x >= screen_renderdist-9) 
-					|| 	(y <= 6 && x >= screen_renderdist-8)
-					|| 	(y <= 7 && x >= screen_renderdist-7)
-					|| 	(y <= 8 && x >= screen_renderdist-6)
-					|| 	(y <= 9 && x >= screen_renderdist-5)) 
-				continue; // x+, y-
+                if (map[x + y * screen_renderdist].flags & INVIS) continue; //tmp=128;
+                else tmp = 0;
 
-				m=x+y*screen_renderdist;
+                if (map[m].flags & INFRARED) tmp |= 256;
+                if (map[m].flags & UWATER) tmp |= 512;
 
-				if (map[x+y*screen_renderdist].flags&INVIS) continue; //tmp=128;
-				else tmp=0;
+                // object
+                if (pdata.hide == 0 || (map[m].flags & ISITEM) || autohide(x, y)) {
+                    int tmp2;
 
-				if (map[m].flags&INFRARED) tmp|=256;
-				if (map[m].flags&UWATER) tmp|=512;
+                    if (map[m].obj1 >= 16350 && map[m].obj1 < 16422 && map[m].obj1 != 16357 &&
+                        map[m].obj1 != 16365 && map[m].obj1 != 16373 && map[m].obj1 != 16381 &&
+                        map[m].obj1 != 16357 && map[m].obj1 != 16389 && map[m].obj1 != 16397 &&
+                        map[m].obj1 != 16405 && map[m].obj1 != 16413 && map[m].obj1 != 16421 &&
+                        !facing(x, y, pl.dir) && !autohide(x, y) && pdata.hide) {
+                        // mine hack
 
-				// object
-                if (pdata.hide==0 || (map[m].flags&ISITEM) || autohide(x,y)) 
-				{
-					int tmp2;
+                        if (map[m].obj1 < 16358) tmp2 = 457;
+                        else if (map[m].obj1 < 16366) tmp2 = 456;
+                        else if (map[m].obj1 < 16374) tmp2 = 455;
+                        else if (map[m].obj1 < 16382) tmp2 = 466;
+                        else if (map[m].obj1 < 16390) tmp2 = 459;
+                        else if (map[m].obj1 < 16398) tmp2 = 458;
+                        else if (map[m].obj1 < 16398) tmp2 = 449;
+                        else if (map[m].obj1 < 16406) tmp2 = 468;
+                        else tmp2 = 467;
 
-					if (map[m].obj1>=16350 && map[m].obj1< 16422 && map[m].obj1!=16357 &&
-						map[m].obj1!=16365 && map[m].obj1!=16373 && map[m].obj1!=16381 &&
-						map[m].obj1!=16357 && map[m].obj1!=16389 && map[m].obj1!=16397 &&
-						map[m].obj1!=16405 && map[m].obj1!=16413 && map[m].obj1!=16421 &&
-						!facing(x,y,pl.dir) && !autohide(x,y) && pdata.hide) { // mine hack
+                        if (hightlight == HL_MAP && tile_type == 1 && tile_x == x && tile_y == y)
+                            copysprite(tmp2, map[m].light | 16 | tmp, x * 32, y * 32, xoff, yoff);
+                        else
+                            copysprite(tmp2, map[m].light | tmp, x * 32, y * 32, xoff, yoff);
+                    } else if (map[m].obj1 == 598 && ( // waypoint floor hacks - set by server build.c
+                                   (pl.waypoints & (1 << 0) && map[m].back == 1002) || (
+                                       pl.waypoints & (1 << 1) && map[m].back == 1008) ||
+                                   (pl.waypoints & (1 << 2) && map[m].back == 1013) || (
+                                       pl.waypoints & (1 << 3) && map[m].back == 1034) ||
+                                   (pl.waypoints & (1 << 4) && map[m].back == 1010) || (
+                                       pl.waypoints & (1 << 5) && map[m].back == 1052) ||
+                                   (pl.waypoints & (1 << 6) && map[m].back == 1100) || (
+                                       pl.waypoints & (1 << 7) && map[m].back == 1099) ||
+                                   (pl.waypoints & (1 << 8) && map[m].back == 1012) || (
+                                       pl.waypoints & (1 << 9) && map[m].back == 1109) ||
+                                   (pl.waypoints & (1 << 10) && map[m].back == 1118) || (
+                                       pl.waypoints & (1 << 11) && map[m].back == 1141) ||
+                                   (pl.waypoints & (1 << 12) && map[m].back == 1158) || (
+                                       pl.waypoints & (1 << 13) && map[m].back == 1145) ||
+                                   (pl.waypoints & (1 << 14) && map[m].back == 1014) || (
+                                       pl.waypoints & (1 << 15) && map[m].back == 1005) ||
+                                   (pl.waypoints & (1 << 16) && map[m].back == 1006) || (
+                                       pl.waypoints & (1 << 17) && map[m].back == 1007) ||
+                                   (pl.waypoints & (1 << 18) && map[m].back == 402) || (
+                                       pl.waypoints & (1 << 19) && map[m].back == 500) ||
+                                   (pl.waypoints & (1 << 20) && map[m].back == 520) || (
+                                       pl.waypoints & (1 << 21) && map[m].back == 531) ||
+                                   (pl.waypoints & (1 << 22) && map[m].back == 542) || (
+                                       pl.waypoints & (1 << 23) && map[m].back == 551) ||
+                                   (pl.waypoints & (1 << 24) && map[m].back == 558) || (
+                                       pl.waypoints & (1 << 25) && map[m].back == 543) ||
+                                   (pl.waypoints & (1 << 26) && map[m].back == 544) || (
+                                       pl.waypoints & (1 << 27) && map[m].back == 545) ||
+                                   (pl.waypoints & (1 << 28) && map[m].back == 546) || (
+                                       pl.waypoints & (1 << 29) && map[m].back == 547) ||
+                                   (pl.waypoints & (1 << 30) && map[m].back == 548) || (
+                                       pl.waypoints & (1 << 31) && map[m].back == 549))) {
+                        // display waypoints as "lit" if you have that flag.
+                        if (hightlight == HL_MAP && tile_type == 1 && tile_x == x && tile_y == y)
+                            copysprite(599, map[m].light | 16 | tmp, x * 32, y * 32, xoff, yoff);
+                        else
+                            copysprite(599, map[m].light | tmp, x * 32, y * 32, xoff, yoff);
+                    } else {
+                        if (hightlight == HL_MAP && tile_type == 1 && tile_x == x && tile_y == y)
+                            copysprite(map[m].obj1, map[m].light | 16 | tmp, x * 32, y * 32, xoff, yoff);
+                        else
+                            copysprite(map[m].obj1, map[m].light | tmp, x * 32, y * 32, xoff, yoff);
+                    }
+                } else if (map[m].obj1) {
+                    copysprite(map[m].obj1 + 1, map[m].light | tmp, x * 32, y * 32, xoff, yoff);
+                }
 
-						if (map[m].obj1<16358) tmp2=457;
-						else if (map[m].obj1<16366)	tmp2=456;
-						else if (map[m].obj1<16374)	tmp2=455;
-						else if (map[m].obj1<16382)	tmp2=466;
-						else if (map[m].obj1<16390)	tmp2=459;
-						else if (map[m].obj1<16398)	tmp2=458;
-						else if (map[m].obj1<16398)	tmp2=449;
-						else if (map[m].obj1<16406)	tmp2=468;
-						else tmp2=467;
+                if (map[m].obj1 && map[m].x < MAPX_MAX && map[m].y < MAPY_MAX) {
+                    xmap[map[m].y + map[m].x * MAPX_MAX] = (unsigned short) get_avgcol(map[m].obj1);
+                }
 
-						if (hightlight==HL_MAP && tile_type==1 && tile_x==x && tile_y==y) 
-							copysprite(tmp2,map[m].light|16|tmp,x*32,y*32,xoff,yoff);
-						else 
-							copysprite(tmp2,map[m].light|tmp,x*32,y*32,xoff,yoff);
-					} 
-					
-					else if (map[m].obj1==598 && (	// waypoint floor hacks - set by server build.c
-						(pl.waypoints&(1<< 0) && map[m].back==1002) || (pl.waypoints&(1<< 1) && map[m].back==1008) ||
-						(pl.waypoints&(1<< 2) && map[m].back==1013) || (pl.waypoints&(1<< 3) && map[m].back==1034) ||
-						(pl.waypoints&(1<< 4) && map[m].back==1010) || (pl.waypoints&(1<< 5) && map[m].back==1052) ||
-						(pl.waypoints&(1<< 6) && map[m].back==1100) || (pl.waypoints&(1<< 7) && map[m].back==1099) ||
-						(pl.waypoints&(1<< 8) && map[m].back==1012) || (pl.waypoints&(1<< 9) && map[m].back==1109) ||
-						(pl.waypoints&(1<<10) && map[m].back==1118) || (pl.waypoints&(1<<11) && map[m].back==1141) ||
-						(pl.waypoints&(1<<12) && map[m].back==1158) || (pl.waypoints&(1<<13) && map[m].back==1145) ||
-						(pl.waypoints&(1<<14) && map[m].back==1014) || (pl.waypoints&(1<<15) && map[m].back==1005) ||
-						(pl.waypoints&(1<<16) && map[m].back==1006) || (pl.waypoints&(1<<17) && map[m].back==1007) ||
-						(pl.waypoints&(1<<18) && map[m].back== 402) || (pl.waypoints&(1<<19) && map[m].back== 500) ||
-						(pl.waypoints&(1<<20) && map[m].back== 520) || (pl.waypoints&(1<<21) && map[m].back== 531) ||
-						(pl.waypoints&(1<<22) && map[m].back== 542) || (pl.waypoints&(1<<23) && map[m].back== 551) ||
-						(pl.waypoints&(1<<24) && map[m].back== 558) || (pl.waypoints&(1<<25) && map[m].back== 543) ||
-						(pl.waypoints&(1<<26) && map[m].back== 544) || (pl.waypoints&(1<<27) && map[m].back== 545) ||
-						(pl.waypoints&(1<<28) && map[m].back== 546) || (pl.waypoints&(1<<29) && map[m].back== 547) ||
-						(pl.waypoints&(1<<30) && map[m].back== 548) || (pl.waypoints&(1<<31) && map[m].back== 549) ))
-					{
-						// display waypoints as "lit" if you have that flag.
-						if (hightlight==HL_MAP && tile_type==1 && tile_x==x && tile_y==y) 
-							copysprite(599,map[m].light|16|tmp,x*32,y*32,xoff,yoff);
-						else 
-							copysprite(599,map[m].light|tmp,x*32,y*32,xoff,yoff);
-					}
-					else
-					{
-						if (hightlight==HL_MAP && tile_type==1 && tile_x==x && tile_y==y) 
-							copysprite(map[m].obj1,map[m].light|16|tmp,x*32,y*32,xoff,yoff);
-						else 
-							copysprite(map[m].obj1,map[m].light|tmp,x*32,y*32,xoff,yoff);
-					}					
+                // character
+                if (tile_type == 2 && tile_x == x && tile_y == y) tmp = 16;
+                else tmp = 0;
+                if (map[m].ch_nr == selected_char) {
+                    tmp |= 32;
+                    selected_visible = 1;
+                }
+                if (map[m].flags & INVIS) tmp |= 64;
+                if (map[m].flags & STONED) tmp |= 128;
+                if (map[m].flags & INFRARED) tmp |= 256;
+                if (map[m].flags & UWATER) tmp |= 512;
+                if (map[m].flags & BLOODY) tmp |= 256;
 
-				} else if (map[m].obj1) {					
-					copysprite(map[m].obj1+1,map[m].light|tmp,x*32,y*32,xoff,yoff);
-				}
+                if (do_shadow) shadow(map[m].obj2, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff + 4);
+                copysprite(map[m].obj2, map[m].light | tmp, x * 32, y * 32, xoff + map[m].obj_xoff,
+                           yoff + map[m].obj_yoff);
 
-				if (map[m].obj1 && map[m].x<MAPX_MAX && map[m].y<MAPY_MAX) {
-					xmap[map[m].y+map[m].x*MAPX_MAX]=(unsigned short)get_avgcol(map[m].obj1);
-				}
+                if (pl.attack_cn && pl.attack_cn == map[m].ch_nr)
+                    copysprite(34, 0, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
 
-				// character
-				if (tile_type==2 && tile_x==x && tile_y==y)	tmp=16;
-				else tmp=0;
-				if (map[m].ch_nr==selected_char) {
-					tmp|=32; selected_visible=1;
-				}
-				if (map[m].flags&INVIS)	tmp|=64;
-				if (map[m].flags&STONED) tmp|=128;
-				if (map[m].flags&INFRARED) tmp|=256;
-				if (map[m].flags&UWATER) tmp|=512;
-				if (map[m].flags&BLOODY) tmp|=256;
+                if (pl.misc_action == DR_GIVE && pl.misc_target1 == map[m].ch_id)
+                    copysprite(45, 0, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
 
-				if (do_shadow) shadow(map[m].obj2,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff+4);
-				copysprite(map[m].obj2,map[m].light|tmp,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+                if ((pdata.show_names | pdata.show_proz) && map[m].ch_nr) {
+                    set_look_proz(map[m].ch_nr, map[m].ch_id, map[m].ch_proz);
+                    // Colors 1 and 0 are flip-flopped in case the color can't be pulled from the server.
+                    if (map[m].ch_fontcolor == 0)
+                        txtclr = 1;
+                    else if (map[m].ch_fontcolor == 1)
+                        txtclr = 0;
+                    else
+                        txtclr = map[m].ch_fontcolor;
+                    gputtext(x * 32, y * 32, txtclr, lookup(map[m].ch_nr, map[m].ch_id), xoff + map[m].obj_xoff,
+                             yoff + map[m].obj_yoff - 8);
+                }
 
-				if (pl.attack_cn && pl.attack_cn==map[m].ch_nr)
-					copysprite(34,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+                // Healthbar over characters
+                if (pdata.show_bars && map[m].ch_nr) {
+                    set_look_proz(map[m].ch_nr, map[m].ch_id, map[m].ch_proz);
+                    rx = ((x * 32) / 2) + ((y * 32) / 2) + 32 - HPBAR_WIDTH / 2 + X_OFFSET - (
+                             (RENDER_DISTANCE - 34) / 2 * 32) + xoff + map[m].obj_xoff;
+                    ry = ((x * 32) / 4) - ((y * 32) / 4) + Y_OFFSET - 55 + yoff + map[m].obj_yoff;
 
-				if (pl.misc_action==DR_GIVE && pl.misc_target1==map[m].ch_id)
-					copysprite(45,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
-				
-				if ((pdata.show_names|pdata.show_proz) && map[m].ch_nr) 
-				{
-					set_look_proz(map[m].ch_nr,map[m].ch_id,map[m].ch_proz);
-					// Colors 1 and 0 are flip-flopped in case the color can't be pulled from the server.
-					if (map[m].ch_fontcolor==0)
-						txtclr = 1;
-					else if (map[m].ch_fontcolor==1)
-						txtclr = 0;
-					else
-						txtclr = map[m].ch_fontcolor;
-					gputtext(x*32,y*32,txtclr,lookup(map[m].ch_nr,map[m].ch_id),xoff+map[m].obj_xoff,yoff+map[m].obj_yoff-8);
-				}
-				
-				// Healthbar over characters
-				if (pdata.show_bars && map[m].ch_nr) 
-				{
-					set_look_proz(map[m].ch_nr,map[m].ch_id,map[m].ch_proz);
-					rx=((x*32)/2)+((y*32)/2)+32-HPBAR_WIDTH/2+X_OFFSET-((RENDER_DISTANCE-34)/2*32)+xoff+map[m].obj_xoff;
-					ry=((x*32)/4)-((y*32)/4)+Y_OFFSET-55+yoff+map[m].obj_yoff;
-					
-					if (looks[map[m].ch_nr].proz) 
-					{
-						showbar(rx-1,ry-1,HPBAR_WIDTH+2,4,(unsigned short)CHAR_BAR_BL);
-						showbar(rx,ry,HPBAR_WIDTH,2,(unsigned short)CHAR_BAR_RD);
-					}
-					showbar(rx,ry,(int)(HPBAR_WIDTH*((float)looks[map[m].ch_nr].proz/100.0)),2,(unsigned short)CHAR_BAR_HP);
-				}
-				
-				if (pl.misc_action==DR_DROP && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
-					copysprite(32,0,x*32,y*32,xoff,yoff);
-				else if (pl.misc_action==DR_PICKUP && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
-					copysprite(33,0,x*32,y*32,xoff,yoff);
-				else if (pl.misc_action==DR_USE && pl.misc_target1==map[m].x && pl.misc_target2==map[m].y)
-					copysprite(45,0,x*32,y*32,xoff,yoff);
-				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_DROP, map[m].x, map[m].y))
-					copysprite(32, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
-				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_PICKUP, map[m].x, map[m].y))
-					copysprite(33, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
-				else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_USE, map[m].x, map[m].y))
-					copysprite(45, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
-				else if (g_config.gameplay.use_queue) {
-					int position = has_cmd_been_queued(CL_CMD_USE, map[m].x, map[m].y);
-					if (position) {
-						copysprite(45, EFFECT_GREEN, x * 32, y * 32, xoff, yoff);
-						copysprite(4000 + position, 0, x * 32, y * 32, xoff, yoff);
-					}
-				}
+                    if (looks[map[m].ch_nr].proz) {
+                        showbar(rx - 1, ry - 1,HPBAR_WIDTH + 2, 4, (unsigned short) CHAR_BAR_BL);
+                        showbar(rx, ry,HPBAR_WIDTH, 2, (unsigned short) CHAR_BAR_RD);
+                    }
+                    showbar(rx, ry, (int) (HPBAR_WIDTH * ((float) looks[map[m].ch_nr].proz / 100.0)), 2,
+                            (unsigned short) CHAR_BAR_HP);
+                }
+
+                if (pl.misc_action == DR_DROP && pl.misc_target1 == map[m].x && pl.misc_target2 == map[m].y)
+                    copysprite(32, 0, x * 32, y * 32, xoff, yoff);
+                else if (pl.misc_action == DR_PICKUP && pl.misc_target1 == map[m].x && pl.misc_target2 == map[m].y)
+                    copysprite(33, 0, x * 32, y * 32, xoff, yoff);
+                else if (pl.misc_action == DR_USE && pl.misc_target1 == map[m].x && pl.misc_target2 == map[m].y)
+                    copysprite(45, 0, x * 32, y * 32, xoff, yoff);
+                else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_DROP, map[m].x, map[m].y))
+                    copysprite(32, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+                else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_PICKUP, map[m].x, map[m].y))
+                    copysprite(33, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+                else if (mod_stubborn_actions_is_cmd_pending(CL_CMD_USE, map[m].x, map[m].y))
+                    copysprite(45, EFFECT_INFRA, x * 32, y * 32, xoff, yoff);
+                else if (g_config.gameplay.use_queue) {
+                    int position = has_cmd_been_queued(CL_CMD_USE, map[m].x, map[m].y);
+                    if (position) {
+                        copysprite(45, EFFECT_GREEN, x * 32, y * 32, xoff, yoff);
+                        copysprite(4000 + position, 0, x * 32, y * 32, xoff, yoff);
+                    }
+                }
 
 
-				// effects
-				if (map[m].flags2&MF_MOVEBLOCK)	copysprite(55,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_SIGHTBLOCK) copysprite(84,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_INDOORS) copysprite(56,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_UWATER) copysprite(75,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_NOFIGHT) copysprite(58,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_NOMONST) copysprite(59,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_BANK) copysprite(60,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_TAVERN) copysprite(61,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_NOMAGIC) copysprite(62,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_DEATHTRAP)	copysprite(73,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_NOLAG)	copysprite(57,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_ARENA)	copysprite(76,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_NOPLAYER) copysprite(77,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&MF_NOEXPIRE) copysprite(82,0,x*32,y*32,xoff,yoff);
-				if (map[m].flags2&0x80000000) copysprite(72,0,x*32,y*32,xoff,yoff);
-				
-				inj = 1079;
-				
-				if (map[m].flags&CRITTED)
-					inj = 1206;
-				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==INJURED)
-					copysprite(inj,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
-				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==(INJURED|INJURED1))
-					copysprite(inj+1,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
-				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==(INJURED|INJURED2))
-					copysprite(inj+2,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
-				if ((map[m].flags&(INJURED|INJURED1|INJURED2))==(INJURED|INJURED1|INJURED2))
-					copysprite(inj+3,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
+                // effects
+                if (map[m].flags2 & MF_MOVEBLOCK) copysprite(55, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_SIGHTBLOCK) copysprite(84, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_INDOORS) copysprite(56, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_UWATER) copysprite(75, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_NOFIGHT) copysprite(58, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_NOMONST) copysprite(59, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_BANK) copysprite(60, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_TAVERN) copysprite(61, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_NOMAGIC) copysprite(62, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_DEATHTRAP) copysprite(73, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_NOLAG) copysprite(57, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_ARENA) copysprite(76, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_NOPLAYER) copysprite(77, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & MF_NOEXPIRE) copysprite(82, 0, x * 32, y * 32, xoff, yoff);
+                if (map[m].flags2 & 0x80000000) copysprite(72, 0, x * 32, y * 32, xoff, yoff);
 
-				if (map[m].flags&DEATH) {
-					if (map[m].obj2) copysprite(280+((map[m].flags&DEATH)>>17)-1,0,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
-					else copysprite(280+((map[m].flags&DEATH)>>17)-1,0,x*32,y*32,xoff,yoff);
-				}
-				if (map[m].flags&TOMB) {
-					copysprite(240+((map[m].flags&TOMB)>>12)-1,map[m].light,x*32,y*32,xoff,yoff);
-				}
+                inj = 1079;
 
-				alpha=0; alphastr=0;
+                if (map[m].flags & CRITTED)
+                    inj = 1206;
+                if ((map[m].flags & (INJURED | INJURED1 | INJURED2)) == INJURED)
+                    copysprite(inj, 0, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
+                if ((map[m].flags & (INJURED | INJURED1 | INJURED2)) == (INJURED | INJURED1))
+                    copysprite(inj + 1, 0, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
+                if ((map[m].flags & (INJURED | INJURED1 | INJURED2)) == (INJURED | INJURED2))
+                    copysprite(inj + 2, 0, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
+                if ((map[m].flags & (INJURED | INJURED1 | INJURED2)) == (INJURED | INJURED1 | INJURED2))
+                    copysprite(inj + 3, 0, x * 32, y * 32, xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
 
-				if (map[m].flags&EMAGIC) {
-					alpha|=1;
-					alphastr=max((unsigned)alphastr,((map[m].flags&EMAGIC)>>22));
-				}
+                if (map[m].flags & DEATH) {
+                    if (map[m].obj2)
+                        copysprite(280 + ((map[m].flags & DEATH) >> 17) - 1, 0, x * 32, y * 32,
+                                   xoff + map[m].obj_xoff, yoff + map[m].obj_yoff);
+                    else copysprite(280 + ((map[m].flags & DEATH) >> 17) - 1, 0, x * 32, y * 32, xoff, yoff);
+                }
+                if (map[m].flags & TOMB) {
+                    copysprite(240 + ((map[m].flags & TOMB) >> 12) - 1, map[m].light, x * 32, y * 32, xoff, yoff);
+                }
 
-				if (map[m].flags&GMAGIC) {
-					alpha|=2;
-					alphastr=max((unsigned)alphastr,((map[m].flags&GMAGIC)>>25));
-				}
+                alpha = 0;
+                alphastr = 0;
 
-				if (map[m].flags&CMAGIC) {
-					alpha|=4;
-					alphastr=max((unsigned)alphastr,((map[m].flags&CMAGIC)>>28));
-				}
-				if (alpha) alphaeffect_magic(alpha,alphastr,x*32,y*32,xoff+map[m].obj_xoff,yoff+map[m].obj_yoff);
-			}
-		}
-	} else {
-		for (y=screen_renderdist-1; y>=0; y--) {
-			for (x=0; x<screen_renderdist; x++) {
-				// background
-				copysprite(SPR_EMPTY,0,x*32,y*32,-176,0);
-			}
-		}
-	}
+                if (map[m].flags & EMAGIC) {
+                    alpha |= 1;
+                    alphastr = max((unsigned) alphastr, ((map[m].flags & EMAGIC) >> 22));
+                }
 
-	if (!selected_visible) selected_char=0;
+                if (map[m].flags & GMAGIC) {
+                    alpha |= 2;
+                    alphastr = max((unsigned) alphastr, ((map[m].flags & GMAGIC) >> 25));
+                }
 
-	copyspritex(do_darkmode?18001:1,0,0,0);
+                if (map[m].flags & CMAGIC) {
+                    alpha |= 4;
+                    alphastr = max((unsigned) alphastr, ((map[m].flags & CMAGIC) >> 28));
+                }
+                if (alpha)
+                    alphaeffect_magic(alpha, alphastr, x * 32, y * 32, xoff + map[m].obj_xoff,
+                                      yoff + map[m].obj_yoff);
+            }
+        }
+    } else {
+        for (y = screen_renderdist - 1; y >= 0; y--) {
+            for (x = 0; x < screen_renderdist; x++) {
+                // background
+                copysprite(SPR_EMPTY, 0, x * 32, y * 32, -176, 0);
+            }
+        }
+    }
 
-	if (init) {
-		// Store your position on the map as a white pixel
-		xmap[mapy+mapx*MAPX_MAX]=0xffff;
-		
-		// offsets the minimap draw, so that it begins drawing from 64 tiles to the upper-left of your position,
-		//   drawing 128 x 128 tiles as pixels in dd_show_map.
-		// Added to this, game_ui_state.minimap_magnification carries a magnification value, which shrinks the tile offsets
-		//   and increases the size of the drawn 'pixels' to fill the 128x128 space.
-		mapx=mapx-(64/max(1,game_ui_state.minimap_magnification));
-		if (mapx<0)	mapx=0;
-		if (mapx>1024-((128/max(1,game_ui_state.minimap_magnification))+1)) mapx=1024-((128/max(1,game_ui_state.minimap_magnification))+1);
+    if (!selected_visible) selected_char = 0;
 
-		mapy=mapy-(64/max(1,game_ui_state.minimap_magnification));
-		if (mapy<0)	mapy=0;
-		if (mapy>MAPY_MAX-((128/max(1,game_ui_state.minimap_magnification))+1)) mapy=MAPY_MAX-((128/max(1,game_ui_state.minimap_magnification))+1);
+    copyspritex(do_darkmode ? 18001 : 1, 0, 0, 0);
 
-		show_map(xmap,mapx,mapy,max(1,game_ui_state.minimap_magnification));
-	}
+    if (init) {
+        // Store your position on the map as a white pixel
+        xmap[mapy + mapx * MAPX_MAX] = 0xffff;
 
-	eng_display_win(plr_sprite,init);
+        // offsets the minimap draw, so that it begins drawing from 64 tiles to the upper-left of your position,
+        //   drawing 128 x 128 tiles as pixels in dd_show_map.
+        // Added to this, game_ui_state.minimap_magnification carries a magnification value, which shrinks the tile offsets
+        //   and increases the size of the drawn 'pixels' to fill the 128x128 space.
+        mapx = mapx - (64 / max(1, game_ui_state.minimap_magnification));
+        if (mapx < 0) mapx = 0;
+        if (mapx > 1024 - ((128 / max(1, game_ui_state.minimap_magnification)) + 1))
+            mapx = 1024 - ((128 / max(1, game_ui_state.minimap_magnification)) + 1);
+
+        mapy = mapy - (64 / max(1, game_ui_state.minimap_magnification));
+        if (mapy < 0) mapy = 0;
+        if (mapy > MAPY_MAX - ((128 / max(1, game_ui_state.minimap_magnification)) + 1))
+            mapy = MAPY_MAX - ((128 / max(1, game_ui_state.minimap_magnification)) + 1);
+
+        show_map(xmap, mapx, mapy, max(1, game_ui_state.minimap_magnification));
+    }
+
+    eng_display_win(plr_sprite, init);
 }
 
 // DISPLAY: TEXT OUTPUT
 
-void tlog(char *text,char font)
-{
-	int n,panic=0;
-	static int flag=0;
+void tlog(char *text, char font) {
+    int n, panic = 0;
+    static int flag = 0;
 
-	if (!flag) {
-		for (n=0; n<XLL*60; n++) {
-			logtext[0][n]=0;
-		}
-		for (n=0; n<XLL; n++) {
-			logfont[n]=0;
-		}
-		flag=1;
-	}
+    if (!flag) {
+        for (n = 0; n < XLL * 60; n++) {
+            logtext[0][n] = 0;
+        }
+        for (n = 0; n < XLL; n++) {
+            logfont[n] = 0;
+        }
+        flag = 1;
+    }
 
-	if (strlen(text)<1)	return;
-	
-	// This loop moves previous line of text into the next line of text
-	// with line breaks in mind, this arranges the text lines backwards.
-	while (panic++<XLL) {
-		memmove(logtext[1],logtext[0],XLL*60-60);
-		memmove(&logfont[1],&logfont[0],XLL-1);
-		memcpy(logtext[0],text,min(60-1,strlen(text)+1));
-		logfont[0]=font;
-		logtext[0][60-1]=0;
-		if (strlen(text)<XS-1) return;
-		for (n=XS-1; n>0; n--) if (logtext[0][n]==' ') break;
-		if (n!=0) {
-			logtext[0][n]=0; text+=n+1;
-		} else text+=XS-1;
-	}
+    if (strlen(text) < 1) return;
+
+    // This loop moves previous line of text into the next line of text
+    // with line breaks in mind, this arranges the text lines backwards.
+    while (panic++ < XLL) {
+        memmove(logtext[1], logtext[0],XLL * 60 - 60);
+        memmove(&logfont[1], &logfont[0],XLL - 1);
+        memcpy(logtext[0], text, min(60 - 1, strlen(text) + 1));
+        logfont[0] = font;
+        logtext[0][60 - 1] = 0;
+        if (strlen(text) < XS - 1) return;
+        for (n = XS - 1; n > 0; n--) if (logtext[0][n] == ' ') break;
+        if (n != 0) {
+            logtext[0][n] = 0;
+            text += n + 1;
+        } else text += XS - 1;
+    }
 }
 
-void motdlog(char *text,char font)
-{
-	int n,panic=0;
-	static int flag=0;
-	static int currline=0;
-	
-	if (!flag) {
-		for (n=0; n<MLL*60; n++) {
-			motdtext[0][n]=0;
-		}
-		for (n=0; n<MLL; n++) {
-			motdfont[n]=0;
-		}
-		flag=1;
-	}
+void motdlog(char *text, char font) {
+    int n, panic = 0;
+    static int flag = 0;
+    static int currline = 0;
 
-	if (strlen(text)<1)	return;
-	
-	// Tracking the text array with currline, this should pass to the next line
-	// this will go until currline exceeds 60. As a failsafe, it then resets to 0.
-	while (panic++<MLL) {
-		if (currline>=59) currline=0;
-		
-		memcpy(motdtext[currline],text,min(60-1,strlen(text)+1));
-		motdfont[currline]=font;
-		motdtext[currline][60-1]=0;
-		
-		if (strlen(text)<XMS-1) break;
-		for (n=XMS-1; n>0; n--) if (motdtext[currline][n]==' ') break;
-		if (n!=0) {
-			motdtext[currline][n]=0; text+=n+1;
-		} else text+=XMS-1;
-		
-		currline++;
-	}
-	currline++;
+    if (!flag) {
+        for (n = 0; n < MLL * 60; n++) {
+            motdtext[0][n] = 0;
+        }
+        for (n = 0; n < MLL; n++) {
+            motdfont[n] = 0;
+        }
+        flag = 1;
+    }
+
+    if (strlen(text) < 1) return;
+
+    // Tracking the text array with currline, this should pass to the next line
+    // this will go until currline exceeds 60. As a failsafe, it then resets to 0.
+    while (panic++ < MLL) {
+        if (currline >= 59) currline = 0;
+
+        memcpy(motdtext[currline], text, min(60 - 1, strlen(text) + 1));
+        motdfont[currline] = font;
+        motdtext[currline][60 - 1] = 0;
+
+        if (strlen(text) < XMS - 1) break;
+        for (n = XMS - 1; n > 0; n--) if (motdtext[currline][n] == ' ') break;
+        if (n != 0) {
+            motdtext[currline][n] = 0;
+            text += n + 1;
+        } else text += XMS - 1;
+
+        currline++;
+    }
+    currline++;
 }
 
-void xlog(char font,char *format,...)
-{
-	va_list args;
-	char buf[1024];
+void xlog(char font, char *format, ...) {
+    va_list args;
+    char buf[1024];
 
-	va_start(args,format);
-	vsprintf(buf,format,args);
-	tlog(buf,font);
-	va_end(args);
+    va_start(args, format);
+    vsprintf(buf, format, args);
+    tlog(buf, font);
+    va_end(args);
 }
 
-void mxlog(char font,char *format,...)
-{
-	va_list args;
-	char buf[1024];
+void mxlog(char font, char *format, ...) {
+    va_list args;
+    char buf[1024];
 
-	va_start(args,format);
-	vsprintf(buf,format,args);
-	motdlog(buf,font);
-	va_end(args);
+    va_start(args, format);
+    vsprintf(buf, format, args);
+    motdlog(buf, font);
+    va_end(args);
 }
 
 
 // ************* MAIN *********************
 
-void init_engine(void)
-{
-	eng_init_map();
-	eng_init_player();
+void init_engine(void) {
+    eng_init_map();
+    eng_init_player();
 }
 
-void eng_flip(unsigned int t)
-{
-	int diff;
+void eng_flip(unsigned int t) {
+    int diff;
 
-	diff=t-SDL_GetTicks();
-	if (diff>0)	idle+=diff;
-	do {
-		handle_input();
-	} while (t>SDL_GetTicks());
+    diff = t - SDL_GetTicks();
+    if (diff > 0) idle += diff;
+    do {
+        handle_input();
+    } while (t > SDL_GetTicks());
 
-	frame++;
+    frame++;
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
@@ -2493,20 +2466,18 @@ int get_speed_value(int speedV, int ctickV) {
     return ((SPEED_MAX - speedV) * (ctickV + 1) / CTICK_MAX - (SPEED_MAX - speedV) * ctickV / CTICK_MAX);
 }
 
-int speedo(int n)
-{
-	int moveSpeedValue;
-	
-	moveSpeedValue = map[n].ch_speed - map[n].ch_movespd;
+int speedo(int n) {
+    int moveSpeedValue;
+
+    moveSpeedValue = map[n].ch_speed - map[n].ch_movespd;
     moveSpeedValue = clamp(moveSpeedValue, 0, (SPEED_MAX - 1));
-	return get_speed_value(moveSpeedValue, ctick);
+    return get_speed_value(moveSpeedValue, ctick);
 }
 
-int speedoMisc(int n)
-{
-	int miscSpeedValue;
-	
-	miscSpeedValue = map[n].ch_speed;
+int speedoMisc(int n) {
+    int miscSpeedValue;
+
+    miscSpeedValue = map[n].ch_speed;
 
     /*
         status2 / ch_stat_off values:
@@ -2522,80 +2493,79 @@ int speedoMisc(int n)
         9 = Use skill (casting)
     */
 
-	switch(map[n].ch_stat_off)
-	{
-		// 0, 5, 6 == Attack
-		case    0:
-		case    5:
-		case    6:
-			miscSpeedValue -= map[n].ch_atkspd;
-			miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
-			return get_speed_value(miscSpeedValue, ctick);
-			
-		// 9 == Use skill, mostly casting
-		case    9:
-			miscSpeedValue  = map[n].ch_speed*5/4;
-			miscSpeedValue -= map[n].ch_castspd*3/2;
-	        miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
-			return get_speed_value(miscSpeedValue, ctick);
-			
-		// Default - Shouldn't happen but here as a redundancy
-		default:
-	        miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
-			return get_speed_value(miscSpeedValue, ctick);
-	}
+    switch (map[n].ch_stat_off) {
+        // 0, 5, 6 == Attack
+        case 0:
+        case 5:
+        case 6:
+            miscSpeedValue -= map[n].ch_atkspd;
+            miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
+            return get_speed_value(miscSpeedValue, ctick);
+
+        // 9 == Use skill, mostly casting
+        case 9:
+            miscSpeedValue = map[n].ch_speed * 5 / 4;
+            miscSpeedValue -= map[n].ch_castspd * 3 / 2;
+            miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
+            return get_speed_value(miscSpeedValue, ctick);
+
+        // Default - Shouldn't happen but here as a redundancy
+        default:
+            miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
+            return get_speed_value(miscSpeedValue, ctick);
+    }
 }
 
-int speedstep(int n,int d,int s,int update)
-{
-	int hard_step;
-	int soft_step;
-	int total_step;
-	int speed;
-	int dist;
-	int z,m;
+int speedstep(int n, int d, int s, int update) {
+    int hard_step;
+    int soft_step;
+    int total_step;
+    int speed;
+    int dist;
+    int z, m;
 
-	speed=map[n].ch_speed - map[n].ch_movespd;
+    speed = map[n].ch_speed - map[n].ch_movespd;
     speed = clamp(speed, 0, (SPEED_MAX - 1));
-	
-	hard_step=map[n].ch_status-d;
 
-	if (!update) return 32*hard_step/s;
+    hard_step = map[n].ch_status - d;
 
-	z=ctick;
-	soft_step=0;
-	m=hard_step;
+    if (!update) return 32 * hard_step / s;
 
-	while (m) {
-		z--;
-		if (z<0) z=(CTICK_MAX - 1);	// ctick extended from 20 to 24 to 200
-		soft_step++;
-		if (get_speed_value(speed, z))	m--;
-	}
-	while (1) {
-		z--;
-		if (z<0) z=(CTICK_MAX - 1);	// ctick extended from 20 to 24 to 200
-		if (get_speed_value(speed, z))	break;
-		soft_step++;
-	}
+    z = ctick;
+    soft_step = 0;
+    m = hard_step;
 
-	z=ctick;
-	total_step=soft_step;
-	m=s-hard_step;
+    while (m) {
+        z--;
+        if (z < 0) z = (CTICK_MAX - 1); // ctick extended from 20 to 24 to 200
+        soft_step++;
+        if (get_speed_value(speed, z)) m--;
+    }
+    while (1) {
+        z--;
+        if (z < 0) z = (CTICK_MAX - 1); // ctick extended from 20 to 24 to 200
+        if (get_speed_value(speed, z)) break;
+        soft_step++;
+    }
 
-	while (1) {
-		if (get_speed_value(speed, z))	m--;
-		if (m<1) break;
-		z++;
-		if (z>= CTICK_MAX) z=0;	// ctick extended from 20 to 24 to 200
-		total_step++;
-	}
-	dist=32*(soft_step)/(total_step+1);
+    z = ctick;
+    total_step = soft_step;
+    m = s - hard_step;
 
-	return dist;
+    while (1) {
+        if (get_speed_value(speed, z)) m--;
+        if (m < 1) break;
+        z++;
+        if (z >= CTICK_MAX) z = 0; // ctick extended from 20 to 24 to 200
+        total_step++;
+    }
+    dist = 32 * (soft_step) / (total_step + 1);
+
+    return dist;
 }
+
 //  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10
-static int stattab[]={ 0, 1, 1, 6, 6, 2, 3, 4, 5, 7, 4};
+static int stattab[] = {0, 1, 1, 6, 6, 2, 3, 4, 5, 7, 4};
 
 #define do_idle(ani,sprite)  (sprite==22480 ? ani : 0)
 
@@ -3152,19 +3122,17 @@ int eng_char(int n) {
     return tmp;
 }
 
-int eng_item(int n)
-{
+int eng_item(int n) {
     int m;
-	switch (map[n].it_status)
-	{
-		case 0: return map[n].it_sprite;
-		case 1: return map[n].it_sprite;
+    switch (map[n].it_status) {
+        case 0: return map[n].it_sprite;
+        case 1: return map[n].it_sprite;
 
-		// four sprite animation, 2-step
-		case 2:
-		case 3:
-		case 4:
-		case 5:
+        // four sprite animation, 2-step
+        case 2:
+        case 3:
+        case 4:
+        case 5:
             m = (map[n].it_status - 2) * 2;
             if ((ctick - 1) % 2) {
                 if (map[n].it_status == 5) map[n].it_status = 2;
@@ -3172,9 +3140,9 @@ int eng_item(int n)
             }
             return map[n].it_sprite + m;
 
-		// two sprite animation, 1-step
-		case 6:
-		case 7:
+        // two sprite animation, 1-step
+        case 6:
+        case 7:
             m = (map[n].it_status - 6);
             if ((ctick - 1) % 2) {
                 if (map[n].it_status == 7) map[n].it_status = 6;
@@ -3182,348 +3150,394 @@ int eng_item(int n)
             }
             return map[n].it_sprite + m;
 
-		// eight sprite animation, 1-step
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-	        m = (map[n].it_status-8);
-	        if ((ctick-1)%2)
-	        {
-	            if (map[n].it_status == 15) map[n].it_status = 8;
-	            else                        map[n].it_status++;
-	        }
-	        return map[n].it_sprite + m;
+        // eight sprite animation, 1-step
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+            m = (map[n].it_status - 8);
+            if ((ctick - 1) % 2) {
+                if (map[n].it_status == 15) map[n].it_status = 8;
+                else map[n].it_status++;
+            }
+            return map[n].it_sprite + m;
 
-		// five sprite animation, 1-step, random
-		case 16:
-		case 17:
-		case 18:
-		case 19:
-		case 20:
-	        m = (map[n].it_status-16);
-	        if ((ctick-1)%2)
-	        {
-	            if (map[n].it_status == 20) map[n].it_status = 16;
-	            else                        map[n].it_status++;
-	        }
-	        return map[n].it_sprite + m;
+        // five sprite animation, 1-step, random
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+            m = (map[n].it_status - 16);
+            if ((ctick - 1) % 2) {
+                if (map[n].it_status == 20) map[n].it_status = 16;
+                else map[n].it_status++;
+            }
+            return map[n].it_sprite + m;
 
-	    // 64 sprite animation?
-		case 21: 
-			return map[n].it_sprite+(ticker&63);
+        // 64 sprite animation?
+        case 21:
+            return map[n].it_sprite + (ticker & 63);
 
-		default: xlog(0,"Unknown it_status");
-			return map[n].it_sprite;
-	}
+        default: xlog(0, "Unknown it_status");
+            return map[n].it_sprite;
+    }
 }
 
 static void eng_display_cursor_items(void) {
-	if (!pl.citem) return;
+    if (!pl.citem) return;
 
-	if (cursor_type==CT_DROP || cursor_type==CT_SWAP || cursor_type==CT_USE)
-	{
-		copyspritex(pl.citem,mouse_x-16,mouse_y-16,16);
-		// Draw soulstone icon
-		if (pl.citem_p&PL_SOULSTONED)
-			copyspritex(4496,mouse_x-16,mouse_y-16,16);
-		// Draw talisman icon
-		if (pl.citem_p&PL_ENCHANTED)
-			copyspritex(4497,mouse_x-16,mouse_y-16,16);
-		// Draw corrupt icon
-		if (pl.citem_p&PL_CORRUPTED)
-			copyspritex(6881,mouse_x-16,mouse_y-16,16);
+    if (cursor_type == CT_DROP || cursor_type == CT_SWAP || cursor_type == CT_USE) {
+        copyspritex(pl.citem, mouse_x - 16, mouse_y - 16, 16);
+        // Draw soulstone icon
+        if (pl.citem_p & PL_SOULSTONED)
+            copyspritex(4496, mouse_x - 16, mouse_y - 16, 16);
+        // Draw talisman icon
+        if (pl.citem_p & PL_ENCHANTED)
+            copyspritex(4497, mouse_x - 16, mouse_y - 16, 16);
+        // Draw corrupt icon
+        if (pl.citem_p & PL_CORRUPTED)
+            copyspritex(6881, mouse_x - 16, mouse_y - 16, 16);
 
-		if (pl.citem_s>0&&pl.citem_s<=10)
-			copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,16);
-	}
-	else
-	{
-		copyspritex(pl.citem,mouse_x-16,mouse_y-16,0);
-		// Draw soulstone icon
-		if (pl.citem_p&PL_SOULSTONED)
-			copyspritex(4496,mouse_x-16,mouse_y-16,0);
-		// Draw talisman icon
-		if (pl.citem_p&PL_ENCHANTED)
-			copyspritex(4497,mouse_x-16,mouse_y-16,0);
-		// Draw corrupt icon
-		if (pl.citem_p&PL_CORRUPTED)
-			copyspritex(6881,mouse_x-16,mouse_y-16,0);
+        if (pl.citem_s > 0 && pl.citem_s <= 10)
+            copyspritex(4000 + pl.citem_s, mouse_x - 16, mouse_y - 16, 16);
+    } else {
+        copyspritex(pl.citem, mouse_x - 16, mouse_y - 16, 0);
+        // Draw soulstone icon
+        if (pl.citem_p & PL_SOULSTONED)
+            copyspritex(4496, mouse_x - 16, mouse_y - 16, 0);
+        // Draw talisman icon
+        if (pl.citem_p & PL_ENCHANTED)
+            copyspritex(4497, mouse_x - 16, mouse_y - 16, 0);
+        // Draw corrupt icon
+        if (pl.citem_p & PL_CORRUPTED)
+            copyspritex(6881, mouse_x - 16, mouse_y - 16, 0);
 
-		if (pl.citem_s>0&&pl.citem_s<=10)
-			copyspritex(4000+pl.citem_s,mouse_x-16,mouse_y-16,0);
-	}
+        if (pl.citem_s > 0 && pl.citem_s <= 10)
+            copyspritex(4000 + pl.citem_s, mouse_x - 16, mouse_y - 16, 0);
+    }
 }
 
-void engine_tick(void)
-{
-	int n,tmp;
+void engine_tick(void) {
+    int n, tmp;
 
-	ticker++;
+    ticker++;
 
-	for (n=0; n<screen_renderdist*screen_renderdist; n++) {
-		map[n].back=0;
-		map[n].obj1=0;
-		map[n].obj2=0;
-		map[n].ovl_xoff=0;
-		map[n].ovl_yoff=0;
-	}
+    for (n = 0; n < screen_renderdist * screen_renderdist; n++) {
+        map[n].back = 0;
+        map[n].obj1 = 0;
+        map[n].obj2 = 0;
+        map[n].ovl_xoff = 0;
+        map[n].ovl_yoff = 0;
+    }
 
-	for (n=0; n<screen_renderdist*screen_renderdist; n++) {
+    for (n = 0; n < screen_renderdist * screen_renderdist; n++) {
+        map[n].back = map[n].ba_sprite;
 
-		map[n].back=map[n].ba_sprite;
+        // item
+        if (map[n].it_sprite) {
+            tmp = eng_item(n);
+            map[n].obj1 = tmp;
+        }
 
-		// item
-		if (map[n].it_sprite) {
-			tmp=eng_item(n);
-			map[n].obj1=tmp;
-		}
-
-		// character
-		if (map[n].ch_sprite) {
-			// eng_char has been modified to only pull the animation frame value.  -- Zarro 12/29/2021
-			tmp=eng_char(n);
-			map[n].obj2=map[n].ch_sprite+tmp;
-			//map[n].obj2f=tmp;
-		}
-	}
+        // character
+        if (map[n].ch_sprite) {
+            // eng_char has been modified to only pull the animation frame value.  -- Zarro 12/29/2021
+            tmp = eng_char(n);
+            map[n].obj2 = map[n].ch_sprite + tmp;
+            //map[n].obj2f=tmp;
+        }
+    }
 }
 
-void send_opt(void)
-{
-	static int state=0;
-	unsigned char buf[16];
-	int n;
+void send_opt(void) {
+    static int state = 0;
+    unsigned char buf[16];
+    int n;
 
-	buf[0]=CL_CMD_SETUSER;
+    buf[0] = CL_CMD_SETUSER;
 
-	switch (state) 
-	{
-		case  0: buf[1]=0; buf[2]= 0; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n];    xlog(1,"Transfering user data..."); break;
-		case  1: buf[1]=0; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+13]; break;
-		case  2: buf[1]=0; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+26]; break;
-		case  3: buf[1]=0; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+39]; break;
-		case  4: buf[1]=0; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+52]; break;
-		case  5: buf[1]=0; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.cname[n+65]; break;
+    switch (state) {
+        case 0: buf[1] = 0;
+            buf[2] = 0;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.cname[n];
+            xlog(1, "Transfering user data...");
+            break;
+        case 1: buf[1] = 0;
+            buf[2] = 13;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.cname[n + 13];
+            break;
+        case 2: buf[1] = 0;
+            buf[2] = 26;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.cname[n + 26];
+            break;
+        case 3: buf[1] = 0;
+            buf[2] = 39;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.cname[n + 39];
+            break;
+        case 4: buf[1] = 0;
+            buf[2] = 52;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.cname[n + 52];
+            break;
+        case 5: buf[1] = 0;
+            buf[2] = 65;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.cname[n + 65];
+            break;
 
-		case  6: buf[1]=1; buf[2]= 0; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n];     break;
-		case  7: buf[1]=1; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+13];  break;
-		case  8: buf[1]=1; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+26];  break;
-		case  9: buf[1]=1; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+39];  break;
-		case 10: buf[1]=1; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+52];  break;
-		case 11: buf[1]=1; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+65];  break;
+        case 6: buf[1] = 1;
+            buf[2] = 0;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n];
+            break;
+        case 7: buf[1] = 1;
+            buf[2] = 13;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 13];
+            break;
+        case 8: buf[1] = 1;
+            buf[2] = 26;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 26];
+            break;
+        case 9: buf[1] = 1;
+            buf[2] = 39;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 39];
+            break;
+        case 10: buf[1] = 1;
+            buf[2] = 52;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 52];
+            break;
+        case 11: buf[1] = 1;
+            buf[2] = 65;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 65];
+            break;
 
-		case 12: buf[1]=2; buf[2]= 0; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+78];  break;
-		case 13: buf[1]=2; buf[2]=13; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+91];  break;
-		case 14: buf[1]=2; buf[2]=26; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+104]; break;
-		case 15: buf[1]=2; buf[2]=39; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+117]; break;
-		case 16: buf[1]=2; buf[2]=52; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+130]; break;
-		case 17: buf[1]=2; buf[2]=65; for (n=0; n<13; n++) buf[n+3]=pdata.desc[n+143];
-			pdata.changed=0; save_options();
-			xlog(1,"Transfer done."); break;
-	}
-	xsend(buf);
-	state++;
+        case 12: buf[1] = 2;
+            buf[2] = 0;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 78];
+            break;
+        case 13: buf[1] = 2;
+            buf[2] = 13;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 91];
+            break;
+        case 14: buf[1] = 2;
+            buf[2] = 26;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 104];
+            break;
+        case 15: buf[1] = 2;
+            buf[2] = 39;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 117];
+            break;
+        case 16: buf[1] = 2;
+            buf[2] = 52;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 130];
+            break;
+        case 17: buf[1] = 2;
+            buf[2] = 65;
+            for (n = 0; n < 13; n++) buf[n + 3] = pdata.desc[n + 143];
+            pdata.changed = 0;
+            save_options();
+            xlog(1, "Transfer done.");
+            break;
+    }
+    xsend(buf);
+    state++;
 }
 
-int firstquit=0;
-int wantquit=0;
-int maynotquit=TICKS*5/TICKMULTI;
+int firstquit = 0;
+int wantquit = 0;
+int maynotquit = TICKS * 5 / TICKMULTI;
 
 void cmd_options() {
-	is_resetting_keybinds = false;
-	game_ui_state.show_options = game_ui_state.show_options ? false : true;
+    is_resetting_keybinds = false;
+    game_ui_state.show_options = game_ui_state.show_options ? false : true;
 }
 
-void cmd_exit(void)
-{
-	if (do_exit || !maynotquit) 
-	{
-		quit=1;
-		return;
-	}
-	if (!firstquit) 
-	{
-		say("/tavern");
-		xlog(0," ");
-		xlog(0,"(F12) Leaving the game without entering a tavern will cause you to take damage, and possibly lose your life. Click again if you need to leave immediately.");
-		xlog(0,"A tavern will be located near where you entered the game.");
-		firstquit=1;
-		return;
-	}
+void cmd_exit(void) {
+    if (do_exit || !maynotquit) {
+        quit = 1;
+        return;
+    }
+    if (!firstquit) {
+        say("/tavern");
+        xlog(0, " ");
+        xlog(
+            0,
+            "(F12) Leaving the game without entering a tavern will cause you to take damage, and possibly lose your life. Click again if you need to leave immediately.");
+        xlog(0, "A tavern will be located near where you entered the game.");
+        firstquit = 1;
+        return;
+    }
 
-	if (!wantquit) 
-	{
-		cmd1(CL_CMD_EXIT,0);
-		wantquit=1;
-		xlog(0," ");
-		xlog(0,"(F12) Exit request acknowledged. Please wait a moment...");
-	}
+    if (!wantquit) {
+        cmd1(CL_CMD_EXIT, 0);
+        wantquit = 1;
+        xlog(0, " ");
+        xlog(0, "(F12) Exit request acknowledged. Please wait a moment...");
+    }
 }
 
-int noshop=0;
-extern int xmove,xxtimer;
+int noshop = 0;
+extern int xmove, xxtimer;
 extern int do_ticker;
 
 const double target_fps = 120.0;
 const double target_frame_time = 1.0 / target_fps;
 
-void engine(void)
-{
-	int tmp,tick,init=0;
-	int step=0,skip=0,lookstep=0,optstep=0,skipinrow=0,n,panic,xtimer=0,autosort=0;
-	extern int cmd_count,tick_count;
-	unsigned int t;
-	Uint32 last_time = 0;
-	Uint32 delta_time = 0;
+void engine(void) {
+    int tmp, tick, init = 0;
+    int step = 0, skip = 0, lookstep = 0, optstep = 0, skipinrow = 0, n, panic, xtimer = 0, autosort = 0;
+    extern int cmd_count, tick_count;
+    unsigned int t;
+    Uint32 last_time = 0;
+    Uint32 delta_time = 0;
 
-    raw_skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
-	skilltab=malloc(sizeof(struct skilltab)*MAXSKILL);
-	meta_stats=malloc(sizeof(struct MetaStat)*MAXMETA);
+    raw_skilltab = malloc(sizeof(struct skilltab) * MAXSKILL);
+    skilltab = malloc(sizeof(struct skilltab) * MAXSKILL);
+    meta_stats = malloc(sizeof(struct MetaStat) * MAXMETA);
 
-	set_temp_skilltab();
-	set_temp_metaStats();
+    set_temp_skilltab();
+    set_temp_metaStats();
 
-	init_done=1;
-	t=SDL_GetTicks();
+    init_done = 1;
+    t = SDL_GetTicks();
 
 
-	while (!quit) 
-	{
-		handle_input();
-		if (wantquit && maynotquit)	maynotquit--;
+    while (!quit) {
+        handle_input();
+        if (wantquit && maynotquit) maynotquit--;
 
-		if (do_ticker && (ticker&15)==0) cmd1s(CL_CMD_CTICK,ticker);
+        if (do_ticker && (ticker & 15) == 0) cmd1s(CL_CMD_CTICK, ticker);
 
-		if (step++>16) 
-		{
-			pskip=100.0*(float)skip/(float)frame;
-			pidle=100.0*(float)idle/(float)xtime;
-			skip=frame=0;
-			idle=xtime=0;
-			step=0;
-		}
+        if (step++ > 16) {
+            pskip = 100.0 * (float) skip / (float) frame;
+            pidle = 100.0 * (float) idle / (float) xtime;
+            skip = frame = 0;
+            idle = xtime = 0;
+            step = 0;
+        }
 
-		frame++;
+        frame++;
 
-		lookstep++;
-		if (lookat && lookstep>QSIZE*3)
-		{
-			if (lookat>=lookmax || looks[lookat].known==0)
-				cmd1s(CL_CMD_AUTOLOOK,lookat);
-			lookat=0;
-			lookstep=0;
-		}
+        lookstep++;
+        if (lookat && lookstep > QSIZE * 3) {
+            if (lookat >= lookmax || looks[lookat].known == 0)
+                cmd1s(CL_CMD_AUTOLOOK, lookat);
+            lookat = 0;
+            lookstep = 0;
+        }
 
-		if (look_timer)	look_timer--;
-		else show_look=0;
+        if (look_timer) look_timer--;
+        else show_look = 0;
 
-		if ((game_ui_state.open_shop) && lookstep>QSIZE)
-		{
-			cmd1s(CL_CMD_LOOK,shop.nr);
-			lookstep=0;
-		}
+        if ((game_ui_state.open_shop) && lookstep > QSIZE) {
+            cmd1s(CL_CMD_LOOK, shop.nr);
+            lookstep = 0;
+        }
 
-		optstep++;
-		if (optstep>4 && pdata.changed)
-		{
-			send_opt();
-			optstep=0;
-		}
+        optstep++;
+        if (optstep > 4 && pdata.changed) {
+            send_opt();
+            optstep = 0;
+        }
 
-		if (autosort<5) autosort++;
-		if (autosort==5)
-		{
-			qsort(skilltab,55,sizeof(struct skilltab),skill_cmp);
-			autosort++;
-		}
+        if (autosort < 5) autosort++;
+        if (autosort == 5) {
+            qsort(skilltab, 55, sizeof(struct skilltab), skill_cmp);
+            autosort++;
+        }
 
-		if (xtime>0) xtimer--;
+        if (xtime > 0) xtimer--;
 
-		if (xmove && xtimer<1)
-		{
-			switch (xmove) 
-			{
-				case 1: cmds(CL_CMD_MOVE,map[(RENDERDIST/2-7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2-7)+screen_renderdist*RENDERDIST/2].y); break;
-				case 3: cmds(CL_CMD_MOVE,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].x,map[(RENDERDIST/2+7)+screen_renderdist*RENDERDIST/2].y); break;
-				case 2: cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2-7)].y); break;
-				case 4: cmds(CL_CMD_MOVE,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].x,map[RENDERDIST/2+screen_renderdist*(RENDERDIST/2+7)].y); break;
-				default: break;
-			}
-			xtimer=4;
-			if (xxtimer++>1000) xmove=xxtimer=0;
-		}
+        if (xmove && xtimer < 1) {
+            switch (xmove) {
+                case 1: cmds(CL_CMD_MOVE, map[(RENDERDIST / 2 - 7) + screen_renderdist * RENDERDIST / 2].x,
+                             map[(RENDERDIST / 2 - 7) + screen_renderdist * RENDERDIST / 2].y);
+                    break;
+                case 3: cmds(CL_CMD_MOVE, map[(RENDERDIST / 2 + 7) + screen_renderdist * RENDERDIST / 2].x,
+                             map[(RENDERDIST / 2 + 7) + screen_renderdist * RENDERDIST / 2].y);
+                    break;
+                case 2: cmds(CL_CMD_MOVE, map[RENDERDIST / 2 + screen_renderdist * (RENDERDIST / 2 - 7)].x,
+                             map[RENDERDIST / 2 + screen_renderdist * (RENDERDIST / 2 - 7)].y);
+                    break;
+                case 4: cmds(CL_CMD_MOVE, map[RENDERDIST / 2 + screen_renderdist * (RENDERDIST / 2 + 7)].x,
+                             map[RENDERDIST / 2 + screen_renderdist * (RENDERDIST / 2 + 7)].y);
+                    break;
+                default: break;
+            }
+            xtimer = 4;
+            if (xxtimer++ > 1000) xmove = xxtimer = 0;
+        }
 
-		panic=0;
-		do {
-			handle_input();
-			tmp=game_loop();
-			panic++;
-		} while (tmp && panic<8192);
+        panic = 0;
+        do {
+            handle_input();
+            tmp = game_loop();
+            panic++;
+        } while (tmp && panic < 8192);
 
-		tmp=tick_do();
-        if (tmp) init=1;
-		if (do_exit) init=0;
+        tmp = tick_do();
+        if (tmp) init = 1;
+        if (do_exit) init = 0;
 
-		if (noshop>0) 
-		{
-			noshop--;
-			game_ui_state.open_shop=0;
-			game_ui_state.show_waypoints = false;
-			game_ui_state.open_skill_tree = 0;
-			game_ui_state.open_book=0;
-			game_ui_state.show_motd=false;
-			game_ui_state.show_new_player = false;
-			game_ui_state.tutorial.open=0;
-		}
+        if (noshop > 0) {
+            noshop--;
+            game_ui_state.open_shop = 0;
+            game_ui_state.show_waypoints = false;
+            game_ui_state.open_skill_tree = 0;
+            game_ui_state.open_book = 0;
+            game_ui_state.show_motd = false;
+            game_ui_state.show_new_player = false;
+            game_ui_state.tutorial.open = 0;
+        }
 
-		handle_input();
-		if (t>SDL_GetTicks() || skipinrow>100)	// display frame only if we've got enough time
-		{
-			perf_begin();
-			delta_time = SDL_GetTicks() - last_time;
-			last_time = SDL_GetTicks();
-			glClear(GL_COLOR_BUFFER_BIT);
-			sdl_start_scaling();
-			eng_display(init);
-			calculate_game_ui_state();
-			perf_end();
-			eng_flip(t);
-			perf_begin();
-			sdl_batch_flush();
+        handle_input();
+        if (t > SDL_GetTicks() || skipinrow > 100) // display frame only if we've got enough time
+        {
+            perf_begin();
+            delta_time = SDL_GetTicks() - last_time;
+            last_time = SDL_GetTicks();
+            glClear(GL_COLOR_BUFFER_BIT);
+            sdl_start_scaling();
+            eng_display(init);
+            calculate_game_ui_state();
+            perf_end();
+            eng_flip(t);
+            perf_begin();
+            sdl_batch_flush();
 
-			/* Now render ImGui on top at native window resolution */
-			for (int i = 0; i < input_event_count; i++) {
-				imgui_process_event(&input_events[i]);
-			}
-			input_event_count = 0;
+            /* Now render ImGui on top at native window resolution */
+            for (int i = 0; i < input_event_count; i++) {
+                imgui_process_event(&input_events[i]);
+            }
+            input_event_count = 0;
 
-		    ui_render(UI_STATE_GAME);
-			SDL_SetCursor(cursors[cursor_type]);
+            ui_render(UI_STATE_GAME);
+            SDL_SetCursor(cursors[cursor_type]);
 
-			if (init) {
-				eng_display_cursor_items();
-				sdl_batch_flush();
-			}
-			sdl_stop_scaling();
+            if (init) {
+                eng_display_cursor_items();
+                sdl_batch_flush();
+            }
+            sdl_stop_scaling();
 
-			SDL_GL_SwapWindow(renderer.window);
+            SDL_GL_SwapWindow(renderer.window);
 
-			mod_stubborn_actions_on_tick(delta_time);
-			perf_end();
-			perf_commit();
-			skipinrow=0;
-		} else {
-			skip++; skipinrow++;
-		}
+            mod_stubborn_actions_on_tick(delta_time);
+            perf_end();
+            perf_commit();
+            skipinrow = 0;
+        } else {
+            skip++;
+            skipinrow++;
+        }
 
-		if (t_size) tick=TICK*QSIZE/t_size;
-		else tick=TICK;
+        if (t_size) tick = TICK * QSIZE / t_size;
+        else tick = TICK;
 
-		t+=tick; ttime+=tick; xtime+=tick;
-	}
+        t += tick;
+        ttime += tick;
+        xtime += tick;
+    }
 }
