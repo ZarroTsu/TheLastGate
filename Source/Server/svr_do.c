@@ -13003,6 +13003,26 @@ void do_update_spell_immolate(int cn, int in)
 	
 	bu[in].power = power;
 }
+void do_update_spell_dispel(int cn, int in)
+{
+	int cc;
+	
+	if (bu[in].temp == SK_DISPEL) // Immunize, on a Braver with Resilience
+	{
+		if (!T_BRAV_SK(cn, 12))
+		{
+			bu[in].active = bu[in].duration = TICKS*15;
+			bu[in].flags &= ~(BF_PERMASPELL);
+		}
+		return;
+	}
+	// else: Inoculate, *from* a Braver with Resilience
+	if (!IS_SANECHAR(cc = bu[in].data[0]) || !T_BRAV_SK(cc, 12))
+	{
+		bu[in].active = bu[in].duration = TICKS*15;
+		bu[in].flags &= ~(BF_PERMASPELL);
+	}
+}
 void do_update_permaspells(int cn)
 {
 	int n, in;
@@ -13018,6 +13038,8 @@ void do_update_permaspells(int cn)
 				case SK_PACT:     do_update_spell_pact(cn, in);     break;
 				case SK_LETHARGY: do_update_spell_lethargy(cn, in); break;
 				case SK_IMMOLATE: do_update_spell_immolate(cn, in); break;
+				case SK_DISPEL:
+				case SK_DISPEL2:  do_update_spell_dispel(cn, in); break;
 				default: break;
 			}
 		}

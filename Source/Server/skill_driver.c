@@ -1834,7 +1834,7 @@ int add_spell(int cn, int new_in)
 			if ((old_temp==SK_DISPEL || old_temp==SK_DISPEL2) &&
 				(new_temp==bu[old_in].data[1] || new_temp==bu[old_in].data[2] || new_temp==bu[old_in].data[3]))
 			{
-				chlog(cn,"Immunize true (%d)", old_temp);
+				//chlog(cn,"Immunize true (%d)", old_temp);
 				if (old_temp==SK_DISPEL2)
 					do_char_log(cn, 0, "The magic didn't work!\n");
 				return 0;
@@ -1891,6 +1891,12 @@ int add_spell(int cn, int new_in)
 				bu[new_in].sprite = min(6733, 6731+bu[new_in].stack-1);
 				
 				bu[old_in].used = USE_EMPTY;
+				break;
+			}
+			else if (new_temp==SK_DISPEL || new_temp==SK_DISPEL2)
+			{
+				bu[old_in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
 				break;
 			}
 			else if (new_temp==SK_SHOCK)
