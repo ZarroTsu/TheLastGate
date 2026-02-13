@@ -2507,7 +2507,21 @@ int speedoMisc(int n)
 	int miscSpeedValue;
 	
 	miscSpeedValue = map[n].ch_speed;
-	
+
+    /*
+        status2 / ch_stat_off values:
+        0 = Attack animation
+        1 = Pickup
+        2 = Drop
+        3 = Give
+        4 = Use
+        5 = Attack animation 2
+        6 = Attack animation 3
+        7 = Bow
+        8 = Wave
+        9 = Use skill (casting)
+    */
+
 	switch(map[n].ch_stat_off)
 	{
 		// 0, 5, 6 == Attack
