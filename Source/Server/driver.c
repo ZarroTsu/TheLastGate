@@ -3532,27 +3532,19 @@ int npc_try_spell(int cn, int co, int spell)
 	// dont blast if enemy armor is too strong
 	// Updated 02/11/2020 - changed the formula to include immunity and allow blasts that would do at least 5 damage.
 	if (truespell==SK_BLAST && ( (offn - max(0, get_target_immunity(cn, co)/2)) * 2 ) - ch[co].armor < 20/3)
-	{
 		return 0;
-	}
 	
 	// dont cleave if enemy armor is too strong
 	if (truespell==SK_CLEAVE && ( ((offn + ch[cn].weapon/4 + ch[cn].top_damage/4 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
-	{
 		return 0;
-	}
 	
 	// dont bash if enemy armor is too strong
 	if (truespell==SK_SHIELD && ( ((offn + ch[cn].armor/2 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
-	{
 		return 0;
-	}
 	
 	// dont leap if enemy armor is too strong
 	if (truespell==SK_LEAP && ( ((offn + ch[cn].weapon/4 + ch[cn].top_damage/4 - max(0, (ch[co].to_parry/2))) * 2 ) - ch[co].armor < 20/3) )
-	{
 		return 0;
-	}
 	
 	// dont debuff if chances of success are bad
 	if (truespell==SK_CURSE   && SP_MULT_CURSE   * offn / max(1, defn)< 7) return 0;
@@ -3580,29 +3572,20 @@ int npc_try_spell(int cn, int co, int spell)
 	if (timm<=1) return 0;
 	
 	// prevent thralling multiple ghosts
-	if (spell==SK_GHOST)
+	if (spell==SK_GHOST) for (n = 1; n<MAXCHARS; n++)
 	{
-		for (n = 1; n<MAXCHARS; n++)
-		{
-			if (ch[n].used==USE_EMPTY || (ch[n].flags & (CF_PLAYER | CF_USURP))) 
-				continue;
-			if (ch[n].data[CHD_MASTER]==cn)
-				return 0;
-		}
+		if (ch[n].used==USE_EMPTY || (ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
+		if (ch[n].data[CHD_MASTER]==cn) return 0;
 	}
 	
+	// Cancel if exhausted
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		in = ch[cn].spell[n];
-		// Cancel if exhausted                // prevent thralling multiple shadows
-		if (in && (bu[in].temp==SK_EXHAUST))
-		{
-			return 0;
-		}
+		if ((in = ch[cn].spell[n]) && (bu[in].temp==SK_EXHAUST)) return 0;
 	}
 
 	mana = (ch[cn].a_mana-500) / 1000;
-	end = (ch[cn].a_end-500) / 1000;
+	end  = (ch[cn].a_end -500) / 1000;
 	tdef = (usemana && get_target_resistance(cn, co) >= offn) ? 1 : 0;
 	
 	if (!IS_PLAYER_COMP(cn) && truespell==SK_BLAST && mana<((offn * 2) / 8 + 5)) return 0; // can't afford Blast
@@ -3614,27 +3597,23 @@ int npc_try_spell(int cn, int co, int spell)
 			//tpow = bu[in].power+15;
 			timm = spell_immunity(cn, co, offn);
 			timm = tdef ? (timm/2) : timm;
+			
 			// Cancel if target is already buffed or debuffed (except for heal)
-			if (bu[in].temp==spell && spell!=SK_HEAL /*&& tpow>=timm*/ && bu[in].active>bu[in].duration/4)
-			{
+			if (bu[in].temp==truespell && truespell!=SK_HEAL /*&& tpow>=timm*/ && bu[in].active>bu[in].duration/4)
 				break;
-			}
+			
 			// Immunize/Inoculate prevents up to three ailments
 			if ((bu[in].temp==SK_DISPEL || bu[in].temp==SK_DISPEL2) &&
 				(truespell==bu[in].data[1] || truespell==bu[in].data[2] || truespell==bu[in].data[3]))
-			{
 				break;
-			}
+				
 			// Poison layer adjustments
 			if (bu[in].temp==truespell && truespell==SK_VENOM && bu[in].active>bu[in].duration/4)
-			{
 				break;
-			}
+			
 			// Don't cast heal if target can't be healed.
 			if (bu[in].temp==spell && spell==SK_HEAL && bu[in].data[1] >= 4)
-			{
 				break;
-			}
 		}
 	}
 	
@@ -3645,7 +3624,7 @@ int npc_try_spell(int cn, int co, int spell)
 		{
 			if (end>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
-				//chlog(cn,"Trying endu skill %d on %s (%d)",spell,ch[co].name,co);
+				//chlog(cn,"Trying skill %d on %s (%d)",spell,ch[co].name,co);
 				ch[cn].skill_nr = spell;
 				ch[cn].skill_target1 = co;
 				ch[co].data[96] |= tmp;
@@ -3657,7 +3636,7 @@ int npc_try_spell(int cn, int co, int spell)
 		{
 			if (mana>=get_spellcost(cn, spell) && !(ch[co].data[96] & tmp))
 			{
-				//chlog(cn,"Trying mana spell %d on %s (%d)",spell,ch[co].name,co);
+				//chlog(cn,"Trying spell %d on %s (%d)",spell,ch[co].name,co);
 				ch[cn].skill_nr = spell;
 				ch[cn].skill_target1 = co;
 				ch[co].data[96] |= tmp;
