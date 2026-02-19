@@ -1500,18 +1500,6 @@ int main(int argc, char *args[])
 		if (ch[n].used==USE_ACTIVE) plr_logout(n, 0, LO_SHUTDOWN);
 		/* // (vvv REMOVE AFTER UPDATE!!!)
 		
-		if (IS_SEYAN_DU(n))  // Finesse -> Precision for Seyans
-		{
-			if (ch[n].skill[SK_FINESSE][0]) { ch[n].skill[SK_PRECISION][0] = ch[n].skill[SK_FINESSE][0]; ch[n].skill[SK_FINESSE][0] = 0; }
-			if (ch[n].skill[SK_FINESSE][1]) { ch[n].skill[SK_PRECISION][1] = ch[n].skill[SK_FINESSE][1]; ch[n].skill[SK_FINESSE][1] = 0; }
-			if (ch[n].skill[SK_FINESSE][2]) { ch[n].skill[SK_PRECISION][2] = ch[n].skill[SK_FINESSE][2]; ch[n].skill[SK_FINESSE][2] = 0; }
-			if (ch[n].skill[SK_FINESSE][3]) { ch[n].skill[SK_PRECISION][3] = ch[n].skill[SK_FINESSE][3]; ch[n].skill[SK_FINESSE][3] = 0; }
-			if (ch[n].skill[SK_FINESSE][4]) { ch[n].skill[SK_PRECISION][4] = ch[n].skill[SK_FINESSE][4]; ch[n].skill[SK_FINESSE][4] = 0; }
-			if (ch[n].skill[SK_FINESSE][5]) { ch[n].skill[SK_PRECISION][5] = ch[n].skill[SK_FINESSE][5]; ch[n].skill[SK_FINESSE][5] = 0; }
-		}
-		god_racechange(n, ch[n].temp, 1); plr_logout(n, 0, LO_TAVERN);  // reset character template
-		ch[n].tree_points = st_skill_pts_all(ch[n].tree_points);  // reset skill tree points
-		
 		// */ // (^^^ REMOVE AFTER UPDATE!!!)
 		ch[n].data[75] = 0;
 		clear_map_buffs(n, 1);

@@ -68,8 +68,8 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_INT, AT_AGL, AT_STR }},
 				
-	{ 14, 'G', 	"Finesse", 				"Passive ability which grants more global damage the healthier you are.", 
-				"Finesse (Inverse)", 	"Passive ability which grants more global damage while near death.",
+	{ 14, 'G', 	"Finesse", 				"Passive ability which grants more global damage.", 
+				"", "",
 				{ AT_BRV, AT_BRV, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
 	{ 15, 'F', 	"Lethargy", 			"Use (Spell): Applies a buff to yourself which reserves mana to let you pierce enemy Resistance and Immunity.", 

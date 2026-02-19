@@ -1407,6 +1407,9 @@ void pop_copy_to_new_items(void)
 {
 	int a, b, c;
 	
+	xlog("pop_copy template items is presently disabled. ");
+	return;
+	
 	xlog("pop_copy template items... ");
 	for (a = 1; a<MAXTITEM; a++)
 	{

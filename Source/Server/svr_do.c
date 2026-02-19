@@ -12381,7 +12381,7 @@ void really_update_char(int cn)
 			n = weapon * max(0, T_BRAV_SK(cn, 4)*2 + TC_SK(cn, 88));       // (Brav) Perfectionism
 			m = more(M_SK(cn, SK_FINESSE), n, 20);
 			
-			dmg_bns = dmg_bns * (3000 + z)/3000;
+			dmg_bns = more(dmg_bns, m, 12);
 		}
 		
 		dmg_bns = more(dmg_bns, do_get_ieffect(cn, VF_EN_MOREDAMAGE), 1);  // [Ench] More damage dealt
