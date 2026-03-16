@@ -7713,6 +7713,22 @@ int use_shrine(int cn, int in)
 	{
 		val = it[in2].value;
 		if (it[in2].flags & IF_LEGACY) return use_shrine_return_legacy(cn, in2);
+		if (it[in2].temp == IT_DEADSEYSWORD && IS_SEYAN_DU(cn))
+		{
+			it[in2].used = USE_EMPTY;
+			
+			in2 = god_create_item(IT_SEYANSWORD);
+			ch[cn].citem = in2;
+			
+			it[in2].x = it[in2].y = 0;
+			it[in2].carried = it[in2].data[0] = cn;
+			
+			do_char_log(cn, 0, "Kwai, the great goddess of war, restored the power of your sword for you.\n");
+			
+			make_seyan_sword(cn, in2, get_seyan_bits(cn));
+			do_update_char(cn);
+			return 1;
+		}
 		if (it[in2].flags & IF_UNIQUE) val *= 4;
 		it[in2].used = USE_EMPTY;
 	}
