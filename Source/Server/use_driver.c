@@ -7105,20 +7105,22 @@ void boost_char(int cn, int type)
 			case  5:
 			case 15:
 				sprintf(buf, "Bloody %s", ch[cn].name); divi = 6;
-				switch (RANDOM(4))
+				switch (RANDOM(6))
 				{
 					case  1: in = god_create_item((RANDOM(2)?IT_H_SA:IT_H_SP)+RANDOM(6)); break;
 					case  2: in = god_create_item(IT_TALISFRAG); break;
+					case  3: in = god_create_item(IT_SM_WHET+RANDOM(4)); break;
 					default: in = 0; ch[cn].gold += getrank(cn)*200+RANDOM(getrank(cn)*400); break;
 				}
 				if (in) god_give_char(in, cn);
 				if (type==15)
 				{
 					divi -= 2;
-					switch (RANDOM(4))
+					switch (RANDOM(6))
 					{
 						case  1: in = god_create_item((RANDOM(2)?IT_H_SA:IT_H_SP)+RANDOM(6)); break;
 						case  2: in = god_create_item(IT_TALISFRAG); break;
+						case  3: in = god_create_item(IT_SM_WHET+RANDOM(4)); break;
 						default: in = 0; ch[cn].gold += getrank(cn)*200+RANDOM(getrank(cn)*400); break;
 					}
 					if (in) god_give_char(in, cn);

@@ -5547,12 +5547,11 @@ int spell_bash(int cn, int co, int power, int co_orig)
 }
 void skill_bash(int cn)
 {
-	int power, cost, co;
+	int power = skill_multiplier(M_SK(cn, SK_SHIELD) + ch[cn].armor, cn);
+	int cost, co;
 	
 	chlog(cn, "Uses SHIELD BASH on %s", ch[co].name);
 	
-	power = M_SK(cn, SK_SHIELD) + ch[cn].armor / 2;
-	power = skill_multiplier(power, cn);
 	cost = power/10 + 5;
 	
 	if (!IS_PLAYER(cn)) cost = 20;
@@ -6249,7 +6248,7 @@ int zephyr_power(int cn, int power)
 {
 	int n;
 	
-	power = spell_multiplier(power, cn) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;
+	power = spell_multiplier(power, cn) + ch[cn].weapon / 8 + ch[cn].top_damage / 8;
 	
 	// Additive bonus
 	{
@@ -6275,7 +6274,7 @@ int zephyr_check(int cn, int co, int cz, int tarot)
 	if (in = has_spell(cn, SK_ZEPHYR))
 		power = bu[in].power;
 	else if (B_SK(cn, SK_ZEPHYR))
-		power = zephyr_power(cn, M_SK(cn, SK_ZEPHYR));
+		power = zephyr_power(cn, M_SK(cn, SK_ZEPHYR) + ch[cn].spell_pow);
 	else
 		return 0;
 	

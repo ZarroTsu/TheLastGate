@@ -4835,6 +4835,12 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 					B_AT(co, n) += 3+RANDOM(3);
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += 3+RANDOM(3)*2;
+				if (!RANDOM(8) && (in = god_create_item(IT_SM_WHET+RANDOM(4))))
+				{
+					god_give_char(in, co);
+					chlog(co, "got %s", itemvowel(in, 0));
+					hasloot=1;
+				}
 				break;
 			case  2:												// "Fierce" (BS)
 				for (n = 0; n<5; n++)
@@ -4842,6 +4848,12 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 				for (n = 0; n<MAXSKILL; n++) if (B_SK(co, n))
 					B_SK(co, n) += 6+RANDOM(5)*2;
 				if (!(ch[co].flags & CF_EXTRACRIT)) ch[co].flags |= CF_EXTRACRIT;
+				if (!RANDOM(4) && (in = god_create_item(IT_SM_WHET+RANDOM(4))))
+				{
+					god_give_char(in, co);
+					chlog(co, "got %s", itemvowel(in, 0));
+					hasloot=1;
+				}
 				break;
 			//
 			case  3:												// "Divine" (CN)
@@ -4882,7 +4894,13 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 				ch[co].data[72] = 5;
 				ch[co].data[25] = 1;
 				//
-				make_talisfrag(co, RANDOM(2)+2);
+				make_talisfrag(co, RANDOM(3)+1);
+				if ((in = god_create_item(IT_SM_GRAD)))
+				{
+					god_give_char(in, co);
+					chlog(co, "got %s", itemvowel(in, 0));
+					hasloot=1;
+				}
 				//
 				break;
 			case  6:												// Legendary
