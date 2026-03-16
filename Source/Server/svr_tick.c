@@ -1860,14 +1860,10 @@ int get_meta_stat_value(int cn, int n)
 			//
 			dmg_low = (  dmg_wpn          * dmg_str/100 * dmg_bns/10000 ) / 4;
 			dmg_hgh = ( (dmg_wpn+dmg_top) * dmg_str/100 * dmg_bns/10000 );
-			dmg_hgh = ( dmg_hgh + dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000 ) / 4;
 			if (T_ARTM_SK(cn, 6))  // (ArTm) Impact
-			{
-				dmg_hit = (dmg_low+dmg_hgh);
-				dmg_low = dmg_hgh;
-			}
-			else
-				dmg_hit = (dmg_low+dmg_hgh)/2;
+				dmg_low = dmg_hgh/4;
+			dmg_hgh = ( dmg_hgh + dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000 ) / 4;
+			dmg_hit = (dmg_low+dmg_hgh+1)/2;
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		default: break;
