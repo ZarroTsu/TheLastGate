@@ -4805,14 +4805,23 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 		if (ch[cm].class > 0) 
 			ch[cc].sprite               = ch[cm].class;						// Assign custom sprite
 	}
+	else if (IS_SHADOW(cn) && ch[cn].data[9] == 1)
+	{
+		if (IS_SANEPLAYER(cm = ch[cn].data[CHD_MASTER]) && do_get_iflag(ch[cn].data[CHD_MASTER], SF_BOOK_DEVI))
+			shadowcopy = 2;													// Copy book state from parent
+		
+		base                            = base * 5 / 12;					// Set Base value (Monsters)
+		ch[cn].data[PCD_SHADOWCOPY]     = cc;								// Set SC's SC
+		ch[cc].kindred                 &= ~(KIN_MONSTER);					// Remove 'Monster' flag
+		ch[cc].data[1]                  = ch[cn].data[1];					// Copy mode
+		ch[cc].data[CHD_GROUP]          = ch[cn].data[CHD_GROUP];			// Copy group
+	}
 	else
 	{
 		if (shadowcopy && IS_SHADOW(cn) && IS_SANEPLAYER(ch[cn].data[CHD_MASTER]))
 		{
 			if (do_get_iflag((cm = ch[cn].data[CHD_MASTER]), SF_BOOK_DEVI))
-			{
 				shadowcopy = 2;												// Copy book state from parent
-			}
 			group = ch[cn].data[CHD_GROUP];
 		}
 		else
