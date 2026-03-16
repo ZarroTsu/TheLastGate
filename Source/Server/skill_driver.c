@@ -1692,7 +1692,7 @@ int get_target_immunity(int cn, int co)
 	
 	// Multiplicative bonuses from defender
 	{
-		if (do_get_iflag(co, SF_AM_ECLIPSE)) n = more(n, 25, 1);
+		if (do_get_iflag(co, SF_AM_ECLIPSE)) target_immune = more(target_immune, 25, 1);
 	}
 	
 	if (IS_SANECHAR(cn))
