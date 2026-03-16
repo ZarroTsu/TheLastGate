@@ -5332,6 +5332,24 @@ void colosseum_driver(int cn)
 
 #define PANDI_LIMIT 	3
 
+// Lazy man's prime number check, up to 200.
+int prime_floor(int fl)
+{
+	switch (fl)
+	{
+		case   2: case   3: case   5: case   7: case  11: case  13: case  17: case  19:
+		case  23: case  29: case  31: case  37: case  41: case  43: case  47: case  53:
+		case  59: case  61: case  67: case  71: case  73: case  79: case  83: case  89:
+		case  97: case 101: case 103: case 107: case 109: case 113: case 127: case 131:
+		case 137: case 139: case 149: case 151: case 157: case 163: case 167: case 173:
+		case 179: case 181:	case 191: case 193: case 197: case 199:
+			return 1;
+		default:
+			break;
+	}
+	return 0;
+}
+
 void spawn_pandium_rewards(int cn, int fl, int x, int y)
 {
 	int in, m;
@@ -5342,7 +5360,7 @@ void spawn_pandium_rewards(int cn, int fl, int x, int y)
 	// Clear any existing chests
 	if ((in = map[x + y * MAPX].it)!=0) { it[in].used = 0; map[x + y * MAPX].it = 0; }
 	//
-	if 		((fl >= 50 && fl%5==0) && (in = build_item(CR_ITEM, x, y))) { it[in].power=53; it[in].data[0] = 2921; } // Obsidian Crown
+	if 		(fl == 50 && (in = build_item(CR_ITEM, x, y))) { it[in].power=53; it[in].data[0] = 2921; } // Obsidian Crown
 	//
 	else if (fl >=  1 && ch[cn].pandium_floor[2] < 1 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 1; // .
 	else if (fl >= 10 && ch[cn].pandium_floor[2] < 2 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 2; //  .
@@ -5351,16 +5369,16 @@ void spawn_pandium_rewards(int cn, int fl, int x, int y)
 	else if (fl >= 40 && ch[cn].pandium_floor[2] < 5 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 5; // .
 	//
 	else if (fl == 45 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2924; // Exp Scroll 750,000
-	else if (fl == 15 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2923; // Exp Scroll 250,000
+	else if (fl == 15 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2307; // Heavensplitter
 	else if (fl ==  0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 0;    // You get nothing. You lose. Good day, sir.
 	//
-	else if (fl%19==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_SPOT;                 // Spot
-	else if (fl%17==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2307;                    // Heavensplitter
-	else if (fl%13==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POP_SSPEL+RANDOM(7);  // Skua scroll
-	else if (fl%11==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2962;                    // Luck scroll
+	else if (prime_floor(fl) && (in = build_item(CR_AUGM, x-4, y+1))) it[in].data[0] = 4; // Augment Shrine
+	//
+	else if (fl%13==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_SPOT;                 // Spot
+	else if (fl%11==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POP_SSPEL+RANDOM(7);  // Skua scroll
 	else if (fl% 7==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_GPOT;                 // Gpot
 	else if (fl% 5==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_OS_BRV+RANDOM(5);     // Greater attribute scroll
-	else if (fl% 3==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = m;                       // Greater attribute potion
+	else if (fl% 3==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2923;                    // Exp Scroll 250,000
 	else if (fl% 2==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POT_D_HP+RANDOM(3)*6; // Divine potion
 	else if ((in = build_item(CR_ITEM, x, y)))             it[in].data[0] = IT_OS_SK;                // Greater skill scroll
 	

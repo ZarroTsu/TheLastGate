@@ -249,12 +249,6 @@ int use_create_item(int cn, int in)
 		do_area_notify(cn, 0, it[in].x, it[in].y, NT_HITME, cn, 0, 0, 0);
 	}
 	
-	if (it[in2].temp==2921)
-	{
-		it[in2].hp[I_I] = it[in2].end[I_I] = it[in2].mana[I_I] = min(255, max(ch[cn].pandium_floor[0], ch[cn].pandium_floor[1]));
-		it[in2].flags |= IF_UPDATE;
-	}
-
 	return 1;
 }
 
