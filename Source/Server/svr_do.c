@@ -10109,7 +10109,7 @@ void do_attack(int cn, int co, int surround)
 			{
 				die = RANDOM(topdam);
 				
-				if (T_ARTM_SK(cn,  6)) die = max(die, RANDOM(topdam));  // (ArTm) Impact
+				if (T_ARTM_SK(cn,  6)) die = topdam;  // (ArTm) Impact
 				
 				dam += die;
 			}

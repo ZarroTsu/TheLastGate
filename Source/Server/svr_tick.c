@@ -1854,16 +1854,18 @@ int get_meta_stat_value(int cn, int n)
 	{
 		case  9: case 10: case 13: case 14: case 17: case 58:
 			dmg_wpn = ch[cn].weapon;
-			dmg_top = ch[cn].top_damage + (6 + 8);
+			dmg_top = ch[cn].top_damage;
 			dmg_str = do_get_iflag(cn, SF_STRENGTH)?120:100;
 			dmg_bns = ch[cn].dmg_bonus;
 			//
-			dmg_low = ( dmg_wpn*dmg_str/100)/4*dmg_bns/10000;
-			dmg_hgh =   dmg_wpn+dmg_top;
-			dmg_top = ((dmg_top+dmg_top*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
-			dmg_hgh = ((dmg_hgh+dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000)*dmg_str/100)/4*dmg_bns/10000;
+			dmg_low = (  dmg_wpn          * dmg_str/100 * dmg_bns/10000 ) / 4;
+			dmg_hgh = ( (dmg_wpn+dmg_top) * dmg_str/100 * dmg_bns/10000 );
+			dmg_hgh = ( dmg_hgh + dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000 ) / 4;
 			if (T_ARTM_SK(cn, 6))  // (ArTm) Impact
-				dmg_hit = (dmg_low+dmg_hgh*2)/3;
+			{
+				dmg_hit = (dmg_low+dmg_hgh);
+				dmg_low = dmg_hgh;
+			}
 			else
 				dmg_hit = (dmg_low+dmg_hgh)/2;
 			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
@@ -1948,7 +1950,7 @@ int get_meta_stat_value(int cn, int n)
 			value = ch[cn].crit_chance;
 			break;
 		case 13: // Melee Ceiling Damage
-			value = dmg_hgh;
+			value = dmg_hgh+2;
 			break;
 		case 14: // Melee  Floor  Damage
 			value = dmg_low;
