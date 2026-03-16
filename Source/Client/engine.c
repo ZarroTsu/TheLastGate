@@ -2280,31 +2280,22 @@ int get_speedValue(int speedV, int ctickV)
 
 int speedo(int n)
 {
-	int moveSpeedValue;
+	int moveSpd;
 	
-	moveSpeedValue = map[n].ch_speed - map[n].ch_movespd;
-	moveSpeedValue = clamp(moveSpeedValue, 0, (SPEEDMAX-1));
-	return get_speedValue(moveSpeedValue, ctick);
+	moveSpd = map[n].ch_speed - map[n].ch_movespd;
+	moveSpd = clamp(moveSpd, 0, (SPEEDMAX-1));
+	return get_speedValue(moveSpd, ctick);
 }
 
 int speedoMisc(int n)
 {
-	int miscSpeedValue;
+	int miscSpd;
 	
-	miscSpeedValue = map[n].ch_speed;
+	miscSpd = map[n].ch_speed;
 	
-	/*
-		status2 / ch_stat_off values:
-		0 = Attack animation
-		1 = Pickup
-		2 = Drop
-		3 = Give
-		4 = Use
-		5 = Attack animation 2
-		6 = Attack animation 3
-		7 = Bow
-		8 = Wave
-		9 = Use skill (casting)
+	/*	status2 / ch_stat_off values:
+		0 = Attack animation		1 = Pickup					2 = Drop		3 = Give		4 = Use	
+		5 = Attack animation 2		6 = Attack animation 3		7 = Bow			8 = Wave		9 = Use skill (casting)
 	*/
 	
 	switch(map[n].ch_stat_off)
@@ -2313,21 +2304,21 @@ int speedoMisc(int n)
 		case  0:
 		case  5:
 		case  6:
-			miscSpeedValue -= map[n].ch_atkspd;
-			miscSpeedValue  = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
-			return get_speedValue(miscSpeedValue, ctick);
+			miscSpd -= map[n].ch_atkspd;
+			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
+			return get_speedValue(miscSpd, ctick);
 			
 		// 9 == Use skill, mostly casting
 		case  9:
-			miscSpeedValue  = map[n].ch_speed*5/4;
-			miscSpeedValue -= map[n].ch_castspd*3/2;
-			miscSpeedValue  = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
-			return get_speedValue(miscSpeedValue, ctick);
+			miscSpd  = map[n].ch_speed*5/4;
+			miscSpd -= map[n].ch_castspd*3/2;
+			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
+			return get_speedValue(miscSpd, ctick);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
-			miscSpeedValue  = clamp(miscSpeedValue, 0, (SPEEDMAX-1));
-			return get_speedValue(miscSpeedValue, ctick);
+			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
+			return get_speedValue(miscSpd, ctick);
 	}
 }
 
@@ -2741,7 +2732,7 @@ int eng_char(int n)
 		case 160: case 161: case 162: case 163: case 164: case 165: case 166: case 167:
 			map[n].obj_xoff=0;  map[n].obj_yoff=0;
 			tmp = (map[n].ch_status - 160) + SPF_MISC_UP + ((int)(stattab[map[n].ch_stat_off])<<5);
-			m = speedo(n);
+			m = speedoMisc(n);
 			if (m && update)
 			{
 				if ((map[n].ch_status + m) > 167) map[n].ch_status = 160 + ((map[n].ch_status + m) - 167 - 1);
@@ -2753,7 +2744,7 @@ int eng_char(int n)
 		case 168: case 169: case 170: case 171: case 172: case 173: case 174: case 175:
 			map[n].obj_xoff=0;  map[n].obj_yoff=0;
 			tmp = (map[n].ch_status - 168) + SPF_MISC_DOWN + ((int)(stattab[map[n].ch_stat_off])<<5);
-			m = speedo(n);
+			m = speedoMisc(n);
 			if (m && update)
 			{
 				if ((map[n].ch_status + m) > 175) map[n].ch_status = 168 + ((map[n].ch_status + m) - 175 - 1);
@@ -2765,7 +2756,7 @@ int eng_char(int n)
 		case 176: case 177: case 178: case 179: case 180: case 181: case 182: case 183:
 			map[n].obj_xoff=0;  map[n].obj_yoff=0;
 			tmp = (map[n].ch_status - 176) + SPF_MISC_LEFT + ((int)(stattab[map[n].ch_stat_off])<<5);
-			m = speedo(n);
+			m = speedoMisc(n);
 			if (m && update)
 			{
 				if ((map[n].ch_status + m) > 183) map[n].ch_status = 176 + ((map[n].ch_status + m) - 183 - 1);
@@ -2777,7 +2768,7 @@ int eng_char(int n)
 		case 184: case 185: case 186: case 187: case 188: case 189: case 190: case 191:
 			map[n].obj_xoff=0;  map[n].obj_yoff=0;
 			tmp = (map[n].ch_status - 184) + SPF_MISC_RIGHT + ((int)(stattab[map[n].ch_stat_off])<<5);
-			m = speedo(n);
+			m = speedoMisc(n);
 			if (m && update)
 			{
 				if ((map[n].ch_status + m) > 191) map[n].ch_status = 184 + ((map[n].ch_status + m) - 191 - 1);

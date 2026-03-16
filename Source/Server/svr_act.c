@@ -2275,46 +2275,47 @@ int get_speedValue(int speedV, int ctickV)
 
 static inline int speedo(int n)
 {
-	int moveSpeedValue;
+	int moveSpd;
 	
-	moveSpeedValue = ch[n].speed - ch[n].move_speed;
-	moveSpeedValue = clamp(moveSpeedValue, 0, 299);
+	moveSpd = ch[n].speed - ch[n].move_speed;
+	moveSpd = clamp(moveSpd, 0, (SPEED_CAP-1));
 	
-	return get_speedValue(moveSpeedValue, ctick);
+	return get_speedValue(moveSpd, ctick);
 }
 static inline int speedoMisc(int n)
 {
-	int miscSpeedValue;
+	int miscSpd;
 	
-	miscSpeedValue = ch[n].speed;
+	miscSpd = ch[n].speed;
 	
 	switch(ch[n].status2)
 	{
 		// 0, 5, 6 == Attack
-		case    0:
-		case    5:
-		case    6:
-			miscSpeedValue -= ch[n].atk_speed;
-			miscSpeedValue  = clamp(miscSpeedValue, 0, 299);
-			return get_speedValue(miscSpeedValue, ctick);
+		case  0:
+		case  5:
+		case  6:
+			miscSpd -= ch[n].atk_speed;
+			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
+			return get_speedValue(miscSpd, ctick);
 			
 		// 9 == Use skill, mostly casting
-		case    9:
-			miscSpeedValue  = ch[n].speed*5/4;
-			miscSpeedValue -= ch[n].cast_speed*3/2;
-			miscSpeedValue  = clamp(miscSpeedValue, 0, 299);
-			return get_speedValue(miscSpeedValue, ctick);
+		case  9:
+			miscSpd  = ch[n].speed*5/4;
+			miscSpd -= ch[n].cast_speed*3/2;
+			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
+			return get_speedValue(miscSpd, ctick);
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
-			miscSpeedValue  = clamp(miscSpeedValue, 0, 299);
-			return get_speedValue(miscSpeedValue, ctick);
+			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
+			return get_speedValue(miscSpd, ctick);
 	}
 }
 
 void plr_act(int cn)
 {
 	unsigned long long prof;
+	int m;
 	
 	if (ch[cn].stunned==1)
 	{
@@ -2332,475 +2333,427 @@ void plr_act(int cn)
 		act_idle(cn);
 		return;
 	}
-
+	
 	switch(ch[cn].status)
 	{
 		// idle up
-		case   0:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   0: act_idle(cn); plr_doact(cn); return;
 		// idle down
-		case   1:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   1: act_idle(cn); plr_doact(cn); return;
 		// idle left
-		case   2:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   2: act_idle(cn); plr_doact(cn); return;
 		// idle right
-		case   3:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   3: act_idle(cn); plr_doact(cn); return;
 		// idle left-up
-		case   4:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   4: act_idle(cn); plr_doact(cn); return;
 		// idle left-down
-		case   5:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   5: act_idle(cn); plr_doact(cn); return;
 		// idle right-up
-		case   6:
-			act_idle(cn); plr_doact(cn);
-			return;
+		case   6: act_idle(cn); plr_doact(cn); return;
 		// idle right-down
-		case   7:
-			act_idle(cn); plr_doact(cn);
-			return;
-
+		case   7: act_idle(cn); plr_doact(cn); return;
+		
 		// walk up
-		case  16:
-		case  17:
-		case  18:
-		case  19:
-		case  20:
-		case  21:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  16: case  17: case  18: case  19: case  20: case  21: case  22: case  23:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 23)
+				{
+					ch[cn].status = 16 + ((ch[cn].status + m) - 23 - 1); 
+					plr_move_up(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  22: 
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 16; plr_move_up(cn); plr_doact(cn); }
-			return;
-		case  23:
-			if (speedo(cn)) { ch[cn].status = 16 + ((speedo(cn)>1) ? 1 : 0); plr_move_up(cn); plr_doact(cn); }
-			return;
-
+		
 		// walk down
-		case  24:
-		case  25:
-		case  26:
-		case  27:
-		case  28:
-		case  29:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  24: case  25: case  26: case  27: case  28: case  29: case  30: case  31:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 31)
+				{
+					ch[cn].status = 24 + ((ch[cn].status + m) - 31 - 1); 
+					plr_move_down(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  30:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 24; plr_move_down(cn); plr_doact(cn); }
-			return;
-		case  31:
-			if (speedo(cn)) { ch[cn].status = 24 + ((speedo(cn)>1) ? 1 : 0); plr_move_down(cn); plr_doact(cn); }
-			return;
-
+		
 		// walk left
-		case  32:
-		case  33:
-		case  34:
-		case  35:
-		case  36:
-		case  37:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  32: case  33: case  34: case  35: case  36: case  37: case  38: case  39:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 39)
+				{
+					ch[cn].status = 32 + ((ch[cn].status + m) - 39 - 1); 
+					plr_move_left(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  38:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 32; plr_move_left(cn); plr_doact(cn); }
-			return;
-		case  39:
-			if (speedo(cn)) { ch[cn].status = 32 + ((speedo(cn)>1) ? 1 : 0); plr_move_left(cn); plr_doact(cn); }
-			return;
-
+		
 		// walk right
-		case  40:
-		case  41:
-		case  42:
-		case  43:
-		case  44:
-		case  45:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  40: case  41: case  42: case  43: case  44: case  45: case  46: case  47:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 47)
+				{
+					ch[cn].status = 40 + ((ch[cn].status + m) - 47 - 1); 
+					plr_move_right(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  46:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 40; plr_move_right(cn); plr_doact(cn); }
-			return;
-		case  47:
-			if (speedo(cn)) { ch[cn].status = 40 + ((speedo(cn)>1) ? 1 : 0); plr_move_right(cn); plr_doact(cn); }
-			return;
-
+		
 		// left+up:
-		case  48:
-		case  49:
-		case  50:
-		case  51:
-		case  52:
-		case  53:
-		case  54:
-		case  55:
-		case  56:
-		case  57:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  48: case  49: case  50: case  51: case  52: case  53:
+		case  54: case  55: case  56: case  57: case  58: case  59:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 59)
+				{
+					ch[cn].status = 48 + ((ch[cn].status + m) - 59 - 1); 
+					plr_move_leftup(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  58:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 48; plr_move_leftup(cn); plr_doact(cn); }
-			return;
-		case  59:
-			if (speedo(cn)) { ch[cn].status = 48 + ((speedo(cn)>1) ? 1 : 0); plr_move_leftup(cn); plr_doact(cn); }
-			return;
-
+		
 		// left+down
-		case  60:
-		case  61:
-		case  62:
-		case  63:
-		case  64:
-		case  65:
-		case  66:
-		case  67:
-		case  68:
-		case  69:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  60: case  61: case  62: case  63: case  64: case  65:
+		case  66: case  67: case  68: case  69: case  70: case  71:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 71)
+				{
+					ch[cn].status = 60 + ((ch[cn].status + m) - 71 - 1); 
+					plr_move_leftdown(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  70:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 60; plr_move_leftdown(cn); plr_doact(cn); }
-			return;
-		case  71:
-			if (speedo(cn)) { ch[cn].status = 60 + ((speedo(cn)>1) ? 1 : 0); plr_move_leftdown(cn); plr_doact(cn); }
-			return;
-
+		
 		// right+up
-		case  72:
-		case  73:
-		case  74:
-		case  75:
-		case  76:
-		case  77:
-		case  78:
-		case  79:
-		case  80:
-		case  81:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  72: case  73: case  74: case  75: case  76: case  77:
+		case  78: case  79: case  80: case  81: case  82: case  83:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 83)
+				{
+					ch[cn].status = 72 + ((ch[cn].status + m) - 83 - 1); 
+					plr_move_rightup(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  82:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 72; plr_move_rightup(cn); plr_doact(cn); }
-			return;
-		case  83:
-			if (speedo(cn)) { ch[cn].status = 72 + ((speedo(cn)>1) ? 1 : 0); plr_move_rightup(cn); plr_doact(cn); }
-			return;
-
+		
 		// right+down
-		case  84:
-		case  85:
-		case  86:
-		case  87:
-		case  88:
-		case  89:
-		case  90:
-		case  91:
-		case  92:
-		case  93:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  84: case  85: case  86: case  87: case  88: case  89:
+		case  90: case  91: case  92: case  93: case  94: case  95:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 95)
+				{
+					ch[cn].status = 84 + ((ch[cn].status + m) - 95 - 1); 
+					plr_move_rightdown(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  94:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 84; plr_move_rightdown(cn); plr_doact(cn); }
-			return;
-		case  95:
-			if (speedo(cn)) { ch[cn].status = 84 + ((speedo(cn)>1) ? 1 : 0); plr_move_rightdown(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn up to left-up
-		case  96:
-		case  97:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case  96: case  97: case  98: case  99:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 99)
+				{
+					ch[cn].status = 96 + ((ch[cn].status + m) - 99 - 1); 
+					plr_turn_leftup(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  98:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 96; plr_turn_leftup(cn); plr_doact(cn); }
-			return;
-		case  99:
-			if (speedo(cn)) { ch[cn].status = 96 + ((speedo(cn)>1) ? 1 : 0); plr_turn_leftup(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn left-up to left
-		case  100:
-		case  101:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 100: case 101: case 102: case 103:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 103)
+				{
+					ch[cn].status = 100 + ((ch[cn].status + m) - 103 - 1); 
+					plr_turn_left(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  102:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 100; plr_turn_left(cn); plr_doact(cn); }
-			return;
-		case  103:
-			if (speedo(cn)) { ch[cn].status = 100 + ((speedo(cn)>1) ? 1 : 0); plr_turn_left(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn up to right-up
-		case  104:
-		case  105:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 104: case 105: case 106: case 107:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 107)
+				{
+					ch[cn].status = 104 + ((ch[cn].status + m) - 107 - 1); 
+					plr_turn_rightup(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  106:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 104; plr_turn_rightup(cn); plr_doact(cn); }
-			return;
-		case  107:
-			if (speedo(cn)) { ch[cn].status = 104 + ((speedo(cn)>1) ? 1 : 0); plr_turn_rightup(cn); plr_doact(cn); }
-			return;
+			
 
 		// turn right-up to up
-		case  108:
-		case  109:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 108: case 109: case 110: case 111:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 111)
+				{
+					ch[cn].status = 108 + ((ch[cn].status + m) - 111 - 1); 
+					plr_turn_right(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  110:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 108; plr_turn_right(cn); plr_doact(cn); }
-			return;
-		case  111:
-			if (speedo(cn)) { ch[cn].status = 108 + ((speedo(cn)>1) ? 1 : 0); plr_turn_right(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn down to left-down
-		case  112:
-		case  113:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 112: case 113: case 114: case 115:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 115)
+				{
+					ch[cn].status = 112 + ((ch[cn].status + m) - 115 - 1); 
+					plr_turn_leftdown(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  114:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 112; plr_turn_leftdown(cn); plr_doact(cn); }
-			return;
-		case  115:
-			if (speedo(cn)) { ch[cn].status = 112 + ((speedo(cn)>1) ? 1 : 0); plr_turn_leftdown(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn left-down to down
-		case  116:
-		case  117:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 116: case 117: case 118: case 119:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 119)
+				{
+					ch[cn].status = 116 + ((ch[cn].status + m) - 119 - 1); 
+					plr_turn_left(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  118:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 116; plr_turn_left(cn); plr_doact(cn); }
-			return;
-		case  119:
-			if (speedo(cn)) { ch[cn].status = 116 + ((speedo(cn)>1) ? 1 : 0); plr_turn_left(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn down to right-down
-		case  120:
-		case  121:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 120: case 121: case 122: case 123:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 123)
+				{
+					ch[cn].status = 120 + ((ch[cn].status + m) - 123 - 1); 
+					plr_turn_rightdown(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  122:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 120; plr_turn_rightdown(cn); plr_doact(cn); }
-			return;
-		case  123:
-			if (speedo(cn)) { ch[cn].status = 120 + ((speedo(cn)>1) ? 1 : 0); plr_turn_rightdown(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn right-down to right
-		case  124:
-		case  125:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 124: case 125: case 126: case 127:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 127)
+				{
+					ch[cn].status = 124 + ((ch[cn].status + m) - 127 - 1); 
+					plr_turn_right(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  126:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 124; plr_turn_right(cn); plr_doact(cn); }
-			return;
-		case  127:
-			if (speedo(cn)) { ch[cn].status = 124 + ((speedo(cn)>1) ? 1 : 0); plr_turn_right(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn left to left-up
-		case  128:
-		case  129:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 128: case 129: case 130: case 131:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 131)
+				{
+					ch[cn].status = 128 + ((ch[cn].status + m) - 131 - 1); 
+					plr_turn_leftup(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  130:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 128; plr_turn_leftup(cn); plr_doact(cn); }
-			return;
-		case  131:
-			if (speedo(cn)) { ch[cn].status = 128 + ((speedo(cn)>1) ? 1 : 0); plr_turn_leftup(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn left-up to up
-		case  132:
-		case  133:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 132: case 133: case 134: case 135:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 135)
+				{
+					ch[cn].status = 132 + ((ch[cn].status + m) - 135 - 1); 
+					plr_turn_up(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  134:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 132; plr_turn_up(cn); plr_doact(cn); }
-			return;
-		case  135:
-			if (speedo(cn)) { ch[cn].status = 132 + ((speedo(cn)>1) ? 1 : 0); plr_turn_up(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn left to left-down
-		case  136:
-		case  137:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 136: case 137: case 138: case 139:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 139)
+				{
+					ch[cn].status = 136 + ((ch[cn].status + m) - 139 - 1); 
+					plr_turn_leftdown(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  138:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 136; plr_turn_leftdown(cn); plr_doact(cn); }
-			return;
-		case  139:
-			if (speedo(cn)) { ch[cn].status = 136 + ((speedo(cn)>1) ? 1 : 0); plr_turn_leftdown(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn left-down to down
-		case  140:
-		case  141:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 140: case 141: case 142: case 143:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 143)
+				{
+					ch[cn].status = 140 + ((ch[cn].status + m) - 143 - 1); 
+					plr_turn_down(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  142:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 140; plr_turn_down(cn); plr_doact(cn); }
-			return;
-		case  143:
-			if (speedo(cn)) { ch[cn].status = 140 + ((speedo(cn)>1) ? 1 : 0); plr_turn_down(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn right to right-up
-		case  144:
-		case  145:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 144: case 145: case 146: case 147:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 147)
+				{
+					ch[cn].status = 144 + ((ch[cn].status + m) - 147 - 1); 
+					plr_turn_rightup(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  146:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 144; plr_turn_rightup(cn); plr_doact(cn); }
-			return;
-		case  147:
-			if (speedo(cn)) { ch[cn].status = 144 + ((speedo(cn)>1) ? 1 : 0); plr_turn_rightup(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn right-up to right
-		case  148:
-		case  149:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 148: case 149: case 150: case 151:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 151)
+				{
+					ch[cn].status = 148 + ((ch[cn].status + m) - 151 - 1); 
+					plr_turn_up(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  150:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 148; plr_turn_up(cn); plr_doact(cn); }
-			return;
-		case  151:
-			if (speedo(cn)) { ch[cn].status = 148 + ((speedo(cn)>1) ? 1 : 0); plr_turn_up(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn right to right-down
-		case  152:
-		case  153:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 152: case 153: case 154: case 155:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 155)
+				{
+					ch[cn].status = 152 + ((ch[cn].status + m) - 155 - 1); 
+					plr_turn_rightdown(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  154:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 152; plr_turn_rightdown(cn); plr_doact(cn); }
-			return;
-		case  155:
-			if (speedo(cn)) { ch[cn].status = 152 + ((speedo(cn)>1) ? 1 : 0); plr_turn_rightdown(cn); plr_doact(cn); }
-			return;
-
+		
 		// turn right-down to down
-		case  156:
-		case  157:
-			if (speedo(cn)) { ch[cn].status+=speedo(cn); } 
+		case 156: case 157: case 158: case 159:
+			if ((m = speedo(cn)))
+			{
+				if ((ch[cn].status + m) > 159)
+				{
+					ch[cn].status = 156 + ((ch[cn].status + m) - 159 - 1); 
+					plr_turn_down(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  158:
-			if (speedo(cn)== 1) { ch[cn].status++; } 
-			else if (speedo(cn) > 1) { ch[cn].status = 156; plr_turn_down(cn); plr_doact(cn); }
-			return;
-		case  159:
-			if (speedo(cn)) { ch[cn].status = 156 + ((speedo(cn)>1) ? 1 : 0); plr_turn_down(cn); plr_doact(cn); }
-			return;
-
+		
 		// misc up
-		case  160:
-		case  161:
-		case  162:
-		case  163:
-		case  164:
-		case  165:
-			if (speedoMisc(cn)) { ch[cn].status+=speedoMisc(cn); } 
+		case 160: case 161: case 162: case 163: case 164: case 165: case 166: case 167:
+			if ((m = speedoMisc(cn)))
+			{
+				if ((ch[cn].status + m) > 167)
+				{
+					ch[cn].status = 160 + ((ch[cn].status + m) - 167 - 1); 
+					plr_misc(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  166:
-			if (speedoMisc(cn)== 1) { ch[cn].status++; } 
-			else if (speedoMisc(cn) > 1) { ch[cn].status = 160; plr_misc(cn); plr_doact(cn); }
-			return;
-		case  167:
-			if (speedoMisc(cn)) { ch[cn].status = 160 + ((speedoMisc(cn)>1) ? 1 : 0); plr_misc(cn); plr_doact(cn); }
-			return;
-
+		
 		// misc down
-		case  168:
-		case  169:
-		case  170:
-		case  171:
-		case  172:
-		case  173:
-			if (speedoMisc(cn)) { ch[cn].status+=speedoMisc(cn); } 
+		case 168: case 169: case 170: case 171: case 172: case 173: case 174: case 175:
+			if ((m = speedoMisc(cn)))
+			{
+				if ((ch[cn].status + m) > 175)
+				{
+					ch[cn].status = 168 + ((ch[cn].status + m) - 175 - 1); 
+					plr_misc(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  174:
-			if (speedoMisc(cn)== 1) { ch[cn].status++; } 
-			else if (speedoMisc(cn) > 1) { ch[cn].status = 168; plr_misc(cn); plr_doact(cn); }
-			return;
-		case  175:
-			if (speedoMisc(cn)) { ch[cn].status = 168 + ((speedoMisc(cn)>1) ? 1 : 0); plr_misc(cn); plr_doact(cn); }
-			return;
-
+		
 		// misc left
-		case  176:
-		case  177:
-		case  178:
-		case  179:
-		case  180:
-		case  181:
-			if (speedoMisc(cn)) { ch[cn].status+=speedoMisc(cn); } 
+		case 176: case 177: case 178: case 179: case 180: case 181: case 182: case 183:
+			if ((m = speedoMisc(cn)))
+			{
+				if ((ch[cn].status + m) > 183)
+				{
+					ch[cn].status = 176 + ((ch[cn].status + m) - 183 - 1); 
+					plr_misc(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  182:
-			if (speedoMisc(cn)== 1) { ch[cn].status++; } 
-			else if (speedoMisc(cn) > 1) { ch[cn].status = 176; plr_misc(cn); plr_doact(cn); }
-			return;
-		case  183:
-			if (speedoMisc(cn)) { ch[cn].status = 176 + ((speedoMisc(cn)>1) ? 1 : 0); plr_misc(cn); plr_doact(cn); }
-			return;
-
+		
 		// misc right
-		case  184:
-		case  185:
-		case  186:
-		case  187:
-		case  188:
-		case  189:
-			if (speedoMisc(cn)) { ch[cn].status+=speedoMisc(cn); } 
+		case 184: case 185: case 186: case 187: case 188: case 189: case 190: case 191:
+			if ((m = speedoMisc(cn)))
+			{
+				if ((ch[cn].status + m) > 191)
+				{
+					ch[cn].status = 184 + ((ch[cn].status + m) - 191 - 1); 
+					plr_misc(cn); plr_doact(cn);
+				}
+				else
+					ch[cn].status += m;
+			}
 			return;
-		case  190:
-			if (speedoMisc(cn)== 1) { ch[cn].status++; } 
-			else if (speedoMisc(cn) > 1) { ch[cn].status = 184; plr_misc(cn); plr_doact(cn); }
-			return;
-		case  191:
-			if (speedoMisc(cn)) { ch[cn].status = 184 + ((speedoMisc(cn)>1) ? 1 : 0); plr_misc(cn); plr_doact(cn); }
-			return;
-
+		
 		default:
 			xlog("plr_act (svr_act.c): Unknown character status %d for char %d", ch[cn].status, cn);
 			ch[cn].status = 0;
 			return;
-
 	}
 	/* not reached */
 }
