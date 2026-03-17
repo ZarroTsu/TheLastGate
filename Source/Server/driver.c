@@ -5372,7 +5372,7 @@ void spawn_pandium_rewards(int cn, int fl, int x, int y)
 	else if (fl == 15 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 2307; // Heavensplitter
 	else if (fl ==  0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = 0;    // You get nothing. You lose. Good day, sir.
 	//
-	else if (prime_floor(fl) && (in = build_item(CR_AUGM, x-4, y+1))) it[in].data[0] = 4; // Augment Shrine
+	else if (prime_floor(fl) && (in = build_item(CR_AUGM, x, y))) it[in].data[0] = 4; // Augment Shrine
 	//
 	else if (fl%13==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_SPOT;                 // Spot
 	else if (fl%11==0 && (in = build_item(CR_ITEM, x, y))) it[in].data[0] = IT_POP_SSPEL+RANDOM(7);  // Skua scroll
