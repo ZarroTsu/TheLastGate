@@ -2123,13 +2123,13 @@ int get_meta_stat_value(int cn, int n)
 		case 54: // Effective Immunity
 			value = M_SK(cn, SK_IMMUN);
 			if (do_get_iflag(cn, SF_HANGED)) value += M_SK(cn, SK_RESIST)/3;
-			value = more(value, (SPEED_BASE+GET_SPD_ATK(cn))*(T_WARR_SK(cn, 4)*2+TC_SK(cn, 40)), 50);  // (Warr) Dismissal
+			value = more(value, (SPEED_BASE+GET_SPD_ATK(cn))*(T_WARR_SK(cn, 4)*2+TC_SK(cn, 40)), 20);  // (Warr) Dismissal
 			if (do_get_iflag(cn, SF_AM_ECLIPSE)) value = more(n, 25, 1);
 			break;
 		case 55: // Effective Resistance
 			value = M_SK(cn, SK_RESIST);
 			if (do_get_iflag(cn, SF_HANGED)) value -= M_SK(cn, SK_RESIST)/3;
-			value = more(value, (SPEED_BASE+GET_SPD_MOV(cn))*(T_SORC_SK(cn, 12)*2+TC_SK(cn, 60)), 50);  // (Sorc) Dodging
+			value = more(value, (SPEED_BASE+GET_SPD_MOV(cn))*(T_SORC_SK(cn, 12)*2+TC_SK(cn, 60)), 20);  // (Sorc) Dodging
 			break;
 		case 61: // Buffing Apt Bonus
 			value = M_AT(cn, AT_WIL)/4;

@@ -1635,7 +1635,7 @@ int get_target_resistance(int cn, int co)
 		n += T_SORC_SK(co, 12)*2;  // (Sorc) Dodging
 		n +=     TC_SK(co, 60);
 		
-		target_resist = more(target_resist, (SPEED_BASE + GET_SPD_MOV(co))*n, 50);
+		target_resist = more(target_resist, (SPEED_BASE + GET_SPD_MOV(co))*n, 20);
 	}
 	
 	if (IS_SANECHAR(cn))
@@ -1687,7 +1687,7 @@ int get_target_immunity(int cn, int co)
 		n += T_WARR_SK(co,  4)*2;  // (Warr) Dismissal
 		n +=     TC_SK(co, 40);
 		
-		target_immune = more(target_immune, (SPEED_BASE + GET_SPD_ATK(co))*n, 50);
+		target_immune = more(target_immune, (SPEED_BASE + GET_SPD_ATK(co))*n, 20);
 	}
 	
 	// Multiplicative bonuses from defender

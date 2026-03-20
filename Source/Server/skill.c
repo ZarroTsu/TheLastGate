@@ -326,7 +326,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Stamina",                       "+30 to Maximum Endurance.",
 		  6627,                            "" },
 		//"         '         '         ", "         '         '         '         '      "
-		{ "Dismissal",                     "1%% increased effect of Immunity for every 25 ",
+		{ "Dismissal",                     "1%% increased effect of Immunity for every 10 ",
 		  6648,                            "uncapped Attack Speed." },
 		{ "Swiftness",                     "20%% increased total Attack Speed.",
 		  6641,                            "" },
@@ -374,7 +374,7 @@ struct sk_tree sk_tree[10][12]={
 		{ "Fleet-Foot",                    "20%% increased total Movement Speed.",
 		  6659,                            "" },
 		{ "Dodging",                       "1%% increased effect of Resistance for every ",
-		  6648,                            "25 uncapped Movement Speed." }
+		  6648,                            "10 uncapped Movement Speed." }
 	}, // "         '         '         ", "         '         '         '         '      "
 	{	// Summoner
 		{ "Nimbleness",                    "+6 to Cast Speed.",
@@ -388,7 +388,7 @@ struct sk_tree sk_tree[10][12]={
 		  6664,                            "affect Attack Speed." },
 		{ "Spellslinger",                  "20%% increased total Cast Speed.",
 		  6665,                            "" },
-		{ "Tactician",                     "1%% increased effect of Tactics for every 25 ",
+		{ "Tactician",                     "1%% increased effect of Tactics for every 10 ",
 		  6666,                            "uncapped Cast Speed." },
 		//"         '         '         ", "         '         '         '         '      "
 		{ "Mysticism",                     "Your active magic spells gain an additional ",
@@ -617,7 +617,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	  6627,                            "" },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "False Dismissal",               "(+1%%) increased effect of Immunity for every ",
-	  6648,                            "50 uncapped Attack Speed." },
+	  6648,                            "20 uncapped Attack Speed." },
 	{ "False Swiftness",               "(+10%%) incressed total Attack Speed.",
 	  6641,                            "" },
 	{ "Axeman",                        "(+15%%) increased effect of stats granted by ",
@@ -663,7 +663,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "False Fleet-Foot",              "(+10%%) increased total Movement Speed.",
 	  6659,                            "" },
 	{ "False Dodging",                 "(+1%%) increased effect of Resistance for ",
-	  6648,                            "every 50 uncapped Movement Speed." },
+	  6648,                            "every 20 uncapped Movement Speed." },
 	//"         '         '         ", "         '         '         '         '      " ////////
 	{ "False Nimbleness",              "(+3) to Cast Speed.",
 	  6661,                            "" },
@@ -677,7 +677,7 @@ struct sk_tree sk_corrupt[NUM_CORR]={
 	{ "False Spellslinger",            "(+10%%) increased total Cast Speed.",
 	  6665,                            "" },
 	{ "False Tactician",               "(+1%%) increased effect of Tactics for every ",
-	  6666,                            "50 uncapped Cast Speed." },
+	  6666,                            "20 uncapped Cast Speed." },
 	//"         '         '         ", "         '         '         '         '      "
 	{ "False Mysticism",               "Your active magic spells gain an additional ",
 	  6629,                            "(+10%%) Willpower bonus." },

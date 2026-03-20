@@ -11921,7 +11921,7 @@ void really_update_char(int cn)
 			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
 			n +=     TC_SK(cn, 66);
 			
-			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 50);
+			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 20);
 		}
 		
 		if (do_get_iflag(cn, SF_MOON_R)) z = more(z, ch[cn].mana[4], 50);    // [Taro] Moon.R
@@ -11940,7 +11940,7 @@ void really_update_char(int cn)
 			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
 			n +=     TC_SK(cn, 66);
 			
-			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 50);
+			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 20);
 		}
 		
 		if (do_get_iflag(co, SF_MOON_R)) z = more(z, ch[co].mana[4], 50);    // [Taro] Moon.R
