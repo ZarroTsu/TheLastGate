@@ -561,7 +561,7 @@ int sv_terminology(unsigned char *buf)
 			case ST_META_DESC19: memcpy(metaStats[n].desc+180, buf+3, 10); return 13;
 			case ST_META_DESC20: memcpy(metaStats[n].desc+190, buf+3, 10); return 13;
 			case ST_META_VALUES: 
-			              metaStats[n].value   =     *(short int*)(buf+3);
+			              metaStats[n].value   =*(unsigned short*)(buf+3);
 						  metaStats[n].flag    = *(unsigned char*)(buf+5);
 			                        memcpy(metaStats[n].affix, buf+6,  8);
 			              metaStats[n].font   = *(unsigned char*)(buf+14); 
@@ -569,7 +569,6 @@ int sv_terminology(unsigned char *buf)
 			default: break;
 		}
 	}
-	
 	return 16; // Should not be reached
 }
 

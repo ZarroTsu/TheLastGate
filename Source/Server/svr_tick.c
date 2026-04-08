@@ -2271,8 +2271,8 @@ int get_meta_stat_value(int cn, int n)
 		default: break;
 	}
 	
-	if (value >  32750) value =  32750;
-	if (value < -32750) value = -32750;
+	if (value > 65535) value = 65535;
+	if (value <     0) value =     0;
 	
 	return value;
 }
@@ -2315,7 +2315,7 @@ void plr_update_meta_stat_values(int nr, int n)
 	v = get_meta_stat_value(cn, n);
 	
 	buf[1] = ST_META_VALUES;
-	    *(short int*)(buf + 3) = (short int)(v);
+	*(unsigned short*)(buf+ 3) = (unsigned short)(v);
 	*(unsigned char*)(buf + 5) = (unsigned char)metaStats[n].flag;
 	mcpy(buf+6, metaStats[n].affix, 8);
 	*(unsigned char*)(buf +14) = (unsigned char)metaStats[n].font;
