@@ -1955,7 +1955,7 @@ int get_meta_stat_value(int cn, int n)
 			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
 			break;
 		case 56: // Movement Speed					Decimal, 0.00
-			value = max(0, min(SPEED_CAP, (SPEED_CAP-ch[cn].speed) + ch[cn].move_speed));
+			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_MOV(cn)));
 			break;
 		case 16: case 57: //   Cast Speed			Decimal, 0.00
 			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_CAS(cn)));
