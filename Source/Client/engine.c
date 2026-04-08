@@ -2273,9 +2273,9 @@ void eng_flip(unsigned int t)
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
-int get_speedValue(int speedV, int ctickV)
+int get_speedValue(int speedV)
 {
-	return ((SPEEDMAX-speedV)*(ctickV+1)/CTICKMAX - (SPEEDMAX-speedV)*ctickV/CTICKMAX);
+	return ((SPEEDMAX-speedV)*(ctick+1)/CTICKMAX - (SPEEDMAX-speedV)*ctick/CTICKMAX);
 }
 
 int speedo(int n)
@@ -2284,7 +2284,7 @@ int speedo(int n)
 	
 	moveSpd = map[n].ch_speed - map[n].ch_movespd;
 	moveSpd = clamp(moveSpd, 0, (SPEEDMAX-1));
-	return get_speedValue(moveSpd, ctick);
+	return get_speedValue(moveSpd);
 }
 
 int speedoMisc(int n)
@@ -2306,20 +2306,22 @@ int speedoMisc(int n)
 		case  6:
 			miscSpd -= map[n].ch_atkspd;
 			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
-			return get_speedValue(miscSpd, ctick);
+			break;
 			
 		// 9 == Use skill, mostly casting
 		case  9:
 			miscSpd  = map[n].ch_speed*5/4;
 			miscSpd -= map[n].ch_castspd*3/2;
 			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
-			return get_speedValue(miscSpd, ctick);
+			break;
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
 			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
-			return get_speedValue(miscSpd, ctick);
+			break;
 	}
+	
+	return get_speedValue(miscSpd);
 }
 
 int speedstep(int n,int d,int s,int update)

@@ -2268,9 +2268,9 @@ void plr_doact(int cn)
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
-int get_speedValue(int speedV, int ctickV)
+int get_speedValue(int speedV)
 {
-	return ((SPEED_CAP-speedV)*(ctickV+1)/CTICK_MAX - (SPEED_CAP-speedV)*ctickV/CTICK_MAX);
+	return ((SPEED_CAP-speedV)*(ctick+1)/CTICK_MAX - (SPEED_CAP-speedV)*ctick/CTICK_MAX);
 }
 
 static inline int speedo(int n)
@@ -2280,7 +2280,7 @@ static inline int speedo(int n)
 	moveSpd = ch[n].speed - ch[n].move_speed;
 	moveSpd = clamp(moveSpd, 0, (SPEED_CAP-1));
 	
-	return get_speedValue(moveSpd, ctick);
+	return get_speedValue(moveSpd);
 }
 static inline int speedoMisc(int n)
 {
@@ -2296,20 +2296,22 @@ static inline int speedoMisc(int n)
 		case  6:
 			miscSpd -= ch[n].atk_speed;
 			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
-			return get_speedValue(miscSpd, ctick);
+			break;
 			
 		// 9 == Use skill, mostly casting
 		case  9:
 			miscSpd  = ch[n].speed*5/4;
 			miscSpd -= ch[n].cast_speed*3/2;
 			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
-			return get_speedValue(miscSpd, ctick);
+			break;
 			
 		// Default - Shouldn't happen but here as a redundancy
 		default:
 			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
-			return get_speedValue(miscSpd, ctick);
+			break;
 	}
+	
+	return get_speedValue(miscSpd);
 }
 
 void plr_act(int cn)
