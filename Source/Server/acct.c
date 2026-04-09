@@ -837,7 +837,6 @@ void view_character_player(LIST *head)
 	printf("<input type=checkbox name=flags value=%Lu %s>Is POH<br>\n", KIN_POH, (ch[cn].kindred & KIN_POH) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Is POH Leader<br>\n", KIN_POH_LEADER, (ch[cn].kindred & KIN_POH_LEADER) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Is Looting<br>\n", CF_ISLOOTING, (ch[cn].flags & CF_ISLOOTING) ? "checked" : "");
-	printf("<input type=checkbox name=flags value=%Lu %s>Gold List<br>\n", CF_GOLDEN, (ch[cn].flags & CF_GOLDEN) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Black List<br>\n", CF_BLACK, (ch[cn].flags & CF_BLACK) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Has Password<br>\n", CF_PASSWD, (ch[cn].flags & CF_PASSWD) ? "checked" : "");
 	printf("<input type=checkbox name=flags value=%Lu %s>Client Side Update Needed<br>\n", CF_UPDATE, (ch[cn].flags & CF_UPDATE) ? "checked" : "");

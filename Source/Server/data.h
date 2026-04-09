@@ -251,7 +251,7 @@ extern unsigned int mapmarker;
 #define CF_THRALL		(1ull<<37)  // is enthralled NPC
 #define CF_LABKEEPER	(1ull<<38)  // is labkeeper
 #define CF_ISLOOTING	(1ull<<39)  // is currently looting a grave
-#define CF_GOLDEN		(1ull<<40)  // is on "golden list" aka good player
+#define CF_AUTODEPOT	(1ull<<40)  // Automatically deposit certain items
 #define CF_BLACK		(1ull<<41)  // is on "black list" aka bad player
 #define CF_PASSWD		(1ull<<42)  // has passwd set
 #define CF_UPDATE		(1ull<<43)  // client side update needed

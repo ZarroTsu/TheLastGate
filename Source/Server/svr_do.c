@@ -5217,6 +5217,12 @@ void do_depot(int cn, char *topic)
 		}
 	}
 	
+	if (!(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_BANK) && !(ch[cn].flags & CF_GOD))
+	{
+		do_char_log(cn, 0, "You cannot access your depot outside a bank.\n");
+		return;
+	}
+	
 	if (temp)
 	{
 		co = temp;
@@ -6325,11 +6331,6 @@ void do_command(int cn, char *ptr)
 			do_gold(cn, atoi(arg[1]));
 			return;
 		}
-		if (prefix(cmd, "golden") && f_g)
-		{
-			god_set_flag(cn, dbatoi(arg[1]), CF_GOLDEN);
-			return;
-		}
 		if (prefix(cmd, "group") && !f_m)
 		{
 			do_group(cn, arg[1]);
@@ -6570,12 +6571,6 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "listimps") && f_giu)
 		{
 			god_implist(cn);
-			return;
-		}
-		;
-		if (prefix(cmd, "listgolden") && f_giu)
-		{
-			do_list_all_flagged(cn, CF_GOLDEN);
 			return;
 		}
 		;
@@ -17326,8 +17321,6 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 		!(ch[co].flags & CF_MERCHANT) && !(ch[co].flags & CF_BODY) && !(ch[co].flags & CF_GOD) && ch[co].gcm != 9)
 	{
 		do_char_log(cn, 3, "This is char %d, created from template %d, pos %d,%d\n", co, ch[co].temp, ch[co].x, ch[co].y);
-		if (ch[co].flags & CF_GOLDEN)
-			do_char_log(cn, 3, "Golden List.\n");
 		if (ch[co].flags & CF_BLACK)
 			do_char_log(cn, 3, "Black List.\n");
 	}
@@ -17364,15 +17357,8 @@ void do_look_depot(int cn, int co)
 		return;
 	}
 	*/
-
-	if (!(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_BANK) && !(ch[cn].flags & CF_GOD))
-	{
-		do_char_log(cn, 0, "You cannot access your depot outside a bank.\n");
-		return;
-	}
-
+	
 	nr = ch[cn].player;
-
 	
 	buf[0] = SV_LOOK1;
 	*(unsigned short*)(buf + 1)  = 35;

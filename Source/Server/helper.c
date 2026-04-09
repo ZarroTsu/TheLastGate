@@ -2785,21 +2785,16 @@ int cap(int cn, int nr)
 		player[nr].prio += 25;
 	}
 	;                                                               // imps are preferred a lot
-
+	
 	if (cn && (ch[cn].flags & CF_STAFF))
 	{
 		player[nr].prio += 10;
 	}
 	;                                                               // staff is preferred
-
-	if (cn && (ch[cn].flags & CF_GOLDEN))
-	{
-		player[nr].prio += 10;                                  // golden list players are preferred
-
-	}
+	
 	if (cn && (ch[cn].flags & CF_BLACK))
 	{
-		player[nr].prio -= 5;                                   // not blacklisted player get disadvantage
+		player[nr].prio -= 5;                                   // blacklisted player get disadvantage
 
 	}
 	for (n = place = 1; n<MAXPLAYER; n++)

@@ -2582,7 +2582,7 @@ void plr_login(int nr)
 	}
 	*/
 
-	if (!(ch[cn].flags & (CF_GOLDEN | CF_GOD)) && god_is_banned(player[nr].addr))
+	if (!(ch[cn].flags & CF_GOD) && god_is_banned(player[nr].addr))
 	{
 		chlog(cn, "Banned, sent away");
 		plr_logout(0, nr, LO_KICKED);

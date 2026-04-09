@@ -4024,9 +4024,6 @@ void god_set_flag(int cn, int co, unsigned long long flag)
 	case    CF_SAFE:
 		ptr = "safe";
 		break;
-	case    CF_GOLDEN:
-		ptr = "golden list";
-		break;
 	case    CF_BLACK:
 		ptr = "black list";
 		break;
