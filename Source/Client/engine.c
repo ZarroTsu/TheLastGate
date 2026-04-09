@@ -928,11 +928,11 @@ void eng_display_win(int plr_sprite,int init)
 				// Draw catalyst name / corruptor number
 				if ((cn = pl.item_p[n+inv_pos]))
 				{
-					if (pl.item[n+inv_pos] == 16972)  // Soul Catalyst
+					if (pl.item[n+inv_pos] == SPR_CATA)  // Soul Catalyst
 					{
 						copyspritex(6999+cn,xx,yy,hh);			// Draw CA text overlay
 					}
-					else if (pl.item[n+inv_pos] == 6881)  // Corruptor
+					else if (pl.item[n+inv_pos] == SPR_CORR)  // Corruptor
 					{
 						copyspritex(7799      ,xx   ,yy,hh);	// Draw CA text overlay - 'x'
 						copyspritex(7800+cn/16,xx+ 5,yy,hh);	// Draw CA text overlay - 10s digit
@@ -1391,11 +1391,11 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if ((cn = shop.depot_c[dept_page][n]))
 				{
-					if (shop.depot[dept_page][n] == 16972)  // Soul Catalyst
+					if (shop.depot[dept_page][n] == SPR_CATA)  // Soul Catalyst
 					{
 						copyspritex(6999+cn,xx,yy,hh);								// Draw CA text overlay
 					}
-					else if (shop.depot[dept_page][n] == 6881)  // Corruptor
+					else if (shop.depot[dept_page][n] == SPR_CORR)  // Corruptor
 					{
 						copyspritex(7799      ,xx   ,yy,hh);						// Draw CA text overlay - 'x'
 						copyspritex(7800+cn/16,xx+ 5,yy,hh);						// Draw CA text overlay - 10s digit
@@ -1494,11 +1494,11 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if ((cn = shop.item_p[n]))
 				{
-					if (shop.item[n] == 16972)  // Soul Catalyst
+					if (shop.item[n] == SPR_CATA)  // Soul Catalyst
 					{
 						copyspritex(6999+cn,xx,yy,hh);								// Draw CA text overlay
 					}
-					else if (shop.item[n] == 6881)  // Corruptor
+					else if (shop.item[n] == SPR_CORR)  // Corruptor
 					{
 						copyspritex(7799      ,xx   ,yy,hh);						// Draw CA text overlay - 'x'
 						copyspritex(7800+cn/16,xx+ 5,yy,hh);						// Draw CA text overlay - 10s digit

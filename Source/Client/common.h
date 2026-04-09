@@ -588,6 +588,9 @@ struct cplayer {
 #define SPR_CHAR0					2048		// fills 256 slots
 #define SPR_CHAR1					2048		// fills 256 slots
 
+#define SPR_CATA					16971
+#define SPR_CORR					6880
+
 //
 
 #define SPF_IDLE_UP					   0
