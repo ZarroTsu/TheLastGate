@@ -2349,10 +2349,44 @@ int use_ladder(int cn, int in)
 	return 1;
 }
 
+int use_autodepot(int cn, int in)
+{
+	int n, m, in2;
+	
+	// Loop through and check if the item can be stacked with any existing item in the depot
+	for (n = 0; n<ST_PAGES; n++) for (m = 0; m<ST_SLOTS; m++) 
+	{
+		if ((in2 = st[cn].depot[n][m]))
+		{
+			if (god_stack_items(in, in2)==1)
+			{
+				do_update_char(cn);
+				return 1;
+			}
+		}
+	}
+	
+	// Loop through again and look for a blank slot if the item cannot stack with any others
+	for (n = 0; n<ST_PAGES; n++) for (m = 0; m<ST_SLOTS; m++) 
+	{
+		if (!st[cn].depot[n][m]) break;
+	}
+	if (n==ST_SLOTS) return 0;
+	
+	chlog(cn, "Autodepot %s", it[in].name);
+	do_char_log(cn, 5, "You autodepot %s to box %d.\n", itemvowel(in, 1), n+1);
+	
+	st[cn].depot[n][m] = in;
+	it[in].carried = cn;
+	do_update_char(cn);
+	
+	return 1;
+}
+
 int use_bag(int cn, int in)
 {
 	int co, owner;
-	int in2, nr;
+	int in2, nr, ad=0;
 	int emptyinv = 2;
 
 	co = it[in].data[0];
@@ -2391,24 +2425,14 @@ int use_bag(int cn, int in)
 			if (IS_SANEITEM(in2 = ch[co].citem))
 			{
 				god_take_from_char(in2, co);
-				if (god_give_char(in2, cn))
+				
+				ad = 0;
+				
+				if ((ch[cn].flags & CF_AUTODEPOT) && IS_DEPOTITEM(in2))
+					ad = use_autodepot(cn, in2);
+				
+				if (!ad)
 				{
-					chlog(cn, "Autoloot %s", it[in2].name);
-					do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
-					emptyinv = 1;
-				}
-				else
-				{
-					god_give_char(in2, co);
-					do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
-					emptyinv = 0;
-				}
-			}
-			for (nr=0; nr<MAXITEMS; nr++)
-			{
-				if (IS_SANEITEM(in2 = ch[co].item[nr]))
-				{
-					god_take_from_char(in2, co);
 					if (god_give_char(in2, cn))
 					{
 						chlog(cn, "Autoloot %s", it[in2].name);
@@ -2420,7 +2444,35 @@ int use_bag(int cn, int in)
 						god_give_char(in2, co);
 						do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
 						emptyinv = 0;
-						break;
+					}
+				}
+			}
+			for (nr=0; nr<MAXITEMS; nr++)
+			{
+				if (IS_SANEITEM(in2 = ch[co].item[nr]))
+				{
+					god_take_from_char(in2, co);
+					
+					ad = 0;
+				
+					if ((ch[cn].flags & CF_AUTODEPOT) && IS_DEPOTITEM(in2))
+						ad = use_autodepot(cn, in2);
+					
+					if (!ad)
+					{
+						if (god_give_char(in2, cn))
+						{
+							chlog(cn, "Autoloot %s", it[in2].name);
+							do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
+							emptyinv = 1;
+						}
+						else
+						{
+							god_give_char(in2, co);
+							do_char_log(cn, 0, "You couldn't autoloot the %s because your inventory is full.\n", it[in2].reference);
+							emptyinv = 0;
+							break;
+						}
 					}
 				}
 			}

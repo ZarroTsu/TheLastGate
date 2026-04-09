@@ -135,6 +135,7 @@ int is_ascroll(int in);
 
 #define IS_RANSACKGEAR(in)		(IS_EQNECK(in) || IS_EQBELT(in) || IS_EQRING(in) || IS_SOULSTONED(in) || IS_ENCHANTED(in) || IS_UNIQUE(in))
 #define IS_MAGICDROP(in)		(IS_MAGICITEM(in) && IS_RANSACKGEAR(in))
+#define IS_DEPOTITEM(in)		(IS_SOULCAT(in) || IS_CORRUPTOR(in))
 
 
 /* *** TEMPLATES *** */

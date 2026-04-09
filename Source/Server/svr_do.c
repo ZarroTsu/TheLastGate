@@ -928,6 +928,25 @@ void do_toggle_spellknowledge(int cn)
 	}
 }
 
+void do_autodepot(int cn)
+{
+	ch[cn].flags ^= CF_AUTODEPOT;
+	
+	if (ch[cn].flags & CF_AUTODEPOT)
+	{
+		do_char_log(cn, 1, "You will now automatically depot abundant items.\n");
+	}
+	else
+	{
+		do_char_log(cn, 1, "You will no longer automatically depot abundant items.\n");
+	}
+	
+	if (ch[cn].flags & (CF_PLAYER))
+	{
+		chlog(cn, "Set autodepot to %s", (ch[cn].flags & CF_AUTODEPOT) ? "on" : "off");
+	}
+}
+
 void do_autoloot(int cn)
 {
 	ch[cn].flags ^= CF_AUTOLOOT;
