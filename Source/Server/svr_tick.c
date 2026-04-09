@@ -2955,7 +2955,13 @@ void inline plr_change_stat(int nr, unsigned char *a, unsigned char *b, unsigned
 void inline plr_change_power(int nr, unsigned short *a, unsigned short *b, unsigned char code)
 {
 	unsigned char buf[16];
-
+	int cn = player[nr].usnr;
+	int v = 0;
+	
+	if (code == SV_SETCHAR_HP)    v = ch[cn].reserve[0];
+	if (code == SV_SETCHAR_ENDUR) v = ch[cn].reserve[1];
+	if (code == SV_SETCHAR_MANA)  v = ch[cn].reserve[2];
+	
 	if (mcmp(a, b, 12))
 	{
 		buf[0] = code;
@@ -2963,9 +2969,9 @@ void inline plr_change_power(int nr, unsigned short *a, unsigned short *b, unsig
 		*(unsigned short*)(buf + 3)  = b[1];
 		*(unsigned short*)(buf + 5)  = b[2];
 		*(unsigned short*)(buf + 7)  = b[3];
-		*(unsigned short*)(buf + 9)  = b[4];
+		*(unsigned short*)(buf + 9)  = v;
 		*(unsigned short*)(buf + 11) = b[5];
-
+		
 		xsend(nr, buf, 13);
 		mcpy(a, b, 12);
 	}

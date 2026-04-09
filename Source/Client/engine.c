@@ -746,6 +746,7 @@ extern int gui_equ_y[];
 #define GUI_BAR_RED		0xB000
 
 #define GUI_BAR_EXP		0xBB00
+#define GUI_BAR_RES		0x0BB0
 
 #define CHAR_BAR_HP		0x0B00
 #define CHAR_BAR_RD		0xA000
@@ -874,7 +875,7 @@ void eng_display_win(int plr_sprite,int init)
 {
 	int y,n,m,v,pr,hh,xx,yy;
 	char *tmp,buf[50];
-	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df, cn;
+	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df, cn, rs;
 
 	//if (load) dd_xputtext(670,300+MAXTS,1,"%3d%%",load);
 
@@ -1258,16 +1259,20 @@ void eng_display_win(int plr_sprite,int init)
 						copyspritex(4,          gui_equ_x[n]+1, gui_equ_y[n]+1,  0); 
 			}
 			//
-
+			
 			if (selected_char) tmp=lookup(selected_char,0);
 			else tmp=pl.name;
 			dd_xputtext(846+(125-strlen(tmp)*6)/2,32,1,tmp);
-
-
+			
 			// Bar for HP
 			if (pl.hp[5]>0)	n=min(124,pl.hp[5]*62/pl.hp[5]);
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
+			if ((rs=pl.hp[4])>0) // Some is reserved
+			{
+				n=min(124,62*rs/100);
+				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_RES);
+			}
 			if (pl.hp[5]>0)	n=min(124,pl.a_hp*62/pl.hp[5]);
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_GRE);
@@ -1276,6 +1281,11 @@ void eng_display_win(int plr_sprite,int init)
 			if (pl.end[5]>0) n=min(124,pl.end[5]*62/pl.end[5]);
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
+			if ((rs=pl.end[4])>0) // Some is reserved
+			{
+				n=min(124,62*rs/100);
+				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_RES);
+			}
 			if (pl.end[5]>0) n=min(124,pl.a_end*62/pl.end[5]);
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_GRE);
@@ -1284,6 +1294,11 @@ void eng_display_win(int plr_sprite,int init)
 			if (pl.mana[5]>0) n=min(124,pl.mana[5]*62/pl.mana[5]);
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
+			if ((rs=pl.mana[4])>0) // Some is reserved
+			{
+				n=min(124,62*rs/100);
+				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RES);
+			}
 			if (pl.mana[5]>0) n=min(124,pl.a_mana*62/pl.mana[5]);
 			else n=0;
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_GRE);
