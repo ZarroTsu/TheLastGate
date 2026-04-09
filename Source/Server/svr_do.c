@@ -5096,6 +5096,13 @@ int qsort_proc(const void *a, const void *b)
 		else if (it[in].temp > it[in2].temp) return 1;
 		else return 0;
 	}
+	// Sort corruptors
+	if (IS_CORRUPTOR(in) && IS_CORRUPTOR(in2))
+	{
+		if (it[in].data[0] < it[in2].data[0]) return -1;
+		else if (it[in].data[0] > it[in2].data[0]) return 1;
+		else return 0;
+	}
 
 	// fall back to sort by value
 	if (it[in].value>it[in2].value)
