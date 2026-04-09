@@ -3399,7 +3399,8 @@ void plr_change(int nr)
 							*(short int*)(buf + 5) = it[in].sprite[I_I];
 						}
 						*(short int*)(buf + 7) = 0;
-						if (IS_SOULCAT(in)) *(short int*)(buf + 7) = it[in].data[4];
+						if (IS_SOULCAT(in))   *(short int*)(buf + 7) = it[in].data[4];
+						if (IS_CORRUPTOR(in)) *(short int*)(buf + 7) = it[in].data[0];
 						*(unsigned char*)(buf + 9)  = (unsigned char)(it[in].stack);
 						*(unsigned char*)(buf + 10) = (unsigned char)((ch[cn].item_lock[n]?0:0)+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0));
 

@@ -17232,7 +17232,8 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				*(unsigned short*)(buf + 2 + (m - n) * 6) = spr;
 				*(unsigned int*)(buf + 4 + (m - n) * 6) = pr;
 				*(unsigned char*)(buf + 14 + (m - n)) = 0;
-				if (IS_SOULCAT(in)) *(unsigned char*)(buf + 14 + (m - n)) = it[in].data[4];
+				if (IS_SOULCAT(in))   *(unsigned char*)(buf + 14 + (m - n)) = it[in].data[4];
+				if (IS_CORRUPTOR(in)) *(unsigned char*)(buf + 14 + (m - n)) = it[in].data[0];
 			}
 			xsend(nr, buf, 16);
 		}
@@ -17445,11 +17446,12 @@ void do_look_depot(int cn, int co)
 		if ((in = st[co].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)
 		{
 			spr = it[in].sprite[I_I];
-			if (it[in].flags & IF_SOULSTONE) ss = 1; else ss = 0;
-			if (it[in].flags & IF_ENCHANTED) en = 2; else en = 0;
-			if (it[in].flags & IF_CORRUPTED) cr = 4; else cr = 0;
-			if (IS_SOULCAT(in) || IS_CORRUPTOR(in)) ca = it[in].data[4]; else ca = 0;
-			if (it[in].stack) stack = it[in].stack;  else stack = 0;
+			if (it[in].flags & IF_SOULSTONE)  ss = 1;  else ss = 0;
+			if (it[in].flags & IF_ENCHANTED)  en = 2;  else en = 0;
+			if (it[in].flags & IF_CORRUPTED)  cr = 4;  else cr = 0;
+			if (IS_SOULCAT(in))   ca = it[in].data[4]; else ca = 0;
+			if (IS_CORRUPTOR(in)) ca = it[in].data[0]; else ca = 0;
+			if (it[in].stack)  stack = it[in].stack;   else stack = 0;
 		}
 		else
 		{
