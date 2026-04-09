@@ -2164,6 +2164,7 @@ int npc_see(int cn, int co)
 		}
 	}
 	
+	// check for companion attack modes
 	if (IS_COMP_TEMP(cn) && ch[cn].data[1]>=2 && ((ch[cn].alignment>0 && ch[co].alignment<0) || (ch[cn].alignment<0 && ch[co].alignment>0)))
 	{
 		int coma, idx2;
@@ -2221,6 +2222,49 @@ int npc_see(int cn, int co)
 		{
 			npc_saytext_n(cn, 8, NULL);
 			ch[cn].data[94] = globs->ticker;
+			return 1;
+		}
+	}
+	
+	// check if we shouldn't actually be attacking this
+	if (ch[cn].attack_cn == co)
+	{
+		if (ch[cn].data[CHD_GROUP  ]==ch[co].data[CHD_GROUP] 
+		 || ch[cn].data[CHD_GROUP+1]==ch[co].data[CHD_GROUP]
+		 || ch[cn].data[CHD_GROUP+2]==ch[co].data[CHD_GROUP]
+		 || ch[cn].data[CHD_GROUP+3]==ch[co].data[CHD_GROUP]
+		 || ch[cn].data[CHD_GROUP+4]==ch[co].data[CHD_GROUP]
+		 || ch[cn].data[59]==ch[co].data[CHD_GROUP])
+		{
+			ch[cn].attack_cn = 0;
+			ch[co].attack_cn = 0;
+			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
+			if (npc_is_enemy(co, cn)) npc_remove_enemy(co, cn);
+			return 1;
+		}
+		
+		// We shouldn't be attacking our master!
+		if (IS_SANECHAR(ch[cn].data[CHD_MASTER]) && co==ch[cn].data[CHD_MASTER])
+		{
+			ch[cn].attack_cn = 0;
+			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
+			return 1;
+		}
+		
+		// We shouldn't be attacking our companions!
+		if (IS_SANECHAR(ch[co].data[CHD_MASTER]) && cn==ch[co].data[CHD_MASTER])
+		{
+			ch[cn].attack_cn = 0;
+			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
+			return 1;
+		}
+		
+		// We shouldn't be attacking our master's other companions!
+		if (IS_SANECHAR(ch[cn].data[CHD_MASTER]) && IS_SANECHAR(ch[co].data[CHD_MASTER]) 
+			&& ch[cn].data[CHD_MASTER]==ch[co].data[CHD_MASTER])
+		{
+			ch[cn].attack_cn = 0;
+			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
 			return 1;
 		}
 	}
