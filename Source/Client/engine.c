@@ -874,7 +874,7 @@ void eng_display_win(int plr_sprite,int init)
 {
 	int y,n,m,v,pr,hh,xx,yy;
 	char *tmp,buf[50];
-	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df;
+	int buffs[MAXBUFFS][2], debuffs[MAXBUFFS][2], bf, df, cn;
 
 	//if (load) dd_xputtext(670,300+MAXTS,1,"%3d%%",load);
 
@@ -899,62 +899,53 @@ void eng_display_win(int plr_sprite,int init)
 
 		// inventory    251  6
 		for (n=0; n<30; n++) {
+			
+			xx = 261+(n%10)*34;
+			yy =   6+(n/10)*34;
+			hh =   0;
+			
 			// Draw inventory items
 			if (pl.item[n+inv_pos]) {
-				if (hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos)
+				if (hightlight==HL_BACKPACK && hightlight_sub==n+(signed)inv_pos) hh = 16;
+				
+				// Draw item sprite
+				copyspritex(pl.item[n+inv_pos],xx,yy,hh);
+				// Draw lock icon for locked items
+				/*
+				if (pl.item_l[n+inv_pos]&1)
+					copyspritex(4000,xx,yy,hh);
+				*/
+				// Draw soulstone icon 
+				if (pl.item_l[n+inv_pos]&2)
+					copyspritex(4496,xx,yy,hh);
+				// Draw talisman icon 
+				if (pl.item_l[n+inv_pos]&4)
+					copyspritex(4497,xx,yy,hh);
+				// Draw corruption icon 
+				if (pl.item_l[n+inv_pos]&8)
+					copyspritex(6881,xx,yy,hh);
+				// Draw catalyst name / corruptor number
+				if ((cn = pl.item_p[n+inv_pos]))
 				{
-					// Draw item sprite
-					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
-					// Draw lock icon for locked items
-					/*
-					if (pl.item_l[n+inv_pos]&1)
-						copyspritex(4000,261+(n%10)*34,6+(n/10)*34,16);
-					*/
-					// Draw soulstone icon 
-					if (pl.item_l[n+inv_pos]&2)
-						copyspritex(4496,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw talisman icon 
-					if (pl.item_l[n+inv_pos]&4)
-						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw corruption icon 
-					if (pl.item_l[n+inv_pos]&8)
-						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,16);
-					// Draw catalyst name
-					if (pl.item_p[n+inv_pos])
-						copyspritex(6999+pl.item_p[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
-					// Draw stack count 
-					if (pl.item_s[n+inv_pos]>0&&pl.item_s[n+inv_pos]<=10)
-						copyspritex(4000+pl.item_s[n+inv_pos],261+(n%10)*34,6+(n/10)*34,16);
+					if (pl.item[n+inv_pos] == 16972)  // Soul Catalyst
+					{
+						copyspritex(6999+cn,xx,yy,hh);			// Draw CA text overlay
+					}
+					else if (pl.item[n+inv_pos] == 6881)  // Corruptor
+					{
+						copyspritex(7799      ,xx   ,yy,hh);	// Draw CA text overlay - 'x'
+						copyspritex(7800+cn/16,xx+ 5,yy,hh);	// Draw CA text overlay - 10s digit
+						copyspritex(7800+cn%16,xx+10,yy,hh);	// Draw CA text overlay -  1s digit
+					}
 				}
-				else
-				{
-					// Draw item sprite
-					copyspritex(pl.item[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
-					// Draw lock icon for locked items
-					/*
-					if (pl.item_l[n+inv_pos]&1)
-						copyspritex(4000,261+(n%10)*34,6+(n/10)*34,0);
-					*/
-					// Draw soulstone icon 
-					if (pl.item_l[n+inv_pos]&2)
-						copyspritex(4496,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw talisman icon 
-					if (pl.item_l[n+inv_pos]&4)
-						copyspritex(4497,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw corruption icon 
-					if (pl.item_l[n+inv_pos]&8)
-						copyspritex(6881,261+(n%10)*34,6+(n/10)*34,0);
-					// Draw catalyst name
-					if (pl.item_p[n+inv_pos])
-						copyspritex(6999+pl.item_p[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
-					// Draw stack count 
-					if (pl.item_s[n+inv_pos]>0&&pl.item_s[n+inv_pos]<=10)
-						copyspritex(4000+pl.item_s[n+inv_pos],261+(n%10)*34,6+(n/10)*34,0);
-				}
+				
+				// Draw stack count 
+				if (pl.item_s[n+inv_pos]>0&&pl.item_s[n+inv_pos]<=10)
+					copyspritex(4000+pl.item_s[n+inv_pos],xx,yy,hh);
 			}
 			// Draw shortcut key IDs
 			for (m=0; m<20; m++) if (pdata.xbutton[m].skill_nr==100+n+(signed)inv_pos)
-				copyspritex(4011+m,261+(n%10)*34,6+(n/10)*34,0);
+				copyspritex(4011+m,xx,yy,hh);
 		}
 
 		// Prepare spell icons // pl.spell[n] is the SPRITE of the debuff being received.
@@ -1378,11 +1369,25 @@ void eng_display_win(int plr_sprite,int init)
 				
 				if (!pl.citem && hightlight==HL_SHOP && (hightlight_sub%64)==n) hh = 16;
 				
-				copyspritex(shop.depot[dept_page][n],xx,yy,hh);												// Draw Item
-				if (shop.depot_f[dept_page][n] & 1) copyspritex(4496,xx,yy,hh); 							// Draw SS
-				if (shop.depot_f[dept_page][n] & 2) copyspritex(4497,xx,yy,hh); 							// Draw EN
-				if (shop.depot_f[dept_page][n] & 4) copyspritex(6881,xx,yy,hh); 							// Draw CR
-				if (shop.depot_c[dept_page][n])		copyspritex(6999+shop.depot_c[dept_page][n],xx,yy,hh);	// Draw CA
+				copyspritex(shop.depot[dept_page][n],xx,yy,hh);						// Draw Item Sprite
+				if (shop.depot_f[dept_page][n] & 1) copyspritex(4496,xx,yy,hh); 	// Draw SS icon
+				if (shop.depot_f[dept_page][n] & 2) copyspritex(4497,xx,yy,hh); 	// Draw EN icon
+				if (shop.depot_f[dept_page][n] & 4) copyspritex(6881,xx,yy,hh); 	// Draw CR icon
+				
+				if ((cn = shop.depot_c[dept_page][n]))
+				{
+					if (shop.depot[dept_page][n] == 16972)  // Soul Catalyst
+					{
+						copyspritex(6999+cn,xx,yy,hh);								// Draw CA text overlay
+					}
+					else if (shop.depot[dept_page][n] == 6881)  // Corruptor
+					{
+						copyspritex(7799      ,xx   ,yy,hh);						// Draw CA text overlay - 'x'
+						copyspritex(7800+cn/16,xx+ 5,yy,hh);						// Draw CA text overlay - 10s digit
+						copyspritex(7800+cn%16,xx+10,yy,hh);						// Draw CA text overlay -  1s digit
+					}
+				}
+				
 				if (shop.depot_s[dept_page][n]>0&&shop.depot_s[dept_page][n]<=10)							// Draw Stack
 					copyspritex(4000+shop.depot_s[dept_page][n],xx,yy,hh);
 			}
@@ -1471,7 +1476,20 @@ void eng_display_win(int plr_sprite,int init)
 				copyspritex(shop.item[n],xx,yy,hh);
 				if (shop.price[n] & (1<<30))       copyspritex(4496,xx,yy,hh); 
 				if (shop.price[n] & (1<<31))       copyspritex(4497,xx,yy,hh);
-				if (shop.item_p[n]) copyspritex(6999+shop.item_p[n],xx,yy,hh);
+				
+				if ((cn = shop.item_p[n]))
+				{
+					if (shop.item[n] == 16972)  // Soul Catalyst
+					{
+						copyspritex(6999+cn,xx,yy,hh);								// Draw CA text overlay
+					}
+					else if (shop.item[n] == 6881)  // Corruptor
+					{
+						copyspritex(7799      ,xx   ,yy,hh);						// Draw CA text overlay - 'x'
+						copyspritex(7800+cn/16,xx+ 5,yy,hh);						// Draw CA text overlay - 10s digit
+						copyspritex(7800+cn%16,xx+10,yy,hh);						// Draw CA text overlay -  1s digit
+					}
+				}
 				
 				if (hh && ((pr = (shop.price[n] - (shop.price[n]&(1<<30)) - (shop.price[n]&(1<<31))))>0))
 				{

@@ -17448,7 +17448,7 @@ void do_look_depot(int cn, int co)
 			if (it[in].flags & IF_SOULSTONE) ss = 1; else ss = 0;
 			if (it[in].flags & IF_ENCHANTED) en = 2; else en = 0;
 			if (it[in].flags & IF_CORRUPTED) cr = 4; else cr = 0;
-			if (IS_SOULCAT(in)) ca = it[in].data[4]; else ca = 0;
+			if (IS_SOULCAT(in) || IS_CORRUPTOR(in)) ca = it[in].data[4]; else ca = 0;
 			if (it[in].stack) stack = it[in].stack;  else stack = 0;
 		}
 		else
