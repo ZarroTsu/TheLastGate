@@ -746,7 +746,7 @@ extern int gui_equ_y[];
 #define GUI_BAR_RED		0xB000
 
 #define GUI_BAR_EXP		0xBB00
-#define GUI_BAR_RES		0x0BB0
+#define GUI_BAR_RES		0x8410
 
 #define CHAR_BAR_HP		0x0B00
 #define CHAR_BAR_RD		0xA000
@@ -825,6 +825,7 @@ void meta_stat(int flag, int n, int font, char* va, int vb, int vc, char* ve)
 	
 					  dd_xputtext(9,  m+n*14,font,"%-20.20s", va    ); // Left side
 	if (vc>=0)		  dd_xputtext(140,m+n*14,font,"%4d.%02d", vb, vc); // Numeric - Decimal
+	else if (vb==65535) ;
 	else if (vb>=0)	  dd_xputtext(140,m+n*14,font,"%7d",      vb    ); // Numeric
 	else if (flag==2) dd_xputtext(140,m+n*14,font,"%7d",      vb    ); // Numeric - show even if negative
 					  dd_xputtext(189,m+n*14,font,"%-7.7s",   ve    ); // Affix
@@ -1270,7 +1271,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
 			if ((rs=pl.hp[4])>0) // Some is reserved
 			{
-				n=min(124,62*rs/100);
+				n=min(62,62*rs/100);
 				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_RES);
 			}
 			if (pl.hp[5]>0)	n=min(124,pl.a_hp*62/pl.hp[5]);
@@ -1283,7 +1284,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
 			if ((rs=pl.end[4])>0) // Some is reserved
 			{
-				n=min(124,62*rs/100);
+				n=min(62,62*rs/100);
 				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_RES);
 			}
 			if (pl.end[5]>0) n=min(124,pl.a_end*62/pl.end[5]);
@@ -1296,7 +1297,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
 			if ((rs=pl.mana[4])>0) // Some is reserved
 			{
-				n=min(124,62*rs/100);
+				n=min(62,62*rs/100);
 				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RES);
 			}
 			if (pl.mana[5]>0) n=min(124,pl.a_mana*62/pl.mana[5]);
@@ -2306,15 +2307,15 @@ void eng_flip(unsigned int t)
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
-int get_speedValue(int speedV)
+int get_speedValue(int speedV, int tickV)
 {
-	return ((SPEEDMAX-speedV)*(ctick+1)/CTICKMAX - (SPEEDMAX-speedV)*ctick/CTICKMAX);
+	return ((SPEEDMAX-speedV)*(tickV+1)/CTICKMAX - (SPEEDMAX-speedV)*tickV/CTICKMAX);
 }
-int get_castSpeedValue(int speedV)
+int get_castSpeedValue(int speedV, int tickV)
 {
 	int bonus = speedV<(SPEED_CAP*2/5) ? ((SPEED_CAP*2/5)-speedV)*6/(SPEED_CAP*2/5) : 0;
 	
-	return (((SPEEDMAX+100)-(speedV*4/3))*(ctick+1)/CTICKMAX - ((SPEEDMAX+100)-(speedV*4/3))*ctick/CTICKMAX) + bonus;
+	return (((SPEEDMAX+100)-(speedV*4/3))*(tickV+1)/CTICKMAX - ((SPEEDMAX+100)-(speedV*4/3))*tickV/CTICKMAX) + bonus;
 }
 
 int speedo(int n)
@@ -2323,7 +2324,7 @@ int speedo(int n)
 	
 	moveSpd = map[n].ch_speed - map[n].ch_movespd;
 	moveSpd = clamp(moveSpd, 0, (SPEEDMAX-1));
-	return get_speedValue(moveSpd);
+	return get_speedValue(moveSpd, ctick);
 }
 
 int speedoMisc(int n)
@@ -2351,8 +2352,8 @@ int speedoMisc(int n)
 		case  9:
 			miscSpd -= map[n].ch_castspd;
 			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
-			if (map[m].ch_fontcolor==5) // Instant cast limited to Players only
-				return get_castSpeedValue(miscSpd);
+			if (map[n].ch_fontcolor==5) // Instant cast limited to Players only
+				return get_castSpeedValue(miscSpd, ctick);
 			break;
 			
 		// Default - Shouldn't happen but here as a redundancy
@@ -2361,7 +2362,7 @@ int speedoMisc(int n)
 			break;
 	}
 	
-	return get_speedValue(miscSpd);
+	return get_speedValue(miscSpd, ctick);
 }
 
 int speedstep(int n,int d,int s,int update)
