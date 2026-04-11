@@ -1000,6 +1000,8 @@ void eng_display_win(int plr_sprite,int init)
 		dd_xputtext(GUI_EN_COUNT_X,	GUI_EN_COUNT_Y,	1,"Endurance         %3d %3d",pl.a_end,pl.end[5]);
 		dd_xputtext(GUI_MP_COUNT_X,	GUI_MP_COUNT_Y,	1,"Mana              %3d %3d",pl.a_mana,pl.mana[5]);
 		
+		
+		
 		// Money, BSP, CST, OSP
 			dd_xputtext(GUI_MONEY_X,	GUI_MONEY_Y,	1,"      Money");
 		dd_xputtext(GUI_MONEY_X+74,	GUI_MONEY_Y,	1,"%9dG %2dS",pl.gold/100,pl.gold%100);
@@ -1271,7 +1273,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_BLU);
 			if ((rs=pl.hp[4])>0) // Some is reserved
 			{
-				n=min(62,62*rs/100);
+				n=min(62,62*rs/100+1);
 				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_HP,n,6,(unsigned short)GUI_BAR_RES);
 			}
 			if (pl.hp[5]>0)	n=min(124,pl.a_hp*62/pl.hp[5]);
@@ -1284,7 +1286,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_BLU);
 			if ((rs=pl.end[4])>0) // Some is reserved
 			{
-				n=min(62,62*rs/100);
+				n=min(62,62*rs/100+1);
 				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_EN,n,6,(unsigned short)GUI_BAR_RES);
 			}
 			if (pl.end[5]>0) n=min(124,pl.a_end*62/pl.end[5]);
@@ -1297,7 +1299,7 @@ void eng_display_win(int plr_sprite,int init)
 			dd_showbar(GUI_BAR_X,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_BLU);
 			if ((rs=pl.mana[4])>0) // Some is reserved
 			{
-				n=min(62,62*rs/100);
+				n=min(62,62*rs/100+1);
 				dd_showbar(GUI_BAR_X+62-n,GUI_BAR_MP,n,6,(unsigned short)GUI_BAR_RES);
 			}
 			if (pl.mana[5]>0) n=min(124,pl.a_mana*62/pl.mana[5]);
@@ -2350,7 +2352,8 @@ int speedoMisc(int n)
 			
 		// 9 == Use skill, mostly casting
 		case  9:
-			miscSpd -= map[n].ch_castspd;
+			miscSpd  = map[n].ch_speed*2;
+			miscSpd -= map[n].ch_castspd*2;
 			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
 			if (map[n].ch_fontcolor==5) // Instant cast limited to Players only
 				return get_castSpeedValue(miscSpd, ctick);

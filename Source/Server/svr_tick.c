@@ -2952,24 +2952,18 @@ void inline plr_change_stat(int nr, unsigned char *a, unsigned char *b, unsigned
 	}
 }
 
-void inline plr_change_power(int nr, unsigned short *a, unsigned short *b, unsigned char code)
+void inline plr_change_power(int nr, unsigned char r, unsigned char cr, unsigned short *a, unsigned short *b, unsigned char code)
 {
 	unsigned char buf[16];
-	int cn = player[nr].usnr;
-	int v = 0;
 	
-	if (code == SV_SETCHAR_HP)    v = ch[cn].reserve[0];
-	if (code == SV_SETCHAR_ENDUR) v = ch[cn].reserve[1];
-	if (code == SV_SETCHAR_MANA)  v = ch[cn].reserve[2];
-	
-	if (mcmp(a, b, 12))
+	if (mcmp(a, b, 12) || r != cr)
 	{
 		buf[0] = code;
 		*(unsigned short*)(buf + 1)  = b[0];
 		*(unsigned short*)(buf + 3)  = b[1];
 		*(unsigned short*)(buf + 5)  = b[2];
 		*(unsigned short*)(buf + 7)  = b[3];
-		*(unsigned short*)(buf + 9)  = v;
+		*(unsigned short*)(buf + 9)  = cr;
 		*(unsigned short*)(buf + 11) = b[5];
 		
 		xsend(nr, buf, 13);
@@ -3333,9 +3327,13 @@ void plr_change(int nr)
 			plr_change_stat(nr, cpl->attrib[n], ch[cn].attrib[n], SV_SETCHAR_ATTRIB, n);
 		}
 
-		plr_change_power(nr, cpl->hp, ch[cn].hp, SV_SETCHAR_HP);
-		plr_change_power(nr, cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
-		plr_change_power(nr, cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
+		plr_change_power(nr, cpl->reserve[0], ch[cn].reserve[0], cpl->hp, ch[cn].hp, SV_SETCHAR_HP);
+		plr_change_power(nr, cpl->reserve[1], ch[cn].reserve[1], cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
+		plr_change_power(nr, cpl->reserve[2], ch[cn].reserve[2], cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
+		
+		cpl->reserve[0] = ch[cn].reserve[0];
+		cpl->reserve[1] = ch[cn].reserve[1];
+		cpl->reserve[2] = ch[cn].reserve[2];
 		
 		for (n = 0; n<MAXSKILL; n++)
 		{

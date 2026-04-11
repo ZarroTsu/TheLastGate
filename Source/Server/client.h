@@ -122,6 +122,9 @@ struct cplayer
 	// blacksmith slots
 	int    sitem[4];
 	
+	// reservation
+	unsigned char reserve[3];
+	
 	// spells ready
 	short spell[MAXBUFFS];
 	char active[MAXBUFFS];

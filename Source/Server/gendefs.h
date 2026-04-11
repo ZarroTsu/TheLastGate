@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #define VERSION				0x000E03
-#define MINVERSION			0x000E03
+#define MINVERSION			0x000E00
 
 #define DATDIR				".dat"
 

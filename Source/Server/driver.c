@@ -2227,7 +2227,7 @@ int npc_see(int cn, int co)
 	}
 	
 	// check if we shouldn't actually be attacking this
-	if (ch[cn].attack_cn == co)
+	if (ch[cn].attack_cn == co && !IS_PLAYER(cn) && !IS_PLAYER(co))
 	{
 		if (ch[cn].data[CHD_GROUP  ]==ch[co].data[CHD_GROUP] 
 		 || ch[cn].data[CHD_GROUP+1]==ch[co].data[CHD_GROUP]
