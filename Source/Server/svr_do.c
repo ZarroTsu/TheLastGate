@@ -1558,7 +1558,7 @@ void do_help(int cn, char *topic)
 			if (B_SK(cn, SK_PROX) || IS_SEYAN_DU(cn))
 				do_char_log(cn, 1, "#area                  toggle area skills.\n");
 			do_char_log(cn, 1, "#armor                 list armor stats.\n");
-			do_char_log(cn, 1, "#autodepot             automatic grave depoting.\n")
+			do_char_log(cn, 1, "#autodepot             automatic grave depoting.\n");
 			do_char_log(cn, 1, "#autoloot              automatic grave looting.\n");
 			do_char_log(cn, 1, "#axe                   list axe stats.\n");
 			do_char_log(cn, 1, "#belt                  list belt stats.\n");
