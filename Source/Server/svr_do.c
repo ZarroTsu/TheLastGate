@@ -1415,6 +1415,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 6):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#tarot                 list tarot cards.\n");
 			if (ch[cn].house_id)
 				do_char_log(cn, 1, "#tavern                exit the game (@house).\n");
 			do_char_log(cn, 1, "#tell <player> <text>  tells player text.\n");
@@ -1441,6 +1442,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 5):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#shield                list shield stats.\n");
 			do_char_log(cn, 1, "#shout <text>          to all players.\n");
 			if (IS_SEYAN_DU(cn))
 				do_char_log(cn, 1, "#shrine <page>         list unattained shrines.\n");
@@ -1457,7 +1459,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#swap                  swap with facing player.\n");
 			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
-			do_char_log(cn, 1, "#tarot                 list tarot cards.\n");
 		}
 		else if (strcmp(topic, "4")==0)
 		{
@@ -1465,6 +1466,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 4):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#opal                  list opal rings.\n");
 			do_char_log(cn, 1, "#override              you always spell self.\n");
 			do_char_log(cn, 1, "#poles <page>          lists unattained poles.\n");
 			do_char_log(cn, 1, "#quest <page>          list available quests.\n");
@@ -1483,7 +1485,6 @@ void do_help(int cn, char *topic)
 				do_char_log(cn, 1, "#sense                 disable enemy spell msgs.\n");
 			do_char_log(cn, 1, "#silence               you won't hear enemies.\n");
 			do_char_log(cn, 1, "#seen <player>         when last seen here?.\n");
-			do_char_log(cn, 1, "#shield                list shield stats.\n");
 		}
 		else if (strcmp(topic, "3")==0)
 		{
@@ -1491,7 +1492,11 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 3):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
-			do_char_log(cn, 1, "#gctome                gc travels with you.\n");
+			if (IS_ANY_HARA(cn) || IS_SEYAN_DU(cn))
+			{
+				do_char_log(cn, 1, "#gcmax                 list ghostcomp maximums.\n");
+				do_char_log(cn, 1, "#gctome                gc travels with you.\n");
+			}
 			do_char_log(cn, 1, "#gold <amount>         get X gold coins.\n");
 			do_char_log(cn, 1, "#greataxe              list greataxe stats.\n");
 			do_char_log(cn, 1, "#group <player>        group with player.\n");
@@ -1509,7 +1514,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#max                   list character maximums.\n");
 			do_char_log(cn, 1, "#noshout               you won't hear shouts.\n");
 			do_char_log(cn, 1, "#notell                you won't hear tells.\n");
-			do_char_log(cn, 1, "#opal                  list opal rings.\n");
 		}
 		else if (strcmp(topic, "2")==0)
 		{
@@ -1517,6 +1521,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 2):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#bs                    display BS points.\n");
 			do_char_log(cn, 1, "#buffs                 display buff timers.\n");
 			if (ch[cn].house_id)
 			do_char_log(cn, 1, "#change <thing> <val>  adjust house (@house).\n");
@@ -1534,7 +1539,6 @@ void do_help(int cn, char *topic)
 			if (IS_ANY_HARA(cn) || IS_SEYAN_DU(cn))
 			{
 				do_char_log(cn, 1, "#gcbuff                display gc buff timers.\n");
-				do_char_log(cn, 1, "#gcmax                 list ghostcomp maximums.\n");
 			}
 		}
 		else
@@ -1554,12 +1558,12 @@ void do_help(int cn, char *topic)
 			if (B_SK(cn, SK_PROX) || IS_SEYAN_DU(cn))
 				do_char_log(cn, 1, "#area                  toggle area skills.\n");
 			do_char_log(cn, 1, "#armor                 list armor stats.\n");
+			do_char_log(cn, 1, "#autodepot             automatic grave depoting.\n")
 			do_char_log(cn, 1, "#autoloot              automatic grave looting.\n");
 			do_char_log(cn, 1, "#axe                   list axe stats.\n");
 			do_char_log(cn, 1, "#belt                  list belt stats.\n");
 			do_char_log(cn, 1, "#beryl                 list beryl rings.\n");
 			do_char_log(cn, 1, "#bow                   you'll bow.\n");
-			do_char_log(cn, 1, "#bs                    display BS points.\n");
 		}
 		do_char_log(cn, 1, " \n");
 	}
@@ -6028,6 +6032,11 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "addban") && f_gi)
 		{
 			god_add_ban(cn, dbatoi(arg[1]));
+			return;
+		}
+		if (prefix(cmd, "autodepot") && !f_m)
+		{
+			do_autodepot(cn);
 			return;
 		}
 		;
