@@ -2268,15 +2268,19 @@ void plr_doact(int cn)
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
-static inline int get_speedValue(int speedV, int ctickV)
+static inline int get_speedValue(int speedV, int tickV, int cast)
 {
-	return ((SPEED_CAP-speedV)*(ctickV+1)/CTICK_MAX - (SPEED_CAP-speedV)*ctickV/CTICK_MAX);
-}
-static inline int get_castSpeedValue(int speedV, int ctickV)
-{
-	int bonus = speedV<(SPEED_CAP*2/5) ? ((SPEED_CAP*2/5)-speedV)*6/(SPEED_CAP*2/5) : 0;
+	int bonus = 0;
 	
-	return (((SPEED_CAP+100)-(speedV*4/3))*(ctickV+1)/CTICK_MAX - ((SPEED_CAP+100)-(speedV*4/3))*ctickV/CTICK_MAX) + bonus;
+	if (cast)
+	{
+		if (speedV <=   0)                  bonus = 8;
+		if (speedV <=  33 && speedV >   0)  bonus = 4;
+		if (speedV <=  66 && speedV >  33)  bonus = 2;
+		if (speedV <=  99 && speedV >  66)  bonus = 1;
+	}
+	
+	return ((SPEED_CAP-speedV)*(tickV+1)/CTICK_MAX - (SPEED_CAP-speedV)*tickV/CTICK_MAX) + bonus;
 }
 
 static inline int speedo(int n)
@@ -2286,7 +2290,7 @@ static inline int speedo(int n)
 	moveSpd = ch[n].speed - ch[n].move_speed;
 	moveSpd = clamp(moveSpd, 0, (SPEED_CAP-1));
 	
-	return get_speedValue(moveSpd, ctick);
+	return get_speedValue(moveSpd, ctick, 0);
 }
 static inline int speedoMisc(int n)
 {
@@ -2306,11 +2310,10 @@ static inline int speedoMisc(int n)
 			
 		// 9 == Use skill, mostly casting
 		case  9:
-			miscSpd  = ch[n].speed*2;
-			miscSpd -= ch[n].cast_speed*2;
+			miscSpd -= ch[n].cast_speed;
 			miscSpd  = clamp(miscSpd, 0, (SPEED_CAP-1));
 			if (IS_PLAYER(n)) // Instant cast limited to Players only
-				return get_castSpeedValue(miscSpd, ctick);
+				return get_speedValue(miscSpd, ctick, 1);
 			break;
 			
 		// Default - Shouldn't happen but here as a redundancy
@@ -2319,7 +2322,7 @@ static inline int speedoMisc(int n)
 			break;
 	}
 	
-	return get_speedValue(miscSpd, ctick);
+	return get_speedValue(miscSpd, ctick, 0);
 }
 
 void plr_act(int cn)

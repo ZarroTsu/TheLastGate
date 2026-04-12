@@ -8175,7 +8175,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 							quick_teleport(cc, 293, 955);
 							break;
 					}
-					if (tmp>=50 && tmp%5==0)
+					if (tmp==50)
 						do_char_log(cc, 9, "Pandium: \"Claim your crown.\"\n");
 					else if (tmp==1 || tmp==10 || tmp==20 || tmp==30 || tmp==40)
 						do_char_log(cc, 7, "Pandium: \"May we grow ever stronger.\"\n");

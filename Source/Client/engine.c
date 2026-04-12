@@ -2309,15 +2309,19 @@ void eng_flip(unsigned int t)
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
-int get_speedValue(int speedV, int tickV)
+int get_speedValue(int speedV, int tickV, int cast)
 {
-	return ((SPEEDMAX-speedV)*(tickV+1)/CTICKMAX - (SPEEDMAX-speedV)*tickV/CTICKMAX);
-}
-int get_castSpeedValue(int speedV, int tickV)
-{
-	int bonus = speedV<(SPEED_CAP*2/5) ? ((SPEED_CAP*2/5)-speedV)*6/(SPEED_CAP*2/5) : 0;
+	int bonus = 0;
 	
-	return (((SPEEDMAX+100)-(speedV*4/3))*(tickV+1)/CTICKMAX - ((SPEEDMAX+100)-(speedV*4/3))*tickV/CTICKMAX) + bonus;
+	if (cast)
+	{
+		if (speedV <=   0)                  bonus = 8;
+		if (speedV <=  33 && speedV >   0)  bonus = 4;
+		if (speedV <=  66 && speedV >  33)  bonus = 2;
+		if (speedV <=  99 && speedV >  66)  bonus = 1;
+	}
+	
+	return ((SPEEDMAX-speedV)*(tickV+1)/CTICKMAX - (SPEEDMAX-speedV)*tickV/CTICKMAX) + bonus;
 }
 
 int speedo(int n)
@@ -2326,7 +2330,7 @@ int speedo(int n)
 	
 	moveSpd = map[n].ch_speed - map[n].ch_movespd;
 	moveSpd = clamp(moveSpd, 0, (SPEEDMAX-1));
-	return get_speedValue(moveSpd, ctick);
+	return get_speedValue(moveSpd, ctick, 0);
 }
 
 int speedoMisc(int n)
@@ -2352,11 +2356,10 @@ int speedoMisc(int n)
 			
 		// 9 == Use skill, mostly casting
 		case  9:
-			miscSpd  = map[n].ch_speed*2;
-			miscSpd -= map[n].ch_castspd*2;
+			miscSpd -= map[n].ch_castspd;
 			miscSpd  = clamp(miscSpd, 0, (SPEEDMAX-1));
 			if (map[n].ch_fontcolor==5) // Instant cast limited to Players only
-				return get_castSpeedValue(miscSpd, ctick);
+				return get_speedValue(miscSpd, ctick, 1);
 			break;
 			
 		// Default - Shouldn't happen but here as a redundancy
@@ -2365,7 +2368,7 @@ int speedoMisc(int n)
 			break;
 	}
 	
-	return get_speedValue(miscSpd, ctick);
+	return get_speedValue(miscSpd, ctick, 0);
 }
 
 int speedstep(int n,int d,int s,int update)
@@ -2393,13 +2396,13 @@ int speedstep(int n,int d,int s,int update)
 		z--;
 		if (z < 0) z = (CTICKMAX-1);
 		soft_step++;
-		if (get_speedValue(speed, z)) m--;
+		if (get_speedValue(speed, z, 0)) m--;
 	}
 	while (1)
 	{
 		z--;
 		if (z < 0) z = (CTICKMAX-1);
-		if (get_speedValue(speed, z)) break;
+		if (get_speedValue(speed, z, 0)) break;
 		soft_step++;
 	}
 	
@@ -2409,7 +2412,7 @@ int speedstep(int n,int d,int s,int update)
 	
 	while (1)
 	{
-		if (get_speedValue(speed, z)) m--;
+		if (get_speedValue(speed, z, 0)) m--;
 		if (m < 1) break;
 		z++;
 		if (z >= CTICKMAX) z=0;
