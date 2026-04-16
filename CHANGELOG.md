@@ -1,5 +1,28 @@
 # Changelog
 
+## [3.13.0](https://github.com/jamesblack/TheLastGate/compare/v3.12.0...v3.13.0) (2026-04-16)
+
+
+### Features
+
+* Client-Side Reservation display ([67b7a27](https://github.com/jamesblack/TheLastGate/commit/67b7a2742e649b52dad07654ecc5e6553d929af8))
+* Corruptor Item Icon Name Overlays ([077747c](https://github.com/jamesblack/TheLastGate/commit/077747ca0b747aba66be32c115dc01414bfa5f39))
+* Instant casting ([83bca35](https://github.com/jamesblack/TheLastGate/commit/83bca35af10e048a7f7816d4c690442168d9e189))
+* Versioning ([a32e6c4](https://github.com/jamesblack/TheLastGate/commit/a32e6c44a0754acca1f164d4af6c5bdbf03ef117))
+
+
+### Bug Fixes
+
+* fix issue with stubborn actions ([3a59bdc](https://github.com/jamesblack/TheLastGate/commit/3a59bdc1f16544db394bf6b4d373a6701f597d3b))
+* Fixes ([8faa0a1](https://github.com/jamesblack/TheLastGate/commit/8faa0a18ae4c8732898a85ced53efe2866b2e2f8))
+* Sprite number corrections ([77aec42](https://github.com/jamesblack/TheLastGate/commit/77aec42f2ce9de2387a7ab255bd0c04634ffe560))
+* use misc speedo for misc actions ([30b4700](https://github.com/jamesblack/TheLastGate/commit/30b4700fedabfd40beb683a01460cee246fe6f30))
+
+
+### Miscellaneous Chores
+
+* bump version ([6453f05](https://github.com/jamesblack/TheLastGate/commit/6453f0553631d729306c4d25e0bcab86e13834e3))
+
 ## [3.12.0](https://github.com/jamesblack/TheLastGate/compare/v3.11.0...v3.12.0) (2026-02-13)
 
 
