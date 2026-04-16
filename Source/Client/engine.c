@@ -767,7 +767,7 @@ extern int gui_equ_y[];
 #define GUI_BAR_RED		0xB000
 
 #define GUI_BAR_EXP		0xBB00
-#define GUI_BAR_RES     0x0BB0
+#define GUI_BAR_RES     0x8410
 
 #define CHAR_BAR_HP		0x0B00
 #define CHAR_BAR_RD		0xA000
@@ -1232,7 +1232,8 @@ void meta_stat(int flag, int n, int font, char *va, int vb, int vc, char *ve) {
 
     xputtext(9, m + n * 14, font, "%-20.20s", va); // Left Side
     if (vc >= 0) xputtext(140, m + n * 14, font, "%4d.%02d", vb, vc); // Numeric - Decimal
-    else if (vb >= 0) xputtext(140, m + n * 14, font, "%7d", vb); // Numeric
+    else if (vb == 65535) {
+    } else if (vb >= 0) xputtext(140, m + n * 14, font, "%7d", vb); // Numeric
     else if (flag == 2) xputtext(140, m + n * 14, font, "%7d", vb); // Numeric - show even if negative
     xputtext(189, m + n * 14, font, "%-7.7s", ve); // Affix
 }
@@ -2478,15 +2479,15 @@ void eng_flip(unsigned int t) {
 }
 
 // Gets the effective "speed table" value, the same way as a hypothetical table of 1's and 0's would.
-int get_speed_value(int speedV) {
-    return ((SPEED_MAX - speedV) * (ctick + 1) / CTICK_MAX - (SPEED_MAX - speedV) * ctick / CTICK_MAX);
-}
-
-int get_cast_speed_value(int speedV) {
-    int bonus = speedV < (SPEED_CAP * 2 / 5) ? ((SPEED_CAP * 2 / 5) - speedV) * 6 / (SPEED_CAP * 2 / 5) : 0;
-
-    return (((SPEED_MAX + 100) - (speedV * 4 / 3)) * (ctick + 1) / CTICK_MAX - ((SPEED_MAX + 100) - (speedV * 4 / 3)) *
-            ctick / CTICK_MAX) + bonus;
+int get_speed_value(int speedV, int tickV, bool cast) {
+    int bonus = 0;
+    if (cast) {
+        if (speedV <= 0) bonus = 8;
+        if (speedV <= 33 && speedV > 0) bonus = 4;
+        if (speedV <= 66 && speedV > 33) bonus = 2;
+        if (speedV <= 99 && speedV > 66) bonus = 1;
+    }
+    return ((SPEED_MAX - speedV) * (tickV + 1) / CTICK_MAX - (SPEED_MAX - speedV) * tickV / CTICK_MAX) + bonus;
 }
 
 int speedo(int n) {
@@ -2494,7 +2495,7 @@ int speedo(int n) {
 
     moveSpeedValue = map[n].ch_speed - map[n].ch_movespd;
     moveSpeedValue = clamp(moveSpeedValue, 0, (SPEED_MAX - 1));
-    return get_speed_value(moveSpeedValue);
+    return get_speed_value(moveSpeedValue, ctick, false);
 }
 
 int speedoMisc(int n) {
@@ -2527,10 +2528,11 @@ int speedoMisc(int n) {
 
         // 9 == Use skill, mostly casting
         case 9:
-            miscSpeedValue -= map[n].ch_castspd;
+            miscSpeedValue = map[n].ch_speed * 2;
+            miscSpeedValue -= map[n].ch_castspd * 2;
             miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
             if (map[n].ch_fontcolor == 5) // Instant cast limited to Players only
-                return get_cast_speed_value(miscSpeedValue);
+                return get_speed_value(miscSpeedValue, ctick, true);
             break;
 
         // Default - Shouldn't happen but here as a redundancy
@@ -2538,7 +2540,7 @@ int speedoMisc(int n) {
             miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
             break;
     }
-    return get_speed_value(miscSpeedValue);
+    return get_speed_value(miscSpeedValue, ctick, false);
 }
 
 int speedstep(int n, int d, int s, int update) {
@@ -2564,12 +2566,12 @@ int speedstep(int n, int d, int s, int update) {
         z--;
         if (z < 0) z = (CTICK_MAX - 1); // ctick extended from 20 to 24 to 200
         soft_step++;
-        if (get_speed_value(speed)) m--;
+        if (get_speed_value(speed, z, false)) m--;
     }
     while (1) {
         z--;
         if (z < 0) z = (CTICK_MAX - 1); // ctick extended from 20 to 24 to 200
-        if (get_speed_value(speed)) break;
+        if (get_speed_value(speed, z, false)) break;
         soft_step++;
     }
 
@@ -2578,7 +2580,7 @@ int speedstep(int n, int d, int s, int update) {
     m = s - hard_step;
 
     while (1) {
-        if (get_speed_value(speed)) m--;
+        if (get_speed_value(speed, z, false)) m--;
         if (m < 1) break;
         z++;
         if (z >= CTICK_MAX) z = 0; // ctick extended from 20 to 24 to 200
