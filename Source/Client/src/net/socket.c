@@ -281,7 +281,7 @@ int sv_terminology(unsigned char *buf) {
             case ST_META_DESC20: memcpy(meta_stats[n].desc + 190, buf + 3, 10);
                 return 13;
             case ST_META_VALUES:
-                meta_stats[n].value = *(short int *) (buf + 3);
+                meta_stats[n].value = *(unsigned short *) (buf + 3);
                 meta_stats[n].flag = *(unsigned char *) (buf + 5);
                 memcpy(meta_stats[n].affix, buf + 6, 8);
                 meta_stats[n].font = *(unsigned char *) (buf + 14);

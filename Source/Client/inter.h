@@ -277,7 +277,7 @@ struct MetaStat {
 	char font;
 	char name[30];
 	char desc[200];
-	short value;
+	unsigned short value;
 	char decimal;
 	char affix[8];
 };
