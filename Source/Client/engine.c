@@ -3044,7 +3044,7 @@ int eng_char(int n) {
             map[n].obj_xoff = 0;
             map[n].obj_yoff = 0;
             tmp = (map[n].ch_status - 160) + SPF_MISC_UP + ((int) (stattab[map[n].ch_stat_off]) << 5);
-            m = speedo(n);
+            m = speedoMisc(n);
             if (m && update) {
                 if ((map[n].ch_status + m) > 167) map[n].ch_status = 160 + ((map[n].ch_status + m) - 167 - 1);
                 else map[n].ch_status += m;
@@ -3065,7 +3065,7 @@ int eng_char(int n) {
             map[n].obj_xoff = 0;
             map[n].obj_yoff = 0;
             tmp = (map[n].ch_status - 168) + SPF_MISC_DOWN + ((int) (stattab[map[n].ch_stat_off]) << 5);
-            m = speedo(n);
+            m = speedoMisc(n);
             if (m && update) {
                 if ((map[n].ch_status + m) > 175) map[n].ch_status = 168 + ((map[n].ch_status + m) - 175 - 1);
                 else map[n].ch_status += m;
@@ -3086,7 +3086,7 @@ int eng_char(int n) {
             map[n].obj_xoff = 0;
             map[n].obj_yoff = 0;
             tmp = (map[n].ch_status - 176) + SPF_MISC_LEFT + ((int) (stattab[map[n].ch_stat_off]) << 5);
-            m = speedo(n);
+            m = speedoMisc(n);
             if (m && update) {
                 if ((map[n].ch_status + m) > 183) map[n].ch_status = 176 + ((map[n].ch_status + m) - 183 - 1);
                 else map[n].ch_status += m;
@@ -3107,7 +3107,7 @@ int eng_char(int n) {
             map[n].obj_xoff = 0;
             map[n].obj_yoff = 0;
             tmp = (map[n].ch_status - 184) + SPF_MISC_RIGHT + ((int) (stattab[map[n].ch_stat_off]) << 5);
-            m = speedo(n);
+            m = speedoMisc(n);
             if (m && update) {
                 if ((map[n].ch_status + m) > 191) map[n].ch_status = 184 + ((map[n].ch_status + m) - 191 - 1);
                 else map[n].ch_status += m;
