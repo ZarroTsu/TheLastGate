@@ -2,6 +2,10 @@
 EXTERN_C_BEGIN
 #include <stdint.h>
 
+typedef enum {
+    SPRITE_ID_CATALYST = 16972,
+    SPRITE_ID_CORRUPTER = 6881
+} SpriteId;
 
 typedef enum {
     SPRITE_OVERLAY_SOULSTONE = 4496,
@@ -9,6 +13,8 @@ typedef enum {
     SPRITE_OVERLAY_CORRUPTION = 6881,
     SPRITE_OVERLAY_STACK_BASE = 4000, /* + count (1-10) */
     SPRITE_OVERLAY_CATALYST_BASE = 6999, /* + catalyst_id */
+    SPRITE_OVERLAY_CORRUPTER_BASE = 7799,
+    SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE = 7800
 } SpriteOverlayId;
 
 typedef enum {

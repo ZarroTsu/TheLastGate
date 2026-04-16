@@ -24,8 +24,15 @@ void render_shop_item_display(const ItemDisplayInfo *item, int x, int y, int eff
         copyspritex(SPRITE_OVERLAY_TALISMAN, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
-    if (item->flags > 0)
-        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int) item->flags, x, y, effect);
+    if (item->flags > 0) {
+        if (item->sprite == SPRITE_ID_CATALYST) {
+            copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int) item->flags, x, y, effect);
+        } else if (item->sprite == SPRITE_ID_CORRUPTER) {
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_BASE, x, y, effect);
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->flags / 16), x + 5, y, effect);
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->flags % 16), x + 10, y, effect);
+        }
+    }
 }
 
 void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int effect) {
@@ -45,8 +52,15 @@ void render_lockable_item_display(const ItemDisplayInfo *item, int x, int y, int
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
-    if (item->properties.catalyst_id > 0)
-        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+    if (item->properties.raw > 0) {
+        if (item->sprite == SPRITE_ID_CATALYST) {
+            copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+        } else if (item->sprite == SPRITE_ID_CORRUPTER) {
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_BASE, x, y, effect);
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->properties.raw / 16), x + 5, y, effect);
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->properties.raw % 16), x + 10, y, effect);
+        }
+    }
 
     /* Draw stack count overlay */
     if (item->stack > 0 && item->stack <= 10)
@@ -88,8 +102,15 @@ void render_item_display(const ItemDisplayInfo *item, int x, int y, int effect) 
         copyspritex(SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
     /* Draw catalyst overlay (properties = catalyst ID) */
-    if (item->properties.catalyst_id > 0)
-        copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+    if (item->properties.raw > 0) {
+        if (item->sprite == SPRITE_ID_CATALYST) {
+            copyspritex(SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+        } else if (item->sprite == SPRITE_ID_CORRUPTER) {
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_BASE, x, y, effect);
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->properties.raw / 16), x + 5, y, effect);
+            copyspritex(SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->properties.raw % 16), x + 10, y, effect);
+        }
+    }
 
     /* Draw stack count overlay */
     if (item->stack > 0 && item->stack <= 10)
@@ -169,8 +190,15 @@ void render_lockable_item_display_imgui(void *draw_list, const ItemDisplayInfo *
     if (item->flags & LOCKABLE_ITEM_FLAG_CORRUPTION)
         imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CORRUPTION, x, y, effect);
 
-    if (item->properties.catalyst_id > 0)
-        imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+    if (item->properties.raw > 0) {
+        if (item->sprite == SPRITE_ID_CATALYST) {
+            imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CATALYST_BASE + (int) item->properties.catalyst_id, x, y, effect);
+        } else if (item->sprite == SPRITE_ID_CORRUPTER) {
+            imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CORRUPTER_BASE, x, y, effect);
+            imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->properties.raw / 16), x + 5, y, effect);
+            imgui_draw_sprite(draw_list, SPRITE_OVERLAY_CORRUPTER_NUMBER_BASE + (int) (item->properties.raw % 16), x + 10, y, effect);
+        }
+    }
 
     if (item->stack > 0 && item->stack <= 10)
         imgui_draw_sprite(draw_list, SPRITE_OVERLAY_STACK_BASE + item->stack, x, y, effect);
