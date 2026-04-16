@@ -1,5 +1,5 @@
 //
-#define NETWORKING_VERSION 0x000E02
+#define NETWORKING_VERSION 0x000E03
 //
 
 #pragma once
