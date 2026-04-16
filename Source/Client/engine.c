@@ -2466,6 +2466,13 @@ int get_speed_value(int speedV) {
     return ((SPEED_MAX - speedV) * (ctick + 1) / CTICK_MAX - (SPEED_MAX - speedV) * ctick / CTICK_MAX);
 }
 
+int get_cast_speed_value(int speedV) {
+    int bonus = speedV < (SPEED_CAP * 2 / 5) ? ((SPEED_CAP * 2 / 5) - speedV) * 6 / (SPEED_CAP * 2 / 5) : 0;
+
+    return (((SPEED_MAX + 100) - (speedV * 4 / 3)) * (ctick + 1) / CTICK_MAX - ((SPEED_MAX + 100) - (speedV * 4 / 3)) *
+            ctick / CTICK_MAX) + bonus;
+}
+
 int speedo(int n) {
     int moveSpeedValue;
 
@@ -2500,20 +2507,22 @@ int speedoMisc(int n) {
         case 6:
             miscSpeedValue -= map[n].ch_atkspd;
             miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
-            return get_speed_value(miscSpeedValue);
+            break;
 
         // 9 == Use skill, mostly casting
         case 9:
-            miscSpeedValue = map[n].ch_speed * 5 / 4;
-            miscSpeedValue -= map[n].ch_castspd * 3 / 2;
+            miscSpeedValue -= map[n].ch_castspd;
             miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
-            return get_speed_value(miscSpeedValue);
+            if (map[n].ch_fontcolor == 5) // Instant cast limited to Players only
+                return get_cast_speed_value(miscSpeedValue);
+            break;
 
         // Default - Shouldn't happen but here as a redundancy
         default:
             miscSpeedValue = clamp(miscSpeedValue, 0, (SPEED_MAX - 1));
-            return get_speed_value(miscSpeedValue);
+            break;
     }
+    return get_speed_value(miscSpeedValue);
 }
 
 int speedstep(int n, int d, int s, int update) {
