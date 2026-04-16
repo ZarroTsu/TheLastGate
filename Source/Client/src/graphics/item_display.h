@@ -3,8 +3,8 @@ EXTERN_C_BEGIN
 #include <stdint.h>
 
 typedef enum {
-    SPRITE_ID_CATALYST = 16972,
-    SPRITE_ID_CORRUPTER = 6881
+    SPRITE_ID_CATALYST = 16971,
+    SPRITE_ID_CORRUPTER = 6880
 } SpriteId;
 
 typedef enum {
