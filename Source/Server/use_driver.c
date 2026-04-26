@@ -2351,12 +2351,12 @@ int use_ladder(int cn, int in)
 
 int use_autodepot(int cn, int in)
 {
-	int n, m, in2;
+	int m, in2;
 	
 	// Loop through and check if the item can be stacked with any existing item in the depot
-	for (n = 0; n<ST_PAGES; n++) for (m = 0; m<ST_SLOTS; m++) 
+	for (m = 0; m<ST_PAGES*ST_SLOTS; m++)
 	{
-		if ((in2 = st[cn].depot[n][m]))
+		if ((in2 = st[cn].depot[m/ST_SLOTS][m%ST_SLOTS]))
 		{
 			if (god_stack_items(in, in2)==1)
 			{
@@ -2367,16 +2367,16 @@ int use_autodepot(int cn, int in)
 	}
 	
 	// Loop through again and look for a blank slot if the item cannot stack with any others
-	for (n = 0; n<ST_PAGES; n++) for (m = 0; m<ST_SLOTS; m++) 
+	for (m = 0; m<ST_PAGES*ST_SLOTS; m++)
 	{
-		if (!st[cn].depot[n][m]) break;
+		if (!st[cn].depot[m/ST_SLOTS][m%ST_SLOTS]) break;
 	}
-	if (n==ST_PAGES) return 0;
+	if (m==ST_PAGES*ST_SLOTS) return 0;
 	
 	chlog(cn, "Autodepot %s", it[in].name);
-	do_char_log(cn, 5, "You autodepot %s to box %d.\n", itemvowel(in, 1), n+1);
+	do_char_log(cn, 5, "You autodepot %s to box %d.\n", itemvowel(in, 1), m/ST_SLOTS+1);
 	
-	st[cn].depot[n][m] = in;
+	st[cn].depot[m/ST_SLOTS][m%ST_SLOTS] = in;
 	it[in].carried = cn;
 	do_update_char(cn);
 	
