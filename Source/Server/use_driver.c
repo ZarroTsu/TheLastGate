@@ -2371,7 +2371,7 @@ int use_autodepot(int cn, int in)
 	{
 		if (!st[cn].depot[n][m]) break;
 	}
-	if (n==ST_SLOTS) return 0;
+	if (n==ST_PAGES) return 0;
 	
 	chlog(cn, "Autodepot %s", it[in].name);
 	do_char_log(cn, 5, "You autodepot %s to box %d.\n", itemvowel(in, 1), n+1);
