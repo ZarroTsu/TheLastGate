@@ -2361,6 +2361,8 @@ int use_autodepot(int cn, int in)
 			if (god_stack_items(in, in2)==1)
 			{
 				do_update_char(cn);
+				chlog(cn, "Autodepot %s", it[in2].name);
+				do_char_log(cn, 5, "You autodepot %s to box %d.\n", itemvowel(in2, 1), m/ST_SLOTS+1);
 				return 1;
 			}
 		}
