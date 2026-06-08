@@ -1864,7 +1864,7 @@ int get_meta_stat_value(int cn, int n)
 				dmg_low = dmg_hgh/4;
 			dmg_hgh = ( dmg_hgh + dmg_hgh*ch[cn].crit_chance*ch[cn].crit_multi/1000000 ) / 4;
 			dmg_hit = (dmg_low+dmg_hgh+1)/2;
-			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)));
+			dmg_dps = dmg_hit*max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_ATK(cn)))*5/4;
 			break;
 		default: break;
 	}
