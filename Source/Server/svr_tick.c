@@ -2271,7 +2271,7 @@ int get_meta_stat_value(int cn, int n)
 		default: break;
 	}
 	
-	if (value > 65535) value = 65535;
+	if (value > 65530) value = 65530;
 	if (value <     0) value =     0;
 	
 	return value;
