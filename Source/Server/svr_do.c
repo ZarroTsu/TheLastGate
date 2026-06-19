@@ -4506,6 +4506,12 @@ void do_allow(int cn, int co)
 		return;
 	}
 	
+	if (IS_OFF_SEASON(cn, co))
+	{
+		do_char_log(cn, 0, "Sorry, you cannot allow %s to access your graves. They are not in the same season as you.\n", ch[co].name);
+		return;
+	}
+	
 	ch[cn].data[PCD_ALLOW] = co;
 	if (co)
 	{
@@ -4629,6 +4635,12 @@ void do_group(int cn, char *name)
 				return;
 			}
 		}
+		
+		if (IS_OFF_SEASON(cn, co))
+		{
+			do_char_log(cn, 0, "Sorry, you cannot group with %s; they are not in the same season as you.\n", ch[co].name);
+			return;
+		}
 
 		switch(max(getrank(cn), getrank(co)))
 		{
@@ -4657,7 +4669,7 @@ void do_group(int cn, char *name)
 
 		if (abs(tmp = rankdiff(cn, co))>allow)
 		{
-			do_char_log(cn, 0, "Sorry, you cannot group with %s; he is %d ranks %s you. %s maximum distance is %d.\n",
+			do_char_log(cn, 0, "Sorry, you cannot group with %s; they are %d ranks %s you. %s maximum distance is %d.\n",
 			            ch[co].name, abs(tmp), tmp>0 ? "above" : "below", tmp>0 ? "Their" : "Your", allow);
 			return;
 		}
@@ -4761,6 +4773,11 @@ void do_follow(int cn, char *name)
 	{
 		if ((co = ch[cn].data[10])!=0)
 		{
+			if (IS_OFF_SEASON(cn, co))
+			{
+				do_char_log(cn, 0, "Sorry, you cannot follow %s; they are not in the same season as you.\n", ch[co].name);
+				return;
+			}
 			do_char_log(cn, 1, "You're following %s; type '#follow self' to stop.\n", ch[co].name);
 		}
 		else
@@ -12878,7 +12895,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 }
 void do_skill_aura(int cn, int intemp, int in)
 {
-	int co, n, idx;
+	int co, n, idx, skip = 0;
 	int x, xc, xf, xt, y, yc, yf, yt;
 	int r = get_aoe_radius(cn, intemp, GET_PROX(cn));
 	
@@ -12910,7 +12927,12 @@ void do_skill_aura(int cn, int intemp, int in)
 			}
 			else // Target is an ally
 			{
-				do_apply_aura(cn, intemp, co, in, 0);
+				if ((map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA) && 
+					(map[XY2M(ch[co].x, ch[co].y)].flags & MF_ARENA)) skip = 1;
+				if (IS_OPP_CLAN(cn, co))                              skip = 1;
+				if (IS_OFF_SEASON(cn, co))                            skip = 1;
+				if (!skip)
+					do_apply_aura(cn, intemp, co, in, 0);
 			}
 		}
 	}

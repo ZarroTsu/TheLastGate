@@ -273,6 +273,8 @@ int is_ascroll(int in);
 #define IS_BAD_SHADOWTEMP(t)	(((t) >= 1 && (t) <= 23) || ((t) >= 31 && (t) <= 35) || (t) == 1554 || (t) == 347 || (t) == 350)
 #define IS_BAD_SHADOW(cn)		()
 
+#define IS_OFF_SEASON(cn, co)	(IS_PLAYER(cn) && IS_PLAYER(co) && ((ch[(cn)].season == CURRENTSEASON && ch[(co)].season != CURRENTSEASON) || (ch[(co)].season == CURRENTSEASON && ch[(cn)].season != CURRENTSEASON)))
+
 /* *** SKILLS *** */
 
 // Sanity check on skill number

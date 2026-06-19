@@ -915,6 +915,7 @@ void plr_drop(int cn)
 		}
 		it[in].flags |= IF_TAKE | IF_LOOK | IF_MONEY;
 		it[in].value  = tmp;
+		it[in].season = ch[cn].season;
 		strcpy(it[in].reference, "some money");
 		if (tmp>999999)
 		{
