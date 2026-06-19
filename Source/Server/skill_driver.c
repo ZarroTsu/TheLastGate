@@ -587,6 +587,12 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			return 0;
 		}
 		
+		if (buff && ch[co].season == CURRENTSEASON && ch[cn].season != CURRENTSEASON)
+		{
+			do_char_log(cn, 0, "You cannot buff seasoned characters as an out-of-season character.\n");
+			return 0;
+		}
+		
 		if (!buff && (ch[co].flags & CF_STONED))
 		{
 			do_char_log(cn, 0, "Your target is lagging. Try again later.\n");
