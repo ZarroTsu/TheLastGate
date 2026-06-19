@@ -693,6 +693,12 @@ void plr_pickup(int cn)
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
+	if (SEASON_CHECK(cn, in))
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		do_char_log(cn, 0, "This item is out of your season.\n");
+		return;
+	}
 	
 	ch[cn].cerrno = ERR_SUCCESS;
 	do_update_char(cn);

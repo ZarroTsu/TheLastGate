@@ -67,6 +67,7 @@ void discord_top_five(void)
 		if (ch[n].used==USE_EMPTY)				continue;
 		if (!(ch[n].flags & (CF_PLAYER)))		continue;
 		if (ch[n].flags & (CF_GOD | CF_NOLIST))	continue;
+		if (ch[n].season != CURRENTSEASON)		continue;
 		
 		if (j==0 && !IS_SEYAN_DU(n))	continue;
 		if (j==1 && !IS_ARCHTEMPLAR(n))	continue;
@@ -101,9 +102,9 @@ void discord_top_five(void)
 		if (j!=0) fprintf(discordTopA, " \n");
 		switch (j)
 		{
-			case  0: fprintf(discordTopA, "- Top Seyan'du:\n"); break;
-			case  1: fprintf(discordTopA, "- Top Arch-Templar:\n"); break;
-			default: fprintf(discordTopA, "- Top Skalds:\n"); break;
+			case  0: fprintf(discordTopA, "- Top Seasoned Seyan'du:\n"); break;
+			case  1: fprintf(discordTopA, "- Top Seasoned Arch-Templar:\n"); break;
+			default: fprintf(discordTopA, "- Top Seasoned Skalds:\n"); break;
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -160,9 +161,9 @@ void discord_top_five(void)
 		if (j!=DISC_R/3) fprintf(discordTopB, " \n");
 		switch (j)
 		{
-			case  3: fprintf(discordTopA, "- Top Warriors:\n"); break;
-			case  4: fprintf(discordTopB, "- Top Sorcerers:\n"); break;
-			default: fprintf(discordTopB, "- Top Summoners:\n"); break;
+			case  3: fprintf(discordTopA, "- Top Seasoned Warriors:\n"); break;
+			case  4: fprintf(discordTopB, "- Top Seasoned Sorcerers:\n"); break;
+			default: fprintf(discordTopB, "- Top Seasoned Summoners:\n"); break;
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -219,9 +220,9 @@ void discord_top_five(void)
 		if (j!=DISC_R/3*2) fprintf(discordTopC, " \n");
 		switch (j)
 		{
-			case  6: fprintf(discordTopB, "- Top Arch-Harakim:\n"); break;
-			case  7: fprintf(discordTopB, "- Top Bravers:\n"); break;
-			default: fprintf(discordTopC, "- Top Lycanthropes:\n"); break;
+			case  6: fprintf(discordTopB, "- Top Seasoned Arch-Harakim:\n"); break;
+			case  7: fprintf(discordTopB, "- Top Seasoned Bravers:\n"); break;
+			default: fprintf(discordTopC, "- Top Seasoned Lycanthropes:\n"); break;
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -379,8 +380,9 @@ void discord_pandium(void)
 			if (IS_BRAVER(nr[j][m]))      cl = 7;
 			if (IS_LYCANTH(nr[j][m]))     cl = 8;
 
-			fprintf(discordPandium, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+			fprintf(discordPandium, "%c %10.10s S%02d %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
 				ch[nr[j][m]].name, 
+				ch[nr[j][m]].season,
 				IS_RB(nr[j][m]) ? '+' : ' ',
 				IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
 				IS_PURPLE(nr[j][m]) ? '*' : ' ',
@@ -427,10 +429,11 @@ void discord_who(void)
 			showarea = 0;
 		}
 
-		fprintf(discordWho, "%c %.5s %-10.10s %c%c%c %.26s\n",
+		fprintf(discordWho, "%c %.5s %-10.10s S%02d %c%c%c %.26s\n",
 					font ? '+' : ' ',
 		            who_rank_name[getrank(n)],
 		            ch[n].name,
+					ch[n].season,
 					IS_RB(n) ? '+' : ' ',
 					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
 		            IS_PURPLE(n) ? '*' : ' ',

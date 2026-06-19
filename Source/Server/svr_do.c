@@ -5274,7 +5274,16 @@ void do_depot(int cn, char *topic)
 			do_char_log(cn, 0, "This is not one of your characters.\n");
 			return;
 		}
+		if (ch[co].season == CURRENTSEASON && ch[cn].season != CURRENTSEASON)
+		{
+			do_char_log(cn, 0, "You're not allowed to give seasoned characters out-of-season items.\n");
+			return;
+		}
+		
 		do_char_log(cn, 1, "This is %s's depot. Anything you take or leave here will be transferred.\n", ch[co].name);
+		
+		if (ch[cn].season == CURRENTSEASON && ch[co].season != CURRENTSEASON)
+			do_char_log(cn, 5, "Items transferred to out-of-season characters cannot be transferred back!\n");
 	}
 	else
 	{
@@ -10214,12 +10223,18 @@ void do_give(int cn, int co)
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
-
+	if (SEASON_CHECK(co, in))
+	{
+		ch[cn].cerrno = ERR_FAILED;
+		do_char_log(cn, 0, "This item does not match your target's season.\n");
+		return;
+	}
+	
 	ch[cn].cerrno = ERR_SUCCESS;
-
+	
 	do_update_char(cn);
 	do_update_char(co);
-
+	
 	if (in & 0x80000000)
 	{
 		tmp = in & 0x7FFFFFFF;
@@ -16768,6 +16783,7 @@ int do_add_depot(int cn, int in, int nr)
 	
 	st[cn].depot[nr][n] = in;
 	it[in].carried = cn;
+	it[in].season = ch[cn].season;
 	do_update_char(cn);
 	
 	return 1;
@@ -17012,10 +17028,14 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 				do_char_log(cn, 8, "%s is a Purple of Honor.\n", ch[co].reference);
 			}
 		}
-
-		if (ch[co].text[3][0] && (ch[co].flags & CF_PLAYER))
+		
+		if (IS_PLAYER(co))
 		{
-			do_char_log(cn, 0, "%s\n", ch[co].text[3]);
+			if (ch[co].text[3][0])
+				do_char_log(cn, 0, "%s\n", ch[co].text[3]);
+			
+			if (ch[co].season == CURRENTSEASON)
+				do_char_log(cn, 9, "Season %d character.\n", ch[co].season);
 		}
 	}
 

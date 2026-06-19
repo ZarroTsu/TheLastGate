@@ -557,6 +557,11 @@ static void char_info(int cn)
 
 	if (!(ch[cn].flags & CF_GOD))
 	{
+		if (ch[cn].season)
+		{
+			printf("%s is a season %d character.\n", ch[cn].name, ch[cn].season);
+		}
+		
 		printf("%s died %d times, was saved by the gods %d times and\n",
 		       ch[cn].name,
 		       ch[cn].data[14],

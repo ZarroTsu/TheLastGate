@@ -215,6 +215,8 @@ int god_create_item(int temp)
 	// Special case to set stacks for spell scrolls
 	if (it[n].driver==48) it[n].stack = it[n].data[2];
 	
+	it[n].season = -1;
+	
 	prof_stop(23, prof);
 	
 	return(n);
@@ -905,17 +907,25 @@ int god_give_char(int in, int cn)
 	{
 		return 0;
 	}
-	if (IS_PLAYER(cn)) for (n = 0; n<MAXITEMS; n++)
+	if (IS_PLAYER(cn))
 	{
-		in2 = ch[cn].item[n];
-		
-		tmp = god_stack_items(in, in2);
-		
-		if (tmp==0) break;
-		if (tmp==1)
+		if (SEASON_CHECK(cn, in))
 		{
-			do_update_char(cn);
-			return 1;
+			do_char_log(cn, 0, "This item is out of season.\n");
+			return 0;
+		}
+		for (n = 0; n<MAXITEMS; n++)
+		{
+			in2 = ch[cn].item[n];
+			
+			tmp = god_stack_items(in, in2);
+			
+			if (tmp==0) break;
+			if (tmp==1)
+			{
+				do_update_char(cn);
+				return 1;
+			}
 		}
 	}
 	for (n = 0; n<MAXITEMS; n++)
@@ -942,6 +952,7 @@ int god_give_char(int in, int cn)
 	it[in].x = 0;
 	it[in].y = 0;
 	it[in].carried = cn;
+	it[in].season = ch[cn].season;
 
 	do_update_char(cn);
 	return 1;

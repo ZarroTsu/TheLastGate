@@ -154,6 +154,9 @@ void look_has_mod(int cn, int in)
 		do_char_log(cn, 2, "%d more blessing%s. Next in %d kills.\n", 
 			it[in].stack, (it[in].stack>1?"s":""), rank2points(max(0, getitemrank(in, it[in].data[1])))/250*it[in].data[1] - it[in].cost);
 	
+	if (it[in].season == CURRENTSEASON)
+		do_char_log(cn, 9, "Season %d item.\n", it[in].season);
+	
 	if (lega)
 		do_char_log(cn, 9, "Legacy item.\n");
 }

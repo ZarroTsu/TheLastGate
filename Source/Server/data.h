@@ -643,7 +643,9 @@ struct character
 	
 	unsigned short leech[3];        // Leech effects for HP/EN/MP
 	
-	unsigned char olditem[5];       // free slots  11 -> 5
+	char season;                    // Challenge season
+	
+	unsigned char olditem[4];       // free slots
 
 	// items worn
 	unsigned int worn[20];
@@ -1240,7 +1242,9 @@ struct item
 	unsigned char reserve_en[2];	//   2x 1b =  678b // Reservation of EN on an item (inactive/active)
 	unsigned char reserve_mp[2];	//   2x 1b =  680b // Reservation of MP on an item (inactive/active)
 	
-	char freespace[47];				//  47x 1b =  727b // Free slots for future additions
+	char season;					//   1x 1b =  681b // Item season value, assigned on item pickup
+	
+	char freespace[46];				//  46x 1b =  727b // Free slots for future additions
 	
 	unsigned char driver;			//   1x 1b =  728b // Special routines for LOOKSPECIAL and USESPECIAL
 	unsigned int data[10];			//  10x 4b =  768b // Driver data

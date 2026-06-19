@@ -4194,6 +4194,7 @@ int item_repair(int cn, int in, int power, int n, int flag)
 			else if (flag==2)	ch[cn].worn[n] 		= in2;
 			else				ch[cn].item[n] 		= in2;
 			it[in2].carried = cn;
+			it[in2].season = ch[cn].season;
 		}
 		// Uh oh, we have no reference.
 		else

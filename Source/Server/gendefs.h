@@ -9,6 +9,8 @@
 #define VERSION				0x000E04
 #define MINVERSION			0x000E00
 
+#define CURRENTSEASON		0
+
 #define DATDIR				".dat"
 
 #define TICKS				20
