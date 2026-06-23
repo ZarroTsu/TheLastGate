@@ -3292,12 +3292,12 @@ int spell_rally(int cn, int co, int power)
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
 	
-	if (cn == co) power = less(power, 25, 1);
+	//if (cn == co) power = less(power, 25, 1);
 	
 	if (!(in = make_new_buff(cn, SK_WARCRY3, BUF_SPR_WARCRY3, power, SP_DUR_RALLY, 1))) 
 		return 0;
 	
-	for (n=0; n<5; n++) bu[in].attrib[n] = min(127, 3 + ((power*2/3)-(4-n))/5);
+	for (n=0; n<5; n++) bu[in].attrib[n] = min(127, 3 + ((power/3)-(4-n))/5);
 	
 	bu[in].data[4] = 1;  // Effects not removed by NMZ
 	
@@ -3400,13 +3400,13 @@ int spell_warcry(int cn, int co, int power, int flag)
 	if (!(in = make_new_buff(cn, SK_WARCRY, BUF_SPR_WARCRY, power, SP_DUR_WARCRY, 0)))
 		return 0;
 	
-	if (IS_PLAYER(cn) && IS_ARCHTEMPLAR(cn))
+	if (IS_PLAYER(cn))
 	{
-		for (n = 0; n<5; n++) bu[in].attrib[n] = -(4+((power*5/8)-n) / 5);
+		for (n = 0; n<5; n++) bu[in].attrib[n] = -(3+((power*2/3)-n) / 5);
 	}
 	else
 	{
-		for (n = 0; n<5; n++) bu[in].attrib[n] = -(3+(power/2-n) / 5);
+		for (n = 0; n<5; n++) bu[in].attrib[n] = -(3+(power/3-n) / 5);
 	}
 	
 	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_WARCRY)

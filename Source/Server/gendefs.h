@@ -327,11 +327,11 @@
 #define SP_MULT_IDENTIFY	180
 #define SP_MULT_DISPEL		 90
 #define SP_MULT_DISPEL2		 80
-#define SP_MULT_WEAKEN		110
-#define SP_MULT_WEAKEN2		105
-#define SP_MULT_WARCRY		 95
+#define SP_MULT_WEAKEN		120
+#define SP_MULT_WEAKEN2		125
+#define SP_MULT_WARCRY		115
 #define SP_MULT_TAUNT		100
-#define SP_MULT_BLIND		125
+#define SP_MULT_BLIND		130
 
 // -------- Damage Multipliers -------- //
 
@@ -598,10 +598,10 @@ extern char *at_short[];
 #define DESC_BLOODYSCY		"When equipped, this weapon can be used to freely cast Cleave, with power equal to 1/2 of your uncapped hitpoints.\n"
 #define DESC_GOLDGLAIVE		"When equipped, your Ghost Companion will use Warcry instead of Taunt, based on its Taunt skill modifier.\n"
 #define DESC_KELPTRID		"When equipped, grants +30 to action speed while underwater.\n"
-#define DESC_FLAGBEAR		"When equipped, this weapon can be used to freely cast Rally, with power equal to your uncapped endurance.\n"
+#define DESC_FLAGBEAR		"When equipped, this weapon can be used to freely cast Rally, with power equal to half of your total Willpower.\n"
 #define DESC_FROSTGLASS		"When equipped, this shield can be used to cast Slow, with power equal to your total Shield skill modifier.\n"
 #define DESC_PHALANX		"When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 2%% damage reduction per 5 endurance spent.\n"
-#define DESC_RISINGPHO		"When equipped, this shield can be used to freely cast Immolate, with power equal to 30%% of your uncapped hitpoints and a base radius of 2. Sources of Leech do not provide healing for Immolate, and instead provide increased damage.\n"
+#define DESC_RISINGPHO		"When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints and a base radius of 2. Sources of Leech do not provide healing for Immolate, and instead provide increased damage.\n"
 #define DESC_THEWALL		"When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n"
 #define DESC_BARBSWORD		"When equipped, your active melee skills gain an additional 5%% Strength bonus.\n"
 #define DESC_LAMEDARG		"Thine worth shall be proven. %d remain.\n", max(0, REQ_LAME-it[in].data[0])
