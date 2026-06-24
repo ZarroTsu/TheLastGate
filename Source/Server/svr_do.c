@@ -10925,6 +10925,8 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
 		if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
 		
+		// HAS_ENCHANT(in,   n)
+		
 		if (it[in].enchantment==  1) do_set_iflag(cn, SF_EN_MOREAV);
 		if (it[in].enchantment==  2) do_set_iflag(cn, SF_EN_HEALIT);
 		if (it[in].enchantment==  3) do_set_iflag(cn, SF_EN_NOTRAPS);
