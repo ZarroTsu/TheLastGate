@@ -3329,9 +3329,12 @@ int skill_rally(int cn, int power)
 				m2 = XY2M(ch[co].x, ch[co].y);
 				if ( IS_PLAYER(cn) && !(IS_PLAYER(co) || IS_PLAYER_COMP(co)))           skip = 1;
 				if (!IS_PLAYER(cn) &&  (IS_PLAYER(co) || IS_PLAYER_COMP(co)))           skip = 1;
-				if (IS_OPP_CLAN(cn, co))                                                skip = 1;
 				if (!IS_PLAYER(cn) && ch[cn].data[CHD_GROUP] != ch[co].data[CHD_GROUP]) skip = 1;
-				if ((map[m1].flags & MF_ARENA) && (map[m2].flags & MF_ARENA))           skip = 1;
+				if (!(isgroup(cn, co) && isgroup(co, cn)))
+				{
+					if (IS_OPP_CLAN(cn, co))                                            skip = 1;
+					if ((map[m1].flags & MF_ARENA) && (map[m2].flags & MF_ARENA))       skip = 1;
+				}
 				if (IS_OFF_SEASON(cn, co))                                              skip = 1;
 				if (skip)
 				{

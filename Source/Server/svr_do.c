@@ -12929,10 +12929,13 @@ void do_skill_aura(int cn, int intemp, int in)
 			}
 			else // Target is an ally
 			{
-				if ((map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA) && 
-					(map[XY2M(ch[co].x, ch[co].y)].flags & MF_ARENA)) skip = 1;
-				if (IS_OPP_CLAN(cn, co))                              skip = 1;
-				if (IS_OFF_SEASON(cn, co))                            skip = 1;
+				if (!(isgroup(cn, co) && isgroup(co, cn)))
+				{
+					if ((map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA) && 
+						(map[XY2M(ch[co].x, ch[co].y)].flags & MF_ARENA)) skip = 1;
+					if (IS_OPP_CLAN(cn, co))                              skip = 1;
+				}
+				if (IS_OFF_SEASON(cn, co))                                skip = 1;
 				if (!skip)
 					do_apply_aura(cn, intemp, co, in, 0);
 			}
