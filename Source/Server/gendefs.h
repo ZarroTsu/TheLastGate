@@ -631,6 +631,15 @@ extern char *at_short[];
 
 // -------- Enchantments -------- //
 
+#define EN_WEAPN(n)			(n==49||n==62||n==66||n==67||n==77||n==87)
+#define EN_ARMOR(n)			(n== 7||n==26||n==52||n==63||n==68||n==89)
+#define EN_HELMS(n)			(n== 3||n==14||n==25||n==32||n==60||n==71||n==82||n==85)
+#define EN_CHEST(n)			(n== 2||n==16||n==23||n==33||n==35||n==74||n==81||n==90)
+#define EN_GLOVE(n)			(n== 8||n==19||n==29||n==38||n==46||n==53||n==59||n==86)
+#define EN_CLOAK(n)			(n== 5||n==10||n==21||n==31||n==41||n==56||n==61||n==75)
+#define EN_BOOTS(n)			(n== 4||n==15||n==30||n==37||n==65||n==70||n==72||n==88)
+#define EN_ACCES(n)			(n==11||n==22||n==54||n==79||n==80||n==83)
+
 #define DESC_EN_WEAPN		"[Weapons Only] "
 #define DESC_EN_ARMOR		"[Armor Pieces Only] "
 #define DESC_EN_HELMS		"[Helmet Only] "
@@ -640,97 +649,101 @@ extern char *at_short[];
 #define DESC_EN_BOOTS		"[Boots Only] "
 #define DESC_EN_ACCES		"[Accessories Only] "
 
-#define DESC_EN_1(in)		"%-12.12s  %+4d\n", "Braveness", 4
-#define DESC_EN_2(in)		"8%% more total Armor Value.\n"
+#define DESC_EN_1(in)		"%-12.12s  %+4d\n", "Braveness",    (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_7(in)		"%-12.12s  %+4d\n", "AoE Bonus",    (IS_TWOHAND(in)?2:1) * 1
+#define DESC_EN_9(in)		"%-12.12s  %+4d\n", "Move Speed",   (IS_TWOHAND(in)?2:1) * 10
+#define DESC_EN_11(in)		"%-12.12s  %+4d\n", "HP & Mana",    (IS_TWOHAND(in)?2:1) * 35
+#define DESC_EN_12(in)		"%-12.12s  %+4d\n", "WV & AV",      (IS_TWOHAND(in)?2:1) * 2
+#define DESC_EN_13(in)		"%-12.12s  %+4d\n", "Willpower",    (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_18(in)		"%-12.12s  %+4d\n", "Mana",         (IS_TWOHAND(in)?2:1) * 30
+#define DESC_EN_20(in)		"%-12.12s  %+4d\n", "Cast Speed",   (IS_TWOHAND(in)?2:1) * 5
+#define DESC_EN_24(in)		"%-12.12s  %+4d\n", "Intuition",    (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_28(in)		"%-12.12s  %+4d\n", "Spellpower",   (IS_TWOHAND(in)?2:1) * 1
+#define DESC_EN_34(in)		"%-12.12s  %+4d\n", "Agility",      (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_39(in)		"%-12.12s  %+4d\n", "Atk Speed",    (IS_TWOHAND(in)?2:1) * 5
+#define DESC_EN_40(in)		"%-12.12s  %+4d\n", "Weapon Value", (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_42(in)		"%-12.12s  %+4d\n", "Parry Bonus",  (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_43(in)		"%-12.12s  %+4d\n", "Strength",     (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_45(in)		"%-12.12s  %+4d\n", "Hitpoints",    (IS_TWOHAND(in)?2:1) * 30
+#define DESC_EN_47(in)		"%-12.12s  %+4d\n", "Endurance",    (IS_TWOHAND(in)?2:1) * 30
+#define DESC_EN_48(in)		"%-12.12s  %+4d\n", "Hit Bonus",    (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_49(in)		"%-12.12s  %+4d\n", "Base Crit",    (IS_TWOHAND(in)?2:1) * 1
+#define DESC_EN_50(in)		"%-12.12s  %+4d\n", "Armor Value",  (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_51(in)		"%-12.12s  %+4d\n", "All Attribs",  (IS_TWOHAND(in)?2:1) * 2
+#define DESC_EN_55(in)		"%-12.12s  %+4d\n", "Hit & Parry",  (IS_TWOHAND(in)?2:1) * 2
+#define DESC_EN_58(in)		"%-12.12s  %+4d\n", "Spell Apt",    (IS_TWOHAND(in)?2:1) * 5
+#define DESC_EN_64(in)		"%-12.12s  %+4d\n", "Crit Multi",   (IS_TWOHAND(in)?2:1) * 10
+#define DESC_EN_69(in)		"%-12.12s  %+4d\n", "All Speed",    (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_73(in)		"%-12.12s  %+4d\n", "Top Damage",   (IS_TWOHAND(in)?2:1) * 6
+#define DESC_EN_76(in)		"%-12.12s  %+4d\n", "Crit Bonus",   (IS_TWOHAND(in)?2:1) * 25
+#define DESC_EN_78(in)		"%-12.12s  %+4d\n", "Thorns",       (IS_TWOHAND(in)?2:1) * 5
+#define DESC_EN_91(in)		"%-12.12s  %+4d\n", "Cooldown",     (IS_TWOHAND(in)?2:1) * 5
+
+#define DESC_EN_6(in)		"%d%% more total Braveness.\n",     (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_17(in)		"%d%% more total Willpower.\n",     (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_27(in)		"%d%% more total Intuition.\n",     (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_36(in)		"%d%% more total Agility.\n",       (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_44(in)		"%d%% more total Strength.\n",      (IS_TWOHAND(in)?2:1) * 3
+#define DESC_EN_84(in)		"%d%% more total attributes.\n",    (IS_TWOHAND(in)?2:1) * 2
+#define DESC_EN_87(in)		"%d%% more total Attack Speed.\n",  (IS_TWOHAND(in)?2:1) * 10
+
+#define DESC_EN_62(in)		"Restore %d Mana upon hitting an enemy.\n",      (IS_TWOHAND(in)?2:1)
+#define DESC_EN_67(in)		"Restore %d Endurance upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)
+#define DESC_EN_77(in)		"Restore %d hitpoints upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)
+
+#define DESC_EN_2(in)		"10%% more total Armor Value.\n"
 #define DESC_EN_3(in)		"Healing items are 50%% more effective.\n"
 #define DESC_EN_4(in)		"Cannot trigger floor traps.\n"
-#define DESC_EN_5(in)		"20%% less effect of debuffs on you.\n"
-#define DESC_EN_6(in)		"%d%% more total Braveness.\n", 3 * (IS_TWOHAND(in)?2:1)
-#define DESC_EN_7(in)		"%-12.12s  %+4d\n", "AoE Bonus", 1
-#define DESC_EN_8(in)		"20%% more effect of Weakens you inflict.\n"
-#define DESC_EN_9(in)		"%-12.12s  %+4d\n", "Move Speed", 6
-#define DESC_EN_10(in)		"Weakens inflicted on you are 80%% weaker.\n"
-#define DESC_EN_11(in)		"%-12.12s  %+4d\n", "HP & Mana", 35
-#define DESC_EN_12(in)		"%-12.12s  %+4d\n", "WV & AV", 2
-#define DESC_EN_13(in)		"%-12.12s  %+4d\n", "Willpower", 4
-#define DESC_EN_14(in)		"Reduces Healing Sickness duration on you by 33%%.\n"
+#define DESC_EN_5(in)		"10%% less effect of debuffs on you.\n"
+#define DESC_EN_8(in)		"10%% more effect of Weakens and Slows you inflict.\n"
+#define DESC_EN_10(in)		"20%% less reservation of hitpoints, endurance, or mana.\n"
+#define DESC_EN_14(in)		"+5%% chance for your minions to inflict critical hits.\n"
 #define DESC_EN_15(in)		"Cannot step on death traps.\n"
 #define DESC_EN_16(in)		"10%% of total Armor Value is granted as additional Resistance.\n"
-#define DESC_EN_17(in)		"3%% more total Willpower.\n"
-#define DESC_EN_18(in)		"%-12.12s  %+4d\n", "Mana", 50
-#define DESC_EN_19(in)		"20%% more effect of Slows you inflict.\n"
-#define DESC_EN_20(in)		"%-12.12s  %+4d\n", "Cast Speed", 3
-#define DESC_EN_21(in)		"Slows inflicted on you are 80%% weaker.\n"
+#define DESC_EN_19(in)		"10%% more effect of your Cleaves and Blasts.\n"
+#define DESC_EN_21(in)		"10%% more effect of Resistance.\n"
 #define DESC_EN_22(in)		"Cannot lose focus.\n"
 #define DESC_EN_23(in)		"20%% of damage taken is dealt to your Endurance before Hitpoints.\n"
-#define DESC_EN_24(in)		"%-12.12s  %+4d\n", "Intuition", 4
 #define DESC_EN_25(in)		"Grants infravision.\n"
-#define DESC_EN_26(in)		"20%% more maximum Endurance.\n"
-#define DESC_EN_27(in)		"3%% more total Intuition.\n"
-#define DESC_EN_28(in)		"%-12.12s  %+4d\n", "Spell Mod", 1
-#define DESC_EN_29(in)		"20%% more effect of Curses you inflict.\n"
-#define DESC_EN_30(in)		"Stealth is 25%% stronger while moving.\n"
-#define DESC_EN_31(in)		"Curses inflicted on you are 80%% weaker.\n"
+#define DESC_EN_26(in)		"10%% more maximum Endurance.\n"
+#define DESC_EN_29(in)		"10%% more effect of Blinds and Curses you inflict.\n"
+#define DESC_EN_30(in)		"20%% more effect of your Stealth skill.\n"
+#define DESC_EN_31(in)		"20%% more total cast speed.\n"
 #define DESC_EN_32(in)		"20%% less cost of skills and spells.\n"
 #define DESC_EN_33(in)		"20%% of damage taken is dealt to your Mana before Hitpoints.\n"
-#define DESC_EN_34(in)		"%-12.12s  %+4d\n", "Agility", 4
 #define DESC_EN_35(in)		"10%% of total Armor Value is granted as additional Immunity.\n"
-#define DESC_EN_36(in)		"3%% more total Agility.\n"
 #define DESC_EN_37(in)		"Movement speed cannot fall below 1.50.\n"
-#define DESC_EN_38(in)		"20%% more effect of Poisons you inflict.\n"
-#define DESC_EN_39(in)		"%-12.12s  %+4d\n", "Atk Speed", 3
-#define DESC_EN_40(in)		"%-12.12s  %+4d\n", "Weapon Value", 3
-#define DESC_EN_41(in)		"Stealth is 25%% stronger while idle.\n"
-#define DESC_EN_42(in)		"%-12.12s  %+4d\n", "Parry Bonus", 3
-#define DESC_EN_43(in)		"%-12.12s  %+4d\n", "Strength", 4
-#define DESC_EN_44(in)		"3%% more total Strength.\n"
-#define DESC_EN_45(in)		"%-12.12s  %+4d\n", "Hitpoints", 50
-#define DESC_EN_46(in)		"20%% more effect of Bleeds you inflict.\n"
-#define DESC_EN_47(in)		"%-12.12s  %+4d\n", "Endurance", 25
-#define DESC_EN_48(in)		"%-12.12s  %+4d\n", "Hit Bonus", 3
-#define DESC_EN_49(in)		"%-12.12s  %+4d\n", "Base Crit", 1
-#define DESC_EN_50(in)		"%-12.12s  %+4d\n", "Armor Value", 3
-#define DESC_EN_51(in)		"%-12.12s  %+4d\n", "All Attribs", 2
-#define DESC_EN_52(in)		"%-12.12s  %+4d\n", "Glow", 20
-#define DESC_EN_53(in)		"20%% more effect of Blinds you inflict.\n"
+#define DESC_EN_38(in)		"10%% more effect of Bleeds and Poisons you inflict.\n"
+#define DESC_EN_41(in)		"Your Stealth skill ignores light penalties.\n"
+#define DESC_EN_46(in)		"10%% more chance to critical hit.\n"
+#define DESC_EN_52(in)		"10%% more maximum Mana.\n"
+#define DESC_EN_53(in)		"10%% more effect of Warcries and Zephyrs you inflict.\n"
 #define DESC_EN_54(in)		"Grants unreduced regeneration rates while walking.\n"
-#define DESC_EN_55(in)		"%-12.12s  %+4d\n", "Hit & Parry", 2
-#define DESC_EN_56(in)		"Blinds inflicted on you are 80%% weaker.\n"
+#define DESC_EN_56(in)		"10% of damage taken from hits is staggered over 5 seconds.\n"
 #define DESC_EN_57(in)		"Item is indestructible.\n"
-#define DESC_EN_58(in)		"%-12.12s  %+4d\n", "Spell Apt", 6
-#define DESC_EN_59(in)		"8%% chance to half damage taken.\n"
-#define DESC_EN_60(in)		"Half of your Meditate score is also applied to your Hitpoints.\n"
-#define DESC_EN_61(in)		"5%% additional chance to avoid being hit.\n"
-#define DESC_EN_62(in)		"Restore 1 Mana upon hitting an enemy.\n"
+#define DESC_EN_59(in)		"20%% more total attack speed.\n"
+#define DESC_EN_60(in)		"Recovery from your Meditate skill is also applied to your Hitpoints.\n"
+#define DESC_EN_61(in)		"You cannot be hit if your chance to avoid being hit is at least 90%%.\n"
 #define DESC_EN_63(in)		"Restore 2 Mana upon being hit by an enemy.\n"
-#define DESC_EN_64(in)		"%-12.12s  %+4d\n", "Crit Multi", 10
-#define DESC_EN_65(in)		"20%% more total Movement Speed.\n"
-#define DESC_EN_66(in)		"5%% additional chance to hit.\n"
-#define DESC_EN_67(in)		"Restore 1 Endurance upon hitting an enemy.\n"
+#define DESC_EN_65(in)		"50%% more total Movement Speed.\n"
+#define DESC_EN_66(in)		"Attacks with this weapon cannot miss if your chance to hit is at least 90%%.\n"
 #define DESC_EN_68(in)		"Restore 2 Endurance upon being hit by an enemy.\n"
-#define DESC_EN_69(in)		"%-12.12s  %+4d\n", "All Speed", 2
-#define DESC_EN_70(in)		"Movement Speed is doubled while underwater.\n"
-#define DESC_EN_71(in)		"Half of your Rest score is also applied to your Mana.\n"
+#define DESC_EN_70(in)		"Your Movement Speed cannot fall below 3.00 while underwater.\n"
+#define DESC_EN_71(in)		"Recovery from your Rest skill is also applied to your Mana.\n"
 #define DESC_EN_72(in)		"You can always escape from combat.\n"
-#define DESC_EN_73(in)		"%-12.12s  %+4d\n", "Top Damage", 12
 #define DESC_EN_74(in)		"Reduces extra damage taken from enemy critical hits by 50%%.\n"
-#define DESC_EN_75(in)		"30%% more total Thorns score.\n"
-#define DESC_EN_76(in)		"%-12.12s  %+4d\n", "Crit Bonus", 16
-#define DESC_EN_77(in)		"Restore 1 hitpoints upon hitting an enemy.\n"
-#define DESC_EN_78(in)		"%-12.12s  %+4d\n", "Thorns", 2
-#define DESC_EN_79(in)		"2%% more damage dealt.\n"
-#define DESC_EN_80(in)		"2%% less damage taken.\n"
-#define DESC_EN_81(in)		"%-12.12s  %+4d\n", "Parry", 4
-#define DESC_EN_82(in)		"Perception is 33%% stronger.\n"
-#define DESC_EN_83(in)		"15%% reduced damage taken from damage over time.\n"
-#define DESC_EN_84(in)		"2%% more total attributes.\n"
-#define DESC_EN_85(in)		"Total Glow score is reduced to 0.\n"
+#define DESC_EN_75(in)		"50%% more total Thorns score.\n"
+#define DESC_EN_79(in)		"5%% more damage dealt.\n"
+#define DESC_EN_80(in)		"5%% less damage taken.\n"
+#define DESC_EN_81(in)		"Enemies beside and behind you no longer gain a bonus to hitting you.\n"
+#define DESC_EN_82(in)		"Your Perception skill is 50%% stronger.\n"
+#define DESC_EN_83(in)		"20%% reduced damage taken from damage over time.\n"
+#define DESC_EN_85(in)		"Your Glow score effects your minions instead of you.\n"
 #define DESC_EN_86(in)		"20%% more effect of heals and regens you apply.\n"
-#define DESC_EN_87(in)		""
-#define DESC_EN_88(in)		""
-#define DESC_EN_89(in)		""
-#define DESC_EN_90(in)		""
-#define DESC_EN_91(in)		"%-12.12s  %+4d\n", "Cooldown", 2
+#define DESC_EN_88(in)		"50%% less damage taken from being underwater.\n"
+#define DESC_EN_89(in)		"10%% more maximum Hitpoints.\n"
+#define DESC_EN_90(in)		"10%% more effect of recovery from all sources.\n"
+
 #define DESC_EN_92(in)		""
 #define DESC_EN_93(in)		""
 #define DESC_EN_94(in)		""
@@ -751,13 +764,12 @@ extern char *at_short[];
 #define DESC_EN_109(in)		""
 #define DESC_EN_110(in)		""
 #define DESC_EN_111(in)		""
-#define DESC_EN_112(in)		""
-#define DESC_EN_113(in)		""
-#define DESC_EN_114(in)		""
-#define DESC_EN_115(in)		""
-#define DESC_EN_116(in)		""
-#define DESC_EN_117(in)		""
-#define DESC_EN_118(in)		""
+
+#define DESC_EN_112(in)		"Weakens inflicted on you are 80%% weaker.\n"
+#define DESC_EN_113(in)		"Slows inflicted on you are 80%% weaker.\n"
+#define DESC_EN_114(in)		"Curses inflicted on you are 80%% weaker.\n"
+#define DESC_EN_115(in)		"Blinds inflicted on you are 80%% weaker.\n"
+#define DESC_EN_116(in)		"8%% chance to half damage taken.\n"
 
 #define DESC_ENCH(in, n)	DESC_EN_##n(in)
 
