@@ -52,7 +52,7 @@
 
 #define CAN_SOULSTONE(in)		(it[(in)].flags & IF_CAN_SS)
 #define CAN_ENCHANT(in)			(it[(in)].flags & IF_CAN_EN)
-#define HAS_ENCHANT(in, n)		(it[(in)].enchantment == (n))
+#define HAS_ENCH(in, n)			(it[(in)].enchantment == (n))
 
 #define IS_IT_TEMP(in, v)		(it[(in)].temp==v || it[(in)].orig_temp==v)
 #define IS_NOT_IT_TEMP(in, v)	(it[(in)].temp!=v && it[(in)].orig_temp!=v)
@@ -287,7 +287,7 @@ int is_ascroll(int in);
 #define B_AT(cn, a)				(ch[(cn)].attrib[(a)][0])
 #define M_AT(cn, a)				(get_attrib_score((cn), (a)))
 #define B_SK(cn, s)				(ch[(cn)].skill[(s)][0])
-#define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s), 1)*(HAS_ENCHANT(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s), 1))
+#define M_SK(cn, s)				((s)==SK_PERCEPT?(get_skill_score((cn), (s), 1)*(HAS_ENCH(ch[(cn)].worn[WN_HEAD], 52)?4:3)/3):get_skill_score((cn), (s), 1))
 
 #define T_SK(cn, a)				(IS_SANECHAR(cn)     && st_skillnum((cn), (a), (-1)))
 #define T_SKT(cn, a)			(IS_SANECHAR(cn)     && st_skillnum((cn), (a), (-2)))

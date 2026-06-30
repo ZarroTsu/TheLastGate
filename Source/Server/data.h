@@ -471,31 +471,24 @@ enum _ch_iflags {
 	SF_HIT_CURSE,   SF_HIT_WEAKEN,  SF_HIT_FROST,   SF_HIT_FEAR,    
 	SF_WBREATH, 
 	
-	SF_EN_MOREAV, // Enchant #  1
-	SF_EN_HEALIT, // Enchant #  2
-	SF_EN_NOTRAPS, // Enchant #  3
-	SF_EN_LESSDEBU, // Enchant #  4
-	SF_EN_MOREWEAK, // Enchant #  7
-	SF_EN_LESSWEAK, // Enchant #  8
-	SF_EN_LESSSICK, // Enchant #  9
-	SF_EN_NODEATHT, // Enchant # 10
-	SF_EN_AVASRES, // Enchant # 11
-	SF_EN_MORESLOW, // Enchant # 13
-	SF_EN_LESSSLOW, // Enchant # 14
-	SF_FREESLOT15, // Enchant # 15
-	SF_EN_TAKEASEN, // Enchant # 16
-	SF_EN_MORECURS, // Enchant # 20
-	SF_EN_LESSCURS, // Enchant # 21
-	SF_EN_MOVESTEA, // Enchant #  6
-	SF_EN_LESSCOST, // Enchant # 22
-	SF_EN_TAKEASMA, // Enchant # 23
-	SF_EN_AVASIMM, // Enchant # 24
-	SF_EN_NOSLOW, // Enchant # 26
-	SF_EN_MOREPOIS, // Enchant # 27
-	SF_EN_IDLESTEA, // Enchant # 28
-	SF_EN_MOREBLEE, // Enchant # 30
-	SF_EN_MOREBLIN, // Enchant # 31
-	SF_EN_LESSBLIN, // Enchant # 33
+	SF_EN_MOREAV,       // Enchant #  2
+	SF_EN_HEALIT,       // Enchant #  3
+	SF_EN_NOTRAPS,      // Enchant #  4
+	SF_EN_LESSDEBU,     // Enchant #  5
+	SF_EN_MOREWEAKSLOW, // Enchant #  8
+	SF_EN_LESSSICK,     // Enchant # 14
+	SF_EN_NODEATHT,     // Enchant # 10
+	SF_EN_AVASRES,      // Enchant # 16
+	SF_EN_MORECLEABLAS, // Enchant # 19
+	SF_EN_TAKEASEN,     // Enchant # 23
+	SF_EN_MOREBLINCURS, // Enchant # 29
+	SF_EN_MORESTEA,     // Enchant # 30
+	SF_EN_LESSCOST,     // Enchant # 32
+	SF_EN_TAKEASMA,     // Enchant # 33
+	SF_EN_AVASIMM,      // Enchant # 35
+	SF_EN_NOSLOW,       // Enchant # 37
+	SF_EN_MOREBLEEPOIS, // Enchant # 38
+	SF_EN_LIGHSTEA,     // Enchant # 41
 	SF_EN_WALKREGN, // Enchant # 32
 	SF_EN_MEDIREGN, // Enchant # 36
 	SF_EN_MOREMOVE, // Enchant # 40
@@ -506,6 +499,11 @@ enum _ch_iflags {
 	SF_EN_MOREPERC, // Enchant # 52
 	SF_EN_MOREHEAL, // Enchant # 56
 	SF_EN_NOGLOW, // Enchant # 55
+	
+	SF_EN_LESSWEAK,     // Enchant #112 (Legacy)
+	SF_EN_LESSSLOW,     // Enchant #113 (Legacy)
+	SF_EN_LESSCURS,     // Enchant #114 (Legacy)
+	SF_EN_LESSBLIN,     // Enchant #115 (Legacy)
 	
 	SF_PIGSBLOOD,   SF_ASTONALE,    SF_DRAGON,      SF_MANALITE,
 	
@@ -521,13 +519,13 @@ enum _ch_ieffects {
 	VF_EXTRA_STR,
 	VF_GEMMULTI,
 	
-	VF_EN_MOREBRV,  // Enchant #  5 (+3) | 54 (+2)
-	VF_EN_MOREWIL,  // Enchant # 12 (+3) | 54 (+2)
-	VF_EN_MOREINT,  // Enchant # 19 (+3) | 54 (+2)
-	VF_EN_MOREAGL,  // Enchant # 25 (+3) | 54 (+2)
-	VF_EN_MORESTR,  // Enchant # 29 (+3) | 54 (+2)
+	VF_EN_MOREBRV,      // Enchant #  6 (+ 3) | 84 (+ 2)
+	VF_EN_MOREWIL,      // Enchant # 17 (+ 3) | 84 (+ 2)
+	VF_EN_MOREINT,      // Enchant # 27 (+ 3) | 84 (+ 2)
+	VF_EN_MOREAGL,      // Enchant # 36 (+ 3) | 84 (+ 2)
+	VF_EN_MORESTR,      // Enchant # 44 (+ 3) | 84 (+ 2)
 	VF_EN_MOREHP,
-	VF_EN_MOREEN,   // Enchant # 18 (+20)
+	VF_EN_MOREEN,       // Enchant # 26 (+10)
 	VF_EN_MOREMP,
 	VF_EN_HPONHIT,  // Enchant # 49 (+1/h)
 	VF_EN_ENONHIT,  // Enchant # 42 (+1/h)
@@ -540,7 +538,7 @@ enum _ch_ieffects {
 	VF_EN_LESSDOT,  // Enchant # 53 (+15)
 	VF_EN_MOREDAMAGE,  // Enchant # 50 (+2)
 	VF_EN_LESSDAMAGE,  // Enchant # 51 (+2)
-	VF_EN_HALFDMG, // Enchant # 35 (+8)
+	VF_EN_HALFDMG,      // Enchant #116 (+8) (Legacy)
 	VF_EN_SKUAMS,  // Enchant # 57 (+25)
 	VF_EN_SKUAGLOW,  // Enchant # 58 (+4)
 	VF_EN_KWAIHIT,  // Enchant # 61 (+3)
@@ -552,6 +550,11 @@ enum _ch_ieffects {
 	VF_EN_OFFHMANA,  // Enchant # 74 (+10)
 	VF_EN_STAGGER,  // Enchant # 75 (+20)
 	VF_EN_LESSCRIT,  // Enchant # 47 (+50) | 76 (+50)
+	VF_EN_LESSRESR,     // Enchant # 10
+	VF_EN_COMPCRIT,     // Enchant # 11
+	VF_EN_MORERES,      // Enchant # 21
+	VF_EN_MORECAST,     // Enchant # 31
+	VF_EN_MOREASPD,     // Enchant # 
 	
 	VF_MAX
 };

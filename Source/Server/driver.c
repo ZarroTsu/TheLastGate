@@ -3566,13 +3566,6 @@ int npc_try_spell(int cn, int co, int spell)
 	if (spell==SK_WARCRY && do_get_iflag(cn, SF_EMPERO_R)) 	truespell = SK_WARCRY3;
 	if (spell==SK_HEAL   && do_get_iflag(cn, SF_STAR)) 		truespell = SK_REGEN;
 	
-	/*
-	if (spell==SK_WEAKEN && do_get_iflag(co, SF_EN_LESSWEAK)) return 0;
-	if (spell==SK_SLOW   && do_get_iflag(co, SF_EN_LESSSLOW)) return 0;
-	if (spell==SK_CURSE  && do_get_iflag(co, SF_EN_LESSCURS)) return 0;
-	if (spell==SK_BLIND  && do_get_iflag(co, SF_EN_LESSBLIN)) return 0;
-	*/
-	
 	// dont blast if enemy armor is too strong
 	// Updated 02/11/2020 - changed the formula to include immunity and allow blasts that would do at least 5 damage.
 	if (truespell==SK_BLAST && ( (offn - max(0, get_target_immunity(cn, co)/2)) * 2 ) - ch[co].armor < 20/3)
@@ -3611,7 +3604,7 @@ int npc_try_spell(int cn, int co, int spell)
 	if ((spell==SK_CURSE  && do_get_iflag(co, SF_EN_LESSCURS)) ||
 		(spell==SK_BLIND  && do_get_iflag(co, SF_EN_LESSBLIN)) ||
 		(spell==SK_WEAKEN && do_get_iflag(co, SF_EN_LESSWEAK)) ||
-		(spell==SK_SLOW   && do_get_iflag(co, SF_EN_LESSSLOW)) ) timm = timm/5;
+		(spell==SK_SLOW   && do_get_iflag(co, SF_EN_LESSSLOW)) ) timm = timm/2;
 	
 	if (timm<=1) return 0;
 	

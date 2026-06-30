@@ -5702,7 +5702,7 @@ void do_make_sstone_gear(int cn, int n, int val)
 	
 	it[in].flags |= IF_UPDATE | IF_IDENTIFIED | IF_SOULSTONE;
 	
-	if (!HAS_ENCHANT(in, 34))
+	if (!HAS_ENCH(in, 34))
 	{
 		it[in].flags &= ~IF_NOREPAIR;
 		if (it[in].flags & IF_WEAPON)		it[in].max_damage = it[in].power * 4000;
@@ -9366,12 +9366,12 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	if (T_WARR_SK(co, 12))                           *en_dam +=   30;    // (Warr) Tenacity
 	if ((n=TC_SK(co, 48)))                           *en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               *en_dam +=   15;    // [Gear] Cloak of Shadows
-	if (isdot && do_get_iflag(co, SF_EN_TAKEASEN))   *en_dam +=   30;    // [Ench] *DoT* damage taken as endurance
+	if (do_get_iflag(co, SF_EN_TAKEASEN))            *en_dam +=   15;    // [Ench] damage taken as endurance
 	
 	if (T_ARHR_SK(co, 12))                           *mp_dam +=   30;    // (ArHr) Resourcefulness
 	if ((n=TC_SK(co, 84)))                           *mp_dam += n*15;
 	if (do_get_iflag(co, SF_PREIST))                 *mp_dam +=   30;    // [Taro] Priestess
-	if (!isdot && do_get_iflag(co, SF_EN_TAKEASMA))  *mp_dam +=   30;    // [Ench] *Hit* damage taken as mana
+	if (do_get_iflag(co, SF_EN_TAKEASMA))            *mp_dam +=   15;    // [Ench] damage taken as mana
 	
 	if ((n = *en_dam + *mp_dam))
 	{
@@ -10430,13 +10430,7 @@ int do_char_can_see(int cn, int co, int flag)
 		d = (d * (M_SK(co, SK_STEALTH)*2)) / 90;
 	}
 	
-	// Enchant & Idle
-	if (do_get_iflag(co, SF_EN_IDLESTEA) && !is_walking(co))
-	{
-		d = d * 5/4;
-	}
-	// Enchant & Moving
-	if (do_get_iflag(co, SF_EN_MOVESTEA) && is_walking(co))
+	if (do_get_iflag(co, SF_EN_MORESTEA))
 	{
 		d = d * 5/4;
 	}
@@ -10448,7 +10442,11 @@ int do_char_can_see(int cn, int co, int flag)
 	{
 		light = max(map[ch[co].x + ch[co].y * MAPX].light, check_dlight(ch[co].x, ch[co].y));
 		light = do_char_calc_light(cn, light);
-
+		
+		if (light && do_get_iflag(co, SF_EN_LIGHSTEA))
+		{
+			light = 1;
+		}
 		if (light==0 && !CAN_ALWAYS_SEE(cn))
 		{
 			prof_stop(21, prof);
@@ -10458,6 +10456,7 @@ int do_char_can_see(int cn, int co, int flag)
 		{
 			light = 64;
 		}
+		
 		d += (64 - light) * 2;
 	}
 
@@ -10925,34 +10924,29 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
 		if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
 		
-		// HAS_ENCHANT(in,   n)
+		// HAS_ENCH(in,   n)
 		
-		if (it[in].enchantment==  1) do_set_iflag(cn, SF_EN_MOREAV);
-		if (it[in].enchantment==  2) do_set_iflag(cn, SF_EN_HEALIT);
-		if (it[in].enchantment==  3) do_set_iflag(cn, SF_EN_NOTRAPS);
-		if (it[in].enchantment==  4) do_set_iflag(cn, SF_EN_LESSDEBU);
-		if (it[in].enchantment==  6) do_set_iflag(cn, SF_EN_MOVESTEA);
-		if (it[in].enchantment==  7) do_set_iflag(cn, SF_EN_MOREWEAK);
-		if (it[in].enchantment==  8) do_set_iflag(cn, SF_EN_LESSWEAK);
-		if (it[in].enchantment==  9) do_set_iflag(cn, SF_EN_LESSSICK);
-		if (it[in].enchantment== 10) do_set_iflag(cn, SF_EN_NODEATHT);
-		if (it[in].enchantment== 11) do_set_iflag(cn, SF_EN_AVASRES);
-		if (it[in].enchantment== 13) do_set_iflag(cn, SF_EN_MORESLOW);
-		if (it[in].enchantment== 14) do_set_iflag(cn, SF_EN_LESSSLOW);
-		if (it[in].enchantment== 15) do_set_iflag(cn, SF_NOFOCUS);
-		if (it[in].enchantment== 16) do_set_iflag(cn, SF_EN_TAKEASEN);
-		if (it[in].enchantment== 20) do_set_iflag(cn, SF_EN_MORECURS);
-		if (it[in].enchantment== 21) do_set_iflag(cn, SF_EN_LESSCURS);
-		if (it[in].enchantment== 22) do_set_iflag(cn, SF_EN_LESSCOST);
-		if (it[in].enchantment== 23) do_set_iflag(cn, SF_EN_TAKEASMA);
-		if (it[in].enchantment== 24) do_set_iflag(cn, SF_EN_AVASIMM);
-		if (it[in].enchantment== 26) do_set_iflag(cn, SF_EN_NOSLOW);
-		if (it[in].enchantment== 27) do_set_iflag(cn, SF_EN_MOREPOIS);
-		if (it[in].enchantment== 28) do_set_iflag(cn, SF_EN_IDLESTEA);
-		if (it[in].enchantment== 30) do_set_iflag(cn, SF_EN_MOREBLEE);
-		if (it[in].enchantment== 31) do_set_iflag(cn, SF_EN_MOREBLIN);
+		if (HAS_ENCH(in,   2)) do_set_iflag(cn, SF_EN_MOREAV);
+		if (HAS_ENCH(in,   3)) do_set_iflag(cn, SF_EN_HEALIT);
+		if (HAS_ENCH(in,   4)) do_set_iflag(cn, SF_EN_NOTRAPS);
+		if (HAS_ENCH(in,   5)) do_set_iflag(cn, SF_EN_LESSDEBU);
+		if (HAS_ENCH(in,   8)) do_set_iflag(cn, SF_EN_MOREWEAKSLOW);
+		if (HAS_ENCH(in,  14)) do_set_iflag(cn, SF_EN_LESSSICK);
+		if (HAS_ENCH(in,  15)) do_set_iflag(cn, SF_EN_NODEATHT);
+		if (HAS_ENCH(in,  16)) do_set_iflag(cn, SF_EN_AVASRES);
+		if (HAS_ENCH(in,  19)) do_set_iflag(cn, SF_EN_MORECLEABLAS);
+		if (HAS_ENCH(in,  22)) do_set_iflag(cn, SF_NOFOCUS);
+		if (HAS_ENCH(in,  23)) do_set_iflag(cn, SF_EN_TAKEASEN);
+		if (HAS_ENCH(in,  29)) do_set_iflag(cn, SF_EN_MOREBLINCURS);
+		if (HAS_ENCH(in,  30)) do_set_iflag(cn, SF_EN_MORESTEA);
+		
+		if (HAS_ENCH(in,  32)) do_set_iflag(cn, SF_EN_LESSCOST);
+		if (HAS_ENCH(in,  33)) do_set_iflag(cn, SF_EN_TAKEASMA);
+		if (HAS_ENCH(in,  35)) do_set_iflag(cn, SF_EN_AVASIMM);
+		if (HAS_ENCH(in,  37)) do_set_iflag(cn, SF_EN_NOSLOW);
+		if (HAS_ENCH(in,  38)) do_set_iflag(cn, SF_EN_MOREBLEEPOIS);
+		if (HAS_ENCH(in,  41)) do_set_iflag(cn, SF_EN_LIGHSTEA);
 		if (it[in].enchantment== 32) do_set_iflag(cn, SF_EN_WALKREGN);
-		if (it[in].enchantment== 33) do_set_iflag(cn, SF_EN_LESSBLIN);
 		if (it[in].enchantment== 36) do_set_iflag(cn, SF_EN_MEDIREGN);
 		if (it[in].enchantment== 40) do_set_iflag(cn, SF_EN_MOREMOVE);
 		if (it[in].enchantment== 44) do_set_iflag(cn, SF_EN_MOVEUW);
@@ -10970,18 +10964,28 @@ void really_update_char(int cn)
 		if (it[in].enchantment== 71) do_set_iflag(cn, SF_HIT_BLIND);
 		if (it[in].enchantment== 72) do_set_iflag(cn, SF_HIT_FROST);
 		
+		if (HAS_ENCH(in, 112)) do_set_iflag(cn, SF_EN_LESSWEAK); // (Legacy)
+		if (HAS_ENCH(in, 113)) do_set_iflag(cn, SF_EN_LESSSLOW); // (Legacy)
+		if (HAS_ENCH(in, 114)) do_set_iflag(cn, SF_EN_LESSCURS); // (Legacy)
+		if (HAS_ENCH(in, 115)) do_set_iflag(cn, SF_EN_LESSBLIN); // (Legacy)
+		
 		if (do_check_items(in, IT_WB_LIONSPAWS)) do_add_ieffect(cn, VF_EXTRA_BRV, 10);
 		if (do_check_items(in, IT_WP_COLDSTEEL)) do_add_ieffect(cn, VF_EXTRA_AGL, 10);
 		if (do_check_items(in, IT_WB_BARBSWORD)) do_add_ieffect(cn, VF_EXTRA_STR,  5);
 		if (do_check_items(in, IT_WP_GEMCUTTER)) do_add_ieffect(cn, VF_GEMMULTI,  25);
 		
-		if (it[in].enchantment==  5) do_add_ieffect(cn, VF_EN_MOREBRV,     3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 12) do_add_ieffect(cn, VF_EN_MOREWIL,     3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 19) do_add_ieffect(cn, VF_EN_MOREINT,     3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 25) do_add_ieffect(cn, VF_EN_MOREAGL,     3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 29) do_add_ieffect(cn, VF_EN_MORESTR,     3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 18) do_add_ieffect(cn, VF_EN_MOREEN,     20*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 35) do_add_ieffect(cn, VF_EN_HALFDMG,     8*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,   6)) do_add_ieffect(cn, VF_EN_MOREBRV,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  10)) do_add_ieffect(cn, VF_EN_LESSRESR,   20*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  11)) do_add_ieffect(cn, VF_EN_COMPCRIT,    5*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  17)) do_add_ieffect(cn, VF_EN_MOREWIL,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  27)) do_add_ieffect(cn, VF_EN_MOREINT,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  36)) do_add_ieffect(cn, VF_EN_MOREAGL,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  44)) do_add_ieffect(cn, VF_EN_MORESTR,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  21)) do_add_ieffect(cn, VF_EN_MORERES,    10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  31)) do_add_ieffect(cn, VF_EN_MORECAST,   20*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  35)) do_add_ieffect(cn, VF_EN_MOREASPD,   20*(1+IS_TWOHAND(in)));
+		
+		if (HAS_ENCH(in,  26)) do_add_ieffect(cn, VF_EN_MOREEN,     10*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 38) do_add_ieffect(cn, VF_EN_MPONHIT,     1*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 39) do_add_ieffect(cn, VF_EN_MPWHENHIT,   2*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 41) do_add_ieffect(cn, VF_EN_EXTRHITCH,   1*(1+IS_TWOHAND(in)));
@@ -10993,7 +10997,7 @@ void really_update_char(int cn)
 		if (it[in].enchantment== 50) do_add_ieffect(cn, VF_EN_MOREDAMAGE,  2*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 51) do_add_ieffect(cn, VF_EN_LESSDAMAGE,  2*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 53) do_add_ieffect(cn, VF_EN_LESSDOT,    15*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 54) 
+		if (HAS_ENCH(in,  84)) 
 		{
 			do_add_ieffect(cn, VF_EN_MOREBRV,     2*(1+IS_TWOHAND(in)));
 			do_add_ieffect(cn, VF_EN_MOREWIL,     2*(1+IS_TWOHAND(in)));
@@ -11013,6 +11017,8 @@ void really_update_char(int cn)
 		if (it[in].enchantment== 74) do_add_ieffect(cn, VF_EN_OFFHMANA,   10*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 75) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
 		if (it[in].enchantment== 76) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
+		
+		if (HAS_ENCH(in, 116)) do_add_ieffect(cn, VF_EN_HALFDMG, 8*(1+IS_TWOHAND(in))); // (Legacy)
 	}
 	
 	// Base critical strike chance
@@ -11093,7 +11099,7 @@ void really_update_char(int cn)
 			spell_cool += do_add_stat(cn, m, it[m].cool_bonus[act] + it[m].cool_bonus[I_P], 0);
 			aoe        += do_add_stat(cn, m, it[m].aoe_bonus[act]  + it[m].aoe_bonus[I_P],  0);
 			
-			if (it[m].enchantment == 17) infra = 15; // Infrared Enchantment
+			if (HAS_ENCH(m, 25)) infra = 15;
 		}
 		
 		critical_b += do_add_stat(cn, m, it[m].base_crit[act]+it[m].base_crit[I_P], 0);
@@ -11228,6 +11234,7 @@ void really_update_char(int cn)
 		{
 			remove_buff(cn, SK_DIVINITY);
 		}
+		critical_b += do_get_ieffect(co, VF_EN_COMPCRIT);
 	}
 	
 	for (n = 0; n<MAXBUFFS; n++)
@@ -11776,6 +11783,7 @@ void really_update_char(int cn)
 			n +=     TC_SK(cn, 71) *  5;
 			
 			skill[z] = more(skill[z], n, 1);
+			skill[z] = more(skill[z], do_get_ieffect(cn, VF_EN_MORERES), 1);
 			
 			if (do_get_iflag(cn, SF_HERMIT))
 				skill[z] = less(skill[z], 20, 1);  // [Taro] Hermit
@@ -12094,15 +12102,20 @@ void really_update_char(int cn)
 		n +=     TC_SK(cn, 41)*10;
 		
 		spd_attack = more(base_spd + spd_attack, n, 1) - base_spd;
+		spd_attack = more(base_spd + spd_attack, do_get_ieffect(cn, VF_EN_MOREASPD), 1) - base_spd;
 		
 		n  = 0;
 		n += T_SUMM_SK(cn,  5)*20;  // (Summ) Spellslinger
 		n +=     TC_SK(cn, 65)*10;
 		
 		spd_cast = more(base_spd + spd_cast, n, 1) - base_spd;
+		spd_cast = more(base_spd + spd_cast, do_get_ieffect(cn, VF_EN_MORECAST), 1) - base_spd;
 		
 		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
+		{
 			spd_attack = more(base_spd + spd_attack, n, 1) - base_spd;
+			spd_attack = more(base_spd + spd_attack, do_get_ieffect(cn, VF_EN_MORECAST), 1) - base_spd;
+		}
 	}
 	
 	if (do_get_iflag(cn, SF_STRENGTH))    // [Taro] Strength
@@ -12300,7 +12313,7 @@ void really_update_char(int cn)
 	
 	// Chest Armor Enchantment
 	if (do_get_iflag(cn, SF_EN_MOREAV))
-		armor = armor * 27/25;
+		armor = armor * 11/10;
 	// Tarot - Reverse Heirophant : GC gets more WV/AV
 	if (IS_COMPANION(cn) && !IS_SHADOW(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && do_get_iflag(co, SF_HEIROP_R))
 	{
@@ -12477,6 +12490,7 @@ void really_update_char(int cn)
 		n +=     TC_SK(cn, 36) * 10;
 		
 		resrv[z] = less(resrv[z], n, 1);
+		resrv[z] = less(resrv[z], do_get_ieffect(cn, VF_EN_LESSRESR), 1);  // Enchant # 10
 		
 		if (resrv[z] > 95) resrv[z] = 95;
 		if (resrv[z] <  0) resrv[z] =  0;
@@ -12807,11 +12821,11 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
-			if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
+			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 			
 			power = common_mult(cn, co, spell_immunity(cn, co, power));
 			
-			if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/5;
+			if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/2;
 			
 			if (do_get_iflag(cn, SF_EMPEROR))  // [Taro] Emperor
 			{
@@ -12839,7 +12853,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
-			if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
+			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 			
 			if (tarot)
 			{
@@ -12850,7 +12864,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			{
 				power = common_mult(cn, co, spell_immunity(cn, co, power));
 				
-				if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/5;
+				if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/2;
 				
 				if (!(in2 = make_new_buff(cn, SK_CURSE, BUF_SPR_CURSE, power, SP_DUR_ARIA, 0))) return;
 				for (n = 0; n<5; n++) bu[in2].attrib[n] = -(3 + (power - (4 - n)) / 5);
@@ -12866,11 +12880,11 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
-			if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
+			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 			
 			power = common_mult(cn, co, spell_immunity(cn, co, power));
 			
-			if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/5;
+			if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/2;
 			
 			if (do_get_iflag(cn, SF_DEATH))  // [Taro] Death
 			{
@@ -13759,7 +13773,7 @@ void do_regenerate(int cn)
 					if (bu[in].data[1] < p / 2)	bu[in].data[1] = p / 2;
 					p = bu[in].data[1];
 					
-					if (do_get_iflag(cn, SF_EN_LESSSLOW)) p = p/5;
+					if (do_get_iflag(cn, SF_EN_LESSSLOW)) p = p/2;
 					bu[in].speed 		= -(min(300, 10 + SLOWFORM(p)/2));
 					bu[in].atk_speed 	= -(min(127, 10 + SLOWFORM(p)/2));
 					bu[in].cast_speed 	= -(min(127, 10 + SLOWFORM(p)/2));

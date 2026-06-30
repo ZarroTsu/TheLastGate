@@ -3144,7 +3144,7 @@ int apply_new_ss(int cn, int in, int in2, int msg) // in2 is the soulstone
 	it[in].value -= 1;
 	it[in].power += rank * 5 + max(0, (rank-1) * 5) + max(0, (rank-2) * 5) + max(0, (rank-3) * 5) + max(0, (rank-4) * 5) + max(0, (rank-5) * 5);
 	
-	if (vlt && !HAS_ENCHANT(in, 34))
+	if (vlt && !HAS_ENCH(in, 34))
 	{
 		if (msg && (it[in].flags & IF_NOREPAIR))
 			do_char_log(cn, 7, "You enhanced the %s with a level %d soulstone. Due to the volatile nature of the stone, it lost its resistance to aging.\n", it[in].name, rank);
@@ -3692,7 +3692,7 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].value -= 1;
 	it[in2].power += 15;
 	
-	if ((it[in2].flags & IF_SOULSTONE) && !HAS_ENCHANT(in2, 34))
+	if ((it[in2].flags & IF_SOULSTONE) && !HAS_ENCH(in2, 34))
 	{
 		it[in2].flags &= ~IF_NOREPAIR;
 		if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = it[in2].power * 4000;

@@ -2169,7 +2169,7 @@ int spell_from_item(int cn, int in2)
 	
 	if (do_get_iflag(cn, SF_EN_HEALIT))
 	{
-		thousand = thousand * 5/4;
+		thousand = thousand * 3/2;
 	}
 	
 	strcpy(bu[in].name, it[in2].name);
@@ -2495,7 +2495,7 @@ int common_mult(int cn, int co, int power)
 	if (n = TC_SK(cn, 10))        power = power*max(10,100-n*10)/100;
 	
 	if (do_get_iflag(cn, SF_CHARIO_R))    power = power*4/5;
-	if (do_get_iflag(co, SF_EN_LESSDEBU)) power = power*4/5;
+	if (do_get_iflag(co, SF_EN_LESSDEBU)) power = power*9/10;
 	
 	return power;
 }
@@ -2782,7 +2782,7 @@ int spell_heal(int cn, int co, int power)
 {
 	int in, in2, n, tmp, healing = 2500, dur = SP_DUR_HEAL;
 	
-	if (do_get_iflag(co, SF_EN_LESSSICK)) dur = dur * 2/3;
+	if (do_get_iflag(co, SF_EN_LESSSICK)) dur = dur / 2;
 	
 	if (IS_COMPANION(cn))
 	{
@@ -2932,7 +2932,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	
 	power = spell_multiplier(power, cn);
 	
-	if (do_get_iflag(cn, SF_EN_MORECURS)) power = power*6/5;
+	if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 	
 	power = spell_immunity(cn, co, power);
 	
@@ -2945,7 +2945,7 @@ int spell_curse(int cn, int co, int power, int flag)
 	
 	power = common_mult(cn, co, power);
 	
-	if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/5;
+	if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/2;
 	
 	if (power <= 0) 
 	{
@@ -3023,7 +3023,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	
 	power = spell_multiplier(power, cn);
 	
-	if (do_get_iflag(cn, SF_EN_MORESLOW)) power = power*6/5;
+	if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 	
 	power = spell_immunity(cn, co, power);
 	
@@ -3036,7 +3036,7 @@ int spell_slow(int cn, int co, int power, int flag)
 	
 	power = common_mult(cn, co, power);
 	
-	if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/5;
+	if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/2;
 	
 	if (power <= 0) 
 	{
@@ -3144,7 +3144,7 @@ int spell_poison(int cn, int co, int power, int flag)
 	
 	power = spell_multiplier(power, cn);
 	
-	if (do_get_iflag(cn, SF_EN_MOREPOIS)) power = more(power, 20, 1);
+	if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);
 	
 	power = spell_immunity(cn, co, power);
 	
@@ -3836,6 +3836,8 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 	int hitpower, crit_dam=0, tmp, in;
 	
 	chlog(cn, "Cast Blast on %s", ch[co].name);
+	
+	if (do_get_iflag(cn, SF_EN_MORECLEABLAS)) power = more(power, 10, 1);
 	
 	hitpower = spell_immunity(cn, co, power) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
@@ -5402,8 +5404,8 @@ int spell_bleed(int cn, int co, int power)
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
 	
-	if (do_get_iflag(cn, SF_EN_MOREBLEE)) power = more(power, 20, 1);                 // [Ench] More Bleed
-	if (T_LYCA_SK(cn, 12))                power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
+	if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
+	if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
 	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	
@@ -5442,6 +5444,8 @@ int spell_cleave(int cn, int co, int power, int co_orig)
 		n = TC_SK(cn,112);    // (Corr) Conquest
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
+	
+	if (do_get_iflag(cn, SF_EN_MORECLEABLAS)) power = more(power, 10, 1);
 	
 	hitpower = power;
 	
@@ -5587,12 +5591,12 @@ int spell_weaken(int cn, int co, int power, int flag)
 		power = more(power, M_AT(cn, AT_AGL) * n, 20);
 	}
 	
-	if (do_get_iflag(cn, SF_EN_MOREWEAK)) power = power*6/5;
+	if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
 	
-	if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/5;
+	if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/2;
 	
 	// Tarot Card - Death :: Change Weaken into Crush
 	if (do_get_iflag(cn, SF_DEATH))
@@ -5674,12 +5678,12 @@ int spell_blind(int cn, int co, int power, int flag)
 		power = more(power, M_AT(cn, AT_AGL) * n, 20);
 	}
 	
-	if (do_get_iflag(cn, SF_EN_MOREBLIN)) power = power*6/5;
+	if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
 	
-	if (do_get_iflag(co, SF_EN_LESSBLIN)) power = power/5;
+	if (do_get_iflag(co, SF_EN_LESSBLIN)) power = power/2;
 	
 	// Tarot Card - Chariot :: Change Blind into Douse
 	if (flag)

@@ -765,10 +765,10 @@ extern char *at_short[];
 #define DESC_EN_110(in)		""
 #define DESC_EN_111(in)		""
 
-#define DESC_EN_112(in)		"Weakens inflicted on you are 80%% weaker.\n"
-#define DESC_EN_113(in)		"Slows inflicted on you are 80%% weaker.\n"
-#define DESC_EN_114(in)		"Curses inflicted on you are 80%% weaker.\n"
-#define DESC_EN_115(in)		"Blinds inflicted on you are 80%% weaker.\n"
+#define DESC_EN_112(in)		"Weakens inflicted on you are 50%% weaker.\n"
+#define DESC_EN_113(in)		"Slows inflicted on you are 50%% weaker.\n"
+#define DESC_EN_114(in)		"Curses inflicted on you are 50%% weaker.\n"
+#define DESC_EN_115(in)		"Blinds inflicted on you are 50%% weaker.\n"
 #define DESC_EN_116(in)		"8%% chance to half damage taken.\n"
 
 #define DESC_ENCH(in, n)	DESC_EN_##n(in)
