@@ -3313,7 +3313,7 @@ int set_enchantment(int cn, int v)
 
 int use_talisman(int cn, int in, int in2)
 {	// [in] is talisman, [in2] is the target item
-	int r, n, temp, inds = 0;
+	int r, n, en, temp;
 	int stk, val, mul = 1;
 	
 	if (!IS_SANECHAR(cn))	return 0;
@@ -3460,200 +3460,114 @@ int use_talisman(int cn, int in, int in2)
 	}
 	// Past here we can assume there is an active enchantment
 	
-	if (!CAN_ENCHANT(in2))
+	if (IS_TWOHAND(in2)) mul = 2;
+	en = it[in].data[0];
+	
+	// Check if this enchant can be applied to this item
+	if (EN_WEAPN(en) && !(it[in2].flags & IF_WEAPON))
+	{ do_char_log(cn, 1, "This can only be applied to Weapons.\n"); return 0; }
+	if (EN_ARMOR(en) && !(it[in2].flags & IF_ARMORS))
+	{ do_char_log(cn, 1, "This can only be applied to Armor Pieces.\n"); return 0; }
+	if (EN_HELMS(en) && !(it[in2].placement & PL_HEAD))
+	{ do_char_log(cn, 1, "This can only be applied to Helmets.\n"); return 0; }
+	if (EN_CHEST(en) && !(it[in2].placement & PL_BODY))
+	{ do_char_log(cn, 1, "This can only be applied to Body Armors.\n"); return 0; }
+	if (EN_CLOAK(en) && !(it[in2].placement & PL_CLOAK))
+	{ do_char_log(cn, 1, "This can only be applied to Cloaks.\n"); return 0; }
+	if (EN_GLOVE(en) && !(it[in2].placement & PL_ARMS))
+	{ do_char_log(cn, 1, "This can only be applied to Gloves.\n"); return 0; }
+	if (EN_BOOTS(en) && !(it[in2].placement & PL_FEET))
+	{ do_char_log(cn, 1, "This can only be applied to Boots.\n"); return 0; }
+	if (EN_ACCES(en) && !(it[in2].placement & PL_NECK) && !(it[in2].placement & PL_BELT) && !(it[in2].placement & PL_RING))
+	{ do_char_log(cn, 1, "This can only be applied to Accessories.\n"); return 0; }
+	
+	// Item already has an enchantment - replace it!
+	if (it[in2].enchantment && !EN_GODS(it[in2].enchantment) 
+		&& it[in].orig_temp && (it_temp[it[in].orig_temp].flags & IF_CAN_EN))
+	{
+		switch (it[in2].enchantment)
+		{
+			case  1: it[in2].attrib[AT_BRV][I_P] -=  4 * mul; break;
+			case  7: it[in2].aoe_bonus[I_P]      -=  1 * mul; break;
+			case  9: it[in2].move_speed[I_P]     -= 10 * mul; break;
+			case 12: it[in2].weapon[I_P]         -=  2 * mul; 
+					 it[in2].armor[I_P]          -=  2 * mul; break;
+			case 13: it[in2].attrib[AT_WIL][I_P] -=  4 * mul; break;
+			case 18: it[in2].mana[I_P]           -= 30 * mul; break;
+			case 20: it[in2].cast_speed[I_P]     -=  5 * mul; break;
+			case 24: it[in2].attrib[AT_INT][I_P] -=  4 * mul; break;
+			case 28: it[in2].spell_pow[I_P]      -=  1 * mul; break;
+			case 34: it[in2].attrib[AT_AGL][I_P] -=  4 * mul; break;
+			case 39: it[in2].atk_speed[I_P]      -=  5 * mul; break;
+			case 40: it[in2].weapon[I_P]         -=  3 * mul; break;
+			case 42: it[in2].to_parry[I_P]       -=  4 * mul; break;
+			case 43: it[in2].attrib[AT_STR][I_P] -=  4 * mul; break;
+			case 45: it[in2].hp[I_P]             -= 30 * mul; break;
+			case 47: it[in2].end[I_P]            -= 30 * mul; break;
+			case 48: it[in2].to_hit[I_P]         -=  4 * mul; break;
+			case 49: it[in2].base_crit[I_P]      -=  1 * mul; break;
+			case 50: it[in2].armor[I_P]          -=  3 * mul; break;
+			case 51: for (n=0;n<5;n++) 
+				   { it[in2].attrib[n][I_P]      -=  2 * mul; } break;
+			case 55: it[in2].to_hit[I_P]         -=  2 * mul; 
+					 it[in2].to_parry[I_P]       -=  2 * mul; break;
+			case 58: it[in2].spell_apt[I_P]      -=  5 * mul; break;
+			case 64: it[in2].crit_multi[I_P]     -= 10 * mul; break;
+			case 69: it[in2].speed[I_P]          -=  3 * mul; break;
+			case 73: it[in2].top_damage[I_P]     -=  6 * mul; break;
+			case 76: it[in2].crit_chance[I_P]    -= 25 * mul; break;
+			case 78: it[in2].gethit_dam[I_P]     -=  5 * mul; break;
+			case 91: it[in2].cool_bonus[I_P]     -=  5 * mul; break;
+			default: break;
+		}
+	}
+	else if (!CAN_ENCHANT(in2))
 	{
 		do_char_log(cn, 1, "Nothing happened.\n");
 		return 0;
 	}
 	
-	// Check if this enchant can be applied to this item
-	switch (it[in].data[0])
-	{
-		// Only Helmets
-		case  3: case 14: case 25: case 32: case 60: case 71: case 82:
-			if (!(it[in2].placement & PL_HEAD))
-			{
-				do_char_log(cn, 1, "This can only be applied to Helmets.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Cloaks
-		case  5: case 10: case 21: case 31: case 41: case 56: case 61:
-			if (!(it[in2].placement & PL_CLOAK))
-			{
-				do_char_log(cn, 1, "This can only be applied to Cloaks.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Chests
-		case  2: case 16: case 23: case 33: case 35: case 74: case 75:
-			if (!(it[in2].placement & PL_BODY))
-			{
-				do_char_log(cn, 1, "This can only be applied to Body Armors.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Gloves
-		case  8: case 19: case 29: case 38: case 46: case 53: case 86:
-			if (!(it[in2].placement & PL_ARMS))
-			{
-				do_char_log(cn, 1, "This can only be applied to Gloves.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Boots
-		case  4: case 15: case 30: case 37: case 65: case 70: case 72:
-			if (!(it[in2].placement & PL_FEET))
-			{
-				do_char_log(cn, 1, "This can only be applied to Boots.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Jewellery
-		case 22: case 54: case 79: case 80: case 83: case 85:
-			if (!(it[in2].placement & PL_NECK) && !(it[in2].placement & PL_BELT) && !(it[in2].placement & PL_RING))
-			{
-				do_char_log(cn, 1, "This can only be applied to Jewellery.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Weapons
-		case 49: case 62: case 66: case 67: case 77:
-			if (!(it[in2].flags & IF_WEAPON))
-			{
-				do_char_log(cn, 1, "This can only be applied to Weapons.\n");
-				return 0;
-			}
-			break;
-		
-		// Only Armors
-		case  7: case 26: case 52: case 63: case 68:
-			if (!(it[in2].flags & IF_ARMORS))
-			{
-				do_char_log(cn, 1, "This can only be applied to Armor Pieces.\n");
-				return 0;
-			}
-			break;
-		
-		// Any
-		default: break;
-	}
-	
-	if (IS_TWOHAND(in2))
-	{
-		mul = 2;
-	}
-	
 	// Apply the enchantment
-	switch (it[in].data[0])
+	switch ((it[in2].enchantment = en))
 	{
-		case  1: it[in2].attrib[AT_BRV][I_P] += 5*mul; break;
-		case  2: it[in2].enchantment =  1; break;
-		case  3: it[in2].enchantment =  2; break;
-		case  4: it[in2].enchantment =  3; break;
-		case  5: it[in2].enchantment =  4; break;
-		case  6: it[in2].enchantment =  5; break;
-		case  7: it[in2].aoe_bonus[I_P] += 1*mul; break;
-		case  8: it[in2].enchantment =  7; break;
-		case  9: it[in2].move_speed[I_P] += 6*mul; break;
-		case 10: it[in2].enchantment =  8; break;
-		case 11: it[in2].hp[I_P] += 35*mul; it[in2].mana[I_P] += 35*mul; break;
-		case 12: it[in2].weapon[I_P] += 2*mul; it[in2].armor[I_P] += 2*mul; break;
-		case 13: it[in2].attrib[AT_WIL][I_P] += 5*mul; break;
-		case 14: it[in2].enchantment =  9; break;
-		case 15: it[in2].enchantment = 10; break;
-		case 16: it[in2].enchantment = 11; break;
-		case 17: it[in2].enchantment = 12; break;
-		case 18: it[in2].mana[I_P] += 50*mul; break;
-		case 19: it[in2].enchantment = 13; break;
-		case 20: it[in2].cast_speed[I_P] += 3*mul; break;
-		case 21: it[in2].enchantment = 14; break;
-		case 22: it[in2].enchantment = 15; break;
-		case 23: it[in2].enchantment = 16; break;
-		case 24: it[in2].attrib[AT_INT][I_P] += 5*mul; break;
-		case 25: it[in2].enchantment = 17; break;
-		case 26: it[in2].enchantment = 18; break;
-		case 27: it[in2].enchantment = 19; break;
-		case 28: it[in2].spell_mod[I_P] += 1*mul; break;
-		case 29: it[in2].enchantment = 20; break;
-		case 30: it[in2].enchantment =  6; break;
-		case 31: it[in2].enchantment = 21; break;
-		case 32: it[in2].enchantment = 22; break;
-		case 33: it[in2].enchantment = 23; break;
-		case 34: it[in2].attrib[AT_AGL][I_P] += 5*mul; break;
-		case 35: it[in2].enchantment = 24; break;
-		case 36: it[in2].enchantment = 25; break;
-		case 37: it[in2].enchantment = 26; break;
-		case 38: it[in2].enchantment = 27; break;
-		case 39: it[in2].atk_speed[I_P] += 3*mul; break;
-		case 40: it[in2].weapon[I_P] += 3*mul; break;
-		case 41: it[in2].enchantment = 28; break;
-		case 42: it[in2].to_parry[I_P] += 3*mul; break;
-		case 43: it[in2].attrib[AT_STR][I_P] += 5*mul; break;
-		case 44: it[in2].enchantment = 29; break;
-		case 45: it[in2].hp[I_P] += 50*mul; break;
-		case 46: it[in2].enchantment = 30; break;
-		case 47: it[in2].end[I_P] += 25*mul; break;
-		case 48: it[in2].to_hit[I_P] += 3*mul; break;
-		case 49: it[in2].base_crit[I_P] += 1*mul; break;
-		case 50: it[in2].armor[I_P] += 3*mul; break;
-		case 51: for (n=0;n<5;n++) { it[in2].attrib[n][I_P] += 2*mul; } break;
-		case 52: it[in2].light[I_P] += 20*mul; break;
-		case 53: it[in2].enchantment = 31; break;
-		case 54: it[in2].enchantment = 32; break;
-		case 55: it[in2].to_hit[I_P] += 2*mul; it[in2].to_parry[I_P] += 2*mul; break;
-		case 56: it[in2].enchantment = 33; break;
-		case 57: it[in2].enchantment = 34; inds = 1; break;
-		case 58: it[in2].spell_apt[I_P] += 6*mul; break;
-		case 59: it[in2].enchantment = 35; break;
-		case 60: it[in2].enchantment = 36; break;
-		case 61: it[in2].enchantment = 37; break;
-		case 62: it[in2].enchantment = 38; break;
-		case 63: it[in2].enchantment = 39; break;
-		case 64: it[in2].crit_multi[I_P] += 10*mul; break;
-		case 65: it[in2].enchantment = 40; break;
-		case 66: it[in2].enchantment = 41; break;
-		case 67: it[in2].enchantment = 42; break;
-		case 68: it[in2].enchantment = 43; break;
-		case 69: it[in2].speed[I_P] += 2*mul; break;
-		case 70: it[in2].enchantment = 44; break;
-		case 71: it[in2].enchantment = 45; break;
-		case 72: it[in2].enchantment = 46; break;
-		case 73: it[in2].top_damage[I_P] += 12*mul; break;
-		case 74: it[in2].enchantment = 47; break;
-		case 75: it[in2].enchantment = 48; break;
-		case 76: it[in2].crit_chance[I_P] += 16*mul; break;
-		case 77: it[in2].enchantment = 49; break;
-		case 78: it[in2].gethit_dam[I_P] += 2*mul; break;
-		//
-		case 79: it[in2].enchantment = 50; break;
-		case 80: it[in2].enchantment = 51; break;
-		case 81: it[in2].to_hit[I_P] -= 2*mul; it[in2].to_parry[I_P] += 4*mul; break;
-		case 82: it[in2].enchantment = 52; break;
-		case 83: it[in2].enchantment = 53; break;
-		case 84: it[in2].enchantment = 54; break;
-		case 85: it[in2].enchantment = 55; break;
-		case 86: it[in2].enchantment = 56; break;
-		case 87: it[in2].to_hit[I_P] += 4*mul; it[in2].to_parry[I_P] -= 2*mul; break;
-		case 88: it[in2].weapon[I_P] += 2*mul; it[in2].top_damage[I_P] += 8*mul; break;
-		case 89: it[in2].crit_chance[I_P] += 8*mul; it[in2].crit_multi[I_P] += 5*mul; break;
-		case 90: it[in2].armor[I_P] += 2*mul; it[in2].gethit_dam[I_P] += 1*mul; break;
-		case 91: it[in2].cool_bonus[I_P] += 2*mul; break;
+		case  1: it[in2].attrib[AT_BRV][I_P] +=  4 * mul; break;
+		case  7: it[in2].aoe_bonus[I_P]      +=  1 * mul; break;
+		case  9: it[in2].move_speed[I_P]     += 10 * mul; break;
+		case 12: it[in2].weapon[I_P]         +=  2 * mul; 
+		         it[in2].armor[I_P]          +=  2 * mul; break;
+		case 13: it[in2].attrib[AT_WIL][I_P] +=  4 * mul; break;
+		case 18: it[in2].mana[I_P]           += 30 * mul; break;
+		case 20: it[in2].cast_speed[I_P]     +=  5 * mul; break;
+		case 24: it[in2].attrib[AT_INT][I_P] +=  4 * mul; break;
+		case 28: it[in2].spell_pow[I_P]      +=  1 * mul; break;
+		case 34: it[in2].attrib[AT_AGL][I_P] +=  4 * mul; break;
+		case 39: it[in2].atk_speed[I_P]      +=  5 * mul; break;
+		case 40: it[in2].weapon[I_P]         +=  3 * mul; break;
+		case 42: it[in2].to_parry[I_P]       +=  4 * mul; break;
+		case 43: it[in2].attrib[AT_STR][I_P] +=  4 * mul; break;
+		case 45: it[in2].hp[I_P]             += 30 * mul; break;
+		case 47: it[in2].end[I_P]            += 30 * mul; break;
+		case 48: it[in2].to_hit[I_P]         +=  4 * mul; break;
+		case 49: it[in2].base_crit[I_P]      +=  1 * mul; break;
+		case 50: it[in2].armor[I_P]          +=  3 * mul; break;
+		case 51: for (n=0;n<5;n++) 
+		       { it[in2].attrib[n][I_P]      +=  2 * mul; } break;
+		case 55: it[in2].to_hit[I_P]         +=  2 * mul; 
+		         it[in2].to_parry[I_P]       +=  2 * mul; break;
+		case 58: it[in2].spell_apt[I_P]      +=  5 * mul; break;
+		case 64: it[in2].crit_multi[I_P]     += 10 * mul; break;
+		case 69: it[in2].speed[I_P]          +=  3 * mul; break;
+		case 73: it[in2].top_damage[I_P]     +=  6 * mul; break;
+		case 76: it[in2].crit_chance[I_P]    += 25 * mul; break;
+		case 78: it[in2].gethit_dam[I_P]     +=  5 * mul; break;
+		case 91: it[in2].cool_bonus[I_P]     +=  5 * mul; break;
 		default: break;
 	}
 	
 	// Finalize
 	if (it[in2].temp)
 	{
-		temp = it[in2].temp;
-		
-		it[in2].orig_temp = temp;
+		it[in2].orig_temp = temp = it[in2].temp;
 	}
 	else
 	{
@@ -3683,7 +3597,7 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].flags |= IF_UPDATE | IF_IDENTIFIED | IF_ENCHANTED | IF_LOOKSPECIAL;
 	it[in2].flags &= ~IF_CAN_EN;
 	
-	if (inds)
+	if (en == 57) // Indestructible
 	{
 		it[in2].max_damage = 0;
 		it[in2].flags |= IF_NOREPAIR;
