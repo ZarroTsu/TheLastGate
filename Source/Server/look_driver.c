@@ -428,7 +428,7 @@ void look_extra(int cn, int in)
 	default: break;
 	}
 	
-	if (it[in].flags & IF_ENCHANTED)
+	if ((it[in].flags & IF_ENCHANTED) && EN_SHOWDESC(n))
 	{
 		n = it[in].enchantment;
 		m = 8;

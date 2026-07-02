@@ -648,6 +648,8 @@ extern char *at_short[];
 #define EN_OFFH(n)			(n >= 108 && n <= 111)
 #define EN_GODS(n)			(n >=  92 && n <= 111)
 
+#define EN_SHOWDESC(n)		(EN_WEAPN(n)||EN_ARMOR(n)||EN_HELMS(n)||EN_CHEST(n)||EN_GLOVE(n)||EN_CLOAK(n)||EN_BOOTS(n)||EN_ACCES(n)||EN_OTHER(n)||EN_GODS(n))
+
 #define DESC_EN_WEAPN		"[Weapons Only] "
 #define DESC_EN_ARMOR		"[Armor Pieces Only] "
 #define DESC_EN_HELMS		"[Helmet Only] "
