@@ -9397,7 +9397,9 @@ int do_recovery(int cn, int type, int v)
 		v = more(v, n, 1);
 	}
 	
-	if (do_get_iflag(cn, SF_WORLD_R)) v = less(v, 50, 1);  // [Taro] World.R
+	if (do_get_iflag(cn, VF_EN_MORERECO)) v = more(v, 20, 1);  // [Ench] # 90
+	
+	if (do_get_iflag(cn, SF_WORLD_R))     v = less(v, 50, 1);  // [Taro] World.R
 	
 	switch (type)
 	{
@@ -10109,7 +10111,8 @@ void do_attack(int cn, int co, int surround)
 	if (!is_facing(co, cn)) sorb = 1;
 	if (   is_back(co, cn)) sorb = 2;
 	
-	if (!T_WARR_SK(co, 10)) s2 -= 10 * sorb; // (Warr) Champion
+	if (!T_WARR_SK(co, 10) && !do_get_ieffect(co, SF_EN_BACKSTOP))  // (Warr) Champion | [Ench] # 81
+		s2 -= 10 * sorb;
 	
 	//   Stunned or not fighting                 ~~  Outsider's Eye
 	if ((ch[co].stunned==1 || !ch[co].attack_cn) && !do_get_iflag(co, SF_TW_OUTSIDE)) s2 -= 10;
@@ -10140,17 +10143,30 @@ void do_attack(int cn, int co, int surround)
 	else if (diff< 40) { chance = 19; bonus = 16; }
 	else               { chance = 19; bonus = 20; }
 	
-	chance += do_get_ieffect(cn, VF_EN_EXTRHITCH);
-	chance -= do_get_ieffect(co, VF_EN_EXTRAVOCH);
-	
-	die = RANDOM(20) + 1;
-	
-	if (die <= chance)  hit = 1;
-	else                hit = 0;
-	
-	if (IS_COMPANION(cn) && !IS_SHADOW(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && 
-		do_get_iflag(cc, SF_HEIROP_R) && !RANDOM(5)) hit = 0;                              // [Taro] Heirophant.R
-	if (do_get_iflag(co, SF_WHEEL_R) && !RANDOM(4))  hit = 1;                              // [Taro] Wheel.R
+	if (chance <= 2 && do_get_iflag(co, SF_EN_NINETYAVO))
+	{
+		hit = 0;
+	}
+	else if (chance >= 18 && do_get_iflag(cn, SF_EN_NINETYHIT))
+	{
+		hit = 1;
+	}
+	else if (IS_COMPANION(cn) && !IS_SHADOW(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) 
+		&& do_get_iflag(cc, SF_HEIROP_R) && !RANDOM(5)) // [Taro] Heirophant.R
+	{
+		hit = 0;
+	}
+	else if (do_get_iflag(co, SF_WHEEL_R) && !RANDOM(4)) // [Taro] Wheel.R
+	{
+		hit = 1;
+	}
+	else
+	{
+		die = RANDOM(20) + 1;
+		
+		if (die <= chance)  hit = 1;
+		else                hit = 0;
+	}
 	
 	if (hit)
 	{
@@ -10939,30 +10955,35 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in,  23)) do_set_iflag(cn, SF_EN_TAKEASEN);
 		if (HAS_ENCH(in,  29)) do_set_iflag(cn, SF_EN_MOREBLINCURS);
 		if (HAS_ENCH(in,  30)) do_set_iflag(cn, SF_EN_MORESTEA);
-		
 		if (HAS_ENCH(in,  32)) do_set_iflag(cn, SF_EN_LESSCOST);
 		if (HAS_ENCH(in,  33)) do_set_iflag(cn, SF_EN_TAKEASMA);
 		if (HAS_ENCH(in,  35)) do_set_iflag(cn, SF_EN_AVASIMM);
 		if (HAS_ENCH(in,  37)) do_set_iflag(cn, SF_EN_NOSLOW);
 		if (HAS_ENCH(in,  38)) do_set_iflag(cn, SF_EN_MOREBLEEPOIS);
 		if (HAS_ENCH(in,  41)) do_set_iflag(cn, SF_EN_LIGHSTEA);
-		if (it[in].enchantment== 32) do_set_iflag(cn, SF_EN_WALKREGN);
-		if (it[in].enchantment== 36) do_set_iflag(cn, SF_EN_MEDIREGN);
-		if (it[in].enchantment== 40) do_set_iflag(cn, SF_EN_MOREMOVE);
-		if (it[in].enchantment== 44) do_set_iflag(cn, SF_EN_MOVEUW);
-		if (it[in].enchantment== 45) do_set_iflag(cn, SF_EN_RESTMEDI);
-		if (it[in].enchantment== 46) do_set_iflag(cn, SF_EN_ESCAPE);
-		if (it[in].enchantment== 48) do_set_iflag(cn, SF_EN_MORETHOR);
-		if (it[in].enchantment== 52) do_set_iflag(cn, SF_EN_MOREPERC);
-		if (it[in].enchantment== 56) do_set_iflag(cn, SF_EN_MOREHEAL);
-		if (it[in].enchantment== 55) do_set_iflag(cn, SF_EN_NOGLOW);
-		if (it[in].enchantment== 60) do_set_iflag(cn, SF_HIT_SCORCH);
-		if (it[in].enchantment== 63) do_set_iflag(cn, SF_HIT_CURSE);
-		if (it[in].enchantment== 64) do_set_iflag(cn, SF_HIT_WEAKEN);
-		if (it[in].enchantment== 67) do_set_iflag(cn, SF_HIT_POISON);
-		if (it[in].enchantment== 68) do_set_iflag(cn, SF_HIT_DOUSE);
-		if (it[in].enchantment== 71) do_set_iflag(cn, SF_HIT_BLIND);
-		if (it[in].enchantment== 72) do_set_iflag(cn, SF_HIT_FROST);
+		if (HAS_ENCH(in,  53)) do_set_iflag(cn, SF_EN_MOREWARCZEPH);
+		if (HAS_ENCH(in,  54)) do_set_iflag(cn, SF_EN_WALKREGN);
+		if (HAS_ENCH(in,  60)) do_set_iflag(cn, SF_EN_MEDIREGN);
+		if (HAS_ENCH(in,  61)) do_set_iflag(cn, SF_EN_NINETYAVO);
+		if (HAS_ENCH(in,  65)) do_set_iflag(cn, SF_EN_MOREMOVE);
+		if (HAS_ENCH(in,  66)) do_set_iflag(cn, SF_EN_NINETYHIT);
+		if (HAS_ENCH(in,  70)) do_set_iflag(cn, SF_EN_MOVEUW);
+		if (HAS_ENCH(in,  71)) do_set_iflag(cn, SF_EN_RESTMEDI);
+		if (HAS_ENCH(in,  72)) do_set_iflag(cn, SF_EN_ESCAPE);
+		if (HAS_ENCH(in,  75)) do_set_iflag(cn, SF_EN_MORETHOR);
+		if (HAS_ENCH(in,  81)) do_set_iflag(cn, SF_EN_BACKSTOP);
+		if (HAS_ENCH(in,  82)) do_set_iflag(cn, SF_EN_MOREPERC);
+		if (HAS_ENCH(in,  85)) do_set_iflag(cn, SF_EN_GLOWCOMP);
+		if (HAS_ENCH(in,  86)) do_set_iflag(cn, SF_EN_MOREHEAL);
+		if (HAS_ENCH(in,  88)) do_set_iflag(cn, SF_EN_LESSWATER);
+		if (HAS_ENCH(in,  94)) do_set_iflag(cn, SF_HIT_SLOW);
+		if (HAS_ENCH(in,  95)) do_set_iflag(cn, SF_HIT_SCORCH);
+		if (HAS_ENCH(in,  98)) do_set_iflag(cn, SF_HIT_CURSE);
+		if (HAS_ENCH(in,  99)) do_set_iflag(cn, SF_HIT_WEAKEN);
+		if (HAS_ENCH(in, 102)) do_set_iflag(cn, SF_HIT_POISON);
+		if (HAS_ENCH(in, 103)) do_set_iflag(cn, SF_HIT_DOUSE);
+		if (HAS_ENCH(in, 106)) do_set_iflag(cn, SF_HIT_BLIND);
+		if (HAS_ENCH(in, 107)) do_set_iflag(cn, SF_HIT_FROST);
 		
 		if (HAS_ENCH(in, 112)) do_set_iflag(cn, SF_EN_LESSWEAK); // (Legacy)
 		if (HAS_ENCH(in, 113)) do_set_iflag(cn, SF_EN_LESSSLOW); // (Legacy)
@@ -10978,25 +10999,25 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in,  10)) do_add_ieffect(cn, VF_EN_LESSRESR,   20*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  11)) do_add_ieffect(cn, VF_EN_COMPCRIT,    5*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  17)) do_add_ieffect(cn, VF_EN_MOREWIL,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  27)) do_add_ieffect(cn, VF_EN_MOREINT,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  36)) do_add_ieffect(cn, VF_EN_MOREAGL,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  44)) do_add_ieffect(cn, VF_EN_MORESTR,     3*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  21)) do_add_ieffect(cn, VF_EN_MORERES,    10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  26)) do_add_ieffect(cn, VF_EN_MOREEN,     10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  27)) do_add_ieffect(cn, VF_EN_MOREINT,     3*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  31)) do_add_ieffect(cn, VF_EN_MORECAST,   20*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  35)) do_add_ieffect(cn, VF_EN_MOREASPD,   20*(1+IS_TWOHAND(in)));
-		
-		if (HAS_ENCH(in,  26)) do_add_ieffect(cn, VF_EN_MOREEN,     10*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 38) do_add_ieffect(cn, VF_EN_MPONHIT,     1*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 39) do_add_ieffect(cn, VF_EN_MPWHENHIT,   2*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 41) do_add_ieffect(cn, VF_EN_EXTRHITCH,   1*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 37) do_add_ieffect(cn, VF_EN_EXTRAVOCH,   1*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 42) do_add_ieffect(cn, VF_EN_ENONHIT,     1*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 43) do_add_ieffect(cn, VF_EN_ENWHENHIT,   2*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 47) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 49) do_add_ieffect(cn, VF_EN_HPONHIT,     1*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 50) do_add_ieffect(cn, VF_EN_MOREDAMAGE,  2*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 51) do_add_ieffect(cn, VF_EN_LESSDAMAGE,  2*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 53) do_add_ieffect(cn, VF_EN_LESSDOT,    15*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  36)) do_add_ieffect(cn, VF_EN_MOREAGL,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  44)) do_add_ieffect(cn, VF_EN_MORESTR,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  46)) do_add_ieffect(cn, VF_EN_MORECRIT,   10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  52)) do_add_ieffect(cn, VF_EN_MOREMP,     10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  56)) do_add_ieffect(cn, VF_EN_STAGGER,    10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  62)) do_add_ieffect(cn, VF_EN_MPONHIT,     1*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  63)) do_add_ieffect(cn, VF_EN_MPWHENHIT,   2*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  67)) do_add_ieffect(cn, VF_EN_ENONHIT,     1*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  68)) do_add_ieffect(cn, VF_EN_ENWHENHIT,   2*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  74)) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  77)) do_add_ieffect(cn, VF_EN_HPONHIT,     1*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  79)) do_add_ieffect(cn, VF_EN_MOREDAMAGE,  5*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  80)) do_add_ieffect(cn, VF_EN_LESSDAMAGE,  5*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  83)) do_add_ieffect(cn, VF_EN_LESSDOT,    20*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  84)) 
 		{
 			do_add_ieffect(cn, VF_EN_MOREBRV,     2*(1+IS_TWOHAND(in)));
@@ -11005,18 +11026,22 @@ void really_update_char(int cn)
 			do_add_ieffect(cn, VF_EN_MOREAGL,     2*(1+IS_TWOHAND(in)));
 			do_add_ieffect(cn, VF_EN_MORESTR,     2*(1+IS_TWOHAND(in)));
 		}
-		if (it[in].enchantment== 57) do_add_ieffect(cn, VF_EN_SKUAMS,     25*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 58) do_add_ieffect(cn, VF_EN_SKUAGLOW,    4*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 61) do_add_ieffect(cn, VF_EN_KWAIHIT,     3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 62) do_add_ieffect(cn, VF_EN_KWAIPARRY,   3*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 65) do_add_ieffect(cn, VF_EN_GORNMANA,   20*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 66) do_add_ieffect(cn, VF_EN_GORNDOT,     1*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 69) do_add_ieffect(cn, VF_EN_PURPLEECH,   4*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 70) do_add_ieffect(cn, VF_EN_PURPDAMG,   10*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 73) do_add_ieffect(cn, VF_EN_HPWHENHIT,   2*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 74) do_add_ieffect(cn, VF_EN_OFFHMANA,   10*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 75) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
-		if (it[in].enchantment== 76) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  87)) do_add_ieffect(cn, VF_EN_MORESPB,    10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  89)) do_add_ieffect(cn, VF_EN_MOREHP,     10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  90)) do_add_ieffect(cn, VF_EN_MORERECO,   20*(1+IS_TWOHAND(in)));
+		
+		if (HAS_ENCH(in,  92)) do_add_ieffect(cn, VF_EN_SKUAMS,     25*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  93)) do_add_ieffect(cn, VF_EN_SKUAGLOW,    4*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  96)) do_add_ieffect(cn, VF_EN_KWAIHIT,     3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  97)) do_add_ieffect(cn, VF_EN_KWAIPARRY,   3*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 100)) do_add_ieffect(cn, VF_EN_GORNMANA,   20*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 101)) do_add_ieffect(cn, VF_EN_GORNDOT,     1*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 104)) do_add_ieffect(cn, VF_EN_PURPLEECH,   4*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 105)) do_add_ieffect(cn, VF_EN_PURPDAMG,   10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 108)) do_add_ieffect(cn, VF_EN_HPWHENHIT,   2*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 109)) do_add_ieffect(cn, VF_EN_OFFHMANA,   10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 110)) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in, 111)) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
 		
 		if (HAS_ENCH(in, 116)) do_add_ieffect(cn, VF_EN_HALFDMG, 8*(1+IS_TWOHAND(in))); // (Legacy)
 	}
@@ -11235,6 +11260,7 @@ void really_update_char(int cn)
 			remove_buff(cn, SK_DIVINITY);
 		}
 		critical_b += do_get_ieffect(co, VF_EN_COMPCRIT);
+		light      += ch[co].gclight;
 	}
 	
 	for (n = 0; n<MAXBUFFS; n++)
@@ -11845,7 +11871,11 @@ void really_update_char(int cn)
 	light -= sublight;
 	
 	if (has_buff(cn, 215)) light = light/10;
-	if (do_get_iflag(cn, SF_EN_NOGLOW)) light = 0;
+	if (do_get_iflag(cn, SF_EN_GLOWCOMP))
+	{
+		ch[cn].gclight = clamp(light, 0, 250);
+		light = 0;
+	}
 	
 	ch[cn].light = clamp(light, 0, 250);
 	
@@ -11972,12 +12002,14 @@ void really_update_char(int cn)
 	
 	// Multiplicative bonus
 	{
-		if (do_get_iflag(cn, SF_EN_MOREMOVE))          spd_move = more(base_spd + spd_move,  20, 1) - base_spd;
-		if (isWater && do_get_iflag(cn, SF_EN_MOVEUW)) spd_move = more(base_spd + spd_move, 100, 1) - base_spd;
+		if (do_get_iflag(cn, SF_EN_MOREMOVE))          spd_move = more(base_spd + spd_move,  50, 1) - base_spd;
 	}
 	
 	if (do_get_iflag(cn, SF_EN_NOSLOW) && (base_spd + spd_move < 150))  // [Ench] Move speed can't go below 150
 		spd_move = 150 - (base_spd + spd_move);
+	
+	if ((isWater && do_get_iflag(cn, SF_EN_MOVEUW)) && (base_spd + spd_move < 300))  // [Ench] Move speed can't go below 300
+		spd_move = 300 - (base_spd + spd_move);
 	
 	ch[cn].move_speed = clamp(spd_move, -127, 127);
 	
@@ -12069,6 +12101,11 @@ void really_update_char(int cn)
 		n +=     TC_SK(cn, 95)*10;
 		
 		spell_pow = more(spell_pow, n, 1);
+	}
+	
+	// Multiplicative bonus
+	{
+		spell_pow = more(spell_pow, do_get_ieffect(cn, VF_EN_MORESPB), 1);
 	}
 	
 	ch[cn].spell_pow = clamp(spell_pow, -300, 300);
@@ -12175,6 +12212,8 @@ void really_update_char(int cn)
 		
 		critical_b += critical_b * n / PREC_CAP;
 	}
+	
+	critical_b = more(critical_b, do_get_ieffect(cn, VF_EN_MORECRIT), 1);
 	
 	if (do_get_iflag(cn, SF_WHEEL)) critical_b = critical_b * 2/3;  // [Taro] Wheel of Fortune
 	
@@ -12403,7 +12442,7 @@ void really_update_char(int cn)
 	
 	// "More" and "Less" Thorns
 	{
-		if (do_get_iflag(cn, SF_EN_MORETHOR)) gethit = more(gethit, 30, 1);  // [Ench] 30% more Thorns
+		if (do_get_iflag(cn, SF_EN_MORETHOR)) gethit = more(gethit, 50, 1);  // [Ench] 50% more Thorns
 	}
 	
 	ch[cn].gethit_dam = clamp(gethit, 0, 255);
@@ -13271,14 +13310,14 @@ void do_regenerate(int cn)
 	// Meditate added to Hitpoints
 	if (do_get_iflag(cn, SF_EN_MEDIREGN))
 	{
-		race_reg += race_med/2;
-		hpmult   += manamult/2;
+		race_reg += race_med;
+		hpmult   += manamult;
 	}
 	// Rest added to mana
 	if (do_get_iflag(cn, SF_EN_RESTMEDI))
 	{
-		race_med += race_res/2;
-		manamult += endmult/2;
+		race_med += race_res;
+		manamult += endmult;
 	}
 	
 	// Special non-ankh amulets
@@ -14205,6 +14244,10 @@ void do_regenerate(int cn)
 			// Amulet of Waterbreathing quarters the result
 			if (do_get_iflag(cn, SF_WBREATH))
 				waterlifeloss /= 4;
+			
+			// [Ench] # 88 - 50% less water damage
+			if (do_get_iflag(cn, SF_EN_LESSWATER))
+				waterlifeloss = less(waterlifeloss, 50, 1);
 			
 			waterlifeloss = alter_damage(cn, waterlifeloss, &en_dam, &mp_dam, 1); // Damage dealt to EN and MP *instead of HP*
 			if (mp_dam)   ch[cn].a_mana -= mp_dam;

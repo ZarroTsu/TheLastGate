@@ -489,16 +489,21 @@ enum _ch_iflags {
 	SF_EN_NOSLOW,       // Enchant # 37
 	SF_EN_MOREBLEEPOIS, // Enchant # 38
 	SF_EN_LIGHSTEA,     // Enchant # 41
-	SF_EN_WALKREGN, // Enchant # 32
-	SF_EN_MEDIREGN, // Enchant # 36
-	SF_EN_MOREMOVE, // Enchant # 40
-	SF_EN_MOVEUW, // Enchant # 44
-	SF_EN_RESTMEDI, // Enchant # 45
-	SF_EN_ESCAPE, // Enchant # 46
-	SF_EN_MORETHOR, // Enchant # 48
-	SF_EN_MOREPERC, // Enchant # 52
-	SF_EN_MOREHEAL, // Enchant # 56
-	SF_EN_NOGLOW, // Enchant # 55
+	SF_EN_MOREWARCZEPH, // Enchant # 53
+	SF_EN_WALKREGN,     // Enchant # 54
+	SF_EN_MEDIREGN,     // Enchant # 60
+	SF_EN_NINETYAVO,    // Enchant # 61
+	SF_EN_MOREMOVE,     // Enchant # 65
+	SF_EN_NINETYHIT,    // Enchant # 66
+	SF_EN_MOVEUW,       // Enchant # 70
+	SF_EN_RESTMEDI,     // Enchant # 71
+	SF_EN_ESCAPE,       // Enchant # 72
+	SF_EN_MORETHOR,     // Enchant # 75
+	SF_EN_BACKSTOP,     // Enchant # 81
+	SF_EN_MOREPERC,     // Enchant # 82
+	SF_EN_GLOWCOMP,     // Enchant # 85
+	SF_EN_MOREHEAL,     // Enchant # 86
+	SF_EN_LESSWATER,    // Enchant # 88
 	
 	SF_EN_LESSWEAK,     // Enchant #112 (Legacy)
 	SF_EN_LESSSLOW,     // Enchant #113 (Legacy)
@@ -519,42 +524,43 @@ enum _ch_ieffects {
 	VF_EXTRA_STR,
 	VF_GEMMULTI,
 	
-	VF_EN_MOREBRV,      // Enchant #  6 (+ 3) | 84 (+ 2)
-	VF_EN_MOREWIL,      // Enchant # 17 (+ 3) | 84 (+ 2)
-	VF_EN_MOREINT,      // Enchant # 27 (+ 3) | 84 (+ 2)
-	VF_EN_MOREAGL,      // Enchant # 36 (+ 3) | 84 (+ 2)
-	VF_EN_MORESTR,      // Enchant # 44 (+ 3) | 84 (+ 2)
-	VF_EN_MOREHP,
-	VF_EN_MOREEN,       // Enchant # 26 (+10)
-	VF_EN_MOREMP,
-	VF_EN_HPONHIT,  // Enchant # 49 (+1/h)
-	VF_EN_ENONHIT,  // Enchant # 42 (+1/h)
-	VF_EN_MPONHIT,  // Enchant # 38 (+1/h)
-	VF_EN_HPWHENHIT,  // Enchant # 73 (+2)
-	VF_EN_ENWHENHIT,  // Enchant # 43 (+2)
-	VF_EN_MPWHENHIT,  // Enchant # 39 (+2)
-	VF_EN_EXTRHITCH,  // Enchant # 41 (+1)
-	VF_EN_EXTRAVOCH,  // Enchant # 37 (+1)
-	VF_EN_LESSDOT,  // Enchant # 53 (+15)
-	VF_EN_MOREDAMAGE,  // Enchant # 50 (+2)
-	VF_EN_LESSDAMAGE,  // Enchant # 51 (+2)
-	VF_EN_HALFDMG,      // Enchant #116 (+8) (Legacy)
-	VF_EN_SKUAMS,  // Enchant # 57 (+25)
-	VF_EN_SKUAGLOW,  // Enchant # 58 (+4)
-	VF_EN_KWAIHIT,  // Enchant # 61 (+3)
-	VF_EN_KWAIPARRY,  // Enchant # 62 (+3)
-	VF_EN_GORNMANA,  // Enchant # 65 (+20)
-	VF_EN_GORNDOT,  // Enchant # 66 (+1)
-	VF_EN_PURPLEECH,  // Enchant # 69 (+4)
-	VF_EN_PURPDAMG,  // Enchant # 70 (+10)
-	VF_EN_OFFHMANA,  // Enchant # 74 (+10)
-	VF_EN_STAGGER,  // Enchant # 75 (+20)
-	VF_EN_LESSCRIT,  // Enchant # 47 (+50) | 76 (+50)
-	VF_EN_LESSRESR,     // Enchant # 10
-	VF_EN_COMPCRIT,     // Enchant # 11
-	VF_EN_MORERES,      // Enchant # 21
-	VF_EN_MORECAST,     // Enchant # 31
-	VF_EN_MOREASPD,     // Enchant # 
+	VF_EN_MOREBRV,    // Enchant #  6 (+ 3) | 84 (+ 2)
+	VF_EN_MOREWIL,    // Enchant # 17 (+ 3) | 84 (+ 2)
+	VF_EN_MOREINT,    // Enchant # 27 (+ 3) | 84 (+ 2)
+	VF_EN_MOREAGL,    // Enchant # 36 (+ 3) | 84 (+ 2)
+	VF_EN_MORESTR,    // Enchant # 44 (+ 3) | 84 (+ 2)
+	VF_EN_MOREHP,     // Enchant # 89 (+10)
+	VF_EN_MOREEN,     // Enchant # 26 (+10)
+	VF_EN_MOREMP,     // Enchant # 52 (+10)
+	VF_EN_HPONHIT,    // Enchant # 77 (+ 1/h)
+	VF_EN_ENONHIT,    // Enchant # 67 (+ 1/h)
+	VF_EN_MPONHIT,    // Enchant # 62 (+ 1/h)
+	VF_EN_HPWHENHIT,  // Enchant #108 (+ 2)
+	VF_EN_ENWHENHIT,  // Enchant # 68 (+ 2)
+	VF_EN_MPWHENHIT,  // Enchant # 63 (+ 2)
+	VF_EN_LESSDOT,    // Enchant # 83 (+15)
+	VF_EN_MOREDAMAGE, // Enchant # 79 (+ 2)
+	VF_EN_LESSDAMAGE, // Enchant # 80 (+ 2)
+	VF_EN_HALFDMG,    // Enchant #116 (+ 8) (Legacy)
+	VF_EN_SKUAMS,     // Enchant # 92 (+25)
+	VF_EN_SKUAGLOW,   // Enchant # 93 (+ 4)
+	VF_EN_KWAIHIT,    // Enchant # 96 (+ 3)
+	VF_EN_KWAIPARRY,  // Enchant # 97 (+ 3)
+	VF_EN_GORNMANA,   // Enchant #100 (+20)
+	VF_EN_GORNDOT,    // Enchant #101 (+ 1)
+	VF_EN_PURPLEECH,  // Enchant #104 (+ 4)
+	VF_EN_PURPDAMG,   // Enchant #105 (+10)
+	VF_EN_OFFHMANA,   // Enchant #109 (+10)
+	VF_EN_STAGGER,    // Enchant # 56 (+10) |  75 (+20)
+	VF_EN_LESSCRIT,   // Enchant # 74 (+50) | 111 (+50)
+	VF_EN_LESSRESR,   // Enchant # 10 (+20)
+	VF_EN_COMPCRIT,   // Enchant # 11 (+ 5)
+	VF_EN_MORERES,    // Enchant # 21 (+10)
+	VF_EN_MORECAST,   // Enchant # 31 (+20)
+	VF_EN_MORECRIT,   // Enchant # 46 (+10)
+	VF_EN_MOREASPD,   // Enchant # 59 (+20)
+	VF_EN_MORESPB,    // Enchant # 87 (+10)
+	VF_EN_MORERECO,   // Enchant # 90 (+20)
 	
 	VF_MAX
 };
@@ -648,7 +654,9 @@ struct character
 	
 	char season;                    // Challenge season
 	
-	unsigned char olditem[4];       // free slots
+	unsigned char gclight;
+	
+	unsigned char olditem[3];       // free slots
 
 	// items worn
 	unsigned int worn[20];

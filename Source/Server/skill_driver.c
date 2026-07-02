@@ -2833,7 +2833,7 @@ void skill_heal(int cn)
 	
 	power = M_SK(cn, SK_HEAL);
 	
-	if (do_get_iflag(cn, SF_EN_MOREHEAL)) power  = power*6/5;
+	if (do_get_iflag(cn, SF_EN_MOREHEAL)) power  = power*11/10;
 	if (!IS_PLAYER(cn))                   power  = power*2/3;
 	if (do_get_iflag(cn, SF_TW_SUPERBIA)) power /= 2;
 	
@@ -3292,6 +3292,8 @@ int spell_rally(int cn, int co, int power)
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
 	
+	if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
+	
 	//if (cn == co) power = less(power, 25, 1);
 	
 	if (!(in = make_new_buff(cn, SK_WARCRY3, BUF_SPR_WARCRY3, power, SP_DUR_RALLY, 1))) 
@@ -3379,6 +3381,8 @@ int spell_warcry(int cn, int co, int power, int flag)
 		
 		power = more(power, M_AT(cn, AT_STR) * n, 20);
 	}
+	
+	if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -6312,12 +6316,10 @@ int spell_zephyr(int cn, int co, int power, int flag)
 		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) return 0;
 		if (ch[co].flags & CF_IMMORTAL)                      return 0;
 		
-		if (IS_PLAYER(co))	power = spell_immunity(cn, co, power);
-		else				power = other_immunity(power, get_target_immunity(cn, co)/2);
+		if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 		
+		power = spell_immunity(cn, co, power);
 		power = common_mult(cn, co, power);
-		
-		if (!IS_PLAYER(cn)) power = power/2;
 		
 		if (!(in = make_new_buff(cn, SK_ZEPHYR2, BUF_SPR_ZEPHYR2, power, TICKS, 0))) 
 			return 0;

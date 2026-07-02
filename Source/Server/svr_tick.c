@@ -1827,9 +1827,9 @@ int get_meta_stat_value(int cn, int n)
 			{ race_res += race_med;  race_med -= race_med;  endmult  += manamult;  manamult -= manamult; }
 			
 			if (do_get_iflag(cn, SF_EN_MEDIREGN)) // Meditate added to Hitpoints
-			{ race_reg += race_med/2;  hpmult   += manamult/2; }
+			{ race_reg += race_med;  hpmult   += manamult; }
 			if (do_get_iflag(cn, SF_EN_RESTMEDI)) // Rest added to mana
-			{ race_med += race_res/2;  manamult += endmult/2; }
+			{ race_med += race_res;  manamult += endmult; }
 			
 			regen = race_reg + hpmult   * 2;
 			restn = race_res + endmult  * 3;
@@ -2059,7 +2059,7 @@ int get_meta_stat_value(int cn, int n)
 		case 40: // Zephyr Hit Damage				Decimal, 0.00
 			power = spell_multiplier(M_SK(cn, SK_ZEPHYR) + ch[cn].spell_pow, cn) + ch[cn].weapon / 8 + ch[cn].top_damage / 8;
 			power = more(power, M_AT(cn, AT_BRV)*(T_BRAV_SK(cn, 9)*2+TC_SK(cn, 93)), 20);  // (Brav) Alacrity
-			
+			if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 			value = power * DAM_MULT_ZEPHYR/10;
 			break;
 		case 41: // Immolate Degen					Decimal, 0.00 /s
@@ -2179,7 +2179,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 73: case 95: // Heal/Regen Effect
 			power = M_SK(cn, SK_HEAL);
-			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = more(power, 20, 1);
+			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = more(power, 10, 1);
 			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power = less(power, 50, 1);
 			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power, cn)*1875/max(1, SP_DUR_REGEN * 20);
 			else                                  value = spell_multiplier(power * 4/5, cn);
@@ -2197,7 +2197,7 @@ int get_meta_stat_value(int cn, int n)
 		case 76: // Warcry Effect											// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 			power = more(power, M_AT(cn, AT_STR)*(T_ARTM_SK(cn, 9)*2+TC_SK(cn, 21)), 20);  // (ArTm) Overlord
-			
+			if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 			if (IS_ARCHTEMPLAR(cn)) value = (4+(power*5/8) / 5);
 			else                    value = (3+(power  /2) / 5);
 			break;
@@ -2259,6 +2259,7 @@ int get_meta_stat_value(int cn, int n)
 		case 98: // Rally Effect
 			power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 			power = more(power, M_AT(cn, AT_STR)*(T_ARTM_SK(cn, 9)*2+TC_SK(cn, 21)), 20);  // (ArTm) Overlord
+			if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 			value = min(127, (power*2/3) / 5 + 3);
 			break;
 		//
