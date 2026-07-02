@@ -639,6 +639,14 @@ extern char *at_short[];
 #define EN_CLOAK(n)			(n== 5||n==10||n==21||n==31||n==41||n==56||n==61||n==75)
 #define EN_BOOTS(n)			(n== 4||n==15||n==30||n==37||n==65||n==70||n==72||n==88)
 #define EN_ACCES(n)			(n==11||n==22||n==54||n==79||n==80||n==83)
+#define EN_OTHER(n)			(n== 6||n==17||n==27||n==36||n==44||n==57||n==84)
+
+#define EN_SKUA(n)			(n >=  92 && n <=  95)
+#define EN_KWAI(n)			(n >=  96 && n <=  99)
+#define EN_GORN(n)			(n >= 100 && n <= 103)
+#define EN_PURP(n)			(n >= 104 && n <= 107)
+#define EN_OFFH(n)			(n >= 108 && n <= 111)
+#define EN_GODS(n)			(n >=  92 && n <= 111)
 
 #define DESC_EN_WEAPN		"[Weapons Only] "
 #define DESC_EN_ARMOR		"[Armor Pieces Only] "
@@ -649,43 +657,43 @@ extern char *at_short[];
 #define DESC_EN_BOOTS		"[Boots Only] "
 #define DESC_EN_ACCES		"[Accessories Only] "
 
-#define DESC_EN_1(in)		"%-12.12s  %+4d\n", "Braveness",    (IS_TWOHAND(in)?2:1) * 4
-#define DESC_EN_7(in)		"%-12.12s  %+4d\n", "AoE Bonus",    (IS_TWOHAND(in)?2:1) * 1
+#define DESC_EN_1(in)		"%-12.12s  %+4d\n", "Braveness",    (IS_TWOHAND(in)?2:1) *  4
+#define DESC_EN_7(in)		"%-12.12s  %+4d\n", "AoE Bonus",    (IS_TWOHAND(in)?2:1) *  1
 #define DESC_EN_9(in)		"%-12.12s  %+4d\n", "Move Speed",   (IS_TWOHAND(in)?2:1) * 10
 #define DESC_EN_11(in)		"%-12.12s  %+4d\n", "HP & Mana",    (IS_TWOHAND(in)?2:1) * 35
-#define DESC_EN_12(in)		"%-12.12s  %+4d\n", "WV & AV",      (IS_TWOHAND(in)?2:1) * 2
-#define DESC_EN_13(in)		"%-12.12s  %+4d\n", "Willpower",    (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_12(in)		"%-12.12s  %+4d\n", "WV & AV",      (IS_TWOHAND(in)?2:1) *  2
+#define DESC_EN_13(in)		"%-12.12s  %+4d\n", "Willpower",    (IS_TWOHAND(in)?2:1) *  4
 #define DESC_EN_18(in)		"%-12.12s  %+4d\n", "Mana",         (IS_TWOHAND(in)?2:1) * 30
-#define DESC_EN_20(in)		"%-12.12s  %+4d\n", "Cast Speed",   (IS_TWOHAND(in)?2:1) * 5
-#define DESC_EN_24(in)		"%-12.12s  %+4d\n", "Intuition",    (IS_TWOHAND(in)?2:1) * 4
-#define DESC_EN_28(in)		"%-12.12s  %+4d\n", "Spellpower",   (IS_TWOHAND(in)?2:1) * 1
-#define DESC_EN_34(in)		"%-12.12s  %+4d\n", "Agility",      (IS_TWOHAND(in)?2:1) * 4
-#define DESC_EN_39(in)		"%-12.12s  %+4d\n", "Atk Speed",    (IS_TWOHAND(in)?2:1) * 5
-#define DESC_EN_40(in)		"%-12.12s  %+4d\n", "Weapon Value", (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_42(in)		"%-12.12s  %+4d\n", "Parry Bonus",  (IS_TWOHAND(in)?2:1) * 4
-#define DESC_EN_43(in)		"%-12.12s  %+4d\n", "Strength",     (IS_TWOHAND(in)?2:1) * 4
+#define DESC_EN_20(in)		"%-12.12s  %+4d\n", "Cast Speed",   (IS_TWOHAND(in)?2:1) *  5
+#define DESC_EN_24(in)		"%-12.12s  %+4d\n", "Intuition",    (IS_TWOHAND(in)?2:1) *  4
+#define DESC_EN_28(in)		"%-12.12s  %+4d\n", "Spellpower",   (IS_TWOHAND(in)?2:1) *  1
+#define DESC_EN_34(in)		"%-12.12s  %+4d\n", "Agility",      (IS_TWOHAND(in)?2:1) *  4
+#define DESC_EN_39(in)		"%-12.12s  %+4d\n", "Atk Speed",    (IS_TWOHAND(in)?2:1) *  5
+#define DESC_EN_40(in)		"%-12.12s  %+4d\n", "Weapon Value", (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_42(in)		"%-12.12s  %+4d\n", "Parry Bonus",  (IS_TWOHAND(in)?2:1) *  4
+#define DESC_EN_43(in)		"%-12.12s  %+4d\n", "Strength",     (IS_TWOHAND(in)?2:1) *  4
 #define DESC_EN_45(in)		"%-12.12s  %+4d\n", "Hitpoints",    (IS_TWOHAND(in)?2:1) * 30
 #define DESC_EN_47(in)		"%-12.12s  %+4d\n", "Endurance",    (IS_TWOHAND(in)?2:1) * 30
-#define DESC_EN_48(in)		"%-12.12s  %+4d\n", "Hit Bonus",    (IS_TWOHAND(in)?2:1) * 4
-#define DESC_EN_49(in)		"%-12.12s  %+4d\n", "Base Crit",    (IS_TWOHAND(in)?2:1) * 1
-#define DESC_EN_50(in)		"%-12.12s  %+4d\n", "Armor Value",  (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_51(in)		"%-12.12s  %+4d\n", "All Attribs",  (IS_TWOHAND(in)?2:1) * 2
-#define DESC_EN_55(in)		"%-12.12s  %+4d\n", "Hit & Parry",  (IS_TWOHAND(in)?2:1) * 2
-#define DESC_EN_58(in)		"%-12.12s  %+4d\n", "Spell Apt",    (IS_TWOHAND(in)?2:1) * 5
+#define DESC_EN_48(in)		"%-12.12s  %+4d\n", "Hit Bonus",    (IS_TWOHAND(in)?2:1) *  4
+#define DESC_EN_49(in)		"%-12.12s  %+4d\n", "Base Crit",    (IS_TWOHAND(in)?2:1) *  1
+#define DESC_EN_50(in)		"%-12.12s  %+4d\n", "Armor Value",  (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_51(in)		"%-12.12s  %+4d\n", "All Attribs",  (IS_TWOHAND(in)?2:1) *  2
+#define DESC_EN_55(in)		"%-12.12s  %+4d\n", "Hit & Parry",  (IS_TWOHAND(in)?2:1) *  2
+#define DESC_EN_58(in)		"%-12.12s  %+4d\n", "Spell Apt",    (IS_TWOHAND(in)?2:1) *  5
 #define DESC_EN_64(in)		"%-12.12s  %+4d\n", "Crit Multi",   (IS_TWOHAND(in)?2:1) * 10
-#define DESC_EN_69(in)		"%-12.12s  %+4d\n", "All Speed",    (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_73(in)		"%-12.12s  %+4d\n", "Top Damage",   (IS_TWOHAND(in)?2:1) * 6
+#define DESC_EN_69(in)		"%-12.12s  %+4d\n", "All Speed",    (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_73(in)		"%-12.12s  %+4d\n", "Top Damage",   (IS_TWOHAND(in)?2:1) *  6
 #define DESC_EN_76(in)		"%-12.12s  %+4d\n", "Crit Bonus",   (IS_TWOHAND(in)?2:1) * 25
-#define DESC_EN_78(in)		"%-12.12s  %+4d\n", "Thorns",       (IS_TWOHAND(in)?2:1) * 5
-#define DESC_EN_91(in)		"%-12.12s  %+4d\n", "Cooldown",     (IS_TWOHAND(in)?2:1) * 5
+#define DESC_EN_78(in)		"%-12.12s  %+4d\n", "Thorns",       (IS_TWOHAND(in)?2:1) *  5
+#define DESC_EN_91(in)		"%-12.12s  %+4d\n", "Cooldown",     (IS_TWOHAND(in)?2:1) *  5
 
-#define DESC_EN_6(in)		"%d%% more total Braveness.\n",     (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_17(in)		"%d%% more total Willpower.\n",     (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_27(in)		"%d%% more total Intuition.\n",     (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_36(in)		"%d%% more total Agility.\n",       (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_44(in)		"%d%% more total Strength.\n",      (IS_TWOHAND(in)?2:1) * 3
-#define DESC_EN_84(in)		"%d%% more total attributes.\n",    (IS_TWOHAND(in)?2:1) * 2
-#define DESC_EN_87(in)		"%d%% more total Attack Speed.\n",  (IS_TWOHAND(in)?2:1) * 10
+#define DESC_EN_6(in)		"%d%% more total Braveness.\n",        (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_17(in)		"%d%% more total Willpower.\n",        (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_27(in)		"%d%% more total Intuition.\n",        (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_36(in)		"%d%% more total Agility.\n",          (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_44(in)		"%d%% more total Strength.\n",         (IS_TWOHAND(in)?2:1) *  3
+#define DESC_EN_84(in)		"%d%% more total attributes.\n",       (IS_TWOHAND(in)?2:1) *  2
+#define DESC_EN_87(in)		"%d%% more total Spellpower Bonus.\n", (IS_TWOHAND(in)?2:1) * 10
 
 #define DESC_EN_62(in)		"Restore %d Mana upon hitting an enemy.\n",      (IS_TWOHAND(in)?2:1)
 #define DESC_EN_67(in)		"Restore %d Endurance upon hitting an enemy.\n", (IS_TWOHAND(in)?2:1)
@@ -705,7 +713,7 @@ extern char *at_short[];
 #define DESC_EN_22(in)		"Cannot lose focus.\n"
 #define DESC_EN_23(in)		"20%% of damage taken is dealt to your Endurance before Hitpoints.\n"
 #define DESC_EN_25(in)		"Grants infravision.\n"
-#define DESC_EN_26(in)		"10%% more maximum Endurance.\n"
+#define DESC_EN_26(in)		"10%% increased maximum Endurance.\n"
 #define DESC_EN_29(in)		"10%% more effect of Blinds and Curses you inflict.\n"
 #define DESC_EN_30(in)		"20%% more effect of your Stealth skill.\n"
 #define DESC_EN_31(in)		"20%% more total cast speed.\n"
@@ -716,7 +724,7 @@ extern char *at_short[];
 #define DESC_EN_38(in)		"10%% more effect of Bleeds and Poisons you inflict.\n"
 #define DESC_EN_41(in)		"Your Stealth skill ignores light penalties.\n"
 #define DESC_EN_46(in)		"10%% more chance to critical hit.\n"
-#define DESC_EN_52(in)		"10%% more maximum Mana.\n"
+#define DESC_EN_52(in)		"10%% increased maximum Mana.\n"
 #define DESC_EN_53(in)		"10%% more effect of Warcries and Zephyrs you inflict.\n"
 #define DESC_EN_54(in)		"Grants unreduced regeneration rates while walking.\n"
 #define DESC_EN_56(in)		"10% of damage taken from hits is staggered over 5 seconds.\n"
@@ -738,32 +746,31 @@ extern char *at_short[];
 #define DESC_EN_81(in)		"Enemies beside and behind you no longer gain a bonus to hitting you.\n"
 #define DESC_EN_82(in)		"Your Perception skill is 50%% stronger.\n"
 #define DESC_EN_83(in)		"20%% reduced damage taken from damage over time.\n"
-#define DESC_EN_85(in)		"Your Glow score effects your minions instead of you.\n"
+#define DESC_EN_85(in)		"Your Glow score affects your minions instead of you.\n"
 #define DESC_EN_86(in)		"20%% more effect of heals and regens you apply.\n"
 #define DESC_EN_88(in)		"50%% less damage taken from being underwater.\n"
-#define DESC_EN_89(in)		"10%% more maximum Hitpoints.\n"
-#define DESC_EN_90(in)		"10%% more effect of recovery from all sources.\n"
-
-#define DESC_EN_92(in)		""
-#define DESC_EN_93(in)		""
-#define DESC_EN_94(in)		""
-#define DESC_EN_95(in)		""
-#define DESC_EN_96(in)		""
-#define DESC_EN_97(in)		""
-#define DESC_EN_98(in)		""
-#define DESC_EN_99(in)		""
-#define DESC_EN_100(in)		""
-#define DESC_EN_101(in)		""
-#define DESC_EN_102(in)		""
-#define DESC_EN_103(in)		""
-#define DESC_EN_104(in)		""
-#define DESC_EN_105(in)		""
-#define DESC_EN_106(in)		""
-#define DESC_EN_107(in)		""
-#define DESC_EN_108(in)		""
-#define DESC_EN_109(in)		""
-#define DESC_EN_110(in)		""
-#define DESC_EN_111(in)		""
+#define DESC_EN_89(in)		"10%% increased maximum Hitpoints.\n"
+#define DESC_EN_90(in)		"20%% more effect of recovery from all sources.\n"
+#define DESC_EN_92(in)		"25%% of Armor Value granted by Magic Shield is granted as additional Weapon Value.\n"
+#define DESC_EN_93(in)		"4%% of total Glow score is granted as additional spell modifier.\n"
+#define DESC_EN_94(in)		"Your hits inflict a self-scaling Slow, reducing enemy action speed.\n"
+#define DESC_EN_95(in)		"Your hits inflict a self-scaling Scorch, causing enemies to take additional damage.\n"
+#define DESC_EN_96(in)		"3%% of total hit score is granted as extra parry score.\n"
+#define DESC_EN_97(in)		"3%% of total parry score is granted as extra hit score.\n"
+#define DESC_EN_98(in)		"Your hits inflict a self-scaling Curse, reducing enemy attributes.\n"
+#define DESC_EN_99(in)		"Your hits inflict a self-scaling Weaken, reducing enemy weapon value.\n"
+#define DESC_EN_100(in)		"20%% of damage dealt with hits is also dealt to enemy mana.\n"
+#define DESC_EN_101(in)		"1%% of damage dealt with damage over time is leeched as hitpoints, endurance and mana.\n"
+#define DESC_EN_102(in)		"Your hits inflict a self-scaling Poison, dealing damage over time.\n"
+#define DESC_EN_103(in)		"Your hits inflict a self-scaling Fatigue, causing enemies to deal less damage.\n"
+#define DESC_EN_104(in)		"1%% of damage dealt with hits is leeched as hitpoints, endurance and mana.\n"
+#define DESC_EN_105(in)		"10%% of current endurance value is granted as additional damage on hit.\n"
+#define DESC_EN_106(in)		"Your hits inflict a self-scaling Blind, reducing enemy perception, hit and parry.\n"
+#define DESC_EN_107(in)		"Your hits inflict a self-scaling Frostburn, draining enemy endurance and mana.\n"
+#define DESC_EN_108(in)		"Restore 2 Hitpoints upon being hit by an enemy.\n"
+#define DESC_EN_109(in)		"10%% of weapon value is granted as additional rapid mana regeneration.\n"
+#define DESC_EN_110(in)		"20%% of damage taken from hits is staggered over 5 seconds.\n"
+#define DESC_EN_111(in)		"Reduces extra damage taken from enemy critical hits by 50%%.\n"
 
 #define DESC_EN_112(in)		"Weakens inflicted on you are 50%% weaker.\n"
 #define DESC_EN_113(in)		"Slows inflicted on you are 50%% weaker.\n"
