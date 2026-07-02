@@ -1508,10 +1508,95 @@ int main(int argc, char *args[])
 		clear_map_buffs(n, 1);
 	}
 	
-	/* // (vvv REMOVE AFTER UPDATE!!!)
+	// (vvv REMOVE AFTER UPDATE!!!)
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;
+		//
+		if (!it[n].enchantment) continue;
+		switch (it[n].enchantment) // Reassign existing enchants to the new number schema. Only run once!!
+		{
+			case  1: it[n].enchantment = 2; break;
+			case  2: it[n].enchantment = 3; break;
+			case  3: it[n].enchantment = 4; break;
+			case  4: it[n].enchantment = 5; break;
+			case  5: it[n].enchantment = 6; break;
+			case  6: it[n].enchantment = 30; break; // !
+			case  7: it[n].enchantment = 8; break;
+			case  8: it[n].enchantment = 112; it[n].flags |= IF_LEGACY; break; // !
+			case  9: it[n].enchantment = 14; break;
+			case 10: it[n].enchantment = 15; break;
+			case 11: it[n].enchantment = 16; break;
+			case 12: it[n].enchantment = 17; break;
+			case 13: it[n].enchantment = 8; break; // !
+			case 14: it[n].enchantment = 113; it[n].flags |= IF_LEGACY; break; // !
+			case 15: it[n].enchantment = 22; break;
+			case 16: it[n].enchantment = 23; break;
+			case 17: it[n].enchantment = 25; break;
+			case 18: it[n].enchantment = 26; break;
+			case 19: it[n].enchantment = 27; break;
+			case 20: it[n].enchantment = 29; break;
+			case 21: it[n].enchantment = 114; it[n].flags |= IF_LEGACY; break; // !
+			case 22: it[n].enchantment = 32; break;
+			case 23: it[n].enchantment = 33; break;
+			case 24: it[n].enchantment = 35; break;
+			case 25: it[n].enchantment = 36; break;
+			case 26: it[n].enchantment = 37; break;
+			case 27: it[n].enchantment = 38; break;
+			case 28: it[n].enchantment = 30; break; // !
+			case 29: it[n].enchantment = 44; break;
+			case 30: it[n].enchantment = 38; break; // !
+			case 31: it[n].enchantment = 29; break; // !
+			case 32: it[n].enchantment = 54; break;
+			case 33: it[n].enchantment = 115; it[n].flags |= IF_LEGACY; break; // !
+			case 34: it[n].enchantment = 57; break;
+			case 35: it[n].enchantment = 116; it[n].flags |= IF_LEGACY; break; // !
+			case 36: it[n].enchantment = 60; break;
+			case 37: it[n].enchantment = 61; break;
+			case 38: it[n].enchantment = 62; break;
+			case 39: it[n].enchantment = 63; break;
+			case 40: it[n].enchantment = 65; break;
+			case 41: it[n].enchantment = 66; break;
+			case 42: it[n].enchantment = 67; break;
+			case 43: it[n].enchantment = 68; break;
+			case 44: it[n].enchantment = 70; break;
+			case 45: it[n].enchantment = 71; break;
+			case 46: it[n].enchantment = 72; break;
+			case 47: it[n].enchantment = 74; break;
+			case 48: it[n].enchantment = 75; break;
+			case 49: it[n].enchantment = 77; break;
+			case 50: it[n].enchantment = 79; break;
+			case 51: it[n].enchantment = 80; break;
+			case 52: it[n].enchantment = 82; break;
+			case 53: it[n].enchantment = 83; break;
+			case 54: it[n].enchantment = 84; break;
+			case 55: it[n].enchantment = 85; break;
+			case 56: it[n].enchantment = 86; break;
+			//
+			case 57: it[n].enchantment = 92; break;
+			case 58: it[n].enchantment = 93; break;
+			case 59: it[n].enchantment = 94; break;
+			case 60: it[n].enchantment = 95; break;
+			case 61: it[n].enchantment = 96; break;
+			case 62: it[n].enchantment = 97; break;
+			case 63: it[n].enchantment = 98; break;
+			case 64: it[n].enchantment = 99; break;
+			case 65: it[n].enchantment = 100; break;
+			case 66: it[n].enchantment = 101; break;
+			case 67: it[n].enchantment = 102; break;
+			case 68: it[n].enchantment = 103; break;
+			case 69: it[n].enchantment = 104; break;
+			case 70: it[n].enchantment = 105; break;
+			case 71: it[n].enchantment = 106; break;
+			case 72: it[n].enchantment = 107; break;
+			case 73: it[n].enchantment = 108; break;
+			case 74: it[n].enchantment = 109; break;
+			case 75: it[n].enchantment = 110; break;
+			case 76: it[n].enchantment = 111; break;
+			//
+			default: break;
+		}
+		//
 	}
 	// */ // (^^^ REMOVE AFTER UPDATE!!!)
 
