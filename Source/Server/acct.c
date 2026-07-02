@@ -3778,7 +3778,7 @@ void list_characters_template_non_monster(LIST *head)    // excludes grolms, gar
 
 
 
-void list_named_characters_template(LIST *head)    // excludes grolms, gargs, icegargs. decides by sprite-nr
+void list_quest_merchant_characters_template(LIST *head)    // excludes grolms, gargs, icegargs. decides by sprite-nr
 {
 	int n;
 	int i;
@@ -3786,18 +3786,8 @@ void list_named_characters_template(LIST *head)    // excludes grolms, gargs, ic
 
 	for (n = 0; n<MAXTCHARS; n++)
 	{
-		if (ch_temp[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (ch_temp[n].sprite==12240 ||
-		    ch_temp[n].sprite==18384 ||
-		    ch_temp[n].sprite==21456 ||
-		    ch_temp[n].sprite==14288 ||
-		    ch_temp[n].sprite==31696)
-		{
-			continue;
-		}
+		if (ch_temp[n].used==USE_EMPTY) continue;
+		if (!ch_temp[n].data[50] && !(ch_temp[n].flags & CF_MERCHANT)) continue;
 		phtml_row_ctemplate(n);
 	}
 
@@ -4043,7 +4033,7 @@ int main(int argc, char *args[])
 		list_characters_template_align(head, 1);
 		break;
 	case 17:
-		list_named_characters_template(head);
+		list_quest_merchant_characters_template(head);
 		break;
 	case 18:
 		list_characters_template_non_monster(head);
@@ -4131,7 +4121,7 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=11>Characters (without Grolms, Gargoyles, Icegargs)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=16>Characters (only with Positive Alignment) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=35>Characters (only with Negative Alignment) </a><br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=17>Characters (only Named) </a><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=17>Characters (Quests and Merchants) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=18>Characters (Non Monster) </a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=41>Characters (only Grolms, Gargoyles, Icegargs) </a><br><br>\n");
 		printf("This list includes only characters with high IDs for fast access<br>\n");

@@ -260,7 +260,7 @@ int is_ascroll(int in);
 
 #define GET_SPD(cn)				(SPEED_CAP - ch[(cn)].speed)
 #define GET_SPD_ATK(cn)			(GET_SPD(cn) - SPEED_BASE + ch[cn].atk_speed)
-#define GET_SPD_CAS(cn)			(GET_SPD(cn)/2 - SPEED_BASE + ch[cn].cast_speed*2)
+#define GET_SPD_CAS(cn)			(GET_SPD(cn) - SPEED_BASE + ch[cn].cast_speed)
 #define GET_SPD_MOV(cn)			(GET_SPD(cn) - SPEED_BASE + ch[cn].move_speed)
 
 
