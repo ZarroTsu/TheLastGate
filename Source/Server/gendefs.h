@@ -650,15 +650,6 @@ extern char *at_short[];
 
 #define EN_SHOWDESC(n)		(EN_WEAPN(n)||EN_ARMOR(n)||EN_HELMS(n)||EN_CHEST(n)||EN_GLOVE(n)||EN_CLOAK(n)||EN_BOOTS(n)||EN_ACCES(n)||EN_OTHER(n)||EN_GODS(n))
 
-#define DESC_EN_WEAPN		"[Weapons Only] "
-#define DESC_EN_ARMOR		"[Armor Pieces Only] "
-#define DESC_EN_HELMS		"[Helmet Only] "
-#define DESC_EN_CHEST		"[Chest Only] "
-#define DESC_EN_GLOVE		"[Gloves Only] "
-#define DESC_EN_CLOAK		"[Cloak Only] "
-#define DESC_EN_BOOTS		"[Boots Only] "
-#define DESC_EN_ACCES		"[Accessories Only] "
-
 #define DESC_EN_1(in)		"%-12.12s  %+4d\n", "Braveness",    (IS_TWOHAND(in)?2:1) *  4
 #define DESC_EN_7(in)		"%-12.12s  %+4d\n", "AoE Bonus",    (IS_TWOHAND(in)?2:1) *  1
 #define DESC_EN_9(in)		"%-12.12s  %+4d\n", "Move Speed",   (IS_TWOHAND(in)?2:1) * 10
@@ -779,8 +770,6 @@ extern char *at_short[];
 #define DESC_EN_114(in)		"Curses inflicted on you are 50%% weaker.\n"
 #define DESC_EN_115(in)		"Blinds inflicted on you are 50%% weaker.\n"
 #define DESC_EN_116(in)		"8%% chance to half damage taken.\n"
-
-#define DESC_ENCH(in, n)	DESC_EN_##n(in)
 
 // -------- Tarot Cards -------- //
 

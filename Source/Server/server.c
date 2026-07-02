@@ -1508,7 +1508,7 @@ int main(int argc, char *args[])
 		clear_map_buffs(n, 1);
 	}
 	
-	// (vvv REMOVE AFTER UPDATE!!!)
+	/* // (vvv REMOVE AFTER UPDATE!!!)
 	for (n = 1; n<MAXITEM; n++)
 	{
 		if (it[n].used==USE_EMPTY) continue;

@@ -557,7 +557,7 @@ static void char_info(int cn)
 
 	if (!(ch[cn].flags & CF_GOD))
 	{
-		if (ch[cn].season)
+		if (ch[cn].season && ch[cn].season > 0)
 		{
 			printf("%s is a season %d character.\n", ch[cn].name, ch[cn].season);
 		}

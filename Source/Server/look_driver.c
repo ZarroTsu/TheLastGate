@@ -154,7 +154,7 @@ void look_has_mod(int cn, int in)
 		do_char_log(cn, 2, "%d more blessing%s. Next in %d kills.\n", 
 			it[in].stack, (it[in].stack>1?"s":""), rank2points(max(0, getitemrank(in, it[in].data[1])))/250*it[in].data[1] - it[in].cost);
 	
-	if (it[in].season == CURRENTSEASON)
+	if (it[in].season == CURRENTSEASON && CURRENTSEASON > 0)
 		do_char_log(cn, 9, "Season %d item.\n", it[in].season);
 	
 	if (lega)
@@ -428,9 +428,8 @@ void look_extra(int cn, int in)
 	default: break;
 	}
 	
-	if ((it[in].flags & IF_ENCHANTED) && EN_SHOWDESC(n))
+	if ((it[in].flags & IF_ENCHANTED) && EN_SHOWDESC((n = it[in].enchantment)))
 	{
-		n = it[in].enchantment;
 		m = 8;
 		
 		if (EN_SKUA(n)) m = 7;
@@ -439,7 +438,126 @@ void look_extra(int cn, int in)
 		if (EN_PURP(n)) m = 8;
 		if (EN_OFFH(n)) m = 9;
 		
-		do_char_log(cn, m, DESC_ENCH(in, n));
+		switch (n)
+		{
+			case   1: do_char_log(cn, m, DESC_EN_1(in)); break;
+			case   2: do_char_log(cn, m, DESC_EN_2(in)); break;
+			case   3: do_char_log(cn, m, DESC_EN_3(in)); break;
+			case   4: do_char_log(cn, m, DESC_EN_4(in)); break;
+			case   5: do_char_log(cn, m, DESC_EN_5(in)); break;
+			case   6: do_char_log(cn, m, DESC_EN_6(in)); break;
+			case   7: do_char_log(cn, m, DESC_EN_7(in)); break;
+			case   8: do_char_log(cn, m, DESC_EN_8(in)); break;
+			case   9: do_char_log(cn, m, DESC_EN_9(in)); break;
+			case  10: do_char_log(cn, m, DESC_EN_10(in)); break;
+			case  11: do_char_log(cn, m, DESC_EN_11(in)); break;
+			case  12: do_char_log(cn, m, DESC_EN_12(in)); break;
+			case  13: do_char_log(cn, m, DESC_EN_13(in)); break;
+			case  14: do_char_log(cn, m, DESC_EN_14(in)); break;
+			case  15: do_char_log(cn, m, DESC_EN_15(in)); break;
+			case  16: do_char_log(cn, m, DESC_EN_16(in)); break;
+			case  17: do_char_log(cn, m, DESC_EN_17(in)); break;
+			case  18: do_char_log(cn, m, DESC_EN_18(in)); break;
+			case  19: do_char_log(cn, m, DESC_EN_19(in)); break;
+			case  20: do_char_log(cn, m, DESC_EN_20(in)); break;
+			case  21: do_char_log(cn, m, DESC_EN_21(in)); break;
+			case  22: do_char_log(cn, m, DESC_EN_22(in)); break;
+			case  23: do_char_log(cn, m, DESC_EN_23(in)); break;
+			case  24: do_char_log(cn, m, DESC_EN_24(in)); break;
+			case  25: do_char_log(cn, m, DESC_EN_25(in)); break;
+			case  26: do_char_log(cn, m, DESC_EN_26(in)); break;
+			case  27: do_char_log(cn, m, DESC_EN_27(in)); break;
+			case  28: do_char_log(cn, m, DESC_EN_28(in)); break;
+			case  29: do_char_log(cn, m, DESC_EN_29(in)); break;
+			case  30: do_char_log(cn, m, DESC_EN_30(in)); break;
+			case  31: do_char_log(cn, m, DESC_EN_31(in)); break;
+			case  32: do_char_log(cn, m, DESC_EN_32(in)); break;
+			case  33: do_char_log(cn, m, DESC_EN_33(in)); break;
+			case  34: do_char_log(cn, m, DESC_EN_34(in)); break;
+			case  35: do_char_log(cn, m, DESC_EN_35(in)); break;
+			case  36: do_char_log(cn, m, DESC_EN_36(in)); break;
+			case  37: do_char_log(cn, m, DESC_EN_37(in)); break;
+			case  38: do_char_log(cn, m, DESC_EN_38(in)); break;
+			case  39: do_char_log(cn, m, DESC_EN_39(in)); break;
+			case  40: do_char_log(cn, m, DESC_EN_40(in)); break;
+			case  41: do_char_log(cn, m, DESC_EN_41(in)); break;
+			case  42: do_char_log(cn, m, DESC_EN_42(in)); break;
+			case  43: do_char_log(cn, m, DESC_EN_43(in)); break;
+			case  44: do_char_log(cn, m, DESC_EN_44(in)); break;
+			case  45: do_char_log(cn, m, DESC_EN_45(in)); break;
+			case  46: do_char_log(cn, m, DESC_EN_46(in)); break;
+			case  47: do_char_log(cn, m, DESC_EN_47(in)); break;
+			case  48: do_char_log(cn, m, DESC_EN_48(in)); break;
+			case  49: do_char_log(cn, m, DESC_EN_49(in)); break;
+			case  50: do_char_log(cn, m, DESC_EN_50(in)); break;
+			case  51: do_char_log(cn, m, DESC_EN_51(in)); break;
+			case  52: do_char_log(cn, m, DESC_EN_52(in)); break;
+			case  53: do_char_log(cn, m, DESC_EN_53(in)); break;
+			case  54: do_char_log(cn, m, DESC_EN_54(in)); break;
+			case  55: do_char_log(cn, m, DESC_EN_55(in)); break;
+			case  56: do_char_log(cn, m, DESC_EN_56(in)); break;
+			case  57: do_char_log(cn, m, DESC_EN_57(in)); break;
+			case  58: do_char_log(cn, m, DESC_EN_58(in)); break;
+			case  59: do_char_log(cn, m, DESC_EN_59(in)); break;
+			case  60: do_char_log(cn, m, DESC_EN_60(in)); break;
+			case  61: do_char_log(cn, m, DESC_EN_61(in)); break;
+			case  62: do_char_log(cn, m, DESC_EN_62(in)); break;
+			case  63: do_char_log(cn, m, DESC_EN_63(in)); break;
+			case  64: do_char_log(cn, m, DESC_EN_64(in)); break;
+			case  65: do_char_log(cn, m, DESC_EN_65(in)); break;
+			case  66: do_char_log(cn, m, DESC_EN_66(in)); break;
+			case  67: do_char_log(cn, m, DESC_EN_67(in)); break;
+			case  68: do_char_log(cn, m, DESC_EN_68(in)); break;
+			case  69: do_char_log(cn, m, DESC_EN_69(in)); break;
+			case  70: do_char_log(cn, m, DESC_EN_70(in)); break;
+			case  71: do_char_log(cn, m, DESC_EN_71(in)); break;
+			case  72: do_char_log(cn, m, DESC_EN_72(in)); break;
+			case  73: do_char_log(cn, m, DESC_EN_73(in)); break;
+			case  74: do_char_log(cn, m, DESC_EN_74(in)); break;
+			case  75: do_char_log(cn, m, DESC_EN_75(in)); break;
+			case  76: do_char_log(cn, m, DESC_EN_76(in)); break;
+			case  77: do_char_log(cn, m, DESC_EN_77(in)); break;
+			case  78: do_char_log(cn, m, DESC_EN_78(in)); break;
+			case  79: do_char_log(cn, m, DESC_EN_79(in)); break;
+			case  80: do_char_log(cn, m, DESC_EN_80(in)); break;
+			case  81: do_char_log(cn, m, DESC_EN_81(in)); break;
+			case  82: do_char_log(cn, m, DESC_EN_82(in)); break;
+			case  83: do_char_log(cn, m, DESC_EN_83(in)); break;
+			case  84: do_char_log(cn, m, DESC_EN_84(in)); break;
+			case  85: do_char_log(cn, m, DESC_EN_85(in)); break;
+			case  86: do_char_log(cn, m, DESC_EN_86(in)); break;
+			case  87: do_char_log(cn, m, DESC_EN_87(in)); break;
+			case  88: do_char_log(cn, m, DESC_EN_88(in)); break;
+			case  89: do_char_log(cn, m, DESC_EN_89(in)); break;
+			case  90: do_char_log(cn, m, DESC_EN_90(in)); break;
+			case  91: do_char_log(cn, m, DESC_EN_91(in)); break;
+			case  92: do_char_log(cn, m, DESC_EN_92(in)); break;
+			case  93: do_char_log(cn, m, DESC_EN_93(in)); break;
+			case  94: do_char_log(cn, m, DESC_EN_94(in)); break;
+			case  95: do_char_log(cn, m, DESC_EN_95(in)); break;
+			case  96: do_char_log(cn, m, DESC_EN_96(in)); break;
+			case  97: do_char_log(cn, m, DESC_EN_97(in)); break;
+			case  98: do_char_log(cn, m, DESC_EN_98(in)); break;
+			case  99: do_char_log(cn, m, DESC_EN_99(in)); break;
+			case 100: do_char_log(cn, m, DESC_EN_100(in)); break;
+			case 101: do_char_log(cn, m, DESC_EN_101(in)); break;
+			case 102: do_char_log(cn, m, DESC_EN_102(in)); break;
+			case 103: do_char_log(cn, m, DESC_EN_103(in)); break;
+			case 104: do_char_log(cn, m, DESC_EN_104(in)); break;
+			case 105: do_char_log(cn, m, DESC_EN_105(in)); break;
+			case 106: do_char_log(cn, m, DESC_EN_106(in)); break;
+			case 107: do_char_log(cn, m, DESC_EN_107(in)); break;
+			case 108: do_char_log(cn, m, DESC_EN_108(in)); break;
+			case 109: do_char_log(cn, m, DESC_EN_109(in)); break;
+			case 110: do_char_log(cn, m, DESC_EN_110(in)); break;
+			case 111: do_char_log(cn, m, DESC_EN_111(in)); break;
+			case 112: do_char_log(cn, m, DESC_EN_112(in)); break;
+			case 113: do_char_log(cn, m, DESC_EN_113(in)); break;
+			case 114: do_char_log(cn, m, DESC_EN_114(in)); break;
+			case 115: do_char_log(cn, m, DESC_EN_115(in)); break;
+			case 116: do_char_log(cn, m, DESC_EN_116(in)); break;
+			default: break;
+		}
 	}
 	
 	if (IS_CORRUPTOR(in))
@@ -587,6 +705,7 @@ void look_contract(int cn, int in, int desc)
 void look_talisman(int cn, int in)
 {
 	int n = it[in].data[0];
+	int m = 1;
 	
 	do_char_log(cn, 6, "%s:\n", it[in].name);
 	
@@ -614,16 +733,104 @@ void look_talisman(int cn, int in)
 	{
 		do_char_log(cn, 1, "A Talisman socketed with two gemstones. It can be used on a piece of gear to grant the following effect:\n");
 		
-		     if (EN_WEAPN(n)) do_char_log(cn, 8, DESC_EN_WEAPN DESC_ENCH(in, n));
-		else if (EN_ARMOR(n)) do_char_log(cn, 8, DESC_EN_ARMOR DESC_ENCH(in, n));
-		else if (EN_HELMS(n)) do_char_log(cn, 8, DESC_EN_HELMS DESC_ENCH(in, n));
-		else if (EN_CHEST(n)) do_char_log(cn, 8, DESC_EN_CHEST DESC_ENCH(in, n));
-		else if (EN_GLOVE(n)) do_char_log(cn, 8, DESC_EN_GLOVE DESC_ENCH(in, n));
-		else if (EN_CLOAK(n)) do_char_log(cn, 8, DESC_EN_CLOAK DESC_ENCH(in, n));
-		else if (EN_BOOTS(n)) do_char_log(cn, 8, DESC_EN_BOOTS DESC_ENCH(in, n));
-		else if (EN_ACCES(n)) do_char_log(cn, 8, DESC_EN_ACCES DESC_ENCH(in, n));
-		else if (EN_OTHER(n)) do_char_log(cn, 8, DESC_ENCH(in, n));
-		else                  do_char_log(cn, 1, DESC_ENCH(in, n));
+		if (EN_WEAPN(n) || EN_ARMOR(n) || EN_HELMS(n) || EN_CHEST(n) || EN_GLOVE(n) 
+			|| EN_CLOAK(n) || EN_BOOTS(n) || EN_ACCES(n) || EN_OTHER(n)) m = 8;
+		
+		switch (n)
+		{
+			case   1: do_char_log(cn, m, DESC_EN_1(in)); break;
+			case   2: do_char_log(cn, m, "[Chest Only] " DESC_EN_2(in)); break;
+			case   3: do_char_log(cn, m, "[Helmet Only] " DESC_EN_3(in)); break;
+			case   4: do_char_log(cn, m, "[Boots Only] " DESC_EN_4(in)); break;
+			case   5: do_char_log(cn, m, "[Cloak Only] " DESC_EN_5(in)); break;
+			case   6: do_char_log(cn, m, DESC_EN_6(in)); break;
+			case   7: do_char_log(cn, m, "[Armor Pieces Only] " DESC_EN_7(in)); break;
+			case   8: do_char_log(cn, m, "[Gloves Only] " DESC_EN_8(in)); break;
+			case   9: do_char_log(cn, m, DESC_EN_9(in)); break;
+			case  10: do_char_log(cn, m, "[Cloak Only] " DESC_EN_10(in)); break;
+			case  11: do_char_log(cn, m, "[Accessories Only] " DESC_EN_11(in)); break;
+			case  12: do_char_log(cn, m, DESC_EN_12(in)); break;
+			case  13: do_char_log(cn, m, DESC_EN_13(in)); break;
+			case  14: do_char_log(cn, m, "[Helmet Only] " DESC_EN_14(in)); break;
+			case  15: do_char_log(cn, m, "[Boots Only] " DESC_EN_15(in)); break;
+			case  16: do_char_log(cn, m, "[Chest Only] " DESC_EN_16(in)); break;
+			case  17: do_char_log(cn, m, DESC_EN_17(in)); break;
+			case  18: do_char_log(cn, m, DESC_EN_18(in)); break;
+			case  19: do_char_log(cn, m, "[Gloves Only] " DESC_EN_19(in)); break;
+			case  20: do_char_log(cn, m, DESC_EN_20(in)); break;
+			case  21: do_char_log(cn, m, "[Cloak Only] " DESC_EN_21(in)); break;
+			case  22: do_char_log(cn, m, "[Accessories Only] " DESC_EN_22(in)); break;
+			case  23: do_char_log(cn, m, "[Chest Only] " DESC_EN_23(in)); break;
+			case  24: do_char_log(cn, m, DESC_EN_24(in)); break;
+			case  25: do_char_log(cn, m, "[Helmet Only] " DESC_EN_25(in)); break;
+			case  26: do_char_log(cn, m, "[Armor Pieces Only] " DESC_EN_26(in)); break;
+			case  27: do_char_log(cn, m, DESC_EN_27(in)); break;
+			case  28: do_char_log(cn, m, DESC_EN_28(in)); break;
+			case  29: do_char_log(cn, m, "[Gloves Only] " DESC_EN_29(in)); break;
+			case  30: do_char_log(cn, m, "[Boots Only] " DESC_EN_30(in)); break;
+			case  31: do_char_log(cn, m, "[Cloak Only] " DESC_EN_31(in)); break;
+			case  32: do_char_log(cn, m, "[Helmet Only] " DESC_EN_32(in)); break;
+			case  33: do_char_log(cn, m, "[Chest Only] " DESC_EN_33(in)); break;
+			case  34: do_char_log(cn, m, DESC_EN_34(in)); break;
+			case  35: do_char_log(cn, m, "[Chest Only] " DESC_EN_35(in)); break;
+			case  36: do_char_log(cn, m, DESC_EN_36(in)); break;
+			case  37: do_char_log(cn, m, "[Boots Only] " DESC_EN_37(in)); break;
+			case  38: do_char_log(cn, m, "[Gloves Only] " DESC_EN_38(in)); break;
+			case  39: do_char_log(cn, m, DESC_EN_39(in)); break;
+			case  40: do_char_log(cn, m, DESC_EN_40(in)); break;
+			case  41: do_char_log(cn, m, "[Cloak Only] " DESC_EN_41(in)); break;
+			case  42: do_char_log(cn, m, DESC_EN_42(in)); break;
+			case  43: do_char_log(cn, m, DESC_EN_43(in)); break;
+			case  44: do_char_log(cn, m, DESC_EN_44(in)); break;
+			case  45: do_char_log(cn, m, DESC_EN_45(in)); break;
+			case  46: do_char_log(cn, m, "[Gloves Only] " DESC_EN_46(in)); break;
+			case  47: do_char_log(cn, m, DESC_EN_47(in)); break;
+			case  48: do_char_log(cn, m, DESC_EN_48(in)); break;
+			case  49: do_char_log(cn, m, "[Weapons Only] " DESC_EN_49(in)); break;
+			case  50: do_char_log(cn, m, DESC_EN_50(in)); break;
+			case  51: do_char_log(cn, m, DESC_EN_51(in)); break;
+			case  52: do_char_log(cn, m, "[Armor Pieces Only] " DESC_EN_52(in)); break;
+			case  53: do_char_log(cn, m, "[Gloves Only] " DESC_EN_53(in)); break;
+			case  54: do_char_log(cn, m, "[Accessories Only] " DESC_EN_54(in)); break;
+			case  55: do_char_log(cn, m, DESC_EN_55(in)); break;
+			case  56: do_char_log(cn, m, "[Cloak Only] " DESC_EN_56(in)); break;
+			case  57: do_char_log(cn, m, DESC_EN_57(in)); break;
+			case  58: do_char_log(cn, m, DESC_EN_58(in)); break;
+			case  59: do_char_log(cn, m, "[Gloves Only] " DESC_EN_59(in)); break;
+			case  60: do_char_log(cn, m, "[Helmet Only] " DESC_EN_60(in)); break;
+			case  61: do_char_log(cn, m, "[Cloak Only] " DESC_EN_61(in)); break;
+			case  62: do_char_log(cn, m, "[Weapons Only] " DESC_EN_62(in)); break;
+			case  63: do_char_log(cn, m, "[Armor Pieces Only] " DESC_EN_63(in)); break;
+			case  64: do_char_log(cn, m, DESC_EN_64(in)); break;
+			case  65: do_char_log(cn, m, "[Boots Only] " DESC_EN_65(in)); break;
+			case  66: do_char_log(cn, m, "[Weapons Only] " DESC_EN_66(in)); break;
+			case  67: do_char_log(cn, m, "[Weapons Only] " DESC_EN_67(in)); break;
+			case  68: do_char_log(cn, m, "[Armor Pieces Only] " DESC_EN_68(in)); break;
+			case  69: do_char_log(cn, m, DESC_EN_69(in)); break;
+			case  70: do_char_log(cn, m, "[Boots Only] " DESC_EN_70(in)); break;
+			case  71: do_char_log(cn, m, "[Helmet Only] " DESC_EN_71(in)); break;
+			case  72: do_char_log(cn, m, "[Boots Only] " DESC_EN_72(in)); break;
+			case  73: do_char_log(cn, m, DESC_EN_73(in)); break;
+			case  74: do_char_log(cn, m, "[Chest Only] " DESC_EN_74(in)); break;
+			case  75: do_char_log(cn, m, "[Cloak Only] " DESC_EN_75(in)); break;
+			case  76: do_char_log(cn, m, DESC_EN_76(in)); break;
+			case  77: do_char_log(cn, m, "[Weapons Only] " DESC_EN_77(in)); break;
+			case  78: do_char_log(cn, m, DESC_EN_78(in)); break;
+			case  79: do_char_log(cn, m, "[Accessories Only] " DESC_EN_79(in)); break;
+			case  80: do_char_log(cn, m, "[Accessories Only] " DESC_EN_80(in)); break;
+			case  81: do_char_log(cn, m, "[Chest Only] " DESC_EN_81(in)); break;
+			case  82: do_char_log(cn, m, "[Helmet Only] " DESC_EN_82(in)); break;
+			case  83: do_char_log(cn, m, "[Accessories Only] " DESC_EN_83(in)); break;
+			case  84: do_char_log(cn, m, DESC_EN_84(in)); break;
+			case  85: do_char_log(cn, m, "[Helmet Only] " DESC_EN_85(in)); break;
+			case  86: do_char_log(cn, m, "[Gloves Only] " DESC_EN_86(in)); break;
+			case  87: do_char_log(cn, m, "[Weapons Only] " DESC_EN_87(in)); break;
+			case  88: do_char_log(cn, m, "[Boots Only] " DESC_EN_88(in)); break;
+			case  89: do_char_log(cn, m, "[Armor Pieces Only] " DESC_EN_89(in)); break;
+			case  90: do_char_log(cn, m, "[Chest Only] " DESC_EN_90(in)); break;
+			case  91: do_char_log(cn, m, DESC_EN_91(in)); break;
+			default: break;
+		}
 	}
 	look_god_details(cn, in);
 }
