@@ -11583,22 +11583,19 @@ int step_portal_pandium(int cn, int in)
 	xe = it[in].data[1] % MAPX;
 	ye = it[in].data[1] / MAPX;
 	
-	for (x = xs; x<=xe; x++)
+	for (x = xs; x<=xe; x++) for (y = ys; y<=ye; y++)
 	{
-		for (y = ys; y<=ye; y++)
+		if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co))
 		{
-			if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co))
-			{
-				p++;
-				remove_all_spells(co, 0);
-			}
-			if (p>=3)
-			{
-				do_char_log(cn, 0, "The waiting room is full (3/3). Please come back later.\n");
-				return -1;
-			}
+			p++;
+		}
+		if (p>=3)
+		{
+			do_char_log(cn, 0, "The waiting room is full (3/3). Please come back later.\n");
+			return -1;
 		}
 	}
+	
 	x = it[in].x;
 	y = it[in].y+1;
 	if (co = map[x + y * MAPX].ch) quick_teleport(co, x-1+RANDOM(3), y+1+RANDOM(3));

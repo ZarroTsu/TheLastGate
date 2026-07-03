@@ -14177,6 +14177,23 @@ void do_regenerate(int cn)
 							char_play_sound(cn, ch[cn].sound + 21, -150, 0);
 							fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 						}
+						if (IS_IN_PENTRY(xo, yo)) // Exiting Pandium's entry foyer
+						{
+							int x, xs, xe, y, ys, ye;
+							
+							xs = it_temp[2954].data[0] % MAPX;
+							ys = it_temp[2954].data[0] / MAPX;
+							xe = it_temp[2954].data[1] % MAPX;
+							ye = it_temp[2954].data[1] / MAPX;
+							
+							for (x = xs; x<=xe; x++) for (y = ys; y<=ye; y++)
+							{
+								if ((co = map[x + y * MAPX].ch) && IS_PLAYER(co))
+								{
+									remove_all_spells(co, 0);
+								}
+							}
+						}
 					}
 					ch[cn].status = 0;
 					ch[cn].attack_cn = 0;

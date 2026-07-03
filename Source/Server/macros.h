@@ -402,6 +402,7 @@ int is_ascroll(int in);
 #define IS_IN_INDW(x, y)	((x>=  24&&y>=1779&&x<= 270&&y<=2025))
 #define IS_IN_AQUE(x, y)	((x>=189&&y>=1378&&x<=321&&y<=1396)?1:((x>=189&&y>=1397&&x<=321&&y<=1415)?2:((x>=189&&y>=1416&&x<=321&&y<=1434)?3:((x>=189&&y>=1435&&x<=321&&y<=1453)?4:((x>=235&&y>=1454&&x<=321&&y<=1472)?5:((x>=235&&y>=1473&&x<=321&&y<=1491)?6:((x>=235&&y>=1492&&x<=321&&y<=1510)?7:((x>=235&&y>=1511&&x<=321&&y<=1529)?8:((x>=235&&y>=1530&&x<=321&&y<=1548)?9:((x>=235&&y>=1459&&x<=321&&y<=1567)?10:0))))))))))
 #define IS_IN_AEMAPP(x, y)	((x>= 422&&y>= 800&&x<= 423&&y<= 825)||(x>= 424&&y>= 797&&x<= 426&&y<= 828)||(x>= 427&&y>= 794&&x<= 464&&y<= 831))
+#define IS_IN_PENTRY(x, y)	((x>= 280&&y>= 932&&x<= 286&&y<= 938))
 
 #define IS_IN_PLH(cn)		(ch[(cn)].x>=(PLH_X+((ch[(cn)].house_id-1)/PLH_WIDTH)*PLH_SIZE)&&ch[(cn)].y>=(PLH_Y+((ch[(cn)].house_id-1)%PLH_WIDTH)*PLH_SIZE)&&ch[(cn)].x<=(PLH_X+((ch[(cn)].house_id-1)/PLH_WIDTH)*PLH_SIZE+(PLH_SIZE-1))&&ch[(cn)].y<=(PLH_Y+((ch[(cn)].house_id-1)%PLH_WIDTH)*PLH_SIZE+(PLH_SIZE-1)))
 #define IS_IN_PLHZONE(cn)	(ch[(cn)].x>=PLH_X&&ch[(cn)].y>=PLH_Y&&ch[(cn)].x<=(PLH_X+PLH_WIDTH*PLH_SIZE)&&ch[(cn)].y<=(PLH_Y+PLH_WIDTH*PLH_SIZE))
