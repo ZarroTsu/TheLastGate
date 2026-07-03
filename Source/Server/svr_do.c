@@ -11577,26 +11577,26 @@ void really_update_char(int cn)
 	
 	for (z = 0; z<5; z++)
 	{
-		ch[cn].limit_break[z][1]  = max(-127, min(127, suppression));
+		ch[cn].limit_break[z][1] = max(-125, min(125, suppression));
 		
-		if ( T_BRAV_SK(cn,  8)  && z==AT_BRV) ch[cn].limit_break[z][1] +=    10;    // (Brav) Overwhelming Braveness
-		if ((n = TC_SK(cn, 92)) && z==AT_BRV) ch[cn].limit_break[z][1] += n * 5;
+		if ( T_BRAV_SK(cn,  8)  && z==AT_BRV) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (Brav) Overwhelming Braveness
+		if ((n = TC_SK(cn, 92)) && z==AT_BRV) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
 		
-		if ( T_SUMM_SK(cn,  8)  && z==AT_WIL) ch[cn].limit_break[z][1] +=    10;    // (Summ) Overwhelming Willpower
-		if ((n = TC_SK(cn, 68)) && z==AT_WIL) ch[cn].limit_break[z][1] += n * 5;
+		if ( T_SUMM_SK(cn,  8)  && z==AT_WIL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (Summ) Overwhelming Willpower
+		if ((n = TC_SK(cn, 68)) && z==AT_WIL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
 		
-		if ( T_ARHR_SK(cn,  8)  && z==AT_INT) ch[cn].limit_break[z][1] +=    10;    // (ArHr) Overwhelming Intuition
-		if ((n = TC_SK(cn, 80)) && z==AT_INT) ch[cn].limit_break[z][1] += n * 5;
+		if ( T_ARHR_SK(cn,  8)  && z==AT_INT) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (ArHr) Overwhelming Intuition
+		if ((n = TC_SK(cn, 80)) && z==AT_INT) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
 		
-		if ( T_SKAL_SK(cn,  8)  && z==AT_AGL) ch[cn].limit_break[z][1] +=    10;    // (Skal) Overwhelming Agility
-		if ((n = TC_SK(cn, 32)) && z==AT_AGL) ch[cn].limit_break[z][1] += n * 5;
+		if ( T_SKAL_SK(cn,  8)  && z==AT_AGL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (Skal) Overwhelming Agility
+		if ((n = TC_SK(cn, 32)) && z==AT_AGL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
 		
-		if ( T_ARTM_SK(cn,  8)  && z==AT_STR) ch[cn].limit_break[z][1] +=    10;    // (ArTm) Overwhelming Strength
-		if ((n = TC_SK(cn, 20)) && z==AT_STR) ch[cn].limit_break[z][1] += n * 5;
+		if ( T_ARTM_SK(cn,  8)  && z==AT_STR) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (ArTm) Overwhelming Strength
+		if ((n = TC_SK(cn, 20)) && z==AT_STR) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
 		
-		ch[cn].limit_break[z][1] += min(5,max(0,(bits+5-z)/6));
+		ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + min(5,max(0,(bits+5-z)/6))));
 		
-		if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[z][1] += 3;
+		if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + 5));
 		
 		// Enchant: More attributes
 		if (z==0) attrib[z] = attrib[z]*(100+do_get_ieffect(cn, VF_EN_MOREBRV))/100;
@@ -11607,12 +11607,12 @@ void really_update_char(int cn)
 		
 		set_attrib_score(cn, z, attrib[z]);
 	}
-	ch[cn].limit_break[5][1]  = max(-127, min(127, suppression));
-	ch[cn].limit_break[5][1] += min(5,max(0,bits/6));
+	ch[cn].limit_break[5][1] = max(-125, min(125, suppression));
+	ch[cn].limit_break[5][1] = max(-125, min(125, ch[cn].limit_break[5][1] + min(5,max(0,bits/6))));
 	
-	if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[5][1] += 5;
+	if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[5][1] = max(-125, min(125, ch[cn].limit_break[5][1] + 5));
 	
-	if ((n=TC_SK(cn, 8))) ch[cn].limit_break[5][1] += n*5;  // *Master of None
+	if ((n=TC_SK(cn, 8))) ch[cn].limit_break[5][1] = max(-125, min(125, ch[cn].limit_break[5][1] + n*5));  // *Master of None
 	
 	// Weapon - Fist of the Heavens :: best attribute times 1.2
 	if (do_get_iflag(cn, SF_TW_HEAVENS))

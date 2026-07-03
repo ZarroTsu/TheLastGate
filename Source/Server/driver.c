@@ -5875,7 +5875,7 @@ void pandium_pattern(int fl)
 			| X X   X X   X X   X X   X X   X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 144
 		*/
-		case 33:
+		case 33: case 139:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5904,7 +5904,7 @@ void pandium_pattern(int fl)
 			| X X X       X X X X X       X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 153
 		*/
-		case 35:
+		case 35: case 137:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -5968,7 +5968,7 @@ void pandium_pattern(int fl)
 			|       X X X           X X X       |
 			+ - - - - - - - - - - - - - - - - - +	score = 136
 		*/
-		case 39:
+		case 39: case 73: case 103: case 149:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -6000,7 +6000,7 @@ void pandium_pattern(int fl)
 			| X X           X X X           X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 165
 		*/
-		case 41:
+		case 41: case 53: case 79: case 107: case 151:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -6034,7 +6034,7 @@ void pandium_pattern(int fl)
 			|     X X X X X       X X X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 186
 		*/
-		case 43:
+		case 43: case 59: case 83: case 109: case 157:
 			rng = RANDOM(2);
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
@@ -6069,7 +6069,7 @@ void pandium_pattern(int fl)
 			|                                   |
 			+ - - - - - - - - - - - - - - - - - +	score = 169
 		*/
-		case 45:
+		case 45: case 61: case 89: case 113: case 163:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -6100,7 +6100,7 @@ void pandium_pattern(int fl)
 			| X X X X X   X X X X X   X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 225
 		*/
-		case 47:
+		case 47: case 67: case 97: case 127: case 167:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -6129,7 +6129,7 @@ void pandium_pattern(int fl)
 			| X X X X X X X X X X X X X X X X X |
 			+ - - - - - - - - - - - - - - - - - +	score = 205
 		*/
-		case 49:
+		case 49: case 71: case 101: case 131: case 173:
 			for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
 				m = x-frx; n = y-fry;
@@ -6144,22 +6144,23 @@ void pandium_pattern(int fl)
 		default:
 			// Variable setup for inner explosion box
 			off = 1;
-			if (fl>=10) off = 2; // 5x5
-			if (fl>=20) off = 3; // 7x7
-			if (fl>=30) off = 4; // 9x9
-			if (fl>=40) off = 1; // 3x3*
-			if (fl>=50) off = 2; // 5x5*
+			if (fl>= 10) off = 2; // 5x5
+			if (fl>= 20) off = 3; // 7x7
+			if (fl>= 30) off = 4; // 9x9
+			if (fl>= 40) off = 1; // 3x3*
+			if (fl>= 50) off = 2; // 5x5*
+			if (fl>=100) off = 3; // 7x7*
 			// Variable setup for x/y offset variance
 			m = 1;
-			if (fl>=15) m = 3;
-			if (fl==20) m = 1;
-			if (fl>=25) m = 5;
-			if (fl==30) m = 1;
-			if (fl>=35) m = 3;
-			if (fl==40) m = 1;
-			if (fl>=45) m = 5;
-			if (fl==50) m = 1;
-			if (fl>=55) m = 3;
+			if (fl>= 15) m = 3;
+			if (fl== 20) m = 1;
+			if (fl>= 25) m = 5;
+			if (fl== 30) m = 1;
+			if (fl>= 35) m = 3;
+			if (fl== 40) m = 1;
+			if (fl>= 45) m = 5;
+			if (fl== 50) m = 1;
+			if (fl>= 55) m = 3;
 			n = RANDOM(m) - (m-1)/2;
 			m = RANDOM(m) - (m-1)/2;
 			// Create inner explosion box
@@ -6169,8 +6170,9 @@ void pandium_pattern(int fl)
 			}
 			// Variable setup for outer explosion box
 			off = 0;
-			if (fl>=40) off = 4; // 9x9
-			if (fl>=50) off = 3; // 7x7
+			if (fl>= 40) off = 4; // 9x9
+			if (fl>= 50) off = 3; // 7x7
+			if (fl>=100) off = 4; // 9x9
 			// Create outer explosion box
 			if (off) for (x = frx; x<=tox; x++) for (y = fry; y<=toy; y++)
 			{
@@ -6353,8 +6355,8 @@ void pandium_driver(int cn) // CT_PANDIUM
 			ch[cn].attrib[m][1] = min(127, fl*5/4);
 			bu[in].attrib[m] = min(127, fl*5/4);
 		}
-		bu[in].power = fl;
-		bu[in].dmg_reduction = min(127, fl);
+		bu[in].power = fl/2;
+		bu[in].dmg_reduction = min(127, fl/2);
 		bu[in].active = bu[in].duration = 1;
 		bu[in].flags  = BF_PERMASPELL;
 		bu[in].sprite = min(6780, 6761+(fl/5)-1);
@@ -6642,6 +6644,8 @@ void pandium_driver(int cn) // CT_PANDIUM
 					ch[co].skill[SK_PERCEPT][1]  = 90;
 					ch[co].skill[SK_SAFEGRD][1]  = min(127, fl);
 					ch[co].skill[SK_IMMUN][1]    = min(127, fl/2);
+					if (fl>= 75) { ch[co].skill[SK_PACT][0]   = min(150,  15 + fl/ 3); }
+					if (fl>=100) { ch[co].skill[SK_SHADOW][0] = min(150, 100 + fl/10); }
 				}
 				else 
 				{ 
