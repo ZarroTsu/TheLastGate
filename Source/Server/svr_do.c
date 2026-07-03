@@ -9611,7 +9611,13 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	
 	// Easy new method!
-	if (cn) dam = dam * ch[cn].dmg_bonus / 10000;
+	if (cn)
+	{
+		dam = dam * ch[cn].dmg_bonus / 10000;
+		
+		if (do_get_iflag(cn, SF_BLEED_DMG) && has_buff(co, SK_BLEED))
+			dam = dam * 11/10;
+	}
 	
 	// Tarot - Strength - 20% more damage dealt
 	if (do_get_iflag(cn, SF_STRENGTH))
@@ -10913,6 +10919,10 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
 		if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
 		
+	//	if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
+	//	if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
+	//	if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_BLEED_DMG);
+	//	if (do_check_items(in, IT_WP_QUICKSILV))  do_set_iflag(cn, SF_QUICKSILV);
 		if (do_check_items(in, IT_WB_GOLDGLAIVE)) do_set_iflag(cn, SF_GHOSTCRY);
 		if (do_check_items(in, IT_WP_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
 		if (do_check_items(in, IT_WB_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
@@ -10939,6 +10949,9 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WP_VOLCANF))    do_set_iflag(cn, SF_VOLCANF);
 		if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
 		if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
+		
+		if (do_check_items(in, IT_TW_ACEDIA) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
+		if (do_check_items(in, IT_TW_ACEDIA) && n == WN_LHAND) do_set_iflag(cn, SF_BUFFLEFT);
 		
 		// HAS_ENCH(in,   n)
 		
@@ -10990,6 +11003,7 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in, 114)) do_set_iflag(cn, SF_EN_LESSCURS); // (Legacy)
 		if (HAS_ENCH(in, 115)) do_set_iflag(cn, SF_EN_LESSBLIN); // (Legacy)
 		
+	//	if (do_check_items(in, IT_WP_HALADIE))   do_add_ieffect(cn, VF_EXTRA_WIL, 10);
 		if (do_check_items(in, IT_WB_LIONSPAWS)) do_add_ieffect(cn, VF_EXTRA_BRV, 10);
 		if (do_check_items(in, IT_WP_COLDSTEEL)) do_add_ieffect(cn, VF_EXTRA_AGL, 10);
 		if (do_check_items(in, IT_WB_BARBSWORD)) do_add_ieffect(cn, VF_EXTRA_STR,  5);
@@ -12256,6 +12270,12 @@ void really_update_char(int cn)
 	
 	parry_rate += get_fight_skill(cn, skill);
 	parry_rate += get_offhand_skill(cn, skill, 0);
+	
+	if (do_get_iflag(cn, SF_QUICKSILV))
+	{
+		hit_rate   += GET_SPD_MOV(cn)/20;
+		parry_rate += GET_SPD_MOV(cn)/20;
+	}
 	
 	// Tarot - Lovers.R : Swaps hit/parry
 	if (do_get_iflag(cn, SF_LOVERS_R))

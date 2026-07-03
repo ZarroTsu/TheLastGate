@@ -333,6 +333,9 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		case SK_FROSTB:
 			tmp = SK_FROSTB;    spr = BUF_SPR_FROSTB;
 			break;
+		case SK_BLEED:
+			tmp = SK_BLEED;     spr = BUF_SPR_BLEED;     nmz = 1;
+			break;
 		default: return 0;  // Invalid skill
 	}
 	
@@ -409,6 +412,9 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].r_end  = -FROSTBFORM(power, dur);
 			bu[in].r_mana = -FROSTBFORM(power, dur);
 			break;
+		case SK_BLEED:
+			bu[in].data[1] = BLEEDFORM(power, dur);  // Decay rate
+			break;
 		default: break;
 	}
 	
@@ -433,6 +439,7 @@ void try_hit_debuff(int cn, int co, int v)
 	if (do_get_iflag(cn, SF_TW_LUXURIA)) on_hit_debuff(cn, co, v, SK_AGGRAVATE);
 	if (do_get_iflag(cn, SF_HIT_DOUSE))  on_hit_debuff(cn, co, v, SK_FATIGUE);
 	if (do_get_iflag(cn, SF_HIT_FROST))  on_hit_debuff(cn, co, v, SK_FROSTB);
+	if (do_get_iflag(cn, SF_HIT_BLEED))  on_hit_debuff(cn, co, v, SK_BLEED);
 }
 
 int friend_is_enemy(int cn, int cc)
@@ -1822,7 +1829,7 @@ int skill_multiplier(int power, int cn)
 
 int add_spell(int cn, int new_in)
 {
-	int n, m, old_in, weak = 999, weakest = 99;
+	int n, m, cc, old_in, weak = 999, weakest = 99;
 	int stack, tickminimum = TICKS*60;
 	int old_temp, new_temp;
 	
@@ -1849,11 +1856,11 @@ int add_spell(int cn, int new_in)
 	}
 	
 	// Acedia
-	if (IS_SANECHAR(bu[new_in].data[0]))
+	if (IS_SANECHAR(cc = bu[new_in].data[0]))
 	{
-		if (IS_IT_TEMP(ch[bu[new_in].data[0]].worn[WN_RHAND], IT_TW_ACEDIA)) // less
+		if (do_get_iflag(cc, SF_BUFFRGHT)) // less
 			bu[new_in].duration = bu[new_in].active = bu[new_in].duration * 3/4;
-		if (IS_IT_TEMP(ch[bu[new_in].data[0]].worn[WN_LHAND], IT_TW_ACEDIA)) // more
+		if (do_get_iflag(cc, SF_BUFFLEFT)) // more
 			bu[new_in].duration = bu[new_in].active = bu[new_in].duration * 6/4;
 	}
 	
@@ -2101,8 +2108,8 @@ int add_exhaust(int cn, int len)
 	len = len * baselen / max(25, ch[cn].cool_bonus);
 	
 	// Acedia
-	if (IS_IT_TEMP(ch[cn].worn[WN_RHAND], IT_TW_ACEDIA)) len = len * 3/4; // less
-	if (IS_IT_TEMP(ch[cn].worn[WN_LHAND], IT_TW_ACEDIA)) len = len * 6/4; // more
+	if (do_get_iflag(cn, SF_BUFFRGHT)) len = len * 3/4; // less
+	if (do_get_iflag(cn, SF_BUFFLEFT)) len = len * 6/4; // more
 	
 	if (ch[cn].spellfail==2)
 	{
