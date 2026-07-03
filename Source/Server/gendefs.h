@@ -653,7 +653,6 @@ extern char *at_short[];
 #define DESC_EN_1(in)		"%-12.12s  %+4d\n", "Braveness",    (IS_TWOHAND(in)?2:1) *  4
 #define DESC_EN_7(in)		"%-12.12s  %+4d\n", "AoE Bonus",    (IS_TWOHAND(in)?2:1) *  1
 #define DESC_EN_9(in)		"%-12.12s  %+4d\n", "Move Speed",   (IS_TWOHAND(in)?2:1) * 10
-#define DESC_EN_11(in)		"%-12.12s  %+4d\n", "HP & Mana",    (IS_TWOHAND(in)?2:1) * 35
 #define DESC_EN_12(in)		"%-12.12s  %+4d\n", "WV & AV",      (IS_TWOHAND(in)?2:1) *  2
 #define DESC_EN_13(in)		"%-12.12s  %+4d\n", "Willpower",    (IS_TWOHAND(in)?2:1) *  4
 #define DESC_EN_18(in)		"%-12.12s  %+4d\n", "Mana",         (IS_TWOHAND(in)?2:1) * 30
@@ -698,7 +697,8 @@ extern char *at_short[];
 #define DESC_EN_5(in)		"10%% less effect of debuffs on you.\n"
 #define DESC_EN_8(in)		"10%% more effect of Weakens and Slows you inflict.\n"
 #define DESC_EN_10(in)		"20%% less reservation of hitpoints, endurance, or mana.\n"
-#define DESC_EN_14(in)		"+5%% chance for your minions to inflict critical hits.\n"
+#define DESC_EN_11(in)		"+5%% chance for your minions to inflict critical hits.\n"
+#define DESC_EN_14(in)		"Halves the duration of Healing Sickness applied to you.\n"
 #define DESC_EN_15(in)		"Cannot step on death traps.\n"
 #define DESC_EN_16(in)		"10%% of total Armor Value is granted as additional Resistance.\n"
 #define DESC_EN_19(in)		"10%% more effect of your Cleaves and Blasts.\n"
