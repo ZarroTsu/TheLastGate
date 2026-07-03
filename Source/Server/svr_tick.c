@@ -2096,11 +2096,11 @@ int get_meta_stat_value(int cn, int n)
 			if (T_WARR_SK(cn, 12))                 en_dam +=   30;    // (Warr) Tenacity
 			if ((m=TC_SK(cn, 48)))                 en_dam += m*15;
 			if (do_get_iflag(cn, SF_TW_CLOAK))     en_dam +=   15;    // [Gear] Cloak of Shadows
-			if (do_get_iflag(cn, SF_EN_TAKEASEN))  en_dam +=   15;    // [Ench] *DoT* damage taken as endurance
+			if (do_get_iflag(cn, SF_EN_TAKEASEN))  en_dam +=   15;    // [Ench] damage taken as endurance
 			if (T_ARHR_SK(cn, 12))                 mp_dam +=   30;    // (ArHr) Resourcefulness
 			if ((m=TC_SK(cn, 84)))                 mp_dam += m*15;
 			if (do_get_iflag(cn, SF_PREIST))       mp_dam +=   30;    // [Taro] Priestess
-			if (do_get_iflag(cn, SF_EN_TAKEASMA))  mp_dam +=   15;    // [Ench] *Hit* damage taken as mana
+			if (do_get_iflag(cn, SF_EN_TAKEASMA))  mp_dam +=   15;    // [Ench] damage taken as mana
 			if ((m = en_dam + mp_dam))
 			{
 				en_dam = ( (en_dam * 100)/m * min(90, m) )/100;
