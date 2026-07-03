@@ -373,6 +373,7 @@ extern unsigned int mapmarker;
 #define SK_ARIA2		39
 //////////////////////////
 #define SK_BLOODLET		 9
+#define SK_REAP			 9
 #define SK_POME			 9
 #define SK_STARLIGHT	23
 #define SK_PHALANX		34

@@ -1100,7 +1100,12 @@ int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power)
 			}
 			else if (intemp==SK_CLEAVE)
 			{
-				spell_cleave(cn, co, power, co_orig);
+				spell_cleave(cn, co, power, co_orig, 0);
+				continue; // skip damage_mshell
+			}
+			else if (intemp==SK_REAP)
+			{
+				spell_cleave(cn, co, power, co_orig, 1);
 				continue; // skip damage_mshell
 			}
 			else if (intemp==SK_SHIELD)
@@ -5444,28 +5449,53 @@ int spell_bleed(int cn, int co, int power)
 	
 	return 1;
 }
-int spell_cleave(int cn, int co, int power, int co_orig)
+int spell_reap(int co, int hitpower) // Consume enemy debuffs to add the debuff power to this attack
+{
+	int n, in;
+	
+	for (n = 0; n<MAXBUFFS; n++)
+	{
+		if ((in = ch[co].spell[n])==0) { continue; }
+		if (bu[in].active<=1)          { continue; }
+		if (bu[in].data[5])
+			hitpower += bu[in].power/4;
+	}
+	
+	remove_all_debuffs(co);
+	
+	return hitpower;
+}
+int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 {
 	int hitpower, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0, crit_dam=0;
 	
-	chlog(cn, "Used Cleave on %s", ch[co].name);
-	
-	// Additive bonus
+	if (flag)
+		chlog(cn, "Used Reap on %s", ch[co].name);
+	else
 	{
-		n = TC_SK(cn,112);    // (Corr) Conquest
-		power = more(power, M_AT(cn, AT_STR) * n, 20);
+		chlog(cn, "Used Cleave on %s", ch[co].name);
+		
+		// Additive bonus
+		{
+			n = TC_SK(cn,112);    // (Corr) Conquest
+			power = more(power, M_AT(cn, AT_STR) * n, 20);
+		}
+		
+		if (do_get_iflag(cn, SF_EN_MORECLEABLAS)) power = more(power, 10, 1);
+		if (do_get_iflag(cn, SF_JUSTICE)) aggravate = 1;    // [Taro] Justice
 	}
 	
-	if (do_get_iflag(cn, SF_EN_MORECLEABLAS)) power = more(power, 10, 1);
-	
 	hitpower = power;
+	
+	if (flag)
+	{
+		hitpower = spell_reap(co, hitpower);
+	}
 	
 	if (T_SKAL_SK(cn, 6)) crit_dam = max(0, do_crit(cn, co, hitpower, 1));  // (Skal) Crushing Blows
 	
 	hitpower = skill_immunity(co, hitpower+crit_dam) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
-	
-	if (do_get_iflag(cn, SF_JUSTICE)) aggravate = 1;    // [Taro] Justice
 	
 	tmp = do_hurt(cn, co, hitpower, 5);
 	
@@ -5477,10 +5507,20 @@ int spell_cleave(int cn, int co, int power, int co_orig)
 	}
 	else if (tmpmp<1)
 	{
-		if (!(ch[cn].flags & CF_SYS_OFF))
-			do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
-		if (!(ch[co].flags & CF_SYS_OFF))
-			do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+		if (flag)
+		{
+			if (!(ch[cn].flags & CF_SYS_OFF))
+				do_char_log(cn, 1, "You reaped %s for %d HP.\n", ch[co].reference, tmp);
+			if (!(ch[co].flags & CF_SYS_OFF))
+				do_char_log(co, 1, "%s reaped you for %d HP.\n", ch[cn].name, tmp);
+		}
+		else
+		{
+			if (!(ch[cn].flags & CF_SYS_OFF))
+				do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
+			if (!(ch[co].flags & CF_SYS_OFF))
+				do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+		}
 	}
 	else
 	{
@@ -5501,15 +5541,30 @@ int spell_cleave(int cn, int co, int power, int co_orig)
 	}
 	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	
-	if (aggravate)
-		spell_aggravate(cn, co, hitpower, 0);
-	else if (tmp)
-		spell_bleed(cn, co, tmp);
+	if (flag)
+	{
+		
+	}
+	else
+	{
+		if (aggravate)
+			spell_aggravate(cn, co, hitpower, 0);
+		else if (tmp)
+			spell_bleed(cn, co, tmp);
+	}
 	
 	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	
-	if (!co_orig)
-		surround_cast(cn, co, 0, SK_CLEAVE, power);
+	if (flag)
+	{
+		if (!co_orig)
+			surround_cast(cn, co, 0, SK_REAP, power);
+	}
+	else
+	{
+		if (!co_orig)
+			surround_cast(cn, co, 0, SK_CLEAVE, power);
+	}
 	
 	return 1+tmp;
 }
@@ -5529,7 +5584,7 @@ void skill_cleave(int cn)
 	// Get hit target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0))) return;
 	
-	spell_cleave(cn, co, power, 0);
+	spell_cleave(cn, co, power, 0, 0);
 	
 	// Zephyr proc
 	zephyr_check(cn, co, cn, 0);

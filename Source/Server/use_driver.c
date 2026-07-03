@@ -4228,7 +4228,7 @@ int use_special_spell(int cn, int in)
 			}
 			if (spellcost(cn, power/12 + 5, SK_CLEAVE, 0)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			ret = spell_cleave(cn, co, power, 0);
+			ret = spell_cleave(cn, co, power, 0, 1);
 			if (ret) add_exhaust(cn, SK_EXH_CLEAVE/2);
 			break;
 		case SK_WARCRY3: // Rally

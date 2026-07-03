@@ -493,7 +493,7 @@ int spell_scorch(int cn, int co, int power, int flag);
 int spell_weaken(int cn, int co, int power, int flag);
 int spell_blind(int cn, int co, int power, int flag);
 int spell_frostburn(int cn, int co, int power);
-int spell_cleave(int cn, int co, int power, int co_orig);
+int spell_cleave(int cn, int co, int power, int co_orig, int flag);
 int spell_blast(int cn, int co, int power, int co_orig, int aoe);
 int spell_obliterate(int cn, int co, int power, int aoe);
 int skill_obliterate(int cn, int co, int power);
