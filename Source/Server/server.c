@@ -100,15 +100,19 @@ void discord_top_five(void)
 	for (j = 0; j<DISC_R/3; j++) 
 	{
 		if (j!=0) fprintf(discordTopA, " \n");
-		switch (j)
+		
+		if (CURRENTSEASON > 0)
 		{
-			if (CURRENTSEASON > 0)
+			switch (j)
 			{
 				case  0: fprintf(discordTopA, "- Top Seasoned Seyan'du:\n"); break;
 				case  1: fprintf(discordTopA, "- Top Seasoned Arch-Templar:\n"); break;
 				default: fprintf(discordTopA, "- Top Seasoned Skalds:\n"); break;
 			}
-			else
+		}
+		else
+		{
+			switch (j)
 			{
 				case  0: fprintf(discordTopA, "- Top Seyan'du:\n"); break;
 				case  1: fprintf(discordTopA, "- Top Arch-Templar:\n"); break;
@@ -168,21 +172,26 @@ void discord_top_five(void)
 	for (j = DISC_R/3; j<DISC_R/3*2; j++) 
 	{
 		if (j!=DISC_R/3) fprintf(discordTopB, " \n");
-		switch (j)
+		
+		if (CURRENTSEASON > 0)
 		{
-			if (CURRENTSEASON > 0)
+			switch (j)
 			{
 				case  3: fprintf(discordTopA, "- Top Seasoned Warriors:\n"); break;
 				case  4: fprintf(discordTopB, "- Top Seasoned Sorcerers:\n"); break;
 				default: fprintf(discordTopB, "- Top Seasoned Summoners:\n"); break;
 			}
-			else
+		}
+		else
+		{
+			switch (j)
 			{
 				case  3: fprintf(discordTopA, "- Top Warriors:\n"); break;
 				case  4: fprintf(discordTopB, "- Top Sorcerers:\n"); break;
 				default: fprintf(discordTopB, "- Top Summoners:\n"); break;
 			}
 		}
+		
 		for (m = 0; m<DISC_T; m++)
 		{
 			if (nr[j][m]==-1) continue;
@@ -236,21 +245,26 @@ void discord_top_five(void)
 	for (j = DISC_R/3*2; j<DISC_R; j++) 
 	{
 		if (j!=DISC_R/3*2) fprintf(discordTopC, " \n");
-		switch (j)
+		
+		if (CURRENTSEASON > 0)
 		{
-			if (CURRENTSEASON > 0)
+			switch (j)
 			{
 				case  6: fprintf(discordTopB, "- Top Seasoned Arch-Harakim:\n"); break;
 				case  7: fprintf(discordTopB, "- Top Seasoned Bravers:\n"); break;
 				default: fprintf(discordTopC, "- Top Seasoned Lycanthropes:\n"); break;
 			}
-			else
+		}
+		else
+		{
+			switch (j)
 			{
 				case  6: fprintf(discordTopB, "- Top Arch-Harakim:\n"); break;
 				case  7: fprintf(discordTopB, "- Top Bravers:\n"); break;
 				default: fprintf(discordTopC, "- Top Lycanthropes:\n"); break;
 			}
 		}
+		
 		for (m = 0; m<DISC_T; m++)
 		{
 			if (nr[j][m]==-1) continue;
