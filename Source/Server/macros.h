@@ -138,6 +138,7 @@ int is_ascroll(int in);
 #define IS_DEPOTITEM(in)		(IS_SOULCAT(in) || IS_CORRUPTOR(in) || IS_GEMSTONE(in) || it[(in)].temp==IT_TALISFRAG)
 
 #define SEASON_CHECK(cn, in)	(IS_PLAYER(cn) && ch[(cn)].season == CURRENTSEASON && it[(in)].season != -1 && it[(in)].season != CURRENTSEASON)
+#define SEASON_PLR(cn, co)		(ch[(cn)].season == CURRENTSEASON && ch[(co)].season == CURRENTSEASON)
 #define STRICT_CHECK(cn, in)	(IS_PLAYER(cn) && (ch[(cn)].season == CURRENTSEASON && it[(in)].season != -1 && it[(in)].season != CURRENTSEASON) || (ch[(cn)].season != CURRENTSEASON && it[(in)].season == CURRENTSEASON))
 
 /* *** TEMPLATES *** */

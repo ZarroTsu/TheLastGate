@@ -102,9 +102,18 @@ void discord_top_five(void)
 		if (j!=0) fprintf(discordTopA, " \n");
 		switch (j)
 		{
-			case  0: fprintf(discordTopA, "- Top Seasoned Seyan'du:\n"); break;
-			case  1: fprintf(discordTopA, "- Top Seasoned Arch-Templar:\n"); break;
-			default: fprintf(discordTopA, "- Top Seasoned Skalds:\n"); break;
+			if (CURRENTSEASON > 0)
+			{
+				case  0: fprintf(discordTopA, "- Top Seasoned Seyan'du:\n"); break;
+				case  1: fprintf(discordTopA, "- Top Seasoned Arch-Templar:\n"); break;
+				default: fprintf(discordTopA, "- Top Seasoned Skalds:\n"); break;
+			}
+			else
+			{
+				case  0: fprintf(discordTopA, "- Top Seyan'du:\n"); break;
+				case  1: fprintf(discordTopA, "- Top Arch-Templar:\n"); break;
+				default: fprintf(discordTopA, "- Top Skalds:\n"); break;
+			}
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -161,9 +170,18 @@ void discord_top_five(void)
 		if (j!=DISC_R/3) fprintf(discordTopB, " \n");
 		switch (j)
 		{
-			case  3: fprintf(discordTopA, "- Top Seasoned Warriors:\n"); break;
-			case  4: fprintf(discordTopB, "- Top Seasoned Sorcerers:\n"); break;
-			default: fprintf(discordTopB, "- Top Seasoned Summoners:\n"); break;
+			if (CURRENTSEASON > 0)
+			{
+				case  3: fprintf(discordTopA, "- Top Seasoned Warriors:\n"); break;
+				case  4: fprintf(discordTopB, "- Top Seasoned Sorcerers:\n"); break;
+				default: fprintf(discordTopB, "- Top Seasoned Summoners:\n"); break;
+			}
+			else
+			{
+				case  3: fprintf(discordTopA, "- Top Warriors:\n"); break;
+				case  4: fprintf(discordTopB, "- Top Sorcerers:\n"); break;
+				default: fprintf(discordTopB, "- Top Summoners:\n"); break;
+			}
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -220,9 +238,18 @@ void discord_top_five(void)
 		if (j!=DISC_R/3*2) fprintf(discordTopC, " \n");
 		switch (j)
 		{
-			case  6: fprintf(discordTopB, "- Top Seasoned Arch-Harakim:\n"); break;
-			case  7: fprintf(discordTopB, "- Top Seasoned Bravers:\n"); break;
-			default: fprintf(discordTopC, "- Top Seasoned Lycanthropes:\n"); break;
+			if (CURRENTSEASON > 0)
+			{
+				case  6: fprintf(discordTopB, "- Top Seasoned Arch-Harakim:\n"); break;
+				case  7: fprintf(discordTopB, "- Top Seasoned Bravers:\n"); break;
+				default: fprintf(discordTopC, "- Top Seasoned Lycanthropes:\n"); break;
+			}
+			else
+			{
+				case  6: fprintf(discordTopB, "- Top Arch-Harakim:\n"); break;
+				case  7: fprintf(discordTopB, "- Top Bravers:\n"); break;
+				default: fprintf(discordTopC, "- Top Lycanthropes:\n"); break;
+			}
 		}
 		for (m = 0; m<DISC_T; m++)
 		{
@@ -379,14 +406,26 @@ void discord_pandium(void)
 			if (IS_ARCHHARAKIM(nr[j][m])) cl = 6;
 			if (IS_BRAVER(nr[j][m]))      cl = 7;
 			if (IS_LYCANTH(nr[j][m]))     cl = 8;
-
-			fprintf(discordPandium, "%c %10.10s S%02d %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
-				ch[nr[j][m]].name, 
-				ch[nr[j][m]].season,
-				IS_RB(nr[j][m]) ? '+' : ' ',
-				IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-				IS_PURPLE(nr[j][m]) ? '*' : ' ',
-				(cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
+			
+			if (CURRENTSEASON > 0)
+			{
+				fprintf(discordPandium, "%c %10.10s  S%02d  %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name, 
+					ch[nr[j][m]].season,
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					(cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
+			}
+			else
+			{
+				fprintf(discordPandium, "%c %10.10s  %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+					ch[nr[j][m]].name,
+					IS_RB(nr[j][m]) ? '+' : ' ',
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
+					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					(cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
+			}
 		}
 	}
 	fprintf(discordPandium, "```\n");
@@ -428,16 +467,30 @@ void discord_who(void)
 		{
 			showarea = 0;
 		}
-
-		fprintf(discordWho, "%c %.5s %-10.10s S%02d %c%c%c %.26s\n",
-					font ? '+' : ' ',
-		            who_rank_name[getrank(n)],
-		            ch[n].name,
-					ch[n].season,
-					IS_RB(n) ? '+' : ' ',
-					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-		            IS_PURPLE(n) ? '*' : ' ',
-		            !showarea ? "--------" : get_area(n, 0));
+		
+		if (CURRENTSEASON > 0)
+		{
+			fprintf(discordWho, "%c %.5s %-10.10s  S%02d  %c%c%c %.26s\n",
+				font ? '+' : ' ',
+				who_rank_name[getrank(n)],
+				ch[n].name,
+				ch[n].season,
+				IS_RB(n) ? '+' : ' ',
+				IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
+				IS_PURPLE(n) ? '*' : ' ',
+				!showarea ? "--------" : get_area(n, 0));
+		}
+		else
+		{
+			fprintf(discordWho, "%c %.5s %-10.10s  %c%c%c %.26s\n",
+				font ? '+' : ' ',
+				who_rank_name[getrank(n)],
+				ch[n].name,
+				IS_RB(n) ? '+' : ' ',
+				IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
+				IS_PURPLE(n) ? '*' : ' ',
+				!showarea ? "--------" : get_area(n, 0));
+		}
 	}
 	if (players) fprintf(discordWho, "-------------------------------------------------\n");
 	fprintf(discordWho, "%3d player%s online.\n", players, (players != 1) ? "s" : "");

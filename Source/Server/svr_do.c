@@ -10262,10 +10262,10 @@ void do_give(int cn, int co)
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
-	if (SEASON_CHECK(co, in))
+	if (IS_PLAYER(cn) && IS_PLAYER(co) && !SEASON_PLR(cn, co))
 	{
 		ch[cn].cerrno = ERR_FAILED;
-		do_char_log(cn, 0, "This item does not match your target's season.\n");
+		do_char_log(cn, 0, "This player is not in the same season as you.\n");
 		return;
 	}
 	
