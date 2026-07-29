@@ -1266,7 +1266,11 @@ void god_info(int cn, int co)
 		            ch[co].total_online_time / (TICKS * 60 * 60) % 24,
 		            ch[co].total_online_time / (TICKS * 60) % 60,
 		            ch[co].total_online_time / (TICKS) % 60);
-
+					
+		do_char_log(cn, 8, "iFlags [%X,%X,%X,%X,%X,%X,%X,%X].\n",
+			            ch[co].iflags[0],ch[co].iflags[1],ch[co].iflags[2],ch[co].iflags[3],
+						ch[co].iflags[4],ch[co].iflags[5],ch[co].iflags[6],ch[co].iflags[7]);
+		
 		if (IS_SANENPC(co) && ch[co].data[64])
 		{
 			t  = ch[co].data[64] - globs->ticker;

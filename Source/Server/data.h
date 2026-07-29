@@ -479,7 +479,7 @@ enum _ch_iflags {
 	SF_EN_LESSDEBU,     // Enchant #  5
 	SF_EN_MOREWEAKSLOW, // Enchant #  8
 	SF_EN_LESSSICK,     // Enchant # 14
-	SF_EN_NODEATHT,     // Enchant # 10
+	SF_EN_NODEATHT,     // Enchant # 15
 	SF_EN_AVASRES,      // Enchant # 16
 	SF_EN_MORECLEABLAS, // Enchant # 19
 	SF_EN_TAKEASEN,     // Enchant # 23

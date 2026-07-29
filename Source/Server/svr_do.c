@@ -10801,7 +10801,7 @@ void really_update_char(int cn)
 	// Loop through gear for item effect flags - Magic checks
 	if (!(ch[cn].flags & CF_NOMAGIC)) for (n=0; n<MAXGSLOTS; n++)
 	{
-		if (!IS_SANEITEM(in = ch[cn].worn[n])) continue;
+		if (!IS_SANEITEM((in = ch[cn].worn[n]))) continue;
 		
 		if (do_check_tarot(in, IT_CH_MAGI    )) do_set_iflag(cn, SF_MAGI);
 		if (do_check_tarot(in, IT_CH_PREIST  )) do_set_iflag(cn, SF_PREIST);
