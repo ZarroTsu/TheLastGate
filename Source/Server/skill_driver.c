@@ -1442,8 +1442,8 @@ int spellcost(int cn, int cost, int in, int usemana)
 		ch[cn].a_end  -= cotfk_cost * 1000;
 		ch[cn].a_hp   -= hp_cost    * 1000;
 		
-		if (do_get_iflag(cn, SF_MA_HEAL) && mana_cost)  spell_pomesol(cn, cn, base_mana_cost, 1);
-		if (do_get_iflag(cn, SF_EN_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 0);
+		if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && mana_cost) spell_pomesol(cn, cn, base_mana_cost*n, 1);
+		if (do_get_iflag(cn, SF_EN_HEAL) && cotfk_cost)        spell_pomesol(cn, cn, cotfk_cost,       0);
 	}
 	if (usemana==0 || usemana==2)
 	{
@@ -1451,8 +1451,8 @@ int spellcost(int cn, int cost, int in, int usemana)
 		ch[cn].a_mana -= cotfk_cost             * 1000;
 		ch[cn].a_hp   -= (hp_cost+devil_cost*2) * 1000;
 		
-		if (do_get_iflag(cn, SF_MA_HEAL) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost, 1);
-		if (do_get_iflag(cn, SF_EN_HEAL) && end_cost)   spell_pomesol(cn, cn, end_cost, 0);
+		if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost*n, 1);
+		if (do_get_iflag(cn, SF_EN_HEAL) && end_cost)           spell_pomesol(cn, cn, end_cost,     0);
 	}
 	return 0;
 }
@@ -3860,7 +3860,7 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 	
 	// Ira
 	if (do_get_iflag(cn, SF_TW_IRA))
-		crit_dam = max(0, do_crit(cn, co, hitpower, 1)/2);
+		crit_dam = max(0, do_crit(cn, co, hitpower, 1));
 	
 	// Tarot Card - Judgment :: Less damage
 	if (do_get_iflag(cn, SF_JUDGE))

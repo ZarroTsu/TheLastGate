@@ -489,6 +489,7 @@
 #define IT_WP_PHALANX		2526	//
 #define IT_WP_RISINGPHO		2791	//
 #define IT_WP_THEWALL		3578	//
+#define IT_WP_ANCIAEGIS		2301
 
 #define IT_WP_BARBSWORD		 129
 #define IT_WP_SWRDSTLTH		 136
@@ -552,6 +553,13 @@
 #define IT_WP_GUNGNIR		3581	//
 
 #define REQ_LAME		    8000
+
+#define IT_WP_SUNSSKUA		3201
+#define IT_WP_PURPPLED		3202
+#define IT_WP_IDOLISHT		3203
+#define IT_WP_SLIVANKH		3204
+#define IT_WP_GESTGORN		3205
+#define IT_WP_CUDGKWAI		3206
 
 // Improved Weapons
 #define IT_WB_GLASSSHNK		3446

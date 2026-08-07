@@ -4050,7 +4050,7 @@ int use_pandium_shrine(int cn, int in)
 
 int use_special_spell(int cn, int in)
 {
-	int spell, power, ret, co=0, buff=0, m, cc;
+	int spell, power, ret, co=0, buff=0, n, m, cc;
 
 	spell = it[in].data[0];
 	
@@ -4094,8 +4094,7 @@ int use_special_spell(int cn, int in)
 			skill_dispel(cn, 1);
 			break;
 		case SK_BLOODLET:
-			if (!get_gear(cn, IT_WP_BLOODLET) && !get_gear(cn, IT_WB_BLOODLET) 
-			 && !get_gear(cn, IT_WP_CRIMRIP)  && !get_gear(cn, IT_WB_CRIMRIP))
+			if (!get_gear(cn, IT_WP_CRIMRIP)  && !get_gear(cn, IT_WB_CRIMRIP))
 			{
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
@@ -4146,7 +4145,7 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_mana -= power*1000;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_starlight(cn, co, power, 1);
 			if (ret) add_exhaust(cn, TICKS);
 			break;
@@ -4195,7 +4194,7 @@ int use_special_spell(int cn, int in)
 			}
 			if (spellcost(cn, SP_COST_POISON, SK_POISON, 1)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_poison(cn, co, power, 1);
 			if (ret) 
 			{
@@ -4258,7 +4257,7 @@ int use_special_spell(int cn, int in)
 				do_update_char(cn);
 				return;
 			}
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_immolate(cn, cn, power);
 			if (ret) add_exhaust(cn, TICKS / 2);
 			break;
@@ -4282,7 +4281,7 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_blast(cn, co, power, 0, 0);
 			if (ret) 
 			{
@@ -4307,7 +4306,7 @@ int use_special_spell(int cn, int in)
 			power = M_SK(cn, SK_SHADOW);
 			if (spellcost(cn, SP_COST_SHADOW, SK_SHADOW, 1)) return 0;
 			item_damage_worn(cn, WN_LHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			if (IS_PLAYER(cn) && (cc = ch[cn].data[PCD_SHADOWCOPY]))
 			{
 				if (!IS_SANECHAR(cc) || ch[cc].data[CHD_MASTER]!=cn || 
@@ -4339,9 +4338,9 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// Sacrifice power equal to 50% of current hitpoints
-			power = (ch[cn].a_hp + 500) / 2;
-			if (ch[cn].hp + 500 < power)
+			// Sacrifice power equal to 25% of current hitpoints
+			power = (ch[cn].a_hp + 500)/4;
+			if (ch[cn].a_hp + 500 < power)
 			{
 				do_char_log(cn, 0, "You dont have enough life.\n");
 				return 0;
@@ -4364,8 +4363,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You can't do that to yourself!\n");
 				return 0;
 			}
-			// Venom power equal to 1/5 of uncapped mana
-			power = ch[cn].mana[4] / 5;
+			// Venom power equal to poison power
+			power = M_SK(cn, SK_POISON);
 			if (!may_attack_msg(cn, co, 1))
 			{
 				chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
@@ -4373,7 +4372,7 @@ int use_special_spell(int cn, int in)
 			}
 			if (spellcost(cn, SP_COST_POISON, SK_POISON, 1)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_poison(cn, co, power, 2);
 			if (ret) 
 			{
@@ -4406,7 +4405,7 @@ int use_special_spell(int cn, int in)
 			}
 			ch[cn].a_mana -= power*1000;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = skill_obliterate(cn, co, power);
 			if (ret) add_exhaust(cn, SK_EXH_BLAST);
 			break;
@@ -4420,10 +4419,11 @@ int use_special_spell(int cn, int in)
 			power = M_SK(cn, SK_SHIELD);
 			if (spellcost(cn, SP_COST_ZEPHYR, SK_ZEPHYR, 1)) return 0;
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_zephyr(cn, cn, power, 0);
 			if (ret) add_exhaust(cn, SK_EXH_ZEPHYR);
 			break;
+		/*
 		case SK_SLOW:
 			if (!get_gear(cn, IT_WB_FROSTGLASS)) 
 			{
@@ -4444,7 +4444,7 @@ int use_special_spell(int cn, int in)
 				return 0;
 			}
 			item_damage_worn(cn, WN_RHAND, 500);
-			if (do_get_iflag(cn, SF_MA_HEAL) && power) spell_pomesol(cn, cn, power, 1);
+			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
 			ret = spell_slow(cn, co, power, 1);
 			if (ret) 
 			{
@@ -4452,6 +4452,7 @@ int use_special_spell(int cn, int in)
 				add_exhaust(cn, SK_EXH_SLOW/2);
 			}
 			break;
+		*/
 		case SK_SLAM:
 			if (!do_get_iflag(cn, SF_VIKINGMALT)) 
 			{

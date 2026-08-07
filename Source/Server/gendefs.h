@@ -505,14 +505,21 @@ extern char *at_short[];
 #define DESC_TW_HEAVENS		"Uses your highest weapon skill for hit and parry scores. When equipped, your highest attribute score is increased by 20%%.\n"
 
 #define FN_ABYSS		4
-#define DESC_TW_ACEDIA		"When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n"
-#define DESC_TW_IRA			"When equipped, your critical hit chance and half of critical multiplier effect your Blast spell, but you reserve 30%% of your mana and cannot deal melee critical hits.\n"
+#define DESC_TW_ACEDIA		"When equipped, this weapon grants full damage and shield parry while in the offhand."
+#define DESC_TW_IRA			"When equipped, 30%% of mana is reserved, and your Blast spell can inflict critical hits.\n"
 #define DESC_TW_INVIDIA		"When equipped, your ghost companion has surround hit AoE, and your shadow copy teleports to new targets, but each cannot regenerate health.\n"
 #define DESC_TW_GULA		"When equipped, you leech 20%% of damage dealt with hits as hitpoints, but you reserve 30%% of your hitpoints.\n"
 #define DESC_TW_LUXURIA		"When equipped, your hits inflict a self-scaling Aggravate, causing enemies to take more damage.\n"
 #define DESC_TW_AVARITIA	"When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you reserve 30%% of your endurance.\n"
 #define DESC_TW_SUPERBIA	"When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n"
 #define DESC_TW_SINBIND		"You may only equip one Sinbinder at a time.\n"
+
+#define DESC_SUNSSKUA		"\n"
+#define DESC_PURPPLED		"\n"
+#define DESC_IDOLISHT		"\n"
+#define DESC_SLIVANKH		"When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n"
+#define DESC_GESTGORN		"When equipped, grants 1 additional Spellpower Bonus for every 100 uncapped Maximum Hitpoints.\n"
+#define DESC_CUDGKWAI		"\n"
 
 #define FN_O			4
 #define DESC_O				"You may only equip one %s at a time.\n", it[in].name
@@ -584,25 +591,37 @@ extern char *at_short[];
 #define DESC_BOOK_GRAN		"When equipped, your highest attribute score is increased by 10%%.\n"
 
 #define FN_WO			9
-#define DESC_STONEDAGG		"When equipped, this weapon can be used to cast 'Sacrifice', converting 50% of your current Hitpoints into half as much Mana.\n"
+
+#define DESC_STONEDAGG		"When equipped, this weapon can be used to cast 'Sacrifice', converting 25%% of your current Hitpoints into Mana.\n"
 #define DESC_LIFESPRIG		"When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n"
-#define DESC_SPIDERFANG		"When equipped, this weapon can be used to cast Venom, with power equal to 1/5 of your uncapped mana.\n"
+#define DESC_SPIDERFANG		"When equipped, this weapon can be used to cast Venom, with power equal to your Poison spell modifier.\n"
 #define DESC_MAGEMASH		"When equipped, this weapon can be used to cast Dispel. Dispel cast in this way does not affect you or your allies, and instead removes enemy buffs.\n"
-#define DESC_BLOODLET		"When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints for power. Bloodletting inflicts bleeding on surrounding enemies.\n"
+#define DESC_BLOODLET		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time.\n"
+#define DESC_BLOODLET2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. You deal 10%% more damage with hits against bleeding enemies.\n"
 #define DESC_GEMCUTTER		"When equipped, stats granted by your ring slots are improved by 25%%.\n"
-#define DESC_QUICKSILV		"When equipped, this weapon grants full damage and shield parry while in the offhand.\n"
+#define DESC_QUICKSILV		"When equipped, grants 1 additional Hit and Parry score for every 30 uncapped Movement Speed.\n"
+#define DESC_HALADIE		"When equipped, your active spell skills gain an additional 10%% Willpower bonus.\n"
+
 #define DESC_JANESOBLIT		"When equipped, this weapon can be used to cast 'Obliterate', costing 1/3 of your uncapped mana for power. Obliterate has a base radius of 4, centered at your target's location.\n"
+#define DESC_VIOLETGAZE		"When equipped, grants 4%% increased total Willpower and Intuition.\n"
 #define DESC_RATTANBO		"When equipped, this weapon can be used to cast a buff version of Zephyr, with power equal to your Staff skill modifier.\n"
+#define DESC_SHIVASCEPT		"When equipped, your active spell skills gain an additional 10%% Intuition bonus.\n"
+#define DESC_KUROKO			"When equipped, 15%% of damage taken is dealt to your Mana before Hitpoints.\n"
 #define DESC_PUTRIDIRE		"When equipped, this weapon can be used to cast Poison, with power equal to 1/3 of your uncapped mana.\n"
 #define DESC_STARLIGHT		"When equipped, this weapon can be used to cast 'Starlight', costing 1/3 of uncapped mana. Starlight grants 1 additional spellpower bonus per 50 mana spent.\n"
 #define DESC_BLOODYSCY		"When equipped, this weapon can be used to cast Reap, with power equal to 1/2 of your uncapped hitpoints. Reap consumes debuffs on enemies hit to deal additional damage per consumed debuff.\n"
+
 #define DESC_GOLDGLAIVE		"When equipped, your Ghost Companion will use Warcry instead of Taunt, based on its Taunt skill modifier.\n"
 #define DESC_KELPTRID		"When equipped, grants +30 to action speed while underwater.\n"
+#define DESC_COBALTLANC		"When equipped, your passive skills gain an additional 10%% Braveness bonus.\n"
 #define DESC_FLAGBEAR		"When equipped, this weapon can be used to freely cast Rally, with power equal to half of your total Willpower.\n"
-#define DESC_FROSTGLASS		"When equipped, this shield can be used to cast Slow, with power equal to your total Shield skill modifier.\n"
+
+#define DESC_ARCHTOWER		"When equipped, enemies beside and behind you no longer gain a bonus to hitting you.\n"
 #define DESC_PHALANX		"When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 2%% damage reduction per 5 endurance spent.\n"
 #define DESC_RISINGPHO		"When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints and a base radius of 2. Sources of Leech do not provide healing for Immolate, and instead provide increased damage.\n"
 #define DESC_THEWALL		"When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n"
+#define DESC_ANCIAEGIS		"When equipped, enemies no longer gain a bonus to hitting you while you are stunned or not fighting back.\n"
+
 #define DESC_BARBSWORD		"When equipped, your active melee skills gain an additional 5%% Strength bonus.\n"
 #define DESC_LAMEDARG		"Thine worth shall be proven. %d remain.\n", max(0, REQ_LAME-it[in].data[0])
 #define DESC_LAMEFULL		"Thou art worthy. Use me when ready.\n"

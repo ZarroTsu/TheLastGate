@@ -7734,8 +7734,8 @@ int get_offhand_skill(int cn, int skill[50], int flag)
 	}
 	
 	// No Gear? No bonus
-	if (!in || (flag  && !(it[in].flags & IF_OF_DUALSW ) && !(it[in].flags & IF_WP_DAGGER )) || 
-		       (!flag && !(it[in].flags & IF_OF_SHIELD ) && !(it[in].temp==IT_WP_QUICKSILV))  )
+	if (!in || (flag  && !(it[in].flags & IF_OF_DUALSW ) && !(it[in].flags & IF_WP_DAGGER)) || 
+		       (!flag && !(it[in].flags & IF_OF_SHIELD ) && !(it[in].temp == IT_TW_ACEDIA))  )
 	{
 		return n;
 	}
@@ -9366,12 +9366,12 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	if (T_WARR_SK(co, 12))                           *en_dam +=   30;    // (Warr) Tenacity
 	if ((n=TC_SK(co, 48)))                           *en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               *en_dam +=   15;    // [Gear] Cloak of Shadows
-	if (do_get_iflag(co, SF_EN_TAKEASEN))            *en_dam +=   15;    // [Ench] damage taken as endurance
+	*en_dam +=                    do_get_ieffect(cn, VF_EN_TAKEASEN);    // [Ench] damage taken as endurance
 	
 	if (T_ARHR_SK(co, 12))                           *mp_dam +=   30;    // (ArHr) Resourcefulness
 	if ((n=TC_SK(co, 84)))                           *mp_dam += n*15;
 	if (do_get_iflag(co, SF_PREIST))                 *mp_dam +=   30;    // [Taro] Priestess
-	if (do_get_iflag(co, SF_EN_TAKEASMA))            *mp_dam +=   15;    // [Ench] damage taken as mana
+	*mp_dam +=                    do_get_ieffect(cn, VF_EN_TAKEASMA);    // [Ench] damage taken as mana
 	
 	if ((n = *en_dam + *mp_dam))
 	{
@@ -9615,8 +9615,8 @@ int do_hurt(int cn, int co, int dam, int type)
 	{
 		dam = dam * ch[cn].dmg_bonus / 10000;
 		
-		if (do_get_iflag(cn, SF_BLEED_DMG) && has_buff(co, SK_BLEED))
-			dam = dam * 11/10;
+		if ((n = do_get_ieffect(cn, VF_QUICKSILV)) && has_buff(co, SK_BLEED))
+			dam = more(dam, n, 1);
 	}
 	
 	// Tarot - Strength - 20% more damage dealt
@@ -10120,8 +10120,9 @@ void do_attack(int cn, int co, int surround)
 	if (!T_WARR_SK(co, 10) && !do_get_ieffect(co, SF_EN_BACKSTOP))  // (Warr) Champion | [Ench] # 81
 		s2 -= 10 * sorb;
 	
-	//   Stunned or not fighting                 ~~  Outsider's Eye
-	if ((ch[co].stunned==1 || !ch[co].attack_cn) && !do_get_iflag(co, SF_TW_OUTSIDE)) s2 -= 10;
+	//   Stunned or not fighting                 ~~  Outsider's Eye | Ancient Aegis
+	if ((ch[co].stunned==1 || !ch[co].attack_cn) && !do_get_iflag(co, SF_TW_OUTSIDE)) 
+		s2 -= 10;
 	
 	diff = s1 - s2;
 	
@@ -10919,14 +10920,14 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
 		if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
 		
-	//	if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
-	//	if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
-	//	if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_BLEED_DMG);
-	//	if (do_check_items(in, IT_WP_QUICKSILV))  do_set_iflag(cn, SF_QUICKSILV);
+		if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
+		if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
 		if (do_check_items(in, IT_WB_GOLDGLAIVE)) do_set_iflag(cn, SF_GHOSTCRY);
 		if (do_check_items(in, IT_WP_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
 		if (do_check_items(in, IT_WB_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
 		if (do_check_items(in, IT_WP_THEWALL))    do_set_iflag(cn, SF_SHIELDBASH);
+		if (do_check_items(in, IT_WP_ANCIAEGIS))  do_set_iflag(cn, SF_TW_OUTSIDE);
+		if (do_check_items(in, IT_WB_ARCHTOWER))  do_set_iflag(cn, SF_EN_BACKSTOP);
 		if (do_check_items(in, IT_WB_BEINESTOC))  do_set_iflag(cn, SF_HIGHHITPAR);
 		if (do_check_items(in, IT_WP_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
 		if (do_check_items(in, IT_WB_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
@@ -10936,8 +10937,6 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WP_EVERGREEN))  do_set_iflag(cn, SF_EVERGREEN);
 		if (do_check_items(in, IT_WP_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
 		if (do_check_items(in, IT_WB_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
-		if (do_check_items(in, IT_WP_LIFESPRIG))  do_set_iflag(cn, SF_MA_HEAL);
-		if (do_check_items(in, IT_WB_LIFESPRIG))  do_set_iflag(cn, SF_MA_HEAL);
 		if (do_check_items(in, IT_WB_LAVA2HND))   do_set_iflag(cn, SF_HIT_WEAKEN);
 		if (do_check_items(in, IT_WB_BURN2HND))   do_set_iflag(cn, SF_HIT_SCORCH);
 		if (do_check_items(in, IT_WB_ICE2HND))    do_set_iflag(cn, SF_HIT_SLOW);
@@ -10950,8 +10949,10 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
 		if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
 		
-		if (do_check_items(in, IT_TW_ACEDIA) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
-		if (do_check_items(in, IT_TW_ACEDIA) && n == WN_LHAND) do_set_iflag(cn, SF_BUFFLEFT);
+		if (do_check_items(in, IT_WP_GESTGORN))   do_set_iflag(cn, SF_GESTGORN);
+		
+		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
+		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_LHAND) do_set_iflag(cn, SF_BUFFLEFT);
 		
 		// HAS_ENCH(in,   n)
 		
@@ -10965,11 +10966,9 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in,  16)) do_set_iflag(cn, SF_EN_AVASRES);
 		if (HAS_ENCH(in,  19)) do_set_iflag(cn, SF_EN_MORECLEABLAS);
 		if (HAS_ENCH(in,  22)) do_set_iflag(cn, SF_NOFOCUS);
-		if (HAS_ENCH(in,  23)) do_set_iflag(cn, SF_EN_TAKEASEN);
 		if (HAS_ENCH(in,  29)) do_set_iflag(cn, SF_EN_MOREBLINCURS);
 		if (HAS_ENCH(in,  30)) do_set_iflag(cn, SF_EN_MORESTEA);
 		if (HAS_ENCH(in,  32)) do_set_iflag(cn, SF_EN_LESSCOST);
-		if (HAS_ENCH(in,  33)) do_set_iflag(cn, SF_EN_TAKEASMA);
 		if (HAS_ENCH(in,  35)) do_set_iflag(cn, SF_EN_AVASIMM);
 		if (HAS_ENCH(in,  37)) do_set_iflag(cn, SF_EN_NOSLOW);
 		if (HAS_ENCH(in,  38)) do_set_iflag(cn, SF_EN_MOREBLEEPOIS);
@@ -11003,11 +11002,28 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in, 114)) do_set_iflag(cn, SF_EN_LESSCURS); // (Legacy)
 		if (HAS_ENCH(in, 115)) do_set_iflag(cn, SF_EN_LESSBLIN); // (Legacy)
 		
-	//	if (do_check_items(in, IT_WP_HALADIE))   do_add_ieffect(cn, VF_EXTRA_WIL, 10);
-		if (do_check_items(in, IT_WB_LIONSPAWS)) do_add_ieffect(cn, VF_EXTRA_BRV, 10);
-		if (do_check_items(in, IT_WP_COLDSTEEL)) do_add_ieffect(cn, VF_EXTRA_AGL, 10);
-		if (do_check_items(in, IT_WB_BARBSWORD)) do_add_ieffect(cn, VF_EXTRA_STR,  5);
-		if (do_check_items(in, IT_WP_GEMCUTTER)) do_add_ieffect(cn, VF_GEMMULTI,  25);
+		if (do_check_items(in, IT_WB_LIONSPAWS))  do_add_ieffect(cn, VF_EXTRA_BRV,   10);
+		if (do_check_items(in, IT_WB_COBALTLANC)) do_add_ieffect(cn, VF_EXTRA_BRV,   10);
+		if (do_check_items(in, IT_WP_HALADIE))    do_add_ieffect(cn, VF_EXTRA_WIL,   10);
+		if (do_check_items(in, IT_WB_SHIVASCEPT)) do_add_ieffect(cn, VF_EXTRA_INT,   10);
+		if (do_check_items(in, IT_WP_COLDSTEEL))  do_add_ieffect(cn, VF_EXTRA_AGL,   10);
+		if (do_check_items(in, IT_WB_BARBSWORD))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
+		if (do_check_items(in, IT_WP_GEMCUTTER))  do_add_ieffect(cn, VF_GEMMULTI,    25);
+		if (do_check_items(in, IT_WP_QUICKSILV))  do_add_ieffect(cn, VF_QUICKSILV,    1);
+		if (do_check_items(in, IT_WB_BLOODLET))   do_add_ieffect(cn, VF_BLEED_DMG,   10);
+		if (do_check_items(in, IT_WB_KUROKO))     do_add_ieffect(cn, VF_EN_TAKEASMA, 15);
+		
+		if (do_check_items(in, IT_WB_VIOLETGAZE)) 
+		{
+			do_add_ieffect(cn, VF_EN_MOREWIL, 4);
+			do_add_ieffect(cn, VF_EN_MOREINT, 4);
+		}
+		
+		if (do_check_items(in, IT_WP_LIFESPRIG)) do_add_ieffect(cn, VF_MA_HEAL,    1);
+		if (do_check_items(in, IT_WB_LIFESPRIG)) do_add_ieffect(cn, VF_MA_HEAL,    1);
+		
+		if (HAS_ENCH(in,  23)) do_add_ieffect(cn, VF_EN_TAKEASEN,   15*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  33)) do_add_ieffect(cn, VF_EN_TAKEASMA,   15*(1+IS_TWOHAND(in)));
 		
 		if (HAS_ENCH(in,   6)) do_add_ieffect(cn, VF_EN_MOREBRV,     3*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  10)) do_add_ieffect(cn, VF_EN_LESSRESR,   20*(1+IS_TWOHAND(in)));
@@ -11195,7 +11211,7 @@ void really_update_char(int cn)
 				tempWeapon /= 2;
 			}
 		}
-		if (n == WN_LHAND && IS_WPDAGGER(m) && it[m].temp != IT_WP_QUICKSILV)
+		if (n == WN_LHAND && IS_WPDAGGER(m) && it[m].temp != IT_TW_ACEDIA)
 		{
 			tempWeapon /= 2;
 		}
@@ -11708,6 +11724,7 @@ void really_update_char(int cn)
 	ch[cn].end[4]  = end;
 	ch[cn].hp[4]   = hp;
 	
+	spell_pow += hp  *(do_get_iflag(cn, SF_GESTGORN)?1:0)/100;  // [Ench] Gesture of Gorn
 	spell_pow += mana*(T_ARHR_SK(cn, 10)*2+TC_SK(cn, 82))/200;  // (ArHr) Flow
 	
 	if (mana > 999 && IS_PLAYER(cn))
@@ -12271,10 +12288,10 @@ void really_update_char(int cn)
 	parry_rate += get_fight_skill(cn, skill);
 	parry_rate += get_offhand_skill(cn, skill, 0);
 	
-	if (do_get_iflag(cn, SF_QUICKSILV))
+	if ((n = do_get_ieffect(cn, VF_QUICKSILV)))
 	{
-		hit_rate   += GET_SPD_MOV(cn)/20;
-		parry_rate += GET_SPD_MOV(cn)/20;
+		hit_rate   += GET_SPD_MOV(cn)*n/30;
+		parry_rate += GET_SPD_MOV(cn)*n/30;
 	}
 	
 	// Tarot - Lovers.R : Swaps hit/parry
