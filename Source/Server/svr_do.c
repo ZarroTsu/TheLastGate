@@ -9389,17 +9389,21 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 
 int do_recovery(int cn, int type, int v)
 {
-	int n;
+	int n, cc;
 	
 	if (v > 0)
 	{
 		n = T_LYCA_SK(cn, 7)*50 + TC_SK(cn, 103)*25;  // (Lyca) Lust
+		
+		if (IS_PLAYER_COMP(cn) && (cc = CN_OWNER(cn)))
+			n += do_get_ieffect(cc, VF_MOREMINREC);
+		
 		v = more(v, n, 1);
+		
+		if (do_get_iflag(cn, VF_EN_MORERECO)) v = more(v, 20, 1);  // [Ench] # 90
+		if (do_get_iflag(cn, SF_WORLD_R))     v = less(v, 50, 1);  // [Taro] World.R
+		if (do_get_iflag(cn, SF_APTRECOV))    v = more(v, ch[cn].spell_apt, 2);  // [Gear] Improved Pearl Axe
 	}
-	
-	if (do_get_iflag(cn, VF_EN_MORERECO)) v = more(v, 20, 1);  // [Ench] # 90
-	
-	if (do_get_iflag(cn, SF_WORLD_R))     v = less(v, 50, 1);  // [Taro] World.R
 	
 	switch (type)
 	{
@@ -10060,6 +10064,11 @@ int do_crit(int cn, int co, int dam, int msg)
 			if (!it[in].active) do_update_char(cn);
 			it[in].active = it[in].duration;
 		}
+		if (do_get_iflag(cn, SF_CRITBLAST))
+		{
+			spell_blast(cn, co, spell_multiplier(M_SK(cn, SK_BLAST), cn), 0, 1);
+			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		}
 	}
 	
 	if ((n=do_get_ieffect(co, VF_EN_LESSCRIT))) crit_redc -=    n;
@@ -10181,8 +10190,9 @@ void do_attack(int cn, int co, int surround)
 		
 		if ((topdam = max(0, ch[cn].top_damage)))
 		{
-			if (T_ARTM_SK(co,  4)) topdam = less(topdam,   30, 1);  // (ArTm) Bulwark
-			if ((n=TC_SK(co, 16))) topdam = less(topdam, n*15, 1);
+			if (T_ARTM_SK(co,  4))            topdam = less(topdam,   30, 1);  // (ArTm) Bulwark
+			if ((n=TC_SK(co, 16)))            topdam = less(topdam, n*15, 1);
+			if (do_get_iflag(co, SF_LESSTDT)) topdam = less(topdam,   30, 1);  // [Ench] Gulloxi
 			
 			if (topdam>1)
 			{
@@ -10699,7 +10709,7 @@ void really_update_char(int cn)
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
 	int critical_b = 0, critical_c = 0, critical_m = 0;
 	int hit_rate = 0, parry_rate = 0, loverSplit = 0;
-	int damage_top = 0, ava_crit = 0, ava_mult = 0;
+	int damage_top = 0, ava_crit = 0, ava_mult = 0, lido = 1, liha = 1;
 	int aoe = 0, tempCost = 10000, dmg_bns = 10000, dmg_rdc = 10000, reduc_bonus = 0;
 	int suppression = 0, bcount=0, labcmd=0, gcdivinity = 0, empty = 0, unarmed = 1, emptyring = 0;
 	int resrv[3];
@@ -10928,18 +10938,30 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WP_THEWALL))    do_set_iflag(cn, SF_SHIELDBASH);
 		if (do_check_items(in, IT_WP_ANCIAEGIS))  do_set_iflag(cn, SF_TW_OUTSIDE);
 		if (do_check_items(in, IT_WB_ARCHTOWER))  do_set_iflag(cn, SF_EN_BACKSTOP);
-		if (do_check_items(in, IT_WB_BEINESTOC))  do_set_iflag(cn, SF_HIGHHITPAR);
-		if (do_check_items(in, IT_WP_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
-		if (do_check_items(in, IT_WB_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
+		if (do_check_items(in, IT_WB_QARMZI))     do_set_iflag(cn, SF_CRITBLAST);
 		if (do_check_items(in, IT_WP_WHITEODA))   do_set_iflag(cn, SF_SPELLPAV);
 		if (do_check_items(in, IT_WB_WHITEODA))   do_set_iflag(cn, SF_SPELLPAV);
 		if (do_check_items(in, IT_WP_EXCALIBUR))  do_set_iflag(cn, SF_EXCALIBUR);
+		if (do_check_items(in, IT_WP_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
+		if (do_check_items(in, IT_WB_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
 		if (do_check_items(in, IT_WP_EVERGREEN))  do_set_iflag(cn, SF_EVERGREEN);
+		if (do_check_items(in, IT_WB_RUSTSPIKES)) do_set_iflag(cn, SF_HIT_POISON);
+		if (do_check_items(in, IT_WB_NEICLAW))    do_set_iflag(cn, SF_SPELLMANA);
+		if (do_check_items(in, IT_WP_CRIMRIP))    do_set_iflag(cn, SF_HIT_BLEED);
+		if (do_check_items(in, IT_WB_CRIMRIP))    do_set_iflag(cn, SF_HIT_BLEED);
+		if (do_check_items(in, IT_WB_CRIMRIP))    do_set_iflag(cn, SF_BLEEDHP);
+		if (do_check_items(in, IT_WB_THEBUTCHER)) do_set_iflag(cn, SF_BUTCHER);
+		if (do_check_items(in, IT_WB_GULLOXI))    do_set_iflag(cn, SF_LESSTDT);
+		if (do_check_items(in, IT_WB_AJAXBLUE))   do_set_iflag(cn, SF_BRAVESTR);
+		if (do_check_items(in, IT_WB_PEARLAXE))   do_set_iflag(cn, SF_APTRECOV);
 		if (do_check_items(in, IT_WP_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
 		if (do_check_items(in, IT_WB_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
+		if (do_check_items(in, IT_WB_JADEHALLOW)) do_set_iflag(cn, SF_JADELEAP);
 		if (do_check_items(in, IT_WB_LAVA2HND))   do_set_iflag(cn, SF_HIT_WEAKEN);
 		if (do_check_items(in, IT_WB_BURN2HND))   do_set_iflag(cn, SF_HIT_SCORCH);
 		if (do_check_items(in, IT_WB_ICE2HND))    do_set_iflag(cn, SF_HIT_SLOW);
+		if (do_check_items(in, IT_WP_PHANTASM))   do_set_iflag(cn, SF_CRITBLAST);
+		if (do_check_items(in, IT_WB_PHANTASM))   do_set_iflag(cn, SF_CRITBLAST);
 		if (do_check_items(in, IT_WP_GILDSHINE))  do_set_iflag(cn, SF_GILDSHINE);
 		if (do_check_items(in, IT_WB_GILDSHINE))  do_set_iflag(cn, SF_GILDSHINE);
 		if (do_check_items(in, IT_WP_CROSSBLAD))  do_set_iflag(cn, SF_CROSSBLAD);
@@ -10949,8 +10971,11 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
 		if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
 		
+		if (do_check_items(in, IT_WP_SUNSSKUA))   lido = 2;
+		if (do_check_items(in, IT_WP_PURPPLED))   liha = 2;
+		if (do_check_items(in, IT_WP_IDOLISHT))   do_set_iflag(cn, );
 		if (do_check_items(in, IT_WP_GESTGORN))   do_set_iflag(cn, SF_GESTGORN);
-		
+		if (do_check_items(in, IT_WP_CUDGKWAI))   do_set_iflag(cn, SF_HIGHHITPAR);
 		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
 		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_LHAND) do_set_iflag(cn, SF_BUFFLEFT);
 		
@@ -11002,12 +11027,13 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in, 114)) do_set_iflag(cn, SF_EN_LESSCURS); // (Legacy)
 		if (HAS_ENCH(in, 115)) do_set_iflag(cn, SF_EN_LESSBLIN); // (Legacy)
 		
-		if (do_check_items(in, IT_WB_LIONSPAWS))  do_add_ieffect(cn, VF_EXTRA_BRV,   10);
-		if (do_check_items(in, IT_WB_COBALTLANC)) do_add_ieffect(cn, VF_EXTRA_BRV,   10);
+		if (do_check_items(in, IT_WB_LIONSPAWS))  do_add_ieffect(cn, VF_EXTRA_BRV,   20);
+		if (do_check_items(in, IT_WB_COBALTLANC)) do_add_ieffect(cn, VF_EXTRA_BRV,   20);
 		if (do_check_items(in, IT_WP_HALADIE))    do_add_ieffect(cn, VF_EXTRA_WIL,   10);
 		if (do_check_items(in, IT_WB_SHIVASCEPT)) do_add_ieffect(cn, VF_EXTRA_INT,   10);
-		if (do_check_items(in, IT_WP_COLDSTEEL))  do_add_ieffect(cn, VF_EXTRA_AGL,   10);
+		if (do_check_items(in, IT_WP_COLDSTEEL))  do_add_ieffect(cn, VF_EXTRA_AGL,   20);
 		if (do_check_items(in, IT_WB_BARBSWORD))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
+		if (do_check_items(in, IT_WB_FELLNIGHT))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
 		if (do_check_items(in, IT_WP_GEMCUTTER))  do_add_ieffect(cn, VF_GEMMULTI,    25);
 		if (do_check_items(in, IT_WP_QUICKSILV))  do_add_ieffect(cn, VF_QUICKSILV,    1);
 		if (do_check_items(in, IT_WB_BLOODLET))   do_add_ieffect(cn, VF_BLEED_DMG,   10);
@@ -11019,8 +11045,10 @@ void really_update_char(int cn)
 			do_add_ieffect(cn, VF_EN_MOREINT, 4);
 		}
 		
-		if (do_check_items(in, IT_WP_LIFESPRIG)) do_add_ieffect(cn, VF_MA_HEAL,    1);
-		if (do_check_items(in, IT_WB_LIFESPRIG)) do_add_ieffect(cn, VF_MA_HEAL,    1);
+		if (do_check_items(in, IT_WP_LIFESPRIG))  do_add_ieffect(cn, VF_MA_HEAL,      1);
+		if (do_check_items(in, IT_WB_LIFESPRIG))  do_add_ieffect(cn, VF_MA_HEAL,      1);
+		if (do_check_items(in, IT_WB_DECOSWORD))  do_add_ieffect(cn, VF_MOREAURA,    30);
+		if (do_check_items(in, IT_WB_ANCIENTORN)) do_add_ieffect(cn, VF_MOREMINREC,  50);
 		
 		if (HAS_ENCH(in,  23)) do_add_ieffect(cn, VF_EN_TAKEASEN,   15*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  33)) do_add_ieffect(cn, VF_EN_TAKEASMA,   15*(1+IS_TWOHAND(in)));
@@ -11582,6 +11610,12 @@ void really_update_char(int cn)
 		}
 	}
 	
+	if (do_get_iflag(cn, SF_BRAVESTR)) // [Gear] Improved Ajax Blue
+	{
+		attrib[AT_STR] += attrib[AT_BRV];
+		do_add_ieffect(cn, VF_EN_MORESTR, do_get_ieffect(cn, VF_EN_MOREBRV));
+	}
+	
 	if (do_get_iflag(cn, SF_FOOL_R)) // Tarot Fool.R - Average up the attributes
 	{
 		int foolaverage = 0;
@@ -11605,28 +11639,40 @@ void really_update_char(int cn)
 	
 	bits = get_rebirth_bits(cn);
 	
+	// lido = 1, liha = 1;
+	
 	for (z = 0; z<5; z++)
 	{
-		ch[cn].limit_break[z][1] = max(-125, min(125, suppression));
+		m = 0;
 		
-		if ( T_BRAV_SK(cn,  8)  && z==AT_BRV) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (Brav) Overwhelming Braveness
-		if ((n = TC_SK(cn, 92)) && z==AT_BRV) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
+		// (Brav) Overwhelming Braveness
+		if ( T_BRAV_SK(cn,  8)  && z==AT_BRV) m = min(127, m +    10 * lido / liha);
+		if ((n = TC_SK(cn, 92)) && z==AT_BRV) m = min(127, m + n * 5 * lido / liha);
 		
-		if ( T_SUMM_SK(cn,  8)  && z==AT_WIL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (Summ) Overwhelming Willpower
-		if ((n = TC_SK(cn, 68)) && z==AT_WIL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
+		// (Summ) Overwhelming Willpower
+		if ( T_SUMM_SK(cn,  8)  && z==AT_WIL) m = min(127, m +    10 * lido / liha);
+		if ((n = TC_SK(cn, 68)) && z==AT_WIL) m = min(127, m + n * 5 * lido / liha);
 		
-		if ( T_ARHR_SK(cn,  8)  && z==AT_INT) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (ArHr) Overwhelming Intuition
-		if ((n = TC_SK(cn, 80)) && z==AT_INT) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
+		// (ArHr) Overwhelming Intuition
+		if ( T_ARHR_SK(cn,  8)  && z==AT_INT) m = min(127, m +    10 * lido / liha);
+		if ((n = TC_SK(cn, 80)) && z==AT_INT) m = min(127, m + n * 5 * lido / liha);
 		
-		if ( T_SKAL_SK(cn,  8)  && z==AT_AGL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (Skal) Overwhelming Agility
-		if ((n = TC_SK(cn, 32)) && z==AT_AGL) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
+		// (Skal) Overwhelming Agility
+		if ( T_SKAL_SK(cn,  8)  && z==AT_AGL) m = min(127, m +    10 * lido / liha);
+		if ((n = TC_SK(cn, 32)) && z==AT_AGL) m = min(127, m + n * 5 * lido / liha);
 		
-		if ( T_ARTM_SK(cn,  8)  && z==AT_STR) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] +    10)); // (ArTm) Overwhelming Strength
-		if ((n = TC_SK(cn, 20)) && z==AT_STR) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + n * 5));
+		// (ArTm) Overwhelming Strength
+		if ( T_ARTM_SK(cn,  8)  && z==AT_STR) m = min(127, m +    10 * lido / liha);
+		if ((n = TC_SK(cn, 20)) && z==AT_STR) m = min(127, m + n * 5 * lido / liha);
 		
-		ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + min(5,max(0,(bits+5-z)/6))));
+		// Blue Pole bits
+		m = min(127, m + min(5,max(0,(bits+5-z)/6)) * lido / liha);
 		
-		if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[z][1] = max(-125, min(125, ch[cn].limit_break[z][1] + 5));
+		// Obsidian Crown
+		if (it[ch[cn].worn[WN_HEAD]].temp==2921) m = min(127, m + 5 * lido / liha);
+		
+		// Purple One's Pledge
+		if (liha == 2) attrib[z] += m;
 		
 		// Enchant: More attributes
 		if (z==0) attrib[z] = attrib[z]*(100+do_get_ieffect(cn, VF_EN_MOREBRV))/100;
@@ -11635,14 +11681,27 @@ void really_update_char(int cn)
 		if (z==3) attrib[z] = attrib[z]*(100+do_get_ieffect(cn, VF_EN_MOREAGL))/100;
 		if (z==4) attrib[z] = attrib[z]*(100+do_get_ieffect(cn, VF_EN_MORESTR))/100;
 		
+		ch[cn].limit_break[z][1] = max(-128, min(127, m + suppression));
+		
 		set_attrib_score(cn, z, attrib[z]);
 	}
-	ch[cn].limit_break[5][1] = max(-125, min(125, suppression));
-	ch[cn].limit_break[5][1] = max(-125, min(125, ch[cn].limit_break[5][1] + min(5,max(0,bits/6))));
 	
-	if (it[ch[cn].worn[WN_HEAD]].temp==2921) ch[cn].limit_break[5][1] = max(-125, min(125, ch[cn].limit_break[5][1] + 5));
+	m = 0;
 	
-	if ((n=TC_SK(cn, 8))) ch[cn].limit_break[5][1] = max(-125, min(125, ch[cn].limit_break[5][1] + n*5));  // *Master of None
+	// *Master of None
+	if ((n=TC_SK(cn, 8))) m = min(127, m + n * 5 * lido / liha);
+	
+	// Blue Pole bits
+	m = min(127, m + min(5,max(0,bits/6)) * lido / liha);
+	
+	// Obsidian Crown
+	if (it[ch[cn].worn[WN_HEAD]].temp==2921) m = min(127, m + 5 * lido / liha);
+	
+	// Purple One's Pledge
+	if (liha == 2) for (z = 0; z<MAXSKILL; z++) skill[z] += m;
+	
+	ch[cn].limit_break[5][1] = max(-128, min(127, m + suppression));
+	
 	
 	// Weapon - Fist of the Heavens :: best attribute times 1.2
 	if (do_get_iflag(cn, SF_TW_HEAVENS))
@@ -11724,8 +11783,9 @@ void really_update_char(int cn)
 	ch[cn].end[4]  = end;
 	ch[cn].hp[4]   = hp;
 	
-	spell_pow += hp  *(do_get_iflag(cn, SF_GESTGORN)?1:0)/100;  // [Ench] Gesture of Gorn
-	spell_pow += mana*(T_ARHR_SK(cn, 10)*2+TC_SK(cn, 82))/200;  // (ArHr) Flow
+	spell_pow += hp  *(do_get_iflag(cn, SF_GESTGORN )?1:0)/100;  // [Ench] Gesture of Gorn
+	spell_pow += mana*(do_get_iflag(cn, SF_SPELLMANA)?1:0)/100; 
+	spell_pow += mana*(T_ARHR_SK(cn, 10)*2+TC_SK(cn, 82))/200;   // (ArHr) Flow
 	
 	if (mana > 999 && IS_PLAYER(cn))
 	{
@@ -11928,12 +11988,9 @@ void really_update_char(int cn)
 		
 		for (n=1;n<5;n++)
 		{
-			ava_crit = min(ava_crit, attrib_ex[n]);
-			ava_mult = max(ava_mult, attrib_ex[n]);
+			ava_mult = min(ava_mult, attrib_ex[n]);
+			ava_crit = max(ava_crit, attrib_ex[n]);
 		}
-		
-		ava_crit*=2;
-		ava_mult/=2;
 	}
 	
 	// Book - Traveler's Guide :: Higher effects of Braveness and Agility
@@ -12263,7 +12320,7 @@ void really_update_char(int cn)
 	// Weapon - Gildshine :: Economize is granted as crit multi
 	if (do_get_iflag(cn, SF_GILDSHINE))
 	{
-		critical_m += skill[SK_ECONOM];
+		critical_m += skill[SK_ECONOM]*2/3;
 	}
 	
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
@@ -12351,13 +12408,13 @@ void really_update_char(int cn)
 		if (do_get_iflag(cn, SF_EXCALIBUR))
 			weapon += (base_spd + spd_attack)/5;
 		
-		// Weapon - White Odachi :: Additional AV by spellmod over 100
-		if (do_get_iflag(cn, SF_SPELLPAV) && spell_mod > 100)
-			armor  += (spell_mod-100);
+		// Weapon - White Odachi :: Additional AV from spell_pow
+		if (do_get_iflag(cn, SF_SPELLPAV) && spell_pow > 100)
+			armor  += spell_pow;
 		
-		// Weapon - Black Tachi :: Additional WV by spellmod over 100
-		if (do_get_iflag(cn, SF_SPELLPWV) && spell_mod > 100)
-			weapon += (spell_mod-100);
+		// Weapon - Black Tachi :: Additional WV from spell_pow
+		if (do_get_iflag(cn, SF_SPELLPWV) && spell_pow > 100)
+			weapon += spell_pow;
 		
 		// Weapon - Evergreen :: Additional WV per AGL, Additional AV per STR
 		if (do_get_iflag(cn, SF_EVERGREEN))
@@ -12833,7 +12890,7 @@ void do_aria_stats(int cn, int in, int power, int flag)
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
-	int power, tarot, in2 = 0, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
+	int power, tarot, in2 = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);  // (Corr) Towering Presence + IT_WB_DECOSWORD
 	
 	if (!co) return;
 	
@@ -13042,6 +13099,32 @@ void do_check_auras(int cn)
 	if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  do_skill_aura(cn, SK_HASTE,  0);  // (Sorc) Fast Forward
 	if (T_BRAV_SK(cn,  6) && B_SK(cn, SK_CURSE))  do_skill_aura(cn, SK_CURSE,  0);  // (Brav) Presence
 	if (T_LYCA_SK(cn,  4) && B_SK(cn, SK_WEAKEN)) do_skill_aura(cn, SK_WEAKEN, 0);  // (Lyca) Sickness
+}
+
+void do_extra_cleave(int cn, int power)
+{
+	int m = ch[cn].x + ch[cn].y * MAPX;
+	
+	if (IS_LIVINGCHAR(co = ch[cn].skill_target1)) ;
+	else if (!buff && ch[cn].dir==DX_DOWN  && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP    && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT  && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && IS_LIVINGCHAR(co = ch[cn].attack_cn)) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_UP && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_DOWN && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_LEFT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else return;
+	
+	if (!do_char_can_see(cn, co, 0)) return;
+	if (!is_facing(cn, co) && !face_target(cn, co)) return;
+	
+	spell_cleave(cn, co, power, 0, 0);
 }
 
 void do_random_blast(int cn, int power)
@@ -14267,6 +14350,11 @@ void do_regenerate(int cn)
 						if (bu[in].data[2] == 2)
 							do_random_blast(cn, bu[in].data[1]);
 						do_random_blast(cn, bu[in].data[1]);
+					}
+					
+					if (bu[in].data[0]==SK_CLEAVE)  // [Gear] Improved Butcher
+					{
+						do_extra_cleave(cn, bu[in].data[1]);
 					}
 					
 					if ((m = TC_SK(cn, 58) * 15))         // (Corr) Skip Ahead

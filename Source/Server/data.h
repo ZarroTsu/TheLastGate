@@ -438,7 +438,7 @@ extern unsigned int mapmarker;
 #define CHARSIZE  (sizeof(struct character)*MAXCHARS)
 #define TCHARSIZE (sizeof(struct character)*MAXTCHARS)
 
-// Special Character Item Flags - equipped items affecting the character
+// Special Character Item Flags - equipped items affecting the character -- limit of 512
 enum _ch_iflags {
 	SF_SEYASWORD,   SF_MAGI,        SF_PREIST,      SF_EMPRESS,
 	SF_EMPEROR,     SF_HEIROPH,     SF_LOVERS,      SF_CHARIOT,
@@ -455,7 +455,7 @@ enum _ch_iflags {
 	SF_BOOK_DAMO,   SF_BOOK_SHIV,   SF_BOOK_PROD,   SF_BOOK_VENO,
 	SF_BOOK_NECR,   SF_BOOK_BISH,   SF_BOOK_GREA,   SF_BOOK_DEVI,
 	SF_BOOK_VERD,   SF_NOFOCUS,     SF_BOOK_GRAN,   SF_TW_CROWN,
-	SF_TW_CLOAK,    SF_TW_DREAD,    SF_HIT_DOUSE,
+	SF_TW_CLOAK,    SF_TW_DREAD,    SF_HIT_DOUSE,   
 	
 	SF_TW_MARCH,    SF_TW_OUTSIDE,  SF_TW_HEAVENS,  SF_TW_IRA,      
 	SF_TW_INVIDIA,  SF_TW_GULA,     SF_TW_LUXURIA,  SF_TW_AVARITIA, 
@@ -471,6 +471,9 @@ enum _ch_iflags {
 	SF_HIT_SCORCH,  SF_HIT_BLIND,   SF_HIT_SLOW,    SF_HIT_CURSE,   
 	SF_HIT_WEAKEN,  SF_HIT_FROST,   SF_HIT_FEAR,    SF_WBREATH,     
 	SF_HIT_BLEED,   SF_BUFFRGHT,    SF_BUFFLEFT,    SF_GESTGORN,    
+	SF_CRITBLAST,   SF_SPELLMANA,   SF_BLEEDHP,     SF_LESSTDT,     
+	SF_BUTCHER,     SF_BRAVESTR,    SF_APTRECOV,    SF_JADELEAP,    
+	
 	
 	SF_EN_MOREAV,       // Enchant #  2
 	SF_EN_HEALIT,       // Enchant #  3
@@ -514,7 +517,7 @@ enum _ch_iflags {
 	SF_MAX
 };
 
-// Variable flags with additive values, such as enchants
+// Variable flags with additive values, such as enchants -- limit of 64
 enum _ch_ieffects {
 	VF_EXTRA_BRV,
 	VF_EXTRA_WIL,
@@ -523,6 +526,7 @@ enum _ch_ieffects {
 	VF_EXTRA_STR,
 	
 	VF_GEMMULTI,    VF_QUICKSILV,   VF_BLEED_DMG,   VF_MA_HEAL,     
+	VF_SLAYSUMM,    VF_MOREAURA,    VF_MOREMINREC,  
 	
 	VF_EN_MOREBRV,    // Enchant #  6 (+ 3) | 84 (+ 2)
 	VF_EN_MOREWIL,    // Enchant # 17 (+ 3) | 84 (+ 2)
@@ -564,7 +568,7 @@ enum _ch_ieffects {
 	VF_EN_TAKEASEN,   // Enchant # 23 (+15)
 	VF_EN_TAKEASMA,   // Enchant # 33 (+15)
 	
-	VF_MAX
+	VF_MAX            // 51 / 64
 };
 
 struct character

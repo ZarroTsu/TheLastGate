@@ -342,30 +342,41 @@ void look_extra(int cn, int in)
 	                       do_char_log(cn, FN_EX, DESC_LAMEDARG);
 	                       else
 	                       do_char_log(cn, FN_WO, DESC_LAMEFULL);   break;
+	case IT_WB_QARMZI:     do_char_log(cn, FN_EX, DESC_QARMZI);     break;
 	case IT_WP_WHITEODA:   
 	case IT_WB_WHITEODA:   do_char_log(cn, FN_EX, DESC_WHITEODA);   break;
 	case IT_WP_EXCALIBUR:  do_char_log(cn, FN_EX, DESC_EXCALIBUR);  break;
 	
-	case IT_WB_BEINESTOC:  do_char_log(cn, FN_EX, DESC_BEINESTOC);  break;
 	case IT_WP_BLACKTAC:   
 	case IT_WB_BLACKTAC:   do_char_log(cn, FN_EX, DESC_BLACKTAC);   break;
 	case IT_WP_EVERGREEN:  do_char_log(cn, FN_EX, DESC_EVERGREEN);  break;
 	
+	case IT_WB_RUSTSPIKES: do_char_log(cn, FN_EX, DESC_RUSTSPIKES); break;
+	case IT_WB_ANCIENTORN: do_char_log(cn, FN_EX, DESC_ANCIENTORN); break;
+	case IT_WB_NEICLAW:    do_char_log(cn, FN_EX, DESC_NEICLAW);    break;
 	case IT_WB_LIONSPAWS:  do_char_log(cn, FN_EX, DESC_LIONSPAWS);  break;
-	case IT_WP_CRIMRIP:    
-	case IT_WB_CRIMRIP:    do_char_log(cn, FN_EX, DESC_CRIMRIP);    break;
+	case IT_WP_CRIMRIP:    do_char_log(cn, FN_EX, DESC_CRIMRIP);    break;
+	case IT_WB_CRIMRIP:    do_char_log(cn, FN_EX, DESC_CRIMRIP2);   break;
 	case IT_WP_SOVERIGNS:  do_char_log(cn, FN_EX, DESC_SOVERIGNS);  break;
 	
+	case IT_WB_THEBUTCHER: do_char_log(cn, FN_EX, DESC_THEBUTCHER); break;
+	case IT_WB_GULLOXI:    do_char_log(cn, FN_EX, DESC_GULLOXI);    break;
+	case IT_WB_AJAXBLUE:   do_char_log(cn, FN_EX, DESC_AJAXBLUE);   break;
+	case IT_WB_PEARLAXE:   do_char_log(cn, FN_EX, DESC_PEARLAXE);   break;
 	case IT_WP_CRESSUN:    
 	case IT_WB_CRESSUN:    do_char_log(cn, FN_EX, DESC_CRESSUN);    break;
+	case IT_WB_JADEHALLOW: do_char_log(cn, FN_EX, DESC_JADEHALLOW); break;
 	case IT_WP_MJOLNIR:    do_char_log(cn, FN_EX, DESC_MJOLNIR);    break;
 	
+	case IT_WB_DECOSWORD:  do_char_log(cn, FN_EX, DESC_DECOSWORD);  break;
 	case IT_WB_LAVA2HND:   do_char_log(cn, FN_EX, DESC_LAVA2HND);   break;
 	case IT_WP_GILDSHINE:  
 	case IT_WB_GILDSHINE:  do_char_log(cn, FN_EX, DESC_GILDSHINE);  break;
 	case IT_WB_BURN2HND:   do_char_log(cn, FN_EX, DESC_BURN2HND);   break;
 	case IT_WB_ICE2HND:    do_char_log(cn, FN_EX, DESC_ICE2HND);    break;
-	case IT_WP_COLDSTEEL:  do_char_log(cn, FN_EX, DESC_COLDSTEEL);  break;
+	case IT_WP_PHANTASM:  
+	case IT_WB_PHANTASM:   do_char_log(cn, FN_EX, DESC_PHANTASM);   break;
+	case IT_WP_MURAMASA:   do_char_log(cn, FN_EX, DESC_MURAMASA);   break;
 	case IT_WP_CROSSBLAD:  do_char_log(cn, FN_EX, DESC_CROSSBLAD);  break;
 	
 	case IT_WP_BRONCHIT:   

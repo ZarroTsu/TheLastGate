@@ -506,20 +506,20 @@ extern char *at_short[];
 
 #define FN_ABYSS		4
 #define DESC_TW_ACEDIA		"When equipped, this weapon grants full damage and shield parry while in the offhand."
-#define DESC_TW_IRA			"When equipped, 30%% of mana is reserved, and your Blast spell can inflict critical hits.\n"
+#define DESC_TW_IRA			"When equipped, 30%% of mana is reserved. Your Blast spell can inflict critical hits.\n"
 #define DESC_TW_INVIDIA		"When equipped, your ghost companion has surround hit AoE, and your shadow copy teleports to new targets, but each cannot regenerate health.\n"
-#define DESC_TW_GULA		"When equipped, you leech 20%% of damage dealt with hits as hitpoints, but you reserve 30%% of your hitpoints.\n"
+#define DESC_TW_GULA		"When equipped, 30%% of hitpoints is reserved. You leech 20%% of damage dealt with hits as hitpoints.\n"
 #define DESC_TW_LUXURIA		"When equipped, your hits inflict a self-scaling Aggravate, causing enemies to take more damage.\n"
-#define DESC_TW_AVARITIA	"When equipped, twice your lowest attribute increases critical hit chance and half your highest attribute increases critical hit multiplier, but you reserve 30%% of your endurance.\n"
+#define DESC_TW_AVARITIA	"When equipped, 30%% of endurance is reserved. Your highest attribute is granted as increased Crit Chance, and your lowest attribute is added to your Crit Multiplier.\n"
 #define DESC_TW_SUPERBIA	"When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n"
 #define DESC_TW_SINBIND		"You may only equip one Sinbinder at a time.\n"
 
-#define DESC_SUNSSKUA		"\n"
-#define DESC_PURPPLED		"\n"
+#define DESC_SUNSSKUA		"When equipped, all increases to attribute and skill limits are doubled.\n"
+#define DESC_PURPPLED		"When equipped, all increases to attribute and skill limits are halved. Increases to attribute and skill limits also affect their modifiers.\n"
 #define DESC_IDOLISHT		"\n"
 #define DESC_SLIVANKH		"When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n"
 #define DESC_GESTGORN		"When equipped, grants 1 additional Spellpower Bonus for every 100 uncapped Maximum Hitpoints.\n"
-#define DESC_CUDGKWAI		"\n"
+#define DESC_CUDGKWAI		"When equipped, your Hit and Parry scores are the higher of the two.\n"
 
 #define FN_O			4
 #define DESC_O				"You may only equip one %s at a time.\n", it[in].name
@@ -594,7 +594,7 @@ extern char *at_short[];
 
 #define DESC_STONEDAGG		"When equipped, this weapon can be used to cast 'Sacrifice', converting 25%% of your current Hitpoints into Mana.\n"
 #define DESC_LIFESPRIG		"When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n"
-#define DESC_SPIDERFANG		"When equipped, this weapon can be used to cast Venom, with power equal to your Poison spell modifier.\n"
+#define DESC_SPIDERFANG		"When equipped, this weapon can be used to cast Venom, with power equal to your Poison spell.\n"
 #define DESC_MAGEMASH		"When equipped, this weapon can be used to cast Dispel. Dispel cast in this way does not affect you or your allies, and instead removes enemy buffs.\n"
 #define DESC_BLOODLET		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time.\n"
 #define DESC_BLOODLET2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. You deal 10%% more damage with hits against bleeding enemies.\n"
@@ -613,7 +613,7 @@ extern char *at_short[];
 
 #define DESC_GOLDGLAIVE		"When equipped, your Ghost Companion will use Warcry instead of Taunt, based on its Taunt skill modifier.\n"
 #define DESC_KELPTRID		"When equipped, grants +30 to action speed while underwater.\n"
-#define DESC_COBALTLANC		"When equipped, your passive skills gain an additional 10%% Braveness bonus.\n"
+#define DESC_COBALTLANC		"When equipped, your passive skills gain an additional 20%% Braveness bonus.\n"
 #define DESC_FLAGBEAR		"When equipped, this weapon can be used to freely cast Rally, with power equal to half of your total Willpower.\n"
 
 #define DESC_ARCHTOWER		"When equipped, enemies beside and behind you no longer gain a bonus to hitting you.\n"
@@ -622,26 +622,43 @@ extern char *at_short[];
 #define DESC_THEWALL		"When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n"
 #define DESC_ANCIAEGIS		"When equipped, enemies no longer gain a bonus to hitting you while you are stunned or not fighting back.\n"
 
-#define DESC_BARBSWORD		"When equipped, your active melee skills gain an additional 5%% Strength bonus.\n"
+#define DESC_BARBSWORD		"When equipped, your active melee skills gain an additional 10%% Strength bonus.\n"
 #define DESC_LAMEDARG		"Thine worth shall be proven. %d remain.\n", max(0, REQ_LAME-it[in].data[0])
 #define DESC_LAMEFULL		"Thou art worthy. Use me when ready.\n"
-#define DESC_WHITEODA		"When equipped, grants additional armor value based on total spell modifier.\n"
+#define DESC_QARMZI			"When equipped, critical hits you inflict also cast Blast on the afflicted target, with power equal to your Blast spell.\n"
+#define DESC_WHITEODA		"When equipped, grants additional armor value equal to your total Spellpower Bonus.\n"
 #define DESC_EXCALIBUR		"When equipped, 20%% of uncapped attack speed is granted as additional weapon value.\n"
-#define DESC_BEINESTOC		"When equipped, your Hit and Parry scores are the higher of the two.\n"
-#define DESC_BLACKTAC		"When equipped, grants additional weapon value based on total spell modifier.\n"
+
+#define DESC_FELLNIGHT		"When equipped, your active melee skills gain an additional 10%% Strength bonus.\n"
+#define DESC_BLACKTAC		"When equipped, grants additional weapon value  equal to your total Spellpower Bonus.\n"
 #define DESC_EVERGREEN		"When equipped, grants 1 additional weapon value per 10 Agility, and 1 additional armor value per 10 Strength.\n"
-#define DESC_LIONSPAWS		"When equipped, your passive skills gain an additional 10%% Braveness bonus.\n"
-#define DESC_CRIMRIP		"When equipped, this weapon can be used to cast 'Bloodletting', costing 1/3 of uncapped hitpoints. Bloodletting inflicts bleeding on surrounding enemies.\n"
+
+#define DESC_RUSTSPIKES		"When equipped, your hits inflict a self-scaling Poison, dealing damage over time.\n"
+#define DESC_ANCIENTORN		"When equipped, your minions gain 50%% more effect of recovery from all sources.\n"
+#define DESC_NEICLAW		"When equipped, grants 1 additional Spellpower Bonus for every 100 uncapped Maximum Mana.\n"
+#define DESC_LIONSPAWS		"When equipped, your passive skills gain an additional 20%% Braveness bonus.\n"
+#define DESC_CRIMRIP		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time.\n"
+#define DESC_CRIMRIP2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. Bleeds you inflict deal 1%% more damage per 50 uncapped maximum Hitpoints.\n"
 #define DESC_SOVERIGNS		"When equipped, %s and %s become the average of the two, plus 10.\n", skilltab[it[in].data[1]].name, skilltab[it[in].data[2]].name
+
+#define DESC_THEBUTCHER		"When equipped, your Cleave hits an additional time when its cooldown expires.\n"
+#define DESC_GULLOXI		"When equipped, grants 30%% less Top Damage taken from enemies attacking you.\n"
+#define DESC_AJAXBLUE		"When equipped, additions and increases to your Braveness also affect your Strength.\n"
+#define DESC_PEARLAXE		"When equipped, recovery from all sources is increased by half of your total Spell Aptitude.\n"
 #define DESC_CRESSUN		"When equipped, endurance spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n"
-#define DESC_MJOLNIR		"When equipped, this weapon can be used to cast Blast, with power based on your WV and top damage, ignoring spell modifier. Blasts cast this way will inflict a stack of Shock, and grant you a stack of Charge.\n"
-#define DESC_LAVA2HND		"Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Weaken, reducing enemy weapon value.\n"
+#define DESC_JADEHALLOW		"When equipped, your Leap repeats an additional time. If Leap no longer repeats, it instead gains +1 AoE per two repeats it would have made.\n"
+#define DESC_MJOLNIR		"When equipped, this weapon can be used to cast Blast, with power equal to your total Strength. Blasts cast this way will inflict a stack of Shock and grant you a stack of Charge.\n"
+
+#define DESC_DECOSWORD		"When equipped, grants 30%% increased effect of passive aura abilities.\n"
+#define DESC_LAVA2HND		"When equipped, your hits inflict a self-scaling Weaken, reducing enemy weapon value.\n"
 #define DESC_GILDSHINE		"When equipped, grants additional critical hit multiplier based off total Economize score.\n"
-#define DESC_BURN2HND		"Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Scorch, causing enemies to take additional damage.\n"
-#define DESC_ICE2HND		"Has a 25%% chance on skill hit and a 5%% chance on melee hit to inflict Slow, reducing enemy action speed.\n"
-#define DESC_COLDSTEEL		"When equipped, your active melee skills gain an additional 10%% Agility bonus.\n"
+#define DESC_BURN2HND		"When equipped, your hits inflict a self-scaling Scorch, causing enemies to take more damage.\n"
+#define DESC_ICE2HND		"When equipped, your hits inflict a self-scaling Slow, reducing enemy action speed.\n"
+#define DESC_PHANTASM		"When equipped, critical hits you inflict also cast Blast on the afflicted target, with power equal to your Blast spell.\n"
+#define DESC_MURAMASA		"When equipped, your active melee skills gain an additional 20%% Agility bonus.\n"
 #define DESC_CROSSBLAD		"When equipped, Surround Hit has a base radius of 4.\n"
-#define DESC_BRONCHIT		"When equipped, 25%% of Cleave's damage is also dealt to the target's mana.\n"
+
+#define DESC_BRONCHIT		"When equipped, \n"
 #define DESC_VOLCANF		"When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n"
 #define DESC_VIKINGMALT		"When equipped, this weapon can be used to cast 'Slam', dealing damage based on Strength around you and stunning enemies with a base radius of 2 around your target. Stun duration with Slam is determined by your crit multiplier.\n"
 #define DESC_GUNGNIR		"When equipped, bleeding you inflict deals its damage three times faster.\n"

@@ -353,6 +353,79 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	else if (power >= 150) power = power + v*2/3;
 	else                   power = power + v;
 	
+	bu[in].data[9] = power;
+	
+	switch (tmp)
+	{
+		case SK_POISON:
+		case SK_VENOM:
+			power = more(power, M_AT(cn, AT_INT) * (T_SORC_SK(cn,  7)*2 + TC_SK(cn, 55)), 20); // (Sorc) Toxins
+			power = spell_multiplier(power, cn);
+			if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			break;
+		case SK_BLIND:
+		case SK_DOUSE:
+			power = more(power, M_AT(cn, AT_AGL) * (T_WARR_SK(cn,  9)*2 + TC_SK(cn, 45)), 20);  // (Warr) Antagonizer
+			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			if (do_get_iflag(co, SF_EN_LESSBLIN)) power = power/2;
+			break;
+		case SK_SLOW:
+		case SK_STYMIE:
+			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
+			power = spell_multiplier(power, cn);
+			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			if (do_get_iflag(co, SF_EN_LESSSLOW)) power = power/2;
+			break;
+		case SK_CURSE:
+			power = more(power, M_AT(cn, AT_INT) * TC_SK(cn,110), 20); // (Corr) Famine
+			power = spell_multiplier(power, cn);
+			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			if (do_get_iflag(co, SF_EN_LESSCURS)) power = power/2;
+			break;
+		case SK_WEAKEN:
+		case SK_WEAKEN2:
+			power = more(power, M_AT(cn, AT_AGL) * TC_SK(cn,111), 20); // (Corr) Burden
+			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/2;
+			break;
+		case SK_SCORCH:
+			power = spell_multiplier(power, cn);
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			break;
+		case SK_AGGRAVATE:
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			break;
+		case SK_FATIGUE:
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			break;
+		case SK_FROSTB:
+			power = spell_multiplier(power, cn);
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			break;
+		case SK_BLEED:
+			if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
+			if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
+			if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/50, 1);    // [Ench] Improved Crimson Ripper
+			power = spell_immunity(cn, co, power);
+			power = common_mult(cn, co, power);
+			break;
+		default: break;
+	}
+	
 	if (!(in = make_new_buff(cn, tmp, spr, power, dur, 0))) return 0;
 	
 	switch (tmp)
@@ -372,6 +445,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].stack = 1;
 			break;
 		case SK_BLIND:
+			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 			bu[in].skill[SK_PERCEPT] = max(-127, -(power/3 + 3));
 			bu[in].to_hit            = max(-127, -(power/8 + 1));
 			bu[in].to_parry          = max(-127, -(power/8 + 1));
@@ -389,6 +463,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].cool_bonus = max(-127, -(power/4 + 1));
 			break;
 		case SK_CURSE:
+			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 			for (n=0; n<5; n++) bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
 			break;
 		case SK_FOCUS:
@@ -420,7 +495,6 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	
 	bu[in].data[4] = nmz;
 	bu[in].data[5] = debuff;
-	bu[in].data[9] = power;
 	
 	if (!debuff)
 		return add_spell(cn, in);
@@ -732,6 +806,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 		case SK_LEAP:
 			n = 200;
 			if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats++;
+			if (do_get_iflag(cn, SF_JADELEAP))  numrepeats++;
 			if (T_WARR_SK(cn,  6))              numrepeats++;  // (Warr) Flash Step
 			if (IS_PLAYER(cn))     numrepeats += max(0, GET_SPD_ATK(cn)/60);
 			else                   numrepeats += max(0, GET_SPD_ATK(cn)/90);
@@ -5417,11 +5492,12 @@ int spell_bleed(int cn, int co, int power)
 	
 	if (GET_SFAIL(cn, co)) return 0;
 	
-	power = spell_immunity(cn, co, power);
-	power = common_mult(cn, co, power);
-	
 	if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
 	if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
+	if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/50, 1);    // [Ench] Improved Crimson Ripper
+	
+	power = spell_immunity(cn, co, power);
+	power = common_mult(cn, co, power);
 	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	
@@ -5589,7 +5665,14 @@ void skill_cleave(int cn)
 	// Zephyr proc
 	zephyr_check(cn, co, cn, 0);
 	
-	add_exhaust(cn, SK_EXH_CLEAVE);
+	in = add_exhaust(cn, SK_EXH_CLEAVE);
+	
+	if (in && do_get_iflag(cn, SF_BUTCHER)) // [Ench] Improved The Butcher
+	{
+		bu[in].data[0] = SK_CLEAVE;
+		bu[in].data[1] = power;
+		bu[in].data[2] = 1;
+	}
 }
 
 int spell_bash(int cn, int co, int power, int co_orig)
@@ -6080,6 +6163,7 @@ void skill_leap(int cn, int flag)
 	
 	if (!flag && is_exhausted(cn)) return;
 	if (do_get_iflag(cn, SF_SIGN_SLAY)) numrepeats++;
+	if (do_get_iflag(cn, SF_JADELEAP))  numrepeats++;
 	if (T_WARR_SK(cn,  6))              numrepeats++;  // (Warr) Flash Step
 	
 	power       = M_SK(cn, SK_LEAP) + ch[cn].weapon / 4 + ch[cn].top_damage / 4;

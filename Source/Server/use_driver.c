@@ -4272,8 +4272,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You can't do that to yourself!\n");
 				return 0;
 			}
-			// Blast power equal to WV + TD
-			power = (ch[cn].weapon + ch[cn].top_damage);
+			// Blast power equal to Strength
+			power = spell_multiplier(M_AT(cn, AT_STR), cn);
 			if (spellcost(cn, power / 8 + 5, SK_BLAST, 1)) return 0; 
 			if (!may_attack_msg(cn, co, 1))
 			{

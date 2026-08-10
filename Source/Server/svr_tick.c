@@ -1981,6 +1981,7 @@ int get_meta_stat_value(int cn, int n)
 			power = more(power, M_AT(cn, AT_STR) * TC_SK(cn,112), 20);  // (Corr) Conquest
 			if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                  // [Ench] More Bleed
 			if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);   // (Lyca) Serration
+			if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/50, 1);     // [Ench] Improved Crimson Ripper
 			if (do_get_iflag(cn, SF_EN_MORECLEABLAS)) power = more(power, 10, 1);
 			durat = 0;
 			durat += TC_SK(cn,113)*15; // (Corr) Torment
@@ -1999,6 +2000,7 @@ int get_meta_stat_value(int cn, int n)
 		case 28: // Leap # of Repeats
 			value = max(0, GET_SPD_ATK(cn)/60);
 			if (do_get_iflag(cn, SF_SIGN_SLAY)) value++;
+			if (do_get_iflag(cn, SF_JADELEAP))  value++;
 			if (T_WARR_SK(cn,  6))              value++;  // (Warr) Flash Step
 			break;
 		case 29: // Leap Cooldown					Decimal, 0.00 Seconds
