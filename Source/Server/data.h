@@ -394,8 +394,10 @@ extern unsigned int mapmarker;
 #define SK_OBLITERATE	67
 #define SK_SLAM			68
 #define SK_FATIGUE		69
+#define SK_FURY			70
 #define SK_SANGUINE	   219
 #define SK_DWLIGHT     220
+#define SK_RAPIDDMG    221
 
 
 /*
@@ -473,7 +475,7 @@ enum _ch_iflags {
 	SF_HIT_BLEED,   SF_BUFFRGHT,    SF_BUFFLEFT,    SF_GESTGORN,    
 	SF_CRITBLAST,   SF_SPELLMANA,   SF_BLEEDHP,     SF_LESSTDT,     
 	SF_BUTCHER,     SF_BRAVESTR,    SF_APTRECOV,    SF_JADELEAP,    
-	
+	SF_IDOLISHT,    
 	
 	SF_EN_MOREAV,       // Enchant #  2
 	SF_EN_HEALIT,       // Enchant #  3

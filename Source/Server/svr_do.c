@@ -9779,10 +9779,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	
 	// *Additional* damage dealt to Endurance or Mana
 	{
-		n = 0;
-		
-		if (type == 5 && do_get_iflag(cn, SF_BRONCHIT)) n += 25;  // [Weap] Bronchitis
-		n += do_get_ieffect(cn, VF_EN_GORNMANA)*25;               // [Ench] Gorn
+		n = do_get_ieffect(cn, VF_EN_GORNMANA)*25;               // [Ench] Gorn
 		
 		mp_dam = min(ch[co].a_mana, mp_dam + dam * n /100);
 	}
@@ -10042,11 +10039,13 @@ int do_crit(int cn, int co, int dam, int msg)
 	
 	die = RANDOM(crit_dice) + 1;
 	
+	/*
 	if (do_get_iflag(cn, SF_VOLCANF) && has_buff(co, SK_SCORCH))
 	{
 		remove_buff(co, SK_SCORCH);
 		die = 0;
 	}
+	*/
 	
 	if (die<=crit_chance)
 	{
@@ -10973,7 +10972,7 @@ void really_update_char(int cn)
 		
 		if (do_check_items(in, IT_WP_SUNSSKUA))   lido = 2;
 		if (do_check_items(in, IT_WP_PURPPLED))   liha = 2;
-		if (do_check_items(in, IT_WP_IDOLISHT))   do_set_iflag(cn, );
+		if (do_check_items(in, IT_WP_IDOLISHT))   do_set_iflag(cn, SF_IDOLISHT);
 		if (do_check_items(in, IT_WP_GESTGORN))   do_set_iflag(cn, SF_GESTGORN);
 		if (do_check_items(in, IT_WP_CUDGKWAI))   do_set_iflag(cn, SF_HIGHHITPAR);
 		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
@@ -11783,9 +11782,10 @@ void really_update_char(int cn)
 	ch[cn].end[4]  = end;
 	ch[cn].hp[4]   = hp;
 	
-	spell_pow += hp  *(do_get_iflag(cn, SF_GESTGORN )?1:0)/100;  // [Ench] Gesture of Gorn
-	spell_pow += mana*(do_get_iflag(cn, SF_SPELLMANA)?1:0)/100; 
-	spell_pow += mana*(T_ARHR_SK(cn, 10)*2+TC_SK(cn, 82))/200;   // (ArHr) Flow
+	spell_pow  += hp  *(do_get_iflag(cn, SF_GESTGORN )?1:0)/100;  // [Gear] Gesture of Gorn
+	spell_pow  += mana*(do_get_iflag(cn, SF_SPELLMANA)?1:0)/100;  // [Gear] Improved Nei's Claw
+	spell_pow  += mana*(T_ARHR_SK(cn, 10)*2+TC_SK(cn, 82)) /200;  // (ArHr) Flow
+	critical_m += mana*(do_get_iflag(cn, SF_IDOLISHT)?1:0) / 20;  // [Gear] Idol of Ishtar
 	
 	if (mana > 999 && IS_PLAYER(cn))
 	{
@@ -12162,7 +12162,12 @@ void really_update_char(int cn)
 	
 	// Multiplicative bonus
 	{
-		if (do_get_iflag(cn, SF_TW_SUPERBIA)) spell_apt = less(spell_apt, 90, 1);  // [Gear] Superbia
+		if (do_get_iflag(cn, SF_TW_SUPERBIA))    // [Gear] Superbia
+		{
+			n = spell_apt;
+			spell_apt = less(spell_apt, 90, 1);
+			damage_top += (n - spell_apt);
+		}
 	}
 	
 	ch[cn].spell_apt = clamp(spell_apt, 1, 999);
@@ -13768,6 +13773,8 @@ void do_regenerate(int cn)
 					if (mp_dam)   do_recovery(cn, 2, mp_dam);
 					if (en_dam)   do_recovery(cn, 1, en_dam);
 					if (degendam) do_recovery(cn, 0, degendam);
+					if (bu[in].temp==SK_RAPIDDMG)
+						bu[in].r_hp += bu[in].data[1];
 				}
 				if (bu[in].r_end!=-1)
 				{

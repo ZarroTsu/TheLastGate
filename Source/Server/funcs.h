@@ -306,6 +306,7 @@ void use_driver(int cn, int in, int worn);
 void quick_teleport(int cn, int x, int y);
 int respawn_check(int v);
 int try_boost(int v);
+void really_spawn_minion(int cn);
 void boost_char(int cn, int type);
 void item_tick(void);
 void map_tick(void);

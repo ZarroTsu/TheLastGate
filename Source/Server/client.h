@@ -370,25 +370,10 @@ struct cplayer
 
 #define SPR_TUNDRA_GROUND 1001
 #define SPR_DESERT_GROUND 1002
-#define SPR_HELMET        1003
-#define SPR_BODY_ARMOR    1004
-#define SPR_LEG_ARMOR     1005
-#define SPR_SWORD         1006
-#define SPR_DAGGER        1007
 #define SPR_GROUND1       1008
 #define SPR_KEY           1009
 #define SPR_STONE_GROUND1 1010
-#define SPR_TORCH1        1011
-#define SPR_LIZARD_POOL   1012
 #define SPR_WOOD_GROUND   1013
-#define SPR_CLOAK         1014
-#define SPR_BELT          1015
-#define SPR_AMULET        1016
-#define SPR_BOOTS         1017
-#define SPR_ARM_ARMOR     1018
-#define SPR_TEMPLAR_POOL  1019
-
-#define SPR_TORCH2 1026
 
 #define SPR_TAVERN_GROUND   1034
 #define SPR_GOLD_CLOAK      1035

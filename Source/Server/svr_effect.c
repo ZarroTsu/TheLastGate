@@ -37,7 +37,6 @@ int is_beam(int in)
 	return 1;
 }
 
-
 void effect_tick(void)
 {
 	int n, cnt = 0, in, m, co, fn, cn, in2, flag, z;
@@ -400,7 +399,13 @@ void effect_tick(void)
 				if (fx[n].data[1])
 				{
 					cn = pop_create_char(fx[n].data[1], 0);
-					if (cn && try_boost(25)) boost_char(cn, 0);
+					
+					// [Gear] Sibat Invidia / [Gear] Devil's Doorway / [Item] Gargoyle Statuette
+					if (cn && fx[n].data[2])
+						really_spawn_minion(fx[n].data[2], cn);
+					else if (cn && try_boost(25))
+						boost_char(cn, 0);
+					
 					god_drop_char(cn, it[in].x, it[in].y);
 					ch[cn].dir = DX_RIGHTUP;
 					plr_reset_status(cn);

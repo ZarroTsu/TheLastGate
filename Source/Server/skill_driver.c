@@ -336,6 +336,9 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		case SK_BLEED:
 			tmp = SK_BLEED;     spr = BUF_SPR_BLEED;     nmz = 1;
 			break;
+		case SK_FURY:
+			tmp = SK_FURY;      spr = BUF_SPR_FURY;      nmz = 1;
+			break;
 		default: return 0;  // Invalid skill
 	}
 	
@@ -445,7 +448,6 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].stack = 1;
 			break;
 		case SK_BLIND:
-			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 			bu[in].skill[SK_PERCEPT] = max(-127, -(power/3 + 3));
 			bu[in].to_hit            = max(-127, -(power/8 + 1));
 			bu[in].to_parry          = max(-127, -(power/8 + 1));
@@ -463,7 +465,6 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].cool_bonus = max(-127, -(power/4 + 1));
 			break;
 		case SK_CURSE:
-			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
 			for (n=0; n<5; n++) bu[in].attrib[n] = -(3 + (power - (4 - n)) / 5);
 			break;
 		case SK_FOCUS:
@@ -490,6 +491,11 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		case SK_BLEED:
 			bu[in].data[1] = BLEEDFORM(power, dur);  // Decay rate
 			break;
+		case SK_FURY:
+			bu[in].top_damage = min(127, power/4 + 1);
+			bu[in].gethit_dam = min(127, power/4 + 1);
+			debuff = 0;
+			break;
 		default: break;
 	}
 	
@@ -514,6 +520,7 @@ void try_hit_debuff(int cn, int co, int v)
 	if (do_get_iflag(cn, SF_HIT_DOUSE))  on_hit_debuff(cn, co, v, SK_FATIGUE);
 	if (do_get_iflag(cn, SF_HIT_FROST))  on_hit_debuff(cn, co, v, SK_FROSTB);
 	if (do_get_iflag(cn, SF_HIT_BLEED))  on_hit_debuff(cn, co, v, SK_BLEED);
+	if (do_get_iflag(cn, SF_VOLCANF))    on_hit_debuff(cn, co, v, SK_FURY);
 }
 
 int friend_is_enemy(int cn, int cc)
@@ -1137,7 +1144,7 @@ int spell_bleed(int cn, int co, int power);
 
 int surround_cast(int cn, int co_orig, int cc_orig, int intemp, int power)
 {
-	int m, n, mc, co, hitpower, tmp, tmpmp, hit=0, crit_dam=0, usemana = 1;
+	int m, n, mc, co, hitpower, tmp, hit=0, crit_dam=0, usemana = 1;
 	int aggravate = 0, mjolnir = 0;
 	
 	m = ch[cn].x + ch[cn].y * MAPX;
@@ -1418,7 +1425,7 @@ int is_near(int cn, int co, int v)
 int spellcost(int cn, int cost, int in, int usemana)
 {
 	int cotfk_cost = 0, devil_cost = 0, hp_cost = 0;
-	int base_mana_cost, mana_cost, end_cost, t, n, in2;
+	int base_mana_cost, mana_cost, end_cost, t, n, in2, co;
 	
 	if (IS_PLAYER(cn)  && in != SK_BLAST && in != SK_CLEAVE && in != SK_SHIELD && in != SK_WEAKEN && in != SK_WARCRY && 
 		in != SK_BLIND && in != SK_DOUSE && in != SK_TAUNT  && in != SK_LEAP   && in != SK_PACT)
@@ -1442,6 +1449,38 @@ int spellcost(int cn, int cost, int in, int usemana)
 		devil_cost=cost/3;
 	}
 	
+	co = cn;
+	
+	if (do_get_iflag(cn, SF_BRONCHIT))  // [Weap] Bronchitis
+	{
+		int x, y, xf, yf, xt, yt, xc, yc, c = 0;
+		int r = get_aoe_radius(cn, SK_WARCRY, GET_PROX(cn));
+		int catalog[64] = { 0 };
+		
+		xc = ch[cn].x;
+		yc = ch[cn].y;
+		
+		xf = max(       1, xc - (sqr(r)/10000));
+		yf = max(       1, yc - (sqr(r)/10000));
+		xt = min(MAPX - 1, xc + (sqr(r)/10000));
+		yt = min(MAPY - 1, yc + (sqr(r)/10000));
+		
+		for (x = xf; x<=xt; x++) for (y = yf; y<=yt; y++)
+		{
+			if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
+			if (IS_SANECHAR(co = map[x + y * MAPX].ch) && cn!=co)
+			{
+				if (!do_char_can_see(cn, co, 0)) continue;
+				if (do_surround_check(cn, co, 1))
+				{
+					catalog[c] = co;
+					c++;
+				}
+			}
+		}
+		if (c) co = catalog[RANDOM(c)];
+	}
+	
 	if (usemana>0)
 	{
 		// Crown of the First King
@@ -1457,19 +1496,19 @@ int spellcost(int cn, int cost, int in, int usemana)
 		base_mana_cost = mana_cost;
 		mana_cost = mana_cost * ch[cn].mana_cost / 10000;
 		
-		if (hp_cost*1000 > ch[cn].a_hp)
+		if (co == cn && hp_cost*1000 > ch[cn].a_hp)
 		{
 			do_char_log(cn, 0, "You don't have enough life.\n");
 			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
-		if (cotfk_cost*1000 > ch[cn].a_end)
+		if (co == cn && cotfk_cost*1000 > ch[cn].a_end)
 		{
 			do_char_log(cn, 0, "You don't have enough endurance.\n");
 			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
-		if (mana_cost*1000 > ch[cn].a_mana)
+		if (co == cn && mana_cost*1000 > ch[cn].a_mana)
 		{
 			do_char_log(cn, 0, "You don't have enough mana.\n");
 			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
@@ -1492,39 +1531,64 @@ int spellcost(int cn, int cost, int in, int usemana)
 			end_cost = end_cost * 85 / 100;
 		}
 		
-		if ((hp_cost+devil_cost*2)*1000 > ch[cn].a_hp)
+		if (co == cn && (hp_cost+devil_cost*2)*1000 > ch[cn].a_hp)
 		{
 			do_char_log(cn, 0, "You don't have enough life.\n");
 			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
-		if ((end_cost+cotfk_cost)*1000 > ch[cn].a_end)
+		if (co == cn && (end_cost+cotfk_cost)*1000 > ch[cn].a_end)
 		{
 			do_char_log(cn, 0, "You're too exhausted for that right now!\n");
 			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
-		if (cotfk_cost*1000 > ch[cn].a_mana)
+		if (co == cn && cotfk_cost*1000 > ch[cn].a_mana)
 		{
 			do_char_log(cn, 0, "You don't have enough mana.\n");
 			if (!IS_PLAYER(cn)) add_exhaust(cn, TICKS * 4); // to keep NPCs from spam-failing
 			return -1;
 		}
 	}
+	
 	if (usemana>0)
 	{
-		ch[cn].a_mana -= mana_cost  * 1000;
-		ch[cn].a_end  -= cotfk_cost * 1000;
-		ch[cn].a_hp   -= hp_cost    * 1000;
+		ch[co].a_mana -= mana_cost  * 1000;
+		ch[co].a_end  -= cotfk_cost * 1000;
+		ch[co].a_hp   -= hp_cost    * 1000;
+		
+		ch[co].a_hp   = clamp(ch[co].a_hp,   0, HP_SOFTCAP(co));
+		ch[co].a_end  = clamp(ch[co].a_end,  0, EN_SOFTCAP(co));
+		ch[co].a_mana = clamp(ch[co].a_mana, 0, MP_SOFTCAP(co));
+		
+		if (co != cn && ch[co].a_hp<500)
+		{
+			if (!(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA) && try_lucksave(co))
+				do_lucksave(co, "bronchitis");
+			else
+				do_char_killed(cn, co, 0);
+		}
 		
 		if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && mana_cost) spell_pomesol(cn, cn, base_mana_cost*n, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && cotfk_cost)        spell_pomesol(cn, cn, cotfk_cost,       0);
 	}
 	if (usemana==0 || usemana==2)
 	{
-		ch[cn].a_end  -= end_cost               * 1000;
-		ch[cn].a_mana -= cotfk_cost             * 1000;
-		ch[cn].a_hp   -= (hp_cost+devil_cost*2) * 1000;
+		ch[co].a_end  -= end_cost               * 1000;
+		ch[co].a_mana -= cotfk_cost             * 1000;
+		ch[co].a_hp   -= (hp_cost+devil_cost*2) * 1000;
+		
+		ch[co].a_hp   = clamp(ch[co].a_hp,   0, HP_SOFTCAP(co));
+		ch[co].a_end  = clamp(ch[co].a_end,  0, EN_SOFTCAP(co));
+		ch[co].a_mana = clamp(ch[co].a_mana, 0, MP_SOFTCAP(co));
+		
+		if (co != cn && ch[co].a_hp<500)
+		{
+			if (!(map[ch[cn].x + ch[cn].y * MAPX].flags & MF_ARENA) && try_lucksave(co))
+				do_lucksave(co, "bronchitis");
+			else
+				do_char_killed(cn, co, 0);
+		}
 		
 		if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && cotfk_cost) spell_pomesol(cn, cn, cotfk_cost*n, 1);
 		if (do_get_iflag(cn, SF_EN_HEAL) && end_cost)           spell_pomesol(cn, cn, end_cost,     0);
@@ -2922,7 +2986,6 @@ void skill_heal(int cn)
 	
 	if (do_get_iflag(cn, SF_EN_MOREHEAL)) power  = power*11/10;
 	if (!IS_PLAYER(cn))                   power  = power*2/3;
-	if (do_get_iflag(cn, SF_TW_SUPERBIA)) power /= 2;
 	
 	if (!(co = get_target(cn, 0, 1, 1, SP_COST_HEAL, SK_HEAL, 1, power, 0))) 
 		return;
@@ -5505,7 +5568,7 @@ int spell_bleed(int cn, int co, int power)
 	
 	if (do_get_iflag(cn, SF_GUNGNIR))
 	{
-		dur = dur/3;
+		dur = dur/2;
 	}
 	
 	bpow = BLEEDFORM(power, dur);
@@ -5543,7 +5606,7 @@ int spell_reap(int co, int hitpower) // Consume enemy debuffs to add the debuff 
 }
 int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 {
-	int hitpower, aggravate=0, tmp, tmpmp=0, in, n, zephyr=0, crit_dam=0;
+	int hitpower, aggravate=0, tmp, in, n, zephyr=0, crit_dam=0;
 	
 	if (flag)
 		chlog(cn, "Used Reap on %s", ch[co].name);
@@ -5573,37 +5636,39 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 	hitpower = skill_immunity(co, hitpower+crit_dam) * 2;
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
 	
-	tmp = do_hurt(cn, co, hitpower, 5);
-	
-	if (do_get_iflag(cn, SF_BRONCHIT)) tmpmp = tmp/4;
-	
-	if (tmp<1)
+	if (do_get_iflag(cn, SF_GUNGNIR))
 	{
-		do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
-	}
-	else if (tmpmp<1)
-	{
-		if (flag)
-		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
-				do_char_log(cn, 1, "You reaped %s for %d HP.\n", ch[co].reference, tmp);
-			if (!(ch[co].flags & CF_SYS_OFF))
-				do_char_log(co, 1, "%s reaped you for %d HP.\n", ch[cn].name, tmp);
-		}
-		else
-		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
-				do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
-			if (!(ch[co].flags & CF_SYS_OFF))
-				do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
-		}
+		if (aggravate)
+			do_char_log(cn, 0, "You seem unable to do any more than bruise %s.\n", ch[co].reference);
+		else if (!(ch[cn].flags & CF_SYS_OFF))
+			do_char_log(cn, 1, "You cause %s to bleed profusely!\n", ch[co].reference);
+		tmp = hitpower*2;
 	}
 	else
 	{
-		if (!(ch[cn].flags & CF_SYS_OFF))
-			do_char_log(cn, 1, "You cleaved %s for %d HP and %d mana.\n", ch[co].reference, tmp, tmpmp);
-		if (!(ch[co].flags & CF_SYS_OFF))
-			do_char_log(co, 1, "%s cleaved you for %d HP and %d mana.\n", ch[cn].name, tmp, tmpmp);
+		tmp = do_hurt(cn, co, hitpower, 5);
+		
+		if (tmp<1)
+		{
+			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+		}
+		else
+		{
+			if (flag)
+			{
+				if (!(ch[cn].flags & CF_SYS_OFF))
+					do_char_log(cn, 1, "You reaped %s for %d HP.\n", ch[co].reference, tmp);
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "%s reaped you for %d HP.\n", ch[cn].name, tmp);
+			}
+			else
+			{
+				if (!(ch[cn].flags & CF_SYS_OFF))
+					do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+			}
+		}
 	}
 	
 	// Plague spreading
@@ -5617,11 +5682,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 	}
 	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	
-	if (flag)
-	{
-		
-	}
-	else
+	if (!flag)
 	{
 		if (aggravate)
 			spell_aggravate(cn, co, hitpower, 0);

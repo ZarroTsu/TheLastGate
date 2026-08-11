@@ -511,12 +511,12 @@ extern char *at_short[];
 #define DESC_TW_GULA		"When equipped, 30%% of hitpoints is reserved. You leech 20%% of damage dealt with hits as hitpoints.\n"
 #define DESC_TW_LUXURIA		"When equipped, your hits inflict a self-scaling Aggravate, causing enemies to take more damage.\n"
 #define DESC_TW_AVARITIA	"When equipped, 30%% of endurance is reserved. Your highest attribute is granted as increased Crit Chance, and your lowest attribute is added to your Crit Multiplier.\n"
-#define DESC_TW_SUPERBIA	"When equipped, the effects of your Heal or Regen spell is halved, and your total spell aptitude is reduced by 90%%.\n"
+#define DESC_TW_SUPERBIA	"When equipped, 90%% of your total Spell Aptitude is converted into Top Damage.\n"
 #define DESC_TW_SINBIND		"You may only equip one Sinbinder at a time.\n"
 
 #define DESC_SUNSSKUA		"When equipped, all increases to attribute and skill limits are doubled.\n"
 #define DESC_PURPPLED		"When equipped, all increases to attribute and skill limits are halved. Increases to attribute and skill limits also affect their modifiers.\n"
-#define DESC_IDOLISHT		"\n"
+#define DESC_IDOLISHT		"When equipped, grants 1%% additional Critial Hit Multiplier for every 20 uncapped Maximum Mana.\n"
 #define DESC_SLIVANKH		"When equipped in your main-hand, you get 25%% less skill cooldown, but 25%% less buff and debuff duration. In your off-hand, you get 50%% more buff and debuff duration, but 50%% more skill cooldown.\n"
 #define DESC_GESTGORN		"When equipped, grants 1 additional Spellpower Bonus for every 100 uncapped Maximum Hitpoints.\n"
 #define DESC_CUDGKWAI		"When equipped, your Hit and Parry scores are the higher of the two.\n"
@@ -658,10 +658,10 @@ extern char *at_short[];
 #define DESC_MURAMASA		"When equipped, your active melee skills gain an additional 20%% Agility bonus.\n"
 #define DESC_CROSSBLAD		"When equipped, Surround Hit has a base radius of 4.\n"
 
-#define DESC_BRONCHIT		"When equipped, \n"
-#define DESC_VOLCANF		"When equipped, you cannot naturally deal critical hits. If your enemy is scorched, the scorch is removed to guarantee a critical hit.\n"
+#define DESC_BRONCHIT		"When equipped, all of your skill and spell costs are instead taken from a random nearby enemy when cast.\n"
+#define DESC_VOLCANF		"When equipped, your hits grant you a self-scaling Fury, granting you additional Top Damage and Thorns.\n"
 #define DESC_VIKINGMALT		"When equipped, this weapon can be used to cast 'Slam', dealing damage based on Strength around you and stunning enemies with a base radius of 2 around your target. Stun duration with Slam is determined by your crit multiplier.\n"
-#define DESC_GUNGNIR		"When equipped, bleeding you inflict deals its damage three times faster.\n"
+#define DESC_GUNGNIR		"When equipped, your Cleave damage is exclusively dealt as bleeding, and bleeding you inflict deals its damage twice as fast.\n"
 
 #define DESC_BONEARMOR		"When equipped, 30%% of damage taken from hits is staggered over 5 seconds.\n"
 
@@ -821,7 +821,7 @@ extern char *at_short[];
 #define DESC_STRENGTH		"When equipped, reduces your attack speed, cast speed, and cooldown recovery speed by 15%%, but grants 20%% more damage with hits.\n"
 #define DESC_HERMIT			"When equipped, you have 15%% more Armor Value, but 20%% less Resistance and Immunity.\n"
 #define DESC_WHEEL			"When equipped, your critical hit chance is reduced by 33%%, but you have 33%% more critical hit multiplier.\n"
-#define DESC_JUSTICE		"When equipped, your Cleave skill no longer inflicts a Bleeding, and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
+#define DESC_JUSTICE		"When equipped, your Cleave skill no longer inflicts Bleeding and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_HANGED			"When equipped, 33%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
 #define DESC_DEATH			"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
 #define DESC_TEMPER			"When equipped, your Taunt skill grants 100%% more Guard power, but Guard duration is halved.\n"

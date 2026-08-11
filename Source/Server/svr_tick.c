@@ -1986,7 +1986,7 @@ int get_meta_stat_value(int cn, int n)
 			durat = 0;
 			durat += TC_SK(cn,113)*15; // (Corr) Torment
 			durat = SP_DUR_BLEED * 100 / (100 + durat);
-			value = BLEEDFORM(power, (do_get_iflag(cn, SF_GUNGNIR)?durat/3:durat));
+			value = BLEEDFORM((do_get_iflag(cn, SF_GUNGNIR)?power*2:power), (do_get_iflag(cn, SF_GUNGNIR)?durat/2:durat));
 			break;
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds
 			value = 5 * cdlen;
@@ -2182,7 +2182,6 @@ int get_meta_stat_value(int cn, int n)
 		case 73: case 95: // Heal/Regen Effect
 			power = M_SK(cn, SK_HEAL);
 			if (do_get_iflag(cn, SF_EN_MOREHEAL)) power = more(power, 10, 1);
-			if (do_get_iflag(cn, SF_TW_SUPERBIA)) power = less(power, 50, 1);
 			if (do_get_iflag(cn, SF_STAR))        value = spell_multiplier(power, cn)*1875/max(1, SP_DUR_REGEN * 20);
 			else                                  value = spell_multiplier(power * 4/5, cn);
 			break;

@@ -7026,6 +7026,99 @@ int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces and
 	return 1;
 }
 
+void really_spawn_minion(int cn, int cc)
+{
+	int in;
+	
+	// TODO: set adjustible stats here
+	
+	
+	// Minion gradually builds degen until they expire
+	{
+		in = god_create_buff(SK_RAPIDDMG)
+		
+		strcpy(bu[in].name, "Rapid Degeneration");
+		
+		bu[in].r_hp    = -10; // base
+		bu[in].data[1] = - 5; // build-up per frame
+		bu[in].active  = bu[in].duration = 1;
+		bu[in].flags   = BF_PERMASPELL;
+		bu[in].sprite  = BUF_SPR_FIRE;
+		
+		add_spell(cc, in);
+	}
+	
+	ch[cc].data[CHD_GROUP] = 65536 + cn; // set group
+	ch[cc].data[59] = 65536 + cn;        // protect all other members of this group
+	ch[cc].data[CHD_MASTER] = cn;        // obey and protect char
+	ch[cc].data[69] = cn;                // follow char
+}
+
+int use_spawn_minion(int cn, int in)
+{
+	int in2, m;
+	
+	if (!cn)             return 0;
+	if (!it[in].carried) return 0;
+	
+	m = XY2M(ch[cn].x, ch[cn].y);
+	
+	// Get the tile behind the player
+	switch(ch[cn].dir)
+	{
+		case DX_UP:        m = m + MAPX;     break
+		case DX_DOWN:      m = m - MAPX;     break
+		case DX_LEFT:      m = m + 1;        break
+		case DX_RIGHT:     m = m - 1;        break
+		case DX_LEFTUP:    m = m + 1 + MAPX; break
+		case DX_LEFTDOWN:  m = m + 1 - MAPX; break
+		case DX_RIGHTUP:   m = m - 1 + MAPX; break
+		case DX_RIGHTDOWN: m = m - 1 - MAPX; break
+		default: break;
+	}
+	
+	// Fuzzy drop check
+	if (can_drop(m)) ;
+	else if (can_drop(m + 1))            m +=  1;
+	else if (can_drop(m - 1))            m += -1;
+	else if (can_drop(m + MAPX))         m +=  MAPX;
+	else if (can_drop(m - MAPX))         m += -MAPX;
+	else if (can_drop(m + 1 + MAPX))     m +=  1 + MAPX;
+	else if (can_drop(m + 1 - MAPX))     m +=  1 - MAPX;
+	else if (can_drop(m - 1 + MAPX))     m += -1 + MAPX;
+	else if (can_drop(m - 1 - MAPX))     m += -1 - MAPX;
+	else if (can_drop(m + 2))            m +=  2;
+	else if (can_drop(m - 2))            m += -2;
+	else if (can_drop(m + 2 * MAPX))     m +=  2 * MAPX;
+	else if (can_drop(m - 2 * MAPX))     m += -2 * MAPX;
+	else if (can_drop(m + 2 + MAPX))     m +=  2 + MAPX;
+	else if (can_drop(m + 2 - MAPX))     m +=  2 - MAPX;
+	else if (can_drop(m - 2 + MAPX))     m += -2 + MAPX;
+	else if (can_drop(m - 2 - MAPX))     m += -2 - MAPX;
+	else if (can_drop(m + 1 + 2 * MAPX)) m +=  1 + 2 * MAPX;
+	else if (can_drop(m + 1 - 2 * MAPX)) m +=  1 - 2 * MAPX;
+	else if (can_drop(m - 1 + 2 * MAPX)) m += -1 + 2 * MAPX;
+	else if (can_drop(m - 1 - 2 * MAPX)) m += -1 - 2 * MAPX;
+	else if (can_drop(m + 2 + 2 * MAPX)) m +=  2 + 2 * MAPX;
+	else if (can_drop(m + 2 - 2 * MAPX)) m +=  2 - 2 * MAPX;
+	else if (can_drop(m - 2 + 2 * MAPX)) m += -2 + 2 * MAPX;
+	else if (can_drop(m - 2 - 2 * MAPX)) m += -2 - 2 * MAPX;
+	else
+	{
+		do_char_log(cn, 0, "The minion could not materialize.\n");
+		return 0;
+	}
+	
+	in2 = god_create_item(it[in].data[0]);
+	god_drop_item(in2, M2X(m), M2Y(m));
+	fx_add_effect(9, 16, in2, it[in2].data[0], cn);
+	
+	if ((it[in].flags & IF_USEDESTROY))
+		use_consume_item(cn, in, 0);
+	
+	return 1;
+}
+
 int use_gargoyle(int cn, int in)
 {
 	int cc;
@@ -9407,7 +9500,7 @@ void use_driver(int cn, int in, int carried)
 				ret = use_mine_respawn(cn, in);
 				break;
 			case 28:
-				ret = use_gargoyle(cn, in);
+				ret = use_gargoyle(cn, in); // TODO: change to use_spawn_minion
 				break;
 			case 29:
 				ret = use_grave(cn, in);
@@ -9806,14 +9899,8 @@ int item_age(int in)
 {
 	int act, st;
 
-	if (it[in].active)
-	{
-		act = 1;
-	}
-	else
-	{
-		act = 0;
-	}
+	if (it[in].active)  act = 1;
+	else                act = 0;
 
 	if ((it[in].max_age[act] && it[in].current_age[act]>it[in].max_age[act]) ||
 	    (it[in].max_damage && it[in].current_damage>it[in].max_damage))
