@@ -401,7 +401,7 @@ void effect_tick(void)
 					cn = pop_create_char(fx[n].data[1], 0);
 					
 					// [Gear] Sibat Invidia / [Gear] Devil's Doorway / [Item] Gargoyle Statuette
-					if (cn && fx[n].data[2])
+					if (cn && IS_SANECHAR(fx[n].data[2]))
 						really_spawn_minion(fx[n].data[2], cn);
 					else if (cn && try_boost(25))
 						boost_char(cn, 0);

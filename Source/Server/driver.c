@@ -220,7 +220,7 @@ int npc_add_enemy(int cn, int co, int always)
 	    (d1>d2 && (globs->flags & GF_CLOSEENEMY)) ||
 	    (d1==d2 && (!cc || ch[cc].attack_cn!=cn) && ch[co].attack_cn==cn) )
 	{
-		ch[cn].attack_cn = co;
+		ch[cn].attack_cn = co;		do_shadow_warp(cn, co);
 		ch[cn].goto_x = 0;        // cancel goto (patrol) as well
 		ch[cn].data[58] = 2;
 	}
@@ -2081,7 +2081,7 @@ int npc_see(int cn, int co)
 		// Otherwise, try to attack the taunter
 		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
-			ch[cn].attack_cn = cc;
+			ch[cn].attack_cn = cc;		do_shadow_warp(cn, cc);
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
@@ -2098,7 +2098,7 @@ int npc_see(int cn, int co)
 		{
 			if (ch[cn].data[n]==idx)
 			{
-				ch[cn].attack_cn = co;
+				ch[cn].attack_cn = co;		do_shadow_warp(cn, co);
 				ch[cn].goto_x = 0; // cancel goto (patrol)
 				ch[cn].data[58] = 2;
 				return 1;

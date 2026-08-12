@@ -527,17 +527,18 @@ int friend_is_enemy(int cn, int cc)
 {
 	int co;
 
-	if (!(co = ch[cn].attack_cn))	{ return 0; }
-	if (may_attack_msg(cc, co, 0))	{ return 0; }
+	if (!(co = ch[cn].attack_cn))  return 0;
+	if (may_attack_msg(cc, co, 0)) return 0;
 	return 1;
 }
 
 int player_or_ghost(int cn, int co)
 {
-	if (IS_SHADOW(co))					{ return 0; }
-	if (!IS_PLAYER(cn))					{ return 1; }
-	if (IS_PLAYER(co)) 					{ return 1; }
-	if (ch[co].data[CHD_MASTER]==cn)	{ return 1; }
+	if (IS_SHADOW(co))               return 0;
+	if (IS_ITEMTHRALL(co))           return 0;
+	if (!IS_PLAYER(cn))              return 1;
+	if (IS_PLAYER(co))               return 1;
+	if (ch[co].data[CHD_MASTER]==cn) return 1;
 	
 	return 0;
 }
@@ -1326,75 +1327,35 @@ void remove_buff(int cn, int bu_temp)
 int is_facing(int cn, int co)
 {
 	int ok = 0;
-
+	
 	switch(ch[cn].dir)
 	{
-		case    DX_RIGHT:
-			if (ch[cn].x + 1==ch[co].x && ch[cn].y==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
-		case    DX_LEFT:
-			if (ch[cn].x - 1==ch[co].x && ch[cn].y==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
-		case    DX_UP:
-			if (ch[cn].x==ch[co].x && ch[cn].y - 1==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
-		case    DX_DOWN:
-			if (ch[cn].x==ch[co].x && ch[cn].y + 1==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
+		case DX_RIGHT: if (ch[cn].x + 1==ch[co].x && ch[cn].y==ch[co].y) ok = 1; break;
+		case DX_LEFT:  if (ch[cn].x - 1==ch[co].x && ch[cn].y==ch[co].y) ok = 1; break;
+		case DX_UP:    if (ch[cn].x==ch[co].x && ch[cn].y - 1==ch[co].y) ok = 1; break;
+		case DX_DOWN:  if (ch[cn].x==ch[co].x && ch[cn].y + 1==ch[co].y) ok = 1; break;
 		default:
 			break;
 	}
-
-	return(ok);
+	
+	return ok;
 }
 
 int is_back(int cn, int co)
 {
 	int ok = 0;
-
+	
 	switch(ch[cn].dir)
 	{
-		case    DX_LEFT:
-			if (ch[cn].x + 1==ch[co].x && ch[cn].y==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
-		case    DX_RIGHT:
-			if (ch[cn].x - 1==ch[co].x && ch[cn].y==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
-		case    DX_DOWN:
-			if (ch[cn].x==ch[co].x && ch[cn].y - 1==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
-		case    DX_UP:
-			if (ch[cn].x==ch[co].x && ch[cn].y + 1==ch[co].y)
-			{
-				ok = 1;
-			}
-			break;
+		case DX_LEFT:  if (ch[cn].x + 1==ch[co].x && ch[cn].y==ch[co].y) ok = 1; break;
+		case DX_RIGHT: if (ch[cn].x - 1==ch[co].x && ch[cn].y==ch[co].y) ok = 1; break;
+		case DX_DOWN:  if (ch[cn].x==ch[co].x && ch[cn].y - 1==ch[co].y) ok = 1; break;
+		case DX_UP:    if (ch[cn].x==ch[co].x && ch[cn].y + 1==ch[co].y) ok = 1; break;
 		default:
 			break;
 	}
-
-	return(ok);
+	
+	return ok;
 }
 
 int is_next_to(int cn, int co)
@@ -4905,14 +4866,9 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 		gcm = more(gcm, M_AT(cn, AT_WIL) * n, 20);
 	}
 	
-	if (shadowcopy == 2) { gcm = 0; if (!IS_SANECTEMPLATE(temp = ch[cn].lastkilltemp)) temp = ch[cn].temp; }
-	else if (shadowcopy) { temp = CT_COMPANION; }										// Shadow copies use the basic template
+	if (shadowcopy)      { temp = CT_COMPANION; }										// Shadow copies use the basic template
 	else if (dreadplate) { if (gcm) temp = CT_ARCHCASTER; else temp = CT_CASTERCOMP; }	// Special GC from tower item
 	else                 { if (gcm) temp = CT_ARCHCOMP;   else temp = CT_COMPANION; }	// Better GC for summoner, or normal GC otherwise
-	
-	// Devil's Doorway template sanity check
-	if (IS_BAD_SHADOWTEMP(temp))
-		temp = ch[cn].lastkilltemp = ch[cn].temp;
 	
 	cc = god_create_char(temp, 1);
 	
@@ -4934,7 +4890,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
 		ch[cc].attack_cn            = co;
 		idx                         = co | (char_id(co) << 16);
-		ch[cc].data[MCD_ENEMY1ST]   = idx;									// add enemy to kill list
+		ch[cc].data[MCD_ENEMY1ST]   = idx; // add enemy to kill list
 	}
 	
 	if (shadowcopy)
@@ -4946,7 +4902,6 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 		power = M_SK(cn, SK_SHADOW);
 		
 		dur = base = ch[cc].data[6] = spell_multiplier(power, cn);
-		if (shadowcopy == 2)    dur = 1400; // Book version - lasts 5 minutes
 	}
 	else
 	{
@@ -4974,9 +4929,6 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	}
 	else if (IS_SHADOW(cn) && ch[cn].data[9] == 1)
 	{
-		if (IS_SANEPLAYER(cm = ch[cn].data[CHD_MASTER]) && do_get_iflag(ch[cn].data[CHD_MASTER], SF_BOOK_DEVI))
-			shadowcopy = 2;													// Copy book state from parent
-		
 		base                            = base * 5 / 12;					// Set Base value (Monsters)
 		ch[cn].data[PCD_SHADOWCOPY]     = cc;								// Set SC's SC
 		ch[cc].kindred                 &= ~(KIN_MONSTER);					// Remove 'Monster' flag
@@ -4986,11 +4938,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	else
 	{
 		if (shadowcopy && IS_SHADOW(cn) && IS_SANEPLAYER(ch[cn].data[CHD_MASTER]))
-		{
-			if (do_get_iflag((cm = ch[cn].data[CHD_MASTER]), SF_BOOK_DEVI))
-				shadowcopy = 2;												// Copy book state from parent
 			group = ch[cn].data[CHD_GROUP];
-		}
 		else
 			group = ch[cm].data[CHD_GROUP];
 		
@@ -5032,18 +4980,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	
 	for (n = 0; n<=5; n++) ch[cc].limit_break[n][0] = ch[cm].limit_break[n][0] + ch[cm].limit_break[n][1];
 	
-	if (shadowcopy == 2)	// Book version
-	{
-		if (B_SK(cn, SK_PROTECT)) ch[cc].skill[SK_PROTECT][0] = 0;
-		if (B_SK(cn, SK_ENHANCE)) ch[cc].skill[SK_ENHANCE][0] = 0;
-		if (B_SK(cn, SK_BLESS))   ch[cc].skill[SK_BLESS][0]   = 0;
-		if (B_SK(cn, SK_HASTE))   ch[cc].skill[SK_HASTE][0]   = 0;
-		
-		ch[cc].temp                      = CT_COMPANION; // Corrects bad behavior
-		ch[cc].data[1]                   = 4; // BERSERK!!
-		ch[cc].sprite                    = ch_temp[temp].sprite;
-	}
-	else if (shadowcopy)	// Grant extra skills based on sprite
+	if (shadowcopy)	// Grant extra skills based on sprite
 	{
 		ch[cc].skill[SK_MEDIT][2]   = 90; ch[cc].skill[SK_MEDIT][3]   = 6;
 		ch[cc].skill[SK_FINESSE][2] = 75; ch[cc].skill[SK_FINESSE][3] = 7;
@@ -5137,99 +5074,82 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 		}
 	}
 	
-	if (shadowcopy && do_get_iflag(cn, SF_SIGN_SHAD)) // Signet of Shadows
+	for (n = 0; n<5; n++)
 	{
-		if (shadowcopy == 2) // Book version
-			ch[cc].skill[SK_SHADOW][0] = max(30, ch[cc].skill[SK_SHADOW][0]);
-		else for (m=0; m<4; m++)
-		{
-			ch[cc].skill[SK_SHADOW][m] = ch[cm].skill[SK_SHADOW][m];
-		}
-		ch[cc].data[9] = 1;
+		root                    = base * 5 / max(1, ch[cc].attrib[n][3]) + (M_AT(cm, n) * gcm/2000);
+		cap                     = ch[cc].attrib[n][2]                    + (M_AT(cm, n) * gcm/1000);
+		B_AT(cc, n)             = max( 10, min(cap + max(0, root - cap)/8, root));
 	}
 	
-	if (shadowcopy != 2)
+	for (n = 0; n<MAXSKILL; n++) if (ch[cc].skill[n][2]) 
 	{
-		for (n = 0; n<5; n++)
-		{
-			root                    = base * 5 / max(1, ch[cc].attrib[n][3]) + (M_AT(cm, n) * gcm/2000);
-			cap                     = ch[cc].attrib[n][2]                    + (M_AT(cm, n) * gcm/1000);
-			B_AT(cc, n)             = max( 10, min(cap + max(0, root - cap)/8, root));
-		}
-		
-		for (n = 0; n<MAXSKILL; n++) if (ch[cc].skill[n][2]) 
-		{
-			root                    = base * 5 / max(1, ch[cc].skill[n][3]) + (M_SK(cm, n) * gcm/2000);
-			cap                     = ch[cc].skill[n][2]                    + (M_SK(cm, n) * gcm/1000);
-			B_SK(cc, n)             = max(  0, min(cap + max(0, root - cap)/8, root));
-		}
-		
-			root                    = base * 6       + (ch[cm].hp[5] * gcm/2000);
-			cap                     = ch[cc].hp[2]   + (ch[cm].hp[5] * gcm/1000);
-			ch[cc].hp[0]            = max( 50, min(cap + max(0, root - cap)/8, root));
-		
-			root                    = base * 2       + (ch[cm].end[5] * gcm/2000);
-			cap                     = ch[cc].end[2]  + (ch[cm].end[5] * gcm/1000);
-			ch[cc].end[0]           = max(100, min(cap + max(0, root - cap)/8, root));
-		
-		if (gcm || dreadplate)
-		{
-			root                    = base * 4       + (ch[cm].mana[5] * gcm/2000);
-			cap                     = ch[cc].mana[2] + (ch[cm].mana[5] * gcm/1000);
-			ch[cc].mana[0]          = max( 50, min(cap + max(0, root - cap)/8, root));
-		} else ch[cc].mana[0]       = 0;
-		
-		if (dreadplate && !shadowcopy)
-		{
-			root                    = base * 5 / 7 + 8;
-			cap                     = 54           +  gcm    /20;
-			ch[cc].weapon_bonus     = max(  8, min(cap + max(0, root - cap)/8, root));
-			
-			
-			root                    = base * 5 / 6 + 6;
-			cap                     = 60           + (gcm+10)/20;
-			ch[cc].armor_bonus      = max( 12, min(cap + max(0, root - cap)/8, root));
-			
-			
-			if (necronomicon)		// caster ~ becomes ghost
-			{
-				B_SK(cc, SK_POISON) = B_SK(cc, SK_RESIST);
-				ch[cc].sprite       = 9168;
-				ch[cc].data[1]      = 3; // BERSERK!!
-			}
-		}
-		else
-		{
-			root                    = base * 5 / 5 + 6;
-			cap                     = 80           +  gcm    /20;
-			ch[cc].weapon_bonus     = max( 12, min(cap + max(0, root - cap)/8, root));
-			
-			root                    = base * 5 / 6 + 8;
-			cap                     = 72           + (gcm+10)/20;
-			ch[cc].armor_bonus      = max(  8, min(cap + max(0, root - cap)/8, root));
-			
-			if (!shadowcopy && necronomicon)		// fighter ~ becomes skeleton
-			{
-				B_SK(cc, SK_CLEAVE) = B_SK(cc, SK_RESIST);
-				ch[cc].sprite       = 10192;
-				ch[cc].data[1]      = 3; // BERSERK!!
-			}
-		}
-		
-		ch[cc].weapon_bonus += ch[cn].weapon * (TC_SK(cn,117)*15) / 100;  // (Corr) Redemption
-		ch[cc].armor_bonus  += ch[cn].armor  * (TC_SK(cn,117)*15) / 100;  // (Corr) Redemption
+		root                    = base * 5 / max(1, ch[cc].skill[n][3]) + (M_SK(cm, n) * gcm/2000);
+		cap                     = ch[cc].skill[n][2]                    + (M_SK(cm, n) * gcm/1000);
+		B_SK(cc, n)             = max(  0, min(cap + max(0, root - cap)/8, root));
 	}
+	
+		root                    = base * 6       + (ch[cm].hp[5] * gcm/2000);
+		cap                     = ch[cc].hp[2]   + (ch[cm].hp[5] * gcm/1000);
+		ch[cc].hp[0]            = max( 50, min(cap + max(0, root - cap)/8, root));
+	
+		root                    = base * 2       + (ch[cm].end[5] * gcm/2000);
+		cap                     = ch[cc].end[2]  + (ch[cm].end[5] * gcm/1000);
+		ch[cc].end[0]           = max(100, min(cap + max(0, root - cap)/8, root));
+	
+	if (gcm || dreadplate)
+	{
+		root                    = base * 4       + (ch[cm].mana[5] * gcm/2000);
+		cap                     = ch[cc].mana[2] + (ch[cm].mana[5] * gcm/1000);
+		ch[cc].mana[0]          = max( 50, min(cap + max(0, root - cap)/8, root));
+	} else ch[cc].mana[0]       = 0;
+	
+	if (dreadplate && !shadowcopy)
+	{
+		root                    = base * 5 / 7 + 8;
+		cap                     = 54           +  gcm    /20;
+		ch[cc].weapon_bonus     = max(  8, min(cap + max(0, root - cap)/8, root));
+		
+		
+		root                    = base * 5 / 6 + 6;
+		cap                     = 60           + (gcm+10)/20;
+		ch[cc].armor_bonus      = max( 12, min(cap + max(0, root - cap)/8, root));
+		
+		
+		if (necronomicon)		// caster ~ becomes ghost
+		{
+			B_SK(cc, SK_POISON) = B_SK(cc, SK_RESIST);
+			ch[cc].sprite       = 9168;
+			ch[cc].data[1]      = 3; // BERSERK!!
+		}
+	}
+	else
+	{
+		root                    = base * 5 / 5 + 6;
+		cap                     = 80           +  gcm    /20;
+		ch[cc].weapon_bonus     = max( 12, min(cap + max(0, root - cap)/8, root));
+		
+		root                    = base * 5 / 6 + 8;
+		cap                     = 72           + (gcm+10)/20;
+		ch[cc].armor_bonus      = max(  8, min(cap + max(0, root - cap)/8, root));
+		
+		if (!shadowcopy && necronomicon)		// fighter ~ becomes skeleton
+		{
+			B_SK(cc, SK_CLEAVE) = B_SK(cc, SK_RESIST);
+			ch[cc].sprite       = 10192;
+			ch[cc].data[1]      = 3; // BERSERK!!
+		}
+	}
+	
+	ch[cc].weapon_bonus += ch[cn].weapon * (TC_SK(cn,117)*15) / 100;  // (Corr) Redemption
+	ch[cc].armor_bonus  += ch[cn].armor  * (TC_SK(cn,117)*15) / 100;  // (Corr) Redemption
 	
 	// calculate experience
-	if (shadowcopy != 2) // Copycat version
-	{
-		temp = 0; for (n = 0; n<MAXSKILL; n++) if (B_SK(cc, n) > B_SK(cc, temp)) temp = n;
-		for (m = 1; m<B_SK(cc, temp); m++)                     pts +=  skill_needed(m, 3);
-		for (n = 0; n<5; n++) for (m = 10; m<B_AT(cc, n); m++) pts += attrib_needed(m, 3);
-		for (m = 50; m<ch[cc].hp[0]; m++)                      pts +=     hp_needed(m, 3);
-		for (m = 50; m<ch[cc].mana[0]; m++)                    pts +=   mana_needed(m, 3);
+	temp = 0; for (n = 0; n<MAXSKILL; n++) if (B_SK(cc, n) > B_SK(cc, temp)) temp = n;
+	for (m = 1; m<B_SK(cc, temp); m++)                     pts +=  skill_needed(m, 3);
+	for (n = 0; n<5; n++) for (m = 10; m<B_AT(cc, n); m++) pts += attrib_needed(m, 3);
+	for (m = 50; m<ch[cc].hp[0]; m++)                      pts +=     hp_needed(m, 3);
+	for (m = 50; m<ch[cc].mana[0]; m++)                    pts +=   mana_needed(m, 3);
 		ch[cc].points_tot = pts;
-	}
 	
 	ch[cc].a_hp = ch[cc].a_end = ch[cc].a_mana = 9999999;
 	
@@ -5248,7 +5168,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 			bu[in].power 	 = base;
 			
 			// additional specs from caster's spells
-			if (IS_SEYA_OR_BRAV(co))
+			if (IS_SEYA_OR_BRAV(cn))
 			{
 				if (B_SK(cn, SK_PROTECT)) bu[in].armor     = spell_multiplier(M_SK(cn, SK_PROTECT), cn) / 6 + 3;
 				if (B_SK(cn, SK_ENHANCE)) bu[in].weapon    = spell_multiplier(M_SK(cn, SK_ENHANCE), cn) / 6 + 3;
@@ -5257,12 +5177,6 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 			{
 				if (B_SK(cn, SK_PROTECT)) bu[in].armor     = spell_multiplier(M_SK(cn, SK_PROTECT), cn) / 4 + 4;
 				if (B_SK(cn, SK_ENHANCE)) bu[in].weapon    = spell_multiplier(M_SK(cn, SK_ENHANCE), cn) / 4 + 4;
-			}
-			if (B_SK(cn, SK_HASTE))
-			{
-				bu[in].speed      = min(300, 10 + (spell_multiplier(M_SK(cn, SK_HASTE), cn)  )/ 6);
-				bu[in].atk_speed  = min(127,  5 + (spell_multiplier(M_SK(cn, SK_HASTE), cn)+6)/12);
-				bu[in].cast_speed = min(127,  5 + (spell_multiplier(M_SK(cn, SK_HASTE), cn)+6)/12);
 			}
 			if (B_SK(cn, SK_BLESS)) for (n = 0; n<5; n++) 
 				bu[in].attrib[n]  = ((spell_multiplier(M_SK(cn, SK_BLESS), cn)*2/3)-n) / 5 + 3;
@@ -5324,8 +5238,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	else
 	{
 		temp = 100;
-		if (necronomicon) temp = RANDOM(40);
-		if (shadowcopy == 2) temp = 50;
+		if (necronomicon) temp = RANDOM(50);
 		switch (temp)
 		{
 			case  0: do_sayx(cc, "I shall rend their flesh!"); break;
@@ -5333,7 +5246,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 			case  2: do_sayx(cc, "Who... what am I...?"); break;
 			case  3: do_sayx(cc, "They watch you with great interest, %s.", ch[cn].name); break;
 			case  4: do_sayx(cc, "#9#My time is short, %s.", ch[cn].name); break;
-			case 50: do_sayx(cc, "I am I, are you you?"); break;
+			case  5: do_sayx(cc, "I am I, are you you?"); break;
 			default: do_sayx(cc, "My time is short, %s.", ch[cn].name); break;
 		}
 	}
@@ -5468,7 +5381,7 @@ void skill_shadow(int cn)
 				else
 				{
 					chlog(cn, "Commands attack against %s (%d)", ch[cz].name, cz);
-					if (skill_gc_atk(cn, co, cz) && do_get_iflag(cn, SF_TW_INVIDIA))
+					if (skill_gc_atk(cn, co, cz) && do_get_iflag(cn, SF_SIGN_SHAD))
 					{
 						quick_teleport(co, ch[cz].x, ch[cz].y);
 					}

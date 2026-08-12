@@ -8334,8 +8334,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 		
 		ch[cn].data[23]++; // Kill Counter
 		
-		if (!(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && !IS_BAD_SHADOWTEMP(ch[co].temp))
-			ch[cn].lastkilltemp = ch[co].temp;
+		if (!IS_BAD_SHADOWTEMP(ch[co].temp)) ch[cn].lastkilltemp = ch[co].temp;
+		if (do_get_iflag(cn, SF_TW_INVIDIA)) place_minion(cn, IT_INVITHRALL, XY2M(ch[co].x, ch[co].y), 0);
 		
 		if (ch[co].flags & (CF_PLAYER))
 		{
@@ -8443,8 +8443,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 		
 		ch[cc].data[23]++; // Kill Counter
 		
-		if (!(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && !IS_BAD_SHADOWTEMP(ch[co].temp))
-			ch[cc].lastkilltemp = ch[co].temp;
+		if (!IS_BAD_SHADOWTEMP(ch[co].temp)) ch[cc].lastkilltemp = ch[co].temp;
+		if (do_get_iflag(cc, SF_TW_INVIDIA)) place_minion(cc, IT_INVITHRALL, XY2M(ch[co].x, ch[co].y), 0);
 		
 		if (ch[co].flags & (CF_PLAYER))
 		{
@@ -9554,13 +9554,6 @@ int do_hurt(int cn, int co, int dam, int type)
 	if (IS_COMP_TEMP(co) && !IS_THRALL(co))
 	{
 		halfexp = 1;
-	}
-	
-	// Invidia
-	if (do_get_iflag(co, SF_TW_INVIDIA) && IS_SANECHAR(ch[co].data[PCD_COMPANION]) 
-		&& ch[ch[co].data[PCD_COMPANION]].data[CHD_MASTER]==co && !(ch[ch[co].data[PCD_COMPANION]].flags & CF_BODY))
-	{
-		co = ch[co].data[PCD_COMPANION];
 	}
 	
 	if (do_get_iflag(co, SF_PREIST_R)) priestess = 2;
@@ -13392,8 +13385,6 @@ void do_regenerate(int cn)
 		race_reg = M_SK(cn, SK_REGEN) * moonmult / 20 + (B_SK(cn, SK_REGEN)?M_SK(cn, SK_REGEN):0) * ch[cn].hp[5]   / 2000;
 		race_res = M_SK(cn, SK_REST)  * moonmult / 20 + (B_SK(cn, SK_REST) ?M_SK(cn, SK_REST) :0) * ch[cn].end[5]  / 1000;
 		race_med = M_SK(cn, SK_MEDIT) * moonmult / 20 + (B_SK(cn, SK_MEDIT)?M_SK(cn, SK_MEDIT):0) * ch[cn].mana[5] / 2000;
-		
-		if (do_get_iflag(co, SF_TW_INVIDIA)) nohp = 1;
 	}
 	else
 	{
@@ -19008,6 +18999,18 @@ void do_spellignore(int cn)
 	}
 }
 
+void do_shadow_warp(int cn, int co)
+{
+	int cc;
+	
+	if (!IS_SANECHAR(cn))                           return;
+	if (!IS_SANECHAR(cc = ch[cn].data[CHD_MASTER])) return;
+	if (!do_get_iflag(cc, SF_SIGN_SHAD))            return;
+	if (ch[cc].data[PCD_SHADOWCOPY] != cn)          return;
+	if (!IS_LIVINGCHAR(co))                         return;
+	
+	quick_teleport(cn, ch[co].x, ch[co].y);
+}
 
 /* CS, 000209: Remember PvP attacks */
 void remember_pvp(int cn, int co)

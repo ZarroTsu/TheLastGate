@@ -4302,35 +4302,8 @@ int use_special_spell(int cn, int in)
 				do_char_log(cn, 0, "You must equip it first.\n");
 				return 0;
 			}
-			// SC power equal to SC score of the item user
-			power = M_SK(cn, SK_SHADOW);
-			if (spellcost(cn, SP_COST_SHADOW, SK_SHADOW, 1)) return 0;
-			item_damage_worn(cn, WN_LHAND, 500);
-			if ((n = do_get_ieffect(cn, VF_MA_HEAL)) && power) spell_pomesol(cn, cn, power*n, 1);
-			if (IS_PLAYER(cn) && (cc = ch[cn].data[PCD_SHADOWCOPY]))
-			{
-				if (!IS_SANECHAR(cc) || ch[cc].data[CHD_MASTER]!=cn || 
-					(ch[cc].flags & CF_BODY) || ch[cc].used==USE_EMPTY)
-				{
-					cc = 0;
-				}
-				if (cc && IS_SHADOW(cc))
-				{
-					if ((co = ch[cn].skill_target1) && do_char_can_see(cn, co, 0))
-					{
-						chlog(cn, "Commands attack against %s (%d)", ch[co].name, co);
-					}
-					else
-					{
-						do_char_log(cn, 1, "You dismissed your Shadow Copy.\n", co);
-						answer_transfer(cc, cn, 0);
-					}
-					return;
-				}
-			}
-			if (cn==co) co = 0;
-			ret = spell_ghost(cn, co, co?co:cn, (co && !may_attack_msg(cn, co, 0)), 2);
-			if (ret) add_exhaust(cn, SK_EXH_SHADOW/2);
+			ret = use_spawn_minion(cn, in);
+			if (ret) add_exhaust(cn, SK_EXH_SHADOW);
 			break;
 		case SK_SACRIFICE:
 			if (!get_gear(cn, IT_WB_STONEDAGG)) 
@@ -7028,53 +7001,188 @@ int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces and
 
 void really_spawn_minion(int cn, int cc)
 {
-	int in;
+	int n, in, base, v = 10, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
 	
-	// TODO: set adjustible stats here
+	base = getrank(cn)+1 * 12;
 	
+	// Adjust the template to reflect desired stat growth
+	switch (ch[cc].temp)
+	{
+		case CT_GARGTHRALL: // [Item] Gargoyle Statuette - Gargoyle
+			base -= RANDOM(7); v = 2;
+			break;
+		case CT_DEVDTHRALL: // [Gear] Devil's Doorway - Skeleton
+			if (IS_SANECTEMPLATE((temp = ch[cn].lastkilltemp)))
+			{
+				for (n = 0; n < MAXSKILL; n++) // mimic skills from the last killed template
+				{
+					if (ch_temp[temp].skill[n][0])
+					{
+						if (n==SK_CLEAVE||n==SK_POISON||n==SK_BLAST)
+							ch[cc].skill[n][2] = 120; ch[cc].skill[n][3] = 4;
+						else if (n==SK_WEAKEN||n==SK_CURSE||n==SK_SLOW)
+							ch[cc].skill[n][2] = 105; ch[cc].skill[n][3] = 5;
+						else if (n==SK_HAND||n==SK_DAGGER||n==SK_SWORD||n==SK_AXE||
+								n==SK_STAFF||n==SK_TWOHAND||n==SK_SHIELD||n==SK_DUAL) ;
+						else
+							ch[cc].skill[n][2] = 90; ch[cc].skill[n][3] = 6;
+					}
+				}
+			}
+			break;
+		case CT_INVITHRALL: // [Gear] Sibat Invidia - Golem
+			base += RANDOM(13); v = 0;
+			// Check if we already have this thrall
+			//  -- if we do, old thralls start to degenerate.
+			for (n=1;n<MAXCHARS;n++)
+			{
+				if (ch[n].used==USE_EMPTY)       continue;
+				if (ch[n].temp != CT_INVITHRALL) continue;
+				if (ch[n].data[CHD_MASTER] == cn)
+				{
+					if ((in = has_buff(n, SK_RAPIDDMG)))
+					{
+						bu[in].r_hp    += -50*2; // base
+						bu[in].data[1] += -50;   // build-up per frame
+					}
+					else // If this thrall somehow lacks this buff, remove them
+					{
+						fx_add_effect(12, 0, ch[n].x, ch[n].y, 0);
+						plr_map_remove(n);
+						ch[n].used = USE_EMPTY;
+					}
+				}
+			}
+			break;
+		default: // How did we get here?
+			plr_map_remove(cc);
+			ch[cc].used = USE_EMPTY;
+			do_char_log(cn, 0, "The minion could not materialize.\n");
+			return;
+	}
+	
+	strcpy(ch[cc].name, mkp());
+	strcpy(ch[cc].reference, ch[cc].name);
+	
+	// Generate stats on the thrall from the values provided
+	{
+		for (n = 0; n<5; n++)
+		{
+			root            = base * 5 / max(1, ch[cc].attrib[n][3]);
+			cap             = ch[cc].attrib[n][2];
+			B_AT(cc, n)     = max( 10,min(cap,root+RANDOM(7)));
+		}
+		
+		for (n = 0; n<MAXSKILL; n++) if (ch[cc].skill[n][2]) 
+		{
+			root            = base * 5 / max(1, ch[cc].skill[n][3]);
+			cap             = ch[cc].skill[n][2];
+			B_SK(cc, n)     = max(  0,min(cap,root+RANDOM(7)));
+		}
+		
+		root                = base * 5;
+		cap                 = 999;
+		ch[cc].hp[0]        = max(100,min(cap,root+RANDOM(13)));
+		ch[cc].end[0]       = max(100,min(300,root+RANDOM(13)));
+		ch[cc].mana[0]      = max(100,min(cap,root+RANDOM(13)));
+		
+		root                = base * 5 / 5 + 5;
+		cap                 = 120;
+		ch[cc].weapon_bonus = max( 10,min(cap,root+RANDOM(7)));
+		ch[cc].armor_bonus  = max( 10,min(cap,root+RANDOM(7)));
+		
+		temp = 0; for (n = 0; n<MAXSKILL; n++) if (B_SK(cc, n) > B_SK(cc, temp)) temp = n;
+		for (m = 1; m<B_SK(cc, temp); m++)                     pts +=  skill_needed(m, 3);
+		for (n = 0; n<5; n++) for (m = 10; m<B_AT(cc, n); m++) pts += attrib_needed(m, 3);
+		for (m = 50; m<ch[cc].hp[0]; m++)                      pts +=     hp_needed(m, 3);
+		for (m = 50; m<ch[cc].mana[0]; m++)                    pts +=   mana_needed(m, 3);
+		ch[cc].points_tot = pts;
+		ch[cc].a_hp = ch[cc].a_end = ch[cc].a_mana = 9999999;
+		
+		for (n = 0; n<=5; n++) 
+			ch[cc].limit_break[n][0] = ch[cn].limit_break[n][0] + ch[cn].limit_break[n][1];
+	}
 	
 	// Minion gradually builds degen until they expire
 	{
-		in = god_create_buff(SK_RAPIDDMG)
+		in = god_create_buff(SK_RAPIDDMG);
 		
-		strcpy(bu[in].name, "Rapid Degeneration");
-		
-		bu[in].r_hp    = -10; // base
-		bu[in].data[1] = - 5; // build-up per frame
+		strcpy(bu[in].name, "Thrall");
+		bu[in].r_hp    = -v*2; // base degen speed
+		bu[in].data[1] = -v;   // build-up per frame
 		bu[in].active  = bu[in].duration = 1;
 		bu[in].flags   = BF_PERMASPELL;
 		bu[in].sprite  = BUF_SPR_FIRE;
 		
+		// additional specs from caster's spells
+		if (IS_SEYA_OR_BRAV(cn))
+		{
+			if (B_SK(cn, SK_PROTECT)) bu[in].armor     = spell_multiplier(M_SK(cn, SK_PROTECT), cn) / 6 + 3;
+			if (B_SK(cn, SK_ENHANCE)) bu[in].weapon    = spell_multiplier(M_SK(cn, SK_ENHANCE), cn) / 6 + 3;
+		}
+		else
+		{
+			if (B_SK(cn, SK_PROTECT)) bu[in].armor     = spell_multiplier(M_SK(cn, SK_PROTECT), cn) / 4 + 4;
+			if (B_SK(cn, SK_ENHANCE)) bu[in].weapon    = spell_multiplier(M_SK(cn, SK_ENHANCE), cn) / 4 + 4;
+		}
+		if (B_SK(cn, SK_BLESS)) for (n = 0; n<5; n++) 
+			bu[in].attrib[n]  = ((spell_multiplier(M_SK(cn, SK_BLESS), cn)*2/3)-n) / 5 + 3;
+		
+		bu[in].data[4]   = 1; // Effects not removed by NMZ
+		
 		add_spell(cc, in);
 	}
 	
-	ch[cc].data[CHD_GROUP] = 65536 + cn; // set group
-	ch[cc].data[59] = 65536 + cn;        // protect all other members of this group
-	ch[cc].data[CHD_MASTER] = cn;        // obey and protect char
-	ch[cc].data[69] = cn;                // follow char
+	ch[cc].data[CHD_GROUP] = 65536 + cn;  // set group
+	ch[cc].data[59] = 65536 + cn;         // protect all other members of this group
+	ch[cc].data[CHD_MASTER] = cn;         // obey and protect char
+	ch[cc].data[69] = cn;                 // follow char
+	ch[cc].kindred &= ~(KIN_MONSTER);     // remove 'monster' flag for movement
+	
+	if (co && co!=cn && do_char_can_see(cn, co, 0) && may_attack_msg(cn, co, 1)) // Attack target
+	{
+		if (!(ch[cn].flags & CF_SILENCE))
+			do_sayx(cc, ch[cc].text[1], ch[co].name);
+		if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
+		if (!IS_IGNORING_SPELLS(co)) do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0);
+		do_notify_char(cn, NT_DIDHIT, co, 0, 0, 0);
+		ch[cc].attack_cn            = co;
+		idx                         = co | (char_id(co) << 16);
+		ch[cc].data[MCD_ENEMY1ST]   = idx;
+	}
+	else
+	{
+		if (!(ch[cn].flags & CF_SILENCE))
+			do_sayx(cc, "I shall obey, %s.", ch[cn].name);
+	}
+	
+	xlog("Created %s (%d) with base %d as Thrall for %s (group %d)", 
+		ch[cc].name, cc, base, ch[cn].reference, ch[cc].data[CHD_GROUP]);
 }
 
-int use_spawn_minion(int cn, int in)
+int place_minion(int cn, int in, int m, int flag)
 {
-	int in2, m;
+	int in2, temp;
 	
-	if (!cn)             return 0;
-	if (!it[in].carried) return 0;
-	
-	m = XY2M(ch[cn].x, ch[cn].y);
-	
-	// Get the tile behind the player
-	switch(ch[cn].dir)
+	if (!flag)
+		temp = in;
+	else
 	{
-		case DX_UP:        m = m + MAPX;     break
-		case DX_DOWN:      m = m - MAPX;     break
-		case DX_LEFT:      m = m + 1;        break
-		case DX_RIGHT:     m = m - 1;        break
-		case DX_LEFTUP:    m = m + 1 + MAPX; break
-		case DX_LEFTDOWN:  m = m + 1 - MAPX; break
-		case DX_RIGHTUP:   m = m - 1 + MAPX; break
-		case DX_RIGHTDOWN: m = m - 1 - MAPX; break
-		default: break;
+		temp = it[in].data[0];
+		
+		// Get the tile behind the player
+		switch(ch[cn].dir)
+		{
+			case DX_UP:        m = m + MAPX;     break
+			case DX_DOWN:      m = m - MAPX;     break
+			case DX_LEFT:      m = m + 1;        break
+			case DX_RIGHT:     m = m - 1;        break
+			case DX_LEFTUP:    m = m + 1 + MAPX; break
+			case DX_LEFTDOWN:  m = m + 1 - MAPX; break
+			case DX_RIGHTUP:   m = m - 1 + MAPX; break
+			case DX_RIGHTDOWN: m = m - 1 - MAPX; break
+			default: break;
+		}
 	}
 	
 	// Fuzzy drop check
@@ -7105,13 +7213,38 @@ int use_spawn_minion(int cn, int in)
 	else if (can_drop(m - 2 - 2 * MAPX)) m += -2 - 2 * MAPX;
 	else
 	{
-		do_char_log(cn, 0, "The minion could not materialize.\n");
+		if (flag)
+			do_char_log(cn, 0, "The minion could not materialize.\n");
 		return 0;
 	}
 	
-	in2 = god_create_item(it[in].data[0]);
+	in2 = god_create_item(temp);
 	god_drop_item(in2, M2X(m), M2Y(m));
 	fx_add_effect(9, 16, in2, it[in2].data[0], cn);
+	
+	return 1;
+}
+
+int use_spawn_minion(int cn, int in)
+{
+	int n;
+	
+	if (!cn)             return 0;
+	if (!it[in].carried) return 0;
+	
+	for (n=1;n<MAXCHARS;n++) // Check if we already have this thrall
+	{
+		if (ch[n].used==USE_EMPTY)       continue;
+		if (ch[n].temp != CT_GARGTHRALL && 
+			ch[n].temp != CT_DEVDTHRALL) continue;
+		if (ch[n].data[CHD_MASTER] == cn)
+		{
+			do_char_log(cn, 0, "You can only have one of these enthralled at a time.\n");
+			return 0;
+		}
+	}
+	
+	if (!place_minion(cn, in, XY2M(ch[cn].x, ch[cn].y), 1)) return 0;
 	
 	if ((it[in].flags & IF_USEDESTROY))
 		use_consume_item(cn, in, 0);

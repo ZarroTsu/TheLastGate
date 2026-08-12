@@ -233,6 +233,8 @@ int is_ascroll(int in);
 #define IS_SHADOW(cn)			(ch[(cn)].kindred & KIN_SHADOW)
 #define IS_BLOODY(cn)			(ch[(cn)].kindred & KIN_BLOODY)
 
+#define IS_ITEMTHRALL(cn)		(ch[(cn)].data[CHD_GROUP] == ch[(cn)].data[CHD_MASTER]+65536 && (ch[(cn)].temp == CT_GARGTHRALL || ch[(cn)].temp == CT_DEVDTHRALL || ch[(cn)].temp == CT_INVITHRALL))
+
 #define IS_ANY_TEMP(cn)			(IS_TEMPLAR(cn) || IS_ARCHTEMPLAR(cn) || IS_SKALD(cn))
 #define IS_ANY_MERC(cn)			(IS_MERCENARY(cn) || IS_WARRIOR(cn) || IS_SORCERER(cn))
 #define IS_ANY_HARA(cn)			(IS_HARAKIM(cn) || IS_SUMMONER(cn) || IS_ARCHHARAKIM(cn))

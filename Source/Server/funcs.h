@@ -299,6 +299,7 @@ void do_trash(int cn);
 void do_swap_gear(int cn);
 void do_force_recall(int cn);
 void do_give_bspoints(int cn, int p, int gflag);
+void do_shadow_warp(int cn, int co);
 
 //-- use --
 void use_activate(int cn, int in, int flag, int carried);
@@ -306,7 +307,8 @@ void use_driver(int cn, int in, int worn);
 void quick_teleport(int cn, int x, int y);
 int respawn_check(int v);
 int try_boost(int v);
-void really_spawn_minion(int cn);
+void really_spawn_minion(int cn, int cc);
+void place_minion(int cn, int in, int m, int flag);
 void boost_char(int cn, int type);
 void item_tick(void);
 void map_tick(void);
