@@ -918,13 +918,12 @@
 #define IT_E_AN			2695
 
 // Statuette thralls - rising minion template & summoned minion template
-#define CT_SEANTHRALL	
-#define IT_GARGTHRALL	
-#define CT_GARGTHRALL	// TODO: make these templates
-#define IT_DEVDTHRALL	
-#define CT_DEVDTHRALL	
-#define IT_INVITHRALL	
-#define CT_INVITHRALL	
+#define IT_GARGTHRALL	3635
+#define CT_GARGTHRALL	1655
+#define IT_DEVDTHRALL	3636
+#define CT_DEVDTHRALL	1656
+#define IT_INVITHRALL	3637
+#define CT_INVITHRALL	1657
 
 // ---- Items for Soulstone Interactions ----
 

@@ -7070,14 +7070,14 @@ void really_spawn_minion(int cn, int cc)
 		{
 			root            = base * 5 / max(1, ch[cc].attrib[n][3]);
 			cap             = ch[cc].attrib[n][2];
-			B_AT(cc, n)     = max( 10,min(cap,root+RANDOM(7)));
+			B_AT(cc, n)     = max( 10,min(cap+max(0,root-cap)/7,root+RANDOM(7)));
 		}
 		
 		for (n = 0; n<MAXSKILL; n++) if (ch[cc].skill[n][2]) 
 		{
 			root            = base * 5 / max(1, ch[cc].skill[n][3]);
 			cap             = ch[cc].skill[n][2];
-			B_SK(cc, n)     = max(  0,min(cap,root+RANDOM(7)));
+			B_SK(cc, n)     = max(  0,min(cap+max(0,root-cap)/7,root+RANDOM(7)));
 		}
 		
 		root                = base * 5;
@@ -7168,7 +7168,10 @@ int place_minion(int cn, int in, int m, int flag)
 		temp = in;
 	else
 	{
-		temp = it[in].data[0];
+		if (it[in].temp == IT_BOOK_DEVI || it[in].orig_temp == IT_BOOK_DEVI)
+			temp = IT_DEVDTHRALL;
+		else
+			temp = it[in].data[0];
 		
 		// Get the tile behind the player
 		switch(ch[cn].dir)
@@ -7252,71 +7255,31 @@ int use_spawn_minion(int cn, int in)
 	return 1;
 }
 
-int use_gargoyle(int cn, int in)
+
+int use_minion_item(int cn, int in)
 {
 	int cc;
-
-	if (!cn)
-	{
-		return 0;
-	}
-	if (!it[in].carried)
-	{
-		return 0;
-	}
-
-	cc = god_create_char(CT_GARGSTAT, 1);
+	
+	if (!cn)             return 0;
+	if (!it[in].carried) return 0;
+	
+	cc = god_create_char(it[in].data[0], 1);
 	if (!god_drop_char_fuzzy(cc, ch[cn].x, ch[cn].y))
 	{
 		ch[cc].used = USE_EMPTY;
-		do_char_log(cn, 0, "The Gargoyle could not materialize.\n");
+		do_char_log(cn, 0, "The minion could not materialize.\n");
 		return 0;
 	}
-
-	god_take_from_char(in, cn);
-	it[in].used = USE_EMPTY;
-
-	ch[cc].data[CHD_GROUP] = 65536 + cn;                       // set group
-	ch[cc].data[59] = 65536 + cn;                       // protect all other members of this group
-
-	ch[cc].data[CHD_MASTER] = cn;                             // obey and protect char
-	ch[cc].data[69] = cn;                             // follow char
-	ch[cc].data[64] = globs->ticker + (TICKS * 60 * 15);    // self destruction
-
-	return 1;
-}
-
-int use_grolm(int cn, int in)
-{
-	int cc;
-
-	if (!cn)
-	{
-		return 0;
-	}
-	if (!it[in].carried)
-	{
-		return 0;
-	}
-
-	cc = god_create_char(CT_GROLMSTA, 1);
-	if (!god_drop_char_fuzzy(cc, ch[cn].x, ch[cn].y))
-	{
-		ch[cc].used = USE_EMPTY;
-		do_char_log(cn, 0, "The Grolm could not materialize.\n");
-		return 0;
-	}
-
-	god_take_from_char(in, cn);
-	it[in].used = USE_EMPTY;
-
-	ch[cc].data[CHD_GROUP] = 65536 + cn;                       // set group
-	ch[cc].data[59] = 65536 + cn;                       // protect all other members of this group
-
-	ch[cc].data[CHD_MASTER] = cn;                             // obey and protect char
-	ch[cc].data[69] = cn;                             // follow char
-	ch[cc].data[64] = globs->ticker + (TICKS * 60 * 15);    // self destruction
-
+	
+	if ((it[in].flags & IF_USEDESTROY))
+		use_consume_item(cn, in, 0);
+	
+	ch[cc].data[CHD_GROUP] = 65536 + cn;  // set group
+	ch[cc].data[59] = 65536 + cn;         // protect all other members of this group
+	ch[cc].data[CHD_MASTER] = cn;         // obey and protect char
+	ch[cc].data[69] = cn;                 // follow char
+	ch[cc].kindred &= ~(KIN_MONSTER);     // remove 'monster' flag for movement
+	
 	return 1;
 }
 
@@ -9633,7 +9596,7 @@ void use_driver(int cn, int in, int carried)
 				ret = use_mine_respawn(cn, in);
 				break;
 			case 28:
-				ret = use_gargoyle(cn, in); // TODO: change to use_spawn_minion
+				ret = use_spawn_minion(cn, in);
 				break;
 			case 29:
 				ret = use_grave(cn, in);
@@ -9728,7 +9691,7 @@ void use_driver(int cn, int in, int carried)
 				ret = explorer_point(cn, in, 1);
 				break;
 			case 58:
-				ret = use_grolm(cn, in);
+				ret = use_minion_item(cn, in);
 				break;
 			case 59:
 				ret = use_create_gold(cn, in);
