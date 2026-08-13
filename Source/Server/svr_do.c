@@ -16036,6 +16036,7 @@ int smith_grade_in(int in)
 		case IT_WP_AJAXBLUE:    return IT_WB_AJAXBLUE;
 		case IT_WP_PEARLAXE:    return IT_WB_PEARLAXE;
 		case IT_WP_CRESSUN:     return IT_WB_CRESSUN;
+		case IT_WP_JADEHALLOW:  return IT_WB_JADEHALLOW;
 		//
 		case IT_WP_DECOSWORD:   return IT_WB_DECOSWORD;
 		case IT_WP_PREISTRAZR:  return IT_WB_PREISTRAZR;

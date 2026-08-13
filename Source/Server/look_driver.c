@@ -343,11 +343,9 @@ void look_extra(int cn, int in)
 	                       else
 	                       do_char_log(cn, FN_WO, DESC_LAMEFULL);   break;
 	case IT_WB_QARMZI:     do_char_log(cn, FN_EX, DESC_QARMZI);     break;
-	case IT_WP_WHITEODA:   
 	case IT_WB_WHITEODA:   do_char_log(cn, FN_EX, DESC_WHITEODA);   break;
 	case IT_WP_EXCALIBUR:  do_char_log(cn, FN_EX, DESC_EXCALIBUR);  break;
 	
-	case IT_WP_BLACKTAC:   
 	case IT_WB_BLACKTAC:   do_char_log(cn, FN_EX, DESC_BLACKTAC);   break;
 	case IT_WP_EVERGREEN:  do_char_log(cn, FN_EX, DESC_EVERGREEN);  break;
 	

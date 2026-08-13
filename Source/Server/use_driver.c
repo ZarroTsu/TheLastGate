@@ -7176,14 +7176,14 @@ int place_minion(int cn, int in, int m, int flag)
 		// Get the tile behind the player
 		switch(ch[cn].dir)
 		{
-			case DX_UP:        m = m + MAPX;     break
-			case DX_DOWN:      m = m - MAPX;     break
-			case DX_LEFT:      m = m + 1;        break
-			case DX_RIGHT:     m = m - 1;        break
-			case DX_LEFTUP:    m = m + 1 + MAPX; break
-			case DX_LEFTDOWN:  m = m + 1 - MAPX; break
-			case DX_RIGHTUP:   m = m - 1 + MAPX; break
-			case DX_RIGHTDOWN: m = m - 1 - MAPX; break
+			case DX_UP:        m = m + MAPX;     break;
+			case DX_DOWN:      m = m - MAPX;     break;
+			case DX_LEFT:      m = m + 1;        break;
+			case DX_RIGHT:     m = m - 1;        break;
+			case DX_LEFTUP:    m = m + 1 + MAPX; break;
+			case DX_LEFTDOWN:  m = m + 1 - MAPX; break;
+			case DX_RIGHTUP:   m = m - 1 + MAPX; break;
+			case DX_RIGHTDOWN: m = m - 1 - MAPX; break;
 			default: break;
 		}
 	}
