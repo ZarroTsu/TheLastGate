@@ -2236,7 +2236,8 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 82: case 105: // Slow/Stymie Effect										// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
-			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
+			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109) +                 // (Corr) Shackle
+				M_SK(cn,SK_STEALTH)*(do_get_iflag(cn,SF_ARGHKNIFE)?20:0)/15, 20);  // [Gear] Improved Argha's Knife
 			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 			if (T_SORC_SK(cn,  6))    // (Sorc) Rewind
 			{

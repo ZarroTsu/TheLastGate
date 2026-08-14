@@ -303,6 +303,7 @@ void look_extra(int cn, int in)
 	
 	// -------- SPECIAL ITEMS --------
 	case IT_WB_STONEDAGG:  do_char_log(cn, FN_EX, DESC_STONEDAGG);  break;
+	case IT_WB_ARGHAKNIFE: do_char_log(cn, FN_EX, DESC_ARGHAKNIFE); break;
 	case IT_WP_LIFESPRIG:  
 	case IT_WB_LIFESPRIG:  do_char_log(cn, FN_EX, DESC_LIFESPRIG);  break;
 	case IT_WB_SPIDERFANG: do_char_log(cn, FN_EX, DESC_SPIDERFANG); break;

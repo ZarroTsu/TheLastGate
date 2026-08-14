@@ -378,7 +378,8 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			break;
 		case SK_SLOW:
 		case SK_STYMIE:
-			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109), 20);  // (Corr) Shackle
+			power = more(power, M_AT(cn, AT_WIL) * TC_SK(cn,109) +                // (Corr) Shackle
+				M_SK(cn,SK_STEALTH)*(do_get_iflag(cn,SF_ARGHKNIFE)?20:0)/15, 20); // [Gear] Improved Argha's Knife
 			power = spell_multiplier(power, cn);
 			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 			power = spell_immunity(cn, co, power);
@@ -3128,7 +3129,8 @@ int spell_slow(int cn, int co, int power, int flag)
 	
 	// Additive bonus
 	{
-		n = TC_SK(cn,109);    // (Corr) Shackle
+		n  = TC_SK(cn,109);                                                // (Corr) Shackle
+		n += M_SK(cn,SK_STEALTH)*(do_get_iflag(cn,SF_ARGHKNIFE)?20:0)/15;  // [Gear] Improved Argha's Knife
 		power = more(power, M_AT(cn, AT_WIL) * n, 20);
 	}
 	

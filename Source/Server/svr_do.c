@@ -10924,6 +10924,7 @@ void really_update_char(int cn)
 		
 		if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
 		if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
+		if (do_check_items(in, IT_WB_ARGHAKNIFE)) do_set_iflag(cn, SF_ARGHKNIFE);
 		if (do_check_items(in, IT_WB_GOLDGLAIVE)) do_set_iflag(cn, SF_GHOSTCRY);
 		if (do_check_items(in, IT_WP_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
 		if (do_check_items(in, IT_WB_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
@@ -12948,7 +12949,10 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			if (!flag) return; // Only effect enemies
 			if (ch[co].flags & CF_NOMAGIC) return;
 			
-			power = spell_multiplier(M_SK(cn, SK_SLOW), cn);
+			power = more(M_SK(cn, SK_SLOW), M_AT(cn, AT_WIL) * TC_SK(cn,109) +    // (Corr) Shackle
+				M_SK(cn,SK_STEALTH)*(do_get_iflag(cn,SF_ARGHKNIFE)?20:0)/15, 20); // [Gear] Improved Argha's Knife
+			
+			power = spell_multiplier(power, cn);
 			power = more(power, n, 1);
 			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
@@ -12980,7 +12984,9 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			if (tarot && flag)   return; // Only effect allies
 			if (ch[co].flags & CF_NOMAGIC) return;
 			
-			power = spell_multiplier(M_SK(cn, SK_CURSE), cn);
+			power = more(M_SK(cn, SK_CURSE), M_AT(cn, AT_INT) * TC_SK(cn,110), 20); // (Corr) Famine
+			
+			power = spell_multiplier(power, cn);
 			power = more(power, n, 1);
 			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			
@@ -13007,7 +13013,9 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 		case SK_WEAKEN:
 			if (!flag) return; // Only effect enemies
 			
-			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
+			power = more(M_SK(cn, SK_WEAKEN), M_AT(cn, AT_AGL) * TC_SK(cn,111), 20);  // (Corr) Burden
+			
+			power = skill_multiplier(power, cn);
 			power = more(power, n, 1);
 			power = less(power, 25, 1);  // Inherent reduced effect from being an aura
 			

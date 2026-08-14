@@ -596,6 +596,7 @@ extern char *at_short[];
 #define FN_WO			9
 
 #define DESC_STONEDAGG		"When equipped, this weapon can be used to cast 'Sacrifice', converting 25%% of your current Hitpoints into Mana.\n"
+#define DESC_ARGHAKNIFE		"When equipped, grants 1%% increased power of your Slow spell for every 15 total Stealth."
 #define DESC_LIFESPRIG		"When equipped, mana spent is restored as life for 5 seconds. This effect is overwritten by stronger sources.\n"
 #define DESC_SPIDERFANG		"When equipped, this weapon can be used to cast Venom, with power equal to your Poison spell.\n"
 #define DESC_MAGEMASH		"When equipped, this weapon can be used to cast Dispel. Dispel cast in this way does not affect you or your allies, and instead removes enemy buffs.\n"
