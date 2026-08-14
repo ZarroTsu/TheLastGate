@@ -1811,15 +1811,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing CLAW weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements: |   Gives:    \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skl | WV | TopDmg \n");
-		do_char_log(cn, 1, "------------+-----+-----+-----+----+--------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |   1 | 10 |     6  \n");
-		do_char_log(cn, 1, "Steel       |  15 |  12 |  16 | 20 |    12  \n");
-		do_char_log(cn, 1, "Gold        |  25 |  18 |  32 | 30 |    18  \n");
-		do_char_log(cn, 1, "Emerald     |  40 |  28 |  48 | 40 |    24  \n");
-		do_char_log(cn, 1, "Crystal     |  60 |  42 |  64 | 50 |    30  \n");
-		do_char_log(cn, 1, "Titanium    |  85 |  60 |  80 | 60 |    36  \n");
+		do_char_log(cn, 1, "   Weapon   |  Requirements:  |     Gives:    \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skl |  WV | AGL,Thr \n");
+		do_char_log(cn, 1, "------------+-----+-----+-----+-----+---------\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |   1 |  12 |     1   \n");
+		do_char_log(cn, 1, "Steel       |  15 |  14 |  12 |  24 |     2   \n");
+		do_char_log(cn, 1, "Gold        |  22 |  20 |  24 |  36 |     3   \n");
+		do_char_log(cn, 1, "Emerald     |  32 |  28 |  36 |  48 |     4   \n");
+		do_char_log(cn, 1, "Crystal     |  46 |  38 |  48 |  60 |     5   \n");
+		do_char_log(cn, 1, "Titanium    |  62 |  52 |  60 |  72 |     6   \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Claws will use both hand slots.\n");
 		do_char_log(cn, 2, "* Claws have a critical hit chance of 2%%.\n");
@@ -1835,12 +1835,12 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "   Weapon   |   Requirements:   |    Gives:   \n");
 		do_char_log(cn, 1, "    Tier    | WIL | AGL | Skill |  WV | Parry \n");
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   6 |    2  \n");
-		do_char_log(cn, 1, "Steel       |  12 |  12 |    10 |  12 |    4  \n");
-		do_char_log(cn, 1, "Gold        |  18 |  14 |    20 |  18 |    6  \n");
-		do_char_log(cn, 1, "Emerald     |  30 |  16 |    30 |  24 |    8  \n");
-		do_char_log(cn, 1, "Crystal     |  48 |  20 |    40 |  30 |   10  \n");
-		do_char_log(cn, 1, "Titanium    |  72 |  24 |    50 |  36 |   12  \n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   6 |    1  \n");
+		do_char_log(cn, 1, "Steel       |  15 |  10 |    10 |  12 |    2  \n");
+		do_char_log(cn, 1, "Gold        |  22 |  12 |    20 |  18 |    3  \n");
+		do_char_log(cn, 1, "Emerald     |  32 |  15 |    30 |  24 |    4  \n");
+		do_char_log(cn, 1, "Crystal     |  46 |  20 |    40 |  30 |    5  \n");
+		do_char_log(cn, 1, "Titanium    |  60 |  30 |    50 |  36 |    6  \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Daggers can be used in the off-hand slot.\n");
 		do_char_log(cn, 0, "* WV is reduced by 50%% in the off-hand slot.\n");
@@ -1854,15 +1854,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing STAFF weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
-		do_char_log(cn, 1, "    Tier    | INT | STR | Skill |  WV | INT \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   4 |   1 \n");
-		do_char_log(cn, 1, "Steel       |  14 |  12 |    10 |   8 |   2 \n");
-		do_char_log(cn, 1, "Gold        |  21 |  14 |    20 |  12 |   3 \n");
-		do_char_log(cn, 1, "Emerald     |  35 |  16 |    30 |  16 |   4 \n");
-		do_char_log(cn, 1, "Crystal     |  56 |  20 |    40 |  20 |   5 \n");
-		do_char_log(cn, 1, "Titanium    |  84 |  24 |    50 |  24 |   6 \n");
+		do_char_log(cn, 1, "   Weapon   |  Requirements:  |     Gives:     \n");
+		do_char_log(cn, 1, "    Tier    | INT | STR | Skl |  WV | SB | INT \n");
+		do_char_log(cn, 1, "------------+-----+-----+-----+-----+----+-----\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |   1 |   4 |    |   1 \n");
+		do_char_log(cn, 1, "Steel       |  16 |  10 |  10 |   8 |  1 |   2 \n");
+		do_char_log(cn, 1, "Gold        |  25 |  12 |  20 |  12 |  1 |   3 \n");
+		do_char_log(cn, 1, "Emerald     |  38 |  15 |  30 |  16 |  2 |   4 \n");
+		do_char_log(cn, 1, "Crystal     |  55 |  20 |  40 |  20 |  2 |   5 \n");
+		do_char_log(cn, 1, "Titanium    |  74 |  30 |  50 |  24 |  3 |   6 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "3")==0 
@@ -1873,13 +1873,13 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
 		do_char_log(cn, 1, "  Weapon  |  Requirements:  |      Gives:      \n");
-		do_char_log(cn, 1, "   Tier   | WIL | STR | Skl | WV | AV | Ht&WIL \n");
-		do_char_log(cn, 1, "----------+-----+-----+-----+----+----+--------\n");
-		do_char_log(cn, 1, "Steel     |  16 |  12 |   8 | 20 |  2 |      4 \n");
-		do_char_log(cn, 1, "Gold      |  22 |  14 |  16 | 30 |  3 |      6 \n");
-		do_char_log(cn, 1, "Emerald   |  34 |  16 |  24 | 40 |  4 |      8 \n");
-		do_char_log(cn, 1, "Crystal   |  52 |  20 |  32 | 50 |  5 |     10 \n");
-		do_char_log(cn, 1, "Titanium  |  76 |  24 |  40 | 60 |  6 |     12 \n");
+		do_char_log(cn, 1, "   Tier   | WIL | INT | Skl |  WV | SB,WIL,Res \n");
+		do_char_log(cn, 1, "----------+-----+-----+-----+-----+------------\n");
+		do_char_log(cn, 1, "Steel     |  15 |  12 |  10 |  20 |      2     \n");
+		do_char_log(cn, 1, "Gold      |  22 |  15 |  20 |  30 |      3     \n");
+		do_char_log(cn, 1, "Emerald   |  32 |  20 |  30 |  40 |      4     \n");
+		do_char_log(cn, 1, "Crystal   |  46 |  28 |  40 |  50 |      5     \n");
+		do_char_log(cn, 1, "Titanium  |  60 |  40 |  50 |  60 |      6     \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Spears will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Dagger and Staff skills.\n");
@@ -1895,15 +1895,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing SHIELD items:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |  Requires:  | Gives: \n");
+		do_char_log(cn, 1, "   Shield   |  Requires:  | Gives: \n");
 		do_char_log(cn, 1, "    Tier    | BRV | Skill |   AV   \n");
 		do_char_log(cn, 1, "------------+-----+-------+--------\n");
 		do_char_log(cn, 1, "Bronze      |   1 |     1 |    4   \n");
-		do_char_log(cn, 1, "Steel       |  12 |    12 |    8   \n");
-		do_char_log(cn, 1, "Gold        |  18 |    24 |   12   \n");
-		do_char_log(cn, 1, "Emerald     |  28 |    36 |   16   \n");
-		do_char_log(cn, 1, "Crystal     |  42 |    48 |   20   \n");
-		do_char_log(cn, 1, "Titanium    |  60 |    60 |   24   \n");
+		do_char_log(cn, 1, "Steel       |  14 |    10 |    8   \n");
+		do_char_log(cn, 1, "Gold        |  20 |    20 |   12   \n");
+		do_char_log(cn, 1, "Emerald     |  28 |    30 |   16   \n");
+		do_char_log(cn, 1, "Crystal     |  38 |    40 |   20   \n");
+		do_char_log(cn, 1, "Titanium    |  52 |    50 |   24   \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Shields use the off-hand slot.\n");
 		do_char_log(cn, 1, " \n");
@@ -1915,15 +1915,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing SWORD weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   | Gives: \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |   WV   \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+--------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |    8   \n");
-		do_char_log(cn, 1, "Steel       |  16 |  12 |    12 |   16   \n");
-		do_char_log(cn, 1, "Gold        |  22 |  16 |    24 |   24   \n");
-		do_char_log(cn, 1, "Emerald     |  30 |  22 |    36 |   32   \n");
-		do_char_log(cn, 1, "Crystal     |  40 |  30 |    48 |   40   \n");
-		do_char_log(cn, 1, "Titanium    |  52 |  40 |    60 |   48   \n");
+		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | BRV \n");
+		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   8 |   1 \n");
+		do_char_log(cn, 1, "Steel       |  14 |  14 |    12 |  16 |   2 \n");
+		do_char_log(cn, 1, "Gold        |  20 |  20 |    24 |  24 |   3 \n");
+		do_char_log(cn, 1, "Emerald     |  28 |  28 |    36 |  32 |   4 \n");
+		do_char_log(cn, 1, "Crystal     |  38 |  38 |    48 |  40 |   5 \n");
+		do_char_log(cn, 1, "Titanium    |  52 |  52 |    60 |  48 |   6 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Swords have a critical hit chance of 2%%.\n");
 		do_char_log(cn, 1, " \n");
@@ -1935,15 +1935,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing DUALSWORD weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   | Gives: \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |   WV   \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+--------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |    6   \n");
-		do_char_log(cn, 1, "Steel       |  12 |  16 |    15 |   12   \n");
-		do_char_log(cn, 1, "Gold        |  16 |  22 |    30 |   18   \n");
-		do_char_log(cn, 1, "Emerald     |  22 |  30 |    45 |   24   \n");
-		do_char_log(cn, 1, "Crystal     |  30 |  40 |    60 |   30   \n");
-		do_char_log(cn, 1, "Titanium    |  40 |  52 |    75 |   36   \n");
+		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | Hit \n");
+		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   6 |   1 \n");
+		do_char_log(cn, 1, "Steel       |  14 |  14 |    12 |  12 |   2 \n");
+		do_char_log(cn, 1, "Gold        |  20 |  20 |    24 |  18 |   3 \n");
+		do_char_log(cn, 1, "Emerald     |  28 |  28 |    36 |  24 |   4 \n");
+		do_char_log(cn, 1, "Crystal     |  38 |  38 |    48 |  30 |   5 \n");
+		do_char_log(cn, 1, "Titanium    |  52 |  52 |    60 |  36 |   6 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Dual-swords use the off-hand slot.\n");
 		do_char_log(cn, 1, " \n");
@@ -1955,15 +1955,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing AXE weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   | Gives: \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |   WV   \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+--------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |   10   \n");
-		do_char_log(cn, 1, "Steel       |  12 |  14 |    16 |   20   \n");
-		do_char_log(cn, 1, "Gold        |  18 |  22 |    32 |   30   \n");
-		do_char_log(cn, 1, "Emerald     |  28 |  34 |    48 |   40   \n");
-		do_char_log(cn, 1, "Crystal     |  42 |  50 |    64 |   50   \n");
-		do_char_log(cn, 1, "Titanium    |  60 |  74 |    80 |   60   \n");
+		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
+		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | STR \n");
+		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
+		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  10 |   1 \n");
+		do_char_log(cn, 1, "Steel       |  14 |  15 |    15 |  20 |   2 \n");
+		do_char_log(cn, 1, "Gold        |  20 |  22 |    30 |  30 |   3 \n");
+		do_char_log(cn, 1, "Emerald     |  28 |  32 |    45 |  40 |   4 \n");
+		do_char_log(cn, 1, "Crystal     |  38 |  46 |    60 |  50 |   5 \n");
+		do_char_log(cn, 1, "Titanium    |  52 |  60 |    75 |  60 |   6 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 
@@ -1973,15 +1973,15 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing TWOHANDER weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   |    Gives:   \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | Multi \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-------\n");
-		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  12 |    5  \n");
-		do_char_log(cn, 1, "Steel       |  16 |  12 |    18 |  24 |   10  \n");
-		do_char_log(cn, 1, "Gold        |  26 |  20 |    36 |  36 |   15  \n");
-		do_char_log(cn, 1, "Emerald     |  40 |  32 |    54 |  48 |   20  \n");
-		do_char_log(cn, 1, "Crystal     |  58 |  48 |    72 |  60 |   25  \n");
-		do_char_log(cn, 1, "Titanium    |  80 |  68 |    90 |  72 |   30  \n");
+		do_char_log(cn, 1, "  Weapon  |  Requirements:  |      Gives:     \n");
+		do_char_log(cn, 1, "   Tier   | AGL | STR | Skl |  WV | Mlt | Imm \n");
+		do_char_log(cn, 1, "----------+-----+-----+-----+-----+-----+-----\n");
+		do_char_log(cn, 1, "Bronze    |   1 |   1 |   1 |  12 |   5 |   1 \n");
+		do_char_log(cn, 1, "Steel     |  15 |  15 |  15 |  24 |  10 |   2 \n");
+		do_char_log(cn, 1, "Gold      |  22 |  22 |  30 |  36 |  15 |   3 \n");
+		do_char_log(cn, 1, "Emerald   |  32 |  32 |  45 |  48 |  20 |   4 \n");
+		do_char_log(cn, 1, "Crystal   |  46 |  46 |  60 |  60 |  25 |   5 \n");
+		do_char_log(cn, 1, "Titanium  |  60 |  60 |  75 |  72 |  30 |   6 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Twohanders will use both hand slots.\n");
 		do_char_log(cn, 2, "* Twohanders have a critical hit chance of 2%%.\n");
@@ -1994,14 +1994,14 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "Now listing GREATAXE weapons:\n");
 		do_char_log(cn, 1, " \n");
 		//                 "!        .         .         .         .        !"
-		do_char_log(cn, 1, "   Weapon   |   Requirements:   |   Gives:  \n");
-		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV |  AV \n");
-		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
-		do_char_log(cn, 1, "Steel       |  12 |  14 |    15 |  28 |   2 \n");
-		do_char_log(cn, 1, "Gold        |  20 |  24 |    30 |  42 |   3 \n");
-		do_char_log(cn, 1, "Emerald     |  32 |  40 |    45 |  56 |   4 \n");
-		do_char_log(cn, 1, "Crystal     |  48 |  62 |    60 |  70 |   5 \n");
-		do_char_log(cn, 1, "Titanium    |  68 |  90 |    75 |  84 |   6 \n");
+		do_char_log(cn, 1, "  Weapon  |  Requirements:  |       Gives:     \n");
+		do_char_log(cn, 1, "   Tier   | AGL | STR | Skl | WV | AV,STR | Td \n");
+		do_char_log(cn, 1, "----------+-----+-----+-----+----+--------+----\n");
+		do_char_log(cn, 1, "Steel     |  15 |  16 |  15 | 28 |    2   |  4 \n");
+		do_char_log(cn, 1, "Gold      |  22 |  25 |  30 | 42 |    3   |  6 \n");
+		do_char_log(cn, 1, "Emerald   |  32 |  38 |  45 | 56 |    4   |  8 \n");
+		do_char_log(cn, 1, "Crystal   |  46 |  55 |  60 | 70 |    5   | 10 \n");
+		do_char_log(cn, 1, "Titanium  |  60 |  74 |  75 | 84 |    6   | 12 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Greataxes will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Axe and Two-Handed skills.\n");
