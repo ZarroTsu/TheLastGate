@@ -9371,12 +9371,12 @@ int alter_damage(int co, int dam, int *en_dam, int *mp_dam, int isdot)
 	if (T_WARR_SK(co, 12))                           *en_dam +=   30;    // (Warr) Tenacity
 	if ((n=TC_SK(co, 48)))                           *en_dam += n*15;
 	if (do_get_iflag(co, SF_TW_CLOAK))               *en_dam +=   15;    // [Gear] Cloak of Shadows
-	*en_dam +=                    do_get_ieffect(cn, VF_EN_TAKEASEN);    // [Ench] damage taken as endurance
+	*en_dam +=                    do_get_ieffect(co, VF_EN_TAKEASEN);    // [Ench] damage taken as endurance
 	
 	if (T_ARHR_SK(co, 12))                           *mp_dam +=   30;    // (ArHr) Resourcefulness
 	if ((n=TC_SK(co, 84)))                           *mp_dam += n*15;
 	if (do_get_iflag(co, SF_PREIST))                 *mp_dam +=   30;    // [Taro] Priestess
-	*mp_dam +=                    do_get_ieffect(cn, VF_EN_TAKEASMA);    // [Ench] damage taken as mana
+	*mp_dam +=                    do_get_ieffect(co, VF_EN_TAKEASMA);    // [Ench] damage taken as mana
 	
 	if ((n = *en_dam + *mp_dam))
 	{
@@ -13114,22 +13114,22 @@ void do_check_auras(int cn)
 
 void do_extra_cleave(int cn, int power)
 {
-	int m = ch[cn].x + ch[cn].y * MAPX;
+	int m = ch[cn].x + ch[cn].y * MAPX, co;
 	
 	if (IS_LIVINGCHAR(co = ch[cn].skill_target1)) ;
-	else if (!buff && ch[cn].dir==DX_DOWN  && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_UP    && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT  && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && IS_LIVINGCHAR(co = ch[cn].attack_cn)) ;
-	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && (ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_UP && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_DOWN && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_LEFT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
-	else if (!buff && ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_DOWN  && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_UP    && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_LEFT  && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (IS_LIVINGCHAR(co = ch[cn].attack_cn)) ;
+	else if ((ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if ((ch[cn].dir==DX_RIGHT || ch[cn].dir==DX_LEFT) && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if ((ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if ((ch[cn].dir==DX_DOWN || ch[cn].dir==DX_UP) && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_UP && IS_LIVINGCHAR(co = map[m + MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_DOWN && IS_LIVINGCHAR(co = map[m - MAPX].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_LEFT && IS_LIVINGCHAR(co = map[m + 1].ch) && may_attack_msg(cn, co, 0)>0) ;
+	else if (ch[cn].dir==DX_RIGHT && IS_LIVINGCHAR(co = map[m - 1].ch) && may_attack_msg(cn, co, 0)>0) ;
 	else return;
 	
 	if (!do_char_can_see(cn, co, 0)) return;

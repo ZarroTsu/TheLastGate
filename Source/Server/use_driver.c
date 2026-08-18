@@ -7001,15 +7001,15 @@ int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces and
 
 void really_spawn_minion(int cn, int cc)
 {
-	int n, in, base, v = 10, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
+	int n, m, in, base, v = 4, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
 	
-	base = getrank(cn)+1 * 12;
+	base = (getrank(cn)+1) * 12;
 	
 	// Adjust the template to reflect desired stat growth
 	switch (ch[cc].temp)
 	{
 		case CT_GARGTHRALL: // [Item] Gargoyle Statuette - Gargoyle
-			base -= RANDOM(7); v = 2;
+			base -= RANDOM(7); v = 1;
 			break;
 		case CT_DEVDTHRALL: // [Gear] Devil's Doorway - Skeleton
 			if (IS_SANECTEMPLATE((temp = ch[cn].lastkilltemp)))
@@ -7019,13 +7019,13 @@ void really_spawn_minion(int cn, int cc)
 					if (ch_temp[temp].skill[n][0])
 					{
 						if (n==SK_CLEAVE||n==SK_POISON||n==SK_BLAST)
-							ch[cc].skill[n][2] = 120; ch[cc].skill[n][3] = 4;
+							{ ch[cc].skill[n][2] = 120; ch[cc].skill[n][3] = 4; }
 						else if (n==SK_WEAKEN||n==SK_CURSE||n==SK_SLOW)
-							ch[cc].skill[n][2] = 105; ch[cc].skill[n][3] = 5;
+							{ ch[cc].skill[n][2] = 105; ch[cc].skill[n][3] = 5; }
 						else if (n==SK_HAND||n==SK_DAGGER||n==SK_SWORD||n==SK_AXE||
 								n==SK_STAFF||n==SK_TWOHAND||n==SK_SHIELD||n==SK_DUAL) ;
 						else
-							ch[cc].skill[n][2] = 90; ch[cc].skill[n][3] = 6;
+							{ ch[cc].skill[n][2] = 90; ch[cc].skill[n][3] = 6; }
 					}
 				}
 			}
@@ -7042,8 +7042,8 @@ void really_spawn_minion(int cn, int cc)
 				{
 					if ((in = has_buff(n, SK_RAPIDDMG)))
 					{
-						bu[in].r_hp    += -50*2; // base
-						bu[in].data[1] += -50;   // build-up per frame
+						bu[in].r_hp    += -20*2; // base
+						bu[in].data[1] += -20;   // build-up per frame
 					}
 					else // If this thrall somehow lacks this buff, remove them
 					{
@@ -7061,7 +7061,7 @@ void really_spawn_minion(int cn, int cc)
 			return;
 	}
 	
-	strcpy(ch[cc].name, mkp());
+	strcpy(ch[cc].name, god_get_mkp());
 	strcpy(ch[cc].reference, ch[cc].name);
 	
 	// Generate stats on the thrall from the values provided
@@ -7108,8 +7108,8 @@ void really_spawn_minion(int cn, int cc)
 		in = god_create_buff(SK_RAPIDDMG);
 		
 		strcpy(bu[in].name, "Thrall");
-		bu[in].r_hp    = -v*2; // base degen speed
-		bu[in].data[1] = -v;   // build-up per frame
+		bu[in].r_hp    = -v*2;  // base degen speed
+		bu[in].data[1] = -v/2;  // build-up per frame
 		bu[in].active  = bu[in].duration = 1;
 		bu[in].flags   = BF_PERMASPELL;
 		bu[in].sprite  = BUF_SPR_FIRE;

@@ -527,6 +527,7 @@
 #define IT_WP_GULLOXI		2541
 #define IT_WP_AJAXBLUE		2542
 #define IT_WP_CRESSUN		2543	//
+#define IT_WP_JADEHALLOW	2544	
 #define IT_WP_MJOLNIR		2792	//
 
 #define IT_WP_DECOSWORD		 283

@@ -222,6 +222,11 @@ int god_create_item(int temp)
 	return(n);
 }
 
+char *god_get_mkp(void)
+{
+	return mkp();
+}
+
 int god_create_char(int temp, int withitems)
 {
 	int n, m, tmp, flag = 0;
