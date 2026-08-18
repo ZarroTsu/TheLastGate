@@ -7235,10 +7235,8 @@ int use_spawn_minion(int cn, int in)
 	if (!cn)             return 0;
 	if (!it[in].carried) return 0;
 	
-	if (it[in].driver == 28)
-		temp = it[in].data[0]; // CT_GARGTHRALL
-	else if (it[in].driver == 114)
-		temp = CT_DEVDTHRALL;
+	if (it[in].driver == 28)       temp = it[in].data[0]; // CT_GARGTHRALL
+	else if (it[in].driver == 114) temp = CT_DEVDTHRALL;
 	else
 	{
 		do_char_log(cn, 0, "The minion could not materialize.\n");

@@ -339,14 +339,15 @@ void look_extra(int cn, int in)
 	case IT_WP_ANCIAEGIS:  do_char_log(cn, FN_EX, DESC_ANCIAEGIS);  break;
 	
 	case IT_WB_BARBSWORD:  do_char_log(cn, FN_EX, DESC_BARBSWORD);  break;
+	case IT_WB_QARMZI:     do_char_log(cn, FN_EX, DESC_QARMZI);     break;
 	case IT_WP_LAMEDARG:   if (it[in].data[0] < REQ_LAME)
 	                       do_char_log(cn, FN_EX, DESC_LAMEDARG);
 	                       else
 	                       do_char_log(cn, FN_WO, DESC_LAMEFULL);   break;
-	case IT_WB_QARMZI:     do_char_log(cn, FN_EX, DESC_QARMZI);     break;
 	case IT_WB_WHITEODA:   do_char_log(cn, FN_EX, DESC_WHITEODA);   break;
 	case IT_WP_EXCALIBUR:  do_char_log(cn, FN_EX, DESC_EXCALIBUR);  break;
 	
+	case IT_WB_FELLNIGHT:  do_char_log(cn, FN_EX, DESC_FELLNIGHT);  break;
 	case IT_WB_BLACKTAC:   do_char_log(cn, FN_EX, DESC_BLACKTAC);   break;
 	case IT_WP_EVERGREEN:  do_char_log(cn, FN_EX, DESC_EVERGREEN);  break;
 	
@@ -356,7 +357,8 @@ void look_extra(int cn, int in)
 	case IT_WB_LIONSPAWS:  do_char_log(cn, FN_EX, DESC_LIONSPAWS);  break;
 	case IT_WP_CRIMRIP:    do_char_log(cn, FN_EX, DESC_CRIMRIP);    break;
 	case IT_WB_CRIMRIP:    do_char_log(cn, FN_EX, DESC_CRIMRIP2);   break;
-	case IT_WP_SOVERIGNS:  do_char_log(cn, FN_EX, DESC_SOVERIGNS);  break;
+//	case IT_WP_SOVERIGNS:  
+//	case IT_WB_SOVERIGNS:  do_char_log(cn, FN_EX, DESC_SOVERIGNS);  break;
 	
 	case IT_WB_THEBUTCHER: do_char_log(cn, FN_EX, DESC_THEBUTCHER); break;
 	case IT_WB_GULLOXI:    do_char_log(cn, FN_EX, DESC_GULLOXI);    break;
@@ -380,8 +382,8 @@ void look_extra(int cn, int in)
 	
 	case IT_WP_BRONCHIT:   
 	case IT_WB_BRONCHIT:   do_char_log(cn, FN_EX, DESC_BRONCHIT);   break;
-	case IT_WP_VOLCANF:    do_char_log(cn, FN_EX, DESC_VOLCANF);    break;
 	case IT_WB_VIKINGMALT: do_char_log(cn, FN_EX, DESC_VIKINGMALT); break;
+	case IT_WP_VOLCANF:    do_char_log(cn, FN_EX, DESC_VOLCANF);    break;
 	case IT_WP_GUNGNIR:    do_char_log(cn, FN_EX, DESC_GUNGNIR);    break;
 	
 	case IT_BONEARMOR:     do_char_log(cn, FN_EX, DESC_BONEARMOR);  break; // Bone Armor
