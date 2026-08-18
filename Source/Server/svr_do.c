@@ -6060,6 +6060,11 @@ void do_command(int cn, char *ptr)
 			god_add_ban(cn, dbatoi(arg[1]));
 			return;
 		}
+		if (prefix(cmd, "addkills") && f_gi)
+		{
+			god_add_item_kills(cn, dbatoi(arg[1]));
+			return;
+		}
 		if (prefix(cmd, "autodepot") && !f_m)
 		{
 			do_autodepot(cn);

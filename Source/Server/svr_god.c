@@ -1548,6 +1548,33 @@ void god_top(int cn)
 	}
 }
 
+void god_add_item_kills(int cn, int v)
+{
+	int in;
+	
+	if (!cn) return;
+	if (!(in = ch[cn].citem))
+	{
+		do_char_log(cn, 0, "Hold the weapon under your cursor first!\n");
+		return;
+	}
+	if (!IS_GODWEAPON(in))
+	{
+		do_char_log(cn, 0, "Seems like this isn't a godly weapon?\n");
+		return;
+	}
+	if (!v)
+	{
+		do_char_log(cn, 0, "Need a number to add.\n");
+		return;
+	}
+	
+	it[in].cost += v;
+	
+	do_char_log(cn, 1, "Done.\n");
+	chlog(cn, "IMP: added %d kills to the %s.", it[in].name);
+}
+
 void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 {
 	int in, m, bonus = 1;
@@ -1729,7 +1756,6 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 	}
 	do_char_log(cn, 1, "created one %s.\n", it[in].name);
 	chlog(cn, "IMP: created one %s.", it[in].name);
-	return;
 }
 
 void god_cleanslots(int cn)

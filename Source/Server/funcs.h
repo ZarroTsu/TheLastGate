@@ -136,6 +136,7 @@ void god_goto(int cn, int co, char *cx, char *cy);
 void god_info(int cn, int co);
 void god_who(int cn);
 void god_top(int cn);
+void god_add_item_kills(int cn, int v);
 void god_create(int cn, int x, int gen_a, int gen_b, int gen_c);
 void god_summon(int cn, char *spec1, char *spec2, char *spec3);
 int god_thrall(int cn, char *spec1, char *spec2, int offset);
