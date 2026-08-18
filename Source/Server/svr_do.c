@@ -11024,7 +11024,7 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WB_COBALTLANC)) do_add_ieffect(cn, VF_EXTRA_BRV,   20);
 		if (do_check_items(in, IT_WP_HALADIE))    do_add_ieffect(cn, VF_EXTRA_WIL,   10);
 		if (do_check_items(in, IT_WB_SHIVASCEPT)) do_add_ieffect(cn, VF_EXTRA_INT,   10);
-		if (do_check_items(in, IT_WP_COLDSTEEL))  do_add_ieffect(cn, VF_EXTRA_AGL,   20);
+		if (do_check_items(in, IT_WP_MURAMASA))   do_add_ieffect(cn, VF_EXTRA_AGL,   20);
 		if (do_check_items(in, IT_WB_BARBSWORD))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
 		if (do_check_items(in, IT_WB_FELLNIGHT))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
 		if (do_check_items(in, IT_WP_GEMCUTTER))  do_add_ieffect(cn, VF_GEMMULTI,    25);
@@ -16054,6 +16054,7 @@ int smith_grade_in(int in)
 		case IT_WP_VERDTRUNK:   return IT_WB_VERDTRUNK;
 		case IT_WP_ICE2HND:     return IT_WB_ICE2HND;
 		case IT_WP_PHANTASM:    return IT_WB_PHANTASM;
+		case IT_WP_COLDSTEEL:   return IT_WB_COLDSTEEL;
 		//
 		case IT_WP_SERASLAB:    return IT_WB_SERASLAB;
 		case IT_WP_HEADSMAN:    return IT_WB_HEADSMAN;
@@ -18460,13 +18461,13 @@ void do_check_new_item_level(int cn, int in)
 		{
 			if (armo && weap)
 			{
-				armo = max(rank-1, armo*5/2 * rank*rank/100) + 1 + 1 * bonus;
-				weap = max(rank-1, weap*5/2 * rank*rank/100) + 1 + 1 * bonus;
+				armo = max(rank-1, armo*5/2 * rank*rank/100) + 1 * bonus;
+				weap = max(rank-1, weap*5/2 * rank*rank/100) + 1 * bonus;
 			}
 			else if (armo) 
-				armo = max(rank-1, armo*5/2 * rank*rank/100) + 2 + 2 * bonus;
+				armo = max(rank-1, armo*5/2 * rank*rank/100) + 2 * bonus;
 			else if (weap)
-				weap = max(rank-1, weap*5/2 * rank*rank/100) + 2 + 2 * bonus;
+				weap = max(rank-1, weap*5/2 * rank*rank/100) + 2 * bonus;
 			
 			if (brav) brav = brav*5/2 * rank*rank/100;
 			if (intu) intu = intu*5/2 * rank*rank/100;
@@ -18521,7 +18522,7 @@ void do_check_new_item_level(int cn, int in)
 			}
 			else if (armo) 
 				armo = max(rank/2, armo*3/4 * rank*rank/100) + 2 * bonus;
-			else if (weapon)
+			else if (weap)
 				weap = max(rank/2, weap*3/4 * rank*rank/100) + 2 * bonus;
 			
 			if (brav) brav = brav*3/4 * rank*rank/100;
@@ -18549,7 +18550,7 @@ void do_check_new_item_level(int cn, int in)
 			}
 			else if (armo) 
 				armo = max(rank/2, armo*2/5 * rank*rank/100) + 2 * bonus;
-			else if (weapon)
+			else if (weap)
 				weap = max(rank/2, weap*2/5 * rank*rank/100) + 2 * bonus;
 			
 			if (brav) brav = brav*2/5 * rank*rank/100;
@@ -18575,9 +18576,9 @@ void do_check_new_item_level(int cn, int in)
 				armo = max((rank+1)/3, armo/6 * rank*rank/100) + 1 * bonus;
 				weap = max((rank+1)/3, weap/6 * rank*rank/100) + 1 * bonus;
 			}
-			else if (armor) 
+			else if (armo) 
 				armo = max((rank+1)/3, armo/6 * rank*rank/100) + 2 * bonus;
-			else if (weapon)
+			else if (weap)
 				weap = max((rank+1)/3, weap/6 * rank*rank/100) + 2 * bonus;
 			
 			if (brav) brav = brav/6 * rank*rank/100;
@@ -18605,19 +18606,19 @@ void do_check_new_item_level(int cn, int in)
 			}
 			else if (armo) 
 				armo = 2 * bonus;
-			else if (weapon)
+			else if (weap)
 				weap = 2 * bonus;
 		}
 		else { } // How did we get here?
 		if (xtra) // extra bonus stats usually granted by Adamant weapons
 		{
-			if      (IS_WPGAXE(in) || IS_WPAXE(in))       { stre += xtra;   agil += xtra/2; }
-			else if (IS_WPTWOHAND(in) || IS_WPCLAW(in))   { agil += xtra;   stre += xtra/2; }
-			else if (IS_WPSWORD(in) || IS_WPDUALSW(in))   { brav += xtra/2; agil += xtra/2;   stre += xtra/2; }
-			else if (IS_WPSHIELD(in))                     { brav += xtra/2; will += xtra/2;   stre += xtra/2; }
-			else if (IS_WPSPEAR(in))                      { will += xtra/2; intu += xtra/2;   agil += xtra/4;   stre += xtra/4; }
-			else if (IS_WPSTAFF(in))                      { intu += xtra;   stre += xtra/2; }
-			else if (IS_WPDAGGER(in))                     { will += xtra;   agil += xtra/2; }
+			if      (IS_WPGAXE(in) || IS_WPAXE(in))     { stre += xtra;   agil += xtra/2; }
+			else if (IS_WPTWOHAND(in) || IS_WPCLAW(in)) { agil += xtra;   stre += xtra/2; }
+			else if (IS_WPSWORD(in) || IS_WPDUALSW(in)) { brav += xtra/4; agil += xtra/4; stre += xtra/4; }
+			else if (IS_WPSHIELD(in))                   { brav += xtra/4; will += xtra/4; stre += xtra/4; }
+			else if (IS_WPSPEAR(in))                    { will += xtra/2; intu += xtra/2; agil += xtra/4; stre += xtra/4; }
+			else if (IS_WPSTAFF(in))                    { intu += xtra/2; stre += xtra/4; }
+			else if (IS_WPDAGGER(in))                   { will += xtra/2; agil += xtra/4; }
 		}
 		if (armo) it[in].armor[I_P]            = armo;
 		if (weap) it[in].weapon[I_P]           = weap;
@@ -18637,26 +18638,26 @@ void do_check_new_item_level(int cn, int in)
 		
 		if (IS_SKUAWEAP(in))
 		{
-			it[in].speed[I_P]      = 5 * bonus * rank/20 + 5 * bonus;
+			it[in].speed[I_P]      = (15 * bonus * rank/10 + 5 * bonus)/2;
 			ench = 57 + RANDOM(4);
 		}
 		else if (IS_GORNWEAP(in))
 		{
-			it[in].spell_pow[I_P]  = 2 * bonus * rank/20 + 2 * bonus + spel;
+			it[in].spell_pow[I_P]  = ( 3 * bonus * rank/10 + 1 * bonus)/2 + spel;
 			ench = 65 + RANDOM(4);
 		}
 		else if (IS_KWAIWEAP(in))
 		{
-			it[in].to_hit[I_P]     = 2 * bonus * rank/20 + 2 * bonus + hitt;
-			it[in].to_parry[I_P]   = 2 * bonus * rank/20 + 2 * bonus + parr;
+			it[in].to_hit[I_P]     = ( 3 * bonus * rank/10 + 1 * bonus)/2 + hitt;
+			it[in].to_parry[I_P]   = ( 3 * bonus * rank/10 + 1 * bonus)/2 + parr;
 			ench = 61 + RANDOM(4);
 		}
 		else if (IS_PURPWEAP(in))
 		{
-			it[in].speed[I_P]      = 5/2 * bonus * rank/20 + 5/2 * bonus;
-			it[in].spell_pow[I_P]  = 1   * bonus * rank/20 + 1   * bonus + spel;
-			it[in].to_hit[I_P]     = 1   * bonus * rank/20 + 1   * bonus + hitt;
-			it[in].to_parry[I_P]   = 1   * bonus * rank/20 + 1   * bonus + parr;
+			it[in].speed[I_P]      = (15 * bonus * rank/10 + 5 * bonus)/4;
+			it[in].spell_pow[I_P]  = ( 3 * bonus * rank/10 + 1 * bonus)/4 + spel;
+			it[in].to_hit[I_P]     = ( 3 * bonus * rank/10 + 1 * bonus)/4 + hitt;
+			it[in].to_parry[I_P]   = ( 3 * bonus * rank/10 + 1 * bonus)/4 + parr;
 			ench = 69 + RANDOM(4);
 		}
 		

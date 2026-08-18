@@ -847,8 +847,9 @@ void reset_item(int n)
 
 	for (in = 1; in<MAXITEM; in++)
 	{
-		if (it[in].used!=USE_ACTIVE) continue;
+		if (it[in].used!=USE_ACTIVE)  continue;
 		if (it[in].flags & IF_LEGACY) continue;
+		if (IS_GODWEAPON(in))         continue;
 		if (it[in].temp==n)
 		{
 			xlog(" --> %s (%d) (%d, %d,%d).", it[in].name, in, it[in].carried, it[in].x, it[in].y);
