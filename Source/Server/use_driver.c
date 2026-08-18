@@ -7230,16 +7230,25 @@ int place_minion(int cn, int in, int m, int flag)
 
 int use_spawn_minion(int cn, int in)
 {
-	int n;
+	int n, temp;
 	
 	if (!cn)             return 0;
 	if (!it[in].carried) return 0;
 	
+	if (it[in].driver == 28)
+		temp = it[in].data[0]; // CT_GARGTHRALL
+	else if (it[in].driver == 114)
+		temp = CT_DEVDTHRALL;
+	else
+	{
+		do_char_log(cn, 0, "The minion could not materialize.\n");
+		return 0;
+	}
+	
 	for (n=1;n<MAXCHARS;n++) // Check if we already have this thrall
 	{
-		if (ch[n].used==USE_EMPTY)       continue;
-		if (ch[n].temp != CT_GARGTHRALL && 
-			ch[n].temp != CT_DEVDTHRALL) continue;
+		if (ch[n].used==USE_EMPTY) continue;
+		if (ch[n].temp != temp)    continue;
 		if (ch[n].data[CHD_MASTER] == cn)
 		{
 			do_char_log(cn, 0, "You can only have one of these enthralled at a time.\n");
