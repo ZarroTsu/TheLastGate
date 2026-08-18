@@ -17726,12 +17726,12 @@ void do_look_depot(int cn, int co)
 		if ((in = st[co].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)
 		{
 			spr = it[in].sprite[I_I];
-			if (it[in].flags & IF_SOULSTONE)  ss = 1;  else ss = 0;
-			if (it[in].flags & IF_ENCHANTED)  en = 2;  else en = 0;
-			if (it[in].flags & IF_CORRUPTED)  cr = 4;  else cr = 0;
-			if (IS_SOULCAT(in))   ca = it[in].data[4]; else ca = 0;
-			if (IS_CORRUPTOR(in)) ca = it[in].data[0]; else ca = 0;
-			if (it[in].stack)  stack = it[in].stack;   else stack = 0;
+			if (it[in].flags & IF_SOULSTONE)  ss = 1;        else ss = 0;
+			if (it[in].flags & IF_ENCHANTED)  en = 2;        else en = 0;
+			if (it[in].flags & IF_CORRUPTED)  cr = 4;        else cr = 0;
+			if (it[in].driver==93)      ca = it[in].data[4];
+			else if (IS_CORRUPTOR(in))  ca = it[in].data[0]; else ca = 0;
+			if (it[in].stack)        stack = it[in].stack;   else stack = 0;
 		}
 		else
 		{
