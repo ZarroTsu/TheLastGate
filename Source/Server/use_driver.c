@@ -7009,7 +7009,7 @@ void really_spawn_minion(int cn, int cc)
 	switch (ch[cc].temp)
 	{
 		case CT_GARGTHRALL: // [Item] Gargoyle Statuette - Gargoyle
-			base -= RANDOM(7); v = 1;
+			base -= RANDOM(7); v = 2;
 			break;
 		case CT_DEVDTHRALL: // [Gear] Devil's Doorway - Skeleton
 			if (IS_SANECTEMPLATE((temp = ch[cn].lastkilltemp)))
@@ -7042,8 +7042,8 @@ void really_spawn_minion(int cn, int cc)
 				{
 					if ((in = has_buff(n, SK_RAPIDDMG)))
 					{
-						bu[in].r_hp    += -20*2; // base
-						bu[in].data[1] += -20;   // build-up per frame
+						bu[in].r_hp    += -40; // base
+						bu[in].data[1] += -10; // build-up per frame
 					}
 					else // If this thrall somehow lacks this buff, remove them
 					{
@@ -7108,8 +7108,8 @@ void really_spawn_minion(int cn, int cc)
 		in = god_create_buff(SK_RAPIDDMG);
 		
 		strcpy(bu[in].name, "Thrall");
-		bu[in].r_hp    = -v*2;  // base degen speed
-		bu[in].data[1] = -v/2;  // build-up per frame
+		bu[in].r_hp    = -(v);    // base degen speed
+		bu[in].data[1] = -(v/4);  // build-up per frame
 		bu[in].active  = bu[in].duration = 1;
 		bu[in].flags   = BF_PERMASPELL;
 		bu[in].sprite  = BUF_SPR_FIRE;

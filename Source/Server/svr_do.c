@@ -9405,9 +9405,9 @@ int do_recovery(int cn, int type, int v)
 		
 		v = more(v, n, 1);
 		
-		if (do_get_iflag(cn, VF_EN_MORERECO)) v = more(v, 20, 1);  // [Ench] # 90
-		if (do_get_iflag(cn, SF_WORLD_R))     v = less(v, 50, 1);  // [Taro] World.R
-		if (do_get_iflag(cn, SF_APTRECOV))    v = more(v, ch[cn].spell_apt, 2);  // [Gear] Improved Pearl Axe
+		if (n = do_get_ieffect(cn, VF_EN_MORERECO)) v = more(v,  n, 1);  // [Ench] # 90
+		if (do_get_iflag(cn, SF_WORLD_R))           v = less(v, 50, 1);  // [Taro] World.R
+		if (do_get_iflag(cn, SF_APTRECOV))          v = more(v, ch[cn].spell_apt, 2);  // [Gear] Improved Pearl Axe
 	}
 	
 	switch (type)
@@ -10123,7 +10123,7 @@ void do_attack(int cn, int co, int surround)
 	if (!is_facing(co, cn)) sorb = 1;
 	if (   is_back(co, cn)) sorb = 2;
 	
-	if (!T_WARR_SK(co, 10) && !do_get_ieffect(co, SF_EN_BACKSTOP))  // (Warr) Champion | [Ench] # 81
+	if (!T_WARR_SK(co, 10) && !do_get_iflag(co, SF_EN_BACKSTOP))  // (Warr) Champion | [Ench] # 81
 		s2 -= 10 * sorb;
 	
 	//   Stunned or not fighting                 ~~  Outsider's Eye | Ancient Aegis
