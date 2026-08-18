@@ -18421,9 +18421,9 @@ int may_attack_msg(int cn, int co, int msg)
 
 void do_check_new_item_level(int cn, int in)
 {
-	int temp, n, m, bonus = 1, rank, weapon=0, armor=0, ench=0;
-	int parr=0, intu=0, will=0, topd=0, mult=0, atks=0, xtra=0;
-	int stre=0, agil=0, brav=0;
+	int temp, n, m, bonus = 1, rank, weap=0, armo=0, ench=0;
+	int parr=0, hitt=0, brav=0, will=0, intu=0, agil=0, stre=0;
+	int spel=0, thor=0, topd=0, mult=0, xtra=0, resi=0, immu=0;
 	char osir[20]; 
 	
 	if (!IS_PLAYER(cn)) return;
@@ -18440,149 +18440,176 @@ void do_check_new_item_level(int cn, int in)
 		if (rank < 2) return;
 		if (it[in].stack >= rank) return;
 		
-		armor  = it_temp[temp].armor[I_I];
-		weapon = it_temp[temp].weapon[I_I];
-		parr   = it_temp[temp].to_parry[I_I];
-		intu   = it_temp[temp].attrib[AT_INT][I_I];
-		will   = it_temp[temp].attrib[AT_WIL][I_I];
-		topd   = it_temp[temp].top_damage[I_I];
-		mult   = it_temp[temp].crit_multi[I_I];
-		atks   = it_temp[temp].atk_speed[I_I];
+		armo = it_temp[temp].armor[I_I];
+		weap = it_temp[temp].weapon[I_I];
+		brav = it_temp[temp].attrib[AT_BRV][I_I];
+		intu = it_temp[temp].attrib[AT_INT][I_I];
+		will = it_temp[temp].attrib[AT_WIL][I_I];
+		agil = it_temp[temp].attrib[AT_AGL][I_I];
+		stre = it_temp[temp].attrib[AT_STR][I_I];
+		hitt = it_temp[temp].to_hit[I_I];
+		parr = it_temp[temp].to_parry[I_I];
+		topd = it_temp[temp].top_damage[I_I];
+		mult = it_temp[temp].crit_multi[I_I];
+		thor = it_temp[temp].gethit_dam[I_I];
+		spel = it_temp[temp].spell_pow[I_I];
+		resi = it_temp[temp].skill[SK_RESIST][I_I];
+		immu = it_temp[temp].skill[SK_IMMUN][I_I];
 		
 		if ((temp >= 284 && temp <= 292) || temp == 1779) // Steel					2
 		{
-			if (armor && weapon)
+			if (armo && weap)
 			{
-				armor  = max(rank-1,  armor*5/2 * rank*rank/100) + 1 + 1 * bonus;
-				weapon = max(rank-1, weapon*5/2 * rank*rank/100) + 1 + 1 * bonus;
+				armo = max(rank-1, armo*5/2 * rank*rank/100) + 1 + 1 * bonus;
+				weap = max(rank-1, weap*5/2 * rank*rank/100) + 1 + 1 * bonus;
 			}
-			else if (armor) 
-				armor  = max(rank-1,  armor*5/2 * rank*rank/100) + 2 + 2 * bonus;
-			else if (weapon)
-				weapon = max(rank-1, weapon*5/2 * rank*rank/100) + 2 + 2 * bonus;
+			else if (armo) 
+				armo = max(rank-1, armo*5/2 * rank*rank/100) + 2 + 2 * bonus;
+			else if (weap)
+				weap = max(rank-1, weap*5/2 * rank*rank/100) + 2 + 2 * bonus;
 			
-			if (parr) parr = parr*5/2 * rank*rank/100;
+			if (brav) brav = brav*5/2 * rank*rank/100;
 			if (intu) intu = intu*5/2 * rank*rank/100;
 			if (will) will = will*5/2 * rank*rank/100;
+			if (agil) agil = agil*5/2 * rank*rank/100;
+			if (stre) stre = stre*5/2 * rank*rank/100;
+			if (hitt) hitt = hitt*5/2 * rank*rank/100;
+			if (parr) parr = parr*5/2 * rank*rank/100;
 			if (topd) topd = topd*5/2 * rank*rank/100;
 			if (mult) mult = mult*5/2 * rank*rank/100;
-			if (atks) atks = atks*5/2 * rank*rank/100;
+			if (thor) thor = thor*5/2 * rank*rank/100;
+			if (spel) spel = spel*5/2 * rank*rank/100;
+			if (resi) resi = resi*5/2 * rank*rank/100;
+			if (immu) immu = immu*5/2 * rank*rank/100;
 			
 			xtra = 4 * rank*rank/100;
 		}
 		else if ((temp >= 523 && temp <= 531) || temp == 1780) // Gold				3
 		{
-			if (armor && weapon)
+			if (armo && weap)
 			{
-				armor  = max(rank-1,  armor*4/3 * rank*rank/100) + 1 * bonus;
-				weapon = max(rank-1, weapon*4/3 * rank*rank/100) + 1 * bonus;
+				armo = max(rank-1, armo*4/3 * rank*rank/100) + 1 * bonus;
+				weap = max(rank-1, weap*4/3 * rank*rank/100) + 1 * bonus;
 			}
-			else if (armor) 
-				armor  = max(rank-1,  armor*4/3 * rank*rank/100) + 2 * bonus;
-			else if (weapon)
-				weapon = max(rank-1, weapon*4/3 * rank*rank/100) + 2 * bonus;
+			else if (armo) 
+				armo = max(rank-1, armo*4/3 * rank*rank/100) + 2 * bonus;
+			else if (weap)
+				weap = max(rank-1, weap*4/3 * rank*rank/100) + 2 * bonus;
 			
-			if (parr) parr = parr*4/3 * rank*rank/100;
+			if (brav) brav = brav*4/3 * rank*rank/100;
 			if (intu) intu = intu*4/3 * rank*rank/100;
 			if (will) will = will*4/3 * rank*rank/100;
+			if (agil) agil = agil*4/3 * rank*rank/100;
+			if (stre) stre = stre*4/3 * rank*rank/100;
+			if (hitt) hitt = hitt*4/3 * rank*rank/100;
+			if (parr) parr = parr*4/3 * rank*rank/100;
 			if (topd) topd = topd*4/3 * rank*rank/100;
 			if (mult) mult = mult*4/3 * rank*rank/100;
-			if (atks) atks = atks*4/3 * rank*rank/100;
+			if (thor) thor = thor*4/3 * rank*rank/100;
+			if (spel) spel = spel*4/3 * rank*rank/100;
+			if (resi) resi = resi*4/3 * rank*rank/100;
+			if (immu) immu = immu*4/3 * rank*rank/100;
 			
 			xtra = 4 * rank*rank/100;
 		}
 		else if ((temp >= 532 && temp <= 540) || temp == 1781) // Emerald			4
 		{
-			if (armor && weapon)
+			if (armo && weap)
 			{
-				armor  = max(rank/2,  armor*3/4 * rank*rank/100) + 1 * bonus;
-				weapon = max(rank/2, weapon*3/4 * rank*rank/100) + 1 * bonus;
+				armo = max(rank/2, armo*3/4 * rank*rank/100) + 1 * bonus;
+				weap = max(rank/2, weap*3/4 * rank*rank/100) + 1 * bonus;
 			}
-			else if (armor) 
-				armor  = max(rank/2,  armor*3/4 * rank*rank/100) + 2 * bonus;
+			else if (armo) 
+				armo = max(rank/2, armo*3/4 * rank*rank/100) + 2 * bonus;
 			else if (weapon)
-				weapon = max(rank/2, weapon*3/4 * rank*rank/100) + 2 * bonus;
+				weap = max(rank/2, weap*3/4 * rank*rank/100) + 2 * bonus;
 			
-			if (parr) parr = parr*3/4 * rank*rank/100;
+			if (brav) brav = brav*3/4 * rank*rank/100;
 			if (intu) intu = intu*3/4 * rank*rank/100;
 			if (will) will = will*3/4 * rank*rank/100;
+			if (agil) agil = agil*3/4 * rank*rank/100;
+			if (stre) stre = stre*3/4 * rank*rank/100;
+			if (hitt) hitt = hitt*3/4 * rank*rank/100;
+			if (parr) parr = parr*3/4 * rank*rank/100;
 			if (topd) topd = topd*3/4 * rank*rank/100;
 			if (mult) mult = mult*3/4 * rank*rank/100;
-			if (atks) atks = atks*3/4 * rank*rank/100;
+			if (thor) thor = thor*3/4 * rank*rank/100;
+			if (spel) spel = spel*3/4 * rank*rank/100;
+			if (resi) resi = resi*3/4 * rank*rank/100;
+			if (immu) immu = immu*3/4 * rank*rank/100;
 			
 			xtra = 4 * rank*rank/100;
 		}
 		else if ((temp >= 541 && temp <= 549) || temp == 1782) // Crystal			5
 		{
-			if (armor && weapon)
+			if (armo && weap)
 			{
-				armor  = max(rank/2,  armor*2/5 * rank*rank/100) + 1 * bonus;
-				weapon = max(rank/2, weapon*2/5 * rank*rank/100) + 1 * bonus;
+				armo = max(rank/2, armo*2/5 * rank*rank/100) + 1 * bonus;
+				weap = max(rank/2, weap*2/5 * rank*rank/100) + 1 * bonus;
 			}
-			else if (armor) 
-				armor  = max(rank/2,  armor*2/5 * rank*rank/100) + 2 * bonus;
+			else if (armo) 
+				armo = max(rank/2, armo*2/5 * rank*rank/100) + 2 * bonus;
 			else if (weapon)
-				weapon = max(rank/2, weapon*2/5 * rank*rank/100) + 2 * bonus;
+				weap = max(rank/2, weap*2/5 * rank*rank/100) + 2 * bonus;
 			
-			if (parr) parr = parr*2/5 * rank*rank/100;
+			if (brav) brav = brav*2/5 * rank*rank/100;
 			if (intu) intu = intu*2/5 * rank*rank/100;
 			if (will) will = will*2/5 * rank*rank/100;
+			if (agil) agil = agil*2/5 * rank*rank/100;
+			if (stre) stre = stre*2/5 * rank*rank/100;
+			if (hitt) hitt = hitt*2/5 * rank*rank/100;
+			if (parr) parr = parr*2/5 * rank*rank/100;
 			if (topd) topd = topd*2/5 * rank*rank/100;
 			if (mult) mult = mult*2/5 * rank*rank/100;
-			if (atks) atks = atks*2/5 * rank*rank/100;
+			if (thor) thor = thor*2/5 * rank*rank/100;
+			if (spel) spel = spel*2/5 * rank*rank/100;
+			if (resi) resi = resi*2/5 * rank*rank/100;
+			if (immu) immu = immu*2/5 * rank*rank/100;
 			
 			xtra = 4 * rank*rank/100;
 		}
 		else if ((temp >= 572 && temp <= 580) || temp == 1783) // Titanium			6
 		{
-			if (armor && weapon)
+			if (armo && weap)
 			{
-				armor  = max((rank+1)/3,  armor/6 * rank*rank/100) + 1 * bonus;
-				weapon = max((rank+1)/3, weapon/6 * rank*rank/100) + 1 * bonus;
+				armo = max((rank+1)/3, armo/6 * rank*rank/100) + 1 * bonus;
+				weap = max((rank+1)/3, weap/6 * rank*rank/100) + 1 * bonus;
 			}
 			else if (armor) 
-				armor  = max((rank+1)/3,  armor/6 * rank*rank/100) + 2 * bonus;
+				armo = max((rank+1)/3, armo/6 * rank*rank/100) + 2 * bonus;
 			else if (weapon)
-				weapon = max((rank+1)/3, weapon/6 * rank*rank/100) + 2 * bonus;
+				weap = max((rank+1)/3, weap/6 * rank*rank/100) + 2 * bonus;
 			
-			if (parr) parr = parr/6 * rank*rank/100;
+			if (brav) brav = brav/6 * rank*rank/100;
 			if (intu) intu = intu/6 * rank*rank/100;
 			if (will) will = will/6 * rank*rank/100;
+			if (agil) agil = agil/6 * rank*rank/100;
+			if (stre) stre = stre/6 * rank*rank/100;
+			if (hitt) hitt = hitt/6 * rank*rank/100;
+			if (parr) parr = parr/6 * rank*rank/100;
 			if (topd) topd = topd/6 * rank*rank/100;
 			if (mult) mult = mult/6 * rank*rank/100;
-			if (atks) atks = atks/6 * rank*rank/100;
+			if (thor) thor = thor/6 * rank*rank/100;
+			if (spel) spel = spel/6 * rank*rank/100;
+			if (resi) resi = resi/6 * rank*rank/100;
+			if (immu) immu = immu/6 * rank*rank/100;
 			
 			xtra = 4 * rank*rank/100;
 		}
-		else if ((temp >= 693 && temp <= 701) || temp == 1784) // Adamantium		6.5
+		else if ((temp >= 693 && temp <= 701) || temp == 1784) // Adamantium		7
 		{
-			if (armor && weapon)
+			if (armo && weap)
 			{
-				armor  = max((rank+1)/3,  armor/13 * rank*rank/100) + 1 * bonus;
-				weapon = max((rank+1)/3, weapon/13 * rank*rank/100) + 1 * bonus;
+				armo = 1 * bonus;
+				weap = 1 * bonus;
 			}
-			else if (armor) 
-				armor  = max((rank+1)/3,  armor/13 * rank*rank/100) + 2 * bonus;
+			else if (armo) 
+				armo = 2 * bonus;
 			else if (weapon)
-				weapon = max((rank+1)/3, weapon/13 * rank*rank/100) + 2 * bonus;
-			
-			if (IS_WPDAGGER(in))  will -= 4;
-			if (IS_WPSTAFF(in))   intu -= 4;
-			if (IS_WPSPEAR(in)) { will -= 2; intu -= 2; }
-			if (IS_WPSHIELD(in))  will -= 2;
-			
-			if (parr) parr = parr/6 * rank*rank/100;
-			if (intu) intu = intu/6 * rank*rank/100;
-			if (will) will = will/6 * rank*rank/100;
-			if (topd) topd = topd/6 * rank*rank/100;
-			if (mult) mult = mult/6 * rank*rank/100;
-			if (atks) atks = atks/6 * rank*rank/100;
+				weap = 2 * bonus;
 		}
-		else
-		{
-			// How did we get here?
-		}
-		if (xtra)
+		else { } // How did we get here?
+		if (xtra) // extra bonus stats usually granted by Adamant weapons
 		{
 			if      (IS_WPGAXE(in) || IS_WPAXE(in))       { stre += xtra;   agil += xtra/2; }
 			else if (IS_WPTWOHAND(in) || IS_WPCLAW(in))   { agil += xtra;   stre += xtra/2; }
@@ -18592,40 +18619,44 @@ void do_check_new_item_level(int cn, int in)
 			else if (IS_WPSTAFF(in))                      { intu += xtra;   stre += xtra/2; }
 			else if (IS_WPDAGGER(in))                     { will += xtra;   agil += xtra/2; }
 		}
-		if (armor)  it[in].armor[I_P]          = armor;
-		if (weapon) it[in].weapon[I_P]         = weapon;
-		if (parr)   it[in].to_parry[I_P]       = parr;
-		if (brav)   it[in].attrib[AT_BRV][I_P] = brav;
-		if (will)   it[in].attrib[AT_WIL][I_P] = will;
-		if (intu)   it[in].attrib[AT_INT][I_P] = intu;
-		if (agil)   it[in].attrib[AT_AGL][I_P] = agil;
-		if (stre)   it[in].attrib[AT_STR][I_P] = stre;
-		if (topd)   it[in].top_damage[I_P]     = topd;
-		if (mult)   it[in].crit_multi[I_P]     = mult;
-		if (atks)   it[in].atk_speed[I_P]      = atks;
+		if (armo) it[in].armor[I_P]            = armo;
+		if (weap) it[in].weapon[I_P]           = weap;
+		if (brav) it[in].attrib[AT_BRV][I_P]   = brav;
+		if (intu) it[in].attrib[AT_INT][I_P]   = intu;
+		if (will) it[in].attrib[AT_WIL][I_P]   = will;
+		if (agil) it[in].attrib[AT_AGL][I_P]   = agil;
+		if (stre) it[in].attrib[AT_STR][I_P]   = stre;
+		if (hitt) it[in].to_hit[I_P]           = hitt;
+		if (parr) it[in].to_parry[I_P]         = parr;
+		if (topd) it[in].top_damage[I_P]       = topd;
+		if (mult) it[in].crit_multi[I_P]       = mult;
+		if (thor) it[in].gethit_dam[I_P]       = thor;
+		if (spel) it[in].spell_pow[I_P]        = spel;
+		if (resi) it[in].skill[SK_RESIST][I_P] = resi;
+		if (immu) it[in].skill[SK_IMMUN][I_P]  = immu;
 		
 		if (IS_SKUAWEAP(in))
 		{
-			it[in].speed[I_P]      = 4 * bonus * rank/20 + 4 * bonus;
+			it[in].speed[I_P]      = 5 * bonus * rank/20 + 5 * bonus;
 			ench = 57 + RANDOM(4);
 		}
 		else if (IS_GORNWEAP(in))
 		{
-			it[in].spell_pow[I_P]  = 2 * bonus * rank/20 + 2 * bonus;
+			it[in].spell_pow[I_P]  = 2 * bonus * rank/20 + 2 * bonus + spel;
 			ench = 65 + RANDOM(4);
 		}
 		else if (IS_KWAIWEAP(in))
 		{
-			it[in].to_hit[I_P]     = 2 * bonus * rank/20 + 2 * bonus;
+			it[in].to_hit[I_P]     = 2 * bonus * rank/20 + 2 * bonus + hitt;
 			it[in].to_parry[I_P]   = 2 * bonus * rank/20 + 2 * bonus + parr;
 			ench = 61 + RANDOM(4);
 		}
 		else if (IS_PURPWEAP(in))
 		{
-			it[in].speed[I_P]      = 2 * bonus * rank/20 + 2 * bonus;
-			it[in].spell_pow[I_P]  = 1 * bonus * rank/20 + 1 * bonus;
-			it[in].to_hit[I_P]     = 1 * bonus * rank/20 + 1 * bonus;
-			it[in].to_parry[I_P]   = 1 * bonus * rank/20 + 1 * bonus + parr;
+			it[in].speed[I_P]      = 5/2 * bonus * rank/20 + 5/2 * bonus;
+			it[in].spell_pow[I_P]  = 1   * bonus * rank/20 + 1   * bonus + spel;
+			it[in].to_hit[I_P]     = 1   * bonus * rank/20 + 1   * bonus + hitt;
+			it[in].to_parry[I_P]   = 1   * bonus * rank/20 + 1   * bonus + parr;
 			ench = 69 + RANDOM(4);
 		}
 		
