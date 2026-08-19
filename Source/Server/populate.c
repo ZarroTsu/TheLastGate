@@ -114,7 +114,7 @@ int pop_create_godly_weapon(int cn, int temp, int godroll)
 		case 1:
 			gend = " god ";     godn = "Skua";
 			it[in].flags            |= IF_KWAI_UNI | IF_GORN_UNI;
-			it[in].speed[I_P]       +=  4 * bonus;
+			it[in].speed[I_P]       += 10 * bonus;
 			break;
 		case 2:
 			gend = " goddess "; godn = "Kwai";
@@ -130,7 +130,7 @@ int pop_create_godly_weapon(int cn, int temp, int godroll)
 		default:
 			gend = " ";			godn = "Purple One";
 			it[in].flags            |= IF_PURP_UNI;
-			it[in].speed[I_P]       +=  2 * bonus;
+			it[in].speed[I_P]       +=  5 * bonus;
 			it[in].to_hit[I_P]      +=  1 * bonus;
 			it[in].to_parry[I_P]    +=  1 * bonus;
 			it[in].spell_pow[I_P]   +=  1 * bonus;

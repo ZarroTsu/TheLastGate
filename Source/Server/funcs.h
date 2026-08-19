@@ -301,7 +301,6 @@ void do_trash(int cn);
 void do_swap_gear(int cn);
 void do_force_recall(int cn);
 void do_give_bspoints(int cn, int p, int gflag);
-void do_shadow_warp(int cn, int co);
 
 //-- use --
 void use_activate(int cn, int in, int flag, int carried);

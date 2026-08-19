@@ -1552,60 +1552,6 @@ struct know know[] = {
 	{{"!passive",		NULL},	0,	AR_GENERAL, CT_COMPANION, 	NULL, 	SP_PASSIVE},
 	{{"!offense",		NULL},	0,	AR_GENERAL, CT_COMPANION, 	NULL, 	SP_OFFENSE},
 	
-	// Arch GC					CT_ARCHCOMP
-	{{"!command",		NULL},	0,	AR_GENERAL,	CT_ARCHCOMP,	NULL, 	SP_COMMAND},
-	{{"!stop",			NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_STOP},
-	{{"!move","!north",	NULL},	0,	AR_GENERAL,	CT_ARCHCOMP,	NULL, 	SP_MOVE_N},
-	{{"!move","!east",	NULL},	0,	AR_GENERAL,	CT_ARCHCOMP,	NULL, 	SP_MOVE_E},
-	{{"!move","!south",	NULL},	0,	AR_GENERAL,	CT_ARCHCOMP,	NULL, 	SP_MOVE_S},
-	{{"!move","!west",	NULL},	0,	AR_GENERAL,	CT_ARCHCOMP,	NULL, 	SP_MOVE_W},
-	{{"!move",			NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_MOVE},
-	{{"!attack",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_ATTACK},
-	{{"!wait",			NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_WAIT},
-	{{"!follow",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_FOLLOW},
-	{{"!transfer",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_TRANSFER},
-	{{"!geronimo",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_SPELLINFO},
-	{{"!quiet",			NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_QUIET},
-	{{"!defense",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_DEFENSE},
-	{{"!passive",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_PASSIVE},
-	{{"!offense",		NULL},	0,	AR_GENERAL, CT_ARCHCOMP, 	NULL, 	SP_OFFENSE},
-	
-	// Caster GC				CT_CASTERCOMP		
-	{{"!command",		NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_COMMAND},
-	{{"!stop",			NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_STOP},
-	{{"!move","!north",	NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_MOVE_N},
-	{{"!move","!east",	NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_MOVE_E},
-	{{"!move","!south",	NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_MOVE_S},
-	{{"!move","!west",	NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_MOVE_W},
-	{{"!move",			NULL},	0,	AR_GENERAL,	CT_CASTERCOMP,	NULL, 	SP_MOVE},
-	{{"!attack",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP,	NULL, 	SP_ATTACK},
-	{{"!wait",			NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_WAIT},
-	{{"!follow",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_FOLLOW},
-	{{"!transfer",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_TRANSFER},
-	{{"!geronimo",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_SPELLINFO},
-	{{"!quiet",			NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_QUIET},
-	{{"!defense",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_DEFENSE},
-	{{"!passive",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_PASSIVE},
-	{{"!offense",		NULL},	0,	AR_GENERAL, CT_CASTERCOMP, 	NULL, 	SP_OFFENSE},
-	
-	// Arch Caster GC			CT_ARCHCASTER
-	{{"!command",		NULL},	0,	AR_GENERAL,	CT_ARCHCASTER,	NULL, 	SP_COMMAND},
-	{{"!stop",			NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_STOP},
-	{{"!move","!north",	NULL},	0,	AR_GENERAL,	CT_ARCHCASTER,	NULL, 	SP_MOVE_N},
-	{{"!move","!east",	NULL},	0,	AR_GENERAL,	CT_ARCHCASTER,	NULL, 	SP_MOVE_E},
-	{{"!move","!south",	NULL},	0,	AR_GENERAL,	CT_ARCHCASTER,	NULL, 	SP_MOVE_S},
-	{{"!move","!west",	NULL},	0,	AR_GENERAL,	CT_ARCHCASTER,	NULL, 	SP_MOVE_W},
-	{{"!move",			NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_MOVE},
-	{{"!attack",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_ATTACK},
-	{{"!wait",			NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_WAIT},
-	{{"!follow",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_FOLLOW},
-	{{"!transfer",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_TRANSFER},
-	{{"!geronimo",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_SPELLINFO},
-	{{"!quiet",			NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_QUIET},
-	{{"!defense",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_DEFENSE},
-	{{"!passive",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_PASSIVE},
-	{{"!offense",		NULL},	0,	AR_GENERAL, CT_ARCHCASTER, 	NULL, 	SP_OFFENSE},
-	
 	// Thrall commands
 	{{"!move","!north",	NULL},	0,	AR_THRALL,	0,	NULL, 	SP_MOVE_N},
 	{{"!move","!east",	NULL},	0,	AR_THRALL,	0,	NULL, 	SP_MOVE_E},
@@ -1624,14 +1570,8 @@ struct know know[] = {
 
 int obey(int cn, int co)
 {
-	if (ch[cn].data[CHD_MASTER]==co)
-	{
-		return 1;
-	}
-	if ((ch[cn].data[26] & ch[co].kindred) && (ch[cn].data[28] & 1))
-	{
-		return( 2);
-	}
+	if (ch[cn].data[CHD_MASTER]==co) return 1;
+	if ((ch[cn].data[26] & ch[co].kindred) && (ch[cn].data[28] & 1)) return 2;
 	return 0;
 }
 
@@ -1662,7 +1602,11 @@ void answer_transfer(int cn, int co, int msg)
 	int removeshadow = 0, n, in;
 	if (obey(cn, co)==1)
 	{
-		if (IS_SHADOW(cn)) 
+		if (IS_ITEMTHRALL(cn))
+		{
+			//
+		}
+		else if (IS_SHADOW(cn)) 
 		{
 			ch[co].data[PCD_SHADOWCOPY] = 0;
 			removeshadow = 1;
@@ -3320,60 +3264,38 @@ void npc_hear(int cn, int co, char *text)
 	if (!strcasecmp(text, ch[cn].text[6]))
 	{
 		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
-		{
 			ch[cn].data[n] = 0;
-		}
-
+		
 		ch[cn].attack_cn = 0;
 		ch[cn].goto_x = ch[cn].goto_y = 0;
 		ch[cn].misc_action = 0;
-
+		
 		ch[cn].data[78] = 0;
 		ch[cn].data[27] = globs->ticker;
 		if (ch[cn].text[7][0])
-		{
 			do_sayx(cn, ch[cn].text[7]);
-		}
 		return;
 	}
-
+	
 	// dont talk to enemies
 	if (!obey(cn, co))
 	{
 		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
-			if ((ch[cn].data[n] & 0xffff)==co)
-			{
-				return;
-			}
+			if ((ch[cn].data[n] & 0xffff)==co) return;
 		}
 	}
-
-	for (n = 0; n<20; n++)
-	{
-		word[n][0] = 0;
-	}
-
+	
+	for (n = 0; n<20; n++) word[n][0] = 0;
+	
 	strcpy(buf, text);
 	strlower(buf);
-
+	
 	for (z = n = cnt = 0; buf[z]; z++)
 	{
-		if (buf[z]=='!')
-		{
-			exclam++;
-			continue;
-		}
-		if (buf[z]=='?')
-		{
-			question++;
-			continue;
-		}
-		if (!isspace(buf[z]) && !isalnum(buf[z]))
-		{
-			continue;
-		}
-
+		if (buf[z]=='!')  { exclam++;             continue; }
+		if (buf[z]=='?')  { question++;           continue; }
+		if (!isspace(buf[z]) && !isalnum(buf[z])) continue;
 		if (!isspace(buf[z]) && n<39)
 		{
 			word[cnt][n++] = buf[z];
@@ -3384,23 +3306,11 @@ void npc_hear(int cn, int co, char *text)
 			if (!flag)
 			{
 				word[cnt][n] = 0;
-				if (is_fillword(word[cnt]))
-				{
-					;
-				}
-				else if (!strcasecmp(word[cnt], ch[cn].name))
-				{
-					name = 1;
-				}
-				else
-				{
-					cnt++;
-				}
+				if (is_fillword(word[cnt])) ;
+				else if (!strcasecmp(word[cnt], ch[cn].name)) name = 1;
+				else cnt++;
 				n = 0;
-				if (cnt==20)
-				{
-					break;
-				}
+				if (cnt==20) break;
 				flag = 1;
 			}
 		}
@@ -3408,100 +3318,44 @@ void npc_hear(int cn, int co, char *text)
 	if (n)
 	{
 		word[cnt][n] = 0;
-		if (is_fillword(word[cnt]))
-		{
-			;
-		}
-		else if (!strcasecmp(word[cnt], ch[cn].name))
-		{
-			name = 1;
-		}
-		else
-		{
-			word[cnt][n] = 0;
-			cnt++;
-		}
+		if (is_fillword(word[cnt])) ;
+		else if (!strcasecmp(word[cnt], ch[cn].name)) name = 1;
+		else { word[cnt][n] = 0; cnt++; }
 	}
-
-	for (n = 0; n<cnt; n++)
-	{
-		replace_synonym(word[n]);
-	}
-
-/*      for (n=0; n<cnt; n++) {
-                do_sayx(cn,"%d: \"%s\".",cn,word[n]);
-        }
-
-        do_sayx(cn,"Question=%d, Exlam=%d, name=%d",question,exclam,name); */
-
+	
+	for (n = 0; n<cnt; n++) replace_synonym(word[n]);
+	
+/*	for (n=0; n<cnt; n++) do_sayx(cn,"%d: \"%s\".",cn,word[n]);
+	do_sayx(cn,"Question=%d, Exlam=%d, name=%d",question,exclam,name); */
+	
 	for (n = 0; n<sizeof(know) / sizeof(know[0]); n++)
 	{
-		if (ch[cn].data[68]>=know[n].value // NPC level of knowledge is >= "value" of the response
-			&& 
-			(ch[cn].data[72]==know[n].area || ch[cn].data[72]==AR_ALL || know[n].area==AR_GENERAL) // If the NPC knows the area, or if it is general knowledge
-			&& 
-			(!know[n].temp || know[n].temp==ch[cn].temp)) // If the template is 0, or the template matches the NPC template number
+		// NPC level of knowledge is >= "value" of the response  // If the NPC knows the area, or if it is general knowledge
+		if (ch[cn].data[68]>=know[n].value && (ch[cn].data[72]==know[n].area || ch[cn].data[72]==AR_ALL || know[n].area==AR_GENERAL)
+			&& (!know[n].temp || know[n].temp == ch[cn].temp  // template 0 or match
+			|| (know[n].temp == CT_COMPANION && IS_REPLYMINION(cn) )))  // Minion response templates
 		{
-
 			hit = miss = 0;
-
-			for (z = 0; z<cnt; z++)
-			{
-				gotword[z] = 0;
-			}
-
+			
+			for (z = 0; z<cnt; z++) gotword[z] = 0;
+			
 			for (m = 0; know[n].word[m]; m++)
 			{
 				if (know[n].word[m][1]==0)
 				{
 					found = 0;
-					if (know[n].word[m][0]=='?')
-					{
-						if (question)
-						{
-							found = 1;
-						}
-					}
-					else if (know[n].word[m][0]=='!')
-					{
-						if (exclam)
-						{
-							found = 1;
-						}
-					}
-					else if (know[n].word[m][0]=='$')
-					{
-						if (name)
-						{
-							found = 1;
-						}
-					}
-					if (found)
-					{
-						hit++;
-					}
-					else
-					{
-						miss++;
-					}
+					if (know[n].word[m][0]=='?')      { if (question) found = 1; }
+					else if (know[n].word[m][0]=='!') { if (exclam)   found = 1; }
+					else if (know[n].word[m][0]=='$') { if (name)     found = 1; }
+					if (found)  hit++;
+					else        miss++;
 				}
 				else
 				{
-					if (know[n].word[m][0]=='?')
-					{
-						misscost = 1;
-						hitcost  = 1;
-					}
-					else if (know[n].word[m][0]=='!')
-					{
-						misscost = 5;
-						hitcost  = 2;
-					}
-					else
-					{
-						hitcost = misscost = 0;
-					}
-
+					if (know[n].word[m][0]=='?')      { misscost = 1; hitcost = 1; }
+					else if (know[n].word[m][0]=='!') { misscost = 5; hitcost = 2; }
+					else                              { hitcost = misscost = 0; }
+					
 					for (z = 0; z<cnt; z++)
 					{
 						if (!strcmp(word[z], know[n].word[m] + 1))
@@ -3510,26 +3364,14 @@ void npc_hear(int cn, int co, char *text)
 							break;
 						}
 					}
-					if (z==cnt)
-					{
-						miss += misscost;
-					}
-					else
-					{
-						hit += hitcost;
-					}
+					if (z==cnt)  miss += misscost;
+					else         hit  += hitcost;
 				}
 			}
 			for (z = 0; z<cnt; z++)
 			{
-				if (gotword[z])
-				{
-					hit++;
-				}
-				else
-				{
-					miss++;
-				}
+				if (gotword[z])  hit++;
+				else             miss++;
 			}
 			conf = hit - miss;
 			if (conf>bestconf)
@@ -3537,16 +3379,13 @@ void npc_hear(int cn, int co, char *text)
 				bestconf = conf;
 				bestnr = n;
 			}
-//                      do_sayx(cn,"%d: %s",conf,know[n].answer);
+//			do_sayx(cn,"%d: %s",conf,know[n].answer);
 		}
 	}
-
+	
 	talk = ch[cn].data[MCD_TALKATIVE] + name;
-	if (obey(cn, co))
-	{
-		talk += 20;
-	}
-
+	if (obey(cn, co)) talk += 20;
+	
 	if (talk>0)     // only talk if we're talkative or addressed directly
 	{
 		if (bestconf>0)
@@ -3564,16 +3403,9 @@ void npc_hear(int cn, int co, char *text)
 		}
 		else
 		{
-			if (name)
-			{
-				do_sayx(cn, "I don't know about that.");
-			}
-			if (bestconf<=0)
-			{
-				chlog(cn, "Could not answer \"%s\".", text);
-			}
+			if (name)         do_sayx(cn, "I don't know about that.");
+			if (bestconf<=0)  chlog(cn, "Could not answer \"%s\".", text);
 		}
 	}
-
-//      do_sayx(cn,"talk=%d, bestconf=%d",talk,bestconf);
+//	do_sayx(cn,"talk=%d, bestconf=%d",talk,bestconf);
 }

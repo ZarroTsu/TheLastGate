@@ -6062,7 +6062,7 @@ void do_command(int cn, char *ptr)
 		}
 		if (prefix(cmd, "addkills") && f_gi)
 		{
-			god_add_item_kills(cn, dbatoi(arg[1]));
+			god_add_item_kills(cn, atoi(arg[1]));
 			return;
 		}
 		if (prefix(cmd, "autodepot") && !f_m)
@@ -8164,6 +8164,14 @@ void do_char_killed(int cn, int co, int pentsolve)
 		ch[co].gold = 0;
 	}
 	
+	// Item thralls pass held exp to master
+	if (IS_ITEMTHRALL(co) && IS_SANEPLAYER(ch[co].data[CHD_MASTER]))
+	{
+		do_give_exp(ch[co].data[CHD_MASTER], ch[co].data[28], 1, -1, 0);
+		fx_add_effect(6, 0, ch[ch[co].data[CHD_MASTER]].x, ch[ch[co].data[CHD_MASTER]].y, 0);
+		fx_add_effect(7, 0, ch[co].x, ch[co].y, 0);
+	}
+	
 	// Un-wedge doors
 	if (!IS_PLAYER(co) && (ch[co].data[26])) npc_wedge_doors(co, 0);
 	
@@ -9973,8 +9981,8 @@ int do_surround_check(int cn, int co, int gethit) // cn is the attacker, co is t
 	m1 = XY2M(ch[cn].x, ch[cn].y);                                                 // Get our map flags
 	m2 = XY2M(ch[co].x, ch[co].y);                                                 // Get their map flags
 	
-	if (IS_COMPANION(cn)) cnm = ch[cn].data[CHD_MASTER];                           // Get our master - if we're a GC
-	if (IS_COMPANION(co)) com = ch[co].data[CHD_MASTER];                           // Get their master - if they're a GC
+	if (IS_COMPANION(cn) || IS_ITEMTHRALL(cn)) cnm = ch[cn].data[CHD_MASTER];      // Get our master - if we're a GC
+	if (IS_COMPANION(co) || IS_ITEMTHRALL(co)) com = ch[co].data[CHD_MASTER];      // Get their master - if they're a GC
 	
 	if (IS_PLAYER(cn))
 	{
@@ -18352,7 +18360,7 @@ int may_attack_msg(int cn, int co, int msg)
 		cn = ch[cn].data[CHD_MASTER];
 	}
 	*/
-	if (IS_COMPANION(cn) && ch[cn].data[64]==0 && IS_SANECHAR(ch[cn].data[CHD_MASTER]))
+	if ((IS_COMPANION(cn) || IS_ITEMTHRALL(cn)) && ch[cn].data[64]==0 && IS_SANECHAR(ch[cn].data[CHD_MASTER]))
 		cc = ch[cn].data[CHD_MASTER];
 
 	// NPCs may attack anyone, anywhere
@@ -18643,26 +18651,26 @@ void do_check_new_item_level(int cn, int in)
 		
 		if (IS_SKUAWEAP(in))
 		{
-			it[in].speed[I_P]      = (15 * bonus * rank/10 + 5 * bonus)/2;
+			it[in].speed[I_P]      = (10 * bonus * rank/10 + 10 * bonus)/2;
 			ench = 57 + RANDOM(4);
 		}
 		else if (IS_GORNWEAP(in))
 		{
-			it[in].spell_pow[I_P]  = ( 3 * bonus * rank/10 + 1 * bonus)/2 + spel;
+			it[in].spell_pow[I_P]  = ( 2 * bonus * rank/10 +  2 * bonus)/2 + spel;
 			ench = 65 + RANDOM(4);
 		}
 		else if (IS_KWAIWEAP(in))
 		{
-			it[in].to_hit[I_P]     = ( 3 * bonus * rank/10 + 1 * bonus)/2 + hitt;
-			it[in].to_parry[I_P]   = ( 3 * bonus * rank/10 + 1 * bonus)/2 + parr;
+			it[in].to_hit[I_P]     = ( 2 * bonus * rank/10 +  2 * bonus)/2 + hitt;
+			it[in].to_parry[I_P]   = ( 2 * bonus * rank/10 +  2 * bonus)/2 + parr;
 			ench = 61 + RANDOM(4);
 		}
 		else if (IS_PURPWEAP(in))
 		{
-			it[in].speed[I_P]      = (15 * bonus * rank/10 + 5 * bonus)/4;
-			it[in].spell_pow[I_P]  = ( 3 * bonus * rank/10 + 1 * bonus)/4 + spel;
-			it[in].to_hit[I_P]     = ( 3 * bonus * rank/10 + 1 * bonus)/4 + hitt;
-			it[in].to_parry[I_P]   = ( 3 * bonus * rank/10 + 1 * bonus)/4 + parr;
+			it[in].speed[I_P]      = (10 * bonus * rank/10 + 10 * bonus)/4;
+			it[in].spell_pow[I_P]  = ( 2 * bonus * rank/10 +  2 * bonus)/4 + spel;
+			it[in].to_hit[I_P]     = ( 2 * bonus * rank/10 +  2 * bonus)/4 + hitt;
+			it[in].to_parry[I_P]   = ( 2 * bonus * rank/10 +  2 * bonus)/4 + parr;
 			ench = 69 + RANDOM(4);
 		}
 		
@@ -19043,19 +19051,6 @@ void do_spellignore(int cn)
 	{
 		do_char_log(cn, 1, "Now reacting to spell attacks.\n");
 	}
-}
-
-void do_shadow_warp(int cn, int co)
-{
-	int cc;
-	
-	if (!IS_SANECHAR(cn))                           return;
-	if (!IS_SANECHAR(cc = ch[cn].data[CHD_MASTER])) return;
-	if (!do_get_iflag(cc, SF_SIGN_SHAD))            return;
-	if (ch[cc].data[PCD_SHADOWCOPY] != cn)          return;
-	if (!IS_LIVINGCHAR(co))                         return;
-	
-	quick_teleport(cn, ch[co].x, ch[co].y);
 }
 
 /* CS, 000209: Remember PvP attacks */

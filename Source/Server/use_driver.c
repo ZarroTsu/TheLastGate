@@ -7003,7 +7003,7 @@ void really_spawn_minion(int cn, int cc)
 {
 	int n, m, in, base, v = 4, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
 	
-	base = (getrank(cn)+1) * 12;
+	base = (getrank(cn)+1) * 11;
 	
 	// Adjust the template to reflect desired stat growth
 	switch (ch[cc].temp)
@@ -11934,6 +11934,15 @@ int step_teleport(int cn, int in)
 	{
 		if (IS_SANECHAR(gc)) god_transfer_char(gc, m3 % MAPX, m3 / MAPX);
 		if (IS_SANECHAR(sc)) god_transfer_char(sc, m3 % MAPX, m3 / MAPX);
+		for (j=1; j<MAXCHARS; j++)
+		{
+			if (ch[j].used==USE_EMPTY) continue;
+			if (!IS_ITEMTHRALL(j))     continue;
+			if (ch[j].data[CHD_MASTER] == cn)
+			{
+				god_transfer_char(j, m3 % MAPX, m3 / MAPX);
+			}
+		}
 	}
 	
 	return(2); // TELEPORT_SUCCESS

@@ -945,7 +945,7 @@ int god_take_from_char(int in, int cn)
 
 int god_transfer_char(int cn, int x, int y)
 {
-	int ret = 0, gc, sc;
+	int ret = 0, j, gc, sc;
 	
 	if (!IS_SANECHAR(cn) || !SANEXY(x, y))
 	{
@@ -974,13 +974,26 @@ int god_transfer_char(int cn, int x, int y)
 		{
 			if (IS_SANECHAR(gc) && ch[gc].data[CHD_MASTER]==cn)
 			{
-				if (IS_IN_INDW(x, y) && has_buff(gc, SK_LIGHT)) remove_buff(gc, SK_LIGHT);
+				if (IS_IN_INDW(x, y) && has_buff(gc, SK_LIGHT)) 
+					remove_buff(gc, SK_LIGHT);
 				god_transfer_char(gc, x, y);
 			}
 			if (IS_SANECHAR(sc) && ch[sc].data[CHD_MASTER]==cn)
 			{
-				if (IS_IN_INDW(x, y) && has_buff(sc, SK_LIGHT)) remove_buff(sc, SK_LIGHT);
+				if (IS_IN_INDW(x, y) && has_buff(sc, SK_LIGHT)) 
+					remove_buff(sc, SK_LIGHT);
 				god_transfer_char(sc, x, y);
+			}
+			for (j=1; j<MAXCHARS; j++)
+			{
+				if (ch[j].used==USE_EMPTY) continue;
+				if (!IS_ITEMTHRALL(j))     continue;
+				if (ch[j].data[CHD_MASTER] == cn)
+				{
+					if (IS_IN_INDW(x, y) && has_buff(j, SK_LIGHT)) 
+						remove_buff(j, SK_LIGHT);
+					god_transfer_char(j, x, y);
+				}
 			}
 		}
 		return 1;
@@ -1632,7 +1645,7 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 						gend = " god ";
 						godn = "Skua";
 						it[in].flags |= IF_KWAI_UNI | IF_GORN_UNI;
-						it[in].speed[I_P]      +=  4 * bonus;
+						it[in].speed[I_P]      += 10 * bonus;
 						break;
 					case 2:
 						gend = " goddess ";
@@ -1651,10 +1664,10 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 						gend = " ";
 						godn = "Purple One";
 						it[in].flags |= IF_PURP_UNI;
-						it[in].speed[I_P]       +=  2 * bonus;
-						it[in].to_hit[I_P]      +=  1 * bonus;
-						it[in].to_parry[I_P]    +=  1 * bonus;
-						it[in].spell_pow[I_P]   +=  1 * bonus;
+						it[in].speed[I_P]      +=  5 * bonus;
+						it[in].to_hit[I_P]     +=  1 * bonus;
+						it[in].to_parry[I_P]   +=  1 * bonus;
+						it[in].spell_pow[I_P]  +=  1 * bonus;
 						break;
 				}
 				if (it_temp[x].armor[I_I] && it_temp[x].weapon[I_I])
@@ -1670,15 +1683,14 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 				it[in].max_damage = 0;
 				it[in].flags |= IF_SINGLEAGE | IF_SHOPDESTROY | IF_NOMARKET | IF_UNIQUE | IF_NOREPAIR;
 				it[in].flags &= ~(IF_CAN_SS | IF_CAN_EN);
+				
 				strcpy(name, it[in].name);
 				strcpy(refer, it[in].reference);
 				strcpy(descr, it[in].description);
-				sprintf(name, "%s's %s", godn, name);
-				strncpy(it[in].name, name, 39);
-				sprintf(refer, "%s's %s", godn, refer);
-				strncpy(it[in].reference, refer, 39);
-				sprintf(descr, "%s It has been blessed by the%s%s.", descr, gend, godn);
-				strncpy(it[in].description, descr, 199);
+				
+				sprintf(it[in].name, "%s's %s", godn, name);
+				sprintf(it[in].reference, "%s's %s", godn, refer);
+				sprintf(it[in].description, "%s It has been blessed by the%s%s.", descr, gend, godn);
 				
 				if (is_unique_able(x) > 54) // Claws
 				{

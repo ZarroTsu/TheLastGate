@@ -162,6 +162,37 @@ int npc_dist(int cn, int co)
 	return(max(abs(ch[cn].x - ch[co].x), abs(ch[cn].y - ch[co].y)));
 }
 
+void npc_shadow_warp(int cn, int co, int cc)
+{
+	if (!IS_SANECHAR(cn))                  return;
+	if (!IS_LIVINGCHAR(co))                return;
+	if (!IS_SANECHAR(cc))                  return;
+	if (!do_get_iflag(cc, SF_SIGN_SHAD))   return;
+	if (ch[cc].data[PCD_SHADOWCOPY] != cn) return;
+	
+	quick_teleport(cn, ch[co].x, ch[co].y);
+}
+
+void npc_set_attack(int cn, int co)
+{
+	int cc;
+	
+	if (!cn) return;
+	
+	cc = ch[cn].data[CHD_MASTER];
+	
+	if (co && co == cc && IS_SANEPLAYER(cc)) // sanity check
+	{
+		if (npc_is_enemy(cn, cc))
+			npc_remove_enemy(cn, cc);
+		co = 0;
+	}
+	
+	ch[cn].attack_cn = co;
+	
+	npc_shadow_warp(cn, co, cc);
+}
+
 // Enemy [cn] adds [co] to their kill list
 int npc_add_enemy(int cn, int co, int always)
 {
@@ -220,7 +251,7 @@ int npc_add_enemy(int cn, int co, int always)
 	    (d1>d2 && (globs->flags & GF_CLOSEENEMY)) ||
 	    (d1==d2 && (!cc || ch[cc].attack_cn!=cn) && ch[co].attack_cn==cn) )
 	{
-		ch[cn].attack_cn = co;		do_shadow_warp(cn, co);
+		npc_set_attack(cn, co);
 		ch[cn].goto_x = 0;        // cancel goto (patrol) as well
 		ch[cn].data[58] = 2;
 	}
@@ -2081,7 +2112,7 @@ int npc_see(int cn, int co)
 		// Otherwise, try to attack the taunter
 		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
-			ch[cn].attack_cn = cc;		do_shadow_warp(cn, cc);
+			npc_set_attack(cn, cc);
 			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
@@ -2098,7 +2129,7 @@ int npc_see(int cn, int co)
 		{
 			if (ch[cn].data[n]==idx)
 			{
-				ch[cn].attack_cn = co;		do_shadow_warp(cn, co);
+				npc_set_attack(cn, co);
 				ch[cn].goto_x = 0; // cancel goto (patrol)
 				ch[cn].data[58] = 2;
 				return 1;
