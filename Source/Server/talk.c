@@ -2392,20 +2392,20 @@ void answer_colosseum(int cn, int co, int nr)
 			do_sayx(cn, "Which would you like to enter?");
 			//                 "!        .         .   |     .         .        !"
 			do_char_log(co, 1, " STANDARD    Somewhat hard,     %-5.5s - %-5.5s.\n", who_rank_name[15], who_rank_name[18]);
-			do_char_log(co, 1, "  Costs 1000G to enter.\n");
-			do_char_log(co, 1, "  Rw: RPot, GPot, Attrib, +2 Augment, rand eq.\n");
+			do_char_log(co, 1, "  Costs  250G to enter.\n");
+			do_char_log(co, 1, "  Win: RPot+GPot,  Attrib, +2 Augment ~ rand eq.\n");
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 5, " CRUEL       More difficult,    %-5.5s - %-5.5s.\n", who_rank_name[18], who_rank_name[21]);
-			do_char_log(co, 5, "  Costs 2000G to enter.\n");
-			do_char_log(co, 5, "  Rw: 2x GPots, G.Skill, +2 Augment, random.\n");
+			do_char_log(co, 5, "  Costs 1000G to enter.\n");
+			do_char_log(co, 5, "  Win: 2x GPots,  G.Skill, +2 Augment ~ random.\n");
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 0, " MERCILESS   Very difficult,    %-5.5s - %-5.5s.\n", who_rank_name[21], who_rank_name[23]);
-			do_char_log(co, 0, "  Costs 4000G to enter.\n");
-			do_char_log(co, 0, "  Rw: GPot, SPot, G.Attrib, +2 Augment, best eq.\n");
+			do_char_log(co, 0, "  Costs 3000G to enter.\n");
+			do_char_log(co, 0, "  W: GPot+SPot,  G.Attrib, +2 Augment ~ best eq.\n");
 			do_char_log(co, 1, " \n");
 			do_char_log(co, 8, " ABSURD      Impossibly hard,   %-5.5s - %-5.5s.\n", who_rank_name[23], who_rank_name[24]);
-			do_char_log(co, 8, "  Costs 8000G to enter.\n");
-			do_char_log(co, 8, "  Rw: 2x SPots, 2x G.Skills, +2 Augment, best.\n");
+			do_char_log(co, 8, "  Costs 6000G to enter.\n");
+			do_char_log(co, 8, "  W: 2x SPots, 2x G.Skill, +2 Augment ~ best.\n");
 			do_char_log(co, 1, " \n");
 			break;
 		case  7: 	// CONTINUE
@@ -2426,10 +2426,10 @@ void answer_colosseum(int cn, int co, int nr)
 			}
 			switch (nr)
 			{
-				case  3: v = 1000; break;
-				case  4: v = 2000; break;
-				case  5: v = 4000; break;
-				default: v = 8000; break;
+				case  3: v =  25000; break; // STANDARD
+				case  4: v = 100000; break; // CRUEL
+				case  5: v = 300000; break; // MERCILESS
+				default: v = 600000; break; // ABSURD
 			}
 			if (ch[co].gold < v)
 			{
