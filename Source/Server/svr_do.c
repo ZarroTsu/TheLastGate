@@ -9648,6 +9648,9 @@ int do_hurt(int cn, int co, int dam, int type)
 		dam = dam * ch[co].dmg_reduction / 10000;
 		dam = RANDOM(dam)+1;
 		
+		if (IS_PLAYER(cn) && !IS_PLAYER(co))
+			dam /= 2;
+		
 		if (type==13) // Parried Thorns
 			dam = dam * (T_LYCA_SK(cn, 10)*20+TC_SK(cn, 106)*10) / 100;  // (Lyca) Sloth
 			
@@ -10945,10 +10948,8 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_WP_ANCIAEGIS))  do_set_iflag(cn, SF_TW_OUTSIDE);
 		if (do_check_items(in, IT_WB_ARCHTOWER))  do_set_iflag(cn, SF_EN_BACKSTOP);
 		if (do_check_items(in, IT_WB_QARMZI))     do_set_iflag(cn, SF_CRITBLAST);
-		if (do_check_items(in, IT_WP_WHITEODA))   do_set_iflag(cn, SF_SPELLPAV);
 		if (do_check_items(in, IT_WB_WHITEODA))   do_set_iflag(cn, SF_SPELLPAV);
 		if (do_check_items(in, IT_WP_EXCALIBUR))  do_set_iflag(cn, SF_EXCALIBUR);
-		if (do_check_items(in, IT_WP_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
 		if (do_check_items(in, IT_WB_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
 		if (do_check_items(in, IT_WP_EVERGREEN))  do_set_iflag(cn, SF_EVERGREEN);
 		if (do_check_items(in, IT_WB_RUSTSPIKES)) do_set_iflag(cn, SF_HIT_POISON);
@@ -12421,11 +12422,11 @@ void really_update_char(int cn)
 			weapon += (base_spd + spd_attack)/5;
 		
 		// Weapon - White Odachi :: Additional AV from spell_pow
-		if (do_get_iflag(cn, SF_SPELLPAV) && spell_pow > 100)
+		if (do_get_iflag(cn, SF_SPELLPAV))
 			armor  += spell_pow;
 		
 		// Weapon - Black Tachi :: Additional WV from spell_pow
-		if (do_get_iflag(cn, SF_SPELLPWV) && spell_pow > 100)
+		if (do_get_iflag(cn, SF_SPELLPWV))
 			weapon += spell_pow;
 		
 		// Weapon - Evergreen :: Additional WV per AGL, Additional AV per STR

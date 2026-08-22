@@ -511,7 +511,7 @@ int pop_create_char(int n, int drop)
 	{
 		if ((tmp = ch[cn].worn[m])!=0)
 		{
-			if (m == WN_RHAND && ((n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE) || (n >= CT_ANTEDUL && n <= CT_LASTANTEDUL)) && !RANDOM(2)) // Vampire equipment adjustment
+			if (m == WN_RHAND && ((n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE) || (n >= CT_ANTEDUL && n <= CT_LASTANTEDUL))) // Vampire equipment adjustment
 			{
 				int randm = RANDOM(9);
 				if (tmp==IT_CLAW_STEL) tmp = IT_DAGG_STEL + randm;

@@ -7009,7 +7009,7 @@ void really_spawn_minion(int cn, int cc)
 	switch (ch[cc].temp)
 	{
 		case CT_GARGTHRALL: // [Item] Gargoyle Statuette - Gargoyle
-			base -= RANDOM(7); v = 2;
+			base -= RANDOM(7); //v = 2;
 			break;
 		case CT_DEVDTHRALL: // [Gear] Devil's Doorway - Skeleton
 			if (IS_SANECTEMPLATE((temp = ch[cn].lastkilltemp)))
