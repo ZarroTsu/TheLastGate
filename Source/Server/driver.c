@@ -168,6 +168,7 @@ void npc_shadow_warp(int cn, int co, int cc)
 	if (!IS_LIVINGCHAR(co))                return;
 	if (!IS_SANECHAR(cc))                  return;
 	if (!do_get_iflag(cc, SF_SIGN_SHAD))   return;
+	if (ch[cn].attack_cn == co)            return;
 	if (ch[cc].data[PCD_SHADOWCOPY] != cn) return;
 	
 	quick_teleport(cn, ch[co].x, ch[co].y);
@@ -186,11 +187,12 @@ void npc_set_attack(int cn, int co)
 		if (npc_is_enemy(cn, cc))
 			npc_remove_enemy(cn, cc);
 		co = 0;
+		chlog(cn, "Removed enemy due to master match.");
 	}
 	
-	ch[cn].attack_cn = co;
-	
 	npc_shadow_warp(cn, co, cc);
+	
+	ch[cn].attack_cn = co;
 }
 
 // Enemy [cn] adds [co] to their kill list
@@ -272,7 +274,7 @@ int npc_add_enemy(int cn, int co, int always)
 	}
 
 	ch[cn].data[MCD_ENEMY1ST] = idx;
-
+	
 	return 1;
 }
 
@@ -2196,10 +2198,10 @@ int npc_see(int cn, int co)
 	}
 	
 	// check for companion attack modes
-	if (IS_COMP_TEMP(cn) && ch[cn].data[1]>=2 && ((ch[cn].alignment>0 && ch[co].alignment<0) || (ch[cn].alignment<0 && ch[co].alignment>0)))
+	if (IS_COMP_TEMP(cn) && ch[cn].data[1]>=2 && ((ch[cn].alignment>=0 && ch[co].alignment<0) || (ch[cn].alignment<0 && ch[co].alignment>=0)))
 	{
 		int coma, idx2;
-
+		
 		if (ch[cn].data[1]==2 && (coma=ch[cn].data[CHD_MASTER])) // Offense Mode
 		{
 			idx = coma | (char_id(coma) << 16);
@@ -2207,14 +2209,9 @@ int npc_see(int cn, int co)
 			for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 			{
 				if (ch[co].data[n]==idx && ch[cn].data[91]!=idx2) // check enemy's kill list. If the master is on it, we fight them.
-				{
 					break;
-				}
 			}
-			if (n==MCD_ENEMYZZZ+1)
-			{
-				co = 0;
-			}
+			if (n==MCD_ENEMYZZZ+1) co = 0;
 		}
 		
 		if (IS_SANECHAR(co) && npc_add_enemy(cn, co, 1))
@@ -2242,9 +2239,7 @@ int npc_see(int cn, int co)
 			if (npc_add_enemy(cn, co, 0))
 			{
 				if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
-				{
 					npc_saytext_n(cn, 1, ch[co].name);
-				}
 				chlog(cn, "Added %s to kill list because he didn't say the password.", ch[co].name);
 				return 1;
 			}
