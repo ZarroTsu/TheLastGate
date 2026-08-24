@@ -536,9 +536,13 @@ int pop_create_char(int n, int drop)
 						ch[cn].skill[SK_STAFF][0]   = ch[cn].skill[SK_HAND][0]-3;
 						ch[cn].skill[SK_HAND][0]    = 0;
 						break;
+					case  3: // Shield
+						break;
 					case  4: // Sword
 						ch[cn].skill[SK_SWORD][0]   = ch[cn].skill[SK_HAND][0]+3;
 						ch[cn].skill[SK_HAND][0]    = 0;
+						break;
+					case  5: // Dual Sword
 						break;
 					case  6: // Axe
 						ch[cn].skill[SK_AXE][0]     = ch[cn].skill[SK_HAND][0];
