@@ -965,8 +965,11 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 {
 	int tmp;
 	
-	if (intemp==SK_BLAST || intemp==SK_MJOLNIR || intemp==SK_SLAM || intemp==SK_OBLITERATE)
+	if (intemp==SK_CLEAVE || intemp==SK_BLAST || intemp==SK_MJOLNIR || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 	{
+		if (intemp==SK_CLEAVE)
+			tmp = spell_cleave(cn, co, power, 2);
+		
 		if (intemp==SK_BLAST || intemp==SK_MJOLNIR)
 		{
 			tmp = spell_blast(cn, co, power, 0, 1);
@@ -1134,12 +1137,21 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		if ((sqr(r)/10000) > 1)
 			do_char_log(cn, 1, "%s\n", splog[intemp].selfaoe);
 		
-		if (intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
+		if (intemp==SK_CLEAVE || intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 		{
 			if (!(ch[cn].flags & CF_SYS_OFF))
 			{
 				do_char_log(cn, 1, "You hit %d of %d creatures in range.\n", hit, count);
-				do_char_log(cn, 1, "You dealt an average of %d damage.\n", max(0, (avgdmg-1)/max(1,hit)) );
+				
+				if (intemp==SK_CLEAVE && do_get_iflag(cn, SF_GUNGNIR))
+				{
+					if (do_get_iflag(cn, SF_JUSTICE))
+						do_char_log(cn, 1, "The developer would like to inform you that you have made a grave error in judgement. Err... justice.\n");
+					else
+						do_char_log(cn, 1, "You caused your targets to begin bleeding profusely.\n");
+				}
+				else
+					do_char_log(cn, 1, "You dealt an average of %d damage.\n", max(0, (avgdmg-1)/max(1,hit)) );
 			}
 		}
 		else
@@ -2844,7 +2856,7 @@ int spell_mshield(int cn, int co, int power, int fromscroll)
 }
 void skill_mshield(int cn)
 {
-	int co, power;
+	int co = cn, cc, n, in, power;
 	
 	if (do_get_iflag(cn, SF_PREIST_R))					{ return; }
 	if (is_exhausted(cn)) 								{ return; }
@@ -2853,7 +2865,31 @@ void skill_mshield(int cn)
 	
 	power = M_SK(cn, SK_MSHIELD);
 	
-	spell_mshield(cn, cn, power, 0);
+	if (do_get_iflag(cn, SF_SIGN_SAFE))
+	{
+		if (!(co = get_target(cn, 0, 1, 1, 0, SK_MSHIELD, 1, power, 0)))
+			return;
+		
+		if (((in = has_buff(cc, SK_MSHIELD)) || (in = has_buff(cc, SK_MSHELL))))
+		{
+			cc = cn;
+			remove_buff(cn, bu[in].temp);
+		}
+		else for (cc = 1; cc<MAXCHARS; cc++)
+		{
+			if (((in = has_buff(cc, SK_MSHIELD)) || (in = has_buff(cc, SK_MSHELL))) && bu[in].data[0] == cn)
+			{
+				remove_buff(cc, bu[in].temp);
+				break;
+			}
+		}
+		if (cc != MAXCHARS && cc != co)
+			do_char_log(cn, 5, "Changed the user of your Magic %s from %s to %s.\n", 
+				do_get_iflag(cn, SF_EMPRESS)?"Shell":"Shield",
+				cc==cn?"yourself":ch[cc].name, co==cn?"yourself":ch[co].name);
+	}
+	
+	spell_mshield(cn, co, power, 0);
 	
 	add_exhaust(cn, SK_EXH_MSHIELD);
 }
@@ -5537,7 +5573,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 {
 	int hitpower, aggravate=0, tmp, in, n, zephyr=0, crit_dam=0;
 	
-	if (flag)
+	if (flag==1)
 		chlog(cn, "Used Reap on %s", ch[co].name);
 	else
 	{
@@ -5555,7 +5591,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 	
 	hitpower = power;
 	
-	if (flag)
+	if (flag==1)
 	{
 		hitpower = spell_reap(co, hitpower);
 	}
@@ -5567,35 +5603,49 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 	
 	if (do_get_iflag(cn, SF_GUNGNIR))
 	{
-		if (aggravate)
-			do_char_log(cn, 0, "You seem unable to do any more than bruise %s.\n", ch[co].reference);
-		else if (!(ch[cn].flags & CF_SYS_OFF))
-			do_char_log(cn, 1, "You cause %s to bleed profusely!\n", ch[co].reference);
+		if (flag!=2)
+		{
+			if (aggravate)
+				do_char_log(cn, 0, "You seem unable to do any more than bruise %s.\n", ch[co].reference);
+			else if (!(ch[cn].flags & CF_SYS_OFF))
+				do_char_log(cn, 1, "You cause %s to bleed profusely!\n", ch[co].reference);
+		}
 		tmp = hitpower*2;
 	}
 	else
 	{
 		tmp = do_hurt(cn, co, hitpower, 5);
 		
-		if (tmp<1)
+		if (flag==2)
 		{
-			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+			if (tmp>0)
+			{
+				if (!(ch[co].flags & CF_SYS_OFF))
+					do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+			}
 		}
 		else
 		{
-			if (flag)
+			if (tmp<1)
 			{
-				if (!(ch[cn].flags & CF_SYS_OFF))
-					do_char_log(cn, 1, "You reaped %s for %d HP.\n", ch[co].reference, tmp);
-				if (!(ch[co].flags & CF_SYS_OFF))
-					do_char_log(co, 1, "%s reaped you for %d HP.\n", ch[cn].name, tmp);
+				do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 			}
 			else
 			{
-				if (!(ch[cn].flags & CF_SYS_OFF))
-					do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
-				if (!(ch[co].flags & CF_SYS_OFF))
-					do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+				if (flag==1)
+				{
+					if (!(ch[cn].flags & CF_SYS_OFF))
+						do_char_log(cn, 1, "You reaped %s for %d HP.\n", ch[co].reference, tmp);
+					if (!(ch[co].flags & CF_SYS_OFF))
+						do_char_log(co, 1, "%s reaped you for %d HP.\n", ch[cn].name, tmp);
+				}
+				else
+				{
+					if (!(ch[cn].flags & CF_SYS_OFF))
+						do_char_log(cn, 1, "You cleaved %s for %d HP.\n", ch[co].reference, tmp);
+					if (!(ch[co].flags & CF_SYS_OFF))
+						do_char_log(co, 1, "%s cleaved you for %d HP.\n", ch[cn].name, tmp);
+				}
 			}
 		}
 	}
@@ -5611,7 +5661,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 	}
 	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
 	
-	if (!flag)
+	if (flag!=1)
 	{
 		if (aggravate)
 			spell_aggravate(cn, co, hitpower, 0);
@@ -5621,12 +5671,12 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 	
 	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	
-	if (flag)
+	if (flag==1)
 	{
 		if (!co_orig)
 			surround_cast(cn, co, 0, SK_REAP, power);
 	}
-	else
+	else if (flag==0)
 	{
 		if (!co_orig)
 			surround_cast(cn, co, 0, SK_CLEAVE, power);
@@ -5638,7 +5688,7 @@ void skill_cleave(int cn)
 {
 	int power = skill_multiplier(M_SK(cn, SK_CLEAVE) + ch[cn].weapon / 4 + ch[cn].top_damage / 4, cn);
 	int cost = power/12 + 5;
-	int count = 0, hit = 0, in = 0, co = 0, co_orig = 0;
+	int avgdmg = 0, count = 0, hit = 0, in = 0, co = 0, co_orig = 0;
 	
 	if (IS_PLAYER(cn) && (IS_ANY_TEMP(cn) || IS_WARRIOR(cn) || IS_LYCANTH(cn)))
 		cost = cost/3*2;
@@ -5650,7 +5700,13 @@ void skill_cleave(int cn)
 	// Get hit target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0))) return;
 	
-	spell_cleave(cn, co, power, 0, 0);
+	avgdmg = spell_cleave(cn, co, power, 0, 0);
+	count = hit = 1;
+	
+	if (do_get_iflag(cn, SF_SIGN_SLAS)) // AoE from Signet
+	{
+		if ((hit = aoe_driver(cn, cn, co, SK_CLEAVE, power, (GET_PROX(cn) + power)/2, count, hit, avgdmg)) < 0) return;
+	}
 	
 	// Zephyr proc
 	zephyr_check(cn, co, cn, 0);

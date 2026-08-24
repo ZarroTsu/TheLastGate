@@ -3358,7 +3358,7 @@ int use_map_chest(int cn, int in)
 			case  8: 	n = IT_POP_ISPEL+RANDOM(7); 											break;
 			case  9:	n = RANDOM(1+tier)?IT_GPOT:IT_RPOT; 									break;
 			case 10:	n = -1000;																break;
-			case 11:	n = RANDOM(6)?2511:(1243+RANDOM(2)*2);									break;
+			case 11:	n = RANDOM(6)?2511:(IT_MATHCAP1+RANDOM(2)*2);							break;
 			default:	n = RANDOM(1+tier)?IT_RD_BRV+RANDOM(5):IT_RD_HP+RANDOM(2)*2; 			break; 
 		}
 	}
@@ -6226,7 +6226,7 @@ int use_sanguine_crystal(int cn, int in)
 
 int use_dw_chest(int cn, int in)
 {
-	int co, rank, x, y, n = 0, stk = 0, in2, base;
+	int co, rank, x, y, n = 0, m, stk = 0, in2, base;
 	
 	if (cn==0)
 	{
@@ -6355,7 +6355,14 @@ int use_dw_chest(int cn, int in)
 						default: n = IT_GPOT;        break;
 					}
 					break;
-				case IT_SIGN_SHOU: n += RANDOM(9);   break;
+				case IT_SIGN_SHOU: 
+					if ((m = RANDOM(12)) >= 9)
+					{
+						n  = IT_SIGN_SAFE;
+						m -= 9;
+					}
+					n += m;
+					break;
 				default: break;
 			}
 		}

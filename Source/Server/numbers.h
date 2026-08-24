@@ -689,6 +689,9 @@
 #define IT_SIGN_SYMM		3431
 #define IT_SIGN_SONG		3432
 #define IT_SIGN_SCRE		3433
+#define IT_SIGN_SAFE		3639
+#define IT_SIGN_SLAS		3640
+#define IT_SIGN_SKIR		3641
 
 #define IT_ICELOTUS			2796
 #define IT_RINGWARMTH		3582
@@ -706,6 +709,9 @@
 #define IT_XIXDARKSUN		3187
 
 #define IT_CHROMEYE			3227
+
+#define IT_MATHCAP1			1243 // Brown ~ more
+#define IT_MATHCAP2			1245 // Green
 
 // -----
 

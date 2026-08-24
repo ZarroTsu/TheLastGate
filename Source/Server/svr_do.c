@@ -1815,11 +1815,11 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "    Tier    | AGL | STR | Skl |  WV | AGL,Thr \n");
 		do_char_log(cn, 1, "------------+-----+-----+-----+-----+---------\n");
 		do_char_log(cn, 1, "Bronze      |   1 |   1 |   1 |  12 |     1   \n");
-		do_char_log(cn, 1, "Steel       |  15 |  14 |  12 |  24 |     2   \n");
-		do_char_log(cn, 1, "Gold        |  22 |  20 |  24 |  36 |     3   \n");
-		do_char_log(cn, 1, "Emerald     |  32 |  28 |  36 |  48 |     4   \n");
-		do_char_log(cn, 1, "Crystal     |  46 |  38 |  48 |  60 |     5   \n");
-		do_char_log(cn, 1, "Titanium    |  62 |  52 |  60 |  72 |     6   \n");
+		do_char_log(cn, 1, "Steel       |  16 |  14 |  12 |  24 |     2   \n");
+		do_char_log(cn, 1, "Gold        |  25 |  20 |  24 |  36 |     3   \n");
+		do_char_log(cn, 1, "Emerald     |  38 |  28 |  36 |  48 |     4   \n");
+		do_char_log(cn, 1, "Crystal     |  55 |  38 |  48 |  60 |     5   \n");
+		do_char_log(cn, 1, "Titanium    |  74 |  52 |  60 |  72 |     6   \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Claws will use both hand slots.\n");
 		do_char_log(cn, 2, "* Claws have a critical hit chance of 2%%.\n");
@@ -1875,11 +1875,11 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "  Weapon  |  Requirements:  |      Gives:      \n");
 		do_char_log(cn, 1, "   Tier   | WIL | INT | Skl |  WV | SB,WIL,Res \n");
 		do_char_log(cn, 1, "----------+-----+-----+-----+-----+------------\n");
-		do_char_log(cn, 1, "Steel     |  15 |  12 |  10 |  20 |      2     \n");
-		do_char_log(cn, 1, "Gold      |  22 |  15 |  20 |  30 |      3     \n");
-		do_char_log(cn, 1, "Emerald   |  32 |  20 |  30 |  40 |      4     \n");
-		do_char_log(cn, 1, "Crystal   |  46 |  28 |  40 |  50 |      5     \n");
-		do_char_log(cn, 1, "Titanium  |  60 |  40 |  50 |  60 |      6     \n");
+		do_char_log(cn, 1, "Steel     |  16 |  12 |  10 |  20 |      2     \n");
+		do_char_log(cn, 1, "Gold      |  25 |  15 |  20 |  30 |      3     \n");
+		do_char_log(cn, 1, "Emerald   |  38 |  20 |  30 |  40 |      4     \n");
+		do_char_log(cn, 1, "Crystal   |  55 |  28 |  40 |  50 |      5     \n");
+		do_char_log(cn, 1, "Titanium  |  74 |  40 |  50 |  60 |      6     \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Spears will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Dagger and Staff skills.\n");
@@ -1959,11 +1959,11 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "    Tier    | AGL | STR | Skill |  WV | STR \n");
 		do_char_log(cn, 1, "------------+-----+-----+-------+-----+-----\n");
 		do_char_log(cn, 1, "Bronze      |   1 |   1 |     1 |  10 |   1 \n");
-		do_char_log(cn, 1, "Steel       |  14 |  15 |    15 |  20 |   2 \n");
-		do_char_log(cn, 1, "Gold        |  20 |  22 |    30 |  30 |   3 \n");
-		do_char_log(cn, 1, "Emerald     |  28 |  32 |    45 |  40 |   4 \n");
-		do_char_log(cn, 1, "Crystal     |  38 |  46 |    60 |  50 |   5 \n");
-		do_char_log(cn, 1, "Titanium    |  52 |  60 |    75 |  60 |   6 \n");
+		do_char_log(cn, 1, "Steel       |  14 |  16 |    15 |  20 |   2 \n");
+		do_char_log(cn, 1, "Gold        |  20 |  25 |    30 |  30 |   3 \n");
+		do_char_log(cn, 1, "Emerald     |  28 |  38 |    45 |  40 |   4 \n");
+		do_char_log(cn, 1, "Crystal     |  38 |  55 |    60 |  50 |   5 \n");
+		do_char_log(cn, 1, "Titanium    |  52 |  74 |    75 |  60 |   6 \n");
 		do_char_log(cn, 1, " \n");
 	}
 	else if (strcmp(topic, "8")==0 
@@ -1997,11 +1997,11 @@ void do_listweapons(int cn, char *topic)
 		do_char_log(cn, 1, "  Weapon  |  Requirements:  |       Gives:     \n");
 		do_char_log(cn, 1, "   Tier   | AGL | STR | Skl | WV | AV,STR | Td \n");
 		do_char_log(cn, 1, "----------+-----+-----+-----+----+--------+----\n");
-		do_char_log(cn, 1, "Steel     |  15 |  16 |  15 | 28 |    2   |  4 \n");
-		do_char_log(cn, 1, "Gold      |  22 |  25 |  30 | 42 |    3   |  6 \n");
-		do_char_log(cn, 1, "Emerald   |  32 |  38 |  45 | 56 |    4   |  8 \n");
-		do_char_log(cn, 1, "Crystal   |  46 |  55 |  60 | 70 |    5   | 10 \n");
-		do_char_log(cn, 1, "Titanium  |  60 |  74 |  75 | 84 |    6   | 12 \n");
+		do_char_log(cn, 1, "Steel     |  15 |  18 |  18 | 28 |    2   |  4 \n");
+		do_char_log(cn, 1, "Gold      |  22 |  30 |  35 | 42 |    3   |  6 \n");
+		do_char_log(cn, 1, "Emerald   |  32 |  45 |  52 | 56 |    4   |  8 \n");
+		do_char_log(cn, 1, "Crystal   |  46 |  65 |  70 | 70 |    5   | 10 \n");
+		do_char_log(cn, 1, "Titanium  |  60 |  85 |  88 | 84 |    6   | 12 \n");
 		do_char_log(cn, 1, " \n");
 		do_char_log(cn, 2, "* Greataxes will use both hand slots.\n");
 		do_char_log(cn, 0, "* Requires both Axe and Two-Handed skills.\n");
@@ -10716,7 +10716,7 @@ void really_update_char(int cn)
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
 	int critical_b = 0, critical_c = 0, critical_m = 0;
-	int hit_rate = 0, parry_rate = 0, loverSplit = 0;
+	int hit_rate = 0, parry_rate = 0, loverSplit = 0, skirmtaunt = 0;
 	int damage_top = 0, ava_crit = 0, ava_mult = 0, lido = 1, liha = 1;
 	int aoe = 0, tempCost = 10000, dmg_bns = 10000, dmg_rdc = 10000, reduc_bonus = 0;
 	int suppression = 0, bcount=0, labcmd=0, gcdivinity = 0, empty = 0, unarmed = 1, emptyring = 0;
@@ -10917,6 +10917,9 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_SIGN_SPAR)) do_set_iflag(cn, SF_SIGN_SPAR);
 		if (do_check_items(in, IT_SIGN_SONG)) do_set_iflag(cn, SF_SIGN_SONG);
 		if (do_check_items(in, IT_SIGN_SCRE)) do_set_iflag(cn, SF_SIGN_SCRE);
+		if (do_check_items(in, IT_SIGN_SAFE)) do_set_iflag(cn, SF_SIGN_SAFE);
+		if (do_check_items(in, IT_SIGN_SLAS)) do_set_iflag(cn, SF_SIGN_SLAS);
+		if (do_check_items(in, IT_SIGN_SKIR)) do_set_iflag(cn, SF_SIGN_SKIR);
 		
 		if (do_check_items(in, IT_ANKHAMULET)) do_set_iflag(cn, SF_ANKHAMULET);
 		if (do_check_items(in, IT_AMBERANKH))  do_set_iflag(cn, SF_AMBERANKH);
@@ -10937,6 +10940,7 @@ void really_update_char(int cn)
 		if (do_check_items(in, IT_BONEARMOR))  do_add_ieffect(cn, VF_EN_STAGGER, 30);
 		if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
 		if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
+		if (do_check_items(in, IT_MATHCAP1))   do_set_iflag(cn, SF_MATHCAP);
 		
 		if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
 		if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
@@ -11437,6 +11441,7 @@ void really_update_char(int cn)
 		
 		if (bu[m].temp==SK_TAUNT && IS_SANECHAR(co = bu[m].data[0]))
 		{
+			if (do_get_iflag(co, SF_SIGN_SKIR)) skirmtaunt = 1;
 			ch[cn].taunted = co;
 			if (ch[cn].temp==CT_PANDIUM) ch[cn].taunted = 0; // Special case for Pandium to ignore persistant aggro
 			
@@ -12284,6 +12289,11 @@ void really_update_char(int cn)
 		spell_mod += light * do_get_ieffect(cn, VF_EN_SKUAGLOW)/100;  // [Ench] Skua
 	}
 	
+	// Multiplicative bonuses
+	{
+		if (do_get_iflag(cn, SF_MATHCAP)) spell_mod = more(spell_mod, 5, 1); // Math Cap
+	}
+	
 	ch[cn].spell_mod = clamp(spell_mod, 0, 300);
 	
 	
@@ -12389,7 +12399,8 @@ void really_update_char(int cn)
 	
 	// Multiplicative bonuses
 	{
-		if (do_get_iflag(cn, SF_STRENG_R)) hit_rate   = less(hit_rate,  20, 1); // [Tarot] Strength.R
+		if (do_get_iflag(cn, SF_STRENG_R)) hit_rate = less(hit_rate,  20, 1); // [Tarot] Strength.R
+		if (skirmtaunt)                    hit_rate = less(hit_rate,  20, 1); // [Item] Signet of Skirmish
 	}
 	
 	parry_rate += hit_rate   * do_get_ieffect(cn, VF_EN_KWAIHIT)   / 100;

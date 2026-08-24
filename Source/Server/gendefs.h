@@ -535,9 +535,9 @@ extern char *at_short[];
 #define DESC_SIGN_SYMM		"When equipped, this ring will copy the effects of your other ring slot.\n"
 #define DESC_SIGN_SONG		"When equipped, your Aria additionally grants yourself and nearby allies 10%% of your Weapon and Armor Values.\n"
 #define DESC_SIGN_SCRE		"When equipped, casting Curse will also inflict Aggravate.\n"
-#define DESC_SIGN_SAFE		"When equipped, .\n"
-#define DESC_SIGN_SMIT		"When equipped, .\n"
-#define DESC_SIGN_SKIR		"When equipped, .\n"
+#define DESC_SIGN_SAFE		"When equipped, your Magic Shield can be cast on allies. Only one Magic Shield owned by you can be active at a time.\n"
+#define DESC_SIGN_SLAS		"When equipped, your Cleave skill now hits all nearby enemies in an area around you.\n"
+#define DESC_SIGN_SKIR		"When equipped, enemies Taunted by you breifly have 20%% less hit score.\n"
 
 #define FN_EX			5
 #define DESC_GL_SERPENT		"When equipped, your hits inflict a self-scaling Poison, dealing damage over time.\n"
@@ -551,6 +551,7 @@ extern char *at_short[];
 #define DESC_BT_NATURES		"When equipped, grants 33%% more regeneration rates while idle.\n"
 #define DESC_RINGWARMTH		"When equipped and activated, grants additional health, endurance, and mana regeneration.\n"
 #define DESC_LIZCROWN		"When equipped, your maximum hitpoints and maximum mana are swapped. Overcap bonuses occur after this swap.\n"
+#define DESC_MATHCAP		"When equipped, you gain 5%% more total Spell Modifier."
 
 #define DESC_ANKHAMULET		"When equipped, grants additional passive regeneration bonuses.\n"
 #define DESC_AMBERANKH		"When equipped, grants additional passive regeneration bonuses. Grants improved life regeneration.\n"
@@ -606,13 +607,13 @@ extern char *at_short[];
 #define DESC_QUICKSILV		"When equipped, grants 1 additional Hit and Parry score for every 30 uncapped Movement Speed.\n"
 #define DESC_HALADIE		"When equipped, your active spell skills gain an additional 10%% Willpower bonus.\n"
 
-#define DESC_JANESOBLIT		"When equipped, this weapon can be used to cast 'Obliterate', costing 1/3 of your uncapped mana for power. Obliterate has a base radius of 4, centered at your target's location.\n"
+#define DESC_JANESOBLIT		"When equipped, this weapon can be used to cast 'Obliterate', consuming 1/3 of your uncapped mana for power. Obliterate has a base radius of 4, centered at your target's location.\n"
 #define DESC_VIOLETGAZE		"When equipped, grants 4%% increased total Willpower and Intuition.\n"
 #define DESC_RATTANBO		"When equipped, this weapon can be used to cast a buff version of Zephyr, with power equal to your Staff skill modifier.\n"
 #define DESC_SHIVASCEPT		"When equipped, your active spell skills gain an additional 10%% Intuition bonus.\n"
 #define DESC_KUROKO			"When equipped, 15%% of damage taken is dealt to your Mana before Hitpoints.\n"
 #define DESC_PUTRIDIRE		"When equipped, this weapon can be used to cast Poison, with power equal to 1/3 of your uncapped mana.\n"
-#define DESC_STARLIGHT		"When equipped, this weapon can be used to cast 'Starlight', costing 1/3 of uncapped mana. Starlight grants 1 additional spellpower bonus per 50 mana spent.\n"
+#define DESC_STARLIGHT		"When equipped, this weapon can be used to cast 'Starlight', consuming 1/3 of uncapped mana. Starlight grants 1 additional spellpower bonus per 50 mana spent.\n"
 #define DESC_BLOODYSCY		"When equipped, this weapon can be used to cast Reap, with power equal to 1/2 of your uncapped hitpoints. Reap consumes debuffs on enemies hit to deal additional damage per consumed debuff.\n"
 
 #define DESC_GOLDGLAIVE		"When equipped, your Ghost Companion will use Warcry instead of Taunt, based on its Taunt skill modifier.\n"
@@ -621,7 +622,7 @@ extern char *at_short[];
 #define DESC_FLAGBEAR		"When equipped, this weapon can be used to freely cast Rally, with power equal to half of your total Willpower.\n"
 
 #define DESC_ARCHTOWER		"When equipped, enemies beside and behind you no longer gain a bonus to hitting you.\n"
-#define DESC_PHALANX		"When equipped, this shield can be used to cast 'Phalanx', costing 1/3 of uncapped endurance. Phalanx grants 2%% damage reduction per 5 endurance spent.\n"
+#define DESC_PHALANX		"When equipped, this shield can be used to cast 'Phalanx', consuming 1/3 of uncapped endurance. Phalanx grants 2%% damage reduction per 5 endurance spent.\n"
 #define DESC_RISINGPHO		"When equipped, this shield can be used to freely cast Immolate, with power equal to 1/3 of your uncapped hitpoints and a base radius of 2. Sources of Leech do not provide healing for Immolate, and instead provide increased damage.\n"
 #define DESC_THEWALL		"When equipped, your Shield skill becomes Shield Bash. Shield Bash inflicts Stun and deals damage based on your Armor Value.\n"
 #define DESC_ANCIAEGIS		"When equipped, enemies no longer gain a bonus to hitting you while you are stunned or not fighting back.\n"
