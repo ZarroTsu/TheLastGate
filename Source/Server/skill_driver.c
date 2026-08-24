@@ -968,7 +968,7 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 	if (intemp==SK_CLEAVE || intemp==SK_BLAST || intemp==SK_MJOLNIR || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 	{
 		if (intemp==SK_CLEAVE)
-			tmp = spell_cleave(cn, co, power, 2);
+			tmp = spell_cleave(cn, co, power, co_orig, 2);
 		
 		if (intemp==SK_BLAST || intemp==SK_MJOLNIR)
 		{

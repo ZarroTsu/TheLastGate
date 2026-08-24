@@ -476,7 +476,7 @@ enum _ch_iflags {
 	SF_CRITBLAST,   SF_SPELLMANA,   SF_BLEEDHP,     SF_LESSTDT,     
 	SF_BUTCHER,     SF_BRAVESTR,    SF_APTRECOV,    SF_JADELEAP,    
 	SF_IDOLISHT,    SF_ARGHKNIFE,   SF_MATHCAP,     SF_SIGN_SAFE,
-	SF_SIGN_SMIT,   SF_SIGN_SKIR,   
+	SF_SIGN_SLAS,   SF_SIGN_SKIR,   
 	
 	SF_EN_MOREAV,       // Enchant #  2
 	SF_EN_HEALIT,       // Enchant #  3
