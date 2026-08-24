@@ -291,8 +291,8 @@ int spell_shock(int cn, int co, int power);
 // Check for and escalate a given debuff template
 int on_hit_debuff(int cn, int co, int v, int origtmp)
 {
-	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 1;
-	int nmz = 0, debuff=1;
+	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 0;
+	int nmz = 0, debuff=1, newbuff=0;
 	
 	if (!origtmp)           return 0;
 	if (!IS_LIVINGCHAR(co)) return 0;
@@ -355,6 +355,12 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	else if (power >= 250) power = power + v/3;
 	else if (power >= 150) power = power + v*2/3;
 	else                   power = power + v;
+	
+	if (!in)
+	{
+		if (!(in = make_new_buff(cn, tmp, spr, power, dur, 0))) return 0;
+		newbuff = 1;
+	}
 	
 	bu[in].data[9] = power;
 	
@@ -430,7 +436,8 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		default: break;
 	}
 	
-	if (!(in = make_new_buff(cn, tmp, spr, power, dur, 0))) return 0;
+	if (!newbuff)
+		bu[in].power = bu[in].data[1] = power;
 	
 	switch (tmp)
 	{
@@ -500,13 +507,18 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		default: break;
 	}
 	
-	bu[in].data[4] = nmz;
-	bu[in].data[5] = debuff;
+	if (newbuff)
+	{
+		bu[in].data[4] = nmz;
+		bu[in].data[5] = debuff;
+		
+		if (!debuff)
+			return add_spell(cn, in);
+		
+		return add_spell(co, in);
+	}
 	
-	if (!debuff)
-		return add_spell(cn, in);
-	
-	return add_spell(co, in);
+	return 1;
 }
 
 void try_hit_debuff(int cn, int co, int v)
@@ -1936,7 +1948,7 @@ int skill_multiplier(int power, int cn)
 int add_spell(int cn, int new_in)
 {
 	int n, m, cc, old_in, weak = 999, weakest = 99;
-	int stack, tickminimum = TICKS*60;
+	int stack, tickminimum;
 	int old_temp, new_temp;
 	
 	if (map[XY2M(ch[cn].x, ch[cn].y)].flags & CF_NOMAGIC) return 0;
@@ -2059,6 +2071,8 @@ int add_spell(int cn, int new_in)
 			}
 			else
 			{
+				tickminimum = TICKS*60;
+				
 				if (old_temp==SK_SLOW)
 					tickminimum = TICKS*5;
 				
