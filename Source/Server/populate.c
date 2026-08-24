@@ -468,7 +468,7 @@ int pop_create_bonus_belt(int cn)
 
 int pop_create_char(int n, int drop)
 {
-	int cn, tmp, m, j=0, flag = 0, hasitems = 0, hasloot = 0;
+	int cn, tmp, m, j=0, flag = 0, hasitems = 0, hasloot = 0, randm=0;
 
 	for (cn = 1; cn<MAXCHARS; cn++)
 	{
@@ -513,7 +513,7 @@ int pop_create_char(int n, int drop)
 		{
 			if (m == WN_RHAND && ((n >= CT_VAMPIRE && n <= CT_LASTVAMPIRE) || (n >= CT_ANTEDUL && n <= CT_LASTANTEDUL))) // Vampire equipment adjustment
 			{
-				int randm = RANDOM(9);
+				randm = RANDOM(9);
 				if (tmp==IT_CLAW_STEL) tmp = IT_DAGG_STEL + randm;
 				if (tmp==IT_CLAW_GOLD) tmp = IT_DAGG_GOLD + randm;
 				if (tmp==IT_CLAW_EMER) tmp = IT_DAGG_EMER + randm;
@@ -567,7 +567,12 @@ int pop_create_char(int n, int drop)
 			else
 			{
 				it[tmp].carried = cn;
-				ch[cn].worn[m]  = tmp;
+				
+				if (m == WN_RHAND && (randm == 3 || randm == 5) && ch[cn].worn[WN_LHAND] == 0)
+					ch[cn].worn[WN_LHAND] = tmp; // Note: RHAND happens after LHAND so this will overwrite their LHAND
+				else
+					ch[cn].worn[m] = tmp;
+				
 				hasitems = 1;
 				if (it[tmp].temp==0)
 				{
