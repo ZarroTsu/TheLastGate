@@ -4099,7 +4099,7 @@ void do_showchars(int cn)
 int do_showbuffs(int cn, int co)
 {
 	int n, in, flag = 0;
-	for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n]))
+	for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n]) && (bu[in].used!=USE_EMPTY))
 	{
 		flag = 1;
 		if (bu[in].temp == SK_MSHIELD || bu[in].temp == SK_MSHELL)
@@ -8738,10 +8738,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 
 		for (n = 0; n<MAXBUFFS; n++)
 		{
-			if (!(in = ch[co].spell[n]))
-			{
-				continue;
-			}
+			if (!(in = ch[co].spell[n])) continue;
 			ch[co].spell[n] = ch[cc].spell[n] = 0;
 			bu[in].used = USE_EMPTY;  // destroy spells all the time
 		}
@@ -8962,10 +8959,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 
 		for (n = 0; n<MAXBUFFS; n++)
 		{
-			if (!(in = ch[co].spell[n]))
-			{
-				continue;
-			}
+			if (!(in = ch[co].spell[n])) continue;
 			ch[co].spell[n] = 0;
 			bu[in].used = USE_EMPTY;  // destroy spells all the time
 		}
@@ -9574,7 +9568,7 @@ int do_hurt(int cn, int co, int dam, int type)
 	// Loop to look for Magic Shield so we can damage it
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[co].spell[n])!=0)
+		if ((in = ch[co].spell[n])!=0 && (bu[in].used!=USE_EMPTY))
 		{
 			if (bu[in].temp==SK_EXHAUST) continue;
 			
@@ -9857,7 +9851,7 @@ int do_hurt(int cn, int co, int dam, int type)
 			tmp  = do_char_score(co);
 			rank = getrank(co);
 
-			for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n]))
+			for (n = 0; n<MAXBUFFS; n++) if ((in = ch[co].spell[n]) && (bu[in].used!=USE_EMPTY))
 			{
 				if (!B_SK(co, SK_MEDIT) && (bu[in].temp==SK_PROTECT || bu[in].temp==SK_ENHANCE || bu[in].temp==SK_BLESS || bu[in].temp==SK_HASTE))
 					tmp += tmp / 5;
@@ -11295,6 +11289,7 @@ void really_update_char(int cn)
 		{
 			if (!ch[co].spell[n]) continue;
 			m = ch[co].spell[n];
+			if (bu[m].used==USE_EMPTY) continue;
 			if ((ch[co].flags & CF_NOMAGIC) && !bu[m].data[4]) continue;
 			
 			// Lab 6 infrared potions
@@ -11336,6 +11331,7 @@ void really_update_char(int cn)
 	{
 		if (!ch[cn].spell[n]) continue;
 		m = ch[cn].spell[n];
+		if (bu[m].used==USE_EMPTY) continue;
 		if ((ch[cn].flags & CF_NOMAGIC) && !bu[m].data[4]) continue;
 		
 		bcount++;
@@ -13740,7 +13736,7 @@ void do_regenerate(int cn)
 	// spell effects
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]))
+		if ((in = ch[cn].spell[n]) && (bu[in].used!=USE_EMPTY))
 		{
 			if ((bu[in].flags & BF_PERMASPELL) || bu[in].temp==206)
 			{

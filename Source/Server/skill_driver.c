@@ -291,7 +291,7 @@ int spell_shock(int cn, int co, int power);
 // Check for and escalate a given debuff template
 int on_hit_debuff(int cn, int co, int v, int origtmp)
 {
-	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 0;
+	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 27;
 	int nmz = 0, debuff=1, newbuff=0;
 	
 	if (!origtmp)           return 0;
@@ -313,7 +313,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			else                              { tmp = SK_SLOW;    spr = BUF_SPR_SLOW;   }
 			break;
 		case SK_CURSE:
-			if (do_get_iflag(cn, SF_TOWER))   { tmp = SK_FOCUS;   spr = BUF_SPR_FOCUS; }
+			if (do_get_iflag(cn, SF_TOWER))   { tmp = SK_FOCUS;   spr = BUF_SPR_FOCUS; debuff = 0; }
 			else                              { tmp = SK_CURSE;   spr = BUF_SPR_CURSE; }
 			break;
 		case SK_WEAKEN:
@@ -338,13 +338,15 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			break;
 		case SK_FURY:
 			tmp = SK_FURY;      spr = BUF_SPR_FURY;      nmz = 1;
+			debuff = 0;
 			break;
 		default: return 0;  // Invalid skill
 	}
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[co].spell[n])==0) continue;
+		if (!debuff     && ((in = ch[cn].spell[n])==0 || (bu[in].used==USE_EMPTY))) continue;
+		else if (debuff && ((in = ch[co].spell[n])==0 || (bu[in].used==USE_EMPTY))) continue;
 		if (bu[in].temp != tmp)        continue;
 		if (!bu[in].data[9])           return 0;  // Don't overwrite a normal debuff
 		power = bu[in].data[9];
@@ -477,7 +479,6 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			break;
 		case SK_FOCUS:
 			bu[in].cool_bonus = min(127, power/4 + 1);
-			debuff = 0;
 			break;
 		case SK_WEAKEN:
 			bu[in].weapon  = max(-127, -(power / 4 + 4));
@@ -502,7 +503,6 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		case SK_FURY:
 			bu[in].top_damage = min(127, power/4 + 1);
 			bu[in].gethit_dam = min(127, power/4 + 1);
-			debuff = 0;
 			break;
 		default: break;
 	}
@@ -562,7 +562,7 @@ int is_exhausted(int cn)
 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0 && bu[in].temp==SK_EXHAUST) { break; }
+		if ((in = ch[cn].spell[n])!=0 && (bu[in].used!=USE_EMPTY) && bu[in].temp==SK_EXHAUST) { break; }
 	}
 	if (n<MAXBUFFS)
 	{
@@ -816,6 +816,7 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 		case SK_HASTE:      n = 400; break; // Aura only
 		case SK_IMMOLATE2:  n = 200; break;
 		//
+		case SK_CLEAVE:     n = 400; break;
 		case SK_BLIND:      n = 400; break;
 		case SK_DOUSE:      n = 400; break;
 		case SK_SLAM:       n = 400; break;
@@ -903,7 +904,7 @@ int aoe_skill_notarget(int cn, int co, int co_orig, int intemp, int power)
 			{
 				for (n = 0; n<MAXBUFFS; n++)
 				{
-					if ((in = ch[co_orig].spell[n])==0)	continue;
+					if ((in = ch[co_orig].spell[n])==0 || (bu[in].used==USE_EMPTY))	continue;
 					if (bu[in].data[5]==1 && bu[in].temp!=SK_SHADOW && !has_buff(co, bu[in].temp))
 					{
 						in2 = copy_buff(in);
@@ -1320,7 +1321,7 @@ int has_buff(int cn, int bu_temp)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0)
+		if ((in = ch[cn].spell[n])!=0 && (bu[in].used!=USE_EMPTY))
 		{
 			if (bu[in].temp==bu_temp)
 			{
@@ -1711,7 +1712,7 @@ void damage_mshell(int co, int dam)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[co].spell[n])!=0)
+		if ((in = ch[co].spell[n])!=0 && (bu[in].used!=USE_EMPTY))
 		{
 			if (bu[in].temp==SK_MSHELL)
 			{
@@ -1731,7 +1732,7 @@ void damage_mshell(int co, int dam)
 					if (priestess==1 && tmp>=bu[in].active)
 					{
 						ch[co].spell[n] = 0;
-						bu[in].used = 0;
+						bu[in].used = USE_EMPTY;
 						do_update_char(co);
 					}
 					else
@@ -1969,7 +1970,7 @@ int add_spell(int cn, int new_in)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((old_in = ch[cn].spell[n]))
+		if ((old_in = ch[cn].spell[n]) && (bu[old_in].used!=USE_EMPTY))
 		{
 			old_temp = bu[old_in].temp;
 			
@@ -1997,9 +1998,8 @@ int add_spell(int cn, int new_in)
 	// overwrite spells if same spell is cast twice and the new spell is more powerful
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((old_in = ch[cn].spell[n]))
+		if ((old_in = ch[cn].spell[n]) && (bu[old_in].used!=USE_EMPTY))
 		{
-			if (bu[old_in].used==USE_EMPTY) continue;
 			if ((old_temp = bu[old_in].temp) != new_temp) continue;
 			
 			if (new_temp==SK_HEAL)
@@ -2021,6 +2021,7 @@ int add_spell(int cn, int new_in)
 				bu[new_in].sprite = min(6720+stack, 6721+bu[new_in].data[1]);
 				
 				bu[old_in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
 				break;
 			}
 			else if (new_temp==SK_VENOM)
@@ -2034,6 +2035,7 @@ int add_spell(int cn, int new_in)
 				bu[new_in].sprite = min(6733, 6731+bu[new_in].stack-1);
 				
 				bu[old_in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
 				break;
 			}
 			else if (new_temp==SK_DISPEL || new_temp==SK_DISPEL2)
@@ -2050,6 +2052,7 @@ int add_spell(int cn, int new_in)
 				bu[new_in].sprite = min(6745, 6741+bu[new_in].stack-1);
 				
 				bu[old_in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
 				break;
 			}
 			else if (new_temp==SK_CHARGE)
@@ -2060,6 +2063,7 @@ int add_spell(int cn, int new_in)
 				bu[new_in].sprite = min(6750, 6746+bu[new_in].stack-1);
 				
 				bu[old_in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
 				break;
 			}
 			else if (new_temp==SK_ZEPHYR2)
@@ -2071,6 +2075,7 @@ int add_spell(int cn, int new_in)
 				bu[new_in].sprite = max(6726, min(6728, 6726+bu[new_in].stack-1));
 				
 				bu[old_in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
 				break;
 			}
 			else if (new_temp==SK_IMMOLATE2)
@@ -2193,7 +2198,7 @@ int add_spell(int cn, int new_in)
 	{
 		for (n = 0; n<MAXBUFFS; n++)
 		{
-			if (!(old_in = ch[cn].spell[n])) break;
+			if (!(old_in = ch[cn].spell[n]) || (bu[old_in].used==USE_EMPTY)) break;
 			if (bu[old_in].power < weak)
 			{
 				weak = bu[old_in].power;
@@ -2420,7 +2425,7 @@ int has_spell(int cn, int temp)
 	int n, in;
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && bu[in].temp==temp)
+		if ((in = ch[cn].spell[n]) && (bu[in].used!=USE_EMPTY) && bu[in].temp==temp)
 		{
 			return in;
 		}
@@ -2433,7 +2438,7 @@ int has_spell_from_item(int cn, int temp)
 	int n, in;
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && bu[in].temp > 100 && bu[in].data[3]==temp)
+		if ((in = ch[cn].spell[n]) && (bu[in].used!=USE_EMPTY) && bu[in].temp > 100 && bu[in].data[3]==temp)
 		{
 			return in;
 		}
@@ -2471,7 +2476,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 	// Check for immunize and inoculate from dispel to see if we can grant the spell
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in2 = ch[co].spell[n])!=0)
+		if ((in2 = ch[co].spell[n])!=0 && (bu[in2].used!=USE_EMPTY))
 		{
 			// Immunize/Inoculate prevents up to three ailments
 			if ((bu[in2].temp==SK_DISPEL || bu[in2].temp==SK_DISPEL2) &&
@@ -4709,6 +4714,7 @@ void skill_dispel(int cn, int flag)
 		for (n = 0; n<MAXBUFFS; n++)
 		{
 			if ((in = ch[co].spell[n])==0) { continue; }
+			if (bu[in].used==USE_EMPTY)    { continue; }
 			if (bu[in].active<=1)          { continue; }
 			if (bu[in].temp==SK_DIVINITY)  { continue; }
 			
@@ -4735,6 +4741,7 @@ void skill_dispel(int cn, int flag)
 		for (n = 0; n<MAXBUFFS; n++)
 		{
 			if ((in = ch[co].spell[n])==0) { continue; }
+			if (bu[in].used==USE_EMPTY)    { continue; }
 			if (bu[in].active<=1)          { continue; }
 			if (bu[in].temp==SK_DIVINITY)  { continue; }
 			
@@ -4759,7 +4766,7 @@ void skill_dispel(int cn, int flag)
 	}
 	for (m = 0; m<DISPEL_MAX; m++) if (ail[m]>-1)
 	{
-		in = ch[co].spell[ail[m]];
+		in = ch[co].spell[ail[m]]; if (bu[in].used==USE_EMPTY) continue;
 		ail_pow = bu[in].power;
 		if (flag)
 		{
@@ -5560,6 +5567,7 @@ int spell_reap(int co, int hitpower) // Consume enemy debuffs to add the debuff 
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in = ch[co].spell[n])==0) { continue; }
+		if (bu[in].used==USE_EMPTY)    { continue; }
 		if (bu[in].active<=1)          { continue; }
 		if (bu[in].data[5])
 			hitpower += bu[in].power/4;

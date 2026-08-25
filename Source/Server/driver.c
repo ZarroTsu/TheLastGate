@@ -3644,7 +3644,7 @@ int npc_try_spell(int cn, int co, int spell)
 	// Cancel if exhausted
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n]) && (bu[in].temp==SK_EXHAUST)) return 0;
+		if ((in = ch[cn].spell[n]) && (bu[in].used!=USE_EMPTY) && (bu[in].temp==SK_EXHAUST)) return 0;
 	}
 
 	mana = (ch[cn].a_mana-500) / 1000;
@@ -3655,7 +3655,7 @@ int npc_try_spell(int cn, int co, int spell)
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[co].spell[n])!=0)
+		if ((in = ch[co].spell[n])!=0 && (bu[in].used!=USE_EMPTY))
 		{
 			//tpow = bu[in].power+15;
 			timm = spell_immunity(cn, co, offn);
@@ -7738,7 +7738,7 @@ int npc_driver_high(int cn)
 	{
 		for (n = 0, m = 0; n<MAXBUFFS; n++)
 		{
-			if ((in = ch[cn].spell[n])==0) continue;
+			if ((in = ch[cn].spell[n])==0 || (bu[in].used==USE_EMPTY)) continue;
 			if (IS_DISPELABLE1(bu[in].temp)) m++;
 		}
 		if (m>1)
@@ -7830,7 +7830,7 @@ int npc_driver_high(int cn)
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
 			{
-				if ((in = ch[co].spell[n])==0) continue;
+				if ((in = ch[co].spell[n])==0 || (bu[in].used==USE_EMPTY)) continue;
 				if (IS_DISPELABLE1(bu[in].temp)) m++;
 			}
 			if (m>1)
@@ -7861,7 +7861,7 @@ int npc_driver_high(int cn)
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
 			{
-				if ((in = ch[co].spell[n])==0) continue;
+				if ((in = ch[co].spell[n])==0 || (bu[in].used==USE_EMPTY)) continue;
 				if (IS_DISPELABLE1(bu[in].temp)) m++;
 			}
 			if (m>1)

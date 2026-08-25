@@ -4820,8 +4820,20 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 				ch[co].data[72] = 6;
 				if (!(ch[co].flags & CF_EXTRACRIT)) ch[co].flags |= CF_EXTRACRIT;
 				//
-				if (!RANDOM(6) && (in = god_create_item(3425+RANDOM(9))))
+				if ((in = IT_SIGN_SHOU) && (n = RANDOM(12)) >= 9)
 				{
+					in = IT_SIGN_SAFE;
+					n -= 9;
+				}
+				if (!RANDOM(6) && (in = god_create_item(in+n)))
+				{
+					if ((m = RANDOM(12)) >= 9)
+					{
+						n  = IT_SIGN_SAFE;
+						m -= 9;
+					}
+					n += m;
+					
 					god_give_char(in, co);
 					chlog(co, "got %s", itemvowel(in, 0));
 					hasloot=1;

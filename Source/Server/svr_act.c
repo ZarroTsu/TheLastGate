@@ -56,7 +56,7 @@ void step_desertfloor(int cn)
 	int n, in2, in3;
 	int alreadyhave = 0;
 
-	for (n = 0; n<MAXBUFFS; n++)	if ((in3 = ch[cn].spell[n])!=0) // Check for coconut
+	for (n = 0; n<MAXBUFFS; n++) if ((in3 = ch[cn].spell[n])!=0 && (bu[in3].used!=USE_EMPTY)) // Check for coconut
 	{
 		if (bu[in3].temp==205) break;
 		if (bu[in3].temp==206) alreadyhave = 1;
