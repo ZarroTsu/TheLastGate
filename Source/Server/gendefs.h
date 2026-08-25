@@ -682,12 +682,18 @@ extern char *at_short[];
 #define EN_ACCES(n)			(n==11||n==22||n==54||n==79||n==80||n==83)
 #define EN_OTHER(n)			(n== 6||n==17||n==27||n==36||n==44||n==57||n==84)
 
-#define EN_SKUA(n)			(n >=  92 && n <=  95)
-#define EN_KWAI(n)			(n >=  96 && n <=  99)
-#define EN_GORN(n)			(n >= 100 && n <= 103)
-#define EN_PURP(n)			(n >= 104 && n <= 107)
-#define EN_OFFH(n)			(n >= 108 && n <= 111)
-#define EN_GODS(n)			(n >=  92 && n <= 111)
+#define EN_SKUA_1			 92
+#define EN_KWAI_1			 96
+#define EN_GORN_1			100
+#define EN_PURP_1			104
+#define EN_OFFH_1			108
+
+#define EN_SKUA(n)			(n >= EN_SKUA_1 && n <= (EN_SKUA_1 + 3))
+#define EN_KWAI(n)			(n >= EN_KWAI_1 && n <= (EN_KWAI_1 + 3))
+#define EN_GORN(n)			(n >= EN_GORN_1 && n <= (EN_GORN_1 + 3))
+#define EN_PURP(n)			(n >= EN_PURP_1 && n <= (EN_PURP_1 + 3))
+#define EN_OFFH(n)			(n >= EN_OFFH_1 && n <= (EN_OFFH_1 + 3))
+#define EN_GODS(n)			(n >= EN_SKUA_1 && n <= (EN_OFFH_1 + 3))
 
 #define EN_SHOWDESC(n)		(EN_WEAPN(n)||EN_ARMOR(n)||EN_HELMS(n)||EN_CHEST(n)||EN_GLOVE(n)||EN_CLOAK(n)||EN_BOOTS(n)||EN_ACCES(n)||EN_OTHER(n)||EN_GODS(n))
 

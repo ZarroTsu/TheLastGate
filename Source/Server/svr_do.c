@@ -18660,18 +18660,18 @@ void do_check_new_item_level(int cn, int in)
 		if (IS_SKUAWEAP(in))
 		{
 			it[in].speed[I_P]      = (10 * bonus * rank/10 + 10 * bonus)/2;
-			ench = 57 + RANDOM(4);
+			ench = EN_SKUA_1 + RANDOM(4);
 		}
 		else if (IS_GORNWEAP(in))
 		{
 			it[in].spell_pow[I_P]  = ( 2 * bonus * rank/10 +  2 * bonus)/2 + spel;
-			ench = 65 + RANDOM(4);
+			ench = EN_GORN_1 + RANDOM(4);
 		}
 		else if (IS_KWAIWEAP(in))
 		{
 			it[in].to_hit[I_P]     = ( 2 * bonus * rank/10 +  2 * bonus)/2 + hitt;
 			it[in].to_parry[I_P]   = ( 2 * bonus * rank/10 +  2 * bonus)/2 + parr;
-			ench = 61 + RANDOM(4);
+			ench = EN_KWAI_1 + RANDOM(4);
 		}
 		else if (IS_PURPWEAP(in))
 		{
@@ -18679,7 +18679,7 @@ void do_check_new_item_level(int cn, int in)
 			it[in].spell_pow[I_P]  = ( 2 * bonus * rank/10 +  2 * bonus)/4 + spel;
 			it[in].to_hit[I_P]     = ( 2 * bonus * rank/10 +  2 * bonus)/4 + hitt;
 			it[in].to_parry[I_P]   = ( 2 * bonus * rank/10 +  2 * bonus)/4 + parr;
-			ench = 69 + RANDOM(4);
+			ench = EN_PURP_1 + RANDOM(4);
 		}
 		
 		char_play_sound(cn, ch[cn].sound + 23, -50, 0);
@@ -18691,7 +18691,7 @@ void do_check_new_item_level(int cn, int in)
 		
 		if (rank == 10)
 		{
-			if (IS_OFFHAND(in)) ench = 73 + RANDOM(4);
+			if (IS_OFFHAND(in)) ench = EN_OFFH_1 + RANDOM(4);
 			
 			it[in].flags &= ~(IF_KWAI_UNI | IF_GORN_UNI | IF_PURP_UNI);
 			it[in].enchantment = ench;
