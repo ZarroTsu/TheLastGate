@@ -118,6 +118,13 @@
 #define PANDI_MIDX			 283
 #define PANDI_MIDY			 989
 
+#define AEMON_X1			 275
+#define AEMON_Y1			 981
+#define AEMON_X2			 291
+#define AEMON_Y2			 997
+#define AEMON_MIDX			 283
+#define AEMON_MIDY			 989
+
 #define AAPPROACH_X1		 421
 #define AAPPROACH_Y1		 793
 #define AAPPROACH_X2		 465

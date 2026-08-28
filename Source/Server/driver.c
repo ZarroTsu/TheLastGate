@@ -4013,6 +4013,21 @@ int is_atpandium(int cn)
 	return 0;
 }
 
+int is_ataemon(int cn)
+{
+	int x, y;
+	
+	if (!IS_SANECHAR(cn)) return 0;
+	if (!IS_ACTIVECHAR(cn)) return 0;
+	
+	x = ch[cn].x;
+	y = ch[cn].y;
+	
+	if (x >= AEMON_X1 && y >= AEMON_Y1 && x <= AEMON_X2 && y <= AEMON_Y2) return 1;
+	
+	return 0;
+}
+
 int shiva_activate_candle(int cn, int in, int candlenum);
 
 // special sub-proc for black stronghold mages
@@ -6223,6 +6238,16 @@ void clean_and_go(int cn, int x, int y, int z, int hpm)
 	chlog(cn, "clean_and_go %d, %d", x, y);
 }
 
+void clear_my_statuses(int cn)
+{
+	remove_buff(cn, SK_ZEPHYR2);
+	remove_buff(cn, SK_TAUNT);
+	remove_buff(cn, SK_POISON);
+	remove_buff(cn, SK_BLEED);
+	ch[cn].taunted = 0;
+	npc_remove_all_enemies(cn);
+}
+
 void pandium_driver(int cn) // CT_PANDIUM
 {
 	int n, m, j, p=0, fl=999, x, y, frx, fry, tox, toy, in=0, co=0, dir=0, try=0;
@@ -6317,12 +6342,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			ch[cn].a_hp   = 9999999;
 			if (ch[cn].data[2] != 99)
 			{
-				remove_buff(cn, SK_ZEPHYR2);
-				remove_buff(cn, SK_TAUNT);
-				remove_buff(cn, SK_POISON);
-				remove_buff(cn, SK_BLEED);
-				ch[cn].taunted = 0;
-				npc_remove_all_enemies(cn);
+				clear_my_statuses(cn);
 				for (n=0;n<4;n++)
 				{
 					to_xy[n][0] = go_xy[n+1][0];
@@ -6898,12 +6918,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			if (ch[cn].data[1] != 99)
 			{
 				change_the_arena(0, frx, fry, tox, toy);
-				remove_buff(cn, SK_ZEPHYR2);
-				remove_buff(cn, SK_TAUNT);
-				remove_buff(cn, SK_POISON);
-				remove_buff(cn, SK_BLEED);
-				ch[cn].taunted = 0;
-				npc_remove_all_enemies(cn);
+				clear_my_statuses(cn);
 				x = go_xy[7][0];
 				y = go_xy[7][1]-1;
 				ch[cn].dir = go_xy[7][2];
@@ -6937,7 +6952,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 		ch[cn].skill[SK_SHADOW][0]   = 0;
 		ch[cn].skill[SK_LEAP][0]     = 0;
 		//
-		in = ch[cn].worn[WN_CHARM]; it[in].x = 0; it[in].y = 0; it[in].carried = 0; ch[cn].worn[WN_CHARM] = 0;
+		if ((in = ch[cn].worn[WN_CHARM])) { it[in].x = 0; it[in].y = 0; it[in].carried = 0; ch[cn].worn[WN_CHARM] = 0; }
 		do_update_char(cn);
 		//
 		ch[cn].data[1] = 1;
@@ -7220,6 +7235,121 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			npc_add_enemy(cn, p, 1);
 			ch[cn].data[1]++; 
 			ch[cn].data[2] = globs->ticker + TICKS;
+			break;
+		// Wait until death
+		default: break;
+	}
+}
+
+void aemon_driver(int cn) // CT_AEMON
+{
+	int n, x, y, fl=999, frx, fry, tox, toy, try, co, in, p=0;
+	static int go_xy[8][3] = { {211,1554,2},{208,1554,2},{204,1547,4},{204,1550,4},
+							   {197,1554,1},{200,1554,1},{204,1561,3},{204,1558,3} };
+	/*
+		Aemon Fight Driver
+		
+		data[0] = Player
+		data[1] = Phase
+		data[2] = Phase timer
+		data[3] = Cascade timer
+		data[4] = Cascade type
+		data[5] = Cascade tile offset & ender
+		data[6] = data[7] = Shadow trace for deletion
+		data[8] = M data for Cascade alignment
+	*/
+	
+	// Check for players
+	for (n = 1; n<MAXCHARS; n++)
+	{
+		if (!IS_SANECHAR(n) || ch[n].used==USE_EMPTY) continue;
+		if (IS_PLAYER(n) && is_ataemon(n)) { p = n; break; }
+	}
+	ch[cn].data[0] = p;
+	
+	frx = AEMON_X1;
+	tox = AEMON_X2;
+	fry = AEMON_Y1;
+	toy = AEMON_Y2;
+	
+	// Initialize
+	if (p<1 || ch[cn].data[1]==99)
+	{
+		if (p<1) 
+		{
+			for (x = frx; x<tox; x++) for (y = fry; y<toy; y++)
+			{
+				// Clear any lingering adds
+				if ((co = map[x + y * MAPX].ch) && !IS_PLAYER(co) && ch[co].temp != CT_AEMON)
+				{
+					god_destroy_items(co);
+					if (ch[co].used==USE_ACTIVE) plr_map_remove(co);
+					ch[co].flags = 0;
+					ch[co].used = USE_EMPTY;
+				}
+				// Clear any lingering graves/etc
+				if ((in = map[x + y * MAPX].it)!=0 && (it[in].flags & IF_USE))
+				{
+					it[in].used = 0;
+					map[x + y * MAPX].it = 0;
+				}
+			}
+			ch[cn].a_hp   = 9999999;
+			if (ch[cn].data[1] != 99)
+			{
+				clear_my_statuses(cn);
+				x = go_xy[7][0];
+				y = go_xy[7][1]-1;
+				ch[cn].dir = go_xy[7][2];
+				ch[cn].data[30] = go_xy[7][2];
+				ch[cn].data[29] = x + y * MAPX;
+				god_transfer_char(cn, x, y);
+			}
+			ch[cn].data[1] = 99;
+		}
+		else
+		{
+			chlog(cn, "Initialized");
+			ch[cn].data[1] = 0;
+		}
+		ch[cn].data[2] = globs->ticker + TICKS / 2;
+		ch[cn].data[3] = 0;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		return; // No further process when nobody is in the area
+	}
+	
+	if (p && ch[cn].data[1] == 0) // Phase 0
+	{
+		//
+		if ((in = ch[cn].worn[WN_CHARM])) { it[in].x = 0; it[in].y = 0; it[in].carried = 0; ch[cn].worn[WN_CHARM] = 0; }
+		do_update_char(cn);
+		//
+		ch[cn].data[1] = 1;
+		ch[cn].data[2] = globs->ticker + TICKS;
+		ch[cn].data[3] = 0;
+		ch[cn].data[4] = 0;
+		ch[cn].data[5] = 0;
+		ch[cn].data[6] = 0;
+		ch[cn].data[7] = 0;
+		ch[cn].data[8] = 0;
+		chlog(cn, "beginning aemon fight");
+	}
+	
+	
+	// Return if time is less than next action
+	if (globs->ticker < ch[cn].data[2])
+		return;
+	
+	switch (ch[cn].data[1])
+	{
+		case 1:
+			do_char_log(p, 3, "Aemon: \"%s\"\n", "I see you reading the repository.");
+			ch[cn].data[1]++; 
+			ch[cn].data[2] = globs->ticker + 1;
 			break;
 		// Wait until death
 		default: break;

@@ -79,6 +79,7 @@
 #define CT_VILEQUEEN	1589
 #define CT_PANDIUM		1335
 #define CT_SHADOW		1432
+#define CT_AEMON		9999
 
 #define CT_STONEGOLEM	 723
 #define CT_SEASONSMOB	 724
