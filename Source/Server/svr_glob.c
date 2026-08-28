@@ -145,8 +145,8 @@ void global_pandium_rewards(void)
 	
 	for (n=0;n<3;n++)
 	{
-		if (IS_SANEPLAYER(globs->top_ps[n])) god_give_char(god_create_item(2974), globs->top_ps[n]);
-		if (IS_SANEPLAYER(globs->top_pg[n])) god_give_char(god_create_item(2974), globs->top_pg[n]);
+		if (IS_SANEPLAYER(globs->top_ps[n])) god_give_char(god_create_item(IT_REWARD_AB), globs->top_ps[n]);
+		if (IS_SANEPLAYER(globs->top_pg[n])) god_give_char(god_create_item(IT_REWARD_AB), globs->top_pg[n]);
 		globs->top_ps[n] = 0;
 		globs->top_pg[n] = 0;
 	}

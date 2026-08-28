@@ -896,9 +896,27 @@ void look_colosseum_shrine(int cn, int in)
 	}
 }
 
+void look_rewardscroll(int cn, int in)
+{
+	int n;
+	
+	do_char_log(cn, 6, "%s:\n", it[in].name);
+	do_char_log(cn, 1, "%s\n", it[in].description);
+	if (it[in].data[1])
+		do_char_log(cn, 2, "Grants one of the following rewards:\n");
+	else
+		do_char_log(cn, 2, "Grants the following reward:\n");
+	
+	for (n=0; n<10; n++)
+	{
+		if (it[in].data[n]==0) break;
+		do_char_log(cn, 1, "  %s\n", n+1, it_temp[it[in].data[n]].name);
+	}
+}
+
 void look_driver(int cn, int in, int showname)
 {
-	if (it[in].driver != 113 && it[in].driver != 119 && it[in].driver != 122) // Skip for Contracts & Talismans & Colosseum Shrines
+	if (it[in].driver != 113 && it[in].driver != 119 && it[in].driver != 122 && it[in].driver != 128) // Skip for Contracts & Talismans & Colosseum Shrines
 	{
 		if (showname)
 			do_char_log(cn, 6, "%s:\n", it[in].name);
@@ -926,6 +944,7 @@ void look_driver(int cn, int in, int showname)
 		case 113: look_contract(cn, in, 1);      break;
 		case 119: look_talisman(cn, in);         break;
 		case 122: look_colosseum_shrine(cn, in); break;
+		case 128: look_rewardscroll(cn, in);     break;
 		
 		default: break;
 	}

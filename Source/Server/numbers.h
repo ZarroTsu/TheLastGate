@@ -713,6 +713,8 @@
 #define IT_MATHCAP1			1243 // Brown ~ more
 #define IT_MATHCAP2			1245 // Green
 
+#define IT_REWARD_AB		2974
+
 // -----
 
 #define IT_FLASK		 100

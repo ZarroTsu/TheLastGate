@@ -2855,15 +2855,15 @@ int use_scroll_B(int cn, int in)
 {
 	int n, in2;
 	
-	switch (RANDOM(3))
+	for (n=0; n<10; n++) if (it[in].data[n]==0) break;
+	
+	if (n==0)
 	{
-		case  0:	n = 2797;	break;
-		case  1:	n = 2798;	break;
-		case  2:	n = 2799;	break;
-		default: break;
+		do_char_log(cn, 0, "Something is wrong with this reward scroll, please let Zarro know.\n");
+		return 0;
 	}
 	
-	in2 = god_create_item(n);
+	in2 = god_create_item(it[in].data[RANDOM(n)]);
 	
 	if (!god_give_char(in2, cn))
 	{
