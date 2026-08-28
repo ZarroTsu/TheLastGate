@@ -4494,8 +4494,8 @@ void set_map_enemy_tarot(int co, int kin, int tarot)
 	
 	if (in && in2)
 	{
-		if (tarot & 1) tmp = ch[co].worn[WN_CHARM]  = pop_create_item(in,  co); it[tmp].carried = co;
-		if (tarot & 2) tmp = ch[co].worn[WN_CHARM2] = pop_create_item(in2, co); it[tmp].carried = co;
+		if (tarot & 1) { tmp = ch[co].worn[WN_CHARM]  = pop_create_item(in,  co); it[tmp].carried = co; }
+		if (tarot & 2) { tmp = ch[co].worn[WN_CHARM2] = pop_create_item(in2, co); it[tmp].carried = co; }
 	}
 }
 

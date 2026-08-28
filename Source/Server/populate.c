@@ -199,7 +199,7 @@ int pop_create_item(int temp, int cn)
 			in = pop_create_godly_weapon(cn, temp, 0);
 		}
 	}
-	if ((is_osiris_weap(temp)) && it_temp[temp].data[1]==0 && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
+	else if ((is_osiris_weap(temp)) && it_temp[temp].data[1]==0 && (it_temp[temp].flags & IF_CAN_SS) && !RANDOM(4))
 	{
 		in = pop_create_godly_weapon(cn, temp, 5);
 	}
@@ -228,7 +228,7 @@ int pop_create_item(int temp, int cn)
 
 int pop_create_bonus(int cn)
 {
-	int n, rank;
+	int n, temp=0, in=0, rank;
 	
 	// Changing from raw exp to rank for simplicity sake
 	rank = getrank(cn);
@@ -255,8 +255,8 @@ int pop_create_bonus(int cn)
 			IT_POT_G_HP, IT_POT_G_EN, IT_POT_G_MP,
 			MCT_CONTRACT
 		};
-		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
-		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); temp =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); temp = gitem[n]; }
 	}
 	// High officer
 	else if (rank>=16)
@@ -279,8 +279,8 @@ int pop_create_bonus(int cn)
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			MCT_CONTRACT
 		};
-		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
-		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); temp =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); temp = gitem[n]; }
 	}
 	// Mid officer
 	else if (rank>=12)
@@ -306,8 +306,8 @@ int pop_create_bonus(int cn)
 			IT_POT_N_HP, IT_POT_N_EN, IT_POT_N_MP,
 			MCT_CONTRACT
 		};
-		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
-		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); temp =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); temp = gitem[n]; }
 	}
 	// Low officer
 	else if (rank>= 8)
@@ -329,8 +329,8 @@ int pop_create_bonus(int cn)
 			IT_POT_M_HP, IT_POT_M_EN, IT_POT_M_MP,
 			MCT_CONTRACT
 		};
-		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
-		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); temp =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); temp = gitem[n]; }
 	}
 	// Early ranks
 	else if (rank>= 4)
@@ -353,8 +353,8 @@ int pop_create_bonus(int cn)
 			IT_FLO_R, IT_FLO_G, IT_FLO_P,
 			IT_FLASK
 		};
-		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
-		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); temp =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); temp = gitem[n]; }
 	}
 	// Newbie
 	else
@@ -373,17 +373,17 @@ int pop_create_bonus(int cn)
 			IT_FLO_R, IT_FLO_G, IT_FLO_P, 
 			IT_FLASK
 		};
-		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); n =  item[n]; }
-		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); n = gitem[n]; }
+		if (RANDOM(POP_GITEM)) 	{ n = RANDOM(sizeof( item) / sizeof(int)); temp =  item[n]; }
+		else 					{ n = RANDOM(sizeof(gitem) / sizeof(int)); temp = gitem[n]; }
 	}
 	
-	if (n)
+	if (temp)
 	{
-		n = god_create_item(n);
-
-		chlog(cn, "got %s (t=%d)", it[n].name, it[n].temp);
+		in = god_create_item(temp);
+		chlog(cn, "got %s (t=%d)", it[in].name, it[in].temp);
 	}
-	return(n);
+	
+	return in;
 }
 
 /*	Added by SoulHunter  04.04.2000	*/
@@ -638,8 +638,7 @@ int pop_create_char(int n, int drop)
 				j = m;
 				if (try_boost(40))
 				{
-					tmp = pop_create_bonus(cn);
-					if (tmp)
+					if ((tmp = pop_create_bonus(cn)))
 					{
 						it[tmp].carried = cn;
 						ch[cn].item[j]  = tmp;
@@ -649,8 +648,7 @@ int pop_create_char(int n, int drop)
 				}
 				if (ch[cn].item[j]==0 && try_boost(500))
 				{
-					tmp = pop_create_bonus(cn);
-					if (tmp)
+					if ((tmp = pop_create_bonus(cn)))
 					{
 						it[tmp].carried = cn;
 						ch[cn].item[j]  = tmp;
@@ -660,11 +658,11 @@ int pop_create_char(int n, int drop)
 				}
 				if (ch[cn].item[j]==0 && try_boost(6000))
 				{
-					tmp = pop_create_bonus_belt(cn);
-					if (tmp)
+					if ((tmp = pop_create_bonus_belt(cn)))
 					{
 						it[tmp].carried = cn;
 						ch[cn].item[j]  = tmp;
+						j++; if (j>=40) break;
 						hasloot = 1;
 					}
 				}
@@ -691,7 +689,7 @@ int pop_create_char(int n, int drop)
 	
 	if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
 	{
-		if (tmp = god_create_item(IT_CORRUPTOR))
+		if ((tmp = god_create_item(IT_CORRUPTOR)))
 		{
 			ch[cn].citem = tmp;
 			it[tmp].carried = cn;

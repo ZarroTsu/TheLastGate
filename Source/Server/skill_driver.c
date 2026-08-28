@@ -291,7 +291,7 @@ int spell_shock(int cn, int co, int power);
 // Check for and escalate a given debuff template
 int on_hit_debuff(int cn, int co, int v, int origtmp)
 {
-	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power = 27;
+	int n, in=0, tmp=0, spr=0, dur = SP_DUR_GLOVES, power=0;
 	int nmz = 0, debuff=1, newbuff=0;
 	
 	if (!origtmp)           return 0;
@@ -342,6 +342,8 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			break;
 		default: return 0;  // Invalid skill
 	}
+	
+	if (debuff) power = 15 + getrank(cn)*3;
 	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
@@ -516,6 +518,13 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			return add_spell(cn, in);
 		
 		return add_spell(co, in);
+	}
+	else
+	{
+		if (!debuff)
+			do_update_char(cn);
+		else
+			do_update_char(co);
 	}
 	
 	return 1;

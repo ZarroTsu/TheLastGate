@@ -4184,79 +4184,58 @@ void god_destroy_items(int cn)
 
 	for (n = 0; n<MAXITEMS; n++)
 	{
-		if ((in = ch[cn].item[n])!=0)
+		if (IS_SANEITEM(in = ch[cn].item[n]))
 		{
 			ch[cn].item[n] = 0;
 		//	ch[cn].item_lock[n] = 0;
-			if (in>0 && in<MAXITEM)
-			{
-				it[in].used = USE_EMPTY;
-			}
+			it[in].used = USE_EMPTY;
 		}
 	}
 	for (n = 0; n<20; n++)
 	{
-		if ((in = ch[cn].worn[n])!=0)
+		if (IS_SANEITEM(in = ch[cn].worn[n]))
 		{
 			ch[cn].worn[n] = 0;
-			if (in>0 && in<MAXITEM)
-			{
-				it[in].used = USE_EMPTY;
-			}
+			it[in].used = USE_EMPTY;
 		}
 	}
 	for (n = 0; n<12; n++)
 	{
-		if ((in = ch[cn].alt_worn[n])!=0)
+		if (IS_SANEITEM(in = ch[cn].alt_worn[n]))
 		{
 			ch[cn].alt_worn[n] = 0;
-			if (in>0 && in<MAXITEM)
-			{
-				it[in].used = USE_EMPTY;
-			}
+			it[in].used = USE_EMPTY;
 		}
 	}
 	for (n = 0; n<4; n++)
 	{
-		if ((in = ch[cn].blacksmith[n])!=0)
+		if (IS_SANEITEM(in = ch[cn].blacksmith[n]))
 		{
 			ch[cn].blacksmith[n] = 0;
-			if (in>0 && in<MAXITEM)
-			{
-				it[in].used = USE_EMPTY;
-			}
+			it[in].used = USE_EMPTY;
 		}
 	}
 	for (n = 0; n<MAXBUFFS; n++)
 	{
-		if ((in = ch[cn].spell[n])!=0)
+		if (IS_SANEITEM(in = ch[cn].spell[n]))
 		{
 			ch[cn].spell[n] = 0;
-			if (in>0 && in<MAXITEM)
-			{
-				bu[in].used = USE_EMPTY;
-			}
+			bu[in].used = USE_EMPTY;
 		}
 	}
-	if ((in = ch[cn].citem)!=0)
+	if (IS_SANEITEM(in = ch[cn].citem))
 	{
 		ch[cn].citem = 0;
-		if (in>0 && in<MAXITEM)
-		{
-			it[in].used = USE_EMPTY;
-		}
+		it[in].used = USE_EMPTY;
 	}
 	if (ch[cn].flags & CF_PLAYER)
 	{
 		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 		{
-			if ((in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS])!=0)
+			if (IS_SANEITEM(in = st[cn].depot[n/ST_SLOTS][n%ST_SLOTS]))
 			{
 				st[cn].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
-				if (in>0 && in<MAXITEM)
-				{
-					it[in].used = USE_EMPTY;
-				}
+				it[in].used = USE_EMPTY;
 			}
 		}
 	}
