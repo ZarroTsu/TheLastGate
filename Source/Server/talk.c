@@ -2095,7 +2095,8 @@ void answer_unlearn(int cn, int co, char *text)
 	}
 	else if (!strcasecmp(word, skilltab[SK_WARCRY].name))    n = SK_WARCRY;
 	else if (!strcasecmp(word, skilltab[SK_LEAP].name))      n = SK_LEAP;
-	else if (!strcasecmp(word, skilltab[SK_GCMASTERY].name)) n = SK_GCMASTERY;
+	else if (!strcasecmp(word, "CompanionMastery"))          n = SK_GCMASTERY;
+	else if (!strcasecmp(word, "CompMastery"))               n = SK_GCMASTERY;
 	else if (!strcasecmp(word, skilltab[SK_LETHARGY].name))  n = SK_LETHARGY;
 	else if (!strcasecmp(word, skilltab[SK_PULSE].name))     n = SK_PULSE;
 	else if (!strcasecmp(word, skilltab[SK_ZEPHYR].name))    n = SK_ZEPHYR;
