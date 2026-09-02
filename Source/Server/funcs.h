@@ -315,6 +315,7 @@ void item_tick(void);
 void map_tick(void);
 void use_consume_item(int cn, int in, int v);
 void use_stack_items(int cn, int in, int in2);
+void destroy_laby_items(int cn);
 void item_damage_armor(int cn, int dam);
 void item_damage_weapon(int cn, int dam);
 void item_damage_citem(int cn, int dam);

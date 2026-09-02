@@ -62,6 +62,7 @@
 
 #define IS_MAGICITEM(in)		(it[(in)].flags & IF_MAGIC)
 #define IS_UNIQUE(in)			(it[(in)].flags & IF_UNIQUE)
+#define IS_LABDESTROY(in)		(it[(in)].flags & IF_LABYDESTROY)
 #define IS_QUESTITEM(in)		((it[(in)].flags & IF_SHOPDESTROY) || (it[(in)].flags & IF_LABYDESTROY) || (it[(in)].flags & IF_NODEPOT))
 #define IS_GEMSTONE(in)			(it[(in)].flags & IF_GEMSTONE)
 #define IS_SOULSTONE(in)		(it[(in)].driver== 68)

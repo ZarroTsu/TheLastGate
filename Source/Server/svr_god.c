@@ -2396,40 +2396,9 @@ int god_thrall(int cn, char *spec1, char *spec2, int offset)
 		ch[ct].text[1][0] = 0;  		// removes attack message entirely for "army" thralls
 		ch[ct].data[43] = 65500;		// on second thought, *do* attack players if we're part of an army...
 	}
-
-	for (n = 0; n<20; n++)
-	{
-		if ((in = ch[ct].worn[n]) && (it[in].flags & IF_LABYDESTROY))
-		{
-			it[in].used = 0;
-			ch[ct].worn[n] = 0;
-		}
-	}
 	
-	for (n = 0; n<12; n++)
-	{
-		if ((in = ch[ct].alt_worn[n]) && (it[in].flags & IF_LABYDESTROY))
-		{
-			it[in].used = 0;
-			ch[ct].alt_worn[n] = 0;
-		}
-	}
-
-	for (n = 0; n<MAXITEMS; n++)
-	{
-		if ((in = ch[ct].item[n]) && (it[in].flags & IF_LABYDESTROY))
-		{
-			it[in].used = 0;
-			ch[ct].item[n] = 0;
-		}
-	}
-
-	if ((in = ch[ct].citem) && (it[in].flags & IF_LABYDESTROY))
-	{
-		it[in].used  = 0;
-		ch[ct].citem = 0;
-	}
-
+	destroy_laby_items(ct);
+	
 	if (!god_drop_char_fuzzy(ct, x, y))
 	{
 		do_char_log(cn, 0, "god_drop_char_fuzzy() called from god_thrall() failed.\n");

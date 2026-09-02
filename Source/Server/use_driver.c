@@ -1699,6 +1699,42 @@ int stone_sword(int cn, int in)
 	return 1;
 }
 
+void laby_vanished(int cn, int in)
+{
+	it[in].used = USE_EMPTY;
+	do_char_log(cn, 1, "Your %s vanished.\n", it[in].reference);
+}
+
+void destroy_laby_items(int cn)
+{
+	int in;
+	
+	if (IS_SANEITEM(in = ch[cn].citem) && !(in & 0x80000000) && IS_LABDESTROY(in))
+	{
+		ch[cn].citem = 0;
+		laby_vanished(cn, in);
+	}
+	
+	for (n = 0; n<MAXITEMS; n++) if (IS_SANEITEM(in = ch[cn].item[n]) && IS_LABDESTROY(in))
+	{
+		ch[cn].item[n] = 0;
+//		ch[cn].item_lock[n] = 0;
+		laby_vanished(cn, in);
+	}
+	
+	for (n = 0; n<20; n++) if (IS_SANEITEM(in = ch[cn].worn[n]) && IS_LABDESTROY(in))
+	{
+		ch[cn].worn[n] = 0;
+		laby_vanished(cn, in);
+	}
+	
+	for (n = 0; n<12; n++) if (IS_SANEITEM(in = ch[cn].alt_worn[n]) && (it[in].flags & IF_LABYDESTROY))
+	{
+		ch[cn].alt_worn[n] = 0;
+		laby_vanished(cn, in);
+	}
+}
+
 void finish_laby_teleport(int cn, int nr, int exp)
 {
 	int n, in2, xt, yt;
@@ -1720,41 +1756,9 @@ void finish_laby_teleport(int cn, int nr, int exp)
 			ch[cn].tree_points++;
 		}
 	}
-	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
-	{
-		ch[cn].citem = 0;
-		it[in2].used = USE_EMPTY;
-		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-	}
-	for (n = 0; n<MAXITEMS; n++)
-	{
-		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].item[n] = 0;
-		//	ch[cn].item_lock[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-	for (n = 0; n<20; n++)
-	{
-		if ((in2 = ch[cn].worn[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].worn[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-	for (n = 0; n<12; n++)
-	{
-		if ((in2 = ch[cn].alt_worn[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].alt_worn[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-
+	
+	destroy_laby_items(cn);
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in2 = ch[cn].spell[n]))
@@ -8132,41 +8136,8 @@ int teleport3(int cn, int in)    // out of labyrinth
 	god_transfer_char(cn, it[in].data[0], it[in].data[1]);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
-
-	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
-	{
-		ch[cn].citem = 0;
-		it[in2].used = USE_EMPTY;
-		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-	}
-	for (n = 0; n<MAXITEMS; n++)
-	{
-		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].item[n] = 0;
-		//	ch[cn].item_lock[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-	for (n = 0; n<20; n++)
-	{
-		if ((in2 = ch[cn].worn[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].worn[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-	for (n = 0; n<12; n++)
-	{
-		if ((in2 = ch[cn].alt_worn[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].alt_worn[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
+	
+	destroy_laby_items(cn);
 	
 	if (has_buff(cn, SK_DIVINITY)) remove_buff(cn, SK_DIVINITY);
 	
@@ -8457,42 +8428,9 @@ int use_seyan_portal(int cn, int in)
 			}
 		}
 	}
-
-	if (IS_SANEITEM(in2 = ch[cn].citem) && !(in2 & 0x80000000) && (it[in2].flags & IF_LABYDESTROY))
-	{
-		ch[cn].citem = 0;
-		it[in2].used = USE_EMPTY;
-		do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-	}
-	for (n = 0; n<MAXITEMS; n++)
-	{
-		if ((in2 = ch[cn].item[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].item[n] = 0;
-		//	ch[cn].item_lock[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-	for (n = 0; n<20; n++)
-	{
-		if ((in2 = ch[cn].worn[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].worn[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-	for (n = 0; n<12; n++)
-	{
-		if ((in2 = ch[cn].alt_worn[n]) && (it[in2].flags & IF_LABYDESTROY))
-		{
-			ch[cn].alt_worn[n] = 0;
-			it[in2].used = USE_EMPTY;
-			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
-		}
-	}
-
+	
+	destroy_laby_items(cn);
+	
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	god_transfer_char(cn, it[in].data[0], it[in].data[1]);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
