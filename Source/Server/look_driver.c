@@ -271,6 +271,7 @@ void look_extra(int cn, int in)
 	case IT_AM_FALMOON: do_char_log(cn, FN_EX, DESC_AM_FALMOON); break;
 	case IT_AM_ECLIPSE: do_char_log(cn, FN_EX, DESC_AM_ECLIPSE); break;
 	case IT_GAMBLERFAL: do_char_log(cn, FN_EX, DESC_GAMBLERFAL); break;
+	case IT_AM_ANTIQUE: do_char_log(cn, FN_EX, DESC_AM_ANTIQUE); break;
 		
 	// -------- SPECIAL BELTS --------
 	case IT_BL_SOLAR:   case IT_BL_LUNAR: 

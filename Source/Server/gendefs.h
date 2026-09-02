@@ -572,6 +572,7 @@ extern char *at_short[];
 #define DESC_AM_FALMOON		"When equipped, you cannot cast or receive spells of any kind.\n"
 #define DESC_AM_ECLIPSE		"When equipped, your immunity has 25%% more effectiveness.\n"
 #define DESC_GAMBLERFAL		"When equipped, critical hits award the active stats on this amulet for 5 seconds.\n"
+#define DESC_AM_ANTIQUE		"Stats on this amulet are applied twice if this amulet has been Soulstoned."
 
 #define DESC_BL_ECLIPSE		"Grants passive bonuses during the day (6:00 to 18:00), and active bonuses during the night (18:00 to 6:00).\n"
 #define DESC_WHITEBELT		"When equipped, get WV from your Hand to Hand skill and +2%% base crit if your main hand and off hand are empty.\n"
