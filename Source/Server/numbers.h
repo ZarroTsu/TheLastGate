@@ -358,6 +358,7 @@
 #define IT_AM_TRUESUN	2295
 #define IT_AM_FALMOON	2296
 #define IT_AM_ECLIPSE	2297
+#define IT_AM_ANTIQUE	2890
 
 // Unique Belts
 #define IT_BL_SOLAR		2395
@@ -366,7 +367,12 @@
 
 #define IT_BL_RED		 628
 #define IT_BL_BLUE		3341
-#define IT_BL_GEMINI	3342
+#define IT_BL_VERD		3642
+#define IT_BL_VIO		3643
+#define IT_BL_GEMI_RB	3342
+#define IT_BL_GEMI_RV	3644
+#define IT_BL_GEMI_VB	3645
+#define IT_BL_GEMI_VV	3646
 
 // Tarot Cards - used with WN_CHARM
 #define IT_CH_FOOL		1513

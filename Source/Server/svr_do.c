@@ -10680,6 +10680,9 @@ int do_add_stat(int cn, int in, int v, int m)
 	if (m && do_get_iflag(cn, SF_TW_MARCH) && v<0) // Tower Boots
 		v = v*2/3;
 	
+	if (in && it[in].temp == IT_AM_ANTIQUE && IS_SOULSTONED(in)) // Antique Amulet
+		v = v*2;
+	
 	if ((n = TC_SK(cn, 18)) && in && IS_WPGAXE(in))    v = more(v, n*15, 1); // (Corr) Goliath
 	if ((n = TC_SK(cn, 22)) && in && IS_WPSHIELD(in))  v = more(v, n*15, 1); // (Corr) Full Cover
 	if ((n = TC_SK(cn, 30)) && in && IS_WPTWOHAND(in)) v = more(v, n*15, 1); // (Corr) Monkey Grip

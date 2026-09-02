@@ -6911,98 +6911,104 @@ int build_sinbinder(int cn, int in)
 int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces and Deus Amulet
 {
 	int t1, t2, in2, r, in3;
-
+	
 	t1 = it[in].temp;
-
+	
 	in2 = ch[cn].citem;
 	if (!in2 || (in2 & 0x80000000))
 	{
 		do_char_log(cn, 1, "Nothing happens.\n");
 		return 0;
 	}
-
+	
 	t2 = it[in2].temp;
-
+	
 	// Sun amulet pieces
-	if 			(t1==471 && t2==472)	r = 476;
-	else if 	(t1==472 && t2==471)	r = 476;
-	else if 	(t1==471 && t2==473)	r = 474;
-	else if 	(t1==473 && t2==471)	r = 474;
-	else if 	(t1==472 && t2==473)	r = 475;
-	else if 	(t1==473 && t2==472)	r = 475;
-	else if 	(t1==471 && t2==475)	r = 466;
-	else if 	(t1==475 && t2==471)	r = 466;
-	else if 	(t1==472 && t2==474)	r = 466;
-	else if 	(t1==474 && t2==472)	r = 466;
-	else if 	(t1==473 && t2==476)	r = 466;
-	else if 	(t1==476 && t2==473)	r = 466;
+	     if (t1== 471 && t2== 472) r =  476;
+	else if (t1== 472 && t2== 471) r =  476;
+	else if (t1== 471 && t2== 473) r =  474;
+	else if (t1== 473 && t2== 471) r =  474;
+	else if (t1== 472 && t2== 473) r =  475;
+	else if (t1== 473 && t2== 472) r =  475;
+	else if (t1== 471 && t2== 475) r =  466;
+	else if (t1== 475 && t2== 471) r =  466;
+	else if (t1== 472 && t2== 474) r =  466;
+	else if (t1== 474 && t2== 472) r =  466;
+	else if (t1== 473 && t2== 476) r =  466;
+	else if (t1== 476 && t2== 473) r =  466;
 	// Hourglass pieces
-	else if 	(t1==1821 && t2==1822)	r = 1823;
-	else if 	(t1==1821 && t2==1825)	r = 1828;
-	else if 	(t1==1821 && t2==1826)	r = 1831;
-	else if 	(t1==1821 && t2==1827)	r = 1829;
-	else if 	(t1==1821 && t2==1832)	r = 1820;
-	else if 	(t1==1824 && t2==1825)	r = 1826;
-	else if 	(t1==1824 && t2==1822)	r = 1827;
-	else if 	(t1==1824 && t2==1823)	r = 1829;
-	else if 	(t1==1824 && t2==1828)	r = 1831;
-	else if 	(t1==1824 && t2==1830)	r = 1820;
-	else if 	(t1==1822 && t2==1821)	r = 1823;
-	else if 	(t1==1822 && t2==1824)	r = 1827;
-	else if 	(t1==1822 && t2==1826)	r = 1832;
-	else if 	(t1==1822 && t2==1828)	r = 1830;
-	else if 	(t1==1822 && t2==1831)	r = 1820;
-	else if 	(t1==1825 && t2==1824)	r = 1826;
-	else if 	(t1==1825 && t2==1821)	r = 1828;
-	else if 	(t1==1825 && t2==1823)	r = 1830;
-	else if 	(t1==1825 && t2==1827)	r = 1832;
-	else if 	(t1==1825 && t2==1829)	r = 1820;
-	else if 	(t1==1823 && t2==1825)	r = 1830;
-	else if 	(t1==1823 && t2==1824)	r = 1829;
-	else if 	(t1==1823 && t2==1826)	r = 1820;
-	else if 	(t1==1826 && t2==1821)	r = 1831;
-	else if 	(t1==1826 && t2==1822)	r = 1832;
-	else if 	(t1==1826 && t2==1823)	r = 1820;
-	else if 	(t1==1827 && t2==1821)	r = 1829;
-	else if 	(t1==1827 && t2==1825)	r = 1832;
-	else if 	(t1==1827 && t2==1828)	r = 1820;
-	else if 	(t1==1828 && t2==1824)	r = 1831;
-	else if 	(t1==1828 && t2==1822)	r = 1830;
-	else if 	(t1==1828 && t2==1827)	r = 1820;
-	else if 	(t1==1830 && t2==1824)	r = 1820;
-	else if 	(t1==1829 && t2==1825)	r = 1820;
-	else if 	(t1==1831 && t2==1822)	r = 1820;
-	else if 	(t1==1832 && t2==1821)	r = 1820;
+	else if (t1==1821 && t2==1822) r = 1823;
+	else if (t1==1821 && t2==1825) r = 1828;
+	else if (t1==1821 && t2==1826) r = 1831;
+	else if (t1==1821 && t2==1827) r = 1829;
+	else if (t1==1821 && t2==1832) r = 1820;
+	else if (t1==1824 && t2==1825) r = 1826;
+	else if (t1==1824 && t2==1822) r = 1827;
+	else if (t1==1824 && t2==1823) r = 1829;
+	else if (t1==1824 && t2==1828) r = 1831;
+	else if (t1==1824 && t2==1830) r = 1820;
+	else if (t1==1822 && t2==1821) r = 1823;
+	else if (t1==1822 && t2==1824) r = 1827;
+	else if (t1==1822 && t2==1826) r = 1832;
+	else if (t1==1822 && t2==1828) r = 1830;
+	else if (t1==1822 && t2==1831) r = 1820;
+	else if (t1==1825 && t2==1824) r = 1826;
+	else if (t1==1825 && t2==1821) r = 1828;
+	else if (t1==1825 && t2==1823) r = 1830;
+	else if (t1==1825 && t2==1827) r = 1832;
+	else if (t1==1825 && t2==1829) r = 1820;
+	else if (t1==1823 && t2==1825) r = 1830;
+	else if (t1==1823 && t2==1824) r = 1829;
+	else if (t1==1823 && t2==1826) r = 1820;
+	else if (t1==1826 && t2==1821) r = 1831;
+	else if (t1==1826 && t2==1822) r = 1832;
+	else if (t1==1826 && t2==1823) r = 1820;
+	else if (t1==1827 && t2==1821) r = 1829;
+	else if (t1==1827 && t2==1825) r = 1832;
+	else if (t1==1827 && t2==1828) r = 1820;
+	else if (t1==1828 && t2==1824) r = 1831;
+	else if (t1==1828 && t2==1822) r = 1830;
+	else if (t1==1828 && t2==1827) r = 1820;
+	else if (t1==1830 && t2==1824) r = 1820;
+	else if (t1==1829 && t2==1825) r = 1820;
+	else if (t1==1831 && t2==1822) r = 1820;
+	else if (t1==1832 && t2==1821) r = 1820;
 	// Deus
-	else if 	(t1==2295 && t2==2296)	r = 2297;
-	else if 	(t1==2296 && t2==2295)	r = 2297;
+	else if (t1==2295 && t2==2296) r = 2297;
+	else if (t1==2296 && t2==2295) r = 2297;
 	// Eclipse belt
-	else if 	(t1==IT_BL_SOLAR && t2==IT_BL_LUNAR)	r = IT_BL_ECLIPSE;
-	else if 	(t1==IT_BL_LUNAR && t2==IT_BL_SOLAR)	r = IT_BL_ECLIPSE;
-	// Gemini belt
-	else if 	(t1==IT_BL_RED  && t2==IT_BL_BLUE)		r = IT_BL_GEMINI;
-	else if 	(t1==IT_BL_BLUE && t2==IT_BL_RED )		r = IT_BL_GEMINI;
+	else if (t1==IT_BL_SOLAR && t2==IT_BL_LUNAR) r = IT_BL_ECLIPSE;
+	else if (t1==IT_BL_LUNAR && t2==IT_BL_SOLAR) r = IT_BL_ECLIPSE;
+	// Gemini belts
+	else if (t1==IT_BL_RED   && t2==IT_BL_BLUE ) r = IT_BL_GEMI_RB;
+	else if (t1==IT_BL_BLUE  && t2==IT_BL_RED  ) r = IT_BL_GEMI_RB;
+	else if (t1==IT_BL_RED   && t2==IT_BL_VIO  ) r = IT_BL_GEMI_RV;
+	else if (t1==IT_BL_VIO   && t2==IT_BL_RED  ) r = IT_BL_GEMI_RV;
+	else if (t1==IT_BL_VERD  && t2==IT_BL_BLUE ) r = IT_BL_GEMI_VB;
+	else if (t1==IT_BL_BLUE  && t2==IT_BL_VERD ) r = IT_BL_GEMI_VB;
+	else if (t1==IT_BL_VERD  && t2==IT_BL_VIO  ) r = IT_BL_GEMI_VV;
+	else if (t1==IT_BL_VIO   && t2==IT_BL_VERD ) r = IT_BL_GEMI_VV;
 	//
 	else
 	{
 		do_char_log(cn, 1, "That doesn't fit.\n");
 		return 0;
 	}
-
+	
 	in3 = god_create_item(r);
 	it[in3].flags |= IF_UPDATE;
-
+	
 	if (in2)
 	{
 		ch[cn].citem = 0;
 		it[in2].used = USE_EMPTY;
 	}
-
+	
 	god_take_from_char(in, cn);
 	it[in].used = USE_EMPTY;
-
+	
 	god_give_char(in3, cn);
-
+	
 	return 1;
 }
 
