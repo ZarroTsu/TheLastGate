@@ -4589,7 +4589,7 @@ int crystal_gear_up(int cc, int slot, int temp, int sss, int ss_item, int en_ite
 	
 	if ((sss&&!RANDOM(4)) || ss_item == slot)
 	{
-		create_new_ss_equipment(cc, in, 0, -1); m++;
+		create_new_soulstone_equipment(cc, in, 0, -1, -1, -1); m++;
 	}
 	if ((sss&&!RANDOM(4)) || en_item == slot)
 	{
@@ -7338,11 +7338,11 @@ void boost_char(int cn, int type)
 			case  1:
 			case 11:
 				sprintf(buf, "Strong %s", ch[cn].name); divi = 5;
-				give_new_ss(cn, 0);
+				give_new_soulstone(cn, 0);
 				if (type==11)
 				{
 					divi -= 2;
-					give_new_ss(cn, 0);
+					give_new_soulstone(cn, 0);
 				}
 				break;
 			case  2:

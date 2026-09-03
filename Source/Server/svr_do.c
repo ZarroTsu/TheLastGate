@@ -7129,7 +7129,7 @@ void do_command(int cn, char *ptr)
 		;
 		if (prefix(cmd, "soulstone") && f_g)
 		{
-			give_new_ss(cn, atoi(arg[1]));
+			give_new_soulstone(cn, atoi(arg[1]));
 			return;
 		}
 		;

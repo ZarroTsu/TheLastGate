@@ -7414,7 +7414,7 @@ void build_item_drop(int x, int y, int v, int cn, int rank)
 			else if (rank>12) { in = RANDOM(sizeof(item_eq3) / sizeof(int)); in = god_create_item(item_eq3[in]); }
 			else if (rank> 8) { in = RANDOM(sizeof(item_eq2) / sizeof(int)); in = god_create_item(item_eq2[in]); }
 			else              { in = RANDOM(sizeof(item_eq1) / sizeof(int)); in = god_create_item(item_eq1[in]); }
-			create_new_ss_equipment(cn, in, rank, -1);
+			create_new_soulstone_equipment(cn, in, rank, -1, -1, -1);
 			break;
 		case MM_P_ARPT: // Potion
 			in = RANDOM(sizeof(item_pt) / sizeof(int));

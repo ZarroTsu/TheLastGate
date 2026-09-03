@@ -2828,41 +2828,47 @@ int cap(int cn, int nr)
 	return(place);
 }
 
-// New Soulstones
-// .stack is the current total power of the stone, for merging & display purposes
-// .data[0] is the catalyzed stat, if applicable. Set to -1 if unused.
-// IF_SOULSTONE is if this stone has been catalyzed.
-// IF_ENCHANTED is if this stone has been focused, causing items to require repair.
+/*
+	Soulstones Version 4
+	
+	Soul Stones merge to roll a new soulstone. Two of the same rank makes the rank go up by 1, until capped.
+	Soul Catalysts add (up to) +3 to a stat.
+	Soul Focuses add +3 levels to the stone.
+	
+	.stack is the current total power of the stone, for merging & display purposes
+	.data[0] is the 1st catalyzed stat, -1 if unused. Migrates downwards on new catalyst.
+	.data[1] is the 2nd catalyzed stat, -1 if unused. Migrates downwards on new catalyst.
+	.data[2] is the 3rd catalyzed stat, -1 if unused. Removed on new catalyst.
+	
+	IF_SOULSTONE is applied if this stone has been catalyzed.
+*/
 
-#define SS_CAP        4
-#define SS_FOCUS_CAP  6
-#define SS_STAT_CAP   2
+#define IS_SS(sk)		((sk) >= 0 && (sk) < MAXSKILL)
 
-void add_ss_stat(int cn, int in, int c[MAXSKILL], int v, int n)
+#define SS_CAP           9
+#define SS_STAT_CAP      3
+#define SS_FOCUS_ADD     3
+#define SS_LISTSIZE     37
+
+static int early_soulstone_list[SS_LISTSIZE] = { 
+	SK_HAND,     SK_DAGGER,  SK_SWORD,      SK_AXE,      SK_STAFF,   SK_TWOHAND,
+	SK_STEALTH,  SK_PERCEPT, SK_METABOLISM, SK_MSHIELD,  SK_ECONOM,  SK_REPAIR,
+	SK_SHIELD,   SK_PROTECT, SK_ENHANCE,    SK_SLOW,     SK_CURSE,   SK_BLESS,
+	SK_RESIST,   SK_BLAST,   SK_DISPEL,     SK_HEAL,     SK_GHOST,   SK_REGEN,
+	SK_REST,     SK_MEDIT,   SK_IMMUN,      SK_SURROUND, SK_TACTICS, SK_BLIND,
+	SK_GEARMAST, SK_CLEAVE,  SK_WEAKEN,     SK_POISON,   SK_HASTE,   SK_TAUNT
+};
+
+void add_soulstone_stat(int cn, int in, int c[MAXSKILL], int v, int n)
 {
-	int early_ss_list[37] = { 
-		SK_HAND,     SK_DAGGER,  SK_SWORD,      SK_AXE,      SK_STAFF,   SK_TWOHAND,
-		SK_STEALTH,  SK_PERCEPT, SK_METABOLISM, SK_MSHIELD,  SK_ECONOM,  SK_REPAIR,
-		SK_SHIELD,   SK_PROTECT, SK_ENHANCE,    SK_SLOW,     SK_CURSE,   SK_BLESS,
-		SK_RESIST,   SK_BLAST,   SK_DISPEL,     SK_HEAL,     SK_GHOST,   SK_REGEN, 
-		SK_REST,     SK_MEDIT,   SK_IMMUN,      SK_SURROUND, SK_TACTICS, SK_BLIND,
-		SK_GEARMAST, SK_CLEAVE,  SK_WEAKEN,     SK_POISON,   SK_HASTE,   SK_TAUNT };
 	int m, sk = 0;
 	
-	for (m=0;m<99;m++)
+	for (m = 0; m < 99; m++)
 	{
-		if (cn)
-		{
-			if (!IS_PLAYER(cn))
-			{
-				if (getrank(cn)<12)
-					sk = early_ss_list[RANDOM(37)];
-				else
-					sk = RANDOM(MAXSKILL);
-			}
-			else
-				sk = c[RANDOM(v)];
-		}
+		if (cn && !IS_PLAYER(cn) && getrank(cn) < 12)
+			sk = early_soulstone_list[RANDOM(SS_LISTSIZE)];
+		else if (cn && IS_PLAYER(cn))
+			sk = c[RANDOM(v)];
 		else
 			sk = RANDOM(MAXSKILL);
 		
@@ -2872,112 +2878,137 @@ void add_ss_stat(int cn, int in, int c[MAXSKILL], int v, int n)
 			break;
 		}
 	}
-	
 }
 
-void randomize_ss_stats(int cn, int in, int rank, int sk)
+void randomize_soulstone_stats(int cn, int in, int rank, int sk1, int sk2, int sk3)
 {
-	int n, v = 0;
+	int n, j=0, v = 0;
 	int c[MAXSKILL] = {0};
 	
 	it[in].flags |= IF_IDENTIFIED;
 	
-	for (n=0;n<MAXSKILL;n++)
+	for (n = 0; n < MAXSKILL; n++)
 	{
 		it[in].skill[n][I_I] = 0;
 		if (IS_PLAYER(cn) && B_SK(cn, n))
-		{
 			c[v++] = n;
-		}
 	}
 	
-	if (sk>=0 && sk<MAXSKILL)
+	// Equal distribution
+	for (n = 0; n < SS_STAT_CAP; n++)
 	{
-		n = min(SS_STAT_CAP, rank);
-		it[in].skill[sk][I_I] = n;
-		rank -= n;
+		if (IS_SS(sk3)) { it[in].skill[sk3][I_I]++; rank--; if (rank < 1) break; }
+		if (IS_SS(sk2)) { it[in].skill[sk2][I_I]++; rank--; if (rank < 1) break; }
+		if (IS_SS(sk1)) { it[in].skill[sk1][I_I]++; rank--; if (rank < 1) break; }
 	}
 	
-	if (rank<1) return;
+	/*
 	
-	for (n=0;n<rank;n++)
-	{
-		add_ss_stat(cn, in, c, v, I_I);
-	}
+	// Cascading distribution
+	if (IS_SS(sk3)) { rank -= it[in].skill[sk3][I_I] = min(SS_STAT_CAP, rank); }
+	if (IS_SS(sk2)) { rank -= it[in].skill[sk2][I_I] = min(SS_STAT_CAP, rank); }
+	if (IS_SS(sk1)) { rank -= it[in].skill[sk1][I_I] = min(SS_STAT_CAP, rank); }
+	
+	*/
+	
+	if (rank < 1) return;
+	
+	for (n = 0; n < rank; n++)
+		add_soulstone_stat(cn, in, c, v, I_I);
 }
 
-int make_new_ss(int cn, int rank, int sk)
+int make_new_soulstone(int cn, int rank, int sk1, int sk2, int sk3)
 {
 	int in;
 	
 	if (!rank) rank = getrank(cn);
 	
-	if (rank>=24)                  rank = 4;             // Warlord+
-	else if (rank<=23 && rank>=20) rank = 3 + RANDOM(2); // Noble
-	else if (rank==19)             rank = 3;             // FDM
-	else if (rank<=18 && rank>=15) rank = 2 + RANDOM(2); // General
-	else if (rank<=14 && rank>=13) rank = 2;             // Colonel
-	else if (rank<=12 && rank>= 9) rank = 1 + RANDOM(2); // Officer
-	else                           rank = 1;             // Low
+	     if (rank >= 24) rank = 5;
+	else if (rank >= 21) rank = 4 + RANDOM(2);
+	else if (rank >= 18) rank = 4;
+	else if (rank >= 15) rank = 3 + RANDOM(2);
+	else if (rank >= 12) rank = 3;
+	else if (rank >=  9) rank = 2 + RANDOM(2);
+	else if (rank >=  6) rank = 2;
+	else if (rank >=  3) rank = 1 + RANDOM(2);
+	else                 rank = 1;
 	
 	if (!(in = god_create_item(IT_SOULSTONE)))
 	{
-		chlog(cn, "ERROR in make_new_ss: god_create_item failure");
+		chlog(cn, "ERROR in make_new_soulstone: god_create_item failure");
 		return;
 	}
 	
-	it[in].stack   = rank = max(rank, 1);
+	it[in].stack = rank = min(max(rank, 1), SS_CAP);
 	
-	sprintf(it[in].name, "Soulstone");
-	sprintf(it[in].reference, "soulstone");
+	sprintf(it[in].name,        "Soulstone");
+	sprintf(it[in].reference,   "soulstone");
 	sprintf(it[in].description, "A level %d soulstone.", rank);
 	
 	it[in].temp    = 0;
 	it[in].driver  = 68;
 	
-	randomize_ss_stats(cn, in, rank, (it[in].data[0] = sk));
+	randomize_soulstone_stats(cn, in, rank, 
+		(it[in].data[0] = sk1), (it[in].data[1] = sk2), (it[in].data[2] = sk3));
 	
 	return in;
 }
 
-void give_new_ss(int cn, int rank)
+void give_new_soulstone(int cn, int rank)
 {
 	int in;
 	
-	in = make_new_ss(cn, rank, -1);
+	in = make_new_soulstone(cn, rank, -1, -1, -1);
 	
 	god_give_char(in, cn);
 }
 
-int merge_new_soulstones(int cn, int in, int in2)
+void update_soulstone(int cn, int in, int rank)
 {
-	int rank;
-	
-	rank = min(max(it[in].stack, it[in2].stack), SS_CAP);
-	
-	it[in].stack  = rank = max(rank, 1);
+	it[in].stack = rank = max(rank, 1);
+	it[in].flags |= IF_UPDATE;
 	
 	sprintf(it[in].description, "A level %d soulstone.", rank);
 	do_char_log(cn, 7, "A new level %d stone was created.\n", rank);
 	
-	randomize_ss_stats(cn, in, rank, -1);
+	randomize_soulstone_stats(cn, in, rank, 
+		it[in].data[0], it[in].data[1], it[in].data[2]);
+}
+
+int merge_soulstones(int cn, int in, int in2)
+{
+	int rank, n = 0;
 	
+	if (it[in].stack == it[in2].stack) n = 1;
+	
+	rank = min(n + max(it[in].stack, it[in2].stack), SS_CAP);
+	
+	it[in].data[0] = -1;
+	it[in].data[1] = -1;
+	it[in].data[2] = -1;
+	
+	update_soulstone(cn, in, rank);
 	use_consume_item(cn, in2, 0);
 	
 	return 1;
 }
 
-int apply_new_catalyst(int cn, int in, int in2) // in2 is the catalyst
+int apply_catalyst(int cn, int in, int in2) // in2 is the catalyst
 {
-	int rank, sk;
+	int rank, sk, sk1, sk2, sk3;
 	
 	rank = min(max(it[in].stack, 1), SS_FOCUS_CAP);
 	
 	sk = it[in2].data[4]-1;
 	
-	do_char_log(cn, 6, "The stone was rerolled with %s.\n", skilltab[sk].name);
+	do_char_log(cn, 6, "Added %s to the soulstone.\n", skilltab[sk].name);
 	
-	randomize_ss_stats(cn, in, rank, (it[in].data[0] = sk));
+	if (IS_SS(sk3 = it[in].data[2])) do_char_log(cn, 5, "The soulstone lost %s.\n", skilltab[sk3].name);
+	if (IS_SS(sk2 = it[in].data[1])) it[in].data[2] = sk2;
+	if (IS_SS(sk1 = it[in].data[0])) it[in].data[1] = sk1;
+	
+	randomize_soulstone_stats(cn, in, rank, 
+		(it[in].data[0] = sk), it[in].data[1], it[in].data[2]);
 	it[in].flags |= IF_SOULSTONE | IF_UPDATE;
 	
 	use_consume_item(cn, in2, 1);
@@ -2987,13 +3018,6 @@ int apply_new_catalyst(int cn, int in, int in2) // in2 is the catalyst
 
 int make_new_catalyst(int cn, int n, int v)
 {
-	int early_ss_list[37] = { 
-		SK_HAND,     SK_DAGGER,  SK_SWORD,      SK_AXE,      SK_STAFF,   SK_TWOHAND,
-		SK_STEALTH,  SK_PERCEPT, SK_METABOLISM, SK_MSHIELD,  SK_ECONOM,  SK_REPAIR,
-		SK_SHIELD,   SK_PROTECT, SK_ENHANCE,    SK_SLOW,     SK_CURSE,   SK_BLESS,
-		SK_RESIST,   SK_BLAST,   SK_DISPEL,     SK_HEAL,     SK_GHOST,   SK_REGEN, 
-		SK_REST,     SK_MEDIT,   SK_IMMUN,      SK_SURROUND, SK_TACTICS, SK_BLIND,
-		SK_GEARMAST, SK_CLEAVE,  SK_WEAKEN,     SK_POISON,   SK_HASTE,   SK_TAUNT };
 	int in;
 	
 	if (!(in = god_create_item(IT_SOULCATAL)))
@@ -3005,7 +3029,7 @@ int make_new_catalyst(int cn, int n, int v)
 	if (!v)
 	{
 		if (!IS_ANY_ARCH(cn) || (IS_MONSTER(cn) && getrank(cn)<12))
-			v = early_ss_list[RANDOM(37)];
+			v = early_soulstone_list[RANDOM(SS_LISTSIZE)];
 		else
 			v = RANDOM(MAXSKILL);
 	}
@@ -3030,40 +3054,24 @@ int make_new_catalyst(int cn, int n, int v)
 	return in;
 }
 
-int apply_new_focus(int cn, int in, int in2) // in2 is the focus
+int apply_focus(int cn, int in, int in2) // in2 is the focus
 {
 	int n, m = 0, v = 0, rank;
 	int c[MAXSKILL] = {0};
 	
 	m = it[in].stack;
 	
-	rank = min(it[in].stack+SS_STAT_CAP, SS_FOCUS_CAP);
+	rank = min(it[in].stack + SS_FOCUS_ADD, SS_CAP);
 	
 	m = rank - m;
 	
-	if (m<=0)
+	if (m <= 0)
 	{
 		do_char_log(cn, 1, "Nothing happened.\n");
 		return 0;
 	}
 	
-	it[in].stack  = rank = max(rank, 1);
-	it[in].flags |= IF_ENCHANTED | IF_UPDATE;
-	
-	sprintf(it[in].description, "A volatile level %d soulstone.", rank);
-	do_char_log(cn, 7, "The stone became volatile, with a new level of %d.\n", rank);
-	
-	for (n=0;n<MAXSKILL;n++)
-	{
-		if (IS_PLAYER(cn) && B_SK(cn, n))
-		{
-			c[v++] = n;
-		}
-	}
-	
-	for (n=0;n<m;n++)
-		add_ss_stat(cn, in, c, v, I_I);
-	
+	update_soulstone(cn, in, rank);
 	use_consume_item(cn, in2, 1);
 	
 	return 1;
@@ -3081,7 +3089,7 @@ int make_new_focus(int cn)
 	
 	sprintf(it[in].name, "Soul Focus");
 	sprintf(it[in].reference, "soul focus");
-	sprintf(it[in].description, "A soul focus. Can be used on a soulstone to increase its level by %d, but may cause volatile side effects.", SS_STAT_CAP);
+	sprintf(it[in].description, "A soul focus. It can be used on a soulstone to increase its level by %d.", SS_FOCUS_ADD);
 	
 	it[in].temp = 0;
 	it[in].driver = 92;
@@ -3089,7 +3097,7 @@ int make_new_focus(int cn)
 	god_give_char(in, cn);
 }
 
-int apply_new_ss(int cn, int in, int in2, int msg) // in2 is the soulstone
+int apply_soulstone(int cn, int in, int in2, int msg) // in2 is the soulstone
 {
 	int n, rank, fool, v = 0, temp, bonus = 1, vlt = 0;
 	int c[MAXSKILL] = {0};
@@ -3119,7 +3127,7 @@ int apply_new_ss(int cn, int in, int in2, int msg) // in2 is the soulstone
 		
 		for (n=0;n<fool;n++)
 		{
-			add_ss_stat(cn, in, c, v, I_P);
+			add_soulstone_stat(cn, in, c, v, I_P);
 		}
 	}
 	
@@ -3144,32 +3152,22 @@ int apply_new_ss(int cn, int in, int in2, int msg) // in2 is the soulstone
 	it[in].value -= 1;
 	it[in].power += rank * 5 + max(0, (rank-1) * 5) + max(0, (rank-2) * 5) + max(0, (rank-3) * 5) + max(0, (rank-4) * 5) + max(0, (rank-5) * 5);
 	
-	if (vlt && !HAS_ENCH(in, 34))
-	{
-		if (msg && (it[in].flags & IF_NOREPAIR))
-			do_char_log(cn, 7, "You enhanced the %s with a level %d soulstone. Due to the volatile nature of the stone, it lost its resistance to aging.\n", it[in].name, rank);
-		it[in].flags &= ~IF_NOREPAIR;
-		if (it[in].flags & IF_WEAPON) it[in].max_damage = it[in].power * 5000;
-		else                          it[in].max_damage = it[in].power * 1250;
-		
-	}
-	else if (msg)
-		do_char_log(cn, 7, "You enhanced the %s with a level %d soulstone.\n", it[in].name, rank);
+	do_char_log(cn, 7, "You enhanced the %s with a level %d soulstone.\n", it[in].name, rank);
 	
 	use_consume_item(cn, in2, 0);
 	
 	return 1;
 }
 
-void create_new_ss_equipment(int cn, int in, int rank, int sk)
+void create_new_soulstone_equipment(int cn, int in, int rank, int sk1, int sk2, int sk3)
 {
 	int in2;
 	
 	if (!CAN_SOULSTONE(in)) return;
 	
-	in2 = make_new_ss(cn, rank, sk);
+	in2 = make_new_soulstone(cn, rank, sk1, sk2, sk3);
 	
-	apply_new_ss(cn, in, in2, 0);
+	apply_soulstone(cn, in, in2, 0);
 }
 
 int make_lskill(int cn, int v)
@@ -3901,27 +3899,26 @@ int use_soulstone(int cn, int in, int in2)
 
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
-	if (!in2)
+	if (!IS_SANEITEM(in2))
 	{
 		do_char_log(cn, 1, "Try using something with the soulstone. Click on it with an item under your cursor.\n");
 		return 0;
 	}
-	if (!IS_SANEITEM(in2))	return 0;
 	
 	switch (it[in2].driver)
 	{
 		case 68: // Soulstone
-			return merge_new_soulstones(cn, in, in2);
+			return merge_soulstones(cn, in, in2);
 		case 92: // Soul Focus
-			return apply_new_focus(cn, in, in2);
+			return apply_focus(cn, in, in2);
 		case 93: // Soul Catalyst
-			return apply_new_catalyst(cn, in, in2);
+			return apply_catalyst(cn, in, in2);
 		default:
 			break;
 	}
 	
 	if (CAN_SOULSTONE(in2))
-		return apply_new_ss(cn, in2, in, 1);
+		return apply_soulstone(cn, in2, in, 1);
 	
 	if (use_soulstone_special(cn, in2))
 	{
@@ -3939,26 +3936,17 @@ int use_soulfocus(int cn, int in) // driver 92
 
 	if (!IS_SANECHAR(cn))	return 0;
 	if (!IS_SANEITEM(in))	return 0;
-	if (!(in2 = ch[cn].citem))
+	if (!IS_SANEITEM(in2 = ch[cn].citem))
 	{
 		do_char_log(cn, 1, "Try using this item on a soulstone.\n");
 		return 0;
 	}
-	if (!IS_SANEITEM(in2))	return 0;
 	
-	switch (it[in2].driver)
-	{
-		case 68: // Soulstone
-			return apply_new_focus(cn, in2, in);
-		case 92: // Soul Focus
-			break;
-		case 93: // Soul Catalyst
-			break;
-		default:
-			break;
-	}
+	if (it[in2].driver == 68) // Soulstone
+		return apply_focus(cn, in2, in);
 	
 	do_char_log(cn, 1, "Nothing happened.\n");
+	
 	return 0;
 }
 
@@ -3966,27 +3954,19 @@ int use_soulcatalyst(int cn, int in) // driver 93
 {
 	int in2, in3, m, v, v1, v2;
 
-	if (!IS_SANECHAR(cn))	return 0;
-	if (!IS_SANEITEM(in))	return 0;
-	if (!(in2 = ch[cn].citem))
+	if (!IS_SANECHAR(cn)) return 0;
+	if (!IS_SANEITEM(in)) return 0;
+	if (!IS_SANEITEM(in2 = ch[cn].citem))
 	{
 		do_char_log(cn, 1, "Try using this item on a soulstone.\n");
 		return 0;
 	}
-	if (!IS_SANEITEM(in2))	return 0;
 	
-	switch (it[in2].driver)
-	{
-		case 68: // Soulstone
-			return apply_new_catalyst(cn, in2, in);
-		case 92: // Soul Focus
-			break;
-		case 93: // Soul Catalyst
-			break;
-		default:
-			break;
-	}
+	if (it[in2].driver == 68) // Soulstone
+		return apply_catalyst(cn, in2, in);
+	
 	do_char_log(cn, 1, "Nothing happened.\n");
+	
 	return 0;
 }
 
