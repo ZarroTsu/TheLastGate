@@ -1707,7 +1707,7 @@ void laby_vanished(int cn, int in)
 
 void destroy_laby_items(int cn)
 {
-	int in;
+	int n, in;
 	
 	if (IS_SANEITEM(in = ch[cn].citem) && !(in & 0x80000000) && IS_LABDESTROY(in))
 	{
