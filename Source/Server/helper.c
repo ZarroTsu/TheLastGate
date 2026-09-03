@@ -2897,9 +2897,24 @@ void randomize_soulstone_stats(int cn, int in, int rank, int sk1, int sk2, int s
 	// Equal distribution
 	for (n = 0; n < SS_STAT_CAP; n++)
 	{
-		if (IS_SS(sk3)) { it[in].skill[sk3][I_I]++; rank--; if (rank < 1) break; }
-		if (IS_SS(sk2)) { it[in].skill[sk2][I_I]++; rank--; if (rank < 1) break; }
-		if (IS_SS(sk1)) { it[in].skill[sk1][I_I]++; rank--; if (rank < 1) break; }
+		if (IS_SS(sk3))
+		{
+			if (it[in].skill[sk3][I_I] >= SS_STAT_CAP) continue;
+			it[in].skill[sk3][I_I]++; rank--;
+			if (rank < 1) break;
+		}
+		if (IS_SS(sk2))
+		{
+			if (it[in].skill[sk2][I_I] >= SS_STAT_CAP) continue;
+			it[in].skill[sk2][I_I]++; rank--;
+			if (rank < 1) break;
+		}
+		if (IS_SS(sk1))
+		{
+			if (it[in].skill[sk1][I_I] >= SS_STAT_CAP) continue;
+			it[in].skill[sk1][I_I]++; rank--;
+			if (rank < 1) break;
+		}
 	}
 	
 	/*
