@@ -3012,7 +3012,7 @@ int apply_catalyst(int cn, int in, int in2) // in2 is the catalyst
 {
 	int rank, sk, sk1, sk2, sk3;
 	
-	rank = min(max(it[in].stack, 1), SS_FOCUS_CAP);
+	rank = min(max(it[in].stack, 1), SS_CAP);
 	
 	sk = it[in2].data[4]-1;
 	
