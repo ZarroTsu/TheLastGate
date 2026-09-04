@@ -10815,301 +10815,312 @@ void really_update_char(int cn)
 	if (IS_PLAYER_COMP(cn)) dmg_rdc = 5000;
 	
 	// Loop through gear for item effect flags - Magic checks
-	if (!(ch[cn].flags & CF_NOMAGIC)) for (n=0; n<MAXGSLOTS; n++)
+	for (n=0; n<MAXGSLOTS; n++)
 	{
 		if (!IS_SANEITEM((in = ch[cn].worn[n]))) continue;
 		
-		if (do_check_tarot(in, IT_CH_MAGI    )) do_set_iflag(cn, SF_MAGI);
-		if (do_check_tarot(in, IT_CH_PREIST  )) do_set_iflag(cn, SF_PREIST);
-		if (do_check_tarot(in, IT_CH_EMPRESS )) do_set_iflag(cn, SF_EMPRESS);
-		if (do_check_tarot(in, IT_CH_EMPEROR )) do_set_iflag(cn, SF_EMPEROR);
-		if (do_check_tarot(in, IT_CH_HEIROPH )) do_set_iflag(cn, SF_HEIROPH);
-		if (do_check_tarot(in, IT_CH_LOVERS  )) do_set_iflag(cn, SF_LOVERS);
-		if (do_check_tarot(in, IT_CH_CHARIOT )) do_set_iflag(cn, SF_CHARIOT);
-		if (do_check_tarot(in, IT_CH_STRENGTH)) do_set_iflag(cn, SF_STRENGTH);
-		if (do_check_tarot(in, IT_CH_HERMIT  )) do_set_iflag(cn, SF_HERMIT);
-		if (do_check_tarot(in, IT_CH_WHEEL   )) do_set_iflag(cn, SF_WHEEL);
-		if (do_check_tarot(in, IT_CH_JUSTICE )) do_set_iflag(cn, SF_JUSTICE);
-		if (do_check_tarot(in, IT_CH_HANGED  )) do_set_iflag(cn, SF_HANGED);
-		if (do_check_tarot(in, IT_CH_DEATH   )) do_set_iflag(cn, SF_DEATH);
-		if (do_check_tarot(in, IT_CH_TEMPER  )) do_set_iflag(cn, SF_TEMPER);
-		if (do_check_tarot(in, IT_CH_DEVIL   )) do_set_iflag(cn, SF_DEVIL);
-		if (do_check_tarot(in, IT_CH_TOWER   )) do_set_iflag(cn, SF_TOWER);
-		if (do_check_tarot(in, IT_CH_STAR    )) do_set_iflag(cn, SF_STAR);
-		if (do_check_tarot(in, IT_CH_MOON    )) do_set_iflag(cn, SF_MOON);
-		if (do_check_tarot(in, IT_CH_SUN     )) do_set_iflag(cn, SF_SUN);
-		if (do_check_tarot(in, IT_CH_JUDGE   )) do_set_iflag(cn, SF_JUDGE);
-		if (do_check_tarot(in, IT_CH_WORLD   )) do_set_iflag(cn, SF_WORLD);
+		if (!(ch[cn].flags & CF_NOMAGIC)) // Enchantment effects blocked by NMZs
+		{
+			if (do_check_tarot(in, IT_CH_MAGI    )) do_set_iflag(cn, SF_MAGI);
+			if (do_check_tarot(in, IT_CH_PREIST  )) do_set_iflag(cn, SF_PREIST);
+			if (do_check_tarot(in, IT_CH_EMPRESS )) do_set_iflag(cn, SF_EMPRESS);
+			if (do_check_tarot(in, IT_CH_EMPEROR )) do_set_iflag(cn, SF_EMPEROR);
+			if (do_check_tarot(in, IT_CH_HEIROPH )) do_set_iflag(cn, SF_HEIROPH);
+			if (do_check_tarot(in, IT_CH_LOVERS  )) do_set_iflag(cn, SF_LOVERS);
+			if (do_check_tarot(in, IT_CH_CHARIOT )) do_set_iflag(cn, SF_CHARIOT);
+			if (do_check_tarot(in, IT_CH_STRENGTH)) do_set_iflag(cn, SF_STRENGTH);
+			if (do_check_tarot(in, IT_CH_HERMIT  )) do_set_iflag(cn, SF_HERMIT);
+			if (do_check_tarot(in, IT_CH_WHEEL   )) do_set_iflag(cn, SF_WHEEL);
+			if (do_check_tarot(in, IT_CH_JUSTICE )) do_set_iflag(cn, SF_JUSTICE);
+			if (do_check_tarot(in, IT_CH_HANGED  )) do_set_iflag(cn, SF_HANGED);
+			if (do_check_tarot(in, IT_CH_DEATH   )) do_set_iflag(cn, SF_DEATH);
+			if (do_check_tarot(in, IT_CH_TEMPER  )) do_set_iflag(cn, SF_TEMPER);
+			if (do_check_tarot(in, IT_CH_DEVIL   )) do_set_iflag(cn, SF_DEVIL);
+			if (do_check_tarot(in, IT_CH_TOWER   )) do_set_iflag(cn, SF_TOWER);
+			if (do_check_tarot(in, IT_CH_STAR    )) do_set_iflag(cn, SF_STAR);
+			if (do_check_tarot(in, IT_CH_MOON    )) do_set_iflag(cn, SF_MOON);
+			if (do_check_tarot(in, IT_CH_SUN     )) do_set_iflag(cn, SF_SUN);
+			if (do_check_tarot(in, IT_CH_JUDGE   )) do_set_iflag(cn, SF_JUDGE);
+			if (do_check_tarot(in, IT_CH_WORLD   )) do_set_iflag(cn, SF_WORLD);
+			
+			if (do_check_tarot(in, IT_CH_FOOL_R  )) do_set_iflag(cn, SF_FOOL_R);
+			if (do_check_tarot(in, IT_CH_MAGI_R  )) do_set_iflag(cn, SF_MAGI_R);
+			if (do_check_tarot(in, IT_CH_PREIST_R)) do_set_iflag(cn, SF_PREIST_R);
+			if (do_check_tarot(in, IT_CH_EMPRES_R)) do_set_iflag(cn, SF_EMPRES_R);
+			if (do_check_tarot(in, IT_CH_EMPERO_R)) do_set_iflag(cn, SF_EMPERO_R);
+			if (do_check_tarot(in, IT_CH_HEIROP_R)) do_set_iflag(cn, SF_HEIROP_R);
+			if (do_check_tarot(in, IT_CH_LOVERS_R)) do_set_iflag(cn, SF_LOVERS_R);
+			if (do_check_tarot(in, IT_CH_CHARIO_R)) do_set_iflag(cn, SF_CHARIO_R);
+			if (do_check_tarot(in, IT_CH_STRENG_R)) do_set_iflag(cn, SF_STRENG_R);
+			if (do_check_tarot(in, IT_CH_HERMIT_R)) do_set_iflag(cn, SF_HERMIT_R);
+			if (do_check_tarot(in, IT_CH_WHEEL_R )) do_set_iflag(cn, SF_WHEEL_R);
+			if (do_check_tarot(in, IT_CH_JUSTIC_R)) do_set_iflag(cn, SF_JUSTIC_R);
+			if (do_check_tarot(in, IT_CH_HANGED_R)) do_set_iflag(cn, SF_HANGED_R);
+			if (do_check_tarot(in, IT_CH_DEATH_R )) do_set_iflag(cn, SF_DEATH_R);
+			if (do_check_tarot(in, IT_CH_TEMPER_R)) do_set_iflag(cn, SF_TEMPER_R);
+			if (do_check_tarot(in, IT_CH_DEVIL_R )) do_set_iflag(cn, SF_DEVIL_R);
+			if (do_check_tarot(in, IT_CH_TOWER_R )) do_set_iflag(cn, SF_TOWER_R);
+			if (do_check_tarot(in, IT_CH_STAR_R  )) do_set_iflag(cn, SF_STAR_R);
+			if (do_check_tarot(in, IT_CH_MOON_R  )) do_set_iflag(cn, SF_MOON_R);
+			if (do_check_tarot(in, IT_CH_SUN_R   )) do_set_iflag(cn, SF_SUN_R);
+			if (do_check_tarot(in, IT_CH_JUDGE_R )) do_set_iflag(cn, SF_JUDGE_R);
+			if (do_check_tarot(in, IT_CH_WORLD_R )) do_set_iflag(cn, SF_WORLD_R);
+			
+			if (do_check_items(in, IT_BOOK_ALCH)) do_set_iflag(cn, SF_BOOK_ALCH);
+			if (do_check_items(in, IT_IMBK_ALCH)) do_set_iflag(cn, SF_BOOK_ALCH);
+			if (do_check_items(in, IT_BOOK_HOLY)) do_set_iflag(cn, SF_BOOK_HOLY);
+			if (do_check_items(in, IT_IMBK_HOLY)) do_set_iflag(cn, SF_BOOK_HOLY);
+			if (do_check_items(in, IT_BOOK_ADVA)) do_set_iflag(cn, SF_BOOK_ADVA);
+			if (do_check_items(in, IT_IMBK_ADVA)) do_set_iflag(cn, SF_BOOK_ADVA);
+			if (do_check_items(in, IT_BOOK_TRAV)) do_set_iflag(cn, SF_BOOK_TRAV);
+			if (do_check_items(in, IT_IMBK_TRAV)) do_set_iflag(cn, SF_BOOK_TRAV);
+			if (do_check_items(in, IT_BOOK_DAMO)) do_set_iflag(cn, SF_BOOK_DAMO);
+			if (do_check_items(in, IT_IMBK_DAMO)) do_set_iflag(cn, SF_BOOK_DAMO);
+			if (do_check_items(in, IT_BOOK_SHIV)) do_set_iflag(cn, SF_BOOK_SHIV);
+			if (do_check_items(in, IT_IMBK_SHIV)) do_set_iflag(cn, SF_BOOK_SHIV);
+			if (do_check_items(in, IT_BOOK_PROD)) do_set_iflag(cn, SF_BOOK_PROD);
+			if (do_check_items(in, IT_IMBK_PROD)) do_set_iflag(cn, SF_BOOK_PROD);
+			if (do_check_items(in, IT_BOOK_VENO)) do_set_iflag(cn, SF_BOOK_VENO);
+			if (do_check_items(in, IT_BOOK_NECR)) do_set_iflag(cn, SF_BOOK_NECR);
+			if (do_check_items(in, IT_BOOK_BISH)) do_set_iflag(cn, SF_BOOK_BISH);
+			if (do_check_items(in, IT_IMBK_BISH)) do_set_iflag(cn, SF_BOOK_BISH);
+			if (do_check_items(in, IT_BOOK_GREA)) do_set_iflag(cn, SF_BOOK_GREA);
+			if (do_check_items(in, IT_IMBK_GREA)) do_set_iflag(cn, SF_BOOK_GREA);
+			if (do_check_items(in, IT_BOOK_DEVI)) do_set_iflag(cn, SF_BOOK_DEVI);
+			if (do_check_items(in, IT_BOOK_VERD)) do_set_iflag(cn, SF_BOOK_VERD);
+			if (do_check_items(in, IT_BOOK_MALT)) do_set_iflag(cn, SF_NOFOCUS);
+			if (do_check_items(in, IT_IMBK_MALT)) do_set_iflag(cn, SF_NOFOCUS);
+			if (do_check_items(in, IT_BOOK_GRAN)) do_set_iflag(cn, SF_BOOK_GRAN);
+			
+			if (do_check_items(in, IT_TW_CROWN))   do_set_iflag(cn, SF_TW_CROWN);
+			if (do_check_items(in, IT_TW_DREAD))   do_set_iflag(cn, SF_TW_DREAD);
+			if (do_check_items(in, IT_TW_DOUSER))  do_set_iflag(cn, SF_HIT_DOUSE);
+			if (do_check_items(in, IT_TW_OUTSIDE)) do_set_iflag(cn, SF_TW_OUTSIDE);
+			if (do_check_items(in, IT_TW_HEAVENS)) do_set_iflag(cn, SF_TW_HEAVENS);
+			
+			if (do_check_items(in, IT_TW_IRA))      do_set_iflag(cn, SF_TW_IRA);
+			if (do_check_items(in, IT_TW_INVIDIA))  do_set_iflag(cn, SF_TW_INVIDIA);
+			if (do_check_items(in, IT_TW_GULA))     do_set_iflag(cn, SF_TW_GULA);
+			if (do_check_items(in, IT_TW_LUXURIA))  do_set_iflag(cn, SF_TW_LUXURIA);
+			if (do_check_items(in, IT_TW_AVARITIA)) do_set_iflag(cn, SF_TW_AVARITIA);
+			if (do_check_items(in, IT_TW_SUPERBIA)) do_set_iflag(cn, SF_TW_SUPERBIA);
+			
+			if (do_check_items(in, IT_SIGN_SKUA)) do_set_iflag(cn, SF_SIGN_SKUA);
+			if (do_check_items(in, IT_SIGN_SHOU)) do_set_iflag(cn, SF_SIGN_SHOU);
+			if (do_check_items(in, IT_SIGN_SLAY)) do_set_iflag(cn, SF_SIGN_SLAY);
+			if (do_check_items(in, IT_SIGN_STOR)) do_set_iflag(cn, SF_SIGN_STOR);
+			if (do_check_items(in, IT_SIGN_SICK)) do_set_iflag(cn, SF_SIGN_SICK);
+			if (do_check_items(in, IT_SIGN_SHAD)) do_set_iflag(cn, SF_SIGN_SHAD);
+			if (do_check_items(in, IT_SIGN_SPAR)) do_set_iflag(cn, SF_SIGN_SPAR);
+			if (do_check_items(in, IT_SIGN_SONG)) do_set_iflag(cn, SF_SIGN_SONG);
+			if (do_check_items(in, IT_SIGN_SCRE)) do_set_iflag(cn, SF_SIGN_SCRE);
+			if (do_check_items(in, IT_SIGN_SAFE)) do_set_iflag(cn, SF_SIGN_SAFE);
+			if (do_check_items(in, IT_SIGN_SLAS)) do_set_iflag(cn, SF_SIGN_SLAS);
+			if (do_check_items(in, IT_SIGN_SKIR)) do_set_iflag(cn, SF_SIGN_SKIR);
+			
+			if (do_check_items(in, IT_AM_ECLIPSE)) do_set_iflag(cn, SF_AM_ECLIPSE);
+			
+			if (do_check_items(in, IT_GL_SERPENT)) do_set_iflag(cn, SF_HIT_POISON);
+			if (do_check_items(in, IT_GL_BURNING)) do_set_iflag(cn, SF_HIT_SCORCH);
+			if (do_check_items(in, IT_GL_SHADOW))  do_set_iflag(cn, SF_HIT_BLIND);
+			if (do_check_items(in, IT_GL_CHILLED)) do_set_iflag(cn, SF_HIT_SLOW);
+			if (do_check_items(in, IT_GL_CURSED))  do_set_iflag(cn, SF_HIT_CURSE);
+			if (do_check_items(in, IT_GL_TITANS))  do_set_iflag(cn, SF_HIT_WEAKEN);
+			if (do_check_items(in, IT_GL_BLVIPER)) do_set_iflag(cn, SF_HIT_FROST);
+			
+			if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
+			if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
+			if (do_check_items(in, IT_MATHCAP1))   do_set_iflag(cn, SF_MATHCAP);
+			
+			if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
+			if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
+			if (do_check_items(in, IT_WB_ARGHAKNIFE)) do_set_iflag(cn, SF_ARGHKNIFE);
+			if (do_check_items(in, IT_WB_GOLDGLAIVE)) do_set_iflag(cn, SF_GHOSTCRY);
+			if (do_check_items(in, IT_WP_THEWALL))    do_set_iflag(cn, SF_SHIELDBASH);
+			if (do_check_items(in, IT_WP_ANCIAEGIS))  do_set_iflag(cn, SF_TW_OUTSIDE);
+			if (do_check_items(in, IT_WB_ARCHTOWER))  do_set_iflag(cn, SF_EN_BACKSTOP);
+			if (do_check_items(in, IT_WB_QARMZI))     do_set_iflag(cn, SF_CRITBLAST);
+			if (do_check_items(in, IT_WB_WHITEODA))   do_set_iflag(cn, SF_SPELLPAV);
+			if (do_check_items(in, IT_WP_EXCALIBUR))  do_set_iflag(cn, SF_EXCALIBUR);
+			if (do_check_items(in, IT_WB_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
+			if (do_check_items(in, IT_WP_EVERGREEN))  do_set_iflag(cn, SF_EVERGREEN);
+			if (do_check_items(in, IT_WB_RUSTSPIKES)) do_set_iflag(cn, SF_HIT_POISON);
+			if (do_check_items(in, IT_WB_NEICLAW))    do_set_iflag(cn, SF_SPELLMANA);
+			if (do_check_items(in, IT_WP_CRIMRIP))    do_set_iflag(cn, SF_HIT_BLEED);
+			if (do_check_items(in, IT_WB_CRIMRIP))    do_set_iflag(cn, SF_HIT_BLEED);
+			if (do_check_items(in, IT_WB_CRIMRIP))    do_set_iflag(cn, SF_BLEEDHP);
+			if (do_check_items(in, IT_WB_THEBUTCHER)) do_set_iflag(cn, SF_BUTCHER);
+			if (do_check_items(in, IT_WB_GULLOXI))    do_set_iflag(cn, SF_LESSTDT);
+			if (do_check_items(in, IT_WB_AJAXBLUE))   do_set_iflag(cn, SF_BRAVESTR);
+			if (do_check_items(in, IT_WB_PEARLAXE))   do_set_iflag(cn, SF_APTRECOV);
+			if (do_check_items(in, IT_WP_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
+			if (do_check_items(in, IT_WB_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
+			if (do_check_items(in, IT_WB_JADEHALLOW)) do_set_iflag(cn, SF_JADELEAP);
+			if (do_check_items(in, IT_WB_LAVA2HND))   do_set_iflag(cn, SF_HIT_WEAKEN);
+			if (do_check_items(in, IT_WB_BURN2HND))   do_set_iflag(cn, SF_HIT_SCORCH);
+			if (do_check_items(in, IT_WB_ICE2HND))    do_set_iflag(cn, SF_HIT_SLOW);
+			if (do_check_items(in, IT_WP_PHANTASM))   do_set_iflag(cn, SF_CRITBLAST);
+			if (do_check_items(in, IT_WB_PHANTASM))   do_set_iflag(cn, SF_CRITBLAST);
+			if (do_check_items(in, IT_WP_GILDSHINE))  do_set_iflag(cn, SF_GILDSHINE);
+			if (do_check_items(in, IT_WB_GILDSHINE))  do_set_iflag(cn, SF_GILDSHINE);
+			if (do_check_items(in, IT_WP_CROSSBLAD))  do_set_iflag(cn, SF_CROSSBLAD);
+			if (do_check_items(in, IT_WP_BRONCHIT))   do_set_iflag(cn, SF_BRONCHIT);
+			if (do_check_items(in, IT_WB_BRONCHIT))   do_set_iflag(cn, SF_BRONCHIT);
+			if (do_check_items(in, IT_WP_VOLCANF))    do_set_iflag(cn, SF_VOLCANF);
+			if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
+			if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
+			
+			if (do_check_items(in, IT_WP_SUNSSKUA))   lido = 2;
+			if (do_check_items(in, IT_WP_PURPPLED))   liha = 2;
+			if (do_check_items(in, IT_WP_IDOLISHT))   do_set_iflag(cn, SF_IDOLISHT);
+			if (do_check_items(in, IT_WP_GESTGORN))   do_set_iflag(cn, SF_GESTGORN);
+			if (do_check_items(in, IT_WP_CUDGKWAI))   do_set_iflag(cn, SF_HIGHHITPAR);
+			if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
+			if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_LHAND) do_set_iflag(cn, SF_BUFFLEFT);
+			
+			// HAS_ENCH(in,   n)
+			
+			if (HAS_ENCH(in,   2)) do_set_iflag(cn, SF_EN_MOREAV);
+			if (HAS_ENCH(in,   3)) do_set_iflag(cn, SF_EN_HEALIT);
+			if (HAS_ENCH(in,   5)) do_set_iflag(cn, SF_EN_LESSDEBU);
+			if (HAS_ENCH(in,   8)) do_set_iflag(cn, SF_EN_MOREWEAKSLOW);
+			if (HAS_ENCH(in,  14)) do_set_iflag(cn, SF_EN_LESSSICK);
+			if (HAS_ENCH(in,  16)) do_set_iflag(cn, SF_EN_AVASRES);
+			if (HAS_ENCH(in,  19)) do_set_iflag(cn, SF_EN_MORECLEABLAS);
+			if (HAS_ENCH(in,  22)) do_set_iflag(cn, SF_NOFOCUS);
+			if (HAS_ENCH(in,  29)) do_set_iflag(cn, SF_EN_MOREBLINCURS);
+			if (HAS_ENCH(in,  30)) do_set_iflag(cn, SF_EN_MORESTEA);
+			if (HAS_ENCH(in,  35)) do_set_iflag(cn, SF_EN_AVASIMM);
+			if (HAS_ENCH(in,  38)) do_set_iflag(cn, SF_EN_MOREBLEEPOIS);
+			if (HAS_ENCH(in,  41)) do_set_iflag(cn, SF_EN_LIGHSTEA);
+			if (HAS_ENCH(in,  53)) do_set_iflag(cn, SF_EN_MOREWARCZEPH);
+			if (HAS_ENCH(in,  54)) do_set_iflag(cn, SF_EN_WALKREGN);
+			if (HAS_ENCH(in,  60)) do_set_iflag(cn, SF_EN_MEDIREGN);
+			if (HAS_ENCH(in,  61)) do_set_iflag(cn, SF_EN_NINETYAVO);
+			if (HAS_ENCH(in,  66)) do_set_iflag(cn, SF_EN_NINETYHIT);
+			if (HAS_ENCH(in,  75)) do_set_iflag(cn, SF_EN_MORETHOR);
+			if (HAS_ENCH(in,  81)) do_set_iflag(cn, SF_EN_BACKSTOP);
+			if (HAS_ENCH(in,  86)) do_set_iflag(cn, SF_EN_MOREHEAL);
+			if (HAS_ENCH(in,  94)) do_set_iflag(cn, SF_HIT_SLOW);
+			if (HAS_ENCH(in,  95)) do_set_iflag(cn, SF_HIT_SCORCH);
+			if (HAS_ENCH(in,  98)) do_set_iflag(cn, SF_HIT_CURSE);
+			if (HAS_ENCH(in,  99)) do_set_iflag(cn, SF_HIT_WEAKEN);
+			if (HAS_ENCH(in, 102)) do_set_iflag(cn, SF_HIT_POISON);
+			if (HAS_ENCH(in, 103)) do_set_iflag(cn, SF_HIT_DOUSE);
+			if (HAS_ENCH(in, 106)) do_set_iflag(cn, SF_HIT_BLIND);
+			if (HAS_ENCH(in, 107)) do_set_iflag(cn, SF_HIT_FROST);
+			
+			if (HAS_ENCH(in, 112)) do_set_iflag(cn, SF_EN_LESSWEAK); // (Legacy)
+			if (HAS_ENCH(in, 113)) do_set_iflag(cn, SF_EN_LESSSLOW); // (Legacy)
+			if (HAS_ENCH(in, 114)) do_set_iflag(cn, SF_EN_LESSCURS); // (Legacy)
+			if (HAS_ENCH(in, 115)) do_set_iflag(cn, SF_EN_LESSBLIN); // (Legacy)
+			
+			if (do_check_items(in, IT_WB_LIONSPAWS))  do_add_ieffect(cn, VF_EXTRA_BRV,   20);
+			if (do_check_items(in, IT_WB_COBALTLANC)) do_add_ieffect(cn, VF_EXTRA_BRV,   20);
+			if (do_check_items(in, IT_WP_HALADIE))    do_add_ieffect(cn, VF_EXTRA_WIL,   10);
+			if (do_check_items(in, IT_WB_SHIVASCEPT)) do_add_ieffect(cn, VF_EXTRA_INT,   10);
+			if (do_check_items(in, IT_WP_MURAMASA))   do_add_ieffect(cn, VF_EXTRA_AGL,   20);
+			if (do_check_items(in, IT_WB_BARBSWORD))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
+			if (do_check_items(in, IT_WB_FELLNIGHT))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
+			if (do_check_items(in, IT_WP_GEMCUTTER))  do_add_ieffect(cn, VF_GEMMULTI,    25);
+			if (do_check_items(in, IT_WP_QUICKSILV))  do_add_ieffect(cn, VF_QUICKSILV,    1);
+			if (do_check_items(in, IT_WB_BLOODLET))   do_add_ieffect(cn, VF_BLEED_DMG,   10);
+			
+			if (do_check_items(in, IT_WB_VIOLETGAZE)) 
+			{
+				do_add_ieffect(cn, VF_EN_MOREWIL, 4);
+				do_add_ieffect(cn, VF_EN_MOREINT, 4);
+			}
+			
+			if (do_check_items(in, IT_WP_LIFESPRIG))  do_add_ieffect(cn, VF_MA_HEAL,      1);
+			if (do_check_items(in, IT_WB_LIFESPRIG))  do_add_ieffect(cn, VF_MA_HEAL,      1);
+			if (do_check_items(in, IT_WB_DECOSWORD))  do_add_ieffect(cn, VF_MOREAURA,    30);
+			if (do_check_items(in, IT_WB_ANCIENTORN)) do_add_ieffect(cn, VF_MOREMINREC,  50);
+			
+			
+			if (HAS_ENCH(in,   6)) do_add_ieffect(cn, VF_EN_MOREBRV,     3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  11)) do_add_ieffect(cn, VF_EN_COMPCRIT,    5*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  17)) do_add_ieffect(cn, VF_EN_MOREWIL,     3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  21)) do_add_ieffect(cn, VF_EN_MORERES,    10*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  27)) do_add_ieffect(cn, VF_EN_MOREINT,     3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  36)) do_add_ieffect(cn, VF_EN_MOREAGL,     3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  44)) do_add_ieffect(cn, VF_EN_MORESTR,     3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  46)) do_add_ieffect(cn, VF_EN_MORECRIT,   10*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  74)) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  79)) do_add_ieffect(cn, VF_EN_MOREDAMAGE,  5*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  80)) do_add_ieffect(cn, VF_EN_LESSDAMAGE,  5*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  84)) 
+			{
+				do_add_ieffect(cn, VF_EN_MOREBRV,     2*(1+IS_TWOHAND(in)));
+				do_add_ieffect(cn, VF_EN_MOREWIL,     2*(1+IS_TWOHAND(in)));
+				do_add_ieffect(cn, VF_EN_MOREINT,     2*(1+IS_TWOHAND(in)));
+				do_add_ieffect(cn, VF_EN_MOREAGL,     2*(1+IS_TWOHAND(in)));
+				do_add_ieffect(cn, VF_EN_MORESTR,     2*(1+IS_TWOHAND(in)));
+			}
+			if (HAS_ENCH(in,  87)) do_add_ieffect(cn, VF_EN_MORESPB,    10*(1+IS_TWOHAND(in)));
+			
+			if (HAS_ENCH(in,  92)) do_add_ieffect(cn, VF_EN_SKUAMS,     25*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  93)) do_add_ieffect(cn, VF_EN_SKUAGLOW,    4*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  96)) do_add_ieffect(cn, VF_EN_KWAIHIT,     3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in,  97)) do_add_ieffect(cn, VF_EN_KWAIPARRY,   3*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in, 100)) do_add_ieffect(cn, VF_EN_GORNMANA,   20*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in, 105)) do_add_ieffect(cn, VF_EN_PURPDAMG,   10*(1+IS_TWOHAND(in)));
+			if (HAS_ENCH(in, 111)) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
+			
+			if (HAS_ENCH(in, 116)) do_add_ieffect(cn, VF_EN_HALFDMG, 8*(1+IS_TWOHAND(in))); // (Legacy)
+		}
 		
-		if (do_check_tarot(in, IT_CH_FOOL_R  )) do_set_iflag(cn, SF_FOOL_R);
-		if (do_check_tarot(in, IT_CH_MAGI_R  )) do_set_iflag(cn, SF_MAGI_R);
-		if (do_check_tarot(in, IT_CH_PREIST_R)) do_set_iflag(cn, SF_PREIST_R);
-		if (do_check_tarot(in, IT_CH_EMPRES_R)) do_set_iflag(cn, SF_EMPRES_R);
-		if (do_check_tarot(in, IT_CH_EMPERO_R)) do_set_iflag(cn, SF_EMPERO_R);
-		if (do_check_tarot(in, IT_CH_HEIROP_R)) do_set_iflag(cn, SF_HEIROP_R);
-		if (do_check_tarot(in, IT_CH_LOVERS_R)) do_set_iflag(cn, SF_LOVERS_R);
-		if (do_check_tarot(in, IT_CH_CHARIO_R)) do_set_iflag(cn, SF_CHARIO_R);
-		if (do_check_tarot(in, IT_CH_STRENG_R)) do_set_iflag(cn, SF_STRENG_R);
-		if (do_check_tarot(in, IT_CH_HERMIT_R)) do_set_iflag(cn, SF_HERMIT_R);
-		if (do_check_tarot(in, IT_CH_WHEEL_R )) do_set_iflag(cn, SF_WHEEL_R);
-		if (do_check_tarot(in, IT_CH_JUSTIC_R)) do_set_iflag(cn, SF_JUSTIC_R);
-		if (do_check_tarot(in, IT_CH_HANGED_R)) do_set_iflag(cn, SF_HANGED_R);
-		if (do_check_tarot(in, IT_CH_DEATH_R )) do_set_iflag(cn, SF_DEATH_R);
-		if (do_check_tarot(in, IT_CH_TEMPER_R)) do_set_iflag(cn, SF_TEMPER_R);
-		if (do_check_tarot(in, IT_CH_DEVIL_R )) do_set_iflag(cn, SF_DEVIL_R);
-		if (do_check_tarot(in, IT_CH_TOWER_R )) do_set_iflag(cn, SF_TOWER_R);
-		if (do_check_tarot(in, IT_CH_STAR_R  )) do_set_iflag(cn, SF_STAR_R);
-		if (do_check_tarot(in, IT_CH_MOON_R  )) do_set_iflag(cn, SF_MOON_R);
-		if (do_check_tarot(in, IT_CH_SUN_R   )) do_set_iflag(cn, SF_SUN_R);
-		if (do_check_tarot(in, IT_CH_JUDGE_R )) do_set_iflag(cn, SF_JUDGE_R);
-		if (do_check_tarot(in, IT_CH_WORLD_R )) do_set_iflag(cn, SF_WORLD_R);
+		// Enchantment effects not blocked by NMZs
 		
-		if (do_check_items(in, IT_BOOK_ALCH)) do_set_iflag(cn, SF_BOOK_ALCH);
-		if (do_check_items(in, IT_IMBK_ALCH)) do_set_iflag(cn, SF_BOOK_ALCH);
-		if (do_check_items(in, IT_BOOK_HOLY)) do_set_iflag(cn, SF_BOOK_HOLY);
-		if (do_check_items(in, IT_IMBK_HOLY)) do_set_iflag(cn, SF_BOOK_HOLY);
-		if (do_check_items(in, IT_BOOK_ADVA)) do_set_iflag(cn, SF_BOOK_ADVA);
-		if (do_check_items(in, IT_IMBK_ADVA)) do_set_iflag(cn, SF_BOOK_ADVA);
-		if (do_check_items(in, IT_BOOK_TRAV)) do_set_iflag(cn, SF_BOOK_TRAV);
-		if (do_check_items(in, IT_IMBK_TRAV)) do_set_iflag(cn, SF_BOOK_TRAV);
-		if (do_check_items(in, IT_BOOK_DAMO)) do_set_iflag(cn, SF_BOOK_DAMO);
-		if (do_check_items(in, IT_IMBK_DAMO)) do_set_iflag(cn, SF_BOOK_DAMO);
-		if (do_check_items(in, IT_BOOK_SHIV)) do_set_iflag(cn, SF_BOOK_SHIV);
-		if (do_check_items(in, IT_IMBK_SHIV)) do_set_iflag(cn, SF_BOOK_SHIV);
-		if (do_check_items(in, IT_BOOK_PROD)) do_set_iflag(cn, SF_BOOK_PROD);
-		if (do_check_items(in, IT_IMBK_PROD)) do_set_iflag(cn, SF_BOOK_PROD);
-		if (do_check_items(in, IT_BOOK_VENO)) do_set_iflag(cn, SF_BOOK_VENO);
-		if (do_check_items(in, IT_BOOK_NECR)) do_set_iflag(cn, SF_BOOK_NECR);
-		if (do_check_items(in, IT_BOOK_BISH)) do_set_iflag(cn, SF_BOOK_BISH);
-		if (do_check_items(in, IT_IMBK_BISH)) do_set_iflag(cn, SF_BOOK_BISH);
-		if (do_check_items(in, IT_BOOK_GREA)) do_set_iflag(cn, SF_BOOK_GREA);
-		if (do_check_items(in, IT_IMBK_GREA)) do_set_iflag(cn, SF_BOOK_GREA);
-		if (do_check_items(in, IT_BOOK_DEVI)) do_set_iflag(cn, SF_BOOK_DEVI);
-		if (do_check_items(in, IT_BOOK_VERD)) do_set_iflag(cn, SF_BOOK_VERD);
-		if (do_check_items(in, IT_BOOK_MALT)) do_set_iflag(cn, SF_NOFOCUS);
-		if (do_check_items(in, IT_IMBK_MALT)) do_set_iflag(cn, SF_NOFOCUS);
-		if (do_check_items(in, IT_BOOK_GRAN)) do_set_iflag(cn, SF_BOOK_GRAN);
+		if (do_check_items(in, IT_TW_CLOAK))      do_set_iflag(cn, SF_TW_CLOAK);
+		if (do_check_items(in, IT_TW_MARCH))      do_set_iflag(cn, SF_TW_MARCH);
 		
-		if (do_check_items(in, IT_TW_CROWN))   do_set_iflag(cn, SF_TW_CROWN);
-		if (do_check_items(in, IT_TW_CLOAK))   do_set_iflag(cn, SF_TW_CLOAK);
-		if (do_check_items(in, IT_TW_DREAD))   do_set_iflag(cn, SF_TW_DREAD);
-		if (do_check_items(in, IT_TW_DOUSER))  do_set_iflag(cn, SF_HIT_DOUSE);
-		if (do_check_items(in, IT_TW_MARCH))   do_set_iflag(cn, SF_TW_MARCH);
-		if (do_check_items(in, IT_TW_OUTSIDE)) do_set_iflag(cn, SF_TW_OUTSIDE);
-		if (do_check_items(in, IT_TW_HEAVENS)) do_set_iflag(cn, SF_TW_HEAVENS);
+		if (do_check_items(in, IT_ANKHAMULET))    do_set_iflag(cn, SF_ANKHAMULET);
+		if (do_check_items(in, IT_AMBERANKH))     do_set_iflag(cn, SF_AMBERANKH);
+		if (do_check_items(in, IT_TURQUANKH))     do_set_iflag(cn, SF_TURQUANKH);
+		if (do_check_items(in, IT_GARNEANKH))     do_set_iflag(cn, SF_GARNEANKH);
+		if (do_check_items(in, IT_TRUEANKH))      do_set_iflag(cn, SF_TRUEANKH);
+		if (do_check_items(in, IT_BREATHAMMY))    do_set_iflag(cn, SF_WBREATH);
 		
-		if (do_check_items(in, IT_TW_IRA))      do_set_iflag(cn, SF_TW_IRA);
-		if (do_check_items(in, IT_TW_INVIDIA))  do_set_iflag(cn, SF_TW_INVIDIA);
-		if (do_check_items(in, IT_TW_GULA))     do_set_iflag(cn, SF_TW_GULA);
-		if (do_check_items(in, IT_TW_LUXURIA))  do_set_iflag(cn, SF_TW_LUXURIA);
-		if (do_check_items(in, IT_TW_AVARITIA)) do_set_iflag(cn, SF_TW_AVARITIA);
-		if (do_check_items(in, IT_TW_SUPERBIA)) do_set_iflag(cn, SF_TW_SUPERBIA);
-		
-		if (do_check_items(in, IT_SIGN_SKUA)) do_set_iflag(cn, SF_SIGN_SKUA);
-		if (do_check_items(in, IT_SIGN_SHOU)) do_set_iflag(cn, SF_SIGN_SHOU);
-		if (do_check_items(in, IT_SIGN_SLAY)) do_set_iflag(cn, SF_SIGN_SLAY);
-		if (do_check_items(in, IT_SIGN_STOR)) do_set_iflag(cn, SF_SIGN_STOR);
-		if (do_check_items(in, IT_SIGN_SICK)) do_set_iflag(cn, SF_SIGN_SICK);
-		if (do_check_items(in, IT_SIGN_SHAD)) do_set_iflag(cn, SF_SIGN_SHAD);
-		if (do_check_items(in, IT_SIGN_SPAR)) do_set_iflag(cn, SF_SIGN_SPAR);
-		if (do_check_items(in, IT_SIGN_SONG)) do_set_iflag(cn, SF_SIGN_SONG);
-		if (do_check_items(in, IT_SIGN_SCRE)) do_set_iflag(cn, SF_SIGN_SCRE);
-		if (do_check_items(in, IT_SIGN_SAFE)) do_set_iflag(cn, SF_SIGN_SAFE);
-		if (do_check_items(in, IT_SIGN_SLAS)) do_set_iflag(cn, SF_SIGN_SLAS);
-		if (do_check_items(in, IT_SIGN_SKIR)) do_set_iflag(cn, SF_SIGN_SKIR);
-		
-		if (do_check_items(in, IT_ANKHAMULET)) do_set_iflag(cn, SF_ANKHAMULET);
-		if (do_check_items(in, IT_AMBERANKH))  do_set_iflag(cn, SF_AMBERANKH);
-		if (do_check_items(in, IT_TURQUANKH))  do_set_iflag(cn, SF_TURQUANKH);
-		if (do_check_items(in, IT_GARNEANKH))  do_set_iflag(cn, SF_GARNEANKH);
-		if (do_check_items(in, IT_TRUEANKH))   do_set_iflag(cn, SF_TRUEANKH);
-		if (do_check_items(in, IT_AM_ECLIPSE)) do_set_iflag(cn, SF_AM_ECLIPSE);
-		if (do_check_items(in, IT_BREATHAMMY)) do_set_iflag(cn, SF_WBREATH);
-		
-		if (do_check_items(in, IT_GL_SERPENT)) do_set_iflag(cn, SF_HIT_POISON);
-		if (do_check_items(in, IT_GL_BURNING)) do_set_iflag(cn, SF_HIT_SCORCH);
-		if (do_check_items(in, IT_GL_SHADOW))  do_set_iflag(cn, SF_HIT_BLIND);
-		if (do_check_items(in, IT_GL_CHILLED)) do_set_iflag(cn, SF_HIT_SLOW);
-		if (do_check_items(in, IT_GL_CURSED))  do_set_iflag(cn, SF_HIT_CURSE);
-		if (do_check_items(in, IT_GL_TITANS))  do_set_iflag(cn, SF_HIT_WEAKEN);
-		if (do_check_items(in, IT_GL_BLVIPER)) do_set_iflag(cn, SF_HIT_FROST);
-		
-		if (do_check_items(in, IT_BONEARMOR))  do_add_ieffect(cn, VF_EN_STAGGER, 30);
-		if (do_check_items(in, IT_BT_NATURES)) do_set_iflag(cn, SF_BT_NATURES);
-		if (do_check_items(in, IT_LIZCROWN))   do_set_iflag(cn, SF_LIZCROWN);
-		if (do_check_items(in, IT_MATHCAP1))   do_set_iflag(cn, SF_MATHCAP);
-		
-		if (do_check_items(in, IT_WP_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
-		if (do_check_items(in, IT_WB_BLOODLET))   do_set_iflag(cn, SF_HIT_BLEED);
-		if (do_check_items(in, IT_WB_ARGHAKNIFE)) do_set_iflag(cn, SF_ARGHKNIFE);
-		if (do_check_items(in, IT_WB_GOLDGLAIVE)) do_set_iflag(cn, SF_GHOSTCRY);
 		if (do_check_items(in, IT_WP_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
 		if (do_check_items(in, IT_WB_KELPTRID))   do_set_iflag(cn, SF_KELPTRID);
-		if (do_check_items(in, IT_WP_THEWALL))    do_set_iflag(cn, SF_SHIELDBASH);
-		if (do_check_items(in, IT_WP_ANCIAEGIS))  do_set_iflag(cn, SF_TW_OUTSIDE);
-		if (do_check_items(in, IT_WB_ARCHTOWER))  do_set_iflag(cn, SF_EN_BACKSTOP);
-		if (do_check_items(in, IT_WB_QARMZI))     do_set_iflag(cn, SF_CRITBLAST);
-		if (do_check_items(in, IT_WB_WHITEODA))   do_set_iflag(cn, SF_SPELLPAV);
-		if (do_check_items(in, IT_WP_EXCALIBUR))  do_set_iflag(cn, SF_EXCALIBUR);
-		if (do_check_items(in, IT_WB_BLACKTAC))   do_set_iflag(cn, SF_SPELLPWV);
-		if (do_check_items(in, IT_WP_EVERGREEN))  do_set_iflag(cn, SF_EVERGREEN);
-		if (do_check_items(in, IT_WB_RUSTSPIKES)) do_set_iflag(cn, SF_HIT_POISON);
-		if (do_check_items(in, IT_WB_NEICLAW))    do_set_iflag(cn, SF_SPELLMANA);
-		if (do_check_items(in, IT_WP_CRIMRIP))    do_set_iflag(cn, SF_HIT_BLEED);
-		if (do_check_items(in, IT_WB_CRIMRIP))    do_set_iflag(cn, SF_HIT_BLEED);
-		if (do_check_items(in, IT_WB_CRIMRIP))    do_set_iflag(cn, SF_BLEEDHP);
-		if (do_check_items(in, IT_WB_THEBUTCHER)) do_set_iflag(cn, SF_BUTCHER);
-		if (do_check_items(in, IT_WB_GULLOXI))    do_set_iflag(cn, SF_LESSTDT);
-		if (do_check_items(in, IT_WB_AJAXBLUE))   do_set_iflag(cn, SF_BRAVESTR);
-		if (do_check_items(in, IT_WB_PEARLAXE))   do_set_iflag(cn, SF_APTRECOV);
-		if (do_check_items(in, IT_WP_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
-		if (do_check_items(in, IT_WB_CRESSUN))    do_set_iflag(cn, SF_EN_HEAL);
-		if (do_check_items(in, IT_WB_JADEHALLOW)) do_set_iflag(cn, SF_JADELEAP);
-		if (do_check_items(in, IT_WB_LAVA2HND))   do_set_iflag(cn, SF_HIT_WEAKEN);
-		if (do_check_items(in, IT_WB_BURN2HND))   do_set_iflag(cn, SF_HIT_SCORCH);
-		if (do_check_items(in, IT_WB_ICE2HND))    do_set_iflag(cn, SF_HIT_SLOW);
-		if (do_check_items(in, IT_WP_PHANTASM))   do_set_iflag(cn, SF_CRITBLAST);
-		if (do_check_items(in, IT_WB_PHANTASM))   do_set_iflag(cn, SF_CRITBLAST);
-		if (do_check_items(in, IT_WP_GILDSHINE))  do_set_iflag(cn, SF_GILDSHINE);
-		if (do_check_items(in, IT_WB_GILDSHINE))  do_set_iflag(cn, SF_GILDSHINE);
-		if (do_check_items(in, IT_WP_CROSSBLAD))  do_set_iflag(cn, SF_CROSSBLAD);
-		if (do_check_items(in, IT_WP_BRONCHIT))   do_set_iflag(cn, SF_BRONCHIT);
-		if (do_check_items(in, IT_WB_BRONCHIT))   do_set_iflag(cn, SF_BRONCHIT);
-		if (do_check_items(in, IT_WP_VOLCANF))    do_set_iflag(cn, SF_VOLCANF);
-		if (do_check_items(in, IT_WB_VIKINGMALT)) do_set_iflag(cn, SF_VIKINGMALT);
-		if (do_check_items(in, IT_WP_GUNGNIR))    do_set_iflag(cn, SF_GUNGNIR);
 		
-		if (do_check_items(in, IT_WP_SUNSSKUA))   lido = 2;
-		if (do_check_items(in, IT_WP_PURPPLED))   liha = 2;
-		if (do_check_items(in, IT_WP_IDOLISHT))   do_set_iflag(cn, SF_IDOLISHT);
-		if (do_check_items(in, IT_WP_GESTGORN))   do_set_iflag(cn, SF_GESTGORN);
-		if (do_check_items(in, IT_WP_CUDGKWAI))   do_set_iflag(cn, SF_HIGHHITPAR);
-		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_RHAND) do_set_iflag(cn, SF_BUFFRGHT);
-		if (do_check_items(in, IT_WP_SLIVANKH) && n == WN_LHAND) do_set_iflag(cn, SF_BUFFLEFT);
+		if (do_check_items(in, IT_BONEARMOR))     do_add_ieffect(cn, VF_EN_STAGGER,  30);
+		if (do_check_items(in, IT_WB_KUROKO))     do_add_ieffect(cn, VF_EN_TAKEASMA, 15);
 		
-		// HAS_ENCH(in,   n)
-		
-		if (HAS_ENCH(in,   2)) do_set_iflag(cn, SF_EN_MOREAV);
-		if (HAS_ENCH(in,   3)) do_set_iflag(cn, SF_EN_HEALIT);
 		if (HAS_ENCH(in,   4)) do_set_iflag(cn, SF_EN_NOTRAPS);
-		if (HAS_ENCH(in,   5)) do_set_iflag(cn, SF_EN_LESSDEBU);
-		if (HAS_ENCH(in,   8)) do_set_iflag(cn, SF_EN_MOREWEAKSLOW);
-		if (HAS_ENCH(in,  14)) do_set_iflag(cn, SF_EN_LESSSICK);
 		if (HAS_ENCH(in,  15)) do_set_iflag(cn, SF_EN_NODEATHT);
-		if (HAS_ENCH(in,  16)) do_set_iflag(cn, SF_EN_AVASRES);
-		if (HAS_ENCH(in,  19)) do_set_iflag(cn, SF_EN_MORECLEABLAS);
-		if (HAS_ENCH(in,  22)) do_set_iflag(cn, SF_NOFOCUS);
-		if (HAS_ENCH(in,  29)) do_set_iflag(cn, SF_EN_MOREBLINCURS);
-		if (HAS_ENCH(in,  30)) do_set_iflag(cn, SF_EN_MORESTEA);
 		if (HAS_ENCH(in,  32)) do_set_iflag(cn, SF_EN_LESSCOST);
-		if (HAS_ENCH(in,  35)) do_set_iflag(cn, SF_EN_AVASIMM);
 		if (HAS_ENCH(in,  37)) do_set_iflag(cn, SF_EN_NOSLOW);
-		if (HAS_ENCH(in,  38)) do_set_iflag(cn, SF_EN_MOREBLEEPOIS);
-		if (HAS_ENCH(in,  41)) do_set_iflag(cn, SF_EN_LIGHSTEA);
-		if (HAS_ENCH(in,  53)) do_set_iflag(cn, SF_EN_MOREWARCZEPH);
-		if (HAS_ENCH(in,  54)) do_set_iflag(cn, SF_EN_WALKREGN);
-		if (HAS_ENCH(in,  60)) do_set_iflag(cn, SF_EN_MEDIREGN);
-		if (HAS_ENCH(in,  61)) do_set_iflag(cn, SF_EN_NINETYAVO);
 		if (HAS_ENCH(in,  65)) do_set_iflag(cn, SF_EN_MOREMOVE);
-		if (HAS_ENCH(in,  66)) do_set_iflag(cn, SF_EN_NINETYHIT);
 		if (HAS_ENCH(in,  70)) do_set_iflag(cn, SF_EN_MOVEUW);
 		if (HAS_ENCH(in,  71)) do_set_iflag(cn, SF_EN_RESTMEDI);
 		if (HAS_ENCH(in,  72)) do_set_iflag(cn, SF_EN_ESCAPE);
-		if (HAS_ENCH(in,  75)) do_set_iflag(cn, SF_EN_MORETHOR);
-		if (HAS_ENCH(in,  81)) do_set_iflag(cn, SF_EN_BACKSTOP);
-		if (HAS_ENCH(in,  82)) do_set_iflag(cn, SF_EN_MOREPERC);
 		if (HAS_ENCH(in,  85)) do_set_iflag(cn, SF_EN_GLOWCOMP);
-		if (HAS_ENCH(in,  86)) do_set_iflag(cn, SF_EN_MOREHEAL);
+		if (HAS_ENCH(in,  82)) do_set_iflag(cn, SF_EN_MOREPERC);
 		if (HAS_ENCH(in,  88)) do_set_iflag(cn, SF_EN_LESSWATER);
-		if (HAS_ENCH(in,  94)) do_set_iflag(cn, SF_HIT_SLOW);
-		if (HAS_ENCH(in,  95)) do_set_iflag(cn, SF_HIT_SCORCH);
-		if (HAS_ENCH(in,  98)) do_set_iflag(cn, SF_HIT_CURSE);
-		if (HAS_ENCH(in,  99)) do_set_iflag(cn, SF_HIT_WEAKEN);
-		if (HAS_ENCH(in, 102)) do_set_iflag(cn, SF_HIT_POISON);
-		if (HAS_ENCH(in, 103)) do_set_iflag(cn, SF_HIT_DOUSE);
-		if (HAS_ENCH(in, 106)) do_set_iflag(cn, SF_HIT_BLIND);
-		if (HAS_ENCH(in, 107)) do_set_iflag(cn, SF_HIT_FROST);
 		
-		if (HAS_ENCH(in, 112)) do_set_iflag(cn, SF_EN_LESSWEAK); // (Legacy)
-		if (HAS_ENCH(in, 113)) do_set_iflag(cn, SF_EN_LESSSLOW); // (Legacy)
-		if (HAS_ENCH(in, 114)) do_set_iflag(cn, SF_EN_LESSCURS); // (Legacy)
-		if (HAS_ENCH(in, 115)) do_set_iflag(cn, SF_EN_LESSBLIN); // (Legacy)
-		
-		if (do_check_items(in, IT_WB_LIONSPAWS))  do_add_ieffect(cn, VF_EXTRA_BRV,   20);
-		if (do_check_items(in, IT_WB_COBALTLANC)) do_add_ieffect(cn, VF_EXTRA_BRV,   20);
-		if (do_check_items(in, IT_WP_HALADIE))    do_add_ieffect(cn, VF_EXTRA_WIL,   10);
-		if (do_check_items(in, IT_WB_SHIVASCEPT)) do_add_ieffect(cn, VF_EXTRA_INT,   10);
-		if (do_check_items(in, IT_WP_MURAMASA))   do_add_ieffect(cn, VF_EXTRA_AGL,   20);
-		if (do_check_items(in, IT_WB_BARBSWORD))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
-		if (do_check_items(in, IT_WB_FELLNIGHT))  do_add_ieffect(cn, VF_EXTRA_STR,   10);
-		if (do_check_items(in, IT_WP_GEMCUTTER))  do_add_ieffect(cn, VF_GEMMULTI,    25);
-		if (do_check_items(in, IT_WP_QUICKSILV))  do_add_ieffect(cn, VF_QUICKSILV,    1);
-		if (do_check_items(in, IT_WB_BLOODLET))   do_add_ieffect(cn, VF_BLEED_DMG,   10);
-		if (do_check_items(in, IT_WB_KUROKO))     do_add_ieffect(cn, VF_EN_TAKEASMA, 15);
-		
-		if (do_check_items(in, IT_WB_VIOLETGAZE)) 
-		{
-			do_add_ieffect(cn, VF_EN_MOREWIL, 4);
-			do_add_ieffect(cn, VF_EN_MOREINT, 4);
-		}
-		
-		if (do_check_items(in, IT_WP_LIFESPRIG))  do_add_ieffect(cn, VF_MA_HEAL,      1);
-		if (do_check_items(in, IT_WB_LIFESPRIG))  do_add_ieffect(cn, VF_MA_HEAL,      1);
-		if (do_check_items(in, IT_WB_DECOSWORD))  do_add_ieffect(cn, VF_MOREAURA,    30);
-		if (do_check_items(in, IT_WB_ANCIENTORN)) do_add_ieffect(cn, VF_MOREMINREC,  50);
-		
-		if (HAS_ENCH(in,  23)) do_add_ieffect(cn, VF_EN_TAKEASEN,   15*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  33)) do_add_ieffect(cn, VF_EN_TAKEASMA,   15*(1+IS_TWOHAND(in)));
-		
-		if (HAS_ENCH(in,   6)) do_add_ieffect(cn, VF_EN_MOREBRV,     3*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  10)) do_add_ieffect(cn, VF_EN_LESSRESR,   20*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  11)) do_add_ieffect(cn, VF_EN_COMPCRIT,    5*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  17)) do_add_ieffect(cn, VF_EN_MOREWIL,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  21)) do_add_ieffect(cn, VF_EN_MORERES,    10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  23)) do_add_ieffect(cn, VF_EN_TAKEASEN,   15*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  26)) do_add_ieffect(cn, VF_EN_MOREEN,     10*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  27)) do_add_ieffect(cn, VF_EN_MOREINT,     3*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  31)) do_add_ieffect(cn, VF_EN_MORECAST,   20*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  35)) do_add_ieffect(cn, VF_EN_MOREASPD,   20*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  36)) do_add_ieffect(cn, VF_EN_MOREAGL,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  44)) do_add_ieffect(cn, VF_EN_MORESTR,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  46)) do_add_ieffect(cn, VF_EN_MORECRIT,   10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  33)) do_add_ieffect(cn, VF_EN_TAKEASMA,   15*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  52)) do_add_ieffect(cn, VF_EN_MOREMP,     10*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  56)) do_add_ieffect(cn, VF_EN_STAGGER,    10*(1+IS_TWOHAND(in)));
+		if (HAS_ENCH(in,  59)) do_add_ieffect(cn, VF_EN_MOREASPD,   20*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  62)) do_add_ieffect(cn, VF_EN_MPONHIT,     1*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  63)) do_add_ieffect(cn, VF_EN_MPWHENHIT,   2*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  67)) do_add_ieffect(cn, VF_EN_ENONHIT,     1*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  68)) do_add_ieffect(cn, VF_EN_ENWHENHIT,   2*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  74)) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  77)) do_add_ieffect(cn, VF_EN_HPONHIT,     1*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  79)) do_add_ieffect(cn, VF_EN_MOREDAMAGE,  5*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  80)) do_add_ieffect(cn, VF_EN_LESSDAMAGE,  5*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  83)) do_add_ieffect(cn, VF_EN_LESSDOT,    20*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  84)) 
-		{
-			do_add_ieffect(cn, VF_EN_MOREBRV,     2*(1+IS_TWOHAND(in)));
-			do_add_ieffect(cn, VF_EN_MOREWIL,     2*(1+IS_TWOHAND(in)));
-			do_add_ieffect(cn, VF_EN_MOREINT,     2*(1+IS_TWOHAND(in)));
-			do_add_ieffect(cn, VF_EN_MOREAGL,     2*(1+IS_TWOHAND(in)));
-			do_add_ieffect(cn, VF_EN_MORESTR,     2*(1+IS_TWOHAND(in)));
-		}
-		if (HAS_ENCH(in,  87)) do_add_ieffect(cn, VF_EN_MORESPB,    10*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  89)) do_add_ieffect(cn, VF_EN_MOREHP,     10*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in,  90)) do_add_ieffect(cn, VF_EN_MORERECO,   20*(1+IS_TWOHAND(in)));
-		
-		if (HAS_ENCH(in,  92)) do_add_ieffect(cn, VF_EN_SKUAMS,     25*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  93)) do_add_ieffect(cn, VF_EN_SKUAGLOW,    4*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  96)) do_add_ieffect(cn, VF_EN_KWAIHIT,     3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in,  97)) do_add_ieffect(cn, VF_EN_KWAIPARRY,   3*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in, 100)) do_add_ieffect(cn, VF_EN_GORNMANA,   20*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in, 101)) do_add_ieffect(cn, VF_EN_GORNDOT,     1*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in, 104)) do_add_ieffect(cn, VF_EN_PURPLEECH,   4*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in, 105)) do_add_ieffect(cn, VF_EN_PURPDAMG,   10*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in, 108)) do_add_ieffect(cn, VF_EN_HPWHENHIT,   2*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in, 109)) do_add_ieffect(cn, VF_EN_OFFHMANA,   10*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in, 110)) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
-		if (HAS_ENCH(in, 111)) do_add_ieffect(cn, VF_EN_LESSCRIT,   50*(1+IS_TWOHAND(in)));
-		
-		if (HAS_ENCH(in, 116)) do_add_ieffect(cn, VF_EN_HALFDMG, 8*(1+IS_TWOHAND(in))); // (Legacy)
 	}
 	
 	// Base critical strike chance
