@@ -6527,8 +6527,12 @@ int spell_zephyr(int cn, int co, int power, int flag)
 		
 		if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 		
-		power = spell_immunity(cn, co, power);
+		if (IS_PLAYER(co))	power = spell_immunity(cn, co, power);
+		else				power = other_immunity(power, get_target_immunity(cn, co)/2);
+		
 		power = common_mult(cn, co, power);
+		
+		if (!IS_PLAYER(cn)) power = power/2;
 		
 		if (!(in = make_new_buff(cn, SK_ZEPHYR2, BUF_SPR_ZEPHYR2, power, TICKS, 0))) 
 			return 0;
