@@ -10210,7 +10210,8 @@ void do_attack(int cn, int co, int surround)
 		odam  =   dam;
 		dam  += bonus;
 		
-		if (!do_get_iflag(cn, SF_TW_IRA)) crit_dam = do_crit(cn, co, dam, 0);  // Critical hit check
+		crit_dam = do_crit(cn, co, dam, 0);  // Critical hit check
+		
 		if (ch[cn].flags & (CF_PLAYER)) item_damage_weapon(cn, dam+crit_dam);  // Player weapon damage
 		
 		dam = do_hurt(cn, (co_orig = co), dam+crit_dam, crit_dam>0?9:0);

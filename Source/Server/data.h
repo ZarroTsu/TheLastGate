@@ -661,14 +661,13 @@ struct character
 	
 	unsigned short leech[3];        // Leech effects for HP/EN/MP
 	
-	char season;                    // Challenge season
+	char season;                    // Current season
+	unsigned short challengebits;   // bitwise flags for challenges
 	
-	unsigned char gclight;
-	
-	unsigned char olditem[3];       // free slots
+	unsigned char aemon_floor[2];   // [0] = Solo  [1] = Group
 
 	// items worn
-	unsigned int worn[20];
+	unsigned int worn[20];          // note: 7 of these slots are unused
 
 	// spells active on character
 	unsigned short spell[MAXBUFFS];
@@ -714,7 +713,7 @@ struct character
 	// misc stuff added later:
 	char speed_mod;                 // race dependent speed modification
 	char last_action;               // last action was success/failure (driver_generic level)
-	char unused;
+	unsigned char gclight;          // light passed to gc via enchant
 	char depot_sold;                // items from depot where sold to pay for the rent
 
 	unsigned char gethit_dam;       // damage for attacker when hitting this char
