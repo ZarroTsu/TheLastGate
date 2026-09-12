@@ -2028,8 +2028,8 @@ int get_meta_stat_value(int cn, int n)
 		case 34: // Lethargy Effect											// Flipped to Positive
 			power = spell_multiplier(M_SK(cn, SK_LETHARGY), cn);
 			power = more(power, M_AT(cn, AT_WIL) * (T_SORC_SK(cn, 9)*2+TC_SK(cn, 57)), 20);  // (Sorc) Hex Master
-			if (IS_SEYAN_DU(cn)) value = (bu[in].power/6);
-			else                 value = (bu[in].power/4);
+			if (IS_SEYAN_DU(cn)) value = (power/6);
+			else                 value = (power/4);
 			break;
 		case 35: case 90: // Poison/Venom Degen		Decimal, 0.00 /s
 			power = spell_multiplier(M_SK(cn, SK_POISON), cn);
