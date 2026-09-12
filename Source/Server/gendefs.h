@@ -20,10 +20,10 @@
 
 #define MAPX				1024
 #define MAPY				2048
-#define MAXCHARS			(18*1024)
+#define MAXCHARS			(20*1024)
 #define MAXBUFF				(40*MAXCHARS)
-#define MAXITEM				(64*1024*5)
-#define MAXEFFECT			(10*1024)
+#define MAXITEM				(64*1024*8)
+#define MAXEFFECT			(16*1024)
 #define MAXMISSION			1024
 #define MAXSKILL			  50
 #define MAXITEMS			  60

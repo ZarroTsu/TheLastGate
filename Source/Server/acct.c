@@ -3944,6 +3944,18 @@ void list_object_drivers(LIST *head)
 	printf("\n</ul>\n");
 }
 
+int countitems(void)
+{
+	int n, m=0;
+	
+	for (n = 1; n<MAXITEM; n++)
+	{
+		if (it[n].used!=USE_EMPTY) m++;
+	}
+	
+	return m;
+}
+
 int main(int argc, char *args[])
 {
 	int step = 0;
@@ -4136,7 +4148,8 @@ int main(int argc, char *args[])
 		printf("<a href=/cgi-imp/acct.cgi?step=39>Object Templates (Spellmod)</a><br>\n");
 		printf("<a href=/cgi-imp/acct.cgi?step=31>Object Driver List</a><br><br>\n");
 		printf("Show All Items<br>\n");
-		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br><br>\n");
+		printf("<a href=/cgi-imp/acct.cgi?step=27>Item List</a><br>\n");
+		printf("%d Active world items (out of %d)<br><br>\n", countitems(), MAXITEM);
 		printf("Ab Aeterno's super cool map editor<br>\n");
 		printf("<a href=/cgi-imp/mapper.cgi>Online Map Editor</a><br>");
 		break;
