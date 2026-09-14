@@ -626,45 +626,36 @@ int pop_create_char(int n, int drop)
 	{
 		ch[cn].a_mana = RANDOM(8) * RANDOM(8) * RANDOM(8) * RANDOM(8) * 100;
 	}
-	ch[cn].dir = DX_DOWN;
+	if ((ch[cn].dir = ch[cn].data[30])) ;
+	else ch[cn].dir = DX_DOWN;
 	ch[cn].data[92] = TICKS * 60;
 
 	if (ch[cn].alignment<0)
 	{
 		for (m = 0; m<40; m++)
 		{
-			if (ch[cn].item[m]==0 && (hasitems || (RANDOM(2) && ch[cn].temp!=347 && ch[cn].temp!=350)))
+			if (hasitems || (RANDOM(2) && ch[cn].temp!=347 && ch[cn].temp!=350))
 			{
-				j = m;
-				if (try_boost(40))
+				if (ch[cn].item[m]==0 &&   try_boost(40) && (tmp = pop_create_bonus(cn)))
 				{
-					if ((tmp = pop_create_bonus(cn)))
-					{
-						it[tmp].carried = cn;
-						ch[cn].item[j]  = tmp;
-						j++; if (j>=40) break;
-						hasloot = 1;
-					}
+					hasloot = 1;
+					it[tmp].carried = cn;
+					ch[cn].item[m]  = tmp;
+					m++; if (m>=40) break;
 				}
-				if (ch[cn].item[j]==0 && try_boost(500))
+				if (ch[cn].item[m]==0 &&  try_boost(500) && (tmp = pop_create_bonus(cn)))
 				{
-					if ((tmp = pop_create_bonus(cn)))
-					{
-						it[tmp].carried = cn;
-						ch[cn].item[j]  = tmp;
-						j++; if (j>=40) break;
-						hasloot = 1;
-					}
+					hasloot = 1;
+					it[tmp].carried = cn;
+					ch[cn].item[m]  = tmp;
+					m++; if (m>=40) break;
 				}
-				if (ch[cn].item[j]==0 && try_boost(6000))
+				if (ch[cn].item[m]==0 && try_boost(6000) && (tmp = pop_create_bonus_belt(cn)))
 				{
-					if ((tmp = pop_create_bonus_belt(cn)))
-					{
-						it[tmp].carried = cn;
-						ch[cn].item[j]  = tmp;
-						j++; if (j>=40) break;
-						hasloot = 1;
-					}
+					hasloot = 1;
+					it[tmp].carried = cn;
+					ch[cn].item[m]  = tmp;
+					m++; if (m>=40) break;
 				}
 				break;
 			}
@@ -810,12 +801,10 @@ void pop_skill(void)
 
 	for (cn = 1; cn<MAXCHARS; cn++)
 	{
-		if (!(ch[cn].flags & (CF_PLAYER)))
-		{
-			continue;
-		}
+		if (!(ch[cn].flags & (CF_PLAYER))) continue;
+		
 		t = ch[cn].temp;
-
+		
 		for (n = 0; n<MAXSKILL; n++)
 		{
 			if (B_SK(cn, n)==0 && ch_temp[t].skill[n][0])
