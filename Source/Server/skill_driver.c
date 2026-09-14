@@ -6494,6 +6494,7 @@ int zephyr_check(int cn, int co, int cz, int tarot)
 {
 	int in, power;
 	
+	if (!do_surround_check(cn, co, 1))             return 0;
 	if (!do_char_can_see(cn, co, 0))               return 0;
 	if (IS_NOMAGIC(co))                            return 0;
 	if (tarot==0 &&  do_get_iflag(cn, SF_DEATH_R)) return 0;
