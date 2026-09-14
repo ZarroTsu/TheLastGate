@@ -584,109 +584,34 @@ int god_drop_char_fuzzy(int nr, int x, int y)
 
 int god_drop_char_fuzzy_large(int nr, int x, int y, int xs, int ys)
 {
-	if (can_go(xs, ys, x, y) && god_drop_char(nr, x, y))
-	{
-		return 1;
-	}
+	if (can_go(xs, ys, x, y) && god_drop_char(nr, x, y)) return 1;
 
-	if (can_go(xs, ys, x + 1, y) && god_drop_char(nr, x + 1, y))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 1, y) && god_drop_char(nr, x - 1, y))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x, y + 1) && god_drop_char(nr, x, y + 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x, y - 1) && god_drop_char(nr, x, y - 1))
-	{
-		return 1;
-	}
+	if (can_go(xs, ys, x + 1, y) && god_drop_char(nr, x + 1, y)) return 1;
+	if (can_go(xs, ys, x - 1, y) && god_drop_char(nr, x - 1, y)) return 1;
+	if (can_go(xs, ys, x, y + 1) && god_drop_char(nr, x, y + 1)) return 1;
+	if (can_go(xs, ys, x, y - 1) && god_drop_char(nr, x, y - 1)) return 1;
 
-	if (can_go(xs, ys, x + 1, y + 1) && god_drop_char(nr, x + 1, y + 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 1, y - 1) && god_drop_char(nr, x + 1, y - 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 1, y + 1) && god_drop_char(nr, x - 1, y + 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 1, y - 1) && god_drop_char(nr, x - 1, y - 1))
-	{
-		return 1;
-	}
+	if (can_go(xs, ys, x + 1, y + 1) && god_drop_char(nr, x + 1, y + 1)) return 1;
+	if (can_go(xs, ys, x + 1, y - 1) && god_drop_char(nr, x + 1, y - 1)) return 1;
+	if (can_go(xs, ys, x - 1, y + 1) && god_drop_char(nr, x - 1, y + 1)) return 1;
+	if (can_go(xs, ys, x - 1, y - 1) && god_drop_char(nr, x - 1, y - 1)) return 1;
 
-	if (can_go(xs, ys, x + 2, y - 2) && god_drop_char(nr, x + 2, y - 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 2, y - 1) && god_drop_char(nr, x + 2, y - 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 2, y + 0) && god_drop_char(nr, x + 2, y + 0))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 2, y + 1) && god_drop_char(nr, x + 2, y + 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 2, y + 2) && god_drop_char(nr, x + 2, y + 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 2, y - 2) && god_drop_char(nr, x - 2, y - 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 2, y - 1) && god_drop_char(nr, x - 2, y - 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 2, y + 0) && god_drop_char(nr, x - 2, y + 0))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 2, y + 1) && god_drop_char(nr, x - 2, y + 1))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 2, y + 2) && god_drop_char(nr, x - 2, y + 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 1, y + 2) && god_drop_char(nr, x - 1, y + 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 0, y + 2) && god_drop_char(nr, x + 0, y + 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 1, y + 2) && god_drop_char(nr, x + 1, y + 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x - 1, y - 2) && god_drop_char(nr, x - 1, y - 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 0, y - 2) && god_drop_char(nr, x + 0, y - 2))
-	{
-		return 1;
-	}
-	if (can_go(xs, ys, x + 1, y - 2) && god_drop_char(nr, x + 1, y - 2))
-	{
-		return 1;
-	}
+	if (can_go(xs, ys, x + 2, y - 2) && god_drop_char(nr, x + 2, y - 2)) return 1;
+	if (can_go(xs, ys, x + 2, y - 1) && god_drop_char(nr, x + 2, y - 1)) return 1;
+	if (can_go(xs, ys, x + 2, y + 0) && god_drop_char(nr, x + 2, y + 0)) return 1;
+	if (can_go(xs, ys, x + 2, y + 1) && god_drop_char(nr, x + 2, y + 1)) return 1;
+	if (can_go(xs, ys, x + 2, y + 2) && god_drop_char(nr, x + 2, y + 2)) return 1;
+	if (can_go(xs, ys, x - 2, y - 2) && god_drop_char(nr, x - 2, y - 2)) return 1;
+	if (can_go(xs, ys, x - 2, y - 1) && god_drop_char(nr, x - 2, y - 1)) return 1;
+	if (can_go(xs, ys, x - 2, y + 0) && god_drop_char(nr, x - 2, y + 0)) return 1;
+	if (can_go(xs, ys, x - 2, y + 1) && god_drop_char(nr, x - 2, y + 1)) return 1;
+	if (can_go(xs, ys, x - 2, y + 2) && god_drop_char(nr, x - 2, y + 2)) return 1;
+	if (can_go(xs, ys, x - 1, y + 2) && god_drop_char(nr, x - 1, y + 2)) return 1;
+	if (can_go(xs, ys, x + 0, y + 2) && god_drop_char(nr, x + 0, y + 2)) return 1;
+	if (can_go(xs, ys, x + 1, y + 2) && god_drop_char(nr, x + 1, y + 2)) return 1;
+	if (can_go(xs, ys, x - 1, y - 2) && god_drop_char(nr, x - 1, y - 2)) return 1;
+	if (can_go(xs, ys, x + 0, y - 2) && god_drop_char(nr, x + 0, y - 2)) return 1;
+	if (can_go(xs, ys, x + 1, y - 2) && god_drop_char(nr, x + 1, y - 2)) return 1;
 
 	return 0;
 }
