@@ -468,7 +468,7 @@ int pop_create_bonus_belt(int cn)
 
 int pop_create_char(int n, int drop)
 {
-	int cn, tmp, m, j=0, flag = 0, hasitems = 0, hasloot = 0, randm=0;
+	int cn, tmp, m, flag = 0, hasitems = 0, hasloot = 0, randm=0;
 
 	for (cn = 1; cn<MAXCHARS; cn++)
 	{
