@@ -1751,18 +1751,11 @@ int find_next_char(int startcn, char *spec1, char *spec2)
 
 int invis(int looker, int target)
 {
-	if (!(ch[target].flags & CF_INVISIBLE))
-	{
-		return 0;
-	}
-	if (invis_level(looker)>=invis_level(target))
-	{
-		return 0;
-	}
+	if (!(ch[target].flags & CF_INVISIBLE))       return 0;
+	if (invis_level(looker)>=invis_level(target)) return 0;
 
 	return 1;
 }
-
 
 void god_summon(int cn, char *spec1, char *spec2, char *spec3)
 {
