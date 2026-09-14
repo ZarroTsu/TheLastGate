@@ -66,8 +66,9 @@ static char *mkp(void)
 	return buf;
 }
 
-#define MAXFREEBUFF 32
-#define MAXFREEITEM 64
+#define MAXFREEBUFF  64
+#define MAXFREEITEM 128
+
 static int free_buff_list[MAXFREEBUFF];
 static int free_item_list[MAXFREEITEM];
 
@@ -91,7 +92,6 @@ void god_init_freelist(void)
 		if (m >= MAXFREEITEM) break;
 	}
 }
-
 
 int get_free_buff(void)
 {
