@@ -168,7 +168,6 @@ void god_set_purple(int cn, int co);
 void god_iinfo(int cn, int in);
 void god_tinfo(int cn, int temp);
 void god_slap(int cn, int co);
-void god_unique(int cn);
 void god_reset_description(int cn, int co);
 void god_set_name(int cn, int co, char *name);
 void god_kick(int cn, int co);

@@ -1106,44 +1106,6 @@ void god_tinfo(int cn, int temp)
 	            ch[it[in].carried].name, it[in].carried, it[in].x, it[in].y, in);
 }
 
-void god_unique(int cn)
-{
-	static int unique[60] = {
-	//	280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 525, 526,
-	//	527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541,
-	//	542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556,
-	//	572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586
-	};
-	int owner[60];
-	int n, in;
-
-	for (n = 0; n<60; n++)
-	{
-		owner[n] = 0;
-	}
-
-	for (in = 1; in<MAXITEM; in++)
-	{
-		if (it[in].used==USE_EMPTY)
-		{
-			continue;
-		}
-		for (n = 0; n<60; n++)
-		{
-			if (it[in].temp==unique[n])
-			{
-				owner[n] = it[in].carried;
-			}
-		}
-	}
-
-	for (n = 0; n<60; n++)
-	{
-		do_char_log(cn, 2, "%-25.25s: %.10s (%d)\n",
-		            it_temp[unique[n]].name, ch[owner[n]].name, owner[n]);
-	}
-}
-
 char *int2str(int val)
 {
 	static char buf[256];

@@ -7323,12 +7323,6 @@ void do_command(int cn, char *ptr)
 			break;
 		}
 		;
-		if (prefix(cmd, "unique") && f_g)
-		{
-			god_unique(cn);
-			return;
-		}
-		;
 		if (prefix(cmd, "usurp") && f_giu)
 		{
 			god_usurp(cn, dbatoi(arg[1]));
