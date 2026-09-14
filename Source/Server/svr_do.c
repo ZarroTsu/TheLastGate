@@ -18942,8 +18942,20 @@ void do_check_new_level(int cn, int announce)
 		{
 			bits = get_rebirth_bits(cn);
 			temp = ch[cn].temp;
-			for (n = 0; n<5; n++) 
-				ch[cn].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+			
+			if (IS_SHIFTED(cn))
+			{
+				ch[cn].attrib[0][2] = ch_temp[temp].attrib[0][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-0)/6));
+				ch[cn].attrib[1][2] = ch_temp[temp].attrib[3][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-3)/6));
+				ch[cn].attrib[2][2] = ch_temp[temp].attrib[4][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-4)/6));
+				ch[cn].attrib[3][2] = ch_temp[temp].attrib[1][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-1)/6));
+				ch[cn].attrib[4][2] = ch_temp[temp].attrib[2][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-2)/6));
+			}
+			else
+			{
+				for (n = 0; n<5; n++) 
+					ch[cn].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+			}
 		}
 		
 		do_update_char(cn);

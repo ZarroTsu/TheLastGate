@@ -4119,8 +4119,19 @@ void god_racechange(int co, int temp, int keepstuff)
 			bits = get_rebirth_bits(co);
 			if (attri || bits)
 			{
-				for (n = 0; n<5; n++) 
-					ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+				if (IS_SHIFTED(co))
+				{
+					ch[co].attrib[0][2] = ch_temp[temp].attrib[0][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-0)/6));
+					ch[co].attrib[1][2] = ch_temp[temp].attrib[3][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-3)/6));
+					ch[co].attrib[2][2] = ch_temp[temp].attrib[4][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-4)/6));
+					ch[co].attrib[3][2] = ch_temp[temp].attrib[1][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-1)/6));
+					ch[co].attrib[4][2] = ch_temp[temp].attrib[2][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-2)/6));
+				}
+				else
+				{
+					for (n = 0; n<5; n++) 
+						ch[co].attrib[n][2] = ch_temp[temp].attrib[n][2] + attri*min(5, max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+				}
 				for (n = 0; n<50; n++) 
 					if (ch[co].skill[n][2] && bits) ch[co].skill[n][2] = ch_temp[temp].skill[n][2] + min(5,max(0,bits/6));
 			}

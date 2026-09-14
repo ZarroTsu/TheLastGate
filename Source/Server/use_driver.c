@@ -9209,10 +9209,22 @@ int rebirth_explorer_point(int cn, int in, int msg)
 		
 		if (rank >= 20) attri = 1;
 		
-		for (n = 0; n<5; n++) 
-			ch[cn].attrib[n][2] = ch_temp[ch[cn].temp].attrib[n][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+		if (IS_SHIFTED(cn))
+		{
+			ch[cn].attrib[0][2] = ch_temp[ch[cn].temp].attrib[0][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-0)/6));
+			ch[cn].attrib[1][2] = ch_temp[ch[cn].temp].attrib[3][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-3)/6));
+			ch[cn].attrib[2][2] = ch_temp[ch[cn].temp].attrib[4][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-4)/6));
+			ch[cn].attrib[3][2] = ch_temp[ch[cn].temp].attrib[1][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-1)/6));
+			ch[cn].attrib[4][2] = ch_temp[ch[cn].temp].attrib[2][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-2)/6));
+		}
+		else
+		{
+			for (n = 0; n<5; n++) 
+				ch[cn].attrib[n][2] = ch_temp[ch[cn].temp].attrib[n][2] + attri*min(5,max(0,rank-19)) + min(5,max(0,(bits+5-n)/6));
+		}
 		for (n = 0; n<50; n++) 
 			if (ch[cn].skill[n][2]) ch[cn].skill[n][2] = ch_temp[ch[cn].temp].skill[n][2] + min(5,max(0,bits/6));
+		
 		if (ch[cn].pandium_floor[2] >= 3)
 		{
 			n = 0;
