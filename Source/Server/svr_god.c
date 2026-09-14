@@ -1728,39 +1728,24 @@ int find_next_char(int startcn, char *spec1, char *spec2)
 	int n;
 	int rank;
 
-	if (isdigit(*spec2))
-	{
-		rank = atoi(spec2);
-	}
-	else
-	{
-		rank = -1;
-	}
+	if (isdigit(*spec2)) rank = atoi(spec2);
+	else                 rank = -1;
+	
 	for (n = startcn + 1; n<MAXCHARS; n++)
 	{
-		if (!IS_USEDCHAR(n))
-		{
-			continue;
-		}
-		if (!strstr(ch[n].name, spec1))
-		{
-			continue;
-		}
+		if (!IS_USEDCHAR(n)) continue;
+		if (!strstr(ch[n].name, spec1)) continue;
+		
 		if (rank == -1)
 		{
-			if (strstr(ch[n].name, spec2))
-			{
-				return( n);
-			}
+			if (strstr(ch[n].name, spec2)) return n;
 		}
 		else
 		{
-			if (getrank(n) == rank)
-			{
-				return( n);
-			}
+			if (getrank(n) == rank) return n;
 		}
 	}
+	
 	return 0;
 }
 
