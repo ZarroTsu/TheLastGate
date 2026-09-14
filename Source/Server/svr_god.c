@@ -1387,7 +1387,7 @@ void god_add_item_kills(int cn, int v)
 
 void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 {
-	int in, m, bonus = 1;
+	int in=0, m, bonus = 1;
 	char *gend, *godn, name[60], refer[60], descr[220];
 
 	if (x == 0)
@@ -1560,6 +1560,7 @@ void god_create(int cn, int x, int gen_a, int gen_b, int gen_c)
 	}
 	if (!god_give_char(in, cn))
 	{
+		it[in].used = USE_EMPTY;
 		do_char_log(cn, 0, "Your inventory is full!\n");
 		return;
 	}
