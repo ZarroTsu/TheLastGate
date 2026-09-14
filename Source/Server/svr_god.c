@@ -230,21 +230,18 @@ char *god_get_mkp(void)
 int god_create_char(int temp, int withitems)
 {
 	int n, m, tmp, flag = 0;
-
+	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (ch[n].used==USE_EMPTY)
-		{
-			break;
-		}
+		if (ch[n].used==USE_EMPTY) break;
 	}
-
+	
 	if (n==MAXCHARS)
 	{
 		xlog("god_create_char (svr_god.c): MAXCHARS reached!");
 		return 0;
 	}
-
+	
 	ch[n] = ch_temp[temp];
 	ch[n].pass1 = RANDOM(0x3fffffff);
 	ch[n].pass2 = RANDOM(0x3fffffff);
@@ -255,22 +252,14 @@ int god_create_char(int temp, int withitems)
 		strcpy(ch[n].name, mkp());
 		for (m = 1; m<MAXCHARS; m++)
 		{
-			if (m==n)
-			{
-				continue;
-			}
-			if (!strcmp(ch[n].name, ch[m].name))
-			{
-				break;
-			}
+			if (m==n) continue;
+			if (!strcmp(ch[n].name, ch[m].name)) break;
 		}
-		if (m==MAXCHARS)
-		{
-			break;
-		}
+		if (m==MAXCHARS) break;
 	}
+	
 	strcpy(ch[n].reference, ch[n].name);
-
+	
 	sprintf(ch[n].description, "%s is a %s%s%s%s%s. %s%s%s looks somewhat nondescript.",
 		ch[n].name,
 		IS_TEMPLAR(n) ? "Templar" : "",
@@ -286,6 +275,7 @@ int god_create_char(int temp, int withitems)
 	{
 		ch[n].data[m] = 0;
 	}
+	
 	ch[n].attack_cn = 0;
 	ch[n].skill_nr  = 0;
 	ch[n].goto_x = 0;
@@ -302,12 +292,10 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp);
-				if (!tmp)
-				{
+				if ((tmp = god_create_item(tmp)))
+					it[tmp].carried = n;
+				else
 					flag = 1;
-				}
-				it[tmp].carried = n;
 			}
 			else
 			{
@@ -323,12 +311,10 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp);
-				if (!tmp)
-				{
+				if ((tmp = god_create_item(tmp)))
+					it[tmp].carried = n;
+				else
 					flag = 1;
-				}
-				it[tmp].carried = n;
 			}
 			else
 			{
@@ -344,12 +330,10 @@ int god_create_char(int temp, int withitems)
 		{
 			if (withitems)
 			{
-				tmp = god_create_item(tmp);
-				if (!tmp)
-				{
+				if ((tmp = god_create_item(tmp)))
+					it[tmp].carried = n;
+				else
 					flag = 1;
-				}
-				it[tmp].carried = n;
 			}
 			else
 			{
@@ -362,21 +346,17 @@ int god_create_char(int temp, int withitems)
 	for (m = 0; m<MAXBUFFS; m++)
 	{
 		if (ch[n].spell[m]!=0)
-		{
 			ch[n].spell[m] = 0;
-		}
 	}
 	
 	if ((tmp = ch[n].citem)!=0)
 	{
 		if (withitems)
 		{
-			tmp = god_create_item(tmp);
-			if (!tmp)
-			{
+			if ((tmp = god_create_item(tmp)))
+				it[tmp].carried = n;
+			else
 				flag = 1;
-			}
-			it[tmp].carried = n;
 		}
 		else
 		{
@@ -391,9 +371,9 @@ int god_create_char(int temp, int withitems)
 		ch[n].used = USE_EMPTY;
 		return 0;
 	}
-
+	
+	ch[n].a_hp   = 9999999;
 	ch[n].a_end  = 1000000;
-	ch[n].a_hp   = 1000000;
 	ch[n].a_mana = 1000000;
 	
 	do_update_char(n);
