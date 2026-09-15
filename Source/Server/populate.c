@@ -573,7 +573,10 @@ int pop_create_char(int n, int drop)
 				it[tmp].carried = cn;
 				
 				if (m == WN_RHAND && (randm == 3 || randm == 5) && ch[cn].worn[WN_LHAND] == 0)
-					ch[cn].worn[WN_LHAND] = tmp; // Note: RHAND happens after LHAND so this will overwrite their LHAND
+				{
+					ch[cn].worn[WN_RHAND] = 0;    // Remove the RHAND item so that its not pointing to a bad ID!
+					ch[cn].worn[WN_LHAND] = tmp;  // RHAND happens after LHAND so this overwrites the old LHAND.
+				}
 				else
 					ch[cn].worn[m] = tmp;
 				
