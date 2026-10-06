@@ -507,7 +507,7 @@ extern char *at_short[];
 #define DESC_TW_DREAD		"When equipped, your ghost companion is replaced with a spellcaster companion.\n"
 #define DESC_TW_DOUSER		"When equipped, your hits inflict a self-scaling Fatigue, causing enemies to deal less damage.\n"
 #define DESC_TW_MARCH		"When equipped, Stun is turned into a speed reduction of 1.50, and all other speed reductions are reduced by one third.\n"
-#define DESC_TW_BBELT		"When equipped, get WV from your Hand to Hand skill and +2%% base crit if your main hand is empty, half of shield parry bonus if your off-hand is empty, and 5%% total base crit if both hands are empty.\n"
+#define DESC_TW_BBELT		"When equipped, being unarmed now grants 50%% of your Hand to Hand skill as WV and 3%% crit chance per empty hand. Grants half of shield parry bonus if your off-hand is empty.\n"
 #define DESC_TW_OUTSIDE		"When equipped, enemies no longer gain a bonus to hitting you while you are stunned or not fighting back.\n"
 #define DESC_TW_HEAVENS		"Uses your highest weapon skill for hit and parry scores. When equipped, your highest attribute score is increased by 20%%.\n"
 
@@ -575,7 +575,7 @@ extern char *at_short[];
 #define DESC_AM_ANTIQUE		"Stats on this amulet are applied twice if this amulet has been Soulstoned."
 
 #define DESC_BL_ECLIPSE		"Grants passive bonuses during the day (6:00 to 18:00), and active bonuses during the night (18:00 to 6:00).\n"
-#define DESC_WHITEBELT		"When equipped, get WV from your Hand to Hand skill and +2%% base crit if your main hand and off hand are empty.\n"
+#define DESC_WHITEBELT		"When equipped, being unarmed now grants 33%% of your Hand to Hand skill as WV and 2%% crit chance per empty hand.\n"
 
 #define DESC_MISERRING		"When equipped and activated, grants 50%% more gold from enemies you kill.\n"
 #define DESC_FORTERING		"When equipped and activated, grants 25%% more EXP from enemies you kill.\n"

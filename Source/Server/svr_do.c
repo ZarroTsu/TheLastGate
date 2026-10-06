@@ -10703,7 +10703,7 @@ void really_update_char(int cn)
 	int n, m, oldlight, z, sublight = 0, maxlight = 0, co=0, cz=0, bits=0;
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0;
 	int heal_hp, heal_end, heal_mana, act = 0, tmphm = 0, gench = 0;
-	int tempWeapon = 0, tempArmor = 0, bbelt = 0, wbelt = 0, in=0; //, nmz=0;
+	int tempWeapon = 0, tempArmor = 0, in = 0;
 	int sickStacks = 0, symSpec = 0, isWater = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
@@ -10711,7 +10711,7 @@ void really_update_char(int cn)
 	int hit_rate = 0, parry_rate = 0, loverSplit = 0, skirmtaunt = 0;
 	int damage_top = 0, ava_crit = 0, ava_mult = 0, lido = 1, liha = 1;
 	int aoe = 0, tempCost = 10000, dmg_bns = 10000, dmg_rdc = 10000, reduc_bonus = 0;
-	int suppression = 0, bcount=0, labcmd=0, gcdivinity = 0, empty = 0, unarmed = 1, emptyring = 0;
+	int suppression = 0, bcount=0, labcmd=0, gcdivinity = 0, empty = 0, emptyring = 0;
 	int resrv[3];
 	int attrib[5];
 	int attrib_ex[5];
@@ -10762,7 +10762,6 @@ void really_update_char(int cn)
 			do_char_log(cn, 0, "You feel your magic return.\n");
 		}
 	}
-//	if (ch[cn].flags & CF_NOMAGIC) nmz = 1;
 	
 	oldlight = ch[cn].light;
 	
@@ -11148,7 +11147,6 @@ void really_update_char(int cn)
 		{
 			if (n!=WN_CHARM && n!=WN_CHARM2 && n!=WN_LHAND) empty++;
 			if (n==WN_LRING || n==WN_RRING) emptyring++;
-			if (IS_PLAYER(cn) && n==WN_RHAND) unarmed++;
 			continue;
 		}
 		
@@ -11201,26 +11199,6 @@ void really_update_char(int cn)
 		
 		critical_b += do_add_stat(cn, m, it[m].base_crit[act]+it[m].base_crit[I_P], 0);
 		
-		if (it[m].temp == IT_TW_BBELT)
-		{
-			if (ch[cn].worn[WN_RHAND]==0)
-			{
-				critical_b += 2;
-				bbelt=1;
-				
-				if (ch[cn].worn[WN_LHAND]==0)
-				{
-					critical_b += 2;
-				}
-			}
-		}
-		
-		if (it[m].temp == IT_WHITEBELT && ch[cn].worn[WN_RHAND]==0 && ch[cn].worn[WN_LHAND]==0)
-		{
-			critical_b += 2;
-			wbelt=1;
-		}
-		
 		// WV, AV
 		tempArmor  = do_add_stat(cn, m, it[m].armor[act]      + it[m].armor[I_P],      0);
 		tempWeapon = do_add_stat(cn, m, it[m].weapon[act]     + it[m].weapon[I_P],     0);
@@ -11257,13 +11235,10 @@ void really_update_char(int cn)
 		{
 			tempWeapon /= 2;
 		}
-		if (IS_WPSHIELD(m))
+		if (n == WN_RHAND && IS_WPSHIELD(m))
 		{
-			if (n == WN_RHAND)
-			{
-				tempWeapon += tempArmor;
-				tempArmor  /= 2;
-			}
+			tempWeapon += tempArmor;
+			tempArmor  /= 2;
 		}
 		
 		weapon += tempWeapon;
@@ -11929,8 +11904,31 @@ void really_update_char(int cn)
 		set_skill_score(cn, z, skill[z]);
 	}
 	
-	if (bbelt) { weapon += min(AT_CAP, skill[0])/2; tempWeapon += min(AT_CAP, skill[0])/2; }  // Black belt
-	if (wbelt) { weapon += min(AT_CAP, skill[0])/3; tempWeapon += min(AT_CAP, skill[0])/3; }  // White belt
+	// Unarmed bonuses
+	if (IS_PLAYER(cn) && !ch[cn].worn[WN_RHAND])
+	{
+		if (it[WN_BELT].temp == IT_TW_BBELT) // Black Belt
+		{
+			n = skill[SK_HAND]/2;
+			m = 3;
+		}
+		else if (it[WN_BELT].temp == IT_WHITEBELT) // White Belt
+		{
+			n = skill[SK_HAND]/3;
+			m = 2;
+		}
+		else
+		{
+			n = skill[SK_HAND]/4;
+			m = 1;
+		}
+		
+		weapon     += n;
+		tempWeapon += n;
+		
+		critical_b += m * ((!ch[cn].worn[WN_LHAND])?2:1);
+		critical_b += TC_SK(cn, 100)*5;  // (Corr) Martial Artist
+	}
 	
 	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && ch[cn].data[1]==4) { cz=cn; cn=co; }
 	
@@ -12315,7 +12313,6 @@ void really_update_char(int cn)
 	critical_c += attrib_ex[AT_BRV]*2;
 	
 	if (!IS_PLAYER(cn) && (ch[cn].flags & CF_EXTRACRIT)) critical_b += 4;
-	if (unarmed) critical_b += TC_SK(cn, 100)*5;  // (Corr) Martial Artist
 	
 	critical_b *= 100;
 	
@@ -12585,7 +12582,7 @@ void really_update_char(int cn)
 	
 	// Flat Bonuses
 	{
-		damage_top += (attrib_ex[AT_STR] * unarmed) / 2;
+		damage_top += attrib_ex[AT_STR] / (unarmed?1:2);
 		
 		if (T_BRAV_SK(cn, 10))    // (Brav) Spellblade
 			damage_top += spell_pow;
