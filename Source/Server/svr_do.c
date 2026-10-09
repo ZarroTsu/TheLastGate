@@ -10707,7 +10707,7 @@ void really_update_char(int cn)
 	int sickStacks = 0, symSpec = 0, isWater = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
-	int critical_b = 0, critical_c = 0, critical_m = 0;
+	int critical_b = 0, critical_c = 0, critical_m = 0, unarmed = 0;
 	int hit_rate = 0, parry_rate = 0, loverSplit = 0, skirmtaunt = 0;
 	int damage_top = 0, ava_crit = 0, ava_mult = 0, lido = 1, liha = 1;
 	int aoe = 0, tempCost = 10000, dmg_bns = 10000, dmg_rdc = 10000, reduc_bonus = 0;
@@ -11907,6 +11907,8 @@ void really_update_char(int cn)
 	// Unarmed bonuses
 	if (IS_PLAYER(cn) && !ch[cn].worn[WN_RHAND])
 	{
+		unarmed = 1;
+		
 		if (it[WN_BELT].temp == IT_TW_BBELT) // Black Belt
 		{
 			n = skill[SK_HAND]/2;
