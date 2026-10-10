@@ -911,7 +911,7 @@ void look_rewardscroll(int cn, int in)
 	for (n=0; n<10; n++)
 	{
 		if (it[in].data[n]==0) break;
-		do_char_log(cn, 1, "  %s\n", n+1, it_temp[it[in].data[n]].name);
+		do_char_log(cn, 1, " %d) %s\n", n+1, it_temp[it[in].data[n]].name);
 	}
 }
 
