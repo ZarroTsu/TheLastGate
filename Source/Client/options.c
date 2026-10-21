@@ -472,27 +472,28 @@ int save_dialog(HWND hwnd,char *name)
 
 void update_race(HWND hwnd)
 {
-	//char buf[2];
-	
 	if (race < 4)
 	{
 		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,0,0,0,0,0);
-
+		SetWindowPos(GetDlgItem(hwnd,IDC_TEMP),NULL,148,100+74-7,120,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_MERC),NULL,148,112+74,  120,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_HARA),NULL,148,124+74+7,120,12,0);
+		
 		if (race==1)  CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_TEMP);
 		if (race==2)  CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_MERC);
 		if (race==3)  CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_HARA);
 		
-		//sprintf(buf,"%d",race);
-		//SetDlgItemText(hwnd,IDC_ARCH,buf);
 		SetDlgItemText(hwnd,IDC_ARCH,"Null");
 	}
 	else
 	{
-		//  AUTORADIOBUTTON "", IDC_ARCH, 176, 143, 60, 12, WS_DISABLED
-		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,176+88,143+92,100,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,148,100+74-7,120,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_TEMP),NULL,0,0,0,0,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_MERC),NULL,0,0,0,0,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_HARA),NULL,0,0,0,0,0);
 		
 		CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_ARCH);
-	
+		
 		if (race==4)  SetDlgItemText(hwnd,IDC_ARCH,"Arch-Templar");
 		if (race==5)  SetDlgItemText(hwnd,IDC_ARCH,"Skald");
 		if (race==6)  SetDlgItemText(hwnd,IDC_ARCH,"Warrior");
@@ -502,7 +503,7 @@ void update_race(HWND hwnd)
 		if (race==10) SetDlgItemText(hwnd,IDC_ARCH,"Arch-Harakim");
 		if (race==11) SetDlgItemText(hwnd,IDC_ARCH,"Braver");
 	}
-
+	
 	if (sex==1)   CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_MALE);
 	if (sex==2)   CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_FEMALE);
 }
@@ -747,7 +748,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					else 
 					{
 						race=1; 
-						SetDlgItemText(hwnd,IDC_STATUS,"STATUS: OK\n\n\nTemplar:\nAn adept at melee combat, these fighters can become heavy hitters or unbreakable tanks. They learn only a few utility spells.");
+						SetDlgItemText(hwnd,IDC_STATUS,"Templar:\nAn adept at melee combat, these fighters can become heavy hitters or unbreakable tanks. They learn only a few utility spells.");
 					}
 					update_buttons(hwnd); 
 					return 1;
@@ -757,7 +758,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					else 
 					{
 						race=2; 
-						SetDlgItemText(hwnd,IDC_STATUS,"STATUS: OK\n\n\nMercenary:\nJack of all trades, master of none. These fighters can do a bit of everything, and can become capable in any situation.");
+						SetDlgItemText(hwnd,IDC_STATUS,"Mercenary:\nJack of all trades, master of none. These fighters can do a bit of everything, and can become capable in any situation.");
 					}
 					update_buttons(hwnd); 
 					return 1;
@@ -767,7 +768,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					else 
 					{
 						race=3; 
-						SetDlgItemText(hwnd,IDC_STATUS,"STATUS: OK\n\n\nHarakim:\nSpellcaster extraordinare, these fighters can summon capable companions and hit foes with a powerful long-range blast.");
+						SetDlgItemText(hwnd,IDC_STATUS,"Harakim:\nSpellcaster extraordinare, these fighters can summon capable companions and hit foes with a powerful long-range blast.");
 					}
 					update_buttons(hwnd); 
 					return 1;

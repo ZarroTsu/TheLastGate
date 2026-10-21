@@ -6,8 +6,8 @@
 
  **************************************************************************/
 
-#define VERSION				0x000E04
-#define MINVERSION			0x000E00
+#define VERSION				0x000F00
+#define MINVERSION			0x000F00
 
 #define CURRENTSEASON		0
 
