@@ -80,7 +80,7 @@ struct pdata pdata={"","","",0};
 
 extern int domusic,dosound,smode;
 static int opmusic,opsound,opshadow,opdarkmode;
-int race=0,sex=0;
+int race=0,sex=0,gamemode=0,season=0;
 
 static char *new_msg1={
 	"Do you really want to create a new account?\n\n"
@@ -475,37 +475,46 @@ void update_race(HWND hwnd)
 	if (race < 4)
 	{
 		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,0,0,0,0,0);
-		SetWindowPos(GetDlgItem(hwnd,IDC_TEMP),NULL,148,100+74-7,120,12,0);
-		SetWindowPos(GetDlgItem(hwnd,IDC_MERC),NULL,148,112+74,  120,12,0);
-		SetWindowPos(GetDlgItem(hwnd,IDC_HARA),NULL,148,124+74+7,120,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_TEMP),NULL,143,100+74-7,100,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_MERC),NULL,143,112+74,  100,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_HARA),NULL,143,124+74+7,100,12,0);
 		
-		if (race==1)  CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_TEMP);
-		if (race==2)  CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_MERC);
-		if (race==3)  CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_HARA);
+		if (race== 1) CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_TEMP);
+		if (race== 2) CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_MERC);
+		if (race== 3) CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_HARA);
 		
 		SetDlgItemText(hwnd,IDC_ARCH,"Null");
 	}
 	else
 	{
-		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,148,100+74-7,120,12,0);
+		SetWindowPos(GetDlgItem(hwnd,IDC_ARCH),NULL,143,100+74-7,100,12,0);
 		SetWindowPos(GetDlgItem(hwnd,IDC_TEMP),NULL,0,0,0,0,0);
 		SetWindowPos(GetDlgItem(hwnd,IDC_MERC),NULL,0,0,0,0,0);
 		SetWindowPos(GetDlgItem(hwnd,IDC_HARA),NULL,0,0,0,0,0);
 		
 		CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_ARCH);
 		
-		if (race==4)  SetDlgItemText(hwnd,IDC_ARCH,"Arch-Templar");
-		if (race==5)  SetDlgItemText(hwnd,IDC_ARCH,"Skald");
-		if (race==6)  SetDlgItemText(hwnd,IDC_ARCH,"Warrior");
-		if (race==7)  SetDlgItemText(hwnd,IDC_ARCH,"Seyan'du");
-		if (race==8)  SetDlgItemText(hwnd,IDC_ARCH,"Sorcerer");
-		if (race==9)  SetDlgItemText(hwnd,IDC_ARCH,"Summoner");
+		if (race== 4) SetDlgItemText(hwnd,IDC_ARCH,"Arch-Templar");
+		if (race== 5) SetDlgItemText(hwnd,IDC_ARCH,"Skald");
+		if (race== 6) SetDlgItemText(hwnd,IDC_ARCH,"Warrior");
+		if (race== 7) SetDlgItemText(hwnd,IDC_ARCH,"Seyan'du");
+		if (race== 8) SetDlgItemText(hwnd,IDC_ARCH,"Sorcerer");
+		if (race== 9) SetDlgItemText(hwnd,IDC_ARCH,"Summoner");
 		if (race==10) SetDlgItemText(hwnd,IDC_ARCH,"Arch-Harakim");
 		if (race==11) SetDlgItemText(hwnd,IDC_ARCH,"Braver");
+		
+		if (race==12) SetDlgItemText(hwnd,IDC_ARCH,"Renegade");
+		if (race==13) SetDlgItemText(hwnd,IDC_ARCH,"Rogue");
+		if (race==14) SetDlgItemText(hwnd,IDC_ARCH,"Ritualist");
 	}
 	
-	if (sex==1)   CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_MALE);
-	if (sex==2)   CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_FEMALE);
+	if (sex==1) CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_MALE);
+	if (sex==2) CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_FEMALE);
+	
+	//if ()
+	{
+		
+	}
 }
 
 void update_alpha(HWND hwnd)
@@ -525,11 +534,22 @@ void update_screenmode(HWND hwnd)
 	//if (screen_width == 1600) CheckRadioButton(hwnd,IDC_RES800,IDC_RES1600,IDC_RES1600);
 }
 
+void update_gamemode(HWND hwnd)
+{
+	if (gamemode == 0) CheckRadioButton(hwnd,IDC_GAMENORM,IDC_GAMEROGUE,IDC_GAMENORM);
+	if (gamemode == 1) CheckRadioButton(hwnd,IDC_GAMENORM,IDC_GAMEROGUE,IDC_GAMEHARD);
+	if (gamemode == 2) CheckRadioButton(hwnd,IDC_GAMENORM,IDC_GAMEROGUE,IDC_GAMEROGUE);
+	
+	if (season == 0) CheckRadioButton(hwnd,IDC_SEASON,IDC_LEGACY,IDC_LEGACY);
+	if (season == 1) CheckRadioButton(hwnd,IDC_SEASON,IDC_LEGACY,IDC_SEASON);
+}
+
 void update_buttons(HWND hwnd)
 {
 	update_alpha(hwnd);
 	update_race(hwnd);
 	update_screenmode(hwnd);
+	update_gamemode(hwnd);
 }
 
 #pragma argsused
@@ -749,6 +769,8 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					{
 						race=1; 
 						SetDlgItemText(hwnd,IDC_STATUS,"Templar:\nAn adept at melee combat, these fighters can become heavy hitters or unbreakable tanks. They learn only a few utility spells.");
+						
+						// set description
 					}
 					update_buttons(hwnd); 
 					return 1;
@@ -779,32 +801,8 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					update_buttons(hwnd); 
 					return 1;
 				
-				case IDC_ARCHTEMPLAR:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=4; update_buttons(hwnd); return 1;
-				case IDC_PUGILIST:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=5; update_buttons(hwnd); return 1;
-					
-				case IDC_WARRIOR:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=6; update_buttons(hwnd); return 1;
-				case IDC_SEY:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=7; update_buttons(hwnd); return 1;
-				case IDC_SORCERER:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=8; update_buttons(hwnd); return 1;
-					
-				case IDC_SUMMONER:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=9; update_buttons(hwnd); return 1;
-				case IDC_ARCHHARAKIM:
-					if (okey.usnr) MessageBox(hwnd,"Changing the race has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
-					else race=10; update_buttons(hwnd); return 1;
-				
 				// **** //// ///// **** //
-
+				
 				case IDC_FULLALPHA:
 					do_alpha=2;
 					update_buttons(hwnd);
@@ -832,23 +830,63 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					update_buttons(hwnd);
 					return 1;
 				
-				/*
-				case IDC_RES800:
-					setres_800();
+				/* Game Mode Settings */
+				
+				case IDC_GAMENORM:
+					if (okey.usnr) 
+						MessageBox(hwnd,"Changing the game mode has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
+					else 
+					{
+						gamemode=0;
+						SetDlgItemText(hwnd,IDC_STATUS,"NORMAL MODE:\nThe normal The Last Gate experience.");
+					}
 					update_buttons(hwnd);
 					return 1;
 				
-				case IDC_RES1280:
-					setres_1280();
+				case IDC_GAMEHARD:
+					if (okey.usnr) 
+						MessageBox(hwnd,"Changing the game mode has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
+					else 
+					{
+						gamemode=1;
+						SetDlgItemText(hwnd,IDC_STATUS,"HARD MODE:\nStricter on-death penalties, reduced progression rewards.");
+					}
 					update_buttons(hwnd);
 					return 1;
 				
-				case IDC_RES1600:
-					setres_1600();
+				case IDC_GAMEROGUE:
+					if (okey.usnr) 
+						MessageBox(hwnd,"Changing the game mode has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
+					else 
+					{
+						gamemode=2;
+						SetDlgItemText(hwnd,IDC_STATUS,"ROGUELIKE MODE:\nProgress through a series of trials with unique, randomized properties.");
+					}
 					update_buttons(hwnd);
 					return 1;
-				*/
-
+				
+				case IDC_LEGACY:
+					if (okey.usnr) 
+						MessageBox(hwnd,"Changing the season has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
+					else 
+					{
+						season=0;
+						SetDlgItemText(hwnd,IDC_STATUS,"LEGACY SEASON (SEASONLESS):\nNo seasonal effects will be applied and the game will behave as normal.");
+					}
+					update_buttons(hwnd);
+					return 1;
+				
+				case IDC_SEASON:
+					if (okey.usnr) 
+						MessageBox(hwnd,"Changing the season has no effect for existing accounts.","Sorry",MB_OK|MB_ICONSTOP);
+					else 
+					{
+						season=1;
+						SetDlgItemText(hwnd,IDC_STATUS,"CURRENT SEASON:\nYour character will play in the current 'season'. You may only group with other players or interact with items found in the same 'season'.");
+					}
+					update_buttons(hwnd);
+					return 1;
+				
 				default:
 					return 1;
 			}

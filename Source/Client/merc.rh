@@ -36,14 +36,6 @@ produced by Borland Resource Workshop
 #define IDC_HARA           72
 #define IDC_ARCH           73
 
-#define IDC_ARCHTEMPLAR    80
-#define IDC_PUGILIST       81
-#define IDC_WARRIOR        82
-#define IDC_SEY            83
-#define IDC_SORCERER       84
-#define IDC_SUMMONER       85
-#define IDC_ARCHHARAKIM    86
-
 #define IDC_MALE           19
 #define IDC_FEMALE         22
 
@@ -62,5 +54,12 @@ produced by Borland Resource Workshop
 #define IDC_RES800         63
 #define IDC_RES1280        64
 #define IDC_RES1600        65
+
+#define IDC_GAMENORM       80
+#define IDC_GAMEHARD       81
+#define IDC_GAMEROGUE      82
+
+#define IDC_SEASON         85
+#define IDC_LEGACY         86
 
 #define IDX_FRAME          -1, "static", SS_BLACKFRAME | WS_CHILD | WS_VISIBLE

@@ -21,27 +21,37 @@ FONT 8, "MS Sans Serif"
 	LTEXT           "Description:",       -1,              12,  52,  44,   8
 	EDITTEXT                              IDC_DESC,        12,  64, 229,  20, ES_MULTILINE | WS_BORDER | WS_TABSTOP
 	
-	LTEXT           "Character Class:",   -1,              98,  90,  60,   8
-	AUTORADIOBUTTON "Null",               IDC_ARCH,        98, 100,  60,  12
-	AUTORADIOBUTTON "Templar",            IDC_TEMP,        98, 100,  60,  12
-	AUTORADIOBUTTON "Mercenary",          IDC_MERC,        98, 112,  60,  12
-	AUTORADIOBUTTON "Harakim",            IDC_HARA,        98, 124,  60,  12
+	// 15  141  257
 	
-	LTEXT           "Character Body:",    -1,              98, 142,  60,   8
-	AUTORADIOBUTTON "Masculine",          IDC_MALE,        99, 154,  60,  12
-	AUTORADIOBUTTON "Feminine",           IDC_FEMALE,      99, 166,  60,  12
+	LTEXT           "Game Mode:",         -1,              14,  90,  60,   8, WS_DISABLED
+	AUTORADIOBUTTON "Normal",             IDC_GAMENORM,    15, 100,  60,  12
+	AUTORADIOBUTTON "Hard Mode",          IDC_GAMEHARD,    15, 112,  60,  12//, WS_DISABLED
+	AUTORADIOBUTTON "Roguelike",          IDC_GAMEROGUE,   15, 124,  60,  12//, WS_DISABLED
 	
-	CONTROL         "",                   IDX_FRAME,       12, 190, 229,  32    // Inner STATUS box
+	LTEXT           "Game Season:",       -1,              14, 142,  60,   8
+	AUTORADIOBUTTON "Legacy",             IDC_LEGACY,      15, 154,  60,  12
+	AUTORADIOBUTTON "Current",            IDC_SEASON,      15, 166,  60,  12//, WS_DISABLED
 	
-	LTEXT           "STATUS: OK",         IDC_STATUS,      16, 194, 221,  27
+	LTEXT           "Character Class:",   -1,              94,  90,  60,   8
+	AUTORADIOBUTTON "Null",               IDC_ARCH,        95, 100,  60,  12
+	AUTORADIOBUTTON "Templar",            IDC_TEMP,        95, 100,  60,  12
+	AUTORADIOBUTTON "Mercenary",          IDC_MERC,        95, 112,  60,  12
+	AUTORADIOBUTTON "Harakim",            IDC_HARA,        95, 124,  60,  12
 	
-	LTEXT           "Settings:",          -1,             175,  96,  60,   8
+	LTEXT           "Character Body:",    -1,              94, 142,  60,   8
+	AUTORADIOBUTTON "Masculine",          IDC_MALE,        95, 154,  60,  12
+	AUTORADIOBUTTON "Feminine",           IDC_FEMALE,      95, 166,  60,  12
+	
+	LTEXT           "Client Settings:",   -1,             175,  96,  60,   8
 	AUTORADIOBUTTON "Windowed",           IDC_WINDOWED,   176, 106,  60,  12
 	AUTORADIOBUTTON "Fullscreen",         IDC_FULLSCREEN, 176, 118,  60,  12
 	
 	CHECKBOX        "Shadows",            IDC_DOSHADOW,   176, 136,  60,  12, BS_AUTOCHECKBOX | WS_TABSTOP
 	AUTOCHECKBOX    "Sound Effects",      IDC_DOSOUND,    176, 148,  60,  12
 	CHECKBOX        "Dark GUI",           IDC_DODARKMODE, 176, 160,  60,  12
+	
+	CONTROL         "",                   IDX_FRAME,       12, 190, 229,  32    // Inner STATUS box
+	LTEXT           "STATUS: OK",         IDC_STATUS,      16, 194, 221,  27
 	
 	DEFPUSHBUTTON   "&Start",             IDOK,             8, 228,  36,  14
 	DEFPUSHBUTTON   "&Load",              IDC_LOAD,        48, 228,  36,  14

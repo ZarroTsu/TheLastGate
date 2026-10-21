@@ -116,6 +116,8 @@ int so_login(unsigned char *buf, HWND hwnd)
 	unsigned char obuf[16];
 	char xbuf[128];
 	extern int race;
+	extern int gamemode;
+	extern int season;
 	static int capcnt;
 	static char mod[256];
 	int n;
