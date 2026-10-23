@@ -470,6 +470,81 @@ int save_dialog(HWND hwnd,char *name)
 	return 1;
 }
 
+#define STR_PRON_1    "He looks"
+#define STR_PRON_2    "She looks"
+#define STR_PRON_3    "They look"
+
+#define STR_TEMP_1    "%s is a Templar. %s somewhat nondescript."
+#define STR_TEMP_2    "%s is a Templar. %s like a walking tin can."
+#define STR_TEMP_3    "%s is a Templar. %s sort of silly."
+#define STR_TEMP_4    "%s is a Templar. %s clad in dense armor with only a slit for eyes."
+
+#define STR_MERC_1    "%s is a Mercenary. %s somewhat nondescript."
+#define STR_MERC_2    "%s is a Mercenary. %s quite dapper."
+#define STR_MERC_3    "%s is a Mercenary. %s rather run of the mill."
+#define STR_MERC_4    "%s is a Mercenary. %s like sitting still is not an option."
+
+#define STR_HARA_1    "%s is a Harakim. %s somewhat nondescript."
+#define STR_HARA_2    "%s is a Harakim. %s close to exploding, figuratively."
+#define STR_HARA_3    "%s is a Harakim. %s old and bold, with teeth made of gold."
+#define STR_HARA_4    "%s is a Harakim. %s like a wiked sorcerer."
+
+void autogen_description(HWND hwnd)
+{
+	char buf[256];
+	char bufname[80];
+	char bufpron[20];
+	
+	GetDlgItemText(hwnd,IDC_DESC,buf,149);
+	
+	if (buf[0]) return;
+	
+	GetDlgItemText(hwnd,IDC_CNAME,bufname,79);
+	
+	switch (random(3))
+	{
+		case  1: sprintf(bufpron, STR_PRON_1); break;
+		case  2: sprintf(bufpron, STR_PRON_2); break;
+		default: sprintf(bufpron, STR_PRON_3); break;
+	}
+	
+	switch (race)
+	{
+		case  1: // Templar
+			switch (random(4))
+			{
+				case  1: sprintf(buf, STR_TEMP_1, bufname, bufpron); break;
+				case  2: sprintf(buf, STR_TEMP_2, bufname, bufpron); break;
+				case  3: sprintf(buf, STR_TEMP_3, bufname, bufpron); break;
+				default: sprintf(buf, STR_TEMP_4, bufname, bufpron); break;
+			}
+			break;
+		case  2: // Mercenary
+			switch (random(4))
+			{
+				case  1: sprintf(buf, STR_MERC_1, bufname, bufpron); break;
+				case  2: sprintf(buf, STR_MERC_2, bufname, bufpron); break;
+				case  3: sprintf(buf, STR_MERC_3, bufname, bufpron); break;
+				default: sprintf(buf, STR_MERC_4, bufname, bufpron); break;
+			}
+			break;
+		case  3: // Harakim
+			switch (random(4))
+			{
+				case  1: sprintf(buf, STR_HARA_1, bufname, bufpron); break;
+				case  2: sprintf(buf, STR_HARA_2, bufname, bufpron); break;
+				case  3: sprintf(buf, STR_HARA_3, bufname, bufpron); break;
+				default: sprintf(buf, STR_HARA_4, bufname, bufpron); break;
+			}
+			break;
+		default:
+			sprintf(buf,"%s is a monster. They look somewhat nondescript.", bufname);
+			break;
+	}
+	
+	SetDlgItemText(hwnd,IDC_DESC,buf);
+}
+
 void update_race(HWND hwnd)
 {
 	if (race < 4)
@@ -484,6 +559,9 @@ void update_race(HWND hwnd)
 		if (race== 3) CheckRadioButton(hwnd,IDC_TEMP,IDC_ARCH,IDC_HARA);
 		
 		SetDlgItemText(hwnd,IDC_ARCH,"Null");
+		
+		if (!okey.usnr)
+			autogen_description(hwnd);
 	}
 	else
 	{
@@ -511,10 +589,6 @@ void update_race(HWND hwnd)
 	if (sex==1) CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_MALE);
 	if (sex==2) CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_FEMALE);
 	
-	//if ()
-	{
-		
-	}
 }
 
 void update_alpha(HWND hwnd)
@@ -690,8 +764,8 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					SetDlgItemText(hwnd,IDC_STATUS,"STATUS: OK");
 					//
 					randomize();
-					race=random(2)+1;
-					sex=random(3)+1;
+					race=random(3)+1;
+					sex=random(2)+1;
 					update_buttons(hwnd);
 					//
 					return 1;
@@ -769,8 +843,6 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					{
 						race=1; 
 						SetDlgItemText(hwnd,IDC_STATUS,"Templar:\nAn adept at melee combat, these fighters can become heavy hitters or unbreakable tanks. They learn only a few utility spells.");
-						
-						// set description
 					}
 					update_buttons(hwnd); 
 					return 1;
