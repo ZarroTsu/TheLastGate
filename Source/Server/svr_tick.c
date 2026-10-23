@@ -2375,7 +2375,7 @@ void plr_update_all_meta_terminology(int nr)
 
 void plr_newlogin(int nr)
 {
-	int cn, temp, tmp, in;
+	int cn, temp, tmp, in, gamemode, season;
 	unsigned char buf[16];
 
 	if (player[nr].version<MINVERSION)
@@ -2404,7 +2404,10 @@ void plr_newlogin(int nr)
 		player[nr].lasttick2 = globs->ticker;
 		return;
 	}
-	temp = player[nr].race;
+	
+	temp     = player[nr].race%100;
+	gamemode = player[nr].race/100%100;
+	season   = player[nr].race/100/100;
 	
 	if (temp!=CT_TEMP_M && temp!=CT_TEMP_F 
 	 && temp!=CT_MERC_M && temp!=CT_MERC_F 
@@ -2415,9 +2418,23 @@ void plr_newlogin(int nr)
 
 	cn = god_create_char(temp, 1);
 	ch[cn].player = nr;
-
-	ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
-	ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+	
+	if (season)
+		ch[cn].season = CURRENTSEASON;
+	
+	if (gamemode == 1) // "Hardmode"
+		ch[cn].flags |= CF_HARDMODE;
+		
+	if (gamemode == 2) // "Roguelike"
+	{
+		ch[cn].temple_x = ch[cn].tavern_x = HOME_ROGUE_X;
+		ch[cn].temple_y = ch[cn].tavern_y = HOME_ROGUE_Y;
+	}
+	else
+	{
+		ch[cn].temple_x = ch[cn].tavern_x = HOME_START_X;
+		ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
+	}
 
 	ch[cn].points = 0;
 	ch[cn].points_tot = 0;
@@ -2524,8 +2541,8 @@ void plr_newlogin(int nr)
 		god_change_pass(cn, cn, player[nr].passwd);
 	}
 	
-	ch[cn].goto_x = HOME_START_X;
-	ch[cn].goto_y = HOME_START_Y;
+	ch[cn].goto_x = ch[cn].temple_x;
+	ch[cn].goto_y = ch[cn].temple_y;
 	
 	plr_update_all_skill_terminology(nr);
 	
@@ -3297,6 +3314,7 @@ void plr_change(int nr)
 	unsigned char buf[256];
 	int spr, ss, en, cr, stack;
 	char areaname[40];
+	int extra = 0;
 
 	cn   = player[nr].usnr;
 	cpl  = &player[nr].cpl;
@@ -3316,7 +3334,9 @@ void plr_change(int nr)
 			xsend(nr, buf, 16);
 			buf[0] = SV_SETCHAR_NAME3;
 			mcpy(buf + 1, ch[cn].name + 30, 10);
-			*(unsigned long*)(buf + 11) = (unsigned long)(ch[cn].temp);
+			extra += (ch[cn].flags & CF_HARDMODE)?100:0;
+			extra += (ch[cn].season == CURRENTSEASON)?10000:0;
+			*(unsigned long*)(buf + 11) = (unsigned long)(ch[cn].temp + extra); // + mode*100 + season*10000
 			xsend(nr, buf, 16);
 			mcpy(cpl->name, ch[cn].name, 40);
 		}

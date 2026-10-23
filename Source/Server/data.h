@@ -219,6 +219,7 @@ extern unsigned int mapmarker;
 #define CF_RESPAWN		(1ull<< 4)  // will respawn after death - not for players
 #define CF_PLAYER		(1ull<< 5)  // is a player
 #define CF_NEWUSER		(1ull<< 6)  // new account created. player may change name
+#define CF_HARDMODE		(1ull<< 7)  // account flagged as hardmode
 #define CF_NOTELL		(1ull<< 8)  // tell will only work on him if used by a god
 #define CF_NOSHOUT		(1ull<< 9)  // shout will only work in him if used by a god
 #define CF_MERCHANT		(1ull<<10)  // will sell his inventory if looked at

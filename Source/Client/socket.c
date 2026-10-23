@@ -131,7 +131,7 @@ int so_login(unsigned char *buf, HWND hwnd)
 		obuf[0]=CL_CHALLENGE;
 		*(unsigned long*)(obuf+1)=tmp;
 		*(unsigned long*)(obuf+5)=VERSION;
-		*(unsigned long*)(obuf+9)=race;
+		*(unsigned long*)(obuf+9)=race + (race<100)?(gamemode*100 + season*10000):0;
 		send(sock,(char*)obuf,16,0);
 
 		load_unique();
@@ -160,11 +160,11 @@ int so_login(unsigned char *buf, HWND hwnd)
 			}
 			pdata.xbutton[ 0].skill_nr=50; strcpy(pdata.xbutton[ 0].name,"Light");
 			pdata.xbutton[19].skill_nr=51; strcpy(pdata.xbutton[19].name,"Recall");
-			if (race==4||race==5) // Templar
+			if (race%100==4||race%100==5) // Templar
 			{
 				pdata.xbutton[ 7].skill_nr=40; strcpy(pdata.xbutton[ 7].name,"Cleave");
 			}
-			else if (race==8||race==9) // Harakim
+			else if (race%100==8||race%100==9) // Harakim
 			{
 				pdata.xbutton[ 7].skill_nr=24; strcpy(pdata.xbutton[ 7].name,"Blast");
 				pdata.xbutton[11].skill_nr=27; strcpy(pdata.xbutton[11].name,"Ghost C");

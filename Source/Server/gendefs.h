@@ -55,6 +55,9 @@
 #define HOME_STAFF_X		 512
 #define HOME_STAFF_Y		 512
 
+#define HOME_ROGUE_X		 768  // To be changed
+#define HOME_ROGUE_Y		 256  // To be changed
+
 #define LAB_ARENA_SPAWN_X 	 142
 #define LAB_ARENA_SPAWN_Y 	 119
 

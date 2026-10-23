@@ -96,9 +96,9 @@ static char *load_msg={
 
 int dd_change(int x,int y);
 
-void translate_okey2race(int *race_ptr,int *sex_ptr)
+void translate_okey2race(int *race_ptr, int *sex_ptr, int *gamemode_ptr, int *season_ptr)
 {
-	switch(okey.race) 
+	switch((okey.race%100))
 	{
 		case  4: race= 1; sex=1; break;	// templar M
 		case  5: race= 1; sex=2; break;	// templar F
@@ -141,9 +141,11 @@ void translate_okey2race(int *race_ptr,int *sex_ptr)
 		
 		default: race=0; sex=0; break;
 	}
-
-	*race_ptr=race;
-	*sex_ptr=sex;
+	
+	*race_ptr     = race;
+	*sex_ptr      = sex;
+	*gamemode_ptr = ((okey.race)/100%100);
+	*season_ptr   = ((okey.race)/100/100);
 }
 
 void setres_800(void)
@@ -779,7 +781,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					SetDlgItemText(hwnd,IDC_CNAME,pdata.cname);
 					SetDlgItemText(hwnd,IDC_DESC,pdata.desc);
 
-					translate_okey2race(&race,&sex);
+					translate_okey2race(&race,&sex,&gamemode,&season);
 
 					update_buttons(hwnd);
 					return 1;
@@ -977,7 +979,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 			SetDlgItemText(hwnd,IDC_CNAME,pdata.cname);
 			SetDlgItemText(hwnd,IDC_DESC,pdata.desc);			
 
-			translate_okey2race(&race,&sex);
+			translate_okey2race(&race,&sex,&gamemode,&season);
 
             update_buttons(hwnd);
 
