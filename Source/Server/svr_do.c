@@ -8573,12 +8573,12 @@ void do_char_killed(int cn, int co, int pentsolve)
 	{	// Arena death : full save, keep everything
 		wimp = 2;
 	}
-	else if (!IS_PURPLE(co))
-	{	// Skua death : Skua save, drop items + 5% exp and 50% gold
+	else if (!IS_HARDMODE(co))
+	{	// Regular death : drop items + 5% exp and 50% gold
 		wimp = 1;
 	}
 	else
-	{	// Purple death : Purple save, drop equipment + 5% exp and 100% gold
+	{	// HARDMODE death : drop equipment + 5% exp and 100% gold
 		wimp = 0;
 	}
 	
@@ -9315,7 +9315,7 @@ void do_give_ospoints(int cn, int p, int gflag)
 
 int try_lucksave(int cn)
 {
-	if ((ch[cn].luck>=100 && RANDOM(10000)<5000 + ch[cn].luck) && !is_atpandium(cn) /* && IS_PURPLE(cn) */ )
+	if ((ch[cn].luck>=100 && RANDOM(10000)<5000 + ch[cn].luck) && !is_atpandium(cn))
 		return 1;
 	
 	return 0;
@@ -10703,7 +10703,7 @@ void really_update_char(int cn)
 	int n, m, oldlight, z, sublight = 0, maxlight = 0, co=0, cz=0, bits=0;
 	int hp = 0, end = 0, mana = 0, weapon = 0, armor = 0, light = 0, gethit = 0, infra = 0, coconut = 0;
 	int heal_hp, heal_end, heal_mana, act = 0, tmphm = 0, gench = 0;
-	int tempWeapon = 0, tempArmor = 0, in = 0;
+	int tempWeapon = 0, tempArmor = 0, in = 0, hardmode = 0;
 	int sickStacks = 0, symSpec = 0, isWater = 0;
 	int base_spd = 0, spd_move = 0, spd_attack = 0, spd_cast = 0, inunderdark = 0;
 	int spell_pow = 0, spell_mod = 0, spell_apt = 0, spell_cool = 0;
@@ -10805,6 +10805,15 @@ void really_update_char(int cn)
 	hit_rate = parry_rate = 0;
 	damage_top = 0;
 	dmg_bns = dmg_rdc = tempCost = 10000;
+	
+	/*
+		HARDMODE has the following effects here:
+		1. Implicit attribute bonuses are slightly worse (*5/6).
+		2. Explicit attribute bonuses become (a+b+c)/6 instead of (a+b+c)/5.
+	*/
+	
+	if (IS_HARDMODE(cn))
+		hardmode = 1;
 	
 	if (IS_PLAYER_COMP(cn)) dmg_rdc = 5000;
 	
@@ -11872,7 +11881,7 @@ void really_update_char(int cn)
 		if (IS_AM_SK(z)) m += do_get_ieffect(cn, VF_EXTRA_AGL) * M_AT(cn, AT_AGL);  // Active melee skills gain an added m% agility bonus
 		if (IS_AM_SK(z)) m += do_get_ieffect(cn, VF_EXTRA_STR) * M_AT(cn, AT_STR);  // Active melee skills gain an added m% strength bonus
 		
-		skill[z] += ( M_AT(cn, GET_AT(cn,z,0)) + M_AT(cn, GET_AT(cn,z,1)) + M_AT(cn, GET_AT(cn,z,2)) + m/100) / 5;
+		skill[z] += ( M_AT(cn, GET_AT(cn,z,0)) + M_AT(cn, GET_AT(cn,z,1)) + M_AT(cn, GET_AT(cn,z,2)) + m/100) / (5+hardmode);
 		
 		if (z==SK_IMMUN)
 		{
@@ -12070,7 +12079,7 @@ void really_update_char(int cn)
 	// Flat bonus
 	{
 		base_spd += SPEED_BASE + ch[cn].speed_mod;
-		base_spd += (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 8;
+		base_spd += (attrib_ex[AT_AGL] + attrib_ex[AT_STR]) / 8 * 5/(5+hardmode);
 		
 		if (isWater && (do_get_iflag(cn, SF_KELPTRID))) base_spd += 30;  // [Gear] Kelp Trident
 		
@@ -12166,7 +12175,7 @@ void really_update_char(int cn)
 	
 	// Flat bonus
 	{
-		spell_apt += (attrib[AT_WIL] + attrib[AT_INT]) * spell_race_mod(100, cn) / 100;
+		spell_apt += (attrib[AT_WIL] + attrib[AT_INT]) * 5/(5+hardmode) * spell_race_mod(100, cn) / 100;
 	}
 	
 	// Additive bonus
@@ -12230,14 +12239,14 @@ void really_update_char(int cn)
 	// Flat bonus
 	{
 		if (IS_SUMMONER(cn))
-			spd_cast   += attrib_ex[AT_WIL]/2;
+			spd_cast   += attrib_ex[AT_WIL]/2 * 5/(5+hardmode);
 		else
-			spd_cast   += attrib_ex[AT_WIL]/4;
+			spd_cast   += attrib_ex[AT_WIL]/4 * 5/(5+hardmode);
 		
 		if (IS_WARRIOR(cn))
-			spd_attack += attrib_ex[AT_AGL]/2;
+			spd_attack += attrib_ex[AT_AGL]/2 * 5/(5+hardmode);
 		else
-			spd_attack += attrib_ex[AT_AGL]/4;
+			spd_attack += attrib_ex[AT_AGL]/4 * 5/(5+hardmode);
 		
 		if (T_SUMM_SK(cn,  4))    // (Summ) Strategist
 			spd_attack += spd_cast;
@@ -12312,7 +12321,7 @@ void really_update_char(int cn)
 		so that precision can have a more consistant effect.
 	*/
 	
-	critical_c += attrib_ex[AT_BRV]*2;
+	critical_c += attrib_ex[AT_BRV]*2 * 5/(5+hardmode);
 	
 	if (!IS_PLAYER(cn) && (ch[cn].flags & CF_EXTRACRIT)) critical_b += 4;
 	
@@ -12509,7 +12518,7 @@ void really_update_char(int cn)
 	
 	// Flat bonuses
 	{
-		spell_cool += attrib_ex[AT_INT]/6;                   // Implicit attribute bonus
+		spell_cool += attrib_ex[AT_INT]/6 * 5/(5+hardmode);  // Implicit attribute bonus
 		spell_cool += weapon * (TC_SK(cn,115) * 10) / 100;   // (Corr) Ambidexterity
 	}
 	
@@ -12584,7 +12593,7 @@ void really_update_char(int cn)
 	
 	// Flat Bonuses
 	{
-		damage_top += attrib_ex[AT_STR] / (unarmed?1:2);
+		damage_top += attrib_ex[AT_STR] / (unarmed?1:2) * 5/(5+hardmode);
 		
 		if (T_BRAV_SK(cn, 10))    // (Brav) Spellblade
 			damage_top += spell_pow;
@@ -13393,7 +13402,7 @@ void do_regenerate(int cn)
 	unsigned long long mf1, mf2;
 	int n, m, p, in, in2, nohp = 0, noen = 0, nomp = 0, halfhp = 0, halfen = 0, halfmp = 0, old;
 	int hp = 0, end = 0, mana = 0, uwater = 0, gothp = 0, sunR = 0, moonR = 0, money = 0;
-	int race_reg = 0, race_res = 0, race_med = 0, degendam=0, en_dam=0, mp_dam=0;
+	int race_reg = 0, race_res = 0, race_med = 0, degendam=0, en_dam=0, mp_dam=0, hardmode=0;
 	int degenpower = 0, tickcheck = 10000;
 	int moonmult = 20;
 	int hpmult, endmult, manamult, rank=0;
@@ -13410,9 +13419,18 @@ void do_regenerate(int cn)
 	
 	if (ch[cn].flags & CF_STONED)
 		return;
-
+	
 	prof = prof_start();
-
+	
+	/*
+		HARDMODE has the following effects here:
+		1. During HARDMODE, Meditate is reverted to vanilla and must be known to have any effect. You can still get mana regen via tarots though!
+		2. During HARDMODE, regeneration while walking is halved and regeneration while fighting is quartered.
+	*/
+	
+	if (IS_HARDMODE(cn))
+		hardmode = 1;
+	
 	if ((ch[cn].flags & (CF_PLAYER)) || (IS_COMP_TEMP(cn) && (co = ch[cn].data[CHD_MASTER]) && IS_SANEPLAYER(co)))
 	{
 		if (IS_GLOB_MAYHEM)				moonmult = 10;
@@ -13421,7 +13439,11 @@ void do_regenerate(int cn)
 		
 		race_reg = M_SK(cn, SK_REGEN) * moonmult / 20 + (B_SK(cn, SK_REGEN)?M_SK(cn, SK_REGEN):0) * ch[cn].hp[5]   / 2000;
 		race_res = M_SK(cn, SK_REST)  * moonmult / 20 + (B_SK(cn, SK_REST) ?M_SK(cn, SK_REST) :0) * ch[cn].end[5]  / 1000;
-		race_med = M_SK(cn, SK_MEDIT) * moonmult / 20 + (B_SK(cn, SK_MEDIT)?M_SK(cn, SK_MEDIT):0) * ch[cn].mana[5] / 2000;
+		
+		if (hardmode)
+			race_med = (B_SK(cn, SK_MEDIT)?M_SK(cn, SK_MEDIT)*moonmult/20:0) + (B_SK(cn, SK_MEDIT)?M_SK(cn, SK_MEDIT):0)*ch[cn].mana[5]/2000;
+		else
+			race_med = M_SK(cn, SK_MEDIT) * moonmult / 20 + (B_SK(cn, SK_MEDIT)?M_SK(cn, SK_MEDIT):0) * ch[cn].mana[5] / 2000;
 	}
 	else
 	{
@@ -13433,7 +13455,7 @@ void do_regenerate(int cn)
 	if (ch[cn].flags & CF_NOHPREG)     halfhp = 1;
 	if (ch[cn].flags & CF_NOENDREG)    halfen = 1;
 	if (ch[cn].flags & CF_NOMANAREG)   halfmp = 1;
-
+	
 	if (mf1 & MF_UWATER)               uwater = 1;
 	
 	hpmult = endmult = manamult = moonmult;
@@ -13522,61 +13544,61 @@ void do_regenerate(int cn)
 			case 128: case 132: case 136: case 140: case 144: case 148: case 152:
 				if (do_get_iflag(cn, SF_EN_WALKREGN))
 				{
-					gothp += do_recovery(cn, 0, (nohp?0: (hp  ) / (halfhp+1)));
+					gothp += do_recovery(cn, 0, (nohp?0: (hp  ) / (halfhp+1) / (hardmode+1)));
 					
 					if (ch[cn].mode==2) // Fast
 					{
 						ch[cn].a_end -= 40;
-						do_recovery(cn, 1, (noen?0: (end) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end) / (halfen+1) / (hardmode+1)));
 					}
 					else
 					{
-						do_recovery(cn, 1, (noen?0: (end) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end) / (halfen+1) / (hardmode+1)));
 					}
 					
-					do_recovery(cn, 2, (nomp?0: (mana) / (halfmp+1))); 
+					do_recovery(cn, 2, (nomp?0: (mana) / (halfmp+1) / (hardmode+1))); 
 				}
 				else
 				{
-					gothp += do_recovery(cn, 0, (nohp?0: (hp/4) / (halfhp+1)));
+					gothp += do_recovery(cn, 0, (nohp?0: (hp/4) / (halfhp+1) / (hardmode+1)));
 					
 					if (ch[cn].mode==2) // Fast
 					{
 						ch[cn].a_end -= 40;
-						do_recovery(cn, 1, (noen?0: (end/4) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/4) / (halfen+1) / (hardmode+1)));
 					}
 					if (ch[cn].mode==1) // Normal
 					{
-						do_recovery(cn, 1, (noen?0: (end/4) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/4) / (halfen+1) / (hardmode+1)));
 					}
 					if (ch[cn].mode==0) // Slow
 					{
-						do_recovery(cn, 1, (noen?0: (end/2) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/2) / (halfen+1) / (hardmode+1)));
 					}
 					
-					do_recovery(cn, 2, (nomp?0: (mana/4) / (halfmp+1)));
+					do_recovery(cn, 2, (nomp?0: (mana/4) / (halfmp+1) / (hardmode+1)));
 				}
 				break;
 			
 			// FIGHTING STATES
 			case 160: case 168: case 176: case 184:
-				gothp += do_recovery(cn, 0, (nohp?0: (hp/ 8 * (sunR?8:1)) / (halfhp+1)));
+				gothp += do_recovery(cn, 0, (nohp?0: (hp/ 8 * (sunR?8:1)) / (halfhp+1) / (hardmode+1)));
 				
 				if (ch[cn].status2==0 || ch[cn].status2==5 || ch[cn].status2==6) // Attacking
 				{
 					if (ch[cn].mode==2) // Fast
 					{
 						ch[cn].a_end -= 75;
-						do_recovery(cn, 1, (noen?0: (end/8 * (sunR?8:1)) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/8 * (sunR?8:1)) / (halfen+1) / (hardmode*3+1)));
 					}
 					if (ch[cn].mode==1) // Normal
 					{
 						ch[cn].a_end -= 25;
-						do_recovery(cn, 1, (noen?0: (end/8 * (sunR?8:1)) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/8 * (sunR?8:1)) / (halfen+1) / (hardmode*3+1)));
 					}
 					if (ch[cn].mode==0) // Slow
 					{
-						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1) / (hardmode*3+1)));
 					}
 				}
 				else // Misc.
@@ -13584,19 +13606,19 @@ void do_regenerate(int cn)
 					if (ch[cn].mode==2)		// Fast
 					{
 						ch[cn].a_end -= 50;
-						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1) / (hardmode*3+1)));
 					}
 					if (ch[cn].mode==1)		// Normal
 					{
-						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/4 * (sunR?4:1)) / (halfen+1) / (hardmode*3+1)));
 					}
 					if (ch[cn].mode==0)		// Slow
 					{
-						do_recovery(cn, 1, (noen?0: (end/2 * (sunR?2:1)) / (halfen+1)));
+						do_recovery(cn, 1, (noen?0: (end/2 * (sunR?2:1)) / (halfen+1) / (hardmode*3+1)));
 					}
 				}
 				
-				do_recovery(cn, 2, (nomp?0: (mana/8 * (sunR?8:1)) / (halfmp+1)));
+				do_recovery(cn, 2, (nomp?0: (mana/8 * (sunR?8:1)) / (halfmp+1) / (hardmode*3+1)));
 				break;
 			
 			default:
@@ -13929,7 +13951,7 @@ void do_regenerate(int cn)
 						// reset spawn point
 						ch[cn].temple_x = ch[cn].tavern_x = HOME_TEMPLE_X;
 						ch[cn].temple_y = ch[cn].tavern_y = HOME_TEMPLE_Y;
-						if (ch[cn].kindred & KIN_PURPLE)
+						if (IS_PURPLE(cn))
 						{
 							ch[cn].temple_x = HOME_PURPLE_X;
 							ch[cn].temple_y = HOME_PURPLE_Y;
@@ -18378,11 +18400,11 @@ int may_attack_msg(int cn, int co, int msg)
 	*/
 	if ((IS_COMPANION(cn) || IS_ITEMTHRALL(cn)) && ch[cn].data[64]==0 && IS_SANECHAR(ch[cn].data[CHD_MASTER]))
 		cc = ch[cn].data[CHD_MASTER];
-
+	
 	// NPCs may attack anyone, anywhere
 	if ((cc && !IS_PLAYER(cc)) || (!cc && !IS_PLAYER(cn)))
 		return 1;
-
+	
 	// Check for NOFIGHT
 	m1 = XY2M(ch[cn].x, ch[cn].y);
 	m2 = XY2M(ch[co].x, ch[co].y);
@@ -18408,7 +18430,7 @@ int may_attack_msg(int cn, int co, int msg)
 	
 	if (IS_THRALL(cn) || IS_THRALL(co))
 		return 1;
-
+	
 	// player GC? act as if he would try to attack the master of the GC instead
 	if (IS_COMPANION(co))
 	{
@@ -18416,15 +18438,40 @@ int may_attack_msg(int cn, int co, int msg)
 		if (!IS_SANECHAR(co))
 			return 1;             // um, lets him try to kill this GC - it's got bad values anway
 	}
-
+	
 	// Check for plr-npc (OK)
 	if (!IS_PLAYER(cn) || !IS_PLAYER(co))
 		return 1;
-
+	
 	// Both are players. Check for Arena (OK)
 	if (map[m1].flags & map[m2].flags & MF_ARENA)
 		return 1;
-
+	
+	// Check if aggressor is purple
+	if (!IS_PURPLE(cn))
+	{
+		if (msg) do_char_log(cn, 0, "You can't attack other players! You're not a follower of the Purple One.\n");
+		return 0;
+	}
+	
+	// Check if victim is purple
+	if (!IS_PURPLE(co))
+	{
+		if (msg) do_char_log(cn, 0, "You can't attack %s! They're not a follower of the Purple One.\n", ch[co].name);
+		return 0;
+	}
+	
+	// Skip clan checks if both parties are Purple
+	if (IS_PURPLE(cn) && IS_PURPLE(co))
+	{
+		if ((!cc && abs(getrank(cn) - getrank(co))>3) || (cc && abs(getrank(cc) - getrank(co))>3))
+		{
+			if (msg) do_char_log(cn, 0, "You're not allowed to attack %s. The rank difference is too large.\n", ch[co].name);
+			return 0;
+		}
+		return 1;
+	}
+	
 	// Check clan warfare
 	if (((!IS_CLANKWAI(cn) && !IS_CLANGORN(cn)) || (IS_CLANKWAI(cn) && !IS_CLANGORN(co)) || (IS_CLANGORN(cn) && !IS_CLANKWAI(co))) || 
 		(cc && ((!IS_CLANKWAI(cc) && !IS_CLANGORN(cc)) || (IS_CLANKWAI(cc) && !IS_CLANGORN(co)) || (IS_CLANGORN(cc) && !IS_CLANKWAI(co))) ))
@@ -18432,20 +18479,20 @@ int may_attack_msg(int cn, int co, int msg)
 		if (msg) do_char_log(cn, 0, "You can't attack other players! You're not a member of an opposing clan.\n");
 		return 0;
 	}
-
-	// Check if victim is purple
+	
+	// Check if victim is in a clan
 	if (!IS_CLANKWAI(co) && !IS_CLANGORN(co))
 	{
-		if (msg) do_char_log(cn, 0, "You can't attack %s! %s's not a member of an opposing clan.\n", ch[co].name, IS_FEMALE(co) ? "She" : "He");
+		if (msg) do_char_log(cn, 0, "You can't attack %s! They're not a member of an opposing clan.\n", ch[co].name);
 		return 0;
 	}
-
+	
 	if ((!cc && abs(getrank(cn) - getrank(co))>3) || (cc && abs(getrank(cc) - getrank(co))>3))
 	{
 		if (msg) do_char_log(cn, 0, "You're not allowed to attack %s. The rank difference is too large.\n", ch[co].name);
 		return 0;
 	}
-
+	
 	return 1;
 }
 
@@ -19104,7 +19151,7 @@ void remember_pvp(int cn, int co)
 	{
 		return;
 	}
-	if (!IS_OPP_CLAN(cn, co))
+	if (!IS_OPP_CLAN(cn, co)) // Includes Purple check
 	{
 		return;
 	}

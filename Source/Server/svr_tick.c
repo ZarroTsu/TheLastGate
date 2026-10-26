@@ -3334,8 +3334,8 @@ void plr_change(int nr)
 			xsend(nr, buf, 16);
 			buf[0] = SV_SETCHAR_NAME3;
 			mcpy(buf + 1, ch[cn].name + 30, 10);
-			extra += (ch[cn].flags & CF_HARDMODE)?10000:0;
-			extra += (ch[cn].season == CURRENTSEASON)?100000:0;
+			extra += IS_HARDMODE(cn)?10000:0;
+			extra += IS_SEASONAL(cn)?100000:0;
 			*(unsigned long*)(buf + 11) = (unsigned long)(ch[cn].temp + extra); // + mode*10000 + season*100000 ~ the first four digits are reserved due to lycan template#
 			xsend(nr, buf, 16);
 			mcpy(cpl->name, ch[cn].name, 40);

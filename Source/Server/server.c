@@ -477,7 +477,7 @@ void discord_who(void)
 		{
 			showarea = 0;
 		}
-		if (IS_CLANKWAI(n) || IS_CLANGORN(n))
+		if (IS_CLANKWAI(n) || IS_CLANGORN(n) || IS_PURPLE(n))
 		{
 			showarea = 0;
 		}

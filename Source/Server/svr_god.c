@@ -3848,8 +3848,8 @@ void god_set_purple(int cn, int co)
 	/* CS, 000209: Reset last kill time and victim */
 	if (!IS_PURPLE(co))
 	{
-		//ch[co].data[PCD_ATTACKTIME] = 0;
-		//ch[co].data[PCD_ATTACKVICT] = 0;
+		ch[co].data[PCD_ATTACKTIME] = 0;
+		ch[co].data[PCD_ATTACKVICT] = 0;
 		ch[co].temple_x = HOME_TEMPLE_X;
 		ch[co].temple_y = HOME_TEMPLE_Y;
 	}
@@ -3985,23 +3985,20 @@ void god_destroy_items(int cn)
 void god_racechange(int co, int temp, int keepstuff)
 {
 	struct item tmp;
-	int n, rank;
+	int n, rank, hardmode=0;
 	struct character old; //, old_dpt;
 	struct storage dpt;
-
-	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co))
-	{
-		return;
-	}
+	
+	if (!IS_SANEUSEDCHAR(co) || !IS_PLAYER(co)) return;
 	
 	if (IS_LYCANTH(co) && IS_SHIFTED(co))
-	{
 		skill_shift(co,1); // this will hopefully avoid issues with continuity...
-	}
-
+	
+	if (IS_HARDMODE(co))
+		hardmode = 1;
+	
 	if (!keepstuff)
 	{
-//		old_dpt = ch[co];
 		dpt = st[co];
 		for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
 			st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = 0;
@@ -4016,7 +4013,7 @@ void god_racechange(int co, int temp, int keepstuff)
 	old = ch[co];
 	dpt = st[co];
 	ch[co] = ch_temp[temp];
-
+	
 	ch[co].temp      = temp;
 	ch[co].pass1     = old.pass1;
 	ch[co].pass2     = old.pass2;
@@ -4024,29 +4021,31 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].bs_points = old.bs_points;
 	ch[co].os_points = old.os_points;
 	ch[co].tokens    = old.tokens;
-
+	
 	strcpy(ch[co].name, old.name);
 	strcpy(ch[co].reference, old.name);
 	strcpy(ch[co].description, old.description);
-
+	
 	ch[co].dir = old.dir;
-
+	
 	ch[co].house_id     = old.house_id;
 	ch[co].house_m      = old.house_m;
 	ch[co].house_layout = old.house_layout;
 	
 	ch[co].temple_x = ch[co].tavern_x = HOME_TEMPLE_X;
 	ch[co].temple_y = ch[co].tavern_y = HOME_TEMPLE_Y;
-
+	
 	ch[co].creation_date = old.creation_date;
 	ch[co].login_date = old.login_date;
 	ch[co].flags = old.flags;
+	
 	if (old.kindred & KIN_PURPLE)
 	{
 		ch[co].kindred |= KIN_PURPLE;
 		ch[co].temple_x = HOME_PURPLE_X;
 		ch[co].temple_y = HOME_PURPLE_Y;
 	}
+	
 	ch[co].total_online_time = old.total_online_time;
 	ch[co].current_online_time = old.current_online_time;
 	ch[co].comp_volume = old.comp_volume;
@@ -4059,7 +4058,7 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].toy = old.toy;
 	ch[co].frx = old.frx;
 	ch[co].fry = old.fry;
-
+	
 	ch[co].mode = old.mode;
 	ch[co].used = USE_ACTIVE;
 	ch[co].player = old.player; old.player = 0;
@@ -4068,7 +4067,7 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].light   = old.light;
 	ch[co].status  = old.status;
 	ch[co].status2 = old.status2;
-
+	
 	for (n = 0; n<MAXBUFFS; n++) ch[co].spell[n] = 0;
 	for (n = 0; n<100; n++) ch[co].data[n] = old.data[n];
 	for (n = 0; n<ST_PAGES*ST_SLOTS; n++)
@@ -4076,7 +4075,7 @@ void god_racechange(int co, int temp, int keepstuff)
 		st[co].depot[n/ST_SLOTS][n%ST_SLOTS] = dpt.depot[n/ST_SLOTS][n%ST_SLOTS];
 		it[st[co].depot[n/ST_SLOTS][n%ST_SLOTS]].carried = co;
 	}
-
+	
 	if (keepstuff)
 	{
 		int hp = 0, mana = 0, attri = 0, exp = 0, bits = 0;
@@ -4144,13 +4143,16 @@ void god_racechange(int co, int temp, int keepstuff)
 			ch[co].data[22] = 0;      // arena monster reset
 			ch[co].data[45] = 0;      // current rank
 			
-			// Reset Pole flags
-			ch[co].data[46] = 0;
-			ch[co].data[47] = 0;
-			ch[co].data[48] = 0;
-			ch[co].data[49] = 0;
-			ch[co].data[91] = 0;
-			ch[co].data[24] = 0;
+			if (!hardmode)
+			{
+				// Reset Pole flags
+				ch[co].data[46] = 0;
+				ch[co].data[47] = 0;
+				ch[co].data[48] = 0;
+				ch[co].data[49] = 0;
+				ch[co].data[91] = 0;
+				ch[co].data[24] = 0;
+			}
 			
 			// Reset quest flags
 			ch[co].data[72] = 0;
@@ -4295,23 +4297,26 @@ void god_racechange(int co, int temp, int keepstuff)
 		ch[co].data[27] = 0;
 		ch[co].data[28] = 0;
 		
-		// Reset Pole flags
-		ch[co].data[46] = 0;
-		ch[co].data[47] = 0;
-		ch[co].data[48] = 0;
-		ch[co].data[49] = 0;
-		ch[co].data[91] = 0;
-		ch[co].data[24] = 0;
-		
-		// Reset FK flags
-		ch[co].data[60] = 0;
-		ch[co].data[61] = 0;
-		ch[co].data[62] = 0;
-		ch[co].data[63] = 0;
-		ch[co].data[70] = 0;
-		ch[co].data[93] = 0;
-		ch[co].data[73] = 0;
-		ch[co].data[67] = 0;
+		if (!hardmode)
+		{
+			// Reset Pole flags
+			ch[co].data[46] = 0;
+			ch[co].data[47] = 0;
+			ch[co].data[48] = 0;
+			ch[co].data[49] = 0;
+			ch[co].data[91] = 0;
+			ch[co].data[24] = 0;
+			
+			// Reset FK flags
+			ch[co].data[60] = 0;
+			ch[co].data[61] = 0;
+			ch[co].data[62] = 0;
+			ch[co].data[63] = 0;
+			ch[co].data[70] = 0;
+			ch[co].data[93] = 0;
+			ch[co].data[73] = 0;
+			ch[co].data[67] = 0;
+		}
 		
 		// Reset quest flags
 		ch[co].data[72] = 0;
@@ -4344,7 +4349,7 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].a_hp   = 9999999;
 	ch[co].a_end  = 999999;
 	ch[co].a_mana = 999999;
-
+	
 	do_update_char(co);
 }
 

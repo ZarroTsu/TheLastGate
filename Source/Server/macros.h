@@ -175,6 +175,8 @@ int is_ascroll(int in);
 #define IS_BUILDING(cn)			((ch[(cn)].flags & CF_BUILDMODE) != 0)
 #define IS_THRALL(cn)			((ch[(cn)].flags & CF_THRALL) || ch[(cn)].data[CHD_GROUP] == 65500)
 #define IS_RB(cn)				((ch[(cn)].rebirth & 1) != 0)
+#define IS_HARDMODE(cn)			((ch[(cn)].flags & CF_HARDMODE) != 0)
+#define IS_SEASONAL(cn)			((ch[(cn)].season == CURRENTSEASON))
 
 // special character group checks
 #define IS_COMPANION(cn) 		(IS_SANECHAR(cn) && (ch[(cn)].temp == CT_COMPANION || ch[(cn)].temp == CT_ARCHCOMP || ch[(cn)].temp == CT_CASTERCOMP || ch[(cn)].temp == CT_ARCHCASTER))
@@ -197,7 +199,8 @@ int is_ascroll(int in);
 #define HIS_HER(cn)				(IS_FEMALE(cn) ? "her" : "his")
 #define HIM_HER(cn)				(IS_FEMALE(cn) ? "her" : "him")
 
-#define IS_OPP_CLAN(cn, co)		((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)))
+#define IS_BOTH_PURP(cn, co)	(IS_PURPLE(cn) && IS_PURPLE(co))
+#define IS_OPP_CLAN(cn, co)		((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)) || IS_BOTH_PURP((cn), (co)))
 #define IS_MY_ALLY(cn, co)		((((!IS_PLAYER(cn) && !IS_PLAYER(co) && ch[(cn)].data[CHD_GROUP] == ch[(co)].data[CHD_GROUP]) || (IS_PLAYER(cn) && IS_PLAYER(co) && !IS_OPP_CLAN(cn, co))) && !(map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA)) || (IS_PLAYER(cn) && IS_PLAYER(co) && isgroup((cn), (co))) || (IS_PLAYER(cn) && IS_COMPANION(co) && CN_OWNER(co)==cn) || (IS_PLAYER(co) && IS_COMPANION(cn) && CN_OWNER(cn)==co))
 
 #define IS_SKILL(a)				((a==13||a==22||a==31||a==35||a==37||a==40||a==41||a==48||a==49)?1:0)

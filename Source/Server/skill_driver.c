@@ -1426,7 +1426,7 @@ int spellcost(int cn, int cost, int in, int usemana)
 	if (IS_PLAYER(cn)  && in != SK_BLAST && in != SK_CLEAVE && in != SK_SHIELD && in != SK_WEAKEN && in != SK_WARCRY && 
 		in != SK_BLIND && in != SK_DOUSE && in != SK_TAUNT  && in != SK_LEAP   && in != SK_PACT)
 	{
-		cost = max(SP_COST_BASE, min(cost, cost*M_SK(cn, in)/100));
+		cost = max(SP_COST_BASE, min(cost, cost*M_SK(cn, in)/(IS_HARDMODE(cn)?50:100))); // HARDMODE - Earlt mana cost alleviation is a bit more restrictive.
 	}
 	if (do_get_iflag(cn, SF_TW_CROWN))
 	{
@@ -5047,6 +5047,9 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	if (ch[cm].flags & CF_IGN_SB)   ch[cc].flags |= CF_IGN_SB;				// Shared SB ignorance with owner (Lab 19)
 	
 	for (n = 0; n<=5; n++) ch[cc].limit_break[n][0] = ch[cm].limit_break[n][0] + ch[cm].limit_break[n][1];
+	
+	if (IS_HARDMODE(cn)) // HARDMODE - Companions lose Surround Hit.
+		ch[cc].skill[SK_SURROUND][2] = 0;
 	
 	if (shadowcopy)	// Grant extra skills based on sprite
 	{
