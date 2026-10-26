@@ -98,54 +98,52 @@ int dd_change(int x,int y);
 
 void translate_okey2race(int *race_ptr, int *sex_ptr, int *gamemode_ptr, int *season_ptr)
 {
-	switch((okey.race%100))
+	switch((okey.race%10000))
 	{
-		case  4: race= 1; sex=1; break;	// templar M
-		case  5: race= 1; sex=2; break;	// templar F
+		case    4: race= 1; sex=1; break;  // templar M
+		case    5: race= 1; sex=2; break;  // templar F
 		
-		case  6: race= 2; sex=1; break;	// mercenary M
-		case  7: race= 2; sex=2; break;	// mercenary F
+		case    6: race= 2; sex=1; break;  // mercenary M
+		case    7: race= 2; sex=2; break;  // mercenary F
 		
-		case  8: race= 3; sex=1; break;	// harakim M
-		case  9: race= 3; sex=2; break;	// harakim F
-		
-		//
-		
-		case 10: race= 7; sex=1; break;	// seyan M
-		case 11: race= 7; sex=2; break;	// seyan F
+		case    8: race= 3; sex=1; break;  // harakim M
+		case    9: race= 3; sex=2; break;  // harakim F
 		
 		//
 		
-		case 12: race= 4; sex=1; break;	// arch templar M
-		case 13: race= 4; sex=2; break;	// arch templar F
+		case   12: race= 4; sex=1; break;  // arch templar M
+		case   13: race= 4; sex=2; break;  // arch templar F
 		
-		case 14: race= 5; sex=1; break;	// pugilist M
-		case 15: race= 5; sex=2; break;	// pugilist F
+		case   14: race= 5; sex=1; break;  // skald M
+		case   15: race= 5; sex=2; break;  // skald F
 		
-		case 16: race= 6; sex=1; break;	// warrior M
-		case 17: race= 6; sex=2; break;	// warrior F
+		case   16: race= 6; sex=1; break;  // warrior M
+		case   17: race= 6; sex=2; break;  // warrior F
 		
-		case 18: race= 8; sex=1; break;	// sorcerer M
-		case 19: race= 8; sex=2; break;	// sorcerer F
+		case   18: race= 8; sex=1; break;  // sorcerer M
+		case   19: race= 8; sex=2; break;  // sorcerer F
 		
-		case 20: race= 9; sex=1; break;	// summoner M
-		case 21: race= 9; sex=2; break;	// summoner F
+		case   20: race= 9; sex=1; break;  // summoner M
+		case   21: race= 9; sex=2; break;  // summoner F
 		
-		case 22: race=10; sex=1; break;	// arch harakim M
-		case 23: race=10; sex=2; break;	// arch harakim F
+		case   22: race=10; sex=1; break;  // arch harakim M
+		case   23: race=10; sex=2; break;  // arch harakim F
 		
-		//
+		case   10: race= 7; sex=1; break;  // seyan M
+		case   11: race= 7; sex=2; break;  // seyan F
 		
-		case  2: race=11; sex=1; break;	// braver M
-		case  3: race=11; sex=2; break;	// braver F
+		case    2: race=11; sex=1; break;  // braver M
+		case    3: race=11; sex=2; break;  // braver F
 		
-		default: race=0; sex=0; break;
+		case 1554: race=12; sex=0; break;  // lycanthrope
+		
+		default:   race= 0; sex=0; break;
 	}
 	
 	*race_ptr     = race;
 	*sex_ptr      = sex;
-	*gamemode_ptr = ((okey.race)/100%100);
-	*season_ptr   = ((okey.race)/100/100);
+	*gamemode_ptr = ((okey.race)/10000%10);
+	*season_ptr   = ((okey.race)/10000/10);
 }
 
 void setres_800(void)
@@ -582,15 +580,15 @@ void update_race(HWND hwnd)
 		if (race== 9) SetDlgItemText(hwnd,IDC_ARCH,"Summoner");
 		if (race==10) SetDlgItemText(hwnd,IDC_ARCH,"Arch-Harakim");
 		if (race==11) SetDlgItemText(hwnd,IDC_ARCH,"Braver");
+		if (race==12) SetDlgItemText(hwnd,IDC_ARCH,"Lycanthrope");
 		
-		if (race==12) SetDlgItemText(hwnd,IDC_ARCH,"Renegade");
-		if (race==13) SetDlgItemText(hwnd,IDC_ARCH,"Rogue");
-		if (race==14) SetDlgItemText(hwnd,IDC_ARCH,"Ritualist");
+		if (race==13) SetDlgItemText(hwnd,IDC_ARCH,"Renegade");
+		if (race==14) SetDlgItemText(hwnd,IDC_ARCH,"Rogue");
+		if (race==15) SetDlgItemText(hwnd,IDC_ARCH,"Ritualist");
 	}
 	
 	if (sex==1) CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_MALE);
 	if (sex==2) CheckRadioButton(hwnd,IDC_MALE,IDC_FEMALE,IDC_FEMALE);
-	
 }
 
 void update_alpha(HWND hwnd)
@@ -695,11 +693,11 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					
 					if (race==0||sex==0)
 					{
-						if (IsDlgButtonChecked(hwnd,IDC_MALE)) sex=1;
-						if (IsDlgButtonChecked(hwnd,IDC_FEMALE)) sex=2;
-						if (IsDlgButtonChecked(hwnd,IDC_TEMP)) race=1;
-						if (IsDlgButtonChecked(hwnd,IDC_MERC)) race=2;
-						if (IsDlgButtonChecked(hwnd,IDC_HARA)) race=3;
+						if (IsDlgButtonChecked(hwnd,IDC_MALE))   sex  = 1;
+						if (IsDlgButtonChecked(hwnd,IDC_FEMALE)) sex  = 2;
+						if (IsDlgButtonChecked(hwnd,IDC_TEMP))   race = 1;
+						if (IsDlgButtonChecked(hwnd,IDC_MERC))   race = 2;
+						if (IsDlgButtonChecked(hwnd,IDC_HARA))   race = 3;
 					}
 					
 					if (race==1) // Templar
