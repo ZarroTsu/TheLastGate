@@ -3524,7 +3524,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[ 4], "Spider's Den",              4000);
 	m = display_pole(cn, flag, page, m, pole1[ 5], "Old Manor",                 4000);
 	m = display_pole(cn, flag, page, m, pole4[ 7], "Earth Pentagram Quest",     4000);
-	m = display_pole(cn, flag, page, m, pole2[14], "Underground I",             6000);
+	m = display_pole(cn, flag, page, m, pole2[14], "Underground I",             6000); // 10
 	m = display_pole(cn, flag, page, m, pole4[ 8], "Earth Pentagram Quest",     6000);
 	m = display_pole(cn, flag, page, m, pole3[ 0], "Lab I, Grolm Gorge",        6125);
 	m = display_pole(cn, flag, page, m, pole3[ 1], "Lab I, Grolm Gorge",        6125);
@@ -3535,7 +3535,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[ 6], "Arachnid Den",              7000);
 	m = display_pole(cn, flag, page, m, pole2[17], "Underground I",             7500);
 	m = display_pole(cn, flag, page, m, pole1[ 7], "Butler's Mansion",          7750);
-	m = display_pole(cn, flag, page, m, pole1[ 1], "Azrael's Throne Room",      8000);
+	m = display_pole(cn, flag, page, m, pole1[ 1], "Azrael's Throne Room",      8000); // 20
 	m = display_pole(cn, flag, page, m, pole2[18], "Underground I",             8000);
 	m = display_pole(cn, flag, page, m, pole4[ 9], "Earth Pentagram Quest",     8000);
 	m = display_pole(cn, flag, page, m, pole1[ 8], "Bell House Basement",       8750);
@@ -3546,7 +3546,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole2[19], "Underground I",            10000);
 	m = display_pole(cn, flag, page, m, pole2[ 7], "Stronghold, North",        10000);
 	m = display_pole(cn, flag, page, m, pole4[10], "Earth Pentagram Quest",    10000);
-	m = display_pole(cn, flag, page, m, pole3[ 6], "Lab III, Undead Gorge",    12000);
+	m = display_pole(cn, flag, page, m, pole3[ 6], "Lab III, Undead Gorge",    12000); // 30
 	m = display_pole(cn, flag, page, m, pole3[ 7], "Lab III, Undead Gorge",    12000);
 	m = display_pole(cn, flag, page, m, pole3[ 8], "Lab III, Undead Gorge",    12000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[ 3], "Lab III, Undead Gorge");
@@ -3558,7 +3558,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole3[10], "Lab IV, Caster Gorge",     16750);
 	m = display_pole(cn, flag, page, m, pole3[11], "Lab IV, Caster Gorge",     16750);
 	m = disp_rb_pole(cn, flag, page, m, poleR[ 4], "Lab IV, Caster Gorge");
-	m = display_pole(cn, flag, page, m, pole4[13], "Fire Pentagram Quest",     18000);
+	m = display_pole(cn, flag, page, m, pole4[13], "Fire Pentagram Quest",     18000); // 40
 	m = display_pole(cn, flag, page, m, pole5[ 4], "Autumn Meadow",            18250);
 	m = display_pole(cn, flag, page, m, pole5[ 5], "Autumn Meadow",            18250);
 	m = display_pole(cn, flag, page, m, pole1[ 9], "Webbed Bush",              18500);
@@ -3569,7 +3569,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole3[14], "Lab V, Knight Gorge",      20625);
 	m = disp_rb_pole(cn, flag, page, m, poleR[ 5], "Lab V, Knight Gorge");
 	m = display_pole(cn, flag, page, m, pole4[14], "Fire Pentagram Quest",     21000);
-	m = display_pole(cn, flag, page, m, pole1[13], "The Mad Hermit's House",   21500);
+	m = display_pole(cn, flag, page, m, pole1[13], "The Mad Hermit's House",   21500); // 50
 	m = display_pole(cn, flag, page, m, pole2[20], "Underground II",           24000);
 	m = display_pole(cn, flag, page, m, pole4[15], "Fire Pentagram Quest",     24000);
 	m = display_pole(cn, flag, page, m, pole1[11], "Astonia Penitentiary",     26000);
@@ -3580,7 +3580,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole3[17], "Lab VI, Desert Gorge",     27250);
 	m = disp_rb_pole(cn, flag, page, m, poleR[ 6], "Lab VI, Desert Gorge");
 	m = display_pole(cn, flag, page, m, pole2[22], "Underground II",           28000);
-	m = display_pole(cn, flag, page, m, pole4[16], "Fire Pentagram Quest",     28000);
+	m = display_pole(cn, flag, page, m, pole4[16], "Fire Pentagram Quest",     28000); // 60
 	m = display_pole(cn, flag, page, m, pole2[23], "Underground II",           30000);
 	m = display_pole(cn, flag, page, m, pole2[ 1], "Gargoyle Nest",            30500);
 	m = display_pole(cn, flag, page, m, pole1[19], "Abandoned Archives",       31000);
@@ -3591,7 +3591,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole3[20], "Lab VII, Light/Dark Gor",  33250);
 	m = disp_rb_pole(cn, flag, page, m, poleR[ 7], "Lab VII, Light/Dark Gor");
 	m = display_pole(cn, flag, page, m, pole1[17], "Jagged Pass Cellar",       34500);
-	m = display_pole(cn, flag, page, m, pole6[20], "Dimling's Den",            36000);
+	m = display_pole(cn, flag, page, m, pole6[20], "Dimling's Den",            36000); // 70
 	m = display_pole(cn, flag, page, m, pole4[18], "Fire Pentagram Quest",     36000);
 	m = display_pole(cn, flag, page, m, pole1[14], "Lavender Lakebed",         38500);
 	m = display_pole(cn, flag, page, m, pole2[25], "Underground II",           40000);
@@ -3602,7 +3602,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole3[23], "Lab VIII, Underwater Go",  42000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[ 8], "Lab VIII, Underwater Go");
 	m = display_pole(cn, flag, page, m, pole6[21], "Dimling's Den",            44000);
-	m = display_pole(cn, flag, page, m, pole1[12], "Grolm Laboratory",         45000);
+	m = display_pole(cn, flag, page, m, pole1[12], "Grolm Laboratory",         45000); // 80
 	m = display_pole(cn, flag, page, m, pole6[25], "Beryl Jungle",             45000);
 	m = display_pole(cn, flag, page, m, pole5[21], "Basalt Desert",            45000);
 	m = display_pole(cn, flag, page, m, pole4[20], "Jungle Pentagram Quest",   45000);
@@ -3612,7 +3612,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[18], "Winding Valley",           49000);
 	m = display_pole(cn, flag, page, m, pole2[ 3], "Gargoyle Nest",            50000);
 	m = display_pole(cn, flag, page, m, pole2[ 8], "Black Stronghold",         50000);
-	m = display_pole(cn, flag, page, m, pole4[21], "Jungle Pentagram Quest",   50000);
+	m = display_pole(cn, flag, page, m, pole4[21], "Jungle Pentagram Quest",   50000); // 90
 	m = display_pole(cn, flag, page, m, pole2[27], "Underground III",          52000);
 	m = display_pole(cn, flag, page, m, pole5[ 6], "Scorpion Burrow",          52500);
 	m = display_pole(cn, flag, page, m, pole3[24], "Lab IX, Riddle Gorge",     54000);
@@ -3624,7 +3624,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[24], "Skitter Hatchery",         57000);
 	m = display_pole(cn, flag, page, m, pole6[22], "Dimling's Den",            60000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[25], "Dimling's Den");
-	m = display_pole(cn, flag, page, m, pole2[29], "Underground III",          60000);
+	m = display_pole(cn, flag, page, m, pole2[29], "Underground III",          60000); // 100
 	m = display_pole(cn, flag, page, m, pole4[23], "Jungle Pentagram Quest",   60000);
 	m = display_pole(cn, flag, page, m, pole3[27], "Lab X, Forest Gorge",      63250);
 	m = display_pole(cn, flag, page, m, pole3[28], "Lab X, Forest Gorge",      63250);
@@ -3635,7 +3635,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole2[30], "Underground III",          64000);
 	m = display_pole(cn, flag, page, m, pole1[21], "Southern Swamp",           65000);
 	m = display_pole(cn, flag, page, m, pole4[24], "Jungle Pentagram Quest",   66000);
-	m = display_pole(cn, flag, page, m, pole1[25], "Thug's Camp",              67000);
+	m = display_pole(cn, flag, page, m, pole1[25], "Thug's Camp",              67000); // 110
 	m = display_pole(cn, flag, page, m, pole6[19], "Thug's Hideaway",          69000);
 	m = display_pole(cn, flag, page, m, pole4[25], "Ice Pentagram Quest",      72000);
 	m = display_pole(cn, flag, page, m, pole4[26], "Ice Pentagram Quest",      78000);
@@ -3646,7 +3646,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole5[10], "Buried Brush",             79000);
 	m = display_pole(cn, flag, page, m, pole2[31], "Underground III",          80000);
 	m = display_pole(cn, flag, page, m, pole2[ 4], "Ice Gargoyle Nest",        82000);
-	m = display_pole(cn, flag, page, m, pole2[11], "Tower X",                  82500);
+	m = display_pole(cn, flag, page, m, pole2[11], "Tower X",                  82500); // 120
 	m = display_pole(cn, flag, page, m, pole5[14], "Hollow Trench",            83750);
 	m = display_pole(cn, flag, page, m, pole6[24], "Southern Shore",           83750);
 	m = display_pole(cn, flag, page, m, pole4[27], "Ice Pentagram Quest",      84000);
@@ -3656,7 +3656,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole1[15], "Aston Mines, Level III",   90000);
 	m = display_pole(cn, flag, page, m, pole2[ 6], "Ice Gargoyle Nest",        90000);
 	m = display_pole(cn, flag, page, m, pole2[ 9], "Stronghold, South",        90000);
-	m = display_pole(cn, flag, page, m, pole1[22], "Northern Mountains",       91000);
+	m = display_pole(cn, flag, page, m, pole1[22], "Northern Mountains",       91000); // 130
 	m = display_pole(cn, flag, page, m, pole4[ 1], "Lab XII, Ascent Gorge",    91500);
 	m = display_pole(cn, flag, page, m, pole4[ 2], "Lab XII, Ascent Gorge",    91500);
 	m = display_pole(cn, flag, page, m, pole4[ 3], "Lab XII, Ascent Gorge",    91500);
@@ -3668,7 +3668,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole4[29], "Sea Pentagram Quest",     100000);
 	m = display_pole(cn, flag, page, m, pole5[ 8], "Outset Den",              105000);
 	m = display_pole(cn, flag, page, m, pole1[30], "Onyx Gargoyle Nest",      105000);
-	m = display_pole(cn, flag, page, m, pole5[23], "Northern Tundra",         106250);
+	m = display_pole(cn, flag, page, m, pole5[23], "Northern Tundra",         106250); // 140
 	m = display_pole(cn, flag, page, m, pole6[ 0], "Lab XIV, Miner's Gorge",  106875);
 	m = display_pole(cn, flag, page, m, pole6[ 1], "Lab XIV, Miner's Gorge",  106875);
 	m = display_pole(cn, flag, page, m, pole6[ 2], "Lab XIV, Miner's Gorge",  106875);
@@ -3680,7 +3680,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = disp_rb_pole(cn, flag, page, m, poleR[24], "Onyx Pentagram Quest");
 	m = display_pole(cn, flag, page, m, pole1[27], "The Emerald Cavern",      121250);
 	m = display_pole(cn, flag, page, m, pole1[28], "The Emerald Cavern",      121250);
-	m = display_pole(cn, flag, page, m, pole1[20], "Forbidden Tomes",         127500);
+	m = display_pole(cn, flag, page, m, pole1[20], "Forbidden Tomes",         127500); // 150
 	m = display_pole(cn, flag, page, m, pole5[ 1], "The Volcano",             127500);
 	m = display_pole(cn, flag, page, m, pole6[ 3], "Lab XV, Vantablack Gorg", 127500);
 	m = display_pole(cn, flag, page, m, pole6[ 4], "Lab XV, Vantablack Gorg", 127500);
@@ -3691,7 +3691,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole5[25], "Violet Thicket",          142500);
 	m = display_pole(cn, flag, page, m, pole6[ 6], "Lab XVI, Pirate's Gorge", 148750);
 	m = display_pole(cn, flag, page, m, pole6[ 7], "Lab XVI, Pirate's Gorge", 148750);
-	m = display_pole(cn, flag, page, m, pole6[ 8], "Lab XVI, Pirate's Gorge", 148750);
+	m = display_pole(cn, flag, page, m, pole6[ 8], "Lab XVI, Pirate's Gorge", 148750); // 160
 	m = disp_rb_pole(cn, flag, page, m, poleR[15], "Lab XVI, Pirate's Gorge");
 	m = display_pole(cn, flag, page, m, pole5[12], "Merlin's Laboratory",     150000);
 	m = display_pole(cn, flag, page, m, pole5[27], "Emerald Catacomb",        150000);
@@ -3706,7 +3706,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = disp_rb_pole(cn, flag, page, m, poleR[27], "Coastal Cave");
 	m = display_pole(cn, flag, page, m, pole1[29], "The Emerald Palace",      170000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[22], "The Emerald Palace");
-	m = display_pole(cn, flag, page, m, pole5[11], "Platinum Mines II",       175000);
+	m = display_pole(cn, flag, page, m, pole5[11], "Platinum Mines II",       175000); // 170
 	m = display_pole(cn, flag, page, m, pole5[26], "Pirate's Galleon",        177500);
 	m = display_pole(cn, flag, page, m, pole6[12], "Lab XVIII, Commandment ", 185000);
 	m = display_pole(cn, flag, page, m, pole6[13], "Lab XVIII, Commandment ", 185000);
@@ -3718,7 +3718,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole6[16], "Lab XIX, Divinity Gorge", 195625);
 	m = display_pole(cn, flag, page, m, pole6[17], "Lab XIX, Divinity Gorge", 195625);
 	m = disp_rb_pole(cn, flag, page, m, poleR[18], "Lab XIX, Divinity Gorge");
-	m = display_pole(cn, flag, page, m, pole5[28], "The Aqueduct",            200000);
+	m = display_pole(cn, flag, page, m, pole5[28], "The Aqueduct",            200000); // 180
 	m = disp_rb_pole(cn, flag, page, m, poleR[28], "The Aqueduct");
 	m = display_pole(cn, flag, page, m, pole5[16], "Seppuku House",           210000);
 	m = display_pole(cn, flag, page, m, pole5[29], "Temple in the Sky",       215000);
@@ -3730,7 +3730,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = disp_rb_pole(cn, flag, page, m, poleR[23], "The Obsidian Fortress");
 	m = display_pole(cn, flag, page, m, pole2[10], "Black Stronghold Baseme", 240000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[21], "Black Stronghold Baseme");
-	m = display_pole(cn, flag, page, m, pole2[13], "Abyss X",                 247500);
+	m = display_pole(cn, flag, page, m, pole2[13], "Abyss X",                 247500); // 187
 	m = disp_rb_pole(cn, flag, page, m, poleR[20], "Abyss X");
 //	m = display_pole(cn, flag, page, m, pole5[31], "Aemon's Palace",          250000);
 	//
@@ -3742,6 +3742,8 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	do_char_log(cn, 1, " \n");
 	do_char_log(cn, 2, "Showing page %d of %d. #poles <x> to swap.\n", page, max(1,min(12,(m-1)/16+1)));
 	do_char_log(cn, 1, " \n");
+	
+	check_challenge(cn, SEAS_POLES); // SEASONAL - Pole check
 }
 
 int display_quest(int cn, int flag, int page, int m, int req, int quest, int rank, char *npcn, char *nloc, char *nrew, int exp)
@@ -4058,6 +4060,8 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	do_char_log(cn, 1, " \n");
 	do_char_log(cn, 2, "Showing page %d of %d. #quest <x> to swap.\n", page, max(1,min(8,(m-1)/16+1)));
 	do_char_log(cn, 1, " \n");
+	
+	check_challenge(cn, SEAS_QUESTS); // SEASONAL - Quest check
 }
 
 void do_showchars(int cn)
@@ -8228,6 +8232,9 @@ void do_char_killed(int cn, int co, int pentsolve)
 					sprintf(message[3], "%s defeated The Archon Pandium at depth %d!", message[0], tmp);
 				if (globs->flags & GF_DISCORD) discord_ranked(message[3]);
 			}
+			if (ch[co].data[32]==1)
+				check_challenge(cn, SEAS_PANDI_HARD); // SEASONAL - Solo HARDMODE check
+			check_challenge(cn, SEAS_PANDI); // SEASONAL - Depth 50 check
 		}
 	}
 	
@@ -8265,6 +8272,8 @@ void do_char_killed(int cn, int co, int pentsolve)
 
 			ch[cc].temple_x = ch[cc].tavern_x = ch[cc].x;
 			ch[cc].temple_y = ch[cc].tavern_y = ch[cc].y;
+			
+			check_challenge(cn, SEAS_FINAL_HARD); // SEASONAL - HARDMODE Lab 20 check
 		}
 	}
 
@@ -18955,6 +18964,10 @@ void do_check_new_level(int cn, int announce)
 		{
 			do_char_log(cn, 0, "Confident with your progress, the gods will no longer return your items when you die. Be careful!\n");
 		}
+		
+		if (rank ==  9) check_challenge(cn, SEAS_2NDLIEU); // SEASONAL - 2nd Lieu Check
+		if (rank == 20) check_challenge(cn, SEAS_KNIGHT); // SEASONAL - Knight Check
+		if (rank == 24) check_challenge(cn, SEAS_WARLORD); // SEASONAL - Warlord Check
 		
 		if (announce)
 		{

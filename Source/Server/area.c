@@ -784,6 +784,8 @@ char *get_area_truncated(int cn)
 	
 	sprintf(buf, "%.20s", get_area(cn, 0));
 	
+	if (strcmp(get_area(cn, 0), "The Tower Rewards")==0) check_challenge(cn, SEAS_TOWER); // SEASONAL - Complete The Tower
+	if (strcmp(get_area(cn, 0), "The Abyss Rewards")==0) check_challenge(cn, SEAS_ABYSS); // SEASONAL - Complete The Abyss
+	
 	return buf;
 }
-

@@ -1819,6 +1819,7 @@ int npc_give(int cn, int co, int in, int money)
 					}
 					// </group rewards>
 				}
+				check_challenge(cn, SEAS_QUESTS); // SEASONAL - Quest check
 			}
 		}
 		else if ((money = ch[cn].data[69]*stsz)!=0)

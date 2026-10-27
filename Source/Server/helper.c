@@ -2320,6 +2320,140 @@ char *get_class_name(int nr)
 }
 
 
+struct season_challenge
+{
+	char *name;
+};
+
+struct season_challenge season_challenge[] = {
+	{"Reach the rank of Second Lieutenant"         },  //  0
+	{"Reach the rank of Knight"                    },  //  1
+	{"Reach the rank of Warlord"                   },  //  2
+	{"Complete The Tower"                          },  //  3
+	{"Complete The Abyss"                          },  //  4
+	{"Clear all available Quests"                  },  //  5
+	{"Reach all available Exploration Points"      },  //  6
+	{"Find the Hidden Exploration Point"           },  //  7
+	{"Defeat The Archon Pandium at Depth 50"       },  //  8
+	{"Complete Lab XII, Ascent Gorge on HARDMODE"  },  //  9
+	{"Complete Lab XX, Final Test on HARDMODE"     },  // 10
+	{"Defeat The Archon Pandium alone on HARDMODE" },  // 11
+	{"Create a True Amulet of Ankh on HARDMODE"    },  // 12
+	{""                                            },  // 13
+	{""                                            },  // 14
+	{""                                            }   // 15 -- Container is only 16 bits, go no higher.
+}
+
+int did_challenge(int cn, int val)
+{
+	int bit, tmp;
+	
+	if (val > 15) return 1;
+	
+	bit = 1 << (val);
+	tmp = ch[cn].challengebits & bit; ch[cn].challengebits |= bit;
+	return tmp;
+}
+
+char *get_challenge_name(int nr)
+{
+	if (nr < 0)
+	{
+		xlog("error: get_challenge_name(%d)", nr);
+		return "err... nothing";
+	}
+	else if (nr >= ARRAYSIZE(season_challenge))
+	{
+		xlog("error: get_challenge_name(%d)", nr);
+		return "umm... whatzit";
+	}
+	
+	return season_challenge[nr].name;
+}
+
+void check_challenge(int cn, int val)
+{
+	int bit, cleared, temp=0, in=0;
+	
+	if (!IS_SEASONAL(cn)) return;
+	if (val > 12) return;
+	if (val >= 9 && !IS_HARDMODE(cn)) return;
+	
+	if (val == 5) // Quest bit check
+	{
+		for (bit=0, cleared=0; bit < 32; bit++)
+		{
+			if (ch[cn].data[72] & (1 << bit)) cleared++;
+			if (ch[cn].data[94] & (1 << bit)) cleared++;
+		}
+		if (cleared < 59) return;
+	}
+	
+	if (val == 6) // Pole bit check
+	{
+		for (bit = 0, cleared=0; bit < 32; bit++)
+		{
+			if (ch[cn].data[46] & (1 << bit)) cleared++;
+			if (ch[cn].data[47] & (1 << bit)) cleared++;
+			if (ch[cn].data[48] & (1 << bit)) cleared++;
+			if (ch[cn].data[49] & (1 << bit)) cleared++;
+			if (ch[cn].data[91] & (1 << bit)) cleared++;
+			if (ch[cn].data[24] & (1 << bit)) cleared++;
+		}
+		if (cleared < 187) return;
+	}
+	
+	if (val == 8) // Archon depth check
+	{
+		if (ch[cn].pandium_floor[0]<50 && ch[cn].pandium_floor[1]<50) return;
+	}
+	
+	if (!did_challenge(cn, val))
+	{
+		do_char_log(cn, 9, "You cleared the challenge, '%s'. Good job.\n", get_challenge_name(val));
+		
+		for (bit=0, cleared=0; bit < 16; bit++)
+		{
+			if (ch[cn].challengebits & (1 << bit)) cleared++;
+		}
+		
+		switch (cleared)
+		{
+			case  4: temp = IT_REWARD_SEAS_1; break; // Cleared  4 challenges, give reward 1.
+			case  8: temp = IT_REWARD_SEAS_2; break; // Cleared  8 challenges, give reward 2.
+			case 12: temp = IT_REWARD_SEAS_3; break; // Cleared 12 challenges, give reward 3.
+			case 13: // Cleared 13 challenges, give pat on the back.
+				do_char_log(cn, 9, "That's all of them. Wonderful work!\n");
+				break;
+			default:
+				break;
+		}
+		
+		if (temp)
+		{
+			if (temp == IT_SOULSTONE)
+				in = make_new_soulstone(cn, 9, -1, -1, -1, 1);
+			else
+				in = god_create_item(temp);
+			
+			if (!in)
+			{
+				do_char_log(cn, 0, "Unfortunately, your reward item could not be created (temp = %d).\n", temp);
+				return;
+			}
+			if (!god_give_char(in, cn))
+			{
+				do_char_log(cn, 0, "Unfortunately, your reward item would not fit into your backpack (temp = %d).\n", temp);
+				it[in].used = USE_EMPTY;
+				return;
+			}
+			
+			do_char_log(cn, 1, "You received a %s as a reward.\n", it[in].name);
+		}
+	}
+}
+
+
 /* Convert case in str as for a proper name: 1st is capital, others lower.
    BEWARE, this function changes its argument! */
 void titlecase_str(char *str)
@@ -2932,21 +3066,24 @@ void randomize_soulstone_stats(int cn, int in, int rank, int sk1, int sk2, int s
 		add_soulstone_stat(cn, in, c, v, I_I);
 }
 
-int make_new_soulstone(int cn, int rank, int sk1, int sk2, int sk3)
+int make_new_soulstone(int cn, int rank, int sk1, int sk2, int sk3, int flag)
 {
 	int in;
 	
-	if (!rank) rank = getrank(cn);
+	if (!rank) { rank = getrank(cn); flag = 0; }
 	
-	     if (rank >= 24) rank = 5;
-	else if (rank >= 21) rank = 4 + RANDOM(2);
-	else if (rank >= 18) rank = 4;
-	else if (rank >= 15) rank = 3 + RANDOM(2);
-	else if (rank >= 12) rank = 3;
-	else if (rank >=  9) rank = 2 + RANDOM(2);
-	else if (rank >=  6) rank = 2;
-	else if (rank >=  3) rank = 1 + RANDOM(2);
-	else                 rank = 1;
+	if (flag)
+	{
+			 if (rank >= 24) rank = 5;
+		else if (rank >= 21) rank = 4 + RANDOM(2);
+		else if (rank >= 18) rank = 4;
+		else if (rank >= 15) rank = 3 + RANDOM(2);
+		else if (rank >= 12) rank = 3;
+		else if (rank >=  9) rank = 2 + RANDOM(2);
+		else if (rank >=  6) rank = 2;
+		else if (rank >=  3) rank = 1 + RANDOM(2);
+		else                 rank = 1;
+	}
 	
 	if (!(in = god_create_item(IT_SOULSTONE)))
 	{
@@ -2973,7 +3110,7 @@ void give_new_soulstone(int cn, int rank)
 {
 	int in;
 	
-	in = make_new_soulstone(cn, rank, -1, -1, -1);
+	in = make_new_soulstone(cn, rank, -1, -1, -1, 1);
 	
 	god_give_char(in, cn);
 }
@@ -3180,7 +3317,7 @@ void create_new_soulstone_equipment(int cn, int in, int rank, int sk1, int sk2, 
 	
 	if (!CAN_SOULSTONE(in)) return;
 	
-	in2 = make_new_soulstone(cn, rank, sk1, sk2, sk3);
+	in2 = make_new_soulstone(cn, rank, sk1, sk2, sk3, 0);
 	
 	apply_soulstone(cn, in, in2, 0);
 }

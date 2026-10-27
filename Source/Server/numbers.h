@@ -722,6 +722,12 @@
 
 #define IT_REWARD_AB		2974
 
+#define IT_REWARD_SEAS_1	1146 // Level 9 Soulstone
+#define IT_REWARD_SEAS_2	 142 // TODO: Change me!
+#define IT_REWARD_SEAS_3	2974 // Ancient Belt Scroll
+
+#define IT_CRYSTALPOLE		9999
+
 // -----
 
 #define IT_FLASK		 100
@@ -2051,4 +2057,19 @@
 #define TS_STOOL_CHAIRE	 6888
 #define TS_STOOL_CHAIRN	 6890
 
+// --------
+
+#define SEAS_2NDLIEU       0
+#define SEAS_KNIGHT        1
+#define SEAS_WARLORD       2
+#define SEAS_TOWER         3
+#define SEAS_ABYSS         4
+#define SEAS_QUESTS        5
+#define SEAS_POLES         6
+#define SEAS_HIDDEN        7
+#define SEAS_PANDI         8
+#define SEAS_ASCENT_HARD   9
+#define SEAS_FINAL_HARD   10
+#define SEAS_PANDI_HARD   11
+#define SEAS_ANKH_HARD    12
 

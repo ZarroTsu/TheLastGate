@@ -1755,6 +1755,7 @@ void finish_laby_teleport(int cn, int nr, int exp)
 			do_char_log(cn, 7, "You earned 1 skill point.\n");
 			ch[cn].tree_points++;
 		}
+		if (nr>=12) check_challenge(cn, SEAS_ASCENT_HARD); // SEASONAL - HARDMODE Lab 12 check
 	}
 	
 	destroy_laby_items(cn);
@@ -6826,6 +6827,8 @@ int place_ankh(int cn, int in)
 		fx_add_effect(6, 0, 565, 117, 0);
 		fx_add_effect(7, 0, 563, 127, 0);
 		
+		check_challenge(cn, SEAS_ANKH_HARD); // SEASONAL - HARDMODE True Ankh check
+		
 		return 0;
 	}
 }
@@ -9267,6 +9270,19 @@ int explorer_point(int cn, int in, int msg)
 	if (it[in].data[8]) 
 		return rebirth_explorer_point(cn, in, msg);
 	
+	if (it[in].temp == IT_CRYSTALPOLE)
+	{
+		n = 1;
+		if (ch[cn].challengebits & 1<<7)
+		{
+			if (msg) do_char_log(cn, 1, "Nothing happened.\n");
+			n = 0;
+		}
+		do_char_log(cn, 8, "You found the hidden exploration point!\n");
+		check_challenge(cn, SEAS_HIDDEN); // SEASONAL - Hidden Pole
+		return n;
+	}
+	
 	if (it[in].temp == DW_EXPPOLE)
 	{
 		if (it[in].active)
@@ -9315,6 +9331,8 @@ int explorer_point(int cn, int in, int msg)
 		chlog(cn, "Found exp point, granting %d (of %d) exp", exp, it[in].data[4]);
 		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
 		do_give_exp(cn, exp, 0, -1, 0);
+		
+		check_challenge(cn, SEAS_POLES); // SEASONAL - Pole check
 	}
 	else
 	{
