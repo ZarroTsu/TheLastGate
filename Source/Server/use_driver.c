@@ -7023,13 +7023,13 @@ void really_spawn_minion(int cn, int cc)
 {
 	int n, m, in, base, v = 4, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
 	
-	base = (getrank(cn)+1) * 11;
+	base = (getrank(cn)+1) * 11/2;
 	
 	// Adjust the template to reflect desired stat growth
 	switch (ch[cc].temp)
 	{
 		case CT_GARGTHRALL: // [Item] Gargoyle Statuette - Gargoyle
-			base -= RANDOM(7); //v = 2;
+			base -= (3+RANDOM(3)); //v = 2;
 			break;
 		case CT_DEVDTHRALL: // [Gear] Devil's Doorway - Skeleton
 			if (IS_SANECTEMPLATE((temp = ch[cn].lastkilltemp)))
@@ -7051,7 +7051,7 @@ void really_spawn_minion(int cn, int cc)
 			}
 			break;
 		case CT_INVITHRALL: // [Gear] Sibat Invidia - Golem
-			base += RANDOM(13); v = 0;
+			base += (6+RANDOM(6)); v = 0;
 			// Check if we already have this thrall
 			//  -- if we do, old thralls start to degenerate.
 			for (n=1;n<MAXCHARS;n++)
@@ -7100,7 +7100,7 @@ void really_spawn_minion(int cn, int cc)
 			B_SK(cc, n)     = max(  0,min(cap+max(0,root-cap)/7,root+RANDOM(7)));
 		}
 		
-		root                = base * 5;
+		root                = base * 7;
 		cap                 = 999;
 		ch[cc].hp[0]        = max(100,min(cap,root+RANDOM(13)));
 		ch[cc].end[0]       = max(100,min(300,root+RANDOM(13)));
