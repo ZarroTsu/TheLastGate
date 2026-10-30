@@ -9,7 +9,7 @@
 #define VERSION				0x000F00
 #define MINVERSION			0x000F00
 
-#define CURRENTSEASON		0
+#define CURRENTSEASON		1
 
 #define DATDIR				".dat"
 

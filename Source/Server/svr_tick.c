@@ -2405,9 +2405,9 @@ void plr_newlogin(int nr)
 		return;
 	}
 	
-	temp     = player[nr].race%100;
-	gamemode = player[nr].race/100%100;
-	season   = player[nr].race/100/100;
+	temp     = player[nr].race%10000;
+	gamemode = player[nr].race/10000%10;
+	season   = player[nr].race/10000/10;
 	
 	if (temp!=CT_TEMP_M && temp!=CT_TEMP_F 
 	 && temp!=CT_MERC_M && temp!=CT_MERC_F 
