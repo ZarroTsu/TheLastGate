@@ -501,6 +501,8 @@ void autogen_description(HWND hwnd)
 	
 	GetDlgItemText(hwnd,IDC_CNAME,bufname,79);
 	
+	if (!bufname[0]) return;
+	
 	switch (random(3))
 	{
 		case  1: sprintf(bufpron, STR_PRON_1); break;
@@ -921,7 +923,7 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					else 
 					{
 						gamemode=1;
-						SetDlgItemText(hwnd,IDC_STATUS,"HARD MODE:\nStricter on-death penalties, reduced progression rewards.");
+						SetDlgItemText(hwnd,IDC_STATUS,"HARD MODE:\nStricter gameplay experience. Good luck!");
 					}
 					update_buttons(hwnd);
 					return 1;

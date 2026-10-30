@@ -31,7 +31,7 @@ extern unsigned int dept_page;
 int screen_width, screen_height, screen_tilexoff, screen_tileyoff, screen_viewsize, view_subedges;
 //int screen_overlay_sprite;
 int xwalk_nx, xwalk_ny, xwalk_ex, xwalk_ey, xwalk_sx, xwalk_sy, xwalk_wx, xwalk_wy;
-short screen_windowed;
+short screen_windowed=1;
 short screen_renderdist;
 
 void dd_invalidate_cache(void);
