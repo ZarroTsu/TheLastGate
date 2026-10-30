@@ -702,17 +702,26 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 						if (IsDlgButtonChecked(hwnd,IDC_HARA))   race = 3;
 					}
 					
-					if (race==1) // Templar
+					if (race%10000==1) // Templar
 					{
 						if (sex==1) race=4; else race=5;
 					}
-					else if (race==3) // Harakim
+					else if (race%10000==3) // Harakim
 					{
 						if (sex==1) race=8; else race=9;
 					}
 					else // Mercenary
 					{
 						if (sex==1) race=6; else race=7;
+					}
+					
+					if (gamemode)
+					{
+						race += gamemode*10000;
+					}
+					if (season)
+					{
+						race += season*100000;
 					}
 
 					save_options();
@@ -768,6 +777,8 @@ APIENTRY OptionsProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 					randomize();
 					race=random(3)+1;
 					sex=random(2)+1;
+					gamemode=0;
+					season=1;
 					update_buttons(hwnd);
 					//
 					return 1;

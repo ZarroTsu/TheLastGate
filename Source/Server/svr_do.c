@@ -3376,9 +3376,9 @@ void do_showchallengelist(int cn)
 	for (n=0; n<13; n++)
 	{
 		if (ch[cn].challengebits & (1 << n))
-			do_char_log(cn, 6, "[X] %s.\n", get_challenge_name(n));
+			do_char_log(cn, 6, "[X] %s\n", get_challenge_name(n));
 		else
-			do_char_log(cn, 1, "[ ] %s.\n", get_challenge_name(n));
+			do_char_log(cn, 1, "[ ] %s\n", get_challenge_name(n));
 	}
 	
 	do_char_log(cn, 1, " \n");
@@ -13506,6 +13506,9 @@ void do_regenerate(int cn)
 	if (mf1 & MF_UWATER)               uwater = 1;
 	
 	hpmult = endmult = manamult = moonmult;
+	
+	if (hardmode && !B_SK(cn, SK_MEDIT))
+		manamult = 0;
 	
 	// Tarot - Moon :: While not full mana, life regen is mana regen
 	if (do_get_iflag(cn, SF_MOON) && (ch[cn].a_mana < MP_SOFTCAP(cn)))

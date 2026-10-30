@@ -116,8 +116,6 @@ int so_login(unsigned char *buf, HWND hwnd)
 	unsigned char obuf[16];
 	char xbuf[128];
 	extern int race;
-	extern int gamemode;
-	extern int season;
 	static int capcnt;
 	static char mod[256];
 	int n;
@@ -131,7 +129,7 @@ int so_login(unsigned char *buf, HWND hwnd)
 		obuf[0]=CL_CHALLENGE;
 		*(unsigned long*)(obuf+1)=tmp;
 		*(unsigned long*)(obuf+5)=VERSION;
-		*(unsigned long*)(obuf+9)=race + (race<10000)?(gamemode*10000 + season*100000):0;
+		*(unsigned long*)(obuf+9)=race;
 		send(sock,(char*)obuf,16,0);
 
 		load_unique();

@@ -2405,9 +2405,11 @@ void plr_newlogin(int nr)
 		return;
 	}
 	
-	temp     = player[nr].race%10000;
-	gamemode = player[nr].race/10000%10;
-	season   = player[nr].race/10000/10;
+	temp     = (int)(player[nr].race%10000);
+	gamemode = (int)(player[nr].race/10000%10);
+	season   = (int)(player[nr].race/10000/10);
+	
+	plog(nr, "race = %d, temp = %d, gamemode = %d, season = %d", player[nr].race, temp, gamemode, season);
 	
 	if (temp!=CT_TEMP_M && temp!=CT_TEMP_F 
 	 && temp!=CT_MERC_M && temp!=CT_MERC_F 
