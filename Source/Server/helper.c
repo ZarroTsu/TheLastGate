@@ -2342,7 +2342,7 @@ struct season_challenge season_challenge[] = {
 	{""                                            },  // 13
 	{""                                            },  // 14
 	{""                                            }   // 15 -- Container is only 16 bits, go no higher.
-}
+};
 
 int did_challenge(int cn, int val)
 {
