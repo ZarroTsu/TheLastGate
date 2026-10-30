@@ -4201,7 +4201,9 @@ void god_racechange(int co, int temp, int keepstuff)
 		if (old.flags & CF_APPRAISE)    ch[co].flags   |= CF_APPRAISE;
 		if (old.flags & CF_LOCKPICK)    ch[co].flags   |= CF_LOCKPICK;
 		if (old.kindred & KIN_IDENTIFY) ch[co].kindred |= KIN_IDENTIFY;
+		if (old.flags & CF_HARDMODE)    ch[co].flags   |= CF_HARDMODE;
 		
+		ch[co].season    = old.season;
 		ch[co].bs_points = old.bs_points;
 		ch[co].os_points = old.os_points;
 		ch[co].tokens    = old.tokens;

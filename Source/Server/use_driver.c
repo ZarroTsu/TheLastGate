@@ -2446,6 +2446,7 @@ int use_bag(int cn, int in)
 						do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
 						emptyinv = 1;
 					}
+					else if (SEASON_CHECK(cn, in2)) ;
 					else
 					{
 						god_give_char(in2, co);
@@ -2473,6 +2474,7 @@ int use_bag(int cn, int in)
 							do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
 							emptyinv = 1;
 						}
+						else if (SEASON_CHECK(cn, in2)) ;
 						else
 						{
 							god_give_char(in2, co);
@@ -2494,6 +2496,7 @@ int use_bag(int cn, int in)
 						do_char_log(cn, 1, "You autoloot %s.\n", itemvowel(in2, 1));
 						emptyinv = 1;
 					}
+					else if (SEASON_CHECK(cn, in2)) ;
 					else
 					{
 						god_give_char(in2, co);
@@ -5884,6 +5887,7 @@ int use_pile(int cn, int in)
 				map[m].it = 0;
 				do_char_log(cn, 0, "You've found %s!\n", itemvowel(in2, 1));
 			}
+			else if (SEASON_CHECK(cn, in2)) ;
 			else
 			{
 				do_char_log(cn, 0, "Your backpack is full, so you can't take the %s.\n", it[in2].reference);
@@ -5911,6 +5915,7 @@ int use_pile(int cn, int in)
 			map[m].it = 0;
 			do_char_log(cn, 0, "You've found %s!\n", itemvowel(in2, 1));
 		}
+		else if (SEASON_CHECK(cn, in2)) ;
 		else
 		{
 			do_char_log(cn, 0, "Your backpack is full, so you can't take the %s.\n", it[in2].reference);

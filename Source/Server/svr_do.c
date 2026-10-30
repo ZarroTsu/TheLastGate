@@ -15257,6 +15257,7 @@ void do_shop_char(int cn, int co, int nr)
 								}
 							}
 						}
+						else if (SEASON_CHECK(cn, in)) ;
 						else
 						{
 							if (orgstk)
@@ -15290,6 +15291,7 @@ void do_shop_char(int cn, int co, int nr)
 						if (!(ch[cn].flags & CF_SYS_OFF))
 							do_char_log(cn, 1, "You took a %s.\n", it[in].reference);
 					}
+					else if (SEASON_CHECK(cn, in)) ;
 					else
 					{
 						god_give_char(in, co);
@@ -15309,6 +15311,7 @@ void do_shop_char(int cn, int co, int nr)
 						if (!(ch[cn].flags & CF_SYS_OFF))
 							do_char_log(cn, 1, "You took a %s.\n", it[in].reference);
 					}
+					else if (SEASON_CHECK(cn, in)) ;
 					else
 					{
 						god_give_char(in, co);
@@ -17196,6 +17199,7 @@ void do_depot_char(int cn, int co, int nr)
 					chlog(cn, "Took %s from depot", it[in].name);
 					do_update_char(co);
 				}
+				else if (SEASON_CHECK(cn, in)) ;
 				else
 				{
 					do_char_log(cn, 0, "You cannot take the %s because your inventory is full.\n", it[in].reference);

@@ -2013,6 +2013,7 @@ void answer_tarot(int cn, int co, int m)
 			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
 		}
+		else if (SEASON_CHECK(co, in)) ;
 		else
 		{
 			do_sayx(cn, "Or, erm... I would, but your inventory seems a bit full. Please come back less encumbered!");
