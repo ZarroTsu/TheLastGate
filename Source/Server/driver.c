@@ -9149,6 +9149,10 @@ void update_shop(int cn)
 			{
 				it[in].used = USE_EMPTY;
 			}
+			else
+			{
+				it[in].season = -1;
+			}
 		}
 	}
 
