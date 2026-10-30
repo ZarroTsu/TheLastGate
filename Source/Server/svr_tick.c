@@ -29,9 +29,9 @@ static char intro_msg1[] = {"Welcome to The Last Gate, based on the Mercenaries 
 static char intro_msg2_font = 1;
 static char intro_msg2[] = {"May your visit here be... interesting.\n"};
 static char intro_msg3_font = 3;
-static char intro_msg3[] = {"Current client/server version is 0.14.4\n"};
-static char intro_msg4_font = 0;
-static char intro_msg4[] = {"Skill trees have been overhauled and deallocated. Remember to reallocate before adventuring!\n"};
+static char intro_msg3[] = {"Current client/server version is 0.15.0\n"};
+static char intro_msg4_font = 1;
+static char intro_msg4[] = {"Season 1 is now live! To participate, create a new character and select the 'current' season!\n"};
 static char intro_msg5_font = 2;
 static char intro_msg5[] = {"For patch notes and changes, please visit our Discord using the Discord button on the load menu.\n"};
 
