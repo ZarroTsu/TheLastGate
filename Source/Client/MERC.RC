@@ -26,7 +26,7 @@ FONT 8, "MS Sans Serif"
 	LTEXT           "Game Mode:",         -1,              14,  90,  60,   8, WS_DISABLED
 	AUTORADIOBUTTON "Normal",             IDC_GAMENORM,    15, 100,  60,  12
 	AUTORADIOBUTTON "Hard Mode",          IDC_GAMEHARD,    15, 112,  60,  12//, WS_DISABLED
-	AUTORADIOBUTTON "Roguelike",          IDC_GAMEROGUE,   15, 124,  60,  12//, WS_DISABLED
+	AUTORADIOBUTTON "Roguelike",          IDC_GAMEROGUE,   15, 124,  60,  12, WS_DISABLED
 	
 	LTEXT           "Game Season:",       -1,              14, 142,  60,   8
 	AUTORADIOBUTTON "Legacy",             IDC_LEGACY,      15, 154,  60,  12

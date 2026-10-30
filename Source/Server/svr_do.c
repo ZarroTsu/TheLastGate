@@ -1415,6 +1415,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 6):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
 			do_char_log(cn, 1, "#tarot                 list tarot cards.\n");
 			if (ch[cn].house_id)
 				do_char_log(cn, 1, "#tavern                exit the game (@house).\n");
@@ -1442,6 +1443,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 5):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#seen <player>         when last seen here?.\n");
 			do_char_log(cn, 1, "#shield                list shield stats.\n");
 			do_char_log(cn, 1, "#shout <text>          to all players.\n");
 			if (IS_SEYAN_DU(cn))
@@ -1458,7 +1460,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#staff                 list staff stats.\n");
 			do_char_log(cn, 1, "#swap                  swap with facing player.\n");
 			do_char_log(cn, 1, "#sword                 list sword stats.\n");
-			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
 		}
 		else if (strcmp(topic, "4")==0)
 		{
@@ -1466,6 +1467,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 4):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#notell                you won't hear tells.\n");
 			do_char_log(cn, 1, "#opal                  list opal rings.\n");
 			do_char_log(cn, 1, "#override              you always spell self.\n");
 			do_char_log(cn, 1, "#poles <page>          lists unattained poles.\n");
@@ -1484,7 +1486,6 @@ void do_help(int cn, char *topic)
 			if (ch[cn].flags & CF_SENSE)
 				do_char_log(cn, 1, "#sense                 disable enemy spell msgs.\n");
 			do_char_log(cn, 1, "#silence               you won't hear enemies.\n");
-			do_char_log(cn, 1, "#seen <player>         when last seen here?.\n");
 		}
 		else if (strcmp(topic, "3")==0)
 		{
@@ -1494,6 +1495,7 @@ void do_help(int cn, char *topic)
 			//                 "!        .         .   |     .         .        !"
 			if (IS_ANY_HARA(cn) || IS_SEYAN_DU(cn))
 			{
+				do_char_log(cn, 1, "#gcbuff                display gc buff timers.\n");
 				do_char_log(cn, 1, "#gcmax                 list ghostcomp maximums.\n");
 				do_char_log(cn, 1, "#gctome                gc travels with you.\n");
 			}
@@ -1513,7 +1515,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#listskills <page>     list skill attributes.\n");
 			do_char_log(cn, 1, "#max                   list character maximums.\n");
 			do_char_log(cn, 1, "#noshout               you won't hear shouts.\n");
-			do_char_log(cn, 1, "#notell                you won't hear tells.\n");
 		}
 		else if (strcmp(topic, "2")==0)
 		{
@@ -1523,6 +1524,8 @@ void do_help(int cn, char *topic)
 			//                 "!        .         .   |     .         .        !"
 			do_char_log(cn, 1, "#bs                    display BS points.\n");
 			do_char_log(cn, 1, "#buffs                 display buff timers.\n");
+			if (IS_SEASONAL(cn))
+			do_char_log(cn, 1, "#challenges            list seasonal challenges.\n");
 			if (ch[cn].house_id)
 			do_char_log(cn, 1, "#change <thing> <val>  adjust house (@house).\n");
 			do_char_log(cn, 1, "#chars                 list your chars and xp.\n");
@@ -1536,10 +1539,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#fightback             toggle auto-fightback.\n");
 			do_char_log(cn, 1, "#follow <player|self>  you'll follow player.\n");
 			do_char_log(cn, 1, "#garbage               delete item from cursor.\n");
-			if (IS_ANY_HARA(cn) || IS_SEYAN_DU(cn))
-			{
-				do_char_log(cn, 1, "#gcbuff                display gc buff timers.\n");
-			}
 		}
 		else
 		{
@@ -3367,6 +3366,24 @@ void do_showrank(int cn)
 	}
 }
 
+void do_showchallengelist(int cn)
+{
+	int n;
+	
+	do_char_log(cn, 1, "Now listing seasonal challenges:\n");
+	do_char_log(cn, 1, " \n");
+	
+	for (n=0; n<13; n++)
+	{
+		if (ch[cn].challengebits & (1 << n))
+			do_char_log(cn, 6, "[X] %s.\n", get_challenge_name(n));
+		else
+			do_char_log(cn, 1, "[ ] %s.\n", get_challenge_name(n));
+	}
+	
+	do_char_log(cn, 1, " \n");
+}
+
 void do_showranklist(int cn)
 {
 	do_char_log(cn, 1, "Now listing total exp for each rank:\n");
@@ -4393,6 +4410,12 @@ void do_swap_chars(int cn)
 		return;
 	}
 	
+	if (IS_OFF_SEASON(cn, co))
+	{
+		do_char_log(cn, 0, "Sorry, you cannot swap places with %s. They are not in the same season as you.\n", ch[co].name);
+		return;
+	}
+	
 	/*
 	if (ch[cn].goto_x || ch[cn].goto_y)
 	{
@@ -4846,6 +4869,11 @@ void do_deposit(int cn, int g, int s, char *topic)
 			do_char_log(cn, 0, "That character doesn't exist.\n");
 			return;
 		}
+		if (ch[co].season == CURRENTSEASON && ch[cn].season != CURRENTSEASON)
+		{
+			do_char_log(cn, 0, "You're not allowed to give money to seasonal characters.\n");
+			return;
+		}
 	}
 
 	m = ch[cn].x + ch[cn].y * MAPX;
@@ -4905,6 +4933,11 @@ void do_withdraw(int cn, int g, int s, char *topic)
 		if (!co)
 		{
 			do_char_log(cn, 0, "That character doesn't exist.\n");
+			return;
+		}
+		if (ch[cn].season == CURRENTSEASON && ch[co].season != CURRENTSEASON)
+		{
+			do_char_log(cn, 0, "You're not allowed to withdraw money from out-of-season characters.\n");
 			return;
 		}
 	}
@@ -6165,6 +6198,12 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
+		if (prefix(cmd, "challenges") && IS_SEASONAL(cn))
+		{
+			do_showchallengelist(cn);
+			return;
+		}
+		;
 		if (prefix(cmd, "chars"))
 		{
 			do_showchars(cn);
@@ -7232,14 +7271,12 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
-		
 		if (prefix(cmd, "swap"))
 		{
 			do_swap_chars(cn);
 			return;
 		}
 		;
-		
 		if (prefix(cmd, "sword"))
 		{
 			do_listweapons(cn, "sword");
@@ -10573,6 +10610,7 @@ int do_char_can_see_item(int cn, int in)
 	if ((it[in].flags & IF_HIDDEN) && !IS_BUILDING(cn))
 	{
 		if (it[in].driver==57 && it[in].data[8] && IS_RB(cn)) return 1;
+		else if (it[in].temp==IT_CRYSTALPOLE && !IS_SEASONAL(cn)) return 0;
 		else d += it[in].data[9];
 	}
 	else if (rd<3 && d>200)

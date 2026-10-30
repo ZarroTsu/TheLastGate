@@ -306,6 +306,7 @@ struct area area[] = {
 	{ 389,  746,  441,  755, "Lizard Temple, Approach",        1},
 //   _x1_, _y1_, _x2_, _y2_, "Area Name",                      0 = in  /  1 = the  /  2 = on  /  3 = at
 	{ 366,  695,  424,  745, "Lizard Temple",                  1},
+	{ 343, 1507,  374, 1568, "Underground Passage",            1},
 	{ 366,  674,  388,  694, "The Beryl Jungle",               0},
 	{ 366,  746,  388,  755, "The Beryl Jungle",               0},
 	{ 310,  674,  365,  755, "The Beryl Jungle",               0},

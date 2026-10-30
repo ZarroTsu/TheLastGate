@@ -723,10 +723,10 @@
 #define IT_REWARD_AB		2974
 
 #define IT_REWARD_SEAS_1	1146 // Level 9 Soulstone
-#define IT_REWARD_SEAS_2	 142 // TODO: Change me!
+#define IT_REWARD_SEAS_2	3647 // Golden Grace Boots
 #define IT_REWARD_SEAS_3	2974 // Ancient Belt Scroll
 
-#define IT_CRYSTALPOLE		9999
+#define IT_CRYSTALPOLE		3648
 
 // -----
 

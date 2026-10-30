@@ -400,6 +400,7 @@ void remove_item_age(int in);
 int create_special_item(int temp, int gen_a, int gen_b, int gen_c);
 int killed_class(int cn, int val);
 char *get_class_name(int nr);
+char *get_challenge_name(int nr);
 void check_challenge(int cn, int val);
 void titlecase_str(char *str);
 int prefix(char *name, char *abbr);
