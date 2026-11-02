@@ -4808,6 +4808,7 @@ int use_crystal_sub(int cn, int in)
 	ch[cc].a_mana = 999999;
 
 	ch[cc].alignment = -RANDOM(7500);
+	ch[cc].season = -1;
 	
 	ss_item = RANDOM(200);
 	en_item = RANDOM(200);
@@ -5203,7 +5204,7 @@ int use_crystal_sub(int cn, int in)
 	{
 		tmp = RANDOM(43); if (tmp>=21) tmp+=IT_CH_FOOL_R-21; else tmp+=IT_CH_MAGI;
 		tmp = pop_create_item(tmp, cc); ch[cc].worn[WN_CHARM] = tmp; it[tmp].carried = cc;
-		xlog("  got %s", it[tmp].name); hasloot++;
+		xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 	}
 	
 	// New: Rings with 'big' gems.
@@ -5268,26 +5269,26 @@ int use_crystal_sub(int cn, int in)
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HEAL), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_MANA), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_END), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(40/(sss?4:1))==0 && base>(0+8))
 		{	switch(RANDOM(3))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
 				case  1: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		if (RANDOM(40/(sss?2:1))==0 && base>(0+16))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		if (RANDOM(100/(sss?4:1))==0 && base>(0+24))
 		{	switch(RANDOM(2))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 	}
 	else if (tier==1) // Tier 1: "base" ranges from  40 -  89
@@ -5299,7 +5300,7 @@ int use_crystal_sub(int cn, int in)
 				case  3: god_give_char(tmp = god_create_item(IT_RD_GHEAL), cc); break;
 				case  4: god_give_char(tmp = god_create_item(IT_RD_GMANA), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_GEND), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(60/(sss?4:1))==0 && base>(40+6))
 		{	switch(RANDOM(12))
@@ -5315,25 +5316,25 @@ int use_crystal_sub(int cn, int in)
 				case  9: god_give_char(tmp = god_create_item(IT_POT_S_MP), cc); break;
 				case 10: god_give_char(tmp = god_create_item(IT_POT_C_MP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		if (RANDOM(40/(sss?2:1))==0 && base>(40+12))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(60/(sss?3:1))==0 && base>(40+18))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		if (RANDOM(100/(sss?4:1))==0 && base>(40+24))
 		{	switch(RANDOM(2))
 			{	case  0: god_give_char(tmp = god_create_item(IT_RD_HP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_MP), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(120/(sss?4:1))==0 && base>(40+30))
 		{	switch(RANDOM(5))
@@ -5342,7 +5343,7 @@ int use_crystal_sub(int cn, int in)
 				case  2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
 				case  3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 	}
 	else if (tier==2)	// Tier 2: "base" ranges from  80 - 129
@@ -5363,35 +5364,35 @@ int use_crystal_sub(int cn, int in)
 				case 12: god_give_char(tmp = god_create_item(IT_POT_S_MP), cc); break;
 				case 13: god_give_char(tmp = god_create_item(IT_POT_C_MP), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_POT_L_MP), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(80/(sss?4:1))==0 && base>(80+4))
 		{	god_give_char(tmp = god_create_item(1985+RANDOM(15)), cc);
-			xlog("  got %s", it[tmp].name); hasloot++;
+			xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		if (RANDOM(40/(sss?2:1))==0 && base>(80+8))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYONE, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTONE, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(60/(sss?3:1))==0 && base>(80+12))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTWO, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTWO, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(80/(sss?4:1))==0 && base>(80+16))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYTHR, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTTHR, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		else if (RANDOM(100/(sss?5:1))==0 && base>(80+24))
 		{	switch(RANDOM(2))
 			{	case  0: tmp = ch[cc].worn[WN_NECK] = pop_create_item(IT_RD_AMMYFOU, cc); it[tmp].carried = cc; break;
 				default: tmp = ch[cc].worn[WN_BELT] = pop_create_item(IT_RD_BELTFOU, cc); it[tmp].carried = cc; break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 		if (RANDOM(120/(sss?4:1))==0 && base>(80+20))
 		{	switch(RANDOM(5))
@@ -5400,7 +5401,7 @@ int use_crystal_sub(int cn, int in)
 				case  2: god_give_char(tmp = god_create_item(IT_RD_INT), cc); break;
 				case  3: god_give_char(tmp = god_create_item(IT_RD_AGL), cc); break;
 				default: god_give_char(tmp = god_create_item(IT_RD_STR), cc); break;
-			}	xlog("  got %s", it[tmp].name); hasloot++;
+			}	xlog("  got %s", it[tmp].name); hasloot++; it[tmp].season = CURRENTSEASON;
 		}
 	}
 	if (!hasloot)
