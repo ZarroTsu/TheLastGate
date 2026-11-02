@@ -17376,7 +17376,7 @@ void do_look_char(int cn, int co, int godflag, int autoflag, int lootflag)
 			if (ch[co].season == CURRENTSEASON && CURRENTSEASON > 0)
 				do_char_log(cn, 9, "Season %d character.\n", ch[co].season);
 			
-			if (IS_HARDMODE(cn))
+			if (IS_HARDMODE(co))
 				do_char_log(cn, 0, "Hardmode character.\n");
 		}
 	}

@@ -667,7 +667,7 @@ int god_give_char(int in, int cn)
 	{
 		return 0;
 	}
-	if (IS_PLAYER(cn))
+	if (IS_PLAYER(cn) && !(ch[cn].flags & CF_BODY))
 	{
 		if (SEASON_CHECK(cn, in))
 		{
