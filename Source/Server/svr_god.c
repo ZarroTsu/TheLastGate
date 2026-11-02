@@ -3373,6 +3373,24 @@ void god_set_depth(int cn, int co, int v, int gflag)
 	}
 }
 
+void god_set_season(int cn, int co, int v)
+{
+	if (co == 0)
+	{
+		do_char_log(cn, 0, "No such character.\n");
+		return;
+	}
+	else if (!IS_SANECHAR(co))
+	{
+		do_char_log(cn, 0, "Bad character number: %d\n", co);
+		return;
+	}
+	
+	ch[co].season = v;
+	
+	do_char_log(cn, 1, "Set %s season to %d.\n", ch[co].name, v);
+}
+
 void god_give_points(int cn, int co, int v)
 {
 	if (co == 0)
@@ -4032,6 +4050,9 @@ void god_racechange(int co, int temp, int keepstuff)
 	ch[co].house_m      = old.house_m;
 	ch[co].house_layout = old.house_layout;
 	
+	ch[co].season        = old.season;
+	ch[co].challengebits = old.challengebits;
+	
 	ch[co].temple_x = ch[co].tavern_x = HOME_TEMPLE_X;
 	ch[co].temple_y = ch[co].tavern_y = HOME_TEMPLE_Y;
 	
@@ -4203,7 +4224,6 @@ void god_racechange(int co, int temp, int keepstuff)
 		if (old.kindred & KIN_IDENTIFY) ch[co].kindred |= KIN_IDENTIFY;
 		if (old.flags & CF_HARDMODE)    ch[co].flags   |= CF_HARDMODE;
 		
-		ch[co].season    = old.season;
 		ch[co].bs_points = old.bs_points;
 		ch[co].os_points = old.os_points;
 		ch[co].tokens    = old.tokens;

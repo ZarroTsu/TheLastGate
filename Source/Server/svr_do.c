@@ -4589,7 +4589,7 @@ void do_group(int cn, char *name)
 	if (name[0]==0)
 	{
 		do_char_log(cn, 1, "Your group consists of:\n");
-		do_char_log(cn, 1, "%-15.15s %d/%dH, %d/%dE, %d/%dM\n",
+		do_char_log(cn, 1, "%-15.15s %3d/%3dH, %3d/%3dE, %3d/%3dM\n",
 		            ch[cn].name,
 		            (ch[cn].a_hp + 500) / 1000,
 		            ch[cn].hp[5],
@@ -4605,7 +4605,7 @@ void do_group(int cn, char *name)
 			}
 			if (isgroup(co, cn))
 			{
-				do_char_log(cn, 1, "%-15.15s %d/%dH, %d/%dE, %d/%dM\n",
+				do_char_log(cn, 1, "%-15.15s %3d/%3dH, %3d/%3dE, %3d/%3dM\n",
 				            ch[co].name,
 				            (ch[co].a_hp + 500) / 1000,
 				            ch[co].hp[5],
@@ -7071,6 +7071,17 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "setpoints") && f_giu)
 		{
 			god_give_points(cn, dbatoi_self(cn, arg[1]), atoi(arg[2]));
+			return;
+		}
+		;
+		if (prefix(cmd, "setseaso"))
+		{
+			break;
+		}
+		;
+		if (prefix(cmd, "setseason") && f_giu)
+		{
+			god_set_season(cn, dbatoi_self(cn, arg[1]), atoi(arg[2]));
 			return;
 		}
 		;
@@ -15430,640 +15441,370 @@ void move_smith_item(int cn)
 
 void smith_mage_item(int in, int spr)
 {
-	int n;
+	int n, temp;
 	
+	// Get the NEXT item's template based on the current sprite.
+	// Current sprite is used in case this item has already been magestone'd.
+	switch (it[in].sprite[I_I])
+	{
+		case IT_SPR_DAGG_STEL: temp = IT_DAGG_GOLD; break;
+		case IT_SPR_DAGG_GOLD: temp = IT_DAGG_EMER; break;
+		case IT_SPR_DAGG_EMER: temp = IT_DAGG_CRYS; break;
+		case IT_SPR_DAGG_CRYS: temp = IT_DAGG_TITN; break;
+		case IT_SPR_DAGG_TITN: temp = IT_DAGG_DAMA; break;
+		case IT_SPR_DAGG_DAMA: temp = IT_DAGG_ADAM; break;
+		//
+		case IT_SPR_STAF_STEL: temp = IT_STAF_GOLD; break;
+		case IT_SPR_STAF_GOLD: temp = IT_STAF_EMER; break;
+		case IT_SPR_STAF_EMER: temp = IT_STAF_CRYS; break;
+		case IT_SPR_STAF_CRYS: temp = IT_STAF_TITN; break;
+		case IT_SPR_STAF_TITN: temp = IT_STAF_DAMA; break;
+		case IT_SPR_STAF_DAMA: temp = IT_STAF_ADAM; break;
+		//
+		case IT_SPR_SPEA_STEL: temp = IT_SPEA_GOLD; break;
+		case IT_SPR_SPEA_GOLD: temp = IT_SPEA_EMER; break;
+		case IT_SPR_SPEA_EMER: temp = IT_SPEA_CRYS; break;
+		case IT_SPR_SPEA_CRYS: temp = IT_SPEA_TITN; break;
+		case IT_SPR_SPEA_TITN: temp = IT_SPEA_DAMA; break;
+		case IT_SPR_SPEA_DAMA: temp = IT_SPEA_ADAM; break;
+		//
+		case IT_SPR_SHIE_STEL: temp = IT_SHIE_GOLD; break;
+		case IT_SPR_SHIE_GOLD: temp = IT_SHIE_EMER; break;
+		case IT_SPR_SHIE_EMER: temp = IT_SHIE_CRYS; break;
+		case IT_SPR_SHIE_CRYS: temp = IT_SHIE_TITN; break;
+		case IT_SPR_SHIE_TITN: temp = IT_SHIE_DAMA; break;
+		case IT_SPR_SHIE_DAMA: temp = IT_SHIE_ADAM; break;
+		//
+		case IT_SPR_SWOR_STEL: temp = IT_SWOR_GOLD; break;
+		case IT_SPR_SWOR_GOLD: temp = IT_SWOR_EMER; break;
+		case IT_SPR_SWOR_EMER: temp = IT_SWOR_CRYS; break;
+		case IT_SPR_SWOR_CRYS: temp = IT_SWOR_TITN; break;
+		case IT_SPR_SWOR_TITN: temp = IT_SWOR_DAMA; break;
+		case IT_SPR_SWOR_DAMA: temp = IT_SWOR_ADAM; break;
+		//
+		case IT_SPR_DUAL_STEL: temp = IT_DUAL_GOLD; break;
+		case IT_SPR_DUAL_GOLD: temp = IT_DUAL_EMER; break;
+		case IT_SPR_DUAL_EMER: temp = IT_DUAL_CRYS; break;
+		case IT_SPR_DUAL_CRYS: temp = IT_DUAL_TITN; break;
+		case IT_SPR_DUAL_TITN: temp = IT_DUAL_DAMA; break;
+		case IT_SPR_DUAL_DAMA: temp = IT_DUAL_ADAM; break;
+		//
+		case IT_SPR_CLAW_STEL: temp = IT_CLAW_GOLD; break;
+		case IT_SPR_CLAW_GOLD: temp = IT_CLAW_EMER; break;
+		case IT_SPR_CLAW_EMER: temp = IT_CLAW_CRYS; break;
+		case IT_SPR_CLAW_CRYS: temp = IT_CLAW_TITN; break;
+		case IT_SPR_CLAW_TITN: temp = IT_CLAW_DAMA; break;
+		case IT_SPR_CLAW_DAMA: temp = IT_CLAW_ADAM; break;
+		//
+		case IT_SPR_AXXE_STEL: temp = IT_AXXE_GOLD; break;
+		case IT_SPR_AXXE_GOLD: temp = IT_AXXE_EMER; break;
+		case IT_SPR_AXXE_EMER: temp = IT_AXXE_CRYS; break;
+		case IT_SPR_AXXE_CRYS: temp = IT_AXXE_TITN; break;
+		case IT_SPR_AXXE_TITN: temp = IT_AXXE_DAMA; break;
+		case IT_SPR_AXXE_DAMA: temp = IT_AXXE_ADAM; break;
+		//
+		case IT_SPR_THSW_STEL: temp = IT_THSW_GOLD; break;
+		case IT_SPR_THSW_GOLD: temp = IT_THSW_EMER; break;
+		case IT_SPR_THSW_EMER: temp = IT_THSW_CRYS; break;
+		case IT_SPR_THSW_CRYS: temp = IT_THSW_TITN; break;
+		case IT_SPR_THSW_TITN: temp = IT_THSW_DAMA; break;
+		case IT_SPR_THSW_DAMA: temp = IT_THSW_ADAM; break;
+		//
+		case IT_SPR_GAXE_STEL: temp = IT_GAXE_GOLD; break;
+		case IT_SPR_GAXE_GOLD: temp = IT_GAXE_EMER; break;
+		case IT_SPR_GAXE_EMER: temp = IT_GAXE_CRYS; break;
+		case IT_SPR_GAXE_CRYS: temp = IT_GAXE_TITN; break;
+		case IT_SPR_GAXE_TITN: temp = IT_GAXE_DAMA; break;
+		case IT_SPR_GAXE_DAMA: temp = IT_GAXE_ADAM; break;
+		//
+		case IT_SPR_HELM_BRNZ: temp = IT_HELM_STEL; break;
+		case IT_SPR_BODY_BRNZ: temp = IT_BODY_STEL; break;
+		case IT_SPR_HELM_STEL: temp = IT_HELM_GOLD; break;
+		case IT_SPR_BODY_STEL: temp = IT_BODY_GOLD; break;
+		case IT_SPR_HELM_GOLD: temp = IT_HELM_EMER; break;
+		case IT_SPR_BODY_GOLD: temp = IT_BODY_EMER; break;
+		case IT_SPR_HELM_EMER: temp = IT_HELM_CRYS; break;
+		case IT_SPR_BODY_EMER: temp = IT_BODY_CRYS; break;
+		case IT_SPR_HELM_CRYS: temp = IT_HELM_TITN; break;
+		case IT_SPR_BODY_CRYS: temp = IT_BODY_TITN; break;
+		case IT_SPR_HELM_TITN: temp = IT_HELM_ADAM; break;
+		case IT_SPR_BODY_TITN: temp = IT_BODY_ADAM; break;
+		case IT_SPR_HELM_CAST: temp = IT_HELM_ADEP; break;
+		case IT_SPR_BODY_CAST: temp = IT_BODY_ADEP; break;
+		case IT_SPR_HELM_ADEP: temp = IT_HELM_WIZR; break;
+		case IT_SPR_BODY_ADEP: temp = IT_BODY_WIZR; break;
+		case IT_SPR_HELM_LIZR: temp = IT_HELM_AZUR; break;
+		case IT_SPR_BODY_LIZR: temp = IT_BODY_AZUR; break;
+		case IT_SPR_HELM_MIDN: temp = IT_HELM_IVOR; break;
+		case IT_SPR_BODY_MIDN: temp = IT_BODY_IVOR; break;
+		//
+		default: break;
+	}
+	
+	// Equip requirements
+	{
+		for (n = 0; n < 5; n++) it[in].attrib[n][I_R] = it_temp[temp].attrib[n][I_R];
+		for (n = 0; n <50; n++) it[in].skill[n][I_R]  = it_temp[temp].skill[n][I_R];
+		it[in].power = it_temp[temp].power;
+		it[in].value = it_temp[temp].value;
+	}
+	
+	// Bonuses -- added in case the item was previously magestone'd
 	switch (it[in].sprite[I_I])
 	{
 		case IT_SPR_DAGG_STEL:
-			it[in].weapon[I_I]           +=   6;
-			it[in].to_parry[I_I]         +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  18;
-			it[in].attrib[AT_AGL][I_R]    =  14;
-			it[in].skill[SK_DAGGER][I_R] +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_DAGG_GOLD:
-			it[in].weapon[I_I]           +=   6;
-			it[in].to_parry[I_I]         +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  30;
-			it[in].attrib[AT_AGL][I_R]    =  16;
-			it[in].skill[SK_DAGGER][I_R] +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_DAGG_EMER:
-			it[in].weapon[I_I]           +=   6;
-			it[in].to_parry[I_I]         +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  48;
-			it[in].attrib[AT_AGL][I_R]    =  20;
-			it[in].skill[SK_DAGGER][I_R] +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_DAGG_CRYS:
 			it[in].weapon[I_I]           +=   6;
-			it[in].to_parry[I_I]         +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  72;
-			it[in].attrib[AT_AGL][I_R]    =  24;
-			it[in].skill[SK_DAGGER][I_R] +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].to_parry[I_I]         +=   1;
 			break;
 		case IT_SPR_DAGG_TITN:
-			it[in].weapon[I_I]           +=   4;
-			it[in].attrib[AT_WIL][I_R]    =  87;
-			it[in].attrib[AT_AGL][I_R]    =  27;
-			it[in].skill[SK_DAGGER][I_R] +=  10;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].weapon[I_I]           +=   3;
+			it[in].to_parry[I_I]         +=   1;
+			it[in].attrib[AT_WIL][I_I]   +=   1;
 			break;
 		case IT_SPR_DAGG_DAMA:
-			it[in].attrib[AT_WIL][I_R]    = 102; it[in].attrib[AT_WIL][I_I]   +=   4;
-			it[in].attrib[AT_AGL][I_R]    =  30; it[in].attrib[AT_AGL][I_I]   +=   2;
-			it[in].value   = it[in].value * 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   3;
+			it[in].to_parry[I_I]         +=   1;
+			it[in].attrib[AT_WIL][I_I]   +=   1;
+			it[in].attrib[AT_AGL][I_I]   +=   1;
 			break;
 		//
-		case IT_SPR_STAF_STEL:
-			it[in].weapon[I_I]           +=   4;
-			it[in].attrib[AT_INT][I_I]   +=   1;
-			it[in].attrib[AT_INT][I_R]    =  21;
-			it[in].attrib[AT_STR][I_R]    =  14;
-			it[in].skill[SK_STAFF][I_R]  +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_STAF_GOLD:
-			it[in].weapon[I_I]           +=   4;
-			it[in].attrib[AT_INT][I_I]   +=   1;
-			it[in].attrib[AT_INT][I_R]    =  35;
-			it[in].attrib[AT_STR][I_R]    =  16;
-			it[in].skill[SK_STAFF][I_R]  +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_STAF_CRYS: 
+			it[in].spell_pow[I_I]        +=   1;
+		case IT_SPR_STAF_STEL:
 		case IT_SPR_STAF_EMER:
 			it[in].weapon[I_I]           +=   4;
 			it[in].attrib[AT_INT][I_I]   +=   1;
-			it[in].attrib[AT_INT][I_R]    =  56;
-			it[in].attrib[AT_STR][I_R]    =  20;
-			it[in].skill[SK_STAFF][I_R]  +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
-		case IT_SPR_STAF_CRYS:
-			it[in].weapon[I_I]           +=   4;
-			it[in].attrib[AT_INT][I_I]   +=   1;
-			it[in].attrib[AT_INT][I_R]    =  84;
-			it[in].attrib[AT_STR][I_R]    =  24;
-			it[in].skill[SK_STAFF][I_R]  +=  10;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
 			break;
 		case IT_SPR_STAF_TITN:
 			it[in].weapon[I_I]           +=   2;
-			it[in].attrib[AT_INT][I_R]    = 102;
-			it[in].attrib[AT_STR][I_R]    =  27;
-			it[in].skill[SK_STAFF][I_R]  +=  10;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].attrib[AT_INT][I_I]   +=   2;
 			break;
 		case IT_SPR_STAF_DAMA:
-			it[in].attrib[AT_INT][I_R]    = 120; it[in].attrib[AT_INT][I_I]   +=   4;
-			it[in].attrib[AT_STR][I_R]    =  30; it[in].attrib[AT_STR][I_I]   +=   2;
-			it[in].value   = it[in].value * 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   2;
+			it[in].spell_pow[I_I]        +=   1;
+			it[in].attrib[AT_INT][I_I]   +=   2;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		//
-		case IT_SPR_SPEA_STEL: // SK_DAGGER SK_STAFF
-			it[in].weapon[I_I]           +=  10;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_WIL][I_I]   +=   2;
-			it[in].to_hit[I_I]           +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  22;
-			it[in].attrib[AT_STR][I_R]    =  14;
-			it[in].skill[SK_DAGGER][I_R] +=   8;
-			it[in].skill[SK_STAFF][I_R]  +=   8;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_SPEA_STEL:
 		case IT_SPR_SPEA_GOLD:
-			it[in].weapon[I_I]           +=  10;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_WIL][I_I]   +=   2;
-			it[in].to_hit[I_I]           +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  34;
-			it[in].attrib[AT_STR][I_R]    =  16;
-			it[in].skill[SK_DAGGER][I_R] +=   8;
-			it[in].skill[SK_STAFF][I_R]  +=   8;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_SPEA_EMER:
-			it[in].weapon[I_I]           +=  10;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_WIL][I_I]   +=   2;
-			it[in].to_hit[I_I]           +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  52;
-			it[in].attrib[AT_STR][I_R]    =  20;
-			it[in].skill[SK_DAGGER][I_R] +=   8;
-			it[in].skill[SK_STAFF][I_R]  +=   8;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_SPEA_CRYS:
 			it[in].weapon[I_I]           +=  10;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_WIL][I_I]   +=   2;
-			it[in].to_hit[I_I]           +=   2;
-			it[in].attrib[AT_WIL][I_R]    =  76;
-			it[in].attrib[AT_STR][I_R]    =  24;
-			it[in].skill[SK_DAGGER][I_R] +=   8;
-			it[in].skill[SK_STAFF][I_R]  +=   8;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].spell_pow[I_I]        +=   1;
+			it[in].attrib[AT_WIL][I_I]   +=   1;
+			it[in].skill[SK_RESIST][I_I] +=   1;
 			break;
 		case IT_SPR_SPEA_TITN:
 			it[in].weapon[I_I]           +=   5;
-			it[in].attrib[AT_WIL][I_R]    =  90;
-			it[in].attrib[AT_STR][I_R]    =  27;
-			it[in].skill[SK_DAGGER][I_R] +=   8;
-			it[in].skill[SK_STAFF][I_R]  +=   8;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].spell_pow[I_I]        +=   1;
+			it[in].attrib[AT_WIL][I_I]   +=   2;
+			it[in].attrib[AT_INT][I_I]   +=   1;
+			it[in].skill[SK_RESIST][I_I] +=   1;
 			break;
 		case IT_SPR_SPEA_DAMA:
-			it[in].attrib[AT_WIL][I_R]    = 105; it[in].attrib[AT_WIL][I_R]   +=   2;
-			                                     it[in].attrib[AT_INT][I_R]   +=   2;
-			                                     it[in].attrib[AT_AGL][I_R]   +=   1;
-			it[in].attrib[AT_STR][I_R]    =  30; it[in].attrib[AT_STR][I_R]   +=   1;
-			it[in].value   = it[in].value * 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   5;
+			it[in].spell_pow[I_I]        +=   1;
+			it[in].attrib[AT_WIL][I_I]   +=   2;
+			it[in].attrib[AT_INT][I_I]   +=   1;
+			it[in].attrib[AT_AGL][I_I]   +=   1;
+			it[in].attrib[AT_STR][I_I]   +=   1;
+			it[in].skill[SK_RESIST][I_I] +=   1;
 			break;
 		//
-		case IT_SPR_SHIE_STEL: // SK_SHIELD
-			it[in].armor[I_I]            +=   4;
-			it[in].attrib[AT_BRV][I_R]    =  18;
-			it[in].skill[SK_SHIELD][I_R] +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_SHIE_STEL:
 		case IT_SPR_SHIE_GOLD:
-			it[in].armor[I_I]            +=   4;
-			it[in].attrib[AT_BRV][I_R]    =  28;
-			it[in].skill[SK_SHIELD][I_R] +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_SHIE_EMER:
-			it[in].armor[I_I]            +=   4;
-			it[in].attrib[AT_BRV][I_R]    =  42;
-			it[in].skill[SK_SHIELD][I_R] +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_SHIE_CRYS:
 			it[in].armor[I_I]            +=   4;
-			it[in].attrib[AT_BRV][I_R]    =  60;
-			it[in].skill[SK_SHIELD][I_R] +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
 			break;
 		case IT_SPR_SHIE_TITN:
 			it[in].armor[I_I]            +=   2;
-			it[in].attrib[AT_BRV][I_R]    =  71;
-			it[in].skill[SK_SHIELD][I_R] +=  12;
-			it[in].power                 +=  15;
-			it[in].value                 *= 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].attrib[AT_BRV][I_I]   +=   1;
 			break;
 		case IT_SPR_SHIE_DAMA:
-			it[in].attrib[AT_BRV][I_R]    =  82; it[in].attrib[AT_BRV][I_I]   +=   2;
-			                                     it[in].attrib[AT_WIL][I_I]   +=   2;
-			                                     it[in].attrib[AT_STR][I_I]   +=   2;
-			it[in].value                 *= 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].armor[I_I]            +=   2;
+			it[in].attrib[AT_WIL][I_I]   +=   1;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		//
-		case IT_SPR_SWOR_STEL: // SK_SWORD
-			it[in].weapon[I_I]           +=   8;
-			it[in].attrib[AT_AGL][I_R]    =  22;
-			it[in].attrib[AT_STR][I_R]    =  16;
-			it[in].skill[SK_SWORD][I_R]  +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_SWOR_STEL:
 		case IT_SPR_SWOR_GOLD:
-			it[in].weapon[I_I]           +=   8;
-			it[in].attrib[AT_AGL][I_R]    =  30;
-			it[in].attrib[AT_STR][I_R]    =  22;
-			it[in].skill[SK_SWORD][I_R]  +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_SWOR_EMER:
-			it[in].weapon[I_I]           +=   8;
-			it[in].attrib[AT_AGL][I_R]    =  40;
-			it[in].attrib[AT_STR][I_R]    =  30;
-			it[in].skill[SK_SWORD][I_R]  +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_SWOR_CRYS:
 			it[in].weapon[I_I]           +=   8;
-			it[in].attrib[AT_AGL][I_R]    =  52;
-			it[in].attrib[AT_STR][I_R]    =  40;
-			it[in].skill[SK_SWORD][I_R]  +=  12;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].attrib[AT_BRV][I_I]   +=   1;
 			break;
 		case IT_SPR_SWOR_TITN:
 			it[in].weapon[I_I]           +=   4;
-			it[in].attrib[AT_AGL][I_R]    =  60;
-			it[in].attrib[AT_STR][I_R]    =  53;
-			it[in].skill[SK_SWORD][I_R]  +=  12;
-			it[in].power                 +=  15;
-			it[in].value                 *= 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].attrib[AT_BRV][I_I]   +=   2;
 			break;
 		case IT_SPR_SWOR_DAMA:
-			                                     it[in].attrib[AT_BRV][I_I]   +=   2;
-			it[in].attrib[AT_AGL][I_R]    =  68; it[in].attrib[AT_AGL][I_I]   +=   2;
-			it[in].attrib[AT_STR][I_R]    =  66; it[in].attrib[AT_STR][I_I]   +=   2;
-			it[in].value                 *= 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   4;
+			it[in].attrib[AT_BRV][I_I]   +=   1;
+			it[in].attrib[AT_AGL][I_I]   +=   1;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		//
-		case IT_SPR_DUAL_STEL: // SK_DUAL
-			it[in].weapon[I_I]           +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  16;
-			it[in].attrib[AT_STR][I_R]    =  22;
-			it[in].skill[SK_DUAL][I_R]   +=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_DUAL_STEL:
 		case IT_SPR_DUAL_GOLD:
-			it[in].weapon[I_I]           +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  22;
-			it[in].attrib[AT_STR][I_R]    =  30;
-			it[in].skill[SK_DUAL][I_R]   +=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_DUAL_EMER:
-			it[in].weapon[I_I]           +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  30;
-			it[in].attrib[AT_STR][I_R]    =  40;
-			it[in].skill[SK_DUAL][I_R]   +=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_DUAL_CRYS:
 			it[in].weapon[I_I]           +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  40;
-			it[in].attrib[AT_STR][I_R]    =  52;
-			it[in].skill[SK_DUAL][I_R]   +=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].to_hit[I_I]           +=   1;
 			break;
 		case IT_SPR_DUAL_TITN:
 			it[in].weapon[I_I]           +=   3;
-			it[in].attrib[AT_AGL][I_R]    =  53;
-			it[in].attrib[AT_STR][I_R]    =  60;
-			it[in].skill[SK_DUAL][I_R]   +=  15;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].to_hit[I_I]           +=   1;
+			it[in].attrib[AT_AGL][I_I]   +=   1;
 			break;
 		case IT_SPR_DUAL_DAMA:
-			                                     it[in].attrib[AT_BRV][I_I]   +=   2;
-			it[in].attrib[AT_AGL][I_R]    =  66; it[in].attrib[AT_AGL][I_I]   +=   2;
-			it[in].attrib[AT_STR][I_R]    =  68; it[in].attrib[AT_STR][I_I]   +=   2;
-			it[in].value                 *= 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   3;
+			it[in].to_hit[I_I]           +=   1;
+			it[in].attrib[AT_BRV][I_I]   +=   1;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		//
-		case IT_SPR_CLAW_STEL: // SK_HAND
-			it[in].weapon[I_I]           +=  10;
-			it[in].top_damage[I_I]       +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  25;
-			it[in].attrib[AT_STR][I_R]    =  18;
-			it[in].skill[SK_HAND][I_R]   +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_CLAW_STEL:
 		case IT_SPR_CLAW_GOLD:
-			it[in].weapon[I_I]           +=  10;
-			it[in].top_damage[I_I]       +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  40;
-			it[in].attrib[AT_STR][I_R]    =  28;
-			it[in].skill[SK_HAND][I_R]   +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_CLAW_EMER:
-			it[in].weapon[I_I]           +=  10;
-			it[in].top_damage[I_I]       +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  60;
-			it[in].attrib[AT_STR][I_R]    =  42;
-			it[in].skill[SK_HAND][I_R]   +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_CLAW_CRYS:
-			it[in].weapon[I_I]           +=  10;
-			it[in].top_damage[I_I]       +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  85;
-			it[in].attrib[AT_STR][I_R]    =  60;
-			it[in].skill[SK_HAND][I_R]   +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].weapon[I_I]           +=  12;
+			it[in].gethit_dam[I_I]       +=   6;
+			it[in].attrib[AT_AGL][I_I]   +=   1;
 			break;
 		case IT_SPR_CLAW_TITN:
-			it[in].weapon[I_I]           +=   5;
-			it[in].top_damage[I_I]       +=   2;
-			it[in].attrib[AT_AGL][I_R]    = 100;
-			it[in].attrib[AT_STR][I_R]    =  71;
-			it[in].skill[SK_HAND][I_R]   +=  16;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].weapon[I_I]           +=   6;
+			it[in].gethit_dam[I_I]       +=   1;
+			it[in].attrib[AT_AGL][I_I]   +=   3;
 			break;
 		case IT_SPR_CLAW_DAMA:
-			it[in].attrib[AT_AGL][I_R]    = 100; it[in].attrib[AT_AGL][I_I]   +=   4;
-			it[in].attrib[AT_STR][I_R]    =  71; it[in].attrib[AT_STR][I_I]   +=   2;
-			it[in].value                 *= 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   6;
+			it[in].gethit_dam[I_I]       +=   1;
+			it[in].attrib[AT_AGL][I_I]   +=   3;
+			it[in].attrib[AT_STR][I_I]   +=   2;
 			break;
 		//
-		case IT_SPR_AXXE_STEL: // SK_AXE
-			it[in].weapon[I_I]           +=  10;
-			it[in].attrib[AT_AGL][I_R]    =  18;
-			it[in].attrib[AT_STR][I_R]    =  22;
-			it[in].skill[SK_AXE][I_R]    +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_AXXE_STEL:
 		case IT_SPR_AXXE_GOLD:
-			it[in].weapon[I_I]           +=  10;
-			it[in].attrib[AT_AGL][I_R]    =  28;
-			it[in].attrib[AT_STR][I_R]    =  34;
-			it[in].skill[SK_AXE][I_R]    +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_AXXE_EMER:
-			it[in].weapon[I_I]           +=  10;
-			it[in].attrib[AT_AGL][I_R]    =  42;
-			it[in].attrib[AT_STR][I_R]    =  50;
-			it[in].skill[SK_AXE][I_R]    +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_AXXE_CRYS:
 			it[in].weapon[I_I]           +=  10;
-			it[in].attrib[AT_AGL][I_R]    =  60;
-			it[in].attrib[AT_STR][I_R]    =  74;
-			it[in].skill[SK_AXE][I_R]    +=  16;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		case IT_SPR_AXXE_TITN:
-			it[in].weapon[I_I]           +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  71;
-			it[in].attrib[AT_STR][I_R]    =  88;
-			it[in].skill[SK_AXE][I_R]    +=  16;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].weapon[I_I]           +=   5;
+			it[in].attrib[AT_STR][I_I]   +=   3;
 			break;
 		case IT_SPR_AXXE_DAMA:
-			it[in].attrib[AT_AGL][I_R]    =  82; it[in].attrib[AT_AGL][I_I]   +=   2;
-			it[in].attrib[AT_STR][I_R]    = 102; it[in].attrib[AT_STR][I_I]   +=   4;
-			it[in].value                 *= 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   5;
+			it[in].attrib[AT_AGL][I_I]   +=   1;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		//
-		case IT_SPR_THSW_STEL: // SK_TWOHAND
-			it[in].weapon[I_I]           +=  12;
-			it[in].crit_multi[I_I]       +=   5;
-			it[in].atk_speed[I_I]        +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  26;
-			it[in].attrib[AT_STR][I_R]    =  20;
-			it[in].skill[SK_TWOHAND][I_R]+=  18;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_THSW_STEL:
 		case IT_SPR_THSW_GOLD:
-			it[in].weapon[I_I]           +=  12;
-			it[in].crit_multi[I_I]       +=   5;
-			it[in].atk_speed[I_I]        +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  40;
-			it[in].attrib[AT_STR][I_R]    =  32;
-			it[in].skill[SK_TWOHAND][I_R]+=  18;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_THSW_EMER:
-			it[in].weapon[I_I]           +=  12;
-			it[in].crit_multi[I_I]       +=   5;
-			it[in].atk_speed[I_I]        +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  58;
-			it[in].attrib[AT_STR][I_R]    =  48;
-			it[in].skill[SK_TWOHAND][I_R]+=  18;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_THSW_CRYS:
 			it[in].weapon[I_I]           +=  12;
 			it[in].crit_multi[I_I]       +=   5;
-			it[in].atk_speed[I_I]        +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  80;
-			it[in].attrib[AT_STR][I_R]    =  68;
-			it[in].skill[SK_TWOHAND][I_R]+=  18;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].skill[SK_IMMUN][I_I]  +=   1;
 			break;
 		case IT_SPR_THSW_TITN:
-			it[in].weapon[I_I]           +=   7;
-			it[in].attrib[AT_AGL][I_R]    =  92;
-			it[in].attrib[AT_STR][I_R]    =  80;
-			it[in].skill[SK_TWOHAND][I_R]+=  18;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
-			it[in].atk_speed[I_I]        +=   3; it[in].cast_speed[I_I]       +=   3;
+			it[in].weapon[I_I]           +=   6;
+			it[in].crit_multi[I_I]       +=   5;
+			it[in].attrib[AT_AGL][I_I]   +=   2;
+			it[in].skill[SK_IMMUN][I_I]  +=   1;
 			break;
 		case IT_SPR_THSW_DAMA:
-			it[in].attrib[AT_AGL][I_R]    = 105; it[in].attrib[AT_AGL][I_I]   +=   4;
-			it[in].attrib[AT_STR][I_R]    =  92; it[in].attrib[AT_STR][I_I]   +=   2;
-			it[in].value                 *= 4/3;
-			it[in].atk_speed[I_I]        -=   3; it[in].cast_speed[I_I]       -=   3;
+			it[in].weapon[I_I]           +=   6;
+			it[in].crit_multi[I_I]       +=   5;
+			it[in].attrib[AT_AGL][I_I]   +=   2;
+			it[in].attrib[AT_STR][I_I]   +=   2;
+			it[in].skill[SK_IMMUN][I_I]  +=   1;
 			break;
 		//
-		case IT_SPR_GAXE_STEL: // SK_TWOHAND SK_AXE
-			it[in].weapon[I_I]           +=  14;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  20;
-			it[in].attrib[AT_STR][I_R]    =  24;
-			it[in].skill[SK_AXE][I_R]    +=  15;
-			it[in].skill[SK_TWOHAND][I_R]+=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
+		case IT_SPR_GAXE_STEL:
 		case IT_SPR_GAXE_GOLD:
-			it[in].weapon[I_I]           +=  14;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  32;
-			it[in].attrib[AT_STR][I_R]    =  40;
-			it[in].skill[SK_AXE][I_R]    +=  15;
-			it[in].skill[SK_TWOHAND][I_R]+=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   4;
-			break;
 		case IT_SPR_GAXE_EMER:
-			it[in].weapon[I_I]           +=  14;
-			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  48;
-			it[in].attrib[AT_STR][I_R]    =  62;
-			it[in].skill[SK_AXE][I_R]    +=  15;
-			it[in].skill[SK_TWOHAND][I_R]+=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   3;
-			break;
 		case IT_SPR_GAXE_CRYS:
 			it[in].weapon[I_I]           +=  14;
 			it[in].armor[I_I]            +=   1;
-			it[in].attrib[AT_AGL][I_R]    =  68;
-			it[in].attrib[AT_STR][I_R]    =  90;
-			it[in].skill[SK_AXE][I_R]    +=  15;
-			it[in].skill[SK_TWOHAND][I_R]+=  15;
-			it[in].power                 +=  10;
-			it[in].value                 *=   2;
+			it[in].top_damage[I_I]       +=   2;
+			it[in].attrib[AT_STR][I_I]   +=   1;
 			break;
 		case IT_SPR_GAXE_TITN:
-			it[in].weapon[I_I]           +=   6;
-			it[in].attrib[AT_AGL][I_R]    =  80;
-			it[in].attrib[AT_STR][I_R]    = 107;
-			it[in].skill[SK_AXE][I_R]    +=  15;
-			it[in].skill[SK_TWOHAND][I_R]+=  15;
-			it[in].power                 +=  15;
-			it[in].value   = it[in].value * 3/2;
+			it[in].weapon[I_I]           +=   7;
+			it[in].armor[I_I]            +=   1;
+			it[in].top_damage[I_I]       +=   2;
+			it[in].attrib[AT_STR][I_I]   +=   3;
 			break;
 		case IT_SPR_GAXE_DAMA:
-			it[in].attrib[AT_AGL][I_R]    =  92; it[in].attrib[AT_AGL][I_I]   +=   2;
-			it[in].attrib[AT_STR][I_R]    = 124; it[in].attrib[AT_STR][I_I]   +=   4;
-			it[in].value                 *= 4/3;
+			it[in].weapon[I_I]           +=   7;
+			it[in].armor[I_I]            +=   1;
+			it[in].top_damage[I_I]       +=   2;
+			it[in].attrib[AT_AGL][I_I]   +=   2;
+			it[in].attrib[AT_STR][I_I]   +=   3;
 			break;
 		//
-		case IT_SPR_HELM_BRNZ:           it[in].armor[I_I] += 1;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 24;
-			it[in].power = 20;           it[in].value =  100;
-			break;
-		case IT_SPR_HELM_STEL:           it[in].armor[I_I] += 1;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 34;
-			it[in].power = 30;           it[in].value =  250;
-			break;
-		case IT_SPR_HELM_GOLD:           it[in].armor[I_I] += 1;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 48;
-			it[in].power = 40;           it[in].value =  500;
-			break;
-		case IT_SPR_HELM_EMER:           it[in].armor[I_I] += 1;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 64;
-			it[in].power = 50;           it[in].value = 1000;
-			break;
-		case IT_SPR_HELM_CRYS:           it[in].armor[I_I] += 1;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 84;
-			it[in].power = 60;           it[in].value = 2500;
+		case IT_SPR_HELM_BRNZ:
+		case IT_SPR_HELM_STEL:
+		case IT_SPR_HELM_GOLD:
+		case IT_SPR_HELM_EMER:
+		case IT_SPR_HELM_CRYS:
+			it[in].armor[I_I] += 1;
 			break;
 		case IT_SPR_HELM_TITN:
 			it[in].armor[I_I] += 1;
 			for (n=0;n<5;n++) it[in].attrib[n][I_I] += 1;
 			it[in].end[I_I] += 5;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 105;
-			it[in].power = 75;           it[in].value = 5000;
 			break;
 		case IT_SPR_HELM_CAST:           it[in].armor[I_I] += 1;
-			it[in].attrib[AT_WIL][I_R] = it[in].attrib[AT_INT][I_R] = 60;
-			it[in].power = 45;           it[in].value = 1200;
 			break;
 		case IT_SPR_HELM_ADEP:           it[in].armor[I_I] += 1;
 			it[in].mana[I_I] += 10;      it[in].cast_speed[I_I] += 1;
-			it[in].attrib[AT_WIL][I_R] = it[in].attrib[AT_INT][I_R] = 90;
-			it[in].power = 60;           it[in].value = 3000;
 			break;
 		case IT_SPR_HELM_LIZR:           it[in].armor[I_I] += 2;
 			it[in].weapon[I_I] -= 1;     it[in].top_damage[I_I] -= 1;
 			it[in].spell_apt[I_I] += 1;  it[in].atk_speed[I_I] += 2;
-			it[in].attrib[AT_WIL][I_R] = 72;
-			it[in].attrib[AT_AGL][I_R] = 90;
-			it[in].attrib[AT_STR][I_R] = 0;
-			it[in].power = 75;           it[in].value = 4000;
 			break;
 		case IT_SPR_HELM_MIDN:           it[in].armor[I_I] += 2;
 			it[in].move_speed[I_I] -= 2; it[in].skill[SK_STEALTH][I_I] -= 2;
 			it[in].cool_bonus[I_I] += 2; it[in].skill[SK_PERCEPT][I_I] += 2;
-			it[in].attrib[AT_WIL][I_R] = 90;
-			it[in].attrib[AT_INT][I_R] = 0;
-			it[in].attrib[AT_AGL][I_R] = 72;
-			it[in].power = 75;           it[in].value = 4000;
 			break;
 		//
-		case IT_SPR_BODY_BRNZ:           it[in].armor[I_I] += 2;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 24;
-			it[in].power = 20;           it[in].value =  100;
-			break;
-		case IT_SPR_BODY_STEL:           it[in].armor[I_I] += 2;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 34;
-			it[in].power = 30;           it[in].value =  250;
-			break;
-		case IT_SPR_BODY_GOLD:           it[in].armor[I_I] += 2;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 48;
-			it[in].power = 40;           it[in].value =  500;
-			break;
-		case IT_SPR_BODY_EMER:           it[in].armor[I_I] += 2;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 64;
-			it[in].power = 50;           it[in].value = 1000;
-			break;
-		case IT_SPR_BODY_CRYS:           it[in].armor[I_I] += 2;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 84;
-			it[in].power = 60;           it[in].value = 2500;
+		case IT_SPR_BODY_BRNZ:
+		case IT_SPR_BODY_STEL:
+		case IT_SPR_BODY_GOLD:
+		case IT_SPR_BODY_EMER:
+		case IT_SPR_BODY_CRYS:
+			it[in].armor[I_I] += 2;
 			break;
 		case IT_SPR_BODY_TITN:
 			it[in].armor[I_I] += 2;
 			for (n=0;n<5;n++) it[in].attrib[n][I_I] += 2;
 			it[in].end[I_I] += 10;
-			it[in].attrib[AT_AGL][I_R] = it[in].attrib[AT_STR][I_R] = 105;
-			it[in].power = 75;           it[in].value = 5000;
 			break;
 		//
-		case IT_SPR_BODY_CAST:           it[in].armor[I_I] += 2;
-			it[in].attrib[AT_WIL][I_R] = it[in].attrib[AT_INT][I_R] = 60;
-			it[in].power = 45;           it[in].value = 1200;
+		case IT_SPR_BODY_CAST:
+			it[in].armor[I_I] += 2;
 			break;
-		case IT_SPR_BODY_ADEP:           it[in].armor[I_I] += 2;
+		case IT_SPR_BODY_ADEP:
+			it[in].armor[I_I] += 2;
 			it[in].mana[I_I] += 20;      it[in].cast_speed[I_I] += 2;
-			it[in].attrib[AT_WIL][I_R] = it[in].attrib[AT_INT][I_R] = 90;
-			it[in].power = 60;           it[in].value = 3000;
 			break;
-		case IT_SPR_BODY_LIZR:           it[in].armor[I_I] += 4;
+		case IT_SPR_BODY_LIZR:
+			it[in].armor[I_I] += 4;
 			it[in].weapon[I_I] -= 2;     it[in].top_damage[I_I] -= 2;
 			it[in].spell_apt[I_I] += 2;  it[in].atk_speed[I_I] += 4;
-			it[in].attrib[AT_WIL][I_R] = 72;
-			it[in].attrib[AT_AGL][I_R] = 90;
-			it[in].attrib[AT_STR][I_R] = 0;
-			it[in].power = 75;           it[in].value = 4000;
 			break;
 		case IT_SPR_BODY_MIDN:           it[in].armor[I_I] += 4;
 			it[in].move_speed[I_I] -= 4; it[in].skill[SK_STEALTH][I_I] -= 4;
 			it[in].cool_bonus[I_I] += 4; it[in].skill[SK_PERCEPT][I_I] += 4;
-			it[in].attrib[AT_WIL][I_R] = 90;
-			it[in].attrib[AT_INT][I_R] = 0;
-			it[in].attrib[AT_AGL][I_R] = 72;
-			it[in].power = 75;           it[in].value = 4000;
 			break;
 		//
 		default: break;

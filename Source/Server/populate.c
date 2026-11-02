@@ -487,6 +487,7 @@ int pop_create_char(int n, int drop)
 	ch[cn].pass1 = RANDOM(0x3fffffff);
 	ch[cn].pass2 = RANDOM(0x3fffffff);
 	ch[cn].temp  = n;
+	ch[cn].season= -1;
 
 	for (m = 0; m<MAXITEMS; m++)
 	{

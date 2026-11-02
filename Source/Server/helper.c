@@ -1192,17 +1192,35 @@ int get_casino_scroll()
 {
 	static int item[] = {
 		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
+		IT_POP_SPELL, IT_POP_SPELL+1, IT_POP_SPELL+2, IT_POP_SPELL+3, IT_POP_SPELL+4, IT_POP_SPELL+5, IT_POP_SPELL+6,
 		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		IT_POP_ASPEL, IT_POP_ASPEL+1, IT_POP_ASPEL+2, IT_POP_ASPEL+3, IT_POP_ASPEL+4, IT_POP_ASPEL+5, IT_POP_ASPEL+6, 
+		IT_POP_ISPEL, IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6, 
 		IT_POP_ISPEL, IT_POP_ISPEL+1, IT_POP_ISPEL+2, IT_POP_ISPEL+3, IT_POP_ISPEL+4, IT_POP_ISPEL+5, IT_POP_ISPEL+6, 
 		IT_POP_SSPEL, IT_POP_SSPEL+1, IT_POP_SSPEL+2, IT_POP_SSPEL+3, IT_POP_SSPEL+4, IT_POP_SSPEL+5, IT_POP_SSPEL+6, 
 		
-		IT_EXPS, IT_LUKS, IT_RD_HP, IT_RD_MP, 2475,
+		IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, IT_EXPS, 
+		IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, IT_LUKS, 
+		IT_RD_HP, IT_RD_HP, IT_RD_MP, IT_RD_MP, 
 		
-		2120, 2121, 2122, 2488, 2923, 2924, 2962, 
-		1928, 1929, 1930, 1931, 1932, 1933, 1934, 
+		2475, 2475, 2475, 2126, 2126, 2126, 3424, 3424, 3424,
+		2488, 2488, 2488, 2488, 2488, 2488, 2488, 
+		2120, 2120, 2120, 2120, 2120, 2120, 
+		2121, 2121, 2121, 2121, 2121, 
+		2122, 2122, 2122, 2122, 2962, 2962, 2923, 2924, 
+		1928, 1929, 1930, 1931, 1932, 1933, 1934, 2557, 
 		
 		IT_RD_BRV, IT_RD_WIL, IT_RD_INT, IT_RD_AGL, IT_RD_STR,
-		IT_OS_BRV, IT_OS_WIL, IT_OS_INT, IT_OS_AGL, IT_OS_STR,
+		IT_RD_BRV, IT_RD_WIL, IT_RD_INT, IT_RD_AGL, IT_RD_STR,
+		IT_OS_BRV, IT_OS_WIL, IT_OS_INT, IT_OS_AGL, IT_OS_STR
 	};
 	return item[RANDOM(sizeof( item) / sizeof(int))];
 }
@@ -1229,7 +1247,20 @@ int get_casino_ring()
 		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
 		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
 		2073, 2074, 2075, 2076, 
+		IT_SILV_RING, 
+		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
+		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
+		2073, 2074, 2075, 2076, 
+		IT_SILV_RING, 
+		1378, 1384, 1390, 1379, 1385, 1391, 1380, 1386, 1392, 
+		1381, 1387, 1393, 1382, 1388, 1394, 1383, 1389, 1395, 
+		2073, 2074, 2075, 2076, 
 		
+		IT_GOLD_RING, 
+		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
+		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
+		2077, 2081, 2078, 2082, 2079, 2083, 2080, 2084, 
+		2085, 2086, 2689, 
 		IT_GOLD_RING, 
 		1396, 1402, 1408, 1397, 1403, 1409, 1398, 1404, 1410, 
 		1399, 1405, 1411, 1400, 1406, 1412, 1401, 1407, 1413, 
@@ -1249,8 +1280,9 @@ int get_casino_ring()
 		
 		3355, 
 		3425, 3426, 3427, 3428, 3429, 3430, 3431, 3432, 3433,
+		3639, 3640, 3641,
 		
-		IT_TW_PROPHET, IT_TW_SINBIND
+		3582, IT_TW_PROPHET, IT_TW_SINBIND
 	};
 	return item[RANDOM(sizeof( item) / sizeof(int))];
 }
@@ -2432,7 +2464,7 @@ void check_challenge(int cn, int val)
 		if (temp)
 		{
 			if (temp == IT_SOULSTONE)
-				in = make_new_soulstone(cn, 9, -1, -1, -1, 1);
+				in = make_new_soulstone(cn, 9, -1, -1, -1);
 			else
 				in = god_create_item(temp);
 			
@@ -3066,23 +3098,23 @@ void randomize_soulstone_stats(int cn, int in, int rank, int sk1, int sk2, int s
 		add_soulstone_stat(cn, in, c, v, I_I);
 }
 
-int make_new_soulstone(int cn, int rank, int sk1, int sk2, int sk3, int flag)
+int make_new_soulstone(int cn, int rank, int sk1, int sk2, int sk3)
 {
 	int in;
 	
-	if (!rank) { rank = getrank(cn); flag = 0; }
-	
-	if (flag)
+	if (rank <= 0)
 	{
-			 if (rank >= 24) rank = 5;
-		else if (rank >= 21) rank = 4 + RANDOM(2);
-		else if (rank >= 18) rank = 4;
-		else if (rank >= 15) rank = 3 + RANDOM(2);
-		else if (rank >= 12) rank = 3;
-		else if (rank >=  9) rank = 2 + RANDOM(2);
-		else if (rank >=  6) rank = 2;
-		else if (rank >=  3) rank = 1 + RANDOM(2);
-		else                 rank = 1;
+		rank = getrank(cn);
+		
+			 if (rank >= 24) rank = 5;              // 24
+		else if (rank >= 22) rank = 4 + RANDOM(2);  // 22 23
+		else if (rank >= 20) rank = 4;              // 20 21 
+		else if (rank >= 18) rank = 3 + RANDOM(2);  // 18 19
+		else if (rank >= 15) rank = 3;              // 15 16 17
+		else if (rank >= 13) rank = 2 + RANDOM(2);  // 13 14
+		else if (rank >= 10) rank = 2;              // 10 11 12
+		else if (rank >=  8) rank = 1 + RANDOM(2);  //  8  9
+		else                 rank = 1;              //  5  6  7
 	}
 	
 	if (!(in = god_create_item(IT_SOULSTONE)))
@@ -3110,7 +3142,8 @@ void give_new_soulstone(int cn, int rank)
 {
 	int in;
 	
-	in = make_new_soulstone(cn, rank, -1, -1, -1, 1);
+	in = make_new_soulstone(cn, rank, -1, -1, -1);
+	it[in].season = -1;
 	
 	god_give_char(in, cn);
 }
@@ -3202,6 +3235,10 @@ int make_new_catalyst(int cn, int n, int v)
 		it[in].used = USE_EMPTY;
 		return 0;
 	}
+	else if (in && !IS_PLAYER(cn))
+	{
+		it[in].season = -1;
+	}
 	
 	return in;
 }
@@ -3245,6 +3282,11 @@ int make_new_focus(int cn)
 	
 	it[in].temp = 0;
 	it[in].driver = 92;
+	
+	if (in && !IS_PLAYER(cn))
+	{
+		it[in].season = -1;
+	}
 	
 	god_give_char(in, cn);
 }
@@ -3317,7 +3359,7 @@ void create_new_soulstone_equipment(int cn, int in, int rank, int sk1, int sk2, 
 	
 	if (!CAN_SOULSTONE(in)) return;
 	
-	in2 = make_new_soulstone(cn, rank, sk1, sk2, sk3, 0);
+	in2 = make_new_soulstone(cn, rank, sk1, sk2, sk3);
 	
 	apply_soulstone(cn, in, in2, 0);
 }

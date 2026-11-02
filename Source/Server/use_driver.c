@@ -11713,8 +11713,12 @@ int step_portal_arena(int cn, int in)
 	boost_char(co, 6);
 
 	ch[co].data[64] = globs->ticker + TICKS * 60 * 5;
+	ch[co].season = -1;
 
 	in = god_create_item(IT_ARENANOTE);
+	
+	it[in].season = -1;
+	
 	god_give_char(in, co);
 	spell_light(co, co, 30);
 
