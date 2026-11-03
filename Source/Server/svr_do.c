@@ -10457,23 +10457,11 @@ int do_char_can_see(int cn, int co, int flag)
 	int d, d1, d2, light, rd;
 	unsigned long long prof;
 
-	if (cn==co)
-	{
-		return 1;
-	}
-
-	if (ch[co].used!=USE_ACTIVE)
-	{
-		return 0;
-	}
-	if ((ch[co].flags & CF_INVISIBLE) && invis_level(cn)<invis_level(co))
-	{
-		return 0;
-	}
-	if (ch[co].flags & CF_BODY)
-	{
-		return 0;
-	}
+	if (cn==co)                             return 1;
+	if (ch[co].used!=USE_ACTIVE)            return 0;
+	if ((ch[co].flags & CF_INVISIBLE) 
+		&& invis_level(cn)<invis_level(co)) return 0;
+	if (ch[co].flags & CF_BODY)             return 0;
 
 	prof = prof_start();
 
@@ -10491,7 +10479,8 @@ int do_char_can_see(int cn, int co, int flag)
 	}                                             // save some time...
 	
 	// x+, y-
-	if (((ch[co].y <= ch[cn].y-16 && ch[co].x >= ch[cn].x+20) || (ch[co].y <= ch[cn].y-20 && ch[co].x >= ch[cn].x+16))
+	if (((ch[co].y <= ch[cn].y-16 && ch[co].x >= ch[cn].x+20) || 
+		 (ch[co].y <= ch[cn].y-20 && ch[co].x >= ch[cn].x+16))
 		&& !CAN_ALWAYS_SEE(cn))
 	{
 		prof_stop(21, prof);
@@ -10504,23 +10493,12 @@ int do_char_can_see(int cn, int co, int flag)
 	{
 		d = 0;
 	}
-	else if (ch[co].mode==0)	// slow
-	{
-		d = (d * (M_SK(co, SK_STEALTH)*2)) / 10;
-	}
-	else if (ch[co].mode==1)	// normal
-	{
-		d = (d * (M_SK(co, SK_STEALTH)*2)) / 30;
-	}
-	else						// fast
-	{
-		d = (d * (M_SK(co, SK_STEALTH)*2)) / 90;
-	}
+	else if (ch[co].mode==0) d = (d * (M_SK(co, SK_STEALTH)*2)) / 10;	// slow
+	else if (ch[co].mode==1) d = (d * (M_SK(co, SK_STEALTH)*2)) / 30;	// normal
+	else                     d = (d * (M_SK(co, SK_STEALTH)*2)) / 90;	// fast
 	
 	if (do_get_iflag(co, SF_EN_MORESTEA))
-	{
 		d = d * 5/4;
-	}
 
 	d -= M_SK(cn, SK_PERCEPT) * 4;
 
@@ -10570,7 +10548,7 @@ int do_char_can_see(int cn, int co, int flag)
 		return 1;
 	}
 
-	return(d);
+	return d;
 }
 
 int do_char_can_see_item(int cn, int in)

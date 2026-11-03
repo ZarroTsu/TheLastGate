@@ -7939,7 +7939,7 @@ int npc_driver_high(int cn)
 		else if (ch[cn].mode!=0)                                             chmode = ch[cn].mode = 0;
 	}
 	
-	if (chmode>-1) do_update_char(cn);
+	//if (chmode>-1) do_update_char(cn);  // Is this causing enemies to flicker rapidly?
 	
 	// create light
 	if ((ch[cn].data[62]<11 && ch[cn].data[62]>ch[cn].data[58] && check_dlight(ch[cn].x, ch[cn].y)<20 && map[ch[cn].x + ch[cn].y * MAPX].light<20)
