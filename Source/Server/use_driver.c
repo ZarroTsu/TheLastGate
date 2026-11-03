@@ -7164,6 +7164,7 @@ void really_spawn_minion(int cn, int cc)
 	ch[cc].data[CHD_MASTER] = cn;         // obey and protect char
 	ch[cc].data[69] = cn;                 // follow char
 	ch[cc].kindred &= ~(KIN_MONSTER);     // remove 'monster' flag for movement
+	ch[cc].season = ch[cn].season;        // Set same season number
 	
 	if (co && co!=cn && do_char_can_see(cn, co, 0) && may_attack_msg(cn, co, 1)) // Attack target
 	{

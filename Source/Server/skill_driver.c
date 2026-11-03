@@ -5036,6 +5036,7 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	ch[cc].data[48]                 = 33;									// Set on-death message chance
 	ch[cc].data[98]                 = globs->ticker + COMPANION_TIMEOUT;	// Set lost timer
 	ch[cc].alignment                = ch[cm].alignment / 2;					// Set alignment value
+	ch[cc].season                   = ch[cm].season;                        // Set same season number
 	ch[cc].gold                     = 0;									// Clean held gold
 	
 	if (ch[cm].flags & CF_SILENCE) 
