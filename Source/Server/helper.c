@@ -3798,12 +3798,14 @@ int use_talisman(int cn, int in, int in2)
 	it[in2].value -= 1;
 	it[in2].power += 15;
 	
+	/*
 	if ((it[in2].flags & IF_SOULSTONE) && !HAS_ENCH(in2, 34))
 	{
 		it[in2].flags &= ~IF_NOREPAIR;
 		if (it[in2].flags & IF_WEAPON)		it[in2].max_damage = it[in2].power * 4000;
 		else								it[in2].max_damage = it[in2].power * 1000;
 	}
+	*/
 	
 	do_char_log(cn, 2, "You enchanted the %s with the talisman.\n", it[in2].name);
 	use_consume_item(cn, in, 0);
