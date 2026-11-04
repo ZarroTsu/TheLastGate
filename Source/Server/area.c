@@ -501,6 +501,7 @@ struct area area[] = {
 	{ 364,  934,  476, 1003, "The Edge of the World",          3},
 	{ 355,  943,  363, 1003, "The Edge of the World",          3},
 	{ 311,  948,  354, 1003, "The Edge of the World",          3},
+	{ 344, 1359,  424, 1485, "Desolate Peak",                  1},
 	{ 422,  800,  423,  825, "Aemon's Castle, Approach",       3},
 	{ 424,  797,  426,  828, "Aemon's Castle, Approach",       3},
 	{ 427,  794,  463,  831, "Aemon's Castle, Approach",       3},

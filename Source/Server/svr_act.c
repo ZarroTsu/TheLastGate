@@ -55,6 +55,8 @@ void step_desertfloor(int cn)
 {
 	int n, in2, in3;
 	int alreadyhave = 0;
+	
+	if ((ch[cn].flags & CF_INVISIBLE)) return;
 
 	for (n = 0; n<MAXBUFFS; n++) if ((in3 = ch[cn].spell[n])!=0 && (bu[in3].used!=USE_EMPTY)) // Check for coconut
 	{
@@ -102,6 +104,8 @@ void step_oppressed(int cn, int fl)
 {
 	int in, m;
 	
+	if ((ch[cn].flags & CF_INVISIBLE)) return;
+	
 	if ((in = has_buff(cn, SK_OPPRESSED2)))
 	{
 		if (bu[in].power != fl)
@@ -130,6 +134,51 @@ void step_oppressed(int cn, int fl)
 		add_spell(cn, in);
 		
 		do_char_log(cn, 0, "You feel something press down on you.\n");
+	}
+}
+
+void step_blizzard(int cn)
+{
+	int in, x, y, m, nearfire=0;
+	
+	if ((ch[cn].flags & CF_INVISIBLE)) return;
+	
+	// Check if we're near a fire (1148, 1886)
+	for (x = max(ch[cn].x-4, 1); x<=min(ch[cn].x+4, MAPX-1); x++) for (y = max(ch[cn].y-4, 1); y<=min(ch[cn].y+4, MAPY-1); y++)
+	{
+		m = XY2M(x, y);
+		if (IS_SANEITEM(in = map[m].it) && (it[in].temp == 1148 || it[in].temp == 1886))
+			nearfire = 1;
+	}
+	
+	m = XY2M(ch[cn].x, ch[cn].y);
+	
+	// If we're indoors and not near a fire, do nothing
+	if ((map[m].flags & MF_INDOORS) && !nearfire) return;
+	
+	if ((in = has_buff(cn, SK_FROSTBITE)))
+	{
+		if (!nearfire) // Make the debuff worse
+			bu[in].data[2] = 1;
+		else           // Make the debuff less worse
+			bu[in].data[2] = 0;
+	}
+	else if (!nearfire) // Make the debuff
+	{
+		in = god_create_buff(SK_FROSTBITE);
+		
+		strcpy(bu[in].name, "Frostbite");
+		
+		bu[in].power   = 1;
+		bu[in].active  = bu[in].duration = 1;
+		bu[in].flags   = BF_PERMASPELL;
+		bu[in].sprite  = BUF_SPR_FROSTB;
+		bu[in].data[1] = 40;
+		bu[in].data[2] = 1;
+		
+		add_spell(cn, in);
+		
+		do_char_log(cn, 0, "The cold is overwhelming.\n");
 	}
 }
 
@@ -325,6 +374,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			else if (IS_IN_VANTA(x, y))         step_vantablack(cn);
 			else if (IS_IN_DW(x, y))            step_dw(cn);
 			else if ((n = IS_IN_AQUE(x, y)))    step_oppressed(cn, n);
+			else if (IS_IN_BLIZZ(x, y))         step_blizzard(cn);
 			//else if ((n = IS_IN_ABYSS(x, y))) step_oppressed(cn, n);
 		}
 		

@@ -971,7 +971,7 @@ int aoe_skill_notarget(int cn, int co, int co_orig, int intemp, int power)
 	return 0;
 }
 
-int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
+int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg, int r)
 {
 	int tmp;
 	
@@ -1008,12 +1008,12 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 		if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, power, 0);
 		switch (intemp)
 		{
-			case SK_CURSE:   spell_curse(cn, co, power, 1); break;
-			case SK_SLOW:     spell_slow(cn, co, power, 1); break;
-			case SK_POISON: spell_poison(cn, co, power, 1); break;
-			case SK_VENOM:  spell_poison(cn, co, power, 3); break;
-			case SK_WEAKEN: spell_weaken(cn, co, power, 1); break;
-			case SK_TAUNT:   spell_taunt(cn, co, power, 1); break;
+			case SK_CURSE:   spell_curse(cn, co, power, ((sqr(r)/10000)>1)?1:0); break;
+			case SK_SLOW:     spell_slow(cn, co, power, ((sqr(r)/10000)>1)?1:0); break;
+			case SK_POISON: spell_poison(cn, co, power, ((sqr(r)/10000)>1)?1:0); break;
+			case SK_VENOM:  spell_poison(cn, co, power, ((sqr(r)/10000)>1)?3:2); break;
+			case SK_WEAKEN: spell_weaken(cn, co, power, ((sqr(r)/10000)>1)?1:0); break;
+			case SK_TAUNT:   spell_taunt(cn, co, power, ((sqr(r)/10000)>1)?1:0); break;
 			default: break;
 		}
 		return 1;
@@ -1031,7 +1031,7 @@ int aoe_target(int cn, int co, int co_orig, int intemp, int power, int *avgdmg)
 			if (!IS_IGNORING_SPELLS(co))
 				do_notify_char(co, NT_GOTMISS, cn, 0, 0, 0);
 		}
-		else if (!(ch[co].flags & CF_SYS_OFF))
+		else if (!(ch[co].flags & CF_SYS_OFF) && ((sqr(r)/10000)>1))
 		{
 			do_char_log(co, 0, "%s\n", splog[intemp].otheraoe);
 		}
@@ -1055,6 +1055,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 	int x, xc, xf, xt, y, yc, yf, yt;
 	int r = get_aoe_radius(cn, intemp, prox_power);
 	int countskip = 0;
+	int hit_orig = hit;
 	
 	if (ch[(cn)].flags & CF_AREA_OFF) r = 100;
 	
@@ -1138,7 +1139,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 			else if (intemp == SK_SURROUND)
 				aoe_surroundhit(cn, co, co_orig, hit, power, avgdmg);
 			else
-				hit += aoe_target(cn, co, co_orig, intemp, power, &avgdmg);
+				hit += aoe_target(cn, co, co_orig, intemp, power, &avgdmg, r);
 		}
 	}
 	
@@ -1149,7 +1150,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		
 		if (intemp==SK_CLEAVE || intemp==SK_BLAST || intemp==SK_SLAM || intemp==SK_OBLITERATE)
 		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
+			if (!(ch[cn].flags & CF_SYS_OFF) && (no_target || (sqr(r)/10000)>1) && hit > hit_orig)
 			{
 				do_char_log(cn, 1, "You hit %d of %d creatures in range.\n", hit, count);
 				
@@ -1166,7 +1167,7 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		}
 		else
 		{
-			if (!(ch[cn].flags & CF_SYS_OFF))
+			if (!(ch[cn].flags & CF_SYS_OFF) && (no_target || (sqr(r)/10000)>1) && hit > hit_orig)
 				do_char_log(cn, 1, "You affected %d of %d creatures in range.\n", hit, count);
 		}
 	}

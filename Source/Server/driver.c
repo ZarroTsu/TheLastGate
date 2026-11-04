@@ -2107,7 +2107,7 @@ int npc_see(int cn, int co)
 	if ((cc = ch[cn].taunted) && IS_SANECHAR(cc) && (do_char_can_see(cn, cc, 0) || ch[cn].data[78]))
 	{
 		// If our last attempt to attack failed, wander near the taunter
-		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78] && ch[cn].data[27]!=1)
+		if (!ch[cn].attack_cn && !ch[cn].goto_x && ch[cn].data[78])
 		{
 			ch[cn].goto_x = ch[cc].x + 5 - RANDOM(10);
 			ch[cn].goto_y = ch[cc].y + 5 - RANDOM(10);
@@ -7939,7 +7939,7 @@ int npc_driver_high(int cn)
 		else if (ch[cn].mode!=0)                                             chmode = ch[cn].mode = 0;
 	}
 	
-	//if (chmode>-1) do_update_char(cn);  // Is this causing enemies to flicker rapidly?
+	if (chmode>-1) do_update_char(cn);
 	
 	// create light
 	if ((ch[cn].data[62]<11 && ch[cn].data[62]>ch[cn].data[58] && check_dlight(ch[cn].x, ch[cn].y)<20 && map[ch[cn].x + ch[cn].y * MAPX].light<20)
@@ -8098,16 +8098,16 @@ int npc_driver_high(int cn)
 	// did we panic?
 	if (ch[cn].data[78] && !ch[cn].attack_cn && !ch[cn].goto_x)
 	{
-		if (ch[cn].data[27]!=1)
-		{
+		//if (ch[cn].data[27]!=1)
+		//{
 			ch[cn].goto_x = ch[cn].x + 5 - RANDOM(10);
 			ch[cn].goto_y = ch[cn].y + 5 - RANDOM(10);
 			return 1;
-		}
-		else
-		{
-			ch[cn].skill[SK_PERCEPT][1] = 120;
-		}
+		//}
+		//else
+		//{
+		//	ch[cn].skill[SK_PERCEPT][1] = 120;
+		//}
 	}
 
 	// are we on protect and want to follow our master?
@@ -8718,7 +8718,7 @@ void npc_driver_low(int cn)
 	}
 
 	// did someone call help? - high prio
-	if (ch[cn].data[55] && ch[cn].data[55] + TICKS * 120>globs->ticker && ch[cn].data[54] && ch[cn].data[27]!=1)
+	if (ch[cn].data[55] && ch[cn].data[55] + TICKS * 120>globs->ticker && ch[cn].data[54])
 	{
 		m = ch[cn].data[54];
 		ch[cn].goto_x = m % MAPX + get_frust_x_off(globs->ticker);
@@ -8728,7 +8728,7 @@ void npc_driver_low(int cn)
 	}
 
 	// go to last known enemy position and stay there for up to 30 seconds
-	if (ch[cn].data[77] && ch[cn].data[77] + TICKS * 30>globs->ticker && ch[cn].data[27]!=1)
+	if (ch[cn].data[77] && ch[cn].data[77] + TICKS * 30>globs->ticker)
 	{
 		m = ch[cn].data[76];
 		ch[cn].goto_x = m % MAPX + get_frust_x_off(ch[cn].data[36]);
@@ -8860,7 +8860,7 @@ void npc_driver_low(int cn)
 		ch[cn].data[58] = 0;
 		return;
 	}
-	if (ch[cn].data[60] && ch[cn].data[27]!=1)   //random walk, low
+	if (ch[cn].data[60])   //random walk, low
 	{
 		ch[cn].data[58] = 0;
 		if (ch[cn].data[61]<1)
@@ -8952,7 +8952,7 @@ void npc_driver_low(int cn)
 		return;
 	}
 
-	if (ch[cn].data[29] && ch[cn].data[27]!=1)    // resting position, lowest prio
+	if (ch[cn].data[29])    // resting position, lowest prio
 	{
 		// Turn off toggles when resting
 		if (ch[cn].a_mana<ch[cn].mana[5]*400 && has_buff(cn, SK_LETHARGY) && !do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))

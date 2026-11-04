@@ -4091,6 +4091,12 @@ int use_special_spell(int cn, int in)
 		return 0;
 	}
 	
+	if (IS_OFF_SEASON(cn, co))
+	{
+		do_char_log(cn, 0, "You cannot target %s because they are not in your season.\n", co);
+		return 0;
+	}
+	
 	switch(spell)
 	{
 		case SK_DISPEL:
@@ -4556,7 +4562,18 @@ int use_special_chest(int cn, int in)
 		return 0;
 	}
 	
-	if (!(in2 = it[in].data[0])) return 0;
+	sprintf(ch[cc].name, "Chest");
+	ch[cc].gcm = 9;
+	ch[cc].data[49] = in;
+	ch[cc].data[64] = globs->ticker + TICKS * 60 * 30;
+	ch[cc].season = ch[cn].season;
+	
+	if (!(in2 = it[in].data[0])) 
+	{
+		ch[cc].used = USE_EMPTY;
+		do_char_log(cn, 0, "Nothing happened.\n");
+		return 0;
+	}
 	if (in2 == IT_CH_FOOL || in2 == IT_CH_FOOL_R)
 	{
 		for (n = 0; n<5; n++)
@@ -4570,12 +4587,8 @@ int use_special_chest(int cn, int in)
 		if (!(in2 = it[in].data[n])) break;
 		in2 = get_special_item(cn, in2, 0, 0, 0);
 		god_give_char(in2, cc);
+		it[in2].season = ch[cn].season;
 	}
-	
-	sprintf(ch[cc].name, "Chest");
-	ch[cc].gcm = 9;
-	ch[cc].data[49] = in;
-	ch[cc].data[64] = globs->ticker + TICKS * 60 * 30;
 	
 	do_look_char(cn, cc, 0, 0, 1);
 	
@@ -6406,9 +6419,13 @@ int use_dw_chest(int cn, int in)
 
 int use_mine(int cn, int in)
 {
-	int tmp, in2, str;
+	int tmp, in2, str = M_AT(cn, AT_STR);
 	
-	str = M_AT(cn, AT_STR);
+	// Tarot - Magician
+	if (do_get_iflag(cn, SF_MAGI) && M_AT(cn, AT_INT) > M_AT(cn, AT_STR))
+	{
+		str = M_AT(cn, AT_INT);
+	}
 	
 	if (ch[cn].a_end<1000)
 	{
@@ -8522,7 +8539,13 @@ int spell_scroll(int cn, int in)
 		do_char_log(cn, 0, "You cannot see your target.\n");
 		return 0;
 	}
-
+	
+	if (IS_OFF_SEASON(cn, co))
+	{
+		do_char_log(cn, 0, "You cannot target %s because they are not in your season.\n", co);
+		return 0;
+	}
+	
 	if (spell==SK_CURSE || spell==SK_SLOW)
 	{
 		if (!may_attack_msg(cn, co, 1))
@@ -8564,8 +8587,7 @@ int spell_scroll(int cn, int in)
 			break;
 		case    SK_IDENT:
 			if (!IS_SANEITEM(in2 = ch[cn].citem)) in2 = 0;
-			if ((in2 && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, it[in2].power, power+100, 1))
-				|| (!in2 && cn!=co && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power+100, 1)))
+			if (!in2 && IS_PLAYER(co) && cn!=co && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power, 1))
 			{
 				ret = 1;
 			}
@@ -8576,7 +8598,7 @@ int spell_scroll(int cn, int in)
 			break;
 		// Blast?
 		case    SK_CURSE:
-			if (chance_base(cn, co, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power+100, 1))
+			if (IS_PLAYER(co) && chance_base(cn, co, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power, 1))
 			{
 				ret = 1;
 			}
@@ -8586,7 +8608,7 @@ int spell_scroll(int cn, int in)
 			}
 			break;
 		case    SK_SLOW:
-			if (chance_base(cn, co, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power+100, 1))
+			if (IS_PLAYER(co) && chance_base(cn, co, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power, 1))
 			{
 				ret = 1;
 			}

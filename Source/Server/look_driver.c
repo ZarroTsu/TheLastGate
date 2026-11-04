@@ -238,6 +238,8 @@ void look_extra(int cn, int in)
 	case IT_SIGN_SLAS: do_char_log(cn, FN_SIGNT, DESC_SIGN_SLAS); do_char_log(cn, FN_O, DESC_O); break;
 	case IT_SIGN_SKIR: do_char_log(cn, FN_SIGNT, DESC_SIGN_SKIR); do_char_log(cn, FN_O, DESC_O); break;
 	
+	case IT_RINGWARMTH: do_char_log(cn, FN_EX, DESC_RINGWARMTH); do_char_log(cn, FN_O, DESC_O); break;
+	
 	case IT_SIGNET_TE: case IT_SIGNET_MR: case IT_SIGNET_HA: case IT_SIGNET_AT:
 	case IT_SIGNET_SK: case IT_SIGNET_WA: case IT_SIGNET_SO: case IT_SIGNET_SU:	
 	case IT_SIGNET_AH: case IT_SIGNET_SE: case IT_SIGNET_BR: case IT_SIGNET_LY:
@@ -254,7 +256,6 @@ void look_extra(int cn, int in)
 		
 	// -------- SPECIAL ITEMS --------
 	case IT_BT_NATURES: do_char_log(cn, FN_EX, DESC_BT_NATURES); break;
-	case IT_RINGWARMTH: do_char_log(cn, FN_EX, DESC_RINGWARMTH); do_char_log(cn, FN_O, DESC_O); break;
 	case IT_LIZCROWN:   do_char_log(cn, FN_EX, DESC_LIZCROWN);   break;
 	case IT_MATHCAP1:   do_char_log(cn, FN_EX, DESC_MATHCAP);    break;
 		

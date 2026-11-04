@@ -396,6 +396,7 @@ extern unsigned int mapmarker;
 #define SK_SLAM			68
 #define SK_FATIGUE		69
 #define SK_FURY			70
+#define SK_FROSTBITE	71
 #define SK_SANGUINE	   219
 #define SK_DWLIGHT     220
 #define SK_RAPIDDMG    221

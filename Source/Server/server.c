@@ -132,33 +132,33 @@ void discord_top_five(void)
 			if (r1)
 				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
 				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
 				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s         %3d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
 				fprintf(discordTopA, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r4);
 		}
@@ -205,33 +205,33 @@ void discord_top_five(void)
 			if (r1)
 				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
 				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
 				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s         %3d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
 				fprintf(discordTopB, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r4);
 		}
@@ -278,33 +278,33 @@ void discord_top_five(void)
 			if (r1)
 				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s %3d,%03d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r1, r2, r3, r4);
 			else if (r2)
 				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s     %3d,%03d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r2, r3, r4);
 			else if (r3)
 				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s         %3d,%03d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r3, r4);
 			else
 				fprintf(discordTopC, "%c %10.10s %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name, 
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					rank_name[getrank(nr[j][m])], 
 					r4);
 		}
@@ -421,25 +421,12 @@ void discord_pandium(void)
 			if (IS_BRAVER(nr[j][m]))      cl = 7;
 			if (IS_LYCANTH(nr[j][m]))     cl = 8;
 			
-			if (CURRENTSEASON > 0)
-			{
-				fprintf(discordPandium, "%c %10.10s  S%02d  %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
-					ch[nr[j][m]].name, 
-					ch[nr[j][m]].season,
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
-					(cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
-			}
-			else
-			{
-				fprintf(discordPandium, "%c %10.10s  %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
+			fprintf(discordPandium, "%c %10.10s  %c%c%c  %20.20s             %3d\n", font ? '+' : ' ', 
 					ch[nr[j][m]].name,
-					IS_RB(nr[j][m]) ? '+' : ' ',
-					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : ' '),
-					IS_PURPLE(nr[j][m]) ? '*' : ' ',
+					IS_SEASONAL(nr[j][m]) ? '1' : '  ',
+					IS_HARDMODE(nr[j][m]) ? (IS_RB(nr[j][m]) ? '*' : '-') : (IS_RB(nr[j][m]) ? '+' : ' '),
+					IS_CLANKWAI(nr[j][m]) ? 'K' : (IS_CLANGORN(nr[j][m]) ? 'G' : (IS_PURPLE(nr[j][m]) ? 'P' : ' ')),
 					(cl == -1) ? "Archless" : class_name[cl], fl[j][m]);
-			}
 		}
 	}
 	fprintf(discordPandium, "```\n");
@@ -458,53 +445,30 @@ void discord_who(void)
 	fprintf(discordWho, "Players Online:\n");
 	fprintf(discordWho, "-------------------------------------------------\n");
 	players = 0;
+	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (!(ch[n].flags & (CF_PLAYER)))
-		{
-			continue;
-		}
-		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & (CF_INVISIBLE | CF_NOWHO)))
-		{
-			continue;
-		}
+		if (!(ch[n].flags & (CF_PLAYER))) continue;
+		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & (CF_INVISIBLE | CF_NOWHO))) continue;
+		
 		players++;
+		
 		/* color staff and gods green */
 		font = (IS_STAFFER(n) || IS_GOD(n)) ? 1 : 0;
-
-		showarea = 1;
-		if (ch[n].flags & CF_GOD)
-		{
-			showarea = 0;
-		}
-		if (IS_CLANKWAI(n) || IS_CLANGORN(n) || IS_PURPLE(n))
-		{
-			showarea = 0;
-		}
 		
-		if (CURRENTSEASON > 0)
-		{
-			fprintf(discordWho, "%c %.5s %-10.10s  S%02d  %c%c%c %.26s\n",
-				font ? '+' : ' ',
-				who_rank_name[getrank(n)],
-				ch[n].name,
-				ch[n].season,
-				IS_RB(n) ? '+' : ' ',
-				IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-				IS_PURPLE(n) ? '*' : ' ',
-				!showarea ? "--------" : get_area(n, 0));
-		}
+		if ((ch[n].flags & CF_GOD) || (IS_CLANKWAI(n) || IS_CLANGORN(n) || IS_PURPLE(n)))
+			showarea = 0;
 		else
-		{
-			fprintf(discordWho, "%c %.5s %-10.10s  %c%c%c %.26s\n",
+			showarea = 1;
+		
+		fprintf(discordWho, "%c %.5s %-10.10s %c%c%c %.26s\n",
 				font ? '+' : ' ',
 				who_rank_name[getrank(n)],
 				ch[n].name,
-				IS_RB(n) ? '+' : ' ',
-				IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-				IS_PURPLE(n) ? '*' : ' ',
+				IS_SEASONAL(n) ? '1' : '  ',
+				IS_HARDMODE(n) ? (IS_RB(n) ? '*' : '-') : (IS_RB(n) ? '+' : ' '),
+				IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : (IS_PURPLE(n) ? 'P' : ' ')),
 				!showarea ? "--------" : get_area(n, 0));
-		}
 	}
 	if (players) fprintf(discordWho, "-------------------------------------------------\n");
 	fprintf(discordWho, "%3d player%s online.\n", players, (players != 1) ? "s" : "");

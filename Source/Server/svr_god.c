@@ -1132,70 +1132,52 @@ void god_who(int cn)
 
 	players = 0;
 	do_char_log(cn, 3, "-----------------------------------------------\n");
+	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (!IS_ACTIVECHAR(n))
-		{
-			continue;
-		}
+		if (!IS_ACTIVECHAR(n)) continue;
 		else if (!IS_PLAYER(n))
 		{
-			if (!IS_USURP(n))
-			{
-				continue;
-			}
-			if (!(IS_GOD(cn)||IS_IMP(cn)) )
-			{
-				continue;
-			}
+			if (!IS_USURP(n)) continue;
+			if (!(IS_GOD(cn)||IS_IMP(cn))) continue;
 			font = 3; // Usurped mobs are blue for imps
 		}
 		else if (IS_INVISIBLE(n))
 		{
-			if (invis_level(cn)<invis_level(n))
-			{
-				continue;
-			}
+			if (invis_level(cn)<invis_level(n)) continue;
 			font = 0; // Invisible chars are red for highers
 		}
 		else if (ch[n].flags & CF_NOWHO)
 		{
-			if (!(ch[cn].flags & (CF_IMP | CF_GOD)))
-			{
-				continue;
-			}
-			// only imps below this point
+			if (!(ch[cn].flags & (CF_IMP | CF_GOD))) continue; // only imps below this point
 			font = 3; // NOWHO'd chars are blue for imps
 		}
 		else if (IS_STAFFER(n) || IS_GOD(n))
 		{
-			// staff and gods are green for everyone
-			font = 2;
+			font = 2; // staff and gods are green for everyone
 		}
 		else
 		{
 			font = 1; // all others yellow
 		}
+		
 		players++;
-
-		showarea = 1;
-		if ((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD))
-		{
+		
+		if (((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD)) ||
+			(IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP))))
 			showarea = 0;
-		}
-		if (IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
-		{
-			showarea = 0;
-		}
-
-		do_char_log(cn, font, "%4d %-10.10s%c%c%c %-8.8s %.19s\n",
-		            n, ch[n].name,
-					IS_RB(n) ? '+' : ' ',
-		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-		            IS_PURPLE(n) ? '*' : ' ',
-		            int2str(ch[n].points_tot),
-		            !showarea ? "--------" : get_area(n, 0));
+		else
+			showarea = 1;
+		
+		do_char_log(cn, 1, "%4d: %-10.10s %c%c%c %-8.8s %.18s\n",
+					n, ch[n].name,
+					IS_SEASONAL(n) ? '1' : '  ',
+					IS_HARDMODE(n) ? (IS_RB(n) ? '*' : '-') : (IS_RB(n) ? '+' : ' '),
+					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : (IS_PURPLE(n) ? 'P' : ' ')),
+					int2str(ch[n].points_tot),
+					!showarea ? "--------" : get_area(n, 0));
 	}
+	
 	/* list player's GC and thralls, if any -- limited to 10 entries as to not flood /who by a country mile */
 	for (n = 1, m = 0; n<MAXCHARS; n++)
 	{
@@ -1203,22 +1185,15 @@ void god_who(int cn)
 		if ((ch[n].flags & (CF_PLAYER)))	continue;
 		if (ch[n].data[CHD_MASTER] != cn)	continue;
 		
-		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
-		            n, ch[n].name,
-		            int2str(ch[n].points_tot),
-		            get_area(n, 0));
-		/*
-		do_char_log(cn, 3, "%.5s %-10.10s%c%c%c %.23s\n",
-		            who_rank_name[getrank(n)],
-		            ch[n].name,
-		            IS_PURPLE(n) ? '*' : ' ',
-		            (ch[n].kindred & KIN_POH) ? '+' : ' ',
-		            (ch[n].kindred & KIN_POH_LEADER) ? '+' : ' ',
-		            get_area(n, 0));
-		*/
+		do_char_log(cn, 3, "%4d: %-10.10s @   %-8.8s %.18s\n",
+					n, ch[n].name,
+					int2str(ch[n].points_tot),
+					get_area(n, 0));
+		
 		m++;
 		if (m>10) break;
 	}
+	
 	do_char_log(cn, 3, "-----------------------------------------------\n");
 	do_char_log(cn, 1, "%3d player%s online.\n",
 	            players, (players > 1) ? "s" : "");
@@ -1230,39 +1205,30 @@ void god_implist(int cn)
 
 	players = 0;
 	do_char_log(cn, 3, "-----------------------------------------------\n");
+	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (!IS_USEDCHAR(n))
-		{
-			continue;
-		}
-		if (!IS_PLAYER(n))
-		{
-			continue;
-		}
-		if (!IS_IMP(n))
-		{
-			continue;
-		}
+		if (!IS_USEDCHAR(n)) continue;
+		if (!IS_PLAYER(n)) continue;
+		if (!IS_IMP(n)) continue;
+		
 		players++;
-
-		showarea = 1;
-		if ((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD))
-		{
+		
+		if (((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD)) ||
+			(IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP))))
 			showarea = 0;
-		}
-		if (IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
-		{
-			showarea = 0;
-		}
-
-		do_char_log(cn, 1, "%4d: %-10.10s%c%c %-8.8s %.19s\n",
-		            n, ch[n].name,
-		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-		            IS_PURPLE(n) ? '*' : ' ',
-		            int2str(ch[n].points_tot),
-		            !showarea ? "--------" : get_area(n, 0));
+		else
+			showarea = 1;
+		
+		do_char_log(cn, 1, "%4d: %-10.10s %c%c%c %-8.8s %.18s\n",
+					n, ch[n].name,
+					IS_SEASONAL(n) ? '1' : '  ',
+					IS_HARDMODE(n) ? (IS_RB(n) ? '*' : '-') : (IS_RB(n) ? '+' : ' '),
+					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : (IS_PURPLE(n) ? 'P' : ' ')),
+					int2str(ch[n].points_tot),
+					!showarea ? "--------" : get_area(n, 0));
 	}
+	
 	do_char_log(cn, 3, "-----------------------------------------------\n");
 	do_char_log(cn, 1, "%3d imp%s.\n",
 	            players, (players > 1) ? "s" : "");
@@ -1271,58 +1237,45 @@ void god_implist(int cn)
 void user_who(int cn)
 {
 	int n, players, gc, font, showarea;
-
-	do_char_log(cn, 1, "-----------------------------------------------\n");
+	
 	players = 0;
+	do_char_log(cn, 1, "-----------------------------------------------\n");
+	
 	/* list players */
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (!(ch[n].flags & (CF_PLAYER)))
-		{
-			continue;
-		}
-		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & (CF_INVISIBLE | CF_NOWHO)))
-		{
-			continue;
-		}
+		if (!(ch[n].flags & (CF_PLAYER))) continue;
+		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & (CF_INVISIBLE | CF_NOWHO))) continue;
 		players++;
+		
 		/* color staff and gods green */
 		font = (IS_STAFFER(n) || IS_GOD(n)) ? 2 : 1;
-
-		showarea = 1;
-		if ((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD))
-		{
+		
+		if (((ch[n].flags & CF_GOD) && !(ch[cn].flags & CF_GOD)) ||
+			(IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP))))
 			showarea = 0;
-		}
-		if (IS_OPP_CLAN(cn, n) && !(ch[cn].flags & (CF_GOD | CF_IMP | CF_USURP)))
-		{
-			showarea = 0;
-		}
-
+		else
+			showarea = 1;
+		
 		do_char_log(cn, font, "%.5s %-10.10s %c%c%c %.26s\n",
-		            who_rank_name[getrank(n)],
-		            ch[n].name,
-					IS_RB(n) ? '+' : ' ',
-		            IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : ' '),
-		            IS_PURPLE(n) ? '*' : ' ',
-		            !showarea ? "--------" : get_area(n, 0));
+					who_rank_name[getrank(n)],
+					ch[n].name,
+					IS_SEASONAL(n) ? '1' : '  ',
+					IS_HARDMODE(n) ? (IS_RB(n) ? '*' : '-') : (IS_RB(n) ? '+' : ' '),
+					IS_CLANKWAI(n) ? 'K' : (IS_CLANGORN(n) ? 'G' : (IS_PURPLE(n) ? 'P' : ' ')),
+					!showarea ? "--------" : get_area(n, 0));
 	}
 	if ((gc = ch[cn].data[PCD_COMPANION]) && IS_SANECHAR(gc))
 	{
 		do_char_log(cn, 3, "%.5s %-10.10s %c%c%c %.26s\n",
-		            who_rank_name[getrank(gc)],
-		            ch[gc].name,
-					IS_RB(gc) ? '+' : ' ',
-		            IS_CLANKWAI(gc) ? 'K' : (IS_CLANGORN(gc) ? 'G' : ' '),
-		            IS_PURPLE(gc) ? '*' : ' ',
-		            get_area(gc, 0));
-		/*
-		do_char_log(cn, 3, "%4d: %-10.10s@ %-8.8s %.20s\n",
-		            gc, ch[gc].name,
-		            int2str(ch[gc].points_tot),
-		            get_area(gc, 0));
-		*/
+					who_rank_name[getrank(gc)],
+					ch[gc].name,
+					IS_SEASONAL(gc) ? '1' : '  ',
+					IS_HARDMODE(gc) ? (IS_RB(gc) ? '*' : '-') : (IS_RB(gc) ? '+' : ' '),
+					IS_CLANKWAI(gc) ? 'K' : (IS_CLANGORN(gc) ? 'G' : (IS_PURPLE(gc) ? 'P' : ' ')),
+					!showarea ? "--------" : get_area(n, 0));
 	}
+	
 	do_char_log(cn, 1, "-----------------------------------------------\n");
 	do_char_log(cn, 1, "%3d player%s online.\n",
 	            players, (players > 1) ? "s" : "");
