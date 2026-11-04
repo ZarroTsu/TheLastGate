@@ -1131,7 +1131,7 @@ void god_who(int cn)
 	int n, m, players, font, showarea;
 
 	players = 0;
-	do_char_log(cn, 3, "-----------------------------------------------\n");
+	do_char_log(cn, 5, "-----------------------------------------------\n");
 	
 	for (n = 1; n<MAXCHARS; n++)
 	{
@@ -1169,7 +1169,7 @@ void god_who(int cn)
 		else
 			showarea = 1;
 		
-		do_char_log(cn, 1, "%4d: %-10.10s %c%c%c %-8.8s %.18s\n",
+		do_char_log(cn, font, "%4d: %-10.10s %c%c%c %-8.8s %.17s\n",
 					n, ch[n].name,
 					IS_SEASONAL(n) ? '1' : '  ',
 					IS_HARDMODE(n) ? (IS_RB(n) ? '*' : '-') : (IS_RB(n) ? '+' : ' '),
@@ -1185,7 +1185,7 @@ void god_who(int cn)
 		if ((ch[n].flags & (CF_PLAYER)))	continue;
 		if (ch[n].data[CHD_MASTER] != cn)	continue;
 		
-		do_char_log(cn, 3, "%4d: %-10.10s @   %-8.8s %.18s\n",
+		do_char_log(cn, 3, "%4d: %-10.10s @   %-8.8s %.17s\n",
 					n, ch[n].name,
 					int2str(ch[n].points_tot),
 					get_area(n, 0));
@@ -1194,7 +1194,7 @@ void god_who(int cn)
 		if (m>10) break;
 	}
 	
-	do_char_log(cn, 3, "-----------------------------------------------\n");
+	do_char_log(cn, 5, "-----------------------------------------------\n");
 	do_char_log(cn, 1, "%3d player%s online.\n",
 	            players, (players > 1) ? "s" : "");
 }
@@ -1220,7 +1220,7 @@ void god_implist(int cn)
 		else
 			showarea = 1;
 		
-		do_char_log(cn, 1, "%4d: %-10.10s %c%c%c %-8.8s %.18s\n",
+		do_char_log(cn, 1, "%4d: %-10.10s %c%c%c %-8.8s %.17s\n",
 					n, ch[n].name,
 					IS_SEASONAL(n) ? '1' : '  ',
 					IS_HARDMODE(n) ? (IS_RB(n) ? '*' : '-') : (IS_RB(n) ? '+' : ' '),
