@@ -3743,7 +3743,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole5[ 0], "Seagrel King's Quarters", 222500);
 	m = display_pole(cn, flag, page, m, pole5[30], "Edge of the World",       230000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[30], "Edge of the World");
-//	m = display_pole(cn, flag, page, m, pole6[28], "Desolate Peak",           232500);
+	m = display_pole(cn, flag, page, m, pole6[28], "Desolate Peak",           232500);
 	m = display_pole(cn, flag, page, m, pole5[17], "The Obsidian Fortress",   235000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[23], "The Obsidian Fortress");
 	m = display_pole(cn, flag, page, m, pole2[10], "Black Stronghold Baseme", 240000);
@@ -4055,7 +4055,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 
 	m = display_quest(cn, flag, page, m, liz, quest2[29], 21, "Rassa",    "Settlement",   "Cloak",    180000);
 	m = display_quest(cn, flag, page, m, nei, quest3[25], 21, "Ichi",     "Titan Street", "Amulet",   185000); // #158 Edge of the World
-//	m = display_quest(cn, flag, page, m, nei, quest3[30], 21, "Marle",    "Turtle Road",  "Ring",     187500); // #163 Desolate Peak
+	m = display_quest(cn, flag, page, m, nei, quest3[30], 21, "Marle",    "Turtle Road",  "Ring",     187500); // #163 Desolate Peak
 	m = display_quest(cn, flag, page, m, nlb, questP[19], 21, "Lab XIX",  "Divinity Gor", "+1 SP",    625000);
 	m = display_quest(cn, flag, page, m, nrb, questP[19], 21, "Lab XIX",  "Divinity Gor", "-",        625000);
 	m = display_quest(cn, flag, page, m, dmr, quest3[22], 21, "Damor",    "Damor's Magi", "Ring",     190000); // #155 Damor / Shiva 2
@@ -13849,13 +13849,13 @@ void do_regenerate(int cn)
 				if (bu[in].temp==SK_FROSTBITE)
 				{
 					if (!IS_IN_BLIZZ(ch[cn].x, ch[cn].y) || bu[in].data[2] == 0)
-						bu[in].data[1]-=10;
+						bu[in].data[1] -= 10;
 					else
 						bu[in].data[1]++;
 					
 					tmp = bu[in].power;
 					
-					if ((bu[in].power = min((bu[in].data[1]+20)/40, 9999)) <= 0)
+					if ((bu[in].power = min((bu[in].data[1]+10)/20, 9999)) <= 0)
 					{
 						do_char_log(cn, 1, "You feel the cold leave you, for now.\n");
 						bu[in].used = USE_EMPTY;

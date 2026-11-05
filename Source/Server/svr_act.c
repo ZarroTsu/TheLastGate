@@ -173,7 +173,7 @@ void step_blizzard(int cn)
 		bu[in].active  = bu[in].duration = 1;
 		bu[in].flags   = BF_PERMASPELL;
 		bu[in].sprite  = BUF_SPR_FROSTB;
-		bu[in].data[1] = 40;
+		bu[in].data[1] = 20;
 		bu[in].data[2] = 1;
 		
 		add_spell(cn, in);

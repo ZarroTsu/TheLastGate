@@ -2419,7 +2419,7 @@ void check_challenge(int cn, int val)
 			if (ch[cn].data[72] & (1 << bit)) cleared++;
 			if (ch[cn].data[94] & (1 << bit)) cleared++;
 		}
-		if (cleared < 59) return;
+		if (cleared < 60) return;
 	}
 	
 	if (val == 6) // Pole bit check
@@ -2433,7 +2433,7 @@ void check_challenge(int cn, int val)
 			if (ch[cn].data[91] & (1 << bit)) cleared++;
 			if (ch[cn].data[24] & (1 << bit)) cleared++;
 		}
-		if (cleared < 187) return;
+		if (cleared < 188) return;
 	}
 	
 	if (val == 8) // Archon depth check
