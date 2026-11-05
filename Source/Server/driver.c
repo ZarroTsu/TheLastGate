@@ -3102,7 +3102,7 @@ int npc_see(int cn, int co)
 				else if (getrank(co)<18) // General
 					do_sayx(cn, "Hello there, %s. Are you lost?", ch[co].name);
 				else
-					do_sayx(cn, "Hello there, %s. I don't have anything for you just yet, but check back soon!", ch[co].name);
+					do_sayx(cn, "Hello there, %s. Some say there is a legendary shield on top of the Desolate Peak far to the north. If you could bring it to me, I would reward you.", ch[co].name);
 			}
 			// 
 			else if (strcmp(ch[cn].text[2], "#blackherbs")==0) //   xx - Zorani - Black Plants
@@ -7926,20 +7926,26 @@ int npc_driver_high(int cn)
 		// companion endurance management
 		if (ch[cn].a_end>10000)
 		{
-			if (ch[co].mode==2 && ch[cn].mode!=2) chmode = ch[cn].mode = 2;
-			if (ch[co].mode==1 && ch[cn].mode!=1) chmode = ch[cn].mode = 1;
-			if (ch[co].mode==0 && ch[cn].mode!=0) chmode = ch[cn].mode = 0;
-		}	else if (ch[cn].mode!=0)              chmode = ch[cn].mode = 0;
+			if (ch[co].mode==2 && ch[cn].mode!=2) chmode = 2;
+			if (ch[co].mode==1 && ch[cn].mode!=1) chmode = 1;
+			if (ch[co].mode==0 && ch[cn].mode!=0) chmode = 0;
+		}	else if (ch[cn].mode!=0)              chmode = 0;
 	}
 	else
 	{
 		// generic endurance management
-		if (ch[cn].data[58]>1 && ch[cn].a_end>10000 && ch[cn].mode!=2)       chmode = ch[cn].mode = 2;
-		else if (ch[cn].data[58]==1 && ch[cn].a_end>10000 && ch[cn].mode!=1) chmode = ch[cn].mode = 1;
-		else if (ch[cn].mode!=0)                                             chmode = ch[cn].mode = 0;
+		if (ch[cn].a_end>10000)
+		{
+			if (ch[cn].data[58] > 1 && ch[cn].mode!=2) chmode = 2;
+			if (ch[cn].data[58]== 1 && ch[cn].mode!=1) chmode = 1;
+		} else if (ch[cn].mode!=0)                     chmode = 0;
 	}
 	
-	if (chmode>-1) do_update_char(cn);
+	if ((chmode > -1) && (chmode != ch[cn].mode) && ((cn&(TICKS*3))==(globs->ticker&(TICKS*3)))) // Limit mode switching to once every 3 seconds.
+	{
+		ch[cn].mode = chmode;
+		do_update_char(cn);
+	}
 	
 	// create light
 	if ((ch[cn].data[62]<11 && ch[cn].data[62]>ch[cn].data[58] && check_dlight(ch[cn].x, ch[cn].y)<20 && map[ch[cn].x + ch[cn].y * MAPX].light<20)

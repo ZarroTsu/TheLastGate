@@ -3743,6 +3743,7 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = display_pole(cn, flag, page, m, pole5[ 0], "Seagrel King's Quarters", 222500);
 	m = display_pole(cn, flag, page, m, pole5[30], "Edge of the World",       230000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[30], "Edge of the World");
+//	m = display_pole(cn, flag, page, m, pole6[28], "Desolate Peak",           232500);
 	m = display_pole(cn, flag, page, m, pole5[17], "The Obsidian Fortress",   235000);
 	m = disp_rb_pole(cn, flag, page, m, poleR[23], "The Obsidian Fortress");
 	m = display_pole(cn, flag, page, m, pole2[10], "Black Stronghold Baseme", 240000);
@@ -3751,7 +3752,6 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = disp_rb_pole(cn, flag, page, m, poleR[20], "Abyss X");
 //	m = display_pole(cn, flag, page, m, pole5[31], "Aemon's Palace",          250000);
 	//
-//	m = display_pole(cn, flag, page, m, pole6[28], "", 0);
 //	m = display_pole(cn, flag, page, m, pole6[29], "", 0);
 //	m = display_pole(cn, flag, page, m, pole6[30], "", 0);
 //	m = display_pole(cn, flag, page, m, pole6[31], "", 0);
@@ -4055,7 +4055,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 
 	m = display_quest(cn, flag, page, m, liz, quest2[29], 21, "Rassa",    "Settlement",   "Cloak",    180000);
 	m = display_quest(cn, flag, page, m, nei, quest3[25], 21, "Ichi",     "Titan Street", "Amulet",   185000); // #158 Edge of the World
-//	m = display_quest(cn, flag, page, m, nei, quest3[30], 21, "Marle",    "Turtle Road",  "Ring",     190000); // #163 Desolate Peak
+//	m = display_quest(cn, flag, page, m, nei, quest3[30], 21, "Marle",    "Turtle Road",  "Ring",     187500); // #163 Desolate Peak
 	m = display_quest(cn, flag, page, m, nlb, questP[19], 21, "Lab XIX",  "Divinity Gor", "+1 SP",    625000);
 	m = display_quest(cn, flag, page, m, nrb, questP[19], 21, "Lab XIX",  "Divinity Gor", "-",        625000);
 	m = display_quest(cn, flag, page, m, dmr, quest3[22], 21, "Damor",    "Damor's Magi", "Ring",     190000); // #155 Damor / Shiva 2
