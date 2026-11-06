@@ -201,7 +201,9 @@ int is_ascroll(int in);
 
 #define IS_BOTH_PURP(cn, co)	(IS_PURPLE(cn) && IS_PURPLE(co))
 #define IS_OPP_CLAN(cn, co)		((IS_CLANKWAI(cn) && IS_CLANGORN(co)) || (IS_CLANKWAI(co) && IS_CLANGORN(cn)) || IS_BOTH_PURP((cn), (co)))
-#define IS_MY_ALLY(cn, co)		((((!IS_PLAYER(cn) && !IS_PLAYER(co) && ch[(cn)].data[CHD_GROUP] == ch[(co)].data[CHD_GROUP]) || (IS_PLAYER(cn) && IS_PLAYER(co) && !IS_OPP_CLAN(cn, co))) && !(map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA)) || (IS_PLAYER(cn) && IS_PLAYER(co) && isgroup((cn), (co))) || (IS_PLAYER(cn) && IS_COMPANION(co) && CN_OWNER(co)==cn) || (IS_PLAYER(co) && IS_COMPANION(cn) && CN_OWNER(cn)==co))
+#define IS_MY_MASTER(cn, co)	(IS_PLAYER(cn) && IS_COMPANION(co) && CN_OWNER(co)==cn)
+#define IS_MY_RELATIVE(cn, co)	(IS_COMPANION(cn) && IS_COMPANION(co) && CN_OWNER(co)==CN_OWNER(cn))
+#define IS_MY_ALLY(cn, co)		((((!IS_PLAYER(cn) && !IS_PLAYER(co) && ch[(cn)].data[CHD_GROUP] == ch[(co)].data[CHD_GROUP]) || (IS_PLAYER(cn) && IS_PLAYER(co) && !IS_OPP_CLAN(cn, co))) && !(map[XY2M(ch[cn].x, ch[cn].y)].flags & MF_ARENA)) || (IS_PLAYER(cn) && IS_PLAYER(co) && isgroup((cn), (co))) || IS_MY_MASTER(cn, co) || IS_MY_MASTER(co, cn) || IS_MY_RELATIVE(cn, co))
 
 #define IS_SKILL(a)				((a==13||a==22||a==31||a==35||a==37||a==40||a==41||a==48||a==49)?1:0)
 #define IS_SPELL(a)				((a==7||a==11||a==15||a==17||a==18||a==19||a==20||a==21||a==24||a==25||a==26||a==27||a==42||a==43||a==46||a==47)?1:0)

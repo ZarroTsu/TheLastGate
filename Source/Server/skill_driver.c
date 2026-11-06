@@ -688,6 +688,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 			"You stop yourself from %s your companion. That would be silly.\n", splog[in].act);
 			return 0;
 		}
+		if (IS_MY_MASTER(co, cn) || IS_MY_RELATIVE(cn, co)) return 0;
 	}
 	
 	if (cn!=co)
@@ -1096,7 +1097,10 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 			if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 			if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 			{
-				if (!do_surround_check(cn, co, 0)) continue;
+				if (!do_surround_check(cn, co, 0))
+					continue;
+				if (IS_MY_MASTER(co, cn) || IS_MY_RELATIVE(cn, co))
+					continue;
 				damage_mshell(co, power);
 				count++;
 			}
@@ -1129,9 +1133,12 @@ int aoe_driver(int cn, int cz, int co_orig, int intemp, int power, int prox_powe
 		if (sqr(xc - x) + sqr(yc - y) > (sqr(r)/10000)) continue;
 		if ((co = map[x + y * MAPX].ch) && cn!=co && co_orig!=co)
 		{
-			if (IS_SPELLEX(intemp) && IS_NOMAGIC(co)) continue;
+			if (IS_SPELLEX(intemp) && IS_NOMAGIC(co))
+				continue;
 			if (sc = do_surround_check(cn, co, 1))
 				remember_pvp(cn, co);
+			if (IS_MY_MASTER(co, cn) || IS_MY_RELATIVE(cn, co))
+				continue;
 			if (no_target)
 				hit += aoe_skill_notarget(cn, co, co_orig, intemp, power);
 			else if (!sc)
