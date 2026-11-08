@@ -18214,8 +18214,12 @@ int may_attack_msg(int cn, int co, int msg)
 	m2 = XY2M(ch[co].x, ch[co].y);
 	if (((map[m1].flags | map[m2].flags) & MF_NOFIGHT) && !(IS_IN_BOJ(ch[cn].x, ch[cn].y) && get_gear(cn, IT_XIXDARKSUN)))
 	{
-		if (msg) do_char_log(cn, 0, "You can't attack anyone here!\n");
-		return 0;
+		if ((IS_COMPANION(cn) || IS_ITEMTHRALL(cn)) && IS_IN_BOJ(ch[cn].x, ch[cn].y) && cc && get_gear(cc, IT_XIXDARKSUN)) ;
+		else
+		{
+			if (msg) do_char_log(cn, 0, "You can't attack anyone here!\n");
+			return 0;
+		}
 	}
 	
 	if (ch[co].temp==CT_ANNOU1 || ch[co].temp==CT_ANNOU2 || ch[co].temp==CT_ANNOU3 || ch[co].temp==CT_ANNOU4 || ch[co].temp==CT_ANNOU5)

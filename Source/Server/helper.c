@@ -2419,7 +2419,7 @@ void check_challenge(int cn, int val)
 			if (ch[cn].data[72] & (1 << bit)) cleared++;
 			if (ch[cn].data[94] & (1 << bit)) cleared++;
 		}
-		if (cleared < 60) return;
+		if (cleared < 62) return;
 	}
 	
 	if (val == 6) // Pole bit check
