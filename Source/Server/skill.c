@@ -398,8 +398,8 @@ struct sk_tree sk_tree[10][12]={
 		{ "Shaper",                        "1%% increased effect of Companion Mastery for ",
 		  6669,                            "every 10 total Willpower." },
 		//"         '         '         ", "         '         '         '         '      "
-		{ "Diviner",                       "Casting a companion skill while holding a ",
-		  6670,                            "tarot card grants the companion its effects." },
+		{ "Diviner",                       "Using a tarot card on a companion skill ",
+		  6670,                            "grants the summoned companion its effects." },
 		{ "Constitution",                  "10%% increased total Resistance.",
 		  6681,                            "" },
 		{ "Necromancy",                    "2%% of damage dealt by your companions is ",

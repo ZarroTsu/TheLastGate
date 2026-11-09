@@ -6748,6 +6748,12 @@ void pandium_driver(int cn) // CT_PANDIUM
 				remove_buff(ch_in[n], SK_TAUNT);
 				ch[ch_in[n]].taunted = 0;
 				ch[ch_in[n]].data[74] = globs->ticker + TICKS*6; // prevent warcries
+				if (map[x + y * MAPX].it) // Remove explosions from destination tile
+				{
+					do_add_light(x, y, -it[in].light[I_A]);
+					it[in].used = 0;
+					map[m].it = 0;
+				}
 				remove_enemy(ch_in[n]);
 				quick_teleport(ch_in[n], x, y);
 				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
