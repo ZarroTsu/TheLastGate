@@ -3864,7 +3864,7 @@ void do_questlist(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	{
 		if (ch[cn].pandium_floor[2]>n) questZ[n] = 1;
 	}
-	if (ch[cn].pandium_floor[0]>=50 || ch[cn].pandium_floor[1]>=50) questZ[6] = 1;
+	if (ch[cn].pandium_floor[0]>50 || ch[cn].pandium_floor[1]>50) questZ[6] = 1;
 	
 	if (ch[cn].temple_x==HOME_START_X && !quest2[ 0] && !(ch[cn].waypoints&(1<<2))) ast = 0;
 	if ((ch[cn].waypoints&(1<<7))     ||  quest2[25]) liz = 1;
@@ -7068,6 +7068,17 @@ void do_command(int cn, char *ptr)
 			return;
 		}
 		;
+		if (prefix(cmd, "setchalleng"))
+		{
+			break;
+		}
+		;
+		if (prefix(cmd, "setchallenge") && f_giu)
+		{
+			god_set_season_challenge(cn, dbatoi_self(cn, arg[1]), atoi(arg[2]));
+			return;
+		}
+		;
 		if (prefix(cmd, "setpoints") && f_giu)
 		{
 			god_give_points(cn, dbatoi_self(cn, arg[1]), atoi(arg[2]));
@@ -8268,6 +8279,9 @@ void do_char_killed(int cn, int co, int pentsolve)
 						do_char_log(cc, 3, "Pandium: \"Rise ever higher.\"\n");
 					if (tmp%10==0)
 						sprintf(message[n], "%s", ch[cc].name);
+					if (ch[co].data[32]==1)
+						check_challenge(cc, SEAS_PANDI_HARD); // SEASONAL - Solo HARDMODE check
+					check_challenge(cc, SEAS_PANDI); // SEASONAL - Depth 50 check
 				}
 			}
 			if (tmp%10==0)
@@ -8280,9 +8294,6 @@ void do_char_killed(int cn, int co, int pentsolve)
 					sprintf(message[3], "%s defeated The Archon Pandium at depth %d!", message[0], tmp);
 				if (globs->flags & GF_DISCORD) discord_ranked(message[3]);
 			}
-			if (ch[co].data[32]==1)
-				check_challenge(cn, SEAS_PANDI_HARD); // SEASONAL - Solo HARDMODE check
-			check_challenge(cn, SEAS_PANDI); // SEASONAL - Depth 50 check
 		}
 	}
 	
@@ -8321,7 +8332,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 			ch[cc].temple_x = ch[cc].tavern_x = ch[cc].x;
 			ch[cc].temple_y = ch[cc].tavern_y = ch[cc].y;
 			
-			check_challenge(cn, SEAS_FINAL_HARD); // SEASONAL - HARDMODE Lab 20 check
+			check_challenge(cc, SEAS_FINAL_HARD); // SEASONAL - HARDMODE Lab 20 check
 		}
 	}
 
@@ -12164,47 +12175,6 @@ void really_update_char(int cn)
 	
 	ch[cn].move_speed = clamp(spd_move, -127, 127);
 	
-	
-	// Tactics
-	if (B_SK(cn, SK_TACTICS))
-	{
-		z = M_SK(cn, SK_TACTICS);
-		
-		// Additive bonus
-		{
-			n  = 0;
-			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
-			n +=     TC_SK(cn, 66);
-			
-			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 20);
-		}
-		
-		if (do_get_iflag(cn, SF_MOON_R)) z = more(z, ch[cn].mana[4], 50);    // [Taro] Moon.R
-		
-		hit_rate   += max(0, z/6);
-		parry_rate += max(0, z/6);
-	}
-	// Tactics for GCs
-	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && B_SK(co, SK_TACTICS))
-	{
-		z = M_SK(co, SK_TACTICS);
-		
-		// Additive bonus
-		{
-			n  = 0;
-			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
-			n +=     TC_SK(cn, 66);
-			
-			z = more(z, (SPEED_BASE + GET_SPD_CAS(cn))*n, 20);
-		}
-		
-		if (do_get_iflag(co, SF_MOON_R)) z = more(z, ch[co].mana[4], 50);    // [Taro] Moon.R
-		
-		hit_rate   += max(0, z/6);
-		parry_rate += max(0, z/6);
-	}
-	
-	
 	/*
 		ch[].spell_apt -- Spell Aptitude
 	*/
@@ -12324,6 +12294,45 @@ void really_update_char(int cn)
 	ch[cn].cast_speed = clamp(spd_cast,   -127, 127);
 	ch[cn].atk_speed  = clamp(spd_attack, -127, 127);
 	
+	// Tactics
+	if (B_SK(cn, SK_TACTICS))
+	{
+		z = M_SK(cn, SK_TACTICS);
+		
+		// Additive bonus
+		{
+			n  = 0;
+			n += T_SUMM_SK(cn,  6)*2;  // (Summ) Tactician
+			n +=     TC_SK(cn, 66);
+			
+			z = more(z, (base_spd + spd_cast)*n, 20);
+		}
+		
+		if (do_get_iflag(cn, SF_MOON_R)) z = more(z, ch[cn].mana[4], 50);    // [Taro] Moon.R
+		
+		hit_rate   += max(0, z/6);
+		parry_rate += max(0, z/6);
+	}
+	// Tactics for GCs
+	if (IS_COMP_TEMP(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && B_SK(co, SK_TACTICS))
+	{
+		z = M_SK(co, SK_TACTICS);
+		
+		// Additive bonus
+		{
+			n  = 0;
+			n += T_SUMM_SK(co,  6)*2;  // (Summ) Tactician
+			n +=     TC_SK(co, 66);
+			
+			z = more(z, (base_spd + spd_cast)*n, 20);
+		}
+		
+		if (do_get_iflag(co, SF_MOON_R)) z = more(z, ch[co].mana[4], 50);    // [Taro] Moon.R
+		
+		hit_rate   += max(0, z/6);
+		parry_rate += max(0, z/6);
+	}
+	
 	
 	/*
 		ch[].spell_mod -- Spell Multiplier
@@ -12419,8 +12428,8 @@ void really_update_char(int cn)
 	
 	if ((n = do_get_ieffect(cn, VF_QUICKSILV)))
 	{
-		hit_rate   += GET_SPD_MOV(cn)*n/30;
-		parry_rate += GET_SPD_MOV(cn)*n/30;
+		hit_rate   += (base_spd + spd_move)*n/30;
+		parry_rate += (base_spd + spd_move)*n/30;
 	}
 	
 	// Tarot - Lovers.R : Swaps hit/parry

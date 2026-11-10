@@ -3326,6 +3326,17 @@ void god_set_depth(int cn, int co, int v, int gflag)
 	}
 }
 
+void god_set_season_challenge(int cn, int co, int v)
+{
+	if (co == 0)               return (void)do_char_log(cn, 0, "No such character.\n");
+	else if (!IS_SANECHAR(co)) return (void)do_char_log(cn, 0, "Bad character number: %d\n", co);
+	if (v > 13 || v < 0)       return (void)do_char_log(cn, 0, "Bad bit value: %d\n", v);
+	
+	ch[co].challengebits ^= (1 << v);
+	
+	do_char_log(cn, 1, "Set season flag %d for %s to %s.\n", v, ch[co].name, (ch[co].challengebits & (1 << v)) ? "ON" : "OFF");
+}
+
 void god_set_season(int cn, int co, int v)
 {
 	if (co == 0)

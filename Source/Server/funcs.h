@@ -155,6 +155,7 @@ void god_drdata(int cn, int co, int n, int val);
 void god_destroy_items(int cn);
 void god_reset_all_depths(int cn);
 void god_set_depth(int cn, int co, int v, int gflag);
+void god_set_season_challenge(int cn, int co, int v);
 void god_set_season(int cn, int co, int v);
 void god_give_points(int cn, int co, int v);
 void god_raise_char(int cn, int co, int v, int bsp);

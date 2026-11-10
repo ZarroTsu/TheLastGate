@@ -4051,7 +4051,8 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 	}
 	else
 	{
-		if (tmp<1)
+		if ((ch[co].flags & CF_BODY)) ;
+		else if (tmp<1)
 		{
 			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		}
@@ -4137,7 +4138,8 @@ int spell_obliterate(int cn, int co, int power, int aoe)
 		do_char_log(co, 1, "%s nuked you for %d HP.\n", ch[cn].name, tmp);
 	else
 	{
-		if (tmp<1)
+		if ((ch[co].flags & CF_BODY)) ;
+		else if (tmp<1)
 			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
 		{
@@ -4179,7 +4181,8 @@ int spell_slam(int cn, int co, int power, int aoe)
 		do_char_log(co, 1, "%s smashed you for %d HP.\n", ch[cn].name, tmp);
 	else
 	{
-		if (tmp<1)
+		if ((ch[co].flags & CF_BODY)) ;
+		else if (tmp<1)
 			do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 		else
 		{
@@ -5655,7 +5658,8 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 		}
 		else
 		{
-			if (tmp<1)
+			if ((ch[co].flags & CF_BODY)) ;
+			else if (tmp<1)
 			{
 				do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 			}
@@ -5760,7 +5764,8 @@ int spell_bash(int cn, int co, int power, int co_orig)
 	if (co_orig) hitpower = hitpower/2 + hitpower/4;
 	tmp = do_hurt(cn, co, hitpower, 5);
 	
-	if (tmp<1)
+	if ((ch[co].flags & CF_BODY)) ;
+	else if (tmp<1)
 	{
 		do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 	}
@@ -6194,7 +6199,8 @@ int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, 
 		}
 	}
 	dam = do_hurt(cn, co, dam, randomtarg?18:8);
-	if (dam<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
+	if ((ch[co].flags & CF_BODY)) ;
+	else if (dam<1) do_char_log(cn, 0, "You cannot penetrate %s's armor.\n", ch[co].reference);
 	else
 	{
 		if ((tmp = has_buff(cn, SK_EXHAUST)) && bu[tmp].data[0] == SK_LEAP)

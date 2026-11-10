@@ -2438,7 +2438,7 @@ void check_challenge(int cn, int val)
 	
 	if (val == 8) // Archon depth check
 	{
-		if (ch[cn].pandium_floor[0]<50 && ch[cn].pandium_floor[1]<50) return;
+		if (ch[cn].pandium_floor[0]<=50 && ch[cn].pandium_floor[1]<=50) return;
 	}
 	
 	if (!did_challenge(cn, val))
