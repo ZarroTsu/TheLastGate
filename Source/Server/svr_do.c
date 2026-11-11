@@ -12831,48 +12831,42 @@ void do_pmshield(int cn, int co)
 
 int get_aria_wv(int cn, int in)
 {
-	int weapon = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	int weapon, effect;
 	
-	if (cn && do_get_iflag(cn, SF_SIGN_SONG))    // [Ring] Signet of Song
-	{
-		weapon = ch[cn].weapon;
-		
-		if (in) weapon -= bu[in].weapon;
-		
-		weapon = weapon * 10; // 10%
-	}
+	if (!cn || !do_get_iflag(cn, SF_SIGN_SONG)) return 0;
 	
-	return more(weapon, n, 1)/100;
+	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	weapon = ch[cn].weapon;
+	
+	if (in) weapon -= bu[in].weapon;
+	
+	return more(weapon * 10, effect, 1)/100;
 }
 int get_aria_av(int cn, int in)
 {
-	int armor = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	int armor, effect;
 	
-	if (cn && do_get_iflag(cn, SF_SIGN_SONG))    // [Ring] Signet of Song
-	{
-		armor = ch[cn].armor;
-		
-		if (in) armor -= bu[in].armor;
-		
-		armor = armor * 10; // 10%
-	}
+	if (!cn || !do_get_iflag(cn, SF_SIGN_SONG)) return 0;
 	
-	return more(armor, n, 1)/100;
+	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	armor = ch[cn].armor;
+	
+	if (in) armor -= bu[in].armor;
+	
+	return more(armor * 10, effect, 1)/100;
 }
 int get_aria_im(int cn, int in)
 {
-	int immun = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	int immun, effect;
 	
-	if (cn && T_SKAL_SK(cn, 10))    // (Skal) Guardian
-	{
-		immun = M_SK(cn, SK_IMMUN);
-		
-		if (in) immun -= bu[in].skill[SK_IMMUN];
-		
-		immun = immun * 20; // 20%
-	}
+	if (!cn || !T_SKAL_SK(cn, 10)) return 0;
 	
-	return more(immun, n, 1)/100;
+	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	immun = M_SK(cn, SK_IMMUN);
+	
+	if (in) immun -= bu[in].skill[SK_IMMUN];
+	
+	return more(immun * 20, effect, 1)/100;
 }
 
 void do_aria_stats(int cn, int in, int power, int flag)
