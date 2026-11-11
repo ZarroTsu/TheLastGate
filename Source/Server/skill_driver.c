@@ -2116,6 +2116,7 @@ int add_spell(int cn, int new_in)
 					{
 						bu[old_in].duration    = bu[old_in].active = bu[new_in].duration;
 						bu[old_in].power       = bu[new_in].power;
+						bu[old_in].data[1]     = bu[new_in].data[1];
 						
 						bu[old_in].hp          = max(bu[new_in].hp, bu[old_in].hp);
 						bu[old_in].end         = max(bu[new_in].end, bu[old_in].end);

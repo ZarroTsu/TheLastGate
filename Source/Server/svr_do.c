@@ -11717,7 +11717,7 @@ void really_update_char(int cn)
 		m = min(127, m + min(5,max(0,(bits+5-z)/6)) * lido / liha);
 		
 		// Obsidian Crown
-		if (it[ch[cn].worn[WN_HEAD]].temp==2921) m = min(127, m + 5 * lido / liha);
+		if (it[ch[cn].worn[WN_HEAD]].temp==IT_OBSCROWN) m = min(127, m + 5 * lido / liha);
 		
 		// Purple One's Pledge
 		if (liha == 2) attrib[z] += m;
@@ -11743,7 +11743,7 @@ void really_update_char(int cn)
 	m = min(127, m + min(5,max(0,bits/6)) * lido / liha);
 	
 	// Obsidian Crown
-	if (it[ch[cn].worn[WN_HEAD]].temp==2921) m = min(127, m + 5 * lido / liha);
+	if (it[ch[cn].worn[WN_HEAD]].temp==IT_OBSCROWN) m = min(127, m + 5 * lido / liha);
 	
 	// Purple One's Pledge
 	if (liha == 2) for (z = 0; z<MAXSKILL; z++) skill[z] += m;

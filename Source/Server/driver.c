@@ -5439,7 +5439,7 @@ void spawn_pandium_rewards(int cn, int fl, int x, int y)
 	// Clear any existing chests
 	if ((in = map[x + y * MAPX].it)!=0) { it[in].used = 0; map[x + y * MAPX].it = 0; }
 	//
-	if 		(fl == 50 && (in = build_item(CR_ITEM, x, y))) { it[in].power=53; it[in].data[0] = 2921; } // Obsidian Crown
+	if 		(fl == 50 && (in = build_item(CR_ITEM, x, y))) { it[in].power=53; it[in].data[0] = IT_OBSCROWN; } // Obsidian Crown
 	//
 	else if (fl >=  1 && ch[cn].pandium_floor[2] < 1 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 1; // .
 	else if (fl >= 10 && ch[cn].pandium_floor[2] < 2 && (in = build_item(CR_BUFF, x, y))) it[in].data[0] = 2; //  .
@@ -6425,7 +6425,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 		if (fl>=32)		{ temp[0]=2916; temp[1]=2917; temp[2]=2918; temp[3]=2919; temp[4]=2920; } // Obsidian
 		else if (fl>=16){ temp[0]=  94; temp[1]=  95; temp[2]=  96; temp[3]=  97; temp[4]=  98; } // Adamant
 		else 			{ temp[0]=  76; temp[1]=  77; temp[2]=  78; temp[3]=  79; temp[4]=  80; } // Titanium
-		if (fl>=50) { temp[0]=2921; } // Crown
+		if (fl>=50) { temp[0]=IT_OBSCROWN; } // Crown
 		in = ch[cn].worn[WN_HEAD]  = pop_create_item(temp[0], cn); it[in].carried = cn;
 		in = ch[cn].worn[WN_CLOAK] = pop_create_item(temp[1], cn); it[in].carried = cn;
 		in = ch[cn].worn[WN_BODY]  = pop_create_item(temp[2], cn); it[in].carried = cn;
