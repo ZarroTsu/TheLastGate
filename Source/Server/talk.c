@@ -1979,7 +1979,7 @@ void answer_quest(int cn, int co)
 
 void answer_tarot(int cn, int co, int m)
 {
-	int n, m, in = 0, in2 = 0;
+	int n, j, in = 0, in2 = 0;
 	
 	if (in = ch[co].worn[m])
 	{
@@ -1991,12 +1991,12 @@ void answer_tarot(int cn, int co, int m)
 		do_sayx(cn, "Very well, %s, I have removed your %s for you.", ch[co].name, it[in].name);
 		if (it[in].temp==IT_CH_WORLD_R) // [Taro] World.R
 		{
-			for (n = 0, m = 0; n<MAXITEMS; n++)
+			for (n = 0, j = 0; n<MAXITEMS; n++)
 			{
 				if (!ch[co].item[n]) // Pre-emptively find two empty inventory slots
 				{
-					if (m) break;
-					m = n;
+					if (j) break;
+					j = n;
 				}
 			}
 			if (n>=(MAXITEMS-1) &&  // Inventory too full...
@@ -2011,7 +2011,7 @@ void answer_tarot(int cn, int co, int m)
 				it[in2].x = 0;
 				it[in2].y = 0;
 				it[in2].carried = co;
-				ch[co].item[m] = in2;
+				ch[co].item[j] = in2;
 				ch[co].worn[WN_LHAND] = 0;
 			}
 			if ((in2 = ch[co].alt_worn[WN_LHAND]) && ch[co].alt_worn[WN_RHAND] && IS_TWOHAND(ch[co].alt_worn[WN_RHAND]))
