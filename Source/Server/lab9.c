@@ -335,7 +335,7 @@ riddles[RIDDLEGIVERS][MAX_RIDDLES] = {
 		 "SECRET"},
 
 		{"Up and down they go but never move\n"
-		 "What are they?\n"
+		 "What are they?\n",
 		 "STAIRS", "STAIR", "STEPS"},
 
 		{"You must keep this thing \n"
