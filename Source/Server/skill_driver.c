@@ -2114,31 +2114,24 @@ int add_spell(int cn, int new_in)
 				{
 					if ((old_temp==SK_ARIA || old_temp==SK_ARIA2))
 					{
-						bu[old_in].duration    = bu[old_in].active = bu[new_in].duration;
-						bu[old_in].power       = bu[new_in].power;
-						bu[old_in].data[1]     = bu[new_in].data[1];
+						if ((bu[old_in].data[0] != bu[new_in].data[0]) && (bu[old_in].data[3] != bu[new_in].data[3])) continue;
 						
-						bu[old_in].hp          = max(bu[new_in].hp, bu[old_in].hp);
-						bu[old_in].end         = max(bu[new_in].end, bu[old_in].end);
-						bu[old_in].mana        = max(bu[new_in].mana, bu[old_in].mana);
+						bu[old_in].duration         = bu[old_in].active = bu[new_in].duration;
+						bu[old_in].power            = bu[new_in].power;
+						bu[old_in].data[2]          = bu[new_in].data[2];
 						
-						for (m=0;m< 5;m++) bu[old_in].attrib[m] = max(bu[new_in].attrib[m], bu[old_in].attrib[m]);
-						for (m=0;m<50;m++) bu[old_in].skill[m]  = max(bu[new_in].skill[m], bu[old_in].skill[m]);
-						
-						bu[old_in].weapon      = max(bu[new_in].weapon, bu[old_in].weapon);
-						bu[old_in].armor       = max(bu[new_in].armor, bu[old_in].armor);
-						bu[old_in].spell_pow   = max(bu[new_in].spell_pow, bu[old_in].spell_pow);
-						bu[old_in].top_damage  = max(bu[new_in].top_damage, bu[old_in].top_damage);
-						bu[old_in].to_hit      = max(bu[new_in].to_hit, bu[old_in].to_hit);
-						bu[old_in].to_parry    = max(bu[new_in].to_parry, bu[old_in].to_parry);
-						bu[old_in].gethit_dam  = max(bu[new_in].gethit_dam, bu[old_in].gethit_dam);
-						bu[old_in].speed       = max(bu[new_in].speed, bu[old_in].speed);
-						bu[old_in].atk_speed   = max(bu[new_in].atk_speed, bu[old_in].atk_speed);
-						bu[old_in].cast_speed  = max(bu[new_in].cast_speed, bu[old_in].cast_speed);
-						bu[old_in].spell_apt   = max(bu[new_in].spell_apt, bu[old_in].spell_apt);
-						bu[old_in].cool_bonus  = max(bu[new_in].cool_bonus, bu[old_in].cool_bonus);
-						bu[old_in].crit_chance = max(bu[new_in].crit_chance, bu[old_in].crit_chance);
-						bu[old_in].crit_multi  = max(bu[new_in].crit_multi, bu[old_in].crit_multi);
+						bu[old_in].top_damage       = bu[new_in].top_damage;
+						bu[old_in].to_hit           = bu[new_in].to_hit;
+						bu[old_in].dmg_reduction    = bu[new_in].dmg_reduction;
+						bu[old_in].gethit_dam       = bu[new_in].gethit_dam;
+						bu[old_in].spell_pow        = bu[new_in].spell_pow;
+						bu[old_in].crit_chance      = bu[new_in].crit_chance;
+						bu[old_in].skill[SK_RESIST] = bu[new_in].skill[SK_RESIST];
+						bu[old_in].crit_multi       = bu[new_in].crit_multi;
+						bu[old_in].skill[SK_IMMUN]  = bu[new_in].skill[SK_IMMUN];
+						bu[old_in].to_parry         = bu[new_in].to_parry;
+						bu[old_in].dmg_bonus        = bu[new_in].dmg_bonus;
+						bu[old_in].cool_bonus       = bu[new_in].cool_bonus;
 					}
 					else if (bu[new_in].power >= bu[old_in].power)
 					{

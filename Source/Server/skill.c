@@ -136,7 +136,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_INT, AT_INT, AT_INT }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
-	{ 31, 'G', 	"Aria", 				"Passively grants you and nearby allies a buff based off equipped rings, and a debuff to enemies.", 
+	{ 31, 'G', 	"Aria", 				"Reserves Mana to grant a buff/debuff based on your current movement mode to nearby characters. Crits increase potency.", 
 				"", "",
 				{ AT_BRV, AT_AGL, AT_AGL }},
 				

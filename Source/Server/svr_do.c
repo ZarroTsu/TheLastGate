@@ -4172,18 +4172,10 @@ int do_showbuffs(int cn, int co)
 				do_char_log(cn, 6, " : %+d.%02d HP/sec\n", bu[in].r_hp/50, bu[in].r_hp%50); break;
 			case SK_ARIA:
 			case SK_ARIA2:
-				if (bu[in].hp)   do_char_log(cn, 6, " : %+d Hitpoints\n",  bu[in].hp);
-				if (bu[in].end)  do_char_log(cn, 6, " : %+d Endurance\n",  bu[in].end);
-				if (bu[in].mana) do_char_log(cn, 6, " : %+d Mana\n",       bu[in].mana);
-				
-				if (bu[in].attrib[0]) do_char_log(cn, 6, " : %+d Braveness\n",  bu[in].attrib[0]); 
-				if (bu[in].attrib[1]) do_char_log(cn, 6, " : %+d Willpower\n",  bu[in].attrib[1]); 
-				if (bu[in].attrib[2]) do_char_log(cn, 6, " : %+d Intuition\n",  bu[in].attrib[2]); 
-				if (bu[in].attrib[3]) do_char_log(cn, 6, " : %+d Agility\n",    bu[in].attrib[3]); 
-				if (bu[in].attrib[4]) do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
-				
 				if (bu[in].skill[SK_IMMUN])
 					do_char_log(cn, 6, " : %+d Immunity\n",     bu[in].skill[SK_IMMUN]);
+				if (bu[in].skill[SK_RESIST])
+					do_char_log(cn, 6, " : %+d Resistance\n",   bu[in].skill[SK_RESIST]);
 				
 				if (bu[in].weapon)      do_char_log(cn, 6, " : %+d Weapon Value\n",    bu[in].weapon);
 				if (bu[in].armor)       do_char_log(cn, 6, " : %+d Armor Value\n",     bu[in].armor);
@@ -4192,12 +4184,17 @@ int do_showbuffs(int cn, int co)
 				if (bu[in].to_hit)      do_char_log(cn, 6, " : %+d Hit Score\n",       bu[in].to_hit); 
 				if (bu[in].to_parry)    do_char_log(cn, 6, " : %+d Parry Score\n",     bu[in].to_parry); 
 				if (bu[in].gethit_dam)  do_char_log(cn, 6, " : %+d Thorns\n",          bu[in].gethit_dam);
-				if (bu[in].speed)       do_char_log(cn, 6, " : %+d Speed\n",           bu[in].speed);
-				if (bu[in].spell_apt)   do_char_log(cn, 6, " : %+d Spell Apt\n",       bu[in].spell_apt);
 				if (bu[in].cool_bonus)  do_char_log(cn, 6, " : %+d Cooldown Rate\n",   bu[in].cool_bonus);
 				if (bu[in].crit_chance) do_char_log(cn, 6, " : %+d Crit Chance\n",     bu[in].crit_chance);
 				if (bu[in].crit_multi)  do_char_log(cn, 6, " : %+d Crit Multiplier\n", bu[in].crit_multi);
 				
+				if (bu[in].dmg_reduction>0)
+				{
+					if (bu[in].dmg_reduction%2==0)
+						do_char_log(cn, 6, " : %+d%% Less Damage Taken\n", abs(bu[in].dmg_reduction/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% Less Damage Taken\n", abs(bu[in].dmg_reduction/2), abs(bu[in].dmg_reduction*5)%10);
+				}
 				if (bu[in].dmg_bonus>0) 
 				{
 					if (bu[in].dmg_bonus%2==0)
@@ -10133,6 +10130,10 @@ int do_crit(int cn, int co, int dam, int msg)
 			spell_blast(cn, co, spell_multiplier(M_SK(cn, SK_BLAST), cn), 0, 1);
 			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 		}
+		if ((in = has_buff(cn, SK_ARIA)) && bu[in].data[0] == cn)
+		{
+			bu[in].data[1] = clamp(bu[in].data[1] + 200, 200, 20000);
+		}
 	}
 	
 	if ((n=do_get_ieffect(co, VF_EN_LESSCRIT))) crit_redc -=    n;
@@ -12830,7 +12831,7 @@ void do_pmshield(int cn, int co)
 
 int get_aria_wv(int cn, int in)
 {
-	int weapon = 0, n = TC_SK(cn, 34)*15;
+	int weapon = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	
 	if (cn && do_get_iflag(cn, SF_SIGN_SONG))    // [Ring] Signet of Song
 	{
@@ -12845,7 +12846,7 @@ int get_aria_wv(int cn, int in)
 }
 int get_aria_av(int cn, int in)
 {
-	int armor = 0, n = TC_SK(cn, 34)*15;
+	int armor = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	
 	if (cn && do_get_iflag(cn, SF_SIGN_SONG))    // [Ring] Signet of Song
 	{
@@ -12860,7 +12861,7 @@ int get_aria_av(int cn, int in)
 }
 int get_aria_im(int cn, int in)
 {
-	int immun = 0, n = TC_SK(cn, 34)*15;
+	int immun = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	
 	if (cn && T_SKAL_SK(cn, 10))    // (Skal) Guardian
 	{
@@ -12874,101 +12875,88 @@ int get_aria_im(int cn, int in)
 	return more(immun, n, 1)/100;
 }
 
-#define ARIA_MULT    power / 300
-
 void do_aria_stats(int cn, int in, int power, int flag)
 {
-	int n, cc = 0, ring1=0, ring2=0, act1=0, act2=0;
-	int r_hp=0, r_en=0, r_mp=0, r_at[5]={0}, r_sk[50]={0};
-	int r_wp=0, r_ar=0, r_sp=0, r_tp=0, r_ht=0, r_pr=0, r_th=0, r_as=0, r_ap=0, r_co=0, r_cc=0, r_cm=0;
-	int r_xx=0;
+	int n,cc = 0, type = 1, r_wp = 0, r_ar = 0;
+	int r_td = 0, r_th = 0, r_dr = 0, r_gh = 0;
+	int r_sp = 0, r_cc = 0, r_re = 0, r_cm = 0;
+	int r_im = 0, r_tp = 0, r_db = 0, r_cd = 0;
 	
-	if (IS_SANECHAR(cc = bu[in].data[0]))
+	if (!IS_SANECHAR(cc = bu[in].data[0])) return;  // No creator, abort
+	
+	type = ch[cc].mode;
+	
+	if (!flag)
 	{
-		if (IS_SANEITEM(ring1 = ch[cc].worn[WN_LRING]) && it[ring1].active) act1 = 1;
-		if (IS_SANEITEM(ring2 = ch[cc].worn[WN_RRING]) && it[ring2].active) act2 = 1;
+		r_wp = get_aria_wv(cc, in);
+		r_ar = get_aria_av(cc, in);
+		r_im = get_aria_im(cc, in);
 	}
 	
 	if (cc == cn) // Caster reserves mana
-		bu[in].reserve[2] = min(35, 10 + M_SK(cn, SK_ARIA) / 15);
+		bu[in].reserve[2] = min(35, 10 + M_SK(cc, SK_ARIA) / 15);
 	
-	if (IS_SANEITEM(ring1))
+	switch (type)  // Creator movement mode determines aura type
 	{
-		for (n=0;n< 5;n++) r_at[n] += max(0, it[ring1].attrib[n][act1]);
-		for (n=0;n<50;n++) r_sk[n] += max(0, it[ring1].skill[n][act1]);
-		r_hp += max(0, it[ring1].hp[act1]);         r_en += max(0, it[ring1].end[act1]);
-		r_mp += max(0, it[ring1].mana[act1]);       r_wp += max(0, it[ring1].weapon[act1]);
-		r_ar += max(0, it[ring1].armor[act1]);      r_sp += max(0, it[ring1].spell_pow[act1]);
-		r_tp += max(0, it[ring1].top_damage[act1]); r_ht += max(0, it[ring1].to_hit[act1]);
-		r_pr += max(0, it[ring1].to_parry[act1]);   r_th += max(0, it[ring1].gethit_dam[act1]);
-		r_as += max(0, it[ring1].speed[act1]);      r_ap += max(0, it[ring1].spell_apt[act1]);
-		r_co += max(0, it[ring1].cool_bonus[act1]); r_cc += max(0, it[ring1].crit_chance[act1]);
-		r_cm += max(0, it[ring1].crit_multi[act1]);
-	}
-	else
-	{
-		r_xx++;
-	}
-	
-	if (IS_SANEITEM(ring2))
-	{
-		for (n=0;n< 5;n++) r_at[n] += max(0, it[ring2].attrib[n][act2]);
-		for (n=0;n<50;n++) r_sk[n] += max(0, it[ring2].skill[n][act2]);
-		r_hp += max(0, it[ring2].hp[act2]);         r_en += max(0, it[ring2].end[act2]);
-		r_mp += max(0, it[ring2].mana[act2]);       r_wp += max(0, it[ring2].weapon[act2]);
-		r_ar += max(0, it[ring2].armor[act2]);      r_sp += max(0, it[ring2].spell_pow[act2]);
-		r_tp += max(0, it[ring2].top_damage[act2]); r_ht += max(0, it[ring2].to_hit[act2]);
-		r_pr += max(0, it[ring2].to_parry[act2]);   r_th += max(0, it[ring2].gethit_dam[act2]);
-		r_as += max(0, it[ring2].speed[act2]);      r_ap += max(0, it[ring2].spell_apt[act2]);
-		r_co += max(0, it[ring2].cool_bonus[act2]); r_cc += max(0, it[ring2].crit_chance[act2]);
-		r_cm += max(0, it[ring2].crit_multi[act2]);
-	}
-	else
-	{
-		r_xx++;
-	}
-	
-	if (flag)  // Enemy
-	{
-		for (n=0;n< 5;n++) r_at[n] *= -1;
-		for (n=0;n<50;n++) r_sk[n] *= -1;
-		r_hp *= -1; r_en *= -1; r_mp *= -1;
-		r_wp *= -1; r_ar *= -1; r_sp *= -1;
-		r_tp *= -1; r_ht *= -1; r_pr *= -1;
-		r_th *= -1; r_as *= -1; r_ap *= -1;
-		r_co *= -1; r_cc *= -1; r_cm *= -1;
-		
-		bu[in].reserve[0] = min(25, r_xx * power / 25);
-	}
-	else  // Ally
-	{
-		bu[in].dmg_bonus = min(25, r_xx * power / 25);
+		case  0: // SLOW
+			strcpy(bu[in].name, "Ballad of Insight");
+			if (flag)  // Enemy - Reduce TD and Hit Score
+			{
+				r_td = -(clamp(power/10, 0, 125));
+				r_th = -(clamp(power/12, 0, 125));
+			}
+			else // Ally - Increase Defense and Thorns
+			{
+				r_dr =   clamp(power/ 6, 0, 125);
+				r_gh =   clamp(power/ 8, 0, 125);
+			}
+			break;
+		case  1: // NORMAL
+			strcpy(bu[in].name, "Aria of Valor");
+			if (flag)  // Enemy - Reduce Crit Chance and Spell Power
+			{
+				r_cc = -(clamp(power/10, 0, 125));
+				r_sp = -(clamp(power/12, 0, 125));
+			}
+			else // Ally - Increase Crit Multi and Resistance
+			{
+				r_re =   clamp(power/ 6, 0, 125);
+				r_cm =   clamp(power/ 8, 0, 125);
+			}
+			break;
+		default: // FAST
+			strcpy(bu[in].name, "Hymn of Intensity");
+			if (flag)  // Enemy - Reduce Immunity and Parry Score
+			{
+				r_im = -(clamp(power/10, 0, 125));
+				r_tp = -(clamp(power/12, 0, 125));
+			}
+			else // Ally - Increase Damage and Cooldown
+			{
+				r_db =   clamp(power/ 6, 0, 125);
+				r_cd =   clamp(power/ 8, 0, 125);
+			}
+			break;
 	}
 	
-	bu[in].power = power;
+	bu[in].power            = power;
+	bu[in].data[3]          = type;
 	
-	bu[in].hp    = r_hp * ARIA_MULT;
-	bu[in].end   = r_en * ARIA_MULT;
-	bu[in].mana  = r_mp * ARIA_MULT;
-	
-	for (n=0;n< 5;n++) bu[in].attrib[n] = r_at[n] * ARIA_MULT;
-	for (n=0;n<50;n++) bu[in].skill[n]  = r_sk[n] * ARIA_MULT + (n==SK_IMMUN)?get_aria_im(cc, in):0;
-	
-	bu[in].weapon      = r_wp * ARIA_MULT + get_aria_wv(cc, in);
-	bu[in].armor       = r_ar * ARIA_MULT + get_aria_av(cc, in);
-	bu[in].spell_pow   = r_sp * ARIA_MULT;
-	bu[in].top_damage  = r_tp * ARIA_MULT;
-	bu[in].to_hit      = r_ht * ARIA_MULT;
-	bu[in].to_parry    = r_pr * ARIA_MULT;
-	bu[in].gethit_dam  = r_th * ARIA_MULT;
-	bu[in].speed       = r_as * ARIA_MULT;
-	bu[in].spell_apt   = r_ap * ARIA_MULT;
-	bu[in].cool_bonus  = r_co * ARIA_MULT;
-	bu[in].crit_chance = r_cc * ARIA_MULT;
-	bu[in].crit_multi  = r_cm * ARIA_MULT;
+	bu[in].weapon           = r_wp;
+	bu[in].armor            = r_ar;
+	bu[in].top_damage       = r_td;
+	bu[in].to_hit           = r_th;
+	bu[in].dmg_reduction    = r_dr;
+	bu[in].gethit_dam       = r_gh;
+	bu[in].spell_pow        = r_sp;
+	bu[in].crit_chance      = r_cc;
+	bu[in].skill[SK_RESIST] = r_re;
+	bu[in].crit_multi       = r_cm;
+	bu[in].skill[SK_IMMUN]  = r_im;
+	bu[in].to_parry         = r_tp;
+	bu[in].dmg_bonus        = r_db;
+	bu[in].cool_bonus       = r_cd;
 }
-
-#undef ARIA_MULT
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
@@ -12994,6 +12982,9 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 		case SK_ARIA:
 			power = M_SK(cn, SK_ARIA);
 			power = more(power, n, 1);
+			
+			if (in && intemp == SK_ARIA && IS_SANECHAR(bu[in].data[0]) && bu[in].data[0] == cn)
+				power = more(power, bu[in].data[2], 200);
 			
 			if (flag) // Target is an enemy
 			{
@@ -13258,18 +13249,25 @@ void do_random_blast(int cn, int power)
 
 void do_update_spell_aria(int cn, int in)
 {
-	int power, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
+	int cc = bu[in].data[0], in2 = 0;
+	int power, n;
 	
-	power = M_SK(cn, SK_ARIA);
+	n = TC_SK(cc, 34)*15 + do_get_ieffect(cc, VF_MOREAURA);  // (Corr) Towering Presence + IT_WB_DECOSWORD
+	
+	power = M_SK(cc, SK_ARIA);
 	power = more(power, n, 1);
+	
+	if (in2 = has_buff(cc, SK_ARIA))
+		power = more(power, bu[in2].data[2], 200);
 	
 	do_aria_stats(cn, in, power, 0);
 }
 void do_update_spell_haste(int cn, int in)
 {
-	int power, n = TC_SK(cn, 34)*15;  // (Corr) Towering Presence
+	int cc = bu[in].data[0];
+	int power, n = TC_SK(cc, 34)*15;  // (Corr) Towering Presence
 	
-	power = spell_multiplier(M_SK(cn, SK_HASTE), cn);
+	power = spell_multiplier(M_SK(cc, SK_HASTE), cc);
 	power = more(power, n, 1);
 	
 	bu[in].speed      = min(300, 10 + (power  )/ 6);
@@ -13365,6 +13363,12 @@ void do_update_permaspells(int cn)
 	{
 		if ((in = ch[cn].spell[n]) && ((bu[in].flags & BF_PERMASPELL) || ((bu[in].data[4] & 2) && (bu[in].data[0] == cn))))
 		{
+			if ((bu[in].temp == SK_ARIA || bu[in].temp == SK_HASTE) && !IS_SANECHAR(bu[in].data[0]))  // The spell has no creator?
+			{
+				bu[in].used = USE_EMPTY;
+				ch[cn].spell[n] = 0;
+				continue;
+			}
 			switch (bu[in].temp)
 			{
 				case SK_ARIA:     do_update_spell_aria(cn, in);     break;
@@ -13881,6 +13885,10 @@ void do_regenerate(int cn)
 							do_update_char(cn);
 					}
 				}
+				
+				// Aria crit decay per frame
+				if (bu[in].temp==SK_ARIA && bu[in].data[2]>0)
+					bu[in].data[2]--;
 				
 				if (bu[in].temp==SK_OPPRESSED2 && !IS_IN_AQUE(ch[cn].x, ch[cn].y))
 				{
