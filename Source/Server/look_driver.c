@@ -258,6 +258,7 @@ void look_extra(int cn, int in)
 	case IT_BT_NATURES: do_char_log(cn, FN_EX, DESC_BT_NATURES); break;
 	case IT_LIZCROWN:   do_char_log(cn, FN_EX, DESC_LIZCROWN);   break;
 	case IT_MATHCAP1:   do_char_log(cn, FN_EX, DESC_MATHCAP);    break;
+	case IT_OBSCROWN:   do_char_log(cn, FN_EX, DESC_OBSCROWN);   break;
 		
 	// -------- SPECIAL AMULETS --------
 	case IT_ANKHAMULET: do_char_log(cn, FN_EX, DESC_ANKHAMULET); break;

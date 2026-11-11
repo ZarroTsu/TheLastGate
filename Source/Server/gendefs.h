@@ -562,6 +562,7 @@ extern char *at_short[];
 #define DESC_RINGWARMTH		"When equipped and activated, grants additional health, endurance, and mana regeneration.\n"
 #define DESC_LIZCROWN		"When equipped, your maximum hitpoints and maximum mana are swapped. Overcap bonuses occur after this swap.\n"
 #define DESC_MATHCAP		"When equipped, you gain 5%% more total Spell Modifier."
+#define DESC_OBSCROWN		"When equipped, increases all attribute and skill limits by 5.\n"
 
 #define DESC_ANKHAMULET		"When equipped, grants additional passive regeneration bonuses.\n"
 #define DESC_AMBERANKH		"When equipped, grants additional passive regeneration bonuses. Grants improved life regeneration.\n"
