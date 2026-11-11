@@ -3676,7 +3676,7 @@ int use_talisman(int cn, int in, int in2)
 	
 	// Item already has an enchantment - replace it!
 	if (it[in2].enchantment && !EN_GODS(it[in2].enchantment) 
-		&& it[in].orig_temp && (it_temp[it[in].orig_temp].flags & IF_CAN_EN))
+		&& it[in2].orig_temp && (it_temp[it[in2].orig_temp].flags & IF_CAN_EN))
 	{
 		switch (it[in2].enchantment)
 		{

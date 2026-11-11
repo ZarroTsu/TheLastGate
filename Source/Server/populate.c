@@ -861,6 +861,7 @@ void reset_item(int n)
 				tmp.y = it[in].y;
 				tmp.carried = it[in].carried;
 				tmp.temp = n;
+				tmp.season = it[in].season;
 				
 				if (item_has_player_mods(in))
 				{
