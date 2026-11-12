@@ -844,6 +844,10 @@ int get_aoe_radius(int cn, int intemp, int prox_power)
 			else                   numrepeats += max(0, GET_SPD_ATK(cn)/90);
 			n += numrepeats * 50;
 			break;
+		case SK_ARIA:
+			if (IS_PLAYER(cn)) n = 600;
+			else               n = 300;
+			break;
 		default: break;
 	}
 	

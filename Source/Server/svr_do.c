@@ -10132,7 +10132,7 @@ int do_crit(int cn, int co, int dam, int msg)
 		}
 		if ((in = has_buff(cn, SK_ARIA)) && bu[in].data[0] == cn)
 		{
-			bu[in].data[1] = clamp(bu[in].data[1] + 200, 200, 20000);
+			bu[in].data[1] = clamp(bu[in].data[2] + 100, 100, 10000);
 		}
 	}
 	
@@ -12873,7 +12873,7 @@ int get_aria_im(int cn, int in)
 
 void do_aria_stats(int cn, int in, int power, int flag)
 {
-	int n,cc = 0, type = 1, r_wp = 0, r_ar = 0;
+	int n,m,cc=0, type = 1, r_wp = 0, r_ar = 0;
 	int r_td = 0, r_th = 0, r_dr = 0, r_gh = 0;
 	int r_sp = 0, r_cc = 0, r_re = 0, r_cm = 0;
 	int r_im = 0, r_tp = 0, r_db = 0, r_cd = 0;
@@ -12890,7 +12890,22 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	}
 	
 	if (cc == cn) // Caster reserves mana
+	{
 		bu[in].reserve[2] = min(35, 10 + M_SK(cc, SK_ARIA) / 15);
+		
+		if (type != bu[in].data[3]) // Update everyone else affected by our aria too
+		{
+			for (n = 1; n<MAXCHARS; n++)
+			{
+				if (ch[n].used!=USE_ACTIVE)	       continue;
+				if (ch[n].flags & CF_BODY)	       continue;
+				if (!(m=has_buff(n, SK_ARIA)))     continue;
+				if (bu[m].data[0]!=bu[in].data[0]) continue;
+				do_update_spell_aria(n, m);
+				do_update_char(n);
+			}
+		}
+	}
 	
 	switch (type)  // Creator movement mode determines aura type
 	{
@@ -12980,7 +12995,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			power = more(power, n, 1);
 			
 			if (in && intemp == SK_ARIA && IS_SANECHAR(bu[in].data[0]) && bu[in].data[0] == cn)
-				power = more(power, bu[in].data[2], 200);
+				power = more(power, bu[in].data[2], 100);
 			
 			if (flag) // Target is an enemy
 			{
@@ -13254,7 +13269,7 @@ void do_update_spell_aria(int cn, int in)
 	power = more(power, n, 1);
 	
 	if (in2 = has_buff(cc, SK_ARIA))
-		power = more(power, bu[in2].data[2], 200);
+		power = more(power, bu[in2].data[2], 100);
 	
 	do_aria_stats(cn, in, power, 0);
 }
