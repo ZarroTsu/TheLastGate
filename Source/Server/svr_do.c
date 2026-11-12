@@ -10132,7 +10132,8 @@ int do_crit(int cn, int co, int dam, int msg)
 		}
 		if ((in = has_buff(cn, SK_ARIA)) && bu[in].data[0] == cn)
 		{
-			bu[in].data[1] = clamp(bu[in].data[2] + 100, 100, 10000);
+			bu[in].data[2] = clamp(bu[in].data[2] + 100, 100, 10000);
+			do_update_spell_aria(cn, in);
 		}
 	}
 	
@@ -13274,7 +13275,7 @@ void do_update_spell_aria(int cn, int in)
 	power = M_SK(cc, SK_ARIA);
 	power = more(power, n, 1);
 	
-	if (in2 = has_buff(cc, SK_ARIA))
+	if ((in2 = has_buff(cc, SK_ARIA)))
 		power = more(power, bu[in2].data[2], 100);
 	
 	do_aria_stats(cn, in, power, 0);
@@ -13905,7 +13906,9 @@ void do_regenerate(int cn)
 				
 				// Aria crit decay per frame
 				if (bu[in].temp==SK_ARIA && bu[in].data[2]>0)
-					bu[in].data[2]--;
+				{
+					bu[in].data[2] -= (100 + bu[in].data[2]/2)/100; // Decays faster the higher it gets
+				}
 				
 				if (bu[in].temp==SK_OPPRESSED2 && !IS_IN_AQUE(ch[cn].x, ch[cn].y))
 				{
