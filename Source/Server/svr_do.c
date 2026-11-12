@@ -12900,10 +12900,12 @@ void do_aria_stats(int cn, int in, int power, int flag)
 				if (ch[n].used!=USE_ACTIVE)	       continue;
 				if (ch[n].flags & CF_BODY)	       continue;
 				if (n==cc)                         continue;
-				if (!(m=has_buff(n, SK_ARIA)))     continue;
-				if (bu[m].data[0]!=bu[in].data[0]) continue;
-				do_update_spell_aria(n, m);
-				do_update_char(n);
+				if ((m=has_buff(n, SK_ARIA)) || (m=has_buff(n, SK_ARIA2)))
+				{
+					if (bu[m].data[0]!=bu[in].data[0]) continue;
+					do_update_spell_aria(n, m);
+					do_update_char(n);
+				}
 			}
 		}
 	}
@@ -12911,40 +12913,43 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	switch (type)  // Creator movement mode determines aura type
 	{
 		case  0: // SLOW
-			strcpy(bu[in].name, "Ballad of Insight");
 			if (flag)  // Enemy - Reduce TD and Hit Score
 			{
+				strcpy(bu[in].name, "Ballad of Ignorance");
 				r_td = -(clamp(power/10, 0, 125));
 				r_th = -(clamp(power/12, 0, 125));
 			}
 			else // Ally - Increase Defense and Thorns
 			{
+				strcpy(bu[in].name, "Ballad of Insight");
 				r_dr =   clamp(power/ 6, 0, 125);
 				r_gh =   clamp(power/ 8, 0, 125);
 			}
 			break;
 		case  1: // NORMAL
-			strcpy(bu[in].name, "Aria of Valor");
 			if (flag)  // Enemy - Reduce Crit Chance and Spell Power
 			{
+				strcpy(bu[in].name, "Aria of Cowardice");
 				r_cc = -(clamp(power/10, 0, 125));
 				r_sp = -(clamp(power/12, 0, 125));
 			}
 			else // Ally - Increase Crit Multi and Resistance
 			{
+				strcpy(bu[in].name, "Aria of Valor");
 				r_re =   clamp(power/ 6, 0, 125);
 				r_cm =   clamp(power/ 8, 0, 125);
 			}
 			break;
 		default: // FAST
-			strcpy(bu[in].name, "Hymn of Intensity");
 			if (flag)  // Enemy - Reduce Immunity and Parry Score
 			{
+				strcpy(bu[in].name, "Hymn of Apathy");
 				r_im = -(clamp(power/10, 0, 125));
 				r_tp = -(clamp(power/12, 0, 125));
 			}
 			else // Ally - Increase Damage and Cooldown
 			{
+				strcpy(bu[in].name, "Hymn of Intensity");
 				r_db =   clamp(power/ 6, 0, 125);
 				r_cd =   clamp(power/ 8, 0, 125);
 			}
