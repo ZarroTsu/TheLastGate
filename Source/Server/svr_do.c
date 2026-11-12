@@ -12899,6 +12899,7 @@ void do_aria_stats(int cn, int in, int power, int flag)
 			{
 				if (ch[n].used!=USE_ACTIVE)	       continue;
 				if (ch[n].flags & CF_BODY)	       continue;
+				if (n==cc)                         continue;
 				if (!(m=has_buff(n, SK_ARIA)))     continue;
 				if (bu[m].data[0]!=bu[in].data[0]) continue;
 				do_update_spell_aria(n, m);
