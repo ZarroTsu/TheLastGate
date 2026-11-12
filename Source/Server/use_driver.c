@@ -8379,6 +8379,7 @@ int use_seyan_portal(int cn, int in)
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 			
 			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
+			plr_update_all_skill_terminology(ch[cn].player);
 			
 			/* Announce the player's new race */
 			if (n<MAXCHARS)
@@ -8408,6 +8409,7 @@ int use_seyan_portal(int cn, int in)
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 			
 			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
+			plr_update_all_skill_terminology(ch[cn].player);
 			
 			in2 = god_create_item(35); god_give_char(in2, cn);
 			in2 = god_create_item(36); god_give_char(in2, cn);
@@ -8440,6 +8442,7 @@ int use_seyan_portal(int cn, int in)
 			ch[cn].temple_y = ch[cn].tavern_y = HOME_START_Y;
 			
 			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
+			plr_update_all_skill_terminology(ch[cn].player);
 			
 			in2 = god_create_item(IT_SEYANSWORD);
 			god_give_char(in2, cn);
@@ -8870,6 +8873,8 @@ void use_announce_class(int cn, int m)
 		do_shout(n, message);
 		if (globs->flags & GF_DISCORD) discord_ranked(message);
 	}
+	
+	plr_update_all_skill_terminology(ch[cn].player);
 }
 
 void change_to_archtemplar(int cn)

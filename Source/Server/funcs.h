@@ -53,6 +53,7 @@ void reset_item(int n);
 void tick(void);
 void player_exit(int nr);
 void ch_update_skill_terminology(int cn, int n);
+void plr_update_all_skill_terminology(int nr);
 void plr_update_treenode_terminology(int nr, int tn, int n);
 void plr_update_tree_terminology(int nr, int val);
 int ch_get_skill_attrib(int cn, int n, int m);

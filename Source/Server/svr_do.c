@@ -10865,6 +10865,8 @@ void really_update_char(int cn)
 	
 	if (IS_PLAYER_COMP(cn)) dmg_rdc = 5000;
 	
+	do_update_permaspells(cn);
+	
 	// Loop through gear for item effect flags - Magic checks
 	for (n=0; n<MAXGSLOTS; n++)
 	{
