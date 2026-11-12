@@ -10866,8 +10866,6 @@ void really_update_char(int cn)
 	
 	if (IS_PLAYER_COMP(cn)) dmg_rdc = 5000;
 	
-	do_update_permaspells(cn);
-	
 	// Loop through gear for item effect flags - Magic checks
 	for (n=0; n<MAXGSLOTS; n++)
 	{
@@ -11176,6 +11174,8 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in, 109)) do_add_ieffect(cn, VF_EN_OFFHMANA,   10*(1+IS_TWOHAND(in)));
 		if (HAS_ENCH(in, 110)) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
 	}
+	
+	do_update_permaspells(cn);
 	
 	// Base critical strike chance
 	if (ch[cn].worn[WN_RHAND]==0 && ch[cn].worn[WN_LHAND]==0) critical_b += 1;
@@ -12834,7 +12834,7 @@ void do_pmshield(int cn, int co)
 
 int get_aria_wv(int cn, int in)
 {
-	int weapon, effect;
+	int weapon=0, effect=0;
 	
 	if (!cn || !do_get_iflag(cn, SF_SIGN_SONG)) return 0;
 	
@@ -12843,33 +12843,45 @@ int get_aria_wv(int cn, int in)
 	
 	if (in) weapon -= bu[in].weapon;
 	
-	return more(weapon * 10, effect, 1)/100;
+	weapon = weapon*10;
+	weapon = more(weapon, effect, 1);
+	weapon = weapon/100;
+	
+	return weapon;
 }
 int get_aria_av(int cn, int in)
 {
-	int armor, effect;
+	int armor=0, effect=0;
 	
 	if (!cn || !do_get_iflag(cn, SF_SIGN_SONG)) return 0;
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
-	armor = ch[cn].armor;
+	armor  = ch[cn].armor;
 	
 	if (in) armor -= bu[in].armor;
 	
-	return more(armor * 10, effect, 1)/100;
+	armor = armor*10;
+	armor = more(armor, effect, 1);
+	armor = armor/100;
+	
+	return armor;
 }
 int get_aria_im(int cn, int in)
 {
-	int immun, effect;
+	int immun=0, effect=0;
 	
 	if (!cn || !T_SKAL_SK(cn, 10)) return 0;
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
-	immun = M_SK(cn, SK_IMMUN);
+	immun  = M_SK(cn, SK_IMMUN);
 	
 	if (in) immun -= bu[in].skill[SK_IMMUN];
 	
-	return more(immun * 20, effect, 1)/100;
+	immun = immun*20;
+	immun = more(immun, effect, 1);
+	immun = immun/100;
+	
+	return immun;
 }
 
 void do_aria_stats(int cn, int in, int power, int flag)

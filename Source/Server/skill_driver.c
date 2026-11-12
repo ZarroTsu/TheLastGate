@@ -2124,6 +2124,8 @@ int add_spell(int cn, int new_in)
 						bu[old_in].power            = bu[new_in].power;
 						bu[old_in].data[2]          = bu[new_in].data[2];
 						
+						bu[old_in].weapon           = bu[new_in].weapon;
+						bu[old_in].armor            = bu[new_in].armor;
 						bu[old_in].top_damage       = bu[new_in].top_damage;
 						bu[old_in].to_hit           = bu[new_in].to_hit;
 						bu[old_in].dmg_reduction    = bu[new_in].dmg_reduction;
