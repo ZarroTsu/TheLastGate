@@ -13024,12 +13024,16 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				
 				if (!(in2 = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, power, SP_DUR_ARIA, 0))) return;
 				
+				bu[in2].data[2] = bu[in].data[2];
+				
 				do_aria_stats(cn, in2, power, 1);
 				bu[in2].data[4] = 1;
 			}
 			else // Target is an ally
 			{
 				if (!(in2 = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) return;
+				
+				bu[in2].data[2] = bu[in].data[2];
 				
 				do_aria_stats(cn, in2, power, 0);
 				bu[in2].data[4] = 1;
@@ -13290,7 +13294,7 @@ void do_update_spell_aria(int cn, int in, int flag)
 	power = more(power, n, 1);
 	
 	if ((in2 = has_buff(cc, SK_ARIA)))
-		power = more(power, bu[in2].data[2], 100);
+		power = more(power, (bu[in].data[2] = bu[in2].data[2]), 100);
 	
 	do_aria_stats(cn, in, power, flag);
 }
