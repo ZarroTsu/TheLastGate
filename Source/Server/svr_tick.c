@@ -2207,7 +2207,7 @@ int get_meta_stat_value(int cn, int n)
 			break;
 		case 78: case 100: // Weaken/Crush Effect							// Flipped to Positive
 			power = skill_multiplier(M_SK(cn, SK_WEAKEN), cn);
-			power = more(power, M_AT(cn, AT_AGL) * TC_SK(cn,1111), 20);  // (Corr) Burden
+			power = more(power, M_AT(cn, AT_AGL) * TC_SK(cn,111), 20);  // (Corr) Burden
 			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
 			if (T_LYCA_SK(cn,  4))    // (Lyca) Sickness
 			{
