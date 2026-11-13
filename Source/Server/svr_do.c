@@ -4130,7 +4130,7 @@ int do_showbuffs(int cn, int co)
 		else if (bu[in].temp == SK_VENOM || bu[in].temp == SK_SHOCK || bu[in].temp == SK_CHARGE || bu[in].temp == SK_ZEPHYR2)
 			do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].stack, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
 		else if (bu[in].temp == SK_ARIA || bu[in].temp == SK_ARIA2)
-			do_char_log(cn, 1, "%s power of %d (+%d.%02d%%)\n", bu[in].name, bu[in].power, bu[in].data[2]/100, bu[in].data[2]%100);
+			do_char_log(cn, 1, "%s power of %d (%d + %d.%02d%%)\n", bu[in].name, bu[in].power, bu[in].data[1], bu[in].data[2]/100, bu[in].data[2]%100);
 		else if ((bu[in].flags & BF_PERMASPELL))
 			do_char_log(cn, 1, "%s power of %d\n", bu[in].name, bu[in].power);
 		else
@@ -12838,7 +12838,8 @@ int get_aria_wv(int cn, int in)
 {
 	int weapon=0, effect=0;
 	
-	if (!cn || !do_get_iflag(cn, SF_SIGN_SONG)) return 0;
+	if (!cn)                             return 0;
+	if (!do_get_iflag(cn, SF_SIGN_SONG)) return 0;
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	weapon = ch[cn].weapon;
@@ -12855,7 +12856,8 @@ int get_aria_av(int cn, int in)
 {
 	int armor=0, effect=0;
 	
-	if (!cn || !do_get_iflag(cn, SF_SIGN_SONG)) return 0;
+	if (!cn)                            return 0;
+	if (!do_get_iflag(cn, SF_SIGN_SONG) return 0;
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	armor  = ch[cn].armor;
@@ -12872,7 +12874,8 @@ int get_aria_im(int cn, int in)
 {
 	int immun=0, effect=0;
 	
-	if (!cn || !T_SKAL_SK(cn, 10)) return 0;
+	if (!cn)                return 0;
+	if (!T_SKAL_SK(cn, 10)) return 0;
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	immun  = M_SK(cn, SK_IMMUN);
@@ -12896,13 +12899,6 @@ void do_aria_stats(int cn, int in, int power, int flag)
 	if (!IS_SANECHAR(cc = bu[in].data[0])) return;  // No creator, abort
 	
 	type = ch[cc].mode;
-	
-	if (!flag)
-	{
-		r_wp = get_aria_wv(cc, in);
-		r_ar = get_aria_av(cc, in);
-		r_im = get_aria_im(cc, in);
-	}
 	
 	if (cc == cn) // Caster reserves mana
 	{
@@ -12971,6 +12967,13 @@ void do_aria_stats(int cn, int in, int power, int flag)
 			break;
 	}
 	
+	if (!flag)
+	{
+		r_wp = get_aria_wv(cc, in);
+		r_ar = get_aria_av(cc, in);
+		r_im = get_aria_im(cc, in);
+	}
+	
 	bu[in].power            = power;
 	bu[in].data[3]          = type;
 	
@@ -12992,7 +12995,8 @@ void do_aria_stats(int cn, int in, int power, int flag)
 
 void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 {
-	int power, tarot, in2 = 0, n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);  // (Corr) Towering Presence + IT_WB_DECOSWORD
+	int power, tarot, tmp1=0, tmp2=0, in2 = 0;
+	int n = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);  // (Corr) Towering Presence + IT_WB_DECOSWORD
 	
 	if (!co) return;
 	
@@ -13013,10 +13017,11 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 	{
 		case SK_ARIA:
 			power = M_SK(cn, SK_ARIA);
-			power = more(power, n, 1);
+			power = tmp1 = more(power, n, 1);
+			tmp2 = bu[in].data[2];
 			
 			if (in && intemp == SK_ARIA && IS_SANECHAR(bu[in].data[0]) && bu[in].data[0] == cn)
-				power = more(power, bu[in].data[2], 100);
+				power = more(power, tmp2, 100);
 			
 			if (flag) // Target is an enemy
 			{
@@ -13024,7 +13029,8 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				
 				if (!(in2 = make_new_buff(cn, SK_ARIA2, BUF_SPR_ARIA2, power, SP_DUR_ARIA, 0))) return;
 				
-				bu[in2].data[2] = bu[in].data[2];
+				bu[in2].data[1] = tmp1;
+				bu[in2].data[2] = tmp2;
 				
 				do_aria_stats(cn, in2, power, 1);
 				bu[in2].data[4] = 1;
@@ -13033,7 +13039,8 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 			{
 				if (!(in2 = make_new_buff(cn, SK_ARIA, BUF_SPR_ARIA, power, SP_DUR_ARIA, 0))) return;
 				
-				bu[in2].data[2] = bu[in].data[2];
+				bu[in2].data[1] = tmp1;
+				bu[in2].data[2] = tmp2;
 				
 				do_aria_stats(cn, in2, power, 0);
 				bu[in2].data[4] = 1;
@@ -13291,7 +13298,7 @@ void do_update_spell_aria(int cn, int in, int flag)
 	n = TC_SK(cc, 34)*15 + do_get_ieffect(cc, VF_MOREAURA);  // (Corr) Towering Presence + IT_WB_DECOSWORD
 	
 	power = M_SK(cc, SK_ARIA);
-	power = more(power, n, 1);
+	power = bu[in].data[1] = more(power, n, 1);
 	
 	if ((in2 = has_buff(cc, SK_ARIA)))
 		power = more(power, (bu[in].data[2] = bu[in2].data[2]), 100);
@@ -13925,9 +13932,9 @@ void do_regenerate(int cn)
 				// Aria crit decay per frame
 				if (bu[in].temp==SK_ARIA && bu[in].data[0]==cn && bu[in].data[2]>0)
 				{
-					tmp = more(bu[in].power, bu[in].data[2], 100);
+					tmp = more(bu[in].data[1], bu[in].data[2], 100);
 					bu[in].data[2] -= (100 + bu[in].data[2]/2)/100; // Decays faster the higher it gets
-					if (tmp != more(bu[in].power, bu[in].data[2], 100))
+					if (tmp != more(bu[in].data[1], bu[in].data[2], 100))
 						do_update_char(cn);
 				}
 				
