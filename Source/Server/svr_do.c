@@ -10650,6 +10650,14 @@ int do_check_tarot(int in, int temp)
 	return 0;
 }
 
+int do_check_rings(int cn, int temp)
+{
+	int in;
+	in = ch[cn].worn[WN_LRING];	if (it[in].temp==temp) return 1;
+	in = ch[cn].worn[WN_RRING];	if (it[in].temp==temp) return 1;
+	return 0;
+}
+
 int do_check_items(int in, int temp)
 {
 	if (it[in].temp==temp || it[in].orig_temp==temp) return 1;
@@ -12838,8 +12846,9 @@ int get_aria_wv(int cn, int in)
 {
 	int weapon=0, effect=0;
 	
-	if (!cn)                             return 0;
-	if (!do_get_iflag(cn, SF_SIGN_SONG)) return 0;
+	if (!cn)                               return 0;
+	if (!do_get_iflag(cn, SF_SIGN_SONG))   return 0;
+	if (!do_check_rings(cn, IT_SIGN_SONG)) return 0;  // Redundant...
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	weapon = ch[cn].weapon;
@@ -12856,8 +12865,9 @@ int get_aria_av(int cn, int in)
 {
 	int armor=0, effect=0;
 	
-	if (!cn)                            return 0;
-	if (!do_get_iflag(cn, SF_SIGN_SONG) return 0;
+	if (!cn)                               return 0;
+	if (!do_get_iflag(cn, SF_SIGN_SONG)    return 0;
+	if (!do_check_rings(cn, IT_SIGN_SONG)) return 0;  // Redundant...
 	
 	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
 	armor  = ch[cn].armor;

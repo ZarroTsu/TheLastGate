@@ -213,6 +213,7 @@ int do_crit(int cn, int co, int dam, int msg);
 void do_attack(int cn, int co, int surround);
 int do_char_can_see(int cn, int co, int flag);
 int do_char_can_see_item(int cn, int in);
+int do_check_rings(int cn, int temp);
 int do_get_iflag(int cn, int v);
 int do_get_ieffect(int cn, int v);
 void do_update_char(int cn);
