@@ -9589,40 +9589,29 @@ int do_hurt(int cn, int co, int dam, int type)
 		mf1 |= map[XY2M(ch[cn].x, ch[cn].y)].flags;
 		mf2 &= map[XY2M(ch[cn].x, ch[cn].y)].flags;
 	}
-
-	if (ch[co].flags & CF_BODY)
-	{
-		return 0;
-	}
+	
+	if (ch[co].flags & CF_BODY) return 0;
 	
 	// God Enchant :: 10% of current endurance value is granted as additional damage on hit.
-	if ((extradam = do_get_ieffect(cn, VF_EN_PURPDAMG)) && (ch[cn].a_end-500)>0)
+	if (type!=2 && type!=3 && type!=13 && (extradam = do_get_ieffect(cn, VF_EN_PURPDAMG)) && (ch[cn].a_end-500)>0)
 	{
-		extradam = (ch[cn].a_end-500)*extradam/100000;
+		extradam = max(0, (ch[cn].a_end-500)*extradam/100000);
 		dam += extradam;
 	}
-
-	if ((ch[co].flags & (CF_PLAYER)) && type!=3 && type!=13)
-	{
+	
+	if (type!=2 && type!=3 && type!=13 && (ch[co].flags & (CF_PLAYER)))
 		item_damage_armor(co, dam);
-	}
-
+	
 	if (!(ch[cn].flags & CF_PLAYER) && ch[cn].data[CHD_MASTER]==co)
-	{
 		noexp = 1;
-	}
-
+	
 	// no exp for killing players
 	if (ch[co].flags & CF_PLAYER)
-	{
 		noexp = 1;
-	}
-
+	
 	// half exp for killing ghosts
 	if (IS_COMP_TEMP(co) && !IS_THRALL(co))
-	{
 		halfexp = 1;
-	}
 	
 	if (do_get_iflag(co, SF_PREIST_R)) priestess = 2;
 	
@@ -9675,19 +9664,14 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
-	// Easy new method!
 	if (cn)
 	{
+		// Easy new method!
 		dam = dam * ch[cn].dmg_bonus / 10000;
 		
-		if ((n = do_get_ieffect(cn, VF_QUICKSILV)) && has_buff(co, SK_BLEED))
-			dam = more(dam, n, 1);
-	}
-	
-	// Tarot - Strength - 20% more damage dealt
-	if (do_get_iflag(cn, SF_STRENGTH))
-	{
-		dam = dam*6/5;
+		// Tarot - Strength - 20% more damage dealt
+		if (do_get_iflag(cn, SF_STRENGTH))
+			dam = dam*6/5;
 	}
 	
 	if ((type==3 || type==13) && (mf1 & MF_NOFIGHT) && !(IS_IN_BOJ(ch[cn].x, ch[cn].y) && get_gear(cn, IT_XIXDARKSUN)))
@@ -9696,30 +9680,31 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	else if (type==3 || type==13)
 	{
-		if (ch[cn].to_parry > ch[co].to_hit)
-			dam = max(0, dam - (ch[cn].to_parry - ch[co].to_hit));
+		// co is the original attacker for thorns, they get hurt in retaliation
+		// cn is the owner of the thorns
+		// dam is equal to the thorns score of the cn
 		
-		dam = dam * DAM_MULT_THORNS;                   // Thorns
+		dam = max(0, dam - max(0, ch[co].to_parry - ch[cn].to_hit)/2);
+		dam = dam * DAM_MULT_THORNS;
 		dam = dam * ch[co].dmg_reduction / 10000;
-		dam = RANDOM(dam)+1;
-		
-		if (IS_PLAYER(cn) && !IS_PLAYER(co))
-			dam /= 2;
+		dam = max(0, dam - RANDOM(dam/4) - RANDOM(dam/4) - RANDOM(dam/4));
 		
 		if (type==13) // Parried Thorns
 			dam = dam * (T_LYCA_SK(cn, 10)*20+TC_SK(cn, 106)*10) / 100;  // (Lyca) Sloth
-			
-		if (ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW || (IS_PLAYER(cn) && IS_PLAYER(co))) // Reduced
-			dam = less(dam, 80, 1);
+		
+		if (IS_PLAYER(co) || ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW) // Reduced
+			dam = less(dam, 50, 1);
 		
 		dam = less(dam, TC_SK(co,114)*25, 1); // (Corr) Courage
 	}
 	else
 	{
-		if (type == 18) // Random Leaps
-			dam -= ch[co].armor/2;
-		else
-			dam -= ch[co].armor;
+		// Improved Bloodletter Dagger
+		if (cn && (n = do_get_ieffect(cn, VF_BLEED_DMG)) && has_buff(co, SK_BLEED))
+			dam = more(dam, n, 1);
+		
+		if (type == 18) dam -= ch[co].armor/2;  // Random Leaps
+		else            dam -= ch[co].armor;
 		
 		// Easy new method!
 		dam = dam * ch[co].dmg_reduction / 10000;
@@ -9826,7 +9811,8 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
-	if (type!=2 && type!=3 && type!=13) do_leech(cn, dam, 0);
+	if (type!=2 && type!=3 && type!=13)
+		do_leech(cn, dam, 0);
 	
 	// Staggered damage
 	{
@@ -10103,14 +10089,6 @@ int do_crit(int cn, int co, int dam, int msg)
 	
 	die = RANDOM(crit_dice) + 1;
 	
-	/*
-	if (do_get_iflag(cn, SF_VOLCANF) && has_buff(co, SK_SCORCH))
-	{
-		remove_buff(co, SK_SCORCH);
-		die = 0;
-	}
-	*/
-	
 	if (die<=crit_chance)
 	{
 		crit_dam  = dam;
@@ -10132,7 +10110,7 @@ int do_crit(int cn, int co, int dam, int msg)
 			spell_blast(cn, co, spell_multiplier(M_SK(cn, SK_BLAST), cn), 0, 1);
 			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 		}
-		if ((in = has_buff(cn, SK_ARIA)) && bu[in].data[0] == cn)
+		if ((in = get_my_aria(cn, cn)))
 		{
 			bu[in].data[2] = clamp(bu[in].data[2] + 100, 100, 10000);
 			do_update_spell_aria(cn, in, 0);
@@ -10650,14 +10628,6 @@ int do_check_tarot(int in, int temp)
 	return 0;
 }
 
-int do_check_rings(int cn, int temp)
-{
-	int in;
-	in = ch[cn].worn[WN_LRING];	if (it[in].temp==temp) return 1;
-	in = ch[cn].worn[WN_RRING];	if (it[in].temp==temp) return 1;
-	return 0;
-}
-
 int do_check_items(int in, int temp)
 {
 	if (it[in].temp==temp || it[in].orig_temp==temp) return 1;
@@ -10752,6 +10722,8 @@ int do_add_stat(int cn, int in, int v, int m)
 }
 
 void do_update_permaspells(int cn);
+int get_aria_ex(int cn, int v, int m);
+int get_my_aria(int cn, int cc);
 
 void do_update_char(int cn)
 {
@@ -11954,6 +11926,14 @@ void really_update_char(int cn)
 			
 			if (do_get_iflag(cn, SF_HERMIT))
 				skill[z] = less(skill[z], 20, 1);  // [Taro] Hermit
+			
+			// Gross Aria cheat for (Skal) Guardian
+			if (B_SK(cn, SK_ARIA) && T_SKAL_SK(cn, 10) && (n = get_my_aria(cn, cn)))
+			{
+				m = get_aria_ex(cn, skill[z], 20);
+				bu[n].skill[z] = m;
+				skill[z]      += m;
+			}
 		}
 		
 		if (z==SK_RESIST)
@@ -11979,12 +11959,12 @@ void really_update_char(int cn)
 	{
 		unarmed = 1;
 		
-		if (it[WN_BELT].temp == IT_TW_BBELT) // Black Belt
+		if (it[ch[cn].worn[WN_BELT]].temp == IT_TW_BBELT) // Black Belt
 		{
 			n = skill[SK_HAND]/2;
 			m = 3;
 		}
-		else if (it[WN_BELT].temp == IT_WHITEBELT) // White Belt
+		else if (it[ch[cn].worn[WN_BELT]].temp == IT_WHITEBELT) // White Belt
 		{
 			n = skill[SK_HAND]/3;
 			m = 2;
@@ -12565,6 +12545,18 @@ void really_update_char(int cn)
 		weapon = more(weapon, n, 1);
 	}
 	
+	// Gross Aria cheat for Signet of Songs
+	if (B_SK(cn, SK_ARIA) && do_get_iflag(cn, SF_SIGN_SONG) && (n = get_my_aria(cn, cn)))
+	{
+		m = get_aria_ex(cn, armor, 10);
+		bu[n].armor = m;
+		armor      += m;
+		
+		m = get_aria_ex(cn, weapon, 10);
+		bu[n].weapon = m;
+		weapon      += m;
+	}
+	
 	ch[cn].armor  = clamp(armor,  0, 999);
 	ch[cn].weapon = clamp(weapon, 0, 999);
 	
@@ -12842,61 +12834,69 @@ void do_pmshield(int cn, int co)
 	add_spell(co, in);
 }
 
+int get_my_aria2(int cn, int cc)
+{
+	int in, n;
+	
+	for (n = 0; n<MAXBUFFS; n++) if ((in = ch[cn].spell[n])!=0 && (bu[in].used!=USE_EMPTY))
+	{
+		if (bu[in].temp==SK_ARIA2 && bu[in].data[0]==cc) return in;
+	}
+	
+	return 0;
+}
+int get_my_aria(int cn, int cc)
+{
+	int in, n;
+	
+	for (n = 0; n<MAXBUFFS; n++) if ((in = ch[cn].spell[n])!=0 && (bu[in].used!=USE_EMPTY))
+	{
+		if (bu[in].temp==SK_ARIA && bu[in].data[0]==cc) return in;
+	}
+	
+	return 0;
+}
+
+int get_aria_ex(int cn, int v, int m)
+{
+	int effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
+	
+	v = more((v*m), effect, 1);
+	
+	return v/100;
+}
 int get_aria_wv(int cn, int in)
 {
-	int weapon=0, effect=0;
+	int weapon;
 	
 	if (!cn)                               return 0;
 	if (!do_get_iflag(cn, SF_SIGN_SONG))   return 0;
-	if (!do_check_rings(cn, IT_SIGN_SONG)) return 0;  // Redundant...
 	
-	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
-	weapon = ch[cn].weapon;
+	weapon = ch[cn].weapon - (in?bu[in].weapon:0);
 	
-	if (in) weapon -= bu[in].weapon;
-	
-	weapon = weapon*10;
-	weapon = more(weapon, effect, 1);
-	weapon = weapon/100;
-	
-	return weapon;
+	return get_aria_ex(cn, weapon, 10); // 10%
 }
 int get_aria_av(int cn, int in)
 {
-	int armor=0, effect=0;
+	int armor;
 	
 	if (!cn)                               return 0;
-	if (!do_get_iflag(cn, SF_SIGN_SONG)    return 0;
-	if (!do_check_rings(cn, IT_SIGN_SONG)) return 0;  // Redundant...
+	if (!do_get_iflag(cn, SF_SIGN_SONG))   return 0;
 	
-	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
-	armor  = ch[cn].armor;
+	armor = ch[cn].armor - (in?bu[in].armor:0);
 	
-	if (in) armor -= bu[in].armor;
-	
-	armor = armor*10;
-	armor = more(armor, effect, 1);
-	armor = armor/100;
-	
-	return armor;
+	return get_aria_ex(cn, armor, 10); // 10%
 }
 int get_aria_im(int cn, int in)
 {
-	int immun=0, effect=0;
+	int immun;
 	
 	if (!cn)                return 0;
-	if (!T_SKAL_SK(cn, 10)) return 0;
+	if (!T_SKAL_SK(cn, 10)) return 0;  // (Skal) Guardian
 	
-	effect = TC_SK(cn, 34)*15 + do_get_ieffect(cn, VF_MOREAURA);
-	immun  = M_SK(cn, SK_IMMUN);
+	immun = M_SK(cn, SK_IMMUN) - (in?bu[in].skill[SK_IMMUN]:0);
 	
-	if (in) immun -= bu[in].skill[SK_IMMUN];
-	
-	immun = immun*20;
-	immun = more(immun, effect, 1);
-	immun = immun/100;
-	
-	return immun;
+	return get_aria_ex(cn, immun, 20); // 20%
 }
 
 void do_aria_stats(int cn, int in, int power, int flag)
@@ -12921,7 +12921,7 @@ void do_aria_stats(int cn, int in, int power, int flag)
 				if (ch[n].used!=USE_ACTIVE)	       continue;
 				if (ch[n].flags & CF_BODY)	       continue;
 				if (n==cc)                         continue;
-				if ((m=has_buff(n, SK_ARIA)) || (m=has_buff(n, SK_ARIA2)))
+				if ((m=get_my_aria(n, cn)) || (m=get_my_aria2(n, cn)))
 				{
 					if (bu[m].data[0]!=bu[in].data[0]) continue;
 					do_update_spell_aria(n, m, bu[m].temp==SK_ARIA?0:1);
@@ -13226,7 +13226,7 @@ void do_check_auras(int cn)
 {
 	int in;
 	
-	if (B_SK(cn, SK_ARIA))                        do_skill_aura(cn, SK_ARIA, has_buff(cn, SK_ARIA));
+	if (B_SK(cn, SK_ARIA))                        do_skill_aura(cn, SK_ARIA, get_my_aria(cn, cn));
 	if ((in = has_buff(cn, SK_IMMOLATE)))         do_skill_aura(cn, SK_IMMOLATE2, in);
 	if (T_SORC_SK(cn,  6) && B_SK(cn, SK_SLOW))   do_skill_aura(cn, SK_SLOW,   0);  // (Sorc) Rewind
 	if (T_SORC_SK(cn, 10) && B_SK(cn, SK_HASTE))  do_skill_aura(cn, SK_HASTE,  0);  // (Sorc) Fast Forward
@@ -13310,7 +13310,7 @@ void do_update_spell_aria(int cn, int in, int flag)
 	power = M_SK(cc, SK_ARIA);
 	power = bu[in].data[1] = more(power, n, 1);
 	
-	if ((in2 = has_buff(cc, SK_ARIA)))
+	if ((in2 = get_my_aria(cc, cc)))
 		power = more(power, (bu[in].data[2] = bu[in2].data[2]), 100);
 	
 	do_aria_stats(cn, in, power, flag);
