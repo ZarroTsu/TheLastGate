@@ -10078,6 +10078,9 @@ int do_surround_check(int cn, int co, int gethit) // cn is the attacker, co is t
 	return 1;
 }
 
+int get_aria_ex(int cn, int v, int m);
+int get_my_aria(int cn, int cc);
+
 int do_crit(int cn, int co, int dam, int msg)
 {
 	int die, crit_dice, crit_chance, crit_mult, crit_dam=0, crit_redc=100;
@@ -10722,8 +10725,6 @@ int do_add_stat(int cn, int in, int v, int m)
 }
 
 void do_update_permaspells(int cn);
-int get_aria_ex(int cn, int v, int m);
-int get_my_aria(int cn, int cc);
 
 void do_update_char(int cn)
 {
