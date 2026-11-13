@@ -12187,7 +12187,7 @@ void really_update_char(int cn)
 	
 	// Flat bonus
 	{
-		spell_apt += (attrib[AT_WIL] + attrib[AT_INT]) * 5/(5+hardmode) * spell_race_mod(100, cn) / 100;
+		spell_apt += ((attrib[AT_WIL] + attrib[AT_INT]) * 5/(5+hardmode)) * spell_race_mod(100, cn) / 100;
 	}
 	
 	// Additive bonus
