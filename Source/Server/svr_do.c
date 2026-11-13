@@ -10133,7 +10133,7 @@ int do_crit(int cn, int co, int dam, int msg)
 		if ((in = has_buff(cn, SK_ARIA)) && bu[in].data[0] == cn)
 		{
 			bu[in].data[2] = clamp(bu[in].data[2] + 100, 100, 10000);
-			do_update_spell_aria(cn, in);
+			do_update_spell_aria(cn, in, 0);
 		}
 	}
 	
@@ -12916,7 +12916,7 @@ void do_aria_stats(int cn, int in, int power, int flag)
 				if ((m=has_buff(n, SK_ARIA)) || (m=has_buff(n, SK_ARIA2)))
 				{
 					if (bu[m].data[0]!=bu[in].data[0]) continue;
-					do_update_spell_aria(n, m);
+					do_update_spell_aria(n, m, bu[m].temp==SK_ARIA?0:1);
 					do_update_char(n);
 				}
 			}
@@ -13277,7 +13277,7 @@ void do_random_blast(int cn, int power)
 }
 
 
-void do_update_spell_aria(int cn, int in)
+void do_update_spell_aria(int cn, int in, int flag)
 {
 	int cc = bu[in].data[0], in2 = 0;
 	int power, n;
@@ -13290,7 +13290,7 @@ void do_update_spell_aria(int cn, int in)
 	if ((in2 = has_buff(cc, SK_ARIA)))
 		power = more(power, bu[in2].data[2], 100);
 	
-	do_aria_stats(cn, in, power, 0);
+	do_aria_stats(cn, in, power, flag);
 }
 void do_update_spell_haste(int cn, int in)
 {
@@ -13401,7 +13401,7 @@ void do_update_permaspells(int cn)
 			}
 			switch (bu[in].temp)
 			{
-				case SK_ARIA:     do_update_spell_aria(cn, in);     break;
+				case SK_ARIA:     do_update_spell_aria(cn, in, 0);  break;
 				case SK_HASTE:    do_update_spell_haste(cn, in);    break;
 				case SK_PACT:     do_update_spell_pact(cn, in);     break;
 				case SK_LETHARGY: do_update_spell_lethargy(cn, in); break;
