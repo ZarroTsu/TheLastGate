@@ -12931,6 +12931,10 @@ void do_aria_stats(int cn, int in, int power, int flag)
 			}
 		}
 	}
+	else
+	{
+		bu[in].reserve[2] = 0;
+	}
 	
 	switch (type)  // Creator movement mode determines aura type
 	{
@@ -13043,7 +13047,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				bu[in2].data[1] = tmp1;
 				bu[in2].data[2] = tmp2;
 				
-				do_aria_stats(cn, in2, power, 1);
+				do_aria_stats(co, in2, power, 1);
 				bu[in2].data[4] = 1;
 			}
 			else // Target is an ally
@@ -13053,7 +13057,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 				bu[in2].data[1] = tmp1;
 				bu[in2].data[2] = tmp2;
 				
-				do_aria_stats(cn, in2, power, 0);
+				do_aria_stats(co, in2, power, 0);
 				bu[in2].data[4] = 1;
 			}
 			break;
