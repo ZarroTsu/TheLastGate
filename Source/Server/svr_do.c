@@ -4129,7 +4129,9 @@ int do_showbuffs(int cn, int co)
 			do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].data[1], bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
 		else if (bu[in].temp == SK_VENOM || bu[in].temp == SK_SHOCK || bu[in].temp == SK_CHARGE || bu[in].temp == SK_ZEPHYR2)
 			do_char_log(cn, 1, "%s power of %d (x%d) for %dm %ds\n", bu[in].name, bu[in].power, bu[in].stack, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
-		else if (bu[in].flags & BF_PERMASPELL)
+		else if (bu[in].temp == SK_ARIA || bu[in].temp == SK_ARIA2)
+			do_char_log(cn, 1, "%s power of %d (+%d.%02d%%)\n", bu[in].name, bu[in].power, bu[in].data[2]/100, bu[in].data[2]%100);
+		else if ((bu[in].flags & BF_PERMASPELL))
 			do_char_log(cn, 1, "%s power of %d\n", bu[in].name, bu[in].power);
 		else
 			do_char_log(cn, 1, "%s power of %d for %dm %ds\n", bu[in].name, bu[in].power, bu[in].active / (TICKS * 60), (bu[in].active / TICKS) % 60);
@@ -13917,9 +13919,12 @@ void do_regenerate(int cn)
 				}
 				
 				// Aria crit decay per frame
-				if (bu[in].temp==SK_ARIA && bu[in].data[2]>0)
+				if (bu[in].temp==SK_ARIA && bu[in].data[0]==cn && bu[in].data[2]>0)
 				{
+					tmp = more(bu[in].power, bu[in].data[2], 100);
 					bu[in].data[2] -= (100 + bu[in].data[2]/2)/100; // Decays faster the higher it gets
+					if (tmp != more(bu[in].power, bu[in].data[2], 100))
+						do_update_char(cn);
 				}
 				
 				if (bu[in].temp==SK_OPPRESSED2 && !IS_IN_AQUE(ch[cn].x, ch[cn].y))
