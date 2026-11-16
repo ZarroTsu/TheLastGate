@@ -3890,8 +3890,15 @@ int use_augment_item(int cn, int in)
 	if (it[in].data[0] == 2 || it[in].data[0] == 4) // held item gets modified
 	{
 		// Abort if no held item
-		if ((in2 = ch[cn].citem)==0 && (it[in].data == 2 || it[in].data == 4))
+		if ((in2 = ch[cn].citem) == 0)
 		{
+			do_char_log(cn, 0, "To use this shrine, hold an equipable item under your mouse cursor.\n");
+			return 0;
+		}
+		// Abort if unequipable
+		if (!it[in2].placement)
+		{
+			do_char_log(cn, 0, "This item cannot be equipped!\n");
 			do_char_log(cn, 0, "To use this shrine, hold an equipable item under your mouse cursor.\n");
 			return 0;
 		}
@@ -3899,12 +3906,6 @@ int use_augment_item(int cn, int in)
 		if (it[in2].flags & IF_AUGMENTED)
 		{
 			do_char_log(cn, 0, "This item has already been augmented!\n");
-			return 0;
-		}
-		// Abort if unequipable
-		if (!it[in2].placement)
-		{
-			do_char_log(cn, 0, "This item cannot be equipped!\n");
 			return 0;
 		}
 	}
