@@ -9692,8 +9692,8 @@ int do_hurt(int cn, int co, int dam, int type)
 		if (type==13) // Parried Thorns
 			dam = dam * (T_LYCA_SK(cn, 10)*20+TC_SK(cn, 106)*10) / 100;  // (Lyca) Sloth
 		
-		if (IS_PLAYER(co) || ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW) // Reduced
-			dam = less(dam, 50, 1);
+		//if (IS_PLAYER(co) || ch[co].temp == CT_PANDIUM || ch[co].temp == CT_SHADOW) // Reduced
+		//	dam = less(dam, 50, 1);
 		
 		dam = less(dam, TC_SK(co,114)*25, 1); // (Corr) Courage
 	}
