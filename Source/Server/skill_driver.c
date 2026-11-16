@@ -2189,7 +2189,7 @@ int add_spell(int cn, int new_in)
 					break;
 				}
 				
-				if (IS_PLAYER_GC(cn) && (ch[CN_OWNER(cn)].flags & CF_OVERRIDE) && bu[new_in].data[0]==cn &&
+				if (IS_PLAYER_GC(cn) && (ch[CN_OWNER(cn)].flags & CF_OVERRIDE) && bu[new_in].data[0]==CN_OWNER(cn) &&
 					(new_temp==SK_BLESS  || new_temp==SK_PROTECT || new_temp==SK_ENHANCE || new_temp==SK_MSHIELD || 
 					 new_temp==SK_MSHELL || new_temp==SK_HASTE   || new_temp==SK_ZEPHYR  || new_temp==SK_PULSE   || 
 					 new_temp==SK_PULSE2 || new_temp==SK_WARCRY3))
