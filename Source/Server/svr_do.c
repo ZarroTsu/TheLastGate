@@ -13022,7 +13022,7 @@ void do_apply_aura(int cn, int intemp, int co, int in, int flag)
 		power = spell_immunity(cn, co, bu[in].power*3);
 		power = more(power, n, 1);
 		
-		if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, power, SP_DUR_ARIA, 0))) return;
+		if (!(in2 = make_new_buff(cn, SK_IMMOLATE2, BUF_SPR_FIRE, power, SP_DUR_IMMOLATE, 0))) return;
 		
 		bu[in2].data[1] = max(100, 100 + power*4);
 		bu[in2].data[4] = 1;

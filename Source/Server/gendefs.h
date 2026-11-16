@@ -395,6 +395,7 @@
 #define SP_DUR_ARIA			( TICKS *  5                      )
 #define SP_DUR_PACT			( TICKS *  5                      )
 #define SP_DUR_LETHARGY		( TICKS *  5                      )
+#define SP_DUR_IMMOLATE		( TICKS /  2                      )
 
 #define SP_DUR_MSHELL(a)	( a * 128                         )
 #define SP_DUR_MSHIELD(a)	( a * 256                         )
