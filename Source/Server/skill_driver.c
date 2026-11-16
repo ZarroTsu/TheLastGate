@@ -301,7 +301,13 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	{
 		case SK_POISON:
 			if (do_get_iflag(cn, SF_TOWER_R)) { tmp = SK_VENOM;   spr = BUF_SPR_VENOM;  }
-			else                              { tmp = SK_POISON;  spr = BUF_SPR_POISON; }
+			else                              
+			{ 
+				tmp = SK_POISON;  spr = BUF_SPR_POISON; 
+				n = TC_SK(cn,113)*15; // (Corr) Torment
+				if (do_get_iflag(cn, SF_BOOK_VENO)) n += 25;  // [Book] Venom Compendium
+				dur = dur * 100 / (100 + n);
+			}
 			break;
 		case SK_BLIND:
 			if (do_get_iflag(cn, SF_CHARIOT)) { tmp = SK_DOUSE;   spr = BUF_SPR_DOUSE; }
@@ -372,6 +378,10 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	{
 		case SK_POISON:
 		case SK_VENOM:
+			dur = SP_DUR_POISON;
+			n = TC_SK(cn,113)*15; // (Corr) Torment
+			if (do_get_iflag(cn, SF_BOOK_VENO)) n += 25;  // [Book] Venom Compendium
+			dur = dur * 100 / (100 + n);
 			power = more(power, M_AT(cn, AT_INT) * (T_SORC_SK(cn,  7)*2 + TC_SK(cn, 55)), 20); // (Sorc) Toxins
 			power = spell_multiplier(power, cn);
 			if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);
@@ -431,6 +441,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			power = common_mult(cn, co, power);
 			break;
 		case SK_BLEED:
+			dur = SP_DUR_BLEED;
 			if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
 			if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
 			if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/50, 1);    // [Ench] Improved Crimson Ripper
@@ -446,9 +457,6 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 	switch (tmp)
 	{
 		case SK_POISON:
-			n = TC_SK(cn,113)*15; // (Corr) Torment
-			if (do_get_iflag(cn, SF_BOOK_VENO)) n += 25;  // [Book] Venom Compendium
-			dur = dur * 100 / (100 + n);
 			bu[in].data[1] = PL_POISFORM(power, dur); // Decay rate
 			break;
 		case SK_VENOM:
@@ -496,8 +504,9 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].dmg_bonus = -min(20*2, power/5);
 			break;
 		case SK_FROSTB:
-			bu[in].r_end  = -FROSTBFORM(power, dur);
-			bu[in].r_mana = -FROSTBFORM(power, dur);
+			bu[in].reserve[0] = max(1, power/5);
+			bu[in].reserve[1] = max(1, power/5);
+			bu[in].reserve[2] = max(1, power/5);
 			break;
 		case SK_BLEED:
 			bu[in].data[1] = BLEEDFORM(power, dur);  // Decay rate
@@ -3157,7 +3166,7 @@ void skill_curse(int cn)
 {
 	int power = M_SK(cn, SK_CURSE), cost = SP_COST_CURSE, cost2 = SP_COST_SLOW;
 	int count = 0, hit = 0, d20 = SP_MULT_CURSE;
-	int co, co_orig = -1, flag;
+	int co, co_orig = -1, flag, n=0;
 	
 	// Shiva's Malice adds Slow's mana cost
 	if ((flag = do_get_iflag(cn, SF_BOOK_SHIV))) cost += cost2;
@@ -3168,7 +3177,7 @@ void skill_curse(int cn)
 		if (!(co = get_target(cn, 0, 1, 1, cost, SK_FOCUS, 1, power, 0)))
 			return;
 		
-		spell_focus(cn, co, power);
+		spell_focus(cn, co, power); n = 1;
 	}
 	else
 	{
@@ -3188,8 +3197,8 @@ void skill_curse(int cn)
 	}
 	
 	// Book - Shiva's Malice :: Cast Slow after casting Curse on success
-	if (flag) skill_slow(cn, 1);
-	else      add_exhaust(cn, SK_EXH_CURSE);
+	if (flag&&!n) skill_slow(cn, 1);
+	else add_exhaust(cn, n?SK_EXH_FOCUS:SK_EXH_CURSE);
 }
 
 // Feb 2020 - Slow
@@ -3285,7 +3294,7 @@ void skill_slow(int cn, int flag)
 	else      add_exhaust(cn, SK_EXH_SLOW);
 }
 
-int spell_frostburn(int cn, int co, int power)
+int spell_frostburn_old(int cn, int co, int power)
 {
 	int in, n, dur, ppow;
 	
@@ -5553,7 +5562,7 @@ int spell_bleed(int cn, int co, int power)
 	
 	if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
 	if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
-	if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/50, 1);    // [Ench] Improved Crimson Ripper
+	if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/20, 1);    // [Ench] Improved Crimson Ripper
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -6773,7 +6782,7 @@ int spell_pact(int cn, int co, int power)
 		n +=     TC_SK(co,105);
 	}
 	
-	if (do_get_iflag(cn, SF_HERMIT_R))
+	if (do_get_iflag(cn, SF_HERMIT_R) || (!IS_PLAYER(cn) && !do_get_iflag(cn, SF_HERMIT_R)))
 	{
 		power = bu[in].reserve[2] = min(80, 15+power/5); // Mana
 		power = more(power, ch[co].mana[5] * n, 100);
@@ -6810,7 +6819,7 @@ void skill_pact(int cn)
 	if (spellcost(cn, SP_COST_PACT, SK_PACT, 0))	{ return; }
 	
 	spell_pact(cn, cn, power);
-
+	
 	add_exhaust(cn, SK_EXH_PACT);
 }
 

@@ -556,7 +556,7 @@ extern char *at_short[];
 #define DESC_GL_CHILLED		"When equipped, your hits inflict a self-scaling Slow, reducing enemy action speed.\n"
 #define DESC_GL_CURSED		"When equipped, your hits inflict a self-scaling Curse, reducing enemy attributes.\n"
 #define DESC_GL_TITANS		"When equipped, your hits inflict a self-scaling Weaken, reducing enemy weapon value.\n"
-#define DESC_GL_BLVIPER		"When equipped, your hits inflict a self-scaling Frostburn, draining enemy endurance and mana.\n"
+#define DESC_GL_BLVIPER		"When equipped, your hits inflict a self-scaling Frostburn, reserving enemy health, endurance and mana.\n"
 
 #define DESC_BT_NATURES		"When equipped, grants 33%% more regeneration rates while idle.\n"
 #define DESC_RINGWARMTH		"When equipped and activated, grants additional health, endurance, and mana regeneration.\n"
@@ -655,7 +655,7 @@ extern char *at_short[];
 #define DESC_NEICLAW		"When equipped, grants 1 additional Spellpower Bonus for every 100 uncapped Maximum Mana.\n"
 #define DESC_LIONSPAWS		"When equipped, your passive skills gain an additional 20%% Braveness bonus.\n"
 #define DESC_CRIMRIP		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time.\n"
-#define DESC_CRIMRIP2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. Bleeds you inflict deal 1%% more damage per 50 uncapped maximum Hitpoints.\n"
+#define DESC_CRIMRIP2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. Bleeds you inflict deal 1%% more damage per 20 uncapped maximum Hitpoints.\n"
 #define DESC_SOVERIGNS		"When equipped, %s and %s become the average of the two, plus 10.\n", skilltab[it[in].data[1]].name, skilltab[it[in].data[2]].name
 
 #define DESC_THEBUTCHER		"When equipped, your Cleave hits an additional time when its cooldown expires.\n"
@@ -818,7 +818,7 @@ extern char *at_short[];
 #define DESC_EN_104(in)		"1%% of damage dealt with hits is leeched as hitpoints, endurance and mana.\n"
 #define DESC_EN_105(in)		"10%% of current endurance value is granted as additional damage on hit.\n"
 #define DESC_EN_106(in)		"Your hits inflict a self-scaling Blind, reducing enemy perception, hit and parry.\n"
-#define DESC_EN_107(in)		"Your hits inflict a self-scaling Frostburn, draining enemy endurance and mana.\n"
+#define DESC_EN_107(in)		"Your hits inflict a self-scaling Frostburn, reserving enemy health, endurance and mana.\n"
 #define DESC_EN_108(in)		"Restore 2 Hitpoints upon being hit by an enemy.\n"
 #define DESC_EN_109(in)		"10%% of weapon value is granted as additional rapid mana regeneration.\n"
 #define DESC_EN_110(in)		"20%% of damage taken from hits is staggered over 5 seconds.\n"
