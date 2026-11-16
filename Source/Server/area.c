@@ -75,6 +75,7 @@ struct area area[] = {
 	{ 791,  317,  809,  330, "Joe's House",                    0},
 	{ 783,  370,  807,  394, "Templar Outlaws",                3},
 	{ 800,  333,  824,  350, "Skeleton Lord",                  3},
+	{ 396, 1508,  424, 1566, "Den of Soot",                    1},
 	{ 813,  375,  845,  428, "Haunted Castle",                 1},
 	{ 835,  301,  851,  349, "Dungeon of Doors",               1},
 	{ 791,  252,  815,  276, "Hedge Maze",                     1},

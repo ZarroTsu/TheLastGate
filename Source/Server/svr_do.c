@@ -3532,7 +3532,8 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	
 	m = 0;
 	//
-	m = display_pole(cn, flag, page, m, pole1[ 0], "Thieves House Cellar",       200);
+	m = display_pole(cn, flag, page, m, pole1[ 0], "Thieves House Cellar",       250);
+	m = display_pole(cn, flag, page, m, pole6[29], "Den of Soot",                750);
 	m = display_pole(cn, flag, page, m, pole4[ 4], "Novice Pentagram Quest",    1000);
 	m = display_pole(cn, flag, page, m, pole1[ 2], "Weeping Woods",             2000);
 	m = display_pole(cn, flag, page, m, pole1[ 3], "Weeping Woods",             2000);
@@ -3752,7 +3753,6 @@ void do_showpoles(int cn, int flag, char *topic) // flag 1 = all, 0 = unattained
 	m = disp_rb_pole(cn, flag, page, m, poleR[20], "Abyss X");
 //	m = display_pole(cn, flag, page, m, pole5[31], "Aemon's Palace",          250000);
 	//
-//	m = display_pole(cn, flag, page, m, pole6[29], "", 0);
 //	m = display_pole(cn, flag, page, m, pole6[30], "", 0);
 //	m = display_pole(cn, flag, page, m, pole6[31], "", 0);
 	//

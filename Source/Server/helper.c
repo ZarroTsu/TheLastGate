@@ -2419,6 +2419,7 @@ void check_challenge(int cn, int val)
 			if (ch[cn].data[72] & (1 << bit)) cleared++;
 			if (ch[cn].data[94] & (1 << bit)) cleared++;
 		}
+		if ((IS_ANY_MERC(cn) || IS_SEYAN_DU(cn)) && B_SK(cn, SK_HASTE)) cleared++;
 		if (cleared < 62) return;
 	}
 	
@@ -2433,7 +2434,7 @@ void check_challenge(int cn, int val)
 			if (ch[cn].data[91] & (1 << bit)) cleared++;
 			if (ch[cn].data[24] & (1 << bit)) cleared++;
 		}
-		if (cleared < 188) return;
+		if (cleared < 189) return;
 	}
 	
 	if (val == 8) // Archon depth check
