@@ -296,6 +296,7 @@ void do_seen(int cn, char *cco);
 void do_spellignore(int cn);
 int isgroup(int cn, int co);
 int isnearby(int cn, int co);
+void do_remove_all_group(int cn);
 void do_afk(int cn, char *msg);
 void do_ransack_corpse(int cn, int co, char *msg);
 void remember_pvp(int cn, int co);

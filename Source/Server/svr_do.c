@@ -4581,6 +4581,14 @@ int isnearby(int cn, int co)
 	return 0;
 }
 
+void do_remove_all_group(int cn)
+{
+	int n;
+	
+	for (n = PCD_MINGROUP; n<=PCD_MAXGROUP; n++)
+		ch[cn].data[n] = 0;
+}
+
 void do_group(int cn, char *name)
 {
 	int n, co, tmp, allow;
