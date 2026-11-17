@@ -396,6 +396,7 @@
 #define SP_DUR_PACT			( TICKS *  5                      )
 #define SP_DUR_LETHARGY		( TICKS *  5                      )
 #define SP_DUR_IMMOLATE		( TICKS /  2                      )
+#define SP_DUR_FROSTBITE	( TICKS /  2                      )
 
 #define SP_DUR_MSHELL(a)	( a * 128                         )
 #define SP_DUR_MSHIELD(a)	( a * 256                         )
@@ -404,6 +405,7 @@
 #define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
 #define SP_DUR_SHADOW(a)	( TICKS * 20 + TICKS * a / 5      )
 #define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
+
 
 // -------- Skill Exhaustion values -------- //
 #define SK_EXH_MAXIMUM	 	(TICKS *10)

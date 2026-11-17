@@ -13934,7 +13934,7 @@ void do_regenerate(int cn)
 					
 					tmp = bu[in].power;
 					
-					if ((bu[in].power = min((bu[in].data[1]+10)/20, 9999)) <= 0)
+					if ((bu[in].power = min((bu[in].data[1]+(SP_DUR_FROSTBITE/2))/SP_DUR_FROSTBITE, 9999)) <= 0)
 					{
 						do_char_log(cn, 1, "You feel the cold leave you, for now.\n");
 						bu[in].used = USE_EMPTY;
@@ -13943,9 +13943,9 @@ void do_regenerate(int cn)
 					}
 					else
 					{
-						bu[in].hp   = -(bu[in].power);
-						bu[in].end  = -(bu[in].power/4);
-						bu[in].mana = -(bu[in].power/2);
+						bu[in].hp   = -(bu[in].data[1]/ 7);
+						bu[in].end  = -(bu[in].data[1]/29);
+						bu[in].mana = -(bu[in].data[1]/13);
 						
 						if (bu[in].power != tmp)
 							do_update_char(cn);
