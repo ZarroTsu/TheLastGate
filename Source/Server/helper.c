@@ -5156,7 +5156,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 			hasloot=1;
 		}
 		
-		if (!ch[co].item[0] && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && 
+		if (!ch[co].item[0] && !hasloot && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && getrank(cn)>8 &&
 			(try_boost(DW_CHANCE) || (RANDOM(100) < tbelt)))
 		{
 			if (in = god_create_item(IT_CORRUPTOR))

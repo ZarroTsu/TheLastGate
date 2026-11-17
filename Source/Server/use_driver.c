@@ -3239,7 +3239,8 @@ int use_map_pentigram(int cn, int in)
 		ch[co].data[29] = m;
 		ch[co].data[60] = TICKS * 23;
 		if (try_boost(25)) boost_char(co, 0);
-		else if (!IS_LABY_MOB(co) && !ch[co].citem && !ch[co].item[0] && !(ch[co].flags & CF_EXTRAEXP) && !(ch[co].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+		else if (!IS_LABY_MOB(co) && !ch[co].citem && !ch[co].item[0] && !(ch[co].flags & CF_EXTRAEXP) && 
+			!(ch[co].flags & CF_EXTRACRIT) && getrank(cn)>8 && try_boost(DW_CHANCE))
 		{
 			if (in2 = god_create_item(IT_CORRUPTOR))
 			{
@@ -5421,7 +5422,8 @@ int use_crystal_sub(int cn, int in)
 	if (!hasloot)
 	{
 		ch[cc].gcm = 90;
-		if (!IS_LABY_MOB(cc) && !ch[cc].citem && !ch[cc].item[0] && !(ch[cc].flags & CF_EXTRAEXP) && !(ch[cc].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+		if (!IS_LABY_MOB(cc) && !ch[cc].citem && !ch[cc].item[0] && !(ch[cc].flags & CF_EXTRAEXP) && 
+			!(ch[cc].flags & CF_EXTRACRIT) && getrank(cn)>8 && try_boost(DW_CHANCE))
 		{
 			if (tmp = god_create_item(IT_CORRUPTOR))
 			{
@@ -7555,7 +7557,8 @@ int spawn_penta_enemy(int in)
 	ch[cn].dir = 1;
 	
 	if (try_boost(25)) boost_char(cn, 0);
-	else if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+	else if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !(ch[cn].flags & CF_EXTRAEXP) && 
+		!(ch[cn].flags & CF_EXTRACRIT) && getrank(cn)>8 && try_boost(DW_CHANCE))
 	{
 		if (tmp = god_create_item(IT_CORRUPTOR))
 		{
@@ -10826,7 +10829,8 @@ void enemyspawner(int in, int type, int flag)
 				ch[cn].data[60] = TICKS * 60 * 2;
 			}
 			if (try_boost(25)) boost_char(cn, 0);
-			else if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE*(type<4?2:1)))
+			else if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !(ch[cn].flags & CF_EXTRAEXP) && 
+				!(ch[cn].flags & CF_EXTRACRIT) && getrank(cn)>8 && try_boost(DW_CHANCE*(type<4?2:1)))
 			{
 				if (in2 = god_create_item(IT_CORRUPTOR))
 				{

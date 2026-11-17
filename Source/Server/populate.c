@@ -682,7 +682,9 @@ int pop_create_char(int n, int drop)
 		hasloot = 1;
 	}
 	
-	if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !hasloot && !(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && try_boost(DW_CHANCE))
+	if (!IS_LABY_MOB(cn) && !ch[cn].citem && !ch[cn].item[0] && !hasloot && 
+		!(ch[cn].flags & CF_EXTRAEXP) && !(ch[cn].flags & CF_EXTRACRIT) && 
+		getrank(cn)>8 && try_boost(DW_CHANCE))
 	{
 		if ((tmp = god_create_item(IT_CORRUPTOR)))
 		{
