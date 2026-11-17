@@ -15354,14 +15354,16 @@ void do_shop_char(int cn, int co, int nr)
 								//chlog(cn, "  Took the item...");
 								if (ch[co].gcm==9)
 								{
+									unsigned char buf[2];
+									
 									chlog(cn, "  Triggered special chest");
 									god_destroy_items(co);
-									do_force_recall(cn);
+									if (ch[co].data[50])
+										do_force_recall(cn);
 									ch[co].used = USE_EMPTY; // do_char_killed(0, co, 0);
-									/*
+									
 									buf[0] = SV_CLOSESHOP;
 									xsend(ch[cn].player, buf, 1);
-									*/
 								}
 							}
 						}

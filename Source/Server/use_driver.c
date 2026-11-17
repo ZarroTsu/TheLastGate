@@ -4567,6 +4567,7 @@ int use_special_chest(int cn, int in)
 	sprintf(ch[cc].name, "Chest");
 	ch[cc].gcm = 9;
 	ch[cc].data[49] = in;
+	if (!(it[in].flags & IF_NOREPAIR)) ch[cc].data[50] = 1; // Trigger recall after use
 	ch[cc].data[64] = globs->ticker + TICKS * 60 * 30;
 	ch[cc].season = ch[cn].season;
 	
@@ -4578,9 +4579,12 @@ int use_special_chest(int cn, int in)
 	}
 	if (in2 == IT_CH_FOOL || in2 == IT_CH_FOOL_R)
 	{
-		for (n = 0; n<5; n++)
+		for (n = 0; n<max(1,it[in].min_rank); n++)
 		{
-			it[in].data[n] = in2 + RANDOM(22);
+			if (!RANDOM(7-max(1,it[in].min_rank)))
+				it[in].data[n] = IT_CH_FOOL_R + RANDOM(22);
+			else
+				it[in].data[n] = IT_CH_FOOL   + RANDOM(22);
 		}
 	}
 	
