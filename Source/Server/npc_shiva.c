@@ -356,14 +356,14 @@ int npc_shiva_phasing(int cn)
 				count = 5;
 				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 				do_sayx(cn, "Khuzak gurawin duskar!");
-				//ch[cn].a_mana -= ch[cn].mana[5] * 300;
+				//ch[cn].a_mana -= MP_PERC(cn,30);
 				break;
 			case 4: // Phase 4  - Gargs
 				temp  = 666;
 				count = 3;
 				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 				do_sayx(cn, "Khuzak gurawin duskar giharr!");
-				//ch[cn].a_mana -= ch[cn].mana[5] * 300;
+				//ch[cn].a_mana -= MP_PERC(cn,30);
 				break;
 			case 6: // Phase 6  - Uh oh
 				temp  = 667;
@@ -590,7 +590,7 @@ int npc_shiva_high(int cn)
 	
 	npc_shiva_phasing(cn);
 	
-	if (ch[cn].a_hp<ch[cn].hp[5] * 600)
+	if (ch[cn].a_hp<HP_PERC(cn,60))
 	{
 		// Phase transition
 		switch (ch[cn].data[0])
@@ -653,7 +653,7 @@ int npc_shiva_high(int cn)
 	}
 	
 	// generic spell management
-	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && ch[cn].data[6]==0)
+	if (ch[cn].a_mana>MP_PERC(cn,85) && ch[cn].data[6]==0)
 	{
 		npc_spell_routine_buffs(cn, 1);
 	}
@@ -670,7 +670,7 @@ int npc_shiva_high(int cn)
 	}
 	
 	// help friend
-	if ((co = ch[cn].data[65])!=0 && ch[cn].data[6]==0 && ch[cn].a_mana>ch[cn].mana[5]*250)
+	if ((co = ch[cn].data[65])!=0 && ch[cn].data[6]==0 && ch[cn].a_mana>MP_PERC(cn,25))
 	{
 		// bless us first if we have enough mana - makes spells more powerful
 		if (ch[cn].a_mana>get_spellcost(cn, SK_BLESS) * 2 + get_spellcost(cn, SK_PROTECT) + get_spellcost(cn, SK_ENHANCE))
@@ -690,7 +690,7 @@ int npc_shiva_high(int cn)
 	{
 		if ((co = ch[cn].attack_cn)!=0 || ch[cn].data[78]) // we're fighting
 		{
-			if (co && (ch[cn].a_hp<ch[cn].hp[5] * 600 || !RANDOM(10))) // we're losing
+			if (co && (ch[cn].a_hp<HP_PERC(cn,60) || !RANDOM(10))) // we're losing
 			{
 				if (npc_try_spell(cn, co, SK_BLAST)) return 1;
 			}
@@ -728,7 +728,7 @@ void npc_shiva_low(int cn)
 	}
 	*/
 	
-	if (ch[cn].a_hp<ch[cn].hp[5] * 750) // we're hurt: rest
+	if (ch[cn].a_hp<HP_PERC(cn,75)) // we're hurt: rest
 		return;
 	
 	if (ch[cn].data[2]>=globs->ticker) 	// Reset the fight

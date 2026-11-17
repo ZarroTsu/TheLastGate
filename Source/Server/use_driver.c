@@ -8042,7 +8042,7 @@ int use_shrine(int cn, int in)
 	
 	if (val>=rank)
 	{
-		if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
+		if (ch[cn].a_mana<MP_SOFTCAP(cn))
 		{
 			ch[cn].a_mana = ch[cn].mana[5] * 1000;
 			do_char_log(cn, 0, "The Goddess of Magic touches your mind.\n");
@@ -8854,7 +8854,7 @@ int use_lab8_moneyshrine(int cn, int in)
 	god_transfer_char(cn, it[in].data[1], it[in].data[2]);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
 	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
-	if (ch[cn].a_mana<ch[cn].mana[5] * 1000)
+	if (ch[cn].a_mana<MP_SOFTCAP(cn))
 	{
 		ch[cn].a_mana = ch[cn].mana[5] * 1000;
 		do_char_log(cn, 0, "You feel the hand of the Goddess of Magic touch your mind.\n");
@@ -11555,7 +11555,7 @@ int use_hole_lycanth(int cn, int in)
 	{
 		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & CF_BODY)) continue;
 		if (ch[n].temp!=CT_LYCAN_KEEP) continue;
-		if (ch[n].temp==CT_LYCAN_KEEP && ch[n].a_hp>ch[n].hp[5]*900 && ch[n].a_mana>ch[n].mana[5]*900)
+		if (ch[n].temp==CT_LYCAN_KEEP && ch[n].a_hp>HP_PERC(n,90) && ch[n].a_mana>MP_PERC(n,90))
 		{
 			flag = 1;
 			break;
@@ -11638,13 +11638,13 @@ int step_portal2_lab13(int cn, int in)
 		if (ch[n].used!=USE_ACTIVE || (ch[n].flags & CF_BODY)) continue;
 		if (ch[n].temp!=CT_LAB13_KEEP && ch[n].temp!=CT_LAB20_KEEP) continue;
 		if (IS_IN_XIII(ch[cn].x, ch[cn].y) && ch[n].temp==CT_LAB13_KEEP && 
-			ch[n].a_hp>ch[n].hp[5] * 900 && ch[n].a_mana>ch[n].mana[5] * 900)
+			ch[n].a_hp>HP_PERC(n,90) && ch[n].a_mana>MP_PERC(n,90))
 		{
 			flag = 1;
 			break;
 		}
 		if (IS_IN_XX(ch[cn].x, ch[cn].y) && ch[n].temp==CT_LAB20_KEEP && 
-			ch[n].a_hp>ch[n].hp[5] * 900 && ch[n].a_mana>ch[n].mana[5] * 900)
+			ch[n].a_hp>HP_PERC(n,90) && ch[n].a_mana>MP_PERC(n,90))
 		{
 			flag = 2;
 			break;

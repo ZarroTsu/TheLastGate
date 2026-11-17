@@ -396,7 +396,7 @@ int npc_gotattack(int cn, int co, int dam)
 
 	ch[cn].data[92] = TICKS * 60 * 10;
 
-	if (co && (ch[co].flags & CF_PLAYER) && ch[cn].alignment==10000 && (strcmp(ch[cn].name, "Peacekeeper") || ch[cn].a_hp<ch[cn].hp[5] * 500) && ch[cn].data[70]<globs->ticker)
+	if (co && (ch[co].flags & CF_PLAYER) && ch[cn].alignment==10000 && (strcmp(ch[cn].name, "Peacekeeper") || ch[cn].a_hp<HP_PERC(cn,50)) && ch[cn].data[70]<globs->ticker)
 	{
 		do_sayx(cn, "Skua! Protect the innocent! Send me a Peacekeeper!");
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
@@ -427,7 +427,7 @@ int npc_gotattack(int cn, int co, int dam)
 		}
 	}
 
-	if (ch[cn].alignment>1000 && ch[cn].data[70]<globs->ticker && ch[cn].a_mana<ch[cn].mana[5] * 333 && !IS_COMP_TEMP(cn))
+	if (ch[cn].alignment>1000 && ch[cn].data[70]<globs->ticker && ch[cn].a_mana<MP_PERC(cn,33) && !IS_COMP_TEMP(cn))
 	{
 		do_sayx(cn, "Skua! Help me!");
 		ch[cn].data[70] = globs->ticker + TICKS * 60 * 2;
@@ -435,7 +435,7 @@ int npc_gotattack(int cn, int co, int dam)
 		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
 	}
 
-	if (ch[cn].data[52] && ch[cn].a_hp<ch[cn].hp[5] * 666)    // we're supposed to shout for help if attacked and HP below 2/3rd
+	if (ch[cn].data[52] && ch[cn].a_hp<HP_PERC(cn,66))    // we're supposed to shout for help if attacked and HP below 2/3rd
 	{
 		if (ch[cn].data[55] + TICKS * 180<globs->ticker) // shout every 180 seconds
 		{
@@ -453,7 +453,7 @@ int npc_gotattack(int cn, int co, int dam)
 	}
 
 	// fight back when attacked - all NPCs do this:
-	if (!IS_PLAYER_COMP(cn) || (IS_PLAYER_COMP(cn) && (ch[cn].data[1]!=1 || ch[cn].a_hp<ch[cn].hp[5] * 600))) // passive gc check - only fight back if at risk of dying
+	if (!IS_PLAYER_COMP(cn) || (IS_PLAYER_COMP(cn) && (ch[cn].data[1]!=1 || ch[cn].a_hp<HP_PERC(cn,60)))) // passive gc check - only fight back if at risk of dying
 	{
 		if (npc_add_enemy(cn, co, 1))
 		{
@@ -4105,9 +4105,9 @@ void stronghold_mage_driver(int cn)
 	// a) Under 60% hp and over 30% mana (Fighting someone!)
 	// b) There is someone here - once per in-game minute
 	// c) Spawn a new candle - once per in-game hour, faster with more people
-	if ((ch[cn].a_hp<ch[cn].hp[5]*600 && ch[cn].a_mana>ch[cn].mana[5]*300)
-		|| (pinline && ch[cn].a_hp>=ch[cn].hp[5]*999 && globs->mdtime%MD_MIN==0) 
-		|| (ch[cn].a_mana>ch[cn].mana[5]*666 && (pinline<1 
+	if ((ch[cn].a_hp<HP_PERC(cn,60) && ch[cn].a_mana>MP_PERC(cn,30))
+		|| (pinline && ch[cn].a_hp>=HP_PERC(cn,99) && globs->mdtime%MD_MIN==0) 
+		|| (ch[cn].a_mana>MP_PERC(cn,66) && (pinline<1 
 		|| (ch[cn].data[3]<2 && ch[cn].data[2]>=BS_RC*1) || (ch[cn].data[3]< 4 && ch[cn].data[2]>=BS_RC*2)
 		|| (ch[cn].data[3]<7 && ch[cn].data[2]>=BS_RC*3) || (ch[cn].data[3]<11 && ch[cn].data[2]>=BS_RC*4))))
 	{
@@ -4127,10 +4127,10 @@ void stronghold_mage_driver(int cn)
 		ch[cn].data[1] = j;
 		
 		// Heal if we're panic-summoning
-		if (ch[cn].a_hp<ch[cn].hp[5]*600)
+		if (ch[cn].a_hp<HP_PERC(cn,60))
 		{
-			ch[cn].a_mana -= ch[cn].mana[5]*333;
-			ch[cn].a_hp   += ch[cn].hp[5]*500;
+			ch[cn].a_mana -= MP_PERC(cn,33);
+			ch[cn].a_hp   += HP_PERC(cn,50);
 		}
 		
 		// If there are less than BS_COUNTER monsters in the given group...
@@ -4207,7 +4207,7 @@ void stronghold_mage_driver(int cn)
 				}
 			}
 			
-			if (ch[cn].a_hp<ch[cn].hp[5]*600) ch[cn].data[3] = -1;
+			if (ch[cn].a_hp<HP_PERC(cn,60)) ch[cn].data[3] = -1;
 
 			if (ch[cn].data[3]>ch[cn].data[4])
 			{
@@ -6548,7 +6548,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			break;
 		// 75% HP Breakpoint
 		case 3: 
-			if (ch[cn].a_hp>ch[cn].hp[5]*750) return; // Wait until 75%
+			if (ch[cn].a_hp>HP_PERC(cn,75)) return; // Wait until 75%
 			if (fl>=20)
 			{
 				m = RANDOM(4)+1;
@@ -6608,7 +6608,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			break;
 		// 50% HP Breakpoint
 		case 6: 
-			if (ch[cn].a_hp>ch[cn].hp[5]*500) return; // Wait until 50%
+			if (ch[cn].a_hp>HP_PERC(cn,50)) return; // Wait until 50%
 			if (fl>=20)
 			{
 				m = RANDOM(4)+1;
@@ -6731,7 +6731,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			break;
 		// 25% HP Breakpoint
 		case 10:
-			if (ch[cn].a_hp>ch[cn].hp[5]*250) return; // Wait until 25%
+			if (ch[cn].a_hp>HP_PERC(cn,25)) return; // Wait until 25%
 			if (fl>=20)
 			{
 				m = RANDOM(4)+1;
@@ -7066,7 +7066,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			break;
 		// Breakpoint 1: 80% Health
 		case 3: 
-			if (ch[cn].a_hp>ch[cn].hp[5]*800) return; // Wait until 80%
+			if (ch[cn].a_hp>HP_PERC(cn,80)) return; // Wait until 80%
 			clean_and_go(cn, go_xy[0][0], go_xy[0][1], go_xy[0][2], 800);
 			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Stalwart. Strong. The labyrinth has tested your might and muscle well, my friend.");
 			ch[cn].data[1]++; 
@@ -7102,7 +7102,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			break;
 		// Breakpoint 2: 60% Health
 		case 7: 
-			if (ch[cn].a_hp>ch[cn].hp[5]*600) return; // Wait until 60%
+			if (ch[cn].a_hp>HP_PERC(cn,60)) return; // Wait until 60%
 			clean_and_go(cn, go_xy[2][0], go_xy[2][1], go_xy[2][2], 600);
 			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Intuitive. Wise. The labyrinth has tested your reason and understanding, truly.");
 			ch[cn].data[1]++; 
@@ -7138,7 +7138,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			break;
 		// Breakpoint 3: 40% Health
 		case 11: 
-			if (ch[cn].a_hp>ch[cn].hp[5]*400) return; // Wait until 40%
+			if (ch[cn].a_hp>HP_PERC(cn,40)) return; // Wait until 40%
 			clean_and_go(cn, go_xy[4][0], go_xy[4][1], go_xy[4][2], 400);
 			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Dexterous. Agile. The labyrinth has tested your ability to navigate its tests.");
 			ch[cn].data[1]++; 
@@ -7175,7 +7175,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			break;
 		// Breakpoint 4: 20% Health - Add shadows for the sweep
 		case 15: 
-			if (ch[cn].a_hp>ch[cn].hp[5]*200) return; // Wait until 20%
+			if (ch[cn].a_hp>HP_PERC(cn,20)) return; // Wait until 20%
 			clean_and_go(cn, go_xy[6][0], go_xy[6][1], go_xy[6][2], 200);
 			//
 			co = pop_create_char(CT_SHADOW, 0); x = go_xy[6][0]-4; y = go_xy[6][1];
@@ -7849,7 +7849,7 @@ int npc_driver_high(int cn)
 	if (ch[cn].temp==CT_LAB20_KEEP) gatekeeper_driver(cn);
 	
 	// driver check if low health
-	if (ch[cn].a_hp<ch[cn].hp[5] * 400)
+	if (ch[cn].a_hp<HP_PERC(cn,40))
 	{
 		if (ch[cn].data[26]==12)      npc_lab_lord_driver(cn);
 		else if (ch[cn].data[26]==13) npc_emperor_driver(cn);
@@ -7857,7 +7857,7 @@ int npc_driver_high(int cn)
 	}
 	
 	// heal us if we're hurt
-	if ((ch[cn].a_hp<ch[cn].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[cn].a_hp<ch[cn].hp[5] * 400)
+	if ((ch[cn].a_hp<HP_PERC(cn,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[cn].a_hp<HP_PERC(cn,40))
 	{
 		if (npc_try_spell(cn, cn, SK_HEAL)) return 1;
 		
@@ -7920,7 +7920,7 @@ int npc_driver_high(int cn)
 	}
 
 	// generic spell management
-	if (ch[cn].a_mana>ch[cn].mana[5] * 850 && !(ch[cn].flags & CF_MERCHANT))
+	if (ch[cn].a_mana>MP_PERC(cn,85) && !(ch[cn].flags & CF_MERCHANT))
 	{
 		npc_spell_routine_buffs(cn, 1);
 	}
@@ -7963,7 +7963,7 @@ int npc_driver_high(int cn)
 	// make sure protected character survives
 	if ((co = ch[cn].data[CHD_MASTER])!=0)
 	{
-		if ((ch[co].a_hp<ch[co].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<ch[co].hp[5] * 400) // he's hurt
+		if ((ch[co].a_hp<HP_PERC(co,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<HP_PERC(co,40)) // he's hurt
 		{
 			if (npc_try_spell(cn, co, SK_HEAL)) return 1;
 		}
@@ -7984,7 +7984,7 @@ int npc_driver_high(int cn)
 	}
 
 	// help friend
-	if ((co = ch[cn].data[65])!=0 && ch[cn].a_mana>ch[cn].mana[5]*250)
+	if ((co = ch[cn].data[65])!=0 && ch[cn].a_mana>MP_PERC(cn,25))
 	{
 		cc = ch[co].attack_cn;
 		
@@ -7994,7 +7994,7 @@ int npc_driver_high(int cn)
 			if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
 		}
 		
-		if ((ch[co].a_hp<ch[co].hp[5] * 600 && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<ch[co].hp[5] * 400) // he's hurt
+		if ((ch[co].a_hp<HP_PERC(co,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<HP_PERC(co,40)) // he's hurt
 		{
 			if (npc_try_spell(cn, co, SK_HEAL)) return 1;
 		}
@@ -8026,7 +8026,7 @@ int npc_driver_high(int cn)
 		}
 		
 		// blast this enemy if our friend is losing and his enemy is our enemy as well
-		if (cc && ch[co].a_hp<ch[co].hp[5] * 650 && npc_is_enemy(cn, cc))
+		if (cc && ch[co].a_hp<HP_PERC(co,65) && npc_is_enemy(cn, cc))
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, cc, SK_BLAST))
 			{
@@ -8058,7 +8058,7 @@ int npc_driver_high(int cn)
 				}
 				
 				// blast this enemy if our friend is losing and his enemy is our enemy as well
-				if (cc && ch[co].a_hp<ch[co].hp[5] * 650 && npc_is_enemy(cn, cc))
+				if (cc && ch[co].a_hp<HP_PERC(co,65) && npc_is_enemy(cn, cc))
 				{
 					if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, cc, SK_BLAST))
 					{
@@ -8093,7 +8093,7 @@ int npc_driver_high(int cn)
 		if (npc_quaff_potion(cn, 267, 254)) // use rpot if available
 			return 1;
 		*/
-		if (co && (ch[cn].a_hp<ch[cn].hp[5] * 600 || !RANDOM(10))) // we're losing
+		if (co && (ch[cn].a_hp<HP_PERC(cn,60) || !RANDOM(10))) // we're losing
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{
@@ -8289,7 +8289,7 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 
 	do_sayx(cn, "Shirak ishagur gorweran dulak!");
 
-	ch[cn].a_mana -= ch[cn].mana[5] * 333; // subtract 33% of mana
+	ch[cn].a_mana -= MP_PERC(cn,33); // subtract 33% of mana
 
 	// Alert players about new candle
 	for (n = 1; n<MAXCHARS; n++)
@@ -8748,7 +8748,7 @@ void npc_driver_low(int cn)
 		return;
 	}
 
-	if (ch[cn].a_hp<ch[cn].hp[5] * 750) // we're hurt: rest
+	if (ch[cn].a_hp<HP_PERC(cn,75)) // we're hurt: rest
 	{
 		return;
 	}
@@ -8967,11 +8967,11 @@ void npc_driver_low(int cn)
 	if (ch[cn].data[29])    // resting position, lowest prio
 	{
 		// Turn off toggles when resting
-		if (ch[cn].a_mana<ch[cn].mana[5]*400 && has_buff(cn, SK_LETHARGY) && !do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
+		if (ch[cn].a_mana<MP_PERC(cn,40) && has_buff(cn, SK_LETHARGY) && !do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
 		{
 			return;
 		}
-		if (co && ch[cn].a_hp<ch[cn].hp[5]*600 && has_buff(cn, SK_LETHARGY) && do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
+		if (co && ch[cn].a_hp<HP_PERC(cn,60) && has_buff(cn, SK_LETHARGY) && do_get_iflag(cn, SF_EMPRES_R) && npc_try_spell(cn, cn, SK_LETHARGY))
 		{
 			return;
 		}

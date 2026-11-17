@@ -185,13 +185,13 @@ int npc_cityattack_high(int cn)
 	int co;
 
 	// heal if hurt
-	if (ch[cn].a_hp<ch[cn].hp[5] * 600)
+	if (ch[cn].a_hp<HP_PERC(cn,60))
 	{
 		if (npc_try_spell(cn, cn, SK_HEAL)) return 1;
 	}
 
 	// generic spell management
-	if (ch[cn].a_mana>ch[cn].mana[5] * 850)
+	if (ch[cn].a_mana>MP_PERC(cn,85))
 	{
 		npc_spell_routine_buffs(cn, 1);
 	}
@@ -204,7 +204,7 @@ int npc_cityattack_high(int cn)
 	// fight management
 	if ((co = ch[cn].attack_cn)) // we're fighting
 	{
-		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && (ch[cn].a_hp<ch[cn].hp[5] * 600 || !RANDOM(10))) // we're losing
+		if (co && (IS_PLAYER(co) || is_facing(cn,co)) && (ch[cn].a_hp<HP_PERC(cn,60) || !RANDOM(10))) // we're losing
 		{
 			if (globs->ticker>ch[co].data[75] && npc_try_spell(cn, co, SK_BLAST))
 			{

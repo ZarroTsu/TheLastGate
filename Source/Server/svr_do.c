@@ -8823,7 +8823,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 			god_transfer_char(co, ch[co].temple_x, ch[co].temple_y);
 		}
 
-		ch[co].a_hp = ch[co].hp[5] * 500;              // come alive!
+		ch[co].a_hp = HP_PERC(co,50);              // come alive!
 		ch[co].status = 0;
 
 		ch[co].attack_cn = 0;
@@ -9400,7 +9400,7 @@ void do_lucksave(int cn, char *deathtype)
 {
 	int in, n;
 	
-	ch[cn].a_hp  = ch[cn].hp[5] * 500;
+	ch[cn].a_hp  = HP_PERC(cn,50);
 	ch[cn].luck /= 2;
 	do_char_log(cn, 0, "A god reached down and saved you from the %s. You must have done the gods a favor sometime in the past!\n", deathtype);
 		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 0, "A god reached down and saved %s from the %s.\n", ch[cn].reference, deathtype);
@@ -13853,7 +13853,7 @@ void do_regenerate(int cn)
 		ch[cn].leech[2] = max(0, ch[cn].leech[2] - mana);
 	}
 	
-	if ((hp && ch[cn].a_hp<ch[cn].hp[5] * 900) || (mana && ch[cn].a_mana<ch[cn].mana[5] * 900))
+	if ((hp && ch[cn].a_hp<HP_PERC(cn,90)) || (mana && ch[cn].a_mana<MP_PERC(cn,90)))
 	{
 		ch[cn].data[92] = TICKS * 60;
 	}

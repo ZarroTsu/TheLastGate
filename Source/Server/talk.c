@@ -3115,11 +3115,11 @@ void casino_quit(co)
 
 void answer_health(int cn, int co)
 {
-	if (ch[cn].a_hp>ch[cn].hp[5] * 550)
+	if (ch[cn].a_hp>HP_PERC(cn,55))
 	{
 		do_sayx(cn, "I'm fine, %s.", ch[co].name);
 	}
-	else if (ch[cn].a_hp>ch[cn].hp[5] * 250)
+	else if (ch[cn].a_hp>HP_PERC(cn,25))
 	{
 		do_sayx(cn, "I don't feel so good, %s.", ch[co].name);
 	}

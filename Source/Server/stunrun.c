@@ -325,7 +325,7 @@ int npc_stunrun_high(int cn)
 				seen[sgr][maxseen].dist = npc_dist(cn, co);
 				seen[sgr][maxseen].friend = 1;
 				seen[sgr][maxseen].stun = 0;
-				seen[sgr][maxseen].help = (ch[co].a_hp<ch[co].hp[5] * 400);
+				seen[sgr][maxseen].help = (ch[co].a_hp<HP_PERC(co,40));
 				help = max(seen[sgr][maxseen].help, help);
 				maxseen++;
 			}
@@ -432,7 +432,7 @@ int npc_stunrun_high(int cn)
 		}
 	}
 
-	if (ch[cn].a_mana<ch[cn].mana[5] * 200)
+	if (ch[cn].a_mana<MP_PERC(cn,20))
 	{
 		stun -= 3;
 		help -= 3;
@@ -450,9 +450,9 @@ int npc_stunrun_high(int cn)
 	if (globs->ticker > ch[cn].data[29])
 		ch[cn].attack_cn = 0;
 
-	if (ch[cn].a_hp<ch[cn].hp[5] * 600) flee += 5;
+	if (ch[cn].a_hp<HP_PERC(cn,60)) flee += 5;
 	
-	if (!done && ch[cn].a_hp<ch[cn].hp[5] * 600)
+	if (!done && ch[cn].a_hp<HP_PERC(cn,60))
 		done = npc_try_spell(cn, cn, SK_HEAL);
 	
 	if (ch[cn].a_end>15000) ch[cn].mode = 1;
@@ -688,7 +688,7 @@ int npc_stunrun_high(int cn)
 		{
 			if (seen[sgr][n].help>tmp || (seen[sgr][n].help && seen[sgr][n].help==tmp && seen[sgr][n].dist<seen[sgr][m].dist))
 			{
-				if (!has_buff(seen[sgr][n].co, SK_BLESS) || ch[seen[sgr][n].co].a_hp<ch[seen[sgr][n].co].hp[5] * 400)
+				if (!has_buff(seen[sgr][n].co, SK_BLESS) || ch[seen[sgr][n].co].a_hp<HP_PERC(seen[sgr][n].co,40))
 				{
 					tmp = seen[sgr][n].help;
 					m = n;
@@ -697,7 +697,7 @@ int npc_stunrun_high(int cn)
 		}
 		if (tmp>0)
 		{
-			if (ch[seen[sgr][m].co].a_hp<ch[seen[sgr][m].co].hp[5]*400) done = npc_try_spell(cn, seen[sgr][m].co, SK_HEAL);
+			if (ch[seen[sgr][m].co].a_hp<HP_PERC(seen[sgr][m].co,40)) done = npc_try_spell(cn, seen[sgr][m].co, SK_HEAL);
 			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_BLESS);
 			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_PROTECT);
 			if (!done) done = npc_try_spell(cn, seen[sgr][m].co, SK_ENHANCE);

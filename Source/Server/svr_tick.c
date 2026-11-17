@@ -1819,11 +1819,11 @@ int get_meta_stat_value(int cn, int n)
 			race_res = M_SK(cn, SK_REST)  * moonmult / 20 + M_SK(cn, SK_REST)  * ch[cn].end[5] /1000;
 			race_med = M_SK(cn, SK_MEDIT) * moonmult / 20 + M_SK(cn, SK_MEDIT) * ch[cn].mana[5]/2000;
 			
-			if (do_get_iflag(cn, SF_MOON)  && (ch[cn].a_mana < ch[cn].mana[5] * 1000)) // Tarot - Moon
+			if (do_get_iflag(cn, SF_MOON)  && (ch[cn].a_mana < MP_SOFTCAP(cn))) // Tarot - Moon
 			{ race_med += race_reg;  race_reg -= race_reg;  manamult += hpmult;    hpmult   -= hpmult; }
-			if (do_get_iflag(cn, SF_SUN)   && (ch[cn].a_hp   < ch[cn].hp[5]   * 1000)) // Tarot - Sun
+			if (do_get_iflag(cn, SF_SUN)   && (ch[cn].a_hp   < HP_SOFTCAP(cn))) // Tarot - Sun
 			{ race_reg += race_res;  race_res -= race_res;  hpmult   += endmult;   endmult  -= endmult; }
-			if (do_get_iflag(cn, SF_WORLD) && (ch[cn].a_end  < ch[cn].end[5]  * 1000)) // Tarot - World
+			if (do_get_iflag(cn, SF_WORLD) && (ch[cn].a_end  < EN_SOFTCAP(cn))) // Tarot - World
 			{ race_res += race_med;  race_med -= race_med;  endmult  += manamult;  manamult -= manamult; }
 			
 			if (do_get_iflag(cn, SF_EN_MEDIREGN)) // Meditate added to Hitpoints

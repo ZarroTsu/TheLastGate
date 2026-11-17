@@ -166,11 +166,11 @@ void ccp_seen(int cn, int co)
 		return;
 	}
 
-	if (ch[cn].a_hp<ch[cn].hp[5] * 800)
+	if (ch[cn].a_hp<HP_PERC(cn,80))
 	{
 		return;
 	}
-	if (ch[cn].a_mana<ch[cn].hp[5] * 800)
+	if (ch[cn].a_mana<HP_PERC(cn,80))
 	{
 		return;
 	}
@@ -345,7 +345,7 @@ void ccp_driver(int cn)
 	struct ccp_mem *mem = get_ccp_mem(cn);
 	int co;
 
-	if (ch[cn].a_hp<ch[cn].hp[5] * 500 && !ccp_at_recall_point(cn) && npc_try_spell(cn, cn, SK_RECALL))
+	if (ch[cn].a_hp<HP_PERC(cn,50) && !ccp_at_recall_point(cn) && npc_try_spell(cn, cn, SK_RECALL))
 	{
 		return;
 	}
@@ -379,8 +379,8 @@ void ccp_driver(int cn)
 		}
 	}
 	if (ch[cn].attack_cn || ch[cn].goto_x || ch[cn].misc_action) return; // we're busy
-	if (ch[cn].a_mana<ch[cn].mana[5] * 900) return;                      // wait for mana regeneration
-	if (ch[cn].a_hp<ch[cn].hp[5] * 900) return;                          // wait for hp regeneration
+	if (ch[cn].a_mana<MP_PERC(cn,90)) return;                            // wait for mana regeneration
+	if (ch[cn].a_hp<HP_PERC(cn,90)) return;                              // wait for hp regeneration
 	
 	ccp_sector_score(cn, -1);        // we get bored easily...
 	ccp_goto_sector(cn);
