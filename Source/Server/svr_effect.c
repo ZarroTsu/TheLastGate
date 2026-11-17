@@ -161,7 +161,7 @@ void effect_tick(void)
 						{
 							for (z = 0; z<MAXITEMS && !flag; z++)
 							{
-								if (ch[co].item[z])
+								if (IS_AUTOLOOT_ITEM(ch[co].item[z]))
 								{
 									// skip if held item template matches current weapon
 									if (it[ch[co].item[z]].temp>0 && it[ch[co].item[z]].temp == it[ch[co].worn[WN_RHAND]].temp && 
@@ -178,7 +178,7 @@ void effect_tick(void)
 							for (z = 0; z<20 && !flag; z++)
 							{
 								// skip weapon slot
-								if (ch[co].worn[z])
+								if (IS_AUTOLOOT_ITEM(ch[co].worn[z]))
 								{
 									if (z == WN_RHAND)
 									{
@@ -205,7 +205,7 @@ void effect_tick(void)
 									}
 								}
 							}
-							if (ch[co].citem)
+							if (IS_AUTOLOOT_ITEM(ch[co].citem))
 							{
 								flag = 1;
 							}

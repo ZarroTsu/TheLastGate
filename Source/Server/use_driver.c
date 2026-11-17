@@ -2429,7 +2429,7 @@ int use_bag(int cn, int in)
 		}
 		if (ch[cn].flags & CF_AUTOLOOT)
 		{
-			if (IS_SANEITEM(in2 = ch[co].citem))
+			if (IS_AUTOLOOT_ITEM(in2 = ch[co].citem))
 			{
 				god_take_from_char(in2, co);
 				
@@ -2457,7 +2457,7 @@ int use_bag(int cn, int in)
 			}
 			for (nr=0; nr<MAXITEMS; nr++)
 			{
-				if (IS_SANEITEM(in2 = ch[co].item[nr]))
+				if (IS_AUTOLOOT_ITEM(in2 = ch[co].item[nr]))
 				{
 					god_take_from_char(in2, co);
 					
@@ -2487,7 +2487,7 @@ int use_bag(int cn, int in)
 			}
 			for (nr=0; nr<12; nr++)
 			{
-				if (IS_SANEITEM(in2 = ch[co].worn[nr]) && (it[in2].flags&IF_SHOPDESTROY))
+				if (IS_AUTOLOOT_ITEM(in2 = ch[co].worn[nr]) && (it[in2].flags&IF_SHOPDESTROY))
 				{
 					god_take_from_char(in2, co);
 					if (god_give_char(in2, cn))

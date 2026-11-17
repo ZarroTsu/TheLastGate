@@ -74,6 +74,7 @@
 #define IS_TAROT(in)			((it[(in)].temp>=IT_CH_FOOL && it[(in)].temp<=IT_CH_WORLD) || (it[(in)].temp>=IT_CH_FOOL_R && it[(in)].temp<=IT_CH_WORLD_R))
 #define IS_CONTRACT(in)			(it[(in)].temp==MCT_CONTRACT)
 #define IS_QUILL(in)			(it[(in)].temp==MCT_QUILL_Y||it[(in)].temp==MCT_QUILL_G||it[(in)].temp==MCT_QUILL_B||it[(in)].temp==MCT_QUILL_R)
+#define IS_AUTOLOOT_ITEM(in)	(IS_SANEITEM(in) && it[(in)].temp != IT_BONESWORD && it[(in)].temp != IT_BONEDSWORD)
 
 #define WAS_SOULSTONED(in)		(it[(in)].flags & IF_SOULSTONE)
 #define WAS_ENCHANTED(in)		(it[(in)].flags & IF_ENCHANTED)

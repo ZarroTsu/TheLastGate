@@ -299,6 +299,9 @@
 
 // -----
 
+#define IT_BONESWORD     116
+#define IT_BONEDSWORD    281
+
 #define IT_SEYANSWORD 	 682
 #define IT_DEADSEYSWORD	 683
 
