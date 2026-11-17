@@ -9343,7 +9343,7 @@ int explorer_point(int cn, int in, int msg)
 		
 		do_char_log(cn, 0, "You found a new exploration point!\n");
 		ch[cn].luck += 10;
-
+		
 		exp  = rank2points(getrank(cn)-1)/(getrank(cn)*getrank(cn)+1);
 		exp -= RANDOM(exp/(IS_HARDMODE(cn)?10:20)+1);   // HARDMODE - more volatile pole exp
 		exp  = min(ch[cn].points_tot / 10, exp);        // not more than 10% of total experience
@@ -9374,9 +9374,9 @@ int explorer_point(int cn, int in, int msg)
 
 		exp  = it[in].data[4];
 		if (IS_RB(cn)) exp = exp/2;
-		exp -= RANDOM(exp/(IS_HARDMODE(cn)?10:20)+1);   // HARDMODE - more volatile pole exp
-		exp  = min(ch[cn].points_tot / 10, exp);        // not more than 10% of total experience
-		exp += RANDOM(exp/(IS_HARDMODE(cn)?10:20)+1);   // HARDMODE - more volatile pole exp
+		exp -= RANDOM(exp/(IS_HARDMODE(cn)?10:20)+1);           // HARDMODE - more volatile pole exp
+		if (exp > 500) exp  = min(ch[cn].points_tot / 10, exp); // not more than 10% of total experience
+		exp += RANDOM(exp/(IS_HARDMODE(cn)?10:20)+1);           // HARDMODE - more volatile pole exp
 		
 		chlog(cn, "Found exp point, granting %d (of %d) exp", exp, it[in].data[4]);
 		char_play_sound(cn, ch[cn].sound + 19, 0, 0);
