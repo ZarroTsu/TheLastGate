@@ -8653,17 +8653,14 @@ int spell_scroll(int cn, int in)
 	return 0;
 }
 
-int use_blook_penta(int cn, int in)
+int use_blood_penta(int cn, int in) // # 756, 757
 {
-	if (!cn)
-	{
-		return 0;
-	}
-
+	if (!cn) return 0;
+	
 	do_char_log(cn, 1, "You try to wipe off the blood, but it seems to be coming back slowly.\n");
 	it[in].data[0] = 1;
 	it[in].sprite[I_I] = it[in].data[1] + it[in].data[0];
-
+	
 	return 1;
 }
 
@@ -9697,7 +9694,7 @@ void use_driver(int cn, int in, int carried)
 				ret = spell_scroll(cn, in);
 				break;
 			case 49:
-				ret = use_blook_penta(cn, in);
+				ret = use_blood_penta(cn, in);
 				break;                                             // blood-penta
 			case 50:
 				ret = use_create_npc(cn, in);
@@ -11308,41 +11305,27 @@ void item_tick(void)
 
 void trap1(int cn, int in)
 {
-	int n, m=0, act=0, must_update=0;
-
-	if ((n = it[in].data[1]))
-	{
-		in = map[n].it;
-		if (!in || it[in].active || it[in].data[0])
-		{
-			do_char_log(cn, 0, "You stepped on a trap, but nothing happened!\n");
-			return;
-		}
-	}
+	int n, m, act=0, must_update=0;
 	
 	do_char_log(cn, 0, "You triggered an acid trap.\n");
 	chlog(cn, "Stepped on Acid Trap");
 	
 	/* age items in gear slots */
-	for (n = 0; n<WN_CHARM2; n++)
+	for (n=0, m=0; n<WN_CHARM2; n++)
 	{
 		if (n==WN_CHARM || n==WN_CHARM2) continue;
-		
-		in = ch[cn].worn[n];
-		if (in)
+		if ((in = ch[cn].worn[n]))
 		{
 			m++;
+			
 			if (it[in].flags & IF_ALWAYSEXP2)
-			{
 				act = 1;
-			}
 			else
-			{
 				act = 0;
-			}
 			
 			it[in].current_age[act]=it[in].max_age[act];
 			it[in].current_age[act]++;
+			
 			if (item_age(in))
 			{
 				must_update=1;
@@ -11365,10 +11348,9 @@ void trap1(int cn, int in)
 		do_char_log(cn, 0, "It hit your skin, burning painfully.\n");
 		do_hurt(0, cn, 350*(11-m), 0);
 	}
+	
 	if (must_update)
-	{
 		do_update_char(cn);
-	}
 }
 
 void trap2(int cn, int tmp)
@@ -11387,11 +11369,31 @@ void trap2(int cn, int tmp)
 }
 
 /* traps:
-   data[0] = type
+    data[0] = type
+    data[1] = blood pent tile 1
+	data[2] = blood pent tile 2
  */
 
 void start_trap(int cn, int in)
 {
+	int m, in2, in3;
+	
+	if ((m = it[in].data[1]))
+	{
+		in2 = map[m].it;
+		
+		if ((m = it[in].data[2]))
+			in3 = map[m].it;
+		else
+			in3 = in2;
+		
+		if ((!in2 || it[in2].active || it[in2].data[0]) && (!in3 || it[in3].active || it[in3].data[0]))
+		{
+			do_char_log(cn, 0, "You stepped on a trap, but nothing happened!\n");
+			return;
+		}
+	}
+	
 	if (it[in].duration)
 	{
 		it[in].active = it[in].duration;
@@ -11400,38 +11402,36 @@ void start_trap(int cn, int in)
 			do_add_light(it[in].x, it[in].y, it[in].light[I_A] - it[in].light[I_I]);
 		}
 	}
-
-	switch(it[in].data[0])
+	
+	switch (it[in].data[0])
 	{
-	case    0:
-		chlog(cn, "Stepped on Arrow Trap");
-		do_char_log(cn, 0, "You feel a sudden pain!\n");
-		do_hurt(0, cn, 250, 0);
-		break;
-
-	case    1:
-		chlog(cn, "Stepped on Attack Trigger Trap");
-		do_char_log(cn, 0, "You hear a loud croaking noise!\n");
-		do_area_notify(cn, 0, it[in].x, it[in].y, NT_HITME, cn, 0, 0, 0);
-		break;
-
-	case    2:
-		trap1(cn, in);
-		break;
-	case    3:
-		trap2(cn, CT_GOLEMTRAP); // Golem
-		break;
-	case    4:
-		trap2(cn, CT_GARGTRAP); // Gargoyle
-		break;
-	case    5:
-		chlog(cn, "Stepped on big Arrow Trap");
-		do_char_log(cn, 0, "You feel a sudden pain!\n");
-		do_hurt(0, cn, 666, 0);
-		break;
-	default:
-		do_char_log(cn, 0, "Phew. Must be your lucky day today.\n");
-		break;
+		case  0:
+			chlog(cn, "Stepped on Arrow Trap");
+			do_char_log(cn, 0, "You feel a sudden pain!\n");
+			do_hurt(0, cn, 250, 0);
+			break;
+		case  1:
+			chlog(cn, "Stepped on Attack Trigger Trap");
+			do_char_log(cn, 0, "You hear a loud croaking noise!\n");
+			do_area_notify(cn, 0, it[in].x, it[in].y, NT_HITME, cn, 0, 0, 0);
+			break;
+		case  2:
+			trap1(cn, in);
+			break;
+		case  3:
+			trap2(cn, CT_GOLEMTRAP); // Golem
+			break;
+		case  4:
+			trap2(cn, CT_GARGTRAP); // Gargoyle
+			break;
+		case  5:
+			chlog(cn, "Stepped on big Arrow Trap");
+			do_char_log(cn, 0, "You feel a sudden pain!\n");
+			do_hurt(0, cn, 666, 0);
+			break;
+		default:
+			do_char_log(cn, 0, "Phew. Must be your lucky day today.\n");
+			break;
 	}
 }
 
