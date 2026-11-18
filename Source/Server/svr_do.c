@@ -10732,7 +10732,7 @@ int do_add_stat(int cn, int in, int v, int m)
 	return v;
 }
 
-void do_update_permaspells(int cn);
+void do_update_permaspells(int cn, int flag);
 
 void do_update_char(int cn)
 {
@@ -11166,7 +11166,7 @@ void really_update_char(int cn)
 		if (HAS_ENCH(in, 110)) do_add_ieffect(cn, VF_EN_STAGGER,    20*(1+IS_TWOHAND(in)));
 	}
 	
-	do_update_permaspells(cn);
+	do_update_permaspells(cn, 0);
 	
 	// Base critical strike chance
 	if (ch[cn].worn[WN_RHAND]==0 && ch[cn].worn[WN_LHAND]==0) critical_b += 1;
@@ -12764,7 +12764,7 @@ void really_update_char(int cn)
 		do_add_light(ch[cn].x, ch[cn].y, ch[cn].light - oldlight);
 	}
 	
-	do_update_permaspells(cn);
+	do_update_permaspells(cn, 1);
 	
 	if (IS_LIVINGPLAYER(cn) && ch[cn].player)
 		plr_update_all_meta_stat_values(ch[cn].player);
@@ -13353,7 +13353,7 @@ void do_update_spell_pact(int cn, int in)
 		n +=     TC_SK(cn,105);
 	}
 	
-	if (do_get_iflag(cn, SF_HERMIT_R))
+	if (do_get_iflag(cn, SF_HERMIT_R) || (!IS_PLAYER(cn) && !do_get_iflag(cn, SF_HERMIT_R)))
 	{
 		bu[in].reserve[2] = min(80, 15 + power/5); // Mana
 		power = ch[cn].reserve[2];
@@ -13421,7 +13421,7 @@ void do_update_spell_dispel(int cn, int in)
 		bu[in].flags &= ~(BF_PERMASPELL);
 	}
 }
-void do_update_permaspells(int cn)
+void do_update_permaspells(int cn, int flag)
 {
 	int n, in;
 	
@@ -13437,13 +13437,13 @@ void do_update_permaspells(int cn)
 			}
 			switch (bu[in].temp)
 			{
-				case SK_ARIA:     do_update_spell_aria(cn, in, 0);  break;
-				case SK_HASTE:    do_update_spell_haste(cn, in);    break;
-				case SK_PACT:     do_update_spell_pact(cn, in);     break;
-				case SK_LETHARGY: do_update_spell_lethargy(cn, in); break;
-				case SK_IMMOLATE: do_update_spell_immolate(cn, in); break;
+				case SK_ARIA:               do_update_spell_aria(cn, in, 0);  break;
+				case SK_HASTE:    if (flag) do_update_spell_haste(cn, in);    break;
+				case SK_PACT:     if (flag) do_update_spell_pact(cn, in);     break;
+				case SK_LETHARGY: if (flag) do_update_spell_lethargy(cn, in); break;
+				case SK_IMMOLATE: if (flag) do_update_spell_immolate(cn, in); break;
 				case SK_DISPEL:
-				case SK_DISPEL2:  do_update_spell_dispel(cn, in); break;
+				case SK_DISPEL2:  if (flag) do_update_spell_dispel(cn, in);   break;
 				default: break;
 			}
 		}
