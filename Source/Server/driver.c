@@ -2826,7 +2826,7 @@ int npc_see(int cn, int co)
 				if (npc_quest_cleared(co, 129))
 					do_sayx(cn, "Human, I mussst asssk you to leave. Quickly, pleassse.");
 				else
-					do_sayx(cn, "Come in and ssstay quiet. The Lizard Emperor is a fool of a man. Bring me hisss helmet, and you may have thisss Ring of Warmth, and the honor if our kin.");
+					do_sayx(cn, "Come in and ssstay quiet. The Lizard Emperor is a fool of a man. Bring me hisss helmet, and you may have thisss old crown, and the honor if our kin.");
 			}
 			else if (strcmp(ch[cn].text[2], "#quest130")==0) //   30 - Rassa - Onyx Egg
 			{
