@@ -14539,7 +14539,7 @@ void do_regenerate(int cn)
 					
 					for (m = 0; m<MAXITEMS; m++)
 					{
-						if (IS_SANEUSEDITEM(in2 = ch[cn].item[m]) && (it[in2].flags & IF_IS_KEY) && it[in2].data[1])
+						if (IS_SANEUSEDITEM(in2 = ch[cn].item[m]) && (it[in2].flags & IF_IS_KEY) && it[in2].data[1]==1)
 						{
 							ch[cn].item[m] = 0;
 						//	ch[cn].item_lock[m] = 0;
