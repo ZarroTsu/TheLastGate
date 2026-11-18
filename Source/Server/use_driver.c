@@ -9548,382 +9548,152 @@ void use_driver(int cn, int in, int carried)
 		{
 			switch(it[in].driver)
 			{
-			case 1:
-				ret = use_create_item(cn, in);
-				break;                                             // uses may-deactivate
-			case 2:
-				ret = use_door(cn, in);
-				break;
-			case 3:
+			case   1: ret = use_create_item(cn, in);             break;  // uses may-deactivate
+			case   2: ret = use_door(cn, in);                    break;
+			case   3:
 				do_char_log(cn, 0, "You cannot use the lock-pick directly. Hold it under your mouse cursor and click on the door...\n");
 				ret = 0;
 				break;
-			case 4:
-				ret = use_mix_potion(cn, in);
-				break;
-			case 5:
-				ret = stone_sword(cn, in);
-				break;
-			case 6:
-				ret = teleport(cn, in);
-				break;
-			case 7:
-				ret = use_bag(cn, in);
-				break;
-			case 8:
-				ret = use_scroll(cn, in);
-				break;                                        // skills
-			case 9:
-				ret = use_crystal(cn, in);
-				break;
-			case 10:
-				ret = use_scroll2(cn, in);
-				break;                                         // attribs
-			case 11:
-				ret = use_scroll3(cn, in);
-				break;                                         // hp
-			case 12:
-				ret = use_scroll4(cn, in);
-				break;                                         // endurance
-			case 13:
-				ret = use_scroll5(cn, in);
-				break;                                         // mana
-			case 14:
-				ret = use_chain(cn, in);
-				break;                                       // leather necklace + lizards teeth
-			case 15:
-				ret = use_labyrinth(cn, in);
-				break;                                           // teleport into labyrinth special
-			case 16:
-				ret = use_ladder(cn, in);
-				break;
-			case 17:
-				ret = rat_eye(cn, in);
-				break;
-			case 18:
-				ret = skua_protect(cn, in);
-				break;
-			case 19:
-				ret = use_lever(cn, in);
-				break;
-			case 20:
-				ret = use_door(cn, in);
-				break;
-			case 21:
-				ret = use_spawn(cn, in);
-				break;
-			case 22:
-				ret = use_pile(cn, in);
-				break;
-			case 23:
-				ret = teleport2(cn, in);
-				break;
-			case 24:
-				ret = build_ring(cn, in);
-				break;
-			case 25:
-				ret = use_mine(cn, in);
-				break;
-			case 26:
-				ret = use_mine_fast(cn, in);
-				break;
-			case 27:
-				ret = use_mine_respawn(cn, in);
-				break;
-			case 28:
-				ret = use_spawn_minion(cn, in);
-				break;
-			case 29:
-				ret = use_grave(cn, in);
-				break;
-			case 30:
-				ret = use_create_item2(cn, in);
-				break;
-			case 31:
-				ret = 0;
-				break;                        // empty, hole water
-			case 32:
-				ret = build_object(cn, in);
-				break;
-			case 33:
-				ret = use_pentagram(cn, in);
-				break;
-			case 34:
-				ret = use_seyan_shrine(cn, in, 0);
-				break;
-			case 35:
-				ret = use_seyan_door(cn, in);
-				break;
-			case 36:
-				ret = 0;
-				break;                        // magic portal 1 in lab13
-			case 37:
-				ret = 0;
-				break;                        // traps
-			case 38:
-				ret = 0;
-				break;                        // magic portal 2 in lab13
-			case 39:
-				ret = purple_protect(cn, in);
-				break;
-			case 40:
-				ret = 0;
-				break;                        // seyan'du sword
-			case 41:
-				ret = use_shrine(cn, in);
-				break;
-			case 42:
-				ret = use_create_item3(cn, in);
-				break;
-			case 43:
-				ret = 0;
-				break;                        // spiderweb
-			case 44:
-				ret = use_kill_undead(cn, in);
-				break;
-			case 45:
-				ret = use_seyan_portal(cn, in);
-				break;
-			case 46:
-				ret = teleport3(cn, in);
-				break;
-			case 47:
-				ret = 0;
-				break;                        // arena portal
-			case 48:
-				ret = spell_scroll(cn, in);
-				break;
-			case 49:
-				ret = use_blood_penta(cn, in);
-				break;                                             // blood-penta
-			case 50:
-				ret = use_create_npc(cn, in);
-				break;
-			case 51:
-				ret = use_rotate(cn, in);
-				break;
-			case 52:
+			case   4: ret = use_mix_potion(cn, in);              break;
+			case   5: ret = stone_sword(cn, in);                 break;
+			case   6: ret = teleport(cn, in);                    break;
+			case   7: ret = use_bag(cn, in);                     break;
+			case   8: ret = use_scroll(cn, in);                  break;  // skills
+			case   9: ret = use_crystal(cn, in);                 break;
+			case  10: ret = use_scroll2(cn, in);                 break;  // attribs
+			case  11: ret = use_scroll3(cn, in);                 break;  // hp
+			case  12: ret = use_scroll4(cn, in);                 break;  // endurance
+			case  13: ret = use_scroll5(cn, in);                 break;  // mana
+			case  14: ret = use_chain(cn, in);                   break;  // leather necklace + lizards teeth
+			case  15: ret = use_labyrinth(cn, in);               break;  // teleport into labyrinth special
+			case  16: ret = use_ladder(cn, in);                  break;
+			case  17: ret = rat_eye(cn, in);                     break;
+			case  18: ret = skua_protect(cn, in);                break;
+			case  19: ret = use_lever(cn, in);                   break;
+			case  20: ret = use_door(cn, in);                    break;
+			case  21: ret = use_spawn(cn, in);                   break;
+			case  22: ret = use_pile(cn, in);                    break;
+			case  23: ret = teleport2(cn, in);                   break;
+			case  24: ret = build_ring(cn, in);                  break;
+			case  25: ret = use_mine(cn, in);                    break;
+			case  26: ret = use_mine_fast(cn, in);               break;
+			case  27: ret = use_mine_respawn(cn, in);            break;
+			case  28: ret = use_spawn_minion(cn, in);            break;
+			case  29: ret = use_grave(cn, in);                   break;
+			case  30: ret = use_create_item2(cn, in);            break;
+			case  31: ret = 0;                                   break;  // empty, hole water
+			case  32: ret = build_object(cn, in);                break;
+			case  33: ret = use_pentagram(cn, in);               break;
+			case  34: ret = use_seyan_shrine(cn, in, 0);         break;
+			case  35: ret = use_seyan_door(cn, in);              break;
+			case  36: ret = 0;                                   break;  // magic portal 1 in lab13
+			case  37: ret = 0;                                   break;  // traps
+			case  38: ret = 0;                                   break;  // magic portal 2 in lab13
+			case  39: ret = purple_protect(cn, in);              break;
+			case  40: ret = 0;                                   break;  // seyan'du sword
+			case  41: ret = use_shrine(cn, in);                  break;
+			case  42: ret = use_create_item3(cn, in);            break;
+			case  43: ret = 0;                                   break;  // spiderweb
+			case  44: ret = use_kill_undead(cn, in);             break;
+			case  45: ret = use_seyan_portal(cn, in);            break;
+			case  46: ret = teleport3(cn, in);                   break;
+			case  47: ret = 0;                                   break;  // arena portal
+			case  48: ret = spell_scroll(cn, in);                break;
+			case  49: ret = use_blood_penta(cn, in);             break;  // blood-penta
+			case  50: ret = use_create_npc(cn, in);              break;
+			case  51: ret = use_rotate(cn, in);                  break;
+			case  52:
 				if (it[in].temp==IT_ANKHAMULET)
 					ret = build_ankh(cn, in);
 				else if (IS_SINBINDER(in))
 					ret = build_sinbinder(cn, in);
 				else
 					ret = 0;
-				break;                        // personal item
-			case 53:
-				ret = use_create_item(cn, in);
-				break;                                             // for personal items
-			case 54:
-				ret = use_create_item(cn, in);
-				break;                                             // attack trigger
-			case 55:
-				ret = shrine_of_change(cn, in);
-				break;
-			case 56:
-				ret = 0;
-				break;                        // greenling green ball
-			case 57:
-				ret = explorer_point(cn, in, 1);
-				break;
-			case 58:
-				ret = use_minion_item(cn, in);
-				break;
-			case 59:
-				ret = use_create_gold(cn, in);
-				break;
-			/* CS, 991127: assembling Lab 8 key */
-			case 61:
-				ret = use_lab8_key(cn, in);
-				break;
-			/* CS, 991127: offering to shrines in Lab 8 */
-			case 63:
-				ret = use_lab8_shrine(cn, in);
-				break;
-			/* CS, 991127: offering money to shrine in Lab 8 */
-			case 64:
-				ret = use_lab8_moneyshrine(cn, in);
-				break;
-			/* CS, 991219: switches in lab9 */
-			case 65:
-				ret = use_lab9_switch(cn, in);
-				break;
-			/* CS, 991219: lab9 one way door */
-			case 66:
-				ret = use_lab9_door(cn, in);
-				break;
-			/* JC, 000615: garbage disposal */
-			case 67:
-				ret = use_garbage(cn, in);
-				break;
-			case 68:
-				ret = use_soulstone(cn, in, ch[cn].citem);
-				break;
-			case 69:
-			case 70:
-			case 71:
-			case 72:
-			case 73:
-			case 74:
-			case 75:
-			case 76:
-				ret = 0;
-				break;
-			case 77:						// walk-through like a door, but behaves like a ladder
-				ret = use_ladder(cn, in);
-				break;
-			case 78:						// walk-through like a door, but behaves like a portal
-				ret = teleport(cn, in);
-				break;
-			case 79:
-			case 80:
-			case 81:
-			case 82:
-			case 83:
-			case 84:
-			case 85:
-			case 86:
-			case 87:
-				ret = 0;
-				break;
-			case 88:						// Waypoint object - use to turn on the WP bit
-				ret = way_point(cn, in);
-				break;
-			case 89:						// Exp scroll
-				ret = use_scroll6(cn, in);
-				break;
-			case 90:						// Luck scroll
-				ret = use_scroll7(cn, in);
-				break;
-			case 91:						// Gold scroll
-				ret = use_scroll8(cn, in);
-				break;
-			case 92:
-				ret = use_soulfocus(cn, in);
-				break;
-			case 93:
-				ret = use_soulcatalyst(cn, in);
-				break;
-			case 94:						// rewards on use while teleporting. /diffi sets reward tier in drdata[9]
-				ret = reward_teleport(cn, in); 
-				break;
-			case 95:
-			case 96:
-			case 97:
-			case 98:
-			case 99:
-			case 100:
-				ret = 0;
-				break;
-			case 101:
-				ret = use_toxic(cn, in);
-				break;
-			case 102:
-				ret = place_ankh(cn, in);
-				break;
-			case 103:
-				ret = use_recall_chest(cn, in);
-				break;
+				break;                                                   // personal item
+			case  53: ret = use_create_item(cn, in);             break;  // for personal items
+			case  54: ret = use_create_item(cn, in);             break;  // attack trigger
+			case  55: ret = shrine_of_change(cn, in);            break;
+			case  56: ret = 0;                                   break;  // greenling green ball
+			case  57: ret = explorer_point(cn, in, 1);           break;
+			case  58: ret = use_minion_item(cn, in);             break;
+			case  59: ret = use_create_gold(cn, in);             break;
+			case  61: ret = use_lab8_key(cn, in);                break;  /* CS, 991127: assembling Lab 8 key */
+			case  63: ret = use_lab8_shrine(cn, in);             break;  /* CS, 991127: offering to shrines in Lab 8 */
+			case  64: ret = use_lab8_moneyshrine(cn, in);        break;  /* CS, 991127: offering money to shrine in Lab 8 */
+			case  65: ret = use_lab9_switch(cn, in);             break;  /* CS, 991219: switches in lab9 */
+			case  66: ret = use_lab9_door(cn, in);               break;  /* CS, 991219: lab9 one way door */
+			case  67: ret = use_garbage(cn, in);                 break;  /* JC, 000615: garbage disposal */
+			case  68: ret = use_soulstone(cn, in, ch[cn].citem); break;
+			case  69:
+			case  70:
+			case  71:
+			case  72:
+			case  73:
+			case  74:
+			case  75:
+			case  76: ret = 0;                                   break;
+			case  77: ret = use_ladder(cn, in);                  break;  // walk-through like a door, but behaves like a ladder
+			case  78: ret = teleport(cn, in);                    break;  // walk-through like a door, but behaves like a portal
+			case  79:
+			case  80:
+			case  81:
+			case  82:
+			case  83:
+			case  84:
+			case  85:
+			case  86:
+			case  87: ret = 0;                                   break;
+			case  88: ret = way_point(cn, in);                   break;  // Waypoint object - use to turn on the WP bit
+			case  89: ret = use_scroll6(cn, in);                 break;  // Exp scroll
+			case  90: ret = use_scroll7(cn, in);                 break;  // Luck scroll
+			case  91: ret = use_scroll8(cn, in);                 break;  // Gold scroll
+			case  92: ret = use_soulfocus(cn, in);               break;
+			case  93: ret = use_soulcatalyst(cn, in);            break;
+			case  94: ret = reward_teleport(cn, in);             break;  // rewards on use while teleporting. /diffi sets reward tier in drdata[9]
+			case  95:
+			case  96:
+			case  97:
+			case  98:
+			case  99:
+			case 100: ret = 0;                                   break;
+			case 101: ret = use_toxic(cn, in);                   break;
+			case 102: ret = place_ankh(cn, in);                  break;
+			case 103: ret = use_recall_chest(cn, in);            break;
 			case 104:
-			case 105:
-				ret = 0;
-				break;
-			case 106:						// Gender scroll
-				ret = use_scroll9(cn, in);
-				break;
-			case 107:
-				ret = use_map_chest(cn, in);
-				break;
-			case 108:
-				ret = use_map_shrine(cn, in);
-				break;
-			case 109:
-				ret = use_map_portal(cn, in);
-				break;
-			case 110:
-				ret = use_scrollA(cn, in);
-				break;
-			case 111:
-				ret = use_map_artifact(cn, in);
-				break;
-			case 112:
-				ret = use_map_pentigram(cn, in);
-				break;
-			case 113:
-				ret = use_map_contract(cn, in);
-				break;
-			case 114:
-				ret = use_special_spell(cn, in);
-				break;
-			case 115:
-				ret = use_lame(cn, in);
-				break;
-			case 116:
-				ret = use_scroll_R(cn, in);
-				break;
-			case 117:
-				ret = use_scroll_S(cn, in);
-				break;
-			case 118:
-				ret = use_make_talisman(cn, in);
-				break;
-			case 119:
-				ret = use_talisman(cn, in, ch[cn].citem);
-				break;
-			case 120:
-				ret = 0;
-				break;
-			case 121:
-				ret = use_special_chest(cn, in);
-				break;
-			case 122:
-				ret = use_augment_item(cn, in);
-				break;
+			case 105: ret = 0;                                   break;
+			case 106: ret = use_scroll9(cn, in);                 break;  // Gender scroll
+			case 107: ret = use_map_chest(cn, in);               break;
+			case 108: ret = use_map_shrine(cn, in);              break;
+			case 109: ret = use_map_portal(cn, in);              break;
+			case 110: ret = use_scrollA(cn, in);                 break;
+			case 111: ret = use_map_artifact(cn, in);            break;
+			case 112: ret = use_map_pentigram(cn, in);           break;
+			case 113: ret = use_map_contract(cn, in);            break;
+			case 114: ret = use_special_spell(cn, in);           break;
+			case 115: ret = use_lame(cn, in);                    break;
+			case 116: ret = use_scroll_R(cn, in);                break;
+			case 117: ret = use_scroll_S(cn, in);                break;
+			case 118: ret = use_make_talisman(cn, in);           break;
+			case 119: ret = use_talisman(cn, in, ch[cn].citem);  break;
+			case 120: ret = 0;                                   break;
+			case 121: ret = use_special_chest(cn, in);           break;
+			case 122: ret = use_augment_item(cn, in);            break;
 			case 123:
-			case 124:
-				ret = 0;
-				break;
-			case 125:
-				ret = use_pandium_shrine(cn, in);
-				break;
-			case 126:
-				ret = 0;
-				break;
-			case 127:
-				ret = use_pandium_teleport(cn, in);
-				break;
-			case 128:
-				ret = use_scroll_B(cn, in);
-				break;
-			case 129:
-				ret = 0;
-				break;
-			case 130:
-				ret = use_item_pedestal(cn, in);
-				break;
-			case 131:
-				ret = use_hole_lycanth(cn, in);
-				break;
-			case 132:
-				ret = use_sanguine_crystal(cn, in);
-				break;
-			case 133:
-				ret = use_corruptor(cn, in);
-				break;
-			case 134:
-				ret = use_scroll_O(cn, in);
-				break;
-			case 135:
-				ret = use_scroll_C(cn, in);
-				break;
-			case 136:
-				ret = use_dw_chest(cn, in);
-				break;
-			case 137:
-				ret = use_whetstone(cn, in);
-				break;
-			case 138:
-				ret = use_scroll_H(cn, in);
-				break;
+			case 124: ret = 0;                                   break;
+			case 125: ret = use_pandium_shrine(cn, in);          break;
+			case 126: ret = 0;                                   break;
+			case 127: ret = use_pandium_teleport(cn, in);        break;
+			case 128: ret = use_scroll_B(cn, in);                break;
+			case 129: ret = 0;                                   break;
+			case 130: ret = use_item_pedestal(cn, in);           break;
+			case 131: ret = use_hole_lycanth(cn, in);            break;
+			case 132: ret = use_sanguine_crystal(cn, in);        break;
+			case 133: ret = use_corruptor(cn, in);               break;
+			case 134: ret = use_scroll_O(cn, in);                break;
+			case 135: ret = use_scroll_C(cn, in);                break;
+			case 136: ret = use_dw_chest(cn, in);                break;
+			case 137: ret = use_whetstone(cn, in);               break;
+			case 138: ret = use_scroll_H(cn, in);                break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;
