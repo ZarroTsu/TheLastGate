@@ -7434,8 +7434,18 @@ void boost_char(int cn, int type)
 				break;
 			case  8:
 			case 18:
-				for (n = 0; n < 40; n++) ch[cn].name[n] = 0; m = 6 + RANDOM(4);
-				for (n = 0; n < m; n++) ch[cn].name[n] = 33 + RANDOM(94);
+				for (n = 0; n < 40; n++) 
+					ch[cn].name[n] = 0; 
+				m = 6 + RANDOM(4); // Length of the monster's name
+				for (n = 0; n < m; n++) 
+				{
+					if (!RANDOM(2))
+						ch[cn].name[n] = 65 + RANDOM(24);
+					else if (!RANDOM(2))
+						ch[cn].name[n] = 97 + RANDOM(24);
+					else
+						ch[cn].name[n] = 48 + RANDOM(10);
+				}
 				sprintf(ch[cn].reference, "the sanguine creature"); divi = 3;
 				switch (RANDOM(6))
 				{

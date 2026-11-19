@@ -4846,8 +4846,18 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 	{
 		if (affix==8)
 		{
-			for (n = 0; n < 40; n++) ch[co].name[n] = 0; m = 6 + RANDOM(4);
-			for (n = 0; n < m; n++) ch[co].name[n] = 33 + RANDOM(94);
+			for (n = 0; n < 40; n++) 
+				ch[co].name[n] = 0; 
+			m = 6 + RANDOM(4); // Length of the monster's name
+			for (n = 0; n < m; n++) 
+			{
+				if (!RANDOM(2))
+					ch[co].name[n] = 65 + RANDOM(24);
+				else if (!RANDOM(2))
+					ch[co].name[n] = 97 + RANDOM(24);
+				else
+					ch[co].name[n] = 48 + RANDOM(10);
+			}
 			sprintf(ch[co].reference, "the sanguine creature");
 			switch (RANDOM(6))
 			{
