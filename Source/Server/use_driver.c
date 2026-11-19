@@ -7051,7 +7051,7 @@ int build_object(int cn, int in) // Used for Sun Amulet and Hourglass Pieces and
 
 void really_spawn_minion(int cn, int cc)
 {
-	int n, m, in, base, v = 4, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
+	int n, m, in, base, v = 8, temp, co = ch[cn].skill_target1, idx, pts = 0, root, cap;
 	
 	base = (getrank(cn)+1) * 11/2;
 	
@@ -7059,7 +7059,7 @@ void really_spawn_minion(int cn, int cc)
 	switch (ch[cc].temp)
 	{
 		case CT_GARGTHRALL: // [Item] Gargoyle Statuette - Gargoyle
-			base -= (3+RANDOM(3)); //v = 2;
+			base -= (3+RANDOM(3)); v = 4;
 			break;
 		case CT_DEVDTHRALL: // [Gear] Devil's Doorway - Skeleton
 			if (IS_SANECTEMPLATE((temp = ch[cn].lastkilltemp)))
@@ -7087,13 +7087,14 @@ void really_spawn_minion(int cn, int cc)
 			for (n=1;n<MAXCHARS;n++)
 			{
 				if (ch[n].used==USE_EMPTY)       continue;
+				if (ch[n].flags & CF_BODY)       continue;
 				if (ch[n].temp != CT_INVITHRALL) continue;
 				if (ch[n].data[CHD_MASTER] == cn)
 				{
 					if ((in = has_buff(n, SK_RAPIDDMG)))
 					{
 						bu[in].r_hp    += -40; // base
-						bu[in].data[1] += -10; // build-up per frame
+						bu[in].data[1] += -40; // build-up per frame
 					}
 					else // If this thrall somehow lacks this buff, remove them
 					{
@@ -7213,7 +7214,7 @@ void really_spawn_minion(int cn, int cc)
 
 int place_minion(int cn, int in, int m, int flag)
 {
-	int in2, temp;
+	int n, j, in2, temp;
 	
 	if (!flag)
 		temp = in;
@@ -7237,6 +7238,16 @@ int place_minion(int cn, int in, int m, int flag)
 			case DX_RIGHTDOWN: m = m - 1 - MAPX; break;
 			default: break;
 		}
+	}
+	
+	for (n=1,j=0;n<MAXCHARS;n++) // Check if we already have this thrall
+	{
+		if (ch[n].used==USE_EMPTY)  continue;
+		if (ch[n].flags & CF_BODY)  continue;
+		if ((ch[n].temp == CT_GARGTHRALL || ch[n].temp == CT_DEVDTHRALL || ch[n].temp == CT_INVITHRALL)
+			&& (ch[n].data[CHD_MASTER] == cn))
+			j++;
+		if (j>=2) return 0;
 	}
 	
 	// Fuzzy drop check
@@ -7281,7 +7292,7 @@ int place_minion(int cn, int in, int m, int flag)
 
 int use_spawn_minion(int cn, int in)
 {
-	int n, temp;
+	int n, m, temp;
 	
 	if (!cn)             return 0;
 	if (!it[in].carried) return 0;
@@ -7294,13 +7305,22 @@ int use_spawn_minion(int cn, int in)
 		return 0;
 	}
 	
-	for (n=1;n<MAXCHARS;n++) // Check if we already have this thrall
+	for (n=1,m=0;n<MAXCHARS;n++) // Check if we already have this thrall
 	{
-		if (ch[n].used==USE_EMPTY) continue;
-		if (ch[n].temp != temp)    continue;
-		if (ch[n].data[CHD_MASTER] == cn)
+		if (ch[n].used==USE_EMPTY)  continue;
+		if (ch[n].flags & CF_BODY)  continue;
+		if ((ch[n].temp == CT_GARGTHRALL || ch[n].temp == CT_DEVDTHRALL || ch[n].temp == CT_INVITHRALL) 
+			&& (ch[n].data[CHD_MASTER] == cn))
 		{
+			m++;
+			if (ch[n].temp != temp) continue;
 			do_char_log(cn, 0, "You can only have one of these enthralled at a time.\n");
+			return 0;
+			
+		}
+		if (m>=2)
+		{
+			do_char_log(cn, 0, "You cannot enthrall any more creatures.\n");
 			return 0;
 		}
 	}

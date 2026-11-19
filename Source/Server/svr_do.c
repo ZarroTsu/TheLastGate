@@ -13969,7 +13969,7 @@ void do_regenerate(int cn)
 					if (mp_dam)   do_recovery(cn, 2, mp_dam);
 					if (en_dam)   do_recovery(cn, 1, en_dam);
 					if (degendam) do_recovery(cn, 0, degendam);
-					if (bu[in].temp==SK_RAPIDDMG)
+					if (bu[in].temp==SK_RAPIDDMG && globs->ticker%4 == 0)
 						bu[in].r_hp += bu[in].data[1];
 				}
 				if (bu[in].r_end!=-1)
