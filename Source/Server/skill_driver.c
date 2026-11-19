@@ -29,7 +29,7 @@ char *at_short[5] = {
 	"STR"
 };
 
-struct s_splog splog[66] = {
+struct s_splog splog[70] = {
 	{
 		0
 	},{
@@ -276,6 +276,26 @@ struct s_splog splog[66] = {
 		SK_PULSE2, 		"Pulse"
 	},{
 		SK_MJOLNIR, 	"Lightning"
+	},{
+		SK_OBLITERATE, 	"Obliterate",	"obliterate",	"obliterating",
+		"You have been obliterated.",
+		" was obliterated.",
+		" cast obliterate on you.",
+		"You obliterate nearby foes.",
+		"You feel a terrible shockwave emanate from somewhere.",
+		" tried to include you in an obliterate but failed."
+	},{
+		SK_SLAM, 		"Slam",			"slam",			"slammed",
+		"You have been slammed.",
+		" was slammed.",
+		" cast slam on you.",
+		"You slam nearby foes.",
+		"You feel a tremble from somewhere.",
+		" tried to slam you but failed."
+	},{
+		SK_FATIGUE, 	"Fatigue"
+	},{
+		SK_FURY, 		"Fury"
 	}
 };
 
