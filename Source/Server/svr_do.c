@@ -18274,7 +18274,7 @@ int may_attack_msg(int cn, int co, int msg)
 		return -1;
 	
 	if (cn == co)
-		return -1;
+		return 1;
 	
 	// unsafe gods may attack anyone
 	if ((ch[cn].flags & CF_GOD && !(ch[cn].flags & CF_SAFE)))
