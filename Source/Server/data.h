@@ -1492,7 +1492,7 @@ struct sk_tree
 #define NUM_MAP_NEG		20
 
 extern struct s_skilltab skilltab[MAXSKILL+5];
-extern struct s_splog splog[66];
+extern struct s_splog splog[70];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;
