@@ -7191,6 +7191,12 @@ void really_spawn_minion(int cn, int cc)
 	ch[cc].kindred &= ~(KIN_MONSTER);     // remove 'monster' flag for movement
 	ch[cc].season = ch[cn].season;        // Set same season number
 	
+	if (ch[cn].flags & CF_SILENCE) 
+	{
+		ch[cc].data[MCD_TALKATIVE]  = 0;									// Quiet
+		ch[cc].flags               |= CF_SILENCE;							// Quiet
+	}
+	
 	if (co && co!=cn && do_char_can_see(cn, co, 0) && may_attack_msg(cn, co, 1)) // Attack target
 	{
 		if (!(ch[cn].flags & CF_SILENCE))
