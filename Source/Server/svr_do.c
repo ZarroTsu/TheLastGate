@@ -9203,7 +9203,7 @@ static void add_enemy(int cn, int co)
 
 void do_give_exp(int cn, int p, int gflag, int rank, int money)
 {
-	int n, c, co, s, v, master;
+	int n, c, co, s, v, t, master;
 
 	if (p<0)
 	{
@@ -9227,8 +9227,12 @@ void do_give_exp(int cn, int p, int gflag, int rank, int money)
 			{
 				if ((co = ch[cn].data[n])!=0 && isgroup(co, cn) && do_char_can_see(cn, co, 0))
 				{
-					do_give_exp(co, p / c, 0, rank, money / c);
-					s += p / c;
+					if (abs(rankdiff(cn, co)) > 3)
+						t = min(max(3, ch[n].points_tot / 100), p / c);
+					else
+						t = p / c;
+					do_give_exp(co, t, 0, rank, money / c);
+					s += t;
 					v += money / c;
 				}
 			}

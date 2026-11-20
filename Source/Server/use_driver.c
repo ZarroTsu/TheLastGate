@@ -7696,25 +7696,28 @@ void solved_pentagram(int cn, int in)
 					
 					do_char_log(n, 0, "Since you were a member of their group, you earned %d bonus experience points.\n", gbonus);
 				}
-				if ((IS_CLANKWAI(cn) && IS_CLANKWAI(n)) || (IS_CLANGORN(cn) && IS_CLANGORN(n)))
+				//if ((ch[cn].season == CURRENTSEASON && ch[n].season == CURRENTSEASON) || (ch[cn].season != CURRENTSEASON && ch[n].season != CURRENTSEASON))
 				{
-					gbonus = bonus/3;
-					
-					gbonus = min(ch[n].points_tot / 100, gbonus);
-					
-					ch[n].data[18] += gbonus;
-					
-					do_char_log(n, 0, "Since you were a member of their clan, you received %d bonus experience points.\n", gbonus);
-				}
-				else if (IS_PURPLE(cn) && IS_PURPLE(n))
-				{
-					gbonus = bonus/6 + min(ch[cn].data[18], get_kill_streak_exp(ch[cn].data[77],ch[cn].data[78]))/6;
-					
-					gbonus = min(ch[n].points_tot / 100, gbonus);
-					
-					ch[n].data[18] += gbonus;
-					
-					do_char_log(n, 0, "As The Purple One's strength grows, so does your own. You gained %d bonus experience points.\n", gbonus);
+					if ((IS_CLANKWAI(cn) && IS_CLANKWAI(n)) || (IS_CLANGORN(cn) && IS_CLANGORN(n)))
+					{
+						gbonus = bonus/3;
+						
+						gbonus = min(ch[n].points_tot / 100, gbonus);
+						
+						ch[n].data[18] += gbonus;
+						
+						do_char_log(n, 0, "Since you were a member of their clan, you received %d bonus experience points.\n", gbonus);
+					}
+					else if (IS_PURPLE(cn) && IS_PURPLE(n))
+					{
+						gbonus = bonus/6 + min(ch[cn].data[18], get_kill_streak_exp(ch[cn].data[77],ch[cn].data[78]))/6;
+						
+						gbonus = min(ch[n].points_tot / 100, gbonus);
+						
+						ch[n].data[18] += gbonus;
+						
+						do_char_log(n, 0, "As The Purple One's strength grows, so does your own. You gained %d bonus experience points.\n", gbonus);
+					}
 				}
 			}
 			if (temp)
