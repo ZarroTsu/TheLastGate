@@ -7656,13 +7656,13 @@ void show_pent_count(int cn)
 
 void solved_pentagram(int cn, int in)
 {
-	int n, m, bonus, inpents = 0, gbonus, co;
+	int n, m, bonus, inpents = 0, gbonus, co, temp=0;
 	int xf, yf, xt, yt, x, y, dontkill;
-
+	
 	bonus = get_pent_value(it[in].data[0]) * 3; //(it[in].data[0] * it[in].data[0] * 3) / 9 + 1;
 	
 	ch[cn].data[18] += bonus;
-
+	
 	do_char_log(cn, 0, "You solved the pentagram quest. Congratulations! You will get %d bonus experience points.\n", bonus);
 	chlog(cn, "Solved pentagram quest");
 	
@@ -7677,69 +7677,69 @@ void solved_pentagram(int cn, int in)
 	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (ch[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (!(ch[n].flags & (CF_PLAYER | CF_USURP)))
-		{
-			continue;
-		}
-
+		if (ch[n].used==USE_EMPTY)                   continue;
+		if (!(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
 		if (ch[n].used==USE_ACTIVE)
 		{
+			temp = ch[n].data[18];
 			if (n!=cn)
 			{
 				do_char_log(n, 0, "%s solved the pentagram quest!\n", ch[cn].name);
 				if (isgroup(n, cn) && isgroup(cn, n) && ch[n].data[18]>0)
 				{
-					gbonus = bonus/2;
+					gbonus = bonus*2/3;
 					
 					if (gbonus > ch[n].data[18]/3)
 						gbonus = ch[n].data[18]/3;
 					
-					ch[n].data[18]+=gbonus;
+					ch[n].data[18] += gbonus;
 					
 					do_char_log(n, 0, "Since you were a member of their group, you earned %d bonus experience points.\n", gbonus);
 				}
+				if ((IS_CLANKWAI(cn) && IS_CLANKWAI(n)) || (IS_CLANGORN(cn) && IS_CLANGORN(n)))
+				{
+					gbonus = bonus/3;
+					
+					gbonus = min(ch[n].points_tot / 100, gbonus);
+					
+					ch[n].data[18] += gbonus;
+					
+					do_char_log(n, 0, "Since you were a member of their clan, you received %d bonus experience points.\n", gbonus);
+				}
+				else if (IS_PURPLE(cn) && IS_PURPLE(n))
+				{
+					gbonus = bonus/6 + min(ch[cn].data[18], get_kill_streak_exp(ch[cn].data[77],ch[cn].data[78]))/6;
+					
+					gbonus = min(ch[n].points_tot / 100, gbonus);
+					
+					ch[n].data[18] += gbonus;
+					
+					do_char_log(n, 0, "As The Purple One's strength grows, so does your own. You gained %d bonus experience points.\n", gbonus);
+				}
 			}
-			/*
-			else
-			{
+			if (temp)
 				do_char_log(n, 1, "Next solve will be at %d pentagrammas.\n", penta_needed);
-			}
-			*/
 		}
 		
 		if (ch[n].data[18] || (ch[n].data[77] && ch[n].data[78]))
 		{
-			do_give_exp(n, ch[n].data[18]+min(ch[n].data[18], get_kill_streak_exp(ch[n].data[77],ch[n].data[78])), 0, -1, 0);
-			ch[n].data[18] = 0;	ch[n].data[77] = 0;	ch[n].data[78] = 0;
-			do_char_log(n, 1, "Next solve will be at %d pentagrammas.\n", penta_needed);
+			do_give_exp(n, ch[n].data[18] + min(ch[n].data[18], get_kill_streak_exp(ch[n].data[77],ch[n].data[78])), 0, -1, 0);
+			ch[n].data[18] = ch[n].data[77] = ch[n].data[78] = 0;
 		}
 		else if (ch[n].data[77])
-		{
 			ch[n].data[77] = 0;
-		}
 	}
-
+	
 	for (n = 1; n<MAXITEM; n++)
 	{
-		if (it[n].used==USE_EMPTY)
-		{
-			continue;
-		}
-		if (it[n].driver!=33)
-		{
-			continue;
-		}
+		if (it[n].used==USE_EMPTY) continue;
+		if (it[n].driver!=33)      continue;
 		if (it[n].active==0)
 		{
 			if (it[n].light[I_I]!=it[n].light[I_A] && it[n].x>0)
-			{
 				do_add_light(it[n].x, it[n].y, it[n].light[I_A] - it[n].light[I_I]);
-			}
 		}
+		
 		if (IS_GLOB_MAYHEM)
 			it[n].duration = it[n].active = TICKS *  5 + RANDOM(TICKS* 5);
 		else
