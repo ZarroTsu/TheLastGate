@@ -8425,7 +8425,7 @@ int use_seyan_portal(int cn, int in)
 			plr_update_tree_terminology(ch[cn].player, SV_TERM_STREE);
 			plr_update_all_skill_terminology(ch[cn].player);
 			
-			do_remove_all_group(cn);
+			//do_remove_all_group(cn);
 			
 			/* Announce the player's new race */
 			if (n<MAXCHARS)
@@ -8460,7 +8460,7 @@ int use_seyan_portal(int cn, int in)
 			in2 = god_create_item(35); god_give_char(in2, cn);
 			in2 = god_create_item(36); god_give_char(in2, cn);
 			
-			do_remove_all_group(cn);
+			//do_remove_all_group(cn);
 			
 			/* Announce the player's new race */
 			if (n<MAXCHARS)
@@ -8496,7 +8496,7 @@ int use_seyan_portal(int cn, int in)
 			god_give_char(in2, cn);
 			it[in2].data[0] = cn;
 			
-			do_remove_all_group(cn);
+			//do_remove_all_group(cn);
 			
 			/* Announce the player's new race */
 			if (n<MAXCHARS)
@@ -9179,7 +9179,7 @@ int shrine_of_change(int cn, int in)
 			ch[co].used = USE_EMPTY;
 		}
 		
-		do_remove_all_group(cn);
+		//do_remove_all_group(cn);
 		
 		sprintf(msg, "%s has completed their journey and claimed their rebirth!", ch[cn].name);
 		if (globs->flags & GF_DISCORD) discord_ranked(msg);

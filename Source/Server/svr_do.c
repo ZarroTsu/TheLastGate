@@ -4675,7 +4675,8 @@ void do_group(int cn, char *name)
 			do_char_log(cn, 0, "Sorry, you cannot group with %s; they are not in the same season as you.\n", ch[co].name);
 			return;
 		}
-
+		
+		/*
 		switch(max(getrank(cn), getrank(co)))
 		{
 		case 19:
@@ -4700,15 +4701,15 @@ void do_group(int cn, char *name)
 			allow = GROUP_RANGE;
 			break;
 		}
-
+		
 		if (abs(tmp = rankdiff(cn, co))>allow)
 		{
 			do_char_log(cn, 0, "Sorry, you cannot group with %s; they are %d ranks %s you. %s maximum distance is %d.\n",
 			            ch[co].name, abs(tmp), tmp>0 ? "above" : "below", tmp>0 ? "Their" : "Your", allow);
 			return;
 		}
-
-
+		*/
+		
 		for (n = 1; n<10; n++)
 		{
 			if (ch[cn].data[n]==0)
