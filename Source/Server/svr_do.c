@@ -14067,7 +14067,7 @@ void do_regenerate(int cn)
 			}
 			
 			// Aria crit decay per frame
-			if (bu[in].temp==SK_ARIA && bu[in].data[0]==cn && bu[in].data[2]>0)
+			if (bu[in].temp==SK_ARIA && bu[in].data[0]==cn && bu[in].data[2]>0 && globs->ticker%4 == 0)
 			{
 				tmp = more(bu[in].data[1], bu[in].data[2], 100);
 				bu[in].data[2] = bu[in].data[2] - max(1, (100 + bu[in].data[2]/2)/100); // Decays faster the higher it gets
