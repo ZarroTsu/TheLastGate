@@ -7197,7 +7197,7 @@ void really_spawn_minion(int cn, int cc)
 		ch[cc].flags               |= CF_SILENCE;							// Quiet
 	}
 	
-	if (co && co!=cn && do_char_can_see(cn, co, 0) && may_attack_msg(cn, co, 1)) // Attack target
+	if (co && co!=cn && do_char_can_see(cn, co, 0) && may_attack_msg(cn, co, 0)) // Attack target
 	{
 		if (!(ch[cn].flags & CF_SILENCE))
 			do_sayx(cc, ch[cc].text[1], ch[co].name);
@@ -7210,7 +7210,7 @@ void really_spawn_minion(int cn, int cc)
 	}
 	else
 	{
-		if (!(ch[cn].flags & CF_SILENCE))
+		if (!(ch[cn].flags & CF_SILENCE) && ch[cc].temp != CT_INVITHRALL)
 			do_sayx(cc, "I shall obey, %s.", ch[cn].name);
 	}
 	
