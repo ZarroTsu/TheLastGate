@@ -9228,7 +9228,7 @@ void do_give_exp(int cn, int p, int gflag, int rank, int money)
 				if ((co = ch[cn].data[n])!=0 && isgroup(co, cn) && do_char_can_see(cn, co, 0))
 				{
 					if (abs(rankdiff(cn, co)) > 3)
-						t = min(max(3, ch[n].points_tot / 100), p / c);
+						t = min(max(3, ch[co].points_tot / 100), p / c);
 					else
 						t = p / c;
 					do_give_exp(co, t, 0, rank, money / c);
