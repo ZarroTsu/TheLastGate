@@ -204,7 +204,7 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 				"", "",
 				{ AT_BRV, AT_WIL, AT_AGL }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
-	{ 48, 'E', 	"Taunt",				"Use (Skill): Forces the target and surrounding enemies to attack you. Grants you damage resistance when it hits.", 
+	{ 48, 'E', 	"Taunt",				"Use (Skill): Forces the target and surrounding enemies to attack you, and reduces the damage they deal for a duration.", 
 				"", "",
 				{ AT_BRV, AT_STR, AT_STR }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",

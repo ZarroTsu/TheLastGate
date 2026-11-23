@@ -9677,15 +9677,10 @@ int do_hurt(int cn, int co, int dam, int type)
 		}
 	}
 	
+	// Easy new method!
 	if (cn)
-	{
-		// Easy new method!
 		dam = dam * ch[cn].dmg_bonus / 10000;
-		
-		// Tarot - Strength - 20% more damage dealt
-		if (do_get_iflag(cn, SF_STRENGTH))
-			dam = dam*6/5;
-	}
+
 	
 	if ((type==3 || type==13) && (mf1 & MF_NOFIGHT) && !(IS_IN_BOJ(ch[cn].x, ch[cn].y) && get_gear(cn, IT_XIXDARKSUN)))
 	{
@@ -9712,6 +9707,10 @@ int do_hurt(int cn, int co, int dam, int type)
 	}
 	else
 	{
+		// Tarot - Strength - 25% more damage dealt
+		if (cn && do_get_iflag(cn, SF_STRENGTH))
+			dam = dam*5/4;
+		
 		// Improved Bloodletter Dagger
 		if (cn && (n = do_get_ieffect(cn, VF_BLEED_DMG)) && has_buff(co, SK_BLEED))
 			dam = more(dam, n, 1);
@@ -10265,7 +10264,7 @@ void do_attack(int cn, int co, int surround)
 				dam += die;
 			}
 		}
-		if (do_get_iflag(co, SF_WHEEL_R)) dam = less(dam, 20, 1);   // [Taro] Wheel.R
+		if (do_get_iflag(co, SF_WHEEL_R)) dam = less(dam, 25, 1);   // [Taro] Wheel.R
 		
 		odam  =   dam;
 		dam  += bonus;
@@ -12291,12 +12290,12 @@ void really_update_char(int cn)
 	
 	if (do_get_iflag(cn, SF_STRENGTH))    // [Taro] Strength
 	{
-		spd_cast = less(base_spd + spd_cast, 15, 1);
+		spd_cast = less(base_spd + spd_cast, 10, 1);
 		
 		if (T_SUMM_SK(cn,  4))  // (Summ) Strategist
-			spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
+			spd_attack = less(base_spd + spd_attack, 10, 1) - base_spd;
 		
-		spd_attack = less(base_spd + spd_attack, 15, 1) - base_spd;
+		spd_attack = less(base_spd + spd_attack, 10, 1) - base_spd;
 	}
 	
 	ch[cn].cast_speed = clamp(spd_cast,   -127, 127);
@@ -12392,7 +12391,7 @@ void really_update_char(int cn)
 	
 	critical_b = more(critical_b, do_get_ieffect(cn, VF_EN_MORECRIT), 1);
 	
-	if (do_get_iflag(cn, SF_WHEEL)) critical_b = critical_b * 2/3;  // [Taro] Wheel of Fortune
+	if (do_get_iflag(cn, SF_WHEEL)) critical_b = critical_b * 3/4;  // [Taro] Wheel of Fortune
 	
 	ch[cn].crit_chance = clamp(critical_b, 0, 10000);
 	
@@ -12415,7 +12414,7 @@ void really_update_char(int cn)
 	// Tarot - Wheel of Fortune :: Less crit chance, more crit multi
 	if (do_get_iflag(cn, SF_WHEEL))
 	{
-		critical_m = (critical_m + 100) * 4/3 - 100;
+		critical_m = (critical_m + 100) * 5/4 - 100;
 	}
 	
 	ch[cn].crit_multi = 100 + clamp(critical_m, 0, 800);
@@ -12465,8 +12464,8 @@ void really_update_char(int cn)
 	
 	// Multiplicative bonuses
 	{
-		if (do_get_iflag(cn, SF_STRENG_R)) hit_rate = less(hit_rate,  20, 1); // [Tarot] Strength.R
-		if (skirmtaunt)                    hit_rate = less(hit_rate,  20, 1); // [Item] Signet of Skirmish
+		if (do_get_iflag(cn, SF_STRENG_R)) hit_rate = less(hit_rate,  10, 1); // [Tarot] Strength.R
+		if (skirmtaunt)                    hit_rate = less(hit_rate,  10, 1); // [Item] Signet of Skirmish
 	}
 	
 	parry_rate += hit_rate   * do_get_ieffect(cn, VF_EN_KWAIHIT)   / 100;
@@ -12526,12 +12525,12 @@ void really_update_char(int cn)
 	}
 	// Tarot - Hermit
 	if (do_get_iflag(cn, SF_HERMIT))
-		armor = armor * 23/20;
+		armor = armor * 6/5;
 	// Tarot - Strength.R : More WV, less hit
 	if (do_get_iflag(cn, SF_STRENG_R))
 		weapon = weapon * 6/5;
 	
-	if (do_get_iflag(cn, SF_HANGED_R)) weapon = less(weapon, 15, 1);             // [Taro] Hanged.R
+	if (do_get_iflag(cn, SF_HANGED_R)) weapon = less(weapon, 10, 1);             // [Taro] Hanged.R
 	if (do_get_iflag(cn, SF_TEMPER_R)) weapon = more(weapon, sickStacks*10, 1);  // [Taro] Temperance.R
 	
 	// Chest Armor Enchantment
@@ -12540,8 +12539,8 @@ void really_update_char(int cn)
 	// Tarot - Reverse Heirophant : GC gets more WV/AV
 	if (IS_COMPANION(cn) && !IS_SHADOW(cn) && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) && do_get_iflag(co, SF_HEIROP_R))
 	{
-		armor  = armor  * 112/100;
-		weapon = weapon * 112/100;
+		armor  = armor  * 6/5;
+		weapon = weapon * 6/5;
 	}
 	
 	// "Increased" and "Decreased" Armor and Weapon Values
@@ -12608,7 +12607,7 @@ void really_update_char(int cn)
 			else                                n = more(n, m, 4);
 		}
 		
-		if (do_get_iflag(cn, SF_STRENGTH))                      n = less(n, 15, 1);      // [Taro] Strength
+		if (do_get_iflag(cn, SF_STRENGTH))                      n = less(n, 10, 1);      // [Taro] Strength
 		if ((m = has_buff(cn, SK_POISON)) && bu[m].data[8]==10) n = less(n, 10, 1);
 		if ((m = has_buff(cn, SK_VENOM))  && bu[m].data[8]==10) n = less(n, 10, 1);
 		

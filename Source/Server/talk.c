@@ -310,7 +310,7 @@ struct know
 #define AN_SK_COMPM		"Companion Mastery is an advanced skill learned by Summoners. It makes their companions much stronger than usual."
 #define AN_SK_SHADOW	"Shadow Copy is an advanced spell learned by Summoners. It lets them summon a copy of themself or their target to fight for them."
 #define AN_SK_HASTE		"Haste is an advanced spell. It allows the caster to dramatically speed up their actions."
-#define AN_SK_TAUNT		"Taunt is a skill used by Templars. It enrages their foes and blosters their defenses."
+#define AN_SK_TAUNT		"Taunt is a skill used by Templars. It weakens and enrages their foes."
 #define AN_SK_LEAP		"Leap is an advanced skill learned by Warriors. It lets them rapidly injure enemies, leaping between them in the process."
 #define AN_SK_PACT		"Pact is an advanced skill learned by Lycanthrope. It allows them to deal more and take less damage, for a cost."
 //}

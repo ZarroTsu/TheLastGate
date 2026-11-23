@@ -405,6 +405,7 @@
 #define SP_DUR_RECALL(a)	( max(TICKS / 3, 66 - (a / 5))    )
 #define SP_DUR_SHADOW(a)	( TICKS * 20 + TICKS * a / 5      )
 #define SP_DUR_DISPEL(a)	( TICKS * 15 + TICKS * a / 5      )
+#define SP_DUR_TAUNT(a)		( TICKS * 10 + TICKS * a / 6      )
 
 
 // -------- Skill Exhaustion values -------- //
@@ -550,7 +551,7 @@ extern char *at_short[];
 #define DESC_SIGN_SCRE		"When equipped, casting Curse will also inflict Aggravate.\n"
 #define DESC_SIGN_SAFE		"When equipped, your Magic Shield can be cast on allies. Only one Magic Shield owned by you can be active at a time.\n"
 #define DESC_SIGN_SLAS		"When equipped, your Cleave skill now hits all nearby enemies in an area around you.\n"
-#define DESC_SIGN_SKIR		"When equipped, enemies Taunted by you breifly have 20%% less hit score.\n"
+#define DESC_SIGN_SKIR		"When equipped, enemies Taunted by you have 10%% less hit score.\n"
 
 #define FN_EX			5
 #define DESC_GL_SERPENT		"When equipped, your hits inflict a self-scaling Poison, dealing damage over time.\n"
@@ -844,19 +845,19 @@ extern char *at_short[];
 #define DESC_HEIROPH		"When equipped, Immunize and Inoculate from your Dispel spell lasts four times as long, but your Dispel spell can only remove a single buff or debuff at a time.\n"
 #define DESC_LOVERS			"When equipped, your Weapon Value and Armor Value become the average of your Weapon Value and Armor Value.\n"
 #define DESC_CHARIOT		"When equipped, your Blind skill is replaced with Douse. Douse reduces your target's stealth and spellpower bonus.\n"
-#define DESC_STRENGTH		"When equipped, reduces your attack speed, cast speed, and cooldown recovery speed by 15%%, but grants 20%% more damage with hits.\n"
-#define DESC_HERMIT			"When equipped, you have 15%% more Armor Value, but 20%% less Resistance and Immunity.\n"
-#define DESC_WHEEL			"When equipped, your critical hit chance is reduced by 33%%, but you have 33%% more critical hit multiplier.\n"
+#define DESC_STRENGTH		"When equipped, reduces your attack speed, cast speed, and cooldown recovery speed by 10%%, but grants 25%% more damage with hits.\n"
+#define DESC_HERMIT			"When equipped, you have 20%% more Armor Value, but 20%% less Resistance and Immunity.\n"
+#define DESC_WHEEL			"When equipped, your critical hit chance is reduced by 25%%, but you have 25%% more critical hit multiplier.\n"
 #define DESC_JUSTICE		"When equipped, your Cleave skill no longer inflicts Bleeding and instead inflicts Aggravate, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_HANGED			"When equipped, 33%% of your Resistance is instead used to reduce the strength of incoming enemy spells.\n"
 #define DESC_DEATH			"When equipped, your Weaken skill is replaced with Crush. Crush reduces a target's Armor Value, but no longer reduces enemy Weapon Value.\n"
-#define DESC_TEMPER			"When equipped, your Taunt skill grants 100%% more Guard power, but Guard duration is halved.\n"
+#define DESC_TEMPER			"When equipped, your Taunts last three times as long, but enemy damage reduction from taunt is halved.\n"
 #define DESC_DEVIL			"When equipped, 33%% of all skill and spell costs are instead taken from your Hitpoints.\n"
 #define DESC_TOWER			"When equipped, your Curse spell is replaced with Focus. Focus grants additional Cooldown Rate.\n"
 #define DESC_STAR			"When equipped, your Heal spell is replaced with Regen. Regen grants a buff which regenerates the target's Hitpoints over 20 seconds.\n"
 #define DESC_MOON			"When equipped, life regeneration is instead applied as mana regeneration while able to recover mana.\n"
 #define DESC_SUN			"When equipped, endurance regeneration is instead applied as life regeneration while able to recover life.\n"
-#define DESC_JUDGE			"When equipped, your Blast spell deals 15%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n"
+#define DESC_JUDGE			"When equipped, your Blast spell deals 10%% less damage but inflicts Scorch, causing the target to take additional damage for 20 seconds.\n"
 #define DESC_WORLD			"When equipped, mana regeneration is instead applied as endurance regeneration while able to recover endurance.\n"
 
 #define DESC_FOOL_R			"When equipped, your attributes become the average of all attributes, plus 5%%.\n"
@@ -864,17 +865,17 @@ extern char *at_short[];
 #define DESC_PREIST_R		"When equipped, your Magic Shield and Magic Shell are now passive and regenerate quickly, but are more fragile. You cannot gain Magic Shield or Magic Shell from other sources.\n"
 #define DESC_EMPRES_R		"When equipped, your Lethargy skill reserves life instead of mana.\n"
 #define DESC_EMPERO_R		"When equipped, your Warcry skill is replaced with Rally. Rally grants nearby allies a buff which improves all attributes.\n"
-#define DESC_HEIROP_R		"When equipped, your Ghost Companion has 12%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
+#define DESC_HEIROP_R		"When equipped, your Ghost Companion has 20%% more Weapon Value and Armor Value, but has a 20%% chance to miss when it should have hit.\n"
 #define DESC_LOVERS_R		"When equipped, your Hit Score and Parry Score become the average of your Hit Score and Parry Score.\n"
-#define DESC_CHARIO_R		"When equipped, your debuffs ignore 25%% of target resistance and immunity, but are 20%% weaker once applied.\n"
-#define DESC_STRENG_R		"When equipped, you have 20%% more Weapon Value, but 20%% less hit score.\n"
+#define DESC_CHARIO_R		"When equipped, your debuffs ignore 30%% of target resistance and immunity, but are 20%% weaker once applied.\n"
+#define DESC_STRENG_R		"When equipped, you have 20%% more Weapon Value, but 10%% less hit score.\n"
 #define DESC_HERMIT_R		"When equipped, your Pact skill reserves and functions based off of reserved mana instead of hitpoints, but provides less of a benefit while active.\n"
-#define DESC_WHEEL_R		"When equipped, you take 20%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
+#define DESC_WHEEL_R		"When equipped, you take 25%% less damage from melee attacks, but have a 25%% chance to be hit when you would have parried.\n"
 #define DESC_JUSTIC_R		"When equipped, your Leap skill no longer repeats. Leap now always deals a critical hit and stuns everything it hits.\n"
-#define DESC_HANGED_R		"When equipped, you have 25%% more Top Damage, but 15%% less Weapon Value.\n"
+#define DESC_HANGED_R		"When equipped, you have 25%% more Top Damage, but 10%% less Weapon Value.\n"
 #define DESC_DEATH_R		"When equipped, your Zephyr skill no longer triggers on hit, and instead triggers when an enemy attacks you.\n"
 #define DESC_TEMPER_R		"When equipped, 10%% more Weapon Value per stack of Healing Sickness on you. The maximum healing sickness you can receive is increased by 1 stack.\n"
-#define DESC_DEVIL_R		"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 20%% less damage and take 20%% more damage.\n"
+#define DESC_DEVIL_R		"When equipped, your Shadow Copy deals 25%% more damage and takes 25%% less damage, but while your Shadow Copy is active you deal 10%% less damage and take 10%% more damage.\n"
 #define DESC_TOWER_R		"When equipped, your Poison spell is replaced with Venom. Venom deals half as much damage, but it reduces enemy Immunity and can stack up to three times.\n"
 #define DESC_STAR_R			"When equipped, your Spellpower Bonus affects active skills instead of active spells.\n"
 #define DESC_MOON_R			"When equipped, your Tactics skill has 1%% increased effect per 50 uncapped mana, but you lose 0.2%% of current mana per second per 50 uncapped mana.\n"

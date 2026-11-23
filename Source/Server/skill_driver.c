@@ -306,6 +306,7 @@ int add_exhaust(int cn, int len);
 void skill_slow(int cn, int flag);
 int spell_plague(int cn, int co, int flag);
 int spell_shock(int cn, int co, int power);
+int spell_taunt(int cn, int co, int power, int flag);
 
 // Newer glove driver
 // Check for and escalate a given debuff template
@@ -1846,7 +1847,7 @@ int get_target_resistance(int cn, int co)
 		{
 			n = target_resist;
 			
-			if (do_get_iflag(cn, SF_CHARIO_R)) n = less(n, 25, 1);    // [Taro] Chariot.R
+			if (do_get_iflag(cn, SF_CHARIO_R)) n = less(n, 30, 1);    // [Taro] Chariot.R
 			
 			target_resist = n;
 		}
@@ -1904,7 +1905,7 @@ int get_target_immunity(int cn, int co)
 		{
 			n = target_immune;
 			
-			if (do_get_iflag(cn, SF_CHARIO_R)) n = less(n, 25, 1);    // [Taro] Chariot.R
+			if (do_get_iflag(cn, SF_CHARIO_R)) n = less(n, 30, 1);    // [Taro] Chariot.R
 			
 			target_immune = n;
 		}
@@ -4066,7 +4067,7 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 	
 	// Tarot Card - Judgment :: Less damage
 	if (do_get_iflag(cn, SF_JUDGE))
-		tmp = do_hurt(cn, co, (hitpower+crit_dam)*85/100, 1);
+		tmp = do_hurt(cn, co, (hitpower+crit_dam)*9/10, 1);
 	else
 		tmp = do_hurt(cn, co, hitpower+crit_dam, 1);
 	
@@ -5317,10 +5318,10 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 			bu[in].power 	 = base;
 			bu[in].data[4]   = 1; // Effects not removed by NMZ (SK_SHADOW on owner)
 			
-			if (devilR) // Player deals 20%% less damage and takes 20%% more damage
+			if (devilR) // Player deals 10%% less damage and takes 10%% more damage
 			{
-				bu[in].dmg_bonus     = -(20*2);
-				bu[in].dmg_reduction = -(20*2);
+				bu[in].dmg_bonus     = -(10*2);
+				bu[in].dmg_reduction = -(10*2);
 				bu[in].data[5] = 2;
 			}
 			add_spell(cn, in);
@@ -6134,21 +6135,32 @@ void skill_pulse(int cn)
 // Gets AoE with Proximity skill
 int spell_taunt(int cn, int co, int power, int flag)
 {
-	int in, n;
+	int in, n, dur, dmgred;
 	
 	if (GET_SFAIL(cn, co)) return 0;
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
 	
-	if (!(in = make_new_buff(cn, SK_TAUNT, BUF_SPR_TAUNT, power, max(TICKS/4, power), 0)))
+	dur    = SP_DUR_TAUNT(power);
+	dmgred = -(min(100, power/5));  // 1% less damage dealt per 10 power
+	
+	if (do_get_iflag(cn, SF_TEMPER))
+	{
+		dur    *= 3;
+		dmgred /= 2;
+	}
+	
+	if (!(in = make_new_buff(cn, SK_TAUNT, BUF_SPR_TAUNT, power, dur, 0)))
 		return 0;
 	
-	bu[in].data[4] = 1; // Effects not removed by NMZ (SK_TAUNT)
-	bu[in].data[5] = 1;
+	bu[in].dmg_bonus = dmgred;
+	bu[in].data[4]   = 1; // Effects not removed by NMZ (SK_TAUNT)
+	bu[in].data[5]   = 1;
 	
 	return cast_a_spell(cn, co, in, 1+flag, 1-flag); // SK_TAUNT
 }
+/*
 int spell_guard(int cn, int co, int power)
 {
 	int in, dur;
@@ -6165,11 +6177,12 @@ int spell_guard(int cn, int co, int power)
 	if (!(in = make_new_buff(cn, SK_GUARD, BUF_SPR_GUARD, power, dur, 0))) 
 		return 0;
 	
-	bu[in].dmg_reduction = min(100, power/5);	// 0.5% less damage taken per 5 power
-	bu[in].data[4] = 1; 							// Effects not removed by NMZ (SK_GUARD)
+	bu[in].dmg_reduction = min(100, power/5);  // 0.5% less damage taken per 5 power
+	bu[in].data[4] = 1;                        // Effects not removed by NMZ (SK_GUARD)
 	
 	return cast_a_spell(cn, co, in, 0, 0); // SK_GUARD
 }
+*/
 void skill_taunt(int cn)
 {
 	int d20 = SP_MULT_TAUNT;
@@ -6184,7 +6197,7 @@ void skill_taunt(int cn)
 	// Get skill target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20))) return;
 	
-	// If we have a valid target, cast Slow on them
+	// If we have a valid target, cast Taunt on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
 	{
 		spell_taunt(cn, (co_orig = co), power, 0);
@@ -6196,7 +6209,7 @@ void skill_taunt(int cn)
 	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
 	
 	//if (hit) 
-	spell_guard(cn, cn, power);
+	//spell_guard(cn, cn, power);
 	
 	add_exhaust(cn, SK_EXH_TAUNT);
 }

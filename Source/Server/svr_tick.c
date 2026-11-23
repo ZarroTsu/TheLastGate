@@ -1855,7 +1855,7 @@ int get_meta_stat_value(int cn, int n)
 		case  9: case 10: case 13: case 14: case 17: case 58:
 			dmg_wpn = ch[cn].weapon;
 			dmg_top = ch[cn].top_damage;
-			dmg_str = do_get_iflag(cn, SF_STRENGTH)?120:100;
+			dmg_str = do_get_iflag(cn, SF_STRENGTH)?125:100;
 			dmg_bns = ch[cn].dmg_bonus;
 			//
 			dmg_low = (  dmg_wpn          * dmg_str/100 * dmg_bns/10000 ) / 4;
@@ -1961,7 +1961,7 @@ int get_meta_stat_value(int cn, int n)
 			value = max(0, min(SPEED_CAP, SPEED_BASE+GET_SPD_CAS(cn)));
 			break;
 		case 17: case 58: // Thorns Score
-			value = ch[cn].gethit_dam * dmg_str/100 * dmg_bns/10000;
+			value = ch[cn].gethit_dam * dmg_bns/10000;
 			break;
 		case 18: case 59: // Mana Cost Multiplier	Decimal, 0.00 %
 			value = ch[cn].mana_cost;
@@ -2017,7 +2017,7 @@ int get_meta_stat_value(int cn, int n)
 		case 32: // Blast Hit Damage
 			power = spell_multiplier(M_SK(cn, SK_BLAST), cn) * 2;
 			if (do_get_iflag(cn, SF_TW_IRA))   in = power * ch[cn].crit_multi / 100 - power;
-			if (do_get_iflag(cn, SF_JUDGE)) power = (power+max(0, in))*85/100;
+			if (do_get_iflag(cn, SF_JUDGE)) power = (power+max(0, in))*9/10;
 			else                            power =  power+max(0, in);
 			if (do_get_iflag(cn, SF_EN_MORECLEABLAS)) power = more(power, 10, 1);
 			value = power * DAM_MULT_BLAST/1000;
@@ -2271,10 +2271,10 @@ int get_meta_stat_value(int cn, int n)
 	switch (n) // Global damage multiplier
 	{
 		case 24: case 27: case 32: case 37: case 40:
-			value = value * ((do_get_iflag(cn, SF_STRENGTH)?120:100)/100)*(ch[cn].dmg_bonus/10000);
+			value = value * ((do_get_iflag(cn, SF_STRENGTH)?125:100)/100)*(ch[cn].dmg_bonus/10000);
 			break;
 		case 25: case 35: case 41: case 90:
-			value = value * ((do_get_iflag(cn, SF_STRENGTH)?120:100)/100)*(ch[cn].dmg_bonus/10000) / 20;
+			value = value * ((do_get_iflag(cn, SF_STRENGTH)?125:100)/100)*(ch[cn].dmg_bonus/10000) / 20;
 			break;
 		default: break;
 	}

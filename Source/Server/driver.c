@@ -3664,6 +3664,10 @@ int npc_try_spell(int cn, int co, int spell)
 			timm = spell_immunity(cn, co, offn);
 			timm = tdef ? (timm/2) : timm;
 			
+			// Cancel if the target is already taunted
+			if (bu[in].temp==truespell && truespell==SK_TAUNT)
+				break;
+			
 			// Cancel if target is already buffed or debuffed (except for heal)
 			if (bu[in].temp==truespell && truespell!=SK_HEAL /*&& tpow>=timm*/ && bu[in].active>bu[in].duration/4)
 				break;
@@ -3802,7 +3806,7 @@ int npc_spell_routine_debuffs(int cn, int co)
 		}
 		if (!is_facing(cn, co) && my_end>max_end*950 && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_TAUNT))
 		{
-			ch[cn].data[74] = globs->ticker + TICKS * 30;
+			ch[cn].data[74] = globs->ticker + TICKS * 40;
 			return 1;
 		}
 		if (my_end>max_end*200 && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, co, SK_BLIND))
