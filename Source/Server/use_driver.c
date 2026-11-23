@@ -11642,7 +11642,7 @@ int step_portal_pandium(int cn, int in)
 		do_char_log(cn, 0, "Seems someone's in the way. Please ask them to kindly move their heiny and try again.\n");
 		return -1;
 	}
-	remove_all_spells(cn, 0);
+	//remove_all_spells(cn, 0);
 	
 	return 1;
 }

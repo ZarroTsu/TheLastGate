@@ -14514,6 +14514,7 @@ void do_regenerate(int cn)
 							char_play_sound(cn, ch[cn].sound + 21, -150, 0);
 							fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 						}
+						/*
 						if (IS_IN_PENTRY(xo, yo)) // Exiting Pandium's entry foyer
 						{
 							int x, xs, xe, y, ys, ye;
@@ -14531,6 +14532,7 @@ void do_regenerate(int cn)
 								}
 							}
 						}
+						*/
 					}
 					ch[cn].status = 0;
 					ch[cn].attack_cn = 0;
