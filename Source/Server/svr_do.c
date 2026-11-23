@@ -4220,6 +4220,7 @@ int do_showbuffs(int cn, int co)
 				do_char_log(cn, 6, " : %+d Immunity\n",       bu[in].skill[SK_IMMUN]);
 				break;
 			case SK_GUARD:
+			case SK_TAUNT:
 			case SK_AGGRAVATE:
 			case SK_SCORCH:
 			case SK_SHOCK:
