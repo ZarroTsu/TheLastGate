@@ -530,7 +530,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			bu[in].reserve[2] = max(1, power/5);
 			break;
 		case SK_BLEED:
-			bu[in].data[1] = BLEEDFORM(power, dur);  // Decay rate
+			bu[in].data[1] = PL_BLEEDFORM(power, dur);  // Decay rate
 			break;
 		case SK_FURY:
 			bu[in].top_damage = min(127, power/4 + 1);
@@ -5583,7 +5583,7 @@ int spell_bleed(int cn, int co, int power)
 	
 	if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
 	if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
-	if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/20, 1);    // [Ench] Improved Crimson Ripper
+	if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/25, 1);    // [Ench] Improved Crimson Ripper
 	
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
@@ -5597,7 +5597,10 @@ int spell_bleed(int cn, int co, int power)
 		dur = dur/2;
 	}
 	
-	bpow = BLEEDFORM(power, dur);
+	if (IS_PLAYER(cn))
+		bpow = PL_BLEEDFORM(power, dur);
+	else
+		bpow = MN_BLEEDFORM(power, dur);
 	
 	if (!(in = make_new_buff(cn, SK_BLEED, BUF_SPR_BLEED, power, dur, 0)))
 		return 0;

@@ -341,7 +341,8 @@ int is_ascroll(int in);
 #define MN_POISFORM(p, d)		(((p   ) * 3000) / max(1, d))
 
 // Bleed's formula (damage per tick)
-#define BLEEDFORM(p, d)			(((p+ 5) *  750) / max(1, d))
+#define PL_BLEEDFORM(p, d)		(((p+ 5) * 1500) / max(1, d))
+#define MN_BLEEDFORM(p, d)		(((p   ) * 1000) / max(1, d))
 
 // Plague's formula
 #define PLAGUEFORM(p, d)		(((p+ 5) * 2000) / max(1, d))

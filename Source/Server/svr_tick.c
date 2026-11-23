@@ -1986,7 +1986,7 @@ int get_meta_stat_value(int cn, int n)
 			durat = 0;
 			durat += TC_SK(cn,113)*15; // (Corr) Torment
 			durat = SP_DUR_BLEED * 100 / (100 + durat);
-			value = BLEEDFORM((do_get_iflag(cn, SF_GUNGNIR)?power*2:power), (do_get_iflag(cn, SF_GUNGNIR)?durat/2:durat));
+			value = PL_BLEEDFORM((do_get_iflag(cn, SF_GUNGNIR)?power*2:power), (do_get_iflag(cn, SF_GUNGNIR)?durat/2:durat));
 			break;
 		case 26: // Cleave Cooldown					Decimal, 0.00 Seconds
 			value = 5 * cdlen;

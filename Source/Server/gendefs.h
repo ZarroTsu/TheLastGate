@@ -659,7 +659,7 @@ extern char *at_short[];
 #define DESC_NEICLAW		"When equipped, grants 1 additional Spellpower Bonus for every 100 uncapped Maximum Mana.\n"
 #define DESC_LIONSPAWS		"When equipped, your passive skills gain an additional 20%% Braveness bonus.\n"
 #define DESC_CRIMRIP		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time.\n"
-#define DESC_CRIMRIP2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. Bleeds you inflict deal 1%% more damage per 20 uncapped maximum Hitpoints.\n"
+#define DESC_CRIMRIP2		"When equipped, your hits inflict a self-scaling Bleed, dealing damage over time. Bleeds you inflict deal 1%% more damage per 25 uncapped maximum Hitpoints.\n"
 #define DESC_SOVERIGNS		"When equipped, %s and %s become the average of the two, plus 10.\n", skilltab[it[in].data[1]].name, skilltab[it[in].data[2]].name
 
 #define DESC_THEBUTCHER		"When equipped, your Cleave hits an additional time when its cooldown expires.\n"
