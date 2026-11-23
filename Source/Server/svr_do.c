@@ -15181,6 +15181,11 @@ void do_shop_char(int cn, int co, int nr)
 								canstk++;
 						}
 						
+						if (SEASON_CHECK(cn, in))
+						{
+							do_char_log(cn, 0, "Sorry, it looks like this item is out of your season!\n");
+							return;
+						}
 						if (stk && (it[in].flags & IF_STACKABLE) && canstk)
 						{
 							pr = barter(cn, in, 1)*stk;
@@ -15399,14 +15404,18 @@ void do_shop_char(int cn, int co, int nr)
 				if ((ch[co].flags & CF_BODY) && (in = ch[co].worn[nr - 40])!=0)
 				{
 					god_take_from_char(in, co);
-					if (god_give_char(in, cn))
+					if (SEASON_CHECK(cn, in))
+					{
+						god_give_char(in, co);
+						do_char_log(cn, 0, "You cannot take the %s because it is out of your season.\n", it[in].reference);
+					}
+					else if (god_give_char(in, cn))
 					{
 						if (it[in].driver==48) it[in].stack = it[in].data[2];
 						chlog(cn, "Took %s", it[in].name);
 						if (!(ch[cn].flags & CF_SYS_OFF))
 							do_char_log(cn, 1, "You took a %s.\n", it[in].reference);
 					}
-					else if (SEASON_CHECK(cn, in)) ;
 					else
 					{
 						god_give_char(in, co);
@@ -15419,14 +15428,18 @@ void do_shop_char(int cn, int co, int nr)
 				if ((ch[co].flags & CF_BODY) && (in = ch[co].citem)!=0)
 				{
 					god_take_from_char(in, co);
-					if (god_give_char(in, cn))
+					if (SEASON_CHECK(cn, in))
+					{
+						god_give_char(in, co);
+						do_char_log(cn, 0, "You cannot take the %s because it is out of your season.\n", it[in].reference);
+					}
+					else if (god_give_char(in, cn))
 					{
 						if (it[in].driver==48) it[in].stack = it[in].data[2];
 						chlog(cn, "Took %s", it[in].name);
 						if (!(ch[cn].flags & CF_SYS_OFF))
 							do_char_log(cn, 1, "You took a %s.\n", it[in].reference);
 					}
-					else if (SEASON_CHECK(cn, in)) ;
 					else
 					{
 						god_give_char(in, co);
