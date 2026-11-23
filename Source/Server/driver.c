@@ -1833,18 +1833,20 @@ int npc_give(int cn, int co, int in, int money)
 			do_char_log(co, 2, "You received %dG %dS.\n", money / 100, money % 100);
 			if ((nr = ch[cn].data[51])!=0)
 			{
+				int div = 4;
 				do_sayx(cn, "As an extra thanks, let me teach you a little something I know.");
-				do_give_exp(co, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
+				do_give_exp(co, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
 				// <group rewards>
 				for (n = 1; n<MAXCHARS; n++)
 				{
 					if (ch[n].used==USE_EMPTY || !(ch[n].flags & (CF_PLAYER | CF_USURP))) continue;
 					if (isgroup(n, co) && isgroup(co, n) && isnearby(co, n))
 					{
-						do_give_exp(n, (tmp ? nr/4 : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
+						div = 4;
+						if (qnum >= 101) tmp = npc_quest_check(n, qnum-101);
+						do_give_exp(n, (tmp ? nr/max(1,div) : nr) + (qnum ? (nr*(stsz-1))/4 : nr*(stsz-1)), 0, -1, 0);
 					}
 				}
-				// </group rewards>
 			}
 		}
 
