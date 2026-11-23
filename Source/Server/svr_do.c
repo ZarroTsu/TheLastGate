@@ -1415,6 +1415,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 6):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 			do_char_log(cn, 1, "#sysoff                disable all system msgs.\n");
 			do_char_log(cn, 1, "#tarot                 list tarot cards.\n");
 			if (ch[cn].house_id)
@@ -1443,6 +1444,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 5):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#silence               you won't hear enemies.\n");
 			do_char_log(cn, 1, "#seen <player>         when last seen here?.\n");
 			do_char_log(cn, 1, "#shield                list shield stats.\n");
 			do_char_log(cn, 1, "#shout <text>          to all players.\n");
@@ -1459,7 +1461,6 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "#spinel                list spinel rings.\n");
 			do_char_log(cn, 1, "#staff                 list staff stats.\n");
 			do_char_log(cn, 1, "#swap                  swap with facing player.\n");
-			do_char_log(cn, 1, "#sword                 list sword stats.\n");
 		}
 		else if (strcmp(topic, "4")==0)
 		{
@@ -1467,6 +1468,7 @@ void do_help(int cn, char *topic)
 			do_char_log(cn, 1, "The following commands are available (PAGE 4):\n");
 			do_char_log(cn, 1, " \n");
 			//                 "!        .         .   |     .         .        !"
+			do_char_log(cn, 1, "#noshout               you won't hear shouts.\n");
 			do_char_log(cn, 1, "#notell                you won't hear tells.\n");
 			do_char_log(cn, 1, "#opal                  list opal rings.\n");
 			do_char_log(cn, 1, "#override              you always spell self.\n");
@@ -1485,7 +1487,6 @@ void do_help(int cn, char *topic)
 			}
 			if (ch[cn].flags & CF_SENSE)
 				do_char_log(cn, 1, "#sense                 disable enemy spell msgs.\n");
-			do_char_log(cn, 1, "#silence               you won't hear enemies.\n");
 		}
 		else if (strcmp(topic, "3")==0)
 		{
@@ -1512,9 +1513,10 @@ void do_help(int cn, char *topic)
 			if (ch[cn].flags & CF_KNOWSPELL)
 				do_char_log(cn, 1, "#knowspells        toggle knowledge skill.\n");
 			do_char_log(cn, 1, "#lag <seconds>         lag control.\n");
+			if (T_BRAV_SK(cn, 12))
+				do_char_log(cn, 1, "#lapse                 clear braver immunize.\n");
 			do_char_log(cn, 1, "#listskills <page>     list skill attributes.\n");
 			do_char_log(cn, 1, "#max                   list character maximums.\n");
-			do_char_log(cn, 1, "#noshout               you won't hear shouts.\n");
 		}
 		else if (strcmp(topic, "2")==0)
 		{
@@ -5960,6 +5962,12 @@ void do_spectate(int cn, int co)
 	if (!IS_GOD(cn)) do_char_log(co, 9, "%s is watching you.\n", ch[cn].name);
 }
 
+void do_lapse_immunize(int cn)
+{
+	remove_buff(cn, SK_DISPEL);
+	do_char_log(cn, 1, "Done.\n");
+}
+
 void do_wipe_deaths(int cn, int co);
 
 void do_command(int cn, char *ptr)
@@ -6618,6 +6626,12 @@ void do_command(int cn, char *ptr)
 		if (prefix(cmd, "lag") && !f_m)
 		{
 			do_lag(cn, atoi(arg[1]));
+			return;
+		}
+		;
+		if (prefix(cmd, "lapse") && T_BRAV_SK(cn, 12))
+		{
+			do_lapse_immunize(cn);
 			return;
 		}
 		;
