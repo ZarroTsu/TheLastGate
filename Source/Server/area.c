@@ -687,7 +687,7 @@ extern struct waypoint waypoint[MAXWPS] = {
 	{ 355, 235, "Pentagram Quest, Onyx", 			"the beginning of the Onyx Pentagram Quest" },
 	{ 431, 729, "Lizard Temple, South", 			"the entrance to the Lizard Temple, north of the Autumn Meadow" },
 	{ 177, 756, "Lizard Settlement, East", 		    "the north-east end of the Lizard Settlement" },
-	{ 156, 544, "The Emerald Cavern, East", 		"the western side of the Emerald Cavern" },
+	{ 156, 544, "The Emerald Cavern, West", 		"the western side of the Emerald Cavern" },
 	{ 771, 595, "The Tower", 						"the entrance to The Tower" },										//   8388608
 	{ 838, 893, "Neiseer, East", 					"the entrance to the Violet Bog, east of Neiseer" },				//  16777216
 	{ 867, 813, "Neiseer, South", 					"the entrance to the Raging Rivers, south of Neiseer" },			//  33554432

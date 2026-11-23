@@ -408,7 +408,7 @@ struct wpslist wpslist[MAXWPS]={
 	{ 20, "Lizard Temple, South", 			"\"Where reptiles implore.\"" },
 	{  7, "Lizard Temple, North", 			"\"The Beryl Jungle.\"" },
 	{ 21, "Lizard Settlement, East", 		"\"Betwixt emerald and magma.\"" },
-	{ 22, "The Emerald Cavern, East", 		"\"A feudal audience.\"" },
+	{ 22, "The Emerald Cavern, West", 		"\"A feudal audience.\"" },
 	{  8, "Temple of Osiris", 				"\"Gods toy with greed.\"" },
 	{ 23, "The Tower", 						"\"Sky-piercing obelisk.\"" },
 	{  9, "Neiseer, West", 					"\"The Basalt Desert.\"" },
