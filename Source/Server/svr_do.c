@@ -4289,7 +4289,7 @@ int do_showbuffs(int cn, int co)
 					do_char_log(cn, 6, " : %+d Strength\n",   bu[in].attrib[4]);
 				}
 				if (bu[in].cool_bonus) do_char_log(cn, 6, " : %+d Cooldown Rate\n", bu[in].cool_bonus);
-				if (bu[in].spell_mod)  do_char_log(cn, 6, " : %+d Spell Bonus\n",   bu[in].spell_pow);
+				if (bu[in].spell_pow)  do_char_log(cn, 6, " : %+d Spell Bonus\n",   bu[in].spell_pow);
 				break;
 			default: break;
 		}
