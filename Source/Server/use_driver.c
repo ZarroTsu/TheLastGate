@@ -3689,7 +3689,7 @@ int use_map_shrine(int cn, int in)
 					if (buff = make_new_buff(cn, v, BUF_SPR_WISDM, 300, SP_DUR_SHRINE, 0))
 					{
 						strcpy(bu[buff].name, "Shrine of Wisdom");
-						bu[buff].spell_mod = (10 + boosted)/2;
+						bu[buff].spell_pow = (10 + boosted)/2;
 						bu[buff].data[4] = 1; bu[buff].data[6] = 3; add_spell(cn, buff);
 						do_char_log(cn, 3, "Be wisened.\n");
 					}
