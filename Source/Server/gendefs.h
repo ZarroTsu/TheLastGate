@@ -385,6 +385,7 @@
 #define SP_DUR_GLOVES		( TICKS * 30                      )
 #define SP_DUR_POISON		( TICKS * 30                      )
 #define SP_DUR_GUARD		( TICKS * 30                      )
+#define SP_DUR_RAGE			( TICKS * 30                      )
 #define SP_DUR_SCORCH		( TICKS * 20                      )
 #define SP_DUR_AGGRAVATE	( TICKS * 20                      )
 #define SP_DUR_FATIGUE		( TICKS * 20                      )

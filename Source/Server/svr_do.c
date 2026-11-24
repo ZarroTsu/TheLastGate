@@ -4227,6 +4227,7 @@ int do_showbuffs(int cn, int co)
 			case SK_SHOCK:
 			case SK_CHARGE:
 			case SK_PACT:
+			case SK_PHALANX:
 				if (bu[in].dmg_reduction>0)
 				{
 					if (bu[in].dmg_reduction%2==0)
@@ -4285,7 +4286,7 @@ int do_showbuffs(int cn, int co)
 			case SK_PLAGUE:
 			case SK_VENOM:
 				break;
-			case 104: case 105: case 106: case 107:
+			case 104: case 105: case 106: case 107: case SK_STARLIGHT:
 				if (bu[in].speed)      do_char_log(cn, 6, " : %+d Speed\n",          bu[in].speed);
 				if (bu[in].weapon)     do_char_log(cn, 6, " : %+d Weapon Value\n",   bu[in].weapon);
 				if (bu[in].armor)      do_char_log(cn, 6, " : %+d Armor Value\n",    bu[in].armor);
@@ -4299,6 +4300,9 @@ int do_showbuffs(int cn, int co)
 				}
 				if (bu[in].cool_bonus) do_char_log(cn, 6, " : %+d Cooldown Rate\n", bu[in].cool_bonus);
 				if (bu[in].spell_pow)  do_char_log(cn, 6, " : %+d Spell Bonus\n",   bu[in].spell_pow);
+				break;
+			case SK_RAGE:
+				do_char_log(cn, 6, " : %+d Spell Modifier\n",   bu[in].spell_mod);
 				break;
 			default: break;
 		}
@@ -8666,7 +8670,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 	
 	remove_all_debuffs(co);
 
-	if ((mf1 & MF_ARENA) || is_atpandium(co) || is_incolosseum(co, 0))
+	if ((mf1 & MF_ARENA) || is_atpandium(co) || is_incolosseum(co, 0) || IS_IN_XIII(x, y) || IS_IN_TLG(x, y))
 	{	// Arena death : full save, keep everything
 		wimp = 2;
 	}
@@ -12051,8 +12055,9 @@ void really_update_char(int cn)
 	if (IS_LYCANTH(cn))
 	{	// PVT = 1 : 8		// WARLORD = 25 : 200
 		z = M_SK(cn, SK_FEROC); // M_SK(cn, SK_FEROC)*(M_SK(cn, SK_FEROC)/8)*136/5000+8;
-		weapon += (z/2 + z*empty/10)/4; //  1 = (  4+  8)/4 == btwn + 1 and +  3
-		armor  += (z/2 + z*empty/10)/4; // 25 = (100+200)/4 == btwn +25 and + 75
+		weapon    += (z + z*4*empty/10)/10; //  1 = (  8+ 32)/10 == btwn +  0 and +  4  (+ 2)
+		armor     += (z + z*4*empty/10)/10; // 25 = (200+800)/10 == btwn + 20 and +100  (+52)
+		base_spd  += (z + z*4*empty/10)/40;
 	}
 	
 	if (cz) cn = cz;

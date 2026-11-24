@@ -397,6 +397,7 @@ extern unsigned int mapmarker;
 #define SK_FATIGUE		69
 #define SK_FURY			70
 #define SK_FROSTBITE	71
+#define SK_RAGE         72
 #define SK_SANGUINE	   219
 #define SK_DWLIGHT     220
 #define SK_RAPIDDMG    221
@@ -1492,7 +1493,7 @@ struct sk_tree
 #define NUM_MAP_NEG		20
 
 extern struct s_skilltab skilltab[MAXSKILL+5];
-extern struct s_splog splog[70];
+extern struct s_splog splog[71];
 extern struct global *globs;
 extern struct map *map;
 extern struct character *ch;

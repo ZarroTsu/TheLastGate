@@ -1859,6 +1859,7 @@ int answer_attack(int cn, int co, char *text)
 			idx = bestn | (char_id(bestn) << 16);
 			ch[cn].data[MCD_ENEMY1ST] = idx;
 			do_sayx(cn, "Yes %s, I will kill %s!", ch[co].name, ch[bestn].reference);
+			ch[cn].goto_x = ch[cn].goto_y = 0;
 			do_notify_char(bestn, NT_GOTMISS, co, 0, 0, 0);
 			return 1;
 		}

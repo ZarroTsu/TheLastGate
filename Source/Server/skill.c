@@ -221,11 +221,11 @@ struct s_skilltab skilltab[MAXSKILL+5] = {
 	{ 52, 'H', 	"Identify", 			"Use (Spell): Identify the properties of a target or an item. Can be used on an already identified item to clear it.", 
 				"", "",
 				{ 0, 0, 0 }},
-	{ 53, 'H', 	"Ferocity", 			"Passively grants a bonus to WV and AV. The bonus increases for each empty gear slot.", 
+	{ 53, 'H', 	"Ferocity", 			"Passively grants a bonus to WV, AV, and action speed. The bonus increases for each empty gear slot.", 
 				"", "",
 				{ 0, 0, 0 }},
 //	{ //, '/', 	"////////////////",		"         '         '         '         '         '         '         '         '         '         '         '         ",
-	{ 54, 'H', 	"Shift", 				"Use (Skill): Change form from that of a Ratling to that of a Greenling, and vice versa. Has a unique cooldown timer.", 
+	{ 54, 'H', 	"Shift", 				"Use (Skill): Change form from a Ratling to that of a Greenling, and vice versa. Grants a temporary spell mod bonus.", 
 				"", "",
 				{ 0, 0, 0 }}
 };

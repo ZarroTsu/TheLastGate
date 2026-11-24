@@ -1408,6 +1408,7 @@
 #define BUF_SPR_WARCRY3		822
 //
 #define BUF_SPR_PACT		700
+#define BUF_SPR_RAGE	   1011
 #define BUF_SPR_ARIA		701
 #define BUF_SPR_ARIA2		702
 #define BUF_SPR_LETHARGY	703
@@ -1447,7 +1448,7 @@
 #define BUF_SPR_STARL		895
 #define BUF_SPR_FROSTB		471
 #define BUF_SPR_PHALANX	  16864
-#define BUF_SPR_FURY	   1011
+#define BUF_SPR_FURY	    518
 //
 #define BUF_SPR_DEBIL	  16860
 #define BUF_SPR_FRAGI	  16861

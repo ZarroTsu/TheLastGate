@@ -29,7 +29,7 @@ char *at_short[5] = {
 	"STR"
 };
 
-struct s_splog splog[70] = {
+struct s_splog splog[71] = {
 	{
 		0
 	},{
@@ -293,9 +293,11 @@ struct s_splog splog[70] = {
 		"You feel a tremble from somewhere.",
 		" tried to slam you but failed."
 	},{
-		SK_FATIGUE, 	"Fatigue"
+		SK_FATIGUE, 	"Fatigue",		"fatigue",		"fatiguing",
 	},{
-		SK_FURY, 		"Fury"
+		SK_FURY, 		"Fury",			"fury",			"fury",
+	},{
+		SK_RAGE, 		"Rage",			"rage",			"raging",
 	}
 };
 
@@ -413,6 +415,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		case SK_DOUSE:
 			power = more(power, M_AT(cn, AT_AGL) * (T_WARR_SK(cn,  9)*2 + TC_SK(cn, 45)), 20);  // (Warr) Antagonizer
 			if (do_get_iflag(cn, SF_EN_MOREBLINCURS)) power = power*6/5;
+			power = skill_multiplier(power, cn);
 			power = spell_immunity(cn, co, power);
 			power = common_mult(cn, co, power);
 			if (do_get_iflag(co, SF_EN_LESSBLIN)) power = power/2;
@@ -439,6 +442,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 		case SK_WEAKEN2:
 			power = more(power, M_AT(cn, AT_AGL) * TC_SK(cn,111), 20); // (Corr) Burden
 			if (do_get_iflag(cn, SF_EN_MOREWEAKSLOW)) power = more(power, 10, 1);
+			power = skill_multiplier(power, cn);
 			power = spell_immunity(cn, co, power);
 			power = common_mult(cn, co, power);
 			if (do_get_iflag(co, SF_EN_LESSWEAK)) power = power/2;
@@ -449,10 +453,12 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			power = common_mult(cn, co, power);
 			break;
 		case SK_AGGRAVATE:
+			power = skill_multiplier(power, cn);
 			power = spell_immunity(cn, co, power);
 			power = common_mult(cn, co, power);
 			break;
 		case SK_FATIGUE:
+			power = skill_multiplier(power, cn);
 			power = spell_immunity(cn, co, power);
 			power = common_mult(cn, co, power);
 			break;
@@ -466,6 +472,7 @@ int on_hit_debuff(int cn, int co, int v, int origtmp)
 			if (do_get_iflag(cn, SF_EN_MOREBLEEPOIS)) power = more(power, 10, 1);                 // [Ench] More Bleed
 			if (T_LYCA_SK(cn, 12))                    power = more(power, ch[cn].gethit_dam, 1);  // (Lyca) Serration
 			if (do_get_iflag(cn, SF_BLEEDHP))         power = more(power, ch[cn].hp[4]/50, 1);    // [Ench] Improved Crimson Ripper
+			power = skill_multiplier(power, cn);
 			power = spell_immunity(cn, co, power);
 			power = common_mult(cn, co, power);
 			break;
@@ -1990,11 +1997,21 @@ int spell_race_mod(int power, int cn)
 
 int spell_multiplier(int power, int cn)
 {
-	return (power * ch[cn].spell_mod / 100);
+	if (IS_LYCANTH(cn) && !IS_SHIFTED(cn))
+		power = power;
+	else
+		power = power * ch[cn].spell_mod / 100;
+	
+	return power;
 }
 
 int skill_multiplier(int power, int cn)
 {
+	if (IS_LYCANTH(cn) && !IS_SHIFTED(cn))
+		power = power * ch[cn].spell_mod / 100;
+	else
+		power = power;
+	
 	return power;
 }
 
@@ -5813,10 +5830,13 @@ int spell_bash(int cn, int co, int power, int co_orig)
 }
 void skill_bash(int cn)
 {
-	int power = skill_multiplier(M_SK(cn, SK_SHIELD) + ch[cn].armor, cn);
-	int cost, co;
+	int power, cost, co, m=0;
 	
-	chlog(cn, "Uses SHIELD BASH on %s", ch[co].name);
+	m += do_get_ieffect(cn, VF_EXTRA_AGL) * M_AT(cn, AT_AGL);  // Active melee skills gain an added m% agility bonus
+	m += do_get_ieffect(cn, VF_EXTRA_STR) * M_AT(cn, AT_STR);  // Active melee skills gain an added m% strength bonus
+	
+	power = M_SK(cn, SK_SHIELD) + m/100;
+	power = skill_multiplier(power + ch[cn].armor, cn);
 	
 	cost = power/10 + 5;
 	
@@ -5824,6 +5844,8 @@ void skill_bash(int cn)
 	
 	// Get hit target - return on failure
 	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SHIELD, 0, power, 0))) return;
+	
+	chlog(cn, "Uses SHIELD BASH on %s", ch[co].name);
 	
 	spell_bash(cn, co, power, 0);
 	
@@ -6669,17 +6691,22 @@ void skill_lethargy(int cn)
 // Shifting between forms for Lycanthropes
 int spell_shift(int cn, int co, int power)
 {
-	int in, dur = SK_EXH_SHIFT, bspmod = 95;
+	int in;
 	
-	dur = dur - power/4;
+	if (!has_buff(cn, SK_RAGE)) 
+	{
+		in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, (SP_DUR_RAGE + power/2), 1);
+		
+		bu[in].spell_mod = 4 + power*2/25;
+		bu[in].data[4]   = 1;  // Effects not removed by NMZ (SK_RAGE)
+		
+		add_spell(co, in); // SK_RAGE
+	}
 	
-	// Need a unique sprite for this.
-	if (!(in = make_new_buff(cn, SK_SHIFT, BUF_SPR_SHIFT, power, dur, 1))) 
+	if (!(in = make_new_buff(cn, SK_SHIFT, BUF_SPR_SHIFT, power, (SK_EXH_SHIFT - power/4), 1)))
 		return 0;
 	
-	if (IS_SHIFTED(cn)) bspmod = 105;
-	
-	bu[in].data[2] = ch[cn].spell_mod - bspmod;
+	bu[in].data[4] = 1;  // Effects not removed by NMZ (SK_SHIFT)
 	
 	return add_spell(co, in); // SK_SHIFT
 }
@@ -6693,11 +6720,6 @@ void skill_shift(int cn, int force)
 		if (is_exhausted(cn)) { return; }
 		if (!IS_LYCANTH(cn))  { return; }
 		if (!IS_PLAYER(cn))   { return; }
-		if (has_buff(cn, SK_SHIFT)) 
-		{
-			do_char_log(cn, 0, "You cannot do that yet!\n");
-			return; 
-		}
 		if (!spell_shift(cn, cn, M_SK(cn, SK_SHIFT)))
 		{
 			do_char_log(cn, 0, "Hmm. That didn't work. Try again?\n");
@@ -6705,8 +6727,8 @@ void skill_shift(int cn, int force)
 		}
 	}
 	
-	sp1 = (short)(ch[cn].class % 1<<16);
-	sp2 = (short)(ch[cn].class / 1<<16);
+	sp1 = (short)(ch[cn].class % (1<<16));
+	sp2 = (short)(ch[cn].class / (1<<16));
 	
 	if (IS_SHIFTED(cn))		// Change from Greenling to Ratling
 	{
@@ -6723,9 +6745,10 @@ void skill_shift(int cn, int force)
 		else		ch[cn].sprite = 31696;
 	}
 	
-	ch[cn].class = (sp2 * 1<<16) + sp1;
+	ch[cn].class = (sp2 * (1<<16)) + sp1;
 	
-	remove_all_spells(cn, 1); // Dispel self
+	if (!has_buff(cn, SK_SHIFT)) 
+		remove_all_spells(cn, 1); // Dispel self
 	
 	for (n = 0; n < 6; n++)
 	{
@@ -6754,19 +6777,19 @@ void skill_shift(int cn, int force)
 		ch[cn].skill[SK_AXE][n] = ch[cn].skill[SK_DAGGER][n];
 		ch[cn].skill[SK_DAGGER][n] = tmp;
 		
-		// Tactics <-> Blind
+		// Tactics <-> Taunt
 		tmp = ch[cn].skill[SK_TACTICS][n];
-		ch[cn].skill[SK_TACTICS][n] = ch[cn].skill[SK_BLIND][n];
-		ch[cn].skill[SK_BLIND][n] = tmp;
+		ch[cn].skill[SK_TACTICS][n] = ch[cn].skill[SK_TAUNT][n];
+		ch[cn].skill[SK_TAUNT][n] = tmp;
 		
 		// Cleave <-> Blast
 		tmp = ch[cn].skill[SK_CLEAVE][n];
 		ch[cn].skill[SK_CLEAVE][n] = ch[cn].skill[SK_BLAST][n];
 		ch[cn].skill[SK_BLAST][n] = tmp;
 		
-		// Taunt <-> Poison
-		tmp = ch[cn].skill[SK_TAUNT][n];
-		ch[cn].skill[SK_TAUNT][n] = ch[cn].skill[SK_POISON][n];
+		// Blind <-> Poison
+		tmp = ch[cn].skill[SK_BLIND][n];
+		ch[cn].skill[SK_BLIND][n] = ch[cn].skill[SK_POISON][n];
 		ch[cn].skill[SK_POISON][n] = tmp;
 		
 		// Weaken <-> Slow
@@ -6811,14 +6834,14 @@ int spell_pact(int cn, int co, int power)
 	{
 		power = bu[in].reserve[2] = min(80, 15+power/5); // Mana
 		power = more(power, ch[co].mana[5] * n, 100);
-		bu[in].dmg_reduction = power*4/6;
+		bu[in].dmg_reduction = power*3/4;
 		bu[in].dmg_bonus     = power*2/6;
 	}
 	else
 	{
 		power = bu[in].reserve[0] = min(80, 15+power/5); // Hitpoints
 		power = more(power, ch[co].hp[5] * n, 100);
-		bu[in].dmg_reduction = power*4/3;
+		bu[in].dmg_reduction = power*3/2;
 		bu[in].dmg_bonus     = power*2/3;
 	}
 	
