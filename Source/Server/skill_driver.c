@@ -2058,7 +2058,7 @@ int add_spell(int cn, int new_in)
 				// Multiple heals stack 'healing sickness' (SK_HEAL), reducing heal power
 				stack = 3;
 				
-				if (do_get_iflag(cn, SF_BOOK_HOLY))        stack--;    // [Book] Holy Etiquette
+				if (do_get_iflag(cn, SF_BOOK_HOLY))        stack-=2;   // [Book] Holy Etiquette
 				if (has_spell_from_item(cn, BUF_IT_DRAG))  stack--;    // [Food] Dragon's Breath
 				if (do_get_iflag(cn, SF_TEMPER_R))         stack++;    // [Taro] Temperance.R
 				
@@ -2355,7 +2355,7 @@ int spell_from_item(int cn, int in2)
 	
 	if (do_get_iflag(cn, SF_BOOK_ALCH)) // Book: Alchemy 101
 	{
-		thousand = thousand * 3/2;
+		thousand = thousand * 2;
 	}
 	
 	if (do_get_iflag(cn, SF_EN_HEALIT))

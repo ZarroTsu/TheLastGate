@@ -11459,7 +11459,8 @@ void really_update_char(int cn)
 			sickStacks = 3;
 			
 			if (do_get_iflag(cn, SF_TEMPER_R)) sickStacks++;
-			if (do_get_iflag(cn, SF_BOOK_HOLY)) sickStacks--;
+			if (has_spell_from_item(cn, BUF_IT_DRAG)) sickStacks--;    // [Food] Dragon's Breath
+			if (do_get_iflag(cn, SF_BOOK_HOLY)) sickStacks-=2;
 			
 			sickStacks = min(sickStacks, bu[m].data[1]+1);
 		}
@@ -16081,7 +16082,7 @@ int smith_cost(int in, int flag)	// 0=whet 1=clay 2=mage 3=grade
 
 int is_valid_smith_item(int in)
 {
-	if (it[in].flags & IF_BOOK)   return  0;
+	if (it[in].flags & IF_BOOK)   return  2;
 	if (it[in].flags & IF_WEAPON) return  1;
 	if (it[in].flags & IF_ARMORS)
 	{
@@ -16303,9 +16304,7 @@ void do_bs_whetstone(int cn, int in, int in2, int flag)
 		return;
 	}
 	
-	n = is_valid_smith_item(in);
-	
-	if (n == 0 || n == -2)
+	if (!(n = is_valid_smith_item(in)) || abs(n) == 2)
 	{
 		do_char_log(cn, 0, "That won't work. This can only be used with weapons, shields, helmets, and body armors.\n");
 		return;

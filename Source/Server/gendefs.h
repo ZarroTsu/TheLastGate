@@ -593,8 +593,8 @@ extern char *at_short[];
 #define DESC_IT_DRAG		"Grants 1 reduced maximum healing sickness stack for its duration.\n"
 #define DESC_IT_MANA		"Grants 15%% reduced mana costs for its duration.\n"
 
-#define DESC_BOOK_ALCH		"When equipped, healing items are 50%% more effective.\n"
-#define DESC_BOOK_HOLY		"When equipped, maximum healing sickness you can inflict is reduced by 1 stack.\n"
+#define DESC_BOOK_ALCH		"When equipped, healing items are twice as effective.\n"
+#define DESC_BOOK_HOLY		"When equipped, maximum healing sickness you can inflict is reduced by 2 stacks.\n"
 #define DESC_BOOK_ADVA		"When equipped, debuffs you cast are more likely to pass resistance checks.\n"
 #define DESC_BOOK_TRAV		"When equipped, secondary effects of Braveness and Agility are equal to the higher of the two.\n"
 #define DESC_BOOK_DAMO		"When equipped, increases cooldown recovery speed by 11%%.\n"

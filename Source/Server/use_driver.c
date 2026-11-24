@@ -3041,7 +3041,7 @@ int use_whetstone(int cn, int in)
 		return 0;
 	}
 	
-	if (!(n = is_valid_smith_item(in2)))
+	if (!(n = is_valid_smith_item(in2)) || abs(n) == 2)
 	{
 		do_char_log(cn, 0, "That won't work. This can only be used with weapons, shields, helmets, and body armors.\n");
 		return 0;
@@ -9793,7 +9793,7 @@ void use_driver(int cn, int in, int carried)
 				
 				if (do_get_iflag(cn, SF_BOOK_ALCH)) // Book: Alchemy 101
 				{
-					thousand = thousand * 3/2;
+					thousand = thousand * 2;
 				}
 				
 				if (do_get_iflag(cn, SF_EN_HEALIT))
