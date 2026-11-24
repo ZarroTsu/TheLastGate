@@ -1421,6 +1421,7 @@ void plr_idle(int nr)
 	{
 		if (IS_BUILDING(player[nr].usnr)) return;
 		if (IS_IN_TEMPLE(ch[player[nr].usnr].x, ch[player[nr].usnr].y)) return;
+		if (IS_IN_PLH(player[nr].usnr)) return;
 	}
 	
 	if (globs->ticker - player[nr].lasttick>TICKS * 60)
