@@ -4222,7 +4222,6 @@ int do_showbuffs(int cn, int co)
 				do_char_log(cn, 6, " : %+d Immunity\n",       bu[in].skill[SK_IMMUN]);
 				break;
 			case SK_GUARD:
-			case SK_TAUNT:
 			case SK_AGGRAVATE:
 			case SK_SCORCH:
 			case SK_SHOCK:
@@ -4273,6 +4272,13 @@ int do_showbuffs(int cn, int co)
 				break;
 			case SK_TAUNT:
 				do_char_log(cn, 6, " : Taunted!\n");
+				if (bu[in].dmg_bonus<0) 
+				{
+					if (bu[in].dmg_bonus%2==0)
+						do_char_log(cn, 6, " : %+d%% Less Damage Dealt\n", abs(bu[in].dmg_bonus/2));
+					else
+						do_char_log(cn, 6, " : %+d.%1d%% Less Damage Dealt\n", abs(bu[in].dmg_bonus/2), abs(bu[in].dmg_bonus*5)%10);
+				}
 				break;
 			case SK_POISON:
 			case SK_BLEED:
