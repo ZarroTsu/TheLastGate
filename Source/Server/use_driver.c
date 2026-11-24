@@ -9319,7 +9319,7 @@ int rebirth_explorer_point(int cn, int in, int msg)
 			n = 0;
 			if 		(IS_SEYAN_DU(cn)) 	 n = SK_PROX;
 			else if (IS_ARCHTEMPLAR(cn)) n = SK_DISPEL;
-			else if (IS_SKALD(cn)) 		 n = SK_PRECISION;
+			else if (IS_SKALD(cn)) 		 n = SK_FINESSE;
 			else if (IS_WARRIOR(cn)) 	 n = SK_GEARMAST;
 			else if (IS_SORCERER(cn)) 	 n = SK_MSHIELD;
 			else if (IS_SUMMONER(cn)) 	 n = SK_IMMUN;
