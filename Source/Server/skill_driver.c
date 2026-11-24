@@ -6693,16 +6693,6 @@ int spell_shift(int cn, int co, int power)
 {
 	int in;
 	
-	if (!has_buff(cn, SK_RAGE)) 
-	{
-		in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, (SP_DUR_RAGE + power/2), 1);
-		
-		bu[in].spell_mod = 4 + power*2/25;
-		bu[in].data[4]   = 1;  // Effects not removed by NMZ (SK_RAGE)
-		
-		add_spell(co, in); // SK_RAGE
-	}
-	
 	if (!(in = make_new_buff(cn, SK_SHIFT, BUF_SPR_SHIFT, power, (SK_EXH_SHIFT - power/4), 1)))
 		return 0;
 	
@@ -6712,7 +6702,7 @@ int spell_shift(int cn, int co, int power)
 }
 void skill_shift(int cn, int force)
 {
-	int n, tmp;
+	int n, in, tmp;
 	short sp1=0, sp2=0;
 	
 	if (!force)
@@ -6812,6 +6802,23 @@ void skill_shift(int cn, int force)
 	if (!force)
 	{
 		do_char_log(cn, 1, "Your body transforms...\n");
+		
+		if (!has_buff(cn, SK_RAGE)) 
+		{
+			in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, (SP_DUR_RAGE + power/2), 1);
+			
+			bu[in].spell_mod = 4 + power*2/25;
+			bu[in].data[4]   = 1;  // Effects not removed by NMZ (SK_RAGE)
+			
+			if (add_spell(co, in)) // SK_RAGE
+				do_char_log(cn, 1, "You enter a rage!\n");
+		}
+		else
+		{
+			do_char_log(cn, 1, "Your rage subsides.\n");
+			remove_buff(cn, SK_RAGE);
+		}
+		
 		add_exhaust(cn, TICKS/2);
 	}
 }
