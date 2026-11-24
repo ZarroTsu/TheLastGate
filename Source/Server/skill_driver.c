@@ -300,7 +300,7 @@ struct s_splog splog[70] = {
 };
 
 void damage_mshell(int co, int dam);
-int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
+int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int msg);
 int chance(int cn, int d20);
 int add_exhaust(int cn, int len);
 void skill_slow(int cn, int flag);
@@ -775,7 +775,7 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 	
 	if (d20!=-1 && (in!=SK_CLEAVE && in!=SK_SHIELD && in!=SK_LEAP && in!=SK_TAUNT && in!=SK_BLIND && in!=SK_DOUSE &&
 		((!d20 && chance(cn, FIVE_PERC_FAIL)) || 
-		(d20 && cn!=co && chance_base(cn, co, in, d20, get_target_resistance(cn, co), usemana, 1)))))
+		(d20 && cn!=co && chance_base(cn, co, in, power, d20, usemana, 1)))))
 	{
 		if (!buff && cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEMISS, cn, co, power, 0);
 		if (usemana && cn!=co && (CAN_SENSE(co) && M_SK(co, SK_PERCEPT) > power + 5))
@@ -1640,9 +1640,9 @@ int chance_compare(int co, int offense, int defense, int usemana)
 	return 0;
 }
 
-int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg)
+int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int msg)
 {
-	int chance, roll, tmp, power;
+	int chance, roll, tmp, defense = get_target_resistance(cn, co);
 	
 	ch[cn].spellfail = 0;
 	ch[co].spellfail = 0;
@@ -1650,56 +1650,37 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 	if (T_ARHR_SK(cn, 4))  // (ArHr) Malice
 		return 0;
 	
-	if (usemana>100)
-		power = usemana-100;
-	else
-		power = M_SK(cn, skill);
-	
-	if (!IS_PLAYER(co) && !usemana)
-	{
+	if (!usemana && !IS_PLAYER(co))  // Small buff to debuffs vs non-players
 		d20 += 25;
-	}
 	
-	chance = d20 * power / max(1, defense*10);
+	chance = clamp(d20 * power / max(1, defense*10), 0, 18);
 	
 	if (IS_PLAYER(cn))
 	{
-		chance += 1;
-		if (ch[cn].luck<0)
-		{
-			chance += ch[cn].luck / 500 - 1;
-		}
+		chance++; if (ch[cn].luck < 0) chance += ch[cn].luck / 500 - 1;
 	}
 	
-	// Lower result is better.
-	roll = RANDOM(20);
+	roll = RANDOM(20); // rolls 0..19; Lower is better for the caster
 	
 	if (usemana)
 	{
-		// Book - Castor's Advantage
-		if (do_get_iflag(cn, SF_BOOK_ADVA))
+		if (do_get_iflag(cn, SF_BOOK_ADVA))  // Book - Castor's Advantage
 		{
 			tmp = RANDOM(20);
 			if (tmp < roll) roll = tmp;
 		}
-		
-		// Book - Shiva's Malice
-		if (do_get_iflag(cn, SF_BOOK_SHIV))
+		if (do_get_iflag(cn, SF_BOOK_SHIV))  // Book - Shiva's Malice
 		{
 			tmp = RANDOM(20);
 			if (tmp > roll) roll = tmp;
 		}
 	}
 	
-	if (chance< 0) { chance =  0; }
-	if (chance>18) { chance = 18; }
-	
-	if (roll > chance || defense >= power + (power / 2))
+	if (roll > chance || defense >= (power + power/2))
 	{
-		if (!IS_PLAYER(cn))
-		{
-			add_exhaust(cn, TICKS * 4); // Exhaust for NPCS to keep them from spam-failing
-		}
+		if (!IS_PLAYER(cn)) // Exhaust for NPCS to keep them from spam-failing
+			add_exhaust(cn, TICKS * 4);
+		
 		if (usemana)
 		{
 			if (IS_PLAYER(cn) && !IS_PLAYER(co) && skill!=SK_IDENT)
@@ -1719,8 +1700,10 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 		{
 			do_char_log(cn, 0, "Your target resisted your attempt to %s them.\n", splog[skill].ref);
 		}
+		
 		return -1;
 	}
+	
 	if (IS_PLAYER(co) && skill!=SK_IDENT && usemana && defense >= power)
 	{
 		ch[cn].spellfail = 2;
@@ -1728,6 +1711,7 @@ int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, in
 		if (msg) 
 			do_char_log(cn, 5, "Your spell was suppressed by your target.\n");
 	}
+	
 	return 0;
 }
 
@@ -3466,7 +3450,7 @@ int spell_stun(int cn, int co, int power)
 	if (ch[co].escape_timer > TICKS*3)     { return 0; }
 	if (ch[co].flags & CF_BODY)            { return 0; }
 	if (!do_surround_check(cn, co, 1) || 
-		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0)) { return 0; }
+		chance_base(cn, co, SK_WARCRY, power, SP_MULT_WARCRY, 0, 0)) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
@@ -3584,7 +3568,7 @@ int spell_warcry(int cn, int co, int power, int flag)
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
 	if (flag != 2 && (!do_surround_check(cn, co, 1) || 
-		chance_base(cn, co, SK_WARCRY, SP_MULT_WARCRY, get_target_resistance(cn, co), 0, 0))) { return 0; }
+		chance_base(cn, co, SK_WARCRY, power, SP_MULT_WARCRY, 0, 0))) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	
@@ -4024,7 +4008,7 @@ void skill_identify(int cn)
 	}
 	
 	if (IS_COMPANION(co) && CN_OWNER(co) == cn) ;
-	else if (chance_base(cn, co, SK_IDENT, d20, power, 1, 1))
+	else if (chance_base(cn, co, SK_IDENT, power, d20, 1, 1))
 		return;
 	
 	spell_identify(cn, co, in);
@@ -5925,7 +5909,7 @@ int spell_blind(int cn, int co, int power, int flag)
 	if (ch[co].escape_timer > TICKS*3) 	{ return 0; }
 	if (ch[co].flags & CF_BODY) 		{ return 0; }
 	if (!do_surround_check(cn, co, 1) || 
-		chance_base(cn, co, SK_BLIND, SP_MULT_BLIND, get_target_resistance(cn, co), 0, 0)) { return 0; }
+		chance_base(cn, co, SK_BLIND, power, SP_MULT_BLIND, 0, 0)) { return 0; }
 	if (cn!=co) do_area_notify(cn, co, ch[cn].x, ch[cn].y, NT_SEEHIT, cn, co, 0, 0);
 	if (!IS_IGNORING_SPELLS(co)) { do_notify_char(co, NT_GOTHIT, cn, 0, 0, 0); }
 	

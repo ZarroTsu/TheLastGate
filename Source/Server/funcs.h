@@ -513,7 +513,7 @@ int skill_lookup(char *skill);
 int skill_rally(int cn, int power);
 void skill_leap(int cn, int flag);
 void skill_shift(int cn, int force);
-int chance_base(int cn, int co, int skill, int d20, int defense, int usemana, int msg);
+int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int msg);
 int player_or_ghost(int cn, int co);
 
 // -- driver --

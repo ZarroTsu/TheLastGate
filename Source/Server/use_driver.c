@@ -8643,35 +8643,23 @@ int spell_scroll(int cn, int in)
 			break;
 		case    SK_IDENT:
 			if (!IS_SANEITEM(in2 = ch[cn].citem)) in2 = 0;
-			if (!in2 && IS_PLAYER(co) && cn!=co && chance_base(cn, co, SK_IDENT, SP_MULT_IDENTIFY, get_target_resistance(cn, co), power, 1))
-			{
+			if (!in2 && IS_PLAYER(co) && cn!=co && chance_base(cn, co, SK_IDENT, power, SP_MULT_IDENTIFY, power, 1))
 				ret = 1;
-			}
 			else
-			{
 				ret = spell_identify(cn, co, in2);
-			}
 			break;
 		// Blast?
 		case    SK_CURSE:
-			if (IS_PLAYER(co) && chance_base(cn, co, SK_CURSE, SP_MULT_CURSE, get_target_resistance(cn, co), power, 1))
-			{
+			if (IS_PLAYER(co) && chance_base(cn, co, SK_CURSE, power, SP_MULT_CURSE, power, 1))
 				ret = 1;
-			}
 			else
-			{
 				ret = spell_curse(cn, co, power, 0);
-			}
 			break;
 		case    SK_SLOW:
-			if (IS_PLAYER(co) && chance_base(cn, co, SK_SLOW, SP_MULT_SLOW, get_target_resistance(cn, co), power, 1))
-			{
+			if (IS_PLAYER(co) && chance_base(cn, co, SK_SLOW, power, SP_MULT_SLOW, power, 1))
 				ret = 1;
-			}
 			else
-			{
 				ret = spell_slow(cn, co, power, 0);
-			}
 			break;
 		
 		default:
