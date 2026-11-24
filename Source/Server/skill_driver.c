@@ -6689,20 +6689,34 @@ void skill_lethargy(int cn)
 }
 
 // Shifting between forms for Lycanthropes
-int spell_shift(int cn, int co, int power)
+int spell_shift(int cn, int power)
 {
 	int in;
+	
+	if (!has_buff(cn, SK_RAGE)) 
+	{
+		in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, SP_DUR_RAGE, 1);
+		
+		bu[in].spell_mod = 4 + power*2/25;
+		bu[in].data[4]   = 1;  // Effects not removed by NMZ (SK_RAGE)
+		
+		add_spell(cn, in); // SK_RAGE
+	}
+	else
+	{
+		remove_buff(cn, SK_RAGE);
+	}
 	
 	if (!(in = make_new_buff(cn, SK_SHIFT, BUF_SPR_SHIFT, power, (SK_EXH_SHIFT - power/4), 1)))
 		return 0;
 	
 	bu[in].data[4] = 1;  // Effects not removed by NMZ (SK_SHIFT)
 	
-	return add_spell(co, in); // SK_SHIFT
+	return add_spell(cn, in); // SK_SHIFT
 }
 void skill_shift(int cn, int force)
 {
-	int n, in, tmp;
+	int n, tmp;
 	short sp1=0, sp2=0;
 	
 	if (!force)
@@ -6710,7 +6724,7 @@ void skill_shift(int cn, int force)
 		if (is_exhausted(cn)) { return; }
 		if (!IS_LYCANTH(cn))  { return; }
 		if (!IS_PLAYER(cn))   { return; }
-		if (!spell_shift(cn, cn, M_SK(cn, SK_SHIFT)))
+		if (!spell_shift(cn, M_SK(cn, SK_SHIFT)))
 		{
 			do_char_log(cn, 0, "Hmm. That didn't work. Try again?\n");
 			return;
@@ -6803,21 +6817,10 @@ void skill_shift(int cn, int force)
 	{
 		do_char_log(cn, 1, "Your body transforms...\n");
 		
-		if (!has_buff(cn, SK_RAGE)) 
-		{
-			in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, (SP_DUR_RAGE + power/2), 1);
-			
-			bu[in].spell_mod = 4 + power*2/25;
-			bu[in].data[4]   = 1;  // Effects not removed by NMZ (SK_RAGE)
-			
-			if (add_spell(co, in)) // SK_RAGE
-				do_char_log(cn, 1, "You enter a rage!\n");
-		}
+		if (has_buff(cn, SK_RAGE))
+			do_char_log(cn, 1, "You enter a rage!\n");
 		else
-		{
 			do_char_log(cn, 1, "Your rage subsides.\n");
-			remove_buff(cn, SK_RAGE);
-		}
 		
 		add_exhaust(cn, TICKS/2);
 	}
