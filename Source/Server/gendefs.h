@@ -787,7 +787,7 @@ extern char *at_short[];
 #define DESC_EN_57(in)		"Item is indestructible.\n"
 #define DESC_EN_59(in)		"20%% more total attack speed.\n"
 #define DESC_EN_60(in)		"Recovery from your Meditate skill is also applied to your Hitpoints.\n"
-#define DESC_EN_61(in)		"You cannot be hit if your chance to avoid being hit is at least 90%%.\n"
+#define DESC_EN_61(in)		"You take 50%% less damage from attacks if your chance to avoid being hit is at least 90%%.\n"
 #define DESC_EN_63(in)		"Restore 2 Mana upon being hit by an enemy.\n"
 #define DESC_EN_65(in)		"50%% more total Movement Speed.\n"
 #define DESC_EN_66(in)		"Attacks with this weapon cannot miss if your chance to hit is at least 90%%.\n"

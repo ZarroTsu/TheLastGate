@@ -10241,11 +10241,7 @@ void do_attack(int cn, int co, int surround)
 	else if (diff< 40) { chance = 19; bonus = 16; }
 	else               { chance = 19; bonus = 20; }
 	
-	if (chance <= 2 && do_get_iflag(co, SF_EN_NINETYAVO))
-	{
-		hit = 0;
-	}
-	else if (chance >= 18 && do_get_iflag(cn, SF_EN_NINETYHIT))
+	if (chance >= 18 && do_get_iflag(cn, SF_EN_NINETYHIT))
 	{
 		hit = 1;
 	}
@@ -10289,6 +10285,9 @@ void do_attack(int cn, int co, int surround)
 		
 		odam  =   dam;
 		dam  += bonus;
+		
+		if (chance <= 2 && do_get_iflag(co, SF_EN_NINETYAVO))
+			dam /= 2;
 		
 		crit_dam = do_crit(cn, co, dam, 0);  // Critical hit check
 		
