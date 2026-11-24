@@ -1669,7 +1669,8 @@ int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int 
 			tmp = RANDOM(20);
 			if (tmp < roll) roll = tmp;
 		}
-		if (do_get_iflag(cn, SF_BOOK_SHIV))  // Book - Shiva's Malice
+		if ((skill==SK_CURSE || skill==SK_SLOW) 
+			&& do_get_iflag(cn, SF_BOOK_SHIV))  // Book - Shiva's Malice
 		{
 			tmp = RANDOM(20);
 			if (tmp > roll) roll = tmp;
