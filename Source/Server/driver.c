@@ -3576,7 +3576,10 @@ int npc_try_spell(int cn, int co, int spell)
 	if (usemana)	offn = spell_multiplier(offn, cn);
 	else			offn = skill_multiplier(offn, cn);
 	
-	defn = get_target_resistance(cn, co)*10;
+	defn = get_target_resistance(cn, co);
+	
+	if (IS_PLAYER(co)) defn *= 12;
+	else               defn *= 10;
 	
 	truespell = spell;
 	

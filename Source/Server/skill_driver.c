@@ -1650,10 +1650,14 @@ int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int 
 	if (T_ARHR_SK(cn, 4))  // (ArHr) Malice
 		return 0;
 	
-	if (!usemana && !IS_PLAYER(co))  // Small buff to debuffs vs non-players
+	if (!usemana && !IS_PLAYER(co))  // Small buff to skill debuffs vs non-players
 		d20 += 25;
 	
-	chance = clamp(d20 * power / max(1, defense*10), 0, 18);
+	     if (IS_PLAYER(cn) && !IS_PLAYER(co)) defense *=  8;
+	else if (IS_PLAYER(co) && !IS_PLAYER(cn)) defense *= 12;
+	else                                      defense *= 10;
+	
+	chance = clamp(d20 * power / max(1, defense), 0, 18);
 	
 	if (IS_PLAYER(cn))
 	{
