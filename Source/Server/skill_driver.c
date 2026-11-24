@@ -29,7 +29,7 @@ char *at_short[5] = {
 	"STR"
 };
 
-struct s_splog splog[71] = {
+struct s_splog splog[72] = {
 	{
 		0
 	},{
@@ -255,7 +255,7 @@ struct s_splog splog[71] = {
 	},{
 		SK_SHIFT, 		"Shift Exhaust",		"shift",		"shifting"
 	},{
-		0, 				"",		"",		""
+		SK_RAGE, 		"Rage",			"rage",			"raging",
 	},{
 		SK_FROSTB, 		"Frostburn",	"frostburn",	"frostburning"
 	},{
@@ -297,7 +297,7 @@ struct s_splog splog[71] = {
 	},{
 		SK_FURY, 		"Fury",			"fury",			"fury",
 	},{
-		SK_RAGE, 		"Rage",			"rage",			"raging",
+		SK_FROSTBITE,	"Frostbite",	"frostbite",	"frostbitten",
 	}
 };
 
@@ -1649,7 +1649,7 @@ int chance_compare(int co, int offense, int defense, int usemana)
 
 int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int msg)
 {
-	int chance, roll, tmp, defense = get_target_resistance(cn, co);
+	int chance, roll, tmp, deforig, defense = get_target_resistance(cn, co);
 	
 	ch[cn].spellfail = 0;
 	ch[co].spellfail = 0;
@@ -1659,6 +1659,8 @@ int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int 
 	
 	if (!usemana && !IS_PLAYER(co))  // Small buff to skill debuffs vs non-players
 		d20 += 25;
+	
+	deforig = defense;
 	
 	     if (IS_PLAYER(cn) && !IS_PLAYER(co)) defense *=  8;
 	else if (IS_PLAYER(co) && !IS_PLAYER(cn)) defense *= 12;
@@ -1688,7 +1690,7 @@ int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int 
 		}
 	}
 	
-	if (roll > chance || defense >= (power + power/2))
+	if (roll > chance || deforig >= (power + power/2))
 	{
 		if (!IS_PLAYER(cn)) // Exhaust for NPCS to keep them from spam-failing
 			add_exhaust(cn, TICKS * 4);
@@ -1716,7 +1718,7 @@ int chance_base(int cn, int co, int skill, int power, int d20, int usemana, int 
 		return -1;
 	}
 	
-	if (IS_PLAYER(co) && skill!=SK_IDENT && usemana && defense >= power)
+	if (IS_PLAYER(co) && skill!=SK_IDENT && usemana && deforig >= power)
 	{
 		ch[cn].spellfail = 2;
 		ch[co].spellfail = 1;
