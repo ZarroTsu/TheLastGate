@@ -658,7 +658,7 @@ int face_target(int cn, int co)
 
 int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usemana, int power, int d20)
 {
-	int m, co = 0, aoe_spell = 0, need_combat = 0, cc=0;
+	int m, co = 0, aoe_spell = 0, need_combat = 0, cc=0, cleaslas=0;
 	char buf[50];
 	strcpy(buf, ch[cn].reference); buf[0] = toupper(buf[0]);
 	
@@ -696,15 +696,15 @@ int get_target(int cn, int cnts, int buff, int redir, int cost, int in, int usem
 		return 0;
 	}
 	
-	if (in==SK_CLEAVE || in==SK_SHIELD || (in==SK_WEAKEN && !CAN_BRAV_PROX(cn)))
-	{
+	cleaslas = do_get_iflag(cn, SF_SIGN_SLAS);
+	
+	if ((in==SK_CLEAVE && !cleaslas) || in==SK_SHIELD || (in==SK_WEAKEN && !CAN_BRAV_PROX(cn)))
 		need_combat = 1;
-	}
 	
 	if (!buff)
 	{
 		// AoE spells forgo failing since there may be targets handled by aoe_driver
-		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && IS_AOESKILL(in)) ;
+		if (cn==co && !(ch[cn].flags & CF_AREA_OFF) && (IS_AOESKILL(in) || (in==SK_CLEAVE && cleaslas))) ;
 		else if (cn==co)
 		{
 			if (need_combat)
@@ -3212,7 +3212,8 @@ void skill_curse(int cn)
 	else
 	{
 		// Get spell target - return on failure or not enough mana
-		if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20))) return;
+		if (!(co = get_target(cn, 0, 0, 0, cost, SK_CURSE, 1, power, d20)))
+			return;
 		
 		// If we have a valid target, cast Curse on them
 		if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
@@ -3306,7 +3307,8 @@ void skill_slow(int cn, int flag)
 	}
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, flag?0:cost, SK_SLOW, 1, power, flag?-1:d20))) return;
+	if (!(co = get_target(cn, 0, 0, 0, flag?0:cost, SK_SLOW, 1, power, flag?-1:d20)))
+		return;
 	
 	// If we have a valid target, cast Slow on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
@@ -4137,7 +4139,8 @@ void skill_blast(int cn)
 		cost = 20;
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLAST, 1, power, 0))) return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_BLAST, 1, power, 0)))
+		return;
 	
 	// If we have a valid target, cast Blast on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
@@ -5774,18 +5777,27 @@ void skill_cleave(int cn)
 		cost = 20;
 	
 	// Get hit target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0))) return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_CLEAVE, 0, power, 0)))
+		return;
 	
-	avgdmg = spell_cleave(cn, co, power, 0, 0);
-	count = hit = 1;
+	// Cleave valid target
+	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
+	{
+		avgdmg = spell_cleave(cn, (co_orig = co), power, 0, 0);
+		count = hit = 1;
+	}
 	
 	if (do_get_iflag(cn, SF_SIGN_SLAS)) // AoE from Signet
 	{
 		if ((hit = aoe_driver(cn, cn, co, SK_CLEAVE, power, (GET_PROX(cn) + power)/2, count, hit, avgdmg)) < 0) return;
+		if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	}
 	
 	// Zephyr proc
-	zephyr_check(cn, co, cn, 0);
+	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
+	{
+		zephyr_check(cn, co, cn, 0);
+	}
 	
 	in = add_exhaust(cn, SK_EXH_CLEAVE);
 	
@@ -5847,7 +5859,8 @@ void skill_bash(int cn)
 	if (!IS_PLAYER(cn)) cost = 20;
 	
 	// Get hit target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SHIELD, 0, power, 0))) return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_SHIELD, 0, power, 0)))
+		return;
 	
 	chlog(cn, "Uses SHIELD BASH on %s", ch[co].name);
 	
@@ -5914,7 +5927,8 @@ void skill_weaken(int cn)
 	}
 	
 	// Get spell target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_WEAKEN, 0, power, d20))) return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_WEAKEN, 0, power, d20)))
+		return;
 	
 	// If we have a valid target, cast Weaken on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
@@ -6213,7 +6227,8 @@ void skill_taunt(int cn)
 		cost = 5;
 	
 	// Get skill target - return on failure
-	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20))) return;
+	if (!(co = get_target(cn, 0, 0, 0, cost, SK_TAUNT, 0, power, d20)))
+		return;
 	
 	// If we have a valid target, cast Taunt on them
 	if (cn!=co && co!=ch[cn].data[PCD_SHADOWCOPY] && co!=ch[cn].data[PCD_COMPANION])
