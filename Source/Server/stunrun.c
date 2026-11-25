@@ -187,7 +187,7 @@ int npc_stunrun_see(int cn, int co)
 		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
 			ch[cn].attack_cn = cc;
-			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
+			if (!ch[cn].data[78]) STOP_GOTO(cn);
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
 		ch[cn].data[20] = cc;
@@ -431,7 +431,7 @@ int npc_stunrun_high(int cn)
 			maxseen++;
 		}
 	}
-
+	
 	if (ch[cn].a_mana<MP_PERC(cn,20))
 	{
 		stun -= 3;
@@ -441,15 +441,14 @@ int npc_stunrun_high(int cn)
 	
 	// reset former orders
 	ch[cn].use_nr      = 0;
-	ch[cn].skill_nr    = 0;
-	ch[cn].goto_x      = 0;
-	ch[cn].goto_y      = 0;
-	ch[cn].misc_action = 0;
+	STOP_SPELL(cn);
+	STOP_GOTO(cn);
+	STOP_ACTION(cn);
 	ch[cn].cerrno      = 0;
 	
 	if (globs->ticker > ch[cn].data[29])
-		ch[cn].attack_cn = 0;
-
+		STOP_ATTACK(cn);
+	
 	if (ch[cn].a_hp<HP_PERC(cn,60)) flee += 5;
 	
 	if (!done && ch[cn].a_hp<HP_PERC(cn,60))

@@ -187,6 +187,7 @@ int is_ascroll(int in);
 #define IS_PLAYER_SC(cn)  		(IS_SANEPLAYER(ch[(cn)].data[CHD_MASTER]) && ch[ch[(cn)].data[CHD_MASTER]].data[PCD_SHADOWCOPY]==(cn))
 #define IS_PLAYER_COMP(cn) 		((IS_PLAYER_GC(cn) || IS_PLAYER_SC(cn)) && !IS_THRALL(cn))
 #define CN_OWNER(cn) 			(ch[(cn)].data[CHD_MASTER] ? ch[(cn)].data[CHD_MASTER] : 3577)
+#define IS_FRIENDLY(cn)			(ch[(cn)].alignment==10000)
 
 // Visibility, etc.
 #define IS_INVISIBLE(cn)		((ch[(cn)].flags & CF_INVISIBLE) != 0)
@@ -285,6 +286,18 @@ int is_ascroll(int in);
 #define IS_BAD_SHADOW(cn)		()
 
 #define IS_OFF_SEASON(cn, co)	(IS_PLAYER(cn) && IS_PLAYER(co) && ((ch[(cn)].season == CURRENTSEASON && ch[(co)].season != CURRENTSEASON) || (ch[(co)].season == CURRENTSEASON && ch[(cn)].season != CURRENTSEASON)))
+
+/* *** QUICK VARIABLE MACROS *** */
+
+#define STOP_GOTO(cn)			ch[(cn)].goto_x = ch[(cn)].goto_y = 0;
+#define STOP_ATTACK(cn)			ch[(cn)].attack_cn = 0;
+#define STOP_SPELL(cn)			ch[(cn)].skill_nr = 0;
+#define STOP_ACTION(cn)			ch[(cn)].misc_action = 0;
+#define REMOVE_ENEMY(cn, co)	if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
+
+#define ADD_FX_EMAGIC(x, y)		fx_add_effect(5, 0, (x), (y), 0); // evil magic
+#define ADD_FX_GMAGIC(x, y)		fx_add_effect(6, 0, (x), (y), 0); // good magic
+#define ADD_FX_CMAGIC(x, y)		fx_add_effect(7, 0, (x), (y), 0); // caster magic
 
 /* *** SKILLS *** */
 

@@ -2599,12 +2599,12 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 		if (debuff)
 		{
 			char_play_sound(co, ch[cn].sound + 7, -150, 0);
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		}
 		else
 		{
 			char_play_sound(co, ch[cn].sound + 1, -150, 0);
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 		}
 	}
 	else
@@ -2625,7 +2625,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 			else
 				do_char_log(cn, 1, "%s\n", splog[temp].self);
 			char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		}
 		if (IS_PLAYER(cn))
 		{
@@ -2634,7 +2634,7 @@ int cast_a_spell(int cn, int co, int in, int debuff, int msg)
 	}
 	if (debuff<2)
 	{
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	}
 	
 	return 1;
@@ -2710,6 +2710,7 @@ int spell_light(int cn, int co, int power)
 	
 	power = min(250, 25 + power / 12 * 9);
 	
+	// Lab XV vampires
 	if (ch[co].temp==1454 || ch[co].temp==1455) power = power/10;
 	
 	bu[in].light = power;
@@ -3220,7 +3221,7 @@ void skill_curse(int cn)
 		
 		// Spell AoE
 		if (aoe_driver(cn, cn, co, SK_CURSE, power, GET_PROX(cn), count, hit, 0) < 0) return;
-		if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	}
 	
 	// Book - Shiva's Malice :: Cast Slow after casting Curse on success
@@ -3314,7 +3315,7 @@ void skill_slow(int cn, int flag)
 	
 	// Spell AoE
 	if (aoe_driver(cn, cn, co, SK_SLOW, power, GET_PROX(cn), count, hit, 0) < 0) return;
-	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	// Book - Shiva's Malice :: Extend exhaust after casting both Curse and Slow
 	if (flag) add_exhaust(cn, SK_EXH_CURSE + SK_EXH_SLOW);
@@ -3460,7 +3461,7 @@ void skill_poison(int cn)
 	
 	// Spell AoE
 	if (aoe_driver(cn, cn, co, SK_POISON, power, GET_PROX(cn), count, hit, 0) < 0) return;
-	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	add_exhaust(cn, SK_EXH_POISON);
 }
@@ -3646,7 +3647,7 @@ int spell_warcry(int cn, int co, int power, int flag)
 	if (do_get_iflag(cn, SF_SIGN_SHOU)) spell_shock(cn, co, power);
 	
 	chlog(cn, "Used Warcry on %s", ch[co].name);
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	return 1;
 }
 void skill_warcry(cn)
@@ -3997,10 +3998,10 @@ int spell_identify(int cn, int co, int in)
 	else
 	{
 		char_info(cn, co);
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 	}
 	
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	return 1;
 }
@@ -4108,7 +4109,7 @@ int spell_blast(int cn, int co, int power, int co_orig, int aoe)
 		char_play_sound(co, ch[cn].sound + 6, -150, 0);
 		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
 	}
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	
 	// Tarot Card - Judgment :: Inflict Scorch
 	if (do_get_iflag(cn, SF_JUDGE))
@@ -4146,7 +4147,7 @@ void skill_blast(int cn)
 	
 	// Spell AoE
 	if ((hit = aoe_driver(cn, cn, co, SK_BLAST, power, GET_PROX(cn), count, hit, avgdmg)) < 0) return;
-	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	in = add_exhaust(cn, exhst);
 	
@@ -4188,7 +4189,7 @@ int spell_obliterate(int cn, int co, int power, int aoe)
 	
 	char_play_sound(co, ch[cn].sound + 6, -150, 0);
 	do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	
 	return 1+tmp;
 }
@@ -4198,7 +4199,7 @@ int skill_obliterate(int cn, int co, int power)
 	
 	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	aoe_driver(cn, co, co, SK_OBLITERATE, power, GET_PROX(cn), 1, 1, avgdmg);
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	return 1;
 }
@@ -4239,7 +4240,7 @@ int spell_slam(int cn, int co, int power, int aoe)
 	
 	char_play_sound(co, ch[cn].sound + 6, -150, 0);
 	do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 6);
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	
 	return 1+tmp;
 }
@@ -4249,7 +4250,7 @@ int skill_slam(int cn, int co, int power)
 	
 	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	aoe_driver(cn, co, co, SK_SLAM, power, GET_PROX(cn), 1, 1, avgdmg);
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	return 1;
 }
@@ -4912,16 +4913,16 @@ void skill_dispel(int cn, int flag)
 		chlog(cn, "Cast Dispel on %s", ch[co].name);
 		char_play_sound(co, ch[cn].sound + 1, -150, 0);
 		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 	}
 	else
 	{
 		chlog(cn, "Cast Dispel");
 		char_play_sound(cn, ch[cn].sound + 1, -150, 0);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	}
 	
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	add_exhaust(cn, SK_EXH_DISPEL);
 }
@@ -4949,6 +4950,7 @@ int skill_gc_atk(int cn, int co, int cz)
 	idx = cz | (char_id(cz) << 16);
 	ch[co].data[MCD_ENEMY1ST] = idx;
 	do_sayx(co, "Yes %s, I will kill %s!", ch[cn].name, ch[cz].reference);
+	STOP_GOTO(cn);
 	do_notify_char(cz, NT_GOTMISS, cn, 0, 0, 0);
 	return 1;
 }
@@ -5383,8 +5385,8 @@ int spell_ghost(int cn, int co, int cs, int dont_atk, int shadowcopy)
 	
 	do_update_char(cc);
 	
-	fx_add_effect(6, 0, ch[cc].x, ch[cc].y, 0);
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cc].x, ch[cc].y);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	return cc;
 }
@@ -5731,7 +5733,7 @@ int spell_cleave(int cn, int co, int power, int co_orig, int flag)
 		char_play_sound(co, ch[cn].sound + 24, -50, 0);
 		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
 	}
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	
 	if (flag!=1)
 	{
@@ -5820,7 +5822,7 @@ int spell_bash(int cn, int co, int power, int co_orig)
 		char_play_sound(co, ch[cn].sound + 24, -50, 0);
 		do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
 	}
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	
 	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);
 	
@@ -5921,7 +5923,7 @@ void skill_weaken(int cn)
 	
 	// Skill AoE
 	if (aoe_driver(cn, cn, co, SK_WEAKEN, power, GET_PROX(cn), count, hit, 0) < 0) return;
-	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	add_exhaust(cn, SK_EXH_WEAKEN);
 }
@@ -6003,7 +6005,7 @@ int spell_blind(int cn, int co, int power, int flag)
 	
 	add_spell(co, in);
 	//
-	fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	
 	if (do_get_iflag(cn, SF_SIGN_STOR))
 	{
@@ -6220,7 +6222,7 @@ void skill_taunt(int cn)
 	
 	// AoE
 	if (aoe_driver(cn, cn, co, SK_TAUNT, power, (GET_PROX(cn) + power)/2, count, hit, 0) < 0) return;
-	if (co_orig != co) fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	if (co_orig != co) ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	//if (hit) 
 	//spell_guard(cn, cn, power);
@@ -6266,7 +6268,7 @@ int spell_leap(int cn, int co, int cc, int power, int critical, int randomtarg, 
 		}
 		if (!(ch[co].flags & CF_SYS_OFF))
 			do_char_log(co, 1, "%s sliced you for %d HP.\n", ch[cn].name, dam);
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	}
 	do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 24);
 	try_hit_debuff(cn, co, HIT_DEBUFF_LARGE);

@@ -4839,7 +4839,7 @@ int generate_map_enemy(int cn, int temp, int kin, int xx, int yy, int base, int 
 		ch[co].used = USE_EMPTY;
 		return 0;
 	}
-	if (affix!=7) fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+	if (affix!=7) ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 	
 	// Set name and sprite
 	if (kin)

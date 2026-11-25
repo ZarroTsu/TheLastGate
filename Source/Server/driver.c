@@ -123,18 +123,12 @@ int get_frust_x_off(int f)
 {
 	switch(f % 5)
 	{
-	case    0:
-		return 0;
-	case    1:
-		return 1;
-	case    2:
-		return -1;
-	case    3:
-		return( 2);
-	case    4:
-		return( -2);
-	default:
-		return 0;
+		case  0: return  0;
+		case  1: return  1;
+		case  2: return -1;
+		case  3: return  2;
+		case  4: return -2;
+		default: return  0;
 	}
 }
 
@@ -142,24 +136,18 @@ int get_frust_y_off(int f)
 {
 	switch((f / 5) % 5)
 	{
-	case    0:
-		return 0;
-	case    1:
-		return 1;
-	case    2:
-		return -1;
-	case    3:
-		return( 2);
-	case    4:
-		return( -2);
-	default:
-		return 0;
+		case  0: return  0;
+		case  1: return  1;
+		case  2: return -1;
+		case  3: return  2;
+		case  4: return -2;
+		default: return  0;
 	}
 }
 
 int npc_dist(int cn, int co)
 {
-	return(max(abs(ch[cn].x - ch[co].x), abs(ch[cn].y - ch[co].y)));
+	return max(abs(ch[cn].x - ch[co].x), abs(ch[cn].y - ch[co].y));
 }
 
 void npc_shadow_warp(int cn, int co, int cc)
@@ -184,8 +172,7 @@ void npc_set_attack(int cn, int co)
 	
 	if (co && co == cc && IS_SANEPLAYER(cc)) // sanity check
 	{
-		if (npc_is_enemy(cn, cc))
-			npc_remove_enemy(cn, cc);
+		REMOVE_ENEMY(cn, cc);
 		co = 0;
 		chlog(cn, "Removed enemy due to master match.");
 	}
@@ -199,80 +186,60 @@ void npc_set_attack(int cn, int co)
 int npc_add_enemy(int cn, int co, int always)
 {
 	int n, idx, d1, d2, cc;
-
+	
 	// don't attack anyone of the same group. Never, never, never.
 	if (ch[cn].data[CHD_GROUP]==ch[co].data[CHD_GROUP])
-	{
 		return 0;
-	}
 	
 	// Thralled enemies ignore other enemies and vice versa
 	if (!IS_PLAYER(co) && !IS_PLAYER_COMP(co) && (ch[cn].data[CHD_GROUP]==65500 || ch[co].data[CHD_GROUP]==65500))
-	{
 		return 0;
-	}
 	
 	// Thralled enemies always ignore their enthraller
 	if (ch[cn].data[CHD_GROUP]==65500 && co == ch[cn].data[CHD_MASTER])
-	{
 		return 0;
-	}
 	
 	// Group check for GCs
 	if (!IS_THRALL(cn) && (
 		(!IS_PLAYER(cn) && IS_SANECHAR(cc = ch[cn].data[CHD_MASTER]) && ch[cc].data[CHD_GROUP]==ch[co].data[CHD_GROUP]) || 
 		(!IS_PLAYER(co) && IS_SANECHAR(cc = ch[co].data[CHD_MASTER]) && ch[cn].data[CHD_GROUP]==ch[cc].data[CHD_GROUP]) ))
-	{
 		return 0;
-	}
 	
 	// Group 1 mobs shall not attack ghost companions.
 	// Ishtar said 65536 to 65536+4096, I hope this is OK.
 	if (!always && (ch[cn].data[CHD_GROUP] == 1) && (ch[co].data[CHD_GROUP] & 0x10000))
-	{
 		return 0;
-	}
 	
 	if (getrank(cn)<20 && !IS_THRALL(cn))
 	{
-		if (!always && (ch[cn].points_tot + 500) * 20<ch[co].points_tot)
-		{
+		if (!always && (ch[cn].points_tot + 500) * 20 < ch[co].points_tot)
 			return 0;
-		}
 	}
-
+	
 	ch[cn].data[76] = ch[co].x + ch[co].y * MAPX;
 	ch[cn].data[77] = globs->ticker;
-
+	
 	cc = ch[cn].attack_cn;
-
+	
 	d1 = npc_dist(cn, cc);
 	d2 = npc_dist(cn, co);
-
-	if (!ch[cn].attack_cn ||
-	    (d1>d2 && (globs->flags & GF_CLOSEENEMY)) ||
+	
+	if (!ch[cn].attack_cn || (d1>d2 && (globs->flags & GF_CLOSEENEMY)) ||
 	    (d1==d2 && (!cc || ch[cc].attack_cn!=cn) && ch[co].attack_cn==cn) )
 	{
 		npc_set_attack(cn, co);
-		ch[cn].goto_x = 0;        // cancel goto (patrol) as well
+		STOP_GOTO(cn);
 		ch[cn].data[58] = 2;
 	}
-
+	
 	idx = co | (char_id(co) << 16);
-
+	
 	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
-	{
-		if (ch[cn].data[n]==idx)
-		{
-			return 0;
-		}
-	}
-
+		if (ch[cn].data[n]==idx) return 0;
+	
 	for (n = MCD_ENEMYZZZ; n>MCD_ENEMY1ST; n--)
-	{
 		ch[cn].data[n] = ch[cn].data[n - 1];
-	}
-
+	
 	ch[cn].data[MCD_ENEMY1ST] = idx;
 	
 	return 1;
@@ -280,18 +247,11 @@ int npc_add_enemy(int cn, int co, int always)
 
 int npc_is_enemy(int cn, int co)
 {
-	int n, idx;
-
-	idx = co | (char_id(co) << 16);
-
+	int n, idx = co | (char_id(co) << 16);
+	
 	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
-	{
-		if (ch[cn].data[n]==idx)
-		{
-			return 1;
-		}
-	}
-
+		if (ch[cn].data[n]==idx) return 1;
+	
 	return 0;
 }
 
@@ -300,8 +260,9 @@ int npc_list_enemies(int npc, int cn)
 	int none = 1;
 	int n;
 	int cv;
-
+	
 	do_char_log(cn, 2, "Enemies of %s:\n", ch[npc].name);
+	
 	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 	{
 		if ((cv = ch[npc].data[n] & 0xFFFF))
@@ -310,11 +271,13 @@ int npc_list_enemies(int npc, int cn)
 			none = 0;
 		}
 	}
+	
 	if (none)
 	{
 		do_char_log(cn, 2, "-none-\n");
 		return 0;
 	}
+	
 	return 1;
 }
 
@@ -322,26 +285,21 @@ int npc_remove_enemy(int npc, int enemy)
 {
 	int found = 0;
 	int n;
-
+	
 	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 	{
-		if ((ch[npc].data[n] & 0xFFFF) == enemy)
-		{
-			found = 1;
-		}
+		if ((ch[npc].data[n] & 0xFFFF) == enemy) found = 1;
+		
 		if (found)
 		{
 			if (n < MCD_ENEMYZZZ)
-			{
 				ch[npc].data[n] = ch[npc].data[n + 1];
-			}
 			else
-			{
 				ch[npc].data[n] = 0;
-			}
 		}
 	}
-	return(found);
+	
+	return found;
 }
 
 void npc_remove_all_enemies(int npc)
@@ -349,33 +307,26 @@ void npc_remove_all_enemies(int npc)
 	int n;
 	
 	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
-	{
 		ch[npc].data[n] = 0;
-	}
-	ch[npc].attack_cn = 0;
-	ch[npc].goto_x = 0;
-	ch[npc].goto_y = 0;
-	ch[npc].data[76] = 0;
-	ch[npc].data[77] = 0;
-	ch[npc].data[78] = 0;
+	
+	STOP_ATTACK(npc);
+	STOP_GOTO(npc);
+	
+	ch[npc].data[76] = 0;  // last known position of an enemy
+	ch[npc].data[77] = 0;  // timeout for 76
+	ch[npc].data[78] = 0;  // attacked by invisible
 }
 
 /* say one of the NPC's canned response messages, with optional name. */
 void npc_saytext_n(int npc, int n, char *name)
 {
-	if (ch[npc].flags & CF_SHUTUP)
-	{
-		return;
-	}
-
+	if (ch[npc].flags & CF_SHUTUP) return;
 	if (ch[npc].text[n][0])
 	{
 		if (IS_COMP_TEMP(npc))
 		{
 			if (ch[npc].data[MCD_TALKATIVE] == -10)
-			{
 				do_sayx(npc, ch[npc].text[n], name);
-			}
 		}
 		else
 		{
@@ -393,13 +344,13 @@ int npc_see(int cn, int co);
 int npc_gotattack(int cn, int co, int dam)
 {
 	int cc;
-
+	
 	ch[cn].data[92] = TICKS * 60 * 10;
-
-	if (co && (ch[co].flags & CF_PLAYER) && ch[cn].alignment==10000 && (strcmp(ch[cn].name, "Peacekeeper") || ch[cn].a_hp<HP_PERC(cn,50)) && ch[cn].data[70]<globs->ticker)
+	
+	if (co && IS_PLAYER(co) && IS_FRIENDLY(cn) && (strcmp(ch[cn].name, "Peacekeeper") || ch[cn].a_hp<HP_PERC(cn,50)) && ch[cn].data[70]<globs->ticker)
 	{
 		do_sayx(cn, "Skua! Protect the innocent! Send me a Peacekeeper!");
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		ch[cn].data[70] = globs->ticker + TICKS * 60 * 1;
 
 		cc = god_create_char(CT_PEACEKEEPER, 1);
@@ -432,7 +383,7 @@ int npc_gotattack(int cn, int co, int dam)
 		do_sayx(cn, "Skua! Help me!");
 		ch[cn].data[70] = globs->ticker + TICKS * 60 * 2;
 		ch[cn].a_mana = ch[cn].mana[5] * 1000;
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	}
 
 	if (ch[cn].data[52] && ch[cn].a_hp<HP_PERC(cn,66))    // we're supposed to shout for help if attacked and HP below 2/3rd
@@ -517,17 +468,16 @@ void npc_activate_rings(int cn, int flag);
 int npc_killed(int cn, int cc, int co)
 {
 	int n, idx;
-
+	
 	if (ch[cn].attack_cn==co)
-	{
-		ch[cn].attack_cn = 0;
-	}
+		STOP_ATTACK(cn);
+	
 	ch[cn].data[76] = ch[cn].data[77] = ch[cn].data[78] = 0;
 	npc_activate_rings(cn, 0);
 	npc_wedge_doors(cn, 0);
-
+	
 	idx = co | (char_id(co) << 16);
-
+	
 	for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++) // remove enemy
 	{
 		if (ch[cn].data[n]==idx)
@@ -543,7 +493,7 @@ int npc_killed(int cn, int cc, int co)
 			return 1;
 		}
 	}
-
+	
 	return 0;
 }
 
@@ -1074,7 +1024,7 @@ int npc_give(int cn, int co, int in, int money)
 			do_sayx(cn, "A tarot card, I see. Allow me to apply its magic to you, %s.", ch[co].name);
 			god_take_from_char(in, cn);
 			do_char_log(co, 1, "You now have the effects of your %s equipped.\n", it[in].name);
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			if (in2)
 			{
 				do_sayx(cn, "I have removed your %s for you as well. Please take it.", it[in2].name);
@@ -1122,7 +1072,7 @@ int npc_give(int cn, int co, int in, int money)
 			do_sayx(cn, "A Sinbinder, I see. Allow me to apply its magic to you, %s.", ch[co].name);
 			god_take_from_char(in, cn);
 			do_char_log(co, 1, "The Priest chanted something and the %s slipped on your finger.\n", it[in].name);
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			if ((in2 = ch[co].worn[WN_RRING]) && IS_SINBINDER(in2))
 			{
 				do_sayx(cn, "I have removed your old Sinbinder for you. It's all yours.");
@@ -1365,7 +1315,7 @@ int npc_give(int cn, int co, int in, int money)
 						ch[co].temple_x = ch[co].tavern_x = HOME_TEMPLE_X;
 						ch[co].temple_y = ch[co].tavern_y = HOME_TEMPLE_Y;
 					}
-					fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+					ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 					if ((nr = ch[cn].data[51])!=0)
 					{
 						do_sayx(cn, "Now I'll teach you a bit about life, the world and everything, %s.", ch[co].name);
@@ -1883,7 +1833,7 @@ int npc_give(int cn, int co, int in, int money)
 	}
 	else if (IS_PLAYER_GC(cn) && co == CN_OWNER(cn) && it[in].driver==117) // Companion sprite set
 	{
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		if (it[in].data[1])
 		{
 			ch[cn].sprite = 15312; ch[co].class  = 0;
@@ -2118,7 +2068,7 @@ int npc_see(int cn, int co)
 		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
 			npc_set_attack(cn, cc);
-			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
+			if (!ch[cn].data[78]) STOP_GOTO(cn);
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
 		ch[cn].data[58] = 2;
@@ -2135,7 +2085,7 @@ int npc_see(int cn, int co)
 			if (ch[cn].data[n]==idx)
 			{
 				npc_set_attack(cn, co);
-				ch[cn].goto_x = 0; // cancel goto (patrol)
+				STOP_GOTO(cn);
 				ch[cn].data[58] = 2;
 				return 1;
 			}
@@ -2265,8 +2215,8 @@ int npc_see(int cn, int co)
 		 || ch[cn].data[CHD_GROUP+4]==ch[co].data[CHD_GROUP]
 		 || ch[cn].data[59]==ch[co].data[CHD_GROUP])
 		{
-			ch[cn].attack_cn = 0;
-			ch[co].attack_cn = 0;
+			STOP_ATTACK(cn);
+			STOP_ATTACK(co);
 			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
 			if (npc_is_enemy(co, cn)) npc_remove_enemy(co, cn);
 			return 1;
@@ -2275,7 +2225,7 @@ int npc_see(int cn, int co)
 		// We shouldn't be attacking our master!
 		if (IS_SANECHAR(ch[cn].data[CHD_MASTER]) && co==ch[cn].data[CHD_MASTER])
 		{
-			ch[cn].attack_cn = 0;
+			STOP_ATTACK(cn);
 			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
 			return 1;
 		}
@@ -2283,7 +2233,7 @@ int npc_see(int cn, int co)
 		// We shouldn't be attacking our companions!
 		if (IS_SANECHAR(ch[co].data[CHD_MASTER]) && cn==ch[co].data[CHD_MASTER])
 		{
-			ch[cn].attack_cn = 0;
+			STOP_ATTACK(cn);
 			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
 			return 1;
 		}
@@ -2292,7 +2242,7 @@ int npc_see(int cn, int co)
 		if (IS_SANECHAR(ch[cn].data[CHD_MASTER]) && IS_SANECHAR(ch[co].data[CHD_MASTER]) 
 			&& ch[cn].data[CHD_MASTER]==ch[co].data[CHD_MASTER])
 		{
-			ch[cn].attack_cn = 0;
+			STOP_ATTACK(cn);
 			if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
 			return 1;
 		}
@@ -3357,14 +3307,13 @@ int npc_shout(int cn, int co, int code, int x, int y)
 		ch[cn].data[54] = x + y * MAPX;
 		ch[cn].data[55] = globs->ticker;
 		npc_saytext_n(cn, 5, ch[co].name);
-
+		
 		// cancel current long-term actions:
-		ch[cn].goto_x = 0;
-		ch[cn].misc_action = 0;
-
+		STOP_GOTO(cn);
+		STOP_ACTION(cn);
+		
 		return 1;
 	}
-
 	return 0;
 }
 
@@ -3940,7 +3889,7 @@ void npc_activate_rings(int cn, int flag)
 
 void die_companion(int cn)
 {
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	god_destroy_items(cn);
 	ch[cn].gold = 0;
 	do_char_killed(0, cn, 0);
@@ -4434,7 +4383,7 @@ void stronghold_mage_driver(int cn)
 						ch[co].used = USE_EMPTY;
 						break;
 					}
-					fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+					ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 					//
 					j = j-bs_temp;
 					if (j>=0 && j<=5)
@@ -4531,7 +4480,7 @@ void stronghold_mage_driver(int cn)
 					// ** generate_map_enemy ends here **
 				}
 				
-				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 				do_sayx(cn, "Khuzak gurawin duskar!");
 				chlog(cn, "created %d new monsters", n);
 				if (ch[cn].data[3]<BS_RC*256) 
@@ -4900,7 +4849,7 @@ void stronghold_mage_driver_ver2(int cn)
 		}
 	}
 	
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	if (!((ch[cn].data[2]-1)%2)) do_sayx(cn, "Khuzak gurawin duskar!");
 	m = bs_waves[magenum-1][ch[cn].data[1]-1][ch[cn].data[2]-1][6];
 	if (IS_GLOB_MAYHEM) m = m - m / 4;
@@ -6600,7 +6549,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 			else if (fl>=15) 	tell_incolosseum(9, "I shall tear down the stars and throw them at you.");
 			else  				tell_incolosseum(9, "May the heavens weep, and the sky smolder and fall around us!");
 			ch[cn].skill[SK_SAFEGRD][1] = 30;
-			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 			do_area_sound(0, 0, go_xy[0][0], go_xy[0][1]+1, 21);
 			ch[cn].data[4] = globs->ticker + TICKS * 2;
 			if (fl>=15) ch[cn].data[5] = globs->ticker + TICKS * 2-1;
@@ -7392,8 +7341,8 @@ void npc_lab_lord_driver(int cn)
 			ch[co].used = USE_EMPTY;
 			return;
 		}
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[co].x, ch[co].y);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		do_sayx(cn, "Underling, come to my aid!");
 		chlog(cn, "created a new monster (lab_lord)");
 	}
@@ -7494,13 +7443,13 @@ void npc_emperor_driver(int cn)
 		do_sayx(cn, "Rissse my conssstructs! Purge thisss filthy outsssider!");
 		chlog(cn, "spawned emerald golems");
 		
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, 928, 416);
 		ch[cn].dir = 3;
-		ch[ch[cn].attack_cn].attack_cn = 0;
-		ch[cn].attack_cn = 0;
+		STOP_ATTACK(ch[cn].attack_cn);
+		STOP_ATTACK(cn);
 		npc_remove_all_enemies(cn);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		
 		do_area_log(cn, 0, ch[cn].x, ch[cn].y, 1, "The %s leapt across the room.\n", ch[cn].name);
 		
@@ -7545,7 +7494,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1244, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7554,7 +7503,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1244, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7563,17 +7512,18 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		
 		do_sayx(cn, "How about a little plague?");
 		chlog(cn, "spawned plagues");
 		
-		ch[ch[cn].attack_cn].attack_cn = 0;
-		ch[cn].attack_cn = 0;
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		STOP_ATTACK(ch[cn].attack_cn);
+		STOP_ATTACK(cn);
+		
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, 577, 126);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		ch[cn].dir = 3;
 		
 		ch[cn].a_hp   = 9999999;
@@ -7591,7 +7541,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1245, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7600,7 +7550,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1245, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7609,17 +7559,18 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		
 		do_sayx(cn, "The pits of hell are quite welcoming this time of year.");
 		chlog(cn, "spawned devils");
 		
-		ch[ch[cn].attack_cn].attack_cn = 0;
-		ch[cn].attack_cn = 0;
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		STOP_ATTACK(ch[cn].attack_cn);
+		STOP_ATTACK(cn);
+		
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, 572, 121);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		ch[cn].dir = 1;
 		
 		ch[cn].a_hp   = 9999999;
@@ -7637,7 +7588,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1246, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7646,7 +7597,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1246, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7655,17 +7606,18 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		
 		do_sayx(cn, "Out with the flame, and in with the cold!");
 		chlog(cn, "spawned hypotherms");
 		
-		ch[ch[cn].attack_cn].attack_cn = 0;
-		ch[cn].attack_cn = 0;
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		STOP_ATTACK(ch[cn].attack_cn);
+		STOP_ATTACK(cn);
+		
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, 580, 121);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		ch[cn].dir = 2;
 		
 		ch[cn].a_hp   = 9999999;
@@ -7683,7 +7635,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1245, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7692,7 +7644,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		co = pop_create_char(1246, 0);
 		if (!co) { chlog(cn, "npc_shivab_driver pop failed"); return; }
@@ -7701,7 +7653,7 @@ void npc_shivab_driver(int cn)
 			god_destroy_items(co); ch[co].used = USE_EMPTY; return; }
 		ch[co].data[64] = globs->ticker + TICKS * 60 * 15;
 		ch[co].attack_cn = ch[cn].attack_cn;
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		//
 		
 		do_sayx(cn, "Let's end this!");
@@ -7711,11 +7663,12 @@ void npc_shivab_driver(int cn)
 		god_give_char(in, cn);
 		npc_quaff_potion(cn, IT_RPOT, 254);
 		
-		ch[ch[cn].attack_cn].attack_cn = 0;
-		ch[cn].attack_cn = 0;
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		STOP_ATTACK(ch[cn].attack_cn);
+		STOP_ATTACK(cn);
+		
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, 572, 126);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		ch[cn].dir = 7;
 		
 		ch[cn].a_hp   = 9999999;
@@ -7726,85 +7679,81 @@ void npc_shivab_driver(int cn)
 
 int npc_driver_high(int cn)
 {
-	int x, y, in, co, indoor1, indoor2, cc, in2, n;
-	int mc, m, chmode=0;
+	int x, y, cx, cy, cm, in, co, indoor1, indoor2, cc, in2, n;
+	int mc, m, chmode = -1;
 	
-	if (ch[cn].data[25])
+	if (ch[cn].data[25]) switch(ch[cn].data[25])
 	{
-		switch(ch[cn].data[25])
-		{
-		case  1:
-			return( npc_stunrun_high(cn) );
-		case  2:
-			return( npc_cityattack_high(cn) );
-		case  3:
-			return( npc_malte_high(cn) );
-		case  4:
-			return( npc_shiva_high(cn) );
+		case  1: return npc_stunrun_high(cn);
+		case  2: return npc_cityattack_high(cn);
+		case  3: return npc_malte_high(cn);
+		case  4: return npc_shiva_high(cn);
 		default:
 			chlog(cn, "unknown special driver %d", ch[cn].data[25]);
-			break;
-		}
-		return 0;
+			return 0;
 	}
-
+	
+	cx = ch[cn].x;
+	cy = ch[cn].y;
+	cm = cx + cy * MAPX;
+	
 	// reset panic mode if expired
-	if (ch[cn].data[78]<globs->ticker)
-	{
+	if (ch[cn].data[78] < globs->ticker)
 		ch[cn].data[78] = 0;
-	}
-
+	
 	// self destruct
 	if (ch[cn].data[64])
 	{
-		if (ch[cn].data[64]<TICKS * 60 * 15)  // values less than 15 minutes mean it's a value set from the administration
-		{                                     // interface and shall wait that long...
+		// values less than 15m mean it's a value set by admin and shall wait that long...
+		if (ch[cn].data[64] < TICKS * 60 * 15)
 			ch[cn].data[64] += globs->ticker;
-		}
-
-		if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn) && IS_PLAYER(ch[cn].data[CHD_MASTER]))
+		
+		// Shadow Copy management
+		if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn))
 		{
-			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
-			if (IS_SANECHAR(ch[cn].data[CHD_MASTER])) 
-				do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
-			do_give_exp(ch[cn].data[CHD_MASTER], ch[cn].data[28], 1, -1, 0);
-			fx_add_effect(6, 0, ch[ch[cn].data[CHD_MASTER]].x, ch[ch[cn].data[CHD_MASTER]].y, 0);
-			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-			die_companion(cn);
-			return 1;
+			if (IS_PLAYER(co = ch[cn].data[CHD_MASTER]))
+			{
+				ch[co].data[PCD_SHADOWCOPY] = 0;
+				if (IS_SANECHAR(co)) 
+					do_sayx(cn, "I'm done, %s...", ch[co].name);
+				do_give_exp(co, ch[cn].data[28], 1, -1, 0);
+				ADD_FX_GMAGIC(ch[co].x, ch[co].y);
+				ADD_FX_CMAGIC(cx, cy);
+				die_companion(cn);
+				return 1;
+			}
+			else if (IS_PLAYER_SC(co) && IS_PLAYER(cc = ch[co].data[CHD_MASTER]))
+			{
+				if (ch[co].data[9] == 2) ch[co].data[9] = 1;
+				ch[co].data[PCD_SHADOWCOPY] = 0;
+				if (IS_SANECHAR(co)) 
+					do_sayx(cn, "I'm done, %s...", ch[co].name);
+				do_give_exp(cc, ch[cn].data[28], 1, -1, 0);
+				ADD_FX_GMAGIC(ch[cc].x, ch[cc].y);
+				ADD_FX_CMAGIC(cx, cy);
+				die_companion(cn);
+				return 1;
+			}
+			else
+			{
+				ch[co].data[PCD_SHADOWCOPY] = 0;
+				if (IS_SANECHAR(co)) 
+					do_sayx(cn, "I'm done, %s...", ch[co].name);
+				ADD_FX_CMAGIC(cx, cy);
+				god_destroy_items(cn);
+				plr_map_remove(cn);
+				ch[cn].used = USE_EMPTY;
+				remove_enemy(cn);
+				return 1;
+			}
 		}
-		else if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn) && IS_PLAYER_SC(ch[cn].data[CHD_MASTER]) && IS_PLAYER(ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER]))
-		{
-			if (ch[ch[cn].data[CHD_MASTER]].data[9] == 2) ch[ch[cn].data[CHD_MASTER]].data[9] = 1;
-			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
-			if (IS_SANECHAR(ch[cn].data[CHD_MASTER])) 
-				do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
-			do_give_exp(ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER], ch[cn].data[28], 1, -1, 0);
-			fx_add_effect(6, 0, ch[ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER]].x, ch[ch[ch[cn].data[CHD_MASTER]].data[CHD_MASTER]].y, 0);
-			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-			die_companion(cn);
-			return 1;
-		}
-		else if (ch[cn].data[64]<globs->ticker && IS_SHADOW(cn))
-		{
-			ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY] = 0;
-			if (IS_SANECHAR(ch[cn].data[CHD_MASTER])) 
-				do_sayx(cn, "I'm done, %s...", ch[ch[cn].data[CHD_MASTER]].name);
-			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-			god_destroy_items(cn);
-			plr_map_remove(cn);
-			ch[cn].used = USE_EMPTY;
-			remove_enemy(cn);
-			return 1;
-		}
-
+		
+		// Timer expiration
 		if (ch[cn].data[64]<globs->ticker)
 		{
-			if (IS_BLOODY(cn))
-				do_sayx(cn, "fRee333333!!");
-			else
-				do_sayx(cn, "Free!");
-			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+			if (IS_BLOODY(cn)) do_sayx(cn, "fRee333333!!");
+			else               do_sayx(cn, "Free!");
+			ADD_FX_CMAGIC(cx, cy);
 			god_destroy_items(cn);
 			plr_map_remove(cn);
 			ch[cn].used = USE_EMPTY;
@@ -7812,12 +7761,11 @@ int npc_driver_high(int cn)
 			return 1;
 		}
 	}
-
+	
 	// Count down master-no-see timer for player ghost companions
 	if (IS_COMP_TEMP(cn) && ch[cn].data[64]==0)
 	{
-		co = ch[cn].data[CHD_MASTER]; // master
-		if (!IS_SANECHAR(co) || ch[co].data[64] != cn)   // mismatch
+		if (!IS_SANECHAR(co = ch[cn].data[CHD_MASTER]) || ch[co].data[64] != cn)
 		{
 			chlog(cn, "killed for bad master(%d)", co);
 			die_companion(cn);
@@ -7831,12 +7779,12 @@ int npc_driver_high(int cn)
 			return 1;
 		}
 	}
-
+	
 	// Count down riddle timeout for riddle givers
 	if ((ch[cn].data[72] >= RIDDLE_MIN_AREA) && (ch[cn].data[72] <= RIDDLE_MAX_AREA))
 	{
 		int idx;
-
+		
 		idx = ch[cn].data[72] - RIDDLE_MIN_AREA;
 		if (riddletimeout[idx] > 0)
 		{
@@ -7887,10 +7835,7 @@ int npc_driver_high(int cn)
 			if ((in = ch[cn].spell[n])==0 || (bu[in].used==USE_EMPTY)) continue;
 			if (IS_DISPELABLE1(bu[in].temp)) m++;
 		}
-		if (m>1)
-		{
-			if (npc_try_spell(cn, cn, SK_DISPEL)) return 1;
-		}
+		if (m>1 && npc_try_spell(cn, cn, SK_DISPEL)) return 1;
 	}
 	
 	// donate/destroy citem if that's our job
@@ -7927,18 +7872,14 @@ int npc_driver_high(int cn)
 			ch[cn].item[39] = 0;
 		}
 	}
-
+	
 	// generic spell management
 	if (ch[cn].a_mana>MP_PERC(cn,85) && !(ch[cn].flags & CF_MERCHANT))
-	{
 		npc_spell_routine_buffs(cn, 1);
-	}
 	
-	chmode = -1;
-	
+	// endurance management
 	if (IS_PLAYER_COMP(cn) && ch[cn].data[1]<2 && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]))
 	{
-		// companion endurance management
 		if (ch[cn].a_end>10000)
 		{
 			if (ch[co].mode==2 && ch[cn].mode!=2) chmode = 2;
@@ -7948,7 +7889,6 @@ int npc_driver_high(int cn)
 	}
 	else
 	{
-		// generic endurance management
 		if (ch[cn].a_end>10000)
 		{
 			if (ch[cn].data[58] > 1 && ch[cn].mode!=2) chmode = 2;
@@ -7956,28 +7896,29 @@ int npc_driver_high(int cn)
 		} else if (ch[cn].mode!=0)                     chmode = 0;
 	}
 	
-	if ((chmode > -1) && (chmode != ch[cn].mode) && ((cn&(TICKS*3))==(globs->ticker&(TICKS*3)))) // Limit mode switching to once every 3 seconds.
+	// Limit mode switching to once every 3 seconds.
+	if ((chmode > -1) && (chmode != ch[cn].mode) && ((cn&(TICKS*3))==(globs->ticker&(TICKS*3))))
 	{
 		ch[cn].mode = chmode;
 		do_update_char(cn);
 	}
 	
 	// create light
-	if ((ch[cn].data[62]<11 && ch[cn].data[62]>ch[cn].data[58] && check_dlight(ch[cn].x, ch[cn].y)<20 && map[ch[cn].x + ch[cn].y * MAPX].light<20)
-		|| ch[cn].data[62]-10>ch[cn].data[58])
+	if ((ch[cn].data[62]<11 && ch[cn].data[62]>ch[cn].data[58] && check_dlight(cx, cy)<20 && map[cm].light<20) || ch[cn].data[62]-10>ch[cn].data[58])
 	{
 		if (npc_try_spell(cn, cn, SK_LIGHT)) return 1;
 	}
-
+	
 	// make sure protected character survives
 	if ((co = ch[cn].data[CHD_MASTER])!=0)
 	{
-		if ((ch[co].a_hp<HP_PERC(co,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<HP_PERC(co,40)) // he's hurt
+		// friend is hurt
+		if ((ch[co].a_hp<HP_PERC(co,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<HP_PERC(co,40))
 		{
 			if (npc_try_spell(cn, co, SK_HEAL)) return 1;
 		}
 		
-		// Dispel - for friend
+		// Dispel for friend
 		if (B_SK(cn, SK_DISPEL) && !has_buff(co, SK_DISPEL))
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
@@ -7985,13 +7926,10 @@ int npc_driver_high(int cn)
 				if ((in = ch[co].spell[n])==0 || (bu[in].used==USE_EMPTY)) continue;
 				if (IS_DISPELABLE1(bu[in].temp)) m++;
 			}
-			if (m>1)
-			{
-				if (npc_try_spell(cn, co, SK_DISPEL)) return 1;
-			}
+			if (m>1 && npc_try_spell(cn, co, SK_DISPEL)) return 1;
 		}
 	}
-
+	
 	// help friend
 	if ((co = ch[cn].data[65])!=0 && ch[cn].a_mana>MP_PERC(cn,25))
 	{
@@ -8003,12 +7941,13 @@ int npc_driver_high(int cn)
 			if (npc_try_spell(cn, cn, SK_BLESS)) return 1;
 		}
 		
-		if ((ch[co].a_hp<HP_PERC(co,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<HP_PERC(co,40)) // he's hurt
+		// friend is hurt
+		if ((ch[co].a_hp<HP_PERC(co,60) && (!IS_PLAYER_COMP(cn) || do_get_iflag(cn, SF_STAR))) || ch[co].a_hp<HP_PERC(co,40))
 		{
 			if (npc_try_spell(cn, co, SK_HEAL)) return 1;
 		}
 		
-		// Dispel - for friend
+		// Dispel for friend
 		if (B_SK(cn, SK_DISPEL) && !has_buff(co, SK_DISPEL))
 		{
 			for (n = 0, m = 0; n<MAXBUFFS; n++)
@@ -8016,16 +7955,13 @@ int npc_driver_high(int cn)
 				if ((in = ch[co].spell[n])==0 || (bu[in].used==USE_EMPTY)) continue;
 				if (IS_DISPELABLE1(bu[in].temp)) m++;
 			}
-			if (m>1)
-			{
-				if (npc_try_spell(cn, co, SK_DISPEL)) return 1;
-			}
+			if (m>1 && npc_try_spell(cn, co, SK_DISPEL)) return 1;
 		}
 		
-		if (do_get_iflag(cn, SF_TOWER) && !npc_can_spell(co, cn, SK_CURSE) && npc_try_spell(cn, co, SK_CURSE)) return 1;
+		if (!npc_can_spell(co, cn, SK_CURSE)   && npc_try_spell(cn, co, SK_CURSE))   return 1; // Focus via [Tower]
 		if (!npc_can_spell(co, cn, SK_PROTECT) && npc_try_spell(cn, co, SK_PROTECT)) return 1;
 		if (!npc_can_spell(co, cn, SK_ENHANCE) && npc_try_spell(cn, co, SK_ENHANCE)) return 1;
-		if (!npc_can_spell(co, cn, SK_BLESS) && npc_try_spell(cn, co, SK_BLESS)) return 1;
+		if (!npc_can_spell(co, cn, SK_BLESS)   && npc_try_spell(cn, co, SK_BLESS))   return 1;
 		
 		// taunt this enemy to pull them off our friend
 		if (cc && globs->ticker>ch[cn].data[74] && npc_try_spell(cn, cc, SK_TAUNT))
@@ -8044,11 +7980,9 @@ int npc_driver_high(int cn)
 			}
 		}
 		
-		m = ch[co].x + ch[co].y * MAPX;
-		
 		// Check for enemies around our ally and see if they're hitting too
 		//  this is helpful if our ally has fightback turned off
-		for (n=0; n<4; n++)
+		for (n=0, m=XY2M(ch[co].x, ch[co].y); n<4; n++)
 		{
 			switch (n)
 			{
@@ -8095,12 +8029,9 @@ int npc_driver_high(int cn)
 		if (ch[cn].data[26] && do_char_can_see(cn, co, 0)) npc_wedge_doors(cn, 1);
 		npc_activate_rings(cn, 1);
 		/*
-		if (npc_quaff_potion(cn, 1479, 254)) // use spot if available
-			return 1;
-		if (npc_quaff_potion(cn, 833, 254)) // use gpot if available
-			return 1;
-		if (npc_quaff_potion(cn, 267, 254)) // use rpot if available
-			return 1;
+		if (npc_quaff_potion(cn, 1479, 254)) return 1;  // use spot if available
+		if (npc_quaff_potion(cn,  833, 254)) return 1;  // use gpot if available
+		if (npc_quaff_potion(cn,  267, 254)) return 1;  // use rpot if available
 		*/
 		if (co && (ch[cn].a_hp<HP_PERC(cn,60) || !RANDOM(10))) // we're losing
 		{
@@ -8115,150 +8046,114 @@ int npc_driver_high(int cn)
 		
 		if (co) npc_spell_routine_debuffs(cn, co);
 	}
-
+	
 	// did we panic?
 	if (ch[cn].data[78] && !ch[cn].attack_cn && !ch[cn].goto_x)
 	{
-		//if (ch[cn].data[27]!=1)
-		//{
-			ch[cn].goto_x = ch[cn].x + 5 - RANDOM(10);
-			ch[cn].goto_y = ch[cn].y + 5 - RANDOM(10);
-			return 1;
-		//}
-		//else
-		//{
-		//	ch[cn].skill[SK_PERCEPT][1] = 120;
-		//}
+		ch[cn].goto_x = cx + 5 - RANDOM(10);
+		ch[cn].goto_y = cy + 5 - RANDOM(10);
+		return 1;
 	}
-
+	
 	// are we on protect and want to follow our master?
 	if (!ch[cn].attack_cn && (co = ch[cn].data[69])!=0 && follow_driver(cn, ch[cn].data[69]))
 	{
-		if (abs(ch[cn].x - ch[co].y) + abs(ch[cn].y - ch[co].y)>6)
-		{
-			ch[cn].data[58] = 2;
-		}
-		else
-		{
-			ch[cn].data[58] = 1;
-		}
+		if (abs(cx - ch[co].y) + abs(cy - ch[co].y)>6) ch[cn].data[58] = 2;
+		else                                           ch[cn].data[58] = 1;
 		return 1;
 	}
-
-	if (!ch[cn].data[41] && !(ch[cn].data[47]>0 && ch[cn].data[47]<10))
-	{
-		return 0;                                     // don't scan if we don't use the information anyway
-	}
+	
+	// don't scan if we don't use the information anyway
+	if (!ch[cn].data[41] && !(ch[cn].data[47]>0 && ch[cn].data[47]<10))           return 0;
+	
 	// save some work. you need to check here if no other work needs to be done!
-	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE && ch[cn].data[58]==1)
-	{
-		return 0;
-	}
-	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_PICKUP)
-	{
-		return 0;
-	}
-	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_USE)
-	{
-		return 0;
-	}
+	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE && ch[cn].data[58]==1)      return 0;
+	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_PICKUP) return 0;
+	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_USE)    return 0;
 
-	if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_INDOORS)
+	if (map[cm].flags & MF_INDOORS) indoor1 = 1;
+	else                            indoor1 = 0;
+	
+	// Janitor ~ Look at nearby objects
+	for (y=max(cy-7,1);y<min(cy+7,MAPY-1);y++) for (x=max(cx-7,1);x<min(cx+7,MAPX-1);x++) if ((in = map[XY2M(x,y)].it)!=0)
 	{
-		indoor1 = 1;
-	}
-	else
-	{
-		indoor1 = 0;
-	}
-
-	for (y = max(ch[cn].y - 7, 1); y<min(ch[cn].y + 7, MAPY - 1); y++)
-	{
-		for (x = max(ch[cn].x - 7, 1); x<min(ch[cn].x + 7, MAPX - 1); x++)
+		if (map[XY2M(x,y)].flags & MF_INDOORS) indoor2 = 1;
+		else                                   indoor2 = 0;
+		
+		// Janitor ~ Street light template checks
+		if (it[in].temp==ch[cn].data[41])
 		{
-			if ((in = map[x + y * MAPX].it)!=0)
+			if (it[in].temp==3079 && it[in].active) // Vantablack candles
 			{
-				if (map[x + y * MAPX].flags & MF_INDOORS)
+				ch[cn].misc_action  = DR_USE;
+				ch[cn].misc_target1 = x;
+				ch[cn].misc_target2 = y;
+				STOP_GOTO(cn);
+				ch[cn].data[58] = 1;
+				return 1;
+			}
+			if (it[in].temp==3311 && !it[in].active) // Greywood candles
+			{
+				ch[cn].misc_action  = DR_USE;
+				ch[cn].misc_target1 = x;
+				ch[cn].misc_target2 = y;
+				STOP_GOTO(cn);
+				ch[cn].data[58] = 1;
+				return 1;
+			}
+			if (!it[in].active && (globs->dlight<200 || indoor2) && it[in].temp!=3079 && it[in].temp!=3311)
+			{
+				ch[cn].misc_action  = DR_USE;
+				ch[cn].misc_target1 = x;
+				ch[cn].misc_target2 = y;
+				STOP_GOTO(cn);
+				ch[cn].data[58] = 1;
+				return 1;
+			}
+			if (it[in].active && globs->dlight>200 && !indoor2 && it[in].temp!=3079 && it[in].temp!=3311)
+			{
+				ch[cn].misc_action  = DR_USE;
+				ch[cn].misc_target1 = x;
+				ch[cn].misc_target2 = y;
+				STOP_GOTO(cn);
+				ch[cn].data[58] = 1;
+				return 1;
+			}
+		}
+		
+		// Janitor ~ Donate Trash to pl#
+		if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && indoor1==indoor2 && can_go(cx, cy, it[in].x, it[in].y) && do_char_can_see_item(cn, in))
+		{
+			// Janitor ~ Automatic garbage pickup (ignores red flowers)
+			if ((it[in].flags & IF_TAKE) && it[in].temp!=IT_FLO_R)
+			{
+				ch[cn].misc_action  = DR_PICKUP;
+				ch[cn].misc_target1 = x;
+				ch[cn].misc_target2 = y;
+				STOP_GOTO(cn);
+				ch[cn].data[58] = 1;
+				return 1;
+			}
+			
+			// Janitor ~ Places a red flower next to graves (exclude Lab XV vampires)
+			if (it[in].driver==7 && ch[cn].temp != 1454 && ch[cn].temp != 1455)
+			{
+				if (plr_check_target(x + y * MAPX + 1) && !map[x + y * MAPX + 1].it)
 				{
-					indoor2 = 1;
-				}
-				else
-				{
-					indoor2 = 0;
-				}
-
-				if (it[in].temp==ch[cn].data[41])
-				{
-					if (it[in].temp==3079 && it[in].active) // Vantablack candles
-					{
-						ch[cn].misc_action  = DR_USE;
-						ch[cn].misc_target1 = x;
-						ch[cn].misc_target2 = y;
-						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
-						ch[cn].data[58] = 1;
-						return 1;
-					}
-					if (it[in].temp==3311 && !it[in].active) // Greywood candles
-					{
-						ch[cn].misc_action  = DR_USE;
-						ch[cn].misc_target1 = x;
-						ch[cn].misc_target2 = y;
-						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
-						ch[cn].data[58] = 1;
-						return 1;
-					}
-					if (!it[in].active && (globs->dlight<200 || indoor2) && it[in].temp!=3079 && it[in].temp!=3311)
-					{
-						ch[cn].misc_action  = DR_USE;
-						ch[cn].misc_target1 = x;
-						ch[cn].misc_target2 = y;
-						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
-						ch[cn].data[58] = 1;
-						return 1;
-					}
-					if (it[in].active && globs->dlight>200 && !indoor2 && it[in].temp!=3079 && it[in].temp!=3311)
-					{
-						ch[cn].misc_action  = DR_USE;
-						ch[cn].misc_target1 = x;
-						ch[cn].misc_target2 = y;
-						ch[cn].goto_x = 0;        // cancel goto, which stems probably from patrol
-						ch[cn].data[58] = 1;
-						return 1;
-					}
-				}
-				if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && indoor1==indoor2 && (it[in].flags & IF_TAKE) &&
-				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
-				    do_char_can_see_item(cn, in) && it[in].temp!=IT_FLO_R)  // Janitor pickup - ignore red flowers
-				{
-					ch[cn].misc_action  = DR_PICKUP;
-					ch[cn].misc_target1 = x;
+					in2 = god_create_item(18);
+					it[in2].carried = cn;
+					ch[cn].citem = in2;
+					ch[cn].misc_action  = DR_DROP;
+					ch[cn].misc_target1 = x + 1;
 					ch[cn].misc_target2 = y;
-					ch[cn].goto_x = 0;
+					STOP_GOTO(cn);
 					ch[cn].data[58] = 1;
 					return 1;
-				}
-				if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && indoor1==indoor2 && (it[in].driver==7) &&
-				    can_go(ch[cn].x, ch[cn].y, it[in].x, it[in].y) &&
-				    do_char_can_see_item(cn, in) && ch[cn].temp != 1454 && ch[cn].temp != 1455)
-				{
-					if (plr_check_target(x + y * MAPX + 1) && !map[x + y * MAPX + 1].it)
-					{
-						in2 = god_create_item(18);
-						it[in2].carried = cn;
-						ch[cn].citem = in2;
-
-						ch[cn].misc_action  = DR_DROP;
-						ch[cn].misc_target1 = x + 1;
-						ch[cn].misc_target2 = y;
-						ch[cn].goto_x = 0;
-						ch[cn].data[58] = 1;
-						return 1;
-					}
 				}
 			}
 		}
 	}
-
+	
 	return 0;
 }
 
@@ -8292,14 +8187,14 @@ int shiva_activate_candle(int cn, int in, int candlenum)
 	{
 		do_add_light(it[in].x, it[in].y, it[in].light[I_I] - it[in].light[I_A]);
 	}
-
-	fx_add_effect(6, 0, it[in].x, it[in].y, 0);
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-
+	
+	ADD_FX_GMAGIC(it[in].x, it[in].y);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
+	
 	do_sayx(cn, "Shirak ishagur gorweran dulak!");
-
+	
 	ch[cn].a_mana -= MP_PERC(cn,33); // subtract 33% of mana
-
+	
 	// Alert players about new candle
 	for (n = 1; n<MAXCHARS; n++)
 	{
@@ -8987,7 +8882,7 @@ void npc_driver_low(int cn)
 		
 		npc_activate_rings(cn, 0);
 		npc_wedge_doors(cn, 0);
-		ch[cn].attack_cn = 0;
+		STOP_ATTACK(cn);
 		
 		m = ch[cn].data[29];
 		x = m % MAPX + get_frust_x_off(ch[cn].data[36]);
@@ -9018,11 +8913,11 @@ void npc_driver_low(int cn)
 						}
 					}
 					ch[cn].status = 0;
-					ch[cn].attack_cn = 0;
-					ch[cn].skill_nr  = 0;
-					ch[cn].goto_x = 0;
+					STOP_ATTACK(cn);
+					STOP_SPELL(cn);
+					STOP_GOTO(cn);
 					ch[cn].use_nr = 0;
-					ch[cn].misc_action = 0;
+					STOP_ACTION(cn);
 					ch[cn].dir = DX_DOWN;
 					
 					chlog(cn, "Couldn't get home, forced Recall");

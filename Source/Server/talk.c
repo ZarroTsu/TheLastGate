@@ -1617,8 +1617,8 @@ void answer_transfer(int cn, int co, int msg)
 		}
 		if (msg) do_sayx(cn, "I'd prefer to die in battle, %s. But I shall obey my master.", ch[co].name);
 		do_give_exp(co, ch[cn].data[28], 1, -1, 0);
-		fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[co].x, ch[co].y);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		die_companion(cn);
 		ch[co].luck--;
 		
@@ -1640,21 +1640,21 @@ void answer_transfer(int cn, int co, int msg)
 void answer_follow(int cn, int co)
 {
 	int n;
-
+	
 	if (obey(cn, co)==1)
 	{
 		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
-
-		ch[cn].attack_cn = 0;
-		ch[cn].goto_x = ch[cn].goto_y = 0;
-		ch[cn].misc_action = 0;
-
+		
+		STOP_ATTACK(cn);
+		STOP_GOTO(cn);
+		STOP_ACTION(cn);
+		
 		ch[cn].data[69] = co;
 		ch[cn].data[29] = 0;
-
+		
 		if (!IS_THRALL(cn)) do_sayx(cn, "Yes, %s!", ch[co].name);
 	}
 }
@@ -1662,23 +1662,23 @@ void answer_follow(int cn, int co)
 void answer_wait(int cn, int co)
 {
 	int n;
-
+	
 	if (obey(cn, co)==1)
 	{
 		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
-
-		ch[cn].attack_cn = 0;
-		ch[cn].goto_x = ch[cn].goto_y = 0;
-		ch[cn].misc_action = 0;
-
+		
+		STOP_ATTACK(cn);
+		STOP_GOTO(cn);
+		STOP_ACTION(cn);
+		
 		ch[cn].data[29] = ch[cn].x + ch[cn].y * MAPX;
 		ch[cn].data[30] = ch[cn].dir;
-
+		
 		ch[cn].data[69] = 0;
-
+		
 		do_sayx(cn, "Yes, %s!", ch[co].name);
 	}
 }
@@ -1706,21 +1706,21 @@ void answer_gccommand(int cn)
 void answer_stop(int cn, int co)
 {
 	int n;
-
+	
 	if (obey(cn, co))
 	{
 		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 		{
 			ch[cn].data[n] = 0;
 		}
-
-		ch[cn].attack_cn = 0;
-		ch[cn].goto_x = ch[cn].goto_y = 0;
-		ch[cn].misc_action = 0;
-
+		
+		STOP_ATTACK(cn);
+		STOP_GOTO(cn);
+		STOP_ACTION(cn);
+		
 		ch[cn].data[78] = 0;
 		ch[cn].data[27] = globs->ticker;
-
+		
 		if (!IS_THRALL(cn)) do_sayx(cn, "Yes master %s!", ch[co].name);
 	}
 }
@@ -1729,8 +1729,8 @@ void answer_move(int cn, int co, int dir)
 {
 	if (obey(cn, co))
 	{
-		ch[cn].attack_cn = 0;
-		ch[cn].misc_action = 0;
+		STOP_ATTACK(cn);
+		STOP_ACTION(cn);
 		
 		if (dir)
 		{
@@ -1859,7 +1859,7 @@ int answer_attack(int cn, int co, char *text)
 			idx = bestn | (char_id(bestn) << 16);
 			ch[cn].data[MCD_ENEMY1ST] = idx;
 			do_sayx(cn, "Yes %s, I will kill %s!", ch[co].name, ch[bestn].reference);
-			ch[cn].goto_x = ch[cn].goto_y = 0;
+			STOP_GOTO(cn);
 			do_notify_char(bestn, NT_GOTMISS, co, 0, 0, 0);
 			return 1;
 		}
@@ -2029,7 +2029,7 @@ void answer_tarot(int cn, int co, int m)
 		{
 			ch[co].worn[m] = 0;
 			do_char_log(co, 1, "%s returned the %s to your inventory.\n", ch[cn].reference, it[in].name);
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			if (n = ch[co].data[PCD_COMPANION])  answer_transfer(n, co, 0);
 			if (n = ch[co].data[PCD_SHADOWCOPY]) answer_transfer(n, co, 0);
 			remove_all_spells(co, 0);
@@ -2417,10 +2417,10 @@ void answer_colosseum(int cn, int co, int nr)
 					case  4: x = COLOSSEUM4_X; y = COLOSSEUM4_Y; break;
 					default: x = COLOSSEUM5_X; y = COLOSSEUM5_Y; break;
 				}
-				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+				ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 				god_transfer_char(co, x, y);
 				char_play_sound(co, ch[co].sound + 22, -150, 0);
-				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+				ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			}
 			else
 			{
@@ -3289,9 +3289,9 @@ void npc_hear(int cn, int co, char *text)
 		for (n = MCD_ENEMY1ST; n<=MCD_ENEMYZZZ; n++)
 			ch[cn].data[n] = 0;
 		
-		ch[cn].attack_cn = 0;
-		ch[cn].goto_x = ch[cn].goto_y = 0;
-		ch[cn].misc_action = 0;
+		STOP_ATTACK(cn);
+		STOP_GOTO(cn);
+		STOP_ACTION(cn);
 		
 		ch[cn].data[78] = 0;
 		ch[cn].data[27] = globs->ticker;

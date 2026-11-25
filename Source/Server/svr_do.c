@@ -3239,10 +3239,10 @@ void do_gohome(int cn)
 	}
 	if (IS_IN_TEMPLE(ch[cn].x, ch[cn].y))
 	{
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, M2X(ch[cn].house_m), M2Y(ch[cn].house_m));
 		char_play_sound(cn, ch[cn].sound + 21, -100, 0);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		do_char_log(cn, 9, "Welcome home. While here, the following commands are available:\n");
 		//                 "!        .         .   |     .         .        !"
 		do_char_log(cn, 1, "#spawn                 set recall point.\n");
@@ -3297,7 +3297,7 @@ void do_setspawn(int cn)
 	if (success)
 	{
 		do_char_log(cn, 9, "Spawn point set. You will now appear here when you recall.\n");
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	}
 	else
 		do_char_log(cn, 0, "You can set your spawn from inside your house or temple.\n");
@@ -4482,7 +4482,7 @@ void do_force_recall(int cn)
 	bu[in].data[4]   = 1;
 	bu[in].duration  = bu[in].active = TICKS * 5;
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	add_spell(cn, in);
 }
@@ -4844,7 +4844,7 @@ void do_follow(int cn, char *name)
 	{
 		do_char_log(cn, 1, "Now following no one.\n");
 		ch[cn].data[10] = 0;
-		ch[cn].goto_x = 0;
+		STOP_GOTO(cn);
 		return;
 	}
 	/* CS, 991127: No #FOLLOW of invisible Imps */
@@ -5574,12 +5574,12 @@ void do_become_purple(int cn)
 				ch[cn].temple_x = HOME_PURPLE_X;
 				ch[cn].temple_y = HOME_PURPLE_Y;
 			}
-
+			
 			do_update_char(cn);
-
+			
 			chlog(cn, "Converted to purple.");
-
-			fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
+			
+			ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
 		}
 		else
 		{
@@ -5804,7 +5804,7 @@ void do_become_gornkwai(int cn, int flag) // 0: become gorn // 1: become kwai
 		ch[cn].temple_y = HOME_KWAI_Y;
 		
 		chlog(cn, "Converted to Kwai.");
-		fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
 	}
 	else if (flag)
 	{
@@ -5826,7 +5826,7 @@ void do_become_gornkwai(int cn, int flag) // 0: become gorn // 1: become kwai
 		ch[cn].temple_y = HOME_GORN_Y;
 		
 		chlog(cn, "Converted to Gorn.");
-		fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
 	}
 	else
 	{
@@ -5893,7 +5893,7 @@ void do_become_skua(int co, int cn)
 				ch[cn].temple_y = HOME_TEMPLE_Y;
 			}
 			chlog(cn, "Converted to skua.");
-			fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
 		}
 		else
 		{
@@ -8255,11 +8255,11 @@ void do_char_killed(int cn, int co, int pentsolve)
 	}
 	
 	// Item thralls pass held exp to master
-	if (IS_ITEMTHRALL(co) && IS_SANEPLAYER(ch[co].data[CHD_MASTER]))
+	if (IS_ITEMTHRALL(co) && IS_SANEPLAYER(cc = ch[co].data[CHD_MASTER]))
 	{
-		do_give_exp(ch[co].data[CHD_MASTER], ch[co].data[28], 1, -1, 0);
-		fx_add_effect(6, 0, ch[ch[co].data[CHD_MASTER]].x, ch[ch[co].data[CHD_MASTER]].y, 0);
-		fx_add_effect(7, 0, ch[co].x, ch[co].y, 0);
+		do_give_exp(cc, ch[co].data[28], 1, -1, 0);
+		ADD_FX_GMAGIC(ch[cc].x, ch[cc].y);
+		ADD_FX_CMAGIC(ch[co].x, ch[co].y);
 	}
 	
 	// Un-wedge doors
@@ -8357,10 +8357,10 @@ void do_char_killed(int cn, int co, int pentsolve)
 			else if (ch[cc].flags & CF_STAFF) { x = HOME_STAFF_X; y = HOME_STAFF_Y; }
 			else { x = HOME_TEMPLE_X; y = HOME_TEMPLE_Y; }
 			
-			fx_add_effect(6, 0, ch[cc].x, ch[cc].y, 0);
+			ADD_FX_GMAGIC(ch[cc].x, ch[cc].y);
 			god_transfer_char(cc, x, y);
 			char_play_sound(cc, ch[cc].sound + 22, -150, 0);
-			fx_add_effect(6, 0, ch[cc].x, ch[cc].y, 0);
+			ADD_FX_GMAGIC(ch[cc].x, ch[cc].y);
 
 			ch[cc].temple_x = ch[cc].tavern_x = ch[cc].x;
 			ch[cc].temple_y = ch[cc].tavern_y = ch[cc].y;
@@ -8415,7 +8415,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 				ch[cn].data[65] = globs->ticker;
 				do_char_log(cn, 0, "So, you want to be a player killer, right?\n");
 				do_char_log(cn, 0, "To join the purple one and be a killer, type #purple now.\n");
-				fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 			}
 		}
 
@@ -8838,7 +8838,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 			bu[in].used = USE_EMPTY;  // destroy spells all the time
 		}
 		clear_map_buffs(co, 1);
-
+		
 		// move evidence (body) away
 		if (ch[co].x==ch[co].temple_x && ch[co].y==ch[co].temple_y)
 		{
@@ -8848,15 +8848,15 @@ void do_char_killed(int cn, int co, int pentsolve)
 		{
 			god_transfer_char(co, ch[co].temple_x, ch[co].temple_y);
 		}
-
+		
 		ch[co].a_hp = HP_PERC(co,50);              // come alive!
 		ch[co].status = 0;
-
-		ch[co].attack_cn = 0;
-		ch[co].skill_nr  = 0;
-		ch[co].goto_x = 0;
+		
+		STOP_ATTACK(co);
+		STOP_SPELL(co);
+		STOP_GOTO(co);
 		ch[co].use_nr = 0;
-		ch[co].misc_action = 0;
+		STOP_ACTION(co);
 		ch[co].stunned = 0;
 		ch[co].taunted = 0;
 		ch[co].retry = 0;
@@ -8928,9 +8928,9 @@ void do_char_killed(int cn, int co, int pentsolve)
 					"You would have lost experience points, but you're already at the minimum.\n");
 			}
 		}
-
+		
 		do_update_char(co);
-
+		
 		plr_reset_status(cc);
 		chlog(cc, "new player body");
 		ch[cc].player = 0;
@@ -8939,12 +8939,12 @@ void do_char_killed(int cn, int co, int pentsolve)
 		ch[cc].data[CHD_CORPSEOWNER] = co;
 		ch[cc].data[99] = 1;
 		ch[cc].data[98] = 0;
-
-		ch[cc].attack_cn = 0;
-		ch[cc].skill_nr  = 0;
-		ch[cc].goto_x = 0;
+		
+		STOP_ATTACK(cc);
+		STOP_SPELL(cc);
+		STOP_GOTO(cc);
 		ch[cc].use_nr = 0;
-		ch[cc].misc_action = 0;
+		STOP_ACTION(cc);
 		ch[cc].stunned = 0;
 		ch[cc].taunted = 0;
 		ch[cc].retry = 0;
@@ -9025,12 +9025,12 @@ void do_char_killed(int cn, int co, int pentsolve)
 #endif
 		ch[co].data[99] = 0;
 		ch[co].data[98] = 0;
-
+		
 		ch[co].attack_cn = 0;
-		ch[co].skill_nr  = 0;
-		ch[co].goto_x = 0;
+		STOP_SPELL(co);
+		STOP_GOTO(co);
 		ch[co].use_nr = 0;
-		ch[co].misc_action = 0;
+		STOP_ACTION(co);
 		ch[co].stunned = 0;
 		ch[co].taunted = 0;
 		ch[co].retry = 0;
@@ -9445,9 +9445,9 @@ void do_lucksave(int cn, char *deathtype)
 	clear_map_buffs(cn, 1);
 	ch[cn].data[11] = 0;
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, ch[cn].temple_x, ch[cn].temple_y);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	for (n = 0; n<4; n++) ch[cn].enemy[n] = 0;
 	remove_enemy(cn);
@@ -10148,7 +10148,7 @@ int do_crit(int cn, int co, int dam, int msg)
 		if (do_get_iflag(cn, SF_CRITBLAST))
 		{
 			spell_blast(cn, co, spell_multiplier(M_SK(cn, SK_BLAST), cn), 0, 1);
-			fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		}
 		if ((in = get_my_aria(cn, cn)))
 		{
@@ -10176,14 +10176,14 @@ void do_attack(int cn, int co, int surround)
 	if (!may_attack_msg(cn, co, 1))
 	{
 		chlog(cn, "Prevented from attacking %s (%d)", ch[co].name, co);
-		ch[cn].attack_cn = 0;
+		STOP_ATTACK(cn);
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
 	
 	if (ch[co].flags & CF_STONED)
 	{
-		ch[cn].attack_cn = 0;
+		STOP_ATTACK(cn);
 		ch[cn].cerrno = ERR_FAILED;
 		return;
 	}
@@ -11507,7 +11507,7 @@ void really_update_char(int cn)
 			
 			if (bu[m].active >= bu[m].duration-1) // Fresh taunt
 			{
-				ch[cn].goto_x = 0;
+				STOP_GOTO(cn);
 				if (WILL_FIGHTBACK(cn))
 				{
 					ch[cn].attack_cn = co;
@@ -13521,7 +13521,7 @@ void do_pulse_tick(int cn, int in)
 					
 					char_play_sound(co, ch[cn].sound + 20, -150, 0);
 					do_area_sound(co, 0, ch[co].x, ch[co].y, ch[cn].sound + 20);
-					fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+					ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 				}
 			}
 			else if (bu[in].temp==SK_PULSE2 && IS_MY_ALLY(cn, co))
@@ -13530,7 +13530,7 @@ void do_pulse_tick(int cn, int in)
 				
 				spell_charge(cn, co, bu[in].power);
 				
-				fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+				ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			}
 		}
 	}
@@ -14513,7 +14513,7 @@ void do_regenerate(int cn)
 				{
 					char_play_sound(cn, ch[co].sound + 20, -150, 0);
 					do_area_sound(cn, 0, ch[cn].x, ch[cn].y, ch[co].sound + 20);
-					fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
+					ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
 				}
 			}
 			
@@ -14561,10 +14561,10 @@ void do_regenerate(int cn)
 					}
 					ch[cn].status = 0;
 					ch[cn].attack_cn = 0;
-					ch[cn].skill_nr  = 0;
-					ch[cn].goto_x = 0;
+					STOP_SPELL(cn);
+					STOP_GOTO(cn);
 					ch[cn].use_nr = 0;
-					ch[cn].misc_action = 0;
+					STOP_ACTION(cn);
 					ch[cn].dir = DX_DOWN;
 					clear_map_buffs(cn, 0);
 					remove_buff(cn, SK_OPPRESSED);
@@ -16716,10 +16716,10 @@ void do_waypoint(int cn, int nr)
 			}
 		}
 		
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, waypoint[nr%32].x, waypoint[nr%32].y);
 		char_play_sound(cn, ch[cn].sound + 21, -100, 0);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	}
 }
 

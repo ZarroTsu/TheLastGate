@@ -364,7 +364,7 @@ void ccp_driver(int cn)
 	if ((co = mem->fighting))
 	{
 		ch[cn].attack_cn = co;
-		ch[cn].goto_x = ch[cn].goto_y = 0;
+		STOP_GOTO(cn);
 		if (ch[cn].a_mana>1000 * 30) // always keep 15 mana for recall
 		{
 			if (mem->enemy_strength>1)

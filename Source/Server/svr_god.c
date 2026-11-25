@@ -276,11 +276,11 @@ int god_create_char(int temp, int withitems)
 		ch[n].data[m] = 0;
 	}
 	
-	ch[n].attack_cn = 0;
-	ch[n].skill_nr  = 0;
-	ch[n].goto_x = 0;
+	STOP_ATTACK(n);
+	STOP_SPELL(n);
+	STOP_GOTO(n);
 	ch[n].use_nr = 0;
-	ch[n].misc_action = 0;
+	STOP_ACTION(n);
 	ch[n].stunned = 0;
 	ch[n].taunted = 0;
 	ch[n].retry = 0;
@@ -786,10 +786,10 @@ int god_transfer_char(int cn, int x, int y)
 	sc = ch[cn].data[PCD_SHADOWCOPY];
 	
 	ch[cn].status = 0;
-	ch[cn].attack_cn = 0;
-	ch[cn].skill_nr  = 0;
-	ch[cn].goto_x = 0;
-
+	STOP_ATTACK(cn);
+	STOP_SPELL(cn);
+	STOP_GOTO(cn);
+	
 	plr_map_remove(cn);
 	
 	if (god_drop_char_fuzzy_large(cn, x, y, x, y)) 		ret = 1;
@@ -4256,10 +4256,10 @@ void god_racechange(int co, int temp, int keepstuff)
 			ch[co].temple_x = ch[co].tavern_x = HOME_START_X;
 			ch[co].temple_y = ch[co].tavern_y = HOME_START_Y;
 		
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			god_transfer_char(co, HOME_START_X, HOME_START_Y);
 			char_play_sound(co, ch[co].sound + 22, -150, 0);
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 		}
 	}
 	else

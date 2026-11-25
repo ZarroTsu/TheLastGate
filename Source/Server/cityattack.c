@@ -118,7 +118,7 @@ int npc_cityattack_see(int cn, int co)
 		else if (do_char_can_see(cn, cc, 0) && ch[cn].attack_cn!=cc)
 		{
 			ch[cn].attack_cn = cc;
-			if (!ch[cn].data[78]) ch[cn].goto_x = 0;
+			if (!ch[cn].data[78]) STOP_GOTO(cn);
 			ch[cn].data[78] = globs->ticker + TICKS * 5;
 		}
 		ch[cn].data[58] = 2;
@@ -131,7 +131,7 @@ int npc_cityattack_see(int cn, int co)
 		if (!(cc = ch[cn].attack_cn) || npc_dist(cn, co)<npc_dist(cn, cc))
 		{
 			ch[cn].attack_cn = co;
-			ch[cn].goto_x = 0;
+			STOP_GOTO(cn);
 			idx = co | (char_id(co) << 16); // so GCs can attack
 			ch[cn].data[MCD_ENEMY1ST] = idx;			// so GCs can attack
 		}
@@ -289,8 +289,7 @@ int npc_cityattack_wait(cn)
 	if (globs->flags & GF_NEWBS) 
 	{
 		chlog(cn, "automatically processed wait");
-		ch[cn].goto_x = 0;
-		ch[cn].goto_y = 0;
+		STOP_GOTO(cn);
 		return 1;
 	}
 	
@@ -307,8 +306,7 @@ int npc_cityattack_wait(cn)
 	     (ch[cn].data[26]>=201 && ch[cn].data[26]<=299 && bsm2>=BS_COUNTER) ||
 	     (ch[cn].data[26]>=101 && ch[cn].data[26]<=199 && bsm1>=BS_COUNTER) )
 	{
-		ch[cn].goto_x = 0;
-		ch[cn].goto_y = 0;
+		STOP_GOTO(cn);
 		return 1;
 	}
 	

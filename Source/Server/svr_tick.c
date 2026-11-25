@@ -369,17 +369,17 @@ void plr_cmd_move(int nr)
 {
 	int x, y;
 	int cn;
-
+	
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
-	ch[cn].attack_cn = 0;
+	
+	STOP_ATTACK(cn);
 	ch[cn].goto_x = x;
 	ch[cn].goto_y = y;
-	ch[cn].misc_action = 0;
+	STOP_ACTION(cn);
 	ch[cn].cerrno = 0;
 	ch[cn].data[12] = globs->ticker;
 }
@@ -390,13 +390,12 @@ void plr_cmd_reset(int nr)
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
+	
 	ch[cn].use_nr = 0;
-	ch[cn].skill_nr  = 0;
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
-	ch[cn].goto_y = 0;
-	ch[cn].misc_action = 0;
+	STOP_SPELL(cn);
+	STOP_ATTACK(cn);
+	STOP_GOTO(cn);
+	STOP_ACTION(cn);
 	ch[cn].cerrno = 0;
 	ch[cn].data[12] = globs->ticker;
 }
@@ -405,31 +404,30 @@ void plr_cmd_turn(int nr)
 {
 	int x, y;
 	int cn;
-
+	
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
+	
 	if (IS_BUILDING(cn))
 	{
 		do_char_log(cn, 3, "x=%d, y=%d, m=%d,light=%d, indoors=%lld, dlight=%d.\n",
 		            x, y, x + y * MAPX, map[x + y * MAPX].light, map[x + y * MAPX].flags & MF_INDOORS, map[x + y * MAPX].dlight);
-
+		
 		do_char_log(cn, 3, "ch=%d, to_ch=%d, it=%d.\n",
 		            map[x + y * MAPX].ch, map[x + y * MAPX].to_ch, map[x + y * MAPX].it);
 		do_char_log(cn, 3, "flags=%04X %04X\n",
 		            (unsigned int) (map[x + y * MAPX].flags >> 32),
 		            (unsigned int) (map[x + y * MAPX].flags & 0xFFFF));
-
+		
 		do_char_log(cn, 3, "sprite=%d, fsprite=%d\n",
 		            map[x + y * MAPX].sprite, map[x + y * MAPX].fsprite);
 	}
-
-
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
+	
+	STOP_ATTACK(cn);
+	STOP_GOTO(cn);
 	ch[cn].misc_action  = DR_TURN;
 	ch[cn].misc_target1 = x;
 	ch[cn].misc_target2 = y;
@@ -828,18 +826,18 @@ void plr_cmd_drop(int nr)
 {
 	int x, y, xs, ys, xe, ye;
 	int cn;
-
+	
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
+	
 	if (IS_BUILDING(cn))
 	{
 		if (ch[cn].misc_action==DR_AREABUILD2)
 		{
-
+			
 			do_char_log(cn, 3, "Areaend: %d,%d\n", x, y);
 			xs = x;
 			ys = y;
@@ -859,7 +857,7 @@ void plr_cmd_drop(int nr)
 			}
 			do_char_log(cn, 3, "Area: %d,%d - %d,%d\n",
 			            xs, ys, xe, ye);
-
+			
 			for (x = xs; x<=xe; x++)
 			{
 				for (y = ys; y<=ye; y++)
@@ -867,7 +865,7 @@ void plr_cmd_drop(int nr)
 					build_drop(x, y, ch[cn].citem);
 				}
 			}
-
+			
 			ch[cn].misc_action = DR_AREABUILD1;
 		}
 		else if (ch[cn].misc_action==DR_AREABUILD1)
@@ -883,9 +881,9 @@ void plr_cmd_drop(int nr)
 		}
 		return;
 	}
-
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
+	
+	STOP_ATTACK(cn);
+	STOP_GOTO(cn);
 	ch[cn].misc_action  = DR_DROP;
 	ch[cn].misc_target1 = x;
 	ch[cn].misc_target2 = y;
@@ -896,9 +894,9 @@ void plr_cmd_drop(int nr)
 void plr_cmd_give(int nr)
 {
 	int cn, co;
-
+	
 	co = *(unsigned int*)(player[nr].inbuf + 1);
-
+	
 	if (co<0 || co>=MAXCHARS)
 	{
 		return;
@@ -906,9 +904,9 @@ void plr_cmd_give(int nr)
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
+	
+	STOP_ATTACK(cn);
+	STOP_GOTO(cn);
 	ch[cn].misc_action  = DR_GIVE;
 	ch[cn].misc_target1 = co;
 	ch[cn].cerrno = 0;
@@ -919,21 +917,21 @@ void plr_cmd_pickup(int nr)
 {
 	int x, y;
 	int cn;
-
+	
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
+	
 	if (IS_BUILDING(cn))
 	{
 		build_remove(x, y);
 		return;
 	}
-
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
+	
+	STOP_ATTACK(cn);
+	STOP_GOTO(cn);
 	ch[cn].misc_action  = DR_PICKUP;
 	ch[cn].misc_target1 = x;
 	ch[cn].misc_target2 = y;
@@ -948,12 +946,12 @@ void plr_cmd_use(int nr)
 	
 	if (player[nr].spectating) return;
 	cn = player[nr].usnr;
-
+	
 	x = *(unsigned short*)(player[nr].inbuf + 1);
 	y = *(unsigned short*)(player[nr].inbuf + 3);
-
-	ch[cn].attack_cn = 0;
-	ch[cn].goto_x = 0;
+	
+	STOP_ATTACK(cn);
+	STOP_GOTO(cn);
 	ch[cn].misc_action  = DR_USE;
 	ch[cn].misc_target1 = x;
 	ch[cn].misc_target2 = y;
@@ -975,8 +973,8 @@ void plr_cmd_attack(int nr)
 	cn = player[nr].usnr;
 	
 	ch[cn].attack_cn = co;
-	ch[cn].goto_x = 0;
-	ch[cn].misc_action = 0;
+	STOP_GOTO(cn);
+	STOP_ACTION(cn);
 	ch[cn].cerrno = 0;
 	ch[cn].data[12] = globs->ticker;
 
@@ -2848,7 +2846,7 @@ void plr_logout(int cn, int nr, int reason)
 			{
 				do_sayx(n, "Goodbye, %s.", ch[cn].name);
 				do_give_exp(cn, ch[n].data[28], 1, -1, 0);
-				fx_add_effect(7, 0, ch[n].x, ch[n].y, 0);
+				ADD_FX_CMAGIC(ch[n].x, ch[n].y);
 				die_companion(n);
 			}
 		}
@@ -2863,11 +2861,11 @@ void plr_logout(int cn, int nr, int reason)
 		
 		for (n = 0; n<4; n++) ch[cn].enemy[n] = 0;
 		
-		ch[cn].attack_cn    = 0;
-		ch[cn].skill_nr     = 0;
-		ch[cn].goto_x       = 0;
+		STOP_ATTACK(cn);
+		STOP_SPELL(cn);
+		STOP_GOTO(cn);
 		ch[cn].use_nr       = 0;
-		ch[cn].misc_action  = 0;
+		STOP_ACTION(cn);
 		ch[cn].stunned      = 0;
 		ch[cn].taunted      = 0;
 		ch[cn].retry        = 0;

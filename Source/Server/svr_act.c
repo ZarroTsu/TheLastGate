@@ -253,9 +253,8 @@ void step_dw(int cn)
 			add_lights(ch[cn].x, ch[cn].y);
 			
 			char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-			ch[cn].goto_x = 0;
-			ch[cn].goto_y = 0;
-			ch[cn].misc_action = 0;
+			STOP_GOTO(cn);
+			STOP_ACTION(cn);
 		}
 	}
 	check_build_dw(cn);
@@ -266,9 +265,9 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 	int m, n, in, ret, x, y;
 	int to_x, to_y;
 	int x_offset=0, y_offset=0;
-
+	
 	m = ch[cn].x + ch[cn].y * MAPX;
-
+	
 	if (!(ch[cn].flags & CF_BODY))
 	{
 		if (IS_SANEITEM(in = map[m].it) && (it[in].flags & IF_STEPACTION))
@@ -288,20 +287,19 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 				
 				x = ch[cn].x + to_x;
 				y = ch[cn].y + to_y;
-
+				
 				if (!map[x + y * MAPX].ch)
 				{
 					ch[cn].x = x;
 					ch[cn].y = y;
-
+					
 					map[ch[cn].x + ch[cn].y * MAPX].ch = cn;
-
+					
 					ch[cn].use_nr = 0;
-					ch[cn].skill_nr  = 0;
-					ch[cn].attack_cn = 0;
-					ch[cn].goto_x = 0;
-					ch[cn].goto_y = 0;
-					ch[cn].misc_action = 0;
+					STOP_SPELL(cn);
+					STOP_ATTACK(cn);
+					STOP_GOTO(cn);
+					STOP_ACTION(cn);
 					
 					if (ch[cn].light)
 					{
@@ -342,13 +340,12 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 				}
 				
 				map[ch[cn].x + ch[cn].y * MAPX].ch = cn;
-
+				
 				ch[cn].use_nr = 0;
-				ch[cn].skill_nr  = 0;
-				ch[cn].attack_cn = 0;
-				ch[cn].goto_x = 0;
-				ch[cn].goto_y = 0;
-				ch[cn].misc_action = 0;
+				STOP_SPELL(cn);
+				STOP_ATTACK(cn);
+				STOP_GOTO(cn);
+				STOP_ACTION(cn);
 				
 				if (ch[cn].light)
 				{
@@ -390,7 +387,7 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			plr_logout(cn, ch[cn].player, LO_TAVERN);
 			return;
 		}
-
+		
 		if (((map[m].flags & MF_NOMAGIC) && !do_get_iflag(cn, SF_AM_SUN)) || do_get_iflag(cn, SF_AM_MOON) ||
 			(IS_MONSTER(cn) && IS_IN_XIX(ch[cn].x, ch[cn].y)))
 		{
@@ -411,10 +408,10 @@ void plr_map_set(int cn)        // set character to map and remove target charac
 			}
 		}
 	}
-
+	
 	map[m].ch = cn;
 	map[m].to_ch = 0;
-
+	
 	if (!(ch[cn].flags & CF_BODY))
 	{
 		if (ch[cn].light)

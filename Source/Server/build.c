@@ -8034,10 +8034,10 @@ int build_new_map(int cn, int cc, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], 
 					ch[co].data[41] = (maploc<<24) + (mission<<16) + (goal<<8);
 					ch[co].data[43] = inc;
 					build_clearbox(co, xx-2, yy-2, MAP_CELL_SIZE*MAP_TILE_SIZE+4, MAP_CELL_SIZE*MAP_TILE_SIZE+4);
-					fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+					ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 					god_transfer_char(co, start_x, start_y);
 					char_play_sound(co, ch[co].sound + 22, -150, 0);
-					fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+					ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 					
 					do_mission_log(co, mission, rank, tier);
 					if (flags) show_map_flags(co, flags, tier);
@@ -8050,10 +8050,10 @@ int build_new_map(int cn, int cc, int rank, int flags[NUM_MAP_POS+NUM_MAP_NEG], 
 		ch[cn].data[41] = (maploc<<24) + (mission<<16) + (goal<<8);
 		ch[co].data[43] = inc;
 		build_clearbox(cn, xx-2, yy-2, MAP_CELL_SIZE*MAP_TILE_SIZE+4, MAP_CELL_SIZE*MAP_TILE_SIZE+4);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, start_x, start_y);
 		char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		
 		do_mission_log(cn, mission, rank, tier);
 		if (flags) show_map_flags(cn, flags, tier);

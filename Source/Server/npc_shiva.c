@@ -56,7 +56,7 @@ int npc_shiva_see(int cn, int co)
 			if (ch[cn].data[n]==idx)
 			{
 				ch[cn].attack_cn = co;
-				ch[cn].goto_x = 0; // cancel goto (patrol)
+				STOP_GOTO(cn);
 				ch[cn].data[58] = 2;
 				return 1;
 			}
@@ -238,7 +238,7 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 		
 		add_spell(co, in);
 		
-		fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	}
 	//
 	
@@ -284,13 +284,13 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 		}
 	}
 	ch[cn].status = 0;
-	ch[cn].attack_cn = 0;
-	ch[cn].skill_nr  = 0;
-	ch[cn].goto_x = 0;
+	STOP_ATTACK(cn);
+	STOP_SPELL(cn);
+	STOP_GOTO(cn);
 	ch[cn].use_nr = 0;
 	
-	ch[ch[cn].data[5]].attack_cn = 0;
-	//ch[cn].misc_action = 0;
+	STOP_ATTACK(ch[cn].data[5]);
+	//STOP_ACTION(cn);
 	//ch[cn].dir = DX_DOWN;
 	
 	ch[cn].misc_action = DR_TURN;
@@ -354,21 +354,21 @@ int npc_shiva_phasing(int cn)
 			case 2: // Phase 2  - Grolms
 				temp  = 665;
 				count = 5;
-				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 				do_sayx(cn, "Khuzak gurawin duskar!");
 				//ch[cn].a_mana -= MP_PERC(cn,30);
 				break;
 			case 4: // Phase 4  - Gargs
 				temp  = 666;
 				count = 3;
-				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 				do_sayx(cn, "Khuzak gurawin duskar giharr!");
 				//ch[cn].a_mana -= MP_PERC(cn,30);
 				break;
 			case 6: // Phase 6  - Uh oh
 				temp  = 667;
 				count = 1;
-				fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 				do_sayx(cn, "AEMON KHUZAK GURAWIN DUSKAR GIHARR!!");
 				ch[cn].a_mana = 0;
 				break;
@@ -390,7 +390,7 @@ int npc_shiva_phasing(int cn)
 				ch[co].used = USE_EMPTY;
 				break;
 			}
-			fx_add_effect(6, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_GMAGIC(ch[co].x, ch[co].y);
 			if (phase!=6) ch[co].attack_cn = ch[cn].data[5];
 		}
 		if (phase==6) 
@@ -464,11 +464,11 @@ int npc_shiva_phasing(int cn)
 			
 			add_spell(co, in);
 			
-			fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+			ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 		}
 		remove_spells(cn);
-		fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
-		ch[cn].attack_cn = 0;
+		ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
+		STOP_ATTACK(cn);
 		remove_buff(cn, SK_ZEPHYR2);
 		remove_buff(cn, SK_TAUNT);
 		remove_buff(cn, SK_POISON);
@@ -557,7 +557,7 @@ int npc_shiva_phasing(int cn)
 		ch[cx].data[43] = ch[cx].data[CHD_GROUP];
 		//ch[cn].hp[0] = 10000;
 		do_sayx(cn, "Unhand me at once! ...Bah!");
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		ch[cn].data[1] = globs->ticker + TICKS * 1;
 		ch[cn].data[3]++;
 	}
@@ -774,11 +774,11 @@ void npc_shiva_low(int cn)
 						}
 					}
 					ch[cn].status = 0;
-					ch[cn].attack_cn = 0;
-					ch[cn].skill_nr  = 0;
-					ch[cn].goto_x = 0;
+					STOP_ATTACK(cn);
+					STOP_SPELL(cn);
+					STOP_GOTO(cn);
 					ch[cn].use_nr = 0;
-					ch[cn].misc_action = 0;
+					STOP_ACTION(cn);
 					ch[cn].dir = DX_DOWN;
 					
 					chlog(cn, "Couldn't get home, forced Recall");

@@ -186,7 +186,7 @@ void drv_moveto(int cn, int x, int y)
 
 	if (ret)
 	{
-		ch[cn].goto_x = 0;
+		STOP_GOTO(cn);
 	}
 	if (ret==-1)
 	{
@@ -329,15 +329,13 @@ void drv_use(int cn, int nr)
 
 void drv_attack_char(int cn, int co)
 {
-	int ret;
-
-	ret = char_attack_char(cn, co);
-	if (ret==-1)
+	int ret = char_attack_char(cn, co);
+	if (ret == -1)
 	{
-		ch[cn].attack_cn = 0;
+		STOP_ATTACK(cn);
 		ch[cn].last_action = ERR_FAILED;
 	}
-	else if (ret==1)
+	else if (ret == 1)
 	{
 		ch[cn].last_action = ERR_SUCCESS;
 	}
@@ -345,18 +343,16 @@ void drv_attack_char(int cn, int co)
 
 void drv_give_char(int cn, int co)
 {
-	int ret;
-
-	ret = char_give_char(cn, co);
+	int ret = char_give_char(cn, co);
 	if (ret)
 	{
 		ch[cn].misc_action = DR_IDLE;
 	}
-	if (ret==-1)
+	if (ret == -1)
 	{
 		ch[cn].last_action = ERR_FAILED;
 	}
-	else if (ret==1)
+	else if (ret == 1)
 	{
 		ch[cn].last_action = ERR_SUCCESS;
 	}
@@ -442,10 +438,10 @@ void drv_skill(int cn)
 		act_turn_right(cn);
 		return;
 	}
-
-	act_skill(cn);          // HACK!! this should go through driver_etc like moveto!
+	
+	act_skill(cn);  // HACK!! this should go through driver_etc like moveto!
 	ch[cn].skill_target2 = ch[cn].skill_nr;
-	ch[cn].skill_nr = 0;
+	STOP_SPELL(cn);
 	ch[cn].cerrno = ERR_NONE;
 	ch[cn].last_action = ERR_SUCCESS;
 }

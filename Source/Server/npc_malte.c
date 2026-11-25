@@ -37,7 +37,7 @@ int npc_malte_gotattack(int cn, int co)
 		if (!(cc = ch[cn].attack_cn) || npc_dist(cn, co)<npc_dist(cn, cc))
 		{
 			ch[cn].attack_cn = co;
-			ch[cn].goto_x = 0;
+			STOP_GOTO(cn);
 		}
 	}
 
@@ -146,7 +146,7 @@ void npc_malte_low(int cn)
 		do_sayx(cn, "I will recall now. I have had enough of this prison!");
 		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		break;
 	case    7:
 		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");
@@ -196,7 +196,7 @@ void npc_archeologist_low(int cn)
 		do_sayx(cn, "I will recall now. I've had enough of this place!");
 		ch[cn].data[2] = globs->ticker + TICKS * 4;
 		ch[cn].data[1]++;
-		fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 		break;
 	case    4:
 		do_sayx(cn, "Good luck my friend. And thank you for freeing me!");

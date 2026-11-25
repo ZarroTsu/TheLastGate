@@ -1776,10 +1776,10 @@ void finish_laby_teleport(int cn, int nr, int exp)
 	else if (ch[cn].flags & CF_STAFF) { xt = HOME_STAFF_X; yt = HOME_STAFF_Y; }
 	else { xt = HOME_TEMPLE_X; yt = HOME_TEMPLE_Y; }
 
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, xt, yt);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 
 	ch[cn].temple_x = ch[cn].tavern_x = ch[cn].x;
 	ch[cn].temple_y = ch[cn].tavern_y = ch[cn].y;
@@ -1809,10 +1809,10 @@ int is_nolab_item(int in)
 
 void quick_teleport(int cn, int x, int y)
 {
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, x, y);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 }
 
 void quick_mob_respawn(int dr, int v)
@@ -2036,49 +2036,49 @@ int teleport(int cn, int in)
 int teleport2(int cn, int in2)
 {
 	int in;
-
+	
 	if (!cn)
 	{
 		return 1;
 	}
-
+	
 	chlog(cn, "Used teleport scroll to %d,%d (%s)",
 	      it[in2].data[0],
 	      it[in2].data[1],
 	      get_area_m(it[in2].data[0], it[in2].data[1], 0));
-
+	
 	if (it[in2].data[2] && it[in2].data[2] + TICKS * 60 * 4<globs->ticker)
 	{
 		chlog(cn, "Lag Scroll Time Difference: %d ticks (%.2fs)",
 		      globs->ticker - it[in2].data[2],
 		      (globs->ticker - it[in2].data[2]) / (double)TICKS);
-
+		
 		do_char_log(cn, 0, "Sorry, this lag scroll was too old. You need to use it four minutes after lagging out or earlier!\n");
-
+		
 		return 1;
 	}
-
+	
 	in = god_create_buff(SK_RECALL);
 	if (!in)
 	{
 		xlog("god_create_buff failed in teleport2");
 		return 0;
 	}
-
+	
 	strcpy(bu[in].name, "Teleport");
 	bu[in].sprite = BUF_SPR_RECALL;
 	bu[in].duration  = bu[in].active = 180;
 	bu[in].power = it[in2].power;
 	bu[in].data[1] = it[in2].data[0];
 	bu[in].data[2] = it[in2].data[1];
-
+	
 	if (!add_spell(cn, in))
 	{
 		do_char_log(cn, 1, "Magical interference neutralized the %s's effect.\n", bu[in].name);
 		return 0;
 	}
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
+	
 	return 1;
 }
 
@@ -2143,7 +2143,7 @@ int use_labyrinth(int cn, int in)
 		}
 		else
 		{
-			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 			switch(ch[cn].data[20])
 			{
 				case 12: flag = god_transfer_char(cn, LAB_XIV_X,   LAB_XIV_Y); 		break;
@@ -2157,7 +2157,7 @@ int use_labyrinth(int cn, int in)
 				//
 			}
 			char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		}
 	}
 	else
@@ -2168,7 +2168,7 @@ int use_labyrinth(int cn, int in)
 		}
 		else
 		{
-			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 			switch(ch[cn].data[20])
 			{
 				case  0: flag = god_transfer_char(cn, LAB_I_X,    LAB_I_Y); 	break;
@@ -2189,7 +2189,7 @@ int use_labyrinth(int cn, int in)
 				//
 			}
 			char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		}
 	}
 
@@ -2792,11 +2792,11 @@ int use_scroll9(int cn, int in)
 	do_char_log(cn, 1, "Used the scroll of gender swap. It's magic takes hold, and...\n");
 	chlog(cn, "used gender scroll");
 	
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
 	
 	use_consume_item(cn, in, 1);
 	do_update_char(cn);
-
+	
 	return 1;
 }
 
@@ -2850,7 +2850,7 @@ int use_scrollA(int cn, int in)
 		do_char_log(cn, 1, "You have used %d out of %d greater skill scrolls.\n", m+1, mm);
 	}
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	use_consume_item(cn, in, 1);
 	do_update_char(cn);
@@ -2883,7 +2883,7 @@ int use_scroll_B(int cn, int in)
 	do_char_log(cn, 1, "You got %s.\n", itemvowel(in2, 1));
 	chlog(cn, "Got %s from a reward scroll", it[in2].name);
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	use_consume_item(cn, in, 1);
 	do_update_char(cn);
@@ -2907,7 +2907,7 @@ int use_scroll_C(int cn, int in)
 	if (m)	do_char_log(cn, 1, "You used the scroll of cleansing. The corruption leaves your body.\n");
 	else	do_char_log(cn, 1, "You used the scroll of cleansing. You feel refreshed.\n");
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	use_consume_item(cn, in, 1);
 	do_update_char(cn);
@@ -2953,7 +2953,7 @@ int use_scroll_O(int cn, int in)
 		if (ch[cn].os_tree==0) plr_update_tree_terminology(ch[cn].player, SV_TERM_CTREE);
 		do_char_log(cn, 1, "You used the scroll of binding. You gained 1 Contract Skill Point.\n");
 		ch[cn].os_tree++;
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	}
 	
 	use_consume_item(cn, in, 1);
@@ -2972,7 +2972,7 @@ int use_scroll_R(int cn, int in)
 	
 	do_char_log(cn, 1, "You used the reset scroll. Your implicit bonuses were reset.\n");
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	use_consume_item(cn, in, 1);
 	do_update_char(cn);
@@ -3013,7 +3013,7 @@ int use_scroll_S(int cn, int in)
 		do_char_log(cn, 1, "You used the scroll. Your form shifted and changed...\n");
 	}
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	use_consume_item(cn, in, 1);
 	do_update_char(cn);
@@ -3847,10 +3847,10 @@ int use_map_portal(int cn, int in)
 	}
 	//
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, OS_WARP_X, OS_WARP_Y);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	clear_map_buffs(cn, 0);
 	
@@ -4338,7 +4338,7 @@ int use_special_spell(int cn, int in)
 			item_damage_worn(cn, WN_RHAND, 500);
 			do_recovery(cn, 2, power);
 			char_play_sound(cn, ch[cn].sound + 6, -100, 0);
-			fx_add_effect(5, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
 			add_exhaust(cn, TICKS*5);
 			break;
 		case SK_VENOM:
@@ -6852,10 +6852,10 @@ int place_ankh(int cn, int in)
 		
 		do_char_log(cn, 2, "The ankhs danced around the room in a flash and merged together on the table behind you.\n");
 		
-		fx_add_effect(6, 0, 561, 117, 0);
-		fx_add_effect(6, 0, 563, 117, 0);
-		fx_add_effect(6, 0, 565, 117, 0);
-		fx_add_effect(7, 0, 563, 127, 0);
+		ADD_FX_GMAGIC(561, 117);
+		ADD_FX_GMAGIC(563, 117);
+		ADD_FX_GMAGIC(565, 117);
+		ADD_FX_CMAGIC(563, 127);
 		
 		check_challenge(cn, SEAS_ANKH_HARD); // SEASONAL - HARDMODE True Ankh check
 		
@@ -8085,7 +8085,7 @@ int use_shrine(int cn, int in)
 		{
 			ch[cn].a_mana = ch[cn].mana[5] * 1000;
 			do_char_log(cn, 0, "The Goddess of Magic touches your mind.\n");
-			fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		}
 			 if (val >= rank * 64) do_char_log(cn, 1, "The gods are madly in love with your offer.\n");
 		else if (val >= rank * 32) do_char_log(cn, 1, "The gods love your offer very much.\n");
@@ -8125,19 +8125,19 @@ int use_shrine(int cn, int in)
 int use_kill_undead(int cn, int in)
 {
 	int x, y, co;
-
+	
 	if (!cn)
 	{
 		return 0;
 	}
-
+	
 	if (ch[cn].worn[WN_RHAND]!=in)
 	{
 		return 0;
 	}
-
-	fx_add_effect(7, 0, ch[cn].x, ch[cn].y, 0);
-
+	
+	ADD_FX_CMAGIC(ch[cn].x, ch[cn].y);
+	
 	for (y = ch[cn].y - 8; y<ch[cn].y + 8; y++)
 	{
 		if (y<1 || y>=MAPY)
@@ -8155,14 +8155,14 @@ int use_kill_undead(int cn, int in)
 				if (ch[co].flags & CF_UNDEAD)
 				{
 					do_hurt(cn, co, 500, 2);
-					fx_add_effect(5, 0, ch[co].x, ch[co].y, 0);
+					ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 				}
 			}
 		}
 	}
-
+	
 	item_damage_worn(cn, WN_RHAND, 500);
-
+	
 	return 1;
 }
 
@@ -8196,7 +8196,7 @@ int teleport3(int cn, int in)    // out of labyrinth
 			do_char_log(cn, 1, "Your %s vanished.\n", it[in2].reference);
 		}
 	}
-
+	
 	for (n = 0; n<MAXBUFFS; n++)
 	{
 		if ((in2 = ch[cn].spell[n]) && (bu[in2].temp==SK_RECALL))
@@ -8205,11 +8205,11 @@ int teleport3(int cn, int in)    // out of labyrinth
 			bu[in2].used = USE_EMPTY;
 		}
 	}
-
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, it[in].data[0], it[in].data[1]);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	destroy_laby_items(cn);
 	
@@ -8514,10 +8514,10 @@ int use_seyan_portal(int cn, int in)
 	
 	destroy_laby_items(cn);
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, it[in].data[0], it[in].data[1]);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	return 1;
 }
@@ -8874,10 +8874,10 @@ int use_lab8_moneyshrine(int cn, int in)
 
 	ch[cn].citem = 0;
 	
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	god_transfer_char(cn, it[in].data[1], it[in].data[2]);
 	char_play_sound(cn, ch[cn].sound + 22, -150, 0);
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	if (ch[cn].a_mana<MP_SOFTCAP(cn))
 	{
 		ch[cn].a_mana = ch[cn].mana[5] * 1000;
@@ -9104,7 +9104,7 @@ int shrine_of_change(int cn, int in)
 		}
 		god_take_from_char(in2, cn);
 		do_char_log(cn, 1, "You now have the effects of your %s equipped.\n", it[in2].name);
-		fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 		if (in3)
 		{
 			do_char_log(cn, 1, "Your %s was returned to you.\n", it[in3].name);
@@ -10705,7 +10705,7 @@ void expire_explosion(int in)
 	{
 		if (IS_PLAYER_COMP(cn)) 
 			dam = dam/2;
-		fx_add_effect(5, 0, x, y, 0);
+		ADD_FX_EMAGIC(x, y);
 		tmp = do_hurt(0, cn, dam, 1);
 		if (!(ch[cn].flags & CF_SYS_OFF))
 			do_char_log(cn, 1, "An explosion hit you for %d HP.\n", tmp);
@@ -11653,10 +11653,10 @@ int step_teleport_silent(int cn, int in)
 	sc = ch[cn].data[PCD_SHADOWCOPY];
 	
 	ch[cn].status    = 0;
-	ch[cn].attack_cn = 0;
-	ch[cn].skill_nr  = 0;
-	ch[cn].goto_x    = 0;
-
+	STOP_ATTACK(cn);
+	STOP_SPELL(cn);
+	STOP_GOTO(cn);
+	
 	plr_map_remove(cn);
 	
 	if (god_drop_char(cn, x, y) ||
@@ -11699,7 +11699,7 @@ int step_teleport(int cn, int in)
 	int m, x, y, j, m2, m3;
 	int gc, sc;
 	static int loc_off[] = { 0, -MAPX, MAPX, 1, -1 };
-
+	
 	if (cn <= 0)
 	{
 		xlog("step_teleport(): cn = %d", cn);
@@ -11744,24 +11744,23 @@ int step_teleport(int cn, int in)
 		// target occupied: fail silently
 		return -1;
 	}
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	plr_map_remove(cn);
-
+	
 	/* mostly copied from plr_map_set() */
 	ch[cn].status = 0;
-	ch[cn].attack_cn = 0;
-	ch[cn].skill_nr  = 0;
-	ch[cn].goto_x = 0;
-
-
+	STOP_ATTACK(cn);
+	STOP_SPELL(cn);
+	STOP_GOTO(cn);
+	
 	// instead of plr_map_set(cn);
 	map[m3].ch = cn;
 	map[m3].to_ch = 0;
 	ch[cn].x = m3 % MAPX;
 	ch[cn].y = m3 / MAPX;
 	do_area_notify(cn, 0, ch[cn].x, ch[cn].y, NT_SEE, cn, 0, 0, 0);
-
-	fx_add_effect(6, 0, ch[cn].x, ch[cn].y, 0);
+	
+	ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	
 	if (ch[cn].flags & CF_GCTOME)
 	{
