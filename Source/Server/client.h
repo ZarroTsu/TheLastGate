@@ -121,6 +121,7 @@ struct cplayer
 	
 	// blacksmith slots
 	int    sitem[4];
+	int    sitem_s[4];
 	
 	// reservation
 	unsigned char reserve[3];

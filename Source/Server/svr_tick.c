@@ -3702,9 +3702,9 @@ void plr_change(int nr)
 	// Blacksmith slots
 	for (n = 0; n<4; n++)
 	{
-		if (cpl->sitem[n] == (in = ch[cn].blacksmith[n])) continue;
-		if (in)
+		if ((in = ch[cn].blacksmith[n]))
 		{
+			if (cpl->sitem[n] == in && cpl->sitem_s[n] == it[in].stack) continue;
 			spr = it[in].sprite[I_I];
 			if (it[in].flags & IF_SOULSTONE) ss = 1; else ss = 0;
 			if (it[in].flags & IF_ENCHANTED) en = 2; else en = 0;
@@ -3713,6 +3713,7 @@ void plr_change(int nr)
 		}
 		else
 		{
+			if (cpl->sitem[n] == in) continue;
 			spr = ss = en = cr = stack = 0;
 		}
 		buf[0] = SV_LOOK8;
@@ -3736,7 +3737,9 @@ void plr_change(int nr)
 			*(unsigned char *)(buf + 7) = 0;
 			xsend(nr, buf, 8);
 		}
-		cpl->sitem[n] = ch[cn].blacksmith[n];
+		
+		if (cpl->sitem[n] = in)
+			cpl->sitem_s[n] = it[in].stack;
 	}
 
 	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)
