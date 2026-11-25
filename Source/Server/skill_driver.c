@@ -6716,6 +6716,9 @@ int spell_shift(int cn, int power)
 	
 	bu[in].data[4] = 1;  // Effects not removed by NMZ (SK_SHIFT)
 	
+	if (!has_buff(cn, SK_SHIFT)) 
+		remove_all_spells(cn, 1); // Dispel self
+	
 	return add_spell(cn, in); // SK_SHIFT
 }
 void skill_shift(int cn, int force)
@@ -6754,9 +6757,6 @@ void skill_shift(int cn, int force)
 	}
 	
 	ch[cn].class = (sp2 * (1<<16)) + sp1;
-	
-	if (!has_buff(cn, SK_SHIFT)) 
-		remove_all_spells(cn, 1); // Dispel self
 	
 	for (n = 0; n < 6; n++)
 	{
