@@ -4605,6 +4605,7 @@ void remove_all_spells(int cn, int flag) // Card turn-ins & Lycan Shifting
 	{
 		if ((in = ch[cn].spell[n])==0)                    continue;
 		if (bu[in].temp == SK_SHIFT)                      continue;
+		if (bu[in].temp == SK_RAGE)                       continue;
 		if (flag)
 		{
 			if (bu[in].temp == SK_LIGHT)                  continue;
