@@ -6701,7 +6701,7 @@ int spell_shift(int cn, int power)
 	{
 		in = make_new_buff(cn, SK_RAGE, BUF_SPR_RAGE, power, SP_DUR_RAGE, 1);
 		
-		bu[in].spell_mod = 4 + power*2/25;
+		bu[in].spell_mod = 2 + power/25;
 		bu[in].data[4]   = 1;  // Effects not removed by NMZ (SK_RAGE)
 		
 		add_spell(cn, in); // SK_RAGE
