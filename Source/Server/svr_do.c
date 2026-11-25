@@ -12197,7 +12197,7 @@ void really_update_char(int cn)
 	
 	// Multiplicative bonus
 	{
-		if (do_get_iflag(cn, SF_EN_MOREMOVE))          spd_move = more(base_spd + spd_move,  50, 1) - base_spd;
+		if (do_get_iflag(cn, SF_EN_MOREMOVE))          spd_move = more(base_spd + spd_move,  30, 1) - base_spd;
 	}
 	
 	if (do_get_iflag(cn, SF_EN_NOSLOW) && (base_spd + spd_move < 150))  // [Ench] Move speed can't go below 150

@@ -790,7 +790,7 @@ extern char *at_short[];
 #define DESC_EN_60(in)		"Recovery from your Meditate skill is also applied to your Hitpoints.\n"
 #define DESC_EN_61(in)		"You take 50%% less damage from attacks if your chance to avoid being hit is at least 90%%.\n"
 #define DESC_EN_63(in)		"Restore 2 Mana upon being hit by an enemy.\n"
-#define DESC_EN_65(in)		"50%% more total Movement Speed.\n"
+#define DESC_EN_65(in)		"30%% more total Movement Speed.\n"
 #define DESC_EN_66(in)		"Attacks with this weapon cannot miss if your chance to hit is at least 90%%.\n"
 #define DESC_EN_68(in)		"Restore 2 Endurance upon being hit by an enemy.\n"
 #define DESC_EN_70(in)		"Your Movement Speed cannot fall below 3.00 while underwater.\n"
