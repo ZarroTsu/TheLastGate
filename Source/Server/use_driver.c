@@ -6424,6 +6424,86 @@ int use_dw_chest(int cn, int in)
 	return 1;
 }
 
+int use_crystal_ball(int cn, int in)
+{	// Fortune Teller crystal ball for showing an item's improved variant.
+	int in2, in3, co, n;
+	
+	if (!cn) return 0;
+	
+	if (it[in].data[0])	for (n = 1, co = 0; n<MAXCHARS; n++) // Grab the Fortune Teller's ID
+	{
+		if (ch[n].used==USE_EMPTY) continue;
+		if (ch[n].flags & CF_BODY) continue;
+		if (ch[n].temp==it[in].data[0])
+		{
+			co = n;
+			break;
+		}
+	}
+	
+	// We're not holding an item
+	if (!(in2 = ch[cn].citem))
+	{
+		n = 0;
+		
+		if 		(IS_SEYAN_DU(cn)) 	 n = SK_PROX;
+		else if (IS_ARCHTEMPLAR(cn)) n = SK_DISPEL;
+		else if (IS_SKALD(cn)) 		 n = SK_FINESSE;
+		else if (IS_WARRIOR(cn)) 	 n = SK_GEARMAST;
+		else if (IS_SORCERER(cn)) 	 n = SK_MSHIELD;
+		else if (IS_SUMMONER(cn)) 	 n = SK_IMMUN;
+		else if (IS_ARCHHARAKIM(cn)) n = SK_SHIELD;
+		else if (IS_BRAVER(cn)) 	 n = SK_TACTICS;
+		else if (IS_LYCANTH(cn)) 	 n = SK_HASTE;
+		
+		if (n)
+		{
+			if (!B_SK(cn, n))
+			{
+				if (co) do_sayx(co, "Ahh... The crystal shows me a story of a skill called '%s' in your future, %s...", skilltab[n].name, ch[cn].name);
+				if (co) do_sayx(co, "That is what the crystal tells... Ee-he-he...");
+			}
+			else
+			{
+				if (co) do_sayx(co, "I'm sorry %s, but it seems your tale is still being written...", ch[cn].name);
+				if (co) do_sayx(co, "Perhaps you might find an interesting item to show me instead...? Ee-he-he...");
+			}
+		}
+		else
+		{
+			if (co) do_sayx(co, "I'm sorry %s, but it seems the crystal has no future to tell me right now...", ch[cn].name);
+			if (co) do_sayx(co, "Perhaps you could come back later when you're stronger...? Ee-he-he...");
+		}
+		return 1;
+	}
+	
+	// This item cannot be 'improved'
+	if (!(in3 = smith_grade_in(in2)))
+	{
+		if (co) do_sayx(co, "I'm sorry %s, but it seems this item has no future tales to tell...", ch[cn].name);
+		if (co) do_sayx(co, "Perhaps you might find something more interesting later...? Ee-he-he...");
+		return 1;
+	}
+	
+	// Assume the held item can be improved.
+	if (in3 = god_create_item(in3))
+	{
+		if (co) do_sayx(co, "Now %s, I will show you this item's future...", ch[cn].name);
+		
+		spell_identify(cn, co, in3);
+		it[in3].used = USE_EMPTY;
+		
+		if (co) do_sayx(co, "That is what the crystal tells... Ee-he-he...");
+	}
+	else
+	{
+		if (co) do_sayx(co, "The crystal seems quite cloudy at the moment...");
+		if (co) do_sayx(co, "Come back and try again later... Ee-he-he...");
+	}
+	
+	return 1;
+}
+
 int use_mine(int cn, int in)
 {
 	int tmp, in2, str = M_AT(cn, AT_STR);
@@ -9721,6 +9801,7 @@ void use_driver(int cn, int in, int carried)
 			case 136: ret = use_dw_chest(cn, in);                break;
 			case 137: ret = use_whetstone(cn, in);               break;
 			case 138: ret = use_scroll_H(cn, in);                break;
+			case 139: ret = use_crystal_ball(cn, in);            break;
 			default:
 				xlog("use_driver (use_driver.c): Unknown use_driver %d for item %d", it[in].driver, in);
 				ret = 0;

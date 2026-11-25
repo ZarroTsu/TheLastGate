@@ -432,7 +432,7 @@ struct area area[] = {
 	{ 713,  772,  723,  783, "Blanche's House",                0},
 	{ 713,  789,  722,  801, "Calliope's House",               0},
 	{ 720,  828,  732,  837, "Ralphy Realty",                  0},
-//	{ 757,  841,  767,  852, "H's House",                   0},
+	{ 757,  841,  767,  851, "Fortune Teller's Abode",         0},
 	{ 769,  807,  781,  816, "Hamako's House",                 0},
 	{ 773,  828,  785,  837, "Blacksmith",                     0},
 	{ 811,  828,  823,  837, "Gilligan's House",               0},
