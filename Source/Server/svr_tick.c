@@ -3316,12 +3316,12 @@ void plr_change(int nr)
 	int spr, ss, en, cr, stack;
 	char areaname[40];
 	int extra = 0;
-
+	
 	cn   = player[nr].usnr;
 	cpl  = &player[nr].cpl;
 	cmap = player[nr].cmap;
 	smap = player[nr].smap;
-
+	
 	if ((ch[cn].flags & CF_UPDATE) || (cn & 15)==(globs->ticker & 15))
 	{
 		// cplayer - stats
@@ -3347,7 +3347,7 @@ void plr_change(int nr)
 			buf[0] = SV_SETCHAR_MODE;
 			buf[1] = ch[cn].mode;
 			xsend(nr, buf, 2);
-
+			
 			cpl->mode = ch[cn].mode;
 		}
 		
@@ -3355,7 +3355,7 @@ void plr_change(int nr)
 		{
 			plr_change_stat(nr, cpl->attrib[n], ch[cn].attrib[n], SV_SETCHAR_ATTRIB, n);
 		}
-
+		
 		plr_change_power(nr, cpl->reserve[0], ch[cn].reserve[0], cpl->hp, ch[cn].hp, SV_SETCHAR_HP);
 		plr_change_power(nr, cpl->reserve[1], ch[cn].reserve[1], cpl->end, ch[cn].end, SV_SETCHAR_ENDUR);
 		plr_change_power(nr, cpl->reserve[2], ch[cn].reserve[2], cpl->mana, ch[cn].mana, SV_SETCHAR_MANA);
@@ -3430,7 +3430,7 @@ void plr_change(int nr)
 						if (IS_CORRUPTOR(in)) *(short int*)(buf + 7) = it[in].data[0];
 						*(unsigned char*)(buf + 9)  = (unsigned char)(it[in].stack);
 						*(unsigned char*)(buf + 10) = (unsigned char)((ch[cn].item_lock[n]?0:0)+((it[in].flags&IF_SOULSTONE)?2:0)+((it[in].flags&IF_ENCHANTED)?4:0)+((it[in].flags&IF_CORRUPTED)?8:0));
-
+						
 						it[in].flags &= ~IF_UPDATE;
 					}
 				}
@@ -3442,7 +3442,7 @@ void plr_change(int nr)
 					*(unsigned char*)(buf + 10) = 0;
 				}
 				xsend(nr, buf, 11);
-
+				
 				cpl->item[n] = in;
 				if (!IS_BUILDING(cn))
 				{
@@ -3451,7 +3451,7 @@ void plr_change(int nr)
 				}
 			}
 		}
-
+		
 		for (n = 0; n<13; n++)
 		{
 			if (cpl->worn[n]!=(in = ch[cn].worn[n]) || (it[in].flags & IF_UPDATE))
@@ -3489,12 +3489,12 @@ void plr_change(int nr)
 					*(unsigned char*)(buf + 9) = 0;
 				}
 				xsend(nr, buf, 10);
-
+				
 				cpl->worn[n]  = in;
 				it[in].flags &= ~IF_UPDATE;
 			}
 		}
-
+		
 		for (n = 0; n<MAXBUFFS; n++)
 		{
 			if (cpl->spell[n]!=(in = ch[cn].spell[n]) ||
@@ -3603,43 +3603,43 @@ void plr_change(int nr)
 			mcpy(cpl->location, areaname, 20);
 		}
 	}
-
+	
 	if (cpl->a_hp!=(ch[cn].a_hp + 500) / 1000)
 	{
 		buf[0] = SV_SETCHAR_AHP;
 		*(unsigned short*)(buf + 1) = (unsigned short)((ch[cn].a_hp + 500) / 1000);
 		xsend(nr, buf, 3);
-
+		
 		cpl->a_hp = (ch[cn].a_hp + 500) / 1000;
 	}
-
+	
 	if (cpl->a_end!=(ch[cn].a_end + 500) / 1000)
 	{
 		buf[0] = SV_SETCHAR_AEND;
 		*(unsigned short*)(buf + 1) = (unsigned short)((ch[cn].a_end + 500) / 1000);
 		xsend(nr, buf, 3);
-
+		
 		cpl->a_end = (ch[cn].a_end + 500) / 1000;
 	}
-
+	
 	if (cpl->a_mana!=(ch[cn].a_mana + 500) / 1000)
 	{
 		buf[0] = SV_SETCHAR_AMANA;
 		*(unsigned short*)(buf + 1) = (unsigned short)((ch[cn].a_mana + 500) / 1000);
 		xsend(nr, buf, 3);
-
+		
 		cpl->a_mana = (ch[cn].a_mana + 500) / 1000;
 	}
-
+	
 	if (cpl->dir!=ch[cn].dir)
 	{
 		buf[0] = SV_SETCHAR_DIR;
 		*(unsigned char*)(buf + 1) = ch[cn].dir;
 		xsend(nr, buf, 2);
-
+		
 		cpl->dir = ch[cn].dir;
 	}
-
+	
 	if (cpl->points!=ch[cn].points ||
 	    cpl->points_tot!=ch[cn].points_tot ||
 	    cpl->kindred!=ch[cn].kindred)
@@ -3649,7 +3649,7 @@ void plr_change(int nr)
 		*(unsigned long*)(buf + 5) = (unsigned long)(ch[cn].points_tot);
 		*(unsigned int*)(buf + 9)  = (unsigned int)(ch[cn].kindred);
 		xsend(nr, buf, 13);
-
+		
 		cpl->points = ch[cn].points;
 		cpl->points_tot = ch[cn].points_tot;
 		cpl->kindred = ch[cn].kindred;
@@ -3716,6 +3716,7 @@ void plr_change(int nr)
 			if (cpl->sitem[n] == in) continue;
 			spr = ss = en = cr = stack = 0;
 		}
+		
 		buf[0] = SV_LOOK8;
 		*(unsigned char *)(buf + 1) = n;
 		*(unsigned short*)(buf + 2) = (unsigned short)(ch[cn].smithnum);
@@ -3738,10 +3739,10 @@ void plr_change(int nr)
 			xsend(nr, buf, 8);
 		}
 		
-		if (cpl->sitem[n] = in)
+		if ((cpl->sitem[n] = in))
 			cpl->sitem_s[n] = it[in].stack;
 	}
-
+	
 	if (cpl->gold!=ch[cn].gold || cpl->armor!=ch[cn].armor || cpl->weapon!=ch[cn].weapon)
 	{
 		buf[0] = SV_SETCHAR_GOLD;
@@ -3754,84 +3755,84 @@ void plr_change(int nr)
 		cpl->armor  = ch[cn].armor;
 		cpl->weapon = ch[cn].weapon;
 	}
-
+	
 	if ((ch[cn].flags & CF_GOD) && (globs->ticker & 31)==0)
 	{
 		buf[0] = SV_LOAD;
 		*(unsigned int*)(buf + 1) = globs->load;
 		xsend(nr, buf, 5);
 	}
-
+	
 	// cplayer - map
-
+	
 	if (cpl->x!=ch[cn].x || cpl->y!=ch[cn].y)
 	{
 		if (cpl->x==ch[cn].x - 1 && cpl->y==ch[cn].y)
 		{
 			buf[0] = SV_SCROLL_RIGHT;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap, cmap + 1, sizeof(struct cmap) * (TILEX * TILEY - 1));
 		}
 		else if (cpl->x==ch[cn].x + 1 && cpl->y==ch[cn].y)
 		{
 			buf[0] = SV_SCROLL_LEFT;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap + 1, cmap, sizeof(struct cmap) * (TILEX * TILEY - 1));
 		}
 		else if (cpl->x==ch[cn].x && cpl->y==ch[cn].y - 1)
 		{
 			buf[0] = SV_SCROLL_DOWN;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap, cmap + TILEX, sizeof(struct cmap) * (TILEX * TILEY - TILEX));
 		}
 		else if (cpl->x==ch[cn].x && cpl->y==ch[cn].y + 1)
 		{
 			buf[0] = SV_SCROLL_UP;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap + TILEX, cmap, sizeof(struct cmap) * (TILEX * TILEY - TILEX));
 		}
 		else if (cpl->x==ch[cn].x + 1 && cpl->y==ch[cn].y + 1)
 		{
 			buf[0] = SV_SCROLL_LEFTUP;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap + TILEX + 1, cmap, sizeof(struct cmap) * (TILEX * TILEY - TILEX - 1));
 		}
 		else if (cpl->x==ch[cn].x + 1 && cpl->y==ch[cn].y - 1)
 		{
 			buf[0] = SV_SCROLL_LEFTDOWN;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap, cmap + TILEX - 1, sizeof(struct cmap) * (TILEX * TILEY - TILEX + 1));
 		}
 		else if (cpl->x==ch[cn].x - 1 && cpl->y==ch[cn].y + 1)
 		{
 			buf[0] = SV_SCROLL_RIGHTUP;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap + TILEX - 1, cmap, sizeof(struct cmap) * (TILEX * TILEY - TILEX + 1));
 		}
 		else if (cpl->x==ch[cn].x - 1 && cpl->y==ch[cn].y - 1)
 		{
 			buf[0] = SV_SCROLL_RIGHTDOWN;
 			xsend(nr, buf, 1);
-
+			
 			memmove(cmap, cmap + TILEX + 1, sizeof(struct cmap) * (TILEX * TILEY - TILEX - 1));
 		}
-
+		
 		cpl->x = ch[cn].x;
 		cpl->y = ch[cn].y;
-
+		
 		buf[0] = SV_SETORIGIN;
 		*(short*)(buf + 1) = ch[cn].x - TMIDDLEX; //smap[0].x;
 		*(short*)(buf + 3) = ch[cn].y - TMIDDLEY; //smap[0].y;
 		xsend(nr, buf, 5);
 	}
-
+	
 	// light as special case which sends multiple tiles at once
 	for (n = 0; n<TILEX * TILEY; n++)
 	{
@@ -3840,7 +3841,7 @@ void plr_change(int nr)
 			int bp = 0, l, bl = 0, pe;
 			static int (*lfunc[])(int, int, struct cmap*, struct cmap*) =
 			{cl_light_one, cl_light_three, cl_light_seven, cl_light_26};
-
+			
 			for (l = 0; l<sizeof(lfunc) / sizeof(int*); l++)
 			{
 				pe = lfunc[l](n, 0, cmap, smap);
@@ -3850,29 +3851,26 @@ void plr_change(int nr)
 					bl = l;
 				}
 			}
-
+			
 			lfunc[bl](n, nr, cmap, smap);
 		}
 	}
-
+	
 	// everything else
 	//for (n=0; n<TILEX*TILEY; n++) {
 	//      if (!fdiff(&cmap[n],&smap[n],sizeof(struct cmap))) continue;
-
+	
 	n = 0;
 	while (1)
 	{
 		unsigned char *tmp;
-
-		tmp = fdiff(cmap + n, smap + n, sizeof(struct cmap) * (TILEX * TILEY - n));   // find address of first difference
-		if (!tmp)
-		{
-			break;                                                  // no difference found? then we're done
-
-		}
+		
+		tmp = fdiff(cmap + n, smap + n, sizeof(struct cmap) * (TILEX * TILEY - n));  // find address of first difference
+		if (!tmp) break; // no difference found? then we're done
+		
 		// calculate index of difference found
 		n = (tmp - (unsigned char*)(cmap + n)) / sizeof(struct cmap) + n;
-
+		
 		//for (f=0; (n=player[nr].changed_field[f])!=-1; f++) {
 		if (n>lastn && n - lastn<127)
 		{
@@ -3887,13 +3885,13 @@ void plr_change(int nr)
 			*(unsigned short*)(buf + 2) = (short)n;
 			p = 4;
 		}
-
+		
 		if (cmap[n].ba_sprite!=smap[n].ba_sprite)
 		{
 			buf[1] |= 1;
 			*(unsigned short*)(buf + p) = smap[n].ba_sprite;
 			p += 2;
-
+		
 		}
 		if (cmap[n].flags!=smap[n].flags)
 		{
@@ -3943,7 +3941,7 @@ void plr_change(int nr)
 			*(short int*)(buf + p) = smap[n].ch_speed;
 			p += 2;
 		}
-
+		
 		if (cmap[n].ch_proz!=smap[n].ch_proz || cmap[n].ch_castspd!=smap[n].ch_castspd || 
 			cmap[n].ch_atkspd!=smap[n].ch_atkspd || cmap[n].ch_movespd!=smap[n].ch_movespd)
 		{
@@ -3959,21 +3957,21 @@ void plr_change(int nr)
 			*(unsigned char*)(buf + p) = smap[n].ch_fontcolor;
 			p += 1;
 		}
-
+		
 		if (buf[1])   // we found a change (no change found can happen since it_status & ch_status are not transmitted all the time)
 		{
 			xsend(nr, buf, p);
 			lastn = n;
 		}
 		mcpy(&cmap[n], &smap[n], sizeof(struct cmap));
-
+		
 		n++;                            // done with this field
 		if (n>=TILEX * TILEY)
 		{
 			break;                  // finished?
 		}
 	}
-
+	
 	if (ch[cn].attack_cn!=cpl->attack_cn ||
 	    ch[cn].goto_x!=cpl->goto_x ||
 	    ch[cn].goto_y!=cpl->goto_y ||
