@@ -156,7 +156,7 @@ void npc_shadow_warp(int cn, int co, int cc)
 	if (!IS_LIVINGCHAR(co))                return;
 	if (!IS_SANECHAR(cc))                  return;
 	if (!do_get_iflag(cc, SF_SIGN_SHAD))   return;
-	if (atk == co)                         return;
+	if (ch[cn].attack_cn == co)            return;
 	if (ch[cc].data[PCD_SHADOWCOPY] != cn) return;
 	
 	quick_teleport(cn, ch[co].x, ch[co].y);
