@@ -152,14 +152,17 @@ int npc_dist(int cn, int co)
 
 void npc_shadow_warp(int cn, int co, int cc)
 {
+	int atk = ch[cn].attack_cn;
+	
 	if (!IS_SANECHAR(cn))                  return;
 	if (!IS_LIVINGCHAR(co))                return;
 	if (!IS_SANECHAR(cc))                  return;
 	if (!do_get_iflag(cc, SF_SIGN_SHAD))   return;
-	if (ch[cn].attack_cn == co)            return;
+	if (atk == co)                         return;
 	if (ch[cc].data[PCD_SHADOWCOPY] != cn) return;
 	
 	quick_teleport(cn, ch[co].x, ch[co].y);
+	ch[cn].attack_cn = atk;
 }
 
 void npc_set_attack(int cn, int co)
