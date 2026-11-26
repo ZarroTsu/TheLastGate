@@ -855,8 +855,8 @@ void god_goto(int cn, int co, char *cx, char *cy)
 			chlog(cn, "IMP: transferred %s to %s (%s).", ch[co].name, ch[who].name, get_area_m(ch[who].x, ch[who].y, 0));
 			if (!(ch[co].flags & CF_INVISIBLE))
 			{
-				fx_add_effect(12, 0, xo, yo, 0);
-				fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+				ADD_FX_POOF(xo, yo);
+				ADD_FX_POOF(ch[co].x, ch[co].y);
 			}
 			return;
 		}
@@ -898,8 +898,8 @@ void god_goto(int cn, int co, char *cx, char *cy)
 			chlog(cn, "IMP: transferred %s to %d,%d (%s).", ch[co].name, x, y, get_area_m(x, y, 0));
 			if (!(ch[co].flags & CF_INVISIBLE))
 			{
-				fx_add_effect(12, 0, xo, yo, 0);
-				fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+				ADD_FX_POOF(xo, yo);
+				ADD_FX_POOF(ch[co].x, ch[co].y);
 			}
 			return;
 		}
@@ -1855,10 +1855,10 @@ void god_summon(int cn, char *spec1, char *spec2, char *spec3)
 	if (!god_transfer_char(co, x, y))
 	{
 		do_char_log(cn, 0, "god_transfer_char() failed.\n");
-
-		fx_add_effect(12, 0, xo, yo, 0);
-		fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
-
+		
+		ADD_FX_POOF(xo, yo);
+		ADD_FX_POOF(ch[co].x, ch[co].y);
+		
 		return;
 	}
 	do_char_log(cn, 1, "%s was summoned.\n", ch[co].name);
@@ -3688,7 +3688,7 @@ void god_set_flag(int cn, int co, unsigned long long flag)
 		break;
 	case    CF_INVISIBLE:
 		ptr = "invisible";
-		fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_POOF(ch[co].x, ch[co].y);
 		break;
 	case    CF_INFRARED:
 		ptr = "infrared";

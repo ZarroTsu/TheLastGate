@@ -245,7 +245,7 @@ void step_dw(int cn)
 			else if (can_drop(m - 2 + 2 * MAPX))	m += -2 + 2 * MAPX;
 			else if (can_drop(m - 2 - 2 * MAPX))	m += -2 - 2 * MAPX;
 			
-			fx_add_effect(12, 0, M2X(m), M2Y(m), 0);
+			ADD_FX_POOF(M2X(m), M2Y(m));
 			in2 = build_item(190, M2X(m), M2Y(m));
 			it[in2].light[I_I] = 60;
 			

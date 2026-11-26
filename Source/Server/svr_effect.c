@@ -151,7 +151,7 @@ void effect_tick(void)
 						{
 							reset_go(M2X(m), M2Y(m));
 							remove_lights(M2X(m), M2Y(m));
-							fx_add_effect(12, 0,  M2X(m), M2Y(m), 0);
+							ADD_FX_POOF(M2X(m), M2Y(m));
 							z = build_item(IT_SANGPORT, M2X(m), M2Y(m));
 							it[z].duration = TICKS * 60 * 60;
 							reset_go(M2X(m), M2Y(m));

@@ -279,8 +279,8 @@ void npc_shiva_warp_away(int cn, int m) // Warp Shiva to the furthest point in t
 	{
 		if (!(ch[cn].flags & CF_INVISIBLE))
 		{
-			fx_add_effect(12, 0, xo, yo, 0);
-			fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+			ADD_FX_POOF(xo, yo);
+			ADD_FX_POOF(ch[cn].x, ch[cn].y);
 		}
 	}
 	ch[cn].status = 0;
@@ -572,7 +572,7 @@ int npc_shiva_phasing(int cn)
 		ch[cn].worn[WN_FEET]  = 0;
 		// "kill" Shiva
 		ch[cn].data[3]++;
-		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_POOF(ch[cn].x, ch[cn].y);
 		do_char_killed(0, cn, 0);
 	}
 }
@@ -769,8 +769,8 @@ void npc_shiva_low(int cn)
 					{
 						if (!(ch[cn].flags & CF_INVISIBLE))
 						{
-							fx_add_effect(12, 0, xo, yo, 0);
-							fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+							ADD_FX_POOF(xo, yo);
+							ADD_FX_POOF(ch[cn].x, ch[cn].y);
 						}
 					}
 					ch[cn].status = 0;

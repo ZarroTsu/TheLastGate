@@ -295,9 +295,10 @@ int is_ascroll(int in);
 #define STOP_ACTION(cn)			ch[(cn)].misc_action = 0;
 #define REMOVE_ENEMY(cn, co)	if (npc_is_enemy(cn, co)) npc_remove_enemy(cn, co);
 
-#define ADD_FX_EMAGIC(x, y)		fx_add_effect(5, 0, (x), (y), 0); // evil magic
-#define ADD_FX_GMAGIC(x, y)		fx_add_effect(6, 0, (x), (y), 0); // good magic
-#define ADD_FX_CMAGIC(x, y)		fx_add_effect(7, 0, (x), (y), 0); // caster magic
+#define ADD_FX_EMAGIC(x, y)		fx_add_effect( 5, 0, (x), (y), 0); // evil magic
+#define ADD_FX_GMAGIC(x, y)		fx_add_effect( 6, 0, (x), (y), 0); // good magic
+#define ADD_FX_CMAGIC(x, y)		fx_add_effect( 7, 0, (x), (y), 0); // caster magic
+#define ADD_FX_POOF(x, y)		fx_add_effect(12, 0, (x), (y), 0); // death mist
 
 /* *** SKILLS *** */
 

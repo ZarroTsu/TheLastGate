@@ -1970,7 +1970,7 @@ int teleport(int cn, int in)
 		else
 			ch[cn].data[25] = XY2M(x, y);
 		
-		fx_add_effect(12, 0, x, y, 0);
+		ADD_FX_POOF(x, y);
 		do_area_sound(cn, 0, x, y, 21);
 		reset_go(x, y); remove_lights(x, y);
 		build_remove(x, y);
@@ -6161,7 +6161,7 @@ int shatter_sanguine_crystal(int cn, int in, int x, int y)
 	
 	build_remove(x, y);
 	
-	fx_add_effect(12, 0, x, y, 0);
+	ADD_FX_POOF(x, y);
 	char_play_sound(cn, 21, -150, 0);
 	do_area_sound(0, 0, x, y, 21);
 	
@@ -7221,7 +7221,7 @@ void really_spawn_minion(int cn, int cc)
 					}
 					else // If this thrall somehow lacks this buff, remove them
 					{
-						fx_add_effect(12, 0, ch[n].x, ch[n].y, 0);
+						ADD_FX_POOF(ch[n].x, ch[n].y);
 						plr_map_remove(n);
 						ch[n].used = USE_EMPTY;
 					}
@@ -10536,7 +10536,7 @@ void sanguinespawner(int in, int rank)
 					cn = it[in].data[n];
 					if (cn && ch[cn].data[0]==in && ch[cn].used!=USE_EMPTY && !IS_PLAYER(cn))
 					{
-						fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+						ADD_FX_POOF(ch[cn].x, ch[cn].y);
 						god_destroy_items(cn);
 						ch[cn].used = USE_EMPTY;
 						it[in].data[n] = 0;
@@ -10773,7 +10773,7 @@ void enemyspawner(int in, int type, int flag)
 			{
 				it[in].data[n] = cn;
 				xlog("enemyspawner: spawned %s at %d %d",ch[cn].name,it[in].x,it[in].y);
-				fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_POOF(ch[cn].x, ch[cn].y);
 			}
 			break;
 		}
@@ -10952,7 +10952,7 @@ void item_tick_expire(void)
 				if (it[in].duration<=0 || it[in].duration > TICKS * 60 * 60)
 				{
 					xlog("removing sangport");
-					fx_add_effect(12, 0, it[in].x, it[in].y, 0);
+					ADD_FX_POOF(it[in].x, it[in].y);
 					reset_go(it[in].x, it[in].y); remove_lights(it[in].x, it[in].y);
 					build_remove(it[in].x, it[in].y);
 					reset_go(it[in].x, it[in].y); add_lights(it[in].x, it[in].y);

@@ -6512,9 +6512,9 @@ void skill_leap(int cn, int flag)
 	
 	if (!obstructed)
 	{
-		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_POOF(ch[cn].x, ch[cn].y);
 		god_transfer_char(cn, x, y);
-		fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+		ADD_FX_POOF(ch[cn].x, ch[cn].y);
 		ch[cn].escape_timer = TICKS*3;
 		for (m = 0; m<4; m++) ch[cn].enemy[m] = 0;
 		remove_enemy(cn);

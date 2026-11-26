@@ -4463,8 +4463,8 @@ void do_swap_chars(int cn)
 	god_transfer_char(co, cn_x, cn_y);
 	god_transfer_char(cn, co_x, co_y);
 	
-	fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
-	fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+	ADD_FX_POOF(ch[cn].x, ch[cn].y);
+	ADD_FX_POOF(ch[co].x, ch[co].y);
 	
 	chlog(cn, "DO_SWAP: swapped %s with %s.", ch[cn].name, ch[co].name);
 }
@@ -14535,9 +14535,9 @@ void do_regenerate(int cn)
 					{
 						if (!(ch[cn].flags & CF_INVISIBLE))
 						{
-							fx_add_effect(12, 0, xo, yo, 0);
+							ADD_FX_POOF(xo, yo);
 							char_play_sound(cn, ch[cn].sound + 21, -150, 0);
-							fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+							ADD_FX_POOF(ch[cn].x, ch[cn].y);
 						}
 						/*
 						if (IS_IN_PENTRY(xo, yo)) // Exiting Pandium's entry foyer
@@ -18367,7 +18367,7 @@ int may_attack_msg(int cn, int co, int msg)
 	if (ch[co].temp==CT_NULLAN || ch[co].temp==CT_DVOID)
 	{
 		if (msg) do_char_log(cn, 0, "Oh. Well then.\n");
-		fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+		ADD_FX_POOF(ch[co].x, ch[co].y);
 		reset_char(ch[co].temp);
 		return 0;
 	}

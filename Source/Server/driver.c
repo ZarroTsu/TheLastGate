@@ -6583,7 +6583,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 					ch[co].used = USE_EMPTY; 
 					continue; 
 				}
-				fx_add_effect(12, 0, ch[co].x, ch[co].y, 0);
+				ADD_FX_POOF(ch[co].x, ch[co].y);
 				ch[co].dir = dir;
 				for (m=0;m<PANDI_LIMIT;m++) ch[co].data[m] = ch_in[n];
 				ch[cn].data[7+n] = co;
@@ -7059,12 +7059,12 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 			co = pop_create_char(CT_SHADOW, 0); x = go_xy[6][0]-4; y = go_xy[6][1];
 			if (co) { ch[cn].data[6] = co; ch[co].kindred |= KIN_SHADOW; ch[co].flags |= CF_NOSLEEP; ch[co].a_hp = 525; ch[co].sprite = ch[cn].sprite; }
 			if (!god_drop_char_fuzzy(co, x, y)) { god_destroy_items(co); ch[co].used = USE_EMPTY; }
-			fx_add_effect(12, 0, x, y, 0); ch[co].dir = go_xy[6][2];
+			ADD_FX_POOF(x, y); ch[co].dir = go_xy[6][2];
 			//
 			co = pop_create_char(CT_SHADOW, 0); x = go_xy[6][0]+4; y = go_xy[6][1];
 			if (co) { ch[cn].data[7] = co; ch[co].kindred |= KIN_SHADOW; ch[co].flags |= CF_NOSLEEP; ch[co].a_hp = 525; ch[co].sprite = ch[cn].sprite; }
 			if (!god_drop_char_fuzzy(co, x, y)) { god_destroy_items(co); ch[co].used = USE_EMPTY; }
-			fx_add_effect(12, 0, x, y, 0); ch[co].dir = go_xy[6][2];
+			ADD_FX_POOF(x, y); ch[co].dir = go_xy[6][2];
 			//
 			do_char_log(p, 3, "Gatekeeper: \"%s\"\n", "Brave. Willing. The labyrinth has challenged your guile and mettle time and again!");
 			ch[cn].data[1]++; 
@@ -7105,7 +7105,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 				ch[co].used = USE_EMPTY;
 				ch[cn].data[6] = 0;
 			}
-			fx_add_effect(12, 0, go_xy[6][0]-4, go_xy[6][1], 0);
+			ADD_FX_POOF(go_xy[6][0]-4, go_xy[6][1]);
 			if (IS_SANECHAR(co = ch[cn].data[7]))
 			{
 				god_destroy_items(co);
@@ -7114,7 +7114,7 @@ void gatekeeper_driver(int cn) // CT_LAB20_KEEP
 				ch[co].used = USE_EMPTY;
 				ch[cn].data[7] = 0;
 			}
-			fx_add_effect(12, 0, go_xy[6][0]+4, go_xy[6][1], 0);
+			ADD_FX_POOF(go_xy[6][0]+4, go_xy[6][1]);
 			//
 			clean_and_go(cn, go_xy[7][0], go_xy[7][1], go_xy[7][2], 200);
 			npc_add_enemy(cn, p, 1);
@@ -8578,7 +8578,7 @@ void npc_driver_low(int cn)
 			// unstick the stuck
 			if (map[XY2M(ch[cn].x,ch[cn].y)].flags & MF_MOVEBLOCK)
 			{
-				fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+				ADD_FX_POOF(ch[cn].x, ch[cn].y);
 				reset_char(ch[cn].temp);
 			}
 			
@@ -8716,9 +8716,9 @@ void npc_driver_low(int cn)
 				
 				if (ch[cn].data[9]>TICKS*60*5) // We haven't been able to return home for the past 5 minutes.
 				{
-					fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+					ADD_FX_POOF(ch[cn].x, ch[cn].y);
 					god_transfer_char(cn, x, y);
-					fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
+					ADD_FX_POOF(ch[cn].x, ch[cn].y);
 					
 					ch[cn].status = 0;
 					STOP_ATTACK(cn);
