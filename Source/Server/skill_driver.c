@@ -5605,6 +5605,8 @@ int spell_bleed(int cn, int co, int power)
 	power = spell_immunity(cn, co, power);
 	power = common_mult(cn, co, power);
 	
+	if (power < 1) return 0;
+	
 	dur = SP_DUR_BLEED; 			// 15 seconds
 	
 	dur = dur * 100 / (100 + TC_SK(cn,113)*15);  // (Corr) Torment
@@ -6542,7 +6544,7 @@ void skill_leap(int cn, int flag)
 	
 	if (!randomtarg || numrepeats==0)
 	{
-		avgdmg = avgdmg/max(1, hit);
+		//avgdmg = avgdmg/max(1, hit);
 		if (avgdmg>0 && !(ch[cn].flags & CF_SYS_OFF))
 			do_char_log(cn, 1, "You sliced your targets for about %d HP.\n", avgdmg);
 		add_exhaust(cn, cooldown);
@@ -6562,7 +6564,7 @@ void skill_leap(int cn, int flag)
 		avgdmg = bu[tmp].data[2];
 		hit    = bu[tmp].data[3];
 		
-		avgdmg = avgdmg/max(1, hit);
+		//avgdmg = avgdmg/max(1, hit);
 		
 		if (avgdmg>0 && !(ch[cn].flags & CF_SYS_OFF))
 			do_char_log(cn, 1, "You sliced your targets for about %d HP.\n", avgdmg);

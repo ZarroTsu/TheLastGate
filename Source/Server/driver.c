@@ -66,7 +66,7 @@
    51:     raises EXP by X in exchange for item
    52:     shout for help if attacked, using code X
    53:     come to help if called by code X
-   54:     place of shout
+   54:     place of shout                                                       // Not used by pcs, free slot?
    55:     timeout for shout, if 54 is zero and 55 is set, WE shouted for help
    56:     timeout2 for greet
    57:     rest time between patrol (used by driver)
@@ -868,7 +868,7 @@ int npc_give(int cn, int co, int in, int money)
 			else               canlearn = 0;
 		}
 	}
-
+	
 	if (in && (
 		ch[cn].data[49]==it[in].temp 
 		|| 
@@ -7988,7 +7988,7 @@ int npc_driver_high(int cn)
 	}
 	
 	// are we on protect and want to follow our master?
-	if (!ch[cn].attack_cn && (co = ch[cn].data[69])!=0 && follow_driver(cn, ch[cn].data[69]))
+	if (!ch[cn].attack_cn && (co = ch[cn].data[69]) && follow_driver(cn, co))
 	{
 		if (abs(cx - ch[co].y) + abs(cy - ch[co].y)>6) ch[cn].data[58] = 2;
 		else                                           ch[cn].data[58] = 1;
@@ -7999,7 +7999,7 @@ int npc_driver_high(int cn)
 	if (!ch[cn].data[41] && !(ch[cn].data[47]>0 && ch[cn].data[47]<10))           return 0;
 	
 	// save some work. you need to check here if no other work needs to be done!
-	if (ch[cn].data[41] && ch[cn].misc_action==DR_USE && ch[cn].data[58]==1)      return 0;
+	if (ch[cn].data[41]   && ch[cn].misc_action==DR_USE)                          return 0;
 	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_PICKUP) return 0;
 	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_USE)    return 0;
 
@@ -8576,7 +8576,7 @@ void npc_driver_low(int cn)
 				ch[cn].data[57] = globs->ticker + ch[cn].data[79];
 			
 			// unstick the stuck
-			if (map[ch[cn].x + ch[cn].y * MAPX].flags & MF_MOVEBLOCK)
+			if (map[XY2M(ch[cn].x,ch[cn].y)].flags & MF_MOVEBLOCK)
 			{
 				fx_add_effect(12, 0, ch[cn].x, ch[cn].y, 0);
 				reset_char(ch[cn].temp);
@@ -8803,18 +8803,14 @@ void update_shop(int cn)
 		}
 		else
 		{
-			for (z = 0; z<10; z++)
+			for (z = 0; z<10; z++) if (it[in].temp==sale[z])
 			{
-				if (it[in].temp==sale[z])
-				{
-					sale[z] = 0;
-					break;
-				}
+				sale[z] = 0;
+				break;
 			}
+			
 			if (z==10)
-			{
 				x = n;
-			}
 		}
 	}
 	

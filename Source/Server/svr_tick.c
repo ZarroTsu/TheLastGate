@@ -441,50 +441,38 @@ void plr_cmd_inv(int nr)
 	int what, n, m, tmp, tmpv, cn, in, co;
 	
 	if (player[nr].spectating) return;
+	
 	cn = player[nr].usnr;
-
+	
 	what = *(unsigned long*)(player[nr].inbuf + 1);
 	n  = *(unsigned long*)(player[nr].inbuf + 5);
 	co = *(unsigned long*)(player[nr].inbuf + 9);
-	if (co<1 || co>=MAXCHARS)
-	{
-		co = 0;
-	}
-
+	
+	if (co<1 || co>=MAXCHARS) co = 0;
+	
 	if (what==0) // 0 - Inventory management - swapping items with other item slots
 	{
-		if (n<0 || n>(MAXITEMS-1))
-		{
-			return;                 // sanity check
-		}
-		if (ch[cn].stunned==1)
-		{
-			return;
-		}
-
+		if (n<0 || n>(MAXITEMS-1)) return;  // sanity check
+		if (ch[cn].stunned==1)     return;
+		
 		tmp = ch[cn].item[n];
-
-		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL))
-			// || ch[cn].item_lock[n])) // Cannot pick up locked items
-		{
+		
+		if (IS_SANEITEM(tmp) && (it[tmp].temp == IT_LAGSCROLL /* || ch[cn].item_lock[n]*/ )) // Cannot pick up locked items
 			return;
-		}
+		
 		/*
-	//	else if (!IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Clean bad item lock if the item isn't valid
+		else if (!IS_SANEITEM(tmp) && ch[cn].item_lock[n]) // Clean bad item lock if the item isn't valid
 		{
-		//	ch[cn].item_lock[n] = 0;
+			ch[cn].item_lock[n] = 0;
 		}
 		*/
-
+		
 		do_update_char(cn);
 		
 		if (ch[cn].citem & 0x80000000)
 		{
 			tmp = ch[cn].citem & 0x7fffffff;
-			if (tmp>0)
-			{
-				ch[cn].gold += tmp;
-			}
+			if (tmp>0) ch[cn].gold += tmp;
 			ch[cn].citem = 0;
 			return;
 		}
@@ -500,63 +488,47 @@ void plr_cmd_inv(int nr)
 				do_char_log(cn, 3, "Single mode\n");
 			}
 		}
+		
 		ch[cn].citem = tmp;
+		
 		return;
 	}
+	
 	if (what==1) // 1 - Swap held item with gear slot
 	{
-		if (ch[cn].stunned==1)
-		{
-			return;
-		}
-
+		if (ch[cn].stunned==1) return;
+		
 		do_swap_item(cn, n);
+		
 		return;
 	}
+	
 	if (what==2) // 2 - Grab money from purse via coin button(s)
 	{
-		if (ch[cn].stunned==1)
-		{
-			return;
-		}
-
-		if (ch[cn].citem)
-		{
-			return;
-		}
-		if (n>ch[cn].gold)
-		{
-			return;
-		}
-		if (n<=0)
-		{
-			return;
-		}
+		if (ch[cn].stunned==1) return;
+		if (ch[cn].citem)      return;
+		if (n>ch[cn].gold)     return;
+		if (n<=0)              return;
+		
 		ch[cn].citem = 0x80000000 | n;
 		ch[cn].gold -= n;
-
+		
 		do_update_char(cn);
+		
 		return;
 	}
+	
 	if (what==3) // 3 - Push or pull item stacks (CTRL+Left)
 	{
-		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
-		if (ch[cn].stunned==1)
-		{
-			return;
-		}
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn)) return;  // sanity check
+		if (ch[cn].stunned==1)                        return;
 		
 		in  = ch[cn].item[n];
 		tmp = ch[cn].citem;
 		
 		// One of the items is not stackable, abort.
 		if ((in && !(it[in].flags & IF_STACKABLE)) || (tmp && !(it[tmp].flags & IF_STACKABLE)))
-		{
 			return;
-		}
 		
 		// Both items are sane and stackable, and both items are the same template
 		// In this instance we just subtract 1 from held item and add 1 to slot item
@@ -577,21 +549,22 @@ void plr_cmd_inv(int nr)
 			{
 				god_take_from_char(tmp, cn);
 			}
+			
 			tmpv = it[in].value / it[in].stack;
 			it[in].stack++;
 			it[in].value = tmpv * it[in].stack;
 			
 			do_update_char(cn);
 		}
-		// Target slot is sane but held item is not - take from slot stack
-		else if (in && !tmp) 
+		else if (in && !tmp)  // Target slot is sane but held item is not - take from slot stack
 		{
 			/*
-		//	if (IS_SANEITEM(in) && ch[cn].item_lock[n]) // Cannot pick up locked items
+			if (IS_SANEITEM(in) && ch[cn].item_lock[n]) // Cannot pick up locked items
 			{
 				return;
 			}
 			*/
+			
 			if ((it[in].flags & IF_STACKABLE) && it[in].stack > 1)
 			{
 				if (it[in].temp)
@@ -658,8 +631,7 @@ void plr_cmd_inv(int nr)
 				ch[cn].citem = in;
 			}
 		}
-		// Target slot is not valid but held item is - drop from held stack
-		else if (!in && tmp) 
+		else if (!in && tmp)  // Target slot is not valid but held item is - drop from held stack
 		{
 			if ((it[tmp].flags & IF_STACKABLE) && it[tmp].stack > 1)
 			{
@@ -681,28 +653,28 @@ void plr_cmd_inv(int nr)
 				ch[cn].citem = in;
 				ch[cn].item[n] = tmp;
 			}
-		//	ch[cn].item_lock[n] = 0;
+			/*
+			ch[cn].item_lock[n] = 0;
+			*/
 		}
 		return;
 	}
+	
 	/*
 	if (what==4) // 4 - Lock item in place in inventory so /sort doesn't move it (CTRL+Right)
 	{
-		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn)) return;  // sanity check
 		
 		if ((in = ch[cn].item[n])!=0)
 		{
-		//	if (ch[cn].item_lock[n])
+			if (ch[cn].item_lock[n])
 			{
-		//		ch[cn].item_lock[n] = 0;
+				ch[cn].item_lock[n] = 0;
 				do_char_log(cn, 1, "%s, now unlocked.\n", it[in].name);
 			}
 			else
 			{
-		//		ch[cn].item_lock[n] = 1;
+				ch[cn].item_lock[n] = 1;
 				do_char_log(cn, 1, "%s, now locked.\n", it[in].name);
 			}
 			
@@ -712,66 +684,57 @@ void plr_cmd_inv(int nr)
 		return;
 	}
 	*/
-	if (what==5) // 5 - Use a given gear piece while it is equipped, such as rings
+	
+	if (what==5)  // 5 - Use a given gear piece while it is equipped, such as rings
 	{
-		if (n<0 || n>19 || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
+		if (n<0 || n>19 || IS_BUILDING(cn)) return;  // sanity check
+		
 		ch[cn].use_nr = n;
 		ch[cn].skill_target1 = co;
+		
 		return;
 	}
-	if (what==6) // 6 - Use an item in your inventory
+	
+	if (what==6)  // 6 - Use an item in your inventory
 	{
-		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn)) return; // sanity check
+		
 		ch[cn].use_nr = n + 20;
 		ch[cn].skill_target1 = co;
+		
 		return;
 	}
+	
 	if (what==7) // 7 - Look at your equipment
 	{
-		if (n<0 || n>19 || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
+		if (n<0 || n>19 || IS_BUILDING(cn)) return;  // sanity check
+		
 		if ((in = ch[cn].worn[n])!=0)
-		{
 			do_look_item(cn, in);
-		}
+		
 		return;
 	}
+	
 	if (what==8) // 8 - Look at your items
 	{
-		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn))
-		{
-			return;                             // sanity check
-		}
+		if (n<0 || n>(MAXITEMS-1) || IS_BUILDING(cn)) return;  // sanity check
+		
 		if ((in = ch[cn].item[n])!=0)
-		{
 			do_look_item(cn, in);
-		}
+		
 		return;
 	}
-	if (what==9) // 9 - Process special command.  0 = Trash,  1 = Swap
+	
+	if (what==9)  // 9 - Process special command.  0 = Trash,  1 = Swap
 	{
-		if (ch[cn].stunned==1)
-		{
-			return;
-		}
-		if (n==0)
-		{
-			do_trash(cn);
-		}
-		if (n==1)
-		{
-			do_swap_gear(cn);
-		}
+		if (ch[cn].stunned==1) return;
+		
+		if (n==0) do_trash(cn);
+		if (n==1) do_swap_gear(cn);
+		
 		return;
 	}
+	
 	plog(nr, "Unknown CMD-INV-what %d", what);
 }
 
