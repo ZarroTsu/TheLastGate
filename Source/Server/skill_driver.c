@@ -3654,13 +3654,16 @@ int spell_warcry(int cn, int co, int power, int flag)
 	ADD_FX_EMAGIC(ch[co].x, ch[co].y);
 	return 1;
 }
-void skill_warcry(cn)
+void skill_warcry(int cn, int ghostcry)
 {
 	int power = skill_multiplier(M_SK(cn, SK_WARCRY), cn);
 	int cost = SP_COST_WARCRY;
 	
 	if (is_exhausted(cn)) { return; }
 	if (spellcost(cn, cost, SK_WARCRY, 0)) { return; }
+	
+	if (ghostcry)
+		power = skill_multiplier(M_SK(cn, SK_TAUNT), cn);
 	
 	if (do_get_iflag(cn, SF_EMPERO_R))
 	{
@@ -7048,11 +7051,18 @@ void skill_driver(int cn, int nr)
 {
 	int tmp = 0, nmz = 0;
 	
+	if (nr==SK_WARCRY && IS_PLAYER_GC(cn) && IS_SANEPLAYER(CN_OWNER(cn)) && do_get_iflag(CN_OWNER(cn), SF_GHOSTCRY))
+	{
+		skill_warcry(cn, 1);
+		return;
+	}
+	
 	if (nr!=50 && nr!=51 && nr!=52 && nr!=53 && nr!=54 && !B_SK(cn, nr))
 	{
 		do_char_log(cn, 0, "You cannot use this skill/spell.\n");
 		return;
 	}
+	
 	if (nr==SK_IDENT && !(ch[cn].kindred & KIN_IDENTIFY)) return;
 	if ((nr==SK_FEROC||nr==SK_SHIFT) && !IS_LYCANTH(cn)) return;
 	
@@ -7062,28 +7072,28 @@ void skill_driver(int cn, int nr)
 	
 	switch(nr)
 	{
-		case SK_BLIND:		skill_blind(cn);	break;
-		case SK_CLEAVE:		skill_cleave(cn);	break;
-		case SK_LEAP:		skill_leap(cn,0);	break;
-		case SK_PACT:		skill_pact(cn);		break;
-		case SK_REPAIR:		skill_repair(cn);	break;
-		case SK_SHIFT:		skill_shift(cn,0);	break;
-		case SK_TAUNT:		skill_taunt(cn);	break;
-		case SK_WARCRY:		skill_warcry(cn);	break;
-		case SK_RECALL:		skill_recall(cn);	break;
+		case SK_BLIND:  skill_blind(cn);     break;
+		case SK_CLEAVE: skill_cleave(cn);    break;
+		case SK_LEAP:   skill_leap(cn, 0);   break;
+		case SK_PACT:   skill_pact(cn);      break;
+		case SK_REPAIR: skill_repair(cn);    break;
+		case SK_SHIFT:  skill_shift(cn, 0);  break;
+		case SK_TAUNT:  skill_taunt(cn);     break;
+		case SK_WARCRY: skill_warcry(cn, 0); break;
+		case SK_RECALL: skill_recall(cn);    break;
 		
-		case SK_BLAST:		if (nmz) nomagic(cn,0); else skill_blast(cn);		break;
-		case SK_BLESS:		if (nmz) nomagic(cn,0); else skill_bless(cn);		break;
-		case SK_DISPEL:		if (nmz) nomagic(cn,0); else skill_dispel(cn, 0);	break;
-		case SK_ENHANCE:	if (nmz) nomagic(cn,0); else skill_enhance(cn, 0);	break;
-		case SK_GHOST:		if (nmz) nomagic(cn,0); else skill_ghost(cn);		break;
-		case SK_HEAL:		if (nmz) nomagic(cn,0); else skill_heal(cn);		break;
-		case SK_IDENT:		if (nmz) nomagic(cn,0); else skill_identify(cn);	break;
-		case SK_LETHARGY:	if (nmz) nomagic(cn,0); else skill_lethargy(cn);	break;
-		case SK_POISON:		if (nmz) nomagic(cn,0); else skill_poison(cn);		break;
-		case SK_PROTECT:	if (nmz) nomagic(cn,0); else skill_protect(cn, 0);	break;
-		case SK_PULSE:		if (nmz) nomagic(cn,0); else skill_pulse(cn);		break;
-		case SK_SHADOW:		if (nmz) nomagic(cn,0); else skill_shadow(cn);		break;
+		case SK_BLAST:    if (nmz) nomagic(cn,0); else skill_blast(cn);      break;
+		case SK_BLESS:    if (nmz) nomagic(cn,0); else skill_bless(cn);      break;
+		case SK_DISPEL:   if (nmz) nomagic(cn,0); else skill_dispel(cn, 0);  break;
+		case SK_ENHANCE:  if (nmz) nomagic(cn,0); else skill_enhance(cn, 0); break;
+		case SK_GHOST:    if (nmz) nomagic(cn,0); else skill_ghost(cn);      break;
+		case SK_HEAL:     if (nmz) nomagic(cn,0); else skill_heal(cn);       break;
+		case SK_IDENT:    if (nmz) nomagic(cn,0); else skill_identify(cn);   break;
+		case SK_LETHARGY: if (nmz) nomagic(cn,0); else skill_lethargy(cn);   break;
+		case SK_POISON:   if (nmz) nomagic(cn,0); else skill_poison(cn);     break;
+		case SK_PROTECT:  if (nmz) nomagic(cn,0); else skill_protect(cn, 0); break;
+		case SK_PULSE:    if (nmz) nomagic(cn,0); else skill_pulse(cn);      break;
+		case SK_SHADOW:   if (nmz) nomagic(cn,0); else skill_shadow(cn);     break;
 		
 		case SK_LIGHT:
 			if (nmz)
