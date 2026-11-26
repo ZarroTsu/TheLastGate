@@ -413,13 +413,10 @@ int npc_gotattack(int cn, int co, int dam)
 		{
 			if (!(ch[co].flags & CF_SILENCE) && !(ch[cn].flags & CF_SILENCE))
 			{
-				if (IS_PLAYER_COMP(cn))
+				if (IS_PLAYER_COMP(cn) && ch[cn].data[55]+TICKS*2<globs->ticker)
 				{
-					if (ch[cn].data[55]+TICKS*2<globs->ticker)
-					{
-						ch[cn].data[55] = globs->ticker;
-						npc_saytext_n(cn, 1, ch[co].name);
-					}
+					ch[cn].data[55] = globs->ticker;
+					npc_saytext_n(cn, 1, ch[co].name);
 				}
 				else
 					npc_saytext_n(cn, 1, ch[co].name);
@@ -473,6 +470,7 @@ int npc_killed(int cn, int cc, int co)
 		STOP_ATTACK(cn);
 	
 	ch[cn].data[76] = ch[cn].data[77] = ch[cn].data[78] = 0;
+	
 	npc_activate_rings(cn, 0);
 	npc_wedge_doors(cn, 0);
 	
@@ -487,8 +485,11 @@ int npc_killed(int cn, int cc, int co)
 				npc_saytext_n(cn, 0, ch[co].name);
 			
 			// add killed mob to data so we don't re-add it immediately 
-			if (IS_COMPANION(cn)) ch[cn].data[91] = idx; 
+			if (IS_COMPANION(cn))
+				ch[cn].data[91] = idx; 
+			
 			ch[cn].data[n] = 0;
+			
 			return 1;
 		}
 	}

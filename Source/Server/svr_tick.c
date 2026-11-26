@@ -5050,15 +5050,11 @@ void check_expire(int cn)
 inline int group_active(int cn)
 {
 	if ((ch[cn].flags & (CF_PLAYER | CF_USURP | CF_NOSLEEP)) && ch[cn].used==USE_ACTIVE)
-	{
 		return 1;
-	}
-
+	
 	if (ch[cn].data[92])
-	{
 		return 1;
-	}
-
+	
 	return 0;
 }
 
@@ -5080,22 +5076,24 @@ static long cl = 0;
 static int  cltick = 0;
 static int  wakeup = 1;
 
+//#define SPEEDTEST
+
 void tick(void)
 {
 	int n, cnt, hour, awake, body, online = 0, plon;
 	unsigned long long prof;
 	time_t t;
 	struct tm *tm;
-
+	
 	prof_tick();
-
+	
 	t  = time(NULL);
 	tm = localtime(&t);
 	hour = tm->tm_hour;
-
+	
 	globs->ticker++;
 	globs->uptime++;
-
+	
 	globs->uptime_per_hour[hour]++;
 	
 	if ((globs->ticker & 31)==0)
@@ -5105,108 +5103,89 @@ void tick(void)
 	
 	// Process map editor queue
 	int queue_prev = 20; // Process this many after finding the first USE_EMPTY instruction
-	for (int i=0; i<MAX_MAPED_QUEUE; i++) {
-			if (maped_queue[i].used == USE_EMPTY) {
-					queue_prev--;
-					if (queue_prev <= 0) break;
-					continue;
-			}
-
-			xlog("processed maped queue: type=%d, x=%d, y=%d, it_temp=%d",
-					maped_queue[i].op_type, maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp);
-
-			switch(maped_queue[i].op_type) {
-					case MAPED_PLACEITEM: // Place item
-							if (maped_queue[i].it_temp > 0) {
-									build_drop(maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp);
-							}
-					break;
-
-					case MAPED_RMVITEM: // Remove item
-							build_remove(maped_queue[i].x, maped_queue[i].y);
-					break;
-
-					case MAPED_SETFLOOR: // Change floor
-							map[maped_queue[i].x + maped_queue[i].y * MAPX].sprite = maped_queue[i].it_temp;
-					break;
-			}
-			maped_queue[i].used = USE_EMPTY;
-			queue_prev = 20;
+	for (int i=0; i<MAX_MAPED_QUEUE; i++)
+	{
+		if (maped_queue[i].used == USE_EMPTY)
+		{
+			queue_prev--;
+			if (queue_prev <= 0) break;
+			continue;
+		}
+		
+		xlog("processed maped queue: type=%d, x=%d, y=%d, it_temp=%d",
+				maped_queue[i].op_type, maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp);
+		
+		switch(maped_queue[i].op_type)
+		{
+			case MAPED_PLACEITEM: // Place item
+					if (maped_queue[i].it_temp > 0) {
+							build_drop(maped_queue[i].x, maped_queue[i].y, maped_queue[i].it_temp);
+					}
+			break;
+			
+			case MAPED_RMVITEM: // Remove item
+					build_remove(maped_queue[i].x, maped_queue[i].y);
+			break;
+			
+			case MAPED_SETFLOOR: // Change floor
+					map[maped_queue[i].x + maped_queue[i].y * MAPX].sprite = maped_queue[i].it_temp;
+			break;
+		}
+		
+		maped_queue[i].used = USE_EMPTY;
+		queue_prev = 20;
 	}
-
+	
 	// send tick to players
 	for (n = 1; n<MAXPLAYER; n++)
 	{
-		if (!player[n].sock)
-		{
-			continue;
-		}
-		if (player[n].state!=ST_NORMAL && player[n].state!=ST_EXIT)
-		{
-			continue;
-		}
+		if (!player[n].sock) continue;
+		if (player[n].state!=ST_NORMAL && player[n].state!=ST_EXIT) continue;
+		
 		plr_tick(n);
-		if (player[n].state==ST_NORMAL)
-		{
-			online++;
-		}
+		
+		if (player[n].state==ST_NORMAL) online++;
 	}
-
+	
 	if (online>globs->max_online)
-	{
 		globs->max_online = online;
-	}
+	
 	if (online>globs->max_online_per_hour[hour])
-	{
 		globs->max_online_per_hour[hour] = online;
-	}
-
+	
 	// check for player commands and translate to character commands, also does timeout checking
 	for (n = 1; n<MAXPLAYER; n++)
 	{
-		if (!player[n].sock)
-		{
-			continue;
-		}
+		if (!player[n].sock) continue;
+		
 		while (player[n].in_len>=16)
 		{
 			plr_cmd(n);
 			player[n].in_len -= 16;
 			memmove(player[n].inbuf, player[n].inbuf + 16, 240);
 		}
+		
 		plr_idle(n);
 	}
-
+	
 	// do login stuff
 	for (n = 1; n<MAXPLAYER; n++)
 	{
-		if (!player[n].sock)
-		{
-			continue;
-		}
-		if (player[n].state==ST_NORMAL)
-		{
-			continue;
-		}
+		if (!player[n].sock)            continue;
+		if (player[n].state==ST_NORMAL) continue;
+		
 		plr_state(n);
 	}
 	
 	// send changes to players
 	for (n = 1; n<MAXPLAYER; n++)
 	{
-		if (!player[n].sock)
-		{
-			continue;
-		}
-		if (player[n].state!=ST_NORMAL)
-		{
-			continue;
-		}
-//#define SPEEDTEST
+		if (!player[n].sock)            continue;
+		if (player[n].state!=ST_NORMAL) continue;
 #ifdef SPEEDTEST
 		{
 			int zz;
-
+			
 			for (zz = 0; zz<80; zz++)
 			{
 				prof = prof_start();
@@ -5218,46 +5197,41 @@ void tick(void)
 			}
 		}
 #else
-		prof = prof_start();
-		plr_getmap(n);
-		prof_stop(10, prof);
-		prof = prof_start();
-		plr_change(n);
-		prof_stop(11, prof);
+		{
+			prof = prof_start();
+			plr_getmap(n);
+			prof_stop(10, prof);
+			prof = prof_start();
+			plr_change(n);
+			prof_stop(11, prof);
+		}
 #endif
 	}
-
+	
 	// let characters act
 	cnt = awake = body = plon = 0;
-
+	
 	if ((globs->ticker & 63)==0)
 	{
-		if (wakeup>=MAXCHARS)
-		{
-			wakeup = 1;
-		}
+		if (wakeup>=MAXCHARS) wakeup = 1;
 		ch[wakeup++].data[92] = TICKS * 60;
 	}
-
+	
 	for (n = 1; n<MAXCHARS; n++)
 	{
-		if (ch[n].used==USE_EMPTY)
-		{
-			continue;
-		}
+		if (ch[n].used==USE_EMPTY) continue;
+		
 		cnt++;
-
+		
 		if (ch[n].flags & CF_UPDATE)
 		{
 			really_update_char(n);
 			ch[n].flags &= ~CF_UPDATE;
 		}
-
+		
 		if (ch[n].used==USE_NONACTIVE && (n & 1023)==(globs->ticker & 1023))
-		{
-			// Check if we delete the character
-			check_expire(n);
-		}
+			check_expire(n); // Check if we delete the character
+		
 		if (ch[n].flags & CF_BODY)
 		{
 			if (!(ch[n].flags & CF_PLAYER) && ch[n].data[98]++>TICKS * 60 * 30)
@@ -5267,54 +5241,49 @@ void tick(void)
 				ch[n].used = USE_EMPTY;
 				continue;
 			}
+			
 			body++;
+			
 			continue;
 		}
-
-		if (!IS_PLAYER(n) && ch[n].data[92]>0)
-		{
-			ch[n].data[92]--;               // reduce single awake
-		}
-		if (ch[n].status<8 && !group_active(n))
-		{
-			// Character is idle/standing still and not a player/usurp/nosleep
-			continue;
-		}
-
+		
+		if (!IS_PLAYER(n) && ch[n].data[92]>0) ch[n].data[92]--; // reduce single awake
+		if (ch[n].status<8 && !group_active(n)) continue;        // Character is idle/standing still and not a player/usurp/nosleep
+		
 		awake++;
-
+		
 		if (ch[n].used==USE_ACTIVE)
 		{
-			if ((n & 1023)==(globs->ticker & 1023) && !check_valid(n))
-			{
-				continue;
-			}
+			if ((n & 1023)==(globs->ticker & 1023) && !check_valid(n)) continue;
+			
 			ch[n].current_online_time++;
 			ch[n].total_online_time++;
+			
 			if (ch[n].flags & (CF_PLAYER | CF_USURP))
 			{
 				globs->total_online_time++;
 				globs->online_per_hour[hour]++;
+				
 				if ((ch[n].flags & CF_PLAYER) && ch[n].data[71]>0)
-				{
 					ch[n].data[71]--;
-				}
+				
 				if ((ch[n].flags & CF_PLAYER) && !(ch[n].flags & CF_INVISIBLE))
-				{
 					plon++;
-				}
 			}
+			
 			prof = prof_start();
 			plr_act(n);
 			prof_stop(12, prof);
 		}
+		
 		do_regenerate(n);
 	}
+	
 	globs->character_cnt = cnt;
 	globs->awake = awake;
 	globs->body  = body;
 	globs->players_online = plon;
-
+	
 	prof = prof_start();
 	pop_tick();
 	prof_stop(13, prof);
@@ -5324,28 +5293,29 @@ void tick(void)
 	prof = prof_start();
 	item_tick();
 	prof_stop(15, prof);
-
+	
 	// do global updates like time of day, weather etc.
 	prof = prof_start();
 	global_tick();
 	prof_stop(26, prof);
-
+	
 	ctick++;
-	if (ctick>199)	// Feb 2020 - extended from 20 to 24 to 200
-	{
-		ctick = 0;
-	}
-
+	
+	if (ctick>199) ctick = 0;  // Feb 2020 - extended from 20 to 24 to 200
+	
 	cltick++;
+	
 	if (cltick>17)
 	{
 		cltick = 0;
 		n = clock() / (CLOCKS_PER_SEC / 100);
+		
 		if (cl && n>cl)
 		{
 			globs->load = n - cl;
 			globs->load_avg = (int)((globs->load_avg * 0.0099 + globs->load * 0.01) * 100);
 		}
+		
 		cl = n;
 	}
 }
@@ -5353,13 +5323,12 @@ void tick(void)
 void player_exit(int nr)
 {
 	int cn;
-
+	
 	player[nr].state = ST_EXIT;
 	player[nr].lasttick = globs->ticker;
-
+	
 	cn = player[nr].usnr;
+	
 	if (cn && cn>0 && cn<MAXCHARS && ch[cn].player==nr)
-	{
 		ch[cn].player = 0;
-	}
 }

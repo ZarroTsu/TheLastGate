@@ -3092,7 +3092,7 @@ int spell_plague(int cn, int co, int flag)
 	
 	if (ch[co].escape_timer > TICKS*3) { return 0; }
 	if (ch[co].flags & CF_BODY) { return 0; }
-	if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
+	if (ch[cn].attack_cn!=co && IS_FRIENDLY(co)) { return 0; }
 	if (ch[co].flags & CF_IMMORTAL) { return 0; }
 	
 	power = M_SK(cn, SK_FEROC);
@@ -4669,8 +4669,8 @@ int spell_dispel(int cn, int co, int power, int sto[DISPEL_STORE], int flag, int
 	
 	if (flag)	// Debuff version
 	{
-		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) { return 0; }
-		if (ch[co].flags & CF_IMMORTAL) { return 0; }
+		if (ch[cn].attack_cn!=co && IS_FRIENDLY(co)) { return 0; }
+		if (ch[co].flags & CF_IMMORTAL)              { return 0; }
 		
 		power = spell_immunity(cn, co, power);
 		power = common_mult(cn, co, power);
@@ -6622,8 +6622,8 @@ int spell_zephyr(int cn, int co, int power, int flag)
 	
 	if (flag) // Debuff version
 	{
-		if (ch[cn].attack_cn!=co && ch[co].alignment==10000) return 0;
-		if (ch[co].flags & CF_IMMORTAL)                      return 0;
+		if (ch[cn].attack_cn!=co && IS_FRIENDLY(co)) return 0;
+		if (ch[co].flags & CF_IMMORTAL)              return 0;
 		
 		if (do_get_iflag(cn, SF_EN_MOREWARCZEPH)) power = more(power, 10, 1);
 		

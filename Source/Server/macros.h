@@ -267,7 +267,7 @@ int is_ascroll(int in);
 #define CAN_BRAV_PROX(cn)		(IS_SEYA_OR_BRAV(cn) && !(ch[(cn)].flags & CF_AREA_OFF) && M_SK(cn, SK_PROX) > 45)
 
 #define GET_PROX(cn)			(B_SK(cn, SK_PROX)?M_SK(cn, SK_PROX):0)
-#define GET_SFAIL(cn, co)		(((ch[co].escape_timer > TICKS*3) || (ch[co].flags & CF_BODY) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[cn].attack_cn!=co && ch[co].alignment==10000) || (ch[co].flags & CF_IMMORTAL))?1:0)
+#define GET_SFAIL(cn, co)		(((ch[co].escape_timer > TICKS*3) || (ch[co].flags & CF_BODY) || (ch[cn].attack_cn!=co && IS_FRIENDLY(co)) || (ch[cn].attack_cn!=co && IS_FRIENDLY(co)) || (ch[co].flags & CF_IMMORTAL))?1:0)
 #define GET_AT(cn, n, m)		(ch_get_skill_attrib((cn), (n), (m)))
 
 #define GET_SPD(cn)				(SPEED_CAP - ch[(cn)].speed)

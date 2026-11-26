@@ -8419,7 +8419,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 			}
 		}
 
-		if (!(ch[co].flags & (CF_PLAYER)) && ch[co].alignment==10000) // shopkeepers & questgivers
+		if (!(ch[co].flags & (CF_PLAYER)) && IS_FRIENDLY(co))  // shopkeepers & questgivers
 		{
 			do_char_log(cn, 0, "You feel a god look into your soul. He seems to be angry.\n");
 
@@ -8527,7 +8527,7 @@ void do_char_killed(int cn, int co, int pentsolve)
 		
 		do_item_kills(cc);
 		
-		if (!(ch[co].flags & (CF_PLAYER)) && ch[co].alignment==10000)
+		if (!(ch[co].flags & (CF_PLAYER)) && IS_FRIENDLY(co))
 		{
 			do_char_log(cc, 0, "A goddess is about to turn your follower into a frog, but notices that you are responsible. You feel her do something to you. Nothing good, that's for sure.\n");
 
@@ -9929,7 +9929,7 @@ int do_hurt(int cn, int co, int dam, int type)
 			{
 				if (IS_SANEPLAYER(ch[cn].data[CHD_MASTER]))
 					ch[ch[cn].data[CHD_MASTER]].data[77]++;
-				else
+				else if (IS_SANEPLAYER(cn))
 					ch[cn].data[77]++;
 			}
 			tmp  = do_char_score(co);
@@ -10092,10 +10092,10 @@ int do_surround_check(int cn, int co, int gethit) // cn is the attacker, co is t
 	}
 	if (co != cnatk && coatk != cn) // We're not attacking eachother.
 	{
-		if (ch[co].alignment==10000)                                     return 0; // Ignore friendly npcs unless we're fighting directly.
+		if (IS_FRIENDLY(co))                                             return 0; // Ignore friendly npcs unless we're fighting directly.
 		if (strcmp(ch[co].name, "Gate Guard")==0)                        return 0; // Ignore Stronghold Gate Guards unless we're fighting directly.
 		if (strcmp(ch[co].name, "Outpost Guard")==0)                     return 0; // Ignore Stronghold Outpost Guards unless we're fighting directly.
-		if (ch[cn].alignment==10000)                                     return 0; // Ignore friendly npcs unless we're fighting directly.
+		if (IS_FRIENDLY(cn))                                             return 0; // Ignore friendly npcs unless we're fighting directly.
 		if (strcmp(ch[cn].name, "Gate Guard")==0)                        return 0; // Ignore Stronghold Gate Guards unless we're fighting directly.
 		if (strcmp(ch[cn].name, "Outpost Guard")==0)                     return 0; // Ignore Stronghold Outpost Guards unless we're fighting directly.
 	}
@@ -14348,7 +14348,7 @@ void do_regenerate(int cn)
 								{
 									if (IS_SANEPLAYER(ch[co].data[CHD_MASTER]))
 										ch[ch[co].data[CHD_MASTER]].data[77]++;
-									else
+									else if (IS_SANEPLAYER(co))
 										ch[co].data[77]++;
 								}
 								tmp  = do_char_score(cn);
