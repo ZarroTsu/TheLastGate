@@ -6426,7 +6426,7 @@ int use_dw_chest(int cn, int in)
 
 int use_crystal_ball(int cn, int in)
 {	// Fortune Teller crystal ball for showing an item's improved variant.
-	int in2, in3, co, n, val=0;
+	int in2, in3, co, n, val=0, x, y, tmp=0;
 	
 	if (!cn) return 0;
 	
@@ -6484,8 +6484,33 @@ int use_crystal_ball(int cn, int in)
 		{
 			if (co) do_sayx(co, "Very well %s, let me see what my magic can do...", ch[cn].name);
 			
+			x = ch[cn].x;
+			y = ch[cn].y;
+			
+			tmp = ch[cn].kindred;
+			
 			god_racechange(cn, ch[cn].temp, 1);
+			god_transfer_char(cn, x, y);
 			ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
+			
+			if (tmp & KIN_PURPLE)
+			{
+				ch[cn].kindred |= KIN_PURPLE;
+				ch[cn].temple_x = HOME_PURPLE_X;
+				ch[cn].temple_y = HOME_PURPLE_Y;
+			}
+			if (tmp & KIN_CLANKWAI)
+			{
+				ch[cn].kindred |= KIN_CLANKWAI;
+				ch[cn].temple_x = HOME_KWAI_X;
+				ch[cn].temple_y = HOME_KWAI_Y;
+			}
+			if (tmp & KIN_CLANGORN)
+			{
+				ch[cn].kindred |= KIN_CLANGORN;
+				ch[cn].temple_x = HOME_GORN_X;
+				ch[cn].temple_y = HOME_GORN_Y;
+			}
 			
 			do_char_log(cn, 8, " \n");
 			do_char_log(cn, 8, "You feel a nasty spell, far darker than any you've ever encountered, hit you somewhere you can't describe.\n");

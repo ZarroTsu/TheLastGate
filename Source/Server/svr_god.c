@@ -907,31 +907,32 @@ void god_goto(int cn, int co, char *cx, char *cy)
 
 void god_info(int cn, int co)
 {
-	int t;
+	int t, n;
 	/* CS, 991128: Support for different levels of #INFO */
 	char cnum_str[20], pos_str[30], temp_str[20], need_str[20];
 	int pos_x, pos_y;
 	int pts;
-
+	
 	if (!IS_SANECHAR(co))
 	{
 		do_char_log(cn, 0, "There's no such character.\n");
 		return;
 	}
-
+	
 	if (IS_SANENPC(co) && !(IS_GOD(cn) | IS_IMP(cn) | IS_USURP(cn)))
 	{
 		do_char_log(cn, 0, "Access denied.\n");
 		return;
 	}
-
+	
 	if ((ch[co].flags & CF_GOD) && !(ch[cn].flags & CF_GOD))
 	{
 		do_char_log(cn, 0, "Access denied.\n");
 		return;
 	}
-
+	
 	char_info(cn, co);
+	
 	/* CS, 991127: No position for invis Imps, no char num to staff */
 	if (IS_IMP(cn)||IS_USURP(cn))
 	{
@@ -941,12 +942,15 @@ void god_info(int cn, int co)
 	{
 		cnum_str[0] = '\0';
 	}
+	
 	pos_x = ch[co].x;
 	pos_y = ch[co].y;
+	
 	if (!IS_IMP(cn) && !IS_USURP(cn) && ((ch[co].flags & (CF_INVISIBLE | CF_NOWHO)) && invis_level(co) > invis_level(cn)))
 	{
 		pos_x = pos_y = 0;
 	}
+	
 	if (pos_x != 0 || pos_y != 0)
 	{
 		sprintf(pos_str, " Pos=%d,%d.", pos_x, pos_y);
@@ -955,40 +959,41 @@ void god_info(int cn, int co)
 	{
 		pos_str[0] = '\0';
 	}
+	
 	/* CS, 991127: Display exp/exp to next level or template number */
 	pts = ch[co].points_tot;
 	strcpy(need_str, int2str(points_tolevel(pts)));
+	
 	if (IS_PLAYER(co))
 	{
 		do_char_log(cn, 2, "%s %s%s%s Pts/need=%s/%s.\n",
-		            who_rank_name[points2rank(pts)],
-		            ch[co].name,
-		            cnum_str, pos_str,
-		            int2str(pts), need_str);
+			who_rank_name[points2rank(pts)],
+			ch[co].name,
+			cnum_str, pos_str,
+			int2str(pts), need_str);
 	}
 	else
 	{
 		if (IS_IMP(cn) || IS_USURP(cn))
-		{
 			sprintf(temp_str, " Temp=%d", ch[co].temp);
-		}
 		else
-		{
 			temp_str[0] = '\0';
-		}
+		
 		do_char_log(cn, 2, "%s %s%s%s%s.\n",
-		            who_rank_name[points2rank(pts)],
-		            ch[co].name,
-		            cnum_str, pos_str, temp_str);
+			who_rank_name[points2rank(pts)],
+			ch[co].name,
+			cnum_str, pos_str, temp_str);
 	}
+	
 	do_char_log(cn, 2, "HP=%d/%d, End=%d/%d, Mana=%d/%d.\n",
-	            ch[co].a_hp / 1000, ch[co].hp[5],
-	            ch[co].a_end / 1000, ch[co].end[5],
-	            ch[co].a_mana / 1000, ch[co].mana[5]);
+		ch[co].a_hp / 1000, ch[co].hp[5],
+		ch[co].a_end / 1000, ch[co].end[5],
+		ch[co].a_mana / 1000, ch[co].mana[5]);
 	do_char_log(cn, 2, "Speed=%d. Gold=%d.%02dG (%d.%02dG).\n",
-	            ch[co].speed,
-	            ch[co].gold / 100, ch[co].gold % 100,
-	            ch[co].data[13] / 100, ch[co].data[13] % 100);
+		ch[co].speed,
+		ch[co].gold / 100, ch[co].gold % 100,
+		ch[co].data[13] / 100, ch[co].data[13] % 100);
+	
 	if (IS_PLAYER(co) && (IS_CLANKWAI(co) || IS_CLANGORN(co)) && ch[co].data[PCD_ATTACKTIME])
 	{
 		if (IS_IMP(cn) && IS_SANEPLAYER(ch[co].data[PCD_ATTACKVICT]))
@@ -1003,6 +1008,7 @@ void god_info(int cn, int co)
 			            ago_string(globs->ticker - ch[co].data[PCD_ATTACKTIME]));
 		}
 	}
+	
 	if (IS_IMP(cn) || IS_USURP(cn))
 	{
 		if (IS_PLAYER(co))
@@ -1014,32 +1020,41 @@ void god_info(int cn, int co)
 			            ch[co].data[29], ch[co].data[40]);
 			do_char_log(cn, 3, "Stronghold: %d total points\n", ch[co].bs_points);
 		}
+		
 		do_char_log(cn, 8, "Drivers [%d,%d,%d,%d,%d,%d,%d,%d,%d,%d].\n",
-			            ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
-			            ch[co].data[5], ch[co].data[6], ch[co].data[7], ch[co].data[8], ch[co].data[9]);
-		do_char_log(cn, 7, "CN %d, CS %d, CG %d, CP %d.\n",
-			            CONT_NUM(co), CONT_SCEN(co), CONT_GOAL(co), CONT_PROG(co));
+			ch[co].data[0], ch[co].data[1], ch[co].data[2], ch[co].data[3], ch[co].data[4],
+			ch[co].data[5], ch[co].data[6], ch[co].data[7], ch[co].data[8], ch[co].data[9]);
+		
+		if (IS_PLAYER(co))
+			do_char_log(cn, 7, "CN %d, CS %d, CG %d, CP %d.\n",
+				CONT_NUM(co), CONT_SCEN(co), CONT_GOAL(co), CONT_PROG(co));
+		
 		//do_char_log(cn, 2, "Current location=%d, Home coords: %d.\n",
 		//	            ch[co].x + ch[co].y * MAPX, ch[co].data[29]);
 		//do_char_log(cn, 1, "Rwalk=%d, Rwalk tm=%d, Rwalk ds=%d.\n",
 		//	            ch[co].data[60], ch[co].data[61], ch[co].data[73]);
-		do_char_log(cn, 3, "Armor=%d, Weapon=%d. Alignment=%d.\n", ch[co].armor, ch[co].weapon, ch[co].alignment);
+		
+		do_char_log(cn, 3, "Armor=%d, Weapon=%d, Thorns=%d.\n", ch[co].armor, ch[co].weapon, ch[co].gethit_dam);
 		do_char_log(cn, 3, "DMG_Bonus=%d, DMG_Reduc=%d.\n", ch[co].dmg_bonus, ch[co].dmg_reduction);
+		do_char_log(cn, 3, "Alignment=%d, Luck=%d.\n", ch[co].alignment, ch[co].luck);
+		
 		//do_char_log(cn, 3, "Group=%d (%d), Single Awake=%d, Spells=%d.\n", ch[co].data[CHD_GROUP], group_active(co), ch[co].data[92], ch[co].data[96]);
-		do_char_log(cn, 3, "Luck=%d, Gethit_Dam=%d.\n", ch[co].luck, ch[co].gethit_dam);
-		do_char_log(cn, 3, "Current Online Time: %dd %dh %dm %ds, Total Online Time: %dd %dh %dm %ds.\n",
-		            ch[co].current_online_time / (TICKS * 60 * 60 * 24),
-		            ch[co].current_online_time / (TICKS * 60 * 60) % 24,
-		            ch[co].current_online_time / (TICKS * 60) % 60,
-		            ch[co].current_online_time / (TICKS) % 60,
-		            ch[co].total_online_time / (TICKS * 60 * 60 * 24),
-		            ch[co].total_online_time / (TICKS * 60 * 60) % 24,
-		            ch[co].total_online_time / (TICKS * 60) % 60,
-		            ch[co].total_online_time / (TICKS) % 60);
-					
+		do_char_log(cn, 7, "Current Online Time: \n");
+		do_char_log(cn, 7, "    %dd %dh %dm %ds.\n",
+			ch[co].current_online_time / (TICKS * 60 * 60 * 24),
+			ch[co].current_online_time / (TICKS * 60 * 60) % 24,
+			ch[co].current_online_time / (TICKS * 60) % 60,
+			ch[co].current_online_time / (TICKS) % 60);
+		do_char_log(cn, 7, "Total Online Time: \n");
+		do_char_log(cn, 7, "    %dd %dh %dm %ds.\n",
+			ch[co].total_online_time / (TICKS * 60 * 60 * 24),
+			ch[co].total_online_time / (TICKS * 60 * 60) % 24,
+			ch[co].total_online_time / (TICKS * 60) % 60,
+			ch[co].total_online_time / (TICKS) % 60);
+		
 		do_char_log(cn, 8, "iFlags [%X,%X,%X,%X,%X,%X,%X,%X].\n",
-			            ch[co].iflags[0],ch[co].iflags[1],ch[co].iflags[2],ch[co].iflags[3],
-						ch[co].iflags[4],ch[co].iflags[5],ch[co].iflags[6],ch[co].iflags[7]);
+			ch[co].iflags[0],ch[co].iflags[1],ch[co].iflags[2],ch[co].iflags[3],
+			ch[co].iflags[4],ch[co].iflags[5],ch[co].iflags[6],ch[co].iflags[7]);
 		
 		if (IS_SANENPC(co) && ch[co].data[64])
 		{
@@ -1047,7 +1062,14 @@ void god_info(int cn, int co)
 			t /= TICKS;
 			do_char_log(cn, 3, "Will self destruct in %dm %ds.\n", t / 60, t % 60);
 		}
+		
+		if (IS_BUILDING(cn) && IS_SANENPC(co)) for (n=0;n<100;n++)
+		{
+			if (ch[co].data[n])
+				do_char_log(cn, n%10, "DATA[%02d] = %d\n", n, ch[co].data[n]);
+		}
 	}
+	
 	return;
 }
 
