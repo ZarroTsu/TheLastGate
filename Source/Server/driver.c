@@ -152,8 +152,6 @@ int npc_dist(int cn, int co)
 
 void npc_shadow_warp(int cn, int co, int cc)
 {
-	int atk = ch[cn].attack_cn;
-	
 	if (!IS_SANECHAR(cn))                  return;
 	if (!IS_LIVINGCHAR(co))                return;
 	if (!IS_SANECHAR(cc))                  return;
@@ -162,7 +160,6 @@ void npc_shadow_warp(int cn, int co, int cc)
 	if (ch[cc].data[PCD_SHADOWCOPY] != cn) return;
 	
 	quick_teleport(cn, ch[co].x, ch[co].y);
-	ch[cn].attack_cn = atk;
 }
 
 void npc_set_attack(int cn, int co)
@@ -357,6 +354,7 @@ int npc_gotattack(int cn, int co, int dam)
 		ch[cn].data[70] = globs->ticker + TICKS * 60 * 1;
 		
 		cc = god_create_char(CT_PEACEKEEPER, 1);
+		
 		ch[cc].temp = CT_COMPANION;
 		ch[cc].data[CHD_GROUP] = 65536 + cn;                    // set group
 		ch[cc].data[59] = 65536 + cn;                           // protect all other members of this group
@@ -389,7 +387,8 @@ int npc_gotattack(int cn, int co, int dam)
 		ADD_FX_GMAGIC(ch[cn].x, ch[cn].y);
 	}
 	
-	if (ch[cn].data[52] && ch[cn].a_hp<HP_PERC(cn,66))    // we're supposed to shout for help if attacked and HP below 2/3rd
+	// we're supposed to shout for help if attacked and HP below 2/3rd
+	if (ch[cn].data[52] && ch[cn].a_hp<HP_PERC(cn,66))
 	{
 		if (ch[cn].data[55] + TICKS * 180<globs->ticker) // shout every 180 seconds
 		{
@@ -400,7 +399,8 @@ int npc_gotattack(int cn, int co, int dam)
 		}
 	}
 	
-	if (!do_char_can_see(cn, co, 0))    // we have been attacked but cannot see the attacker
+	// we have been attacked but cannot see the attacker
+	if (!do_char_can_see(cn, co, 0))
 	{
 		ch[cn].data[78] = globs->ticker + TICKS * 30;
 		return 1;
@@ -520,7 +520,7 @@ int npc_seekill(int cn, int cc, int co)
 
 int npc_seeattack(int cn, int cc, int co)
 {
-	int diff, ret, c2, c3;
+	int diff, ret, c2, c3, cz;
 	int idx;
 	
 	ch[cn].data[92] = TICKS * 60 * 10;
@@ -610,11 +610,11 @@ int npc_seeattack(int cn, int cc, int co)
 	}
 	
 	// protect char (by nr)
-	if (ch[cn].data[CHD_MASTER] || ch[ch[cn].data[CHD_MASTER]].data[PCD_COMPANION] || ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY])
+	if ((cz = ch[cn].data[CHD_MASTER]))
 	{
 		ret = 0;
 		
-		if ((co==ch[cn].data[CHD_MASTER] || co==ch[ch[cn].data[CHD_MASTER]].data[PCD_COMPANION] || co==ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY]) && ch[cn].data[1]!=1)
+		if ((co==cz || co==ch[cz].data[PCD_COMPANION] || co==ch[cz].data[PCD_SHADOWCOPY]) && ch[cn].data[1]!=1)
 		{
 			idx = cc | (char_id(cc) << 16);
 			
@@ -633,7 +633,7 @@ int npc_seeattack(int cn, int cc, int co)
 				ch[cn].data[65] = co;
 		}
 		
-		if ((cc==ch[cn].data[CHD_MASTER] || cc==ch[ch[cn].data[CHD_MASTER]].data[PCD_COMPANION] || cc==ch[ch[cn].data[CHD_MASTER]].data[PCD_SHADOWCOPY]) && ch[cn].data[1]!=1)
+		if ((cc==cz || cc==ch[cz].data[PCD_COMPANION] || cc==ch[cz].data[PCD_SHADOWCOPY]) && ch[cn].data[1]!=1)
 		{
 			idx = co | (char_id(co) << 16);
 			
@@ -6128,6 +6128,31 @@ void clear_my_statuses(int cn)
 	npc_remove_all_enemies(cn);
 }
 
+void remove_explosion_tile(int x, int y)
+{
+	int in;
+	
+	if (in = map[XY2M(x, y)].it) // Remove explosions from destination tile
+	{
+		do_add_light(x, y, -it[in].light[I_A]);
+		it[in].used = 0;
+		map[XY2M(x, y)].it = 0;
+	}
+}
+
+void remove_explosion_tile_square(int x, int y)
+{
+	remove_explosion_tile(x,   y);
+	remove_explosion_tile(x+1, y);
+	remove_explosion_tile(x-1, y);
+	remove_explosion_tile(x,   y+1);
+	remove_explosion_tile(x+1, y+1);
+	remove_explosion_tile(x-1, y+1);
+	remove_explosion_tile(x,   y-1);
+	remove_explosion_tile(x+1, y-1);
+	remove_explosion_tile(x-1, y-1);
+}
+
 void pandium_driver(int cn) // CT_PANDIUM
 {
 	int n, m, j, p=0, fl=999, x, y, frx, fry, tox, toy, in=0, co=0, dir=0, try=0;
@@ -6444,6 +6469,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				remove_buff(ch_in[n], SK_TAUNT);
 				ch[ch_in[n]].taunted = 0;
 				remove_enemy(ch_in[n]);
+				remove_explosion_tile_square(x, y);
 				quick_teleport(ch_in[n], x, y);
 				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
 				{
@@ -6509,6 +6535,7 @@ void pandium_driver(int cn) // CT_PANDIUM
 				remove_buff(ch_in[n], SK_TAUNT);
 				ch[ch_in[n]].taunted = 0;
 				remove_enemy(ch_in[n]);
+				remove_explosion_tile_square(x, y);
 				quick_teleport(ch_in[n], x, y);
 				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
 				{
@@ -6627,13 +6654,8 @@ void pandium_driver(int cn) // CT_PANDIUM
 				remove_buff(ch_in[n], SK_TAUNT);
 				ch[ch_in[n]].taunted = 0;
 				ch[ch_in[n]].data[74] = globs->ticker + TICKS*6; // prevent warcries
-				if (map[x + y * MAPX].it) // Remove explosions from destination tile
-				{
-					do_add_light(x, y, -it[in].light[I_A]);
-					it[in].used = 0;
-					map[m].it = 0;
-				}
 				remove_enemy(ch_in[n]);
+				remove_explosion_tile_square(x, y);
 				quick_teleport(ch_in[n], x, y);
 				if (IS_SANECHAR(co = ch[ch_in[n]].data[PCD_COMPANION]) && IS_ALIVEMASTER(co, ch_in[n]))
 				{
@@ -7779,7 +7801,7 @@ int npc_driver_high(int cn)
 			ch[cn].citem = 0;
 		}
 	}
-
+	
 	if ((in = ch[cn].item[39]) && ch[cn].data[47]>0 && ch[cn].data[47]<10)
 	{
 		if (it[in].damage_state || (it[in].flags & IF_SHOPDESTROY) || !(it[in].flags & IF_DONATE))
@@ -7997,13 +8019,13 @@ int npc_driver_high(int cn)
 	}
 	
 	// don't scan if we don't use the information anyway
-	if (!ch[cn].data[41] && !(ch[cn].data[47]>0 && ch[cn].data[47]<10))           return 0;
+	if (!ch[cn].data[41] && (ch[cn].data[47]==0 || ch[cn].data[47]>9))            return 0;
 	
 	// save some work. you need to check here if no other work needs to be done!
 	if (ch[cn].data[41]   && ch[cn].misc_action==DR_USE)                          return 0;
 	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_PICKUP) return 0;
 	if (ch[cn].data[47]>0 && ch[cn].data[47]<10 && ch[cn].misc_action==DR_USE)    return 0;
-
+	
 	if (map[cm].flags & MF_INDOORS) indoor1 = 1;
 	
 	// Janitor ~ Look at nearby objects

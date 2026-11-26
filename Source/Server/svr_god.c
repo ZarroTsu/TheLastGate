@@ -777,10 +777,7 @@ int god_transfer_char(int cn, int x, int y)
 {
 	int ret = 0, j, gc, sc;
 	
-	if (!IS_SANECHAR(cn) || !SANEXY(x, y))
-	{
-		return 0;
-	}
+	if (!IS_SANECHAR(cn) || !SANEXY(x, y)) return 0;
 	
 	gc = ch[cn].data[PCD_COMPANION];
 	sc = ch[cn].data[PCD_SHADOWCOPY];
@@ -792,11 +789,11 @@ int god_transfer_char(int cn, int x, int y)
 	
 	plr_map_remove(cn);
 	
-	if (god_drop_char_fuzzy_large(cn, x, y, x, y)) 		ret = 1;
-	else if (god_drop_char_fuzzy_large(cn, x + 3, y, x, y))	ret = 1;
-	else if (god_drop_char_fuzzy_large(cn, x - 3, y, x, y))	ret = 1;
-	else if (god_drop_char_fuzzy_large(cn, x, y + 3, x, y))	ret = 1;
-	else if (god_drop_char_fuzzy_large(cn, x, y - 3, x, y))	ret = 1;
+	if (god_drop_char_fuzzy_large(cn, x, y, x, y))          ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x + 3, y, x, y)) ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x - 3, y, x, y)) ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x, y + 3, x, y)) ret = 1;
+	else if (god_drop_char_fuzzy_large(cn, x, y - 3, x, y)) ret = 1;
 	
 	if (ret)
 	{
