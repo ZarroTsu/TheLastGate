@@ -6426,7 +6426,7 @@ int use_dw_chest(int cn, int in)
 
 int use_crystal_ball(int cn, int in)
 {	// Fortune Teller crystal ball for showing an item's improved variant.
-	int in2, in3, co, n;
+	int in2, in3, co, n, val=0;
 	
 	if (!cn) return 0;
 	
@@ -6473,6 +6473,49 @@ int use_crystal_ball(int cn, int in)
 		{
 			if (co) do_sayx(co, "I'm sorry %s, but it seems the crystal has no future to tell me right now...", ch[cn].name);
 			if (co) do_sayx(co, "Perhaps you could come back later when you're stronger...? Ee-he-he...");
+		}
+		return 1;
+	}
+	
+	// The held item appears to be money.
+	if ((in2 & 0x80000000))
+	{
+		if ((val = in2 & 0x7fffffff) >= 10000000)
+		{
+			if (co) do_sayx(co, "Very well %s, let me see what my magic can do...", ch[cn].name);
+			
+			god_racechange(cn, ch[cn].temp, 1);
+			ADD_FX_EMAGIC(ch[cn].x, ch[cn].y);
+			
+			do_char_log(cn, 8, " \n");
+			do_char_log(cn, 8, "You feel a nasty spell, far darker than any you've ever encountered, hit you somewhere you can't describe.\n");
+			do_char_log(cn, 8, " \n");
+			do_char_log(cn, 8, "Time seems to slow down. Pain strikes you. It starts between the eyes and grows until it becomes unbearable.\n");
+			do_char_log(cn, 8, " \n");
+			do_char_log(cn, 8, "Finally, all at once, it leaves you. Your limbs feel heavy, but your mind feels much lighter.\n");
+			do_char_log(cn, 8, " \n");
+			do_char_log(cn, 8, "You hope to never have to do that again.\n");
+			do_char_log(cn, 8, " \n");
+			
+			if (co) do_sayx(co, "Take care, you may find yourself a little off-balance... Ee-he-he...");
+			
+			ch[cn].citem = 0;
+		}
+		else 
+		{
+			if (co) do_sayx(co, "My, my, %s... Trying to bribe me, are you...?", ch[cn].name);
+			if (val >= 1000000)
+			{
+				if (co) do_sayx(co, "It will take a bit more than that to pique my interest, my dear... Ee-he-he...");
+			}
+			else if (val >= 100000)
+			{
+				if (co) do_sayx(co, "It will take more than that to pique my interest, my dear... Ee-he-he...");
+			}
+			else
+			{
+				if (co) do_sayx(co, "It will take far more than that to pique my interest, my dear... Ee-he-he...");
+			}
 		}
 		return 1;
 	}
