@@ -5514,7 +5514,7 @@ void skill_shadow(int cn)
 					if (skill_gc_atk(cn, co, cz) && do_get_iflag(cn, SF_SIGN_SHAD))
 					{
 						quick_teleport(co, ch[cz].x, ch[cz].y);
-						ch[cn].attack_cn = cz;
+						ch[co].attack_cn = cz;
 					}
 				}
 			}

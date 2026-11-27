@@ -3616,6 +3616,8 @@ int npc_spell_routine_buffs(int cn, int wake)
 	if (                npc_try_spell(cn, cn, SK_ENHANCE)) return 1;
 	if (                npc_try_spell(cn, cn, SK_BLESS))   return 1;
 	if (war && wc_ch && npc_try_spell(cn, cn, SK_WARCRY))  return 1;
+	
+	return 0;
 }
 
 int npc_spell_routine_debuffs(int cn, int co)
@@ -3726,6 +3728,8 @@ int npc_spell_routine_debuffs(int cn, int co)
 			return 1;
 		}
 	}
+	
+	return 0;
 }
 
 int npc_quaff_potion(int cn, int itemp, int stemp)

@@ -4324,7 +4324,8 @@ void show_map_flags(int cn, int flags[NUM_MAP_POS+NUM_MAP_NEG], int tier)
 void clear_map_buffs(int cn, int flag)
 {
 	int in, n;
-	ch[cn].data[41] = 0;			// Reset active map number
+	if (IS_PLAYER(cn))
+		ch[cn].data[41] = 0;		// Reset active map number
 	for (n = 0; n<MAXBUFFS; n++)	// Remove map buffs/debuffs
 	{
 		if ((in = ch[cn].spell[n])==0)	continue;
