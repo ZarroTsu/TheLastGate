@@ -6480,8 +6480,16 @@ int use_crystal_ball(int cn, int in)
 	// The held item appears to be money.
 	if ((in2 & 0x80000000))
 	{
-		if ((val = in2 & 0x7fffffff) >= 10000000)
+		if ((val = in2 & 0x7fffffff) >= 1000000)
 		{
+			// limit this functionality to lower ranked users to avoid abuse cases
+			if (getrank(cn)>=20 || ch[cn].data[20]>=17) // Knight or on Lab 19
+			{
+				if (co) do_sayx(co, "My, my, %s... You really aren't decisive about yourself, are you...?", ch[cn].name);
+				if (co) do_sayx(co, "Oh, but the gods would be so angry if I did that to you now... Ee-he-he...");
+				return 1;
+			}
+			
 			if (co) do_sayx(co, "Very well %s, let me see what my magic can do...", ch[cn].name);
 			
 			x = ch[cn].x;
@@ -6529,11 +6537,11 @@ int use_crystal_ball(int cn, int in)
 		else 
 		{
 			if (co) do_sayx(co, "My, my, %s... Trying to bribe me, are you...?", ch[cn].name);
-			if (val >= 1000000)
+			if (val >= 100000)
 			{
 				if (co) do_sayx(co, "It will take a bit more than that to pique my interest, my dear... Ee-he-he...");
 			}
-			else if (val >= 100000)
+			else if (val >= 10000)
 			{
 				if (co) do_sayx(co, "It will take more than that to pique my interest, my dear... Ee-he-he...");
 			}
