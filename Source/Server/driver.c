@@ -7825,7 +7825,7 @@ int npc_driver_high(int cn)
 	
 	// generic spell management
 	if (ch[cn].a_mana>MP_PERC(cn,85) && !(ch[cn].flags & CF_MERCHANT))
-		return npc_spell_routine_buffs(cn, 1);
+		npc_spell_routine_buffs(cn, 1);
 	
 	// endurance management
 	if (IS_PLAYER_COMP(cn) && ch[cn].data[1]<2 && IS_SANECHAR(co = ch[cn].data[CHD_MASTER]))
@@ -8001,9 +8001,9 @@ int npc_driver_high(int cn)
 			}
 		}
 		
-		return npc_spell_routine_buffs(cn, 0);
+		npc_spell_routine_buffs(cn, 0);
 		
-		if (co) return npc_spell_routine_debuffs(cn, co);
+		if (co) npc_spell_routine_debuffs(cn, co);
 	}
 	
 	// did we panic?
